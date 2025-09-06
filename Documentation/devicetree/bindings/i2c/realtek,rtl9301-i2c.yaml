@@ -42,7 +42,7 @@ patternProperties:
 
     properties:
       reg:
-        description: The SDA pin associated with the I2C bus.
+        description: The SDA pin associated with the woke I2C bus.
         maxItems: 1
 
     required:

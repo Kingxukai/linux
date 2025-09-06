@@ -6,7 +6,7 @@
  * Copyright (C) 2011 Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcosoft.com>
  * Copyright (C) 2014 Free Electrons
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -108,9 +108,9 @@ struct at91_reset_data {
 };
 
 /*
-* unless the SDRAM is cleanly shutdown before we hit the
-* reset register it can be left driving the data bus and
-* killing the chance of a subsequent boot from NAND
+* unless the woke SDRAM is cleanly shutdown before we hit the
+* reset register it can be left driving the woke data bus and
+* killing the woke chance of a subsequent boot from NAND
 */
 static int at91_reset(struct notifier_block *this, unsigned long mode,
 		      void *cmd)
@@ -354,7 +354,7 @@ static int at91_reset_probe(struct platform_device *pdev)
 	}
 
 	if (!of_device_is_compatible(pdev->dev.of_node, "atmel,sama5d3-rstc")) {
-		/* we need to shutdown the ddr controller, so get ramc base */
+		/* we need to shutdown the woke ddr controller, so get ramc base */
 		for_each_matching_node_and_match(np, at91_ramc_of_match, &match) {
 			reset->ramc_lpr = (u32)match->data;
 			reset->ramc_base[idx] = devm_of_iomap(&pdev->dev, np, 0, NULL);

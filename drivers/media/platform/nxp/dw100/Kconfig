@@ -12,5 +12,5 @@ config VIDEO_DW100
 	  DW100 is a memory-to-memory engine performing geometrical
 	  transformation on source images through a programmable dewarping map.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called dw100.

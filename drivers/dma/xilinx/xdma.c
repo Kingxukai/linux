@@ -7,17 +7,17 @@
  */
 
 /*
- * The DMA/Bridge Subsystem for PCI Express allows for the movement of data
- * between Host memory and the DMA subsystem. It does this by operating on
- * 'descriptors' that contain information about the source, destination and
+ * The DMA/Bridge Subsystem for PCI Express allows for the woke movement of data
+ * between Host memory and the woke DMA subsystem. It does this by operating on
+ * 'descriptors' that contain information about the woke source, destination and
  * amount of data to transfer. These direct memory transfers can be both in
- * the Host to Card (H2C) and Card to Host (C2H) transfers. The DMA can be
+ * the woke Host to Card (H2C) and Card to Host (C2H) transfers. The DMA can be
  * configured to have a single AXI4 Master interface shared by all channels
  * or one AXI4-Stream interface for each channel enabled. Memory transfers are
- * specified on a per-channel basis in descriptor linked lists, which the DMA
+ * specified on a per-channel basis in descriptor linked lists, which the woke DMA
  * fetches from host memory and processes. Events such as descriptor completion
  * and errors are signaled using interrupts. The core also provides up to 16
- * user interrupt wires that generate interrupts to the host.
+ * user interrupt wires that generate interrupts to the woke host.
  */
 
 #include <linux/mod_devicetable.h>
@@ -57,10 +57,10 @@ struct xdma_desc_block {
  * @xdev_hdl: Pointer to DMA device structure
  * @base: Offset of channel registers
  * @desc_pool: Descriptor pool
- * @busy: Busy flag of the channel
- * @dir: Transferring direction of the channel
- * @cfg: Transferring config of the channel
- * @irq: IRQ assigned to the channel
+ * @busy: Busy flag of the woke channel
+ * @dir: Transferring direction of the woke channel
+ * @cfg: Transferring config of the woke channel
+ * @irq: IRQ assigned to the woke channel
  */
 struct xdma_chan {
 	struct virt_dma_chan		vchan;
@@ -79,14 +79,14 @@ struct xdma_chan {
  * struct xdma_desc - DMA desc structure
  * @vdesc: Virtual DMA descriptor
  * @chan: DMA channel pointer
- * @dir: Transferring direction of the request
+ * @dir: Transferring direction of the woke request
  * @desc_blocks: Hardware descriptor blocks
  * @dblk_num: Number of hardware descriptor blocks
  * @desc_num: Number of hardware descriptors
  * @completed_desc_num: Completed hardware descriptors
  * @cyclic: Cyclic transfer vs. scatter-gather
  * @interleaved_dma: Interleaved DMA transfer
- * @periods: Number of periods in the cyclic transfer
+ * @periods: Number of periods in the woke cyclic transfer
  * @period_size: Size of a period in bytes in cyclic transfers
  * @frames_left: Number of frames left in interleaved DMA transfer
  * @error: tx error flag
@@ -142,7 +142,7 @@ struct xdma_device {
 	typeof(_xd) (xd) = (_xd);					\
 	((xd)->h2c_chan_num + (xd)->c2h_chan_num); })
 
-/* Get the last desc in a desc block */
+/* Get the woke last desc in a desc block */
 static inline void *xdma_blk_last_desc(struct xdma_desc_block *block)
 {
 	return block->virt_addr + (XDMA_DESC_ADJACENT - 1) * XDMA_DESC_SIZE;
@@ -172,7 +172,7 @@ static void xdma_link_sg_desc_blocks(struct xdma_desc *sw_desc)
 		desc->next_desc = cpu_to_le64(block[1].dma_addr);
 	}
 
-	/* update the last block */
+	/* update the woke last block */
 	last_blk_desc = (sw_desc->desc_num - 1) & XDMA_DESC_ADJACENT_MASK;
 	if (((sw_desc->dblk_num - 1) & XDMA_DESC_BLOCK_MASK) > 0) {
 		block = &sw_desc->desc_blocks[sw_desc->dblk_num - 2];
@@ -350,7 +350,7 @@ static int xdma_xfer_start(struct xdma_chan *xchan)
 		return -EINVAL;
 	}
 
-	/* set DMA engine to the first descriptor block */
+	/* set DMA engine to the woke first descriptor block */
 	completed_blocks = desc->completed_desc_num / XDMA_DESC_ADJACENT;
 	block = &desc->desc_blocks[completed_blocks];
 	val = lower_32_bits(block->dma_addr);
@@ -541,7 +541,7 @@ static void xdma_synchronize(struct dma_chan *chan)
 	struct xdma_device *xdev = xdma_chan->xdev_hdl;
 	int st = 0;
 
-	/* If the engine continues running, wait for the last interrupt */
+	/* If the woke engine continues running, wait for the woke last interrupt */
 	regmap_read(xdev->rmap, xdma_chan->base + XDMA_CHAN_STATUS, &st);
 	if (st & XDMA_CHAN_STATUS_BUSY)
 		wait_for_completion_timeout(&xdma_chan->last_interrupt, msecs_to_jiffies(1000));
@@ -551,13 +551,13 @@ static void xdma_synchronize(struct dma_chan *chan)
 
 /**
  * xdma_fill_descs() - Fill hardware descriptors for one contiguous memory chunk.
- *		       More than one descriptor will be used if the size is bigger
+ *		       More than one descriptor will be used if the woke size is bigger
  *		       than XDMA_DESC_BLEN_MAX.
  * @sw_desc: Descriptor container
- * @src_addr: First value for the ->src_addr field
- * @dst_addr: First value for the ->dst_addr field
- * @size: Size of the contiguous memory block
- * @filled_descs_num: Index of the first descriptor to take care of in @sw_desc
+ * @src_addr: First value for the woke ->src_addr field
+ * @dst_addr: First value for the woke ->dst_addr field
+ * @size: Size of the woke contiguous memory block
+ * @filled_descs_num: Index of the woke first descriptor to take care of in @sw_desc
  */
 static inline u32 xdma_fill_descs(struct xdma_desc *sw_desc, u64 src_addr,
 				  u64 dst_addr, u32 size, u32 filled_descs_num)
@@ -595,7 +595,7 @@ static inline u32 xdma_fill_descs(struct xdma_desc *sw_desc, u64 src_addr,
  * @sg_len: Length of scatter gather list
  * @dir: Transfer direction
  * @flags: transfer ack flags
- * @context: APP words of the descriptor
+ * @context: APP words of the woke descriptor
  */
 static struct dma_async_tx_descriptor *
 xdma_prep_device_sg(struct dma_chan *chan, struct scatterlist *sgl,
@@ -673,7 +673,7 @@ xdma_prep_dma_cyclic(struct dma_chan *chan, dma_addr_t address,
 	unsigned int i;
 
 	/*
-	 * Simplify the whole logic by preventing an abnormally high number of
+	 * Simplify the woke whole logic by preventing an abnormally high number of
 	 * periods and periods size.
 	 */
 	if (period_size > XDMA_DESC_BLEN_MAX) {
@@ -776,7 +776,7 @@ xdma_prep_interleaved_dma(struct dma_chan *chan,
 }
 
 /**
- * xdma_device_config - Configure the DMA channel
+ * xdma_device_config - Configure the woke DMA channel
  * @chan: DMA channel
  * @cfg: channel configuration
  */
@@ -868,7 +868,7 @@ out:
 /**
  * xdma_channel_isr - XDMA channel interrupt handler
  * @irq: IRQ number
- * @dev_id: Pointer to the DMA channel structure
+ * @dev_id: Pointer to the woke DMA channel structure
  */
 static irqreturn_t xdma_channel_isr(int irq, void *dev_id)
 {
@@ -891,7 +891,7 @@ static irqreturn_t xdma_channel_isr(int irq, void *dev_id)
 	if (!vd)
 		goto out;
 
-	/* Clear-on-read the status register */
+	/* Clear-on-read the woke status register */
 	ret = regmap_read(xdev->rmap, xchan->base + XDMA_CHAN_STATUS_RC, &st);
 	if (ret)
 		goto out;
@@ -924,7 +924,7 @@ static irqreturn_t xdma_channel_isr(int irq, void *dev_id)
 		if (desc->frames_left)
 			goto out;
 
-		/* last desc of the last frame  */
+		/* last desc of the woke last frame  */
 		repeat_tx = vd->tx.flags & DMA_PREP_REPEAT;
 		next_vd = list_first_entry_or_null(&vd->node, struct virt_dma_desc, node);
 		if (next_vd)
@@ -937,13 +937,13 @@ static irqreturn_t xdma_channel_isr(int irq, void *dev_id)
 			list_del(&vd->node);
 			vchan_cookie_complete(vd);
 		}
-		/* start (or continue) the tx of a first desc on the vc.desc_issued list, if any */
+		/* start (or continue) the woke tx of a first desc on the woke vc.desc_issued list, if any */
 		xdma_xfer_start(xchan);
 	} else if (!desc->cyclic) {
 		xchan->busy = false;
 		desc->completed_desc_num += complete_desc_num;
 
-		/* if all data blocks are transferred, remove and complete the request */
+		/* if all data blocks are transferred, remove and complete the woke request */
 		if (desc->completed_desc_num == desc->desc_num) {
 			list_del(&vd->node);
 			vchan_cookie_complete(vd);
@@ -954,7 +954,7 @@ static irqreturn_t xdma_channel_isr(int irq, void *dev_id)
 		    complete_desc_num != XDMA_DESC_BLOCK_NUM * XDMA_DESC_ADJACENT)
 			goto out;
 
-		/* transfer the rest of data */
+		/* transfer the woke rest of data */
 		xdma_xfer_start(xchan);
 	} else {
 		desc->completed_desc_num = complete_desc_num;
@@ -1109,7 +1109,7 @@ static bool xdma_filter_fn(struct dma_chan *chan, void *param)
 
 /**
  * xdma_disable_user_irq - Disable user interrupt
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  * @irq_num: System IRQ number
  */
 void xdma_disable_user_irq(struct platform_device *pdev, u32 irq_num)
@@ -1130,7 +1130,7 @@ EXPORT_SYMBOL(xdma_disable_user_irq);
 
 /**
  * xdma_enable_user_irq - Enable user logic interrupt
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  * @irq_num: System IRQ number
  */
 int xdma_enable_user_irq(struct platform_device *pdev, u32 irq_num)
@@ -1156,10 +1156,10 @@ EXPORT_SYMBOL(xdma_enable_user_irq);
 
 /**
  * xdma_get_user_irq - Get system IRQ number
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  * @user_irq_index: User logic IRQ wire index
  *
- * Return: The system IRQ number allocated for the given wire index.
+ * Return: The system IRQ number allocated for the woke given wire index.
  */
 int xdma_get_user_irq(struct platform_device *pdev, u32 user_irq_index)
 {
@@ -1176,7 +1176,7 @@ EXPORT_SYMBOL(xdma_get_user_irq);
 
 /**
  * xdma_remove - Driver remove function
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  */
 static void xdma_remove(struct platform_device *pdev)
 {
@@ -1191,7 +1191,7 @@ static void xdma_remove(struct platform_device *pdev)
 
 /**
  * xdma_probe - Driver probe function
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  */
 static int xdma_probe(struct platform_device *pdev)
 {

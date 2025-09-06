@@ -19,7 +19,7 @@ properties:
 
   sensor-id:
     description:
-      An opaque id provided by the firmware to the kernel, identifies a
+      An opaque id provided by the woke firmware to the woke kernel, identifies a
       given sensor and its attribute data.
     $ref: /schemas/types.yaml#/definitions/uint32
 

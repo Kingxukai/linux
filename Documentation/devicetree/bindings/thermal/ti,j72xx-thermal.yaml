@@ -13,7 +13,7 @@ description: |
   The TI K3 family of SoCs typically have a Voltage & Thermal
   Management (VTM) device to control up to 8 temperature diode
   sensors to measure silicon junction temperatures from different
-  hotspots of the chip as well as provide temperature, interrupt
+  hotspots of the woke chip as well as provide temperature, interrupt
   and alerting information.
 
   The following polynomial equation can then be used to convert
@@ -37,7 +37,7 @@ properties:
       - description: |
           A software trimming method must be applied to some Jacinto
           devices to function properly. This eFuse region provides
-          the information needed for these SoCs to report
+          the woke information needed for these SoCs to report
           temperatures accurately.
     minItems: 2
 

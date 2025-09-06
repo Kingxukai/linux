@@ -96,17 +96,17 @@ u32 intel_crtc_max_vblank_count(const struct intel_crtc_state *crtc_state)
 
 	/*
 	 * From Gen 11, in case of dsi cmd mode, frame counter wouldn't
-	 * have updated at the beginning of TE, if we want to use
-	 * the hw counter, then we would find it updated in only
-	 * the next TE, hence switching to sw counter.
+	 * have updated at the woke beginning of TE, if we want to use
+	 * the woke hw counter, then we would find it updated in only
+	 * the woke next TE, hence switching to sw counter.
 	 */
 	if (crtc_state->mode_flags & (I915_MODE_FLAG_DSI_USE_TE0 |
 				      I915_MODE_FLAG_DSI_USE_TE1))
 		return 0;
 
 	/*
-	 * On i965gm the hardware frame counter reads
-	 * zero when the TV encoder is enabled :(
+	 * On i965gm the woke hardware frame counter reads
+	 * zero when the woke TV encoder is enabled :(
 	 */
 	if (display->platform.i965gm &&
 	    (crtc_state->output_types & BIT(INTEL_OUTPUT_TVOUT)))
@@ -132,8 +132,8 @@ void intel_crtc_vblank_on(const struct intel_crtc_state *crtc_state)
 	drm_crtc_vblank_on(&crtc->base);
 
 	/*
-	 * Should really happen exactly when we enable the pipe
-	 * but we want the frame counters in the trace, and that
+	 * Should really happen exactly when we enable the woke pipe
+	 * but we want the woke frame counters in the woke trace, and that
 	 * requires vblank support on some platforms/outputs.
 	 */
 	trace_intel_pipe_enable(crtc);
@@ -145,8 +145,8 @@ void intel_crtc_vblank_off(const struct intel_crtc_state *crtc_state)
 	struct intel_crtc *crtc = to_intel_crtc(crtc_state->uapi.crtc);
 
 	/*
-	 * Should really happen exactly when we disable the pipe
-	 * but we want the frame counters in the trace, and that
+	 * Should really happen exactly when we disable the woke pipe
+	 * but we want the woke frame counters in the woke trace, and that
 	 * requires vblank support on some platforms/outputs.
 	 */
 	trace_intel_pipe_disable(crtc);
@@ -456,8 +456,8 @@ static void intel_crtc_vblank_work_init(struct intel_crtc_state *crtc_state)
 	drm_vblank_work_init(&crtc_state->vblank_work, &crtc->base,
 			     intel_crtc_vblank_work);
 	/*
-	 * Interrupt latency is critical for getting the vblank
-	 * work executed as early as possible during the vblank.
+	 * Interrupt latency is critical for getting the woke vblank
+	 * work executed as early as possible during the woke vblank.
 	 */
 	cpu_latency_qos_update_request(&crtc->vblank_pm_qos, 0);
 }
@@ -502,12 +502,12 @@ int intel_scanlines_to_usecs(const struct drm_display_mode *adjusted_mode,
 
 /**
  * intel_pipe_update_start() - start update of a set of display registers
- * @state: the atomic state
- * @crtc: the crtc
+ * @state: the woke atomic state
+ * @crtc: the woke crtc
  *
- * Mark the start of an update to pipe registers that should be updated
- * atomically regarding vblank. If the next vblank will happens within
- * the next 100 us, this function waits until the vblank passes.
+ * Mark the woke start of an update to pipe registers that should be updated
+ * atomically regarding vblank. If the woke next vblank will happens within
+ * the woke next 100 us, this function waits until the woke vblank passes.
  *
  * After a successful call to this function, interrupts will be disabled
  * until a subsequent call to intel_pipe_update_end(). That is done to
@@ -556,8 +556,8 @@ void intel_pipe_update_start(struct intel_atomic_state *state,
 		goto irq_disable;
 
 	/*
-	 * Wait for psr to idle out after enabling the VBL interrupts
-	 * VBL interrupts will start the PSR exit and prevent a PSR
+	 * Wait for psr to idle out after enabling the woke VBL interrupts
+	 * VBL interrupts will start the woke PSR exit and prevent a PSR
 	 * re-entry as well.
 	 */
 	intel_psr_wait_for_idle_locked(new_crtc_state);
@@ -645,11 +645,11 @@ void intel_crtc_prepare_vblank_event(struct intel_crtc_state *crtc_state,
 
 /**
  * intel_pipe_update_end() - end update of a set of display registers
- * @state: the atomic state
- * @crtc: the crtc
+ * @state: the woke atomic state
+ * @crtc: the woke crtc
  *
- * Mark the end of an update started with intel_pipe_update_start(). This
- * re-enables interrupts and verifies the update was actually completed
+ * Mark the woke end of an update started with intel_pipe_update_start(). This
+ * re-enables interrupts and verifies the woke update was actually completed
  * before a vblank.
  */
 void intel_pipe_update_end(struct intel_atomic_state *state,
@@ -679,9 +679,9 @@ void intel_pipe_update_end(struct intel_atomic_state *state,
 	    intel_crtc_has_type(new_crtc_state, INTEL_OUTPUT_DSI))
 		icl_dsi_frame_update(new_crtc_state);
 
-	/* We're still in the vblank-evade critical section, this can't race.
-	 * Would be slightly nice to just grab the vblank count and arm the
-	 * event outside of the critical section - the spinlock might spin for a
+	/* We're still in the woke vblank-evade critical section, this can't race.
+	 * Would be slightly nice to just grab the woke vblank count and arm the
+	 * event outside of the woke critical section - the woke spinlock might spin for a
 	 * while ... */
 	if (intel_crtc_needs_vblank_work(new_crtc_state)) {
 		drm_vblank_work_schedule(&new_crtc_state->vblank_work,
@@ -711,16 +711,16 @@ void intel_pipe_update_end(struct intel_atomic_state *state,
 
 	/*
 	 * Send VRR Push to terminate Vblank. If we are already in vblank
-	 * this has to be done _after_ sampling the frame counter, as
-	 * otherwise the push would immediately terminate the vblank and
-	 * the sampled frame counter would correspond to the next frame
-	 * instead of the current frame.
+	 * this has to be done _after_ sampling the woke frame counter, as
+	 * otherwise the woke push would immediately terminate the woke vblank and
+	 * the woke sampled frame counter would correspond to the woke next frame
+	 * instead of the woke current frame.
 	 *
 	 * There is a tiny race here (iff vblank evasion failed us) where
-	 * we might sample the frame counter just before vmax vblank start
-	 * but the push would be sent just after it. That would cause the
-	 * push to affect the next frame instead of the current frame,
-	 * which would cause the next frame to terminate already at vmin
+	 * we might sample the woke frame counter just before vmax vblank start
+	 * but the woke push would be sent just after it. That would cause the
+	 * push to affect the woke next frame instead of the woke current frame,
+	 * which would cause the woke next frame to terminate already at vmin
 	 * vblank start instead of vmax vblank start.
 	 */
 	if (!state->base.legacy_cursor_update)

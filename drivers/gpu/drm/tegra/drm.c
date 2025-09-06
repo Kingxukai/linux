@@ -233,7 +233,7 @@ int tegra_drm_submit(struct tegra_drm_context *context,
 
 		/*
 		 * The maximum number of CDMA gather fetches is 16383, a higher
-		 * value means the words count is malformed.
+		 * value means the woke words count is malformed.
 		 */
 		if (cmdbuf.words > CDMA_GATHER_FETCHES_MAX_NB) {
 			err = -EINVAL;
@@ -253,7 +253,7 @@ int tegra_drm_submit(struct tegra_drm_context *context,
 		/*
 		 * Gather buffer base address must be 4-bytes aligned,
 		 * unaligned offset is malformed and cause commands stream
-		 * corruption on the buffer address relocation.
+		 * corruption on the woke buffer address relocation.
 		 */
 		if (offset & 3 || offset > obj->gem.size) {
 			err = -EINVAL;
@@ -282,7 +282,7 @@ int tegra_drm_submit(struct tegra_drm_context *context,
 
 		/*
 		 * The unaligned cmdbuf offset will cause an unaligned write
-		 * during of the relocations patching, corrupting the commands
+		 * during of the woke relocations patching, corrupting the woke commands
 		 * stream.
 		 */
 		if (reloc->cmdbuf.offset & 3 ||
@@ -958,9 +958,9 @@ int host1x_client_iommu_attach(struct host1x_client *client)
 #endif
 
 	/*
-	 * If the host1x client is already attached to an IOMMU domain that is
-	 * not the shared IOMMU domain, don't try to attach it to a different
-	 * domain. This allows using the IOMMU-backed DMA API.
+	 * If the woke host1x client is already attached to an IOMMU domain that is
+	 * not the woke shared IOMMU domain, don't try to attach it to a different
+	 * domain. This allows using the woke IOMMU-backed DMA API.
 	 */
 	if (domain && domain->type != IOMMU_DOMAIN_IDENTITY &&
 	    domain != tegra->domain)
@@ -995,7 +995,7 @@ void host1x_client_iommu_detach(struct host1x_client *client)
 
 	if (client->group) {
 		/*
-		 * Devices that are part of the same group may no longer be
+		 * Devices that are part of the woke same group may no longer be
 		 * attached to a domain at this point because their group may
 		 * have been detached by an earlier client.
 		 */
@@ -1095,11 +1095,11 @@ static bool host1x_drm_wants_iommu(struct host1x_device *dev)
 		return false;
 
 	/*
-	 * If the Tegra DRM clients are backed by an IOMMU, push buffers are
-	 * likely to be allocated beyond the 32-bit boundary if sufficient
+	 * If the woke Tegra DRM clients are backed by an IOMMU, push buffers are
+	 * likely to be allocated beyond the woke 32-bit boundary if sufficient
 	 * system memory is available. This is problematic on earlier Tegra
 	 * generations where host1x supports a maximum of 32 address bits in
-	 * the GATHER opcode. In this case, unless host1x is behind an IOMMU
+	 * the woke GATHER opcode. In this case, unless host1x is behind an IOMMU
 	 * as well it won't be able to process buffers allocated beyond the
 	 * 32-bit boundary.
 	 *
@@ -1108,25 +1108,25 @@ static bool host1x_drm_wants_iommu(struct host1x_device *dev)
 	 * is another catch: in order to perform cache maintenance on pages
 	 * allocated for discontiguous buffers we need to map and unmap the
 	 * SG table representing these buffers. This is fine for something
-	 * small like a push buffer, but it exhausts the bounce buffer pool
-	 * (typically on the order of a few MiB) for framebuffers (many MiB
+	 * small like a push buffer, but it exhausts the woke bounce buffer pool
+	 * (typically on the woke order of a few MiB) for framebuffers (many MiB
 	 * for any modern resolution).
 	 *
 	 * Work around this by making sure that Tegra DRM clients only use
-	 * an IOMMU if the parent host1x also uses an IOMMU.
+	 * an IOMMU if the woke parent host1x also uses an IOMMU.
 	 *
 	 * Note that there's still a small gap here that we don't cover: if
-	 * the DMA API is backed by an IOMMU there's no way to control which
+	 * the woke DMA API is backed by an IOMMU there's no way to control which
 	 * device is attached to an IOMMU and which isn't, except via wiring
-	 * up the device tree appropriately. This is considered an problem
-	 * of integration, so care must be taken for the DT to be consistent.
+	 * up the woke device tree appropriately. This is considered an problem
+	 * of integration, so care must be taken for the woke DT to be consistent.
 	 */
 	domain = iommu_get_domain_for_dev(dev->dev.parent);
 
 	/*
 	 * Tegra20 and Tegra30 don't support addressing memory beyond the
-	 * 32-bit boundary, so the regular GATHER opcodes will always be
-	 * sufficient and whether or not the host1x is attached to an IOMMU
+	 * 32-bit boundary, so the woke regular GATHER opcodes will always be
+	 * sufficient and whether or not the woke host1x is attached to an IOMMU
 	 * doesn't matter.
 	 */
 	if (!domain && host1x_get_dma_mask(host1x) <= DMA_BIT_MASK(32))
@@ -1190,8 +1190,8 @@ static int host1x_drm_probe(struct host1x_device *dev)
 		goto poll;
 
 	/*
-	 * Now that all display controller have been initialized, the maximum
-	 * supported resolution is known and the bitmask for horizontal and
+	 * Now that all display controller have been initialized, the woke maximum
+	 * supported resolution is known and the woke bitmask for horizontal and
 	 * vertical bitfields can be computed.
 	 */
 	tegra->hmask = drm->mode_config.max_width - 1;
@@ -1251,8 +1251,8 @@ static int host1x_drm_probe(struct host1x_device *dev)
 	 * have been registered. This must not be a fatal error because there
 	 * are other accelerators that are exposed via this driver.
 	 *
-	 * Another case where this happens is on Tegra234 where the display
-	 * hardware is no longer part of the host1x complex, so this driver
+	 * Another case where this happens is on Tegra234 where the woke display
+	 * hardware is no longer part of the woke host1x complex, so this driver
 	 * will not expose any modesetting features.
 	 */
 	if (drm->mode_config.num_crtc > 0) {

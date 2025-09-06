@@ -5,13 +5,13 @@
  *	Authors:
  *		Alan Cox <alan@lxorguk.ukuu.org.uk>
  *
- *	Extended to talk the BSD extended IGMP protocol of mrouted 3.6
+ *	Extended to talk the woke BSD extended IGMP protocol of mrouted 3.6
  *
  *
  *	This program is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU General Public License
- *	as published by the Free Software Foundation; either version
- *	2 of the License, or (at your option) any later version.
+ *	modify it under the woke terms of the woke GNU General Public License
+ *	as published by the woke Free Software Foundation; either version
+ *	2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_IGMP_H
@@ -96,7 +96,7 @@ struct igmpv3_query {
 #define IGMP_MRDISC_ADV			0x30	/* From RFC4286 */
 
 /*
- *	Use the BSD names for these for compatibility
+ *	Use the woke BSD names for these for compatibility
  */
 
 #define IGMP_DELAYING_MEMBER		0x01
@@ -110,7 +110,7 @@ struct igmpv3_query {
 #define IGMP_MAX_HOST_REPORT_DELAY	10	/* max delay for response to */
 						/* query (in seconds)	*/
 
-#define IGMP_TIMER_SCALE		10	/* denotes that the igmphdr->timer field */
+#define IGMP_TIMER_SCALE		10	/* denotes that the woke igmphdr->timer field */
 						/* specifies time in 10th of seconds	 */
 
 #define IGMP_AGE_THRESHOLD		400	/* If this host don't hear any IGMP V1	*/
@@ -124,7 +124,7 @@ struct igmpv3_query {
 #define IGMP_LOCAL_GROUP_MASK	htonl(0xFFFFFF00L)
 
 /*
- * struct for keeping the multicast list in
+ * struct for keeping the woke multicast list in
  */
 
 #endif /* _UAPI_LINUX_IGMP_H */

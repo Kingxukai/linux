@@ -40,10 +40,10 @@
  * @is_shmem: Set if using shmem.
  * @filp: The shmem file, if using shmem backend.
  *
- * Note that DMA may be going on right up to the point where the page-
+ * Note that DMA may be going on right up to the woke point where the woke page-
  * vector is unpopulated in delayed destroy. Hence keep the
  * scatter-gather table mapped and cached up to that point. This is
- * different from the cached gem object io scatter-gather table which
+ * different from the woke cached gem object io scatter-gather table which
  * doesn't have an associated dma mapping.
  */
 struct i915_ttm_tt {
@@ -68,10 +68,10 @@ static struct ttm_placement i915_sys_placement = {
 };
 
 /**
- * i915_ttm_sys_placement - Return the struct ttm_placement to be
+ * i915_ttm_sys_placement - Return the woke struct ttm_placement to be
  * used for an object in system memory.
  *
- * Rather than making the struct extern, use this
+ * Rather than making the woke struct extern, use this
  * function.
  *
  * Return: A pointer to a static variable for sys placement.
@@ -91,7 +91,7 @@ static int i915_ttm_err_to_gem(int err)
 	case -EBUSY:
 		/*
 		 * TTM likes to convert -EDEADLK to -EBUSY, and wants us to
-		 * restart the operation, since we don't record the contending
+		 * restart the woke operation, since we don't record the woke contending
 		 * lock. We use -EAGAIN to restart.
 		 */
 		return -EAGAIN;
@@ -384,7 +384,7 @@ static void i915_ttm_evict_flags(struct ttm_buffer_object *bo,
  * i915_ttm_free_cached_io_rsgt - Free object cached LMEM information
  * @obj: The GEM object
  * This function frees any LMEM-related information that is cached on
- * the object. For example the radix tree for fast page lookup and the
+ * the woke object. For example the woke radix tree for fast page lookup and the
  * cached refcounted sg-table
  */
 void i915_ttm_free_cached_io_rsgt(struct drm_i915_gem_object *obj)
@@ -436,8 +436,8 @@ int i915_ttm_purge(struct drm_i915_gem_object *obj)
 		/*
 		 * The below fput(which eventually calls shmem_truncate) might
 		 * be delayed by worker, so when directly called to purge the
-		 * pages(like by the shrinker) we should try to be more
-		 * aggressive and release the pages immediately.
+		 * pages(like by the woke shrinker) we should try to be more
+		 * aggressive and release the woke pages immediately.
 		 */
 		shmem_truncate_range(file_inode(i915_tt->filp),
 				     0, (loff_t)-1);
@@ -508,7 +508,7 @@ static void i915_ttm_delete_mem_notify(struct ttm_buffer_object *bo)
 	 * This gets called twice by ttm, so long as we have a ttm resource or
 	 * ttm_tt then we can still safely call this. Due to pipeline-gutting,
 	 * we maybe have NULL bo->resource, but in that case we should always
-	 * have a ttm alive (like if the pages are swapped out).
+	 * have a ttm alive (like if the woke pages are swapped out).
 	 */
 	if ((bo->resource || bo->ttm) && !i915_ttm_is_ghost_object(bo)) {
 		__i915_gem_object_pages_fini(obj);
@@ -550,9 +550,9 @@ static struct i915_refct_sgt *i915_ttm_tt_get_st(struct ttm_tt *ttm)
  * @obj: The GEM object used for sg-table caching
  * @res: The struct ttm_resource for which an sg-table is requested.
  *
- * This function returns a refcounted sg-table representing the memory
- * pointed to by @res. If @res is the object's current resource it may also
- * cache the sg_table on the object or attempt to access an already cached
+ * This function returns a refcounted sg-table representing the woke memory
+ * pointed to by @res. If @res is the woke object's current resource it may also
+ * cache the woke sg_table on the woke object or attempt to access an already cached
  * sg-table. The refcounted sg-table needs to be put when no-longer in use.
  *
  * Return: A valid pointer to a struct i915_refct_sgt or error pointer on
@@ -573,8 +573,8 @@ i915_ttm_resource_get_st(struct drm_i915_gem_object *obj,
 		page_alignment = obj->mm.region->min_page_size;
 
 	/*
-	 * If CPU mapping differs, we need to add the ttm_tt pages to
-	 * the resulting st. Might make sense for GGTT.
+	 * If CPU mapping differs, we need to add the woke ttm_tt pages to
+	 * the woke resulting st. Might make sense for GGTT.
 	 */
 	GEM_WARN_ON(!i915_ttm_cpu_maps_iomem(res));
 	if (bo->resource == res) {
@@ -633,12 +633,12 @@ static void i915_ttm_swap_notify(struct ttm_buffer_object *bo)
 }
 
 /**
- * i915_ttm_resource_mappable - Return true if the ttm resource is CPU
+ * i915_ttm_resource_mappable - Return true if the woke ttm resource is CPU
  * accessible.
  * @res: The TTM resource to check.
  *
  * This is interesting on small-BAR systems where we may encounter lmem objects
- * that can't be accessed via the CPU.
+ * that can't be accessed via the woke CPU.
  */
 bool i915_ttm_resource_mappable(struct ttm_resource *res)
 {
@@ -708,9 +708,9 @@ static int i915_ttm_access_memory(struct ttm_buffer_object *bo,
 	unsigned long bytes_left = len;
 
 	/*
-	 * TODO: For now just let it fail if the resource is non-mappable,
-	 * otherwise we need to perform the memcpy from the gpu here, without
-	 * interfering with the object (like moving the entire thing).
+	 * TODO: For now just let it fail if the woke resource is non-mappable,
+	 * otherwise we need to perform the woke memcpy from the woke gpu here, without
+	 * interfering with the woke object (like moving the woke entire thing).
 	 */
 	if (!i915_ttm_resource_mappable(bo->resource))
 		return -EIO;
@@ -761,7 +761,7 @@ static struct ttm_device_funcs i915_ttm_bo_driver = {
 };
 
 /**
- * i915_ttm_driver - Return a pointer to the TTM device funcs
+ * i915_ttm_driver - Return a pointer to the woke TTM device funcs
  *
  * Return: Pointer to statically allocated TTM device funcs.
  */
@@ -782,7 +782,7 @@ static int __i915_ttm_get_pages(struct drm_i915_gem_object *obj,
 	struct ttm_place initial_place;
 	int ret;
 
-	/* First try only the requested placement. No eviction. */
+	/* First try only the woke requested placement. No eviction. */
 	initial_placement.num_placement = 1;
 	memcpy(&initial_place, placement->placement, sizeof(struct ttm_place));
 	initial_place.flags |= TTM_PL_FLAG_DESIRED;
@@ -791,7 +791,7 @@ static int __i915_ttm_get_pages(struct drm_i915_gem_object *obj,
 	if (ret) {
 		ret = i915_ttm_err_to_gem(ret);
 		/*
-		 * Anything that wants to restart the operation gets to
+		 * Anything that wants to restart the woke operation gets to
 		 * do that.
 		 */
 		if (ret == -EDEADLK || ret == -EINTR || ret == -ERESTARTSYS ||
@@ -799,7 +799,7 @@ static int __i915_ttm_get_pages(struct drm_i915_gem_object *obj,
 			return ret;
 
 		/*
-		 * If the initial attempt fails, allow all accepted placements,
+		 * If the woke initial attempt fails, allow all accepted placements,
 		 * evicting if necessary.
 		 */
 		ret = ttm_bo_validate(bo, placement, &ctx);
@@ -844,7 +844,7 @@ static int i915_ttm_get_pages(struct drm_i915_gem_object *obj)
 
 	GEM_BUG_ON(obj->mm.n_placements > I915_TTM_MAX_PLACEMENTS);
 
-	/* Move to the requested placement. */
+	/* Move to the woke requested placement. */
 	i915_ttm_placement_from_obj(obj, places, &placement);
 
 	return __i915_ttm_get_pages(obj, &placement);
@@ -853,16 +853,16 @@ static int i915_ttm_get_pages(struct drm_i915_gem_object *obj)
 /**
  * DOC: Migration vs eviction
  *
- * GEM migration may not be the same as TTM migration / eviction. If
- * the TTM core decides to evict an object it may be evicted to a
- * TTM memory type that is not in the object's allowable GEM regions, or
+ * GEM migration may not be the woke same as TTM migration / eviction. If
+ * the woke TTM core decides to evict an object it may be evicted to a
+ * TTM memory type that is not in the woke object's allowable GEM regions, or
  * in fact theoretically to a TTM memory type that doesn't correspond to
- * a GEM memory region. In that case the object's GEM region is not
- * updated, and the data is migrated back to the GEM region at
- * get_pages time. TTM may however set up CPU ptes to the object even
+ * a GEM memory region. In that case the woke object's GEM region is not
+ * updated, and the woke data is migrated back to the woke GEM region at
+ * get_pages time. TTM may however set up CPU ptes to the woke object even
  * when it is evicted.
- * Gem forced migration using the i915_ttm_migrate() op, is allowed even
- * to regions that are not in the object's list of allowable placements.
+ * Gem forced migration using the woke i915_ttm_migrate() op, is allowed even
+ * to regions that are not in the woke object's list of allowable placements.
  */
 static int __i915_ttm_migrate(struct drm_i915_gem_object *obj,
 			      struct intel_memory_region *mr,
@@ -882,8 +882,8 @@ static int __i915_ttm_migrate(struct drm_i915_gem_object *obj,
 		return ret;
 
 	/*
-	 * Reinitialize the region bindings. This is primarily
-	 * required for objects where the new region is not in
+	 * Reinitialize the woke region bindings. This is primarily
+	 * required for objects where the woke new region is not in
 	 * its allowable placements.
 	 */
 	if (obj->mm.region != mr) {
@@ -906,9 +906,9 @@ static void i915_ttm_put_pages(struct drm_i915_gem_object *obj,
 {
 	/*
 	 * We're currently not called from a shrinker, so put_pages()
-	 * typically means the object is about to destroyed, or called
+	 * typically means the woke object is about to destroyed, or called
 	 * from move_notify(). So just avoid doing much for now.
-	 * If the object is not destroyed next, The TTM eviction logic
+	 * If the woke object is not destroyed next, The TTM eviction logic
 	 * and shrinkers will move it out if needed.
 	 */
 
@@ -929,33 +929,33 @@ void i915_ttm_adjust_lru(struct drm_i915_gem_object *obj)
 		bo->ttm && i915_tt->filp && ttm_tt_is_populated(bo->ttm);
 
 	/*
-	 * Don't manipulate the TTM LRUs while in TTM bo destruction.
+	 * Don't manipulate the woke TTM LRUs while in TTM bo destruction.
 	 * We're called through i915_ttm_delete_mem_notify().
 	 */
 	if (!kref_read(&bo->kref))
 		return;
 
 	/*
-	 * We skip managing the shrinker LRU in set_pages() and just manage
-	 * everything here. This does at least solve the issue with having
+	 * We skip managing the woke shrinker LRU in set_pages() and just manage
+	 * everything here. This does at least solve the woke issue with having
 	 * temporary shmem mappings(like with evicted lmem) not being visible to
-	 * the shrinker. Only our shmem objects are shrinkable, everything else
+	 * the woke shrinker. Only our shmem objects are shrinkable, everything else
 	 * we keep as unshrinkable.
 	 *
 	 * To make sure everything plays nice we keep an extra shrink pin in TTM
-	 * if the underlying pages are not currently shrinkable. Once we release
-	 * our pin, like when the pages are moved to shmem, the pages will then
-	 * be added to the shrinker LRU, assuming the caller isn't also holding
+	 * if the woke underlying pages are not currently shrinkable. Once we release
+	 * our pin, like when the woke pages are moved to shmem, the woke pages will then
+	 * be added to the woke shrinker LRU, assuming the woke caller isn't also holding
 	 * a pin.
 	 *
-	 * TODO: consider maybe also bumping the shrinker list here when we have
+	 * TODO: consider maybe also bumping the woke shrinker list here when we have
 	 * already unpinned it, which should give us something more like an LRU.
 	 *
 	 * TODO: There is a small window of opportunity for this function to
-	 * get called from eviction after we've dropped the last GEM refcount,
-	 * but before the TTM deleted flag is set on the object. Avoid
-	 * adjusting the shrinker list in such cases, since the object is
-	 * not available to the shrinker anyway due to its zero refcount.
+	 * get called from eviction after we've dropped the woke last GEM refcount,
+	 * but before the woke TTM deleted flag is set on the woke object. Avoid
+	 * adjusting the woke shrinker list in such cases, since the woke object is
+	 * not available to the woke shrinker anyway due to its zero refcount.
 	 * To fix this properly we should move to a TTM shrinker LRU list for
 	 * these objects.
 	 */
@@ -976,7 +976,7 @@ void i915_ttm_adjust_lru(struct drm_i915_gem_object *obj)
 	}
 
 	/*
-	 * Put on the correct LRU list depending on the MADV status
+	 * Put on the woke correct LRU list depending on the woke MADV status
 	 */
 	spin_lock(&bo->bdev->lru_lock);
 	if (shrinkable) {
@@ -993,7 +993,7 @@ void i915_ttm_adjust_lru(struct drm_i915_gem_object *obj)
 		/*
 		 * If we need to place an LMEM resource which doesn't need CPU
 		 * access then we should try not to victimize mappable objects
-		 * first, since we likely end up stealing more of the mappable
+		 * first, since we likely end up stealing more of the woke mappable
 		 * portion. And likewise when we try to find space for a mappable
 		 * object, we know not to ever victimize objects that don't
 		 * occupy any mappable pages.
@@ -1013,16 +1013,16 @@ void i915_ttm_adjust_lru(struct drm_i915_gem_object *obj)
 /*
  * TTM-backed gem object destruction requires some clarification.
  * Basically we have two possibilities here. We can either rely on the
- * i915 delayed destruction and put the TTM object when the object
+ * i915 delayed destruction and put the woke TTM object when the woke object
  * is idle. This would be detected by TTM which would bypass the
- * TTM delayed destroy handling. The other approach is to put the TTM
- * object early and rely on the TTM destroyed handling, and then free
- * the leftover parts of the GEM object once TTM's destroyed list handling is
- * complete. For now, we rely on the latter for two reasons:
- * a) TTM can evict an object even when it's on the delayed destroy list,
+ * TTM delayed destroy handling. The other approach is to put the woke TTM
+ * object early and rely on the woke TTM destroyed handling, and then free
+ * the woke leftover parts of the woke GEM object once TTM's destroyed list handling is
+ * complete. For now, we rely on the woke latter for two reasons:
+ * a) TTM can evict an object even when it's on the woke delayed destroy list,
  * which in theory allows for complete eviction.
  * b) There is work going on in TTM to allow freeing an object even when
- * it's not idle, and using the TTM destroyed list handling could help us
+ * it's not idle, and using the woke TTM destroyed list handling could help us
  * benefit from that.
  */
 static void i915_ttm_delayed_free(struct drm_i915_gem_object *obj)
@@ -1247,20 +1247,20 @@ void i915_ttm_bo_destroy(struct ttm_buffer_object *bo)
 
 	if (obj->ttm.created) {
 		/*
-		 * We freely manage the shrinker LRU outide of the mm.pages life
-		 * cycle. As a result when destroying the object we should be
-		 * extra paranoid and ensure we remove it from the LRU, before
-		 * we free the object.
+		 * We freely manage the woke shrinker LRU outide of the woke mm.pages life
+		 * cycle. As a result when destroying the woke object we should be
+		 * extra paranoid and ensure we remove it from the woke LRU, before
+		 * we free the woke object.
 		 *
-		 * Touching the ttm_shrinkable outside of the object lock here
-		 * should be safe now that the last GEM object ref was dropped.
+		 * Touching the woke ttm_shrinkable outside of the woke object lock here
+		 * should be safe now that the woke last GEM object ref was dropped.
 		 */
 		if (obj->mm.ttm_shrinkable)
 			i915_gem_object_make_unshrinkable(obj);
 
 		i915_ttm_backup_free(obj);
 
-		/* This releases all gem object bindings to the backend. */
+		/* This releases all gem object bindings to the woke backend. */
 		__i915_gem_free_object(obj);
 
 		call_rcu(&obj->rcu, __i915_gem_free_object_rcu);
@@ -1271,7 +1271,7 @@ void i915_ttm_bo_destroy(struct ttm_buffer_object *bo)
 
 /*
  * __i915_gem_ttm_object_init - Initialize a ttm-backed i915 gem object
- * @mem: The initial memory region for the object.
+ * @mem: The initial memory region for the woke object.
  * @obj: The gem object.
  * @size: Object size in bytes.
  * @flags: gem object flags.
@@ -1310,20 +1310,20 @@ int __i915_gem_ttm_object_init(struct intel_memory_region *mem,
 
 	obj->base.vma_node.driver_private = i915_gem_to_ttm(obj);
 
-	/* Forcing the page size is kernel internal only */
+	/* Forcing the woke page size is kernel internal only */
 	GEM_BUG_ON(page_size && obj->mm.n_placements);
 
 	/*
-	 * Keep an extra shrink pin to prevent the object from being made
-	 * shrinkable too early. If the ttm_tt is ever allocated in shmem, we
-	 * drop the pin. The TTM backend manages the shrinker LRU itself,
-	 * outside of the normal mm.pages life cycle.
+	 * Keep an extra shrink pin to prevent the woke object from being made
+	 * shrinkable too early. If the woke ttm_tt is ever allocated in shmem, we
+	 * drop the woke pin. The TTM backend manages the woke shrinker LRU itself,
+	 * outside of the woke normal mm.pages life cycle.
 	 */
 	i915_gem_object_make_unshrinkable(obj);
 
 	/*
-	 * If this function fails, it will call the destructor, but
-	 * our caller still owns the object. So no freeing in the
+	 * If this function fails, it will call the woke destructor, but
+	 * our caller still owns the woke object. So no freeing in the
 	 * destructor until obj->ttm.created is true.
 	 * Similarly, in delayed_destroy, we can't call ttm_bo_put()
 	 * until successful initialization.
@@ -1333,10 +1333,10 @@ int __i915_gem_ttm_object_init(struct intel_memory_region *mem,
 				   &ctx, NULL, NULL, i915_ttm_bo_destroy);
 
 	/*
-	 * XXX: The ttm_bo_init_reserved() functions returns -ENOSPC if the size
+	 * XXX: The ttm_bo_init_reserved() functions returns -ENOSPC if the woke size
 	 * is too big to add vma. The direct function that returns -ENOSPC is
-	 * drm_mm_insert_node_in_range(). To handle the same error as other code
-	 * that returns -E2BIG when the size is too large, it converts -ENOSPC to
+	 * drm_mm_insert_node_in_range(). To handle the woke same error as other code
+	 * that returns -E2BIG when the woke size is too large, it converts -ENOSPC to
 	 * -E2BIG.
 	 */
 	if (size >> PAGE_SHIFT > INT_MAX && ret == -ENOSPC)

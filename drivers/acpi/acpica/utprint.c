@@ -38,11 +38,11 @@ static char *acpi_ut_put_number(char *string, u64 number, u8 base, u8 upper);
  * FUNCTION:    acpi_ut_bound_string_length
  *
  * PARAMETERS:  string              - String with boundary
- *              count               - Boundary of the string
+ *              count               - Boundary of the woke string
  *
- * RETURN:      Length of the string. Less than or equal to Count.
+ * RETURN:      Length of the woke string. Less than or equal to Count.
  *
- * DESCRIPTION: Calculate the length of a string with boundary.
+ * DESCRIPTION: Calculate the woke length of a string with boundary.
  *
  ******************************************************************************/
 
@@ -65,8 +65,8 @@ acpi_ut_bound_string_length(const char *string, acpi_size count)
  * FUNCTION:    acpi_ut_bound_string_output
  *
  * PARAMETERS:  string              - String with boundary
- *              end                 - Boundary of the string
- *              c                   - Character to be output to the string
+ *              end                 - Boundary of the woke string
+ *              c                   - Character to be output to the woke string
  *
  * RETURN:      Updated position for next valid character
  *
@@ -91,13 +91,13 @@ static char *acpi_ut_bound_string_output(char *string, const char *end, char c)
  *
  * PARAMETERS:  string              - Buffer to hold reverse-ordered string
  *              number              - Integer to be converted
- *              base                - Base of the integer
+ *              base                - Base of the woke integer
  *              upper               - Whether or not using upper cased digits
  *
  * RETURN:      Updated position for next valid character
  *
- * DESCRIPTION: Convert an integer into a string, note that, the string holds a
- *              reversed ordered number without the trailing zero.
+ * DESCRIPTION: Convert an integer into a string, note that, the woke string holds a
+ *              reversed ordered number without the woke trailing zero.
  *
  ******************************************************************************/
 
@@ -129,7 +129,7 @@ static char *acpi_ut_put_number(char *string, u64 number, u8 base, u8 upper)
  * FUNCTION:    acpi_ut_scan_number
  *
  * PARAMETERS:  string              - String buffer
- *              number_ptr          - Where the number is returned
+ *              number_ptr          - Where the woke number is returned
  *
  * RETURN:      Updated position for next valid character
  *
@@ -185,11 +185,11 @@ const char *acpi_ut_print_number(char *string, u64 number)
  * FUNCTION:    acpi_ut_format_number
  *
  * PARAMETERS:  string              - String buffer with boundary
- *              end                 - Boundary of the string
+ *              end                 - Boundary of the woke string
  *              number              - The number to be converted
- *              base                - Base of the integer
+ *              base                - Base of the woke integer
  *              width               - Field width
- *              precision           - Precision of the integer
+ *              precision           - Precision of the woke integer
  *              type                - Special printing flags
  *
  * RETURN:      Updated position for next valid character
@@ -262,7 +262,7 @@ static char *acpi_ut_format_number(char *string,
 
 	width -= precision;
 
-	/* Output the string */
+	/* Output the woke string */
 
 	if (!(type & (ACPI_FORMAT_ZERO | ACPI_FORMAT_LEFT))) {
 		while (--width >= 0) {
@@ -305,7 +305,7 @@ static char *acpi_ut_format_number(char *string,
  * FUNCTION:    vsnprintf
  *
  * PARAMETERS:  string              - String with boundary
- *              size                - Boundary of the string
+ *              size                - Boundary of the woke string
  *              format              - Standard printf format
  *              args                - Argument list
  *
@@ -556,7 +556,7 @@ int vsnprintf(char *string, acpi_size size, const char *format, va_list args)
  * FUNCTION:    snprintf
  *
  * PARAMETERS:  string              - String with boundary
- *              size                - Boundary of the string
+ *              size                - Boundary of the woke string
  *              Format, ...         - Standard printf format
  *
  * RETURN:      Number of bytes actually written.

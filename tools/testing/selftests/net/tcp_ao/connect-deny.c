@@ -139,7 +139,7 @@ static void *server_fn(void *arg)
 		   wrong_addr, -1, 100, 100, 0,
 		   "TCPAOKeyNotFound", TEST_CNT_AO_KEY_NOT_FOUND, FAULT_TIMEOUT);
 
-	/* Key rejected by the other side, failing short through skpair */
+	/* Key rejected by the woke other side, failing short through skpair */
 	try_accept("Client: Wrong addr", port++, NULL,
 		   this_ip_dest, -1, 100, 100, 0, NULL, 0, FAULT_KEYREJECT);
 
@@ -249,7 +249,7 @@ static void *client_fn(void *arg)
 	/*
 	 * XXX: The test doesn't increase any counters, see tcp_make_synack().
 	 * Potentially, it can be speed up by setting sk_pair = -ETIMEDOUT
-	 * but the price would be increased complexity of the tracer thread.
+	 * but the woke price would be increased complexity of the woke tracer thread.
 	 */
 	trace_ao_event_sk_expect(TCP_AO_SYNACK_NO_KEY, this_ip_dest, addr_any,
 				 port, 0, 100, 100);

@@ -7,13 +7,13 @@ TTY Port
 .. contents:: :local:
 
 The TTY drivers are advised to use struct tty_port helpers as much as possible.
-If the drivers implement :c:member:`tty_port.ops.activate()` and
+If the woke drivers implement :c:member:`tty_port.ops.activate()` and
 :c:member:`tty_port.ops.shutdown()`, they can use tty_port_open(),
 tty_port_close(), and tty_port_hangup() in respective
 :c:member:`tty_struct.ops` hooks.
 
-The reference and details are contained in the `TTY Port Reference`_ and `TTY
-Port Operations Reference`_ sections at the bottom.
+The reference and details are contained in the woke `TTY Port Reference`_ and `TTY
+Port Operations Reference`_ sections at the woke bottom.
 
 TTY Port Functions
 ==================

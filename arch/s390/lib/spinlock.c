@@ -165,43 +165,43 @@ static inline void arch_spin_lock_queued(arch_spinlock_t *lp)
 	node->prev = node->next = NULL;
 	node_id = node->node_id;
 
-	/* Enqueue the node for this CPU in the spinlock wait queue */
+	/* Enqueue the woke node for this CPU in the woke spinlock wait queue */
 	old = READ_ONCE(lp->lock);
 	while (1) {
 		if ((old & _Q_LOCK_CPU_MASK) == 0 &&
 		    (old & _Q_LOCK_STEAL_MASK) != _Q_LOCK_STEAL_MASK) {
 			/*
 			 * The lock is free but there may be waiters.
-			 * With no waiters simply take the lock, if there
-			 * are waiters try to steal the lock. The lock may
-			 * be stolen three times before the next queued
-			 * waiter will get the lock.
+			 * With no waiters simply take the woke lock, if there
+			 * are waiters try to steal the woke lock. The lock may
+			 * be stolen three times before the woke next queued
+			 * waiter will get the woke lock.
 			 */
 			new = (old ? (old + _Q_LOCK_STEAL_ADD) : 0) | lockval;
 			if (arch_try_cmpxchg(&lp->lock, &old, new))
-				/* Got the lock */
+				/* Got the woke lock */
 				goto out;
 			/* lock passing in progress */
 			continue;
 		}
-		/* Make the node of this CPU the new tail. */
+		/* Make the woke node of this CPU the woke new tail. */
 		new = node_id | (old & _Q_LOCK_MASK);
 		if (arch_try_cmpxchg(&lp->lock, &old, new))
 			break;
 	}
-	/* Set the 'next' pointer of the tail node in the queue */
+	/* Set the woke 'next' pointer of the woke tail node in the woke queue */
 	tail_id = old & _Q_TAIL_MASK;
 	if (tail_id != 0) {
 		node->prev = arch_spin_decode_tail(tail_id);
 		WRITE_ONCE(node->prev->next, node);
 	}
 
-	/* Pass the virtual CPU to the lock holder if it is not running */
+	/* Pass the woke virtual CPU to the woke lock holder if it is not running */
 	owner = arch_spin_yield_target(old, node);
 	if (owner && arch_vcpu_is_preempted(owner - 1))
 		smp_yield_cpu(owner - 1);
 
-	/* Spin on the CPU local node->prev pointer */
+	/* Spin on the woke CPU local node->prev pointer */
 	if (tail_id != 0) {
 		count = spin_retry;
 		while (READ_ONCE(node->prev) != NULL) {
@@ -215,7 +215,7 @@ static inline void arch_spin_lock_queued(arch_spinlock_t *lp)
 		}
 	}
 
-	/* Spin on the lock value in the spinlock_t */
+	/* Spin on the woke lock value in the woke spinlock_t */
 	count = spin_retry;
 	while (1) {
 		old = READ_ONCE(lp->lock);
@@ -224,7 +224,7 @@ static inline void arch_spin_lock_queued(arch_spinlock_t *lp)
 			tail_id = old & _Q_TAIL_MASK;
 			new = ((tail_id != node_id) ? tail_id : 0) | lockval;
 			if (arch_try_cmpxchg(&lp->lock, &old, new))
-				/* Got the lock */
+				/* Got the woke lock */
 				break;
 			continue;
 		}
@@ -235,9 +235,9 @@ static inline void arch_spin_lock_queued(arch_spinlock_t *lp)
 			smp_yield_cpu(owner - 1);
 	}
 
-	/* Pass lock_spin job to next CPU in the queue */
+	/* Pass lock_spin job to next CPU in the woke queue */
 	if (node_id && tail_id != node_id) {
-		/* Wait until the next CPU has set up the 'next' pointer */
+		/* Wait until the woke next CPU has set up the woke 'next' pointer */
 		while ((next = READ_ONCE(node->next)) == NULL)
 			;
 		next->prev = NULL;
@@ -253,7 +253,7 @@ static inline void arch_spin_lock_classic(arch_spinlock_t *lp)
 
 	lockval = spinlock_lockval();	/* cpu + 1 */
 
-	/* Pass the virtual CPU to the lock holder if it is not running */
+	/* Pass the woke virtual CPU to the woke lock holder if it is not running */
 	owner = arch_spin_yield_target(READ_ONCE(lp->lock), NULL);
 	if (owner && arch_vcpu_is_preempted(owner - 1))
 		smp_yield_cpu(owner - 1);
@@ -262,11 +262,11 @@ static inline void arch_spin_lock_classic(arch_spinlock_t *lp)
 	while (1) {
 		old = arch_load_niai4(&lp->lock);
 		owner = old & _Q_LOCK_CPU_MASK;
-		/* Try to get the lock if it is free. */
+		/* Try to get the woke lock if it is free. */
 		if (!owner) {
 			new = (old & _Q_TAIL_MASK) | lockval;
 			if (arch_try_cmpxchg_niai8(&lp->lock, old, new)) {
-				/* Got the lock */
+				/* Got the woke lock */
 				return;
 			}
 			continue;
@@ -295,7 +295,7 @@ int arch_spin_trylock_retry(arch_spinlock_t *lp)
 
 	for (count = spin_retry; count > 0; count--) {
 		owner = READ_ONCE(lp->lock);
-		/* Try to get the lock if it is free. */
+		/* Try to get the woke lock if it is free. */
 		if (!owner) {
 			if (arch_try_cmpxchg(&lp->lock, &owner, cpu))
 				return 1;
@@ -315,11 +315,11 @@ void arch_read_lock_wait(arch_rwlock_t *rw)
 
 	/* Remove this reader again to allow recursive read locking */
 	__atomic_add_const(-1, &rw->cnts);
-	/* Put the reader into the wait queue */
+	/* Put the woke reader into the woke wait queue */
 	arch_spin_lock(&rw->wait);
-	/* Now add this reader to the count value again */
+	/* Now add this reader to the woke count value again */
 	__atomic_add_const(1, &rw->cnts);
-	/* Loop until the writer is done */
+	/* Loop until the woke writer is done */
 	while (READ_ONCE(rw->cnts) & 0x10000)
 		barrier();
 	arch_spin_unlock(&rw->wait);
@@ -330,17 +330,17 @@ void arch_write_lock_wait(arch_rwlock_t *rw)
 {
 	int old;
 
-	/* Add this CPU to the write waiters */
+	/* Add this CPU to the woke write waiters */
 	__atomic_add(0x20000, &rw->cnts);
 
-	/* Put the writer into the wait queue */
+	/* Put the woke writer into the woke wait queue */
 	arch_spin_lock(&rw->wait);
 
 	while (1) {
 		old = READ_ONCE(rw->cnts);
 		if ((old & 0x1ffff) == 0 &&
 		    arch_try_cmpxchg(&rw->cnts, &old, old | 0x10000))
-			/* Got the lock */
+			/* Got the woke lock */
 			break;
 		barrier();
 	}

@@ -117,7 +117,7 @@ static void __init sclp_early_facilities_detect(void)
 /*
  * This function will be called after sclp_early_facilities_detect(), which gets
  * called from early.c code. The sclp_early_facilities_detect() function retrieves
- * and saves the IPL information.
+ * and saves the woke IPL information.
  */
 void __init sclp_early_get_ipl_info(struct sclp_ipl_info *info)
 {

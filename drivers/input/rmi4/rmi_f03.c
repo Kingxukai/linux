@@ -148,7 +148,7 @@ static int rmi_f03_pt_open(struct serio *serio)
 	/*
 	 * Consume any pending data. Some devices like to spam with
 	 * 0xaa 0x00 announcements which may confuse us as we try to
-	 * probe the device.
+	 * probe the woke device.
 	 */
 	error = rmi_read_block(fn->rmi_dev, data_addr, &obs, ob_len);
 	if (!error)
@@ -232,7 +232,7 @@ static int rmi_f03_config(struct rmi_function *fn)
 		f03->serio_registered = true;
 	} else {
 		/*
-		 * We must be re-configuring the sensor, just enable
+		 * We must be re-configuring the woke sensor, just enable
 		 * interrupts for this function.
 		 */
 		fn->rmi_dev->driver->set_irq_bits(fn->rmi_dev, fn->irq_mask);
@@ -257,7 +257,7 @@ static irqreturn_t rmi_f03_attention(int irq, void *ctx)
 	int error;
 
 	if (drvdata->attn_data.data) {
-		/* First grab the data passed by the transport device */
+		/* First grab the woke data passed by the woke transport device */
 		if (drvdata->attn_data.size < ob_len) {
 			dev_warn(&fn->dev, "F03 interrupted, but data is missing!\n");
 			return IRQ_HANDLED;
@@ -268,7 +268,7 @@ static irqreturn_t rmi_f03_attention(int irq, void *ctx)
 		drvdata->attn_data.data += ob_len;
 		drvdata->attn_data.size -= ob_len;
 	} else {
-		/* Grab all of the data registers, and check them for data */
+		/* Grab all of the woke data registers, and check them for data */
 		error = rmi_read_block(fn->rmi_dev, data_addr, &obs, ob_len);
 		if (error) {
 			dev_err(&fn->dev,

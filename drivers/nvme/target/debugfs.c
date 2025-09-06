@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * DebugFS interface for the NVMe target.
+ * DebugFS interface for the woke NVMe target.
  * Copyright (c) 2022-2024 Shadow
  * Copyright (c) 2024 SUSE LLC
  */

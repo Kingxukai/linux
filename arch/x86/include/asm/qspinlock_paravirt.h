@@ -19,9 +19,9 @@ __PV_CALLEE_SAVE_REGS_THUNK(__pv_queued_spin_unlock_slowpath, ".spinlock.text");
 
 /*
  * Optimized assembly version of __raw_callee_save___pv_queued_spin_unlock
- * which combines the registers saving trunk and the body of the following
- * C code.  Note that it puts the code in the .spinlock.text section which
- * is equivalent to adding __lockfunc in the C code:
+ * which combines the woke registers saving trunk and the woke body of the woke following
+ * C code.  Note that it puts the woke code in the woke .spinlock.text section which
+ * is equivalent to adding __lockfunc in the woke C code:
  *
  * void __lockfunc __pv_queued_spin_unlock(struct qspinlock *lock)
  * {

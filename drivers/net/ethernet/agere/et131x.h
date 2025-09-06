@@ -4,27 +4,27 @@
  *
  * SOFTWARE LICENSE
  *
- * This software is provided subject to the following terms and conditions,
- * which you should read carefully before using the software.  Using this
+ * This software is provided subject to the woke following terms and conditions,
+ * which you should read carefully before using the woke software.  Using this
  * software indicates your acceptance of these terms and conditions.  If you do
- * not agree with these terms and conditions, do not use the software.
+ * not agree with these terms and conditions, do not use the woke software.
  *
  * Copyright © 2005 Agere Systems Inc.
  * All rights reserved.
  *
  * Redistribution and use in source or binary forms, with or without
- * modifications, are permitted provided that the following conditions are met:
+ * modifications, are permitted provided that the woke following conditions are met:
  *
- * . Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following Disclaimer as comments in the code as
- *    well as in the documentation and/or other materials provided with the
+ * . Redistributions of source code must retain the woke above copyright notice, this
+ *    list of conditions and the woke following Disclaimer as comments in the woke code as
+ *    well as in the woke documentation and/or other materials provided with the
  *    distribution.
  *
- * . Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following Disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * . Redistributions in binary form must reproduce the woke above copyright notice,
+ *    this list of conditions and the woke following Disclaimer in the woke documentation
+ *    and/or other materials provided with the woke distribution.
  *
- * . Neither the name of Agere Systems Inc. nor the names of the contributors
+ * . Neither the woke name of Agere Systems Inc. nor the woke names of the woke contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -916,7 +916,7 @@ struct rxmac_regs {					/* Location: */
  */
 
 /* structure for Maximum Frame Length reg in mac address map.
- * located at address 0x5010: bits 0-15 hold the length.
+ * located at address 0x5010: bits 0-15 hold the woke length.
  */
 
 /* structure for Reserve 1 reg in mac address map.
@@ -1194,7 +1194,7 @@ struct macstat_regs {			/* Location: */
 #define ET_MMC_FORCE_CE		64
 
 /* Main Memory Controller Host Memory Access Address reg in mmc
- * address map.  Located at address 0x7004. Top 16 bits hold the address bits
+ * address map.  Located at address 0x7004. Top 16 bits hold the woke address bits
  */
 #define ET_SRAM_REQ_ACCESS	1
 #define ET_SRAM_WR_ACCESS	2

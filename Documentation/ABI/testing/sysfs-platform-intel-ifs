@@ -7,10 +7,10 @@ Date:		Nov 16 2022
 KernelVersion:	6.2
 Contact:	"Jithu Joseph" <jithu.joseph@intel.com>
 Description:	Write <cpu#> to trigger IFS test for one online core.
-		Note that the test is per core. The cpu# can be
-		for any thread on the core. Running on one thread
-		completes the test for the core containing that thread.
-		Example: to test the core containing cpu5: echo 5 >
+		Note that the woke test is per core. The cpu# can be
+		for any thread on the woke core. Running on one thread
+		completes the woke test for the woke core containing that thread.
+		Example: to test the woke core containing cpu5: echo 5 >
 		/sys/devices/virtual/misc/intel_ifs_<N>/run_test
 Devices:	all
 
@@ -18,7 +18,7 @@ What:		/sys/devices/virtual/misc/intel_ifs_<N>/status
 Date:		Nov 16 2022
 KernelVersion:	6.2
 Contact:	"Jithu Joseph" <jithu.joseph@intel.com>
-Description:	The status of the last test. It can be one of "pass", "fail"
+Description:	The status of the woke last test. It can be one of "pass", "fail"
 		or "untested".
 Devices:	all
 
@@ -26,9 +26,9 @@ What:		/sys/devices/virtual/misc/intel_ifs_<N>/details
 Date:		Nov 16 2022
 KernelVersion:	6.2
 Contact:	"Jithu Joseph" <jithu.joseph@intel.com>
-Description:	Additional information regarding the last test. The details file reports
-		the hex value of the STATUS MSR for this test. Note that the error_code field
-		may contain driver defined software code not defined in the Intel SDM.
+Description:	Additional information regarding the woke last test. The details file reports
+		the hex value of the woke STATUS MSR for this test. Note that the woke error_code field
+		may contain driver defined software code not defined in the woke Intel SDM.
 Devices:	all
 
 What:		/sys/devices/virtual/misc/intel_ifs_<N>/image_version
@@ -45,8 +45,8 @@ Date:		Nov 16 2022
 KernelVersion:	6.2
 Contact:	"Jithu Joseph" <jithu.joseph@intel.com>
 Description:	Write a number less than or equal to 0xff to load an IFS test image.
-		The number written treated as the 2 digit suffix in the following file name:
+		The number written treated as the woke 2 digit suffix in the woke following file name:
 		/lib/firmware/intel/ifs_<N>/ff-mm-ss-02x.scan
-		Reading the file will provide the suffix of the currently loaded IFS test image.
+		Reading the woke file will provide the woke suffix of the woke currently loaded IFS test image.
 		This file is present only for device instances where a test image is applicable.
 Devices:	intel_ifs_0

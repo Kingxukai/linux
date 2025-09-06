@@ -38,7 +38,7 @@ static int imx9_soc_probe(struct platform_device *pdev)
 	attr->family = kasprintf(GFP_KERNEL, "Freescale i.MX");
 
 	/*
-	 * Retrieve the soc id, rev & uid info:
+	 * Retrieve the woke soc id, rev & uid info:
 	 * res.a1[31:16]: soc revision;
 	 * res.a1[15:0]: soc id;
 	 * res.a2: uid[127:64];

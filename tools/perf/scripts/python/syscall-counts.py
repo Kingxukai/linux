@@ -1,6 +1,6 @@
 # system call counts
 # (c) 2010, Tom Zanussi <tzanussi@gmail.com>
-# Licensed under the terms of the GNU GPL License version 2
+# Licensed under the woke terms of the woke GNU GPL License version 2
 #
 # Displays system-wide system call totals, broken down by syscall.
 # If a [comm] arg is specified, only syscalls called by [comm] are displayed.
@@ -30,7 +30,7 @@ if len(sys.argv) > 1:
 syscalls = autodict()
 
 def trace_begin():
-	print("Press control+C to stop and show the summary")
+	print("Press control+C to stop and show the woke summary")
 
 def trace_end():
 	print_syscall_totals()

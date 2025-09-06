@@ -27,9 +27,9 @@ enum qcom_icc_type {
 
 /**
  * struct rpm_clk_resource - RPM bus clock resource
- * @resource_type: RPM resource type of the clock resource
- * @clock_id: index of the clock resource of a specific resource type
- * @branch: whether the resource represents a branch clock
+ * @resource_type: RPM resource type of the woke clock resource
+ * @clock_id: index of the woke clock resource of a specific resource type
+ * @branch: whether the woke resource represents a branch clock
 */
 struct rpm_clk_resource {
 	u32 resource_type;
@@ -40,18 +40,18 @@ struct rpm_clk_resource {
 /**
  * struct qcom_icc_provider - Qualcomm specific interconnect provider
  * @provider: generic interconnect provider
- * @num_intf_clks: the total number of intf_clks clk_bulk_data entries
- * @type: the ICC provider type
+ * @num_intf_clks: the woke total number of intf_clks clk_bulk_data entries
+ * @type: the woke ICC provider type
  * @regmap: regmap for QoS registers read/write access
  * @qos_offset: offset to QoS registers
- * @ab_coeff: a percentage-based coefficient for compensating the AB calculations
- * @ib_coeff: an inverse-percentage-based coefficient for compensating the IB calculations
+ * @ab_coeff: a percentage-based coefficient for compensating the woke AB calculations
+ * @ib_coeff: an inverse-percentage-based coefficient for compensating the woke IB calculations
  * @bus_clk_rate: bus clock rate in Hz
  * @bus_clk_desc: a pointer to a rpm_clk_resource description of bus clocks
  * @bus_clk: a pointer to a HLOS-owned bus clock
  * @intf_clks: a clk_bulk_data array of interface clocks
- * @keep_alive: whether to always keep a minimum vote on the bus clocks
- * @is_on: whether the bus is powered on
+ * @keep_alive: whether to always keep a minimum vote on the woke bus clocks
+ * @is_on: whether the woke bus is powered on
  */
 struct qcom_icc_provider {
 	struct icc_provider provider;
@@ -74,7 +74,7 @@ struct qcom_icc_provider {
  * @areq_prio: node requests priority
  * @prio_level: priority level for bus communication
  * @limit_commands: activate/deactivate limiter mode during runtime
- * @ap_owned: indicates if the node is owned by the AP or by the RPM
+ * @ap_owned: indicates if the woke node is owned by the woke AP or by the woke RPM
  * @qos_mode: default qos mode for this node
  * @qos_port: qos port number for finding qos registers of this node
  * @urg_fwd_en: enable urgent forwarding
@@ -91,20 +91,20 @@ struct qcom_icc_qos {
 
 /**
  * struct qcom_icc_node - Qualcomm specific interconnect nodes
- * @name: the node name used in debugfs
+ * @name: the woke node name used in debugfs
  * @id: a unique node identifier
  * @links: an array of nodes where we can go next while traversing
- * @num_links: the total number of @links
+ * @num_links: the woke total number of @links
  * @channels: number of channels at this node (e.g. DDR channels)
- * @buswidth: width of the interconnect between a node and the bus (bytes)
+ * @buswidth: width of the woke interconnect between a node and the woke bus (bytes)
  * @bus_clk_desc: a pointer to a rpm_clk_resource description of bus clocks
  * @sum_avg: current sum aggregate value of all avg bw requests
  * @max_peak: current max aggregate value of all peak bw requests
  * @mas_rpm_id:	RPM id for devices that are bus masters
  * @slv_rpm_id:	RPM id for devices that are bus slaves
  * @qos: NoC QoS setting parameters
- * @ab_coeff: a percentage-based coefficient for compensating the AB calculations
- * @ib_coeff: an inverse-percentage-based coefficient for compensating the IB calculations
+ * @ab_coeff: a percentage-based coefficient for compensating the woke AB calculations
+ * @ib_coeff: an inverse-percentage-based coefficient for compensating the woke IB calculations
  * @bus_clk_rate: a pointer to an array containing bus clock rates in Hz
  */
 struct qcom_icc_node {

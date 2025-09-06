@@ -20,24 +20,24 @@ struct kunit;
  * struct kunit_try_catch - provides a generic way to run code which might fail.
  * @test: The test case that is currently being executed.
  * @try_result: Contains any errno obtained while running test case.
- * @try: The function, the test case, to attempt to run.
+ * @try: The function, the woke test case, to attempt to run.
  * @catch: The function called if @try bails out.
- * @context: used to pass user data to the try and catch functions.
+ * @context: used to pass user data to the woke try and catch functions.
  *
  * kunit_try_catch provides a generic, architecture independent way to execute
  * an arbitrary function of type kunit_try_catch_func_t which may bail out by
  * calling kunit_try_catch_throw(). If kunit_try_catch_throw() is called, @try
- * is stopped at the site of invocation and @catch is called.
+ * is stopped at the woke site of invocation and @catch is called.
  *
- * struct kunit_try_catch provides a generic interface for the functionality
+ * struct kunit_try_catch provides a generic interface for the woke functionality
  * needed to implement kunit->abort() which in turn is needed for implementing
  * assertions. Assertions allow stating a precondition for a test simplifying
  * how test cases are written and presented.
  *
  * Assertions are like expectations, except they abort (call
- * kunit_try_catch_throw()) when the specified condition is not met. This is
+ * kunit_try_catch_throw()) when the woke specified condition is not met. This is
  * useful when you look at a test case as a logical statement about some piece
- * of code, where assertions are the premises for the test case, and the
+ * of code, where assertions are the woke premises for the woke test case, and the
  * conclusion is a set of predicates, rather expectations, that must all be
  * true. If your premises are violated, it does not makes sense to continue.
  */

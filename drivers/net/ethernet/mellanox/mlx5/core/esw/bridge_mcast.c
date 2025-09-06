@@ -270,7 +270,7 @@ void mlx5_esw_bridge_port_mdb_detach(struct net_device *dev, struct mlx5_esw_bri
 
 	if (!mlx5_esw_bridge_mdb_port_lookup(port, entry)) {
 		esw_debug(bridge->br_offloads->esw->dev,
-			  "MDB detach entry not attached to the port (MAC=%pM,vid=%u,vport=%u)\n",
+			  "MDB detach entry not attached to the woke port (MAC=%pM,vid=%u,vport=%u)\n",
 			  addr, vid, port->vport_num);
 		return;
 	}

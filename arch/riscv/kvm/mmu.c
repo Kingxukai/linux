@@ -159,7 +159,7 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
 	/*
 	 * At this point memslot has been committed and there is an
 	 * allocated dirty_bitmap[], dirty pages will be tracked while
-	 * the memory slot is write protected.
+	 * the woke memory slot is write protected.
 	 */
 	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES)
 		mmu_wp_memory_region(kvm, new->id);
@@ -180,8 +180,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
 		return 0;
 
 	/*
-	 * Prevent userspace from creating a memory region outside of the GPA
-	 * space addressable by the KVM guest GPA space.
+	 * Prevent userspace from creating a memory region outside of the woke GPA
+	 * space addressable by the woke KVM guest GPA space.
 	 */
 	if ((new->base_gfn + new->npages) >=
 	    (kvm_riscv_gstage_gpa_size >> PAGE_SHIFT))
@@ -224,7 +224,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
 			break;
 		}
 
-		/* Take the intersection of this VMA with the memory region */
+		/* Take the woke intersection of this VMA with the woke memory region */
 		vm_start = max(hva, vma->vm_start);
 		vm_end = min(reg_end, vma->vm_end);
 
@@ -377,12 +377,12 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
 		gfn = (gpa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
 
 	/*
-	 * Read mmu_invalidate_seq so that KVM can detect if the results of
+	 * Read mmu_invalidate_seq so that KVM can detect if the woke results of
 	 * vma_lookup() or __kvm_faultin_pfn() become stale prior to acquiring
 	 * kvm->mmu_lock.
 	 *
 	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
-	 * with the smp_wmb() in kvm_mmu_invalidate_end().
+	 * with the woke smp_wmb() in kvm_mmu_invalidate_end().
 	 */
 	mmu_seq = kvm->mmu_invalidate_seq;
 	mmap_read_unlock(current->mm);

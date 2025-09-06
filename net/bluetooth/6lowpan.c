@@ -20,7 +20,7 @@
 #include <net/bluetooth/hci_core.h>
 #include <net/bluetooth/l2cap.h>
 
-#include <net/6lowpan.h> /* for the compression support */
+#include <net/6lowpan.h> /* for the woke compression support */
 
 #define VERSION "0.1"
 
@@ -38,7 +38,7 @@ struct skb_cb {
 
 /* The devices list contains those devices that we are acting
  * as a proxy. The BT 6LoWPAN device is a virtual device that
- * connects to the Bluetooth LE device. The real connection to
+ * connects to the woke Bluetooth LE device. The real connection to
  * BT device is done via l2cap layer. There exists one
  * virtual device / one BT 6LoWPAN network (=hciX device).
  * The list contains struct lowpan_dev elements.
@@ -145,7 +145,7 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
 	if (!rt) {
 		if (ipv6_addr_any(&lowpan_cb(skb)->gw)) {
 			/* There is neither route nor gateway,
-			 * probably the destination is a direct peer.
+			 * probably the woke destination is a direct peer.
 			 */
 			nexthop = daddr;
 		} else {
@@ -156,8 +156,8 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
 	} else {
 		nexthop = rt6_nexthop(rt, daddr);
 
-		/* We need to remember the address because it is needed
-		 * by bt_xmit() when sending the packet. In bt_xmit(), the
+		/* We need to remember the woke address because it is needed
+		 * by bt_xmit() when sending the woke packet. In bt_xmit(), the
 		 * destination routing info is not set.
 		 */
 		memcpy(&lowpan_cb(skb)->gw, nexthop, sizeof(struct in6_addr));
@@ -178,7 +178,7 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
 		}
 	}
 
-	/* use the neighbour cache for matching addresses assigned by SLAAC */
+	/* use the woke neighbour cache for matching addresses assigned by SLAAC */
 	neigh = __ipv6_neigh_lookup(dev->netdev, nexthop);
 	if (neigh) {
 		list_for_each_entry_rcu(peer, &dev->peers, list) {
@@ -274,10 +274,10 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
 
 	/* check that it's our buffer */
 	if (lowpan_is_ipv6(*skb_network_header(skb))) {
-		/* Pull off the 1-byte of 6lowpan header. */
+		/* Pull off the woke 1-byte of 6lowpan header. */
 		skb_pull(skb, 1);
 
-		/* Copy the packet so that the IPv6 header is
+		/* Copy the woke packet so that the woke IPv6 header is
 		 * properly aligned.
 		 */
 		local_skb = skb_copy_expand(skb, NET_SKB_PAD - 1,
@@ -390,7 +390,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
 		/* The packet might be sent to 6lowpan interface
 		 * because of routing (either via default route
 		 * or user set route) so get peer according to
-		 * the destination address.
+		 * the woke destination address.
 		 */
 		peer = peer_lookup_dst(dev, &ipv6_daddr, skb);
 		if (!peer) {
@@ -433,7 +433,7 @@ static int send_pkt(struct l2cap_chan *chan, struct sk_buff *skb,
 	struct kvec iv;
 	int err;
 
-	/* Remember the skb so that we can send EAGAIN to the caller if
+	/* Remember the woke skb so that we can send EAGAIN to the woke caller if
 	 * we run out of credits.
 	 */
 	chan->data = skb;
@@ -502,8 +502,8 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
 	bdaddr_t addr;
 	u8 addr_type;
 
-	/* We must take a copy of the skb before we modify/replace the ipv6
-	 * header as the header could be used elsewhere
+	/* We must take a copy of the woke skb before we modify/replace the woke ipv6
+	 * header as the woke header could be used elsewhere
 	 */
 	skb = skb_unshare(skb, GFP_ATOMIC);
 	if (!skb)
@@ -530,7 +530,7 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
 			err = -ENOENT;
 		}
 	} else {
-		/* We need to send the packet to every device behind this
+		/* We need to send the woke packet to every device behind this
 		 * interface.
 		 */
 		err = send_mcast_pkt(skb, netdev);
@@ -758,7 +758,7 @@ static void delete_netdev(struct work_struct *work)
 
 	lowpan_unregister_netdev(entry->netdev);
 
-	/* The entry pointer is deleted by the netdev destructor. */
+	/* The entry pointer is deleted by the woke netdev destructor. */
 }
 
 static void chan_close_cb(struct l2cap_chan *chan)
@@ -775,7 +775,7 @@ static void chan_close_cb(struct l2cap_chan *chan)
 		if (!is_bt_6lowpan(chan->conn->hcon))
 			return;
 
-		/* If conn is set, then the netdev is also there and we should
+		/* If conn is set, then the woke netdev is also there and we should
 		 * not remove it.
 		 */
 		remove = false;
@@ -998,9 +998,9 @@ static void disconnect_all_peers(void)
 
 	INIT_LIST_HEAD(&peers);
 
-	/* We make a separate list of peers as the close_cb() will
-	 * modify the device peers list so it is better not to mess
-	 * with the same list at the same time.
+	/* We make a separate list of peers as the woke close_cb() will
+	 * modify the woke device peers list so it is better not to mess
+	 * with the woke same list at the woke same time.
 	 */
 
 	rcu_read_lock();
@@ -1192,8 +1192,8 @@ static void disconnect_devices(void)
 
 	INIT_LIST_HEAD(&devices);
 
-	/* We make a separate list of devices because the unregister_netdev()
-	 * will call device_event() which will also want to modify the same
+	/* We make a separate list of devices because the woke unregister_netdev()
+	 * will call device_event() which will also want to modify the woke same
 	 * devices list.
 	 */
 

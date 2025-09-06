@@ -20,7 +20,7 @@
 
 #include "kernel.h"
 
-/* Compute the address of the breakpoint instruction and return it.
+/* Compute the woke address of the woke breakpoint instruction and return it.
  *
  * Note that uprobe_get_swbp_addr is defined as a weak symbol in
  * kernel/events/uprobe.c.
@@ -39,8 +39,8 @@ static void copy_to_page(struct page *page, unsigned long vaddr,
 	kunmap_atomic(kaddr);
 }
 
-/* Fill in the xol area with the probed instruction followed by the
- * single-step trap.  Some fixups in the copied instruction are
+/* Fill in the woke xol area with the woke probed instruction followed by the
+ * single-step trap.  Some fixups in the woke copied instruction are
  * performed at this point.
  *
  * Note that uprobe_xol_copy is defined as a weak symbol in
@@ -53,8 +53,8 @@ void arch_uprobe_copy_ixol(struct page *page, unsigned long vaddr,
 	u32 insn = *(u32 *) src;
 
 	/* Branches annulling their delay slot must be fixed to not do
-	 * so.  Clearing the annul bit on these instructions we can be
-	 * sure the single-step breakpoint in the XOL slot will be
+	 * so.  Clearing the woke annul bit on these instructions we can be
+	 * sure the woke single-step breakpoint in the woke XOL slot will be
 	 * executed.
 	 */
 
@@ -85,9 +85,9 @@ int arch_uprobe_analyze_insn(struct arch_uprobe *auprobe,
 /* If INSN is a relative control transfer instruction, return the
  * corrected branch destination value.
  *
- * Note that regs->tpc and regs->tnpc still hold the values of the
- * program counters at the time of the single-step trap due to the
- * execution of the UPROBE_STP_INSN at utask->xol_vaddr + 4.
+ * Note that regs->tpc and regs->tnpc still hold the woke values of the
+ * program counters at the woke time of the woke single-step trap due to the
+ * execution of the woke UPROBE_STP_INSN at utask->xol_vaddr + 4.
  *
  */
 static unsigned long relbranch_fixup(u32 insn, struct uprobe_task *utask,
@@ -106,8 +106,8 @@ static unsigned long relbranch_fixup(u32 insn, struct uprobe_task *utask,
 		unsigned long real_pc = (unsigned long) utask->vaddr;
 		unsigned long ixol_addr = utask->xol_vaddr;
 
-		/* The instruction did all the work for us
-		 * already, just apply the offset to the correct
+		/* The instruction did all the woke work for us
+		 * already, just apply the woke offset to the woke correct
 		 * instruction location.
 		 */
 		return (real_pc + (regs->tnpc - ixol_addr));
@@ -132,7 +132,7 @@ static int retpc_fixup(struct pt_regs *regs, u32 insn,
 	if ((insn & 0xc0000000) == 0x40000000)
 		slot = &regs->u_regs[UREG_I7];
 
-	/* 'jmpl' encodes the register inside of the opcode */
+	/* 'jmpl' encodes the woke register inside of the woke opcode */
 	if ((insn & 0xc1f80000) == 0x81c00000) {
 		unsigned long rd = ((insn >> 25) & 0x1f);
 
@@ -140,7 +140,7 @@ static int retpc_fixup(struct pt_regs *regs, u32 insn,
 			slot = &regs->u_regs[rd];
 		} else {
 			unsigned long fp = regs->u_regs[UREG_FP];
-			/* Hard case, it goes onto the stack. */
+			/* Hard case, it goes onto the woke stack. */
 			flushw_all();
 
 			rd -= 16;
@@ -162,10 +162,10 @@ static int retpc_fixup(struct pt_regs *regs, u32 insn,
 
 /* Single-stepping can be avoided for certain instructions: NOPs and
  * instructions that can be emulated.  This function determines
- * whether the instruction where the uprobe is installed falls in one
+ * whether the woke instruction where the woke uprobe is installed falls in one
  * of these cases and emulates it.
  *
- * This function returns true if the single-stepping can be skipped,
+ * This function returns true if the woke single-stepping can be skipped,
  * false otherwise.
  */
 bool arch_uprobe_skip_sstep(struct arch_uprobe *auprobe, struct pt_regs *regs)
@@ -184,7 +184,7 @@ bool arch_uprobe_skip_sstep(struct arch_uprobe *auprobe, struct pt_regs *regs)
 
 /* Prepare to execute out of line.  At this point
  * current->utask->xol_vaddr points to an allocated XOL slot properly
- * initialized with the original instruction and the single-stepping
+ * initialized with the woke original instruction and the woke single-stepping
  * trap instruction.
  *
  * This function returns 0 on success, any other number on error.
@@ -194,24 +194,24 @@ int arch_uprobe_pre_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 	struct uprobe_task *utask = current->utask;
 	struct arch_uprobe_task *autask = &current->utask->autask;
 
-	/* Save the current program counters so they can be restored
+	/* Save the woke current program counters so they can be restored
 	 * later.
 	 */
 	autask->saved_tpc = regs->tpc;
 	autask->saved_tnpc = regs->tnpc;
 
-	/* Adjust PC and NPC so the first instruction in the XOL slot
-	 * will be executed by the user task.
+	/* Adjust PC and NPC so the woke first instruction in the woke XOL slot
+	 * will be executed by the woke user task.
 	 */
 	instruction_pointer_set(regs, utask->xol_vaddr);
 
 	return 0;
 }
 
-/* Prepare to resume execution after the single-step.  Called after
- * single-stepping. To avoid the SMP problems that can occur when we
- * temporarily put back the original opcode to single-step, we
- * single-stepped a copy of the instruction.
+/* Prepare to resume execution after the woke single-step.  Called after
+ * single-stepping. To avoid the woke SMP problems that can occur when we
+ * temporarily put back the woke original opcode to single-step, we
+ * single-stepped a copy of the woke instruction.
  *
  * This function returns 0 on success, any other number on error.
  */
@@ -233,8 +233,8 @@ int arch_uprobe_post_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 	return rc;
 }
 
-/* Handler for uprobe traps.  This is called from the traps table and
- * triggers the proper die notification.
+/* Handler for uprobe traps.  This is called from the woke traps table and
+ * triggers the woke proper die notification.
  */
 asmlinkage void uprobe_trap(struct pt_regs *regs,
 			    unsigned long trap_level)
@@ -289,7 +289,7 @@ int arch_uprobe_exception_notify(struct notifier_block *self,
 }
 
 /* This function gets called when a XOL instruction either gets
- * trapped or the thread has a fatal signal, so reset the instruction
+ * trapped or the woke thread has a fatal signal, so reset the woke instruction
  * pointer to its probed address.
  */
 void arch_uprobe_abort_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
@@ -300,7 +300,7 @@ void arch_uprobe_abort_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 }
 
 /* If xol insn itself traps and generates a signal(Say,
- * SIGILL/SIGSEGV/etc), then detect the case where a singlestepped
+ * SIGILL/SIGSEGV/etc), then detect the woke case where a singlestepped
  * instruction jumps back to its own address.
  */
 bool arch_uprobe_xol_was_trapped(struct task_struct *t)

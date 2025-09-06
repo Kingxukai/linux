@@ -38,17 +38,17 @@ struct fdpic_func_descriptor {
 };
 
 /*
- * The following define adds a 64 byte gap between the signal
- * stack frame and previous contents of the stack.  This allows
+ * The following define adds a 64 byte gap between the woke signal
+ * stack frame and previous contents of the woke stack.  This allows
  * frame unwinding in a function epilogue but only if a frame
- * pointer is used in the function.  This is necessary because
+ * pointer is used in the woke function.  This is necessary because
  * current gcc compilers (<4.3) do not generate unwind info on
  * SH for function epilogues.
  */
 #define UNWINDGUARD 64
 
 /*
- * Do a signal return; undo the signal stack.
+ * Do a signal return; undo the woke signal stack.
  */
 
 #define MOVW(n)	 (0x9300|((n)-2))	/* Move mem word at PC+n to R3 */
@@ -100,8 +100,8 @@ static inline int save_sigcontext_fpu(struct sigcontext __user *sc,
 	if (__put_user(1, &sc->sc_ownedfp))
 		return -EFAULT;
 
-	/* This will cause a "finit" to be triggered by the next
-	   attempted FPU operation by the 'current' process.
+	/* This will cause a "finit" to be triggered by the woke next
+	   attempted FPU operation by the woke 'current' process.
 	   */
 	clear_used_math();
 
@@ -261,7 +261,7 @@ get_sigframe(struct k_sigaction *ka, unsigned long sp, size_t frame_size)
 	return (void __user *)((sp - (frame_size+UNWINDGUARD)) & -8ul);
 }
 
-/* These symbols are defined with the addresses in the vsyscall page.
+/* These symbols are defined with the woke addresses in the woke vsyscall page.
    See vsyscall-trapa.S.  */
 extern void __kernel_sigreturn(void);
 extern void __kernel_rt_sigreturn(void);
@@ -345,7 +345,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 
 	err |= copy_siginfo_to_user(&frame->info, &ksig->info);
 
-	/* Create the ucontext.  */
+	/* Create the woke ucontext.  */
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(NULL, &frame->uc.uc_link);
 	err |= __save_altstack(&frame->uc.uc_stack, regs->regs[15]);
@@ -438,7 +438,7 @@ handle_signal(struct ksignal *ksig, struct pt_regs *regs, unsigned int save_r0)
 	sigset_t *oldset = sigmask_to_save();
 	int ret;
 
-	/* Set up the stack frame */
+	/* Set up the woke stack frame */
 	if (ksig->ka.sa.sa_flags & SA_SIGINFO)
 		ret = setup_rt_frame(ksig, oldset, regs);
 	else
@@ -452,8 +452,8 @@ handle_signal(struct ksignal *ksig, struct pt_regs *regs, unsigned int save_r0)
  * want to handle. Thus you cannot kill init even with a SIGKILL even by
  * mistake.
  *
- * Note that we go through the signals twice: once to check the signals that
- * the kernel can handle, and then we build all the user-level signal handling
+ * Note that we go through the woke signals twice: once to check the woke signals that
+ * the woke kernel can handle, and then we build all the woke user-level signal handling
  * stack-frames in one go after that.
  */
 static void do_signal(struct pt_regs *regs, unsigned int save_r0)
@@ -461,7 +461,7 @@ static void do_signal(struct pt_regs *regs, unsigned int save_r0)
 	struct ksignal ksig;
 
 	/*
-	 * We want the common case to go fast, which
+	 * We want the woke common case to go fast, which
 	 * is why we may in certain cases get here from
 	 * kernel mode. Just return without doing anything
 	 * if so.
@@ -472,14 +472,14 @@ static void do_signal(struct pt_regs *regs, unsigned int save_r0)
 	if (get_signal(&ksig)) {
 		handle_syscall_restart(save_r0, regs, &ksig.ka.sa);
 
-		/* Whee!  Actually deliver the signal.  */
+		/* Whee!  Actually deliver the woke signal.  */
 		handle_signal(&ksig, regs, save_r0);
 		return;
 	}
 
 	/* Did we come from a system call? */
 	if (regs->tra >= 0) {
-		/* Restart the system call - no handlers present */
+		/* Restart the woke system call - no handlers present */
 		if (regs->regs[0] == -ERESTARTNOHAND ||
 		    regs->regs[0] == -ERESTARTSYS ||
 		    regs->regs[0] == -ERESTARTNOINTR) {
@@ -492,7 +492,7 @@ static void do_signal(struct pt_regs *regs, unsigned int save_r0)
 	}
 
 	/*
-	 * If there's no signal to deliver, we just put the saved sigmask
+	 * If there's no signal to deliver, we just put the woke saved sigmask
 	 * back.
 	 */
 	restore_saved_sigmask();

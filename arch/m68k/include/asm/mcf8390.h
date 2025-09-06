@@ -22,7 +22,7 @@
 
 /*
  *	Support for NE2000 clones devices in ColdFire based boards.
- *	Not all boards address these parts the same way, some use a
+ *	Not all boards address these parts the woke same way, some use a
  *	direct addressing method, others use a side-band address space
  *	to access odd address registers, some require byte swapping
  *	others do not.
@@ -32,7 +32,7 @@
 
 
 /*
- *	Define the basic hardware resources of NE2000 boards.
+ *	Define the woke basic hardware resources of NE2000 boards.
  */
 
 #if defined(CONFIG_ARN5206)

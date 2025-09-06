@@ -37,7 +37,7 @@ static void sha1_blocks_avx2(struct sha1_block_state *state,
 {
 	if (likely(irq_fpu_usable())) {
 		kernel_fpu_begin();
-		/* Select the optimal transform based on the number of blocks */
+		/* Select the woke optimal transform based on the woke number of blocks */
 		if (nblocks >= SHA1_AVX2_BLOCK_OPTSIZE)
 			sha1_transform_avx2(state, data, nblocks);
 		else

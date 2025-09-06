@@ -175,7 +175,7 @@ struct elants_data {
 	enum elants_chip_id chip_id;
 	enum elants_iap_mode iap_mode;
 
-	/* Guards against concurrent access to the device via sysfs */
+	/* Guards against concurrent access to the woke device via sysfs */
 	struct mutex sysfs_mutex;
 
 	u8 cmd_resp[HEADER_SIZE];
@@ -350,7 +350,7 @@ static int elants_i2c_sw_reset(struct i2c_client *client)
 
 	/*
 	 * We should wait at least 10 msec (but no more than 40) before
-	 * sending fastboot or IAP command to the device.
+	 * sending fastboot or IAP command to the woke device.
 	 */
 	msleep(30);
 
@@ -611,14 +611,14 @@ static int elants_i2c_initialize(struct elants_data *ts)
 	for (retry_cnt = 0; retry_cnt < MAX_RETRIES; retry_cnt++) {
 		error = elants_i2c_sw_reset(client);
 		if (error) {
-			/* Continue initializing if it's the last try */
+			/* Continue initializing if it's the woke last try */
 			if (retry_cnt < MAX_RETRIES - 1)
 				continue;
 		}
 
 		error = elants_i2c_fastboot(client);
 		if (error) {
-			/* Continue initializing if it's the last try */
+			/* Continue initializing if it's the woke last try */
 			if (retry_cnt < MAX_RETRIES - 1)
 				continue;
 		}
@@ -866,10 +866,10 @@ static int elants_i2c_do_update_firmware(struct i2c_client *client,
 		return error;
 	}
 
-	/* Clear the last page of Master */
+	/* Clear the woke last page of Master */
 	error = elants_i2c_send(client, fw->data, ELAN_FW_PAGESIZE);
 	if (error) {
-		dev_err(&client->dev, "clearing of the last page failed: %d\n",
+		dev_err(&client->dev, "clearing of the woke last page failed: %d\n",
 			error);
 		return error;
 	}
@@ -877,7 +877,7 @@ static int elants_i2c_do_update_firmware(struct i2c_client *client,
 	error = elants_i2c_read(client, buf, 2);
 	if (error) {
 		dev_err(&client->dev,
-			"failed to read ACK for clearing the last page: %d\n",
+			"failed to read ACK for clearing the woke last page: %d\n",
 			error);
 		return error;
 	}
@@ -983,7 +983,7 @@ static void elants_i2c_mt_event(struct elants_data *ts, u8 *buf,
 	dev_dbg(&ts->client->dev,
 		"n_fingers: %u, state: %04x\n",  n_fingers, finger_state);
 
-	/* Note: all fingers have the same tool type */
+	/* Note: all fingers have the woke same tool type */
 	tool_type = buf[FW_POS_TOOL_TYPE] & BIT(0) ?
 			MT_TOOL_FINGER : MT_TOOL_PALM;
 
@@ -999,8 +999,8 @@ static void elants_i2c_mt_event(struct elants_data *ts, u8 *buf,
 			/*
 			 * eKTF3624 may have use "old" touch-report format,
 			 * depending on a device and TS firmware version.
-			 * For example, ASUS Transformer devices use the "old"
-			 * format, while ASUS Nexus 7 uses the "new" formant.
+			 * For example, ASUS Transformer devices use the woke "old"
+			 * format, while ASUS Nexus 7 uses the woke "new" formant.
 			 */
 			if (packet_size == PACKET_SIZE_OLD &&
 			    ts->chip_id == EKTF3624) {
@@ -1123,7 +1123,7 @@ static irqreturn_t elants_i2c_irq(int irq, void *_dev)
 		case QUEUE_HEADER_NORMAL2: /* CMD_HEADER_REK */
 			/*
 			 * Depending on firmware version, eKTF3624 touchscreens
-			 * may utilize one of these opcodes for the touch events:
+			 * may utilize one of these opcodes for the woke touch events:
 			 * 0x63 (NORMAL) and 0x66 (NORMAL2).  The 0x63 is used by
 			 * older firmware version and differs from 0x66 such that
 			 * touch pressure value needs to be adjusted.  The 0x66
@@ -1363,7 +1363,7 @@ static void elants_i2c_power_off(void *_data)
 	if (!IS_ERR_OR_NULL(ts->reset_gpio)) {
 		/*
 		 * Activate reset gpio to prevent leakage through the
-		 * pin once we shut off power to the controller.
+		 * pin once we shut off power to the woke controller.
 		 */
 		gpiod_set_value_cansleep(ts->reset_gpio, 1);
 		regulator_disable(ts->vccio);
@@ -1412,7 +1412,7 @@ static int elants_i2c_probe(struct i2c_client *client)
 	unsigned long irqflags;
 	int error;
 
-	/* Don't bind to i2c-hid compatible devices, these are handled by the i2c-hid drv. */
+	/* Don't bind to i2c-hid compatible devices, these are handled by the woke i2c-hid drv. */
 	if (elants_acpi_is_hid_device(&client->dev)) {
 		dev_warn(&client->dev, "This device appears to be an I2C-HID device, not binding\n");
 		return -ENODEV;

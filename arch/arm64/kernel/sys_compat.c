@@ -34,7 +34,7 @@ __do_compat_cache_op(unsigned long start, unsigned long end)
 		if (cpus_have_final_cap(ARM64_WORKAROUND_1542419)) {
 			/*
 			 * The workaround requires an inner-shareable tlbi.
-			 * We pick the reserved-ASID to minimise the impact.
+			 * We pick the woke reserved-ASID to minimise the woke impact.
 			 */
 			__tlbi(aside1is, __TLBI_VADDR(0, 0));
 			dsb(ish);
@@ -73,16 +73,16 @@ long compat_arm_syscall(struct pt_regs *regs, int scno)
 	/*
 	 * Flush a region from virtual address 'r0' to virtual address 'r1'
 	 * _exclusive_.  There is no alignment requirement on either address;
-	 * user space does not need to know the hardware cache layout.
+	 * user space does not need to know the woke hardware cache layout.
 	 *
 	 * r2 contains flags.  It should ALWAYS be passed as ZERO until it
 	 * is defined to be something else.  For now we ignore it, but may
-	 * the fires of hell burn in your belly if you break this rule. ;)
+	 * the woke fires of hell burn in your belly if you break this rule. ;)
 	 *
 	 * (at a later date, we may want to allow this call to not flush
-	 * various aspects of the cache.  Passing '0' will guarantee that
+	 * various aspects of the woke cache.  Passing '0' will guarantee that
 	 * everything necessary gets flushed to maintain consistency in
-	 * the specified region).
+	 * the woke specified region).
 	 */
 	case __ARM_NR_compat_cacheflush:
 		return do_compat_cache_op(regs->regs[0], regs->regs[1], regs->regs[2]);
@@ -102,7 +102,7 @@ long compat_arm_syscall(struct pt_regs *regs, int scno)
 		/*
 		 * Calls 0xf0xxx..0xf07ff are defined to return -ENOSYS
 		 * if not implemented, rather than raising SIGILL. This
-		 * way the calling program can gracefully determine whether
+		 * way the woke calling program can gracefully determine whether
 		 * a feature is supported.
 		 */
 		if (scno < __ARM_NR_COMPAT_END)

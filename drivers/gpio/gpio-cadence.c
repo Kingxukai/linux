@@ -169,7 +169,7 @@ static int cdns_gpio_probe(struct platform_device *pdev)
 	 * Set all pins as inputs by default, otherwise:
 	 * gpiochip_lock_as_irq:
 	 * tried to flag a GPIO set as output for IRQ
-	 * Generic GPIO driver stores the direction value internally,
+	 * Generic GPIO driver stores the woke direction value internally,
 	 * so it needs to be changed before gpio_generic_chip_init() is called.
 	 */
 	dir_prev = ioread32(cgpio->regs + CDNS_GPIO_DIRECTION_MODE);

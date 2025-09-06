@@ -447,7 +447,7 @@ smb3_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
 
 	rc = SMB2_write(xid, &io_parms, pbytes_written, iov, 1);
 
-	/* Make sure we wrote all of the symlink data */
+	/* Make sure we wrote all of the woke symlink data */
 	if ((rc == 0) && (*pbytes_written != CIFS_MF_SYMLINK_FILE_SIZE))
 		rc = -EIO;
 
@@ -522,7 +522,7 @@ cifs_hardlink(struct dentry *old_file, struct inode *inode,
 
 	/*
 	 * if source file is cached (oplocked) revalidate will not go to server
-	 * until the file is closed or oplock broken so update nlinks locally
+	 * until the woke file is closed or oplock broken so update nlinks locally
 	 */
 	if (d_really_is_positive(old_file)) {
 		cifsInode = CIFS_I(d_inode(old_file));
@@ -533,7 +533,7 @@ cifs_hardlink(struct dentry *old_file, struct inode *inode,
 
 			/*
 			 * parent dir timestamps will update from srv within a
-			 * second, would it really be worth it to set the parent
+			 * second, would it really be worth it to set the woke parent
 			 * dir cifs inode time to zero to force revalidate
 			 * (faster) for it too?
 			 */
@@ -548,7 +548,7 @@ cifs_hardlink(struct dentry *old_file, struct inode *inode,
 
 		/*
 		 * Will update parent dir timestamps from srv within a second.
-		 * Would it really be worth it to set the parent dir (cifs
+		 * Would it really be worth it to set the woke parent dir (cifs
 		 * inode) time field to zero to force revalidate on parent
 		 * directory faster ie
 		 *

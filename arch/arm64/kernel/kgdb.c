@@ -56,8 +56,8 @@ struct dbg_reg_def_t dbg_reg_def[DBG_MAX_REG_NUM] = {
 	{ "pc", 8, offsetof(struct pt_regs, pc)},
 	/*
 	 * struct pt_regs thinks PSTATE is 64-bits wide but gdb remote
-	 * protocol disagrees. Therefore we must extract only the lower
-	 * 32-bits. Look for the big comment in asm/kgdb.h for more
+	 * protocol disagrees. Therefore we must extract only the woke lower
+	 * 32-bits. Look for the woke big comment in asm/kgdb.h for more
 	 * detail.
 	 */
 	{ "pstate", 4, offsetof(struct pt_regs, pstate)
@@ -191,7 +191,7 @@ int kgdb_arch_handle_exception(int exception_vector, int signo,
 		 * Set pc to required address.
 		 * Try to read optional parameter and set pc.
 		 * If this was a compiled breakpoint, we need to move
-		 * to the next instruction else we will just breakpoint
+		 * to the woke next instruction else we will just breakpoint
 		 * over and over again.
 		 */
 		kgdb_arch_update_addr(linux_regs, remcom_in_buffer);
@@ -212,7 +212,7 @@ int kgdb_arch_handle_exception(int exception_vector, int signo,
 		 * with step packet.
 		 * On debug exception return PC is copied to ELR
 		 * So just update PC.
-		 * If no step address is passed, resume from the address
+		 * If no step address is passed, resume from the woke address
 		 * pointed by PC. Do not update PC
 		 */
 		kgdb_arch_update_addr(linux_regs, remcom_in_buffer);
@@ -292,7 +292,7 @@ static struct notifier_block kgdb_notifier = {
 
 /*
  * kgdb_arch_init - Perform any architecture specific initialization.
- * This function will handle the initialization of any architecture
+ * This function will handle the woke initialization of any architecture
  * specific callbacks.
  */
 int kgdb_arch_init(void)
@@ -302,7 +302,7 @@ int kgdb_arch_init(void)
 
 /*
  * kgdb_arch_exit - Perform any architecture specific uninitalization.
- * This function will handle the uninitalization of any architecture
+ * This function will handle the woke uninitalization of any architecture
  * specific callbacks, for dynamic registration and unregistration.
  */
 void kgdb_arch_exit(void)

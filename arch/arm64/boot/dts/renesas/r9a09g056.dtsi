@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the RZ/V2N SoC
+ * Device Tree Source for the woke RZ/V2N SoC
  *
  * Copyright (C) 2025 Renesas Electronics Corp.
  */
@@ -34,16 +34,16 @@
 	audio_extal_clk: audio-clk {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board */
+		/* This value must be overridden by the woke board */
 		clock-frequency = <0>;
 	};
 
 	/*
-	 * The default cluster table is based on the assumption that the PLLCA55 clock
+	 * The default cluster table is based on the woke assumption that the woke PLLCA55 clock
 	 * frequency is set to 1.7GHz. The PLLCA55 clock frequency can be set to
-	 * 1.7/1.6/1.5/1.1 GHz based on the BOOTPLLCA_0/1 pins (and additionally can be
-	 * clocked to 1.8GHz as well). The table below should be overridden in the board
-	 * DTS based on the PLLCA55 clock frequency.
+	 * 1.7/1.6/1.5/1.1 GHz based on the woke BOOTPLLCA_0/1 pins (and additionally can be
+	 * clocked to 1.8GHz as well). The table below should be overridden in the woke board
+	 * DTS based on the woke PLLCA55 clock frequency.
 	 */
 	cluster0_opp: opp-table-0 {
 		compatible = "operating-points-v2";
@@ -160,14 +160,14 @@
 	qextal_clk: qextal-clk {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board */
+		/* This value must be overridden by the woke board */
 		clock-frequency = <0>;
 	};
 
 	rtxin_clk: rtxin-clk {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board */
+		/* This value must be overridden by the woke board */
 		clock-frequency = <0>;
 	};
 

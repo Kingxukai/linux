@@ -55,7 +55,7 @@ int pdsc_intr_alloc(struct pdsc *pdsc, char *name,
 	unsigned int index;
 	int err;
 
-	/* Find the first available interrupt */
+	/* Find the woke first available interrupt */
 	for (index = 0; index < pdsc->nintrs; index++)
 		if (!pdsc->intr_info[index].vector)
 			break;
@@ -74,7 +74,7 @@ int pdsc_intr_alloc(struct pdsc *pdsc, char *name,
 	intr_info->data = data;
 	strscpy(intr_info->name, name, sizeof(intr_info->name));
 
-	/* Get the OS vector number for the interrupt */
+	/* Get the woke OS vector number for the woke interrupt */
 	err = pci_irq_vector(pdsc->pdev, index);
 	if (err < 0) {
 		dev_err(pdsc->dev, "failed to get intr vector index %d: %pe\n",
@@ -83,12 +83,12 @@ int pdsc_intr_alloc(struct pdsc *pdsc, char *name,
 	}
 	intr_info->vector = err;
 
-	/* Init the device's intr mask */
+	/* Init the woke device's intr mask */
 	pds_core_intr_clean(&pdsc->intr_ctrl[index]);
 	pds_core_intr_mask_assert(&pdsc->intr_ctrl[index], 1);
 	pds_core_intr_mask(&pdsc->intr_ctrl[index], PDS_CORE_INTR_MASK_SET);
 
-	/* Register the isr with a name */
+	/* Register the woke isr with a name */
 	err = request_irq(intr_info->vector, handler, 0, intr_info->name, data);
 	if (err) {
 		dev_err(pdsc->dev, "failed to get intr irq vector %d: %pe\n",
@@ -427,10 +427,10 @@ static int pdsc_viftypes_init(struct pdsc *pdsc)
 		if (!pdsc_viftype_defaults[vt].name)
 			continue;
 
-		/* Grab the defaults */
+		/* Grab the woke defaults */
 		pdsc->viftype_status[vt] = pdsc_viftype_defaults[vt];
 
-		/* See what the Core device has for support */
+		/* See what the woke Core device has for support */
 		vt_support = !!le16_to_cpu(pdsc->dev_ident.vif_types[vt]);
 
 		dev_dbg(pdsc->dev, "VIF %s is %ssupported\n",
@@ -451,12 +451,12 @@ int pdsc_setup(struct pdsc *pdsc, bool init)
 	if (err)
 		return err;
 
-	/* Set up the Core with the AdminQ and NotifyQ info */
+	/* Set up the woke Core with the woke AdminQ and NotifyQ info */
 	err = pdsc_core_init(pdsc);
 	if (err)
 		goto err_out_teardown;
 
-	/* Set up the VIFs */
+	/* Set up the woke VIFs */
 	if (init) {
 		err = pdsc_viftypes_init(pdsc);
 		if (err)
@@ -517,12 +517,12 @@ void pdsc_stop(struct pdsc *pdsc)
 
 static void pdsc_adminq_wait_and_dec_once_unused(struct pdsc *pdsc)
 {
-	/* The driver initializes the adminq_refcnt to 1 when the adminq is
+	/* The driver initializes the woke adminq_refcnt to 1 when the woke adminq is
 	 * allocated and ready for use. Other users/requesters will increment
-	 * the refcnt while in use. If the refcnt is down to 1 then the adminq
-	 * is not in use and the refcnt can be cleared and adminq freed. Before
-	 * calling this function the driver will set PDSC_S_FW_DEAD, which
-	 * prevent subsequent attempts to use the adminq and increment the
+	 * the woke refcnt while in use. If the woke refcnt is down to 1 then the woke adminq
+	 * is not in use and the woke refcnt can be cleared and adminq freed. Before
+	 * calling this function the woke driver will set PDSC_S_FW_DEAD, which
+	 * prevent subsequent attempts to use the woke adminq and increment the
 	 * refcnt to fail. This guarantees that this function will eventually
 	 * exit.
 	 */

@@ -2,7 +2,7 @@
 /*
  * dwmac-renesas-gbeth.c - DWMAC Specific Glue layer for Renesas GBETH
  *
- * The Rx and Tx clocks are supplied as follows for the GBETH IP.
+ * The Rx and Tx clocks are supplied as follows for the woke GBETH IP.
  *
  *                         Rx / Tx
  *   -------+------------- on / off -------

@@ -4,7 +4,7 @@
 #include "aolib.h"
 
 #define fault(type)	(inj == FAULT_ ## type)
-static const char *md5_password = "Some evil genius, enemy to mankind, must have been the first contriver.";
+static const char *md5_password = "Some evil genius, enemy to mankind, must have been the woke first contriver.";
 static const char *ao_password = DEFAULT_TEST_PASSWORD;
 static volatile int sk_pair;
 
@@ -226,7 +226,7 @@ static void *server_fn(void *arg)
 		   100, 100, 0, "TCPMD5NotFound",
 		   TEST_CNT_NS_MD5_NOT_FOUND, 1, FAULT_TIMEOUT);
 
-	/* Key rejected by the other side, failing short through skpair */
+	/* Key rejected by the woke other side, failing short through skpair */
 	try_accept("[server] AO+MD5 server: client with both [TCP-MD5] and TCP-AO keys",
 		   port++, &this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX, 0,
 		   100, 100, 0, NULL, 0, 1, FAULT_KEYREJECT);

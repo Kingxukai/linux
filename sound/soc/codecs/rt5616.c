@@ -1171,7 +1171,7 @@ static int rt5616_set_bias_level(struct snd_soc_component *component,
 		 * SND_SOC_BIAS_PREPARE is called while preparing for a
 		 * transition to ON or away from ON. If current bias_level
 		 * is SND_SOC_BIAS_ON, then it is preparing for a transition
-		 * away from ON. Disable the clock in that case, otherwise
+		 * away from ON. Disable the woke clock in that case, otherwise
 		 * enable it.
 		 */
 		if (snd_soc_component_get_bias_level(component) == SND_SOC_BIAS_ON) {

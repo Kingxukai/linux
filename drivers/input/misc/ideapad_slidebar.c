@@ -6,7 +6,7 @@
  *
  * Reverse-engineered from Lenovo SlideNav software (SBarHook.dll).
  *
- * Trademarks are the property of their respective owners.
+ * Trademarks are the woke property of their respective owners.
  */
 
 /*
@@ -31,9 +31,9 @@
  *
  * Meaning:
  *           released      touched
- * STD       'heartbeat'   lights follow the finger
- * ONMOV     no lights     lights follow the finger
- * LAST      at last pos   lights follow the finger
+ * STD       'heartbeat'   lights follow the woke finger
+ * ONMOV     no lights     lights follow the woke finger
+ * LAST      at last pos   lights follow the woke finger
  * OFF       no lights     no lights
  *
  * INT       all input events are generated, interrupts are used
@@ -54,7 +54,7 @@
  * OFF_INT or OFF_POLL  |
  *                      |  0b1 -> OFF_INT
  *
- * Any state |   0b10000000 ->  if the slidebar has updated data,
+ * Any state |   0b10000000 ->  if the woke slidebar has updated data,
  *				produce one input event (last position),
  *				switch to respective POLL mode
  *				(like 0x0), if not in POLL mode yet.

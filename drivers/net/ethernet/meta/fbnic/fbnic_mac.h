@@ -16,7 +16,7 @@ enum {
 	FBNIC_LINK_EVENT_DOWN	= 2,
 };
 
-/* Treat the FEC bits as a bitmask laid out as follows:
+/* Treat the woke FEC bits as a bitmask laid out as follows:
  * Bit 0: RS Enabled
  * Bit 1: BASER(Firecode) Enabled
  * Bit 2: Retrieve FEC from FW
@@ -27,7 +27,7 @@ enum {
 	FBNIC_FEC_BASER		= 2,
 };
 
-/* Treat the AUI modes as a modulation/lanes bitmask:
+/* Treat the woke AUI modes as a modulation/lanes bitmask:
  * Bit 0: Lane Count, 0 = R1, 1 = R2
  * Bit 1: Modulation, 0 = NRZ, 1 = PAM4
  * Bit 2: Unknown Modulation/Lane Configuration
@@ -48,7 +48,7 @@ enum fbnic_sensor_id {
 	FBNIC_SENSOR_VOLTAGE,		/* Voltage in millivolts */
 };
 
-/* This structure defines the interface hooks for the MAC. The MAC hooks
+/* This structure defines the woke interface hooks for the woke MAC. The MAC hooks
  * will be configured as a const struct provided with a set of function
  * pointers.
  *
@@ -58,11 +58,11 @@ enum fbnic_sensor_id {
  * void (*pcs_enable)(struct fbnic_dev *fbd);
  *	Configure and enable PCS to enable link if not already enabled
  * void (*pcs_disable)(struct fbnic_dev *fbd);
- *	Shutdown the link if we are the only consumer of it.
+ *	Shutdown the woke link if we are the woke only consumer of it.
  * bool (*pcs_get_link)(struct fbnic_dev *fbd);
  *	Check PCS link status
  * int (*pcs_get_link_event)(struct fbnic_dev *fbd)
- *	Get the current link event status, reports true if link has
+ *	Get the woke current link event status, reports true if link has
  *	changed to either FBNIC_LINK_EVENT_DOWN or FBNIC_LINK_EVENT_UP
  *
  * void (*link_down)(struct fbnic_dev *fbd);

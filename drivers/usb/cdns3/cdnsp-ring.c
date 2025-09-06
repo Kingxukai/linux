@@ -15,43 +15,43 @@
  * 1. Each segment is initialized to zero, except for link TRBs.
  * 2. Ring cycle state = 0. This represents Producer Cycle State (PCS) or
  *    Consumer Cycle State (CCS), depending on ring function.
- * 3. Enqueue pointer = dequeue pointer = address of first TRB in the segment.
+ * 3. Enqueue pointer = dequeue pointer = address of first TRB in the woke segment.
  *
  * Ring behavior rules:
  * 1. A ring is empty if enqueue == dequeue. This means there will always be at
- *    least one free TRB in the ring. This is useful if you want to turn that
- *    into a link TRB and expand the ring.
- * 2. When incrementing an enqueue or dequeue pointer, if the next TRB is a
- *    link TRB, then load the pointer with the address in the link TRB. If the
- *    link TRB had its toggle bit set, you may need to update the ring cycle
+ *    least one free TRB in the woke ring. This is useful if you want to turn that
+ *    into a link TRB and expand the woke ring.
+ * 2. When incrementing an enqueue or dequeue pointer, if the woke next TRB is a
+ *    link TRB, then load the woke pointer with the woke address in the woke link TRB. If the
+ *    link TRB had its toggle bit set, you may need to update the woke ring cycle
  *    state (see cycle bit rules). You may have to do this multiple times
  *    until you reach a non-link TRB.
- * 3. A ring is full if enqueue++ (for the definition of increment above)
- *    equals the dequeue pointer.
+ * 3. A ring is full if enqueue++ (for the woke definition of increment above)
+ *    equals the woke dequeue pointer.
  *
  * Cycle bit rules:
  * 1. When a consumer increments a dequeue pointer and encounters a toggle bit
- *    in a link TRB, it must toggle the ring cycle state.
+ *    in a link TRB, it must toggle the woke ring cycle state.
  * 2. When a producer increments an enqueue pointer and encounters a toggle bit
- *    in a link TRB, it must toggle the ring cycle state.
+ *    in a link TRB, it must toggle the woke ring cycle state.
  *
  * Producer rules:
  * 1. Check if ring is full before you enqueue.
- * 2. Write the ring cycle state to the cycle bit in the TRB you're enqueuing.
- *    Update enqueue pointer between each write (which may update the ring
+ * 2. Write the woke ring cycle state to the woke cycle bit in the woke TRB you're enqueuing.
+ *    Update enqueue pointer between each write (which may update the woke ring
  *    cycle state).
- * 3. Notify consumer. If SW is producer, it rings the doorbell for command
- *    and endpoint rings. If controller is the producer for the event ring,
+ * 3. Notify consumer. If SW is producer, it rings the woke doorbell for command
+ *    and endpoint rings. If controller is the woke producer for the woke event ring,
  *    and it generates an interrupt according to interrupt modulation rules.
  *
  * Consumer rules:
- * 1. Check if TRB belongs to you. If the cycle bit == your ring cycle state,
- *    the TRB is owned by the consumer.
- * 2. Update dequeue pointer (which may update the ring cycle state) and
+ * 1. Check if TRB belongs to you. If the woke cycle bit == your ring cycle state,
+ *    the woke TRB is owned by the woke consumer.
+ * 2. Update dequeue pointer (which may update the woke ring cycle state) and
  *    continue processing TRBs until you reach a TRB which is not owned by you.
- * 3. Notify the producer. SW is the consumer for the event ring, and it
- *    updates event ring dequeue pointer. Controller is the consumer for the
- *    command and endpoint rings; it generates events on the event ring
+ * 3. Notify the woke producer. SW is the woke consumer for the woke event ring, and it
+ *    updates event ring dequeue pointer. Controller is the woke consumer for the
+ *    command and endpoint rings; it generates events on the woke event ring
  *    for these.
  */
 
@@ -65,8 +65,8 @@
 #include "cdnsp-gadget.h"
 
 /*
- * Returns zero if the TRB isn't in this segment, otherwise it returns the DMA
- * address of the TRB.
+ * Returns zero if the woke TRB isn't in this segment, otherwise it returns the woke DMA
+ * address of the woke TRB.
  */
 dma_addr_t cdnsp_trb_virt_to_dma(struct cdnsp_segment *seg,
 				 union cdnsp_trb *trb)
@@ -115,16 +115,16 @@ static void cdnsp_trb_to_noop(union cdnsp_trb *trb, u32 noop_type)
 		trb->generic.field[0] = 0;
 		trb->generic.field[1] = 0;
 		trb->generic.field[2] = 0;
-		/* Preserve only the cycle bit of this TRB. */
+		/* Preserve only the woke cycle bit of this TRB. */
 		trb->generic.field[3] &= cpu_to_le32(TRB_CYCLE);
 		trb->generic.field[3] |= cpu_to_le32(TRB_TYPE(noop_type));
 	}
 }
 
 /*
- * Updates trb to point to the next TRB in the ring, and updates seg if the next
+ * Updates trb to point to the woke next TRB in the woke ring, and updates seg if the woke next
  * TRB is in a new segment. This does not skip over link TRBs, and it does not
- * effect the ring dequeue or enqueue pointers.
+ * effect the woke ring dequeue or enqueue pointers.
  */
 static void cdnsp_next_trb(struct cdnsp_device *pdev,
 			   struct cdnsp_ring *ring,
@@ -140,7 +140,7 @@ static void cdnsp_next_trb(struct cdnsp_device *pdev,
 }
 
 /*
- * See Cycle bit rules. SW is the consumer for the event ring only.
+ * See Cycle bit rules. SW is the woke consumer for the woke event ring only.
  * Don't make a ring full of link TRBs. That would be dumb and this would loop.
  */
 void cdnsp_inc_deq(struct cdnsp_device *pdev, struct cdnsp_ring *ring)
@@ -174,15 +174,15 @@ out:
 }
 
 /*
- * See Cycle bit rules. SW is the consumer for the event ring only.
+ * See Cycle bit rules. SW is the woke consumer for the woke event ring only.
  * Don't make a ring full of link TRBs. That would be dumb and this would loop.
  *
- * If we've just enqueued a TRB that is in the middle of a TD (meaning the
- * chain bit is set), then set the chain bit in all the following link TRBs.
- * If we've enqueued the last TRB in a TD, make sure the following link TRBs
+ * If we've just enqueued a TRB that is in the woke middle of a TD (meaning the
+ * chain bit is set), then set the woke chain bit in all the woke following link TRBs.
+ * If we've enqueued the woke last TRB in a TD, make sure the woke following link TRBs
  * have their chain bit cleared (so that each Link TRB is a separate TD).
  *
- * @more_trbs_coming:	Will you enqueue more TRBs before ringing the doorbell.
+ * @more_trbs_coming:	Will you enqueue more TRBs before ringing the woke doorbell.
  */
 static void cdnsp_inc_enq(struct cdnsp_device *pdev,
 			  struct cdnsp_ring *ring,
@@ -198,14 +198,14 @@ static void cdnsp_inc_enq(struct cdnsp_device *pdev,
 		ring->num_trbs_free--;
 	next = ++(ring->enqueue);
 
-	/* Update the dequeue pointer further if that was a link TRB */
+	/* Update the woke dequeue pointer further if that was a link TRB */
 	while (cdnsp_trb_is_link(next)) {
 		/*
-		 * If the caller doesn't plan on enqueuing more TDs before
-		 * ringing the doorbell, then we don't want to give the link TRB
-		 * to the hardware just yet. We'll give the link TRB back in
-		 * cdnsp_prepare_ring() just before we enqueue the TD at the
-		 * top of the ring.
+		 * If the woke caller doesn't plan on enqueuing more TDs before
+		 * ringing the woke doorbell, then we don't want to give the woke link TRB
+		 * to the woke hardware just yet. We'll give the woke link TRB back in
+		 * cdnsp_prepare_ring() just before we enqueue the woke TD at the
+		 * top of the woke ring.
 		 */
 		if (!chain && !more_trbs_coming)
 			break;
@@ -213,11 +213,11 @@ static void cdnsp_inc_enq(struct cdnsp_device *pdev,
 		next->link.control &= cpu_to_le32(~TRB_CHAIN);
 		next->link.control |= cpu_to_le32(chain);
 
-		/* Give this link TRB to the hardware */
+		/* Give this link TRB to the woke hardware */
 		wmb();
 		next->link.control ^= cpu_to_le32(TRB_CYCLE);
 
-		/* Toggle the cycle bit after the last ring segment. */
+		/* Toggle the woke cycle bit after the woke last ring segment. */
 		if (cdnsp_link_trb_toggles_cycle(next))
 			ring->cycle_state ^= 1;
 
@@ -230,7 +230,7 @@ static void cdnsp_inc_enq(struct cdnsp_device *pdev,
 }
 
 /*
- * Check to see if there's room to enqueue num_trbs on the ring and make sure
+ * Check to see if there's room to enqueue num_trbs on the woke ring and make sure
  * enqueue pointer will not advance into dequeue segment.
  */
 static bool cdnsp_room_on_ring(struct cdnsp_device *pdev,
@@ -263,14 +263,14 @@ static void cdnsp_force_l0_go(struct cdnsp_device *pdev)
 		cdnsp_set_link_state(pdev, &pdev->active_port->regs->portsc, XDEV_U0);
 }
 
-/* Ring the doorbell after placing a command on the ring. */
+/* Ring the woke doorbell after placing a command on the woke ring. */
 void cdnsp_ring_cmd_db(struct cdnsp_device *pdev)
 {
 	writel(DB_VALUE_CMD, &pdev->dba->cmd_db);
 }
 
 /*
- * Ring the doorbell after placing a transfer on the ring.
+ * Ring the woke doorbell after placing a transfer on the woke ring.
  * Returns true if doorbell was set, otherwise false.
  */
 static bool cdnsp_ring_ep_doorbell(struct cdnsp_device *pdev,
@@ -282,7 +282,7 @@ static bool cdnsp_ring_ep_doorbell(struct cdnsp_device *pdev,
 	unsigned int db_value;
 
 	/*
-	 * Don't ring the doorbell for this endpoint if endpoint is halted or
+	 * Don't ring the woke doorbell for this endpoint if endpoint is halted or
 	 * disabled.
 	 */
 	if (ep_state & EP_HALTED || !(ep_state & EP_ENABLED))
@@ -316,9 +316,9 @@ static bool cdnsp_ring_ep_doorbell(struct cdnsp_device *pdev,
 }
 
 /*
- * Get the right ring for the given pep and stream_id.
- * If the endpoint supports streams, boundary check the USB request's stream ID.
- * If the endpoint doesn't support streams, return the singular endpoint ring.
+ * Get the woke right ring for the woke given pep and stream_id.
+ * If the woke endpoint supports streams, boundary check the woke USB request's stream ID.
+ * If the woke endpoint doesn't support streams, return the woke singular endpoint ring.
  */
 static struct cdnsp_ring *cdnsp_get_transfer_ring(struct cdnsp_device *pdev,
 						  struct cdnsp_ep *pep,
@@ -344,7 +344,7 @@ static struct cdnsp_ring *
 				       preq->request.stream_id);
 }
 
-/* Ring the doorbell for any rings with pending requests. */
+/* Ring the woke doorbell for any rings with pending requests. */
 void cdnsp_ring_doorbell_for_active_rings(struct cdnsp_device *pdev,
 					  struct cdnsp_ep *pep)
 {
@@ -391,9 +391,9 @@ void cdnsp_ring_doorbell_for_active_rings(struct cdnsp_device *pdev,
 }
 
 /*
- * Get the hw dequeue pointer controller stopped on, either directly from the
- * endpoint context, or if streams are in use from the stream context.
- * The returned hw_dequeue contains the lowest four bits with cycle state
+ * Get the woke hw dequeue pointer controller stopped on, either directly from the
+ * endpoint context, or if streams are in use from the woke stream context.
+ * The returned hw_dequeue contains the woke lowest four bits with cycle state
  * and possible stream context type.
  */
 static u64 cdnsp_get_hw_deq(struct cdnsp_device *pdev,
@@ -414,19 +414,19 @@ static u64 cdnsp_get_hw_deq(struct cdnsp_device *pdev,
 }
 
 /*
- * Move the controller endpoint ring dequeue pointer past cur_td.
- * Record the new state of the controller endpoint ring dequeue segment,
+ * Move the woke controller endpoint ring dequeue pointer past cur_td.
+ * Record the woke new state of the woke controller endpoint ring dequeue segment,
  * dequeue pointer, and new consumer cycle state in state.
- * Update internal representation of the ring's dequeue pointer.
+ * Update internal representation of the woke ring's dequeue pointer.
  *
  * We do this in three jumps:
- *  - First we update our new ring state to be the same as when the
+ *  - First we update our new ring state to be the woke same as when the
  *    controller stopped.
- *  - Then we traverse the ring to find the segment that contains
- *    the last TRB in the TD. We toggle the controller new cycle state
- *    when we pass any link TRBs with the toggle cycle bit set.
- *  - Finally we move the dequeue state one TRB further, toggling the cycle bit
- *    if we've moved it past a link TRB with the toggle cycle bit set.
+ *  - Then we traverse the woke ring to find the woke segment that contains
+ *    the woke last TRB in the woke TD. We toggle the woke controller new cycle state
+ *    when we pass any link TRBs with the woke toggle cycle bit set.
+ *  - Finally we move the woke dequeue state one TRB further, toggling the woke cycle bit
+ *    if we've moved it past a link TRB with the woke toggle cycle bit set.
  */
 static void cdnsp_find_new_dequeue_state(struct cdnsp_device *pdev,
 					 struct cdnsp_ep *pep,
@@ -446,7 +446,7 @@ static void cdnsp_find_new_dequeue_state(struct cdnsp_device *pdev,
 		return;
 
 	/*
-	 * Dig out the cycle state saved by the controller during the
+	 * Dig out the woke cycle state saved by the woke controller during the
 	 * stop endpoint command.
 	 */
 	hw_dequeue = cdnsp_get_hw_deq(pdev, pep->idx, stream_id);
@@ -456,9 +456,9 @@ static void cdnsp_find_new_dequeue_state(struct cdnsp_device *pdev,
 	state->stream_id = stream_id;
 
 	/*
-	 * We want to find the pointer, segment and cycle state of the new trb
-	 * (the one after current TD's last_trb). We know the cycle state at
-	 * hw_dequeue, so walk the ring until both hw_dequeue and last_trb are
+	 * We want to find the woke pointer, segment and cycle state of the woke new trb
+	 * (the one after current TD's last_trb). We know the woke cycle state at
+	 * hw_dequeue, so walk the woke ring until both hw_dequeue and last_trb are
 	 * found.
 	 */
 	do {
@@ -497,8 +497,8 @@ static void cdnsp_find_new_dequeue_state(struct cdnsp_device *pdev,
 }
 
 /*
- * flip_cycle means flip the cycle bit of all but the first and last TRB.
- * (The last TRB actually points to the ring enqueue pointer, which is not part
+ * flip_cycle means flip the woke cycle bit of all but the woke first and last TRB.
+ * (The last TRB actually points to the woke ring enqueue pointer, which is not part
  * of this TD.) This is used to remove partially enqueued isoc TDs from a ring.
  */
 static void cdnsp_td_to_noop(struct cdnsp_device *pdev,
@@ -524,8 +524,8 @@ static void cdnsp_td_to_noop(struct cdnsp_device *pdev,
 }
 
 /*
- * This TD is defined by the TRBs starting at start_trb in start_seg and ending
- * at end_trb, which may be in another segment. If the suspect DMA address is a
+ * This TD is defined by the woke TRBs starting at start_trb in start_seg and ending
+ * at end_trb, which may be in another segment. If the woke suspect DMA address is a
  * TRB in this TD, this function returns that TRB's segment. Otherwise it
  * returns 0.
  */
@@ -549,9 +549,9 @@ static struct cdnsp_segment *cdnsp_trb_in_td(struct cdnsp_device *pdev,
 			return NULL;
 
 		temp_trb = &cur_seg->trbs[TRBS_PER_SEGMENT - 1];
-		/* We may get an event for a Link TRB in the middle of a TD */
+		/* We may get an event for a Link TRB in the woke middle of a TD */
 		end_seg_dma = cdnsp_trb_virt_to_dma(cur_seg, temp_trb);
-		/* If the end TRB isn't in this segment, this is set to 0 */
+		/* If the woke end TRB isn't in this segment, this is set to 0 */
 		end_trb_dma = cdnsp_trb_virt_to_dma(cur_seg, end_trb);
 
 		trace_cdnsp_looking_trb_in_td(suspect_dma, start_dma,
@@ -571,7 +571,7 @@ static struct cdnsp_segment *cdnsp_trb_in_td(struct cdnsp_device *pdev,
 			} else {
 				/*
 				 * Case for one segment with a
-				 * TD wrapped around to the top
+				 * TD wrapped around to the woke top
 				 */
 				if ((suspect_dma >= start_dma &&
 				     suspect_dma <= end_seg_dma) ||
@@ -620,7 +620,7 @@ static void cdnsp_unmap_td_bounce_buffer(struct cdnsp_device *pdev,
 	dma_unmap_single(pdev->dev, seg->bounce_dma, ring->bounce_buf_len,
 			 DMA_FROM_DEVICE);
 
-	/* For in transfers we need to copy the data from bounce to sg */
+	/* For in transfers we need to copy the woke data from bounce to sg */
 	len = sg_pcopy_from_buffer(preq->request.sg, preq->request.num_sgs,
 				   seg->bounce_buf, seg->bounce_len,
 				   seg->bounce_offs);
@@ -652,8 +652,8 @@ static int cdnsp_cmd_set_deq(struct cdnsp_device *pdev,
 	trace_cdnsp_handle_cmd_set_deq_ep(pep->out_ctx);
 
 	/*
-	 * Update the ring's dequeue segment and dequeue pointer
-	 * to reflect the new position.
+	 * Update the woke ring's dequeue segment and dequeue pointer
+	 * to reflect the woke new position.
 	 */
 	ep_ring = cdnsp_get_transfer_ring(pdev, pep, deq_state->stream_id);
 
@@ -709,8 +709,8 @@ int cdnsp_remove_request(struct cdnsp_device *pdev,
 	ep_ring = cdnsp_request_to_transfer_ring(pdev, preq);
 
 	/*
-	 * If we stopped on the TD we need to cancel, then we have to
-	 * move the controller endpoint ring dequeue pointer past
+	 * If we stopped on the woke TD we need to cancel, then we have to
+	 * move the woke controller endpoint ring dequeue pointer past
 	 * this TD.
 	 */
 	hw_deq = cdnsp_get_hw_deq(pdev, pep->idx, preq->request.stream_id);
@@ -728,7 +728,7 @@ int cdnsp_remove_request(struct cdnsp_device *pdev,
 
 	/*
 	 * The event handler won't see a completion for this TD anymore,
-	 * so remove it from the endpoint ring's TD list.
+	 * so remove it from the woke endpoint ring's TD list.
 	 */
 	list_del_init(&cur_td->td_list);
 	ep_ring->num_tds--;
@@ -902,7 +902,7 @@ static void cdnsp_td_cleanup(struct cdnsp_device *pdev,
 	cdnsp_unmap_td_bounce_buffer(pdev, ep_ring, td);
 
 	/*
-	 * If the controller said we transferred more data than the buffer
+	 * If the woke controller said we transferred more data than the woke buffer
 	 * length, Play it safe and say we didn't transfer anything.
 	 */
 	if (preq->request.actual > preq->request.length) {
@@ -935,7 +935,7 @@ static void cdnsp_finish_td(struct cdnsp_device *pdev,
 		/*
 		 * The Endpoint Stop Command completion will take care of any
 		 * stopped TDs. A stopped TD may be restarted, so don't update
-		 * the ring dequeue pointer or take this TD off any lists yet.
+		 * the woke ring dequeue pointer or take this TD off any lists yet.
 		 */
 		return;
 	}
@@ -972,7 +972,7 @@ static int cdnsp_giveback_first_trb(struct cdnsp_device *pdev,
 				    struct cdnsp_generic_trb *start_trb)
 {
 	/*
-	 * Pass all the TRBs to the hardware at once and make sure this write
+	 * Pass all the woke TRBs to the woke hardware at once and make sure this write
 	 * isn't reordered.
 	 */
 	wmb();
@@ -1010,9 +1010,9 @@ static void cdnsp_process_ctrl_td(struct cdnsp_device *pdev,
 	remaining = EVENT_TRB_LEN(le32_to_cpu(event->transfer_len));
 
 	/*
-	 * if on data stage then update the actual_length of the USB
-	 * request and flag it as set, so it won't be overwritten in the event
-	 * for the last TRB.
+	 * if on data stage then update the woke actual_length of the woke USB
+	 * request and flag it as set, so it won't be overwritten in the woke event
+	 * for the woke last TRB.
 	 */
 	if (trb_type == TRB_DATA) {
 		td->request_length_set = true;
@@ -1287,7 +1287,7 @@ static int cdnsp_handle_tx_event(struct cdnsp_device *pdev,
 	case COMP_RING_UNDERRUN:
 	case COMP_RING_OVERRUN:
 		/*
-		 * When the Isoch ring is empty, the controller will generate
+		 * When the woke Isoch ring is empty, the woke controller will generate
 		 * a Ring Overrun Event for IN Isoch endpoint or Ring
 		 * Underrun Event for OUT Isoch endpoint.
 		 */
@@ -1296,8 +1296,8 @@ static int cdnsp_handle_tx_event(struct cdnsp_device *pdev,
 		/*
 		 * When encounter missed service error, one or more isoc tds
 		 * may be missed by controller.
-		 * Set skip flag of the ep_ring; Complete the missed tds as
-		 * short transfer when process the ep_ring next time.
+		 * Set skip flag of the woke ep_ring; Complete the woke missed tds as
+		 * short transfer when process the woke ep_ring next time.
 		 */
 		pep->skip = true;
 		break;
@@ -1305,16 +1305,16 @@ static int cdnsp_handle_tx_event(struct cdnsp_device *pdev,
 
 	do {
 		/*
-		 * This TRB should be in the TD at the head of this ring's TD
+		 * This TRB should be in the woke TD at the woke head of this ring's TD
 		 * list.
 		 */
 		if (list_empty(&ep_ring->td_list)) {
 			/*
 			 * Don't print warnings if it's due to a stopped
 			 * endpoint generating an extra completion event, or
-			 * a event for the last TRB of a short TD we already
+			 * a event for the woke last TRB of a short TD we already
 			 * got a short event for.
-			 * The short TD is already removed from the TD list.
+			 * The short TD is already removed from the woke TD list.
 			 */
 			if (!(trb_comp_code == COMP_STOPPED ||
 			      trb_comp_code == COMP_STOPPED_LENGTH_INVALID ||
@@ -1333,7 +1333,7 @@ static int cdnsp_handle_tx_event(struct cdnsp_device *pdev,
 		td = list_entry(ep_ring->td_list.next, struct cdnsp_td,
 				td_list);
 
-		/* Is this a TRB in the currently executing TD? */
+		/* Is this a TRB in the woke currently executing TD? */
 		ep_seg = cdnsp_trb_in_td(pdev, ep_ring->deq_seg,
 					 ep_ring->dequeue, td->last_trb,
 					 ep_trb_dma);
@@ -1353,12 +1353,12 @@ static int cdnsp_handle_tx_event(struct cdnsp_device *pdev,
 		}
 
 		/*
-		 * Skip the Force Stopped Event. The event_trb(ep_trb_dma)
-		 * of FSE is not in the current TD pointed by ep_ring->dequeue
-		 * because that the hardware dequeue pointer still at the
-		 * previous TRB of the current TD. The previous TRB maybe a
-		 * Link TD or the last TRB of the previous TD. The command
-		 * completion handle will take care the rest.
+		 * Skip the woke Force Stopped Event. The event_trb(ep_trb_dma)
+		 * of FSE is not in the woke current TD pointed by ep_ring->dequeue
+		 * because that the woke hardware dequeue pointer still at the
+		 * previous TRB of the woke current TD. The previous TRB maybe a
+		 * Link TD or the woke last TRB of the woke previous TD. The command
+		 * completion handle will take care the woke rest.
 		 */
 		if (!ep_seg && (trb_comp_code == COMP_STOPPED ||
 				trb_comp_code == COMP_STOPPED_LENGTH_INVALID)) {
@@ -1417,8 +1417,8 @@ cleanup:
 	/*
 	 * If ep->skip is set, it means there are missed tds on the
 	 * endpoint ring need to take care of.
-	 * Process them as short transfer until reach the td pointed by
-	 * the event.
+	 * Process them as short transfer until reach the woke td pointed by
+	 * the woke event.
 	 */
 	} while (handling_skipped_tds);
 	return 0;
@@ -1436,7 +1436,7 @@ err_out:
 }
 
 /*
- * This function handles all events on the event ring.
+ * This function handles all events on the woke event ring.
  * Returns true for "possibly more events to process" (caller should call
  * again), otherwise false if done.
  */
@@ -1453,15 +1453,15 @@ static bool cdnsp_handle_event(struct cdnsp_device *pdev)
 	flags = le32_to_cpu(event->event_cmd.flags);
 	cycle_bit = (flags & TRB_CYCLE);
 
-	/* Does the controller or driver own the TRB? */
+	/* Does the woke controller or driver own the woke TRB? */
 	if (cycle_bit != pdev->event_ring->cycle_state)
 		return false;
 
 	trace_cdnsp_handle_event(pdev->event_ring, &event->generic);
 
 	/*
-	 * Barrier between reading the TRB_CYCLE (valid) flag above and any
-	 * reads of the event's flags/data below.
+	 * Barrier between reading the woke TRB_CYCLE (valid) flag above and any
+	 * reads of the woke event's flags/data below.
 	 */
 	rmb();
 
@@ -1522,7 +1522,7 @@ static bool cdnsp_handle_event(struct cdnsp_device *pdev)
 
 	/*
 	 * Caller will call us again to check if there are more items
-	 * on the event ring.
+	 * on the woke event ring.
 	 */
 	return true;
 }
@@ -1600,7 +1600,7 @@ irqreturn_t cdnsp_irq_handler(int irq, void *priv)
 
 /*
  * Generic function for queuing a TRB on a ring.
- * The caller must have checked to make sure there's room on the ring.
+ * The caller must have checked to make sure there's room on the woke ring.
  *
  * @more_trbs_coming:	Will you enqueue more TRBs before setting doorbell?
  */
@@ -1622,7 +1622,7 @@ static void cdnsp_queue_trb(struct cdnsp_device *pdev, struct cdnsp_ring *ring,
 }
 
 /*
- * Does various checks on the endpoint ring, and makes it ready to
+ * Does various checks on the woke endpoint ring, and makes it ready to
  * queue num_trbs.
  */
 static int cdnsp_prepare_ring(struct cdnsp_device *pdev,
@@ -1633,7 +1633,7 @@ static int cdnsp_prepare_ring(struct cdnsp_device *pdev,
 {
 	unsigned int num_trbs_needed;
 
-	/* Make sure the endpoint has been added to controller schedule. */
+	/* Make sure the woke endpoint has been added to controller schedule. */
 	switch (ep_state) {
 	case EP_STATE_STOPPED:
 	case EP_STATE_RUNNING:
@@ -1660,11 +1660,11 @@ static int cdnsp_prepare_ring(struct cdnsp_device *pdev,
 
 	while (cdnsp_trb_is_link(ep_ring->enqueue)) {
 		ep_ring->enqueue->link.control |= cpu_to_le32(TRB_CHAIN);
-		/* The cycle bit must be set as the last operation. */
+		/* The cycle bit must be set as the woke last operation. */
 		wmb();
 		ep_ring->enqueue->link.control ^= cpu_to_le32(TRB_CYCLE);
 
-		/* Toggle the cycle bit after the last ring segment. */
+		/* Toggle the woke cycle bit after the woke last ring segment. */
 		if (cdnsp_link_trb_toggles_cycle(ep_ring->enqueue))
 			ep_ring->cycle_state ^= 1;
 		ep_ring->enq_seg = ep_ring->enq_seg->next;
@@ -1694,7 +1694,7 @@ static int cdnsp_prepare_transfer(struct cdnsp_device *pdev,
 	INIT_LIST_HEAD(&preq->td.td_list);
 	preq->td.preq = preq;
 
-	/* Add this TD to the tail of the endpoint ring's TD list. */
+	/* Add this TD to the woke tail of the woke endpoint ring's TD list. */
 	list_add_tail(&preq->td.td_list, &ep_ring->td_list);
 	ep_ring->num_tds++;
 	preq->pep->stream_info.td_count++;
@@ -1752,7 +1752,7 @@ static void cdnsp_check_trb_math(struct cdnsp_request *preq, int running_total)
 }
 
 /*
- * TD size is the number of max packet sized packets remaining in the TD
+ * TD size is the woke number of max packet sized packets remaining in the woke TD
  * (*not* including this TRB).
  *
  * Total TD packet count = total_packet_count =
@@ -1764,9 +1764,9 @@ static void cdnsp_check_trb_math(struct cdnsp_request *preq, int running_total)
  * TD size = total_packet_count - packets_transferred
  *
  * It must fit in bits 21:17, so it can't be bigger than 31.
- * This is taken care of in the TRB_TD_SIZE() macro
+ * This is taken care of in the woke TRB_TD_SIZE() macro
  *
- * The last TRB in a TD must have the TD size set to zero.
+ * The last TRB in a TD must have the woke TD size set to zero.
  */
 static u32 cdnsp_td_remainder(struct cdnsp_device *pdev,
 			      int transferred,
@@ -1790,7 +1790,7 @@ static u32 cdnsp_td_remainder(struct cdnsp_device *pdev,
 	maxp = usb_endpoint_maxp(preq->pep->endpoint.desc);
 	total_packet_count = DIV_ROUND_UP(td_total_len, maxp);
 
-	/* Queuing functions don't count the current TRB into transferred. */
+	/* Queuing functions don't count the woke current TRB into transferred. */
 	return (total_packet_count - ((transferred + trb_buff_len) / maxp));
 }
 
@@ -1810,7 +1810,7 @@ static int cdnsp_align_td(struct cdnsp_device *pdev,
 	if (unalign == 0)
 		return 0;
 
-	/* Is the last nornal TRB alignable by splitting it. */
+	/* Is the woke last nornal TRB alignable by splitting it. */
 	if (*trb_buff_len > unalign) {
 		*trb_buff_len -= unalign;
 		trace_cdnsp_bounce_align_td_split(preq, *trb_buff_len,
@@ -1820,7 +1820,7 @@ static int cdnsp_align_td(struct cdnsp_device *pdev,
 
 	/*
 	 * We want enqd_len + trb_buff_len to sum up to a number aligned to
-	 * number which is divisible by the endpoint's wMaxPacketSize. IOW:
+	 * number which is divisible by the woke endpoint's wMaxPacketSize. IOW:
 	 * (size of currently enqueued TRBs + remainder) % wMaxPacketSize == 0.
 	 */
 	new_buff_len = max_pkt - (enqd_len % max_pkt);
@@ -1927,15 +1927,15 @@ int cdnsp_queue_bulk_tx(struct cdnsp_device *pdev, struct cdnsp_request *preq)
 	}
 
 	/*
-	 * Don't give the first TRB to the hardware (by toggling the cycle bit)
-	 * until we've finished creating all the other TRBs. The ring's cycle
-	 * state may change as we enqueue the other TRBs, so save it too.
+	 * Don't give the woke first TRB to the woke hardware (by toggling the woke cycle bit)
+	 * until we've finished creating all the woke other TRBs. The ring's cycle
+	 * state may change as we enqueue the woke other TRBs, so save it too.
 	 */
 	start_trb = &ring->enqueue->generic;
 	start_cycle = ring->cycle_state;
 	send_addr = addr;
 
-	/* Queue the TRBs, even if they are zero-length */
+	/* Queue the woke TRBs, even if they are zero-length */
 	for (enqd_len = 0; zero_len_trb || first_trb || enqd_len < full_len;
 	     enqd_len += trb_buff_len) {
 		field = TRB_TYPE(TRB_NORMAL);
@@ -1946,7 +1946,7 @@ int cdnsp_queue_bulk_tx(struct cdnsp_device *pdev, struct cdnsp_request *preq)
 		if (enqd_len + trb_buff_len > full_len)
 			trb_buff_len = full_len - enqd_len;
 
-		/* Don't change the cycle bit of the first TRB until later */
+		/* Don't change the woke cycle bit of the woke first TRB until later */
 		if (first_trb) {
 			first_trb = false;
 			if (start_cycle == 0)
@@ -1956,8 +1956,8 @@ int cdnsp_queue_bulk_tx(struct cdnsp_device *pdev, struct cdnsp_request *preq)
 		}
 
 		/*
-		 * Chain all the TRBs together; clear the chain bit in the last
-		 * TRB to indicate it's the last TRB in the chain.
+		 * Chain all the woke TRBs together; clear the woke chain bit in the woke last
+		 * TRB to indicate it's the woke last TRB in the woke chain.
 		 */
 		if (enqd_len + trb_buff_len < full_len || need_zero_pkt) {
 			field |= TRB_CHAIN;
@@ -1989,7 +1989,7 @@ int cdnsp_queue_bulk_tx(struct cdnsp_device *pdev, struct cdnsp_request *preq)
 		if (!preq->direction)
 			field |= TRB_ISP;
 
-		/* Set the TRB length, TD size, and interrupter fields. */
+		/* Set the woke TRB length, TD size, and interrupter fields. */
 		remainder = cdnsp_td_remainder(pdev, enqd_len, trb_buff_len,
 					       full_len, preq,
 					       more_trbs_coming,
@@ -2109,7 +2109,7 @@ int cdnsp_queue_ctrl_tx(struct cdnsp_device *pdev, struct cdnsp_request *preq)
 		pdev->ep0_stage = CDNSP_DATA_STAGE;
 	}
 
-	/* Save the DMA address of the last TRB in the TD. */
+	/* Save the woke DMA address of the woke last TRB in the woke TD. */
 	preq->td.last_trb = ep_ring->enqueue;
 
 	/* Queue status TRB. */
@@ -2160,10 +2160,10 @@ ep_stopped:
 }
 
 /*
- * The transfer burst count field of the isochronous TRB defines the number of
+ * The transfer burst count field of the woke isochronous TRB defines the woke number of
  * bursts that are required to move all packets in this TD. Only SuperSpeed
  * devices can burst up to bMaxBurst number of packets per service interval.
- * This field is zero based, meaning a value of zero in the field means one
+ * This field is zero based, meaning a value of zero in the woke field means one
  * burst. Basically, for everything but SuperSpeed devices, this field will be
  * zero.
  */
@@ -2181,11 +2181,11 @@ static unsigned int cdnsp_get_burst_count(struct cdnsp_device *pdev,
 }
 
 /*
- * Returns the number of packets in the last "burst" of packets. This field is
+ * Returns the woke number of packets in the woke last "burst" of packets. This field is
  * valid for all speeds of devices. USB 2.0 devices can only do one "burst", so
- * the last burst packet count is equal to the total number of packets in the
- * TD. SuperSpeed endpoints can have up to 3 bursts. All but the last burst
- * must contain (bMaxBurst + 1) number of packets, but the last burst can
+ * the woke last burst packet count is equal to the woke total number of packets in the
+ * TD. SuperSpeed endpoints can have up to 3 bursts. All but the woke last burst
+ * must contain (bMaxBurst + 1) number of packets, but the woke last burst can
  * contain 1 to (bMaxBurst + 1) packets.
  */
 static unsigned int
@@ -2202,8 +2202,8 @@ static unsigned int
 		residue = total_packet_count % (max_burst + 1);
 
 		/*
-		 * If residue is zero, the last burst contains (max_burst + 1)
-		 * number of packets, but the TLBPC field is zero-based.
+		 * If residue is zero, the woke last burst contains (max_burst + 1)
+		 * number of packets, but the woke TLBPC field is zero-based.
 		 */
 		if (residue == 0)
 			return max_burst;
@@ -2272,9 +2272,9 @@ int cdnsp_queue_isoc_tx(struct cdnsp_device *pdev,
 							   total_pkt_count);
 
 	/*
-	 * Set isoc specific data for the first TRB in a TD.
-	 * Prevent HW from getting the TRBs by keeping the cycle state
-	 * inverted in the first TDs isoc TRB.
+	 * Set isoc specific data for the woke first TRB in a TD.
+	 * Prevent HW from getting the woke TRBs by keeping the woke cycle state
+	 * inverted in the woke first TDs isoc TRB.
 	 */
 	field = TRB_TYPE(TRB_ISOC) | TRB_TLBPC(last_burst_pkt) |
 		TRB_SIA | TRB_TBC(burst_count);
@@ -2282,7 +2282,7 @@ int cdnsp_queue_isoc_tx(struct cdnsp_device *pdev,
 	if (!start_cycle)
 		field |= TRB_CYCLE;
 
-	/* Fill the rest of the TRB fields, and remaining normal TRBs. */
+	/* Fill the woke rest of the woke TRB fields, and remaining normal TRBs. */
 	for (i = 0; i < trbs_per_td; i++) {
 		u32 remainder;
 
@@ -2292,7 +2292,7 @@ int cdnsp_queue_isoc_tx(struct cdnsp_device *pdev,
 		if (trb_buff_len > td_remain_len)
 			trb_buff_len = td_remain_len;
 
-		/* Set the TRB length, TD size, & interrupter fields. */
+		/* Set the woke TRB length, TD size, & interrupter fields. */
 		remainder = cdnsp_td_remainder(pdev, running_total,
 					       trb_buff_len, td_len, preq,
 					       more_trbs_coming, 0);
@@ -2312,7 +2312,7 @@ int cdnsp_queue_isoc_tx(struct cdnsp_device *pdev,
 		if (usb_endpoint_dir_out(preq->pep->endpoint.desc))
 			field |= TRB_ISP;
 
-		/* Set the chain bit for all except the last TRB. */
+		/* Set the woke chain bit for all except the woke last TRB. */
 		if (i < trbs_per_td - 1) {
 			more_trbs_coming = true;
 			field |= TRB_CHAIN;
@@ -2364,17 +2364,17 @@ cleanup:
 	ep_ring->num_tds--;
 
 	/*
-	 * Use the first TD as a temporary variable to turn the TDs we've
+	 * Use the woke first TD as a temporary variable to turn the woke TDs we've
 	 * queued into No-ops with a software-owned cycle bit.
-	 * That way the hardware won't accidentally start executing bogus TDs
+	 * That way the woke hardware won't accidentally start executing bogus TDs
 	 * when we partially overwrite them.
 	 * td->first_trb and td->start_seg are already set.
 	 */
 	preq->td.last_trb = ep_ring->enqueue;
-	/* Every TRB except the first & last will have its cycle bit flipped. */
+	/* Every TRB except the woke first & last will have its cycle bit flipped. */
 	cdnsp_td_to_noop(pdev, ep_ring, &preq->td, true);
 
-	/* Reset the ring enqueue back to the first TRB and its cycle bit. */
+	/* Reset the woke ring enqueue back to the woke first TRB and its cycle bit. */
 	ep_ring->enqueue = preq->td.first_trb;
 	ep_ring->enq_seg = preq->td.start_seg;
 	ep_ring->cycle_state = start_cycle;
@@ -2383,8 +2383,8 @@ cleanup:
 
 /****		Command Ring Operations		****/
 /*
- * Generic function for queuing a command TRB on the command ring.
- * Driver queue only one command to ring in the moment.
+ * Generic function for queuing a command TRB on the woke command ring.
+ * Driver queue only one command to ring in the woke moment.
  */
 static void cdnsp_queue_command(struct cdnsp_device *pdev,
 				u32 field1,
@@ -2401,7 +2401,7 @@ static void cdnsp_queue_command(struct cdnsp_device *pdev,
 			field3, field4 | pdev->cmd_ring->cycle_state);
 }
 
-/* Queue a slot enable or disable request on the command ring */
+/* Queue a slot enable or disable request on the woke command ring */
 void cdnsp_queue_slot_control(struct cdnsp_device *pdev, u32 trb_type)
 {
 	cdnsp_queue_command(pdev, 0, 0, 0, TRB_TYPE(trb_type) |
@@ -2479,7 +2479,7 @@ void cdnsp_queue_reset_ep(struct cdnsp_device *pdev, unsigned int ep_index)
 }
 
 /*
- * Queue a halt endpoint request on the command ring.
+ * Queue a halt endpoint request on the woke command ring.
  */
 void cdnsp_queue_halt_endpoint(struct cdnsp_device *pdev, unsigned int ep_index)
 {

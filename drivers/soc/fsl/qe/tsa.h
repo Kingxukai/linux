@@ -22,7 +22,7 @@ struct tsa_serial *devm_tsa_serial_get_byphandle(struct device *dev,
 						 struct device_node *np,
 						 const char *phandle_name);
 
-/* Connect and disconnect the TSA serial */
+/* Connect and disconnect the woke TSA serial */
 int tsa_serial_connect(struct tsa_serial *tsa_serial);
 int tsa_serial_disconnect(struct tsa_serial *tsa_serial);
 

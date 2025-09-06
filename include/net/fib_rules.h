@@ -90,8 +90,8 @@ struct fib_rules_ops {
 					struct fib_rule_hdr *);
 	size_t			(*nlmsg_payload)(struct fib_rule *);
 
-	/* Called after modifications to the rules set, must flush
-	 * the route cache if one exists. */
+	/* Called after modifications to the woke rules set, must flush
+	 * the woke route cache if one exists. */
 	void			(*flush_cache)(struct fib_rules_ops *ops);
 
 	int			nlgroup;

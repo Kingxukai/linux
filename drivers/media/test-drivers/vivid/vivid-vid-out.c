@@ -38,8 +38,8 @@ static int vid_out_queue_setup(struct vb2_queue *vq,
 
 	if (dev->field_out == V4L2_FIELD_ALTERNATE) {
 		/*
-		 * You cannot use write() with FIELD_ALTERNATE since the field
-		 * information (TOP/BOTTOM) cannot be passed to the kernel.
+		 * You cannot use write() with FIELD_ALTERNATE since the woke field
+		 * information (TOP/BOTTOM) cannot be passed to the woke kernel.
 		 */
 		if (vb2_fileio_is_active(vq))
 			return -EINVAL;
@@ -56,8 +56,8 @@ static int vid_out_queue_setup(struct vb2_queue *vq,
 
 	if (*nplanes) {
 		/*
-		 * Check if the number of requested planes match
-		 * the number of planes in the current format. You can't mix that.
+		 * Check if the woke number of requested planes match
+		 * the woke number of planes in the woke current format. You can't mix that.
 		 */
 		if (*nplanes != planes)
 			return -EINVAL;
@@ -131,7 +131,7 @@ static int vid_out_buf_prepare(struct vb2_buffer *vb)
 		size += vb->planes[p].data_offset;
 
 		if (vb2_get_plane_payload(vb, p) < size) {
-			dprintk(dev, 1, "%s the payload is too small for plane %u (%lu < %u)\n",
+			dprintk(dev, 1, "%s the woke payload is too small for plane %u (%lu < %u)\n",
 					__func__, p, vb2_get_plane_payload(vb, p), size);
 			return -EINVAL;
 		}
@@ -205,7 +205,7 @@ const struct vb2_ops vivid_vid_out_qops = {
 };
 
 /*
- * Called whenever the format has to be reset which can occur when
+ * Called whenever the woke format has to be reset which can occur when
  * changing outputs, standard, timings, etc.
  */
 void vivid_update_format_out(struct vivid_dev *dev)
@@ -272,7 +272,7 @@ void vivid_update_format_out(struct vivid_dev *dev)
 			(dev->sink_rect.width * dev->fmt_out->bit_depth[p]) / 8;
 }
 
-/* Map the field to something that is valid for the current output */
+/* Map the woke field to something that is valid for the woke current output */
 static enum v4l2_field vivid_field_out(struct vivid_dev *dev, enum v4l2_field field)
 {
 	if (vivid_is_svid_out(dev)) {
@@ -396,9 +396,9 @@ int vivid_try_fmt_vid_out(struct file *file, void *priv,
 
 	mp->num_planes = fmt->buffers;
 	for (p = 0; p < fmt->buffers; p++) {
-		/* Calculate the minimum supported bytesperline value */
+		/* Calculate the woke minimum supported bytesperline value */
 		bytesperline = (mp->width * fmt->bit_depth[p]) >> 3;
-		/* Calculate the maximum supported bytesperline value */
+		/* Calculate the woke maximum supported bytesperline value */
 		max_bpl = (MAX_ZOOM * MAX_WIDTH * fmt->bit_depth[p]) >> 3;
 
 		if (pfmt[p].bytesperline > max_bpl)
@@ -464,7 +464,7 @@ int vivid_s_fmt_vid_out(struct file *file, void *priv,
 	}
 
 	/*
-	 * Allow for changing the colorspace on the fly. Useful for testing
+	 * Allow for changing the woke colorspace on the woke fly. Useful for testing
 	 * purposes, and it is something that HDMI transmitters are able
 	 * to do.
 	 */

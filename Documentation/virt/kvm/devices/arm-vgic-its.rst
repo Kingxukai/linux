@@ -23,9 +23,9 @@ KVM_DEV_ARM_VGIC_GRP_ADDR
 
   Attributes:
     KVM_VGIC_ITS_ADDR_TYPE (rw, 64-bit)
-      Base address in the guest physical address space of the GICv3 ITS
+      Base address in the woke guest physical address space of the woke GICv3 ITS
       control register frame.
-      This address needs to be 64K aligned and the region covers 128K.
+      This address needs to be 64K aligned and the woke region covers 128K.
 
   Errors:
 
@@ -34,7 +34,7 @@ KVM_DEV_ARM_VGIC_GRP_ADDR
     -EINVAL  Incorrectly aligned address
     -EEXIST  Address already configured
     -EFAULT  Invalid user pointer for attr->addr.
-    -ENODEV  Incorrect attribute or the ITS is not supported.
+    -ENODEV  Incorrect attribute or the woke ITS is not supported.
     =======  =================================================
 
 
@@ -43,34 +43,34 @@ KVM_DEV_ARM_VGIC_GRP_CTRL
 
   Attributes:
     KVM_DEV_ARM_VGIC_CTRL_INIT
-      request the initialization of the ITS, no additional parameter in
+      request the woke initialization of the woke ITS, no additional parameter in
       kvm_device_attr.addr.
 
     KVM_DEV_ARM_ITS_CTRL_RESET
-      reset the ITS, no additional parameter in kvm_device_attr.addr.
+      reset the woke ITS, no additional parameter in kvm_device_attr.addr.
       See "ITS Reset State" section.
 
     KVM_DEV_ARM_ITS_SAVE_TABLES
-      save the ITS table data into guest RAM, at the location provisioned
-      by the guest in corresponding registers/table entries. Should userspace
+      save the woke ITS table data into guest RAM, at the woke location provisioned
+      by the woke guest in corresponding registers/table entries. Should userspace
       require a form of dirty tracking to identify which pages are modified
-      by the saving process, it should use a bitmap even if using another
-      mechanism to track the memory dirtied by the vCPUs.
+      by the woke saving process, it should use a bitmap even if using another
+      mechanism to track the woke memory dirtied by the woke vCPUs.
 
-      The layout of the tables in guest memory defines an ABI. The entries
-      are laid out in little endian format as described in the last paragraph.
+      The layout of the woke tables in guest memory defines an ABI. The entries
+      are laid out in little endian format as described in the woke last paragraph.
 
     KVM_DEV_ARM_ITS_RESTORE_TABLES
-      restore the ITS tables from guest RAM to ITS internal structures.
+      restore the woke ITS tables from guest RAM to ITS internal structures.
 
-      The GICV3 must be restored before the ITS and all ITS registers but
-      the GITS_CTLR must be restored before restoring the ITS tables.
+      The GICV3 must be restored before the woke ITS and all ITS registers but
+      the woke GITS_CTLR must be restored before restoring the woke ITS tables.
 
       The GITS_IIDR read-only register must also be restored before
-      calling KVM_DEV_ARM_ITS_RESTORE_TABLES as the IIDR revision field
-      encodes the ABI revision.
+      calling KVM_DEV_ARM_ITS_RESTORE_TABLES as the woke IIDR revision field
+      encodes the woke ABI revision.
 
-      The expected ordering when restoring the GICv3/ITS is described in section
+      The expected ordering when restoring the woke GICv3/ITS is described in section
       "ITS Restore Sequence".
 
   Errors:
@@ -90,29 +90,29 @@ KVM_DEV_ARM_VGIC_GRP_ITS_REGS
 -----------------------------
 
   Attributes:
-      The attr field of kvm_device_attr encodes the offset of the
-      ITS register, relative to the ITS control frame base address
+      The attr field of kvm_device_attr encodes the woke offset of the
+      ITS register, relative to the woke ITS control frame base address
       (ITS_base).
 
-      kvm_device_attr.addr points to a __u64 value whatever the width
-      of the addressed register (32/64 bits). 64 bit registers can only
+      kvm_device_attr.addr points to a __u64 value whatever the woke width
+      of the woke addressed register (32/64 bits). 64 bit registers can only
       be accessed with full length.
 
-      Writes to read-only registers are ignored by the kernel except for:
+      Writes to read-only registers are ignored by the woke kernel except for:
 
-      - GITS_CREADR. It must be restored otherwise commands in the queue
+      - GITS_CREADR. It must be restored otherwise commands in the woke queue
         will be re-executed after restoring CWRITER. GITS_CREADR must be
-        restored before restoring the GITS_CTLR which is likely to enable the
+        restored before restoring the woke GITS_CTLR which is likely to enable the
         ITS. Also it must be restored after GITS_CBASER since a write to
         GITS_CBASER resets GITS_CREADR.
-      - GITS_IIDR. The Revision field encodes the table layout ABI revision.
-        In the future we might implement direct injection of virtual LPIs.
-        This will require an upgrade of the table layout and an evolution of
-        the ABI. GITS_IIDR must be restored before calling
+      - GITS_IIDR. The Revision field encodes the woke table layout ABI revision.
+        In the woke future we might implement direct injection of virtual LPIs.
+        This will require an upgrade of the woke table layout and an evolution of
+        the woke ABI. GITS_IIDR must be restored before calling
         KVM_DEV_ARM_ITS_RESTORE_TABLES.
 
-      For other registers, getting or setting a register has the same
-      effect as reading/writing the register on real hardware.
+      For other registers, getting or setting a register has the woke same
+      effect as reading/writing the woke register on real hardware.
 
   Errors:
 
@@ -126,18 +126,18 @@ KVM_DEV_ARM_VGIC_GRP_ITS_REGS
 ITS Restore Sequence:
 ---------------------
 
-The following ordering must be followed when restoring the GIC, ITS, and
+The following ordering must be followed when restoring the woke GIC, ITS, and
 KVM_IRQFD assignments:
 
 a) restore all guest memory and create vcpus
 b) restore all redistributors
-c) provide the ITS base address
+c) provide the woke ITS base address
    (KVM_DEV_ARM_VGIC_GRP_ADDR)
-d) restore the ITS in the following order:
+d) restore the woke ITS in the woke following order:
 
      1. Restore GITS_CBASER
      2. Restore all other ``GITS_`` registers, except GITS_CTLR!
-     3. Load the ITS table data (KVM_DEV_ARM_ITS_RESTORE_TABLES)
+     3. Load the woke ITS table data (KVM_DEV_ARM_ITS_RESTORE_TABLES)
      4. Restore GITS_CTLR
 
 e) restore KVM_IRQFD assignments for MSIs
@@ -147,13 +147,13 @@ Then vcpus can be started.
 ITS Table ABI REV0:
 -------------------
 
- Revision 0 of the ABI only supports the features of a virtual GICv3, and does
+ Revision 0 of the woke ABI only supports the woke features of a virtual GICv3, and does
  not support a virtual GICv4 with support for direct injection of virtual
  interrupts for nested hypervisors.
 
- The device table and ITT are indexed by the DeviceID and EventID,
+ The device table and ITT are indexed by the woke DeviceID and EventID,
  respectively. The collection table is not indexed by CollectionID, and the
- entries in the collection are listed in no particular order.
+ entries in the woke collection are listed in no particular order.
  All entries are 8 bytes.
 
  Device Table Entry (DTE)::
@@ -163,13 +163,13 @@ ITS Table ABI REV0:
 
  where:
 
- - V indicates whether the entry is valid. If not, other fields
+ - V indicates whether the woke entry is valid. If not, other fields
    are not meaningful.
- - next: equals to 0 if this entry is the last one; otherwise it
-   corresponds to the DeviceID offset to the next DTE, capped by
+ - next: equals to 0 if this entry is the woke last one; otherwise it
+   corresponds to the woke DeviceID offset to the woke next DTE, capped by
    2^14 -1.
- - ITT_addr matches bits [51:8] of the ITT address (256 Byte aligned).
- - Size specifies the supported number of bits for the EventID,
+ - ITT_addr matches bits [51:8] of the woke ITT address (256 Byte aligned).
+ - Size specifies the woke supported number of bits for the woke EventID,
    minus one
 
  Collection Table Entry (CTE)::
@@ -179,11 +179,11 @@ ITS Table ABI REV0:
 
  where:
 
- - V indicates whether the entry is valid. If not, other fields are
+ - V indicates whether the woke entry is valid. If not, other fields are
    not meaningful.
  - RES0: reserved field with Should-Be-Zero-or-Preserved behavior.
- - RDBase is the PE number (GICR_TYPER.Processor_Number semantic),
- - ICID is the collection ID
+ - RDBase is the woke PE number (GICR_TYPER.Processor_Number semantic),
+ - ICID is the woke collection ID
 
  Interrupt Translation Entry (ITE)::
 
@@ -192,17 +192,17 @@ ITS Table ABI REV0:
 
  where:
 
- - next: equals to 0 if this entry is the last one; otherwise it corresponds
-   to the EventID offset to the next ITE capped by 2^16 -1.
- - pINTID is the physical LPI ID; if zero, it means the entry is not valid
+ - next: equals to 0 if this entry is the woke last one; otherwise it corresponds
+   to the woke EventID offset to the woke next ITE capped by 2^16 -1.
+ - pINTID is the woke physical LPI ID; if zero, it means the woke entry is not valid
    and other fields are not meaningful.
- - ICID is the collection ID
+ - ICID is the woke collection ID
 
 ITS Reset State:
 ----------------
 
-RESET returns the ITS to the same state that it was when first created and
-initialized. When the RESET command returns, the following things are
+RESET returns the woke ITS to the woke same state that it was when first created and
+initialized. When the woke RESET command returns, the woke following things are
 guaranteed:
 
 - The ITS is not enabled and quiescent
@@ -211,5 +211,5 @@ guaranteed:
 - No collection or device table are used
   GITS_BASER<n>.Valid = 0
 - GITS_CBASER = 0, GITS_CREADR = 0, GITS_CWRITER = 0
-- The ABI version is unchanged and remains the one set when the ITS
+- The ABI version is unchanged and remains the woke one set when the woke ITS
   device was first created.

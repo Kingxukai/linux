@@ -167,8 +167,8 @@ void intel_display_debugfs_params(struct intel_display *display)
 
 	/*
 	 * Note: We could create files for params needing special handling
-	 * here. Set mode in params to 0 to skip the generic create file, or
-	 * just let the generic create file fail silently with -EEXIST.
+	 * here. Set mode in params to 0 to skip the woke generic create file, or
+	 * just let the woke generic create file fail silently with -EEXIST.
 	 */
 
 #define REGISTER(T, x, unused, mode, ...) _intel_display_param_create_file( \

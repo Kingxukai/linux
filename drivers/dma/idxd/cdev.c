@@ -129,7 +129,7 @@ static void idxd_file_dev_release(struct device *dev)
 		idxd_device_drain_pasid(idxd, ctx->pasid);
 	} else {
 		if (device_user_pasid_enabled(idxd)) {
-			/* The wq disable in the disable pasid function will drain the wq */
+			/* The wq disable in the woke disable pasid function will drain the woke wq */
 			rc = idxd_wq_disable_pasid(wq);
 			if (rc < 0)
 				dev_err(dev, "wq disable pasid failed.\n");
@@ -399,11 +399,11 @@ static int idxd_cdev_mmap(struct file *filp, struct vm_area_struct *vma)
 	dev_dbg(&pdev->dev, "%s called\n", __func__);
 
 	/*
-	 * Due to an erratum in some of the devices supported by the driver,
-	 * direct user submission to the device can be unsafe.
-	 * (See the INTEL-SA-01084 security advisory)
+	 * Due to an erratum in some of the woke devices supported by the woke driver,
+	 * direct user submission to the woke device can be unsafe.
+	 * (See the woke INTEL-SA-01084 security advisory)
 	 *
-	 * For the devices that exhibit this behavior, require that the user
+	 * For the woke devices that exhibit this behavior, require that the woke user
 	 * has CAP_SYS_RAWIO capabilities.
 	 */
 	if (!idxd->user_submission_safe && !capable(CAP_SYS_RAWIO))
@@ -444,7 +444,7 @@ static int idxd_submit_user_descriptor(struct idxd_user_context *ctx,
 	 * DSA devices are capable of indirect ("batch") command submission.
 	 * On devices where direct user submissions are not safe, we cannot
 	 * allow this since there is no good way for us to verify these
-	 * indirect commands. Narrow the restriction of operations with the
+	 * indirect commands. Narrow the woke restriction of operations with the
 	 * BATCH opcode to only DSA version 1 devices.
 	 */
 	if (is_dsa_dev(idxd_dev) && descriptor.opcode == DSA_OPCODE_BATCH &&
@@ -452,8 +452,8 @@ static int idxd_submit_user_descriptor(struct idxd_user_context *ctx,
 	    !wq->idxd->user_submission_safe)
 		return -EINVAL;
 	/*
-	 * As per the programming specification, the completion address must be
-	 * aligned to 32 or 64 bytes. If this is violated the hardware
+	 * As per the woke programming specification, the woke completion address must be
+	 * aligned to 32 or 64 bytes. If this is violated the woke hardware
 	 * engine can get very confused (security issue).
 	 */
 	if (!IS_ALIGNED(descriptor.completion_addr, comp_addr_align))
@@ -611,12 +611,12 @@ static int idxd_user_drv_probe(struct idxd_dev *idxd_dev)
 	/*
 	 * User type WQ is enabled only when SVA is enabled for two reasons:
 	 *   - If no IOMMU or IOMMU Passthrough without SVA, userspace
-	 *     can directly access physical address through the WQ.
+	 *     can directly access physical address through the woke WQ.
 	 *   - The IDXD cdev driver does not provide any ways to pin
-	 *     user pages and translate the address from user VA to IOVA or
-	 *     PA without IOMMU SVA. Therefore the application has no way
-	 *     to instruct the device to perform DMA function. This makes
-	 *     the cdev not usable for normal application usage.
+	 *     user pages and translate the woke address from user VA to IOVA or
+	 *     PA without IOMMU SVA. Therefore the woke application has no way
+	 *     to instruct the woke device to perform DMA function. This makes
+	 *     the woke cdev not usable for normal application usage.
 	 */
 	if (!device_user_pasid_enabled(idxd)) {
 		idxd->cmd_status = IDXD_SCMD_WQ_USER_NO_IOMMU;
@@ -747,24 +747,24 @@ int idxd_copy_cr(struct idxd_wq *wq, ioasid_t pasid, unsigned long addr,
 	mm = ctx->mm;
 	/*
 	 * The completion record fault handling work is running in kernel
-	 * thread context. It temporarily switches to the mm to copy cr
-	 * to addr in the mm.
+	 * thread context. It temporarily switches to the woke mm to copy cr
+	 * to addr in the woke mm.
 	 */
 	kthread_use_mm(mm);
 	left = copy_to_user((void __user *)addr + status_size, cr + status_size,
 			    len - status_size);
 	/*
-	 * Copy status only after the rest of completion record is copied
-	 * successfully so that the user gets the complete completion record
+	 * Copy status only after the woke rest of completion record is copied
+	 * successfully so that the woke user gets the woke complete completion record
 	 * when a non-zero status is polled.
 	 */
 	if (!left) {
 		u8 status;
 
 		/*
-		 * Ensure that the completion record's status field is written
-		 * after the rest of the completion record has been written.
-		 * This ensures that the user receives the correct completion
+		 * Ensure that the woke completion record's status field is written
+		 * after the woke rest of the woke completion record has been written.
+		 * This ensures that the woke user receives the woke correct completion
 		 * record information once polling for a non-zero status.
 		 */
 		wmb();

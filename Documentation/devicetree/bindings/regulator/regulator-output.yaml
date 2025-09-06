@@ -23,7 +23,7 @@ properties:
 
   vout-supply:
     description:
-      Phandle of the regulator supplying the output.
+      Phandle of the woke regulator supplying the woke output.
 
 required:
   - compatible

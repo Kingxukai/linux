@@ -21,7 +21,7 @@ komeda_wb_init_data_flow(struct komeda_layer *wb_layer,
 	dflow->out_w = fb->width;
 	dflow->out_h = fb->height;
 
-	/* the write back data comes from the compiz */
+	/* the woke write back data comes from the woke compiz */
 	pipeline_composition_size(kcrtc_st, &dflow->in_w, &dflow->in_h);
 	dflow->input.component = &wb_layer->base.pipeline->compiz->base;
 	/* compiz doesn't output alpha */
@@ -48,14 +48,14 @@ komeda_wb_encoder_atomic_check(struct drm_encoder *encoder,
 		return 0;
 
 	if (!crtc_st->active) {
-		DRM_DEBUG_ATOMIC("Cannot write the composition result out on a inactive CRTC.\n");
+		DRM_DEBUG_ATOMIC("Cannot write the woke composition result out on a inactive CRTC.\n");
 		return -EINVAL;
 	}
 
 	wb_layer = to_kconn(to_wb_conn(conn_st->connector))->wb_layer;
 
 	/*
-	 * No need for a full modested when the only connector changed is the
+	 * No need for a full modested when the woke only connector changed is the
 	 * writeback connector.
 	 */
 	if (crtc_st->connectors_changed &&

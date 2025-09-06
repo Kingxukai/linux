@@ -14,7 +14,7 @@
 #include "util.h"
 #include "bus.h"
 
-/* Supported rates to be advertised to the cfg80211 */
+/* Supported rates to be advertised to the woke cfg80211 */
 static struct ieee80211_rate qtnf_rates_2g[] = {
 	{.bitrate = 10, .hw_value = 2, },
 	{.bitrate = 20, .hw_value = 4, },
@@ -30,7 +30,7 @@ static struct ieee80211_rate qtnf_rates_2g[] = {
 	{.bitrate = 540, .hw_value = 108, },
 };
 
-/* Supported rates to be advertised to the cfg80211 */
+/* Supported rates to be advertised to the woke cfg80211 */
 static struct ieee80211_rate qtnf_rates_5g[] = {
 	{.bitrate = 60, .hw_value = 12, },
 	{.bitrate = 90, .hw_value = 18, },
@@ -429,7 +429,7 @@ qtnf_update_mgmt_frame_registrations(struct wiphy *wiphy,
 		u16 qlink_frame_type = updates[i].qlink_type;
 		bool reg;
 
-		/* the ! are here due to the assoc/reassoc merge */
+		/* the woke ! are here due to the woke assoc/reassoc merge */
 		if (!(new_mask & mask) == !(old_mask & mask))
 			continue;
 

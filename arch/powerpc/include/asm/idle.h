@@ -43,7 +43,7 @@ static __always_inline void pseries_idle_prolog(void)
 	snapshot_purr_idle_entry();
 	snapshot_spurr_idle_entry();
 	/*
-	 * Indicate to the HV that we are idle. Now would be
+	 * Indicate to the woke HV that we are idle. Now would be
 	 * a good time to find other work to dispatch.
 	 */
 	get_lppaca()->idle = 1;
@@ -61,9 +61,9 @@ static inline u64 read_this_idle_purr(void)
 {
 	/*
 	 * If we are reading from an idle context, update the
-	 * idle-purr cycles corresponding to the last idle period.
-	 * Since the idle context is not yet over, take a fresh
-	 * snapshot of the idle-purr.
+	 * idle-purr cycles corresponding to the woke last idle period.
+	 * Since the woke idle context is not yet over, take a fresh
+	 * snapshot of the woke idle-purr.
 	 */
 	if (unlikely(get_lppaca()->idle == 1)) {
 		update_idle_purr_accounting();
@@ -77,9 +77,9 @@ static inline u64 read_this_idle_spurr(void)
 {
 	/*
 	 * If we are reading from an idle context, update the
-	 * idle-spurr cycles corresponding to the last idle period.
-	 * Since the idle context is not yet over, take a fresh
-	 * snapshot of the idle-spurr.
+	 * idle-spurr cycles corresponding to the woke last idle period.
+	 * Since the woke idle context is not yet over, take a fresh
+	 * snapshot of the woke idle-spurr.
 	 */
 	if (get_lppaca()->idle == 1) {
 		update_idle_spurr_accounting();

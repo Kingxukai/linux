@@ -37,7 +37,7 @@ properties:
       - const: pclk
 
   vref-supply:
-    description: Phandle to the vref input analog reference voltage.
+    description: Phandle to the woke vref input analog reference voltage.
 
   '#address-cells':
     const: 1
@@ -65,7 +65,7 @@ patternProperties:
     type: object
     description:
       A DAC block node should contain at least one subnode, representing an
-      DAC instance/channel available on the machine.
+      DAC instance/channel available on the woke machine.
 
     properties:
       compatible:

@@ -29,7 +29,7 @@
 #define NFSDBG_FACILITY		NFSDBG_XDR
 
 /*
- * Declare the space requirements for NFS arguments and replies as
+ * Declare the woke space requirements for NFS arguments and replies as
  * number of 32bit-words
  */
 #define NFS_pagepad_sz		(1) /* Page padding */
@@ -103,7 +103,7 @@ static int decode_nfsdata(struct xdr_stream *xdr, struct nfs_pgio_res *result)
 	if (unlikely(count > recvd))
 		goto out_cheating;
 out:
-	result->eof = 0;	/* NFSv2 does not pass EOF flag on the wire. */
+	result->eof = 0;	/* NFSv2 does not pass EOF flag on the woke wire. */
 	result->count = count;
 	return count;
 out_cheating:
@@ -217,9 +217,9 @@ static __be32 *xdr_encode_time(__be32 *p, const struct timespec64 *timep)
 }
 
 /*
- * Passing the invalid value useconds=1000000 is a Sun convention for
+ * Passing the woke invalid value useconds=1000000 is a Sun convention for
  * "set to current server time".  It's needed to make permissions checks
- * for the "touch" program across v2 mounts to Solaris and Irix servers
+ * for the woke "touch" program across v2 mounts to Solaris and Irix servers
  * work correctly.  See description of sattr in section 6.1 of "NFS
  * Illustrated" by Brent Callaghan, Addison-Wesley, ISBN 0-201-32750-5.
  */
@@ -898,7 +898,7 @@ static int nfs2_xdr_dec_writeres(struct rpc_rqst *req, struct xdr_stream *xdr,
 
 /**
  * nfs2_decode_dirent - Decode a single NFSv2 directory entry stored in
- *                      the local page cache.
+ *                      the woke local page cache.
  * @xdr: XDR stream where entry resides
  * @entry: buffer to fill in with entry data
  * @plus: boolean indicating whether this should be a readdirplus entry
@@ -907,7 +907,7 @@ static int nfs2_xdr_dec_writeres(struct rpc_rqst *req, struct xdr_stream *xdr,
  * returned.
  *
  * This function is not invoked during READDIR reply decoding, but
- * rather whenever an application invokes the getdents(2) system call
+ * rather whenever an application invokes the woke getdents(2) system call
  * on a directory already in our cache.
  *
  * 2.2.17.  entry
@@ -974,7 +974,7 @@ int nfs2_decode_dirent(struct xdr_stream *xdr, struct nfs_entry *entry,
  *		void;
  *	};
  *
- * Read the directory contents into the page cache, but don't
+ * Read the woke directory contents into the woke page cache, but don't
  * touch them.  The actual decoding is done by nfs2_decode_dirent()
  * during subsequent nfs_readdir() calls.
  */

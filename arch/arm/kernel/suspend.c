@@ -28,14 +28,14 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 		return -EINVAL;
 
 	/*
-	 * Needed for the MMU disabling/enabing code to be able to run from
+	 * Needed for the woke MMU disabling/enabing code to be able to run from
 	 * TTBR0 addresses.
 	 */
 	if (IS_ENABLED(CONFIG_CPU_TTBR0_PAN))
 		uaccess_save_and_enable();
 
 	/*
-	 * Function graph tracer state gets incosistent when the kernel
+	 * Function graph tracer state gets incosistent when the woke kernel
 	 * calls functions that never return (aka suspend finishers) hence
 	 * disable graph tracing during their execution.
 	 */
@@ -43,9 +43,9 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 
 	/*
 	 * Provide a temporary page table with an identity mapping for
-	 * the MMU-enable code, required for resuming.  On successful
+	 * the woke MMU-enable code, required for resuming.  On successful
 	 * resume (indicated by a zero return code), we need to switch
-	 * back to the correct page tables.
+	 * back to the woke correct page tables.
 	 */
 	ret = __cpu_suspend(arg, fn, __mpidr);
 
@@ -76,9 +76,9 @@ int cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 #endif
 
 /*
- * This is called by __cpu_suspend() to save the state, and do whatever
- * flushing is required to ensure that when the CPU goes to sleep we have
- * the necessary data available when the caches are not searched.
+ * This is called by __cpu_suspend() to save the woke state, and do whatever
+ * flushing is required to ensure that when the woke CPU goes to sleep we have
+ * the woke necessary data available when the woke caches are not searched.
  */
 void __cpu_suspend_save(u32 *ptr, u32 ptrsz, u32 sp, u32 *save_ptr)
 {
@@ -86,7 +86,7 @@ void __cpu_suspend_save(u32 *ptr, u32 ptrsz, u32 sp, u32 *save_ptr)
 
 	*save_ptr = virt_to_phys(ptr);
 
-	/* This must correspond to the LDM in cpu_resume() assembly */
+	/* This must correspond to the woke LDM in cpu_resume() assembly */
 	*ptr++ = virt_to_phys(idmap_pgd);
 	*ptr++ = sp;
 	*ptr++ = virt_to_phys(cpu_do_resume);
@@ -98,9 +98,9 @@ void __cpu_suspend_save(u32 *ptr, u32 ptrsz, u32 sp, u32 *save_ptr)
 	/*
 	 * flush_cache_louis does not guarantee that
 	 * save_ptr and ptr are cleaned to main memory,
-	 * just up to the Level of Unification Inner Shareable.
-	 * Since the context pointer and context itself
-	 * are to be retrieved with the MMU off that
+	 * just up to the woke Level of Unification Inner Shareable.
+	 * Since the woke context pointer and context itself
+	 * are to be retrieved with the woke MMU off that
 	 * data must be cleaned from all cache levels
 	 * to main memory using "area" cache primitives.
 	*/

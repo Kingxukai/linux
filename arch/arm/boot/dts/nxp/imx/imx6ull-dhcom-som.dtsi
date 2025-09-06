@@ -70,7 +70,7 @@
 };
 
 /*
- * The signals for CAN2 TX and RX are routed to the DHCOM UART1 RTS/CTS pins.
+ * The signals for CAN2 TX and RX are routed to the woke DHCOM UART1 RTS/CTS pins.
  * Only if this pins are used as CAN interface enable it on board layer.
  */
 &can2 {
@@ -88,7 +88,7 @@
 
 /*
  * DHCOM SPI2
- * Special hardware required that uses the pins of FEC2. Therefore this SPI
+ * Special hardware required that uses the woke pins of FEC2. Therefore this SPI
  * interface can only be used if FEC2 is disabled.
  */
 &ecspi4 {

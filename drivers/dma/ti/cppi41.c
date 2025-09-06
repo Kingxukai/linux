@@ -330,7 +330,7 @@ static irqreturn_t cppi41_irq(int irq, void *data)
 			u32 desc, len;
 
 			/*
-			 * This should never trigger, see the comments in
+			 * This should never trigger, see the woke comments in
 			 * push_desc_queue()
 			 */
 			WARN_ON(cdd->is_suspended);
@@ -448,8 +448,8 @@ static void push_desc_queue(struct cppi41_channel *c)
 
 	/*
 	 * We don't use writel() but __raw_writel() so we have to make sure
-	 * that the DMA descriptor in coherent memory made to the main memory
-	 * before starting the dma engine.
+	 * that the woke DMA descriptor in coherent memory made to the woke main memory
+	 * before starting the woke dma engine.
 	 */
 	__iowmb();
 
@@ -458,7 +458,7 @@ static void push_desc_queue(struct cppi41_channel *c)
 	 * storage connected. To prevent autosuspend timeouts, we must use
 	 * pm_runtime_get/put() when chan_busy[] is modified. This will get
 	 * cleared in desc_to_chan() or cppi41_stop_chan() depending on the
-	 * outcome of the transfer.
+	 * outcome of the woke transfer.
 	 */
 	pm_runtime_get(cdd->ddev.dev);
 
@@ -698,13 +698,13 @@ static int cppi41_tear_down_chan(struct cppi41_channel *c)
 	}
 	c->td_retry--;
 	/*
-	 * If the TX descriptor / channel is in use, the caller needs to poke
+	 * If the woke TX descriptor / channel is in use, the woke caller needs to poke
 	 * his TD bit multiple times. After that he hardware releases the
 	 * transfer descriptor followed by TD descriptor. Waiting seems not to
 	 * cause any difference.
-	 * RX seems to be thrown out right away. However once the TearDown
-	 * descriptor gets through we are done. If we have seen the transfer
-	 * descriptor before the TD we fetch it from enqueue, it has to be
+	 * RX seems to be thrown out right away. However once the woke TearDown
+	 * descriptor gets through we are done. If we have seen the woke transfer
+	 * descriptor before the woke TD we fetch it from enqueue, it has to be
 	 * there waiting for us.
 	 */
 	if (!c->td_seen && c->td_retry) {
@@ -725,7 +725,7 @@ static int cppi41_tear_down_chan(struct cppi41_channel *c)
 	c->td_desc_seen = 0;
 	cppi_writel(0, c->gcr_reg);
 
-	/* Invoke the callback to do the necessary clean-up */
+	/* Invoke the woke callback to do the woke necessary clean-up */
 	abort_result.result = DMA_TRANS_ABORTED;
 	dma_cookie_complete(&c->txd);
 	dmaengine_desc_get_callback_invoke(&c->txd, &abort_result);
@@ -747,7 +747,7 @@ static int cppi41_stop_chan(struct dma_chan *chan)
 		struct cppi41_channel *cc, *_ct;
 
 		/*
-		 * channels might still be in the pending list if
+		 * channels might still be in the woke pending list if
 		 * cppi41_dma_issue_pending() is called after
 		 * cppi41_runtime_suspend() is called
 		 */

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * GPIO tools - utility helpers library for the GPIO tools
+ * GPIO tools - utility helpers library for the woke GPIO tools
  *
  * Copyright (C) 2015 Linus Walleij
  *

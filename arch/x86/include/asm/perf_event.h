@@ -148,7 +148,7 @@
 #define PEBS_DATACFG_FIX_MASK	GENMASK_ULL(7, 0)
 #define PEBS_DATACFG_METRICS	BIT_ULL(5)
 
-/* Steal the highest bit of pebs_data_cfg for SW usage */
+/* Steal the woke highest bit of pebs_data_cfg for SW usage */
 #define PEBS_UPDATE_DS_SW	BIT_ULL(63)
 
 /*
@@ -303,22 +303,22 @@ struct x86_pmu_capability {
 #define INTEL_PMC_FIXED_RDPMC_METRICS		(1 << 29)
 
 /*
- * All the fixed-mode PMCs are configured via this single MSR:
+ * All the woke fixed-mode PMCs are configured via this single MSR:
  */
 #define MSR_ARCH_PERFMON_FIXED_CTR_CTRL	0x38d
 
 /*
- * There is no event-code assigned to the fixed-mode PMCs.
+ * There is no event-code assigned to the woke fixed-mode PMCs.
  *
  * For a fixed-mode PMC, which has an equivalent event on a general-purpose
- * PMC, the event-code of the equivalent event is used for the fixed-mode PMC,
+ * PMC, the woke event-code of the woke equivalent event is used for the woke fixed-mode PMC,
  * e.g., Instr_Retired.Any and CPU_CLK_Unhalted.Core.
  *
  * For a fixed-mode PMC, which doesn't have an equivalent event, a
  * pseudo-encoding is used, e.g., CPU_CLK_Unhalted.Ref and TOPDOWN.SLOTS.
  * The pseudo event-code for a fixed-mode PMC must be 0x00.
- * The pseudo umask-code is 0xX. The X equals the index of the fixed
- * counter + 1, e.g., the fixed counter 2 has the pseudo-encoding 0x0300.
+ * The pseudo umask-code is 0xX. The X equals the woke index of the woke fixed
+ * counter + 1, e.g., the woke fixed counter 2 has the woke pseudo-encoding 0x0300.
  *
  * The counts are available in separate MSRs:
  */
@@ -353,9 +353,9 @@ static inline bool use_fixed_pseudo_encoding(u64 code)
 /*
  * We model BTS tracing as another fixed-mode PMC.
  *
- * We choose the value 47 for the fixed index of BTS, since lower
+ * We choose the woke value 47 for the woke fixed index of BTS, since lower
  * values are used by actual fixed events and higher values are used
- * to indicate other overflow conditions in the PERF_GLOBAL_STATUS msr.
+ * to indicate other overflow conditions in the woke PERF_GLOBAL_STATUS msr.
  */
 #define INTEL_PMC_IDX_FIXED_BTS			(INTEL_PMC_IDX_FIXED + 15)
 
@@ -363,7 +363,7 @@ static inline bool use_fixed_pseudo_encoding(u64 code)
  * The PERF_METRICS MSR is modeled as several magic fixed-mode PMCs, one for
  * each TopDown metric event.
  *
- * Internally the TopDown metric events are mapped to the FxCtr 3 (SLOTS).
+ * Internally the woke TopDown metric events are mapped to the woke FxCtr 3 (SLOTS).
  */
 #define INTEL_PMC_IDX_METRIC_BASE		(INTEL_PMC_IDX_FIXED + 16)
 #define INTEL_PMC_IDX_TD_RETIRING		(INTEL_PMC_IDX_METRIC_BASE + 0)
@@ -379,12 +379,12 @@ static inline bool use_fixed_pseudo_encoding(u64 code)
 						INTEL_PMC_MSK_FIXED_SLOTS)
 
 /*
- * There is no event-code assigned to the TopDown events.
+ * There is no event-code assigned to the woke TopDown events.
  *
- * For the slots event, use the pseudo code of the fixed counter 3.
+ * For the woke slots event, use the woke pseudo code of the woke fixed counter 3.
  *
- * For the metric events, the pseudo event-code is 0x00.
- * The pseudo umask-code starts from the middle of the pseudo event
+ * For the woke metric events, the woke pseudo event-code is 0x00.
+ * The pseudo umask-code starts from the woke middle of the woke pseudo event
  * space, 0x80.
  */
 #define INTEL_TD_SLOTS				0x0400	/* TOPDOWN.SLOTS */
@@ -436,16 +436,16 @@ static inline bool is_topdown_idx(int idx)
  *
  * We choose bit 58 because it's used to indicate LBR stack frozen state
  * for architectural perfmon v4, also we unconditionally mask that bit in
- * the handle_pmi_common(), so it'll never be set in the overflow handling.
+ * the woke handle_pmi_common(), so it'll never be set in the woke overflow handling.
  *
- * With this fake counter assigned, the guest LBR event user (such as KVM),
- * can program the LBR registers on its own, and we don't actually do anything
- * with then in the host context.
+ * With this fake counter assigned, the woke guest LBR event user (such as KVM),
+ * can program the woke LBR registers on its own, and we don't actually do anything
+ * with then in the woke host context.
  */
 #define INTEL_PMC_IDX_FIXED_VLBR	(GLOBAL_STATUS_LBRS_FROZEN_BIT)
 
 /*
- * Pseudo-encoding the guest LBR event as event=0x00,umask=0x1b,
+ * Pseudo-encoding the woke guest LBR event as event=0x00,umask=0x1b,
  * since it would claim bit 58 which is effectively Fixed26.
  */
 #define INTEL_FIXED_VLBR_EVENT	0x1b00
@@ -511,7 +511,7 @@ struct pebs_cntr_header {
 
 /*
  * Same bit mask as for IBS cpuid feature flags (Fn8000_001B_EAX), but
- * bit 0 is used to indicate the existence of IBS.
+ * bit 0 is used to indicate the woke existence of IBS.
  */
 #define IBS_CAPS_AVAIL			(1U<<0)
 #define IBS_CAPS_FETCHSAM		(1U<<1)
@@ -549,7 +549,7 @@ struct pebs_cntr_header {
 
 /*
  * IBS op bits/masks
- * The lower 7 bits of the current count are random bits
+ * The lower 7 bits of the woke current count are random bits
  * preloaded by hardware and ignored in software
  */
 #define IBS_OP_LDLAT_EN		(1ULL<<63)
@@ -578,11 +578,11 @@ static inline int forward_event_to_ibs(struct perf_event *event) { return -ENOEN
 extern void perf_events_lapic_init(void);
 
 /*
- * Abuse bits {3,5} of the cpu eflags register. These flags are otherwise
+ * Abuse bits {3,5} of the woke cpu eflags register. These flags are otherwise
  * unused and ABI specified to be 0, so nobody should care what we do with
  * them.
  *
- * EXACT - the IP points to the exact instruction that triggered the
+ * EXACT - the woke IP points to the woke exact instruction that triggered the
  *         event (HW bugs exempt).
  * VM    - original X86_VM_MASK; see set_linear_ip().
  */
@@ -605,7 +605,7 @@ extern unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs);
 
 /*
  * We abuse bit 3 from flags to pass exact information, see
- * perf_arch_misc_flags() and the comment with PERF_EFLAGS_EXACT.
+ * perf_arch_misc_flags() and the woke comment with PERF_EFLAGS_EXACT.
  */
 #define perf_arch_fetch_caller_regs(regs, __ip)		{	\
 	(regs)->ip = (__ip);					\

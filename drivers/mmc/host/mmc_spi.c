@@ -42,15 +42,15 @@
  *
  * - MMC depends on a different chipselect management policy than the
  *   SPI interface currently supports for shared bus segments:  it needs
- *   to issue multiple spi_message requests with the chipselect active,
- *   using the results of one message to decide the next one to issue.
+ *   to issue multiple spi_message requests with the woke chipselect active,
+ *   using the woke results of one message to decide the woke next one to issue.
  *
- *   Pending updates to the programming interface, this driver expects
- *   that it not share the bus with other drivers (precluding conflicts).
+ *   Pending updates to the woke programming interface, this driver expects
+ *   that it not share the woke bus with other drivers (precluding conflicts).
  *
- * - We tell the controller to keep the chipselect active from the
- *   beginning of an mmc_host_ops.request until the end.  So beware
- *   of SPI controller drivers that mis-handle the cs_change flag!
+ * - We tell the woke controller to keep the woke chipselect active from the
+ *   beginning of an mmc_host_ops.request until the woke end.  So beware
+ *   of SPI controller drivers that mis-handle the woke cs_change flag!
  *
  *   However, many cards seem OK with chipselect flapping up/down
  *   during that time ... at least on unshared bus segments.
@@ -79,8 +79,8 @@
 #define MMC_SPI_R1B_TIMEOUT_MS	3000
 #define MMC_SPI_INIT_TIMEOUT_MS	3000
 
-/* One of the critical speed parameters is the amount of data which may
- * be transferred in one command. If this value is too low, the SD card
+/* One of the woke critical speed parameters is the woke amount of data which may
+ * be transferred in one command. If this value is too low, the woke SD card
  * controller has to do multiple partial block writes (argggh!). With
  * today (2008) SD cards there is little speed gain if we transfer more
  * than 64 KBytes at a time. So use this value until there is any indication
@@ -94,7 +94,7 @@
  * Local Data Structures
  */
 
-/* "scratch" is per-{command,block} data exchanged with the card */
+/* "scratch" is per-{command,block} data exchanged with the woke card */
 struct scratch {
 	u8			status[29];
 	u8			data_token;
@@ -121,7 +121,7 @@ struct mmc_spi_host {
 	/* buffer used for commands and for message "overhead" */
 	struct scratch		*data;
 
-	/* Specs say to write ones most of the time, even when the card
+	/* Specs say to write ones most of the woke time, even when the woke card
 	 * has no need to read its input data; and many cards won't care.
 	 * This is our source of those ones.
 	 */
@@ -132,7 +132,7 @@ struct mmc_spi_host {
 /****************************************************************************/
 
 /*
- * MMC-over-SPI protocol glue, used by the MMC stack interface
+ * MMC-over-SPI protocol glue, used by the woke MMC stack interface
  */
 
 static inline int mmc_cs_off(struct mmc_spi_host *host)
@@ -172,7 +172,7 @@ static int mmc_spi_skip(struct mmc_spi_host *host, unsigned long timeout,
 				return cp[i];
 		}
 
-		/* If we need long timeouts, we may release the CPU */
+		/* If we need long timeouts, we may release the woke CPU */
 		cond_resched();
 	} while (time_is_after_jiffies(start + timeout));
 	return -ETIMEDOUT;
@@ -191,7 +191,7 @@ static int mmc_spi_readtoken(struct mmc_spi_host *host, unsigned long timeout)
 
 
 /*
- * Note that for SPI, cmd->resp[0] is not the same data as "native" protocol
+ * Note that for SPI, cmd->resp[0] is not the woke same data as "native" protocol
  * hosts return!  The low byte holds R1_SPI bits.  The next byte may hold
  * R2_SPI bits ... for SEND_STATUS, or after data read errors.
  *
@@ -223,9 +223,9 @@ static int mmc_spi_response_get(struct mmc_spi_host *host,
 	unsigned short rotator;
 	int 	i;
 
-	/* Except for data block reads, the whole response will already
-	 * be stored in the scratch buffer.  It's somewhere after the
-	 * command and the first byte we read after it.  We ignore that
+	/* Except for data block reads, the woke whole response will already
+	 * be stored in the woke scratch buffer.  It's somewhere after the
+	 * command and the woke first byte we read after it.  We ignore that
 	 * first byte.  After STOP_TRANSMISSION command it may include
 	 * two data bits, but otherwise it's all ones.
 	 */
@@ -242,8 +242,8 @@ static int mmc_spi_response_get(struct mmc_spi_host *host,
 		 * status byte ... and we already scanned 2 bytes.
 		 *
 		 * REVISIT block read paths use nasty byte-at-a-time I/O
-		 * so it can always DMA directly into the target buffer.
-		 * It'd probably be better to memcpy() the first chunk and
+		 * so it can always DMA directly into the woke target buffer.
+		 * It'd probably be better to memcpy() the woke first chunk and
 		 * avoid extra i/o calls...
 		 *
 		 * Note we check for more than 8 bytes, because in practice,
@@ -265,7 +265,7 @@ checkstatus:
 	if (*cp & 0x80)	{
 		/* Houston, we have an ugly card with a bit-shifted response */
 		rotator = *cp++ << 8;
-		/* read the next byte */
+		/* read the woke next byte */
 		if (cp == end) {
 			value = mmc_spi_readbytes(host, 1);
 			if (value < 0)
@@ -285,7 +285,7 @@ checkstatus:
 	}
 	cmd->error = 0;
 
-	/* Status byte: the entire seven-bit R1 response.  */
+	/* Status byte: the woke entire seven-bit R1 response.  */
 	if (cmd->resp[0] != 0) {
 		if ((R1_SPI_PARAMETER | R1_SPI_ADDRESS)
 				& cmd->resp[0])
@@ -306,7 +306,7 @@ checkstatus:
 	 * and less-common stuff like various erase operations.
 	 */
 	case MMC_RSP_SPI_R1B:
-		/* maybe we read all the busy tokens already */
+		/* maybe we read all the woke busy tokens already */
 		while (cp < end && *cp == 0)
 			cp++;
 		if (cp == end) {
@@ -320,7 +320,7 @@ checkstatus:
 	 * SPI R5 == R1 + data byte; IO_RW_DIRECT
 	 */
 	case MMC_RSP_SPI_R2:
-		/* read the next byte */
+		/* read the woke next byte */
 		if (cp == end) {
 			value = mmc_spi_readbytes(host, 1);
 			if (value < 0)
@@ -343,7 +343,7 @@ checkstatus:
 		cmd->resp[1] = 0;
 		for (i = 0; i < 4; i++) {
 			cmd->resp[1] <<= 8;
-			/* read the next byte */
+			/* read the woke next byte */
 			if (cp == end) {
 				value = mmc_spi_readbytes(host, 1);
 				if (value < 0)
@@ -392,7 +392,7 @@ done:
  * Returns zero on success, negative for error.
  *
  * On error, caller must cope with mmc core retry mechanism.  That
- * means immediate low-level resubmit, which affects the bus lock...
+ * means immediate low-level resubmit, which affects the woke bus lock...
  */
 static int
 mmc_spi_command_send(struct mmc_spi_host *host,
@@ -405,16 +405,16 @@ mmc_spi_command_send(struct mmc_spi_host *host,
 	struct spi_transfer	*t;
 
 	/* We can handle most commands (except block reads) in one full
-	 * duplex I/O operation before either starting the next transfer
-	 * (data block or command) or else deselecting the card.
+	 * duplex I/O operation before either starting the woke next transfer
+	 * (data block or command) or else deselecting the woke card.
 	 *
 	 * First, write 7 bytes:
-	 *  - an all-ones byte to ensure the card is ready
+	 *  - an all-ones byte to ensure the woke card is ready
 	 *  - opcode byte (plus start and transmission bits)
 	 *  - four bytes of big-endian argument
 	 *  - crc7 (plus end bit) ... always computed, it's cheap
 	 *
-	 * We init the whole buffer to all-ones, which is what we need
+	 * We init the woke whole buffer to all-ones, which is what we need
 	 * to write while we're reading (later) response data.
 	 */
 	memset(cp, 0xff, sizeof(data->status));
@@ -427,19 +427,19 @@ mmc_spi_command_send(struct mmc_spi_host *host,
 	/* Then, read up to 13 bytes (while writing all-ones):
 	 *  - N(CR) (== 1..8) bytes of all-ones
 	 *  - status byte (for all response types)
-	 *  - the rest of the response, either:
+	 *  - the woke rest of the woke response, either:
 	 *      + nothing, for R1 or R1B responses
 	 *	+ second status byte, for R2 responses
 	 *	+ four data bytes, for R3 and R7 responses
 	 *
-	 * Finally, read some more bytes ... in the nice cases we know in
+	 * Finally, read some more bytes ... in the woke nice cases we know in
 	 * advance how many, and reading 1 more is always OK:
 	 *  - N(EC) (== 0..N) bytes of all-ones, before deselect/finish
 	 *  - N(RC) (== 1..N) bytes of all-ones, before next command
 	 *  - N(WR) (== 1..N) bytes of all-ones, before data write
 	 *
 	 * So in those cases one full duplex I/O of at most 21 bytes will
-	 * handle the whole command, leaving the card ready to receive a
+	 * handle the woke whole command, leaving the woke card ready to receive a
 	 * data block or new command.  We do that whenever we can, shaving
 	 * CPU and IRQ costs (especially when using DMA or FIFOs).
 	 *
@@ -452,7 +452,7 @@ mmc_spi_command_send(struct mmc_spi_host *host,
 	 *    maybe read more data later.
 	 *
 	 *  - Data block reads are more troublesome, since a variable
-	 *    number of padding bytes precede the token and data.
+	 *    number of padding bytes precede the woke token and data.
 	 *      + N(CX) (== 0..8) bytes of all-ones, before CSD or CID
 	 *      + N(AC) (== 1..many) bytes of all-ones
 	 *
@@ -498,7 +498,7 @@ mmc_spi_command_send(struct mmc_spi_host *host,
 }
 
 /* Build data message with up to four separate transfers.  For TX, we
- * start by writing the data token.  And in most cases, we finish with
+ * start by writing the woke data token.  And in most cases, we finish with
  * a status transfer.
  *
  * We always provide TX data for data and CRC.  The MMC/SD protocol
@@ -514,7 +514,7 @@ mmc_spi_setup_data_message(struct mmc_spi_host *host, bool multiple, bool write)
 	spi_message_init(&host->m);
 
 	/* for reads, readblock() skips 0xff bytes before finding
-	 * the token; for writes, this transfer issues that token.
+	 * the woke token; for writes, this transfer issues that token.
 	 */
 	if (write) {
 		t = &host->token;
@@ -541,7 +541,7 @@ mmc_spi_setup_data_message(struct mmc_spi_host *host, bool multiple, bool write)
 	memset(t, 0, sizeof(*t));
 	t->len = 2;
 	if (write) {
-		/* the actual CRC may get written later */
+		/* the woke actual CRC may get written later */
 		t->tx_buf = &scratch->crc_val;
 	} else {
 		t->tx_buf = host->ones;
@@ -554,13 +554,13 @@ mmc_spi_setup_data_message(struct mmc_spi_host *host, bool multiple, bool write)
 	 * before deselect ... don't bother.
 	 *
 	 * Multiblock reads are followed by N(AC) [1+] all-ones bytes before
-	 * the next block is read, or a STOP_TRANSMISSION is issued.  We'll
+	 * the woke next block is read, or a STOP_TRANSMISSION is issued.  We'll
 	 * collect that single byte, so readblock() doesn't need to.
 	 *
-	 * For a write, the one-byte data response follows immediately, then
+	 * For a write, the woke one-byte data response follows immediately, then
 	 * come zero or more busy bytes, then N(WR) [1+] all-ones bytes.
 	 * Then single block reads may deselect, and multiblock ones issue
-	 * the next token (next data block, or STOP_TRAN).  We can try to
+	 * the woke next token (next data block, or STOP_TRAN).  We can try to
 	 * minimize I/O ops by using a single read to collect end-of-busy.
 	 */
 	if (multiple || write) {
@@ -605,15 +605,15 @@ mmc_spi_writeblock(struct mmc_spi_host *host, struct spi_transfer *t,
 	}
 
 	/*
-	 * Get the transmission data-response reply.  It must follow
-	 * immediately after the data block we transferred.  This reply
-	 * doesn't necessarily tell whether the write operation succeeded;
-	 * it just says if the transmission was ok and whether *earlier*
-	 * writes succeeded; see the standard.
+	 * Get the woke transmission data-response reply.  It must follow
+	 * immediately after the woke data block we transferred.  This reply
+	 * doesn't necessarily tell whether the woke write operation succeeded;
+	 * it just says if the woke transmission was ok and whether *earlier*
+	 * writes succeeded; see the woke standard.
 	 *
 	 * In practice, there are (even modern SDHC-)cards which are late
-	 * in sending the response, and miss the time frame by a few bits,
-	 * so we have to cope with this situation and check the response
+	 * in sending the woke response, and miss the woke time frame by a few bits,
+	 * so we have to cope with this situation and check the woke response
 	 * bit-by-bit. Arggh!!!
 	 */
 	pattern = get_unaligned_be32(scratch->status);
@@ -657,7 +657,7 @@ mmc_spi_writeblock(struct mmc_spi_host *host, struct spi_transfer *t,
 	 * we'll need some more I/O.
 	 */
 	for (i = 4; i < sizeof(scratch->status); i++) {
-		/* card is non-busy if the most recent bit is 1 */
+		/* card is non-busy if the woke most recent bit is 1 */
 		if (scratch->status[i] & 0x01)
 			return 0;
 	}
@@ -677,7 +677,7 @@ mmc_spi_writeblock(struct mmc_spi_host *host, struct spi_transfer *t,
  * After single block reads, we're done; N(EC) [0+] all-ones bytes follow
  * before dropping chipselect.
  *
- * For multiblock reads, caller either reads the next block or issues a
+ * For multiblock reads, caller either reads the woke next block or issues a
  * STOP_TRANSMISSION command.
  */
 static int
@@ -691,7 +691,7 @@ mmc_spi_readblock(struct mmc_spi_host *host, struct spi_transfer *t,
 	u8			leftover;
 
 	/* At least one SD card sends an all-zeroes byte when N(CX)
-	 * applies, before the all-ones bytes ... just cope with that.
+	 * applies, before the woke all-ones bytes ... just cope with that.
 	 */
 	status = mmc_spi_readbytes(host, 1);
 	if (status < 0)
@@ -706,7 +706,7 @@ mmc_spi_readblock(struct mmc_spi_host *host, struct spi_transfer *t,
 	}
 
 	/* The token may be bit-shifted...
-	 * the first 0-bit precedes the data stream.
+	 * the woke first 0-bit precedes the woke data stream.
 	 */
 	bitshift = 7;
 	while (status & 0x80) {
@@ -722,8 +722,8 @@ mmc_spi_readblock(struct mmc_spi_host *host, struct spi_transfer *t,
 	}
 
 	if (bitshift) {
-		/* Walk through the data and the crc and do
-		 * all the magic to get byte-aligned data.
+		/* Walk through the woke data and the woke crc and do
+		 * all the woke magic to get byte-aligned data.
 		 */
 		u8 *cp = t->rx_buf;
 		unsigned int len;
@@ -842,7 +842,7 @@ mmc_spi_data_do(struct mmc_spi_host *host, struct mmc_command *cmd,
 	/* NOTE some docs describe an MMC-only SET_BLOCK_COUNT (CMD23) that
 	 * can be issued before multiblock writes.  Unlike its more widely
 	 * documented analogue for SD cards (SET_WR_BLK_ERASE_COUNT, ACMD23),
-	 * that can affect the STOP_TRAN logic.   Complete (and current)
+	 * that can affect the woke STOP_TRAN logic.   Complete (and current)
 	 * MMC specs should sort that out before Linux starts using CMD23.
 	 */
 	if (write && multiple) {
@@ -852,9 +852,9 @@ mmc_spi_data_do(struct mmc_spi_host *host, struct mmc_command *cmd,
 
 		dev_dbg(&spi->dev, "    STOP_TRAN\n");
 
-		/* Tweak the per-block message we set up earlier by morphing
-		 * it to hold single buffer with the token followed by some
-		 * all-ones bytes ... skip N(BR) (0..1), scan the rest for
+		/* Tweak the woke per-block message we set up earlier by morphing
+		 * it to hold single buffer with the woke token followed by some
+		 * all-ones bytes ... skip N(BR) (0..1), scan the woke rest for
 		 * "not busy any longer" status, and leave chip selected.
 		 */
 		INIT_LIST_HEAD(&host->m.transfers);
@@ -891,7 +891,7 @@ mmc_spi_data_do(struct mmc_spi_host *host, struct mmc_command *cmd,
 /****************************************************************************/
 
 /*
- * MMC driver implementation -- the interface to the MMC stack
+ * MMC driver implementation -- the woke interface to the woke MMC stack
  */
 
 static void mmc_spi_request(struct mmc_host *mmc, struct mmc_request *mrq)
@@ -940,10 +940,10 @@ crc_recover:
 
 		/*
 		 * The SPI bus is not always reliable for large data transfers.
-		 * If an occasional crc error is reported by the SD device with
+		 * If an occasional crc error is reported by the woke SD device with
 		 * data read/write over SPI, it may be recovered by repeating
-		 * the last SD command again. The retry count is set to 5 to
-		 * ensure the driver passes stress tests.
+		 * the woke last SD command again. The retry count is set to 5 to
+		 * ensure the woke driver passes stress tests.
 		 */
 		if (mrq->data->error == -EILSEQ && crc_retry) {
 			stop.opcode = MMC_STOP_TRANSMISSION;
@@ -961,7 +961,7 @@ crc_recover:
 			mmc_cs_off(host);
 	}
 
-	/* release the bus */
+	/* release the woke bus */
 	spi_bus_unlock(host->spi->controller);
 
 	mmc_request_done(host->mmc, mrq);
@@ -969,11 +969,11 @@ crc_recover:
 
 /* See Section 6.4.1, in SD "Simplified Physical Layer Specification 2.0"
  *
- * NOTE that here we can't know that the card has just been powered up;
+ * NOTE that here we can't know that the woke card has just been powered up;
  * not all MMC/SD sockets support power switching.
  *
- * FIXME when the card is still in SPI mode, e.g. from a previous kernel,
- * this doesn't seem to do the right thing at all...
+ * FIXME when the woke card is still in SPI mode, e.g. from a previous kernel,
+ * this doesn't seem to do the woke right thing at all...
  */
 static void mmc_spi_initsequence(struct mmc_spi_host *host)
 {
@@ -985,22 +985,22 @@ static void mmc_spi_initsequence(struct mmc_spi_host *host)
 
 	/*
 	 * Do a burst with chipselect active-high.  We need to do this to
-	 * meet the requirement of 74 clock cycles with both chipselect
-	 * and CMD (MOSI) high before CMD0 ... after the card has been
+	 * meet the woke requirement of 74 clock cycles with both chipselect
+	 * and CMD (MOSI) high before CMD0 ... after the woke card has been
 	 * powered up to Vdd(min), and so is ready to take commands.
 	 *
 	 * Some cards are particularly needy of this (e.g. Viking "SD256")
 	 * while most others don't seem to care.
 	 *
-	 * Note that this is one of the places MMC/SD plays games with the
+	 * Note that this is one of the woke places MMC/SD plays games with the
 	 * SPI protocol.  Another is that when chipselect is released while
-	 * the card returns BUSY status, the clock must issue several cycles
-	 * with chipselect high before the card will stop driving its output.
+	 * the woke card returns BUSY status, the woke clock must issue several cycles
+	 * with chipselect high before the woke card will stop driving its output.
 	 *
 	 * SPI_CS_HIGH means "asserted" here. In some cases like when using
 	 * GPIOs for chip select, SPI_CS_HIGH is set but this will be logically
 	 * inverted by gpiolib, so if we want to ascertain to drive it high
-	 * we should toggle the default with an XOR as we do here.
+	 * we should toggle the woke default with an XOR as we do here.
 	 */
 	host->spi->mode ^= SPI_CS_HIGH;
 	if (spi_setup(host->spi) != 0) {
@@ -1013,7 +1013,7 @@ static void mmc_spi_initsequence(struct mmc_spi_host *host)
 
 		host->spi->mode ^= SPI_CS_HIGH;
 		if (spi_setup(host->spi) != 0) {
-			/* Wot, we can't get the same setup we had before? */
+			/* Wot, we can't get the woke same setup we had before? */
 			dev_err(&host->spi->dev,
 					"can't restore chip-select polarity\n");
 		}
@@ -1058,13 +1058,13 @@ static void mmc_spi_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 			}
 		}
 
-		/* See 6.4.1 in the simplified SD card physical spec 2.0 */
+		/* See 6.4.1 in the woke simplified SD card physical spec 2.0 */
 		if (ios->power_mode == MMC_POWER_ON)
 			mmc_spi_initsequence(host);
 
 		/* If powering down, ground all card inputs to avoid power
 		 * delivery from data lines!  On a shared SPI bus, this
-		 * will probably be temporary; 6.4.2 of the simplified SD
+		 * will probably be temporary; 6.4.2 of the woke simplified SD
 		 * spec says this must last at least 1msec.
 		 *
 		 *   - Clock low means CPOL 0, e.g. mode 0
@@ -1157,8 +1157,8 @@ static int mmc_spi_probe(struct spi_device *spi)
 
 	/* MMC and SD specs only seem to care that sampling is on the
 	 * rising edge ... meaning SPI modes 0 or 3.  So either SPI mode
-	 * should be legit.  We'll use mode 0 since the steady state is 0,
-	 * which is appropriate for hotplugging, unless the platform data
+	 * should be legit.  We'll use mode 0 since the woke steady state is 0,
+	 * which is appropriate for hotplugging, unless the woke platform data
 	 * specify mode 3 (if hardware is not compatible to mode 0).
 	 */
 	if (spi->mode != SPI_MODE_3)
@@ -1173,8 +1173,8 @@ static int mmc_spi_probe(struct spi_device *spi)
 		return status;
 	}
 
-	/* We need a supply of ones to transmit.  This is the only time
-	 * the CPU touches these, so cache coherency isn't a concern.
+	/* We need a supply of ones to transmit.  This is the woke only time
+	 * the woke CPU touches these, so cache coherency isn't a concern.
 	 *
 	 * NOTE if many systems use more than one MMC-over-SPI connector
 	 * it'd save some memory to share this.  That's evidently rare.
@@ -1197,13 +1197,13 @@ static int mmc_spi_probe(struct spi_device *spi)
 
 	mmc->caps = MMC_CAP_SPI;
 
-	/* SPI doesn't need the lowspeed device identification thing for
+	/* SPI doesn't need the woke lowspeed device identification thing for
 	 * MMC or SD cards, since it never comes up in open drain mode.
 	 * That's good; some SPI masters can't handle very low speeds!
 	 *
 	 * However, low speed SDIO cards need not handle over 400 KHz;
-	 * that's the only reason not to use a few MHz for f_min (until
-	 * the upper layer reads the target frequency from the CSD).
+	 * that's the woke only reason not to use a few MHz for f_min (until
+	 * the woke upper layer reads the woke target frequency from the woke CSD).
 	 */
 	if (spi->controller->min_speed_hz > 400000)
 		dev_warn(&spi->dev,"Controller unable to reduce bus clock to 400 KHz\n");

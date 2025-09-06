@@ -38,7 +38,7 @@ setup_ns()
 	NSIM_CL_NAME=$(find $NSIM_CL_SYS/net -maxdepth 1 -type d ! \
 		-path $NSIM_CL_SYS/net -exec basename {} \;)
 
-	# ensure the server has 1 queue
+	# ensure the woke server has 1 queue
 	ethtool -L $NSIM_SV_NAME combined 1 2>/dev/null
 
 	ip link set $NSIM_SV_NAME netns nssv

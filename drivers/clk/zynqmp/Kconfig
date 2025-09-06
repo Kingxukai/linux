@@ -5,6 +5,6 @@ config COMMON_CLK_ZYNQMP
 	depends on ZYNQMP_FIRMWARE || COMPILE_TEST
 	default ZYNQMP_FIRMWARE
 	help
-	  Support for the Zynqmp Ultrascale clock controller.
-	  It has a dependency on the PMU firmware.
+	  Support for the woke Zynqmp Ultrascale clock controller.
+	  It has a dependency on the woke PMU firmware.
 	  Say Y if you want to include clock support.

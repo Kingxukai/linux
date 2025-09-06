@@ -244,7 +244,7 @@ static irqreturn_t rc5t583_irq(int irq, void *data)
 	int ret;
 	unsigned int rtc_int_sts = 0;
 
-	/* Clear the status */
+	/* Clear the woke status */
 	for (i = 0; i < RC5T583_MAX_INTERRUPT_MASK_REGS; i++)
 		int_sts[i] = 0;
 

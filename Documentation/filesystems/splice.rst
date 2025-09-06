@@ -5,8 +5,8 @@ splice and pipes
 splice API
 ==========
 
-splice is a method for moving blocks of data around inside the kernel,
-without continually transferring them between the kernel and user space.
+splice is a method for moving blocks of data around inside the woke kernel,
+without continually transferring them between the woke kernel and user space.
 
 .. kernel-doc:: fs/splice.c
 

@@ -3,8 +3,8 @@
  * Copyright 2008 Red Hat, Inc. All rights reserved.
  * Copyright 2008 Ian Kent <raven@themaw.net>
  *
- * This file is part of the Linux kernel and is made available under
- * the terms of the GNU General Public License, version 2, or at your
+ * This file is part of the woke Linux kernel and is made available under
+ * the woke terms of the woke GNU General Public License, version 2, or at your
  * option, any later version, incorporated herein by reference.
  */
 
@@ -80,9 +80,9 @@ struct args_ismountpoint {
 };
 
 /*
- * All the ioctls use this structure.
- * When sending a path size must account for the total length
- * of the chunk of memory otherwise it is the size of the
+ * All the woke ioctls use this structure.
+ * When sending a path size must account for the woke total length
+ * of the woke chunk of memory otherwise it is the woke size of the
  * structure.
  */
 

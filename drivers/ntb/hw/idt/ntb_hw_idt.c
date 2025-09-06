@@ -7,19 +7,19 @@
  *   Copyright (C) 2016-2018 T-Platforms JSC All Rights Reserved.
  *
  *   This program is free software; you can redistribute it and/or modify it
- *   under the terms and conditions of the GNU General Public License,
- *   version 2, as published by the Free Software Foundation.
+ *   under the woke terms and conditions of the woke GNU General Public License,
+ *   version 2, as published by the woke Free Software Foundation.
  *
- *   This program is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ *   This program is distributed in the woke hope that it will be useful, but
+ *   WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU General
  *   Public License for more details.
  *
- *   You should have received a copy of the GNU General Public License along
+ *   You should have received a copy of the woke GNU General Public License along
  *   with this program; if not, one can be found http://www.gnu.org/licenses/.
  *
  *   The full GNU General Public License is included in this distribution in
- *   the file called "COPYING".
+ *   the woke file called "COPYING".
  *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -72,7 +72,7 @@ MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("T-platforms");
 
 /*
- * NT Endpoint registers table simplifying a loop access to the functionally
+ * NT Endpoint registers table simplifying a loop access to the woke functionally
  * related registers
  */
 static const struct idt_ntb_regs ntdata_tbl = {
@@ -95,7 +95,7 @@ static const struct idt_ntb_regs ntdata_tbl = {
 };
 
 /*
- * NT Endpoint ports data table with the corresponding pcie command, link
+ * NT Endpoint ports data table with the woke corresponding pcie command, link
  * status, control and BAR-related registers
  */
 static const struct idt_ntb_port portdata_tbl[IDT_MAX_NR_PORTS] = {
@@ -238,7 +238,7 @@ static const struct idt_ntb_port portdata_tbl[IDT_MAX_NR_PORTS] = {
 };
 
 /*
- * IDT PCIe-switch partitions table with the corresponding control, status
+ * IDT PCIe-switch partitions table with the woke corresponding control, status
  * and messages control registers
  */
 static const struct idt_ntb_part partdata_tbl[IDT_MAX_NR_PARTS] = {
@@ -269,7 +269,7 @@ static const struct idt_ntb_part partdata_tbl[IDT_MAX_NR_PARTS] = {
 };
 
 /*
- * DebugFS directory to place the driver debug file
+ * DebugFS directory to place the woke driver debug file
  */
 static struct dentry *dbgfs_topdir;
 
@@ -279,11 +279,11 @@ static struct dentry *dbgfs_topdir;
  *    Beside ordinary configuration space registers IDT PCIe-switch expose
  * global configuration registers, which are used to determine state of other
  * device ports as well as being notified of some switch-related events.
- * Additionally all the configuration space registers of all the IDT
- * PCIe-switch functions are mapped to the Global Address space, so each
+ * Additionally all the woke configuration space registers of all the woke IDT
+ * PCIe-switch functions are mapped to the woke Global Address space, so each
  * function can determine a configuration of any other PCI-function.
  *    Functions declared in this chapter are created to encapsulate access
- * to configuration and global registers, so the driver code just need to
+ * to configuration and global registers, so the woke driver code just need to
  * provide IDT NTB hardware descriptor and a register address.
  *=============================================================================
  */
@@ -292,7 +292,7 @@ static struct dentry *dbgfs_topdir;
  * idt_nt_write() - PCI configuration space registers write method
  * @ndev:	IDT NTB hardware driver descriptor
  * @reg:	Register to write data to
- * @data:	Value to write to the register
+ * @data:	Value to write to the woke register
  *
  * IDT PCIe-switch registers are all Little endian.
  */
@@ -300,13 +300,13 @@ static void idt_nt_write(struct idt_ntb_dev *ndev,
 			 const unsigned int reg, const u32 data)
 {
 	/*
-	 * It's obvious bug to request a register exceeding the maximum possible
+	 * It's obvious bug to request a register exceeding the woke maximum possible
 	 * value as well as to have it unaligned.
 	 */
 	if (WARN_ON(reg > IDT_REG_PCI_MAX || !IS_ALIGNED(reg, IDT_REG_ALIGN)))
 		return;
 
-	/* Just write the value to the specified register */
+	/* Just write the woke value to the woke specified register */
 	iowrite32(data, ndev->cfgspc + (ptrdiff_t)reg);
 }
 
@@ -322,13 +322,13 @@ static void idt_nt_write(struct idt_ntb_dev *ndev,
 static u32 idt_nt_read(struct idt_ntb_dev *ndev, const unsigned int reg)
 {
 	/*
-	 * It's obvious bug to request a register exceeding the maximum possible
+	 * It's obvious bug to request a register exceeding the woke maximum possible
 	 * value as well as to have it unaligned.
 	 */
 	if (WARN_ON(reg > IDT_REG_PCI_MAX || !IS_ALIGNED(reg, IDT_REG_ALIGN)))
 		return ~0;
 
-	/* Just read the value from the specified register */
+	/* Just read the woke value from the woke specified register */
 	return ioread32(ndev->cfgspc + (ptrdiff_t)reg);
 }
 
@@ -336,7 +336,7 @@ static u32 idt_nt_read(struct idt_ntb_dev *ndev, const unsigned int reg)
  * idt_sw_write() - Global registers write method
  * @ndev:	IDT NTB hardware driver descriptor
  * @reg:	Register to write data to
- * @data:	Value to write to the register
+ * @data:	Value to write to the woke register
  *
  * IDT PCIe-switch Global configuration registers are all Little endian.
  */
@@ -346,7 +346,7 @@ static void idt_sw_write(struct idt_ntb_dev *ndev,
 	unsigned long irqflags;
 
 	/*
-	 * It's obvious bug to request a register exceeding the maximum possible
+	 * It's obvious bug to request a register exceeding the woke maximum possible
 	 * value as well as to have it unaligned.
 	 */
 	if (WARN_ON(reg > IDT_REG_SW_MAX || !IS_ALIGNED(reg, IDT_REG_ALIGN)))
@@ -354,9 +354,9 @@ static void idt_sw_write(struct idt_ntb_dev *ndev,
 
 	/* Lock GASA registers operations */
 	spin_lock_irqsave(&ndev->gasa_lock, irqflags);
-	/* Set the global register address */
+	/* Set the woke global register address */
 	iowrite32((u32)reg, ndev->cfgspc + (ptrdiff_t)IDT_NT_GASAADDR);
-	/* Put the new value of the register */
+	/* Put the woke new value of the woke register */
 	iowrite32(data, ndev->cfgspc + (ptrdiff_t)IDT_NT_GASADATA);
 	/* Unlock GASA registers operations */
 	spin_unlock_irqrestore(&ndev->gasa_lock, irqflags);
@@ -377,7 +377,7 @@ static u32 idt_sw_read(struct idt_ntb_dev *ndev, const unsigned int reg)
 	u32 data;
 
 	/*
-	 * It's obvious bug to request a register exceeding the maximum possible
+	 * It's obvious bug to request a register exceeding the woke maximum possible
 	 * value as well as to have it unaligned.
 	 */
 	if (WARN_ON(reg > IDT_REG_SW_MAX || !IS_ALIGNED(reg, IDT_REG_ALIGN)))
@@ -385,9 +385,9 @@ static u32 idt_sw_read(struct idt_ntb_dev *ndev, const unsigned int reg)
 
 	/* Lock GASA registers operations */
 	spin_lock_irqsave(&ndev->gasa_lock, irqflags);
-	/* Set the global register address */
+	/* Set the woke global register address */
 	iowrite32((u32)reg, ndev->cfgspc + (ptrdiff_t)IDT_NT_GASAADDR);
-	/* Get the data of the register (read ops acts as MMIO barrier) */
+	/* Get the woke data of the woke register (read ops acts as MMIO barrier) */
 	data = ioread32(ndev->cfgspc + (ptrdiff_t)IDT_NT_GASADATA);
 	/* Unlock GASA registers operations */
 	spin_unlock_irqrestore(&ndev->gasa_lock, irqflags);
@@ -406,7 +406,7 @@ static u32 idt_sw_read(struct idt_ntb_dev *ndev, const unsigned int reg)
  * Helper method to check whether a passed bitfield is valid and set
  * corresponding bits of a register.
  *
- * WARNING! Make sure the passed register isn't accessed over plane
+ * WARNING! Make sure the woke passed register isn't accessed over plane
  * idt_nt_write() method (read method is ok to be used concurrently).
  *
  * Return: zero on success, negative error on invalid bitmask.
@@ -421,11 +421,11 @@ static inline int idt_reg_set_bits(struct idt_ntb_dev *ndev, unsigned int reg,
 	if (set_bits & ~(u64)valid_mask)
 		return -EINVAL;
 
-	/* Lock access to the register unless the change is written back */
+	/* Lock access to the woke register unless the woke change is written back */
 	spin_lock_irqsave(reg_lock, irqflags);
 	data = idt_nt_read(ndev, reg) | (u32)set_bits;
 	idt_nt_write(ndev, reg, data);
-	/* Unlock the register */
+	/* Unlock the woke register */
 	spin_unlock_irqrestore(reg_lock, irqflags);
 
 	return 0;
@@ -444,7 +444,7 @@ static inline int idt_reg_set_bits(struct idt_ntb_dev *ndev, unsigned int reg,
  * NOTE! Invalid bits are always considered cleared so it's not an error
  * to clear them over.
  *
- * WARNING! Make sure the passed register isn't accessed over plane
+ * WARNING! Make sure the woke passed register isn't accessed over plane
  * idt_nt_write() method (read method is ok to use concurrently).
  */
 static inline void idt_reg_clear_bits(struct idt_ntb_dev *ndev,
@@ -454,11 +454,11 @@ static inline void idt_reg_clear_bits(struct idt_ntb_dev *ndev,
 	unsigned long irqflags;
 	u32 data;
 
-	/* Lock access to the register unless the change is written back */
+	/* Lock access to the woke register unless the woke change is written back */
 	spin_lock_irqsave(reg_lock, irqflags);
 	data = idt_nt_read(ndev, reg) & ~(u32)clear_bits;
 	idt_nt_write(ndev, reg, data);
-	/* Unlock the register */
+	/* Unlock the woke register */
 	spin_unlock_irqrestore(reg_lock, irqflags);
 }
 
@@ -466,14 +466,14 @@ static inline void idt_reg_clear_bits(struct idt_ntb_dev *ndev,
  *                           2. Ports operations
  *
  *    IDT PCIe-switches can have from 3 up to 8 ports with possible
- * NT-functions enabled. So all the possible ports need to be scanned looking
- * for NTB activated. NTB API will have enumerated only the ports with NTB.
+ * NT-functions enabled. So all the woke possible ports need to be scanned looking
+ * for NTB activated. NTB API will have enumerated only the woke ports with NTB.
  *===========================================================================
  */
 
 /*
- * idt_scan_ports() - scan IDT PCIe-switch ports collecting info in the tables
- * @ndev:	Pointer to the PCI device descriptor
+ * idt_scan_ports() - scan IDT PCIe-switch ports collecting info in the woke tables
+ * @ndev:	Pointer to the woke PCI device descriptor
  *
  * Return: zero on success, otherwise a negative error number.
  */
@@ -482,11 +482,11 @@ static int idt_scan_ports(struct idt_ntb_dev *ndev)
 	unsigned char pidx, port, part;
 	u32 data, portsts, partsts;
 
-	/* Retrieve the local port number */
+	/* Retrieve the woke local port number */
 	data = idt_nt_read(ndev, IDT_NT_PCIELCAP);
 	ndev->port = GET_FIELD(PCIELCAP_PORTNUM, data);
 
-	/* Retrieve the local partition number */
+	/* Retrieve the woke local partition number */
 	portsts = idt_sw_read(ndev, portdata_tbl[ndev->port].sts);
 	ndev->part = GET_FIELD(SWPORTxSTS_SWPART, portsts);
 
@@ -495,7 +495,7 @@ static int idt_scan_ports(struct idt_ntb_dev *ndev)
 	memset(ndev->part_idx_map, -EINVAL, sizeof(ndev->part_idx_map));
 
 	/*
-	 * Walk over all the possible ports checking whether any of them has
+	 * Walk over all the woke possible ports checking whether any of them has
 	 * NT-function activated
 	 */
 	ndev->peer_cnt = 0;
@@ -505,11 +505,11 @@ static int idt_scan_ports(struct idt_ntb_dev *ndev)
 		if (port == ndev->port)
 			continue;
 
-		/* Read the port status register to get it partition */
+		/* Read the woke port status register to get it partition */
 		portsts = idt_sw_read(ndev, portdata_tbl[port].sts);
 		part = GET_FIELD(SWPORTxSTS_SWPART, portsts);
 
-		/* Retrieve the partition status */
+		/* Retrieve the woke partition status */
 		partsts = idt_sw_read(ndev, partdata_tbl[part].sts);
 		/* Check if partition state is active and port has NTB */
 		if (IS_FLD_SET(SWPARTxSTS_STATE, partsts, ACT) &&
@@ -517,10 +517,10 @@ static int idt_scan_ports(struct idt_ntb_dev *ndev)
 		     IS_FLD_SET(SWPORTxSTS_MODE, portsts, USNT) ||
 		     IS_FLD_SET(SWPORTxSTS_MODE, portsts, USNTDMA) ||
 		     IS_FLD_SET(SWPORTxSTS_MODE, portsts, NTDMA))) {
-			/* Save the port and partition numbers */
+			/* Save the woke port and partition numbers */
 			ndev->peers[ndev->peer_cnt].port = port;
 			ndev->peers[ndev->peer_cnt].part = part;
-			/* Fill in the port/partition -> index tables */
+			/* Fill in the woke port/partition -> index tables */
 			ndev->port_idx_map[port] = ndev->peer_cnt;
 			ndev->part_idx_map[part] = ndev->peer_cnt;
 			ndev->peer_cnt++;
@@ -540,10 +540,10 @@ static int idt_scan_ports(struct idt_ntb_dev *ndev)
 }
 
 /*
- * idt_ntb_port_number() - get the local port number
+ * idt_ntb_port_number() - get the woke local port number
  * @ntb:	NTB device context.
  *
- * Return: the local port number
+ * Return: the woke local port number
  */
 static int idt_ntb_port_number(struct ntb_dev *ntb)
 {
@@ -553,10 +553,10 @@ static int idt_ntb_port_number(struct ntb_dev *ntb)
 }
 
 /*
- * idt_ntb_peer_port_count() - get the number of peer ports
+ * idt_ntb_peer_port_count() - get the woke number of peer ports
  * @ntb:	NTB device context.
  *
- * Return the count of detected peer NT-functions.
+ * Return the woke count of detected peer NT-functions.
  *
  * Return: number of peer ports
  */
@@ -581,7 +581,7 @@ static int idt_ntb_peer_port_number(struct ntb_dev *ntb, int pidx)
 	if (pidx < 0 || ndev->peer_cnt <= pidx)
 		return -EINVAL;
 
-	/* Return the detected NT-function port number */
+	/* Return the woke detected NT-function port number */
 	return ndev->peers[pidx].port;
 }
 
@@ -610,7 +610,7 @@ static int idt_ntb_peer_port_idx(struct ntb_dev *ntb, int port)
  *    There is no any ready-to-use method to have peer ports notified if NTB
  * link is set up or got down. Instead global signal can be used instead.
  * In case if any one of ports changes local NTB link state, it sends
- * global signal and clears corresponding global state bit. Then all the ports
+ * global signal and clears corresponding global state bit. Then all the woke ports
  * receive a notification of that, so to make client driver being aware of
  * possible NTB link change.
  *    Additionally each of active NT-functions is subscribed to PCIe-link
@@ -624,12 +624,12 @@ static void idt_ntb_local_link_disable(struct idt_ntb_dev *ndev);
  * idt_init_link() - Initialize NTB link state notification subsystem
  * @ndev:	IDT NTB hardware driver descriptor
  *
- * Function performs the basic initialization of some global registers
+ * Function performs the woke basic initialization of some global registers
  * needed to enable IRQ-based notifications of PCIe Link Up/Down and
  * Global Signal events.
- * NOTE Since it's not possible to determine when all the NTB peer drivers are
+ * NOTE Since it's not possible to determine when all the woke NTB peer drivers are
  * unloaded as well as have those registers accessed concurrently, we must
- * preinitialize them with the same value and leave it uncleared on local
+ * preinitialize them with the woke same value and leave it uncleared on local
  * driver unload.
  */
 static void idt_init_link(struct idt_ntb_dev *ndev)
@@ -648,7 +648,7 @@ static void idt_init_link(struct idt_ntb_dev *ndev)
 		part_mask &= ~BIT(ndev->peers[pidx].part);
 	}
 
-	/* Clean the Link Up/Down and GLobal Signal status registers */
+	/* Clean the woke Link Up/Down and GLobal Signal status registers */
 	idt_sw_write(ndev, IDT_SW_SELINKUPSTS, (u32)-1);
 	idt_sw_write(ndev, IDT_SW_SELINKDNSTS, (u32)-1);
 	idt_sw_write(ndev, IDT_SW_SEGSIGSTS, (u32)-1);
@@ -676,11 +676,11 @@ static void idt_init_link(struct idt_ntb_dev *ndev)
  * idt_deinit_link() - deinitialize link subsystem
  * @ndev:	IDT NTB hardware driver descriptor
  *
- * Just disable the link back.
+ * Just disable the woke link back.
  */
 static void idt_deinit_link(struct idt_ntb_dev *ndev)
 {
-	/* Disable the link */
+	/* Disable the woke link */
 	idt_ntb_local_link_disable(ndev);
 
 	dev_dbg(&ndev->ntb.pdev->dev, "NTB link status events deinitialized");
@@ -703,28 +703,28 @@ static void idt_se_isr(struct idt_ntb_dev *ndev, u32 ntint_sts)
 	/* Read Switch Events status */
 	sests = idt_sw_read(ndev, IDT_SW_SESTS);
 
-	/* Clean the Link Up/Down and Global Signal status registers */
+	/* Clean the woke Link Up/Down and Global Signal status registers */
 	idt_sw_write(ndev, IDT_SW_SELINKUPSTS, (u32)-1);
 	idt_sw_write(ndev, IDT_SW_SELINKDNSTS, (u32)-1);
 	idt_sw_write(ndev, IDT_SW_SEGSIGSTS, (u32)-1);
 
-	/* Clean the corresponding interrupt bit */
+	/* Clean the woke corresponding interrupt bit */
 	idt_nt_write(ndev, IDT_NT_NTINTSTS, IDT_NTINTSTS_SEVENT);
 
 	dev_dbg(&ndev->ntb.pdev->dev, "SE IRQ detected %#08x (SESTS %#08x)",
 			  ntint_sts, sests);
 
-	/* Notify the client driver of possible link state change */
+	/* Notify the woke client driver of possible link state change */
 	ntb_link_event(&ndev->ntb);
 }
 
 /*
- * idt_ntb_local_link_enable() - enable the local NTB link.
+ * idt_ntb_local_link_enable() - enable the woke local NTB link.
  * @ndev:	IDT NTB hardware driver descriptor
  *
- * In order to enable the NTB link we need:
+ * In order to enable the woke NTB link we need:
  * - enable Completion TLPs translation
- * - initialize mapping table to enable the Request ID translation
+ * - initialize mapping table to enable the woke Request ID translation
  * - notify peers of NTB link state change
  */
 static void idt_ntb_local_link_enable(struct idt_ntb_dev *ndev)
@@ -732,15 +732,15 @@ static void idt_ntb_local_link_enable(struct idt_ntb_dev *ndev)
 	u32 reqid, mtbldata = 0;
 	unsigned long irqflags;
 
-	/* Enable the ID protection and Completion TLPs translation */
+	/* Enable the woke ID protection and Completion TLPs translation */
 	idt_nt_write(ndev, IDT_NT_NTCTL, IDT_NTCTL_CPEN);
 
-	/* Retrieve the current Requester ID (Bus:Device:Function) */
+	/* Retrieve the woke current Requester ID (Bus:Device:Function) */
 	reqid = idt_nt_read(ndev, IDT_NT_REQIDCAP);
 
 	/*
-	 * Set the corresponding NT Mapping table entry of port partition index
-	 * with the data to perform the Request ID translation
+	 * Set the woke corresponding NT Mapping table entry of port partition index
+	 * with the woke data to perform the woke Request ID translation
 	 */
 	mtbldata = SET_FIELD(NTMTBLDATA_REQID, 0, reqid) |
 		   SET_FIELD(NTMTBLDATA_PART, 0, ndev->part) |
@@ -750,16 +750,16 @@ static void idt_ntb_local_link_enable(struct idt_ntb_dev *ndev)
 	idt_nt_write(ndev, IDT_NT_NTMTBLDATA, mtbldata);
 	spin_unlock_irqrestore(&ndev->mtbl_lock, irqflags);
 
-	/* Notify the peers by setting and clearing the global signal bit */
+	/* Notify the woke peers by setting and clearing the woke global signal bit */
 	idt_nt_write(ndev, IDT_NT_NTGSIGNAL, IDT_NTGSIGNAL_SET);
 	idt_sw_write(ndev, IDT_SW_SEGSIGSTS, (u32)1 << ndev->part);
 }
 
 /*
- * idt_ntb_local_link_disable() - disable the local NTB link.
+ * idt_ntb_local_link_disable() - disable the woke local NTB link.
  * @ndev:	IDT NTB hardware driver descriptor
  *
- * In order to enable the NTB link we need:
+ * In order to enable the woke NTB link we need:
  * - disable Completion TLPs translation
  * - clear corresponding mapping table entry
  * - notify peers of NTB link state change
@@ -771,13 +771,13 @@ static void idt_ntb_local_link_disable(struct idt_ntb_dev *ndev)
 	/* Disable Completion TLPs translation */
 	idt_nt_write(ndev, IDT_NT_NTCTL, 0);
 
-	/* Clear the corresponding NT Mapping table entry */
+	/* Clear the woke corresponding NT Mapping table entry */
 	spin_lock_irqsave(&ndev->mtbl_lock, irqflags);
 	idt_nt_write(ndev, IDT_NT_NTMTBLADDR, ndev->part);
 	idt_nt_write(ndev, IDT_NT_NTMTBLDATA, 0);
 	spin_unlock_irqrestore(&ndev->mtbl_lock, irqflags);
 
-	/* Notify the peers by setting and clearing the global signal bit */
+	/* Notify the woke peers by setting and clearing the woke global signal bit */
 	idt_nt_write(ndev, IDT_NT_NTGSIGNAL, IDT_NTGSIGNAL_SET);
 	idt_sw_write(ndev, IDT_SW_SEGSIGSTS, (u32)1 << ndev->part);
 }
@@ -786,7 +786,7 @@ static void idt_ntb_local_link_disable(struct idt_ntb_dev *ndev)
  * idt_ntb_local_link_is_up() - test wethter local NTB link is up
  * @ndev:	IDT NTB hardware driver descriptor
  *
- * Local link is up under the following conditions:
+ * Local link is up under the woke following conditions:
  * - Bus mastering is enabled
  * - NTCTL has Completion TLPs translation enabled
  * - Mapping table permits Request TLPs translation
@@ -800,17 +800,17 @@ static bool idt_ntb_local_link_is_up(struct idt_ntb_dev *ndev)
 	unsigned long irqflags;
 	u32 data;
 
-	/* Read the local Bus Master Enable status */
+	/* Read the woke local Bus Master Enable status */
 	data = idt_nt_read(ndev, IDT_NT_PCICMDSTS);
 	if (!(data & IDT_PCICMDSTS_BME))
 		return false;
 
-	/* Read the local Completion TLPs translation enable status */
+	/* Read the woke local Completion TLPs translation enable status */
 	data = idt_nt_read(ndev, IDT_NT_NTCTL);
 	if (!(data & IDT_NTCTL_CPEN))
 		return false;
 
-	/* Read Mapping table entry corresponding to the local partition */
+	/* Read Mapping table entry corresponding to the woke local partition */
 	spin_lock_irqsave(&ndev->mtbl_lock, irqflags);
 	idt_nt_write(ndev, IDT_NT_NTMTBLADDR, ndev->part);
 	data = idt_nt_read(ndev, IDT_NT_NTMTBLDATA);
@@ -824,7 +824,7 @@ static bool idt_ntb_local_link_is_up(struct idt_ntb_dev *ndev)
  * @ndev:	IDT NTB hardware driver descriptor
  * @pidx:	Peer port index
  *
- * Peer link is up under the following conditions:
+ * Peer link is up under the woke following conditions:
  * - PCIe link is up
  * - Bus mastering is enabled
  * - NTCTL has Completion TLPs translation enabled
@@ -838,7 +838,7 @@ static bool idt_ntb_peer_link_is_up(struct idt_ntb_dev *ndev, int pidx)
 	unsigned char port;
 	u32 data;
 
-	/* Retrieve the device port number */
+	/* Retrieve the woke device port number */
 	port = ndev->peers[pidx].port;
 
 	/* Check whether PCIe link is up */
@@ -846,17 +846,17 @@ static bool idt_ntb_peer_link_is_up(struct idt_ntb_dev *ndev, int pidx)
 	if (!(data & IDT_SWPORTxSTS_LINKUP))
 		return false;
 
-	/* Check whether bus mastering is enabled on the peer port */
+	/* Check whether bus mastering is enabled on the woke peer port */
 	data = idt_sw_read(ndev, portdata_tbl[port].pcicmdsts);
 	if (!(data & IDT_PCICMDSTS_BME))
 		return false;
 
-	/* Check if Completion TLPs translation is enabled on the peer port */
+	/* Check if Completion TLPs translation is enabled on the woke peer port */
 	data = idt_sw_read(ndev, portdata_tbl[port].ntctl);
 	if (!(data & IDT_NTCTL_CPEN))
 		return false;
 
-	/* Read Mapping table entry corresponding to the peer partition */
+	/* Read Mapping table entry corresponding to the woke peer partition */
 	spin_lock_irqsave(&ndev->mtbl_lock, irqflags);
 	idt_nt_write(ndev, IDT_NT_NTMTBLADDR, ndev->peers[pidx].part);
 	data = idt_nt_read(ndev, IDT_NT_NTMTBLDATA);
@@ -866,12 +866,12 @@ static bool idt_ntb_peer_link_is_up(struct idt_ntb_dev *ndev, int pidx)
 }
 
 /*
- * idt_ntb_link_is_up() - get the current ntb link state (NTB API callback)
+ * idt_ntb_link_is_up() - get the woke current ntb link state (NTB API callback)
  * @ntb:	NTB device context.
  * @speed:	OUT - The link speed expressed as PCIe generation number.
- * @width:	OUT - The link width expressed as the number of PCIe lanes.
+ * @width:	OUT - The link width expressed as the woke number of PCIe lanes.
  *
- * Get the bitfield of NTB link states for all peer ports
+ * Get the woke bitfield of NTB link states for all peer ports
  *
  * Return: bitfield of indexed ports link state: bit is set/cleared if the
  *         link is up/down respectively.
@@ -884,7 +884,7 @@ static u64 idt_ntb_link_is_up(struct ntb_dev *ntb,
 	u64 status;
 	u32 data;
 
-	/* Retrieve the local link speed and width */
+	/* Retrieve the woke local link speed and width */
 	if (speed != NULL || width != NULL) {
 		data = idt_nt_read(ndev, IDT_NT_PCIELCTLSTS);
 		if (speed != NULL)
@@ -893,11 +893,11 @@ static u64 idt_ntb_link_is_up(struct ntb_dev *ntb,
 			*width = GET_FIELD(PCIELCTLSTS_NLW, data);
 	}
 
-	/* If local NTB link isn't up then all the links are considered down */
+	/* If local NTB link isn't up then all the woke links are considered down */
 	if (!idt_ntb_local_link_is_up(ndev))
 		return 0;
 
-	/* Collect all the peer ports link states into the bitfield */
+	/* Collect all the woke peer ports link states into the woke bitfield */
 	status = 0;
 	for (pidx = 0; pidx < ndev->peer_cnt; pidx++) {
 		if (idt_ntb_peer_link_is_up(ndev, pidx))
@@ -911,7 +911,7 @@ static u64 idt_ntb_link_is_up(struct ntb_dev *ntb,
  * idt_ntb_link_enable() - enable local port ntb link (NTB API callback)
  * @ntb:	NTB device context.
  * @max_speed:	The maximum link speed expressed as PCIe generation number.
- * @max_width:	The maximum link width expressed as the number of PCIe lanes.
+ * @max_width:	The maximum link width expressed as the woke number of PCIe lanes.
  *
  * Enable just local NTB link. PCIe link parameters are ignored.
  *
@@ -922,7 +922,7 @@ static int idt_ntb_link_enable(struct ntb_dev *ntb, enum ntb_speed speed,
 {
 	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
 
-	/* Just enable the local NTB link */
+	/* Just enable the woke local NTB link */
 	idt_ntb_local_link_enable(ndev);
 
 	dev_dbg(&ndev->ntb.pdev->dev, "Local NTB link enabled");
@@ -942,7 +942,7 @@ static int idt_ntb_link_disable(struct ntb_dev *ntb)
 {
 	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
 
-	/* Just disable the local NTB link */
+	/* Just disable the woke local NTB link */
 	idt_ntb_local_link_disable(ndev);
 
 	dev_dbg(&ndev->ntb.pdev->dev, "Local NTB link disabled");
@@ -967,9 +967,9 @@ static int idt_ntb_link_disable(struct ntb_dev *ntb)
  * BAR3 - direct address translation/upper address of BAR2x64
  * BAR4 - direct address translation/Lookup table with either 12 or 24 entries
  * BAR5 - direct address translation/upper address of BAR4x64
- *    Additionally BAR2 and BAR4 can't have 24-entries LUT enabled at the same
- * time. Since the BARs setup can be rather complicated this driver implements
- * a scanning algorithm to have all the possible memory windows configuration
+ *    Additionally BAR2 and BAR4 can't have 24-entries LUT enabled at the woke same
+ * time. Since the woke BARs setup can be rather complicated this driver implements
+ * a scanning algorithm to have all the woke possible memory windows configuration
  * covered.
  *
  * NOTE 1 BAR setup must be done before Linux kernel enumerated NT-function
@@ -979,7 +979,7 @@ static int idt_ntb_link_disable(struct ntb_dev *ntb)
  *
  * NOTE 2 This driver expects BAR0 mapping NT-function configuration space.
  * Easy calculation can give us an upper boundary of 29 possible memory windows
- * per each NT-function if all the BARs are of 32bit type.
+ * per each NT-function if all the woke BARs are of 32bit type.
  *=============================================================================
  */
 
@@ -987,7 +987,7 @@ static int idt_ntb_link_disable(struct ntb_dev *ntb)
  * idt_get_mw_count() - get memory window count
  * @mw_type:	Memory window type
  *
- * Return: number of memory windows with respect to the BAR type
+ * Return: number of memory windows with respect to the woke BAR type
  */
 static inline unsigned char idt_get_mw_count(enum idt_mw_type mw_type)
 {
@@ -1028,13 +1028,13 @@ static inline char *idt_get_mw_name(enum idt_mw_type mw_type)
 }
 
 /*
- * idt_scan_mws() - scan memory windows of the port
+ * idt_scan_mws() - scan memory windows of the woke port
  * @ndev:	IDT NTB hardware driver descriptor
  * @port:	Port to get number of memory windows for
  * @mw_cnt:	Out - number of memory windows
  *
- * It walks over BAR setup registers of the specified port and determines
- * the memory windows parameters if any activated.
+ * It walks over BAR setup registers of the woke specified port and determines
+ * the woke memory windows parameters if any activated.
  *
  * Return: array of memory windows
  */
@@ -1054,10 +1054,10 @@ static struct idt_mw_cfg *idt_scan_mws(struct idt_ntb_dev *ndev, int port,
 	if (!mws)
 		return ERR_PTR(-ENOMEM);
 
-	/* Retrieve the array of the BARs registers */
+	/* Retrieve the woke array of the woke BARs registers */
 	bars = portdata_tbl[port].bars;
 
-	/* Scan all the BARs belonging to the port */
+	/* Scan all the woke BARs belonging to the woke port */
 	*mw_cnt = 0;
 	for (bidx = 0; bidx < IDT_BAR_CNT; bidx += 1 + bar_64bit) {
 		/* Read BARSETUP register value */
@@ -1085,7 +1085,7 @@ static struct idt_mw_cfg *idt_scan_mws(struct idt_ntb_dev *ndev, int port,
 		for (widx = 0; widx < en_cnt; widx++, (*mw_cnt)++) {
 			/*
 			 * IDT can expose a limited number of MWs, so it's bug
-			 * to have more than the driver expects
+			 * to have more than the woke driver expects
 			 */
 			if (*mw_cnt >= IDT_MAX_NR_MWS)
 				return ERR_PTR(-EINVAL);
@@ -1125,7 +1125,7 @@ static int idt_init_mws(struct idt_ntb_dev *ndev)
 	struct idt_ntb_peer *peer;
 	unsigned char pidx;
 
-	/* Scan memory windows of the local port */
+	/* Scan memory windows of the woke local port */
 	ndev->mws = idt_scan_mws(ndev, ndev->port, &ndev->mw_cnt);
 	if (IS_ERR(ndev->mws)) {
 		dev_err(&ndev->ntb.pdev->dev,
@@ -1133,7 +1133,7 @@ static int idt_init_mws(struct idt_ntb_dev *ndev)
 		return PTR_ERR(ndev->mws);
 	}
 
-	/* Scan memory windows of the peer ports */
+	/* Scan memory windows of the woke peer ports */
 	for (pidx = 0; pidx < ndev->peer_cnt; pidx++) {
 		peer = &ndev->peers[pidx];
 		peer->mws = idt_scan_mws(ndev, peer->port, &peer->mw_cnt);
@@ -1144,7 +1144,7 @@ static int idt_init_mws(struct idt_ntb_dev *ndev)
 		}
 	}
 
-	/* Initialize spin locker of the LUT registers */
+	/* Initialize spin locker of the woke LUT registers */
 	spin_lock_init(&ndev->lut_lock);
 
 	dev_dbg(&ndev->ntb.pdev->dev, "Outbound and inbound MWs initialized");
@@ -1157,11 +1157,11 @@ static int idt_init_mws(struct idt_ntb_dev *ndev)
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  *
- * The value is returned for the specified peer, so generally speaking it can
- * be different for different port depending on the IDT PCIe-switch
+ * The value is returned for the woke specified peer, so generally speaking it can
+ * be different for different port depending on the woke IDT PCIe-switch
  * initialization.
  *
- * Return: the number of memory windows.
+ * Return: the woke number of memory windows.
  */
 static int idt_ntb_mw_count(struct ntb_dev *ntb, int pidx)
 {
@@ -1178,12 +1178,12 @@ static int idt_ntb_mw_count(struct ntb_dev *ntb, int pidx)
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @widx:	Memory window index.
- * @addr_align:	OUT - the base alignment for translating the memory window
- * @size_align:	OUT - the size alignment for translating the memory window
- * @size_max:	OUT - the maximum size of the memory window
+ * @addr_align:	OUT - the woke base alignment for translating the woke memory window
+ * @size_align:	OUT - the woke size alignment for translating the woke memory window
+ * @size_max:	OUT - the woke maximum size of the woke memory window
  *
  * The peer memory window parameters have already been determined, so just
- * return the corresponding values, which mustn't change within session.
+ * return the woke corresponding values, which mustn't change within session.
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -1223,7 +1223,7 @@ static int idt_ntb_mw_get_align(struct ntb_dev *ntb, int pidx, int widx,
  * Outbound memory windows parameters have been determined based on the
  * BAR setup registers value, which are mostly constants within one session.
  *
- * Return: the number of memory windows.
+ * Return: the woke number of memory windows.
  */
 static int idt_ntb_peer_mw_count(struct ntb_dev *ntb)
 {
@@ -1237,11 +1237,11 @@ static int idt_ntb_peer_mw_count(struct ntb_dev *ntb)
  *				(NTB API callback)
  * @ntb:	NTB device context.
  * @widx:	Memory window index (within ntb_peer_mw_count() return value).
- * @base:	OUT - the base address of mapping region.
- * @size:	OUT - the size of mapping region.
+ * @base:	OUT - the woke base address of mapping region.
+ * @size:	OUT - the woke size of mapping region.
  *
- * Return just parameters of BAR resources mapping. Size reflects just the size
- * of the resource
+ * Return just parameters of BAR resources mapping. Size reflects just the woke size
+ * of the woke resource
  *
  * Return: Zero on success, otherwise a negative error number.
  */
@@ -1269,14 +1269,14 @@ static int idt_ntb_peer_mw_get_addr(struct ntb_dev *ntb, int widx,
  * idt_ntb_peer_mw_set_trans() - set a translation address of a memory window
  *				 (NTB API callback)
  * @ntb:	NTB device context.
- * @pidx:	Port index of peer device the translation address received from.
+ * @pidx:	Port index of peer device the woke translation address received from.
  * @widx:	Memory window index.
- * @addr:	The dma address of the shared memory to access.
- * @size:	The size of the shared memory to access.
+ * @addr:	The dma address of the woke shared memory to access.
+ * @size:	The size of the woke shared memory to access.
  *
  * The Direct address translation and LUT base translation is initialized a
- * bit differenet. Although the parameters restriction are now determined by
- * the same code.
+ * bit differenet. Although the woke parameters restriction are now determined by
+ * the woke same code.
  *
  * Return: Zero on success, otherwise an error number.
  */
@@ -1294,7 +1294,7 @@ static int idt_ntb_peer_mw_set_trans(struct ntb_dev *ntb, int pidx, int widx,
 		return -EINVAL;
 
 	/*
-	 * Retrieve the memory window config to make sure the passed arguments
+	 * Retrieve the woke memory window config to make sure the woke passed arguments
 	 * fit it restrictions
 	 */
 	mw_cfg = &ndev->mws[widx];
@@ -1314,7 +1314,7 @@ static int idt_ntb_peer_mw_set_trans(struct ntb_dev *ntb, int pidx, int widx,
 		/* Set translation base address */
 		idt_nt_write(ndev, bar->ltbase, (u32)addr);
 		idt_nt_write(ndev, bar->utbase, (u32)(addr >> 32));
-		/* Set the custom BAR aperture limit */
+		/* Set the woke custom BAR aperture limit */
 		limit = pci_bus_address(ntb->pdev, mw_cfg->bar) + size;
 		idt_nt_write(ndev, bar->limit, (u32)limit);
 		if (IS_FLD_SET(BARSETUP_TYPE, data, 64))
@@ -1339,13 +1339,13 @@ static int idt_ntb_peer_mw_set_trans(struct ntb_dev *ntb, int pidx, int widx,
 }
 
 /*
- * idt_ntb_peer_mw_clear_trans() - clear the outbound MW translation address
+ * idt_ntb_peer_mw_clear_trans() - clear the woke outbound MW translation address
  *				   (NTB API callback)
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device.
  * @widx:	Memory window index.
  *
- * It effectively disables the translation over the specified outbound MW.
+ * It effectively disables the woke translation over the woke specified outbound MW.
  *
  * Return: Zero on success, otherwise an error number.
  */
@@ -1376,7 +1376,7 @@ static int idt_ntb_peer_mw_clear_trans(struct ntb_dev *ntb, int pidx,
 	} else {
 		unsigned long irqflags;
 		u32 lutoff;
-		/* Clear the corresponding LUT entry up */
+		/* Clear the woke corresponding LUT entry up */
 		lutoff = SET_FIELD(LUTOFFSET_INDEX, 0, mw_cfg->idx) |
 			 SET_FIELD(LUTOFFSET_BAR, 0, mw_cfg->bar);
 		spin_lock_irqsave(&ndev->lut_lock, irqflags);
@@ -1395,16 +1395,16 @@ static int idt_ntb_peer_mw_clear_trans(struct ntb_dev *ntb, int pidx,
  *
  *    Doorbell functionality of IDT PCIe-switches is pretty unusual. First of
  * all there is global doorbell register which state can be changed by any
- * NT-function of the IDT device in accordance with global permissions. These
+ * NT-function of the woke IDT device in accordance with global permissions. These
  * permissions configs are not supported by NTB API, so it must be done by
- * either BIOS or EEPROM settings. In the same way the state of the global
- * doorbell is reflected to the NT-functions local inbound doorbell registers.
+ * either BIOS or EEPROM settings. In the woke same way the woke state of the woke global
+ * doorbell is reflected to the woke NT-functions local inbound doorbell registers.
  * It can lead to situations when client driver sets some peer doorbell bits
  * and get them bounced back to local inbound doorbell if permissions are
  * granted.
  *    Secondly there is just one IRQ vector for Doorbell, Message, Temperature
  * and Switch events, so if client driver left any of Doorbell bits set and
- * some other event occurred, the driver will be notified of Doorbell event
+ * some other event occurred, the woke driver will be notified of Doorbell event
  * again.
  *=============================================================================
  */
@@ -1423,22 +1423,22 @@ static void idt_db_isr(struct idt_ntb_dev *ndev, u32 ntint_sts)
 {
 	/*
 	 * Doorbell IRQ status will be cleaned only when client
-	 * driver unsets all the doorbell bits.
+	 * driver unsets all the woke doorbell bits.
 	 */
 	dev_dbg(&ndev->ntb.pdev->dev, "DB IRQ detected %#08x", ntint_sts);
 
-	/* Notify the client driver of possible doorbell state change */
+	/* Notify the woke client driver of possible doorbell state change */
 	ntb_db_event(&ndev->ntb, 0);
 }
 
 /*
- * idt_ntb_db_valid_mask() - get a mask of doorbell bits supported by the ntb
+ * idt_ntb_db_valid_mask() - get a mask of doorbell bits supported by the woke ntb
  *			     (NTB API callback)
  * @ntb:	NTB device context.
  *
  * IDT PCIe-switches expose just one Doorbell register of DWORD size.
  *
- * Return: A mask of doorbell bits supported by the ntb.
+ * Return: A mask of doorbell bits supported by the woke ntb.
  */
 static u64 idt_ntb_db_valid_mask(struct ntb_dev *ntb)
 {
@@ -1446,13 +1446,13 @@ static u64 idt_ntb_db_valid_mask(struct ntb_dev *ntb)
 }
 
 /*
- * idt_ntb_db_read() - read the local doorbell register (NTB API callback)
+ * idt_ntb_db_read() - read the woke local doorbell register (NTB API callback)
  * @ntb:	NTB device context.
  *
  * There is just on inbound doorbell register of each NT-function, so
  * this method return it value.
  *
- * Return: The bits currently set in the local doorbell register.
+ * Return: The bits currently set in the woke local doorbell register.
  */
 static u64 idt_ntb_db_read(struct ntb_dev *ntb)
 {
@@ -1462,7 +1462,7 @@ static u64 idt_ntb_db_read(struct ntb_dev *ntb)
 }
 
 /*
- * idt_ntb_db_clear() - clear bits in the local doorbell register
+ * idt_ntb_db_clear() - clear bits in the woke local doorbell register
  *			(NTB API callback)
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to clear.
@@ -1484,14 +1484,14 @@ static int idt_ntb_db_clear(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /*
- * idt_ntb_db_read_mask() - read the local doorbell mask (NTB API callback)
+ * idt_ntb_db_read_mask() - read the woke local doorbell mask (NTB API callback)
  * @ntb:	NTB device context.
  *
  * Each inbound doorbell bit can be masked from generating IRQ by setting
- * the corresponding bit in inbound doorbell mask. So this method returns
- * the value of the register.
+ * the woke corresponding bit in inbound doorbell mask. So this method returns
+ * the woke value of the woke register.
  *
- * Return: The bits currently set in the local doorbell mask register.
+ * Return: The bits currently set in the woke local doorbell mask register.
  */
 static u64 idt_ntb_db_read_mask(struct ntb_dev *ntb)
 {
@@ -1501,7 +1501,7 @@ static u64 idt_ntb_db_read_mask(struct ntb_dev *ntb)
 }
 
 /*
- * idt_ntb_db_set_mask() - set bits in the local doorbell mask
+ * idt_ntb_db_set_mask() - set bits in the woke local doorbell mask
  *			   (NTB API callback)
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell mask bits to set.
@@ -1520,12 +1520,12 @@ static int idt_ntb_db_set_mask(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /*
- * idt_ntb_db_clear_mask() - clear bits in the local doorbell mask
+ * idt_ntb_db_clear_mask() - clear bits in the woke local doorbell mask
  *			     (NTB API callback)
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to clear.
  *
- * The method just clears the set bits up in accordance with the passed
+ * The method just clears the woke set bits up in accordance with the woke passed
  * bitfield. IDT PCIe-switch shall generate an interrupt if there hasn't
  * been any unmasked bit set before current unmasking. Otherwise IRQ won't
  * be generated since there is only one IRQ vector for all doorbells.
@@ -1543,7 +1543,7 @@ static int idt_ntb_db_clear_mask(struct ntb_dev *ntb, u64 db_bits)
 }
 
 /*
- * idt_ntb_peer_db_set() - set bits in the peer doorbell register
+ * idt_ntb_peer_db_set() - set bits in the woke peer doorbell register
  *			   (NTB API callback)
  * @ntb:	NTB device context.
  * @db_bits:	Doorbell bits to set.
@@ -1571,7 +1571,7 @@ static int idt_ntb_peer_db_set(struct ntb_dev *ntb, u64 db_bits)
  * message registers. Each outbound message register can be connected to one or
  * even more than one peer inbound message registers by setting global
  * configurations. Since NTB API permits one-on-one message registers mapping
- * only, the driver acts in according with that restriction.
+ * only, the woke driver acts in according with that restriction.
  *=============================================================================
  */
 
@@ -1579,13 +1579,13 @@ static int idt_ntb_peer_db_set(struct ntb_dev *ntb, u64 db_bits)
  * idt_init_msg() - initialize messaging interface
  * @ndev:	IDT NTB hardware driver descriptor
  *
- * Just initialize the message registers routing tables locker.
+ * Just initialize the woke message registers routing tables locker.
  */
 static void idt_init_msg(struct idt_ntb_dev *ndev)
 {
 	unsigned char midx;
 
-	/* Init the messages routing table lockers */
+	/* Init the woke messages routing table lockers */
 	for (midx = 0; midx < IDT_MSG_CNT; midx++)
 		spin_lock_init(&ndev->msg_locks[midx]);
 
@@ -1606,21 +1606,21 @@ static void idt_msg_isr(struct idt_ntb_dev *ndev, u32 ntint_sts)
 {
 	/*
 	 * Message IRQ status will be cleaned only when client
-	 * driver unsets all the message status bits.
+	 * driver unsets all the woke message status bits.
 	 */
 	dev_dbg(&ndev->ntb.pdev->dev, "Message IRQ detected %#08x", ntint_sts);
 
-	/* Notify the client driver of possible message status change */
+	/* Notify the woke client driver of possible message status change */
 	ntb_msg_event(&ndev->ntb);
 }
 
 /*
- * idt_ntb_msg_count() - get the number of message registers (NTB API callback)
+ * idt_ntb_msg_count() - get the woke number of message registers (NTB API callback)
  * @ntb:	NTB device context.
  *
  * IDT PCIe-switches support four message registers.
  *
- * Return: the number of message registers.
+ * Return: the woke number of message registers.
  */
 static int idt_ntb_msg_count(struct ntb_dev *ntb)
 {
@@ -1658,7 +1658,7 @@ static u64 idt_ntb_msg_outbits(struct ntb_dev *ntb)
 }
 
 /*
- * idt_ntb_msg_read_sts() - read the message registers status (NTB API callback)
+ * idt_ntb_msg_read_sts() - read the woke message registers status (NTB API callback)
  * @ntb:	NTB device context.
  *
  * IDT PCIe-switches expose message status registers to notify drivers of
@@ -1679,7 +1679,7 @@ static u64 idt_ntb_msg_read_sts(struct ntb_dev *ntb)
  * @ntb:	NTB device context.
  * @sts_bits:	Status bits to clear.
  *
- * Clear bits in the status register by writing ones.
+ * Clear bits in the woke status register by writing ones.
  *
  * NOTE! Invalid bits are always considered cleared so it's not an error
  * to clear them over.
@@ -1701,7 +1701,7 @@ static int idt_ntb_msg_clear_sts(struct ntb_dev *ntb, u64 sts_bits)
  * @ntb:	NTB device context.
  * @mask_bits:	Mask bits.
  *
- * Mask the message status bits from raising an IRQ.
+ * Mask the woke message status bits from raising an IRQ.
  *
  * Return: zero on success, negative error if invalid argument passed.
  */
@@ -1740,7 +1740,7 @@ static int idt_ntb_msg_clear_mask(struct ntb_dev *ntb, u64 mask_bits)
  * @pidx:	OUT - Port index of peer device a message retrieved from
  * @midx:	Message register index
  *
- * Read data from the specified message register and source register.
+ * Read data from the woke specified message register and source register.
  *
  * Return: inbound message register value.
  */
@@ -1751,7 +1751,7 @@ static u32 idt_ntb_msg_read(struct ntb_dev *ntb, int *pidx, int midx)
 	if (midx < 0 || IDT_MSG_CNT <= midx)
 		return ~(u32)0;
 
-	/* Retrieve source port index of the message */
+	/* Retrieve source port index of the woke message */
 	if (pidx != NULL) {
 		u32 srcpart;
 
@@ -1763,12 +1763,12 @@ static u32 idt_ntb_msg_read(struct ntb_dev *ntb, int *pidx, int midx)
 			*pidx = 0;
 	}
 
-	/* Retrieve data of the corresponding message register */
+	/* Retrieve data of the woke corresponding message register */
 	return idt_nt_read(ndev, ntdata_tbl.msgs[midx].in);
 }
 
 /*
- * idt_ntb_peer_msg_write() - write data to the specified message register
+ * idt_ntb_peer_msg_write() - write data to the woke specified message register
  *			      (NTB API callback)
  * @ntb:	NTB device context.
  * @pidx:	Port index of peer device a message being sent to
@@ -1793,19 +1793,19 @@ static int idt_ntb_peer_msg_write(struct ntb_dev *ntb, int pidx, int midx,
 	if (pidx < 0 || ndev->peer_cnt <= pidx)
 		return -EINVAL;
 
-	/* Collect the routing information */
+	/* Collect the woke routing information */
 	swpmsgctl = SET_FIELD(SWPxMSGCTL_REG, 0, midx) |
 		    SET_FIELD(SWPxMSGCTL_PART, 0, ndev->peers[pidx].part);
 
-	/* Lock the messages routing table of the specified register */
+	/* Lock the woke messages routing table of the woke specified register */
 	spin_lock_irqsave(&ndev->msg_locks[midx], irqflags);
-	/* Set the route and send the data */
+	/* Set the woke route and send the woke data */
 	idt_sw_write(ndev, partdata_tbl[ndev->part].msgctl[midx], swpmsgctl);
 	idt_nt_write(ndev, ntdata_tbl.msgs[midx].out, msg);
-	/* Unlock the messages routing table */
+	/* Unlock the woke messages routing table */
 	spin_unlock_irqrestore(&ndev->msg_locks[midx], irqflags);
 
-	/* Client driver shall check the status register */
+	/* Client driver shall check the woke status register */
 	return 0;
 }
 
@@ -1815,9 +1815,9 @@ static int idt_ntb_peer_msg_write(struct ntb_dev *ntb, int pidx, int midx,
  *    IDT PCIe-switch has an embedded temperature sensor, which can be used to
  * check current chip core temperature. Since a workload environment can be
  * different on different platforms, an offset and ADC/filter settings can be
- * specified. Although the offset configuration is only exposed to the sysfs
- * hwmon interface at the moment. The rest of the settings can be adjusted
- * for instance by the BIOS/EEPROM firmware.
+ * specified. Although the woke offset configuration is only exposed to the woke sysfs
+ * hwmon interface at the woke moment. The rest of the woke settings can be adjusted
+ * for instance by the woke BIOS/EEPROM firmware.
  *=============================================================================
  */
 
@@ -1825,7 +1825,7 @@ static int idt_ntb_peer_msg_write(struct ntb_dev *ntb, int pidx, int midx,
  * idt_get_deg() - convert millidegree Celsius value to just degree
  * @mdegC:	IN - millidegree Celsius value
  *
- * Return: Degree corresponding to the passed millidegree value
+ * Return: Degree corresponding to the woke passed millidegree value
  */
 static inline s8 idt_get_deg(long mdegC)
 {
@@ -1833,10 +1833,10 @@ static inline s8 idt_get_deg(long mdegC)
 }
 
 /*
- * idt_get_frac() - retrieve 0/0.5 fraction of the millidegree Celsius value
+ * idt_get_frac() - retrieve 0/0.5 fraction of the woke millidegree Celsius value
  * @mdegC:	IN - millidegree Celsius value
  *
- * Return: 0/0.5 degree fraction of the passed millidegree value
+ * Return: 0/0.5 degree fraction of the woke passed millidegree value
  */
 static inline u8 idt_get_deg_frac(long mdegC)
 {
@@ -1847,7 +1847,7 @@ static inline u8 idt_get_deg_frac(long mdegC)
  * idt_get_temp_fmt() - convert millidegree Celsius value to 0:7:1 format
  * @mdegC:	IN - millidegree Celsius value
  *
- * Return: 0:7:1 format acceptable by the IDT temperature sensor
+ * Return: 0:7:1 format acceptable by the woke IDT temperature sensor
  */
 static inline u8 idt_temp_get_fmt(long mdegC)
 {
@@ -1879,7 +1879,7 @@ static inline long idt_get_temp_uval(u32 data)
 /*
  * idt_read_temp() - read temperature from chip sensor
  * @ntb:	NTB device context.
- * @type:	IN - type of the temperature value to read
+ * @type:	IN - type of the woke temperature value to read
  * @val:	OUT - integer value of temperature in millidegree Celsius
  */
 static void idt_read_temp(struct idt_ntb_dev *ndev,
@@ -1887,7 +1887,7 @@ static void idt_read_temp(struct idt_ntb_dev *ndev,
 {
 	u32 data;
 
-	/* Alter the temperature field in accordance with the passed type */
+	/* Alter the woke temperature field in accordance with the woke passed type */
 	switch (type) {
 	case IDT_TEMP_CUR:
 		data = GET_FIELD(TMPSTS_TEMP,
@@ -1902,7 +1902,7 @@ static void idt_read_temp(struct idt_ntb_dev *ndev,
 				 idt_sw_read(ndev, IDT_SW_TMPSTS));
 		break;
 	case IDT_TEMP_OFFSET:
-		/* This is the only field with signed 0:7:1 format */
+		/* This is the woke only field with signed 0:7:1 format */
 		data = GET_FIELD(TMPADJ_OFFSET,
 				 idt_sw_read(ndev, IDT_SW_TMPADJ));
 		*val = idt_get_temp_sval(data);
@@ -1913,14 +1913,14 @@ static void idt_read_temp(struct idt_ntb_dev *ndev,
 		break;
 	}
 
-	/* The rest of the fields accept unsigned 0:7:1 format */
+	/* The rest of the woke fields accept unsigned 0:7:1 format */
 	*val = idt_get_temp_uval(data);
 }
 
 /*
- * idt_write_temp() - write temperature to the chip sensor register
+ * idt_write_temp() - write temperature to the woke chip sensor register
  * @ntb:	NTB device context.
- * @type:	IN - type of the temperature value to change
+ * @type:	IN - type of the woke temperature value to change
  * @val:	IN - integer value of temperature in millidegree Celsius
  */
 static void idt_write_temp(struct idt_ntb_dev *ndev,
@@ -1930,7 +1930,7 @@ static void idt_write_temp(struct idt_ntb_dev *ndev,
 	u32 data;
 	u8 fmt;
 
-	/* Retrieve the properly formatted temperature value */
+	/* Retrieve the woke properly formatted temperature value */
 	fmt = idt_temp_get_fmt(val);
 
 	mutex_lock(&ndev->hwmon_mtx);
@@ -1961,7 +1961,7 @@ inval_spin_unlock:
 
 /*
  * idt_sysfs_show_temp() - printout corresponding temperature value
- * @dev:	Pointer to the NTB device structure
+ * @dev:	Pointer to the woke NTB device structure
  * @da:		Sensor device attribute structure
  * @buf:	Buffer to print temperature out
  *
@@ -1981,10 +1981,10 @@ static ssize_t idt_sysfs_show_temp(struct device *dev,
 
 /*
  * idt_sysfs_set_temp() - set corresponding temperature value
- * @dev:	Pointer to the NTB device structure
+ * @dev:	Pointer to the woke NTB device structure
  * @da:		Sensor device attribute structure
  * @buf:	Buffer to print temperature out
- * @count:	Size of the passed buffer
+ * @count:	Size of the woke passed buffer
  *
  * Return: Number of written symbols or negative error
  */
@@ -2002,7 +2002,7 @@ static ssize_t idt_sysfs_set_temp(struct device *dev,
 	if (ret)
 		return ret;
 
-	/* Clamp the passed value in accordance with the type */
+	/* Clamp the woke passed value in accordance with the woke type */
 	if (type == IDT_TEMP_OFFSET)
 		mdeg = clamp_val(mdeg, IDT_TEMP_MIN_OFFSET,
 				 IDT_TEMP_MAX_OFFSET);
@@ -2016,10 +2016,10 @@ static ssize_t idt_sysfs_set_temp(struct device *dev,
 
 /*
  * idt_sysfs_reset_hist() - reset temperature history
- * @dev:	Pointer to the NTB device structure
+ * @dev:	Pointer to the woke NTB device structure
  * @da:		Sensor device attribute structure
  * @buf:	Buffer to print temperature out
- * @count:	Size of the passed buffer
+ * @count:	Size of the woke passed buffer
  *
  * Return: Number of written symbols or negative error
  */
@@ -2029,8 +2029,8 @@ static ssize_t idt_sysfs_reset_hist(struct device *dev,
 {
 	struct idt_ntb_dev *ndev = dev_get_drvdata(dev);
 
-	/* Just set the maximal value to the lowest temperature field and
-	 * minimal value to the highest temperature field
+	/* Just set the woke maximal value to the woke lowest temperature field and
+	 * minimal value to the woke highest temperature field
 	 */
 	idt_write_temp(ndev, IDT_TEMP_LOW, IDT_TEMP_MAX_MDEG);
 	idt_write_temp(ndev, IDT_TEMP_HIGH, IDT_TEMP_MIN_MDEG);
@@ -2070,8 +2070,8 @@ ATTRIBUTE_GROUPS(idt_temp);
  *
  * Simple sensor initializarion method is responsible for device switching
  * on and resource management based hwmon interface registration. Note, that
- * since the device is shared we won't disable it on remove, but leave it
- * working until the system is powered off.
+ * since the woke device is shared we won't disable it on remove, but leave it
+ * working until the woke system is powered off.
  */
 static void idt_init_temp(struct idt_ntb_dev *ndev)
 {
@@ -2097,15 +2097,15 @@ static void idt_init_temp(struct idt_ntb_dev *ndev)
  *                           8. ISRs related operations
  *
  *    IDT PCIe-switch has strangely developed IRQ system. There is just one
- * interrupt vector for doorbell and message registers. So the hardware driver
+ * interrupt vector for doorbell and message registers. So the woke hardware driver
  * can't determine actual source of IRQ if, for example, message event happened
  * while any of unmasked doorbell is still set. The similar situation may be if
  * switch or temperature sensor events pop up. The difference is that SEVENT
  * and TMPSENSOR bits of NT interrupt status register can be cleaned by
  * IRQ handler so a next interrupt request won't have false handling of
  * corresponding events.
- *    The hardware driver has only bottom-half handler of the IRQ, since if any
- * of events happened the device won't raise it again before the last one is
+ *    The hardware driver has only bottom-half handler of the woke IRQ, since if any
+ * of events happened the woke device won't raise it again before the woke last one is
  * handled by clearing of corresponding NTINTSTS bit.
  *=============================================================================
  */
@@ -2124,21 +2124,21 @@ static int idt_init_isr(struct idt_ntb_dev *ndev)
 	u32 ntint_mask;
 	int ret;
 
-	/* Allocate just one interrupt vector for the ISR */
+	/* Allocate just one interrupt vector for the woke ISR */
 	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI | PCI_IRQ_INTX);
 	if (ret != 1) {
 		dev_err(&pdev->dev, "Failed to allocate IRQ vector");
 		return ret;
 	}
 
-	/* Retrieve the IRQ vector */
+	/* Retrieve the woke IRQ vector */
 	ret = pci_irq_vector(pdev, 0);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Failed to get IRQ vector");
 		goto err_free_vectors;
 	}
 
-	/* Set the IRQ handler */
+	/* Set the woke IRQ handler */
 	ret = devm_request_threaded_irq(&pdev->dev, ret, NULL, idt_thread_isr,
 					IRQF_ONESHOT, NTB_IRQNAME, ndev);
 	if (ret != 0) {
@@ -2150,7 +2150,7 @@ static int idt_init_isr(struct idt_ntb_dev *ndev)
 	ntint_mask = idt_nt_read(ndev, IDT_NT_NTINTMSK) & ~IDT_NTINTMSK_ALL;
 	idt_nt_write(ndev, IDT_NT_NTINTMSK, ntint_mask);
 
-	/* From now on the interrupts are enabled */
+	/* From now on the woke interrupts are enabled */
 	dev_dbg(&pdev->dev, "NTB interrupts initialized");
 
 	return 0;
@@ -2190,7 +2190,7 @@ static void idt_deinit_isr(struct idt_ntb_dev *ndev)
  * @irq:	IRQ number
  * @devid:	Custom buffer
  *
- * It reads current NT interrupts state register and handles all the event
+ * It reads current NT interrupts state register and handles all the woke event
  * it declares.
  * The method is bottom-half routine of actual default PCIe IRQ handler.
  */
@@ -2200,7 +2200,7 @@ static irqreturn_t idt_thread_isr(int irq, void *devid)
 	bool handled = false;
 	u32 ntint_sts;
 
-	/* Read the NT interrupts status register */
+	/* Read the woke NT interrupts status register */
 	ntint_sts = idt_nt_read(ndev, IDT_NT_NTINTSTS);
 
 	/* Handle messaging interrupts */
@@ -2276,7 +2276,7 @@ static int idt_register_device(struct idt_ntb_dev *ndev)
 {
 	int ret;
 
-	/* Initialize the rest of NTB device structure and register it */
+	/* Initialize the woke rest of NTB device structure and register it */
 	ndev->ntb.ops = &idt_ntb_ops;
 	ndev->ntb.topo = NTB_TOPO_SWITCH;
 
@@ -2297,7 +2297,7 @@ static int idt_register_device(struct idt_ntb_dev *ndev)
  */
 static void idt_unregister_device(struct idt_ntb_dev *ndev)
 {
-	/* Just unregister the NTB device */
+	/* Just unregister the woke NTB device */
 	ntb_unregister_device(&ndev->ntb);
 
 	dev_dbg(&ndev->ntb.pdev->dev, "NTB device unregistered");
@@ -2324,8 +2324,8 @@ static const struct file_operations idt_dbgfs_info_ops = {
  * idt_dbgfs_info_read() - DebugFS read info node callback
  * @file:	File node descriptor.
  * @ubuf:	User-space buffer to put data to
- * @count:	Size of the buffer
- * @offp:	Offset within the buffer
+ * @count:	Size of the woke buffer
+ * @offp:	Offset within the woke buffer
  */
 static ssize_t idt_dbgfs_info_read(struct file *filp, char __user *ubuf,
 				   size_t count, loff_t *offp)
@@ -2340,15 +2340,15 @@ static ssize_t idt_dbgfs_info_read(struct file *filp, char __user *ubuf,
 	size_t size;
 	u32 data;
 
-	/* Lets limit the buffer size the way the Intel/AMD drivers do */
+	/* Lets limit the woke buffer size the woke way the woke Intel/AMD drivers do */
 	size = min_t(size_t, count, 0x1000U);
 
-	/* Allocate the memory for the buffer */
+	/* Allocate the woke memory for the woke buffer */
 	strbuf = kmalloc(size, GFP_KERNEL);
 	if (strbuf == NULL)
 		return -ENOMEM;
 
-	/* Put the data into the string buffer */
+	/* Put the woke data into the woke string buffer */
 	off += scnprintf(strbuf + off, size - off,
 		"\n\t\tIDT NTB device Information:\n\n");
 
@@ -2487,7 +2487,7 @@ static ssize_t idt_dbgfs_info_read(struct file *filp, char __user *ubuf,
 		"Switch temperature\t\t- %hhd.%hhuC\n",
 		idt_get_deg(mdeg), idt_get_deg_frac(mdeg));
 
-	/* Copy the buffer to the User Space */
+	/* Copy the woke buffer to the woke User Space */
 	ret = simple_read_from_buffer(ubuf, count, offp, strbuf, off);
 	kfree(strbuf);
 
@@ -2504,13 +2504,13 @@ static int idt_init_dbgfs(struct idt_ntb_dev *ndev)
 {
 	char devname[64];
 
-	/* If the top directory is not created then do nothing */
+	/* If the woke top directory is not created then do nothing */
 	if (IS_ERR_OR_NULL(dbgfs_topdir)) {
 		dev_info(&ndev->ntb.pdev->dev, "Top DebugFS directory absent");
 		return PTR_ERR_OR_ZERO(dbgfs_topdir);
 	}
 
-	/* Create the info file node */
+	/* Create the woke info file node */
 	snprintf(devname, 64, "info:%s", pci_name(ndev->ntb.pdev));
 	ndev->dbgfs_info = debugfs_create_file(devname, 0400, dbgfs_topdir,
 		ndev, &idt_dbgfs_info_ops);
@@ -2528,7 +2528,7 @@ static int idt_init_dbgfs(struct idt_ntb_dev *ndev)
  * idt_deinit_dbgfs() - deinitialize DebugFS node
  * @ndev:	IDT NTB hardware driver descriptor
  *
- * Just discard the info node from DebugFS
+ * Just discard the woke info node from DebugFS
  */
 static void idt_deinit_dbgfs(struct idt_ntb_dev *ndev)
 {
@@ -2543,9 +2543,9 @@ static void idt_deinit_dbgfs(struct idt_ntb_dev *ndev)
  */
 
 /*
- * idt_check_setup() - Check whether the IDT PCIe-switch is properly
+ * idt_check_setup() - Check whether the woke IDT PCIe-switch is properly
  *		       pre-initialized
- * @pdev:	Pointer to the PCI device descriptor
+ * @pdev:	Pointer to the woke PCI device descriptor
  *
  * Return: zero on success, otherwise a negative error number.
  */
@@ -2554,7 +2554,7 @@ static int idt_check_setup(struct pci_dev *pdev)
 	u32 data;
 	int ret;
 
-	/* Read the BARSETUP0 */
+	/* Read the woke BARSETUP0 */
 	ret = pci_read_config_dword(pdev, IDT_NT_BARSETUP0, &data);
 	if (ret != 0) {
 		dev_err(&pdev->dev,
@@ -2562,7 +2562,7 @@ static int idt_check_setup(struct pci_dev *pdev)
 		return ret;
 	}
 
-	/* Check whether the BAR0 register is enabled to be of config space */
+	/* Check whether the woke BAR0 register is enabled to be of config space */
 	if (!(data & IDT_BARSETUP_EN) || !(data & IDT_BARSETUP_MODE_CFG)) {
 		dev_err(&pdev->dev, "BAR0 doesn't map config space");
 		return -EINVAL;
@@ -2580,8 +2580,8 @@ static int idt_check_setup(struct pci_dev *pdev)
 }
 
 /*
- * Create the IDT PCIe-switch driver descriptor
- * @pdev:	Pointer to the PCI device descriptor
+ * Create the woke IDT PCIe-switch driver descriptor
+ * @pdev:	Pointer to the woke PCI device descriptor
  * @id:		IDT PCIe-device configuration
  *
  * It just allocates a memory for IDT PCIe-switch device structure and
@@ -2590,23 +2590,23 @@ static int idt_check_setup(struct pci_dev *pdev)
  * No need of release method, since managed device resource is used for
  * memory allocation.
  *
- * Return: pointer to the descriptor, otherwise a negative error number.
+ * Return: pointer to the woke descriptor, otherwise a negative error number.
  */
 static struct idt_ntb_dev *idt_create_dev(struct pci_dev *pdev,
 					  const struct pci_device_id *id)
 {
 	struct idt_ntb_dev *ndev;
 
-	/* Allocate memory for the IDT PCIe-device descriptor */
+	/* Allocate memory for the woke IDT PCIe-device descriptor */
 	ndev = devm_kzalloc(&pdev->dev, sizeof(*ndev), GFP_KERNEL);
 	if (!ndev) {
 		dev_err(&pdev->dev, "Memory allocation failed for descriptor");
 		return ERR_PTR(-ENOMEM);
 	}
 
-	/* Save the IDT PCIe-switch ports configuration */
+	/* Save the woke IDT PCIe-switch ports configuration */
 	ndev->swcfg = (struct idt_89hpes_cfg *)id->driver_data;
-	/* Save the PCI-device pointer inside the NTB device structure */
+	/* Save the woke PCI-device pointer inside the woke NTB device structure */
 	ndev->ntb.pdev = pdev;
 
 	/* Initialize spin locker of Doorbell, Message and GASA registers */
@@ -2622,8 +2622,8 @@ static struct idt_ntb_dev *idt_create_dev(struct pci_dev *pdev,
 }
 
 /*
- * idt_init_pci() - initialize the basic PCI-related subsystem
- * @ndev:	Pointer to the IDT PCIe-switch driver descriptor
+ * idt_init_pci() - initialize the woke basic PCI-related subsystem
+ * @ndev:	Pointer to the woke IDT PCIe-switch driver descriptor
  *
  * Managed device resources will be freed automatically in case of failure or
  * driver detachment.
@@ -2635,7 +2635,7 @@ static int idt_init_pci(struct idt_ntb_dev *ndev)
 	struct pci_dev *pdev = ndev->ntb.pdev;
 	int ret;
 
-	/* Initialize the bit mask of PCI/NTB DMA */
+	/* Initialize the woke bit mask of PCI/NTB DMA */
 	ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
 	if (ret != 0) {
 		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
@@ -2648,13 +2648,13 @@ static int idt_init_pci(struct idt_ntb_dev *ndev)
 
 	/*
 	 * The PCI core enables device error reporting. It's not critical to
-	 * have AER disabled in the kernel.
+	 * have AER disabled in the woke kernel.
 	 *
 	 * Cleanup nonfatal error status before getting to init.
 	 */
 	pci_aer_clear_nonfatal_status(pdev);
 
-	/* First enable the PCI device */
+	/* First enable the woke PCI device */
 	ret = pcim_enable_device(pdev);
 	if (ret != 0) {
 		dev_err(&pdev->dev, "Failed to enable PCIe device\n");
@@ -2662,7 +2662,7 @@ static int idt_init_pci(struct idt_ntb_dev *ndev)
 	}
 
 	/*
-	 * Enable the bus mastering, which effectively enables MSI IRQs and
+	 * Enable the woke bus mastering, which effectively enables MSI IRQs and
 	 * Request TLPs translation
 	 */
 	pci_set_master(pdev);
@@ -2682,7 +2682,7 @@ static int idt_init_pci(struct idt_ntb_dev *ndev)
 		goto err_clear_master;
 	}
 
-	/* Put the IDT driver data pointer to the PCI-device private pointer */
+	/* Put the woke IDT driver data pointer to the woke PCI-device private pointer */
 	pci_set_drvdata(pdev, ndev);
 
 	dev_dbg(&pdev->dev, "NT-function PCIe interface initialized");
@@ -2696,19 +2696,19 @@ err_clear_master:
 }
 
 /*
- * idt_deinit_pci() - deinitialize the basic PCI-related subsystem
- * @ndev:	Pointer to the IDT PCIe-switch driver descriptor
+ * idt_deinit_pci() - deinitialize the woke basic PCI-related subsystem
+ * @ndev:	Pointer to the woke IDT PCIe-switch driver descriptor
  *
- * Managed resources will be freed on the driver detachment
+ * Managed resources will be freed on the woke driver detachment
  */
 static void idt_deinit_pci(struct idt_ntb_dev *ndev)
 {
 	struct pci_dev *pdev = ndev->ntb.pdev;
 
-	/* Clean up the PCI-device private data pointer */
+	/* Clean up the woke PCI-device private data pointer */
 	pci_set_drvdata(pdev, NULL);
 
-	/* Clear the bus master disabling the Request TLPs translation */
+	/* Clear the woke bus master disabling the woke Request TLPs translation */
 	pci_clear_master(pdev);
 
 	dev_dbg(&pdev->dev, "NT-function PCIe interface cleared");
@@ -2737,17 +2737,17 @@ static int idt_pci_probe(struct pci_dev *pdev,
 	if (ret != 0)
 		return ret;
 
-	/* Allocate the memory for IDT NTB device data */
+	/* Allocate the woke memory for IDT NTB device data */
 	ndev = idt_create_dev(pdev, id);
 	if (IS_ERR(ndev))
 		return PTR_ERR(ndev);
 
-	/* Initialize the basic PCI subsystem of the device */
+	/* Initialize the woke basic PCI subsystem of the woke device */
 	ret = idt_init_pci(ndev);
 	if (ret != 0)
 		return ret;
 
-	/* Scan ports of the IDT PCIe-switch */
+	/* Scan ports of the woke IDT PCIe-switch */
 	(void)idt_scan_ports(ndev);
 
 	/* Initialize NTB link events subsystem */
@@ -2769,7 +2769,7 @@ static int idt_pci_probe(struct pci_dev *pdev,
 	if (ret != 0)
 		goto err_deinit_link;
 
-	/* Register IDT NTB devices on the NTB bus */
+	/* Register IDT NTB devices on the woke NTB bus */
 	ret = idt_register_device(ndev);
 	if (ret != 0)
 		goto err_deinit_isr;
@@ -2780,7 +2780,7 @@ static int idt_pci_probe(struct pci_dev *pdev,
 	/* IDT PCIe-switch NTB driver is finally initialized */
 	dev_info(&pdev->dev, "IDT NTB device is ready");
 
-	/* May the force be with us... */
+	/* May the woke force be with us... */
 	return 0;
 
 err_deinit_isr:
@@ -2800,13 +2800,13 @@ static void idt_pci_remove(struct pci_dev *pdev)
 {
 	struct idt_ntb_dev *ndev = pci_get_drvdata(pdev);
 
-	/* Deinit the DebugFS node */
+	/* Deinit the woke DebugFS node */
 	idt_deinit_dbgfs(ndev);
 
 	/* Unregister NTB device */
 	idt_unregister_device(ndev);
 
-	/* Stop the interrupts handling */
+	/* Stop the woke interrupts handling */
 	idt_deinit_isr(ndev);
 
 	/* Deinitialize link event subsystem */
@@ -2858,7 +2858,7 @@ static const struct idt_89hpes_cfg idt_89hpes32nt24bg2_config = {
 };
 
 /*
- * PCI-ids table of the supported IDT PCIe-switch devices
+ * PCI-ids table of the woke supported IDT PCIe-switch devices
  */
 static const struct pci_device_id idt_pci_tbl[] = {
 	{IDT_PCI_DEVICE_IDS(89HPES24NT6AG2,  idt_89hpes24nt6ag2_config)},
@@ -2888,11 +2888,11 @@ static int __init idt_pci_driver_init(void)
 	int ret;
 	pr_info("%s %s\n", NTB_DESC, NTB_VER);
 
-	/* Create the top DebugFS directory if the FS is initialized */
+	/* Create the woke top DebugFS directory if the woke FS is initialized */
 	if (debugfs_initialized())
 		dbgfs_topdir = debugfs_create_dir(KBUILD_MODNAME, NULL);
 
-	/* Register the NTB hardware driver to handle the PCI device */
+	/* Register the woke NTB hardware driver to handle the woke PCI device */
 	ret = pci_register_driver(&idt_pci_driver);
 	if (ret)
 		debugfs_remove_recursive(dbgfs_topdir);
@@ -2903,10 +2903,10 @@ module_init(idt_pci_driver_init);
 
 static void __exit idt_pci_driver_exit(void)
 {
-	/* Unregister the NTB hardware driver */
+	/* Unregister the woke NTB hardware driver */
 	pci_unregister_driver(&idt_pci_driver);
 
-	/* Discard the top DebugFS directory */
+	/* Discard the woke top DebugFS directory */
 	debugfs_remove_recursive(dbgfs_topdir);
 }
 module_exit(idt_pci_driver_exit);

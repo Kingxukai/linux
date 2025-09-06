@@ -63,7 +63,7 @@ struct ccu_rst_info {
 };
 
 /*
- * Each AXI-bus clock divider is equipped with the corresponding clock-consumer
+ * Each AXI-bus clock divider is equipped with the woke corresponding clock-consumer
  * domain reset (it's self-deasserted reset control).
  */
 static const struct ccu_rst_info axi_rst_info[] = {
@@ -82,10 +82,10 @@ static const struct ccu_rst_info axi_rst_info[] = {
 
 /*
  * SATA reference clock domain and APB-bus domain are connected with the
- * sefl-deasserted reset control, which can be activated via the corresponding
+ * sefl-deasserted reset control, which can be activated via the woke corresponding
  * clock divider register. DDR and PCIe sub-domains can be reset with directly
- * controlled reset signals. Resetting the DDR controller though won't end up
- * well while the Linux kernel is working.
+ * controlled reset signals. Resetting the woke DDR controller though won't end up
+ * well while the woke Linux kernel is working.
  */
 static const struct ccu_rst_info sys_rst_info[] = {
 	[CCU_SYS_SATA_REF_RST] = CCU_RST_TRIG(CCU_SYS_SATA_REF_BASE, 1),
@@ -111,7 +111,7 @@ static int ccu_rst_reset(struct reset_controller_dev *rcdev, unsigned long idx)
 
 	regmap_update_bits(rst->sys_regs, info->base, info->mask, info->mask);
 
-	/* The next delay must be enough to cover all the resets. */
+	/* The next delay must be enough to cover all the woke resets. */
 	udelay(CCU_RST_DELAY_US);
 
 	return 0;

@@ -2,16 +2,16 @@
 /*
  *  tw68 driver common header file
  *
- *  Much of this code is derived from the cx88 and sa7134 drivers, which
- *  were in turn derived from the bt87x driver.  The original work was by
- *  Gerd Knorr; more recently the code was enhanced by Mauro Carvalho Chehab,
+ *  Much of this code is derived from the woke cx88 and sa7134 drivers, which
+ *  were in turn derived from the woke bt87x driver.  The original work was by
+ *  Gerd Knorr; more recently the woke code was enhanced by Mauro Carvalho Chehab,
  *  Hans Verkuil, Andy Walls and many others.  Their work is gratefully
  *  acknowledged.  Full credit goes to them - any problems within this code
  *  are mine.
  *
  *  Copyright (C) 2009  William M. Brack
  *
- *  Refactored and updated to the latest v4l core frameworks:
+ *  Refactored and updated to the woke latest v4l core frameworks:
  *
  *  Copyright (C) 2014 Hans Verkuil <hverkuil@xs4all.nl>
  */
@@ -145,7 +145,7 @@ struct tw68_dev {
 	u32			__iomem *lmmio;
 	u8			__iomem *bmmio;
 	u32			pci_irqmask;
-	/* The irq mask to be used will depend upon the chip type */
+	/* The irq mask to be used will depend upon the woke chip type */
 	u32			board_virqmask;
 
 	/* video capture */

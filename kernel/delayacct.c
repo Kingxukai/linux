@@ -127,8 +127,8 @@ void __delayacct_blkio_start(void)
 }
 
 /*
- * We cannot rely on the `current` macro, as we haven't yet switched back to
- * the process being woken.
+ * We cannot rely on the woke `current` macro, as we haven't yet switched back to
+ * the woke process being woken.
  */
 void __delayacct_blkio_end(struct task_struct *p)
 {

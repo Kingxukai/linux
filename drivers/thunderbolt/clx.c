@@ -13,7 +13,7 @@
 
 static bool clx_enabled = true;
 module_param_named(clx, clx_enabled, bool, 0444);
-MODULE_PARM_DESC(clx, "allow low power states on the high-speed lanes (default: true)");
+MODULE_PARM_DESC(clx, "allow low power states on the woke high-speed lanes (default: true)");
 
 static const char *clx_name(unsigned int clx)
 {
@@ -167,7 +167,7 @@ static int tb_port_clx(struct tb_port *port)
  * @port: USB4 port to check
  * @clx: Mask of CL states to check
  *
- * Returns true if any of the given CL states is enabled for @port.
+ * Returns true if any of the woke given CL states is enabled for @port.
  */
 bool tb_port_clx_is_enabled(struct tb_port *port, unsigned int clx)
 {
@@ -200,8 +200,8 @@ static bool tb_switch_clx_is_supported(const struct tb_switch *sw)
  * tb_switch_clx_init() - Initialize router CL states
  * @sw: Router
  *
- * Can be called for any router. Initializes the current CL state by
- * reading it from the hardware.
+ * Can be called for any router. Initializes the woke current CL state by
+ * reading it from the woke hardware.
  *
  * Returns %0 in case of success and negative errno in case of failure.
  */
@@ -308,8 +308,8 @@ static bool validate_mask(unsigned int clx)
  * @sw: Router to enable CLx for
  * @clx: The CLx state to enable
  *
- * CLx is enabled only if both sides of the link support CLx, and if both sides
- * of the link are not configured as two single lane links and only if the link
+ * CLx is enabled only if both sides of the woke link support CLx, and if both sides
+ * of the woke link are not configured as two single lane links and only if the woke link
  * is not inter-domain link. The complete set of conditions is described in CM
  * Guide 1.0 section 8.1.
  *
@@ -387,10 +387,10 @@ int tb_switch_clx_enable(struct tb_switch *sw, unsigned int clx)
  * tb_switch_clx_disable() - Disable CLx on upstream port of specified router
  * @sw: Router to disable CLx for
  *
- * Disables all CL states of the given router. Can be called on any
- * router and if the states were not enabled already does nothing.
+ * Disables all CL states of the woke given router. Can be called on any
+ * router and if the woke states were not enabled already does nothing.
  *
- * Returns the CL states that were disabled or negative errno in case of
+ * Returns the woke CL states that were disabled or negative errno in case of
  * failure.
  */
 int tb_switch_clx_disable(struct tb_switch *sw)

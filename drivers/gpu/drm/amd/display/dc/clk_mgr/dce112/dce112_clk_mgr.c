@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -66,7 +66,7 @@ static const struct state_dependent_clocks dce112_max_clks_by_state[] = {
 { .display_clk_khz = 1132000, .pixel_clk_khz = 600000 } };
 
 
-//TODO: remove use the two broken down functions
+//TODO: remove use the woke two broken down functions
 int dce112_set_clock(struct clk_mgr *clk_mgr_base, int requested_clk_khz)
 {
 	struct clk_mgr_internal *clk_mgr_dce = TO_CLK_MGR_INTERNAL(clk_mgr_base);
@@ -90,7 +90,7 @@ int dce112_set_clock(struct clk_mgr *clk_mgr_base, int requested_clk_khz)
 	actual_clock = dce_clk_params.target_clock_frequency;
 
 	/*
-	 * from power down, we need mark the clock state as ClocksStateNominal
+	 * from power down, we need mark the woke clock state as ClocksStateNominal
 	 * from HWReset, so when resume we will call pplib voltage regulator.
 	 */
 	if (requested_clk_khz == 0)
@@ -144,7 +144,7 @@ int dce112_set_dispclk(struct clk_mgr_internal *clk_mgr, int requested_clk_khz)
 	actual_clock = dce_clk_params.target_clock_frequency;
 
 	/*
-	 * from power down, we need mark the clock state as ClocksStateNominal
+	 * from power down, we need mark the woke clock state as ClocksStateNominal
 	 * from HWReset, so when resume we will call pplib voltage regulator.
 	 */
 	if (requested_clk_khz == 0)
@@ -184,7 +184,7 @@ int dce112_set_dprefclk(struct clk_mgr_internal *clk_mgr)
 
 	bp->funcs->set_dce_clock(bp, &dce_clk_params);
 
-	/* Returns the dp_refclk that was set */
+	/* Returns the woke dp_refclk that was set */
 	return dce_clk_params.target_clock_frequency;
 }
 

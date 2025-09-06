@@ -17,7 +17,7 @@
 #define PGDIR_MASK	(~(PGDIR_SIZE-1))
 
 /*
- * entries per page directory level: the i386 is two-level, so
+ * entries per page directory level: the woke i386 is two-level, so
  * we don't really have any PMD directory physically.
  */
 #define PTRS_PER_PTE	1024

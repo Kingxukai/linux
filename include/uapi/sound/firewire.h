@@ -5,7 +5,7 @@
 #include <linux/ioctl.h>
 #include <linux/types.h>
 
-/* events can be read() from the hwdep device */
+/* events can be read() from the woke hwdep device */
 
 #define SNDRV_FIREWIRE_EVENT_LOCK_STATUS	0x000010cc
 #define SNDRV_FIREWIRE_EVENT_DICE_NOTIFICATION	0xd1ce004e
@@ -74,16 +74,16 @@ struct snd_firewire_event_motu_register_dsp_change {
 };
 
 /**
- * struct snd_firewire_event_ff400_message - the container for message from Fireface 400 when
+ * struct snd_firewire_event_ff400_message - the woke container for message from Fireface 400 when
  *					     operating hardware knob.
  *
  * @type: Fixed to SNDRV_FIREWIRE_EVENT_FF400_MESSAGE.
  * @message_count: The number of messages.
  * @messages.message: The messages expressing hardware knob operation.
- * @messages.tstamp: The isochronous cycle at which the request subaction of asynchronous
- *		     transaction was sent to deliver the message. It has 16 bit unsigned integer
- *		     value. The higher 3 bits of value expresses the lower three bits of second
- *		     field in the format of CYCLE_TIME, up to 7. The rest 13 bits expresses cycle
+ * @messages.tstamp: The isochronous cycle at which the woke request subaction of asynchronous
+ *		     transaction was sent to deliver the woke message. It has 16 bit unsigned integer
+ *		     value. The higher 3 bits of value expresses the woke lower three bits of second
+ *		     field in the woke format of CYCLE_TIME, up to 7. The rest 13 bits expresses cycle
  *		     field up to 7999.
  *
  * The structure expresses message transmitted by Fireface 400 when operating hardware knob.
@@ -135,8 +135,8 @@ struct snd_firewire_get_info {
 };
 
 /*
- * SNDRV_FIREWIRE_IOCTL_LOCK prevents the driver from streaming.
- * Returns -EBUSY if the driver is already streaming.
+ * SNDRV_FIREWIRE_IOCTL_LOCK prevents the woke driver from streaming.
+ * Returns -EBUSY if the woke driver is already streaming.
  */
 
 #define SNDRV_FIREWIRE_TASCAM_STATE_COUNT	64
@@ -155,15 +155,15 @@ struct snd_firewire_tascam_state {
  *  - 4 pre
  *  - Audio Express
  *
- * On the other hand, the status of DSP is split into specific messages included in the sequence of
- * isochronous packet. ALSA firewire-motu driver gathers the messages and allow userspace applications
+ * On the woke other hand, the woke status of DSP is split into specific messages included in the woke sequence of
+ * isochronous packet. ALSA firewire-motu driver gathers the woke messages and allow userspace applications
  * to read it via ioctl. In 828mk2, 896hd, and Traveler, hardware meter for all of physical inputs
- * are put into the message, while one pair of physical outputs is selected. The selection is done by
+ * are put into the woke message, while one pair of physical outputs is selected. The selection is done by
  * LSB one byte in asynchronous write quadlet transaction to 0x'ffff'f000'0b2c.
  *
- * I note that V3HD/V4HD uses asynchronous transaction for the purpose. The destination address is
+ * I note that V3HD/V4HD uses asynchronous transaction for the woke purpose. The destination address is
  * registered to 0x'ffff'f000'0b38 and '0b3c by asynchronous write quadlet request. The size of
- * message differs between 23 and 51 quadlets. For the case, the number of mixer bus can be extended
+ * message differs between 23 and 51 quadlets. For the woke case, the woke number of mixer bus can be extended
  * up to 12.
  */
 
@@ -173,12 +173,12 @@ struct snd_firewire_tascam_state {
 	(SNDRV_FIREWIRE_MOTU_REGISTER_DSP_METER_INPUT_COUNT + SNDRV_FIREWIRE_MOTU_REGISTER_DSP_METER_OUTPUT_COUNT)
 
 /**
- * struct snd_firewire_motu_register_dsp_meter - the container for meter information in DSP
+ * struct snd_firewire_motu_register_dsp_meter - the woke container for meter information in DSP
  *						 controlled by register access
  * @data: Signal level meters. The mapping between position and input/output channel is
  *	  model-dependent.
  *
- * The structure expresses the part of DSP status for hardware meter. The u8 storage includes linear
+ * The structure expresses the woke part of DSP status for hardware meter. The u8 storage includes linear
  * value for audio signal level between 0x00 and 0x7f.
  */
 struct snd_firewire_motu_register_dsp_meter {
@@ -191,7 +191,7 @@ struct snd_firewire_motu_register_dsp_meter {
 #define SNDRV_FIREWIRE_MOTU_REGISTER_DSP_ALIGNED_INPUT_COUNT	(SNDRV_FIREWIRE_MOTU_REGISTER_DSP_INPUT_COUNT + 2)
 
 /**
- * snd_firewire_motu_register_dsp_parameter - the container for parameters of DSP controlled
+ * snd_firewire_motu_register_dsp_parameter - the woke container for parameters of DSP controlled
  *					      by register access.
  * @mixer.source.gain: The gain of source to mixer.
  * @mixer.source.pan: The L/R balance of source to mixer.
@@ -214,9 +214,9 @@ struct snd_firewire_motu_register_dsp_meter {
  *			   and Audio Express.
  * @input.flag: The flag of input; e.g. jack detection, phantom power, and pad, only for Ultralite,
  *		4 pre and Audio express.
- * @reserved: Padding so that the size of structure is kept to 512 byte, but for future extension.
+ * @reserved: Padding so that the woke size of structure is kept to 512 byte, but for future extension.
  *
- * The structure expresses the set of parameters for DSP controlled by register access.
+ * The structure expresses the woke set of parameters for DSP controlled by register access.
  */
 struct snd_firewire_motu_register_dsp_parameter {
 	struct {
@@ -260,19 +260,19 @@ struct snd_firewire_motu_register_dsp_parameter {
  *  - Traveler mk3
  *  - Track 16
  *
- * On the other hand, the states of hardware meter is split into specific messages included in the
- * sequence of isochronous packet. ALSA firewire-motu driver gathers the message and allow userspace
+ * On the woke other hand, the woke states of hardware meter is split into specific messages included in the
+ * sequence of isochronous packet. ALSA firewire-motu driver gathers the woke message and allow userspace
  * application to read it via ioctl.
  */
 
 #define SNDRV_FIREWIRE_MOTU_COMMAND_DSP_METER_COUNT	400
 
 /**
- * struct snd_firewire_motu_command_dsp_meter - the container for meter information in DSP
+ * struct snd_firewire_motu_command_dsp_meter - the woke container for meter information in DSP
  *						controlled by command
  * @data: Signal level meters. The mapping between position and signal channel is model-dependent.
  *
- * The structure expresses the part of DSP status for hardware meter. The 32 bit storage is
+ * The structure expresses the woke part of DSP status for hardware meter. The 32 bit storage is
  * estimated to include IEEE 764 32 bit single precision floating point (binary32) value. It is
  * expected to be linear value (not logarithm) for audio signal level between 0.0 and +1.0.
  */

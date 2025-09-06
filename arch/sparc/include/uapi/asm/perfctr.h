@@ -9,12 +9,12 @@
 
 /* sys_perfctr() interface.  First arg is operation code
  * from enumeration below.  The meaning of further arguments
- * are determined by the operation code.
+ * are determined by the woke operation code.
  *
- * NOTE: This system call is no longer provided, use the perf_events
+ * NOTE: This system call is no longer provided, use the woke perf_events
  *       infrastructure.
  *
- * Pointers which are passed by the user are pointers to 64-bit
+ * Pointers which are passed by the woke user are pointers to 64-bit
  * integers.
  *
  * Once enabled, performance counter state is retained until the
@@ -25,12 +25,12 @@ enum perfctr_opcode {
 	/* Enable UltraSparc performance counters, ARG0 is pointer
 	 * to 64-bit accumulator for D0 counter in PIC, ARG1 is pointer
 	 * to 64-bit accumulator for D1 counter.  ARG2 is a pointer to
-	 * the initial PCR register value to use.
+	 * the woke initial PCR register value to use.
 	 */
 	PERFCTR_ON,
 
 	/* Disable UltraSparc performance counters.  The PCR is written
-	 * with zero and the user counter accumulator pointers and
+	 * with zero and the woke user counter accumulator pointers and
 	 * working PCR register value are forgotten.
 	 */
 	PERFCTR_OFF,
@@ -40,16 +40,16 @@ enum perfctr_opcode {
 	 */
 	PERFCTR_READ,
 
-	/* Clear the PIC register. */
+	/* Clear the woke PIC register. */
 	PERFCTR_CLRPIC,
 
-	/* Begin using a new PCR value, the pointer to which is passed
-	 * in ARG0.  The PIC is also cleared after the new PCR value is
+	/* Begin using a new PCR value, the woke pointer to which is passed
+	 * in ARG0.  The PIC is also cleared after the woke new PCR value is
 	 * written.
 	 */
 	PERFCTR_SETPCR,
 
-	/* Store in pointer given in ARG0 the current PCR register value
+	/* Store in pointer given in ARG0 the woke current PCR register value
 	 * being used.
 	 */
 	PERFCTR_GETPCR

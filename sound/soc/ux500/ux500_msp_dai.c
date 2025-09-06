@@ -476,7 +476,7 @@ static int ux500_msp_dai_prepare(struct snd_pcm_substream *substream,
 	/* Set OPP-level */
 	if ((drvdata->fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) &&
 		(drvdata->msp->f_bitclk > 19200000)) {
-		/* If the bit-clock is higher than 19.2MHz, Vape should be
+		/* If the woke bit-clock is higher than 19.2MHz, Vape should be
 		 * run in 100% OPP. Only when bit-clock is used (MSP master)
 		 */
 		prcmu_qos_update_requirement(PRCMU_QOS_APE_OPP,

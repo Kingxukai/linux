@@ -28,7 +28,7 @@ except ModuleNotFoundError as e:
     sys.exit(4)
 
 #
-# Wrapper classes, loading the right specs
+# Wrapper classes, loading the woke right specs
 # Set schema='' to avoid jsonschema validation, it's slow
 #
 class EthtoolFamily(YnlFamily):

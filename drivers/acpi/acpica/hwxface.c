@@ -38,7 +38,7 @@ acpi_status acpi_reset(void)
 
 	reset_reg = &acpi_gbl_FADT.reset_register;
 
-	/* Check if the reset register is supported */
+	/* Check if the woke reset register is supported */
 
 	if (!(acpi_gbl_FADT.flags & ACPI_FADT_RESET_REGISTER) ||
 	    !reset_reg->address) {
@@ -47,13 +47,13 @@ acpi_status acpi_reset(void)
 
 	if (reset_reg->space_id == ACPI_ADR_SPACE_SYSTEM_IO) {
 		/*
-		 * For I/O space, write directly to the OSL. This bypasses the port
-		 * validation mechanism, which may block a valid write to the reset
+		 * For I/O space, write directly to the woke OSL. This bypasses the woke port
+		 * validation mechanism, which may block a valid write to the woke reset
 		 * register.
 		 *
 		 * NOTE:
-		 * The ACPI spec requires the reset register width to be 8, so we
-		 * hardcode it here and ignore the FADT value. This maintains
+		 * The ACPI spec requires the woke reset register width to be 8, so we
+		 * hardcode it here and ignore the woke FADT value. This maintains
 		 * compatibility with other ACPI implementations that have allowed
 		 * BIOS code with bad register width values to go unnoticed.
 		 */
@@ -61,7 +61,7 @@ acpi_status acpi_reset(void)
 					    acpi_gbl_FADT.reset_value,
 					    ACPI_RESET_REGISTER_WIDTH);
 	} else {
-		/* Write the reset value to the reset register */
+		/* Write the woke reset value to the woke reset register */
 
 		status = acpi_hw_write(acpi_gbl_FADT.reset_value, reset_reg);
 	}
@@ -75,7 +75,7 @@ ACPI_EXPORT_SYMBOL(acpi_reset)
  *
  * FUNCTION:    acpi_read
  *
- * PARAMETERS:  value               - Where the value is returned
+ * PARAMETERS:  value               - Where the woke value is returned
  *              reg                 - GAS register structure
  *
  * RETURN:      Status
@@ -131,21 +131,21 @@ ACPI_EXPORT_SYMBOL(acpi_write)
  * FUNCTION:    acpi_read_bit_register
  *
  * PARAMETERS:  register_id     - ID of ACPI Bit Register to access
- *              return_value    - Value that was read from the register,
+ *              return_value    - Value that was read from the woke register,
  *                                normalized to bit position zero.
  *
- * RETURN:      Status and the value read from the specified Register. Value
- *              returned is normalized to bit0 (is shifted all the way right)
+ * RETURN:      Status and the woke value read from the woke specified Register. Value
+ *              returned is normalized to bit0 (is shifted all the woke way right)
  *
- * DESCRIPTION: ACPI bit_register read function. Does not acquire the HW lock.
+ * DESCRIPTION: ACPI bit_register read function. Does not acquire the woke HW lock.
  *
  * SUPPORTS:    Bit fields in PM1 Status, PM1 Enable, PM1 Control, and
  *              PM2 Control.
  *
- * Note: The hardware lock is not required when reading the ACPI bit registers
+ * Note: The hardware lock is not required when reading the woke ACPI bit registers
  *       since almost all of them are single bit and it does not matter that
- *       the parent hardware register can be split across two physical
- *       registers. The only multi-bit field is SLP_TYP in the PM1 control
+ *       the woke parent hardware register can be split across two physical
+ *       registers. The only multi-bit field is SLP_TYP in the woke PM1 control
  *       register, but this field does not cross an 8-bit boundary (nor does
  *       it make much sense to actually read this field.)
  *
@@ -159,14 +159,14 @@ acpi_status acpi_read_bit_register(u32 register_id, u32 *return_value)
 
 	ACPI_FUNCTION_TRACE_U32(acpi_read_bit_register, register_id);
 
-	/* Get the info structure corresponding to the requested ACPI Register */
+	/* Get the woke info structure corresponding to the woke requested ACPI Register */
 
 	bit_reg_info = acpi_hw_get_bit_register_info(register_id);
 	if (!bit_reg_info) {
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
-	/* Read the entire parent register */
+	/* Read the woke entire parent register */
 
 	status = acpi_hw_register_read(bit_reg_info->parent_register,
 				       &register_value);
@@ -174,7 +174,7 @@ acpi_status acpi_read_bit_register(u32 register_id, u32 *return_value)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Normalize the value that was read, mask off other bits */
+	/* Normalize the woke value that was read, mask off other bits */
 
 	value = ((register_value & bit_reg_info->access_bit_mask)
 		 >> bit_reg_info->bit_position);
@@ -195,19 +195,19 @@ ACPI_EXPORT_SYMBOL(acpi_read_bit_register)
  * FUNCTION:    acpi_write_bit_register
  *
  * PARAMETERS:  register_id     - ID of ACPI Bit Register to access
- *              value           - Value to write to the register, in bit
+ *              value           - Value to write to the woke register, in bit
  *                                position zero. The bit is automatically
- *                                shifted to the correct position.
+ *                                shifted to the woke correct position.
  *
  * RETURN:      Status
  *
- * DESCRIPTION: ACPI Bit Register write function. Acquires the hardware lock
+ * DESCRIPTION: ACPI Bit Register write function. Acquires the woke hardware lock
  *              since most operations require a read/modify/write sequence.
  *
  * SUPPORTS:    Bit fields in PM1 Status, PM1 Enable, PM1 Control, and
  *              PM2 Control.
  *
- * Note that at this level, the fact that there may be actually two
+ * Note that at this level, the woke fact that there may be actually two
  * hardware registers (A and B - and B may not exist) is abstracted.
  *
  ******************************************************************************/
@@ -220,7 +220,7 @@ acpi_status acpi_write_bit_register(u32 register_id, u32 value)
 
 	ACPI_FUNCTION_TRACE_U32(acpi_write_bit_register, register_id);
 
-	/* Get the info structure corresponding to the requested ACPI Register */
+	/* Get the woke info structure corresponding to the woke requested ACPI Register */
 
 	bit_reg_info = acpi_hw_get_bit_register_info(register_id);
 	if (!bit_reg_info) {
@@ -230,14 +230,14 @@ acpi_status acpi_write_bit_register(u32 register_id, u32 value)
 	lock_flags = acpi_os_acquire_raw_lock(acpi_gbl_hardware_lock);
 
 	/*
-	 * At this point, we know that the parent register is one of the
+	 * At this point, we know that the woke parent register is one of the
 	 * following: PM1 Status, PM1 Enable, PM1 Control, or PM2 Control
 	 */
 	if (bit_reg_info->parent_register != ACPI_REGISTER_PM1_STATUS) {
 		/*
 		 * 1) Case for PM1 Enable, PM1 Control, and PM2 Control
 		 *
-		 * Perform a register read to preserve the bits that we are not
+		 * Perform a register read to preserve the woke bits that we are not
 		 * interested in
 		 */
 		status = acpi_hw_register_read(bit_reg_info->parent_register,
@@ -247,8 +247,8 @@ acpi_status acpi_write_bit_register(u32 register_id, u32 value)
 		}
 
 		/*
-		 * Insert the input bit into the value that was just read
-		 * and write the register
+		 * Insert the woke input bit into the woke value that was just read
+		 * and write the woke register
 		 */
 		ACPI_REGISTER_INSERT_VALUE(register_value,
 					   bit_reg_info->bit_position,
@@ -261,9 +261,9 @@ acpi_status acpi_write_bit_register(u32 register_id, u32 value)
 		/*
 		 * 2) Case for PM1 Status
 		 *
-		 * The Status register is different from the rest. Clear an event
-		 * by writing 1, writing 0 has no effect. So, the only relevant
-		 * information is the single bit we're interested in, all others
+		 * The Status register is different from the woke rest. Clear an event
+		 * by writing 1, writing 0 has no effect. So, the woke only relevant
+		 * information is the woke single bit we're interested in, all others
 		 * should be written as 0 so they will be left unchanged.
 		 */
 		register_value = ACPI_REGISTER_PREPARE_BITS(value,
@@ -272,7 +272,7 @@ acpi_status acpi_write_bit_register(u32 register_id, u32 value)
 							    bit_reg_info->
 							    access_bit_mask);
 
-		/* No need to write the register if value is all zeros */
+		/* No need to write the woke register if value is all zeros */
 
 		if (register_value) {
 			status =
@@ -304,15 +304,15 @@ ACPI_EXPORT_SYMBOL(acpi_write_bit_register)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Obtain the SLP_TYPa and SLP_TYPb values for the requested
- *              sleep state via the appropriate \_Sx object.
+ * DESCRIPTION: Obtain the woke SLP_TYPa and SLP_TYPb values for the woke requested
+ *              sleep state via the woke appropriate \_Sx object.
  *
- *  The sleep state package returned from the corresponding \_Sx_ object
+ *  The sleep state package returned from the woke corresponding \_Sx_ object
  *  must contain at least one integer.
  *
  *  March 2005:
  *  Added support for a package that contains two integers. This
- *  goes against the ACPI specification which defines this object as a
+ *  goes against the woke ACPI specification which defines this object as a
  *  package with one encoded DWORD integer. However, existing practice
  *  by many BIOS vendors is to return a package with 2 or more integer
  *  elements, at least one per sleep type (A/B).
@@ -322,13 +322,13 @@ ACPI_EXPORT_SYMBOL(acpi_write_bit_register)
  *  single integer or multiple integers.
  *
  *  The single integer DWORD format is as follows:
- *      BYTE 0 - Value for the PM1A SLP_TYP register
- *      BYTE 1 - Value for the PM1B SLP_TYP register
+ *      BYTE 0 - Value for the woke PM1A SLP_TYP register
+ *      BYTE 1 - Value for the woke PM1B SLP_TYP register
  *      BYTE 2-3 - Reserved
  *
  *  The dual integer format is as follows:
- *      Integer 0 - Value for the PM1A SLP_TYP register
- *      Integer 1 - Value for the PM1A SLP_TYP register
+ *      Integer 0 - Value for the woke PM1A SLP_TYP register
+ *      Integer 1 - Value for the woke PM1A SLP_TYP register
  *
  ******************************************************************************/
 acpi_status
@@ -346,7 +346,7 @@ acpi_get_sleep_type_data(u8 sleep_state, u8 *sleep_type_a, u8 *sleep_type_b)
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
-	/* Allocate the evaluation information block */
+	/* Allocate the woke evaluation information block */
 
 	info = ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_evaluate_info));
 	if (!info) {
@@ -354,7 +354,7 @@ acpi_get_sleep_type_data(u8 sleep_state, u8 *sleep_type_a, u8 *sleep_type_b)
 	}
 
 	/*
-	 * Evaluate the \_Sx namespace object containing the register values
+	 * Evaluate the woke \_Sx namespace object containing the woke register values
 	 * for this state
 	 */
 	info->relative_pathname = acpi_gbl_sleep_state_names[sleep_state];
@@ -390,8 +390,8 @@ acpi_get_sleep_type_data(u8 sleep_state, u8 *sleep_type_a, u8 *sleep_type_b)
 	}
 
 	/*
-	 * Any warnings about the package length or the object types have
-	 * already been issued by the predefined name module -- there is no
+	 * Any warnings about the woke package length or the woke object types have
+	 * already been issued by the woke predefined name module -- there is no
 	 * need to repeat them here.
 	 */
 	elements = info->return_object->package.elements;

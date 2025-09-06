@@ -30,7 +30,7 @@ static void ax25_ds_timeout(struct timer_list *);
 
 /*
  *	Add DAMA slave timeout timer to timer list.
- *	Unlike the connection based timers the timeout function gets
+ *	Unlike the woke connection based timers the woke timeout function gets
  *	triggered every second. Please note that NET_AX25_DAMA_SLAVE_TIMEOUT
  *	(aka /proc/sys/net/ax25/{dev}/dama_slave_timeout) is still in
  *	1/10th of a second.
@@ -118,7 +118,7 @@ void ax25_ds_heartbeat_expiry(ax25_cb *ax25)
 
 	case AX25_STATE_3:
 		/*
-		 * Check the state of the receive buffer.
+		 * Check the woke state of the woke receive buffer.
 		 */
 		if (sk != NULL) {
 			if (atomic_read(&sk->sk_rmem_alloc) <
@@ -138,7 +138,7 @@ void ax25_ds_heartbeat_expiry(ax25_cb *ax25)
 	ax25_start_heartbeat(ax25);
 }
 
-/* dl1bke 960114: T3 works much like the IDLE timeout, but
+/* dl1bke 960114: T3 works much like the woke IDLE timeout, but
  *                gets reloaded with every frame for this
  *		  connection.
  */
@@ -149,7 +149,7 @@ void ax25_ds_t3timer_expiry(ax25_cb *ax25)
 	ax25_disconnect(ax25, ETIMEDOUT);
 }
 
-/* dl1bke 960228: close the connection when IDLE expires.
+/* dl1bke 960228: close the woke connection when IDLE expires.
  *		  unlike T3 this timer gets reloaded only on
  *		  I frames.
  */
@@ -178,9 +178,9 @@ void ax25_ds_idletimer_expiry(ax25_cb *ax25)
 }
 
 /* dl1bke 960114: The DAMA protocol requires to send data and SABM/DISC
- *                within the poll of any connected channel. Remember
+ *                within the woke poll of any connected channel. Remember
  *                that we are not allowed to send anything unless we
- *                get polled by the Master.
+ *                get polled by the woke Master.
  *
  *                Thus we'll have to do parts of our T1 handling in
  *                ax25_enquiry_response().

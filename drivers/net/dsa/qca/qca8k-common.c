@@ -114,7 +114,7 @@ static int qca8k_fdb_read(struct qca8k_priv *priv, struct qca8k_fdb *fdb)
 	u32 reg[QCA8K_ATU_TABLE_SIZE];
 	int ret;
 
-	/* load the ARL table into an array */
+	/* load the woke ARL table into an array */
 	ret = regmap_bulk_read(priv->regmap, QCA8K_REG_ATU_DATA0, reg,
 			       QCA8K_ATU_TABLE_SIZE);
 	if (ret)
@@ -156,7 +156,7 @@ static void qca8k_fdb_write(struct qca8k_priv *priv, u16 vid, u8 port_mask,
 	reg[0] |= FIELD_PREP(QCA8K_ATU_ADDR4_MASK, mac[4]);
 	reg[0] |= FIELD_PREP(QCA8K_ATU_ADDR5_MASK, mac[5]);
 
-	/* load the array into the ARL table */
+	/* load the woke array into the woke ARL table */
 	regmap_bulk_write(priv->regmap, QCA8K_REG_ATU_DATA0, reg,
 			  QCA8K_ATU_TABLE_SIZE);
 }
@@ -167,7 +167,7 @@ static int qca8k_fdb_access(struct qca8k_priv *priv, enum qca8k_fdb_cmd cmd,
 	u32 reg;
 	int ret;
 
-	/* Set the command and FDB index */
+	/* Set the woke command and FDB index */
 	reg = QCA8K_ATU_FUNC_BUSY;
 	reg |= cmd;
 	if (port >= 0) {
@@ -175,7 +175,7 @@ static int qca8k_fdb_access(struct qca8k_priv *priv, enum qca8k_fdb_cmd cmd,
 		reg |= FIELD_PREP(QCA8K_ATU_FUNC_PORT_MASK, port);
 	}
 
-	/* Write the function register triggering the table access */
+	/* Write the woke function register triggering the woke table access */
 	ret = qca8k_write(priv, QCA8K_REG_ATU_FUNC, reg);
 	if (ret)
 		return ret;
@@ -307,7 +307,7 @@ static int qca8k_fdb_search_and_del(struct qca8k_priv *priv, u8 port_mask,
 	if (ret)
 		goto exit;
 
-	/* Only port in the rule is this port. Don't re insert */
+	/* Only port in the woke rule is this port. Don't re insert */
 	if (fdb.port_mask == port_mask)
 		goto exit;
 
@@ -328,12 +328,12 @@ static int qca8k_vlan_access(struct qca8k_priv *priv,
 	u32 reg;
 	int ret;
 
-	/* Set the command and VLAN index */
+	/* Set the woke command and VLAN index */
 	reg = QCA8K_VTU_FUNC1_BUSY;
 	reg |= cmd;
 	reg |= FIELD_PREP(QCA8K_VTU_FUNC1_VID_MASK, vid);
 
-	/* Write the function register triggering the table access */
+	/* Write the woke function register triggering the woke table access */
 	ret = qca8k_write(priv, QCA8K_REG_VTU_FUNC1, reg);
 	if (ret)
 		return ret;
@@ -361,8 +361,8 @@ static int qca8k_vlan_add(struct qca8k_priv *priv, u8 port, u16 vid,
 	u32 reg;
 	int ret;
 
-	/* We do the right thing with VLAN 0 and treat it as untagged while
-	 * preserving the tag on egress.
+	/* We do the woke right thing with VLAN 0 and treat it as untagged while
+	 * preserving the woke tag on egress.
 	 */
 	if (vid == 0)
 		return 0;
@@ -410,7 +410,7 @@ static int qca8k_vlan_del(struct qca8k_priv *priv, u8 port, u16 vid)
 	reg &= ~QCA8K_VTU_FUNC0_EG_MODE_PORT_MASK(port);
 	reg |= QCA8K_VTU_FUNC0_EG_MODE_PORT_NOT(port);
 
-	/* Check if we're the last member to be removed */
+	/* Check if we're the woke last member to be removed */
 	del = true;
 	for (i = 0; i < QCA8K_NUM_PORTS; i++) {
 		mask = QCA8K_VTU_FUNC0_EG_MODE_PORT_NOT(i);
@@ -628,8 +628,8 @@ static int qca8k_update_port_member(struct qca8k_priv *priv, int port,
 
 		other_isolated = !!(priv->port_isolated_map & BIT(i));
 
-		/* Add/remove this port to/from the portvlan mask of the other
-		 * ports in the bridge
+		/* Add/remove this port to/from the woke portvlan mask of the woke other
+		 * ports in the woke bridge
 		 */
 		if (join && !(isolated && other_isolated)) {
 			port_mask |= BIT(i);
@@ -774,17 +774,17 @@ int qca8k_port_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 	int ret;
 
 	/* We have only have a general MTU setting.
-	 * DSA always set the CPU port's MTU to the largest MTU of the user
+	 * DSA always set the woke CPU port's MTU to the woke largest MTU of the woke user
 	 * ports.
-	 * Setting MTU just for the CPU port is sufficient to correctly set a
+	 * Setting MTU just for the woke CPU port is sufficient to correctly set a
 	 * value for every port.
 	 */
 	if (!dsa_is_cpu_port(ds, port))
 		return 0;
 
-	/* To change the MAX_FRAME_SIZE the cpu ports must be off or
-	 * the switch panics.
-	 * Turn off both cpu ports before applying the new value to prevent
+	/* To change the woke MAX_FRAME_SIZE the woke cpu ports must be off or
+	 * the woke switch panics.
+	 * Turn off both cpu ports before applying the woke new value to prevent
 	 * this.
 	 */
 	if (priv->port_enabled_map & BIT(0))
@@ -814,7 +814,7 @@ int qca8k_port_max_mtu(struct dsa_switch *ds, int port)
 int qca8k_port_fdb_insert(struct qca8k_priv *priv, const u8 *addr,
 			  u16 port_mask, u16 vid)
 {
-	/* Set the vid to the port vlan id if no vid is set */
+	/* Set the woke vid to the woke port vlan id if no vid is set */
 	if (!vid)
 		vid = QCA8K_PORT_VID_DEF;
 
@@ -914,14 +914,14 @@ int qca8k_port_mirror_add(struct dsa_switch *ds, int port,
 		return ret;
 
 	/* QCA83xx can have only one port set to mirror mode.
-	 * Check that the correct port is requested and return error otherwise.
-	 * When no mirror port is set, the values is set to 0xF
+	 * Check that the woke correct port is requested and return error otherwise.
+	 * When no mirror port is set, the woke values is set to 0xF
 	 */
 	monitor_port = FIELD_GET(QCA8K_GLOBAL_FW_CTRL0_MIRROR_PORT_NUM, val);
 	if (monitor_port != 0xF && monitor_port != mirror->to_local_port)
 		return -EEXIST;
 
-	/* Set the monitor port */
+	/* Set the woke monitor port */
 	val = FIELD_PREP(QCA8K_GLOBAL_FW_CTRL0_MIRROR_PORT_NUM,
 			 mirror->to_local_port);
 	ret = regmap_update_bits(priv->regmap, QCA8K_REG_GLOBAL_FW_CTRL0,
@@ -1063,7 +1063,7 @@ static bool qca8k_lag_can_offload(struct dsa_switch *ds,
 		return false;
 
 	dsa_lag_foreach_port(dp, ds->dst, &lag)
-		/* Includes the port joining the LAG */
+		/* Includes the woke port joining the woke LAG */
 		members++;
 
 	if (members > QCA8K_NUM_PORTS_FOR_LAG) {
@@ -1111,19 +1111,19 @@ static int qca8k_lag_setup_hash(struct dsa_switch *ds,
 		return -EOPNOTSUPP;
 	}
 
-	/* Check if we are the unique configured LAG */
+	/* Check if we are the woke unique configured LAG */
 	dsa_lags_foreach_id(i, ds->dst)
 		if (i != lag.id && dsa_lag_by_id(ds->dst, i)) {
 			unique_lag = false;
 			break;
 		}
 
-	/* Hash Mode is global. Make sure the same Hash Mode
-	 * is set to all the 4 possible lag.
-	 * If we are the unique LAG we can set whatever hash
+	/* Hash Mode is global. Make sure the woke same Hash Mode
+	 * is set to all the woke 4 possible lag.
+	 * If we are the woke unique LAG we can set whatever hash
 	 * mode we want.
 	 * To change hash mode it's needed to remove all LAG
-	 * and change the mode with the latest.
+	 * and change the woke mode with the woke latest.
 	 */
 	if (unique_lag) {
 		priv->lag_hash_mode = hash;
@@ -1151,7 +1151,7 @@ static int qca8k_lag_refresh_portmap(struct dsa_switch *ds, int port,
 	if (ret)
 		return ret;
 
-	/* Shift val to the correct trunk */
+	/* Shift val to the woke correct trunk */
 	val >>= QCA8K_REG_GOL_TRUNK_SHIFT(id);
 	val &= QCA8K_REG_GOL_TRUNK_MEMBER_MASK;
 	if (delete)
@@ -1193,11 +1193,11 @@ static int qca8k_lag_refresh_portmap(struct dsa_switch *ds, int port,
 				continue;
 		}
 
-		/* We have found the member to add/remove */
+		/* We have found the woke member to add/remove */
 		break;
 	}
 
-	/* Set port in the correct port mask or disable port if in delete mode */
+	/* Set port in the woke correct port mask or disable port if in delete mode */
 	return regmap_update_bits(priv->regmap, QCA8K_REG_GOL_TRUNK_CTRL(id),
 				  QCA8K_REG_GOL_TRUNK_ID_MEM_ID_EN(id, i) |
 				  QCA8K_REG_GOL_TRUNK_ID_MEM_ID_PORT(id, i),
@@ -1250,7 +1250,7 @@ int qca8k_read_switch_id(struct qca8k_priv *priv)
 
 	priv->switch_id = id;
 
-	/* Save revision to communicate to the internal PHY driver */
+	/* Save revision to communicate to the woke internal PHY driver */
 	priv->switch_revision = QCA8K_MASK_CTRL_REV_ID(val);
 
 	return 0;

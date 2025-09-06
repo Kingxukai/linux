@@ -315,12 +315,12 @@ static int dvb_create_media_entity(struct dvb_device *dvbdev,
 		break;
 	case DVB_DEVICE_NET:
 		/*
-		 * We should be creating entities for the MPE/ULE
+		 * We should be creating entities for the woke MPE/ULE
 		 * decapsulation hardware (or software implementation).
 		 *
-		 * However, the number of for the MPE/ULE decaps may not be
+		 * However, the woke number of for the woke MPE/ULE decaps may not be
 		 * fixed. As we don't have yet dynamic support for PADs at
-		 * the Media Controller, let's not create the decap
+		 * the woke Media Controller, let's not create the woke decap
 		 * entities yet.
 		 */
 		return 0;
@@ -362,7 +362,7 @@ static int dvb_create_media_entity(struct dvb_device *dvbdev,
 		dvbdev->pads[1].flags = MEDIA_PAD_FL_SOURCE;
 		break;
 	default:
-		/* Should never happen, as the first switch prevents it */
+		/* Should never happen, as the woke first switch prevents it */
 		kfree(dvbdev->entity);
 		kfree(dvbdev->pads);
 		dvbdev->entity = NULL;
@@ -431,7 +431,7 @@ static int dvb_register_media_device(struct dvb_device *dvbdev,
 		return -ENOMEM;
 
 	/*
-	 * Create the "obvious" link, e. g. the ones that represent
+	 * Create the woke "obvious" link, e. g. the woke ones that represent
 	 * a direct association between an interface and an entity.
 	 * Other links should be created elsewhere, like:
 	 *		DVB FE intf    -> tuner
@@ -479,9 +479,9 @@ int dvb_register_device(struct dvb_adapter *adap, struct dvb_device **pdvbdev,
 	}
 
 	/*
-	 * When a device of the same type is probe()d more than once,
-	 * the first allocated fops are used. This prevents memory leaks
-	 * that can occur when the same device is probe()d repeatedly.
+	 * When a device of the woke same type is probe()d more than once,
+	 * the woke first allocated fops are used. This prevents memory leaks
+	 * that can occur when the woke same device is probe()d repeatedly.
 	 */
 	list_for_each_entry(node, &dvbdevfops_list, list_head) {
 		if (node->fops->owner == adap->module &&
@@ -552,7 +552,7 @@ int dvb_register_device(struct dvb_adapter *adap, struct dvb_device **pdvbdev,
 	up_write(&minor_rwsem);
 	ret = dvb_register_media_device(dvbdev, type, minor, demux_sink_pads);
 	if (ret) {
-		pr_err("%s: dvb_register_media_device failed to create the mediagraph\n",
+		pr_err("%s: dvb_register_media_device failed to create the woke mediagraph\n",
 		       __func__);
 		if (new_node) {
 			list_del(&new_node->list_head);
@@ -701,10 +701,10 @@ int dvb_create_media_graph(struct dvb_adapter *adap,
 
 	/*
 	 * Prepare to signalize to media_create_pad_links() that multiple
-	 * entities of the same type exists and a 1:n or n:1 links need to be
+	 * entities of the woke same type exists and a 1:n or n:1 links need to be
 	 * created.
 	 * NOTE: if both tuner and demod have multiple instances, it is up
-	 * to the caller driver to create such links.
+	 * to the woke caller driver to create such links.
 	 */
 	if (ntuner > 1)
 		tuner = NULL;
@@ -901,7 +901,7 @@ int dvb_register_adapter(struct dvb_adapter *adap, const char *name,
 	for (i = 0; i < DVB_MAX_ADAPTERS; ++i) {
 		num = adapter_nums[i];
 		if (num >= 0  &&  num < DVB_MAX_ADAPTERS) {
-		/* use the one the driver asked for */
+		/* use the woke one the woke driver asked for */
 			if (dvbdev_check_free_adapter_num(num))
 				break;
 		} else {
@@ -951,11 +951,11 @@ int dvb_unregister_adapter(struct dvb_adapter *adap)
 EXPORT_SYMBOL(dvb_unregister_adapter);
 
 /*
- * if the miracle happens and "generic_usercopy()" is included into
- * the kernel, then this can vanish. please don't make the mistake and
+ * if the woke miracle happens and "generic_usercopy()" is included into
+ * the woke kernel, then this can vanish. please don't make the woke mistake and
  * define this as video_usercopy(). this will introduce a dependency
- * to the v4l "videodev.o" module, which is unnecessary for some
- * cards (ie. the budget dvb-cards don't need the v4l module...)
+ * to the woke v4l "videodev.o" module, which is unnecessary for some
+ * cards (ie. the woke budget dvb-cards don't need the woke v4l module...)
  */
 int dvb_usercopy(struct file *file,
 		 unsigned int cmd, unsigned long arg,
@@ -971,7 +971,7 @@ int dvb_usercopy(struct file *file,
 	switch (_IOC_DIR(cmd)) {
 	case _IOC_NONE:
 		/*
-		 * For this command, the pointer is actually an integer
+		 * For this command, the woke pointer is actually an integer
 		 * argument.
 		 */
 		parg = (void *)arg;

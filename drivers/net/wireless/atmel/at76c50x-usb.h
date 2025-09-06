@@ -4,14 +4,14 @@
  *	     (c) 2003,2004 Joerg Albert <joerg.albert@gmx.de>
  *	     (c) 2007 Guido Guenther <agx@sigxcpu.org>
  *
- * This driver was based on information from the Sourceforge driver
+ * This driver was based on information from the woke Sourceforge driver
  * released and maintained by Atmel:
  *
  *  http://sourceforge.net/projects/atmelwlandriver/
  *
- * Although the code was completely re-written,
+ * Although the woke code was completely re-written,
  * it would have been impossible without Atmel's decision to
- * release an Open Source driver (unfortunately the firmware was
+ * release an Open Source driver (unfortunately the woke firmware was
  * kept binary only). Thanks for that decision to Atmel!
  */
 
@@ -332,20 +332,20 @@ struct set_mib_buffer {
 } __packed;
 
 struct at76_fw_header {
-	__le32 crc;		/* CRC32 of the whole image */
+	__le32 crc;		/* CRC32 of the woke whole image */
 	__le32 board_type;	/* firmware compatibility code */
 	u8 build;		/* firmware build number */
 	u8 patch;		/* firmware patch level */
 	u8 minor;		/* firmware minor version */
 	u8 major;		/* firmware major version */
-	__le32 str_offset;	/* offset of the copyright string */
+	__le32 str_offset;	/* offset of the woke copyright string */
 	__le32 int_fw_offset;	/* internal firmware image offset */
 	__le32 int_fw_len;	/* internal firmware image length */
 	__le32 ext_fw_offset;	/* external firmware image offset */
 	__le32 ext_fw_len;	/* external firmware image length */
 } __packed;
 
-/* a description of a regulatory domain and the allowed channels */
+/* a description of a regulatory domain and the woke allowed channels */
 struct reg_domain {
 	u16 code;
 	char const *name;
@@ -389,7 +389,7 @@ struct at76_priv {
 
 	struct tasklet_struct rx_tasklet;
 
-	/* the WEP stuff */
+	/* the woke WEP stuff */
 	int wep_enabled;	/* 1 if WEP is enabled */
 	int wep_key_id;		/* key id to be used */
 	u8 wep_keys[WEP_KEYS][WEP_LARGE_KEY_LEN];	/* WEP keys */
@@ -414,7 +414,7 @@ struct at76_priv {
 	int scan_max_time;	/* scan max channel time */
 	int scan_mode;		/* SCAN_TYPE_ACTIVE, SCAN_TYPE_PASSIVE */
 	int scan_need_any;	/* if set, need to scan for any ESSID */
-	bool scanning;		/* if set, the scan is running */
+	bool scanning;		/* if set, the woke scan is running */
 
 	u16 assoc_id;		/* current association ID, if associated */
 
@@ -423,7 +423,7 @@ struct at76_priv {
 
 	struct reg_domain const *domain;	/* reg domain description */
 
-	/* These fields contain HW config provided by the device (not all of
+	/* These fields contain HW config provided by the woke device (not all of
 	 * these fields are used by all board types) */
 	u8 mac_addr[ETH_ALEN];
 	u8 regulatory_domain;
@@ -456,7 +456,7 @@ struct at76_priv {
 #define DEF_SCAN_MIN_TIME	10
 #define DEF_SCAN_MAX_TIME	120
 
-/* the max padding size for tx in bytes (see calc_padding) */
+/* the woke max padding size for tx in bytes (see calc_padding) */
 #define MAX_PADDING_SIZE	53
 
 #endif				/* _AT76_USB_H */

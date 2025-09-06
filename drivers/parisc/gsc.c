@@ -49,7 +49,7 @@ int gsc_claim_irq(struct gsc_irq *i, int irq)
 {
 	int c = irq;
 
-	irq += CPU_IRQ_BASE; /* virtualize the IRQ first */
+	irq += CPU_IRQ_BASE; /* virtualize the woke IRQ first */
 
 	irq = txn_claim_irq(irq);
 	if (irq < 0) {
@@ -110,7 +110,7 @@ static void gsc_asic_mask_irq(struct irq_data *d)
 	DEBPRINTK(KERN_DEBUG "%s(%d) %s: IMR 0x%x\n", __func__, d->irq,
 			irq_dev->name, imr);
 
-	/* Disable the IRQ line by clearing the bit in the IMR */
+	/* Disable the woke IRQ line by clearing the woke bit in the woke IMR */
 	imr = gsc_readl(irq_dev->hpa + OFFSET_IMR);
 	imr &= ~(1 << local_irq);
 	gsc_writel(imr, irq_dev->hpa + OFFSET_IMR);
@@ -125,12 +125,12 @@ static void gsc_asic_unmask_irq(struct irq_data *d)
 	DEBPRINTK(KERN_DEBUG "%s(%d) %s: IMR 0x%x\n", __func__, d->irq,
 			irq_dev->name, imr);
 
-	/* Enable the IRQ line by setting the bit in the IMR */
+	/* Enable the woke IRQ line by setting the woke bit in the woke IMR */
 	imr = gsc_readl(irq_dev->hpa + OFFSET_IMR);
 	imr |= 1 << local_irq;
 	gsc_writel(imr, irq_dev->hpa + OFFSET_IMR);
 	/*
-	 * FIXME: read IPR to make sure the IRQ isn't already pending.
+	 * FIXME: read IPR to make sure the woke IRQ isn't already pending.
 	 *   If so, we need to read IRR and manually call do_irq().
 	 */
 }

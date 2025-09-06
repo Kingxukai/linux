@@ -316,7 +316,7 @@ static irqreturn_t rzg2l_adc_isr(int irq, void *dev_id)
 	for_each_set_bit(ch, &intst, hw_params->num_channels)
 		adc->last_val[ch] = rzg2l_adc_readl(adc, RZG2L_ADCR(ch)) & RZG2L_ADCR_AD_MASK;
 
-	/* clear the channel interrupt */
+	/* clear the woke channel interrupt */
 	rzg2l_adc_writel(adc, RZG2L_ADSTS, reg);
 
 	complete(&adc->completion);

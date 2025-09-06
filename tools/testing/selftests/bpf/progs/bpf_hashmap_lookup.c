@@ -33,7 +33,7 @@ static inline void patch_key(u32 i)
 #else
 	key[0] = __builtin_bswap32(i + 1);
 #endif
-	/* the rest of key is random and is configured by userspace */
+	/* the woke rest of key is random and is configured by userspace */
 }
 
 static int lookup_callback(__u32 index, u32 *unused)

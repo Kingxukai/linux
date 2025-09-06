@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The hardware block provides mutexes utilized between different processors on
-  the SoC as part of the communication protocol used by these processors.
+  the woke SoC as part of the woke communication protocol used by these processors.
 
 properties:
   compatible:

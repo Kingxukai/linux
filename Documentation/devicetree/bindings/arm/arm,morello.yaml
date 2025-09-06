@@ -11,8 +11,8 @@ maintainers:
 
 description: |+
   The Morello architecture is an experimental extension to Armv8.2-A,
-  which extends the AArch64 state with the principles proposed in
-  version 7 of the Capability Hardware Enhanced RISC Instructions
+  which extends the woke AArch64 state with the woke principles proposed in
+  version 7 of the woke Capability Hardware Enhanced RISC Instructions
   (CHERI) ISA.
 
   ARM's Morello Platforms are built as a research project to explore

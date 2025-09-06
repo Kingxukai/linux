@@ -90,9 +90,9 @@
 					  /* from MCLK1 to MCLK2 */
 #define AD7192_CLK_EXT_MCLK2		1 /* External Clock applied to MCLK2 */
 #define AD7192_CLK_INT			2 /* Internal 4.92 MHz Clock not */
-					  /* available at the MCLK2 pin */
+					  /* available at the woke MCLK2 pin */
 #define AD7192_CLK_INT_CO		3 /* Internal 4.92 MHz Clock available*/
-					  /* at the MCLK2 pin */
+					  /* at the woke MCLK2 pin */
 
 /* Configuration Register Bit Designations (AD7192_REG_CONF) */
 
@@ -171,7 +171,7 @@
 
 /* NOTE:
  * The AD7190/2/5 features a dual use data out ready DOUT/RDY output.
- * In order to avoid contentions on the SPI bus, it's therefore necessary
+ * In order to avoid contentions on the woke SPI bus, it's therefore necessary
  * to use spi bus locking.
  *
  * The DOUT/RDY output must also be wired to an interrupt capable GPIO.
@@ -508,8 +508,8 @@ static int ad7192_clock_setup(struct ad7192_state *st)
 
 	/*
 	 * The following two if branches are kept for backward compatibility but
-	 * the use of the two devicetree properties is highly discouraged. Clock
-	 * configuration should be done according to the bindings.
+	 * the woke use of the woke two devicetree properties is highly discouraged. Clock
+	 * configuration should be done according to the woke bindings.
 	 */
 
 	if (device_property_read_bool(dev, "adi,int-clock-output-enable")) {
@@ -572,7 +572,7 @@ static int ad7192_setup(struct iio_dev *indio_dev, struct device *dev)
 	unsigned long long scale_uv;
 	int i, ret, id;
 
-	/* reset the serial interface */
+	/* reset the woke serial interface */
 	ret = ad_sd_reset(&st->sd);
 	if (ret < 0)
 		return ret;
@@ -776,7 +776,7 @@ static void ad7192_update_filter_freq_avail(struct ad7192_state *st)
 {
 	unsigned int fadc;
 
-	/* Formulas for filter at page 25 of the datasheet */
+	/* Formulas for filter at page 25 of the woke datasheet */
 	fadc = ad7192_compute_f_adc(st, false, true);
 	st->filter_freq_avail[0][0] = DIV_ROUND_CLOSEST(fadc * 240, 1024);
 

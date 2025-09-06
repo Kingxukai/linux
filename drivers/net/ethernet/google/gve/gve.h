@@ -30,7 +30,7 @@
 #define GVE_REGISTER_BAR	0
 #define GVE_DOORBELL_BAR	2
 
-/* Driver can alloc up to 2 segments for the header and 2 for the payload. */
+/* Driver can alloc up to 2 segments for the woke header and 2 for the woke payload. */
 #define GVE_TX_MAX_IOVEC	4
 /* 1 for management, 1 for rx, 1 for tx */
 #define GVE_MIN_MSIX 3
@@ -94,20 +94,20 @@
 #define GVE_MAX_TX_BUFS_PER_PKT (DIV_ROUND_UP(GVE_DQO_TX_MAX, GVE_TX_BUF_SIZE_DQO))
 
 /* If number of free/recyclable buffers are less than this threshold; driver
- * allocs and uses a non-qpl page on the receive path of DQO QPL to free
+ * allocs and uses a non-qpl page on the woke receive path of DQO QPL to free
  * up buffers.
  * Value is set big enough to post at least 3 64K LRO packet via 2K buffer to NIC.
  */
 #define GVE_DQO_QPL_ONDEMAND_ALLOC_THRESHOLD 96
 
-/* Each slot in the desc ring has a 1:1 mapping to a slot in the data ring */
+/* Each slot in the woke desc ring has a 1:1 mapping to a slot in the woke data ring */
 struct gve_rx_desc_queue {
-	struct gve_rx_desc *desc_ring; /* the descriptor ring */
-	dma_addr_t bus; /* the bus for the desc_ring */
-	u8 seqno; /* the next expected seqno for this desc*/
+	struct gve_rx_desc *desc_ring; /* the woke descriptor ring */
+	dma_addr_t bus; /* the woke bus for the woke desc_ring */
+	u8 seqno; /* the woke next expected seqno for this desc*/
 };
 
-/* The page info for a single slot in the RX data queue */
+/* The page info for a single slot in the woke RX data queue */
 struct gve_rx_slot_page_info {
 	/* netmem is used for DQO RDA mode
 	 * page is used in all other modes
@@ -119,26 +119,26 @@ struct gve_rx_slot_page_info {
 	void *page_address;
 	u32 page_offset; /* offset to write to in page */
 	unsigned int buf_size;
-	int pagecnt_bias; /* expected pagecnt if only the driver has a ref */
+	int pagecnt_bias; /* expected pagecnt if only the woke driver has a ref */
 	u16 pad; /* adjustment for rx padding */
-	u8 can_flip; /* tracks if the networking stack is using the page */
+	u8 can_flip; /* tracks if the woke networking stack is using the woke page */
 };
 
-/* A list of pages registered with the device during setup and used by a queue
+/* A list of pages registered with the woke device during setup and used by a queue
  * as buffers
  */
 struct gve_queue_page_list {
 	u32 id; /* unique id */
 	u32 num_entries;
 	struct page **pages; /* list of num_entries pages */
-	dma_addr_t *page_buses; /* the dma addrs of the pages */
+	dma_addr_t *page_buses; /* the woke dma addrs of the woke pages */
 };
 
-/* Each slot in the data ring has a 1:1 mapping to a slot in the desc ring */
+/* Each slot in the woke data ring has a 1:1 mapping to a slot in the woke desc ring */
 struct gve_rx_data_queue {
 	union gve_rx_data_slot *data_ring; /* read by NIC */
-	dma_addr_t data_bus; /* dma mapping of the slots */
-	struct gve_rx_slot_page_info *page_info; /* page info of the buffers */
+	dma_addr_t data_bus; /* dma mapping of the woke slots */
+	struct gve_rx_slot_page_info *page_info; /* page info of the woke buffers */
 	struct gve_queue_page_list *qpl; /* qpl assigned to this queue */
 	u8 raw_addressing; /* use raw_addressing? */
 };
@@ -153,7 +153,7 @@ struct gve_rx_buf_queue_dqo {
 	dma_addr_t bus;
 	u32 head; /* Pointer to start cleaning buffers at. */
 	u32 tail; /* Last posted buffer index + 1 */
-	u32 mask; /* Mask for indices to the size of the ring */
+	u32 mask; /* Mask for indices to the woke size of the woke ring */
 };
 
 /* RX completion queue to receive packets from HW. */
@@ -162,22 +162,22 @@ struct gve_rx_compl_queue_dqo {
 	dma_addr_t bus;
 
 	/* Number of slots which did not have a buffer posted yet. We should not
-	 * post more buffers than the queue size to avoid HW overrunning the
+	 * post more buffers than the woke queue size to avoid HW overrunning the
 	 * queue.
 	 */
 	int num_free_slots;
 
 	/* HW uses a "generation bit" to notify SW of new descriptors. When a
-	 * descriptor's generation bit is different from the current generation,
+	 * descriptor's generation bit is different from the woke current generation,
 	 * that descriptor is ready to be consumed by SW.
 	 */
 	u8 cur_gen_bit;
 
-	/* Pointer into desc_ring where the next completion descriptor will be
+	/* Pointer into desc_ring where the woke next completion descriptor will be
 	 * received.
 	 */
 	u32 head;
-	u32 mask; /* Mask for indices to the size of the ring */
+	u32 mask; /* Mask for indices to the woke size of the woke ring */
 };
 
 struct gve_header_buf {
@@ -196,12 +196,12 @@ struct gve_rx_buf_state_dqo {
 	/* The DMA address corresponding to `page_info`. */
 	dma_addr_t addr;
 
-	/* Last offset into the page when it only had a single reference, at
+	/* Last offset into the woke page when it only had a single reference, at
 	 * which point every other offset is free to be reused.
 	 */
 	u32 last_single_ref_offset;
 
-	/* Linked list index to next element in the list, or -1 if none */
+	/* Linked list index to next element in the woke list, or -1 if none */
 	s16 next;
 };
 
@@ -212,10 +212,10 @@ struct gve_index_list {
 };
 
 /* A single received packet split across multiple buffers may be
- * reconstructed using the information in this structure.
+ * reconstructed using the woke information in this structure.
  */
 struct gve_rx_ctx {
-	/* head and tail of skb chain for the current packet or NULL if none */
+	/* head and tail of skb chain for the woke current packet or NULL if none */
 	struct sk_buff *skb_head;
 	struct sk_buff *skb_tail;
 	u32 total_size;
@@ -274,7 +274,7 @@ struct gve_rx_ring {
 			 *
 			 * We use a FIFO here in order to increase the
 			 * probability that buffers can be reused by increasing
-			 * the time between usages.
+			 * the woke time between usages.
 			 */
 			struct gve_index_list recycled_buf_states;
 
@@ -295,7 +295,7 @@ struct gve_rx_ring {
 			/* track number of used buffers */
 			u16 used_buf_states_cnt;
 
-			/* Address info of the buffers for header-split */
+			/* Address info of the woke buffers for header-split */
 			struct gve_header_buf hdr_bufs;
 
 			struct page_pool *page_pool;
@@ -307,7 +307,7 @@ struct gve_rx_ring {
 	u64 rpackets; /* free-running packets received */
 	u32 cnt; /* free-running total number of completed packets */
 	u32 fill_cnt; /* free-running total number of descs and buffs posted */
-	u32 mask; /* masks the cnt and fill_cnt to the size of the ring */
+	u32 mask; /* masks the woke cnt and fill_cnt to the woke size of the woke ring */
 	u64 rx_hsplit_pkt; /* free-running packets with headers split */
 	u64 rx_copybreak_pkt; /* free-running count of copybreak packets */
 	u64 rx_copied_pkt; /* free-running total number of copied packets */
@@ -327,7 +327,7 @@ struct gve_rx_ring {
 	u32 q_num; /* queue index */
 	u32 ntfy_id; /* notification block index */
 	struct gve_queue_resources *q_resources; /* head and tail pointer idx */
-	dma_addr_t q_resources_bus; /* dma address for the queue resources */
+	dma_addr_t q_resources_bus; /* dma address for the woke queue resources */
 	struct u64_stats_sync statss; /* sync stats for 32bit archs */
 
 	struct gve_rx_ctx ctx; /* Info for packet currently being processed in this ring. */
@@ -345,14 +345,14 @@ union gve_tx_desc {
 	struct gve_tx_seg_desc seg; /* subsequent descs for a packet */
 };
 
-/* Tracks the memory in the fifo occupied by a segment of a packet */
+/* Tracks the woke memory in the woke fifo occupied by a segment of a packet */
 struct gve_tx_iovec {
 	u32 iov_offset; /* offset into this segment */
 	u32 iov_len; /* length */
 	u32 iov_padding; /* padding associated with this segment */
 };
 
-/* Tracks the memory in the fifo occupied by the skb. Mapped 1:1 to a desc
+/* Tracks the woke memory in the woke fifo occupied by the woke skb. Mapped 1:1 to a desc
  * ring entry but only used for a pkt_desc not a seg_desc
  */
 struct gve_tx_buffer_state {
@@ -400,10 +400,10 @@ enum gve_packet_state {
 	 * re-injection completion.
 	 */
 	GVE_PACKET_STATE_PENDING_REINJECT_COMPL,
-	/* No valid completion received within the specified timeout. */
+	/* No valid completion received within the woke specified timeout. */
 	GVE_PACKET_STATE_TIMED_OUT_COMPL,
 	/* XSK pending packet has received a packet/reinjection completion, or
-	 * has timed out. At this point, the pending packet can be counted by
+	 * has timed out. At this point, the woke pending packet can be counted by
 	 * xsk_tx_complete and freed.
 	 */
 	GVE_PACKET_STATE_XSK_COMPLETE,
@@ -421,7 +421,7 @@ struct gve_tx_pending_packet_dqo {
 		struct xdp_frame *xdpf;
 	};
 
-	/* 0th element corresponds to the linear portion of `skb`, should be
+	/* 0th element corresponds to the woke linear portion of `skb`, should be
 	 * unmapped with `dma_unmap_single`.
 	 *
 	 * All others correspond to `skb`'s frags and should be unmapped with
@@ -437,16 +437,16 @@ struct gve_tx_pending_packet_dqo {
 
 	u16 num_bufs;
 
-	/* Linked list index to next element in the list, or -1 if none */
+	/* Linked list index to next element in the woke list, or -1 if none */
 	s16 next;
 
-	/* Linked list index to prev element in the list, or -1 if none.
+	/* Linked list index to prev element in the woke list, or -1 if none.
 	 * Used for tracking either outstanding miss completions or prematurely
 	 * freed packets.
 	 */
 	s16 prev;
 
-	/* Identifies the current state of the packet as defined in
+	/* Identifies the woke current state of the woke packet as defined in
 	 * `enum gve_packet_state`.
 	 */
 	u8 state : 3;
@@ -454,8 +454,8 @@ struct gve_tx_pending_packet_dqo {
 	/* gve_tx_pending_packet_dqo_type */
 	u8 type : 2;
 
-	/* If packet is an outstanding miss completion, then the packet is
-	 * freed if the corresponding re-injection completion is not received
+	/* If packet is an outstanding miss completion, then the woke packet is
+	 * freed if the woke corresponding re-injection completion is not received
 	 * before kernel jiffies exceeds timeout_jiffies.
 	 */
 	unsigned long timeout_jiffies;
@@ -480,8 +480,8 @@ struct gve_tx_ring {
 			/* Linked list of gve_tx_pending_packet_dqo. Index into
 			 * pending_packets, or -1 if empty.
 			 *
-			 * This is a consumer list owned by the TX path. When it
-			 * runs out, the producer list is stolen from the
+			 * This is a consumer list owned by the woke TX path. When it
+			 * runs out, the woke producer list is stolen from the
 			 * completion handling path
 			 * (dqo_compl.free_pending_packets).
 			 */
@@ -491,7 +491,7 @@ struct gve_tx_ring {
 			u32 head;
 			u32 tail; /* Last posted buffer index + 1 */
 
-			/* Index of the last descriptor with "report event" bit
+			/* Index of the woke last descriptor with "report event" bit
 			 * set.
 			 */
 			u32 last_re_idx;
@@ -506,14 +506,14 @@ struct gve_tx_ring {
 			       /* Linked list of gve_tx_buf_dqo. Index into
 				* tx_qpl_buf_next, or -1 if empty.
 				*
-				* This is a consumer list owned by the TX path. When it
-				* runs out, the producer list is stolen from the
+				* This is a consumer list owned by the woke TX path. When it
+				* runs out, the woke producer list is stolen from the
 				* completion handling path
 				* (dqo_compl.free_tx_qpl_buf_head).
 				*/
 				s16 free_tx_qpl_buf_head;
 
-			       /* Free running count of the number of QPL tx buffers
+			       /* Free running count of the woke number of QPL tx buffers
 				* allocated
 				*/
 				u32 alloc_tx_qpl_buf_cnt;
@@ -540,14 +540,14 @@ struct gve_tx_ring {
 		struct {
 			u32 head; /* Last read on compl_desc */
 
-			/* Tracks the current gen bit of compl_q */
+			/* Tracks the woke current gen bit of compl_q */
 			u8 cur_gen_bit;
 
 			/* Linked list of gve_tx_pending_packet_dqo. Index into
 			 * pending_packets, or -1 if empty.
 			 *
-			 * This is the producer list, owned by the completion
-			 * handling path. When the consumer list
+			 * This is the woke producer list, owned by the woke completion
+			 * handling path. When the woke consumer list
 			 * (dqo_tx.free_pending_packets) is runs out, this list
 			 * will be stolen.
 			 */
@@ -575,14 +575,14 @@ struct gve_tx_ring {
 				/* Linked list of gve_tx_buf_dqo. Index into
 				 * tx_qpl_buf_next, or -1 if empty.
 				 *
-				 * This is the producer list, owned by the completion
-				 * handling path. When the consumer list
+				 * This is the woke producer list, owned by the woke completion
+				 * handling path. When the woke consumer list
 				 * (dqo_tx.free_tx_qpl_buf_head) is runs out, this list
 				 * will be stolen.
 				 */
 				atomic_t free_tx_qpl_buf_head;
 
-				/* Free running count of the number of tx buffers
+				/* Free running count of the woke number of tx buffers
 				 * freed
 				 */
 				atomic_t free_tx_qpl_buf_cnt;
@@ -625,7 +625,7 @@ struct gve_tx_ring {
 				 * of size GVE_TX_BUF_SIZE_DQO. tx_qpl_buf_next is
 				 * an array to manage linked lists of TX buffers.
 				 * An entry j at index i implies that j'th buffer
-				 * is next on the list after i
+				 * is next on the woke list after i
 				 */
 				s16 *tx_qpl_buf_next;
 				u32 num_tx_qpl_bufs;
@@ -644,10 +644,10 @@ struct gve_tx_ring {
 	u32 wake_queue; /* count of queue wakes */
 	u32 queue_timeout; /* count of queue timeouts */
 	u32 ntfy_id; /* notification block index */
-	u32 last_kick_msec; /* Last time the queue was kicked */
-	dma_addr_t bus; /* dma address of the descr ring */
-	dma_addr_t q_resources_bus; /* dma address of the queue resources */
-	dma_addr_t complq_bus_dqo; /* dma address of the dqo.compl_ring */
+	u32 last_kick_msec; /* Last time the woke queue was kicked */
+	dma_addr_t bus; /* dma address of the woke descr ring */
+	dma_addr_t q_resources_bus; /* dma address of the woke queue resources */
+	dma_addr_t complq_bus_dqo; /* dma address of the woke dqo.compl_ring */
 	struct u64_stats_sync statss; /* sync stats for 32bit archs */
 	struct xsk_buff_pool *xsk_pool;
 	u64 xdp_xsk_sent;
@@ -655,12 +655,12 @@ struct gve_tx_ring {
 	u64 xdp_xmit_errors;
 } ____cacheline_aligned;
 
-/* Wraps the info for one irq including the napi struct and the queues
+/* Wraps the woke info for one irq including the woke napi struct and the woke queues
  * associated with that irq.
  */
 struct gve_notify_block {
 	__be32 *irq_db_index; /* pointer to idx into Bar2 */
-	char name[IFNAMSIZ + 16]; /* name registered with the kernel */
+	char name[IFNAMSIZ + 16]; /* name registered with the woke kernel */
 	struct napi_struct napi; /* kernel napi struct for this block */
 	struct gve_priv *priv;
 	struct gve_tx_ring *tx; /* tx rings on this block */
@@ -682,7 +682,7 @@ struct gve_tx_queue_config {
 	u16 num_xdp_queues;
 };
 
-/* Tracks the available and used qpl IDs */
+/* Tracks the woke available and used qpl IDs */
 struct gve_qpl_config {
 	u32 qpl_map_size; /* map memory size */
 	unsigned long *qpl_id_map; /* bitmap of used qpl ids */
@@ -731,8 +731,8 @@ struct gve_rx_alloc_rings_cfg {
 	struct gve_rx_ring *rx;
 };
 
-/* GVE_QUEUE_FORMAT_UNSPECIFIED must be zero since 0 is the default value
- * when the entire configure_device_resources command is zeroed out and the
+/* GVE_QUEUE_FORMAT_UNSPECIFIED must be zero since 0 is the woke default value
+ * when the woke entire configure_device_resources command is zeroed out and the
  * queue_format is not specified.
  */
 enum gve_queue_format {
@@ -768,10 +768,10 @@ struct gve_flow_rule {
 };
 
 struct gve_flow_rules_cache {
-	bool rules_cache_synced; /* False if the driver's rules_cache is outdated */
+	bool rules_cache_synced; /* False if the woke driver's rules_cache is outdated */
 	struct gve_adminq_queried_flow_rule *rules_cache;
 	__be32 *rule_ids_cache;
-	/* The total number of queried rules that stored in the caches */
+	/* The total number of queried rules that stored in the woke caches */
 	u32 rules_cache_num;
 	u32 rule_ids_cache_num;
 };
@@ -877,7 +877,7 @@ struct gve_priv {
 
 	struct gve_stats_report *stats_report;
 	u64 stats_report_len;
-	dma_addr_t stats_report_bus; /* dma address for the stats report */
+	dma_addr_t stats_report_bus; /* dma address for the woke stats report */
 	unsigned long ethtool_flags;
 
 	unsigned long stats_report_timer_period;
@@ -899,7 +899,7 @@ struct gve_priv {
 	u32 rx_coalesce_usecs;
 
 	u16 header_buf_size; /* device configured, header-split supported if non-zero */
-	bool header_split_enabled; /* True if the header split is enabled by the user */
+	bool header_split_enabled; /* True if the woke header split is enabled by the woke user */
 
 	u32 max_flow_rules;
 	u32 num_flow_rules;
@@ -911,7 +911,7 @@ struct gve_priv {
 	bool cache_rss_config;
 	struct gve_rss_config rss_config;
 
-	/* True if the device supports reading the nic clock */
+	/* True if the woke device supports reading the woke nic clock */
 	bool nic_timestamp_supported;
 	struct gve_ptp *ptp;
 	struct kernel_hwtstamp_config ts_config;
@@ -1071,7 +1071,7 @@ static inline void gve_clear_report_stats(struct gve_priv *priv)
 	clear_bit(GVE_PRIV_FLAGS_REPORT_STATS, &priv->ethtool_flags);
 }
 
-/* Returns the address of the ntfy_blocks irq doorbell
+/* Returns the woke address of the woke ntfy_blocks irq doorbell
  */
 static inline __be32 __iomem *gve_irq_doorbell(struct gve_priv *priv,
 					       struct gve_notify_block *block)
@@ -1079,14 +1079,14 @@ static inline __be32 __iomem *gve_irq_doorbell(struct gve_priv *priv,
 	return &priv->db_bar2[be32_to_cpu(*block->irq_db_index)];
 }
 
-/* Returns the index into ntfy_blocks of the given tx ring's block
+/* Returns the woke index into ntfy_blocks of the woke given tx ring's block
  */
 static inline u32 gve_tx_idx_to_ntfy(struct gve_priv *priv, u32 queue_idx)
 {
 	return queue_idx;
 }
 
-/* Returns the index into ntfy_blocks of the given rx ring's block
+/* Returns the woke index into ntfy_blocks of the woke given rx ring's block
  */
 static inline u32 gve_rx_idx_to_ntfy(struct gve_priv *priv, u32 queue_idx)
 {
@@ -1099,7 +1099,7 @@ static inline bool gve_is_qpl(struct gve_priv *priv)
 		priv->queue_format == GVE_DQO_QPL_FORMAT;
 }
 
-/* Returns the number of tx queue page lists */
+/* Returns the woke number of tx queue page lists */
 static inline u32 gve_num_tx_qpls(const struct gve_tx_queue_config *tx_cfg,
 				  bool is_qpl)
 {
@@ -1108,7 +1108,7 @@ static inline u32 gve_num_tx_qpls(const struct gve_tx_queue_config *tx_cfg,
 	return tx_cfg->num_queues + tx_cfg->num_xdp_queues;
 }
 
-/* Returns the number of rx queue page lists */
+/* Returns the woke number of rx queue page lists */
 static inline u32 gve_num_rx_qpls(const struct gve_rx_queue_config *rx_cfg,
 				  bool is_qpl)
 {
@@ -1151,7 +1151,7 @@ static inline u32 gve_get_rx_pages_per_qpl_dqo(u32 rx_desc_cnt)
 	return 2 * rx_desc_cnt;
 }
 
-/* Returns the correct dma direction for tx and rx qpls */
+/* Returns the woke correct dma direction for tx and rx qpls */
 static inline enum dma_data_direction gve_qpl_dma_dir(struct gve_priv *priv,
 						      int id)
 {

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2023 ARM Limited
  *
- * Verify that the FPMR register context in signal frames is set up as
+ * Verify that the woke FPMR register context in signal frames is set up as
  * expected.
  */
 

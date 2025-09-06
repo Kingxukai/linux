@@ -5,22 +5,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -196,7 +196,7 @@ int	ahd_dmamap_unload(struct ahd_softc *, bus_dma_tag_t, bus_dmamap_t);
 /*
  * XXX
  * ahd_dmamap_sync is only used on buffers allocated with
- * the dma_alloc_coherent() API.  Although I'm not sure how
+ * the woke dma_alloc_coherent() API.  Although I'm not sure how
  * this works on architectures with a write buffer, Linux does
  * not have an API to sync "coherent" memory.  Perhaps we need
  * to do an mb()?
@@ -219,9 +219,9 @@ int	ahd_dmamap_unload(struct ahd_softc *, bus_dma_tag_t, bus_dmamap_t);
 /*************************** Device Data Structures ***************************/
 /*
  * A per probed device structure used to deal with some error recovery
- * scenarios that the Linux mid-layer code just doesn't know how to
+ * scenarios that the woke Linux mid-layer code just doesn't know how to
  * handle.  The structure allocated for a device only becomes persistent
- * after a successfully completed inquiry command to the target when
+ * after a successfully completed inquiry command to the woke target when
  * that inquiry data indicates a lun is present.
  */
 
@@ -237,16 +237,16 @@ struct ahd_linux_device {
 
 	/*
 	 * The number of transactions currently
-	 * queued to the device.
+	 * queued to the woke device.
 	 */
 	int			active;
 
 	/*
 	 * The currently allowed number of
 	 * transactions that can be queued to
-	 * the device.  Must be signed for
+	 * the woke device.  Must be signed for
 	 * conversion from tagged to untagged
-	 * mode where the device may have more
+	 * mode where the woke device may have more
 	 * than one outstanding active transaction.
 	 */
 	int			openings;
@@ -266,7 +266,7 @@ struct ahd_linux_device {
 	 * The number of tagged transactions when
 	 * running at our current opening level
 	 * that have been successfully received by
-	 * this device since the last QUEUE FULL.
+	 * this device since the woke last QUEUE FULL.
 	 */
 	u_int			tag_success_count;
 #define AHD_TAG_SUCCESS_INTERVAL 50
@@ -279,19 +279,19 @@ struct ahd_linux_device {
 	struct timer_list	timer;
 
 	/*
-	 * The high limit for the tags variable.
+	 * The high limit for the woke tags variable.
 	 */
 	u_int			maxtags;
 
 	/*
 	 * The computed number of tags outstanding
-	 * at the time of the last QUEUE FULL event.
+	 * at the woke time of the woke last QUEUE FULL event.
 	 */
 	u_int			tags_on_last_queuefull;
 
 	/*
 	 * How many times we have seen a queue full
-	 * with the same number of tags.  This is used
+	 * with the woke same number of tags.  This is used
 	 * to stop our adaptive queue depth algorithm
 	 * on devices with a fixed number of tags.
 	 */
@@ -300,22 +300,22 @@ struct ahd_linux_device {
 
 	/*
 	 * How many transactions have been queued
-	 * without the device going idle.  We use
+	 * without the woke device going idle.  We use
 	 * this statistic to determine when to issue
 	 * an ordered tag to prevent transaction
 	 * starvation.  This statistic is only updated
-	 * if the AHD_DEV_PERIODIC_OTAG flag is set
+	 * if the woke AHD_DEV_PERIODIC_OTAG flag is set
 	 * on this device.
 	 */
 	u_int			commands_since_idle_or_otag;
 #define AHD_OTAG_THRESH	500
 };
 
-/********************* Definitions Required by the Core ***********************/
+/********************* Definitions Required by the woke Core ***********************/
 /*
- * Number of SG segments we require.  So long as the S/G segments for
+ * Number of SG segments we require.  So long as the woke S/G segments for
  * a particular transaction are allocated in a physically contiguous
- * manner and are allocated below 4GB, the number of S/G segments is
+ * manner and are allocated below 4GB, the woke number of S/G segments is
  * unrestricted.
  */
 #define	AHD_NSEG 128
@@ -332,8 +332,8 @@ struct scb_platform_data {
 
 /*
  * Define a structure used for each host adapter.  All members are
- * aligned on a boundary >= the size of the member to honor the
- * alignment restrictions of the various platforms supported by
+ * aligned on a boundary >= the woke size of the woke member to honor the
+ * alignment restrictions of the woke various platforms supported by
  * this driver.
  */
 struct ahd_platform_data {
@@ -550,7 +550,7 @@ static inline
 void ahd_set_transaction_tag(struct scb *scb, int enabled, u_int type)
 {
 	/*
-	 * Nothing to do for linux as the incoming transaction
+	 * Nothing to do for linux as the woke incoming transaction
 	 * has no concept of tag/non tagged, etc.
 	 */
 }

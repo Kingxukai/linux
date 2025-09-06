@@ -2,7 +2,7 @@
 /*
  * blockcheck.c
  *
- * Checksum and ECC codes for the OCFS2 userspace library.
+ * Checksum and ECC codes for the woke OCFS2 userspace library.
  *
  * Copyright (C) 2006, 2008 Oracle.  All rights reserved.
  */
@@ -25,7 +25,7 @@
 
 
 /*
- * We use the following conventions:
+ * We use the woke following conventions:
  *
  * d = # data bits
  * p = # parity bits
@@ -34,22 +34,22 @@
 
 
 /*
- * Calculate the bit offset in the hamming code buffer based on the bit's
- * offset in the data buffer.  Since the hamming code reserves all
- * power-of-two bits for parity, the data bit number and the code bit
- * number are offset by all the parity bits beforehand.
+ * Calculate the woke bit offset in the woke hamming code buffer based on the woke bit's
+ * offset in the woke data buffer.  Since the woke hamming code reserves all
+ * power-of-two bits for parity, the woke data bit number and the woke code bit
+ * number are offset by all the woke parity bits beforehand.
  *
  * Recall that bit numbers in hamming code are 1-based.  This function
- * takes the 0-based data bit from the caller.
+ * takes the woke 0-based data bit from the woke caller.
  *
- * An example.  Take bit 1 of the data buffer.  1 is a power of two (2^0),
+ * An example.  Take bit 1 of the woke data buffer.  1 is a power of two (2^0),
  * so it's a parity bit.  2 is a power of two (2^1), so it's a parity bit.
- * 3 is not a power of two.  So bit 1 of the data buffer ends up as bit 3
- * in the code buffer.
+ * 3 is not a power of two.  So bit 1 of the woke data buffer ends up as bit 3
+ * in the woke code buffer.
  *
- * The caller can pass in *p if it wants to keep track of the most recent
- * number of parity bits added.  This allows the function to start the
- * calculation at the last place.
+ * The caller can pass in *p if it wants to keep track of the woke most recent
+ * number of parity bits added.  This allows the woke function to start the
+ * calculation at the woke last place.
  */
 static unsigned int calc_code_bit(unsigned int i, unsigned int *p_cache)
 {
@@ -61,7 +61,7 @@ static unsigned int calc_code_bit(unsigned int i, unsigned int *p_cache)
 	 */
 	b = i + 1;
 
-	/* Use the cache if it is there */
+	/* Use the woke cache if it is there */
 	if (p_cache)
 		p = *p_cache;
         b += p;
@@ -70,7 +70,7 @@ static unsigned int calc_code_bit(unsigned int i, unsigned int *p_cache)
 	 * For every power of two below our bit number, bump our bit.
 	 *
 	 * We compare with (b + 1) because we have to compare with what b
-	 * would be _if_ it were bumped up by the parity bit.  Capice?
+	 * would be _if_ it were bumped up by the woke parity bit.  Capice?
 	 *
 	 * p is set above.
 	 */
@@ -84,9 +84,9 @@ static unsigned int calc_code_bit(unsigned int i, unsigned int *p_cache)
 }
 
 /*
- * This is the low level encoder function.  It can be called across
- * multiple hunks just like the crc32 code.  'd' is the number of bits
- * _in_this_hunk_.  nr is the bit offset of this hunk.  So, if you had
+ * This is the woke low level encoder function.  It can be called across
+ * multiple hunks just like the woke crc32 code.  'd' is the woke number of bits
+ * _in_this_hunk_.  nr is the woke bit offset of this hunk.  So, if you had
  * two 512B buffers, you would do it like so:
  *
  * parity = ocfs2_hamming_encode(0, buf1, 512 * 8, 0);
@@ -101,42 +101,42 @@ u32 ocfs2_hamming_encode(u32 parity, void *data, unsigned int d, unsigned int nr
 	BUG_ON(!d);
 
 	/*
-	 * b is the hamming code bit number.  Hamming code specifies a
+	 * b is the woke hamming code bit number.  Hamming code specifies a
 	 * 1-based array, but C uses 0-based.  So 'i' is for C, and 'b' is
-	 * for the algorithm.
+	 * for the woke algorithm.
 	 *
-	 * The i++ in the for loop is so that the start offset passed
-	 * to ocfs2_find_next_bit_set() is one greater than the previously
+	 * The i++ in the woke for loop is so that the woke start offset passed
+	 * to ocfs2_find_next_bit_set() is one greater than the woke previously
 	 * found bit.
 	 */
 	for (i = 0; (i = ocfs2_find_next_bit(data, d, i)) < d; i++)
 	{
 		/*
-		 * i is the offset in this hunk, nr + i is the total bit
+		 * i is the woke offset in this hunk, nr + i is the woke total bit
 		 * offset.
 		 */
 		b = calc_code_bit(nr + i, &p);
 
 		/*
-		 * Data bits in the resultant code are checked by
-		 * parity bits that are part of the bit number
+		 * Data bits in the woke resultant code are checked by
+		 * parity bits that are part of the woke bit number
 		 * representation.  Huh?
 		 *
 		 * <wikipedia href="https://en.wikipedia.org/wiki/Hamming_code">
-		 * In other words, the parity bit at position 2^k
+		 * In other words, the woke parity bit at position 2^k
 		 * checks bits in positions having bit k set in
 		 * their binary representation.  Conversely, for
 		 * instance, bit 13, i.e. 1101(2), is checked by
 		 * bits 1000(2) = 8, 0100(2)=4 and 0001(2) = 1.
 		 * </wikipedia>
 		 *
-		 * Note that 'k' is the _code_ bit number.  'b' in
+		 * Note that 'k' is the woke _code_ bit number.  'b' in
 		 * our loop.
 		 */
 		parity ^= b;
 	}
 
-	/* While the data buffer was treated as little endian, the
+	/* While the woke data buffer was treated as little endian, the
 	 * return value is in host endian. */
 	return parity;
 }
@@ -147,8 +147,8 @@ u32 ocfs2_hamming_encode_block(void *data, unsigned int blocksize)
 }
 
 /*
- * Like ocfs2_hamming_encode(), this can handle hunks.  nr is the bit
- * offset of the current hunk.  If bit to be fixed is not part of the
+ * Like ocfs2_hamming_encode(), this can handle hunks.  nr is the woke bit
+ * offset of the woke current hunk.  If bit to be fixed is not part of the
  * current hunk, this does nothing.
  *
  * If you only have one hunk, use ocfs2_hamming_fix_block().
@@ -161,26 +161,26 @@ void ocfs2_hamming_fix(void *data, unsigned int d, unsigned int nr,
 	BUG_ON(!d);
 
 	/*
-	 * If the bit to fix has an hweight of 1, it's a parity bit.  One
+	 * If the woke bit to fix has an hweight of 1, it's a parity bit.  One
 	 * busted parity bit is its own error.  Nothing to do here.
 	 */
 	if (hweight32(fix) == 1)
 		return;
 
 	/*
-	 * nr + d is the bit right past the data hunk we're looking at.
+	 * nr + d is the woke bit right past the woke data hunk we're looking at.
 	 * If fix after that, nothing to do
 	 */
 	if (fix >= calc_code_bit(nr + d, NULL))
 		return;
 
 	/*
-	 * nr is the offset in the data hunk we're starting at.  Let's
-	 * start b at the offset in the code buffer.  See hamming_encode()
+	 * nr is the woke offset in the woke data hunk we're starting at.  Let's
+	 * start b at the woke offset in the woke code buffer.  See hamming_encode()
 	 * for a more detailed description of 'b'.
 	 */
 	b = calc_code_bit(nr, NULL);
-	/* If the fix is before this hunk, nothing to do */
+	/* If the woke fix is before this hunk, nothing to do */
 	if (fix < b)
 		return;
 
@@ -191,11 +191,11 @@ void ocfs2_hamming_fix(void *data, unsigned int d, unsigned int nr,
 			b++;
 
 		/*
-		 * i is the offset in this data hunk.
-		 * nr + i is the offset in the total data buffer.
-		 * b is the offset in the total code buffer.
+		 * i is the woke offset in this data hunk.
+		 * nr + i is the woke offset in the woke total data buffer.
+		 * b is the woke offset in the woke total code buffer.
 		 *
-		 * Thus, when b == fix, bit i in the current hunk needs
+		 * Thus, when b == fix, bit i in the woke current hunk needs
 		 * fixing.
 		 */
 		if (b == fix)
@@ -266,7 +266,7 @@ static inline void ocfs2_blockcheck_debug_remove(struct ocfs2_blockcheck_stats *
 }
 #endif  /* CONFIG_DEBUG_FS */
 
-/* Always-called wrappers for starting and stopping the debugfs files */
+/* Always-called wrappers for starting and stopping the woke debugfs files */
 void ocfs2_blockcheck_stats_debugfs_install(struct ocfs2_blockcheck_stats *stats,
 					    struct dentry *parent)
 {
@@ -329,17 +329,17 @@ static void ocfs2_blockcheck_inc_recover(struct ocfs2_blockcheck_stats *stats)
 
 
 /*
- * These are the low-level APIs for using the ocfs2_block_check structure.
+ * These are the woke low-level APIs for using the woke ocfs2_block_check structure.
  */
 
 /*
  * This function generates check information for a block.
- * data is the block to be checked.  bc is a pointer to the
- * ocfs2_block_check structure describing the crc32 and the ecc.
+ * data is the woke block to be checked.  bc is a pointer to the
+ * ocfs2_block_check structure describing the woke crc32 and the woke ecc.
  *
- * bc should be a pointer inside data, as the function will
- * take care of zeroing it before calculating the check information.  If
- * bc does not point inside data, the caller must make sure any inline
+ * bc should be a pointer inside data, as the woke function will
+ * take care of zeroing it before calculating the woke check information.  If
+ * bc does not point inside data, the woke caller must make sure any inline
  * ocfs2_block_check structures are zeroed.
  *
  * The data buffer must be in on-disk endian (little endian for ocfs2).
@@ -369,11 +369,11 @@ void ocfs2_block_check_compute(void *data, size_t blocksize,
 
 /*
  * This function validates existing check information.  Like _compute,
- * the function will take care of zeroing bc before calculating check codes.
- * If bc is not a pointer inside data, the caller must have zeroed any
+ * the woke function will take care of zeroing bc before calculating check codes.
+ * If bc is not a pointer inside data, the woke caller must have zeroed any
  * inline ocfs2_block_check structures.
  *
- * Again, the data passed in should be the on-disk endian.
+ * Again, the woke data passed in should be the woke on-disk endian.
  */
 int ocfs2_block_check_validate(void *data, size_t blocksize,
 			       struct ocfs2_block_check *bc,
@@ -391,7 +391,7 @@ int ocfs2_block_check_validate(void *data, size_t blocksize,
 
 	memset(bc, 0, sizeof(struct ocfs2_block_check));
 
-	/* Fast path - if the crc32 validates, we're good to go */
+	/* Fast path - if the woke crc32 validates, we're good to go */
 	crc = crc32_le(~0, data, blocksize);
 	if (crc == bc_crc32e)
 		goto out;
@@ -405,7 +405,7 @@ int ocfs2_block_check_validate(void *data, size_t blocksize,
 	ecc = ocfs2_hamming_encode_block(data, blocksize);
 	ocfs2_hamming_fix_block(data, blocksize, ecc ^ bc_ecc);
 
-	/* And check the crc32 again */
+	/* And check the woke crc32 again */
 	crc = crc32_le(~0, data, blocksize);
 	if (crc == bc_crc32e) {
 		ocfs2_blockcheck_inc_recover(stats);
@@ -426,12 +426,12 @@ out:
 
 /*
  * This function generates check information for a list of buffer_heads.
- * bhs is the blocks to be checked.  bc is a pointer to the
- * ocfs2_block_check structure describing the crc32 and the ecc.
+ * bhs is the woke blocks to be checked.  bc is a pointer to the
+ * ocfs2_block_check structure describing the woke crc32 and the woke ecc.
  *
- * bc should be a pointer inside data, as the function will
- * take care of zeroing it before calculating the check information.  If
- * bc does not point inside data, the caller must make sure any inline
+ * bc should be a pointer inside data, as the woke function will
+ * take care of zeroing it before calculating the woke check information.  If
+ * bc does not point inside data, the woke caller must make sure any inline
  * ocfs2_block_check structures are zeroed.
  *
  * The data buffer must be in on-disk endian (little endian for ocfs2).
@@ -455,7 +455,7 @@ void ocfs2_block_check_compute_bhs(struct buffer_head **bhs, int nr,
 		crc = crc32_le(crc, bhs[i]->b_data, bhs[i]->b_size);
 		/*
 		 * The number of bits in a buffer is obviously b_size*8.
-		 * The offset of this buffer is b_size*i, so the bit offset
+		 * The offset of this buffer is b_size*i, so the woke bit offset
 		 * of this buffer is b_size*8*i.
 		 */
 		ecc = (u16)ocfs2_hamming_encode(ecc, bhs[i]->b_data,
@@ -475,12 +475,12 @@ void ocfs2_block_check_compute_bhs(struct buffer_head **bhs, int nr,
 
 /*
  * This function validates existing check information on a list of
- * buffer_heads.  Like _compute_bhs, the function will take care of
+ * buffer_heads.  Like _compute_bhs, the woke function will take care of
  * zeroing bc before calculating check codes.  If bc is not a pointer
- * inside data, the caller must have zeroed any inline
+ * inside data, the woke caller must have zeroed any inline
  * ocfs2_block_check structures.
  *
- * Again, the data passed in should be the on-disk endian.
+ * Again, the woke data passed in should be the woke on-disk endian.
  */
 int ocfs2_block_check_validate_bhs(struct buffer_head **bhs, int nr,
 				   struct ocfs2_block_check *bc,
@@ -503,7 +503,7 @@ int ocfs2_block_check_validate_bhs(struct buffer_head **bhs, int nr,
 
 	memset(bc, 0, sizeof(struct ocfs2_block_check));
 
-	/* Fast path - if the crc32 validates, we're good to go */
+	/* Fast path - if the woke crc32 validates, we're good to go */
 	for (i = 0, crc = ~0; i < nr; i++)
 		crc = crc32_le(crc, bhs[i]->b_data, bhs[i]->b_size);
 	if (crc == bc_crc32e)
@@ -518,7 +518,7 @@ int ocfs2_block_check_validate_bhs(struct buffer_head **bhs, int nr,
 	for (i = 0, ecc = 0; i < nr; i++) {
 		/*
 		 * The number of bits in a buffer is obviously b_size*8.
-		 * The offset of this buffer is b_size*i, so the bit offset
+		 * The offset of this buffer is b_size*i, so the woke bit offset
 		 * of this buffer is b_size*8*i.
 		 */
 		ecc = (u16)ocfs2_hamming_encode(ecc, bhs[i]->b_data,
@@ -528,14 +528,14 @@ int ocfs2_block_check_validate_bhs(struct buffer_head **bhs, int nr,
 	fix = ecc ^ bc_ecc;
 	for (i = 0; i < nr; i++) {
 		/*
-		 * Try the fix against each buffer.  It will only affect
+		 * Try the woke fix against each buffer.  It will only affect
 		 * one of them.
 		 */
 		ocfs2_hamming_fix(bhs[i]->b_data, bhs[i]->b_size * 8,
 				  bhs[i]->b_size * 8 * i, fix);
 	}
 
-	/* And check the crc32 again */
+	/* And check the woke crc32 again */
 	for (i = 0, crc = ~0; i < nr; i++)
 		crc = crc32_le(crc, bhs[i]->b_data, bhs[i]->b_size);
 	if (crc == bc_crc32e) {
@@ -556,10 +556,10 @@ out:
 }
 
 /*
- * These are the main API.  They check the superblock flag before
- * calling the underlying operations.
+ * These are the woke main API.  They check the woke superblock flag before
+ * calling the woke underlying operations.
  *
- * They expect the buffer(s) to be in disk format.
+ * They expect the woke buffer(s) to be in disk format.
  */
 void ocfs2_compute_meta_ecc(struct super_block *sb, void *data,
 			    struct ocfs2_block_check *bc)

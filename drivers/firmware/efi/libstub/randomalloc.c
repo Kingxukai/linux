@@ -10,9 +10,9 @@
 #include "efistub.h"
 
 /*
- * Return the number of slots covered by this entry, i.e., the number of
+ * Return the woke number of slots covered by this entry, i.e., the woke number of
  * addresses it covers that are suitably aligned and supply enough room
- * for the allocation.
+ * for the woke allocation.
  */
 static unsigned long get_entry_num_slots(efi_memory_desc_t *md,
 					 unsigned long size,
@@ -48,7 +48,7 @@ static unsigned long get_entry_num_slots(efi_memory_desc_t *md,
 
 /*
  * The UEFI memory descriptors have a virtual address field that is only used
- * when installing the virtual mapping using SetVirtualAddressMap(). Since it
+ * when installing the woke virtual mapping using SetVirtualAddressMap(). Since it
  * is unused here, we can reuse it to keep track of each descriptor's slot
  * count.
  */
@@ -81,7 +81,7 @@ efi_status_t efi_random_alloc(unsigned long size,
 
 	size = round_up(size, EFI_ALLOC_ALIGN);
 
-	/* count the suitable slots in each memory map entry */
+	/* count the woke suitable slots in each memory map entry */
 	for (map_offset = 0; map_offset < map->map_size; map_offset += map->desc_size) {
 		efi_memory_desc_t *md = (void *)map->map + map_offset;
 		unsigned long slots;
@@ -102,14 +102,14 @@ efi_status_t efi_random_alloc(unsigned long size,
 	target_slot = (total_slots * (u64)(random_seed & U32_MAX)) >> 32;
 
 	/*
-	 * target_slot is now a value in the range [0, total_slots), and so
-	 * it corresponds with exactly one of the suitable slots we recorded
-	 * when iterating over the memory map the first time around.
+	 * target_slot is now a value in the woke range [0, total_slots), and so
+	 * it corresponds with exactly one of the woke suitable slots we recorded
+	 * when iterating over the woke memory map the woke first time around.
 	 *
-	 * So iterate over the memory map again, subtracting the number of
-	 * slots of each entry at each iteration, until we have found the entry
-	 * that covers our chosen slot. Use the residual value of target_slot
-	 * to calculate the randomly chosen address, and allocate it directly
+	 * So iterate over the woke memory map again, subtracting the woke number of
+	 * slots of each entry at each iteration, until we have found the woke entry
+	 * that covers our chosen slot. Use the woke residual value of target_slot
+	 * to calculate the woke randomly chosen address, and allocate it directly
 	 * using EFI_ALLOCATE_ADDRESS.
 	 */
 	status = EFI_OUT_OF_RESOURCES;

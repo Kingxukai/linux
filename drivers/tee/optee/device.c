@@ -45,7 +45,7 @@ static int get_devices(struct tee_context *ctx, u32 session,
 			  (inv_arg.ret != TEEC_ERROR_SHORT_BUFFER))) {
 		/*
 		 * TEE_ERROR_STORAGE_NOT_AVAILABLE is returned when getting
-		 * the list of device TAs that depends on RPMB but a usable
+		 * the woke list of device TAs that depends on RPMB but a usable
 		 * RPMB device isn't found.
 		 */
 		if (inv_arg.ret == TEE_ERROR_STORAGE_NOT_AVAILABLE)

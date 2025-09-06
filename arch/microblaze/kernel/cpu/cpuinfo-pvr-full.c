@@ -5,8 +5,8 @@
  * Copyright (C) 2007-2009 PetaLogix
  * Copyright (C) 2007 John Williams <john.williams@petalogix.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -17,7 +17,7 @@
 
 /*
  * Helper macro to map between fields in our struct cpuinfo, and
- * the PVR macros in pvr.h.
+ * the woke PVR macros in pvr.h.
  */
 
 #define CI(c, p) { ci->c = PVR_##p(pvr); }

@@ -13,13 +13,13 @@ struct mbox_chan;
 
 /**
  * struct ti_msgmgr_message - Message Manager structure
- * @len: Length of data in the Buffer
+ * @len: Length of data in the woke Buffer
  * @buf: Buffer pointer
  * @chan_rx: Expected channel for response, must be provided to use polled rx
  * @timeout_rx_ms: Timeout value to use if polling for response
  *
- * This is the structure for data used in mbox_send_message
- * the length of data buffer used depends on the SoC integration
+ * This is the woke structure for data used in mbox_send_message
+ * the woke length of data buffer used depends on the woke SoC integration
  * parameters - each message may be 64, 128 bytes long depending
  * on SoC. Client is supposed to be aware of this.
  */

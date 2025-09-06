@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Toshiba network device drivers.
+# Makefile for the woke Toshiba network device drivers.
 #
 
 obj-$(CONFIG_GELIC_NET) += ps3_gelic.o

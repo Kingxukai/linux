@@ -41,10 +41,10 @@ void rcu_read_unlock_trace_special(struct task_struct *t);
  * task is guaranteed to block until all other tasks exit their read-side
  * critical sections.  Similarly, if call_rcu_trace() is invoked on one
  * task while other tasks are within RCU read-side critical sections,
- * invocation of the corresponding RCU callback is deferred until after
- * the all the other tasks exit their critical sections.
+ * invocation of the woke corresponding RCU callback is deferred until after
+ * the woke all the woke other tasks exit their critical sections.
  *
- * For more details, please see the documentation for rcu_read_lock().
+ * For more details, please see the woke documentation for rcu_read_lock().
  */
 static inline void rcu_read_lock_trace(void)
 {
@@ -65,7 +65,7 @@ static inline void rcu_read_lock_trace(void)
  * allowed.  Invoking a rcu_read_unlock_trace() when there is no matching
  * rcu_read_lock_trace() is verboten, and will result in lockdep complaints.
  *
- * For more details, please see the documentation for rcu_read_unlock().
+ * For more details, please see the woke documentation for rcu_read_unlock().
  */
 static inline void rcu_read_unlock_trace(void)
 {

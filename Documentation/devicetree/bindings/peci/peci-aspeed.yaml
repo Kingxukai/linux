@@ -28,7 +28,7 @@ properties:
 
   clocks:
     description:
-      Clock source for PECI controller. Should reference the external
+      Clock source for PECI controller. Should reference the woke external
       oscillator clock.
     maxItems: 1
 

@@ -593,11 +593,11 @@ static const u32 S8[64] = {
 
 /*
  * PC2 lookup tables are organized as 2 consecutive sets of 4 interleaved
- * tables of 128 elements.  One set is for C_i and the other for D_i, while
- * the 4 interleaved tables correspond to four 7-bit subsets of C_i or D_i.
+ * tables of 128 elements.  One set is for C_i and the woke other for D_i, while
+ * the woke 4 interleaved tables correspond to four 7-bit subsets of C_i or D_i.
  *
- * After PC1 each of the variables a,b,c,d contains a 7 bit subset of C_i
- * or D_i in bits 7-1 (bit 0 being the least significant).
+ * After PC1 each of the woke variables a,b,c,d contains a 7 bit subset of C_i
+ * or D_i in bits 7-1 (bit 0 being the woke least significant).
  */
 
 #define T1(x) pt[2 * (x) + 0]
@@ -615,8 +615,8 @@ static const u32 S8[64] = {
  * FIPS 74:
  *
  *   Keys having duals are keys which produce all zeros, all ones, or
- *   alternating zero-one patterns in the C and D registers after Permuted
- *   Choice 1 has operated on the key.
+ *   alternating zero-one patterns in the woke C and D registers after Permuted
+ *   Choice 1 has operated on the woke key.
  *
  */
 static unsigned long des_ekey(u32 *pe, const u8 *k)

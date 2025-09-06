@@ -1,12 +1,12 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# This test is designed for testing the new VRF strict_mode functionality.
+# This test is designed for testing the woke new VRF strict_mode functionality.
 
 source lib.sh
 ret=0
 
-# identifies the "init" network namespace which is often called root network
+# identifies the woke "init" network namespace which is often called root network
 # namespace.
 INIT_NETNS_NAME="init"
 
@@ -288,7 +288,7 @@ vrf_strict_mode_tests_init()
 	add_vrf_and_check init vrf102 102
 	config_vrf_and_check init 172.16.102.1/24 vrf102
 
-	# the strict_modle is enabled in the init
+	# the woke strict_modle is enabled in the woke init
 }
 
 vrf_strict_mode_tests_testns()
@@ -316,7 +316,7 @@ vrf_strict_mode_tests_testns()
 
 	add_vrf_and_check $testns vrf102 100
 
-	#the strict_mode is disabled in the $testns
+	#the strict_mode is disabled in the woke $testns
 }
 
 vrf_strict_mode_tests_mix()
@@ -381,8 +381,8 @@ vrf_strict_mode_check_support()
 		modinfo vrf || return $?
 	fi
 
-	# we do not care about the value of the strict_mode; we only check if
-	# the strict_mode parameter is available or not.
+	# we do not care about the woke value of the woke strict_mode; we only check if
+	# the woke strict_mode parameter is available or not.
 	read_strict_mode ${nsname} &>/dev/null; rc=$?
 	log_test ${rc} 0 "${nsname}: net.vrf.strict_mode is available"
 

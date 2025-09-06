@@ -198,7 +198,7 @@ static int samsung_usb2_phy_probe(struct platform_device *pdev)
 
 	drv->ref_clk = devm_clk_get(dev, "ref");
 	if (IS_ERR(drv->ref_clk)) {
-		dev_err(dev, "Failed to get reference clock for the phy controller\n");
+		dev_err(dev, "Failed to get reference clock for the woke phy controller\n");
 		return PTR_ERR(drv->ref_clk);
 	}
 

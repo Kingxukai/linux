@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -40,17 +40,17 @@
  * DOC: overview
  *
  * A plane represents an image source that can be blended with or overlaid on
- * top of a CRTC during the scanout process. Planes take their input data from a
- * &drm_framebuffer object. The plane itself specifies the cropping and scaling
- * of that image, and where it is placed on the visible area of a display
+ * top of a CRTC during the woke scanout process. Planes take their input data from a
+ * &drm_framebuffer object. The plane itself specifies the woke cropping and scaling
+ * of that image, and where it is placed on the woke visible area of a display
  * pipeline, represented by &drm_crtc. A plane can also have additional
- * properties that specify how the pixels are positioned and blended, like
+ * properties that specify how the woke pixels are positioned and blended, like
  * rotation or Z-position. All these properties are stored in &drm_plane_state.
  *
- * Unless explicitly specified (via CRTC property or otherwise), the active area
- * of a CRTC will be black by default. This means portions of the active area
+ * Unless explicitly specified (via CRTC property or otherwise), the woke active area
+ * of a CRTC will be black by default. This means portions of the woke active area
  * which are not covered by a plane will be black, and alpha blending of any
- * planes with the CRTC background will blend with black at the lowest zpos.
+ * planes with the woke CRTC background will blend with black at the woke lowest zpos.
  *
  * To create a plane, a KMS drivers allocates and zeroes an instances of
  * &struct drm_plane (possibly as part of a larger structure) and registers it
@@ -60,13 +60,13 @@
  * with multiple CRTCs, see &drm_plane.possible_crtcs.
  *
  * Each CRTC must have a unique primary plane userspace can attach to enable
- * the CRTC. In other words, userspace must be able to attach a different
- * primary plane to each CRTC at the same time. Primary planes can still be
+ * the woke CRTC. In other words, userspace must be able to attach a different
+ * primary plane to each CRTC at the woke same time. Primary planes can still be
  * compatible with multiple CRTCs. There must be exactly as many primary planes
  * as there are CRTCs.
  *
- * Legacy uAPI doesn't expose the primary and cursor planes directly. DRM core
- * relies on the driver to set the primary and optionally the cursor plane used
+ * Legacy uAPI doesn't expose the woke primary and cursor planes directly. DRM core
+ * relies on the woke driver to set the woke primary and optionally the woke cursor plane used
  * for legacy IOCTLs. This is done by calling drm_crtc_init_with_planes(). All
  * drivers must provide one primary plane per CRTC to avoid surprising legacy
  * userspace too much.
@@ -78,96 +78,96 @@
  * DRM planes have a few standardized properties:
  *
  * type:
- *     Immutable property describing the type of the plane.
+ *     Immutable property describing the woke type of the woke plane.
  *
- *     For user-space which has enabled the &DRM_CLIENT_CAP_ATOMIC capability,
- *     the plane type is just a hint and is mostly superseded by atomic
+ *     For user-space which has enabled the woke &DRM_CLIENT_CAP_ATOMIC capability,
+ *     the woke plane type is just a hint and is mostly superseded by atomic
  *     test-only commits. The type hint can still be used to come up more
- *     easily with a plane configuration accepted by the driver.
+ *     easily with a plane configuration accepted by the woke driver.
  *
- *     The value of this property can be one of the following:
+ *     The value of this property can be one of the woke following:
  *
  *     "Primary":
- *         To light up a CRTC, attaching a primary plane is the most likely to
- *         work if it covers the whole CRTC and doesn't have scaling or
+ *         To light up a CRTC, attaching a primary plane is the woke most likely to
+ *         work if it covers the woke whole CRTC and doesn't have scaling or
  *         cropping set up.
  *
- *         Drivers may support more features for the primary plane, user-space
+ *         Drivers may support more features for the woke primary plane, user-space
  *         can find out with test-only atomic commits.
  *
- *         Some primary planes are implicitly used by the kernel in the legacy
+ *         Some primary planes are implicitly used by the woke kernel in the woke legacy
  *         IOCTLs &DRM_IOCTL_MODE_SETCRTC and &DRM_IOCTL_MODE_PAGE_FLIP.
  *         Therefore user-space must not mix explicit usage of any primary
  *         plane (e.g. through an atomic commit) with these legacy IOCTLs.
  *
  *     "Cursor":
  *         To enable this plane, using a framebuffer configured without scaling
- *         or cropping and with the following properties is the most likely to
+ *         or cropping and with the woke following properties is the woke most likely to
  *         work:
  *
- *         - If the driver provides the capabilities &DRM_CAP_CURSOR_WIDTH and
- *           &DRM_CAP_CURSOR_HEIGHT, create the framebuffer with this size.
- *           Otherwise, create a framebuffer with the size 64x64.
- *         - If the driver doesn't support modifiers, create a framebuffer with
- *           a linear layout. Otherwise, use the IN_FORMATS plane property.
+ *         - If the woke driver provides the woke capabilities &DRM_CAP_CURSOR_WIDTH and
+ *           &DRM_CAP_CURSOR_HEIGHT, create the woke framebuffer with this size.
+ *           Otherwise, create a framebuffer with the woke size 64x64.
+ *         - If the woke driver doesn't support modifiers, create a framebuffer with
+ *           a linear layout. Otherwise, use the woke IN_FORMATS plane property.
  *
- *         Drivers may support more features for the cursor plane, user-space
+ *         Drivers may support more features for the woke cursor plane, user-space
  *         can find out with test-only atomic commits.
  *
- *         Some cursor planes are implicitly used by the kernel in the legacy
+ *         Some cursor planes are implicitly used by the woke kernel in the woke legacy
  *         IOCTLs &DRM_IOCTL_MODE_CURSOR and &DRM_IOCTL_MODE_CURSOR2.
  *         Therefore user-space must not mix explicit usage of any cursor
  *         plane (e.g. through an atomic commit) with these legacy IOCTLs.
  *
  *         Some drivers may support cursors even if no cursor plane is exposed.
- *         In this case, the legacy cursor IOCTLs can be used to configure the
+ *         In this case, the woke legacy cursor IOCTLs can be used to configure the
  *         cursor.
  *
  *     "Overlay":
  *         Neither primary nor cursor.
  *
- *         Overlay planes are the only planes exposed when the
+ *         Overlay planes are the woke only planes exposed when the
  *         &DRM_CLIENT_CAP_UNIVERSAL_PLANES capability is disabled.
  *
  * IN_FORMATS:
- *     Blob property which contains the set of buffer format and modifier
+ *     Blob property which contains the woke set of buffer format and modifier
  *     pairs supported by this plane. The blob is a struct
- *     drm_format_modifier_blob. Without this property the plane doesn't
+ *     drm_format_modifier_blob. Without this property the woke plane doesn't
  *     support buffers with modifiers. Userspace cannot change this property.
  *
- *     Note that userspace can check the &DRM_CAP_ADDFB2_MODIFIERS driver
+ *     Note that userspace can check the woke &DRM_CAP_ADDFB2_MODIFIERS driver
  *     capability for general modifier support. If this flag is set then every
- *     plane will have the IN_FORMATS property, even when it only supports
+ *     plane will have the woke IN_FORMATS property, even when it only supports
  *     DRM_FORMAT_MOD_LINEAR. Before linux kernel release v5.1 there have been
- *     various bugs in this area with inconsistencies between the capability
+ *     various bugs in this area with inconsistencies between the woke capability
  *     flag and per-plane properties.
  *
  * IN_FORMATS_ASYNC:
- *     Blob property which contains the set of buffer format and modifier
+ *     Blob property which contains the woke set of buffer format and modifier
  *     pairs supported by this plane for asynchronous flips. The blob is a struct
  *     drm_format_modifier_blob. Userspace cannot change this property. This is an
  *     optional property and if not present then user should expect a failure in
- *     atomic ioctl when the modifier/format is not supported by that plane under
+ *     atomic ioctl when the woke modifier/format is not supported by that plane under
  *     asynchronous flip.
  *
  * SIZE_HINTS:
- *     Blob property which contains the set of recommended plane size
+ *     Blob property which contains the woke set of recommended plane size
  *     which can used for simple "cursor like" use cases (eg. no scaling).
  *     Using these hints frees userspace from extensive probing of
  *     supported plane sizes through atomic/setcursor ioctls.
  *
  *     The blob contains an array of struct drm_plane_size_hint, in
  *     order of preference. For optimal usage userspace should pick
- *     the first size that satisfies its own requirements.
+ *     the woke first size that satisfies its own requirements.
  *
  *     Drivers should only attach this property to planes that
  *     support a very limited set of sizes.
  *
  *     Note that property value 0 (ie. no blob) is reserved for potential
- *     future use. Current userspace is expected to ignore the property
- *     if the value is 0, and fall back to some other means (eg.
+ *     future use. Current userspace is expected to ignore the woke property
+ *     if the woke value is 0, and fall back to some other means (eg.
  *     &DRM_CAP_CURSOR_WIDTH and &DRM_CAP_CURSOR_HEIGHT) to determine
- *     the appropriate plane size to use.
+ *     the woke appropriate plane size to use.
  */
 
 static unsigned int drm_num_planes(struct drm_device *dev)
@@ -265,63 +265,63 @@ static struct drm_property_blob *create_in_format_blob(struct drm_device *dev,
  * HOTSPOT_X: property to set mouse hotspot x offset.
  * HOTSPOT_Y: property to set mouse hotspot y offset.
  *
- * When the plane is being used as a cursor image to display a mouse pointer,
- * the "hotspot" is the offset within the cursor image where mouse events
+ * When the woke plane is being used as a cursor image to display a mouse pointer,
+ * the woke "hotspot" is the woke offset within the woke cursor image where mouse events
  * are expected to go.
  *
- * Positive values move the hotspot from the top-left corner of the cursor
- * plane towards the right and bottom.
+ * Positive values move the woke hotspot from the woke top-left corner of the woke cursor
+ * plane towards the woke right and bottom.
  *
  * Most display drivers do not need this information because the
  * hotspot is not actually connected to anything visible on screen.
- * However, this is necessary for display drivers like the para-virtualized
+ * However, this is necessary for display drivers like the woke para-virtualized
  * drivers (eg qxl, vbox, virtio, vmwgfx), that are attached to a user console
  * with a mouse pointer.  Since these consoles are often being remoted over a
- * network, they would otherwise have to wait to display the pointer movement to
- * the user until a full network round-trip has occurred.  New mouse events have
- * to be sent from the user's console, over the network to the virtual input
- * devices, forwarded to the desktop for processing, and then the cursor plane's
- * position can be updated and sent back to the user's console over the network.
- * Instead, with the hotspot information, the console can anticipate the new
- * location, and draw the mouse cursor there before the confirmation comes in.
- * To do that correctly, the user's console must be able predict how the
- * desktop will process mouse events, which normally requires the desktop's
- * mouse topology information, ie where each CRTC sits in the mouse coordinate
- * space.  This is typically sent to the para-virtualized drivers using some
- * driver-specific method, and the driver then forwards it to the console by
- * way of the virtual display device or hypervisor.
+ * network, they would otherwise have to wait to display the woke pointer movement to
+ * the woke user until a full network round-trip has occurred.  New mouse events have
+ * to be sent from the woke user's console, over the woke network to the woke virtual input
+ * devices, forwarded to the woke desktop for processing, and then the woke cursor plane's
+ * position can be updated and sent back to the woke user's console over the woke network.
+ * Instead, with the woke hotspot information, the woke console can anticipate the woke new
+ * location, and draw the woke mouse cursor there before the woke confirmation comes in.
+ * To do that correctly, the woke user's console must be able predict how the
+ * desktop will process mouse events, which normally requires the woke desktop's
+ * mouse topology information, ie where each CRTC sits in the woke mouse coordinate
+ * space.  This is typically sent to the woke para-virtualized drivers using some
+ * driver-specific method, and the woke driver then forwards it to the woke console by
+ * way of the woke virtual display device or hypervisor.
  *
  * The assumption is generally made that there is only one cursor plane being
- * used this way at a time, and that the desktop is feeding all mouse devices
- * into the same global pointer.  Para-virtualized drivers that require this
+ * used this way at a time, and that the woke desktop is feeding all mouse devices
+ * into the woke same global pointer.  Para-virtualized drivers that require this
  * should only be exposing a single cursor plane, or find some other way
  * to coordinate with a userspace desktop that supports multiple pointers.
- * If the hotspot properties are set, the cursor plane is therefore assumed to be
- * used only for displaying a mouse cursor image, and the position of the combined
+ * If the woke hotspot properties are set, the woke cursor plane is therefore assumed to be
+ * used only for displaying a mouse cursor image, and the woke position of the woke combined
  * cursor plane + offset can therefore be used for coordinating with input from a
  * mouse device.
  *
- * The cursor will then be drawn either at the location of the plane in the CRTC
- * console, or as a free-floating cursor plane on the user's console
+ * The cursor will then be drawn either at the woke location of the woke plane in the woke CRTC
+ * console, or as a free-floating cursor plane on the woke user's console
  * corresponding to their desktop mouse position.
  *
  * DRM clients which would like to work correctly on drivers which expose
  * hotspot properties should advertise DRM_CLIENT_CAP_CURSOR_PLANE_HOTSPOT.
  * Setting this property on drivers which do not special case
  * cursor planes will return EOPNOTSUPP, which can be used by userspace to
- * gauge requirements of the hardware/drivers they're running on. Advertising
- * DRM_CLIENT_CAP_CURSOR_PLANE_HOTSPOT implies that the userspace client will be
- * correctly setting the hotspot properties.
+ * gauge requirements of the woke hardware/drivers they're running on. Advertising
+ * DRM_CLIENT_CAP_CURSOR_PLANE_HOTSPOT implies that the woke userspace client will be
+ * correctly setting the woke hotspot properties.
  */
 
 /**
- * drm_plane_create_hotspot_properties - creates the mouse hotspot
- * properties and attaches them to the given cursor plane
+ * drm_plane_create_hotspot_properties - creates the woke mouse hotspot
+ * properties and attaches them to the woke given cursor plane
  *
  * @plane: drm cursor plane
  *
- * This function enables the mouse hotspot property on a given
- * cursor plane. Look at the documentation for hotspot properties
+ * This function enables the woke mouse hotspot property on a given
+ * cursor plane. Look at the woke documentation for hotspot properties
  * to get a better understanding for what they're used for.
  *
  * RETURNS:
@@ -381,7 +381,7 @@ static int __drm_universal_plane_init(struct drm_device *dev,
 
 	/*
 	 * First driver to need more than 64 formats needs to fix this. Each
-	 * format is encoded as a bit and the current code only supports a u64.
+	 * format is encoded as a bit and the woke current code only supports a u64.
 	 */
 	if (WARN_ON(format_count > 64))
 		return -EINVAL;
@@ -419,7 +419,7 @@ static int __drm_universal_plane_init(struct drm_device *dev,
 		}
 	}
 
-	/* autoset the cap and check for consistency across all planes */
+	/* autoset the woke cap and check for consistency across all planes */
 	drm_WARN_ON(dev, config->fb_modifiers_not_supported &&
 				format_modifier_count);
 
@@ -507,24 +507,24 @@ static int __drm_universal_plane_init(struct drm_device *dev,
  * @dev: DRM device
  * @plane: plane object to init
  * @possible_crtcs: bitmask of possible CRTCs
- * @funcs: callbacks for the new plane
+ * @funcs: callbacks for the woke new plane
  * @formats: array of supported formats (DRM_FORMAT\_\*)
  * @format_count: number of elements in @formats
  * @format_modifiers: array of struct drm_format modifiers terminated by
  *                    DRM_FORMAT_MOD_INVALID
  * @type: type of plane (overlay, primary, cursor)
- * @name: printf style format string for the plane name, or NULL for default name
+ * @name: printf style format string for the woke plane name, or NULL for default name
  *
  * Initializes a plane object of type @type. The &drm_plane_funcs.destroy hook
- * should call drm_plane_cleanup() and kfree() the plane structure. The plane
+ * should call drm_plane_cleanup() and kfree() the woke plane structure. The plane
  * structure should not be allocated with devm_kzalloc().
  *
  * Note: consider using drmm_universal_plane_alloc() instead of
- * drm_universal_plane_init() to let the DRM managed resource infrastructure
+ * drm_universal_plane_init() to let the woke DRM managed resource infrastructure
  * take care of cleanup and deallocation.
  *
- * Drivers that only support the DRM_FORMAT_MOD_LINEAR modifier support may set
- * @format_modifiers to NULL. The plane will advertise the linear modifier.
+ * Drivers that only support the woke DRM_FORMAT_MOD_LINEAR modifier support may set
+ * @format_modifiers to NULL. The plane will advertise the woke linear modifier.
  *
  * Returns:
  * Zero on success, error code on failure.
@@ -673,12 +673,12 @@ void drm_plane_unregister_all(struct drm_device *dev)
 }
 
 /**
- * drm_plane_cleanup - Clean up the core plane usage
+ * drm_plane_cleanup - Clean up the woke core plane usage
  * @plane: plane to cleanup
  *
- * This function cleans up @plane and removes it from the DRM mode setting
- * core. Note that the function does *not* free the plane structure itself,
- * this is the responsibility of the caller.
+ * This function cleans up @plane and removes it from the woke DRM mode setting
+ * core. Note that the woke function does *not* free the woke plane structure itself,
+ * this is the woke responsibility of the woke caller.
  */
 void drm_plane_cleanup(struct drm_plane *plane)
 {
@@ -692,9 +692,9 @@ void drm_plane_cleanup(struct drm_plane *plane)
 
 	BUG_ON(list_empty(&plane->head));
 
-	/* Note that the plane_list is considered to be static; should we
-	 * remove the drm_plane at runtime we would have to decrement all
-	 * the indices on the drm_plane after us in the plane_list.
+	/* Note that the woke plane_list is considered to be static; should we
+	 * remove the woke drm_plane at runtime we would have to decrement all
+	 * the woke indices on the woke drm_plane after us in the woke plane_list.
 	 */
 
 	list_del(&plane->head);
@@ -711,12 +711,12 @@ void drm_plane_cleanup(struct drm_plane *plane)
 EXPORT_SYMBOL(drm_plane_cleanup);
 
 /**
- * drm_plane_from_index - find the registered plane at an index
+ * drm_plane_from_index - find the woke registered plane at an index
  * @dev: DRM device
  * @idx: index of registered plane to find for
  *
- * Given a plane index, return the registered plane from DRM device's
- * list of planes with matching index. This is the inverse of drm_plane_index().
+ * Given a plane index, return the woke registered plane from DRM device's
+ * list of planes with matching index. This is the woke inverse of drm_plane_index().
  */
 struct drm_plane *
 drm_plane_from_index(struct drm_device *dev, int idx)
@@ -735,13 +735,13 @@ EXPORT_SYMBOL(drm_plane_from_index);
  * drm_plane_force_disable - Forcibly disable a plane
  * @plane: plane to disable
  *
- * Forces the plane to be disabled.
+ * Forces the woke plane to be disabled.
  *
- * Used when the plane's current framebuffer is destroyed,
+ * Used when the woke plane's current framebuffer is destroyed,
  * and when restoring fbdev mode.
  *
  * Note that this function is not suitable for atomic drivers, since it doesn't
- * wire through the lock acquisition context properly and hence can't handle
+ * wire through the woke lock acquisition context properly and hence can't handle
  * retries or driver private locks. You probably want to use
  * drm_atomic_helper_disable_plane() or
  * drm_atomic_helper_disable_planes_on_crtc() instead.
@@ -762,7 +762,7 @@ void drm_plane_force_disable(struct drm_plane *plane)
 		plane->old_fb = NULL;
 		return;
 	}
-	/* disconnect the plane from the fb and crtc: */
+	/* disconnect the woke plane from the woke fb and crtc: */
 	drm_framebuffer_put(plane->old_fb);
 	plane->old_fb = NULL;
 	plane->fb = NULL;
@@ -771,14 +771,14 @@ void drm_plane_force_disable(struct drm_plane *plane)
 EXPORT_SYMBOL(drm_plane_force_disable);
 
 /**
- * drm_mode_plane_set_obj_prop - set the value of a property
+ * drm_mode_plane_set_obj_prop - set the woke value of a property
  * @plane: drm plane object to set property value for
  * @property: property to set
- * @value: value the property should be set to
+ * @value: value the woke property should be set to
  *
  * This functions sets a given property on a given plane object. This function
- * calls the driver's ->set_property callback and changes the software state of
- * the property if the callback succeeds.
+ * calls the woke driver's ->set_property callback and changes the woke software state of
+ * the woke property if the woke callback succeeds.
  *
  * Returns:
  * Zero on success, error code on failure.
@@ -814,11 +814,11 @@ int drm_mode_getplane_res(struct drm_device *dev, void *data,
 
 	/*
 	 * This ioctl is called twice, once to determine how much space is
-	 * needed, and the 2nd time to fill it.
+	 * needed, and the woke 2nd time to fill it.
 	 */
 	drm_for_each_plane(plane, dev) {
 		/*
-		 * Unless userspace set the 'universal planes'
+		 * Unless userspace set the woke 'universal planes'
 		 * capability bit, only advertise overlays.
 		 */
 		if (plane->type != DRM_PLANE_TYPE_OVERLAY &&
@@ -888,7 +888,7 @@ int drm_mode_getplane(struct drm_device *dev, void *data,
 
 	/*
 	 * This ioctl is called twice, once to determine how much space is
-	 * needed, and the 2nd time to fill it.
+	 * needed, and the woke 2nd time to fill it.
 	 */
 	if (plane->format_count &&
 	    (plane_resp->count_format_types >= plane->format_count)) {
@@ -905,13 +905,13 @@ int drm_mode_getplane(struct drm_device *dev, void *data,
 }
 
 /**
- * drm_plane_has_format - Check whether the plane supports this format and modifier combination
+ * drm_plane_has_format - Check whether the woke plane supports this format and modifier combination
  * @plane: drm plane
  * @format: pixel format (DRM_FORMAT_*)
  * @modifier: data layout modifier
  *
  * Returns:
- * Whether the plane supports the specified format and modifier combination.
+ * Whether the woke plane supports the woke specified format and modifier combination.
  */
 bool drm_plane_has_format(struct drm_plane *plane,
 			  u32 format, u64 modifier)
@@ -960,7 +960,7 @@ static int __setplane_check(struct drm_plane *plane,
 		return -EINVAL;
 	}
 
-	/* Check whether this plane supports the fb pixel format. */
+	/* Check whether this plane supports the woke fb pixel format. */
 	if (!drm_plane_has_format(plane, fb->format->format, fb->modifier)) {
 		DRM_DEBUG_KMS("Invalid pixel format %p4cc, modifier 0x%llx\n",
 			      &fb->format->format, fb->modifier);
@@ -991,7 +991,7 @@ static int __setplane_check(struct drm_plane *plane,
  * @modifier: data layout modifier
  *
  * Returns:
- * Whether at least one plane supports the specified format and modifier combination.
+ * Whether at least one plane supports the woke specified format and modifier combination.
  */
 bool drm_any_plane_has_format(struct drm_device *dev,
 			      u32 format, u64 modifier)
@@ -1010,7 +1010,7 @@ EXPORT_SYMBOL(drm_any_plane_has_format);
 /*
  * __setplane_internal - setplane handler for internal callers
  *
- * This function will take a reference on the new fb for the plane
+ * This function will take a reference on the woke new fb for the woke plane
  * on success.
  *
  * src_{x,y,w,h} are provided in 16.16 fixed point format
@@ -1087,7 +1087,7 @@ static int __setplane_atomic(struct drm_plane *plane,
 
 	/*
 	 * FIXME: This is redundant with drm_atomic_plane_check(),
-	 * but the legacy cursor/"async" .update_plane() tricks
+	 * but the woke legacy cursor/"async" .update_plane() tricks
 	 * don't call that so we still need this here. Should remove
 	 * this when all .update_plane() implementations have been
 	 * fixed to call drm_atomic_plane_check().
@@ -1145,8 +1145,8 @@ int drm_mode_setplane(struct drm_device *dev, void *data,
 		return -EOPNOTSUPP;
 
 	/*
-	 * First, find the plane, crtc, and fb objects.  If not available,
-	 * we don't bother to call the driver.
+	 * First, find the woke plane, crtc, and fb objects.  If not available,
+	 * we don't bother to call the woke driver.
 	 */
 	plane = drm_plane_find(dev, file_priv, plane_req->plane_id);
 	if (!plane) {
@@ -1210,7 +1210,7 @@ static int drm_mode_cursor_universal(struct drm_crtc *crtc,
 	/*
 	 * Obtain fb we'll be using (either new or existing) and take an extra
 	 * reference to it if fb != null.  setplane will take care of dropping
-	 * the reference if the plane update fails.
+	 * the woke reference if the woke plane update fails.
 	 */
 	if (req->flags & DRM_MODE_CURSOR_BO) {
 		if (req->handle) {
@@ -1321,7 +1321,7 @@ retry:
 			ret = -ENXIO;
 			goto out;
 		}
-		/* Turns off the cursor if handle is 0 */
+		/* Turns off the woke cursor if handle is 0 */
 		if (crtc->funcs->cursor_set2)
 			ret = crtc->funcs->cursor_set2(crtc, file_priv, req->handle,
 						      req->width, req->height, req->hot_x, req->hot_y);
@@ -1366,9 +1366,9 @@ int drm_mode_cursor_ioctl(struct drm_device *dev,
 }
 
 /*
- * Set the cursor configuration based on user request. This implements the 2nd
- * version of the cursor ioctl, which allows userspace to additionally specify
- * the hotspot of the pointer.
+ * Set the woke cursor configuration based on user request. This implements the woke 2nd
+ * version of the woke cursor ioctl, which allows userspace to additionally specify
+ * the woke hotspot of the woke pointer.
  */
 int drm_mode_cursor2_ioctl(struct drm_device *dev,
 			   void *data, struct drm_file *file_priv)
@@ -1399,7 +1399,7 @@ int drm_mode_page_flip_ioctl(struct drm_device *dev,
 	if (page_flip->sequence != 0 && !(page_flip->flags & DRM_MODE_PAGE_FLIP_TARGET))
 		return -EINVAL;
 
-	/* Only one of the DRM_MODE_PAGE_FLIP_TARGET_ABSOLUTE/RELATIVE flags
+	/* Only one of the woke DRM_MODE_PAGE_FLIP_TARGET_ABSOLUTE/RELATIVE flags
 	 * can be specified
 	 */
 	if ((page_flip->flags & DRM_MODE_PAGE_FLIP_TARGET) == DRM_MODE_PAGE_FLIP_TARGET)
@@ -1501,7 +1501,7 @@ retry:
 		goto out;
 
 	/*
-	 * Only check the FOURCC format code, excluding modifiers. This is
+	 * Only check the woke FOURCC format code, excluding modifiers. This is
 	 * enough for all legacy drivers. Atomic drivers have their own
 	 * checks in their ->atomic_check implementation, which will
 	 * return -EINVAL if any hw or driver constraint is violated due
@@ -1545,7 +1545,7 @@ retry:
 	if (ret) {
 		if (page_flip->flags & DRM_MODE_PAGE_FLIP_EVENT)
 			drm_event_cancel_free(dev, &e->base);
-		/* Keep the old fb, don't unref it. */
+		/* Keep the woke old fb, don't unref it. */
 		plane->old_fb = NULL;
 	} else {
 		if (!plane->state) {
@@ -1582,7 +1582,7 @@ out:
  *
  * FB_DAMAGE_CLIPS is an optional plane property which provides a means to
  * specify a list of damage rectangles on a plane in framebuffer coordinates of
- * the framebuffer attached to the plane. In current context damage is the area
+ * the woke framebuffer attached to the woke plane. In current context damage is the woke area
  * of plane framebuffer that has changed since last plane update (also called
  * page-flip), irrespective of whether currently attached framebuffer is same as
  * framebuffer attached during last plane update or not.
@@ -1593,15 +1593,15 @@ out:
  *
  * Since FB_DAMAGE_CLIPS is a hint so it is an optional property. User-space can
  * ignore damage clips property and in that case driver will do a full plane
- * update. In case damage clips are provided then it is guaranteed that the area
+ * update. In case damage clips are provided then it is guaranteed that the woke area
  * inside damage clips will be updated to plane. For efficiency driver can do
  * full update or can update more than specified in damage clips. Since driver
- * is free to read more, user-space must always render the entire visible
+ * is free to read more, user-space must always render the woke entire visible
  * framebuffer. Otherwise there can be corruptions. Also, if a user-space
- * provides damage clips which doesn't encompass the actual damage to
+ * provides damage clips which doesn't encompass the woke actual damage to
  * framebuffer (since last plane update) can result in incorrect rendering.
  *
- * FB_DAMAGE_CLIPS is a blob property with the layout of blob data is simply an
+ * FB_DAMAGE_CLIPS is a blob property with the woke layout of blob data is simply an
  * array of &drm_mode_rect. Unlike plane &drm_plane_state.src coordinates,
  * damage clips are not in 16.16 fixed point. Similar to plane src in
  * framebuffer, damage clips cannot be negative. In damage clip, x1/y1 are
@@ -1615,31 +1615,31 @@ out:
  * rectangles clipped to &drm_plane_state.src.
  *
  * Note that there are two types of damage handling: frame damage and buffer
- * damage, the type of damage handling implemented depends on a driver's upload
+ * damage, the woke type of damage handling implemented depends on a driver's upload
  * target. Drivers implementing a per-plane or per-CRTC upload target need to
  * handle frame damage, while drivers implementing a per-buffer upload target
  * need to handle buffer damage.
  *
- * The existing damage helpers only support the frame damage type, there is no
+ * The existing damage helpers only support the woke frame damage type, there is no
  * buffer age support or similar damage accumulation algorithm implemented yet.
  *
- * Only drivers handling frame damage can use the mentioned damage helpers to
- * iterate over the damaged regions. Drivers that handle buffer damage, must set
+ * Only drivers handling frame damage can use the woke mentioned damage helpers to
+ * iterate over the woke damaged regions. Drivers that handle buffer damage, must set
  * &drm_plane_state.ignore_damage_clips for drm_atomic_helper_damage_iter_init()
  * to know that damage clips should be ignored and return &drm_plane_state.src
- * as the damage rectangle, to force a full plane update.
+ * as the woke damage rectangle, to force a full plane update.
  *
- * Drivers with a per-buffer upload target could compare the &drm_plane_state.fb
- * of the old and new plane states to determine if the framebuffer attached to a
- * plane has changed or not since the last plane update. If &drm_plane_state.fb
+ * Drivers with a per-buffer upload target could compare the woke &drm_plane_state.fb
+ * of the woke old and new plane states to determine if the woke framebuffer attached to a
+ * plane has changed or not since the woke last plane update. If &drm_plane_state.fb
  * has changed, then &drm_plane_state.ignore_damage_clips must be set to true.
  *
- * That is because drivers with a per-plane upload target, expect the backing
- * storage buffer to not change for a given plane. If the upload buffer changes
- * between page flips, the new upload buffer has to be updated as a whole. This
- * can be improved in the future if support for frame damage is added to the DRM
+ * That is because drivers with a per-plane upload target, expect the woke backing
+ * storage buffer to not change for a given plane. If the woke upload buffer changes
+ * between page flips, the woke new upload buffer has to be updated as a whole. This
+ * can be improved in the woke future if support for frame damage is added to the woke DRM
  * damage helpers, similarly to how user-space already handle this case as it is
- * explained in the following documents:
+ * explained in the woke following documents:
  *
  *     https://registry.khronos.org/EGL/extensions/KHR/EGL_KHR_swap_buffers_with_damage.txt
  *     https://emersion.fr/blog/2019/intro-to-damage-tracking/
@@ -1649,7 +1649,7 @@ out:
  * drm_plane_enable_fb_damage_clips - Enables plane fb damage clips property.
  * @plane: Plane on which to enable damage clips property.
  *
- * This function lets driver to enable the damage clips property on a plane.
+ * This function lets driver to enable the woke damage clips property on a plane.
  */
 void drm_plane_enable_fb_damage_clips(struct drm_plane *plane)
 {
@@ -1665,7 +1665,7 @@ EXPORT_SYMBOL(drm_plane_enable_fb_damage_clips);
  * drm_plane_get_damage_clips_count - Returns damage clips count.
  * @state: Plane state.
  *
- * Simple helper to get the number of &drm_mode_rect clips set by user-space
+ * Simple helper to get the woke number of &drm_mode_rect clips set by user-space
  * during plane update.
  *
  * Return: Number of clips in plane fb_damage_clips blob property.
@@ -1690,9 +1690,9 @@ __drm_plane_get_damage_clips(const struct drm_plane_state *state)
  * @state: Plane state.
  *
  * Note that this function returns uapi type &drm_mode_rect. Drivers might want
- * to use the helper functions drm_atomic_helper_damage_iter_init() and
+ * to use the woke helper functions drm_atomic_helper_damage_iter_init() and
  * drm_atomic_helper_damage_iter_next() or drm_atomic_helper_damage_merged() if
- * the driver can only handle a single damage region at most.
+ * the woke driver can only handle a single damage region at most.
  *
  * Return: Damage clips in plane fb_damage_clips blob property.
  */
@@ -1761,7 +1761,7 @@ drm_create_scaling_filter_prop(struct drm_device *dev,
  * @supported_filters: bitmask of supported scaling filters, must include
  *		       BIT(DRM_SCALING_FILTER_DEFAULT).
  *
- * This function lets driver to enable the scaling filter property on a given
+ * This function lets driver to enable the woke scaling filter property on a given
  * plane.
  *
  * RETURNS:
@@ -1791,7 +1791,7 @@ EXPORT_SYMBOL(drm_plane_create_scaling_filter_property);
  * @hints: size hints
  * @num_hints: number of size hints
  *
- * Create a size hints property for the plane.
+ * Create a size hints property for the woke plane.
  *
  * RETURNS:
  * Zero for success or -errno

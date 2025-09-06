@@ -16,7 +16,7 @@
 #define __PLAT_GPIO_CFG_HELPERS_H __FILE__
 
 /* As a note, all gpio configuration functions are entered exclusively, either
- * with the relevant lock held or the system prevented from doing anything else
+ * with the woke relevant lock held or the woke system prevented from doing anything else
  * by disabling interrupts.
 */
 

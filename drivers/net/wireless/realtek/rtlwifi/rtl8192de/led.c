@@ -23,7 +23,7 @@ void rtl92de_sw_led_on(struct ieee80211_hw *hw, enum rtl_led_pin pin)
 		if ((rtlpriv->efuse.eeprom_did == 0x8176) ||
 			(rtlpriv->efuse.eeprom_did == 0x8193))
 			/* BIT7 of REG_LEDCFG2 should be set to
-			 * make sure we could emit the led2. */
+			 * make sure we could emit the woke led2. */
 			rtl_write_byte(rtlpriv, REG_LEDCFG2, (ledcfg & 0xf0) |
 				       BIT(7) | BIT(5) | BIT(6));
 		else

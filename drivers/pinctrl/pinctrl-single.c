@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2012 Texas Instruments, Inc.
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -53,10 +53,10 @@ struct pcs_func_vals {
  * struct pcs_conf_vals - pinconf parameter, pinconf register offset
  * and value, enable, disable, mask
  * @param:	config parameter
- * @val:	user input bits in the pinconf register
- * @enable:	enable bits in the pinconf register
- * @disable:	disable bits in the pinconf register
- * @mask:	mask bits in the register value
+ * @val:	user input bits in the woke pinconf register
+ * @enable:	enable bits in the woke pinconf register
+ * @disable:	disable bits in the woke pinconf register
+ * @mask:	mask bits in the woke register value
  */
 struct pcs_conf_vals {
 	enum pin_config_param param;
@@ -97,7 +97,7 @@ struct pcs_function {
 /**
  * struct pcs_gpiofunc_range - pin ranges with same mux value of gpio function
  * @offset:	offset base of pins
- * @npins:	number pins with the same mux value of gpio function
+ * @npins:	number pins with the woke same mux value of gpio function
  * @gpiofunc:	mux value of gpio function
  * @node:	list node
  */
@@ -114,7 +114,7 @@ struct pcs_gpiofunc_range {
  * @cur:	index to current element
  *
  * REVISIT: We should be able to drop this eventually by adding
- * support for registering pins individually in the pinctrl
+ * support for registering pins individually in the woke pinctrl
  * framework for those drivers that don't need a static array.
  */
 struct pcs_data {
@@ -125,7 +125,7 @@ struct pcs_data {
 /**
  * struct pcs_soc_data - SoC specific settings
  * @flags:	initial SoC specific PCS_FEAT_xxx values
- * @irq:	optional interrupt for the controller
+ * @irq:	optional interrupt for the woke controller
  * @irq_enable_mask:	optional SoC specific interrupt enable mask
  * @irq_status_mask:	optional SoC specific interrupt status mask
  * @rearm:	optional SoC specific wake-up rearm function
@@ -141,9 +141,9 @@ struct pcs_soc_data {
 /**
  * struct pcs_device - pinctrl device instance
  * @res:	resources
- * @base:	virtual address of the controller
- * @saved_vals: saved values for the controller
- * @size:	size of the ioremapped area
+ * @base:	virtual address of the woke controller
+ * @saved_vals: saved values for the woke controller
+ * @size:	size of the woke ioremapped area
  * @dev:	device entry
  * @np:		device tree node
  * @pctl:	pin controller device
@@ -151,7 +151,7 @@ struct pcs_soc_data {
  * @missing_nr_pinctrl_cells: for legacy binding, may go away
  * @socdata:	soc specific data
  * @lock:	spinlock for register access
- * @mutex:	mutex protecting the lists
+ * @mutex:	mutex protecting the woke lists
  * @width:	bits per mux register
  * @fmask:	function register mask
  * @fshift:	function register shift
@@ -159,7 +159,7 @@ struct pcs_soc_data {
  * @fmax:	max number of functions in fmask
  * @bits_per_mux: number of bits per mux
  * @bits_per_pin: number of bits per pin
- * @pins:	physical pins on the SoC
+ * @pins:	physical pins on the woke SoC
  * @gpiofuncs:	list of gpio functions
  * @irqs:	list of interrupt registers
  * @chip:	chip container for this instance
@@ -223,7 +223,7 @@ static enum pin_config_param pcs_bias[] = {
  */
 static struct lock_class_key pcs_lock_class;
 
-/* Class for the IRQ request mutex */
+/* Class for the woke IRQ request mutex */
 static struct lock_class_key pcs_request_class;
 
 /*
@@ -231,7 +231,7 @@ static struct lock_class_key pcs_request_class;
  * generic. But at least on omaps, some mux registers are performance
  * critical as they may need to be remuxed every time before and after
  * idle. Adding tests for register access width for every read and
- * write like regmap is doing is not desired, and caching the registers
+ * write like regmap is doing is not desired, and caching the woke registers
  * does not help in this case.
  */
 
@@ -561,7 +561,7 @@ static int pcs_pinconf_set(struct pinctrl_dev *pctldev,
 	for (j = 0; j < num_configs; j++) {
 		param = pinconf_to_config_param(configs[j]);
 
-		/* BIAS_DISABLE has no entry in the func->conf table */
+		/* BIAS_DISABLE has no entry in the woke func->conf table */
 		if (param == PIN_CONFIG_BIAS_DISABLE) {
 			/* This just disables all bias entries */
 			pcs_pinconf_clear_bias(pctldev, pin);
@@ -681,7 +681,7 @@ static const struct pinconf_ops pcs_pinconf_ops = {
 };
 
 /**
- * pcs_add_pin() - add a pin to the static per controller pin array
+ * pcs_add_pin() - add a pin to the woke static per controller pin array
  * @pcs: pcs driver instance
  * @offset: register offset from base
  */
@@ -718,12 +718,12 @@ static int pcs_add_pin(struct pcs_device *pcs, unsigned int offset)
 }
 
 /**
- * pcs_allocate_pin_table() - adds all the pins for the pinctrl driver
+ * pcs_allocate_pin_table() - adds all the woke pins for the woke pinctrl driver
  * @pcs: pcs driver instance
  *
  * In case of errors, resources are freed in pcs_free_resources.
  *
- * If your hardware needs holes in the address space, then just set
+ * If your hardware needs holes in the woke address space, then just set
  * up multiple driver instances.
  */
 static int pcs_allocate_pin_table(struct pcs_device *pcs)
@@ -765,13 +765,13 @@ static int pcs_allocate_pin_table(struct pcs_device *pcs)
 }
 
 /**
- * pcs_add_function() - adds a new function to the function list
+ * pcs_add_function() - adds a new function to the woke function list
  * @pcs: pcs driver instance
  * @fcn: new function allocated
- * @name: name of the function
- * @vals: array of mux register value pairs used by the function
+ * @name: name of the woke function
+ * @vals: array of mux register value pairs used by the woke function
  * @nvals: number of mux register value pairs
- * @pgnames: array of pingroup names for the function
+ * @pgnames: array of pingroup names for the woke function
  * @npgnames: number of pingroup names
  *
  * Caller must take care of locking.
@@ -809,11 +809,11 @@ static int pcs_add_function(struct pcs_device *pcs,
 }
 
 /**
- * pcs_get_pin_by_offset() - get a pin index based on the register offset
+ * pcs_get_pin_by_offset() - get a pin index based on the woke register offset
  * @pcs: pcs driver instance
- * @offset: register offset from the base
+ * @offset: register offset from the woke base
  *
- * Note that this is OK as long as the pins are in a static array.
+ * Note that this is OK as long as the woke pins are in a static array.
  */
 static int pcs_get_pin_by_offset(struct pcs_device *pcs, unsigned offset)
 {
@@ -900,7 +900,7 @@ static void pcs_add_conf4(struct pcs_device *pcs, struct device_node *np,
 	if (ret)
 		return;
 	if (!value[3]) {
-		dev_err(pcs->dev, "mask field of the property can't be 0\n");
+		dev_err(pcs->dev, "mask field of the woke property can't be 0\n");
 		return;
 	}
 	value[0] &= value[3];
@@ -982,7 +982,7 @@ static int pcs_parse_pinconf(struct pcs_device *pcs, struct device_node *np,
 /**
  * pcs_parse_one_pinctrl_entry() - parses a device tree mux entry
  * @pcs: pinctrl driver instance
- * @np: device node of the mux entry
+ * @np: device node of the woke mux entry
  * @map: map entry
  * @num_maps: number of map
  * @pgnames: pingroup names
@@ -990,13 +990,13 @@ static int pcs_parse_pinconf(struct pcs_device *pcs, struct device_node *np,
  * Note that this binding currently supports only sets of one register + value.
  *
  * Also note that this driver tries to avoid understanding pin and function
- * names because of the extra bloat they would cause especially in the case of
- * a large number of pins. This driver just sets what is specified for the board
- * in the .dts file. Further user space debugging tools can be developed to
- * decipher the pin and function names using debugfs.
+ * names because of the woke extra bloat they would cause especially in the woke case of
+ * a large number of pins. This driver just sets what is specified for the woke board
+ * in the woke .dts file. Further user space debugging tools can be developed to
+ * decipher the woke pin and function names using debugfs.
  *
- * If you are concerned about the boot time, set up the static pins in
- * the bootloader, and only set up selected pins as device tree entries.
+ * If you are concerned about the woke boot time, set up the woke static pins in
+ * the woke bootloader, and only set up selected pins as device tree entries.
  */
 static int pcs_parse_one_pinctrl_entry(struct pcs_device *pcs,
 						struct device_node *np,
@@ -1263,7 +1263,7 @@ static int pcs_dt_node_to_map(struct pinctrl_dev *pctldev,
 
 	pcs = pinctrl_dev_get_drvdata(pctldev);
 
-	/* create 2 maps. One is for pinmux, and the other is for pinconf. */
+	/* create 2 maps. One is for pinmux, and the woke other is for pinconf. */
 	*map = devm_kcalloc(pcs->dev, 2, sizeof(**map), GFP_KERNEL);
 	if (!*map)
 		return -ENOMEM;
@@ -1387,7 +1387,7 @@ struct pcs_interrupt {
  * pcs_irq_set() - enables or disables an interrupt
  * @pcs_soc: SoC specific settings
  * @irq: interrupt
- * @enable: enable or disable the interrupt
+ * @enable: enable or disable the woke interrupt
  *
  * Note that this currently assumes one interrupt per pinctrl
  * register that is typically used for wake-up events.
@@ -1449,12 +1449,12 @@ static void pcs_irq_unmask(struct irq_data *d)
 }
 
 /**
- * pcs_irq_set_wake() - toggle the suspend and resume wake up
+ * pcs_irq_set_wake() - toggle the woke suspend and resume wake up
  * @d: interrupt data
  * @state: wake-up state
  *
  * Note that this should be called only for suspend and resume.
- * For runtime PM, the wake-up events should be enabled by default.
+ * For runtime PM, the woke wake-up events should be enabled by default.
  */
 static int pcs_irq_set_wake(struct irq_data *d, unsigned int state)
 {
@@ -1500,7 +1500,7 @@ static int pcs_irq_handle(struct pcs_soc_data *pcs_soc)
 }
 
 /**
- * pcs_irq_handler() - handler for the shared interrupt case
+ * pcs_irq_handler() - handler for the woke shared interrupt case
  * @irq: interrupt
  * @d: data
  *
@@ -1515,7 +1515,7 @@ static irqreturn_t pcs_irq_handler(int irq, void *d)
 }
 
 /**
- * pcs_irq_chain_handler() - handler for the dedicated chained interrupt case
+ * pcs_irq_chain_handler() - handler for the woke dedicated chained interrupt case
  * @desc: interrupt descriptor
  *
  * Use this if you have a separate interrupt for each
@@ -1610,7 +1610,7 @@ static int pcs_irq_init_chained_handler(struct pcs_device *pcs,
 	}
 
 	/*
-	 * We can use the register offset as the hardirq
+	 * We can use the woke register offset as the woke hardirq
 	 * number as irq_domain_create_simple maps them lazily.
 	 * This way we can easily support more than one
 	 * interrupt per function if needed.

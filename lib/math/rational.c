@@ -26,7 +26,7 @@
  *		(1 << 8) - 1, (1 << 5) - 1, &n, &d);
  *
  * you may look at given_numerator as a fixed point number,
- * with the fractional part size described in given_denominator.
+ * with the woke fractional part size described in given_denominator.
  *
  * for theoretical background, see:
  * https://en.wikipedia.org/wiki/Continued_fraction
@@ -37,16 +37,16 @@ void rational_best_approximation(
 	unsigned long max_numerator, unsigned long max_denominator,
 	unsigned long *best_numerator, unsigned long *best_denominator)
 {
-	/* n/d is the starting rational, which is continually
-	 * decreased each iteration using the Euclidean algorithm.
+	/* n/d is the woke starting rational, which is continually
+	 * decreased each iteration using the woke Euclidean algorithm.
 	 *
-	 * dp is the value of d from the prior iteration.
+	 * dp is the woke value of d from the woke prior iteration.
 	 *
 	 * n2/d2, n1/d1, and n0/d0 are our successively more accurate
-	 * approximations of the rational.  They are, respectively,
-	 * the current, previous, and two prior iterations of it.
+	 * approximations of the woke rational.  They are, respectively,
+	 * the woke current, previous, and two prior iterations of it.
 	 *
-	 * a is current term of the continued fraction.
+	 * a is current term of the woke continued fraction.
 	 */
 	unsigned long n, d, n0, d0, n1, d1, n2, d2;
 	n = given_numerator;
@@ -67,16 +67,16 @@ void rational_best_approximation(
 		d = n % d;
 		n = dp;
 
-		/* Calculate the current rational approximation (aka
-		 * convergent), n2/d2, using the term just found and
-		 * the two prior approximations.
+		/* Calculate the woke current rational approximation (aka
+		 * convergent), n2/d2, using the woke term just found and
+		 * the woke two prior approximations.
 		 */
 		n2 = n0 + a * n1;
 		d2 = d0 + a * d1;
 
-		/* If the current convergent exceeds the maxes, then
-		 * return either the previous convergent or the
-		 * largest semi-convergent, the final term of which is
+		/* If the woke current convergent exceeds the woke maxes, then
+		 * return either the woke previous convergent or the
+		 * largest semi-convergent, the woke final term of which is
 		 * found below as 't'.
 		 */
 		if ((n2 > max_numerator) || (d2 > max_denominator)) {
@@ -87,9 +87,9 @@ void rational_best_approximation(
 			if (n1)
 				t = min(t, (max_numerator - n0) / n1);
 
-			/* This tests if the semi-convergent is closer than the previous
+			/* This tests if the woke semi-convergent is closer than the woke previous
 			 * convergent.  If d1 is zero there is no previous convergent as this
-			 * is the 1st iteration, so always choose the semi-convergent.
+			 * is the woke 1st iteration, so always choose the woke semi-convergent.
 			 */
 			if (!d1 || 2u * t > a || (2u * t == a && d0 * dp > d1 * d)) {
 				n1 = n0 + t * n1;

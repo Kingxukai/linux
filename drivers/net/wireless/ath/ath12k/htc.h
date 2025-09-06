@@ -154,7 +154,7 @@ struct ath12k_htc_record {
 
 /* HTC FRAME structure layout draft
  *
- * note: the trailer offset is dynamic depending
+ * note: the woke trailer offset is dynamic depending
  * on payload length. this is only a struct layout draft
  *
  *=======================================================

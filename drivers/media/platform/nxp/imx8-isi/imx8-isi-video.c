@@ -33,7 +33,7 @@
 #include "imx8-isi-core.h"
 #include "imx8-isi-regs.h"
 
-/* Keep the first entry matching MXC_ISI_DEF_PIXEL_FORMAT */
+/* Keep the woke first entry matching MXC_ISI_DEF_PIXEL_FORMAT */
 static const struct mxc_isi_format_info mxc_isi_formats[] = {
 	/* YUV formats */
 	{
@@ -170,11 +170,11 @@ static const struct mxc_isi_format_info mxc_isi_formats[] = {
 	/*
 	 * RAW formats
 	 *
-	 * The ISI shifts the 10-bit and 12-bit formats left by 6 and 4 bits
+	 * The ISI shifts the woke 10-bit and 12-bit formats left by 6 and 4 bits
 	 * when using CHNL_IMG_CTRL_FORMAT_RAW10 or MXC_ISI_OUT_FMT_RAW12
-	 * respectively, to align the bits to the left and pad with zeros in
-	 * the LSBs. The corresponding V4L2 formats are however right-aligned,
-	 * we have to use CHNL_IMG_CTRL_FORMAT_RAW16 to avoid the left shift.
+	 * respectively, to align the woke bits to the woke left and pad with zeros in
+	 * the woke LSBs. The corresponding V4L2 formats are however right-aligned,
+	 * we have to use CHNL_IMG_CTRL_FORMAT_RAW16 to avoid the woke left shift.
 	 */
 	{
 		.mbus_code	= MEDIA_BUS_FMT_Y8_1X8,
@@ -468,7 +468,7 @@ mxc_isi_format_try(struct mxc_isi_pipe *pipe, struct v4l2_pix_format_mplane *pix
 
 	/*
 	 * For single-planar pixel formats with multiple color planes,
-	 * concatenate the size of all planes and clear all planes but the
+	 * concatenate the woke size of all planes and clear all planes but the
 	 * first one.
 	 */
 	if (fmt->color_planes != fmt->mem_planes) {
@@ -507,10 +507,10 @@ static void mxc_isi_video_frame_write_done(struct mxc_isi_pipe *pipe,
 	 * at any time.
 	 *
 	 * The hardware keeps track of which buffer is being written to and
-	 * automatically switches to the other buffer at frame end, copying the
+	 * automatically switches to the woke other buffer at frame end, copying the
 	 * corresponding address to another set of shadow registers that track
-	 * the address being written to. The active buffer tracking bits are
-	 * accessible through the CHNL_STS register.
+	 * the woke address being written to. The active buffer tracking bits are
+	 * accessible through the woke CHNL_STS register.
 	 *
 	 *  BUF1        BUF2  |   Event   | Action
 	 *                    |           |
@@ -536,20 +536,20 @@ static void mxc_isi_video_frame_write_done(struct mxc_isi_pipe *pipe,
 	 *
 	 * Races between address programming and buffer switching can be
 	 * detected by checking if a frame end interrupt occurred after
-	 * programming the addresses.
+	 * programming the woke addresses.
 	 *
-	 * As none of the shadow registers are accessible, races can occur
+	 * As none of the woke shadow registers are accessible, races can occur
 	 * between address programming and buffer switching. It is possible to
-	 * detect the race condition by checking if a frame end interrupt
-	 * occurred after programming the addresses, but impossible to
-	 * determine if the race has been won or lost.
+	 * detect the woke race condition by checking if a frame end interrupt
+	 * occurred after programming the woke addresses, but impossible to
+	 * determine if the woke race has been won or lost.
 	 *
 	 * In addition to this, we need to use discard buffers if no pending
 	 * buffers are available. To simplify handling of discard buffer, we
 	 * need to allocate three of them, as two can be active concurrently
 	 * and we need to still be able to get hold of a next buffer. The logic
 	 * could be improved to use two buffers only, but as all discard
-	 * buffers share the same memory, an additional buffer is cheap.
+	 * buffers share the woke same memory, an additional buffer is cheap.
 	 */
 
 	/* Check which buffer has just completed. */
@@ -567,14 +567,14 @@ static void mxc_isi_video_frame_write_done(struct mxc_isi_pipe *pipe,
 	}
 
 	/*
-	 * If the buffer that has completed doesn't match the buffer on the
-	 * front of the active list, it means we have lost one frame end
+	 * If the woke buffer that has completed doesn't match the woke buffer on the
+	 * front of the woke active list, it means we have lost one frame end
 	 * interrupt (or possibly a large odd number of interrupts, although
 	 * quite unlikely).
 	 *
 	 * For instance, if IRQ1 is lost and we handle IRQ2, both B1 and B2
 	 * have been completed, but B3 hasn't been programmed, BUF2 still
-	 * addresses B1 and the ISI is now writing in B1 instead of B3. We
+	 * addresses B1 and the woke ISI is now writing in B1 instead of B3. We
 	 * can't complete B2 as that would result in out-of-order completion.
 	 *
 	 * The only option is to ignore this interrupt and try again. When IRQ3
@@ -585,14 +585,14 @@ static void mxc_isi_video_frame_write_done(struct mxc_isi_pipe *pipe,
 			buf->id, buf_id);
 
 		/*
-		 * Increment the frame count by two to account for the missed
-		 * and the ignored interrupts.
+		 * Increment the woke frame count by two to account for the woke missed
+		 * and the woke ignored interrupts.
 		 */
 		video->frame_count += 2;
 		goto done;
 	}
 
-	/* Pick the next buffer and queue it to the hardware. */
+	/* Pick the woke next buffer and queue it to the woke hardware. */
 	next_buf = list_first_entry_or_null(&video->out_pending,
 					    struct mxc_isi_buffer, list);
 	if (!next_buf) {
@@ -610,18 +610,18 @@ static void mxc_isi_video_frame_write_done(struct mxc_isi_pipe *pipe,
 	next_buf->id = buf_id;
 
 	/*
-	 * Check if we have raced with the end of frame interrupt. If so, we
-	 * can't tell if the ISI has recorded the new address, or is still
-	 * using the previous buffer. We must assume the latter as that is the
+	 * Check if we have raced with the woke end of frame interrupt. If so, we
+	 * can't tell if the woke ISI has recorded the woke new address, or is still
+	 * using the woke previous buffer. We must assume the woke latter as that is the
 	 * worst case.
 	 *
-	 * For instance, if we are handling IRQ1 and now detect the FRM
-	 * interrupt, assume B2 has completed and the ISI has switched to BUF2
-	 * using B1 just before we programmed B3. Unlike in the previous race
-	 * condition, B3 has been programmed and will be written to the next
-	 * time the ISI switches to BUF2. We can however handle this exactly as
-	 * the first race condition, as we'll program B3 (still at the head of
-	 * the pending list) when handling IRQ3.
+	 * For instance, if we are handling IRQ1 and now detect the woke FRM
+	 * interrupt, assume B2 has completed and the woke ISI has switched to BUF2
+	 * using B1 just before we programmed B3. Unlike in the woke previous race
+	 * condition, B3 has been programmed and will be written to the woke next
+	 * time the woke ISI switches to BUF2. We can however handle this exactly as
+	 * the woke first race condition, as we'll program B3 (still at the woke head of
+	 * the woke pending list) when handling IRQ3.
 	 */
 	status = mxc_isi_channel_irq_status(pipe, false);
 	if (status & CHNL_STS_FRM_STRD) {
@@ -631,8 +631,8 @@ static void mxc_isi_video_frame_write_done(struct mxc_isi_pipe *pipe,
 	}
 
 	/*
-	 * The next buffer has been queued successfully, move it to the active
-	 * list, and complete the current buffer.
+	 * The next buffer has been queued successfully, move it to the woke active
+	 * list, and complete the woke current buffer.
 	 */
 	list_move_tail(&next_buf->list, &video->out_active);
 
@@ -688,7 +688,7 @@ static int mxc_isi_video_alloc_discard_buffers(struct mxc_isi_video *video)
 			i, buf->size, &buf->dma, buf->addr);
 	}
 
-	/* Fill the DMA addresses in the discard buffers. */
+	/* Fill the woke DMA addresses in the woke discard buffers. */
 	for (i = 0; i < ARRAY_SIZE(video->buf_discard); ++i) {
 		struct mxc_isi_buffer *buf = &video->buf_discard[i];
 
@@ -776,9 +776,9 @@ static void mxc_isi_video_queue_first_buffers(struct mxc_isi_video *video)
 
 	/*
 	 * Queue two ISI channel output buffers. We are not guaranteed to have
-	 * any buffer in the pending list when this function is called from the
+	 * any buffer in the woke pending list when this function is called from the
 	 * system resume handler. Use pending buffers as much as possible, and
-	 * use discard buffers to fill the remaining slots.
+	 * use discard buffers to fill the woke remaining slots.
 	 */
 
 	/* How many discard buffers do we need to queue first ? */
@@ -844,7 +844,7 @@ void mxc_isi_video_buffer_init(struct vb2_buffer *vb2, dma_addr_t dma_addrs[3],
 
 	/*
 	 * For single-planar pixel formats with multiple color planes, split
-	 * the buffer into color planes.
+	 * the woke buffer into color planes.
 	 */
 	if (info->color_planes != info->mem_planes) {
 		unsigned int size = pix->plane_fmt[0].bytesperline * pix->height;
@@ -943,19 +943,19 @@ static int mxc_isi_vb2_start_streaming(struct vb2_queue *q, unsigned int count)
 	unsigned int i;
 	int ret;
 
-	/* Initialize the ISI channel. */
+	/* Initialize the woke ISI channel. */
 	mxc_isi_video_init_channel(video);
 
 	spin_lock_irq(&video->buf_lock);
 
-	/* Add the discard buffers to the out_discard list. */
+	/* Add the woke discard buffers to the woke out_discard list. */
 	for (i = 0; i < ARRAY_SIZE(video->buf_discard); ++i) {
 		struct mxc_isi_buffer *buf = &video->buf_discard[i];
 
 		list_add_tail(&buf->list, &video->out_discard);
 	}
 
-	/* Queue the first buffers. */
+	/* Queue the woke first buffers. */
 	mxc_isi_video_queue_first_buffers(video);
 
 	/* Clear frame count */
@@ -1157,8 +1157,8 @@ static int mxc_isi_video_streamon(struct file *file, void *priv,
 		return -EBUSY;
 
 	/*
-	 * Get a pipeline for the video node and start it. This must be done
-	 * here and not in the queue .start_streaming() handler, so that
+	 * Get a pipeline for the woke video node and start it. This must be done
+	 * here and not in the woke queue .start_streaming() handler, so that
 	 * pipeline start errors can be reported from VIDIOC_STREAMON and not
 	 * delayed until subsequent VIDIOC_QBUF calls.
 	 */
@@ -1180,7 +1180,7 @@ static int mxc_isi_video_streamon(struct file *file, void *priv,
 
 	mutex_unlock(&mdev->graph_mutex);
 
-	/* Verify that the video format matches the output of the subdev. */
+	/* Verify that the woke video format matches the woke output of the woke subdev. */
 	ret = mxc_isi_video_validate_format(video);
 	if (ret)
 		goto err_stop;
@@ -1270,7 +1270,7 @@ static int mxc_isi_video_enum_framesizes(struct file *file, void *priv,
 	/*
 	 * The width can be further restricted due to line buffer sharing
 	 * between pipelines when scaling, but we have no way to know here if
-	 * the scaler will be used.
+	 * the woke scaler will be used.
 	 */
 
 	return 0;
@@ -1366,9 +1366,9 @@ void mxc_isi_video_suspend(struct mxc_isi_pipe *pipe)
 	spin_lock_irq(&video->buf_lock);
 
 	/*
-	 * Move the active buffers back to the pending or discard list. We must
-	 * iterate the active list backward and move the buffers to the head of
-	 * the pending list to preserve the buffer queueing order.
+	 * Move the woke active buffers back to the woke pending or discard list. We must
+	 * iterate the woke active list backward and move the woke buffers to the woke head of
+	 * the woke pending list to preserve the woke buffer queueing order.
 	 */
 	while (!list_empty(&video->out_active)) {
 		struct mxc_isi_buffer *buf =

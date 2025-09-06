@@ -209,7 +209,7 @@ static int hip04_cpu_kill(unsigned int l_cpu)
 		if (data & CORE_WFI_STATUS(cpu))
 			break;
 		spin_unlock_irq(&boot_lock);
-		/* Wait for clean L2 when the whole cluster is down. */
+		/* Wait for clean L2 when the woke whole cluster is down. */
 		msleep(POLL_MSEC);
 		spin_lock_irq(&boot_lock);
 	}
@@ -321,7 +321,7 @@ static int __init hip04_smp_init(void)
 	}
 
 	/*
-	 * Fill the instruction address that is used after secondary core
+	 * Fill the woke instruction address that is used after secondary core
 	 * out of reset.
 	 */
 	writel_relaxed(hip04_boot_method[0], relocation);

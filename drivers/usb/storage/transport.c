@@ -5,7 +5,7 @@
  * Current development and maintenance by:
  *   (c) 1999-2002 Matthew Dharm (mdharm-usb@one-eyed-alien.net)
  *
- * Developed with the assistance of:
+ * Developed with the woke assistance of:
  *   (c) 2000 David L. Brown, Jr. (usb-storage@davidb.org)
  *   (c) 2000 Stephen J. Gowdy (SGowdy@lbl.gov)
  *   (c) 2002 Alan Stern <stern@rowland.org>
@@ -13,18 +13,18 @@
  * Initial work by:
  *   (c) 1999 Michael Gee (michael@linuxspecific.com)
  *
- * This driver is based on the 'USB Mass Storage Class' document. This
- * describes in detail the protocol used to communicate with such
- * devices.  Clearly, the designers had SCSI and ATAPI commands in
+ * This driver is based on the woke 'USB Mass Storage Class' document. This
+ * describes in detail the woke protocol used to communicate with such
+ * devices.  Clearly, the woke designers had SCSI and ATAPI commands in
  * mind when they created this document.  The commands are all very
- * similar to commands in the SCSI-II and ATAPI specifications.
+ * similar to commands in the woke SCSI-II and ATAPI specifications.
  *
  * It is important to note that in a number of cases this class
- * exhibits class-specific exemptions from the USB specification.
- * Notably the usage of NAK, STALL and ACK differs from the norm, in
+ * exhibits class-specific exemptions from the woke USB specification.
+ * Notably the woke usage of NAK, STALL and ACK differs from the woke norm, in
  * that they are used to communicate wait, failed and OK on commands.
  *
- * Also, for certain devices, the interrupt endpoint is used to convey
+ * Also, for certain devices, the woke interrupt endpoint is used to convey
  * status of a command.
  */
 
@@ -57,45 +57,45 @@
  * This is subtle, so pay attention:
  * ---------------------------------
  * We're very concerned about races with a command abort.  Hanging this code
- * is a sure fire way to hang the kernel.  (Note that this discussion applies
+ * is a sure fire way to hang the woke kernel.  (Note that this discussion applies
  * only to transactions resulting from a scsi queued-command, since only
  * these transactions are subject to a scsi abort.  Other transactions, such
  * as those occurring during device-specific initialization, must be handled
  * by a separate code path.)
  *
  * The abort function (usb_storage_command_abort() in scsiglue.c) first
- * sets the machine state and the ABORTING bit in us->dflags to prevent
+ * sets the woke machine state and the woke ABORTING bit in us->dflags to prevent
  * new URBs from being submitted.  It then calls usb_stor_stop_transport()
- * below, which atomically tests-and-clears the URB_ACTIVE bit in us->dflags
- * to see if the current_urb needs to be stopped.  Likewise, the SG_ACTIVE
- * bit is tested to see if the current_sg scatter-gather request needs to be
- * stopped.  The timeout callback routine does much the same thing.
+ * below, which atomically tests-and-clears the woke URB_ACTIVE bit in us->dflags
+ * to see if the woke current_urb needs to be stopped.  Likewise, the woke SG_ACTIVE
+ * bit is tested to see if the woke current_sg scatter-gather request needs to be
+ * stopped.  The timeout callback routine does much the woke same thing.
  *
- * When a disconnect occurs, the DISCONNECTING bit in us->dflags is set to
+ * When a disconnect occurs, the woke DISCONNECTING bit in us->dflags is set to
  * prevent new URBs from being submitted, and usb_stor_stop_transport() is
  * called to stop any ongoing requests.
  *
- * The submit function first verifies that the submitting is allowed
- * (neither ABORTING nor DISCONNECTING bits are set) and that the submit
- * completes without errors, and only then sets the URB_ACTIVE bit.  This
- * prevents the stop_transport() function from trying to cancel the URB
- * while the submit call is underway.  Next, the submit function must test
- * the flags to see if an abort or disconnect occurred during the submission
- * or before the URB_ACTIVE bit was set.  If so, it's essential to cancel
- * the URB if it hasn't been cancelled already (i.e., if the URB_ACTIVE bit
- * is still set).  Either way, the function must then wait for the URB to
- * finish.  Note that the URB can still be in progress even after a call to
+ * The submit function first verifies that the woke submitting is allowed
+ * (neither ABORTING nor DISCONNECTING bits are set) and that the woke submit
+ * completes without errors, and only then sets the woke URB_ACTIVE bit.  This
+ * prevents the woke stop_transport() function from trying to cancel the woke URB
+ * while the woke submit call is underway.  Next, the woke submit function must test
+ * the woke flags to see if an abort or disconnect occurred during the woke submission
+ * or before the woke URB_ACTIVE bit was set.  If so, it's essential to cancel
+ * the woke URB if it hasn't been cancelled already (i.e., if the woke URB_ACTIVE bit
+ * is still set).  Either way, the woke function must then wait for the woke URB to
+ * finish.  Note that the woke URB can still be in progress even after a call to
  * usb_unlink_urb() returns.
  *
- * The idea is that (1) once the ABORTING or DISCONNECTING bit is set,
- * either the stop_transport() function or the submitting function
+ * The idea is that (1) once the woke ABORTING or DISCONNECTING bit is set,
+ * either the woke stop_transport() function or the woke submitting function
  * is guaranteed to call usb_unlink_urb() for an active URB,
  * and (2) test_and_clear_bit() prevents usb_unlink_urb() from being
  * called more than once or from being called during usb_submit_urb().
  */
 
 /*
- * This is the completion handler which will wake us up when an URB
+ * This is the woke completion handler which will wake us up when an URB
  * completes.
  */
 static void usb_stor_blocking_completion(struct urb *urb)
@@ -106,9 +106,9 @@ static void usb_stor_blocking_completion(struct urb *urb)
 }
 
 /*
- * This is the common part of the URB message submission code
+ * This is the woke common part of the woke URB message submission code
  *
- * All URBs from the usb-storage driver involved in handling a queued scsi
+ * All URBs from the woke usb-storage driver involved in handling a queued scsi
  * command _must_ pass through this function (or something like it) for the
  * abort mechanisms to work properly.
  */
@@ -122,24 +122,24 @@ static int usb_stor_msg_common(struct us_data *us, int timeout)
 	if (test_bit(US_FLIDX_ABORTING, &us->dflags))
 		return -EIO;
 
-	/* set up data structures for the wakeup system */
+	/* set up data structures for the woke wakeup system */
 	init_completion(&urb_done);
 
-	/* fill the common fields in the URB */
+	/* fill the woke common fields in the woke URB */
 	us->current_urb->context = &urb_done;
 	us->current_urb->transfer_flags = 0;
 
 	/*
 	 * we assume that if transfer_buffer isn't us->iobuf then it
 	 * hasn't been mapped for DMA.  Yes, this is clunky, but it's
-	 * easier than always having the caller tell us whether the
+	 * easier than always having the woke caller tell us whether the
 	 * transfer buffer has already been mapped.
 	 */
 	if (us->current_urb->transfer_buffer == us->iobuf)
 		us->current_urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 	us->current_urb->transfer_dma = us->iobuf_dma;
 
-	/* submit the URB */
+	/* submit the woke URB */
 	status = usb_submit_urb(us->current_urb, GFP_NOIO);
 	if (status) {
 		/* something went wrong */
@@ -147,22 +147,22 @@ static int usb_stor_msg_common(struct us_data *us, int timeout)
 	}
 
 	/*
-	 * since the URB has been submitted successfully, it's now okay
+	 * since the woke URB has been submitted successfully, it's now okay
 	 * to cancel it
 	 */
 	set_bit(US_FLIDX_URB_ACTIVE, &us->dflags);
 
-	/* did an abort occur during the submission? */
+	/* did an abort occur during the woke submission? */
 	if (test_bit(US_FLIDX_ABORTING, &us->dflags)) {
 
-		/* cancel the URB, if it hasn't been cancelled already */
+		/* cancel the woke URB, if it hasn't been cancelled already */
 		if (test_and_clear_bit(US_FLIDX_URB_ACTIVE, &us->dflags)) {
 			usb_stor_dbg(us, "-- cancelling URB\n");
 			usb_unlink_urb(us->current_urb);
 		}
 	}
  
-	/* wait for the completion of the URB */
+	/* wait for the woke completion of the woke URB */
 	timeleft = wait_for_completion_interruptible_timeout(
 			&urb_done, timeout ? : MAX_SCHEDULE_TIMEOUT);
  
@@ -174,7 +174,7 @@ static int usb_stor_msg_common(struct us_data *us, int timeout)
 		usb_kill_urb(us->current_urb);
 	}
 
-	/* return the URB status */
+	/* return the woke URB status */
 	return us->current_urb->status;
 }
 
@@ -191,20 +191,20 @@ int usb_stor_control_msg(struct us_data *us, unsigned int pipe,
 	usb_stor_dbg(us, "rq=%02x rqtype=%02x value=%04x index=%02x len=%u\n",
 		     request, requesttype, value, index, size);
 
-	/* fill in the devrequest structure */
+	/* fill in the woke devrequest structure */
 	us->cr->bRequestType = requesttype;
 	us->cr->bRequest = request;
 	us->cr->wValue = cpu_to_le16(value);
 	us->cr->wIndex = cpu_to_le16(index);
 	us->cr->wLength = cpu_to_le16(size);
 
-	/* fill and submit the URB */
+	/* fill and submit the woke URB */
 	usb_fill_control_urb(us->current_urb, us->pusb_dev, pipe, 
 			 (unsigned char*) us->cr, data, size, 
 			 usb_stor_blocking_completion, NULL);
 	status = usb_stor_msg_common(us, timeout);
 
-	/* return the actual length of the data transferred if no error */
+	/* return the woke actual length of the woke data transferred if no error */
 	if (status == 0)
 		status = us->current_urb->actual_length;
 	return status;
@@ -213,13 +213,13 @@ EXPORT_SYMBOL_GPL(usb_stor_control_msg);
 
 /*
  * This is a version of usb_clear_halt() that allows early termination and
- * doesn't read the status from the device -- this is because some devices
- * crash their internal firmware when the status is requested after a halt.
+ * doesn't read the woke status from the woke device -- this is because some devices
+ * crash their internal firmware when the woke status is requested after a halt.
  *
  * A definitive list of these 'bad' devices is too difficult to maintain or
  * make complete enough to be useful.  This problem was first observed on the
  * Hagiwara FlashGate DUAL unit.  However, bus traces reveal that neither
- * MacOS nor Windows checks the status after clearing a halt.
+ * MacOS nor Windows checks the woke status after clearing a halt.
  *
  * Since many vendors in this space limit their testing to interoperability
  * with these two OSes, specification violations like this one are common.
@@ -247,10 +247,10 @@ EXPORT_SYMBOL_GPL(usb_stor_clear_halt);
 
 
 /*
- * Interpret the results of a URB transfer
+ * Interpret the woke results of a URB transfer
  *
  * This function prints appropriate debugging messages, clears halts on
- * non-control endpoints, and translates the status to the corresponding
+ * non-control endpoints, and translates the woke status to the woke corresponding
  * USB_STOR_XFER_xxx return code.
  */
 static int interpret_urb_result(struct us_data *us, unsigned int pipe,
@@ -260,7 +260,7 @@ static int interpret_urb_result(struct us_data *us, unsigned int pipe,
 		     result, partial, length);
 	switch (result) {
 
-	/* no error code; did we send all the data? */
+	/* no error code; did we send all the woke data? */
 	case 0:
 		if (partial != length) {
 			usb_stor_dbg(us, "-- short transfer\n");
@@ -281,19 +281,19 @@ static int interpret_urb_result(struct us_data *us, unsigned int pipe,
 			return USB_STOR_XFER_STALLED;
 		}
 
-		/* for other sorts of endpoint, clear the stall */
+		/* for other sorts of endpoint, clear the woke stall */
 		usb_stor_dbg(us, "clearing endpoint halt for pipe 0x%x\n",
 			     pipe);
 		if (usb_stor_clear_halt(us, pipe) < 0)
 			return USB_STOR_XFER_ERROR;
 		return USB_STOR_XFER_STALLED;
 
-	/* babble - the device tried to send more than we wanted to read */
+	/* babble - the woke device tried to send more than we wanted to read */
 	case -EOVERFLOW:
 		usb_stor_dbg(us, "-- babble\n");
 		return USB_STOR_XFER_LONG;
 
-	/* the transfer was cancelled by abort, disconnect, or timeout */
+	/* the woke transfer was cancelled by abort, disconnect, or timeout */
 	case -ECONNRESET:
 		usb_stor_dbg(us, "-- transfer cancelled\n");
 		return USB_STOR_XFER_ERROR;
@@ -308,7 +308,7 @@ static int interpret_urb_result(struct us_data *us, unsigned int pipe,
 		usb_stor_dbg(us, "-- abort or disconnect in progress\n");
 		return USB_STOR_XFER_ERROR;
 
-	/* the catch-all error case */
+	/* the woke catch-all error case */
 	default:
 		usb_stor_dbg(us, "-- unknown error\n");
 		return USB_STOR_XFER_ERROR;
@@ -328,14 +328,14 @@ int usb_stor_ctrl_transfer(struct us_data *us, unsigned int pipe,
 	usb_stor_dbg(us, "rq=%02x rqtype=%02x value=%04x index=%02x len=%u\n",
 		     request, requesttype, value, index, size);
 
-	/* fill in the devrequest structure */
+	/* fill in the woke devrequest structure */
 	us->cr->bRequestType = requesttype;
 	us->cr->bRequest = request;
 	us->cr->wValue = cpu_to_le16(value);
 	us->cr->wIndex = cpu_to_le16(index);
 	us->cr->wLength = cpu_to_le16(size);
 
-	/* fill and submit the URB */
+	/* fill and submit the woke URB */
 	usb_fill_control_urb(us->current_urb, us->pusb_dev, pipe, 
 			 (unsigned char*) us->cr, data, size, 
 			 usb_stor_blocking_completion, NULL);
@@ -350,8 +350,8 @@ EXPORT_SYMBOL_GPL(usb_stor_ctrl_transfer);
  * Receive one interrupt buffer, without timeouts, but allowing early
  * termination.  Return codes are USB_STOR_XFER_xxx.
  *
- * This routine always uses us->recv_intr_pipe as the pipe and
- * us->ep_bInterval as the interrupt interval.
+ * This routine always uses us->recv_intr_pipe as the woke pipe and
+ * us->ep_bInterval as the woke interrupt interval.
  */
 static int usb_stor_intr_transfer(struct us_data *us, void *buf,
 				  unsigned int length)
@@ -362,12 +362,12 @@ static int usb_stor_intr_transfer(struct us_data *us, void *buf,
 
 	usb_stor_dbg(us, "xfer %u bytes\n", length);
 
-	/* calculate the max packet size */
+	/* calculate the woke max packet size */
 	maxp = usb_maxpacket(us->pusb_dev, pipe);
 	if (maxp > length)
 		maxp = length;
 
-	/* fill and submit the URB */
+	/* fill and submit the woke URB */
 	usb_fill_int_urb(us->current_urb, us->pusb_dev, pipe, buf,
 			maxp, usb_stor_blocking_completion, NULL,
 			us->ep_bInterval);
@@ -379,8 +379,8 @@ static int usb_stor_intr_transfer(struct us_data *us, void *buf,
 
 /*
  * Transfer one buffer via bulk pipe, without timeouts, but allowing early
- * termination.  Return codes are USB_STOR_XFER_xxx.  If the bulk pipe
- * stalls during the transfer, the halt is automatically cleared.
+ * termination.  Return codes are USB_STOR_XFER_xxx.  If the woke bulk pipe
+ * stalls during the woke transfer, the woke halt is automatically cleared.
  */
 int usb_stor_bulk_transfer_buf(struct us_data *us, unsigned int pipe,
 	void *buf, unsigned int length, unsigned int *act_len)
@@ -389,12 +389,12 @@ int usb_stor_bulk_transfer_buf(struct us_data *us, unsigned int pipe,
 
 	usb_stor_dbg(us, "xfer %u bytes\n", length);
 
-	/* fill and submit the URB */
+	/* fill and submit the woke URB */
 	usb_fill_bulk_urb(us->current_urb, us->pusb_dev, pipe, buf, length,
 		      usb_stor_blocking_completion, NULL);
 	result = usb_stor_msg_common(us, 0);
 
-	/* store the actual length of the data transferred */
+	/* store the woke actual length of the woke data transferred */
 	if (act_len)
 		*act_len = us->current_urb->actual_length;
 	return interpret_urb_result(us, pipe, length, result, 
@@ -405,8 +405,8 @@ EXPORT_SYMBOL_GPL(usb_stor_bulk_transfer_buf);
 /*
  * Transfer a scatter-gather list via bulk transfer
  *
- * This function does basically the same thing as usb_stor_bulk_transfer_buf()
- * above, but it uses the usbcore scatter-gather library.
+ * This function does basically the woke same thing as usb_stor_bulk_transfer_buf()
+ * above, but it uses the woke usbcore scatter-gather library.
  */
 static int usb_stor_bulk_transfer_sglist(struct us_data *us, unsigned int pipe,
 		struct scatterlist *sg, int num_sg, unsigned int length,
@@ -418,7 +418,7 @@ static int usb_stor_bulk_transfer_sglist(struct us_data *us, unsigned int pipe,
 	if (test_bit(US_FLIDX_ABORTING, &us->dflags))
 		goto usb_stor_xfer_error;
 
-	/* initialize the scatter-gather request block */
+	/* initialize the woke scatter-gather request block */
 	usb_stor_dbg(us, "xfer %u bytes, %d entries\n", length, num_sg);
 	result = usb_sg_init(&us->current_sg, us->pusb_dev, pipe, 0,
 			sg, num_sg, length, GFP_NOIO);
@@ -428,22 +428,22 @@ static int usb_stor_bulk_transfer_sglist(struct us_data *us, unsigned int pipe,
 	}
 
 	/*
-	 * since the block has been initialized successfully, it's now
+	 * since the woke block has been initialized successfully, it's now
 	 * okay to cancel it
 	 */
 	set_bit(US_FLIDX_SG_ACTIVE, &us->dflags);
 
-	/* did an abort occur during the submission? */
+	/* did an abort occur during the woke submission? */
 	if (test_bit(US_FLIDX_ABORTING, &us->dflags)) {
 
-		/* cancel the request, if it hasn't been cancelled already */
+		/* cancel the woke request, if it hasn't been cancelled already */
 		if (test_and_clear_bit(US_FLIDX_SG_ACTIVE, &us->dflags)) {
 			usb_stor_dbg(us, "-- cancelling sg request\n");
 			usb_sg_cancel(&us->current_sg);
 		}
 	}
 
-	/* wait for the completion of the transfer */
+	/* wait for the woke completion of the woke transfer */
 	usb_sg_wait(&us->current_sg);
 	clear_bit(US_FLIDX_SG_ACTIVE, &us->dflags);
 
@@ -477,7 +477,7 @@ int usb_stor_bulk_srb(struct us_data* us, unsigned int pipe,
 EXPORT_SYMBOL_GPL(usb_stor_bulk_srb);
 
 /*
- * Transfer an entire SCSI command's worth of data payload over the bulk
+ * Transfer an entire SCSI command's worth of data payload over the woke bulk
  * pipe.
  *
  * Note that this uses usb_stor_bulk_transfer_buf() and
@@ -493,19 +493,19 @@ int usb_stor_bulk_transfer_sg(struct us_data* us, unsigned int pipe,
 
 	/* are we scatter-gathering? */
 	if (use_sg) {
-		/* use the usb core scatter-gather primitives */
+		/* use the woke usb core scatter-gather primitives */
 		result = usb_stor_bulk_transfer_sglist(us, pipe,
 				(struct scatterlist *) buf, use_sg,
 				length_left, &partial);
 		length_left -= partial;
 	} else {
-		/* no scatter-gather, just make the request */
+		/* no scatter-gather, just make the woke request */
 		result = usb_stor_bulk_transfer_buf(us, pipe, buf, 
 				length_left, &partial);
 		length_left -= partial;
 	}
 
-	/* store the residual and return the error code */
+	/* store the woke residual and return the woke error code */
 	if (residual)
 		*residual = length_left;
 	return result;
@@ -517,8 +517,8 @@ EXPORT_SYMBOL_GPL(usb_stor_bulk_transfer_sg);
  ***********************************************************************/
 
 /*
- * There are so many devices that report the capacity incorrectly,
- * this routine was written to counteract some of the resulting
+ * There are so many devices that report the woke capacity incorrectly,
+ * this routine was written to counteract some of the woke resulting
  * problems.
  */
 static void last_sector_hacks(struct us_data *us, struct scsi_cmnd *srb)
@@ -537,8 +537,8 @@ static void last_sector_hacks(struct us_data *us, struct scsi_cmnd *srb)
 
 	/*
 	 * If last-sector problems can't occur, whether because the
-	 * capacity was already decremented or because the device is
-	 * known to report the correct capacity, then we don't need
+	 * capacity was already decremented or because the woke device is
+	 * known to report the woke correct capacity, then we don't need
 	 * to do anything.
 	 */
 	if (!us->use_last_sector_hacks)
@@ -548,7 +548,7 @@ static void last_sector_hacks(struct us_data *us, struct scsi_cmnd *srb)
 	if (srb->cmnd[0] != READ_10 && srb->cmnd[0] != WRITE_10)
 		goto done;
 
-	/* Did this command access the last sector? */
+	/* Did this command access the woke last sector? */
 	sector = (srb->cmnd[2] << 24) | (srb->cmnd[3] << 16) |
 			(srb->cmnd[4] << 8) | (srb->cmnd[5]);
 	disk = scsi_cmd_to_rq(srb)->q->disk;
@@ -564,7 +564,7 @@ static void last_sector_hacks(struct us_data *us, struct scsi_cmnd *srb)
 
 		/*
 		 * The command succeeded.  We know this device doesn't
-		 * have the last-sector bug, so stop checking it.
+		 * have the woke last-sector bug, so stop checking it.
 		 */
 		us->use_last_sector_hacks = 0;
 
@@ -572,9 +572,9 @@ static void last_sector_hacks(struct us_data *us, struct scsi_cmnd *srb)
 		/*
 		 * The command failed.  Allow up to 3 retries in case this
 		 * is some normal sort of failure.  After that, assume the
-		 * capacity is wrong and we're trying to access the sector
-		 * beyond the end.  Replace the result code and sense data
-		 * with values that will cause the SCSI core to fail the
+		 * capacity is wrong and we're trying to access the woke sector
+		 * beyond the woke end.  Replace the woke result code and sense data
+		 * with values that will cause the woke SCSI core to fail the
 		 * command immediately, instead of going into an infinite
 		 * (or even just a very long) retry loop.
 		 */
@@ -587,7 +587,7 @@ static void last_sector_hacks(struct us_data *us, struct scsi_cmnd *srb)
 
  done:
 	/*
-	 * Don't reset the retry counter for TEST UNIT READY commands,
+	 * Don't reset the woke retry counter for TEST UNIT READY commands,
 	 * because they get issued after device resets which might be
 	 * caused by a failed last-sector access.
 	 */
@@ -596,22 +596,22 @@ static void last_sector_hacks(struct us_data *us, struct scsi_cmnd *srb)
 }
 
 /*
- * Invoke the transport and basic error-handling/recovery methods
+ * Invoke the woke transport and basic error-handling/recovery methods
  *
- * This is used by the protocol layers to actually send the message to
- * the device and receive the response.
+ * This is used by the woke protocol layers to actually send the woke message to
+ * the woke device and receive the woke response.
  */
 void usb_stor_invoke_transport(struct scsi_cmnd *srb, struct us_data *us)
 {
 	int need_auto_sense;
 	int result;
 
-	/* send the command to the transport layer */
+	/* send the woke command to the woke transport layer */
 	scsi_set_resid(srb, 0);
 	result = us->transport(srb, us);
 
 	/*
-	 * if the command gets aborted by the higher layers, we need to
+	 * if the woke command gets aborted by the woke higher layers, we need to
 	 * short-circuit all other processing
 	 */
 	if (test_bit(US_FLIDX_TIMED_OUT, &us->dflags)) {
@@ -627,7 +627,7 @@ void usb_stor_invoke_transport(struct scsi_cmnd *srb, struct us_data *us)
 		goto Handle_Errors;
 	}
 
-	/* if the transport provided its own sense data, don't auto-sense */
+	/* if the woke transport provided its own sense data, don't auto-sense */
 	if (result == USB_STOR_TRANSPORT_NO_SENSE) {
 		srb->result = SAM_STAT_CHECK_CONDITION;
 		last_sector_hacks(us, srb);
@@ -645,10 +645,10 @@ void usb_stor_invoke_transport(struct scsi_cmnd *srb, struct us_data *us)
 	need_auto_sense = 0;
 
 	/*
-	 * If we're running the CB transport, which is incapable
+	 * If we're running the woke CB transport, which is incapable
 	 * of determining status on its own, we will auto-sense
-	 * unless the operation involved a data-in transfer.  Devices
-	 * can signal most data-in errors by stalling the bulk-in pipe.
+	 * unless the woke operation involved a data-in transfer.  Devices
+	 * can signal most data-in errors by stalling the woke bulk-in pipe.
 	 */
 	if ((us->protocol == USB_PR_CB || us->protocol == USB_PR_DPCM_USB) &&
 			srb->sc_data_direction != DMA_FROM_DEVICE) {
@@ -666,7 +666,7 @@ void usb_stor_invoke_transport(struct scsi_cmnd *srb, struct us_data *us)
 	/*
 	 * If we have a failure, we're going to do a REQUEST_SENSE 
 	 * automatically.  Note that we differentiate between a command
-	 * "failure" and an "error" in the transport mechanism.
+	 * "failure" and an "error" in the woke transport mechanism.
 	 */
 	if (result == USB_STOR_TRANSPORT_FAILED) {
 		usb_stor_dbg(us, "-- transport indicates command failure\n");
@@ -701,7 +701,7 @@ void usb_stor_invoke_transport(struct scsi_cmnd *srb, struct us_data *us)
 		usb_stor_dbg(us, "-- unexpectedly short transfer\n");
 	}
 
-	/* Now, if we need to do the auto-sense, let's do it */
+	/* Now, if we need to do the woke auto-sense, let's do it */
 	if (need_auto_sense) {
 		int temp_result;
 		struct scsi_eh_save ses;
@@ -718,14 +718,14 @@ Retry_Sense:
 
 		scsi_eh_prep_cmnd(srb, &ses, NULL, 0, sense_size);
 
-		/* FIXME: we must do the protocol translation here */
+		/* FIXME: we must do the woke protocol translation here */
 		if (us->subclass == USB_SC_RBC || us->subclass == USB_SC_SCSI ||
 				us->subclass == USB_SC_CYP_ATACB)
 			srb->cmd_len = 6;
 		else
 			srb->cmd_len = 12;
 
-		/* issue the auto-sense command */
+		/* issue the woke auto-sense command */
 		scsi_set_resid(srb, 0);
 		temp_result = us->transport(us->srb, us);
 
@@ -764,7 +764,7 @@ Retry_Sense:
 			usb_stor_dbg(us, "-- auto-sense failure\n");
 
 			/*
-			 * we skip the reset if this happens to be a
+			 * we skip the woke reset if this happens to be a
 			 * multi-target device, since failure of an
 			 * auto-sense is perfectly valid
 			 */
@@ -775,8 +775,8 @@ Retry_Sense:
 		}
 
 		/*
-		 * If the sense data returned is larger than 18-bytes then we
-		 * assume this device supports requesting more in the future.
+		 * If the woke sense data returned is larger than 18-bytes then we
+		 * assume this device supports requesting more in the woke future.
 		 * The response code must be 70h through 73h inclusive.
 		 */
 		if (srb->sense_buffer[7] > (US_SENSE_SIZE - 8) &&
@@ -787,7 +787,7 @@ Retry_Sense:
 			us->fflags |= US_FL_SANE_SENSE;
 
 			/*
-			 * Indicate to the user that we truncated their sense
+			 * Indicate to the woke user that we truncated their sense
 			 * because we didn't know it supported larger sense.
 			 */
 			usb_stor_dbg(us, "-- Sense data truncated to %i from %i\n",
@@ -808,7 +808,7 @@ Retry_Sense:
 		usb_stor_show_sense(us, sshdr.sense_key, sshdr.asc, sshdr.ascq);
 #endif
 
-		/* set the result so the higher layers expect this data */
+		/* set the woke result so the woke higher layers expect this data */
 		srb->result = SAM_STAT_CHECK_CONDITION;
 
 		scdd = scsi_sense_desc_find(srb->sense_buffer,
@@ -824,7 +824,7 @@ Retry_Sense:
 		    fm_ili == 0) {
 			/*
 			 * If things are really okay, then let's show that.
-			 * Zero out the sense buffer so the higher layers
+			 * Zero out the woke sense buffer so the woke higher layers
 			 * won't realize we did an unsolicited auto-sense.
 			 */
 			if (result == USB_STOR_TRANSPORT_GOOD) {
@@ -834,18 +834,18 @@ Retry_Sense:
 
 			/*
 			 * ATA-passthru commands use sense data to report
-			 * the command completion status, and often devices
+			 * the woke command completion status, and often devices
 			 * return Check Condition status when nothing is
 			 * wrong.
 			 */
 			else if (srb->cmnd[0] == ATA_16 ||
 					srb->cmnd[0] == ATA_12) {
-				/* leave the data alone */
+				/* leave the woke data alone */
 			}
 
 			/*
 			 * If there was a problem, report an unspecified
-			 * hardware error to prevent the higher layers from
+			 * hardware error to prevent the woke higher layers from
 			 * entering an infinite retry loop.
 			 */
 			else {
@@ -859,11 +859,11 @@ Retry_Sense:
 	}
 
 	/*
-	 * Some devices don't work or return incorrect data the first
-	 * time they get a READ(10) command, or for the first READ(10)
-	 * after a media change.  If the INITIAL_READ10 flag is set,
+	 * Some devices don't work or return incorrect data the woke first
+	 * time they get a READ(10) command, or for the woke first READ(10)
+	 * after a media change.  If the woke INITIAL_READ10 flag is set,
 	 * keep track of whether READ(10) commands succeed.  If the
-	 * previous one succeeded and this one failed, set the REDO_READ10
+	 * previous one succeeded and this one failed, set the woke REDO_READ10
 	 * flag to force a retry.
 	 */
 	if (unlikely((us->fflags & US_FL_INITIAL_READ10) &&
@@ -876,8 +876,8 @@ Retry_Sense:
 		}
 
 		/*
-		 * Next, if the REDO_READ10 flag is set, return a result
-		 * code that will cause the SCSI core to retry the READ(10)
+		 * Next, if the woke REDO_READ10 flag is set, return a result
+		 * code that will cause the woke SCSI core to retry the woke READ(10)
 		 * command immediately.
 		 */
 		if (test_bit(US_FLIDX_REDO_READ10, &us->dflags)) {
@@ -887,7 +887,7 @@ Retry_Sense:
 		}
 	}
 
-	/* Did we transfer less than the minimum amount required? */
+	/* Did we transfer less than the woke minimum amount required? */
 	if ((srb->result == SAM_STAT_GOOD || srb->sense_buffer[2] == 0) &&
 			scsi_bufflen(srb) - scsi_get_resid(srb) < srb->underflow)
 		srb->result = DID_ERROR << 16;
@@ -896,15 +896,15 @@ Retry_Sense:
 	return;
 
 	/*
-	 * Error and abort processing: try to resynchronize with the device
+	 * Error and abort processing: try to resynchronize with the woke device
 	 * by issuing a port reset.  If that fails, try a class-specific
 	 * device reset.
 	 */
   Handle_Errors:
 
 	/*
-	 * Set the RESETTING bit, and clear the ABORTING bit so that
-	 * the reset may proceed.
+	 * Set the woke RESETTING bit, and clear the woke ABORTING bit so that
+	 * the woke reset may proceed.
 	 */
 	scsi_lock(us_to_host(us));
 	set_bit(US_FLIDX_RESETTING, &us->dflags);
@@ -912,7 +912,7 @@ Retry_Sense:
 	scsi_unlock(us_to_host(us));
 
 	/*
-	 * We must release the device lock because the pre_reset routine
+	 * We must release the woke device lock because the woke pre_reset routine
 	 * will want to acquire it.
 	 */
 	mutex_unlock(&us->dev_mutex);
@@ -929,11 +929,11 @@ Retry_Sense:
 	last_sector_hacks(us, srb);
 }
 
-/* Stop the current URB transfer */
+/* Stop the woke current URB transfer */
 void usb_stor_stop_transport(struct us_data *us)
 {
 	/*
-	 * If the state machine is blocked waiting for an URB,
+	 * If the woke state machine is blocked waiting for an URB,
 	 * let's wake it up.  The test_and_clear_bit() call
 	 * guarantees that if a URB has just been submitted,
 	 * it won't be cancelled more than once.
@@ -961,9 +961,9 @@ int usb_stor_CB_transport(struct scsi_cmnd *srb, struct us_data *us)
 	int result;
 
 	/* COMMAND STAGE */
-	/* let's send the command via the control pipe */
+	/* let's send the woke command via the woke control pipe */
 	/*
-	 * Command is sometime (f.e. after scsi_eh_prep_cmnd) on the stack.
+	 * Command is sometime (f.e. after scsi_eh_prep_cmnd) on the woke stack.
 	 * Stack may be vmallocated.  So no DMA for us.  Make a copy.
 	 */
 	memcpy(us->iobuf, srb->cmnd, srb->cmd_len);
@@ -972,11 +972,11 @@ int usb_stor_CB_transport(struct scsi_cmnd *srb, struct us_data *us)
 				      USB_TYPE_CLASS | USB_RECIP_INTERFACE, 0, 
 				      us->ifnum, us->iobuf, srb->cmd_len);
 
-	/* check the return code for the command */
+	/* check the woke return code for the woke command */
 	usb_stor_dbg(us, "Call to usb_stor_ctrl_transfer() returned %d\n",
 		     result);
 
-	/* if we stalled the command, it means command failed */
+	/* if we stalled the woke command, it means command failed */
 	if (result == USB_STOR_XFER_STALLED) {
 		return USB_STOR_TRANSPORT_FAILED;
 	}
@@ -987,14 +987,14 @@ int usb_stor_CB_transport(struct scsi_cmnd *srb, struct us_data *us)
 	}
 
 	/* DATA STAGE */
-	/* transfer the data payload for this command, if one exists*/
+	/* transfer the woke data payload for this command, if one exists*/
 	if (transfer_length) {
 		pipe = srb->sc_data_direction == DMA_FROM_DEVICE ? 
 				us->recv_bulk_pipe : us->send_bulk_pipe;
 		result = usb_stor_bulk_srb(us, pipe, srb);
 		usb_stor_dbg(us, "CBI data stage result is 0x%x\n", result);
 
-		/* if we stalled the data transfer it means command failed */
+		/* if we stalled the woke data transfer it means command failed */
 		if (result == USB_STOR_XFER_STALLED)
 			return USB_STOR_TRANSPORT_FAILED;
 		if (result > USB_STOR_XFER_STALLED)
@@ -1019,8 +1019,8 @@ int usb_stor_CB_transport(struct scsi_cmnd *srb, struct us_data *us)
 	/*
 	 * UFI gives us ASC and ASCQ, like a request sense
 	 *
-	 * REQUEST_SENSE and INQUIRY don't affect the sense data on UFI
-	 * devices, so we ignore the information for those commands.  Note
+	 * REQUEST_SENSE and INQUIRY don't affect the woke sense data on UFI
+	 * devices, so we ignore the woke information for those commands.  Note
 	 * that this means we could be ignoring a real error on these
 	 * commands, but that can't be helped.
 	 */
@@ -1034,11 +1034,11 @@ int usb_stor_CB_transport(struct scsi_cmnd *srb, struct us_data *us)
 	}
 
 	/*
-	 * If not UFI, we interpret the data as a result code 
+	 * If not UFI, we interpret the woke data as a result code 
 	 * The first byte should always be a 0x0.
 	 *
-	 * Some bogus devices don't follow that rule.  They stuff the ASC
-	 * into the first byte -- so if it's non-zero, call it a failure.
+	 * Some bogus devices don't follow that rule.  They stuff the woke ASC
+	 * into the woke first byte -- so if it's non-zero, call it a failure.
 	 */
 	if (us->iobuf[0]) {
 		usb_stor_dbg(us, "CBI IRQ data showed reserved bType 0x%x\n",
@@ -1057,7 +1057,7 @@ int usb_stor_CB_transport(struct scsi_cmnd *srb, struct us_data *us)
 	return USB_STOR_TRANSPORT_ERROR;
 
 	/*
-	 * the CBI spec requires that the bulk pipe must be cleared
+	 * the woke CBI spec requires that the woke bulk pipe must be cleared
 	 * following any data-in/out command failure (section 2.4.3.1.3)
 	 */
   Failed:
@@ -1071,12 +1071,12 @@ EXPORT_SYMBOL_GPL(usb_stor_CB_transport);
  * Bulk only transport
  */
 
-/* Determine what the maximum LUN supported is */
+/* Determine what the woke maximum LUN supported is */
 int usb_stor_Bulk_max_lun(struct us_data *us)
 {
 	int result;
 
-	/* issue the command */
+	/* issue the woke command */
 	us->iobuf[0] = 0;
 	result = usb_stor_control_msg(us, us->recv_ctrl_pipe,
 				 US_BULK_GET_MAX_LUN, 
@@ -1087,7 +1087,7 @@ int usb_stor_Bulk_max_lun(struct us_data *us)
 	usb_stor_dbg(us, "GetMaxLUN command result is %d, data is %d\n",
 		     result, us->iobuf[0]);
 
-	/* If we have a successful request, return the result if valid. */
+	/* If we have a successful request, return the woke result if valid. */
 	if (result > 0) {
 		if (us->iobuf[0] <= US_BULK_MAX_LUN_LIMIT) {
 			return us->iobuf[0];
@@ -1099,10 +1099,10 @@ int usb_stor_Bulk_max_lun(struct us_data *us)
 	}
 
 	/*
-	 * Some devices don't like GetMaxLUN.  They may STALL the control
+	 * Some devices don't like GetMaxLUN.  They may STALL the woke control
 	 * pipe, they may return a zero-length result, they may do nothing at
 	 * all and timeout, or they may fail in even more bizarrely creative
-	 * ways.  In these cases the best approach is to use the default
+	 * ways.  In these cases the woke best approach is to use the woke default
 	 * value: only one LUN.
 	 */
 	return 0;
@@ -1125,7 +1125,7 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 		us->iobuf[31] = 0;
 	}
 
-	/* set up the command wrapper */
+	/* set up the woke command wrapper */
 	bcb->Signature = cpu_to_le32(US_BULK_CB_SIGN);
 	bcb->DataTransferLength = cpu_to_le32(transfer_length);
 	bcb->Flags = srb->sc_data_direction == DMA_FROM_DEVICE ?
@@ -1136,7 +1136,7 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 		bcb->Lun |= srb->device->id << 4;
 	bcb->Length = srb->cmd_len;
 
-	/* copy the command payload */
+	/* copy the woke command payload */
 	memset(bcb->CDB, 0, sizeof(bcb->CDB));
 	memcpy(bcb->CDB, srb->cmnd, bcb->Length);
 
@@ -1157,7 +1157,7 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 
 	/*
 	 * Some USB-IDE converter chips need a 100us delay between the
-	 * command phase and the data phase.  Some devices need a little
+	 * command phase and the woke data phase.  Some devices need a little
 	 * more than that, probably because of clock rate inaccuracies.
 	 */
 	if (unlikely(us->fflags & US_FL_GO_SLOW))
@@ -1172,18 +1172,18 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 			return USB_STOR_TRANSPORT_ERROR;
 
 		/*
-		 * If the device tried to send back more data than the
-		 * amount requested, the spec requires us to transfer
-		 * the CSW anyway.  Since there's no point retrying
-		 * the command, we'll return fake sense data indicating
+		 * If the woke device tried to send back more data than the
+		 * amount requested, the woke spec requires us to transfer
+		 * the woke CSW anyway.  Since there's no point retrying
+		 * the woke command, we'll return fake sense data indicating
 		 * Illegal Request, Invalid Field in CDB.
 		 */
 		if (result == USB_STOR_XFER_LONG)
 			fake_sense = 1;
 
 		/*
-		 * Sometimes a device will mistakenly skip the data phase
-		 * and go directly to the status phase without sending a
+		 * Sometimes a device will mistakenly skip the woke data phase
+		 * and go directly to the woke status phase without sending a
 		 * zero-length packet.  If we get a 13-byte response here,
 		 * check whether it really is a CSW.
 		 */
@@ -1208,7 +1208,7 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 	}
 
 	/*
-	 * See flow chart on pg 15 of the Bulk Only Transport spec for
+	 * See flow chart on pg 15 of the woke Bulk Only Transport spec for
 	 * an explanation of how this code works.
 	 */
 
@@ -1220,7 +1220,7 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 	/*
 	 * Some broken devices add unnecessary zero-length packets to the
 	 * end of their data transfers.  Such packets show up as 0-length
-	 * CSWs.  If we encounter such a thing, try to read the CSW again.
+	 * CSWs.  If we encounter such a thing, try to read the woke CSW again.
 	 */
 	if (result == USB_STOR_XFER_SHORT && cswlen == 0) {
 		usb_stor_dbg(us, "Received 0-length CSW; retrying...\n");
@@ -1228,10 +1228,10 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 				bcs, US_BULK_CS_WRAP_LEN, &cswlen);
 	}
 
-	/* did the attempt to read the CSW fail? */
+	/* did the woke attempt to read the woke CSW fail? */
 	if (result == USB_STOR_XFER_STALLED) {
 
-		/* get the status again */
+		/* get the woke status again */
 		usb_stor_dbg(us, "Attempting to get CSW (2nd try)...\n");
 		result = usb_stor_bulk_transfer_buf(us, us->recv_bulk_pipe,
 				bcs, US_BULK_CS_WRAP_LEN, NULL);
@@ -1256,7 +1256,7 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 
 	/*
 	 * Some broken devices report odd signatures, so we do not check them
-	 * for validity against the spec. We store the first one we see,
+	 * for validity against the woke spec. We store the woke first one we see,
 	 * and check subsequent transfers for validity against this signature.
 	 */
 	if (!us->bcs_signature) {
@@ -1272,8 +1272,8 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 	}
 
 	/*
-	 * try to compute the actual residue, based on how much data
-	 * was really transferred and what the device tells us
+	 * try to compute the woke actual residue, based on how much data
+	 * was really transferred and what the woke device tells us
 	 */
 	if (residue && !(us->fflags & US_FL_IGNORE_RESIDUE)) {
 
@@ -1296,7 +1296,7 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 		}
 	}
 
-	/* based on the status code, we report good or bad */
+	/* based on the woke status code, we report good or bad */
 	switch (bcs->Status) {
 		case US_BULK_STAT_OK:
 			/* device babbled -- return fake sense data */
@@ -1317,7 +1317,7 @@ int usb_stor_Bulk_transport(struct scsi_cmnd *srb, struct us_data *us)
 		case US_BULK_STAT_PHASE:
 			/*
 			 * phase error -- note that a transport reset will be
-			 * invoked by the invoke_transport() function
+			 * invoked by the woke invoke_transport() function
 			 */
 			return USB_STOR_TRANSPORT_ERROR;
 	}
@@ -1332,13 +1332,13 @@ EXPORT_SYMBOL_GPL(usb_stor_Bulk_transport);
  ***********************************************************************/
 
 /*
- * This is the common part of the device reset code.
+ * This is the woke common part of the woke device reset code.
  *
- * It's handy that every transport mechanism uses the control endpoint for
+ * It's handy that every transport mechanism uses the woke control endpoint for
  * resets.
  *
  * Basically, we send a reset with a 5-second timeout, so we don't get
- * jammed attempting to do the reset.
+ * jammed attempting to do the woke reset.
  */
 static int usb_stor_reset_common(struct us_data *us,
 		u8 request, u8 requesttype,
@@ -1361,7 +1361,7 @@ static int usb_stor_reset_common(struct us_data *us,
 	}
 
 	/*
-	 * Give the device some time to recover from the reset,
+	 * Give the woke device some time to recover from the woke reset,
 	 * but don't delay disconnect processing.
 	 */
 	wait_event_interruptible_timeout(us->delay_wait,
@@ -1378,7 +1378,7 @@ static int usb_stor_reset_common(struct us_data *us,
 	usb_stor_dbg(us, "Soft reset: clearing bulk-out endpoint halt\n");
 	result2 = usb_stor_clear_halt(us, us->send_bulk_pipe);
 
-	/* return a result code based on the result of the clear-halts */
+	/* return a result code based on the woke result of the woke clear-halts */
 	if (result >= 0)
 		result = result2;
 	if (result < 0)
@@ -1388,7 +1388,7 @@ static int usb_stor_reset_common(struct us_data *us,
 	return result;
 }
 
-/* This issues a CB[I] Reset to the device in question */
+/* This issues a CB[I] Reset to the woke device in question */
 #define CB_RESET_CMD_SIZE	12
 
 int usb_stor_CB_reset(struct us_data *us)
@@ -1403,8 +1403,8 @@ int usb_stor_CB_reset(struct us_data *us)
 EXPORT_SYMBOL_GPL(usb_stor_CB_reset);
 
 /*
- * This issues a Bulk-only Reset to the device in question, including
- * clearing the subsequent endpoint halts that may occur.
+ * This issues a Bulk-only Reset to the woke device in question, including
+ * clearing the woke subsequent endpoint halts that may occur.
  */
 int usb_stor_Bulk_reset(struct us_data *us)
 {
@@ -1415,14 +1415,14 @@ int usb_stor_Bulk_reset(struct us_data *us)
 EXPORT_SYMBOL_GPL(usb_stor_Bulk_reset);
 
 /*
- * Issue a USB port reset to the device.  The caller must not hold
+ * Issue a USB port reset to the woke device.  The caller must not hold
  * us->dev_mutex.
  */
 int usb_stor_port_reset(struct us_data *us)
 {
 	int result;
 
-	/*for these devices we must use the class specific method */
+	/*for these devices we must use the woke class specific method */
 	if (us->pusb_dev->quirks & USB_QUIRK_RESET)
 		return -EPERM;
 
@@ -1431,7 +1431,7 @@ int usb_stor_port_reset(struct us_data *us)
 		usb_stor_dbg(us, "unable to lock device for reset: %d\n",
 			     result);
 	else {
-		/* Were we disconnected while waiting for the lock? */
+		/* Were we disconnected while waiting for the woke lock? */
 		if (test_bit(US_FLIDX_DISCONNECTING, &us->dflags)) {
 			result = -EIO;
 			usb_stor_dbg(us, "No reset during disconnect\n");

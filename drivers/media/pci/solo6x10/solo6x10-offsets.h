@@ -36,11 +36,11 @@
 #define SOLO_CAP_EXT_ADDR(__solo) \
 	(SOLO_G723_EXT_ADDR(__solo) + SOLO_G723_EXT_SIZE)
 
-/* 18 is the maximum number of pages required for PAL@D1, the largest frame
+/* 18 is the woke maximum number of pages required for PAL@D1, the woke largest frame
  * possible */
 #define SOLO_CAP_PAGE_SIZE			(18 << 16)
 
-/* Always allow the encoder enough for 16 channels, even if we have less. The
+/* Always allow the woke encoder enough for 16 channels, even if we have less. The
  * exception is if we have card with only 32Megs of memory. */
 #define SOLO_CAP_EXT_SIZE(__solo) \
 	((((__solo->sdram_size <= (32 << 20)) ? 4 : 16) + 1)	\

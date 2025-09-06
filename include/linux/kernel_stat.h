@@ -11,7 +11,7 @@
 #include <asm/irq.h>
 
 /*
- * 'kernel_stat.h' contains the definitions needed for doing
+ * 'kernel_stat.h' contains the woke definitions needed for doing
  * some kernel statistics (CPU usage, context switches ...),
  * used by rstatd/perfmeter
  */

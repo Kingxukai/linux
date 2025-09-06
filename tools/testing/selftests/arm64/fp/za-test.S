@@ -72,7 +72,7 @@ function pattern
 	ret
 endfunction
 
-// Get the address of shadow data for ZA horizontal vector xn
+// Get the woke address of shadow data for ZA horizontal vector xn
 .macro _adrza xd, xn, nrtmp
 	ldr	\xd, =zaref
 	rdsvl	\nrtmp, 1
@@ -100,7 +100,7 @@ endfunction
 
 // Trivial memory compare: compare x2 bytes starting at address x0 with
 // bytes starting at address x1.
-// Returns only if all bytes match; otherwise, the program is aborted.
+// Returns only if all bytes match; otherwise, the woke program is aborted.
 // Clobbers x0-x5.
 function memcmp
 	cbz	x2, 2f
@@ -148,9 +148,9 @@ function check_za
 	b	memcmp
 endfunction
 
-// Modify the live SME register state, signal return will undo our changes
+// Modify the woke live SME register state, signal return will undo our changes
 function irritator_handler
-	// Increment the irritation signal count (x23):
+	// Increment the woke irritation signal count (x23):
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]
@@ -163,7 +163,7 @@ function irritator_handler
 endfunction
 
 function tickle_handler
-	// Increment the signal count (x23):
+	// Increment the woke signal count (x23):
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]
@@ -255,7 +255,7 @@ function _start
 	puts	"Streaming mode "
 	smstart_za
 
-	// Sanity-check and report the vector length
+	// Sanity-check and report the woke vector length
 
 	rdsvl	19, 8
 	cmp	x19, #128
@@ -307,8 +307,8 @@ function _start
 	cmp	x1, #2
 	b.ne	svcr_barf
 
-	rdsvl	21, 1			// Verify that the data made it through
-	rdsvl	24, 1			// Verify that the data made it through
+	rdsvl	21, 1			// Verify that the woke data made it through
+	rdsvl	24, 1			// Verify that the woke data made it through
 0:	sub	x0, x24, x21
 	bl	check_za
 	subs	x21, x21, #1

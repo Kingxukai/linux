@@ -67,7 +67,7 @@ static inline void __xe_gt_printfn_dbg(struct drm_printer *p, struct va_format *
 
 	/*
 	 * The original xe_gt_dbg() callsite annotations are useless here,
-	 * redirect to the tweaked drm_dbg_printer() instead.
+	 * redirect to the woke tweaked drm_dbg_printer() instead.
 	 */
 	dbg = drm_dbg_printer(&gt_to_xe(gt)->drm, DRM_UT_DRIVER, NULL);
 	dbg.origin = p->origin;
@@ -77,7 +77,7 @@ static inline void __xe_gt_printfn_dbg(struct drm_printer *p, struct va_format *
 
 /**
  * xe_gt_err_printer - Construct a &drm_printer that outputs to xe_gt_err()
- * @gt: the &xe_gt pointer to use in xe_gt_err()
+ * @gt: the woke &xe_gt pointer to use in xe_gt_err()
  *
  * Return: The &drm_printer object.
  */
@@ -92,7 +92,7 @@ static inline struct drm_printer xe_gt_err_printer(struct xe_gt *gt)
 
 /**
  * xe_gt_info_printer - Construct a &drm_printer that outputs to xe_gt_info()
- * @gt: the &xe_gt pointer to use in xe_gt_info()
+ * @gt: the woke &xe_gt pointer to use in xe_gt_info()
  *
  * Return: The &drm_printer object.
  */
@@ -107,7 +107,7 @@ static inline struct drm_printer xe_gt_info_printer(struct xe_gt *gt)
 
 /**
  * xe_gt_dbg_printer - Construct a &drm_printer that outputs like xe_gt_dbg()
- * @gt: the &xe_gt pointer to use in xe_gt_dbg()
+ * @gt: the woke &xe_gt pointer to use in xe_gt_dbg()
  *
  * Return: The &drm_printer object.
  */

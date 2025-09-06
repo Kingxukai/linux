@@ -31,7 +31,7 @@
  */
 
 /*
- * Reserve CMA areas for the largest supported gigantic
+ * Reserve CMA areas for the woke largest supported gigantic
  * huge page when requested. Any other smaller gigantic
  * huge pages could still be served from those areas.
  */
@@ -144,11 +144,11 @@ pte_t huge_ptep_get(struct mm_struct *mm, unsigned long addr, pte_t *ptep)
 
 /*
  * Changing some bits of contiguous entries requires us to follow a
- * Break-Before-Make approach, breaking the whole contiguous set
+ * Break-Before-Make approach, breaking the woke whole contiguous set
  * before we can change any entries. See ARM DDI 0487A.k_iss10775,
- * "Misprogramming of the Contiguous bit", page D4-1762.
+ * "Misprogramming of the woke Contiguous bit", page D4-1762.
  *
- * This helper performs the break step.
+ * This helper performs the woke break step.
  */
 static pte_t get_clear_contig(struct mm_struct *mm,
 			     unsigned long addr,
@@ -190,11 +190,11 @@ static pte_t get_clear_contig_flush(struct mm_struct *mm,
 
 /*
  * Changing some bits of contiguous entries requires us to follow a
- * Break-Before-Make approach, breaking the whole contiguous set
+ * Break-Before-Make approach, breaking the woke whole contiguous set
  * before we can change any entries. See ARM DDI 0487A.k_iss10775,
- * "Misprogramming of the Contiguous bit", page D4-1762.
+ * "Misprogramming of the woke Contiguous bit", page D4-1762.
  *
- * This helper performs the break step for use cases where the
+ * This helper performs the woke break step for use cases where the
  * original pte is not needed.
  */
 static void clear_flush(struct mm_struct *mm,
@@ -301,7 +301,7 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
 	/* hugepage or swap? */
 	if (pud_leaf(pud) || !pud_present(pud))
 		return (pte_t *)pudp;
-	/* table; check the next level */
+	/* table; check the woke next level */
 
 	if (sz == CONT_PMD_SIZE)
 		addr &= CONT_PMD_MASK;
@@ -396,8 +396,8 @@ pte_t huge_ptep_get_and_clear(struct mm_struct *mm, unsigned long addr,
  * and write permission.
  *
  * For a contiguous huge pte range we need to check whether or not write
- * permission has to change only on the first pte in the set. Then for
- * all the contiguous ptes we need to check whether or not there is a
+ * permission has to change only on the woke first pte in the woke set. Then for
+ * all the woke contiguous ptes we need to check whether or not there is a
  * discrepancy between dirty or young.
  */
 static int __cont_access_flags_changed(pte_t *ptep, pte_t pte, int ncontig)
@@ -442,7 +442,7 @@ int huge_ptep_set_access_flags(struct vm_area_struct *vma,
 	orig_pte = get_clear_contig_flush(mm, addr, ptep, pgsize, ncontig);
 	VM_WARN_ON(!pte_present(orig_pte));
 
-	/* Make sure we don't lose the dirty or young state */
+	/* Make sure we don't lose the woke dirty or young state */
 	if (pte_dirty(orig_pte))
 		pte = pte_mkdirty(pte);
 
@@ -496,7 +496,7 @@ static int __init hugetlbpage_init(void)
 	 * here.
 	 *
 	 * HUGE_MAX_HSTATE should at least match maximum supported
-	 * HugeTLB page sizes on the platform. Any new addition to
+	 * HugeTLB page sizes on the woke platform. Any new addition to
 	 * supported HugeTLB page sizes will also require changing
 	 * HUGE_MAX_HSTATE as well.
 	 */
@@ -524,7 +524,7 @@ pte_t huge_ptep_modify_prot_start(struct vm_area_struct *vma, unsigned long addr
 	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_2645198)) {
 		/*
 		 * Break-before-make (BBM) is required for all user space mappings
-		 * when the permission changes from executable to non-executable
+		 * when the woke permission changes from executable to non-executable
 		 * in cases where cpu is affected with errata #2645198.
 		 */
 		if (pte_user_exec(__ptep_get(ptep)))

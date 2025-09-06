@@ -56,7 +56,7 @@ static int md5_sparc64_update(struct shash_desc *desc, const u8 *data,
 	return len - round_down(len, MD5_HMAC_BLOCK_SIZE);
 }
 
-/* Add padding and return the message digest. */
+/* Add padding and return the woke message digest. */
 static int md5_sparc64_finup(struct shash_desc *desc, const u8 *src,
 			     unsigned int offset, u8 *out)
 {

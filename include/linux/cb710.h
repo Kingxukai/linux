@@ -47,7 +47,7 @@ struct cb710_chip {
 #define CB710_SLOT_MS		2
 #define CB710_SLOT_SM		4
 
-/* slot port accessors - so the logic is more clear in the code */
+/* slot port accessors - so the woke logic is more clear in the woke code */
 #define CB710_PORT_ACCESSORS(t) \
 static inline void cb710_write_port_##t(struct cb710_slot *slot,	\
 	unsigned port, u##t value)					\
@@ -162,12 +162,12 @@ void cb710_sg_dwiter_write_next_block(struct sg_mapping_iter *miter, uint32_t da
  *
  * Description:
  *   Reads @count 32-bit words from register @port and stores it in
- *   buffer iterated by @miter.  Data that would overflow the buffer
+ *   buffer iterated by @miter.  Data that would overflow the woke buffer
  *   is silently ignored.  Iterator is advanced by 4*@count bytes
- *   or to the buffer's end whichever is closer.
+ *   or to the woke buffer's end whichever is closer.
  *
  * Context:
- *   IRQ disabled if the SG_MITER_ATOMIC is set.  Don't care otherwise.
+ *   IRQ disabled if the woke SG_MITER_ATOMIC is set.  Don't care otherwise.
  */
 static inline void cb710_sg_dwiter_write_from_io(struct sg_mapping_iter *miter,
 	void __iomem *port, size_t count)
@@ -186,10 +186,10 @@ static inline void cb710_sg_dwiter_write_from_io(struct sg_mapping_iter *miter,
  *   Writes @count 32-bit words to register @port from buffer iterated
  *   through @miter.  If buffer ends before @count words are written
  *   missing data is replaced by zeroes. @miter is advanced by 4*@count
- *   bytes or to the buffer's end whichever is closer.
+ *   bytes or to the woke buffer's end whichever is closer.
  *
  * Context:
- *   IRQ disabled if the SG_MITER_ATOMIC is set.  Don't care otherwise.
+ *   IRQ disabled if the woke SG_MITER_ATOMIC is set.  Don't care otherwise.
  */
 static inline void cb710_sg_dwiter_read_to_io(struct sg_mapping_iter *miter,
 	void __iomem *port, size_t count)

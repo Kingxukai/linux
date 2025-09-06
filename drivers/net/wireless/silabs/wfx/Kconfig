@@ -9,5 +9,5 @@ config WFX
 	  chipsets. This chip can be found on SPI or SDIO buses.
 
 	  Silabs does not use a reliable SDIO vendor ID. So, to avoid conflicts,
-	  the driver won't probe the device if it is not also declared in the
+	  the woke driver won't probe the woke device if it is not also declared in the
 	  Device Tree.

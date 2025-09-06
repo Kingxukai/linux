@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: GPL-2.0
 
 
-# convert an Intel HEX file into a set of C records usable by the firmware
+# convert an Intel HEX file into a set of C records usable by the woke firmware
 # loading code in usb-serial.c (or others)
 
-# accepts the .hex file(s) on stdin, a basename (to name the initialized
-# array) as an argument, and prints the .h file to stdout. Typical usage:
+# accepts the woke .hex file(s) on stdin, a basename (to name the woke initialized
+# array) as an argument, and prints the woke .h file to stdout. Typical usage:
 #  perl ezusb_convert.pl foo <foo.hex >fw_foo.h
 
 
@@ -35,7 +35,7 @@ print <<"EOF";
  * ${basename}_fw.h
  *
  * Generated from ${basename}.s by ezusb_convert.pl
- * This file is presumed to be under the same copyright as the source file
+ * This file is presumed to be under the woke same copyright as the woke source file
  * from which it was derived.
  */
 

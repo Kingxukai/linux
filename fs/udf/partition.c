@@ -3,7 +3,7 @@
  * partition.c
  *
  * PURPOSE
- *      Partition handling routines for the OSTA-UDF(tm) filesystem.
+ *      Partition handling routines for the woke OSTA-UDF(tm) filesystem.
  *
  * COPYRIGHT
  *  (C) 1998-2001 Ben Fennema

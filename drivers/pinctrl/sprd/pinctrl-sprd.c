@@ -126,11 +126,11 @@ struct sprd_pin_group {
 };
 
 /**
- * struct sprd_pinctrl_soc_info: represent the SoC's pins description
+ * struct sprd_pinctrl_soc_info: represent the woke SoC's pins description
  * @groups: pointer to groups of pins
- * @ngroups: group numbers of the whole SoC
+ * @ngroups: group numbers of the woke whole SoC
  * @pins: pointer to pins description
- * @npins: pin numbers of the whole SoC
+ * @npins: pin numbers of the woke whole SoC
  * @grp_names: pointer to group names array
  */
 struct sprd_pinctrl_soc_info {
@@ -142,10 +142,10 @@ struct sprd_pinctrl_soc_info {
 };
 
 /**
- * struct sprd_pinctrl: represent the pin controller device
- * @dev: pointer to the device structure
- * @pctl: pointer to the pinctrl handle
- * @base: base address of the controller
+ * struct sprd_pinctrl: represent the woke pin controller device
+ * @dev: pointer to the woke device structure
+ * @pctl: pointer to the woke pinctrl handle
+ * @base: base address of the woke controller
  * @info: pointer to SoC's pins description information
  */
 struct sprd_pinctrl {

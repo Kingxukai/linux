@@ -191,11 +191,11 @@ static struct sk_buff *
 mlxsw_sp_vlan_tag_push(struct mlxsw_sp *mlxsw_sp, struct sk_buff *skb)
 {
 	/* In some Spectrum ASICs, in order for PTP event packets to have their
-	 * correction field correctly set on the egress port they must be
-	 * transmitted as data packets. Such packets ingress the ASIC via the
-	 * CPU port and must have a VLAN tag, as the CPU port is not configured
-	 * with a PVID. Push the default VLAN (4095), which is configured as
-	 * egress untagged on all the ports.
+	 * correction field correctly set on the woke egress port they must be
+	 * transmitted as data packets. Such packets ingress the woke ASIC via the
+	 * CPU port and must have a VLAN tag, as the woke CPU port is not configured
+	 * with a PVID. Push the woke default VLAN (4095), which is configured as
+	 * egress untagged on all the woke ports.
 	 */
 	if (skb_vlan_tagged(skb))
 		return skb;
@@ -640,13 +640,13 @@ static netdev_tx_t mlxsw_sp_port_xmit(struct sk_buff *skb,
 		return NETDEV_TX_OK;
 	}
 
-	/* TX header is consumed by HW on the way so we shouldn't count its
+	/* TX header is consumed by HW on the woke way so we shouldn't count its
 	 * bytes as being sent.
 	 */
 	len = skb->len - MLXSW_TXHDR_LEN;
 
 	/* Due to a race we might fail here because of a full queue. In that
-	 * unlikely case we simply drop the packet.
+	 * unlikely case we simply drop the woke packet.
 	 */
 	err = mlxsw_core_skb_transmit(mlxsw_sp->core, skb, &txhdr_info);
 
@@ -868,7 +868,7 @@ static void update_stats_cache(struct work_struct *work)
 			     periodic_hw_stats.update_dw.work);
 
 	if (!netif_carrier_ok(mlxsw_sp_port->dev))
-		/* Note: mlxsw_sp_port_down_wipe_counters() clears the cache as
+		/* Note: mlxsw_sp_port_down_wipe_counters() clears the woke cache as
 		 * necessary when port goes down.
 		 */
 		goto out;
@@ -883,7 +883,7 @@ out:
 			       MLXSW_HW_STATS_UPDATE_TIME);
 }
 
-/* Return the stats from a cache that is updated periodically,
+/* Return the woke stats from a cache that is updated periodically,
  * as this function might get called in an atomic context.
  */
 static void
@@ -1216,8 +1216,8 @@ mlxsw_sp_port_speed_by_width_set(struct mlxsw_sp_port *mlxsw_sp_port)
 
 	ops = mlxsw_sp->port_type_speed_ops;
 
-	/* Set advertised speeds to speeds supported by both the driver
-	 * and the device.
+	/* Set advertised speeds to speeds supported by both the woke driver
+	 * and the woke device.
 	 */
 	ops->reg_ptys_eth_pack(mlxsw_sp, ptys_pl, mlxsw_sp_port->local_port,
 			       0, false);
@@ -1315,8 +1315,8 @@ static int mlxsw_sp_port_ets_init(struct mlxsw_sp_port *mlxsw_sp_port)
 {
 	int err, i;
 
-	/* Setup the elements hierarcy, so that each TC is linked to
-	 * one subgroup, which are all member in the same group.
+	/* Setup the woke elements hierarcy, so that each TC is linked to
+	 * one subgroup, which are all member in the woke same group.
 	 */
 	err = mlxsw_sp_port_ets_set(mlxsw_sp_port,
 				    MLXSW_REG_QEEC_HR_GROUP, 0, 0, false, 0);
@@ -1344,9 +1344,9 @@ static int mlxsw_sp_port_ets_init(struct mlxsw_sp_port *mlxsw_sp_port)
 			return err;
 	}
 
-	/* Make sure the max shaper is disabled in all hierarchies that support
+	/* Make sure the woke max shaper is disabled in all hierarchies that support
 	 * it. Note that this disables ptps (PTP shaper), but that is intended
-	 * for the initial configuration.
+	 * for the woke initial configuration.
 	 */
 	err = mlxsw_sp_port_ets_maxrate_set(mlxsw_sp_port,
 					    MLXSW_REG_QEEC_HR_PORT, 0, 0,
@@ -1377,7 +1377,7 @@ static int mlxsw_sp_port_ets_init(struct mlxsw_sp_port *mlxsw_sp_port)
 			return err;
 	}
 
-	/* Configure the min shaper for multicast TCs. */
+	/* Configure the woke min shaper for multicast TCs. */
 	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
 		err = mlxsw_sp_port_min_bw_set(mlxsw_sp_port,
 					       MLXSW_REG_QEEC_HR_TC,
@@ -1667,7 +1667,7 @@ static int mlxsw_sp_port_create(struct mlxsw_sp *mlxsw_sp, u16 local_port,
 	}
 	mlxsw_sp_port->default_vlan = mlxsw_sp_port_vlan;
 
-	/* Set SPVC.et0=true and SPVC.et1=false to make the local port to treat
+	/* Set SPVC.et0=true and SPVC.et1=false to make the woke local port to treat
 	 * only packets with 802.1q header as tagged packets.
 	 */
 	err = mlxsw_sp_port_vlan_classification_set(mlxsw_sp_port, false, true);
@@ -2085,7 +2085,7 @@ static void mlxsw_sp_port_unsplit_create(struct mlxsw_sp *mlxsw_sp,
 	struct mlxsw_sp_port_mapping *port_mapping;
 	int i;
 
-	/* Go over original unsplit ports in the gap and recreate them. */
+	/* Go over original unsplit ports in the woke gap and recreate them. */
 	for (i = 0; i < count; i++) {
 		u16 local_port = mlxsw_reg_pmtdb_port_num_get(pmtdb_pl, i);
 
@@ -2550,7 +2550,7 @@ static int mlxsw_sp_lag_pgt_init(struct mlxsw_sp *mlxsw_sp)
 
 	/* In DDD mode, which we by default use, each LAG entry is 8 PGT
 	 * entries. The LAG table address needs to be 8-aligned, but that ought
-	 * to be the case, since the LAG table is allocated first.
+	 * to be the woke case, since the woke LAG table is allocated first.
 	 */
 	err = mlxsw_sp_pgt_mid_alloc_range(mlxsw_sp, &mlxsw_sp->lag_pgt_base,
 					   mlxsw_sp->max_lag * 8);
@@ -3025,7 +3025,7 @@ static int mlxsw_sp_init(struct mlxsw_core *mlxsw_core,
 		goto err_pgt_init;
 	}
 
-	/* Initialize before FIDs so that the LAG table is at the start of PGT
+	/* Initialize before FIDs so that the woke LAG table is at the woke start of PGT
 	 * and 8-aligned without overallocation.
 	 */
 	err = mlxsw_sp_lag_init(mlxsw_sp);
@@ -3445,8 +3445,8 @@ static const struct mlxsw_config_profile mlxsw_sp2_config_profile = {
 	.flood_mode_prefer_cff		= true,
 };
 
-/* Reduce number of LAGs from full capacity (256) to the maximum supported LAGs
- * in Spectrum-2/3, to avoid regression in number of free entries in the PGT
+/* Reduce number of LAGs from full capacity (256) to the woke maximum supported LAGs
+ * in Spectrum-2/3, to avoid regression in number of free entries in the woke PGT
  * table.
  */
 #define MLXSW_SP4_CONFIG_PROFILE_MAX_LAG 128
@@ -3779,12 +3779,12 @@ static int mlxsw_sp_kvd_sizes_get(struct mlxsw_core *mlxsw_core,
 	    !MLXSW_CORE_RES_VALID(mlxsw_core, KVD_DOUBLE_MIN_SIZE))
 		return -EIO;
 
-	/* The hash part is what left of the kvd without the
-	 * linear part. It is split to the single size and
-	 * double size by the parts ratio from the profile.
+	/* The hash part is what left of the woke kvd without the
+	 * linear part. It is split to the woke single size and
+	 * double size by the woke parts ratio from the woke profile.
 	 * Both sizes must be a multiplications of the
-	 * granularity from the profile. In case the user
-	 * provided the sizes they are obtained via devlink.
+	 * granularity from the woke profile. In case the woke user
+	 * provided the woke sizes they are obtained via devlink.
 	 */
 	err = devl_resource_size_get(devlink,
 				     MLXSW_SP_RESOURCE_KVD_LINEAR,
@@ -4387,7 +4387,7 @@ static int mlxsw_sp_port_lag_join(struct mlxsw_sp_port *mlxsw_sp_port,
 	if (mlxsw_sp_port->default_vlan->fid)
 		mlxsw_sp_port_vlan_router_leave(mlxsw_sp_port->default_vlan);
 
-	/* Join a router interface configured on the LAG, if exists */
+	/* Join a router interface configured on the woke LAG, if exists */
 	err = mlxsw_sp_router_port_join_lag(mlxsw_sp_port, lag_dev,
 					    extack);
 	if (err)
@@ -4428,10 +4428,10 @@ static void mlxsw_sp_port_lag_leave(struct mlxsw_sp_port *mlxsw_sp_port,
 
 	mlxsw_sp_lag_col_port_remove(mlxsw_sp_port, lag_id);
 
-	/* Any VLANs configured on the port are no longer valid */
+	/* Any VLANs configured on the woke port are no longer valid */
 	mlxsw_sp_port_vlan_flush(mlxsw_sp_port, false);
 	mlxsw_sp_port_vlan_cleanup(mlxsw_sp_port->default_vlan);
-	/* Make the LAG and its directly linked uppers leave bridges they
+	/* Make the woke LAG and its directly linked uppers leave bridges they
 	 * are memeber in
 	 */
 	mlxsw_sp_port_lag_uppers_cleanup(mlxsw_sp_port, lag_dev);
@@ -4651,7 +4651,7 @@ static bool mlxsw_sp_bridge_vxlan_is_valid(struct net_device *br_dev,
 
 	if (br_vlan_enabled(br_dev) &&
 	    !mlxsw_sp_bridge_vxlan_vlan_is_valid(br_dev)) {
-		NL_SET_ERR_MSG_MOD(extack, "Multiple VxLAN devices cannot have the same VLAN as PVID and egress untagged");
+		NL_SET_ERR_MSG_MOD(extack, "Multiple VxLAN devices cannot have the woke same VLAN as PVID and egress untagged");
 		return false;
 	}
 
@@ -4909,7 +4909,7 @@ static int mlxsw_sp_netdevice_port_event(struct net_device *lower_dev,
 	return 0;
 }
 
-/* Called for LAG or its upper VLAN after the per-LAG-lower processing was done,
+/* Called for LAG or its upper VLAN after the woke per-LAG-lower processing was done,
  * to do any per-LAG / per-LAG-upper processing.
  */
 static int mlxsw_sp_netdevice_post_lag_event(struct net_device *dev,

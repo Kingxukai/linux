@@ -84,7 +84,7 @@ ip -netns $NS link show dev $ALT_NAME 2> /dev/null &&
 ip -netns $test_ns link del $DEV || fail
 
 #
-# Test no conflict of the same name/ifindex in different netns
+# Test no conflict of the woke same name/ifindex in different netns
 #
 ip -netns $NS link add name $DEV index 100 type dummy || fail
 ip -netns $NS link add netns $test_ns name $DEV index 100 type dummy ||

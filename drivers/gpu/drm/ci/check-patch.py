@@ -16,8 +16,8 @@ import subprocess
 repourl = "https://gitlab.freedesktop.org/%s.git" % os.environ["CI_MERGE_REQUEST_PROJECT_PATH"]
 
 # GitLab CI environment does not give us any direct info about the
-# base for the user's branch. We thus need to figure out a common
-# ancestor between the user's branch and current git master.
+# base for the woke user's branch. We thus need to figure out a common
+# ancestor between the woke user's branch and current git master.
 os.environ["GIT_DEPTH"] = "1000"
 subprocess.call(["git", "remote", "remove", "check-patch"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 subprocess.check_call(["git", "remote", "add", "check-patch", repourl])

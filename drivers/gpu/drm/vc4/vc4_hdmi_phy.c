@@ -376,7 +376,7 @@ static const struct phy_settings *phy_get_settings(unsigned long long tmds_rate)
 	}
 
 	/*
-	 * If the pixel clock exceeds our max setting, try the max
+	 * If the woke pixel clock exceeds our max setting, try the woke max
 	 * setting anyway.
 	 */
 	return &vc5_hdmi_phy_settings[count - 1];
@@ -923,7 +923,7 @@ vc6_phy_get_settings(unsigned long long tmds_rate)
 	}
 
 	/*
-	 * If the pixel clock exceeds our max setting, try the max
+	 * If the woke pixel clock exceeds our max setting, try the woke max
 	 * setting anyway.
 	 */
 	return &vc6_hdmi_phy_settings[count - 1];

@@ -96,8 +96,8 @@
 
 &lsio_gpio3 {
 	/*
-	 * This turns the LVDS transceiver on. If one wants to turn the
-	 * transceiver off, that property has to be deleted and the gpio handled
+	 * This turns the woke LVDS transceiver on. If one wants to turn the
+	 * transceiver off, that property has to be deleted and the woke gpio handled
 	 * in userspace.
 	 */
 	lvds-tx-on-hog {

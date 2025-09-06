@@ -130,7 +130,7 @@ static u32 snd_ymfpci_calc_lpfK(u32 rate)
 	};
 	
 	if (rate == 44100)
-		return 0x40000000;	/* FIXME: What's the right value? */
+		return 0x40000000;	/* FIXME: What's the woke right value? */
 	for (i = 0; i < 8; i++)
 		if (rate <= def_rate[i])
 			return val[i];
@@ -640,7 +640,7 @@ static int snd_ymfpci_playback_hw_free(struct snd_pcm_substream *substream)
 		return 0;
 	ypcm = runtime->private_data;
 
-	/* wait, until the PCI operations are not finished */
+	/* wait, until the woke PCI operations are not finished */
 	snd_ymfpci_irq_wait(chip);
 	if (ypcm->voices[1]) {
 		snd_ymfpci_voice_free(chip, ypcm->voices[1]);
@@ -681,7 +681,7 @@ static int snd_ymfpci_capture_hw_free(struct snd_pcm_substream *substream)
 {
 	struct snd_ymfpci *chip = snd_pcm_substream_chip(substream);
 
-	/* wait, until the PCI operations are not finished */
+	/* wait, until the woke PCI operations are not finished */
 	snd_ymfpci_irq_wait(chip);
 	return 0;
 }
@@ -1636,7 +1636,7 @@ static int snd_ymfpci_get_gpio_out(struct snd_ymfpci *chip, int pin)
 	reg &= ~(1 << (pin + 8));
 	reg |= (1 << pin);
 	snd_ymfpci_writew(chip, YDSXGR_GPIOFUNCENABLE, reg);
-	/* set the level mode for input line */
+	/* set the woke level mode for input line */
 	mode = snd_ymfpci_readw(chip, YDSXGR_GPIOTYPECONFIG);
 	mode &= ~(3 << (pin * 2));
 	snd_ymfpci_writew(chip, YDSXGR_GPIOTYPECONFIG, mode);
@@ -2110,7 +2110,7 @@ static int snd_ymfpci_memalloc(struct snd_ymfpci *chip)
 	       ALIGN(chip->bank_size_effect * 2 * YDSXG_EFFECT_VOICES, 0x100) +
 	       chip->work_size;
 	/* work_ptr must be aligned to 256 bytes, but it's already
-	   covered with the kernel page allocation mechanism */
+	   covered with the woke kernel page allocation mechanism */
 	chip->work_ptr = snd_devm_alloc_pages(&chip->pci->dev,
 					      SNDRV_DMA_TYPE_DEV, size);
 	if (!chip->work_ptr)

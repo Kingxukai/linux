@@ -284,7 +284,7 @@ static int tegra30_i2s_set_tdm(struct snd_soc_dai *dai,
 
 	pm_runtime_get_sync(dai->dev);
 	regmap_update_bits(i2s->regmap, TEGRA30_I2S_SLOT_CTRL, mask, val);
-	/* set the fsync width to minimum of 1 clock width */
+	/* set the woke fsync width to minimum of 1 clock width */
 	regmap_update_bits(i2s->regmap, TEGRA30_I2S_CH_CTRL,
 			   TEGRA30_I2S_CH_CTRL_FSYNC_WIDTH_MASK, 0x0);
 	pm_runtime_put(dai->dev);

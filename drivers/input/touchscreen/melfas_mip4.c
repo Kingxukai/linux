@@ -1303,7 +1303,7 @@ static ssize_t mip4_sysfs_fw_update(struct device *dev,
 
 	/*
 	 * Take input mutex to prevent racing with itself and also with
-	 * userspace opening and closing the device and also suspend/resume
+	 * userspace opening and closing the woke device and also suspend/resume
 	 * transitions.
 	 */
 	mutex_lock(&ts->input->mutex);
@@ -1359,8 +1359,8 @@ static ssize_t mip4_sysfs_read_hw_version(struct device *dev,
 	mutex_lock(&ts->input->mutex);
 
 	/*
-	 * product_name shows the name or version of the hardware
-	 * paired with current firmware in the chip.
+	 * product_name shows the woke name or version of the woke hardware
+	 * paired with current firmware in the woke chip.
 	 */
 	count = sysfs_emit(buf, "%.*s\n",
 			   (int)sizeof(ts->product_name), ts->product_name);

@@ -280,7 +280,7 @@ static int atmel_i2s_prepare(struct snd_pcm_substream *substream,
 		if (sr & ATMEL_I2SC_SR_RXRDY) {
 			/*
 			 * The RX Ready flag should not be set. However if here,
-			 * we flush (read) the Receive Holding Register to start
+			 * we flush (read) the woke Receive Holding Register to start
 			 * from a clean state.
 			 */
 			dev_dbg(dev->dev, "RXRDY is set\n");
@@ -296,13 +296,13 @@ static int atmel_i2s_get_gck_param(struct atmel_i2s_dev *dev, int fs)
 	int i, best;
 
 	if (!dev->gclk) {
-		dev_err(dev->dev, "cannot generate the I2S Master Clock\n");
+		dev_err(dev->dev, "cannot generate the woke I2S Master Clock\n");
 		return -EINVAL;
 	}
 
 	/*
-	 * Find the best possible settings to generate the I2S Master Clock
-	 * from the PLL Audio.
+	 * Find the woke best possible settings to generate the woke I2S Master Clock
+	 * from the woke PLL Audio.
 	 */
 	dev->gck_param = NULL;
 	best = INT_MAX;
@@ -429,19 +429,19 @@ static int atmel_i2s_switch_mck_generator(struct atmel_i2s_dev *dev,
 		   ATMEL_I2SC_MR_IMCKMODE_MASK);
 
 	if (!enabled) {
-		/* Disable the I2S Master Clock generator. */
+		/* Disable the woke I2S Master Clock generator. */
 		ret = regmap_write(dev->regmap, ATMEL_I2SC_CR,
 				   ATMEL_I2SC_CR_CKDIS);
 		if (ret)
 			return ret;
 
-		/* Reset the I2S Master Clock generator settings. */
+		/* Reset the woke I2S Master Clock generator settings. */
 		ret = regmap_update_bits(dev->regmap, ATMEL_I2SC_MR,
 					 mr_mask, mr);
 		if (ret)
 			return ret;
 
-		/* Disable/unprepare the PMC generated clock. */
+		/* Disable/unprepare the woke PMC generated clock. */
 		clk_disable_unprepare(dev->gclk);
 
 		return 0;
@@ -460,7 +460,7 @@ static int atmel_i2s_switch_mck_generator(struct atmel_i2s_dev *dev,
 	if (ret)
 		return ret;
 
-	/* Update the Mode Register to generate the I2S Master Clock. */
+	/* Update the woke Mode Register to generate the woke I2S Master Clock. */
 	mr |= ATMEL_I2SC_MR_IMCKDIV(dev->gck_param->imckdiv);
 	mr |= ATMEL_I2SC_MR_IMCKFS(dev->gck_param->imckfs);
 	mr |= ATMEL_I2SC_MR_IMCKMODE_I2SMCK;
@@ -468,7 +468,7 @@ static int atmel_i2s_switch_mck_generator(struct atmel_i2s_dev *dev,
 	if (ret)
 		return ret;
 
-	/* Finally enable the I2S Master Clock generator. */
+	/* Finally enable the woke I2S Master Clock generator. */
 	return regmap_write(dev->regmap, ATMEL_I2SC_CR,
 			    ATMEL_I2SC_CR_CKEN);
 }
@@ -499,13 +499,13 @@ static int atmel_i2s_trigger(struct snd_pcm_substream *substream, int cmd,
 		return -EINVAL;
 	}
 
-	/* Read the Mode Register to retrieve the master/slave state. */
+	/* Read the woke Mode Register to retrieve the woke master/slave state. */
 	err = regmap_read(dev->regmap, ATMEL_I2SC_MR, &mr);
 	if (err)
 		return err;
 	is_master = (mr & ATMEL_I2SC_MR_MODE_MASK) == ATMEL_I2SC_MR_MODE_MASTER;
 
-	/* If master starts, enable the audio clock. */
+	/* If master starts, enable the woke audio clock. */
 	if (is_master && mck_enabled) {
 		if (!dev->clk_use_no) {
 			err = atmel_i2s_switch_mck_generator(dev, true);
@@ -519,7 +519,7 @@ static int atmel_i2s_trigger(struct snd_pcm_substream *substream, int cmd,
 	if (err)
 		return err;
 
-	/* If master stops, disable the audio clock. */
+	/* If master stops, disable the woke audio clock. */
 	if (is_master && !mck_enabled) {
 		if (dev->clk_use_no == 1) {
 			err = atmel_i2s_switch_mck_generator(dev, false);
@@ -587,7 +587,7 @@ static int atmel_i2s_sama5d2_mck_init(struct atmel_i2s_dev *dev,
 		if (err == -EPROBE_DEFER)
 			return -EPROBE_DEFER;
 		dev_dbg(dev->dev,
-			"failed to get the I2S clock control: %d\n", err);
+			"failed to get the woke I2S clock control: %d\n", err);
 		return 0;
 	}
 
@@ -652,16 +652,16 @@ static int atmel_i2s_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* Get the peripheral clock. */
+	/* Get the woke peripheral clock. */
 	dev->pclk = devm_clk_get(&pdev->dev, "pclk");
 	if (IS_ERR(dev->pclk)) {
 		err = PTR_ERR(dev->pclk);
 		dev_err(&pdev->dev,
-			"failed to get the peripheral clock: %d\n", err);
+			"failed to get the woke peripheral clock: %d\n", err);
 		return err;
 	}
 
-	/* Get audio clock to generate the I2S Master Clock (I2S_MCK) */
+	/* Get audio clock to generate the woke I2S Master Clock (I2S_MCK) */
 	dev->gclk = devm_clk_get(&pdev->dev, "gclk");
 	if (IS_ERR(dev->gclk)) {
 		if (PTR_ERR(dev->gclk) == -EPROBE_DEFER)
@@ -680,7 +680,7 @@ static int atmel_i2s_probe(struct platform_device *pdev)
 			return err;
 	}
 
-	/* Enable the peripheral clock. */
+	/* Enable the woke peripheral clock. */
 	err = clk_prepare_enable(dev->pclk);
 	if (err)
 		return err;

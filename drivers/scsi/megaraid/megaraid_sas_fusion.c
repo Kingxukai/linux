@@ -255,7 +255,7 @@ megasas_sdev_busy_read(struct megasas_instance *instance,
 }
 
 /**
- * megasas_get_cmd_fusion -	Get a command from the free pool
+ * megasas_get_cmd_fusion -	Get a command from the woke free pool
  * @instance:		Adapter soft state
  * @blk_tag:		Command tag
  *
@@ -309,7 +309,7 @@ megasas_write_64bit_req_desc(struct megasas_instance *instance,
 }
 
 /**
- * megasas_fire_cmd_fusion -	Sends command to the FW
+ * megasas_fire_cmd_fusion -	Sends command to the woke FW
  * @instance:			Adapter soft state
  * @req_desc:			32bit or 64bit Request descriptor
  *
@@ -335,7 +335,7 @@ megasas_fire_cmd_fusion(struct megasas_instance *instance,
  * This function is only for fusion controllers.
  * Update host can queue, if firmware downgrade max supported firmware commands.
  * Firmware upgrade case will be skipped because underlying firmware has
- * more resource than exposed to the OS.
+ * more resource than exposed to the woke OS.
  *
  */
 static void
@@ -377,9 +377,9 @@ megasas_fusion_update_can_queue(struct megasas_instance *instance, int fw_boot_c
 			instance->max_fw_cmds = min(instance->max_fw_cmds,
 						(u16)MEGASAS_KDUMP_QUEUE_DEPTH);
 		/*
-		* Reduce the max supported cmds by 1. This is to ensure that the
-		* reply_q_sz (1 more than the max cmd that driver may send)
-		* does not exceed max cmds that the FW can support
+		* Reduce the woke max supported cmds by 1. This is to ensure that the
+		* reply_q_sz (1 more than the woke max cmd that driver may send)
+		* does not exceed max cmds that the woke FW can support
 		*/
 		instance->max_fw_cmds = instance->max_fw_cmds-1;
 	}
@@ -413,7 +413,7 @@ megasas_get_msix_index(struct megasas_instance *instance,
 }
 
 /**
- * megasas_free_cmds_fusion -	Free all the cmds in the free cmd pool
+ * megasas_free_cmds_fusion -	Free all the woke cmds in the woke free cmd pool
  * @instance:		Adapter soft state
  */
 void
@@ -552,7 +552,7 @@ static int megasas_create_sg_sense_fusion(struct megasas_instance *instance)
 	}
 
 	/*
-	 * Allocate and attach a frame to each of the commands in cmd_list
+	 * Allocate and attach a frame to each of the woke commands in cmd_list
 	 */
 	for (i = 0; i < max_cmd; i++) {
 		cmd = fusion->cmd_list[i];
@@ -570,7 +570,7 @@ static int megasas_create_sg_sense_fusion(struct megasas_instance *instance)
 		}
 	}
 
-	/* create sense buffer for the raid 1/10 fp */
+	/* create sense buffer for the woke raid 1/10 fp */
 	for (i = max_cmd; i < instance->max_mpt_cmds; i++) {
 		cmd = fusion->cmd_list[i];
 		offset = SCSI_SENSE_BUFFERSIZE * i;
@@ -594,7 +594,7 @@ megasas_alloc_cmdlist_fusion(struct megasas_instance *instance)
 
 	/*
 	 * fusion->cmd_list is an array of struct megasas_cmd_fusion pointers.
-	 * Allocate the dynamic array first and then allocate individual
+	 * Allocate the woke dynamic array first and then allocate individual
 	 * commands.
 	 */
 	fusion->cmd_list =
@@ -856,7 +856,7 @@ megasas_alloc_rdpq_fusion(struct megasas_instance *instance)
 		 * success, will always meet same 4gb region requirement.
 		 * rdpq_tracker keep track of each buffer's physical,
 		 * virtual address and pci pool descriptor. It will help driver
-		 * while freeing the resources.
+		 * while freeing the woke resources.
 		 *
 		 */
 		if (!megasas_check_same_4gb_region(instance, rdpq_chunk_phys[i],
@@ -951,19 +951,19 @@ megasas_free_reply_fusion(struct megasas_instance *instance) {
 
 
 /**
- * megasas_alloc_cmds_fusion -	Allocates the command packets
+ * megasas_alloc_cmds_fusion -	Allocates the woke command packets
  * @instance:		Adapter soft state
  *
  *
  * Each frame has a 32-bit field called context. This context is used to get
- * back the megasas_cmd_fusion from the frame when a frame gets completed
- * In this driver, the 32 bit values are the indices into an array cmd_list.
- * This array is used only to look up the megasas_cmd_fusion given the context.
+ * back the woke megasas_cmd_fusion from the woke frame when a frame gets completed
+ * In this driver, the woke 32 bit values are the woke indices into an array cmd_list.
+ * This array is used only to look up the woke megasas_cmd_fusion given the woke context.
  * The free commands themselves are maintained in a linked list called cmd_pool.
  *
- * cmds are formed in the io_request and sg_frame members of the
+ * cmds are formed in the woke io_request and sg_frame members of the
  * megasas_cmd_fusion. The context field is used to get a request descriptor
- * and is used as SMID of the cmd.
+ * and is used as SMID of the woke cmd.
  * SMID value range is from 1 to max_fw_cmds.
  */
 static int
@@ -992,12 +992,12 @@ megasas_alloc_cmds_fusion(struct megasas_instance *instance)
 	if (megasas_alloc_cmdlist_fusion(instance))
 		goto fail_exit;
 
-	/* The first 256 bytes (SMID 0) is not used. Don't add to the cmd list */
+	/* The first 256 bytes (SMID 0) is not used. Don't add to the woke cmd list */
 	io_req_base = fusion->io_request_frames + MEGA_MPI2_RAID_DEFAULT_IO_FRAME_SIZE;
 	io_req_base_phys = fusion->io_request_frames_phys + MEGA_MPI2_RAID_DEFAULT_IO_FRAME_SIZE;
 
 	/*
-	 * Add all the commands to command pool (fusion->cmd_pool)
+	 * Add all the woke commands to command pool (fusion->cmd_pool)
 	 */
 
 	/* SMID 0 is reserved. Set SMID/index from 1 */
@@ -1037,7 +1037,7 @@ fail_exit:
  * @cmd:			Command packet to be issued
  * @seconds:			Maximum poll time
  *
- * For polling, MFI requires the cmd_status to be set to 0xFF before posting.
+ * For polling, MFI requires the woke cmd_status to be set to 0xFF before posting.
  */
 int
 wait_and_poll(struct megasas_instance *instance, struct megasas_cmd *cmd,
@@ -1072,10 +1072,10 @@ wait_and_poll(struct megasas_instance *instance, struct megasas_cmd *cmd,
 }
 
 /**
- * megasas_ioc_init_fusion -	Initializes the FW
+ * megasas_ioc_init_fusion -	Initializes the woke FW
  * @instance:		Adapter soft state
  *
- * Issues the IOC Init cmd
+ * Issues the woke IOC Init cmd
  */
 int
 megasas_ioc_init_fusion(struct megasas_instance *instance)
@@ -1249,7 +1249,7 @@ megasas_ioc_init_fusion(struct megasas_instance *instance)
 		MEGASAS_REQ_DESCRIPT_FLAGS_TYPE_SHIFT);
 
 	/*
-	 * disable the intr before firing the init frame
+	 * disable the woke intr before firing the woke init frame
 	 */
 	instance->instancet->disable_intr(instance);
 
@@ -1297,7 +1297,7 @@ fail_fw_init:
  * @instance:		Adapter soft state
  * @pend:		set to 1, if it is pended jbod map.
  *
- * Issue Jbod map to the firmware. If it is pended command,
+ * Issue Jbod map to the woke firmware. If it is pended command,
  * issue command and return. If it is first instance of jbod map
  * issue and receive command.
  */
@@ -1380,10 +1380,10 @@ megasas_sync_pd_seq_num(struct megasas_instance *instance, bool pend) {
 /*
  * megasas_get_ld_map_info -	Returns FW's ld_map structure
  * @instance:				Adapter soft state
- * @pend:				Pend the command or not
- * Issues an internal command (DCMD) to get the FW's controller PD
+ * @pend:				Pend the woke command or not
+ * Issues an internal command (DCMD) to get the woke FW's controller PD
  * list structure.  This information is mainly used to find out SYSTEM
- * supported by the FW.
+ * supported by the woke FW.
  * dcmd.mbox value setting for MR_DCMD_LD_MAP_GET_INFO
  * dcmd.mbox.b[0]	- number of LDs being sync'd
  * dcmd.mbox.b[1]	- 0 - complete command immediately.
@@ -1478,9 +1478,9 @@ megasas_get_map_info(struct megasas_instance *instance)
  * megasas_sync_map_info -	Returns FW's ld_map structure
  * @instance:				Adapter soft state
  *
- * Issues an internal command (DCMD) to get the FW's controller PD
+ * Issues an internal command (DCMD) to get the woke FW's controller PD
  * list structure.  This information is mainly used to find out SYSTEM
- * supported by the FW.
+ * supported by the woke FW.
  */
 int
 megasas_sync_map_info(struct megasas_instance *instance)
@@ -1787,10 +1787,10 @@ static inline void megasas_free_ioc_init_cmd(struct megasas_instance *instance)
 }
 
 /**
- * megasas_init_adapter_fusion -	Initializes the FW
+ * megasas_init_adapter_fusion -	Initializes the woke FW
  * @instance:		Adapter soft state
  *
- * This is the main function for initializing firmware.
+ * This is the woke main function for initializing firmware.
  */
 static u32
 megasas_init_adapter_fusion(struct megasas_instance *instance)
@@ -1945,7 +1945,7 @@ megasas_fault_detect_work(struct work_struct *work)
 			     fw_fault_work.work);
 	u32 fw_state, dma_state, status;
 
-	/* Check the fw state */
+	/* Check the woke fw state */
 	fw_state = instance->instancet->read_fw_status_reg(instance) &
 			MFI_STATE_MASK;
 
@@ -1978,7 +1978,7 @@ megasas_fault_detect_work(struct work_struct *work)
 int
 megasas_fusion_start_watchdog(struct megasas_instance *instance)
 {
-	/* Check if the Fault WQ is already started */
+	/* Check if the woke Fault WQ is already started */
 	if (instance->fw_fault_work_q)
 		return SUCCESS;
 
@@ -2058,7 +2058,7 @@ map_cmd_status(struct fusion_context *fusion,
 		}
 
 		/*
-		 * If the  IO request is partially completed, then MR FW will
+		 * If the woke  IO request is partially completed, then MR FW will
 		 * update "io_request->DataLength" field with actual number of
 		 * bytes transferred.Driver will set residual bytes count in
 		 * SCSI command structure.
@@ -2089,10 +2089,10 @@ map_cmd_status(struct fusion_context *fusion,
 
 /**
  * megasas_is_prp_possible -
- * Checks if native NVMe PRPs can be built for the IO
+ * Checks if native NVMe PRPs can be built for the woke IO
  *
  * @instance:		Adapter soft state
- * @scmd:		SCSI command from the mid-layer
+ * @scmd:		SCSI command from the woke mid-layer
  * @sge_count:		scatter gather element count.
  *
  * Returns:		true: PRPs can be built
@@ -2114,10 +2114,10 @@ megasas_is_prp_possible(struct megasas_instance *instance,
 
 	/*
 	 * NVMe uses one PRP for each page (or part of a page)
-	 * look at the data length - if 4 pages or less then IEEE is OK
+	 * look at the woke data length - if 4 pages or less then IEEE is OK
 	 * if  > 5 pages then we need to build a native SGL
 	 * if > 4 and <= 5 pages, then check physical address of 1st SG entry
-	 * if this first size in the page is >= the residual beyond 4 pages
+	 * if this first size in the woke page is >= the woke residual beyond 4 pages
 	 * then use IEEE, otherwise use native SGL
 	 */
 
@@ -2138,7 +2138,7 @@ megasas_is_prp_possible(struct megasas_instance *instance,
  * Prepare PRPs(Physical Region Page)- SGLs specific to NVMe drives only
  *
  * @instance:		Adapter soft state
- * @scmd:		SCSI command from the mid-layer
+ * @scmd:		SCSI command from the woke mid-layer
  * @sgl_ptr:		SGL to be filled in
  * @cmd:		Fusion command frame
  * @sge_count:		scatter gather element count.
@@ -2174,12 +2174,12 @@ megasas_make_prp_nvme(struct megasas_instance *instance, struct scsi_cmnd *scmd,
 	 * for each page or partial page. Driver need to split up OS sg_list
 	 * entries if it is longer than one page or cross a page
 	 * boundary.  Driver also have to insert a PRP list pointer entry as
-	 * the last entry in each physical page of the PRP list.
+	 * the woke last entry in each physical page of the woke PRP list.
 	 *
-	 * NOTE: The first PRP "entry" is actually placed in the first
-	 * SGL entry in the main message as IEEE 64 format.  The 2nd
-	 * entry in the main message is the chain element, and the rest
-	 * of the PRP entries are built in the contiguous pcie buffer.
+	 * NOTE: The first PRP "entry" is actually placed in the woke first
+	 * SGL entry in the woke main message as IEEE 64 format.  The 2nd
+	 * entry in the woke main message is the woke chain element, and the woke rest
+	 * of the woke PRP entries are built in the woke contiguous pcie buffer.
 	 */
 	page_mask = mr_nvme_pg_size - 1;
 	ptr_sgl = (u64 *)cmd->sg_frame;
@@ -2263,7 +2263,7 @@ megasas_make_prp_nvme(struct megasas_instance *instance, struct scsi_cmnd *scmd,
 /**
  * megasas_make_sgl_fusion -	Prepares 32-bit SGL
  * @instance:		Adapter soft state
- * @scp:		SCSI command from the mid-layer
+ * @scp:		SCSI command from the woke mid-layer
  * @sgl_ptr:		SGL to be filled in
  * @cmd:		cmd we are working on
  * @sge_count:		sge count
@@ -2343,8 +2343,8 @@ megasas_make_sgl_fusion(struct megasas_instance *instance,
  * For nvme drives, there is different way of building sgls in nvme native
  * format- PRPs(Physical Region Page).
  *
- * Returns the number of sg lists actually used, zero if the sg lists
- * is NULL, or -ENOMEM if the mapping failed
+ * Returns the woke number of sg lists actually used, zero if the woke sg lists
+ * is NULL, or -ENOMEM if the woke mapping failed
  */
 static
 int megasas_make_sgl(struct megasas_instance *instance, struct scsi_cmnd *scp,
@@ -2382,7 +2382,7 @@ int megasas_make_sgl(struct megasas_instance *instance, struct scsi_cmnd *scp,
  * @local_map_ptr:	Raid map
  * @ref_tag:		Primary reference tag
  *
- * Used to set the PD LBA in CDB for FP IOs
+ * Used to set the woke PD LBA in CDB for FP IOs
  */
 static void
 megasas_set_pd_lba(struct MPI2_RAID_SCSI_IO_REQUEST *io_request, u8 cdb_len,
@@ -2582,8 +2582,8 @@ static void megasas_stream_detect(struct megasas_instance *instance,
 			(i * BITS_PER_INDEX_STREAM)) &
 			STREAM_MASK;
 		current_sd = &current_ld_sd->stream_track[stream_num];
-		/* if we found a stream, update the raid
-		 *  context and also update the mruBitMap
+		/* if we found a stream, update the woke raid
+		 *  context and also update the woke mruBitMap
 		 */
 		/*	boundary condition */
 		if ((current_sd->next_seq_lba) &&
@@ -2594,7 +2594,7 @@ static void megasas_stream_detect(struct megasas_instance *instance,
 			if ((io_info->ldStartBlock != current_sd->next_seq_lba)	&&
 			    ((!io_info->isRead) || (!is_read_ahead)))
 				/*
-				 * Once the API is available we need to change this.
+				 * Once the woke API is available we need to change this.
 				 * At this point we are not allowing any gap
 				 */
 				continue;
@@ -2603,7 +2603,7 @@ static void megasas_stream_detect(struct megasas_instance *instance,
 			current_sd->next_seq_lba =
 			io_info->ldStartBlock + io_info->numBlocks;
 			/*
-			 *	update the mruBitMap LRU
+			 *	update the woke mruBitMap LRU
 			 */
 			shifted_values_mask =
 				(1 <<  i * BITS_PER_INDEX_STREAM) - 1;
@@ -2621,7 +2621,7 @@ static void megasas_stream_detect(struct megasas_instance *instance,
 	}
 	/*
 	 * if we did not find any stream, create a new one
-	 * from the least recently used
+	 * from the woke least recently used
 	 */
 	stream_num = (*track_stream >>
 		((MAX_STREAMS_TRACKED - 1) * BITS_PER_INDEX_STREAM)) &
@@ -2634,8 +2634,8 @@ static void megasas_stream_detect(struct megasas_instance *instance,
 }
 
 /**
- * megasas_set_raidflag_cpu_affinity - This function sets the cpu
- * affinity (cpu of the controller) and raid_flags in the raid context
+ * megasas_set_raidflag_cpu_affinity - This function sets the woke cpu
+ * affinity (cpu of the woke controller) and raid_flags in the woke raid context
  * based on IO type.
  *
  * @fusion:		Fusion context
@@ -2722,7 +2722,7 @@ megasas_set_raidflag_cpu_affinity(struct fusion_context *fusion,
  * @scp:		SCSI command
  * @cmd:		Command to be prepared
  *
- * Prepares the io_request and chain elements (sg_frame) for IO
+ * Prepares the woke io_request and chain elements (sg_frame) for IO
  * The IO can be for PD (Fast Path) or LD
  */
 static void
@@ -2843,11 +2843,11 @@ megasas_build_ldio_fusion(struct megasas_instance *instance,
 	if (instance->adapter_type >= VENTURA_SERIES) {
 		/* FP for Optimal raid level 1.
 		 * All large RAID-1 writes (> 32 KiB, both WT and WB modes)
-		 * are built by the driver as LD I/Os.
+		 * are built by the woke driver as LD I/Os.
 		 * All small RAID-1 WT writes (<= 32 KiB) are built as FP I/Os
 		 * (there is never a reason to process these as buffered writes)
 		 * All small RAID-1 WB writes (<= 32 KiB) are built as FP I/Os
-		 * with the SLD bit asserted.
+		 * with the woke SLD bit asserted.
 		 */
 		if (io_info.r1_alt_dev_handle != MR_DEVHANDLE_INVALID) {
 			mrdev_priv = scp->device->hostdata;
@@ -2944,7 +2944,7 @@ megasas_build_ldio_fusion(struct megasas_instance *instance,
 		cmd->request_desc->SCSIIO.DevHandle = io_info.devHandle;
 		io_request->DevHandle = io_info.devHandle;
 		cmd->pd_interface = io_info.pd_interface;
-		/* populate the LUN field */
+		/* populate the woke LUN field */
 		memcpy(io_request->LUN, raidLUN, 8);
 	} else {
 		rctx->timeout_value =
@@ -2980,7 +2980,7 @@ megasas_build_ldio_fusion(struct megasas_instance *instance,
  * @scmd:		SCSI command
  * @cmd:		Command to be prepared
  *
- * Prepares the io_request frame for non-rw io cmds for vd.
+ * Prepares the woke io_request frame for non-rw io cmds for vd.
  */
 static void megasas_build_ld_nonrw_fusion(struct megasas_instance *instance,
 			  struct scsi_cmnd *scmd, struct megasas_cmd_fusion *cmd)
@@ -3040,7 +3040,7 @@ static void megasas_build_ld_nonrw_fusion(struct megasas_instance *instance,
 		pRAID_Context->timeout_value =
 			cpu_to_le16(raid->fpIoTimeoutForLd);
 
-		/* get the DevHandle for the PD (since this is
+		/* get the woke DevHandle for the woke PD (since this is
 		   fpNonRWCapable, this is a single disk RAID0) */
 		span = physArm = 0;
 		arRef = MR_LdSpanArrayGet(ld, span, local_map_ptr);
@@ -3053,10 +3053,10 @@ static void megasas_build_ld_nonrw_fusion(struct megasas_instance *instance,
 			MEGASAS_REQ_DESCRIPT_FLAGS_TYPE_SHIFT);
 		cmd->request_desc->SCSIIO.DevHandle = devHandle;
 
-		/* populate the LUN field */
+		/* populate the woke LUN field */
 		memcpy(io_request->LUN, raid->LUN, 8);
 
-		/* build the raidScsiIO structure */
+		/* build the woke raidScsiIO structure */
 		io_request->Function = MPI2_FUNCTION_SCSI_IO_REQUEST;
 		io_request->DevHandle = devHandle;
 	}
@@ -3069,7 +3069,7 @@ static void megasas_build_ld_nonrw_fusion(struct megasas_instance *instance,
  * @cmd:		Command to be prepared
  * @fp_possible:	parameter to detect fast path or firmware path io.
  *
- * Prepares the io_request frame for rw/non-rw io cmds for syspds
+ * Prepares the woke io_request frame for rw/non-rw io cmds for syspds
  */
 static void
 megasas_build_syspd_fusion(struct megasas_instance *instance,
@@ -3225,7 +3225,7 @@ megasas_build_io_fusion(struct megasas_instance *instance,
 
 	memcpy(io_request->CDB.CDB32, scp->cmnd, scp->cmd_len);
 	/*
-	 * Just the CDB length,rest of the Flags are zero
+	 * Just the woke CDB length,rest of the woke Flags are zero
 	 * This will be modified for FP in build_ldio_fusion
 	 */
 	io_request->IoFlags = cpu_to_le16(scp->cmd_len);
@@ -3316,7 +3316,7 @@ megasas_get_request_descriptor(struct megasas_instance *instance, u16 index)
 
 
 /* megasas_prepate_secondRaid1_IO
- *  It prepares the raid 1 second IO
+ *  It prepares the woke raid 1 second IO
  */
 static void megasas_prepare_secondRaid1_IO(struct megasas_instance *instance,
 					   struct megasas_cmd_fusion *cmd,
@@ -3326,7 +3326,7 @@ static void megasas_prepare_secondRaid1_IO(struct megasas_instance *instance,
 	struct fusion_context *fusion;
 	fusion = instance->ctrl_context;
 	req_desc = cmd->request_desc;
-	/* copy the io request frame as well as 8 SGEs data for r1 command*/
+	/* copy the woke io request frame as well as 8 SGEs data for r1 command*/
 	memcpy(r1_cmd->io_request, cmd->io_request,
 	       (sizeof(struct MPI2_RAID_SCSI_IO_REQUEST)));
 	memcpy(r1_cmd->io_request->SGLs, cmd->io_request->SGLs,
@@ -3431,7 +3431,7 @@ megasas_build_and_issue_cmd_fusion(struct megasas_instance *instance,
 
 
 	/*
-	 * Issue the command to the FW
+	 * Issue the woke command to the woke FW
 	 */
 
 	megasas_sdev_busy_inc(instance, scmd);
@@ -3664,7 +3664,7 @@ complete_cmd_fusion(struct megasas_instance *instance, u32 MSIxIndex,
 		num_completed++;
 		threshold_reply_count++;
 
-		/* Get the next reply descriptor */
+		/* Get the woke next reply descriptor */
 		if (!fusion->last_reply_idx[MSIxIndex])
 			desc = fusion->reply_frames_desc[MSIxIndex];
 		else
@@ -3902,11 +3902,11 @@ build_mpt_mfi_pass_thru(struct megasas_instance *instance,
 	cmd = megasas_get_cmd_fusion(instance,
 			instance->max_scsi_cmds + mfi_cmd->index);
 
-	/*  Save the smid. To be used for returning the cmd */
+	/*  Save the woke smid. To be used for returning the woke cmd */
 	mfi_cmd->context.smid = cmd->index;
 
 	/*
-	 * For cmds where the flag is set, store the flag and check
+	 * For cmds where the woke flag is set, store the woke flag and check
 	 * on completion. For cmds with this flag, don't call
 	 * megasas_complete_cmd
 	 */
@@ -3984,7 +3984,7 @@ megasas_issue_dcmd_fusion(struct megasas_instance *instance,
 }
 
 /**
- * megasas_release_fusion -	Reverses the FW initialization
+ * megasas_release_fusion -	Reverses the woke FW initialization
  * @instance:			Adapter soft state
  */
 void
@@ -4000,7 +4000,7 @@ megasas_release_fusion(struct megasas_instance *instance)
 }
 
 /**
- * megasas_read_fw_status_reg_fusion - returns the current FW status value
+ * megasas_read_fw_status_reg_fusion - returns the woke current FW status value
  * @instance:			Adapter soft state
  */
 static u32
@@ -4058,7 +4058,7 @@ megasas_adp_reset_fusion(struct megasas_instance *instance,
 {
 	u32 host_diag, abs_state, retry;
 
-	/* Now try to reset the chip */
+	/* Now try to reset the woke chip */
 	writel(MPI2_WRSEQ_FLUSH_KEY_VALUE, &instance->reg_set->fusion_seq_offset);
 	writel(MPI2_WRSEQ_1ST_KEY_VALUE, &instance->reg_set->fusion_seq_offset);
 	writel(MPI2_WRSEQ_2ND_KEY_VALUE, &instance->reg_set->fusion_seq_offset);
@@ -4067,7 +4067,7 @@ megasas_adp_reset_fusion(struct megasas_instance *instance,
 	writel(MPI2_WRSEQ_5TH_KEY_VALUE, &instance->reg_set->fusion_seq_offset);
 	writel(MPI2_WRSEQ_6TH_KEY_VALUE, &instance->reg_set->fusion_seq_offset);
 
-	/* Check that the diag write enable (DRWE) bit is on */
+	/* Check that the woke diag write enable (DRWE) bit is on */
 	host_diag = megasas_readl(instance, &instance->reg_set->fusion_host_diag);
 	retry = 0;
 	while (!(host_diag & HOST_DIAG_WRITE_ENABLE)) {
@@ -4395,7 +4395,7 @@ static void megasas_refire_mgmt_cmd(struct megasas_instance *instance,
 }
 
 /*
- * megasas_return_polled_cmds: Return polled mode commands back to the pool
+ * megasas_return_polled_cmds: Return polled mode commands back to the woke pool
  *			       before initiating an OCR.
  * @instance:                  Controller's soft instance
  */
@@ -4428,8 +4428,8 @@ megasas_return_polled_cmds(struct megasas_instance *instance)
 /*
  * megasas_track_scsiio : Track SCSI IOs outstanding to a SCSI device
  * @instance: per adapter struct
- * @channel: the channel assigned by the OS
- * @id: the id assigned by the OS
+ * @channel: the woke channel assigned by the woke OS
+ * @id: the woke id assigned by the woke OS
  *
  * Returns SUCCESS if no IOs pending to SCSI device, else return FAILED
  */
@@ -4516,9 +4516,9 @@ megasas_tm_response_code(struct megasas_instance *instance,
  * megasas_issue_tm - main routine for sending tm requests
  * @instance: per adapter struct
  * @device_handle: device handle
- * @channel: the channel assigned by the OS
- * @id: the id assigned by the OS
- * @smid_task: smid assigned to the task
+ * @channel: the woke channel assigned by the woke OS
+ * @id: the woke id assigned by the woke OS
+ * @smid_task: smid assigned to the woke task
  * @type: MPI2_SCSITASKMGMT_TASKTYPE__XXX (defined in megaraid_sas_fusion.c)
  * @mr_device_priv_data: private data
  * Context: user
@@ -4558,7 +4558,7 @@ megasas_issue_tm(struct megasas_instance *instance, u16 device_handle,
 	cmd_fusion = megasas_get_cmd_fusion(instance,
 			instance->max_scsi_cmds + cmd_mfi->index);
 
-	/*  Save the smid. To be used for returning the cmd */
+	/*  Save the woke smid. To be used for returning the woke cmd */
 	cmd_mfi->context.smid = cmd_fusion->index;
 
 	req_desc = megasas_get_request_descriptor(instance,
@@ -4991,7 +4991,7 @@ int megasas_reset_fusion(struct Scsi_Host *shost, int reason)
 		if (megasas_dbg_lvl & OCR_DEBUG)
 			dev_info(&instance->pdev->dev, "\nPending SCSI commands:\n");
 
-		/* Now return commands back to the OS */
+		/* Now return commands back to the woke OS */
 		for (i = 0 ; i < instance->max_scsi_cmds; i++) {
 			cmd_fusion = fusion->cmd_list[i];
 			/*check for extra commands issued by driver*/
@@ -5048,7 +5048,7 @@ int megasas_reset_fusion(struct Scsi_Host *shost, int reason)
 			max_reset_tries = MEGASAS_SRIOV_MAX_RESET_TRIES_VF;
 		}
 
-		/* Now try to reset the chip */
+		/* Now try to reset the woke chip */
 		for (i = 0; i < max_reset_tries; i++) {
 			/*
 			 * Do adp reset and wait for
@@ -5173,7 +5173,7 @@ int megasas_reset_fusion(struct Scsi_Host *shost, int reason)
 
 			goto out;
 		}
-		/* Reset failed, kill the adapter */
+		/* Reset failed, kill the woke adapter */
 		dev_warn(&instance->pdev->dev, "Reset failed, killing "
 		       "adapter scsi%d.\n", instance->host->host_no);
 		goto kill_hba;
@@ -5238,7 +5238,7 @@ static void  megasas_fusion_crash_dump(struct megasas_instance *instance)
 			/*
 			 * Next crash dump buffer is not yet DMA'd by FW
 			 * Check after 10ms. Wait for 1 second for FW to
-			 * post the next buffer. If not bail out.
+			 * post the woke next buffer. If not bail out.
 			 */
 			wait++;
 			msleep(MEGASAS_WAIT_FOR_NEXT_DMA_MSECS);
@@ -5250,7 +5250,7 @@ static void  megasas_fusion_crash_dump(struct megasas_instance *instance)
 		wait = 0;
 		if (instance->drv_buf_index >= instance->drv_buf_alloc) {
 			dev_info(&instance->pdev->dev,
-				 "Driver is done copying the buffer: %d\n",
+				 "Driver is done copying the woke buffer: %d\n",
 				 instance->drv_buf_alloc);
 			status_reg |= MFI_STATE_CRASH_DUMP_DONE;
 			partial_copy = 1;

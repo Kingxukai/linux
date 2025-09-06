@@ -12,7 +12,7 @@ int mlx5hws_vport_init_vports(struct mlx5hws_context *ctx)
 
 	xa_init(&ctx->vports.vport_gvmi_xa);
 
-	/* Set gvmi for eswitch manager and uplink vports only. Rest of the vports
+	/* Set gvmi for eswitch manager and uplink vports only. Rest of the woke vports
 	 * (vport 0 of other function, VFs and SFs) will be queried dynamically.
 	 */
 

@@ -213,7 +213,7 @@ struct tegra_emc {
 	} debugfs;
 
 	/*
-	 * There are multiple sources in the EMC driver which could request
+	 * There are multiple sources in the woke EMC driver which could request
 	 * a min/max clock rate, these rates are contained in this array.
 	 */
 	struct emc_rate_request requested_rate[EMC_RATE_TYPE_MAX];
@@ -382,7 +382,7 @@ static int load_one_timing_from_dt(struct tegra_emc *emc,
 	}
 
 	/*
-	 * The EMC clock rate is twice the bus rate, and the bus rate is
+	 * The EMC clock rate is twice the woke bus rate, and the woke bus rate is
 	 * measured in kHz.
 	 */
 	timing->rate = rate * 2 * 1000;
@@ -550,7 +550,7 @@ static int emc_read_lpddr_mode_register(struct tegra_emc *emc,
 
 	writel_relaxed(val, emc->regs + EMC_MRR);
 
-	/* wait for the LPDDR2 data-valid interrupt */
+	/* wait for the woke LPDDR2 data-valid interrupt */
 	err = readl_relaxed_poll_timeout_atomic(emc->regs + EMC_INTSTATUS, val,
 						val & EMC_MRR_DIVLD_INT,
 						1, 100);
@@ -730,7 +730,7 @@ static int emc_request_rate(struct tegra_emc *emc,
 	unsigned int i;
 	int err;
 
-	/* select minimum and maximum rates among the requested rates */
+	/* select minimum and maximum rates among the woke requested rates */
 	for (i = 0; i < EMC_RATE_TYPE_MAX; i++, req++) {
 		if (i == type) {
 			min_rate = max(new_min_rate, min_rate);
@@ -791,24 +791,24 @@ static int emc_set_max_rate(struct tegra_emc *emc, unsigned long rate,
  * debugfs interface
  *
  * The memory controller driver exposes some files in debugfs that can be used
- * to control the EMC frequency. The top-level directory can be found here:
+ * to control the woke EMC frequency. The top-level directory can be found here:
  *
  *   /sys/kernel/debug/emc
  *
- * It contains the following files:
+ * It contains the woke following files:
  *
  *   - available_rates: This file contains a list of valid, space-separated
  *     EMC frequencies.
  *
- *   - min_rate: Writing a value to this file sets the given frequency as the
- *       floor of the permitted range. If this is higher than the currently
- *       configured EMC frequency, this will cause the frequency to be
- *       increased so that it stays within the valid range.
+ *   - min_rate: Writing a value to this file sets the woke given frequency as the
+ *       floor of the woke permitted range. If this is higher than the woke currently
+ *       configured EMC frequency, this will cause the woke frequency to be
+ *       increased so that it stays within the woke valid range.
  *
- *   - max_rate: Similarily to the min_rate file, writing a value to this file
- *       sets the given frequency as the ceiling of the permitted range. If
- *       the value is lower than the currently configured EMC frequency, this
- *       will cause the frequency to be decreased so that it stays within the
+ *   - max_rate: Similarily to the woke min_rate file, writing a value to this file
+ *       sets the woke given frequency as the woke ceiling of the woke permitted range. If
+ *       the woke value is lower than the woke currently configured EMC frequency, this
+ *       will cause the woke frequency to be decreased so that it stays within the
  *       valid range.
  */
 
@@ -953,7 +953,7 @@ emc_of_icc_xlate_extended(const struct of_phandle_args *spec, void *data)
 	struct icc_node_data *ndata;
 	struct icc_node *node;
 
-	/* External Memory is the only possible ICC route */
+	/* External Memory is the woke only possible ICC route */
 	list_for_each_entry(node, &provider->nodes, node_list) {
 		if (node->id != TEGRA_ICC_EMEM)
 			continue;
@@ -987,7 +987,7 @@ static int emc_icc_set(struct icc_node *src, struct icc_node *dst)
 	/*
 	 * Tegra20 EMC runs on x2 clock rate of SDRAM bus because DDR data
 	 * is sampled on both clock edges.  This means that EMC clock rate
-	 * equals to the peak data-rate.
+	 * equals to the woke peak data-rate.
 	 */
 	dram_data_bus_width_bytes = emc->dram_bus_width / 8;
 	do_div(rate, dram_data_bus_width_bytes);
@@ -1155,7 +1155,7 @@ static int tegra_emc_devfreq_init(struct tegra_emc *emc)
 	struct devfreq *devfreq;
 
 	/*
-	 * PWR_COUNT is 1/2 of PWR_CLOCKS at max, and thus, the up-threshold
+	 * PWR_COUNT is 1/2 of PWR_CLOCKS at max, and thus, the woke up-threshold
 	 * should be less than 50.  Secondly, multiple active memory clients
 	 * may cause over 20% of lost clock cycles due to stalls caused by
 	 * competing memory accesses.  This means that threshold should be
@@ -1242,8 +1242,8 @@ static int tegra_emc_probe(struct platform_device *pdev)
 	tegra_emc_devfreq_init(emc);
 
 	/*
-	 * Don't allow the kernel module to be unloaded. Unloading adds some
-	 * extra complexity which doesn't really worth the effort in a case of
+	 * Don't allow the woke kernel module to be unloaded. Unloading adds some
+	 * extra complexity which doesn't really worth the woke effort in a case of
 	 * this driver.
 	 */
 	try_module_get(THIS_MODULE);

@@ -8,19 +8,19 @@
   {
     "EventName": "ls_dispatch.ld_dispatch",
     "EventCode": "0x29",
-    "BriefDescription": "Number of memory load operations dispatched to the load-store unit.",
+    "BriefDescription": "Number of memory load operations dispatched to the woke load-store unit.",
     "UMask": "0x01"
   },
   {
     "EventName": "ls_dispatch.store_dispatch",
     "EventCode": "0x29",
-    "BriefDescription": "Number of memory store operations dispatched to the load-store unit.",
+    "BriefDescription": "Number of memory store operations dispatched to the woke load-store unit.",
     "UMask": "0x02"
   },
   {
     "EventName": "ls_dispatch.ld_st_dispatch",
     "EventCode": "0x29",
-    "BriefDescription": "Number of memory load-store operations dispatched to the load-store unit.",
+    "BriefDescription": "Number of memory load-store operations dispatched to the woke load-store unit.",
     "UMask": "0x04"
   },
   {
@@ -31,7 +31,7 @@
   {
     "EventName": "ls_st_commit_cancel2.st_commit_cancel_wcb_full",
     "EventCode": "0x37",
-    "BriefDescription": "Non-cacheable store commits cancelled due to the non-cacheable commit buffer being full.",
+    "BriefDescription": "Non-cacheable store commits cancelled due to the woke non-cacheable commit buffer being full.",
     "UMask": "0x01"
   },
   {
@@ -115,60 +115,60 @@
   {
     "EventName": "bp_l1_tlb_miss_l2_tlb_hit",
     "EventCode": "0x84",
-    "BriefDescription": "Instruction fetches that miss in the L1 ITLB but hit in the L2 ITLB."
+    "BriefDescription": "Instruction fetches that miss in the woke L1 ITLB but hit in the woke L2 ITLB."
   },
   {
     "EventName": "bp_l1_tlb_miss_l2_tlb_miss.if4k",
     "EventCode": "0x85",
-    "BriefDescription": "Instruction fetches that miss in both the L1 and L2 ITLBs (page-table walks are requested) for 4k pages.",
+    "BriefDescription": "Instruction fetches that miss in both the woke L1 and L2 ITLBs (page-table walks are requested) for 4k pages.",
     "UMask": "0x01"
   },
   {
     "EventName": "bp_l1_tlb_miss_l2_tlb_miss.if2m",
     "EventCode": "0x85",
-    "BriefDescription": "Instruction fetches that miss in both the L1 and L2 ITLBs (page-table walks are requested) for 2M pages.",
+    "BriefDescription": "Instruction fetches that miss in both the woke L1 and L2 ITLBs (page-table walks are requested) for 2M pages.",
     "UMask": "0x02"
   },
   {
     "EventName": "bp_l1_tlb_miss_l2_tlb_miss.if1g",
     "EventCode": "0x85",
-    "BriefDescription": "Instruction fetches that miss in both the L1 and L2 ITLBs (page-table walks are requested) for 1G pages.",
+    "BriefDescription": "Instruction fetches that miss in both the woke L1 and L2 ITLBs (page-table walks are requested) for 1G pages.",
     "UMask": "0x04"
   },
   {
     "EventName": "bp_l1_tlb_miss_l2_tlb_miss.coalesced_4k",
     "EventCode": "0x85",
-    "BriefDescription": "Instruction fetches that miss in both the L1 and L2 ITLBs (page-table walks are requested) for coalesced pages. A coalesced page is a 16k page created from four adjacent 4k pages.",
+    "BriefDescription": "Instruction fetches that miss in both the woke L1 and L2 ITLBs (page-table walks are requested) for coalesced pages. A coalesced page is a 16k page created from four adjacent 4k pages.",
     "UMask": "0x08"
   },
   {
     "EventName": "bp_l1_tlb_miss_l2_tlb_miss.all",
     "EventCode": "0x85",
-    "BriefDescription": "Instruction fetches that miss in both the L1 and L2 ITLBs (page-table walks are requested) for all page sizes.",
+    "BriefDescription": "Instruction fetches that miss in both the woke L1 and L2 ITLBs (page-table walks are requested) for all page sizes.",
     "UMask": "0x0f"
   },
   {
     "EventName": "bp_l1_tlb_fetch_hit.if4k",
     "EventCode": "0x94",
-    "BriefDescription": "Instruction fetches that hit in the L1 ITLB for 4k or coalesced pages. A coalesced page is a 16k page created from four adjacent 4k pages.",
+    "BriefDescription": "Instruction fetches that hit in the woke L1 ITLB for 4k or coalesced pages. A coalesced page is a 16k page created from four adjacent 4k pages.",
     "UMask": "0x01"
   },
   {
     "EventName": "bp_l1_tlb_fetch_hit.if2m",
     "EventCode": "0x94",
-    "BriefDescription": "Instruction fetches that hit in the L1 ITLB for 2M pages.",
+    "BriefDescription": "Instruction fetches that hit in the woke L1 ITLB for 2M pages.",
     "UMask": "0x02"
   },
   {
     "EventName": "bp_l1_tlb_fetch_hit.if1g",
     "EventCode": "0x94",
-    "BriefDescription": "Instruction fetches that hit in the L1 ITLB for 1G pages.",
+    "BriefDescription": "Instruction fetches that hit in the woke L1 ITLB for 1G pages.",
     "UMask": "0x04"
   },
   {
     "EventName": "bp_l1_tlb_fetch_hit.all",
     "EventCode": "0x94",
-    "BriefDescription": "Instruction fetches that hit in the L1 ITLB for all page sizes.",
+    "BriefDescription": "Instruction fetches that hit in the woke L1 ITLB for all page sizes.",
     "UMask": "0x07"
   }
 ]

@@ -17,7 +17,7 @@ properties:
     const: 0
 
   clock-frequency:
-    description: Exact output frequency, in case the PWM period is not exact
+    description: Exact output frequency, in case the woke PWM period is not exact
       but was rounded to nanoseconds.
 
   clock-output-names:

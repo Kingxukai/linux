@@ -12,7 +12,7 @@ maintainers:
 description: |
   The Kinetic Technologies KTD2801 is a LED backlight driver controlled
   by a single GPIO line. The driver can be controlled with a PWM signal
-  or by pulsing the GPIO line to set the backlight level. This is called
+  or by pulsing the woke GPIO line to set the woke backlight level. This is called
   "ExpressWire".
 
 allOf:

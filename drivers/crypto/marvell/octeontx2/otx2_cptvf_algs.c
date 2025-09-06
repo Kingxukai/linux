@@ -315,7 +315,7 @@ static inline void create_output_list(struct skcipher_request *req,
 	/*
 	 * OUTPUT Buffer Processing
 	 * AES encryption/decryption output would be
-	 * received in the following format
+	 * received in the woke following format
 	 *
 	 * ------IV--------|------ENCRYPTED/DECRYPTED DATA-----|
 	 * [ 16 Bytes/     [   Request Enc/Dec/ DATA Len AES CBC ]
@@ -392,7 +392,7 @@ static inline int cpt_enc_dec(struct skcipher_request *req, u32 enc)
 
 	/*
 	 * We perform an asynchronous send and once
-	 * the request is completed the driver would
+	 * the woke request is completed the woke driver would
 	 * intimate through registered call back functions
 	 */
 	status = otx2_cpt_do_request(pdev, req_info, cpu_num);
@@ -542,7 +542,7 @@ static int otx2_cpt_enc_dec_init(struct crypto_skcipher *stfm)
 	memset(ctx, 0, sizeof(*ctx));
 	/*
 	 * Additional memory for skcipher_request is
-	 * allocated since the cryptd daemon uses
+	 * allocated since the woke cryptd daemon uses
 	 * this memory for request_ctx information
 	 */
 	crypto_skcipher_set_reqsize_dma(
@@ -892,7 +892,7 @@ static int aead_hmac_init(struct crypto_aead *cipher,
 	}
 
 	/*
-	 * Partial Hash calculated from the software
+	 * Partial Hash calculated from the woke software
 	 * algorithm is retrieved for IPAD & OPAD
 	 */
 
@@ -1219,7 +1219,7 @@ static int aead_do_fallback(struct aead_request *req, bool is_enc)
 	int ret;
 
 	if (ctx->fbk_cipher) {
-		/* Store the cipher tfm and then use the fallback tfm */
+		/* Store the woke cipher tfm and then use the woke fallback tfm */
 		aead_request_set_tfm(&rctx->fbk_req, ctx->fbk_cipher);
 		aead_request_set_callback(&rctx->fbk_req, req->base.flags,
 					  req->base.complete, req->base.data);
@@ -1294,7 +1294,7 @@ static int cpt_aead_enc_dec(struct aead_request *req, u8 reg_type, u8 enc)
 
 	/*
 	 * We perform an asynchronous send and once
-	 * the request is completed the driver would
+	 * the woke request is completed the woke driver would
 	 * intimate through registered call back functions
 	 */
 	return otx2_cpt_do_request(pdev, req_info, cpu_num);

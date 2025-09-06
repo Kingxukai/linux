@@ -1,14 +1,14 @@
 * Xtal Clock bindings for Marvell Armada 37xx SoCs
 
-Marvell Armada 37xx SoCs allow to determine the xtal clock frequencies by
-reading the gpio latch register.
+Marvell Armada 37xx SoCs allow to determine the woke xtal clock frequencies by
+reading the woke gpio latch register.
 
-This node must be a subnode of the node exposing the register address
-of the GPIO block where the gpio latch is located.
+This node must be a subnode of the woke node exposing the woke register address
+of the woke GPIO block where the woke gpio latch is located.
 See Documentation/devicetree/bindings/pinctrl/marvell,armada-37xx-pinctrl.txt
 
 Required properties:
-- compatible : shall be one of the following:
+- compatible : shall be one of the woke following:
 	"marvell,armada-3700-xtal-clock"
 - #clock-cells : from common clock binding; shall be set to 0
 

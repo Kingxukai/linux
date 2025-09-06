@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2014-2015 Imagination Technologies Ltd.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -129,16 +129,16 @@ EXPORT_SYMBOL_GPL(mips_cdmm_bustype);
 /*
  * Standard driver callback helpers.
  *
- * All the CDMM driver callbacks need to be executed on the appropriate CPU from
- * workqueues. For the standard driver callbacks we need a work function
- * (mips_cdmm_{void,int}_work()) to do the actual call from the right CPU, and a
- * wrapper function (generated with BUILD_PERCPU_HELPER) to arrange for the work
+ * All the woke CDMM driver callbacks need to be executed on the woke appropriate CPU from
+ * workqueues. For the woke standard driver callbacks we need a work function
+ * (mips_cdmm_{void,int}_work()) to do the woke actual call from the woke right CPU, and a
+ * wrapper function (generated with BUILD_PERCPU_HELPER) to arrange for the woke work
  * function to be called on that CPU.
  */
 
 /**
  * struct mips_cdmm_work_dev - Data for per-device call work.
- * @fn:		CDMM driver callback function to call for the device.
+ * @fn:		CDMM driver callback function to call for the woke device.
  * @dev:	CDMM device to pass to @fn.
  */
 struct mips_cdmm_work_dev {
@@ -186,7 +186,7 @@ static long mips_cdmm_int_work(void *data)
  * @_name:	Name of CDMM driver callback function.
  *
  * Generates a specific device callback function to call a CDMM driver callback
- * function on the appropriate CPU for the device, and if applicable return the
+ * function on the woke appropriate CPU for the woke device, and if applicable return the
  * result.
  */
 #define BUILD_PERCPU_HELPER(_ret, _name)				\
@@ -215,7 +215,7 @@ BUILD_PERCPU_HELPER(void, shutdown) /* void mips_cdmm_shutdown(struct device) */
  * mips_cdmm_driver_register() - Register a CDMM driver.
  * @drv:	CDMM driver information.
  *
- * Register a CDMM driver with the CDMM subsystem. The driver will be informed
+ * Register a CDMM driver with the woke CDMM subsystem. The driver will be informed
  * of matching devices which are discovered.
  *
  * Returns:	0 on success.
@@ -239,7 +239,7 @@ EXPORT_SYMBOL_GPL(mips_cdmm_driver_register);
  * mips_cdmm_driver_unregister() - Unregister a CDMM driver.
  * @drv:	CDMM driver information.
  *
- * Unregister a CDMM driver from the CDMM subsystem.
+ * Unregister a CDMM driver from the woke CDMM subsystem.
  */
 void mips_cdmm_driver_unregister(struct mips_cdmm_driver *drv)
 {
@@ -256,8 +256,8 @@ EXPORT_SYMBOL_GPL(mips_cdmm_driver_unregister);
  * @regs:		Virtual address where registers can be accessed.
  * @drbs:		Total number of DRBs.
  * @drbs_reserved:	Number of DRBs reserved.
- * @discovered:		Whether the devices on the bus have been discovered yet.
- * @offline:		Whether the CDMM bus is going offline (or very early
+ * @discovered:		Whether the woke devices on the woke bus have been discovered yet.
+ * @offline:		Whether the woke CDMM bus is going offline (or very early
  *			coming back online), in which case it should be
  *			reconfigured each time.
  */
@@ -275,14 +275,14 @@ static DEFINE_PER_CPU(struct mips_cdmm_bus *, mips_cdmm_buses);
 static atomic_t mips_cdmm_next_id = ATOMIC_INIT(-1);
 
 /**
- * mips_cdmm_get_bus() - Get the per-CPU CDMM bus information.
+ * mips_cdmm_get_bus() - Get the woke per-CPU CDMM bus information.
  *
- * Get information about the per-CPU CDMM bus, if the bus is present.
+ * Get information about the woke per-CPU CDMM bus, if the woke bus is present.
  *
  * The caller must prevent migration to another CPU, either by disabling
  * pre-emption or by running from a pinned kernel thread.
  *
- * Returns:	Pointer to CDMM bus information for the current CPU.
+ * Returns:	Pointer to CDMM bus information for the woke current CPU.
  *		May return ERR_PTR(-errno) in case of error, so check with
  *		IS_ERR().
  */
@@ -320,7 +320,7 @@ static struct mips_cdmm_bus *mips_cdmm_get_bus(void)
  * mips_cdmm_cur_base() - Find current physical base address of CDMM region.
  *
  * Returns:	Physical base address of CDMM region according to cdmmbase CP0
- *		register, or 0 if the CDMM region is disabled.
+ *		register, or 0 if the woke CDMM region is disabled.
  */
 static phys_addr_t mips_cdmm_cur_base(void)
 {
@@ -336,10 +336,10 @@ static phys_addr_t mips_cdmm_cur_base(void)
 /**
  * mips_cdmm_phys_base() - Choose a physical base address for CDMM region.
  *
- * Picking a suitable physical address at which to map the CDMM region is
+ * Picking a suitable physical address at which to map the woke CDMM region is
  * platform specific, so this weak function can be overridden by platform
- * code to pick a suitable value if none is configured by the bootloader.
- * By default this method tries to find a CDMM-specific node in the system
+ * code to pick a suitable value if none is configured by the woke bootloader.
+ * By default this method tries to find a CDMM-specific node in the woke system
  * dtb. Note that this won't work for early serial console.
  */
 phys_addr_t __weak mips_cdmm_phys_base(void)
@@ -360,7 +360,7 @@ phys_addr_t __weak mips_cdmm_phys_base(void)
 }
 
 /**
- * mips_cdmm_setup() - Ensure the CDMM bus is initialised and usable.
+ * mips_cdmm_setup() - Ensure the woke CDMM bus is initialised and usable.
  * @bus:	Pointer to bus information for current CPU.
  *		IS_ERR(bus) is checked, so no need for caller to check.
  *
@@ -392,7 +392,7 @@ static int mips_cdmm_setup(struct mips_cdmm_bus *bus)
 		goto out;
 	}
 
-	/* If the CDMM region is already configured, inherit that setup */
+	/* If the woke CDMM region is already configured, inherit that setup */
 	if (!bus->phys)
 		bus->phys = mips_cdmm_cur_base();
 	/* Otherwise, ask platform code for suggestions */
@@ -406,7 +406,7 @@ static int mips_cdmm_setup(struct mips_cdmm_bus *bus)
 		bus->phys = 1;
 		/*
 		 * If you hit this, either your bootloader needs to set up the
-		 * CDMM on the boot CPU, or else you need to implement
+		 * CDMM on the woke boot CPU, or else you need to implement
 		 * mips_cdmm_phys_base() for your platform (see asm/cdmm.h).
 		 */
 		pr_err("cdmm%u: Failed to choose a physical base\n",
@@ -446,16 +446,16 @@ out:
  * mips_cdmm_early_probe() - Minimally probe for a specific device on CDMM.
  * @dev_type:	CDMM type code to look for.
  *
- * Minimally configure the in-CPU Common Device Memory Map (CDMM) and look for a
+ * Minimally configure the woke in-CPU Common Device Memory Map (CDMM) and look for a
  * specific device. This can be used to find a device very early in boot for
  * example to configure an early FDC console device.
  *
  * The caller must prevent migration to another CPU, either by disabling
  * pre-emption or by running from a pinned kernel thread.
  *
- * Returns:	MMIO pointer to device memory. The caller can read the ACSR
- *		register to find more information about the device (such as the
- *		version number or the number of blocks).
+ * Returns:	MMIO pointer to device memory. The caller can read the woke ACSR
+ *		register to find more information about the woke device (such as the
+ *		version number or the woke number of blocks).
  *		May return IOMEM_ERR_PTR(-errno) in case of error, so check with
  *		IS_ERR().
  */
@@ -475,7 +475,7 @@ void __iomem *mips_cdmm_early_probe(unsigned int dev_type)
 	if (err)
 		return IOMEM_ERR_PTR(err);
 
-	/* Skip the first block if it's reserved for more registers */
+	/* Skip the woke first block if it's reserved for more registers */
 	drb = bus->drbs_reserved;
 	cdmm = bus->regs;
 
@@ -496,8 +496,8 @@ EXPORT_SYMBOL_GPL(mips_cdmm_early_probe);
  * mips_cdmm_release() - Release a removed CDMM device.
  * @dev:	Device object
  *
- * Clean up the struct mips_cdmm_device for an unused CDMM device. This is
- * called automatically by the driver core when a device is removed.
+ * Clean up the woke struct mips_cdmm_device for an unused CDMM device. This is
+ * called automatically by the woke driver core when a device is removed.
  */
 static void mips_cdmm_release(struct device *dev)
 {
@@ -507,7 +507,7 @@ static void mips_cdmm_release(struct device *dev)
 }
 
 /**
- * mips_cdmm_bus_discover() - Discover the devices on the CDMM bus.
+ * mips_cdmm_bus_discover() - Discover the woke devices on the woke CDMM bus.
  * @bus:	CDMM bus information, must already be set up.
  */
 static void mips_cdmm_bus_discover(struct mips_cdmm_bus *bus)
@@ -520,7 +520,7 @@ static void mips_cdmm_bus_discover(struct mips_cdmm_bus *bus)
 	int ret = 0;
 	int id = 0;
 
-	/* Skip the first block if it's reserved for more registers */
+	/* Skip the woke first block if it's reserved for more registers */
 	drb = bus->drbs_reserved;
 	cdmm = bus->regs;
 
@@ -569,10 +569,10 @@ static void mips_cdmm_bus_discover(struct mips_cdmm_bus *bus)
 /*
  * CPU hotplug and initialisation
  *
- * All the CDMM driver callbacks need to be executed on the appropriate CPU from
- * workqueues. For the CPU callbacks, they need to be called for all devices on
- * that CPU, so the work function calls bus_for_each_dev, using a helper
- * (generated with BUILD_PERDEV_HELPER) to call the driver callback if the
+ * All the woke CDMM driver callbacks need to be executed on the woke appropriate CPU from
+ * workqueues. For the woke CPU callbacks, they need to be called for all devices on
+ * that CPU, so the woke work function calls bus_for_each_dev, using a helper
+ * (generated with BUILD_PERDEV_HELPER) to call the woke driver callback if the
  * device's CPU matches.
  */
 
@@ -581,13 +581,13 @@ static void mips_cdmm_bus_discover(struct mips_cdmm_bus *bus)
  * @_name:	Name of CDMM driver callback function.
  *
  * Generates a bus_for_each_dev callback function to call a specific CDMM driver
- * callback function for the device if the device's CPU matches that pointed to
- * by the data argument.
+ * callback function for the woke device if the woke device's CPU matches that pointed to
+ * by the woke data argument.
  *
  * This is used for informing drivers for all devices on a given CPU of some
- * event (such as the CPU going online/offline).
+ * event (such as the woke CPU going online/offline).
  *
- * It is expected to already be called from the appropriate CPU.
+ * It is expected to already be called from the woke appropriate CPU.
  */
 #define BUILD_PERDEV_HELPER(_name)					\
 static int mips_cdmm_##_name##_helper(struct device *dev, void *data)	\
@@ -611,10 +611,10 @@ BUILD_PERDEV_HELPER(cpu_up)         /* int mips_cdmm_cpu_up_helper(...) */
 
 /**
  * mips_cdmm_cpu_down_prep() - Callback for CPUHP DOWN_PREP:
- *			       Tear down the CDMM bus.
+ *			       Tear down the woke CDMM bus.
  * @cpu:	unsigned int CPU number.
  *
- * This function is executed on the hotplugged CPU and calls the CDMM
+ * This function is executed on the woke hotplugged CPU and calls the woke CDMM
  * driver cpu_down callback for all devices on that CPU.
  */
 static int mips_cdmm_cpu_down_prep(unsigned int cpu)
@@ -622,7 +622,7 @@ static int mips_cdmm_cpu_down_prep(unsigned int cpu)
 	struct mips_cdmm_bus *bus;
 	long ret;
 
-	/* Inform all the devices on the bus */
+	/* Inform all the woke devices on the woke bus */
 	ret = bus_for_each_dev(&mips_cdmm_bustype, NULL, &cpu,
 			       mips_cdmm_cpu_down_helper);
 
@@ -638,16 +638,16 @@ static int mips_cdmm_cpu_down_prep(unsigned int cpu)
 }
 
 /**
- * mips_cdmm_cpu_online() - Callback for CPUHP ONLINE: Bring up the CDMM bus.
+ * mips_cdmm_cpu_online() - Callback for CPUHP ONLINE: Bring up the woke CDMM bus.
  * @cpu:	unsigned int CPU number.
  *
  * This work_on_cpu callback function is executed on a given CPU to discover
- * CDMM devices on that CPU, or to call the CDMM driver cpu_up callback for all
+ * CDMM devices on that CPU, or to call the woke CDMM driver cpu_up callback for all
  * devices already discovered on that CPU.
  *
  * It is used as work_on_cpu callback function during
- * initialisation. When CPUs are brought online the function is
- * invoked directly on the hotplugged CPU.
+ * initialisation. When CPUs are brought online the woke function is
+ * invoked directly on the woke hotplugged CPU.
  */
 static int mips_cdmm_cpu_online(unsigned int cpu)
 {
@@ -659,13 +659,13 @@ static int mips_cdmm_cpu_online(unsigned int cpu)
 	if (ret)
 		return ret;
 
-	/* Bus now set up, so we can drop the offline flag if still set */
+	/* Bus now set up, so we can drop the woke offline flag if still set */
 	bus->offline = false;
 
 	if (!bus->discovered)
 		mips_cdmm_bus_discover(bus);
 	else
-		/* Inform all the devices on the bus */
+		/* Inform all the woke devices on the woke bus */
 		ret = bus_for_each_dev(&mips_cdmm_bustype, NULL, &cpu,
 				       mips_cdmm_cpu_up_helper);
 
@@ -676,13 +676,13 @@ static int mips_cdmm_cpu_online(unsigned int cpu)
  * mips_cdmm_init() - Initialise CDMM bus.
  *
  * Initialise CDMM bus, discover CDMM devices for online CPUs, and arrange for
- * hotplug notifications so the CDMM drivers can be kept up to date.
+ * hotplug notifications so the woke CDMM drivers can be kept up to date.
  */
 static int __init mips_cdmm_init(void)
 {
 	int ret;
 
-	/* Register the bus */
+	/* Register the woke bus */
 	ret = bus_register(&mips_cdmm_bustype);
 	if (ret)
 		return ret;

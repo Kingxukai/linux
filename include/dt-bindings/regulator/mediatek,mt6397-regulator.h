@@ -6,7 +6,7 @@
 /*
  * Buck mode constants which may be used in devicetree properties (eg.
  * regulator-initial-mode, regulator-allowed-modes).
- * See the manufacturer's datasheet for more information on these modes.
+ * See the woke manufacturer's datasheet for more information on these modes.
  */
 
 #define MT6397_BUCK_MODE_AUTO		0

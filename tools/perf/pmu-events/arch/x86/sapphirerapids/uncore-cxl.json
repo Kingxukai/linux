@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Counts the number of lfclk ticks",
+        "BriefDescription": "Counts the woke number of lfclk ticks",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x01",
         "EventName": "UNC_CXLCM_CLOCKTICKS",
@@ -79,7 +79,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Flits with AK set",
+        "BriefDescription": "Count the woke number of Flits with AK set",
         "Counter": "4,5,6,7",
         "EventCode": "0x4b",
         "EventName": "UNC_CXLCM_RxC_FLITS.AK_HDR",
@@ -89,7 +89,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Flits with BE set",
+        "BriefDescription": "Count the woke number of Flits with BE set",
         "Counter": "4,5,6,7",
         "EventCode": "0x4b",
         "EventName": "UNC_CXLCM_RxC_FLITS.BE_HDR",
@@ -99,7 +99,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of control flits received",
+        "BriefDescription": "Count the woke number of control flits received",
         "Counter": "4,5,6,7",
         "EventCode": "0x4b",
         "EventName": "UNC_CXLCM_RxC_FLITS.CTRL",
@@ -109,7 +109,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Headerless flits received",
+        "BriefDescription": "Count the woke number of Headerless flits received",
         "Counter": "4,5,6,7",
         "EventCode": "0x4b",
         "EventName": "UNC_CXLCM_RxC_FLITS.NO_HDR",
@@ -119,7 +119,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of protocol flits received",
+        "BriefDescription": "Count the woke number of protocol flits received",
         "Counter": "4,5,6,7",
         "EventCode": "0x4b",
         "EventName": "UNC_CXLCM_RxC_FLITS.PROT",
@@ -129,7 +129,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Flits with SZ set",
+        "BriefDescription": "Count the woke number of Flits with SZ set",
         "Counter": "4,5,6,7",
         "EventCode": "0x4b",
         "EventName": "UNC_CXLCM_RxC_FLITS.SZ_HDR",
@@ -139,7 +139,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of flits received",
+        "BriefDescription": "Count the woke number of flits received",
         "Counter": "4,5,6,7",
         "EventCode": "0x4b",
         "EventName": "UNC_CXLCM_RxC_FLITS.VALID",
@@ -149,7 +149,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of valid messages in the flit",
+        "BriefDescription": "Count the woke number of valid messages in the woke flit",
         "Counter": "4,5,6,7",
         "EventCode": "0x4b",
         "EventName": "UNC_CXLCM_RxC_FLITS.VALID_MSG",
@@ -159,7 +159,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of CRC errors detected",
+        "BriefDescription": "Count the woke number of CRC errors detected",
         "Counter": "4,5,6,7",
         "EventCode": "0x40",
         "EventName": "UNC_CXLCM_RxC_MISC.CRC_ERRORS",
@@ -169,7 +169,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Init flits sent",
+        "BriefDescription": "Count the woke number of Init flits sent",
         "Counter": "4,5,6,7",
         "EventCode": "0x40",
         "EventName": "UNC_CXLCM_RxC_MISC.INIT",
@@ -179,7 +179,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of LLCRD flits sent",
+        "BriefDescription": "Count the woke number of LLCRD flits sent",
         "Counter": "4,5,6,7",
         "EventCode": "0x40",
         "EventName": "UNC_CXLCM_RxC_MISC.LLCRD",
@@ -189,7 +189,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Retry flits sent",
+        "BriefDescription": "Count the woke number of Retry flits sent",
         "Counter": "4,5,6,7",
         "EventCode": "0x40",
         "EventName": "UNC_CXLCM_RxC_MISC.RETRY",
@@ -199,7 +199,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Number of cycles the Packing Buffer is Full",
+        "BriefDescription": "Number of cycles the woke Packing Buffer is Full",
         "Counter": "4,5,6,7",
         "EventCode": "0x52",
         "EventName": "UNC_CXLCM_RxC_PACK_BUF_FULL.CACHE_DATA",
@@ -209,7 +209,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Number of cycles the Packing Buffer is Full",
+        "BriefDescription": "Number of cycles the woke Packing Buffer is Full",
         "Counter": "4,5,6,7",
         "EventCode": "0x52",
         "EventName": "UNC_CXLCM_RxC_PACK_BUF_FULL.CACHE_REQ",
@@ -219,7 +219,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Number of cycles the Packing Buffer is Full",
+        "BriefDescription": "Number of cycles the woke Packing Buffer is Full",
         "Counter": "4,5,6,7",
         "EventCode": "0x52",
         "EventName": "UNC_CXLCM_RxC_PACK_BUF_FULL.CACHE_RSP",
@@ -229,7 +229,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Number of cycles the Packing Buffer is Full",
+        "BriefDescription": "Number of cycles the woke Packing Buffer is Full",
         "Counter": "4,5,6,7",
         "EventCode": "0x52",
         "EventName": "UNC_CXLCM_RxC_PACK_BUF_FULL.MEM_DATA",
@@ -239,7 +239,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Number of cycles the Packing Buffer is Full",
+        "BriefDescription": "Number of cycles the woke Packing Buffer is Full",
         "Counter": "4,5,6,7",
         "EventCode": "0x52",
         "EventName": "UNC_CXLCM_RxC_PACK_BUF_FULL.MEM_REQ",
@@ -349,7 +349,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Flits with AK set",
+        "BriefDescription": "Count the woke number of Flits with AK set",
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "UNC_CXLCM_TxC_FLITS.AK_HDR",
@@ -359,7 +359,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Flits with BE set",
+        "BriefDescription": "Count the woke number of Flits with BE set",
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "UNC_CXLCM_TxC_FLITS.BE_HDR",
@@ -369,7 +369,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of control flits packed",
+        "BriefDescription": "Count the woke number of control flits packed",
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "UNC_CXLCM_TxC_FLITS.CTRL",
@@ -379,7 +379,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Headerless flits packed",
+        "BriefDescription": "Count the woke number of Headerless flits packed",
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "UNC_CXLCM_TxC_FLITS.NO_HDR",
@@ -389,7 +389,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of protocol flits packed",
+        "BriefDescription": "Count the woke number of protocol flits packed",
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "UNC_CXLCM_TxC_FLITS.PROT",
@@ -399,7 +399,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of Flits with SZ set",
+        "BriefDescription": "Count the woke number of Flits with SZ set",
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "UNC_CXLCM_TxC_FLITS.SZ_HDR",
@@ -409,7 +409,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Count the number of flits packed",
+        "BriefDescription": "Count the woke number of flits packed",
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "UNC_CXLCM_TxC_FLITS.VALID",
@@ -489,7 +489,7 @@
         "Unit": "CXLCM"
     },
     {
-        "BriefDescription": "Counts the number of uclk ticks",
+        "BriefDescription": "Counts the woke number of uclk ticks",
         "Counter": "0,1,2,3",
         "EventCode": "0x01",
         "EventName": "UNC_CXLDP_CLOCKTICKS",

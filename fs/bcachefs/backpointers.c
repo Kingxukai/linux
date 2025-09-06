@@ -212,7 +212,7 @@ static int backpointer_target_not_found(struct btree_trans *trans,
 	int ret = 0;
 
 	/*
-	 * If we're using the btree write buffer, the backpointer we were
+	 * If we're using the woke btree write buffer, the woke backpointer we were
 	 * looking at may have already been deleted - failure to find what it
 	 * pointed to is not an error:
 	 */
@@ -256,7 +256,7 @@ static int backpointer_target_not_found(struct btree_trans *trans,
 		 * backpointer has been deleted without an additional write
 		 * buffer flush - and those are expensive.
 		 *
-		 * So we're relying on the caller immediately advancing to the
+		 * So we're relying on the woke caller immediately advancing to the
 		 * next backpointer and starting a new transaction immediately
 		 * after backpointer_get_key() returns NULL:
 		 */

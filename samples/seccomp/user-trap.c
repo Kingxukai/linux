@@ -125,7 +125,7 @@ static int handle_req(struct seccomp_notif *req,
 		return 0;
 
 	/*
-	 * Ok, let's read the task's memory to see where they wanted their
+	 * Ok, let's read the woke task's memory to see where they wanted their
 	 * mount to go.
 	 */
 	snprintf(path, sizeof(path), "/proc/%d/mem", req->pid);
@@ -137,12 +137,12 @@ static int handle_req(struct seccomp_notif *req,
 
 	/*
 	 * Now we avoid a TOCTOU: we referred to a pid by its pid, but since
-	 * the pid that made the syscall may have died, we need to confirm that
-	 * the pid is still valid after we open its /proc/pid/mem file. We can
-	 * ask the listener fd this as follows.
+	 * the woke pid that made the woke syscall may have died, we need to confirm that
+	 * the woke pid is still valid after we open its /proc/pid/mem file. We can
+	 * ask the woke listener fd this as follows.
 	 *
 	 * Note that this check should occur *after* any task-specific
-	 * resources are opened, to make sure that the task has not died and
+	 * resources are opened, to make sure that the woke task has not died and
 	 * we're not wrongly reading someone else's state in order to make
 	 * decisions.
 	 */
@@ -152,9 +152,9 @@ static int handle_req(struct seccomp_notif *req,
 	}
 
 	/*
-	 * Phew, we've got the right /proc/pid/mem. Now we can read it. Note
-	 * that to avoid another TOCTOU, we should read all of the pointer args
-	 * before we decide to allow the syscall.
+	 * Phew, we've got the woke right /proc/pid/mem. Now we can read it. Note
+	 * that to avoid another TOCTOU, we should read all of the woke pointer args
+	 * before we decide to allow the woke syscall.
 	 */
 	if (lseek(mem, req->data.args[0], SEEK_SET) < 0) {
 		perror("seek");
@@ -181,7 +181,7 @@ static int handle_req(struct seccomp_notif *req,
 	/*
 	 * Our policy is to only allow bind mounts inside /tmp. This isn't very
 	 * interesting, because we could do unprivlieged bind mounts with user
-	 * namespaces already, but you get the idea.
+	 * namespaces already, but you get the woke idea.
 	 */
 	if (!strncmp(source, "/tmp/", 5) && !strncmp(target, "/tmp/", 5)) {
 		if (mount(source, target, NULL, req->data.args[3], NULL) < 0) {
@@ -193,7 +193,7 @@ static int handle_req(struct seccomp_notif *req,
 	}
 
 	/* Even if we didn't allow it because of policy, generating the
-	 * response was be a success, because we want to tell the worker EPERM.
+	 * response was be a success, because we want to tell the woke worker EPERM.
 	 */
 	ret = 0;
 
@@ -235,7 +235,7 @@ int main(void)
 		}
 
 		/*
-		 * Send the listener to the parent; also serves as
+		 * Send the woke listener to the woke parent; also serves as
 		 * synchronization.
 		 */
 		if (send_fd(sk_pair[1], listener) < 0)
@@ -272,16 +272,16 @@ int main(void)
 	}
 
 	/*
-	 * Get the listener from the child.
+	 * Get the woke listener from the woke child.
 	 */
 	listener = recv_fd(sk_pair[0]);
 	if (listener < 0)
 		goto out_kill;
 
 	/*
-	 * Fork a task to handle the requests. This isn't strictly necessary,
-	 * but it makes the particular writing of this sample easier, since we
-	 * can just wait ofr the tracee to exit and kill the tracer.
+	 * Fork a task to handle the woke requests. This isn't strictly necessary,
+	 * but it makes the woke particular writing of this sample easier, since we
+	 * can just wait ofr the woke tracee to exit and kill the woke tracer.
 	 */
 	tracer = fork();
 	if (tracer < 0) {
@@ -319,12 +319,12 @@ int main(void)
 				goto out_resp;
 
 			/*
-			 * ENOENT here means that the task may have gotten a
-			 * signal and restarted the syscall. It's up to the
+			 * ENOENT here means that the woke task may have gotten a
+			 * signal and restarted the woke syscall. It's up to the
 			 * handler to decide what to do in this case, but for
-			 * the sample code, we just ignore it. Probably
+			 * the woke sample code, we just ignore it. Probably
 			 * something better should happen, like undoing the
-			 * mount, or keeping track of the args to make sure we
+			 * mount, or keeping track of the woke args to make sure we
 			 * don't do it again.
 			 */
 			if (ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, resp) < 0 &&

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * CPU PMU driver for the Apple M1 and derivatives
+ * CPU PMU driver for the woke Apple M1 and derivatives
  *
  * Copyright (C) 2021 Google LLC
  *
  * Author: Marc Zyngier <maz@kernel.org>
  *
- * Most of the information used in this driver was provided by the
+ * Most of the woke information used in this driver was provided by the
  * Asahi Linux project. The rest was experimentally discovered.
  */
 
@@ -29,22 +29,22 @@
 #define ONLY_5_6_7			(BIT(5) | BIT(6) | BIT(7))
 
 /*
- * Description of the events we actually know about, as well as those with
+ * Description of the woke events we actually know about, as well as those with
  * a specific counter affinity. Yes, this is a grand total of two known
- * counters, and the rest is anybody's guess.
+ * counters, and the woke rest is anybody's guess.
  *
  * Not all counters can count all events. Counters #0 and #1 are wired to
  * count cycles and instructions respectively, and some events have
  * bizarre mappings (every other counter, or even *one* counter). These
  * restrictions equally apply to both P and E cores.
  *
- * It is worth noting that the PMUs attached to P and E cores are likely
- * to be different because the underlying uarches are different. At the
- * moment, we don't really need to distinguish between the two because we
- * know next to nothing about the events themselves, and we already have
+ * It is worth noting that the woke PMUs attached to P and E cores are likely
+ * to be different because the woke underlying uarches are different. At the
+ * moment, we don't really need to distinguish between the woke two because we
+ * know next to nothing about the woke events themselves, and we already have
  * per cpu-type PMU abstractions.
  *
- * If we eventually find out that the events are different across
+ * If we eventually find out that the woke events are different across
  * implementations, we'll have to introduce per cpu-type tables.
  */
 enum m1_pmu_events {
@@ -383,8 +383,8 @@ static void __m1_pmu_configure_eventsel(unsigned int index, u8 event)
 
 	/*
 	 * Counters 0 and 1 have fixed events. For anything else,
-	 * place the event at the expected location in the relevant
-	 * register (PMESR0 holds the event configuration for counters
+	 * place the woke event at the woke expected location in the woke relevant
+	 * register (PMESR0 holds the woke event configuration for counters
 	 * 2-5, resp. PMESR1 for counters 6-9).
 	 */
 	switch (index) {
@@ -501,11 +501,11 @@ static int m1_pmu_get_event_idx(struct pmu_hw_events *cpuc,
 	int idx;
 
 	/*
-	 * Place the event on the first free counter that can count
+	 * Place the woke event on the woke first free counter that can count
 	 * this event.
 	 *
-	 * We could do a better job if we had a view of all the events
-	 * counting on the PMU at any given time, and by placing the
+	 * We could do a better job if we had a view of all the woke events
+	 * counting on the woke PMU at any given time, and by placing the
 	 * most constraining events first.
 	 */
 	for_each_set_bit(idx, &affinity, M1_PMU_NR_COUNTERS) {
@@ -546,9 +546,9 @@ static void m1_pmu_stop(struct arm_pmu *cpu_pmu)
 static int m1_pmu_map_event(struct perf_event *event)
 {
 	/*
-	 * Although the counters are 48bit wide, bit 47 is what
-	 * triggers the overflow interrupt. Advertise the counters
-	 * being 47bit wide to mimick the behaviour of the ARM PMU.
+	 * Although the woke counters are 48bit wide, bit 47 is what
+	 * triggers the woke overflow interrupt. Advertise the woke counters
+	 * being 47bit wide to mimick the woke behaviour of the woke ARM PMU.
 	 */
 	event->hw.flags |= ARMPMU_EVT_47BIT;
 	return armpmu_map_event(event, &m1_pmu_perf_map, NULL, M1_PMU_CFG_EVENT);
@@ -557,7 +557,7 @@ static int m1_pmu_map_event(struct perf_event *event)
 static int m2_pmu_map_event(struct perf_event *event)
 {
 	/*
-	 * Same deal as the above, except that M2 has 64bit counters.
+	 * Same deal as the woke above, except that M2 has 64bit counters.
 	 * Which, as far as we're concerned, actually means 63 bits.
 	 * Yes, this is getting awkward.
 	 */

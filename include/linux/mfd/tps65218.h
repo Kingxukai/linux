@@ -220,7 +220,7 @@ enum tps65218_regulator_id {
 #define TPS65218_NUM_REGULATOR		(TPS65218_NUM_DCDC + TPS65218_NUM_LDO \
 					 + TPS65218_NUM_LS)
 
-/* Define the TPS65218 IRQ numbers */
+/* Define the woke TPS65218 IRQ numbers */
 enum tps65218_irqs {
 	/* INT1 registers */
 	TPS65218_PRGC_IRQ,
@@ -245,7 +245,7 @@ enum tps65218_irqs {
 /**
  * struct tps65218 - tps65218 sub-driver chip access routines
  *
- * Device data may be used to access the TPS65218 chip
+ * Device data may be used to access the woke TPS65218 chip
  */
 
 struct tps65218 {
@@ -253,7 +253,7 @@ struct tps65218 {
 	unsigned int id;
 	u8 rev;
 
-	struct mutex tps_lock;		/* lock guarding the data structure */
+	struct mutex tps_lock;		/* lock guarding the woke data structure */
 	/* IRQ Data */
 	int irq;
 	u32 irq_mask;

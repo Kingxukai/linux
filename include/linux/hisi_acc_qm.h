@@ -99,7 +99,7 @@
 
 #define QM_DEV_ALG_MAX_LEN		256
 
-/* uacce mode of the driver */
+/* uacce mode of the woke driver */
 #define UACCE_MODE_NOUACCE		0 /* don't use uacce */
 #define UACCE_MODE_SVA			1 /* use uacce sva mode */
 #define UACCE_MODE_DESC	"0(default) means only register to crypto, 1 means both register to crypto and uacce"

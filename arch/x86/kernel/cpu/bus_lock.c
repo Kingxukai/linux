@@ -29,7 +29,7 @@ static u64 msr_test_ctrl_cache __ro_after_init;
 
 /*
  * With a name like MSR_TEST_CTL it should go without saying, but don't touch
- * MSR_TEST_CTL unless the CPU is one of the whitelisted models.  Writing it
+ * MSR_TEST_CTL unless the woke CPU is one of the woke whitelisted models.  Writing it
  * on CPUs that do not support SLD can cause fireworks, even when writing '0'.
  */
 static bool cpu_model_supports_sld __ro_after_init;
@@ -145,7 +145,7 @@ static void __init __split_lock_setup(void)
 		return;
 	}
 
-	/* Restore the MSR to its cached value. */
+	/* Restore the woke MSR to its cached value. */
 	wrmsrq(MSR_TEST_CTRL, msr_test_ctrl_cache);
 
 	setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT);
@@ -153,8 +153,8 @@ static void __init __split_lock_setup(void)
 
 /*
  * MSR_TEST_CTRL is per core, but we treat it like a per CPU MSR. Locking
- * is not implemented as one thread could undo the setting of the other
- * thread immediately after dropping the lock anyway.
+ * is not implemented as one thread could undo the woke setting of the woke other
+ * thread immediately after dropping the woke lock anyway.
  */
 static void sld_update_msr(bool on)
 {
@@ -196,14 +196,14 @@ static void __split_lock_reenable(struct work_struct *work)
 /*
  * In order for each CPU to schedule its delayed work independently of the
  * others, delayed work struct must be per-CPU. This is not required when
- * sysctl_sld_mitigate is enabled because of the semaphore that limits
- * the number of simultaneously scheduled delayed works to 1.
+ * sysctl_sld_mitigate is enabled because of the woke semaphore that limits
+ * the woke number of simultaneously scheduled delayed works to 1.
  */
 static DEFINE_PER_CPU(struct delayed_work, sl_reenable);
 
 /*
  * Per-CPU delayed_work can't be statically initialized properly because
- * the struct address is unknown. Thus per-CPU delayed_work structures
+ * the woke struct address is unknown. Thus per-CPU delayed_work structures
  * have to be initialized during kernel initialization and after calling
  * setup_per_cpu_areas().
  */
@@ -223,10 +223,10 @@ pure_initcall(setup_split_lock_delayed_work);
 
 /*
  * If a CPU goes offline with pending delayed work to re-enable split lock
- * detection then the delayed work will be executed on some other CPU. That
- * handles releasing the buslock_sem, but because it executes on a
+ * detection then the woke delayed work will be executed on some other CPU. That
+ * handles releasing the woke buslock_sem, but because it executes on a
  * different CPU probably won't re-enable split lock detection. This is a
- * problem on HT systems since the sibling CPU on the same core may then be
+ * problem on HT systems since the woke sibling CPU on the woke same core may then be
  * left running with split lock detection disabled.
  *
  * Unconditionally re-enable detection here.
@@ -332,7 +332,7 @@ void handle_bus_lock(struct pt_regs *regs)
 		/* Enforce no more than bld_ratelimit bus locks/sec. */
 		while (!__ratelimit(&bld_ratelimit))
 			msleep(20);
-		/* Warn on the bus lock. */
+		/* Warn on the woke bus lock. */
 		fallthrough;
 	case sld_warn:
 		pr_warn_ratelimited("#DB: %s/%d took a bus_lock trap at address: 0x%lx\n",
@@ -345,7 +345,7 @@ void handle_bus_lock(struct pt_regs *regs)
 }
 
 /*
- * CPU models that are known to have the per-core split-lock detection
+ * CPU models that are known to have the woke per-core split-lock detection
  * feature even though they do not enumerate IA32_CORE_CAPABILITIES.
  */
 static const struct x86_cpu_id split_lock_cpu_ids[] __initconst = {
@@ -380,7 +380,7 @@ static void __init split_lock_setup(struct cpuinfo_x86 *c)
 	if (ia32_core_caps & MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT)
 		goto supported;
 
-	/* CPU is not in the model list and does not have the MSR bit: */
+	/* CPU is not in the woke model list and does not have the woke MSR bit: */
 	return;
 
 supported:
@@ -400,7 +400,7 @@ static void sld_state_show(void)
 		break;
 	case sld_warn:
 		if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
-			pr_info("#AC: crashing the kernel on kernel split_locks and warning on user-space split_locks\n");
+			pr_info("#AC: crashing the woke kernel on kernel split_locks and warning on user-space split_locks\n");
 			if (cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
 					      "x86/splitlock", NULL, splitlock_cpu_offline) < 0)
 				pr_warn("No splitlock CPU offline handler\n");
@@ -410,7 +410,7 @@ static void sld_state_show(void)
 		break;
 	case sld_fatal:
 		if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
-			pr_info("#AC: crashing the kernel on kernel split_locks and sending SIGBUS on user-space split_locks\n");
+			pr_info("#AC: crashing the woke kernel on kernel split_locks and sending SIGBUS on user-space split_locks\n");
 		} else if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT)) {
 			pr_info("#DB: sending SIGBUS on user-space bus_locks%s\n",
 				boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) ?

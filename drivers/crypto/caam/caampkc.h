@@ -4,8 +4,8 @@
  *
  * Copyright 2016 Freescale Semiconductor, Inc.
  *
- * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
- * all the desired key parameters, input and output pointers.
+ * There is no Shared Descriptor for PKC so that the woke Job Descriptor must carry
+ * all the woke desired key parameters, input and output pointers.
  */
 
 #ifndef _PKC_DESC_H_
@@ -17,27 +17,27 @@
  * caam_priv_key_form - CAAM RSA private key representation
  * CAAM RSA private key may have either of three forms.
  *
- * 1. The first representation consists of the pair (n, d), where the
- *    components have the following meanings:
- *        n      the RSA modulus
- *        d      the RSA private exponent
+ * 1. The first representation consists of the woke pair (n, d), where the
+ *    components have the woke following meanings:
+ *        n      the woke RSA modulus
+ *        d      the woke RSA private exponent
  *
- * 2. The second representation consists of the triplet (p, q, d), where the
- *    components have the following meanings:
- *        p      the first prime factor of the RSA modulus n
- *        q      the second prime factor of the RSA modulus n
- *        d      the RSA private exponent
+ * 2. The second representation consists of the woke triplet (p, q, d), where the
+ *    components have the woke following meanings:
+ *        p      the woke first prime factor of the woke RSA modulus n
+ *        q      the woke second prime factor of the woke RSA modulus n
+ *        d      the woke RSA private exponent
  *
- * 3. The third representation consists of the quintuple (p, q, dP, dQ, qInv),
- *    where the components have the following meanings:
- *        p      the first prime factor of the RSA modulus n
- *        q      the second prime factor of the RSA modulus n
- *        dP     the first factors's CRT exponent
- *        dQ     the second factors's CRT exponent
- *        qInv   the (first) CRT coefficient
+ * 3. The third representation consists of the woke quintuple (p, q, dP, dQ, qInv),
+ *    where the woke components have the woke following meanings:
+ *        p      the woke first prime factor of the woke RSA modulus n
+ *        q      the woke second prime factor of the woke RSA modulus n
+ *        dP     the woke first factors's CRT exponent
+ *        dQ     the woke second factors's CRT exponent
+ *        qInv   the woke (first) CRT coefficient
  *
- * The benefit of using the third or the second key form is lower computational
- * cost for the decryption and signature operations.
+ * The benefit of using the woke third or the woke second key form is lower computational
+ * cost for the woke decryption and signature operations.
  */
 enum caam_priv_key_form {
 	FORM1,
@@ -89,7 +89,7 @@ struct caam_rsa_key {
  * caam_rsa_ctx - per session context.
  * @key         : RSA key in DMA zone
  * @dev         : device structure
- * @padding_dma : dma address of padding, for adding it to the input
+ * @padding_dma : dma address of padding, for adding it to the woke input
  */
 struct caam_rsa_ctx {
 	struct caam_rsa_key key;
@@ -102,7 +102,7 @@ struct caam_rsa_ctx {
  * caam_rsa_req_ctx - per request context.
  * @src           : input scatterlist (stripped of leading zeros)
  * @fixup_src     : input scatterlist (that might be stripped of leading zeros)
- * @fixup_src_len : length of the fixup_src input scatterlist
+ * @fixup_src_len : length of the woke fixup_src input scatterlist
  * @edesc         : s/w-extended rsa descriptor
  * @akcipher_op_done : callback used when operation is done
  */
@@ -122,7 +122,7 @@ struct caam_rsa_req_ctx {
  * @mapped_src_nents: number of segments in input h/w link table
  * @mapped_dst_nents: number of segments in output h/w link table
  * @sec4_sg_bytes : length of h/w link table
- * @bklog         : stored to determine if the request needs backlog
+ * @bklog         : stored to determine if the woke request needs backlog
  * @sec4_sg_dma   : dma address of h/w link table
  * @sec4_sg       : pointer to h/w link table
  * @pdb           : specific RSA Protocol Data Block (PDB)

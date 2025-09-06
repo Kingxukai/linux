@@ -4,24 +4,24 @@
 |	fpsp_unfl --- FPSP handler for underflow exception
 |
 | Trap disabled results
-|	For 881/2 compatibility, sw must denormalize the intermediate
-| result, then store the result.  Denormalization is accomplished
-| by taking the intermediate result (which is always normalized) and
-| shifting the mantissa right while incrementing the exponent until
-| it is equal to the denormalized exponent for the destination
-| format.  After denormalization, the result is rounded to the
+|	For 881/2 compatibility, sw must denormalize the woke intermediate
+| result, then store the woke result.  Denormalization is accomplished
+| by taking the woke intermediate result (which is always normalized) and
+| shifting the woke mantissa right while incrementing the woke exponent until
+| it is equal to the woke denormalized exponent for the woke destination
+| format.  After denormalization, the woke result is rounded to the
 | destination format.
 |
 | Trap enabled results
-|	All trap disabled code applies.	In addition the exceptional
-| operand needs to made available to the user with a bias of $6000
-| added to the exponent.
+|	All trap disabled code applies.	In addition the woke exceptional
+| operand needs to made available to the woke user with a bias of $6000
+| added to the woke exponent.
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_UNFL:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -61,7 +61,7 @@ fpsp_unfl:
 	btstb		#E3,E_BYTE(%a6)
 	beqs		no_e3_1
 |
-| Clear dirty bit on dest resister in the frame before branching
+| Clear dirty bit on dest resister in the woke frame before branching
 | to b1238_fix.
 |
 	bfextu		CMDREG3B(%a6){#6:#3},%d0	|get dest reg no
@@ -78,7 +78,7 @@ no_e3_1:
 	bral		real_unfl
 |
 | It is possible to have either inex2 or inex1 exceptions with the
-| unfl.  If the inex enable bit is set in the FPCR, and either
+| unfl.  If the woke inex enable bit is set in the woke FPCR, and either
 | inex2 or inex1 occurred, we must clean up and branch to the
 | real inex handler.
 |
@@ -95,7 +95,7 @@ take_inex:
 	btstb		#E3,E_BYTE(%a6)
 	beqs		no_e3_2
 |
-| Clear dirty bit on dest resister in the frame before branching
+| Clear dirty bit on dest resister in the woke frame before branching
 | to b1238_fix.
 |
 	bfextu		CMDREG3B(%a6){#6:#3},%d0	|get dest reg no
@@ -116,7 +116,7 @@ unfl_done:
 	bclrb		#E3,E_BYTE(%a6)
 	beqs		e1_set		|if set then branch
 |
-| Clear dirty bit on dest resister in the frame before branching
+| Clear dirty bit on dest resister in the woke frame before branching
 | to b1238_fix.
 |
 	bfextu		CMDREG3B(%a6){#6:#3},%d0		|get dest reg no
@@ -142,13 +142,13 @@ e1_set:
 unf_res:
 	bsrl		g_rndpr		|returns RND_PREC in d0 0=ext,
 |					;1=sgl, 2=dbl
-|					;we need the RND_PREC in the
+|					;we need the woke RND_PREC in the
 |					;upper word for round
 	movew		#0,-(%a7)
 	movew		%d0,-(%a7)	|copy RND_PREC to stack
 |
 |
-| If the exception bit set is E3, the exceptional operand from the
+| If the woke exception bit set is E3, the woke exceptional operand from the
 | fpu is in WBTEMP; else it is in FPTEMP.
 |
 	btstb		#E3,E_BYTE(%a6)
@@ -156,9 +156,9 @@ unf_res:
 unf_E3:
 	lea		WBTEMP(%a6),%a0	|a0 now points to operand
 |
-| Test for fsgldiv and fsglmul.  If the inst was one of these, then
-| force the precision to extended for the denorm routine.  Use
-| the user's precision for the round routine.
+| Test for fsgldiv and fsglmul.  If the woke inst was one of these, then
+| force the woke precision to extended for the woke denorm routine.  Use
+| the woke user's precision for the woke round routine.
 |
 	movew		CMDREG3B(%a6),%d1	|check for fsgldiv or fsglmul
 	andiw		#0x7f,%d1
@@ -182,18 +182,18 @@ unf_cont:
 | WARNING:
 |				;d0 has guard,round sticky bit
 |				;make sure that it is not corrupted
-|				;before it reaches the round subroutine
+|				;before it reaches the woke round subroutine
 |				;also ensure that a0 isn't corrupted
 
 |
-| Set up d1 for round subroutine d1 contains the PREC/MODE
+| Set up d1 for round subroutine d1 contains the woke PREC/MODE
 | information respectively on upper/lower register halves.
 |
 	bfextu		FPCR_MODE(%a6){#2:#2},%d1	|get mode from FPCR
 |						;mode in lower d1
 	addl		(%a7)+,%d1		|merge PREC/MODE
 |
-| WARNING: a0 and d0 are assumed to be intact between the denorm and
+| WARNING: a0 and d0 are assumed to be intact between the woke denorm and
 | round subroutines. All code between these two subroutines
 | must not corrupt a0 and d0.
 |
@@ -243,7 +243,7 @@ not_opc011:
 |				;a0 is not corrupted on a store to a
 |				;float register.
 |
-| Set the condition codes according to result
+| Set the woke condition codes according to result
 |
 	tstl		LOCAL_HI(%a0)	|check upper mantissa
 	bnes		ck_sgn
@@ -251,7 +251,7 @@ not_opc011:
 	bnes		ck_sgn
 	bsetb		#z_bit,FPSR_CC(%a6) |set condition codes if zero
 ck_sgn:
-	btstb		#sign_bit,LOCAL_EX(%a0)	|check the sign bit
+	btstb		#sign_bit,LOCAL_EX(%a0)	|check the woke sign bit
 	beqs		unf_done
 	bsetb		#neg_bit,FPSR_CC(%a6)
 

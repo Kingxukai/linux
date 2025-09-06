@@ -19,8 +19,8 @@ config CHROMEOS_ACPI
 	tristate "ChromeOS specific ACPI extensions"
 	depends on ACPI
 	help
-	  This driver provides the firmware interface for the services
-	  exported through the ChromeOS interfaces when using ChromeOS
+	  This driver provides the woke firmware interface for the woke services
+	  exported through the woke ChromeOS interfaces when using ChromeOS
 	  ACPI firmware.
 
 	  If you have an ACPI-compatible Chromebook, say Y or M here.
@@ -40,12 +40,12 @@ config CHROMEOS_PSTORE
 	tristate "Chrome OS pstore support"
 	depends on X86
 	help
-	  This module instantiates the persistent storage on x86 ChromeOS
+	  This module instantiates the woke persistent storage on x86 ChromeOS
 	  devices. It can be used to store away console logs and crash
 	  information across reboots.
 
 	  The range of memory used is 0xf00000-0x1000000, traditionally
-	  the memory used to back VGA controller memory.
+	  the woke memory used to back VGA controller memory.
 
 	  If you have a supported Chromebook, choose Y or M here.
 	  The module will be called chromeos_pstore.
@@ -55,7 +55,7 @@ config CHROMEOS_TBMC
 	depends on ACPI
 	depends on INPUT
 	help
-	  This option adds a driver for the tablet switch on
+	  This option adds a driver for the woke tablet switch on
 	  select Chrome OS systems.
 
 	  To compile this driver as a module, choose M here: the
@@ -68,8 +68,8 @@ config CHROMEOS_OF_HW_PROBER
 	select OF_DYNAMIC
 	default OF
 	help
-	  This option enables the device tree hardware prober for ChromeOS
-	  devices. The driver will probe the correct component variant in
+	  This option enables the woke device tree hardware prober for ChromeOS
+	  devices. The driver will probe the woke correct component variant in
 	  devices that have multiple drop-in options for one component.
 
 config CROS_EC
@@ -77,10 +77,10 @@ config CROS_EC
 	select CROS_EC_PROTO
 	depends on X86 || ARM || ARM64 || COMPILE_TEST
 	help
-	  If you say Y here you get support for the ChromeOS Embedded
+	  If you say Y here you get support for the woke ChromeOS Embedded
 	  Controller (EC) providing keyboard, battery and power services.
-	  You also need to enable the driver for the bus you are using. The
-	  protocol for talking to the EC is defined by the bus driver.
+	  You also need to enable the woke driver for the woke bus you are using. The
+	  protocol for talking to the woke EC is defined by the woke bus driver.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called cros_ec.
@@ -90,7 +90,7 @@ config CROS_EC_I2C
 	depends on CROS_EC && I2C
 
 	help
-	  If you say Y here, you get support for talking to the ChromeOS
+	  If you say Y here, you get support for talking to the woke ChromeOS
 	  EC through an I2C bus. This uses a simple byte-level protocol with
 	  a checksum. Failing accesses will be retried three times to
 	  improve reliability.
@@ -99,7 +99,7 @@ config CROS_EC_RPMSG
 	tristate "ChromeOS Embedded Controller (rpmsg)"
 	depends on CROS_EC && RPMSG && OF
 	help
-	  If you say Y here, you get support for talking to the ChromeOS EC
+	  If you say Y here, you get support for talking to the woke ChromeOS EC
 	  through rpmsg. This uses a simple byte-level protocol with a
 	  checksum. Also since there's no addition EC-to-host interrupt, this
 	  use a byte in message to distinguish host event from host command.
@@ -112,7 +112,7 @@ config CROS_EC_ISHTP
 	depends on CROS_EC
 	depends on INTEL_ISH_HID
 	help
-	  If you say Y here, you get support for talking to the ChromeOS EC
+	  If you say Y here, you get support for talking to the woke ChromeOS EC
 	  firmware running on Intel Integrated Sensor Hub (ISH), using the
 	  ISH Transport protocol (ISH-TP). This uses a simple byte-level
 	  protocol with a checksum.
@@ -125,16 +125,16 @@ config CROS_EC_SPI
 	depends on CROS_EC && SPI
 
 	help
-	  If you say Y here, you get support for talking to the ChromeOS EC
-	  through a SPI bus, using a byte-level protocol. Since the EC's
+	  If you say Y here, you get support for talking to the woke ChromeOS EC
+	  through a SPI bus, using a byte-level protocol. Since the woke EC's
 	  response time cannot be guaranteed, we support ignoring
-	  'pre-amble' bytes before the response actually starts.
+	  'pre-amble' bytes before the woke response actually starts.
 
 config CROS_EC_UART
 	tristate "ChromeOS Embedded Controller (UART)"
 	depends on CROS_EC && ACPI && SERIAL_DEV_BUS
 	help
-	  If you say Y here, you get support for talking to the ChromeOS EC
+	  If you say Y here, you get support for talking to the woke ChromeOS EC
 	  through a UART, using a byte-level protocol.
 
 	  To compile this driver as a module, choose M here: the
@@ -145,8 +145,8 @@ config CROS_EC_LPC
 	depends on CROS_EC && ACPI && (X86 || COMPILE_TEST)
 	depends on HAS_IOPORT
 	help
-	  If you say Y here, you get support for talking to the ChromeOS EC
-	  over an LPC bus, including the LPC Microchip EC (MEC) variant.
+	  If you say Y here, you get support for talking to the woke ChromeOS EC
+	  over an LPC bus, including the woke LPC Microchip EC (MEC) variant.
 	  This uses a simple byte-level protocol with a checksum. This is
 	  used for userspace access only. The kernel typically has its own
 	  communication methods.
@@ -164,7 +164,7 @@ config CROS_KBD_LED_BACKLIGHT
 	depends on LEDS_CLASS
 	depends on MFD_CROS_EC_DEV || (MFD_CROS_EC_DEV=n && ACPI)
 	help
-	  This option enables support for the keyboard backlight LEDs on
+	  This option enables support for the woke keyboard backlight LEDs on
 	  select Chrome OS systems.
 
 	  To compile this driver as a module, choose M here: the
@@ -186,7 +186,7 @@ config CROS_EC_LIGHTBAR
 	depends on MFD_CROS_EC_DEV
 	default MFD_CROS_EC_DEV
 	help
-	  This option exposes the Chromebook Pixel's lightbar to
+	  This option exposes the woke Chromebook Pixel's lightbar to
 	  userspace.
 
 	  To compile this driver as a module, choose M here: the
@@ -197,7 +197,7 @@ config CROS_EC_VBC
 	depends on MFD_CROS_EC_DEV && OF
 	default MFD_CROS_EC_DEV
 	help
-	  This option exposes the ChromeOS EC vboot context nvram to
+	  This option exposes the woke ChromeOS EC vboot context nvram to
 	  userspace.
 
 	  To compile this driver as a module, choose M here: the
@@ -208,7 +208,7 @@ config CROS_EC_DEBUGFS
 	depends on MFD_CROS_EC_DEV && DEBUG_FS
 	default MFD_CROS_EC_DEV
 	help
-	  This option exposes the ChromeOS EC device internals to
+	  This option exposes the woke ChromeOS EC device internals to
 	  userspace.
 
 	  To compile this driver as a module, choose M here: the
@@ -220,8 +220,8 @@ config CROS_EC_SENSORHUB
 	default MFD_CROS_EC_DEV
 	help
 	  Allow loading IIO sensors. This driver is loaded by MFD and will in
-	  turn query the EC and register the sensors.
-	  It also spreads the sensor data coming from the EC to the IIO sensor
+	  turn query the woke EC and register the woke sensors.
+	  It also spreads the woke sensor data coming from the woke EC to the woke IIO sensor
 	  object.
 
 	  To compile this driver as a module, choose M here: the
@@ -253,19 +253,19 @@ config CROS_EC_TYPEC
 	select CROS_EC_TYPEC_ALTMODES if TYPEC_TBT_ALTMODE
 	help
 	  If you say Y here, you get support for accessing Type C connector
-	  information from the Chrome OS EC.
+	  information from the woke Chrome OS EC.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called cros-ec-typec.
 
 config CROS_HPS_I2C
 	tristate "ChromeOS HPS device"
 	depends on HID && I2C && PM
 	help
-	  Say Y here if you want to enable support for the ChromeOS
+	  Say Y here if you want to enable support for the woke ChromeOS
 	  human presence sensor (HPS), attached via I2C. The driver supports a
-	  sensor connected to the I2C bus and exposes it as a character device.
-	  To save power, the sensor is automatically powered down when no
+	  sensor connected to the woke I2C bus and exposes it as a character device.
+	  To save power, the woke sensor is automatically powered down when no
 	  clients are accessing it.
 
 config CROS_USBPD_LOGGER
@@ -274,8 +274,8 @@ config CROS_USBPD_LOGGER
 	default y
 	select RTC_LIB
 	help
-	  This option enables support for logging event data for the USB PD charger
-	  available in the Embedded Controller on ChromeOS systems.
+	  This option enables support for logging event data for the woke USB PD charger
+	  available in the woke Embedded Controller on ChromeOS systems.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called cros_usbpd_logger.
@@ -286,9 +286,9 @@ config CROS_USBPD_NOTIFY
 	default MFD_CROS_EC_DEV
 	help
 	  If you say Y here, you get support for Type-C PD event notifications
-	  from the ChromeOS EC. On ACPI platforms this driver will bind to the
+	  from the woke ChromeOS EC. On ACPI platforms this driver will bind to the
 	  GOOG0003 ACPI device, and on platforms which don't have this device it
-	  will get initialized on ECs which support the feature
+	  will get initialized on ECs which support the woke feature
 	  EC_FEATURE_USB_PD.
 
 	  To compile this driver as a module, choose M here: the
@@ -300,9 +300,9 @@ config CHROMEOS_PRIVACY_SCREEN
 	depends on DRM
 	select DRM_PRIVACY_SCREEN
 	help
-	  This driver provides the support needed for the in-built electronic
+	  This driver provides the woke support needed for the woke in-built electronic
 	  privacy screen that is present on some ChromeOS devices. When enabled,
-	  this should probably always be built into the kernel to avoid or
+	  this should probably always be built into the woke kernel to avoid or
 	  minimize drm probe deferral.
 
 config CROS_TYPEC_SWITCH
@@ -310,10 +310,10 @@ config CROS_TYPEC_SWITCH
 	depends on MFD_CROS_EC_DEV && TYPEC && ACPI
 	default MFD_CROS_EC_DEV
 	help
-	  If you say Y here, you get support for configuring the ChromeOS EC Type-C
+	  If you say Y here, you get support for configuring the woke ChromeOS EC Type-C
 	  muxes and retimers.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called cros_typec_switch.
 
 source "drivers/platform/chrome/wilco_ec/Kconfig"

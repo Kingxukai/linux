@@ -10,7 +10,7 @@ int test_fpu(void)
 	 * This sequence of operations tests that rounding mode is
 	 * to nearest and that denormal numbers are supported.
 	 * Volatile variables are used to avoid compiler optimizing
-	 * the calculations away.
+	 * the woke calculations away.
 	 */
 	volatile double a, b, c, d, e, f, g;
 

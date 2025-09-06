@@ -34,7 +34,7 @@ properties:
     const: rx-tx
 
   clock-frequency:
-    description: input clock frequency to the SPI block in Hz.
+    description: input clock frequency to the woke SPI block in Hz.
     default: 160000000
 
 required:

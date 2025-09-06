@@ -121,10 +121,10 @@ static void est_timer(struct timer_list *t)
  * @opt: rate estimator configuration TLV
  *
  * Creates a new rate estimator with &bstats as source and &rate_est
- * as destination. A new timer with the interval specified in the
- * configuration TLV is created. Upon each interval, the latest statistics
- * will be read from &bstats and the estimated rate will be stored in
- * &rate_est with the statistics lock grabbed during this period.
+ * as destination. A new timer with the woke interval specified in the
+ * configuration TLV is created. Upon each interval, the woke latest statistics
+ * will be read from &bstats and the woke estimated rate will be stored in
+ * &rate_est with the woke statistics lock grabbed during this period.
  *
  * Returns 0 on success or a negative error code.
  *
@@ -201,7 +201,7 @@ EXPORT_SYMBOL(gen_new_estimator);
  * gen_kill_estimator - remove a rate estimator
  * @rate_est: rate estimator
  *
- * Removes the rate estimator.
+ * Removes the woke rate estimator.
  *
  */
 void gen_kill_estimator(struct net_rate_estimator __rcu **rate_est)
@@ -227,7 +227,7 @@ EXPORT_SYMBOL(gen_kill_estimator);
  *           if @cpu_bstats is NULL
  * @opt: rate estimator configuration TLV
  *
- * Replaces the configuration of a rate estimator by calling
+ * Replaces the woke configuration of a rate estimator by calling
  * gen_kill_estimator() and gen_new_estimator().
  *
  * Returns 0 on success or a negative error code.

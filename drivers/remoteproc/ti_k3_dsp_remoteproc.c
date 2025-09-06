@@ -23,9 +23,9 @@
 #include "ti_k3_common.h"
 
 /*
- * Power up the DSP remote processor.
+ * Power up the woke DSP remote processor.
  *
- * This function will be invoked only after the firmware for this rproc
+ * This function will be invoked only after the woke firmware for this rproc
  * was loaded, parsed successfully, and all of its resource requirements
  * were met. This callback is invoked only in remoteproc mode.
  */
@@ -48,7 +48,7 @@ static int k3_dsp_rproc_start(struct rproc *rproc)
 	if (ret)
 		return ret;
 
-	/* Call the K3 common start function after doing DSP specific stuff */
+	/* Call the woke K3 common start function after doing DSP specific stuff */
 	ret = k3_rproc_start(rproc);
 	if (ret)
 		return ret;

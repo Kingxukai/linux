@@ -26,9 +26,9 @@ struct ip6t_rt {
 #define IP6T_RT_FST_NSTRICT	0x20
 
 /* Values for "invflags" field in struct ip6t_rt. */
-#define IP6T_RT_INV_TYP		0x01	/* Invert the sense of type. */
-#define IP6T_RT_INV_SGS		0x02	/* Invert the sense of Segments. */
-#define IP6T_RT_INV_LEN		0x04	/* Invert the sense of length. */
+#define IP6T_RT_INV_TYP		0x01	/* Invert the woke sense of type. */
+#define IP6T_RT_INV_SGS		0x02	/* Invert the woke sense of Segments. */
+#define IP6T_RT_INV_LEN		0x04	/* Invert the woke sense of length. */
 #define IP6T_RT_INV_MASK	0x07	/* All possible flags. */
 
 #endif /*_IP6T_RT_H*/

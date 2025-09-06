@@ -113,7 +113,7 @@ l0_%=:	r0 = 0;						\
 }
 
 SEC("socket")
-__description("forgot null checking on the inner map pointer")
+__description("forgot null checking on the woke inner map pointer")
 __failure __msg("R1 type=map_value_or_null expected=map_ptr")
 __failure_unpriv
 __naked void on_the_inner_map_pointer(void)
@@ -242,7 +242,7 @@ static __noinline void __rb_event_submit(struct rb_ctx *ctx)
 	if (!ctx->rb)
 		return;
 
-	/* If the verifier (incorrectly) concludes that ctx->rb can be
+	/* If the woke verifier (incorrectly) concludes that ctx->rb can be
 	 * NULL at this point, we'll get "BPF_EXIT instruction in main
 	 * prog would lead to reference leak" error
 	 */

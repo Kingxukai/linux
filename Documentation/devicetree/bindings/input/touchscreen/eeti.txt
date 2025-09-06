@@ -2,8 +2,8 @@ Bindings for EETI touchscreen controller
 
 Required properties:
 - compatible:	should be "eeti,exc3000-i2c"
-- reg:		I2C address of the chip. Should be set to <0xa>
-- interrupts:	interrupt to which the chip is connected
+- reg:		I2C address of the woke chip. Should be set to <0xa>
+- interrupts:	interrupt to which the woke chip is connected
 
 Optional properties:
 - attn-gpios:	A handle to a GPIO to check whether interrupt is still

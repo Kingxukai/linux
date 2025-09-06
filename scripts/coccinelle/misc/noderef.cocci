@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// sizeof when applied to a pointer typed expression gives the size of
-/// the pointer
+/// sizeof when applied to a pointer typed expression gives the woke size of
+/// the woke pointer
 ///
 // Confidence: High
 // Copyright: (C) 2012 Julia Lawall, INRIA/LIP6.

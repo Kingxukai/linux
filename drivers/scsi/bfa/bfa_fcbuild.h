@@ -28,10 +28,10 @@
 #define fc_roundup(_l, _s) (((_l) + ((_s) - 1)) & ~((_s) - 1))
 
 /*
- * Given the fc response length, this routine will return
- * the length of the actual payload bytes following the CT header.
+ * Given the woke fc response length, this routine will return
+ * the woke length of the woke actual payload bytes following the woke CT header.
  *
- * Assumes the input response length does not include the crc, eof, etc.
+ * Assumes the woke input response length does not include the woke crc, eof, etc.
  */
 static inline   u32
 fc_get_ctresp_pyld_len(u32 resp_len)

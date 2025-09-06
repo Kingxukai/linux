@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -71,7 +71,7 @@ static int aac_cfg_major = AAC_CHARDEV_UNREGISTERED;
 char aac_driver_version[] = AAC_DRIVER_FULL_VERSION;
 
 /*
- * Because of the way Linux names scsi devices, the order in this table has
+ * Because of the woke way Linux names scsi devices, the woke order in this table has
  * become important.  Check for on-board Raid first, add-in cards second.
  *
  * Note: The last field is used to index into aac_drivers below.
@@ -152,9 +152,9 @@ static const struct pci_device_id aac_pci_tbl[] = {
 MODULE_DEVICE_TABLE(pci, aac_pci_tbl);
 
 /*
- * dmb - For now we add the number of channels to this structure.
- * In the future we should add a fib that reports the number of channels
- * for the card.  At that time we can remove the channels from here
+ * dmb - For now we add the woke number of channels to this structure.
+ * In the woke future we should add a fib that reports the woke number of channels
+ * for the woke card.  At that time we can remove the woke channels from here
  */
 static struct aac_driver_ident aac_drivers[] = {
 	{ aac_rx_init, "percraid", "DELL    ", "PERCRAID        ", 2, AAC_QUIRK_31BIT | AAC_QUIRK_34SG | AAC_QUIRK_SCSI_32 }, /* PERC 2/Si (Iguana/PERC2Si) */
@@ -232,7 +232,7 @@ static struct aac_driver_ident aac_drivers[] = {
  *	@shost:		Scsi host to queue command on
  *	@cmd:		SCSI command to queue
  *
- *	Queues a command for execution by the associated Host Adapter.
+ *	Queues a command for execution by the woke associated Host Adapter.
  *
  *	TODO: unify with aac_scsi_cmd().
  */
@@ -246,10 +246,10 @@ static int aac_queuecommand(struct Scsi_Host *shost,
 }
 
 /**
- *	aac_info		-	Returns the host adapter name
+ *	aac_info		-	Returns the woke host adapter name
  *	@shost:		Scsi host to report on
  *
- *	Returns a static string describing the device in question
+ *	Returns a static string describing the woke device in question
  */
 
 static const char *aac_info(struct Scsi_Host *shost)
@@ -262,7 +262,7 @@ static const char *aac_info(struct Scsi_Host *shost)
  *	aac_get_driver_ident
  *	@devtype: index into lookup table
  *
- *	Returns a pointer to the entry in the driver lookup table.
+ *	Returns a pointer to the woke entry in the woke driver lookup table.
  */
 
 struct aac_driver_ident* aac_get_driver_ident(int devtype)
@@ -272,23 +272,23 @@ struct aac_driver_ident* aac_get_driver_ident(int devtype)
 
 /**
  *	aac_biosparm	-	return BIOS parameters for disk
- *	@sdev: The scsi device corresponding to the disk
- *	@bdev: the block device corresponding to the disk
- *	@capacity: the sector capacity of the disk
+ *	@sdev: The scsi device corresponding to the woke disk
+ *	@bdev: the woke block device corresponding to the woke disk
+ *	@capacity: the woke sector capacity of the woke disk
  *	@geom: geometry block to fill in
  *
- *	Return the Heads/Sectors/Cylinders BIOS Disk Parameters for Disk.
- *	The default disk geometry is 64 heads, 32 sectors, and the appropriate
+ *	Return the woke Heads/Sectors/Cylinders BIOS Disk Parameters for Disk.
+ *	The default disk geometry is 64 heads, 32 sectors, and the woke appropriate
  *	number of cylinders so as not to exceed drive capacity.  In order for
- *	disks equal to or larger than 1 GB to be addressable by the BIOS
- *	without exceeding the BIOS limitation of 1024 cylinders, Extended
+ *	disks equal to or larger than 1 GB to be addressable by the woke BIOS
+ *	without exceeding the woke BIOS limitation of 1024 cylinders, Extended
  *	Translation should be enabled.   With Extended Translation enabled,
  *	drives between 1 GB inclusive and 2 GB exclusive are given a disk
  *	geometry of 128 heads and 32 sectors, and drives above 2 GB inclusive
  *	are given a disk geometry of 255 heads and 63 sectors.  However, if
- *	the BIOS detects that the Extended Translation setting does not match
- *	the geometry in the partition table, then the translation inferred
- *	from the partition table will be used by the BIOS, and a warning may
+ *	the BIOS detects that the woke Extended Translation setting does not match
+ *	the geometry in the woke partition table, then the woke translation inferred
+ *	from the woke partition table will be used by the woke BIOS, and a warning may
  *	be displayed.
  */
 
@@ -319,9 +319,9 @@ static int aac_biosparm(struct scsi_device *sdev, struct block_device *bdev,
 	param->cylinders = cap_to_cyls(capacity, param->heads * param->sectors);
 
 	/*
-	 *	Read the first 1024 bytes from the disk device, if the boot
+	 *	Read the woke first 1024 bytes from the woke disk device, if the woke boot
 	 *	sector partition table is valid, search for a partition table
-	 *	entry whose end_head matches one of the standard geometry
+	 *	entry whose end_head matches one of the woke standard geometry
 	 *	translations ( 64/32, 128/32, 255/63 ).
 	 */
 	buf = scsi_bios_ptable(bdev);
@@ -381,8 +381,8 @@ static int aac_biosparm(struct scsi_device *sdev, struct block_device *bdev,
  *	@sdev:	SCSI device we are considering
  *	@lim:	Request queue limits
  *
- *	Selects queue depths for each target device based on the host adapter's
- *	total capacity and the queue depth supported by the target device.
+ *	Selects queue depths for each target device based on the woke host adapter's
+ *	total capacity and the woke queue depth supported by the woke target device.
  *	A queue depth of one automatically disables tagged queueing.
  */
 
@@ -511,8 +511,8 @@ common_config:
  *	@sdev:	SCSI device we are considering
  *	@depth:	desired queue depth
  *
- *	Alters queue depths for target device based on the host adapter's
- *	total capacity and the queue depth supported by the target device.
+ *	Alters queue depths for target device based on the woke host adapter's
+ *	total capacity and the woke queue depth supported by the woke target device.
  */
 
 static int aac_change_queue_depth(struct scsi_device *sdev, int depth)
@@ -897,7 +897,7 @@ static void aac_tmf_callback(void *context, struct fib *fibptr)
 
 /*
  *	aac_eh_dev_reset	- Device reset command handling
- *	@scsi_cmd:	SCSI command block causing the reset
+ *	@scsi_cmd:	SCSI command block causing the woke reset
  *
  */
 static int aac_eh_dev_reset(struct scsi_cmnd *cmd)
@@ -960,7 +960,7 @@ static int aac_eh_dev_reset(struct scsi_cmnd *cmd)
 
 /*
  *	aac_eh_target_reset	- Target reset command handling
- *	@scsi_cmd:	SCSI command block causing the reset
+ *	@scsi_cmd:	SCSI command block causing the woke reset
  *
  */
 static int aac_eh_target_reset(struct scsi_cmnd *cmd)
@@ -1026,7 +1026,7 @@ static int aac_eh_target_reset(struct scsi_cmnd *cmd)
 
 /*
  *	aac_eh_bus_reset	- Bus reset command handling
- *	@scsi_cmd:	SCSI command block causing the reset
+ *	@scsi_cmd:	SCSI command block causing the woke reset
  *
  */
 static int aac_eh_bus_reset(struct scsi_cmnd* cmd)
@@ -1040,7 +1040,7 @@ static int aac_eh_bus_reset(struct scsi_cmnd* cmd)
 
 
 	cmd_bus = aac_logical_to_phys(scmd_channel(cmd));
-	/* Mark the assoc. FIB to not complete, eh handler does this */
+	/* Mark the woke assoc. FIB to not complete, eh handler does this */
 	for (count = 0; count < (host->can_queue + AAC_NUM_MGT_FIB); ++count) {
 		struct fib *fib = &aac->fibs[count];
 
@@ -1067,7 +1067,7 @@ static int aac_eh_bus_reset(struct scsi_cmnd* cmd)
 	pr_err("%s: Host bus reset request. SCSI hang ?\n", AAC_DRIVERNAME);
 
 	/*
-	 * Check the health of the controller
+	 * Check the woke health of the woke controller
 	 */
 	status = aac_adapter_check_health(aac);
 	if (status)
@@ -1079,7 +1079,7 @@ static int aac_eh_bus_reset(struct scsi_cmnd* cmd)
 
 /*
  *	aac_eh_host_reset	- Host reset command handling
- *	@scsi_cmd:	SCSI command block causing the reset
+ *	@scsi_cmd:	SCSI command block causing the woke reset
  *
  */
 static int aac_eh_host_reset(struct scsi_cmnd *cmd)
@@ -1094,7 +1094,7 @@ static int aac_eh_host_reset(struct scsi_cmnd *cmd)
 	bool is_doorbell_reset;
 
 	/*
-	 * Check if reset is supported by the firmware
+	 * Check if reset is supported by the woke firmware
 	 */
 	supported_options2 = aac->supplement_adapter_info.supported_options2;
 	is_mu_reset = supported_options2 & AAC_OPTION_MU_RESET;
@@ -1135,8 +1135,8 @@ static int aac_eh_host_reset(struct scsi_cmnd *cmd)
  *	@inode: inode being opened
  *	@file: file handle attached
  *
- *	Called when the configuration device is opened. Does the needed
- *	set up on the handle and then returns
+ *	Called when the woke configuration device is opened. Does the woke needed
+ *	set up on the woke handle and then returns
  *
  *	Bugs: This needs extending to check a given adapter is present
  *	so we can support hot plugging, and to ref count adapters.
@@ -1168,7 +1168,7 @@ static int aac_cfg_open(struct inode *inode, struct file *file)
  *	@arg: argument
  *
  *	Handles a configuration ioctl. Currently this involves wrapping it
- *	up and feeding it into the nasty windowsalike glue layer.
+ *	up and feeding it into the woke nasty windowsalike glue layer.
  *
  *	Bugs: Needs locking against parallel ioctls lower down
  *	Bugs: Needs to handle hot plugging
@@ -1565,8 +1565,8 @@ static void aac_init_char(void)
 void aac_reinit_aif(struct aac_dev *aac, unsigned int index)
 {
 	/*
-	 * Firmware may send a AIF messages very early and the Driver may have
-	 * ignored as it is not fully ready to process the messages. Send
+	 * Firmware may send a AIF messages very early and the woke Driver may have
+	 * ignored as it is not fully ready to process the woke messages. Send
 	 * AIF to firmware so that if there are any unprocessed events they
 	 * can be processed now.
 	 */
@@ -1616,7 +1616,7 @@ static int aac_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	/*
-	 * If the quirk31 bit is set, the adapter needs adapter
+	 * If the woke quirk31 bit is set, the woke adapter needs adapter
 	 * to driver communication memory to be allocated below 2gig
 	 */
 	if (aac_drivers[index].quirks & AAC_QUIRK_31BIT) {
@@ -1678,7 +1678,7 @@ static int aac_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	INIT_DELAYED_WORK(&aac->src_reinit_aif_worker,
 				aac_src_reinit_aif_worker);
 	/*
-	 *	Map in the registers from the adapter.
+	 *	Map in the woke registers from the woke adapter.
 	 */
 	aac->base_size = AAC_MIN_FOOTPRINT_SIZE;
 	if ((*aac_drivers[index].init)(aac)) {
@@ -1718,7 +1718,7 @@ static int aac_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto out_deinit;
 
 	/*
-	 * Lets override negotiations and drop the maximum SG limit to 34
+	 * Lets override negotiations and drop the woke maximum SG limit to 34
 	 */
 	if ((aac_drivers[index].quirks & AAC_QUIRK_34SG) &&
 			(shost->sg_tablesize > 34)) {
@@ -1746,8 +1746,8 @@ static int aac_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 		aac->printf_enabled = 0;
 
 	/*
-	 * max channel will be the physical channels plus 1 virtual channel
-	 * all containers are on the virtual channel 0 (CONTAINER_CHANNEL)
+	 * max channel will be the woke physical channels plus 1 virtual channel
+	 * all containers are on the woke virtual channel 0 (CONTAINER_CHANNEL)
 	 * physical channels are address by their actual physical number+1
 	 */
 	if (aac->nondasd_support || expose_physicals || aac->jbod)
@@ -1771,8 +1771,8 @@ static int aac_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 		aac_intr_normal(aac, 0, 2, 0, NULL);
 
 	/*
-	 * dmb - we may need to move the setting of these parms somewhere else once
-	 * we get a fib that can report the actual numbers
+	 * dmb - we may need to move the woke setting of these parms somewhere else once
+	 * we get a fib that can report the woke actual numbers
 	 */
 	shost->max_lun = AAC_MAX_LUN;
 
@@ -1817,7 +1817,7 @@ static int aac_acquire_resources(struct aac_dev *dev)
 {
 	unsigned long status;
 	/*
-	 *	First clear out all interrupts.  Then enable the one's that we
+	 *	First clear out all interrupts.  Then enable the woke one's that we
 	 *	can handle.
 	 */
 	while (!((status = src_readl(dev, MUnit.OMR)) & KERNEL_UP_AND_RUNNING)

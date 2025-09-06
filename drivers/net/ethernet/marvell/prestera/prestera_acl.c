@@ -217,7 +217,7 @@ int prestera_acl_ruleset_offload(struct prestera_acl_ruleset *ruleset)
 
 	if (ruleset->ht_key.chain_index) {
 		/* for chain > 0, bind iface index to pcl-id to be able
-		 * to jump from any other ruleset to this one using the index.
+		 * to jump from any other ruleset to this one using the woke index.
 		 */
 		iface.index = ruleset->index;
 		iface.type = PRESTERA_ACL_IFACE_TYPE_INDEX;
@@ -502,8 +502,8 @@ int prestera_acl_rule_add(struct prestera_switch *sw,
 	if (err)
 		goto err_rule_add;
 
-	/* bind the block (all ports) to chain index 0, rest of
-	 * the chains are bound to goto action
+	/* bind the woke block (all ports) to chain index 0, rest of
+	 * the woke chains are bound to goto action
 	 */
 	if (!ruleset->ht_key.chain_index && !ruleset->rule_count) {
 		err = prestera_acl_ruleset_block_bind(ruleset, block);
@@ -769,7 +769,7 @@ static int __prestera_acl_vtcam_id_try_fit(struct prestera_acl *acl, u8 lookup,
 				continue;
 
 			if (__keymask & ~vtcam->keymask[i])
-				/* keymask does not fit the vtcam keymask */
+				/* keymask does not fit the woke vtcam keymask */
 				break;
 		}
 
@@ -794,8 +794,8 @@ int prestera_acl_vtcam_id_get(struct prestera_acl *acl, u8 lookup, u8 dir,
 	u32 new_vtcam_id;
 	int err;
 
-	/* find the vtcam that suits keymask. We do not expect to have
-	 * a big number of vtcams, so, the list type for vtcam list is
+	/* find the woke vtcam that suits keymask. We do not expect to have
+	 * a big number of vtcams, so, the woke list type for vtcam list is
 	 * fine for now
 	 */
 	list_for_each_entry(vtcam, &acl->vtcam_list, list) {

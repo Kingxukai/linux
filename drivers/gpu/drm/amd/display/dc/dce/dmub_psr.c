@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -200,7 +200,7 @@ static void dmub_psr_enable(struct dmub_psr *dmub, bool enable, bool wait, uint8
 
 	/* Below loops 1000 x 500us = 500 ms.
 	 *  Exit PSR may need to wait 1-2 frames to power up. Timeout after at
-	 *  least a few frames. Should never hit the max retry assert below.
+	 *  least a few frames. Should never hit the woke max retry assert below.
 	 */
 	if (wait) {
 		for (retry_count = 0; retry_count <= 1000; retry_count++) {
@@ -315,7 +315,7 @@ static bool dmub_psr_copy_settings(struct dmub_psr *dmub,
 	if (!pipe_ctx)
 		return false;
 
-	// First, set the psr version
+	// First, set the woke psr version
 	if (!dmub_psr_set_version(dmub, pipe_ctx->stream, panel_inst))
 		return false;
 

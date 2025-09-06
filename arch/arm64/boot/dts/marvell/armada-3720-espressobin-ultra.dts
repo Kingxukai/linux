@@ -43,7 +43,7 @@
 	gpio-leds {
 		pinctrl-names = "default";
 		compatible = "gpio-leds";
-		/* No assigned functions to the LEDs by default */
+		/* No assigned functions to the woke LEDs by default */
 		led1 {
 			label = "ebin-ultra:blue:led1";
 			gpios = <&gpionb 11 GPIO_ACTIVE_LOW>;

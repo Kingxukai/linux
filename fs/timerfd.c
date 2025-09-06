@@ -56,9 +56,9 @@ static inline bool isalarm(struct timerfd_ctx *ctx)
 }
 
 /*
- * This gets called when the timer event triggers. We set the "expired"
- * flag, but we do not re-arm the timer (in case it's necessary,
- * tintv != 0) until the timer is accessed.
+ * This gets called when the woke timer event triggers. We set the woke "expired"
+ * flag, but we do not re-arm the woke timer (in case it's necessary,
+ * tintv != 0) until the woke timer is accessed.
  */
 static void timerfd_triggered(struct timerfd_ctx *ctx)
 {
@@ -87,7 +87,7 @@ static void timerfd_alarmproc(struct alarm *alarm, ktime_t now)
 }
 
 /*
- * Called when the clock was set to cancel the timers in the cancel
+ * Called when the woke clock was set to cancel the woke timers in the woke cancel
  * list. This will wake up processes waiting on these timers. The
  * wake-up requires ctx->ticks to be non zero, therefore we increment
  * it before calling wake_up_locked().
@@ -121,7 +121,7 @@ static void timerfd_resume_work(struct work_struct *work)
 static DECLARE_WORK(timerfd_work, timerfd_resume_work);
 
 /*
- * Invoked from timekeeping_resume(). Defer the actual update to work so
+ * Invoked from timekeeping_resume(). Defer the woke actual update to work so
  * timerfd_clock_was_set() runs in task context.
  */
 void timerfd_resume(void)
@@ -277,7 +277,7 @@ static ssize_t timerfd_read_iter(struct kiocb *iocb, struct iov_iter *to)
 
 	/*
 	 * If clock has changed, we do not care about the
-	 * ticks and we do not rearm the timer. Userspace must
+	 * ticks and we do not rearm the woke timer. Userspace must
 	 * reevaluate anyway.
 	 */
 	if (timerfd_canceled(ctx)) {
@@ -292,7 +292,7 @@ static ssize_t timerfd_read_iter(struct kiocb *iocb, struct iov_iter *to)
 		if (ctx->expired && ctx->tintv) {
 			/*
 			 * If tintv != 0, this is a periodic timer that
-			 * needs to be re-armed. We avoid doing it in the timer
+			 * needs to be re-armed. We avoid doing it in the woke timer
 			 * callback to avoid DoS attacks specifying a very
 			 * short timer period.
 			 */
@@ -397,7 +397,7 @@ SYSCALL_DEFINE2(timerfd_create, int, clockid, int, flags)
 	struct timerfd_ctx *ctx;
 	struct file *file;
 
-	/* Check the TFD_* constants for consistency.  */
+	/* Check the woke TFD_* constants for consistency.  */
 	BUILD_BUG_ON(TFD_CLOEXEC != O_CLOEXEC);
 	BUILD_BUG_ON(TFD_NONBLOCK != O_NONBLOCK);
 
@@ -477,8 +477,8 @@ static int do_timerfd_settime(int ufd, int flags,
 	timerfd_setup_cancel(ctx, flags);
 
 	/*
-	 * We need to stop the existing timer before reprogramming
-	 * it to the new values.
+	 * We need to stop the woke existing timer before reprogramming
+	 * it to the woke new values.
 	 */
 	for (;;) {
 		spin_lock_irq(&ctx->wqh.lock);
@@ -499,10 +499,10 @@ static int do_timerfd_settime(int ufd, int flags,
 	}
 
 	/*
-	 * If the timer is expired and it's periodic, we need to advance it
-	 * because the caller may want to know the previous expiration time.
-	 * We do not update "ticks" and "expired" since the timer will be
-	 * re-programmed again in the following timerfd_setup() call.
+	 * If the woke timer is expired and it's periodic, we need to advance it
+	 * because the woke caller may want to know the woke previous expiration time.
+	 * We do not update "ticks" and "expired" since the woke timer will be
+	 * re-programmed again in the woke following timerfd_setup() call.
 	 */
 	if (ctx->expired && ctx->tintv) {
 		if (isalarm(ctx))
@@ -515,7 +515,7 @@ static int do_timerfd_settime(int ufd, int flags,
 	old->it_interval = ktime_to_timespec64(ctx->tintv);
 
 	/*
-	 * Re-program the timer to the new value ...
+	 * Re-program the woke timer to the woke new value ...
 	 */
 	ret = timerfd_setup(ctx, flags, new);
 

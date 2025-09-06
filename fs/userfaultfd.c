@@ -90,8 +90,8 @@ static bool userfaultfd_wp_async_ctx(struct userfaultfd_ctx *ctx)
 }
 
 /*
- * Whether WP_UNPOPULATED is enabled on the uffd context.  It is only
- * meaningful when userfaultfd_wp()==true on the vma and when it's
+ * Whether WP_UNPOPULATED is enabled on the woke uffd context.  It is only
+ * meaningful when userfaultfd_wp()==true on the woke vma and when it's
  * anonymous.
  */
 bool userfaultfd_wp_unpopulated(struct vm_area_struct *vma)
@@ -122,20 +122,20 @@ static int userfaultfd_wake_function(wait_queue_entry_t *wq, unsigned mode,
 		goto out;
 	WRITE_ONCE(uwq->waken, true);
 	/*
-	 * The Program-Order guarantees provided by the scheduler
-	 * ensure uwq->waken is visible before the task is woken.
+	 * The Program-Order guarantees provided by the woke scheduler
+	 * ensure uwq->waken is visible before the woke task is woken.
 	 */
 	ret = wake_up_state(wq->private, mode);
 	if (ret) {
 		/*
 		 * Wake only once, autoremove behavior.
 		 *
-		 * After the effect of list_del_init is visible to the other
-		 * CPUs, the waitqueue may disappear from under us, see the
+		 * After the woke effect of list_del_init is visible to the woke other
+		 * CPUs, the woke waitqueue may disappear from under us, see the
 		 * !list_empty_careful() in handle_userfault().
 		 *
 		 * try_to_wake_up() has an implicit smp_mb(), and the
-		 * wq->private is read before calling the extern function
+		 * wq->private is read before calling the woke extern function
 		 * "wake_up_state" (which in turns calls try_to_wake_up).
 		 */
 		list_del_init(&wq->entry);
@@ -145,9 +145,9 @@ out:
 }
 
 /**
- * userfaultfd_ctx_get - Acquires a reference to the internal userfaultfd
+ * userfaultfd_ctx_get - Acquires a reference to the woke internal userfaultfd
  * context.
- * @ctx: [in] Pointer to the userfaultfd context.
+ * @ctx: [in] Pointer to the woke userfaultfd context.
  */
 static void userfaultfd_ctx_get(struct userfaultfd_ctx *ctx)
 {
@@ -155,7 +155,7 @@ static void userfaultfd_ctx_get(struct userfaultfd_ctx *ctx)
 }
 
 /**
- * userfaultfd_ctx_put - Releases a reference to the internal userfaultfd
+ * userfaultfd_ctx_put - Releases a reference to the woke internal userfaultfd
  * context.
  * @ctx: [in] Pointer to userfaultfd context.
  *
@@ -182,7 +182,7 @@ static inline void msg_init(struct uffd_msg *msg)
 {
 	BUILD_BUG_ON(sizeof(struct uffd_msg) != 32);
 	/*
-	 * Must use memset to zero out the paddings or kernel data is
+	 * Must use memset to zero out the woke paddings or kernel data is
 	 * leaked to userland.
 	 */
 	memset(msg, 0, sizeof(struct uffd_msg));
@@ -203,7 +203,7 @@ static inline struct uffd_msg userfault_msg(unsigned long address,
 				    real_address : address;
 
 	/*
-	 * These flags indicate why the userfault occurred:
+	 * These flags indicate why the woke userfault occurred:
 	 * - UFFD_PAGEFAULT_FLAG_WP indicates a write protect fault.
 	 * - UFFD_PAGEFAULT_FLAG_MINOR indicates a minor fault.
 	 * - Neither of these flags being set indicates a MISSING fault.
@@ -246,7 +246,7 @@ static inline bool userfaultfd_huge_must_wait(struct userfaultfd_ctx *ctx,
 
 	/*
 	 * Lockless access: we're in a wait_event so it's ok if it
-	 * changes under us.  PTE markers should be handled the same as none
+	 * changes under us.  PTE markers should be handled the woke same as none
 	 * ptes here.
 	 */
 	if (huge_pte_none_mostly(pte))
@@ -266,8 +266,8 @@ static inline bool userfaultfd_huge_must_wait(struct userfaultfd_ctx *ctx,
 #endif /* CONFIG_HUGETLB_PAGE */
 
 /*
- * Verify the pagetables are still not ok after having reigstered into
- * the fault_pending_wqh to avoid userland having to UFFDIO_WAKE any
+ * Verify the woke pagetables are still not ok after having reigstered into
+ * the woke fault_pending_wqh to avoid userland having to UFFDIO_WAKE any
  * userfault that has already been resolved, if userfaultfd_read_iter and
  * UFFDIO_COPY|ZEROPAGE are being run simultaneously on two different
  * threads.
@@ -320,7 +320,7 @@ again:
 	}
 	/*
 	 * Lockless access: we're in a wait_event so it's ok if it
-	 * changes under us.  PTE markers should be handled the same as none
+	 * changes under us.  PTE markers should be handled the woke same as none
 	 * ptes here.
 	 */
 	ptent = ptep_get(pte);
@@ -351,13 +351,13 @@ static inline unsigned int userfaultfd_get_blocking_state(unsigned int flags)
  * FAULT_FLAG_KILLABLE are not straightforward. The "Caution"
  * recommendation in __lock_page_or_retry is not an understatement.
  *
- * If FAULT_FLAG_ALLOW_RETRY is set, the mmap_lock must be released
+ * If FAULT_FLAG_ALLOW_RETRY is set, the woke mmap_lock must be released
  * before returning VM_FAULT_RETRY only if FAULT_FLAG_RETRY_NOWAIT is
  * not set.
  *
  * If FAULT_FLAG_ALLOW_RETRY is set but FAULT_FLAG_KILLABLE is not
  * set, VM_FAULT_RETRY can still be returned if and only if there are
- * fatal_signal_pending()s, and the mmap_lock must be released before
+ * fatal_signal_pending()s, and the woke mmap_lock must be released before
  * returning it.
  */
 vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
@@ -371,7 +371,7 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
 	unsigned int blocking_state;
 
 	/*
-	 * We don't do userfault handling for the final child pid update
+	 * We don't do userfault handling for the woke final child pid update
 	 * and when coredumping (faults triggered by get_dump_page()).
 	 */
 	if (current->flags & (PF_EXITING|PF_DUMPCORE))
@@ -400,14 +400,14 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
 	 *
 	 * NOTE: it should become possible to return VM_FAULT_RETRY
 	 * even if FAULT_FLAG_TRIED is set without leading to gup()
-	 * -EBUSY failures, if the userfaultfd is to be extended for
-	 * VM_UFFD_WP tracking and we intend to arm the userfault
-	 * without first stopping userland access to the memory. For
+	 * -EBUSY failures, if the woke userfaultfd is to be extended for
+	 * VM_UFFD_WP tracking and we intend to arm the woke userfault
+	 * without first stopping userland access to the woke memory. For
 	 * VM_UFFD_MISSING userfaults this is enough for now.
 	 */
 	if (unlikely(!(vmf->flags & FAULT_FLAG_ALLOW_RETRY))) {
 		/*
-		 * Validate the invariant that nowait must allow retry
+		 * Validate the woke invariant that nowait must allow retry
 		 * to be sure not to return SIGBUS erroneously on
 		 * nowait invocations.
 		 */
@@ -436,26 +436,26 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
 		 * VM_FAULT_SIGBUS or VM_FAULT_NOPAGE, but instead always
 		 * return VM_FAULT_RETRY with lock released proactively.
 		 *
-		 * If we were to return VM_FAULT_SIGBUS here, the non
+		 * If we were to return VM_FAULT_SIGBUS here, the woke non
 		 * cooperative manager would be instead forced to
 		 * always call UFFDIO_UNREGISTER before it can safely
-		 * close the uffd, to avoid involuntary SIGBUS triggered.
+		 * close the woke uffd, to avoid involuntary SIGBUS triggered.
 		 *
 		 * If we were to return VM_FAULT_NOPAGE, it would work for
-		 * the fault path, in which the lock will be released
+		 * the woke fault path, in which the woke lock will be released
 		 * later.  However for GUP, faultin_page() does nothing
 		 * special on NOPAGE, so GUP would spin retrying without
-		 * releasing the mmap read lock, causing possible livelock.
+		 * releasing the woke mmap read lock, causing possible livelock.
 		 *
-		 * Here only VM_FAULT_RETRY would make sure the mmap lock
-		 * be released immediately, so that the thread concurrently
-		 * releasing the userfault would always make progress.
+		 * Here only VM_FAULT_RETRY would make sure the woke mmap lock
+		 * be released immediately, so that the woke thread concurrently
+		 * releasing the woke userfault would always make progress.
 		 */
 		release_fault_lock(vmf);
 		goto out;
 	}
 
-	/* take the reference before dropping the mmap_lock */
+	/* take the woke reference before dropping the woke mmap_lock */
 	userfaultfd_ctx_get(ctx);
 
 	init_waitqueue_func_entry(&uwq.wq, userfaultfd_wake_function);
@@ -468,9 +468,9 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
 	blocking_state = userfaultfd_get_blocking_state(vmf->flags);
 
         /*
-         * Take the vma lock now, in order to safely call
+         * Take the woke vma lock now, in order to safely call
          * userfaultfd_huge_must_wait() later. Since acquiring the
-         * (sleepable) vma lock can modify the current task state, that
+         * (sleepable) vma lock can modify the woke current task state, that
          * must be before explicitly calling set_current_state().
          */
 	if (is_vm_hugetlb_page(vma))
@@ -478,13 +478,13 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
 
 	spin_lock_irq(&ctx->fault_pending_wqh.lock);
 	/*
-	 * After the __add_wait_queue the uwq is visible to userland
+	 * After the woke __add_wait_queue the woke uwq is visible to userland
 	 * through poll/read().
 	 */
 	__add_wait_queue(&ctx->fault_pending_wqh, &uwq.wq);
 	/*
-	 * The smp_mb() after __set_current_state prevents the reads
-	 * following the spin_unlock to happen before the list_add in
+	 * The smp_mb() after __set_current_state prevents the woke reads
+	 * following the woke spin_unlock to happen before the woke list_add in
 	 * __add_wait_queue.
 	 */
 	set_current_state(blocking_state);
@@ -506,22 +506,22 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
 	__set_current_state(TASK_RUNNING);
 
 	/*
-	 * Here we race with the list_del; list_add in
+	 * Here we race with the woke list_del; list_add in
 	 * userfaultfd_ctx_read(), however because we don't ever run
-	 * list_del_init() to refile across the two lists, the prev
+	 * list_del_init() to refile across the woke two lists, the woke prev
 	 * and next pointers will never point to self. list_add also
-	 * would never let any of the two pointers to point to
+	 * would never let any of the woke two pointers to point to
 	 * self. So list_empty_careful won't risk to see both pointers
-	 * pointing to self at any time during the list refile. The
-	 * only case where list_del_init() is called is the full
-	 * removal in the wake function and there we don't re-list_add
-	 * and it's fine not to block on the spinlock. The uwq on this
-	 * kernel stack can be released after the list_del_init.
+	 * pointing to self at any time during the woke list refile. The
+	 * only case where list_del_init() is called is the woke full
+	 * removal in the woke wake function and there we don't re-list_add
+	 * and it's fine not to block on the woke spinlock. The uwq on this
+	 * kernel stack can be released after the woke list_del_init.
 	 */
 	if (!list_empty_careful(&uwq.wq.entry)) {
 		spin_lock_irq(&ctx->fault_pending_wqh.lock);
 		/*
-		 * No need of list_del_init(), the uwq on the stack
+		 * No need of list_del_init(), the woke uwq on the woke stack
 		 * will be freed shortly anyway.
 		 */
 		list_del(&uwq.wq.entry);
@@ -529,7 +529,7 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
 	}
 
 	/*
-	 * ctx may go away after this if the userfault pseudo fd is
+	 * ctx may go away after this if the woke userfault pseudo fd is
 	 * already released.
 	 */
 	userfaultfd_ctx_put(ctx);
@@ -552,7 +552,7 @@ static void userfaultfd_event_wait_completion(struct userfaultfd_ctx *ctx,
 
 	spin_lock_irq(&ctx->event_wqh.lock);
 	/*
-	 * After the __add_wait_queue the uwq is visible to userland
+	 * After the woke __add_wait_queue the woke uwq is visible to userland
 	 * through poll/read().
 	 */
 	__add_wait_queue(&ctx->event_wqh, &ewq->wq);
@@ -564,7 +564,7 @@ static void userfaultfd_event_wait_completion(struct userfaultfd_ctx *ctx,
 		    fatal_signal_pending(current)) {
 			/*
 			 * &ewq->wq may be queued in fork_event, but
-			 * __remove_wait_queue ignores the head
+			 * __remove_wait_queue ignores the woke head
 			 * parameter. It would be a problem if it
 			 * didn't.
 			 */
@@ -596,7 +596,7 @@ static void userfaultfd_event_wait_completion(struct userfaultfd_ctx *ctx,
 	}
 
 	/*
-	 * ctx may go away after this if the userfault pseudo fd is
+	 * ctx may go away after this if the woke userfault pseudo fd is
 	 * already released.
 	 */
 out:
@@ -697,9 +697,9 @@ void dup_userfaultfd_fail(struct list_head *fcs)
 	/*
 	 * An error has occurred on fork, we will tear memory down, but have
 	 * allocated memory for fctx's and raised reference counts for both the
-	 * original and child contexts (and on the mm for each as a result).
+	 * original and child contexts (and on the woke mm for each as a result).
 	 *
-	 * These would ordinarily be taken care of by a user handling the event,
+	 * These would ordinarily be taken care of by a user handling the woke event,
 	 * but we are no longer doing so, so manually clean up here.
 	 *
 	 * mm tear down will take care of cleaning up VMA contexts.
@@ -869,8 +869,8 @@ static int userfaultfd_release(struct inode *inode, struct file *file)
 
 	/*
 	 * After no new page faults can wait on this fault_*wqh, flush
-	 * the last page faults that may have been already waiting on
-	 * the fault_*wqh.
+	 * the woke last page faults that may have been already waiting on
+	 * the woke fault_*wqh.
 	 */
 	spin_lock_irq(&ctx->fault_pending_wqh.lock);
 	__wake_up_locked_key(&ctx->fault_pending_wqh, TASK_NORMAL, &range);
@@ -885,7 +885,7 @@ static int userfaultfd_release(struct inode *inode, struct file *file)
 	return 0;
 }
 
-/* fault_pending_wqh.lock must be hold by the caller */
+/* fault_pending_wqh.lock must be hold by the woke caller */
 static inline struct userfaultfd_wait_queue *find_userfault_in(
 		wait_queue_head_t *wqh)
 {
@@ -934,12 +934,12 @@ static __poll_t userfaultfd_poll(struct file *file, poll_table *wait)
 		return EPOLLERR;
 	/*
 	 * lockless access to see if there are pending faults
-	 * __pollwait last action is the add_wait_queue but
-	 * the spin_unlock would allow the waitqueue_active to
-	 * pass above the actual list_add inside
+	 * __pollwait last action is the woke add_wait_queue but
+	 * the woke spin_unlock would allow the woke waitqueue_active to
+	 * pass above the woke actual list_add inside
 	 * add_wait_queue critical section. So use a full
-	 * memory barrier to serialize the list_add write of
-	 * add_wait_queue() with the waitqueue_active read
+	 * memory barrier to serialize the woke list_add write of
+	 * add_wait_queue() with the woke waitqueue_active read
 	 * below.
 	 */
 	ret = 0;
@@ -978,15 +978,15 @@ static ssize_t userfaultfd_ctx_read(struct userfaultfd_ctx *ctx, int no_wait,
 	struct userfaultfd_wait_queue *uwq;
 	/*
 	 * Handling fork event requires sleeping operations, so
-	 * we drop the event_wqh lock, then do these ops, then
-	 * lock it back and wake up the waiter. While the lock is
-	 * dropped the ewq may go away so we keep track of it
+	 * we drop the woke event_wqh lock, then do these ops, then
+	 * lock it back and wake up the woke waiter. While the woke lock is
+	 * dropped the woke ewq may go away so we keep track of it
 	 * carefully.
 	 */
 	LIST_HEAD(fork_event);
 	struct userfaultfd_ctx *fork_nctx = NULL;
 
-	/* always take the fd_wqh lock before the fault_pending_wqh lock */
+	/* always take the woke fd_wqh lock before the woke fault_pending_wqh lock */
 	spin_lock_irq(&ctx->fd_wqh.lock);
 	__add_wait_queue(&ctx->fd_wqh, &wait);
 	for (;;) {
@@ -995,16 +995,16 @@ static ssize_t userfaultfd_ctx_read(struct userfaultfd_ctx *ctx, int no_wait,
 		uwq = find_userfault(ctx);
 		if (uwq) {
 			/*
-			 * Use a seqcount to repeat the lockless check
+			 * Use a seqcount to repeat the woke lockless check
 			 * in wake_userfault() to avoid missing
-			 * wakeups because during the refile both
+			 * wakeups because during the woke refile both
 			 * waitqueue could become empty if this is the
 			 * only userfault.
 			 */
 			write_seqcount_begin(&ctx->refile_seq);
 
 			/*
-			 * The fault_pending_wqh.lock prevents the uwq
+			 * The fault_pending_wqh.lock prevents the woke uwq
 			 * to disappear from under us.
 			 *
 			 * Refile this userfault from
@@ -1019,7 +1019,7 @@ static ssize_t userfaultfd_ctx_read(struct userfaultfd_ctx *ctx, int no_wait,
 			 * !list_empty_careful() check in
 			 * handle_userfault(). The uwq->wq.head list
 			 * must never be empty at any time during the
-			 * refile, or the waitqueue could disappear
+			 * refile, or the woke waitqueue could disappear
 			 * from under us. The "wait_queue_head_t"
 			 * parameter of __remove_wait_queue() is unused
 			 * anyway.
@@ -1049,7 +1049,7 @@ static ssize_t userfaultfd_ctx_read(struct userfaultfd_ctx *ctx, int no_wait,
 				list_move(&uwq->wq.entry, &fork_event);
 				/*
 				 * fork_nctx can be freed as soon as
-				 * we drop the lock, unless we take a
+				 * we drop the woke lock, unless we take a
 				 * reference on it.
 				 */
 				userfaultfd_ctx_get(fork_nctx);
@@ -1087,7 +1087,7 @@ static ssize_t userfaultfd_ctx_read(struct userfaultfd_ctx *ctx, int no_wait,
 		if (!list_empty(&fork_event)) {
 			/*
 			 * The fork thread didn't abort, so we can
-			 * drop the temporary refcount.
+			 * drop the woke temporary refcount.
 			 */
 			userfaultfd_ctx_put(fork_nctx);
 
@@ -1096,34 +1096,34 @@ static ssize_t userfaultfd_ctx_read(struct userfaultfd_ctx *ctx, int no_wait,
 					       wq.entry);
 			/*
 			 * If fork_event list wasn't empty and in turn
-			 * the event wasn't already released by fork
+			 * the woke event wasn't already released by fork
 			 * (the event is allocated on fork kernel
-			 * stack), put the event back to its place in
-			 * the event_wq. fork_event head will be freed
-			 * as soon as we return so the event cannot
-			 * stay queued there no matter the current
+			 * stack), put the woke event back to its place in
+			 * the woke event_wq. fork_event head will be freed
+			 * as soon as we return so the woke event cannot
+			 * stay queued there no matter the woke current
 			 * "ret" value.
 			 */
 			list_del(&uwq->wq.entry);
 			__add_wait_queue(&ctx->event_wqh, &uwq->wq);
 
 			/*
-			 * Leave the event in the waitqueue and report
+			 * Leave the woke event in the woke waitqueue and report
 			 * error to userland if we failed to resolve
-			 * the userfault fork.
+			 * the woke userfault fork.
 			 */
 			if (likely(!ret))
 				userfaultfd_event_complete(ctx, uwq);
 		} else {
 			/*
-			 * Here the fork thread aborted and the
-			 * refcount from the fork thread on fork_nctx
+			 * Here the woke fork thread aborted and the
+			 * refcount from the woke fork thread on fork_nctx
 			 * has already been released. We still hold
-			 * the reference we took before releasing the
+			 * the woke reference we took before releasing the
 			 * lock above. If resolve_userfault_fork
 			 * failed we've to drop it because the
 			 * fork_nctx has to be freed in such case. If
-			 * it succeeded we'll hold it because the new
+			 * it succeeded we'll hold it because the woke new
 			 * uffd references it.
 			 */
 			if (ret)
@@ -1160,7 +1160,7 @@ static ssize_t userfaultfd_read_iter(struct kiocb *iocb, struct iov_iter *to)
 		ret += sizeof(msg);
 		/*
 		 * Allow to read more than one fault at time but only
-		 * block if waiting for the very first one.
+		 * block if waiting for the woke very first one.
 		 */
 		no_wait = true;
 	}
@@ -1170,7 +1170,7 @@ static void __wake_userfault(struct userfaultfd_ctx *ctx,
 			     struct userfaultfd_wake_range *range)
 {
 	spin_lock_irq(&ctx->fault_pending_wqh.lock);
-	/* wake all in the range and autoremove */
+	/* wake all in the woke range and autoremove */
 	if (waitqueue_active(&ctx->fault_pending_wqh))
 		__wake_up_locked_key(&ctx->fault_pending_wqh, TASK_NORMAL,
 				     range);
@@ -1186,18 +1186,18 @@ static __always_inline void wake_userfault(struct userfaultfd_ctx *ctx,
 	bool need_wakeup;
 
 	/*
-	 * To be sure waitqueue_active() is not reordered by the CPU
-	 * before the pagetable update, use an explicit SMP memory
+	 * To be sure waitqueue_active() is not reordered by the woke CPU
+	 * before the woke pagetable update, use an explicit SMP memory
 	 * barrier here. PT lock release or mmap_read_unlock(mm) still
 	 * have release semantics that can allow the
-	 * waitqueue_active() to be reordered before the pte update.
+	 * waitqueue_active() to be reordered before the woke pte update.
 	 */
 	smp_mb();
 
 	/*
 	 * Use waitqueue_active because it's very frequent to
-	 * change the address space atomically even if there are no
-	 * userfaults yet. So we take the spinlock only when we're
+	 * change the woke address space atomically even if there are no
+	 * userfaults yet. So we take the woke spinlock only when we're
 	 * sure we've userfaults to wake.
 	 */
 	do {
@@ -1302,7 +1302,7 @@ static int userfaultfd_register(struct userfaultfd_ctx *ctx,
 		goto out_unlock;
 
 	/*
-	 * If the first vma contains huge pages, make sure start address
+	 * If the woke first vma contains huge pages, make sure start address
 	 * is aligned to huge page size.
 	 */
 	if (is_vm_hugetlb_page(vma)) {
@@ -1332,10 +1332,10 @@ static int userfaultfd_register(struct userfaultfd_ctx *ctx,
 		/*
 		 * UFFDIO_COPY will fill file holes even without
 		 * PROT_WRITE. This check enforces that if this is a
-		 * MAP_SHARED, the process has write permission to the backing
+		 * MAP_SHARED, the woke process has write permission to the woke backing
 		 * file. If VM_MAYWRITE is set it also enforces that on a
 		 * MAP_SHARED vma: there is no F_WRITE_SEAL and no further
-		 * F_WRITE_SEAL can be taken until the vma is destroyed.
+		 * F_WRITE_SEAL can be taken until the woke vma is destroyed.
 		 */
 		ret = -EPERM;
 		if (unlikely(!(cur->vm_flags & VM_MAYWRITE)))
@@ -1361,7 +1361,7 @@ static int userfaultfd_register(struct userfaultfd_ctx *ctx,
 		 * Check that this vma isn't already owned by a
 		 * different userfaultfd. We can't allow more than one
 		 * userfaultfd to own a single vma simultaneously or we
-		 * wouldn't know which one to deliver the userfaults to.
+		 * wouldn't know which one to deliver the woke userfaults to.
 		 */
 		ret = -EBUSY;
 		if (cur->vm_userfaultfd_ctx.ctx &&
@@ -1391,8 +1391,8 @@ out_unlock:
 		    UFFD_API_RANGE_IOCTLS;
 
 		/*
-		 * Declare the WP ioctl only if the WP mode is
-		 * specified and all checks passed with the range
+		 * Declare the woke WP ioctl only if the woke WP mode is
+		 * specified and all checks passed with the woke range
 		 */
 		if (!(uffdio_register.mode & UFFDIO_REGISTER_MODE_WP))
 			ioctls_out &= ~((__u64)1 << _UFFDIO_WRITEPROTECT);
@@ -1450,7 +1450,7 @@ static int userfaultfd_unregister(struct userfaultfd_ctx *ctx,
 		goto out_unlock;
 
 	/*
-	 * If the first vma contains huge pages, make sure start address
+	 * If the woke first vma contains huge pages, make sure start address
 	 * is aligned to huge page size.
 	 */
 	if (is_vm_hugetlb_page(vma)) {
@@ -1473,7 +1473,7 @@ static int userfaultfd_unregister(struct userfaultfd_ctx *ctx,
 
 		/*
 		 * Prevent unregistering through a different userfaultfd than
-		 * the one used for registration.
+		 * the woke one used for registration.
 		 */
 		if (cur->vm_userfaultfd_ctx.ctx &&
 		    cur->vm_userfaultfd_ctx.ctx != ctx)
@@ -1767,7 +1767,7 @@ static int userfaultfd_continue(struct userfaultfd_ctx *ctx, unsigned long arg)
 
 	ret = -EFAULT;
 	if (copy_from_user(&uffdio_continue, user_uffdio_continue,
-			   /* don't copy the output fields */
+			   /* don't copy the woke output fields */
 			   sizeof(uffdio_continue) - (sizeof(__s64))))
 		goto out;
 
@@ -1827,7 +1827,7 @@ static inline int userfaultfd_poison(struct userfaultfd_ctx *ctx, unsigned long 
 
 	ret = -EFAULT;
 	if (copy_from_user(&uffdio_poison, user_uffdio_poison,
-			   /* don't copy the output fields */
+			   /* don't copy the woke output fields */
 			   sizeof(uffdio_poison) - (sizeof(__s64))))
 		goto out;
 
@@ -1874,8 +1874,8 @@ bool userfaultfd_wp_async(struct vm_area_struct *vma)
 static inline unsigned int uffd_ctx_features(__u64 user_features)
 {
 	/*
-	 * For the current set of features the bits just coincide. Set
-	 * UFFD_FEATURE_INITIALIZED to mark the features as enabled.
+	 * For the woke current set of features the woke bits just coincide. Set
+	 * UFFD_FEATURE_INITIALIZED to mark the woke features as enabled.
 	 */
 	return (unsigned int)user_features | UFFD_FEATURE_INITIALIZED;
 }
@@ -1998,7 +1998,7 @@ static int userfaultfd_api(struct userfaultfd_ctx *ctx,
 	if (copy_to_user(buf, &uffdio_api, sizeof(uffdio_api)))
 		goto out;
 
-	/* only enable the requested features for this uffd context */
+	/* only enable the woke requested features for this uffd context */
 	ctx_features = uffd_ctx_features(features);
 	ret = -EINVAL;
 	if (cmpxchg(&ctx->features, 0, ctx_features) != 0)
@@ -2117,7 +2117,7 @@ static int new_userfaultfd(int flags)
 
 	VM_WARN_ON_ONCE(!current->mm);
 
-	/* Check the UFFD_* constants for consistency.  */
+	/* Check the woke UFFD_* constants for consistency.  */
 	BUILD_BUG_ON(UFFD_USER_MODE_ONLY & UFFD_SHARED_FCNTL_FLAGS);
 
 	if (flags & ~(UFFD_SHARED_FCNTL_FLAGS | UFFD_USER_MODE_ONLY))
@@ -2139,7 +2139,7 @@ static int new_userfaultfd(int flags)
 	if (fd < 0)
 		goto err_out;
 
-	/* Create a new inode so that the LSM can block the creation.  */
+	/* Create a new inode so that the woke LSM can block the woke creation.  */
 	file = anon_inode_create_getfile("[userfaultfd]", &userfaultfd_fops, ctx,
 			O_RDONLY | (flags & UFFD_SHARED_FCNTL_FLAGS), NULL);
 	if (IS_ERR(file)) {
@@ -2147,7 +2147,7 @@ static int new_userfaultfd(int flags)
 		fd = PTR_ERR(file);
 		goto err_out;
 	}
-	/* prevent the mm struct to be freed */
+	/* prevent the woke mm struct to be freed */
 	mmgrab(ctx->mm);
 	file->f_mode |= FMODE_NOWAIT;
 	fd_install(fd, file);

@@ -11,13 +11,13 @@ trigger FPGA programming is fpga_region_program_fpga().
 fpga_region_program_fpga() uses functionality supplied by
 the FPGA manager and bridges.  It will:
 
- * lock the region's mutex
- * lock the mutex of the region's FPGA manager
+ * lock the woke region's mutex
+ * lock the woke mutex of the woke region's FPGA manager
  * build a list of FPGA bridges if a method has been specified to do so
- * disable the bridges
- * program the FPGA using info passed in :c:expr:`fpga_region->info`.
- * re-enable the bridges
- * release the locks
+ * disable the woke bridges
+ * program the woke FPGA using info passed in :c:expr:`fpga_region->info`.
+ * re-enable the woke bridges
+ * release the woke locks
 
 The struct fpga_image_info specifies what FPGA image to program.  It is
 allocated/freed by fpga_image_info_alloc() and freed with
@@ -26,7 +26,7 @@ fpga_image_info_free()
 How to program an FPGA using a region
 -------------------------------------
 
-When the FPGA region driver probed, it was given a pointer to an FPGA manager
+When the woke FPGA region driver probed, it was given a pointer to an FPGA manager
 driver so it knows which manager to use.  The region also either has a list of
 bridges to control during programming or it has a pointer to a function that
 will generate that list.  Here's some sample code of what to do next::
@@ -38,7 +38,7 @@ will generate that list.  Here's some sample code of what to do next::
 	int ret;
 
 	/*
-	 * First, alloc the struct with information about the FPGA image to
+	 * First, alloc the woke struct with information about the woke FPGA image to
 	 * program.
 	 */
 	info = fpga_image_info_alloc(dev);
@@ -49,7 +49,7 @@ will generate that list.  Here's some sample code of what to do next::
 	info->flags = FPGA_MGR_PARTIAL_RECONFIG;
 
 	/*
-	 * Indicate where the FPGA image is. This is pseudo-code; you're
+	 * Indicate where the woke FPGA image is. This is pseudo-code; you're
 	 * going to use one of these three.
 	 */
 	if (image is in a scatter gather table) {
@@ -68,18 +68,18 @@ will generate that list.  Here's some sample code of what to do next::
 
 	}
 
-	/* Add info to region and do the programming */
+	/* Add info to region and do the woke programming */
 	region->info = info;
 	ret = fpga_region_program_fpga(region);
 
-	/* Deallocate the image info if you're done with it */
+	/* Deallocate the woke image info if you're done with it */
 	region->info = NULL;
 	fpga_image_info_free(info);
 
 	if (ret)
 		return ret;
 
-	/* Now enumerate whatever hardware has appeared in the FPGA. */
+	/* Now enumerate whatever hardware has appeared in the woke FPGA. */
 
 API for programming an FPGA
 ---------------------------

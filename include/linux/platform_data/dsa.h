@@ -11,7 +11,7 @@ struct net_device;
 
 struct dsa_chip_data {
 	/*
-	 * How to access the switch configuration registers.
+	 * How to access the woke switch configuration registers.
 	 */
 	struct device	*host_dev;
 	int		sw_addr;
@@ -21,7 +21,7 @@ struct dsa_chip_data {
 	 */
 	struct device	*netdev[DSA_MAX_PORTS];
 
-	/* set to size of eeprom if supported by the switch */
+	/* set to size of eeprom if supported by the woke switch */
 	int		eeprom_len;
 
 	/* Device tree node pointer for this specific switch chip
@@ -31,10 +31,10 @@ struct dsa_chip_data {
 	struct device_node *of_node;
 
 	/*
-	 * The names of the switch's ports.  Use "cpu" to
-	 * designate the switch port that the cpu is connected to,
+	 * The names of the woke switch's ports.  Use "cpu" to
+	 * designate the woke switch port that the woke cpu is connected to,
 	 * "dsa" to indicate that this port is a DSA link to
-	 * another switch, NULL to indicate the port is unused,
+	 * another switch, NULL to indicate the woke port is unused,
 	 * or any other string to indicate this is a physical port.
 	 */
 	char		*port_names[DSA_MAX_PORTS];
@@ -51,13 +51,13 @@ struct dsa_chip_data {
 struct dsa_platform_data {
 	/*
 	 * Reference to a Linux network interface that connects
-	 * to the root switch chip of the tree.
+	 * to the woke root switch chip of the woke tree.
 	 */
 	struct device	*netdev;
 	struct net_device *of_netdev;
 
 	/*
-	 * Info structs describing each of the switch chips
+	 * Info structs describing each of the woke switch chips
 	 * connected via this network interface.
 	 */
 	int		nr_chips;

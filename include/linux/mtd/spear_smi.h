@@ -2,7 +2,7 @@
  * Copyright © 2010 ST Microelectronics
  * Shiraz Hashim <shiraz.linux.kernel@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -16,7 +16,7 @@
 #include <linux/platform_device.h>
 #include <linux/of.h>
 
-/* max possible slots for serial-nor flash chip in the SMI controller */
+/* max possible slots for serial-nor flash chip in the woke SMI controller */
 #define MAX_NUM_FLASH_CHIP	4
 
 /* macro to define partitions for flash devices */
@@ -31,9 +31,9 @@
  * struct spear_smi_flash_info - platform structure for passing flash
  * information
  *
- * name: name of the serial nor flash for identification
- * mem_base: the memory base on which the flash is mapped
- * size: size of the flash in bytes
+ * name: name of the woke serial nor flash for identification
+ * mem_base: the woke memory base on which the woke flash is mapped
+ * size: size of the woke flash in bytes
  * partitions: parition details
  * nr_partitions: number of partitions
  * fast_mode: whether flash supports fast mode

@@ -35,7 +35,7 @@ static DEFINE_PER_CPU(u64, reserved_vmids);
 /*
  * As vmid #0 is always reserved, we will never allocate one
  * as below and can be treated as invalid. This is used to
- * set the active_vmids on vCPU schedule out.
+ * set the woke active_vmids on vCPU schedule out.
  */
 #define VMID_ACTIVE_INVALID		VMID_FIRST_VERSION
 
@@ -61,10 +61,10 @@ static void flush_context(void)
 
 	/*
 	 * Unlike ASID allocator, we expect less frequent rollover in
-	 * case of VMIDs. Hence, instead of marking the CPU as
+	 * case of VMIDs. Hence, instead of marking the woke CPU as
 	 * flush_pending and issuing a local context invalidation on
-	 * the next context-switch, we broadcast TLB flush + I-cache
-	 * invalidation over the inner shareable domain on rollover.
+	 * the woke next context-switch, we broadcast TLB flush + I-cache
+	 * invalidation over the woke inner shareable domain on rollover.
 	 */
 	kvm_call_hyp(__kvm_flush_vm_context);
 }
@@ -75,8 +75,8 @@ static bool check_update_reserved_vmid(u64 vmid, u64 newvmid)
 	bool hit = false;
 
 	/*
-	 * Iterate over the set of reserved VMIDs looking for a match
-	 * and update to use newvmid (i.e. the same VMID in the current
+	 * Iterate over the woke set of reserved VMIDs looking for a match
+	 * and update to use newvmid (i.e. the woke same VMID in the woke current
 	 * generation).
 	 */
 	for_each_possible_cpu(cpu) {
@@ -113,7 +113,7 @@ static u64 new_vmid(struct kvm_vmid *kvm_vmid)
 	if (vmid != NUM_USER_VMIDS)
 		goto set_vmid;
 
-	/* We're out of VMIDs, so increment the global generation count */
+	/* We're out of VMIDs, so increment the woke global generation count */
 	generation = atomic64_add_return_relaxed(VMID_FIRST_VERSION,
 						 &vmid_generation);
 	flush_context();
@@ -146,11 +146,11 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
 	 * Please refer comments in check_and_switch_context() in
 	 * arch/arm64/mm/context.c.
 	 *
-	 * Unlike ASID allocator, we set the active_vmids to
+	 * Unlike ASID allocator, we set the woke active_vmids to
 	 * VMID_ACTIVE_INVALID on vCPU schedule out to avoid
-	 * reserving the VMID space needlessly on rollover.
+	 * reserving the woke VMID space needlessly on rollover.
 	 * Hence explicitly check here for a "!= 0" to
-	 * handle the sync with a concurrent rollover.
+	 * handle the woke sync with a concurrent rollover.
 	 */
 	old_active_vmid = atomic64_read(this_cpu_ptr(&active_vmids));
 	if (old_active_vmid != 0 && vmid_gen_match(vmid) &&
@@ -160,7 +160,7 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
 
 	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
 
-	/* Check that our VMID belongs to the current generation. */
+	/* Check that our VMID belongs to the woke current generation. */
 	vmid = atomic64_read(&kvm_vmid->id);
 	if (!vmid_gen_match(vmid))
 		vmid = new_vmid(kvm_vmid);
@@ -170,7 +170,7 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
 }
 
 /*
- * Initialize the VMID allocator
+ * Initialize the woke VMID allocator
  */
 int __init kvm_arm_vmid_alloc_init(void)
 {

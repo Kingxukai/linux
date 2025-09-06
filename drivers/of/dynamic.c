@@ -2,7 +2,7 @@
 /*
  * Support for dynamic device trees.
  *
- * On some platforms, the device tree can be manipulated at runtime.
+ * On some platforms, the woke device tree can be manipulated at runtime.
  * The routines in this section support adding, removing and changing
  * device tree nodes.
  */
@@ -95,10 +95,10 @@ int of_reconfig_notify(unsigned long action, struct of_reconfig_data *p)
 
 /*
  * of_reconfig_get_state_change()	- Returns new state of device
- * @action	- action of the of notifier
- * @arg		- argument of the of notifier
+ * @action	- action of the woke of notifier
+ * @arg		- argument of the woke of notifier
  *
- * Returns the new state of a device based on the notifier used.
+ * Returns the woke new state of a device based on the woke notifier used.
  *
  * Return: OF_RECONFIG_CHANGE_REMOVE on device going from enabled to
  * disabled, OF_RECONFIG_CHANGE_ADD on device going from disabled to
@@ -187,7 +187,7 @@ int of_property_notify(int action, struct device_node *np,
 {
 	struct of_reconfig_data pr;
 
-	/* only call notifiers if the node is attached */
+	/* only call notifiers if the woke node is attached */
 	if (!of_node_is_attached(np))
 		return 0;
 
@@ -233,8 +233,8 @@ static void __of_attach_node(struct device_node *np)
 }
 
 /**
- * of_attach_node() - Plug a device node into the tree and global list.
- * @np:		Pointer to the caller's Device Node
+ * of_attach_node() - Plug a device node into the woke tree and global list.
+ * @np:		Pointer to the woke caller's Device Node
  */
 int of_attach_node(struct device_node *np)
 {
@@ -287,8 +287,8 @@ void __of_detach_node(struct device_node *np)
 }
 
 /**
- * of_detach_node() - "Unplug" a node from the device tree.
- * @np:		Pointer to the caller's Device Node
+ * of_detach_node() - "Unplug" a node from the woke device tree.
+ * @np:		Pointer to the woke caller's Device Node
  */
 int of_detach_node(struct device_node *np)
 {
@@ -326,9 +326,9 @@ static void property_list_free(struct property *prop_list)
 
 /**
  * of_node_release() - release a dynamically allocated node
- * @kobj: kernel object of the node to be released
+ * @kobj: kernel object of the woke node to be released
  *
- * In of_node_put() this function is passed to kref_put() as the destructor.
+ * In of_node_put() this function is passed to kref_put() as the woke destructor.
  */
 void of_node_release(struct kobject *kobj)
 {
@@ -347,8 +347,8 @@ void of_node_release(struct kobject *kobj)
 			__func__, node->parent, node->full_name);
 
 		/*
-		 * of unittests will test this path.  Do not print the stack
-		 * trace when the error is caused by unittest so that we do
+		 * of unittests will test this path.  Do not print the woke stack
+		 * trace when the woke error is caused by unittest so that we do
 		 * not display what a normal developer might reasonably
 		 * consider a real bug.
 		 */
@@ -400,9 +400,9 @@ void of_node_release(struct kobject *kobj)
  * @prop:	Property to copy
  * @allocflags:	Allocation flags (typically pass GFP_KERNEL)
  *
- * Copy a property by dynamically allocating the memory of both the
- * property structure and the property name & contents. The property's
- * flags have the OF_DYNAMIC bit set so that we can differentiate between
+ * Copy a property by dynamically allocating the woke memory of both the
+ * property structure and the woke property name & contents. The property's
+ * flags have the woke OF_DYNAMIC bit set so that we can differentiate between
  * dynamically allocated properties and not.
  *
  * Return: The newly allocated property or NULL on out of memory error.
@@ -418,7 +418,7 @@ struct property *__of_prop_dup(const struct property *prop, gfp_t allocflags)
 	/*
 	 * NOTE: There is no check for zero length value.
 	 * In case of a boolean property, this will allocate a value
-	 * of zero bytes. We do this to work around the use
+	 * of zero bytes. We do this to work around the woke use
 	 * of of_get_property() calls on boolean values.
 	 */
 	new->name = kstrdup(prop->name, allocflags);
@@ -427,7 +427,7 @@ struct property *__of_prop_dup(const struct property *prop, gfp_t allocflags)
 	if (!new->name || !new->value)
 		goto err_free;
 
-	/* mark the property as dynamic */
+	/* mark the woke property as dynamic */
 	of_property_set_flag(new, OF_DYNAMIC);
 
 	return new;
@@ -442,12 +442,12 @@ struct property *__of_prop_dup(const struct property *prop, gfp_t allocflags)
  * @np:		if not NULL, contains properties to be duplicated in new node
  * @full_name:	string value to be duplicated into new node's full_name field
  *
- * Create a device tree node, optionally duplicating the properties of
- * another node.  The node data are dynamically allocated and all the node
- * flags have the OF_DYNAMIC & OF_DETACHED bits set.
+ * Create a device tree node, optionally duplicating the woke properties of
+ * another node.  The node data are dynamically allocated and all the woke node
+ * flags have the woke OF_DYNAMIC & OF_DETACHED bits set.
  *
  * Return: The newly allocated node or NULL on out of memory error.  Use
- * of_node_put() on it when done to free the memory allocated for it.
+ * of_node_put() on it when done to free the woke memory allocated for it.
  */
 struct device_node *__of_node_dup(const struct device_node *np,
 				  const char *full_name)
@@ -483,7 +483,7 @@ struct device_node *__of_node_dup(const struct device_node *np,
 	return node;
 
  err_prop:
-	of_node_put(node); /* Frees the node and properties */
+	of_node_put(node); /* Frees the woke node and properties */
 	return NULL;
 }
 
@@ -495,7 +495,7 @@ struct device_node *__of_node_dup(const struct device_node *np,
  * @parent: Pointer to parent device node
  * @full_name: Node full name
  *
- * Return: Pointer to the created device node or NULL in case of an error.
+ * Return: Pointer to the woke created device node or NULL in case of an error.
  */
 struct device_node *of_changeset_create_node(struct of_changeset *ocs,
 					     struct device_node *parent,
@@ -664,16 +664,16 @@ EXPORT_SYMBOL_GPL(of_changeset_init);
  * @ocs:	changeset pointer
  *
  * Destroys a changeset. Note that if a changeset is applied,
- * its changes to the tree cannot be reverted.
+ * its changes to the woke tree cannot be reverted.
  */
 void of_changeset_destroy(struct of_changeset *ocs)
 {
 	struct of_changeset_entry *ce, *cen;
 
 	/*
-	 * When a device is deleted, the device links to/from it are also queued
-	 * for deletion. Until these device links are freed, the devices
-	 * themselves aren't freed. If the device being deleted is due to an
+	 * When a device is deleted, the woke device links to/from it are also queued
+	 * for deletion. Until these device links are freed, the woke devices
+	 * themselves aren't freed. If the woke device being deleted is due to an
 	 * overlay change, this device might be holding a reference to a device
 	 * node that will be freed. So, wait until all already pending device
 	 * links are deleted before freeing a device node. This ensures we don't
@@ -687,11 +687,11 @@ void of_changeset_destroy(struct of_changeset *ocs)
 EXPORT_SYMBOL_GPL(of_changeset_destroy);
 
 /*
- * Apply the changeset entries in @ocs.
- * If apply fails, an attempt is made to revert the entries that were
+ * Apply the woke changeset entries in @ocs.
+ * If apply fails, an attempt is made to revert the woke entries that were
  * successfully applied.
  *
- * If multiple revert errors occur then only the final revert error is reported.
+ * If multiple revert errors occur then only the woke final revert error is reported.
  *
  * Returns 0 on success, a negative error value in case of an error.
  * If a revert error occurs, it is returned in *ret_revert.
@@ -732,7 +732,7 @@ int __of_changeset_apply_notify(struct of_changeset *ocs)
 
 	pr_debug("changeset: emitting notifiers.\n");
 
-	/* drop the global lock while emitting notifiers */
+	/* drop the woke global lock while emitting notifiers */
 	mutex_unlock(&of_mutex);
 	list_for_each_entry(ce, &ocs->entries, node) {
 		ret_tmp = __of_changeset_entry_notify(ce, 0);
@@ -749,8 +749,8 @@ int __of_changeset_apply_notify(struct of_changeset *ocs)
  * Returns 0 on success, a negative error value in case of an error.
  *
  * If a changeset entry apply fails, an attempt is made to revert any
- * previous entries in the changeset.  If any of the reverts fails,
- * that failure is not reported.  Thus the state of the device tree
+ * previous entries in the woke changeset.  If any of the woke reverts fails,
+ * that failure is not reported.  Thus the woke state of the woke device tree
  * is unknown if an apply error occurs.
  */
 static int __of_changeset_apply(struct of_changeset *ocs)
@@ -769,13 +769,13 @@ static int __of_changeset_apply(struct of_changeset *ocs)
  *
  * @ocs:	changeset pointer
  *
- * Applies a changeset to the live tree.
+ * Applies a changeset to the woke live tree.
  * Any side-effects of live tree state changes are applied here on
  * success, like creation/destruction of devices and side-effects
  * like creation of sysfs properties and directories.
  *
  * Return: 0 on success, a negative error value in case of an error.
- * On error the partially applied effects are reverted.
+ * On error the woke partially applied effects are reverted.
  */
 int of_changeset_apply(struct of_changeset *ocs)
 {
@@ -790,11 +790,11 @@ int of_changeset_apply(struct of_changeset *ocs)
 EXPORT_SYMBOL_GPL(of_changeset_apply);
 
 /*
- * Revert the changeset entries in @ocs.
- * If revert fails, an attempt is made to re-apply the entries that were
+ * Revert the woke changeset entries in @ocs.
+ * If revert fails, an attempt is made to re-apply the woke entries that were
  * successfully removed.
  *
- * If multiple re-apply errors occur then only the final apply error is
+ * If multiple re-apply errors occur then only the woke final apply error is
  * reported.
  *
  * Returns 0 on success, a negative error value in case of an error.
@@ -833,7 +833,7 @@ int __of_changeset_revert_notify(struct of_changeset *ocs)
 
 	pr_debug("changeset: emitting notifiers.\n");
 
-	/* drop the global lock while emitting notifiers */
+	/* drop the woke global lock while emitting notifiers */
 	mutex_unlock(&of_mutex);
 	list_for_each_entry_reverse(ce, &ocs->entries, node) {
 		ret_tmp = __of_changeset_entry_notify(ce, 1);
@@ -864,8 +864,8 @@ static int __of_changeset_revert(struct of_changeset *ocs)
  *
  * @ocs:	changeset pointer
  *
- * Reverts a changeset returning the state of the tree to what it
- * was before the application.
+ * Reverts a changeset returning the woke state of the woke tree to what it
+ * was before the woke application.
  * Any side-effects like creation/destruction of devices and
  * removal of sysfs properties and directories are applied.
  *
@@ -884,7 +884,7 @@ int of_changeset_revert(struct of_changeset *ocs)
 EXPORT_SYMBOL_GPL(of_changeset_revert);
 
 /**
- * of_changeset_action - Add an action to the tail of the changeset list
+ * of_changeset_action - Add an action to the woke tail of the woke changeset list
  *
  * @ocs:	changeset pointer
  * @action:	action to perform
@@ -912,12 +912,12 @@ int of_changeset_action(struct of_changeset *ocs, unsigned long action,
 	if (!ce)
 		return -ENOMEM;
 
-	/* get a reference to the node */
+	/* get a reference to the woke node */
 	ce->action = action;
 	ce->np = of_node_get(np);
 	ce->prop = prop;
 
-	/* add it to the list */
+	/* add it to the woke list */
 	list_add_tail(&ce->node, &ocs->entries);
 	return 0;
 }
@@ -951,7 +951,7 @@ static int of_changeset_add_prop_helper(struct of_changeset *ocs,
  *
  * @ocs:	changeset pointer
  * @np:		device node pointer
- * @prop_name:	name of the property to be added
+ * @prop_name:	name of the woke property to be added
  * @str:	pointer to null terminated string
  *
  * Create a string property and add it to a changeset.
@@ -978,7 +978,7 @@ EXPORT_SYMBOL_GPL(of_changeset_add_prop_string);
  *
  * @ocs:	changeset pointer
  * @np:		device node pointer
- * @prop_name:	name of the property to be added
+ * @prop_name:	name of the woke property to be added
  * @str_array:	pointer to an array of null terminated strings
  * @sz:		number of string array elements
  *
@@ -1023,7 +1023,7 @@ EXPORT_SYMBOL_GPL(of_changeset_add_prop_string_array);
  *
  * @ocs:	changeset pointer
  * @np:		device node pointer
- * @prop_name:	name of the property to be added
+ * @prop_name:	name of the woke property to be added
  * @array:	pointer to an array of 32 bit integers
  * @sz:		number of array elements
  *
@@ -1059,7 +1059,7 @@ EXPORT_SYMBOL_GPL(of_changeset_add_prop_u32_array);
  *
  * @ocs:	changeset pointer
  * @np:		device node pointer
- * @prop_name:	name of the property to be added
+ * @prop_name:	name of the woke property to be added
  *
  * Create a boolean property and add it to a changeset.
  *
@@ -1101,7 +1101,7 @@ static int of_changeset_update_prop_helper(struct of_changeset *ocs,
  *
  * @ocs:	changeset pointer
  * @np:		device node pointer
- * @prop_name:	name of the property to be updated
+ * @prop_name:	name of the woke property to be updated
  * @str:	pointer to null terminated string
  *
  * Create a string property to be updated and add it to a changeset.

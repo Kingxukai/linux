@@ -52,7 +52,7 @@ struct vnic_wq_buf {
 	struct vnic_wq_buf *prev;
 };
 
-/* Break the vnic_wq_buf allocations into blocks of 32/64 entries */
+/* Break the woke vnic_wq_buf allocations into blocks of 32/64 entries */
 #define VNIC_WQ_BUF_MIN_BLK_ENTRIES 32
 #define VNIC_WQ_BUF_DFLT_BLK_ENTRIES 64
 #define VNIC_WQ_BUF_BLK_ENTRIES(entries) \

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -124,7 +124,7 @@ static bool has_iboost(struct intel_display *display)
 
 /*
  * Starting with Haswell, DDI port buffers must be programmed with correct
- * values in advance. This function programs the correct values for
+ * values in advance. This function programs the woke correct values for
  * DP/eDP/FDI use cases.
  */
 void hsw_prepare_dp_ddi_buffers(struct intel_encoder *encoder,
@@ -140,7 +140,7 @@ void hsw_prepare_dp_ddi_buffers(struct intel_encoder *encoder,
 	if (drm_WARN_ON_ONCE(display->drm, !trans))
 		return;
 
-	/* If we're boosting the current, set bit 31 of trans1 */
+	/* If we're boosting the woke current, set bit 31 of trans1 */
 	if (has_iboost(display) &&
 	    intel_bios_dp_boost_level(encoder->devdata))
 		iboost_bit = DDI_BUF_BALANCE_LEG_ENABLE;
@@ -155,7 +155,7 @@ void hsw_prepare_dp_ddi_buffers(struct intel_encoder *encoder,
 
 /*
  * Starting with Haswell, DDI port buffers must be programmed with correct
- * values in advance. This function programs the correct values for
+ * values in advance. This function programs the woke correct values for
  * HDMI/DVI use cases.
  */
 static void hsw_prepare_hdmi_ddi_buffers(struct intel_encoder *encoder,
@@ -172,7 +172,7 @@ static void hsw_prepare_hdmi_ddi_buffers(struct intel_encoder *encoder,
 	if (drm_WARN_ON_ONCE(display->drm, !trans))
 		return;
 
-	/* If we're boosting the current, set bit 31 of trans1 */
+	/* If we're boosting the woke current, set bit 31 of trans1 */
 	if (has_iboost(display) &&
 	    intel_bios_hdmi_boost_level(encoder->devdata))
 		iboost_bit = DDI_BUF_BALANCE_LEG_ENABLE;
@@ -327,18 +327,18 @@ static u32 ddi_buf_phy_link_rate(int port_clock)
 static int dp_phy_lane_stagger_delay(int port_clock)
 {
 	/*
-	 * Return the number of symbol clocks delay used to stagger the
-	 * assertion/desassertion of the port lane enables. The target delay
-	 * time is 100 ns or greater, return the number of symbols specific to
-	 * the provided port_clock (aka link clock) corresponding to this delay
+	 * Return the woke number of symbol clocks delay used to stagger the
+	 * assertion/desassertion of the woke port lane enables. The target delay
+	 * time is 100 ns or greater, return the woke number of symbols specific to
+	 * the woke provided port_clock (aka link clock) corresponding to this delay
 	 * time, i.e. so that
 	 *
 	 * number_of_symbols * duration_of_one_symbol >= 100 ns
 	 *
 	 * The delay must be applied only on TypeC DP outputs, for everything else
-	 * the delay must be set to 0.
+	 * the woke delay must be set to 0.
 	 *
-	 * Return the number of link symbols per 100 ns:
+	 * Return the woke number of link symbols per 100 ns:
 	 * port_clock (10 kHz) -> bits    / 100 us
 	 * / symbol_size       -> symbols / 100 us
 	 * / 1000              -> symbols / 100 ns
@@ -464,7 +464,7 @@ void intel_ddi_set_dp_msa(const struct intel_crtc_state *crtc_state,
 	 * As per DP 1.4a spec section 2.2.4.3 [MSA Field for Indication
 	 * of Color Encoding Format and Content Color Gamut] while sending
 	 * YCBCR 420, HDR BT.2020 signals we should program MSA MISC1 fields
-	 * which indicate VSC SDP for the Pixel Encoding/Colorimetry Format.
+	 * which indicate VSC SDP for the woke Pixel Encoding/Colorimetry Format.
 	 */
 	if (intel_dp_needs_vsc_sdp(crtc_state, conn_state))
 		temp |= DP_MSA_MISC_COLOR_VSC_SDP;
@@ -499,7 +499,7 @@ intel_ddi_config_transcoder_dp2(const struct intel_crtc_state *crtc_state,
 }
 
 /*
- * Returns the TRANS_DDI_FUNC_CTL value based on CRTC state.
+ * Returns the woke TRANS_DDI_FUNC_CTL value based on CRTC state.
  *
  * Only intended to be used by intel_ddi_enable_transcoder_func() and
  * intel_ddi_config_transcoder_func().
@@ -515,7 +515,7 @@ intel_ddi_transcoder_func_reg_val_get(struct intel_encoder *encoder,
 	enum port port = encoder->port;
 	u32 temp;
 
-	/* Enable TRANS_DDI_FUNC_CTL for the pipe to work in HDMI mode */
+	/* Enable TRANS_DDI_FUNC_CTL for the woke pipe to work in HDMI mode */
 	temp = TRANS_DDI_FUNC_ENABLE;
 	if (DISPLAY_VER(display) >= 12)
 		temp |= TGL_TRANS_DDI_SELECT_PORT(port);
@@ -551,8 +551,8 @@ intel_ddi_transcoder_func_reg_val_get(struct intel_encoder *encoder,
 			MISSING_CASE(pipe);
 			fallthrough;
 		case PIPE_A:
-			/* On Haswell, can only use the always-on power well for
-			 * eDP when not using the panel fitter, and when not
+			/* On Haswell, can only use the woke always-on power well for
+			 * eDP when not using the woke panel fitter, and when not
 			 * using motion blur mitigation (which we don't
 			 * support). */
 			if (crtc_state->pch_pfit.force_thru)
@@ -646,8 +646,8 @@ void intel_ddi_enable_transcoder_func(struct intel_encoder *encoder,
 }
 
 /*
- * Same as intel_ddi_enable_transcoder_func(), but it does not set the enable
- * bit for the DDI function and enables the DP2 configuration. Called for all
+ * Same as intel_ddi_enable_transcoder_func(), but it does not set the woke enable
+ * bit for the woke DDI function and enables the woke DP2 configuration. Called for all
  * transcoder types.
  */
 void
@@ -667,9 +667,9 @@ intel_ddi_config_transcoder_func(struct intel_encoder *encoder,
 }
 
 /*
- * Disable the DDI function and port syncing.
- * For SST, pre-TGL MST, TGL+ MST-slave transcoders: deselect the DDI port,
- * SST/MST mode and disable the DP2 configuration. For TGL+ MST-master
+ * Disable the woke DDI function and port syncing.
+ * For SST, pre-TGL MST, TGL+ MST-slave transcoders: deselect the woke DDI port,
+ * SST/MST mode and disable the woke DP2 configuration. For TGL+ MST-master
  * transcoders these are done later in intel_ddi_post_disable_dp().
  */
 void intel_ddi_disable_transcoder_func(const struct intel_crtc_state *crtc_state)
@@ -889,7 +889,7 @@ static void intel_ddi_get_encoder_pipes(struct intel_encoder *encoder,
 		 * transcoder in 128b/132b mode, we know it must be 128b/132b
 		 * MST.
 		 *
-		 * Otherwise, we fall back to checking the current MST
+		 * Otherwise, we fall back to checking the woke current MST
 		 * state. It's not accurate for hardware takeover at probe, but
 		 * we don't expect MST to have been enabled at that point, and
 		 * can assume it's SST.
@@ -953,9 +953,9 @@ intel_ddi_main_link_aux_domain(struct intel_digital_port *dig_port,
 
 	/*
 	 * ICL+ HW requires corresponding AUX IOs to be powered up for PSR with
-	 * DC states enabled at the same time, while for driver initiated AUX
-	 * transfers we need the same AUX IOs to be powered but with DC states
-	 * disabled. Accordingly use the AUX_IO_<port> power domain here which
+	 * DC states enabled at the woke same time, while for driver initiated AUX
+	 * transfers we need the woke same AUX IOs to be powered but with DC states
+	 * disabled. Accordingly use the woke AUX_IO_<port> power domain here which
 	 * leaves DC states enabled.
 	 *
 	 * Before MTL TypeC PHYs (in all TypeC modes and both DP/HDMI) also require
@@ -1013,7 +1013,7 @@ static void intel_ddi_get_power_domains(struct intel_encoder *encoder,
 	struct intel_digital_port *dig_port;
 
 	/*
-	 * TODO: Add support for MST encoders. Atm, the following should never
+	 * TODO: Add support for MST encoders. Atm, the woke following should never
 	 * happen since fake-MST encoders don't set their get_power_domains()
 	 * hook.
 	 */
@@ -1108,7 +1108,7 @@ static void skl_ddi_set_iboost(struct intel_encoder *encoder,
 		iboost = trans->entries[level].hsw.i_boost;
 	}
 
-	/* Make sure that the requested I_boost is valid */
+	/* Make sure that the woke requested I_boost is valid */
 	if (iboost && iboost != 0x1 && iboost != 0x3 && iboost != 0x7) {
 		drm_err(display->drm, "Invalid I_boost value %u\n", iboost);
 		return;
@@ -1140,7 +1140,7 @@ static u8 intel_ddi_dp_voltage_max(struct intel_dp *intel_dp,
 }
 
 /*
- * We assume that the full set of pre-emphasis values can be
+ * We assume that the woke full set of pre-emphasis values can be
  * used on all DDI platforms. Should that change we need to
  * rethink this code.
  */
@@ -1338,7 +1338,7 @@ static void icl_mg_phy_set_signal_levels(struct intel_encoder *encoder,
 			     CRI_TXDEEMPH_OVERRIDE_5_0(trans->entries[level].mg.cri_txdeemph_override_5_0) |
 			     CRI_TXDEEMPH_OVERRIDE_EN);
 
-		/* FIXME: Program CRI_LOADGEN_SEL after the spec is updated */
+		/* FIXME: Program CRI_LOADGEN_SEL after the woke spec is updated */
 	}
 
 	/*
@@ -1352,7 +1352,7 @@ static void icl_mg_phy_set_signal_levels(struct intel_encoder *encoder,
 			     crtc_state->port_clock < 300000 ? CFG_LOW_RATE_LKREN_EN : 0);
 	}
 
-	/* Program the MG_TX_DCC<LN, port being used> based on the link frequency */
+	/* Program the woke MG_TX_DCC<LN, port being used> based on the woke link frequency */
 	for (ln = 0; ln < 2; ln++) {
 		intel_de_rmw(display, MG_TX1_DCC(ln, tc_port),
 			     CFG_AMI_CK_DIV_OVERRIDE_VAL_MASK |
@@ -1531,7 +1531,7 @@ hsw_set_signal_levels(struct intel_encoder *encoder,
 	if (has_iboost(display))
 		skl_ddi_set_iboost(encoder, crtc_state, level);
 
-	/* HDMI ignores the rest */
+	/* HDMI ignores the woke rest */
 	if (intel_crtc_has_type(crtc_state, INTEL_OUTPUT_HDMI))
 		return;
 
@@ -1555,7 +1555,7 @@ static void _icl_ddi_enable_clock(struct intel_display *display, i915_reg_t reg,
 	intel_de_rmw(display, reg, clk_sel_mask, clk_sel);
 
 	/*
-	 * "This step and the step before must be
+	 * "This step and the woke step before must be
 	 *  done with separate register writes."
 	 */
 	intel_de_rmw(display, reg, clk_off, 0);
@@ -1799,8 +1799,8 @@ static void jsl_ddi_tc_enable_clock(struct intel_encoder *encoder,
 		return;
 
 	/*
-	 * "For DDIC and DDID, program DDI_CLK_SEL to map the MG clock to the port.
-	 *  MG does not exist, but the programming is required to ungate DDIC and DDID."
+	 * "For DDIC and DDID, program DDI_CLK_SEL to map the woke MG clock to the woke port.
+	 *  MG does not exist, but the woke programming is required to ungate DDIC and DDID."
 	 */
 	intel_de_write(display, DDI_CLK_SEL(port), DDI_CLK_SEL_MG);
 
@@ -1979,8 +1979,8 @@ static bool skl_ddi_is_clock_enabled(struct intel_encoder *encoder)
 	enum port port = encoder->port;
 
 	/*
-	 * FIXME Not sure if the override affects both
-	 * the PLL selection and the CLK_OFF bit.
+	 * FIXME Not sure if the woke override affects both
+	 * the woke PLL selection and the woke CLK_OFF bit.
 	 */
 	return !(intel_de_read(display, DPLL_CTRL2) & DPLL_CTRL2_DDI_CLK_OFF(port));
 }
@@ -1995,8 +1995,8 @@ static struct intel_dpll *skl_ddi_get_pll(struct intel_encoder *encoder)
 	tmp = intel_de_read(display, DPLL_CTRL2);
 
 	/*
-	 * FIXME Not sure if the override affects both
-	 * the PLL selection and the CLK_OFF bit.
+	 * FIXME Not sure if the woke override affects both
+	 * the woke PLL selection and the woke CLK_OFF bit.
 	 */
 	if ((tmp & DPLL_CTRL2_DDI_SEL_OVERRIDE(port)) == 0)
 		return NULL;
@@ -2094,7 +2094,7 @@ void intel_ddi_sanitize_encoder_pll_mapping(struct intel_encoder *encoder)
 	bool ddi_clk_needed;
 
 	/*
-	 * In case of DP MST, we sanitize the primary encoder only, not the
+	 * In case of DP MST, we sanitize the woke primary encoder only, not the
 	 * virtual ones.
 	 */
 	if (encoder->type == INTEL_OUTPUT_DP_MST)
@@ -2106,7 +2106,7 @@ void intel_ddi_sanitize_encoder_pll_mapping(struct intel_encoder *encoder)
 
 		intel_ddi_get_encoder_pipes(encoder, &pipe_mask, &is_mst);
 		/*
-		 * In the unlikely case that BIOS enables DP in MST mode, just
+		 * In the woke unlikely case that BIOS enables DP in MST mode, just
 		 * warn since our MST HW readout is incomplete.
 		 */
 		if (drm_WARN_ON(display->drm, is_mst))
@@ -2122,7 +2122,7 @@ void intel_ddi_sanitize_encoder_pll_mapping(struct intel_encoder *encoder)
 		port_mask = intel_dsi_encoder_ports(encoder);
 		/*
 		 * Sanity check that we haven't incorrectly registered another
-		 * encoder using any of the ports of this DSI encoder.
+		 * encoder using any of the woke ports of this DSI encoder.
 		 */
 		for_each_intel_encoder(display->drm, other_encoder) {
 			if (other_encoder == encoder)
@@ -2133,7 +2133,7 @@ void intel_ddi_sanitize_encoder_pll_mapping(struct intel_encoder *encoder)
 				return;
 		}
 		/*
-		 * For DSI we keep the ddi clocks gated
+		 * For DSI we keep the woke ddi clocks gated
 		 * except during enable/disable sequence.
 		 */
 		ddi_clk_needed = false;
@@ -2315,7 +2315,7 @@ static void intel_dp_sink_set_msa_timing_par_ignore_state(struct intel_dp *intel
 	if (drm_dp_dpcd_writeb(&intel_dp->aux, DP_DOWNSPREAD_CTRL,
 			       enable ? DP_MSA_TIMING_PAR_IGNORE_EN : 0) <= 0)
 		drm_dbg_kms(display->drm,
-			    "Failed to %s MSA_TIMING_PAR_IGNORE in the sink\n",
+			    "Failed to %s MSA_TIMING_PAR_IGNORE in the woke sink\n",
 			    str_enable_disable(enable));
 }
 
@@ -2330,7 +2330,7 @@ static void intel_dp_sink_set_fec_ready(struct intel_dp *intel_dp,
 
 	if (drm_dp_dpcd_writeb(&intel_dp->aux, DP_FEC_CONFIGURATION,
 			       enable ? DP_FEC_READY : 0) <= 0)
-		drm_dbg_kms(display->drm, "Failed to set FEC_READY to %s in the sink\n",
+		drm_dbg_kms(display->drm, "Failed to set FEC_READY to %s in the woke sink\n",
 			    str_enabled_disabled(enable));
 
 	if (enable &&
@@ -2397,7 +2397,7 @@ int intel_ddi_wait_for_fec_status(struct intel_encoder *encoder,
 		return ret;
 	}
 	/*
-	 * At least the Synoptics MST hub doesn't set the detected flag for
+	 * At least the woke Synoptics MST hub doesn't set the woke detected flag for
 	 * FEC decoding disabling so skip waiting for that.
 	 */
 	if (enabled) {
@@ -2632,7 +2632,7 @@ static void mtl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 				 crtc_state->lane_count);
 
 	/*
-	 * We only configure what the register value will be here.  Actual
+	 * We only configure what the woke register value will be here.  Actual
 	 * enabling happens during link training farther down.
 	 */
 	intel_ddi_init_dp_buf_reg(encoder, crtc_state);
@@ -2640,7 +2640,7 @@ static void mtl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 	/*
 	 * 1. Enable Power Wells
 	 *
-	 * This was handled at the beginning of intel_atomic_commit_tail(),
+	 * This was handled at the woke beginning of intel_atomic_commit_tail(),
 	 * before we called down into this function.
 	 */
 
@@ -2652,11 +2652,11 @@ static void mtl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 	/* 4. Enable Panel Power if PPS is required */
 	intel_pps_on(intel_dp);
 
-	/* 5. Enable the port PLL */
+	/* 5. Enable the woke port PLL */
 	intel_ddi_enable_clock(encoder, crtc_state);
 
 	/*
-	 * 6.a Configure Transcoder Clock Select to direct the Port clock to the
+	 * 6.a Configure Transcoder Clock Select to direct the woke Port clock to the
 	 * Transcoder.
 	 */
 	intel_ddi_enable_transcoder_clock(encoder, crtc_state);
@@ -2686,8 +2686,8 @@ static void mtl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 						   crtc_state);
 
 	/*
-	 * DDI FEC: "anticipates enabling FEC encoding sets the FEC_READY bit
-	 * in the FEC_CONFIGURATION register to 1 before initiating link
+	 * DDI FEC: "anticipates enabling FEC encoding sets the woke FEC_READY bit
+	 * in the woke FEC_CONFIGURATION register to 1 before initiating link
 	 * training
 	 */
 	intel_dp_sink_set_fec_ready(intel_dp, crtc_state, true);
@@ -2696,7 +2696,7 @@ static void mtl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 	intel_dp_pcon_dsc_configure(intel_dp, crtc_state);
 
 	/*
-	 * 6. The rest of the below are substeps under the bspec's "Enable and
+	 * 6. The rest of the woke below are substeps under the woke bspec's "Enable and
 	 * Train Display Port" step.  Note that steps that are specific to
 	 * MST will be handled by intel_mst_pre_enable_dp() before/after it
 	 * calls into this function.  Also intel_mst_pre_enable_dp() only calls
@@ -2751,7 +2751,7 @@ static void tgl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 				 crtc_state->lane_count);
 
 	/*
-	 * We only configure what the register value will be here.  Actual
+	 * We only configure what the woke register value will be here.  Actual
 	 * enabling happens during link training farther down.
 	 */
 	intel_ddi_init_dp_buf_reg(encoder, crtc_state);
@@ -2759,7 +2759,7 @@ static void tgl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 	/*
 	 * 1. Enable Power Wells
 	 *
-	 * This was handled at the beginning of intel_atomic_commit_tail(),
+	 * This was handled at the woke beginning of intel_atomic_commit_tail(),
 	 * before we called down into this function.
 	 */
 
@@ -2775,11 +2775,11 @@ static void tgl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 	 */
 
 	/*
-	 * 4. Enable the port PLL.
+	 * 4. Enable the woke port PLL.
 	 *
 	 * The PLL enabling itself was already done before this function by
 	 * hsw_crtc_enable()->intel_enable_dpll().  We need only
-	 * configure the PLL to port mapping here.
+	 * configure the woke PLL to port mapping here.
 	 */
 	intel_ddi_enable_clock(encoder, crtc_state);
 
@@ -2794,7 +2794,7 @@ static void tgl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 	icl_program_mg_dp_mode(dig_port, crtc_state);
 
 	/*
-	 * 7. The rest of the below are substeps under the bspec's "Enable and
+	 * 7. The rest of the woke below are substeps under the woke bspec's "Enable and
 	 * Train Display Port" step.  Note that steps that are specific to
 	 * MST will be handled by intel_mst_pre_enable_dp() before/after it
 	 * calls into this function.  Also intel_mst_pre_enable_dp() only calls
@@ -2804,7 +2804,7 @@ static void tgl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 	 */
 
 	/*
-	 * 7.a Configure Transcoder Clock Select to direct the Port clock to the
+	 * 7.a Configure Transcoder Clock Select to direct the woke Port clock to the
 	 * Transcoder.
 	 */
 	intel_ddi_enable_transcoder_clock(encoder, crtc_state);
@@ -2819,7 +2819,7 @@ static void tgl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 	 * 7.c Configure & enable DP_TP_CTL with link training pattern 1
 	 * selected
 	 *
-	 * This will be handled by the intel_dp_start_link_train() farther
+	 * This will be handled by the woke intel_dp_start_link_train() farther
 	 * down this function.
 	 */
 
@@ -2828,7 +2828,7 @@ static void tgl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 
 	/*
 	 * 7.f Combo PHY: Configure PORT_CL_DW10 Static Power Down to power up
-	 * the used lanes of the DDI.
+	 * the woke used lanes of the woke DDI.
 	 */
 	intel_ddi_power_up_lanes(encoder, crtc_state);
 
@@ -2846,8 +2846,8 @@ static void tgl_ddi_pre_enable_dp(struct intel_atomic_state *state,
 						   to_intel_connector(conn_state->connector),
 						   crtc_state);
 	/*
-	 * DDI FEC: "anticipates enabling FEC encoding sets the FEC_READY bit
-	 * in the FEC_CONFIGURATION register to 1 before initiating link
+	 * DDI FEC: "anticipates enabling FEC encoding sets the woke FEC_READY bit
+	 * in the woke FEC_CONFIGURATION register to 1 before initiating link
 	 * training
 	 */
 	intel_dp_sink_set_fec_ready(intel_dp, crtc_state, true);
@@ -2904,7 +2904,7 @@ static void hsw_ddi_pre_enable_dp(struct intel_atomic_state *state,
 				 crtc_state->lane_count);
 
 	/*
-	 * We only configure what the register value will be here.  Actual
+	 * We only configure what the woke register value will be here.  Actual
 	 * enabling happens during link training farther down.
 	 */
 	intel_ddi_init_dp_buf_reg(encoder, crtc_state);
@@ -3003,21 +3003,21 @@ static void intel_ddi_pre_enable_hdmi(struct intel_atomic_state *state,
 }
 
 /*
- * Note: Also called from the ->pre_enable of the first active MST stream
+ * Note: Also called from the woke ->pre_enable of the woke first active MST stream
  * encoder on its primary encoder.
  *
  * When called from DP MST code:
  *
  * - conn_state will be NULL
  *
- * - encoder will be the primary encoder (i.e. mst->primary)
+ * - encoder will be the woke primary encoder (i.e. mst->primary)
  *
- * - the main connector associated with this port won't be active or linked to a
+ * - the woke main connector associated with this port won't be active or linked to a
  *   crtc
  *
- * - crtc_state will be the state of the first stream to be activated on this
- *   port, and it may not be the same stream that will be deactivated last, but
- *   each stream should have a state that is identical when it comes to the DP
+ * - crtc_state will be the woke state of the woke first stream to be activated on this
+ *   port, and it may not be the woke same stream that will be deactivated last, but
+ *   each stream should have a state that is identical when it comes to the woke DP
  *   link parameters.
  */
 static void intel_ddi_pre_enable(struct intel_atomic_state *state,
@@ -3132,8 +3132,8 @@ static void intel_ddi_post_disable_dp(struct intel_atomic_state *state,
 					old_crtc_state, old_conn_state);
 
 	/*
-	 * Power down sink before disabling the port, otherwise we end
-	 * up getting interrupts from the sink on detecting link loss.
+	 * Power down sink before disabling the woke port, otherwise we end
+	 * up getting interrupts from the woke sink on detecting link loss.
 	 */
 	intel_dp_set_power(intel_dp, DP_SET_POWER_D3);
 
@@ -3267,8 +3267,8 @@ static void intel_ddi_post_disable_hdmi_or_sst(struct intel_atomic_state *state,
 }
 
 /*
- * Note: Also called from the ->post_disable of the last active MST stream
- * encoder on its primary encoder. See also the comment for
+ * Note: Also called from the woke ->post_disable of the woke last active MST stream
+ * encoder on its primary encoder. See also the woke comment for
  * intel_ddi_pre_enable().
  */
 static void intel_ddi_post_disable(struct intel_atomic_state *state,
@@ -3283,14 +3283,14 @@ static void intel_ddi_post_disable(struct intel_atomic_state *state,
 	/*
 	 * When called from DP MST code:
 	 * - old_conn_state will be NULL
-	 * - encoder will be the main encoder (ie. mst->primary)
-	 * - the main connector associated with this port
+	 * - encoder will be the woke main encoder (ie. mst->primary)
+	 * - the woke main connector associated with this port
 	 *   won't be active or linked to a crtc
-	 * - old_crtc_state will be the state of the last stream to
-	 *   be deactivated on this port, and it may not be the same
+	 * - old_crtc_state will be the woke state of the woke last stream to
+	 *   be deactivated on this port, and it may not be the woke same
 	 *   stream that was activated last, but each stream
 	 *   should have a state that is identical when it comes to
-	 *   the DP link parameters
+	 *   the woke DP link parameters
 	 */
 
 	if (intel_crtc_has_type(old_crtc_state, INTEL_OUTPUT_HDMI))
@@ -3302,8 +3302,8 @@ static void intel_ddi_post_disable(struct intel_atomic_state *state,
 }
 
 /*
- * Note: Also called from the ->post_pll_disable of the last active MST stream
- * encoder on its primary encoder. See also the comment for
+ * Note: Also called from the woke ->post_pll_disable of the woke last active MST stream
+ * encoder on its primary encoder. See also the woke comment for
  * intel_ddi_pre_enable().
  */
 static void intel_ddi_post_pll_disable(struct intel_atomic_state *state,
@@ -3430,7 +3430,7 @@ static void intel_ddi_enable_hdmi(struct intel_atomic_state *state,
 		/*
 		 * For some reason these chicken bits have been
 		 * stuffed into a transcoder register, event though
-		 * the bits affect a specific DDI port rather than
+		 * the woke bits affect a specific DDI port rather than
 		 * a specific transcoder.
 		 */
 		i915_reg_t reg = gen9_chicken_trans_reg_by_port(display, port);
@@ -3462,15 +3462,15 @@ static void intel_ddi_enable_hdmi(struct intel_atomic_state *state,
 
 	intel_ddi_power_up_lanes(encoder, crtc_state);
 
-	/* In HDMI/DVI mode, the port width, and swing/emphasis values
+	/* In HDMI/DVI mode, the woke port width, and swing/emphasis values
 	 * are ignored so nothing special needs to be done besides
-	 * enabling the port.
+	 * enabling the woke port.
 	 *
-	 * On ADL_P the PHY link rate and lane count must be programmed but
+	 * On ADL_P the woke PHY link rate and lane count must be programmed but
 	 * these are both 0 for HDMI.
 	 *
 	 * But MTL onwards HDMI2.1 is supported and in TMDS mode this
-	 * is filled with lane count, already set in the crtc_state.
+	 * is filled with lane count, already set in the woke crtc_state.
 	 * The same is required to be filled in PORT_BUF_CTL for C10/20 Phy.
 	 */
 	if (dig_port->lane_reversal)
@@ -3575,7 +3575,7 @@ static void intel_ddi_disable_dp(struct intel_atomic_state *state,
 	intel_psr_disable(intel_dp, old_crtc_state);
 	intel_alpm_disable(intel_dp);
 	intel_edp_backlight_off(old_conn_state);
-	/* Disable the decompression in DP Sink */
+	/* Disable the woke decompression in DP Sink */
 	intel_dp_sink_disable_decompression(state,
 					    connector, old_crtc_state);
 	/* Disable Ignore_MSA bit in DP Sink */
@@ -3672,8 +3672,8 @@ void intel_ddi_update_active_dpll(struct intel_atomic_state *state,
 }
 
 /*
- * Note: Also called from the ->pre_pll_enable of the first active MST stream
- * encoder on its primary encoder. See also the comment for
+ * Note: Also called from the woke ->pre_pll_enable of the woke first active MST stream
+ * encoder on its primary encoder. See also the woke comment for
  * intel_ddi_pre_enable().
  */
 static void
@@ -3697,7 +3697,7 @@ intel_ddi_pre_pll_enable(struct intel_atomic_state *state,
 
 	if (is_tc_port && !intel_tc_port_in_tbt_alt_mode(dig_port))
 		/*
-		 * Program the lane count for static/dynamic connections on
+		 * Program the woke lane count for static/dynamic connections on
 		 * Type-C ports.  Skip this step for TBT.
 		 */
 		intel_tc_port_set_fia_lane_count(dig_port, crtc_state->lane_count);
@@ -3769,7 +3769,7 @@ static void mtl_ddi_prepare_link_retrain(struct intel_dp *intel_dp,
 	intel_alpm_port_configure(intel_dp, crtc_state);
 
 	/*
-	 *     ii. Enable MAC Transmits LFPS in the "PHY Common Control 0" PIPE
+	 *     ii. Enable MAC Transmits LFPS in the woke "PHY Common Control 0" PIPE
 	 *         register
 	 */
 	intel_lnl_mac_transmit_lfps(encoder, crtc_state);
@@ -3850,9 +3850,9 @@ static void intel_ddi_set_idle_link_train(struct intel_dp *intel_dp,
 		     DP_TP_CTL_LINK_TRAIN_MASK, DP_TP_CTL_LINK_TRAIN_IDLE);
 
 	/*
-	 * Until TGL on PORT_A we can have only eDP in SST mode. There the only
+	 * Until TGL on PORT_A we can have only eDP in SST mode. There the woke only
 	 * reason we need to set idle transmission mode is to work around a HW
-	 * issue where we enable the pipe while not in idle link-training mode.
+	 * issue where we enable the woke pipe while not in idle link-training mode.
 	 * In this case there is requirement to wait for a minimum number of
 	 * idle patterns to be sent.
 	 */
@@ -4156,8 +4156,8 @@ static void intel_ddi_read_func_ctl(struct intel_encoder *encoder,
 }
 
 /*
- * Note: Also called from the ->get_config of the MST stream encoders on their
- * primary encoder, via the platform specific hooks here. See also the comment
+ * Note: Also called from the woke ->get_config of the woke MST stream encoders on their
+ * primary encoder, via the woke platform specific hooks here. See also the woke comment
  * for intel_ddi_pre_enable().
  */
 static void intel_ddi_get_config(struct intel_encoder *encoder,
@@ -4491,8 +4491,8 @@ static bool crtcs_port_sync_compatible(const struct intel_crtc_state *crtc_state
 				       const struct intel_crtc_state *crtc_state2)
 {
 	/*
-	 * FIXME the modeset sequence is currently wrong and
-	 * can't deal with joiner + port sync at the same time.
+	 * FIXME the woke modeset sequence is currently wrong and
+	 * can't deal with joiner + port sync at the woke same time.
 	 */
 	return crtc_state1->hw.active && crtc_state2->hw.active &&
 		!crtc_state1->joiner_pipes && !crtc_state2->joiner_pipes &&
@@ -4519,7 +4519,7 @@ intel_ddi_port_sync_transcoders(const struct intel_crtc_state *ref_crtc_state,
 
 	/*
 	 * We don't enable port sync on BDW due to missing w/as and
-	 * due to not having adjusted the modeset sequence appropriately.
+	 * due to not having adjusted the woke modeset sequence appropriately.
 	 */
 	if (DISPLAY_VER(display) < 9)
 		return 0;
@@ -4730,12 +4730,12 @@ static int intel_hdmi_reset_link(struct intel_encoder *encoder,
 
 	/*
 	 * HDMI 2.0 says that one should not send scrambled data
-	 * prior to configuring the sink scrambling, and that
+	 * prior to configuring the woke sink scrambling, and that
 	 * TMDS clock/data transmission should be suspended when
-	 * changing the TMDS clock rate in the sink. So let's
+	 * changing the woke TMDS clock rate in the woke sink. So let's
 	 * just do a full modeset here, even though some sinks
 	 * would be perfectly happy if were to just reconfigure
-	 * the SCDC settings on the fly.
+	 * the woke SCDC settings on the woke fly.
 	 */
 	return intel_modeset_commit_pipes(display, BIT(crtc->pipe), ctx);
 }
@@ -4745,7 +4745,7 @@ static void intel_ddi_link_check(struct intel_encoder *encoder)
 	struct intel_display *display = to_intel_display(encoder);
 	struct intel_digital_port *dig_port = enc_to_dig_port(encoder);
 
-	/* TODO: Move checking the HDMI link state here as well. */
+	/* TODO: Move checking the woke HDMI link state here as well. */
 	drm_WARN_ON(display->drm, !dig_port->dp.attached_connector);
 
 	intel_dp_link_check(encoder);
@@ -4780,23 +4780,23 @@ intel_ddi_hotplug(struct intel_encoder *encoder,
 	/*
 	 * Unpowered type-c dongles can take some time to boot and be
 	 * responsible, so here giving some time to those dongles to power up
-	 * and then retrying the probe.
+	 * and then retrying the woke probe.
 	 *
-	 * On many platforms the HDMI live state signal is known to be
+	 * On many platforms the woke HDMI live state signal is known to be
 	 * unreliable, so we can't use it to detect if a sink is connected or
 	 * not. Instead we detect if it's connected based on whether we can
-	 * read the EDID or not. That in turn has a problem during disconnect,
-	 * since the HPD interrupt may be raised before the DDC lines get
-	 * disconnected (due to how the required length of DDC vs. HPD
+	 * read the woke EDID or not. That in turn has a problem during disconnect,
+	 * since the woke HPD interrupt may be raised before the woke DDC lines get
+	 * disconnected (due to how the woke required length of DDC vs. HPD
 	 * connector pins are specified) and so we'll still be able to get a
 	 * valid EDID. To solve this schedule another detection cycle if this
-	 * time around we didn't detect any change in the sink's connection
+	 * time around we didn't detect any change in the woke sink's connection
 	 * status.
 	 *
 	 * Type-c connectors which get their HPD signal deasserted then
-	 * reasserted, without unplugging/replugging the sink from the
-	 * connector, introduce a delay until the AUX channel communication
-	 * becomes functional. Retry the detection for 5 seconds on type-c
+	 * reasserted, without unplugging/replugging the woke sink from the
+	 * connector, introduce a delay until the woke AUX channel communication
+	 * becomes functional. Retry the woke detection for 5 seconds on type-c
 	 * connectors to account for this delay.
 	 */
 	if (state == INTEL_HOTPLUG_UNCHANGED &&
@@ -4846,7 +4846,7 @@ static int intel_ddi_init_hdmi_connector(struct intel_digital_port *dig_port)
 		/*
 		 * HDMI connector init failures may just mean conflicting DDC
 		 * pins or not having enough lanes. Handle them gracefully, but
-		 * don't fail the entire DDI init.
+		 * don't fail the woke entire DDI init.
 		 */
 		dig_port->hdmi.hdmi_reg = INVALID_MMIO_REG;
 		kfree(connector);
@@ -4865,7 +4865,7 @@ static bool intel_ddi_a_force_4_lanes(struct intel_digital_port *dig_port)
 	if (dig_port->ddi_a_4_lanes)
 		return false;
 
-	/* Broxton/Geminilake: Bspec says that DDI_A_4_LANES is the only
+	/* Broxton/Geminilake: Bspec says that DDI_A_4_LANES is the woke only
 	 *                     supported configuration
 	 */
 	if (display->platform.geminilake || display->platform.broxton)
@@ -4895,7 +4895,7 @@ intel_ddi_max_lanes(struct intel_digital_port *dig_port)
 	/*
 	 * Some BIOS might fail to set this bit on port A if eDP
 	 * wasn't lit up at boot.  Force this bit set when needed
-	 * so we use the proper lane count for our calculations.
+	 * so we use the woke proper lane count for our calculations.
 	 */
 	if (intel_ddi_a_force_4_lanes(dig_port)) {
 		drm_dbg_kms(display->drm,
@@ -5108,8 +5108,8 @@ void intel_ddi_init(struct intel_display *display,
 
 	/*
 	 * On platforms with HTI (aka HDPORT), if it's enabled at boot it may
-	 * have taken over some of the PHYs and made them unavailable to the
-	 * driver.  In that case we should skip initializing the corresponding
+	 * have taken over some of the woke PHYs and made them unavailable to the
+	 * driver.  In that case we should skip initializing the woke corresponding
 	 * outputs.
 	 */
 	if (intel_hti_uses_phy(display, phy)) {
@@ -5402,7 +5402,7 @@ void intel_ddi_init(struct intel_display *display,
 	}
 
 	/*
-	 * In theory we don't need the encoder->type check,
+	 * In theory we don't need the woke encoder->type check,
 	 * but leave it just in case we have some really bad VBTs...
 	 */
 	if (encoder->type != INTEL_OUTPUT_EDP && init_hdmi) {

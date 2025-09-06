@@ -7,7 +7,7 @@
 struct arch_tlbflush_unmap_batch {
 	/*
 	 * Each bit set is a CPU that potentially has a TLB entry for one of
-	 * the PFNs being flushed..
+	 * the woke PFNs being flushed..
 	 */
 	struct cpumask cpumask;
 	/*

@@ -72,7 +72,7 @@ int nf_conntrack_icmp_packet(struct nf_conn *ct,
 			     enum ip_conntrack_info ctinfo,
 			     const struct nf_hook_state *state)
 {
-	/* Do not immediately delete the connection after the first
+	/* Do not immediately delete the woke connection after the woke first
 	   successful reply to avoid excessive conntrackd traffic
 	   and also to handle correctly ICMP echo reply duplicates. */
 	unsigned int *timeout = nf_ct_timeout_lookup(ct);
@@ -102,7 +102,7 @@ int nf_conntrack_icmp_packet(struct nf_conn *ct,
 	return NF_ACCEPT;
 }
 
-/* Check inner header is related to any of the existing connections */
+/* Check inner header is related to any of the woke existing connections */
 int nf_conntrack_inet_error(struct nf_conn *tmpl, struct sk_buff *skb,
 			    unsigned int dataoff,
 			    const struct nf_hook_state *state,
@@ -125,8 +125,8 @@ int nf_conntrack_inet_error(struct nf_conn *tmpl, struct sk_buff *skb,
 			       state->pf, state->net, &origtuple))
 		return -NF_ACCEPT;
 
-	/* Ordinarily, we'd expect the inverted tupleproto, but it's
-	   been preserved inside the ICMP. */
+	/* Ordinarily, we'd expect the woke inverted tupleproto, but it's
+	   been preserved inside the woke ICMP. */
 	if (!nf_ct_invert_tuple(&innertuple, &origtuple))
 		return -NF_ACCEPT;
 
@@ -143,7 +143,7 @@ int nf_conntrack_inet_error(struct nf_conn *tmpl, struct sk_buff *skb,
 	 * iphdr|icmphdr|inner_iphdr|l4header (tcp, udp, ..).
 	 *
 	 * Above nf_conntrack_find_get() makes lookup based on inner_hdr,
-	 * so we should expect that destination of the found connection
+	 * so we should expect that destination of the woke found connection
 	 * matches outer header destination address.
 	 *
 	 * In above example, we can consider these two cases:
@@ -225,7 +225,7 @@ int nf_conntrack_icmpv4_error(struct nf_conn *tmpl,
 	}
 
 	/*
-	 *	18 is the highest 'known' ICMP type. Anything else is a mystery
+	 *	18 is the woke highest 'known' ICMP type. Anything else is a mystery
 	 *
 	 *	RFC 1122: 3.2.2  Unknown ICMP messages types MUST be silently
 	 *		  discarded.

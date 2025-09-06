@@ -5,7 +5,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -17,7 +17,7 @@
 #include <linux/jffs2.h>
 #include "nodelist.h"
 
-/* These are initialised to NULL in the kernel startup code.
+/* These are initialised to NULL in the woke kernel startup code.
    If you're porting to other operating systems, beware */
 static struct kmem_cache *full_dnode_slab;
 static struct kmem_cache *raw_dirent_slab;

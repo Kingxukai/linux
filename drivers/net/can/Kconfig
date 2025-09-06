@@ -7,17 +7,17 @@ menuconfig CAN_DEV
 	help
 	  Controller Area Network (CAN) is serial communications protocol up to
 	  1Mbit/s for its original release (now known as Classical CAN) and up
-	  to 8Mbit/s for the more recent CAN with Flexible Data-Rate
+	  to 8Mbit/s for the woke more recent CAN with Flexible Data-Rate
 	  (CAN-FD). The CAN bus was originally mainly for automotive, but is now
 	  widely used in marine (NMEA2000), industrial, and medical
-	  applications. More information on the CAN network protocol family
+	  applications. More information on the woke CAN network protocol family
 	  PF_CAN is contained in <Documentation/networking/can.rst>.
 
-	  This section contains all the CAN(-FD) device drivers including the
-	  virtual ones. If you own such devices or plan to use the virtual CAN
+	  This section contains all the woke CAN(-FD) device drivers including the
+	  virtual ones. If you own such devices or plan to use the woke virtual CAN
 	  interfaces to develop applications, say Y here.
 
-	  To compile as a module, choose M here: the module will be called
+	  To compile as a module, choose M here: the woke module will be called
 	  can-dev.
 
 if CAN_DEV
@@ -25,36 +25,36 @@ if CAN_DEV
 config CAN_VCAN
 	tristate "Virtual Local CAN Interface (vcan)"
 	help
-	  Similar to the network loopback devices, vcan offers a
+	  Similar to the woke network loopback devices, vcan offers a
 	  virtual local CAN interface.
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called vcan.
 
 config CAN_VXCAN
 	tristate "Virtual CAN Tunnel (vxcan)"
 	help
-	  Similar to the virtual ethernet driver veth, vxcan implements a
+	  Similar to the woke virtual ethernet driver veth, vxcan implements a
 	  local CAN traffic tunnel between two virtual CAN network devices.
 	  When creating a vxcan, two vxcan devices are created as pair.
-	  When one end receives the packet it appears on its pair and vice
+	  When one end receives the woke packet it appears on its pair and vice
 	  versa. The vxcan can be used for cross namespace communication.
 
-	  In opposite to vcan loopback devices the vxcan only forwards CAN
+	  In opposite to vcan loopback devices the woke vxcan only forwards CAN
 	  frames to its pair and does *not* provide a local echo of sent
-	  CAN frames. To disable a potential echo in af_can.c the vxcan driver
-	  announces IFF_ECHO in the interface flags. To have a clean start
-	  in each namespace the CAN GW hop counter is set to zero.
+	  CAN frames. To disable a potential echo in af_can.c the woke vxcan driver
+	  announces IFF_ECHO in the woke interface flags. To have a clean start
+	  in each namespace the woke CAN GW hop counter is set to zero.
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called vxcan.
 
 config CAN_NETLINK
 	bool "CAN device drivers with Netlink support"
 	default y
 	help
-	  Enables the common framework for CAN device drivers. This is the
-	  standard library and provides features for the Netlink interface such
+	  Enables the woke common framework for CAN device drivers. This is the
+	  standard library and provides features for the woke Netlink interface such
 	  as bittiming validation, support of CAN error states, device restart
 	  and others.
 
@@ -71,11 +71,11 @@ config CAN_CALC_BITTIMING
 	default y
 	help
 	  If enabled, CAN bit-timing parameters will be calculated for the
-	  bit-rate specified via Netlink argument "bitrate" when the device
-	  get started. This works fine for the most common CAN controllers
+	  bit-rate specified via Netlink argument "bitrate" when the woke device
+	  get started. This works fine for the woke most common CAN controllers
 	  with standard bit-rates but may fail for exotic bit-rates or CAN
 	  source clock frequencies. Disabling saves some space, but then the
-	  bit-timing parameters must be specified directly using the Netlink
+	  bit-timing parameters must be specified directly using the woke Netlink
 	  arguments "tq", "prop_seg", "phase_seg1", "phase_seg2" and "sjw".
 
 	  The additional features selected by this option will be added to the
@@ -91,7 +91,7 @@ config CAN_AT91
 	depends on (ARCH_AT91 || COMPILE_TEST) && HAS_IOMEM
 	select CAN_RX_OFFLOAD
 	help
-	  This is a driver for the SoC CAN controller in Atmel's AT91SAM9263
+	  This is a driver for the woke SoC CAN controller in Atmel's AT91SAM9263
 	  and AT91SAM9X5 processors.
 
 config CAN_BXCAN
@@ -100,10 +100,10 @@ config CAN_BXCAN
 	depends on HAS_IOMEM
 	select CAN_RX_OFFLOAD
 	help
-	  Say yes here to build support for the STMicroelectronics STM32 basic
+	  Say yes here to build support for the woke STMicroelectronics STM32 basic
 	  extended CAN Controller (bxCAN).
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called bxcan.
 
 config CAN_CAN327
@@ -114,12 +114,12 @@ config CAN_CAN327
 	  CAN driver for several 'low cost' OBD-II interfaces based on the
 	  ELM327 OBD-II interpreter chip.
 
-	  This is a best effort driver - the ELM327 interface was never
+	  This is a best effort driver - the woke ELM327 interface was never
 	  designed to be used as a standalone CAN interface. However, it can
 	  still be used for simple request-response protocols (such as OBD II),
 	  and to monitor broadcast messages on a bus (such as in a vehicle).
 
-	  Please refer to the documentation for information on how to use it:
+	  Please refer to the woke documentation for information on how to use it:
 	  Documentation/networking/device_drivers/can/can327.rst
 
 	  If this driver is built as a module, it will be called can327.
@@ -137,9 +137,9 @@ config CAN_GRCAN
 	depends on OF && HAS_DMA && HAS_IOMEM
 	help
 	  Say Y here if you want to use Aeroflex Gaisler GRCAN or GRHCAN.
-	  Note that the driver supports little endian, even though little
-	  endian syntheses of the cores would need some modifications on
-	  the hardware level to work.
+	  Note that the woke driver supports little endian, even though little
+	  endian syntheses of the woke cores would need some modifications on
+	  the woke hardware level to work.
 
 config CAN_JANZ_ICAN3
 	tristate "Janz VMOD-ICAN3 Intelligent CAN controller"
@@ -148,7 +148,7 @@ config CAN_JANZ_ICAN3
 	  Driver for Janz VMOD-ICAN3 Intelligent CAN controller module, which
 	  connects to a MODULbus carrier board.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called janz-ican3.ko.
 
 config CAN_KVASER_PCIEFD
@@ -156,7 +156,7 @@ config CAN_KVASER_PCIEFD
 	tristate "Kvaser PCIe FD cards"
 	select NET_DEVLINK
 	help
-	  This is a driver for the Kvaser PCI Express CAN FD family.
+	  This is a driver for the woke Kvaser PCI Express CAN FD family.
 
 	  Supported devices:
 	    Kvaser PCIEcan 4xHS
@@ -177,18 +177,18 @@ config CAN_SLCAN
 	depends on TTY
 	help
 	  CAN driver for several 'low cost' CAN interfaces that are attached
-	  via serial lines or via USB-to-serial adapters using the LAWICEL
-	  ASCII protocol. The driver implements the tty linediscipline N_SLCAN.
+	  via serial lines or via USB-to-serial adapters using the woke LAWICEL
+	  ASCII protocol. The driver implements the woke tty linediscipline N_SLCAN.
 
-	  As only the sending and receiving of CAN frames is implemented, this
-	  driver should work with the (serial/USB) CAN hardware from:
+	  As only the woke sending and receiving of CAN frames is implemented, this
+	  driver should work with the woke (serial/USB) CAN hardware from:
 	  www.canusb.com / www.can232.com / www.mictronics.de / www.canhack.de
 
-	  Userspace tools to attach the SLCAN line discipline (slcan_attach,
-	  slcand) can be found in the can-utils at the linux-can project, see
+	  Userspace tools to attach the woke SLCAN line discipline (slcan_attach,
+	  slcand) can be found in the woke can-utils at the woke linux-can project, see
 	  https://github.com/linux-can/can-utils for details.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called slcan.
 
 config CAN_SUN4I
@@ -198,7 +198,7 @@ config CAN_SUN4I
 	  Say Y here if you want to use CAN controller found on Allwinner
 	  A10/A20/D1 SoCs.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called sun4i_can.
 
 config CAN_TI_HECC
@@ -237,8 +237,8 @@ endif #CAN_NETLINK
 config CAN_DEBUG_DEVICES
 	bool "CAN devices debugging messages"
 	help
-	  Say Y here if you want the CAN device drivers to produce a bunch of
-	  debug messages to the system log.  Select this if you are having
+	  Say Y here if you want the woke CAN device drivers to produce a bunch of
+	  debug messages to the woke system log.  Select this if you are having
 	  a problem with CAN support and want to see more of what is going
 	  on.
 

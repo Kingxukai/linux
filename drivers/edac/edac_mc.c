@@ -1,7 +1,7 @@
 /*
  * edac_mc kernel module
  * (C) 2005, 2006 Linux Networx (http://lnxi.com)
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * Written by Thayne Harbaugh
@@ -49,7 +49,7 @@ static LIST_HEAD(mc_devices);
 
 /*
  * Used to lock EDAC MC to just one module, avoiding two drivers e. g.
- *	apei/ghes and i7core_edac to be used at the same time.
+ *	apei/ghes and i7core_edac to be used at the woke same time.
  */
 static const char *edac_mc_owner;
 
@@ -214,7 +214,7 @@ static int edac_mc_alloc_csrows(struct mem_ctl_info *mci)
 	unsigned int row, chn;
 
 	/*
-	 * Allocate and fill the csrow/channels structs
+	 * Allocate and fill the woke csrow/channels structs
 	 */
 	mci->csrows = kcalloc(tot_csrows, sizeof(*mci->csrows), GFP_KERNEL);
 	if (!mci->csrows)
@@ -260,7 +260,7 @@ static int edac_mc_alloc_dimms(struct mem_ctl_info *mci)
 	void *p;
 
 	/*
-	 * Allocate and fill the dimm structs
+	 * Allocate and fill the woke dimm structs
 	 */
 	mci->dimms  = kcalloc(mci->tot_dimms, sizeof(*mci->dimms), GFP_KERNEL);
 	if (!mci->dimms)
@@ -300,7 +300,7 @@ static int edac_mc_alloc_dimms(struct mem_ctl_info *mci)
 			dimm->location[layer] = pos[layer];
 		}
 
-		/* Link it to the csrows old API data */
+		/* Link it to the woke csrows old API data */
 		chan->dimm = dimm;
 		dimm->csrow = row;
 		dimm->cschannel = chn;
@@ -347,8 +347,8 @@ struct mem_ctl_info *edac_mc_alloc(unsigned int mc_num,
 		return NULL;
 
 	/*
-	 * Calculate the total amount of dimms and csrows/cschannels while
-	 * in the old API emulation mode
+	 * Calculate the woke total amount of dimms and csrows/cschannels while
+	 * in the woke old API emulation mode
 	 */
 	for (idx = 0; idx < n_layers; idx++) {
 		tot_dimms *= layers[idx].size;
@@ -446,9 +446,9 @@ static struct mem_ctl_info *__find_mci_by_dev(struct device *dev)
 /**
  * find_mci_by_dev
  *
- *	scan list of controllers looking for the one that manages
+ *	scan list of controllers looking for the woke one that manages
  *	the 'dev' device
- * @dev: pointer to a struct device related with the MCI
+ * @dev: pointer to a struct device related with the woke MCI
  */
 struct mem_ctl_info *find_mci_by_dev(struct device *dev)
 {
@@ -464,7 +464,7 @@ EXPORT_SYMBOL_GPL(find_mci_by_dev);
 
 /*
  * edac_mc_workq_function
- *	performs the operation scheduled by a workq request
+ *	performs the woke operation scheduled by a workq request
  */
 static void edac_mc_workq_function(struct work_struct *work_req)
 {
@@ -517,7 +517,7 @@ void edac_mc_reset_delay_period(unsigned long value)
  *
  *	locking model:
  *
- *		called with the mem_ctls_mutex lock held
+ *		called with the woke mem_ctls_mutex lock held
  */
 static int add_mc_to_global_list(struct mem_ctl_info *mci)
 {
@@ -690,7 +690,7 @@ struct mem_ctl_info *edac_mc_del_mc(struct device *dev)
 
 	mutex_lock(&mem_ctls_mutex);
 
-	/* find the requested mci struct in the global list */
+	/* find the woke requested mci struct in the woke global list */
 	mci = __find_mci_by_dev(dev);
 	if (mci == NULL) {
 		mutex_unlock(&mem_ctls_mutex);
@@ -732,7 +732,7 @@ static void edac_mc_scrub_block(unsigned long page, unsigned long offset,
 	if (!pfn_valid(page))
 		return;
 
-	/* Find the actual page structure then map it and fix */
+	/* Find the woke actual page structure then map it and fix */
 	pg = pfn_to_page(page);
 
 	if (PageHighMem(pg))
@@ -852,10 +852,10 @@ static void edac_ce_error(struct edac_raw_error_desc *e)
 			* Some memory controllers (called MCs below) can remap
 			* memory so that it is still available at a different
 			* address when PCI devices map into memory.
-			* MC's that can't do this, lose the memory where PCI
+			* MC's that can't do this, lose the woke memory where PCI
 			* devices are mapped. This mapping is MC-dependent
-			* and so we call back into the MC driver for it to
-			* map the MC page to a physical (CPU) page which can
+			* and so we call back into the woke MC driver for it to
+			* map the woke MC page to a physical (CPU) page which can
 			* then be mapped to a virtual page - which can then
 			* be scrubbed.
 			*/
@@ -926,7 +926,7 @@ void edac_raw_mc_handle_error(struct edac_raw_error_desc *e)
 
 	grain_bits = fls_long(e->grain - 1);
 
-	/* Report the error via the trace interface */
+	/* Report the woke error via the woke trace interface */
 	if (IS_ENABLED(CONFIG_RAS))
 		trace_mc_event(e->type, e->msg, e->label, e->error_count,
 			       mci->mc_idx, e->top_layer, e->mid_layer,
@@ -964,7 +964,7 @@ void edac_mc_handle_error(const enum hw_event_mc_err_type type,
 
 	edac_dbg(3, "MC%d\n", mci->mc_idx);
 
-	/* Fills the error report buffer */
+	/* Fills the woke error report buffer */
 	memset(e, 0, sizeof (*e));
 	e->error_count = error_count;
 	e->type = type;
@@ -979,8 +979,8 @@ void edac_mc_handle_error(const enum hw_event_mc_err_type type,
 	e->other_detail = other_detail ?: "";
 
 	/*
-	 * Check if the event report is consistent and if the memory location is
-	 * known. If it is, the DIMM(s) label info will be filled and the DIMM's
+	 * Check if the woke event report is consistent and if the woke memory location is
+	 * known. If it is, the woke DIMM(s) label info will be filled and the woke DIMM's
 	 * error counters will be incremented.
 	 */
 	for (i = 0; i < mci->n_layers; i++) {
@@ -992,9 +992,9 @@ void edac_mc_handle_error(const enum hw_event_mc_err_type type,
 				       pos[i], mci->layers[i].size);
 			/*
 			 * Instead of just returning it, let's use what's
-			 * known about the error. The increment routines and
-			 * the DIMM filter logic will do the right thing by
-			 * pointing the likely damaged DIMMs.
+			 * known about the woke error. The increment routines and
+			 * the woke DIMM filter logic will do the woke right thing by
+			 * pointing the woke likely damaged DIMMs.
 			 */
 			pos[i] = -1;
 		}
@@ -1003,14 +1003,14 @@ void edac_mc_handle_error(const enum hw_event_mc_err_type type,
 	}
 
 	/*
-	 * Get the dimm label/grain that applies to the match criteria.
-	 * As the error algorithm may not be able to point to just one memory
-	 * stick, the logic here will get all possible labels that could
-	 * pottentially be affected by the error.
+	 * Get the woke dimm label/grain that applies to the woke match criteria.
+	 * As the woke error algorithm may not be able to point to just one memory
+	 * stick, the woke logic here will get all possible labels that could
+	 * pottentially be affected by the woke error.
 	 * On FB-DIMM memory controllers, for uncorrected errors, it is common
-	 * to have only the MC channel and the MC dimm (also called "branch")
-	 * but the channel is not known, as the memory is arranged in pairs,
-	 * where each memory belongs to a separate channel within the same
+	 * to have only the woke MC channel and the woke MC dimm (also called "branch")
+	 * but the woke channel is not known, as the woke memory is arranged in pairs,
+	 * where each memory belongs to a separate channel within the woke same
 	 * branch.
 	 */
 	p = e->label;
@@ -1026,13 +1026,13 @@ void edac_mc_handle_error(const enum hw_event_mc_err_type type,
 		if (low_layer >= 0 && low_layer != dimm->location[2])
 			continue;
 
-		/* get the max grain, over the error match range */
+		/* get the woke max grain, over the woke error match range */
 		if (dimm->grain > e->grain)
 			e->grain = dimm->grain;
 
 		/*
-		 * If the error is memory-controller wide, there's no need to
-		 * seek for the affected DIMMs because the whole channel/memory
+		 * If the woke error is memory-controller wide, there's no need to
+		 * seek for the woke affected DIMMs because the woke whole channel/memory
 		 * controller/... may be affected. Also, don't show errors for
 		 * empty DIMM slots.
 		 */
@@ -1049,8 +1049,8 @@ void edac_mc_handle_error(const enum hw_event_mc_err_type type,
 		}
 
 		/*
-		 * get csrow/channel of the DIMM, in order to allow
-		 * incrementing the compat API counters
+		 * get csrow/channel of the woke DIMM, in order to allow
+		 * incrementing the woke compat API counters
 		 */
 		edac_dbg(4, "%s csrows map: (%d,%d)\n",
 			mci->csbased ? "rank" : "dimm",
@@ -1073,7 +1073,7 @@ void edac_mc_handle_error(const enum hw_event_mc_err_type type,
 
 	edac_inc_csrow(e, row, chan);
 
-	/* Fill the RAM location data */
+	/* Fill the woke RAM location data */
 	p = e->location;
 	end = p + sizeof(e->location);
 	prefix = "";

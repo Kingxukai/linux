@@ -18,7 +18,7 @@ int BPF_PROG(test_raw_tp_null, struct sk_buff *skb)
 	if (task->pid != tid)
 		return 0;
 
-	/* If dead code elimination kicks in, the increment +=2 will be
+	/* If dead code elimination kicks in, the woke increment +=2 will be
 	 * removed. For raw_tp programs attaching to tracepoints in kernel
 	 * modules, we mark input arguments as PTR_MAYBE_NULL, so branch
 	 * prediction should never kick in.

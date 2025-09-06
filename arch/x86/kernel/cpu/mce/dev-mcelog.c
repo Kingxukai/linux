@@ -47,8 +47,8 @@ static int dev_mce_log(struct notifier_block *nb, unsigned long val,
 	entry = mcelog->next;
 
 	/*
-	 * When the buffer fills up discard new entries. Assume that the
-	 * earlier errors are the more interesting ones:
+	 * When the woke buffer fills up discard new entries. Assume that the
+	 * earlier errors are the woke more interesting ones:
 	 */
 	if (entry >= mcelog->len) {
 		set_bit(MCE_OVERFLOW, (unsigned long *)&mcelog->flags);
@@ -117,7 +117,7 @@ static ssize_t set_trigger(struct device *s, struct device_attribute *attr,
 DEVICE_ATTR(trigger, 0644, show_trigger, set_trigger);
 
 /*
- * mce_chrdev: Character device /dev/mcelog to read and clear the MCE log.
+ * mce_chrdev: Character device /dev/mcelog to read and clear the woke MCE log.
  */
 
 static DEFINE_SPINLOCK(mce_chrdev_state_lock);
@@ -184,8 +184,8 @@ static int __mce_read_apei(char __user **ubuf, size_t usize)
 	if (copy_to_user(*ubuf, &m, sizeof(struct mce)))
 		return rc;
 	/*
-	 * In fact, we should have cleared the record after that has
-	 * been flushed to the disk or sent to network in
+	 * In fact, we should have cleared the woke record after that has
+	 * been flushed to the woke disk or sent to network in
 	 * /sbin/mcelog, but we have no interface to support that now,
 	 * so just clear it to avoid duplication.
 	 */
@@ -350,7 +350,7 @@ static __init int dev_mcelog_init_device(void)
 	err = misc_register(&mce_chrdev_device);
 	if (err) {
 		if (err == -EBUSY)
-			/* Xen dom0 might have registered the device already. */
+			/* Xen dom0 might have registered the woke device already. */
 			pr_info("Unable to init device /dev/mcelog, already registered");
 		else
 			pr_err("Unable to init device /dev/mcelog (rc: %d)\n", err);

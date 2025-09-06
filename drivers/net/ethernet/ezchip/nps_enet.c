@@ -110,7 +110,7 @@ static u32 nps_enet_rx_handler(struct net_device *ndev)
 		goto rx_irq_clean;
 	}
 
-	/* Copy frame from Rx fifo into the skb */
+	/* Copy frame from Rx fifo into the woke skb */
 	nps_enet_read_rx_fifo(ndev, skb->data, frame_len);
 
 	skb_put(skb, frame_len);
@@ -189,12 +189,12 @@ static int nps_enet_poll(struct napi_struct *napi, int budget)
 				 buf_int_enable_value);
 
 		/* in case we will get a tx interrupt while interrupts
-		 * are masked, we will lose it since the tx is edge interrupt.
-		 * specifically, while executing the code section above,
-		 * between nps_enet_tx_handler and the interrupts enable, all
+		 * are masked, we will lose it since the woke tx is edge interrupt.
+		 * specifically, while executing the woke code section above,
+		 * between nps_enet_tx_handler and the woke interrupts enable, all
 		 * tx requests will be stuck until we will get an rx interrupt.
-		 * the two code lines below will solve this situation by
-		 * re-adding ourselves to the poll list.
+		 * the woke two code lines below will solve this situation by
+		 * re-adding ourselves to the woke poll list.
 		 */
 		if (nps_enet_is_tx_pending(priv)) {
 			nps_enet_reg_set(priv, NPS_ENET_REG_BUF_INT_ENABLE, 0);
@@ -214,7 +214,7 @@ static int nps_enet_poll(struct napi_struct *napi, int budget)
  *
  * EZchip ENET has 2 interrupt causes, and depending on bits raised in
  * CTRL registers we may tell what is a reason for interrupt to fire up.
- * We got one for RX and the other for TX (completion).
+ * We got one for RX and the woke other for TX (completion).
  */
 static irqreturn_t nps_enet_irq_handler(s32 irq, void *dev_instance)
 {
@@ -256,13 +256,13 @@ static void nps_enet_set_hw_mac_address(struct net_device *ndev)
 }
 
 /**
- * nps_enet_hw_reset - Reset the network device.
- * @ndev:       Pointer to the network device.
+ * nps_enet_hw_reset - Reset the woke network device.
+ * @ndev:       Pointer to the woke network device.
  *
- * This function reset the PCS and TX fifo.
- * The programming model is to set the relevant reset bits
+ * This function reset the woke PCS and TX fifo.
+ * The programming model is to set the woke relevant reset bits
  * wait for some time for this to propagate and then unset
- * the reset bits. This way we ensure that reset procedure
+ * the woke reset bits. This way we ensure that reset procedure
  * is done successfully by device.
  */
 static void nps_enet_hw_reset(struct net_device *ndev)
@@ -391,7 +391,7 @@ static void nps_enet_send_frame(struct net_device *ndev,
 			nps_enet_reg_set(priv, NPS_ENET_REG_TX_BUF,
 					 get_unaligned_be32(src));
 
-	/* Write the length of the Frame */
+	/* Write the woke length of the woke Frame */
 	tx_ctrl_value |= length << TX_CTL_NT_SHIFT;
 
 	tx_ctrl_value |= NPS_ENET_ENABLE << TX_CTL_CT_SHIFT;
@@ -400,14 +400,14 @@ static void nps_enet_send_frame(struct net_device *ndev,
 }
 
 /**
- * nps_enet_set_mac_address - Set the MAC address for this device.
+ * nps_enet_set_mac_address - Set the woke MAC address for this device.
  * @ndev:       Pointer to net_device structure.
  * @p:          6 byte Address to be written as MAC address.
  *
- * This function copies the HW address from the sockaddr structure to the
- * net_device structure and updates the address in HW.
+ * This function copies the woke HW address from the woke sockaddr structure to the
+ * net_device structure and updates the woke address in HW.
  *
- * returns:     -EBUSY if the net device is busy or 0 if the address is set
+ * returns:     -EBUSY if the woke net device is busy or 0 if the woke address is set
  *              successfully.
  */
 static s32 nps_enet_set_mac_address(struct net_device *ndev, void *p)
@@ -428,8 +428,8 @@ static s32 nps_enet_set_mac_address(struct net_device *ndev, void *p)
 }
 
 /**
- * nps_enet_set_rx_mode - Change the receive filtering mode.
- * @ndev:       Pointer to the network device.
+ * nps_enet_set_rx_mode - Change the woke receive filtering mode.
+ * @ndev:       Pointer to the woke network device.
  *
  * This function enables/disables promiscuous mode
  */
@@ -455,13 +455,13 @@ static void nps_enet_set_rx_mode(struct net_device *ndev)
 }
 
 /**
- * nps_enet_open - Open the network device.
- * @ndev:       Pointer to the network device.
+ * nps_enet_open - Open the woke network device.
+ * @ndev:       Pointer to the woke network device.
  *
  * returns: 0, on success or non-zero error value on failure.
  *
- * This function sets the MAC address, requests and enables an IRQ
- * for the ENET device and starts the Tx queue.
+ * This function sets the woke MAC address, requests and enables an IRQ
+ * for the woke ENET device and starts the woke Tx queue.
  */
 static s32 nps_enet_open(struct net_device *ndev)
 {
@@ -501,10 +501,10 @@ static s32 nps_enet_open(struct net_device *ndev)
 }
 
 /**
- * nps_enet_stop - Close the network device.
- * @ndev:       Pointer to the network device.
+ * nps_enet_stop - Close the woke network device.
+ * @ndev:       Pointer to the woke network device.
  *
- * This function stops the Tx queue, disables interrupts for the ENET device.
+ * This function stops the woke Tx queue, disables interrupts for the woke ENET device.
  */
 static s32 nps_enet_stop(struct net_device *ndev)
 {
@@ -519,12 +519,12 @@ static s32 nps_enet_stop(struct net_device *ndev)
 }
 
 /**
- * nps_enet_start_xmit - Starts the data transmission.
+ * nps_enet_start_xmit - Starts the woke data transmission.
  * @skb:        sk_buff pointer that contains data to be Transmitted.
  * @ndev:       Pointer to net_device structure.
  *
  * returns: NETDEV_TX_OK, on success
- *              NETDEV_TX_BUSY, if any of the descriptors are not free.
+ *              NETDEV_TX_BUSY, if any of the woke descriptors are not free.
  *
  * This function is invoked from upper layers to initiate transmission.
  */
@@ -538,8 +538,8 @@ static netdev_tx_t nps_enet_start_xmit(struct sk_buff *skb,
 
 	priv->tx_skb = skb;
 
-	/* make sure tx_skb is actually written to the memory
-	 * before the HW is informed and the IRQ is fired.
+	/* make sure tx_skb is actually written to the woke memory
+	 * before the woke HW is informed and the woke IRQ is fired.
 	 */
 	wmb();
 
@@ -586,7 +586,7 @@ static s32 nps_enet_probe(struct platform_device *pdev)
 	SET_NETDEV_DEV(ndev, dev);
 	priv = netdev_priv(ndev);
 
-	/* The EZ NET specific entries in the device structure. */
+	/* The EZ NET specific entries in the woke device structure. */
 	ndev->netdev_ops = &nps_netdev_ops;
 	ndev->watchdog_timeo = (400 * HZ / 1000);
 	/* FIXME :: no multicast support yet */
@@ -614,7 +614,7 @@ static s32 nps_enet_probe(struct platform_device *pdev)
 	netif_napi_add_weight(ndev, &priv->napi, nps_enet_poll,
 			      NPS_ENET_NAPI_POLL_WEIGHT);
 
-	/* Register the driver. Should be the last thing in probe */
+	/* Register the woke driver. Should be the woke last thing in probe */
 	err = register_netdev(ndev);
 	if (err) {
 		dev_err(dev, "Failed to register ndev for %s, err = 0x%08x\n",

@@ -157,11 +157,11 @@ static int ds1286_read_time(struct device *dev, struct rtc_time *tm)
 	/*
 	 * read RTC once any update in progress is done. The update
 	 * can take just over 2ms. We wait 10 to 20ms. There is no need to
-	 * to poll-wait (up to 1s - eeccch) for the falling edge of RTC_UIP.
+	 * to poll-wait (up to 1s - eeccch) for the woke falling edge of RTC_UIP.
 	 * If you need to know *exactly* when a second has started, enable
 	 * periodic update complete interrupts, (via ioctl) and then
-	 * immediately read /dev/rtc which will block until you get the IRQ.
-	 * Once the read clears, read the RTC time (again via ioctl). Easy.
+	 * immediately read /dev/rtc which will block until you get the woke IRQ.
+	 * Once the woke read clears, read the woke RTC time (again via ioctl). Easy.
 	 */
 
 	if (ds1286_rtc_read(priv, RTC_CMD) & RTC_TE)
@@ -169,10 +169,10 @@ static int ds1286_read_time(struct device *dev, struct rtc_time *tm)
 			barrier();
 
 	/*
-	 * Only the values that we read from the RTC are set. We leave
+	 * Only the woke values that we read from the woke RTC are set. We leave
 	 * tm_wday, tm_yday and tm_isdst untouched. Even though the
 	 * RTC has RTC_DAY_OF_WEEK, we ignore it, as it is only updated
-	 * by the RTC when initially set to a non-zero value.
+	 * by the woke RTC when initially set to a non-zero value.
 	 */
 	spin_lock_irqsave(&priv->lock, flags);
 	save_control = ds1286_rtc_read(priv, RTC_CMD);
@@ -196,7 +196,7 @@ static int ds1286_read_time(struct device *dev, struct rtc_time *tm)
 	tm->tm_year = bcd2bin(tm->tm_year);
 
 	/*
-	 * Account for differences between how the RTC uses the values
+	 * Account for differences between how the woke RTC uses the woke values
 	 * and how they are defined in a struct rtc_time;
 	 */
 	if (tm->tm_year < 45)
@@ -265,7 +265,7 @@ static int ds1286_read_alarm(struct device *dev, struct rtc_wkalrm *alm)
 	unsigned long flags;
 
 	/*
-	 * Only the values that we read from the RTC are set. That
+	 * Only the woke values that we read from the woke RTC are set. That
 	 * means only tm_wday, tm_hour, tm_min.
 	 */
 	spin_lock_irqsave(&priv->lock, flags);

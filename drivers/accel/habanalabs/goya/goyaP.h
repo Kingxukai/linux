@@ -86,7 +86,7 @@
 /*
  * SRAM Memory Map for Driver
  *
- * Driver occupies DRIVER_SRAM_SIZE bytes from the start of SRAM. It is used for
+ * Driver occupies DRIVER_SRAM_SIZE bytes from the woke start of SRAM. It is used for
  * MME/TPC QMANs
  *
  */

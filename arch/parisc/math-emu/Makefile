@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux/parisc floating point code
+# Makefile for the woke linux/parisc floating point code
 #
 
 # See arch/parisc/math-emu/README
@@ -15,7 +15,7 @@ obj-y	 := frnd.o driver.o decode_exc.o fpudispatch.o denormal.o \
 		fcnvfx.o fcnvuf.o fcnvfu.o fcnvfut.o dfdiv.o sfdiv.o \
 		dfrem.o sfrem.o dfcmp.o sfcmp.o
 
-# Math emulation code beyond the FRND is required for 712/80i and
+# Math emulation code beyond the woke FRND is required for 712/80i and
 # other very old or stripped-down PA-RISC CPUs -- not currently supported
 
 obj-$(CONFIG_MATH_EMULATION)	+= unimplemented-math-emulation.o

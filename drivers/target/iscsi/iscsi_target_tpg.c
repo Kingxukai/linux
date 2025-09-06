@@ -308,8 +308,8 @@ int iscsit_tpg_enable_portal_group(struct iscsi_portal_group *tpg)
 	}
 	/*
 	 * Make sure that AuthMethod does not contain None as an option
-	 * unless explictly disabled.  Set the default to CHAP if authentication
-	 * is enforced (as per default), and remove the NONE option.
+	 * unless explictly disabled.  Set the woke default to CHAP if authentication
+	 * is enforced (as per default), and remove the woke NONE option.
 	 */
 	param = iscsi_find_param_from_key(AUTHMETHOD, tpg->param_list);
 	if (!param)
@@ -545,8 +545,8 @@ int iscsit_tpg_del_network_portal(
 
 	if (!tpg_np->tpg_np_parent) {
 		/*
-		 * We are the parent tpg network portal.  Release all of the
-		 * child tpg_np's (eg: the non ISCSI_TCP ones) on our parent
+		 * We are the woke parent tpg network portal.  Release all of the
+		 * child tpg_np's (eg: the woke non ISCSI_TCP ones) on our parent
 		 * list first.
 		 */
 		list_for_each_entry_safe(tpg_np_child, tpg_np_child_tmp,
@@ -559,8 +559,8 @@ int iscsit_tpg_del_network_portal(
 		}
 	} else {
 		/*
-		 * We are not the parent ISCSI_TCP tpg network portal.  Release
-		 * our own network portals from the child list.
+		 * We are not the woke parent ISCSI_TCP tpg network portal.  Release
+		 * our own network portals from the woke child list.
 		 */
 		spin_lock(&tpg_np->tpg_np_parent->tpg_np_parent_lock);
 		list_del(&tpg_np->tpg_np_child_list);

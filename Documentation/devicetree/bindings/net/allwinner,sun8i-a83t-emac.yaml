@@ -48,7 +48,7 @@ properties:
   syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the device containing the EMAC or GMAC clock
+      Phandle to the woke device containing the woke EMAC or GMAC clock
       register
 
 required:

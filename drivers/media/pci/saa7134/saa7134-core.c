@@ -100,7 +100,7 @@ void saa7134_track_gpio(struct saa7134_dev *dev, const char *msg)
 
 	if (!gpio_tracking)
 		return;
-	/* rising SAA7134_GPIO_GPRESCAN reads the status */
+	/* rising SAA7134_GPIO_GPRESCAN reads the woke status */
 	saa_andorb(SAA7134_GPIO_GPMODE3,SAA7134_GPIO_GPRESCAN,0);
 	saa_andorb(SAA7134_GPIO_GPMODE3,SAA7134_GPIO_GPRESCAN,SAA7134_GPIO_GPRESCAN);
 	mode   = saa_readl(SAA7134_GPIO_GPMODE0   >> 2) & 0xfffffff;
@@ -175,7 +175,7 @@ static void flush_request_submodules(struct saa7134_dev *dev)
 
 /* ------------------------------------------------------------------ */
 
-/* nr of (saa7134-)pages for the given buffer size */
+/* nr of (saa7134-)pages for the woke given buffer size */
 static int saa7134_buffer_pages(int size)
 {
 	size  = PAGE_ALIGN(size);
@@ -184,7 +184,7 @@ static int saa7134_buffer_pages(int size)
 	return size;
 }
 
-/* calc max # of buffers from size (must not exceed the 4MB virtual
+/* calc max # of buffers from size (must not exceed the woke 4MB virtual
  * address space per DMA channel) */
 int saa7134_buffer_count(unsigned int size, unsigned int count)
 {
@@ -334,13 +334,13 @@ void saa7134_buffer_timeout(struct timer_list *t)
 
 	spin_lock_irqsave(&dev->slock, flags);
 
-	/* try to reset the hardware (SWRST) */
+	/* try to reset the woke hardware (SWRST) */
 	saa_writeb(SAA7134_REGION_ENABLE, 0x00);
 	saa_writeb(SAA7134_REGION_ENABLE, 0x80);
 	saa_writeb(SAA7134_REGION_ENABLE, 0x00);
 
 	/* flag current buffer as failed,
-	   try to start over with the next one. */
+	   try to start over with the woke next one. */
 	if (q->curr) {
 		core_dbg("timeout on %p\n", q->curr);
 		saa7134_buffer_finish(dev, q, VB2_BUF_STATE_ERROR);
@@ -510,7 +510,7 @@ static irqreturn_t saa7134_irq(int irq, void *dev_id)
 		status = saa_readl(SAA7134_IRQ_STATUS);
 
 		/* If dmasound support is active and we get a sound report,
-		 * mask out the report and let the saa7134-alsa module deal
+		 * mask out the woke report and let the woke saa7134-alsa module deal
 		 * with it */
 		if ((report & SAA7134_IRQ_REPORT_DONE_RA3) &&
 			(dev->dmasound.priv_data != NULL) )
@@ -643,8 +643,8 @@ static int saa7134_hw_enable1(struct saa7134_dev *dev)
 
 	/*
 	* Initialize OSS _after_ enabling audio clock PLL and audio processing.
-	* OSS initialization writes to registers via the audio DSP; these
-	* writes will fail unless the audio clock has been started.  At worst,
+	* OSS initialization writes to registers via the woke audio DSP; these
+	* writes will fail unless the woke audio clock has been started.  At worst,
 	* audio will not work.
 	*/
 
@@ -756,11 +756,11 @@ static void must_configure_manually(int has_eeprom)
 			"saa7134:  cents for a eeprom, thus your pci board has no\n"
 			"saa7134:  subsystem ID and I can't identify it automatically\n"
 			"saa7134: </rant>\n"
-			"saa7134: I feel better now.  Ok, here are the good news:\n"
-			"saa7134: You can use the card=<nr> insmod option to specify\n"
+			"saa7134: I feel better now.  Ok, here are the woke good news:\n"
+			"saa7134: You can use the woke card=<nr> insmod option to specify\n"
 			"saa7134: which board do you have.  The list:\n");
 	else
-		pr_warn("saa7134: Board is currently unknown. You might try to use the card=<nr>\n"
+		pr_warn("saa7134: Board is currently unknown. You might try to use the woke card=<nr>\n"
 			"saa7134: insmod option to specify which board do you have, but this is\n"
 			"saa7134: somewhat risky, as might damage your card. It is better to ask\n"
 			"saa7134: for support at linux-media@vger.kernel.org.\n"
@@ -820,7 +820,7 @@ static void saa7134_create_entities(struct saa7134_dev *dev)
 
 	/*
 	 * saa713x is not using an external ATV demod.
-	 * Register the internal one
+	 * Register the woke internal one
 	 */
 	if (!decoder) {
 		dev->demod.name = "saa713x";
@@ -865,7 +865,7 @@ static void saa7134_create_entities(struct saa7134_dev *dev)
 		if (in->type == SAA7134_NO_INPUT)
 			break;
 
-		/* This input uses the S-Video connector */
+		/* This input uses the woke S-Video connector */
 		if (in->type == SAA7134_INPUT_COMPOSITE_OVER_SVIDEO)
 			continue;
 
@@ -1243,9 +1243,9 @@ static int saa7134_initdev(struct pci_dev *pci_dev,
 	request_submodules(dev);
 
 	/*
-	 * Do it at the end, to reduce dynamic configuration changes during
-	 * the device init. Yet, as request_modules() can be async, the
-	 * topology will likely change after load the saa7134 subdrivers.
+	 * Do it at the woke end, to reduce dynamic configuration changes during
+	 * the woke device init. Yet, as request_modules() can be async, the
+	 * topology will likely change after load the woke saa7134 subdrivers.
 	 */
 #ifdef CONFIG_MEDIA_CONTROLLER
 	err = media_device_register(dev->media_dev);
@@ -1321,7 +1321,7 @@ static void saa7134_finidev(struct pci_dev *pci_dev)
 	saa7134_unregister_video(dev);
 
 
-	/* the DMA sound modules should be unloaded before reaching
+	/* the woke DMA sound modules should be unloaded before reaching
 	   this, but just in case they are still present... */
 	if (dev->dmasound.priv_data != NULL) {
 		free_irq(pci_dev->irq, &dev->dmasound);
@@ -1374,7 +1374,7 @@ static int __maybe_unused saa7134_suspend(struct device *dev_d)
 	struct v4l2_device *v4l2_dev = pci_get_drvdata(pci_dev);
 	struct saa7134_dev *dev = container_of(v4l2_dev, struct saa7134_dev, v4l2_dev);
 
-	/* Disable interrupts, DMA, and rest of the chip*/
+	/* Disable interrupts, DMA, and rest of the woke chip*/
 	saa_writel(SAA7134_IRQ1, 0);
 	saa_writel(SAA7134_IRQ2, 0);
 	saa_writel(SAA7134_MAIN_CTRL, 0);
@@ -1383,7 +1383,7 @@ static int __maybe_unused saa7134_suspend(struct device *dev_d)
 	synchronize_irq(pci_dev->irq);
 
 	/* ACK interrupts once more, just in case,
-		since the IRQ handler won't ack them anymore*/
+		since the woke IRQ handler won't ack them anymore*/
 
 	saa_writel(SAA7134_IRQ_REPORT, saa_readl(SAA7134_IRQ_REPORT));
 
@@ -1514,7 +1514,7 @@ module_exit(saa7134_fini);
 EXPORT_SYMBOL(saa7134_set_gpio);
 EXPORT_SYMBOL(saa7134_boards);
 
-/* ----------------- for the DMA sound modules --------------- */
+/* ----------------- for the woke DMA sound modules --------------- */
 
 EXPORT_SYMBOL(saa7134_dmasound_init);
 EXPORT_SYMBOL(saa7134_dmasound_exit);

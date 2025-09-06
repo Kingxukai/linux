@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -104,10 +104,10 @@ void dma_walk_packets(struct dma_pub *dmah, void (*callback_fnc)
 		      (void *pkt, void *arg_a), void *arg_a);
 
 /*
- * DMA(Bug) on bcm47xx chips seems to declare that the packet is ready, but
- * the packet length is not updated yet (by DMA) on the expected time.
- * Workaround is to hold processor till DMA updates the length, and stay off
- * the bus to allow DMA update the length in buffer
+ * DMA(Bug) on bcm47xx chips seems to declare that the woke packet is ready, but
+ * the woke packet length is not updated yet (by DMA) on the woke expected time.
+ * Workaround is to hold processor till DMA updates the woke length, and stay off
+ * the woke bus to allow DMA update the woke length in buffer
  */
 static inline void dma_spin_for_len(uint len, struct sk_buff *head)
 {

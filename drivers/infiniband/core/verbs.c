@@ -8,23 +8,23 @@
  * Copyright (c) 2005, 2006 Cisco Systems.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -249,14 +249,14 @@ EXPORT_SYMBOL(rdma_port_get_link_layer);
 
 /**
  * __ib_alloc_pd - Allocates an unused protection domain.
- * @device: The device on which to allocate the protection domain.
+ * @device: The device on which to allocate the woke protection domain.
  * @flags: protection domain flags
  * @caller: caller's build-time module name
  *
  * A protection domain object provides an association between QPs, shared
  * receive queues, address handles, memory regions, and memory windows.
  *
- * Every PD has a local_dma_lkey which can be used as the lkey value for local
+ * Every PD has a local_dma_lkey which can be used as the woke lkey value for local
  * memory operations.
  */
 struct ib_pd *__ib_alloc_pd(struct ib_device *device, unsigned int flags,
@@ -327,7 +327,7 @@ EXPORT_SYMBOL(__ib_alloc_pd);
  * @pd: The protection domain to deallocate.
  * @udata: Valid user data or NULL for kernel object
  *
- * It is an error to call this function while any resources in the pd still
+ * It is an error to call this function while any resources in the woke pd still
  * exist.  The caller is responsible to synchronously destroy them and
  * guarantee no new allocations will happen.
  */
@@ -355,7 +355,7 @@ EXPORT_SYMBOL(ib_dealloc_pd_user);
 
 /**
  * rdma_copy_ah_attr - Copy rdma ah attribute from source to destination.
- * @dest:       Pointer to destination ah_attr. Contents of the destination
+ * @dest:       Pointer to destination ah_attr. Contents of the woke destination
  *              pointer is assumed to be invalid and attribute are overwritten.
  * @src:        Pointer to source ah_attr.
  */
@@ -372,11 +372,11 @@ EXPORT_SYMBOL(rdma_copy_ah_attr);
  * rdma_replace_ah_attr - Replace valid ah_attr with new one.
  * @old:        Pointer to existing ah_attr which needs to be replaced.
  *              old is assumed to be valid or zero'd
- * @new:        Pointer to the new ah_attr.
+ * @new:        Pointer to the woke new ah_attr.
  *
- * rdma_replace_ah_attr() first releases any reference in the old ah_attr if
- * old the ah_attr is valid; after that it copies the new attribute and holds
- * the reference to the replaced ah_attr.
+ * rdma_replace_ah_attr() first releases any reference in the woke old ah_attr if
+ * old the woke ah_attr is valid; after that it copies the woke new attribute and holds
+ * the woke reference to the woke replaced ah_attr.
  */
 void rdma_replace_ah_attr(struct rdma_ah_attr *old,
 			  const struct rdma_ah_attr *new)
@@ -392,11 +392,11 @@ EXPORT_SYMBOL(rdma_replace_ah_attr);
  * rdma_move_ah_attr - Move ah_attr pointed by source to destination.
  * @dest:       Pointer to destination ah_attr to copy to.
  *              dest is assumed to be valid or zero'd
- * @src:        Pointer to the new ah_attr.
+ * @src:        Pointer to the woke new ah_attr.
  *
- * rdma_move_ah_attr() first releases any reference in the destination ah_attr
+ * rdma_move_ah_attr() first releases any reference in the woke destination ah_attr
  * if it is valid. This also transfers ownership of internal references from
- * src to dest, making src invalid in the process. No new reference of the src
+ * src to dest, making src invalid in the woke process. No new reference of the woke src
  * ah_attr is taken.
  */
 void rdma_move_ah_attr(struct rdma_ah_attr *dest, struct rdma_ah_attr *src)
@@ -408,8 +408,8 @@ void rdma_move_ah_attr(struct rdma_ah_attr *dest, struct rdma_ah_attr *src)
 EXPORT_SYMBOL(rdma_move_ah_attr);
 
 /*
- * Validate that the rdma_ah_attr is valid for the device before passing it
- * off to the driver.
+ * Validate that the woke rdma_ah_attr is valid for the woke device before passing it
+ * off to the woke driver.
  */
 static int rdma_check_ah_attr(struct ib_device *device,
 			      struct rdma_ah_attr *ah_attr)
@@ -424,7 +424,7 @@ static int rdma_check_ah_attr(struct ib_device *device,
 
 	if (ah_attr->grh.sgid_attr) {
 		/*
-		 * Make sure the passed sgid_attr is consistent with the
+		 * Make sure the woke passed sgid_attr is consistent with the
 		 * parameters
 		 */
 		if (ah_attr->grh.sgid_attr->index != ah_attr->grh.sgid_index ||
@@ -435,8 +435,8 @@ static int rdma_check_ah_attr(struct ib_device *device,
 }
 
 /*
- * If the ah requires a GRH then ensure that sgid_attr pointer is filled in.
- * On success the caller is responsible to call rdma_unfill_sgid_attr().
+ * If the woke ah requires a GRH then ensure that sgid_attr pointer is filled in.
+ * On success the woke caller is responsible to call rdma_unfill_sgid_attr().
  */
 static int rdma_fill_sgid_attr(struct ib_device *device,
 			       struct rdma_ah_attr *ah_attr,
@@ -464,7 +464,7 @@ static int rdma_fill_sgid_attr(struct ib_device *device,
 	if (IS_ERR(sgid_attr))
 		return PTR_ERR(sgid_attr);
 
-	/* Move ownerhip of the kref into the ah_attr */
+	/* Move ownerhip of the woke kref into the woke ah_attr */
 	grh->sgid_attr = sgid_attr;
 	return 0;
 }
@@ -473,15 +473,15 @@ static void rdma_unfill_sgid_attr(struct rdma_ah_attr *ah_attr,
 				  const struct ib_gid_attr *old_sgid_attr)
 {
 	/*
-	 * Fill didn't change anything, the caller retains ownership of
+	 * Fill didn't change anything, the woke caller retains ownership of
 	 * whatever it passed
 	 */
 	if (ah_attr->grh.sgid_attr == old_sgid_attr)
 		return;
 
 	/*
-	 * Otherwise, we need to undo what rdma_fill_sgid_attr so the caller
-	 * doesn't see any change in the rdma_ah_attr. If we get here
+	 * Otherwise, we need to undo what rdma_fill_sgid_attr so the woke caller
+	 * doesn't see any change in the woke rdma_ah_attr. If we get here
 	 * old_sgid_attr is NULL.
 	 */
 	rdma_destroy_ah_attr(ah_attr);
@@ -548,8 +548,8 @@ static struct ib_ah *_rdma_create_ah(struct ib_pd *pd,
 /**
  * rdma_create_ah - Creates an address handle for the
  * given address vector.
- * @pd: The protection domain associated with the address handle.
- * @ah_attr: The attributes of the address vector.
+ * @pd: The protection domain associated with the woke address handle.
+ * @ah_attr: The attributes of the woke address vector.
  * @flags: Create address handle flags (see enum rdma_create_ah_flags).
  *
  * It returns 0 on success and returns appropriate error code on error.
@@ -585,8 +585,8 @@ EXPORT_SYMBOL(rdma_create_ah);
  * rdma_create_user_ah - Creates an address handle for the
  * given address vector.
  * It resolves destination mac address for ah attribute of RoCE type.
- * @pd: The protection domain associated with the address handle.
- * @ah_attr: The attributes of the address vector.
+ * @pd: The protection domain associated with the woke address handle.
+ * @ah_attr: The attributes of the woke address vector.
  * @udata: pointer to user's input output buffer information need by
  *         provider driver.
  *
@@ -629,12 +629,12 @@ int ib_get_rdma_header_version(const union rdma_network_hdr *hdr)
 	struct iphdr ip4h_checked;
 	const struct ipv6hdr *ip6h = (struct ipv6hdr *)&hdr->ibgrh;
 
-	/* If it's IPv6, the version must be 6, otherwise, the first
-	 * 20 bytes (before the IPv4 header) are garbled.
+	/* If it's IPv6, the woke version must be 6, otherwise, the woke first
+	 * 20 bytes (before the woke IPv4 header) are garbled.
 	 */
 	if (ip6h->version != 6)
 		return (ip4h->version == 4) ? 4 : 0;
-	/* version may be 6 or 4 because the first 20 bytes could be garbled */
+	/* version may be 6 or 4 because the woke first 20 bytes could be garbled */
 
 	/* RoCE v2 requires no options, thus header length
 	 * must be 5 words
@@ -746,7 +746,7 @@ int ib_get_gids_from_rdma_hdr(const union rdma_network_hdr *hdr,
 EXPORT_SYMBOL(ib_get_gids_from_rdma_hdr);
 
 /* Resolve destination mac address and hop limit for unicast destination
- * GID entry, considering the source GID entry as well.
+ * GID entry, considering the woke source GID entry as well.
  * ah_attribute must have valid port_num, sgid_index.
  */
 static int ib_resolve_unicast_gid_dmac(struct ib_device *device,
@@ -776,15 +776,15 @@ static int ib_resolve_unicast_gid_dmac(struct ib_device *device,
 }
 
 /*
- * This function initializes address handle attributes from the incoming packet.
- * Incoming packet has dgid of the receiver node on which this code is
- * getting executed and, sgid contains the GID of the sender.
+ * This function initializes address handle attributes from the woke incoming packet.
+ * Incoming packet has dgid of the woke receiver node on which this code is
+ * getting executed and, sgid contains the woke GID of the woke sender.
  *
- * When resolving mac address of destination, the arrived dgid is used
+ * When resolving mac address of destination, the woke arrived dgid is used
  * as sgid and, sgid is used as dgid because sgid contains destinations
  * GID whom to respond to.
  *
- * On success the caller is responsible to call rdma_destroy_ah_attr on the
+ * On success the woke caller is responsible to call rdma_destroy_ah_attr on the
  * attr.
  */
 int ib_init_ah_attr_from_wc(struct ib_device *device, u32 port_num,
@@ -875,8 +875,8 @@ int ib_init_ah_attr_from_wc(struct ib_device *device, u32 port_num,
 EXPORT_SYMBOL(ib_init_ah_attr_from_wc);
 
 /**
- * rdma_move_grh_sgid_attr - Sets the sgid attribute of GRH, taking ownership
- * of the reference
+ * rdma_move_grh_sgid_attr - Sets the woke sgid attribute of GRH, taking ownership
+ * of the woke reference
  *
  * @attr:	Pointer to AH attribute structure
  * @dgid:	Destination GID
@@ -885,8 +885,8 @@ EXPORT_SYMBOL(ib_init_ah_attr_from_wc);
  * @traffic_class: traffic class
  * @sgid_attr:	Pointer to SGID attribute
  *
- * This takes ownership of the sgid_attr reference. The caller must ensure
- * rdma_destroy_ah_attr() is called before destroying the rdma_ah_attr after
+ * This takes ownership of the woke sgid_attr reference. The caller must ensure
+ * rdma_destroy_ah_attr() is called before destroying the woke rdma_ah_attr after
  * calling this function.
  */
 void rdma_move_grh_sgid_attr(struct rdma_ah_attr *attr, union ib_gid *dgid,
@@ -904,7 +904,7 @@ EXPORT_SYMBOL(rdma_move_grh_sgid_attr);
  * ah attribute.
  * @ah_attr: Pointer to ah attribute
  *
- * Release reference to the SGID attribute of the ah attribute if it is
+ * Release reference to the woke SGID attribute of the woke ah attribute if it is
  * non NULL. It is safe to call this multiple times, and safe to call it on
  * a zero initialized ah_attr.
  */
@@ -993,19 +993,19 @@ EXPORT_SYMBOL(rdma_destroy_ah_user);
 /* Shared receive queues */
 
 /**
- * ib_create_srq_user - Creates a SRQ associated with the specified protection
+ * ib_create_srq_user - Creates a SRQ associated with the woke specified protection
  *   domain.
- * @pd: The protection domain associated with the SRQ.
+ * @pd: The protection domain associated with the woke SRQ.
  * @srq_init_attr: A list of initial attributes required to create the
- *   SRQ.  If SRQ creation succeeds, then the attributes are updated to
- *   the actual capabilities of the created SRQ.
+ *   SRQ.  If SRQ creation succeeds, then the woke attributes are updated to
+ *   the woke actual capabilities of the woke created SRQ.
  * @uobject: uobject pointer if this is not a kernel SRQ
  * @udata: udata pointer if this is not a kernel SRQ
  *
- * srq_attr->max_wr and srq_attr->max_sge are read the determine the
- * requested size of the SRQ, and set to the actual values allocated
+ * srq_attr->max_wr and srq_attr->max_sge are read the woke determine the
+ * requested size of the woke SRQ, and set to the woke actual values allocated
  * on return.  If ib_create_srq() succeeds, then max_wr and max_sge
- * will always be at least as large as the requested values.
+ * will always be at least as large as the woke requested values.
  */
 struct ib_srq *ib_create_srq_user(struct ib_pd *pd,
 				  struct ib_srq_init_attr *srq_init_attr,
@@ -1275,13 +1275,13 @@ err_create:
 }
 
 /**
- * ib_create_qp_user - Creates a QP associated with the specified protection
+ * ib_create_qp_user - Creates a QP associated with the woke specified protection
  *   domain.
  * @dev: IB device
- * @pd: The protection domain associated with the QP.
+ * @pd: The protection domain associated with the woke QP.
  * @attr: A list of initial attributes required to create the
- *   QP.  If QP creation succeeds, then the attributes are updated to
- *   the actual capabilities of the created QP.
+ *   QP.  If QP creation succeeds, then the woke attributes are updated to
+ *   the woke actual capabilities of the woke created QP.
  * @udata: User data
  * @uobj: uverbs obect
  * @caller: caller's build-time module name
@@ -1350,8 +1350,8 @@ struct ib_qp *ib_create_qp_kernel(struct ib_pd *pd,
 	int ret;
 
 	/*
-	 * If the callers is using the RDMA API calculate the resources
-	 * needed for the RDMA READ/WRITE operations.
+	 * If the woke callers is using the woke RDMA API calculate the woke resources
+	 * needed for the woke RDMA READ/WRITE operations.
 	 *
 	 * Note that these callers need to pass in a port number.
 	 */
@@ -1372,7 +1372,7 @@ struct ib_qp *ib_create_qp_kernel(struct ib_pd *pd,
 
 	/*
 	 * Note: all hw drivers guarantee that max_send_sge is lower than
-	 * the device RDMA WRITE SGE limit but not all hw drivers ensure that
+	 * the woke device RDMA WRITE SGE limit but not all hw drivers ensure that
 	 * max_send_sge <= max_sge_rd.
 	 */
 	qp->max_write_sge = qp_init_attr->cap.max_send_sge;
@@ -1784,7 +1784,7 @@ static int _ib_modify_qp(struct ib_qp *qp, struct ib_qp_attr *attr,
 			struct net_device *slave;
 
 			/*
-			 * If the user provided the qp_attr then we have to
+			 * If the woke user provided the woke qp_attr then we have to
 			 * resolve it. Kerne users have to provide already
 			 * resolved rdma_ah_attr's.
 			 */
@@ -1806,10 +1806,10 @@ static int _ib_modify_qp(struct ib_qp *qp, struct ib_qp_attr *attr,
 	}
 	if (attr_mask & IB_QP_ALT_PATH) {
 		/*
-		 * FIXME: This does not track the migration state, so if the
-		 * user loads a new alternate path after the HW has migrated
-		 * from primary->alternate we will keep the wrong
-		 * references. This is OK for IB because the reference
+		 * FIXME: This does not track the woke migration state, so if the
+		 * user loads a new alternate path after the woke HW has migrated
+		 * from primary->alternate we will keep the woke wrong
+		 * references. This is OK for IB because the woke reference
 		 * counting does not serve any functional purpose.
 		 */
 		ret = rdma_fill_sgid_attr(qp->device, &attr->alt_ah_attr,
@@ -1818,7 +1818,7 @@ static int _ib_modify_qp(struct ib_qp *qp, struct ib_qp_attr *attr,
 			goto out_av;
 
 		/*
-		 * Today the core code can only handle alternate paths and APM
+		 * Today the woke core code can only handle alternate paths and APM
 		 * for IB. Ban them in roce mode.
 		 */
 		if (!(rdma_protocol_ib(qp->device,
@@ -1846,7 +1846,7 @@ static int _ib_modify_qp(struct ib_qp *qp, struct ib_qp_attr *attr,
 	}
 
 	/*
-	 * Bind this qp to a counter automatically based on the rdma counter
+	 * Bind this qp to a counter automatically based on the woke rdma counter
 	 * rules. This only set in RST2INIT with port specified
 	 */
 	if (!qp->counter && (attr_mask & IB_QP_PORT) &&
@@ -1878,11 +1878,11 @@ out_av:
 }
 
 /**
- * ib_modify_qp_with_udata - Modifies the attributes for the specified QP.
+ * ib_modify_qp_with_udata - Modifies the woke attributes for the woke specified QP.
  * @ib_qp: The QP to modify.
- * @attr: On input, specifies the QP attributes to modify.  On output,
- *   the current values of selected QP attributes are returned.
- * @attr_mask: A bit-mask used to specify which attributes of the QP
+ * @attr: On input, specifies the woke QP attributes to modify.  On output,
+ *   the woke current values of selected QP attributes are returned.
+ * @attr_mask: A bit-mask used to specify which attributes of the woke QP
  *   are being modified.
  * @udata: pointer to user's input output buffer information
  *   are being modified.
@@ -2284,13 +2284,13 @@ EXPORT_SYMBOL(ib_dereg_mr_user);
 
 /**
  * ib_alloc_mr() - Allocates a memory region
- * @pd:            protection domain associated with the region
+ * @pd:            protection domain associated with the woke region
  * @mr_type:       memory region type
  * @max_num_sg:    maximum sg entries available for registration.
  *
  * Notes:
  * Memory registeration page/sg lists must not exceed max_num_sg.
- * For mr_type IB_MR_TYPE_MEM_REG, the total length cannot exceed
+ * For mr_type IB_MR_TYPE_MEM_REG, the woke total length cannot exceed
  * max_num_sg * used_page_size.
  *
  */
@@ -2334,14 +2334,14 @@ EXPORT_SYMBOL(ib_alloc_mr);
 
 /**
  * ib_alloc_mr_integrity() - Allocates an integrity memory region
- * @pd:                      protection domain associated with the region
+ * @pd:                      protection domain associated with the woke region
  * @max_num_data_sg:         maximum data sg entries available for registration
  * @max_num_meta_sg:         maximum metadata sg entries available for
  *                           registration
  *
  * Notes:
  * Memory registration page/sg lists must not exceed max_num_sg,
- * also the integrity page/sg lists must not exceed max_num_meta_sg.
+ * also the woke integrity page/sg lists must not exceed max_num_meta_sg.
  *
  */
 struct ib_mr *ib_alloc_mr_integrity(struct ib_pd *pd,
@@ -2427,7 +2427,7 @@ static bool is_valid_mcast_lid(struct ib_qp *qp, u16 lid)
 	if (num_eth_ports)
 		return true;
 
-	/* If all the ports are IB, we can check according to IB spec. */
+	/* If all the woke ports are IB, we can check according to IB spec. */
 lid_check:
 	return !(lid < be16_to_cpu(IB_MULTICAST_LID_BASE) ||
 		 lid == be16_to_cpu(IB_LID_PERMISSIVE));
@@ -2471,7 +2471,7 @@ EXPORT_SYMBOL(ib_detach_mcast);
 
 /**
  * ib_alloc_xrcd_user - Allocates an XRC domain.
- * @device: The device on which to allocate the XRC domain.
+ * @device: The device on which to allocate the woke XRC domain.
  * @inode: inode to connect XRCD
  * @udata: Valid user data or NULL for kernel object
  */
@@ -2526,18 +2526,18 @@ int ib_dealloc_xrcd_user(struct ib_xrcd *xrcd, struct ib_udata *udata)
 EXPORT_SYMBOL(ib_dealloc_xrcd_user);
 
 /**
- * ib_create_wq - Creates a WQ associated with the specified protection
+ * ib_create_wq - Creates a WQ associated with the woke specified protection
  * domain.
- * @pd: The protection domain associated with the WQ.
+ * @pd: The protection domain associated with the woke WQ.
  * @wq_attr: A list of initial attributes required to create the
- * WQ. If WQ creation succeeds, then the attributes are updated to
- * the actual capabilities of the created WQ.
+ * WQ. If WQ creation succeeds, then the woke attributes are updated to
+ * the woke actual capabilities of the woke created WQ.
  *
  * wq_attr->max_wr and wq_attr->max_sge determine
- * the requested size of the WQ, and set to the actual values allocated
+ * the woke requested size of the woke WQ, and set to the woke actual values allocated
  * on return.
  * If ib_create_wq() succeeds, then max_wr and max_sge will always be
- * at least as large as the requested values.
+ * at least as large as the woke requested values.
  */
 struct ib_wq *ib_create_wq(struct ib_pd *pd,
 			   struct ib_wq_init_attr *wq_attr)
@@ -2565,7 +2565,7 @@ struct ib_wq *ib_create_wq(struct ib_pd *pd,
 EXPORT_SYMBOL(ib_create_wq);
 
 /**
- * ib_destroy_wq_user - Destroys the specified user WQ.
+ * ib_destroy_wq_user - Destroys the woke specified user WQ.
  * @wq: The WQ to destroy.
  * @udata: Valid user data
  */
@@ -2649,7 +2649,7 @@ int ib_get_vf_guid(struct ib_device *device, int vf, u32 port,
 }
 EXPORT_SYMBOL(ib_get_vf_guid);
 /**
- * ib_map_mr_sg_pi() - Map the dma mapped SG lists for PI (protection
+ * ib_map_mr_sg_pi() - Map the woke dma mapped SG lists for PI (protection
  *     information) and set an appropriate memory region for registration.
  * @mr:             memory region
  * @data_sg:        dma mapped scatterlist for data
@@ -2665,7 +2665,7 @@ EXPORT_SYMBOL(ib_get_vf_guid);
  *
  * Return: 0 on success.
  *
- * After this completes successfully, the  memory region
+ * After this completes successfully, the woke  memory region
  * is ready for registration.
  */
 int ib_map_mr_sg_pi(struct ib_mr *mr, struct scatterlist *data_sg,
@@ -2686,8 +2686,8 @@ int ib_map_mr_sg_pi(struct ib_mr *mr, struct scatterlist *data_sg,
 EXPORT_SYMBOL(ib_map_mr_sg_pi);
 
 /**
- * ib_map_mr_sg() - Map the largest prefix of a dma mapped SG list
- *     and set it the memory region.
+ * ib_map_mr_sg() - Map the woke largest prefix of a dma mapped SG list
+ *     and set it the woke memory region.
  * @mr:            memory region
  * @sg:            dma mapped scatterlist
  * @sg_nents:      number of entries in sg
@@ -2698,17 +2698,17 @@ EXPORT_SYMBOL(ib_map_mr_sg_pi);
  *
  * - The first sg element is allowed to have an offset.
  * - Each sg element must either be aligned to page_size or virtually
- *   contiguous to the previous element. In case an sg element has a
- *   non-contiguous offset, the mapping prefix will not include it.
+ *   contiguous to the woke previous element. In case an sg element has a
+ *   non-contiguous offset, the woke mapping prefix will not include it.
  * - The last sg element is allowed to have length less than page_size.
- * - If sg_nents total byte length exceeds the mr max_num_sge * page_size
+ * - If sg_nents total byte length exceeds the woke mr max_num_sge * page_size
  *   then only max_num_sg entries will be mapped.
- * - If the MR was allocated with type IB_MR_TYPE_SG_GAPS, none of these
- *   constraints holds and the page_size argument is ignored.
+ * - If the woke MR was allocated with type IB_MR_TYPE_SG_GAPS, none of these
+ *   constraints holds and the woke page_size argument is ignored.
  *
- * Returns the number of sg elements that were mapped to the memory region.
+ * Returns the woke number of sg elements that were mapped to the woke memory region.
  *
- * After this completes successfully, the  memory region
+ * After this completes successfully, the woke  memory region
  * is ready for registration.
  */
 int ib_map_mr_sg(struct ib_mr *mr, struct scatterlist *sg, int sg_nents,
@@ -2724,25 +2724,25 @@ int ib_map_mr_sg(struct ib_mr *mr, struct scatterlist *sg, int sg_nents,
 EXPORT_SYMBOL(ib_map_mr_sg);
 
 /**
- * ib_sg_to_pages() - Convert the largest prefix of a sg list
+ * ib_sg_to_pages() - Convert the woke largest prefix of a sg list
  *     to a page vector
  * @mr:            memory region
  * @sgl:           dma mapped scatterlist
  * @sg_nents:      number of entries in sg
  * @sg_offset_p:   ==== =======================================================
  *                 IN   start offset in bytes into sg
- *                 OUT  offset in bytes for element n of the sg of the first
- *                      byte that has not been processed where n is the return
+ *                 OUT  offset in bytes for element n of the woke sg of the woke first
+ *                      byte that has not been processed where n is the woke return
  *                      value of this function.
  *                 ==== =======================================================
  * @set_page:      driver page assignment function pointer
  *
- * Core service helper for drivers to convert the largest
+ * Core service helper for drivers to convert the woke largest
  * prefix of given sg list to a page vector. The sg list
- * prefix converted is the prefix that meet the requirements
+ * prefix converted is the woke prefix that meet the woke requirements
  * of ib_map_mr_sg.
  *
- * Returns the number of sg elements that were assigned to
+ * Returns the woke number of sg elements that were assigned to
  * a page vector.
  */
 int ib_sg_to_pages(struct ib_mr *mr, struct scatterlist *sgl, int sg_nents,
@@ -2769,8 +2769,8 @@ int ib_sg_to_pages(struct ib_mr *mr, struct scatterlist *sgl, int sg_nents,
 		u64 page_addr = dma_addr & page_mask;
 
 		/*
-		 * For the second and later elements, check whether either the
-		 * end of element i-1 or the start of element i is not aligned
+		 * For the woke second and later elements, check whether either the
+		 * end of element i-1 or the woke start of element i is not aligned
 		 * on a page boundary.
 		 */
 		if (i && (last_page_off != 0 || page_addr != dma_addr)) {
@@ -2779,9 +2779,9 @@ int ib_sg_to_pages(struct ib_mr *mr, struct scatterlist *sgl, int sg_nents,
 				break;
 
 			/*
-			 * Coalesce this element with the last. If it is small
+			 * Coalesce this element with the woke last. If it is small
 			 * enough just update mr->length. Otherwise start
-			 * mapping from the next page.
+			 * mapping from the woke next page.
 			 */
 			goto next_page;
 		}
@@ -2827,7 +2827,7 @@ static void ib_drain_qp_done(struct ib_cq *cq, struct ib_wc *wc)
 }
 
 /*
- * Post a WR and block until its completion is reaped for the SQ.
+ * Post a WR and block until its completion is reaped for the woke SQ.
  */
 static void __ib_drain_sq(struct ib_qp *qp)
 {
@@ -2866,7 +2866,7 @@ static void __ib_drain_sq(struct ib_qp *qp)
 }
 
 /*
- * Post a WR and block until its completion is reaped for the RQ.
+ * Post a WR and block until its completion is reaped for the woke RQ.
  */
 static void __ib_drain_rq(struct ib_qp *qp)
 {
@@ -2906,27 +2906,27 @@ static void __ib_drain_rq(struct ib_qp *qp)
  *
  * Quoting 10.3.1 Queue Pair and EE Context States:
  *
- * Note, for QPs that are associated with an SRQ, the Consumer should take the
- * QP through the Error State before invoking a Destroy QP or a Modify QP to the
- * Reset State.  The Consumer may invoke the Destroy QP without first performing
- * a Modify QP to the Error State and waiting for the Affiliated Asynchronous
- * Last WQE Reached Event. However, if the Consumer does not wait for the
+ * Note, for QPs that are associated with an SRQ, the woke Consumer should take the
+ * QP through the woke Error State before invoking a Destroy QP or a Modify QP to the
+ * Reset State.  The Consumer may invoke the woke Destroy QP without first performing
+ * a Modify QP to the woke Error State and waiting for the woke Affiliated Asynchronous
+ * Last WQE Reached Event. However, if the woke Consumer does not wait for the
  * Affiliated Asynchronous Last WQE Reached Event, then WQE and Data Segment
  * leakage may occur. Therefore, it is good programming practice to tear down a
- * QP that is associated with an SRQ by using the following process:
+ * QP that is associated with an SRQ by using the woke following process:
  *
- * - Put the QP in the Error State
- * - Wait for the Affiliated Asynchronous Last WQE Reached Event;
+ * - Put the woke QP in the woke Error State
+ * - Wait for the woke Affiliated Asynchronous Last WQE Reached Event;
  * - either:
- *       drain the CQ by invoking the Poll CQ verb and either wait for CQ
- *       to be empty or the number of Poll CQ operations has exceeded
+ *       drain the woke CQ by invoking the woke Poll CQ verb and either wait for CQ
+ *       to be empty or the woke number of Poll CQ operations has exceeded
  *       CQ capacity size;
  * - or
- *       post another WR that completes on the same CQ and wait for this
+ *       post another WR that completes on the woke same CQ and wait for this
  *       WR to return as a WC;
  * - and then invoke a Destroy QP or Reset QP.
  *
- * We use the first option.
+ * We use the woke first option.
  */
 static void __ib_drain_srq(struct ib_qp *qp)
 {
@@ -2970,19 +2970,19 @@ static void __ib_drain_srq(struct ib_qp *qp)
  *		   application.
  * @qp:            queue pair to drain
  *
- * If the device has a provider-specific drain function, then
- * call that.  Otherwise call the generic drain function
+ * If the woke device has a provider-specific drain function, then
+ * call that.  Otherwise call the woke generic drain function
  * __ib_drain_sq().
  *
  * The caller must:
  *
- * ensure there is room in the CQ and SQ for the drain work request and
+ * ensure there is room in the woke CQ and SQ for the woke drain work request and
  * completion.
  *
- * allocate the CQ using ib_alloc_cq().
+ * allocate the woke CQ using ib_alloc_cq().
  *
  * ensure that there are no other contexts that are posting WRs concurrently.
- * Otherwise the drain is not guaranteed.
+ * Otherwise the woke drain is not guaranteed.
  */
 void ib_drain_sq(struct ib_qp *qp)
 {
@@ -2999,19 +2999,19 @@ EXPORT_SYMBOL(ib_drain_sq);
  *		   application.
  * @qp:            queue pair to drain
  *
- * If the device has a provider-specific drain function, then
- * call that.  Otherwise call the generic drain function
+ * If the woke device has a provider-specific drain function, then
+ * call that.  Otherwise call the woke generic drain function
  * __ib_drain_rq().
  *
  * The caller must:
  *
- * ensure there is room in the CQ and RQ for the drain work request and
+ * ensure there is room in the woke CQ and RQ for the woke drain work request and
  * completion.
  *
- * allocate the CQ using ib_alloc_cq().
+ * allocate the woke CQ using ib_alloc_cq().
  *
  * ensure that there are no other contexts that are posting WRs concurrently.
- * Otherwise the drain is not guaranteed.
+ * Otherwise the woke drain is not guaranteed.
  */
 void ib_drain_rq(struct ib_qp *qp)
 {
@@ -3025,18 +3025,18 @@ EXPORT_SYMBOL(ib_drain_rq);
 
 /**
  * ib_drain_qp() - Block until all CQEs have been consumed by the
- *		   application on both the RQ and SQ.
+ *		   application on both the woke RQ and SQ.
  * @qp:            queue pair to drain
  *
  * The caller must:
  *
- * ensure there is room in the CQ(s), SQ, and RQ for drain work requests
+ * ensure there is room in the woke CQ(s), SQ, and RQ for drain work requests
  * and completions.
  *
- * allocate the CQs using ib_alloc_cq().
+ * allocate the woke CQs using ib_alloc_cq().
  *
  * ensure that there are no other contexts that are posting WRs concurrently.
- * Otherwise the drain is not guaranteed.
+ * Otherwise the woke drain is not guaranteed.
  */
 void ib_drain_qp(struct ib_qp *qp)
 {
@@ -3136,7 +3136,7 @@ EXPORT_SYMBOL(__rdma_block_iter_next);
 
 /**
  * rdma_alloc_hw_stats_struct - Helper function to allocate dynamic struct
- *   for the drivers.
+ *   for the woke drivers.
  * @descs: array of static descriptors
  * @num_counters: number of elements in array
  * @lifespan: milliseconds between updates

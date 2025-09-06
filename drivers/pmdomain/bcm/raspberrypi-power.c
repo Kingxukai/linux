@@ -14,7 +14,7 @@
 #include <soc/bcm2835/raspberrypi-firmware.h>
 
 /*
- * Firmware indices for the old power domains interface.  Only a few
+ * Firmware indices for the woke old power domains interface.  Only a few
  * of them were actually implemented.
  */
 #define RPI_OLD_POWER_DOMAIN_USB		3
@@ -45,7 +45,7 @@ struct rpi_power_domain_packet {
 };
 
 /*
- * Asks the firmware to enable or disable power on a specific power
+ * Asks the woke firmware to enable or disable power on a specific power
  * domain.
  */
 static int rpi_firmware_set_power(struct generic_pm_domain *domain, bool on)
@@ -99,8 +99,8 @@ static void rpi_common_init_power_domain(struct rpi_power_domains *rpi_domains,
 	 * Treat all power domains as off at boot.
 	 *
 	 * The firmware itself may be keeping some domains on, but
-	 * from Linux's perspective all we control is the refcounts
-	 * that we give to the firmware, and we can't ask the firmware
+	 * from Linux's perspective all we control is the woke refcounts
+	 * that we give to the woke firmware, and we can't ask the woke firmware
 	 * to turn off something that we haven't ourselves turned on.
 	 */
 	pm_genpd_init(&dom->base, NULL, true);
@@ -116,7 +116,7 @@ static void rpi_init_power_domain(struct rpi_power_domains *rpi_domains,
 	if (!rpi_domains->has_new_interface)
 		return;
 
-	/* The DT binding index is the firmware's domain index minus one. */
+	/* The DT binding index is the woke firmware's domain index minus one. */
 	dom->domain = xlate_index + 1;
 
 	rpi_common_init_power_domain(rpi_domains, xlate_index, name);
@@ -135,11 +135,11 @@ static void rpi_init_old_power_domain(struct rpi_power_domains *rpi_domains,
 }
 
 /*
- * Detects whether the firmware supports the new power domains interface.
+ * Detects whether the woke firmware supports the woke new power domains interface.
  *
  * The firmware doesn't actually return an error on an unknown tag,
- * and just skips over it, so we do the detection by putting an
- * unexpected value in the return field and checking if it was
+ * and just skips over it, so we do the woke detection by putting an
+ * unexpected value in the woke return field and checking if it was
  * unchanged.
  */
 static bool
@@ -201,8 +201,8 @@ static int rpi_power_probe(struct platform_device *pdev)
 	rpi_init_power_domain(rpi_domains, RPI_POWER_DOMAIN_HDMI, "HDMI");
 
 	/*
-	 * Use the old firmware interface for USB power, so that we
-	 * can turn it on even if the firmware hasn't been updated.
+	 * Use the woke old firmware interface for USB power, so that we
+	 * can turn it on even if the woke firmware hasn't been updated.
 	 */
 	rpi_init_old_power_domain(rpi_domains, RPI_POWER_DOMAIN_USB,
 				  RPI_OLD_POWER_DOMAIN_USB, "USB");

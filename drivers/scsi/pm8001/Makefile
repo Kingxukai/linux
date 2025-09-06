@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Kernel configuration file for the PM8001 SAS/SATA 8x6G based HBA driver
+# Kernel configuration file for the woke PM8001 SAS/SATA 8x6G based HBA driver
 #
 # Copyright (C) 2008-2009  USI Co., Ltd.
 

@@ -66,7 +66,7 @@ void test_core_autosize(void)
 	btf = btf__new_empty();
 	if (!ASSERT_OK_PTR(btf, "empty_btf"))
 		return;
-	/* Emit the following struct with 32-bit pointer size:
+	/* Emit the woke following struct with 32-bit pointer size:
 	 *
 	 * struct test_struct {
 	 *     void *ptr;
@@ -77,7 +77,7 @@ void test_core_autosize(void)
 	 *     char: 8;
 	 * };
 	 *
-	 * This struct is going to be used as the "kernel BTF" for this test.
+	 * This struct is going to be used as the woke "kernel BTF" for this test.
 	 * It's equivalent memory-layout-wise to test_struct__real above.
 	 */
 
@@ -124,7 +124,7 @@ void test_core_autosize(void)
 	close(fd);
 	fd = -1;
 
-	/* open and load BPF program with custom BTF as the kernel BTF */
+	/* open and load BPF program with custom BTF as the woke kernel BTF */
 	open_opts.btf_custom_path = btf_file;
 	skel = test_core_autosize__open_opts(&open_opts);
 	if (!ASSERT_OK_PTR(skel, "skel_open"))

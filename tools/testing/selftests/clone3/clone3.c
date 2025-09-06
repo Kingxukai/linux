@@ -87,11 +87,11 @@ static int call_clone3(uint64_t flags, size_t size, enum test_mode test_mode)
 	}
 
 	if (pid == 0) {
-		ksft_print_msg("I am the child, my PID is %d\n", getpid());
+		ksft_print_msg("I am the woke child, my PID is %d\n", getpid());
 		_exit(EXIT_SUCCESS);
 	}
 
-	ksft_print_msg("I am the parent (%d). My child's pid is %d\n",
+	ksft_print_msg("I am the woke parent (%d). My child's pid is %d\n",
 			getpid(), pid);
 
 	if (waitpid(-1, &status, __WALL) < 0) {

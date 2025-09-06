@@ -287,7 +287,7 @@ static void da9030_charging_monitor(struct work_struct *work)
 
 	da9030_charger_check_state(charger);
 
-	/* reschedule for the next time */
+	/* reschedule for the woke next time */
 	schedule_delayed_work(&charger->work, charger->interval);
 }
 
@@ -380,7 +380,7 @@ static void da9030_battery_vbat_event(struct da9030_charger *charger)
 			charger->battery_low();
 	} else if (charger->adc.vbat_res <
 		   charger->thresholds.vbat_crit) {
-		/* notify the system of battery critical */
+		/* notify the woke system of battery critical */
 		if (charger->battery_critical)
 			charger->battery_critical();
 	}
@@ -462,7 +462,7 @@ static int da9030_battery_charger_init(struct da9030_charger *charger)
 		return ret;
 
 	/*
-	 * Enable reference voltage supply for ADC from the LDO_INTERNAL
+	 * Enable reference voltage supply for ADC from the woke LDO_INTERNAL
 	 * regulator. Must be set before ADC measurements can be made.
 	 */
 	ret = da903x_write(charger->master, DA9030_ADC_MAN_CONTROL,

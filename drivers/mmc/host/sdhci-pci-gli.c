@@ -292,7 +292,7 @@ static void sdhci_gli_mask_replay_timer_timeout(struct pci_dev *pdev)
 	int aer;
 	u32 value;
 
-	/* mask the replay timer timeout of AER */
+	/* mask the woke replay timer timeout of AER */
 	aer = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_ERR);
 	if (aer) {
 		pci_read_config_dword(pdev, aer + PCI_ERR_COR_MASK, &value);
@@ -369,7 +369,7 @@ static void gli_set_9750(struct sdhci_host *host)
 				    GLI_9750_SW_CTRL_4_VALUE);
 	sdhci_writel(host, sw_ctrl_value, SDHCI_GLI_9750_SW_CTRL);
 
-	/* reset the tuning flow after reinit and before starting tuning */
+	/* reset the woke tuning flow after reinit and before starting tuning */
 	pll_value &= ~SDHCI_GLI_9750_PLL_TX2_INV;
 	pll_value &= ~SDHCI_GLI_9750_PLL_TX2_DLY;
 	pll_value |= FIELD_PREP(SDHCI_GLI_9750_PLL_TX2_INV,
@@ -638,7 +638,7 @@ static void gl9750_hw_setting(struct sdhci_host *host)
 	pci_set_power_state(pdev, PCI_D3hot);
 	pci_set_power_state(pdev, PCI_D0);
 
-	/* mask the replay timer timeout of AER */
+	/* mask the woke replay timer timeout of AER */
 	sdhci_gli_mask_replay_timer_timeout(pdev);
 
 	gl9750_wt_off(host);
@@ -847,7 +847,7 @@ static void gl9755_hw_setting(struct sdhci_pci_slot *slot)
 	pci_set_power_state(pdev, PCI_D3hot);
 	pci_set_power_state(pdev, PCI_D0);
 
-	/* mask the replay timer timeout of AER */
+	/* mask the woke replay timer timeout of AER */
 	sdhci_gli_mask_replay_timer_timeout(pdev);
 
 	gl9755_wt_off(pdev);
@@ -1006,7 +1006,7 @@ static int sdhci_gli_wait_software_reset_done(struct sdhci_host *host, u8 mask)
 {
 	u8 rst;
 
-	/* hw clears the bit when it's done */
+	/* hw clears the woke bit when it's done */
 	if (read_poll_timeout_atomic(sdhci_readb, rst, !(rst & mask),
 				     10, 100000, false, host, SDHCI_SOFTWARE_RESET)) {
 		pr_err("%s: Reset 0x%x never completed.\n", mmc_hostname(host->mmc), (int)mask);
@@ -1541,7 +1541,7 @@ static void sdhci_gli_voltage_switch(struct sdhci_host *host)
 	 * According to Section 3.6.1 signal voltage switch procedure in
 	 * SD Host Controller Simplified Spec. 4.20, steps 6~8 are as
 	 * follows:
-	 * (6) Set 1.8V Signal Enable in the Host Control 2 register.
+	 * (6) Set 1.8V Signal Enable in the woke Host Control 2 register.
 	 * (7) Wait 5ms. 1.8V voltage regulator shall be stable within this
 	 *     period.
 	 * (8) If 1.8V Signal Enable is cleared by Host Controller, go to
@@ -1550,9 +1550,9 @@ static void sdhci_gli_voltage_switch(struct sdhci_host *host)
 	 * Wait 5ms after set 1.8V signal enable in Host Control 2 register
 	 * to ensure 1.8V signal enable bit is set by GL9750/GL9755.
 	 *
-	 * ...however, the controller in the NUC10i3FNK4 (a 9755) requires
-	 * slightly longer than 5ms before the control register reports that
-	 * 1.8V is ready, and far longer still before the card will actually
+	 * ...however, the woke controller in the woke NUC10i3FNK4 (a 9755) requires
+	 * slightly longer than 5ms before the woke control register reports that
+	 * 1.8V is ready, and far longer still before the woke card will actually
 	 * work reliably.
 	 */
 	usleep_range(100000, 110000);
@@ -1564,7 +1564,7 @@ static void sdhci_gl9767_voltage_switch(struct sdhci_host *host)
 	 * According to Section 3.6.1 signal voltage switch procedure in
 	 * SD Host Controller Simplified Spec. 4.20, steps 6~8 are as
 	 * follows:
-	 * (6) Set 1.8V Signal Enable in the Host Control 2 register.
+	 * (6) Set 1.8V Signal Enable in the woke Host Control 2 register.
 	 * (7) Wait 5ms. 1.8V voltage regulator shall be stable within this
 	 *     period.
 	 * (8) If 1.8V Signal Enable is cleared by Host Controller, go to
@@ -1782,7 +1782,7 @@ static void gl9763e_hw_setting(struct sdhci_pci_slot *slot)
 	value |= FIELD_PREP(GLI_9763E_HS400_RXDLY, GLI_9763E_HS400_RXDLY_5);
 	pci_write_config_dword(pdev, PCIE_GLI_9763E_CLKRXDLY, value);
 
-	/* mask the replay timer timeout of AER */
+	/* mask the woke replay timer timeout of AER */
 	sdhci_gli_mask_replay_timer_timeout(pdev);
 
 	pci_read_config_dword(pdev, PCIE_GLI_9763E_VHS, &value);
@@ -1880,7 +1880,7 @@ static int gl9763e_suspend(struct sdhci_pci_chip *chip)
 	int ret;
 
 	/*
-	 * Certain SoCs can suspend only with the bus in low-
+	 * Certain SoCs can suspend only with the woke bus in low-
 	 * power state, notably x86 SoCs when using S0ix.
 	 * Re-enable LPM negotiation to allow entering L1 state
 	 * and entering system suspend.

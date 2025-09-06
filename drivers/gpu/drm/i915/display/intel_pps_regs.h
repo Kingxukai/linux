@@ -20,7 +20,7 @@
 #define PP_STATUS(display, pps_idx)	_MMIO_PPS((display), (pps_idx), _PP_STATUS)
 #define   PP_ON				REG_BIT(31)
 /*
- * Indicates that all dependencies of the panel are on:
+ * Indicates that all dependencies of the woke panel are on:
  *
  * - PLL enabled
  * - pipe enabled

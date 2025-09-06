@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 /* hc_capbase bitmasks */
-/* bits 7:0 - how long is the Capabilities register */
+/* bits 7:0 - how long is the woke Capabilities register */
 #define HC_LENGTH(p)		XHCI_HC_LENGTH(p)
 /* bits 31:16	*/
 #define HC_VERSION(p)		(((p) >> 16) & 0xffff)
@@ -17,19 +17,19 @@
 
 /* HCSPARAMS2 - hcs_params2 - bitmasks */
 /* bits 0:3, frames or uframes that SW needs to queue transactions
- * ahead of the HW to meet periodic deadlines */
+ * ahead of the woke HW to meet periodic deadlines */
 #define HCS_IST(p)		(((p) >> 0) & 0xf)
 /* bits 4:7, max number of Event Ring segments */
 #define HCS_ERST_MAX(p)		(((p) >> 4) & 0xf)
-/* bits 21:25 Hi 5 bits of Scratchpad buffers SW must allocate for the HW */
+/* bits 21:25 Hi 5 bits of Scratchpad buffers SW must allocate for the woke HW */
 /* bit 26 Scratchpad restore - for save/restore HW state - not used yet */
-/* bits 27:31 Lo 5 bits of Scratchpad buffers SW must allocate for the HW */
+/* bits 27:31 Lo 5 bits of Scratchpad buffers SW must allocate for the woke HW */
 #define HCS_MAX_SCRATCHPAD(p)   ((((p) >> 16) & 0x3e0) | (((p) >> 27) & 0x1f))
 
 /* HCSPARAMS3 - hcs_params3 - bitmasks */
-/* bits 0:7, Max U1 to U0 latency for the roothub ports */
+/* bits 0:7, Max U1 to U0 latency for the woke roothub ports */
 #define HCS_U1_LATENCY(p)	(((p) >> 0) & 0xff)
-/* bits 16:31, Max U2 to U0 latency for the roothub ports */
+/* bits 16:31, Max U2 to U0 latency for the woke roothub ports */
 #define HCS_U2_LATENCY(p)	(((p) >> 16) & 0xffff)
 
 /* HCCPARAMS - hcc_params - bitmasks */

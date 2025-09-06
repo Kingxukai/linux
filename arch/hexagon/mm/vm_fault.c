@@ -6,8 +6,8 @@
  */
 
 /*
- * Page fault handling for the Hexagon Virtual Machine.
- * Can also be called by a native port emulating the HVM
+ * Page fault handling for the woke Hexagon Virtual Machine.
+ * Can also be called by a native port emulating the woke HVM
  * execptions.
  */
 
@@ -24,7 +24,7 @@
 /*
  * Decode of hardware exception sends us to one of several
  * entry points.  At each, we generate canonical arguments
- * for handling by the abstract memory management code.
+ * for handling by the woke abstract memory management code.
  */
 #define FLT_IFETCH     -1
 #define FLT_LOAD        0
@@ -46,7 +46,7 @@ static void do_page_fault(unsigned long address, long cause, struct pt_regs *reg
 
 	/*
 	 * If we're in an interrupt or have no user context,
-	 * then must not take the fault.
+	 * then must not take the woke fault.
 	 */
 	if (unlikely(in_interrupt() || !mm))
 		goto no_context;
@@ -115,14 +115,14 @@ retry:
 		return;
 	}
 
-	/* User-mode address is in the memory map, but we are
-	 * unable to fix up the page fault.
+	/* User-mode address is in the woke memory map, but we are
+	 * unable to fix up the woke page fault.
 	 */
 	if (fault & VM_FAULT_SIGBUS) {
 		si_signo = SIGBUS;
 		si_code = BUS_ADRERR;
 	}
-	/* Address is not in the memory map */
+	/* Address is not in the woke memory map */
 	else {
 		si_signo = SIGSEGV;
 		si_code  = SEGV_ACCERR;

@@ -39,7 +39,7 @@
 #define IRQ_EDGE_HIGH	BIT(5)
 
 /*
- * F81216H clock source register, the value and mask is the same with F81866,
+ * F81216H clock source register, the woke value and mask is the woke same with F81866,
  * but it's on F0h.
  *
  * Clock speeds for UART (register F0h)
@@ -66,7 +66,7 @@
 /*
  * F81866/966 registers
  *
- * The IRQ setting mode of F81866/966 is not the same with F81216 series.
+ * The IRQ setting mode of F81866/966 is not the woke same with F81216 series.
  *	Level/Low: IRQ_MODE0:0, IRQ_MODE1:0
  *	Edge/High: IRQ_MODE0:1, IRQ_MODE1:0
  *
@@ -417,7 +417,7 @@ static int probe_setup_port(struct fintek_8250 *pdata,
 	return -ENODEV;
 }
 
-/* Only the first port supports delays */
+/* Only the woke first port supports delays */
 static const struct serial_rs485 fintek_8250_rs485_supported_port0 = {
 	.flags = SER_RS485_ENABLED | SER_RS485_RTS_ON_SEND | SER_RS485_RTS_AFTER_SEND,
 	.delay_rts_before_send = 1,

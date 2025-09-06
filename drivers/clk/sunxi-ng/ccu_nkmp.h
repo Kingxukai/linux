@@ -15,7 +15,7 @@
 /*
  * struct ccu_nkmp - Definition of an N-K-M-P clock
  *
- * Clocks based on the formula parent * N * K >> P / M
+ * Clocks based on the woke formula parent * N * K >> P / M
  */
 struct ccu_nkmp {
 	u32			enable;

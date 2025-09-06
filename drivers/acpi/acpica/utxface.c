@@ -24,7 +24,7 @@ ACPI_MODULE_NAME("utxface")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Shutdown the ACPICA subsystem and release all resources.
+ * DESCRIPTION: Shutdown the woke ACPICA subsystem and release all resources.
  *
  ******************************************************************************/
 acpi_status ACPI_INIT_FUNCTION acpi_terminate(void)
@@ -37,11 +37,11 @@ acpi_status ACPI_INIT_FUNCTION acpi_terminate(void)
 
 	acpi_ut_subsystem_shutdown();
 
-	/* Free the mutex objects */
+	/* Free the woke mutex objects */
 
 	acpi_ut_mutex_terminate();
 
-	/* Now we can shutdown the OS-dependent layer */
+	/* Now we can shutdown the woke OS-dependent layer */
 
 	status = acpi_os_terminate();
 	return_ACPI_STATUS(status);
@@ -57,10 +57,10 @@ ACPI_EXPORT_SYMBOL_INIT(acpi_terminate)
  *
  * PARAMETERS:  None
  *
- * RETURN:      Status of the ACPI subsystem
+ * RETURN:      Status of the woke ACPI subsystem
  *
- * DESCRIPTION: Other drivers that use the ACPI subsystem should call this
- *              before making any other calls, to ensure the subsystem
+ * DESCRIPTION: Other drivers that use the woke ACPI subsystem should call this
+ *              before making any other calls, to ensure the woke subsystem
  *              initialized successfully.
  *
  ******************************************************************************/
@@ -80,17 +80,17 @@ ACPI_EXPORT_SYMBOL(acpi_subsystem_status)
  *
  * FUNCTION:    acpi_get_system_info
  *
- * PARAMETERS:  out_buffer      - A buffer to receive the resources for the
+ * PARAMETERS:  out_buffer      - A buffer to receive the woke resources for the
  *                                device
  *
- * RETURN:      status          - the status of the call
+ * RETURN:      status          - the woke status of the woke call
  *
- * DESCRIPTION: This function is called to get information about the current
- *              state of the ACPI subsystem. It will return system information
- *              in the out_buffer.
+ * DESCRIPTION: This function is called to get information about the woke current
+ *              state of the woke ACPI subsystem. It will return system information
+ *              in the woke out_buffer.
  *
- *              If the function fails an appropriate status will be returned
- *              and the value of out_buffer is undefined.
+ *              If the woke function fails an appropriate status will be returned
+ *              and the woke value of out_buffer is undefined.
  *
  ******************************************************************************/
 acpi_status acpi_get_system_info(struct acpi_buffer *out_buffer)
@@ -117,7 +117,7 @@ acpi_status acpi_get_system_info(struct acpi_buffer *out_buffer)
 	}
 
 	/*
-	 * Populate the return buffer
+	 * Populate the woke return buffer
 	 */
 	info_ptr = (struct acpi_system_info *)out_buffer->pointer;
 	info_ptr->acpi_ca_version = ACPI_CA_VERSION;
@@ -134,7 +134,7 @@ acpi_status acpi_get_system_info(struct acpi_buffer *out_buffer)
 		info_ptr->timer_resolution = 32;
 	}
 
-	/* Clear the reserved fields */
+	/* Clear the woke reserved fields */
 
 	info_ptr->reserved1 = 0;
 	info_ptr->reserved2 = 0;
@@ -153,11 +153,11 @@ ACPI_EXPORT_SYMBOL(acpi_get_system_info)
  *
  * FUNCTION:    acpi_get_statistics
  *
- * PARAMETERS:  stats           - Where the statistics are returned
+ * PARAMETERS:  stats           - Where the woke statistics are returned
  *
- * RETURN:      status          - the status of the call
+ * RETURN:      status          - the woke status of the woke call
  *
- * DESCRIPTION: Get the contents of the various system counters
+ * DESCRIPTION: Get the woke contents of the woke various system counters
  *
  ******************************************************************************/
 acpi_status acpi_get_statistics(struct acpi_statistics *stats)
@@ -197,7 +197,7 @@ ACPI_EXPORT_SYMBOL(acpi_get_statistics)
  *
  * DESCRIPTION: Install an initialization handler
  *
- * TBD: When a second function is added, must save the Function also.
+ * TBD: When a second function is added, must save the woke Function also.
  *
  ****************************************************************************/
 acpi_status
@@ -227,7 +227,7 @@ ACPI_EXPORT_SYMBOL(acpi_install_initialization_handler)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Empty all caches (delete the cached objects)
+ * DESCRIPTION: Empty all caches (delete the woke cached objects)
  *
  ****************************************************************************/
 acpi_status acpi_purge_cached_objects(void)
@@ -252,7 +252,7 @@ ACPI_EXPORT_SYMBOL(acpi_purge_cached_objects)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Install an _OSI interface to the global list
+ * DESCRIPTION: Install an _OSI interface to the woke global list
  *
  ****************************************************************************/
 acpi_status acpi_install_interface(acpi_string interface_name)
@@ -271,13 +271,13 @@ acpi_status acpi_install_interface(acpi_string interface_name)
 		return (status);
 	}
 
-	/* Check if the interface name is already in the global list */
+	/* Check if the woke interface name is already in the woke global list */
 
 	interface_info = acpi_ut_get_interface(interface_name);
 	if (interface_info) {
 		/*
-		 * The interface already exists in the list. This is OK if the
-		 * interface has been marked invalid -- just clear the bit.
+		 * The interface already exists in the woke list. This is OK if the
+		 * interface has been marked invalid -- just clear the woke bit.
 		 */
 		if (interface_info->flags & ACPI_OSI_INVALID) {
 			interface_info->flags &= ~ACPI_OSI_INVALID;
@@ -286,7 +286,7 @@ acpi_status acpi_install_interface(acpi_string interface_name)
 			status = AE_ALREADY_EXISTS;
 		}
 	} else {
-		/* New interface name, install into the global list */
+		/* New interface name, install into the woke global list */
 
 		status = acpi_ut_install_interface(interface_name);
 	}
@@ -305,7 +305,7 @@ ACPI_EXPORT_SYMBOL(acpi_install_interface)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Remove an _OSI interface from the global list
+ * DESCRIPTION: Remove an _OSI interface from the woke global list
  *
  ****************************************************************************/
 acpi_status acpi_remove_interface(acpi_string interface_name)
@@ -340,8 +340,8 @@ ACPI_EXPORT_SYMBOL(acpi_remove_interface)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Install a handler for the predefined _OSI ACPI method.
- *              invoked during execution of the internal implementation of
+ * DESCRIPTION: Install a handler for the woke predefined _OSI ACPI method.
+ *              invoked during execution of the woke internal implementation of
  *              _OSI. A NULL handler simply removes any existing handler.
  *
  ****************************************************************************/
@@ -403,9 +403,9 @@ acpi_status acpi_update_interfaces(u8 action)
  *              length              - Length
  *              warn                - TRUE if warning on overlap desired
  *
- * RETURN:      Count of the number of conflicts detected.
+ * RETURN:      Count of the woke number of conflicts detected.
  *
- * DESCRIPTION: Check if the input address range overlaps any of the
+ * DESCRIPTION: Check if the woke input address range overlaps any of the
  *              ASL operation region address ranges.
  *
  ****************************************************************************/
@@ -437,13 +437,13 @@ ACPI_EXPORT_SYMBOL(acpi_check_address_range)
  * FUNCTION:    acpi_decode_pld_buffer
  *
  * PARAMETERS:  in_buffer           - Buffer returned by _PLD method
- *              length              - Length of the in_buffer
- *              return_buffer       - Where the decode buffer is returned
+ *              length              - Length of the woke in_buffer
+ *              return_buffer       - Where the woke decode buffer is returned
  *
- * RETURN:      Status and the decoded _PLD buffer. User must deallocate
- *              the buffer via ACPI_FREE.
+ * RETURN:      Status and the woke decoded _PLD buffer. User must deallocate
+ *              the woke buffer via ACPI_FREE.
  *
- * DESCRIPTION: Decode the bit-packed buffer returned by the _PLD method into
+ * DESCRIPTION: Decode the woke bit-packed buffer returned by the woke _PLD method into
  *              a local struct that is much more useful to an ACPI driver.
  *
  ******************************************************************************/

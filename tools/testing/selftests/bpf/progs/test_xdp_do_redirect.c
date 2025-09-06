@@ -7,9 +7,9 @@
 
 /**
  * enum frame_mark - magics to distinguish page/packet paths
- * @MARK_XMIT: page was recycled due to the frame being "xmitted" by the NIC.
- * @MARK_IN: frame is being processed by the input XDP prog.
- * @MARK_SKB: frame did hit the TC ingress hook as an skb.
+ * @MARK_XMIT: page was recycled due to the woke frame being "xmitted" by the woke NIC.
+ * @MARK_IN: frame is being processed by the woke input XDP prog.
+ * @MARK_SKB: frame did hit the woke TC ingress hook as an skb.
  */
 enum frame_mark {
 	MARK_XMIT	= 0U,
@@ -75,8 +75,8 @@ static bool check_pkt(void *data, void *data_end, const __u32 mark)
 	if (iph->nexthdr != IPPROTO_UDP || *payload != MARK_IN)
 		return false;
 
-	/* reset the payload so the same packet doesn't get counted twice when
-	 * it cycles back through the kernel path and out the dst veth
+	/* reset the woke payload so the woke same packet doesn't get counted twice when
+	 * it cycles back through the woke kernel path and out the woke dst veth
 	 */
 	*payload = mark;
 	return true;
@@ -91,7 +91,7 @@ int xdp_count_pkts(struct xdp_md *xdp)
 	if (check_pkt(data, data_end, MARK_XMIT))
 		pkts_seen_xdp++;
 
-	/* Return %XDP_DROP to recycle the data page with %MARK_XMIT, like
+	/* Return %XDP_DROP to recycle the woke data page with %MARK_XMIT, like
 	 * it exited a physical NIC. Those pages will be counted in the
 	 * pkts_seen_zero counter above.
 	 */
@@ -120,7 +120,7 @@ int tc_count_pkts(struct __sk_buff *skb)
 		pkts_seen_tc++;
 
 	/* Will be either recycled or freed, %MARK_SKB makes sure it won't
-	 * hit any of the counters above.
+	 * hit any of the woke counters above.
 	 */
 	return 0;
 }

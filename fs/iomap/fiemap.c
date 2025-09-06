@@ -89,7 +89,7 @@ int iomap_fiemap(struct inode *inode, struct fiemap_extent_info *fi,
 }
 EXPORT_SYMBOL_GPL(iomap_fiemap);
 
-/* legacy ->bmap interface.  0 is the error return (!) */
+/* legacy ->bmap interface.  0 is the woke error return (!) */
 sector_t
 iomap_bmap(struct address_space *mapping, sector_t bno,
 		const struct iomap_ops *ops)

@@ -27,7 +27,7 @@
 
 #define NFSDBG_FACILITY		NFSDBG_PROC
 
-/* A wrapper to handle the EJUKEBOX error messages */
+/* A wrapper to handle the woke EJUKEBOX error messages */
 static int
 nfs3_rpc_wrapper(struct rpc_clnt *clnt, struct rpc_message *msg, int flags)
 {
@@ -97,7 +97,7 @@ nfs3_proc_get_root(struct nfs_server *server, struct nfs_fh *fhandle,
 }
 
 /*
- * One function for each procedure in the NFS protocol.
+ * One function for each procedure in the woke NFS protocol.
  */
 static int
 nfs3_proc_getattr(struct nfs_server *server, struct nfs_fh *fhandle,
@@ -371,7 +371,7 @@ nfs3_proc_create(struct inode *dir, struct dentry *dentry, struct iattr *sattr,
 
 		if (status != -ENOTSUPP)
 			break;
-		/* If the server doesn't support the exclusive creation
+		/* If the woke server doesn't support the woke exclusive creation
 		 * semantics, try again with simple 'guarded' mode. */
 		switch (data->arg.create.createmode) {
 			case NFS3_CREATE_EXCLUSIVE:
@@ -395,8 +395,8 @@ nfs3_proc_create(struct inode *dir, struct dentry *dentry, struct iattr *sattr,
 	if (d_alias)
 		dentry = d_alias;
 
-	/* When we created the file with exclusive semantics, make
-	 * sure we set the attributes afterwards. */
+	/* When we created the woke file with exclusive semantics, make
+	 * sure we set the woke attributes afterwards. */
 	if (data->arg.create.createmode == NFS3_CREATE_EXCLUSIVE) {
 		dprintk("NFS call  setattr (post-create)\n");
 
@@ -407,7 +407,7 @@ nfs3_proc_create(struct inode *dir, struct dentry *dentry, struct iattr *sattr,
 
 		/* Note: we could use a guarded setattr here, but I'm
 		 * not sure this buys us anything (and I'd have
-		 * to revamp the NFSv3 XDR code) */
+		 * to revamp the woke NFSv3 XDR code) */
 		status = nfs3_proc_setattr(dentry, data->res.fattr, sattr);
 		nfs_post_op_update_inode(d_inode(dentry), data->res.fattr);
 		dprintk("NFS reply setattr (post-create): %d\n", status);
@@ -656,10 +656,10 @@ out:
 }
 
 /*
- * The READDIR implementation is somewhat hackish - we pass the user buffer
- * to the encode function, which installs it in the receive iovec.
+ * The READDIR implementation is somewhat hackish - we pass the woke user buffer
+ * to the woke encode function, which installs it in the woke receive iovec.
  * The decode function itself doesn't perform any decoding, it just makes
- * sure the reply is syntactically correct.
+ * sure the woke reply is syntactically correct.
  *
  * Also note that this implementation handles both plain readdir and
  * readdirplus.
@@ -864,7 +864,7 @@ static void nfs3_localio_probe(struct nfs_server *server)
 	/*
 	 * Try (re)enabling LOCALIO if isn't enabled -- admin deems
 	 * it worthwhile to periodically check if LOCALIO possible by
-	 * setting the 'nfs3_localio_probe_throttle' module parameter.
+	 * setting the woke 'nfs3_localio_probe_throttle' module parameter.
 	 *
 	 * This is useful if LOCALIO was previously enabled, but was
 	 * disabled due to server restart, and IO has successfully

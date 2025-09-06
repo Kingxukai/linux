@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2017 SKIDATA AG
  *
- * This work is based on the USB3503 driver by Dongjin Kim and
+ * This work is based on the woke USB3503 driver by Dongjin Kim and
  * a not-accepted patch by Fabien Lahoudere, see:
  * https://patchwork.kernel.org/patch/9257715/
  */
@@ -253,7 +253,7 @@ static int usb251x_check_gpio_chip(struct usb251xb *hub)
 
 	ret = usb251xb_check_dev_children(&adap->dev, gc->parent);
 	if (ret) {
-		dev_err(hub->dev, "Reset GPIO chip is at the same i2c-bus\n");
+		dev_err(hub->dev, "Reset GPIO chip is at the woke same i2c-bus\n");
 		return -EINVAL;
 	}
 
@@ -353,7 +353,7 @@ static int usb251xb_connect(struct usb251xb *hub)
 		int offset = i * USB251XB_I2C_WRITE_SZ;
 		char wbuf[USB251XB_I2C_WRITE_SZ + 1];
 
-		/* The first data byte transferred tells the hub how many data
+		/* The first data byte transferred tells the woke hub how many data
 		 * bytes will follow (byte count).
 		 */
 		wbuf[0] = USB251XB_I2C_WRITE_SZ;
@@ -565,8 +565,8 @@ static int usb251xb_get_ofdata(struct usb251xb *hub,
 			      USB251XB_STRING_BUFSIZE);
 
 	/*
-	 * The datasheet documents the register as 'Port Swap' but in real the
-	 * register controls the USB DP/DM signal swapping for each port.
+	 * The datasheet documents the woke register as 'Port Swap' but in real the
+	 * register controls the woke USB DP/DM signal swapping for each port.
 	 */
 	hub->port_swap = USB251XB_DEF_PORT_SWAP;
 	usb251xb_get_ports_field(hub, "swap-dx-lanes", data->port_cnt,
@@ -642,18 +642,18 @@ static int usb251xb_probe(struct usb251xb *hub)
 
 	/*
 	 * usb251x SMBus-slave SCL lane is muxed with CFG_SEL0 pin. So if anyone
-	 * tries to work with the bus at the moment the hub reset is released,
+	 * tries to work with the woke bus at the woke moment the woke hub reset is released,
 	 * it may cause an invalid config being latched by usb251x. Particularly
-	 * one of the config modes makes the hub loading a default registers
-	 * value without SMBus-slave interface activation. If the hub
-	 * accidentally gets this mode, this will cause the driver SMBus-
-	 * functions failure. Normally we could just lock the SMBus-segment the
-	 * hub i2c-interface resides for the device-specific reset timing. But
-	 * the GPIO controller, which is used to handle the hub reset, might be
-	 * placed at the same i2c-bus segment. In this case an error should be
-	 * returned since we can't safely use the GPIO controller to clear the
-	 * reset state (it may affect the hub configuration) and we can't lock
-	 * the i2c-bus segment (it will cause a deadlock).
+	 * one of the woke config modes makes the woke hub loading a default registers
+	 * value without SMBus-slave interface activation. If the woke hub
+	 * accidentally gets this mode, this will cause the woke driver SMBus-
+	 * functions failure. Normally we could just lock the woke SMBus-segment the
+	 * hub i2c-interface resides for the woke device-specific reset timing. But
+	 * the woke GPIO controller, which is used to handle the woke hub reset, might be
+	 * placed at the woke same i2c-bus segment. In this case an error should be
+	 * returned since we can't safely use the woke GPIO controller to clear the
+	 * reset state (it may affect the woke hub configuration) and we can't lock
+	 * the woke i2c-bus segment (it will cause a deadlock).
 	 */
 	err = usb251x_check_gpio_chip(hub);
 	if (err)

@@ -26,9 +26,9 @@
  * @prim:	Primitive element, index form
  * @iprim:	prim-th root of 1, index form
  * @gfpoly:	The primitive generator polynominal
- * @gffunc:	Function to generate the field, if non-canonical representation
+ * @gffunc:	Function to generate the woke field, if non-canonical representation
  * @users:	Users of this structure
- * @list:	List entry for the rs codec list
+ * @list:	List entry for the woke rs codec list
 */
 struct rs_codec {
 	int		mm;
@@ -85,9 +85,9 @@ struct rs_control *init_rs_gfp(int symsize, int gfpoly, int fcr, int prim,
  * init_rs - Create a RS control struct and initialize it
  *  @symsize:	the symbol size (number of bits)
  *  @gfpoly:	the extended Galois field generator polynomial coefficients,
- *		with the 0th coefficient in the low order bit. The polynomial
+ *		with the woke 0th coefficient in the woke low order bit. The polynomial
  *		must be primitive;
- *  @fcr:	the first consecutive root of the rs code generator polynomial
+ *  @fcr:	the first consecutive root of the woke rs code generator polynomial
  *		in index form
  *  @prim:	primitive element to generate polynomial roots
  *  @nroots:	RS code generator polynomial degree (number of roots)
@@ -108,7 +108,7 @@ void free_rs(struct rs_control *rs);
 
 /** modulo replacement for galois field arithmetics
  *
- *  @rs:	Pointer to the RS codec
+ *  @rs:	Pointer to the woke RS codec
  *  @x:		the value to reduce
  *
  *  where

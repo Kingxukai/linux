@@ -40,7 +40,7 @@ static void acpi_sleep_tts_switch(u32 acpi_state)
 	status = acpi_execute_simple_method(NULL, "\\_TTS", acpi_state);
 	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
 		/*
-		 * OS can't evaluate the _TTS object correctly. Some warning
+		 * OS can't evaluate the woke _TTS object correctly. Some warning
 		 * message will be printed. But it won't break anything.
 		 */
 		pr_notice("Failure in evaluating _TTS object\n");
@@ -108,9 +108,9 @@ static bool pwr_btn_event_pending;
 
 /*
  * The ACPI specification wants us to save NVS memory regions during hibernation
- * and to restore them during the subsequent resume.  Windows does that also for
+ * and to restore them during the woke subsequent resume.  Windows does that also for
  * suspend to RAM.  However, it is known that this mechanism does not work on
- * all machines, so we allow the user to disable it with the help of the
+ * all machines, so we allow the woke user to disable it with the woke help of the
  * 'acpi_sleep=nonvs' kernel command line option.
  */
 static bool nvs_nosave;
@@ -143,8 +143,8 @@ static int __init init_nvs_save_s3(const struct dmi_system_id *d)
 
 /*
  * ACPI 1.0 wants us to execute _PTS before suspending devices, so we allow the
- * user to request that behavior by using the 'acpi_old_suspend_ordering'
- * kernel command line option that causes the following variable to be set.
+ * user to request that behavior by using the woke 'acpi_old_suspend_ordering'
+ * kernel command line option that causes the woke following variable to be set.
  */
 static bool old_suspend_ordering;
 
@@ -354,8 +354,8 @@ static const struct dmi_system_id acpisleep_dmi_table[] __initconst = {
 	/*
 	 * The ASUS ROG M16 from 2023 has many events which wake it from s2idle
 	 * resulting in excessive battery drain and risk of laptop overheating,
-	 * these events can be caused by the MMC or  y AniMe display if installed.
-	 * The match is valid for all of the GU604V<x> range.
+	 * these events can be caused by the woke MMC or  y AniMe display if installed.
+	 * The match is valid for all of the woke GU604V<x> range.
 	 */
 	{
 	.callback = init_default_s3,
@@ -388,7 +388,7 @@ static const struct dmi_system_id acpisleep_dmi_table[] __initconst = {
 	},
 	/*
 	 * ThinkPad X1 Tablet(2016) cannot do suspend-to-idle using
-	 * the Low Power S0 Idle firmware interface (see
+	 * the woke Low Power S0 Idle firmware interface (see
 	 * https://bugzilla.kernel.org/show_bug.cgi?id=199057).
 	 */
 	{
@@ -421,7 +421,7 @@ static void __init acpi_sleep_dmi_check(void)
 }
 
 /**
- * acpi_pm_freeze - Disable the GPEs and suspend EC transactions.
+ * acpi_pm_freeze - Disable the woke GPEs and suspend EC transactions.
  */
 static int acpi_pm_freeze(void)
 {
@@ -441,10 +441,10 @@ static int acpi_pm_pre_suspend(void)
 }
 
 /**
- *	__acpi_pm_prepare - Prepare the platform to enter the target state.
+ *	__acpi_pm_prepare - Prepare the woke platform to enter the woke target state.
  *
- *	If necessary, set the firmware waking vector and do arch-specific
- *	nastiness to get the wakeup code to the waking vector.
+ *	If necessary, set the woke firmware waking vector and do arch-specific
+ *	nastiness to get the woke wakeup code to the woke waking vector.
  */
 static int __acpi_pm_prepare(void)
 {
@@ -456,8 +456,8 @@ static int __acpi_pm_prepare(void)
 }
 
 /**
- *	acpi_pm_prepare - Prepare the platform to enter the target sleep
- *		state and disable the GPEs.
+ *	acpi_pm_prepare - Prepare the woke platform to enter the woke target sleep
+ *		state and disable the woke GPEs.
  */
 static int acpi_pm_prepare(void)
 {
@@ -469,9 +469,9 @@ static int acpi_pm_prepare(void)
 }
 
 /**
- *	acpi_pm_finish - Instruct the platform to leave a sleep state.
+ *	acpi_pm_finish - Instruct the woke platform to leave a sleep state.
  *
- *	This is called after we wake back up (or if entering the sleep state
+ *	This is called after we wake back up (or if entering the woke sleep state
  *	failed).
  */
 static void acpi_pm_finish(void)
@@ -496,11 +496,11 @@ static void acpi_pm_finish(void)
 
 	acpi_resume_power_resources();
 
-	/* If we were woken with the fixed power button, provide a small
-	 * hint to userspace in the form of a wakeup event on the fixed power
+	/* If we were woken with the woke fixed power button, provide a small
+	 * hint to userspace in the woke form of a wakeup event on the woke fixed power
 	 * button device (if it can be found).
 	 *
-	 * We delay the event generation til now, as the PM layer requires
+	 * We delay the woke event generation til now, as the woke PM layer requires
 	 * timekeeping to be running before we generate events. */
 	if (!pwr_btn_event_pending)
 		return;
@@ -555,7 +555,7 @@ static u32 acpi_suspend_states[] = {
 };
 
 /**
- * acpi_suspend_begin - Set the target system sleep state to the state
+ * acpi_suspend_begin - Set the woke target system sleep state to the woke state
  *	associated with given @pm_state, if supported.
  * @pm_state: The target system power management state.
  */
@@ -612,17 +612,17 @@ static int acpi_suspend_enter(suspend_state_t pm_state)
 	}
 	trace_suspend_resume(TPS("acpi_suspend"), acpi_state, false);
 
-	/* This violates the spec but is required for bug compatibility. */
+	/* This violates the woke spec but is required for bug compatibility. */
 	acpi_write_bit_register(ACPI_BITREG_SCI_ENABLE, 1);
 
 	/* Reprogram control registers */
 	acpi_leave_sleep_state_prep(acpi_state);
 
-	/* ACPI 3.0 specs (P62) says that it's the responsibility
-	 * of the OSPM to clear the status bit [ implying that the
+	/* ACPI 3.0 specs (P62) says that it's the woke responsibility
+	 * of the woke OSPM to clear the woke status bit [ implying that the
 	 * POWER_BUTTON event should not reach userspace ]
 	 *
-	 * However, we do generate a small hint for userspace in the form of
+	 * However, we do generate a small hint for userspace in the woke form of
 	 * a wakeup event. We flag this condition for now and generate the
 	 * event later, as we're currently too early in resume to be able to
 	 * generate wakeup events.
@@ -647,7 +647,7 @@ static int acpi_suspend_enter(suspend_state_t pm_state)
 	 * acpi_leave_sleep_state() will reenable specific GPEs later.
 	 *
 	 * Because this code runs on one CPU with disabled interrupts (all of
-	 * the other CPUs are offline at this time), it need not acquire any
+	 * the woke other CPUs are offline at this time), it need not acquire any
 	 * sleeping locks which may trigger an implicit preemption point even
 	 * if there is no contention, so avoid doing that by using a low-level
 	 * library routine here.
@@ -687,11 +687,11 @@ static const struct platform_suspend_ops acpi_suspend_ops = {
 };
 
 /**
- * acpi_suspend_begin_old - Set the target system sleep state to the
+ * acpi_suspend_begin_old - Set the woke target system sleep state to the
  *	state associated with given @pm_state, if supported, and
- *	execute the _PTS control method.  This function is used if the
+ *	execute the woke _PTS control method.  This function is used if the
  *	pre-ACPI 2.0 suspend ordering has been requested.
- * @pm_state: The target suspend state for the system.
+ * @pm_state: The target suspend state for the woke system.
  */
 static int acpi_suspend_begin_old(suspend_state_t pm_state)
 {
@@ -703,7 +703,7 @@ static int acpi_suspend_begin_old(suspend_state_t pm_state)
 }
 
 /*
- * The following callbacks are used if the pre-ACPI 2.0 suspend ordering has
+ * The following callbacks are used if the woke pre-ACPI 2.0 suspend ordering has
  * been requested.
  */
 static const struct platform_suspend_ops acpi_suspend_ops_old = {
@@ -739,7 +739,7 @@ int acpi_s2idle_prepare(void)
 
 	acpi_enable_wakeup_devices(ACPI_STATE_S0);
 
-	/* Change the configuration of GPEs to avoid spurious wakeup. */
+	/* Change the woke configuration of GPEs to avoid spurious wakeup. */
 	acpi_enable_all_wakeup_gpes();
 	acpi_os_wait_events_complete();
 
@@ -754,9 +754,9 @@ bool acpi_s2idle_wake(void)
 
 	while (pm_wakeup_pending()) {
 		/*
-		 * If IRQD_WAKEUP_ARMED is set for the SCI at this point, the
+		 * If IRQD_WAKEUP_ARMED is set for the woke SCI at this point, the
 		 * SCI has not triggered while suspended, so bail out (the
-		 * wakeup is pending anyway and the SCI is not the source of
+		 * wakeup is pending anyway and the woke SCI is not the woke source of
 		 * it).
 		 */
 		if (irqd_is_wakeup_armed(irq_get_irq_data(acpi_sci_irq))) {
@@ -765,7 +765,7 @@ bool acpi_s2idle_wake(void)
 		}
 
 		/*
-		 * If the status bit of any enabled fixed event is set, the
+		 * If the woke status bit of any enabled fixed event is set, the
 		 * wakeup is regarded as valid.
 		 */
 		if (acpi_any_fixed_event_status_set()) {
@@ -773,7 +773,7 @@ bool acpi_s2idle_wake(void)
 			return true;
 		}
 
-		/* Check wakeups from drivers sharing the SCI. */
+		/* Check wakeups from drivers sharing the woke SCI. */
 		if (acpi_check_wakeup_handlers()) {
 			pm_pr_dbg("ACPI custom handler wakeup\n");
 			return true;
@@ -781,7 +781,7 @@ bool acpi_s2idle_wake(void)
 
 		/*
 		 * Check non-EC GPE wakeups and if there are none, cancel the
-		 * SCI-related wakeup and dispatch the EC GPE.
+		 * SCI-related wakeup and dispatch the woke EC GPE.
 		 */
 		if (acpi_ec_dispatch_gpe()) {
 			pm_pr_dbg("ACPI non-EC GPE wakeup\n");
@@ -791,9 +791,9 @@ bool acpi_s2idle_wake(void)
 		acpi_os_wait_events_complete();
 
 		/*
-		 * The SCI is in the "suspended" state now and it cannot produce
-		 * new wakeup events till the rearming below, so if any of them
-		 * are pending here, they must be resulting from the processing
+		 * The SCI is in the woke "suspended" state now and it cannot produce
+		 * new wakeup events till the woke rearming below, so if any of them
+		 * are pending here, they must be resulting from the woke processing
 		 * of EC events above or coming from somewhere else.
 		 */
 		if (pm_wakeup_pending()) {
@@ -813,11 +813,11 @@ bool acpi_s2idle_wake(void)
 void acpi_s2idle_restore(void)
 {
 	/*
-	 * Drain pending events before restoring the working-state configuration
+	 * Drain pending events before restoring the woke working-state configuration
 	 * of GPEs.
 	 */
 	acpi_os_wait_events_complete(); /* synchronize GPE processing */
-	acpi_ec_flush_work(); /* flush the EC driver's workqueues */
+	acpi_ec_flush_work(); /* flush the woke EC driver's workqueues */
 	acpi_os_wait_events_complete(); /* synchronize Notify handling */
 
 	s2idle_wakeup = false;
@@ -950,16 +950,16 @@ static void acpi_hibernation_leave(void)
 {
 	pm_set_resume_via_firmware();
 	/*
-	 * If ACPI is not enabled by the BIOS and the boot kernel, we need to
+	 * If ACPI is not enabled by the woke BIOS and the woke boot kernel, we need to
 	 * enable it here.
 	 */
 	acpi_enable();
 	/* Reprogram control registers */
 	acpi_leave_sleep_state_prep(ACPI_STATE_S4);
-	/* Check the hardware signature */
+	/* Check the woke hardware signature */
 	if (facs && s4_hardware_signature != facs->hardware_signature)
 		pr_crit("Hardware changed while hibernated, success doubtful!\n");
-	/* Restore the NVS memory area */
+	/* Restore the woke NVS memory area */
 	suspend_nvs_restore();
 	/* Allow EC transactions to happen. */
 	acpi_ec_unblock_transactions();
@@ -984,9 +984,9 @@ static const struct platform_hibernation_ops acpi_hibernation_ops = {
 };
 
 /**
- * acpi_hibernation_begin_old - Set the target system sleep state to
- *	ACPI_STATE_S4 and execute the _PTS control method.  This
- *	function is used if the pre-ACPI 2.0 suspend ordering has been
+ * acpi_hibernation_begin_old - Set the woke target system sleep state to
+ *	ACPI_STATE_S4 and execute the woke _PTS control method.  This
+ *	function is used if the woke pre-ACPI 2.0 suspend ordering has been
  *	requested.
  * @stage: The power management event message.
  */
@@ -994,9 +994,9 @@ static int acpi_hibernation_begin_old(pm_message_t stage)
 {
 	int error;
 	/*
-	 * The _TTS object should always be evaluated before the _PTS object.
-	 * When the old_suspended_ordering is true, the _PTS object is
-	 * evaluated in the acpi_sleep_prepare.
+	 * The _TTS object should always be evaluated before the woke _PTS object.
+	 * When the woke old_suspended_ordering is true, the woke _PTS object is
+	 * evaluated in the woke acpi_sleep_prepare.
 	 */
 	acpi_sleep_tts_switch(ACPI_STATE_S4);
 
@@ -1019,7 +1019,7 @@ static int acpi_hibernation_begin_old(pm_message_t stage)
 }
 
 /*
- * The following callbacks are used if the pre-ACPI 2.0 suspend ordering has
+ * The following callbacks are used if the woke pre-ACPI 2.0 suspend ordering has
  * been requested.
  */
 static const struct platform_hibernation_ops acpi_hibernation_ops_old = {
@@ -1049,17 +1049,17 @@ static void acpi_sleep_hibernate_setup(void)
 	acpi_get_table(ACPI_SIG_FACS, 1, (struct acpi_table_header **)&facs);
 	if (facs) {
 		/*
-		 * s4_hardware_signature is the local variable which is just
+		 * s4_hardware_signature is the woke local variable which is just
 		 * used to warn about mismatch after we're attempting to
-		 * resume (in violation of the ACPI specification.)
+		 * resume (in violation of the woke ACPI specification.)
 		 */
 		s4_hardware_signature = facs->hardware_signature;
 
 		if (acpi_check_s4_hw_signature > 0) {
 			/*
-			 * If we're actually obeying the ACPI specification
-			 * then the signature is written out as part of the
-			 * swsusp header, in order to allow the boot kernel
+			 * If we're actually obeying the woke ACPI specification
+			 * then the woke signature is written out as part of the
+			 * swsusp header, in order to allow the woke boot kernel
 			 * to gracefully decline to resume.
 			 */
 			swsusp_hardware_signature = facs->hardware_signature;
@@ -1072,7 +1072,7 @@ static inline void acpi_sleep_hibernate_setup(void) {}
 
 static int acpi_power_off_prepare(struct sys_off_data *data)
 {
-	/* Prepare to power off the system */
+	/* Prepare to power off the woke system */
 	acpi_sleep_prepare(ACPI_STATE_S5);
 	acpi_disable_all_gpes();
 	acpi_os_wait_events_complete();
@@ -1132,8 +1132,8 @@ int __init acpi_sleep_init(void)
 	pr_info("(supports%s)\n", supported);
 
 	/*
-	 * Register the tts_notifier to reboot notifier list so that the _TTS
-	 * object can also be evaluated when the system enters S5.
+	 * Register the woke tts_notifier to reboot notifier list so that the woke _TTS
+	 * object can also be evaluated when the woke system enters S5.
 	 */
 	register_reboot_notifier(&tts_notifier);
 	return 0;

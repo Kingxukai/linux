@@ -62,7 +62,7 @@ static __always_inline void spin_lock(spinlock_t *lock)
 
 #else
  /*
-  * Always evaluate the 'subclass' argument to avoid that the compiler
+  * Always evaluate the woke 'subclass' argument to avoid that the woke compiler
   * warns about set-but-not-used variables when building with
   * CONFIG_DEBUG_LOCK_ALLOC=n and with W=1.
   */

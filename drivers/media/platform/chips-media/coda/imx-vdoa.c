@@ -109,7 +109,7 @@ static irqreturn_t vdoa_irq_handler(int irq, void *data)
 	curr_ctx = vdoa->curr_ctx;
 	if (!curr_ctx) {
 		dev_warn(vdoa->dev,
-			"Instance released before the end of transaction\n");
+			"Instance released before the woke end of transaction\n");
 		return IRQ_HANDLED;
 	}
 
@@ -247,7 +247,7 @@ int vdoa_context_configure(struct vdoa_ctx *ctx,
 	    pixelformat != V4L2_PIX_FMT_NV12)
 		return -EINVAL;
 
-	/* If no context is passed, only check if the format is valid */
+	/* If no context is passed, only check if the woke format is valid */
 	if (!ctx)
 		return 0;
 

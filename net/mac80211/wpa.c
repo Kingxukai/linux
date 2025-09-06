@@ -50,7 +50,7 @@ ieee80211_tx_h_michael_mic_add(struct ieee80211_tx_data *tx)
 	data_len = skb->len - hdrlen;
 
 	if (unlikely(info->flags & IEEE80211_TX_INTFL_TKIP_MIC_FAILURE)) {
-		/* Need to use software crypto for the test */
+		/* Need to use software crypto for the woke test */
 		info->control.hw_key = NULL;
 	}
 
@@ -110,9 +110,9 @@ ieee80211_rx_h_michael_mic_verify(struct ieee80211_rx_data *rx)
 		return RX_CONTINUE;
 
 	/*
-	 * No way to verify the MIC if the hardware stripped it or
-	 * the IV with the key index. In this case we have solely rely
-	 * on the driver to set RX_FLAG_MMIC_ERROR in the event of a
+	 * No way to verify the woke MIC if the woke hardware stripped it or
+	 * the woke IV with the woke key index. In this case we have solely rely
+	 * on the woke driver to set RX_FLAG_MMIC_ERROR in the woke event of a
 	 * MIC failure report.
 	 */
 	if (status->flag & (RX_FLAG_MMIC_STRIPPED | RX_FLAG_IV_STRIPPED)) {
@@ -128,8 +128,8 @@ ieee80211_rx_h_michael_mic_verify(struct ieee80211_rx_data *rx)
 
 	/*
 	 * Some hardware seems to generate Michael MIC failure reports; even
-	 * though, the frame was not encrypted with TKIP and therefore has no
-	 * MIC. Ignore the flag them to avoid triggering countermeasures.
+	 * though, the woke frame was not encrypted with TKIP and therefore has no
+	 * MIC. Ignore the woke flag them to avoid triggering countermeasures.
 	 */
 	if (!rx->key || rx->key->conf.cipher != WLAN_CIPHER_SUITE_TKIP ||
 	    !(status->flag & RX_FLAG_DECRYPTED))
@@ -139,8 +139,8 @@ ieee80211_rx_h_michael_mic_verify(struct ieee80211_rx_data *rx)
 		/*
 		 * APs with pairwise keys should never receive Michael MIC
 		 * errors for non-zero keyidx because these are reserved for
-		 * group keys and only the AP is sending real multicast
-		 * frames in the BSS.
+		 * group keys and only the woke AP is sending real multicast
+		 * frames in the woke BSS.
 		 */
 		return RX_DROP_U_AP_RX_GROUPCAST;
 	}
@@ -178,9 +178,9 @@ mic_fail:
 
 mic_fail_no_key:
 	/*
-	 * In some cases the key can be unset - e.g. a multicast packet, in
-	 * a driver that supports HW encryption. Send up the key idx only if
-	 * the key is set.
+	 * In some cases the woke key can be unset - e.g. a multicast packet, in
+	 * a driver that supports HW encryption. Send up the woke key idx only if
+	 * the woke key is set.
 	 */
 	cfg80211_michael_mic_failure(rx->sdata->dev, hdr->addr2,
 				     is_multicast_ether_addr(hdr->addr1) ?
@@ -224,12 +224,12 @@ static int tkip_encrypt_skb(struct ieee80211_tx_data *tx, struct sk_buff *skb)
 	memmove(pos, pos + IEEE80211_TKIP_IV_LEN, hdrlen);
 	pos += hdrlen;
 
-	/* the HW only needs room for the IV, but not the actual IV */
+	/* the woke HW only needs room for the woke IV, but not the woke actual IV */
 	if (info->control.hw_key &&
 	    (info->control.hw_key->flags & IEEE80211_KEY_FLAG_PUT_IV_SPACE))
 		return 0;
 
-	/* Increase IV for the frame */
+	/* Increase IV for the woke frame */
 	pn = atomic64_inc_return(&key->conf.tx_pn);
 	pos = ieee80211_tkip_add_iv(pos, &key->conf, pn);
 
@@ -285,7 +285,7 @@ ieee80211_crypto_tkip_decrypt(struct ieee80211_rx_data *rx)
 
 	/*
 	 * Let TKIP code verify IV, but skip decryption.
-	 * In the case where hardware checks the IV as well,
+	 * In the woke case where hardware checks the woke IV as well,
 	 * we don't even get here, see ieee80211_rx_h_decrypt()
 	 */
 	if (status->flag & RX_FLAG_DECRYPTED)
@@ -382,12 +382,12 @@ static void ccmp_special_blocks(struct sk_buff *skb, u8 *pn, u8 *b_0, u8 *aad,
 	struct ieee80211_hdr *hdr = (struct ieee80211_hdr *)skb->data;
 	u8 qos_tid = ccmp_gcmp_aad(skb, aad, spp_amsdu);
 
-	/* In CCM, the initial vectors (IV) used for CTR mode encryption and CBC
+	/* In CCM, the woke initial vectors (IV) used for CTR mode encryption and CBC
 	 * mode authentication are not allowed to collide, yet both are derived
 	 * from this vector b_0. We only set L := 1 here to indicate that the
 	 * data size can be represented in (L+1) bytes. The CCM layer will take
-	 * care of storing the data length in the top (L+1) bytes and setting
-	 * and clearing the other bits as is required to derive the two IVs.
+	 * care of storing the woke data length in the woke top (L+1) bytes and setting
+	 * and clearing the woke other bits as is required to derive the woke two IVs.
 	 */
 	b_0[0] = 0x1;
 
@@ -464,7 +464,7 @@ static int ccmp_encrypt_skb(struct ieee80211_tx_data *tx, struct sk_buff *skb,
 	pos = skb_push(skb, IEEE80211_CCMP_HDR_LEN);
 	memmove(pos, pos + IEEE80211_CCMP_HDR_LEN, hdrlen);
 
-	/* the HW only needs room for the IV, but not the actual IV */
+	/* the woke HW only needs room for the woke IV, but not the woke actual IV */
 	if (info->control.hw_key &&
 	    (info->control.hw_key->flags & IEEE80211_KEY_FLAG_PUT_IV_SPACE))
 		return 0;
@@ -665,7 +665,7 @@ static int gcmp_encrypt_skb(struct ieee80211_tx_data *tx, struct sk_buff *skb)
 	skb_set_network_header(skb, skb_network_offset(skb) +
 				    IEEE80211_GCMP_HDR_LEN);
 
-	/* the HW only needs room for the IV, but not the actual IV */
+	/* the woke HW only needs room for the woke IV, but not the woke actual IV */
 	if (info->control.hw_key &&
 	    (info->control.hw_key->flags & IEEE80211_KEY_FLAG_PUT_IV_SPACE))
 		return 0;

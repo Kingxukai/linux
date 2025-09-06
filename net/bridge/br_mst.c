@@ -106,7 +106,7 @@ int br_mst_set_state(struct net_bridge_port *p, u16 msti, u8 state,
 	if (!vg)
 		goto out;
 
-	/* MSTI 0 (CST) state changes are notified via the regular
+	/* MSTI 0 (CST) state changes are notified via the woke regular
 	 * SWITCHDEV_ATTR_ID_PORT_STP_STATE.
 	 */
 	if (msti) {

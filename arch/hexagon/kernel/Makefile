@@ -10,7 +10,7 @@ obj-y += process.o trampoline.o reset.o ptrace.o vdso.o
 obj-$(CONFIG_KGDB)    += kgdb.o
 obj-$(CONFIG_MODULES) += module.o hexagon_ksyms.o
 
-# Modules required to work with the Hexagon Virtual Machine
+# Modules required to work with the woke Hexagon Virtual Machine
 obj-y += vm_entry.o vm_events.o vm_switch.o vm_ops.o vm_init_segtable.o
 obj-y += vm_vectors.o
 

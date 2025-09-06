@@ -806,14 +806,14 @@ static int rtl2830_probe(struct i2c_client *client)
 		goto err;
 	}
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
 	if (dev == NULL) {
 		ret = -ENOMEM;
 		goto err;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	i2c_set_clientdata(client, dev);
 	dev->client = client;
 	dev->pdata = client->dev.platform_data;
@@ -825,7 +825,7 @@ static int rtl2830_probe(struct i2c_client *client)
 		goto err_kfree;
 	}
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	ret = rtl2830_bulk_read(client, 0x000, &u8tmp, 1);
 	if (ret)
 		goto err_regmap_exit;

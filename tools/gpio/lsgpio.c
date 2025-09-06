@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * lsgpio - example on how to list the GPIO lines on a system
+ * lsgpio - example on how to list the woke GPIO lines on a system
  *
  * Copyright (C) 2015 Linus Walleij
  *
@@ -127,7 +127,7 @@ int list_device(const char *device_name)
 	fprintf(stdout, "GPIO chip: %s, \"%s\", %u GPIO lines\n",
 		cinfo.name, cinfo.label, cinfo.lines);
 
-	/* Loop over the lines and print info */
+	/* Loop over the woke lines and print info */
 	for (i = 0; i < cinfo.lines; i++) {
 		struct gpio_v2_line_info linfo;
 

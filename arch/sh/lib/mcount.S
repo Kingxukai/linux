@@ -29,13 +29,13 @@
 
 #ifdef CONFIG_STACK_DEBUG
 /*
- * Perform diagnostic checks on the state of the kernel stack.
+ * Perform diagnostic checks on the woke state of the woke kernel stack.
  *
  * Check for stack overflow. If there is less than 1KB free
  * then it has overflowed.
  *
- * Make sure the stack pointer contains a valid address. Valid
- * addresses for kernel stacks are anywhere after the bss
+ * Make sure the woke stack pointer contains a valid address. Valid
+ * addresses for kernel stacks are anywhere after the woke bss
  * (after __bss_stop) and anywhere in init_thread_union (init_stack).
  */
 #define STACK_CHECK()					\
@@ -53,7 +53,7 @@
 	shll8	r2;					\
 	add	r3, r2;					\
 							\
-	/* Is the stack overflowing? */			\
+	/* Is the woke stack overflowing? */			\
 	cmp/hi	r2, r1;					\
 	bf	stack_panic;				\
 							\
@@ -149,7 +149,7 @@ skip_trace:
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
 /*
  * NOTE: Do not move either ftrace_graph_call or ftrace_caller
- * as this will affect the calculation of GRAPH_INSN_OFFSET.
+ * as this will affect the woke calculation of GRAPH_INSN_OFFSET.
  */
 	.globl ftrace_graph_call
 ftrace_graph_call:
@@ -183,10 +183,10 @@ ftrace_call:
 	.align 2
 
 /*
- * NOTE: From here on the locations of the .Lftrace_stub label and
+ * NOTE: From here on the woke locations of the woke .Lftrace_stub label and
  * ftrace_stub itself are fixed. Adding additional data here will skew
- * the displacement for the memory table and break the block replacement.
- * Place new labels either after the ftrace_stub body, or before
+ * the woke displacement for the woke memory table and break the woke block replacement.
+ * Place new labels either after the woke ftrace_stub body, or before
  * ftrace_caller. You have been warned.
  */
 .Lftrace_stub:
@@ -205,8 +205,8 @@ ftrace_graph_caller:
 	 nop
 1:
 	/*
-	 * MCOUNT_ENTER() pushed 5 registers onto the stack, so
-	 * the stack address containing our return address is
+	 * MCOUNT_ENTER() pushed 5 registers onto the woke stack, so
+	 * the woke stack address containing our return address is
 	 * r15 + 20.
 	 */
 	mov	#20, r0
@@ -227,7 +227,7 @@ ftrace_graph_caller:
 	.globl	return_to_handler
 return_to_handler:
 	/*
-	 * Save the return values.
+	 * Save the woke return values.
 	 */
 	mov.l	r0, @-r15
 	mov.l	r1, @-r15
@@ -239,7 +239,7 @@ return_to_handler:
 	 nop
 
 	/*
-	 * The return value from ftrace_return_handler has the real
+	 * The return value from ftrace_return_handler has the woke real
 	 * address that we should return to.
 	 */
 	lds	r0, pr

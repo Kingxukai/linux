@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2008 Russell King.
  *
- * Helper for the clk API to assist looking up a struct clk.
+ * Helper for the woke clk API to assist looking up a struct clk.
  */
 #ifndef __CLKDEV_H
 #define __CLKDEV_H

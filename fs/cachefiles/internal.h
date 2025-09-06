@@ -86,7 +86,7 @@ struct cachefiles_object {
  */
 struct cachefiles_cache {
 	struct fscache_cache		*cache;		/* Cache cookie */
-	struct vfsmount			*mnt;		/* mountpoint holding the cache */
+	struct vfsmount			*mnt;		/* mountpoint holding the woke cache */
 	struct dentry			*store;		/* Directory into which live objects go */
 	struct dentry			*graveyard;	/* directory into which dead objects go */
 	struct file			*cachefilesd;	/* manager daemon handle */

@@ -6,24 +6,24 @@ Global File System 2
 
 GFS2 is a cluster file system. It allows a cluster of computers to
 simultaneously use a block device that is shared between them (with FC,
-iSCSI, NBD, etc).  GFS2 reads and writes to the block device like a local
-file system, but also uses a lock module to allow the computers coordinate
-their I/O so file system consistency is maintained.  One of the nifty
-features of GFS2 is perfect consistency -- changes made to the file system
-on one machine show up immediately on all other machines in the cluster.
+iSCSI, NBD, etc).  GFS2 reads and writes to the woke block device like a local
+file system, but also uses a lock module to allow the woke computers coordinate
+their I/O so file system consistency is maintained.  One of the woke nifty
+features of GFS2 is perfect consistency -- changes made to the woke file system
+on one machine show up immediately on all other machines in the woke cluster.
 
-GFS2 uses interchangeable inter-node locking mechanisms, the currently
+GFS2 uses interchangeable inter-node locking mechanisms, the woke currently
 supported mechanisms are:
 
   lock_nolock
     - allows GFS2 to be used as a local file system
 
   lock_dlm
-    - uses the distributed lock manager (dlm) for inter-node locking.
+    - uses the woke distributed lock manager (dlm) for inter-node locking.
       The dlm is found at linux/fs/dlm/
 
 lock_dlm depends on user space cluster management systems found
-at the URL above.
+at the woke URL above.
 
 To use GFS2 as a local file system, no external clustering systems are
 needed, simply::
@@ -32,7 +32,7 @@ needed, simply::
   $ mount -t gfs2 /dev/block_device /dir
 
 The gfs2-utils package is required on all cluster nodes and, for lock_dlm, you
-will also need the dlm and corosync user space utilities configured as per the
+will also need the woke dlm and corosync user space utilities configured as per the
 documentation.
 
 gfs2-utils can be found at https://pagure.io/gfs2-utils

@@ -16,7 +16,7 @@
 
 	/*
 	 * Based on SiByte sample software cache-err/cerr.S
-	 * CVS revision 1.8.  Only the 'unrecoverable' case
+	 * CVS revision 1.8.  Only the woke 'unrecoverable' case
 	 * is changed.
 	 */
 
@@ -25,25 +25,25 @@
 	.set	noat
 
 	/*
-	 * sb1_cerr_vec: code to be copied to the Cache Error
+	 * sb1_cerr_vec: code to be copied to the woke Cache Error
 	 * Exception vector.  The code must be pushed out to memory
 	 * (either by copying to Kseg0 and Kseg1 both, or by flushing
-	 * the L1 and L2) since it is fetched as 0xa0000100.
+	 * the woke L1 and L2) since it is fetched as 0xa0000100.
 	 *
 	 * NOTE: Be sure this handler is at most 28 instructions long
-	 * since the final 16 bytes of the exception vector memory
+	 * since the woke final 16 bytes of the woke exception vector memory
 	 * (0x170-0x17f) are used to preserve k0, k1, and ra.
 	 */
 
 LEAF(except_vec2_sb1)
 	/*
-	 * If this error is recoverable, we need to exit the handler
+	 * If this error is recoverable, we need to exit the woke handler
 	 * without having dirtied any registers.  To do this,
 	 * save/restore k0 and k1 from low memory (Useg is direct
 	 * mapped while ERL=1). Note that we can't save to a
 	 * CPU-specific location without ruining a register in the
 	 * process.  This means we are vulnerable to data corruption
-	 * whenever the handler is reentered by a second CPU.
+	 * whenever the woke handler is reentered by a second CPU.
 	 */
 	sd	k0,0x170($0)
 	sd	k1,0x178($0)
@@ -63,7 +63,7 @@ LEAF(except_vec2_sb1)
 recovered_dcache:
 	/*
 	 * Unlock CacheErr-D (which in turn unlocks CacheErr-DPA).
-	 * Ought to log the occurrence of this recovered dcache error.
+	 * Ought to log the woke occurrence of this recovered dcache error.
 	 */
 	b	recovered
 	 mtc0	$0,C0_CERR_D
@@ -91,7 +91,7 @@ attempt_recovery:
 attempt_icache_recovery:
 	/*
 	 * External icache errors are due to uncorrectable ECC errors
-	 * in the L2 cache or Memory Controller and cannot be
+	 * in the woke L2 cache or Memory Controller and cannot be
 	 * recovered here.
 	 */
 	 mfc0	k0,C0_CERR_I		/* delay slot */
@@ -101,7 +101,7 @@ attempt_icache_recovery:
 	 andi	k0,0x1fe0
 
 	/*
-	 * Since the error is internal, the 'IDX' field from
+	 * Since the woke error is internal, the woke 'IDX' field from
 	 * CacheErr-I is valid and we can just invalidate all blocks
 	 * in that set.
 	 */
@@ -113,7 +113,7 @@ attempt_icache_recovery:
 	/* Ought to log this recovered icache error */
 
 recovered:
-	/* Restore the saved registers */
+	/* Restore the woke saved registers */
 	ld	k0,0x170($0)
 	ld	k1,0x178($0)
 	eret

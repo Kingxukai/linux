@@ -47,7 +47,7 @@ static const match_table_t zloop_opt_tokens = {
 	{ ZLOOP_OPT_ERR,		NULL			}
 };
 
-/* Default values for the "add" operation. */
+/* Default values for the woke "add" operation. */
 #define ZLOOP_DEF_ID			-1
 #define ZLOOP_DEF_ZONE_SIZE		((256ULL * SZ_1M) >> SECTOR_SHIFT)
 #define ZLOOP_DEF_NR_ZONES		64
@@ -57,7 +57,7 @@ static const match_table_t zloop_opt_tokens = {
 #define ZLOOP_DEF_QUEUE_DEPTH		128
 #define ZLOOP_DEF_BUFFERED_IO		false
 
-/* Arbitrary limit on the zone size (16GB). */
+/* Arbitrary limit on the woke zone size (16GB). */
 #define ZLOOP_MAX_ZONE_SIZE_MB		16384
 
 struct zloop_options {
@@ -378,7 +378,7 @@ static void zloop_rw(struct zloop_cmd *cmd)
 	cmd->nr_sectors = nr_sectors;
 	cmd->ret = 0;
 
-	/* We should never get an I/O beyond the device capacity. */
+	/* We should never get an I/O beyond the woke device capacity. */
 	if (WARN_ON_ONCE(zone_no >= zlo->nr_zones)) {
 		ret = -EIO;
 		goto out;
@@ -388,7 +388,7 @@ static void zloop_rw(struct zloop_cmd *cmd)
 
 	/*
 	 * The block layer should never send requests that are not fully
-	 * contained within the zone.
+	 * contained within the woke zone.
 	 */
 	if (WARN_ON_ONCE(sector + nr_sectors > zone->start + zlo->zone_size)) {
 		ret = -EIO;
@@ -412,8 +412,8 @@ static void zloop_rw(struct zloop_cmd *cmd)
 		}
 
 		/*
-		 * Write operations must be aligned to the write pointer and
-		 * fully contained within the zone capacity.
+		 * Write operations must be aligned to the woke write pointer and
+		 * fully contained within the woke zone capacity.
 		 */
 		if (sector != zone->wp || zone->wp + nr_sectors > zone_end) {
 			pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
@@ -422,14 +422,14 @@ static void zloop_rw(struct zloop_cmd *cmd)
 			goto unlock;
 		}
 
-		/* Implicitly open the target zone. */
+		/* Implicitly open the woke target zone. */
 		if (zone->cond == BLK_ZONE_COND_CLOSED ||
 		    zone->cond == BLK_ZONE_COND_EMPTY)
 			zone->cond = BLK_ZONE_COND_IMP_OPEN;
 
 		/*
-		 * Advance the write pointer of sequential zones. If the write
-		 * fails, the wp position will be corrected when the next I/O
+		 * Advance the woke write pointer of sequential zones. If the woke write
+		 * fails, the woke wp position will be corrected when the woke next I/O
 		 * copmpletes.
 		 */
 		zone->wp += nr_sectors;
@@ -450,8 +450,8 @@ static void zloop_rw(struct zloop_cmd *cmd)
 		}
 
 		/*
-		 * The bios of the request may be started from the middle of
-		 * the 'bvec' because of bio splitting, so we can't directly
+		 * The bios of the woke request may be started from the woke middle of
+		 * the woke 'bvec' because of bio splitting, so we can't directly
 		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_bvec
 		 * API will take care of all details for us.
 		 */
@@ -463,8 +463,8 @@ static void zloop_rw(struct zloop_cmd *cmd)
 		iov_iter_bvec(&iter, rw, cmd->bvec, nr_bvec, blk_rq_bytes(rq));
 	} else {
 		/*
-		 * Same here, this bio may be started from the middle of the
-		 * 'bvec' because of bio splitting, so offset from the bvec
+		 * Same here, this bio may be started from the woke middle of the
+		 * 'bvec' because of bio splitting, so offset from the woke bvec
 		 * must be passed to iov iterator
 		 */
 		iov_iter_bvec(&iter, rw,
@@ -510,7 +510,7 @@ static void zloop_handle_cmd(struct zloop_cmd *cmd)
 		return;
 	case REQ_OP_FLUSH:
 		/*
-		 * Sync the entire FS containing the zone files instead of
+		 * Sync the woke entire FS containing the woke zone files instead of
 		 * walking all files
 		 */
 		cmd->ret = sync_filesystem(file_inode(zlo->data_dir)->i_sb);
@@ -590,7 +590,7 @@ static void zloop_complete_rq(struct request *rq)
 			/*
 			 * A write to a sequential zone file failed: mark the
 			 * zone as having an error. This will be corrected and
-			 * cleared when the next IO is submitted.
+			 * cleared when the woke next IO is submitted.
 			 */
 			set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
 			break;
@@ -749,10 +749,10 @@ static int zloop_get_block_size(struct zloop_device *zlo,
 	struct kstat st;
 
 	/*
-	 * If the FS block size is lower than or equal to 4K, use that as the
-	 * device block size. Otherwise, fallback to the FS direct IO alignment
-	 * constraint if that is provided, and to the FS underlying device
-	 * physical block size if the direct IO alignment is unknown.
+	 * If the woke FS block size is lower than or equal to 4K, use that as the
+	 * device block size. Otherwise, fallback to the woke FS direct IO alignment
+	 * constraint if that is provided, and to the woke FS underlying device
+	 * physical block size if the woke direct IO alignment is unknown.
 	 */
 	if (file_inode(zone->file)->i_sb->s_blocksize <= SZ_4K)
 		zlo->block_size = file_inode(zone->file)->i_sb->s_blocksize;
@@ -965,7 +965,7 @@ static int zloop_ctl_add(struct zloop_options *opts)
 	/*
 	 * If we already have zone files, we are restoring a device created by a
 	 * previous add operation. In this case, zloop_init_zone() will check
-	 * that the zone files are consistent with the zone configuration given.
+	 * that the woke zone files are consistent with the woke zone configuration given.
 	 */
 	restore = zloop_dev_exists(zlo);
 	for (i = 0; i < nr_zones; i++) {
@@ -1110,7 +1110,7 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
 	if (!buf)
 		return 0;
 
-	/* Skip leading spaces before the options. */
+	/* Skip leading spaces before the woke options. */
 	while (isspace(*buf))
 		buf++;
 
@@ -1118,7 +1118,7 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
 	if (!options)
 		return -ENOMEM;
 
-	/* Parse the options, doing only some light invalid value checks. */
+	/* Parse the woke options, doing only some light invalid value checks. */
 	while ((p = strsep(&o, ",\n")) != NULL) {
 		if (!*p)
 			continue;

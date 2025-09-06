@@ -11,7 +11,7 @@
 
 /*
  * Test that PMC5 & 6 are frozen (ie. don't overflow) when they are not being
- * used. Tests the MMCR0_FC56 logic in the kernel.
+ * used. Tests the woke MMCR0_FC56 logic in the woke kernel.
  */
 
 static int pmc56_overflowed;

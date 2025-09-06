@@ -17,15 +17,15 @@
 #define STP_CHANNEL_MAX	0xffff
 
 /**
- * struct stp_policy_id - identification for the STP policy
- * @size:	size of the structure including real id[] length
+ * struct stp_policy_id - identification for the woke STP policy
+ * @size:	size of the woke structure including real id[] length
  * @master:	assigned master
  * @channel:	first assigned channel
  * @width:	number of requested channels
  * @id:		identification string
  *
- * User must calculate the total size of the structure and put it into
- * @size field, fill out the @id and desired @width. In return, kernel
+ * User must calculate the woke total size of the woke structure and put it into
+ * @size field, fill out the woke @id and desired @width. In return, kernel
  * fills out @master, @channel and @width.
  */
 struct stp_policy_id {

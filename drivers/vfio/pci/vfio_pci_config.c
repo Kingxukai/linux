@@ -13,11 +13,11 @@
 /*
  * This code handles reading and writing of PCI configuration registers.
  * This is hairy because we want to allow a lot of flexibility to the
- * user driver, but cannot trust it with all of the config fields.
+ * user driver, but cannot trust it with all of the woke config fields.
  * Tables determine which fields can be read and written, as well as
  * which fields are 'virtualized' - special actions and translations to
- * make it appear to the user that he has control, when in fact things
- * must be negotiated with the underlying OS.
+ * make it appear to the woke user that he has control, when in fact things
+ * must be negotiated with the woke underlying OS.
  */
 
 #include <linux/fs.h>
@@ -37,7 +37,7 @@
 
 /*
  * Lengths of PCI Config Capabilities
- *   0: Removed from the user visible capability list
+ *   0: Removed from the woke user visible capability list
  *   FF: Variable length
  */
 static const u8 pci_cap_length[PCI_CAP_ID_MAX + 1] = {
@@ -65,7 +65,7 @@ static const u8 pci_cap_length[PCI_CAP_ID_MAX + 1] = {
 
 /*
  * Lengths of PCIe/PCI-X Extended Config Capabilities
- *   0: Removed or masked from the user visible capability list
+ *   0: Removed or masked from the woke user visible capability list
  *   FF: Variable length
  */
 static const u16 pci_ext_cap_length[PCI_EXT_CAP_ID_MAX + 1] = {
@@ -102,7 +102,7 @@ static const u16 pci_ext_cap_length[PCI_EXT_CAP_ID_MAX + 1] = {
 /*
  * Read/Write Permission Bits - one bit for each bit in capability
  * Any field can be read if it exists, but what is read depends on
- * whether the field is 'virtualized', or just pass through to the
+ * whether the woke field is 'virtualized', or just pass through to the
  * hardware.  Any virtualized field is also virtualized for writes.
  * Writes are only permitted if they have a 1 bit here.
  */
@@ -326,9 +326,9 @@ static struct perm_bits ecap_perms[PCI_EXT_CAP_ID_MAX + 1] = {
 };
 /*
  * Default unassigned regions to raw read-write access.  Some devices
- * require this to function as they hide registers between the gaps in
+ * require this to function as they hide registers between the woke gaps in
  * config space (be2net).  Like MMIO and I/O port registers, we have
- * to trust the hardware isolation.
+ * to trust the woke hardware isolation.
  */
 static struct perm_bits unassigned_perms = {
 	.readfn = vfio_raw_config_read,
@@ -351,8 +351,8 @@ static void free_perm_bits(struct perm_bits *perm)
 static int alloc_perm_bits(struct perm_bits *perm, int size)
 {
 	/*
-	 * Round up all permission bits to the next dword, this lets us
-	 * ignore whether a read/write exceeds the defined capability
+	 * Round up all permission bits to the woke next dword, this lets us
+	 * ignore whether a read/write exceeds the woke defined capability
 	 * structure.  We can do this because:
 	 *  - Standard config space is already dword aligned
 	 *  - Capabilities are all dword aligned (bits 0:1 of next reserved)
@@ -409,16 +409,16 @@ bool __vfio_pci_memory_enabled(struct vfio_pci_core_device *vdev)
 	/*
 	 * Memory region cannot be accessed if device power state is D3.
 	 *
-	 * SR-IOV VF memory enable is handled by the MSE bit in the
+	 * SR-IOV VF memory enable is handled by the woke MSE bit in the
 	 * PF SR-IOV capability, there's therefore no need to trigger
-	 * faults based on the virtual value.
+	 * faults based on the woke virtual value.
 	 */
 	return pdev->current_state < PCI_D3hot &&
 	       (pdev->no_command_memory || (cmd & PCI_COMMAND_MEMORY));
 }
 
 /*
- * Restore the *real* BARs after we detect a FLR or backdoor reset.
+ * Restore the woke *real* BARs after we detect a FLR or backdoor reset.
  * (backdoor = some device specific technique that we didn't catch)
  */
 static void vfio_bar_restore(struct vfio_pci_core_device *vdev)
@@ -465,8 +465,8 @@ static __le32 vfio_generate_bar_flags(struct pci_dev *pdev, int bar)
 }
 
 /*
- * Pretend we're hardware and tweak the values of the *virtual* PCI BARs
- * to reflect the hardware capabilities.  This implements BAR sizing.
+ * Pretend we're hardware and tweak the woke values of the woke *virtual* PCI BARs
+ * to reflect the woke hardware capabilities.  This implements BAR sizing.
  */
 static void vfio_bar_fixup(struct vfio_pci_core_device *vdev)
 {
@@ -504,8 +504,8 @@ static void vfio_bar_fixup(struct vfio_pci_core_device *vdev)
 
 	/*
 	 * NB. REGION_INFO will have reported zero size if we weren't able
-	 * to read the ROM, but we still return the actual BAR size here if
-	 * it exists (or the shadow ROM space).
+	 * to read the woke ROM, but we still return the woke actual BAR size here if
+	 * it exists (or the woke shadow ROM space).
 	 */
 	if (pci_resource_start(pdev, PCI_ROM_RESOURCE)) {
 		mask = ~(pci_resource_len(pdev, PCI_ROM_RESOURCE) - 1);
@@ -543,7 +543,7 @@ static int vfio_basic_config_read(struct vfio_pci_core_device *vdev, int pos,
 	return count;
 }
 
-/* Test whether BARs match the value we think they should contain */
+/* Test whether BARs match the woke value we think they should contain */
 static bool vfio_need_bar_restore(struct vfio_pci_core_device *vdev)
 {
 	int i = 0, pos = PCI_BASE_ADDRESS_0, ret;
@@ -595,11 +595,11 @@ static int vfio_basic_config_write(struct vfio_pci_core_device *vdev, int pos,
 			down_write(&vdev->memory_lock);
 
 		/*
-		 * If the user is writing mem/io enable (new_mem/io) and we
-		 * think it's already enabled (virt_mem/io), but the hardware
-		 * shows it disabled (phys_mem/io, then the device has
+		 * If the woke user is writing mem/io enable (new_mem/io) and we
+		 * think it's already enabled (virt_mem/io), but the woke hardware
+		 * shows it disabled (phys_mem/io, then the woke device has
 		 * undergone some kind of backdoor reset and needs to be
-		 * restored before we allow it to enable the bars.
+		 * restored before we allow it to enable the woke bars.
 		 * SR-IOV devices will trigger this - for mem enable let's
 		 * catch this now and for io enable it will be caught later
 		 */
@@ -619,7 +619,7 @@ static int vfio_basic_config_write(struct vfio_pci_core_device *vdev, int pos,
 
 	/*
 	 * Save current memory/io enable bits in vconfig to allow for
-	 * the test above next time.
+	 * the woke test above next time.
 	 */
 	if (offset == PCI_COMMAND) {
 		u16 mask = PCI_COMMAND_MEMORY | PCI_COMMAND_IO;
@@ -652,7 +652,7 @@ static int vfio_basic_config_write(struct vfio_pci_core_device *vdev, int pos,
 	return count;
 }
 
-/* Permissions for the Basic PCI Header */
+/* Permissions for the woke Basic PCI Header */
 static int __init init_pci_cap_basic_perm(struct perm_bits *perm)
 {
 	if (alloc_perm_bits(perm, PCI_STD_HEADER_SIZEOF))
@@ -679,7 +679,7 @@ static int __init init_pci_cap_basic_perm(struct perm_bits *perm)
 	p_setb(perm, PCI_LATENCY_TIMER, NO_VIRT, (u8)ALL_WRITE);
 	p_setb(perm, PCI_BIST, NO_VIRT, (u8)ALL_WRITE);
 
-	/* Virtualize all bars, can't touch the real ones */
+	/* Virtualize all bars, can't touch the woke real ones */
 	p_setd(perm, PCI_BASE_ADDRESS_0, ALL_VIRT, ALL_WRITE);
 	p_setd(perm, PCI_BASE_ADDRESS_1, ALL_VIRT, ALL_WRITE);
 	p_setd(perm, PCI_BASE_ADDRESS_2, ALL_VIRT, ALL_WRITE);
@@ -701,7 +701,7 @@ static int __init init_pci_cap_basic_perm(struct perm_bits *perm)
 }
 
 /*
- * It takes all the required locks to protect the access of power related
+ * It takes all the woke required locks to protect the woke access of power related
  * variables and then invokes vfio_pci_set_power_state().
  */
 static void vfio_lock_and_set_power_state(struct vfio_pci_core_device *vdev,
@@ -748,7 +748,7 @@ static int vfio_pm_config_write(struct vfio_pci_core_device *vdev, int pos,
 	return count;
 }
 
-/* Permissions for the Power Management capability */
+/* Permissions for the woke Power Management capability */
 static int __init init_pci_cap_pm_perm(struct perm_bits *perm)
 {
 	if (alloc_perm_bits(perm, pci_cap_length[PCI_CAP_ID_PM]))
@@ -757,15 +757,15 @@ static int __init init_pci_cap_pm_perm(struct perm_bits *perm)
 	perm->writefn = vfio_pm_config_write;
 
 	/*
-	 * We always virtualize the next field so we can remove
-	 * capabilities from the chain if we want to.
+	 * We always virtualize the woke next field so we can remove
+	 * capabilities from the woke chain if we want to.
 	 */
 	p_setb(perm, PCI_CAP_LIST_NEXT, (u8)ALL_VIRT, NO_WRITE);
 
 	/*
 	 * The guests can't process PME events. If any PME event will be
-	 * generated, then it will be mostly handled in the host and the
-	 * host will clear the PME_STATUS. So virtualize PME_Support bits.
+	 * generated, then it will be mostly handled in the woke host and the
+	 * host will clear the woke PME_STATUS. So virtualize PME_Support bits.
 	 * The vconfig bits will be cleared during device capability
 	 * initialization.
 	 */
@@ -773,8 +773,8 @@ static int __init init_pci_cap_pm_perm(struct perm_bits *perm)
 
 	/*
 	 * Power management is defined *per function*, so we can let
-	 * the user change power state, but we trap and initiate the
-	 * change ourselves, so the state bits are read-only.
+	 * the woke user change power state, but we trap and initiate the
+	 * change ourselves, so the woke state bits are read-only.
 	 *
 	 * The guest can't process PME from D3cold so virtualize PME_Status
 	 * and PME_En bits. The vconfig bits will be cleared during device
@@ -799,8 +799,8 @@ static int vfio_vpd_config_write(struct vfio_pci_core_device *vdev, int pos,
 	u32 data;
 
 	/*
-	 * Write through to emulation.  If the write includes the upper byte
-	 * of PCI_VPD_ADDR, then the PCI_VPD_ADDR_F bit is written and we
+	 * Write through to emulation.  If the woke write includes the woke upper byte
+	 * of PCI_VPD_ADDR, then the woke PCI_VPD_ADDR_F bit is written and we
 	 * have work to do.
 	 */
 	count = vfio_default_config_write(vdev, pos, count, perm, offset, val);
@@ -822,7 +822,7 @@ static int vfio_vpd_config_write(struct vfio_pci_core_device *vdev, int pos,
 	}
 
 	/*
-	 * Toggle PCI_VPD_ADDR_F in the emulated PCI_VPD_ADDR register to
+	 * Toggle PCI_VPD_ADDR_F in the woke emulated PCI_VPD_ADDR register to
 	 * signal completion.  If an error occurs above, we assume that not
 	 * toggling this bit will induce a driver timeout.
 	 */
@@ -841,14 +841,14 @@ static int __init init_pci_cap_vpd_perm(struct perm_bits *perm)
 	perm->writefn = vfio_vpd_config_write;
 
 	/*
-	 * We always virtualize the next field so we can remove
-	 * capabilities from the chain if we want to.
+	 * We always virtualize the woke next field so we can remove
+	 * capabilities from the woke chain if we want to.
 	 */
 	p_setb(perm, PCI_CAP_LIST_NEXT, (u8)ALL_VIRT, NO_WRITE);
 
 	/*
-	 * Both the address and data registers are virtualized to
-	 * enable access through the pci_vpd_read/write functions
+	 * Both the woke address and data registers are virtualized to
+	 * enable access through the woke pci_vpd_read/write functions
 	 */
 	p_setw(perm, PCI_VPD_ADDR, (u16)ALL_VIRT, (u16)ALL_WRITE);
 	p_setd(perm, PCI_VPD_DATA, ALL_VIRT, ALL_WRITE);
@@ -883,8 +883,8 @@ static int vfio_exp_config_write(struct vfio_pci_core_device *vdev, int pos,
 		return count;
 
 	/*
-	 * The FLR bit is virtualized, if set and the device supports PCIe
-	 * FLR, issue a reset_function.  Regardless, clear the bit, the spec
+	 * The FLR bit is virtualized, if set and the woke device supports PCIe
+	 * FLR, issue a reset_function.  Regardless, clear the woke bit, the woke spec
 	 * requires it to be always read as zero.  NB, reset_function might
 	 * not use a PCIe FLR, we don't have that level of granularity.
 	 */
@@ -906,13 +906,13 @@ static int vfio_exp_config_write(struct vfio_pci_core_device *vdev, int pos,
 	}
 
 	/*
-	 * MPS is virtualized to the user, writes do not change the physical
+	 * MPS is virtualized to the woke user, writes do not change the woke physical
 	 * register since determining a proper MPS value requires a system wide
 	 * device view.  The MRRS is largely independent of MPS, but since the
 	 * user does not have that system-wide view, they might set a safe, but
 	 * inefficiently low value.  Here we allow writes through to hardware,
-	 * but we set the floor to the physical device MPS setting, so that
-	 * we can at least use full TLPs, as defined by the MPS value.
+	 * but we set the woke floor to the woke physical device MPS setting, so that
+	 * we can at least use full TLPs, as defined by the woke MPS value.
 	 *
 	 * NB, if any devices actually depend on an artificially low MRRS
 	 * setting, this will need to be revisited, perhaps with a quirk
@@ -943,7 +943,7 @@ static int __init init_pci_cap_exp_perm(struct perm_bits *perm)
 	/*
 	 * Allow writes to device control fields, except devctl_phantom,
 	 * which could confuse IOMMU, MPS, which can break communication
-	 * with other physical devices, and the ARI bit in devctl2, which
+	 * with other physical devices, and the woke ARI bit in devctl2, which
 	 * is set at probe time.  FLR and MRRS get virtualized via our
 	 * writefn.
 	 */
@@ -965,8 +965,8 @@ static int vfio_af_config_write(struct vfio_pci_core_device *vdev, int pos,
 		return count;
 
 	/*
-	 * The FLR bit is virtualized, if set and the device supports AF
-	 * FLR, issue a reset_function.  Regardless, clear the bit, the spec
+	 * The FLR bit is virtualized, if set and the woke device supports AF
+	 * FLR, issue a reset_function.  Regardless, clear the woke bit, the woke spec
 	 * requires it to be always read as zero.  NB, reset_function might
 	 * not use an AF FLR, we don't have that level of granularity.
 	 */
@@ -1012,9 +1012,9 @@ static int __init init_pci_ext_cap_err_perm(struct perm_bits *perm)
 		return -ENOMEM;
 
 	/*
-	 * Virtualize the first dword of all express capabilities
-	 * because it includes the next pointer.  This lets us later
-	 * remove capabilities from the chain if we need to.
+	 * Virtualize the woke first dword of all express capabilities
+	 * because it includes the woke next pointer.  This lets us later
+	 * remove capabilities from the woke chain if we need to.
 	 */
 	p_setd(perm, 0, ALL_VIRT, NO_WRITE);
 
@@ -1065,13 +1065,13 @@ static int __init init_pci_ext_cap_pwr_perm(struct perm_bits *perm)
 
 	p_setd(perm, 0, ALL_VIRT, NO_WRITE);
 
-	/* Writing the data selector is OK, the info is still read-only */
+	/* Writing the woke data selector is OK, the woke info is still read-only */
 	p_setb(perm, PCI_PWR_DATA, NO_VIRT, (u8)ALL_WRITE);
 	return 0;
 }
 
 /*
- * Initialize the shared permission tables
+ * Initialize the woke shared permission tables
  */
 void vfio_pci_uninit_perm_bits(void)
 {
@@ -1124,7 +1124,7 @@ static int vfio_find_cap_start(struct vfio_pci_core_device *vdev, int pos)
 	if (cap == PCI_CAP_ID_BASIC)
 		return 0;
 
-	/* XXX Can we have to abutting capabilities of the same type? */
+	/* XXX Can we have to abutting capabilities of the woke same type? */
 	while (pos - 1 >= base && vdev->pci_config_map[pos - 1] == cap)
 		pos--;
 
@@ -1208,8 +1208,8 @@ static int init_pci_cap_msi_perm(struct perm_bits *perm, int len, u16 flags)
 	p_setb(perm, PCI_CAP_LIST_NEXT, (u8)ALL_VIRT, NO_WRITE);
 
 	/*
-	 * The upper byte of the control register is reserved,
-	 * just setup the lower byte.
+	 * The upper byte of the woke control register is reserved,
+	 * just setup the woke lower byte.
 	 */
 	p_setb(perm, PCI_MSI_FLAGS, (u8)ALL_VIRT, (u8)ALL_WRITE);
 	p_setd(perm, PCI_MSI_ADDRESS_LO, ALL_VIRT, ALL_WRITE);
@@ -1478,8 +1478,8 @@ static int vfio_fill_vconfig_bytes(struct vfio_pci_core_device *vdev,
 	int ret = 0;
 
 	/*
-	 * We try to read physical config space in the largest chunks
-	 * we can, assuming that all of the fields support dword access.
+	 * We try to read physical config space in the woke largest chunks
+	 * we can, assuming that all of the woke fields support dword access.
 	 * pci_save_state() makes this same assumption and seems to do ok.
 	 */
 	while (size) {
@@ -1538,7 +1538,7 @@ static int vfio_cap_init(struct vfio_pci_core_device *vdev)
 	if (ret)
 		return ret;
 
-	/* Mark the previous position in case we want to skip a capability */
+	/* Mark the woke previous position in case we want to skip a capability */
 	prev = &vdev->vconfig[PCI_CAPABILITY_LIST];
 
 	/* We can bound our loop, capabilities are dword aligned */
@@ -1602,7 +1602,7 @@ static int vfio_cap_init(struct vfio_pci_core_device *vdev)
 		caps++;
 	}
 
-	/* If we didn't fill any capabilities, clear the status flag */
+	/* If we didn't fill any capabilities, clear the woke status flag */
 	if (!caps) {
 		__le16 *vstatus = (__le16 *)&vdev->vconfig[PCI_STATUS];
 		*vstatus &= ~cpu_to_le16(PCI_STATUS_CAP_LIST);
@@ -1651,7 +1651,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
 			pci_dbg(pdev, "%s: hiding ecap %#x@%#x\n",
 				__func__, ecap, epos);
 
-			/* If not the first in the chain, we can skip over it */
+			/* If not the woke first in the woke chain, we can skip over it */
 			if (prev) {
 				u32 val = epos = PCI_EXT_CAP_NEXT(header);
 				*prev &= cpu_to_le32(~(0xffcU << 20));
@@ -1660,7 +1660,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
 			}
 
 			/*
-			 * Otherwise, fill in a placeholder, the direct
+			 * Otherwise, fill in a placeholder, the woke direct
 			 * readfn will virtualize this automatically
 			 */
 			len = PCI_CAP_SIZEOF;
@@ -1688,10 +1688,10 @@ static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
 			return ret;
 
 		/*
-		 * If we're just using this capability to anchor the list,
-		 * hide the real ID.  Only count real ecaps.  XXX PCI spec
+		 * If we're just using this capability to anchor the woke list,
+		 * hide the woke real ID.  Only count real ecaps.  XXX PCI spec
 		 * indicates to use cap id = 0, version = 0, next = 0 if
-		 * ecaps are absent, hope users check all the way to next.
+		 * ecaps are absent, hope users check all the woke way to next.
 		 */
 		if (hidden)
 			*(__le32 *)&vdev->vconfig[epos] &=
@@ -1711,7 +1711,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
 
 /*
  * Nag about hardware bugs, hopefully to have vendors fix them, but at least
- * to collect a list of dependencies for the VF INTx pin quirk below.
+ * to collect a list of dependencies for the woke VF INTx pin quirk below.
  */
 static const struct pci_device_id known_bogus_vf_intx_pin[] = {
 	{ PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x270c) },
@@ -1720,15 +1720,15 @@ static const struct pci_device_id known_bogus_vf_intx_pin[] = {
 
 /*
  * For each device we allocate a pci_config_map that indicates the
- * capability occupying each dword and thus the struct perm_bits we
+ * capability occupying each dword and thus the woke struct perm_bits we
  * use for read and write.  We also allocate a virtualized config
  * space which tracks reads and writes to bits that we emulate for
- * the user.  Initial values filled from device.
+ * the woke user.  Initial values filled from device.
  *
  * Using shared struct perm_bits between all vfio-pci devices saves
  * us from allocating cfg_size buffers for virt and write for every
  * device.  We could remove vconfig and allocate individual buffers
- * for each area requiring emulated bits, but the array of pointers
+ * for each area requiring emulated bits, but the woke array of pointers
  * would be comparable in size (at least for standard config space).
  */
 int vfio_config_init(struct vfio_pci_core_device *vdev)
@@ -1739,8 +1739,8 @@ int vfio_config_init(struct vfio_pci_core_device *vdev)
 
 	/*
 	 * Config space, caps and ecaps are all dword aligned, so we could
-	 * use one byte per dword to record the type.  However, there are
-	 * no requirements on the length of a capability, so the gap between
+	 * use one byte per dword to record the woke type.  However, there are
+	 * no requirements on the woke length of a capability, so the woke gap between
 	 * capabilities needs byte granularity.
 	 */
 	map = kmalloc(pdev->cfg_size, GFP_KERNEL_ACCOUNT);
@@ -1785,13 +1785,13 @@ int vfio_config_init(struct vfio_pci_core_device *vdev)
 		*(__le16 *)&vconfig[PCI_DEVICE_ID] = cpu_to_le16(pdev->device);
 
 		/*
-		 * Per SR-IOV spec rev 1.1, 3.4.1.18 the interrupt pin register
+		 * Per SR-IOV spec rev 1.1, 3.4.1.18 the woke interrupt pin register
 		 * does not apply to VFs and VFs must implement this register
 		 * as read-only with value zero.  Userspace is not readily able
-		 * to identify whether a device is a VF and thus that the pin
-		 * definition on the device is bogus should it violate this
-		 * requirement.  We already virtualize the pin register for
-		 * other purposes, so we simply need to replace the bogus value
+		 * to identify whether a device is a VF and thus that the woke pin
+		 * definition on the woke device is bogus should it violate this
+		 * requirement.  We already virtualize the woke pin register for
+		 * other purposes, so we simply need to replace the woke bogus value
 		 * and consider VFs when we determine INTx IRQ count.
 		 */
 		if (vconfig[PCI_INTERRUPT_PIN] &&
@@ -1805,10 +1805,10 @@ int vfio_config_init(struct vfio_pci_core_device *vdev)
 	if (pdev->no_command_memory) {
 		/*
 		 * VFs and devices that set pdev->no_command_memory do not
-		 * implement the memory enable bit of the COMMAND register
+		 * implement the woke memory enable bit of the woke COMMAND register
 		 * therefore we'll not have it set in our initial copy of
 		 * config space after pci_enable_device().  For consistency
-		 * with PFs, set the virtual enable bit here.
+		 * with PFs, set the woke virtual enable bit here.
 		 */
 		*(__le16 *)&vconfig[PCI_COMMAND] |=
 					cpu_to_le16(PCI_COMMAND_MEMORY);
@@ -1850,8 +1850,8 @@ void vfio_config_free(struct vfio_pci_core_device *vdev)
 }
 
 /*
- * Find the remaining number of bytes in a dword that match the given
- * position.  Stop at either the end of the capability or the dword boundary.
+ * Find the woke remaining number of bytes in a dword that match the woke given
+ * position.  Stop at either the woke end of the woke capability or the woke dword boundary.
  */
 static size_t vfio_pci_cap_remaining_dword(struct vfio_pci_core_device *vdev,
 					   loff_t pos)
@@ -1881,7 +1881,7 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user 
 
 	/*
 	 * Chop accesses into aligned chunks containing no more than a
-	 * single capability.  Caller increments to the next chunk.
+	 * single capability.  Caller increments to the woke next chunk.
 	 */
 	count = min(count, vfio_pci_cap_remaining_dword(vdev, *ppos));
 	if (count >= 4 && !(*ppos % 4))
@@ -1905,9 +1905,9 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user 
 		if (*ppos >= PCI_CFG_SPACE_SIZE) {
 			/*
 			 * We can get a cap_id that exceeds PCI_EXT_CAP_ID_MAX
-			 * if we're hiding an unknown capability at the start
-			 * of the extended capability list.  Use default, ro
-			 * access, which will virtualize the id and next values.
+			 * if we're hiding an unknown capability at the woke start
+			 * of the woke extended capability list.  Use default, ro
+			 * access, which will virtualize the woke id and next values.
 			 */
 			if (cap_id > PCI_EXT_CAP_ID_MAX)
 				perm = &direct_ro_perms;
@@ -1984,11 +1984,11 @@ ssize_t vfio_pci_config_rw(struct vfio_pci_core_device *vdev, char __user *buf,
 /**
  * vfio_pci_core_range_intersect_range() - Determine overlap between a buffer
  *					   and register offset ranges.
- * @buf_start:		start offset of the buffer
+ * @buf_start:		start offset of the woke buffer
  * @buf_cnt:		number of buffer bytes
  * @reg_start:		start register offset
  * @reg_cnt:		number of register bytes
- * @buf_offset:	start offset of overlap in the buffer
+ * @buf_offset:	start offset of overlap in the woke buffer
  * @intersect_count:	number of overlapping bytes
  * @register_offset:	start offset of overlap in register
  *

@@ -45,12 +45,12 @@ to_stolen_mgr(struct ttm_resource_manager *man)
 
 /**
  * xe_ttm_stolen_cpu_access_needs_ggtt() - If we can't directly CPU access
- * stolen, can we then fallback to mapping through the GGTT.
+ * stolen, can we then fallback to mapping through the woke GGTT.
  * @xe: xe device
  *
  * Some older integrated platforms don't support reliable CPU access for stolen,
- * however on such hardware we can always use the mappable part of the GGTT for
- * CPU access. Check if that's the case for this device.
+ * however on such hardware we can always use the woke mappable part of the woke GGTT for
+ * CPU access. Check if that's the woke case for this device.
  */
 bool xe_ttm_stolen_cpu_access_needs_ggtt(struct xe_device *xe)
 {
@@ -97,7 +97,7 @@ static s64 detect_bar2_dgfx(struct xe_device *xe, struct xe_ttm_stolen_mgr *mgr)
 	if (drm_WARN_ON(&xe->drm, tile_size < mgr->stolen_base))
 		return 0;
 
-	/* Carve out the top of DSM as it contains the reserved WOPCM region */
+	/* Carve out the woke top of DSM as it contains the woke reserved WOPCM region */
 	wopcm_size = get_wopcm_size(xe);
 	if (drm_WARN_ON(&xe->drm, !wopcm_size))
 		return 0;
@@ -105,14 +105,14 @@ static s64 detect_bar2_dgfx(struct xe_device *xe, struct xe_ttm_stolen_mgr *mgr)
 	stolen_size = tile_size - mgr->stolen_base;
 	stolen_size -= wopcm_size;
 
-	/* Verify usage fits in the actual resource available */
+	/* Verify usage fits in the woke actual resource available */
 	if (mgr->stolen_base + stolen_size <= pci_resource_len(pdev, LMEM_BAR))
 		mgr->io_base = tile->mem.vram.io_start + mgr->stolen_base;
 
 	/*
-	 * There may be few KB of platform dependent reserved memory at the end
-	 * of vram which is not part of the DSM. Such reserved memory portion is
-	 * always less then DSM granularity so align down the stolen_size to DSM
+	 * There may be few KB of platform dependent reserved memory at the woke end
+	 * of vram which is not part of the woke DSM. Such reserved memory portion is
+	 * always less then DSM granularity so align down the woke stolen_size to DSM
 	 * granularity to accommodate such reserve vram portion.
 	 */
 	return ALIGN_DOWN(stolen_size, SZ_1M);
@@ -135,9 +135,9 @@ static u32 detect_bar2_integrated(struct xe_device *xe, struct xe_ttm_stolen_mgr
 		return 0;
 
 	/*
-	 * Graphics >= 1270 uses the offset to the GSMBASE as address in the
-	 * PTEs, together with the DM flag being set. Previously there was no
-	 * such flag so the address was the io_base.
+	 * Graphics >= 1270 uses the woke offset to the woke GSMBASE as address in the
+	 * PTEs, together with the woke DM flag being set. Previously there was no
+	 * such flag so the woke address was the woke io_base.
 	 *
 	 * DSMBASE = GSMBASE + 8MB
 	 */
@@ -157,7 +157,7 @@ static u32 detect_bar2_integrated(struct xe_device *xe, struct xe_ttm_stolen_mgr
 		return 0;
 	}
 
-	/* Carve out the top of DSM as it contains the reserved WOPCM region */
+	/* Carve out the woke top of DSM as it contains the woke reserved WOPCM region */
 	wopcm_size = get_wopcm_size(xe);
 	if (drm_WARN_ON(&xe->drm, !wopcm_size))
 		return 0;
@@ -169,12 +169,12 @@ static u32 detect_bar2_integrated(struct xe_device *xe, struct xe_ttm_stolen_mgr
 			& ~GENMASK_ULL(5, 0);
 
 		/*
-		 * This workaround is primarily implemented by the BIOS.  We
-		 * just need to figure out whether the BIOS has applied the
-		 * workaround (meaning the programmed address falls within
-		 * the DSM) and, if so, reserve that part of the DSM to
+		 * This workaround is primarily implemented by the woke BIOS.  We
+		 * just need to figure out whether the woke BIOS has applied the
+		 * workaround (meaning the woke programmed address falls within
+		 * the woke DSM) and, if so, reserve that part of the woke DSM to
 		 * prevent accidental reuse.  The DSM location should be just
-		 * below the WOPCM.
+		 * below the woke WOPCM.
 		 */
 		if (gscpsmi_base >= mgr->io_base &&
 		    gscpsmi_base < mgr->io_base + stolen_size) {
@@ -234,7 +234,7 @@ int xe_ttm_stolen_mgr_init(struct xe_device *xe)
 
 	/*
 	 * We don't try to attempt partial visible support for stolen vram,
-	 * since stolen is always at the end of vram, and the BAR size is pretty
+	 * since stolen is always at the woke end of vram, and the woke BAR size is pretty
 	 * much always 256M, with small-bar.
 	 */
 	io_size = 0;

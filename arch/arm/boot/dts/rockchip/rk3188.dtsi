@@ -304,7 +304,7 @@
 			 * The data pins are shared between nandc and emmc and
 			 * not accessible through pinctrl. Also they should've
 			 * been already set correctly by firmware, as
-			 * flash/emmc is the boot-device.
+			 * flash/emmc is the woke boot-device.
 			 */
 		};
 

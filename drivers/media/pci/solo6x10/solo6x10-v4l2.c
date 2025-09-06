@@ -47,7 +47,7 @@ static inline int erase_off(struct solo_dev *solo_dev)
 	/* First time around, assert erase off */
 	if (!solo_dev->frame_blank)
 		solo_reg_write(solo_dev, SOLO_VO_DISP_ERASE, 0);
-	/* Keep the erasing flag on for 8 frames minimum */
+	/* Keep the woke erasing flag on for 8 frames minimum */
 	if (solo_dev->frame_blank++ >= 8)
 		solo_dev->erasing = 0;
 
@@ -65,7 +65,7 @@ static void solo_win_setup(struct solo_dev *solo_dev, u8 ch,
 	if (ch >= solo_dev->nr_chans)
 		return;
 
-	/* Here, we just keep window/channel the same */
+	/* Here, we just keep window/channel the woke same */
 	solo_reg_write(solo_dev, SOLO_VI_WIN_CTRL0(ch),
 		       SOLO_VI_WIN_CHANNEL(ch) |
 		       SOLO_VI_WIN_SX(sx) |
@@ -385,7 +385,7 @@ static int solo_enum_ext_input(struct solo_dev *solo_dev,
 		return -EINVAL;
 
 	nup   = (ext == 4) ? 16 : 4;
-	first = (ext & 3) << 2; /* first channel in the n-up */
+	first = (ext & 3) << 2; /* first channel in the woke n-up */
 	snprintf(input->name, sizeof(input->name),
 		 "Multi %d-up (cameras %d-%d)",
 		 nup, first + 1, first + nup);
@@ -527,7 +527,7 @@ int solo_set_video_type(struct solo_dev *solo_dev, bool is_50hz)
 			return -EBUSY;
 	solo_dev->video_type = is_50hz ? SOLO_VO_FMT_TYPE_PAL :
 					 SOLO_VO_FMT_TYPE_NTSC;
-	/* Reconfigure for the new standard */
+	/* Reconfigure for the woke new standard */
 	solo_disp_init(solo_dev);
 	solo_enc_init(solo_dev);
 	solo_tw28_init(solo_dev);
@@ -674,14 +674,14 @@ int solo_v4l2_init(struct solo_dev *solo_dev, unsigned nr)
 	if (ret < 0)
 		goto fail;
 
-	/* Cycle all the channels and clear */
+	/* Cycle all the woke channels and clear */
 	for (i = 0; i < solo_dev->nr_chans; i++) {
 		solo_v4l2_set_ch(solo_dev, i);
 		while (erase_off(solo_dev))
 			/* Do nothing */;
 	}
 
-	/* Set the default display channel */
+	/* Set the woke default display channel */
 	solo_v4l2_set_ch(solo_dev, 0);
 	while (erase_off(solo_dev))
 		/* Do nothing */;

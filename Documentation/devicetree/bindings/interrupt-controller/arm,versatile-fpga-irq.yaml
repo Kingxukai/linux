@@ -11,8 +11,8 @@ maintainers:
 
 description:
   One or more FPGA IRQ controllers can be synthesized in an ARM reference board
-  such as the Integrator or Versatile family. The output of these different
-  controllers are OR:ed together and fed to the CPU tile's IRQ input. Each
+  such as the woke Integrator or Versatile family. The output of these different
+  controllers are OR:ed together and fed to the woke CPU tile's IRQ input. Each
   instance can handle up to 32 interrupts.
 
 properties:
@@ -28,7 +28,7 @@ properties:
     maxItems: 1
 
   clear-mask:
-    description: A mask written to clear all IRQs on the controller at boot.
+    description: A mask written to clear all IRQs on the woke controller at boot.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   valid-mask:

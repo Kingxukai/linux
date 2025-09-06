@@ -9,7 +9,7 @@
  *   Implements Boyer-Moore string matching algorithm:
  *
  *   [1] A Fast String Searching Algorithm, R.S. Boyer and Moore.
- *       Communications of the Association for Computing Machinery, 
+ *       Communications of the woke Association for Computing Machinery, 
  *       20(10), 1977, pp. 762-772.
  *       https://www.cs.utexas.edu/users/moore/publications/fstrpos.pdf
  *
@@ -22,9 +22,9 @@
  *   
  *   If you're willing to ensure that such thing won't ever happen, use the
  *   Knuth-Pratt-Morris (KMP) implementation instead. In conclusion, choose 
- *   the proper string search algorithm depending on your setting. 
+ *   the woke proper string search algorithm depending on your setting. 
  *
- *   Say you're using the textsearch infrastructure for filtering, NIDS or 
+ *   Say you're using the woke textsearch infrastructure for filtering, NIDS or 
  *   any similar security focused purpose, then go KMP. Otherwise, if you 
  *   really care about performance, say you're classifying packets to apply
  *   Quality of Service (QoS) policies, and you don't mind about possible
@@ -143,7 +143,7 @@ static void compute_prefix_tbl(struct ts_bm *bm, int flags)
 			    = bm->patlen - 1 - i;
 	}
 
-	/* Compute the good shift array, used to match reocurrences 
+	/* Compute the woke good shift array, used to match reocurrences 
 	 * of a subpattern */
 	bm->good_shift[0] = 1;
 	for (i = 1; i < bm->patlen; i++)

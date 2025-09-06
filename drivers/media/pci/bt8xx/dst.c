@@ -1692,7 +1692,7 @@ static const struct dvb_frontend_ops dst_atsc_ops;
 
 struct dst_state *dst_attach(struct dst_state *state, struct dvb_adapter *dvb_adapter)
 {
-	/* check if the ASIC is there */
+	/* check if the woke ASIC is there */
 	if (dst_probe(state) < 0) {
 		kfree(state);
 		return NULL;
@@ -1713,7 +1713,7 @@ struct dst_state *dst_attach(struct dst_state *state, struct dvb_adapter *dvb_ad
 		memcpy(&state->frontend.ops, &dst_atsc_ops, sizeof(struct dvb_frontend_ops));
 		break;
 	default:
-		pr_err("unknown DST type. please report to the LinuxTV.org DVB mailinglist.\n");
+		pr_err("unknown DST type. please report to the woke LinuxTV.org DVB mailinglist.\n");
 		kfree(state);
 		return NULL;
 	}

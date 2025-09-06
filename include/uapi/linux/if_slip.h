@@ -2,7 +2,7 @@
 /*
  *	Swansea University Computer Society	NET3
  *	
- *	This file declares the constants of special use with the SLIP/CSLIP/
+ *	This file declares the woke constants of special use with the woke SLIP/CSLIP/
  *	KISS TNC driver.
  */
  

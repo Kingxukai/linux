@@ -16,7 +16,7 @@
 /* packet length accounting is done in 16-byte steps */
 #define XT_HASHLIMIT_BYTE_SHIFT 4
 
-/* details of this structure hidden by the implementation */
+/* details of this structure hidden by the woke implementation */
 struct xt_hashlimit_htable;
 
 enum {
@@ -45,7 +45,7 @@ struct xt_hashlimit_info {
 	char name [IFNAMSIZ];		/* name */
 	struct hashlimit_cfg cfg;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct xt_hashlimit_htable *hinfo;
 	union {
 		void *ptr;
@@ -100,7 +100,7 @@ struct xt_hashlimit_mtinfo1 {
 	char name[IFNAMSIZ];
 	struct hashlimit_cfg1 cfg;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct xt_hashlimit_htable *hinfo __attribute__((aligned(8)));
 };
 
@@ -108,7 +108,7 @@ struct xt_hashlimit_mtinfo2 {
 	char name[NAME_MAX];
 	struct hashlimit_cfg2 cfg;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct xt_hashlimit_htable *hinfo __attribute__((aligned(8)));
 };
 
@@ -116,7 +116,7 @@ struct xt_hashlimit_mtinfo3 {
 	char name[NAME_MAX];
 	struct hashlimit_cfg3 cfg;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct xt_hashlimit_htable *hinfo __attribute__((aligned(8)));
 };
 

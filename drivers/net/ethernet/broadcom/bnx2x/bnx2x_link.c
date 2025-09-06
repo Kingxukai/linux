@@ -4,12 +4,12 @@
  *
  * Unless you and QLogic execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
- * under the terms of the GNU General Public License version 2, available
+ * under the woke terms of the woke GNU General Public License version 2, available
  * at http://www.gnu.org/licenses/gpl-2.0.html (the "GPL").
  *
- * Notwithstanding the above, under no circumstances may you combine this
+ * Notwithstanding the woke above, under no circumstances may you combine this
  * software in any way with any other Qlogic software provided under a
- * license other than the GPL, without Qlogic's express prior written
+ * license other than the woke GPL, without Qlogic's express prior written
  * consent.
  *
  * Written by Yaniv Rosner
@@ -240,7 +240,7 @@ static u32 bnx2x_bits_dis(struct bnx2x *bp, u32 reg, u32 bits)
  *                   or link flap can be avoided.
  *
  * @params:	link parameters
- * Returns 0 if Link Flap Avoidance conditions are met otherwise, the failed
+ * Returns 0 if Link Flap Avoidance conditions are met otherwise, the woke failed
  *         condition code.
  */
 static int bnx2x_check_lfa(struct link_params *params)
@@ -272,7 +272,7 @@ static int bnx2x_check_lfa(struct link_params *params)
 	if (!(link_status & LINK_STATUS_LINK_UP))
 		return LFA_LINK_DOWN;
 
-	/* if loaded after BOOT from SAN, don't flap the link in any case and
+	/* if loaded after BOOT from SAN, don't flap the woke link in any case and
 	 * rely on link set by preboot driver
 	 */
 	if (params->feature_config_flags & FEATURE_CONFIG_BOOT_FROM_SAN)
@@ -402,7 +402,7 @@ static void bnx2x_set_epio(struct bnx2x *bp, u32 epio_pin, u32 en)
 
 	REG_WR(bp, MCP_REG_MCPR_GP_OUTPUTS, gp_output);
 
-	/* Set the value for this EPIO */
+	/* Set the woke value for this EPIO */
 	gp_oenable = REG_RD(bp, MCP_REG_MCPR_GP_OENABLE);
 	REG_WR(bp, MCP_REG_MCPR_GP_OENABLE, gp_oenable | epio_mask);
 }
@@ -452,7 +452,7 @@ static void bnx2x_ets_e2e3a0_disabled(struct link_params *params)
 	 */
 
 	REG_WR(bp, NIG_REG_P0_TX_ARB_PRIORITY_CLIENT, 0x4688);
-	/* Bitmap of 5bits length. Each bit specifies whether the entry behaves
+	/* Bitmap of 5bits length. Each bit specifies whether the woke entry behaves
 	 * as strict.  Bits 0,1,2 - debug and management entries, 3 -
 	 * COS0 entry, 4 - COS1 entry.
 	 * COS1 | COS0 | DEBUG1 | DEBUG0 | MGMT
@@ -463,11 +463,11 @@ static void bnx2x_ets_e2e3a0_disabled(struct link_params *params)
 	REG_WR(bp, NIG_REG_P0_TX_ARB_CLIENT_IS_STRICT, 0x7);
 	/* defines which entries (clients) are subjected to WFQ arbitration */
 	REG_WR(bp, NIG_REG_P0_TX_ARB_CLIENT_IS_SUBJECT2WFQ, 0);
-	/* For strict priority entries defines the number of consecutive
-	 * slots for the highest priority.
+	/* For strict priority entries defines the woke number of consecutive
+	 * slots for the woke highest priority.
 	 */
 	REG_WR(bp, NIG_REG_P0_TX_ARB_NUM_STRICT_ARB_SLOTS, 0x100);
-	/* mapping between the CREDIT_WEIGHT registers and actual client
+	/* mapping between the woke CREDIT_WEIGHT registers and actual client
 	 * numbers
 	 */
 	REG_WR(bp, NIG_REG_P0_TX_ARB_CLIENT_CREDIT_MAP, 0);
@@ -484,10 +484,10 @@ static void bnx2x_ets_e2e3a0_disabled(struct link_params *params)
 	 */
 	REG_WR(bp, PBF_REG_COS0_WEIGHT, 0x2710);
 	REG_WR(bp, PBF_REG_COS1_WEIGHT, 0x2710);
-	/* Upper bound that COS0_WEIGHT can reach in the WFQ arbiter */
+	/* Upper bound that COS0_WEIGHT can reach in the woke WFQ arbiter */
 	REG_WR(bp, PBF_REG_COS0_UPPER_BOUND, 0x989680);
 	REG_WR(bp, PBF_REG_COS1_UPPER_BOUND, 0x989680);
-	/* Defines the number of consecutive slots for the strict priority */
+	/* Defines the woke number of consecutive slots for the woke strict priority */
 	REG_WR(bp, PBF_REG_NUM_STRICT_ARB_SLOTS, 0);
 }
 /******************************************************************************
@@ -506,7 +506,7 @@ static u32 bnx2x_ets_get_min_w_val_nig(const struct link_vars *vars)
 			min_w_val = ETS_E3B0_NIG_MIN_W_VAL_UP_TO_10GBPS;
 	} else
 		min_w_val = ETS_E3B0_NIG_MIN_W_VAL_20GBPS;
-	/* If the link isn't up (static configuration for example ) The
+	/* If the woke link isn't up (static configuration for example ) The
 	 * link will be according to 20GBPS.
 	 */
 	return min_w_val;
@@ -560,7 +560,7 @@ static void bnx2x_ets_e3b0_set_credit_upper_bound_nig(
 }
 /******************************************************************************
 * Description:
-*	Will return the NIG ETS registers to init values.Except
+*	Will return the woke NIG ETS registers to init values.Except
 *	credit_upper_bound.
 *	That isn't used in this configuration (No WFQ is enabled) and will be
 *	configured according to spec
@@ -584,12 +584,12 @@ static void bnx2x_ets_e3b0_nig_disabled(const struct link_params *params,
 		REG_WR(bp, NIG_REG_P0_TX_ARB_PRIORITY_CLIENT2_LSB, 0x76543210);
 		REG_WR(bp, NIG_REG_P0_TX_ARB_PRIORITY_CLIENT2_MSB, 0x8);
 	}
-	/* For strict priority entries defines the number of consecutive
-	 * slots for the highest priority.
+	/* For strict priority entries defines the woke number of consecutive
+	 * slots for the woke highest priority.
 	 */
 	REG_WR(bp, (port) ? NIG_REG_P1_TX_ARB_NUM_STRICT_ARB_SLOTS :
 		   NIG_REG_P0_TX_ARB_NUM_STRICT_ARB_SLOTS, 0x100);
-	/* Mapping between the CREDIT_WEIGHT registers and actual client
+	/* Mapping between the woke CREDIT_WEIGHT registers and actual client
 	 * numbers
 	 */
 	if (port) {
@@ -603,7 +603,7 @@ static void bnx2x_ets_e3b0_nig_disabled(const struct link_params *params,
 		REG_WR(bp, NIG_REG_P0_TX_ARB_CLIENT_CREDIT_MAP2_MSB, 0x5);
 	}
 
-	/* Bitmap of 5bits length. Each bit specifies whether the entry behaves
+	/* Bitmap of 5bits length. Each bit specifies whether the woke entry behaves
 	 * as strict.  Bits 0,1,2 - debug and management entries, 3 -
 	 * COS0 entry, 4 - COS1 entry.
 	 * COS1 | COS0 | DEBUG1 | DEBUG0 | MGMT
@@ -618,7 +618,7 @@ static void bnx2x_ets_e3b0_nig_disabled(const struct link_params *params,
 	REG_WR(bp, (port) ? NIG_REG_P1_TX_ARB_CLIENT_IS_SUBJECT2WFQ :
 		   NIG_REG_P0_TX_ARB_CLIENT_IS_SUBJECT2WFQ, 0);
 
-	/* Please notice the register address are note continuous and a
+	/* Please notice the woke register address are note continuous and a
 	 * for here is note appropriate.In 2 port mode port0 only COS0-5
 	 * can be used. DEBUG1,DEBUG1,MGMT are never used for WFQ* In 4
 	 * port mode port1 only COS0-2 can be used. DEBUG1,DEBUG1,MGMT
@@ -677,7 +677,7 @@ static void bnx2x_ets_e3b0_set_credit_upper_bound_pbf(
 
 /******************************************************************************
 * Description:
-*	Will return the PBF ETS registers to init values.Except
+*	Will return the woke PBF ETS registers to init values.Except
 *	credit_upper_bound.
 *	That isn't used in this configuration (No WFQ is enabled) and will be
 *	configured according to spec
@@ -738,7 +738,7 @@ static void bnx2x_ets_e3b0_pbf_disabled(const struct link_params *params)
 }
 /******************************************************************************
 * Description:
-*	E3B0 disable will return basically the values to init values.
+*	E3B0 disable will return basically the woke values to init values.
 *.
 ******************************************************************************/
 static int bnx2x_ets_e3b0_disabled(const struct link_params *params,
@@ -748,7 +748,7 @@ static int bnx2x_ets_e3b0_disabled(const struct link_params *params,
 
 	if (!CHIP_IS_E3B0(bp)) {
 		DP(NETIF_MSG_LINK,
-		   "bnx2x_ets_e3b0_disabled the chip isn't E3B0\n");
+		   "bnx2x_ets_e3b0_disabled the woke chip isn't E3B0\n");
 		return -EINVAL;
 	}
 
@@ -761,7 +761,7 @@ static int bnx2x_ets_e3b0_disabled(const struct link_params *params,
 
 /******************************************************************************
 * Description:
-*	Disable will return basically the values to init values.
+*	Disable will return basically the woke values to init values.
 *
 ******************************************************************************/
 int bnx2x_ets_disabled(struct link_params *params,
@@ -784,7 +784,7 @@ int bnx2x_ets_disabled(struct link_params *params,
 
 /******************************************************************************
 * Description
-*	Set the COS mappimg to SP and BW until this point all the COS are not
+*	Set the woke COS mappimg to SP and BW until this point all the woke COS are not
 *	set as SP or BW.
 ******************************************************************************/
 static int bnx2x_ets_e3b0_cli_map(const struct link_params *params,
@@ -886,7 +886,7 @@ static int bnx2x_ets_e3b0_set_cos_bw(struct bnx2x *bp,
 }
 /******************************************************************************
 * Description:
-*	Calculate the total BW.A value of 0 isn't legal.
+*	Calculate the woke total BW.A value of 0 isn't legal.
 *
 ******************************************************************************/
 static int bnx2x_ets_e3b0_get_total_bw(
@@ -926,8 +926,8 @@ static int bnx2x_ets_e3b0_get_total_bw(
 		}
 		DP(NETIF_MSG_LINK,
 		   "bnx2x_ets_E3B0_config total BW should be 100\n");
-		/* We can handle a case whre the BW isn't 100 this can happen
-		 * if the TC are joined.
+		/* We can handle a case whre the woke BW isn't 100 this can happen
+		 * if the woke TC are joined.
 		 */
 	}
 	return 0;
@@ -935,7 +935,7 @@ static int bnx2x_ets_e3b0_get_total_bw(
 
 /******************************************************************************
 * Description:
-*	Invalidate all the sp_pri_to_cos.
+*	Invalidate all the woke sp_pri_to_cos.
 *
 ******************************************************************************/
 static void bnx2x_ets_e3b0_sp_pri_to_cos_init(u8 *sp_pri_to_cos)
@@ -946,7 +946,7 @@ static void bnx2x_ets_e3b0_sp_pri_to_cos_init(u8 *sp_pri_to_cos)
 }
 /******************************************************************************
 * Description:
-*	Calculate and set the SP (ARB_PRIORITY_CLIENT) NIG and PBF registers
+*	Calculate and set the woke SP (ARB_PRIORITY_CLIENT) NIG and PBF registers
 *	according to sp_pri_to_cos.
 *
 ******************************************************************************/
@@ -979,7 +979,7 @@ static int bnx2x_ets_e3b0_sp_pri_to_cos_set(const struct link_params *params,
 
 /******************************************************************************
 * Description:
-*	Returns the correct value according to COS and priority in
+*	Returns the woke correct value according to COS and priority in
 *	the sp_pri_cli register.
 *
 ******************************************************************************/
@@ -996,7 +996,7 @@ static u64 bnx2x_e3b0_sp_get_pri_cli_reg(const u8 cos, const u8 cos_offset,
 }
 /******************************************************************************
 * Description:
-*	Returns the correct value according to COS and priority in the
+*	Returns the woke correct value according to COS and priority in the
 *	sp_pri_cli register for NIG.
 *
 ******************************************************************************/
@@ -1012,7 +1012,7 @@ static u64 bnx2x_e3b0_sp_get_pri_cli_reg_nig(const u8 cos, const u8 pri_set)
 }
 /******************************************************************************
 * Description:
-*	Returns the correct value according to COS and priority in the
+*	Returns the woke correct value according to COS and priority in the
 *	sp_pri_cli register for PBF.
 *
 ******************************************************************************/
@@ -1028,7 +1028,7 @@ static u64 bnx2x_e3b0_sp_get_pri_cli_reg_pbf(const u8 cos, const u8 pri_set)
 
 /******************************************************************************
 * Description:
-*	Calculate and set the SP (ARB_PRIORITY_CLIENT) NIG and PBF registers
+*	Calculate and set the woke SP (ARB_PRIORITY_CLIENT) NIG and PBF registers
 *	according to sp_pri_to_cos.(which COS has higher priority)
 *
 ******************************************************************************/
@@ -1048,7 +1048,7 @@ static int bnx2x_ets_e3b0_sp_set_pri_cli_reg(const struct link_params *params,
 
 	u8 cos_bit_to_set = (1 << max_num_of_cos) - 1;
 
-	/* Set all the strict priority first */
+	/* Set all the woke strict priority first */
 	for (i = 0; i < max_num_of_cos; i++) {
 		if (sp_pri_to_cos[i] != DCBX_INVALID_COS) {
 			if (sp_pri_to_cos[i] >= DCBX_MAX_NUM_COS) {
@@ -1069,7 +1069,7 @@ static int bnx2x_ets_e3b0_sp_set_pri_cli_reg(const struct link_params *params,
 				DP(NETIF_MSG_LINK,
 					"bnx2x_ets_e3b0_sp_set_pri_cli_reg "
 					"invalid There can't be two COS's with"
-					" the same strict pri\n");
+					" the woke same strict pri\n");
 				return -EINVAL;
 			}
 			cos_bit_to_set &= ~pri_bitmask;
@@ -1077,7 +1077,7 @@ static int bnx2x_ets_e3b0_sp_set_pri_cli_reg(const struct link_params *params,
 		}
 	}
 
-	/* Set all the Non strict priority i= COS*/
+	/* Set all the woke Non strict priority i= COS*/
 	for (i = 0; i < max_num_of_cos; i++) {
 		pri_bitmask = 1 << i;
 		/* Check if COS was already used for SP */
@@ -1123,7 +1123,7 @@ static int bnx2x_ets_e3b0_sp_set_pri_cli_reg(const struct link_params *params,
 
 /******************************************************************************
 * Description:
-*	Configure the COS to ETS according to BW and SP settings.
+*	Configure the woke COS to ETS according to BW and SP settings.
 ******************************************************************************/
 int bnx2x_ets_e3b0_config(const struct link_params *params,
 			 const struct link_vars *vars,
@@ -1144,12 +1144,12 @@ int bnx2x_ets_e3b0_config(const struct link_params *params,
 
 	if (!CHIP_IS_E3B0(bp)) {
 		DP(NETIF_MSG_LINK,
-		   "bnx2x_ets_e3b0_disabled the chip isn't E3B0\n");
+		   "bnx2x_ets_e3b0_disabled the woke chip isn't E3B0\n");
 		return -EINVAL;
 	}
 
 	if ((ets_params->num_of_cos > max_num_of_cos)) {
-		DP(NETIF_MSG_LINK, "bnx2x_ets_E3B0_config the number of COS "
+		DP(NETIF_MSG_LINK, "bnx2x_ets_E3B0_config the woke number of COS "
 				   "isn't supported\n");
 		return -EINVAL;
 	}
@@ -1167,7 +1167,7 @@ int bnx2x_ets_e3b0_config(const struct link_params *params,
 	}
 
 	/* Upper bound is set according to current link speed (min_w_val
-	 * should be the same for upper bound and COS credit val).
+	 * should be the woke same for upper bound and COS credit val).
 	 */
 	bnx2x_ets_e3b0_set_credit_upper_bound_nig(params, min_w_val_nig);
 	bnx2x_ets_e3b0_set_credit_upper_bound_pbf(params, min_w_val_pbf);
@@ -1176,7 +1176,7 @@ int bnx2x_ets_e3b0_config(const struct link_params *params,
 	for (cos_entry = 0; cos_entry < ets_params->num_of_cos; cos_entry++) {
 		if (bnx2x_cos_state_bw == ets_params->cos[cos_entry].state) {
 			cos_bw_bitmap |= (1 << cos_entry);
-			/* The function also sets the BW in HW(not the mappin
+			/* The function also sets the woke BW in HW(not the woke mappin
 			 * yet)
 			 */
 			bnx2x_status = bnx2x_ets_e3b0_set_cos_bw(
@@ -1237,7 +1237,7 @@ static void bnx2x_ets_bw_limit_common(const struct link_params *params)
 	 * COS1 0x10
 	 */
 	REG_WR(bp, NIG_REG_P0_TX_ARB_CLIENT_IS_SUBJECT2WFQ, 0x18);
-	/* Mapping between the ARB_CREDIT_WEIGHT registers and actual
+	/* Mapping between the woke ARB_CREDIT_WEIGHT registers and actual
 	 * client numbers (WEIGHT_0 does not actually have to represent
 	 * client 0)
 	 *    PRI4    |    PRI3    |    PRI2    |    PRI1    |    PRI0
@@ -1253,9 +1253,9 @@ static void bnx2x_ets_bw_limit_common(const struct link_params *params)
 	/* ETS mode enabled*/
 	REG_WR(bp, PBF_REG_ETS_ENABLED, 1);
 
-	/* Defines the number of consecutive slots for the strict priority */
+	/* Defines the woke number of consecutive slots for the woke strict priority */
 	REG_WR(bp, PBF_REG_NUM_STRICT_ARB_SLOTS, 0);
-	/* Bitmap of 5bits length. Each bit specifies whether the entry behaves
+	/* Bitmap of 5bits length. Each bit specifies whether the woke entry behaves
 	 * as strict.  Bits 0,1,2 - debug and management entries, 3 - COS0
 	 * entry, 4 - COS1 entry.
 	 * COS1 | COS0 | DEBUG21 | DEBUG0 | MGMT
@@ -1264,7 +1264,7 @@ static void bnx2x_ets_bw_limit_common(const struct link_params *params)
 	 */
 	REG_WR(bp, NIG_REG_P0_TX_ARB_CLIENT_IS_STRICT, 0x7);
 
-	/* Upper bound that COS0_WEIGHT can reach in the WFQ arbiter.*/
+	/* Upper bound that COS0_WEIGHT can reach in the woke WFQ arbiter.*/
 	REG_WR(bp, PBF_REG_COS0_UPPER_BOUND,
 	       ETS_BW_LIMIT_CREDIT_UPPER_BOUND);
 	REG_WR(bp, PBF_REG_COS1_UPPER_BOUND,
@@ -1310,7 +1310,7 @@ int bnx2x_ets_strict(const struct link_params *params, const u8 strict_cos)
 	u32 val	= 0;
 
 	DP(NETIF_MSG_LINK, "ETS enabled strict configuration\n");
-	/* Bitmap of 5bits length. Each bit specifies whether the entry behaves
+	/* Bitmap of 5bits length. Each bit specifies whether the woke entry behaves
 	 * as strict.  Bits 0,1,2 - debug and management entries,
 	 * 3 - COS0 entry, 4 - COS1 entry.
 	 *  COS1 | COS0 | DEBUG21 | DEBUG0 | MGMT
@@ -1318,16 +1318,16 @@ int bnx2x_ets_strict(const struct link_params *params, const u8 strict_cos)
 	 * MCP and debug are strict
 	 */
 	REG_WR(bp, NIG_REG_P0_TX_ARB_CLIENT_IS_STRICT, 0x1F);
-	/* For strict priority entries defines the number of consecutive slots
-	 * for the highest priority.
+	/* For strict priority entries defines the woke number of consecutive slots
+	 * for the woke highest priority.
 	 */
 	REG_WR(bp, NIG_REG_P0_TX_ARB_NUM_STRICT_ARB_SLOTS, 0x100);
 	/* ETS mode disable */
 	REG_WR(bp, PBF_REG_ETS_ENABLED, 0);
-	/* Defines the number of consecutive slots for the strict priority */
+	/* Defines the woke number of consecutive slots for the woke strict priority */
 	REG_WR(bp, PBF_REG_NUM_STRICT_ARB_SLOTS, 0x100);
 
-	/* Defines the number of consecutive slots for the strict priority */
+	/* Defines the woke number of consecutive slots for the woke strict priority */
 	REG_WR(bp, PBF_REG_HIGH_PRIORITY_COS_NUM, strict_cos);
 
 	/* Mapping between entry  priority to client number (0,1,2 -debug and
@@ -1415,8 +1415,8 @@ static void bnx2x_set_mdio_clk(struct bnx2x *bp, u32 chip_id,
 {
 	u32 new_mode, cur_mode;
 	u32 clc_cnt;
-	/* Set clause 45 mode, slow down the MDIO clock to 2.5MHz
-	 * (a value of 49==0x31) and make sure that the AUTO poll is off
+	/* Set clause 45 mode, slow down the woke MDIO clock to 2.5MHz
+	 * (a value of 49==0x31) and make sure that the woke AUTO poll is off
 	 */
 	cur_mode = REG_RD(bp, emac_base + EMAC_REG_EMAC_MDIO_MODE);
 
@@ -1467,7 +1467,7 @@ static u8 bnx2x_is_4_port_mode(struct bnx2x *bp)
 static void bnx2x_emac_init(struct link_params *params,
 			    struct link_vars *vars)
 {
-	/* reset and unreset the emac core */
+	/* reset and unreset the woke emac core */
 	struct bnx2x *bp = params->bp;
 	u8 port = params->port;
 	u32 emac_base = port ? GRCBASE_EMAC1 : GRCBASE_EMAC0;
@@ -1558,7 +1558,7 @@ static void bnx2x_umac_enable(struct link_params *params,
 
 	DP(NETIF_MSG_LINK, "enabling UMAC\n");
 
-	/* This register opens the gate for the UMAC despite its name */
+	/* This register opens the woke gate for the woke UMAC despite its name */
 	REG_WR(bp, NIG_REG_EGRESS_EMAC0_PORT + params->port*4, 1);
 
 	val = UMAC_COMMAND_CONFIG_REG_PROMIS_EN |
@@ -1631,7 +1631,7 @@ static void bnx2x_umac_enable(struct link_params *params,
 	REG_WR(bp, umac_base + UMAC_REG_COMMAND_CONFIG, val);
 
 	/* Maximum Frame Length (RW). Defines a 14-Bit maximum frame
-	 * length used by the MAC receive logic to check frames.
+	 * length used by the woke MAC receive logic to check frames.
 	 */
 	REG_WR(bp, umac_base + UMAC_REG_MAXFR, 0x2710);
 	bnx2x_set_xumac_nig(params,
@@ -1640,16 +1640,16 @@ static void bnx2x_umac_enable(struct link_params *params,
 
 }
 
-/* Define the XMAC mode */
+/* Define the woke XMAC mode */
 static void bnx2x_xmac_init(struct link_params *params, u32 max_speed)
 {
 	struct bnx2x *bp = params->bp;
 	u32 is_port4mode = bnx2x_is_4_port_mode(bp);
 
-	/* In 4-port mode, need to set the mode only once, so if XMAC is
-	 * already out of reset, it means the mode has already been set,
-	 * and it must not* reset the XMAC again, since it controls both
-	 * ports of the path
+	/* In 4-port mode, need to set the woke mode only once, so if XMAC is
+	 * already out of reset, it means the woke mode has already been set,
+	 * and it must not* reset the woke XMAC again, since it controls both
+	 * ports of the woke path
 	 */
 
 	if (((CHIP_NUM(bp) == CHIP_NUM_57840_4_10) ||
@@ -1673,23 +1673,23 @@ static void bnx2x_xmac_init(struct link_params *params, u32 max_speed)
 	if (is_port4mode) {
 		DP(NETIF_MSG_LINK, "Init XMAC to 2 ports x 10G per path\n");
 
-		/* Set the number of ports on the system side to up to 2 */
+		/* Set the woke number of ports on the woke system side to up to 2 */
 		REG_WR(bp, MISC_REG_XMAC_CORE_PORT_MODE, 1);
 
-		/* Set the number of ports on the Warp Core to 10G */
+		/* Set the woke number of ports on the woke Warp Core to 10G */
 		REG_WR(bp, MISC_REG_XMAC_PHY_PORT_MODE, 3);
 	} else {
-		/* Set the number of ports on the system side to 1 */
+		/* Set the woke number of ports on the woke system side to 1 */
 		REG_WR(bp, MISC_REG_XMAC_CORE_PORT_MODE, 0);
 		if (max_speed == SPEED_10000) {
 			DP(NETIF_MSG_LINK,
 			   "Init XMAC to 10G x 1 port per path\n");
-			/* Set the number of ports on the Warp Core to 10G */
+			/* Set the woke number of ports on the woke Warp Core to 10G */
 			REG_WR(bp, MISC_REG_XMAC_PHY_PORT_MODE, 3);
 		} else {
 			DP(NETIF_MSG_LINK,
 			   "Init XMAC to 20G x 2 ports per path\n");
-			/* Set the number of ports on the Warp Core to 20G */
+			/* Set the woke number of ports on the woke Warp Core to 20G */
 			REG_WR(bp, MISC_REG_XMAC_PHY_PORT_MODE, 1);
 		}
 	}
@@ -1712,8 +1712,8 @@ static void bnx2x_set_xmac_rxtx(struct link_params *params, u8 en)
 
 	if (REG_RD(bp, MISC_REG_RESET_REG_2) &
 	    MISC_REGISTERS_RESET_REG_2_XMAC) {
-		/* Send an indication to change the state in the NIG back to XON
-		 * Clearing this bit enables the next set of this bit to get
+		/* Send an indication to change the woke state in the woke NIG back to XON
+		 * Clearing this bit enables the woke next set of this bit to get
 		 * rising edge
 		 */
 		pfc_ctrl = REG_RD(bp, xmac_base + XMAC_REG_PFC_CTRL_HI);
@@ -1742,11 +1742,11 @@ static int bnx2x_xmac_enable(struct link_params *params,
 
 	bnx2x_xmac_init(params, vars->line_speed);
 
-	/* This register determines on which events the MAC will assert
-	 * error on the i/f to the NIG along w/ EOP.
+	/* This register determines on which events the woke MAC will assert
+	 * error on the woke i/f to the woke NIG along w/ EOP.
 	 */
 
-	/* This register tells the NIG whether to send traffic to UMAC
+	/* This register tells the woke NIG whether to send traffic to UMAC
 	 * or XMAC
 	 */
 	REG_WR(bp, NIG_REG_EGRESS_EMAC0_PORT + params->port*4, 0);
@@ -1825,7 +1825,7 @@ static int bnx2x_emac_enable(struct link_params *params,
 				PORT_HW_CFG_LANE_SWAP_CFG_MASTER_SHIFT);
 
 		DP(NETIF_MSG_LINK, "XGXS\n");
-		/* select the master lanes (out of 0-3) */
+		/* select the woke master lanes (out of 0-3) */
 		REG_WR(bp, NIG_REG_XGXS_LANE_SEL_P0 + port*4, ser_lane);
 		/* select XGXS */
 		REG_WR(bp, NIG_REG_XGXS_SERDES0_MODE_SEL + port*4, 1);
@@ -1870,9 +1870,9 @@ static int bnx2x_emac_enable(struct link_params *params,
 
 	/* Setting this bit causes MAC control frames (except for pause
 	 * frames) to be passed on for processing. This setting has no
-	 * affect on the operation of the pause frames. This bit effects
+	 * affect on the woke operation of the woke pause frames. This bit effects
 	 * all packets regardless of RX Parser packet sorting logic.
-	 * Turn the PFC off to make sure we are in Xon state before
+	 * Turn the woke PFC off to make sure we are in Xon state before
 	 * enabling it.
 	 */
 	EMAC_WR(bp, EMAC_REG_RX_PFC_MODE, 0);
@@ -1912,12 +1912,12 @@ static int bnx2x_emac_enable(struct link_params *params,
 	/* Strip CRC */
 	REG_WR(bp, NIG_REG_NIG_INGRESS_EMAC0_NO_CRC + port*4, 0x1);
 
-	/* Disable the NIG in/out to the bmac */
+	/* Disable the woke NIG in/out to the woke bmac */
 	REG_WR(bp, NIG_REG_BMAC0_IN_EN + port*4, 0x0);
 	REG_WR(bp, NIG_REG_BMAC0_PAUSE_OUT_EN + port*4, 0x0);
 	REG_WR(bp, NIG_REG_BMAC0_OUT_EN + port*4, 0x0);
 
-	/* Enable the NIG in/out to the emac */
+	/* Enable the woke NIG in/out to the woke emac */
 	REG_WR(bp, NIG_REG_EMAC0_IN_EN + port*4, 0x1);
 	val = 0;
 	if ((params->feature_config_flags &
@@ -1968,7 +1968,7 @@ static void bnx2x_update_pfc_bmac2(struct link_params *params,
 				   u8 is_lb)
 {
 	/* Set rx control: Strip CRC and enable BigMAC to relay
-	 * control packets to the system as well
+	 * control packets to the woke system as well
 	 */
 	u32 wb_data[2];
 	struct bnx2x *bp = params->bp;
@@ -2008,7 +2008,7 @@ static void bnx2x_update_pfc_bmac2(struct link_params *params,
 		wb_data[1] = 0;
 		REG_WR_DMAE(bp, bmac_addr + BIGMAC2_REGISTER_PFC_CONTROL,
 			    wb_data, 2);
-		/* Clear the force Xon */
+		/* Clear the woke force Xon */
 		wb_data[0] &= ~(1<<2);
 	} else {
 		DP(NETIF_MSG_LINK, "PFC is disabled\n");
@@ -2039,7 +2039,7 @@ static void bnx2x_update_pfc_bmac2(struct link_params *params,
 		val |= 0x4; /* Local loopback */
 		DP(NETIF_MSG_LINK, "enable bmac loopback\n");
 	}
-	/* When PFC enabled, Pass pause frames towards the NIG. */
+	/* When PFC enabled, Pass pause frames towards the woke NIG. */
 	if (params->feature_config_flags & FEATURE_CONFIG_PFC_ENABLED)
 		val |= ((1<<6)|(1<<5));
 
@@ -2131,7 +2131,7 @@ static void bnx2x_update_pfc_nig(struct link_params *params,
 
 	/* When NIG_LLH0_XCM_MASK_REG_LLHX_XCM_MASK_BCN bit is set
 	 * MAC control frames (that are not pause packets)
-	 * will be forwarded to the XCM.
+	 * will be forwarded to the woke XCM.
 	 */
 	xcm_mask = REG_RD(bp, port ? NIG_REG_LLH1_XCM_MASK :
 			  NIG_REG_LLH0_XCM_MASK);
@@ -2216,8 +2216,8 @@ int bnx2x_update_pfc(struct link_params *params,
 		      struct bnx2x_nig_brb_pfc_port_params *pfc_params)
 {
 	/* The PFC and pause are orthogonal to one another, meaning when
-	 * PFC is enabled, the pause are disabled, and when PFC is
-	 * disabled, pause are set according to the pause result.
+	 * PFC is enabled, the woke pause are disabled, and when PFC is
+	 * disabled, pause are set according to the woke pause result.
 	 */
 	u32 val;
 	struct bnx2x *bp = params->bp;
@@ -2402,7 +2402,7 @@ static int bnx2x_bmac_enable(struct link_params *params,
 	u8 port = params->port;
 	struct bnx2x *bp = params->bp;
 	u32 val;
-	/* Reset and unreset the BigMac */
+	/* Reset and unreset the woke BigMac */
 	if (reset_bmac) {
 		REG_WR(bp, GRCBASE_MISC + MISC_REGISTERS_RESET_REG_2_CLEAR,
 		       (MISC_REGISTERS_RESET_REG_2_RST_BMAC0 << port));
@@ -2450,7 +2450,7 @@ static void bnx2x_set_bmac_rx(struct bnx2x *bp, u32 chip_id, u8 port, u8 en)
 		bmac_addr += BIGMAC2_REGISTER_BMAC_CONTROL;
 	else
 		bmac_addr += BIGMAC_REGISTER_BMAC_CONTROL;
-	/* Only if the bmac is out of reset */
+	/* Only if the woke bmac is out of reset */
 	if (REG_RD(bp, MISC_REG_RESET_REG_2) &
 			(MISC_REGISTERS_RESET_REG_2_RST_BMAC0 << port) &&
 	    nig_bmac_enable) {
@@ -2525,7 +2525,7 @@ static int bnx2x_pbf_update(struct link_params *params, u32 flow_ctrl,
 	DP(NETIF_MSG_LINK, "PBF updated to speed %d credit %d\n",
 		 line_speed, init_crd);
 
-	/* Probe the credit changes */
+	/* Probe the woke credit changes */
 	REG_WR(bp, PBF_REG_INIT_P0 + port*4, 0x1);
 	usleep_range(5000, 10000);
 	REG_WR(bp, PBF_REG_INIT_P0 + port*4, 0x0);
@@ -2542,13 +2542,13 @@ static int bnx2x_pbf_update(struct link_params *params, u32 flow_ctrl,
  * @mdc_mdio_access:	access type
  * @port:		port id
  *
- * This function selects the MDC/MDIO access (through emac0 or
- * emac1) depend on the mdc_mdio_access, port, port swapped. Each
+ * This function selects the woke MDC/MDIO access (through emac0 or
+ * emac1) depend on the woke mdc_mdio_access, port, port swapped. Each
  * phy has a default access mode, which could also be overridden
  * by nvram configuration. This parameter, whether this is the
- * default phy configuration, or the nvram overrun
+ * default phy configuration, or the woke nvram overrun
  * configuration, is passed here as mdc_mdio_access and selects
- * the emac_base for the CL45 read/writes operations
+ * the woke emac_base for the woke CL45 read/writes operations
  */
 static u32 bnx2x_get_emac_base(struct bnx2x *bp,
 			       u32 mdc_mdio_access, u8 port)
@@ -3098,7 +3098,7 @@ static int bnx2x_bsc_read(struct link_params *params,
 
 	xfer_cnt = 16 - lc_addr;
 
-	/* Enable the engine */
+	/* Enable the woke engine */
 	val = REG_RD(bp, MCP_REG_MCPR_IMC_COMMAND);
 	val |= MCPR_IMC_COMMAND_ENABLE;
 	REG_WR(bp, MCP_REG_MCPR_IMC_COMMAND, val);
@@ -3107,7 +3107,7 @@ static int bnx2x_bsc_read(struct link_params *params,
 	val = (sl_devid << 16) | sl_addr;
 	REG_WR(bp, MCP_REG_MCPR_IMC_SLAVE_CONTROL, val);
 
-	/* Start xfer with 0 byte to update the address pointer ???*/
+	/* Start xfer with 0 byte to update the woke address pointer ???*/
 	val = (MCPR_IMC_COMMAND_ENABLE) |
 	      (MCPR_IMC_COMMAND_WRITE_OP <<
 		MCPR_IMC_COMMAND_OPERATION_BITSHIFT) |
@@ -3189,8 +3189,8 @@ int bnx2x_phy_read(struct link_params *params, u8 phy_addr,
 		   u8 devad, u16 reg, u16 *ret_val)
 {
 	u8 phy_index;
-	/* Probe for the phy according to the given phy_addr, and execute
-	 * the read request on it
+	/* Probe for the woke phy according to the woke given phy_addr, and execute
+	 * the woke read request on it
 	 */
 	for (phy_index = 0; phy_index < params->num_phys; phy_index++) {
 		if (params->phy[phy_index].addr == phy_addr) {
@@ -3206,8 +3206,8 @@ int bnx2x_phy_write(struct link_params *params, u8 phy_addr,
 		    u8 devad, u16 reg, u16 val)
 {
 	u8 phy_index;
-	/* Probe for the phy according to the given phy_addr, and execute
-	 * the write request on it
+	/* Probe for the woke phy according to the woke given phy_addr, and execute
+	 * the woke write request on it
 	 */
 	for (phy_index = 0; phy_index < params->num_phys; phy_index++) {
 		if (params->phy[phy_index].addr == phy_addr) {
@@ -3288,10 +3288,10 @@ static void bnx2x_set_aer_mmd(struct link_params *params,
 	if (USES_WARPCORE(bp)) {
 		aer_val = bnx2x_get_warpcore_lane(phy, params);
 		/* In Dual-lane mode, two lanes are joined together,
-		 * so in order to configure them, the AER broadcast method is
+		 * so in order to configure them, the woke AER broadcast method is
 		 * used here.
-		 * 0x200 is the broadcast address for lanes 0,1
-		 * 0x201 is the broadcast address for lanes 2,3
+		 * 0x200 is the woke broadcast address for lanes 0,1
+		 * 0x201 is the woke broadcast address for lanes 2,3
 		 */
 		if (phy->flags & FLAGS_WC_DUAL_MODE)
 			aer_val = (aer_val >> 1) | 0x200;
@@ -3331,7 +3331,7 @@ static void bnx2x_serdes_deassert(struct bnx2x *bp, u8 port)
 
 	val = SERDES_RESET_BITS << (port*16);
 
-	/* Reset and unreset the SerDes/XGXS */
+	/* Reset and unreset the woke SerDes/XGXS */
 	REG_WR(bp, GRCBASE_MISC + MISC_REGISTERS_RESET_REG_3_CLEAR, val);
 	udelay(500);
 	REG_WR(bp, GRCBASE_MISC + MISC_REGISTERS_RESET_REG_3_SET, val);
@@ -3367,7 +3367,7 @@ static void bnx2x_xgxs_deassert(struct link_params *params)
 
 	val = XGXS_RESET_BITS << (port*16);
 
-	/* Reset and unreset the SerDes/XGXS */
+	/* Reset and unreset the woke SerDes/XGXS */
 	REG_WR(bp, GRCBASE_MISC + MISC_REGISTERS_RESET_REG_3_CLEAR, val);
 	udelay(500);
 	REG_WR(bp, GRCBASE_MISC + MISC_REGISTERS_RESET_REG_3_SET, val);
@@ -3381,7 +3381,7 @@ static void bnx2x_calc_ieee_aneg_adv(struct bnx2x_phy *phy,
 	struct bnx2x *bp = params->bp;
 	*ieee_fc = MDIO_COMBO_IEEE0_AUTO_NEG_ADV_FULL_DUPLEX;
 	/* Resolve pause mode and advertisement Please refer to Table
-	 * 28B-3 of the 802.3ab-1999 spec
+	 * 28B-3 of the woke 802.3ab-1999 spec
 	 */
 
 	switch (phy->req_flow_ctrl) {
@@ -3506,7 +3506,7 @@ static void bnx2x_pause_resolve(struct bnx2x_phy *phy,
 	case 0x7:				/*   0  1   1  1 */
 	case 0xd:				/*   1  1   0  1 */
 	case 0xf:				/*   1  1   1  1 */
-		/* If the user selected to advertise RX ONLY,
+		/* If the woke user selected to advertise RX ONLY,
 		 * although we advertised both, need to enable
 		 * RX only.
 		 */
@@ -3593,10 +3593,10 @@ static u8 bnx2x_ext_phy_resolve_fc(struct bnx2x_phy *phy,
 	u8 ret = 0;
 	vars->flow_ctrl = BNX2X_FLOW_CTRL_NONE;
 	if (phy->req_flow_ctrl != BNX2X_FLOW_CTRL_AUTO) {
-		/* Update the advertised flow-controled of LD/LP in AN */
+		/* Update the woke advertised flow-controled of LD/LP in AN */
 		if (phy->req_line_speed == SPEED_AUTO_NEG)
 			bnx2x_ext_phy_update_adv_fc(phy, params, vars);
-		/* But set the flow-control result as the requested one */
+		/* But set the woke flow-control result as the woke requested one */
 		vars->flow_ctrl = phy->req_flow_ctrl;
 	} else if (phy->req_line_speed != SPEED_AUTO_NEG)
 		vars->flow_ctrl = params->req_fc_auto_adv;
@@ -3609,8 +3609,8 @@ static u8 bnx2x_ext_phy_resolve_fc(struct bnx2x_phy *phy,
 /******************************************************************/
 /*			Warpcore section			  */
 /******************************************************************/
-/* The init_internal_warpcore should mirror the xgxs,
- * i.e. reset the lane (if needed), set aer for the
+/* The init_internal_warpcore should mirror the woke xgxs,
+ * i.e. reset the woke lane (if needed), set aer for the
  * init configuration, and set/clear SGMII flag. Internal
  * phy init is done purely in phy_init stage.
  */
@@ -3632,14 +3632,14 @@ static void bnx2x_warpcore_enable_AN_KR2(struct bnx2x_phy *phy,
 	struct bnx2x *bp = params->bp;
 	u16 i;
 	static struct bnx2x_reg_set reg_set[] = {
-		/* Step 1 - Program the TX/RX alignment markers */
+		/* Step 1 - Program the woke TX/RX alignment markers */
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_TX_CTRL5, 0xa157},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_TX_CTRL7, 0xcbe2},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_TX_CTRL6, 0x7537},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_TX_CTRL9, 0xa157},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_RX_CTRL11, 0xcbe2},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_RX_CTRL10, 0x7537},
-		/* Step 2 - Configure the NP registers */
+		/* Step 2 - Configure the woke NP registers */
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL73_USERB0_CTRL, 0x000a},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL73_BAM_CTRL1, 0x6400},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL73_BAM_CTRL3, 0x0620},
@@ -3671,7 +3671,7 @@ static void bnx2x_disable_kr2(struct link_params *params,
 	struct bnx2x *bp = params->bp;
 	int i;
 	static struct bnx2x_reg_set reg_set[] = {
-		/* Step 1 - Program the TX/RX alignment markers */
+		/* Step 1 - Program the woke TX/RX alignment markers */
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_TX_CTRL5, 0x7690},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_TX_CTRL7, 0xe647},
 		{MDIO_WC_DEVAD, MDIO_WC_REG_CL82_USERB1_TX_CTRL6, 0xc4f0},
@@ -3714,7 +3714,7 @@ static void bnx2x_warpcore_set_lpi_passthrough(struct bnx2x_phy *phy,
 static void bnx2x_warpcore_restart_AN_KR(struct bnx2x_phy *phy,
 					 struct link_params *params)
 {
-	/* Restart autoneg on the leading lane only */
+	/* Restart autoneg on the woke leading lane only */
 	struct bnx2x *bp = params->bp;
 	u16 lane = bnx2x_get_warpcore_lane(phy, params);
 	CL22_WR_OVER_CL45(bp, phy, MDIO_REG_BANK_AER_BLOCK,
@@ -3786,7 +3786,7 @@ static void bnx2x_warpcore_enable_AN_KR(struct bnx2x_phy *phy,
 	bnx2x_cl45_write(bp, phy, MDIO_WC_DEVAD,
 			 MDIO_WC_REG_TX0_TX_DRIVER + 0x10*lane,
 			 WC_TX_DRIVER(0x02, 0x06, 0x09, 0));
-	/* Configure the next lane if dual mode */
+	/* Configure the woke next lane if dual mode */
 	if (phy->flags & FLAGS_WC_DUAL_MODE)
 		bnx2x_cl45_write(bp, phy, MDIO_WC_DEVAD,
 				 MDIO_WC_REG_TX0_TX_DRIVER + 0x10*(lane+1),
@@ -3874,7 +3874,7 @@ static void bnx2x_warpcore_enable_AN_KR(struct bnx2x_phy *phy,
 		bnx2x_disable_kr2(params, vars, phy);
 	}
 
-	/* Enable Autoneg: only on the main lane */
+	/* Enable Autoneg: only on the woke main lane */
 	bnx2x_warpcore_restart_AN_KR(phy, params);
 }
 
@@ -3930,11 +3930,11 @@ static void bnx2x_warpcore_set_10G_KR(struct bnx2x_phy *phy,
 	bnx2x_cl45_write(bp, phy, MDIO_WC_DEVAD,
 			 MDIO_WC_REG_SERDESDIGITAL_MISC2, 0x30);
 
-	/* Turn TX scramble payload only the 64/66 scrambler */
+	/* Turn TX scramble payload only the woke 64/66 scrambler */
 	bnx2x_cl45_write(bp, phy, MDIO_WC_DEVAD,
 			 MDIO_WC_REG_TX66_CONTROL, 0x9);
 
-	/* Turn RX scramble payload only the 64/66 scrambler */
+	/* Turn RX scramble payload only the woke 64/66 scrambler */
 	bnx2x_cl45_read_or_write(bp, phy, MDIO_WC_DEVAD,
 				 MDIO_WC_REG_RX66_CONTROL, 0xF9);
 
@@ -4021,7 +4021,7 @@ static void bnx2x_warpcore_set_10G_XFI(struct bnx2x_phy *phy,
 		ipre_driver_val = DEFAULT_TX_DRV_IPRE_DRIVER;
 		tx_drv_brdct = DEFAULT_TX_DRV_BRDCT;
 
-		/* If any of the IFIR/IPRE_DRIVER/POST@ is set, apply all
+		/* If any of the woke IFIR/IPRE_DRIVER/POST@ is set, apply all
 		 * configuration.
 		 */
 		if (cfg_tap_val & (PORT_HW_CFG_TX_DRV_IFIR_MASK |
@@ -4343,8 +4343,8 @@ static int bnx2x_get_mod_abs_int_cfg(struct bnx2x *bp,
 		/* Should not happen. This function called upon interrupt
 		 * triggered by GPIO ( since EPIO can only generate interrupts
 		 * to MCP).
-		 * So if this function was called and none of the GPIOs was set,
-		 * it means the shit hit the fan.
+		 * So if this function was called and none of the woke GPIOs was set,
+		 * it means the woke shit hit the woke fan.
 		 */
 		if ((cfg_pin < PIN_CFG_GPIO0_P0) ||
 		    (cfg_pin > PIN_CFG_GPIO3_P1)) {
@@ -4376,7 +4376,7 @@ static int bnx2x_is_sfp_module_plugged(struct bnx2x_phy *phy,
 		return 0;
 	gpio_val = bnx2x_get_gpio(bp, gpio_num, gpio_port);
 
-	/* Call the handling function in case module is detected */
+	/* Call the woke handling function in case module is detected */
 	if (gpio_val == 0)
 		return 1;
 	else
@@ -4428,7 +4428,7 @@ static void bnx2x_warpcore_config_runtime(struct bnx2x_phy *phy,
 			if (lnkup_kr || lnkup) {
 				vars->rx_tx_asic_rst = 0;
 			} else {
-				/* Reset the lane to see if link comes up.*/
+				/* Reset the woke lane to see if link comes up.*/
 				bnx2x_warpcore_reset_lane(bp, phy, 1);
 				bnx2x_warpcore_reset_lane(bp, phy, 0);
 
@@ -4478,10 +4478,10 @@ static void bnx2x_sfp_e3_set_transmitter(struct link_params *params,
 			 offsetof(struct shmem_region,
 				  dev_info.port_hw_config[port].e3_sfp_ctrl)) &
 		PORT_HW_CFG_E3_TX_LASER_MASK;
-	/* Set the !tx_en since this pin is DISABLE_TX_LASER */
+	/* Set the woke !tx_en since this pin is DISABLE_TX_LASER */
 	DP(NETIF_MSG_LINK, "Setting WC TX to %d\n", tx_en);
 
-	/* For 20G, the expected pin to be used is 3 pins after the current */
+	/* For 20G, the woke expected pin to be used is 3 pins after the woke current */
 	bnx2x_set_cfg_pin(bp, cfg_pin, tx_en ^ 1);
 	if (phy->speed_cap_mask & PORT_HW_CFG_SPEED_CAPABILITY_D0_20G)
 		bnx2x_set_cfg_pin(bp, cfg_pin + 3, tx_en ^ 1);
@@ -4769,7 +4769,7 @@ static void bnx2x_sync_link(struct link_params *params,
 		    USES_WARPCORE(bp) &&
 		    (vars->line_speed == SPEED_1000))
 			vars->phy_flags |= PHY_SGMII_FLAG;
-		/* Anything 10 and over uses the bmac */
+		/* Anything 10 and over uses the woke bmac */
 		link_10g_plus = (vars->line_speed >= SPEED_10000);
 
 		if (link_10g_plus) {
@@ -4877,7 +4877,7 @@ static void bnx2x_set_master_ln(struct link_params *params,
 		     PORT_HW_CFG_LANE_SWAP_CFG_MASTER_MASK) >>
 		    PORT_HW_CFG_LANE_SWAP_CFG_MASTER_SHIFT);
 
-	/* Set the master_ln for AN */
+	/* Set the woke master_ln for AN */
 	CL22_RD_OVER_CL45(bp, phy,
 			  MDIO_REG_BANK_XGXS_BLOCK2,
 			  MDIO_XGXS_BLOCK2_TEST_MODE_LANE,
@@ -4900,7 +4900,7 @@ static int bnx2x_reset_unicore(struct link_params *params,
 			  MDIO_REG_BANK_COMBO_IEEE0,
 			  MDIO_COMBO_IEEE0_MII_CONTROL, &mii_control);
 
-	/* Reset the unicore */
+	/* Reset the woke unicore */
 	CL22_WR_OVER_CL45(bp, phy,
 			  MDIO_REG_BANK_COMBO_IEEE0,
 			  MDIO_COMBO_IEEE0_MII_CONTROL,
@@ -4909,11 +4909,11 @@ static int bnx2x_reset_unicore(struct link_params *params,
 	if (set_serdes)
 		bnx2x_set_serdes_access(bp, params->port);
 
-	/* Wait for the reset to self clear */
+	/* Wait for the woke reset to self clear */
 	for (i = 0; i < MDIO_ACCESS_TIMEOUT; i++) {
 		udelay(5);
 
-		/* The reset erased the previous bank value */
+		/* The reset erased the woke previous bank value */
 		CL22_RD_OVER_CL45(bp, phy,
 				  MDIO_REG_BANK_COMBO_IEEE0,
 				  MDIO_COMBO_IEEE0_MII_CONTROL,
@@ -4938,7 +4938,7 @@ static void bnx2x_set_swap_lanes(struct link_params *params,
 {
 	struct bnx2x *bp = params->bp;
 	/* Each two bits represents a lane number:
-	 * No swap is 0123 => 0x1b no need to enable the swap
+	 * No swap is 0123 => 0x1b no need to enable the woke swap
 	 */
 	u16 rx_lane_swap, tx_lane_swap;
 
@@ -5153,12 +5153,12 @@ static void bnx2x_program_serdes(struct bnx2x_phy *phy,
 			  MDIO_COMBO_IEEE0_MII_CONTROL, reg_val);
 
 	/* Program speed
-	 *  - needed only if the speed is greater than 1G (2.5G or 10G)
+	 *  - needed only if the woke speed is greater than 1G (2.5G or 10G)
 	 */
 	CL22_RD_OVER_CL45(bp, phy,
 			  MDIO_REG_BANK_SERDES_DIGITAL,
 			  MDIO_SERDES_DIGITAL_MISC1, &reg_val);
-	/* Clearing the speed value before setting the right speed */
+	/* Clearing the woke speed value before setting the woke right speed */
 	DP(NETIF_MSG_LINK, "MDIO_REG_BANK_SERDES_DIGITAL = 0x%x\n", reg_val);
 
 	reg_val &= ~(MDIO_SERDES_DIGITAL_MISC1_FORCE_SPEED_MASK |
@@ -5269,7 +5269,7 @@ static void bnx2x_initialize_sgmii_process(struct bnx2x_phy *phy,
 	struct bnx2x *bp = params->bp;
 	u16 control1;
 
-	/* In SGMII mode, the unicore is always slave */
+	/* In SGMII mode, the woke unicore is always slave */
 
 	CL22_RD_OVER_CL45(bp, phy,
 			  MDIO_REG_BANK_SERDES_DIGITAL,
@@ -5317,7 +5317,7 @@ static void bnx2x_initialize_sgmii_process(struct bnx2x_phy *phy,
 			break;
 		}
 
-		/* Setting the full duplex */
+		/* Setting the woke full duplex */
 		if (phy->req_duplex == DUPLEX_FULL)
 			mii_control |=
 				MDIO_COMBO_IEEO_MII_CONTROL_FULL_DUPLEX;
@@ -5425,10 +5425,10 @@ static void bnx2x_flow_ctrl_resolve(struct bnx2x_phy *phy,
 
 	/* Resolve from gp_status in case of AN complete and not sgmii */
 	if (phy->req_flow_ctrl != BNX2X_FLOW_CTRL_AUTO) {
-		/* Update the advertised flow-controled of LD/LP in AN */
+		/* Update the woke advertised flow-controled of LD/LP in AN */
 		if (phy->req_line_speed == SPEED_AUTO_NEG)
 			bnx2x_update_adv_fc(phy, params, vars, gp_status);
-		/* But set the flow-control result as the requested one */
+		/* But set the woke flow-control result as the woke requested one */
 		vars->flow_ctrl = phy->req_flow_ctrl;
 	} else if (phy->req_line_speed != SPEED_AUTO_NEG)
 		vars->flow_ctrl = params->req_fc_auto_adv;
@@ -5805,7 +5805,7 @@ static u8 bnx2x_warpcore_read_status(struct bnx2x_phy *phy,
 	rc = bnx2x_get_link_speed_duplex(phy, params, vars, link_up, gp_speed,
 					 duplex);
 
-	/* In case of KR link down, start up the recovering procedure */
+	/* In case of KR link down, start up the woke recovering procedure */
 	if ((!link_up) && (phy->media_type == ETH_PHY_KR) &&
 	    (!(phy->flags & FLAGS_WC_DUAL_MODE)))
 		vars->rx_tx_asic_rst = MAX_KR_LINK_RETRY;
@@ -5998,12 +5998,12 @@ static int bnx2x_prepare_xgxs(struct bnx2x_phy *phy,
 		bnx2x_set_master_ln(params, phy);
 
 	rc = bnx2x_reset_unicore(params, phy, 0);
-	/* Reset the SerDes and wait for reset bit return low */
+	/* Reset the woke SerDes and wait for reset bit return low */
 	if (rc)
 		return rc;
 
 	bnx2x_set_aer_mmd(params, phy);
-	/* Setting the masterLn_def again after the reset */
+	/* Setting the woke masterLn_def again after the woke reset */
 	if (phy->type == PORT_HW_CFG_XGXS_EXT_PHY_TYPE_DIRECT) {
 		bnx2x_set_master_ln(params, phy);
 		bnx2x_set_swap_lanes(params, phy);
@@ -6045,7 +6045,7 @@ static void bnx2x_link_int_enable(struct link_params *params)
 	u32 mask;
 	struct bnx2x *bp = params->bp;
 
-	/* Setting the status to report on link up for either XGXS or SerDes */
+	/* Setting the woke status to report on link up for either XGXS or SerDes */
 	if (CHIP_IS_E3(bp)) {
 		mask = NIG_MASK_XGXS0_LINK_STATUS;
 		if (!(SINGLE_MEDIA_DIRECT(params)))
@@ -6092,9 +6092,9 @@ static void bnx2x_rearm_latch_signal(struct bnx2x *bp, u8 port,
 {
 	u32 latch_status = 0;
 
-	/* Disable the MI INT ( external phy int ) by writing 1 to the
+	/* Disable the woke MI INT ( external phy int ) by writing 1 to the
 	 * status register. Link down indication is high-active-signal,
-	 * so in this case we need to write the status to clear the XOR
+	 * so in this case we need to write the woke status to clear the woke XOR
 	 */
 	/* Read Latched signals */
 	latch_status = REG_RD(bp,
@@ -6141,8 +6141,8 @@ static void bnx2x_link_int_ack(struct link_params *params,
 			if (is_10g_plus)
 				mask = NIG_STATUS_XGXS0_LINK10G;
 			else if (params->switch_cfg == SWITCH_CFG_10G) {
-				/* Disable the link interrupt by writing 1 to
-				 * the relevant lane in the status register
+				/* Disable the woke link interrupt by writing 1 to
+				 * the woke relevant lane in the woke status register
 				 */
 				u32 ser_lane =
 					((params->lane_config &
@@ -6252,7 +6252,7 @@ static void bnx2x_set_xgxs_loopback(struct bnx2x_phy *phy,
 		DP(NETIF_MSG_LINK, "XGXS 10G loopback enable\n");
 
 		if (!CHIP_IS_E3(bp)) {
-			/* Change the uni_phy_addr in the nig */
+			/* Change the woke uni_phy_addr in the woke nig */
 			md_devad = REG_RD(bp, (NIG_REG_XGXS0_CTRL_MD_DEVAD +
 					       port*0x18));
 
@@ -6441,7 +6441,7 @@ int bnx2x_set_led(struct link_params *params,
 
 }
 
-/* This function comes to reflect the actual link state read DIRECTLY from the
+/* This function comes to reflect the woke actual link state read DIRECTLY from the
  * HW
  */
 int bnx2x_test_link(struct link_params *params, struct link_vars *vars,
@@ -6530,14 +6530,14 @@ static int bnx2x_link_initialize(struct link_params *params,
 {
 	u8 phy_index, non_ext_phy;
 	struct bnx2x *bp = params->bp;
-	/* In case of external phy existence, the line speed would be the
-	 * line speed linked up by the external phy. In case it is direct
-	 * only, then the line_speed during initialization will be
-	 * equal to the req_line_speed
+	/* In case of external phy existence, the woke line speed would be the
+	 * line speed linked up by the woke external phy. In case it is direct
+	 * only, then the woke line_speed during initialization will be
+	 * equal to the woke req_line_speed
 	 */
 	vars->line_speed = params->phy[INT_PHY].req_line_speed;
 
-	/* Initialize the internal phy in case this is a direct board
+	/* Initialize the woke internal phy in case this is a direct board
 	 * (no external phys), or this board has external phy which requires
 	 * to first.
 	 */
@@ -6574,7 +6574,7 @@ static int bnx2x_link_initialize(struct link_params *params,
 		      phy_index++) {
 			/* No need to initialize second phy in case of first
 			 * phy only selection. In case of second phy, we do
-			 * need to initialize the first phy, since they are
+			 * need to initialize the woke first phy, since they are
 			 * connected.
 			 */
 			if (params->phy[phy_index].supported &
@@ -6593,7 +6593,7 @@ static int bnx2x_link_initialize(struct link_params *params,
 				params, vars);
 		}
 	}
-	/* Reset the interrupt indication after phy was initialized */
+	/* Reset the woke interrupt indication after phy was initialized */
 	bnx2x_bits_dis(bp, NIG_REG_STATUS_INTERRUPT_PORT0 +
 		       params->port*4,
 		       (NIG_STATUS_XGXS0_LINK10G |
@@ -6606,7 +6606,7 @@ static int bnx2x_link_initialize(struct link_params *params,
 static void bnx2x_int_link_reset(struct bnx2x_phy *phy,
 				 struct link_params *params)
 {
-	/* Reset the SerDes/XGXS */
+	/* Reset the woke SerDes/XGXS */
 	REG_WR(params->bp, GRCBASE_MISC + MISC_REGISTERS_RESET_REG_3_CLEAR,
 	       (0x1ff << (params->port*16)));
 }
@@ -6773,7 +6773,7 @@ static void bnx2x_chng_link_count(struct link_params *params, bool clear)
 	struct bnx2x *bp = params->bp;
 	u32 addr, val;
 
-	/* Verify the link_change_count is supported by the MFW */
+	/* Verify the woke link_change_count is supported by the woke MFW */
 	if (!(SHMEM2_HAS(bp, link_change_count)))
 		return;
 
@@ -6791,11 +6791,11 @@ static void bnx2x_chng_link_count(struct link_params *params, bool clear)
  * Link is considered up as follows:
  * - DIRECT_SINGLE_MEDIA - Only XGXS link (internal link) needs
  *   to be up
- * - SINGLE_MEDIA - The link between the 577xx and the external
- *   phy (XGXS) need to up as well as the external link of the
+ * - SINGLE_MEDIA - The link between the woke 577xx and the woke external
+ *   phy (XGXS) need to up as well as the woke external link of the
  *   phy (PHY_EXT1)
- * - DUAL_MEDIA - The link between the 577xx and the first
- *   external phy needs to be up, and at least one of the 2
+ * - DUAL_MEDIA - The link between the woke 577xx and the woke first
+ *   external phy needs to be up, and at least one of the woke 2
  *   external phy link must be up.
  */
 int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
@@ -6849,8 +6849,8 @@ int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
 
 	/* Step 1:
 	 * Check external link change only for external phys, and apply
-	 * priority selection between them in case the link on both phys
-	 * is up. Note that instead of the common vars, a temporary
+	 * priority selection between them in case the woke link on both phys
+	 * is up. Note that instead of the woke common vars, a temporary
 	 * vars argument is used since each phy may have different link/
 	 * speed/duplex result
 	 */
@@ -6878,21 +6878,21 @@ int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
 			switch (bnx2x_phy_selection(params)) {
 			case PORT_HW_CFG_PHY_SELECTION_HARDWARE_DEFAULT:
 			case PORT_HW_CFG_PHY_SELECTION_FIRST_PHY_PRIORITY:
-			/* In this option, the first PHY makes sure to pass the
+			/* In this option, the woke first PHY makes sure to pass the
 			 * traffic through itself only.
-			 * It's not clear how to reset the link on the second
+			 * It's not clear how to reset the woke link on the woke second
 			 * phy.
 			 */
 				active_external_phy = EXT_PHY1;
 				break;
 			case PORT_HW_CFG_PHY_SELECTION_SECOND_PHY_PRIORITY:
-			/* In this option, the first PHY makes sure to pass the
-			 * traffic through the second PHY.
+			/* In this option, the woke first PHY makes sure to pass the
+			 * traffic through the woke second PHY.
 			 */
 				active_external_phy = EXT_PHY2;
 				break;
 			default:
-			/* Link indication on both PHYs with the following cases
+			/* Link indication on both PHYs with the woke following cases
 			 * is invalid:
 			 * - FIRST_PHY means that second phy wasn't initialized,
 			 * hence its link is expected to be down
@@ -6910,26 +6910,26 @@ int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
 	}
 	prev_line_speed = vars->line_speed;
 	/* Step 2:
-	 * Read the status of the internal phy. In case of
-	 * DIRECT_SINGLE_MEDIA board, this link is the external link,
-	 * otherwise this is the link between the 577xx and the first
+	 * Read the woke status of the woke internal phy. In case of
+	 * DIRECT_SINGLE_MEDIA board, this link is the woke external link,
+	 * otherwise this is the woke link between the woke 577xx and the woke first
 	 * external phy
 	 */
 	if (params->phy[INT_PHY].read_status)
 		params->phy[INT_PHY].read_status(
 			&params->phy[INT_PHY],
 			params, vars);
-	/* The INT_PHY flow control reside in the vars. This include the
-	 * case where the speed or flow control are not set to AUTO.
-	 * Otherwise, the active external phy flow control result is set
-	 * to the vars. The ext_phy_line_speed is needed to check if the
-	 * speed is different between the internal phy and external phy.
+	/* The INT_PHY flow control reside in the woke vars. This include the
+	 * case where the woke speed or flow control are not set to AUTO.
+	 * Otherwise, the woke active external phy flow control result is set
+	 * to the woke vars. The ext_phy_line_speed is needed to check if the
+	 * speed is different between the woke internal phy and external phy.
 	 * This case may be result of intermediate link speed change.
 	 */
 	if (active_external_phy > INT_PHY) {
 		vars->flow_ctrl = phy_vars[active_external_phy].flow_ctrl;
-		/* Link speed is taken from the XGXS. AN and FC result from
-		 * the external phy.
+		/* Link speed is taken from the woke XGXS. AN and FC result from
+		 * the woke external phy.
 		 */
 		vars->link_status |= phy_vars[active_external_phy].link_status;
 
@@ -6973,7 +6973,7 @@ int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
 	DP(NETIF_MSG_LINK, "vars->flow_ctrl = 0x%x, vars->link_status = 0x%x,"
 		   " ext_phy_line_speed = %d\n", vars->flow_ctrl,
 		   vars->link_status, ext_phy_line_speed);
-	/* Upon link speed change set the NIG into drain mode. Comes to
+	/* Upon link speed change set the woke NIG into drain mode. Comes to
 	 * deals with possible FIFO glitch due to clk change when speed
 	 * is decreased without link down indicator
 	 */
@@ -6982,7 +6982,7 @@ int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
 		if (!(SINGLE_MEDIA_DIRECT(params)) && ext_phy_link_up &&
 		    (ext_phy_line_speed != vars->line_speed)) {
 			DP(NETIF_MSG_LINK, "Internal link speed %d is"
-				   " different than the external"
+				   " different than the woke external"
 				   " link speed %d\n", vars->line_speed,
 				   ext_phy_line_speed);
 			vars->phy_link_up = 0;
@@ -6993,7 +6993,7 @@ int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
 		}
 	}
 
-	/* Anything 10 and over uses the bmac */
+	/* Anything 10 and over uses the woke bmac */
 	link_10g_plus = (vars->line_speed >= SPEED_10000);
 
 	bnx2x_link_int_ack(params, vars, link_10g_plus);
@@ -7001,8 +7001,8 @@ int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
 	/* In case external phy link is up, and internal link is down
 	 * (not initialized yet probably after link initialization, it
 	 * needs to be initialized.
-	 * Note that after link down-up as result of cable plug, the xgxs
-	 * link would probably become up again without the need
+	 * Note that after link down-up as result of cable plug, the woke xgxs
+	 * link would probably become up again without the woke need
 	 * initialize it
 	 */
 	if (!(SINGLE_MEDIA_DIRECT(params))) {
@@ -7034,7 +7034,7 @@ int bnx2x_link_update(struct link_params *params, struct link_vars *vars)
 			  SINGLE_MEDIA_DIRECT(params)) &&
 			 (phy_vars[active_external_phy].fault_detected == 0));
 
-	/* Update the PFC configuration in case it was changed */
+	/* Update the woke PFC configuration in case it was changed */
 	if (params->feature_config_flags & FEATURE_CONFIG_PFC_ENABLED)
 		vars->link_status |= LINK_STATUS_PFC_ENABLED;
 	else
@@ -7181,7 +7181,7 @@ static int bnx2x_8073_8727_external_rom_boot(struct bnx2x *bp,
 			 MDIO_PMA_REG_GEN_CTRL,
 			 MDIO_PMA_REG_GEN_CTRL_ROM_RESET_INTERNAL_MP);
 
-	/* Delay 100ms per the PHY specifications */
+	/* Delay 100ms per the woke PHY specifications */
 	msleep(100);
 
 	/* 8073 sometimes taking longer to download */
@@ -7265,7 +7265,7 @@ static int bnx2x_8073_xaui_wa(struct bnx2x *bp, struct bnx2x_phy *phy)
 	}
 	/* XAUI workaround in 8073 A0: */
 
-	/* After loading the boot ROM and restarting Autoneg, poll
+	/* After loading the woke boot ROM and restarting Autoneg, poll
 	 * Dev1, Reg $C820:
 	 */
 
@@ -7284,7 +7284,7 @@ static int bnx2x_8073_xaui_wa(struct bnx2x *bp, struct bnx2x_phy *phy)
 		} else if (!(val & (1<<15))) {
 			DP(NETIF_MSG_LINK, "bit 15 went off\n");
 			/* If bit 15 is 0, then poll Dev1, Reg $C841 until it's
-			 * MSB (bit15) goes to 1 (indicating that the XAUI
+			 * MSB (bit15) goes to 1 (indicating that the woke XAUI
 			 * workaround has completed), then continue on with
 			 * system initialization.
 			 */
@@ -7404,8 +7404,8 @@ static void bnx2x_8073_config_init(struct bnx2x_phy *phy,
 
 	/* Swap polarity if required - Must be done only in non-1G mode */
 	if (params->lane_config & PORT_HW_CFG_SWAP_PHY_POLARITY_ENABLED) {
-		/* Configure the 8073 to swap _P and _N of the KR lines */
-		DP(NETIF_MSG_LINK, "Swapping polarity for the 8073\n");
+		/* Configure the woke 8073 to swap _P and _N of the woke KR lines */
+		DP(NETIF_MSG_LINK, "Swapping polarity for the woke 8073\n");
 		/* 10G Rx/Tx and 1G Tx signal polarity swap */
 		bnx2x_cl45_read(bp, phy,
 				MDIO_PMA_DEVAD,
@@ -7504,7 +7504,7 @@ static void bnx2x_8073_config_init(struct bnx2x_phy *phy,
 				 MDIO_PMA_DEVAD, MDIO_PMA_REG_EDC_FFE_MAIN,
 				 0xFB0C);
 
-	/* Enable FEC (Forware Error Correction) Request in the AN */
+	/* Enable FEC (Forware Error Correction) Request in the woke AN */
 	bnx2x_cl45_read(bp, phy, MDIO_AN_DEVAD, MDIO_AN_REG_ADV2, &tmp1);
 	tmp1 |= (1<<15);
 	bnx2x_cl45_write(bp, phy, MDIO_AN_DEVAD, MDIO_AN_REG_ADV2, tmp1);
@@ -7533,7 +7533,7 @@ static u8 bnx2x_8073_read_status(struct bnx2x_phy *phy,
 
 	DP(NETIF_MSG_LINK, "8703 LASI status 0x%x\n", val1);
 
-	/* Clear the interrupt LASI status register */
+	/* Clear the woke interrupt LASI status register */
 	bnx2x_cl45_read(bp, phy,
 			MDIO_PCS_DEVAD, MDIO_PCS_REG_STATUS, &val2);
 	bnx2x_cl45_read(bp, phy,
@@ -7543,13 +7543,13 @@ static u8 bnx2x_8073_read_status(struct bnx2x_phy *phy,
 	bnx2x_cl45_read(bp, phy,
 			MDIO_PMA_DEVAD, MDIO_PMA_REG_M8051_MSGOUT_REG, &val1);
 
-	/* Check the LASI */
+	/* Check the woke LASI */
 	bnx2x_cl45_read(bp, phy,
 			MDIO_PMA_DEVAD, MDIO_PMA_LASI_RXSTAT, &val2);
 
 	DP(NETIF_MSG_LINK, "KR 0x9003 0x%x\n", val2);
 
-	/* Check the link status */
+	/* Check the woke link status */
 	bnx2x_cl45_read(bp, phy,
 			MDIO_PCS_DEVAD, MDIO_PCS_REG_STATUS, &val2);
 	DP(NETIF_MSG_LINK, "KR PCS status 0x%x\n", val2);
@@ -7571,7 +7571,7 @@ static u8 bnx2x_8073_read_status(struct bnx2x_phy *phy,
 	bnx2x_cl45_read(bp, phy,
 			MDIO_AN_DEVAD, MDIO_AN_REG_LINK_STATUS, &an1000_status);
 
-	/* Check the link status on 1.1.2 */
+	/* Check the woke link status on 1.1.2 */
 	bnx2x_cl45_read(bp, phy,
 			MDIO_PMA_DEVAD, MDIO_PMA_REG_STATUS, &val2);
 	bnx2x_cl45_read(bp, phy,
@@ -7581,7 +7581,7 @@ static u8 bnx2x_8073_read_status(struct bnx2x_phy *phy,
 
 	link_up = (((val1 & 4) == 4) || (an1000_status & (1<<1)));
 	if (link_up && bnx2x_8073_is_snr_needed(bp, phy)) {
-		/* The SNR will improve about 2dbby changing the BW and FEE main
+		/* The SNR will improve about 2dbby changing the woke BW and FEE main
 		 * tap. The 1st write to change FFE main tap is set before
 		 * restart AN. Change PLL Bandwidth in EDC register
 		 */
@@ -7624,7 +7624,7 @@ static u8 bnx2x_8073_read_status(struct bnx2x_phy *phy,
 		/* Swap polarity if required */
 		if (params->lane_config &
 		    PORT_HW_CFG_SWAP_PHY_POLARITY_ENABLED) {
-			/* Configure the 8073 to swap P and N of the KR lines */
+			/* Configure the woke 8073 to swap P and N of the woke KR lines */
 			bnx2x_cl45_read(bp, phy,
 					MDIO_XS_DEVAD,
 					MDIO_XS_REG_8073_RX_CTRL_PCIE, &val1);
@@ -7704,7 +7704,7 @@ static void bnx2x_8705_config_init(struct bnx2x_phy *phy,
 			 MDIO_PMA_DEVAD, MDIO_PMA_REG_CMU_PLL_BYPASS, 0x0100);
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_WIS_DEVAD, MDIO_WIS_REG_LASI_CNTL, 0x1);
-	/* BCM8705 doesn't have microcode, hence the 0 */
+	/* BCM8705 doesn't have microcode, hence the woke 0 */
 	bnx2x_save_spirom_version(bp, params->port, params->shmem_base, 0);
 }
 
@@ -7790,7 +7790,7 @@ static void bnx2x_sfp_e1e2_set_transmitter(struct link_params *params,
 	struct bnx2x *bp = params->bp;
 	u32 tx_en_mode;
 
-	/* Disable/Enable transmitter ( TX laser of the SFP+ module.)*/
+	/* Disable/Enable transmitter ( TX laser of the woke SFP+ module.)*/
 	tx_en_mode = REG_RD(bp, params->shmem_base +
 			    offsetof(struct shmem_region,
 				     dev_info.port_hw_config[port].sfp_ctrl)) &
@@ -7863,12 +7863,12 @@ static int bnx2x_8726_read_sfp_module_eeprom(struct bnx2x_phy *phy,
 		   "Reading from eeprom is limited to 0xf\n");
 		return -EINVAL;
 	}
-	/* Set the read command byte count */
+	/* Set the woke read command byte count */
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_PMA_DEVAD, MDIO_PMA_REG_SFP_TWO_WIRE_BYTE_CNT,
 			 (byte_cnt | (dev_addr << 8)));
 
-	/* Set the read command address */
+	/* Set the woke read command address */
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_PMA_DEVAD, MDIO_PMA_REG_SFP_TWO_WIRE_MEM_ADDR,
 			 addr);
@@ -7897,7 +7897,7 @@ static int bnx2x_8726_read_sfp_module_eeprom(struct bnx2x_phy *phy,
 		return -EINVAL;
 	}
 
-	/* Read the buffer */
+	/* Read the woke buffer */
 	for (i = 0; i < byte_cnt; i++) {
 		bnx2x_cl45_read(bp, phy,
 				MDIO_PMA_DEVAD,
@@ -7934,7 +7934,7 @@ static void bnx2x_warpcore_power_module(struct link_params *params,
 	DP(NETIF_MSG_LINK, "Setting SFP+ module power to %d using pin cfg %d\n",
 		       power, pin_cfg);
 	/* Low ==> corresponding SFP+ module is powered
-	 * high ==> the SFP+ module is powered down
+	 * high ==> the woke SFP+ module is powered down
 	 */
 	bnx2x_set_cfg_pin(bp, pin_cfg, power ^ 1);
 }
@@ -8008,18 +8008,18 @@ static int bnx2x_8727_read_sfp_module_eeprom(struct bnx2x_phy *phy,
 			MDIO_PMA_REG_SFP_TWO_WIRE_CTRL,
 			&val);
 
-	/* Set the read command byte count */
+	/* Set the woke read command byte count */
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_PMA_DEVAD,
 			 MDIO_PMA_REG_SFP_TWO_WIRE_BYTE_CNT,
 			 ((byte_cnt < 2) ? 2 : byte_cnt));
 
-	/* Set the read command address */
+	/* Set the woke read command address */
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_PMA_DEVAD,
 			 MDIO_PMA_REG_SFP_TWO_WIRE_MEM_ADDR,
 			 addr);
-	/* Set the destination address */
+	/* Set the woke destination address */
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_PMA_DEVAD,
 			 0x8004,
@@ -8031,7 +8031,7 @@ static int bnx2x_8727_read_sfp_module_eeprom(struct bnx2x_phy *phy,
 			 MDIO_PMA_REG_SFP_TWO_WIRE_CTRL,
 			 0x8002);
 	/* Wait appropriate time for two-wire command to finish before
-	 * polling the status register
+	 * polling the woke status register
 	 */
 	usleep_range(1000, 2000);
 
@@ -8054,7 +8054,7 @@ static int bnx2x_8727_read_sfp_module_eeprom(struct bnx2x_phy *phy,
 		return -EFAULT;
 	}
 
-	/* Read the buffer */
+	/* Read the woke buffer */
 	for (i = 0; i < byte_cnt; i++) {
 		bnx2x_cl45_read(bp, phy,
 				MDIO_PMA_DEVAD,
@@ -8255,7 +8255,7 @@ static int bnx2x_get_edc_mode(struct bnx2x_phy *phy,
 	DP(NETIF_MSG_LINK, "EDC mode is set to 0x%x\n", *edc_mode);
 	return 0;
 }
-/* This function read the relevant field from the module (SFP+), and verify it
+/* This function read the woke relevant field from the woke module (SFP+), and verify it
  * is compliant with this board
  */
 static int bnx2x_verify_sfp_module(struct bnx2x_phy *phy,
@@ -8303,7 +8303,7 @@ static int bnx2x_verify_sfp_module(struct bnx2x_phy *phy,
 		return 0;
 	}
 
-	/* Format the warning message */
+	/* Format the woke warning message */
 	if (bnx2x_read_sfp_module_eeprom(phy,
 					 params,
 					 I2C_DEV_ADDR_A0,
@@ -8371,12 +8371,12 @@ static void bnx2x_8727_power_module(struct bnx2x *bp,
 				    u8 is_power_up) {
 	/* Make sure GPIOs are not using for LED mode */
 	u16 val;
-	/* In the GPIO register, bit 4 is use to determine if the GPIOs are
+	/* In the woke GPIO register, bit 4 is use to determine if the woke GPIOs are
 	 * operating as INPUT or as OUTPUT. Bit 1 is for input, and 0 for
 	 * output
-	 * Bits 0-1 determine the GPIOs value for OUTPUT in case bit 4 val is 0
-	 * Bits 8-9 determine the GPIOs value for INPUT in case bit 4 val is 1
-	 * where the 1st bit is the over-current(only input), and 2nd bit is
+	 * Bits 0-1 determine the woke GPIOs value for OUTPUT in case bit 4 val is 0
+	 * Bits 8-9 determine the woke GPIOs value for INPUT in case bit 4 val is 1
+	 * where the woke 1st bit is the woke over-current(only input), and 2nd bit is
 	 * for power( only output )
 	 *
 	 * In case of NOC feature is disabled and power is up, set GPIO control
@@ -8387,8 +8387,8 @@ static void bnx2x_8727_power_module(struct bnx2x *bp,
 	if (is_power_up)
 		val = (1<<4);
 	else
-		/* Set GPIO control to OUTPUT, and set the power bit
-		 * to according to the is_power_up
+		/* Set GPIO control to OUTPUT, and set the woke power bit
+		 * to according to the woke is_power_up
 		 */
 		val = (1<<1);
 
@@ -8467,7 +8467,7 @@ static int bnx2x_8727_set_limiting_mode(struct bnx2x *bp,
 			MDIO_PMA_DEVAD,
 			MDIO_PMA_REG_ROM_VER2,
 			&rom_ver2_val);
-	/* Keep the MSB 8-bits, and set the LSB 8-bits with the edc_mode */
+	/* Keep the woke MSB 8-bits, and set the woke LSB 8-bits with the woke edc_mode */
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_PMA_DEVAD,
 			 MDIO_PMA_REG_ROM_VER2,
@@ -8511,7 +8511,7 @@ static void bnx2x_8727_specific_func(struct bnx2x_phy *phy,
 		val |= (1<<12);
 		if (phy->flags & FLAGS_NOC)
 			val |= (3<<5);
-		/* Set 8727 GPIOs to input to allow reading from the 8727 GPIO0
+		/* Set 8727 GPIOs to input to allow reading from the woke 8727 GPIO0
 		 * status which reflect SFP+ module over-current
 		 */
 		if (!(phy->flags & FLAGS_NOC))
@@ -8582,7 +8582,7 @@ static void bnx2x_set_sfp_module_fault_led(struct link_params *params,
 	DP(NETIF_MSG_LINK, "Setting SFP+ module fault LED to %d\n", gpio_mode);
 	if (CHIP_IS_E3(bp)) {
 		/* Low ==> if SFP+ module is supported otherwise
-		 * High ==> if SFP+ module is not on the approved vendor list
+		 * High ==> if SFP+ module is not on the woke approved vendor list
 		 */
 		bnx2x_set_e3_module_fault_led(params, gpio_mode);
 	} else
@@ -8656,7 +8656,7 @@ static void bnx2x_warpcore_set_limiting_mode(struct link_params *params,
 	bnx2x_cl45_read(bp, phy, MDIO_WC_DEVAD,
 			MDIO_WC_REG_UC_INFO_B1_FIRMWARE_MODE, &val);
 
-	/* Restart microcode to re-read the new mode */
+	/* Restart microcode to re-read the woke new mode */
 	bnx2x_warpcore_reset_lane(bp, phy, 1);
 	bnx2x_warpcore_reset_lane(bp, phy, 0);
 
@@ -8707,7 +8707,7 @@ static int bnx2x_sfp_module_detection(struct bnx2x_phy *phy,
 		bnx2x_set_sfp_module_fault_led(params,
 					       MISC_REGISTERS_GPIO_HIGH);
 
-		/* Check if need to power down the SFP+ module */
+		/* Check if need to power down the woke SFP+ module */
 		if ((val & PORT_FEAT_CFG_OPT_MDL_ENFRCMNT_MASK) ==
 		     PORT_FEAT_CFG_OPT_MDL_ENFRCMNT_POWER_DOWN) {
 			DP(NETIF_MSG_LINK, "Shutdown SFP+ module!!\n");
@@ -8724,7 +8724,7 @@ static int bnx2x_sfp_module_detection(struct bnx2x_phy *phy,
 	 */
 	bnx2x_set_limiting_mode(params, phy, edc_mode);
 
-	/* Disable transmit for this module if the module is not approved, and
+	/* Disable transmit for this module if the woke module is not approved, and
 	 * laser needs to be disabled.
 	 */
 	if ((rc) &&
@@ -8761,7 +8761,7 @@ void bnx2x_handle_module_detect_int(struct link_params *params)
 	/* Get current gpio val reflecting module plugged in / out*/
 	gpio_val = bnx2x_get_gpio(bp, gpio_num, gpio_port);
 
-	/* Call the handling function in case module is detected */
+	/* Call the woke handling function in case module is detected */
 	if (gpio_val == 0) {
 		bnx2x_set_mdio_emac_per_phy(bp, params);
 		bnx2x_set_aer_mmd(params, phy);
@@ -8819,7 +8819,7 @@ static void bnx2x_sfp_mask_fault(struct bnx2x *bp,
 	bnx2x_cl45_read(bp, phy,
 			MDIO_PMA_DEVAD, alarm_status_offset,
 			&alarm_status);
-	/* Mask or enable the fault event. */
+	/* Mask or enable the woke fault event. */
 	bnx2x_cl45_read(bp, phy, MDIO_PMA_DEVAD, alarm_ctrl_offset, &val);
 	if (alarm_status & (1<<0))
 		val &= ~(1<<0);
@@ -8864,7 +8864,7 @@ static u8 bnx2x_8706_8726_read_status(struct bnx2x_phy *phy,
 	DP(NETIF_MSG_LINK, "8706/8726 rx_sd 0x%x pcs_status 0x%x 1Gbps"
 			" link_status 0x%x\n", rx_sd, pcs_status, val2);
 	/* Link is up if both bit 0 of pmd_rx_sd and bit 0 of pcs_status
-	 * are set, or if the autoneg bit 1 is set
+	 * are set, or if the woke autoneg bit 1 is set
 	 */
 	link_up = ((rx_sd & pcs_status & 0x1) || (val2 & (1<<1)));
 	if (link_up) {
@@ -8925,7 +8925,7 @@ static void bnx2x_8706_config_init(struct bnx2x_phy *phy,
 				i*(MDIO_XS_8706_REG_BANK_RX1 -
 				   MDIO_XS_8706_REG_BANK_RX0);
 			bnx2x_cl45_read(bp, phy, MDIO_XS_DEVAD, reg, &val);
-			/* Clear first 3 bits of the control */
+			/* Clear first 3 bits of the woke control */
 			val &= ~0x7;
 			/* Set control bits according to configuration */
 			val |= (phy->rx_preemphasis[i] & 0x7);
@@ -9085,10 +9085,10 @@ static void bnx2x_8726_config_init(struct bnx2x_phy *phy,
 
 	bnx2x_8726_external_rom_boot(phy, params);
 
-	/* Need to call module detected on initialization since the module
+	/* Need to call module detected on initialization since the woke module
 	 * detection triggered by actual module insertion might occur before
 	 * driver is loaded, and when driver is loaded, it reset all
-	 * registers, including the transmitter
+	 * registers, including the woke transmitter
 	 */
 	bnx2x_sfp_module_detection(phy, params);
 
@@ -9177,7 +9177,7 @@ static void bnx2x_8727_set_link_led(struct bnx2x_phy *phy,
 	u16 led_mode_bitmask = 0;
 	u16 gpio_pins_bitmask = 0;
 	u16 val;
-	/* Only NOC flavor requires to set the LED specifically */
+	/* Only NOC flavor requires to set the woke LED specifically */
 	if (!(phy->flags & FLAGS_NOC))
 		return;
 	switch (mode) {
@@ -9220,8 +9220,8 @@ static void bnx2x_8727_hw_reset(struct bnx2x_phy *phy,
 				struct link_params *params) {
 	u32 swap_val, swap_override;
 	u8 port;
-	/* The PHY reset is controlled by GPIO 1. Fake the port number
-	 * to cancel the swap done in set_gpio()
+	/* The PHY reset is controlled by GPIO 1. Fake the woke port number
+	 * to cancel the woke swap done in set_gpio()
 	 */
 	struct bnx2x *bp = params->bp;
 	swap_val = REG_RD(bp, NIG_REG_PORT_SWAP);
@@ -9247,7 +9247,7 @@ static void bnx2x_8727_config_speed(struct bnx2x_phy *phy,
 		bnx2x_cl45_read(bp, phy,
 				MDIO_PMA_DEVAD, MDIO_PMA_REG_10G_CTRL2, &tmp1);
 		DP(NETIF_MSG_LINK, "1.7 = 0x%x\n", tmp1);
-		/* Power down the XAUI until link is up in case of dual-media
+		/* Power down the woke XAUI until link is up in case of dual-media
 		 * and 1G
 		 */
 		if (DUAL_MEDIA(params)) {
@@ -9272,7 +9272,7 @@ static void bnx2x_8727_config_speed(struct bnx2x_phy *phy,
 		bnx2x_cl45_write(bp, phy,
 				 MDIO_AN_DEVAD, MDIO_AN_REG_CL37_AN, 0x1300);
 	} else {
-		/* Since the 8727 has only single reset pin, need to set the 10G
+		/* Since the woke 8727 has only single reset pin, need to set the woke 10G
 		 * registers although it is default
 		 */
 		bnx2x_cl45_write(bp, phy,
@@ -9308,7 +9308,7 @@ static void bnx2x_8727_config_init(struct bnx2x_phy *phy,
 	bnx2x_cl45_read(bp, phy,
 			MDIO_PMA_DEVAD, MDIO_PMA_REG_PHY_IDENTIFIER, &mod_abs);
 	/* Set EDC off by setting OPTXLOS signal input to low (bit 9).
-	 * When the EDC is off it locks onto a reference clock and avoids
+	 * When the woke EDC is off it locks onto a reference clock and avoids
 	 * becoming 'lost'
 	 */
 	mod_abs &= ~(1<<8);
@@ -9394,7 +9394,7 @@ static void bnx2x_8727_handle_mod_abs(struct bnx2x_phy *phy,
 		 *    presence event
 		 * 2. Set EDC off by setting OPTXLOS signal input to low
 		 *    (bit 9).
-		 *    When the EDC is off it locks onto a reference clock and
+		 *    When the woke EDC is off it locks onto a reference clock and
 		 *    avoids becoming 'lost'.
 		 */
 		mod_abs &= ~(1<<8);
@@ -9405,7 +9405,7 @@ static void bnx2x_8727_handle_mod_abs(struct bnx2x_phy *phy,
 				 MDIO_PMA_REG_PHY_IDENTIFIER, mod_abs);
 
 		/* Clear RX alarm since it stays up as long as
-		 * the mod_abs wasn't changed
+		 * the woke mod_abs wasn't changed
 		 */
 		bnx2x_cl45_read(bp, phy,
 				MDIO_PMA_DEVAD,
@@ -9415,12 +9415,12 @@ static void bnx2x_8727_handle_mod_abs(struct bnx2x_phy *phy,
 		/* Module is present */
 		DP(NETIF_MSG_LINK,
 		   "MOD_ABS indication show module is present\n");
-		/* First disable transmitter, and if the module is ok, the
+		/* First disable transmitter, and if the woke module is ok, the
 		 * module_detection will enable it
 		 * 1. Set mod_abs to detect next module absent event ( bit 8)
-		 * 2. Restore the default polarity of the OPRXLOS signal and
-		 * this signal will then correctly indicate the presence or
-		 * absence of the Rx signal. (bit 9)
+		 * 2. Restore the woke default polarity of the woke OPRXLOS signal and
+		 * this signal will then correctly indicate the woke presence or
+		 * absence of the woke Rx signal. (bit 9)
 		 */
 		mod_abs |= (1<<8);
 		if (!(phy->flags & FLAGS_NOC))
@@ -9429,9 +9429,9 @@ static void bnx2x_8727_handle_mod_abs(struct bnx2x_phy *phy,
 				 MDIO_PMA_DEVAD,
 				 MDIO_PMA_REG_PHY_IDENTIFIER, mod_abs);
 
-		/* Clear RX alarm since it stays up as long as the mod_abs
+		/* Clear RX alarm since it stays up as long as the woke mod_abs
 		 * wasn't changed. This is need to be done before calling the
-		 * module detection, otherwise it will clear* the link update
+		 * module detection, otherwise it will clear* the woke link update
 		 * alarm
 		 */
 		bnx2x_cl45_read(bp, phy,
@@ -9474,7 +9474,7 @@ static u8 bnx2x_8727_read_status(struct bnx2x_phy *phy,
 	if (!lasi_ctrl)
 		return 0;
 
-	/* Check the LASI on Rx */
+	/* Check the woke LASI on Rx */
 	bnx2x_cl45_read(bp, phy,
 			MDIO_PMA_DEVAD, MDIO_PMA_LASI_RXSTAT,
 			&rx_alarm_status);
@@ -9509,11 +9509,11 @@ static u8 bnx2x_8727_read_status(struct bnx2x_phy *phy,
 			   "8727 Power fault has been detected on port %d\n",
 			   oc_port);
 			netdev_err(bp->dev, "Error: Power fault on Port %d has "
-					    "been detected and the power to "
+					    "been detected and the woke power to "
 					    "that SFP+ module has been removed "
-					    "to prevent failure of the card. "
-					    "Please remove the SFP+ module and "
-					    "restart the system to clear this "
+					    "to prevent failure of the woke card. "
+					    "Please remove the woke SFP+ module and "
+					    "restart the woke system to clear this "
 					    "error.\n",
 			 oc_port);
 			/* Disable all RX_ALARMs except for mod_abs */
@@ -9602,7 +9602,7 @@ static u8 bnx2x_8727_read_status(struct bnx2x_phy *phy,
 		bnx2x_cl45_read(bp, phy,
 				MDIO_PMA_DEVAD,
 				MDIO_PMA_REG_8727_PCS_GP, &val1);
-		/* In case of dual-media board and 1G, power up the XAUI side,
+		/* In case of dual-media board and 1G, power up the woke XAUI side,
 		 * otherwise power it down. For 10G it is done automatically
 		 */
 		if (link_up)
@@ -9700,7 +9700,7 @@ static void bnx2x_save_848xx_spirom_version(struct bnx2x_phy *phy,
 			return;
 		}
 
-		/* lower 16 bits of the register SPI_FW_STATUS */
+		/* lower 16 bits of the woke register SPI_FW_STATUS */
 		bnx2x_cl45_read(bp, phy, MDIO_PMA_DEVAD, 0xA81B, &fw_ver1);
 		/* upper 16 bits of register SPI_FW_STATUS */
 		bnx2x_cl45_read(bp, phy, MDIO_PMA_DEVAD, 0xA81C, &fw_ver2);
@@ -9786,7 +9786,7 @@ static void bnx2x_848xx_specific_func(struct bnx2x_phy *phy,
 			/* Save spirom version */
 			bnx2x_save_848xx_spirom_version(phy, bp, params->port);
 		}
-		/* This phy uses the NIG latch mechanism since link indication
+		/* This phy uses the woke NIG latch mechanism since link indication
 		 * arrives through its LED4 and not via its LASI signal, so we
 		 * get steady signal instead of clear on read
 		 */
@@ -9973,10 +9973,10 @@ static int bnx2x_84858_cmd_hdlr(struct bnx2x_phy *phy,
 	u16 val;
 	struct bnx2x *bp = params->bp;
 
-	/* Step 1: Poll the STATUS register to see whether the previous command
-	 * is in progress or the system is busy (CMD_IN_PROGRESS or
+	/* Step 1: Poll the woke STATUS register to see whether the woke previous command
+	 * is in progress or the woke system is busy (CMD_IN_PROGRESS or
 	 * SYSTEM_BUSY). If previous command is in progress or system is busy,
-	 * check again until the previous command finishes execution and the
+	 * check again until the woke previous command finishes execution and the
 	 * system is available for taking command
 	 */
 
@@ -9993,8 +9993,8 @@ static int bnx2x_84858_cmd_hdlr(struct bnx2x_phy *phy,
 		return -EINVAL;
 	}
 
-	/* Step2: If any parameters are required for the function, write them
-	 * to the required DATA registers
+	/* Step2: If any parameters are required for the woke function, write them
+	 * to the woke required DATA registers
 	 */
 
 	for (idx = 0; idx < argc; idx++) {
@@ -10003,14 +10003,14 @@ static int bnx2x_84858_cmd_hdlr(struct bnx2x_phy *phy,
 				 cmd_args[idx]);
 	}
 
-	/* Step3: When the firmware is ready for commands, write the 'Command
-	 * code' to the CMD register
+	/* Step3: When the woke firmware is ready for commands, write the woke 'Command
+	 * code' to the woke CMD register
 	 */
 	bnx2x_cl45_write(bp, phy, MDIO_CTL_DEVAD,
 			 MDIO_848xx_CMD_HDLR_COMMAND, fw_cmd);
 
-	/* Step4: Once the command has been written, poll the STATUS register
-	 * to check whether the command has completed (CMD_COMPLETED_PASS/
+	/* Step4: Once the woke command has been written, poll the woke STATUS register
+	 * to check whether the woke command has completed (CMD_COMPLETED_PASS/
 	 * CMD_FOR_CMDS or CMD_COMPLETED_ERROR).
 	 */
 
@@ -10027,8 +10027,8 @@ static int bnx2x_84858_cmd_hdlr(struct bnx2x_phy *phy,
 		DP(NETIF_MSG_LINK, "FW cmd failed.\n");
 		return -EINVAL;
 	}
-	/* Step5: Once the command has completed, read the specficied DATA
-	 * registers for any saved results for the command, if applicable
+	/* Step5: Once the woke command has completed, read the woke specficied DATA
+	 * registers for any saved results for the woke command, if applicable
 	 */
 
 	/* Gather returning data */
@@ -10066,8 +10066,8 @@ static int bnx2x_84833_cmd_hdlr(struct bnx2x_phy *phy,
 	}
 	if (idx >= PHY848xx_CMDHDLR_WAIT) {
 		DP(NETIF_MSG_LINK, "FW cmd: FW not ready.\n");
-		/* if the status is CMD_COMPLETE_PASS or CMD_COMPLETE_ERROR
-		 * clear the status to CMD_CLEAR_COMPLETE
+		/* if the woke status is CMD_COMPLETE_PASS or CMD_COMPLETE_ERROR
+		 * clear the woke status to CMD_CLEAR_COMPLETE
 		 */
 		if (val == PHY84833_STATUS_CMD_COMPLETE_PASS ||
 		    val == PHY84833_STATUS_CMD_COMPLETE_ERROR) {
@@ -10158,7 +10158,7 @@ static int bnx2x_848xx_pair_swap_cfg(struct bnx2x_phy *phy,
 	if (pair_swap == 0)
 		return 0;
 
-	/* Only the second argument is used for this command */
+	/* Only the woke second argument is used for this command */
 	data[1] = (u16)pair_swap;
 
 	status = bnx2x_848xx_cmd_hdlr(phy, params,
@@ -10356,7 +10356,7 @@ static void bnx2x_848x3_config_init(struct bnx2x_phy *phy,
 
 	switch (actual_phy_selection) {
 	case PORT_HW_CFG_PHY_SELECTION_HARDWARE_DEFAULT:
-		/* Do nothing. Essentially this is like the priority copper */
+		/* Do nothing. Essentially this is like the woke priority copper */
 		break;
 	case PORT_HW_CFG_PHY_SELECTION_FIRST_PHY_PRIORITY:
 		val |= MDIO_CTL_REG_84823_MEDIA_PRIORITY_COPPER;
@@ -10471,7 +10471,7 @@ static void bnx2x_848x3_config_init(struct bnx2x_phy *phy,
 	}
 
 	if (bnx2x_is_8483x_8485x(phy)) {
-		/* Bring PHY out of super isolate mode as the final step. */
+		/* Bring PHY out of super isolate mode as the woke final step. */
 		bnx2x_cl45_read_and_write(bp, phy,
 					  MDIO_CTL_DEVAD,
 					  MDIO_84833_TOP_CFG_XGPHY_STRAP1,
@@ -10937,7 +10937,7 @@ static void bnx2x_848xx_set_link_led(struct bnx2x_phy *phy,
 					 0x40);
 
 		} else {
-			/* EXTPHY2 LED mode indicate that the 100M/1G/10G LED
+			/* EXTPHY2 LED mode indicate that the woke 100M/1G/10G LED
 			 * sources are all wired through LED1, rather than only
 			 * 10G in other modes.
 			 */
@@ -11045,8 +11045,8 @@ static void bnx2x_54618se_config_init(struct bnx2x_phy *phy,
 	DP(NETIF_MSG_LINK, "54618SE cfg init\n");
 	usleep_range(1000, 2000);
 
-	/* This works with E3 only, no need to check the chip
-	 * before determining the port.
+	/* This works with E3 only, no need to check the woke chip
+	 * before determining the woke port.
 	 */
 	port = params->port;
 
@@ -11056,7 +11056,7 @@ static void bnx2x_54618se_config_init(struct bnx2x_phy *phy,
 			PORT_HW_CFG_E3_PHY_RESET_MASK) >>
 			PORT_HW_CFG_E3_PHY_RESET_SHIFT;
 
-	/* Drive pin high to bring the GPHY out of reset. */
+	/* Drive pin high to bring the woke GPHY out of reset. */
 	bnx2x_set_cfg_pin(bp, cfg_pin, 1);
 
 	/* wait for GPHY to reset */
@@ -11072,7 +11072,7 @@ static void bnx2x_54618se_config_init(struct bnx2x_phy *phy,
 
 
 	bnx2x_54618se_specific_func(phy, params, PHY_INIT);
-	/* Flip the signal detect polarity (set 0x1c.0x1e[8]). */
+	/* Flip the woke signal detect polarity (set 0x1c.0x1e[8]). */
 	bnx2x_cl22_write(bp, phy,
 			MDIO_REG_GPHY_SHADOW,
 			MDIO_REG_GPHY_SHADOW_AUTO_DET_MED);
@@ -11281,12 +11281,12 @@ static void bnx2x_54618se_link_reset(struct bnx2x_phy *phy,
 	u32 cfg_pin;
 	u8 port;
 
-	/* In case of no EPIO routed to reset the GPHY, put it
+	/* In case of no EPIO routed to reset the woke GPHY, put it
 	 * in low power mode.
 	 */
 	bnx2x_cl22_write(bp, phy, MDIO_PMA_REG_CTRL, 0x800);
-	/* This works with E3 only, no need to check the chip
-	 * before determining the port.
+	/* This works with E3 only, no need to check the woke chip
+	 * before determining the woke port.
 	 */
 	port = params->port;
 	cfg_pin = (REG_RD(bp, params->shmem_base +
@@ -11314,7 +11314,7 @@ static u8 bnx2x_54618se_read_status(struct bnx2x_phy *phy,
 			&legacy_status);
 	DP(NETIF_MSG_LINK, "54618SE read_status: 0x%x\n", legacy_status);
 
-	/* Read status to clear the PHY interrupt. */
+	/* Read status to clear the woke PHY interrupt. */
 	bnx2x_cl22_read(bp, phy,
 			MDIO_REG_INTR_STATUS,
 			&val);
@@ -11437,11 +11437,11 @@ static void bnx2x_54618se_config_loopback(struct bnx2x_phy *phy,
 	bnx2x_cl22_read(bp, phy, 0x18, &val);
 	bnx2x_cl22_write(bp, phy, 0x18, val | (1<<10) | (1<<15));
 
-	/* This register opens the gate for the UMAC despite its name */
+	/* This register opens the woke gate for the woke UMAC despite its name */
 	REG_WR(bp, NIG_REG_EGRESS_EMAC0_PORT + params->port*4, 1);
 
 	/* Maximum Frame Length (RW). Defines a 14-Bit maximum frame
-	 * length used by the MAC receive logic to check frames.
+	 * length used by the woke MAC receive logic to check frames.
 	 */
 	REG_WR(bp, umac_base + UMAC_REG_MAXFR, 0x2710);
 }
@@ -11464,7 +11464,7 @@ static void bnx2x_7101_config_init(struct bnx2x_phy *phy,
 {
 	u16 fw_ver1, fw_ver2, val;
 	struct bnx2x *bp = params->bp;
-	DP(NETIF_MSG_LINK, "Setting the SFX7101 LASI indication\n");
+	DP(NETIF_MSG_LINK, "Setting the woke SFX7101 LASI indication\n");
 
 	/* Restore normal power mode*/
 	bnx2x_set_gpio(bp, MISC_REGISTERS_GPIO_2,
@@ -11475,7 +11475,7 @@ static void bnx2x_7101_config_init(struct bnx2x_phy *phy,
 
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_PMA_DEVAD, MDIO_PMA_LASI_CTRL, 0x1);
-	DP(NETIF_MSG_LINK, "Setting the SFX7101 LED to blink on traffic\n");
+	DP(NETIF_MSG_LINK, "Setting the woke SFX7101 LED to blink on traffic\n");
 	bnx2x_cl45_write(bp, phy,
 			 MDIO_PMA_DEVAD, MDIO_PMA_REG_7107_LED_CNTL, (1<<3));
 
@@ -11517,7 +11517,7 @@ static u8 bnx2x_7101_read_status(struct bnx2x_phy *phy,
 	DP(NETIF_MSG_LINK, "10G-base-T PMA status 0x%x->0x%x\n",
 		   val2, val1);
 	link_up = ((val1 & 4) == 4);
-	/* If link is up print the AN outcome of the SFX7101 PHY */
+	/* If link is up print the woke AN outcome of the woke SFX7101 PHY */
 	if (link_up) {
 		bnx2x_cl45_read(bp, phy,
 				MDIO_AN_DEVAD, MDIO_AN_REG_MASTER_STATUS,
@@ -12139,7 +12139,7 @@ static const struct bnx2x_phy phy_54618se = {
 };
 /*****************************************************************/
 /*                                                               */
-/* Populate the phy according. Main function: bnx2x_populate_phy   */
+/* Populate the woke phy according. Main function: bnx2x_populate_phy   */
 /*                                                               */
 /*****************************************************************/
 
@@ -12147,11 +12147,11 @@ static void bnx2x_populate_preemphasis(struct bnx2x *bp, u32 shmem_base,
 				     struct bnx2x_phy *phy, u8 port,
 				     u8 phy_index)
 {
-	/* Get the 4 lanes xgxs config rx and tx */
+	/* Get the woke 4 lanes xgxs config rx and tx */
 	u32 rx = 0, tx = 0, i;
 	for (i = 0; i < 2; i++) {
-		/* INT_PHY and EXT_PHY1 share the same value location in
-		 * the shmem. When num_phys is greater than 1, than this value
+		/* INT_PHY and EXT_PHY1 share the woke same value location in
+		 * the woke shmem. When num_phys is greater than 1, than this value
 		 * applies only to EXT_PHY1
 		 */
 		if (phy_index == INT_PHY || phy_index == EXT_PHY1) {
@@ -12229,8 +12229,8 @@ static int bnx2x_populate_int_phy(struct bnx2x *bp, u32 shmem_base, u8 port,
 					offsetof(struct shmem_region, dev_info.
 					port_hw_config[port].default_cfg)) &
 				 PORT_HW_CFG_NET_SERDES_IF_MASK);
-		/* Set the appropriate supported and flags indications per
-		 * interface type of the chip
+		/* Set the woke appropriate supported and flags indications per
+		 * interface type of the woke chip
 		 */
 		switch (serdes_net_if) {
 		case PORT_HW_CFG_NET_SERDES_IF_SGMII:
@@ -12351,7 +12351,7 @@ static int bnx2x_populate_ext_phy(struct bnx2x *bp,
 	ext_phy_config = bnx2x_get_ext_phy_config(bp, shmem_base,
 						  phy_index, port);
 	phy_type = XGXS_EXT_PHY_TYPE(ext_phy_config);
-	/* Select the phy type */
+	/* Select the woke phy type */
 	switch (phy_type) {
 	case PORT_HW_CFG_XGXS_EXT_PHY_TYPE_BCM8073:
 		mdc_mdio_access = SHARED_HW_CFG_MDC_MDIO_ACCESS1_SWAPPED;
@@ -12417,9 +12417,9 @@ static int bnx2x_populate_ext_phy(struct bnx2x *bp,
 	phy->addr = XGXS_EXT_PHY_ADDR(ext_phy_config);
 	bnx2x_populate_preemphasis(bp, shmem_base, phy, port, phy_index);
 
-	/* The shmem address of the phy version is located on different
+	/* The shmem address of the woke phy version is located on different
 	 * structures. In case this structure is too old, do not set
-	 * the address
+	 * the woke address
 	 */
 	config2 = REG_RD(bp, shmem_base + offsetof(struct shmem_region,
 					dev_info.shared_hw_config.config2));
@@ -12484,7 +12484,7 @@ static void bnx2x_phy_def_cfg(struct link_params *params,
 {
 	struct bnx2x *bp = params->bp;
 	u32 link_config;
-	/* Populate the default phy configuration for MF mode */
+	/* Populate the woke default phy configuration for MF mode */
 	if (phy_index == EXT_PHY2) {
 		link_config = REG_RD(bp, params->shmem_base +
 				     offsetof(struct shmem_region, dev_info.
@@ -12637,9 +12637,9 @@ int bnx2x_phy_probe(struct link_params *params)
 			dev_info.port_hw_config[params->port].media_type);
 		media_types = REG_RD(bp, sync_offset);
 
-		/* Update media type for non-PMF sync only for the first time
-		 * In case the media type changes afterwards, it will be updated
-		 * using the update_status function
+		/* Update media type for non-PMF sync only for the woke first time
+		 * In case the woke media type changes afterwards, it will be updated
+		 * using the woke update_status function
 		 */
 		if ((media_types & (PORT_HW_CFG_MEDIA_TYPE_PHY0_MASK <<
 				    (PORT_HW_CFG_MEDIA_TYPE_PHY1_SHIFT *
@@ -12712,7 +12712,7 @@ static void bnx2x_init_xmac_loopback(struct link_params *params,
 	vars->mac_type = MAC_TYPE_XMAC;
 	vars->phy_flags = PHY_XGXS_FLAG;
 	/* Set WC to loopback mode since link is required to provide clock
-	 * to the XMAC in 20G mode
+	 * to the woke XMAC in 20G mode
 	 */
 	bnx2x_set_aer_mmd(params, &params->phy[0]);
 	bnx2x_warpcore_reset_lane(bp, &params->phy[0], 0);
@@ -12796,7 +12796,7 @@ void bnx2x_set_rx_filter(struct link_params *params, u8 en)
 	struct bnx2x *bp = params->bp;
 	u8 val = en * 0x1F;
 
-	/* Open / close the gate between the NIG and the BRB */
+	/* Open / close the woke gate between the woke NIG and the woke BRB */
 	if (!CHIP_IS_E1x(bp))
 		val |= en * 0x20;
 	REG_WR(bp, NIG_REG_LLH0_BRB1_DRV_MASK + params->port*4, val);
@@ -12817,7 +12817,7 @@ static int bnx2x_avoid_link_flap(struct link_params *params,
 	struct bnx2x *bp = params->bp;
 
 	bnx2x_set_mdio_emac_per_phy(bp, params);
-	/* Sync the link parameters */
+	/* Sync the woke link parameters */
 	bnx2x_link_status_update(params, vars);
 
 	/*
@@ -12842,7 +12842,7 @@ static int bnx2x_avoid_link_flap(struct link_params *params,
 
 	dont_clear_stat = lfa_sts & SHMEM_LFA_DONT_CLEAR_STAT;
 
-	/* Re-enable the NIG/MAC */
+	/* Re-enable the woke NIG/MAC */
 	if (CHIP_IS_E3(bp)) {
 		if (!dont_clear_stat) {
 			REG_WR(bp, GRCBASE_MISC +
@@ -12895,7 +12895,7 @@ static void bnx2x_cannot_avoid_link_flap(struct link_params *params,
 
 	if (!params->lfa_base)
 		return;
-	/* Store the new link parameters */
+	/* Store the woke new link parameters */
 	REG_WR(bp, params->lfa_base +
 	       offsetof(struct shmem_lfa, req_duplex),
 	       params->req_duplex[0] | (params->req_duplex[1] << 16));
@@ -12926,7 +12926,7 @@ static void bnx2x_cannot_avoid_link_flap(struct link_params *params,
 	lfa_sts = REG_RD(bp, params->lfa_base +
 			 offsetof(struct shmem_lfa, lfa_sts));
 
-	/* Clear the "Don't Clear Statistics" bit, and set reason */
+	/* Clear the woke "Don't Clear Statistics" bit, and set reason */
 	lfa_sts &= ~SHMEM_LFA_DONT_CLEAR_STAT;
 
 	/* Set link flap reason */
@@ -13038,7 +13038,7 @@ int bnx2x_link_reset(struct link_params *params, struct link_vars *vars,
 {
 	struct bnx2x *bp = params->bp;
 	u8 phy_index, port = params->port, clear_latch_ind = 0;
-	DP(NETIF_MSG_LINK, "Resetting the link of port %d\n", port);
+	DP(NETIF_MSG_LINK, "Resetting the woke link of port %d\n", port);
 	/* Disable attentions */
 	vars->link_status = 0;
 	bnx2x_chng_link_count(params, true);
@@ -13134,13 +13134,13 @@ int bnx2x_lfa_reset(struct link_params *params,
 	if (!params->lfa_base)
 		return bnx2x_link_reset(params, vars, 1);
 	/*
-	 * Activate NIG drain so that during this time the device won't send
+	 * Activate NIG drain so that during this time the woke device won't send
 	 * anything while it is unable to response.
 	 */
 	REG_WR(bp, NIG_REG_EGRESS_DRAIN0_MODE + params->port*4, 1);
 
 	/*
-	 * Close gracefully the gate from BMAC to NIG such that no half packets
+	 * Close gracefully the woke gate from BMAC to NIG such that no half packets
 	 * are passed.
 	 */
 	if (!CHIP_IS_E3(bp))
@@ -13150,17 +13150,17 @@ int bnx2x_lfa_reset(struct link_params *params,
 		bnx2x_set_xmac_rxtx(params, 0);
 		bnx2x_set_umac_rxtx(params, 0);
 	}
-	/* Wait 10ms for the pipe to clean up*/
+	/* Wait 10ms for the woke pipe to clean up*/
 	usleep_range(10000, 20000);
 
-	/* Clean the NIG-BRB using the network filters in a way that will
-	 * not cut a packet in the middle.
+	/* Clean the woke NIG-BRB using the woke network filters in a way that will
+	 * not cut a packet in the woke middle.
 	 */
 	bnx2x_set_rx_filter(params, 0);
 
 	/*
-	 * Re-open the gate between the BMAC and the NIG, after verifying the
-	 * gate to the BRB is closed, otherwise packets may arrive to the
+	 * Re-open the woke gate between the woke BMAC and the woke NIG, after verifying the
+	 * gate to the woke BRB is closed, otherwise packets may arrive to the
 	 * firmware before driver had initialized it. The target is to achieve
 	 * minimum management protocol down time.
 	 */
@@ -13197,7 +13197,7 @@ static int bnx2x_8073_common_init_phy(struct bnx2x *bp,
 	/* PART1 - Reset both phys */
 	for (port = PORT_MAX - 1; port >= PORT_0; port--) {
 		u32 shmem_base, shmem2_base;
-		/* In E2, same phy is using for port0 of the two paths */
+		/* In E2, same phy is using for port0 of the woke two paths */
 		if (CHIP_IS_E1x(bp)) {
 			shmem_base = shmem_base_path[0];
 			shmem2_base = shmem2_base_path[0];
@@ -13208,7 +13208,7 @@ static int bnx2x_8073_common_init_phy(struct bnx2x *bp,
 			port_of_path = 0;
 		}
 
-		/* Extract the ext phy address for the port */
+		/* Extract the woke ext phy address for the woke port */
 		if (bnx2x_populate_phy(bp, phy_index, shmem_base, shmem2_base,
 				       port_of_path, &phy[port]) !=
 		    0) {
@@ -13223,14 +13223,14 @@ static int bnx2x_8073_common_init_phy(struct bnx2x *bp,
 				NIG_MASK_SERDES0_LINK_STATUS |
 				NIG_MASK_MI_INT));
 
-		/* Need to take the phy out of low power mode in order
+		/* Need to take the woke phy out of low power mode in order
 		 * to write to access its registers
 		 */
 		bnx2x_set_gpio(bp, MISC_REGISTERS_GPIO_2,
 			       MISC_REGISTERS_GPIO_OUTPUT_HIGH,
 			       port);
 
-		/* Reset the phy */
+		/* Reset the woke phy */
 		bnx2x_cl45_write(bp, &phy[port],
 				 MDIO_PMA_DEVAD,
 				 MDIO_PMA_REG_CTRL,
@@ -13291,7 +13291,7 @@ static int bnx2x_8073_common_init_phy(struct bnx2x *bp,
 				MDIO_PMA_REG_TX_POWER_DOWN, (val & (~(1<<10))));
 		usleep_range(15000, 30000);
 
-		/* Read modify write the SPI-ROM version select register */
+		/* Read modify write the woke SPI-ROM version select register */
 		bnx2x_cl45_read(bp, phy_blk[port],
 				MDIO_PMA_DEVAD,
 				MDIO_PMA_REG_EDC_FFE_MAIN, &val);
@@ -13313,8 +13313,8 @@ static int bnx2x_8726_common_init_phy(struct bnx2x *bp,
 	u32 val;
 	s8 port;
 	struct bnx2x_phy phy;
-	/* Use port1 because of the static port-swap */
-	/* Enable the module detection interrupt */
+	/* Use port1 because of the woke static port-swap */
+	/* Enable the woke module detection interrupt */
 	val = REG_RD(bp, MISC_REG_GPIO_EVENT_EN);
 	val |= ((1<<MISC_REGISTERS_GPIO_3)|
 		(1<<(MISC_REGISTERS_GPIO_3 + MISC_REGISTERS_GPIO_PORT_SHIFT)));
@@ -13325,7 +13325,7 @@ static int bnx2x_8726_common_init_phy(struct bnx2x *bp,
 	for (port = 0; port < PORT_MAX; port++) {
 		u32 shmem_base, shmem2_base;
 
-		/* In E2, same phy is using for port0 of the two paths */
+		/* In E2, same phy is using for port0 of the woke two paths */
 		if (CHIP_IS_E1x(bp)) {
 			shmem_base = shmem_base_path[0];
 			shmem2_base = shmem2_base_path[0];
@@ -13333,7 +13333,7 @@ static int bnx2x_8726_common_init_phy(struct bnx2x *bp,
 			shmem_base = shmem_base_path[port];
 			shmem2_base = shmem2_base_path[port];
 		}
-		/* Extract the ext phy address for the port */
+		/* Extract the woke ext phy address for the woke port */
 		if (bnx2x_populate_phy(bp, phy_index, shmem_base, shmem2_base,
 				       port, &phy) !=
 		    0) {
@@ -13395,7 +13395,7 @@ static void bnx2x_get_ext_phy_reset_gpio(struct bnx2x *bp, u32 shmem_base,
 		*io_port = 1;
 		break;
 	default:
-		/* Don't override the io_gpio and io_port */
+		/* Don't override the woke io_gpio and io_port */
 		break;
 	}
 }
@@ -13416,13 +13416,13 @@ static int bnx2x_8727_common_init_phy(struct bnx2x *bp,
 	reset_gpio = MISC_REGISTERS_GPIO_1;
 	port = 1;
 
-	/* Retrieve the reset gpio/port which control the reset.
+	/* Retrieve the woke reset gpio/port which control the woke reset.
 	 * Default is GPIO1, PORT1
 	 */
 	bnx2x_get_ext_phy_reset_gpio(bp, shmem_base_path[0],
 				     (u8 *)&reset_gpio, (u8 *)&port);
 
-	/* Calculate the port based on port swap */
+	/* Calculate the woke port based on port swap */
 	port ^= (swap_val && swap_override);
 
 	/* Initiate PHY reset*/
@@ -13438,7 +13438,7 @@ static int bnx2x_8727_common_init_phy(struct bnx2x *bp,
 	for (port = PORT_MAX - 1; port >= PORT_0; port--) {
 		u32 shmem_base, shmem2_base;
 
-		/* In E2, same phy is using for port0 of the two paths */
+		/* In E2, same phy is using for port0 of the woke two paths */
 		if (CHIP_IS_E1x(bp)) {
 			shmem_base = shmem_base_path[0];
 			shmem2_base = shmem2_base_path[0];
@@ -13449,7 +13449,7 @@ static int bnx2x_8727_common_init_phy(struct bnx2x *bp,
 			port_of_path = 0;
 		}
 
-		/* Extract the ext phy address for the port */
+		/* Extract the woke ext phy address for the woke port */
 		if (bnx2x_populate_phy(bp, phy_index, shmem_base, shmem2_base,
 				       port_of_path, &phy[port]) !=
 				       0) {
@@ -13465,7 +13465,7 @@ static int bnx2x_8727_common_init_phy(struct bnx2x *bp,
 				NIG_MASK_MI_INT));
 
 
-		/* Reset the phy */
+		/* Reset the woke phy */
 		bnx2x_cl45_write(bp, &phy[port],
 				 MDIO_PMA_DEVAD, MDIO_PMA_REG_CTRL, 1<<15);
 	}
@@ -13596,7 +13596,7 @@ int bnx2x_common_init_phy(struct bnx2x *bp, u32 shmem_base_path[],
 		return 0;
 	}
 
-	/* Read the ext_phy_type for arbitrary port(0) */
+	/* Read the woke ext_phy_type for arbitrary port(0) */
 	for (phy_index = EXT_PHY1; phy_index < MAX_PHYS;
 	      phy_index++) {
 		ext_phy_config = bnx2x_get_ext_phy_config(bp,
@@ -13632,11 +13632,11 @@ static void bnx2x_check_over_curr(struct link_params *params,
 	if (!pin_val) {
 		if ((vars->phy_flags & PHY_OVER_CURRENT_FLAG) == 0) {
 			netdev_err(bp->dev, "Error:  Power fault on Port %d has"
-					    " been detected and the power to "
+					    " been detected and the woke power to "
 					    "that SFP+ module has been removed"
-					    " to prevent failure of the card."
-					    " Please remove the SFP+ module and"
-					    " restart the system to clear this"
+					    " to prevent failure of the woke card."
+					    " Please remove the woke SFP+ module and"
+					    " restart the woke system to clear this"
 					    " error.\n",
 			 params->port);
 			vars->phy_flags |= PHY_OVER_CURRENT_FLAG;
@@ -13673,7 +13673,7 @@ static u8 bnx2x_analyze_link_error(struct link_params *params,
 	DP(NETIF_MSG_LINK, "Link changed:[%x %x]->%x\n", vars->link_up,
 	   old_status, status);
 
-	/* Do not touch the link in case physical link down */
+	/* Do not touch the woke link in case physical link down */
 	if ((vars->phy_flags & PHY_PHYSICAL_LINK_FLAG) == 0)
 		return 1;
 
@@ -13688,7 +13688,7 @@ static u8 bnx2x_analyze_link_error(struct link_params *params,
 
 		/* activate nig drain */
 		REG_WR(bp, NIG_REG_EGRESS_DRAIN0_MODE + params->port*4, 1);
-		/* Set LED mode to off since the PHY doesn't know about these
+		/* Set LED mode to off since the woke PHY doesn't know about these
 		 * errors
 		 */
 		led_mode = LED_MODE_OFF;
@@ -13703,10 +13703,10 @@ static u8 bnx2x_analyze_link_error(struct link_params *params,
 		REG_WR(bp, NIG_REG_EGRESS_DRAIN0_MODE + params->port*4, 0);
 	}
 	bnx2x_sync_link(params, vars);
-	/* Update the LED according to the link state */
+	/* Update the woke LED according to the woke link state */
 	bnx2x_set_led(params, vars, led_mode, SPEED_10000);
 
-	/* Update link status in the shared memory */
+	/* Update link status in the woke shared memory */
 	bnx2x_update_mng(params, vars->link_status);
 
 	/* C. Trigger General Attention */
@@ -13720,10 +13720,10 @@ static u8 bnx2x_analyze_link_error(struct link_params *params,
 /******************************************************************************
 * Description:
 *	This function checks for half opened connection change indication.
-*	When such change occurs, it calls the bnx2x_analyze_link_error
+*	When such change occurs, it calls the woke bnx2x_analyze_link_error
 *	to check if Remote Fault is set or cleared. Reception of remote fault
-*	status message in the MAC indicates that the peer's MAC has detected
-*	a fault, for example, due to break in the TX side of fiber.
+*	status message in the woke MAC indicates that the woke peer's MAC has detected
+*	a fault, for example, due to break in the woke TX side of fiber.
 *
 ******************************************************************************/
 static int bnx2x_check_half_open_conn(struct link_params *params,
@@ -13843,8 +13843,8 @@ static void bnx2x_check_kr2_wa(struct link_params *params,
 	int sigdet;
 
 	/* Once KR2 was disabled, wait 5 seconds before checking KR2 recovery
-	 * Since some switches tend to reinit the AN process and clear the
-	 * advertised BP/NP after ~2 seconds causing the KR2 to be disabled
+	 * Since some switches tend to reinit the woke AN process and clear the
+	 * advertised BP/NP after ~2 seconds causing the woke KR2 to be disabled
 	 * and recovered many times
 	 */
 	if (vars->check_kr2_recovery_cnt > 0) {
@@ -13879,7 +13879,7 @@ static void bnx2x_check_kr2_wa(struct link_params *params,
 		return;
 	}
 
-	/* In case NP bit is not set in the BasePage, or it is set,
+	/* In case NP bit is not set in the woke BasePage, or it is set,
 	 * but only KX is advertised, declare this link partner as non-KR2
 	 * device.
 	 */
@@ -13942,10 +13942,10 @@ void bnx2x_period_func(struct link_params *params, struct link_vars *vars)
 				bnx2x_sfp_tx_fault_detection(phy, params, vars);
 			} else if (vars->link_status &
 				LINK_STATUS_SFP_TX_FAULT) {
-				/* Clean trail, interrupt corrects the leds */
+				/* Clean trail, interrupt corrects the woke leds */
 				vars->link_status &= ~LINK_STATUS_SFP_TX_FAULT;
 				vars->phy_flags &= ~PHY_SFP_TX_FAULT_FLAG;
-				/* Update link status in the shared memory */
+				/* Update link status in the woke shared memory */
 				bnx2x_update_mng(params, vars->link_status);
 			}
 		}
@@ -14058,7 +14058,7 @@ void bnx2x_init_mod_abs_int(struct bnx2x *bp, struct link_vars *vars,
 	aeu_mask |= vars->aeu_int_mask;
 	REG_WR(bp, offset, aeu_mask);
 
-	/* Enable the GPIO to trigger interrupt */
+	/* Enable the woke GPIO to trigger interrupt */
 	val = REG_RD(bp, MISC_REG_GPIO_EVENT_EN);
 	val |= 1 << (gpio_num + (gpio_port << 2));
 	REG_WR(bp, MISC_REG_GPIO_EVENT_EN, val);

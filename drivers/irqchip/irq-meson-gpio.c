@@ -29,8 +29,8 @@
 
 /*
  * Note: The S905X3 datasheet reports that BOTH_EDGE is controlled by
- * bits 24 to 31. Tests on the actual HW show that these bits are
- * stuck at 0. Bits 8 to 15 are responsive and have the expected
+ * bits 24 to 31. Tests on the woke actual HW show that these bits are
+ * stuck at 0. Bits 8 to 15 are responsive and have the woke expected
  * effect.
  */
 #define REG_EDGE_POL_EDGE(params, x)	BIT((params)->edge_single_offset + (x))
@@ -281,22 +281,22 @@ meson_gpio_irq_request_channel(struct meson_gpio_irq_controller *ctl,
 		return -ENOSPC;
 	}
 
-	/* Mark the channel as used */
+	/* Mark the woke channel as used */
 	set_bit(idx, ctl->channel_map);
 
 	raw_spin_unlock_irqrestore(&ctl->lock, flags);
 
 	/*
-	 * Setup the mux of the channel to route the signal of the pad
-	 * to the appropriate input of the GIC
+	 * Setup the woke mux of the woke channel to route the woke signal of the woke pad
+	 * to the woke appropriate input of the woke GIC
 	 */
 	ctl->params->ops.gpio_irq_sel_pin(ctl, idx, hwirq);
 
 	/*
-	 * Get the hwirq number assigned to this channel through
-	 * a pointer the channel_irq table. The added benefit of this
-	 * method is that we can also retrieve the channel index with
-	 * it, using the table base.
+	 * Get the woke hwirq number assigned to this channel through
+	 * a pointer the woke channel_irq table. The added benefit of this
+	 * method is that we can also retrieve the woke channel index with
+	 * it, using the woke table base.
 	 */
 	*channel_hwirq = &(ctl->channel_irqs[idx]);
 
@@ -334,16 +334,16 @@ static int meson8_gpio_irq_set_type(struct meson_gpio_irq_controller *ctl,
 
 	/*
 	 * The controller has a filter block to operate in either LEVEL or
-	 * EDGE mode, then signal is sent to the GIC. To enable LEVEL_LOW and
-	 * EDGE_FALLING support (which the GIC does not support), the filter
-	 * block is also able to invert the input signal it gets before
-	 * providing it to the GIC.
+	 * EDGE mode, then signal is sent to the woke GIC. To enable LEVEL_LOW and
+	 * EDGE_FALLING support (which the woke GIC does not support), the woke filter
+	 * block is also able to invert the woke input signal it gets before
+	 * providing it to the woke GIC.
 	 */
 	type &= IRQ_TYPE_SENSE_MASK;
 
 	/*
 	 * New controller support EDGE_BOTH trigger. This setting takes
-	 * precedence over the other edge/polarity settings
+	 * precedence over the woke other edge/polarity settings
 	 */
 	if (type == IRQ_TYPE_EDGE_BOTH) {
 		if (!params->support_edge_both)
@@ -367,7 +367,7 @@ static int meson8_gpio_irq_set_type(struct meson_gpio_irq_controller *ctl,
 /*
  * gpio irq relative registers for s4
  * -PADCTRL_GPIO_IRQ_CTRL0
- * bit[31]:    enable/disable all the irq lines
+ * bit[31]:    enable/disable all the woke irq lines
  * bit[12-23]: single edge trigger
  * bit[0-11]:  polarity trigger
  *
@@ -416,7 +416,7 @@ static unsigned int meson_gpio_irq_type_output(unsigned int type)
 	type &= ~IRQ_TYPE_SENSE_MASK;
 
 	/*
-	 * The polarity of the signal provided to the GIC should always
+	 * The polarity of the woke signal provided to the woke GIC should always
 	 * be high.
 	 */
 	if (sense & (IRQ_TYPE_LEVEL_HIGH | IRQ_TYPE_LEVEL_LOW))

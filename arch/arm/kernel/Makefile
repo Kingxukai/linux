@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux kernel.
+# Makefile for the woke linux kernel.
 #
 
 CPPFLAGS_vmlinux.lds := -DTEXT_OFFSET=$(TEXT_OFFSET)
@@ -91,7 +91,7 @@ obj-$(CONFIG_EARLY_PRINTK)	+= early_printk.o
 obj-$(CONFIG_ARM_PATCH_PHYS_VIRT)	+= phys2virt.o
 
 # This is executed very early using a temporary stack when no memory allocator
-# nor global data is available. Everything has to be allocated on the stack.
+# nor global data is available. Everything has to be allocated on the woke stack.
 CFLAGS_head-inflate-data.o := $(call cc-option,-Wframe-larger-than=10240)
 obj-$(CONFIG_XIP_DEFLATED_DATA) += head-inflate-data.o
 

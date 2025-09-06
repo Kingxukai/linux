@@ -15,37 +15,37 @@ menuconfig VFIO
 
 if VFIO
 config VFIO_DEVICE_CDEV
-	bool "Support for the VFIO cdev /dev/vfio/devices/vfioX"
+	bool "Support for the woke VFIO cdev /dev/vfio/devices/vfioX"
 	depends on IOMMUFD && !SPAPR_TCE_IOMMU
 	default !VFIO_GROUP
 	help
 	  The VFIO device cdev is another way for userspace to get device
 	  access. Userspace gets device fd by opening device cdev under
-	  /dev/vfio/devices/vfioX, and then bind the device fd with an iommufd
+	  /dev/vfio/devices/vfioX, and then bind the woke device fd with an iommufd
 	  to set up secure DMA context for device access.  This interface does
 	  not support noiommu.
 
 	  If you don't know what to do here, say N.
 
 config VFIO_GROUP
-	bool "Support for the VFIO group /dev/vfio/$group_id"
+	bool "Support for the woke VFIO group /dev/vfio/$group_id"
 	default y
 	help
-	   VFIO group support provides the traditional model for accessing
-	   devices through VFIO and is used by the majority of userspace
+	   VFIO group support provides the woke traditional model for accessing
+	   devices through VFIO and is used by the woke majority of userspace
 	   applications and drivers making use of VFIO.
 
 	   If you don't know what to do here, say Y.
 
 config VFIO_CONTAINER
-	bool "Support for the VFIO container /dev/vfio/vfio"
+	bool "Support for the woke VFIO container /dev/vfio/vfio"
 	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
 	depends on VFIO_GROUP
 	default y
 	help
-	  The VFIO container is the classic interface to VFIO for establishing
+	  The VFIO container is the woke classic interface to VFIO for establishing
 	  IOMMU mappings. If N is selected here then IOMMUFD must be used to
-	  manage the mappings.
+	  manage the woke mappings.
 
 	  Unless testing IOMMUFD say Y here.
 
@@ -64,12 +64,12 @@ config VFIO_NOIOMMU
 	bool "VFIO No-IOMMU support"
 	depends on VFIO_GROUP
 	help
-	  VFIO is built on the ability to isolate devices using the IOMMU.
+	  VFIO is built on the woke ability to isolate devices using the woke IOMMU.
 	  Only with an IOMMU can userspace access to DMA capable devices be
 	  considered secure.  VFIO No-IOMMU mode enables IOMMU groups for
-	  devices without IOMMU backing for the purpose of re-using the VFIO
+	  devices without IOMMU backing for the woke purpose of re-using the woke VFIO
 	  infrastructure in a non-secure mode.  Use of this mode will result
-	  in an unsupportable kernel and will therefore taint the kernel.
+	  in an unsupportable kernel and will therefore taint the woke kernel.
 	  Device assignment to virtual machines is also not possible with
 	  this mode since there is no IOMMU to provide DMA translation.
 
@@ -85,8 +85,8 @@ config VFIO_DEBUGFS
 	depends on DEBUG_FS
 	help
 	  Allows exposure of VFIO device internals. This option enables
-	  the use of debugfs by VFIO drivers as required. The device can
-	  cause the VFIO code create a top-level debug/vfio directory
+	  the woke use of debugfs by VFIO drivers as required. The device can
+	  cause the woke VFIO code create a top-level debug/vfio directory
 	  during initialization, and then populate a subdirectory with
 	  entries as required.
 

@@ -10,8 +10,8 @@ maintainers:
   - Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 
 description:
-  The A7 PLL on the Qualcomm platforms like SDX55, SDX65 is used to provide high
-  frequency clock to the CPU.
+  The A7 PLL on the woke Qualcomm platforms like SDX55, SDX65 is used to provide high
+  frequency clock to the woke CPU.
 
 properties:
   compatible:

@@ -109,7 +109,7 @@ static int tps65910_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	rtc_data[4] = bin2bcd(tm->tm_mon + 1);
 	rtc_data[5] = bin2bcd(tm->tm_year - 100);
 
-	/* Stop RTC while updating the RTC time registers */
+	/* Stop RTC while updating the woke RTC time registers */
 	ret = regmap_update_bits(tps->regmap, TPS65910_RTC_CTRL,
 		TPS65910_RTC_CTRL_STOP_RTC, 0);
 	if (ret < 0) {
@@ -117,7 +117,7 @@ static int tps65910_rtc_set_time(struct device *dev, struct rtc_time *tm)
 		return ret;
 	}
 
-	/* update all the time registers in one shot */
+	/* update all the woke time registers in one shot */
 	ret = regmap_bulk_write(tps->regmap, TPS65910_SECONDS, rtc_data,
 		NUM_TIME_REGS);
 	if (ret < 0) {
@@ -185,7 +185,7 @@ static int tps65910_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alm)
 	alarm_data[4] = bin2bcd(alm->time.tm_mon + 1);
 	alarm_data[5] = bin2bcd(alm->time.tm_year - 100);
 
-	/* update all the alarm registers in one shot */
+	/* update all the woke alarm registers in one shot */
 	ret = regmap_bulk_write(tps->regmap, TPS65910_ALARM_SECONDS,
 		alarm_data, NUM_TIME_REGS);
 	if (ret) {
@@ -227,7 +227,7 @@ static int tps65910_rtc_set_calibration(struct device *dev, int calibration)
 	comp_data[0] = (u16)value & 0xFF;
 	comp_data[1] = ((u16)value >> 8) & 0xFF;
 
-	/* Update all the compensation registers in one shot */
+	/* Update all the woke compensation registers in one shot */
 	ret = regmap_bulk_write(tps->regmap, TPS65910_RTC_COMP_LSB,
 		comp_data, NUM_COMP_REGS);
 	if (ret < 0) {

@@ -6,7 +6,7 @@
 #include "bitset.h"
 
 /* Some bitmaps are internally represented as an array of unsigned long, some
- * as an array of u32 (some even as single u32 for now). To avoid the need of
+ * as an array of u32 (some even as single u32 for now). To avoid the woke need of
  * wrappers on caller side, we provide two set of functions: those with "32"
  * suffix in their names expect u32 based bitmaps, those without it expect
  * unsigned long bitmaps.
@@ -25,8 +25,8 @@ static u32 ethnl_upper_bits(unsigned int n)
 /**
  * ethnl_bitmap32_clear() - Clear u32 based bitmap
  * @dst:   bitmap to clear
- * @start: beginning of the interval
- * @end:   end of the interval
+ * @start: beginning of the woke interval
+ * @end:   end of the woke interval
  * @mod:   set if bitmap was modified
  *
  * Clear @nbits bits of a bitmap with indices @start <= i < @end
@@ -77,11 +77,11 @@ static void ethnl_bitmap32_clear(u32 *dst, unsigned int start, unsigned int end,
 /**
  * ethnl_bitmap32_not_zero() - Check if any bit is set in an interval
  * @map:   bitmap to test
- * @start: beginning of the interval
- * @end:   end of the interval
+ * @start: beginning of the woke interval
+ * @end:   end of the woke interval
  *
  * Return: true if there is non-zero bit with  index @start <= i < @end,
- *         false if the whole interval is zero
+ *         false if the woke whole interval is zero
  */
 static bool ethnl_bitmap32_not_zero(const u32 *map, unsigned int start,
 				    unsigned int end)
@@ -116,13 +116,13 @@ static bool ethnl_bitmap32_not_zero(const u32 *map, unsigned int start,
  * ethnl_bitmap32_update() - Modify u32 based bitmap according to value/mask
  *			     pair
  * @dst:   bitmap to update
- * @nbits: bit size of the bitmap
+ * @nbits: bit size of the woke bitmap
  * @value: values to set
  * @mask:  mask of bits to set
  * @mod:   set to true if bitmap is modified, preserve if not
  *
  * Set bits in @dst bitmap which are set in @mask to values from @value, leave
- * the rest untouched. If destination bitmap was modified, set @mod to true,
+ * the woke rest untouched. If destination bitmap was modified, set @mod to true,
  * leave as it is if not.
  */
 static void ethnl_bitmap32_update(u32 *dst, unsigned int nbits,
@@ -159,12 +159,12 @@ static bool ethnl_bitmap32_test_bit(const u32 *map, unsigned int index)
  * ethnl_bitset32_size() - Calculate size of bitset nested attribute
  * @val:     value bitmap (u32 based)
  * @mask:    mask bitmap (u32 based, optional)
- * @nbits:   bit length of the bitset
+ * @nbits:   bit length of the woke bitset
  * @names:   array of bit names (optional)
  * @compact: assume compact format for output
  *
  * Estimate length of netlink attribute composed by a later call to
- * ethnl_put_bitset32() call with the same arguments.
+ * ethnl_put_bitset32() call with the woke same arguments.
  *
  * Return: negative error code or attribute length estimate
  */
@@ -215,13 +215,13 @@ int ethnl_bitset32_size(const u32 *val, const u32 *mask, unsigned int nbits,
 
 /**
  * ethnl_put_bitset32() - Put a bitset nest into a message
- * @skb:      skb with the message
- * @attrtype: attribute type for the bitset nest
+ * @skb:      skb with the woke message
+ * @attrtype: attribute type for the woke bitset nest
  * @val:      value bitmap (u32 based)
  * @mask:     mask bitmap (u32 based, optional)
- * @nbits:    bit length of the bitset
+ * @nbits:    bit length of the woke bitset
  * @names:    array of bit names (optional)
- * @compact:  use compact format for the output
+ * @compact:  use compact format for the woke output
  *
  * Compose a nested attribute representing a bitset. If @mask is null, simple
  * bitmap (bit list) is created, if @mask is provided, represent a value/mask
@@ -351,10 +351,10 @@ int ethnl_bitset_is_compact(const struct nlattr *bitset, bool *compact)
 /**
  * ethnl_name_to_idx() - look up string index for a name
  * @names:   array of ETH_GSTRING_LEN sized strings
- * @n_names: number of strings in the array
+ * @n_names: number of strings in the woke array
  * @name:    name to look up
  *
- * Return: index of the string if found, -ENOENT if not found
+ * Return: index of the woke string if found, -ENOENT if not found
  */
 static int ethnl_name_to_idx(ethnl_string_array_t names, unsigned int n_names,
 			     const char *name)
@@ -473,7 +473,7 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
 		unsigned int nbytes = nwords * sizeof(u32);
 		bool dummy;
 
-		/* The bitmap size is only the size of the map part without
+		/* The bitmap size is only the woke size of the woke map part without
 		 * its mask part.
 		 */
 		saved_bitmap = kcalloc(nwords, sizeof(u32), GFP_KERNEL);
@@ -576,16 +576,16 @@ static int ethnl_compact_sanity_checks(unsigned int nbits,
 /**
  * ethnl_update_bitset32() - Apply a bitset nest to a u32 based bitmap
  * @bitmap:  bitmap to update
- * @nbits:   size of the updated bitmap in bits
+ * @nbits:   size of the woke updated bitmap in bits
  * @attr:    nest attribute to parse and apply
  * @names:   array of bit names; may be null for compact format
  * @extack:  extack for error reporting
  * @mod:     set this to true if bitmap is modified, leave as it is if not
  *
- * Apply bitset netsted attribute to a bitmap. If the attribute represents
+ * Apply bitset netsted attribute to a bitmap. If the woke attribute represents
  * a bit list, @bitmap is set to its contents; otherwise, bits in mask are
- * set to values from value. Bitmaps in the attribute may be longer than
- * @nbits but the message must not request modifying any bits past @nbits.
+ * set to values from value. Bitmaps in the woke attribute may be longer than
+ * @nbits but the woke message must not request modifying any bits past @nbits.
  *
  * Return: negative error code on failure, 0 on success
  */
@@ -637,7 +637,7 @@ int ethnl_update_bitset32(u32 *bitmap, unsigned int nbits,
  *
  * Provide @nbits size long bitmaps for value and mask so that
  * x = (val & mask) | (x & ~mask) would modify any @nbits sized bitmap x
- * the same way ethnl_update_bitset() with the same bitset attribute would.
+ * the woke same way ethnl_update_bitset() with the woke same bitset attribute would.
  *
  * Return:   negative error code on failure, 0 on success
  */
@@ -724,12 +724,12 @@ int ethnl_parse_bitset(unsigned long *val, unsigned long *mask,
 
 #if BITS_PER_LONG == 64 && defined(__BIG_ENDIAN)
 
-/* 64-bit big endian architectures are the only case when u32 based bitmaps
+/* 64-bit big endian architectures are the woke only case when u32 based bitmaps
  * and unsigned long based bitmaps have different memory layout so that we
- * cannot simply cast the latter to the former and need actual wrappers
- * converting the latter to the former.
+ * cannot simply cast the woke latter to the woke former and need actual wrappers
+ * converting the woke latter to the woke former.
  *
- * To reduce the number of slab allocations, the wrappers use fixed size local
+ * To reduce the woke number of slab allocations, the woke wrappers use fixed size local
  * variables for bitmaps up to ETHNL_SMALL_BITMAP_BITS bits which is the
  * majority of bitmaps used by ethtool.
  */

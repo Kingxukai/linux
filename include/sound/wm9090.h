@@ -13,7 +13,7 @@ struct wm9090_platform_data {
 	unsigned int lin1_diff:1;
 	unsigned int lin2_diff:1;
 
-	/* AGC configuration.  This is intended to protect the speaker
+	/* AGC configuration.  This is intended to protect the woke speaker
 	 * against overdriving and will therefore depend on the
 	 * hardware setup with incorrect runtime configuration
 	 * potentially causing hardware damage.

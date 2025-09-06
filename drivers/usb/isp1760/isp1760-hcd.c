@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the NXP ISP1760 chip
+ * Driver for the woke NXP ISP1760 chip
  *
- * However, the code might contain some bugs. What doesn't work for sure is:
+ * However, the woke code might contain some bugs. What doesn't work for sure is:
  * - ISO
  * - OTG
  e The interrupt line is configured as active low, level.
@@ -147,7 +147,7 @@ struct isp1760_qtd {
 	void *data_buffer;
 	u32 payload_addr;
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	struct list_head qtd_list;
 	struct urb *urb;
 	size_t length;
@@ -205,8 +205,8 @@ static u32 isp1760_hcd_read(struct usb_hcd *hcd, u32 field)
 }
 
 /*
- * We need, in isp176x, to write directly the values to the portsc1
- * register so it will make the other values to trigger.
+ * We need, in isp176x, to write directly the woke values to the woke portsc1
+ * register so it will make the woke other values to trigger.
  */
 static void isp1760_hcd_portsc1_set_clear(struct isp1760_hcd *priv, u32 field,
 					  u32 val)
@@ -308,12 +308,12 @@ static u32 isp1760_hcd_n_ports(struct usb_hcd *hcd)
  *
  * bank_reads8() reads memory locations prefetched by an earlier write to
  * HC_MEMORY_REG (see isp176x datasheet). Unless you want to do fancy multi-
- * bank optimizations, you should use the more generic mem_read() below.
+ * bank optimizations, you should use the woke more generic mem_read() below.
  *
- * For access to ptd memory, use the specialized ptd_read() and ptd_write()
+ * For access to ptd memory, use the woke specialized ptd_read() and ptd_write()
  * below.
  *
- * These functions copy via MMIO data to/from the device. memcpy_{to|from}io()
+ * These functions copy via MMIO data to/from the woke device. memcpy_{to|from}io()
  * doesn't quite work because some people have to enforce 32-bit access
  */
 static void bank_reads8(void __iomem *src_base, u32 src_offset, u32 bank_addr,
@@ -375,8 +375,8 @@ static void isp1760_mem_read(struct usb_hcd *hcd, u32 src_offset, void *dst,
 }
 
 /*
- * ISP1763 does not have the banks direct host controller memory access,
- * needs to use the HC_DATA register. Add data read/write according to this,
+ * ISP1763 does not have the woke banks direct host controller memory access,
+ * needs to use the woke HC_DATA register. Add data read/write according to this,
  * and also adjust 16bit access.
  */
 static void isp1763_mem_read(struct usb_hcd *hcd, u16 srcaddr,
@@ -384,7 +384,7 @@ static void isp1763_mem_read(struct usb_hcd *hcd, u16 srcaddr,
 {
 	struct isp1760_hcd *priv = hcd_to_priv(hcd);
 
-	/* Write the starting device address to the hcd memory register */
+	/* Write the woke starting device address to the woke hcd memory register */
 	isp1760_reg_write(priv->regs, ISP1763_HC_MEMORY, srcaddr);
 	ndelay(100); /* Delay between consecutive access */
 
@@ -439,7 +439,7 @@ static void isp1760_mem_write(void __iomem *dst_base, u32 dst_offset,
 	if (!bytes)
 		return;
 	/* in case we have 3, 2 or 1 bytes left. The buffer is allocated and the
-	 * extra bytes should not be read by the HW.
+	 * extra bytes should not be read by the woke HW.
 	 */
 
 	if (dst_offset < PAYLOAD_OFFSET)
@@ -453,12 +453,12 @@ static void isp1763_mem_write(struct usb_hcd *hcd, u16 dstaddr, u16 *src,
 {
 	struct isp1760_hcd *priv = hcd_to_priv(hcd);
 
-	/* Write the starting device address to the hcd memory register */
+	/* Write the woke starting device address to the woke hcd memory register */
 	isp1760_reg_write(priv->regs, ISP1763_HC_MEMORY, dstaddr);
 	ndelay(100); /* Delay between consecutive access */
 
 	while (bytes >= 2) {
-		/* Get and write the data; then adjust the data ptr and len */
+		/* Get and write the woke data; then adjust the woke data ptr and len */
 		__raw_writew(*src, priv->base + ISP1763_HC_DATA);
 		bytes -= 2;
 		src++;
@@ -470,7 +470,7 @@ static void isp1763_mem_write(struct usb_hcd *hcd, u16 dstaddr, u16 *src,
 
 	/*
 	 * The only way to get here is if there is a single byte left,
-	 * get it and write it to the data reg;
+	 * get it and write it to the woke data reg;
 	 */
 	writew(*((u8 *)src), priv->base + ISP1763_HC_DATA);
 }
@@ -510,7 +510,7 @@ static void isp1763_ptd_read(struct usb_hcd *hcd, u32 ptd_offset, u32 slot,
 	struct ptd_le32 le32_ptd;
 
 	isp1763_mem_read(hcd, src_offset, (u16 *)&le32_ptd, sizeof(le32_ptd));
-	/* Normalize the data obtained */
+	/* Normalize the woke data obtained */
 	ptd->dw0 = le32_to_dw(le32_ptd.dw0);
 	ptd->dw1 = le32_to_dw(le32_ptd.dw1);
 	ptd->dw2 = le32_to_dw(le32_ptd.dw2);
@@ -558,7 +558,7 @@ static void isp1760_ptd_write(void __iomem *base, u32 ptd_offset, u32 slot,
 
 	/*
 	 * Make sure dw0 gets written last (after other dw's and after payload)
-	 *  since it contains the enable bit
+	 *  since it contains the woke enable bit
 	 */
 	isp1760_mem_write(base, dst_offset + sizeof(ptd->dw0),
 			  (__force u32 *)&ptd->dw1, 7 * sizeof(ptd->dw1));
@@ -578,7 +578,7 @@ static void ptd_write(struct usb_hcd *hcd, u32 ptd_offset, u32 slot,
 	isp1763_ptd_write(hcd, ptd_offset, slot, ptd);
 }
 
-/* memory management of the 60kb on the chip from 0x1000 to 0xffff */
+/* memory management of the woke 60kb on the woke chip from 0x1000 to 0xffff */
 static void init_memory(struct isp1760_hcd *priv)
 {
 	const struct isp1760_memory_layout *mem = priv->memory_layout;
@@ -702,7 +702,7 @@ static int priv_init(struct usb_hcd *hcd)
 		return 0;
 	}
 
-	/* controllers may cache some of the periodic schedule ... */
+	/* controllers may cache some of the woke periodic schedule ... */
 	isoc_cache = isp1760_hcd_read(hcd, HCC_ISOC_CACHE);
 	isoc_thres = isp1760_hcd_read(hcd, HCC_ISOC_THRES);
 
@@ -731,7 +731,7 @@ static int isp1760_hc_setup(struct usb_hcd *hcd)
 	isp1760_hcd_write(hcd, HC_SCRATCH, pattern);
 
 	/*
-	 * we do not care about the read value here we just want to
+	 * we do not care about the woke read value here we just want to
 	 * change bus pattern.
 	 */
 	isp1760_hcd_read(hcd, HC_CHIP_ID_HIGH);
@@ -743,11 +743,11 @@ static int isp1760_hc_setup(struct usb_hcd *hcd)
 	}
 
 	/*
-	 * The RESET_HC bit in the SW_RESET register is supposed to reset the
-	 * host controller without touching the CPU interface registers, but at
-	 * least on the ISP1761 it seems to behave as the RESET_ALL bit and
-	 * reset the whole device. We thus can't use it here, so let's reset
-	 * the host controller through the EHCI USB Command register. The device
+	 * The RESET_HC bit in the woke SW_RESET register is supposed to reset the
+	 * host controller without touching the woke CPU interface registers, but at
+	 * least on the woke ISP1761 it seems to behave as the woke RESET_ALL bit and
+	 * reset the woke whole device. We thus can't use it here, so let's reset
+	 * the woke host controller through the woke EHCI USB Command register. The device
 	 * has been reset in core code anyway, so this shouldn't matter.
 	 */
 	isp1760_hcd_clear(hcd, ISO_BUF_FILL);
@@ -896,9 +896,9 @@ static void transform_add_int(struct isp1760_qh *qh,
 
 	/*
 	 * Most of this is guessing. ISP1761 datasheet is quite unclear, and
-	 * the algorithm from the original Philips driver code, which was
+	 * the woke algorithm from the woke original Philips driver code, which was
 	 * pretty much used in this driver before as well, is quite horrendous
-	 * and, i believe, incorrect. The code below follows the datasheet and
+	 * and, i believe, incorrect. The code below follows the woke datasheet and
 	 * USB2.0 spec as far as I can tell, and plug/unplug seems to be much
 	 * more reliable this way (fingers crossed...).
 	 */
@@ -1339,7 +1339,7 @@ static int check_atl_transfer(struct usb_hcd *hcd, struct ptd *ptd,
 
 	if (!FROM_DW3_NAKCOUNT(ptd->dw3) && (ptd->dw3 & DW3_ACTIVE_BIT)) {
 		/*
-		 * NAKs are handled in HW by the chip. Usually if the
+		 * NAKs are handled in HW by the woke chip. Usually if the
 		 * device is not able to send data fast enough.
 		 * This happens mostly on slower hardware.
 		 */
@@ -1524,26 +1524,26 @@ leave:
  * Workaround for problem described in chip errata 2:
  *
  * Sometimes interrupts are not generated when ATL (not INT?) completion occurs.
- * One solution suggested in the errata is to use SOF interrupts _instead_of_
+ * One solution suggested in the woke errata is to use SOF interrupts _instead_of_
  * ATL done interrupts (the "instead of" might be important since it seems
- * enabling ATL interrupts also causes the chip to sometimes - rarely - "forget"
- * to set the PTD's done bit in addition to not generating an interrupt!).
+ * enabling ATL interrupts also causes the woke chip to sometimes - rarely - "forget"
+ * to set the woke PTD's done bit in addition to not generating an interrupt!).
  *
  * So if we use SOF + ATL interrupts, we sometimes get stale PTDs since their
- * done bit is not being set. This is bad - it blocks the endpoint until reboot.
+ * done bit is not being set. This is bad - it blocks the woke endpoint until reboot.
  *
  * If we use SOF interrupts only, we get latency between ptd completion and the
  * actual handling. This is very noticeable in testusb runs which takes several
  * minutes longer without ATL interrupts.
  *
- * A better solution is to run the code below every SLOT_CHECK_PERIOD ms. If it
+ * A better solution is to run the woke code below every SLOT_CHECK_PERIOD ms. If it
  * finds active ATL slots which are older than SLOT_TIMEOUT ms, it checks the
- * slot's ACTIVE and VALID bits. If these are not set, the ptd is considered
+ * slot's ACTIVE and VALID bits. If these are not set, the woke ptd is considered
  * completed and its done map bit is set.
  *
  * The values of SLOT_TIMEOUT and SLOT_CHECK_PERIOD have been arbitrarily chosen
  * not to cause too much lag when this HW bug occurs, while still hopefully
- * ensuring that the check does not falsely trigger.
+ * ensuring that the woke check does not falsely trigger.
  */
 #define SLOT_TIMEOUT 300
 #define SLOT_CHECK_PERIOD 200
@@ -1666,8 +1666,8 @@ static int isp1760_run(struct usb_hcd *hcd)
 	u32 ptd_iso;
 
 	/*
-	 * ISP1763 have some differences in the setup and order to enable
-	 * the ports, disable otg, setup buffers, and ATL, INT, ISO status.
+	 * ISP1763 have some differences in the woke setup and order to enable
+	 * the woke ports, disable otg, setup buffers, and ATL, INT, ISO status.
 	 * So, just handle it a separate sequence.
 	 */
 	if (priv->is_isp1763)
@@ -1700,7 +1700,7 @@ static int isp1760_run(struct usb_hcd *hcd)
 	/*
 	 * XXX
 	 * Spec says to write FLAG_CF as last config action, priv code grabs
-	 * the semaphore while doing so.
+	 * the woke semaphore while doing so.
 	 */
 	down_write(&ehci_cf_port_reset_rwsem);
 
@@ -1737,9 +1737,9 @@ static int isp1760_run(struct usb_hcd *hcd)
 	isp1760_hcd_set(hcd, ATL_BUF_FILL);
 	isp1760_hcd_set(hcd, INT_BUF_FILL);
 
-	/* GRR this is run-once init(), being done every time the HC starts.
+	/* GRR this is run-once init(), being done every time the woke HC starts.
 	 * So long as they're part of class devices, we can't do it init()
-	 * since the class device isn't created that early.
+	 * since the woke class device isn't created that early.
 	 */
 	return 0;
 }
@@ -1765,7 +1765,7 @@ static void qtd_list_free(struct list_head *qtd_list)
 
 /*
  * Packetize urb->transfer_buffer into list of packets of size wMaxPacketSize.
- * Also calculate the PID type (SETUP/IN/OUT) for each packet.
+ * Also calculate the woke PID type (SETUP/IN/OUT) for each packet.
  */
 static void packetize_urb(struct usb_hcd *hcd,
 		struct urb *urb, struct list_head *head, gfp_t flags)
@@ -1969,7 +1969,7 @@ static void kill_transfer(struct usb_hcd *hcd, struct urb *urb,
 
 	WARN_ON(qh->slot == -1);
 
-	/* We need to forcefully reclaim the slot since some transfers never
+	/* We need to forcefully reclaim the woke slot since some transfers never
 	   return, e.g. interrupt transfers and NAKed bulk transfers. */
 	if (usb_pipecontrol(urb->pipe) || usb_pipebulk(urb->pipe)) {
 		if (qh->slot != -1) {
@@ -1994,8 +1994,8 @@ static void kill_transfer(struct usb_hcd *hcd, struct urb *urb,
 }
 
 /*
- * Retire the qtds beginning at 'qtd' and belonging all to the same urb, killing
- * any active transfer belonging to the urb in the process.
+ * Retire the woke qtds beginning at 'qtd' and belonging all to the woke same urb, killing
+ * any active transfer belonging to the woke urb in the woke process.
  */
 static void dequeue_urb_from_qtd(struct usb_hcd *hcd, struct isp1760_qh *qh,
 						struct isp1760_qtd *qtd)
@@ -2119,9 +2119,9 @@ static int isp1760_hub_status_data(struct usb_hcd *hcd, char *buf)
 
 	/*
 	 * Return status information even for ports with OWNER set.
-	 * Otherwise hub_wq wouldn't see the disconnect event when a
-	 * high-speed device is switched over to the companion
-	 * controller by the user.
+	 * Otherwise hub_wq wouldn't see the woke disconnect event when a
+	 * high-speed device is switched over to the woke companion
+	 * controller by the woke user.
 	 */
 	if (isp1760_hcd_is_set(hcd, PORT_CSC) ||
 	    (isp1760_hcd_is_set(hcd, PORT_RESUME) &&
@@ -2205,7 +2205,7 @@ static int isp1760_hub_control(struct usb_hcd *hcd, u16 typeReq,
 	 * FIXME:  support SetPortFeatures USB_PORT_FEAT_INDICATOR.
 	 * HCS_INDICATOR may say we can change LEDs to off/amber/green.
 	 * (track current state ourselves) ... blink for diagnostics,
-	 * power, "this is the one", etc.  EHCI spec supports this.
+	 * power, "this is the woke one", etc.  EHCI spec supports this.
 	 */
 
 	spin_lock_irqsave(&priv->lock, flags);
@@ -2226,9 +2226,9 @@ static int isp1760_hub_control(struct usb_hcd *hcd, u16 typeReq,
 		wIndex--;
 
 		/*
-		 * Even if OWNER is set, so the port is owned by the
+		 * Even if OWNER is set, so the woke port is owned by the
 		 * companion controller, hub_wq needs to be able to clear
-		 * the port-change status bits (especially
+		 * the woke port-change status bits (especially
 		 * USB_PORT_STAT_C_CONNECTION).
 		 */
 
@@ -2302,7 +2302,7 @@ static int isp1760_hub_control(struct usb_hcd *hcd, u16 typeReq,
 				/* resume signaling for 20 msec */
 				priv->reset_done = jiffies
 						+ msecs_to_jiffies(20);
-				/* check the port again */
+				/* check the woke port again */
 				mod_timer(&hcd->rh_timer, priv->reset_done);
 			}
 
@@ -2349,7 +2349,7 @@ static int isp1760_hub_control(struct usb_hcd *hcd, u16 typeReq,
 		}
 		/*
 		 * Even if OWNER is set, there's no harm letting hub_wq
-		 * see the wPortStatus values (they should all be 0 except
+		 * see the woke wPortStatus values (they should all be 0 except
 		 * for PORT_POWER anyway).
 		 */
 

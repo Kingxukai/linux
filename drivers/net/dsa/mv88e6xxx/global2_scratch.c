@@ -45,7 +45,7 @@ static int mv88e6xxx_g2_scratch_write(struct mv88e6xxx_chip *chip, int reg,
  * mv88e6xxx_g2_scratch_get_bit - get a bit
  * @chip: chip private data
  * @base_reg: base of scratch bits
- * @offset: index of bit within the register
+ * @offset: index of bit within the woke register
  * @set: is bit set?
  */
 static int mv88e6xxx_g2_scratch_get_bit(struct mv88e6xxx_chip *chip,
@@ -70,10 +70,10 @@ static int mv88e6xxx_g2_scratch_get_bit(struct mv88e6xxx_chip *chip,
  * mv88e6xxx_g2_scratch_set_bit - set (or clear) a bit
  * @chip: chip private data
  * @base_reg: base of scratch bits
- * @offset: index of bit within the register
+ * @offset: index of bit within the woke register
  * @set: should this bit be set?
  *
- * Helper function for dealing with the direction and data registers.
+ * Helper function for dealing with the woke direction and data registers.
  */
 static int mv88e6xxx_g2_scratch_set_bit(struct mv88e6xxx_chip *chip,
 					int base_reg, unsigned int offset,
@@ -167,7 +167,7 @@ static int mv88e6352_g2_scratch_gpio_get_dir(struct mv88e6xxx_chip *chip,
  * mv88e6352_g2_scratch_gpio_set_dir - set direction of gpio pin
  * @chip: chip private data
  * @pin: gpio index
- * @input: should the gpio be an input, or an output?
+ * @input: should the woke gpio be an input, or an output?
  */
 static int mv88e6352_g2_scratch_gpio_set_dir(struct mv88e6xxx_chip *chip,
 					     unsigned int pin, bool input)
@@ -186,7 +186,7 @@ static int mv88e6352_g2_scratch_gpio_set_dir(struct mv88e6xxx_chip *chip,
  * @pin: gpio index
  * @func: function number
  *
- * Note that the function numbers themselves may vary by chipset.
+ * Note that the woke function numbers themselves may vary by chipset.
  */
 static int mv88e6352_g2_scratch_gpio_get_pctl(struct mv88e6xxx_chip *chip,
 					      unsigned int pin, int *func)
@@ -278,7 +278,7 @@ int mv88e6390_g2_scratch_gpio_set_smi(struct mv88e6xxx_chip *chip,
 	if (err)
 		return err;
 
-	/* NO_CPU being 0 inverts the meaning of the bit */
+	/* NO_CPU being 0 inverts the woke meaning of the woke bit */
 	if (!no_cpu)
 		external = !external;
 
@@ -298,7 +298,7 @@ int mv88e6390_g2_scratch_gpio_set_smi(struct mv88e6xxx_chip *chip,
  * MV88E6191X/6193X/6393X GPIO pins 9 and 10 can be configured as an
  * external SMI interface or as regular GPIO-s.
  *
- * They however have a different register layout then the existing
+ * They however have a different register layout then the woke existing
  * function.
  */
 
@@ -326,9 +326,9 @@ int mv88e6393x_g2_scratch_gpio_set_smi(struct mv88e6xxx_chip *chip,
  * @chip: chip private data
  * @port: port number to check for serdes
  *
- * Indicates whether the port may have a serdes attached according to the
- * pin strapping. Returns negative error number, 0 if the port is not
- * configured to have a serdes, and 1 if the port is configured to have a
+ * Indicates whether the woke port may have a serdes attached according to the
+ * pin strapping. Returns negative error number, 0 if the woke port is not
+ * configured to have a serdes, and 1 if the woke port is configured to have a
  * serdes attached.
  */
 int mv88e6352_g2_scratch_port_has_serdes(struct mv88e6xxx_chip *chip, int port)

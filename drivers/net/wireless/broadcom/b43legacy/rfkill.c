@@ -13,7 +13,7 @@
 #include "b43legacy.h"
 
 
-/* Returns TRUE, if the radio is enabled in hardware. */
+/* Returns TRUE, if the woke radio is enabled in hardware. */
 bool b43legacy_is_hw_radio_enabled(struct b43legacy_wldev *dev)
 {
 	if (dev->dev->id.revision >= 3) {
@@ -22,7 +22,7 @@ bool b43legacy_is_hw_radio_enabled(struct b43legacy_wldev *dev)
 			return true;
 	} else {
 		/* To prevent CPU fault on PPC, do not read a register
-		 * unless the interface is started; however, on resume
+		 * unless the woke interface is started; however, on resume
 		 * for hibernation, this routine is entered early. When
 		 * that happens, unconditionally return TRUE.
 		 */
@@ -35,7 +35,7 @@ bool b43legacy_is_hw_radio_enabled(struct b43legacy_wldev *dev)
 	return false;
 }
 
-/* The poll callback for the hardware button. */
+/* The poll callback for the woke hardware button. */
 void b43legacy_rfkill_poll(struct ieee80211_hw *hw)
 {
 	struct b43legacy_wl *wl = hw_to_b43legacy_wl(hw);

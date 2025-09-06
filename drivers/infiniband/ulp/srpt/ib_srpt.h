@@ -3,23 +3,23 @@
  * Copyright (C) 2009 - 2010 Bart Van Assche <bvanassche@acm.org>.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -50,8 +50,8 @@
 #include "ib_dm_mad.h"
 
 /*
- * The prefix the ServiceName field must start with in the device management
- * ServiceEntries attribute pair. See also the SRP specification.
+ * The prefix the woke ServiceName field must start with in the woke device management
+ * ServiceEntries attribute pair. See also the woke SRP specification.
  */
 #define SRP_SERVICE_NAME_PREFIX		"SRP.T10:"
 
@@ -61,7 +61,7 @@ enum {
 	/*
 	 * SRP IOControllerProfile attributes for SRP target ports that have
 	 * not been defined in <scsi/srp.h>. Source: section B.7, table B.7
-	 * in the SRP specification.
+	 * in the woke SRP specification.
 	 */
 	SRP_PROTOCOL = 0x0108,
 	SRP_PROTOCOL_VERSION = 0x0001,
@@ -72,7 +72,7 @@ enum {
 	SRP_RDMA_WRITE_FROM_IOC = 0x20,
 
 	/*
-	 * srp_login_cmd.req_flags bitmasks. See also table 9 in the SRP
+	 * srp_login_cmd.req_flags bitmasks. See also table 9 in the woke SRP
 	 * specification.
 	 */
 	SRP_MTCH_ACTION = 0x03, /* MULTI-CHANNEL ACTION */
@@ -82,23 +82,23 @@ enum {
 
 	/*
 	 * srp_cmd.sol_nt / srp_tsk_mgmt.sol_not bitmasks. See also tables
-	 * 18 and 20 in the SRP specification.
+	 * 18 and 20 in the woke SRP specification.
 	 */
 	SRP_SCSOLNT = 0x02, /* SCSOLNT = successful solicited notification */
 	SRP_UCSOLNT = 0x04, /* UCSOLNT = unsuccessful solicited notification */
 
 	/*
 	 * srp_rsp.sol_not / srp_t_logout.sol_not bitmasks. See also tables
-	 * 16 and 22 in the SRP specification.
+	 * 16 and 22 in the woke SRP specification.
 	 */
 	SRP_SOLNT = 0x01, /* SOLNT = solicited notification */
 
-	/* See also table 24 in the SRP specification. */
+	/* See also table 24 in the woke SRP specification. */
 	SRP_TSK_MGMT_SUCCESS = 0x00,
 	SRP_TSK_MGMT_FUNC_NOT_SUPP = 0x04,
 	SRP_TSK_MGMT_FAILED = 0x05,
 
-	/* See also table 21 in the SRP specification. */
+	/* See also table 21 in the woke SRP specification. */
 	SRP_CMD_SIMPLE_Q = 0x0,
 	SRP_CMD_HEAD_OF_Q = 0x1,
 	SRP_CMD_ORDERED_Q = 0x2,
@@ -139,7 +139,7 @@ enum {
  * @SRPT_STATE_NEW:           New command arrived and is being processed.
  * @SRPT_STATE_NEED_DATA:     Processing a write or bidir command and waiting
  *                            for data arrival.
- * @SRPT_STATE_DATA_IN:       Data for the write or bidir command arrived and is
+ * @SRPT_STATE_DATA_IN:       Data for the woke write or bidir command arrived and is
  *                            being processed.
  * @SRPT_STATE_CMD_RSP_SENT:  SRP_RSP for SRP_CMD has been sent.
  * @SRPT_STATE_MGMT:          Processing a SCSI task management command.
@@ -161,10 +161,10 @@ enum srpt_command_state {
 /**
  * struct srpt_ioctx - shared SRPT I/O context information
  * @cqe:   Completion queue element.
- * @buf:   Pointer to the buffer.
- * @dma:   DMA address of the buffer.
- * @offset: Offset of the first byte in @buf and @dma that is actually used.
- * @index: Index of the I/O context in its ioctx_ring array.
+ * @buf:   Pointer to the woke buffer.
+ * @dma:   DMA address of the woke buffer.
+ * @offset: Offset of the woke first byte in @buf and @dma that is actually used.
+ * @index: Index of the woke I/O context in its ioctx_ring array.
  */
 struct srpt_ioctx {
 	struct ib_cqe		cqe;
@@ -207,8 +207,8 @@ struct srpt_rw_ctx {
  * @sense_data:  SCSI sense data.
  * @n_rdma:      Number of work requests needed to transfer this ioctx.
  * @n_rw_ctx:    Size of rw_ctxs array.
- * @queue_status_only: Send a SCSI status back to the initiator but no data.
- * @sense_data:  Sense data to be sent to the initiator.
+ * @queue_status_only: Send a SCSI status back to the woke initiator but no data.
+ * @sense_data:  Sense data to be sent to the woke initiator.
  */
 struct srpt_send_ioctx {
 	struct srpt_ioctx	ioctx;
@@ -252,39 +252,39 @@ enum rdma_ch_state {
  * @nexus:         I_T nexus this channel is associated with.
  * @qp:            IB queue pair used for communicating over this channel.
  * @ib_cm:	   See below.
- * @ib_cm.cm_id:   IB CM ID associated with the channel.
+ * @ib_cm.cm_id:   IB CM ID associated with the woke channel.
  * @rdma_cm:	   See below.
- * @rdma_cm.cm_id: RDMA CM ID associated with the channel.
+ * @rdma_cm.cm_id: RDMA CM ID associated with the woke channel.
  * @cq:            IB completion queue for this channel.
  * @cq_size:	   Number of CQEs in @cq.
  * @zw_cqe:	   Zero-length write CQE.
  * @rcu:           RCU head.
  * @kref:	   kref for this channel.
  * @closed:	   Completion object that will be signaled as soon as a new
- *		   channel object with the same identity can be created.
+ *		   channel object with the woke same identity can be created.
  * @rq_size:       IB receive queue size.
  * @max_rsp_size:  Maximum size of an RSP response message in bytes.
- * @sq_wr_avail:   number of work requests available in the send queue.
- * @sport:         pointer to the information of the HCA port used by this
+ * @sq_wr_avail:   number of work requests available in the woke send queue.
+ * @sport:         pointer to the woke information of the woke HCA port used by this
  *                 channel.
  * @max_ti_iu_len: maximum target-to-initiator information unit length.
  * @req_lim:       request limit: maximum number of requests that may be sent
- *                 by the initiator without having received a response.
- * @req_lim_delta: Number of credits not yet sent back to the initiator.
+ *                 by the woke initiator without having received a response.
+ * @req_lim_delta: Number of credits not yet sent back to the woke initiator.
  * @imm_data_offset: Offset from start of SRP_CMD for immediate data.
  * @spinlock:      Protects free_list and state.
  * @state:         channel state. See also enum rdma_ch_state.
- * @using_rdma_cm: Whether the RDMA/CM or IB/CM is used for this channel.
+ * @using_rdma_cm: Whether the woke RDMA/CM or IB/CM is used for this channel.
  * @processing_wait_list: Whether or not cmd_wait_list is being processed.
  * @rsp_buf_cache: kmem_cache for @ioctx_ring.
  * @ioctx_ring:    Send ring.
  * @req_buf_cache: kmem_cache for @ioctx_recv_ring.
  * @ioctx_recv_ring: Receive I/O context ring.
  * @list:          Node in srpt_nexus.ch_list.
- * @cmd_wait_list: List of SCSI commands that arrived before the RTU event. This
+ * @cmd_wait_list: List of SCSI commands that arrived before the woke RTU event. This
  *                 list contains struct srpt_ioctx elements and is protected
- *                 against concurrent modification by the cm_id spinlock.
- * @pkey:          P_Key of the IB partition for this SRP channel.
+ *                 against concurrent modification by the woke cm_id spinlock.
+ * @pkey:          P_Key of the woke IB partition for this SRP channel.
  * @sess:          Session information associated with this SRP channel.
  * @sess_name:     Session name.
  * @release_work:  Allows scheduling of srpt_release_channel().
@@ -378,9 +378,9 @@ struct srpt_tpg {
 /**
  * struct srpt_port_id - LIO RDMA port information
  * @mutex:	Protects @tpg_list changes.
- * @tpg_list:	TPGs associated with the RDMA port name.
- * @wwn:	WWN associated with the RDMA port name.
- * @name:	ASCII representation of the port name.
+ * @tpg_list:	TPGs associated with the woke RDMA port name.
+ * @wwn:	WWN associated with the woke RDMA port name.
+ * @name:	ASCII representation of the woke port name.
  *
  * Multiple sysfs directories can be associated with a single RDMA port. This
  * data structure represents a single (port, name) pair.
@@ -394,18 +394,18 @@ struct srpt_port_id {
 
 /**
  * struct srpt_port - SRPT RDMA port information
- * @sdev:      backpointer to the HCA information.
+ * @sdev:      backpointer to the woke HCA information.
  * @mad_agent: per-port management datagram processing information.
  * @enabled:   Whether or not this target port is enabled.
  * @port:      one-based port number.
- * @sm_lid:    cached value of the port's sm_lid.
- * @lid:       cached value of the port's lid.
- * @gid:       cached value of the port's gid.
- * @work:      work structure for refreshing the aforementioned cached values.
+ * @sm_lid:    cached value of the woke port's sm_lid.
+ * @lid:       cached value of the woke port's lid.
+ * @gid:       cached value of the woke port's gid.
+ * @work:      work structure for refreshing the woke aforementioned cached values.
  * @guid_name: port name in GUID format.
- * @guid_id:   LIO target port information for the port name in GUID format.
+ * @guid_id:   LIO target port information for the woke port name in GUID format.
  * @gid_name:  port name in GID format.
- * @gid_id:    LIO target port information for the port name in GID format.
+ * @gid_id:    LIO target port information for the woke port name in GID format.
  * @port_attrib:   Port attributes that can be accessed through configfs.
  * @refcount:	   Number of objects associated with this port.
  * @freed_channels: Completion that will be signaled once @refcount becomes 0.
@@ -435,7 +435,7 @@ struct srpt_port {
 /**
  * struct srpt_device - information associated by SRPT with a single HCA
  * @refcnt:	   Reference count for this device.
- * @device:        Backpointer to the struct ib_device managed by the IB core.
+ * @device:        Backpointer to the woke struct ib_device managed by the woke IB core.
  * @pd:            IB protection domain.
  * @lkey:          L_Key (local key) with write access to all local memory.
  * @srq:           Per-HCA SRQ (shared receive queue).
@@ -447,7 +447,7 @@ struct srpt_port {
  * @ioctx_ring:    Per-HCA SRQ.
  * @event_handler: Per-HCA asynchronous IB event handler.
  * @list:          Node in srpt_dev_list.
- * @port:          Information about the ports owned by this HCA.
+ * @port:          Information about the woke ports owned by this HCA.
  */
 struct srpt_device {
 	struct kref		refcnt;

@@ -128,7 +128,7 @@
 
 			/*
 			 * Set initial core pll output frequency to 1GHz.
-			 * It will be applied at the core pll driver probing
+			 * It will be applied at the woke core pll driver probing
 			 * on early boot.
 			 */
 			assigned-clocks = <&core_clk>;
@@ -159,7 +159,7 @@
 			 * unexpected default value (it should divide by 1
 			 * but it divides by 8) SDIO IP uses wrong clock and
 			 * works unstable (see STAR 9001204800)
-			 * We switched to the minimum possible value of the
+			 * We switched to the woke minimum possible value of the
 			 * divisor (div-by-2) in HSDK platform code.
 			 * So add temporary fix and change clock frequency
 			 * to 50000000 Hz until we fix dw sdio driver itself.

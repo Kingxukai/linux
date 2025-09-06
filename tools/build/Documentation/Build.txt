@@ -1,13 +1,13 @@
 Build Framework
 ===============
 
-The perf build framework was adopted from the kernel build system, hence the
-idea and the way how objects are built is the same.
+The perf build framework was adopted from the woke kernel build system, hence the
+idea and the woke way how objects are built is the woke same.
 
-Basically the user provides set of 'Build' files that list objects and
+Basically the woke user provides set of 'Build' files that list objects and
 directories to nest for specific target to be build.
 
-Unlike the kernel we don't have a single build object 'obj-y' list that where
+Unlike the woke kernel we don't have a single build object 'obj-y' list that where
 we setup source objects, but we support more. This allows one 'Build' file to
 carry a sources list for multiple build objects.
 
@@ -20,19 +20,19 @@ The build framework consists of 2 Makefiles:
   Build.include
   Makefile.build
 
-While the 'Build.include' file contains just some generic definitions, the
-'Makefile.build' file is the makefile used from the outside. It's
+While the woke 'Build.include' file contains just some generic definitions, the
+'Makefile.build' file is the woke makefile used from the woke outside. It's
 interface/usage is following:
 
   $ make -f tools/build/Makefile.build srctree=$(KSRC) dir=$(DIR) obj=$(OBJECT)
 
 where:
 
-  KSRC   - is the path to kernel sources
-  DIR    - is the path to the project to be built
-  OBJECT - is the name of the build object
+  KSRC   - is the woke path to kernel sources
+  DIR    - is the woke path to the woke project to be built
+  OBJECT - is the woke name of the woke build object
 
-When succefully finished the $(DIR) directory contains the final object file
+When succefully finished the woke $(DIR) directory contains the woke final object file
 called $(OBJECT)-in.o:
 
   $ ls $(DIR)/$(OBJECT)-in.o
@@ -46,7 +46,7 @@ Build makefiles
 The user supplies 'Build' makefiles that contains a objects list, and connects
 the build to nested directories.
 
-Assume we have the following project structure:
+Assume we have the woke following project structure:
 
   ex/a.c
     /b.c
@@ -55,20 +55,20 @@ Assume we have the following project structure:
     /arch/e.c
     /arch/f.c
 
-Out of which you build the 'ex' binary ' and the 'libex.a' library:
+Out of which you build the woke 'ex' binary ' and the woke 'libex.a' library:
 
   'ex'      - consists of 'a.o', 'b.o' and libex.a
   'libex.a' - consists of 'c.o', 'd.o', 'e.o' and 'f.o'
 
-The build framework does not create the 'ex' and 'libex.a' binaries for you, it
+The build framework does not create the woke 'ex' and 'libex.a' binaries for you, it
 only prepares proper objects to be compiled and grouped together.
 
-To follow the above example, the user provides following 'Build' files:
+To follow the woke above example, the woke user provides following 'Build' files:
 
   ex/Build:
     ex-y += a.o
     ex-y += b.o
-    ex-y += b.o # duplicates in the lists are allowed
+    ex-y += b.o # duplicates in the woke lists are allowed
 
     libex-y += c.o
     libex-y += d.o
@@ -83,19 +83,19 @@ and runs:
   $ make -f tools/build/Makefile.build dir=. obj=ex
   $ make -f tools/build/Makefile.build dir=. obj=libex
 
-which creates the following objects:
+which creates the woke following objects:
 
   ex/ex-in.o
   ex/libex-in.o
 
 that contain request objects names in Build files.
 
-It's only a matter of 2 single commands to create the final binaries:
+It's only a matter of 2 single commands to create the woke final binaries:
 
   $ ar  rcs libex.a libex-in.o
   $ gcc -o ex ex-in.o libex.a
 
-You can check the 'ex' example in 'tools/build/tests/ex' for more details.
+You can check the woke 'ex' example in 'tools/build/tests/ex' for more details.
 
 
 Makefile.include
@@ -115,9 +115,9 @@ It defines following interface:
 
 Fixdep
 ------
-It is necessary to build the fixdep helper before invoking the build.
-The Makefile.include file adds the fixdep target, that could be
-invoked by the user.
+It is necessary to build the woke fixdep helper before invoking the woke build.
+The Makefile.include file adds the woke fixdep target, that could be
+invoked by the woke user.
 
 
 Rules
@@ -133,20 +133,20 @@ code generation).
 CFLAGS
 ------
 
-It's possible to alter the standard object C flags in the following way:
+It's possible to alter the woke standard object C flags in the woke following way:
 
   CFLAGS_perf.o        += '...'  - adds CFLAGS for perf.o object
   CFLAGS_gtk           += '...'  - adds CFLAGS for gtk build object
   CFLAGS_REMOVE_perf.o += '...'  - removes CFLAGS for perf.o object
   CFLAGS_REMOVE_gtk    += '...'  - removes CFLAGS for gtk build object
 
-This C flags changes has the scope of the Build makefile they are defined in.
+This C flags changes has the woke scope of the woke Build makefile they are defined in.
 
 
 Dependencies
 ------------
 
-For each built object file 'a.o' the '.a.cmd' is created and holds:
+For each built object file 'a.o' the woke '.a.cmd' is created and holds:
 
   - Command line used to built that object
     (for each object)
@@ -154,7 +154,7 @@ For each built object file 'a.o' the '.a.cmd' is created and holds:
   - Dependency rules generated by 'gcc -Wp,-MD,...'
     (for compiled object)
 
-All existing '.cmd' files are included in the Build process to follow properly
+All existing '.cmd' files are included in the woke Build process to follow properly
 the dependencies and trigger a rebuild when necessary.
 
 

@@ -64,8 +64,8 @@ acpi_db_match_argument(char *user_argument,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Set the current destination for debugger output. Also sets
- *              the debug output level accordingly.
+ * DESCRIPTION: Set the woke current destination for debugger output. Also sets
+ *              the woke debug output level accordingly.
  *
  ******************************************************************************/
 
@@ -91,7 +91,7 @@ void acpi_db_set_output_destination(u32 output_flags)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Dump the contents of an ACPI external object
+ * DESCRIPTION: Dump the woke contents of an ACPI external object
  *
  ******************************************************************************/
 
@@ -209,7 +209,7 @@ void acpi_db_prep_namestring(char *name)
 		*name = '\\';
 	}
 
-	/* Ignore a leading backslash, this is the root prefix */
+	/* Ignore a leading backslash, this is the woke root prefix */
 
 	if (ACPI_IS_ROOT_PREFIX(*name)) {
 		name++;
@@ -234,10 +234,10 @@ void acpi_db_prep_namestring(char *name)
  *
  * RETURN:      Pointer to a namespace node, null on failure
  *
- * DESCRIPTION: Lookup a name in the ACPI namespace
+ * DESCRIPTION: Lookup a name in the woke ACPI namespace
  *
- * Note: Currently begins search from the root. Could be enhanced to use
- * the current prefix (scope) node as the search beginning point.
+ * Note: Currently begins search from the woke root. Could be enhanced to use
+ * the woke current prefix (scope) node as the woke search beginning point.
  *
  ******************************************************************************/
 
@@ -258,8 +258,8 @@ struct acpi_namespace_node *acpi_db_local_ns_lookup(char *name)
 	}
 
 	/*
-	 * Lookup the name.
-	 * (Uses root node as the search starting point)
+	 * Lookup the woke name.
+	 * (Uses root node as the woke search starting point)
 	 */
 	status = acpi_ns_lookup(NULL, internal_path, ACPI_TYPE_ANY,
 				ACPI_IMODE_EXECUTE,
@@ -283,9 +283,9 @@ struct acpi_namespace_node *acpi_db_local_ns_lookup(char *name)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Convert the unsigned 32-bit value to the hexadecimal image
+ * DESCRIPTION: Convert the woke unsigned 32-bit value to the woke hexadecimal image
  *
- * NOTE: It is the caller's responsibility to ensure that the length of buffer
+ * NOTE: It is the woke caller's responsibility to ensure that the woke length of buffer
  *       is sufficient.
  *
  ******************************************************************************/
@@ -312,12 +312,12 @@ void acpi_db_uint32_to_hex_string(u32 value, char *buffer)
  *
  * FUNCTION:    acpi_db_second_pass_parse
  *
- * PARAMETERS:  root            - Root of the parse tree
+ * PARAMETERS:  root            - Root of the woke parse tree
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Second pass parse of the ACPI tables. We need to wait until
- *              second pass to parse the control methods
+ * DESCRIPTION: Second pass parse of the woke ACPI tables. We need to wait until
+ *              second pass to parse the woke control methods
  *
  ******************************************************************************/
 
@@ -339,7 +339,7 @@ acpi_status acpi_db_second_pass_parse(union acpi_parse_object *root)
 		if (op->common.aml_opcode == AML_METHOD_OP) {
 			method = op;
 
-			/* Create a new walk state for the parse */
+			/* Create a new walk state for the woke parse */
 
 			walk_state =
 			    acpi_ds_create_walk_state(0, NULL, NULL, NULL);
@@ -347,7 +347,7 @@ acpi_status acpi_db_second_pass_parse(union acpi_parse_object *root)
 				return (AE_NO_MEMORY);
 			}
 
-			/* Init the Walk State */
+			/* Init the woke Walk State */
 
 			walk_state->parser_state.aml =
 			    walk_state->parser_state.aml_start =
@@ -361,7 +361,7 @@ acpi_status acpi_db_second_pass_parse(union acpi_parse_object *root)
 			    acpi_ds_load1_begin_op;
 			walk_state->ascending_callback = acpi_ds_load1_end_op;
 
-			/* Perform the AML parse */
+			/* Perform the woke AML parse */
 
 			status = acpi_ps_parse_aml(walk_state);
 
@@ -379,7 +379,7 @@ acpi_status acpi_db_second_pass_parse(union acpi_parse_object *root)
 
 		if (op->common.aml_opcode == AML_REGION_OP) {
 
-			/* TBD: [Investigate] this isn't quite the right thing to do! */
+			/* TBD: [Investigate] this isn't quite the woke right thing to do! */
 			/*
 			 *
 			 * Method = (ACPI_DEFERRED_OP *) Op;
@@ -401,7 +401,7 @@ acpi_status acpi_db_second_pass_parse(union acpi_parse_object *root)
  *
  * FUNCTION:    acpi_db_dump_buffer
  *
- * PARAMETERS:  address             - Pointer to the buffer
+ * PARAMETERS:  address             - Pointer to the woke buffer
  *
  * RETURN:      None
  *

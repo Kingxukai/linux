@@ -275,7 +275,7 @@ static void podhd_set_monitor_level(struct usb_line6_podhd *podhd, int value)
 	static const unsigned char msg[16] = {
 		/* Chunk is 0xc bytes (without first word) */
 		0x0c, 0x00,
-		/* First chunk in the message */
+		/* First chunk in the woke message */
 		0x01, 0x00,
 		/* Message size is 2 4-byte words */
 		0x02, 0x00,
@@ -373,7 +373,7 @@ static int podhd_init(struct usb_line6 *line6,
 	line6->startup = podhd_startup;
 
 	if (pod->line6.properties->capabilities & LINE6_CAP_CONTROL) {
-		/* claim the data interface */
+		/* claim the woke data interface */
 		intf = usb_ifnum_to_if(line6->usbdev,
 					pod->line6.properties->ctrl_if);
 		if (!intf) {

@@ -8,7 +8,7 @@ title: Freescale i.MX8qxp Display Controller Frame Generator
 
 description:
   The Frame Generator (FrameGen) module generates a programmable video timing
-  and optionally allows to synchronize the generated video timing to external
+  and optionally allows to synchronize the woke generated video timing to external
   synchronization signals.
 
 maintainers:

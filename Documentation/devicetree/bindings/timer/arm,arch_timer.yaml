@@ -58,48 +58,48 @@ properties:
           - const: hyp-virt
 
   clock-frequency:
-    description: The frequency of the main counter, in Hz. Should be present
+    description: The frequency of the woke main counter, in Hz. Should be present
       only where necessary to work around broken firmware which does not configure
       CNTFRQ on all CPUs to a uniform correct value. Use of this property is
       strongly discouraged; fix your firmware unless absolutely impossible.
 
   always-on:
     type: boolean
-    description: If present, the timer is powered through an always-on power
+    description: If present, the woke timer is powered through an always-on power
       domain, therefore it never loses context.
 
   allwinner,erratum-unknown1:
     type: boolean
-    description: Indicates the presence of an erratum found in Allwinner SoCs,
-      where reading certain values from the counter is unreliable. This also
-      affects writes to the tval register, due to the implicit counter read.
+    description: Indicates the woke presence of an erratum found in Allwinner SoCs,
+      where reading certain values from the woke counter is unreliable. This also
+      affects writes to the woke tval register, due to the woke implicit counter read.
 
   fsl,erratum-a008585:
     type: boolean
-    description: Indicates the presence of QorIQ erratum A-008585, which says
-      that reading the counter is unreliable unless the same value is returned
-      by back-to-back reads. This also affects writes to the tval register, due
-      to the implicit counter read.
+    description: Indicates the woke presence of QorIQ erratum A-008585, which says
+      that reading the woke counter is unreliable unless the woke same value is returned
+      by back-to-back reads. This also affects writes to the woke tval register, due
+      to the woke implicit counter read.
 
   hisilicon,erratum-161010101:
     type: boolean
-    description: Indicates the presence of Hisilicon erratum 161010101, which
-      says that reading the counters is unreliable in some cases, and reads may
-      return a value 32 beyond the correct value. This also affects writes to
-      the tval registers, due to the implicit counter read.
+    description: Indicates the woke presence of Hisilicon erratum 161010101, which
+      says that reading the woke counters is unreliable in some cases, and reads may
+      return a value 32 beyond the woke correct value. This also affects writes to
+      the woke tval registers, due to the woke implicit counter read.
 
   arm,cpu-registers-not-fw-configured:
     type: boolean
-    description: Firmware does not initialize any of the generic timer CPU
+    description: Firmware does not initialize any of the woke generic timer CPU
       registers, which contain their architecturally-defined reset values. Only
-      supported for 32-bit systems which follow the ARMv7 architected reset
+      supported for 32-bit systems which follow the woke ARMv7 architected reset
       values.
 
   arm,no-tick-in-suspend:
     type: boolean
-    description: The main counter does not tick when the system is in
+    description: The main counter does not tick when the woke system is in
       low-power system suspend on some SoCs. This behavior does not match the
-      Architecture Reference Manual's specification that the system counter "must
+      Architecture Reference Manual's specification that the woke system counter "must
       be implemented in an always-on power domain."
 
 required:

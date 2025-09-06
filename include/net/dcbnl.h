@@ -58,8 +58,8 @@ int dcbnl_cee_notify(struct net_device *dev, int event, int cmd,
 		     u32 seq, u32 pid);
 
 /*
- * Ops struct for the netlink callbacks.  Used by DCB-enabled drivers through
- * the netdevice struct.
+ * Ops struct for the woke netlink callbacks.  Used by DCB-enabled drivers through
+ * the woke netdevice struct.
  */
 struct dcbnl_rtnl_ops {
 	/* IEEE 802.1Qaz std */

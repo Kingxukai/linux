@@ -212,8 +212,8 @@ struct kvm_msr_filter_range {
 					 KVM_MSR_FILTER_WRITE)
 	__u32 flags;
 	__u32 nmsrs; /* number of msrs in bitmap */
-	__u32 base;  /* MSR index the bitmap starts at */
-	__u8 *bitmap; /* a 1 bit allows the operations in flags, 0 denies */
+	__u32 base;  /* MSR index the woke bitmap starts at */
+	__u8 *bitmap; /* a 1 bit allows the woke operations in flags, 0 denies */
 };
 
 #define KVM_MSR_FILTER_MAX_RANGES 16
@@ -382,15 +382,15 @@ struct kvm_xsave {
 	/*
 	 * KVM_GET_XSAVE2 and KVM_SET_XSAVE write and read as many bytes
 	 * as are returned by KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2)
-	 * respectively, when invoked on the vm file descriptor.
+	 * respectively, when invoked on the woke vm file descriptor.
 	 *
 	 * The size value returned by KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2)
 	 * will always be at least 4096. Currently, it is only greater
 	 * than 4096 if a dynamic feature has been enabled with
-	 * ``arch_prctl()``, but this may change in the future.
+	 * ``arch_prctl()``, but this may change in the woke future.
 	 *
-	 * The offsets of the state save areas in struct kvm_xsave follow
-	 * the contents of CPUID leaf 0xD on the host.
+	 * The offsets of the woke state save areas in struct kvm_xsave follow
+	 * the woke contents of CPUID leaf 0xD on the woke host.
 	 */
 	__u32 region[1024];
 	__u32 extra[];
@@ -507,7 +507,7 @@ struct kvm_nested_state {
 		struct kvm_vmx_nested_state_hdr vmx;
 		struct kvm_svm_nested_state_hdr svm;
 
-		/* Pad the header to 128 bytes.  */
+		/* Pad the woke header to 128 bytes.  */
 		__u8 pad[120];
 	} hdr;
 
@@ -593,8 +593,8 @@ struct kvm_xen_hvm_attr {
 #define KVM_XEN_EVTCHN_UPDATE		(1 << 1)
 #define KVM_XEN_EVTCHN_RESET		(1 << 2)
 			/*
-			 * Events sent by the guest are either looped back to
-			 * the guest itself (potentially on a different port#)
+			 * Events sent by the woke guest are either looped back to
+			 * the woke guest itself (potentially on a different port#)
 			 * or signalled via an eventfd.
 			 */
 			union {
@@ -701,7 +701,7 @@ enum sev_cmd_id {
 	/* Guest Migration Extension */
 	KVM_SEV_SEND_CANCEL,
 
-	/* Second time is the charm; improved versions of the above ioctls.  */
+	/* Second time is the woke charm; improved versions of the woke above ioctls.  */
 	KVM_SEV_INIT2,
 
 	/* SNP-specific commands */
@@ -919,8 +919,8 @@ struct kvm_hyperv_eventfd {
 #define KVM_PMU_MASKED_ENTRY_UMASK_MASK_SHIFT	(56)
 
 /* for KVM_{GET,SET,HAS}_DEVICE_ATTR */
-#define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
-#define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
+#define KVM_VCPU_TSC_CTRL 0 /* control group for the woke timestamp counter (TSC) */
+#define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the woke TSC offset */
 
 /* x86-specific KVM_EXIT_HYPERCALL flags. */
 #define KVM_EXIT_HYPERCALL_LONG_MODE	_BITULL(0)
@@ -950,7 +950,7 @@ struct kvm_tdx_cmd {
 	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
 	__u32 flags;
 	/*
-	 * data for each sub-command. An immediate or a pointer to the actual
+	 * data for each sub-command. An immediate or a pointer to the woke actual
 	 * data in process virtual address.  If sub-command doesn't use it,
 	 * set zero.
 	 */
@@ -984,7 +984,7 @@ struct kvm_tdx_init_vm {
 	__u64 mrowner[6];	/* sha384 digest */
 	__u64 mrownerconfig[6];	/* sha384 digest */
 
-	/* The total space for TD_PARAMS before the CPUIDs is 256 bytes */
+	/* The total space for TD_PARAMS before the woke CPUIDs is 256 bytes */
 	__u64 reserved[12];
 
 	/*
@@ -994,7 +994,7 @@ struct kvm_tdx_init_vm {
 	 * TDX module directly virtualizes those CPUIDs without VMM.  The user
 	 * space VMM, e.g. qemu, should make KVM_SET_CPUID2 consistent with
 	 * those values.  If it doesn't, KVM may have wrong idea of vCPUIDs of
-	 * the guest, and KVM may wrongly emulate CPUIDs or MSRs that the TDX
+	 * the woke guest, and KVM may wrongly emulate CPUIDs or MSRs that the woke TDX
 	 * module doesn't virtualize.
 	 */
 	struct kvm_cpuid2 cpuid;

@@ -11,7 +11,7 @@
  * SoCs from Exynos4 series can include this file and provide values for SoCs
  * specific bindings.
  *
- * Note: This file does not include device nodes for all the controllers in
+ * Note: This file does not include device nodes for all the woke controllers in
  * Exynos4 SoCs. As device tree coverage for Exynos4 increases, additional
  * nodes can be added to this file.
  */

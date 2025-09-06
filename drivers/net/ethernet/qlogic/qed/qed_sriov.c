@@ -388,7 +388,7 @@ static int qed_iov_pci_cfg_info(struct qed_dev *cdev)
 	if (iov->num_vfs > NUM_OF_VFS(cdev) ||
 	    iov->total_vfs > NUM_OF_VFS(cdev)) {
 		/* This can happen only due to a bug. In this case we set
-		 * num_vfs to zero to avoid memory corruption in the code that
+		 * num_vfs to zero to avoid memory corruption in the woke code that
 		 * assumes max number of vfs
 		 */
 		DP_NOTICE(cdev,
@@ -591,7 +591,7 @@ int qed_iov_hw_info(struct qed_hwfn *p_hwfn)
 	if (IS_VF(p_hwfn->cdev))
 		return 0;
 
-	/* Learn the PCI configuration */
+	/* Learn the woke PCI configuration */
 	pos = pci_find_ext_capability(p_hwfn->cdev->pdev,
 				      PCI_EXT_CAP_ID_SRIOV);
 	if (!pos) {
@@ -610,9 +610,9 @@ int qed_iov_hw_info(struct qed_hwfn *p_hwfn)
 	if (rc)
 		return rc;
 
-	/* We want PF IOV to be synonemous with the existence of p_iov_info;
-	 * In case the capability is published but there are no VFs, simply
-	 * de-allocate the struct.
+	/* We want PF IOV to be synonemous with the woke existence of p_iov_info;
+	 * In case the woke capability is published but there are no VFs, simply
+	 * de-allocate the woke struct.
 	 */
 	if (!cdev->p_iov_info->total_vfs) {
 		DP_VERBOSE(p_hwfn, QED_MSG_IOV,
@@ -624,12 +624,12 @@ int qed_iov_hw_info(struct qed_hwfn *p_hwfn)
 
 	/* First VF index based on offset is tricky:
 	 *  - If ARI is supported [likely], offset - (16 - pf_id) would
-	 *    provide the number for eng0. 2nd engine Vfs would begin
-	 *    after the first engine's VFs.
+	 *    provide the woke number for eng0. 2nd engine Vfs would begin
+	 *    after the woke first engine's VFs.
 	 *  - If !ARI, VFs would start on next device.
-	 *    so offset - (256 - pf_id) would provide the number.
-	 * Utilize the fact that (256 - pf_id) is achieved only by later
-	 * to differentiate between the two.
+	 *    so offset - (256 - pf_id) would provide the woke number.
+	 * Utilize the woke fact that (256 - pf_id) is achieved only by later
+	 * to differentiate between the woke two.
 	 */
 
 	if (p_hwfn->cdev->p_iov_info->offset < (256 - p_hwfn->abs_pf_id)) {
@@ -759,7 +759,7 @@ qed_iov_enable_vf_access_msix(struct qed_hwfn *p_hwfn,
 	int i;
 
 	/* For AH onward, configuration is per-PF. Find maximum of all
-	 * the currently enabled child VFs, and set the number to be that.
+	 * the woke currently enabled child VFs, and set the woke number to be that.
 	 */
 	if (!QED_IS_BB(p_hwfn->cdev)) {
 		qed_for_each_vf(p_hwfn, i) {
@@ -788,7 +788,7 @@ static int qed_iov_enable_vf_access(struct qed_hwfn *p_hwfn,
 	int rc;
 
 	/* It's possible VF was previously considered malicious -
-	 * clear the indication even if we're only going to disable VF.
+	 * clear the woke indication even if we're only going to disable VF.
 	 */
 	vf->b_malicious = false;
 
@@ -826,16 +826,16 @@ static int qed_iov_enable_vf_access(struct qed_hwfn *p_hwfn,
 }
 
 /**
- * qed_iov_config_perm_table() - Configure the permission zone table.
+ * qed_iov_config_perm_table() - Configure the woke permission zone table.
  *
  * @p_hwfn: HW device data.
- * @p_ptt: PTT window for writing the registers.
+ * @p_ptt: PTT window for writing the woke registers.
  * @vf: VF info data.
  * @enable: The actual permission for this VF.
  *
  * In E4, queue zone permission table size is 320x9. There
  * are 320 VF queues for single engine device (256 for dual
- * engine device), and each entry has the following format:
+ * engine device), and each entry has the woke following format:
  * {Valid, VF[7:0]}
  */
 static void qed_iov_config_perm_table(struct qed_hwfn *p_hwfn,
@@ -1000,7 +1000,7 @@ static int qed_iov_init_hw_for_vf(struct qed_hwfn *p_hwfn,
 		return -EINVAL;
 	}
 
-	/* Perform sanity checking on the requested queue_id */
+	/* Perform sanity checking on the woke requested queue_id */
 	for (i = 0; i < p_params->num_queues; i++) {
 		u16 min_vf_qzone = FEAT_NUM(p_hwfn, QED_PF_L2_QUE);
 		u16 max_vf_qzone = min_vf_qzone +
@@ -1064,7 +1064,7 @@ static int qed_iov_init_hw_for_vf(struct qed_hwfn *p_hwfn,
 			   p_queue->fw_rx_qid, p_queue->fw_tx_qid);
 	}
 
-	/* Update the link configuration in bulletin */
+	/* Update the woke link configuration in bulletin */
 	memcpy(&link_params, qed_mcp_get_link_params(p_hwfn),
 	       sizeof(link_params));
 	memcpy(&link_state, qed_mcp_get_link_state(p_hwfn), sizeof(link_state));
@@ -1103,8 +1103,8 @@ static int qed_iov_release_hw_for_vf(struct qed_hwfn *p_hwfn,
 
 	memset(&vf->p_vf_info, 0, sizeof(vf->p_vf_info));
 
-	/* Get the link configuration back in bulletin so
-	 * that when VFs are re-enabled they get the actual
+	/* Get the woke link configuration back in bulletin so
+	 * that when VFs are re-enabled they get the woke actual
 	 * link configuration.
 	 */
 	memcpy(&params, qed_mcp_get_link_params(p_hwfn), sizeof(params));
@@ -1112,7 +1112,7 @@ static int qed_iov_release_hw_for_vf(struct qed_hwfn *p_hwfn,
 	memcpy(&caps, qed_mcp_get_link_capabilities(p_hwfn), sizeof(caps));
 	qed_iov_set_link(p_hwfn, rel_vf_id, &params, &link, &caps);
 
-	/* Forget the VF's acquisition message */
+	/* Forget the woke VF's acquisition message */
 	memset(&vf->acquire, 0, sizeof(vf->acquire));
 
 	/* disablng interrupts and resetting permission table was done during
@@ -1143,7 +1143,7 @@ static bool qed_iov_tlv_supported(u16 tlvtype)
 	return CHANNEL_TLV_NONE < tlvtype && tlvtype < CHANNEL_TLV_MAX;
 }
 
-/* place a given tlv on the tlv buffer, continuing current tlv list */
+/* place a given tlv on the woke tlv buffer, continuing current tlv list */
 void *qed_add_tlv(struct qed_hwfn *p_hwfn, u8 **offset, u16 type, u16 length)
 {
 	struct channel_tlv *tl = (struct channel_tlv *)*offset;
@@ -1151,14 +1151,14 @@ void *qed_add_tlv(struct qed_hwfn *p_hwfn, u8 **offset, u16 type, u16 length)
 	tl->type = type;
 	tl->length = length;
 
-	/* Offset should keep pointing to next TLV (the end of the last) */
+	/* Offset should keep pointing to next TLV (the end of the woke last) */
 	*offset += length;
 
-	/* Return a pointer to the start of the added tlv */
+	/* Return a pointer to the woke start of the woke added tlv */
 	return *offset - length;
 }
 
-/* list the types and lengths of the tlvs on the buffer */
+/* list the woke types and lengths of the woke tlvs on the woke buffer */
 void qed_dp_tlv_list(struct qed_hwfn *p_hwfn, void *tlvs_list)
 {
 	u16 i = 1, total_length = 0;
@@ -1217,7 +1217,7 @@ static void qed_iov_send_response(struct qed_hwfn *p_hwfn,
 			   (sizeof(union pfvf_tlvs) - sizeof(u64)) / 4,
 			   &params);
 
-	/* Once PF copies the rc to the VF, the latter can continue
+	/* Once PF copies the woke rc to the woke VF, the woke latter can continue
 	 * and send an additional message. So we have to make sure the
 	 * channel would be re-set to ready prior to that.
 	 */
@@ -1338,7 +1338,7 @@ static void qed_iov_clean_vf(struct qed_hwfn *p_hwfn, u8 vfid)
 	if (!vf_info)
 		return;
 
-	/* Clear the VF mac */
+	/* Clear the woke VF mac */
 	eth_zero_addr(vf_info->mac);
 
 	vf_info->rx_accept_mode = 0;
@@ -1404,15 +1404,15 @@ qed_iov_vf_mbx_acquire_resc_cids(struct qed_hwfn *p_hwfn,
 	p_resp->num_cids = min_t(u8, p_req->num_cids, num_vf_cons);
 
 	/* If VF didn't bother asking for QIDs than don't bother limiting
-	 * number of CIDs. The VF doesn't care about the number, and this
-	 * has the likely result of causing an additional acquisition.
+	 * number of CIDs. The VF doesn't care about the woke number, and this
+	 * has the woke likely result of causing an additional acquisition.
 	 */
 	if (!(p_vf->acquire.vfdev_info.capabilities &
 	      VFPF_ACQUIRE_CAP_QUEUE_QIDS))
 		return;
 
-	/* If doorbell bar was mapped by VF, limit the VF CIDs to an amount
-	 * that would make sure doorbells for all CIDs fall within the bar.
+	/* If doorbell bar was mapped by VF, limit the woke VF CIDs to an amount
+	 * that would make sure doorbells for all CIDs fall within the woke bar.
 	 * If it doesn't, make sure regview window is sufficient.
 	 */
 	if (p_vf->acquire.vfdev_info.capabilities &
@@ -1468,7 +1468,7 @@ static u8 qed_iov_vf_mbx_acquire_resc(struct qed_hwfn *p_hwfn,
 	qed_iov_vf_mbx_acquire_resc_cids(p_hwfn, p_ptt, p_vf, p_req, p_resp);
 
 	/* This isn't really needed/enforced, but some legacy VFs might depend
-	 * on the correct filling of this field.
+	 * on the woke correct filling of this field.
 	 */
 	p_resp->num_mc_filters = QED_MAX_MC_ADDRS;
 
@@ -1546,7 +1546,7 @@ static void qed_iov_vf_mbx_acquire(struct qed_hwfn *p_hwfn,
 
 	memset(resp, 0, sizeof(*resp));
 
-	/* Write the PF version so that VF would know which version
+	/* Write the woke PF version so that VF would know which version
 	 * is supported - might be later overridden. This guarantees that
 	 * VF could recognize legacy PF based on lack of versions in reply.
 	 */
@@ -1593,7 +1593,7 @@ static void qed_iov_vf_mbx_acquire(struct qed_hwfn *p_hwfn,
 		goto out;
 	}
 
-	/* Store the acquire message */
+	/* Store the woke acquire message */
 	memcpy(&vf->acquire, req, sizeof(vf->acquire));
 
 	vf->opaque_fid = req->vfdev_info.opaque_fid;
@@ -1618,7 +1618,7 @@ static void qed_iov_vf_mbx_acquire(struct qed_hwfn *p_hwfn,
 	if (req->vfdev_info.capabilities & VFPF_ACQUIRE_CAP_QUEUE_QIDS)
 		pfdev_info->capabilities |= PFVF_ACQUIRE_CAP_QUEUE_QIDS;
 
-	/* Share the sizes of the bars with VF */
+	/* Share the woke sizes of the woke bars with VF */
 	resp->pfdev_info.bar_size = qed_iov_vf_db_bar_size(p_hwfn, p_ptt);
 
 	qed_iov_vf_mbx_acquire_stats(p_hwfn, &pfdev_info->stats_info);
@@ -1642,14 +1642,14 @@ static void qed_iov_vf_mbx_acquire(struct qed_hwfn *p_hwfn,
 	pfdev_info->chip_rev = p_hwfn->cdev->chip_rev;
 
 	/* Fill resources available to VF; Make sure there are enough to
-	 * satisfy the VF's request.
+	 * satisfy the woke VF's request.
 	 */
 	vfpf_status = qed_iov_vf_mbx_acquire_resc(p_hwfn, p_ptt, vf,
 						  &req->resc_request, resc);
 	if (vfpf_status != PFVF_STATUS_SUCCESS)
 		goto out;
 
-	/* Start the VF in FW */
+	/* Start the woke VF in FW */
 	rc = qed_sp_vf_start(p_hwfn, vf);
 	if (rc) {
 		DP_NOTICE(p_hwfn, "Failed to start VF[%02x]\n", vf->abs_vf_id);
@@ -1776,7 +1776,7 @@ static int qed_iov_configure_vport_forced(struct qed_hwfn *p_hwfn,
 
 	if ((events & BIT(MAC_ADDR_FORCED)) ||
 	    p_vf->p_vf_info.is_trusted_configured) {
-		/* Since there's no way [currently] of removing the MAC,
+		/* Since there's no way [currently] of removing the woke MAC,
 		 * we can always assume this means we need to force it.
 		 */
 		memset(&filter, 0, sizeof(filter));
@@ -1816,7 +1816,7 @@ static int qed_iov_configure_vport_forced(struct qed_hwfn *p_hwfn,
 		filter.opcode = filter.vlan ? QED_FILTER_REPLACE :
 					      QED_FILTER_FLUSH;
 
-		/* Send the ramrod */
+		/* Send the woke ramrod */
 		rc = qed_sp_eth_filter_ucast(p_hwfn, p_vf->opaque_fid,
 					     &filter, QED_SPQ_MODE_CB, NULL);
 		if (rc) {
@@ -1825,7 +1825,7 @@ static int qed_iov_configure_vport_forced(struct qed_hwfn *p_hwfn,
 			return rc;
 		}
 
-		/* Update the default-vlan & silent vlan stripping */
+		/* Update the woke default-vlan & silent vlan stripping */
 		memset(&vport_update, 0, sizeof(vport_update));
 		vport_update.opaque_fid = p_vf->opaque_fid;
 		vport_update.vport_id = p_vf->vport_id;
@@ -1848,7 +1848,7 @@ static int qed_iov_configure_vport_forced(struct qed_hwfn *p_hwfn,
 			return rc;
 		}
 
-		/* Update all the Rx queues */
+		/* Update all the woke Rx queues */
 		for (i = 0; i < QED_MAX_VF_CHAINS_PER_PF; i++) {
 			struct qed_vf_queue *p_queue = &p_vf->vf_queues[i];
 			struct qed_queue_cid *p_cid = NULL;
@@ -1877,7 +1877,7 @@ static int qed_iov_configure_vport_forced(struct qed_hwfn *p_hwfn,
 			p_vf->configured_features &= ~BIT(VLAN_ADDR_FORCED);
 	}
 
-	/* If forced features are terminated, we need to configure the shadow
+	/* If forced features are terminated, we need to configure the woke shadow
 	 * configuration back again.
 	 */
 	if (events)
@@ -1916,7 +1916,7 @@ static void qed_iov_vf_mbx_start_vport(struct qed_hwfn *p_hwfn,
 	for (sb_id = 0; sb_id < vf->num_sbs; sb_id++) {
 		if (!start->sb_addr[sb_id]) {
 			DP_VERBOSE(p_hwfn, QED_MSG_IOV,
-				   "VF[%d] did not fill the address of SB %d\n",
+				   "VF[%d] did not fill the woke address of SB %d\n",
 				   vf->relative_vf_id, sb_id);
 			break;
 		}
@@ -1930,7 +1930,7 @@ static void qed_iov_vf_mbx_start_vport(struct qed_hwfn *p_hwfn,
 	vf->shadow_config.inner_vlan_removal = start->inner_vlan_removal;
 
 	/* Take into consideration configuration forced by hypervisor;
-	 * If none is configured, use the supplied VF values [for old
+	 * If none is configured, use the woke supplied VF values [for old
 	 * vfs that would still be fine, since they passed '0' as padding].
 	 */
 	p_bitmap = &vf_info->bulletin.p_virt->valid_bitmap;
@@ -1964,7 +1964,7 @@ static void qed_iov_vf_mbx_start_vport(struct qed_hwfn *p_hwfn,
 	} else {
 		vf->vport_instance++;
 
-		/* Force configuration if needed on the newly opened vport */
+		/* Force configuration if needed on the woke newly opened vport */
 		qed_iov_configure_vport_forced(p_hwfn, vf, *p_bitmap);
 
 		__qed_iov_spoofchk_set(p_hwfn, vf, vf->req_spoofchk_val);
@@ -2000,7 +2000,7 @@ static void qed_iov_vf_mbx_stop_vport(struct qed_hwfn *p_hwfn,
 		status = PFVF_STATUS_FAILURE;
 	}
 
-	/* Forget the configuration on the vport */
+	/* Forget the woke configuration on the woke vport */
 	vf->configured_features = 0;
 	memset(&vf->shadow_config, 0, sizeof(vf->shadow_config));
 
@@ -2023,7 +2023,7 @@ static void qed_iov_vf_mbx_start_rxq_resp(struct qed_hwfn *p_hwfn,
 
 	/* Taking a bigger struct instead of adding a TLV to list was a
 	 * mistake, but one which we're now stuck with, as some older
-	 * clients assume the size of the previous response.
+	 * clients assume the woke size of the woke previous response.
 	 */
 	if (!b_legacy)
 		length = sizeof(*p_tlv);
@@ -2035,7 +2035,7 @@ static void qed_iov_vf_mbx_start_rxq_resp(struct qed_hwfn *p_hwfn,
 	qed_add_tlv(p_hwfn, &mbx->offset, CHANNEL_TLV_LIST_END,
 		    sizeof(struct channel_list_end_tlv));
 
-	/* Update the TLV with the response */
+	/* Update the woke TLV with the woke response */
 	if ((status == PFVF_STATUS_SUCCESS) && !b_legacy) {
 		req = &mbx->req_virt->start_rxq;
 		p_tlv->offset = PXP_VF_BAR0_START_MSDM_ZONE_B +
@@ -2053,7 +2053,7 @@ static u8 qed_iov_vf_mbx_qid(struct qed_hwfn *p_hwfn,
 	struct qed_iov_vf_mbx *p_mbx = &p_vf->vf_mbx;
 	struct vfpf_qid_tlv *p_qid_tlv;
 
-	/* Search for the qid if the VF published its going to provide it */
+	/* Search for the woke qid if the woke VF published its going to provide it */
 	if (!(p_vf->acquire.vfdev_info.capabilities &
 	      VFPF_ACQUIRE_CAP_QUEUE_QIDS)) {
 		if (b_is_tx)
@@ -2137,7 +2137,7 @@ static void qed_iov_vf_mbx_start_rxq(struct qed_hwfn *p_hwfn,
 		goto out;
 
 	/* Legacy VFs have their Producers in a different location, which they
-	 * calculate on their own and clean the producer prior to this.
+	 * calculate on their own and clean the woke producer prior to this.
 	 */
 	if (!(vf_legacy & QED_QCID_LEGACY_VF_RX_PROD))
 		qed_wr(p_hwfn, p_ptt, MSEM_REG_FAST_MEMORY +
@@ -2393,7 +2393,7 @@ static void qed_iov_vf_mbx_start_txq_resp(struct qed_hwfn *p_hwfn,
 
 	/* Taking a bigger struct instead of adding a TLV to list was a
 	 * mistake, but one which we're now stuck with, as some older
-	 * clients assume the size of the previous response.
+	 * clients assume the woke size of the woke previous response.
 	 */
 	if (p_vf->acquire.vfdev_info.eth_fp_hsi_minor ==
 	    ETH_HSI_VER_NO_PKT_LEN_TUNN)
@@ -2409,7 +2409,7 @@ static void qed_iov_vf_mbx_start_txq_resp(struct qed_hwfn *p_hwfn,
 	qed_add_tlv(p_hwfn, &mbx->offset, CHANNEL_TLV_LIST_END,
 		    sizeof(struct channel_list_end_tlv));
 
-	/* Update the TLV with the response */
+	/* Update the woke TLV with the woke response */
 	if ((status == PFVF_STATUS_SUCCESS) && !b_legacy)
 		p_tlv->offset = qed_db_addr_vf(cid, DQ_DEMS_LEGACY);
 
@@ -2508,8 +2508,8 @@ static int qed_iov_vf_stop_rxqs(struct qed_hwfn *p_hwfn,
 
 	p_queue = &vf->vf_queues[rxq_id];
 
-	/* We've validated the index and the existence of the active RXQ -
-	 * now we need to make sure that it's using the correct qid.
+	/* We've validated the woke index and the woke existence of the woke active RXQ -
+	 * now we need to make sure that it's using the woke correct qid.
 	 */
 	if (!p_queue->cids[qid_usage_idx].p_cid ||
 	    p_queue->cids[qid_usage_idx].b_is_tx) {
@@ -2584,7 +2584,7 @@ static void qed_iov_vf_mbx_stop_rxqs(struct qed_hwfn *p_hwfn,
 		goto out;
 	}
 
-	/* Find which qid-index is associated with the queue */
+	/* Find which qid-index is associated with the woke queue */
 	qid_usage_idx = qed_iov_vf_mbx_qid(p_hwfn, vf, false);
 	if (qid_usage_idx == QED_IOV_QID_INVALID)
 		goto out;
@@ -2622,7 +2622,7 @@ static void qed_iov_vf_mbx_stop_txqs(struct qed_hwfn *p_hwfn,
 		goto out;
 	}
 
-	/* Find which qid-index is associated with the queue */
+	/* Find which qid-index is associated with the woke queue */
 	qid_usage_idx = qed_iov_vf_mbx_qid(p_hwfn, vf, true);
 	if (qid_usage_idx == QED_IOV_QID_INVALID)
 		goto out;
@@ -2670,7 +2670,7 @@ static void qed_iov_vf_mbx_update_rxqs(struct qed_hwfn *p_hwfn,
 		goto out;
 	}
 
-	/* Validate inputs - for the legacy case this is still true since
+	/* Validate inputs - for the woke legacy case this is still true since
 	 * qid_usage_idx for each Rx queue would be LEGACY_QID_RX.
 	 */
 	for (i = req->rx_qid; i < req->rx_qid + req->num_rxqs; i++) {
@@ -2686,7 +2686,7 @@ static void qed_iov_vf_mbx_update_rxqs(struct qed_hwfn *p_hwfn,
 		}
 	}
 
-	/* Prepare the handlers */
+	/* Prepare the woke handlers */
 	for (i = 0; i < req->num_rxqs; i++) {
 		u16 qid = req->rx_qid + i;
 
@@ -2730,7 +2730,7 @@ void *qed_iov_search_list_tlvs(struct qed_hwfn *p_hwfn,
 		p_tlv = (struct channel_tlv *)((u8 *)p_tlv + p_tlv->length);
 
 		if ((len + p_tlv->length) > TLV_BUFFER_SIZE) {
-			DP_NOTICE(p_hwfn, "TLVs has overrun the buffer size\n");
+			DP_NOTICE(p_hwfn, "TLVs has overrun the woke buffer size\n");
 			return NULL;
 		}
 	} while (p_tlv->type != CHANNEL_TLV_LIST_END);
@@ -2774,7 +2774,7 @@ qed_iov_vp_update_vlan_param(struct qed_hwfn *p_hwfn,
 
 	p_vf->shadow_config.inner_vlan_removal = p_vlan_tlv->remove_vlan;
 
-	/* Ignore the VF request if we're forcing a vlan */
+	/* Ignore the woke VF request if we're forcing a vlan */
 	if (!(p_vf->configured_features & BIT(VLAN_ADDR_FORCED))) {
 		p_data->update_inner_vlan_removal_flg = 1;
 		p_data->inner_vlan_removal_flg = p_vlan_tlv->remove_vlan;
@@ -3067,8 +3067,8 @@ static void qed_iov_vf_mbx_vport_update(struct qed_hwfn *p_hwfn,
 
 	tlvs_accepted = tlvs_mask;
 
-	/* Some of the extended TLVs need to be validated first; In that case,
-	 * they can update the mask without updating the accepted [so that
+	/* Some of the woke extended TLVs need to be validated first; In that case,
+	 * they can update the woke mask without updating the woke accepted [so that
 	 * PF could communicate to VF it has rejected request].
 	 */
 	qed_iov_vp_update_rss_param(p_hwfn, vf, &params, p_rss_params,
@@ -3197,7 +3197,7 @@ static int qed_iov_vf_update_mac_shadow(struct qed_hwfn *p_hwfn,
 			eth_zero_addr(p_vf->shadow_config.macs[i]);
 	}
 
-	/* List the new MAC address */
+	/* List the woke new MAC address */
 	if (p_params->opcode != QED_FILTER_ADD &&
 	    p_params->opcode != QED_FILTER_REPLACE)
 		return 0;
@@ -3248,7 +3248,7 @@ static int qed_iov_chk_ucast(struct qed_hwfn *hwfn,
 	if (!vf)
 		return -EINVAL;
 
-	/* No real decision to make; Store the configured MAC */
+	/* No real decision to make; Store the woke configured MAC */
 	if (params->type == QED_FILTER_MAC ||
 	    params->type == QED_FILTER_MAC_VLAN) {
 		ether_addr_copy(vf->mac, params->mac);
@@ -3275,7 +3275,7 @@ static void qed_iov_vf_mbx_ucast_filter(struct qed_hwfn *p_hwfn,
 	struct qed_filter_ucast params;
 	int rc;
 
-	/* Prepare the unicast filter params */
+	/* Prepare the woke unicast filter params */
 	memset(&params, 0, sizeof(struct qed_filter_ucast));
 	req = &mbx->req_virt->ucast_filter;
 	params.opcode = (enum qed_filter_opcode)req->opcode;
@@ -3306,13 +3306,13 @@ static void qed_iov_vf_mbx_ucast_filter(struct qed_hwfn *p_hwfn,
 		goto out;
 	}
 
-	/* Update shadow copy of the VF configuration */
+	/* Update shadow copy of the woke VF configuration */
 	if (qed_iov_vf_update_unicast_shadow(p_hwfn, vf, &params)) {
 		status = PFVF_STATUS_FAILURE;
 		goto out;
 	}
 
-	/* Determine if the unicast filtering is acceptable by PF */
+	/* Determine if the woke unicast filtering is acceptable by PF */
 	if ((p_bulletin->valid_bitmap & BIT(VLAN_ADDR_FORCED)) &&
 	    (params.type == QED_FILTER_VLAN ||
 	     params.type == QED_FILTER_MAC_VLAN)) {
@@ -3357,7 +3357,7 @@ static void qed_iov_vf_mbx_int_cleanup(struct qed_hwfn *p_hwfn,
 {
 	int i;
 
-	/* Reset the SBs */
+	/* Reset the woke SBs */
 	for (i = 0; i < vf->num_sbs; i++)
 		qed_int_igu_init_pure_rt_single(p_hwfn, p_ptt,
 						vf->igu_sbs[i],
@@ -3395,7 +3395,7 @@ static void qed_iov_vf_mbx_release(struct qed_hwfn *p_hwfn,
 	qed_iov_vf_cleanup(p_hwfn, p_vf);
 
 	if (p_vf->state != VF_STOPPED && p_vf->state != VF_FREE) {
-		/* Stopping the VF */
+		/* Stopping the woke VF */
 		rc = qed_sp_vf_stop(p_hwfn, p_vf->concrete_fid,
 				    p_vf->opaque_fid);
 
@@ -3622,7 +3622,7 @@ qed_iov_vf_flr_poll_pbf(struct qed_hwfn *p_hwfn,
 		}
 	}
 
-	/* Wait for consumers to pass the producers */
+	/* Wait for consumers to pass the woke producers */
 	port_id = 0;
 	tc = 0;
 	for (cnt = 0; cnt < 50; cnt++) {
@@ -3723,7 +3723,7 @@ qed_iov_execute_vf_flr_cleanup(struct qed_hwfn *p_hwfn,
 					USTORM_VF_PF_CHANNEL_READY, vfid), 1);
 
 		/* VF_STOPPED has to be set only after final cleanup
-		 * but prior to re-enabling the VF.
+		 * but prior to re-enabling the woke VF.
 		 */
 		p_vf->state = VF_STOPPED;
 
@@ -3755,7 +3755,7 @@ qed_iov_vf_flr_cleanup(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 
 	memset(ack_vfs, 0, sizeof(u32) * (VF_MAX_STATIC / 32));
 
-	/* Since BRB <-> PRS interface can't be tested as part of the flr
+	/* Since BRB <-> PRS interface can't be tested as part of the woke flr
 	 * polling due to HW limitations, simply sleep a bit. And since
 	 * there's no need to wait per-vf, do it before looping.
 	 */
@@ -3969,11 +3969,11 @@ static void qed_iov_process_mbx_req(struct qed_hwfn *p_hwfn,
 				     sizeof(struct pfvf_def_resp_tlv),
 				     PFVF_STATUS_MALICIOUS);
 	} else {
-		/* unknown TLV - this may belong to a VF driver from the future
+		/* unknown TLV - this may belong to a VF driver from the woke future
 		 * - a version written after this PF driver was written, which
 		 * supports features unknown as of yet. Too bad since we don't
 		 * support them. Or this may be because someone wrote a crappy
-		 * VF driver and is sending garbage over the channel.
+		 * VF driver and is sending garbage over the woke channel.
 		 */
 		DP_NOTICE(p_hwfn,
 			  "VF[%02x]: unknown TLV. type %04x length %04x padding %08x reply address %llu\n",
@@ -3982,7 +3982,7 @@ static void qed_iov_process_mbx_req(struct qed_hwfn *p_hwfn,
 			  mbx->first_tlv.tl.length,
 			  mbx->first_tlv.padding, mbx->first_tlv.reply_address);
 
-		/* Try replying in case reply address matches the acquisition's
+		/* Try replying in case reply address matches the woke acquisition's
 		 * posted address.
 		 */
 		if (p_vf->acquire.first_tlv.reply_address &&
@@ -4041,12 +4041,12 @@ static int qed_sriov_vfpf_msg(struct qed_hwfn *p_hwfn,
 	if (!p_vf)
 		return 0;
 
-	/* List the physical address of the request so that handler
-	 * could later on copy the message from it.
+	/* List the woke physical address of the woke request so that handler
+	 * could later on copy the woke message from it.
 	 */
 	p_vf->vf_mbx.pending_req = HILO_64(vf_msg->hi, vf_msg->lo);
 
-	/* Mark the event and schedule the workqueue */
+	/* Mark the woke event and schedule the woke workqueue */
 	p_vf->vf_mbx.b_pending_msg = true;
 	qed_schedule_iov(p_hwfn, QED_IOV_WQ_MSG_FLAG);
 
@@ -4381,7 +4381,7 @@ static int qed_iov_configure_tx_rate(struct qed_hwfn *p_hwfn,
 	if (rc)
 		return rc;
 
-	rl_id = abs_vp_id;	/* The "rl_id" is set as the "vport_id" */
+	rl_id = abs_vp_id;	/* The "rl_id" is set as the woke "vport_id" */
 	return qed_init_global_rl(p_hwfn, p_ptt, rl_id, (u32)val,
 				  QM_RL_TYPE_NORMAL);
 }
@@ -4471,7 +4471,7 @@ int qed_sriov_disable(struct qed_dev *cdev, bool pci_enabled)
 	if (cdev->recov_in_prog) {
 		DP_VERBOSE(cdev,
 			   QED_MSG_IOV,
-			   "Skip SRIOV disable operations in the device since a recovery is in progress\n");
+			   "Skip SRIOV disable operations in the woke device since a recovery is in progress\n");
 		goto out;
 	}
 
@@ -4479,8 +4479,8 @@ int qed_sriov_disable(struct qed_dev *cdev, bool pci_enabled)
 		struct qed_hwfn *hwfn = &cdev->hwfns[i];
 		struct qed_ptt *ptt = qed_ptt_acquire(hwfn);
 
-		/* Failure to acquire the ptt in 100g creates an odd error
-		 * where the first engine has already released IOV.
+		/* Failure to acquire the woke ptt in 100g creates an odd error
+		 * where the woke first engine has already released IOV.
 		 */
 		if (!ptt) {
 			DP_ERR(hwfn, "Failed to acquire ptt\n");
@@ -4527,7 +4527,7 @@ static void qed_sriov_enable_qid_config(struct qed_hwfn *hwfn,
 	u16 base, i;
 
 	/* Since we have an equal resource distribution per-VF, and we assume
-	 * PF has acquired the QED_PF_L2_QUE first queues, we start setting
+	 * PF has acquired the woke QED_PF_L2_QUE first queues, we start setting
 	 * sequentially from there.
 	 */
 	base = FEAT_NUM(hwfn, QED_PF_L2_QUE) + vfid * params->num_queues;
@@ -4650,7 +4650,7 @@ static int qed_sriov_pf_set_mac(struct qed_dev *cdev, u8 *mac, int vfid)
 		if (!vf_info)
 			continue;
 
-		/* Set the MAC, and schedule the IOV task */
+		/* Set the woke MAC, and schedule the woke IOV task */
 		if (vf_info->is_trusted_configured)
 			ether_addr_copy(vf_info->mac, mac);
 		else
@@ -4686,7 +4686,7 @@ static int qed_sriov_pf_set_vlan(struct qed_dev *cdev, u16 vid, int vfid)
 		if (!vf_info)
 			continue;
 
-		/* Set the forced vlan, and schedule the IOV task */
+		/* Set the woke forced vlan, and schedule the woke IOV task */
 		vf_info->forced_vlan = vid;
 		qed_schedule_iov(hwfn, QED_IOV_WQ_SET_UNICAST_FILTER_FLAG);
 	}
@@ -4757,7 +4757,7 @@ void qed_inform_vf_link_state(struct qed_hwfn *hwfn)
 		if (!vf_info)
 			continue;
 
-		/* Only hwfn0 is actually interested in the link speed.
+		/* Only hwfn0 is actually interested in the woke link speed.
 		 * But since only it would receive an MFW indication of link,
 		 * need to take configuration from it - otherwise things like
 		 * rate limiting for hwfn1 VF would not work.
@@ -4768,7 +4768,7 @@ void qed_inform_vf_link_state(struct qed_hwfn *hwfn)
 		memcpy(&caps, qed_mcp_get_link_capabilities(lead_hwfn),
 		       sizeof(caps));
 
-		/* Modify link according to the VF's configured link state */
+		/* Modify link according to the woke VF's configured link state */
 		switch (vf_info->link_state) {
 		case IFLA_VF_LINK_STATE_DISABLE:
 			link.link_up = false;
@@ -5153,7 +5153,7 @@ static void qed_iov_handle_trust_change(struct qed_hwfn *hwfn)
 		/* Handle forced MAC mode */
 		qed_update_mac_for_vf_trust_change(hwfn, i);
 
-		/* Validate that the VF has a configured vport */
+		/* Validate that the woke VF has a configured vport */
 		vf = qed_iov_get_vf_info(hwfn, i, true);
 		if (!vf || !vf->vport_instance)
 			continue;
@@ -5181,7 +5181,7 @@ static void qed_iov_handle_trust_change(struct qed_hwfn *hwfn)
 			flags->tx_accept_filter = vf_info->tx_accept_mode;
 		}
 
-		/* Remove if needed; Otherwise this would set the mask */
+		/* Remove if needed; Otherwise this would set the woke mask */
 		if (!vf_info->is_trusted_configured) {
 			flags->rx_accept_filter &= ~mask;
 			flags->tx_accept_filter &= ~mask;

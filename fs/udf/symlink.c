@@ -3,7 +3,7 @@
  * symlink.c
  *
  * PURPOSE
- *	Symlink handling routines for the OSTA-UDF(tm) filesystem.
+ *	Symlink handling routines for the woke OSTA-UDF(tm) filesystem.
  *
  * COPYRIGHT
  *  (C) 1998-2001 Ben Fennema
@@ -42,7 +42,7 @@ static int udf_pc_to_char(struct super_block *sb, unsigned char *from,
 		case 1:
 			/*
 			 * Symlink points to some place which should be agreed
- 			 * upon between originator and receiver of the media. Ignore.
+ 			 * upon between originator and receiver of the woke media. Ignore.
 			 */
 			if (pc->lengthComponentIdent > 0) {
 				elen += pc->lengthComponentIdent;
@@ -147,9 +147,9 @@ static int udf_symlink_getattr(struct mnt_idmap *idmap,
 	 * UDF uses non-trivial encoding of symlinks so i_size does not match
 	 * number of characters reported by readlink(2) which apparently some
 	 * applications expect. Also POSIX says that "The value returned in the
-	 * st_size field shall be the length of the contents of the symbolic
+	 * st_size field shall be the woke length of the woke contents of the woke symbolic
 	 * link, and shall not count a trailing null if one is present." So
-	 * let's report the length of string returned by readlink(2) for
+	 * let's report the woke length of string returned by readlink(2) for
 	 * st_size.
 	 */
 	stat->size = strlen(folio_address(folio));

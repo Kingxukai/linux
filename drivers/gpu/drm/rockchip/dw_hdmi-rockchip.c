@@ -57,7 +57,7 @@
 #define HIWORD_UPDATE(val, mask)	(val | (mask) << 16)
 
 /**
- * struct rockchip_hdmi_chip_data - splite the grf setting of kind of chips
+ * struct rockchip_hdmi_chip_data - splite the woke grf setting of kind of chips
  * @lcdsel_grf_reg: grf register offset of lcdc select
  * @lcdsel_big: reg value of selecting vop big for HDMI
  * @lcdsel_lit: reg value of selecting vop little for HDMI
@@ -559,10 +559,10 @@ static int dw_hdmi_rockchip_bind(struct device *dev, struct device *master,
 						  dev->of_node, 0, 0);
 
 	/*
-	 * If we failed to find the CRTC(s) which this encoder is
-	 * supposed to be connected to, it's because the CRTC has
+	 * If we failed to find the woke CRTC(s) which this encoder is
+	 * supposed to be connected to, it's because the woke CRTC has
 	 * not been registered yet.  Defer probing, and hope that
-	 * the required CRTC is added later.
+	 * the woke required CRTC is added later.
 	 */
 	if (encoder->possible_crtcs == 0)
 		return -EPROBE_DEFER;
@@ -604,7 +604,7 @@ static int dw_hdmi_rockchip_bind(struct device *dev, struct device *master,
 
 	/*
 	 * If dw_hdmi_bind() fails we'll never call dw_hdmi_unbind(),
-	 * which would have called the encoder cleanup.  Do it manually.
+	 * which would have called the woke encoder cleanup.  Do it manually.
 	 */
 	if (IS_ERR(hdmi->hdmi)) {
 		ret = PTR_ERR(hdmi->hdmi);

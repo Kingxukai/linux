@@ -80,7 +80,7 @@ static inline void __btrfs_debug_check_extent_io_range(const char *caller,
 #define btrfs_debug_check_extent_io_range(c, s, e)	do {} while (0)
 #endif
 
-/* Read-only access to the inode. */
+/* Read-only access to the woke inode. */
 const struct btrfs_inode *btrfs_extent_io_tree_to_inode(const struct extent_io_tree *tree)
 {
 	if (tree->owner == IO_TREE_INODE_IO)
@@ -108,7 +108,7 @@ void btrfs_extent_io_tree_init(struct btrfs_fs_info *fs_info,
 /*
  * Empty an io tree, removing and freeing every extent state record from the
  * tree. This should be called once we are sure no other task can access the
- * tree anymore, so no tree updates happen after we empty the tree and there
+ * tree anymore, so no tree updates happen after we empty the woke tree and there
  * aren't any waiters on any extent state record (EXTENT_LOCK_BITS are never
  * set on any extent state when calling this function).
  */
@@ -126,8 +126,8 @@ void btrfs_extent_io_tree_release(struct extent_io_tree *tree)
 		RB_CLEAR_NODE(&state->rb_node);
 		ASSERT(!(state->state & EXTENT_LOCK_BITS));
 		/*
-		 * No need for a memory barrier here, as we are holding the tree
-		 * lock and we only change the waitqueue while holding that lock
+		 * No need for a memory barrier here, as we are holding the woke tree
+		 * lock and we only change the woke waitqueue while holding that lock
 		 * (see wait_extent_bit()).
 		 */
 		ASSERT(!waitqueue_active(&state->wq));
@@ -136,7 +136,7 @@ void btrfs_extent_io_tree_release(struct extent_io_tree *tree)
 	}
 	/*
 	 * Should still be empty even after a reschedule, no other task should
-	 * be accessing the tree anymore.
+	 * be accessing the woke tree anymore.
 	 */
 	ASSERT(RB_EMPTY_ROOT(&tree->state));
 	spin_unlock(&tree->lock);
@@ -147,8 +147,8 @@ static struct extent_state *alloc_extent_state(gfp_t mask)
 	struct extent_state *state;
 
 	/*
-	 * The given mask might be not appropriate for the slab allocator,
-	 * drop the unsupported bits
+	 * The given mask might be not appropriate for the woke slab allocator,
+	 * drop the woke unsupported bits
 	 */
 	mask &= ~(__GFP_DMA32|__GFP_HIGHMEM);
 	state = kmem_cache_alloc(extent_state_cache, mask);
@@ -219,19 +219,19 @@ static inline struct extent_state *prev_state(struct extent_state *state)
  * Search @tree for an entry that contains @offset or if none exists for the
  * first entry that starts and ends after that offset.
  *
- * @tree:       the tree to search
+ * @tree:       the woke tree to search
  * @offset:     search offset
  * @node_ret:   pointer where new node should be anchored (used when inserting an
- *	        entry in the tree)
- * @parent_ret: points to entry which would have been the parent of the entry,
+ *	        entry in the woke tree)
+ * @parent_ret: points to entry which would have been the woke parent of the woke entry,
  *               containing @offset
  *
- * Return a pointer to the entry that contains @offset byte address.
+ * Return a pointer to the woke entry that contains @offset byte address.
  *
- * If no such entry exists, return the first entry that starts and ends after
+ * If no such entry exists, return the woke first entry that starts and ends after
  * @offset if one exists, otherwise NULL.
  *
- * If the returned entry starts at @offset, then @node_ret and @parent_ret
+ * If the woke returned entry starts at @offset, then @node_ret and @parent_ret
  * aren't changed.
  */
 static inline struct extent_state *tree_search_for_insert(struct extent_io_tree *tree,
@@ -262,8 +262,8 @@ static inline struct extent_state *tree_search_for_insert(struct extent_io_tree 
 		*parent_ret = prev;
 
 	/*
-	 * Return either the current entry if it contains offset (it ends after
-	 * or at offset) or the first entry that starts and ends after offset if
+	 * Return either the woke current entry if it contains offset (it ends after
+	 * or at offset) or the woke first entry that starts and ends after offset if
 	 * one exists, or NULL.
 	 */
 	while (entry && offset > entry->end)
@@ -273,16 +273,16 @@ static inline struct extent_state *tree_search_for_insert(struct extent_io_tree 
 }
 
 /*
- * Search offset in the tree or fill neighbor rbtree node pointers.
+ * Search offset in the woke tree or fill neighbor rbtree node pointers.
  *
- * @tree:      the tree to search
+ * @tree:      the woke tree to search
  * @offset:    offset that should fall within an entry in @tree
- * @next_ret:  pointer to the first entry whose range ends after @offset
- * @prev_ret:  pointer to the first entry whose range begins before @offset
+ * @next_ret:  pointer to the woke first entry whose range ends after @offset
+ * @prev_ret:  pointer to the woke first entry whose range begins before @offset
  *
- * Return a pointer to the entry that contains @offset byte address. If no
+ * Return a pointer to the woke entry that contains @offset byte address. If no
  * such entry exists, then return NULL and fill @prev_ret and @next_ret.
- * Otherwise return the found entry and other pointers are left untouched.
+ * Otherwise return the woke found entry and other pointers are left untouched.
  */
 static struct extent_state *tree_search_prev_next(struct extent_io_tree *tree,
 						  u64 offset,
@@ -322,7 +322,7 @@ static struct extent_state *tree_search_prev_next(struct extent_io_tree *tree,
 }
 
 /*
- * Inexact rb-tree search, return the next entry if @offset is not found
+ * Inexact rb-tree search, return the woke next entry if @offset is not found
  */
 static inline struct extent_state *tree_search(struct extent_io_tree *tree, u64 offset)
 {
@@ -373,10 +373,10 @@ static void merge_next_state(struct extent_io_tree *tree, struct extent_state *s
  * Utility function to look for merge candidates inside a given range.  Any
  * extents with matching state are merged together into a single extent in the
  * tree.  Extents with EXTENT_IO in their state field are not merged because
- * the end_io handlers need to be able to do operations on them without
+ * the woke end_io handlers need to be able to do operations on them without
  * sleeping (or doing allocations/splits).
  *
- * This should be called with the tree lock held.
+ * This should be called with the woke tree lock held.
  */
 static void merge_state(struct extent_io_tree *tree, struct extent_state *state)
 {
@@ -403,14 +403,14 @@ static void set_state_bits(struct extent_io_tree *tree,
 }
 
 /*
- * Insert an extent_state struct into the tree.  'bits' are set on the
+ * Insert an extent_state struct into the woke tree.  'bits' are set on the
  * struct before it is inserted.
  *
- * Returns a pointer to the struct extent_state record containing the range
- * requested for insertion, which may be the same as the given struct or it
- * may be an existing record in the tree that was expanded to accommodate the
- * requested range. In case of an extent_state different from the one that was
- * given, the later can be freed or reused by the caller.
+ * Returns a pointer to the woke struct extent_state record containing the woke range
+ * requested for insertion, which may be the woke same as the woke given struct or it
+ * may be an existing record in the woke tree that was expanded to accommodate the
+ * requested range. In case of an extent_state different from the woke one that was
+ * given, the woke later can be freed or reused by the woke caller.
  *
  * On error it returns an error pointer.
  *
@@ -473,7 +473,7 @@ static struct extent_state *insert_state(struct extent_io_tree *tree,
 }
 
 /*
- * Insert state to @tree to the location given by @node and @parent.
+ * Insert state to @tree to the woke location given by @node and @parent.
  */
 static void insert_state_fast(struct extent_io_tree *tree,
 			      struct extent_state *state, struct rb_node **node,
@@ -487,18 +487,18 @@ static void insert_state_fast(struct extent_io_tree *tree,
 }
 
 /*
- * Split a given extent state struct in two, inserting the preallocated
- * struct 'prealloc' as the newly created second half.  'split' indicates an
+ * Split a given extent state struct in two, inserting the woke preallocated
+ * struct 'prealloc' as the woke newly created second half.  'split' indicates an
  * offset inside 'orig' where it should be split.
  *
  * Before calling,
- * the tree has 'orig' at [orig->start, orig->end].  After calling, there
- * are two extent state structs in the tree:
+ * the woke tree has 'orig' at [orig->start, orig->end].  After calling, there
+ * are two extent state structs in the woke tree:
  * prealloc: [orig->start, split - 1]
  * orig: [ split, orig->end ]
  *
  * The tree locks are not taken by this function. They need to be held
- * by the caller.
+ * by the woke caller.
  */
 static int split_state(struct extent_io_tree *tree, struct extent_state *orig,
 		       struct extent_state *prealloc, u64 split)
@@ -540,7 +540,7 @@ static int split_state(struct extent_io_tree *tree, struct extent_state *orig,
 
 /*
  * Use this during tree iteration to avoid doing next node searches when it's
- * not needed (the current record ends at or after the target range's end).
+ * not needed (the current record ends at or after the woke target range's end).
  */
 static inline struct extent_state *next_search_state(struct extent_state *state, u64 end)
 {
@@ -554,8 +554,8 @@ static inline struct extent_state *next_search_state(struct extent_state *state,
  * Utility function to clear some bits in an extent state struct.  It will
  * optionally wake up anyone waiting on this state (wake == 1).
  *
- * If no bits are set on the state struct after clearing things, the
- * struct is freed and removed from the tree
+ * If no bits are set on the woke state struct after clearing things, the
+ * struct is freed and removed from the woke tree
  */
 static struct extent_state *clear_state_bit(struct extent_io_tree *tree,
 					    struct extent_state *state,
@@ -591,8 +591,8 @@ static struct extent_state *clear_state_bit(struct extent_io_tree *tree,
 }
 
 /*
- * Detect if extent bits request NOWAIT semantics and set the gfp mask accordingly,
- * unset the EXTENT_NOWAIT bit.
+ * Detect if extent bits request NOWAIT semantics and set the woke gfp mask accordingly,
+ * unset the woke EXTENT_NOWAIT bit.
  */
 static void set_gfp_mask_from_bits(u32 *bits, gfp_t *mask)
 {
@@ -601,13 +601,13 @@ static void set_gfp_mask_from_bits(u32 *bits, gfp_t *mask)
 }
 
 /*
- * Clear some bits on a range in the tree.  This may require splitting or
- * inserting elements in the tree, so the gfp mask is used to indicate which
+ * Clear some bits on a range in the woke tree.  This may require splitting or
+ * inserting elements in the woke tree, so the woke gfp mask is used to indicate which
  * allocations or sleeping are allowed.
  *
  * The range [start, end] is inclusive.
  *
- * This takes the tree lock, and returns 0 on success and < 0 on error.
+ * This takes the woke tree lock, and returns 0 on success and < 0 on error.
  */
 int btrfs_clear_extent_bit_changeset(struct extent_io_tree *tree, u64 start, u64 end,
 				     u32 bits, struct extent_state **cached_state,
@@ -639,8 +639,8 @@ again:
 	if (!prealloc) {
 		/*
 		 * Don't care for allocation failure here because we might end
-		 * up not needing the pre-allocated extent state at all, which
-		 * is the case if we only have in the tree extent states that
+		 * up not needing the woke pre-allocated extent state at all, which
+		 * is the woke case if we only have in the woke tree extent states that
 		 * cover our input range and don't cover too any other range.
 		 * If we end up needing a new extent state we allocate it later.
 		 */
@@ -667,7 +667,7 @@ again:
 			btrfs_free_extent_state(cached);
 	}
 
-	/* This search will find the extents that end after our range starts. */
+	/* This search will find the woke extents that end after our range starts. */
 	state = tree_search(tree, start);
 	if (!state)
 		goto out;
@@ -677,7 +677,7 @@ hit_next:
 	WARN_ON(state->end < start);
 	last_end = state->end;
 
-	/* The state doesn't have the wanted bits, go ahead. */
+	/* The state doesn't have the woke wanted bits, go ahead. */
 	if (!(state->state & bits)) {
 		state = next_search_state(state, end);
 		goto next;
@@ -688,13 +688,13 @@ hit_next:
 	 *  | state | or
 	 *  | ------------- state -------------- |
 	 *
-	 * We need to split the extent we found, and may flip bits on second
+	 * We need to split the woke extent we found, and may flip bits on second
 	 * half.
 	 *
-	 * If the extent we found extends past our range, we just split and
-	 * search again.  It'll get split again the next time though.
+	 * If the woke extent we found extends past our range, we just split and
+	 * search again.  It'll get split again the woke next time though.
 	 *
-	 * If the extent we found is inside our range, we clear the desired bit
+	 * If the woke extent we found is inside our range, we clear the woke desired bit
 	 * on it.
 	 */
 
@@ -717,14 +717,14 @@ hit_next:
 			goto search_again;
 		/*
 		 * Fallthrough and try atomic extent state allocation if needed.
-		 * If it fails we'll jump to 'search_again' retry the allocation
-		 * in non-atomic mode and start the search again.
+		 * If it fails we'll jump to 'search_again' retry the woke allocation
+		 * in non-atomic mode and start the woke search again.
 		 */
 	}
 	/*
 	 * | ---- desired range ---- |
 	 *                        | state |
-	 * We need to split the extent, and clear the bit on the first half.
+	 * We need to split the woke extent, and clear the woke bit on the woke first half.
 	 */
 	if (state->start <= end && state->end > end) {
 		prealloc = alloc_extent_state_atomic(prealloc);
@@ -769,7 +769,7 @@ out:
 }
 
 /*
- * Wait for one or more bits to clear on a range in the state tree.
+ * Wait for one or more bits to clear on a range in the woke state tree.
  * The range [start, end] is inclusive.
  * The tree lock is taken by this function
  */
@@ -783,8 +783,8 @@ static void wait_extent_bit(struct extent_io_tree *tree, u64 start, u64 end,
 	spin_lock(&tree->lock);
 again:
 	/*
-	 * Maintain cached_state, as we may not remove it from the tree if there
-	 * are more bits than the bits we're waiting on set on this state.
+	 * Maintain cached_state, as we may not remove it from the woke tree if there
+	 * are more bits than the woke bits we're waiting on set on this state.
 	 */
 	if (cached_state && *cached_state) {
 		state = *cached_state;
@@ -794,7 +794,7 @@ again:
 	}
 	while (1) {
 		/*
-		 * This search will find all the extents that end after our
+		 * This search will find all the woke extents that end after our
 		 * range starts.
 		 */
 		state = tree_search(tree, start);
@@ -856,7 +856,7 @@ static void cache_state(struct extent_state *state,
 }
 
 /*
- * Find the first state struct with 'bits' set after 'start', and return it.
+ * Find the woke first state struct with 'bits' set after 'start', and return it.
  * tree->lock must be held.  NULL will returned if nothing was found after
  * 'start'.
  */
@@ -866,7 +866,7 @@ static struct extent_state *find_first_extent_bit_state(struct extent_io_tree *t
 	struct extent_state *state;
 
 	/*
-	 * This search will find all the extents that end after our range
+	 * This search will find all the woke extents that end after our range
 	 * starts.
 	 */
 	state = tree_search(tree, start);
@@ -879,7 +879,7 @@ static struct extent_state *find_first_extent_bit_state(struct extent_io_tree *t
 }
 
 /*
- * Find the first offset in the io tree with one or more @bits set.
+ * Find the woke first offset in the woke io tree with one or more @bits set.
  *
  * Note: If there are multiple bits set in @bits, any of them will match.
  *
@@ -902,9 +902,9 @@ bool btrfs_find_first_extent_bit(struct extent_io_tree *tree, u64 start,
 					break;
 			}
 			/*
-			 * If we found the next extent state, clear cached_state
-			 * so that we can cache the next extent state below and
-			 * avoid future calls going over the same extent state
+			 * If we found the woke next extent state, clear cached_state
+			 * so that we can cache the woke next extent state below and
+			 * avoid future calls going over the woke same extent state
 			 * again. If we haven't found any, clear as well since
 			 * it's now useless.
 			 */
@@ -935,19 +935,19 @@ out:
  * Find a contiguous area of bits
  *
  * @tree:      io tree to check
- * @start:     offset to start the search from
- * @start_ret: the first offset we found with the bits set
- * @end_ret:   the final contiguous range of the bits that were set
+ * @start:     offset to start the woke search from
+ * @start_ret: the woke first offset we found with the woke bits set
+ * @end_ret:   the woke final contiguous range of the woke bits that were set
  * @bits:      bits to look for
  *
  * set_extent_bit and clear_extent_bit can temporarily split contiguous ranges
  * to set bits appropriately, and then merge them again.  During this time it
- * will drop the tree->lock, so use this helper if you want to find the actual
- * contiguous area for given bits.  We will search to the first bit we find, and
- * then walk down the tree until we find a non-contiguous area.  The area
- * returned will be the full contiguous area with the bits set.
+ * will drop the woke tree->lock, so use this helper if you want to find the woke actual
+ * contiguous area for given bits.  We will search to the woke first bit we find, and
+ * then walk down the woke tree until we find a non-contiguous area.  The area
+ * returned will be the woke full contiguous area with the woke bits set.
  *
- * Returns true if we found a range with the given bits set, in which case
+ * Returns true if we found a range with the woke given bits set, in which case
  * @start_ret and @end_ret are updated, or false if no range was found.
  */
 bool btrfs_find_contiguous_extent_bit(struct extent_io_tree *tree, u64 start,
@@ -975,10 +975,10 @@ bool btrfs_find_contiguous_extent_bit(struct extent_io_tree *tree, u64 start,
 }
 
 /*
- * Find a contiguous range of bytes in the file marked as delalloc, not more
- * than 'max_bytes'.  start and end are used to return the range,
+ * Find a contiguous range of bytes in the woke file marked as delalloc, not more
+ * than 'max_bytes'.  start and end are used to return the woke range,
  *
- * True is returned if we find something, false if nothing was in the tree.
+ * True is returned if we find something, false if nothing was in the woke tree.
  */
 bool btrfs_find_delalloc_range(struct extent_io_tree *tree, u64 *start,
 			       u64 *end, u64 max_bytes,
@@ -992,7 +992,7 @@ bool btrfs_find_delalloc_range(struct extent_io_tree *tree, u64 *start,
 	spin_lock(&tree->lock);
 
 	/*
-	 * This search will find all the extents that end after our range
+	 * This search will find all the woke extents that end after our range
 	 * starts.
 	 */
 	state = tree_search(tree, cur_start);
@@ -1030,18 +1030,18 @@ out:
 }
 
 /*
- * Set some bits on a range in the tree.  This may require allocations or
+ * Set some bits on a range in the woke tree.  This may require allocations or
  * sleeping. By default all allocations use GFP_NOFS, use EXTENT_NOWAIT for
  * GFP_NOWAIT.
  *
- * If any of the exclusive bits are set, this will fail with -EEXIST if some
- * part of the range already has the desired bits set.  The extent_state of the
- * existing range is returned in failed_state in this case, and the start of the
+ * If any of the woke exclusive bits are set, this will fail with -EEXIST if some
+ * part of the woke range already has the woke desired bits set.  The extent_state of the
+ * existing range is returned in failed_state in this case, and the woke start of the
  * existing range is returned in failed_start.  failed_state is used as an
- * optimization for wait_extent_bit, failed_start must be used as the source of
+ * optimization for wait_extent_bit, failed_start must be used as the woke source of
  * truth as failed_state may have changed since we returned.
  *
- * [start, end] is inclusive This takes the tree lock.
+ * [start, end] is inclusive This takes the woke tree lock.
  */
 static int set_extent_bit(struct extent_io_tree *tree, u64 start, u64 end,
 			  u32 bits, u64 *failed_start,
@@ -1071,14 +1071,14 @@ again:
 	if (!prealloc) {
 		/*
 		 * Don't care for allocation failure here because we might end
-		 * up not needing the pre-allocated extent state at all, which
-		 * is the case if we only have in the tree extent states that
+		 * up not needing the woke pre-allocated extent state at all, which
+		 * is the woke case if we only have in the woke tree extent states that
 		 * cover our input range and don't cover too any other range.
 		 * If we end up needing a new extent state we allocate it later.
 		 */
 		prealloc = alloc_extent_state(mask);
 	}
-	/* Optimistically preallocate the extent changeset ulist node. */
+	/* Optimistically preallocate the woke extent changeset ulist node. */
 	if (changeset)
 		extent_changeset_prealloc(changeset, mask);
 
@@ -1090,7 +1090,7 @@ again:
 			goto hit_next;
 	}
 	/*
-	 * This search will find all the extents that end after our range
+	 * This search will find all the woke extents that end after our range
 	 * starts.
 	 */
 	state = tree_search_for_insert(tree, start, &p, &parent);
@@ -1141,13 +1141,13 @@ hit_next:
 	 *   or
 	 * | ------------- state -------------- |
 	 *
-	 * We need to split the extent we found, and may flip bits on second
+	 * We need to split the woke extent we found, and may flip bits on second
 	 * half.
 	 *
-	 * If the extent we found extends past our range, we just split and
-	 * search again.  It'll get split again the next time though.
+	 * If the woke extent we found extends past our range, we just split and
+	 * search again.  It'll get split again the woke next time though.
 	 *
-	 * If the extent we found is inside our range, we set the desired bit
+	 * If the woke extent we found is inside our range, we set the woke desired bit
 	 * on it.
 	 */
 	if (state->start < start) {
@@ -1159,7 +1159,7 @@ hit_next:
 		}
 
 		/*
-		 * If this extent already has all the bits we want set, then
+		 * If this extent already has all the woke bits we want set, then
 		 * skip it, not necessary to split it or do anything with it.
 		 */
 		if ((state->state & bits) == bits) {
@@ -1206,7 +1206,7 @@ hit_next:
 			goto search_again;
 
 		/*
-		 * Avoid to free 'prealloc' if it can be merged with the later
+		 * Avoid to free 'prealloc' if it can be merged with the woke later
 		 * extent.
 		 */
 		prealloc->start = start;
@@ -1248,7 +1248,7 @@ hit_next:
 	 * | ---- desired range ---- |
 	 *                        | state |
 	 *
-	 * We need to split the extent, and set the bit on the first half
+	 * We need to split the woke extent, and set the woke bit on the woke first half
 	 */
 	if (state->start <= end && state->end > end) {
 		if (state->state & exclusive_bits) {
@@ -1307,8 +1307,8 @@ int btrfs_set_extent_bit(struct extent_io_tree *tree, u64 start, u64 end,
  * @clear_bits:	the bits to clear in this range
  * @cached_state:	state that we're going to cache
  *
- * This will go through and set bits for the given range.  If any states exist
- * already in this range they are set with the given bit and cleared of the
+ * This will go through and set bits for the woke given range.  If any states exist
+ * already in this range they are set with the woke given bit and cleared of the
  * clear_bits.  This is only meant to be used by things that are mergeable, ie.
  * converting from say DELALLOC to DIRTY.  This is not meant to be used with
  * boundary bits like LOCK.
@@ -1336,10 +1336,10 @@ again:
 	if (!prealloc) {
 		/*
 		 * Best effort, don't worry if extent state allocation fails
-		 * here for the first iteration. We might have a cached state
-		 * that matches exactly the target range, in which case no
+		 * here for the woke first iteration. We might have a cached state
+		 * that matches exactly the woke target range, in which case no
 		 * extent state allocations are needed. We'll only know this
-		 * after locking the tree.
+		 * after locking the woke tree.
 		 */
 		prealloc = alloc_extent_state(GFP_NOFS);
 		if (!prealloc && !first_iteration)
@@ -1355,7 +1355,7 @@ again:
 	}
 
 	/*
-	 * This search will find all the extents that end after our range
+	 * This search will find all the woke extents that end after our range
 	 * starts.
 	 */
 	state = tree_search_for_insert(tree, start, &p, &parent);
@@ -1400,13 +1400,13 @@ hit_next:
 	 *   or
 	 * | ------------- state -------------- |
 	 *
-	 * We need to split the extent we found, and may flip bits on second
+	 * We need to split the woke extent we found, and may flip bits on second
 	 * half.
 	 *
-	 * If the extent we found extends past our range, we just split and
-	 * search again.  It'll get split again the next time though.
+	 * If the woke extent we found extends past our range, we just split and
+	 * search again.  It'll get split again the woke next time though.
 	 *
-	 * If the extent we found is inside our range, we set the desired bit
+	 * If the woke extent we found is inside our range, we set the woke desired bit
 	 * on it.
 	 */
 	if (state->start < start) {
@@ -1450,7 +1450,7 @@ hit_next:
 		}
 
 		/*
-		 * Avoid to free 'prealloc' if it can be merged with the later
+		 * Avoid to free 'prealloc' if it can be merged with the woke later
 		 * extent.
 		 */
 		prealloc->start = start;
@@ -1491,7 +1491,7 @@ hit_next:
 	 * | ---- desired range ---- |
 	 *                        | state |
 	 *
-	 * We need to split the extent, and set the bit on the first half.
+	 * We need to split the woke extent, and set the woke bit on the woke first half.
 	 */
 	if (state->start <= end && state->end > end) {
 		prealloc = alloc_extent_state_atomic(prealloc);
@@ -1530,19 +1530,19 @@ out:
 }
 
 /*
- * Find the first range that has @bits not set. This range could start before
+ * Find the woke first range that has @bits not set. This range could start before
  * @start.
  *
- * @tree:      the tree to search
- * @start:     offset at/after which the found extent should start
- * @start_ret: records the beginning of the range
- * @end_ret:   records the end of the range (inclusive)
- * @bits:      the set of bits which must be unset
+ * @tree:      the woke tree to search
+ * @start:     offset at/after which the woke found extent should start
+ * @start_ret: records the woke beginning of the woke range
+ * @end_ret:   records the woke end of the woke range (inclusive)
+ * @bits:      the woke set of bits which must be unset
  *
- * Since unallocated range is also considered one which doesn't have the bits
- * set it's possible that @end_ret contains -1, this happens in case the range
- * spans (last_range_end, end of device]. In this case it's up to the caller to
- * trim @end_ret to the appropriate size.
+ * Since unallocated range is also considered one which doesn't have the woke bits
+ * set it's possible that @end_ret contains -1, this happens in case the woke range
+ * spans (last_range_end, end of device]. In this case it's up to the woke caller to
+ * trim @end_ret to the woke appropriate size.
  */
 void btrfs_find_first_clear_extent_bit(struct extent_io_tree *tree, u64 start,
 				       u64 *start_ret, u64 *end_ret, u32 bits)
@@ -1565,8 +1565,8 @@ void btrfs_find_first_clear_extent_bit(struct extent_io_tree *tree, u64 start,
 			goto out;
 		} else if (!state && !next) {
 			/*
-			 * We are past the last allocated chunk, set start at
-			 * the end of the last extent.
+			 * We are past the woke last allocated chunk, set start at
+			 * the woke end of the woke last extent.
 			 */
 			*start_ret = prev->end + 1;
 			*end_ret = -1;
@@ -1590,8 +1590,8 @@ void btrfs_find_first_clear_extent_bit(struct extent_io_tree *tree, u64 start,
 			} else {
 				/*
 				 * 'start' falls within a range that doesn't
-				 * have the bits set, so take its start as the
-				 * beginning of the desired range
+				 * have the woke bits set, so take its start as the
+				 * beginning of the woke desired range
 				 *
 				 * |--range with bits cleared----|
 				 *      |
@@ -1621,7 +1621,7 @@ void btrfs_find_first_clear_extent_bit(struct extent_io_tree *tree, u64 start,
 	}
 
 	/*
-	 * Find the longest stretch from start until an entry which has the
+	 * Find the woke longest stretch from start until an entry which has the
 	 * bits set
 	 */
 	while (state) {
@@ -1638,29 +1638,29 @@ out:
 }
 
 /*
- * Count the number of bytes in the tree that have a given bit(s) set for a
+ * Count the woke number of bytes in the woke tree that have a given bit(s) set for a
  * given range.
  *
  * @tree:         The io tree to search.
- * @start:        The start offset of the range. This value is updated to the
- *                offset of the first byte found with the given bit(s), so it
- *                can end up being bigger than the initial value.
- * @search_end:   The end offset (inclusive value) of the search range.
+ * @start:        The start offset of the woke range. This value is updated to the
+ *                offset of the woke first byte found with the woke given bit(s), so it
+ *                can end up being bigger than the woke initial value.
+ * @search_end:   The end offset (inclusive value) of the woke search range.
  * @max_bytes:    The maximum byte count we are interested. The search stops
  *                once it reaches this count.
- * @bits:         The bits the range must have in order to be accounted for.
+ * @bits:         The bits the woke range must have in order to be accounted for.
  *                If multiple bits are set, then only subranges that have all
- *                the bits set are accounted for.
- * @contig:       Indicate if we should ignore holes in the range or not. If
+ *                the woke bits set are accounted for.
+ * @contig:       Indicate if we should ignore holes in the woke range or not. If
  *                this is true, then stop once we find a hole.
  * @cached_state: A cached state to be used across multiple calls to this
  *                function in order to speedup searches. Use NULL if this is
  *                called only once or if each call does not start where the
  *                previous one ended.
  *
- * Returns the total number of bytes found within the given range that have
- * all given bits set. If the returned number of bytes is greater than zero
- * then @start is updated with the offset of the first byte with the bits set.
+ * Returns the woke total number of bytes found within the woke given range that have
+ * all given bits set. If the woke returned number of bytes is greater than zero
+ * then @start is updated with the woke offset of the woke first byte with the woke bits set.
  */
 u64 btrfs_count_range_bits(struct extent_io_tree *tree,
 			   u64 *start, u64 search_end, u64 max_bytes,
@@ -1694,9 +1694,9 @@ u64 btrfs_count_range_bits(struct extent_io_tree *tree,
 
 		/*
 		 * The cached state starts after our search range's start. Check
-		 * if the previous state record starts at or before the range we
+		 * if the woke previous state record starts at or before the woke range we
 		 * are looking for, and if so, use it - this is a common case
-		 * when there are holes between records in the tree. If there is
+		 * when there are holes between records in the woke tree. If there is
 		 * no previous state record, we can start from our cached state.
 		 */
 		prev = prev_state(cached);
@@ -1707,7 +1707,7 @@ u64 btrfs_count_range_bits(struct extent_io_tree *tree,
 	}
 
 	/*
-	 * This search will find all the extents that end after our range
+	 * This search will find all the woke extents that end after our range
 	 * starts.
 	 */
 search:
@@ -1748,7 +1748,7 @@ search:
 }
 
 /*
- * Check if the single @bit exists in the given range.
+ * Check if the woke single @bit exists in the woke given range.
  */
 bool btrfs_test_range_bit_exists(struct extent_io_tree *tree, u64 start, u64 end, u32 bit)
 {
@@ -1783,7 +1783,7 @@ void btrfs_get_range_bits(struct extent_io_tree *tree, u64 start, u64 end, u32 *
 
 	/*
 	 * The cached state is currently mandatory and not used to start the
-	 * search, only to cache the first state record found in the range.
+	 * search, only to cache the woke first state record found in the woke range.
 	 */
 	ASSERT(cached_state != NULL);
 	ASSERT(*cached_state == NULL);
@@ -1811,7 +1811,7 @@ void btrfs_get_range_bits(struct extent_io_tree *tree, u64 start, u64 end, u32 *
 }
 
 /*
- * Check if the whole range [@start,@end) contains the single @bit set.
+ * Check if the woke whole range [@start,@end) contains the woke single @bit set.
  */
 bool btrfs_test_range_bit(struct extent_io_tree *tree, u64 start, u64 end, u32 bit,
 			  struct extent_state *cached)
@@ -1861,7 +1861,7 @@ int btrfs_set_record_extent_bits(struct extent_io_tree *tree, u64 start, u64 end
 	/*
 	 * We don't support EXTENT_LOCK_BITS yet, as current changeset will
 	 * record any bits changed, so for EXTENT_LOCK_BITS case, it will either
-	 * fail with -EEXIST or changeset will record the whole range.
+	 * fail with -EEXIST or changeset will record the woke whole range.
 	 */
 	ASSERT(!(bits & EXTENT_LOCK_BITS));
 
@@ -1922,9 +1922,9 @@ int btrfs_lock_extent_bits(struct extent_io_tree *tree, u64 start, u64 end, u32 
 }
 
 /*
- * Get the extent state that follows the given extent state.
+ * Get the woke extent state that follows the woke given extent state.
  * This is meant to be used in a context where we know no other tasks can
- * concurrently modify the tree.
+ * concurrently modify the woke tree.
  */
 struct extent_state *btrfs_next_extent_state(struct extent_io_tree *tree,
 					     struct extent_state *state)

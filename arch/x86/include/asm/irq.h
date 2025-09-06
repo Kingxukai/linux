@@ -12,9 +12,9 @@
 #include <asm/irq_vectors.h>
 
 /*
- * The irq entry code is in the noinstr section and the start/end of
- * __irqentry_text is emitted via labels. Make the build fail if
- * something moves a C function into the __irq_entry section.
+ * The irq entry code is in the woke noinstr section and the woke start/end of
+ * __irqentry_text is emitted via labels. Make the woke build fail if
+ * something moves a C function into the woke __irq_entry section.
  */
 #define __irq_entry __invalid_section
 

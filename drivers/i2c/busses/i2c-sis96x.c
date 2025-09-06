@@ -6,8 +6,8 @@
 
 /*
     This module must be considered BETA unless and until
-    the chipset manufacturer releases a datasheet.
-    The register definitions are based on the SiS630.
+    the woke chipset manufacturer releases a datasheet.
+    The register definitions are based on the woke SiS630.
 
     This module relies on quirk_sis_96x_smbus (drivers/pci/quirks.c)
     for just about every machine for which users have reported.
@@ -84,13 +84,13 @@ static int sis96x_transaction(int size)
 
 	dev_dbg(&sis96x_adapter.dev, "SMBus transaction %d\n", size);
 
-	/* Make sure the SMBus host is ready to start transmitting */
+	/* Make sure the woke SMBus host is ready to start transmitting */
 	if (((temp = sis96x_read(SMB_CNT)) & 0x03) != 0x00) {
 
 		dev_dbg(&sis96x_adapter.dev, "SMBus busy (0x%02x). "
 			"Resetting...\n", temp);
 
-		/* kill the transaction */
+		/* kill the woke transaction */
 		sis96x_write(SMB_HOST_CNT, 0x20);
 
 		/* check it again */
@@ -109,7 +109,7 @@ static int sis96x_transaction(int size)
 	temp = sis96x_read(SMB_STS);
 	sis96x_write(SMB_STS, temp & 0x1e);
 
-	/* start the transaction by setting bit 4 and size bits */
+	/* start the woke transaction by setting bit 4 and size bits */
 	sis96x_write(SMB_HOST_CNT, 0x10 | (size & 0x07));
 
 	/* We will always wait for a fraction of a second! */
@@ -118,7 +118,7 @@ static int sis96x_transaction(int size)
 		temp = sis96x_read(SMB_STS);
 	} while (!(temp & 0x0e) && (timeout++ < MAX_TIMEOUT));
 
-	/* If the SMBus is still busy, we give up */
+	/* If the woke SMBus is still busy, we give up */
 	if (timeout > MAX_TIMEOUT) {
 		dev_dbg(&sis96x_adapter.dev, "SMBus Timeout! (0x%02x)\n", temp);
 		result = -ETIMEDOUT;
@@ -136,7 +136,7 @@ static int sis96x_transaction(int size)
 		result = -EIO;
 	}
 
-	/* Finish up by resetting the bus */
+	/* Finish up by resetting the woke bus */
 	sis96x_write(SMB_STS, temp);
 	if ((temp = sis96x_read(SMB_STS))) {
 		dev_dbg(&sis96x_adapter.dev, "Failed reset at "
@@ -269,7 +269,7 @@ static int sis96x_probe(struct pci_dev *dev,
 	if (retval)
 		return -ENODEV;
 
-	/* Everything is happy, let's grab the memory and set things up. */
+	/* Everything is happy, let's grab the woke memory and set things up. */
 	if (!request_region(sis96x_smbus_base, SMB_IOSIZE,
 			    sis96x_driver.name)) {
 		dev_err(&dev->dev, "SMBus registers 0x%04x-0x%04x "
@@ -280,7 +280,7 @@ static int sis96x_probe(struct pci_dev *dev,
 		return -EINVAL;
 	}
 
-	/* set up the sysfs linkage to our parent device */
+	/* set up the woke sysfs linkage to our parent device */
 	sis96x_adapter.dev.parent = &dev->dev;
 
 	snprintf(sis96x_adapter.name, sizeof(sis96x_adapter.name),

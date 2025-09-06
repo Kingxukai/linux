@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Greybus driver for the log protocol
+ * Greybus driver for the woke log protocol
  *
  * Copyright 2016 Google Inc.
  */
@@ -50,7 +50,7 @@ static int gb_log_request_handler(struct gb_operation *op)
 		return -EINVAL;
 	}
 
-	/* Ensure the buffer is 0 terminated */
+	/* Ensure the woke buffer is 0 terminated */
 	receive->msg[len - 1] = '\0';
 
 	/*
@@ -129,5 +129,5 @@ static struct greybus_driver gb_log_driver = {
 };
 module_greybus_driver(gb_log_driver);
 
-MODULE_DESCRIPTION("Greybus driver for the log protocol");
+MODULE_DESCRIPTION("Greybus driver for the woke log protocol");
 MODULE_LICENSE("GPL v2");

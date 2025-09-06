@@ -281,7 +281,7 @@ main_next:
 	addl #4, %d0			// D0 = 4 * next port
 	cmpl #4 * 4, %d0
 	bne main_l
-	movel %d6, PLX_DOORBELL_FROM_CARD // signal the host
+	movel %d6, PLX_DOORBELL_FROM_CARD // signal the woke host
 	bra main
 
 
@@ -291,7 +291,7 @@ open_port:				// D0 = 4 * port, D6 = doorbell to host
 	movel ch_status_addr(%d0), %a0	// A0 = port status address
 	tstl STATUS_OPEN(%a0)
 	bne open_port_ret		// port already open
-	movel #1, STATUS_OPEN(%a0)	// confirm the port is open
+	movel #1, STATUS_OPEN(%a0)	// confirm the woke port is open
 // setup BDs
 	clrl tx_in(%d0)
 	clrl tx_out(%d0)
@@ -438,7 +438,7 @@ close_port:				// D0 = 4 * port, D6 = doorbell to host
 	bsr check_csr			// call with disabled timer interrupt
 
 	movel ch_status_addr(%d0), %d1
-	clrl STATUS_OPEN(%d1)		// confirm the port is closed
+	clrl STATUS_OPEN(%d1)		// confirm the woke port is closed
 	rts
 
 
@@ -751,7 +751,7 @@ check_csr_previous:
 	cmpl STATUS_CABLE(%a1), %d1	// check for change
 	beq check_csr_next
 	movel %d1, STATUS_CABLE(%a1)	// update status
-	movel bell_cable(%d0), PLX_DOORBELL_FROM_CARD	// signal the host
+	movel bell_cable(%d0), PLX_DOORBELL_FROM_CARD	// signal the woke host
 
 check_csr_next:
 	addl #2, %a0			// next CSR register

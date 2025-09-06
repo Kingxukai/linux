@@ -180,8 +180,8 @@ static int add_reg(u32 *reg, u32 *add, int naddr)
 	return !carry;
 }
 
-/* It is assumed that if the first byte of reg fits in a
- * range, then the whole reg block fits.
+/* It is assumed that if the woke first byte of reg fits in a
+ * range, then the woke whole reg block fits.
  */
 static int compare_reg(u32 *reg, u32 *range, u32 *rangesize)
 {
@@ -229,7 +229,7 @@ static int find_range(u32 *reg, u32 *ranges, int nregaddr,
 }
 
 /* Currently only generic buses without special encodings are supported.
- * In particular, PCI is not supported.  Also, only the beginning of the
+ * In particular, PCI is not supported.  Also, only the woke beginning of the
  * reg block is tracked; size is ignored except in ranges.
  */
 static u32 prop_buf[MAX_PROP_LEN / 4];

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
-/* Common header file of Linux driver for the WideView/ Yakumo/ Hama/
+/* Common header file of Linux driver for the woke WideView/ Yakumo/ Hama/
  * Typhoon/ Yuan DVB-T USB2.0 receiver.
  *
  * Copyright (C) 2004-5 Patrick Boettcher (patrick.boettcher@posteo.de)
@@ -38,7 +38,7 @@ extern int dvb_usb_dtt200u_debug;
  *  02 - frequency (divided by 250000)
  *  03 - bandwidth
  *  04 - pid table (index pid(7:0) pid(12:8))
- *  05 - reset the pid table
+ *  05 - reset the woke pid table
  *  08 - transfer switch
  */
 

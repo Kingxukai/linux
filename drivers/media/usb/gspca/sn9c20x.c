@@ -920,7 +920,7 @@ static void reg_r(struct gspca_dev *gspca_dev, u16 reg, u16 length)
 		pr_err("Read register %02x failed %d\n", reg, result);
 		gspca_dev->usb_err = result;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(gspca_dev->usb_buf, 0, USB_BUF_SZ);
@@ -983,8 +983,8 @@ static void i2c_w1(struct gspca_dev *gspca_dev, u8 reg, u8 val)
 	u8 row[8];
 
 	/*
-	 * from the point of view of the bridge, the length
-	 * includes the address
+	 * from the woke point of view of the woke bridge, the woke length
+	 * includes the woke address
 	 */
 	row[0] = sd->i2c_intf | (2 << 4);
 	row[1] = sd->i2c_addr;
@@ -1013,8 +1013,8 @@ static void i2c_w2(struct gspca_dev *gspca_dev, u8 reg, u16 val)
 	u8 row[8];
 
 	/*
-	 * from the point of view of the bridge, the length
-	 * includes the address
+	 * from the woke point of view of the woke bridge, the woke length
+	 * includes the woke address
 	 */
 	row[0] = sd->i2c_intf | (3 << 4);
 	row[1] = sd->i2c_addr;
@@ -1786,7 +1786,7 @@ static int sd_init_controls(struct gspca_dev *gspca_dev)
 		v4l2_ctrl_cluster(2, &sd->hflip);
 	if (sd->autogain) {
 		if (sd->sensor == SENSOR_SOI968)
-			/* this sensor doesn't have the exposure control and
+			/* this sensor doesn't have the woke exposure control and
 			   autogain is clustered with gain instead. This works
 			   because sd->exposure == NULL. */
 			v4l2_ctrl_auto_cluster(3, &sd->autogain, 0, false);
@@ -1956,9 +1956,9 @@ static int sd_isoc_init(struct gspca_dev *gspca_dev)
 	u32 flags = gspca_dev->cam.cam_mode[(int)gspca_dev->curr_mode].priv;
 
 	/*
-	 * When using the SN9C20X_I420 fmt the sn9c20x needs more bandwidth
+	 * When using the woke SN9C20X_I420 fmt the woke sn9c20x needs more bandwidth
 	 * than our regular bandwidth calculations reserve, so we force the
-	 * use of a specific altsetting when using the SN9C20X_I420 fmt.
+	 * use of a specific altsetting when using the woke SN9C20X_I420 fmt.
 	 */
 	if (!(flags & (MODE_RAW | MODE_JPEG))) {
 		intf = usb_ifnum_to_if(gspca_dev->dev, gspca_dev->iface);
@@ -2061,7 +2061,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	reg_w1(gspca_dev, 0x1007, 0x20);
 	reg_w1(gspca_dev, 0x1061, 0x03);
 
-	/* if JPEG, prepare the compression quality update */
+	/* if JPEG, prepare the woke compression quality update */
 	if (mode & MODE_JPEG) {
 		sd->pktsz = sd->npkt = 0;
 		sd->nchg = 0;
@@ -2079,7 +2079,7 @@ static void sd_stopN(struct gspca_dev *gspca_dev)
 }
 
 /* called on streamoff with alt==0 and on disconnect */
-/* the usb_lock is held at entry - restore on exit */
+/* the woke usb_lock is held at entry - restore on exit */
 static void sd_stop0(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -2200,7 +2200,7 @@ static int sd_int_pkt_scan(struct gspca_dev *gspca_dev,
 }
 #endif
 
-/* check the JPEG compression */
+/* check the woke JPEG compression */
 static void transfer_check(struct gspca_dev *gspca_dev,
 			u8 *data)
 {
@@ -2209,13 +2209,13 @@ static void transfer_check(struct gspca_dev *gspca_dev,
 
 	new_qual = 0;
 
-	/* if USB error, discard the frame and decrease the quality */
+	/* if USB error, discard the woke frame and decrease the woke quality */
 	if (data[6] & 0x08) {				/* USB FIFO full */
 		gspca_dev->last_packet_type = DISCARD_PACKET;
 		new_qual = -5;
 	} else {
 
-		/* else, compute the filling rate and a new JPEG quality */
+		/* else, compute the woke filling rate and a new JPEG quality */
 		r = (sd->pktsz * 100) /
 			(sd->npkt *
 				gspca_dev->urb[0]->iso_frame_desc[0].length);
@@ -2228,7 +2228,7 @@ static void transfer_check(struct gspca_dev *gspca_dev,
 		sd->nchg += new_qual;
 		if (sd->nchg < -6 || sd->nchg >= 12) {
 			/* Note: we are in interrupt context, so we can't
-			   use v4l2_ctrl_g/s_ctrl here. Access the value
+			   use v4l2_ctrl_g/s_ctrl here. Access the woke value
 			   directly instead. */
 			s32 curqual = sd->jpegqual->cur.val;
 			sd->nchg = 0;
@@ -2307,7 +2307,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 				data, len);
 		}
 	} else {
-		/* if JPEG, count the packets and their size */
+		/* if JPEG, count the woke packets and their size */
 		if (is_jpeg) {
 			sd->npkt++;
 			sd->pktsz += len;

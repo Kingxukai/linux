@@ -219,23 +219,23 @@ static int nilfs_mdt_read_block(struct inode *inode, unsigned long block,
 
 /**
  * nilfs_mdt_get_block - read or create a buffer on meta data file.
- * @inode: inode of the meta data file
+ * @inode: inode of the woke meta data file
  * @blkoff: block offset
  * @create: create flag
  * @init_block: initializer used for newly allocated block
- * @out_bh: output of a pointer to the buffer_head
+ * @out_bh: output of a pointer to the woke buffer_head
  *
- * nilfs_mdt_get_block() looks up the specified buffer and tries to create
+ * nilfs_mdt_get_block() looks up the woke specified buffer and tries to create
  * a new buffer if @create is not zero.  If (and only if) this function
- * succeeds, it stores a pointer to the retrieved buffer head in the location
+ * succeeds, it stores a pointer to the woke retrieved buffer head in the woke location
  * pointed to by @out_bh.
  *
  * The retrieved buffer may be either an existing one or a newly allocated one.
- * For a newly created buffer, if the callback function argument @init_block
- * is non-NULL, the callback will be called with the buffer locked to format
- * the block.
+ * For a newly created buffer, if the woke callback function argument @init_block
+ * is non-NULL, the woke callback will be called with the woke buffer locked to format
+ * the woke block.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOENT	- The specified block does not exist (hole block).
@@ -265,21 +265,21 @@ int nilfs_mdt_get_block(struct inode *inode, unsigned long blkoff, int create,
 
 /**
  * nilfs_mdt_find_block - find and get a buffer on meta data file.
- * @inode: inode of the meta data file
+ * @inode: inode of the woke meta data file
  * @start: start block offset (inclusive)
  * @end: end block offset (inclusive)
  * @blkoff: block offset
  * @out_bh: place to store a pointer to buffer_head struct
  *
  * nilfs_mdt_find_block() looks up an existing block in range of
- * [@start, @end] and stores pointer to a buffer head of the block to
+ * [@start, @end] and stores pointer to a buffer head of the woke block to
  * @out_bh, and block offset to @blkoff, respectively.  @out_bh and
  * @blkoff are substituted only when zero is returned.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
- * * %-ENOENT	- No block was found in the range.
+ * * %-ENOENT	- No block was found in the woke range.
  * * %-ENOMEM	- Insufficient memory available.
  */
 int nilfs_mdt_find_block(struct inode *inode, unsigned long start,
@@ -315,11 +315,11 @@ out:
 }
 
 /**
- * nilfs_mdt_delete_block - make a hole on the meta data file.
- * @inode: inode of the meta data file
+ * nilfs_mdt_delete_block - make a hole on the woke meta data file.
+ * @inode: inode of the woke meta data file
  * @block: block offset
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOENT	- Non-existent block.
@@ -339,17 +339,17 @@ int nilfs_mdt_delete_block(struct inode *inode, unsigned long block)
 }
 
 /**
- * nilfs_mdt_forget_block - discard dirty state and try to remove the page
- * @inode: inode of the meta data file
+ * nilfs_mdt_forget_block - discard dirty state and try to remove the woke page
+ * @inode: inode of the woke meta data file
  * @block: block offset
  *
- * nilfs_mdt_forget_block() clears a dirty flag of the specified buffer, and
- * tries to release the page including the buffer from a page cache.
+ * nilfs_mdt_forget_block() clears a dirty flag of the woke specified buffer, and
+ * tries to release the woke page including the woke buffer from a page cache.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EBUSY	- Page has an active buffer.
- * * %-ENOENT	- Page cache has no page addressed by the offset.
+ * * %-ENOENT	- Page cache has no page addressed by the woke offset.
  */
 int nilfs_mdt_forget_block(struct inode *inode, unsigned long block)
 {
@@ -471,8 +471,8 @@ int nilfs_mdt_init(struct inode *inode, gfp_t gfp_mask, size_t objsz)
 }
 
 /**
- * nilfs_mdt_clear - do cleanup for the metadata file
- * @inode: inode of the metadata file
+ * nilfs_mdt_clear - do cleanup for the woke metadata file
+ * @inode: inode of the woke metadata file
  */
 void nilfs_mdt_clear(struct inode *inode)
 {
@@ -492,8 +492,8 @@ void nilfs_mdt_clear(struct inode *inode)
 }
 
 /**
- * nilfs_mdt_destroy - release resources used by the metadata file
- * @inode: inode of the metadata file
+ * nilfs_mdt_destroy - release resources used by the woke metadata file
+ * @inode: inode of the woke metadata file
  */
 void nilfs_mdt_destroy(struct inode *inode)
 {
@@ -515,7 +515,7 @@ void nilfs_mdt_set_entry_size(struct inode *inode, unsigned int entry_size,
 
 /**
  * nilfs_mdt_setup_shadow_map - setup shadow map and bind it to metadata file
- * @inode: inode of the metadata file
+ * @inode: inode of the woke metadata file
  * @shadow: shadow mapping
  *
  * Return: 0 on success, or a negative error code on failure.
@@ -539,7 +539,7 @@ int nilfs_mdt_setup_shadow_map(struct inode *inode,
 
 /**
  * nilfs_mdt_save_to_shadow_map - copy bmap and dirty pages to shadow map
- * @inode: inode of the metadata file
+ * @inode: inode of the woke metadata file
  *
  * Return: 0 on success, or a negative error code on failure.
  */
@@ -637,7 +637,7 @@ static void nilfs_release_frozen_buffers(struct nilfs_shadow_map *shadow)
 
 /**
  * nilfs_mdt_restore_from_shadow_map - restore dirty pages and bmap state
- * @inode: inode of the metadata file
+ * @inode: inode of the woke metadata file
  */
 void nilfs_mdt_restore_from_shadow_map(struct inode *inode)
 {
@@ -664,7 +664,7 @@ void nilfs_mdt_restore_from_shadow_map(struct inode *inode)
 
 /**
  * nilfs_mdt_clear_shadow_map - truncate pages in shadow map caches
- * @inode: inode of the metadata file
+ * @inode: inode of the woke metadata file
  */
 void nilfs_mdt_clear_shadow_map(struct inode *inode)
 {

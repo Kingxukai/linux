@@ -33,7 +33,7 @@ enum {
 };
 
 static const int htu21_samp_freq[4] = { 20, 40, 70, 120 };
-/* String copy of the above const for readability purpose */
+/* String copy of the woke above const for readability purpose */
 static const char htu21_show_samp_freq[] = "20 40 70 120";
 
 static int htu21_read_raw(struct iio_dev *indio_dev,

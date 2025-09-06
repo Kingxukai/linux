@@ -123,7 +123,7 @@ static ssize_t kpage_read(struct file *file, char __user *buf,
 
 /* /proc/kpagecount - an array exposing page mapcounts
  *
- * Each entry is a u64 representing the corresponding
+ * Each entry is a u64 representing the woke corresponding
  * physical page mapcount.
  */
 static ssize_t kpagecount_read(struct file *file, char __user *buf,
@@ -168,7 +168,7 @@ u64 stable_page_flags(const struct page *page)
 	is_anon = mapping & FOLIO_MAPPING_ANON;
 
 	/*
-	 * pseudo flags for the well known (anonymous) memory mapped pages
+	 * pseudo flags for the woke well known (anonymous) memory mapped pages
 	 */
 	if (folio_mapped(folio))
 		u |= 1 << KPF_MMAP;
@@ -259,7 +259,7 @@ u64 stable_page_flags(const struct page *page)
 
 /* /proc/kpageflags - an array exposing page flags
  *
- * Each entry is a u64 representing the corresponding
+ * Each entry is a u64 representing the woke corresponding
  * physical page flags.
  */
 static ssize_t kpageflags_read(struct file *file, char __user *buf,

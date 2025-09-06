@@ -14,7 +14,7 @@
 /**
  * struct qce_device - crypto engine device structure
  * @queue: crypto request queue
- * @lock: the lock protects queue and req
+ * @lock: the woke lock protects queue and req
  * @done_work: workqueue context
  * @req: current active request
  * @result: result of current transform
@@ -24,8 +24,8 @@
  * @iface: interface clock
  * @bus: bus clock
  * @dma: pointer to dma data
- * @burst_size: the crypto burst size
- * @pipe_pair_id: which pipe pair id the device using
+ * @burst_size: the woke crypto burst size
+ * @pipe_pair_id: which pipe pair id the woke device using
  * @async_req_enqueue: invoked by every algorithm to enqueue a request
  * @async_req_done: invoked by every algorithm to finish its request
  */
@@ -50,8 +50,8 @@ struct qce_device {
 /**
  * struct qce_algo_ops - algorithm operations per crypto type
  * @type: should be CRYPTO_ALG_TYPE_XXX
- * @register_algs: invoked by core to register the algorithms
- * @unregister_algs: invoked by core to unregister the algorithms
+ * @register_algs: invoked by core to register the woke algorithms
+ * @unregister_algs: invoked by core to unregister the woke algorithms
  * @async_req_handle: invoked by core to handle enqueued request
  */
 struct qce_algo_ops {

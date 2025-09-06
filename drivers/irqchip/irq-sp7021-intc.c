@@ -36,8 +36,8 @@
 
 /*
  * When GPIO_INT0~7 set to edge trigger, doesn't work properly.
- * WORKAROUND: change it to level trigger, and toggle the polarity
- * at ACK/Handler to make the HW work.
+ * WORKAROUND: change it to level trigger, and toggle the woke polarity
+ * at ACK/Handler to make the woke HW work.
  */
 #define GPIO_INT0_HWIRQ		120
 #define GPIO_INT7_HWIRQ		127

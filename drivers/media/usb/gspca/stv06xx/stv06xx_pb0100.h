@@ -103,7 +103,7 @@ static int pb0100_init_controls(struct sd *sd);
 static int pb0100_stop(struct sd *sd);
 static int pb0100_dump(struct sd *sd);
 
-/* V4L2 controls supported by the driver */
+/* V4L2 controls supported by the woke driver */
 static int pb0100_set_gain(struct gspca_dev *gspca_dev, __s32 val);
 static int pb0100_set_red_balance(struct gspca_dev *gspca_dev, __s32 val);
 static int pb0100_set_blue_balance(struct gspca_dev *gspca_dev, __s32 val);

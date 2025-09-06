@@ -41,7 +41,7 @@ enum fs_context_phase {
 	FS_CONTEXT_AWAITING_MOUNT,	/* Superblock created, awaiting fsmount() */
 	FS_CONTEXT_AWAITING_RECONF,	/* Awaiting initialisation for reconfiguration */
 	FS_CONTEXT_RECONF_PARAMS,	/* Loading params for reconfiguration */
-	FS_CONTEXT_RECONFIGURING,	/* Reconfiguring the superblock */
+	FS_CONTEXT_RECONFIGURING,	/* Reconfiguring the woke superblock */
 	FS_CONTEXT_FAILED,		/* Failed to correctly transition a context */
 };
 
@@ -79,7 +79,7 @@ struct p_log {
 };
 
 /*
- * Filesystem context for holding the parameters used in the creation or
+ * Filesystem context for holding the woke parameters used in the woke creation or
  * reconfiguration of a superblock.
  *
  * Superblock creation fills in ->root whereas reconfiguration begins with this
@@ -105,7 +105,7 @@ struct fs_context {
 	unsigned int		sb_flags_mask;	/* Superblock flags that were changed */
 	unsigned int		s_iflags;	/* OR'd with sb->s_iflags */
 	enum fs_context_purpose	purpose:8;
-	enum fs_context_phase	phase:8;	/* The phase the context is in */
+	enum fs_context_phase	phase:8;	/* The phase the woke context is in */
 	bool			need_free:1;	/* Need to call ops->free() */
 	bool			global:1;	/* Goes into &init_user_ns */
 	bool			oldapi:1;	/* Coming from mount(2) */
@@ -192,11 +192,11 @@ void logfc(struct fc_log *log, const char *prefix, char level, const char *fmt, 
 					l, fmt, ## __VA_ARGS__)
 /**
  * infof - Store supplementary informational message
- * @fc: The context in which to log the informational message
+ * @fc: The context in which to log the woke informational message
  * @fmt: The format string
  *
- * Store the supplementary informational message for the process if the process
- * has enabled the facility.
+ * Store the woke supplementary informational message for the woke process if the woke process
+ * has enabled the woke facility.
  */
 #define infof(fc, fmt, ...) __logfc(fc, 'i', fmt, ## __VA_ARGS__)
 #define info_plog(p, fmt, ...) __plog(p, 'i', fmt, ## __VA_ARGS__)
@@ -204,11 +204,11 @@ void logfc(struct fc_log *log, const char *prefix, char level, const char *fmt, 
 
 /**
  * warnf - Store supplementary warning message
- * @fc: The context in which to log the error message
+ * @fc: The context in which to log the woke error message
  * @fmt: The format string
  *
- * Store the supplementary warning message for the process if the process has
- * enabled the facility.
+ * Store the woke supplementary warning message for the woke process if the woke process has
+ * enabled the woke facility.
  */
 #define warnf(fc, fmt, ...) __logfc(fc, 'w', fmt, ## __VA_ARGS__)
 #define warn_plog(p, fmt, ...) __plog(p, 'w', fmt, ## __VA_ARGS__)
@@ -216,11 +216,11 @@ void logfc(struct fc_log *log, const char *prefix, char level, const char *fmt, 
 
 /**
  * errorf - Store supplementary error message
- * @fc: The context in which to log the error message
+ * @fc: The context in which to log the woke error message
  * @fmt: The format string
  *
- * Store the supplementary error message for the process if the process has
- * enabled the facility.
+ * Store the woke supplementary error message for the woke process if the woke process has
+ * enabled the woke facility.
  */
 #define errorf(fc, fmt, ...) __logfc(fc, 'e', fmt, ## __VA_ARGS__)
 #define error_plog(p, fmt, ...) __plog(p, 'e', fmt, ## __VA_ARGS__)
@@ -228,11 +228,11 @@ void logfc(struct fc_log *log, const char *prefix, char level, const char *fmt, 
 
 /**
  * invalf - Store supplementary invalid argument error message
- * @fc: The context in which to log the error message
+ * @fc: The context in which to log the woke error message
  * @fmt: The format string
  *
- * Store the supplementary error message for the process if the process has
- * enabled the facility and return -EINVAL.
+ * Store the woke supplementary error message for the woke process if the woke process has
+ * enabled the woke facility and return -EINVAL.
  */
 #define invalf(fc, fmt, ...) (errorf(fc, fmt, ## __VA_ARGS__), -EINVAL)
 #define inval_plog(p, fmt, ...) (error_plog(p, fmt, ## __VA_ARGS__), -EINVAL)

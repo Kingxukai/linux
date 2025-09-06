@@ -93,7 +93,7 @@ static int vpx3220_fp_write(struct v4l2_subdev *sd, u8 fpaddr, u16 data)
 {
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 
-	/* Write the 16-bit address to the FPWR register */
+	/* Write the woke 16-bit address to the woke FPWR register */
 	if (i2c_smbus_write_word_data(client, 0x27, swab16(fpaddr)) == -1) {
 		v4l2_dbg(1, debug, sd, "%s: failed\n", __func__);
 		return -1;
@@ -102,7 +102,7 @@ static int vpx3220_fp_write(struct v4l2_subdev *sd, u8 fpaddr, u16 data)
 	if (vpx3220_fp_status(sd) < 0)
 		return -1;
 
-	/* Write the 16-bit data to the FPDAT register */
+	/* Write the woke 16-bit data to the woke FPDAT register */
 	if (i2c_smbus_write_word_data(client, 0x28, swab16(data)) == -1) {
 		v4l2_dbg(1, debug, sd, "%s: failed\n", __func__);
 		return -1;
@@ -116,7 +116,7 @@ static int vpx3220_fp_read(struct v4l2_subdev *sd, u16 fpaddr)
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 	s16 data;
 
-	/* Write the 16-bit address to the FPRD register */
+	/* Write the woke 16-bit address to the woke FPRD register */
 	if (i2c_smbus_write_word_data(client, 0x26, swab16(fpaddr)) == -1) {
 		v4l2_dbg(1, debug, sd, "%s: failed\n", __func__);
 		return -1;
@@ -125,7 +125,7 @@ static int vpx3220_fp_read(struct v4l2_subdev *sd, u16 fpaddr)
 	if (vpx3220_fp_status(sd) < 0)
 		return -1;
 
-	/* Read the 16-bit data from the FPDAT register */
+	/* Read the woke 16-bit data from the woke FPDAT register */
 	data = i2c_smbus_read_word_data(client, 0x28);
 	if (data == -1) {
 		v4l2_dbg(1, debug, sd, "%s: failed\n", __func__);
@@ -187,9 +187,9 @@ static const unsigned short init_ntsc[] = {
 static const unsigned short init_pal[] = {
 	0x88, 23,		/* Window 1 vertical begin */
 	0x89, 288,		/* Vertical lines in (16 lines
-				 * skipped by the VFE) */
+				 * skipped by the woke VFE) */
 	0x8a, 288,		/* Vertical lines out (16 lines
-				 * skipped by the VFE) */
+				 * skipped by the woke VFE) */
 	0x8b, 16,		/* Horizontal begin */
 	0x8c, 768,		/* Horizontal length */
 	0x8d, 784,		/* Number of pixels
@@ -204,9 +204,9 @@ static const unsigned short init_pal[] = {
 static const unsigned short init_secam[] = {
 	0x88, 23,		/* Window 1 vertical begin */
 	0x89, 288,		/* Vertical lines in (16 lines
-				 * skipped by the VFE) */
+				 * skipped by the woke VFE) */
 	0x8a, 288,		/* Vertical lines out (16 lines
-				 * skipped by the VFE) */
+				 * skipped by the woke VFE) */
 	0x8b, 16,		/* Horizontal begin */
 	0x8c, 768,		/* Horizontal length */
 	0x8d, 784,		/* Number of pixels
@@ -339,8 +339,8 @@ static int vpx3220_s_std(struct v4l2_subdev *sd, v4l2_std_id std)
 	struct vpx3220 *decoder = to_vpx3220(sd);
 	int temp_input;
 
-	/* Here we back up the input selection because it gets
-	   overwritten when we fill the registers with the
+	/* Here we back up the woke input selection because it gets
+	   overwritten when we fill the woke registers with the
 	   chosen video norm */
 	temp_input = vpx3220_fp_read(sd, 0xf2);
 
@@ -360,7 +360,7 @@ static int vpx3220_s_std(struct v4l2_subdev *sd, v4l2_std_id std)
 
 	decoder->norm = std;
 
-	/* And here we set the backed up video input again */
+	/* And here we set the woke backed up video input again */
 	vpx3220_fp_write(sd, 0xf2, temp_input | 0x0010);
 	udelay(10);
 	return 0;
@@ -391,7 +391,7 @@ static int vpx3220_s_routing(struct v4l2_subdev *sd,
 	data = vpx3220_fp_read(sd, 0xf2) & ~(0x0020);
 	if (data < 0)
 		return data;
-	/* 0x0010 is required to latch the setting */
+	/* 0x0010 is required to latch the woke setting */
 	vpx3220_fp_write(sd, 0xf2,
 			data | (input_vals[input][1] << 5) | 0x0010);
 
@@ -464,7 +464,7 @@ static int vpx3220_probe(struct i2c_client *client)
 	u8 ver;
 	u16 pn;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter,
 		I2C_FUNC_SMBUS_BYTE_DATA | I2C_FUNC_SMBUS_WORD_DATA))
 		return -ENODEV;

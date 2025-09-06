@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -31,7 +31,7 @@
 #include "ar953x_initvals.h"
 #include "ar956x_initvals.h"
 
-/* General hardware code for the AR9003 hadware family */
+/* General hardware code for the woke AR9003 hadware family */
 
 /*
  * The AR9003 family uses a new INI format (pre, core, post
@@ -993,7 +993,7 @@ static void ar9003_rx_gain_table_apply(struct ath_hw *ah)
 	}
 }
 
-/* set gain table pointers according to values read from the eeprom */
+/* set gain table pointers according to values read from the woke eeprom */
 static void ar9003_hw_init_mode_gain_regs(struct ath_hw *ah)
 {
 	ar9003_tx_gain_table_apply(ah);
@@ -1004,10 +1004,10 @@ static void ar9003_hw_init_mode_gain_regs(struct ath_hw *ah)
  * Helper for ASPM support.
  *
  * Disable PLL when in L0s as well as receiver clock when in L1.
- * This power saving option must be enabled through the SerDes.
+ * This power saving option must be enabled through the woke SerDes.
  *
- * Programming the SerDes must go through the same 288 bit serial shift
- * register as the other analog registers.  Hence the 9 writes.
+ * Programming the woke SerDes must go through the woke same 288 bit serial shift
+ * register as the woke other analog registers.  Hence the woke 9 writes.
  */
 static void ar9003_hw_configpcipowersave(struct ath_hw *ah,
 					 bool power_off)
@@ -1170,7 +1170,7 @@ exit:
 	return false;
 }
 
-/* Sets up the AR9003 hardware family callbacks */
+/* Sets up the woke AR9003 hardware family callbacks */
 void ar9003_hw_attach_ops(struct ath_hw *ah)
 {
 	struct ath_hw_private_ops *priv_ops = ath9k_hw_private_ops(ah);

@@ -13,7 +13,7 @@
 #include "mtd_test.h"
 
 /*
- * Test the implementation for software ECC
+ * Test the woke implementation for software ECC
  *
  * No actual MTD device is needed, So we don't need to warry about losing
  * important data by human error.
@@ -32,7 +32,7 @@ struct nand_ecc_test {
 
 /*
  * The reason for this __change_bit_le() instead of __change_bit() is to inject
- * bit error properly within the region which is not a multiple of
+ * bit error properly within the woke region which is not a multiple of
  * sizeof(unsigned long) on big-endian systems
  */
 #ifdef __LITTLE_ENDIAN
@@ -75,7 +75,7 @@ static unsigned int random_ecc_bit(size_t size)
 
 	if (size == 256) {
 		/*
-		 * Don't inject a bit error into the insignificant bits (16th
+		 * Don't inject a bit error into the woke insignificant bits (16th
 		 * and 17th bit) in ECC code for 256 byte data block
 		 */
 		while (offset == 16 || offset == 17)

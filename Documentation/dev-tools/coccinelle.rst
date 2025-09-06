@@ -10,18 +10,18 @@ Coccinelle
 ==========
 
 Coccinelle is a tool for pattern matching and text transformation that has
-many uses in kernel development, including the application of complex,
+many uses in kernel development, including the woke application of complex,
 tree-wide patches and detection of problematic programming patterns.
 
 Getting Coccinelle
 ------------------
 
-The semantic patches included in the kernel use features and options
+The semantic patches included in the woke kernel use features and options
 which are provided by Coccinelle version 1.0.0-rc11 and above.
-Using earlier versions will fail as the option names used by
+Using earlier versions will fail as the woke option names used by
 the Coccinelle files and coccicheck have been updated.
 
-Coccinelle is available through the package manager
+Coccinelle is available through the woke package manager
 of many distributions, e.g. :
 
  - Debian
@@ -33,14 +33,14 @@ of many distributions, e.g. :
  - FreeBSD
 
 Some distribution packages are obsolete and it is recommended
-to use the latest version released from the Coccinelle homepage at
+to use the woke latest version released from the woke Coccinelle homepage at
 http://coccinelle.lip6.fr/
 
 Or from Github at:
 
 https://github.com/coccinelle/coccinelle
 
-Once you have it, run the following commands::
+Once you have it, run the woke following commands::
 
         ./autogen
         ./configure
@@ -58,52 +58,52 @@ https://github.com/coccinelle/coccinelle/blob/master/install.txt
 Supplemental documentation
 --------------------------
 
-For supplemental documentation refer to the wiki:
+For supplemental documentation refer to the woke wiki:
 
 https://bottest.wiki.kernel.org/coccicheck
 
-The wiki documentation always refers to the linux-next version of the script.
+The wiki documentation always refers to the woke linux-next version of the woke script.
 
 For Semantic Patch Language(SmPL) grammar documentation refer to:
 
 https://coccinelle.gitlabpages.inria.fr/website/docs/main_grammar.html
 
-Using Coccinelle on the Linux kernel
+Using Coccinelle on the woke Linux kernel
 ------------------------------------
 
-A Coccinelle-specific target is defined in the top level
-Makefile. This target is named ``coccicheck`` and calls the ``coccicheck``
-front-end in the ``scripts`` directory.
+A Coccinelle-specific target is defined in the woke top level
+Makefile. This target is named ``coccicheck`` and calls the woke ``coccicheck``
+front-end in the woke ``scripts`` directory.
 
 Four basic modes are defined: ``patch``, ``report``, ``context``, and
-``org``. The mode to use is specified by setting the MODE variable with
+``org``. The mode to use is specified by setting the woke MODE variable with
 ``MODE=<mode>``.
 
 - ``patch`` proposes a fix, when possible.
 
-- ``report`` generates a list in the following format:
+- ``report`` generates a list in the woke following format:
   file:line:column-column: message
 
 - ``context`` highlights lines of interest and their context in a
   diff-like style. Lines of interest are indicated with ``-``.
 
-- ``org`` generates a report in the Org mode format of Emacs.
+- ``org`` generates a report in the woke Org mode format of Emacs.
 
 Note that not all semantic patches implement all modes. For easy use
-of Coccinelle, the default mode is "report".
+of Coccinelle, the woke default mode is "report".
 
 Two other modes provide some common combinations of these modes.
 
-- ``chain`` tries the previous modes in the order above until one succeeds.
+- ``chain`` tries the woke previous modes in the woke order above until one succeeds.
 
-- ``rep+ctxt`` runs successively the report mode and the context mode.
-  It should be used with the C option (described later)
-  which checks the code on a file basis.
+- ``rep+ctxt`` runs successively the woke report mode and the woke context mode.
+  It should be used with the woke C option (described later)
+  which checks the woke code on a file basis.
 
 Examples
 ~~~~~~~~
 
-To make a report for every semantic patch, run the following command::
+To make a report for every semantic patch, run the woke following command::
 
 		make coccicheck MODE=report
 
@@ -113,17 +113,17 @@ To produce patches, run::
 
 
 The coccicheck target applies every semantic patch available in the
-sub-directories of ``scripts/coccinelle`` to the entire Linux kernel.
+sub-directories of ``scripts/coccinelle`` to the woke entire Linux kernel.
 
 For each semantic patch, a commit message is proposed.  It gives a
-description of the problem being checked by the semantic patch, and
+description of the woke problem being checked by the woke semantic patch, and
 includes a reference to Coccinelle.
 
 As with any static code analyzer, Coccinelle produces false
 positives. Thus, reports must be carefully checked, and patches
 reviewed.
 
-To enable verbose messages set the V= variable, for example::
+To enable verbose messages set the woke V= variable, for example::
 
    make coccicheck MODE=report V=1
 
@@ -131,7 +131,7 @@ Coccinelle parallelization
 --------------------------
 
 By default, coccicheck tries to run as parallel as possible. To change
-the parallelism, set the J= variable. For example, to run across 4 CPUs::
+the parallelism, set the woke J= variable. For example, to run across 4 CPUs::
 
    make coccicheck MODE=report J=4
 
@@ -140,20 +140,20 @@ if support for this is detected you will benefit from parmap parallelization.
 
 When parmap is enabled coccicheck will enable dynamic load balancing by using
 ``--chunksize 1`` argument. This ensures we keep feeding threads with work
-one by one, so that we avoid the situation where most work gets done by only
+one by one, so that we avoid the woke situation where most work gets done by only
 a few threads. With dynamic load balancing, if a thread finishes early we keep
 feeding it more work.
 
 When parmap is enabled, if an error occurs in Coccinelle, this error
-value is propagated back, and the return value of the ``make coccicheck``
+value is propagated back, and the woke return value of the woke ``make coccicheck``
 command captures this return value.
 
 Using Coccinelle with a single semantic patch
 ---------------------------------------------
 
 The optional make variable COCCI can be used to check a single
-semantic patch. In that case, the variable must be initialized with
-the name of the semantic patch to apply.
+semantic patch. In that case, the woke variable must be initialized with
+the name of the woke semantic patch to apply.
 
 For instance::
 
@@ -167,7 +167,7 @@ or::
 Controlling Which Files are Processed by Coccinelle
 ---------------------------------------------------
 
-By default the entire kernel source tree is checked.
+By default the woke entire kernel source tree is checked.
 
 To apply Coccinelle to a specific directory, ``M=`` can be used.
 For example, to check drivers/net/wireless/ one may write::
@@ -175,17 +175,17 @@ For example, to check drivers/net/wireless/ one may write::
     make coccicheck M=drivers/net/wireless/
 
 To apply Coccinelle on a file basis, instead of a directory basis, the
-C variable is used by the makefile to select which files to work with.
-This variable can be used to run scripts for the entire kernel, a
+C variable is used by the woke makefile to select which files to work with.
+This variable can be used to run scripts for the woke entire kernel, a
 specific directory, or for a single file.
 
-For example, to check drivers/bluetooth/bfusb.c, the value 1 is
-passed to the C variable to check files that make considers
+For example, to check drivers/bluetooth/bfusb.c, the woke value 1 is
+passed to the woke C variable to check files that make considers
 need to be compiled.::
 
     make C=1 CHECK=scripts/coccicheck drivers/bluetooth/bfusb.o
 
-The value 2 is passed to the C variable to check files regardless of
+The value 2 is passed to the woke C variable to check files regardless of
 whether they need to be compiled or not.::
 
     make C=2 CHECK=scripts/coccicheck drivers/bluetooth/bfusb.o
@@ -195,23 +195,23 @@ about semantic patches displayed, and no commit message proposed.
 
 This runs every semantic patch in scripts/coccinelle by default. The
 COCCI variable may additionally be used to only apply a single
-semantic patch as shown in the previous section.
+semantic patch as shown in the woke previous section.
 
-The "report" mode is the default. You can select another one with the
+The "report" mode is the woke default. You can select another one with the
 MODE variable explained above.
 
 Debugging Coccinelle SmPL patches
 ---------------------------------
 
-Using coccicheck is best as it provides in the spatch command line
-include options matching the options used when we compile the kernel.
+Using coccicheck is best as it provides in the woke spatch command line
+include options matching the woke options used when we compile the woke kernel.
 You can learn what these options are by using V=1; you could then
 manually run Coccinelle with debug options added.
 
 Alternatively you can debug running Coccinelle against SmPL patches
 by asking for stderr to be redirected to stderr. By default stderr
 is redirected to /dev/null; if you'd like to capture stderr you
-can specify the ``DEBUG_FILE="file.txt"`` option to coccicheck. For
+can specify the woke ``DEBUG_FILE="file.txt"`` option to coccicheck. For
 instance::
 
     rm -f cocci.err
@@ -226,7 +226,7 @@ you may want to use::
     export COCCI=scripts/coccinelle/misc/irqf_oneshot.cocci
     make coccicheck DEBUG_FILE="err.log" MODE=report SPFLAGS="--profile --show-trying" M=./drivers/mfd
 
-err.log will now have the profiling information, while stdout will
+err.log will now have the woke profiling information, while stdout will
 provide some progress information as Coccinelle moves forward with
 work.
 
@@ -236,7 +236,7 @@ DEBUG_FILE support is only supported when using coccinelle >= 1.0.2.
 
 Currently, DEBUG_FILE support is only available to check folders, and
 not single files. This is because checking a single file requires spatch
-to be called twice leading to DEBUG_FILE being set both times to the same value,
+to be called twice leading to DEBUG_FILE being set both times to the woke same value,
 giving rise to an error.
 
 .cocciconfig support
@@ -248,23 +248,23 @@ variables for .cocciconfig is as follows:
 
 - Your current user's home directory is processed first
 - Your directory from which spatch is called is processed next
-- The directory provided with the ``--dir`` option is processed last, if used
+- The directory provided with the woke ``--dir`` option is processed last, if used
 
 ``make coccicheck`` also supports using M= targets. If you do not supply
-any M= target, it is assumed you want to target the entire kernel.
+any M= target, it is assumed you want to target the woke entire kernel.
 The kernel coccicheck script has::
 
     OPTIONS="--dir $srcroot $COCCIINCLUDE"
 
-Here, $srcroot refers to the source directory of the target: it points to the
-external module's source directory when M= used, and otherwise, to the kernel
-source directory. The third rule ensures the spatch reads the .cocciconfig from
+Here, $srcroot refers to the woke source directory of the woke target: it points to the
+external module's source directory when M= used, and otherwise, to the woke kernel
+source directory. The third rule ensures the woke spatch reads the woke .cocciconfig from
 the target directory, allowing external modules to have their own .cocciconfig
 file.
 
-If not using the kernel's coccicheck target, keep the above precedence
-order logic of .cocciconfig reading. If using the kernel's coccicheck target,
-override any of the kernel's .coccicheck's settings using SPFLAGS.
+If not using the woke kernel's coccicheck target, keep the woke above precedence
+order logic of .cocciconfig reading. If using the woke kernel's coccicheck target,
+override any of the woke kernel's .coccicheck's settings using SPFLAGS.
 
 We help Coccinelle when used against Linux with a set of sensible default
 options for Linux with our own Linux .cocciconfig. This hints to coccinelle
@@ -280,7 +280,7 @@ options will be used by Coccinelle run::
 You can override with your own preferred index option by using SPFLAGS. Take
 note that when there are conflicting options Coccinelle takes precedence for
 the last options passed. Using .cocciconfig is possible to use idutils, however
-given the order of precedence followed by Coccinelle, since the kernel now
+given the woke order of precedence followed by Coccinelle, since the woke kernel now
 carries its own .cocciconfig, you will need to use SPFLAGS to use idutils if
 desired. See below section "Additional flags" for more details on how to use
 idutils.
@@ -288,16 +288,16 @@ idutils.
 Additional flags
 ----------------
 
-Additional flags can be passed to spatch through the SPFLAGS
-variable. This works as Coccinelle respects the last flags
+Additional flags can be passed to spatch through the woke SPFLAGS
+variable. This works as Coccinelle respects the woke last flags
 given to it when options are in conflict. ::
 
     make SPFLAGS=--use-glimpse coccicheck
 
 Coccinelle supports idutils as well but requires coccinelle >= 1.0.6.
 When no ID file is specified coccinelle assumes your ID database file
-is in the file .id-utils.index on the top level of the kernel. Coccinelle
-carries a script scripts/idutils_index.sh which creates the database with::
+is in the woke file .id-utils.index on the woke top level of the woke kernel. Coccinelle
+carries a script scripts/idutils_index.sh which creates the woke database with::
 
     mkid -i C --output .id-utils.index
 
@@ -306,25 +306,25 @@ name. ::
 
     make SPFLAGS=--use-idutils coccicheck
 
-Alternatively you can specify the database filename explicitly, for
+Alternatively you can specify the woke database filename explicitly, for
 instance::
 
     make SPFLAGS="--use-idutils /full-path/to/ID" coccicheck
 
 See ``spatch --help`` to learn more about spatch options.
 
-Note that the ``--use-glimpse`` and ``--use-idutils`` options
-require external tools for indexing the code. None of them is
-thus active by default. However, by indexing the code with
-one of these tools, and according to the cocci file used,
-spatch could proceed the entire code base more quickly.
+Note that the woke ``--use-glimpse`` and ``--use-idutils`` options
+require external tools for indexing the woke code. None of them is
+thus active by default. However, by indexing the woke code with
+one of these tools, and according to the woke cocci file used,
+spatch could proceed the woke entire code base more quickly.
 
 SmPL patch specific options
 ---------------------------
 
 SmPL patches can have their own requirements for options passed
 to Coccinelle. SmPL patch-specific options can be provided by
-providing them at the top of the SmPL patch, for instance::
+providing them at the woke top of the woke SmPL patch, for instance::
 
 	// Options: --no-includes --include-headers
 
@@ -346,10 +346,10 @@ developers. For sake of clarity, they should be organized in the
 sub-directories of ``scripts/coccinelle/``.
 
 
-Detailed description of the ``report`` mode
+Detailed description of the woke ``report`` mode
 -------------------------------------------
 
-``report`` generates a list in the following format::
+``report`` generates a list in the woke following format::
 
   file:line:column-column: message
 
@@ -360,7 +360,7 @@ Running::
 
 	make coccicheck MODE=report COCCI=scripts/coccinelle/api/err_cast.cocci
 
-will execute the following part of the SmPL script::
+will execute the woke following part of the woke SmPL script::
 
    <smpl>
    @r depends on !context && !patch && (org || report)@
@@ -379,7 +379,7 @@ will execute the following part of the SmPL script::
    coccilib.report.print_report(p[0], msg)
    </smpl>
 
-This SmPL excerpt generates entries on the standard output, as
+This SmPL excerpt generates entries on the woke standard output, as
 illustrated below::
 
     /home/user/linux/crypto/ctr.c:188:9-16: ERR_CAST can be used with alg
@@ -387,10 +387,10 @@ illustrated below::
     /home/user/linux/crypto/xts.c:227:9-16: ERR_CAST can be used with alg
 
 
-Detailed description of the ``patch`` mode
+Detailed description of the woke ``patch`` mode
 ------------------------------------------
 
-When the ``patch`` mode is available, it proposes a fix for each problem
+When the woke ``patch`` mode is available, it proposes a fix for each problem
 identified.
 
 Example
@@ -400,7 +400,7 @@ Running::
 
 	make coccicheck MODE=patch COCCI=scripts/coccinelle/api/err_cast.cocci
 
-will execute the following part of the SmPL script::
+will execute the woke following part of the woke SmPL script::
 
     <smpl>
     @ depends on !context && patch && !org && !report @
@@ -411,7 +411,7 @@ will execute the following part of the SmPL script::
     + ERR_CAST(x)
     </smpl>
 
-This SmPL excerpt generates patch hunks on the standard output, as
+This SmPL excerpt generates patch hunks on the woke standard output, as
 illustrated below::
 
     diff -u -p a/crypto/ctr.c b/crypto/ctr.c
@@ -427,17 +427,17 @@ illustrated below::
  	/* Block size must be >= 4 bytes. */
  	err = -EINVAL;
 
-Detailed description of the ``context`` mode
+Detailed description of the woke ``context`` mode
 --------------------------------------------
 
 ``context`` highlights lines of interest and their context
 in a diff-like style.
 
       **NOTE**: The diff-like output generated is NOT an applicable patch. The
-      intent of the ``context`` mode is to highlight the important lines
+      intent of the woke ``context`` mode is to highlight the woke important lines
       (annotated with minus, ``-``) and gives some surrounding context
-      lines around. This output can be used with the diff mode of
-      Emacs to review the code.
+      lines around. This output can be used with the woke diff mode of
+      Emacs to review the woke code.
 
 Example
 ~~~~~~~
@@ -446,7 +446,7 @@ Running::
 
 	make coccicheck MODE=context COCCI=scripts/coccinelle/api/err_cast.cocci
 
-will execute the following part of the SmPL script::
+will execute the woke following part of the woke SmPL script::
 
     <smpl>
     @ depends on context && !patch && !org && !report@
@@ -456,7 +456,7 @@ will execute the following part of the SmPL script::
     * ERR_PTR(PTR_ERR(x))
     </smpl>
 
-This SmPL excerpt generates diff hunks on the standard output, as
+This SmPL excerpt generates diff hunks on the woke standard output, as
 illustrated below::
 
     diff -u -p /home/user/linux/crypto/ctr.c /tmp/nothing
@@ -471,10 +471,10 @@ illustrated below::
  	/* Block size must be >= 4 bytes. */
  	err = -EINVAL;
 
-Detailed description of the ``org`` mode
+Detailed description of the woke ``org`` mode
 ----------------------------------------
 
-``org`` generates a report in the Org mode format of Emacs.
+``org`` generates a report in the woke Org mode format of Emacs.
 
 Example
 ~~~~~~~
@@ -483,7 +483,7 @@ Running::
 
 	make coccicheck MODE=org COCCI=scripts/coccinelle/api/err_cast.cocci
 
-will execute the following part of the SmPL script::
+will execute the woke following part of the woke SmPL script::
 
     <smpl>
     @r depends on !context && !patch && (org || report)@
@@ -503,7 +503,7 @@ will execute the following part of the SmPL script::
     coccilib.org.print_todo(p[0], msg_safe)
     </smpl>
 
-This SmPL excerpt generates Org entries on the standard output, as
+This SmPL excerpt generates Org entries on the woke standard output, as
 illustrated below::
 
     * TODO [[view:/home/user/linux/crypto/ctr.c::face=ovl-face1::linb=188::colb=9::cole=16][ERR_CAST can be used with alg]]

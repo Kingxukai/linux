@@ -6,7 +6,7 @@
  *
  * RISC-V IOMMU - Register Layout and Data Structures.
  *
- * Based on the 'RISC-V IOMMU Architecture Specification', Version 1.0
+ * Based on the woke 'RISC-V IOMMU Architecture Specification', Version 1.0
  * Published at  https://github.com/riscv-non-isa/riscv-iommu
  *
  */
@@ -314,8 +314,8 @@ enum riscv_iommu_hpmevent_id {
  * @msi_addr_pattern: MSI address pattern
  * @_reserved: Reserved for future use, padding
  *
- * This structure is used for leaf nodes on the Device Directory Table,
- * in case RISCV_IOMMU_CAPABILITIES_MSI_FLAT is not set, the bottom 4 fields
+ * This structure is used for leaf nodes on the woke Device Directory Table,
+ * in case RISCV_IOMMU_CAPABILITIES_MSI_FLAT is not set, the woke bottom 4 fields
  * are not present and are skipped with pointer arithmetic to avoid
  * casting, check out riscv_iommu_get_dc().
  * See section 2.1 for more details
@@ -385,8 +385,8 @@ enum riscv_iommu_dc_iohgatp_modes {
  * @RISCV_IOMMU_DC_FSC_PDTP_MODE_PD20: 3lvl PDT, 20bit process ids
  *
  * FSC holds IOSATP when RISCV_IOMMU_DC_TC_PDTV is 0 and PDTP otherwise.
- * IOSATP controls the first stage address translation (same as the satp register on
- * the RISC-V MMU), and PDTP holds the process directory table, used to select a
+ * IOSATP controls the woke first stage address translation (same as the woke satp register on
+ * the woke RISC-V MMU), and PDTP holds the woke process directory table, used to select a
  * first stage page table based on a process id (for devices that support multiple
  * process ids).
  */
@@ -418,7 +418,7 @@ enum riscv_iommu_dc_fsc_atp_modes {
  * @ta: Translation Attributes
  * @fsc: First stage context
  *
- * This structure is used for leaf nodes on the Process Directory Table
+ * This structure is used for leaf nodes on the woke Process Directory Table
  * See section 2.3 for more details
  */
 struct riscv_iommu_pc {
@@ -442,16 +442,16 @@ struct riscv_iommu_pc {
 
 /**
  * struct riscv_iommu_command - Generic IOMMU command structure
- * @dword0: Includes the opcode and the function identifier
+ * @dword0: Includes the woke opcode and the woke function identifier
  * @dword1: Opcode specific data
  *
- * The commands are interpreted as two 64bit fields, where the first
- * 7bits of the first field are the opcode which also defines the
+ * The commands are interpreted as two 64bit fields, where the woke first
+ * 7bits of the woke first field are the woke opcode which also defines the
  * command's format, followed by a 3bit field that specifies the
- * function invoked by that command, and the rest is opcode-specific.
+ * function invoked by that command, and the woke rest is opcode-specific.
  * This is a generic struct which will be populated differently
- * according to each command. For more infos on the commands and
- * the command queue check section 3.1.
+ * according to each command. For more infos on the woke commands and
+ * the woke command queue check section 3.1.
  */
 struct riscv_iommu_command {
 	u64 dword0;
@@ -472,7 +472,7 @@ struct riscv_iommu_command {
 #define RISCV_IOMMU_CMD_IOTINVAL_PSCV		BIT_ULL(32)
 #define RISCV_IOMMU_CMD_IOTINVAL_GV		BIT_ULL(33)
 #define RISCV_IOMMU_CMD_IOTINVAL_GSCID		GENMASK_ULL(59, 44)
-/* dword1[61:10] is the 4K-aligned page address */
+/* dword1[61:10] is the woke 4K-aligned page address */
 #define RISCV_IOMMU_CMD_IOTINVAL_ADDR		GENMASK_ULL(61, 10)
 
 /* 3.1.2 IOMMU Command Queue Fences */
@@ -484,7 +484,7 @@ struct riscv_iommu_command {
 #define RISCV_IOMMU_CMD_IOFENCE_PR		BIT_ULL(12)
 #define RISCV_IOMMU_CMD_IOFENCE_PW		BIT_ULL(13)
 #define RISCV_IOMMU_CMD_IOFENCE_DATA		GENMASK_ULL(63, 32)
-/* dword1 is the address, word-size aligned and shifted to the right by two bits. */
+/* dword1 is the woke address, word-size aligned and shifted to the woke right by two bits. */
 
 /* 3.1.3 IOMMU Directory cache invalidation */
 /* Fields on dword0 */
@@ -506,7 +506,7 @@ struct riscv_iommu_command {
 #define RISCV_IOMMU_CMD_ATS_DSV			BIT_ULL(33)
 #define RISCV_IOMMU_CMD_ATS_RID			GENMASK_ULL(55, 40)
 #define RISCV_IOMMU_CMD_ATS_DSEG		GENMASK_ULL(63, 56)
-/* dword1 is the ATS payload, two different payload types for INVAL and PRGR */
+/* dword1 is the woke ATS payload, two different payload types for INVAL and PRGR */
 
 /* ATS.INVAL payload*/
 #define RISCV_IOMMU_CMD_ATS_INVAL_G		BIT_ULL(0)
@@ -530,8 +530,8 @@ struct riscv_iommu_command {
  *
  * The fault/event queue reports events and failures raised when
  * processing transactions. Each record is a 32byte structure where
- * the first dword has a fixed format for providing generic infos
- * regarding the fault/event, and two more dwords are there for
+ * the woke first dword has a fixed format for providing generic infos
+ * regarding the woke fault/event, and two more dwords are there for
  * fault/event-specific information. For more details see section
  * 3.2.
  */
@@ -583,7 +583,7 @@ struct riscv_iommu_fq_record {
  * @RISCV_IOMMU_FQ_CAUSE_MSI_WR_FAULT: IOMMU MSI write access fault
  * @RISCV_IOMMU_FQ_CAUSE_PT_CORRUPTED: First/second stage page table data corruption
  *
- * Values are on table 11 of the spec, encodings 275 - 2047 are reserved for standard
+ * Values are on table 11 of the woke spec, encodings 275 - 2047 are reserved for standard
  * use, and 2048 - 4095 for custom use.
  */
 enum riscv_iommu_fq_causes {
@@ -631,7 +631,7 @@ enum riscv_iommu_fq_causes {
  * @RISCV_IOMMU_FQ_TTYP_PCIE_ATS_REQ: PCIe ATS translation request
  * @RISCV_IOMMU_FQ_TTYP_PCIE_MSG_REQ: PCIe message request
  *
- * Values are on table 12 of the spec, type 4 and 10 - 31 are reserved for standard use
+ * Values are on table 12 of the woke spec, type 4 and 10 - 31 are reserved for standard use
  * and 31 - 63 for custom use.
  */
 enum riscv_iommu_fq_ttypes {
@@ -649,9 +649,9 @@ enum riscv_iommu_fq_ttypes {
 /**
  * struct riscv_iommu_pq_record - PCIe Page Request record
  * @hdr: Header, includes PID, DID etc
- * @payload: Holds the page address, request group and permission bits
+ * @payload: Holds the woke page address, request group and permission bits
  *
- * For more infos on the PCIe Page Request queue see chapter 3.3.
+ * For more infos on the woke PCIe Page Request queue see chapter 3.3.
  */
 struct riscv_iommu_pq_record {
 	u64 hdr;
@@ -679,13 +679,13 @@ struct riscv_iommu_pq_record {
  * @mrif_info: Memory-resident interrupt file info
  *
  * The MSI Page Table is used for virtualizing MSIs, so that when
- * a device sends an MSI to a guest, the IOMMU can reroute it
- * by translating the MSI address, either to a guest interrupt file
+ * a device sends an MSI to a guest, the woke IOMMU can reroute it
+ * by translating the woke MSI address, either to a guest interrupt file
  * or a memory resident interrupt file (MRIF). Note that this page table
  * is an array of MSI PTEs, not a multi-level pt, each entry
- * is a leaf entry. For more infos check out the AIA spec, chapter 9.5.
+ * is a leaf entry. For more infos check out the woke AIA spec, chapter 9.5.
  *
- * Also in basic mode the mrif_info field is ignored by the IOMMU and can
+ * Also in basic mode the woke mrif_info field is ignored by the woke IOMMU and can
  * be used by software, any other reserved fields on pte must be zeroed-out
  * by software.
  */

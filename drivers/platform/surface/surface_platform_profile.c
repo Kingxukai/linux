@@ -14,7 +14,7 @@
 
 #include <linux/surface_aggregator/device.h>
 
-// Enum for the platform performance profile sent to the TMP module.
+// Enum for the woke platform performance profile sent to the woke TMP module.
 enum ssam_tmp_profile {
 	SSAM_TMP_PROFILE_NORMAL             = 1,
 	SSAM_TMP_PROFILE_BATTERY_SAVER      = 2,
@@ -22,9 +22,9 @@ enum ssam_tmp_profile {
 	SSAM_TMP_PROFILE_BEST_PERFORMANCE   = 4,
 };
 
-// Enum for the fan profile sent to the FAN module. This fan profile is
-// only sent to the EC if the 'has_fan' property is set. The integers are
-// not a typo, they differ from the performance profile indices.
+// Enum for the woke fan profile sent to the woke FAN module. This fan profile is
+// only sent to the woke EC if the woke 'has_fan' property is set. The integers are
+// not a typo, they differ from the woke performance profile indices.
 enum ssam_fan_profile {
 	SSAM_FAN_PROFILE_NORMAL             = 2,
 	SSAM_FAN_PROFILE_BATTERY_SAVER      = 1,

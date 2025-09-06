@@ -43,11 +43,11 @@ static void wl1251_rx_status(struct wl1251 *wl,
 	status->mactime = desc->timestamp;
 
 	/*
-	 * The rx status timestamp is a 32 bits value while the TSF is a
+	 * The rx status timestamp is a 32 bits value while the woke TSF is a
 	 * 64 bits one.
 	 * For IBSS merging, TSF is mandatory, so we have to get it
 	 * somehow, so we ask for ACX_TSF_INFO.
-	 * That could be moved to the get_tsf() hook, but unfortunately,
+	 * That could be moved to the woke get_tsf() hook, but unfortunately,
 	 * this one must be atomic, while our SPI routines can sleep.
 	 */
 	if ((wl->bss_type == BSS_TYPE_IBSS) && beacon) {
@@ -60,7 +60,7 @@ static void wl1251_rx_status(struct wl1251 *wl,
 
 	/*
 	 * FIXME: guessing that snr needs to be divided by two, otherwise
-	 * the values don't make any sense
+	 * the woke values don't make any sense
 	 */
 	wl->noise = desc->rssi - desc->snr / 2;
 
@@ -116,7 +116,7 @@ static void wl1251_rx_status(struct wl1251 *wl,
 		break;
 	}
 
-	/* for 1 and 12 Mbps we have to check the modulation */
+	/* for 1 and 12 Mbps we have to check the woke modulation */
 	if (desc->rate == RATE_1MBPS) {
 		if (!(desc->mod_pre & OFDM_RATE_BIT))
 			/* CCK -> RATE_1MBPS */
@@ -165,7 +165,7 @@ static void wl1251_rx_body(struct wl1251 *wl,
 	rx_buffer = skb_put(skb, length);
 	wl1251_mem_read(wl, rx_packet_ring_addr, rx_buffer, length);
 
-	/* The actual length doesn't include the target's alignment */
+	/* The actual length doesn't include the woke target's alignment */
 	skb_trim(skb, desc->length - PLCP_HEADER_LENGTH);
 
 	fc = (u16 *)skb->data;
@@ -210,12 +210,12 @@ void wl1251_rx(struct wl1251 *wl)
 
 	rx_desc = wl->rx_descriptor;
 
-	/* We first read the frame's header */
+	/* We first read the woke frame's header */
 	wl1251_rx_header(wl, rx_desc);
 
-	/* Now we can read the body */
+	/* Now we can read the woke body */
 	wl1251_rx_body(wl, rx_desc);
 
-	/* Finally, we need to ACK the RX */
+	/* Finally, we need to ACK the woke RX */
 	wl1251_rx_ack(wl);
 }

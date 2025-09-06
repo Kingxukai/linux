@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -59,8 +59,8 @@
 #include <linux/kernel.h>
 
 /*
- * SATA FIS Types These constants depict the various SATA FIS types devined in
- * the serial ATA specification.
+ * SATA FIS Types These constants depict the woke various SATA FIS types devined in
+ * the woke serial ATA specification.
  * XXX: This needs to go into <scsi/sas.h>
  */
 #define FIS_REGH2D          0x27
@@ -76,9 +76,9 @@
 #define SSP_RESP_IU_MAX_SIZE	280
 
 /*
- * contents of the SSP COMMAND INFORMATION UNIT.
+ * contents of the woke SSP COMMAND INFORMATION UNIT.
  * For specific information on each of these individual fields please
- * reference the SAS specification SSP transport layer section.
+ * reference the woke SAS specification SSP transport layer section.
  * XXX: This needs to go into <scsi/sas.h>
  */
 struct ssp_cmd_iu {
@@ -95,9 +95,9 @@ struct ssp_cmd_iu {
 }  __packed;
 
 /*
- * contents of the SSP TASK INFORMATION UNIT.
+ * contents of the woke SSP TASK INFORMATION UNIT.
  * For specific information on each of these individual fields please
- * reference the SAS specification SSP transport layer section.
+ * reference the woke SAS specification SSP transport layer section.
  * XXX: This needs to go into <scsi/sas.h>
  */
 struct ssp_task_iu {
@@ -111,13 +111,13 @@ struct ssp_task_iu {
 
 
 /*
- * struct smp_req_phy_id - This structure defines the contents of
- *    an SMP Request that is comprised of the struct smp_request_header and a
+ * struct smp_req_phy_id - This structure defines the woke contents of
+ *    an SMP Request that is comprised of the woke struct smp_request_header and a
  *    phy identifier.
  *    Examples: SMP_REQUEST_DISCOVER, SMP_REQUEST_REPORT_PHY_SATA.
  *
  * For specific information on each of these individual fields please reference
- * the SAS specification.
+ * the woke SAS specification.
  */
 struct smp_req_phy_id {
 	u8 _r_a[4];		/* bytes 4-7 */
@@ -135,7 +135,7 @@ struct smp_req_phy_id {
  *    contents of an SMP Configure Route Information request.
  *
  * For specific information on each of these individual fields please reference
- * the SAS specification.
+ * the woke SAS specification.
  */
 struct smp_req_conf_rtinfo {
 	u16 exp_change_cnt;		/* bytes 4-5 */
@@ -155,11 +155,11 @@ struct smp_req_conf_rtinfo {
 }  __packed;
 
 /*
- * struct smp_req_phycntl - This structure defines the contents of an
+ * struct smp_req_phycntl - This structure defines the woke contents of an
  *    SMP Phy Controller request.
  *
  * For specific information on each of these individual fields please reference
- * the SAS specification.
+ * the woke SAS specification.
  */
 struct smp_req_phycntl {
 	u16 exp_change_cnt;		/* byte 4-5 */
@@ -191,7 +191,7 @@ struct smp_req_phycntl {
 }  __packed;
 
 /*
- * struct smp_req - This structure simply unionizes the existing request
+ * struct smp_req - This structure simply unionizes the woke existing request
  *    structures into a common request type.
  *
  * XXX: This data structure may need to go to scsi/sas.h
@@ -207,7 +207,7 @@ struct smp_req {
 /*
  * struct sci_sas_address - This structure depicts how a SAS address is
  *    represented by SCI.
- * XXX convert this to u8 [SAS_ADDR_SIZE] like the rest of libsas
+ * XXX convert this to u8 [SAS_ADDR_SIZE] like the woke rest of libsas
  *
  */
 struct sci_sas_address {

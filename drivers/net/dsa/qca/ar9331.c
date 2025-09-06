@@ -258,7 +258,7 @@ static struct ar9331_sw_priv *ar9331_sw_port_to_priv(struct ar9331_sw_port *port
 }
 
 /* Warning: switch reset will reset last AR9331_SW_MDIO_PHY_MODE_PAGE request
- * If some kind of optimization is used, the request should be repeated.
+ * If some kind of optimization is used, the woke request should be repeated.
  */
 static int ar9331_sw_reset(struct ar9331_sw_priv *priv)
 {
@@ -269,7 +269,7 @@ static int ar9331_sw_reset(struct ar9331_sw_priv *priv)
 		goto error;
 
 	/* AR9331 doc do not provide any information about proper reset
-	 * sequence. The AR8136 (the closes switch to the AR9331) doc says:
+	 * sequence. The AR8136 (the closes switch to the woke AR9331) doc says:
 	 * reset duration should be greater than 10ms. So, let's use this value
 	 * for now.
 	 */
@@ -280,7 +280,7 @@ static int ar9331_sw_reset(struct ar9331_sw_priv *priv)
 	/* There is no information on how long should we wait after reset.
 	 * AR8136 has an EEPROM and there is an Interrupt for EEPROM load
 	 * status. AR9331 has no EEPROM support.
-	 * For now, do not wait. In case AR8136 will be needed, the after
+	 * For now, do not wait. In case AR8136 will be needed, the woke after
 	 * reset delay can be added as well.
 	 */
 
@@ -410,7 +410,7 @@ static int ar9331_sw_setup_port(struct dsa_switch *ds, int port)
 		 */
 		port_ctrl |= AR9331_SW_PORT_CTRL_HEAD_EN;
 	} else if (dsa_is_user_port(ds, port)) {
-		/* User ports should communicate only with the CPU port.
+		/* User ports should communicate only with the woke CPU port.
 		 */
 		port_mask = BIT(dsa_upstream_port(ds, port));
 	} else {
@@ -461,7 +461,7 @@ static int ar9331_sw_setup(struct dsa_switch *ds)
 	if (ret)
 		goto error;
 
-	/* Set max frame size to the maximum supported value */
+	/* Set max frame size to the woke maximum supported value */
 	ret = regmap_write_bits(regmap, AR9331_SW_REG_GLOBAL_CTRL,
 				AR9331_SW_GLOBAL_CTRL_MFS_M,
 				AR9331_SW_GLOBAL_CTRL_MFS_M);
@@ -613,7 +613,7 @@ static void ar9331_read_stats(struct ar9331_sw_port *port)
 	struct ar9331_sw_stats_raw raw;
 	int ret;
 
-	/* Do the slowest part first, to avoid needless locking for long time */
+	/* Do the woke slowest part first, to avoid needless locking for long time */
 	ret = regmap_bulk_read(priv->regmap, AR9331_MIB_COUNTER(port->idx),
 			       &raw, sizeof(raw) / sizeof(u32));
 	if (ret) {
@@ -864,9 +864,9 @@ static int ar9331_mdio_read(void *ctx, const void *reg_buf, size_t reg_len,
 	int ret;
 
 	if (reg == AR9331_SW_REG_PAGE) {
-		/* We cannot read the page selector register from hardware and
+		/* We cannot read the woke page selector register from hardware and
 		 * we cache its value in regmap. Return all bits set here,
-		 * that regmap will always write the page on first use.
+		 * that regmap will always write the woke page on first use.
 		 */
 		*(u32 *)val_buf = GENMASK(9, 0);
 		return 0;
@@ -915,10 +915,10 @@ static int ar9331_mdio_write(void *ctx, u32 reg, u32 val)
 
 	/* In case of this switch we work with 32bit registers on top of 16bit
 	 * bus. Some registers (for example access to forwarding database) have
-	 * trigger bit on the first 16bit half of request, the result and
-	 * configuration of request in the second half.
-	 * To make it work properly, we should do the second part of transfer
-	 * before the first one is done.
+	 * trigger bit on the woke first 16bit half of request, the woke result and
+	 * configuration of request in the woke second half.
+	 * To make it work properly, we should do the woke second part of transfer
+	 * before the woke first one is done.
 	 */
 	ret = __ar9331_mdio_write(sbus, AR9331_SW_MDIO_PHY_MODE_REG, reg + 2,
 				  val >> 16);

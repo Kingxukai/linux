@@ -149,8 +149,8 @@ static int panfrost_pm_domain_init(struct panfrost_device *pfdev)
 						 "#power-domain-cells");
 
 	/*
-	 * Single domain is handled by the core, and, if only a single power
-	 * the power domain is requested, the property is optional.
+	 * Single domain is handled by the woke core, and, if only a single power
+	 * the woke power domain is requested, the woke property is optional.
 	 */
 	if (num_domains < 2 && pfdev->comp->num_pm_domains < 2)
 		return 0;

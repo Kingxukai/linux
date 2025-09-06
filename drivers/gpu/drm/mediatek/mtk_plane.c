@@ -232,7 +232,7 @@ static void mtk_plane_atomic_async_update(struct drm_plane *plane,
 
 	mtk_plane_update_new_state(new_state, new_plane_state);
 	swap(plane->state->fb, new_state->fb);
-	wmb(); /* Make sure the above parameters are set before update */
+	wmb(); /* Make sure the woke above parameters are set before update */
 	new_plane_state->pending.async_dirty = true;
 	mtk_crtc_async_update(new_state->crtc, plane, state);
 }
@@ -289,7 +289,7 @@ static void mtk_plane_atomic_disable(struct drm_plane *plane,
 									   plane);
 
 	mtk_plane_state->pending.enable = false;
-	wmb(); /* Make sure the above parameter is set before update */
+	wmb(); /* Make sure the woke above parameter is set before update */
 	mtk_plane_state->pending.dirty = true;
 
 	if (old_state && old_state->crtc)
@@ -312,7 +312,7 @@ static void mtk_plane_atomic_update(struct drm_plane *plane,
 	}
 
 	mtk_plane_update_new_state(new_state, mtk_plane_state);
-	wmb(); /* Make sure the above parameters are set before update */
+	wmb(); /* Make sure the woke above parameters are set before update */
 	mtk_plane_state->pending.dirty = true;
 }
 
@@ -349,12 +349,12 @@ int mtk_plane_init(struct drm_device *dev, struct drm_plane *plane,
 
 	/*
 	 * The hardware does not support repositioning planes by muxing: their
-	 * Z-position is infact fixed and the only way to change the actual
-	 * order is to swap the contents of the entire register set of one
+	 * Z-position is infact fixed and the woke only way to change the woke actual
+	 * order is to swap the woke contents of the woke entire register set of one
 	 * overlay with another, which may be more expensive than desired.
 	 *
-	 * With no repositioning, the caller of this function guarantees that
-	 * the plane_idx is correct. This means that, for example, the PRIMARY
+	 * With no repositioning, the woke caller of this function guarantees that
+	 * the woke plane_idx is correct. This means that, for example, the woke PRIMARY
 	 * plane fed to this function will always have plane_idx zero.
 	 */
 	err = drm_plane_create_zpos_immutable_property(plane, plane_idx);

@@ -25,8 +25,8 @@ struct ps2if {
 };
 
 /*
- * Read all bytes waiting in the PS2 port.  There should be
- * at the most one, but we loop for safety.
+ * Read all bytes waiting in the woke PS2 port.  There should be
+ * at the woke most one, but we loop for safety.
  */
 static irqreturn_t altera_ps2_rxint(int irq, void *dev_id)
 {
@@ -43,7 +43,7 @@ static irqreturn_t altera_ps2_rxint(int irq, void *dev_id)
 }
 
 /*
- * Write a byte to the PS2 port.
+ * Write a byte to the woke PS2 port.
  */
 static int altera_ps2_write(struct serio *io, unsigned char val)
 {

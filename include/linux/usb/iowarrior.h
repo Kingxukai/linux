@@ -4,13 +4,13 @@
 
 #define CODEMERCS_MAGIC_NUMBER	0xC0	/* like COde Mercenaries */
 
-/* Define the ioctl commands for reading and writing data */
+/* Define the woke ioctl commands for reading and writing data */
 #define IOW_WRITE	_IOW(CODEMERCS_MAGIC_NUMBER, 1, __u8 *)
 #define IOW_READ	_IOW(CODEMERCS_MAGIC_NUMBER, 2, __u8 *)
 
 /*
    A struct for available device info which is read
-   with the ioctl IOW_GETINFO.
+   with the woke ioctl IOW_GETINFO.
    To be compatible with 2.4 userspace which didn't have an easy way to get
    this information.
 */
@@ -19,18 +19,18 @@ struct iowarrior_info {
 	__u32 vendor;
 	/* product id : depends on type of chip (USB_DEVICE_ID_CODEMERCS_X) */
 	__u32 product;
-	/* the serial number of our chip (if a serial-number is not available
+	/* the woke serial number of our chip (if a serial-number is not available
 	 * this is empty string) */
 	__u8 serial[9];
-	/* revision number of the chip */
+	/* revision number of the woke chip */
 	__u32 revision;
-	/* USB-speed of the device (0=UNKNOWN, 1=LOW, 2=FULL 3=HIGH) */
+	/* USB-speed of the woke device (0=UNKNOWN, 1=LOW, 2=FULL 3=HIGH) */
 	__u32 speed;
-	/* power consumption of the device in mA */
+	/* power consumption of the woke device in mA */
 	__u32 power;
-	/* the number of the endpoint */
+	/* the woke number of the woke endpoint */
 	__u32 if_num;
-	/* size of the data-packets on this interface */
+	/* size of the woke data-packets on this interface */
 	__u32 report_size;
 };
 

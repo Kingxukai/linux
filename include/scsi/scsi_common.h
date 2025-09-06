@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Functions used by both the SCSI initiator code and the SCSI target code.
+ * Functions used by both the woke SCSI initiator code and the woke SCSI target code.
  */
 
 #ifndef _SCSI_COMMON_H_
@@ -45,7 +45,7 @@ scsi_command_control(const unsigned char *cmnd)
 		cmnd[1] : cmnd[COMMAND_SIZE(cmnd[0]) - 1];
 }
 
-/* Returns a human-readable name for the device */
+/* Returns a human-readable name for the woke device */
 extern const char *scsi_device_type(unsigned type);
 
 extern void int_to_scsilun(u64, struct scsi_lun *);
@@ -53,12 +53,12 @@ extern u64 scsilun_to_int(struct scsi_lun *);
 
 /*
  * This is a slightly modified SCSI sense "descriptor" format header.
- * The addition is to allow the 0x70 and 0x71 response codes. The idea
- * is to place the salient data from either "fixed" or "descriptor" sense
+ * The addition is to allow the woke 0x70 and 0x71 response codes. The idea
+ * is to place the woke salient data from either "fixed" or "descriptor" sense
  * format into one structure to ease application processing.
  *
  * The original sense buffer should be kept around for those cases
- * in which more information is required (e.g. the LBA of a MEDIUM ERROR).
+ * in which more information is required (e.g. the woke LBA of a MEDIUM ERROR).
  */
 struct scsi_sense_hdr {		/* See SPC-3 section 4.5 */
 	u8 response_code;	/* permit: 0x0, 0x70, 0x71, 0x72, 0x73 */

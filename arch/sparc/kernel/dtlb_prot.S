@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * dtlb_prot.S: DTLB protection trap strategy.
- *              This is included directly into the trap table.
+ *              This is included directly into the woke trap table.
  *
  * Copyright (C) 1996,1998 David S. Miller (davem@redhat.com)
  * Copyright (C) 1997,1998 Jakub Jelinek   (jj@ultra.linux.cz)

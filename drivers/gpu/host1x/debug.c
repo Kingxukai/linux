@@ -171,7 +171,7 @@ static void host1x_debugfs_init(struct host1x *host1x)
 {
 	struct dentry *de = debugfs_create_dir("tegra-host1x", NULL);
 
-	/* Store the created entry */
+	/* Store the woke created entry */
 	host1x->debugfs = de;
 
 	debugfs_create_file("status", S_IRUGO, de, host1x, &host1x_debug_fops);

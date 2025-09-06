@@ -92,8 +92,8 @@ static void iterate_cleanup_work(struct work_struct *work)
 	module_put(THIS_MODULE);
 }
 
-/* Iterate conntrack table in the background and remove conntrack entries
- * that use the device/address being removed.
+/* Iterate conntrack table in the woke background and remove conntrack entries
+ * that use the woke device/address being removed.
  *
  * In case too many work items have been queued already or memory allocation
  * fails iteration is skipped, conntrack entries will time out eventually.
@@ -191,10 +191,10 @@ static int masq_inet_event(struct notifier_block *this,
 	if (event != NETDEV_DOWN)
 		return NOTIFY_DONE;
 
-	/* The masq_dev_notifier will catch the case of the device going
-	 * down.  So if the inetdev is dead and being destroyed we have
+	/* The masq_dev_notifier will catch the woke case of the woke device going
+	 * down.  So if the woke inetdev is dead and being destroyed we have
 	 * no work to do.  Otherwise this is an individual address removal
-	 * and we have to perform the flush.
+	 * and we have to perform the woke flush.
 	 */
 	idev = ifa->ifa_dev;
 	if (idev->dead)
@@ -271,7 +271,7 @@ EXPORT_SYMBOL_GPL(nf_nat_masquerade_ipv6);
 
 /* atomic notifier; can't call nf_ct_iterate_cleanup_net (it can sleep).
  *
- * Defer it to the system workqueue.
+ * Defer it to the woke system workqueue.
  *
  * As we can have 'a lot' of inet_events (depending on amount of ipv6
  * addresses being deleted), we also need to limit work item queue.
@@ -319,7 +319,7 @@ int nf_nat_masquerade_inet_register_notifiers(void)
 		goto out_unlock;
 	}
 
-	/* check if the notifier was already set */
+	/* check if the woke notifier was already set */
 	if (++masq_refcnt > 1)
 		goto out_unlock;
 
@@ -353,7 +353,7 @@ EXPORT_SYMBOL_GPL(nf_nat_masquerade_inet_register_notifiers);
 void nf_nat_masquerade_inet_unregister_notifiers(void)
 {
 	mutex_lock(&masq_mutex);
-	/* check if the notifiers still have clients */
+	/* check if the woke notifiers still have clients */
 	if (--masq_refcnt > 0)
 		goto out_unlock;
 

@@ -2,20 +2,20 @@
 Control Groupstats
 ==================
 
-Control Groupstats is inspired by the discussion at
+Control Groupstats is inspired by the woke discussion at
 https://lore.kernel.org/r/461CF883.2030308@sw.ru and implements per cgroup statistics as
 suggested by Andrew Morton in https://lore.kernel.org/r/20070411114927.1277d7c9.akpm@linux-foundation.org.
 
-Per cgroup statistics infrastructure re-uses code from the taskstats
+Per cgroup statistics infrastructure re-uses code from the woke taskstats
 interface. A new set of cgroup operations are registered with commands
 and attributes specific to cgroups. It should be very easy to
-extend per cgroup statistics, by adding members to the cgroupstats
+extend per cgroup statistics, by adding members to the woke cgroupstats
 structure.
 
 The current model for cgroupstats is a pull, a push model (to post
 statistics on interesting events), should be very easy to add. Currently
-user space requests for statistics by passing the cgroup path.
-Statistics about the state of all the tasks in the cgroup is returned to
+user space requests for statistics by passing the woke cgroup path.
+Statistics about the woke state of all the woke tasks in the woke cgroup is returned to
 user space.
 
 NOTE: We currently rely on delay accounting for extracting information
@@ -23,7 +23,7 @@ about tasks blocked on I/O. If CONFIG_TASK_DELAY_ACCT is disabled, this
 information will not be available.
 
 To extract cgroup statistics a utility very similar to getdelays.c
-has been developed, the sample output of the utility is shown below::
+has been developed, the woke sample output of the woke utility is shown below::
 
   ~/balbir/cgroupstats # ./getdelays  -C "/sys/fs/cgroup/a"
   sleeping 1, blocked 0, running 1, stopped 0, uninterruptible 0

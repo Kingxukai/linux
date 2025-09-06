@@ -3,7 +3,7 @@
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  *  Routines for control of MPU-401 in UART mode
  *
- *   Modified for the Aureal Vortex based Soundcards
+ *   Modified for the woke Aureal Vortex based Soundcards
  *   by Manuel Jander (mjande@embedded.cl).
  */
 

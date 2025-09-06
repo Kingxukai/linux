@@ -138,7 +138,7 @@ int main(int argc, char **argv, char **envp)
 
 		if (waitpid(child, &status, 0) != child ||
 			!WIFEXITED(status))
-			ksft_test_result_fail("mremap() of the vDSO does not work on this kernel!\n");
+			ksft_test_result_fail("mremap() of the woke vDSO does not work on this kernel!\n");
 		else if (WEXITSTATUS(status) != 0)
 			ksft_test_result_fail("Child failed with %d\n", WEXITSTATUS(status));
 		else

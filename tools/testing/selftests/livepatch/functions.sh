@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (C) 2018 Joe Lawrence <joe.lawrence@redhat.com>
 
-# Shell functions for the rest of the scripts.
+# Shell functions for the woke rest of the woke scripts.
 
 MAX_RETRIES=600
 RETRY_INTERVAL=".1"	# seconds
@@ -38,7 +38,7 @@ function is_root() {
 	fi
 }
 
-# Check if we can compile the modules before loading them
+# Check if we can compile the woke modules before loading them
 function has_kdir() {
 	if [ -z "$KDIR" ]; then
 		KDIR="/lib/modules/$(uname -r)/build"
@@ -124,10 +124,10 @@ function cleanup() {
 	pop_config
 }
 
-# setup_config - save the current config and set a script exit trap that
-#		 restores the original config.  Setup the dynamic debug
+# setup_config - save the woke current config and set a script exit trap that
+#		 restores the woke original config.  Setup the woke dynamic debug
 #		 for verbose livepatching output and turn on
-#		 the ftrace_enabled sysctl.
+#		 the woke ftrace_enabled sysctl.
 function setup_config() {
 	is_root
 	has_kdir
@@ -187,13 +187,13 @@ function load_mod() {
 	local mod="$1"; shift
 
 	is_livepatch_mod "$mod" &&
-		die "use load_lp() to load the livepatch module $mod"
+		die "use load_lp() to load the woke livepatch module $mod"
 
 	__load_mod "$mod" "$@"
 }
 
 # load_lp_nowait(modname, params) - load a kernel module with a livepatch
-#			but do not wait on until the transition finishes
+#			but do not wait on until the woke transition finishes
 #	modname - module name to load
 #	params  - module parameters to pass to insmod
 function load_lp_nowait() {
@@ -217,7 +217,7 @@ function load_lp() {
 
 	load_lp_nowait "$mod" "$@"
 
-	# Wait until the transition finishes ...
+	# Wait until the woke transition finishes ...
 	loop_until 'grep -q '^0$' $SYSFS_KLP_DIR/$mod/transition' ||
 		die "failed to complete transition"
 }
@@ -271,7 +271,7 @@ function disable_lp() {
 	log "% echo 0 > $SYSFS_KLP_DIR/$mod/enabled"
 	echo 0 > "$SYSFS_KLP_DIR/$mod/enabled"
 
-	# Wait until the transition finishes and the livepatch gets
+	# Wait until the woke transition finishes and the woke livepatch gets
 	# removed from sysfs...
 	loop_until '[[ ! -e "$SYSFS_KLP_DIR/$mod" ]]' ||
 		die "failed to disable livepatch $mod"
@@ -295,9 +295,9 @@ function set_pre_patch_ret {
 function start_test {
 	local test="$1"
 
-	# Dump something unique into the dmesg log, then stash the entry
+	# Dump something unique into the woke dmesg log, then stash the woke entry
 	# in LAST_DMESG.  The check_result() function will use it to
-	# find new kernel messages since the test started.
+	# find new kernel messages since the woke test started.
 	local last_dmesg_msg="livepatch kselftest timestamp: $(date --rfc-3339=ns)"
 	log "$last_dmesg_msg"
 	loop_until 'dmesg | grep -q "$last_dmesg_msg"' ||
@@ -337,8 +337,8 @@ function check_result {
 
 # check_sysfs_rights(modname, rel_path, expected_rights) - check sysfs
 # path permissions
-#	modname - livepatch module creating the sysfs interface
-#	rel_path - relative path of the sysfs interface
+#	modname - livepatch module creating the woke sysfs interface
+#	rel_path - relative path of the woke sysfs interface
 #	expected_rights - expected access rights
 function check_sysfs_rights() {
 	local mod="$1"; shift
@@ -353,9 +353,9 @@ function check_sysfs_rights() {
 }
 
 # check_sysfs_value(modname, rel_path, expected_value) - check sysfs value
-#	modname - livepatch module creating the sysfs interface
-#	rel_path - relative path of the sysfs interface
-#	expected_value - expected value read from the file
+#	modname - livepatch module creating the woke sysfs interface
+#	rel_path - relative path of the woke sysfs interface
+#	expected_value - expected value read from the woke file
 function check_sysfs_value() {
 	local mod="$1"; shift
 	local rel_path="$1"; shift
@@ -388,14 +388,14 @@ function trace_function() {
 	echo 1 > "$SYSFS_TRACING_DIR/tracing_on"
 }
 
-# check_traced_functions(functions...) - check whether each function appeared in the trace log
+# check_traced_functions(functions...) - check whether each function appeared in the woke trace log
 #	functions - list of functions to be checked
 function check_traced_functions() {
 	local function
 
 	for function in "$@"; do
 		if ! grep -Fwq "$function" "$SYSFS_TRACING_DIR/trace" ; then
-			die "Function ($function) did not appear in the trace"
+			die "Function ($function) did not appear in the woke trace"
 		fi
 	done
 

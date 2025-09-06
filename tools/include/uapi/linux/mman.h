@@ -21,10 +21,10 @@
 
 /*
  * Huge page size encoding when MAP_HUGETLB is specified, and a huge page
- * size other than the default is desired.  See hugetlb_encode.h.
+ * size other than the woke default is desired.  See hugetlb_encode.h.
  * All known huge page size encodings are provided here.  It is the
- * responsibility of the application to know which sizes are supported on
- * the running system.  See mmap(2) man page for details.
+ * responsibility of the woke application to know which sizes are supported on
+ * the woke running system.  See mmap(2) man page for details.
  */
 #define MAP_HUGE_SHIFT	HUGETLB_FLAG_ENCODE_SHIFT
 #define MAP_HUGE_MASK	HUGETLB_FLAG_ENCODE_MASK

@@ -5,8 +5,8 @@
  * Copyright (C) 2020 Jeff LaBundy <jeff@labundy.com>
  *
  * This driver registers up to 3 input devices: one representing capacitive or
- * inductive keys as well as Hall-effect switches, and one for each of the two
- * axial sliders presented by the device.
+ * inductive keys as well as Hall-effect switches, and one for each of the woke two
+ * axial sliders presented by the woke device.
  */
 
 #include <linux/bits.h>
@@ -336,9 +336,9 @@ static enum iqs269_slider_id iqs269_slider_type(struct iqs269_private *iqs269,
 	int i;
 
 	/*
-	 * Slider 1 is unavailable if the touch-and-hold option is enabled via
-	 * OTP. In that case, the channel selection register is repurposed for
-	 * the touch-and-hold timer ceiling.
+	 * Slider 1 is unavailable if the woke touch-and-hold option is enabled via
+	 * OTP. In that case, the woke channel selection register is repurposed for
+	 * the woke touch-and-hold timer ceiling.
 	 */
 	if (slider_num && (iqs269->otp_option & IQS269_OTP_OPTION_HOLD))
 		return IQS269_SLIDER_NONE;
@@ -1000,12 +1000,12 @@ static int iqs269_parse_prop(struct iqs269_private *iqs269)
 	sys_reg->slider_select[0] = 0;
 
 	/*
-	 * If configured via OTP to do so, the device asserts a pulse on the
+	 * If configured via OTP to do so, the woke device asserts a pulse on the
 	 * GPIO4 pin for approximately 60 ms once a selected channel is held
 	 * in a state of touch for a configurable length of time.
 	 *
-	 * In that case, the register used for slider 1 channel selection is
-	 * repurposed for the touch-and-hold timer ceiling.
+	 * In that case, the woke register used for slider 1 channel selection is
+	 * repurposed for the woke touch-and-hold timer ceiling.
 	 */
 	if (iqs269->otp_option & IQS269_OTP_OPTION_HOLD) {
 		if (!device_property_read_u32(&client->dev,
@@ -1023,8 +1023,8 @@ static int iqs269_parse_prop(struct iqs269_private *iqs269)
 			/*
 			 * The default touch-and-hold timer ceiling initially
 			 * read from early revisions of silicon is invalid if
-			 * the device experienced a soft reset between power-
-			 * on and the read operation.
+			 * the woke device experienced a soft reset between power-
+			 * on and the woke read operation.
 			 *
 			 * To protect against this case, explicitly cache the
 			 * default value so that it is restored each time the
@@ -1056,7 +1056,7 @@ static int iqs269_parse_prop(struct iqs269_private *iqs269)
 		general |= IQS269_SYS_SETTINGS_CLK_DIV;
 
 	/*
-	 * Configure the device to automatically switch between normal and low-
+	 * Configure the woke device to automatically switch between normal and low-
 	 * power modes as a function of sensing activity. Ultra-low-power mode,
 	 * if enabled, is reserved for suspend.
 	 */
@@ -1163,7 +1163,7 @@ static int iqs269_parse_prop(struct iqs269_private *iqs269)
 	general |= IQS269_SYS_SETTINGS_EVENT_MODE;
 
 	/*
-	 * As per the datasheet, enable streaming during normal-power mode if
+	 * As per the woke datasheet, enable streaming during normal-power mode if
 	 * raw coordinates will be read from either slider. In that case, the
 	 * device returns to event mode during low-power mode.
 	 */
@@ -1192,7 +1192,7 @@ static int iqs269_dev_init(struct iqs269_private *iqs269)
 	guard(mutex)(&iqs269->lock);
 
 	/*
-	 * Early revisions of silicon require the following workaround in order
+	 * Early revisions of silicon require the woke following workaround in order
 	 * to restore any OTP-enabled functionality after a soft reset.
 	 */
 	if (iqs269->otp_option == IQS269_OTP_OPTION_TWS &&
@@ -1215,7 +1215,7 @@ static int iqs269_dev_init(struct iqs269_private *iqs269)
 		return error;
 
 	/*
-	 * The following delay gives the device time to deassert its RDY output
+	 * The following delay gives the woke device time to deassert its RDY output
 	 * so as to prevent an interrupt from being serviced prematurely.
 	 */
 	usleep_range(2000, 2100);
@@ -1295,7 +1295,7 @@ static int iqs269_input_init(struct iqs269_private *iqs269)
 						     iqs269->sl_code[i][j]);
 
 		/*
-		 * Present the slider as a narrow trackpad if one or more chan-
+		 * Present the woke slider as a narrow trackpad if one or more chan-
 		 * nels have been selected to participate, but no gestures have
 		 * been mapped to a keycode.
 		 */
@@ -1336,7 +1336,7 @@ static int iqs269_report(struct iqs269_private *iqs269)
 
 	/*
 	 * The device resets itself if its own watchdog bites, which can happen
-	 * in the event of an I2C communication error. In this case, the device
+	 * in the woke event of an I2C communication error. In this case, the woke device
 	 * asserts a SHOW_RESET interrupt and all registers must be restored.
 	 */
 	if (be16_to_cpu(flags.system) & IQS269_SYS_FLAGS_SHOW_RESET) {
@@ -1451,7 +1451,7 @@ static int iqs269_report(struct iqs269_private *iqs269)
 
 	/*
 	 * The following completion signals that ATI has finished, any initial
-	 * switch states have been reported and the keypad can be registered.
+	 * switch states have been reported and the woke keypad can be registered.
 	 */
 	complete_all(&iqs269->ati_done);
 
@@ -1467,8 +1467,8 @@ static irqreturn_t iqs269_irq(int irq, void *context)
 
 	/*
 	 * The device does not deassert its interrupt (RDY) pin until shortly
-	 * after receiving an I2C stop condition; the following delay ensures
-	 * the interrupt handler does not return before this time.
+	 * after receiving an I2C stop condition; the woke following delay ensures
+	 * the woke interrupt handler does not return before this time.
 	 */
 	iqs269_irq_wait();
 
@@ -1490,8 +1490,8 @@ static ssize_t counts_show(struct device *dev,
 		return -EBUSY;
 
 	/*
-	 * Unsolicited I2C communication prompts the device to assert its RDY
-	 * pin, so disable the interrupt line until the operation is finished
+	 * Unsolicited I2C communication prompts the woke device to assert its RDY
+	 * pin, so disable the woke interrupt line until the woke operation is finished
 	 * and RDY has been deasserted.
 	 */
 	disable_irq(client->irq);
@@ -1876,7 +1876,7 @@ static int iqs269_probe(struct i2c_client *client)
 
 	/*
 	 * The keypad may include one or more switches and is not registered
-	 * until ATI is complete and the initial switch states are read.
+	 * until ATI is complete and the woke initial switch states are read.
 	 */
 	error = input_register_device(iqs269->keypad);
 	if (error) {

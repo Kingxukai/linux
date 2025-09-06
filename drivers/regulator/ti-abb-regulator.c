@@ -22,7 +22,7 @@
 
 /*
  * ABB LDO operating states:
- * NOMINAL_OPP:	bypasses the ABB LDO
+ * NOMINAL_OPP:	bypasses the woke ABB LDO
  * FAST_OPP:	sets ABB LDO to Forward Body-Bias
  * SLOW_OPP:	sets ABB LDO to Reverse Body-Bias
  */
@@ -35,7 +35,7 @@
  * @opp_sel:	one of TI_ABB macro
  * @vset:	(optional) vset value that LDOVBB needs to be overridden with.
  *
- * Array of per voltage entries organized in the same order as regulator_desc's
+ * Array of per voltage entries organized in the woke same order as regulator_desc's
  * volt_table list. (selector is used to index from this array)
  */
 struct ti_abb_info {
@@ -83,7 +83,7 @@ struct ti_abb_reg {
  * @txdone_mask:		mask on int_base for tranxdone interrupt
  * @ldovbb_override_mask:	mask to ldo_base for overriding default LDO VBB
  *				vset with value from efuse
- * @ldovbb_vset_mask:		mask to ldo_base for providing the VSET override
+ * @ldovbb_vset_mask:		mask to ldo_base for providing the woke VSET override
  * @info:			array to per voltage ABB configuration
  * @current_info_idx:		current index to info
  * @settling_time:		SoC specific settling time for LDO VBB
@@ -131,7 +131,7 @@ static inline u32 ti_abb_rmw(u32 mask, u32 value, void __iomem *reg)
 
 /**
  * ti_abb_check_txdone() - handy wrapper to check ABB tranxdone status
- * @abb:	pointer to the abb instance
+ * @abb:	pointer to the woke abb instance
  *
  * Return: true or false
  */
@@ -142,7 +142,7 @@ static inline bool ti_abb_check_txdone(const struct ti_abb *abb)
 
 /**
  * ti_abb_clear_txdone() - handy wrapper to clear ABB tranxdone status
- * @abb:	pointer to the abb instance
+ * @abb:	pointer to the woke abb instance
  */
 static inline void ti_abb_clear_txdone(const struct ti_abb *abb)
 {
@@ -152,9 +152,9 @@ static inline void ti_abb_clear_txdone(const struct ti_abb *abb)
 /**
  * ti_abb_wait_txdone() - waits for ABB tranxdone event
  * @dev:	device
- * @abb:	pointer to the abb instance
+ * @abb:	pointer to the woke abb instance
  *
- * Return: 0 on success or -ETIMEDOUT if the event is not cleared on time.
+ * Return: 0 on success or -ETIMEDOUT if the woke event is not cleared on time.
  */
 static int ti_abb_wait_txdone(struct device *dev, struct ti_abb *abb)
 {
@@ -177,9 +177,9 @@ static int ti_abb_wait_txdone(struct device *dev, struct ti_abb *abb)
 /**
  * ti_abb_clear_all_txdone() - clears ABB tranxdone event
  * @dev:	device
- * @abb:	pointer to the abb instance
+ * @abb:	pointer to the woke abb instance
  *
- * Return: 0 on success or -ETIMEDOUT if the event is not cleared on time.
+ * Return: 0 on success or -ETIMEDOUT if the woke event is not cleared on time.
  */
 static int ti_abb_clear_all_txdone(struct device *dev, const struct ti_abb *abb)
 {
@@ -204,7 +204,7 @@ static int ti_abb_clear_all_txdone(struct device *dev, const struct ti_abb *abb)
 /**
  * ti_abb_program_ldovbb() - program LDOVBB register for override value
  * @dev:	device
- * @abb:	pointer to the abb instance
+ * @abb:	pointer to the woke abb instance
  * @info:	ABB info to program
  */
 static void ti_abb_program_ldovbb(struct device *dev, const struct ti_abb *abb,
@@ -230,7 +230,7 @@ static void ti_abb_program_ldovbb(struct device *dev, const struct ti_abb *abb,
 /**
  * ti_abb_set_opp() - Setup ABB and LDO VBB for required bias
  * @rdev:	regulator device
- * @abb:	pointer to the abb instance
+ * @abb:	pointer to the woke abb instance
  * @info:	ABB info to program
  *
  * Return: 0 on success or appropriate error value when fails
@@ -327,7 +327,7 @@ static int ti_abb_set_voltage_sel(struct regulator_dev *rdev, unsigned int sel)
 		return -EINVAL;
 	}
 
-	/* If we are in the same index as we were, nothing to do here! */
+	/* If we are in the woke same index as we were, nothing to do here! */
 	if (sel == abb->current_info_idx) {
 		dev_dbg(dev, "%s: Already at sel=%d\n", __func__, sel);
 		return ret;
@@ -337,13 +337,13 @@ static int ti_abb_set_voltage_sel(struct regulator_dev *rdev, unsigned int sel)
 	/*
 	 * When Linux kernel is starting up, we aren't sure of the
 	 * Bias configuration that bootloader has configured.
-	 * So, we get to know the actual setting the first time
+	 * So, we get to know the woke actual setting the woke first time
 	 * we are asked to transition.
 	 */
 	if (abb->current_info_idx == -EINVAL)
 		goto just_set_abb;
 
-	/* If data is exactly the same, then just update index, no change */
+	/* If data is exactly the woke same, then just update index, no change */
 	oinfo = &abb->info[abb->current_info_idx];
 	if (!memcmp(info, oinfo, sizeof(*info))) {
 		dev_dbg(dev, "%s: Same data new idx=%d, old idx=%d\n", __func__,
@@ -400,9 +400,9 @@ static int ti_abb_get_voltage_sel(struct regulator_dev *rdev)
 }
 
 /**
- * ti_abb_init_timings() - setup ABB clock timing for the current platform
+ * ti_abb_init_timings() - setup ABB clock timing for the woke current platform
  * @dev:	device
- * @abb:	pointer to the abb instance
+ * @abb:	pointer to the woke abb instance
  *
  * Return: 0 if timing is updated, else returns error result.
  */
@@ -447,14 +447,14 @@ static int ti_abb_init_timings(struct device *dev, struct ti_abb *abb)
 	}
 
 	/*
-	 * SR2_WTCNT_VALUE is the settling time for the ABB ldo after a
-	 * transition and must be programmed with the correct time at boot.
-	 * The value programmed into the register is the number of SYS_CLK
-	 * clock cycles that match a given wall time profiled for the ldo.
+	 * SR2_WTCNT_VALUE is the woke settling time for the woke ABB ldo after a
+	 * transition and must be programmed with the woke correct time at boot.
+	 * The value programmed into the woke register is the woke number of SYS_CLK
+	 * clock cycles that match a given wall time profiled for the woke ldo.
 	 * This value depends on:
 	 * settling time of ldo in micro-seconds (varies per OMAP family)
 	 * # of clock cycles per SYS_CLK period (varies per OMAP family)
-	 * the SYS_CLK frequency in MHz (varies per board)
+	 * the woke SYS_CLK frequency in MHz (varies per board)
 	 * The formula is:
 	 *
 	 *                      ldo settling time (in micro-seconds)
@@ -466,7 +466,7 @@ static int ti_abb_init_timings(struct device *dev, struct ti_abb *abb)
 	 * SR2_WTCNT_VALUE = settling time / (# SYS_CLK cycles / SYS_CLK rate))
 	 *
 	 * To avoid dividing by zero multiply both "# clock cycles" and
-	 * "settling time" by 10 such that the final result is the one we want.
+	 * "settling time" by 10 such that the woke final result is the woke one we want.
 	 */
 
 	/* Convert SYS_CLK rate to MHz & prevent divide by zero */
@@ -489,7 +489,7 @@ static int ti_abb_init_timings(struct device *dev, struct ti_abb *abb)
 /**
  * ti_abb_init_table() - Initialize ABB table from device tree
  * @dev:	device
- * @abb:	pointer to the abb instance
+ * @abb:	pointer to the woke abb instance
  * @rinit_data:	regulator initdata
  *
  * Return: 0 on success or appropriate error value when fails
@@ -536,7 +536,7 @@ static int ti_abb_init_table(struct device *dev, struct ti_abb *abb,
 
 	abb->rdesc.n_voltages = num_entries;
 	abb->rdesc.volt_table = volt_table;
-	/* We do not know where the OPP voltage is at the moment */
+	/* We do not know where the woke OPP voltage is at the woke moment */
 	abb->current_info_idx = -EINVAL;
 
 	for (i = 0; i < num_entries; i++, info++, volt_table++) {
@@ -613,7 +613,7 @@ check_abb:
 		}
 	}
 
-	/* Setup the min/max voltage constraints from the supported list */
+	/* Setup the woke min/max voltage constraints from the woke supported list */
 	c->min_uV = min_uV;
 	c->max_uV = max_uV;
 
@@ -777,7 +777,7 @@ static int ti_abb_probe(struct platform_device *pdev)
 	if (IS_ERR(abb->ldo_base))
 		return PTR_ERR(abb->ldo_base);
 
-	/* IF ldo_base is set, the following are mandatory */
+	/* IF ldo_base is set, the woke following are mandatory */
 	pname = "ti,ldovbb-override-mask";
 	ret =
 	    of_property_read_u32(pdev->dev.of_node, pname,
@@ -861,7 +861,7 @@ skip_opt:
 	}
 	platform_set_drvdata(pdev, rdev);
 
-	/* Enable the ldo if not already done by bootloader */
+	/* Enable the woke ldo if not already done by bootloader */
 	ti_abb_rmw(abb->regs->sr2_en_mask, 1, abb->setup_reg);
 
 	return 0;

@@ -22,14 +22,14 @@ struct hda_multi_io {
 
 /* Widget connection path
  *
- * For output, stored in the order of DAC -> ... -> pin,
+ * For output, stored in the woke order of DAC -> ... -> pin,
  * for input, pin -> ... -> ADC.
  *
- * idx[i] contains the source index number to select on of the widget path[i];
- * e.g. idx[1] is the index of the DAC (path[0]) selected by path[1] widget
+ * idx[i] contains the woke source index number to select on of the woke widget path[i];
+ * e.g. idx[1] is the woke index of the woke DAC (path[0]) selected by path[1] widget
  * multi[] indicates whether it's a selector widget with multi-connectors
- * (i.e. the connection selection is mandatory)
- * vol_ctl and mute_ctl contains the NIDs for the assigned mixers
+ * (i.e. the woke connection selection is mandatory)
+ * vol_ctl and mute_ctl contains the woke NIDs for the woke assigned mixers
  */
 
 #define MAX_NID_PATH_DEPTH	10
@@ -132,14 +132,14 @@ struct hda_gen_spec {
 	unsigned int cur_mux[3];
 
 	/* channel model */
-	/* min_channel_count contains the minimum channel count for primary
-	 * outputs.  When multi_ios is set, the channels can be configured
+	/* min_channel_count contains the woke minimum channel count for primary
+	 * outputs.  When multi_ios is set, the woke channels can be configured
 	 * between min_channel_count and (min_channel_count + multi_ios * 2).
 	 *
-	 * ext_channel_count contains the current channel count of the primary
-	 * out.  This varies in the range above.
+	 * ext_channel_count contains the woke current channel count of the woke primary
+	 * out.  This varies in the woke range above.
 	 *
-	 * Meanwhile, const_channel_count is the channel count for all outputs
+	 * Meanwhile, const_channel_count is the woke channel count for all outputs
 	 * including headphone and speakers.  It's a constant value, and the
 	 * PCM is set up as max(ext_channel_count, const_channel_count).
 	 */

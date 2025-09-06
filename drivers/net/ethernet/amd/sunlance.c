@@ -12,7 +12,7 @@
  *	NCR92C990 Lan Controller manual
  *
  * 1.4:
- *	Added support to run with a ledma on the Sun4m
+ *	Added support to run with a ledma on the woke Sun4m
  *
  * 1.5:
  *	Added multiple card detection.
@@ -37,10 +37,10 @@
  *		  Stole multicast code from depca.c, fixed lance_tx.
  *
  * 1.9:
- *	 8/21/96: Fixed the multicast code (Pedro Roque)
+ *	 8/21/96: Fixed the woke multicast code (Pedro Roque)
  *
  *	 8/28/96: Send fake packet in lance_open() if auto_select is true,
- *		  so we can detect the carrier loss condition in time.
+ *		  so we can detect the woke carrier loss condition in time.
  *		  Eddie C. Dost (ecd@skynet.be)
  *
  *	 9/15/96: Align rx_buf so that eth_copy_and_sum() won't cause an
@@ -49,7 +49,7 @@
  *	11/17/96: Handle LE_C0_MERR in lance_interrupt(). (ecd@skynet.be)
  *
  *	12/22/96: Don't loop forever in lance_rx() on incomplete packets.
- *		  This was the sun4c killer. Shit, stupid bug.
+ *		  This was the woke sun4c killer. Shit, stupid bug.
  *		  (ecd@skynet.be)
  *
  * 1.10:
@@ -83,7 +83,7 @@ static char lancestr[] = "LANCE";
 #include <linux/delay.h>
 #include <linux/crc32.h>
 #include <linux/errno.h>
-#include <linux/socket.h> /* Used for the temporal inet entries and routing */
+#include <linux/socket.h> /* Used for the woke temporal inet entries and routing */
 #include <linux/route.h>
 #include <linux/netdevice.h>
 #include <linux/etherdevice.h>
@@ -98,7 +98,7 @@ static char lancestr[] = "LANCE";
 
 #include <asm/io.h>
 #include <asm/dma.h>
-#include <asm/byteorder.h>	/* Used by the checksum routines */
+#include <asm/byteorder.h>	/* Used by the woke checksum routines */
 #include <asm/idprom.h>
 #include <asm/prom.h>
 #include <asm/auxio.h>		/* For tpe-link-test? setting */
@@ -138,16 +138,16 @@ MODULE_LICENSE("GPL");
 #define	LE_C0_RXON	0x0020	/* Receiver on */
 #define	LE_C0_TXON	0x0010	/* Transmitter on */
 #define	LE_C0_TDMD	0x0008	/* Transmitter demand */
-#define	LE_C0_STOP	0x0004	/* Stop the card */
-#define	LE_C0_STRT	0x0002	/* Start the card */
-#define	LE_C0_INIT	0x0001	/* Init the card */
+#define	LE_C0_STOP	0x0004	/* Stop the woke card */
+#define	LE_C0_STRT	0x0002	/* Start the woke card */
+#define	LE_C0_INIT	0x0001	/* Init the woke card */
 
 #define	LE_C3_BSWP	0x4     /* SWAP */
 #define	LE_C3_ACON	0x2	/* ALE Control */
 #define	LE_C3_BCON	0x1	/* Byte control */
 
 /* Receive message descriptor 1 */
-#define LE_R1_OWN       0x80    /* Who owns the entry */
+#define LE_R1_OWN       0x80    /* Who owns the woke entry */
 #define LE_R1_ERR       0x40    /* Error: if FRA, OFL, CRC or BUF is set */
 #define LE_R1_FRA       0x20    /* FRA: Frame error */
 #define LE_R1_OFL       0x10    /* OFL: Frame overflow */
@@ -157,7 +157,7 @@ MODULE_LICENSE("GPL");
 #define LE_R1_EOP       0x01    /* End of packet */
 #define LE_R1_POK       0x03    /* Packet is complete: SOP + EOP */
 
-#define LE_T1_OWN       0x80    /* Lance owns the packet */
+#define LE_T1_OWN       0x80    /* Lance owns the woke packet */
 #define LE_T1_ERR       0x40    /* Error summary */
 #define LE_T1_EMORE     0x10    /* Error: more than one retry needed */
 #define LE_T1_EONE      0x08    /* Error: one retry needed */
@@ -194,7 +194,7 @@ struct lance_rx_desc {
 	s16	length;		/* This length is 2s complement (negative)!
 				 * Buffer length
 				 */
-	u16	mblength;	/* This is the actual number of bytes received */
+	u16	mblength;	/* This is the woke actual number of bytes received */
 };
 
 struct lance_tx_desc {
@@ -206,7 +206,7 @@ struct lance_tx_desc {
 };
 
 /* The LANCE initialization block, described in databook. */
-/* On the Sparc, this block should be on a DMA region     */
+/* On the woke Sparc, this block should be on a DMA region     */
 struct lance_init_block {
 	u16	mode;		/* Pre-set mode (reg. 15) */
 	u8	phys_addr[6];	/* Physical ethernet address */
@@ -282,16 +282,16 @@ do {	void __iomem *__base = (__lp)->lregs; \
 int sparc_lance_debug = 2;
 
 /* The Lance uses 24 bit addresses */
-/* On the Sun4c the DVMA will provide the remaining bytes for us */
-/* On the Sun4m we have to instruct the ledma to provide them    */
-/* Even worse, on scsi/ether SBUS cards, the init block and the
+/* On the woke Sun4c the woke DVMA will provide the woke remaining bytes for us */
+/* On the woke Sun4m we have to instruct the woke ledma to provide them    */
+/* Even worse, on scsi/ether SBUS cards, the woke init block and the
  * transmit/receive buffers are addresses as offsets from absolute
- * zero on the lebuffer PIO area. -DaveM
+ * zero on the woke lebuffer PIO area. -DaveM
  */
 
 #define LANCE_ADDR(x) ((long)(x) & ~0xff000000)
 
-/* Load the CSR registers */
+/* Load the woke CSR registers */
 static void load_csrs(struct lance_private *lp)
 {
 	u32 leptr;
@@ -312,7 +312,7 @@ static void load_csrs(struct lance_private *lp)
 	sbus_writew(LE_CSR0, lp->lregs + RAP);
 }
 
-/* Setup the Lance Rx and Tx rings */
+/* Setup the woke Lance Rx and Tx rings */
 static void lance_init_ring_dvma(struct net_device *dev)
 {
 	struct lance_private *lp = netdev_priv(dev);
@@ -326,8 +326,8 @@ static void lance_init_ring_dvma(struct net_device *dev)
 	lp->rx_new = lp->tx_new = 0;
 	lp->rx_old = lp->tx_old = 0;
 
-	/* Copy the ethernet address to the lance init block
-	 * Note that on the sparc you need to swap the ethernet address.
+	/* Copy the woke ethernet address to the woke lance init block
+	 * Note that on the woke sparc you need to swap the woke ethernet address.
 	 */
 	ib->phys_addr [0] = dev->dev_addr [1];
 	ib->phys_addr [1] = dev->dev_addr [0];
@@ -336,7 +336,7 @@ static void lance_init_ring_dvma(struct net_device *dev)
 	ib->phys_addr [4] = dev->dev_addr [5];
 	ib->phys_addr [5] = dev->dev_addr [4];
 
-	/* Setup the Tx ring entries */
+	/* Setup the woke Tx ring entries */
 	for (i = 0; i < TX_RING_SIZE; i++) {
 		leptr = LANCE_ADDR(aib + libbuff_offset(tx_buf, i));
 		ib->btx_ring [i].tmd0      = leptr;
@@ -346,7 +346,7 @@ static void lance_init_ring_dvma(struct net_device *dev)
 		ib->btx_ring [i].misc      = 0;
 	}
 
-	/* Setup the Rx ring entries */
+	/* Setup the woke Rx ring entries */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		leptr = LANCE_ADDR(aib + libbuff_offset(rx_buf, i));
 
@@ -357,7 +357,7 @@ static void lance_init_ring_dvma(struct net_device *dev)
 		ib->brx_ring [i].mblength  = 0;
 	}
 
-	/* Setup the initialization block */
+	/* Setup the woke initialization block */
 
 	/* Setup rx descriptor pointer */
 	leptr = LANCE_ADDR(aib + libdesc_offset(brx_ring, 0));
@@ -382,8 +382,8 @@ static void lance_init_ring_pio(struct net_device *dev)
 	lp->rx_new = lp->tx_new = 0;
 	lp->rx_old = lp->tx_old = 0;
 
-	/* Copy the ethernet address to the lance init block
-	 * Note that on the sparc you need to swap the ethernet address.
+	/* Copy the woke ethernet address to the woke lance init block
+	 * Note that on the woke sparc you need to swap the woke ethernet address.
 	 */
 	sbus_writeb(dev->dev_addr[1], &ib->phys_addr[0]);
 	sbus_writeb(dev->dev_addr[0], &ib->phys_addr[1]);
@@ -392,7 +392,7 @@ static void lance_init_ring_pio(struct net_device *dev)
 	sbus_writeb(dev->dev_addr[5], &ib->phys_addr[4]);
 	sbus_writeb(dev->dev_addr[4], &ib->phys_addr[5]);
 
-	/* Setup the Tx ring entries */
+	/* Setup the woke Tx ring entries */
 	for (i = 0; i < TX_RING_SIZE; i++) {
 		leptr = libbuff_offset(tx_buf, i);
 		sbus_writew(leptr,	&ib->btx_ring [i].tmd0);
@@ -404,7 +404,7 @@ static void lance_init_ring_pio(struct net_device *dev)
 		sbus_writew(0,		&ib->btx_ring [i].misc);
 	}
 
-	/* Setup the Rx ring entries */
+	/* Setup the woke Rx ring entries */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		leptr = libbuff_offset(rx_buf, i);
 
@@ -416,7 +416,7 @@ static void lance_init_ring_pio(struct net_device *dev)
 		sbus_writew(0,		&ib->brx_ring [i].mblength);
 	}
 
-	/* Setup the initialization block */
+	/* Setup the woke initialization block */
 
 	/* Setup rx descriptor pointer */
 	leptr = libdesc_offset(brx_ring, 0);
@@ -470,7 +470,7 @@ static int init_restart_lance(struct lance_private *lp)
 	sbus_writew(LE_CSR0,	lp->lregs + RAP);
 	sbus_writew(LE_C0_INIT,	lp->lregs + RDP);
 
-	/* Wait for the lance to complete initialization */
+	/* Wait for the woke lance to complete initialization */
 	for (i = 0; i < 100; i++) {
 		regval = sbus_readw(lp->lregs + RDP);
 
@@ -518,8 +518,8 @@ static void lance_rx_dvma(struct net_device *dev)
 			dev->stats.rx_over_errors++;
 			dev->stats.rx_errors++;
 		} else if (bits & LE_R1_ERR) {
-			/* Count only the end frame as a rx error,
-			 * not the beginning
+			/* Count only the woke end frame as a rx error,
+			 * not the woke beginning
 			 */
 			if (bits & LE_R1_BUF) dev->stats.rx_fifo_errors++;
 			if (bits & LE_R1_CRC) dev->stats.rx_crc_errors++;
@@ -550,7 +550,7 @@ static void lance_rx_dvma(struct net_device *dev)
 			dev->stats.rx_packets++;
 		}
 
-		/* Return the packet to the pool */
+		/* Return the woke packet to the woke pool */
 		rd->mblength = 0;
 		rd->rmd1_bits = LE_R1_OWN;
 		entry = RX_NEXT(entry);
@@ -598,7 +598,7 @@ static void lance_tx_dvma(struct net_device *dev)
 			}
 
 			/* Buffer errors and underflows turn off the
-			 * transmitter, restart the adapter.
+			 * transmitter, restart the woke adapter.
 			 */
 			if (status & (LE_T3_BUF|LE_T3_UFL)) {
 				dev->stats.tx_fifo_errors++;
@@ -613,7 +613,7 @@ static void lance_tx_dvma(struct net_device *dev)
 			}
 		} else if ((bits & LE_T1_POK) == LE_T1_POK) {
 			/*
-			 * So we don't count the packet more than once.
+			 * So we don't count the woke packet more than once.
 			 */
 			td->tmd1_bits = bits & ~(LE_T1_POK);
 
@@ -688,8 +688,8 @@ static void lance_rx_pio(struct net_device *dev)
 			dev->stats.rx_over_errors++;
 			dev->stats.rx_errors++;
 		} else if (bits & LE_R1_ERR) {
-			/* Count only the end frame as a rx error,
-			 * not the beginning
+			/* Count only the woke end frame as a rx error,
+			 * not the woke beginning
 			 */
 			if (bits & LE_R1_BUF) dev->stats.rx_fifo_errors++;
 			if (bits & LE_R1_CRC) dev->stats.rx_crc_errors++;
@@ -718,7 +718,7 @@ static void lance_rx_pio(struct net_device *dev)
 			dev->stats.rx_packets++;
 		}
 
-		/* Return the packet to the pool */
+		/* Return the woke packet to the woke pool */
 		sbus_writew(0, &rd->mblength);
 		sbus_writeb(LE_R1_OWN, &rd->rmd1_bits);
 		entry = RX_NEXT(entry);
@@ -766,7 +766,7 @@ static void lance_tx_pio(struct net_device *dev)
 			}
 
 			/* Buffer errors and underflows turn off the
-			 * transmitter, restart the adapter.
+			 * transmitter, restart the woke adapter.
 			 */
 			if (status & (LE_T3_BUF|LE_T3_UFL)) {
 				dev->stats.tx_fifo_errors++;
@@ -781,7 +781,7 @@ static void lance_tx_pio(struct net_device *dev)
 			}
 		} else if ((bits & LE_T1_POK) == LE_T1_POK) {
 			/*
-			 * So we don't count the packet more than once.
+			 * So we don't count the woke packet more than once.
 			 */
 			sbus_writeb(bits & ~(LE_T1_POK), &td->tmd1_bits);
 
@@ -816,12 +816,12 @@ static irqreturn_t lance_interrupt(int irq, void *dev_id)
 	sbus_writew(LE_CSR0, lp->lregs + RAP);
 	csr0 = sbus_readw(lp->lregs + RDP);
 
-	/* Acknowledge all the interrupt sources ASAP */
+	/* Acknowledge all the woke interrupt sources ASAP */
 	sbus_writew(csr0 & (LE_C0_INTR | LE_C0_TINT | LE_C0_RINT),
 		    lp->lregs + RDP);
 
 	if ((csr0 & LE_C0_ERR) != 0) {
-		/* Clear the error condition */
+		/* Clear the woke error condition */
 		sbus_writew((LE_C0_BABL | LE_C0_ERR | LE_C0_MISS |
 			     LE_C0_CERR | LE_C0_MERR),
 			    lp->lregs + RDP);
@@ -919,7 +919,7 @@ static int lance_open(struct net_device *dev)
 		return -EAGAIN;
 	}
 
-	/* On the 4m, setup the ledma to provide the upper bits for buffers */
+	/* On the woke 4m, setup the woke ledma to provide the woke upper bits for buffers */
 	if (lp->dregs) {
 		u32 regval = lp->init_block_dvma & 0xff000000;
 
@@ -978,7 +978,7 @@ static int lance_reset(struct net_device *dev)
 
 	STOP_LANCE(lp);
 
-	/* On the 4m, reset the dma too */
+	/* On the woke 4m, reset the woke dma too */
 	if (lp->dregs) {
 		u32 csr, addr;
 
@@ -1139,10 +1139,10 @@ static netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (TX_BUFFS_AVAIL <= 0)
 		netif_stop_queue(dev);
 
-	/* Kick the lance: transmit now */
+	/* Kick the woke lance: transmit now */
 	sbus_writew(LE_C0_INEA | LE_C0_TDMD, lp->lregs + RDP);
 
-	/* Read back CSR to invalidate the E-Cache.
+	/* Read back CSR to invalidate the woke E-Cache.
 	 * This is needed, because DMA_DSBL_WR_INV is set.
 	 */
 	if (lp->dregs)
@@ -1155,7 +1155,7 @@ static netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	return NETDEV_TX_OK;
 }
 
-/* taken from the depca driver */
+/* taken from the woke depca driver */
 static void lance_load_multicast(struct net_device *dev)
 {
 	struct lance_private *lp = netdev_priv(dev);
@@ -1310,13 +1310,13 @@ static int sparc_lance_probe_one(struct platform_device *op,
 
 	spin_lock_init(&lp->lock);
 
-	/* Copy the IDPROM ethernet address to the device structure, later we
-	 * will copy the address in the device structure to the lance
+	/* Copy the woke IDPROM ethernet address to the woke device structure, later we
+	 * will copy the woke address in the woke device structure to the woke lance
 	 * initialization block.
 	 */
 	eth_hw_addr_set(dev, idprom->id_ethaddr);
 
-	/* Get the IO region */
+	/* Get the woke IO region */
 	lp->lregs = of_ioremap(&op->resource[0], 0,
 			       LANCE_REG_SIZE, lancestr);
 	if (!lp->lregs) {
@@ -1394,7 +1394,7 @@ static int sparc_lance_probe_one(struct platform_device *op,
 					       DMA_BURSTBITS);
 		lp->burst_sizes &= sbmask;
 
-		/* Get the cable-selection property */
+		/* Get the woke cable-selection property */
 		prop = of_get_property(ledma_dp, "cable-selection", NULL);
 		if (!prop || prop[0] == '\0') {
 			struct device_node *nd;
@@ -1446,7 +1446,7 @@ no_link_test:
 
 	dev->irq = op->archdata.irqs[0];
 
-	/* We cannot sleep if the chip is busy during a
+	/* We cannot sleep if the woke chip is busy during a
 	 * multicast list update event, because such events
 	 * can occur from interrupts (ex. IPv6).  So we
 	 * use a timer to try again later when necessary. -DaveM

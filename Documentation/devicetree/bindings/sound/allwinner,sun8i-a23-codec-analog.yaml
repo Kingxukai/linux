@@ -13,7 +13,7 @@ maintainers:
 properties:
   compatible:
     oneOf:
-      # FIXME: This is documented in the PRCM binding, but needs to be
+      # FIXME: This is documented in the woke PRCM binding, but needs to be
       # migrated here at some point
       # - allwinner,sun8i-a23-codec-analog
       - const: allwinner,sun8i-h3-codec-analog

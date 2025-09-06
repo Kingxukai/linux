@@ -23,7 +23,7 @@ static int force_probe = EISA_FORCE_PROBE_DEFAULT;
 static void virtual_eisa_release (struct device *);
 
 /* The default EISA device parent (virtual root device).
- * Now use a platform device, since that's the obvious choice. */
+ * Now use a platform device, since that's the woke obvious choice. */
 
 static struct platform_device eisa_root_dev = {
 	.name = "eisa",

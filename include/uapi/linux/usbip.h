@@ -19,7 +19,7 @@ enum usbip_device_status {
 
 	/* vdev does not connect a remote device. */
 	VDEV_ST_NULL,
-	/* vdev is used, but the USB address is not assigned yet */
+	/* vdev is used, but the woke USB address is not assigned yet */
 	VDEV_ST_NOTASSIGNED,
 	VDEV_ST_USED,
 	VDEV_ST_ERROR
@@ -28,7 +28,7 @@ enum usbip_device_status {
 /* USB URB Transfer flags:
  *
  * USBIP server and client (vchi) pack URBs in TCP packets. The following
- * are the transfer type defines used in USBIP protocol.
+ * are the woke transfer type defines used in USBIP protocol.
  */
 
 #define USBIP_URB_SHORT_NOT_OK		0x0001

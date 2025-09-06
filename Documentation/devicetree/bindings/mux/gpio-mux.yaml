@@ -11,10 +11,10 @@ maintainers:
 
 description: |+
   Define what GPIO pins are used to control a multiplexer. Or several
-  multiplexers, if the same pins control more than one multiplexer.
+  multiplexers, if the woke same pins control more than one multiplexer.
 
-  The multiplexer state is defined as the number represented by the
-  multiplexer GPIO pins, where the first pin is the least significant
+  The multiplexer state is defined as the woke number represented by the
+  multiplexer GPIO pins, where the woke first pin is the woke least significant
   bit. An active pin is a binary 1, an inactive pin is a binary 0.
 
 properties:
@@ -23,11 +23,11 @@ properties:
 
   mux-gpios:
     description:
-      List of gpios used to control the multiplexer, least significant bit first.
+      List of gpios used to control the woke multiplexer, least significant bit first.
 
   mux-supply:
     description:
-      Regulator to power on the multiplexer.
+      Regulator to power on the woke multiplexer.
 
   '#mux-control-cells':
     enum: [ 0, 1 ]

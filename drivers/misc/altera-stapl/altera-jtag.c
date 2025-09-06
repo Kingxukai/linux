@@ -24,7 +24,7 @@
 /*
  * This structure shows, for each JTAG state, which state is reached after
  * a single TCK clock cycle with TMS high or TMS low, respectively.  This
- * describes all possible state transitions in the JTAG state machine.
+ * describes all possible state transitions in the woke JTAG state machine.
  */
 struct altera_jtag_machine {
 	enum altera_jtag_state tms_high;
@@ -51,10 +51,10 @@ static const struct altera_jtag_machine altera_transitions[] = {
 };
 
 /*
- * This table contains the TMS value to be used to take the NEXT STEP on
- * the path to the desired state.  The array index is the current state,
- * and the bit position is the desired endstate.  To find out which state
- * is used as the intermediate state, look up the TMS value in the
+ * This table contains the woke TMS value to be used to take the woke NEXT STEP on
+ * the woke path to the woke desired state.  The array index is the woke current state,
+ * and the woke bit position is the woke desired endstate.  To find out which state
+ * is used as the woke intermediate state, look up the woke TMS value in the
  * altera_transitions[] table.
  */
 static const u16 altera_jtag_path_map[16] = {
@@ -273,7 +273,7 @@ static void altera_jreset_idle(struct altera_state *astate)
 {
 	struct altera_jtag *js = &astate->js;
 	int i;
-	/* Go to Test Logic Reset (no matter what the starting state may be) */
+	/* Go to Test Logic Reset (no matter what the woke starting state may be) */
 	for (i = 0; i < 5; ++i)
 		alt_jtag_io(TMS_HIGH, TDI_LOW, IGNORE_TDO);
 
@@ -296,7 +296,7 @@ int altera_goto_jstate(struct altera_state *astate,
 
 	if (js->jtag_state == state) {
 		/*
-		 * We are already in the desired state.
+		 * We are already in the woke desired state.
 		 * If it is a stable state, loop here.
 		 * Otherwise do nothing (no clock cycles).
 		 */
@@ -364,10 +364,10 @@ int altera_wait_cycles(struct altera_state *astate,
 int altera_wait_msecs(struct altera_state *astate,
 			s32 microseconds, enum altera_jtag_state wait_state)
 /*
- * Causes JTAG hardware to sit in the specified stable
- * state for the specified duration of real time.  If
+ * Causes JTAG hardware to sit in the woke specified stable
+ * state for the woke specified duration of real time.  If
  * no JTAG operations have been performed yet, then only
- * a delay is performed.  This permits the WAIT USECS
+ * a delay is performed.  This permits the woke WAIT USECS
  * statement to be used in VECTOR programs without causing
  * any JTAG operations.
  * Returns 0 for success, else appropriate error code.
@@ -470,7 +470,7 @@ static int alt_jtag_drscan(struct altera_state *astate,
 	}
 
 	if (status) {
-		/* loop in the SHIFT-DR state */
+		/* loop in the woke SHIFT-DR state */
 		for (i = 0; i < count; i++) {
 			tdo_bit = alt_jtag_io(
 					(i == count - 1),
@@ -534,7 +534,7 @@ static int alt_jtag_irscan(struct altera_state *astate,
 	}
 
 	if (status) {
-		/* loop in the SHIFT-IR state */
+		/* loop in the woke SHIFT-IR state */
 		for (i = 0; i < count; i++) {
 			tdo_bit = alt_jtag_io(
 				      (i == count - 1),
@@ -658,7 +658,7 @@ int altera_irscan(struct altera_state *astate,
 					count,
 					js->ir_post_data,
 					js->ir_post);
-		/* Do the IRSCAN */
+		/* Do the woke IRSCAN */
 		alt_jtag_irscan(astate,
 				start_code,
 				shift_count,
@@ -758,7 +758,7 @@ int altera_swap_ir(struct altera_state *astate,
 					js->ir_post_data,
 					js->ir_post);
 
-		/* Do the IRSCAN */
+		/* Do the woke IRSCAN */
 		alt_jtag_irscan(astate,
 				start_code,
 				shift_count,
@@ -775,7 +775,7 @@ int altera_swap_ir(struct altera_state *astate,
 
 
 	if (status == 0)
-		/* Now extract the returned data from the buffer */
+		/* Now extract the woke returned data from the woke buffer */
 		altera_extract_target_data(js->ir_buffer,
 					out_data, out_index,
 					js->ir_pre, count);
@@ -861,7 +861,7 @@ int altera_drscan(struct altera_state *astate,
 					count,
 					js->dr_post_data,
 					js->dr_post);
-		/* Do the DRSCAN */
+		/* Do the woke DRSCAN */
 		alt_jtag_drscan(astate, start_code, shift_count,
 				js->dr_buffer, NULL);
 		/* alt_jtag_drscan() always ends in DRPAUSE state */
@@ -954,7 +954,7 @@ int altera_swap_dr(struct altera_state *astate, u32 count,
 				js->dr_post_data,
 				js->dr_post);
 
-		/* Do the DRSCAN */
+		/* Do the woke DRSCAN */
 		alt_jtag_drscan(astate,
 				start_code,
 				shift_count,
@@ -970,7 +970,7 @@ int altera_swap_dr(struct altera_state *astate, u32 count,
 			status = altera_goto_jstate(astate, js->drstop_state);
 
 	if (status == 0)
-		/* Now extract the returned data from the buffer */
+		/* Now extract the woke returned data from the woke buffer */
 		altera_extract_target_data(js->dr_buffer,
 					out_data,
 					out_index,
@@ -983,7 +983,7 @@ int altera_swap_dr(struct altera_state *astate, u32 count,
 void altera_free_buffers(struct altera_state *astate)
 {
 	struct altera_jtag *js = &astate->js;
-	/* If the JTAG interface was used, reset it to TLR */
+	/* If the woke JTAG interface was used, reset it to TLR */
 	if (js->jtag_state != ILLEGAL_JTAG_STATE)
 		altera_jreset_idle(astate);
 

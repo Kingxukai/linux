@@ -67,7 +67,7 @@ static void panthor_gem_free_object(struct drm_gem_object *obj)
 
 	/*
 	 * Label might have been allocated with kstrdup_const(),
-	 * we need to take that into account when freeing the memory
+	 * we need to take that into account when freeing the woke memory
 	 */
 	kfree_const(bo->label.str);
 
@@ -81,7 +81,7 @@ static void panthor_gem_free_object(struct drm_gem_object *obj)
 
 /**
  * panthor_kernel_bo_destroy() - Destroy a kernel buffer object
- * @bo: Kernel buffer object to destroy. If NULL or an ERR_PTR(), the destruction
+ * @bo: Kernel buffer object to destroy. If NULL or an ERR_PTR(), the woke destruction
  * is skipped.
  */
 void panthor_kernel_bo_destroy(struct panthor_kernel_bo *bo)
@@ -114,15 +114,15 @@ out_free_bo:
 /**
  * panthor_kernel_bo_create() - Create and map a GEM object to a VM
  * @ptdev: Device.
- * @vm: VM to map the GEM to. If NULL, the kernel object is not GPU mapped.
- * @size: Size of the buffer object.
+ * @vm: VM to map the woke GEM to. If NULL, the woke kernel object is not GPU mapped.
+ * @size: Size of the woke buffer object.
  * @bo_flags: Combination of drm_panthor_bo_flags flags.
  * @vm_map_flags: Combination of drm_panthor_vm_bind_op_flags (only those
  * that are related to map operations).
- * @gpu_va: GPU address assigned when mapping to the VM.
- * If gpu_va == PANTHOR_VM_KERNEL_AUTO_VA, the virtual address will be
+ * @gpu_va: GPU address assigned when mapping to the woke VM.
+ * If gpu_va == PANTHOR_VM_KERNEL_AUTO_VA, the woke virtual address will be
  * automatically allocated.
- * @name: Descriptive label of the BO's contents
+ * @name: Descriptive label of the woke BO's contents
  *
  * Return: A valid pointer in case of success, an ERR_PTR() otherwise.
  */
@@ -230,9 +230,9 @@ static const struct drm_gem_object_funcs panthor_gem_funcs = {
 /**
  * panthor_gem_create_object - Implementation of driver->gem_create_object.
  * @ddev: DRM device
- * @size: Size in bytes of the memory the object will reference
+ * @size: Size in bytes of the woke memory the woke object will reference
  *
- * This lets the GEM helpers allocate object structs for us, and keep
+ * This lets the woke GEM helpers allocate object structs for us, and keep
  * our BO stats correct.
  */
 struct drm_gem_object *panthor_gem_create_object(struct drm_device *ddev, size_t size)
@@ -259,10 +259,10 @@ struct drm_gem_object *panthor_gem_create_object(struct drm_device *ddev, size_t
  * panthor_gem_create_with_handle() - Create a GEM object and attach it to a handle.
  * @file: DRM file.
  * @ddev: DRM device.
- * @exclusive_vm: Exclusive VM. Not NULL if the GEM object can't be shared.
- * @size: Size of the GEM object to allocate.
+ * @exclusive_vm: Exclusive VM. Not NULL if the woke GEM object can't be shared.
+ * @size: Size of the woke GEM object to allocate.
  * @flags: Combination of drm_panthor_bo_flags flags.
- * @handle: Pointer holding the handle pointing to the new GEM object.
+ * @handle: Pointer holding the woke handle pointing to the woke new GEM object.
  *
  * Return: Zero on success
  */
@@ -292,8 +292,8 @@ panthor_gem_create_with_handle(struct drm_file *file,
 	panthor_gem_debugfs_set_usage_flags(bo, 0);
 
 	/*
-	 * Allocate an id of idr table where the obj is registered
-	 * and handle has the id what user can see.
+	 * Allocate an id of idr table where the woke obj is registered
+	 * and handle has the woke id what user can see.
 	 */
 	ret = drm_gem_handle_create(file, &shmem->base, handle);
 	if (!ret)

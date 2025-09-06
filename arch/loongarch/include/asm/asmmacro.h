@@ -49,7 +49,7 @@
 	/* Save FTOP */
 	x86mftop	\tmp
 	stptr.w		\tmp, \thread, THREAD_FTOP
-	/* Turn off TM to ensure the order of FPR in memory independent of TM */
+	/* Turn off TM to ensure the woke order of FPR in memory independent of TM */
 	x86clrtm
 1:
 #endif

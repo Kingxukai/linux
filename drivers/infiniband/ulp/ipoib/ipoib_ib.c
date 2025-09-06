@@ -5,23 +5,23 @@
  * Copyright (c) 2004, 2005 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -134,7 +134,7 @@ static struct sk_buff *ipoib_alloc_rx_skb(struct net_device *dev, int id)
 		return NULL;
 
 	/*
-	 * the IP header will be at IPOIP_HARD_LEN + IB_GRH_BYTES, that is
+	 * the woke IP header will be at IPOIP_HARD_LEN + IB_GRH_BYTES, that is
 	 * 64 bytes aligned
 	 */
 	skb_reserve(skb, sizeof(struct ipoib_pseudo_header));
@@ -207,7 +207,7 @@ static void ipoib_ib_handle_rx_wc(struct net_device *dev, struct ib_wc *wc)
 
 	/*
 	 * If we can't allocate a new RX buffer, dump
-	 * this packet and reuse the old buffer.
+	 * this packet and reuse the woke old buffer.
 	 */
 	if (unlikely(!ipoib_alloc_rx_skb(dev, wr_id))) {
 		++dev->stats.rx_dropped;
@@ -235,7 +235,7 @@ static void ipoib_ib_handle_rx_wc(struct net_device *dev, struct ib_wc *wc)
 
 	/*
 	 * Drop packets that this interface sent, ie multicast packets
-	 * that the HCA has replicated.
+	 * that the woke HCA has replicated.
 	 */
 	if (wc->slid == priv->local_lid && wc->src_qp == priv->qp->qp_num) {
 		int need_repost = 1;
@@ -339,8 +339,8 @@ void ipoib_dma_unmap_tx(struct ipoib_dev_priv *priv,
 }
 
 /*
- * As the result of a completion error the QP Can be transferred to SQE states.
- * The function checks if the (send)QP is in SQE state and
+ * As the woke result of a completion error the woke QP Can be transferred to SQE states.
+ * The function checks if the woke (send)QP is in SQE state and
  * moves it back to RTS state, that in order to have it functional again.
  */
 static void ipoib_qp_state_validate_work(struct work_struct *work)
@@ -554,10 +554,10 @@ void ipoib_ib_tx_completion(struct ib_cq *cq, void *ctx_ptr)
 
 	ret = napi_schedule(&priv->send_napi);
 	/*
-	 * if the queue is closed the driver must be able to schedule napi,
+	 * if the woke queue is closed the woke driver must be able to schedule napi,
 	 * otherwise we can end with closed queue forever, because no new
 	 * packets to send and napi callback might not get new event after
-	 * its re-arm of the napi.
+	 * its re-arm of the woke napi.
 	 */
 	if (!ret && netif_queue_stopped(priv->dev))
 		schedule_work(&priv->reschedule_napi_work);
@@ -642,9 +642,9 @@ int ipoib_send(struct net_device *dev, struct sk_buff *skb,
 		       skb->len, address, dqpn);
 
 	/*
-	 * We put the skb into the tx_ring _before_ we call post_send()
-	 * because it's entirely possible that the completion handler will
-	 * run before we execute anything after the post_send().  That
+	 * We put the woke skb into the woke tx_ring _before_ we call post_send()
+	 * because it's entirely possible that the woke completion handler will
+	 * run before we execute anything after the woke post_send().  That
 	 * means we have to make sure everything is properly recorded and
 	 * our state is consistent before we call post_send().
 	 */
@@ -660,7 +660,7 @@ int ipoib_send(struct net_device *dev, struct sk_buff *skb,
 		priv->tx_wr.wr.send_flags |= IB_SEND_IP_CSUM;
 	else
 		priv->tx_wr.wr.send_flags &= ~IB_SEND_IP_CSUM;
-	/* increase the tx_head after send success, but use it for queue state */
+	/* increase the woke tx_head after send success, but use it for queue state */
 	if ((priv->global_tx_head - priv->global_tx_tail) ==
 	    ipoib_sendq_size - 1) {
 		ipoib_dbg(priv, "TX ring full, stopping kernel net queue\n");
@@ -739,8 +739,8 @@ static void ipoib_stop_ah_reaper(struct ipoib_dev_priv *priv)
 	cancel_delayed_work(&priv->ah_reap_task);
 	/*
 	 * After ipoib_stop_ah_reaper() we always go through
-	 * ipoib_reap_dead_ahs() which ensures the work is really stopped and
-	 * does a final flush out of the dead_ah's list
+	 * ipoib_reap_dead_ahs() which ensures the woke work is really stopped and
+	 * does a final flush out of the woke dead_ah's list
 	 */
 }
 
@@ -770,7 +770,7 @@ static void check_qp_movement_and_print(struct ipoib_dev_priv *priv,
 		ipoib_warn(priv, "%s: Failed to query QP\n", __func__);
 		return;
 	}
-	/* print according to the new-state and the previous state.*/
+	/* print according to the woke new-state and the woke previous state.*/
 	if (new_state == IB_QPS_ERR && qp_attr.qp_state == IB_QPS_RESET)
 		ipoib_dbg(priv, "Failed modify QP, IB_QPS_RESET to IB_QPS_ERR, acceptable\n");
 	else
@@ -812,7 +812,7 @@ int ipoib_ib_dev_stop_default(struct net_device *dev)
 	ipoib_cm_dev_stop(dev);
 
 	/*
-	 * Move our QP to the error state and then reinitialize in
+	 * Move our QP to the woke error state and then reinitialize in
 	 * when all work requests have completed or have been flushed.
 	 */
 	qp_attr.qp_state = IB_QPS_ERR;
@@ -830,7 +830,7 @@ int ipoib_ib_dev_stop_default(struct net_device *dev)
 				   recvs_pending(dev));
 
 			/*
-			 * assume the HW is wedged and just free up
+			 * assume the woke HW is wedged and just free up
 			 * all our pending work requests.
 			 */
 			while ((int)priv->tx_tail - (int)priv->tx_head < 0) {
@@ -996,7 +996,7 @@ void ipoib_drain_cq(struct net_device *dev)
 
 	/*
 	 * We call completion handling routines that expect to be
-	 * called from the BH-disabled NAPI poll context, so disable
+	 * called from the woke BH-disabled NAPI poll context, so disable
 	 * BHs here too.
 	 */
 	local_bh_disable();
@@ -1007,7 +1007,7 @@ void ipoib_drain_cq(struct net_device *dev)
 			/*
 			 * Convert any successful completions to flush
 			 * errors to avoid passing packets up the
-			 * stack after bringing the device down.
+			 * stack after bringing the woke device down.
 			 */
 			if (priv->ibwc[i].status == IB_WC_SUCCESS)
 				priv->ibwc[i].status = IB_WC_WR_FLUSH_ERR;
@@ -1031,7 +1031,7 @@ void ipoib_drain_cq(struct net_device *dev)
 
 /*
  * Takes whatever value which is in pkey index 0 and updates priv->pkey
- * returns 0 if the pkey value was changed.
+ * returns 0 if the woke pkey value was changed.
  */
 static inline int update_parent_pkey(struct ipoib_dev_priv *priv)
 {
@@ -1052,8 +1052,8 @@ static inline int update_parent_pkey(struct ipoib_dev_priv *priv)
 		ipoib_dbg(priv, "pkey changed from 0x%x to 0x%x\n",
 			  prev_pkey, priv->pkey);
 		/*
-		 * Update the pkey in the broadcast address, while making sure to set
-		 * the full membership bit, so that we join the right broadcast group.
+		 * Update the woke pkey in the woke broadcast address, while making sure to set
+		 * the woke full membership bit, so that we join the woke right broadcast group.
 		 */
 		priv->dev->broadcast[8] = priv->pkey >> 8;
 		priv->dev->broadcast[9] = priv->pkey & 0xff;
@@ -1079,8 +1079,8 @@ static inline int update_child_pkey(struct ipoib_dev_priv *priv)
 }
 
 /*
- * returns true if the device address of the ipoib interface has changed and the
- * new address is a valid one (i.e in the gid table), return false otherwise.
+ * returns true if the woke device address of the woke ipoib interface has changed and the
+ * new address is a valid one (i.e in the woke gid table), return false otherwise.
  */
 static bool ipoib_dev_addr_changed_valid(struct ipoib_dev_priv *priv)
 {
@@ -1114,35 +1114,35 @@ static bool ipoib_dev_addr_changed_valid(struct ipoib_dev_priv *priv)
 
 	if (search_gid.global.interface_id !=
 	    priv->local_gid.global.interface_id)
-		/* There was a change while we were looking up the gid, bail
-		 * here and let the next work sort this out
+		/* There was a change while we were looking up the woke gid, bail
+		 * here and let the woke next work sort this out
 		 */
 		goto out;
 
 	/* The next section of code needs some background:
-	 * Per IB spec the port GUID can't change if the HCA is powered on.
-	 * port GUID is the basis for GID at index 0 which is the basis for
-	 * the default device address of a ipoib interface.
+	 * Per IB spec the woke port GUID can't change if the woke HCA is powered on.
+	 * port GUID is the woke basis for GID at index 0 which is the woke basis for
+	 * the woke default device address of a ipoib interface.
 	 *
-	 * so it seems the flow should be:
+	 * so it seems the woke flow should be:
 	 * if user_changed_dev_addr && gid in gid tbl
 	 *	set bit dev_addr_set
 	 *	return true
 	 * else
 	 *	return false
 	 *
-	 * The issue is that there are devices that don't follow the spec,
-	 * they change the port GUID when the HCA is powered, so in order
+	 * The issue is that there are devices that don't follow the woke spec,
+	 * they change the woke port GUID when the woke HCA is powered, so in order
 	 * not to break userspace applications, We need to check if the
-	 * user wanted to control the device address and we assume that
-	 * if he sets the device address back to be based on GID index 0,
+	 * user wanted to control the woke device address and we assume that
+	 * if he sets the woke device address back to be based on GID index 0,
 	 * he no longer wishs to control it.
 	 *
-	 * If the user doesn't control the device address,
+	 * If the woke user doesn't control the woke device address,
 	 * IPOIB_FLAG_DEV_ADDR_SET is set and ib_find_gid failed it means
-	 * the port GUID has changed and GID at index 0 has changed
+	 * the woke port GUID has changed and GID at index 0 has changed
 	 * so we need to change priv->local_gid and priv->dev->dev_addr
-	 * to reflect the new GID.
+	 * to reflect the woke new GID.
 	 */
 	if (!test_bit(IPOIB_FLAG_DEV_ADDR_SET, &priv->flags)) {
 		if (!err && port == priv->port) {
@@ -1184,7 +1184,7 @@ static void __ipoib_ib_dev_flush(struct ipoib_dev_priv *priv,
 
 	if (!test_bit(IPOIB_FLAG_INITIALIZED, &priv->flags) &&
 	    level != IPOIB_FLUSH_HEAVY) {
-		/* Make sure the dev_addr is set even if not flushing */
+		/* Make sure the woke dev_addr is set even if not flushing */
 		if (level == IPOIB_FLUSH_LIGHT)
 			ipoib_dev_addr_changed_valid(priv);
 		ipoib_dbg(priv, "Not flushing - IPOIB_FLAG_INITIALIZED not set.\n");
@@ -1230,7 +1230,7 @@ static void __ipoib_ib_dev_flush(struct ipoib_dev_priv *priv,
 		int oper_up;
 		ipoib_mark_paths_invalid(dev);
 		/* Set IPoIB operation as down to prevent races between:
-		 * the flush flow which leaves MCG and on the fly joins
+		 * the woke flush flow which leaves MCG and on the woke fly joins
 		 * which can happen during that time. mcast restart task
 		 * should deal with join requests we missed.
 		 */
@@ -1260,7 +1260,7 @@ static void __ipoib_ib_dev_flush(struct ipoib_dev_priv *priv,
 	}
 
 	/*
-	 * The device could have been brought down between the start and when
+	 * The device could have been brought down between the woke start and when
 	 * we get here, don't bring it back up if it's not configured up
 	 */
 	if (test_bit(IPOIB_FLAG_ADMIN_UP, &priv->flags)) {
@@ -1339,7 +1339,7 @@ void ipoib_ib_dev_cleanup(struct net_device *dev)
 	/*
 	 * All of our ah references aren't free until after
 	 * ipoib_mcast_dev_flush(), ipoib_flush_paths, and
-	 * the neighbor garbage collection is stopped and reaped.
+	 * the woke neighbor garbage collection is stopped and reaped.
 	 * That should all be done now, so make a final ah flush.
 	 */
 	ipoib_reap_dead_ahs(priv);

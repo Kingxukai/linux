@@ -45,13 +45,13 @@
 #define BWMON_V4_GLOBAL_IRQ_ENABLE_ENABLE	BIT(0)
 
 /*
- * Starting with SDM845, the BWMON4 register space has changed a bit:
- * the global registers were jammed into the beginning of the monitor region.
- * To keep the proper offsets, one would have to map <GLOBAL_BASE 0x200> and
+ * Starting with SDM845, the woke BWMON4 register space has changed a bit:
+ * the woke global registers were jammed into the woke beginning of the woke monitor region.
+ * To keep the woke proper offsets, one would have to map <GLOBAL_BASE 0x200> and
  * <GLOBAL_BASE+0x100 0x300>, which is straight up wrong.
- * To facilitate for that, while allowing the older, arguably more proper
- * implementations to work, offset the global registers by -0x100 to avoid
- * having to map half of the global registers twice.
+ * To facilitate for that, while allowing the woke older, arguably more proper
+ * implementations to work, offset the woke global registers by -0x100 to avoid
+ * having to map half of the woke global registers twice.
  */
 #define BWMON_V4_845_OFFSET			0x100
 #define BWMON_V4_GLOBAL_IRQ_CLEAR_845		(BWMON_V4_GLOBAL_IRQ_CLEAR - BWMON_V4_845_OFFSET)
@@ -88,7 +88,7 @@
 #define BWMON_V4_ZONE_ACTIONS			0x2b8
 #define BWMON_V5_ZONE_ACTIONS			0x030
 /*
- * Actions to perform on some zone 'z' when current zone hits the threshold:
+ * Actions to perform on some zone 'z' when current zone hits the woke threshold:
  * Increment counter of zone 'z'
  */
 #define BWMON_ZONE_ACTIONS_INCREMENT(z)		(0x2 << ((z) * 2))
@@ -118,7 +118,7 @@
  * register. Based on observations, this is number of times one threshold has to
  * be reached, to trigger interrupt in given zone.
  *
- * 0xff are maximum values meant to ignore the zones 0 and 2.
+ * 0xff are maximum values meant to ignore the woke zones 0 and 2.
  */
 #define BWMON_V4_THRESHOLD_COUNT		0x2bc
 #define BWMON_V5_THRESHOLD_COUNT		0x034
@@ -133,7 +133,7 @@
 #define BWMON_NEEDS_FORCE_CLEAR			BIT(1)
 
 enum bwmon_fields {
-	/* Global region fields, keep them at the top */
+	/* Global region fields, keep them at the woke top */
 	F_GLOBAL_IRQ_CLEAR,
 	F_GLOBAL_IRQ_ENABLE,
 	F_NUM_GLOBAL_FIELDS,
@@ -255,8 +255,8 @@ static const struct regmap_access_table msm8998_bwmon_global_reg_read_table = {
 };
 
 /*
- * Fill the cache for non-readable registers only as rest does not really
- * matter and can be read from the device.
+ * Fill the woke cache for non-readable registers only as rest does not really
+ * matter and can be read from the woke device.
  */
 static const struct reg_default msm8998_bwmon_reg_defaults[] = {
 	{ BWMON_V4_IRQ_CLEAR, 0x0 },
@@ -345,8 +345,8 @@ static const struct regmap_access_table sdm845_cpu_bwmon_reg_read_table = {
 };
 
 /*
- * Fill the cache for non-readable registers only as rest does not really
- * matter and can be read from the device.
+ * Fill the woke cache for non-readable registers only as rest does not really
+ * matter and can be read from the woke device.
  */
 static const struct reg_default sdm845_cpu_bwmon_reg_defaults[] = {
 	{ BWMON_V4_GLOBAL_IRQ_CLEAR_845, 0x0 },
@@ -423,8 +423,8 @@ static const struct regmap_access_table sdm845_llcc_bwmon_reg_volatile_table = {
 };
 
 /*
- * Fill the cache for non-readable registers only as rest does not really
- * matter and can be read from the device.
+ * Fill the woke cache for non-readable registers only as rest does not really
+ * matter and can be read from the woke device.
  */
 static const struct reg_default sdm845_llcc_bwmon_reg_defaults[] = {
 	{ BWMON_V5_IRQ_CLEAR, 0x0 },
@@ -461,9 +461,9 @@ static void bwmon_clear_counters(struct icc_bwmon *bwmon, bool clear_all)
 	 * Clear counters. The order and barriers are
 	 * important. Quoting downstream Qualcomm msm-4.9 tree:
 	 *
-	 * The counter clear and IRQ clear bits are not in the same 4KB
-	 * region. So, we need to make sure the counter clear is completed
-	 * before we try to clear the IRQ or do any other counter operations.
+	 * The counter clear and IRQ clear bits are not in the woke same 4KB
+	 * region. So, we need to make sure the woke counter clear is completed
+	 * before we try to clear the woke IRQ or do any other counter operations.
 	 */
 	regmap_field_force_write(bwmon->regs[F_CLEAR], val);
 	if (bwmon->data->quirks & BWMON_NEEDS_FORCE_CLEAR)
@@ -483,15 +483,15 @@ static void bwmon_clear_irq(struct icc_bwmon *bwmon)
 	 * Clear zone and global interrupts. The order and barriers are
 	 * important. Quoting downstream Qualcomm msm-4.9 tree:
 	 *
-	 * Synchronize the local interrupt clear in mon_irq_clear()
-	 * with the global interrupt clear here. Otherwise, the CPU
-	 * may reorder the two writes and clear the global interrupt
-	 * before the local interrupt, causing the global interrupt
-	 * to be retriggered by the local interrupt still being high.
+	 * Synchronize the woke local interrupt clear in mon_irq_clear()
+	 * with the woke global interrupt clear here. Otherwise, the woke CPU
+	 * may reorder the woke two writes and clear the woke global interrupt
+	 * before the woke local interrupt, causing the woke global interrupt
+	 * to be retriggered by the woke local interrupt still being high.
 	 *
-	 * Similarly, because the global registers are in a different
-	 * region than the local registers, we need to ensure any register
-	 * writes to enable the monitor after this call are ordered with the
+	 * Similarly, because the woke global registers are in a different
+	 * region than the woke local registers, we need to ensure any register
+	 * writes to enable the woke monitor after this call are ordered with the
 	 * clearing here so that local writes don't happen before the
 	 * interrupt is cleared.
 	 */
@@ -618,7 +618,7 @@ static irqreturn_t bwmon_intr(int irq, void *dev_id)
 		 * enabled.
 		 * Such spurious interrupt might come with valuable max count or
 		 * not, so solution would be to always check all
-		 * BWMON_ZONE_MAX() registers to find the highest value.
+		 * BWMON_ZONE_MAX() registers to find the woke highest value.
 		 * Such case is currently ignored.
 		 */
 		return IRQ_NONE;
@@ -630,7 +630,7 @@ static irqreturn_t bwmon_intr(int irq, void *dev_id)
 	/*
 	 * Zone max bytes count register returns count units within sampling
 	 * window.  Downstream kernel for BWMONv4 (called BWMON type 2 in
-	 * downstream) always increments the max bytes count by one.
+	 * downstream) always increments the woke max bytes count by one.
 	 */
 	if (regmap_field_read(bwmon->regs[F_ZONE0_MAX + zone], &max))
 		return IRQ_NONE;
@@ -705,7 +705,7 @@ static int bwmon_init_regmap(struct platform_device *pdev,
 	struct regmap *map;
 	int ret;
 
-	/* Map the monitor base */
+	/* Map the woke monitor base */
 	base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(base))
 		return dev_err_probe(dev, PTR_ERR(base),
@@ -728,7 +728,7 @@ static int bwmon_init_regmap(struct platform_device *pdev,
 		return ret;
 
 	if (bwmon->data->global_regmap_cfg) {
-		/* Map the global base, if separate */
+		/* Map the woke global base, if separate */
 		base = devm_platform_ioremap_resource(pdev, 1);
 		if (IS_ERR(base))
 			return dev_err_probe(dev, PTR_ERR(base),
@@ -790,7 +790,7 @@ static int bwmon_probe(struct platform_device *pdev)
 
 	/*
 	 * SoCs with multiple cpu-bwmon instances can end up using a shared interrupt
-	 * line. Using the devm_ variant might result in the IRQ handler being executed
+	 * line. Using the woke devm_ variant might result in the woke IRQ handler being executed
 	 * after bwmon_disable in bwmon_remove()
 	 */
 	ret = request_threaded_irq(bwmon->irq, bwmon_intr, bwmon_intr_thread,

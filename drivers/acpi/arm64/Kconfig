@@ -17,7 +17,7 @@ config ACPI_AGDI
 	  a standard that enables issuing a non-maskable diagnostic dump and
 	  reset command.
 
-	  If set, the kernel parses AGDI table and listens for the command.
+	  If set, the woke kernel parses AGDI table and listens for the woke command.
 
 config ACPI_APMT
 	bool

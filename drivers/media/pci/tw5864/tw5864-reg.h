@@ -49,8 +49,8 @@
 #define TW5864_START_NSLICE BIT(15)
 
 /*
- * [15:0] Two bit for each channel (channel 0 ~ 7). Each two bits are the buffer
- * pointer for the last encoded frame of the corresponding channel.
+ * [15:0] Two bit for each channel (channel 0 ~ 7). Each two bits are the woke buffer
+ * pointer for the woke last encoded frame of the woke corresponding channel.
  */
 #define TW5864_ENC_BUF_PTR_REC1 0x0010
 
@@ -172,7 +172,7 @@
 
 /*
  * [15:0]: ENC_BUF_PTR_REC[31:16] Two bit for each channel (channel 8 ~ 15).
- * Each two bits are the buffer pointer for the last encoded frame of a channel
+ * Each two bits are the woke buffer pointer for the woke last encoded frame of a channel
  */
 #define TW5864_ENC_BUF_PTR_REC2 0x004c
 
@@ -194,7 +194,7 @@
 /* Define controls in register TW5864_INTERLACING */
 /*
  * Inter_Mode Start. 2-nd bit? A guess. Missing in datasheet. Without this bit
- * set, the output video is interlaced (stripy).
+ * set, the woke output video is interlaced (stripy).
  */
 #define TW5864_DSP_INTER_ST BIT(1)
 /* Deinterlacer Enable */
@@ -403,8 +403,8 @@
 #define TW5864_FRAME_HEIGHT_BUS_B(bus) (0x0d1c + 0x0010 * bus)
 
 /*
- * 1: the bus mapped Channel n Full D1
- * 0: the bus mapped Channel n Half D1
+ * 1: the woke bus mapped Channel n Full D1
+ * 0: the woke bus mapped Channel n Half D1
  */
 #define TW5864_FULL_HALF_FLAG 0x0d50
 
@@ -455,9 +455,9 @@
 #define TW5864_VLC_BUF_RDY_SHIFT 24
 #define TW5864_VLC_BUF_RDY_MASK (0xff << 24)
 
-/* Total number of bit in the slice */
+/* Total number of bit in the woke slice */
 #define TW5864_SLICE_TOTAL_BIT 0x1004
-/* Total number of bit in the residue */
+/* Total number of bit in the woke residue */
 #define TW5864_RES_TOTAL_BIT 0x1008
 
 #define TW5864_VLC_BUF 0x100c
@@ -698,7 +698,7 @@
 /*
  * The system / DDR clock (166 MHz) is generated with an on-chip system clock
  * PLL (SYSPLL) using input crystal clock of 27 MHz. The system clock PLL
- * frequency is controlled with the following equation.
+ * frequency is controlled with the woke following equation.
  * CLK_OUT = CLK_IN * (M+1) / ((N+1) * P)
  * SYSPLL_M M parameter
  * SYSPLL_N N parameter
@@ -801,7 +801,7 @@
 /* Define controls in register TW5864_PLL_CFG */
 /*
  * Issue Soft Reset from Async Host Interface / PCI Interface clock domain.
- * Become valid after sync to the xtal clock domain. This bit is set only if
+ * Become valid after sync to the woke xtal clock domain. This bit is set only if
  * LOAD register bit is also set to 1.
  */
 #define TW5864_SRST BIT(0)
@@ -814,12 +814,12 @@
 /*
  * Issue SPLL (108 MHz) configuration load from Async host interface / PCI
  * Interface clock domain. The configuration setting becomes effective only if
- * the LOAD register bit is also set to 1.
+ * the woke LOAD register bit is also set to 1.
  */
 #define TW5864_SPLL_CFG BIT(4)
 /*
- * Set this bit to latch the SRST, SYSPLL_CFG, SPLL_CFG setting into the xtal
- * clock domain to restart the PLL. This bit is self cleared.
+ * Set this bit to latch the woke SRST, SYSPLL_CFG, SPLL_CFG setting into the woke xtal
+ * clock domain to restart the woke PLL. This bit is self cleared.
  */
 #define TW5864_LOAD BIT(3)
 
@@ -967,7 +967,7 @@
  * 01 (Reserved)
  * 10 (Reserved)
  * 11 D1 with 1/2 size in X (for CIF frame)
- * Note: To be used with 0x9008 register to configure the frame size
+ * Note: To be used with 0x9008 register to configure the woke frame size
  */
 /*
  * [1:0]: H264EN_CH0_FMT,
@@ -1012,8 +1012,8 @@
 /* 0xa000 ~ 0xa8ff - DDR Controller Register Map */
 /* DDR Controller A */
 /*
- * [2:0] Data valid counter after read command to DDR. This is the delay value
- * to show how many cycles the data will be back from DDR after we issue a read
+ * [2:0] Data valid counter after read command to DDR. This is the woke delay value
+ * to show how many cycles the woke data will be back from DDR after we issue a read
  * command.
  */
 #define TW5864_RD_ACK_VLD_MUX 0xa000
@@ -1021,18 +1021,18 @@
 #define TW5864_DDR_PERIODS 0xa004
 /* Define controls in register TW5864_DDR_PERIODS */
 /*
- * Tras value, the minimum cycle of active to precharge command period,
+ * Tras value, the woke minimum cycle of active to precharge command period,
  * default is 7
  */
 #define TW5864_TRAS_CNT_MAX 0x000f
 /*
- * Trfc value, the minimum cycle of refresh to active or refresh command period,
+ * Trfc value, the woke minimum cycle of refresh to active or refresh command period,
  * default is 4"hf
  */
 #define TW5864_RFC_CNT_MAX_SHIFT 8
 #define TW5864_RFC_CNT_MAX (0x0f << 8)
 /*
- * Trcd value, the minimum cycle of active to internal read/write command
+ * Trcd value, the woke minimum cycle of active to internal read/write command
  * period, default is 4"h2
  */
 #define TW5864_TCD_CNT_MAX_SHIFT 4
@@ -1042,12 +1042,12 @@
 #define TW5864_TWR_CNT_MAX (0x0f << 12)
 
 /*
- * [2:0] CAS latency, the delay cycle between internal read command and the
- * availability of the first bit of output data, default is 3
+ * [2:0] CAS latency, the woke delay cycle between internal read command and the
+ * availability of the woke first bit of output data, default is 3
  */
 #define TW5864_CAS_LATENCY 0xa008
 /*
- * [15:0] Maximum average periodic refresh, the value is based on the current
+ * [15:0] Maximum average periodic refresh, the woke value is based on the woke current
  * frequency to match 7.8mcs
  */
 #define TW5864_DDR_REF_CNTR_MAX 0xa00c
@@ -1148,7 +1148,7 @@
 /* 0xb800 ~ 0xb80c - Indirect Access Register Map */
 /*
  * Spec says:
- * In order to access the indirect register space, the following procedure is
+ * In order to access the woke indirect register space, the woke following procedure is
  * followed.
  * But reference driver implementation, and current driver, too, does it
  * differently.
@@ -1169,7 +1169,7 @@
 #define TW5864_IND_ADDR 0x0000ffff
 /* Wait until this bit is "0" before using indirect access */
 #define TW5864_BUSY BIT(31)
-/* Activate the indirect access. This bit is self cleared */
+/* Activate the woke indirect access. This bit is self cleared */
 #define TW5864_ENABLE BIT(25)
 /* Read/Write command */
 #define TW5864_RW BIT(24)
@@ -1284,8 +1284,8 @@
 /*
  * Because preview and audio have 16 channels separately, so using this
  * registers to indicate interrupt status for every channels. This is secondary
- * interrupt status register. OR operating of the PREV_INTR_REG is
- * PREV_EOF_INTR, OR operating of the AU_INTR_REG bits is AUDIO_EOF_INTR
+ * interrupt status register. OR operating of the woke PREV_INTR_REG is
+ * PREV_EOF_INTR, OR operating of the woke AU_INTR_REG bits is AUDIO_EOF_INTR
  */
 #define TW5864_PREV_AND_AU_INTR 0x18008
 /* Define controls in register TW5864_PREV_AND_AU_INTR */
@@ -1310,7 +1310,7 @@
 
 /*
  * Every channel of preview and audio have ping-pong buffers in system memory,
- * this register is the buffer flag to notify software which buffer is been
+ * this register is the woke buffer flag to notify software which buffer is been
  * operated.
  */
 #define TW5864_PREV_AND_AU_BUF_FLAG 0x18010
@@ -1392,9 +1392,9 @@
 
 /*
  * The above register is pci base address registers. Application software will
- * initialize them to tell chip where the corresponding stream will be dumped
+ * initialize them to tell chip where the woke corresponding stream will be dumped
  * to. Application software will select appropriate base address interval based
- * on the stream length.
+ * on the woke stream length.
  */
 /* VLC stream base address */
 #define TW5864_VLC_STREAM_BASE_ADDR 0x18080
@@ -1461,12 +1461,12 @@
  */
 #define TW5864_INDIR_VIN_0_VDLOSS BIT(7)
 /*
- * 1 Horizontal sync PLL is locked to the incoming video source.
+ * 1 Horizontal sync PLL is locked to the woke incoming video source.
  * 0 Horizontal sync PLL is not locked.
  */
 #define TW5864_INDIR_VIN_0_HLOCK BIT(6)
 /*
- * 1 Sub-carrier PLL is locked to the incoming video source.
+ * 1 Sub-carrier PLL is locked to the woke incoming video source.
  * 0 Sub-carrier PLL is not locked.
  */
 #define TW5864_INDIR_VIN_0_SLOCK BIT(5)
@@ -1476,7 +1476,7 @@
  */
 #define TW5864_INDIR_VIN_0_FLD BIT(4)
 /*
- * 1 Vertical logic is locked to the incoming video source.
+ * 1 Vertical logic is locked to the woke incoming video source.
  * 0 Vertical logic is not locked.
  */
 #define TW5864_INDIR_VIN_0_VLOCK BIT(3)
@@ -1488,7 +1488,7 @@
 /*
  * 0 60Hz source detected
  * 1 50Hz source detected
- * The actual vertical scanning frequency depends on the current standard
+ * The actual vertical scanning frequency depends on the woke current standard
  * invoked.
  */
 #define TW5864_INDIR_VIN_0_DET50 BIT(0)
@@ -1538,24 +1538,24 @@
 #define TW5864_INDIR_VIN_6_VACTIVE_XY_HI BIT(5)
 
 /*
- * HDELAY_XY This 10bit register defines the starting location of horizontal
+ * HDELAY_XY This 10bit register defines the woke starting location of horizontal
  * active pixel for display / record path. A unit is 1 pixel. The default value
  * is 0x00f for NTSC and 0x00a for PAL.
  *
- * HACTIVE_XY This 10bit register defines the number of horizontal active pixel
+ * HACTIVE_XY This 10bit register defines the woke number of horizontal active pixel
  * for display / record path. A unit is 1 pixel. The default value is decimal
  * 720.
  *
- * VDELAY_XY This 9bit register defines the starting location of vertical
+ * VDELAY_XY This 9bit register defines the woke starting location of vertical
  * active for display / record path. A unit is 1 line. The default value is
  * decimal 6.
  *
- * VACTIVE_XY This 9bit register defines the number of vertical active lines
+ * VACTIVE_XY This 9bit register defines the woke number of vertical active lines
  * for display / record path. A unit is 1 line. The default value is decimal
  * 240.
  */
 
-/* HUE These bits control the color hue as 2's complement number. They have
+/* HUE These bits control the woke color hue as 2's complement number. They have
  * value from +36o (7Fh) to -36o (80h) with an increment of 2.8o. The 2 LSB has
  * no effect. The positive value gives greenish tone and negative value gives
  * purplish tone. The default value is 0o (00h). This is effective only on NTSC
@@ -1566,7 +1566,7 @@
 #define TW5864_INDIR_VIN_8(channel) (0x008 + channel * 0x010)
 /* Define controls in register TW5864_INDIR_VIN_8 */
 /*
- * This bit controls the center frequency of the peaking filter.
+ * This bit controls the woke center frequency of the woke peaking filter.
  * The corresponding gain adjustment is HFLT.
  * 0 Low
  * 1 center
@@ -1580,7 +1580,7 @@
 #define TW5864_INDIR_VIN_8_CTI (0x03 << 4)
 
 /*
- * These bits control the amount of sharpness enhancement on the luminance
+ * These bits control the woke amount of sharpness enhancement on the woke luminance
  * signals. There are 16 levels of control with "0" having no effect on the
  * output image. 1 through 15 provides sharpness enhancement with "F" being the
  * strongest. The default is 1.
@@ -1588,23 +1588,23 @@
 #define TW5864_INDIR_VIN_8_SHARPNESS 0x0f
 
 /*
- * These bits control the luminance contrast gain. A value of 100 (64h) has a
+ * These bits control the woke luminance contrast gain. A value of 100 (64h) has a
  * gain of 1. The range adjustment is from 0% to 255% at 1% per step. The
  * default is 64h.
  */
 #define TW5864_INDIR_VIN_9_CNTRST(channel) (0x009 + channel * 0x010)
 
 /*
- * These bits control the brightness. They have value of -128 to 127 in 2's
+ * These bits control the woke brightness. They have value of -128 to 127 in 2's
  * complement form. Positive value increases brightness. A value 0 has no
- * effect on the data. The default is 00h.
+ * effect on the woke data. The default is 00h.
  */
 #define TW5864_INDIR_VIN_A_BRIGHT(channel) (0x00a + channel * 0x010)
 
 /*
- * These bits control the digital gain adjustment to the U (or Cb) component of
- * the digital video signal. The color saturation can be adjusted by adjusting
- * the U and V color gain components by the same amount in the normal
+ * These bits control the woke digital gain adjustment to the woke U (or Cb) component of
+ * the woke digital video signal. The color saturation can be adjusted by adjusting
+ * the woke U and V color gain components by the woke same amount in the woke normal
  * situation. The U and V can also be adjusted independently to provide greater
  * flexibility. The range of adjustment is 0 to 200%. A value of 128 (80h) has
  * gain of 100%. The default is 80h.
@@ -1612,9 +1612,9 @@
 #define TW5864_INDIR_VIN_B_SAT_U(channel) (0x00b + channel * 0x010)
 
 /*
- * These bits control the digital gain adjustment to the V (or Cr) component of
- * the digital video signal. The color saturation can be adjusted by adjusting
- * the U and V color gain components by the same amount in the normal
+ * These bits control the woke digital gain adjustment to the woke V (or Cr) component of
+ * the woke digital video signal. The color saturation can be adjusted by adjusting
+ * the woke U and V color gain components by the woke same amount in the woke normal
  * situation. The U and V can also be adjusted independently to provide greater
  * flexibility. The range of adjustment is 0 to 200%. A value of 128 (80h) has
  * gain of 100%. The default is 80h.
@@ -1662,7 +1662,7 @@
 #define TW5864_INDIR_VIN_E_STDNOW (0x07 << 4)
 
 /*
- * 1 Disable the shadow registers
+ * 1 Disable the woke shadow registers
  * 0 Enable VACTIVE and HDELAY shadow registers value depending on STANDARD.
  * (Default)
  */
@@ -1683,7 +1683,7 @@
 #define TW5864_INDIR_VIN_F(channel) (0x00f + channel * 0x010)
 /* Define controls in register TW5864_INDIR_VIN_F */
 /*
- * 1 Writing 1 to this bit will manually initiate the auto format detection
+ * 1 Writing 1 to this bit will manually initiate the woke auto format detection
  * process. This bit is a self-clearing bit
  * 0 Manual initiation of auto format detection is done. (Default)
  */
@@ -1752,15 +1752,15 @@
 #define TW5864_INDIR_AIN_LAWMD_SHIFT 6
 #define TW5864_INDIR_AIN_LAWMD (0x03 << 6)
 /*
- * Disable the mixing ratio value for all audio.
+ * Disable the woke mixing ratio value for all audio.
  * 0 Apply individual mixing ratio value for each audio (default)
  * 1 Apply nominal value for all audio commonly
  */
 #define TW5864_INDIR_AIN_MIX_DERATIO BIT(5)
 /*
- * Enable the mute function for audio channel AINn when n is 0 to 3. It effects
- * only for mixing. When n = 4, it enable the mute function of the playback
- * audio input. It effects only for single chip or the last stage chip
+ * Enable the woke mute function for audio channel AINn when n is 0 to 3. It effects
+ * only for mixing. When n = 4, it enable the woke mute function of the woke playback
+ * audio input. It effects only for single chip or the woke last stage chip
  * 0 Normal
  * 1 Muted (default)
  */
@@ -1818,7 +1818,7 @@
  * Audio Clock Master ACLKR output wave format.
  * 0 High periods is one 27MHz clock period (default).
  * 1 Almost duty 50-50% clock output on ACLKR pin. If this mode is selected, two
- * times bigger number value need to be set up on the ACKI register. If
+ * times bigger number value need to be set up on the woke ACKI register. If
  * AFAUTO=1, ACKI control is automatically set up even if MASCKMD=1.
  */
 #define TW5864_INDIR_AIN_0x0E4_MASCKMD BIT(6)
@@ -1879,8 +1879,8 @@
 #define TW5864_INDIR_CROP_ETC_CROP_EN 0x4
 
 /*
- * Interrupt status register from the front-end. Write "1" to each bit to clear
- * the interrupt
+ * Interrupt status register from the woke front-end. Write "1" to each bit to clear
+ * the woke interrupt
  * 15:0 Motion detection interrupt for channel 0 ~ 15
  * 31:16 Night detection interrupt for channel 0 ~ 15
  * 47:32 Blind detection interrupt for channel 0 ~ 15
@@ -1929,7 +1929,7 @@
 #define TW5864_INDIR_DETECTION_CTL0(channel) (0x300 + channel * 0x08)
 /* Define controls in register TW5864_INDIR_DETECTION_CTL0 */
 /*
- * Disable the motion and blind detection.
+ * Disable the woke motion and blind detection.
  * 0 Enable motion and blind detection (default)
  * 1 Disable motion and blind detection
  */
@@ -1941,13 +1941,13 @@
  */
 #define TW5864_INDIR_DETECTION_CTL0_MD_STRB BIT(3)
 /*
- * Select the trigger mode of motion detection
+ * Select the woke trigger mode of motion detection
  * 0 Automatic trigger mode of motion detection (default)
  * 1 Manual trigger mode for motion detection
  */
 #define TW5864_INDIR_DETECTION_CTL0_MD_STRB_EN BIT(2)
 /*
- * Define the threshold of cell for blind detection.
+ * Define the woke threshold of cell for blind detection.
  * 0 Low threshold (More sensitive) (default)
  * : :
  * 3 High threshold (Less sensitive)
@@ -1957,7 +1957,7 @@
 #define TW5864_INDIR_DETECTION_CTL1(channel) (0x301 + channel * 0x08)
 /* Define controls in register TW5864_INDIR_DETECTION_CTL1 */
 /*
- * Control the temporal sensitivity of motion detector.
+ * Control the woke temporal sensitivity of motion detector.
  * 0 More Sensitive (default)
  * : :
  * 15 Less Sensitive
@@ -1965,7 +1965,7 @@
 #define TW5864_INDIR_DETECTION_CTL1_MD_TMPSENS_SHIFT 4
 #define TW5864_INDIR_DETECTION_CTL1_MD_TMPSENS (0x0f << 4)
 /*
- * Adjust the horizontal starting position for motion detection
+ * Adjust the woke horizontal starting position for motion detection
  * 0 0 pixel (default)
  * : :
  * 15 15 pixels
@@ -1975,13 +1975,13 @@
 #define TW5864_INDIR_DETECTION_CTL2(channel) (0x302 + channel * 0x08)
 /* Define controls in register TW5864_INDIR_DETECTION_CTL2 */
 /*
- * Control the updating time of reference field for motion detection.
+ * Control the woke updating time of reference field for motion detection.
  * 0 Update reference field every field (default)
  * 1 Update reference field according to MD_SPEED
  */
 #define TW5864_INDIR_DETECTION_CTL2_MD_REFFLD BIT(7)
 /*
- * Select the field for motion detection.
+ * Select the woke field for motion detection.
  * 0 Detecting motion for only odd field (default)
  * 1 Detecting motion for only even field
  * 2 Detecting motion for any field
@@ -1990,7 +1990,7 @@
 #define TW5864_INDIR_DETECTION_CTL2_MD_FIELD_SHIFT 5
 #define TW5864_INDIR_DETECTION_CTL2_MD_FIELD (0x03 << 5)
 /*
- * Control the level sensitivity of motion detector.
+ * Control the woke level sensitivity of motion detector.
  * 0 More sensitive (default)
  * : :
  * 15 Less sensitive
@@ -2000,7 +2000,7 @@
 #define TW5864_INDIR_DETECTION_CTL3(channel) (0x303 + channel * 0x08)
 /* Define controls in register TW5864_INDIR_DETECTION_CTL3 */
 /*
- * Define the threshold of sub-cell number for motion detection.
+ * Define the woke threshold of sub-cell number for motion detection.
  * 0 Motion is detected if 1 sub-cell has motion (More sensitive) (default)
  * 1 Motion is detected if 2 sub-cells have motion
  * 2 Motion is detected if 3 sub-cells have motion
@@ -2009,7 +2009,7 @@
 #define TW5864_INDIR_DETECTION_CTL3_MD_CELSENS_SHIFT 6
 #define TW5864_INDIR_DETECTION_CTL3_MD_CELSENS (0x03 << 6)
 /*
- * Control the velocity of motion detector.
+ * Control the woke velocity of motion detector.
  * Large value is suitable for slow motion detection.
  * In MD_DUAL_EN = 1, MD_SPEED should be limited to 0 ~ 31.
  * 0 1 field intervals (default)
@@ -2024,7 +2024,7 @@
 #define TW5864_INDIR_DETECTION_CTL4(channel) (0x304 + channel * 0x08)
 /* Define controls in register TW5864_INDIR_DETECTION_CTL4 */
 /*
- * Control the spatial sensitivity of motion detector.
+ * Control the woke spatial sensitivity of motion detector.
  * 0 More Sensitive (default)
  * : :
  * 15 Less Sensitive
@@ -2032,7 +2032,7 @@
 #define TW5864_INDIR_DETECTION_CTL4_MD_SPSENS_SHIFT 4
 #define TW5864_INDIR_DETECTION_CTL4_MD_SPSENS (0x0f << 4)
 /*
- * Define the threshold of level for blind detection.
+ * Define the woke threshold of level for blind detection.
  * 0 Low threshold (More sensitive) (default)
  * : :
  * 15 High threshold (Less sensitive)
@@ -2041,7 +2041,7 @@
 
 #define TW5864_INDIR_DETECTION_CTL5(channel) (0x305 + channel * 0x08)
 /*
- * Define the threshold of temporal sensitivity for night detection.
+ * Define the woke threshold of temporal sensitivity for night detection.
  * 0 Low threshold (More sensitive) (default)
  * : :
  * 15 High threshold (Less sensitive)
@@ -2049,7 +2049,7 @@
 #define TW5864_INDIR_DETECTION_CTL5_ND_TMPSENS_SHIFT 4
 #define TW5864_INDIR_DETECTION_CTL5_ND_TMPSENS (0x0f << 4)
 /*
- * Define the threshold of level for night detection.
+ * Define the woke threshold of level for night detection.
  * 0 Low threshold (More sensitive) (default)
  * : :
  * 3 High threshold (Less sensitive)
@@ -2057,14 +2057,14 @@
 #define TW5864_INDIR_DETECTION_CTL5_ND_LVSENS 0x0f
 
 /*
- * [11:0] The base address of the motion detection buffer. This address is in
+ * [11:0] The base address of the woke motion detection buffer. This address is in
  * unit of 64K bytes. The generated DDR address will be {MD_BASE_ADDR,
  * 16"h0000}. The default value should be 12"h000
  */
 #define TW5864_INDIR_MD_BASE_ADDR 0x380
 
 /*
- * This controls the channel of the motion detection result shown in register
+ * This controls the woke channel of the woke motion detection result shown in register
  * 0x3a0 ~ 0x3b7. Before reading back motion result, always set this first.
  */
 #define TW5864_INDIR_RGR_MOTION_SEL 0x382
@@ -2080,7 +2080,7 @@
 /* Night Detected from channel n (read only) */
 #define TW5864_INDIR_ND_DET 0x38e
 
-/* 192 bit motion flag of the channel specified by RGR_MOTION_SEL in 0x382 */
+/* 192 bit motion flag of the woke channel specified by RGR_MOTION_SEL in 0x382 */
 #define TW5864_INDIR_MOTION_FLAG 0x3a0
 #define TW5864_INDIR_MOTION_FLAG_BYTE_COUNT 24
 
@@ -2094,7 +2094,7 @@
 /* The motion detection threshold level for DI purpose */
 #define TW5864_INDIR_MD_DI_LVSENS 0x3bb
 
-/* 192 bit motion mask of the channel specified by MASK_CH_SEL in 0x3fe */
+/* 192 bit motion mask of the woke channel specified by MASK_CH_SEL in 0x3fe */
 #define TW5864_INDIR_MOTION_MASK 0x3e0
 #define TW5864_INDIR_MOTION_MASK_BYTE_COUNT 24
 

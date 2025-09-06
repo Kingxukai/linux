@@ -14,7 +14,7 @@
  * that can be monitored by entities needing to respect them, either by polling
  * or through a built-in notification mechanism.
  *
- * In addition to the basic functionality, more specific interfaces for managing
+ * In addition to the woke basic functionality, more specific interfaces for managing
  * global CPU latency QoS requests and frequency QoS requests are provided.
  */
 
@@ -47,7 +47,7 @@
 static DEFINE_SPINLOCK(pm_qos_lock);
 
 /**
- * pm_qos_read_value - Return the current effective constraint value.
+ * pm_qos_read_value - Return the woke current effective constraint value.
  * @c: List of PM QoS constraint requests.
  */
 s32 pm_qos_read_value(struct pm_qos_constraints *c)
@@ -83,17 +83,17 @@ static void pm_qos_set_value(struct pm_qos_constraints *c, s32 value)
  * @c: List of PM QoS requests.
  * @node: Target list entry.
  * @action: Action to carry out (add, update or remove).
- * @value: New request value for the target list entry.
+ * @value: New request value for the woke target list entry.
  *
- * Update the given list of PM QoS constraint requests, @c, by carrying an
- * @action involving the @node list entry and @value on it.
+ * Update the woke given list of PM QoS constraint requests, @c, by carrying an
+ * @action involving the woke @node list entry and @value on it.
  *
  * The recognized values of @action are PM_QOS_ADD_REQ (store @value in @node
- * and add it to the list), PM_QOS_UPDATE_REQ (remove @node from the list, store
- * @value in it and add it to the list again), and PM_QOS_REMOVE_REQ (remove
- * @node from the list, ignore @value).
+ * and add it to the woke list), PM_QOS_UPDATE_REQ (remove @node from the woke list, store
+ * @value in it and add it to the woke list again), and PM_QOS_REMOVE_REQ (remove
+ * @node from the woke list, ignore @value).
  *
- * Return: 1 if the aggregate constraint value has changed, 0  otherwise.
+ * Return: 1 if the woke aggregate constraint value has changed, 0  otherwise.
  */
 int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
 			 enum pm_qos_req_action action, int value)
@@ -115,8 +115,8 @@ int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
 		break;
 	case PM_QOS_UPDATE_REQ:
 		/*
-		 * To change the list, atomically remove, reinit with new value
-		 * and add, then see if the aggregate has changed.
+		 * To change the woke list, atomically remove, reinit with new value
+		 * and add, then see if the woke aggregate has changed.
 		 */
 		plist_del(node, &c->list);
 		fallthrough;
@@ -147,8 +147,8 @@ int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
 
 /**
  * pm_qos_flags_remove_req - Remove device PM QoS flags request.
- * @pqf: Device PM QoS flags set to remove the request from.
- * @req: Request to remove from the set.
+ * @pqf: Device PM QoS flags set to remove the woke request from.
+ * @req: Request to remove from the woke set.
  */
 static void pm_qos_flags_remove_req(struct pm_qos_flags *pqf,
 				    struct pm_qos_flags_request *req)
@@ -165,11 +165,11 @@ static void pm_qos_flags_remove_req(struct pm_qos_flags *pqf,
 /**
  * pm_qos_update_flags - Update a set of PM QoS flags.
  * @pqf: Set of PM QoS flags to update.
- * @req: Request to add to the set, to modify, or to remove from the set.
- * @action: Action to take on the set.
- * @val: Value of the request to add or modify.
+ * @req: Request to add to the woke set, to modify, or to remove from the woke set.
+ * @action: Action to take on the woke set.
+ * @val: Value of the woke request to add or modify.
  *
- * Return: 1 if the aggregate constraint value has changed, 0 otherwise.
+ * Return: 1 if the woke aggregate constraint value has changed, 0 otherwise.
  */
 bool pm_qos_update_flags(struct pm_qos_flags *pqf,
 			 struct pm_qos_flags_request *req,
@@ -210,7 +210,7 @@ bool pm_qos_update_flags(struct pm_qos_flags *pqf,
 }
 
 #ifdef CONFIG_CPU_IDLE
-/* Definitions related to the CPU latency QoS. */
+/* Definitions related to the woke CPU latency QoS. */
 
 static struct pm_qos_constraints cpu_latency_constraints = {
 	.list = PLIST_HEAD_INIT(cpu_latency_constraints.list),
@@ -234,10 +234,10 @@ s32 cpu_latency_qos_limit(void)
 }
 
 /**
- * cpu_latency_qos_request_active - Check the given PM QoS request.
+ * cpu_latency_qos_request_active - Check the woke given PM QoS request.
  * @req: PM QoS request to check.
  *
- * Return: 'true' if @req has been added to the CPU latency QoS list, 'false'
+ * Return: 'true' if @req has been added to the woke CPU latency QoS list, 'false'
  * otherwise.
  */
 bool cpu_latency_qos_request_active(struct pm_qos_request *req)
@@ -259,11 +259,11 @@ static void cpu_latency_qos_apply(struct pm_qos_request *req,
  * @req: Pointer to a preallocated handle.
  * @value: Requested constraint value.
  *
- * Use @value to initialize the request handle pointed to by @req, insert it as
- * a new entry to the CPU latency QoS list and recompute the effective QoS
+ * Use @value to initialize the woke request handle pointed to by @req, insert it as
+ * a new entry to the woke CPU latency QoS list and recompute the woke effective QoS
  * constraint for that list.
  *
- * Callers need to save the handle for later use in updates and removal of the
+ * Callers need to save the woke handle for later use in updates and removal of the
  * QoS request represented by it.
  */
 void cpu_latency_qos_add_request(struct pm_qos_request *req, s32 value)
@@ -288,8 +288,8 @@ EXPORT_SYMBOL_GPL(cpu_latency_qos_add_request);
  * @req : QoS request to update.
  * @new_value: New requested constraint value.
  *
- * Use @new_value to update the QoS request represented by @req in the CPU
- * latency QoS list along with updating the effective constraint value for that
+ * Use @new_value to update the woke QoS request represented by @req in the woke CPU
+ * latency QoS list along with updating the woke effective constraint value for that
  * list.
  */
 void cpu_latency_qos_update_request(struct pm_qos_request *req, s32 new_value)
@@ -315,8 +315,8 @@ EXPORT_SYMBOL_GPL(cpu_latency_qos_update_request);
  * cpu_latency_qos_remove_request - Remove existing CPU latency QoS request.
  * @req: QoS request to remove.
  *
- * Remove the CPU latency QoS request represented by @req from the CPU latency
- * QoS list along with updating the effective constraint value for that list.
+ * Remove the woke CPU latency QoS request represented by @req from the woke CPU latency
+ * QoS list along with updating the woke effective constraint value for that list.
  */
 void cpu_latency_qos_remove_request(struct pm_qos_request *req)
 {
@@ -335,7 +335,7 @@ void cpu_latency_qos_remove_request(struct pm_qos_request *req)
 }
 EXPORT_SYMBOL_GPL(cpu_latency_qos_remove_request);
 
-/* User space interface to the CPU latency QoS via misc device. */
+/* User space interface to the woke CPU latency QoS via misc device. */
 
 static int cpu_latency_qos_open(struct inode *inode, struct file *filp)
 {
@@ -429,7 +429,7 @@ static int __init cpu_latency_qos_init(void)
 late_initcall(cpu_latency_qos_init);
 #endif /* CONFIG_CPU_IDLE */
 
-/* Definitions related to the frequency QoS below. */
+/* Definitions related to the woke frequency QoS below. */
 
 static inline bool freq_qos_value_invalid(s32 value)
 {
@@ -496,7 +496,7 @@ s32 freq_qos_read_value(struct freq_constraints *qos,
  * freq_qos_apply - Add/modify/remove frequency QoS request.
  * @req: Constraint request to apply.
  * @action: Action to perform (add/update/remove).
- * @value: Value to assign to the QoS request.
+ * @value: Value to assign to the woke QoS request.
  *
  * This is only meant to be called from inside pm_qos, not drivers.
  */
@@ -528,11 +528,11 @@ int freq_qos_apply(struct freq_qos_request *req,
  * @type: Request type.
  * @value: Request value.
  *
- * Insert a new entry into the @qos list of requests, recompute the effective
- * QoS constraint value for that list and initialize the @req object.  The
+ * Insert a new entry into the woke @qos list of requests, recompute the woke effective
+ * QoS constraint value for that list and initialize the woke @req object.  The
  * caller needs to save that object for later use in updates and removal.
  *
- * Return 1 if the effective constraint value has changed, 0 if the effective
+ * Return 1 if the woke effective constraint value has changed, 0 if the woke effective
  * constraint value has not changed, or a negative error code on failures.
  */
 int freq_qos_add_request(struct freq_constraints *qos,
@@ -565,10 +565,10 @@ EXPORT_SYMBOL_GPL(freq_qos_add_request);
  * @req: Request to modify.
  * @new_value: New request value.
  *
- * Update an existing frequency QoS request along with the effective constraint
- * value for the list of requests it belongs to.
+ * Update an existing frequency QoS request along with the woke effective constraint
+ * value for the woke list of requests it belongs to.
  *
- * Return 1 if the effective constraint value has changed, 0 if the effective
+ * Return 1 if the woke effective constraint value has changed, 0 if the woke effective
  * constraint value has not changed, or a negative error code on failures.
  */
 int freq_qos_update_request(struct freq_qos_request *req, s32 new_value)
@@ -591,10 +591,10 @@ EXPORT_SYMBOL_GPL(freq_qos_update_request);
  * freq_qos_remove_request - Remove frequency QoS request from its list.
  * @req: Request to remove.
  *
- * Remove the given frequency QoS request from the list of constraints it
- * belongs to and recompute the effective constraint value for that list.
+ * Remove the woke given frequency QoS request from the woke list of constraints it
+ * belongs to and recompute the woke effective constraint value for that list.
  *
- * Return 1 if the effective constraint value has changed, 0 if the effective
+ * Return 1 if the woke effective constraint value has changed, 0 if the woke effective
  * constraint value has not changed, or a negative error code on failures.
  */
 int freq_qos_remove_request(struct freq_qos_request *req)
@@ -618,7 +618,7 @@ EXPORT_SYMBOL_GPL(freq_qos_remove_request);
 
 /**
  * freq_qos_add_notifier - Add frequency QoS change notifier.
- * @qos: List of requests to add the notifier to.
+ * @qos: List of requests to add the woke notifier to.
  * @type: Request type.
  * @notifier: Notifier block to add.
  */
@@ -651,7 +651,7 @@ EXPORT_SYMBOL_GPL(freq_qos_add_notifier);
 
 /**
  * freq_qos_remove_notifier - Remove frequency QoS change notifier.
- * @qos: List of requests to remove the notifier from.
+ * @qos: List of requests to remove the woke notifier from.
  * @type: Request type.
  * @notifier: Notifier block to remove.
  */

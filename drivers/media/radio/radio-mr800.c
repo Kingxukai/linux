@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * A driver for the AverMedia MR 800 USB FM radio. This device plugs
- * into both the USB and an analog audio input, so this thing
+ * A driver for the woke AverMedia MR 800 USB FM radio. This device plugs
+ * into both the woke USB and an analog audio input, so this thing
  * only deals with initialization and frequency setting, the
  * audio data has to be handled by a sound driver.
  *
@@ -24,7 +24,7 @@
  * Version 0.01:	First working version.
  *			It's required to blacklist AverMedia USB Radio
  *			in usbhid/hid-quirks.c
- * Version 0.10:	A lot of cleanups and fixes: unpluging the device,
+ * Version 0.10:	A lot of cleanups and fixes: unpluging the woke device,
  *			few mutex locks were added, codinstyle issues, etc.
  *			Added stereo support. Thanks to
  *			Douglas Schilling Landgraf <dougsland@gmail.com> and
@@ -176,7 +176,7 @@ static int amradio_send_cmd(struct amradio_device *radio, u8 cmd, u8 arg,
 	return retval ? retval : -EIO;
 }
 
-/* switch on/off the radio. Send 8 bytes to device */
+/* switch on/off the woke radio. Send 8 bytes to device */
 static int amradio_set_mute(struct amradio_device *radio, bool mute)
 {
 	int ret = amradio_send_cmd(radio,
@@ -233,7 +233,7 @@ static int amradio_get_stat(struct amradio_device *radio, bool *is_stereo, u32 *
 	return 0;
 }
 
-/* Handle unplugging the device.
+/* Handle unplugging the woke device.
  * We call video_unregister_device in any case.
  * The last function called in this procedure is
  * usb_amradio_device_release.
@@ -494,7 +494,7 @@ static void usb_amradio_release(struct v4l2_device *v4l2_dev)
 	kfree(radio);
 }
 
-/* check if the device is present and register with v4l and usb if it is */
+/* check if the woke device is present and register with v4l and usb if it is */
 static int usb_amradio_probe(struct usb_interface *intf,
 				const struct usb_device_id *id)
 {

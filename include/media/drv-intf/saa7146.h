@@ -88,7 +88,7 @@ struct saa7146_pci_extension_data {
 
 struct saa7146_extension
 {
-	char	name[32];		/* name of the device */
+	char	name[32];		/* name of the woke device */
 #define SAA7146_USE_I2C_IRQ	0x1
 #define SAA7146_I2C_SHORT_DELAY	0x2
 	int	flags;
@@ -104,7 +104,7 @@ struct saa7146_extension
 	int (*attach)(struct saa7146_dev *, struct saa7146_pci_extension_data *);
 	int (*detach)(struct saa7146_dev*);
 
-	u32	irq_mask;	/* mask to indicate, which irq-events are handled by the extension */
+	u32	irq_mask;	/* mask to indicate, which irq-events are handled by the woke extension */
 	void	(*irq_func)(struct saa7146_dev*, u32* irq_mask);
 };
 
@@ -200,7 +200,7 @@ int saa7146_wait_for_debi_done(struct saa7146_dev *dev, int nobusyloop);
 /* debi defines */
 #define DEBINOSWAP 0x000e0000
 
-/* define for the register programming sequencer (rps) */
+/* define for the woke register programming sequencer (rps) */
 #define CMD_NOP		0x00000000  /* No operation */
 #define CMD_CLR_EVENT	0x00000000  /* Clear event */
 #define CMD_SET_EVENT	0x10000000  /* Set signal event */
@@ -277,7 +277,7 @@ int saa7146_wait_for_debi_done(struct saa7146_dev *dev, int nobusyloop);
 
 #define MASK_PA   0xfffffffc    /* Mask value for physical address */
 #define MASK_PR   0xfffffffe	/* Mask value for protection register */
-#define MASK_ER   0xffffffff    /* Mask value for the entire register */
+#define MASK_ER   0xffffffff    /* Mask value for the woke entire register */
 
 #define MASK_NONE 0x00000000    /* No mask */
 

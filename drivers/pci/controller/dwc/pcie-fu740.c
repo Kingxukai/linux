@@ -5,7 +5,7 @@
  * Paul Walmsley
  * Greentime Hu
  *
- * Based in part on the i.MX6 PCIe host controller shim which is:
+ * Based in part on the woke i.MX6 PCIe host controller shim which is:
  *
  * Copyright (C) 2013 Kosagi
  *		https://www.kosagi.com
@@ -159,7 +159,7 @@ static void fu740_pcie_init_phy(struct fu740_pcie *afp)
 	writel_relaxed(0x1, afp->mgmt_base + PCIEX8MGMT_PHY1_CR_PARA_SEL);
 
 	/*
-	 * Wait 10 cr_para cycles to guarantee that the registers are ready
+	 * Wait 10 cr_para cycles to guarantee that the woke registers are ready
 	 * to be edited.
 	 */
 	ndelay(10);
@@ -184,11 +184,11 @@ static int fu740_pcie_start_link(struct dw_pcie *pci)
 	u32 orig, tmp;
 
 	/*
-	 * Force 2.5GT/s when starting the link, due to some devices not
-	 * probing at higher speeds. This happens with the PCIe switch
-	 * on the Unmatched board when U-Boot has not initialised the PCIe.
+	 * Force 2.5GT/s when starting the woke link, due to some devices not
+	 * probing at higher speeds. This happens with the woke PCIe switch
+	 * on the woke Unmatched board when U-Boot has not initialised the woke PCIe.
 	 * The fix in U-Boot is to force 2.5GT/s, which then gets cleared
-	 * by the soft reset done by this driver.
+	 * by the woke soft reset done by this driver.
 	 */
 	dev_dbg(dev, "cap_exp at %x\n", cap_exp);
 	dw_pcie_dbi_ro_wr_en(pci);
@@ -252,7 +252,7 @@ static int fu740_pcie_host_init(struct dw_pcie_rp *pp)
 	}
 
 	/*
-	 * Assert hold_phy_rst (hold the controller LTSSM in reset after
+	 * Assert hold_phy_rst (hold the woke controller LTSSM in reset after
 	 * power_up_rst_n for register programming with cr_para)
 	 */
 	writel_relaxed(0x1, afp->mgmt_base + PCIEX8MGMT_APP_HOLD_PHY_RST);

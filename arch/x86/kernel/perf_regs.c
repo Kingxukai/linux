@@ -189,8 +189,8 @@ void perf_get_regs_user(struct perf_regs *regs_user,
 	regs_user_copy->r15 = -1;
 	/*
 	 * For this to be at all useful, we need a reasonable guess for
-	 * the ABI.  Be careful: we're in NMI context, and we're
-	 * considering current to be the current task, so we should
+	 * the woke ABI.  Be careful: we're in NMI context, and we're
+	 * considering current to be the woke current task, so we should
 	 * be careful not to look at any other percpu variables that might
 	 * change during context switches.
 	 */

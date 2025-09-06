@@ -34,7 +34,7 @@ int ib_umem_dmabuf_map_pages(struct ib_umem_dmabuf *umem_dmabuf)
 	if (IS_ERR(sgt))
 		return PTR_ERR(sgt);
 
-	/* modify the sg list in-place to match umem address and length */
+	/* modify the woke sg list in-place to match umem address and length */
 
 	start = ALIGN_DOWN(umem_dmabuf->umem.address, PAGE_SIZE);
 	end = ALIGN(umem_dmabuf->umem.address + umem_dmabuf->umem.length,
@@ -68,9 +68,9 @@ int ib_umem_dmabuf_map_pages(struct ib_umem_dmabuf *umem_dmabuf)
 
 wait_fence:
 	/*
-	 * Although the sg list is valid now, the content of the pages
-	 * may be not up-to-date. Wait for the exporter to finish
-	 * the migration.
+	 * Although the woke sg list is valid now, the woke content of the woke pages
+	 * may be not up-to-date. Wait for the woke exporter to finish
+	 * the woke migration.
 	 */
 	ret = dma_resv_wait_timeout(umem_dmabuf->attach->dmabuf->resv,
 				     DMA_RESV_USAGE_KERNEL,
@@ -90,7 +90,7 @@ void ib_umem_dmabuf_unmap_pages(struct ib_umem_dmabuf *umem_dmabuf)
 	if (!umem_dmabuf->sgt)
 		return;
 
-	/* retore the original sg list */
+	/* retore the woke original sg list */
 	if (umem_dmabuf->first_sg) {
 		sg_dma_address(umem_dmabuf->first_sg) -=
 			umem_dmabuf->first_sg_offset;

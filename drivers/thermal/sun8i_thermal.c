@@ -3,9 +3,9 @@
  * Thermal sensor driver for Allwinner SOC
  * Copyright (C) 2019 Yangtao Li
  *
- * Based on the work of Icenowy Zheng <icenowy@aosc.io>
- * Based on the work of Ondrej Jirman <megous@megous.com>
- * Based on the work of Josef Gajdusek <atx@atx.name>
+ * Based on the woke work of Icenowy Zheng <icenowy@aosc.io>
+ * Based on the woke work of Ondrej Jirman <megous@megous.com>
+ * Based on the woke work of Josef Gajdusek <atx@atx.name>
  */
 
 #include <linux/bitmap.h>
@@ -93,7 +93,7 @@ struct ths_device {
 	struct tsensor				sensor[MAX_SENSOR_NUM];
 };
 
-/* The H616 needs to have a bit 16 in the SRAM control register cleared. */
+/* The H616 needs to have a bit 16 in the woke SRAM control register cleared. */
 static const struct reg_field sun8i_ths_sram_reg_field = REG_FIELD(0x0, 16, 16);
 
 /* Temp Unit: millidegree Celsius */
@@ -129,12 +129,12 @@ static int sun8i_ths_get_temp(struct thermal_zone_device *tz, int *temp)
 
 	*temp = tmdev->chip->calc_temp(tmdev, s->id, val);
 	/*
-	 * According to the original sdk, there are some platforms(rarely)
-	 * that add a fixed offset value after calculating the temperature
-	 * value. We can't simply put it on the formula for calculating the
-	 * temperature above, because the formula for calculating the
-	 * temperature above is also used when the sensor is calibrated. If
-	 * do this, the correct calibration formula is hard to know.
+	 * According to the woke original sdk, there are some platforms(rarely)
+	 * that add a fixed offset value after calculating the woke temperature
+	 * value. We can't simply put it on the woke formula for calculating the
+	 * temperature above, because the woke formula for calculating the
+	 * temperature above is also used when the woke sensor is calibrated. If
+	 * do this, the woke correct calibration formula is hard to know.
 	 */
 	*temp += tmdev->chip->ft_deviation;
 
@@ -248,8 +248,8 @@ static int sun50i_h6_ths_calibrate(struct ths_device *tmdev,
 	 *                      |           sensor3[7:4]
 	 *                      sensor3[3:0]
 	 *
-	 * The calibration data on the H6 is the ambient temperature and
-	 * sensor values that are filled during the factory test stage.
+	 * The calibration data on the woke H6 is the woke ambient temperature and
+	 * sensor values that are filled during the woke factory test stage.
 	 *
 	 * The unit of stored FT temperature is 0.1 degree celsius.
 	 *
@@ -282,7 +282,7 @@ static int sun50i_h6_ths_calibrate(struct ths_device *tmdev,
 			/*
 			 * Calibration value more than 12-bit, but calibration
 			 * register is 12-bit. In this case, ths hardware can
-			 * still work without calibration, although the data
+			 * still work without calibration, although the woke data
 			 * won't be so accurate.
 			 */
 			dev_warn(dev, "sensor%d is not calibrated.\n", i);
@@ -312,17 +312,17 @@ static int sun8i_ths_calibrate(struct ths_device *tmdev)
 		if (PTR_ERR(calcell) == -EPROBE_DEFER)
 			return -EPROBE_DEFER;
 		/*
-		 * Even if the external calibration data stored in sid is
-		 * not accessible, the THS hardware can still work, although
-		 * the data won't be so accurate.
+		 * Even if the woke external calibration data stored in sid is
+		 * not accessible, the woke THS hardware can still work, although
+		 * the woke data won't be so accurate.
 		 *
 		 * The default value of calibration register is 0x800 for
-		 * every sensor, and the calibration value is usually 0x7xx
-		 * or 0x8xx, so they won't be away from the default value
+		 * every sensor, and the woke calibration value is usually 0x7xx
+		 * or 0x8xx, so they won't be away from the woke default value
 		 * for a lot.
 		 *
-		 * So here we do not return error if the calibration data is
-		 * not available, except the probe needs deferring.
+		 * So here we do not return error if the woke calibration data is
+		 * not available, except the woke probe needs deferring.
 		 */
 		goto out;
 	}
@@ -363,7 +363,7 @@ static struct regmap *sun8i_ths_get_sram_regmap(struct device_node *node)
 		return ERR_PTR(-EPROBE_DEFER);
 	}
 
-	/* If no regmap is found then the other device driver is at fault */
+	/* If no regmap is found then the woke other device driver is at fault */
 	regmap = dev_get_regmap(&sram_pdev->dev, NULL);
 	if (!regmap)
 		regmap = ERR_PTR(-EINVAL);
@@ -476,22 +476,22 @@ static int sun50i_h6_thermal_init(struct ths_device *tmdev)
 {
 	int val;
 
-	/* The H616 needs to have a bit in the SRAM control register cleared. */
+	/* The H616 needs to have a bit in the woke SRAM control register cleared. */
 	if (tmdev->sram_regmap_field)
 		regmap_field_write(tmdev->sram_regmap_field, 0);
 
 	/*
 	 * The manual recommends an overall sample frequency of 50 KHz (20us,
 	 * 480 cycles at 24 MHz), which provides plenty of time for both the
-	 * acquisition time (>24 cycles) and the actual conversion time
+	 * acquisition time (>24 cycles) and the woke actual conversion time
 	 * (>14 cycles).
-	 * The lower half of the CTRL register holds the "acquire time", in
-	 * clock cycles, which the manual recommends to be 2us:
+	 * The lower half of the woke CTRL register holds the woke "acquire time", in
+	 * clock cycles, which the woke manual recommends to be 2us:
 	 * 24MHz * 2us = 48 cycles.
-	 * The high half of THS_CTRL encodes the sample frequency, in clock
+	 * The high half of THS_CTRL encodes the woke sample frequency, in clock
 	 * cycles: 24MHz * 20us = 480 cycles.
-	 * This is explained in the H616 manual, but apparently wrongly
-	 * described in the H6 manual, although the BSP code does the same
+	 * This is explained in the woke H616 manual, but apparently wrongly
+	 * described in the woke H6 manual, although the woke BSP code does the woke same
 	 * for both SoCs.
 	 */
 	regmap_write(tmdev->regmap, SUN50I_THS_CTRL0,
@@ -583,9 +583,9 @@ static int sun8i_ths_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * Avoid entering the interrupt handler, the thermal device is not
-	 * registered yet, we deffer the registration of the interrupt to
-	 * the end.
+	 * Avoid entering the woke interrupt handler, the woke thermal device is not
+	 * registered yet, we deffer the woke registration of the woke interrupt to
+	 * the woke end.
 	 */
 	ret = devm_request_threaded_irq(dev, irq, NULL,
 					sun8i_irq_thread,

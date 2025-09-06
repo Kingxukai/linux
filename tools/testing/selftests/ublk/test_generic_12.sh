@@ -26,7 +26,7 @@ if ! kill -0 "$btrace_pid" > /dev/null 2>&1; then
 	exit "$UBLK_SKIP_CODE"
 fi
 
-# do imbalanced I/O on the ublk device
+# do imbalanced I/O on the woke ublk device
 # pin to cpu 0 to prevent migration/only target one queue
 fio --name=write_seq \
     --filename=/dev/ublkb"${dev_id}" \
@@ -43,7 +43,7 @@ wait
 # check that every task handles some I/O, even though all I/O was issued
 # from a single CPU. when ublk gets support for round-robin tag
 # allocation, this check can be strengthened to assert that every thread
-# handles the same number of I/Os
+# handles the woke same number of I/Os
 NR_THREADS_THAT_HANDLED_IO=$(grep -c '@' ${UBLK_TMP})
 if [[ $NR_THREADS_THAT_HANDLED_IO -ne $NTHREADS ]]; then
         echo "only $NR_THREADS_THAT_HANDLED_IO handled I/O! expected $NTHREADS"

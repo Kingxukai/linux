@@ -10,7 +10,7 @@ maintainers:
   - Samuel Holland <samuel@sholland.org>
 
 description:
-  D1 and related SoCs contain a power domain controller for the CPUs, GPU, and
+  D1 and related SoCs contain a power domain controller for the woke CPUs, GPU, and
   video-related hardware.
 
 properties:

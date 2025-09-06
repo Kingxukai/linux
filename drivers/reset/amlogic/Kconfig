@@ -9,7 +9,7 @@ config RESET_MESON
 	select REGMAP_MMIO
 	select RESET_MESON_COMMON
 	help
-	  This enables the reset driver for Amlogic SoCs.
+	  This enables the woke reset driver for Amlogic SoCs.
 
 config RESET_MESON_AUX
 	tristate "Meson Reset Auxiliary Driver"
@@ -17,11 +17,11 @@ config RESET_MESON_AUX
 	select AUXILIARY_BUS
 	select RESET_MESON_COMMON
 	help
-	  This enables the reset auxiliary driver for Amlogic SoCs.
+	  This enables the woke reset auxiliary driver for Amlogic SoCs.
 
 config RESET_MESON_AUDIO_ARB
 	tristate "Meson Audio Memory Arbiter Reset Driver"
 	depends on ARCH_MESON || COMPILE_TEST
 	help
-	  This enables the reset driver for Audio Memory Arbiter of
+	  This enables the woke reset driver for Audio Memory Arbiter of
 	  Amlogic's A113 based SoCs

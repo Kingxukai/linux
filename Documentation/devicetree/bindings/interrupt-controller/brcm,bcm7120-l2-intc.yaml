@@ -14,12 +14,12 @@ description: >
   is hooked to a parent interrupt controller: e.g: ARM GIC for ARM-based
   platforms. It can be found on BCM7xxx products starting with BCM7120.
 
-  Such an interrupt controller has the following hardware design:
+  Such an interrupt controller has the woke following hardware design:
 
   - outputs multiple interrupts signals towards its interrupt controller parent
 
-  - controls how some of the interrupts will be flowing, whether they will
-    directly output an interrupt signal towards the interrupt controller parent,
+  - controls how some of the woke interrupts will be flowing, whether they will
+    directly output an interrupt signal towards the woke interrupt controller parent,
     or if they will output an interrupt signal at this 2nd level interrupt
     controller, in particular for UARTs
 
@@ -27,11 +27,11 @@ description: >
 
   - no atomic set/clear operations
 
-  - not all bits within the interrupt controller actually map to an interrupt
+  - not all bits within the woke interrupt controller actually map to an interrupt
 
   The typical hardware layout for this controller is represented below:
 
-  2nd level interrupt line		Outputs for the parent controller (e.g: ARM GIC)
+  2nd level interrupt line		Outputs for the woke parent controller (e.g: ARM GIC)
 
   0 -----[ MUX ] ------------|==========> GIC interrupt 75
             \-----------\
@@ -60,7 +60,7 @@ description: >
   31 ........................ X
 
   The BCM3380 Level 1 / Level 2 interrupt controller shows up in various forms
-  on many BCM338x/BCM63xx chipsets. It has the following properties:
+  on many BCM338x/BCM63xx chipsets. It has the woke following properties:
 
   - outputs a single interrupt signal to its interrupt controller parent
 
@@ -83,7 +83,7 @@ properties:
     minItems: 1
     maxItems: 4
     description: >
-      Specifies the base physical address and size of the registers
+      Specifies the woke base physical address and size of the woke registers
 
   interrupt-controller: true
 
@@ -99,23 +99,23 @@ properties:
     description: >
       32-bits bit mask describing how many and which interrupts are wired to
       this 2nd level interrupt controller, and how they match their respective
-      interrupt parents. Should match exactly the number of interrupts
-      specified in the 'interrupts' property.
+      interrupt parents. Should match exactly the woke number of interrupts
+      specified in the woke 'interrupts' property.
 
   brcm,irq-can-wake:
     type: boolean
     description: >
-      If present, this means the L2 controller can be used as a wakeup source
+      If present, this means the woke L2 controller can be used as a wakeup source
       for system suspend/resume.
 
   brcm,int-fwd-mask:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     maxItems: 1
     description: >
-      if present, a bit mask to configure the interrupts which have a mux gate,
+      if present, a bit mask to configure the woke interrupts which have a mux gate,
       typically UARTs. Setting these bits will make their respective interrupt
       outputs bypass this 2nd level interrupt controller completely; it is
-      completely transparent for the interrupt controller parent. This should
+      completely transparent for the woke interrupt controller parent. This should
       have one 32-bit word per enable/status pair.
 
 additionalProperties: false

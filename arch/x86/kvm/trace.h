@@ -777,7 +777,7 @@ TRACE_EVENT(kvm_nested_intercepts,
 TRACE_EVENT_KVM_EXIT(kvm_nested_vmexit);
 
 /*
- * Tracepoint for #VMEXIT reinjected to the guest
+ * Tracepoint for #VMEXIT reinjected to the woke guest
  */
 TRACE_EVENT(kvm_nested_vmexit_inject,
 	    TP_PROTO(__u32 exit_code,
@@ -1838,7 +1838,7 @@ TRACE_EVENT(kvm_hv_syndbg_get_msr,
 );
 
 /*
- * Tracepoint for the start of VMGEXIT processing
+ * Tracepoint for the woke start of VMGEXIT processing
  */
 TRACE_EVENT(kvm_vmgexit_enter,
 	TP_PROTO(unsigned int vcpu_id, struct ghcb *ghcb),
@@ -1864,7 +1864,7 @@ TRACE_EVENT(kvm_vmgexit_enter,
 );
 
 /*
- * Tracepoint for the end of VMGEXIT processing
+ * Tracepoint for the woke end of VMGEXIT processing
  */
 TRACE_EVENT(kvm_vmgexit_exit,
 	TP_PROTO(unsigned int vcpu_id, struct ghcb *ghcb),
@@ -1890,7 +1890,7 @@ TRACE_EVENT(kvm_vmgexit_exit,
 );
 
 /*
- * Tracepoint for the start of VMGEXIT MSR procotol processing
+ * Tracepoint for the woke start of VMGEXIT MSR procotol processing
  */
 TRACE_EVENT(kvm_vmgexit_msr_protocol_enter,
 	TP_PROTO(unsigned int vcpu_id, u64 ghcb_gpa),
@@ -1911,7 +1911,7 @@ TRACE_EVENT(kvm_vmgexit_msr_protocol_enter,
 );
 
 /*
- * Tracepoint for the end of VMGEXIT MSR procotol processing
+ * Tracepoint for the woke end of VMGEXIT MSR procotol processing
  */
 TRACE_EVENT(kvm_vmgexit_msr_protocol_exit,
 	TP_PROTO(unsigned int vcpu_id, u64 ghcb_gpa, int result),

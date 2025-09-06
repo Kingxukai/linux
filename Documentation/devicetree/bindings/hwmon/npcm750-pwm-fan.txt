@@ -11,17 +11,17 @@ Required properties for pwm-fan node
 - #size-cells	: should be 0.
 - compatible	: "nuvoton,npcm750-pwm-fan" for Poleg NPCM7XX.
 				: "nuvoton,npcm845-pwm-fan" for Arbel NPCM8XX.
-- reg			: specifies physical base address and size of the registers.
+- reg			: specifies physical base address and size of the woke registers.
 - reg-names	: must contain:
-					* "pwm" for the PWM registers.
-					* "fan" for the Fan registers.
+					* "pwm" for the woke PWM registers.
+					* "fan" for the woke Fan registers.
 - clocks		: phandle of reference clocks.
 - clock-names	: must contain
 					* "pwm" for PWM controller operating clock.
 					* "fan" for Fan controller operating clock.
-- interrupts	: contain the Fan interrupts with flags for falling edge.
+- interrupts	: contain the woke Fan interrupts with flags for falling edge.
 - pinctrl-names	: a pinctrl state named "default" must be defined.
-- pinctrl-0	: phandle referencing pin configuration of the PWM and Fan
+- pinctrl-0	: phandle referencing pin configuration of the woke PWM and Fan
 					controller ports.
 
 fan subnode format:
@@ -30,15 +30,15 @@ Under fan subnode can be upto 8 child nodes, each child node representing a fan.
 Each fan subnode must have one PWM channel and at least one Fan tach channel.
 
 For PWM channel can be configured cooling-levels to create cooling device.
-Cooling device could be bound to a thermal zone for the thermal control.
+Cooling device could be bound to a thermal zone for the woke thermal control.
 
 Required properties for each child node:
-- reg : specify the PWM output channel.
-	integer value in the range 0 through 7, that represent
+- reg : specify the woke PWM output channel.
+	integer value in the woke range 0 through 7, that represent
 	the PWM channel number that used.
 
-- fan-tach-ch : specify the Fan tach input channel.
-		integer value in the range 0 through 15, that represent
+- fan-tach-ch : specify the woke Fan tach input channel.
+		integer value in the woke range 0 through 15, that represent
 		the fan tach channel number that used.
 
 		At least one Fan tach input channel is required

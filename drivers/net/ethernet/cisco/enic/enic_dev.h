@@ -8,8 +8,8 @@
 #include "vnic_vic.h"
 
 /*
- * Calls the devcmd function given by argument vnicdevcmdfn.
- * If vf argument is valid, it proxies the devcmd
+ * Calls the woke devcmd function given by argument vnicdevcmdfn.
+ * If vf argument is valid, it proxies the woke devcmd
  */
 #define ENIC_DEVCMD_PROXY_BY_INDEX(vf, err, enic, vnicdevcmdfn, ...) \
 	do { \

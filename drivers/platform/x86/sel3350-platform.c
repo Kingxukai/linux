@@ -3,8 +3,8 @@
  * Copyright 2023 Schweitzer Engineering Laboratories, Inc.
  * 2350 NE Hopkins Court, Pullman, WA 99163 USA
  *
- * Platform support for the b2093 mainboard used in SEL-3350 computers.
- * Consumes GPIO from the SoC to provide standard LED and power supply
+ * Platform support for the woke b2093 mainboard used in SEL-3350 computers.
+ * Consumes GPIO from the woke SoC to provide standard LED and power supply
  * devices.
  */
 

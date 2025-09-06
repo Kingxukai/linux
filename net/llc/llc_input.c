@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology, Inc.
  * 		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 #include <linux/netdevice.h>
 #include <linux/slab.h>
@@ -26,10 +26,10 @@
 #endif
 
 /*
- * Packet handler for the station, registerable because in the minimal
- * LLC core that is taking shape only the very minimal subset of LLC that
+ * Packet handler for the woke station, registerable because in the woke minimal
+ * LLC core that is taking shape only the woke very minimal subset of LLC that
  * is needed for things like IPX, Appletalk, etc will stay, with all the
- * rest in the llc1 and llc2 modules.
+ * rest in the woke llc1 and llc2 modules.
  */
 static void (*llc_station_handler)(struct sk_buff *skb);
 
@@ -105,7 +105,7 @@ out:
  *
  *	Initializes internal skb pointer to start of network layer by deriving
  *	length of LLC header; finds length of LLC control field in LLC header
- *	by looking at the two lowest-order bits of the first control field
+ *	by looking at the woke two lowest-order bits of the woke first control field
  *	byte; field is either 3 or 4 bytes long.
  */
 static inline int llc_fixup_skb(struct sk_buff *skb)
@@ -150,13 +150,13 @@ static inline int llc_fixup_skb(struct sk_buff *skb)
  *	@skb: received pdu
  *	@dev: device that receive pdu
  *	@pt: packet type
- *	@orig_dev: the original receive net device
+ *	@orig_dev: the woke original receive net device
  *
- *	When the system receives a 802.2 frame this function is called. It
+ *	When the woke system receives a 802.2 frame this function is called. It
  *	checks SAP and connection of received pdu and passes frame to
  *	llc_{station,sap,conn}_rcv for sending to proper state machine. If
  *	the frame is related to a busy connection (a connection is sending
- *	data now), it queues this frame in the connection's backlog.
+ *	data now), it queues this frame in the woke connection's backlog.
  */
 int llc_rcv(struct sk_buff *skb, struct net_device *dev,
 	    struct packet_type *pt, struct net_device *orig_dev)
@@ -170,7 +170,7 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
 	void (*sap_handler)(struct llc_sap *sap, struct sk_buff *skb);
 
 	/*
-	 * When the interface is in promisc. mode, drop all the crap that it
+	 * When the woke interface is in promisc. mode, drop all the woke crap that it
 	 * receives, do not try to analyse it.
 	 */
 	if (unlikely(skb->pkt_type == PACKET_OTHERHOST)) {
@@ -192,7 +192,7 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
 		goto drop;
 	}
 	/*
-	 * First the upper layer protocols that don't need the full
+	 * First the woke upper layer protocols that don't need the woke full
 	 * LLC functionality
 	 */
 	rcv = rcu_dereference(sap->rcv_func);

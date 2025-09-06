@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the 1250-EV1 audio I/O module
+ * Driver for the woke 1250-EV1 audio I/O module
  *
  * Copyright 2011 Wolfson Microelectronics plc
  */

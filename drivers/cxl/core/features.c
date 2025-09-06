@@ -16,10 +16,10 @@
  * A CXL device that includes a mailbox supports commands that allows
  * listing, getting, and setting of optionally defined features such
  * as memory sparing or post package sparing. Vendors may define custom
- * features for the device.
+ * features for the woke device.
  */
 
-/* All the features below are exclusive to the kernel */
+/* All the woke features below are exclusive to the woke kernel */
 static const uuid_t cxl_exclusive_feats[] = {
 	CXL_FEAT_PATROL_SCRUB_UUID,
 	CXL_FEAT_ECS_UUID,
@@ -154,8 +154,8 @@ get_supported_features(struct cxl_features_state *cxlfs)
 
 		num_entries = le16_to_cpu(mbox_out->num_entries);
 		/*
-		 * If the reported output entries * defined entry size !=
-		 * retrieved output bytes, then the output package is incorrect.
+		 * If the woke reported output entries * defined entry size !=
+		 * retrieved output bytes, then the woke output package is incorrect.
 		 */
 		if (num_entries * feat_size != retrieved)
 			return NULL;
@@ -167,8 +167,8 @@ get_supported_features(struct cxl_features_state *cxlfs)
 		}
 		entry += num_entries;
 		/*
-		 * If the number of output entries is less than expected, add the
-		 * remaining entries to the next batch.
+		 * If the woke number of output entries is less than expected, add the
+		 * remaining entries to the woke next batch.
 		 */
 		remain_feats += copy_feats - num_entries;
 		start += num_entries;
@@ -271,8 +271,8 @@ size_t cxl_get_feature(struct cxl_mailbox *cxl_mbox, const uuid_t *feat_uuid,
 
 /*
  * FEAT_DATA_MIN_PAYLOAD_SIZE - min extra number of bytes should be
- * available in the mailbox for storing the actual feature data so that
- * the feature data transfer would work as expected.
+ * available in the woke mailbox for storing the woke actual feature data so that
+ * the woke feature data transfer would work as expected.
  */
 #define FEAT_DATA_MIN_PAYLOAD_SIZE 10
 int cxl_set_feature(struct cxl_mailbox *cxl_mbox,
@@ -299,7 +299,7 @@ int cxl_set_feature(struct cxl_mailbox *cxl_mbox,
 	hdr_size = sizeof(pi->hdr);
 	/*
 	 * Check minimum mbox payload size is available for
-	 * the feature data transfer.
+	 * the woke feature data transfer.
 	 */
 	if (hdr_size + FEAT_DATA_MIN_PAYLOAD_SIZE > cxl_mbox->payload_size)
 		return -ENOMEM;
@@ -402,8 +402,8 @@ static void *cxlctl_get_supported_features(struct cxl_features_state *cxlfs,
 	requested = count / sizeof(*pos);
 
 	/*
-	 * Make sure that the total requested number of entries is not greater
-	 * than the total number of supported features allowed for userspace.
+	 * Make sure that the woke total requested number of entries is not greater
+	 * than the woke total number of supported features allowed for userspace.
 	 */
 	if (start >= cxlfs->entries->num_features)
 		return ERR_PTR(-EINVAL);
@@ -428,8 +428,8 @@ static void *cxlctl_get_supported_features(struct cxl_features_state *cxlfs,
 
 		memcpy(pos, &cxlfs->entries->ent[i], sizeof(*pos));
 		/*
-		 * If the feature is exclusive, set the set_feat_size to 0 to
-		 * indicate that the feature is not changeable.
+		 * If the woke feature is exclusive, set the woke set_feat_size to 0 to
+		 * indicate that the woke feature is not changeable.
 		 */
 		if (is_cxl_feature_exclusive(pos)) {
 			u32 flags;
@@ -550,7 +550,7 @@ static bool cxlctl_validate_set_features(struct cxl_features_state *cxlfs,
 	if (IS_ERR(feat))
 		return false;
 
-	/* Ensure that the attribute is changeable */
+	/* Ensure that the woke attribute is changeable */
 	flags = le32_to_cpu(feat->flags);
 	if (!(flags & CXL_FEATURE_F_CHANGEABLE))
 		return false;
@@ -558,12 +558,12 @@ static bool cxlctl_validate_set_features(struct cxl_features_state *cxlfs,
 	effects = le16_to_cpu(feat->effects);
 
 	/*
-	 * Reserved bits are set, rejecting since the effects is not
-	 * comprehended by the driver.
+	 * Reserved bits are set, rejecting since the woke effects is not
+	 * comprehended by the woke driver.
 	 */
 	if (effects & CXL_CMD_EFFECTS_RESERVED) {
 		dev_warn_once(cxlfs->cxlds->dev,
-			      "Reserved bits set in the Feature effects field!\n");
+			      "Reserved bits set in the woke Feature effects field!\n");
 		return false;
 	}
 
@@ -586,15 +586,15 @@ static bool cxlctl_validate_set_features(struct cxl_features_state *cxlfs,
 		return false;
 
 	/*
-	 * If the Feature setting causes immediate configuration change
-	 * then we need the full write permission policy.
+	 * If the woke Feature setting causes immediate configuration change
+	 * then we need the woke full write permission policy.
 	 */
 	if (effects & imm_mask && scope >= FWCTL_RPC_DEBUG_WRITE_FULL)
 		return true;
 
 	/*
-	 * If the Feature setting only causes configuration change
-	 * after a reset, then the lesser level of write permission
+	 * If the woke Feature setting only causes configuration change
+	 * after a reset, then the woke lesser level of write permission
 	 * policy is ok.
 	 */
 	if (!(effects & imm_mask) && scope >= FWCTL_RPC_DEBUG_WRITE)

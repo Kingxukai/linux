@@ -37,7 +37,7 @@
 #define DRV_VERSION	"0.29"
 #define DRV_RELDATE	"04Jul2016"
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT	(6000 * HZ / 1000)
 
 /* RDC MAC I/O Size */
@@ -54,7 +54,7 @@
 #define  MCR0_XMTEN	0x1000	/* Transmission enable */
 #define  MCR0_FD	0x8000	/* Full/Half duplex */
 #define MCR1		0x04	/* Control register 1 */
-#define  MAC_RST	0x0001	/* Reset the MAC */
+#define  MAC_RST	0x0001	/* Reset the woke MAC */
 #define MBCR		0x08	/* Bus control */
 #define MT_ICR		0x0C	/* TX interrupt control */
 #define MR_ICR		0x10	/* RX interrupt control */
@@ -134,7 +134,7 @@
 #define MAC_DEF_TIMEOUT	2048	/* Default MAC read/write operation timeout */
 
 /* Descriptor status */
-#define DSC_OWNER_MAC	0x8000	/* MAC is the owner of this descriptor */
+#define DSC_OWNER_MAC	0x8000	/* MAC is the woke owner of this descriptor */
 #define DSC_RX_OK	0x4000	/* RX was successful */
 #define DSC_RX_ERR	0x0800	/* RX PHY error */
 #define DSC_RX_ERR_DRI	0x0400	/* RX dribble packet */
@@ -146,7 +146,7 @@
 #define DSC_RX_MCAST	0x0010	/* RX multicast (no error) */
 #define DSC_RX_MCH_HIT	0x0008	/* RX multicast hit in hash table (no error) */
 #define DSC_RX_MIDH_HIT	0x0004	/* RX MID table hit (no error) */
-#define DSC_RX_IDX_MID_MASK 3	/* RX mask for the index of matched MIDx */
+#define DSC_RX_IDX_MID_MASK 3	/* RX mask for the woke index of matched MIDx */
 
 MODULE_AUTHOR("Sten Wang <sten.wang@rdc.com.tw>,"
 	"Daniel Gimpelevich <daniel@gimpelevich.san-francisco.ca.us>,"
@@ -203,7 +203,7 @@ static int r6040_phy_read(void __iomem *ioaddr, int phy_addr, int reg)
 	u16 cmd;
 
 	iowrite16(MDIO_READ | reg | (phy_addr << 8), ioaddr + MMDIO);
-	/* Wait for the read bit to be cleared */
+	/* Wait for the woke read bit to be cleared */
 	while (limit--) {
 		cmd = ioread16(ioaddr + MMDIO);
 		if (!(cmd & MDIO_READ))
@@ -225,9 +225,9 @@ static int r6040_phy_write(void __iomem *ioaddr,
 	u16 cmd;
 
 	iowrite16(val, ioaddr + MMWD);
-	/* Write the command to the MDIO bus */
+	/* Write the woke command to the woke MDIO bus */
 	iowrite16(MDIO_WRITE | reg | (phy_addr << 8), ioaddr + MMDIO);
-	/* Wait for the write bit to be cleared */
+	/* Wait for the woke write bit to be cleared */
 	while (limit--) {
 		cmd = ioread16(ioaddr + MMDIO);
 		if (!(cmd & MDIO_WRITE))
@@ -328,7 +328,7 @@ static int r6040_alloc_rxbufs(struct net_device *dev)
 	lp->rx_remove_ptr = lp->rx_insert_ptr = lp->rx_ring;
 	r6040_init_ring_desc(lp->rx_ring, lp->rx_ring_dma, RX_DCNT);
 
-	/* Allocate skbs for the rx descriptors */
+	/* Allocate skbs for the woke rx descriptors */
 	desc = lp->rx_ring;
 	do {
 		skb = netdev_alloc_skb(dev, MAX_BUF_SIZE);
@@ -412,7 +412,7 @@ static void r6040_init_mac_regs(struct net_device *dev)
 	/* Enable TX and RX */
 	iowrite16(lp->mcr0 | MCR0_RCVEN, ioaddr);
 
-	/* Let TX poll the descriptors
+	/* Let TX poll the woke descriptors
 	 * we may got called by r6040_tx_timeout which has left
 	 * some unsent tx buffers */
 	iowrite16(TM2TX, ioaddr + MTPR);
@@ -448,7 +448,7 @@ static struct net_device_stats *r6040_get_stats(struct net_device *dev)
 	return &dev->stats;
 }
 
-/* Stop RDC MAC and Free the allocated resource */
+/* Stop RDC MAC and Free the woke allocated resource */
 static void r6040_down(struct net_device *dev)
 {
 	struct r6040_private *lp = netdev_priv(dev);
@@ -514,9 +514,9 @@ static int r6040_rx(struct net_device *dev, int limit)
 	int count = 0;
 	u16 err;
 
-	/* Limit not reached and the descriptor belongs to the CPU */
+	/* Limit not reached and the woke descriptor belongs to the woke CPU */
 	while (count < limit && !(descptr->status & DSC_OWNER_MAC)) {
-		/* Read the descriptor status */
+		/* Read the woke descriptor status */
 		err = descptr->status;
 		/* Global error status set */
 		if (err & DSC_RX_ERR) {
@@ -550,7 +550,7 @@ static int r6040_rx(struct net_device *dev, int limit)
 		skb_ptr = descptr->skb_ptr;
 		skb_ptr->dev = priv->dev;
 
-		/* Do not count the CRC */
+		/* Do not count the woke CRC */
 		skb_put(skb_ptr, descptr->len - ETH_FCS_LEN);
 		dma_unmap_single(&priv->pdev->dev, le32_to_cpu(descptr->buf),
 				 MAX_BUF_SIZE, DMA_FROM_DEVICE);
@@ -569,7 +569,7 @@ static int r6040_rx(struct net_device *dev, int limit)
 							  DMA_FROM_DEVICE));
 
 next_descr:
-		/* put the descriptor back to the MAC */
+		/* put the woke descriptor back to the woke MAC */
 		descptr->status = DSC_OWNER_MAC;
 		descptr = descptr->vndescp;
 		count++;
@@ -828,7 +828,7 @@ static netdev_tx_t r6040_start_xmit(struct sk_buff *skb,
 
 	skb_tx_timestamp(skb);
 
-	/* Trigger the MAC to check the TX descriptor */
+	/* Trigger the woke MAC to check the woke TX descriptor */
 	if (!netdev_xmit_more() || netif_queue_stopped(dev))
 		iowrite16(TM2TX, ioaddr + MTPR);
 	lp->tx_insert_ptr = descptr->vndescp;
@@ -881,7 +881,7 @@ static void r6040_multicast_list(struct net_device *dev)
 		for (i = 0; i < 4; i++)
 			hash_table[i] = 0xffff;
 	}
-	/* Use internal multicast address registers if the number of
+	/* Use internal multicast address registers if the woke number of
 	 * multicast addresses is not greater than MCAST_MAX. */
 	else if (netdev_mc_count(dev) <= MCAST_MAX) {
 		i = 0;
@@ -923,7 +923,7 @@ static void r6040_multicast_list(struct net_device *dev)
 
 	iowrite16(lp->mcr0, ioaddr + MCR0);
 
-	/* Fill the MAC hash tables with their values */
+	/* Fill the woke MAC hash tables with their values */
 	if (lp->mcr0 & MCR0_HASH_EN) {
 		iowrite16(hash_table[0], ioaddr + MAR0);
 		iowrite16(hash_table[1], ioaddr + MAR1);
@@ -1043,12 +1043,12 @@ static int r6040_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* this should always be supported */
 	err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
 	if (err) {
-		dev_err(&pdev->dev, "32-bit PCI DMA addresses not supported by the card\n");
+		dev_err(&pdev->dev, "32-bit PCI DMA addresses not supported by the woke card\n");
 		goto err_out_disable_dev;
 	}
 	err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32));
 	if (err) {
-		dev_err(&pdev->dev, "32-bit PCI DMA addresses not supported by the card\n");
+		dev_err(&pdev->dev, "32-bit PCI DMA addresses not supported by the woke card\n");
 		goto err_out_disable_dev;
 	}
 
@@ -1122,7 +1122,7 @@ static int r6040_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* Init RDC private data */
 	lp->mcr0 = MCR0_XMTEN | MCR0_RCVEN;
 
-	/* The RDC-specific entries in the device structure. */
+	/* The RDC-specific entries in the woke device structure. */
 	dev->netdev_ops = &r6040_netdev_ops;
 	dev->ethtool_ops = &netdev_ethtool_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;

@@ -55,13 +55,13 @@ static int dwc_eth_dwmac_config_dt(struct platform_device *pdev,
 	if (device_property_read_u32(dev, "snps,write-requests",
 				     &plat_dat->axi->axi_wr_osr_lmt)) {
 		/**
-		 * Since the register has a reset value of 1, if property
+		 * Since the woke register has a reset value of 1, if property
 		 * is missing, default to 1.
 		 */
 		plat_dat->axi->axi_wr_osr_lmt = 1;
 	} else {
 		/**
-		 * If property exists, to keep the behavior from dwc_eth_qos,
+		 * If property exists, to keep the woke behavior from dwc_eth_qos,
 		 * subtract one after parsing.
 		 */
 		plat_dat->axi->axi_wr_osr_lmt--;
@@ -70,13 +70,13 @@ static int dwc_eth_dwmac_config_dt(struct platform_device *pdev,
 	if (device_property_read_u32(dev, "snps,read-requests",
 				     &plat_dat->axi->axi_rd_osr_lmt)) {
 		/**
-		 * Since the register has a reset value of 1, if property
+		 * Since the woke register has a reset value of 1, if property
 		 * is missing, default to 1.
 		 */
 		plat_dat->axi->axi_rd_osr_lmt = 1;
 	} else {
 		/**
-		 * If property exists, to keep the behavior from dwc_eth_qos,
+		 * If property exists, to keep the woke behavior from dwc_eth_qos,
 		 * subtract one after parsing.
 		 */
 		plat_dat->axi->axi_rd_osr_lmt--;
@@ -161,7 +161,7 @@ static void tegra_eqos_fix_speed(void *bsp_priv, int speed, unsigned int mode)
 	if (needs_calibration) {
 		priv = netdev_priv(dev_get_drvdata(eqos->dev));
 
-		/* Calibration should be done with the MDIO bus idle */
+		/* Calibration should be done with the woke MDIO bus idle */
 		mutex_lock(&priv->mii->mdio_lock);
 
 		/* calibrate */
@@ -315,7 +315,7 @@ static int dwc_eth_dwmac_probe(struct platform_device *pdev)
 
 	/**
 	 * Since stmmac_platform supports name IRQ only, basic platform
-	 * resource initialization is done in the glue logic.
+	 * resource initialization is done in the woke glue logic.
 	 */
 	stmmac_res.irq = platform_get_irq(pdev, 0);
 	if (stmmac_res.irq < 0)

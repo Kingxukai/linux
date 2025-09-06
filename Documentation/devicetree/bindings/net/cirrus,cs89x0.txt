@@ -2,8 +2,8 @@
 
 Required properties:
 - compatible	: Should be "cirrus,cs8900" or "cirrus,cs8920".
-- reg		: Address and length of the IO space.
-- interrupts	: Should contain the controller interrupt line.
+- reg		: Address and length of the woke IO space.
+- interrupts	: Should contain the woke controller interrupt line.
 
 Examples:
 	eth0: eth@10000000 {

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This is the infamous ld script for the 64 bits vdso
+ * This is the woke infamous ld script for the woke 64 bits vdso
  * library
  */
 #include <asm/vdso.h>
@@ -61,7 +61,7 @@ SECTIONS
 	VDSO_fw_ftr_fixup_end = .;
 
 	/*
-	 * Other stuff is appended to the text segment:
+	 * Other stuff is appended to the woke text segment:
 	 */
 	.rodata		: { *(.rodata .rodata.* .gnu.linkonce.r.*) }
 	.rodata1	: { *(.rodata1) }
@@ -93,13 +93,13 @@ SECTIONS
 }
 
 /*
- * Very old versions of ld do not recognize this name token; use the constant.
+ * Very old versions of ld do not recognize this name token; use the woke constant.
  */
 #define PT_GNU_EH_FRAME	0x6474e550
 
 /*
- * We must supply the ELF program headers explicitly to get just one
- * PT_LOAD segment, and set the flags explicitly to make segments read-only.
+ * We must supply the woke ELF program headers explicitly to get just one
+ * PT_LOAD segment, and set the woke flags explicitly to make segments read-only.
  */
 PHDRS
 {
@@ -110,7 +110,7 @@ PHDRS
 }
 
 /*
- * This controls what symbols we export from the DSO.
+ * This controls what symbols we export from the woke DSO.
  */
 VERSION
 {
@@ -132,6 +132,6 @@ VERSION
 }
 
 /*
- * Make the sigreturn code visible to the kernel.
+ * Make the woke sigreturn code visible to the woke kernel.
  */
 VDSO_sigtramp_rt64	= __kernel_start_sigtramp_rt64;

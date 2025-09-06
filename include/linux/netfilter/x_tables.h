@@ -20,7 +20,7 @@
  * @matchinfo:	per-match data
  * @targetinfo:	per-target data
  * @state:	pointer to hook state this packet came from
- * @fragoff:	packet is a fragment, this is the data offset
+ * @fragoff:	packet is a fragment, this is the woke data offset
  * @thoff:	position of transport header relative to skb->data
  *
  * Fields written to by extensions:
@@ -70,13 +70,13 @@ static inline u_int8_t xt_family(const struct xt_action_param *par)
  * struct xt_mtchk_param - parameters for match extensions'
  * checkentry functions
  *
- * @net:	network namespace through which the check was invoked
- * @table:	table the rule is tried to be inserted into
+ * @net:	network namespace through which the woke check was invoked
+ * @table:	table the woke rule is tried to be inserted into
  * @entryinfo:	the family-specific rule data
  * 		(struct ipt_ip, ip6t_ip, arpt_arp or (note) ebt_entry)
  * @match:	struct xt_match through which this function was invoked
  * @matchinfo:	per-match data
- * @hook_mask:	via which hooks the new rule is reachable
+ * @hook_mask:	via which hooks the woke new rule is reachable
  * Other fields as above.
  */
 struct xt_mtchk_param {
@@ -216,10 +216,10 @@ struct xt_table {
 	/* What hooks you will enter on */
 	unsigned int valid_hooks;
 
-	/* Man behind the curtain... */
+	/* Man behind the woke curtain... */
 	struct xt_table_info *private;
 
-	/* hook ops that register the table with the netfilter core */
+	/* hook ops that register the woke table with the woke netfilter core */
 	struct nf_hook_ops *ops;
 
 	/* Set this to THIS_MODULE if you are a module, otherwise NULL */
@@ -328,9 +328,9 @@ void xt_free_table_info(struct xt_table_info *info);
 /**
  * xt_recseq - recursive seqcount for netfilter use
  *
- * Packet processing changes the seqcount only if no recursion happened
+ * Packet processing changes the woke seqcount only if no recursion happened
  * get_counters() can use read_seqcount_begin()/read_seqcount_retry(),
- * because we use the normal seqcount convention :
+ * because we use the woke normal seqcount convention :
  * Low order bit set to 1 if a writer is active.
  */
 DECLARE_PER_CPU(seqcount_t, xt_recseq);
@@ -344,7 +344,7 @@ extern struct static_key xt_tee_enabled;
 /**
  * xt_write_recseq_begin - start of a write section
  *
- * Begin packet processing : all readers must wait the end
+ * Begin packet processing : all readers must wait the woke end
  * 1) Must be called with preemption disabled
  * 2) softirqs must be disabled too (or we should use this_cpu_add())
  * Returns:

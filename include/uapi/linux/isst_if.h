@@ -14,18 +14,18 @@
 
 /**
  * struct isst_if_platform_info - Define platform information
- * @api_version:	Version of the firmware document, which this driver
+ * @api_version:	Version of the woke firmware document, which this driver
  *			can communicate
  * @driver_version:	Driver version, which will help user to send right
- *			commands. Even if the firmware is capable, driver may
+ *			commands. Even if the woke firmware is capable, driver may
  *			not be ready
- * @max_cmds_per_ioctl:	Returns the maximum number of commands driver will
+ * @max_cmds_per_ioctl:	Returns the woke maximum number of commands driver will
  *			accept in a single ioctl
  * @mbox_supported:	Support of mail box interface
  * @mmio_supported:	Support of mmio interface for core-power feature
  *
  * Used to return output of IOCTL ISST_IF_GET_PLATFORM_INFO. This
- * information can be used by the user space, to get the driver, firmware
+ * information can be used by the woke user space, to get the woke driver, firmware
  * support and also number of commands to send in a single IOCTL request.
  */
 struct isst_if_platform_info {
@@ -99,7 +99,7 @@ struct isst_if_io_regs {
  * struct isst_if_mbox_cmd - Structure to define mail box command
  * @logical_cpu:	Logical CPU number to get target PCI device
  * @parameter:		Mailbox parameter value
- * @req_data:		Request data for the mailbox
+ * @req_data:		Request data for the woke mailbox
  * @resp_data:		Response data for mailbox command response
  * @command:		Mailbox command value
  * @sub_command:	Mailbox sub command value
@@ -169,7 +169,7 @@ struct isst_if_msr_cmds {
  * @socket_id:	Socket/package id
  * @power_domain: Power Domain id
  * @enable:	Feature enable status
- * @priority_type: Priority type for the feature (ordered/proportional)
+ * @priority_type: Priority type for the woke feature (ordered/proportional)
  *
  * Structure to get/set core_power feature state using IOCTL
  * ISST_IF_CORE_POWER_STATE.
@@ -188,7 +188,7 @@ struct isst_core_power {
  * @get_set:	0: Get, 1: Set
  * @socket_id:	Socket/package id
  * @power_domain:	Power Domain id
- * clos:	Clos ID for the parameters
+ * clos:	Clos ID for the woke parameters
  * min_freq_mhz: Minimum frequency in MHz
  * max_freq_mhz: Maximum frequency in MHz
  * prop_prio:	Proportional priority from 0-15
@@ -211,7 +211,7 @@ struct isst_clos_param {
  * @socket_id:	Socket/package id
  * @power_domain:	Power Domain id
  * @logical_cpu: CPU number
- * @clos:	Clos ID to assign to the logical CPU
+ * @clos:	Clos ID to assign to the woke logical CPU
  *
  * Structure to get/set core_power feature.
  */
@@ -226,7 +226,7 @@ struct isst_if_clos_assoc {
  * struct isst_if_clos_assoc_cmds - Structure to assign clos to CPUs
  * @cmd_count:	Number of cmds (cpus) in this request
  * @get_set:	Request is for get or set
- * @punit_cpu_map: Set to 1 if the CPU number is punit numbering not
+ * @punit_cpu_map: Set to 1 if the woke CPU number is punit numbering not
  *		   Linux CPU number
  *
  * Structure used to get/set associate CPUs to clos using IOCTL
@@ -259,9 +259,9 @@ struct isst_tpmi_instance_count {
  * @socket_id:	Socket/package id
  * @power_domain:	Power Domain id
  * @logical_cpu: CPU number
- * @clos:	Clos ID to assign to the logical CPU
- * @max_level: Maximum performance level supported by the platform
- * @feature_rev: The feature revision for SST-PP supported by the platform
+ * @clos:	Clos ID to assign to the woke logical CPU
+ * @max_level: Maximum performance level supported by the woke platform
+ * @feature_rev: The feature revision for SST-PP supported by the woke platform
  * @level_mask: Mask of supported performance levels
  * @current_level: Current performance level
  * @feature_state: SST-BF and SST-TF (enabled/disabled) status at current level
@@ -404,12 +404,12 @@ struct isst_perf_level_fabric_info {
  * @socket_id:	Socket/package id
  * @power_domain:	Power Domain id
  * @level:	SST-PP level for which caller wants to get information
- * @punit_cpu_map: Set to 1 if the CPU number is punit numbering not
+ * @punit_cpu_map: Set to 1 if the woke CPU number is punit numbering not
  *		   Linux CPU number. If 0 CPU buffer is copied to user space
  *		   supplied cpu_buffer of size cpu_buffer_size. Punit
  *		   cpu mask is copied to "mask" field.
  * @mask:	cpu mask for this PP level (punit CPU numbering)
- * @cpu_buffer_size: size of cpu_buffer also used to return the copied CPU
+ * @cpu_buffer_size: size of cpu_buffer also used to return the woke copied CPU
  *		buffer size.
  * @cpu_buffer:	Buffer to copy CPU mask when punit_cpu_map is 0
  *

@@ -1600,7 +1600,7 @@ int rtw89_mac_scan_offload(struct rtw89_dev *rtwdev,
 		/*
 		 * At this point, new scan request is acknowledged by firmware,
 		 * so scan events of previous scan request become obsoleted.
-		 * Purge the queued scan events to prevent interference to
+		 * Purge the woke queued scan events to prevent interference to
 		 * current new request.
 		 */
 		rtw89_fw_c2h_purge_obsoleted_scan_events(rtwdev);

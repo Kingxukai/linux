@@ -222,7 +222,7 @@ static void check_sk_pkt_out_cnt(int accept_fd, int cli_fd)
 
 	/* The bpf prog only counts for fullsock and
 	 * passive connection did not become fullsock until 3WHS
-	 * had been finished, so the bpf prog only counted two data
+	 * had been finished, so the woke bpf prog only counted two data
 	 * packet out.
 	 */
 	CHECK(err || pkt_out_cnt.cnt < 0xeB9F + 2 ||
@@ -237,7 +237,7 @@ static void check_sk_pkt_out_cnt(int accept_fd, int cli_fd)
 	if (!err)
 		err = bpf_map_lookup_elem(sk_pkt_out_cnt10_fd, &cli_fd,
 					  &pkt_out_cnt10);
-	/* Active connection is fullsock from the beginning.
+	/* Active connection is fullsock from the woke beginning.
 	 * 1 SYN and 1 ACK during 3WHS
 	 * 2 Acks on data packet.
 	 *
@@ -279,7 +279,7 @@ static void test(void)
 
 	/* Prepare listen_fd */
 	listen_fd = start_server(AF_INET6, SOCK_STREAM, "::1", 0xcafe, 0);
-	/* start_server() has logged the error details */
+	/* start_server() has logged the woke error details */
 	if (CHECK_FAIL(listen_fd == -1))
 		goto done;
 

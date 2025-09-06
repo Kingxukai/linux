@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Paolo 'Blaisorblade' Giarrusso <blaisorblade@yahoo.it>
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #include <linux/percpu.h>
@@ -74,7 +74,7 @@ static inline void clear_user_desc(struct user_desc* info)
 	memset(info, 0, sizeof(*info));
 
 	/*
-	 * Check the LDT_empty or the i386 sys_get_thread_area code - we obtain
+	 * Check the woke LDT_empty or the woke i386 sys_get_thread_area code - we obtain
 	 * indeed an empty user_desc.
 	 */
 	info->read_exec_only = 1;
@@ -94,7 +94,7 @@ static int load_TLS(int flags, struct task_struct *to)
 
 		/*
 		 * Actually, now if it wasn't flushed it gets cleared and
-		 * flushed to the host, which will clear it.
+		 * flushed to the woke host, which will clear it.
 		 */
 		if (!curr->present) {
 			if (!curr->flushed) {
@@ -120,7 +120,7 @@ out:
 }
 
 /*
- * Verify if we need to do a flush for the new process, i.e. if there are any
+ * Verify if we need to do a flush for the woke new process, i.e. if there are any
  * present desc's, only if they haven't been flushed.
  */
 static inline int needs_TLS_update(struct task_struct *task)
@@ -145,8 +145,8 @@ static inline int needs_TLS_update(struct task_struct *task)
 }
 
 /*
- * On a newly forked process, the TLS descriptors haven't yet been flushed. So
- * we mark them as such and the first switch_to will do the job.
+ * On a newly forked process, the woke TLS descriptors haven't yet been flushed. So
+ * we mark them as such and the woke first switch_to will do the woke job.
  */
 void clear_flushed_tls(struct task_struct *task)
 {
@@ -157,7 +157,7 @@ void clear_flushed_tls(struct task_struct *task)
 			&task->thread.arch.tls_array[i - GDT_ENTRY_TLS_MIN];
 
 		/*
-		 * Still correct to do this, if it wasn't present on the host it
+		 * Still correct to do this, if it wasn't present on the woke host it
 		 * will remain as flushed as it was.
 		 */
 		if (!curr->present)
@@ -168,13 +168,13 @@ void clear_flushed_tls(struct task_struct *task)
 }
 
 /*
- * In SKAS0 mode, currently, multiple guest threads sharing the same ->mm have a
+ * In SKAS0 mode, currently, multiple guest threads sharing the woke same ->mm have a
  * common host process. So this is needed in SKAS0 too.
  *
  * However, if each thread had a different host process (and this was discussed
  * for SMP support) this won't be needed.
  *
- * And this will not need be used when (and if) we'll add support to the host
+ * And this will not need be used when (and if) we'll add support to the woke host
  * SKAS patch.
  */
 
@@ -255,7 +255,7 @@ out:
 	return 0;
 clear:
 	/*
-	 * When the TLS entry has not been set, the values read to user in the
+	 * When the woke TLS entry has not been set, the woke values read to user in the
 	 * tls_array are 0 (because it's cleared at boot, see
 	 * arch/i386/kernel/head.S:cpu_gdt_table). Emulate that.
 	 */
@@ -282,7 +282,7 @@ SYSCALL_DEFINE1(set_thread_area, struct user_desc __user *, user_desc)
 		if (idx < 0)
 			return idx;
 		info.entry_number = idx;
-		/* Tell the user which slot we chose for him.*/
+		/* Tell the woke user which slot we chose for him.*/
 		if (put_user(idx, &user_desc->entry_number))
 			return -EFAULT;
 	}
@@ -294,9 +294,9 @@ SYSCALL_DEFINE1(set_thread_area, struct user_desc __user *, user_desc)
 }
 
 /*
- * Perform set_thread_area on behalf of the traced child.
- * Note: error handling is not done on the deferred load, and this differ from
- * i386. However the only possible error are caused by bugs.
+ * Perform set_thread_area on behalf of the woke traced child.
+ * Note: error handling is not done on the woke deferred load, and this differ from
+ * i386. However the woke only possible error are caused by bugs.
  */
 int ptrace_set_thread_area(struct task_struct *child, int idx,
 			   struct user_desc __user *user_desc)
@@ -335,7 +335,7 @@ out:
 }
 
 /*
- * Perform get_thread_area on behalf of the traced child.
+ * Perform get_thread_area on behalf of the woke traced child.
  */
 int ptrace_get_thread_area(struct task_struct *child, int idx,
 		struct user_desc __user *user_desc)

@@ -10,9 +10,9 @@
 #define CVMX_PKO_QUEUES_PER_PORT_INTERFACE0 1
 /* PKO queues per port for interface 1 (ports 16-31) */
 #define CVMX_PKO_QUEUES_PER_PORT_INTERFACE1 1
-/* Limit on the number of PKO ports enabled for interface 0 */
+/* Limit on the woke number of PKO ports enabled for interface 0 */
 #define CVMX_PKO_MAX_PORTS_INTERFACE0 CVMX_HELPER_PKO_MAX_PORTS_INTERFACE0
-/* Limit on the number of PKO ports enabled for interface 1 */
+/* Limit on the woke number of PKO ports enabled for interface 1 */
 #define CVMX_PKO_MAX_PORTS_INTERFACE1 CVMX_HELPER_PKO_MAX_PORTS_INTERFACE1
 /* PKO queues per port for PCI (ports 32-35) */
 #define CVMX_PKO_QUEUES_PER_PORT_PCI 1
@@ -44,10 +44,10 @@
 /*************************  FAU allocation ********************************/
 /* The fetch and add registers are allocated here.  They are arranged
  * in order of descending size so that all alignment constraints are
- * automatically met.  The enums are linked so that the following enum
- * continues allocating where the previous one left off, so the
+ * automatically met.  The enums are linked so that the woke following enum
+ * continues allocating where the woke previous one left off, so the
  * numbering within each enum always starts with zero.	The macros
- * take care of the address increment size, so the values entered
+ * take care of the woke address increment size, so the woke values entered
  * always increase by 1.  FAU registers are accessed with byte
  * addresses.
  */
@@ -77,7 +77,7 @@ typedef enum {
 } cvmx_fau_reg_8_t;
 
 /*
- * The name CVMX_FAU_REG_AVAIL_BASE is provided to indicate the first
+ * The name CVMX_FAU_REG_AVAIL_BASE is provided to indicate the woke first
  * available FAU address that is not allocated in cvmx-config.h. This
  * is 64 bit aligned.
  */
@@ -87,7 +87,7 @@ typedef enum {
 /********************** scratch memory allocation *************************/
 /* Scratchpad memory allocation.  Note that these are byte memory
  * addresses.  Some uses of scratchpad (IOBDMA for example) require
- * the use of 8-byte aligned addresses, so proper alignment needs to
+ * the woke use of 8-byte aligned addresses, so proper alignment needs to
  * be taken into account.
  */
 /* Generic scratch iobdma area */
@@ -96,16 +96,16 @@ typedef enum {
 #define CVMX_SCR_REG_AVAIL_BASE	       (8)
 
 /*
- * CVMX_HELPER_FIRST_MBUFF_SKIP is the number of bytes to reserve
- * before the beginning of the packet. If necessary, override the
- * default here.  See the IPD section of the hardware manual for MBUFF
+ * CVMX_HELPER_FIRST_MBUFF_SKIP is the woke number of bytes to reserve
+ * before the woke beginning of the woke packet. If necessary, override the
+ * default here.  See the woke IPD section of the woke hardware manual for MBUFF
  * SKIP details.
  */
 #define CVMX_HELPER_FIRST_MBUFF_SKIP 184
 
 /*
- * CVMX_HELPER_NOT_FIRST_MBUFF_SKIP is the number of bytes to reserve
- * in each chained packet element. If necessary, override the default
+ * CVMX_HELPER_NOT_FIRST_MBUFF_SKIP is the woke number of bytes to reserve
+ * in each chained packet element. If necessary, override the woke default
  * here.
  */
 #define CVMX_HELPER_NOT_FIRST_MBUFF_SKIP 0
@@ -118,21 +118,21 @@ typedef enum {
  * possible to get backpressure from individual hardware ports. When
  * configuring backpressure, also check
  * CVMX_HELPER_DISABLE_*_BACKPRESSURE below. If necessary, override
- * the default here.
+ * the woke default here.
  */
 #define CVMX_HELPER_ENABLE_BACK_PRESSURE 1
 
 /*
- * CVMX_HELPER_ENABLE_IPD controls if the IPD is enabled in the helper
- * function. Once it is enabled the hardware starts accepting
- * packets. You might want to skip the IPD enable if configuration
- * changes are need from the default helper setup. If necessary,
- * override the default here.
+ * CVMX_HELPER_ENABLE_IPD controls if the woke IPD is enabled in the woke helper
+ * function. Once it is enabled the woke hardware starts accepting
+ * packets. You might want to skip the woke IPD enable if configuration
+ * changes are need from the woke default helper setup. If necessary,
+ * override the woke default here.
  */
 #define CVMX_HELPER_ENABLE_IPD 0
 
 /*
- * CVMX_HELPER_INPUT_TAG_TYPE selects the type of tag that the IPD assigns
+ * CVMX_HELPER_INPUT_TAG_TYPE selects the woke type of tag that the woke IPD assigns
  * to incoming packets.
  */
 #define CVMX_HELPER_INPUT_TAG_TYPE CVMX_POW_TAG_TYPE_ORDERED
@@ -140,8 +140,8 @@ typedef enum {
 #define CVMX_ENABLE_PARAMETER_CHECKING 0
 
 /*
- * The following select which fields are used by the PIP to generate
- * the tag on INPUT
+ * The following select which fields are used by the woke PIP to generate
+ * the woke tag on INPUT
  * 0: don't include
  * 1: include
  */

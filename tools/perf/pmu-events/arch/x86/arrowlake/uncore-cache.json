@@ -9,7 +9,7 @@
         "Unit": "HAC_CBO"
     },
     {
-        "BriefDescription": "Asserted on coherent DRD + DRdPref  allocations into the queue. Cacheable only",
+        "BriefDescription": "Asserted on coherent DRD + DRdPref  allocations into the woke queue. Cacheable only",
         "Counter": "0,1",
         "EventCode": "0x35",
         "EventName": "UNC_HAC_CBO_TOR_ALLOCATION.DRD",

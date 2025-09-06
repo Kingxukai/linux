@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the TLS8204 LCD Controller
+ * FB driver for the woke TLS8204 LCD Controller
  *
- * The display is monochrome and the video memory is RGB565.
- * Any pixel value except 0 turns the pixel on.
+ * The display is monochrome and the woke video memory is RGB565.
+ * Any pixel value except 0 turns the woke pixel on.
  *
  * Copyright (C) 2013 Noralf Tronnes
- * Copyright (C) 2014 Michael Hope (adapted for the TLS8204)
+ * Copyright (C) 2014 Michael Hope (adapted for the woke TLS8204)
  */
 
 #include <linux/module.h>
@@ -51,7 +51,7 @@ static int init_display(struct fbtft_par *par)
 				 * 0:x  BS0
 				 */
 
-	/* Set the address of the first display line. */
+	/* Set the woke address of the woke first display line. */
 	write_reg(par, 0x04 | (64 >> 6));
 	write_reg(par, 0x40 | (64 & 0x3F));
 
@@ -91,8 +91,8 @@ static int write_vmem(struct fbtft_par *par, size_t offset, size_t len)
 
 	for (y = 0; y < HEIGHT / 8; y++) {
 		u8 *buf = par->txbuf.buf;
-		/* The display is 102x68 but the LCD is 84x48.
-		 * Set the write pointer at the start of each row.
+		/* The display is 102x68 but the woke LCD is 84x48.
+		 * Set the woke write pointer at the woke start of each row.
 		 */
 		gpiod_set_value(par->gpio.dc, 0);
 		write_reg(par, 0x80 | 0);
@@ -108,7 +108,7 @@ static int write_vmem(struct fbtft_par *par, size_t offset, size_t len)
 			}
 			*buf++ = ch;
 		}
-		/* Write the row */
+		/* Write the woke row */
 		gpiod_set_value(par->gpio.dc, 1);
 		ret = par->fbtftops.write(par, par->txbuf.buf, WIDTH);
 		if (ret < 0) {
@@ -155,6 +155,6 @@ FBTFT_REGISTER_DRIVER(DRVNAME, "teralane,tls8204", &display);
 MODULE_ALIAS("spi:" DRVNAME);
 MODULE_ALIAS("spi:tls8204");
 
-MODULE_DESCRIPTION("FB driver for the TLS8204 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke TLS8204 LCD Controller");
 MODULE_AUTHOR("Michael Hope");
 MODULE_LICENSE("GPL");

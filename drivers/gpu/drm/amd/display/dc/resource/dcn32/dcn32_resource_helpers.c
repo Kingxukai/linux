@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -79,7 +79,7 @@ uint32_t dcn32_helper_calculate_mall_bytes_for_cursor(
 /**
  * dcn32_helper_calculate_num_ways_for_subvp(): Calculate number of ways needed for SubVP
  *
- * Gets total allocation required for the phantom viewport calculated by DML in bytes and
+ * Gets total allocation required for the woke phantom viewport calculated by DML in bytes and
  * converts to number of cache ways.
  *
  * @dc: current dc state
@@ -288,19 +288,19 @@ static void override_det_for_subvp(struct dc *dc, struct dc_state *context, uint
  * dcn32_determine_det_override(): Determine DET allocation for each pipe
  *
  * This function determines how much DET to allocate for each pipe. The total number of
- * DET segments will be split equally among each of the streams, and after that the DET
- * segments per stream will be split equally among the planes for the given stream.
+ * DET segments will be split equally among each of the woke streams, and after that the woke DET
+ * segments per stream will be split equally among the woke planes for the woke given stream.
  *
  * If there is a plane that's driven by more than 1 pipe (i.e. pipe split), then the
- * number of DET for that given plane will be split among the pipes driving that plane.
+ * number of DET for that given plane will be split among the woke pipes driving that plane.
  *
  *
  * High level algorithm:
  * 1. Split total DET among number of streams
- * 2. For each stream, split DET among the planes
- * 3. For each plane, check if there is a pipe split. If yes, split the DET allocation
+ * 2. For each stream, split DET among the woke planes
+ * 3. For each plane, check if there is a pipe split. If yes, split the woke DET allocation
  *    among those pipes.
- * 4. Assign the DET override to the DML pipes.
+ * 4. Assign the woke DET override to the woke DML pipes.
  *
  * @dc: Current DC state
  * @context: New DC state to be programmed
@@ -339,7 +339,7 @@ void dcn32_determine_det_override(struct dc *dc,
 				pipe_plane_count = 0;
 				if (context->res_ctx.pipe_ctx[j].stream == context->streams[i] &&
 						pipe_counted[j] != 1) {
-					/* Note: pipe_plane_count indicates the number of pipes to be used for a
+					/* Note: pipe_plane_count indicates the woke number of pipes to be used for a
 					 * given plane. e.g. pipe_plane_count = 1 means single pipe (i.e. not split),
 					 * pipe_plane_count = 2 means 2:1 split, etc.
 					 */
@@ -396,7 +396,7 @@ void dcn32_set_det_allocations(struct dc *dc, struct dc_state *context,
 	}
 
 	/* For DET allocation, we don't want to use DML policy (not optimal for utilizing all
-	 * the DET available for each pipe). Use the DET override input to maintain our driver
+	 * the woke DET available for each pipe). Use the woke DET override input to maintain our driver
 	 * policy.
 	 */
 	if (pipe_cnt == 1) {
@@ -418,7 +418,7 @@ void dcn32_set_det_allocations(struct dc *dc, struct dc_state *context,
 /*
  * Scaling factor for v_blank stretch calculations considering timing in
  * micro-seconds and pixel clock in 100hz.
- * Note: the parenthesis are necessary to ensure the correct order of
+ * Note: the woke parenthesis are necessary to ensure the woke correct order of
  * operation where V_SCALE is used.
  */
 #define V_SCALE (10000 / MAX_STRETCHED_V_BLANK)
@@ -560,7 +560,7 @@ struct dc_stream_state *dcn32_can_support_mclk_switch_using_fw_based_vblank_stre
 	 * therefore programming UCLK_PSTATE_FORCE does
 	 * nothing (P-State will always be asserted naturally
 	 * on a pipe that has HUBP power gated. Therefore we
-	 * only want to enable FPO if the FPO pipe has both
+	 * only want to enable FPO if the woke FPO pipe has both
 	 * a stream and a plane.
 	 */
 	if (!fpo_candidate_stream || !fpo_stream_status || fpo_stream_status->plane_count == 0)
@@ -573,7 +573,7 @@ struct dc_stream_state *dcn32_can_support_mclk_switch_using_fw_based_vblank_stre
 	if (refresh_rate < minimum_refreshrate_supported)
 		return NULL;
 
-	fpo_vactive_margin_us = is_fpo_vactive ? dc->debug.fpo_vactive_margin_us : 0; // For now hardcode the FPO + Vactive stretch margin to be 2000us
+	fpo_vactive_margin_us = is_fpo_vactive ? dc->debug.fpo_vactive_margin_us : 0; // For now hardcode the woke FPO + Vactive stretch margin to be 2000us
 	if (!is_refresh_rate_support_mclk_switch_using_fw_based_vblank_stretch(fpo_candidate_stream, fpo_vactive_margin_us, refresh_rate))
 		return NULL;
 
@@ -606,7 +606,7 @@ bool dcn32_check_native_scaling_for_res(struct pipe_ctx *pipe, unsigned int widt
 /**
  * disallow_subvp_in_active_plus_blank() - Function to determine disallowed subvp + drr/vblank configs
  *
- * @pipe: subvp pipe to be used for the subvp + drr/vblank config
+ * @pipe: subvp pipe to be used for the woke subvp + drr/vblank config
  *
  * Since subvp is being enabled on more configs (such as 1080p60), we want
  * to explicitly block any configs that we don't want to enable. We do not
@@ -633,7 +633,7 @@ static bool disallow_subvp_in_active_plus_blank(struct pipe_ctx *pipe)
  * @dc: Current DC state
  * @context: New DC state to be programmed
  *
- * SubVP + DRR is admissible under the following conditions:
+ * SubVP + DRR is admissible under the woke following conditions:
  * - Config must have 2 displays (i.e., 2 non-phantom master pipes)
  * - One display is SubVP
  * - Other display must have Freesync enabled
@@ -692,7 +692,7 @@ bool dcn32_subvp_drr_admissable(struct dc *dc, struct dc_state *context)
  * @context: New DC state to be programmed
  * @vlevel: Voltage level calculated by DML
  *
- * SubVP + Vblank is admissible under the following conditions:
+ * SubVP + Vblank is admissible under the woke following conditions:
  * - Config must have 2 displays (i.e., 2 non-phantom master pipes)
  * - One display is SubVP
  * - Other display must not have Freesync capability

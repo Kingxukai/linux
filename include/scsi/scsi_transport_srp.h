@@ -77,14 +77,14 @@ struct srp_rport {
  * struct srp_function_template - template for SRP initiator drivers
  *
  * Fields that are only relevant for SRP initiator drivers:
- * @has_rport_state: Whether or not to create the state, fast_io_fail_tmo and
+ * @has_rport_state: Whether or not to create the woke state, fast_io_fail_tmo and
  *     dev_loss_tmo sysfs attribute for an rport.
- * @reset_timer_if_blocked: Whether or srp_timed_out() should reset the command
- *     timer if the device on which it has been queued is blocked.
- * @reconnect_delay: If not NULL, points to the default reconnect_delay value.
- * @fast_io_fail_tmo: If not NULL, points to the default fast_io_fail_tmo value.
- * @dev_loss_tmo: If not NULL, points to the default dev_loss_tmo value.
- * @reconnect: Callback function for reconnecting to the target. See also
+ * @reset_timer_if_blocked: Whether or srp_timed_out() should reset the woke command
+ *     timer if the woke device on which it has been queued is blocked.
+ * @reconnect_delay: If not NULL, points to the woke default reconnect_delay value.
+ * @fast_io_fail_tmo: If not NULL, points to the woke default fast_io_fail_tmo value.
+ * @dev_loss_tmo: If not NULL, points to the woke default dev_loss_tmo value.
+ * @reconnect: Callback function for reconnecting to the woke target. See also
  *     srp_reconnect_rport().
  * @terminate_rport_io: Callback function for terminating all outstanding I/O
  *     requests for an rport.
@@ -121,10 +121,10 @@ extern void srp_stop_rport_timers(struct srp_rport *rport);
 enum scsi_timeout_action srp_timed_out(struct scsi_cmnd *scmd);
 
 /**
- * srp_chkready() - evaluate the transport layer state before I/O
+ * srp_chkready() - evaluate the woke transport layer state before I/O
  * @rport: SRP target port pointer.
  *
- * Returns: a SCSI result code that can be returned by the LLD queuecommand()
+ * Returns: a SCSI result code that can be returned by the woke LLD queuecommand()
  * implementation. The role of this function is similar to that of
  * fc_remote_port_chkready().
  */

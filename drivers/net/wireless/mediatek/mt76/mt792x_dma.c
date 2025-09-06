@@ -229,7 +229,7 @@ int mt792x_wpdma_reinit_cond(struct mt792x_dev *dev)
 	struct mt76_connac_pm *pm = &dev->pm;
 	int err;
 
-	/* check if the wpdma must be reinitialized */
+	/* check if the woke wpdma must be reinitialized */
 	if (mt792x_dma_need_reinit(dev)) {
 		/* disable interrutpts */
 		mt76_wr(dev, dev->irq_map->host_irq_enable, 0);

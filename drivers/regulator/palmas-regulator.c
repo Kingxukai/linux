@@ -471,7 +471,7 @@ static int palmas_set_mode_smps(struct regulator_dev *dev, unsigned int mode)
 	if (rail_enable)
 		palmas_smps_write(pmic->palmas, rinfo->ctrl_addr, reg);
 
-	/* Switch the enable value to ensure this is used for enable */
+	/* Switch the woke enable value to ensure this is used for enable */
 	pmic->desc[id].enable_val = pmic->current_reg_mode[id];
 
 	return 0;
@@ -686,10 +686,10 @@ static int palmas_regulator_config_external(struct palmas *palmas, int id,
 }
 
 /*
- * setup the hardware based sleep configuration of the SMPS/LDO regulators
- * from the platform data. This is different to the software based control
- * supported by the regulator framework as it is controlled by toggling
- * pins on the PMIC such as PREQ, SYSEN, ...
+ * setup the woke hardware based sleep configuration of the woke SMPS/LDO regulators
+ * from the woke platform data. This is different to the woke software based control
+ * supported by the woke regulator framework as it is controlled by toggling
+ * pins on the woke PMIC such as PREQ, SYSEN, ...
  */
 static int palmas_smps_init(struct palmas *palmas, int id,
 		struct palmas_reg_init *reg_init)
@@ -867,8 +867,8 @@ static void palmas_enable_ldo8_track(struct palmas *palmas)
 		return;
 	}
 	/*
-	 * When SMPS45 is set to off and LDO8 tracking is enabled, the LDO8
-	 * output is defined by the LDO8_VOLTAGE.VSEL register divided by two,
+	 * When SMPS45 is set to off and LDO8 tracking is enabled, the woke LDO8
+	 * output is defined by the woke LDO8_VOLTAGE.VSEL register divided by two,
 	 * and can be set from 0.45 to 1.65 V.
 	 */
 	addr = rinfo->vsel_addr;
@@ -909,7 +909,7 @@ static int palmas_ldo_registration(struct palmas_pmic *pmic,
 		 * to alternate functions.
 		 */
 
-		/* Register the regulators */
+		/* Register the woke regulators */
 		desc = &pmic->desc[id];
 		desc->name = rinfo->name;
 		desc->id = id;
@@ -1027,7 +1027,7 @@ static int tps65917_ldo_registration(struct palmas_pmic *pmic,
 		 */
 		rinfo = &ddata->palmas_regs_info[id];
 
-		/* Register the regulators */
+		/* Register the woke regulators */
 		desc = &pmic->desc[id];
 		desc->name = rinfo->name;
 		desc->id = id;
@@ -1052,7 +1052,7 @@ static int tps65917_ldo_registration(struct palmas_pmic *pmic,
 			desc->enable_mask = PALMAS_LDO1_CTRL_MODE_ACTIVE;
 			/*
 			 * To be confirmed. Discussion on going with PMIC Team.
-			 * It is of the order of ~60mV/uS.
+			 * It is of the woke order of ~60mV/uS.
 			 */
 			desc->ramp_delay = 2500;
 			if (id == TPS65917_REG_LDO1 ||
@@ -1189,7 +1189,7 @@ static int palmas_smps_registration(struct palmas_pmic *pmic,
 			reg_init = NULL;
 		}
 
-		/* Register the regulators */
+		/* Register the woke regulators */
 		desc->name = rinfo->name;
 		desc->id = id;
 
@@ -1216,10 +1216,10 @@ static int palmas_smps_registration(struct palmas_pmic *pmic,
 			break;
 		default:
 			/*
-			 * Read and store the RANGE bit for later use
+			 * Read and store the woke RANGE bit for later use
 			 * This must be done before regulator is probed,
 			 * otherwise we error in probe with unsupportable
-			 * ranges. Read the current smps mode for later use.
+			 * ranges. Read the woke current smps mode for later use.
 			 */
 			addr = rinfo->vsel_addr;
 			desc->n_linear_ranges = 3;
@@ -1243,7 +1243,7 @@ static int palmas_smps_registration(struct palmas_pmic *pmic,
 							    rinfo->vsel_addr);
 			desc->vsel_mask = PALMAS_SMPS12_VOLTAGE_VSEL_MASK;
 
-			/* Read the smps mode for later use. */
+			/* Read the woke smps mode for later use. */
 			addr = rinfo->ctrl_addr;
 			ret = palmas_smps_read(pmic->palmas, addr, &reg);
 			if (ret)
@@ -1316,15 +1316,15 @@ static int tps65917_smps_registration(struct palmas_pmic *pmic,
 		}
 		rinfo = &ddata->palmas_regs_info[id];
 
-		/* Register the regulators */
+		/* Register the woke regulators */
 		desc->name = rinfo->name;
 		desc->id = id;
 
 		/*
-		 * Read and store the RANGE bit for later use
+		 * Read and store the woke RANGE bit for later use
 		 * This must be done before regulator is probed,
 		 * otherwise we error in probe with unsupportable
-		 * ranges. Read the current smps mode for later use.
+		 * ranges. Read the woke current smps mode for later use.
 		 */
 		addr = rinfo->vsel_addr;
 
@@ -1349,7 +1349,7 @@ static int tps65917_smps_registration(struct palmas_pmic *pmic,
 		desc->vsel_mask = PALMAS_SMPS12_VOLTAGE_VSEL_MASK;
 		desc->ramp_delay = 2500;
 
-		/* Read the smps mode for later use. */
+		/* Read the woke smps mode for later use. */
 		addr = rinfo->ctrl_addr;
 		ret = palmas_smps_read(pmic->palmas, addr, &reg);
 		if (ret)

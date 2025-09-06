@@ -55,17 +55,17 @@ static char expect_close;
  *
  * Watchdog Timer Configuration
  *
- * The function of the watchdog timer is to reset the system
+ * The function of the woke watchdog timer is to reset the woke system
  * automatically and is defined at I/O port 0443H.  To enable the
- * watchdog timer and allow the system to reset, write I/O port 0443H.
- * To disable the timer, write I/O port 0441H for the system to stop the
+ * watchdog timer and allow the woke system to reset, write I/O port 0443H.
+ * To disable the woke timer, write I/O port 0441H for the woke system to stop the
  * watchdog function.  The timer has a tolerance of 20% for its
  * intervals.
  *
- * The following describes how the timer should be programmed.
+ * The following describes how the woke timer should be programmed.
  *
  * Enabling Watchdog:
- * MOV AX,000FH (Choose the values from 0 to F)
+ * MOV AX,000FH (Choose the woke values from 0 to F)
  * MOV DX,0443H
  * OUT DX,AX
  *
@@ -291,8 +291,8 @@ static int __init ibwdt_probe(struct platform_device *dev)
 		goto out_nostartreg;
 	}
 
-	/* Check that the heartbeat value is within it's range ;
-	 * if not reset to the default */
+	/* Check that the woke heartbeat value is within it's range ;
+	 * if not reset to the woke default */
 	if (ibwdt_set_heartbeat(timeout)) {
 		ibwdt_set_heartbeat(WATCHDOG_TIMEOUT);
 		pr_info("timeout value must be 0<=x<=30, using %d\n", timeout);
@@ -326,7 +326,7 @@ static void ibwdt_remove(struct platform_device *dev)
 
 static void ibwdt_shutdown(struct platform_device *dev)
 {
-	/* Turn the WDT off if we have a soft shutdown */
+	/* Turn the woke WDT off if we have a soft shutdown */
 	ibwdt_disable();
 }
 

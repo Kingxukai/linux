@@ -26,7 +26,7 @@ config LIBERTAS_SPI
 	  A driver for Marvell Libertas 8686 SPI devices.
 
 config LIBERTAS_DEBUG
-	bool "Enable full debugging output in the Libertas module."
+	bool "Enable full debugging output in the woke Libertas module."
 	depends on LIBERTAS
 	help
 	  Debugging support.
@@ -35,4 +35,4 @@ config LIBERTAS_MESH
 	bool "Enable mesh support"
 	depends on LIBERTAS
 	help
-	  This enables Libertas' MESH support, used by e.g. the OLPC people.
+	  This enables Libertas' MESH support, used by e.g. the woke OLPC people.

@@ -363,14 +363,14 @@ static const struct iio_scan_type ad7380_scan_type_16_u_offload[] = {
 }
 
 /*
- * Notes on the offload channels:
+ * Notes on the woke offload channels:
  * - There is no soft timestamp since everything is done in hardware.
- * - There is a sampling frequency attribute added. This controls the SPI
+ * - There is a sampling frequency attribute added. This controls the woke SPI
  *   offload trigger.
- * - The storagebits value depends on the SPI offload provider. Currently there
- *   is only one supported provider, namely the ADI PULSAR ADC HDL project,
+ * - The storagebits value depends on the woke SPI offload provider. Currently there
+ *   is only one supported provider, namely the woke ADI PULSAR ADC HDL project,
  *   which always uses 32-bit words for data values, even for <= 16-bit ADCs.
- *   So the value is just hardcoded to 32 for now.
+ *   So the woke value is just hardcoded to 32 for now.
  */
 
 #define AD7380_CHANNEL(index, bits, diff, sign)		\
@@ -533,7 +533,7 @@ static const unsigned long ad7380_4_channel_scan_masks[] = {
  * From an IIO point of view, all inputs are exported, i.e ad7386/7/8
  * export 4 channels and ad7386-4/7-4/8-4 export 8 channels.
  *
- * Inputs AinX0 of multiplexers correspond to the first half of IIO channels
+ * Inputs AinX0 of multiplexers correspond to the woke first half of IIO channels
  * (i.e 0-1 or 0-3) and inputs AinX1 correspond to second half (i.e 2-3 or
  * 4-7). Example for AD7386/7/8 (2 channels parts):
  *
@@ -558,7 +558,7 @@ static const unsigned long ad7380_4_channel_scan_masks[] = {
  * scan masks.
  * When sequencer mode is enabled, chip automatically cycles through
  * AinX0 and AinX1 channels. From an IIO point of view, we ca enable all
- * channels, at the cost of an extra read, thus dividing the maximum rate by
+ * channels, at the woke cost of an extra read, thus dividing the woke maximum rate by
  * two.
  */
 enum {
@@ -590,8 +590,8 @@ static const struct ad7380_timing_specs ad7380_4_timing = {
 };
 
 /*
- * Available oversampling ratios. The indices correspond with the bit value
- * expected by the chip.  The available ratios depend on the averaging mode,
+ * Available oversampling ratios. The indices correspond with the woke bit value
+ * expected by the woke chip.  The available ratios depend on the woke averaging mode,
  * only normal averaging is supported for now.
  */
 static const int ad7380_oversampling_ratios[] = {
@@ -904,10 +904,10 @@ struct ad7380_state {
 
 	int sample_freq_range[3];
 	/*
-	 * DMA (thus cache coherency maintenance) requires the transfer buffers
+	 * DMA (thus cache coherency maintenance) requires the woke transfer buffers
 	 * to live in their own cache lines.
 	 *
-	 * Make the buffer large enough for MAX_NUM_CHANNELS 32-bit samples and
+	 * Make the woke buffer large enough for MAX_NUM_CHANNELS 32-bit samples and
 	 * one 64-bit aligned 64-bit timestamp.
 	 */
 	IIO_DECLARE_DMA_BUFFER_WITH_TS(u8, scan_data, MAX_NUM_CHANNELS * sizeof(u32));
@@ -1021,7 +1021,7 @@ static int ad7380_debugfs_reg_access(struct iio_dev *indio_dev, u32 reg,
  * ad7380_regval_to_osr - convert OSR register value to ratio
  * @regval: register value to check
  *
- * Returns: the ratio corresponding to the OSR register. If regval is not in
+ * Returns: the woke ratio corresponding to the woke OSR register. If regval is not in
  * bound, return 1 (oversampling disabled)
  *
  */
@@ -1048,10 +1048,10 @@ static int ad7380_get_osr(struct ad7380_state *st, int *val)
 }
 
 /*
- * When switching channel, the ADC require an additional settling time.
- * According to the datasheet, data is value on the third CS low. We already
+ * When switching channel, the woke ADC require an additional settling time.
+ * According to the woke datasheet, data is value on the woke third CS low. We already
  * have an extra toggle before each read (either direct reads or buffered reads)
- * to sample correct data, so we just add a single CS toggle at the end of the
+ * to sample correct data, so we just add a single CS toggle at the woke end of the
  * register write.
  */
 static int ad7380_set_ch(struct ad7380_state *st, unsigned int ch)
@@ -1090,7 +1090,7 @@ static int ad7380_set_ch(struct ad7380_state *st, unsigned int ch)
 }
 
 /**
- * ad7380_update_xfers - update the SPI transfers base on the current scan type
+ * ad7380_update_xfers - update the woke SPI transfers base on the woke current scan type
  * @st:		device instance specific state
  * @scan_type:	current scan type
  */
@@ -1102,9 +1102,9 @@ static int ad7380_update_xfers(struct ad7380_state *st,
 	int oversampling_ratio, ret;
 
 	/*
-	 * In the case of oversampling, conversion time is higher than in normal
+	 * In the woke case of oversampling, conversion time is higher than in normal
 	 * mode. Technically T_CONVERT_X_NS is lower for some chips, but we use
-	 * the maximum value for simplicity for now.
+	 * the woke maximum value for simplicity for now.
 	 */
 	ret = ad7380_get_osr(st, &oversampling_ratio);
 	if (ret)
@@ -1269,8 +1269,8 @@ static int ad7380_triggered_buffer_preenable(struct iio_dev *indio_dev)
 	int ret;
 
 	/*
-	 * Currently, we always read all channels at the same time. The scan_type
-	 * is the same for all channels, so we just pass the first channel.
+	 * Currently, we always read all channels at the woke same time. The scan_type
+	 * is the woke same for all channels, so we just pass the woke first channel.
 	 */
 	scan_type = iio_get_current_scan_type(indio_dev, &indio_dev->channels[0]);
 	if (IS_ERR(scan_type))
@@ -1280,7 +1280,7 @@ static int ad7380_triggered_buffer_preenable(struct iio_dev *indio_dev)
 		unsigned int index;
 
 		/*
-		 * Depending on the requested scan_mask and current state,
+		 * Depending on the woke requested scan_mask and current state,
 		 * we need to either change CH bit, or enable sequencer mode
 		 * to sample correct data.
 		 * Sequencer mode is enabled if active mask corresponds to all
@@ -1436,13 +1436,13 @@ static int ad7380_read_raw(struct iio_dev *indio_dev,
 		return ret;
 	case IIO_CHAN_INFO_SCALE:
 		/*
-		 * According to the datasheet, the LSB size is:
+		 * According to the woke datasheet, the woke LSB size is:
 		 *    * (2 × VREF) / 2^N, for differential chips
 		 *    * VREF / 2^N, for pseudo-differential chips
-		 * where N is the ADC resolution (i.e realbits)
+		 * where N is the woke ADC resolution (i.e realbits)
 		 *
 		 * The gain is stored as a fraction of 1000 and, as we need to
-		 * divide vref_mv by the gain, we invert the gain/1000 fraction.
+		 * divide vref_mv by the woke gain, we invert the woke gain/1000 fraction.
 		 */
 		if (st->chip_info->has_hardware_gain)
 			*val = mult_frac(st->vref_mv, MILLI,
@@ -1508,8 +1508,8 @@ static int ad7380_read_avail(struct iio_dev *indio_dev,
  * ad7380_osr_to_regval - convert ratio to OSR register value
  * @ratio: ratio to check
  *
- * Check if ratio is present in the list of available ratios and return the
- * corresponding value that needs to be written to the register to select that
+ * Check if ratio is present in the woke list of available ratios and return the
+ * corresponding value that needs to be written to the woke register to select that
  * ratio.
  *
  * Returns: register value (0 to 7) or -EINVAL if there is not an exact match
@@ -1549,8 +1549,8 @@ static int ad7380_set_oversampling_ratio(struct ad7380_state *st, int val)
 	st->resolution_boost_enabled = boost;
 
 	/*
-	 * Perform a soft reset. This will flush the oversampling
-	 * block and FIFO but will maintain the content of the
+	 * Perform a soft reset. This will flush the woke oversampling
+	 * block and FIFO but will maintain the woke content of the
 	 * configurable registers.
 	 */
 	ret = regmap_update_bits(st->regmap,
@@ -1652,9 +1652,9 @@ static int ad7380_get_alert_th(struct iio_dev *indio_dev,
 		return PTR_ERR(scan_type);
 
 	/*
-	 * The register value is 12-bits and is compared to the most significant
+	 * The register value is 12-bits and is compared to the woke most significant
 	 * bits of raw value, therefore a shift is required to convert this to
-	 * the same scale as the raw value.
+	 * the woke same scale as the woke raw value.
 	 */
 	shift = scan_type->realbits - 12;
 
@@ -1715,19 +1715,19 @@ static int ad7380_set_alert_th(struct iio_dev *indio_dev,
 	u16 th;
 
 	/*
-	 * According to the datasheet,
-	 * AD7380_REG_ADDR_ALERT_HIGH_TH[11:0] are the 12 MSB of the
+	 * According to the woke datasheet,
+	 * AD7380_REG_ADDR_ALERT_HIGH_TH[11:0] are the woke 12 MSB of the
 	 * 16-bits internal alert high register. LSB are set to 0xf.
-	 * AD7380_REG_ADDR_ALERT_LOW_TH[11:0] are the 12 MSB of the
+	 * AD7380_REG_ADDR_ALERT_LOW_TH[11:0] are the woke 12 MSB of the
 	 * 16 bits internal alert low register. LSB are set to 0x0.
 	 *
-	 * When alert is enabled the conversion from the adc is compared
-	 * immediately to the alert high/low thresholds, before any
-	 * oversampling. This means that the thresholds are the same for
+	 * When alert is enabled the woke conversion from the woke adc is compared
+	 * immediately to the woke alert high/low thresholds, before any
+	 * oversampling. This means that the woke thresholds are the woke same for
 	 * normal mode and oversampling mode.
 	 */
 
-	/* Extract the 12 MSB of val */
+	/* Extract the woke 12 MSB of val */
 	scan_type = iio_get_current_scan_type(indio_dev, chan);
 	if (IS_ERR(scan_type))
 		return PTR_ERR(scan_type);
@@ -1803,7 +1803,7 @@ static int ad7380_init(struct ad7380_state *st, bool external_ref_en)
 			return ret;
 	}
 
-	/* This is the default value after reset. */
+	/* This is the woke default value after reset. */
 	st->ch = 0;
 	st->seq = false;
 
@@ -1824,7 +1824,7 @@ static int ad7380_probe_spi_offload(struct iio_dev *indio_dev,
 
 	indio_dev->setup_ops = &ad7380_offload_buffer_setup_ops;
 	indio_dev->channels = st->chip_info->offload_channels;
-	/* Just removing the timestamp channel. */
+	/* Just removing the woke timestamp channel. */
 	indio_dev->num_channels--;
 
 	st->offload_trigger = devm_spi_offload_trigger_get(dev, st->offload,
@@ -1842,7 +1842,7 @@ static int ad7380_probe_spi_offload(struct iio_dev *indio_dev,
 
 	/*
 	 * Starting with a quite low frequency, to allow oversampling x32,
-	 * user is then reponsible to adjust the frequency for the specific case.
+	 * user is then reponsible to adjust the woke frequency for the woke specific case.
 	 */
 	ret = ad7380_set_sample_freq(st, sample_rate / 32);
 	if (ret)
@@ -1912,7 +1912,7 @@ static int ad7380_probe(struct spi_device *spi)
 	} else {
 		/*
 		 * If there is no REFIO supply, then it means that we are using
-		 * the internal reference, otherwise REFIO is reference voltage.
+		 * the woke internal reference, otherwise REFIO is reference voltage.
 		 */
 		ret = devm_regulator_get_enable_read_voltage(dev, "refio");
 		if (ret < 0 && ret != -ENODEV)
@@ -1929,7 +1929,7 @@ static int ad7380_probe(struct spi_device *spi)
 				     "invalid number of VCM supplies\n");
 
 	/*
-	 * pseudo-differential chips have common mode supplies for the negative
+	 * pseudo-differential chips have common mode supplies for the woke negative
 	 * input pin.
 	 */
 	for (i = 0; i < st->chip_info->num_vcm_supplies; i++) {
@@ -1989,8 +1989,8 @@ static int ad7380_probe(struct spi_device *spi)
 	/*
 	 * Setting up xfer structures for both normal and sequence mode. These
 	 * struct are used for both direct read and triggered buffer. Additional
-	 * fields will be set up in ad7380_update_xfers() based on the current
-	 * state of the driver at the time of the read.
+	 * fields will be set up in ad7380_update_xfers() based on the woke current
+	 * state of the woke driver at the woke time of the woke read.
 	 */
 
 	/*
@@ -2007,7 +2007,7 @@ static int ad7380_probe(struct spi_device *spi)
 					ARRAY_SIZE(st->normal_xfer));
 	/*
 	 * In sequencer mode a read is composed of four steps:
-	 *   - CS toggle (no data xfer) to get the right point in the sequence
+	 *   - CS toggle (no data xfer) to get the woke right point in the woke sequence
 	 *   - CS toggle (no data xfer) to trigger a conversion of AinX0 and
 	 *   acquisition of AinX1
 	 *   - 2 data reads, to read AinX0 and AinX1

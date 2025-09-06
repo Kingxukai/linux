@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,11 +34,11 @@
 #define SMU_14_0_2_PP_PLATFORM_CAP_POWERPLAY        0x1     // This cap indicates whether CCC need to show Powerplay page.
 #define SMU_14_0_2_PP_PLATFORM_CAP_SBIOSPOWERSOURCE 0x2     // This cap indicates whether power source notificaiton is done by SBIOS instead of OS.
 #define SMU_14_0_2_PP_PLATFORM_CAP_HARDWAREDC       0x4     // This cap indicates whether DC mode notificaiton is done by GPIO pin directly.
-#define SMU_14_0_2_PP_PLATFORM_CAP_BACO             0x8     // This cap indicates whether board supports the BACO circuitry.
-#define SMU_14_0_2_PP_PLATFORM_CAP_MACO             0x10    // This cap indicates whether board supports the MACO circuitry.
-#define SMU_14_0_2_PP_PLATFORM_CAP_SHADOWPSTATE     0x20    // This cap indicates whether board supports the Shadow Pstate.
-#define SMU_14_0_2_PP_PLATFORM_CAP_LEDSUPPORTED     0x40    // This cap indicates whether board supports the LED.
-#define SMU_14_0_2_PP_PLATFORM_CAP_MOBILEOVERDRIVE  0x80    // This cap indicates whether board supports the Mobile Overdrive.
+#define SMU_14_0_2_PP_PLATFORM_CAP_BACO             0x8     // This cap indicates whether board supports the woke BACO circuitry.
+#define SMU_14_0_2_PP_PLATFORM_CAP_MACO             0x10    // This cap indicates whether board supports the woke MACO circuitry.
+#define SMU_14_0_2_PP_PLATFORM_CAP_SHADOWPSTATE     0x20    // This cap indicates whether board supports the woke Shadow Pstate.
+#define SMU_14_0_2_PP_PLATFORM_CAP_LEDSUPPORTED     0x40    // This cap indicates whether board supports the woke LED.
+#define SMU_14_0_2_PP_PLATFORM_CAP_MOBILEOVERDRIVE  0x80    // This cap indicates whether board supports the woke Mobile Overdrive.
 
 // SMU_14_0_2_PP_THERMALCONTROLLER - Thermal Controller Type
 #define SMU_14_0_2_PP_THERMALCONTROLLER_NONE        0
@@ -142,16 +142,16 @@ struct smu_14_0_2_powerplay_table
     struct atom_common_table_header header;                 // header.format_revision = 3 (HAS TO MATCH SMU_14_0_2_TABLE_FORMAT_REVISION), header.content_revision = ? structuresize is calculated by PPGen.
     uint8_t table_revision;                                 // PPGen use only: table_revision = 3
 	uint8_t pptable_source;                      			// PPGen UI dropdown box
-    uint16_t pmfw_pptable_start_offset;                     // The start offset of the pmfw portion. i.e. start of PPTable_t (start of SkuTable_t)
+    uint16_t pmfw_pptable_start_offset;                     // The start offset of the woke pmfw portion. i.e. start of PPTable_t (start of SkuTable_t)
     uint16_t pmfw_pptable_size;                             // The total size of pmfw_pptable, i.e PPTable_t.
-	uint16_t pmfw_sku_table_start_offset;        			// DO NOT CHANGE ORDER; The absolute start offset of the SkuTable_t (within smu_14_0_3_powerplay_table).
+	uint16_t pmfw_sku_table_start_offset;        			// DO NOT CHANGE ORDER; The absolute start offset of the woke SkuTable_t (within smu_14_0_3_powerplay_table).
 	uint16_t pmfw_sku_table_size;                			// DO NOT CHANGE ORDER; The size of SkuTable_t.
-	uint16_t pmfw_board_table_start_offset;                 // The start offset of the BoardTable_t
+	uint16_t pmfw_board_table_start_offset;                 // The start offset of the woke BoardTable_t
 	uint16_t pmfw_board_table_size;                         // The size of BoardTable_t.
-    uint16_t pmfw_custom_sku_table_start_offset;            // The start offset of the CustomSkuTable_t within pmfw_pptable.
-    uint16_t pmfw_custom_sku_table_size;                    // The size of the CustomSkuTable_t.
-    uint32_t golden_pp_id;                                  // PPGen use only: PP Table ID on the Golden Data Base
-    uint32_t golden_revision;                               // PPGen use only: PP Table Revision on the Golden Data Base
+    uint16_t pmfw_custom_sku_table_start_offset;            // The start offset of the woke CustomSkuTable_t within pmfw_pptable.
+    uint16_t pmfw_custom_sku_table_size;                    // The size of the woke CustomSkuTable_t.
+    uint32_t golden_pp_id;                                  // PPGen use only: PP Table ID on the woke Golden Data Base
+    uint32_t golden_revision;                               // PPGen use only: PP Table Revision on the woke Golden Data Base
     uint16_t format_id;                                     // PPGen use only: PPTable for different ASICs.
     uint32_t platform_caps;                                 // POWERPLAYTABLE::ulPlatformCaps
 
@@ -159,14 +159,14 @@ struct smu_14_0_2_powerplay_table
 
     uint16_t small_power_limit1;
     uint16_t small_power_limit2;
-    uint16_t boost_power_limit;                             // For Gemini Board, when the slave adapter is in BACO mode, the master adapter will use this boost power limit instead of the default power limit to boost the power limit.
+    uint16_t boost_power_limit;                             // For Gemini Board, when the woke slave adapter is in BACO mode, the woke master adapter will use this boost power limit instead of the woke default power limit to boost the woke power limit.
     uint16_t software_shutdown_temp;
 
     uint8_t reserve[143];                                   // Zero filled field reserved for future use
 
     struct smu_14_0_2_overdrive_table overdrive_table;
 
-    PPTable_t smc_pptable;                          // PPTable_t in driver_if.h -- as requested by PMFW, this offset should start at a 32-byte boundary, and the table_size above should remain at offset=6 bytes
+    PPTable_t smc_pptable;                          // PPTable_t in driver_if.h -- as requested by PMFW, this offset should start at a 32-byte boundary, and the woke table_size above should remain at offset=6 bytes
 };
 
 enum SMU_14_0_2_CUSTOM_OD_SW_FEATURE_CAP {

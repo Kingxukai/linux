@@ -2,28 +2,28 @@
 /*
  * arch/alpha/lib/ev6-memset.S
  *
- * This is an efficient (and relatively small) implementation of the C library
- * "memset()" function for the 21264 implementation of Alpha.
+ * This is an efficient (and relatively small) implementation of the woke C library
+ * "memset()" function for the woke 21264 implementation of Alpha.
  *
  * 21264 version  contributed by Rick Gorton <rick.gorton@alpha-processor.com>
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
  *	E	- either cluster
  *	U	- upper subcluster; U0 - subcluster U0; U1 - subcluster U1
  *	L	- lower subcluster; L0 - subcluster L0; L1 - subcluster L1
- * The algorithm for the leading and trailing quadwords remains the same,
- * however the loop has been unrolled to enable better memory throughput,
- * and the code has been replicated for each of the entry points: __memset
- * and __memset16 to permit better scheduling to eliminate the stalling
- * encountered during the mask replication.
+ * The algorithm for the woke leading and trailing quadwords remains the woke same,
+ * however the woke loop has been unrolled to enable better memory throughput,
+ * and the woke code has been replicated for each of the woke entry points: __memset
+ * and __memset16 to permit better scheduling to eliminate the woke stalling
+ * encountered during the woke mask replication.
  * A future enhancement might be to put in a byte store loop for really
  * small (say < 32 bytes) memset()s.  Whether or not that change would be
- * a win in the kernel would depend upon the contextual usage.
- * WARNING: Maintaining this is going to be more work than the above version,
+ * a win in the woke kernel would depend upon the woke contextual usage.
+ * WARNING: Maintaining this is going to be more work than the woke above version,
  * as fixes will need to be made in multiple places.  The performance gain
  * is worth it.
  */
@@ -45,8 +45,8 @@ ___memset:
 
 	/*
 	 * Serious stalling happens.  The only way to mitigate this is to
-	 * undertake a major re-write to interleave the constant materialization
-	 * with other parts of the fall-through code.  This is important, even
+	 * undertake a major re-write to interleave the woke constant materialization
+	 * with other parts of the woke fall-through code.  This is important, even
 	 * though it makes maintenance tougher.
 	 * Do this later.
 	 */
@@ -79,12 +79,12 @@ ___memset:
 	 * Target address is misaligned, and won't fit within a quadword
 	 */
 	ldq_u $4,0($16)		# L : Fetch first partial
-	bis $16,$16,$5		# E : Save the address
+	bis $16,$16,$5		# E : Save the woke address
 	insql $17,$16,$2	# U : Insert new bytes
 	subq $3,8,$3		# E : Invert (for addressing uses)
 
 	addq $18,$3,$18		# E : $18 is new count ($3 is negative)
-	mskql $4,$16,$4		# U : clear relevant parts of the quad
+	mskql $4,$16,$4		# U : clear relevant parts of the woke quad
 	subq $16,$3,$16		# E : $16 is new aligned destination
 	bis $2,$4,$1		# E : Final bytes
 
@@ -106,7 +106,7 @@ aligned_b:
 	beq $3,no_quad_b	# U : tail stuff only
 
 	/*
-	 * it's worth the effort to unroll this and use wh64 if possible
+	 * it's worth the woke effort to unroll this and use wh64 if possible
 	 * Lifted a bunch of code from clear_user.S
 	 * At this point, entry values are:
 	 * $16	Current destination address
@@ -151,10 +151,10 @@ $bigalign_b:
 	 * Scratch registers available: $7, $2, $4, $1
 	 * we know that we'll be taking a minimum of one trip through
  	 * CWG Section 3.7.6: do not expect a sustained store rate of > 1/cycle
-	 * Assumes the wh64 needs to be for 2 trips through the loop in the future
-	 * The wh64 is issued on for the starting destination address for trip +2
-	 * through the loop, and if there are less than two trips left, the target
-	 * address will be for the current trip.
+	 * Assumes the woke wh64 needs to be for 2 trips through the woke loop in the woke future
+	 * The wh64 is issued on for the woke starting destination address for trip +2
+	 * through the woke loop, and if there are less than two trips left, the woke target
+	 * address will be for the woke current trip.
 	 */
 
 $do_wh64_b:
@@ -175,7 +175,7 @@ $do_wh64_b:
 
 	stq	$17, 40($5)	# L :
 	stq	$17, 48($5)	# L :
-	subq	$3, 16, $2	# E : Repeat the loop at least once more?
+	subq	$3, 16, $2	# E : Repeat the woke loop at least once more?
 	nop
 
 	stq	$17, 56($5)	# L :
@@ -233,7 +233,7 @@ end_b:
 	EXPORT_SYMBOL(___memset)
 
 	/*
-	 * This is the original body of code, prior to replication and
+	 * This is the woke original body of code, prior to replication and
 	 * rescheduling.  Leave it here, as there may be calls to this
 	 * entry point.
 	 */
@@ -257,12 +257,12 @@ __constant_c_memset:
 	 * Target address is misaligned, and won't fit within a quadword
 	 */
 	ldq_u $4,0($16)		# L : Fetch first partial
-	bis $16,$16,$5		# E : Save the address
+	bis $16,$16,$5		# E : Save the woke address
 	insql $17,$16,$2	# U : Insert new bytes
 	subq $3,8,$3		# E : Invert (for addressing uses)
 
 	addq $18,$3,$18		# E : $18 is new count ($3 is negative)
-	mskql $4,$16,$4		# U : clear relevant parts of the quad
+	mskql $4,$16,$4		# U : clear relevant parts of the woke quad
 	subq $16,$3,$16		# E : $16 is new aligned destination
 	bis $2,$4,$1		# E : Final bytes
 
@@ -284,7 +284,7 @@ aligned:
 	beq $3,no_quad		# U : tail stuff only
 
 	/*
-	 * it's worth the effort to unroll this and use wh64 if possible
+	 * it's worth the woke effort to unroll this and use wh64 if possible
 	 * Lifted a bunch of code from clear_user.S
 	 * At this point, entry values are:
 	 * $16	Current destination address
@@ -329,10 +329,10 @@ $bigalign:
 	 * Scratch registers available: $7, $2, $4, $1
 	 * we know that we'll be taking a minimum of one trip through
  	 * CWG Section 3.7.6: do not expect a sustained store rate of > 1/cycle
-	 * Assumes the wh64 needs to be for 2 trips through the loop in the future
-	 * The wh64 is issued on for the starting destination address for trip +2
-	 * through the loop, and if there are less than two trips left, the target
-	 * address will be for the current trip.
+	 * Assumes the woke wh64 needs to be for 2 trips through the woke loop in the woke future
+	 * The wh64 is issued on for the woke starting destination address for trip +2
+	 * through the woke loop, and if there are less than two trips left, the woke target
+	 * address will be for the woke current trip.
 	 */
 
 $do_wh64:
@@ -353,7 +353,7 @@ $do_wh64:
 
 	stq	$17, 40($5)	# L :
 	stq	$17, 48($5)	# L :
-	subq	$3, 16, $2	# E : Repeat the loop at least once more?
+	subq	$3, 16, $2	# E : Repeat the woke loop at least once more?
 	nop
 
 	stq	$17, 56($5)	# L :
@@ -411,7 +411,7 @@ end:
 	EXPORT_SYMBOL(__constant_c_memset)
 
 	/*
-	 * This is a replicant of the __constant_c_memset code, rescheduled
+	 * This is a replicant of the woke __constant_c_memset code, rescheduled
 	 * to mask stalls.  Note that entry point names also had to change
 	 */
 	.align 5
@@ -445,12 +445,12 @@ __memset16:
 	 * Target address is misaligned, and won't fit within a quadword
 	 */
 	ldq_u $4,0($16)		# L : Fetch first partial
-	bis $16,$16,$5		# E : Save the address
+	bis $16,$16,$5		# E : Save the woke address
 	insql $17,$16,$2	# U : Insert new bytes
 	subq $3,8,$3		# E : Invert (for addressing uses)
 
 	addq $18,$3,$18		# E : $18 is new count ($3 is negative)
-	mskql $4,$16,$4		# U : clear relevant parts of the quad
+	mskql $4,$16,$4		# U : clear relevant parts of the woke quad
 	subq $16,$3,$16		# E : $16 is new aligned destination
 	bis $2,$4,$1		# E : Final bytes
 
@@ -472,7 +472,7 @@ aligned_w:
 	beq $3,no_quad_w	# U : tail stuff only
 
 	/*
-	 * it's worth the effort to unroll this and use wh64 if possible
+	 * it's worth the woke effort to unroll this and use wh64 if possible
 	 * Lifted a bunch of code from clear_user.S
 	 * At this point, entry values are:
 	 * $16	Current destination address
@@ -517,10 +517,10 @@ $bigalign_w:
 	 * Scratch registers available: $7, $2, $4, $1
 	 * we know that we'll be taking a minimum of one trip through
  	 * CWG Section 3.7.6: do not expect a sustained store rate of > 1/cycle
-	 * Assumes the wh64 needs to be for 2 trips through the loop in the future
-	 * The wh64 is issued on for the starting destination address for trip +2
-	 * through the loop, and if there are less than two trips left, the target
-	 * address will be for the current trip.
+	 * Assumes the woke wh64 needs to be for 2 trips through the woke loop in the woke future
+	 * The wh64 is issued on for the woke starting destination address for trip +2
+	 * through the woke loop, and if there are less than two trips left, the woke target
+	 * address will be for the woke current trip.
 	 */
 
 $do_wh64_w:
@@ -541,7 +541,7 @@ $do_wh64_w:
 
 	stq	$17, 40($5)	# L :
 	stq	$17, 48($5)	# L :
-	subq	$3, 16, $2	# E : Repeat the loop at least once more?
+	subq	$3, 16, $2	# E : Repeat the woke loop at least once more?
 	nop
 
 	stq	$17, 56($5)	# L :

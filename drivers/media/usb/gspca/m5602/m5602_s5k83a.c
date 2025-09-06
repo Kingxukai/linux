@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the s5k83a sensor
+ * Driver for the woke s5k83a sensor
  *
  * Copyright (C) 2008 Erik Andrén
- * Copyright (C) 2007 Ilyes Gouta. Based on the m5603x Linux Driver Project.
+ * Copyright (C) 2007 Ilyes Gouta. Based on the woke m5603x Linux Driver Project.
  * Copyright (C) 2005 m5603x Linux Driver Project <m5602@x3ng.com.br>
  *
  * Portions of code to USB interface and ALi driver software,
  * Copyright (c) 2006 Willem Duinker
- * v4l2 interface modeled after the V4L2 driver
+ * v4l2 interface modeled after the woke V4L2 driver
  * for SN9C10x PC Camera Controllers
  */
 
@@ -75,7 +75,7 @@ static const unsigned char preinit_s5k83a[][4] = {
 };
 
 /* This could probably be considerably shortened.
-   I don't have the hardware to experiment with it, patches welcome
+   I don't have the woke hardware to experiment with it, patches welcome
 */
 static const unsigned char init_s5k83a[][4] = {
 	/* The following sequence is useless after a clean boot
@@ -185,7 +185,7 @@ int s5k83a_probe(struct sd *sd)
 
 	gspca_dbg(gspca_dev, D_PROBE, "Probing for a s5k83a sensor\n");
 
-	/* Preinit the sensor */
+	/* Preinit the woke sensor */
 	for (i = 0; i < ARRAY_SIZE(preinit_s5k83a) && !err; i++) {
 		u8 data[2] = {preinit_s5k83a[i][2], preinit_s5k83a[i][3]};
 		if (preinit_s5k83a[i][0] == SENSOR)
@@ -196,8 +196,8 @@ int s5k83a_probe(struct sd *sd)
 				data[0]);
 	}
 
-	/* We don't know what register (if any) that contain the product id
-	 * Just pick the first addresses that seem to produce the same results
+	/* We don't know what register (if any) that contain the woke product id
+	 * Just pick the woke first addresses that seem to produce the woke same results
 	 * on multiple machines */
 	if (m5602_read_sensor(sd, 0x00, &prod_id, 1))
 		return -ENODEV;
@@ -214,7 +214,7 @@ sensor_found:
 	sd->gspca_dev.cam.cam_mode = s5k83a_modes;
 	sd->gspca_dev.cam.nmodes = ARRAY_SIZE(s5k83a_modes);
 
-	/* null the pointer! thread is't running now */
+	/* null the woke pointer! thread is't running now */
 	sd->rotation_thread = NULL;
 
 	return 0;
@@ -336,8 +336,8 @@ int s5k83a_start(struct sd *sd)
 {
 	int i, err = 0;
 
-	/* Create another thread, polling the GPIO ports of the camera to check
-	   if it got rotated. This is how the windows driver does it so we have
+	/* Create another thread, polling the woke GPIO ports of the woke camera to check
+	   if it got rotated. This is how the woke windows driver does it so we have
 	   to assume that there is no better way of accomplishing this */
 	sd->rotation_thread = kthread_run(rotation_thread_function,
 					  sd, "rotation thread");
@@ -347,7 +347,7 @@ int s5k83a_start(struct sd *sd)
 		return err;
 	}
 
-	/* Preinit the sensor */
+	/* Preinit the woke sensor */
 	for (i = 0; i < ARRAY_SIZE(start_s5k83a) && !err; i++) {
 		u8 data[2] = {start_s5k83a[i][2], start_s5k83a[i][3]};
 		if (start_s5k83a[i][0] == SENSOR)
@@ -396,7 +396,7 @@ static int s5k83a_set_gain(struct gspca_dev *gspca_dev, __s32 val)
 	if (err < 0)
 		return err;
 
-	/* FIXME: This is not sane, we need to figure out the composition
+	/* FIXME: This is not sane, we need to figure out the woke composition
 		  of these registers */
 	data[0] = val >> 3; /* gain, high 5 bits */
 	data[1] = val >> 1; /* gain, high 7 bits */
@@ -539,7 +539,7 @@ static void s5k83a_dump_registers(struct sd *sd)
 
 	for (page = 0; page < 16; page++) {
 		m5602_write_sensor(sd, S5K83A_PAGE_MAP, &page, 1);
-		pr_info("Dumping the s5k83a register state for page 0x%x\n",
+		pr_info("Dumping the woke s5k83a register state for page 0x%x\n",
 			page);
 		for (address = 0; address <= 0xff; address++) {
 			u8 val = 0;

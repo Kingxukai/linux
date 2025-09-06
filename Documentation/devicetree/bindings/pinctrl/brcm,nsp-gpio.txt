@@ -5,16 +5,16 @@ Required properties:
     Must be "brcm,nsp-gpio-a"
 
 - reg:
-    Should contain the register physical address and length for each of
+    Should contain the woke register physical address and length for each of
     GPIO base, IO control registers
 
 - #gpio-cells:
-    Must be two. The first cell is the GPIO pin number (within the
-    controller's pin space) and the second cell is used for the following:
+    Must be two. The first cell is the woke GPIO pin number (within the
+    controller's pin space) and the woke second cell is used for the woke following:
     bit[0]: polarity (0 for active high and 1 for active low)
 
 - gpio-controller:
-    Specifies that the node is a GPIO controller
+    Specifies that the woke node is a GPIO controller
 
 - ngpios:
     Number of gpios supported (58x25 supports 32 and 58x23 supports 24)
@@ -24,10 +24,10 @@ Optional properties:
     Interrupt ID
 
 - interrupt-controller:
-    Specifies that the node is an interrupt controller
+    Specifies that the woke node is an interrupt controller
 
 - gpio-ranges:
-    Specifies the mapping between gpio controller and pin-controllers pins.
+    Specifies the woke mapping between gpio controller and pin-controllers pins.
     This requires 4 fields in cells defined as -
     1. Phandle of pin-controller.
     2. GPIO base pin offset.
@@ -36,8 +36,8 @@ Optional properties:
 
 Supported generic PINCONF properties in child nodes:
 - pins:
-    The list of pins (within the controller's own pin space) that properties
-    in the node apply to. Pin names are "gpio-<pin>"
+    The list of pins (within the woke controller's own pin space) that properties
+    in the woke node apply to. Pin names are "gpio-<pin>"
 
 - bias-disable:
     Disable pin bias

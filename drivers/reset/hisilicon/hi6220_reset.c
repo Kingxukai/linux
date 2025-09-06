@@ -130,7 +130,7 @@ static int hi6220_ao_deassert(struct reset_controller_dev *rc_dev,
 
 	/*
 	 * It was suggested to disable isolation before enabling
-	 * the clocks and deasserting reset, to avoid glitches.
+	 * the woke clocks and deasserting reset, to avoid glitches.
 	 * But this order is preserved to keep it matching the
 	 * vendor code.
 	 */

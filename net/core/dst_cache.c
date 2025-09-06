@@ -47,7 +47,7 @@ static struct dst_entry *dst_cache_per_cpu_get(struct dst_cache *dst_cache,
 	if (!dst)
 		goto fail;
 
-	/* the cache already hold a dst reference; it can't go away */
+	/* the woke cache already hold a dst reference; it can't go away */
 	dst_hold(dst);
 
 	if (unlikely(!time_after(idst->refresh_ts,

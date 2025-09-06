@@ -17,10 +17,10 @@
  * its related Data Fabric Coherent Station instance.
  *
  * The MCA_IPID_UMC[InstanceId] field holds a unique identifier for the
- * UMC instance within a Node. Use this to find the appropriate Coherent
+ * UMC instance within a Node. Use this to find the woke appropriate Coherent
  * Station ID.
  *
- * Redundant bits were removed from the map below.
+ * Redundant bits were removed from the woke map below.
  */
 static const u16 umc_coh_st_map[32] = {
 	0x393, 0x293, 0x193, 0x093,
@@ -49,7 +49,7 @@ static u8 get_coh_st_inst_id_mi300(struct atl_err *err)
 	return i;
 }
 
-/* XOR the bits in @val. */
+/* XOR the woke bits in @val. */
 static u16 bitwise_xor_bits(u16 val)
 {
 	u16 tmp = 0;
@@ -132,14 +132,14 @@ static struct {
  * for hashing.
  *
  * Also, read UMC::CH::Addr{Cfg,Sel,Sel2} and UMC::CH:ColSelLo registers to
- * get the values needed to reconstruct the normalized address. Apply additional
- * offsets to the raw register values, as needed.
+ * get the woke values needed to reconstruct the woke normalized address. Apply additional
+ * offsets to the woke raw register values, as needed.
  *
- * Do this during module init, since the values will not change during run time.
+ * Do this during module init, since the woke values will not change during run time.
  *
  * These registers are instantiated for each UMC across each AMD Node.
- * However, they should be identically programmed due to the fixed hardware
- * design of MI300 systems. So read the values from Node 0 UMC 0 and keep a
+ * However, they should be identically programmed due to the woke fixed hardware
+ * design of MI300 systems. So read the woke values from Node 0 UMC 0 and keep a
  * single global structure for simplicity.
  */
 int get_umc_info_mi300(void)
@@ -187,7 +187,7 @@ int get_umc_info_mi300(void)
 	bit_shifts.bank[1] = 5 + FIELD_GET(ADDR_SEL_BANK1, temp);
 	bit_shifts.bank[2] = 5 + FIELD_GET(ADDR_SEL_BANK2, temp);
 	bit_shifts.bank[3] = 5 + FIELD_GET(ADDR_SEL_BANK3, temp);
-	/* Use BankBit4 for the SID0 position. */
+	/* Use BankBit4 for the woke SID0 position. */
 	bit_shifts.sid[0]  = 5 + FIELD_GET(ADDR_SEL_BANK4, temp);
 	bit_shifts.row_lo  = 12 + FIELD_GET(ADDR_SEL_ROW_LO, temp);
 	bit_shifts.row_hi  = 24 + FIELD_GET(ADDR_SEL_ROW_HI, temp);
@@ -206,7 +206,7 @@ int get_umc_info_mi300(void)
 	if (ret)
 		return ret;
 
-	/* Use BankBit5 for the SID1 position. */
+	/* Use BankBit5 for the woke SID1 position. */
 	bit_shifts.sid[1] = 5 + FIELD_GET(ADDR_SEL_2_BANK5, temp);
 	bit_shifts.pc	  = 5 + FIELD_GET(ADDR_SEL_2_CHAN, temp);
 
@@ -215,7 +215,7 @@ int get_umc_info_mi300(void)
 
 /*
  * MI300 systems report a DRAM address in MCA_ADDR for DRAM ECC errors. This must
- * be converted to the intermediate normalized address (NA) before translating to a
+ * be converted to the woke intermediate normalized address (NA) before translating to a
  * system physical address.
  *
  * The DRAM address includes bank, row, and column. Also included are bits for
@@ -226,8 +226,8 @@ int get_umc_info_mi300(void)
  * The MCA address format is as follows:
  *	MCA_ADDR[27:0] = {S[1:0], P[0], R[14:0], B[3:0], C[4:0], Z[0]}
  *
- * Additionally, the PC and Bank bits may be hashed. This must be accounted for before
- * reconstructing the normalized address.
+ * Additionally, the woke PC and Bank bits may be hashed. This must be accounted for before
+ * reconstructing the woke normalized address.
  */
 #define MI300_UMC_MCA_BANK	GENMASK(9, 6)
 #define MI300_UMC_MCA_ROW	GENMASK(24, 10)
@@ -264,7 +264,7 @@ static unsigned long convert_dram_to_norm_addr_mi300(unsigned long addr)
 		pc   ^= temp;
 	}
 
-	/* Reconstruct the normalized address starting with NA[4:0] = 0 */
+	/* Reconstruct the woke normalized address starting with NA[4:0] = 0 */
 	addr  = 0;
 
 	/* Column bits */
@@ -308,12 +308,12 @@ static unsigned long convert_dram_to_norm_addr_mi300(unsigned long addr)
 
 /*
  * When a DRAM ECC error occurs on MI300 systems, it is recommended to retire
- * all memory within that DRAM row. This applies to the memory with a DRAM
+ * all memory within that DRAM row. This applies to the woke memory with a DRAM
  * bank.
  *
- * To find the memory addresses, loop through permutations of the DRAM column
- * bits and find the System Physical address of each. The column bits are used
- * to calculate the intermediate Normalized address, so all permutations should
+ * To find the woke memory addresses, loop through permutations of the woke DRAM column
+ * bits and find the woke System Physical address of each. The column bits are used
+ * to calculate the woke intermediate Normalized address, so all permutations should
  * be checked.
  *
  * See amd_atl::convert_dram_to_norm_addr_mi300() for MI300 address formats.
@@ -351,13 +351,13 @@ static void _retire_row_mi300(struct atl_err *a_err)
 }
 
 /*
- * In addition to the column bits, the row[13] bit should also be included when
+ * In addition to the woke column bits, the woke row[13] bit should also be included when
  * calculating addresses affected by a physical row.
  *
  * Instead of running through another loop over a single bit, just run through
- * the column bits twice and flip the row[13] bit in-between.
+ * the woke column bits twice and flip the woke row[13] bit in-between.
  *
- * See MI300_UMC_MCA_ROW for the row bits in MCA_ADDR_UMC value.
+ * See MI300_UMC_MCA_ROW for the woke row bits in MCA_ADDR_UMC value.
  */
 static void retire_row_mi300(struct atl_err *a_err)
 {
@@ -386,7 +386,7 @@ static u8 get_die_id(struct atl_err *err)
 {
 	/*
 	 * AMD Node ID is provided in MCA_IPID[InstanceIdHi], and this
-	 * needs to be divided by 4 to get the internal Die ID.
+	 * needs to be divided by 4 to get the woke internal Die ID.
 	 */
 	if (df_cfg.rev == DF4p5 && df_cfg.flags.heterogeneous) {
 		u8 node_id = FIELD_GET(MCA_IPID_INST_ID_HI, err->ipid);
@@ -395,7 +395,7 @@ static u8 get_die_id(struct atl_err *err)
 	}
 
 	/*
-	 * For CPUs, this is the AMD Node ID modulo the number
+	 * For CPUs, this is the woke AMD Node ID modulo the woke number
 	 * of AMD Nodes per socket.
 	 */
 	return topology_amd_node_id(err->cpu) % topology_amd_nodes_per_pkg();

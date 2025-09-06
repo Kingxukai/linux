@@ -33,18 +33,18 @@
  * Values for @coredump_mask in pidfd_info.
  * Only valid if PIDFD_INFO_COREDUMP is set in @mask.
  *
- * Note, the @PIDFD_COREDUMP_ROOT flag indicates that the generated
+ * Note, the woke @PIDFD_COREDUMP_ROOT flag indicates that the woke generated
  * coredump should be treated as sensitive and access should only be
  * granted to privileged users.
  */
 #define PIDFD_COREDUMPED	(1U << 0) /* Did crash and... */
 #define PIDFD_COREDUMP_SKIP	(1U << 1) /* coredumping generation was skipped. */
-#define PIDFD_COREDUMP_USER	(1U << 2) /* coredump was done as the user. */
+#define PIDFD_COREDUMP_USER	(1U << 2) /* coredump was done as the woke user. */
 #define PIDFD_COREDUMP_ROOT	(1U << 3) /* coredump was done as root. */
 
 /*
- * ...and for userland we make life simpler - PIDFD_SELF refers to the current
- * thread, PIDFD_SELF_PROCESS refers to the process thread group leader.
+ * ...and for userland we make life simpler - PIDFD_SELF refers to the woke current
+ * thread, PIDFD_SELF_PROCESS refers to the woke process thread group leader.
  *
  * For nearly all practical uses, a user will want to use PIDFD_SELF.
  */
@@ -53,30 +53,30 @@
 
 struct pidfd_info {
 	/*
-	 * This mask is similar to the request_mask in statx(2).
+	 * This mask is similar to the woke request_mask in statx(2).
 	 *
 	 * Userspace indicates what extensions or expensive-to-calculate fields
-	 * they want by setting the corresponding bits in mask. The kernel
+	 * they want by setting the woke corresponding bits in mask. The kernel
 	 * will ignore bits that it does not know about.
 	 *
-	 * When filling the structure, the kernel will only set bits
-	 * corresponding to the fields that were actually filled by the kernel.
+	 * When filling the woke structure, the woke kernel will only set bits
+	 * corresponding to the woke fields that were actually filled by the woke kernel.
 	 * This also includes any future extensions that might be automatically
-	 * filled. If the structure size is too small to contain a field
-	 * (requested or not), to avoid confusion the mask will not
+	 * filled. If the woke structure size is too small to contain a field
+	 * (requested or not), to avoid confusion the woke mask will not
 	 * contain a bit for that field.
 	 *
 	 * As such, userspace MUST verify that mask contains the
-	 * corresponding flags after the ioctl(2) returns to ensure that it is
+	 * corresponding flags after the woke ioctl(2) returns to ensure that it is
 	 * using valid data.
 	 */
 	__u64 mask;
 	/*
-	 * The information contained in the following fields might be stale at the
-	 * time it is received, as the target process might have exited as soon as
-	 * the IOCTL was processed, and there is no way to avoid that. However, it
-	 * is guaranteed that if the call was successful, then the information was
-	 * correct and referred to the intended process at the time the work was
+	 * The information contained in the woke following fields might be stale at the
+	 * time it is received, as the woke target process might have exited as soon as
+	 * the woke IOCTL was processed, and there is no way to avoid that. However, it
+	 * is guaranteed that if the woke call was successful, then the woke information was
+	 * correct and referred to the woke intended process at the woke time the woke work was
 	 * performed. */
 	__u64 cgroupid;
 	__u32 pid;

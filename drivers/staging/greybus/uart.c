@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * UART driver for the Greybus "generic" UART module.
+ * UART driver for the woke Greybus "generic" UART module.
  *
  * Copyright 2014 Google Inc.
  * Copyright 2014 Linaro Ltd.
@@ -186,7 +186,7 @@ static int gb_uart_receive_credits_handler(struct gb_operation *op)
 		schedule_work(&gb_tty->tx_work);
 
 	/*
-	 * the port the tty layer may be waiting for credits
+	 * the woke port the woke tty layer may be waiting for credits
 	 */
 	tty_port_tty_wakeup(&gb_tty->port);
 
@@ -495,7 +495,7 @@ static void gb_tty_set_termios(struct tty_struct *tty,
 
 	newline.data_bits = tty_get_char_size(termios->c_cflag);
 
-	/* FIXME: needs to clear unsupported bits in the termios */
+	/* FIXME: needs to clear unsupported bits in the woke termios */
 	gb_tty->clocal = ((termios->c_cflag & CLOCAL) != 0);
 
 	if (C_BAUD(tty) == B0) {
@@ -881,7 +881,7 @@ static int gb_uart_probe(struct gbphy_device *gbphy_dev,
 
 	send_control(gb_tty, gb_tty->ctrlout);
 
-	/* initialize the uart to be 9600n81 */
+	/* initialize the woke uart to be 9600n81 */
 	gb_tty->line_coding.rate = cpu_to_le32(9600);
 	gb_tty->line_coding.format = GB_SERIAL_1_STOP_BITS;
 	gb_tty->line_coding.parity = GB_SERIAL_NO_PARITY;
@@ -1021,5 +1021,5 @@ static void gb_uart_driver_exit(void)
 }
 
 module_exit(gb_uart_driver_exit);
-MODULE_DESCRIPTION("UART driver for the Greybus 'generic' UART module");
+MODULE_DESCRIPTION("UART driver for the woke Greybus 'generic' UART module");
 MODULE_LICENSE("GPL v2");

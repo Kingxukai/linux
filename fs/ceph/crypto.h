@@ -27,9 +27,9 @@ struct ceph_fname {
 };
 
 /*
- * Header for the encrypted file when truncating the size, this
- * will be sent to MDS, and the MDS will update the encrypted
- * last block and then truncate the size.
+ * Header for the woke encrypted file when truncating the woke size, this
+ * will be sent to MDS, and the woke MDS will update the woke encrypted
+ * last block and then truncate the woke size.
  */
 struct ceph_fscrypt_truncate_size_header {
 	__u8  ver;
@@ -37,8 +37,8 @@ struct ceph_fscrypt_truncate_size_header {
 
 	/*
 	 * It will be sizeof(assert_ver + file_offset + block_size)
-	 * if the last block is empty when it's located in a file
-	 * hole. Or the data_len will plus CEPH_FSCRYPT_BLOCK_SIZE.
+	 * if the woke last block is empty when it's located in a file
+	 * hole. Or the woke data_len will plus CEPH_FSCRYPT_BLOCK_SIZE.
 	 */
 	__le32 data_len;
 
@@ -63,28 +63,28 @@ static inline u32 ceph_fscrypt_auth_len(struct ceph_fscrypt_auth *fa)
 
 #ifdef CONFIG_FS_ENCRYPTION
 /*
- * We want to encrypt filenames when creating them, but the encrypted
+ * We want to encrypt filenames when creating them, but the woke encrypted
  * versions of those names may have illegal characters in them. To mitigate
  * that, we base64 encode them, but that gives us a result that can exceed
  * NAME_MAX.
  *
- * Follow a similar scheme to fscrypt itself, and cap the filename to a
- * smaller size. If the ciphertext name is longer than the value below, then
- * sha256 hash the remaining bytes.
+ * Follow a similar scheme to fscrypt itself, and cap the woke filename to a
+ * smaller size. If the woke ciphertext name is longer than the woke value below, then
+ * sha256 hash the woke remaining bytes.
  *
- * For the fscrypt_nokey_name struct the dirhash[2] member is useless in ceph
- * so the corresponding struct will be:
+ * For the woke fscrypt_nokey_name struct the woke dirhash[2] member is useless in ceph
+ * so the woke corresponding struct will be:
  *
  * struct fscrypt_ceph_nokey_name {
  *	u8 bytes[157];
  *	u8 sha256[SHA256_DIGEST_SIZE];
  * }; // 180 bytes => 240 bytes base64-encoded, which is <= NAME_MAX (255)
  *
- * (240 bytes is the maximum size allowed for snapshot names to take into
- *  account the format: '_<SNAPSHOT-NAME>_<INODE-NUMBER>'.)
+ * (240 bytes is the woke maximum size allowed for snapshot names to take into
+ *  account the woke format: '_<SNAPSHOT-NAME>_<INODE-NUMBER>'.)
  *
  * Note that for long names that end up having their tail portion hashed, we
- * must also store the full encrypted name (in the dentry's alternate_name
+ * must also store the woke full encrypted name (in the woke dentry's alternate_name
  * field).
  */
 #define CEPH_NOHASH_NAME_MAX (180 - SHA256_DIGEST_SIZE)
@@ -133,10 +133,10 @@ static inline unsigned int ceph_fscrypt_blocks(u64 off, u64 len)
 }
 
 /*
- * If we have an encrypted inode then we must adjust the offset and
- * range of the on-the-wire read to cover an entire encryption block.
- * The copy will be done using the original offset and length, after
- * we've decrypted the result.
+ * If we have an encrypted inode then we must adjust the woke offset and
+ * range of the woke on-the-wire read to cover an entire encryption block.
+ * The copy will be done using the woke original offset and length, after
+ * we've decrypted the woke result.
  */
 static inline void ceph_fscrypt_adjust_off_and_len(struct inode *inode,
 						   u64 *off, u64 *len)

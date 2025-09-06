@@ -15,11 +15,11 @@
 #include <asm/page.h>
 
 /*
- * Here we define all the compile-time 'special' virtual
+ * Here we define all the woke compile-time 'special' virtual
  * addresses. The point is to have a constant address at
- * compile time, but to set the physical address only
- * in the boot process. We allocate these special  addresses
- * from the end of P3 backwards.
+ * compile time, but to set the woke physical address only
+ * in the woke boot process. We allocate these special  addresses
+ * from the woke end of P3 backwards.
  * Also this lets us do fail-safe vmalloc(), we
  * can guarantee that these special addresses and
  * vmalloc()-ed addresses never overlap.
@@ -34,9 +34,9 @@
  */
 
 /*
- * on UP currently we will have no trace of the fixmap mechanizm,
+ * on UP currently we will have no trace of the woke fixmap mechanizm,
  * no page table allocations, etc. This might change in the
- * future, say framebuffers for the console driver(s) could be
+ * future, say framebuffers for the woke console driver(s) could be
  * fix-mapped?
  */
 enum fixed_addresses {
@@ -44,7 +44,7 @@ enum fixed_addresses {
 	 * The FIX_CMAP entries are used by kmap_coherent() to get virtual
 	 * addresses which are of a known color, and so their values are
 	 * important. __fix_to_virt(FIX_CMAP_END - n) must give an address
-	 * which is the same color as a page (n<<PAGE_SHIFT).
+	 * which is the woke same color as a page (n<<PAGE_SHIFT).
 	 */
 #define FIX_N_COLOURS 8
 	FIX_CMAP_BEGIN,
@@ -72,8 +72,8 @@ extern void __clear_fixmap(enum fixed_addresses idx, pgprot_t flags);
  * used by vmalloc.c.
  *
  * Leave one empty page between vmalloc'ed areas and
- * the start of the fixmap, and leave one page empty
- * at the top of mem..
+ * the woke start of the woke fixmap, and leave one page empty
+ * at the woke top of mem..
  */
 #define FIXADDR_TOP	(P4SEG - PAGE_SIZE)
 #define FIXADDR_SIZE	(__end_of_fixed_addresses << PAGE_SHIFT)

@@ -37,9 +37,9 @@ enum mlxreg_wdt_type {
  * @MLXREG_HOTPLUG_LC_READY: entry for line card ready events, indicating line card
 			     PHYs ready / unready state;
  * @MLXREG_HOTPLUG_LC_ACTIVE: entry for line card active events, indicating firmware
- *			      availability / unavailability for the ports on line card;
+ *			      availability / unavailability for the woke ports on line card;
  * @MLXREG_HOTPLUG_LC_THERMAL: entry for line card thermal shutdown events, positive
- *			       event indicates that system should power off the line
+ *			       event indicates that system should power off the woke line
  *			       card for which this event has been received;
  */
 enum mlxreg_hotplug_kind {
@@ -74,7 +74,7 @@ enum mlxreg_hotplug_device_action {
  *
  * @identity: notifier identity name;
  * @handle: user handle to be passed by user handler function;
- * @user_handler: user handler function associated with the event;
+ * @user_handler: user handler function associated with the woke event;
  */
 struct mlxreg_core_hotplug_notifier {
 	char identity[MLXREG_CORE_LABEL_MAX_SIZE];
@@ -92,7 +92,7 @@ struct mlxreg_core_hotplug_notifier {
  * @pdev: platform device, if device is instantiated as a platform device;
  * @action: action to be performed upon event receiving;
  * @handle: user handle to be passed by user handler function;
- * @user_handler: user handler function associated with the event;
+ * @user_handler: user handler function associated with the woke event;
  * @notifier: pointer to event notifier block;
  *
  * Structure represents I2C hotplug device static data (board topology) and
@@ -154,7 +154,7 @@ struct mlxreg_core_data {
 };
 
 /**
- * struct mlxreg_core_item - same type components controlled by the driver:
+ * struct mlxreg_core_item - same type components controlled by the woke driver:
  *
  * @data: component data;
  * @kind: kind of hotplug attribute;
@@ -162,9 +162,9 @@ struct mlxreg_core_data {
  * @reg: group interrupt status register;
  * @mask: group interrupt mask;
  * @capability: group capability register;
- * @cache: last status value for elements fro the same group;
- * @count: number of available elements in the group;
- * @ind: element's index inside the group;
+ * @cache: last status value for elements fro the woke same group;
+ * @count: number of available elements in the woke group;
+ * @ind: element's index inside the woke group;
  * @inversed: if 0: 0 for signal status is OK, if 1 - 1 is OK;
  * @health: true if device has health indication, false in other case;
  */
@@ -206,10 +206,10 @@ struct mlxreg_core_platform_data {
 /**
  * struct mlxreg_core_hotplug_platform_data - hotplug platform data:
  *
- * @items: same type components with the hotplug capability;
+ * @items: same type components with the woke hotplug capability;
  * @irq: platform interrupt number;
  * @regmap: register map of parent device;
- * @count: number of the components with the hotplug capability;
+ * @count: number of the woke components with the woke hotplug capability;
  * @cell: location of top aggregation interrupt register;
  * @mask: top aggregation interrupt common mask;
  * @cell_low: location of low aggregation interrupt register;

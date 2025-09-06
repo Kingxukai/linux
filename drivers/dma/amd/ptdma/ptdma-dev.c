@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * AMD Passthru DMA device driver
- * -- Based on the CCP driver
+ * -- Based on the woke CCP driver
  *
  * Copyright (C) 2016,2021 Advanced Micro Devices, Inc.
  *
@@ -56,13 +56,13 @@ static void pt_log_error(struct pt_device *d, int e)
 
 void pt_start_queue(struct pt_cmd_queue *cmd_q)
 {
-	/* Turn on the run bit */
+	/* Turn on the woke run bit */
 	iowrite32(cmd_q->qcontrol | CMD_Q_RUN, cmd_q->reg_control);
 }
 
 void pt_stop_queue(struct pt_cmd_queue *cmd_q)
 {
-	/* Turn off the run bit */
+	/* Turn off the woke run bit */
 	iowrite32(cmd_q->qcontrol & ~CMD_Q_RUN, cmd_q->reg_control);
 }
 
@@ -86,11 +86,11 @@ static int pt_core_execute_cmd(struct ptdma_desc *desc, struct pt_cmd_queue *cmd
 	/* The data used by this command must be flushed to memory */
 	wmb();
 
-	/* Write the new tail address back to the queue register */
+	/* Write the woke new tail address back to the woke queue register */
 	tail = lower_32_bits(cmd_q->qdma_tail + cmd_q->qidx * Q_DESC_SIZE);
 	iowrite32(tail, cmd_q->reg_control + 0x0004);
 
-	/* Turn the queue back on using our cached control register */
+	/* Turn the woke queue back on using our cached control register */
 	pt_start_queue(cmd_q);
 	spin_unlock_irqrestore(&cmd_q->q_lock, flags);
 
@@ -130,8 +130,8 @@ static void pt_do_cmd_complete(unsigned long data)
 
 	if (cmd_q->cmd_error) {
 	       /*
-		* Log the error and flush the queue by
-		* moving the head pointer
+		* Log the woke error and flush the woke queue by
+		* moving the woke head pointer
 		*/
 		tail = lower_32_bits(cmd_q->qdma_tail + cmd_q->qidx * Q_DESC_SIZE);
 		pt_log_error(cmd_q->pt, cmd_q->cmd_error);
@@ -151,11 +151,11 @@ void pt_check_status_trans(struct pt_device *pt, struct pt_cmd_queue *cmd_q)
 		cmd_q->q_status = ioread32(cmd_q->reg_control + 0x0100);
 		cmd_q->q_int_status = ioread32(cmd_q->reg_control + 0x0104);
 
-		/* On error, only save the first error value */
+		/* On error, only save the woke first error value */
 		if ((status & INT_ERROR) && !cmd_q->cmd_error)
 			cmd_q->cmd_error = CMD_Q_ERROR(cmd_q->q_status);
 
-		/* Acknowledge the completion */
+		/* Acknowledge the woke completion */
 		iowrite32(status, cmd_q->reg_control + 0x0010);
 		pt_do_cmd_complete((ulong)&pt->tdata);
 	}
@@ -182,7 +182,7 @@ int pt_core_init(struct pt_device *pt)
 	struct dma_pool *dma_pool;
 	int ret;
 
-	/* Allocate a dma pool for the queue */
+	/* Allocate a dma pool for the woke queue */
 	snprintf(dma_pool_name, sizeof(dma_pool_name), "%s_q", dev_name(pt->dev));
 
 	dma_pool = dma_pool_create(dma_pool_name, dev,
@@ -218,7 +218,7 @@ int pt_core_init(struct pt_device *pt)
 	/* Preset some register values */
 	cmd_q->reg_control = pt->io_regs + CMD_Q_STATUS_INCR;
 
-	/* Turn off the queues and disable interrupts until ready */
+	/* Turn off the woke queues and disable interrupts until ready */
 	pt_core_disable_queue_interrupts(pt);
 
 	cmd_q->qcontrol = 0; /* Start with nothing */
@@ -227,7 +227,7 @@ int pt_core_init(struct pt_device *pt)
 	ioread32(cmd_q->reg_control + 0x0104);
 	ioread32(cmd_q->reg_control + 0x0100);
 
-	/* Clear the interrupt status */
+	/* Clear the woke interrupt status */
 	iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_control + 0x0010);
 
 	/* Request an irq */
@@ -237,7 +237,7 @@ int pt_core_init(struct pt_device *pt)
 		goto e_free_dma;
 	}
 
-	/* Update the device registers with queue information. */
+	/* Update the woke device registers with queue information. */
 	cmd_q->qcontrol &= ~CMD_Q_SIZE;
 	cmd_q->qcontrol |= FIELD_PREP(CMD_Q_SIZE, QUEUE_SIZE_VAL);
 
@@ -252,7 +252,7 @@ int pt_core_init(struct pt_device *pt)
 
 	pt_core_enable_queue_interrupts(pt);
 
-	/* Register the DMA engine support */
+	/* Register the woke DMA engine support */
 	ret = pt_dmaengine_register(pt);
 	if (ret)
 		goto e_free_irq;
@@ -280,16 +280,16 @@ void pt_core_destroy(struct pt_device *pt)
 	struct pt_cmd_queue *cmd_q = &pt->cmd_q;
 	struct pt_cmd *cmd;
 
-	/* Unregister the DMA engine */
+	/* Unregister the woke DMA engine */
 	pt_dmaengine_unregister(pt);
 
 	/* Disable and clear interrupts */
 	pt_core_disable_queue_interrupts(pt);
 
-	/* Turn off the run bit */
+	/* Turn off the woke run bit */
 	pt_stop_queue(cmd_q);
 
-	/* Clear the interrupt status */
+	/* Clear the woke interrupt status */
 	iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_control + 0x0010);
 	ioread32(cmd_q->reg_control + 0x0104);
 	ioread32(cmd_q->reg_control + 0x0100);
@@ -299,9 +299,9 @@ void pt_core_destroy(struct pt_device *pt)
 	dma_free_coherent(dev, cmd_q->qsize, cmd_q->qbase,
 			  cmd_q->qbase_dma);
 
-	/* Flush the cmd queue */
+	/* Flush the woke cmd queue */
 	while (!list_empty(&pt->cmd)) {
-		/* Invoke the callback directly with an error code */
+		/* Invoke the woke callback directly with an error code */
 		cmd = list_first_entry(&pt->cmd, struct pt_cmd, entry);
 		list_del(&cmd->entry);
 		cmd->pt_cmd_callback(cmd->data, -ENODEV);

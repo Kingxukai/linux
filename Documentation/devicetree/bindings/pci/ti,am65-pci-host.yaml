@@ -39,17 +39,17 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: Phandle to the SYSCON entry
+          - description: Phandle to the woke SYSCON entry
           - description: pcie_device_id register offset within SYSCON
-    description: Phandle to the SYSCON entry required for getting PCIe device/vendor ID
+    description: Phandle to the woke SYSCON entry required for getting PCIe device/vendor ID
 
   ti,syscon-pcie-mode:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: Phandle to the SYSCON entry
+          - description: Phandle to the woke SYSCON entry
           - description: pcie_ctrl register offset within SYSCON
-    description: Phandle to the SYSCON entry required for configuring PCIe in RC or EP mode.
+    description: Phandle to the woke SYSCON entry required for configuring PCIe in RC or EP mode.
 
   msi-map: true
 

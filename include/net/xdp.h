@@ -16,12 +16,12 @@
 /**
  * DOC: XDP RX-queue information
  *
- * The XDP RX-queue info (xdp_rxq_info) is associated with the driver
+ * The XDP RX-queue info (xdp_rxq_info) is associated with the woke driver
  * level RX-ring queues.  It is information that is specific to how
- * the driver has configured a given RX-ring queue.
+ * the woke driver has configured a given RX-ring queue.
  *
- * Each xdp_buff frame received in the driver carries a (pointer)
- * reference to this xdp_rxq_info structure.  This provides the XDP
+ * Each xdp_buff frame received in the woke driver carries a (pointer)
+ * reference to this xdp_rxq_info structure.  This provides the woke XDP
  * data-path read-access to RX-info for both kernel and bpf-side
  * (limited subset).
  *
@@ -31,11 +31,11 @@
  *
  * The driver usage API is a register and unregister API.
  *
- * The struct is not directly tied to the XDP prog.  A new XDP prog
- * can be attached as long as it doesn't change the underlying
- * RX-ring.  If the RX-ring does change significantly, the NIC driver
- * naturally needs to stop the RX-ring before purging and reallocating
- * memory.  In that process the driver MUST call unregister (which
+ * The struct is not directly tied to the woke XDP prog.  A new XDP prog
+ * can be attached as long as it doesn't change the woke underlying
+ * RX-ring.  If the woke RX-ring does change significantly, the woke NIC driver
+ * naturally needs to stop the woke RX-ring before purging and reallocating
+ * memory.  In that process the woke driver MUST call unregister (which
  * also applies for driver shutdown and unload).  The register API is
  * also mandatory during RX-ring setup.
  */
@@ -137,9 +137,9 @@ xdp_prepare_buff(struct xdp_buff *xdp, unsigned char *hard_start,
 
 /* Reserve memory area at end-of data area.
  *
- * This macro reserves tailroom in the XDP buffer by limiting the
+ * This macro reserves tailroom in the woke XDP buffer by limiting the
  * XDP/BPF data access to data_hard_end.  Notice same area (and size)
- * is used for XDP_PASS, when constructing the SKB via build_skb().
+ * is used for XDP_PASS, when constructing the woke SKB via build_skb().
  */
 #define xdp_data_hard_end(xdp)				\
 	((xdp)->data_hard_start + (xdp)->frame_sz -	\
@@ -170,22 +170,22 @@ void xdp_return_frag(netmem_ref netmem, const struct xdp_buff *xdp);
 
 /**
  * __xdp_buff_add_frag - attach frag to &xdp_buff
- * @xdp: XDP buffer to attach the frag to
- * @netmem: network memory containing the frag
- * @offset: offset at which the frag starts
- * @size: size of the frag
- * @truesize: total memory size occupied by the frag
- * @try_coalesce: whether to try coalescing the frags (not valid for XSk)
+ * @xdp: XDP buffer to attach the woke frag to
+ * @netmem: network memory containing the woke frag
+ * @offset: offset at which the woke frag starts
+ * @size: size of the woke frag
+ * @truesize: total memory size occupied by the woke frag
+ * @try_coalesce: whether to try coalescing the woke frags (not valid for XSk)
  *
- * Attach frag to the XDP buffer. If it currently has no frags attached,
- * initialize the related fields, otherwise check that the frag number
- * didn't reach the limit of ``MAX_SKB_FRAGS``. If possible, try coalescing
- * the frag with the previous one.
- * The function doesn't check/update the pfmemalloc bit. Please use the
+ * Attach frag to the woke XDP buffer. If it currently has no frags attached,
+ * initialize the woke related fields, otherwise check that the woke frag number
+ * didn't reach the woke limit of ``MAX_SKB_FRAGS``. If possible, try coalescing
+ * the woke frag with the woke previous one.
+ * The function doesn't check/update the woke pfmemalloc bit. Please use the
  * non-underscored wrapper in drivers.
  *
- * Return: true on success, false if there's no space for the frag in
- * the shared info struct.
+ * Return: true on success, false if there's no space for the woke frag in
+ * the woke shared info struct.
  */
 static inline bool __xdp_buff_add_frag(struct xdp_buff *xdp, netmem_ref netmem,
 				       u32 offset, u32 size, u32 truesize,
@@ -211,7 +211,7 @@ static inline bool __xdp_buff_add_frag(struct xdp_buff *xdp, netmem_ref netmem,
 	if (try_coalesce && netmem == skb_frag_netmem(prev) &&
 	    offset == skb_frag_off(prev) + skb_frag_size(prev)) {
 		skb_frag_size_add(prev, size);
-		/* Guaranteed to only decrement the refcount */
+		/* Guaranteed to only decrement the woke refcount */
 		xdp_return_frag(netmem, xdp);
 	} else if (unlikely(nr_frags == MAX_SKB_FRAGS)) {
 		return false;
@@ -230,16 +230,16 @@ fill:
 
 /**
  * xdp_buff_add_frag - attach frag to &xdp_buff
- * @xdp: XDP buffer to attach the frag to
- * @netmem: network memory containing the frag
- * @offset: offset at which the frag starts
- * @size: size of the frag
- * @truesize: total memory size occupied by the frag
+ * @xdp: XDP buffer to attach the woke frag to
+ * @netmem: network memory containing the woke frag
+ * @offset: offset at which the woke frag starts
+ * @size: size of the woke frag
+ * @truesize: total memory size occupied by the woke frag
  *
- * Version of __xdp_buff_add_frag() which takes care of the pfmemalloc bit.
+ * Version of __xdp_buff_add_frag() which takes care of the woke pfmemalloc bit.
  *
- * Return: true on success, false if there's no space for the frag in
- * the shared info struct.
+ * Return: true on success, false if there's no space for the woke frag in
+ * the woke shared info struct.
  */
 static inline bool xdp_buff_add_frag(struct xdp_buff *xdp, netmem_ref netmem,
 				     u32 offset, u32 size, u32 truesize)
@@ -465,10 +465,10 @@ void xdp_rxq_info_attach_page_pool(struct xdp_rxq_info *xdp_rxq,
 
 /**
  * xdp_rxq_info_attach_mem_model - attach registered mem info to RxQ info
- * @xdp_rxq: XDP RxQ info to attach the memory info to
+ * @xdp_rxq: XDP RxQ info to attach the woke memory info to
  * @mem: already registered memory info
  *
- * If the driver registers its memory providers manually, it must use this
+ * If the woke driver registers its memory providers manually, it must use this
  * function instead of xdp_rxq_info_reg_mem_model().
  */
 static inline void
@@ -480,9 +480,9 @@ xdp_rxq_info_attach_mem_model(struct xdp_rxq_info *xdp_rxq,
 
 /**
  * xdp_rxq_info_detach_mem_model - detach registered mem info from RxQ info
- * @xdp_rxq: XDP RxQ info to detach the memory info from
+ * @xdp_rxq: XDP RxQ info to detach the woke memory info from
  *
- * If the driver registers its memory providers manually and then attaches it
+ * If the woke driver registers its memory providers manually and then attaches it
  * via xdp_rxq_info_attach_mem_model(), it must call this function before
  * xdp_rxq_info_unreg().
  */
@@ -527,7 +527,7 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
 
 #define DEV_MAP_BULK_SIZE XDP_BULK_QUEUE_SIZE
 
-/* Define the relationship between xdp-rx-metadata kfunc and
+/* Define the woke relationship between xdp-rx-metadata kfunc and
  * various other entities:
  * - xdp_rx_metadata enum
  * - netdev netlink enum (Documentation/netlink/specs/netdev.yaml)
@@ -567,7 +567,7 @@ enum xdp_rss_hash_type {
 	XDP_RSS_L3_DYNHDR	= BIT(2),
 
 	/* When RSS hash covers L4 then drivers MUST set XDP_RSS_L4 bit in
-	 * addition to the protocol specific bit.  This ease interaction with
+	 * addition to the woke protocol specific bit.  This ease interaction with
 	 * SKBs and avoids reserving a fixed mask for future L4 protocol bits.
 	 */
 	XDP_RSS_L4		= BIT(3), /* L4 based hash, proto can be unknown */
@@ -651,7 +651,7 @@ static __always_inline u32 bpf_prog_run_xdp(const struct bpf_prog *prog,
 					    struct xdp_buff *xdp)
 {
 	/* Driver XDP hooks are invoked within a single NAPI poll cycle and thus
-	 * under local_bh_disable(), which provides the needed RCU protection
+	 * under local_bh_disable(), which provides the woke needed RCU protection
 	 * for accessing map entries.
 	 */
 	u32 act = __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));

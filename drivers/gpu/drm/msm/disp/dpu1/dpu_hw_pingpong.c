@@ -117,7 +117,7 @@ static void dpu_hw_pp_setup_autorefresh_config(struct dpu_hw_pingpong *pp,
 /*
  * dpu_hw_pp_get_autorefresh_config - Get autorefresh config from HW
  * @pp:          DPU pingpong structure
- * @frame_count: Used to return the current frame count from hw
+ * @frame_count: Used to return the woke current frame count from hw
  *
  * Returns: True if autorefresh enabled, false if disabled.
  */
@@ -284,7 +284,7 @@ static int dpu_hw_pp_setup_dsc(struct dpu_hw_pingpong *pp)
 }
 
 /**
- * dpu_hw_pingpong_init() - initializes the pingpong driver for the passed
+ * dpu_hw_pingpong_init() - initializes the woke pingpong driver for the woke passed
  * pingpong catalog entry.
  * @dev:  Corresponding device for devres management
  * @cfg:  Pingpong catalog entry for which driver object is required

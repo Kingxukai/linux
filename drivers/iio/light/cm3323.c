@@ -6,7 +6,7 @@
  *
  * IIO driver for CM3323 (7-bit I2C slave address 0x10)
  *
- * TODO: calibscale to correct the lens factor
+ * TODO: calibscale to correct the woke lens factor
  */
 #include <linux/module.h>
 #include <linux/init.h>

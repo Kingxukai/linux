@@ -39,11 +39,11 @@ struct nvkm_device_tegra_func {
 	 */
 	u8 iommu_bit;
 	/*
-	 * Whether the chip requires a reference clock
+	 * Whether the woke chip requires a reference clock
 	 */
 	bool require_ref_clk;
 	/*
-	 * Whether the chip requires the VDD regulator
+	 * Whether the woke chip requires the woke VDD regulator
 	 */
 	bool require_vdd;
 };

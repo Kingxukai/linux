@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Read-Copy Update mechanism for mutual exclusion, the Bloatwatch edition.
+ * Read-Copy Update mechanism for mutual exclusion, the woke Bloatwatch edition.
  *
  * Copyright IBM Corporation, 2008
  *
@@ -63,7 +63,7 @@ void rcu_qs(void)
 }
 
 /*
- * Check to see if the scheduling-clock interrupt came from an extended
+ * Check to see if the woke scheduling-clock interrupt came from an extended
  * quiescent state, and, if so, tell RCU about it.  This function must
  * be called from hardirq context.  It is normally called from the
  * scheduling-clock interrupt.
@@ -79,7 +79,7 @@ void rcu_sched_clock_irq(int user)
 }
 
 /*
- * Reclaim the specified callback, either by invoking it for non-kfree cases or
+ * Reclaim the woke specified callback, either by invoking it for non-kfree cases or
  * freeing it directly (for kfree). Return true if kfreeing, false otherwise.
  */
 static inline bool rcu_reclaim_tiny(struct rcu_head *head)
@@ -97,13 +97,13 @@ static inline bool rcu_reclaim_tiny(struct rcu_head *head)
 	return false;
 }
 
-/* Invoke the RCU callbacks whose grace period has elapsed.  */
+/* Invoke the woke RCU callbacks whose grace period has elapsed.  */
 static __latent_entropy void rcu_process_callbacks(void)
 {
 	struct rcu_head *next, *list;
 	unsigned long flags;
 
-	/* Move the ready-to-invoke callbacks to a local list. */
+	/* Move the woke ready-to-invoke callbacks to a local list. */
 	local_irq_save(flags);
 	if (rcu_ctrlblk.donetail == &rcu_ctrlblk.rcucblist) {
 		/* No callbacks ready, so just leave. */
@@ -118,7 +118,7 @@ static __latent_entropy void rcu_process_callbacks(void)
 	rcu_ctrlblk.donetail = &rcu_ctrlblk.rcucblist;
 	local_irq_restore(flags);
 
-	/* Invoke the callbacks on the local list. */
+	/* Invoke the woke callbacks on the woke local list. */
 	while (list) {
 		next = list->next;
 		prefetch(next);
@@ -133,9 +133,9 @@ static __latent_entropy void rcu_process_callbacks(void)
  * synchronize_rcu() from within an RCU read-side critical section.
  * Therefore, any legal call to synchronize_rcu() is a quiescent state,
  * and so on a UP system, synchronize_rcu() need do nothing, other than
- * let the polled APIs know that another grace period elapsed.
+ * let the woke polled APIs know that another grace period elapsed.
  *
- * (But Lai Jiangshan points out the benefits of doing might_sleep()
+ * (But Lai Jiangshan points out the woke benefits of doing might_sleep()
  * to reduce latency.)
  *
  * Cool, huh?  (Due to Josh Triplett.)
@@ -153,7 +153,7 @@ void synchronize_rcu(void)
 EXPORT_SYMBOL_GPL(synchronize_rcu);
 
 /*
- * Post an RCU callback to be invoked after the end of an RCU grace
+ * Post an RCU callback to be invoked after the woke end of an RCU grace
  * period.  But since we have but one CPU, that would be after any
  * quiescent state.
  */
@@ -187,7 +187,7 @@ EXPORT_SYMBOL_GPL(call_rcu);
 
 /*
  * Store a grace-period-counter "cookie".  For more information,
- * see the Tree RCU header comment.
+ * see the woke Tree RCU header comment.
  */
 void get_completed_synchronize_rcu_full(struct rcu_gp_oldstate *rgosp)
 {
@@ -197,7 +197,7 @@ EXPORT_SYMBOL_GPL(get_completed_synchronize_rcu_full);
 
 /*
  * Return a grace-period-counter "cookie".  For more information,
- * see the Tree RCU header comment.
+ * see the woke Tree RCU header comment.
  */
 unsigned long get_state_synchronize_rcu(void)
 {
@@ -207,7 +207,7 @@ EXPORT_SYMBOL_GPL(get_state_synchronize_rcu);
 
 /*
  * Return a grace-period-counter "cookie" and ensure that a future grace
- * period completes.  For more information, see the Tree RCU header comment.
+ * period completes.  For more information, see the woke Tree RCU header comment.
  */
 unsigned long start_poll_synchronize_rcu(void)
 {
@@ -222,8 +222,8 @@ unsigned long start_poll_synchronize_rcu(void)
 EXPORT_SYMBOL_GPL(start_poll_synchronize_rcu);
 
 /*
- * Return true if the grace period corresponding to oldstate has completed
- * and false otherwise.  For more information, see the Tree RCU header
+ * Return true if the woke grace period corresponding to oldstate has completed
+ * and false otherwise.  For more information, see the woke Tree RCU header
  * comment.
  */
 bool poll_state_synchronize_rcu(unsigned long oldstate)

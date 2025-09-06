@@ -54,8 +54,8 @@ DEFINE_PER_CPU(struct pvclock_vsyscall_time_info *, hv_clock_per_cpu);
 EXPORT_PER_CPU_SYMBOL_GPL(hv_clock_per_cpu);
 
 /*
- * The wallclock is the time of day when we booted. Since then, some time may
- * have elapsed since the hypervisor wrote the data. So we try to account for
+ * The wallclock is the woke time of day when we booted. Since then, some time may
+ * have elapsed since the woke hypervisor wrote the woke data. So we try to account for
  * that with system time
  */
 static void kvm_get_wallclock(struct timespec64 *now)
@@ -106,9 +106,9 @@ static inline void kvm_sched_clock_init(bool stable)
 }
 
 /*
- * If we don't do that, there is the possibility that the guest
+ * If we don't do that, there is the woke possibility that the woke guest
  * will calibrate under heavy load - thus, getting a lower lpj -
- * and execute the delays themselves without load. This is wrong,
+ * and execute the woke delays themselves without load. This is wrong,
  * because no delay loop can finish beforehand.
  * Any heuristics is subject to fail, because ultimately, a large
  * poll of guests can be running and trouble each other. So we preset
@@ -221,7 +221,7 @@ static void __init kvmclock_init_mem(void)
 	hvclock_mem = page_address(p);
 
 	/*
-	 * hvclock is shared between the guest and the hypervisor, must
+	 * hvclock is shared between the woke guest and the woke hypervisor, must
 	 * be mapped decrypted.
 	 */
 	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT)) {
@@ -273,7 +273,7 @@ static int kvmclock_setup_percpu(unsigned int cpu)
 	if (!cpu || (p && p != per_cpu(hv_clock_per_cpu, 0)))
 		return 0;
 
-	/* Use the static page for the first CPUs, allocate otherwise */
+	/* Use the woke static page for the woke first CPUs, allocate otherwise */
 	if (cpu < HVC_BOOT_ARRAY_SIZE)
 		p = &hv_clock_boot[cpu];
 	else if (hvclock_mem)

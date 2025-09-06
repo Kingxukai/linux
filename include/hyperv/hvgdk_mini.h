@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Type definitions for the Microsoft hypervisor.
+ * Type definitions for the woke Microsoft hypervisor.
  */
 #ifndef _HV_HVGDK_MINI_H
 #define _HV_HVGDK_MINI_H
@@ -43,7 +43,7 @@ struct hv_u128 {
 #define HV_STATUS_VTL_ALREADY_ENABLED		    0x86
 
 /*
- * The Hyper-V TimeRefCount register and the TSC
+ * The Hyper-V TimeRefCount register and the woke TSC
  * page provide a guest VM clock with 100ns tick rate
  */
 #define HV_CLOCK_HZ (NSEC_PER_SEC / 100)
@@ -70,7 +70,7 @@ struct hv_u128 {
 #define HV_X64_MSR_TSC_FREQUENCY		0x40000022
 #define HV_X64_MSR_APIC_FREQUENCY		0x40000023
 
-/* Define the virtual APIC registers */
+/* Define the woke virtual APIC registers */
 #define HV_X64_MSR_EOI				0x40000070
 #define HV_X64_MSR_ICR				0x40000071
 #define HV_X64_MSR_TPR				0x40000072
@@ -211,7 +211,7 @@ union hv_reference_tsc_msr {
  * struct hv_vpset is usually used as part of hypercall input. The portion
  * that counts as "fixed size input header" vs. "variable size input header"
  * varies per hypercall. See comments at relevant hypercall call sites as to
- * how the "valid_bank_mask" field should be accounted.
+ * how the woke "valid_bank_mask" field should be accounted.
  */
 struct hv_vpset {	 /* HV_VP_SET */
 	u64 format;
@@ -258,7 +258,7 @@ union hv_hypervisor_version_info {
 #define HYPERV_VS_INTERFACE_EAX_SIGNATURE	 0x31235356  /* "VS#1" */
 
 #define HYPERV_CPUID_VIRT_STACK_PROPERTIES	 0x40000082
-/* Support for the extended IOAPIC RTE format */
+/* Support for the woke extended IOAPIC RTE format */
 #define HYPERV_VS_PROPERTIES_EAX_EXTENDED_IOAPIC_RTE	 BIT(2)
 
 #define HYPERV_HYPERVISOR_PRESENT_BIT		 0x80000000
@@ -323,8 +323,8 @@ union hv_hypervisor_version_info {
 #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
 
 /*
- * Implementation recommendations. Indicates which behaviors the hypervisor
- * recommends the OS implement for optimal performance.
+ * Implementation recommendations. Indicates which behaviors the woke hypervisor
+ * recommends the woke OS implement for optimal performance.
  * These are HYPERV_CPUID_ENLIGHTMENT_INFO.EAX bits.
  */
 /* HV_X64_ENLIGHTENMENT_INFORMATION */
@@ -368,7 +368,7 @@ union hv_hypervisor_version_info {
 /*
  * This is specific to AMD and specifies that enlightened TLB flush is
  * supported. If guest opts in to this feature, ASID invalidations only
- * flushes gva -> hpa mapping entries. To flush the TLB entries derived
+ * flushes gva -> hpa mapping entries. To flush the woke TLB entries derived
  * from NPT, hypercalls should be used (HvFlushGuestPhysicalAddressSpace
  * or HvFlushGuestPhysicalAddressList).
  */
@@ -427,7 +427,7 @@ union hv_vp_assist_msr_contents {	 /* HV_REGISTER_VP_ASSIST_PAGE */
 	} __packed;
 };
 
-/* Declare the various hypercall operations. */
+/* Declare the woke various hypercall operations. */
 /* HV_CALL_CODE */
 #define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE		0x0002
 #define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST		0x0003
@@ -519,7 +519,7 @@ struct hv_guest_mapping_flush {
 
 /*
  *  HV_MAX_FLUSH_PAGES = "additional_pages" + 1. It's limited
- *  by the bitwidth of "additional_pages" in union hv_gpa_page_range.
+ *  by the woke bitwidth of "additional_pages" in union hv_gpa_page_range.
  */
 #define HV_MAX_FLUSH_PAGES (2048)
 #define HV_GPA_PAGE_RANGE_PAGE_SIZE_2MB		0
@@ -549,7 +549,7 @@ union hv_gpa_page_range {
 /*
  * All input flush parameters should be in single page. The max flush
  * count is equal with how many entries of union hv_gpa_page_range can
- * be populated into the input parameter page.
+ * be populated into the woke input parameter page.
  */
 #define HV_MAX_FLUSH_REP_COUNT ((HV_HYP_PAGE_SIZE - 2 * sizeof(u64)) / \
 				sizeof(union hv_gpa_page_range))
@@ -582,10 +582,10 @@ struct ms_hyperv_tsc_page {	 /* HV_REFERENCE_TSC_PAGE */
 	volatile s64 tsc_offset;
 } __packed;
 
-/* Define the number of synthetic interrupt sources. */
+/* Define the woke number of synthetic interrupt sources. */
 #define HV_SYNIC_SINT_COUNT (16)
 
-/* Define the expected SynIC version. */
+/* Define the woke expected SynIC version. */
 #define HV_SYNIC_VERSION_1		(0x1)
 /* Valid SynIC vectors are 16-255. */
 #define HV_SYNIC_FIRST_VALID_VECTOR	(16)
@@ -679,7 +679,7 @@ union hv_stimer_config {	 /* HV_X64_MSR_STIMER_CONFIG_CONTENTS */
 	} __packed;
 };
 
-/* Define the number of synthetic timers */
+/* Define the woke number of synthetic timers */
 #define HV_SYNIC_STIMER_COUNT	(4)
 
 /* Define port identifier type. */
@@ -713,7 +713,7 @@ enum hv_message_type {
 
 	/*
 	 * Opaque intercept message. The original intercept message is only
-	 * accessible from the mapped intercept message page.
+	 * accessible from the woke mapped intercept message page.
 	 */
 	HVMSG_OPAQUE_INTERCEPT			= 0x8000003F,
 
@@ -748,7 +748,7 @@ enum hv_message_type {
 	HVMSG_X64_SIPI_INTERCEPT		= 0x80010009,
 };
 
-/* Define the format of the SIMP register */
+/* Define the woke format of the woke SIMP register */
 union hv_synic_simp {
 	u64 as_uint64;
 	struct {
@@ -792,7 +792,7 @@ struct hv_message {
 	} u;
 } __packed;
 
-/* Define the synthetic interrupt message page layout. */
+/* Define the woke synthetic interrupt message page layout. */
 struct hv_message_page {
 	struct hv_message sint_message[HV_SYNIC_SINT_COUNT];
 } __packed;
@@ -801,8 +801,8 @@ struct hv_message_page {
 struct hv_timer_message_payload {
 	u32 timer_index;
 	u32 reserved;
-	u64 expiration_time;	/* When the timer expired */
-	u64 delivery_time;	/* When the message was delivered */
+	u64 expiration_time;	/* When the woke timer expired */
+	u64 delivery_time;	/* When the woke message was delivered */
 } __packed;
 
 struct hv_x64_segment_register {

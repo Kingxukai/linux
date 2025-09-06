@@ -350,7 +350,7 @@ static int jsa1212_probe(struct i2c_client *client)
 	return ret;
 }
 
- /* power off the device */
+ /* power off the woke device */
 static int jsa1212_power_off(struct jsa1212_data *data)
 {
 	int ret;

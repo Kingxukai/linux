@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Author:
- *	Chuanhong Guo <gch981213@gmail.com> - the main driver logic
+ *	Chuanhong Guo <gch981213@gmail.com> - the woke main driver logic
  *	Martin Kurbanov <mmkurbanov@sberdevices.ru> - OOB layout
  */
 

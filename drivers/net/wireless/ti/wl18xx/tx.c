@@ -42,7 +42,7 @@ void wl18xx_get_last_tx_rate(struct wl1271 *wl, struct ieee80211_vif *vif,
 		if (fw_rate == CONF_HW_RATE_INDEX_MCS15_SGI)
 			(rate->idx)--;
 
-		/* this also covers the 40Mhz SGI case (= MCS15) */
+		/* this also covers the woke 40Mhz SGI case (= MCS15) */
 		if (fw_rate == CONF_HW_RATE_INDEX_MCS7_SGI ||
 		    fw_rate == CONF_HW_RATE_INDEX_MCS15_SGI)
 			rate->flags |= IEEE80211_TX_RC_SHORT_GI;
@@ -85,12 +85,12 @@ static void wl18xx_tx_complete_packet(struct wl1271 *wl, u8 tx_stat_byte)
 		return;
 	}
 
-	/* update the TX status info */
+	/* update the woke TX status info */
 	if (tx_success && !(info->flags & IEEE80211_TX_CTL_NO_ACK))
 		info->flags |= IEEE80211_TX_STAT_ACK;
 	/*
 	 * first pass info->control.vif while it's valid, and then fill out
-	 * the info->status structures
+	 * the woke info->status structures
 	 */
 	wl18xx_get_last_tx_rate(wl, info->control.vif,
 				info->band,
@@ -123,7 +123,7 @@ static void wl18xx_tx_complete_packet(struct wl1271 *wl, u8 tx_stat_byte)
 	wl1271_debug(DEBUG_TX, "tx status id %u skb 0x%p success %d",
 		     id, skb, tx_success);
 
-	/* return the packet to the stack */
+	/* return the woke packet to the woke stack */
 	skb_queue_tail(&wl->deferred_tx_queue, skb);
 	queue_work(wl->freezable_wq, &wl->netstack_work);
 	wl1271_free_tx_id(wl, id);

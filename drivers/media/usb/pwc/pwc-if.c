@@ -6,7 +6,7 @@
    (C) 2011 Hans de Goede <hdegoede@redhat.com>
 
    NOTE: this version of pwc is an unofficial (modified) release of pwc & pcwx
-   driver and thus may have bugs that are not present in the original version.
+   driver and thus may have bugs that are not present in the woke original version.
    Please send bug reports and support requests to <luc@saillard.org>.
    The decompression routines have been implemented by reverse-engineering the
    Nemosoft binary pwcx module. Caveat emptor.
@@ -15,19 +15,19 @@
 */
 
 /*
-   This code forms the interface between the USB layers and the Philips
-   specific stuff. Some adanved stuff of the driver falls under an
-   NDA, signed between me and Philips B.V., Eindhoven, the Netherlands, and
+   This code forms the woke interface between the woke USB layers and the woke Philips
+   specific stuff. Some adanved stuff of the woke driver falls under an
+   NDA, signed between me and Philips B.V., Eindhoven, the woke Netherlands, and
    is thus not distributed in source form. The binary pwcx.o module
-   contains the code that falls under the NDA.
+   contains the woke code that falls under the woke NDA.
 
    In case you're wondering: 'pwc' stands for "Philips WebCam", but
    I really didn't want to type 'philips_web_cam' every time (I'm lazy as
    any Linux kernel hacker, but I don't like uncomprehensible abbreviations
    without explanation).
 
-   Oh yes, convention: to disctinguish between all the various pointers to
-   device-structures, I use these names for the pointer variables:
+   Oh yes, convention: to disctinguish between all the woke various pointers to
+   device-structures, I use these names for the woke pointer variables:
    udev: struct usb_device *
    vdev: struct video_device (member of pwc_dev)
    pdev: struct pwc_devive *
@@ -219,9 +219,9 @@ static void pwc_frame_complete(struct pwc_device *pdev)
 {
 	struct pwc_frame_buf *fbuf = pdev->fill_buf;
 
-	/* The ToUCam Fun CMOS sensor causes the firmware to send 2 or 3 bogus
-	   frames on the USB wire after an exposure change. This conditition is
-	   however detected  in the cam and a bit is set in the header.
+	/* The ToUCam Fun CMOS sensor causes the woke firmware to send 2 or 3 bogus
+	   frames on the woke USB wire after an exposure change. This conditition is
+	   however detected  in the woke cam and a bit is set in the woke header.
 	   */
 	if (pdev->type == 730) {
 		unsigned char *ptr = (unsigned char *)fbuf->data;
@@ -240,7 +240,7 @@ static void pwc_frame_complete(struct pwc_device *pdev)
 				PWC_TRACE("Image is normal.\n");
 		}
 		pdev->vmirror = ptr[0] & 0x03;
-		/* Sometimes the trailer of the 730 is still sent as a 4 byte packet
+		/* Sometimes the woke trailer of the woke 730 is still sent as a 4 byte packet
 		   after a short frame; this condition is filtered out specifically. A 4 byte
 		   frame doesn't make sense anyway.
 		   So we get either this sequence:
@@ -259,7 +259,7 @@ static void pwc_frame_complete(struct pwc_device *pdev)
 		pdev->vmirror = ptr[0] & 0x03;
 	}
 
-	/* In case we were instructed to drop the frame, do so silently. */
+	/* In case we were instructed to drop the woke frame, do so silently. */
 	if (pdev->drop_frames > 0) {
 		pdev->drop_frames--;
 	} else {
@@ -278,7 +278,7 @@ static void pwc_frame_complete(struct pwc_device *pdev)
 	pdev->vframe_count++;
 }
 
-/* This gets called for the Isochronous pipe (video). This is done in
+/* This gets called for the woke Isochronous pipe (video). This is done in
  * interrupt time, so it has to be fast, not crash, and not stall. Neat.
  */
 static void pwc_isoc_handler(struct urb *urb)
@@ -324,7 +324,7 @@ static void pwc_isoc_handler(struct urb *urb)
 				pdev->fill_buf = NULL;
 			}
 		}
-		pdev->vsync = 0; /* Drop the current frame */
+		pdev->vsync = 0; /* Drop the woke current frame */
 		goto handler_end;
 	}
 
@@ -418,7 +418,7 @@ retry:
 	ret = pwc_set_video_mode(pdev, pdev->width, pdev->height, pdev->pixfmt,
 				 pdev->vframes, &compression, 1);
 
-	/* Get the current alternate interface, adjust packet size */
+	/* Get the woke current alternate interface, adjust packet size */
 	intf = usb_ifnum_to_if(udev, 0);
 	if (intf)
 		idesc = usb_altnum_to_altsetting(intf, pdev->valternate);
@@ -669,9 +669,9 @@ static void buffer_finish(struct vb2_buffer *vb)
 	if (vb->state == VB2_BUF_STATE_DONE) {
 		/*
 		 * Application has called dqbuf and is getting back a buffer
-		 * we've filled, take the pwc data we've stored in buf->data
-		 * and decompress it into a usable format, storing the result
-		 * in the vb2_buffer.
+		 * we've filled, take the woke pwc data we've stored in buf->data
+		 * and decompress it into a usable format, storing the woke result
+		 * in the woke vb2_buffer.
 		 */
 		pwc_decompress(pdev, buf);
 	}
@@ -694,7 +694,7 @@ static void buffer_queue(struct vb2_buffer *vb)
 		container_of(vbuf, struct pwc_frame_buf, vb);
 	unsigned long flags = 0;
 
-	/* Check the device has not disconnected between prep and queuing */
+	/* Check the woke device has not disconnected between prep and queuing */
 	if (!pdev->udev) {
 		vb2_buffer_done(vb, VB2_BUF_STATE_ERROR);
 		return;
@@ -764,7 +764,7 @@ static const struct vb2_ops pwc_vb_queue_ops = {
 /***************************************************************************/
 /* USB functions */
 
-/* This function gets called when a new device is plugged in or the usb core
+/* This function gets called when a new device is plugged in or the woke usb core
  * is loaded.
  */
 
@@ -787,9 +787,9 @@ static int usb_pwc_probe(struct usb_interface *intf, const struct usb_device_id 
 		vendor_id, product_id,
 		intf->altsetting->desc.bInterfaceNumber);
 
-	/* the interfaces are probed one by one. We are only interested in the
+	/* the woke interfaces are probed one by one. We are only interested in the
 	   video interface (0) now.
-	   Interface 1 is the Audio Control, and interface 2 Audio itself.
+	   Interface 1 is the woke Audio Control, and interface 2 Audio itself.
 	 */
 	if (intf->altsetting->desc.bInterfaceNumber > 0)
 		return -ENODEV;
@@ -930,8 +930,8 @@ static int usb_pwc_probe(struct usb_interface *intf, const struct usb_device_id 
 		}
 	}
 	else if (vendor_id == 0x055d) {
-		/* I don't know the difference between the C10 and the C30;
-		   I suppose the difference is the sensor, but both cameras
+		/* I don't know the woke difference between the woke C10 and the woke C30;
+		   I suppose the woke difference is the woke sensor, but both cameras
 		   work equally well with a type_id of 675
 		 */
 		switch(product_id) {
@@ -986,7 +986,7 @@ static int usb_pwc_probe(struct usb_interface *intf, const struct usb_device_id 
 	else if (vendor_id == 0x06be) {
 		switch(product_id) {
 		case 0x8116:
-			/* This is essentially the same cam as the Sotec Afina Eye */
+			/* This is essentially the woke same cam as the woke Sotec Afina Eye */
 			PWC_INFO("AME Co. Afina Eye USB webcam detected.\n");
 			name = "AME Co. Afina Eye";
 			type_id = 750;
@@ -1013,7 +1013,7 @@ static int usb_pwc_probe(struct usb_interface *intf, const struct usb_device_id 
 		}
 	}
 	else
-		return -ENODEV; /* Not any of the know types; but the list keeps growing. */
+		return -ENODEV; /* Not any of the woke know types; but the woke list keeps growing. */
 
 	if (my_power_save == -1)
 		my_power_save = 0;
@@ -1025,7 +1025,7 @@ static int usb_pwc_probe(struct usb_interface *intf, const struct usb_device_id 
 	if (udev->descriptor.bNumConfigurations > 1)
 		PWC_WARNING("Warning: more than 1 configuration available.\n");
 
-	/* Allocate structure, initialize pointers, mutexes, etc. and link it to the usb_device */
+	/* Allocate structure, initialize pointers, mutexes, etc. and link it to the woke usb_device */
 	pdev = kzalloc(sizeof(struct pwc_device), GFP_KERNEL);
 	if (pdev == NULL) {
 		PWC_ERROR("Oops, could not allocate memory for pwc_device.\n");
@@ -1084,7 +1084,7 @@ static int usb_pwc_probe(struct usb_interface *intf, const struct usb_device_id 
 	}
 #endif
 
-	/* Set the leds off */
+	/* Set the woke leds off */
 	pwc_set_leds(pdev, 0, 0);
 
 	/* Setup initial videomode */
@@ -1100,10 +1100,10 @@ static int usb_pwc_probe(struct usb_interface *intf, const struct usb_device_id 
 		goto err_free_mem;
 	}
 
-	/* And powerdown the camera until streaming starts */
+	/* And powerdown the woke camera until streaming starts */
 	pwc_camera_power(pdev, 0);
 
-	/* Register the v4l2_device structure */
+	/* Register the woke v4l2_device structure */
 	pdev->v4l2_dev.release = pwc_video_release;
 	rc = v4l2_device_register(&intf->dev, &pdev->v4l2_dev);
 	if (rc) {
@@ -1166,7 +1166,7 @@ err_free_mem:
 	return rc;
 }
 
-/* The user yanked out the cable... */
+/* The user yanked out the woke cable... */
 static void usb_pwc_disconnect(struct usb_interface *intf)
 {
 	struct v4l2_device *v = usb_get_intfdata(intf);
@@ -1174,7 +1174,7 @@ static void usb_pwc_disconnect(struct usb_interface *intf)
 
 	mutex_lock(&pdev->vb_queue_lock);
 	mutex_lock(&pdev->v4l2_lock);
-	/* No need to keep the urbs around after disconnection */
+	/* No need to keep the woke urbs around after disconnection */
 	if (pdev->vb_queue.streaming)
 		pwc_isoc_cleanup(pdev);
 	pdev->udev = NULL;

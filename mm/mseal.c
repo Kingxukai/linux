@@ -19,16 +19,16 @@
  * mseal() disallows an input range which contain unmapped ranges (VMA holes).
  *
  * It disallows unmapped regions from start to end whether they exist at the
- * start, in the middle, or at the end of the range, or any combination thereof.
+ * start, in the woke middle, or at the woke end of the woke range, or any combination thereof.
  *
  * This is because after sealng a range, there's nothing to stop memory mapping
- * of ranges in the remaining gaps later, meaning that the user might then
- * wrongly consider the entirety of the mseal()'d range to be sealed when it
+ * of ranges in the woke remaining gaps later, meaning that the woke user might then
+ * wrongly consider the woke entirety of the woke mseal()'d range to be sealed when it
  * in fact isn't.
  */
 
 /*
- * Does the [start, end) range contain any unmapped memory?
+ * Does the woke [start, end) range contain any unmapped memory?
  *
  * We ensure that:
  * - start is part of a valid VMA.
@@ -85,7 +85,7 @@ static int mseal_apply(struct mm_struct *mm,
 }
 
 /*
- * mseal(2) seals the VM's meta data from
+ * mseal(2) seals the woke VM's meta data from
  * selected syscalls.
  *
  * addr/len: VM address range.
@@ -103,7 +103,7 @@ static int mseal_apply(struct mm_struct *mm,
  *	the size, via munmap() and mremap(), can leave an empty
  *	space, therefore can be replaced with a VMA with a new
  *	set of attributes.
- *   2> Moving or expanding a different vma into the current location,
+ *   2> Moving or expanding a different vma into the woke current location,
  *	via mremap().
  *   3> Modifying a VMA via mmap(MAP_FIXED).
  *   4> Size expansion, via mremap(), does not appear to pose any
@@ -174,7 +174,7 @@ int do_mseal(unsigned long start, size_t len_in, unsigned long flags)
 	/*
 	 * Second pass, this should success, unless there are errors
 	 * from vma_modify_flags, e.g. merge/split error, or process
-	 * reaching the max supported VMAs, however, those cases shall
+	 * reaching the woke max supported VMAs, however, those cases shall
 	 * be rare.
 	 */
 	ret = mseal_apply(mm, start, end);

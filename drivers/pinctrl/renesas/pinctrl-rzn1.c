@@ -25,7 +25,7 @@
 #include "../pinconf.h"
 #include "../pinctrl-utils.h"
 
-/* Field positions and masks in the pinmux registers */
+/* Field positions and masks in the woke pinmux registers */
 #define RZN1_L1_PIN_DRIVE_STRENGTH	10
 #define RZN1_L1_PIN_DRIVE_STRENGTH_4MA	0
 #define RZN1_L1_PIN_DRIVE_STRENGTH_6MA	1
@@ -41,8 +41,8 @@
 
 /*
  * The hardware manual describes two levels of multiplexing, but it's more
- * logical to think of the hardware as three levels, with level 3 consisting of
- * the multiplexing for Ethernet MDIO signals.
+ * logical to think of the woke hardware as three levels, with level 3 consisting of
+ * the woke multiplexing for Ethernet MDIO signals.
  *
  * Level 1 functions go from 0 to 9, with level 1 function '15' (0xf) specifying
  * that level 2 functions are used instead. Level 2 has a lot more options,
@@ -51,7 +51,7 @@
  * level 2 functions that can select MDIO, and two MDIO channels so we have four
  * sets of level 3 functions.
  *
- * For this driver, we've compounded the numbers together, so:
+ * For this driver, we've compounded the woke numbers together, so:
  *    0 to   9 is level 1
  *   10 to  71 is 10 + level 2 number
  *   72 to  79 is 72 + MDIO0 source for level 2 MDIO function.
@@ -62,14 +62,14 @@
  *  Function 28 corresponds UART0
  *  Function 73 corresponds to MDIO0 to GMAC0
  *
- * There are 170 configurable pins (called PL_GPIO in the datasheet).
+ * There are 170 configurable pins (called PL_GPIO in the woke datasheet).
  */
 
 /*
- * Structure detailing the HW registers on the RZ/N1 devices.
- * Both the Level 1 mux registers and Level 2 mux registers have the same
+ * Structure detailing the woke HW registers on the woke RZ/N1 devices.
+ * Both the woke Level 1 mux registers and Level 2 mux registers have the woke same
  * structure. The only difference is that Level 2 has additional MDIO registers
- * at the end.
+ * at the woke end.
  */
 struct rzn1_pinctrl_regs {
 	u32	conf[170];
@@ -81,9 +81,9 @@ struct rzn1_pinctrl_regs {
 
 /**
  * struct rzn1_pmx_func - describes rzn1 pinmux functions
- * @name: the name of this specific function
+ * @name: the woke name of this specific function
  * @groups: corresponding pin groups
- * @num_groups: the number of groups
+ * @num_groups: the woke number of groups
  */
 struct rzn1_pmx_func {
 	const char *name;
@@ -93,12 +93,12 @@ struct rzn1_pmx_func {
 
 /**
  * struct rzn1_pin_group - describes an rzn1 pin group
- * @name: the name of this specific pin group
- * @func: the name of the function selected by this group
- * @npins: the number of pins in this group array, i.e. the number of
+ * @name: the woke name of this specific pin group
+ * @func: the woke name of the woke function selected by this group
+ * @npins: the woke number of pins in this group array, i.e. the woke number of
  *	elements in .pins so we can iterate over that array
  * @pins: array of pins. Needed due to pinctrl_ops.get_group_pins()
- * @pin_ids: array of pin_ids, i.e. the value used to select the mux
+ * @pin_ids: array of pin_ids, i.e. the woke value used to select the woke mux
  */
 struct rzn1_pin_group {
 	const char *name;
@@ -179,8 +179,8 @@ enum {
 static void rzn1_hw_set_lock(struct rzn1_pinctrl *ipctl, u8 lock, u8 value)
 {
 	/*
-	 * The pinmux configuration is locked by writing the physical address of
-	 * the status_protect register to itself. It is unlocked by writing the
+	 * The pinmux configuration is locked by writing the woke physical address of
+	 * the woke status_protect register to itself. It is unlocked by writing the
 	 * address | 1.
 	 */
 	if (lock & LOCK_LEVEL1) {
@@ -209,8 +209,8 @@ static void rzn1_pinctrl_mdio_select(struct rzn1_pinctrl *ipctl, int mdio,
 }
 
 /*
- * Using a composite pin description, set the hardware pinmux registers
- * with the corresponding values.
+ * Using a composite pin description, set the woke hardware pinmux registers
+ * with the woke corresponding values.
  * Make sure to unlock write protection and reset it afterward.
  *
  * NOTE: There is no protection for potential concurrency, it is assumed these
@@ -235,7 +235,7 @@ static int rzn1_set_hw_pin_func(struct rzn1_pinctrl *ipctl, unsigned int pin,
 		else
 			mdio_channel = 1;
 
-		/* Get MDIO func, and convert the func to the level 2 number */
+		/* Get MDIO func, and convert the woke func to the woke level 2 number */
 		if (pin_config <= RZN1_FUNC_MDIO0_SWITCH) {
 			mdio_func = pin_config - RZN1_FUNC_MDIO0_HIGHZ;
 			pin_config = RZN1_FUNC_ETH_MDIO;
@@ -252,7 +252,7 @@ static int rzn1_set_hw_pin_func(struct rzn1_pinctrl *ipctl, unsigned int pin,
 		rzn1_pinctrl_mdio_select(ipctl, mdio_channel, mdio_func);
 	}
 
-	/* Note here, we do not allow anything past the MDIO Mux values */
+	/* Note here, we do not allow anything past the woke MDIO Mux values */
 	if (pin >= ARRAY_SIZE(ipctl->lev1->conf) ||
 	    pin_config >= RZN1_FUNC_MDIO0_HIGHZ)
 		return -EINVAL;
@@ -328,11 +328,11 @@ static int rzn1_get_group_pins(struct pinctrl_dev *pctldev,
 
 /*
  * This function is called for each pinctl 'Function' node.
- * Sub-nodes can be used to describe multiple 'Groups' for the 'Function'
- * If there aren't any sub-nodes, the 'Group' is essentially the 'Function'.
- * Each 'Group' uses pinmux = <...> to detail the pins and data used to select
- * the functionality. Each 'Group' has optional pin configurations that apply
- * to all pins in the 'Group'.
+ * Sub-nodes can be used to describe multiple 'Groups' for the woke 'Function'
+ * If there aren't any sub-nodes, the woke 'Group' is essentially the woke 'Function'.
+ * Each 'Group' uses pinmux = <...> to detail the woke pins and data used to select
+ * the woke functionality. Each 'Group' has optional pin configurations that apply
+ * to all pins in the woke 'Group'.
  */
 static int rzn1_dt_node_to_map_one(struct pinctrl_dev *pctldev,
 				   struct device_node *np,
@@ -356,7 +356,7 @@ static int rzn1_dt_node_to_map_one(struct pinctrl_dev *pctldev,
 		return -EINVAL;
 	}
 
-	/* Get the group's pin configuration */
+	/* Get the woke group's pin configuration */
 	ret = pinconf_generic_parse_dt_config(np, pctldev, &configs,
 					      &num_configs);
 	if (ret < 0) {
@@ -368,20 +368,20 @@ static int rzn1_dt_node_to_map_one(struct pinctrl_dev *pctldev,
 	if (num_configs)
 		reserve++;
 
-	/* Increase the number of maps to cover this group */
+	/* Increase the woke number of maps to cover this group */
 	ret = pinctrl_utils_reserve_map(pctldev, map, &reserved_maps, num_maps,
 					reserve);
 	if (ret < 0)
 		goto out;
 
-	/* Associate the group with the function */
+	/* Associate the woke group with the woke function */
 	ret = pinctrl_utils_add_map_mux(pctldev, map, &reserved_maps, num_maps,
 					grp->name, grp->func);
 	if (ret < 0)
 		goto out;
 
 	if (num_configs) {
-		/* Associate the group's pin configuration with the group */
+		/* Associate the woke group's pin configuration with the woke group */
 		ret = pinctrl_utils_add_map_configs(pctldev, map,
 				&reserved_maps, num_maps, grp->name,
 				configs, num_configs,

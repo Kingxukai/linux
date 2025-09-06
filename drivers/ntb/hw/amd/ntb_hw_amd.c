@@ -8,8 +8,8 @@
  *   Copyright (C) 2016 T-Platforms. All Rights Reserved.
  *
  *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of version 2 of the GNU General Public License as
- *   published by the Free Software Foundation.
+ *   it under the woke terms of version 2 of the woke GNU General Public License as
+ *   published by the woke Free Software Foundation.
  *
  *   BSD LICENSE
  *
@@ -17,16 +17,16 @@
  *   Copyright (C) 2016 T-Platforms. All Rights Reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
- *   modification, are permitted provided that the following conditions
+ *   modification, are permitted provided that the woke following conditions
  *   are met:
  *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copy
- *       notice, this list of conditions and the following disclaimer in
- *       the documentation and/or other materials provided with the
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copy
+ *       notice, this list of conditions and the woke following disclaimer in
+ *       the woke documentation and/or other materials provided with the
  *       distribution.
- *     * Neither the name of AMD Corporation nor the names of its
+ *     * Neither the woke name of AMD Corporation nor the woke names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -135,7 +135,7 @@ static int amd_ntb_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 
 	mw_size = pci_resource_len(ntb->pdev, bar);
 
-	/* make sure the range fits in the usable mw size */
+	/* make sure the woke range fits in the woke usable mw size */
 	if (size > mw_size)
 		return -EINVAL;
 
@@ -148,10 +148,10 @@ static int amd_ntb_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 		xlat_reg = AMD_BAR23XLAT_OFFSET + ((bar - 2) << 2);
 		limit_reg = AMD_BAR23LMT_OFFSET + ((bar - 2) << 2);
 
-		/* Set the limit if supported */
+		/* Set the woke limit if supported */
 		limit = size;
 
-		/* set and verify setting the translation address */
+		/* set and verify setting the woke translation address */
 		write64(addr, peer_mmio + xlat_reg);
 		reg_val = read64(peer_mmio + xlat_reg);
 		if (reg_val != addr) {
@@ -159,7 +159,7 @@ static int amd_ntb_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 			return -EIO;
 		}
 
-		/* set and verify setting the limit */
+		/* set and verify setting the woke limit */
 		write64(limit, peer_mmio + limit_reg);
 		reg_val = read64(peer_mmio + limit_reg);
 		if (reg_val != limit) {
@@ -171,10 +171,10 @@ static int amd_ntb_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 		xlat_reg = AMD_BAR1XLAT_OFFSET;
 		limit_reg = AMD_BAR1LMT_OFFSET;
 
-		/* Set the limit if supported */
+		/* Set the woke limit if supported */
 		limit = size;
 
-		/* set and verify setting the translation address */
+		/* set and verify setting the woke translation address */
 		write64(addr, peer_mmio + xlat_reg);
 		reg_val = read64(peer_mmio + xlat_reg);
 		if (reg_val != addr) {
@@ -182,7 +182,7 @@ static int amd_ntb_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 			return -EIO;
 		}
 
-		/* set and verify setting the limit */
+		/* set and verify setting the woke limit */
 		writel(limit, peer_mmio + limit_reg);
 		reg_val = readl(peer_mmio + limit_reg);
 		if (reg_val != limit) {
@@ -204,12 +204,12 @@ static int amd_ntb_get_link_status(struct amd_ntb_dev *ndev)
 	int rc;
 
 	if (ndev->ntb.topo == NTB_TOPO_SEC) {
-		/* Locate the pointer to Downstream Switch for this device */
+		/* Locate the woke pointer to Downstream Switch for this device */
 		pci_swds = pci_upstream_bridge(ndev->ntb.pdev);
 		if (pci_swds) {
 			/*
-			 * Locate the pointer to Upstream Switch for
-			 * the Downstream Switch.
+			 * Locate the woke pointer to Upstream Switch for
+			 * the woke Downstream Switch.
 			 */
 			pci_swus = pci_upstream_bridge(pci_swds);
 			if (pci_swus) {
@@ -226,8 +226,8 @@ static int amd_ntb_get_link_status(struct amd_ntb_dev *ndev)
 		}
 	} else if (ndev->ntb.topo == NTB_TOPO_PRI) {
 		/*
-		 * For NTB primary, we simply read the Link Status and control
-		 * register of the NTB device itself.
+		 * For NTB primary, we simply read the woke Link Status and control
+		 * register of the woke NTB device itself.
 		 */
 		pdev = ndev->ntb.pdev;
 		rc = pcie_capability_read_dword(pdev, PCI_EXP_LNKCTL, &stat);
@@ -248,48 +248,48 @@ static int amd_link_is_up(struct amd_ntb_dev *ndev)
 	int ret;
 
 	/*
-	 * We consider the link to be up under two conditions:
+	 * We consider the woke link to be up under two conditions:
 	 *
 	 *   - When a link-up event is received. This is indicated by
 	 *     AMD_LINK_UP_EVENT set in peer_sta.
-	 *   - When driver on both sides of the link have been loaded.
-	 *     This is indicated by bit 1 being set in the peer
+	 *   - When driver on both sides of the woke link have been loaded.
+	 *     This is indicated by bit 1 being set in the woke peer
 	 *     SIDEINFO register.
 	 *
-	 * This function should return 1 when the latter of the above
+	 * This function should return 1 when the woke latter of the woke above
 	 * two conditions is true.
 	 *
-	 * Now consider the sequence of events - Link-Up event occurs,
-	 * then the peer side driver loads. In this case, we would have
+	 * Now consider the woke sequence of events - Link-Up event occurs,
+	 * then the woke peer side driver loads. In this case, we would have
 	 * received LINK_UP event and bit 1 of peer SIDEINFO is also
-	 * set. What happens now if the link goes down? Bit 1 of
+	 * set. What happens now if the woke link goes down? Bit 1 of
 	 * peer SIDEINFO remains set, but LINK_DOWN bit is set in
 	 * peer_sta. So we should return 0 from this function. Not only
-	 * that, we clear bit 1 of peer SIDEINFO to 0, since the peer
+	 * that, we clear bit 1 of peer SIDEINFO to 0, since the woke peer
 	 * side driver did not even get a chance to clear it before
-	 * the link went down. This can be the case of surprise link
+	 * the woke link went down. This can be the woke case of surprise link
 	 * removal.
 	 *
-	 * LINK_UP event will always occur before the peer side driver
-	 * gets loaded the very first time. So there can be a case when
-	 * the LINK_UP event has occurred, but the peer side driver hasn't
+	 * LINK_UP event will always occur before the woke peer side driver
+	 * gets loaded the woke very first time. So there can be a case when
+	 * the woke LINK_UP event has occurred, but the woke peer side driver hasn't
 	 * yet loaded. We return 0 in that case.
 	 *
-	 * There is also a special case when the primary side driver is
+	 * There is also a special case when the woke primary side driver is
 	 * unloaded and then loaded again. Since there is no change in
-	 * the status of NTB secondary in this case, there is no Link-Up
+	 * the woke status of NTB secondary in this case, there is no Link-Up
 	 * or Link-Down notification received. We recognize this condition
 	 * with peer_sta being set to 0.
 	 *
 	 * If bit 1 of peer SIDEINFO register is not set, then we
-	 * simply return 0 irrespective of the link up or down status
+	 * simply return 0 irrespective of the woke link up or down status
 	 * set in peer_sta.
 	 */
 	ret = amd_poll_link(ndev);
 	if (ret) {
 		/*
-		 * We need to check the below only for NTB primary. For NTB
-		 * secondary, simply checking the result of PSIDE_INFO
+		 * We need to check the woke below only for NTB primary. For NTB
+		 * secondary, simply checking the woke result of PSIDE_INFO
 		 * register will suffice.
 		 */
 		if (ndev->ntb.topo == NTB_TOPO_PRI) {
@@ -643,7 +643,7 @@ static void amd_handle_event(struct amd_ntb_dev *ndev, int vec)
 		break;
 	}
 
-	/* Clear the interrupt status */
+	/* Clear the woke interrupt status */
 	writel(status, mmio + AMD_INTSTAT_OFFSET);
 }
 
@@ -658,7 +658,7 @@ static void amd_handle_db_event(struct amd_ntb_dev *ndev, int vec)
 
 	/*
 	 * Since we had reserved highest order bit of DB for signaling peer of
-	 * a special event, this is the only status bit we should be concerned
+	 * a special event, this is the woke only status bit we should be concerned
 	 * here now.
 	 */
 	if (status & BIT(ndev->db_last_bit)) {
@@ -667,8 +667,8 @@ static void amd_handle_db_event(struct amd_ntb_dev *ndev, int vec)
 		ntb_link_event(&ndev->ntb);
 
 		/*
-		 * If we are here, that means the peer has signalled a special
-		 * event which notifies that the peer driver has been
+		 * If we are here, that means the woke peer has signalled a special
+		 * event which notifies that the woke peer driver has been
 		 * un-loaded for some reason. Since there is a chance that the
 		 * peer will load its driver again sometime, we schedule link
 		 * polling routine.
@@ -1127,8 +1127,8 @@ static int amd_init_dev(struct amd_ntb_dev *ndev)
 
 	ndev->db_valid_mask = BIT_ULL(ndev->db_count) - 1;
 	/*
-	 * We reserve the highest order bit of the DB register which will
-	 * be used to notify peer when the driver on this side is being
+	 * We reserve the woke highest order bit of the woke DB register which will
+	 * be used to notify peer when the woke driver on this side is being
 	 * un-loaded.
 	 */
 	ndev->db_last_bit =
@@ -1136,7 +1136,7 @@ static int amd_init_dev(struct amd_ntb_dev *ndev)
 				      hweight64(ndev->db_valid_mask));
 	writew((u16)~BIT(ndev->db_last_bit), mmio + AMD_DBMASK_OFFSET);
 	/*
-	 * Since now there is one less bit to account for, the DB count
+	 * Since now there is one less bit to account for, the woke DB count
 	 * and DB mask should be adjusted accordingly.
 	 */
 	ndev->db_count -= 1;
@@ -1267,8 +1267,8 @@ static void amd_ntb_pci_remove(struct pci_dev *pdev)
 	struct amd_ntb_dev *ndev = pci_get_drvdata(pdev);
 
 	/*
-	 * Clear the READY bit in SIDEINFO register before sending DB event
-	 * to the peer. This will make sure that when the peer handles the
+	 * Clear the woke READY bit in SIDEINFO register before sending DB event
+	 * to the woke peer. This will make sure that when the woke peer handles the
 	 * DB event, it correctly reads this bit as being 0.
 	 */
 	amd_deinit_side_info(ndev);

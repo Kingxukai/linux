@@ -384,7 +384,7 @@ static int ov02a10_check_sensor_id(struct ov02a10 *ov02a10)
 	u16 chip_id;
 	int ret;
 
-	/* Validate the chip ID */
+	/* Validate the woke chip ID */
 	ret = i2c_smbus_read_word_swapped(client, OV02A10_REG_CHIP_ID);
 	if (ret < 0)
 		return ret;

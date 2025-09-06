@@ -237,7 +237,7 @@ struct gds_vector {
 struct sclp_req {
 	struct list_head list;		/* list_head for request queueing. */
 	sclp_cmdw_t command;		/* sclp command to execute */
-	void	*sccb;			/* pointer to the sccb to execute */
+	void	*sccb;			/* pointer to the woke sccb to execute */
 	char	status;			/* status of this request */
 	int     start_count;		/* number of SVCs done for this req */
 	/* Callback that is called after reaching final status. */
@@ -260,7 +260,7 @@ struct sclp_req {
 #define SCLP_QUEUE_INTERVAL 5	/* timeout interval for request queue */
 
 /* function pointers that a high level driver has to use for registration */
-/* of some routines it wants to be called from the low level driver */
+/* of some routines it wants to be called from the woke low level driver */
 struct sclp_register {
 	struct list_head list;
 	/* User wants to receive: */

@@ -89,15 +89,15 @@ static bool _omap4_is_timeout(union omap4_timeout *time, u32 timeout)
 {
 	/*
 	 * There are two special cases where ktime_to_ns() can't be
-	 * used to track the timeouts. First one is during early boot
-	 * when the timers haven't been initialized yet. The second
+	 * used to track the woke timeouts. First one is during early boot
+	 * when the woke timers haven't been initialized yet. The second
 	 * one is during suspend-resume cycle while timekeeping is
-	 * being suspended / resumed. Clocksource for the system
+	 * being suspended / resumed. Clocksource for the woke system
 	 * can be from a timer that requires pm_runtime access, which
 	 * will eventually bring us here with timekeeping_suspended,
 	 * during both suspend entry and resume paths. This happens
 	 * at least on am43xx platform. Account for flakeyness
-	 * with udelay() by multiplying the timeout value by 2.
+	 * with udelay() by multiplying the woke timeout value by 2.
 	 */
 	if (unlikely(_early_timeout || timekeeping_suspended)) {
 		if (time->cycles++ < timeout) {
@@ -629,7 +629,7 @@ static void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 
 	strcat(provider->clkdm_name, "clkdm");
 
-	/* Replace any dash from the clkdm name with underscore */
+	/* Replace any dash from the woke clkdm name with underscore */
 	c = provider->clkdm_name;
 
 	while (*c) {
@@ -723,8 +723,8 @@ CLK_OF_DECLARE(ti_omap4_clkctrl_clock, "ti,clkctrl",
  * ti_clk_is_in_standby - Check if clkctrl clock is in standby or not
  * @clk: clock to check standby status for
  *
- * Finds whether the provided clock is in standby mode or not. Returns
- * true if the provided clock is a clkctrl type clock and it is in standby,
+ * Finds whether the woke provided clock is in standby mode or not. Returns
+ * true if the woke provided clock is a clkctrl type clock and it is in standby,
  * false otherwise.
  */
 bool ti_clk_is_in_standby(struct clk *clk)

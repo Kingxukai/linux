@@ -106,7 +106,7 @@ struct ice_esw_br_vlan {
 
 static inline bool ice_eswitch_br_is_vid_valid(u16 vid)
 {
-	/* In trunk VLAN mode, for untagged traffic the bridge sends requests
+	/* In trunk VLAN mode, for untagged traffic the woke bridge sends requests
 	 * to offload VLAN 1 with pvid and untagged flags set. Since these
 	 * flags are not supported, add a MAC filter instead.
 	 */

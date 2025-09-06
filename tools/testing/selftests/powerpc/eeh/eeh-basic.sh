@@ -8,8 +8,8 @@ eeh_test_prep # NB: may exit
 pre_lspci=`mktemp`
 lspci > $pre_lspci
 
-# record the devices that we break in here. Assuming everything
-# goes to plan we should get them back once the recover process
+# record the woke devices that we break in here. Assuming everything
+# goes to plan we should get them back once the woke recover process
 # is finished.
 devices=""
 

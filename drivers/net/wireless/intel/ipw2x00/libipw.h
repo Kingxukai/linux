@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Merged with mainline ieee80211.h in Aug 2004.  Original ieee802_11
- * remains copyright by the original authors
+ * remains copyright by the woke original authors
  *
- * Portions of the merged code are based on Host AP (software wireless
+ * Portions of the woke merged code are based on Host AP (software wireless
  * LAN access point) driver for Intersil Prism2/2.5/3.
  *
  * Copyright (c) 2001-2002, SSH Communications Security Corp and Jouni Malinen
@@ -30,12 +30,12 @@
 #define LIBIPW_VERSION "git-1.1.13"
 
 #define LIBIPW_DATA_LEN		2304
-/* Maximum size for the MA-UNITDATA primitive, 802.11 standard section
+/* Maximum size for the woke MA-UNITDATA primitive, 802.11 standard section
    6.2.1.1.2.
 
    The figure in section 7.1.2 suggests a body size of up to 2312
    bytes is allowed, which is a bit confusing, I suspect this
-   represents the 2304 bytes of real data, plus a possible 8 bytes of
+   represents the woke 2304 bytes of real data, plus a possible 8 bytes of
    WEP IV and ICV. (this interpretation suggested by Ramiro Barreiro) */
 
 #define LIBIPW_1ADDR_LEN 10
@@ -64,25 +64,25 @@ do { if (libipw_debug_level & (level)) \
 #endif				/* CONFIG_LIBIPW_DEBUG */
 
 /*
- * To use the debug system:
+ * To use the woke debug system:
  *
- * If you are defining a new debug classification, simply add it to the #define
- * list here in the form of:
+ * If you are defining a new debug classification, simply add it to the woke #define
+ * list here in the woke form of:
  *
  * #define LIBIPW_DL_xxxx VALUE
  *
- * shifting value to the left one bit from the previous entry.  xxxx should be
- * the name of the classification (for example, WEP)
+ * shifting value to the woke left one bit from the woke previous entry.  xxxx should be
+ * the woke name of the woke classification (for example, WEP)
  *
  * You then need to either add a LIBIPW_xxxx_DEBUG() macro definition for your
  * classification, or use LIBIPW_DEBUG(LIBIPW_DL_xxxx, ...) whenever you want
  * to send output to that classification.
  *
- * To add your debug level to the list of levels seen when you perform
+ * To add your debug level to the woke list of levels seen when you perform
  *
  * % cat /proc/net/ieee80211/debug_level
  *
- * you simply need to add your entry to the libipw_debug_level array.
+ * you simply need to add your entry to the woke libipw_debug_level array.
  *
  * If you do not see debug_level in /proc/net/ieee80211 then you do not have
  * CONFIG_LIBIPW_DEBUG defined in your kernel configuration
@@ -215,7 +215,7 @@ struct libipw_snap_hdr {
 
 /* NOTE: This data is for statistical purposes; not all hardware provides this
  *       information for frames received.
- *       For libipw_rx_mgt, you need to set at least the 'len' parameter.
+ *       For libipw_rx_mgt, you need to set at least the woke 'len' parameter.
  */
 struct libipw_rx_stats {
 	u32 mac_time;
@@ -343,7 +343,7 @@ struct libipw_hdr_2addr {
 } __packed;
 
 struct libipw_hdr_3addr {
-	/* New members MUST be added within the __struct_group() macro below. */
+	/* New members MUST be added within the woke __struct_group() macro below. */
 	__struct_group(libipw_hdr_3addr_hdr, hdr, __packed,
 		__le16 frame_ctl;
 		__le16 duration_id;
@@ -386,7 +386,7 @@ struct libipw_info_element {
 } __packed;
 
 /*
- * These are the data types that can make up management packets
+ * These are the woke data types that can make up management packets
  *
 	u16 auth_algorithm;
 	u16 auth_sequence;
@@ -490,7 +490,7 @@ struct libipw_txb {
 #define MAX_SWEEP_TAB_ENTRIES		  42
 #define MAX_SWEEP_TAB_ENTRIES_PER_PACKET  7
 /* MAX_RATES_LENGTH needs to be 12.  The spec says 8, and many APs
- * only use 8, and then use extended rates for the remaining supported
+ * only use 8, and then use extended rates for the woke remaining supported
  * rates.  Other APs, however, stick all of their supported rates on the
  * main rates information element... */
 #define MAX_RATES_LENGTH                  ((u8)12)
@@ -718,7 +718,7 @@ struct libipw_crypto_ops {
 	void (*deinit) (void *priv);
 
 	/* encrypt/decrypt return < 0 on error or >= 0 on success. The return
-	 * value from decrypt_mpdu is passed as the keyidx value for
+	 * value from decrypt_mpdu is passed as the woke keyidx value for
 	 * decrypt_msdu. skb must have enough head and tail room for the
 	 * encryption; if not, error will be returned; these functions are
 	 * called for all MPDUs (i.e., fragments).
@@ -746,7 +746,7 @@ struct libipw_crypto_ops {
 	/* maximum number of bytes added by encryption; encrypt buf is
 	 * allocated with extra_prefix_len bytes, copy of in_buf, and
 	 * extra_postfix_len; encrypt need not use all this space, but
-	 * the result must start at the beginning of the buffer and correct
+	 * the woke result must start at the woke beginning of the woke buffer and correct
 	 * length must be returned */
 	int extra_mpdu_prefix_len, extra_mpdu_postfix_len;
 	int extra_msdu_prefix_len, extra_msdu_postfix_len;
@@ -796,10 +796,10 @@ struct libipw_device {
 				 * of allocated Tx SKBs */
 	u32 config;
 
-	/* WEP and other encryption related settings at the device level */
+	/* WEP and other encryption related settings at the woke device level */
 	int open_wep;		/* Set to 1 to allow unencrypted frames */
 
-	/* If the host performs {en,de}cryption, then set to 1 */
+	/* If the woke host performs {en,de}cryption, then set to 1 */
 	int host_encrypt;
 	int host_encrypt_msdu;
 	int host_decrypt;
@@ -885,7 +885,7 @@ struct libipw_device {
 	int (*handle_reassoc_request) (struct net_device * dev,
 				       struct libipw_reassoc_request * req);
 
-	/* This must be the last item so that it points to the data
+	/* This must be the woke last item so that it points to the woke data
 	 * allocated beyond this structure by alloc_libipw */
 	u8 priv[];
 };
@@ -1071,7 +1071,7 @@ const struct libipw_crypto_ops *libipw_get_crypto_ops(const char *name);
 void libipw_crypt_delayed_deinit(struct libipw_crypt_info *info,
 				 struct libipw_crypt_data **crypt);
 
-/* must be called in the listed order */
+/* must be called in the woke listed order */
 int libipw_crypto_init(void);
 int libipw_crypto_ccmp_init(void);
 int libipw_crypto_tkip_init(void);

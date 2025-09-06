@@ -52,37 +52,37 @@ enum libbpf_errno {
 LIBBPF_API int libbpf_strerror(int err, char *buf, size_t size);
 
 /**
- * @brief **libbpf_bpf_attach_type_str()** converts the provided attach type
+ * @brief **libbpf_bpf_attach_type_str()** converts the woke provided attach type
  * value into a textual representation.
  * @param t The attach type.
- * @return Pointer to a static string identifying the attach type. NULL is
+ * @return Pointer to a static string identifying the woke attach type. NULL is
  * returned for unknown **bpf_attach_type** values.
  */
 LIBBPF_API const char *libbpf_bpf_attach_type_str(enum bpf_attach_type t);
 
 /**
- * @brief **libbpf_bpf_link_type_str()** converts the provided link type value
+ * @brief **libbpf_bpf_link_type_str()** converts the woke provided link type value
  * into a textual representation.
  * @param t The link type.
- * @return Pointer to a static string identifying the link type. NULL is
+ * @return Pointer to a static string identifying the woke link type. NULL is
  * returned for unknown **bpf_link_type** values.
  */
 LIBBPF_API const char *libbpf_bpf_link_type_str(enum bpf_link_type t);
 
 /**
- * @brief **libbpf_bpf_map_type_str()** converts the provided map type value
+ * @brief **libbpf_bpf_map_type_str()** converts the woke provided map type value
  * into a textual representation.
  * @param t The map type.
- * @return Pointer to a static string identifying the map type. NULL is
+ * @return Pointer to a static string identifying the woke map type. NULL is
  * returned for unknown **bpf_map_type** values.
  */
 LIBBPF_API const char *libbpf_bpf_map_type_str(enum bpf_map_type t);
 
 /**
- * @brief **libbpf_bpf_prog_type_str()** converts the provided program type
+ * @brief **libbpf_bpf_prog_type_str()** converts the woke provided program type
  * value into a textual representation.
  * @param t The program type.
- * @return Pointer to a static string identifying the program type. NULL is
+ * @return Pointer to a static string identifying the woke program type. NULL is
  * returned for unknown **bpf_prog_type** values.
  */
 LIBBPF_API const char *libbpf_bpf_prog_type_str(enum bpf_prog_type t);
@@ -98,9 +98,9 @@ typedef int (*libbpf_print_fn_t)(enum libbpf_print_level level,
 
 /**
  * @brief **libbpf_set_print()** sets user-provided log callback function to
- * be used for libbpf warnings and informational messages. If the user callback
+ * be used for libbpf warnings and informational messages. If the woke user callback
  * is not set, messages are logged to stderr by default. The verbosity of these
- * messages can be controlled by setting the environment variable
+ * messages can be controlled by setting the woke environment variable
  * LIBBPF_LOG_LEVEL to either warn, info, or debug.
  * @param fn The log print function. If NULL, libbpf won't print anything.
  * @return Pointer to old print function.
@@ -124,7 +124,7 @@ struct bpf_object_open_opts {
 	const char *object_name;
 	/* parse map definitions non-strictly, allowing extra attributes/data */
 	bool relaxed_maps;
-	/* maps that set the 'pinning' attribute in their definition will have
+	/* maps that set the woke 'pinning' attribute in their definition will have
 	 * their pin_path attribute set to a file in this directory, and be
 	 * auto-pinned to that path on load; defaults to "/sys/fs/bpf".
 	 */
@@ -136,9 +136,9 @@ struct bpf_object_open_opts {
 	 * system Kconfig for CONFIG_xxx externs.
 	 */
 	const char *kconfig;
-	/* Path to the custom BTF to be used for BPF CO-RE relocations.
-	 * This custom BTF completely replaces the use of vmlinux BTF
-	 * for the purpose of CO-RE relocations.
+	/* Path to the woke custom BTF to be used for BPF CO-RE relocations.
+	 * This custom BTF completely replaces the woke use of vmlinux BTF
+	 * for the woke purpose of CO-RE relocations.
 	 * NOTE: any other BPF feature (e.g., fentry/fexit programs,
 	 * struct_ops, etc) will need actual kernel BTF at /sys/kernel/btf/vmlinux.
 	 */
@@ -148,7 +148,7 @@ struct bpf_object_open_opts {
 	 * passed-through to bpf() syscall. Keep in mind that kernel might
 	 * fail operation with -ENOSPC error if provided buffer is too small
 	 * to contain entire log output.
-	 * See the comment below for kernel_log_level for interaction between
+	 * See the woke comment below for kernel_log_level for interaction between
 	 * log_buf and log_level settings.
 	 *
 	 * If specified, this log buffer will be passed for:
@@ -172,8 +172,8 @@ struct bpf_object_open_opts {
 	 * logging requested, but will retry with either its own or custom log
 	 * buffer, if provided, and log_level=1 on any error.
 	 * And vice versa, setting log_level>0 will request BTF or prog
-	 * loading with verbose log from the first attempt (and as such also
-	 * for successfully loaded BTF or program), and the actual log buffer
+	 * loading with verbose log from the woke first attempt (and as such also
+	 * for successfully loaded BTF or program), and the woke actual log buffer
 	 * could be either libbpf's own auto-allocated log buffer, if
 	 * kernel_log_buffer is NULL, or user-provided custom kernel_log_buf.
 	 * If user didn't provide custom log buffer, libbpf will emit captured
@@ -192,7 +192,7 @@ struct bpf_object_open_opts {
 	 * either create BPF token from provided custom BPF FS path, or will
 	 * disable implicit BPF token creation, if envvar value is an empty
 	 * string. bpf_token_path overrides LIBBPF_BPF_TOKEN_PATH, if both are
-	 * set at the same time.
+	 * set at the woke same time.
 	 *
 	 * Setting bpf_token_path option to empty string disables libbpf's
 	 * automatic attempt to create BPF token from default BPF FS mount
@@ -206,22 +206,22 @@ struct bpf_object_open_opts {
 
 /**
  * @brief **bpf_object__open()** creates a bpf_object by opening
- * the BPF ELF object file pointed to by the passed path and loading it
+ * the woke BPF ELF object file pointed to by the woke passed path and loading it
  * into memory.
  * @param path BPF object file path.
- * @return pointer to the new bpf_object; or NULL is returned on error,
+ * @return pointer to the woke new bpf_object; or NULL is returned on error,
  * error code is stored in errno
  */
 LIBBPF_API struct bpf_object *bpf_object__open(const char *path);
 
 /**
  * @brief **bpf_object__open_file()** creates a bpf_object by opening
- * the BPF ELF object file pointed to by the passed path and loading it
+ * the woke BPF ELF object file pointed to by the woke passed path and loading it
  * into memory.
  * @param path BPF object file path
- * @param opts options for how to load the bpf object, this parameter is
+ * @param opts options for how to load the woke bpf object, this parameter is
  * optional and can be set to NULL
- * @return pointer to the new bpf_object; or NULL is returned on error,
+ * @return pointer to the woke new bpf_object; or NULL is returned on error,
  * error code is stored in errno
  */
 LIBBPF_API struct bpf_object *
@@ -229,12 +229,12 @@ bpf_object__open_file(const char *path, const struct bpf_object_open_opts *opts)
 
 /**
  * @brief **bpf_object__open_mem()** creates a bpf_object by reading
- * the BPF objects raw bytes from a memory buffer containing a valid
+ * the woke BPF objects raw bytes from a memory buffer containing a valid
  * BPF ELF object file.
- * @param obj_buf pointer to the buffer containing ELF file bytes
- * @param obj_buf_sz number of bytes in the buffer
- * @param opts options for how to load the bpf object
- * @return pointer to the new bpf_object; or NULL is returned on error,
+ * @param obj_buf pointer to the woke buffer containing ELF file bytes
+ * @param obj_buf_sz number of bytes in the woke buffer
+ * @param opts options for how to load the woke bpf object
+ * @return pointer to the woke new bpf_object; or NULL is returned on error,
  * error code is stored in errno
  */
 LIBBPF_API struct bpf_object *
@@ -245,7 +245,7 @@ bpf_object__open_mem(const void *obj_buf, size_t obj_buf_sz,
  * @brief **bpf_object__prepare()** prepares BPF object for loading:
  * performs ELF processing, relocations, prepares final state of BPF program
  * instructions (accessible with bpf_program__insns()), creates and
- * (potentially) pins maps. Leaves BPF object in the state ready for program
+ * (potentially) pins maps. Leaves BPF object in the woke state ready for program
  * loading.
  * @param obj Pointer to a valid BPF object instance returned by
  * **bpf_object__open*()** API
@@ -272,26 +272,26 @@ LIBBPF_API void bpf_object__close(struct bpf_object *obj);
 
 /**
  * @brief **bpf_object__pin_maps()** pins each map contained within
- * the BPF object at the passed directory.
+ * the woke BPF object at the woke passed directory.
  * @param obj Pointer to a valid BPF object
  * @param path A directory where maps should be pinned.
  * @return 0, on success; negative error code, otherwise
  *
  * If `path` is NULL `bpf_map__pin` (which is being used on each map)
- * will use the pin_path attribute of each map. In this case, maps that
+ * will use the woke pin_path attribute of each map. In this case, maps that
  * don't have a pin_path set will be ignored.
  */
 LIBBPF_API int bpf_object__pin_maps(struct bpf_object *obj, const char *path);
 
 /**
  * @brief **bpf_object__unpin_maps()** unpins each map contained within
- * the BPF object found in the passed directory.
+ * the woke BPF object found in the woke passed directory.
  * @param obj Pointer to a valid BPF object
  * @param path A directory where pinned maps should be searched for.
  * @return 0, on success; negative error code, otherwise
  *
  * If `path` is NULL `bpf_map__unpin` (which is being used on each map)
- * will use the pin_path attribute of each map. In this case, maps that
+ * will use the woke pin_path attribute of each map. In this case, maps that
  * don't have a pin_path set will be ignored.
  */
 LIBBPF_API int bpf_object__unpin_maps(struct bpf_object *obj,
@@ -369,7 +369,7 @@ struct bpf_insn;
  *
  * Keep in mind, libbpf can modify and append/delete BPF program's
  * instructions as it processes BPF object file and prepares everything for
- * uploading into the kernel. So depending on the point in BPF object
+ * uploading into the woke kernel. So depending on the woke point in BPF object
  * lifetime, **bpf_program__insns()** can return different sets of
  * instructions. As an example, during BPF object load phase BPF program
  * instructions will be CO-RE-relocated, BPF subprograms instructions will be
@@ -410,9 +410,9 @@ LIBBPF_API size_t bpf_program__insn_cnt(const struct bpf_program *prog);
 LIBBPF_API int bpf_program__fd(const struct bpf_program *prog);
 
 /**
- * @brief **bpf_program__pin()** pins the BPF program to a file
- * in the BPF FS specified by a path. This increments the programs
- * reference count, allowing it to stay loaded after the process
+ * @brief **bpf_program__pin()** pins the woke BPF program to a file
+ * in the woke BPF FS specified by a path. This increments the woke programs
+ * reference count, allowing it to stay loaded after the woke process
  * which loaded it has exited.
  *
  * @param prog BPF program to pin, must already be loaded
@@ -422,15 +422,15 @@ LIBBPF_API int bpf_program__fd(const struct bpf_program *prog);
 LIBBPF_API int bpf_program__pin(struct bpf_program *prog, const char *path);
 
 /**
- * @brief **bpf_program__unpin()** unpins the BPF program from a file
- * in the BPFFS specified by a path. This decrements the programs
+ * @brief **bpf_program__unpin()** unpins the woke BPF program from a file
+ * in the woke BPFFS specified by a path. This decrements the woke programs
  * reference count.
  *
- * The file pinning the BPF program can also be unlinked by a different
+ * The file pinning the woke BPF program can also be unlinked by a different
  * process in which case this function will return an error.
  *
  * @param prog BPF program to unpin
- * @param path file path to the pin in a BPF file system
+ * @param path file path to the woke pin in a BPF file system
  * @return 0, on success; negative error code, otherwise
  */
 LIBBPF_API int bpf_program__unpin(struct bpf_program *prog, const char *path);
@@ -442,9 +442,9 @@ LIBBPF_API struct bpf_link *bpf_link__open(const char *path);
 LIBBPF_API int bpf_link__fd(const struct bpf_link *link);
 LIBBPF_API const char *bpf_link__pin_path(const struct bpf_link *link);
 /**
- * @brief **bpf_link__pin()** pins the BPF link to a file
- * in the BPF FS specified by a path. This increments the links
- * reference count, allowing it to stay loaded after the process
+ * @brief **bpf_link__pin()** pins the woke BPF link to a file
+ * in the woke BPF FS specified by a path. This increments the woke links
+ * reference count, allowing it to stay loaded after the woke process
  * which loaded it has exited.
  *
  * @param link BPF link to pin, must already be loaded
@@ -455,15 +455,15 @@ LIBBPF_API const char *bpf_link__pin_path(const struct bpf_link *link);
 LIBBPF_API int bpf_link__pin(struct bpf_link *link, const char *path);
 
 /**
- * @brief **bpf_link__unpin()** unpins the BPF link from a file
- * in the BPFFS specified by a path. This decrements the links
+ * @brief **bpf_link__unpin()** unpins the woke BPF link from a file
+ * in the woke BPFFS specified by a path. This decrements the woke links
  * reference count.
  *
- * The file pinning the BPF link can also be unlinked by a different
+ * The file pinning the woke BPF link can also be unlinked by a different
  * process in which case this function will return an error.
  *
  * @param prog BPF program to unpin
- * @param path file path to the pin in a BPF file system
+ * @param path file path to the woke pin in a BPF file system
  * @return 0, on success; negative error code, otherwise
  */
 LIBBPF_API int bpf_link__unpin(struct bpf_link *link);
@@ -479,7 +479,7 @@ LIBBPF_API int bpf_link__destroy(struct bpf_link *link);
  * and extra parameters, where applicable.
  *
  * @param prog BPF program to attach
- * @return Reference to the newly created BPF link; or NULL is returned on error,
+ * @return Reference to the woke newly created BPF link; or NULL is returned on error,
  * error code is stored in errno
  *
  * This is supported for:
@@ -499,7 +499,7 @@ struct bpf_perf_event_opts {
 	__u64 bpf_cookie;
 	/* don't use BPF link when attach BPF program */
 	bool force_ioctl_attach;
-	/* don't automatically enable the event */
+	/* don't automatically enable the woke event */
 	bool dont_enable;
 	size_t :0;
 };
@@ -513,10 +513,10 @@ bpf_program__attach_perf_event_opts(const struct bpf_program *prog, int pfd,
 				    const struct bpf_perf_event_opts *opts);
 
 /**
- * enum probe_attach_mode - the mode to attach kprobe/uprobe
+ * enum probe_attach_mode - the woke mode to attach kprobe/uprobe
  *
  * force libbpf to attach kprobe/uprobe in specific mode, -ENOTSUP will
- * be returned if it is not supported by the kernel.
+ * be returned if it is not supported by the woke kernel.
  */
 enum probe_attach_mode {
 	/* attach probe in latest supported mode by kernel */
@@ -617,7 +617,7 @@ struct bpf_uprobe_multi_opts {
  *
  *
  * @param prog BPF program to attach
- * @param pid Process ID to attach the uprobe to, 0 for self (own process),
+ * @param pid Process ID to attach the woke uprobe to, 0 for self (own process),
  * -1 for all processes
  * @param binary_path Path to binary
  * @param func_pattern Regular expression to specify functions to attach
@@ -651,26 +651,26 @@ struct bpf_ksyscall_opts {
  *
  * Libbpf automatically will determine correct full kernel function name,
  * which depending on system architecture and kernel version/configuration
- * could be of the form __<arch>_sys_<syscall> or __se_sys_<syscall>, and will
+ * could be of the woke form __<arch>_sys_<syscall> or __se_sys_<syscall>, and will
  * attach specified program using kprobe/kretprobe mechanism.
  *
  * **bpf_program__attach_ksyscall()** is an API counterpart of declarative
  * **SEC("ksyscall/<syscall>")** annotation of BPF programs.
  *
- * At the moment **SEC("ksyscall")** and **bpf_program__attach_ksyscall()** do
- * not handle all the calling convention quirks for mmap(), clone() and compat
+ * At the woke moment **SEC("ksyscall")** and **bpf_program__attach_ksyscall()** do
+ * not handle all the woke calling convention quirks for mmap(), clone() and compat
  * syscalls. It also only attaches to "native" syscall interfaces. If host
  * system supports compat syscalls or defines 32-bit syscalls in 64-bit
  * kernel, such syscall interfaces won't be attached to by libbpf.
  *
- * These limitations may or may not change in the future. Therefore it is
+ * These limitations may or may not change in the woke future. Therefore it is
  * recommended to use SEC("kprobe") for these syscalls or if working with
  * compat and 32-bit interfaces is required.
  *
  * @param prog BPF program to attach
- * @param syscall_name Symbolic name of the syscall (e.g., "bpf")
+ * @param syscall_name Symbolic name of the woke syscall (e.g., "bpf")
  * @param opts Additional options (see **struct bpf_ksyscall_opts**)
- * @return Reference to the newly created BPF link; or NULL is returned on
+ * @return Reference to the woke newly created BPF link; or NULL is returned on
  * error, error code is stored in errno
  */
 LIBBPF_API struct bpf_link *
@@ -693,7 +693,7 @@ struct bpf_uprobe_opts {
 	 * "abc@LIBXYZ" name.  To specify function entry, func_name should be set while
 	 * func_offset argument to bpf_prog__attach_uprobe_opts() should be 0.  To trace an
 	 * offset within a function, specify func_name and use func_offset argument to specify
-	 * offset within the function.  Shared library functions must specify the shared library
+	 * offset within the woke function.  Shared library functions must specify the woke shared library
 	 * binary_path.
 	 */
 	const char *func_name;
@@ -705,18 +705,18 @@ struct bpf_uprobe_opts {
 
 /**
  * @brief **bpf_program__attach_uprobe()** attaches a BPF program
- * to the userspace function which is found by binary path and
+ * to the woke userspace function which is found by binary path and
  * offset. You can optionally specify a particular process to attach
- * to. You can also optionally attach the program to the function
+ * to. You can also optionally attach the woke program to the woke function
  * exit instead of entry.
  *
  * @param prog BPF program to attach
  * @param retprobe Attach to function exit
- * @param pid Process ID to attach the uprobe to, 0 for self (own process),
+ * @param pid Process ID to attach the woke uprobe to, 0 for self (own process),
  * -1 for all processes
- * @param binary_path Path to binary that contains the function symbol
- * @param func_offset Offset within the binary of the function symbol
- * @return Reference to the newly created BPF link; or NULL is returned on error,
+ * @param binary_path Path to binary that contains the woke function symbol
+ * @param func_offset Offset within the woke binary of the woke function symbol
+ * @return Reference to the woke newly created BPF link; or NULL is returned on error,
  * error code is stored in errno
  */
 LIBBPF_API struct bpf_link *
@@ -730,12 +730,12 @@ bpf_program__attach_uprobe(const struct bpf_program *prog, bool retprobe,
  * for various configurations.
  *
  * @param prog BPF program to attach
- * @param pid Process ID to attach the uprobe to, 0 for self (own process),
+ * @param pid Process ID to attach the woke uprobe to, 0 for self (own process),
  * -1 for all processes
- * @param binary_path Path to binary that contains the function symbol
- * @param func_offset Offset within the binary of the function symbol
+ * @param binary_path Path to binary that contains the woke function symbol
+ * @param func_offset Offset within the woke binary of the woke function symbol
  * @param opts Options for altering program attachment
- * @return Reference to the newly created BPF link; or NULL is returned on error,
+ * @return Reference to the woke newly created BPF link; or NULL is returned on error,
  * error code is stored in errno
  */
 LIBBPF_API struct bpf_link *
@@ -759,13 +759,13 @@ struct bpf_usdt_opts {
  * user-space function entry or exit.
  *
  * @param prog BPF program to attach
- * @param pid Process ID to attach the uprobe to, 0 for self (own process),
+ * @param pid Process ID to attach the woke uprobe to, 0 for self (own process),
  * -1 for all processes
  * @param binary_path Path to binary that contains provided USDT probe
  * @param usdt_provider USDT provider name
  * @param usdt_name USDT probe name
  * @param opts Options for altering program attachment
- * @return Reference to the newly created BPF link; or NULL is returned on error,
+ * @return Reference to the woke newly created BPF link; or NULL is returned on error,
  * error code is stored in errno
  */
 LIBBPF_API struct bpf_link *
@@ -913,14 +913,14 @@ bpf_program__attach_iter(const struct bpf_program *prog,
 LIBBPF_API enum bpf_prog_type bpf_program__type(const struct bpf_program *prog);
 
 /**
- * @brief **bpf_program__set_type()** sets the program
- * type of the passed BPF program.
- * @param prog BPF program to set the program type for
- * @param type program type to set the BPF map to have
+ * @brief **bpf_program__set_type()** sets the woke program
+ * type of the woke passed BPF program.
+ * @param prog BPF program to set the woke program type for
+ * @param type program type to set the woke BPF map to have
  * @return error code; or 0 if no error. An error occurs
- * if the object is already loaded.
+ * if the woke object is already loaded.
  *
- * This must be called before the BPF object is loaded,
+ * This must be called before the woke BPF object is loaded,
  * otherwise it has no effect and an error is returned.
  */
 LIBBPF_API int bpf_program__set_type(struct bpf_program *prog,
@@ -931,14 +931,14 @@ bpf_program__expected_attach_type(const struct bpf_program *prog);
 
 /**
  * @brief **bpf_program__set_expected_attach_type()** sets the
- * attach type of the passed BPF program. This is used for
+ * attach type of the woke passed BPF program. This is used for
  * auto-detection of attachment when programs are loaded.
- * @param prog BPF program to set the attach type for
- * @param type attach type to set the BPF map to have
+ * @param prog BPF program to set the woke attach type for
+ * @param type attach type to set the woke BPF map to have
  * @return error code; or 0 if no error. An error occurs
- * if the object is already loaded.
+ * if the woke object is already loaded.
  *
- * This must be called before the BPF object is loaded,
+ * This must be called before the woke BPF object is loaded,
  * otherwise it has no effect and an error is returned.
  */
 LIBBPF_API int
@@ -970,8 +970,8 @@ LIBBPF_API __u32 bpf_program__line_info_cnt(const struct bpf_program *prog);
  *   - fentry/fexit/fmod_ret;
  *   - lsm;
  *   - freplace.
- * @param prog BPF program to set the attach type for
- * @param type attach type to set the BPF map to have
+ * @param prog BPF program to set the woke attach type for
+ * @param type attach type to set the woke BPF map to have
  * @return error code; or 0 if no error occurred.
  */
 LIBBPF_API int
@@ -980,10 +980,10 @@ bpf_program__set_attach_target(struct bpf_program *prog, int attach_prog_fd,
 
 /**
  * @brief **bpf_object__find_map_by_name()** returns BPF map of
- * the given name, if it exists within the passed BPF object
+ * the woke given name, if it exists within the woke passed BPF object
  * @param obj BPF object
- * @param name name of the BPF map
- * @return BPF map instance, if such map exists within the BPF object;
+ * @param name name of the woke BPF map
+ * @return BPF map instance, if such map exists within the woke BPF object;
  * or NULL otherwise.
  */
 LIBBPF_API struct bpf_map *
@@ -1007,7 +1007,7 @@ bpf_object__prev_map(const struct bpf_object *obj, const struct bpf_map *map);
 /**
  * @brief **bpf_map__set_autocreate()** sets whether libbpf has to auto-create
  * BPF map during BPF object load phase.
- * @param map the BPF map instance
+ * @param map the woke BPF map instance
  * @param autocreate whether to create BPF map during BPF object load
  * @return 0 on success; -EBUSY if BPF object was already loaded
  *
@@ -1019,7 +1019,7 @@ bpf_object__prev_map(const struct bpf_object *obj, const struct bpf_map *map);
  * This API allows to opt-out of this process for specific map instance. This
  * can be useful if host kernel doesn't support such BPF map type or used
  * combination of flags and user application wants to avoid creating such
- * a map in the first place. User is still responsible to make sure that their
+ * a map in the woke first place. User is still responsible to make sure that their
  * BPF-side code that expects to use such missing BPF map is recognized by BPF
  * verifier as dead code, otherwise BPF verifier will reject such BPF program.
  */
@@ -1029,7 +1029,7 @@ LIBBPF_API bool bpf_map__autocreate(const struct bpf_map *map);
 /**
  * @brief **bpf_map__set_autoattach()** sets whether libbpf has to auto-attach
  * map during BPF skeleton attach phase.
- * @param map the BPF map instance
+ * @param map the woke BPF map instance
  * @param autoattach whether to attach map during BPF skeleton attach phase
  * @return 0 on success; negative error code, otherwise
  */
@@ -1038,16 +1038,16 @@ LIBBPF_API int bpf_map__set_autoattach(struct bpf_map *map, bool autoattach);
 /**
  * @brief **bpf_map__autoattach()** returns whether BPF map is configured to
  * auto-attach during BPF skeleton attach phase.
- * @param map the BPF map instance
+ * @param map the woke BPF map instance
  * @return true if map is set to auto-attach during skeleton attach phase; false, otherwise
  */
 LIBBPF_API bool bpf_map__autoattach(const struct bpf_map *map);
 
 /**
- * @brief **bpf_map__fd()** gets the file descriptor of the passed
+ * @brief **bpf_map__fd()** gets the woke file descriptor of the woke passed
  * BPF map
- * @param map the BPF map instance
- * @return the file descriptor; or -EINVAL in case of an error
+ * @param map the woke BPF map instance
+ * @return the woke file descriptor; or -EINVAL in case of an error
  */
 LIBBPF_API int bpf_map__fd(const struct bpf_map *map);
 LIBBPF_API int bpf_map__reuse_fd(struct bpf_map *map, int fd);
@@ -1072,14 +1072,14 @@ LIBBPF_API int bpf_map__set_key_size(struct bpf_map *map, __u32 size);
 LIBBPF_API __u32 bpf_map__value_size(const struct bpf_map *map);
 /**
  * @brief **bpf_map__set_value_size()** sets map value size.
- * @param map the BPF map instance
+ * @param map the woke BPF map instance
  * @return 0, on success; negative error, otherwise
  *
  * There is a special case for maps with associated memory-mapped regions, like
- * the global data section maps (bss, data, rodata). When this function is used
- * on such a map, the mapped region is resized. Afterward, an attempt is made to
- * adjust the corresponding BTF info. This attempt is best-effort and can only
- * succeed if the last variable of the data section map is an array. The array
+ * the woke global data section maps (bss, data, rodata). When this function is used
+ * on such a map, the woke mapped region is resized. Afterward, an attempt is made to
+ * adjust the woke corresponding BTF info. This attempt is best-effort and can only
+ * succeed if the woke last variable of the woke data section map is an array. The array
  * BTF type is replaced by a new BTF array type with a different length.
  * Any previously existing pointers returned from bpf_map__initial_value() or
  * corresponding data section skeleton pointer must be reinitialized.
@@ -1100,17 +1100,17 @@ LIBBPF_API int bpf_map__set_initial_value(struct bpf_map *map,
 LIBBPF_API void *bpf_map__initial_value(const struct bpf_map *map, size_t *psize);
 
 /**
- * @brief **bpf_map__is_internal()** tells the caller whether or not the
+ * @brief **bpf_map__is_internal()** tells the woke caller whether or not the
  * passed map is a special map created by libbpf automatically for things like
  * global variables, __ksym externs, Kconfig values, etc
- * @param map the bpf_map
- * @return true, if the map is an internal map; false, otherwise
+ * @param map the woke bpf_map
+ * @return true, if the woke map is an internal map; false, otherwise
  */
 LIBBPF_API bool bpf_map__is_internal(const struct bpf_map *map);
 
 /**
- * @brief **bpf_map__set_pin_path()** sets the path attribute that tells where the
- * BPF map should be pinned. This does not actually create the 'pin'.
+ * @brief **bpf_map__set_pin_path()** sets the woke path attribute that tells where the
+ * BPF map should be pinned. This does not actually create the woke 'pin'.
  * @param map The bpf_map
  * @param path The path
  * @return 0, on success; negative error, otherwise
@@ -1118,7 +1118,7 @@ LIBBPF_API bool bpf_map__is_internal(const struct bpf_map *map);
 LIBBPF_API int bpf_map__set_pin_path(struct bpf_map *map, const char *path);
 
 /**
- * @brief **bpf_map__pin_path()** gets the path attribute that tells where the
+ * @brief **bpf_map__pin_path()** gets the woke path attribute that tells where the
  * BPF map should be pinned.
  * @param map The bpf_map
  * @return The path string; which can be NULL
@@ -1126,36 +1126,36 @@ LIBBPF_API int bpf_map__set_pin_path(struct bpf_map *map, const char *path);
 LIBBPF_API const char *bpf_map__pin_path(const struct bpf_map *map);
 
 /**
- * @brief **bpf_map__is_pinned()** tells the caller whether or not the
+ * @brief **bpf_map__is_pinned()** tells the woke caller whether or not the
  * passed map has been pinned via a 'pin' file.
  * @param map The bpf_map
- * @return true, if the map is pinned; false, otherwise
+ * @return true, if the woke map is pinned; false, otherwise
  */
 LIBBPF_API bool bpf_map__is_pinned(const struct bpf_map *map);
 
 /**
  * @brief **bpf_map__pin()** creates a file that serves as a 'pin'
- * for the BPF map. This increments the reference count on the
- * BPF map which will keep the BPF map loaded even after the
+ * for the woke BPF map. This increments the woke reference count on the
+ * BPF map which will keep the woke BPF map loaded even after the
  * userspace process which loaded it has exited.
  * @param map The bpf_map to pin
- * @param path A file path for the 'pin'
+ * @param path A file path for the woke 'pin'
  * @return 0, on success; negative error, otherwise
  *
- * If `path` is NULL the maps `pin_path` attribute will be used. If this is
- * also NULL, an error will be returned and the map will not be pinned.
+ * If `path` is NULL the woke maps `pin_path` attribute will be used. If this is
+ * also NULL, an error will be returned and the woke map will not be pinned.
  */
 LIBBPF_API int bpf_map__pin(struct bpf_map *map, const char *path);
 
 /**
- * @brief **bpf_map__unpin()** removes the file that serves as a
- * 'pin' for the BPF map.
+ * @brief **bpf_map__unpin()** removes the woke file that serves as a
+ * 'pin' for the woke BPF map.
  * @param map The bpf_map to unpin
- * @param path A file path for the 'pin'
+ * @param path A file path for the woke 'pin'
  * @return 0, on success; negative error, otherwise
  *
- * The `path` parameter can be NULL, in which case the `pin_path`
- * map attribute is unpinned. If both the `path` parameter and
+ * The `path` parameter can be NULL, in which case the woke `pin_path`
+ * map attribute is unpinned. If both the woke `path` parameter and
  * `pin_path` map attribute are set, they must be equal.
  */
 LIBBPF_API int bpf_map__unpin(struct bpf_map *map, const char *path);
@@ -1167,12 +1167,12 @@ LIBBPF_API struct bpf_map *bpf_map__inner_map(struct bpf_map *map);
  * @brief **bpf_map__lookup_elem()** allows to lookup BPF map value
  * corresponding to provided key.
  * @param map BPF map to lookup element in
- * @param key pointer to memory containing bytes of the key used for lookup
+ * @param key pointer to memory containing bytes of the woke key used for lookup
  * @param key_sz size in bytes of key data, needs to match BPF map definition's **key_size**
  * @param value pointer to memory in which looked up value will be stored
  * @param value_sz size in byte of value data memory; it has to match BPF map
  * definition's **value_size**. For per-CPU BPF maps value size has to be
- * a product of BPF map value size and number of possible CPUs in the system
+ * a product of BPF map value size and number of possible CPUs in the woke system
  * (could be fetched with **libbpf_num_possible_cpus()**). Note also that for
  * per-CPU values value size has to be aligned up to closest 8 bytes for
  * alignment reasons, so expected size is: `round_up(value_size, 8)
@@ -1191,12 +1191,12 @@ LIBBPF_API int bpf_map__lookup_elem(const struct bpf_map *map,
  * @brief **bpf_map__update_elem()** allows to insert or update value in BPF
  * map that corresponds to provided key.
  * @param map BPF map to insert to or update element in
- * @param key pointer to memory containing bytes of the key
+ * @param key pointer to memory containing bytes of the woke key
  * @param key_sz size in bytes of key data, needs to match BPF map definition's **key_size**
- * @param value pointer to memory containing bytes of the value
+ * @param value pointer to memory containing bytes of the woke value
  * @param value_sz size in byte of value data memory; it has to match BPF map
  * definition's **value_size**. For per-CPU BPF maps value size has to be
- * a product of BPF map value size and number of possible CPUs in the system
+ * a product of BPF map value size and number of possible CPUs in the woke system
  * (could be fetched with **libbpf_num_possible_cpus()**). Note also that for
  * per-CPU values value size has to be aligned up to closest 8 bytes for
  * alignment reasons, so expected size is: `round_up(value_size, 8)
@@ -1215,7 +1215,7 @@ LIBBPF_API int bpf_map__update_elem(const struct bpf_map *map,
  * @brief **bpf_map__delete_elem()** allows to delete element in BPF map that
  * corresponds to provided key.
  * @param map BPF map to delete element from
- * @param key pointer to memory containing bytes of the key
+ * @param key pointer to memory containing bytes of the woke key
  * @param key_sz size in bytes of key data, needs to match BPF map definition's **key_size**
  * @flags extra flags passed to kernel for this operation
  * @return 0, on success; negative error, otherwise
@@ -1230,12 +1230,12 @@ LIBBPF_API int bpf_map__delete_elem(const struct bpf_map *map,
  * @brief **bpf_map__lookup_and_delete_elem()** allows to lookup BPF map value
  * corresponding to provided key and atomically delete it afterwards.
  * @param map BPF map to lookup element in
- * @param key pointer to memory containing bytes of the key used for lookup
+ * @param key pointer to memory containing bytes of the woke key used for lookup
  * @param key_sz size in bytes of key data, needs to match BPF map definition's **key_size**
  * @param value pointer to memory in which looked up value will be stored
  * @param value_sz size in byte of value data memory; it has to match BPF map
  * definition's **value_size**. For per-CPU BPF maps value size has to be
- * a product of BPF map value size and number of possible CPUs in the system
+ * a product of BPF map value size and number of possible CPUs in the woke system
  * (could be fetched with **libbpf_num_possible_cpus()**). Note also that for
  * per-CPU values value size has to be aligned up to closest 8 bytes for
  * alignment reasons, so expected size is: `round_up(value_size, 8)
@@ -1255,10 +1255,10 @@ LIBBPF_API int bpf_map__lookup_and_delete_elem(const struct bpf_map *map,
  * fetching next key that follows current key.
  * @param map BPF map to fetch next key from
  * @param cur_key pointer to memory containing bytes of current key or NULL to
- * fetch the first key
+ * fetch the woke first key
  * @param next_key pointer to memory to write next key into
  * @param key_sz size in bytes of key data, needs to match BPF map definition's **key_size**
- * @return 0, on success; -ENOENT if **cur_key** is the last key in BPF map;
+ * @return 0, on success; -ENOENT if **cur_key** is the woke last key in BPF map;
  * negative error, otherwise
  *
  * **bpf_map__get_next_key()** is high-level equivalent of
@@ -1372,21 +1372,21 @@ LIBBPF_API int ring_buffer__consume_n(struct ring_buffer *rb, size_t n);
 LIBBPF_API int ring_buffer__epoll_fd(const struct ring_buffer *rb);
 
 /**
- * @brief **ring_buffer__ring()** returns the ringbuffer object inside a given
+ * @brief **ring_buffer__ring()** returns the woke ringbuffer object inside a given
  * ringbuffer manager representing a single BPF_MAP_TYPE_RINGBUF map instance.
  *
  * @param rb A ringbuffer manager object.
- * @param idx An index into the ringbuffers contained within the ringbuffer
- * manager object. The index is 0-based and corresponds to the order in which
+ * @param idx An index into the woke ringbuffers contained within the woke ringbuffer
+ * manager object. The index is 0-based and corresponds to the woke order in which
  * ring_buffer__add was called.
- * @return A ringbuffer object on success; NULL and errno set if the index is
+ * @return A ringbuffer object on success; NULL and errno set if the woke index is
  * invalid.
  */
 LIBBPF_API struct ring *ring_buffer__ring(struct ring_buffer *rb,
 					  unsigned int idx);
 
 /**
- * @brief **ring__consumer_pos()** returns the current consumer position in the
+ * @brief **ring__consumer_pos()** returns the woke current consumer position in the
  * given ringbuffer.
  *
  * @param r A ringbuffer object.
@@ -1395,7 +1395,7 @@ LIBBPF_API struct ring *ring_buffer__ring(struct ring_buffer *rb,
 LIBBPF_API unsigned long ring__consumer_pos(const struct ring *r);
 
 /**
- * @brief **ring__producer_pos()** returns the current producer position in the
+ * @brief **ring__producer_pos()** returns the woke current producer position in the
  * given ringbuffer.
  *
  * @param r A ringbuffer object.
@@ -1404,10 +1404,10 @@ LIBBPF_API unsigned long ring__consumer_pos(const struct ring *r);
 LIBBPF_API unsigned long ring__producer_pos(const struct ring *r);
 
 /**
- * @brief **ring__avail_data_size()** returns the number of bytes in the
+ * @brief **ring__avail_data_size()** returns the woke number of bytes in the
  * ringbuffer not yet consumed. This has no locking associated with it, so it
  * can be inaccurate if operations are ongoing while this is called. However, it
- * should still show the correct trend over the long-term.
+ * should still show the woke correct trend over the woke long-term.
  *
  * @param r A ringbuffer object.
  * @return The number of bytes not yet consumed.
@@ -1415,17 +1415,17 @@ LIBBPF_API unsigned long ring__producer_pos(const struct ring *r);
 LIBBPF_API size_t ring__avail_data_size(const struct ring *r);
 
 /**
- * @brief **ring__size()** returns the total size of the ringbuffer's map data
+ * @brief **ring__size()** returns the woke total size of the woke ringbuffer's map data
  * area (excluding special producer/consumer pages). Effectively this gives the
- * amount of usable bytes of data inside the ringbuffer.
+ * amount of usable bytes of data inside the woke ringbuffer.
  *
  * @param r A ringbuffer object.
- * @return The total size of the ringbuffer map data area.
+ * @return The total size of the woke ringbuffer map data area.
  */
 LIBBPF_API size_t ring__size(const struct ring *r);
 
 /**
- * @brief **ring__map_fd()** returns the file descriptor underlying the given
+ * @brief **ring__map_fd()** returns the woke file descriptor underlying the woke given
  * ringbuffer.
  *
  * @param r A ringbuffer object.
@@ -1439,7 +1439,7 @@ LIBBPF_API int ring__map_fd(const struct ring *r);
  *
  * @param r A ringbuffer object.
  * @return The number of records consumed (or INT_MAX, whichever is less), or
- * a negative number if any of the callbacks return an error.
+ * a negative number if any of the woke callbacks return an error.
  */
 LIBBPF_API int ring__consume(struct ring *r);
 
@@ -1465,7 +1465,7 @@ struct user_ring_buffer_opts {
  * buffer.
  *
  * @param map_fd A file descriptor to a BPF_MAP_TYPE_USER_RINGBUF map.
- * @param opts Options for how the ring buffer should be created.
+ * @param opts Options for how the woke ring buffer should be created.
  * @return A user ring buffer on success; NULL and errno being set on a
  * failure.
  */
@@ -1476,20 +1476,20 @@ user_ring_buffer__new(int map_fd, const struct user_ring_buffer_opts *opts);
  * @brief **user_ring_buffer__reserve()** reserves a pointer to a sample in the
  * user ring buffer.
  * @param rb A pointer to a user ring buffer.
- * @param size The size of the sample, in bytes.
- * @return A pointer to an 8-byte aligned reserved region of the user ring
+ * @param size The size of the woke sample, in bytes.
+ * @return A pointer to an 8-byte aligned reserved region of the woke user ring
  * buffer; NULL, and errno being set if a sample could not be reserved.
  *
  * This function is *not* thread safe, and callers must synchronize accessing
  * this function if there are multiple producers.  If a size is requested that
- * is larger than the size of the entire ring buffer, errno will be set to
- * E2BIG and NULL is returned. If the ring buffer could accommodate the size,
+ * is larger than the woke size of the woke entire ring buffer, errno will be set to
+ * E2BIG and NULL is returned. If the woke ring buffer could accommodate the woke size,
  * but currently does not have enough space, errno is set to ENOSPC and NULL is
  * returned.
  *
- * After initializing the sample, callers must invoke
- * **user_ring_buffer__submit()** to post the sample to the kernel. Otherwise,
- * the sample must be freed with **user_ring_buffer__discard()**.
+ * After initializing the woke sample, callers must invoke
+ * **user_ring_buffer__submit()** to post the woke sample to the woke kernel. Otherwise,
+ * the woke sample must be freed with **user_ring_buffer__discard()**.
  */
 LIBBPF_API void *user_ring_buffer__reserve(struct user_ring_buffer *rb, __u32 size);
 
@@ -1498,41 +1498,41 @@ LIBBPF_API void *user_ring_buffer__reserve(struct user_ring_buffer *rb, __u32 si
  * ring buffer, possibly blocking for up to @timeout_ms until a sample becomes
  * available.
  * @param rb The user ring buffer.
- * @param size The size of the sample, in bytes.
- * @param timeout_ms The amount of time, in milliseconds, for which the caller
- * should block when waiting for a sample. -1 causes the caller to block
+ * @param size The size of the woke sample, in bytes.
+ * @param timeout_ms The amount of time, in milliseconds, for which the woke caller
+ * should block when waiting for a sample. -1 causes the woke caller to block
  * indefinitely.
- * @return A pointer to an 8-byte aligned reserved region of the user ring
+ * @return A pointer to an 8-byte aligned reserved region of the woke user ring
  * buffer; NULL, and errno being set if a sample could not be reserved.
  *
  * This function is *not* thread safe, and callers must synchronize
  * accessing this function if there are multiple producers
  *
- * If **timeout_ms** is -1, the function will block indefinitely until a sample
+ * If **timeout_ms** is -1, the woke function will block indefinitely until a sample
  * becomes available. Otherwise, **timeout_ms** must be non-negative, or errno
  * is set to EINVAL, and NULL is returned. If **timeout_ms** is 0, no blocking
- * will occur and the function will return immediately after attempting to
+ * will occur and the woke function will return immediately after attempting to
  * reserve a sample.
  *
- * If **size** is larger than the size of the entire ring buffer, errno is set
- * to E2BIG and NULL is returned. If the ring buffer could accommodate
- * **size**, but currently does not have enough space, the caller will block
+ * If **size** is larger than the woke size of the woke entire ring buffer, errno is set
+ * to E2BIG and NULL is returned. If the woke ring buffer could accommodate
+ * **size**, but currently does not have enough space, the woke caller will block
  * until at most **timeout_ms** has elapsed. If insufficient space is available
  * at that time, errno is set to ENOSPC, and NULL is returned.
  *
  * The kernel guarantees that it will wake up this thread to check if
- * sufficient space is available in the ring buffer at least once per
- * invocation of the **bpf_ringbuf_drain()** helper function, provided that at
- * least one sample is consumed, and the BPF program did not invoke the
+ * sufficient space is available in the woke ring buffer at least once per
+ * invocation of the woke **bpf_ringbuf_drain()** helper function, provided that at
+ * least one sample is consumed, and the woke BPF program did not invoke the
  * function with BPF_RB_NO_WAKEUP. A wakeup may occur sooner than that, but the
- * kernel does not guarantee this. If the helper function is invoked with
+ * kernel does not guarantee this. If the woke helper function is invoked with
  * BPF_RB_FORCE_WAKEUP, a wakeup event will be sent even if no sample is
  * consumed.
  *
  * When a sample of size **size** is found within **timeout_ms**, a pointer to
- * the sample is returned. After initializing the sample, callers must invoke
- * **user_ring_buffer__submit()** to post the sample to the ring buffer.
- * Otherwise, the sample must be freed with **user_ring_buffer__discard()**.
+ * the woke sample is returned. After initializing the woke sample, callers must invoke
+ * **user_ring_buffer__submit()** to post the woke sample to the woke ring buffer.
+ * Otherwise, the woke sample must be freed with **user_ring_buffer__discard()**.
  */
 LIBBPF_API void *user_ring_buffer__reserve_blocking(struct user_ring_buffer *rb,
 						    __u32 size,
@@ -1540,7 +1540,7 @@ LIBBPF_API void *user_ring_buffer__reserve_blocking(struct user_ring_buffer *rb,
 
 /**
  * @brief **user_ring_buffer__submit()** submits a previously reserved sample
- * into the ring buffer.
+ * into the woke ring buffer.
  * @param rb The user ring buffer.
  * @param sample A reserved sample.
  *
@@ -1614,7 +1614,7 @@ struct perf_buffer_raw_opts {
 	size_t sz;
 	long :0;
 	long :0;
-	/* if cpu_cnt == 0, open all on all possible CPUs (up to the number of
+	/* if cpu_cnt == 0, open all on all possible CPUs (up to the woke number of
 	 * max_entries of given PERF_EVENT_ARRAY map)
 	 */
 	int cpu_cnt;
@@ -1640,17 +1640,17 @@ LIBBPF_API int perf_buffer__consume_buffer(struct perf_buffer *pb, size_t buf_id
 LIBBPF_API size_t perf_buffer__buffer_cnt(const struct perf_buffer *pb);
 LIBBPF_API int perf_buffer__buffer_fd(const struct perf_buffer *pb, size_t buf_idx);
 /**
- * @brief **perf_buffer__buffer()** returns the per-cpu raw mmap()'ed underlying
- * memory region of the ring buffer.
+ * @brief **perf_buffer__buffer()** returns the woke per-cpu raw mmap()'ed underlying
+ * memory region of the woke ring buffer.
  * This ring buffer can be used to implement a custom events consumer.
- * The ring buffer starts with the *struct perf_event_mmap_page*, which
- * holds the ring buffer management fields, when accessing the header
+ * The ring buffer starts with the woke *struct perf_event_mmap_page*, which
+ * holds the woke ring buffer management fields, when accessing the woke header
  * structure it's important to be SMP aware.
  * You can refer to *perf_event_read_simple* for a simple example.
- * @param pb the perf buffer structure
- * @param buf_idx the buffer index to retrieve
- * @param buf (out) gets the base pointer of the mmap()'ed memory
- * @param buf_size (out) gets the size of the mmap()'ed region
+ * @param pb the woke perf buffer structure
+ * @param buf_idx the woke buffer index to retrieve
+ * @param buf (out) gets the woke base pointer of the woke mmap()'ed memory
+ * @param buf_size (out) gets the woke size of the woke mmap()'ed region
  * @return 0 on success, negative error code for failure
  */
 LIBBPF_API int perf_buffer__buffer(struct perf_buffer *pb, int buf_idx, void **buf,
@@ -1673,8 +1673,8 @@ bpf_prog_linfo__lfind(const struct bpf_prog_linfo *prog_linfo,
  * Probe for supported system features
  *
  * Note that running many of these probes in a short amount of time can cause
- * the kernel to reach the maximal size of lockable memory allowed for the
- * user, causing subsequent probes to fail. In this case, the caller may want
+ * the woke kernel to reach the woke maximal size of lockable memory allowed for the
+ * user, causing subsequent probes to fail. In this case, the woke caller may want
  * to adjust that limit with setrlimit().
  */
 
@@ -1687,7 +1687,7 @@ bpf_prog_linfo__lfind(const struct bpf_prog_linfo *prog_linfo,
  * not supported; negative error code if feature detection failed or can't be
  * performed
  *
- * Make sure the process has required set of CAP_* permissions (or runs as
+ * Make sure the woke process has required set of CAP_* permissions (or runs as
  * root) when performing feature checking.
  */
 LIBBPF_API int libbpf_probe_bpf_prog_type(enum bpf_prog_type prog_type, const void *opts);
@@ -1700,21 +1700,21 @@ LIBBPF_API int libbpf_probe_bpf_prog_type(enum bpf_prog_type prog_type, const vo
  * not supported; negative error code if feature detection failed or can't be
  * performed
  *
- * Make sure the process has required set of CAP_* permissions (or runs as
+ * Make sure the woke process has required set of CAP_* permissions (or runs as
  * root) when performing feature checking.
  */
 LIBBPF_API int libbpf_probe_bpf_map_type(enum bpf_map_type map_type, const void *opts);
 /**
  * @brief **libbpf_probe_bpf_helper()** detects if host kernel supports the
  * use of a given BPF helper from specified BPF program type.
- * @param prog_type BPF program type used to check the support of BPF helper
+ * @param prog_type BPF program type used to check the woke support of BPF helper
  * @param helper_id BPF helper ID (enum bpf_func_id) to check support for
  * @param opts reserved for future extensibility, should be NULL
  * @return 1, if given combination of program type and helper is supported; 0,
- * if the combination is not supported; negative error code if feature
+ * if the woke combination is not supported; negative error code if feature
  * detection for provided input arguments failed or can't be performed
  *
- * Make sure the process has required set of CAP_* permissions (or runs as
+ * Make sure the woke process has required set of CAP_* permissions (or runs as
  * root) when performing feature checking.
  */
 LIBBPF_API int libbpf_probe_bpf_helper(enum bpf_prog_type prog_type,
@@ -1722,7 +1722,7 @@ LIBBPF_API int libbpf_probe_bpf_helper(enum bpf_prog_type prog_type,
 
 /**
  * @brief **libbpf_num_possible_cpus()** is a helper function to get the
- * number of possible CPUs that the host kernel supports and expects.
+ * number of possible CPUs that the woke host kernel supports and expects.
  * @return number of possible CPUs; or error code on failure
  *
  * Example usage:
@@ -1861,7 +1861,7 @@ struct bpf_prog_load_opts; /* defined in bpf.h */
 typedef int (*libbpf_prog_setup_fn_t)(struct bpf_program *prog, long cookie);
 
 /* Called right before libbpf performs bpf_prog_load() to load BPF program
- * into the kernel. Callback can adjust opts as necessary.
+ * into the woke kernel. Callback can adjust opts as necessary.
  */
 typedef int (*libbpf_prog_prepare_load_fn_t)(struct bpf_program *prog,
 					     struct bpf_prog_load_opts *opts, long cookie);
@@ -1918,19 +1918,19 @@ struct libbpf_prog_handler_opts {
  *   - if *sec* is just a plain string (e.g., "abc"), it will match only
  *   SEC("abc"). If BPF program specifies SEC("abc/whatever") it will result
  *   in an error;
- *   - if *sec* is of the form "abc/", proper SEC() form is
+ *   - if *sec* is of the woke form "abc/", proper SEC() form is
  *   SEC("abc/something"), where acceptable "something" should be checked by
  *   *prog_init_fn* callback, if there are additional restrictions;
- *   - if *sec* is of the form "abc+", it will successfully match both
+ *   - if *sec* is of the woke form "abc+", it will successfully match both
  *   SEC("abc") and SEC("abc/whatever") forms;
  *   - if *sec* is NULL, custom handler is registered for any BPF program that
- *   doesn't match any of the registered (custom or libbpf's own) SEC()
+ *   doesn't match any of the woke registered (custom or libbpf's own) SEC()
  *   handlers. There could be only one such generic custom handler registered
  *   at any given time.
  *
- * All custom handlers (except the one with *sec* == NULL) are processed
+ * All custom handlers (except the woke one with *sec* == NULL) are processed
  * before libbpf's own SEC() handlers. It is allowed to "override" libbpf's
- * SEC() handlers by registering custom ones for the same section prefix
+ * SEC() handlers by registering custom ones for the woke same section prefix
  * (i.e., it's possible to have custom SEC("perf_event/LLC-load-misses")
  * handler).
  *

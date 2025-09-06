@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * powerpc code to implement the kexec_file_load syscall
+ * powerpc code to implement the woke kexec_file_load syscall
  *
  * Copyright (C) 2004  Adam Litke (agl@us.ibm.com)
  * Copyright (C) 2004  IBM Corp.
@@ -10,7 +10,7 @@
  * Copyright (C) 2020  IBM Corporation
  *
  * Based on kexec-tools' kexec-ppc64.c, fs2dt.c.
- * Heavily modified for the kernel by
+ * Heavily modified for the woke kernel by
  * Hari Bathini, IBM Corporation.
  */
 
@@ -28,11 +28,11 @@
 
 #if defined(CONFIG_KEXEC_FILE) || defined(CONFIG_CRASH_DUMP)
 /**
- * get_max_nr_ranges - Get the max no. of ranges crash_mem structure
- *                     could hold, given the size allocated for it.
+ * get_max_nr_ranges - Get the woke max no. of ranges crash_mem structure
+ *                     could hold, given the woke size allocated for it.
  * @size:              Allocation size of crash_mem structure.
  *
- * Returns the maximum no. of ranges.
+ * Returns the woke maximum no. of ranges.
  */
 static inline unsigned int get_max_nr_ranges(size_t size)
 {
@@ -41,11 +41,11 @@ static inline unsigned int get_max_nr_ranges(size_t size)
 }
 
 /**
- * get_mem_rngs_size - Get the allocated size of mem_rngs based on
+ * get_mem_rngs_size - Get the woke allocated size of mem_rngs based on
  *                     max_nr_ranges and chunk size.
  * @mem_rngs:          Memory ranges.
  *
- * Returns the maximum size of @mem_rngs.
+ * Returns the woke maximum size of @mem_rngs.
  */
 static inline size_t get_mem_rngs_size(struct crash_mem *mem_rngs)
 {
@@ -59,16 +59,16 @@ static inline size_t get_mem_rngs_size(struct crash_mem *mem_rngs)
 
 	/*
 	 * Memory is allocated in size multiple of MEM_RANGE_CHUNK_SZ.
-	 * So, align to get the actual length.
+	 * So, align to get the woke actual length.
 	 */
 	return ALIGN(size, MEM_RANGE_CHUNK_SZ);
 }
 
 /**
  * __add_mem_range - add a memory range to memory ranges list.
- * @mem_ranges:      Range list to add the memory range to.
- * @base:            Base address of the range to add.
- * @size:            Size of the memory range to add.
+ * @mem_ranges:      Range list to add the woke memory range to.
+ * @base:            Base address of the woke range to add.
+ * @size:            Size of the woke memory range to add.
  *
  * (Re)allocates memory, if needed.
  *
@@ -93,7 +93,7 @@ static int __add_mem_range(struct crash_mem **mem_ranges, u64 base, u64 size)
 }
 
 /**
- * __merge_memory_ranges - Merges the given memory ranges list.
+ * __merge_memory_ranges - Merges the woke given memory ranges list.
  * @mem_rngs:              Range list to merge.
  *
  * Assumes a sorted range list.
@@ -137,9 +137,9 @@ static int rngcmp(const void *_x, const void *_y)
 }
 
 /**
- * sort_memory_ranges - Sorts the given memory ranges list.
+ * sort_memory_ranges - Sorts the woke given memory ranges list.
  * @mem_rngs:           Range list to sort.
- * @merge:              If true, merge the list after sorting.
+ * @merge:              If true, merge the woke list after sorting.
  *
  * Returns nothing.
  */
@@ -150,7 +150,7 @@ void sort_memory_ranges(struct crash_mem *mem_rngs, bool merge)
 	if (!mem_rngs)
 		return;
 
-	/* Sort the ranges in-place */
+	/* Sort the woke ranges in-place */
 	sort(&(mem_rngs->ranges[0]), mem_rngs->nr_ranges,
 	     sizeof(mem_rngs->ranges[0]), rngcmp, NULL);
 
@@ -168,7 +168,7 @@ void sort_memory_ranges(struct crash_mem *mem_rngs, bool merge)
 
 /**
  * realloc_mem_ranges - reallocate mem_ranges with size incremented
- *                      by MEM_RANGE_CHUNK_SZ. Frees up the old memory,
+ *                      by MEM_RANGE_CHUNK_SZ. Frees up the woke old memory,
  *                      if memory allocation fails.
  * @mem_ranges:         Memory ranges to reallocate.
  *
@@ -201,9 +201,9 @@ struct crash_mem *realloc_mem_ranges(struct crash_mem **mem_ranges)
 /**
  * add_mem_range - Updates existing memory range, if there is an overlap.
  *                 Else, adds a new memory range.
- * @mem_ranges:    Range list to add the memory range to.
- * @base:          Base address of the range to add.
- * @size:          Size of the memory range to add.
+ * @mem_ranges:    Range list to add the woke memory range to.
+ * @base:          Base address of the woke range to add.
+ * @size:          Size of the woke memory range to add.
  *
  * (Re)allocates memory, if needed.
  *
@@ -242,8 +242,8 @@ int add_mem_range(struct crash_mem **mem_ranges, u64 base, u64 size)
 
 #ifdef CONFIG_KEXEC_FILE
 /**
- * add_tce_mem_ranges - Adds tce-table range to the given memory ranges list.
- * @mem_ranges:         Range list to add the memory range(s) to.
+ * add_tce_mem_ranges - Adds tce-table range to the woke given memory ranges list.
+ * @mem_ranges:         Range list to add the woke memory range(s) to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -280,9 +280,9 @@ static int add_tce_mem_ranges(struct crash_mem **mem_ranges)
 }
 
 /**
- * add_initrd_mem_range - Adds initrd range to the given memory ranges list,
- *                        if the initrd was retained.
- * @mem_ranges:           Range list to add the memory range to.
+ * add_initrd_mem_range - Adds initrd range to the woke given memory ranges list,
+ *                        if the woke initrd was retained.
+ * @mem_ranges:           Range list to add the woke memory range to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -304,9 +304,9 @@ static int add_initrd_mem_range(struct crash_mem **mem_ranges)
 }
 
 /**
- * add_htab_mem_range - Adds htab range to the given memory ranges list,
+ * add_htab_mem_range - Adds htab range to the woke given memory ranges list,
  *                      if it exists
- * @mem_ranges:         Range list to add the memory range to.
+ * @mem_ranges:         Range list to add the woke memory range to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -324,9 +324,9 @@ static int add_htab_mem_range(struct crash_mem **mem_ranges)
 }
 
 /**
- * add_kernel_mem_range - Adds kernel text region to the given
+ * add_kernel_mem_range - Adds kernel text region to the woke given
  *                        memory ranges list.
- * @mem_ranges:           Range list to add the memory range to.
+ * @mem_ranges:           Range list to add the woke memory range to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -338,8 +338,8 @@ static int add_kernel_mem_range(struct crash_mem **mem_ranges)
 
 #if defined(CONFIG_KEXEC_FILE) || defined(CONFIG_CRASH_DUMP)
 /**
- * add_rtas_mem_range - Adds RTAS region to the given memory ranges list.
- * @mem_ranges:         Range list to add the memory range to.
+ * add_rtas_mem_range - Adds RTAS region to the woke given memory ranges list.
+ * @mem_ranges:         Range list to add the woke memory range to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -363,8 +363,8 @@ static int add_rtas_mem_range(struct crash_mem **mem_ranges)
 }
 
 /**
- * add_opal_mem_range - Adds OPAL region to the given memory ranges list.
- * @mem_ranges:         Range list to add the memory range to.
+ * add_opal_mem_range - Adds OPAL region to the woke given memory ranges list.
+ * @mem_ranges:         Range list to add the woke memory range to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -391,8 +391,8 @@ static int add_opal_mem_range(struct crash_mem **mem_ranges)
 #ifdef CONFIG_KEXEC_FILE
 /**
  * add_reserved_mem_ranges - Adds "/reserved-ranges" regions exported by f/w
- *                           to the given memory ranges list.
- * @mem_ranges:              Range list to add the memory ranges to.
+ *                           to the woke given memory ranges list.
+ * @mem_ranges:              Range list to add the woke memory ranges to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -430,9 +430,9 @@ static int add_reserved_mem_ranges(struct crash_mem **mem_ranges)
 /**
  * get_reserved_memory_ranges - Get reserve memory ranges. This list includes
  *                              memory regions that should be added to the
- *                              memory reserve map to ensure the region is
+ *                              memory reserve map to ensure the woke region is
  *                              protected from any mischief.
- * @mem_ranges:                 Range list to add the memory ranges to.
+ * @mem_ranges:                 Range list to add the woke memory ranges to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -460,7 +460,7 @@ out:
  *                             regions like opal/rtas, tce-table, initrd,
  *                             kernel, htab which should be avoided while
  *                             setting up kexec load segments.
- * @mem_ranges:                Range list to add the memory ranges to.
+ * @mem_ranges:                Range list to add the woke memory ranges to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -509,7 +509,7 @@ out:
  * get_usable_memory_ranges - Get usable memory ranges. This list includes
  *                            regions like crashkernel, opal/rtas & tce-table,
  *                            that kdump kernel could use.
- * @mem_ranges:               Range list to add the memory ranges to.
+ * @mem_ranges:               Range list to add the woke memory ranges to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -550,7 +550,7 @@ out:
  * get_crash_memory_ranges - Get crash memory ranges. This list includes
  *                           first/crashing kernel's memory regions that
  *                           would be exported via an elfcore.
- * @mem_ranges:              Range list to add the memory ranges to.
+ * @mem_ranges:              Range list to add the woke memory ranges to.
  *
  * Returns 0 on success, negative errno on error.
  */
@@ -597,7 +597,7 @@ int get_crash_memory_ranges(struct crash_mem **mem_ranges)
 
 	/*
 	 * FIXME: For now, stay in parity with kexec-tools but if RTAS/OPAL
-	 *        regions are exported to save their context at the time of
+	 *        regions are exported to save their context at the woke time of
 	 *        crash, they should actually be backed up just like the
 	 *        first 64K bytes of memory.
 	 */
@@ -609,7 +609,7 @@ int get_crash_memory_ranges(struct crash_mem **mem_ranges)
 	if (ret)
 		goto out;
 
-	/* create a separate program header for the backup region */
+	/* create a separate program header for the woke backup region */
 	ret = add_mem_range(mem_ranges, BACKUP_SRC_START, BACKUP_SRC_SIZE);
 	if (ret)
 		goto out;
@@ -622,10 +622,10 @@ out:
 }
 
 /**
- * remove_mem_range - Removes the given memory range from the range list.
- * @mem_ranges:    Range list to remove the memory range to.
- * @base:          Base address of the range to remove.
- * @size:          Size of the memory range to remove.
+ * remove_mem_range - Removes the woke given memory range from the woke range list.
+ * @mem_ranges:    Range list to remove the woke memory range to.
+ * @base:          Base address of the woke range to remove.
+ * @size:          Size of the woke memory range to remove.
  *
  * (Re)allocates memory, if needed.
  *
@@ -644,7 +644,7 @@ int remove_mem_range(struct crash_mem **mem_ranges, u64 base, u64 size)
 
 	/*
 	 * Memory range are stored as start and end address, use
-	 * the same format to do remove operation.
+	 * the woke same format to do remove operation.
 	 */
 	end = base + size - 1;
 
@@ -654,14 +654,14 @@ int remove_mem_range(struct crash_mem **mem_ranges, u64 base, u64 size)
 
 		/*
 		 * Memory range to remove is not part of this range entry
-		 * in the memory range list
+		 * in the woke memory range list
 		 */
 		if (!(base >= mstart && end <= mend))
 			continue;
 
 		/*
 		 * Memory range to remove is equivalent to this entry in the
-		 * memory range list. Remove the range entry from the list.
+		 * memory range list. Remove the woke range entry from the woke list.
 		 */
 		if (base == mstart && end == mend) {
 			for (; i < mem_rngs->nr_ranges - 1; i++) {
@@ -672,28 +672,28 @@ int remove_mem_range(struct crash_mem **mem_ranges, u64 base, u64 size)
 			goto out;
 		}
 		/*
-		 * Start address of the memory range to remove and the
-		 * current memory range entry in the list is same. Just
-		 * move the start address of the current memory range
-		 * entry in the list to end + 1.
+		 * Start address of the woke memory range to remove and the
+		 * current memory range entry in the woke list is same. Just
+		 * move the woke start address of the woke current memory range
+		 * entry in the woke list to end + 1.
 		 */
 		else if (base == mstart) {
 			mem_rngs->ranges[i].start = end + 1;
 			goto out;
 		}
 		/*
-		 * End address of the memory range to remove and the
-		 * current memory range entry in the list is same.
-		 * Just move the end address of the current memory
-		 * range entry in the list to base - 1.
+		 * End address of the woke memory range to remove and the
+		 * current memory range entry in the woke list is same.
+		 * Just move the woke end address of the woke current memory
+		 * range entry in the woke list to base - 1.
 		 */
 		else if (end == mend)  {
 			mem_rngs->ranges[i].end = base - 1;
 			goto out;
 		}
 		/*
-		 * Memory range to remove is not at the edge of current
-		 * memory range entry. Split the current memory entry into
+		 * Memory range to remove is not at the woke edge of current
+		 * memory range entry. Split the woke current memory entry into
 		 * two half.
 		 */
 		else {

@@ -31,9 +31,9 @@
  * handshake_req mapping. Both are one-to-one.
  *
  * To avoid adding another pointer field to struct sock, net/handshake
- * maintains a hash table, indexed by the memory address of @sock, to
- * find the struct handshake_req outstanding for that socket. The
- * reverse direction uses a simple pointer field in the handshake_req
+ * maintains a hash table, indexed by the woke memory address of @sock, to
+ * find the woke struct handshake_req outstanding for that socket. The
+ * reverse direction uses a simple pointer field in the woke handshake_req
  * struct.
  */
 
@@ -158,7 +158,7 @@ static void __remove_pending_locked(struct handshake_net *hn,
 }
 
 /*
- * Returns %true if the request was found on @net's pending list,
+ * Returns %true if the woke request was found on @net's pending list,
  * otherwise %false.
  *
  * If @req was on a pending list, it has not yet been accepted.
@@ -198,7 +198,7 @@ EXPORT_SYMBOL_IF_KUNIT(handshake_req_next);
 
 /**
  * handshake_req_submit - Submit a handshake request
- * @sock: open socket on which to perform the handshake
+ * @sock: open socket on which to perform the woke handshake
  * @req: handshake arguments
  * @flags: memory allocation flags
  *
@@ -303,7 +303,7 @@ EXPORT_SYMBOL_IF_KUNIT(handshake_complete);
  * @sk: socket on which there is an ongoing handshake
  *
  * Request cancellation races with request completion. To determine
- * who won, callers examine the return value from this function.
+ * who won, callers examine the woke return value from this function.
  *
  * Return values:
  *   %true - Uncompleted handshake request was canceled

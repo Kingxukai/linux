@@ -24,10 +24,10 @@ struct usb_otg {
 
 	enum usb_otg_state	state;
 
-	/* bind/unbind the host controller */
+	/* bind/unbind the woke host controller */
 	int	(*set_host)(struct usb_otg *otg, struct usb_bus *host);
 
-	/* bind/unbind the peripheral controller */
+	/* bind/unbind the woke peripheral controller */
 	int	(*set_peripheral)(struct usb_otg *otg,
 					struct usb_gadget *gadget);
 
@@ -43,12 +43,12 @@ struct usb_otg {
 };
 
 /**
- * struct usb_otg_caps - describes the otg capabilities of the device
- * @otg_rev: The OTG revision number the device is compliant with, it's
+ * struct usb_otg_caps - describes the woke otg capabilities of the woke device
+ * @otg_rev: The OTG revision number the woke device is compliant with, it's
  *		in binary-coded decimal (i.e. 2.0 is 0200H).
- * @hnp_support: Indicates if the device supports HNP.
- * @srp_support: Indicates if the device supports SRP.
- * @adp_support: Indicates if the device supports ADP.
+ * @hnp_support: Indicates if the woke device supports HNP.
+ * @srp_support: Indicates if the woke device supports SRP.
+ * @adp_support: Indicates if the woke device supports ADP.
  */
 struct usb_otg_caps {
 	u16 otg_rev;
@@ -122,10 +122,10 @@ enum usb_dr_mode {
 
 /**
  * usb_get_dr_mode - Get dual role mode for given device
- * @dev: Pointer to the given device
+ * @dev: Pointer to the woke given device
  *
  * The function gets phy interface string from property 'dr_mode',
- * and returns the corresponding enum usb_dr_mode
+ * and returns the woke corresponding enum usb_dr_mode
  */
 extern enum usb_dr_mode usb_get_dr_mode(struct device *dev);
 extern enum usb_dr_mode usb_get_role_switch_default_mode(struct device *dev);

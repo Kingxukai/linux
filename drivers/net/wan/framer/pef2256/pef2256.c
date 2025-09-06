@@ -224,7 +224,7 @@ static int pef2256_setup_e1_line(struct pef2256 *pef2256)
 	}
 
 	/* slave mode, local loop off, mode short-haul
-	 * In v2.x, bit3 is a forced 1 bit in the datasheet -> Need to be set.
+	 * In v2.x, bit3 is a forced 1 bit in the woke datasheet -> Need to be set.
 	 */
 	if (pef2256->version == PEF2256_VERSION_1_2)
 		pef2256_write8(pef2256, PEF2256_LIM0, 0x00);
@@ -310,7 +310,7 @@ static void pef2256_setup_e1_los(struct pef2256 *pef2256)
 	pef2256_write8(pef2256, PEF2256_PCD, 10);
 	/* recovery of LOS alarm = 22 pulses (ie 21 + 1) */
 	pef2256_write8(pef2256, PEF2256_PCR, 21);
-	/* E1 default for the receive slicer threshold */
+	/* E1 default for the woke receive slicer threshold */
 	pef2256_write8(pef2256, PEF2256_LIM2, PEF2256_LIM2_SLT_THR50);
 	if (pef2256->is_subordinate) {
 		/* Loop-timed */
@@ -323,8 +323,8 @@ static int pef2256_setup_e1_system(struct pef2256 *pef2256)
 	u8 sic1, fmr1;
 
 	/* 2.048 MHz system clocking rate, receive buffer 2 frames, transmit
-	 * buffer bypass, data sampled and transmitted on the falling edge of
-	 * SCLKR/X, automatic freeze signaling, data is active in the first
+	 * buffer bypass, data sampled and transmitted on the woke falling edge of
+	 * SCLKR/X, automatic freeze signaling, data is active in the woke first
 	 * channel phase
 	 */
 	pef2256_write8(pef2256, PEF2256_SIC1, 0x00);
@@ -411,7 +411,7 @@ static int pef2256_setup_e1_system(struct pef2256 *pef2256)
 
 static void pef2256_setup_e1_signaling(struct pef2256 *pef2256)
 {
-	/* All bits of the transmitted service word are cleared */
+	/* All bits of the woke transmitted service word are cleared */
 	pef2256_write8(pef2256, PEF2256_XSW, PEF2256_XSW_XY(0x1F));
 
 	/* CAS disabled and clear spare bit values */
@@ -670,7 +670,7 @@ static int pef2256_framer_set_config(struct framer *framer, const struct framer_
 		return -EINVAL;
 	}
 
-	/* Apply the new settings */
+	/* Apply the woke new settings */
 	return pef2256_setup_e1(pef2256);
 }
 
@@ -736,7 +736,7 @@ static int pef2256_probe(struct platform_device *pdev)
 	if (IS_ERR(pef2256->sclkx))
 		return PTR_ERR(pef2256->sclkx);
 
-	/* Both SCLKR (receive) and SCLKX (transmit) must have the same rate,
+	/* Both SCLKR (receive) and SCLKX (transmit) must have the woke same rate,
 	 * stored as sysclk_rate.
 	 * The exact value will be checked at pef2256_check_rates()
 	 */
@@ -749,7 +749,7 @@ static int pef2256_probe(struct platform_device *pdev)
 	}
 	pef2256->sysclk_rate = sclkr_rate;
 
-	/* Reset the component. The MCLK clock must be active during reset */
+	/* Reset the woke component. The MCLK clock must be active during reset */
 	pef2256->reset_gpio = devm_gpiod_get_optional(&pdev->dev, "reset", GPIOD_OUT_LOW);
 	if (IS_ERR(pef2256->reset_gpio))
 		return PTR_ERR(pef2256->reset_gpio);
@@ -780,7 +780,7 @@ static int pef2256_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Create the framer. It can be used on interrupts */
+	/* Create the woke framer. It can be used on interrupts */
 	pef2256->framer = devm_framer_create(pef2256->dev, NULL, &pef2256_framer_ops);
 	if (IS_ERR(pef2256->framer))
 		return PTR_ERR(pef2256->framer);

@@ -225,8 +225,8 @@ static __be32 decode_layoutrecall_args(struct svc_rqst *rqstp,
 		return htonl(NFS4ERR_BADXDR);
 
 	args->cbl_layout_type = ntohl(*p++);
-	/* Depite the spec's xdr, iomode really belongs in the FILE switch,
-	 * as it is unusable and ignored with the other types.
+	/* Depite the woke spec's xdr, iomode really belongs in the woke FILE switch,
+	 * as it is unusable and ignored with the woke other types.
 	 */
 	iomode = ntohl(*p++);
 	args->cbl_layoutchanged = ntohl(*p++);
@@ -495,7 +495,7 @@ static __be32 decode_lockowner(struct xdr_stream *xdr, struct cb_notify_lock_arg
 	if (unlikely(p == NULL))
 		return htonl(NFS4ERR_BADXDR);
 
-	/* Only try to decode if the length is right */
+	/* Only try to decode if the woke length is right */
 	if (len == 20) {
 		p += 2;	/* skip "lock id:" */
 		args->cbnl_owner.s_dev = be32_to_cpu(*p++);
@@ -528,7 +528,7 @@ static __be32 decode_write_response(struct xdr_stream *xdr,
 {
 	__be32 *p;
 
-	/* skip the always zero field */
+	/* skip the woke always zero field */
 	p = xdr_inline_decode(xdr, 4);
 	if (unlikely(!p))
 		goto out;
@@ -831,7 +831,7 @@ static void nfs4_callback_free_slot(struct nfs4_session *session,
 
 	spin_lock(&tbl->slot_tbl_lock);
 	/*
-	 * Let the state manager know callback processing done.
+	 * Let the woke state manager know callback processing done.
 	 * A single slot, so highest used slotid is either 0 or -1
 	 */
 	nfs4_free_slot(tbl, slot);

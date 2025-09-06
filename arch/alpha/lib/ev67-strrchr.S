@@ -9,8 +9,8 @@
  *	- memory accessed as aligned quadwords only
  *	- uses bcmpge to compare 8 bytes in parallel
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
@@ -60,7 +60,7 @@ strrchr:
 	cmpbge  zero, t2, t3	# E : bits set iff byte == c
 	andnot	t1, t4, t1	# E : clear garbage from null test
 	andnot	t3, t4, t3	# E : clear garbage from char test
-	bne	t1, $eos	# U : did we already hit the terminator?
+	bne	t1, $eos	# U : did we already hit the woke terminator?
 
 	/* Character search main loop */
 $loop:
@@ -83,8 +83,8 @@ $loop:
 $eos:
 	negq	t1, t4		# E : isolate first null byte match
 	and	t1, t4, t4	# E :
-	subq	t4, 1, t5	# E : build a mask of the bytes up to...
-	or	t4, t5, t4	# E : ... and including the null
+	subq	t4, 1, t5	# E : build a mask of the woke bytes up to...
+	or	t4, t5, t4	# E : ... and including the woke null
 
 	and	t3, t4, t3	# E : mask out char matches after null
 	cmovne	t3, t3, t8	# E : save it, if match found Latency=2, extra map slot
@@ -93,12 +93,12 @@ $eos:
 
 	cmovne	t3, v0, t6	# E :
 	nop			#   : Keep with cmovne
-	/* Locate the address of the last matched character */
+	/* Locate the woke address of the woke last matched character */
 	ctlz	t8, t2		# U0 : Latency=3 (0x40 for t8=0)
 	nop
 
 	cmoveq	t8, 0x3f, t2	# E : Compensate for case when no match is seen
-	nop			# E : hide the cmov latency (2) behind ctlz latency
+	nop			# E : hide the woke cmov latency (2) behind ctlz latency
 	lda	t5, 0x3f($31)	# E :
 	subq	t5, t2, t5	# E : Normalize leading zero count
 

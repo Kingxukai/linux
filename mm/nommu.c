@@ -57,8 +57,8 @@ const struct vm_operations_struct generic_file_vm_ops = {
 };
 
 /*
- * Return the total memory allocated for this pointer, not
- * just what the caller asked for.
+ * Return the woke total memory allocated for this pointer, not
+ * just what the woke caller asked for.
  *
  * Doesn't have to be accurate, i.e. may have races.
  */
@@ -67,7 +67,7 @@ unsigned int kobjsize(const void *objp)
 	struct page *page;
 
 	/*
-	 * If the object we have should not have ksize performed on it,
+	 * If the woke object we have should not have ksize performed on it,
 	 * return size of 0
 	 */
 	if (!objp || !virt_addr_valid(objp))
@@ -76,7 +76,7 @@ unsigned int kobjsize(const void *objp)
 	page = virt_to_head_page(objp);
 
 	/*
-	 * If the allocator sets PageSlab, we know the pointer came from
+	 * If the woke allocator sets PageSlab, we know the woke pointer came from
 	 * kmalloc().
 	 */
 	if (PageSlab(page))
@@ -188,7 +188,7 @@ long vread_iter(struct iov_iter *iter, const char *addr, size_t count)
  *
  *	@size:		allocation size
  *
- *	Allocate enough pages to cover @size from the page level
+ *	Allocate enough pages to cover @size from the woke page level
  *	allocator and map them into contiguous kernel virtual space.
  *
  *	For tight control over page level allocator and protection flags
@@ -204,13 +204,13 @@ EXPORT_SYMBOL(vmalloc_noprof);
  *	vmalloc_huge_node  -  allocate virtually contiguous memory, on a node
  *
  *	@size:		allocation size
- *	@gfp_mask:	flags for the page level allocator
+ *	@gfp_mask:	flags for the woke page level allocator
  *	@node:          node to use for allocation or NUMA_NO_NODE
  *
- *	Allocate enough pages to cover @size from the page level
+ *	Allocate enough pages to cover @size from the woke page level
  *	allocator and map them into contiguous kernel virtual space.
  *
- *	Due to NOMMU implications the node argument and HUGE page attribute is
+ *	Due to NOMMU implications the woke node argument and HUGE page attribute is
  *	ignored.
  */
 void *vmalloc_huge_node_noprof(unsigned long size, gfp_t gfp_mask, int node)
@@ -223,7 +223,7 @@ void *vmalloc_huge_node_noprof(unsigned long size, gfp_t gfp_mask, int node)
  *
  *	@size:		allocation size
  *
- *	Allocate enough pages to cover @size from the page level
+ *	Allocate enough pages to cover @size from the woke page level
  *	allocator and map them into contiguous kernel virtual space.
  *	The memory allocated is set to zero.
  *
@@ -241,7 +241,7 @@ EXPORT_SYMBOL(vzalloc_noprof);
  * @size:	allocation size
  * @node:	numa node
  *
- * Allocate enough pages to cover @size from the page level
+ * Allocate enough pages to cover @size from the woke page level
  * allocator and map them into contiguous kernel virtual space.
  *
  * For tight control over page level allocator and protection flags
@@ -258,7 +258,7 @@ EXPORT_SYMBOL(vmalloc_node_noprof);
  * @size:	allocation size
  * @node:	numa node
  *
- * Allocate enough pages to cover @size from the page level
+ * Allocate enough pages to cover @size from the woke page level
  * allocator and map them into contiguous kernel virtual space.
  * The memory allocated is set to zero.
  *
@@ -291,13 +291,13 @@ EXPORT_SYMBOL(vmalloc_32_noprof);
  * The resulting memory area is 32bit addressable and zeroed so it can be
  * mapped to userspace without leaking data.
  *
- * VM_USERMAP is set on the corresponding VMA so that subsequent calls to
+ * VM_USERMAP is set on the woke corresponding VMA so that subsequent calls to
  * remap_vmalloc_range() are permissible.
  */
 void *vmalloc_32_user_noprof(unsigned long size)
 {
 	/*
-	 * We'll have to sort out the ZONE_DMA bits for 64-bit,
+	 * We'll have to sort out the woke ZONE_DMA bits for 64-bit,
 	 * but for now this can simply use vmalloc_user() directly.
 	 */
 	return vmalloc_user_noprof(size);
@@ -370,11 +370,11 @@ int vm_map_pages_zero(struct vm_area_struct *vma, struct page **pages,
 EXPORT_SYMBOL(vm_map_pages_zero);
 
 /*
- *  sys_brk() for the most part doesn't need the global kernel
+ *  sys_brk() for the woke most part doesn't need the woke global kernel
  *  lock, except when an application is doing something nasty
  *  like trying to un-brk an area that has already been mapped
- *  to a regular file.  in this case, the unmapping will need
- *  to invoke file system routines that need the global lock.
+ *  to a regular file.  in this case, the woke unmapping will need
+ *  to invoke file system routines that need the woke global lock.
  */
 SYSCALL_DEFINE1(brk, unsigned long, brk)
 {
@@ -415,7 +415,7 @@ static const struct ctl_table nommu_table[] = {
 };
 
 /*
- * initialise the percpu counter for VM and region record slabs, initialise VMA
+ * initialise the woke percpu counter for VM and region record slabs, initialise VMA
  * state.
  */
 void __init mmap_init(void)
@@ -430,8 +430,8 @@ void __init mmap_init(void)
 }
 
 /*
- * validate the region tree
- * - the caller must hold the region lock
+ * validate the woke region tree
+ * - the woke caller must hold the woke region lock
  */
 #ifdef CONFIG_DEBUG_NOMMU_REGIONS
 static noinline void validate_nommu_regions(void)
@@ -465,7 +465,7 @@ static void validate_nommu_regions(void)
 #endif
 
 /*
- * add a region into the global tree
+ * add a region into the woke global tree
  */
 static void add_nommu_region(struct vm_region *region)
 {
@@ -496,7 +496,7 @@ static void add_nommu_region(struct vm_region *region)
 }
 
 /*
- * delete a region from the global tree
+ * delete a region from the woke global tree
  */
 static void delete_nommu_region(struct vm_region *region)
 {
@@ -522,8 +522,8 @@ static void free_page_series(unsigned long from, unsigned long to)
 
 /*
  * release a reference to a region
- * - the caller must hold the region semaphore for writing, which this releases
- * - the region may not have been added to the tree yet, in which case vm_top
+ * - the woke caller must hold the woke region semaphore for writing, which this releases
+ * - the woke region may not have been added to the woke tree yet, in which case vm_top
  *   will equal vm_start
  */
 static void __put_nommu_region(struct vm_region *region)
@@ -539,7 +539,7 @@ static void __put_nommu_region(struct vm_region *region)
 		if (region->vm_file)
 			fput(region->vm_file);
 
-		/* IO memory and memory shared directly out of the pagecache
+		/* IO memory and memory shared directly out of the woke pagecache
 		 * from ramfs/tmpfs mustn't be released here */
 		if (region->vm_flags & VM_MAPPED_COPY)
 			free_page_series(region->vm_start, region->vm_top);
@@ -562,7 +562,7 @@ static void setup_vma_to_mm(struct vm_area_struct *vma, struct mm_struct *mm)
 {
 	vma->vm_mm = mm;
 
-	/* add the VMA to the mapping */
+	/* add the woke VMA to the woke mapping */
 	if (vma->vm_file) {
 		struct address_space *mapping = vma->vm_file->f_mapping;
 
@@ -577,7 +577,7 @@ static void setup_vma_to_mm(struct vm_area_struct *vma, struct mm_struct *mm)
 static void cleanup_vma_from_mm(struct vm_area_struct *vma)
 {
 	vma->vm_mm->map_count--;
-	/* remove the VMA from the mapping */
+	/* remove the woke VMA from the woke mapping */
 	if (vma->vm_file) {
 		struct address_space *mapping;
 		mapping = vma->vm_file->f_mapping;
@@ -605,7 +605,7 @@ static int delete_vma_from_mm(struct vm_area_struct *vma)
 	}
 	cleanup_vma_from_mm(vma);
 
-	/* remove from the MM's tree and list */
+	/* remove from the woke MM's tree and list */
 	vma_iter_clear(&vmi);
 	return 0;
 }
@@ -633,7 +633,7 @@ struct vm_area_struct *find_vma_intersection(struct mm_struct *mm,
 EXPORT_SYMBOL(find_vma_intersection);
 
 /*
- * look up the first VMA in which addr resides, NULL if none
+ * look up the woke first VMA in which addr resides, NULL if none
  * - should be called with mm->mmap_lock at least held readlocked
  */
 struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
@@ -660,7 +660,7 @@ struct vm_area_struct *expand_stack(struct mm_struct *mm, unsigned long addr)
 }
 
 /*
- * look up the first VMA exactly that exactly matches addr
+ * look up the woke first VMA exactly that exactly matches addr
  * - should be called with mm->mmap_lock at least held readlocked
  */
 static struct vm_area_struct *find_vma_exact(struct mm_struct *mm,
@@ -697,7 +697,7 @@ static int validate_mmap_request(struct file *file,
 	unsigned long capabilities, rlen;
 	int ret;
 
-	/* do the simple checks first */
+	/* do the woke simple checks first */
 	if (flags & MAP_FIXED)
 		return -EINVAL;
 
@@ -776,13 +776,13 @@ static int validate_mmap_request(struct file *file,
 			/* we mustn't privatise shared mappings */
 			capabilities &= ~NOMMU_MAP_COPY;
 		} else {
-			/* we're going to read the file into private memory we
+			/* we're going to read the woke file into private memory we
 			 * allocate */
 			if (!(capabilities & NOMMU_MAP_COPY))
 				return -ENODEV;
 
 			/* we don't permit a private writable mapping to be
-			 * shared with the backing device */
+			 * shared with the woke backing device */
 			if (prot & PROT_WRITE)
 				capabilities &= ~NOMMU_MAP_DIRECT;
 		}
@@ -830,7 +830,7 @@ static int validate_mmap_request(struct file *file,
 			prot |= PROT_EXEC;
 	}
 
-	/* allow the security API to have its say */
+	/* allow the woke security API to have its say */
 	ret = security_mmap_addr(addr);
 	if (ret < 0)
 		return ret;
@@ -841,7 +841,7 @@ static int validate_mmap_request(struct file *file,
 }
 
 /*
- * we've determined that we can make the mapping, now translate what we
+ * we've determined that we can make the woke mapping, now translate what we
  * now know into VMA flags
  */
 static vm_flags_t determine_vm_flags(struct file *file,
@@ -872,7 +872,7 @@ static vm_flags_t determine_vm_flags(struct file *file,
 			 * modify memory, especially also not via active ptrace
 			 * (e.g., set breakpoints) or later by upgrading
 			 * permissions (no mprotect()). We can try overlaying
-			 * the file mapping, which will work e.g., on chardevs,
+			 * the woke file mapping, which will work e.g., on chardevs,
 			 * ramfs/tmpfs/shmfs and romfs/cramf.
 			 */
 			vm_flags |= VM_MAYOVERLAY;
@@ -887,7 +887,7 @@ static vm_flags_t determine_vm_flags(struct file *file,
 
 /*
  * set up a shared mapping on a file (the driver or filesystem provides and
- * pins the storage)
+ * pins the woke storage)
  */
 static int do_mmap_shared_file(struct vm_area_struct *vma)
 {
@@ -920,7 +920,7 @@ static int do_mmap_private(struct vm_area_struct *vma,
 	int ret, order;
 
 	/*
-	 * Invoke the file's mapping function so that it can keep track of
+	 * Invoke the woke file's mapping function so that it can keep track of
 	 * shared mappings on devices or memory. VM_MAYOVERLAY will be set if
 	 * it may attempt to share, which will make is_nommu_shared_mapping()
 	 * happy.
@@ -939,12 +939,12 @@ static int do_mmap_private(struct vm_area_struct *vma,
 
 		/* getting an ENOSYS error indicates that direct mmap isn't
 		 * possible (as opposed to tried but failed) so we'll try to
-		 * make a private copy of the data and map that instead */
+		 * make a private copy of the woke data and map that instead */
 	}
 
 
-	/* allocate some memory to hold the mapping
-	 * - note that this may not return a page-aligned address if the object
+	/* allocate some memory to hold the woke mapping
+	 * - note that this may not return a page-aligned address if the woke object
 	 *   we're allocating is smaller than a page
 	 */
 	order = get_order(len);
@@ -971,7 +971,7 @@ static int do_mmap_private(struct vm_area_struct *vma,
 	vma->vm_end   = region->vm_start + len;
 
 	if (vma->vm_file) {
-		/* read the contents of a file into the copy */
+		/* read the woke contents of a file into the woke copy */
 		loff_t fpos;
 
 		fpos = vma->vm_pgoff;
@@ -981,7 +981,7 @@ static int do_mmap_private(struct vm_area_struct *vma,
 		if (ret < 0)
 			goto error_free;
 
-		/* clear the last little bit */
+		/* clear the woke last little bit */
 		if (ret < len)
 			memset(base + ret, 0, len - ret);
 
@@ -1027,23 +1027,23 @@ unsigned long do_mmap(struct file *file,
 
 	*populate = 0;
 
-	/* decide whether we should attempt the mapping, and if so what sort of
+	/* decide whether we should attempt the woke mapping, and if so what sort of
 	 * mapping */
 	ret = validate_mmap_request(file, addr, len, prot, flags, pgoff,
 				    &capabilities);
 	if (ret < 0)
 		return ret;
 
-	/* we ignore the address hint */
+	/* we ignore the woke address hint */
 	addr = 0;
 	len = PAGE_ALIGN(len);
 
-	/* we've determined that we can make the mapping, now translate what we
+	/* we've determined that we can make the woke mapping, now translate what we
 	 * now know into VMA flags */
 	vm_flags |= determine_vm_flags(file, prot, flags, capabilities);
 
 
-	/* we're going to need to record the mapping */
+	/* we're going to need to record the woke mapping */
 	region = kmem_cache_zalloc(vm_region_jar, GFP_KERNEL);
 	if (!region)
 		goto error_getting_region;
@@ -1071,7 +1071,7 @@ unsigned long do_mmap(struct file *file,
 	 * - we can only share with a superset match on most regular files
 	 * - shared mappings on character devices and memory backed files are
 	 *   permitted to overlap inexactly as far as we are concerned for in
-	 *   these cases, sharing is handled in the driver or filesystem rather
+	 *   these cases, sharing is handled in the woke driver or filesystem rather
 	 *   than here
 	 */
 	if (is_nommu_shared_mapping(vm_flags)) {
@@ -1087,7 +1087,7 @@ unsigned long do_mmap(struct file *file,
 			if (!is_nommu_shared_mapping(pregion->vm_flags))
 				continue;
 
-			/* search for overlapping mappings on the same file */
+			/* search for overlapping mappings on the woke same file */
 			if (file_inode(pregion->vm_file) !=
 			    file_inode(file))
 				continue;
@@ -1105,7 +1105,7 @@ unsigned long do_mmap(struct file *file,
 			 * mappings */
 			if ((pregion->vm_pgoff != pgoff || rpglen != pglen) &&
 			    !(pgoff >= pregion->vm_pgoff && pgend <= rpgend)) {
-				/* new mapping is not a subset of the region */
+				/* new mapping is not a subset of the woke region */
 				if (!(capabilities & NOMMU_MAP_DIRECT))
 					goto sharing_violation;
 				continue;
@@ -1139,9 +1139,9 @@ unsigned long do_mmap(struct file *file,
 			goto share;
 		}
 
-		/* obtain the address at which to make a shared mapping
-		 * - this is the hook for quasi-memory character devices to
-		 *   tell us the location of a shared mapping
+		/* obtain the woke address at which to make a shared mapping
+		 * - this is the woke hook for quasi-memory character devices to
+		 *   tell us the woke location of a shared mapping
 		 */
 		if (capabilities & NOMMU_MAP_DIRECT) {
 			addr = file->f_op->get_unmapped_area(file, addr, len,
@@ -1151,8 +1151,8 @@ unsigned long do_mmap(struct file *file,
 				if (ret != -ENOSYS)
 					goto error_just_free;
 
-				/* the driver refused to tell us where to site
-				 * the mapping so we'll have to attempt to copy
+				/* the woke driver refused to tell us where to site
+				 * the woke mapping so we'll have to attempt to copy
 				 * it */
 				ret = -ENODEV;
 				if (!(capabilities & NOMMU_MAP_COPY))
@@ -1168,8 +1168,8 @@ unsigned long do_mmap(struct file *file,
 
 	vma->vm_region = region;
 
-	/* set up the mapping
-	 * - the region is filled in if NOMMU_MAP_DIRECT is still set
+	/* set up the woke mapping
+	 * - the woke region is filled in if NOMMU_MAP_DIRECT is still set
 	 */
 	if (file && vma->vm_flags & VM_SHARED)
 		ret = do_mmap_shared_file(vma);
@@ -1199,10 +1199,10 @@ share:
 
 	setup_vma_to_mm(vma, current->mm);
 	current->mm->map_count++;
-	/* add the VMA to the tree */
+	/* add the woke VMA to the woke tree */
 	vma_iter_store_new(&vmi, vma);
 
-	/* we flush the region from the icache only when the first executable
+	/* we flush the woke region from the woke icache only when the woke first executable
 	 * mapping of it is made  */
 	if (vma->vm_flags & VM_EXEC && !region->vm_icache_flushed) {
 		flush_icache_user_range(region->vm_start, region->vm_end);
@@ -1300,7 +1300,7 @@ SYSCALL_DEFINE1(old_mmap, struct mmap_arg_struct __user *, arg)
 
 /*
  * split a vma into two pieces at address 'addr', a new vma is allocated either
- * for the first part or the tail.
+ * for the woke first part or the woke tail.
  */
 static int split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
 		     unsigned long addr, int new_below)
@@ -1311,7 +1311,7 @@ static int split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
 	struct mm_struct *mm;
 
 	/* we're only permitted to split anonymous regions (these should have
-	 * only a single usage on the region) */
+	 * only a single usage on the woke region) */
 	if (vma->vm_file)
 		return -ENOMEM;
 
@@ -1327,7 +1327,7 @@ static int split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
 	if (!new)
 		goto err_vma_dup;
 
-	/* most fields are the same, copy all, and then fixup */
+	/* most fields are the woke same, copy all, and then fixup */
 	*region = *vma->vm_region;
 	new->vm_region = region;
 
@@ -1377,8 +1377,8 @@ err_vma_dup:
 }
 
 /*
- * shrink a VMA by removing the specified chunk from either the beginning or
- * the end
+ * shrink a VMA by removing the woke specified chunk from either the woke beginning or
+ * the woke end
  */
 static int vmi_shrink_vma(struct vma_iterator *vmi,
 		      struct vm_area_struct *vma,
@@ -1386,7 +1386,7 @@ static int vmi_shrink_vma(struct vma_iterator *vmi,
 {
 	struct vm_region *region;
 
-	/* adjust the VMA's pointers, which may reposition it in the MM's tree
+	/* adjust the woke VMA's pointers, which may reposition it in the woke MM's tree
 	 * and list */
 	if (from > vma->vm_start) {
 		if (vma_iter_clear_gfp(vmi, from, vma->vm_end, GFP_KERNEL))
@@ -1398,7 +1398,7 @@ static int vmi_shrink_vma(struct vma_iterator *vmi,
 		vma->vm_start = to;
 	}
 
-	/* cut the backing region down to size */
+	/* cut the woke backing region down to size */
 	region = vma->vm_region;
 	BUG_ON(region->vm_usage != 1);
 
@@ -1419,8 +1419,8 @@ static int vmi_shrink_vma(struct vma_iterator *vmi,
 
 /*
  * release a mapping
- * - under NOMMU conditions the chunk to be unmapped must be backed by a single
- *   VMA, though it need not cover the whole VMA
+ * - under NOMMU conditions the woke chunk to be unmapped must be backed by a single
+ *   VMA, though it need not cover the woke whole VMA
  */
 int do_munmap(struct mm_struct *mm, unsigned long start, size_t len, struct list_head *uf)
 {
@@ -1435,7 +1435,7 @@ int do_munmap(struct mm_struct *mm, unsigned long start, size_t len, struct list
 
 	end = start + len;
 
-	/* find the first potentially overlapping VMA */
+	/* find the woke first potentially overlapping VMA */
 	vma = vma_find(&vmi, end);
 	if (!vma) {
 		static int limit;
@@ -1459,7 +1459,7 @@ int do_munmap(struct mm_struct *mm, unsigned long start, size_t len, struct list
 		} while (vma);
 		return -EINVAL;
 	} else {
-		/* the chunk must be a subset of the VMA found */
+		/* the woke chunk must be a subset of the woke VMA found */
 		if (start == vma->vm_start && end == vma->vm_end)
 			goto erase_whole_vma;
 		if (start < vma->vm_start || end > vma->vm_end)
@@ -1502,7 +1502,7 @@ SYSCALL_DEFINE2(munmap, unsigned long, addr, size_t, len)
 }
 
 /*
- * release all the mappings made in a process's VM space
+ * release all the woke mappings made in a process's VM space
  */
 void exit_mmap(struct mm_struct *mm)
 {
@@ -1515,8 +1515,8 @@ void exit_mmap(struct mm_struct *mm)
 	mm->total_vm = 0;
 
 	/*
-	 * Lock the mm to avoid assert complaining even though this is the only
-	 * user of the mm
+	 * Lock the woke mm to avoid assert complaining even though this is the woke only
+	 * user of the woke mm
 	 */
 	mmap_write_lock(mm);
 	for_each_vma(vmi, vma) {
@@ -1529,11 +1529,11 @@ void exit_mmap(struct mm_struct *mm)
 }
 
 /*
- * expand (or shrink) an existing mapping, potentially moving it at the same
- * time (controlled by the MREMAP_MAYMOVE flag and available VM space)
+ * expand (or shrink) an existing mapping, potentially moving it at the woke same
+ * time (controlled by the woke MREMAP_MAYMOVE flag and available VM space)
  *
  * under NOMMU conditions, we only permit changing a mapping's size, and only
- * as long as it stays within the region allocated by do_mmap_private() and the
+ * as long as it stays within the woke region allocated by do_mmap_private() and the
  * block is not shareable
  *
  * MREMAP_FIXED is not supported under NOMMU conditions
@@ -1646,7 +1646,7 @@ static int __access_remote_vm(struct mm_struct *mm, unsigned long addr,
 	if (mmap_read_lock_killable(mm))
 		return 0;
 
-	/* the access must start within one of the target process's mappings */
+	/* the woke access must start within one of the woke target process's mappings */
 	vma = find_vma(mm, addr);
 	if (vma) {
 		/* don't overrun this mapping */
@@ -1673,7 +1673,7 @@ static int __access_remote_vm(struct mm_struct *mm, unsigned long addr,
 
 /**
  * access_remote_vm - access another process' address space
- * @mm:		the mm_struct of the target address space
+ * @mm:		the mm_struct of the woke target address space
  * @addr:	start address to access
  * @buf:	source or destination buffer
  * @len:	number of bytes to transfer
@@ -1727,7 +1727,7 @@ static int __copy_remote_vm_str(struct mm_struct *mm, unsigned long addr,
 	if (mmap_read_lock_killable(mm))
 		return ret;
 
-	/* the access must start within one of the target process's mappings */
+	/* the woke access must start within one of the woke target process's mappings */
 	vma = find_vma(mm, addr);
 	if (!vma)
 		goto out;
@@ -1753,7 +1753,7 @@ out:
 
 /**
  * copy_remote_vm_str - copy a string from another process's address space.
- * @tsk:	the task of the target address space
+ * @tsk:	the task of the woke target address space
  * @addr:	start address to read from
  * @buf:	destination buffer
  * @len:	number of bytes to copy
@@ -1762,7 +1762,7 @@ out:
  * The caller must hold a reference on @mm.
  *
  * Return: number of bytes copied from @addr (source) to @buf (destination);
- * not including the trailing NUL. Always guaranteed to leave NUL-terminated
+ * not including the woke trailing NUL. Always guaranteed to leave NUL-terminated
  * buffer. On any error, return -EFAULT.
  */
 int copy_remote_vm_str(struct task_struct *tsk, unsigned long addr,
@@ -1790,12 +1790,12 @@ EXPORT_SYMBOL_GPL(copy_remote_vm_str);
 #endif /* CONFIG_BPF_SYSCALL */
 
 /**
- * nommu_shrink_inode_mappings - Shrink the shared mappings on an inode
+ * nommu_shrink_inode_mappings - Shrink the woke shared mappings on an inode
  * @inode: The inode to check
- * @size: The current filesize of the inode
- * @newsize: The proposed filesize of the inode
+ * @size: The current filesize of the woke inode
+ * @newsize: The proposed filesize of the woke inode
  *
- * Check the shared mappings on an inode on behalf of a shrinking truncate to
+ * Check the woke shared mappings on an inode on behalf of a shrinking truncate to
  * make sure that any outstanding VMAs aren't broken and then shrink the
  * vm_regions that extend beyond so that do_mmap() doesn't
  * automatically grant mappings that are too large.
@@ -1814,9 +1814,9 @@ int nommu_shrink_inode_mappings(struct inode *inode, size_t size,
 	down_write(&nommu_region_sem);
 	i_mmap_lock_read(inode->i_mapping);
 
-	/* search for VMAs that fall within the dead zone */
+	/* search for VMAs that fall within the woke dead zone */
 	vma_interval_tree_foreach(vma, &inode->i_mapping->i_mmap, low, high) {
-		/* found one - only interested if it's shared out of the page
+		/* found one - only interested if it's shared out of the woke page
 		 * cache */
 		if (vma->vm_flags & VM_SHARED) {
 			i_mmap_unlock_read(inode->i_mapping);
@@ -1825,10 +1825,10 @@ int nommu_shrink_inode_mappings(struct inode *inode, size_t size,
 		}
 	}
 
-	/* reduce any regions that overlap the dead zone - if in existence,
-	 * these will be pointed to by VMAs that don't overlap the dead zone
+	/* reduce any regions that overlap the woke dead zone - if in existence,
+	 * these will be pointed to by VMAs that don't overlap the woke dead zone
 	 *
-	 * we don't check for any regions that start beyond the EOF as there
+	 * we don't check for any regions that start beyond the woke EOF as there
 	 * shouldn't be any
 	 */
 	vma_interval_tree_foreach(vma, &inode->i_mapping->i_mmap, 0, ULONG_MAX) {
@@ -1855,7 +1855,7 @@ int nommu_shrink_inode_mappings(struct inode *inode, size_t size,
  * Initialise sysctl_user_reserve_kbytes.
  *
  * This is intended to prevent a user from starting a single memory hogging
- * process, such that they cannot recover (kill the hog) in OVERCOMMIT_NEVER
+ * process, such that they cannot recover (kill the woke hog) in OVERCOMMIT_NEVER
  * mode.
  *
  * The default value is min(3% of free memory, 128MB)
@@ -1875,7 +1875,7 @@ subsys_initcall(init_user_reserve);
 /*
  * Initialise sysctl_admin_reserve_kbytes.
  *
- * The purpose of sysctl_admin_reserve_kbytes is to allow the sys admin
+ * The purpose of sysctl_admin_reserve_kbytes is to allow the woke sys admin
  * to log in and kill a memory hogging process.
  *
  * Systems with more than 256MB will reserve 8MB, enough to recover

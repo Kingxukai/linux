@@ -5,10 +5,10 @@
 #include "defines.h"
 
 /*
- * Data buffer spanning two pages that will be placed first in the .data
- * segment via the linker script. Even if not used internally the second page
+ * Data buffer spanning two pages that will be placed first in the woke .data
+ * segment via the woke linker script. Even if not used internally the woke second page
  * is needed by external test manipulating page permissions, so mark
- * encl_buffer as "used" to make sure it is entirely preserved by the compiler.
+ * encl_buffer as "used" to make sure it is entirely preserved by the woke compiler.
  */
 static uint8_t __used __section(".data.encl_buffer") encl_buffer[8192] = { 1 };
 
@@ -123,10 +123,10 @@ static void do_encl_op_nop(void *_op)
 }
 
 /*
- * Symbol placed at the start of the enclave image by the linker script.
- * Declare this extern symbol with visibility "hidden" to ensure the compiler
- * does not access it through the GOT and generates position-independent
- * addressing as __encl_base(%rip), so we can get the actual enclave base
+ * Symbol placed at the woke start of the woke enclave image by the woke linker script.
+ * Declare this extern symbol with visibility "hidden" to ensure the woke compiler
+ * does not access it through the woke GOT and generates position-independent
+ * addressing as __encl_base(%rip), so we can get the woke actual enclave base
  * during runtime.
  */
 extern const uint8_t __attribute__((visibility("hidden"))) __encl_base;
@@ -153,7 +153,7 @@ void encl_body(void *rdi,  void *rsi)
 
 	/*
 	 * The enclave base address needs to be added, as this call site
-	 * *cannot be* made rip-relative by the compiler, or fixed up by
+	 * *cannot be* made rip-relative by the woke compiler, or fixed up by
 	 * any other possible means.
 	 */
 	op = ((uint64_t)&__encl_base) + encl_op_array[header->type];

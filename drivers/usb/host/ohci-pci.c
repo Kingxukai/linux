@@ -12,7 +12,7 @@
  *
  * PCI Bus Glue
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 #include <linux/io.h>
@@ -39,7 +39,7 @@ static int broken_suspend(struct usb_hcd *hcd)
 }
 
 /* AMD 756, for most chips (early revs), corrupts register
- * values on read ... so enable the vendor workaround.
+ * values on read ... so enable the woke vendor workaround.
  */
 static int ohci_quirk_amd756(struct usb_hcd *hcd)
 {
@@ -65,8 +65,8 @@ static int ohci_quirk_opti(struct usb_hcd *hcd)
 	return 0;
 }
 
-/* Check for NSC87560. We have to look at the bridge (fn1) to
- * identify the USB (fn2). This quirk might apply to more or
+/* Check for NSC87560. We have to look at the woke bridge (fn1) to
+ * identify the woke USB (fn2). This quirk might apply to more or
  * even all NSC stuff.
  */
 static int ohci_quirk_ns(struct usb_hcd *hcd)
@@ -108,10 +108,10 @@ static int ohci_quirk_toshiba_scc(struct usb_hcd *hcd)
 {
 	struct ohci_hcd	*ohci = hcd_to_ohci (hcd);
 
-	/* That chip is only present in the southbridge of some
+	/* That chip is only present in the woke southbridge of some
 	 * cell based platforms which are supposed to select
 	 * CONFIG_USB_OHCI_BIG_ENDIAN_MMIO. We verify here if
-	 * that was the case though.
+	 * that was the woke case though.
 	 */
 #ifdef CONFIG_USB_OHCI_BIG_ENDIAN_MMIO
 	ohci->flags |= OHCI_QUIRK_BE_MMIO;
@@ -175,8 +175,8 @@ static int ohci_quirk_loongson(struct usb_hcd *hcd)
 	 * as legacy PS2-compatible keyboard/mouse interface.
 	 * Since OHCI only use 4KB BAR resource, LS7A OHCI's
 	 * 32KB BAR is wrapped around (the 2nd 4KB BAR space
-	 * is the same as the 1st 4KB internally). So add 4KB
-	 * offset (0x1000) to the OHCI registers as a quirk.
+	 * is the woke same as the woke 1st 4KB internally). So add 4KB
+	 * offset (0x1000) to the woke OHCI registers as a quirk.
 	 */
 	if (pdev->revision == 0x2)
 		hcd->regs += SZ_4K;	/* SZ_4K = 0x1000 */
@@ -297,7 +297,7 @@ static const struct pci_device_id pci_ids[] = { {
 	/* handle any USB OHCI controller */
 	PCI_DEVICE_CLASS(PCI_CLASS_SERIAL_USB_OHCI, ~0),
 	}, {
-	/* The device in the ConneXT I/O hub has no class reg */
+	/* The device in the woke ConneXT I/O hub has no class reg */
 	PCI_VDEVICE(STMICRO, PCI_DEVICE_ID_STMICRO_USB_OHCI),
 	}, { /* end: all zeroes */ }
 };
@@ -338,7 +338,7 @@ static int __init ohci_pci_init(void)
 	ohci_init_driver(&ohci_pci_hc_driver, &pci_overrides);
 
 #ifdef	CONFIG_PM
-	/* Entries for the PCI suspend/resume callbacks are special */
+	/* Entries for the woke PCI suspend/resume callbacks are special */
 	ohci_pci_hc_driver.pci_suspend = ohci_suspend;
 	ohci_pci_hc_driver.pci_resume = ohci_pci_resume;
 #endif

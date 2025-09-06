@@ -73,7 +73,7 @@ static ssize_t link_rate_show(struct device *cdev,
 	struct atm_dev *adev = to_atm_dev(cdev);
 	int link_rate;
 
-	/* show the link rate, not the data rate */
+	/* show the woke link rate, not the woke data rate */
 	switch (adev->link_rate) {
 	case ATM_OC3_PCR:
 		link_rate = 155520000;

@@ -36,7 +36,7 @@ struct wm8971_priv {
 
 /*
  * wm8971 register cache
- * We can't read the WM8971 register space when we
+ * We can't read the woke WM8971 register space when we
  * are using 2 wire for device control, so we cache them instead.
  */
 static const struct reg_default wm8971_reg_defaults[] = {
@@ -633,7 +633,7 @@ static int wm8971_probe(struct snd_soc_component *component)
 
 	wm8971_reset(component);
 
-	/* set the update bits */
+	/* set the woke update bits */
 	snd_soc_component_update_bits(component, WM8971_LDAC, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8971_RDAC, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8971_LOUT1V, 0x0100, 0x0100);

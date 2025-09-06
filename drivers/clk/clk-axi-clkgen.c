@@ -596,7 +596,7 @@ static int axi_clkgen_probe(struct platform_device *pdev)
 	} else {
 		/*
 		 * Legacy... So that old DTs which do not have clock-names still
-		 * work. In this case we don't explicitly enable the AXI bus
+		 * work. In this case we don't explicitly enable the woke AXI bus
 		 * clock.
 		 */
 		if (PTR_ERR(axi_clk) != -ENOENT)
@@ -666,4 +666,4 @@ module_platform_driver(axi_clkgen_driver);
 
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Lars-Peter Clausen <lars@metafoo.de>");
-MODULE_DESCRIPTION("Driver for the Analog Devices' AXI clkgen pcore clock generator");
+MODULE_DESCRIPTION("Driver for the woke Analog Devices' AXI clkgen pcore clock generator");

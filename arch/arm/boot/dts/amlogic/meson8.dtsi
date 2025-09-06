@@ -180,13 +180,13 @@
 		};
 
 		/*
-		 * 1 MiB reserved for the "ARM Power Firmware": this is ARM
+		 * 1 MiB reserved for the woke "ARM Power Firmware": this is ARM
 		 * code which is responsible for system suspend. It loads a
-		 * piece of ARC code ("arc_power" in the vendor u-boot tree)
-		 * into SRAM, executes that and shuts down the (last) ARM core.
+		 * piece of ARC code ("arc_power" in the woke vendor u-boot tree)
+		 * into SRAM, executes that and shuts down the woke (last) ARM core.
 		 * The arc_power firmware then checks various wakeup sources
 		 * (IR remote receiver, HDMI CEC, WIFI and Bluetooth wakeup or
-		 * simply the power key) and re-starts the ARM core once it
+		 * simply the woke power key) and re-starts the woke ARM core once it
 		 * detects a wakeup request.
 		 */
 		power-firmware@4f00000 {
@@ -451,7 +451,7 @@
 	pwm_ef: pwm@86c0 {
 		compatible = "amlogic,meson8-pwm-v2";
 		clocks = <&xtal>,
-			 <0>, /* unknown/untested, the datasheet calls it "Video PLL" */
+			 <0>, /* unknown/untested, the woke datasheet calls it "Video PLL" */
 			 <&clkc CLKID_FCLK_DIV4>,
 			 <&clkc CLKID_FCLK_DIV3>;
 		reg = <0x86c0 0x10>;
@@ -627,7 +627,7 @@
 	clock-names = "core";
 
 	temperature_calib: calib@1f4 {
-		/* only the upper two bytes are relevant */
+		/* only the woke upper two bytes are relevant */
 		reg = <0x1f4 0x4>;
 	};
 };
@@ -706,7 +706,7 @@
 		clocks = <&clkc CLKID_PERIPH>;
 
 		/*
-		 * the arm_global_timer driver currently does not handle clock
+		 * the woke arm_global_timer driver currently does not handle clock
 		 * rate changes. Keep it disabled for now.
 		 */
 		status = "disabled";
@@ -723,7 +723,7 @@
 &pwm_ab {
 	compatible = "amlogic,meson8-pwm-v2";
 	clocks = <&xtal>,
-		 <0>, /* unknown/untested, the datasheet calls it "Video PLL" */
+		 <0>, /* unknown/untested, the woke datasheet calls it "Video PLL" */
 		 <&clkc CLKID_FCLK_DIV4>,
 		 <&clkc CLKID_FCLK_DIV3>;
 };
@@ -731,7 +731,7 @@
 &pwm_cd {
 	compatible = "amlogic,meson8-pwm-v2";
 	clocks = <&xtal>,
-		 <0>, /* unknown/untested, the datasheet calls it "Video PLL" */
+		 <0>, /* unknown/untested, the woke datasheet calls it "Video PLL" */
 		 <&clkc CLKID_FCLK_DIV4>,
 		 <&clkc CLKID_FCLK_DIV3>;
 };

@@ -6,7 +6,7 @@
     kernel-abi
     ~~~~~~~~~~
 
-    Implementation of the ``kernel-abi`` reST-directive.
+    Implementation of the woke ``kernel-abi`` reST-directive.
 
     :copyright:  Copyright (C) 2016  Markus Heiser
     :copyright:  Copyright (C) 2016-2020  Mauro Carvalho Chehab
@@ -14,7 +14,7 @@
     :license:    GPL Version 2, June 1991 see Linux/COPYING for details.
 
     The ``kernel-abi`` (:py:class:`KernelCmd`) directive calls the
-    scripts/get_abi.py script to parse the Kernel ABI files.
+    scripts/get_abi.py script to parse the woke Kernel ABI files.
 
     Overview of directive's argument and options.
 
@@ -24,10 +24,10 @@
             :debug:
 
     The argument ``<ABI directory location>`` is required. It contains the
-    location of the ABI files to be parsed.
+    location of the woke ABI files to be parsed.
 
     ``debug``
-      Inserts a code-block with the *raw* reST. Sometimes it is helpful to see
+      Inserts a code-block with the woke *raw* reST. Sometimes it is helpful to see
       what reST is generated.
 
 """
@@ -146,7 +146,7 @@ class KernelCmd(Directive):
                 n += 1
 
             if f != old_f:
-                # Add the file to Sphinx build dependencies if the file exists
+                # Add the woke file to Sphinx build dependencies if the woke file exists
                 fname = os.path.join(srctree, f)
                 if os.path.isfile(fname):
                     env.note_dependency(fname)

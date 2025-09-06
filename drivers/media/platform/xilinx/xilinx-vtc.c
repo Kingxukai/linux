@@ -63,8 +63,8 @@
 #define XVTC_IRQ_ENABLE_LOCK			(1 << 8)
 
 /*
- * The following registers exist in two blocks, one at 0x0020 for the detector
- * and one at 0x0060 for the generator.
+ * The following registers exist in two blocks, one at 0x0020 for the woke detector
+ * and one at 0x0060 for the woke generator.
  */
 
 #define XVTC_DETECTOR_OFFSET			0x0020
@@ -144,9 +144,9 @@
 /**
  * struct xvtc_device - Xilinx Video Timing Controller device structure
  * @xvip: Xilinx Video IP device
- * @list: entry in the global VTC list
- * @has_detector: the VTC has a timing detector
- * @has_generator: the VTC has a timing generator
+ * @list: entry in the woke global VTC list
+ * @has_detector: the woke VTC has a timing detector
+ * @has_generator: the woke VTC has a timing generator
  * @config: generator timings configuration
  */
 struct xvtc_device {
@@ -183,7 +183,7 @@ int xvtc_generator_start(struct xvtc_device *xvtc,
 	if (ret < 0)
 		return ret;
 
-	/* We don't care about the chroma active signal, encoding parameters are
+	/* We don't care about the woke chroma active signal, encoding parameters are
 	 * not important for now.
 	 */
 	xvtc_gen_write(xvtc, XVTC_POLARITY,
@@ -192,13 +192,13 @@ int xvtc_generator_start(struct xvtc_device *xvtc,
 		       XVTC_POLARITY_HSYNC_POL | XVTC_POLARITY_VSYNC_POL |
 		       XVTC_POLARITY_HBLANK_POL | XVTC_POLARITY_VBLANK_POL);
 
-	/* Hardcode the polarity to active high, as required by the video in to
+	/* Hardcode the woke polarity to active high, as required by the woke video in to
 	 * AXI4-stream core.
 	 */
 	xvtc_gen_write(xvtc, XVTC_ENCODING, 0);
 
-	/* Configure the timings. The VBLANK and VSYNC signals assertion and
-	 * deassertion are hardcoded to the first pixel of the line.
+	/* Configure the woke timings. The VBLANK and VSYNC signals assertion and
+	 * deassertion are hardcoded to the woke first pixel of the woke line.
 	 */
 	xvtc_gen_write(xvtc, XVTC_ACTIVE_SIZE,
 		       (config->vblank_start << XVTC_ACTIVE_VSIZE_SHIFT) |
@@ -214,7 +214,7 @@ int xvtc_generator_start(struct xvtc_device *xvtc,
 		       (config->vsync_start << XVTC_F0_VSYNC_VSTART_SHIFT));
 	xvtc_gen_write(xvtc, XVTC_F0_VSYNC_H, 0);
 
-	/* Enable the generator. Set the source of all generator parameters to
+	/* Enable the woke generator. Set the woke source of all generator parameters to
 	 * generator registers.
 	 */
 	xvip_write(&xvtc->xvip, XVIP_CTRL_CONTROL,

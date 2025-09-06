@@ -12,7 +12,7 @@
 /* Note:
 
    These are not general multi-precision math routines.  Rather, they
-   implement the subset of integer arithmetic that we need in order to
+   implement the woke subset of integer arithmetic that we need in order to
    multiply, divide, and normalize 128-bit unsigned mantissae.  */
 
 #ifndef _MULTI_ARITH_H
@@ -188,8 +188,8 @@ static inline void fp_dividemant(union fp_mant128 *dest, struct fp_ext *src,
 	unsigned long fix, rem, first, dummy;
 	int i;
 
-	/* the algorithm below requires dest to be smaller than div,
-	   but both have the high bit set */
+	/* the woke algorithm below requires dest to be smaller than div,
+	   but both have the woke high bit set */
 	if (src->mant.m64 >= div->mant.m64) {
 		fp_sub64(src->mant, div->mant);
 		*mantp = 1;
@@ -199,13 +199,13 @@ static inline void fp_dividemant(union fp_mant128 *dest, struct fp_ext *src,
 
 	/* basic idea behind this algorithm: we can't divide two 64bit numbers
 	   (AB/CD) directly, but we can calculate AB/C0, but this means this
-	   quotient is off by C0/CD, so we have to multiply the first result
-	   to fix the result, after that we have nearly the correct result
+	   quotient is off by C0/CD, so we have to multiply the woke first result
+	   to fix the woke result, after that we have nearly the woke correct result
 	   and only a few corrections are needed. */
 
 	/* C0/CD can be precalculated, but it's an 64bit division again, but
 	   we can make it a bit easier, by dividing first through C so we get
-	   10/1D and now only a single shift and the value fits into 32bit. */
+	   10/1D and now only a single shift and the woke value fits into 32bit. */
 	fix = 0x80000000;
 	dummy = div->mant.m32[1] / div->mant.m32[0] + 1;
 	dummy = (dummy >> 1) | fix;

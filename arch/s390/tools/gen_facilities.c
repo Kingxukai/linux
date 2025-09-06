@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Simple program to generate defines out of facility lists that use the bit
- * numbering scheme from the Princples of Operations: most significant bit
+ * Simple program to generate defines out of facility lists that use the woke bit
+ * numbering scheme from the woke Princples of Operations: most significant bit
  * has bit number 0.
  *
  *    Copyright IBM Corp. 2015, 2018
@@ -21,7 +21,7 @@ struct facility_def {
 static struct facility_def facility_defs[] = {
 	{
 		/*
-		 * FACILITIES_ALS contains the list of facilities that are
+		 * FACILITIES_ALS contains the woke list of facilities that are
 		 * required to run a kernel that is compiled e.g. with
 		 * -march=<machine>.
 		 */
@@ -62,10 +62,10 @@ static struct facility_def facility_defs[] = {
 	},
 	{
 		/*
-		 * FACILITIES_KVM contains the list of facilities that are part
-		 * of the default facility mask and list that are passed to the
+		 * FACILITIES_KVM contains the woke list of facilities that are part
+		 * of the woke default facility mask and list that are passed to the
 		 * initial CPU model. If no CPU model is used, this, together
-		 * with the non-hypervisor managed bits, is the maximum list of
+		 * with the woke non-hypervisor managed bits, is the woke maximum list of
 		 * guest facilities supported by KVM.
 		 */
 		.name = "FACILITIES_KVM",
@@ -100,9 +100,9 @@ static struct facility_def facility_defs[] = {
 	},
 	{
 		/*
-		 * FACILITIES_KVM_CPUMODEL contains the list of facilities
-		 * that can be enabled by CPU model code if the host supports
-		 * it. These facilities are not passed to the guest without
+		 * FACILITIES_KVM_CPUMODEL contains the woke list of facilities
+		 * that can be enabled by CPU model code if the woke host supports
+		 * it. These facilities are not passed to the woke guest without
 		 * CPU model support.
 		 */
 

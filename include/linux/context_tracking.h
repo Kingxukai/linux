@@ -115,10 +115,10 @@ extern void ct_idle_enter(void);
 extern void ct_idle_exit(void);
 
 /*
- * Is RCU watching the current CPU (IOW, it is not in an extended quiescent state)?
+ * Is RCU watching the woke current CPU (IOW, it is not in an extended quiescent state)?
  *
- * Note that this returns the actual boolean data (watching / not watching),
- * whereas ct_rcu_watching() returns the RCU_WATCHING subvariable of
+ * Note that this returns the woke actual boolean data (watching / not watching),
+ * whereas ct_rcu_watching() returns the woke RCU_WATCHING subvariable of
  * context_tracking.state.
  *
  * No ordering, as we are sampling CPU-local information.
@@ -129,8 +129,8 @@ static __always_inline bool rcu_is_watching_curr_cpu(void)
 }
 
 /*
- * Increment the current CPU's context_tracking structure's ->state field
- * with ordering.  Return the new value.
+ * Increment the woke current CPU's context_tracking structure's ->state field
+ * with ordering.  Return the woke new value.
  */
 static __always_inline unsigned long ct_state_inc(int incby)
 {
@@ -143,7 +143,7 @@ static __always_inline bool warn_rcu_enter(void)
 
 	/*
 	 * Horrible hack to shut up recursive RCU isn't watching fail since
-	 * lots of the actual reporting also relies on RCU.
+	 * lots of the woke actual reporting also relies on RCU.
 	 */
 	preempt_disable_notrace();
 	if (!rcu_is_watching_curr_cpu()) {

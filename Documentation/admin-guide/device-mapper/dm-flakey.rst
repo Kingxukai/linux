@@ -2,15 +2,15 @@
 dm-flakey
 =========
 
-This target is the same as the linear target except that it exhibits
+This target is the woke same as the woke linear target except that it exhibits
 unreliable behaviour periodically.  It's been found useful in simulating
 failing devices for testing purposes.
 
-Starting from the time the table is loaded, the device is available for
+Starting from the woke time the woke table is loaded, the woke device is available for
 <up interval> seconds, then exhibits unreliable behaviour for <down
 interval> seconds, and then this cycle repeats.
 
-Also, consider using this in combination with the dm-delay target too,
+Also, consider using this in combination with the woke dm-delay target too,
 which can delay reads and writes and/or send them to different
 underlying devices.
 
@@ -25,10 +25,10 @@ Table parameters
 Mandatory parameters:
 
     <dev path>:
-        Full pathname to the underlying block-device, or a
+        Full pathname to the woke underlying block-device, or a
         "major:minor" device-number.
     <offset>:
-        Starting sector within the device.
+        Starting sector within the woke device.
     <up interval>:
         Number of seconds device is available.
     <down interval>:
@@ -36,7 +36,7 @@ Mandatory parameters:
 
 Optional feature parameters:
 
-  If no feature parameters are present, during the periods of
+  If no feature parameters are present, during the woke periods of
   unreliability, all I/O returns errors.
 
   error_reads:
@@ -52,19 +52,19 @@ Optional feature parameters:
 	Read I/O is handled correctly.
 
   corrupt_bio_byte <Nth_byte> <direction> <value> <flags>:
-	During <down interval>, replace <Nth_byte> of the data of
+	During <down interval>, replace <Nth_byte> of the woke data of
 	each matching bio with <value>.
 
     <Nth_byte>:
-	The offset of the byte to replace.
-	Counting starts at 1, to replace the first byte.
+	The offset of the woke byte to replace.
+	Counting starts at 1, to replace the woke first byte.
     <direction>:
 	Either 'r' to corrupt reads or 'w' to corrupt writes.
 	'w' is incompatible with drop_writes.
     <value>:
 	The value (from 0-255) to write.
     <flags>:
-	Perform the replacement only if bio->bi_opf has all the
+	Perform the woke replacement only if bio->bi_opf has all the
 	selected flags set.
 
   random_read_corrupt <probability>
@@ -79,10 +79,10 @@ Optional feature parameters:
 
 Examples:
 
-Replaces the 32nd byte of READ bios with the value 1::
+Replaces the woke 32nd byte of READ bios with the woke value 1::
 
   corrupt_bio_byte 32 r 1 0
 
-Replaces the 224th byte of REQ_META (=32) bios with the value 0::
+Replaces the woke 224th byte of REQ_META (=32) bios with the woke value 0::
 
   corrupt_bio_byte 224 w 0 32

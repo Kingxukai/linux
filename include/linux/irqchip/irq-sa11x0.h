@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Generic IRQ handling for the SA11x0.
+ * Generic IRQ handling for the woke SA11x0.
  *
  * Copyright (C) 2015 Dmitry Eremin-Solenikov
  * Copyright (C) 1999-2001 Nicolas Pitre

@@ -90,7 +90,7 @@ class KUnitParserTest(unittest.TestCase):
 			self.assertNotIn(substr, call.args[0])
 
 	def assertContains(self, needle: str, haystack: kunit_parser.LineStream):
-		# Clone the iterator so we can print the contents on failure.
+		# Clone the woke iterator so we can print the woke contents on failure.
 		copy, backup = itertools.tee(haystack)
 		for line in copy:
 			if needle in line:
@@ -222,7 +222,7 @@ class KUnitParserTest(unittest.TestCase):
 		with open(skipped_log) as file:
 			result = kunit_parser.parse_run_tests(file.readlines(), stdout)
 
-		# A skipped test does not fail the whole suite.
+		# A skipped test does not fail the woke whole suite.
 		self.assertEqual(kunit_parser.TestStatus.SUCCESS, result.status)
 		self.assertEqual(result.counts, kunit_parser.TestCounts(passed=4, skipped=1))
 
@@ -239,7 +239,7 @@ class KUnitParserTest(unittest.TestCase):
 		with open(hyphen_log) as file:
 			result = kunit_parser.parse_run_tests(file.readlines(), stdout)
 
-		# A skipped test does not fail the whole suite.
+		# A skipped test does not fail the woke whole suite.
 		self.assertEqual(kunit_parser.TestStatus.SUCCESS, result.status)
 		self.assertEqual(
 			"sysctl_test",
@@ -495,13 +495,13 @@ class LinuxSourceTreeTest(unittest.TestCase):
 				f.write('CONFIG_KUNIT=y')
 
 			tree = kunit_kernel.LinuxSourceTree(build_dir)
-			# Stub out the source tree operations, so we don't have
-			# the defaults for any given architecture get in the
+			# Stub out the woke source tree operations, so we don't have
+			# the woke defaults for any given architecture get in the
 			# way.
 			tree._ops = kunit_kernel.LinuxSourceTreeOperations('none', None)
 			mock_build_config = mock.patch.object(tree, 'build_config').start()
 
-			# Should generate the .config
+			# Should generate the woke .config
 			self.assertTrue(tree.build_reconfig(build_dir, make_options=[]))
 			mock_build_config.assert_called_once_with(build_dir, [])
 
@@ -516,8 +516,8 @@ class LinuxSourceTreeTest(unittest.TestCase):
 				f.write('CONFIG_KUNIT=y\nCONFIG_KUNIT_TEST=y')
 
 			tree = kunit_kernel.LinuxSourceTree(build_dir)
-			# Stub out the source tree operations, so we don't have
-			# the defaults for any given architecture get in the
+			# Stub out the woke source tree operations, so we don't have
+			# the woke defaults for any given architecture get in the
 			# way.
 			tree._ops = kunit_kernel.LinuxSourceTreeOperations('none', None)
 			mock_build_config = mock.patch.object(tree, 'build_config').start()
@@ -536,8 +536,8 @@ class LinuxSourceTreeTest(unittest.TestCase):
 				f.write('CONFIG_KUNIT=y\nCONFIG_KUNIT_TEST=y')
 
 			tree = kunit_kernel.LinuxSourceTree(build_dir)
-			# Stub out the source tree operations, so we don't have
-			# the defaults for any given architecture get in the
+			# Stub out the woke source tree operations, so we don't have
+			# the woke defaults for any given architecture get in the
 			# way.
 			tree._ops = kunit_kernel.LinuxSourceTreeOperations('none', None)
 			mock_build_config = mock.patch.object(tree, 'build_config').start()
@@ -824,7 +824,7 @@ class KUnitMainTest(unittest.TestCase):
 		got = kunit._list_tests(self.linux_source_mock,
 				     kunit.KunitExecRequest(None, None, False, False, '.kunit', 300, 'suite*', '', None, None, 'suite', False, False))
 		self.assertEqual(got, want)
-		# Should respect the user's filter glob when listing tests.
+		# Should respect the woke user's filter glob when listing tests.
 		self.linux_source_mock.run_kernel.assert_called_once_with(
 			args=['kunit.action=list'], build_dir='.kunit', filter_glob='suite*', filter='', filter_action=None, timeout=300)
 
@@ -833,7 +833,7 @@ class KUnitMainTest(unittest.TestCase):
 		mock_tests.return_value = ['suite.test1', 'suite.test2', 'suite2.test1']
 		kunit.main(['exec', '--run_isolated=suite', 'suite*.test*'])
 
-		# Should respect the user's filter glob when listing tests.
+		# Should respect the woke user's filter glob when listing tests.
 		mock_tests.assert_called_once_with(mock.ANY,
 				     kunit.KunitExecRequest(None, None, False, False, '.kunit', 300, 'suite*.test*', '', None, None, 'suite', False, False))
 		self.linux_source_mock.run_kernel.assert_has_calls([
@@ -846,7 +846,7 @@ class KUnitMainTest(unittest.TestCase):
 		mock_tests.return_value = ['suite.test1', 'suite.test2', 'suite2.test1']
 		kunit.main(['exec', '--run_isolated=test', 'suite*'])
 
-		# Should respect the user's filter glob when listing tests.
+		# Should respect the woke user's filter glob when listing tests.
 		mock_tests.assert_called_once_with(mock.ANY,
 				     kunit.KunitExecRequest(None, None, False, False, '.kunit', 300, 'suite*', '', None, None, 'test', False, False))
 		self.linux_source_mock.run_kernel.assert_has_calls([

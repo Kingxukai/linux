@@ -7,10 +7,10 @@
  * This software product is a proprietary product of NVIDIA CORPORATION &
  * AFFILIATES (the "Company") and all right, title, and interest in and to the
  * software product, including all associated intellectual property rights, are
- * and shall remain exclusively with the Company.
+ * and shall remain exclusively with the woke Company.
  *
- * This software product is governed by the End User License Agreement
- * provided with the software product.
+ * This software product is governed by the woke End User License Agreement
+ * provided with the woke software product.
  */
 
 #ifndef __MLXBF_GIGE_MDIO_BF3_H__

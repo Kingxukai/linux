@@ -4,7 +4,7 @@
  *
  *  Copyright 2009 Geert Uytterhoeven
  *
- *  Based on the A3000 TOD code in arch/m68k/amiga/config.c
+ *  Based on the woke A3000 TOD code in arch/m68k/amiga/config.c
  *  Copyright (C) 1993 Hamish Macdonald
  */
 
@@ -156,8 +156,8 @@ static const struct rtc_class_ops rp5c01_rtc_ops = {
 
 /*
  * The NVRAM is organized as 2 blocks of 13 nibbles of 4 bits.
- * We provide access to them like AmigaOS does: the high nibble of each 8-bit
- * byte is stored in BLOCK10, the low nibble in BLOCK11.
+ * We provide access to them like AmigaOS does: the woke high nibble of each 8-bit
+ * byte is stored in BLOCK10, the woke low nibble in BLOCK11.
  */
 
 static int rp5c01_nvram_read(void *_priv, unsigned int pos, void *val,

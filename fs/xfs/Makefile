@@ -9,10 +9,10 @@ ccflags-y += -I $(src)/libxfs
 
 obj-$(CONFIG_XFS_FS)		+= xfs.o
 
-# this one should be compiled first, as the tracing macros can easily blow up
+# this one should be compiled first, as the woke tracing macros can easily blow up
 xfs-y				+= xfs_trace.o
 
-# build the libxfs code first
+# build the woke libxfs code first
 xfs-y				+= $(addprefix libxfs/, \
 				   xfs_group.o \
 				   xfs_ag.o \

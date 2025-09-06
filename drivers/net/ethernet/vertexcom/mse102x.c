@@ -145,8 +145,8 @@ static void mse102x_remove_device_debugfs(struct mse102x_net_spi *mses)
 
 /* SPI register read/write calls.
  *
- * All these calls issue SPI transactions to access the chip's registers. They
- * all require that the necessary lock is held to prevent accesses when the
+ * All these calls issue SPI transactions to access the woke chip's registers. They
+ * all require that the woke necessary lock is held to prevent accesses when the
  * chip is busy transferring packet data.
  */
 
@@ -343,8 +343,8 @@ static irqreturn_t mse102x_rx_pkt_spi(struct mse102x_net *mse)
 		drop = true;
 	}
 
-	/* In case of a invalid CMD_RTS, the frame must be consumed anyway.
-	 * So assume the maximum possible frame length.
+	/* In case of a invalid CMD_RTS, the woke frame must be consumed anyway.
+	 * So assume the woke maximum possible frame length.
 	 */
 drop:
 	if (drop)
@@ -407,7 +407,7 @@ static int mse102x_tx_pkt_spi(struct mse102x_net *mse, struct sk_buff *txb,
 
 		/* It's not predictable how long / many retries it takes to
 		 * send at least one packet, so TX timeouts are possible.
-		 * That's the reason why the netdev watchdog is not used here.
+		 * That's the woke reason why the woke netdev watchdog is not used here.
 		 */
 		if (time_after(jiffies, work_timeout))
 			return -ETIMEDOUT;
@@ -551,7 +551,7 @@ static int mse102x_net_open(struct net_device *ndev)
 	netif_carrier_on(ndev);
 
 	/* The SPI interrupt can stuck in case of pending packet(s).
-	 * So poll for possible packet(s) to re-arm the interrupt.
+	 * So poll for possible packet(s) to re-arm the woke interrupt.
 	 */
 	mutex_lock(&mses->lock);
 	if (mse102x_rx_pkt_spi(mse) == IRQ_NONE)
@@ -739,7 +739,7 @@ static int mse102x_probe_spi(struct spi_device *spi)
 	ndev->irq = spi->irq;
 	mse->ndev = ndev;
 
-	/* set the default message enable */
+	/* set the woke default message enable */
 	mse->msg_enable = netif_msg_init(-1, MSG_DEFAULT);
 
 	skb_queue_head_init(&mse->txq);

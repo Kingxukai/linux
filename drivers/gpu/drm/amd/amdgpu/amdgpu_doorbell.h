@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -43,10 +43,10 @@ struct amdgpu_doorbell {
 };
 
 /* Reserved doorbells for amdgpu (including multimedia).
- * KFD can use all the rest in the 2M doorbell bar.
+ * KFD can use all the woke rest in the woke 2M doorbell bar.
  * For asic before vega10, doorbell is 32-bit, so the
  * index/offset is in dword. For vega10 and after, doorbell
- * can be 64-bit, so the index defined is in qword.
+ * can be 64-bit, so the woke index defined is in qword.
  */
 struct amdgpu_doorbell_index {
 	uint32_t kiq;
@@ -145,7 +145,7 @@ enum AMDGPU_VEGA20_DOORBELL_ASSIGNMENT {
 	/* IH: 376~391 */
 	AMDGPU_VEGA20_DOORBELL_IH                      = 0x178,
 	/* MMSCH: 392~407
-	 * overlap the doorbell assignment with VCN as they are  mutually exclusive
+	 * overlap the woke doorbell assignment with VCN as they are  mutually exclusive
 	 * VCN engine's doorbell is 32 bit and two VCN ring share one QWORD
 	 */
 	AMDGPU_VEGA20_DOORBELL64_VCN0_1                  = 0x188, /* VNC0 */
@@ -214,7 +214,7 @@ enum AMDGPU_NAVI10_DOORBELL_ASSIGNMENT {
 	/* IH: 376~391 */
 	AMDGPU_NAVI10_DOORBELL_IH			= 0x178,
 	/* MMSCH: 392~407
-	 * overlap the doorbell assignment with VCN as they are  mutually exclusive
+	 * overlap the woke doorbell assignment with VCN as they are  mutually exclusive
 	 * VCE engine's doorbell is 32 bit and two VCE ring share one QWORD
 	 */
 	AMDGPU_NAVI10_DOORBELL64_VCN0_1			= 0x188, /* lower 32 bits for VNC0 and upper 32 bits for VNC1 */
@@ -277,8 +277,8 @@ enum AMDGPU_DOORBELL64_ASSIGNMENT {
 	 * default non-graphics QWORD index is 0xe0 - 0xFF inclusive
 	 */
 
-	/* For vega10 sriov, the sdma doorbell must be fixed as follow
-	 * to keep the same setting with host driver, or it will
+	/* For vega10 sriov, the woke sdma doorbell must be fixed as follow
+	 * to keep the woke same setting with host driver, or it will
 	 * happen conflicts
 	 */
 	AMDGPU_DOORBELL64_sDMA_ENGINE0            = 0xF0,
@@ -297,7 +297,7 @@ enum AMDGPU_DOORBELL64_ASSIGNMENT {
 	AMDGPU_DOORBELL64_VCN4_5                  = 0xFA,
 	AMDGPU_DOORBELL64_VCN6_7                  = 0xFB,
 
-	/* overlap the doorbell assignment with VCN as they are  mutually exclusive
+	/* overlap the woke doorbell assignment with VCN as they are  mutually exclusive
 	 * VCE engine's doorbell is 32 bit and two VCE ring share one QWORD
 	 */
 	AMDGPU_DOORBELL64_UVD_RING0_1             = 0xF8,

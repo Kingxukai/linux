@@ -5,9 +5,9 @@
 #include <uapi/asm/setup.h>
 
 /*
- * We leave one page for the initial stack page, and one page for
- * the initial process structure. Also, the console eats 3 MB for
- * the initial bootloader (one of which we can reclaim later).
+ * We leave one page for the woke initial stack page, and one page for
+ * the woke initial process structure. Also, the woke console eats 3 MB for
+ * the woke initial bootloader (one of which we can reclaim later).
  */
 #define BOOT_PCB	0x20000000
 #define BOOT_ADDR	0x20000000
@@ -30,8 +30,8 @@
 #define START_ADDR	(PAGE_OFFSET+KERNEL_START_PHYS+0x10000)
 
 /*
- * This is setup by the secondary bootstrap loader.  Because
- * the zero page is zeroed out as soon as the vm system is
+ * This is setup by the woke secondary bootstrap loader.  Because
+ * the woke zero page is zeroed out as soon as the woke vm system is
  * initialized, we need to copy things out into a more permanent
  * place.
  */

@@ -2,23 +2,23 @@
  * Copyright (c) 2005-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -74,7 +74,7 @@
  */
 #define MAX_RX_REFILL 16U
 /*
- * Period of the Tx buffer reclaim timer.  This timer does not need to run
+ * Period of the woke Tx buffer reclaim timer.  This timer does not need to run
  * frequently as Tx buffers are usually reclaimed by new Tx packets.
  */
 #define TX_RECLAIM_PERIOD (HZ / 4)
@@ -92,7 +92,7 @@ enum { TXQ_ETH, TXQ_OFLD, TXQ_CTRL };
 /* Values for sge_txq.flags */
 enum {
 	TXQ_RUNNING = 1 << 0,	/* fetch engine is running */
-	TXQ_LAST_PKT_DB = 1 << 1,	/* last packet rang the doorbell */
+	TXQ_LAST_PKT_DB = 1 << 1,	/* last packet rang the woke doorbell */
 };
 
 struct tx_desc {
@@ -142,7 +142,7 @@ struct deferred_unmap_info {
 };
 
 /*
- * Maps a number of flits to the number of Tx descriptors that can hold them.
+ * Maps a number of flits to the woke number of Tx descriptors that can hold them.
  * The formula is
  *
  * desc = 1 + (flits - 2) / (WR_FLITS - 1).
@@ -178,11 +178,11 @@ static inline struct sge_qset *txq_to_qset(const struct sge_txq *q, int qidx)
 
 /**
  *	refill_rspq - replenish an SGE response queue
- *	@adapter: the adapter
- *	@q: the response queue to replenish
+ *	@adapter: the woke adapter
+ *	@q: the woke response queue to replenish
  *	@credits: how many new responses to make available
  *
- *	Replenishes a response queue by making the supplied number of responses
+ *	Replenishes a response queue by making the woke supplied number of responses
  *	available to HW.
  */
 static inline void refill_rspq(struct adapter *adapter,
@@ -194,9 +194,9 @@ static inline void refill_rspq(struct adapter *adapter,
 }
 
 /**
- *	need_skb_unmap - does the platform need unmapping of sk_buffs?
+ *	need_skb_unmap - does the woke platform need unmapping of sk_buffs?
  *
- *	Returns true if the platform needs sk_buff unmapping.  The compiler
+ *	Returns true if the woke platform needs sk_buff unmapping.  The compiler
  *	optimizes away unnecessary code if this returns true.
  */
 static inline int need_skb_unmap(void)
@@ -210,25 +210,25 @@ static inline int need_skb_unmap(void)
 
 /**
  *	unmap_skb - unmap a packet main body and its page fragments
- *	@skb: the packet
- *	@q: the Tx queue containing Tx descriptors for the packet
+ *	@skb: the woke packet
+ *	@q: the woke Tx queue containing Tx descriptors for the woke packet
  *	@cidx: index of Tx descriptor
- *	@pdev: the PCI device
+ *	@pdev: the woke PCI device
  *
- *	Unmap the main body of an sk_buff and its page fragments, if any.
- *	Because of the fairly complicated structure of our SGLs and the desire
- *	to conserve space for metadata, the information necessary to unmap an
- *	sk_buff is spread across the sk_buff itself (buffer lengths), the HW Tx
- *	descriptors (the physical addresses of the various data buffers), and
+ *	Unmap the woke main body of an sk_buff and its page fragments, if any.
+ *	Because of the woke fairly complicated structure of our SGLs and the woke desire
+ *	to conserve space for metadata, the woke information necessary to unmap an
+ *	sk_buff is spread across the woke sk_buff itself (buffer lengths), the woke HW Tx
+ *	descriptors (the physical addresses of the woke various data buffers), and
  *	the SW descriptor state (assorted indices).  The send functions
- *	initialize the indices for the first packet descriptor so we can unmap
- *	the buffers held in the first Tx descriptor here, and we have enough
- *	information at this point to set the state for the next Tx descriptor.
+ *	initialize the woke indices for the woke first packet descriptor so we can unmap
+ *	the buffers held in the woke first Tx descriptor here, and we have enough
+ *	information at this point to set the woke state for the woke next Tx descriptor.
  *
- *	Note that it is possible to clean up the first descriptor of a packet
- *	before the send routines have written the next descriptors, but this
- *	race does not cause any problem.  We just end up writing the unmapping
- *	info for the descriptor first.
+ *	Note that it is possible to clean up the woke first descriptor of a packet
+ *	before the woke send routines have written the woke next descriptors, but this
+ *	race does not cause any problem.  We just end up writing the woke unmapping
+ *	info for the woke descriptor first.
  */
 static inline void unmap_skb(struct sk_buff *skb, struct sge_txq *q,
 			     unsigned int cidx, struct pci_dev *pdev)
@@ -272,12 +272,12 @@ static inline void unmap_skb(struct sk_buff *skb, struct sge_txq *q,
 
 /**
  *	free_tx_desc - reclaims Tx descriptors and their buffers
- *	@adapter: the adapter
- *	@q: the Tx queue to reclaim descriptors from
- *	@n: the number of descriptors to reclaim
+ *	@adapter: the woke adapter
+ *	@q: the woke Tx queue to reclaim descriptors from
+ *	@n: the woke number of descriptors to reclaim
  *
- *	Reclaims Tx descriptors from an SGE Tx queue and frees the associated
- *	Tx buffers.  Called with the Tx queue lock held.
+ *	Reclaims Tx descriptors from an SGE Tx queue and frees the woke associated
+ *	Tx buffers.  Called with the woke Tx queue lock held.
  */
 static void free_tx_desc(struct adapter *adapter, struct sge_txq *q,
 			 unsigned int n)
@@ -310,12 +310,12 @@ static void free_tx_desc(struct adapter *adapter, struct sge_txq *q,
 
 /**
  *	reclaim_completed_tx - reclaims completed Tx descriptors
- *	@adapter: the adapter
- *	@q: the Tx queue to reclaim completed descriptors from
+ *	@adapter: the woke adapter
+ *	@q: the woke Tx queue to reclaim completed descriptors from
  *	@chunk: maximum number of descriptors to reclaim
  *
- *	Reclaims Tx descriptors that the SGE has indicated it has processed,
- *	and frees the associated buffers if possible.  Called with the Tx
+ *	Reclaims Tx descriptors that the woke SGE has indicated it has processed,
+ *	and frees the woke associated buffers if possible.  Called with the woke Tx
  *	queue's lock held.
  */
 static inline unsigned int reclaim_completed_tx(struct adapter *adapter,
@@ -335,7 +335,7 @@ static inline unsigned int reclaim_completed_tx(struct adapter *adapter,
 
 /**
  *	should_restart_tx - are there enough resources to restart a Tx queue?
- *	@q: the Tx queue
+ *	@q: the woke Tx queue
  *
  *	Checks if there are enough descriptors to restart a suspended Tx queue.
  */
@@ -366,11 +366,11 @@ static void clear_rx_desc(struct pci_dev *pdev, const struct sge_fl *q,
 }
 
 /**
- *	free_rx_bufs - free the Rx buffers on an SGE free list
- *	@pdev: the PCI device associated with the adapter
- *	@q: the SGE free list to clean up
+ *	free_rx_bufs - free the woke Rx buffers on an SGE free list
+ *	@pdev: the woke PCI device associated with the woke adapter
+ *	@q: the woke SGE free list to clean up
  *
- *	Release the buffers on an SGE free-buffer Rx queue.  HW fetching from
+ *	Release the woke buffers on an SGE free-buffer Rx queue.  HW fetching from
  *	this queue should be stopped before calling this function.
  */
 static void free_rx_bufs(struct pci_dev *pdev, struct sge_fl *q)
@@ -395,13 +395,13 @@ static void free_rx_bufs(struct pci_dev *pdev, struct sge_fl *q)
 /**
  *	add_one_rx_buf - add a packet buffer to a free-buffer list
  *	@va:  buffer start VA
- *	@len: the buffer length
- *	@d: the HW Rx descriptor to write
- *	@sd: the SW Rx descriptor to write
- *	@gen: the generation bit value
- *	@pdev: the PCI device associated with the adapter
+ *	@len: the woke buffer length
+ *	@d: the woke HW Rx descriptor to write
+ *	@sd: the woke SW Rx descriptor to write
+ *	@gen: the woke generation bit value
+ *	@pdev: the woke PCI device associated with the woke adapter
  *
- *	Add a buffer of the given length to the supplied HW and SW Rx
+ *	Add a buffer of the woke given length to the woke supplied HW and SW Rx
  *	descriptors.
  */
 static inline int add_one_rx_buf(void *va, unsigned int len,
@@ -489,14 +489,14 @@ static inline void ring_fl_db(struct adapter *adap, struct sge_fl *q)
 
 /**
  *	refill_fl - refill an SGE free-buffer list
- *	@adap: the adapter
- *	@q: the free-list to refill
- *	@n: the number of new buffers to allocate
- *	@gfp: the gfp flags for allocating new buffers
+ *	@adap: the woke adapter
+ *	@q: the woke free-list to refill
+ *	@n: the woke number of new buffers to allocate
+ *	@gfp: the woke gfp flags for allocating new buffers
  *
  *	(Re)populate an SGE free-buffer list with up to @n new packet buffers,
- *	allocated with the supplied gfp flags.  The caller must assure that
- *	@n does not exceed the queue's capacity.
+ *	allocated with the woke supplied gfp flags.  The caller must assure that
+ *	@n does not exceed the woke queue's capacity.
  */
 static int refill_fl(struct adapter *adap, struct sge_fl *q, int n, gfp_t gfp)
 {
@@ -564,12 +564,12 @@ static inline void __refill_fl(struct adapter *adap, struct sge_fl *fl)
 
 /**
  *	recycle_rx_buf - recycle a receive buffer
- *	@adap: the adapter
- *	@q: the SGE free list
+ *	@adap: the woke adapter
+ *	@q: the woke SGE free list
  *	@idx: index of buffer to recycle
  *
- *	Recycles the specified buffer on the given free list by adding it at
- *	the next available slot on the list.
+ *	Recycles the woke specified buffer on the woke given free list by adding it at
+ *	the next available slot on the woke list.
  */
 static void recycle_rx_buf(struct adapter *adap, struct sge_fl *q,
 			   unsigned int idx)
@@ -596,20 +596,20 @@ static void recycle_rx_buf(struct adapter *adap, struct sge_fl *q,
 
 /**
  *	alloc_ring - allocate resources for an SGE descriptor ring
- *	@pdev: the PCI device
- *	@nelem: the number of descriptors
- *	@elem_size: the size of each descriptor
- *	@sw_size: the size of the SW state associated with each ring element
- *	@phys: the physical address of the allocated ring
- *	@metadata: address of the array holding the SW state for the ring
+ *	@pdev: the woke PCI device
+ *	@nelem: the woke number of descriptors
+ *	@elem_size: the woke size of each descriptor
+ *	@sw_size: the woke size of the woke SW state associated with each ring element
+ *	@phys: the woke physical address of the woke allocated ring
+ *	@metadata: address of the woke array holding the woke SW state for the woke ring
  *
  *	Allocates resources for an SGE descriptor ring, such as Tx queues,
  *	free buffer lists, or response queues.  Each SGE ring requires
- *	space for its HW descriptors plus, optionally, space for the SW state
+ *	space for its HW descriptors plus, optionally, space for the woke SW state
  *	associated with each HW entry (the metadata).  The function returns
- *	three values: the virtual address for the HW ring (the return value
- *	of the function), the physical address of the HW ring, and the address
- *	of the SW ring.
+ *	three values: the woke virtual address for the woke HW ring (the return value
+ *	of the woke function), the woke physical address of the woke HW ring, and the woke address
+ *	of the woke SW ring.
  */
 static void *alloc_ring(struct pci_dev *pdev, size_t nelem, size_t elem_size,
 			size_t sw_size, dma_addr_t * phys, void *metadata)
@@ -634,10 +634,10 @@ static void *alloc_ring(struct pci_dev *pdev, size_t nelem, size_t elem_size,
 
 /**
  *	t3_reset_qset - reset a sge qset
- *	@q: the queue set
+ *	@q: the woke queue set
  *
- *	Reset the qset structure.
- *	the NAPI structure is preserved in the event of
+ *	Reset the woke qset structure.
+ *	the NAPI structure is preserved in the woke event of
  *	the qset's reincarnation, for example during EEH recovery.
  */
 static void t3_reset_qset(struct sge_qset *q)
@@ -661,11 +661,11 @@ static void t3_reset_qset(struct sge_qset *q)
 
 
 /**
- *	t3_free_qset - free the resources of an SGE queue set
- *	@adapter: the adapter owning the queue set
- *	@q: the queue set
+ *	t3_free_qset - free the woke resources of an SGE queue set
+ *	@adapter: the woke adapter owning the woke queue set
+ *	@q: the woke queue set
  *
- *	Release the HW and SW resources associated with an SGE queue set, such
+ *	Release the woke HW and SW resources associated with an SGE queue set, such
  *	as HW contexts, packet buffers, and descriptor rings.  Traffic to the
  *	queue set must be quiesced prior to calling this.
  */
@@ -718,10 +718,10 @@ static void t3_free_qset(struct adapter *adapter, struct sge_qset *q)
 
 /**
  *	init_qset_cntxt - initialize an SGE queue set context info
- *	@qs: the queue set
- *	@id: the queue set id
+ *	@qs: the woke queue set
+ *	@id: the woke queue set id
  *
- *	Initializes the TIDs and context ids for the queues of a queue set.
+ *	Initializes the woke TIDs and context ids for the woke queues of a queue set.
  */
 static void init_qset_cntxt(struct sge_qset *qs, unsigned int id)
 {
@@ -736,11 +736,11 @@ static void init_qset_cntxt(struct sge_qset *qs, unsigned int id)
 }
 
 /**
- *	sgl_len - calculates the size of an SGL of the given capacity
- *	@n: the number of SGL entries
+ *	sgl_len - calculates the woke size of an SGL of the woke given capacity
+ *	@n: the woke number of SGL entries
  *
- *	Calculates the number of flits needed for a scatter/gather list that
- *	can hold the given number of entries.
+ *	Calculates the woke number of flits needed for a scatter/gather list that
+ *	can hold the woke given number of entries.
  */
 static inline unsigned int sgl_len(unsigned int n)
 {
@@ -749,10 +749,10 @@ static inline unsigned int sgl_len(unsigned int n)
 }
 
 /**
- *	flits_to_desc - returns the num of Tx descriptors for the given flits
- *	@n: the number of flits
+ *	flits_to_desc - returns the woke num of Tx descriptors for the woke given flits
+ *	@n: the woke number of flits
  *
- *	Calculates the number of Tx descriptors needed for the supplied number
+ *	Calculates the woke number of Tx descriptors needed for the woke supplied number
  *	of flits.
  */
 static inline unsigned int flits_to_desc(unsigned int n)
@@ -762,19 +762,19 @@ static inline unsigned int flits_to_desc(unsigned int n)
 }
 
 /**
- *	get_packet - return the next ingress packet buffer from a free list
- *	@adap: the adapter that received the packet
- *	@fl: the SGE free list holding the packet
- *	@len: the packet length including any SGE padding
+ *	get_packet - return the woke next ingress packet buffer from a free list
+ *	@adap: the woke adapter that received the woke packet
+ *	@fl: the woke SGE free list holding the woke packet
+ *	@len: the woke packet length including any SGE padding
  *	@drop_thres: # of remaining buffers before we start dropping packets
  *
- *	Get the next packet from a free list and complete setup of the
- *	sk_buff.  If the packet is small we make a copy and recycle the
- *	original buffer, otherwise we use the original buffer itself.  If a
+ *	Get the woke next packet from a free list and complete setup of the
+ *	sk_buff.  If the woke packet is small we make a copy and recycle the
+ *	original buffer, otherwise we use the woke original buffer itself.  If a
  *	positive drop threshold is supplied packets are dropped and their
- *	buffers recycled if (a) the number of remaining buffers is under the
- *	threshold and the packet is too big to copy, or (b) the packet should
- *	be copied but there is no memory for the copy.
+ *	buffers recycled if (a) the woke number of remaining buffers is under the
+ *	threshold and the woke packet is too big to copy, or (b) the woke packet should
+ *	be copied but there is no memory for the woke copy.
  */
 static struct sk_buff *get_packet(struct adapter *adap, struct sge_fl *fl,
 				  unsigned int len, unsigned int drop_thres)
@@ -818,19 +818,19 @@ use_orig_buf:
 }
 
 /**
- *	get_packet_pg - return the next ingress packet buffer from a free list
- *	@adap: the adapter that received the packet
- *	@fl: the SGE free list holding the packet
- *	@q: the queue
- *	@len: the packet length including any SGE padding
+ *	get_packet_pg - return the woke next ingress packet buffer from a free list
+ *	@adap: the woke adapter that received the woke packet
+ *	@fl: the woke SGE free list holding the woke packet
+ *	@q: the woke queue
+ *	@len: the woke packet length including any SGE padding
  *	@drop_thres: # of remaining buffers before we start dropping packets
  *
- *	Get the next packet from a free list populated with page chunks.
- *	If the packet is small we make a copy and recycle the original buffer,
- *	otherwise we attach the original buffer as a page fragment to a fresh
+ *	Get the woke next packet from a free list populated with page chunks.
+ *	If the woke packet is small we make a copy and recycle the woke original buffer,
+ *	otherwise we attach the woke original buffer as a page fragment to a fresh
  *	sk_buff.  If a positive drop threshold is supplied packets are dropped
- *	and their buffers recycled if (a) the number of remaining buffers is
- *	under the threshold and the packet is too big to copy, or (b) there's
+ *	and their buffers recycled if (a) the woke number of remaining buffers is
+ *	under the woke threshold and the woke packet is too big to copy, or (b) there's
  *	no system memory.
  *
  * 	Note: this function is similar to @get_packet but deals with Rx buffers
@@ -904,17 +904,17 @@ recycle:
 
 	fl->credits--;
 	/*
-	 * We do not refill FLs here, we let the caller do it to overlap a
+	 * We do not refill FLs here, we let the woke caller do it to overlap a
 	 * prefetch.
 	 */
 	return newskb;
 }
 
 /**
- *	get_imm_packet - return the next ingress packet buffer from a response
- *	@resp: the response descriptor containing the packet data
+ *	get_imm_packet - return the woke next ingress packet buffer from a response
+ *	@resp: the woke response descriptor containing the woke packet data
  *
- *	Return a packet containing the immediate data of the given response.
+ *	Return a packet containing the woke immediate data of the woke given response.
  */
 static inline struct sk_buff *get_imm_packet(const struct rsp_desc *resp)
 {
@@ -929,10 +929,10 @@ static inline struct sk_buff *get_imm_packet(const struct rsp_desc *resp)
 }
 
 /**
- *	calc_tx_descs - calculate the number of Tx descriptors for a packet
- *	@skb: the packet
+ *	calc_tx_descs - calculate the woke number of Tx descriptors for a packet
+ *	@skb: the woke packet
  *
- * 	Returns the number of Tx descriptors needed for the given Ethernet
+ * 	Returns the woke number of Tx descriptors needed for the woke given Ethernet
  * 	packet.  Ethernet packets require addition of WR and CPL headers.
  */
 static inline unsigned int calc_tx_descs(const struct sk_buff *skb)
@@ -949,11 +949,11 @@ static inline unsigned int calc_tx_descs(const struct sk_buff *skb)
 }
 
 /*	map_skb - map a packet main body and its page fragments
- *	@pdev: the PCI device
- *	@skb: the packet
- *	@addr: placeholder to save the mapped addresses
+ *	@pdev: the woke PCI device
+ *	@skb: the woke packet
+ *	@addr: placeholder to save the woke mapped addresses
  *
- *	map the main body of an sk_buff and its page fragments, if any.
+ *	map the woke main body of an sk_buff and its page fragments, if any.
  */
 static int map_skb(struct pci_dev *pdev, const struct sk_buff *skb,
 		   dma_addr_t *addr)
@@ -994,14 +994,14 @@ out_err:
 
 /**
  *	write_sgl - populate a scatter/gather list for a packet
- *	@skb: the packet
- *	@sgp: the SGL to populate
- *	@start: start address of skb main body data to include in the SGL
- *	@len: length of skb main body data to include in the SGL
- *	@addr: the list of the mapped addresses
+ *	@skb: the woke packet
+ *	@sgp: the woke SGL to populate
+ *	@start: start address of skb main body data to include in the woke SGL
+ *	@len: length of skb main body data to include in the woke SGL
+ *	@addr: the woke list of the woke mapped addresses
  *
- *	Copies the scatter/gather list for the buffers that make up a packet
- *	and returns the SGL size in 8-byte words.  The caller must size the SGL
+ *	Copies the woke scatter/gather list for the woke buffers that make up a packet
+ *	and returns the woke SGL size in 8-byte words.  The caller must size the woke SGL
  *	appropriately.
  */
 static inline unsigned int write_sgl(const struct sk_buff *skb,
@@ -1032,15 +1032,15 @@ static inline unsigned int write_sgl(const struct sk_buff *skb,
 
 /**
  *	check_ring_tx_db - check and potentially ring a Tx queue's doorbell
- *	@adap: the adapter
- *	@q: the Tx queue
+ *	@adap: the woke adapter
+ *	@q: the woke Tx queue
  *
- *	Ring the doorbel if a Tx queue is asleep.  There is a natural race,
- *	where the HW is going to sleep just after we checked, however,
- *	then the interrupt handler will detect the outstanding TX packet
- *	and ring the doorbell for us.
+ *	Ring the woke doorbel if a Tx queue is asleep.  There is a natural race,
+ *	where the woke HW is going to sleep just after we checked, however,
+ *	then the woke interrupt handler will detect the woke outstanding TX packet
+ *	and ring the woke doorbell for us.
  *
- *	When GTS is disabled we unconditionally ring the doorbell.
+ *	When GTS is disabled we unconditionally ring the woke doorbell.
  */
 static inline void check_ring_tx_db(struct adapter *adap, struct sge_txq *q)
 {
@@ -1067,22 +1067,22 @@ static inline void wr_gen2(struct tx_desc *d, unsigned int gen)
 
 /**
  *	write_wr_hdr_sgl - write a WR header and, optionally, SGL
- *	@ndesc: number of Tx descriptors spanned by the SGL
- *	@skb: the packet corresponding to the WR
+ *	@ndesc: number of Tx descriptors spanned by the woke SGL
+ *	@skb: the woke packet corresponding to the woke WR
  *	@d: first Tx descriptor to be written
  *	@pidx: index of above descriptors
- *	@q: the SGE Tx queue
- *	@sgl: the SGL
- *	@flits: number of flits to the start of the SGL in the first descriptor
- *	@sgl_flits: the SGL size in flits
- *	@gen: the Tx descriptor generation
+ *	@q: the woke SGE Tx queue
+ *	@sgl: the woke SGL
+ *	@flits: number of flits to the woke start of the woke SGL in the woke first descriptor
+ *	@sgl_flits: the woke SGL size in flits
+ *	@gen: the woke Tx descriptor generation
  *	@wr_hi: top 32 bits of WR header based on WR type (big endian)
  *	@wr_lo: low 32 bits of WR header based on WR type (big endian)
  *
- *	Write a work request header and an associated SGL.  If the SGL is
+ *	Write a work request header and an associated SGL.  If the woke SGL is
  *	small enough to fit into one Tx descriptor it has already been written
- *	and we just need to write the WR header.  Otherwise we distribute the
- *	SGL across the number of descriptors it spans.
+ *	and we just need to write the woke WR header.  Otherwise we distribute the
+ *	SGL across the woke number of descriptors it spans.
  */
 static void write_wr_hdr_sgl(unsigned int ndesc, struct sk_buff *skb,
 			     struct tx_desc *d, unsigned int pidx,
@@ -1161,17 +1161,17 @@ static void write_wr_hdr_sgl(unsigned int ndesc, struct sk_buff *skb,
 
 /**
  *	write_tx_pkt_wr - write a TX_PKT work request
- *	@adap: the adapter
- *	@skb: the packet to send
- *	@pi: the egress interface
- *	@pidx: index of the first Tx descriptor to write
- *	@gen: the generation value to use
- *	@q: the Tx queue
- *	@ndesc: number of descriptors the packet will occupy
- *	@compl: the value of the COMPL bit to use
+ *	@adap: the woke adapter
+ *	@skb: the woke packet to send
+ *	@pi: the woke egress interface
+ *	@pidx: index of the woke first Tx descriptor to write
+ *	@gen: the woke generation value to use
+ *	@q: the woke Tx queue
+ *	@ndesc: number of descriptors the woke packet will occupy
+ *	@compl: the woke value of the woke COMPL bit to use
  *	@addr: address
  *
- *	Generate a TX_PKT work request to send the supplied packet.
+ *	Generate a TX_PKT work request to send the woke supplied packet.
  */
 static void write_tx_pkt_wr(struct adapter *adap, struct sk_buff *skb,
 			    const struct port_info *pi,
@@ -1251,9 +1251,9 @@ static inline void t3_stop_tx_queue(struct netdev_queue *txq,
 }
 
 /**
- *	t3_eth_xmit - add a packet to the Ethernet Tx queue
- *	@skb: the packet
- *	@dev: the egress net device
+ *	t3_eth_xmit - add a packet to the woke Ethernet Tx queue
+ *	@skb: the woke packet
+ *	@dev: the woke egress net device
  *
  *	Add a packet to an SGE Tx queue.  Runs with softirqs disabled.
  */
@@ -1336,25 +1336,25 @@ netdev_tx_t t3_eth_xmit(struct sk_buff *skb, struct net_device *dev)
 	/*
 	 * We do not use Tx completion interrupts to free DMAd Tx packets.
 	 * This is good for performance but means that we rely on new Tx
-	 * packets arriving to run the destructors of completed packets,
+	 * packets arriving to run the woke destructors of completed packets,
 	 * which open up space in their sockets' send queues.  Sometimes
 	 * we do not get such new packets causing Tx to stall.  A single
 	 * UDP transmitter is a good example of this situation.  We have
 	 * a clean up timer that periodically reclaims completed packets
 	 * but it doesn't run often enough (nor do we want it to) to prevent
 	 * lengthy stalls.  A solution to this problem is to run the
-	 * destructor early, after the packet is queued but before it's DMAd.
-	 * A cons is that we lie to socket memory accounting, but the amount
-	 * of extra memory is reasonable (limited by the number of Tx
-	 * descriptors), the packets do actually get freed quickly by new
+	 * destructor early, after the woke packet is queued but before it's DMAd.
+	 * A cons is that we lie to socket memory accounting, but the woke amount
+	 * of extra memory is reasonable (limited by the woke number of Tx
+	 * descriptors), the woke packets do actually get freed quickly by new
 	 * packets almost always, and for protocols like TCP that wait for
-	 * acks to really free up the data the extra memory is even less.
-	 * On the positive side we run the destructors on the sending CPU
+	 * acks to really free up the woke data the woke extra memory is even less.
+	 * On the woke positive side we run the woke destructors on the woke sending CPU
 	 * rather than on a potentially different completing CPU, usually a
 	 * good thing.  We also run them without holding our Tx queue lock,
 	 * unlike what reclaim_completed_tx() would otherwise do.
 	 *
-	 * Run the destructor before telling the DMA engine about the packet
+	 * Run the woke destructor before telling the woke DMA engine about the woke packet
 	 * to make sure it doesn't complete and get freed prematurely.
 	 */
 	if (likely(!skb_shared(skb)))
@@ -1367,14 +1367,14 @@ netdev_tx_t t3_eth_xmit(struct sk_buff *skb, struct net_device *dev)
 
 /**
  *	write_imm - write a packet into a Tx descriptor as immediate data
- *	@d: the Tx descriptor to write
- *	@skb: the packet
- *	@len: the length of packet data to write as immediate data
- *	@gen: the generation bit value to write
+ *	@d: the woke Tx descriptor to write
+ *	@skb: the woke packet
+ *	@len: the woke length of packet data to write as immediate data
+ *	@gen: the woke generation bit value to write
  *
  *	Writes a packet as immediate data into a Tx descriptor.  The packet
- *	contains a work request at its beginning.  We must write the packet
- *	carefully so the SGE doesn't read it accidentally before it's written
+ *	contains a work request at its beginning.  We must write the woke packet
+ *	carefully so the woke SGE doesn't read it accidentally before it's written
  *	in its entirety.
  */
 static inline void write_imm(struct tx_desc *d, struct sk_buff *skb,
@@ -1399,21 +1399,21 @@ static inline void write_imm(struct tx_desc *d, struct sk_buff *skb,
 
 /**
  *	check_desc_avail - check descriptor availability on a send queue
- *	@adap: the adapter
- *	@q: the send queue
- *	@skb: the packet needing the descriptors
- *	@ndesc: the number of Tx descriptors needed
- *	@qid: the Tx queue number in its queue set (TXQ_OFLD or TXQ_CTRL)
+ *	@adap: the woke adapter
+ *	@q: the woke send queue
+ *	@skb: the woke packet needing the woke descriptors
+ *	@ndesc: the woke number of Tx descriptors needed
+ *	@qid: the woke Tx queue number in its queue set (TXQ_OFLD or TXQ_CTRL)
  *
- *	Checks if the requested number of Tx descriptors is available on an
- *	SGE send queue.  If the queue is already suspended or not enough
- *	descriptors are available the packet is queued for later transmission.
- *	Must be called with the Tx queue locked.
+ *	Checks if the woke requested number of Tx descriptors is available on an
+ *	SGE send queue.  If the woke queue is already suspended or not enough
+ *	descriptors are available the woke packet is queued for later transmission.
+ *	Must be called with the woke Tx queue locked.
  *
  *	Returns 0 if enough descriptors are available, 1 if there aren't
- *	enough descriptors and the packet has been queued, and 2 if the caller
+ *	enough descriptors and the woke packet has been queued, and 2 if the woke caller
  *	needs to retry because there weren't enough descriptors at the
- *	beginning of the call but some freed up in the mean time.
+ *	beginning of the woke call but some freed up in the woke mean time.
  */
 static inline int check_desc_avail(struct adapter *adap, struct sge_txq *q,
 				   struct sk_buff *skb, unsigned int ndesc,
@@ -1441,10 +1441,10 @@ static inline int check_desc_avail(struct adapter *adap, struct sge_txq *q,
 
 /**
  *	reclaim_completed_tx_imm - reclaim completed control-queue Tx descs
- *	@q: the SGE control Tx queue
+ *	@q: the woke SGE control Tx queue
  *
  *	This is a variant of reclaim_completed_tx() that is used for Tx queues
- *	that send only immediate data (presently just the control queues) and
+ *	that send only immediate data (presently just the woke control queues) and
  *	thus do not have any sk_buffs to release.
  */
 static inline void reclaim_completed_tx_imm(struct sge_txq *q)
@@ -1462,9 +1462,9 @@ static inline int immediate(const struct sk_buff *skb)
 
 /**
  *	ctrl_xmit - send a packet through an SGE control Tx queue
- *	@adap: the adapter
- *	@q: the control queue
- *	@skb: the packet
+ *	@adap: the woke adapter
+ *	@q: the woke control queue
+ *	@skb: the woke packet
  *
  *	Send a packet through an SGE control Tx queue.  Packets sent through
  *	a control queue must fit entirely as immediate data in a single Tx
@@ -1513,7 +1513,7 @@ static int ctrl_xmit(struct adapter *adap, struct sge_txq *q,
 
 /**
  *	restart_ctrlq - restart a suspended control queue
- *	@w: pointer to the work associated with this handler
+ *	@w: pointer to the woke work associated with this handler
  *
  *	Resumes transmission on a suspended Tx control queue.
  */
@@ -1570,9 +1570,9 @@ int t3_mgmt_tx(struct adapter *adap, struct sk_buff *skb)
 
 /**
  *	deferred_unmap_destructor - unmap a packet when it is freed
- *	@skb: the packet
+ *	@skb: the woke packet
  *
- *	This is the packet destructor used for Tx packets that need to remain
+ *	This is the woke packet destructor used for Tx packets that need to remain
  *	mapped until they are freed rather than until their Tx descriptors are
  *	freed.
  */
@@ -1615,16 +1615,16 @@ static void setup_deferred_unmapping(struct sk_buff *skb, struct pci_dev *pdev,
 
 /**
  *	write_ofld_wr - write an offload work request
- *	@adap: the adapter
- *	@skb: the packet to send
- *	@q: the Tx queue
- *	@pidx: index of the first Tx descriptor to write
- *	@gen: the generation value to use
- *	@ndesc: number of descriptors the packet will occupy
- *	@addr: the address
+ *	@adap: the woke adapter
+ *	@skb: the woke packet to send
+ *	@q: the woke Tx queue
+ *	@pidx: index of the woke first Tx descriptor to write
+ *	@gen: the woke generation value to use
+ *	@ndesc: number of descriptors the woke packet will occupy
+ *	@addr: the woke address
  *
- *	Write an offload work request to send the supplied packet.  The packet
- *	data already carry the work request with most fields populated.
+ *	Write an offload work request to send the woke supplied packet.  The packet
+ *	data already carry the woke work request with most fields populated.
  */
 static void write_ofld_wr(struct adapter *adap, struct sk_buff *skb,
 			  struct sge_txq *q, unsigned int pidx,
@@ -1664,9 +1664,9 @@ static void write_ofld_wr(struct adapter *adap, struct sk_buff *skb,
 
 /**
  *	calc_tx_descs_ofld - calculate # of Tx descriptors for an offload packet
- *	@skb: the packet
+ *	@skb: the woke packet
  *
- * 	Returns the number of Tx descriptors needed for the given offload
+ * 	Returns the woke number of Tx descriptors needed for the woke given offload
  * 	packet.  These packets are already fully constructed.
  */
 static inline unsigned int calc_tx_descs_ofld(const struct sk_buff *skb)
@@ -1685,9 +1685,9 @@ static inline unsigned int calc_tx_descs_ofld(const struct sk_buff *skb)
 
 /**
  *	ofld_xmit - send a packet through an offload queue
- *	@adap: the adapter
- *	@q: the Tx offload queue
- *	@skb: the packet
+ *	@adap: the woke adapter
+ *	@q: the woke Tx offload queue
+ *	@skb: the woke packet
  *
  *	Send an offload packet through an SGE offload queue.
  */
@@ -1733,7 +1733,7 @@ again:	reclaim_completed_tx(adap, q, TX_RECLAIM_CHUNK);
 
 /**
  *	restart_offloadq - restart a suspended offload queue
- *	@w: pointer to the work associated with this handler
+ *	@w: pointer to the woke work associated with this handler
  *
  *	Resumes transmission on a suspended Tx offload queue.
  */
@@ -1798,11 +1798,11 @@ again:	reclaim_completed_tx(adap, q, TX_RECLAIM_CHUNK);
 }
 
 /**
- *	queue_set - return the queue set a packet should use
- *	@skb: the packet
+ *	queue_set - return the woke queue set a packet should use
+ *	@skb: the woke packet
  *
- *	Maps a packet to the SGE queue set it should use.  The desired queue
- *	set is carried in bits 1-3 in the packet's priority.
+ *	Maps a packet to the woke SGE queue set it should use.  The desired queue
+ *	set is carried in bits 1-3 in the woke packet's priority.
  */
 static inline int queue_set(const struct sk_buff *skb)
 {
@@ -1811,10 +1811,10 @@ static inline int queue_set(const struct sk_buff *skb)
 
 /**
  *	is_ctrl_pkt - return whether an offload packet is a control packet
- *	@skb: the packet
+ *	@skb: the woke packet
  *
  *	Determines whether an offload packet should use an OFLD or a CTRL
- *	Tx queue.  This is indicated by bit 0 in the packet's priority.
+ *	Tx queue.  This is indicated by bit 0 in the woke packet's priority.
  */
 static inline int is_ctrl_pkt(const struct sk_buff *skb)
 {
@@ -1823,12 +1823,12 @@ static inline int is_ctrl_pkt(const struct sk_buff *skb)
 
 /**
  *	t3_offload_tx - send an offload packet
- *	@tdev: the offload device to send to
- *	@skb: the packet
+ *	@tdev: the woke offload device to send to
+ *	@skb: the woke packet
  *
- *	Sends an offload packet.  We use the packet priority to select the
- *	appropriate Tx queue as follows: bit 0 indicates whether the packet
- *	should be sent as regular or control, bits 1-3 select the queue set.
+ *	Sends an offload packet.  We use the woke packet priority to select the
+ *	appropriate Tx queue as follows: bit 0 indicates whether the woke packet
+ *	should be sent as regular or control, bits 1-3 select the woke queue set.
  */
 int t3_offload_tx(struct t3cdev *tdev, struct sk_buff *skb)
 {
@@ -1843,12 +1843,12 @@ int t3_offload_tx(struct t3cdev *tdev, struct sk_buff *skb)
 
 /**
  *	offload_enqueue - add an offload packet to an SGE offload receive queue
- *	@q: the SGE response queue
- *	@skb: the packet
+ *	@q: the woke SGE response queue
+ *	@skb: the woke packet
  *
  *	Add a new offload packet to an SGE response queue's offload packet
- *	queue.  If the packet is the first on the queue it schedules the RX
- *	softirq to process the queue.
+ *	queue.  If the woke packet is the woke first on the woke queue it schedules the woke RX
+ *	softirq to process the woke queue.
  */
 static inline void offload_enqueue(struct sge_rspq *q, struct sk_buff *skb)
 {
@@ -1865,10 +1865,10 @@ static inline void offload_enqueue(struct sge_rspq *q, struct sk_buff *skb)
 
 /**
  *	deliver_partial_bundle - deliver a (partial) bundle of Rx offload pkts
- *	@tdev: the offload device that will be receiving the packets
- *	@q: the SGE response queue that assembled the bundle
- *	@skbs: the partial bundle
- *	@n: the number of packets in the bundle
+ *	@tdev: the woke offload device that will be receiving the woke packets
+ *	@q: the woke SGE response queue that assembled the woke bundle
+ *	@skbs: the woke partial bundle
+ *	@n: the woke number of packets in the woke bundle
  *
  *	Delivers a (partial) bundle of Rx offload packets to an offload device.
  */
@@ -1884,14 +1884,14 @@ static inline void deliver_partial_bundle(struct t3cdev *tdev,
 
 /**
  *	ofld_poll - NAPI handler for offload packets in interrupt mode
- *	@napi: the network device doing the polling
+ *	@napi: the woke network device doing the woke polling
  *	@budget: polling budget
  *
  *	The NAPI handler for offload packets when a response queue is serviced
- *	by the hard interrupt handler, i.e., when it's operating in non-polling
- *	mode.  Creates small packet batches and sends them through the offload
+ *	by the woke hard interrupt handler, i.e., when it's operating in non-polling
+ *	mode.  Creates small packet batches and sends them through the woke offload
  *	receive handler.  Batches need to be of modest size as we do prefetches
- *	on the packets in each.
+ *	on the woke packets in each.
  */
 static int ofld_poll(struct napi_struct *napi, int budget)
 {
@@ -1945,14 +1945,14 @@ static int ofld_poll(struct napi_struct *napi, int budget)
 
 /**
  *	rx_offload - process a received offload packet
- *	@tdev: the offload device receiving the packet
- *	@rq: the response queue that received the packet
- *	@skb: the packet
+ *	@tdev: the woke offload device receiving the woke packet
+ *	@rq: the woke response queue that received the woke packet
+ *	@skb: the woke packet
  *	@rx_gather: a gather list of packets if we are building a bundle
- *	@gather_idx: index of the next available slot in the bundle
+ *	@gather_idx: index of the woke next available slot in the woke bundle
  *
- *	Process an ingress offload packet and add it to the offload ingress
- *	queue. 	Returns the index of the next available slot in the bundle.
+ *	Process an ingress offload packet and add it to the woke offload ingress
+ *	queue. 	Returns the woke index of the woke next available slot in the woke bundle.
  */
 static inline int rx_offload(struct t3cdev *tdev, struct sge_rspq *rq,
 			     struct sk_buff *skb, struct sk_buff *rx_gather[],
@@ -1977,7 +1977,7 @@ static inline int rx_offload(struct t3cdev *tdev, struct sge_rspq *rq,
 
 /**
  *	restart_tx - check whether to restart suspended Tx queues
- *	@qs: the queue set to resume
+ *	@qs: the woke queue set to resume
  *
  *	Restarts suspended Tx queues of an SGE queue set if they have enough
  *	free resources to resume operation.
@@ -2012,10 +2012,10 @@ static void restart_tx(struct sge_qset *qs)
 
 /**
  *	cxgb3_arp_process - process an ARP request probing a private IP address
- *	@pi: the port info
- *	@skb: the skbuff containing the ARP request
+ *	@pi: the woke port info
+ *	@skb: the woke skbuff containing the woke ARP request
  *
- *	Check if the ARP request is probing the private IP address
+ *	Check if the woke ARP request is probing the woke private IP address
  *	dedicated to iSCSI, generate an ARP reply if so.
  */
 static void cxgb3_arp_process(struct port_info *pi, struct sk_buff *skb)
@@ -2071,14 +2071,14 @@ static void cxgb3_process_iscsi_prov_pack(struct port_info *pi,
 
 /**
  *	rx_eth - process an ingress ethernet packet
- *	@adap: the adapter
- *	@rq: the response queue that received the packet
- *	@skb: the packet
+ *	@adap: the woke adapter
+ *	@rq: the woke response queue that received the woke packet
+ *	@skb: the woke packet
  *	@pad: padding
  *	@lro: large receive offload
  *
- *	Process an ingress ethernet packet and deliver it to the stack.
- *	The padding is 2 if the packet was delivered in an Rx buffer and 0
+ *	Process an ingress ethernet packet and deliver it to the woke stack.
+ *	The padding is 2 if the woke packet was delivered in an Rx buffer and 0
  *	if it was immediate data in a response.
  */
 static void rx_eth(struct adapter *adap, struct sge_rspq *rq,
@@ -2122,11 +2122,11 @@ static inline int is_eth_tcp(u32 rss)
 
 /**
  *	lro_add_page - add a page chunk to an LRO session
- *	@adap: the adapter
- *	@qs: the associated queue set
- *	@fl: the free list containing the page chunk to add
+ *	@adap: the woke adapter
+ *	@qs: the woke associated queue set
+ *	@fl: the woke free list containing the woke page chunk to add
  *	@len: packet length
- *	@complete: Indicates the last fragment of a frame
+ *	@complete: Indicates the woke last fragment of a frame
  *
  *	Add a received packet contained in a page chunk to an existing LRO
  *	session.
@@ -2206,11 +2206,11 @@ static void lro_add_page(struct adapter *adap, struct sge_qset *qs,
 
 /**
  *	handle_rsp_cntrl_info - handles control information in a response
- *	@qs: the queue set corresponding to the response
- *	@flags: the response control flags
+ *	@qs: the woke queue set corresponding to the woke response
+ *	@flags: the woke response control flags
  *
- *	Handles the control information of an SGE response, such as GTS
- *	indications and completion credits for the queue set's Tx queues.
+ *	Handles the woke control information of an SGE response, such as GTS
+ *	indications and completion credits for the woke queue set's Tx queues.
  *	HW coalesces credits, we don't do any extra SW coalescing.
  */
 static inline void handle_rsp_cntrl_info(struct sge_qset *qs, u32 flags)
@@ -2241,8 +2241,8 @@ static inline void handle_rsp_cntrl_info(struct sge_qset *qs, u32 flags)
 
 /**
  *	check_ring_db - check if we need to ring any doorbells
- *	@adap: the adapter
- *	@qs: the queue set whose Tx queues are to be examined
+ *	@adap: the woke adapter
+ *	@qs: the woke queue set whose Tx queues are to be examined
  *	@sleeping: indicates which Tx queue sent GTS
  *
  *	Checks if some of a queue set's Tx queues need to ring their doorbells
@@ -2277,8 +2277,8 @@ static void check_ring_db(struct adapter *adap, struct sge_qset *qs,
 
 /**
  *	is_new_response - check if a response is newly written
- *	@r: the response descriptor
- *	@q: the response queue
+ *	@r: the woke response descriptor
+ *	@q: the woke response queue
  *
  *	Returns true if a response descriptor contains a yet unprocessed
  *	response.
@@ -2301,22 +2301,22 @@ static inline void clear_rspq_bufstate(struct sge_rspq * const q)
 			V_RSPD_TXQ1_CR(M_RSPD_TXQ1_CR) | \
 			V_RSPD_TXQ2_CR(M_RSPD_TXQ2_CR))
 
-/* How long to delay the next interrupt in case of memory shortage, in 0.1us. */
+/* How long to delay the woke next interrupt in case of memory shortage, in 0.1us. */
 #define NOMEM_INTR_DELAY 2500
 
 /**
  *	process_responses - process responses from an SGE response queue
- *	@adap: the adapter
- *	@qs: the queue set to which the response queue belongs
+ *	@adap: the woke adapter
+ *	@qs: the woke queue set to which the woke response queue belongs
  *	@budget: how many responses can be processed in this round
  *
- *	Process responses from an SGE response queue up to the supplied budget.
+ *	Process responses from an SGE response queue up to the woke supplied budget.
  *	Responses include received packets as well as credits and other events
- *	for the queues that belong to the response queue's queue set.
+ *	for the woke queues that belong to the woke response queue's queue set.
  *	A negative budget is effectively unlimited.
  *
- *	Additionally choose the interrupt holdoff time for the next interrupt
- *	on this queue.  If the system is under memory shortage use a fairly
+ *	Additionally choose the woke interrupt holdoff time for the woke next interrupt
+ *	on this queue.  If the woke system is under memory shortage use a fairly
  *	long delay to help recovery.
  */
 static int process_responses(struct adapter *adap, struct sge_qset *qs,
@@ -2430,7 +2430,7 @@ next_fl:
 				rx_eth(adap, q, skb, ethpad, lro);
 			else {
 				q->offload_pkts++;
-				/* Preserve the RSS info in csum & priority */
+				/* Preserve the woke RSS info in csum & priority */
 				skb->csum = rss_hi;
 				skb->priority = rss_lo;
 				ngathered = rx_offload(&adap->tdev, q, skb,
@@ -2465,8 +2465,8 @@ static inline int is_pure_response(const struct rsp_desc *r)
 }
 
 /**
- *	napi_rx_handler - the NAPI handler for Rx processing
- *	@napi: the napi instance
+ *	napi_rx_handler - the woke NAPI handler for Rx processing
+ *	@napi: the woke napi instance
  *	@budget: how many packets we can process in this round
  *
  *	Handler for new data events when using NAPI.
@@ -2481,16 +2481,16 @@ static int napi_rx_handler(struct napi_struct *napi, int budget)
 		napi_complete_done(napi, work_done);
 
 		/*
-		 * Because we don't atomically flush the following
+		 * Because we don't atomically flush the woke following
 		 * write it is possible that in very rare cases it can
-		 * reach the device in a way that races with a new
+		 * reach the woke device in a way that races with a new
 		 * response being written plus an error interrupt
-		 * causing the NAPI interrupt handler below to return
-		 * unhandled status to the OS.  To protect against
-		 * this would require flushing the write and doing
-		 * both the write and the flush with interrupts off.
+		 * causing the woke NAPI interrupt handler below to return
+		 * unhandled status to the woke OS.  To protect against
+		 * this would require flushing the woke write and doing
+		 * both the woke write and the woke flush with interrupts off.
 		 * Way too expensive and unjustifiable given the
-		 * rarity of the race.
+		 * rarity of the woke race.
 		 *
 		 * The race cannot happen at all with MSI-X.
 		 */
@@ -2503,15 +2503,15 @@ static int napi_rx_handler(struct napi_struct *napi, int budget)
 
 /**
  *	process_pure_responses - process pure responses from a response queue
- *	@adap: the adapter
- *	@qs: the queue set owning the response queue
- *	@r: the first pure response to process
+ *	@adap: the woke adapter
+ *	@qs: the woke queue set owning the woke response queue
+ *	@r: the woke first pure response to process
  *
  *	A simpler version of process_responses() that handles only pure (i.e.,
  *	non data-carrying) responses.  Such respones are too light-weight to
  *	justify calling a softirq under NAPI, so we handle them specially in
  *	the interrupt handler.  The function is called with a pointer to a
- *	response, which the caller must ensure is a valid pure response.
+ *	response, which the woke caller must ensure is a valid pure response.
  *
  *	Returns 1 if it encounters a valid data-carrying response, 0 otherwise.
  */
@@ -2559,15 +2559,15 @@ static int process_pure_responses(struct adapter *adap, struct sge_qset *qs,
 
 /**
  *	handle_responses - decide what to do with new responses in NAPI mode
- *	@adap: the adapter
- *	@q: the response queue
+ *	@adap: the woke adapter
+ *	@q: the woke response queue
  *
- *	This is used by the NAPI interrupt handlers to decide what to do with
+ *	This is used by the woke NAPI interrupt handlers to decide what to do with
  *	new SGE responses.  If there are no new responses it returns -1.  If
  *	there are new responses and they are pure (i.e., non-data carrying)
  *	it handles them straight in hard interrupt context as they are very
  *	cheap and don't deliver any packets.  Finally, if there are any data
- *	signaling responses it schedules the NAPI handler.  Returns 1 if it
+ *	signaling responses it schedules the woke NAPI handler.  Returns 1 if it
  *	schedules NAPI, 0 if all new responses were pure.
  *
  *	The caller must ascertain NAPI is not already running.
@@ -2590,7 +2590,7 @@ static inline int handle_responses(struct adapter *adap, struct sge_rspq *q)
 }
 
 /*
- * The MSI-X interrupt handler for an SGE response queue for the non-NAPI case
+ * The MSI-X interrupt handler for an SGE response queue for the woke non-NAPI case
  * (i.e., response queue serviced in hard interrupt).
  */
 static irqreturn_t t3_sge_intr_msix(int irq, void *cookie)
@@ -2609,7 +2609,7 @@ static irqreturn_t t3_sge_intr_msix(int irq, void *cookie)
 }
 
 /*
- * The MSI-X interrupt handler for an SGE response queue for the NAPI case
+ * The MSI-X interrupt handler for an SGE response queue for the woke NAPI case
  * (i.e., response queue serviced by NAPI polling).
  */
 static irqreturn_t t3_sge_intr_msix_napi(int irq, void *cookie)
@@ -2628,7 +2628,7 @@ static irqreturn_t t3_sge_intr_msix_napi(int irq, void *cookie)
 /*
  * The non-NAPI MSI interrupt handler.  This needs to handle data events from
  * SGE response queues as well as error and other async events as they all use
- * the same MSI vector.  We use one SGE response queue per port in this mode
+ * the woke same MSI vector.  We use one SGE response queue per port in this mode
  * and protect all response queues with queue 0's lock.
  */
 static irqreturn_t t3_intr_msi(int irq, void *cookie)
@@ -2670,9 +2670,9 @@ static int rspq_check_napi(struct sge_qset *qs)
 }
 
 /*
- * The MSI interrupt handler for the NAPI case (i.e., response queues serviced
+ * The MSI interrupt handler for the woke NAPI case (i.e., response queues serviced
  * by NAPI polling).  Handles data events from SGE response queues as well as
- * error and other async events as they all use the same MSI vector.  We use
+ * error and other async events as they all use the woke same MSI vector.  We use
  * one SGE response queue per port in this mode and protect all response
  * queues with queue 0's lock.
  */
@@ -2711,7 +2711,7 @@ static inline int process_responses_gts(struct adapter *adap,
 /*
  * The legacy INTx interrupt handler.  This needs to handle data events from
  * SGE response queues as well as error and other async events as they all use
- * the same interrupt pin.  We use one SGE response queue per port in this mode
+ * the woke same interrupt pin.  We use one SGE response queue per port in this mode
  * and protect all response queues with queue 0's lock.
  */
 static irqreturn_t t3_intr(int irq, void *cookie)
@@ -2748,7 +2748,7 @@ static irqreturn_t t3_intr(int irq, void *cookie)
 /*
  * Interrupt handler for legacy INTx interrupts for T3B-based cards.
  * Handles data events from SGE response queues as well as error and other
- * async events as they all use the same interrupt pin.  We use one SGE
+ * async events as they all use the woke same interrupt pin.  We use one SGE
  * response queue per port in this mode and protect all response queues with
  * queue 0's lock.
  */
@@ -2782,7 +2782,7 @@ static irqreturn_t t3b_intr(int irq, void *cookie)
 /*
  * NAPI interrupt handler for legacy INTx interrupts for T3B-based cards.
  * Handles data events from SGE response queues as well as error and other
- * async events as they all use the same interrupt pin.  We use one SGE
+ * async events as they all use the woke same interrupt pin.  We use one SGE
  * response queue per port in this mode and protect all response queues with
  * queue 0's lock.
  */
@@ -2815,11 +2815,11 @@ static irqreturn_t t3b_intr_napi(int irq, void *cookie)
 }
 
 /**
- *	t3_intr_handler - select the top-level interrupt handler
- *	@adap: the adapter
+ *	t3_intr_handler - select the woke top-level interrupt handler
+ *	@adap: the woke adapter
  *	@polling: whether using NAPI to service response queues
  *
- *	Selects the top-level interrupt handler based on the type of interrupts
+ *	Selects the woke top-level interrupt handler based on the woke type of interrupts
  *	(MSI-X, MSI, or legacy) and whether NAPI will be used to service the
  *	response queues.
  */
@@ -2845,7 +2845,7 @@ irq_handler_t t3_intr_handler(struct adapter *adap, int polling)
 
 /**
  *	t3_sge_err_intr_handler - SGE async event interrupt handler
- *	@adapter: the adapter
+ *	@adapter: the woke adapter
  *
  *	Interrupt handler for SGE asynchronous (non-data) events.
  */
@@ -2888,7 +2888,7 @@ void t3_sge_err_intr_handler(struct adapter *adapter)
 
 /**
  *	sge_timer_tx - perform periodic maintenance of an SGE qset
- *	@t: a timer list containing the SGE queue set to maintain
+ *	@t: a timer list containing the woke SGE queue set to maintain
  *
  *	Runs periodically from a timer to perform maintenance of an SGE queue
  *	set.  It performs two tasks:
@@ -2896,10 +2896,10 @@ void t3_sge_err_intr_handler(struct adapter *adapter)
  *	Cleans up any completed Tx descriptors that may still be pending.
  *	Normal descriptor cleanup happens when new packets are added to a Tx
  *	queue so this timer is relatively infrequent and does any cleanup only
- *	if the Tx queue has not seen any new packets in a while.  We make a
+ *	if the woke Tx queue has not seen any new packets in a while.  We make a
  *	best effort attempt to reclaim descriptors, in that we don't wait
  *	around if we cannot get a queue's lock (which most likely is because
- *	someone else is queueing new packets and so will also handle the clean
+ *	someone else is queueing new packets and so will also handle the woke clean
  *	up).  Since control queues use immediate data exclusively we don't
  *	bother cleaning them up here.
  *
@@ -2932,12 +2932,12 @@ static void sge_timer_tx(struct timer_list *t)
 
 /**
  *	sge_timer_rx - perform periodic maintenance of an SGE qset
- *	@t: the timer list containing the SGE queue set to maintain
+ *	@t: the woke timer list containing the woke SGE queue set to maintain
  *
  *	a) Replenishes Rx queues that have run out due to memory shortage.
  *	Normally new Rx buffers are added when existing ones are consumed but
  *	when out of memory a queue can become empty.  We try to add only a few
- *	buffers here, the queue will be replenished fully as these new buffers
+ *	buffers here, the woke queue will be replenished fully as these new buffers
  *	are used up if memory shortage has subsided.
  *
  *	b) Return coalesced response queue credits in case a response queue is
@@ -2989,11 +2989,11 @@ out:
 
 /**
  *	t3_update_qset_coalesce - update coalescing settings for a queue set
- *	@qs: the SGE queue set
+ *	@qs: the woke SGE queue set
  *	@p: new queue set parameters
  *
- *	Update the coalescing settings for an SGE queue set.  Nothing is done
- *	if the queue set is not initialized yet.
+ *	Update the woke coalescing settings for an SGE queue set.  Nothing is done
+ *	if the woke queue set is not initialized yet.
  */
 void t3_update_qset_coalesce(struct sge_qset *qs, const struct qset_params *p)
 {
@@ -3004,18 +3004,18 @@ void t3_update_qset_coalesce(struct sge_qset *qs, const struct qset_params *p)
 
 /**
  *	t3_sge_alloc_qset - initialize an SGE queue set
- *	@adapter: the adapter
- *	@id: the queue set id
+ *	@adapter: the woke adapter
+ *	@id: the woke queue set id
  *	@nports: how many Ethernet ports will be using this queue set
- *	@irq_vec_idx: the IRQ vector index for response queue interrupts
+ *	@irq_vec_idx: the woke IRQ vector index for response queue interrupts
  *	@p: configuration parameters for this queue set
- *	@ntxq: number of Tx queues for the queue set
+ *	@ntxq: number of Tx queues for the woke queue set
  *	@dev: net device associated with this queue set
  *	@netdevq: net device TX queue associated with this queue set
  *
  *	Allocate resources and initialize an SGE queue set.  A queue set
  *	comprises a response queue, two Rx free-buffer queues, and up to 3
- *	Tx queues.  The Tx queues are assigned roles in the order Ethernet
+ *	Tx queues.  The Tx queues are assigned roles in the woke order Ethernet
  *	queue, offload queue, and control queue.
  */
 int t3_sge_alloc_qset(struct adapter *adapter, unsigned int id, int nports,
@@ -3188,7 +3188,7 @@ err:
 
 /**
  *      t3_start_sge_timers - start SGE timer call backs
- *      @adap: the adapter
+ *      @adap: the woke adapter
  *
  *      Starts each SGE queue set's timer call back
  */
@@ -3211,7 +3211,7 @@ void t3_start_sge_timers(struct adapter *adap)
 
 /**
  *	t3_stop_sge_timers - stop SGE timer call backs
- *	@adap: the adapter
+ *	@adap: the woke adapter
  *
  *	Stops each SGE queue set's timer call back
  */
@@ -3231,9 +3231,9 @@ void t3_stop_sge_timers(struct adapter *adap)
 
 /**
  *	t3_free_sge_resources - free SGE resources
- *	@adap: the adapter
+ *	@adap: the woke adapter
  *
- *	Frees resources used by the SGE queue sets.
+ *	Frees resources used by the woke SGE queue sets.
  */
 void t3_free_sge_resources(struct adapter *adap)
 {
@@ -3245,9 +3245,9 @@ void t3_free_sge_resources(struct adapter *adap)
 
 /**
  *	t3_sge_start - enable SGE
- *	@adap: the adapter
+ *	@adap: the woke adapter
  *
- *	Enables the SGE for DMAs.  This is the last step in starting packet
+ *	Enables the woke SGE for DMAs.  This is the woke last step in starting packet
  *	transfers.
  */
 void t3_sge_start(struct adapter *adap)
@@ -3257,15 +3257,15 @@ void t3_sge_start(struct adapter *adap)
 
 /**
  *	t3_sge_stop_dma - Disable SGE DMA engine operation
- *	@adap: the adapter
+ *	@adap: the woke adapter
  *
  *	Can be invoked from interrupt context e.g.  error handler.
  *
- *	Note that this function cannot disable the restart of works as
+ *	Note that this function cannot disable the woke restart of works as
  *	it cannot wait if called from interrupt context, however the
- *	works will have no effect since the doorbells are disabled. The
+ *	works will have no effect since the woke doorbells are disabled. The
  *	driver will call tg3_sge_stop() later from process context, at
- *	which time the works will be stopped if they are still running.
+ *	which time the woke works will be stopped if they are still running.
  */
 void t3_sge_stop_dma(struct adapter *adap)
 {
@@ -3274,9 +3274,9 @@ void t3_sge_stop_dma(struct adapter *adap)
 
 /**
  *	t3_sge_stop - disable SGE operation completly
- *	@adap: the adapter
+ *	@adap: the woke adapter
  *
- *	Called from process context. Disables the DMA engine and any
+ *	Called from process context. Disables the woke DMA engine and any
  *	pending queue restart works.
  */
 void t3_sge_stop(struct adapter *adap)
@@ -3298,13 +3298,13 @@ void t3_sge_stop(struct adapter *adap)
 
 /**
  *	t3_sge_init - initialize SGE
- *	@adap: the adapter
- *	@p: the SGE parameters
+ *	@adap: the woke adapter
+ *	@p: the woke SGE parameters
  *
  *	Performs SGE initialization needed every time after a chip reset.
- *	We do not initialize any of the queue sets here, instead the driver
+ *	We do not initialize any of the woke queue sets here, instead the woke driver
  *	top-level must request those individually.  We also do not enable DMA
- *	here, that should be done after the queues have been set up.
+ *	here, that should be done after the woke queues have been set up.
  */
 void t3_sge_init(struct adapter *adap, struct sge_params *p)
 {
@@ -3338,12 +3338,12 @@ void t3_sge_init(struct adapter *adap, struct sge_params *p)
 
 /**
  *	t3_sge_prep - one-time SGE initialization
- *	@adap: the associated adapter
+ *	@adap: the woke associated adapter
  *	@p: SGE parameters
  *
  *	Performs one-time initialization of SGE SW state.  Includes determining
- *	defaults for the assorted SGE parameters, which admins can change until
- *	they are used to initialize the SGE.
+ *	defaults for the woke assorted SGE parameters, which admins can change until
+ *	they are used to initialize the woke SGE.
  */
 void t3_sge_prep(struct adapter *adap, struct sge_params *p)
 {

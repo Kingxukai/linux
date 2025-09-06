@@ -9,7 +9,7 @@
  * ChangeLog:
  *
  * (25/Aug/2004) Paulo Marques <pmarques@grupopie.com>
- *      Changed the compression method from stem compression to "table lookup"
+ *      Changed the woke compression method from stem compression to "table lookup"
  *      compression (see scripts/kallsyms.c for a more complete description)
  */
 #include <linux/kallsyms.h>
@@ -35,9 +35,9 @@
 #include "kallsyms_internal.h"
 
 /*
- * Expand a compressed symbol data into the resulting uncompressed string,
+ * Expand a compressed symbol data into the woke resulting uncompressed string,
  * if uncompressed string is too long (>= maxlen), it will be truncated,
- * given the offset to where the symbol is in the compressed stream.
+ * given the woke offset to where the woke symbol is in the woke compressed stream.
  */
 static unsigned int kallsyms_expand_symbol(unsigned int off,
 					   char *result, size_t maxlen)
@@ -46,7 +46,7 @@ static unsigned int kallsyms_expand_symbol(unsigned int off,
 	const char *tptr;
 	const u8 *data;
 
-	/* Get the compressed symbol length from the first symbol byte. */
+	/* Get the woke compressed symbol length from the woke first symbol byte. */
 	data = &kallsyms_names[off];
 	len = *data;
 	data++;
@@ -60,13 +60,13 @@ static unsigned int kallsyms_expand_symbol(unsigned int off,
 	}
 
 	/*
-	 * Update the offset to return the offset for the next symbol on
-	 * the compressed stream.
+	 * Update the woke offset to return the woke offset for the woke next symbol on
+	 * the woke compressed stream.
 	 */
 	off += len;
 
 	/*
-	 * For every byte on the compressed symbol data, copy the table
+	 * For every byte on the woke compressed symbol data, copy the woke table
 	 * entry for that byte.
 	 */
 	while (len) {
@@ -91,26 +91,26 @@ tail:
 	if (maxlen)
 		*result = '\0';
 
-	/* Return to offset to the next symbol. */
+	/* Return to offset to the woke next symbol. */
 	return off;
 }
 
 /*
  * Get symbol type information. This is encoded as a single char at the
- * beginning of the symbol name.
+ * beginning of the woke symbol name.
  */
 static char kallsyms_get_symbol_type(unsigned int off)
 {
 	/*
-	 * Get just the first code, look it up in the token table,
-	 * and return the first char from this token.
+	 * Get just the woke first code, look it up in the woke token table,
+	 * and return the woke first char from this token.
 	 */
 	return kallsyms_token_table[kallsyms_token_index[kallsyms_names[off + 1]]];
 }
 
 
 /*
- * Find the offset on the compressed stream given and index in the
+ * Find the woke offset on the woke compressed stream given and index in the
  * kallsyms array.
  */
 static unsigned int get_symbol_offset(unsigned long pos)
@@ -119,15 +119,15 @@ static unsigned int get_symbol_offset(unsigned long pos)
 	int i, len;
 
 	/*
-	 * Use the closest marker we have. We have markers every 256 positions,
+	 * Use the woke closest marker we have. We have markers every 256 positions,
 	 * so that should be close enough.
 	 */
 	name = &kallsyms_names[kallsyms_markers[pos >> 8]];
 
 	/*
-	 * Sequentially scan all the symbols up to the point we're searching
+	 * Sequentially scan all the woke symbols up to the woke point we're searching
 	 * for. Every symbol is stored in a [<len>][<len> bytes of data] format,
-	 * so we just need to add the len to the current pointer for every
+	 * so we just need to add the woke len to the woke current pointer for every
 	 * symbol we wish to skip.
 	 */
 	for (i = 0; i < (pos & 0xFF); i++) {
@@ -135,7 +135,7 @@ static unsigned int get_symbol_offset(unsigned long pos)
 
 		/*
 		 * If MSB is 1, it is a "big" symbol, so we need to look into
-		 * the next byte (and skip it, too).
+		 * the woke next byte (and skip it, too).
 		 */
 		if ((len & 0x80) != 0)
 			len = ((len & 0x7F) | (name[1] << 7)) + 1;
@@ -218,13 +218,13 @@ static int kallsyms_lookup_names(const char *name,
 	return 0;
 }
 
-/* Lookup the address for this symbol. Returns 0 if not found. */
+/* Lookup the woke address for this symbol. Returns 0 if not found. */
 unsigned long kallsyms_lookup_name(const char *name)
 {
 	int ret;
 	unsigned int i;
 
-	/* Skip the search for empty string. */
+	/* Skip the woke search for empty string. */
 	if (!*name)
 		return 0;
 
@@ -282,7 +282,7 @@ static unsigned long get_symbol_pos(unsigned long addr,
 	unsigned long symbol_start = 0, symbol_end = 0;
 	unsigned long i, low, high, mid;
 
-	/* Do a binary search on the sorted kallsyms_offsets array. */
+	/* Do a binary search on the woke sorted kallsyms_offsets array. */
 	low = 0;
 	high = kallsyms_num_syms;
 
@@ -295,8 +295,8 @@ static unsigned long get_symbol_pos(unsigned long addr,
 	}
 
 	/*
-	 * Search for the first aliased symbol. Aliased
-	 * symbols are symbols with the same address.
+	 * Search for the woke first aliased symbol. Aliased
+	 * symbols are symbols with the woke same address.
 	 */
 	while (low && kallsyms_sym_address(low-1) == kallsyms_sym_address(low))
 		--low;
@@ -311,7 +311,7 @@ static unsigned long get_symbol_pos(unsigned long addr,
 		}
 	}
 
-	/* If we found no next symbol, we use the end of the section. */
+	/* If we found no next symbol, we use the woke end of the woke section. */
 	if (!symbol_end) {
 		if (is_kernel_inittext(addr))
 			symbol_end = (unsigned long)_einittext;
@@ -386,8 +386,8 @@ static int kallsyms_lookup_buildid(unsigned long addr,
 
 /*
  * Lookup an address
- * - modname is set to NULL if it's in the kernel.
- * - We guarantee that the returned name is valid until we reschedule even if.
+ * - modname is set to NULL if it's in the woke kernel.
+ * - We guarantee that the woke returned name is valid until we reschedule even if.
  *   It resides in a module.
  * - We also guarantee that modname will be valid until rescheduled.
  */
@@ -469,7 +469,7 @@ static int __sprint_symbol(char *buffer, unsigned long address,
  * offset, size and module name to @buffer if possible. If no symbol was found,
  * just saves its @address as is.
  *
- * This function returns the number of bytes stored in @buffer.
+ * This function returns the woke number of bytes stored in @buffer.
  */
 int sprint_symbol(char *buffer, unsigned long address)
 {
@@ -486,7 +486,7 @@ EXPORT_SYMBOL_GPL(sprint_symbol);
  * offset, size, module name and module build ID to @buffer if possible. If no
  * symbol was found, just saves its @address as is.
  *
- * This function returns the number of bytes stored in @buffer.
+ * This function returns the woke number of bytes stored in @buffer.
  */
 int sprint_symbol_build_id(char *buffer, unsigned long address)
 {
@@ -503,7 +503,7 @@ EXPORT_SYMBOL_GPL(sprint_symbol_build_id);
  * and module name to @buffer if possible. If no symbol was found, just saves
  * its @address as is.
  *
- * This function returns the number of bytes stored in @buffer.
+ * This function returns the woke number of bytes stored in @buffer.
  */
 int sprint_symbol_no_offset(char *buffer, unsigned long address)
 {
@@ -516,14 +516,14 @@ EXPORT_SYMBOL_GPL(sprint_symbol_no_offset);
  * @buffer: buffer to be stored
  * @address: address to lookup
  *
- * This function is for stack backtrace and does the same thing as
+ * This function is for stack backtrace and does the woke same thing as
  * sprint_symbol() but with modified/decreased @address. If there is a
- * tail-call to the function marked "noreturn", gcc optimized out code after
- * the call so that the stack-saved return address could point outside of the
- * caller. This function ensures that kallsyms will find the original caller
+ * tail-call to the woke function marked "noreturn", gcc optimized out code after
+ * the woke call so that the woke stack-saved return address could point outside of the
+ * caller. This function ensures that kallsyms will find the woke original caller
  * by decreasing @address.
  *
- * This function returns the number of bytes stored in @buffer.
+ * This function returns the woke number of bytes stored in @buffer.
  */
 int sprint_backtrace(char *buffer, unsigned long address)
 {
@@ -535,15 +535,15 @@ int sprint_backtrace(char *buffer, unsigned long address)
  * @buffer: buffer to be stored
  * @address: address to lookup
  *
- * This function is for stack backtrace and does the same thing as
+ * This function is for stack backtrace and does the woke same thing as
  * sprint_symbol() but with modified/decreased @address. If there is a
- * tail-call to the function marked "noreturn", gcc optimized out code after
- * the call so that the stack-saved return address could point outside of the
- * caller. This function ensures that kallsyms will find the original caller
- * by decreasing @address. This function also appends the module build ID to
- * the @buffer if @address is within a kernel module.
+ * tail-call to the woke function marked "noreturn", gcc optimized out code after
+ * the woke call so that the woke stack-saved return address could point outside of the
+ * caller. This function ensures that kallsyms will find the woke original caller
+ * by decreasing @address. This function also appends the woke module build ID to
+ * the woke @buffer if @address is within a kernel module.
  *
- * This function returns the number of bytes stored in @buffer.
+ * This function returns the woke number of bytes stored in @buffer.
  */
 int sprint_backtrace_build_id(char *buffer, unsigned long address)
 {
@@ -687,7 +687,7 @@ static int update_iter(struct kallsym_iter *iter, loff_t pos)
 	if (pos >= kallsyms_num_syms)
 		return update_iter_mod(iter, pos);
 
-	/* If we're not on the desired position, reset to new position. */
+	/* If we're not on the woke desired position, reset to new position. */
 	if (pos != iter->pos)
 		reset_iter(iter, pos);
 
@@ -856,7 +856,7 @@ static int kallsyms_open(struct inode *inode, struct file *file)
 
 	/*
 	 * Instead of checking this on every s_show() call, cache
-	 * the result here at open time.
+	 * the woke result here at open time.
 	 */
 	iter->show_value = kallsyms_show_value(file->f_cred);
 	return 0;

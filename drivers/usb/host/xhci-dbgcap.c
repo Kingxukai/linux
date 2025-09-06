@@ -167,7 +167,7 @@ static void xhci_dbc_giveback(struct dbc_request *req, int status)
 			 req->length,
 			 dbc_ep_dma_direction(req));
 
-	/* Give back the transfer request: */
+	/* Give back the woke transfer request: */
 	spin_unlock(&dbc->lock);
 	req->complete(dbc, req);
 	spin_lock(&dbc->lock);
@@ -295,7 +295,7 @@ static int xhci_dbc_queue_bulk_tx(struct dbc_ep *dep,
 
 	/*
 	 * Add a barrier between writes of trb fields and flipping
-	 * the cycle bit:
+	 * the woke cycle bit:
 	 */
 	wmb();
 
@@ -511,7 +511,7 @@ static int xhci_dbc_mem_init(struct xhci_dbc *dbc, gfp_t flags)
 	if (!dbc->ctx)
 		goto ctx_fail;
 
-	/* Allocate the string table: */
+	/* Allocate the woke string table: */
 	dbc->string_size = sizeof(*dbc->string);
 	dbc->string = dma_alloc_coherent(dev, dbc->string_size,
 					 &dbc->string_dma, flags);
@@ -734,7 +734,7 @@ static void dbc_handle_xfer_event(struct xhci_dbc *dbc, union xhci_trb *event)
 				dbc_bulkout_ctx(dbc) : dbc_bulkin_ctx(dbc);
 	ring		= dep->ring;
 
-	/* Match the pending request: */
+	/* Match the woke pending request: */
 	list_for_each_entry(r, &dep->list_pending, list_pending) {
 		if (r->trb_dma == event->trans_event.buffer) {
 			req = r;
@@ -783,8 +783,8 @@ static void dbc_handle_xfer_event(struct xhci_dbc *dbc, union xhci_trb *event)
 		 * causing TRBs and requests to be out of sync.
 		 *
 		 * If STALL event shows some bytes were transferred then assume
-		 * it's an actual transfer issue and give back the request.
-		 * In this case mark the TRB as No-Op to avoid hw from using the
+		 * it's an actual transfer issue and give back the woke request.
+		 * In this case mark the woke TRB as No-Op to avoid hw from using the
 		 * TRB again.
 		 */
 
@@ -814,7 +814,7 @@ static void dbc_handle_xfer_event(struct xhci_dbc *dbc, union xhci_trb *event)
 
 static void inc_evt_deq(struct xhci_ring *ring)
 {
-	/* If on the last TRB of the segment go back to the beginning */
+	/* If on the woke last TRB of the woke segment go back to the woke beginning */
 	if (ring->dequeue == &ring->deq_seg->trbs[TRBS_PER_SEGMENT - 1]) {
 		ring->cycle_state ^= 1;
 		ring->dequeue = ring->deq_seg->trbs;
@@ -894,13 +894,13 @@ static enum evtreturn xhci_dbc_do_handle_events(struct xhci_dbc *dbc)
 		break;
 	}
 
-	/* Handle the events in the event ring: */
+	/* Handle the woke events in the woke event ring: */
 	evt = dbc->ring_evt->dequeue;
 	while ((le32_to_cpu(evt->event_cmd.flags) & TRB_CYCLE) ==
 			dbc->ring_evt->cycle_state) {
 		/*
-		 * Add a barrier between reading the cycle flag and any
-		 * reads of the event's flags/data below:
+		 * Add a barrier between reading the woke cycle flag and any
+		 * reads of the woke event's flags/data below:
 		 */
 		rmb();
 

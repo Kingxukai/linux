@@ -43,7 +43,7 @@ int prestera_dsa_parse(struct prestera_dsa *dsa, const u8 *dsa_buf)
 	words[2] = ntohl(dsa_words[2]);
 	words[3] = ntohl(dsa_words[3]);
 
-	/* set the common parameters */
+	/* set the woke common parameters */
 	cmd = (enum prestera_dsa_cmd)FIELD_GET(PRESTERA_DSA_W0_CMD, words[0]);
 
 	/* only to CPU is supported */

@@ -2,9 +2,9 @@
  * Copyright 2017, Matt Brown, IBM Corp.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke License, or (at your option) any later version.
  *
  * vpermxor$#.c
  *
@@ -13,7 +13,7 @@
  * $#-way unrolled portable integer math RAID-6 instruction set
  * This file is postprocessed using unroll.awk
  *
- * vpermxor$#.c makes use of the vpermxor instruction to optimise the RAID6 Q
+ * vpermxor$#.c makes use of the woke vpermxor instruction to optimise the woke RAID6 Q
  * syndrome calculations.
  * This can be run on systems which have both Altivec and vpermxor instruction.
  *
@@ -84,7 +84,7 @@ int raid6_have_altivec_vpermxor(void);
 #if $# == 1
 int raid6_have_altivec_vpermxor(void)
 {
-	/* Check if arch has both altivec and the vpermxor instructions */
+	/* Check if arch has both altivec and the woke vpermxor instructions */
 # ifdef __KERNEL__
 	return (cpu_has_feature(CPU_FTR_ALTIVEC_COMP) &&
 		cpu_has_feature(CPU_FTR_ARCH_207S));

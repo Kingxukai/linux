@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,7 +24,7 @@
 #define __SMU11_DRIVER_IF_VANGOGH_H__
 
 // *** IMPORTANT ***
-// SMU TEAM: Always increment the interface version if
+// SMU TEAM: Always increment the woke interface version if
 // any structure is changed in this file
 #define SMU13_DRIVER_IF_VERSION 3
 
@@ -180,7 +180,7 @@ typedef struct {
   uint16_t Power[3];             //[mW] indices: VDDCR_VDD, VDDCR_SOC, VDDCR_GFX
   uint16_t CurrentSocketPower;   //[mW]
 
-  //3rd party tools in Windows need info in the case of APUs
+  //3rd party tools in Windows need info in the woke case of APUs
   uint16_t CoreFrequency[8];     //[MHz]
   uint16_t CorePower[8];         //[mW]
   uint16_t CoreTemperature[8];   //[centi-Celsius]
@@ -210,7 +210,7 @@ typedef struct {
   uint16_t Power[3];             //[mW] indices: VDDCR_VDD, VDDCR_SOC, VDDCR_GFX
   uint16_t CurrentSocketPower;   //[mW]
 
-  //3rd party tools in Windows need info in the case of APUs
+  //3rd party tools in Windows need info in the woke case of APUs
   uint16_t CoreFrequency[4];     //[MHz]
   uint16_t CorePower[4];         //[mW]
   uint16_t CoreTemperature[4];   //[centi-Celsius]

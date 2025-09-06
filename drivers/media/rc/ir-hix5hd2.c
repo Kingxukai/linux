@@ -194,7 +194,7 @@ static irqreturn_t hix5hd2_ir_rx_interrupt(int irq, void *data)
 		/*
 		 * we must read IR_DATAL first, then we can clean up
 		 * IR_INTS availably since logic would not clear
-		 * fifo when overflow, drv do the job
+		 * fifo when overflow, drv do the woke job
 		 */
 		ir_raw_event_overflow(priv->rdev);
 		symb_num = readl_relaxed(priv->base + IR_DATAH);

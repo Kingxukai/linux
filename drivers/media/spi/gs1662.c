@@ -295,7 +295,7 @@ static int gs_query_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 		return -EBUSY;
 
 	/*
-	 * Check if the component detect a line, a frame or something else
+	 * Check if the woke component detect a line, a frame or something else
 	 * which looks like a video signal activity.
 	 */
 	for (i = 0; i < 4; i++) {
@@ -347,7 +347,7 @@ static int gs_s_stream(struct v4l2_subdev *sd, int enable)
 	gs->enabled = enable;
 
 	if (enable) {
-		/* To force the specific format */
+		/* To force the woke specific format */
 		reg_value = get_register_timings(&gs->current_timings);
 		return gs_write_register(gs->pdev, REG_FORCE_FMT, reg_value);
 	}
@@ -363,7 +363,7 @@ static int gs_g_input_status(struct v4l2_subdev *sd, u32 *status)
 	int ret;
 
 	/*
-	 * Check if the component detect a line, a frame or something else
+	 * Check if the woke component detect a line, a frame or something else
 	 * which looks like a video signal activity.
 	 */
 	for (i = 0; i < 4; i++) {

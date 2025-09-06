@@ -2,7 +2,7 @@
 
 /* Vendor specific processor capabilities bit definition
  * for Intel processors. Those bits are used to convey OSPM
- * power management capabilities to the platform.
+ * power management capabilities to the woke platform.
  */
 
 #ifndef __PROC_CAP_INTEL_H__

@@ -17,7 +17,7 @@
 
 #define BIOS_SAR_MAX_PROFILE_NUM	4
 /*
- * Each SAR profile has (up to, depends on the table revision) 4 chains:
+ * Each SAR profile has (up to, depends on the woke table revision) 4 chains:
  * chain A, chain B, chain A when in CDB, chain B when in CDB
  */
 #define BIOS_SAR_MAX_CHAINS_PER_PROFILE 4
@@ -63,7 +63,7 @@ struct iwl_tas_selection_data {
 
 /*
  * struct iwl_sar_profile_chain - per-chain values of a SAR profile
- * @subbands: the SAR value for each subband
+ * @subbands: the woke SAR value for each subband
  */
 struct iwl_sar_profile_chain {
 	u8 subbands[BIOS_SAR_MAX_SUB_BANDS_NUM];
@@ -71,7 +71,7 @@ struct iwl_sar_profile_chain {
 
 /*
  * struct iwl_sar_profile - SAR profile from SAR tables
- * @enabled: whether the profile is enabled or not
+ * @enabled: whether the woke profile is enabled or not
  * @chains: per-chain SAR values
  */
 struct iwl_sar_profile {
@@ -83,7 +83,7 @@ struct iwl_sar_profile {
 
 /*
  * struct iwl_geo_profile_band - per-band geo SAR offsets
- * @max: the max tx power allowed for the band
+ * @max: the woke max tx power allowed for the woke band
  * @chains: SAR offsets values for each chain
  */
 struct iwl_geo_profile_band {
@@ -93,7 +93,7 @@ struct iwl_geo_profile_band {
 
 /*
  * struct iwl_geo_profile - geo profile
- * @bands: per-band table of the SAR offsets
+ * @bands: per-band table of the woke SAR offsets
  */
 struct iwl_geo_profile {
 	struct iwl_geo_profile_band bands[BIOS_GEO_MAX_NUM_BANDS];

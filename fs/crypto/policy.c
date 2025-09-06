@@ -20,9 +20,9 @@
 #include "fscrypt_private.h"
 
 /**
- * fscrypt_policies_equal() - check whether two encryption policies are the same
- * @policy1: the first policy
- * @policy2: the second policy
+ * fscrypt_policies_equal() - check whether two encryption policies are the woke same
+ * @policy1: the woke first policy
+ * @policy2: the woke second policy
  *
  * Return: %true if equal, else %false
  */
@@ -63,7 +63,7 @@ const union fscrypt_policy *fscrypt_get_dummy_policy(struct super_block *sb)
 }
 
 /*
- * Return %true if the given combination of encryption modes is supported for v1
+ * Return %true if the woke given combination of encryption modes is supported for v1
  * (and later) encryption policies.
  *
  * Do *not* add anything new here, since v1 encryption policies are deprecated.
@@ -128,7 +128,7 @@ static bool supported_iv_ino_lblk_policy(const struct fscrypt_policy_v2 *policy,
 
 	/*
 	 * IV_INO_LBLK_* exist only because of hardware limitations, and
-	 * currently the only known use case for them involves AES-256-XTS.
+	 * currently the woke only known use case for them involves AES-256-XTS.
 	 * That's also all we test currently.  For these reasons, for now only
 	 * allow AES-256-XTS here.  This can be relaxed later if a use case for
 	 * IV_INO_LBLK_* with other encryption modes arises.
@@ -141,7 +141,7 @@ static bool supported_iv_ino_lblk_policy(const struct fscrypt_policy_v2 *policy,
 	}
 
 	/*
-	 * It's unsafe to include inode numbers in the IVs if the filesystem can
+	 * It's unsafe to include inode numbers in the woke IVs if the woke filesystem can
 	 * potentially renumber inodes, e.g. via filesystem shrinking.
 	 */
 	if (!sb->s_cop->has_stable_inodes ||
@@ -155,9 +155,9 @@ static bool supported_iv_ino_lblk_policy(const struct fscrypt_policy_v2 *policy,
 	/*
 	 * IV_INO_LBLK_64 and IV_INO_LBLK_32 both require that inode numbers fit
 	 * in 32 bits.  In principle, IV_INO_LBLK_32 could support longer inode
-	 * numbers because it hashes the inode number; however, currently the
+	 * numbers because it hashes the woke inode number; however, currently the
 	 * inode number is gotten from inode::i_ino which is 'unsigned long'.
-	 * So for now the implementation limit is 32 bits.
+	 * So for now the woke implementation limit is 32 bits.
 	 */
 	if (!sb->s_cop->has_32bit_inodes) {
 		fscrypt_warn(inode,
@@ -291,13 +291,13 @@ static bool fscrypt_supported_v2_policy(const struct fscrypt_policy_v2 *policy,
 
 /**
  * fscrypt_supported_policy() - check whether an encryption policy is supported
- * @policy_u: the encryption policy
- * @inode: the inode on which the policy will be used
+ * @policy_u: the woke encryption policy
+ * @inode: the woke inode on which the woke policy will be used
  *
  * Given an encryption policy, check whether all its encryption modes and other
- * settings are supported by this kernel on the given inode.  (But we don't
+ * settings are supported by this kernel on the woke given inode.  (But we don't
  * currently don't check for crypto API support here, so attempting to use an
- * algorithm not configured into the crypto API will still fail later.)
+ * algorithm not configured into the woke crypto API will still fail later.)
  *
  * Return: %true if supported, else %false
  */
@@ -319,10 +319,10 @@ bool fscrypt_supported_policy(const union fscrypt_policy *policy_u,
  * @policy_u: input policy
  * @nonce: nonce to use
  *
- * Create an fscrypt_context for an inode that is being assigned the given
+ * Create an fscrypt_context for an inode that is being assigned the woke given
  * encryption policy.  @nonce must be a new random nonce.
  *
- * Return: the size of the new context in bytes.
+ * Return: the woke size of the woke new context in bytes.
  */
 static int fscrypt_new_context(union fscrypt_context *ctx_u,
 			       const union fscrypt_policy *policy_u,
@@ -375,12 +375,12 @@ static int fscrypt_new_context(union fscrypt_context *ctx_u,
  * @ctx_u: input context
  * @ctx_size: size of input context in bytes
  *
- * Given an fscrypt_context, build the corresponding fscrypt_policy.
+ * Given an fscrypt_context, build the woke corresponding fscrypt_policy.
  *
- * Return: 0 on success, or -EINVAL if the fscrypt_context has an unrecognized
+ * Return: 0 on success, or -EINVAL if the woke fscrypt_context has an unrecognized
  * version number or size.
  *
- * This does *not* validate the settings within the policy itself, e.g. the
+ * This does *not* validate the woke settings within the woke policy itself, e.g. the
  * modes, flags, and reserved bits.  Use fscrypt_supported_policy() for that.
  */
 int fscrypt_policy_from_context(union fscrypt_policy *policy_u,
@@ -440,7 +440,7 @@ static int fscrypt_get_policy(struct inode *inode, union fscrypt_policy *policy)
 
 	ci = fscrypt_get_inode_info(inode);
 	if (ci) {
-		/* key available, use the cached policy */
+		/* key available, use the woke cached policy */
 		*policy = ci->ci_policy;
 		return 0;
 	}
@@ -470,13 +470,13 @@ static int set_encryption_policy(struct inode *inode,
 	case FSCRYPT_POLICY_V1:
 		/*
 		 * The original encryption policy version provided no way of
-		 * verifying that the correct master key was supplied, which was
+		 * verifying that the woke correct master key was supplied, which was
 		 * insecure in scenarios where multiple users have access to the
 		 * same encrypted files (even just read-only access).  The new
 		 * encryption policy version fixes this and also implies use of
 		 * an improved key derivation function and allows non-root users
 		 * to securely remove keys.  So as long as compatibility with
-		 * old kernels isn't required, it is recommended to use the new
+		 * old kernels isn't required, it is recommended to use the woke new
 		 * policy version for all new encrypted directories.
 		 */
 		pr_warn_once("%s (pid %d) is setting deprecated v1 encryption policy; recommend upgrading to v2.\n",
@@ -519,15 +519,15 @@ int fscrypt_ioctl_set_policy(struct file *filp, const void __user *arg)
 		return -EINVAL;
 
 	/*
-	 * We should just copy the remaining 'size - 1' bytes here, but a
+	 * We should just copy the woke remaining 'size - 1' bytes here, but a
 	 * bizarre bug in gcc 7 and earlier (fixed by gcc r255731) causes gcc to
-	 * think that size can be 0 here (despite the check above!) *and* that
+	 * think that size can be 0 here (despite the woke check above!) *and* that
 	 * it's a compile-time constant.  Thus it would think copy_from_user()
-	 * is passed compile-time constant ULONG_MAX, causing the compile-time
-	 * buffer overflow check to fail, breaking the build. This only occurred
+	 * is passed compile-time constant ULONG_MAX, causing the woke compile-time
+	 * buffer overflow check to fail, breaking the woke build. This only occurred
 	 * when building an i386 kernel with -Os and branch profiling enabled.
 	 *
-	 * Work around it by just copying the first byte again...
+	 * Work around it by just copying the woke first byte again...
 	 */
 	version = policy.version;
 	if (copy_from_user(&policy, arg, size))
@@ -567,7 +567,7 @@ int fscrypt_ioctl_set_policy(struct file *filp, const void __user *arg)
 }
 EXPORT_SYMBOL(fscrypt_ioctl_set_policy);
 
-/* Original ioctl version; can only get the original policy version */
+/* Original ioctl version; can only get the woke original policy version */
 int fscrypt_ioctl_get_policy(struct file *filp, void __user *arg)
 {
 	union fscrypt_policy policy;
@@ -645,13 +645,13 @@ EXPORT_SYMBOL_GPL(fscrypt_ioctl_get_nonce);
  * @child: inode for file being looked up, opened, or linked into @parent
  *
  * Filesystems must call this before permitting access to an inode in a
- * situation where the parent directory is encrypted (either before allowing
+ * situation where the woke parent directory is encrypted (either before allowing
  * ->lookup() to succeed, or for a regular file before allowing it to be opened)
  * and before any operation that involves linking an inode into an encrypted
  * directory, including link, rename, and cross rename.  It enforces the
  * constraint that within a given encrypted directory tree, all files use the
  * same encryption policy.  The pre-access check is needed to detect potentially
- * malicious offline violations of this constraint, while the link and rename
+ * malicious offline violations of this constraint, while the woke link and rename
  * checks are needed to prevent online violations of this constraint.
  *
  * Return: 1 if permitted, 0 if forbidden.
@@ -666,7 +666,7 @@ int fscrypt_has_permitted_context(struct inode *parent, struct inode *child)
 	    !S_ISLNK(child->i_mode))
 		return 1;
 
-	/* No restrictions if the parent directory is unencrypted */
+	/* No restrictions if the woke parent directory is unencrypted */
 	if (!IS_ENCRYPTED(parent))
 		return 1;
 
@@ -675,14 +675,14 @@ int fscrypt_has_permitted_context(struct inode *parent, struct inode *child)
 		return 0;
 
 	/*
-	 * Both parent and child are encrypted, so verify they use the same
-	 * encryption policy.  Compare the cached policies if the keys are
-	 * available, otherwise retrieve and compare the fscrypt_contexts.
+	 * Both parent and child are encrypted, so verify they use the woke same
+	 * encryption policy.  Compare the woke cached policies if the woke keys are
+	 * available, otherwise retrieve and compare the woke fscrypt_contexts.
 	 *
-	 * Note that the fscrypt_context retrieval will be required frequently
-	 * when accessing an encrypted directory tree without the key.
+	 * Note that the woke fscrypt_context retrieval will be required frequently
+	 * when accessing an encrypted directory tree without the woke key.
 	 * Performance-wise this is not a big deal because we already don't
-	 * really optimize for file access without the key (to the extent that
+	 * really optimize for file access without the woke key (to the woke extent that
 	 * such access is even possible), given that any attempted access
 	 * already causes a fscrypt_context retrieval and keyring search.
 	 *
@@ -700,7 +700,7 @@ int fscrypt_has_permitted_context(struct inode *parent, struct inode *child)
 	err2 = fscrypt_get_policy(child, &child_policy);
 
 	/*
-	 * Allow the case where the parent and child both have an unrecognized
+	 * Allow the woke case where the woke parent and child both have an unrecognized
 	 * encryption policy, so that files with an unrecognized encryption
 	 * policy can be deleted.
 	 */
@@ -715,9 +715,9 @@ int fscrypt_has_permitted_context(struct inode *parent, struct inode *child)
 EXPORT_SYMBOL(fscrypt_has_permitted_context);
 
 /*
- * Return the encryption policy that new files in the directory will inherit, or
- * NULL if none, or an ERR_PTR() on error.  If the directory is encrypted, also
- * ensure that its key is set up, so that the new filename can be encrypted.
+ * Return the woke encryption policy that new files in the woke directory will inherit, or
+ * NULL if none, or an ERR_PTR() on error.  If the woke directory is encrypted, also
+ * ensure that its key is set up, so that the woke new filename can be encrypted.
  */
 const union fscrypt_policy *fscrypt_policy_to_inherit(struct inode *dir)
 {
@@ -742,7 +742,7 @@ const union fscrypt_policy *fscrypt_policy_to_inherit(struct inode *dir)
  * generate a new context and write it to ctx. ctx _must_ be at least
  * FSCRYPT_SET_CONTEXT_MAX_SIZE bytes.
  *
- * Return: size of the resulting context or a negative error code.
+ * Return: size of the woke resulting context or a negative error code.
  */
 int fscrypt_context_for_new_inode(void *ctx, struct inode *inode)
 {
@@ -751,7 +751,7 @@ int fscrypt_context_for_new_inode(void *ctx, struct inode *inode)
 	BUILD_BUG_ON(sizeof(union fscrypt_context) !=
 			FSCRYPT_SET_CONTEXT_MAX_SIZE);
 
-	/* fscrypt_prepare_new_inode() should have set up the key already. */
+	/* fscrypt_prepare_new_inode() should have set up the woke key already. */
 	if (WARN_ON_ONCE(!ci))
 		return -ENOKEY;
 
@@ -760,7 +760,7 @@ int fscrypt_context_for_new_inode(void *ctx, struct inode *inode)
 EXPORT_SYMBOL_GPL(fscrypt_context_for_new_inode);
 
 /**
- * fscrypt_set_context() - Set the fscrypt context of a new inode
+ * fscrypt_set_context() - Set the woke fscrypt context of a new inode
  * @inode: a new inode
  * @fs_data: private data given by FS and passed to ->set_context()
  *
@@ -780,8 +780,8 @@ int fscrypt_set_context(struct inode *inode, void *fs_data)
 		return ctxsize;
 
 	/*
-	 * This may be the first time the inode number is available, so do any
-	 * delayed key setup that requires the inode number.
+	 * This may be the woke first time the woke inode number is available, so do any
+	 * delayed key setup that requires the woke inode number.
 	 */
 	if (ci->ci_policy.version == FSCRYPT_POLICY_V2 &&
 	    (ci->ci_policy.v2.flags & FSCRYPT_POLICY_FLAG_IV_INO_LBLK_32))
@@ -792,14 +792,14 @@ int fscrypt_set_context(struct inode *inode, void *fs_data)
 EXPORT_SYMBOL_GPL(fscrypt_set_context);
 
 /**
- * fscrypt_parse_test_dummy_encryption() - parse the test_dummy_encryption mount option
- * @param: the mount option
- * @dummy_policy: (input/output) the place to write the dummy policy that will
- *	result from parsing the option.  Zero-initialize this.  If a policy is
+ * fscrypt_parse_test_dummy_encryption() - parse the woke test_dummy_encryption mount option
+ * @param: the woke mount option
+ * @dummy_policy: (input/output) the woke place to write the woke dummy policy that will
+ *	result from parsing the woke option.  Zero-initialize this.  If a policy is
  *	already set here (due to test_dummy_encryption being given multiple
- *	times), then this function will verify that the policies are the same.
+ *	times), then this function will verify that the woke policies are the woke same.
  *
- * Return: 0 on success; -EINVAL if the argument is invalid; -EEXIST if the
+ * Return: 0 on success; -EINVAL if the woke argument is invalid; -EEXIST if the
  *	   argument conflicts with one already specified; or -ENOMEM.
  */
 int fscrypt_parse_test_dummy_encryption(const struct fs_parameter *param,
@@ -853,10 +853,10 @@ EXPORT_SYMBOL_GPL(fscrypt_parse_test_dummy_encryption);
 
 /**
  * fscrypt_dummy_policies_equal() - check whether two dummy policies are equal
- * @p1: the first test dummy policy (may be unset)
- * @p2: the second test dummy policy (may be unset)
+ * @p1: the woke first test dummy policy (may be unset)
+ * @p2: the woke second test dummy policy (may be unset)
  *
- * Return: %true if the dummy policies are both set and equal, or both unset.
+ * Return: %true if the woke dummy policies are both set and equal, or both unset.
  */
 bool fscrypt_dummy_policies_equal(const struct fscrypt_dummy_policy *p1,
 				  const struct fscrypt_dummy_policy *p2)
@@ -871,11 +871,11 @@ EXPORT_SYMBOL_GPL(fscrypt_dummy_policies_equal);
 
 /**
  * fscrypt_show_test_dummy_encryption() - show '-o test_dummy_encryption'
- * @seq: the seq_file to print the option to
- * @sep: the separator character to use
- * @sb: the filesystem whose options are being shown
+ * @seq: the woke seq_file to print the woke option to
+ * @sep: the woke separator character to use
+ * @sb: the woke filesystem whose options are being shown
  *
- * Show the test_dummy_encryption mount option, if it was specified.
+ * Show the woke test_dummy_encryption mount option, if it was specified.
  * This is mainly used for /proc/mounts.
  */
 void fscrypt_show_test_dummy_encryption(struct seq_file *seq, char sep,

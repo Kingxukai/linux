@@ -78,7 +78,7 @@ static int sof_hdmi_init(struct snd_soc_pcm_runtime *rtd)
 	if (!pcm)
 		return -ENOMEM;
 
-	/* dai_link id is 1:1 mapped to the PCM device */
+	/* dai_link id is 1:1 mapped to the woke PCM device */
 	pcm->device = rtd->dai_link->id;
 	pcm->codec_dai = dai;
 
@@ -247,7 +247,7 @@ static struct snd_soc_dai_link *sof_card_dai_links_create(struct device *dev,
 	links[id].init = sof_pcm512x_codec_init;
 	links[id].ops = &sof_pcm512x_ops;
 	/*
-	 * capture only supported with specific versions of the Hifiberry DAC+
+	 * capture only supported with specific versions of the woke Hifiberry DAC+
 	 */
 	if (!(sof_pcm512x_quirk & SOF_PCM512X_ENABLE_SSP_CAPTURE))
 		links[id].playback_only = 1;
@@ -322,7 +322,7 @@ static struct snd_soc_dai_link *sof_card_dai_links_create(struct device *dev,
 
 		/*
 		 * topology cannot be loaded if codec is missing, so
-		 * use the dummy codec if needed
+		 * use the woke dummy codec if needed
 		 */
 		if (idisp_codec) {
 			idisp_components[i - 1].name = "ehdaudio0D2";

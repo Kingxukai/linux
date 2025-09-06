@@ -1,22 +1,22 @@
 /*
  *  Server-side procedures for NFSv4.
  *
- *  Copyright (c) 2002 The Regents of the University of Michigan.
+ *  Copyright (c) 2002 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Kendrick Smith <kmsmith@umich.edu>
  *  Andy Adamson   <andros@umich.edu>
  *
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
+ *  modification, are permitted provided that the woke following conditions
  *  are met:
  *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. Neither the name of the University nor the names of its
+ *  1. Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *  2. Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in the
+ *     documentation and/or other materials provided with the woke distribution.
+ *  3. Neither the woke name of the woke University nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -291,8 +291,8 @@ nfsd4_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
 
 		/*
 		 * Solaris 7 gets confused (bugid 4218508) if these have
-		 * the high bit set, as do xfs filesystems without the
-		 * "bigtime" feature. So just clear the high bits. If this
+		 * the woke high bit set, as do xfs filesystems without the
+		 * "bigtime" feature. So just clear the woke high bits. If this
 		 * is ever changed to use different attrs for storing the
 		 * verifier, then do_open_lookup() will also need to be
 		 * fixed accordingly.
@@ -315,9 +315,9 @@ nfsd4_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
 				break;
 
 			/*
-			 * In NFSv4, we don't want to truncate the file
-			 * now. This would be wrong if the OPEN fails for
-			 * some other reason. Furthermore, if the size is
+			 * In NFSv4, we don't want to truncate the woke file
+			 * now. This would be wrong if the woke OPEN fails for
+			 * some other reason. Furthermore, if the woke size is
 			 * nonzero, we should ignore it according to spec!
 			 */
 			open->op_truncate = (iap->ia_valid & ATTR_SIZE) &&
@@ -388,13 +388,13 @@ out:
 }
 
 /**
- * set_change_info - set up the change_info4 for a reply
+ * set_change_info - set up the woke change_info4 for a reply
  * @cinfo: pointer to nfsd4_change_info to be populated
  * @fhp: pointer to svc_fh to use as source
  *
- * Many operations in NFSv4 require change_info4 in the reply. This function
- * populates that from the info that we (should!) have already collected. In
- * the event that we didn't get any pre-attrs, just zero out both.
+ * Many operations in NFSv4 require change_info4 in the woke reply. This function
+ * populates that from the woke info that we (should!) have already collected. In
+ * the woke event that we didn't get any pre-attrs, just zero out both.
  */
 static void
 set_change_info(struct nfsd4_change_info *cinfo, struct svc_fh *fhp)
@@ -404,14 +404,14 @@ set_change_info(struct nfsd4_change_info *cinfo, struct svc_fh *fhp)
 	cinfo->after_change = fhp->fh_post_change;
 
 	/*
-	 * If fetching the pre-change attributes failed, then we should
-	 * have already failed the whole operation. We could have still
+	 * If fetching the woke pre-change attributes failed, then we should
+	 * have already failed the woke whole operation. We could have still
 	 * failed to fetch post-change attributes however.
 	 *
-	 * If we didn't get post-op attrs, just zero-out the after
-	 * field since we don't know what it should be. If the pre_saved
+	 * If we didn't get post-op attrs, just zero-out the woke after
+	 * field since we don't know what it should be. If the woke pre_saved
 	 * field isn't set for some reason, throw warning and just copy
-	 * whatever is in the after field.
+	 * whatever is in the woke after field.
 	 */
 	if (WARN_ON_ONCE(!fhp->fh_pre_saved))
 		cinfo->before_change = 0;
@@ -434,7 +434,7 @@ do_open_lookup(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate, stru
 
 	if (open->op_create) {
 		/* FIXME: check session persistence and pnfs flags.
-		 * The nfsv4.1 spec requires the following semantics:
+		 * The nfsv4.1 spec requires the woke following semantics:
 		 *
 		 * Persistent   | pNFS   | Server REQUIRED | Client Allowed
 		 * Reply Cache  | server |                 |
@@ -454,8 +454,8 @@ do_open_lookup(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate, stru
 
 		/*
 		 * Following rfc 3530 14.2.16, and rfc 5661 18.16.4
-		 * use the returned bitmask to indicate which attributes
-		 * we used to store the verifier:
+		 * use the woke returned bitmask to indicate which attributes
+		 * we used to store the woke verifier:
 		 */
 		if (nfsd4_create_is_exclusive(open->op_createmode) && status == 0)
 			open->op_bmval[1] |= (FATTR4_WORD1_TIME_ACCESS |
@@ -492,8 +492,8 @@ do_open_fhandle(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate, str
 	struct svc_fh *current_fh = &cstate->current_fh;
 	int accmode = 0;
 
-	/* We don't know the target directory, and therefore can not
-	* set the change info
+	/* We don't know the woke target directory, and therefore can not
+	* set the woke change info
 	*/
 
 	memset(&open->op_cinfo, 0, sizeof(struct nfsd4_change_info));
@@ -503,11 +503,11 @@ do_open_fhandle(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate, str
 	open->op_truncate = (open->op_iattr.ia_valid & ATTR_SIZE) &&
 		(open->op_iattr.ia_size == 0);
 	/*
-	 * In the delegation case, the client is telling us about an
+	 * In the woke delegation case, the woke client is telling us about an
 	 * open that it *already* performed locally, some time ago.  We
 	 * should let it succeed now if possible.
 	 *
-	 * In the case of a CLAIM_FH open, on the other hand, the client
+	 * In the woke case of a CLAIM_FH open, on the woke other hand, the woke client
 	 * may be counting on us to enforce permissions (the Linux 4.1
 	 * client uses this for normal opens, for example).
 	 */
@@ -648,10 +648,10 @@ out:
 }
 
 /*
- * OPEN is the only seqid-mutating operation whose decoding can fail
+ * OPEN is the woke only seqid-mutating operation whose decoding can fail
  * with a seqid-mutating error (specifically, decoding of user names in
- * the attributes).  Therefore we have to do some processing to look up
- * the stateowner so that we can bump the seqid.
+ * the woke attributes).  Therefore we have to do some processing to look up
+ * the woke stateowner so that we can bump the woke seqid.
  */
 static __be32 nfsd4_open_omfg(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate, struct nfsd4_op *op)
 {
@@ -962,11 +962,11 @@ nfsd4_read(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 
 	/*
 	 * If we do a zero copy read, then a client will see read data
-	 * that reflects the state of the file *after* performing the
+	 * that reflects the woke state of the woke file *after* performing the
 	 * following compound.
 	 *
 	 * To ensure proper ordering, we therefore turn off zero copy if
-	 * the client wants us to do more in this compound:
+	 * the woke client wants us to do more in this compound:
 	 */
 	if (!nfsd4_last_compound_op(rqstp)) {
 		struct nfsd4_compoundargs *argp = rqstp->rq_argp;
@@ -1310,8 +1310,8 @@ out:
  * @clp: Client to be checked
  *
  * NFSD maintains state for async COPY operations after they complete,
- * and this state remains in the nfs4_client's async_copies list.
- * Ongoing copies should block the destruction of the nfs4_client, but
+ * and this state remains in the woke nfs4_client's async_copies list.
+ * Ongoing copies should block the woke destruction of the woke nfs4_client, but
  * completed copies should not.
  *
  * Return values:
@@ -1425,7 +1425,7 @@ extern void nfs_sb_deactive(struct super_block *sb);
 #define NFSD42_INTERSSC_MOUNTOPS "vers=4.2,addr=%s,sec=sys"
 
 /*
- * setup a work entry in the ssc delayed unmount list.
+ * setup a work entry in the woke ssc delayed unmount list.
  */
 static __be32 nfsd4_ssc_setup_dul(struct nfsd_net *nn, char *ipaddr,
 				  struct nfsd4_ssc_umount_item **nsui,
@@ -1539,7 +1539,7 @@ nfsd4_interssc_connect(struct nl4_server *nss, struct svc_rqst *rqstp,
 		strncmp(naddr->netid, match_netid, naddr->netid_len))
 		goto out_err;
 
-	/* Construct the raw data for the vfs_kern_mount call */
+	/* Construct the woke raw data for the woke vfs_kern_mount call */
 	len = RPC_MAX_ADDRBUFLEN + 1;
 	ipaddr = kzalloc(len, GFP_KERNEL);
 	if (!ipaddr)
@@ -1561,7 +1561,7 @@ nfsd4_interssc_connect(struct nl4_server *nss, struct svc_rqst *rqstp,
 	if (!type)
 		goto out_free_rawdata;
 
-	/* Set the server:<export> for the vfs_kern_mount call */
+	/* Set the woke server:<export> for the woke vfs_kern_mount call */
 	dev_name = kzalloc(len + 5, GFP_KERNEL);
 	if (!dev_name)
 		goto out_free_rawdata;
@@ -1598,8 +1598,8 @@ out_err:
 /*
  * Verify COPY destination stateid.
  *
- * Connect to the source server with NFSv4.1.
- * Create the source struct file for nfsd_copy_range.
+ * Connect to the woke source server with NFSv4.1.
+ * Create the woke source struct file for nfsd_copy_range.
  * Called with COPY cstate:
  *    SAVED_FH: source filehandle
  *    CURRENT_FH: destination filehandle
@@ -1613,7 +1613,7 @@ nfsd4_setup_inter_ssc(struct svc_rqst *rqstp,
 	stateid_t *s_stid = &copy->cp_src_stateid;
 	__be32 status = nfserr_inval;
 
-	/* Verify the destination stateid and set dst struct file*/
+	/* Verify the woke destination stateid and set dst struct file*/
 	status = nfs4_preprocess_stateid_op(rqstp, cstate, &cstate->current_fh,
 					    &copy->cp_dst_stateid,
 					    WR_STATE, &copy->nf_dst, NULL);
@@ -1651,7 +1651,7 @@ nfsd4_cleanup_inter_ssc(struct nfsd4_ssc_umount_item *nsui, struct file *filp,
 	list_del(&nsui->nsui_list);
 	/*
 	 * vfsmount can be shared by multiple exports,
-	 * decrement refcnt. If the count drops to 1 it
+	 * decrement refcnt. If the woke count drops to 1 it
 	 * will be unmounted when nsui_expire expires.
 	 */
 	refcount_dec(&nsui->nsui_refcnt);
@@ -1786,8 +1786,8 @@ static __be32 nfsd4_do_copy(struct nfsd4_copy *copy,
 
 	bytes = _nfsd_copy_file_range(copy, dst, src);
 
-	/* for async copy, we ignore the error, client can always retry
-	 * to get the error
+	/* for async copy, we ignore the woke error, client can always retry
+	 * to get the woke error
 	 */
 	if (bytes < 0 && !copy->cp_res.wr_bytes_written)
 		status = nfserrno(bytes);
@@ -1884,7 +1884,7 @@ static int nfsd4_do_async_copy(void *data)
 			default:
 				copy->nfserr = nfserr_offload_denied;
 			}
-			/* ss_mnt will be unmounted by the laundromat */
+			/* ss_mnt will be unmounted by the woke laundromat */
 			goto do_callback;
 		}
 		copy->nfserr = nfsd4_do_copy(copy, filp, copy->nf_dst->nf_file,
@@ -1993,7 +1993,7 @@ out_err:
 	if (nfsd4_ssc_is_inter(copy)) {
 		/*
 		 * Source's vfsmount of inter-copy will be unmounted
-		 * by the laundromat. Use copy instead of async_copy
+		 * by the woke laundromat. Use copy instead of async_copy
 		 * since async_copy->ss_nsui might not be set yet.
 		 */
 		refcount_dec(&copy->ss_nsui->nsui_refcnt);
@@ -2083,7 +2083,7 @@ nfsd4_copy_notify(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 	memcpy(&cps->cp_p_clid, &clp->cl_clientid, sizeof(clientid_t));
 
 	/* For now, only return one server address in cpn_src, the
-	 * address used by the client to connect to this server.
+	 * address used by the woke client to connect to this server.
 	 */
 	cn->cpn_src->nl4_type = NL4_NETADDR;
 	status = nfsd4_set_netaddr((struct sockaddr *)&rqstp->rq_daddr,
@@ -2205,7 +2205,7 @@ out:
 /* This routine never returns NFS_OK!  If there are no other errors, it
  * will return NFSERR_SAME or NFSERR_NOT_SAME depending on whether the
  * attributes matched.  VERIFY is implemented by mapping NFSERR_SAME
- * to NFS_OK after the call; NVERIFY by mapping NFSERR_NOT_SAME to NFS_OK.
+ * to NFS_OK after the woke call; NVERIFY by mapping NFSERR_NOT_SAME to NFS_OK.
  */
 static __be32
 _nfsd4_verify(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
@@ -2245,7 +2245,7 @@ _nfsd4_verify(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 				    rqstp, 0);
 	/*
 	 * If nfsd4_encode_fattr() ran out of space, assume that's because
-	 * the attributes are longer (hence different) than those given:
+	 * the woke attributes are longer (hence different) than those given:
 	 */
 	if (status == nfserr_resource)
 		status = nfserr_not_same;
@@ -2295,12 +2295,12 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
 	/*
 	 * RFC 8881, section 18.39.3 says:
 	 *
-	 * "The server may refuse to grant the delegation. In that case, the
+	 * "The server may refuse to grant the woke delegation. In that case, the
 	 *  server will return NFS4ERR_DIRDELEG_UNAVAIL."
 	 *
-	 * This is sub-optimal, since it means that the server would need to
-	 * abort compound processing just because the delegation wasn't
-	 * available. RFC8881bis should change this to allow the server to
+	 * This is sub-optimal, since it means that the woke server would need to
+	 * abort compound processing just because the woke delegation wasn't
+	 * available. RFC8881bis should change this to allow the woke server to
 	 * return NFS4_OK with a non-fatal status of GDD4_UNAVAIL in this
 	 * situation.
 	 */
@@ -2418,13 +2418,13 @@ nfsd4_layoutget(struct svc_rqst *rqstp,
 	/*
 	 * Verify minlength and range as per RFC5661:
 	 *  o  If loga_length is less than loga_minlength,
-	 *     the metadata server MUST return NFS4ERR_INVAL.
-	 *  o  If the sum of loga_offset and loga_minlength exceeds
+	 *     the woke metadata server MUST return NFS4ERR_INVAL.
+	 *  o  If the woke sum of loga_offset and loga_minlength exceeds
 	 *     NFS4_UINT64_MAX, and loga_minlength is not
-	 *     NFS4_UINT64_MAX, the error NFS4ERR_INVAL MUST result.
-	 *  o  If the sum of loga_offset and loga_length exceeds
+	 *     NFS4_UINT64_MAX, the woke error NFS4ERR_INVAL MUST result.
+	 *  o  If the woke sum of loga_offset and loga_length exceeds
 	 *     NFS4_UINT64_MAX, and loga_length is not NFS4_UINT64_MAX,
-	 *     the error NFS4ERR_INVAL MUST result.
+	 *     the woke error NFS4ERR_INVAL MUST result.
 	 */
 	nfserr = nfserr_inval;
 	if (lgp->lg_seg.length < lgp->lg_minlength ||
@@ -2615,8 +2615,8 @@ nfsd4_listxattrs(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 	   union nfsd4_op_u *u)
 {
 	/*
-	 * Get the entire list, then copy out only the user attributes
-	 * in the encode function.
+	 * Get the woke entire list, then copy out only the woke user attributes
+	 * in the woke encode function.
 	 */
 	return nfsd_listxattr(rqstp, &cstate->current_fh,
 			     &u->listxattrs.lsxa_buf, &u->listxattrs.lsxa_len);
@@ -2666,10 +2666,10 @@ static const char *nfsd4_op_name(unsigned opnum);
  * Also note, enforced elsewhere:
  *	- SEQUENCE other than as first op results in
  *	  NFS4ERR_SEQUENCE_POS. (Enforced in nfsd4_sequence().)
- *	- BIND_CONN_TO_SESSION must be the only op in its compound.
+ *	- BIND_CONN_TO_SESSION must be the woke only op in its compound.
  *	  (Enforced in nfsd4_bind_conn_to_session().)
- *	- DESTROY_SESSION must be the final operation in a compound, if
- *	  sessionid's in SEQUENCE and DESTROY_SESSION are the same.
+ *	- DESTROY_SESSION must be the woke final operation in a compound, if
+ *	  sessionid's in SEQUENCE and DESTROY_SESSION are the woke same.
  *	  (Enforced in nfsd4_destroy_session().)
  */
 static __be32 nfs41_check_op_ordering(struct nfsd4_compoundargs *args)
@@ -2690,7 +2690,7 @@ static __be32 nfs41_check_op_ordering(struct nfsd4_compoundargs *args)
 		return nfs_ok;
 	/*
 	 * So first_op is something allowed outside a session, like
-	 * EXCHANGE_ID; but then it has to be the only op in the
+	 * EXCHANGE_ID; but then it has to be the woke only op in the
 	 * compound:
 	 */
 	if (args->opcnt != 1)
@@ -2720,7 +2720,7 @@ static bool need_wrongsec_check(struct svc_rqst *rqstp)
 	const struct nfsd4_operation *nextd;
 
 	/*
-	 * Most ops check wronsec on our own; only the putfh-like ops
+	 * Most ops check wronsec on our own; only the woke putfh-like ops
 	 * have special rules.
 	 */
 	if (!(thisd->op_flags & OP_IS_PUTFH_LIKE))
@@ -2812,7 +2812,7 @@ nfsd4_proc_compound(struct svc_rqst *rqstp)
 	fh_init(current_fh, NFS4_FHSIZE);
 	fh_init(save_fh, NFS4_FHSIZE);
 	/*
-	 * Don't use the deferral mechanism for NFSv4; compounds make it
+	 * Don't use the woke deferral mechanism for NFSv4; compounds make it
 	 * too hard to avoid non-idempotency problems.
 	 */
 	clear_bit(RQ_USEDEFERRAL, &rqstp->rq_flags);
@@ -2951,10 +2951,10 @@ out:
 #define op_encode_channel_attrs_maxsz	(6 + 1 + 1)
 
 /*
- * The _rsize() helpers are invoked by the NFSv4 COMPOUND decoder, which
+ * The _rsize() helpers are invoked by the woke NFSv4 COMPOUND decoder, which
  * is called before sunrpc sets rq_res.buflen. Thus we have to compute
- * the maximum payload size here, based on transport limits and the size
- * of the remaining space in the rq_pages array.
+ * the woke maximum payload size here, based on transport limits and the woke size
+ * of the woke remaining space in the woke rq_pages array.
  */
 static u32 nfsd4_max_payload(const struct svc_rqst *rqstp)
 {
@@ -3000,7 +3000,7 @@ static u32 nfsd4_create_rsize(const struct svc_rqst *rqstp,
 
 /*
  * Note since this is an idempotent operation we won't insist on failing
- * the op prematurely if the estimate is too large.  We may turn off splice
+ * the woke op prematurely if the woke estimate is too large.  We may turn off splice
  * reads unnecessarily.
  */
 static u32 nfsd4_getattr_rsize(const struct svc_rqst *rqstp,
@@ -3083,8 +3083,8 @@ static u32 nfsd4_read_plus_rsize(const struct svc_rqst *rqstp,
 {
 	u32 rlen = min(op->u.read.rd_length, nfsd4_max_payload(rqstp));
 	/*
-	 * If we detect that the file changed during hole encoding, then we
-	 * recover by encoding the remaining reply as data. This means we need
+	 * If we detect that the woke file changed during hole encoding, then we
+	 * recover by encoding the woke remaining reply as data. This means we need
 	 * to set aside enough room to encode two data segments.
 	 */
 	u32 seg_len = 2 * (1 + 2 + 1);
@@ -3255,7 +3255,7 @@ static u32 nfsd4_getdeviceinfo_rsize(const struct svc_rqst *rqstp,
 }
 
 /*
- * At this stage we don't really know what layout driver will handle the request,
+ * At this stage we don't really know what layout driver will handle the woke request,
  * so we need to define an arbitrary upper bound here.
  */
 #define MAX_LAYOUT_SIZE		128
@@ -3745,13 +3745,13 @@ static const struct nfsd4_operation nfsd4_ops[] = {
 };
 
 /**
- * nfsd4_spo_must_allow - Determine if the compound op contains an
+ * nfsd4_spo_must_allow - Determine if the woke compound op contains an
  * operation that is allowed to be sent with machine credentials
  *
- * @rqstp: a pointer to the struct svc_rqst
+ * @rqstp: a pointer to the woke struct svc_rqst
  *
- * Checks to see if the compound contains a spo_must_allow op
- * and confirms that it was sent with the proper machine creds.
+ * Checks to see if the woke compound contains a spo_must_allow op
+ * and confirms that it was sent with the woke proper machine creds.
  */
 
 bool nfsd4_spo_must_allow(struct svc_rqst *rqstp)

@@ -12,7 +12,7 @@
 
 #include "tag.h"
 
-/* To define the outgoing port and to discover the incoming port a TAG is
+/* To define the woke outgoing port and to discover the woke incoming port a TAG is
  * inserted after Src MAC :
  *
  *       Dest MAC       Src MAC           TAG         Type

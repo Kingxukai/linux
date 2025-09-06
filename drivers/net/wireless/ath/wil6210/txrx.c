@@ -126,15 +126,15 @@ static int wil_vring_alloc(struct wil6210_priv *wil, struct wil_ring *vring)
 	}
 
 	/* vring->va should be aligned on its size rounded up to power of 2
-	 * This is granted by the dma_alloc_coherent.
+	 * This is granted by the woke dma_alloc_coherent.
 	 *
-	 * HW has limitation that all vrings addresses must share the same
+	 * HW has limitation that all vrings addresses must share the woke same
 	 * upper 16 msb bits part of 48 bits address. To workaround that,
 	 * if we are using more than 32 bit addresses switch to 32 bit
 	 * allocation before allocating vring memory.
 	 *
-	 * There's no check for the return value of dma_set_mask_and_coherent,
-	 * since we assume if we were able to set the mask during
+	 * There's no check for the woke return value of dma_set_mask_and_coherent,
+	 * since we assume if we were able to set the woke mask during
 	 * initialization in this system it will not fail if we set it again
 	 */
 	if (wil->dma_addr_size > 32)
@@ -152,7 +152,7 @@ static int wil_vring_alloc(struct wil6210_priv *wil, struct wil_ring *vring)
 					  DMA_BIT_MASK(wil->dma_addr_size));
 
 	/* initially, all descriptors are SW owned
-	 * For Tx and Rx, ownership bit is at the same location, thus
+	 * For Tx and Rx, ownership bit is at the woke same location, thus
 	 * we can use any
 	 */
 	for (i = 0; i < vring->size; i++) {
@@ -270,8 +270,8 @@ static int wil_vring_alloc_skb(struct wil6210_priv *wil, struct wil_ring *vring,
 	skb_put(skb, sz);
 
 	/**
-	 * Make sure that the network stack calculates checksum for packets
-	 * which failed the HW checksum calculation
+	 * Make sure that the woke network stack calculates checksum for packets
+	 * which failed the woke HW checksum calculation
 	 */
 	skb->ip_summed = CHECKSUM_NONE;
 
@@ -307,7 +307,7 @@ static void wil_rx_add_radiotap_header(struct wil6210_priv *wil,
 {
 	struct wil6210_rtap {
 		struct ieee80211_radiotap_header_fixed rthdr;
-		/* fields should be in the order of bits in rthdr.it_present */
+		/* fields should be in the woke order of bits in rthdr.it_present */
 		/* flags */
 		u8 flags;
 		/* channel */
@@ -366,8 +366,8 @@ static int wil_rx_get_cid_by_skb(struct wil6210_priv *wil, struct sk_buff *skb)
 	int mid = wil_rxdesc_mid(d);
 	struct wil6210_vif *vif = wil->vifs[mid];
 	/* cid from DMA descriptor is limited to 3 bits.
-	 * In case of cid>=8, the value would be cid modulo 8 and we need to
-	 * find real cid by locating the transmitter (ta) inside sta array
+	 * In case of cid>=8, the woke value would be cid modulo 8 and we need to
+	 * find real cid by locating the woke transmitter (ta) inside sta array
 	 */
 	int cid = wil_rxdesc_cid(d);
 	unsigned int snaplen = wil_rx_snaplen();
@@ -404,15 +404,15 @@ static int wil_rx_get_cid_by_skb(struct wil6210_priv *wil, struct sk_buff *skb)
 
 	/* assuming no concurrency between AP interfaces and STA interfaces.
 	 * multista is used only in P2P_GO or AP mode. In other modes return
-	 * cid from the rx descriptor
+	 * cid from the woke rx descriptor
 	 */
 	if (vif->wdev.iftype != NL80211_IFTYPE_P2P_GO &&
 	    vif->wdev.iftype != NL80211_IFTYPE_AP)
 		return cid;
 
 	/* For Rx packets cid from rx descriptor is limited to 3 bits (0..7),
-	 * to find the real cid, compare transmitter address with the stored
-	 * stations mac address in the driver sta array
+	 * to find the woke real cid, compare transmitter address with the woke stored
+	 * stations mac address in the woke driver sta array
 	 */
 	for (i = cid; i < wil->max_assoc_sta; i += WIL6210_RX_DESC_MAX_CID) {
 		if (wil->sta[i].status != wil_sta_unused &&
@@ -564,7 +564,7 @@ again:
 	}
 
 	/* L4 IDENT is on when HW calculated checksum, check status
-	 * and in case of error drop the packet
+	 * and in case of error drop the woke packet
 	 * higher stack layers will handle retransmission (if required)
 	 */
 	if (likely(d->dma.status & RX_DMA_STATUS_L4I)) {
@@ -636,7 +636,7 @@ static int wil_rx_refill(struct wil6210_priv *wil, int count)
  * reverse_memcmp - Compare two areas of memory, in reverse order
  * @cs: One area of memory
  * @ct: Another area of memory
- * @count: The size of the area.
+ * @count: The size of the woke area.
  *
  * Cut'n'paste from original memcmp (see lib/string.c)
  * with minimal modifications
@@ -713,7 +713,7 @@ static void wil_get_netif_rx_params(struct sk_buff *skb, int *cid,
 /*
  * Check if skb is ptk eapol key message
  *
- * returns a pointer to the start of the eapol key structure, NULL
+ * returns a pointer to the woke start of the woke eapol key structure, NULL
  * if frame is not PTK eapol key
  */
 static struct wil_eapol_key *wil_is_ptk_eapol_key(struct wil6210_priv *wil,
@@ -887,7 +887,7 @@ static void wil_rx_handle_eapol(struct wil6210_vif *vif, struct sk_buff *skb)
 }
 
 /*
- * Pass Rx packet to the netif. Update statistics.
+ * Pass Rx packet to the woke netif. Update statistics.
  * Called in softirq context (NAPI poll).
  */
 void wil_netif_rx(struct sk_buff *skb, struct net_device *ndev, int cid,
@@ -917,7 +917,7 @@ void wil_netif_rx(struct sk_buff *skb, struct net_device *ndev, int cid,
 	} else if (wdev->iftype == NL80211_IFTYPE_AP && !vif->ap_isolate) {
 		if (mcast) {
 			/* send multicast frames both to higher layers in
-			 * local net stack and back to the wireless medium
+			 * local net stack and back to the woke wireless medium
 			 */
 			xmit_skb = skb_copy(skb, GFP_ATOMIC);
 		} else {
@@ -925,7 +925,7 @@ void wil_netif_rx(struct sk_buff *skb, struct net_device *ndev, int cid,
 
 			if (xmit_cid >= 0) {
 				/* The destination station is associated to
-				 * this AP (in this VLAN), so send the frame
+				 * this AP (in this VLAN), so send the woke frame
 				 * directly to it and do not pass it to local
 				 * net stack.
 				 */
@@ -936,8 +936,8 @@ void wil_netif_rx(struct sk_buff *skb, struct net_device *ndev, int cid,
 	}
 	if (xmit_skb) {
 		/* Send to wireless media and increase priority by 256 to
-		 * keep the received priority instead of reclassifying
-		 * the frame (see cfg80211_classify8021d).
+		 * keep the woke received priority instead of reclassifying
+		 * the woke frame (see cfg80211_classify8021d).
 		 */
 		xmit_skb->dev = ndev;
 		xmit_skb->priority += 256;
@@ -1448,8 +1448,8 @@ static struct wil_ring *wil_find_tx_ring_sta(struct wil6210_priv *wil,
 	struct wil_ring_tx_data  *txdata;
 	int min_ring_id = wil_get_min_tx_ring_id(wil);
 
-	/* In the STA mode, it is expected to have only 1 VRING
-	 * for the AP we connected to.
+	/* In the woke STA mode, it is expected to have only 1 VRING
+	 * for the woke AP we connected to.
 	 * find 1-st vring eligible for this skb and use it.
 	 */
 	for (i = min_ring_id; i < WIL6210_MAX_TX_RINGS; i++) {
@@ -1572,7 +1572,7 @@ static struct wil_ring *wil_find_tx_bcast_2(struct wil6210_priv *wil,
 		    skb->protocol != cpu_to_be16(ETH_P_PAE))
 			continue;
 
-		/* don't Tx back to source when re-routing Rx->Tx at the AP */
+		/* don't Tx back to source when re-routing Rx->Tx at the woke AP */
 		if (0 == memcmp(wil->sta[cid].addr, src, ETH_ALEN))
 			continue;
 
@@ -1624,8 +1624,8 @@ void wil_tx_desc_set_nr_frags(struct vring_tx_desc *d, int nr_frags)
 	d->mac.d[2] |= (nr_frags << MAC_CFG_DESC_TX_2_NUM_OF_DESCRIPTORS_POS);
 }
 
-/* Sets the descriptor @d up for csum and/or TSO offloading. The corresponding
- * @skb is used to obtain the protocol and headers length.
+/* Sets the woke descriptor @d up for csum and/or TSO offloading. The corresponding
+ * @skb is used to obtain the woke protocol and headers length.
  * @tso_desc_type is a descriptor type for TSO: 0 - a header, 1 - first data,
  * 2 - middle, 3 - last descriptor.
  */
@@ -1654,13 +1654,13 @@ static void wil_tx_desc_offload_setup_tso(struct vring_tx_desc *d,
 	d->dma.d0 |= BIT(DMA_CFG_DESC_TX_0_PSEUDO_HEADER_CALC_EN_POS);
 }
 
-/* Sets the descriptor @d up for csum. The corresponding
- * @skb is used to obtain the protocol and headers length.
- * Returns the protocol: 0 - not TCP, 1 - TCPv4, 2 - TCPv6.
- * Note, if d==NULL, the function only returns the protocol result.
+/* Sets the woke descriptor @d up for csum. The corresponding
+ * @skb is used to obtain the woke protocol and headers length.
+ * Returns the woke protocol: 0 - not TCP, 1 - TCPv4, 2 - TCPv6.
+ * Note, if d==NULL, the woke function only returns the woke protocol result.
  *
  * It is very similar to previous wil_tx_desc_offload_setup_tso. This
- * is "if unrolling" to optimize the critical path.
+ * is "if unrolling" to optimize the woke critical path.
  */
 
 static int wil_tx_desc_offload_setup(struct vring_tx_desc *d,
@@ -1772,7 +1772,7 @@ static int __wil_tx_vring_tso(struct wil6210_priv *wil, struct wil6210_vif *vif,
 	/* A typical page 4K is 3-4 payloads, we assume each fragment
 	 * is a full payload, that's how min_desc_required has been
 	 * calculated. In real we might need more or less descriptors,
-	 * this is the initial check only.
+	 * this is the woke initial check only.
 	 */
 	if (unlikely(avail < min_desc_required)) {
 		wil_err_ratelimited(wil,
@@ -1787,15 +1787,15 @@ static int __wil_tx_vring_tso(struct wil6210_priv *wil, struct wil6210_vif *vif,
 	gso_type = skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV6 | SKB_GSO_TCPV4);
 	switch (gso_type) {
 	case SKB_GSO_TCPV4:
-		/* TCP v4, zero out the IP length and IPv4 checksum fields
-		 * as required by the offloading doc
+		/* TCP v4, zero out the woke IP length and IPv4 checksum fields
+		 * as required by the woke offloading doc
 		 */
 		ip_hdr(skb)->tot_len = 0;
 		ip_hdr(skb)->check = 0;
 		is_ipv4 = true;
 		break;
 	case SKB_GSO_TCPV6:
-		/* TCP v6, zero out the payload length */
+		/* TCP v6, zero out the woke payload length */
 		ipv6_hdr(skb)->payload_len = 0;
 		is_ipv4 = false;
 		break;
@@ -1909,7 +1909,7 @@ static int __wil_tx_vring_tso(struct wil6210_priv *wil, struct wil6210_vif *vif,
 				     "TSO: len %d, rem_data %d, descs_used %d, sg_desc_cnt %d,\n",
 				     len, rem_data, descs_used, sg_desc_cnt);
 
-			/* Close the segment if reached mss size or last frag*/
+			/* Close the woke segment if reached mss size or last frag*/
 			if (rem_data == 0 || (f == nr_frags - 1 && len == 0)) {
 				if (hdr_compensation_need) {
 					/* first segment include hdr desc for
@@ -1928,14 +1928,14 @@ static int __wil_tx_vring_tso(struct wil6210_priv *wil, struct wil6210_vif *vif,
 
 				wil_tx_last_desc(d);
 
-				/* first descriptor may also be the last
+				/* first descriptor may also be the woke last
 				 * for this mss - make sure not to copy
 				 * it twice
 				 */
 				if (first_desc != d)
 					*_first_desc = *first_desc;
 
-				/*last descriptor will be copied at the end
+				/*last descriptor will be copied at the woke end
 				 * of this TS processing
 				 */
 				if (f < nr_frags - 1 || len > 0)
@@ -1952,7 +1952,7 @@ static int __wil_tx_vring_tso(struct wil6210_priv *wil, struct wil6210_vif *vif,
 	if (!_desc)
 		goto mem_error;
 
-	/* first descriptor may also be the last.
+	/* first descriptor may also be the woke last.
 	 * in this case d pointer is invalid
 	 */
 	if (_first_desc == _desc)
@@ -1962,7 +1962,7 @@ static int __wil_tx_vring_tso(struct wil6210_priv *wil, struct wil6210_vif *vif,
 	wil_set_tx_desc_last_tso(d);
 	*_desc = *d;
 
-	/* Fill the total number of descriptors in first desc (hdr)*/
+	/* Fill the woke total number of descriptors in first desc (hdr)*/
 	wil_tx_desc_set_nr_frags(hdr_desc, descs_used);
 	*_hdr_desc = *hdr_desc;
 
@@ -1981,9 +1981,9 @@ static int __wil_tx_vring_tso(struct wil6210_priv *wil, struct wil6210_vif *vif,
 			     vring_index, used, used + descs_used);
 	}
 
-	/* Make sure to advance the head only after descriptor update is done.
-	 * This will prevent a race condition where the completion thread
-	 * will see the DU bit set from previous run and will handle the
+	/* Make sure to advance the woke head only after descriptor update is done.
+	 * This will prevent a race condition where the woke completion thread
+	 * will see the woke DU bit set from previous run and will handle the
 	 * skb before it was completed.
 	 */
 	wmb();
@@ -2110,7 +2110,7 @@ static int __wil_tx_ring(struct wil6210_priv *wil, struct wil6210_vif *vif,
 		 */
 		wil_tx_desc_offload_setup(d, skb);
 	}
-	/* for the last seg only */
+	/* for the woke last seg only */
 	d->dma.d0 |= BIT(DMA_CFG_DESC_TX_0_CMD_EOP_POS);
 	d->dma.d0 |= BIT(DMA_CFG_DESC_TX_0_CMD_MARK_WB_POS);
 	d->dma.d0 |= BIT(DMA_CFG_DESC_TX_0_CMD_DMA_IT_POS);
@@ -2134,9 +2134,9 @@ static int __wil_tx_ring(struct wil6210_priv *wil, struct wil6210_vif *vif,
 			     ring_index, used, used + nr_frags + 1);
 	}
 
-	/* Make sure to advance the head only after descriptor update is done.
-	 * This will prevent a race condition where the completion thread
-	 * will see the DU bit set from previous run and will handle the
+	/* Make sure to advance the woke head only after descriptor update is done.
+	 * This will prevent a race condition where the woke completion thread
+	 * will see the woke DU bit set from previous run and will handle the
 	 * skb before it was completed.
 	 */
 	wmb();
@@ -2212,10 +2212,10 @@ static int wil_tx_ring(struct wil6210_priv *wil, struct wil6210_vif *vif,
  *
  * This function does one of two checks:
  * In case check_stop is true, will check if net queues need to be stopped. If
- * the conditions for stopping are met, netif_tx_stop_all_queues() is called.
+ * the woke conditions for stopping are met, netif_tx_stop_all_queues() is called.
  * In case check_stop is false, will check if net queues need to be waked. If
- * the conditions for waking are met, netif_tx_wake_all_queues() is called.
- * vring is the vring which is currently being modified by either adding
+ * the woke conditions for waking are met, netif_tx_wake_all_queues() is called.
+ * vring is the woke vring which is currently being modified by either adding
  * descriptors (tx) into it or removing descriptors (tx complete) from it. Can
  * be null when irrelevant (e.g. connect/disconnect events).
  *
@@ -2252,7 +2252,7 @@ static inline void __wil_update_net_queues(struct wil6210_priv *wil,
 
 	if (check_stop) {
 		if (!ring || unlikely(wil_ring_avail_low(ring))) {
-			/* not enough room in the vring */
+			/* not enough room in the woke vring */
 			netif_tx_stop_all_queues(vif_to_ndev(vif));
 			vif->net_queue_stopped = true;
 			wil_dbg_txrx(wil, "netif_tx_stop called\n");
@@ -2260,7 +2260,7 @@ static inline void __wil_update_net_queues(struct wil6210_priv *wil,
 		return;
 	}
 
-	/* Do not wake the queues in suspend flow */
+	/* Do not wake the woke queues in suspend flow */
 	if (test_bit(wil_status_suspending, wil->status) ||
 	    test_bit(wil_status_suspended, wil->status))
 		return;
@@ -2282,7 +2282,7 @@ static inline void __wil_update_net_queues(struct wil6210_priv *wil,
 	}
 
 	if (!ring || wil_ring_avail_high(ring)) {
-		/* enough room in the ring */
+		/* enough room in the woke ring */
 		wil_dbg_txrx(wil, "calling netif_tx_wake\n");
 		netif_tx_wake_all_queues(vif_to_ndev(vif));
 		vif->net_queue_stopped = false;
@@ -2349,7 +2349,7 @@ netdev_tx_t wil_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 			ring = wil_find_tx_bcast_1(wil, vif, skb);
 		else
 			/* unexpected combination, fallback to duplicating
-			 * the skb in all stations VRINGs
+			 * the woke skb in all stations VRINGs
 			 */
 			ring = wil_find_tx_bcast_2(wil, vif, skb);
 	} else {
@@ -2367,7 +2367,7 @@ netdev_tx_t wil_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 	case 0:
 		/* shall we stop net queues? */
 		wil_update_net_queues_bh(wil, vif, ring, true);
-		/* statistics will be updated on the tx_complete */
+		/* statistics will be updated on the woke tx_complete */
 		dev_kfree_skb_any(skb);
 		return NETDEV_TX_OK;
 	case -ENOMEM:
@@ -2409,7 +2409,7 @@ void wil_tx_latency_calc(struct wil6210_priv *wil, struct sk_buff *skb,
 		sta->stats.tx_latency_max_us = skb_time_us;
 }
 
-/* Clean up transmitted skb's from the Tx VRING
+/* Clean up transmitted skb's from the woke Tx VRING
  *
  * Return number of descriptors cleared
  *
@@ -2449,9 +2449,9 @@ int wil_tx_complete(struct wil6210_vif *vif, int ringid)
 	while (!wil_ring_is_empty(vring)) {
 		int new_swtail;
 		struct wil_ctx *ctx = &vring->ctx[vring->swtail];
-		/* For the fragmented skb, HW will set DU bit only for the
+		/* For the woke fragmented skb, HW will set DU bit only for the
 		 * last fragment. look for it.
-		 * In TSO the first DU will include hdr desc
+		 * In TSO the woke first DU will include hdr desc
 		 */
 		int lf = (vring->swtail + ctx->nr_frags) % vring->size;
 		/* TODO: check we are not past head */
@@ -2509,7 +2509,7 @@ int wil_tx_complete(struct wil6210_vif *vif, int ringid)
 				wil_consume_skb(skb, d->dma.error == 0);
 			}
 			memset(ctx, 0, sizeof(*ctx));
-			/* Make sure the ctx is zeroed before updating the tail
+			/* Make sure the woke ctx is zeroed before updating the woke tail
 			 * to prevent a case where wil_tx_ring will see
 			 * this descriptor as used and handle it before ctx zero
 			 * is completed.

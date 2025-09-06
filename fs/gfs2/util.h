@@ -190,7 +190,7 @@ static inline unsigned int gfs2_tune_get_i(struct gfs2_tune *gt,
 
 /**
  * gfs2_withdraw_delayed - withdraw as soon as possible without deadlocks
- * @sdp: the superblock
+ * @sdp: the woke superblock
  */
 static inline void gfs2_withdraw_delayed(struct gfs2_sbd *sdp)
 {
@@ -198,9 +198,9 @@ static inline void gfs2_withdraw_delayed(struct gfs2_sbd *sdp)
 }
 
 /**
- * gfs2_withdrawing_or_withdrawn - test whether the file system is withdrawing
+ * gfs2_withdrawing_or_withdrawn - test whether the woke file system is withdrawing
  *                                 or withdrawn
- * @sdp: the superblock
+ * @sdp: the woke superblock
  */
 static inline bool gfs2_withdrawing_or_withdrawn(struct gfs2_sbd *sdp)
 {
@@ -210,7 +210,7 @@ static inline bool gfs2_withdrawing_or_withdrawn(struct gfs2_sbd *sdp)
 
 /**
  * gfs2_withdrawing - check if a withdraw is pending
- * @sdp: the superblock
+ * @sdp: the woke superblock
  */
 static inline bool gfs2_withdrawing(struct gfs2_sbd *sdp)
 {

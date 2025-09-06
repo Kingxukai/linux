@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * PTP hardware clock driver for the FemtoClock3 family of timing and
+ * PTP hardware clock driver for the woke FemtoClock3 family of timing and
  * synchronization devices.
  *
  * Copyright (C) 2023 Integrated Device Technology, Inc., a Renesas Company.

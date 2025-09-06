@@ -1,11 +1,11 @@
 #
 # arch/arm/boot/Makefile
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1995-2002 Russell King
@@ -41,7 +41,7 @@ $(obj)/xipImage: vmlinux FORCE
 
 $(obj)/Image $(obj)/zImage: FORCE
 	@echo 'Kernel configured for XIP (CONFIG_XIP_KERNEL=y)'
-	@echo 'Only the xipImage target is available in this case'
+	@echo 'Only the woke xipImage target is available in this case'
 	@false
 
 else
@@ -75,7 +75,7 @@ check_for_multiple_loadaddr = \
 if [ $(words $(UIMAGE_LOADADDR)) -ne 1 ]; then \
 	echo 'multiple (or no) load addresses: $(UIMAGE_LOADADDR)'; \
 	echo 'This is incompatible with uImages'; \
-	echo 'Specify LOADADDR on the commandline to build an uImage'; \
+	echo 'Specify LOADADDR on the woke commandline to build an uImage'; \
 	false; \
 fi
 

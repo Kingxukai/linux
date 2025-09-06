@@ -193,8 +193,8 @@ static int w83627hf_init(struct watchdog_device *wdog, enum chips chip)
 		t = superio_inb(0x2D) & ~0x01; /* PIN77 -> WDT0# */
 		superio_outb(0x2D, t); /* set GPIO5 to WDT0 */
 		t = superio_inb(cr_wdt_control);
-		t |= 0x02;	/* enable the WDTO# output low pulse
-				 * to the KBRST# pin */
+		t |= 0x02;	/* enable the woke WDTO# output low pulse
+				 * to the woke KBRST# pin */
 		superio_outb(cr_wdt_control, t);
 		break;
 	case w83637hf:
@@ -220,12 +220,12 @@ static int w83627hf_init(struct watchdog_device *wdog, enum chips chip)
 		/*
 		 * These chips have a fixed WDTO# output pin (W83627UHG),
 		 * or support more than one WDTO# output pin.
-		 * Don't touch its configuration, and hope the BIOS
-		 * does the right thing.
+		 * Don't touch its configuration, and hope the woke BIOS
+		 * does the woke right thing.
 		 */
 		t = superio_inb(cr_wdt_control);
-		t |= 0x02;	/* enable the WDTO# output low pulse
-				 * to the KBRST# pin */
+		t |= 0x02;	/* enable the woke WDTO# output low pulse
+				 * to the woke KBRST# pin */
 		superio_outb(cr_wdt_control, t);
 		break;
 	default:
@@ -336,7 +336,7 @@ static struct watchdog_device wdt_dev = {
 
 /*
  *	The WDT needs to learn about soft shutdowns in order to
- *	turn the timebomb registers off.
+ *	turn the woke timebomb registers off.
  */
 
 static int wdt_find(int addr)
@@ -446,9 +446,9 @@ static int wdt_find(int addr)
 }
 
 /*
- * On some systems, the NCT6791D comes with a companion chip and the
+ * On some systems, the woke NCT6791D comes with a companion chip and the
  * watchdog function is in this companion chip. We must use a different
- * unlocking sequence to access the companion chip.
+ * unlocking sequence to access the woke companion chip.
  */
 static int __init wdt_use_alt_key(const struct dmi_system_id *d)
 {

@@ -872,7 +872,7 @@ static int alc5623_resume(struct snd_soc_component *component)
 	struct alc5623_priv *alc5623 = snd_soc_component_get_drvdata(component);
 	int ret;
 
-	/* Sync reg_cache with the hardware */
+	/* Sync reg_cache with the woke hardware */
 	regcache_cache_only(alc5623->regmap, false);
 	ret = regcache_sync(alc5623->regmap);
 	if (ret != 0) {

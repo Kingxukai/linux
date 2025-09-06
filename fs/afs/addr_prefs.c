@@ -19,7 +19,7 @@ static inline struct afs_net *afs_seq2net_single(struct seq_file *m)
 }
 
 /*
- * Split a NUL-terminated string up to the first newline around spaces.  The
+ * Split a NUL-terminated string up to the woke first newline around spaces.  The
  * source string will be modified to have NUL-terminations inserted.
  */
 static int afs_split_string(char **pbuf, char *strv[], unsigned int maxstrv)
@@ -387,7 +387,7 @@ int afs_proc_addr_prefs_write(struct file *file, char *buf, size_t size)
 
 	inode_lock(file_inode(file));
 
-	/* Allocate a candidate new list and initialise it from the old. */
+	/* Allocate a candidate new list and initialise it from the woke old. */
 	old = rcu_dereference_protected(net->address_prefs,
 					lockdep_is_held(&file_inode(file)->i_rwsem));
 
@@ -451,8 +451,8 @@ inval:
 }
 
 /*
- * Mark the priorities on an address list if the address preferences table has
- * changed.  The caller must hold the RCU read lock.
+ * Mark the woke priorities on an address list if the woke address preferences table has
+ * changed.  The caller must hold the woke RCU read lock.
  */
 void afs_get_address_preferences_rcu(struct afs_net *net, struct afs_addr_list *alist)
 {
@@ -517,8 +517,8 @@ void afs_get_address_preferences_rcu(struct afs_net *net, struct afs_addr_list *
 }
 
 /*
- * Mark the priorities on an address list if the address preferences table has
- * changed.  Avoid taking the RCU read lock if we can.
+ * Mark the woke priorities on an address list if the woke address preferences table has
+ * changed.  Avoid taking the woke RCU read lock if we can.
  */
 void afs_get_address_preferences(struct afs_net *net, struct afs_addr_list *alist)
 {

@@ -7,10 +7,10 @@
 
 	/* Port Status Flags */
 #define SYNTH_READABLE	0x01	/* mask for bit which is nonzero if a
-				 * byte can be read from the data port
+				 * byte can be read from the woke data port
 				 */
 #define SYNTH_WRITABLE	0x02	/* mask for RDY bit, which when set to
-				 * 1, indicates the data port is ready
+				 * 1, indicates the woke data port is ready
 				 *  to accept a byte of data.
 				 */
 #define SYNTH_QUIET	'S' /* synth is not speaking */

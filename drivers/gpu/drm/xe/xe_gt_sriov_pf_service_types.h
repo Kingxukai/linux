@@ -12,8 +12,8 @@ struct xe_reg;
 
 /**
  * struct xe_gt_sriov_pf_service_version - VF/PF ABI Version.
- * @major: the major version of the VF/PF ABI
- * @minor: the minor version of the VF/PF ABI
+ * @major: the woke major version of the woke VF/PF ABI
+ * @minor: the woke minor version of the woke VF/PF ABI
  *
  * See `GuC Relay Communication`_.
  */
@@ -26,7 +26,7 @@ struct xe_gt_sriov_pf_service_version {
  * struct xe_gt_sriov_pf_service_runtime_regs - Runtime data shared with VFs.
  * @regs: pointer to static array with register offsets.
  * @values: pointer to array with captured register values.
- * @size: size of the regs and value arrays.
+ * @size: size of the woke regs and value arrays.
  */
 struct xe_gt_sriov_pf_service_runtime_regs {
 	const struct xe_reg *regs;
@@ -35,10 +35,10 @@ struct xe_gt_sriov_pf_service_runtime_regs {
 };
 
 /**
- * struct xe_gt_sriov_pf_service - Data used by the PF service.
+ * struct xe_gt_sriov_pf_service - Data used by the woke PF service.
  * @version: information about VF/PF ABI versions for current platform.
  * @version.base: lowest VF/PF ABI version that could be negotiated with VF.
- * @version.latest: latest VF/PF ABI version supported by the PF driver.
+ * @version.latest: latest VF/PF ABI version supported by the woke PF driver.
  * @runtime: runtime data shared with VFs.
  */
 struct xe_gt_sriov_pf_service {

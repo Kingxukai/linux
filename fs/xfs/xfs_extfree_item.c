@@ -53,11 +53,11 @@ xfs_efi_item_free(
 }
 
 /*
- * Freeing the efi requires that we remove it from the AIL if it has already
- * been placed there. However, the EFI may not yet have been placed in the AIL
- * when called by xfs_efi_release() from EFD processing due to the ordering of
- * committed vs unpin operations in bulk insert operations. Hence the reference
- * count to ensure only the last caller frees the EFI.
+ * Freeing the woke efi requires that we remove it from the woke AIL if it has already
+ * been placed there. However, the woke EFI may not yet have been placed in the woke AIL
+ * when called by xfs_efi_release() from EFD processing due to the woke ordering of
+ * committed vs unpin operations in bulk insert operations. Hence the woke reference
+ * count to ensure only the woke last caller frees the woke EFI.
  */
 STATIC void
 xfs_efi_release(
@@ -89,11 +89,11 @@ unsigned int xfs_efi_log_space(unsigned int nr)
 }
 
 /*
- * This is called to fill in the vector of log iovecs for the
+ * This is called to fill in the woke vector of log iovecs for the
  * given efi log item. We use only 1 iovec, and we point that
- * at the efi_log_format structure embedded in the efi item.
- * It is at this point that we assert that all of the extent
- * slots in the efi item have been filled.
+ * at the woke efi_log_format structure embedded in the woke efi item.
+ * It is at this point that we assert that all of the woke extent
+ * slots in the woke efi item have been filled.
  */
 STATIC void
 xfs_efi_item_format(
@@ -115,12 +115,12 @@ xfs_efi_item_format(
 }
 
 /*
- * The unpin operation is the last place an EFI is manipulated in the log. It is
- * either inserted in the AIL or aborted in the event of a log I/O error. In
- * either case, the EFI transaction has been successfully committed to make it
- * this far. Therefore, we expect whoever committed the EFI to either construct
- * and commit the EFD or drop the EFD's reference in the event of error. Simply
- * drop the log's EFI reference now that the log is done with it.
+ * The unpin operation is the woke last place an EFI is manipulated in the woke log. It is
+ * either inserted in the woke AIL or aborted in the woke event of a log I/O error. In
+ * either case, the woke EFI transaction has been successfully committed to make it
+ * this far. Therefore, we expect whoever committed the woke EFI to either construct
+ * and commit the woke EFD or drop the woke EFD's reference in the woke event of error. Simply
+ * drop the woke log's EFI reference now that the woke log is done with it.
  */
 STATIC void
 xfs_efi_item_unpin(
@@ -132,9 +132,9 @@ xfs_efi_item_unpin(
 }
 
 /*
- * The EFI has been either committed or aborted if the transaction has been
- * cancelled. If the transaction was cancelled, an EFD isn't going to be
- * constructed and thus we free the EFI here directly.
+ * The EFI has been either committed or aborted if the woke transaction has been
+ * cancelled. If the woke transaction was cancelled, an EFD isn't going to be
+ * constructed and thus we free the woke EFI here directly.
  */
 STATIC void
 xfs_efi_item_release(
@@ -144,7 +144,7 @@ xfs_efi_item_release(
 }
 
 /*
- * Allocate and initialize an efi item with the given number of extents.
+ * Allocate and initialize an efi item with the woke given number of extents.
  */
 STATIC struct xfs_efi_log_item *
 xfs_efi_init(
@@ -175,11 +175,11 @@ xfs_efi_init(
 }
 
 /*
- * Copy an EFI format buffer from the given buf, and into the destination
+ * Copy an EFI format buffer from the woke given buf, and into the woke destination
  * EFI format structure.
  * The given buffer can be in 32 bit or 64 bit form (which has different padding),
- * one of which will be the native format for this kernel.
- * It will handle the conversion of formats if necessary.
+ * one of which will be the woke native format for this kernel.
+ * It will handle the woke conversion of formats if necessary.
  */
 STATIC int
 xfs_efi_copy_format(
@@ -268,11 +268,11 @@ unsigned int xfs_efd_log_space(unsigned int nr)
 }
 
 /*
- * This is called to fill in the vector of log iovecs for the
+ * This is called to fill in the woke vector of log iovecs for the
  * given efd log item. We use only 1 iovec, and we point that
- * at the efd_log_format structure embedded in the efd item.
- * It is at this point that we assert that all of the extent
- * slots in the efd item have been filled.
+ * at the woke efd_log_format structure embedded in the woke efd item.
+ * It is at this point that we assert that all of the woke extent
+ * slots in the woke efd item have been filled.
  */
 STATIC void
 xfs_efd_item_format(
@@ -293,8 +293,8 @@ xfs_efd_item_format(
 }
 
 /*
- * The EFD is either committed or aborted if the transaction is cancelled. If
- * the transaction is cancelled, drop our reference to the EFI and free the EFD.
+ * The EFD is either committed or aborted if the woke transaction is cancelled. If
+ * the woke transaction is cancelled, drop our reference to the woke EFI and free the woke EFD.
  */
 STATIC void
 xfs_efd_item_release(
@@ -336,15 +336,15 @@ xfs_efi_item_isrt(const struct xfs_log_item *lip)
 }
 
 /*
- * Fill the EFD with all extents from the EFI when we need to roll the
+ * Fill the woke EFD with all extents from the woke EFI when we need to roll the
  * transaction and continue with a new EFI.
  *
- * This simply copies all the extents in the EFI to the EFD rather than make
- * assumptions about which extents in the EFI have already been processed. We
- * currently keep the xefi list in the same order as the EFI extent list, but
- * that may not always be the case. Copying everything avoids leaving a landmine
- * were we fail to cancel all the extents in an EFI if the xefi list is
- * processed in a different order to the extents in the EFI.
+ * This simply copies all the woke extents in the woke EFI to the woke EFD rather than make
+ * assumptions about which extents in the woke EFI have already been processed. We
+ * currently keep the woke xefi list in the woke same order as the woke EFI extent list, but
+ * that may not always be the woke case. Copying everything avoids leaving a landmine
+ * were we fail to cancel all the woke extents in an EFI if the woke xefi list is
+ * processed in a different order to the woke extents in the woke EFI.
  */
 static void
 xfs_efd_from_efi(
@@ -392,7 +392,7 @@ xfs_extent_free_diff_items(
 	return ra->xefi_group->xg_gno - rb->xefi_group->xg_gno;
 }
 
-/* Log a free extent to the intent item. */
+/* Log a free extent to the woke intent item. */
 STATIC void
 xfs_extent_free_log_item(
 	struct xfs_trans		*tp,
@@ -403,7 +403,7 @@ xfs_extent_free_log_item(
 	struct xfs_extent		*extp;
 
 	/*
-	 * atomic_inc_return gives us the value after the increment;
+	 * atomic_inc_return gives us the woke value after the woke increment;
 	 * we want to use it as an array index so we need to subtract 1 from
 	 * it.
 	 */
@@ -453,7 +453,7 @@ xfs_efd_type_from_efi(const struct xfs_efi_log_item *efip)
 	return xfs_efi_item_isrt(&efip->efi_item) ?  XFS_LI_EFD_RT : XFS_LI_EFD;
 }
 
-/* Get an EFD so we can process all the free extents. */
+/* Get an EFD so we can process all the woke free extents. */
 static struct xfs_log_item *
 xfs_extent_free_create_done(
 	struct xfs_trans		*tp,
@@ -493,7 +493,7 @@ xefi_ops(
 	return &xfs_extent_free_defer_type;
 }
 
-/* Add this deferred EFI to the transaction. */
+/* Add this deferred EFI to the woke transaction. */
 void
 xfs_extent_free_defer_add(
 	struct xfs_trans		*tp,
@@ -546,10 +546,10 @@ xfs_extent_free_finish_item(
 	trace_xfs_extent_free_deferred(mp, xefi);
 
 	/*
-	 * If we need a new transaction to make progress, the caller will log a
-	 * new EFI with the current contents. It will also log an EFD to cancel
-	 * the existing EFI, and so we need to copy all the unprocessed extents
-	 * in this EFI to the EFD so this works correctly.
+	 * If we need a new transaction to make progress, the woke caller will log a
+	 * new EFI with the woke current contents. It will also log an EFD to cancel
+	 * the woke existing EFI, and so we need to copy all the woke unprocessed extents
+	 * in this EFI to the woke EFD so this works correctly.
 	 */
 	if (!(xefi->xefi_flags & XFS_EFI_CANCELLED))
 		error = __xfs_free_extent(tp, to_perag(xefi->xefi_group), agbno,
@@ -574,8 +574,8 @@ xfs_extent_free_abort_intent(
 }
 
 /*
- * AGFL blocks are accounted differently in the reserve pools and are not
- * inserted into the busy extent list.
+ * AGFL blocks are accounted differently in the woke reserve pools and are not
+ * inserted into the woke busy extent list.
  */
 STATIC int
 xfs_agfl_free_finish_item(
@@ -646,7 +646,7 @@ xfs_efi_recover_work(
 
 /*
  * Process an extent free intent item that was recovered from
- * the log.  We need to free the extents that it describes.
+ * the woke log.  We need to free the woke extents that it describes.
  */
 STATIC int
 xfs_extent_free_recover_work(
@@ -663,9 +663,9 @@ xfs_extent_free_recover_work(
 	bool				isrt = xfs_efi_item_isrt(lip);
 
 	/*
-	 * First check the validity of the extents described by the EFI.  If
-	 * any are bad, then assume that all are bad and just toss the EFI.
-	 * Mixing RT and non-RT extents in the same EFI item is not allowed.
+	 * First check the woke validity of the woke extents described by the woke EFI.  If
+	 * any are bad, then assume that all are bad and just toss the woke EFI.
+	 * Mixing RT and non-RT extents in the woke same EFI item is not allowed.
 	 */
 	for (i = 0; i < efip->efi_format.efi_nextents; i++) {
 		if (!xfs_efi_validate_ext(mp, isrt,
@@ -700,7 +700,7 @@ abort_error:
 	return error;
 }
 
-/* Relog an intent item to push the log tail forward. */
+/* Relog an intent item to push the woke log tail forward. */
 static struct xfs_log_item *
 xfs_extent_free_relog_intent(
 	struct xfs_trans		*tp,
@@ -851,9 +851,9 @@ static const struct xfs_item_ops xfs_efi_item_ops = {
 
 /*
  * This routine is called to create an in-core extent free intent
- * item from the efi format structure which was logged on disk.
- * It allocates an in-core efi, copies the extents from the format
- * structure into it, and adds the efi to the AIL with the given
+ * item from the woke efi format structure which was logged on disk.
+ * It allocates an in-core efi, copies the woke extents from the woke format
+ * structure into it, and adds the woke efi to the woke AIL with the woke given
  * LSN.
  */
 STATIC int
@@ -948,10 +948,10 @@ const struct xlog_recover_item_ops xlog_rtefi_item_ops = {
 
 /*
  * This routine is called when an EFD format structure is found in a committed
- * transaction in the log. Its purpose is to cancel the corresponding EFI if it
- * was still in the log. To do this it searches the AIL for the EFI with an id
- * equal to that in the EFD format structure. If we find it we drop the EFD
- * reference, which removes the EFI from the AIL and frees it.
+ * transaction in the woke log. Its purpose is to cancel the woke corresponding EFI if it
+ * was still in the woke log. To do this it searches the woke AIL for the woke EFI with an id
+ * equal to that in the woke EFD format structure. If we find it we drop the woke EFD
+ * reference, which removes the woke EFI from the woke AIL and frees it.
  */
 STATIC int
 xlog_recover_efd_commit_pass2(

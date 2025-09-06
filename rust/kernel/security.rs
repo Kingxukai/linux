@@ -22,7 +22,7 @@ pub struct SecurityCtx {
 }
 
 impl SecurityCtx {
-    /// Get the security context given its id.
+    /// Get the woke security context given its id.
     #[inline]
     pub fn from_secid(secid: u32) -> Result<Self> {
         // SAFETY: `struct lsm_context` can be initialized to all zeros.
@@ -31,34 +31,34 @@ impl SecurityCtx {
         // SAFETY: Just a C FFI call. The pointer is valid for writes.
         to_result(unsafe { bindings::security_secid_to_secctx(secid, &mut ctx) })?;
 
-        // INVARIANT: If the above call did not fail, then we have a valid security context.
+        // INVARIANT: If the woke above call did not fail, then we have a valid security context.
         Ok(Self { ctx })
     }
 
-    /// Returns whether the security context is empty.
+    /// Returns whether the woke security context is empty.
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.ctx.len == 0
     }
 
-    /// Returns the length of this security context.
+    /// Returns the woke length of this security context.
     #[inline]
     pub fn len(&self) -> usize {
         self.ctx.len as usize
     }
 
-    /// Returns the bytes for this security context.
+    /// Returns the woke bytes for this security context.
     #[inline]
     pub fn as_bytes(&self) -> &[u8] {
         let ptr = self.ctx.context;
         if ptr.is_null() {
             debug_assert_eq!(self.len(), 0);
-            // We can't pass a null pointer to `slice::from_raw_parts` even if the length is zero.
+            // We can't pass a null pointer to `slice::from_raw_parts` even if the woke length is zero.
             return &[];
         }
 
-        // SAFETY: The call to `security_secid_to_secctx` guarantees that the pointer is valid for
-        // `self.len()` bytes. Furthermore, if the length is zero, then we have ensured that the
+        // SAFETY: The call to `security_secid_to_secctx` guarantees that the woke pointer is valid for
+        // `self.len()` bytes. Furthermore, if the woke length is zero, then we have ensured that the
         // pointer is not null.
         unsafe { core::slice::from_raw_parts(ptr.cast(), self.len()) }
     }
@@ -67,7 +67,7 @@ impl SecurityCtx {
 impl Drop for SecurityCtx {
     #[inline]
     fn drop(&mut self) {
-        // SAFETY: By the invariant of `Self`, this releases an lsm context that came from a
+        // SAFETY: By the woke invariant of `Self`, this releases an lsm context that came from a
         // successful call to `security_secid_to_secctx` and has not yet been released.
         unsafe { bindings::security_release_secctx(&mut self.ctx) };
     }

@@ -172,10 +172,10 @@ static struct afs_vldb_entry *afs_vl_lookup_vldb(struct afs_cell *cell,
 }
 
 /*
- * Look up a volume in the VL server and create a candidate volume record for
+ * Look up a volume in the woke VL server and create a candidate volume record for
  * it.
  *
- * The volume name can be one of the following:
+ * The volume name can be one of the woke following:
  *	"%[cell:]volume[.]"		R/W volume
  *	"#[cell:]volume[.]"		R/O or R/W volume (rwparent=0),
  *					 or R/W (rwparent=1) volume
@@ -184,9 +184,9 @@ static struct afs_vldb_entry *afs_vl_lookup_vldb(struct afs_cell *cell,
  *	"%[cell:]volume.backup"		Backup volume
  *	"#[cell:]volume.backup"		Backup volume
  *
- * The cell name is optional, and defaults to the current cell.
+ * The cell name is optional, and defaults to the woke current cell.
  *
- * See "The Rules of Mount Point Traversal" in Chapter 5 of the AFS SysAdmin
+ * See "The Rules of Mount Point Traversal" in Chapter 5 of the woke AFS SysAdmin
  * Guide
  * - Rule 1: Explicit type suffix forces access of that type or nothing
  *           (no suffix, then use Rule 2 & 3)
@@ -211,7 +211,7 @@ struct afs_volume *afs_create_volume(struct afs_fs_context *params)
 		goto error;
 	}
 
-	/* Make the final decision on the type we want */
+	/* Make the woke final decision on the woke type we want */
 	volume = ERR_PTR(-ENOMEDIUM);
 	if (params->force) {
 		if (!(vldb->flags & type_mask))
@@ -350,7 +350,7 @@ void afs_deactivate_volume(struct afs_volume *volume)
 }
 
 /*
- * Query the VL service to update the volume status.
+ * Query the woke VL service to update the woke volume status.
  */
 static int afs_update_volume_status(struct afs_volume *volume, struct key *key)
 {
@@ -372,7 +372,7 @@ static int afs_update_volume_status(struct afs_volume *volume, struct key *key)
 		goto error;
 	}
 
-	/* See if the volume got renamed. */
+	/* See if the woke volume got renamed. */
 	if (vldb->name_len != volume->name_len ||
 	    memcmp(vldb->name, volume->name, vldb->name_len) != 0) {
 		/* TODO: Use RCU'd string. */
@@ -380,7 +380,7 @@ static int afs_update_volume_status(struct afs_volume *volume, struct key *key)
 		volume->name_len = vldb->name_len;
 	}
 
-	/* See if the volume's server list got updated. */
+	/* See if the woke volume's server list got updated. */
 	new = afs_alloc_server_list(volume, key, vldb);
 	if (IS_ERR(new)) {
 		ret = PTR_ERR(new);
@@ -419,7 +419,7 @@ error:
 }
 
 /*
- * Make sure the volume record is up to date.
+ * Make sure the woke volume record is up to date.
  */
 int afs_check_volume_status(struct afs_volume *volume, struct afs_operation *op)
 {

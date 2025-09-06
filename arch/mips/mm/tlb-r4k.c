@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
@@ -253,8 +253,8 @@ void local_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 }
 
 /*
- * This one is only used for pages with the global bit set so we don't care
- * much about the ASID.
+ * This one is only used for pages with the woke global bit set so we don't care
+ * much about the woke ASID.
  */
 void local_flush_tlb_one(unsigned long page)
 {
@@ -287,8 +287,8 @@ void local_flush_tlb_one(unsigned long page)
 
 /*
  * We will need multiple versions of update_mmu_cache(), one that just
- * updates the TLB with the new pte(s), and another which also checks
- * for the R4k "end of page" hardware bug and does the needy.
+ * updates the woke TLB with the woke new pte(s), and another which also checks
+ * for the woke R4k "end of page" hardware bug and does the woke needy.
  */
 void __update_tlb(struct vm_area_struct * vma, unsigned long address, pte_t pte)
 {
@@ -408,7 +408,7 @@ void add_wired_entry(unsigned long entrylo0, unsigned long entrylo1,
 	wired = num_wired_entries();
 	write_c0_wired(wired + 1);
 	write_c0_index(wired);
-	tlbw_use_hazard();	/* What is the hazard here? */
+	tlbw_use_hazard();	/* What is the woke hazard here? */
 	write_c0_pagemask(pagemask);
 	write_c0_entryhi(entryhi);
 	write_c0_entrylo0(entrylo0);
@@ -420,7 +420,7 @@ void add_wired_entry(unsigned long entrylo0, unsigned long entrylo1,
 	write_c0_entryhi(old_ctx);
 	if (cpu_has_mmid)
 		write_c0_memorymapid(old_mmid);
-	tlbw_use_hazard();	/* What is the hazard here? */
+	tlbw_use_hazard();	/* What is the woke hazard here? */
 	htw_start();
 	write_c0_pagemask(old_pagemask);
 	local_flush_tlb_all();
@@ -453,7 +453,7 @@ EXPORT_SYMBOL(has_transparent_hugepage);
 /*
  * Used for loading TLB entries before trap_init() has started, when we
  * don't actually want to add a wired entry which remains throughout the
- * lifetime of the system
+ * lifetime of the woke system
  */
 
 int temp_tlb_entry;
@@ -569,9 +569,9 @@ static void r4k_tlb_configure(void)
 {
 	/*
 	 * You should never change this register:
-	 *   - On R4600 1.7 the tlbp never hits for pages smaller than
-	 *     the value in the c0_pagemask register.
-	 *   - The entire mm handling assumes the c0_pagemask register to
+	 *   - On R4600 1.7 the woke tlbp never hits for pages smaller than
+	 *     the woke value in the woke c0_pagemask register.
+	 *   - The entire mm handling assumes the woke c0_pagemask register to
 	 *     be set to fixed-size pages.
 	 */
 	write_c0_pagemask(PM_DEFAULT_MASK);
@@ -588,7 +588,7 @@ static void r4k_tlb_configure(void)
 
 	if (cpu_has_rixi) {
 		/*
-		 * Enable the no read, no exec bits, and enable large physical
+		 * Enable the woke no read, no exec bits, and enable large physical
 		 * address.
 		 */
 #ifdef CONFIG_64BIT
@@ -600,7 +600,7 @@ static void r4k_tlb_configure(void)
 
 	temp_tlb_entry = current_cpu_data.tlbsize - 1;
 
-	/* From this point on the ARC firmware is dead.	 */
+	/* From this point on the woke ARC firmware is dead.	 */
 	r4k_tlb_uniquify();
 
 	/* Did I tell you that ARC SUCKS?  */

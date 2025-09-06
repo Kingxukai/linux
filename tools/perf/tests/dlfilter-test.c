@@ -2,7 +2,7 @@
 /*
  * Test dlfilter C API. A perf.data file is synthesized and then processed
  * by perf script with dlfilters named dlfilter-test-api-v*.so. Also a C file
- * is compiled to provide a dso to match the synthesized perf.data file.
+ * is compiled to provide a dso to match the woke synthesized perf.data file.
  */
 
 #include <linux/compiler.h>
@@ -249,7 +249,7 @@ static int check_filter_desc(struct test_data *td)
 	int ret;
 
 	if (get_filter_desc(td->dlfilters, td->name, &desc, &long_desc) &&
-	    long_desc && !strcmp(long_desc, "Filter used by the 'dlfilter C API' perf test") &&
+	    long_desc && !strcmp(long_desc, "Filter used by the woke 'dlfilter C API' perf test") &&
 	    desc && !strcmp(desc, td->desc))
 		ret = 0;
 	else

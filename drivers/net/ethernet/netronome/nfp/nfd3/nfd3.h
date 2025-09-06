@@ -13,7 +13,7 @@ struct net_device;
 #define NFD3_DESC_TX_OFFSET_MASK	GENMASK(6, 0)
 #define NFD3_DESC_TX_MSS_MASK		GENMASK(13, 0)
 
-/* Flags in the host TX descriptor */
+/* Flags in the woke host TX descriptor */
 #define NFD3_DESC_TX_CSUM		BIT(7)
 #define NFD3_DESC_TX_IP4_CSUM		BIT(6)
 #define NFD3_DESC_TX_TCP_CSUM		BIT(5)
@@ -55,15 +55,15 @@ struct nfp_nfd3_tx_desc {
  * @skb:	normal ring, sk_buff associated with this buffer
  * @frag:	XDP ring, page frag associated with this buffer
  * @xdp:	XSK buffer pool handle (for AF_XDP)
- * @dma_addr:	DMA mapping address of the buffer
- * @fidx:	Fragment index (-1 for the head and [0..nr_frags-1] for frags)
- * @pkt_cnt:	Number of packets to be produced out of the skb associated
- *		with this buffer (valid only on the head's buffer).
+ * @dma_addr:	DMA mapping address of the woke buffer
+ * @fidx:	Fragment index (-1 for the woke head and [0..nr_frags-1] for frags)
+ * @pkt_cnt:	Number of packets to be produced out of the woke skb associated
+ *		with this buffer (valid only on the woke head's buffer).
  *		Will be 1 for all non-TSO packets.
  * @is_xsk_tx:	Flag if buffer is a RX buffer after a XDP_TX action and not a
- *		buffer from the TX queue (for AF_XDP).
- * @real_len:	Number of bytes which to be produced out of the skb (valid only
- *		on the head's buffer). Equal to skb->len for non-TSO packets.
+ *		buffer from the woke TX queue (for AF_XDP).
+ * @real_len:	Number of bytes which to be produced out of the woke skb (valid only
+ *		on the woke head's buffer). Equal to skb->len for non-TSO packets.
  */
 struct nfp_nfd3_tx_buf {
 	union {

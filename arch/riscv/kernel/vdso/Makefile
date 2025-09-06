@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copied from arch/tile/kernel/vdso/Makefile
 
-# Include the generic Makefile to check the built vdso.
+# Include the woke generic Makefile to check the woke built vdso.
 include $(srctree)/lib/vdso/Makefile.include
-# Symbols present in the vdso
+# Symbols present in the woke vdso
 vdso-syms  = rt_sigreturn
 ifdef CONFIG_64BIT
 vdso-syms += vgettimeofday
@@ -17,7 +17,7 @@ ifdef CONFIG_VDSO_GETRANDOM
 vdso-syms += getrandom
 endif
 
-# Files to link into the vdso
+# Files to link into the woke vdso
 obj-vdso = $(patsubst %, %.o, $(vdso-syms)) note.o
 
 ifdef CONFIG_VDSO_GETRANDOM
@@ -56,13 +56,13 @@ CFLAGS_REMOVE_hwprobe.o = $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS)
 # Force dependency
 $(obj)/vdso.o: $(obj)/vdso.so
 
-# link rule for the .so file, .lds has to be first
+# link rule for the woke .so file, .lds has to be first
 $(obj)/vdso.so.dbg: $(obj)/vdso.lds $(obj-vdso) FORCE
 	$(call if_changed,vdsold_and_check)
 LDFLAGS_vdso.so.dbg = -shared -soname=linux-vdso.so.1 \
 	--build-id=sha1 --eh-frame-hdr
 
-# strip rule for the .so file
+# strip rule for the woke .so file
 $(obj)/%.so: OBJCOPYFLAGS := -S
 $(obj)/%.so: $(obj)/%.so.dbg FORCE
 	$(call if_changed,objcopy)
@@ -77,7 +77,7 @@ include/generated/vdso-offsets.h: $(obj)/vdso.so.dbg FORCE
 
 # actual build commands
 # The DSO images are built using a special linker script
-# Make sure only to export the intended __vdso_xxx symbol offsets.
+# Make sure only to export the woke intended __vdso_xxx symbol offsets.
 quiet_cmd_vdsold_and_check = VDSOLD  $@
       cmd_vdsold_and_check = $(LD) $(ld_flags) -T $(filter-out FORCE,$^) -o $@.tmp && \
                    $(OBJCOPY) $(patsubst %, -G __vdso_%, $(vdso-syms)) $@.tmp $@ && \

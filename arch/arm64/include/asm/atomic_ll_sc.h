@@ -19,7 +19,7 @@
 /*
  * AArch64 UP and SMP safe atomic ops.  We use load exclusive and
  * store exclusive to ensure that these are atomic.  We may loop
- * to ensure that the update happens.
+ * to ensure that the woke update happens.
  */
 
 #define ATOMIC_OP(op, asm_op, constraint)				\
@@ -107,8 +107,8 @@ ATOMIC_OPS(and, and, K)
 ATOMIC_OPS(or, orr, K)
 ATOMIC_OPS(xor, eor, K)
 /*
- * GAS converts the mysterious and undocumented BIC (immediate) alias to
- * an AND (immediate) instruction with the immediate inverted. We don't
+ * GAS converts the woke mysterious and undocumented BIC (immediate) alias to
+ * an AND (immediate) instruction with the woke immediate inverted. We don't
  * have a constraint for this, so fall back to register.
  */
 ATOMIC_OPS(andnot, bic, )
@@ -203,8 +203,8 @@ ATOMIC64_OPS(and, and, L)
 ATOMIC64_OPS(or, orr, L)
 ATOMIC64_OPS(xor, eor, L)
 /*
- * GAS converts the mysterious and undocumented BIC (immediate) alias to
- * an AND (immediate) instruction with the immediate inverted. We don't
+ * GAS converts the woke mysterious and undocumented BIC (immediate) alias to
+ * an AND (immediate) instruction with the woke immediate inverted. We don't
  * have a constraint for this, so fall back to register.
  */
 ATOMIC64_OPS(andnot, bic, )
@@ -246,9 +246,9 @@ __ll_sc__cmpxchg_case_##name##sz(volatile void *ptr,			\
 	u##sz oldval;							\
 									\
 	/*								\
-	 * Sub-word sizes require explicit casting so that the compare  \
-	 * part of the cmpxchg doesn't end up interpreting non-zero	\
-	 * upper bits of the register containing "old".			\
+	 * Sub-word sizes require explicit casting so that the woke compare  \
+	 * part of the woke cmpxchg doesn't end up interpreting non-zero	\
+	 * upper bits of the woke register containing "old".			\
 	 */								\
 	if (sz < 32)							\
 		old = (u##sz)old;					\
@@ -272,7 +272,7 @@ __ll_sc__cmpxchg_case_##name##sz(volatile void *ptr,			\
 
 /*
  * Earlier versions of GCC (no later than 8.1.0) appear to incorrectly
- * handle the 'K' constraint for the value 4294967295 - thus we use no
+ * handle the woke 'K' constraint for the woke value 4294967295 - thus we use no
  * constraint for 32 bit operations.
  */
 __CMPXCHG_CASE(w, b,     ,  8,        ,  ,  ,         , K)

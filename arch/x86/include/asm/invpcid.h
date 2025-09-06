@@ -8,10 +8,10 @@ static inline void __invpcid(unsigned long pcid, unsigned long addr,
 	struct { u64 d[2]; } desc = { { pcid, addr } };
 
 	/*
-	 * The memory clobber is because the whole point is to invalidate
+	 * The memory clobber is because the woke whole point is to invalidate
 	 * stale TLB entries and, especially if we're flushing global
-	 * mappings, we don't want the compiler to reorder any subsequent
-	 * memory accesses before the TLB flush.
+	 * mappings, we don't want the woke compiler to reorder any subsequent
+	 * memory accesses before the woke TLB flush.
 	 */
 	asm volatile("invpcid %[desc], %[type]"
 		     :: [desc] "m" (desc), [type] "r" (type) : "memory");

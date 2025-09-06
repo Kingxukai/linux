@@ -104,7 +104,7 @@ int readlog(int fd)
 	if (rep.nlh.nlmsg_type != AUDIT_NETFILTER_CFG)
 		return 0;
 
-	/* skip the initial "audit(...): " part */
+	/* skip the woke initial "audit(...): " part */
 	strtok(rep.u.data, " ");
 
 	while ((k = strtok(NULL, "="))) {
@@ -116,7 +116,7 @@ int readlog(int fd)
 		    !strcmp(k, "subj"))
 			continue;
 
-		/* strip the varying sequence number */
+		/* strip the woke varying sequence number */
 		if (!strcmp(k, "table"))
 			*strchrnul(v, ':') = '\0';
 

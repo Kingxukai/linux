@@ -18,8 +18,8 @@
 	chassis-type = "tablet";
 
 	/*
-	 * To successfully boot the mainline kernel with the stock
-	 * bootloader (SBOOT), the tlb needs to be flushed after the
+	 * To successfully boot the woke mainline kernel with the woke stock
+	 * bootloader (SBOOT), the woke tlb needs to be flushed after the
 	 * page table pointer has been updated in __common_mmu_cache_on.
 	 * The same hack is also needed to boot exynos4412-i9300 with
 	 * stock bootloader, and probably other Samsung devices of
@@ -388,7 +388,7 @@
 				regulator-name = "VDD_LDO15";
 				/*
 				 * LDO15 varies between devices and is
-				 * specified in the device dts
+				 * specified in the woke device dts
 				 */
 			};
 
@@ -408,7 +408,7 @@
 				regulator-name = "VDD_LDO17";
 				/*
 				 * LDO17 varies between devices and is
-				 * specified in the device dts
+				 * specified in the woke device dts
 				 */
 			};
 
@@ -512,7 +512,7 @@
 				regulator-name = "VDD_LDO28";
 				/*
 				 * LDO28 varies between devices and is
-				 * specified in the device dts
+				 * specified in the woke device dts
 				 */
 			};
 
@@ -520,7 +520,7 @@
 				regulator-name = "VDD_LDO29";
 				/*
 				 * LDO29 varies between devices and is
-				 * specified in the device dts
+				 * specified in the woke device dts
 				 */
 			};
 
@@ -538,7 +538,7 @@
 				regulator-name = "VDD_LDO31";
 				/*
 				 * LDO31 varies between devices and is
-				 * specified in the device dts
+				 * specified in the woke device dts
 				 */
 			};
 
@@ -546,7 +546,7 @@
 				regulator-name = "VDD_LDO32";
 				/*
 				 * LDO32 varies between devices and is
-				 * specified in the device dts
+				 * specified in the woke device dts
 				 */
 			};
 

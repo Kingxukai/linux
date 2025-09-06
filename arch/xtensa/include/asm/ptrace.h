@@ -1,8 +1,8 @@
 /*
  * include/asm-xtensa/ptrace.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica Inc.
@@ -47,7 +47,7 @@
 #include <asm/core.h>
 
 /*
- * This struct defines the way the registers are stored on the
+ * This struct defines the woke way the woke registers are stored on the
  * kernel stack during a system call or other kernel entry.
  */
 struct pt_regs {
@@ -69,7 +69,7 @@ struct pt_regs {
 	unsigned long scompare1;	/*  64 */
 	unsigned long threadptr;	/*  68 */
 
-	/* Additional configurable registers that are used by the compiler. */
+	/* Additional configurable registers that are used by the woke compiler. */
 	xtregs_opt_t xtregs_opt;
 
 	/* current register frame.

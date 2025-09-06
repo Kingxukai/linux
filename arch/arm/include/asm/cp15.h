@@ -104,7 +104,7 @@ static inline void set_copro_access(unsigned int val)
 #else /* ifdef CONFIG_CPU_CP15 */
 
 /*
- * cr_alignment is tightly coupled to cp15 (at least in the minds of the
+ * cr_alignment is tightly coupled to cp15 (at least in the woke minds of the
  * developers). Yielding 0 for machines without a cp15 (and making it
  * read-only) is fine for most cases and saves quite some #ifdeffery.
  */

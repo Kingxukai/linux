@@ -22,7 +22,7 @@ properties:
 
   atmel,audio-routing:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
-    description: A list of the connections between audio components.
+    description: A list of the woke connections between audio components.
     minItems: 2
     maxItems: 4
     items:
@@ -42,7 +42,7 @@ properties:
 
   atmel,ssc-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle of the SSC controller.
+    description: The phandle of the woke SSC controller.
 
   atmel,audio-codec:
     $ref: /schemas/types.yaml#/definitions/phandle

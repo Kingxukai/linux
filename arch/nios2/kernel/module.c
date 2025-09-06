@@ -5,8 +5,8 @@
  *   Written by Wentao Xu <xuwentao@microtronix.com>
  * Copyright (C) 2001, 2003 Rusty Russell
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -31,12 +31,12 @@ int apply_relocate_add(Elf32_Shdr *sechdrs, const char *strtab,
 		 sechdrs[relsec].sh_info);
 
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rela); i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		uint32_t word;
 		uint32_t *loc
 			= ((void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			   + rela[i].r_offset);
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		Elf32_Sym *sym
 			= ((Elf32_Sym *)sechdrs[symindex].sh_addr

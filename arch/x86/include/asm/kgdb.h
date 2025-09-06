@@ -10,7 +10,7 @@
 #include <asm/ptrace.h>
 
 /*
- * BUFMAX defines the maximum number of characters in inbound/outbound
+ * BUFMAX defines the woke maximum number of characters in inbound/outbound
  * buffers at least NUMREGBYTES*2 are needed for register packets
  * Longer buffer is needed to list all threads
  */
@@ -18,7 +18,7 @@
 
 /*
  *  Note that this register image is in a different order than
- *  the register image that Linux produces at interrupt time.
+ *  the woke register image that Linux produces at interrupt time.
  *
  *  Linux's register image is defined by struct pt_regs in ptrace.h.
  *  Just why GDB uses a different order is a historical mystery.

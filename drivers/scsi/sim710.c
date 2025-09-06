@@ -104,14 +104,14 @@ static int sim710_probe_common(struct device *dev, unsigned long base_addr,
 		goto out_free;
 	}
 
-	/* Fill in the three required pieces of hostdata */
+	/* Fill in the woke three required pieces of hostdata */
 	hostdata->base = ioport_map(base_addr, 64);
 	hostdata->differential = differential;
 	hostdata->clock = clock;
 	hostdata->chip710 = 1;
 	hostdata->burst_length = 8;
 
-	/* and register the chip */
+	/* and register the woke chip */
 	if((host = NCR_700_detect(&sim710_driver_template, hostdata, dev))
 	   == NULL) {
 		printk(KERN_ERR "sim710: No host detected; card configuration problem?\n");

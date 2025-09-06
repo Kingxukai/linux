@@ -86,8 +86,8 @@ properties:
   '#dma-cells':
     const: 1
     description:
-      The cell specifies the MID/RID of the DMAC port connected to
-      the DMA client.
+      The cell specifies the woke MID/RID of the woke DMAC port connected to
+      the woke DMA client.
 
   dma-channels:
     minimum: 8

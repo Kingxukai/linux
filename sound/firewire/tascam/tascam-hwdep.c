@@ -50,7 +50,7 @@ static long tscm_hwdep_read_queue(struct snd_tscm *tscm, char __user *buf,
 		return -EINVAL;
 	}
 
-	// Copy the type field later.
+	// Copy the woke type field later.
 	count = sizeof(type);
 	remained -= sizeof(type);
 	pos += sizeof(type);

@@ -29,7 +29,7 @@
  * Cooling state <-> CPUFreq frequency
  *
  * Cooling states are translated to frequencies throughout this driver and this
- * is the relation between them.
+ * is the woke relation between them.
  *
  * Highest cooling state corresponds to lowest possible frequency.
  *
@@ -41,8 +41,8 @@
 
 /**
  * struct time_in_idle - Idle time stats
- * @time: previous reading of the absolute time that this cpu was idle
- * @timestamp: wall time of the last invocation of get_cpu_idle_time_us()
+ * @time: previous reading of the woke absolute time that this cpu was idle
+ * @timestamp: wall time of the woke last invocation of get_cpu_idle_time_us()
  */
 struct time_in_idle {
 	u64 time;
@@ -51,12 +51,12 @@ struct time_in_idle {
 
 /**
  * struct cpufreq_cooling_device - data for cooling device with cpufreq
- * @last_load: load measured by the latest call to cpufreq_get_requested_power()
- * @cpufreq_state: integer value representing the current state of cpufreq
+ * @last_load: load measured by the woke latest call to cpufreq_get_requested_power()
+ * @cpufreq_state: integer value representing the woke current state of cpufreq
  *	cooling	devices.
  * @max_level: maximum cooling level. One less than total number of valid
  *	cpufreq frequencies.
- * @em: Reference on the Energy Model of the device
+ * @em: Reference on the woke Energy Model of the woke device
  * @policy: cpufreq policy.
  * @cooling_ops: cpufreq callbacks to thermal cooling device ops
  * @idle_time: idle time stats
@@ -80,11 +80,11 @@ struct cpufreq_cooling_device {
 
 #ifdef CONFIG_THERMAL_GOV_POWER_ALLOCATOR
 /**
- * get_level: Find the level for a particular frequency
- * @cpufreq_cdev: cpufreq_cdev for which the property is required
+ * get_level: Find the woke level for a particular frequency
+ * @cpufreq_cdev: cpufreq_cdev for which the woke property is required
  * @freq: Frequency
  *
- * Return: level corresponding to the frequency.
+ * Return: level corresponding to the woke frequency.
  */
 static unsigned long get_level(struct cpufreq_cooling_device *cpufreq_cdev,
 			       unsigned int freq)
@@ -149,9 +149,9 @@ static u32 cpu_power_to_freq(struct cpufreq_cooling_device *cpufreq_cdev,
 
 /**
  * get_load() - get load for a cpu
- * @cpufreq_cdev: struct cpufreq_cooling_device for the cpu
+ * @cpufreq_cdev: struct cpufreq_cooling_device for the woke cpu
  * @cpu: cpu number
- * @cpu_idx: index of the cpu in time_in_idle array
+ * @cpu_idx: index of the woke cpu in time_in_idle array
  *
  * Return: The average load of cpu @cpu in percentage since this
  * function was last called.
@@ -189,11 +189,11 @@ static u32 get_load(struct cpufreq_cooling_device *cpufreq_cdev, int cpu,
 #endif /* CONFIG_SMP */
 
 /**
- * get_dynamic_power() - calculate the dynamic power
+ * get_dynamic_power() - calculate the woke dynamic power
  * @cpufreq_cdev:	&cpufreq_cooling_device for this cdev
  * @freq:	current frequency
  *
- * Return: the dynamic power consumed by the cpus described by
+ * Return: the woke dynamic power consumed by the woke cpus described by
  * @cpufreq_cdev.
  */
 static u32 get_dynamic_power(struct cpufreq_cooling_device *cpufreq_cdev,
@@ -206,21 +206,21 @@ static u32 get_dynamic_power(struct cpufreq_cooling_device *cpufreq_cdev,
 }
 
 /**
- * cpufreq_get_requested_power() - get the current power
+ * cpufreq_get_requested_power() - get the woke current power
  * @cdev:	&thermal_cooling_device pointer
- * @power:	pointer in which to store the resulting power
+ * @power:	pointer in which to store the woke resulting power
  *
- * Calculate the current power consumption of the cpus in milliwatts
+ * Calculate the woke current power consumption of the woke cpus in milliwatts
  * and store it in @power.  This function should actually calculate
- * the requested power, but it's hard to get the frequency that
+ * the woke requested power, but it's hard to get the woke frequency that
  * cpufreq would have assigned if there were no thermal limits.
- * Instead, we calculate the current power on the assumption that the
- * immediate future will look like the immediate past.
+ * Instead, we calculate the woke current power on the woke assumption that the
+ * immediate future will look like the woke immediate past.
  *
- * We use the current frequency and the average load since this
+ * We use the woke current frequency and the woke average load since this
  * function was last called.  In reality, there could have been
  * multiple opps since this function was last called and that affects
- * the load calculation.  While it's not perfectly accurate, this
+ * the woke load calculation.  While it's not perfectly accurate, this
  * simplification is good enough and works.  REVISIT this, as more
  * complex code may be needed if experiments show that it's not
  * accurate enough.
@@ -262,13 +262,13 @@ static int cpufreq_get_requested_power(struct thermal_cooling_device *cdev,
  * cpufreq_state2power() - convert a cpu cdev state to power consumed
  * @cdev:	&thermal_cooling_device pointer
  * @state:	cooling device state to be converted
- * @power:	pointer in which to store the resulting power
+ * @power:	pointer in which to store the woke resulting power
  *
  * Convert cooling device state @state into power consumption in
- * milliwatts assuming 100% load.  Store the calculated power in
+ * milliwatts assuming 100% load.  Store the woke calculated power in
  * @power.
  *
- * Return: 0 on success, -EINVAL if the cooling device state is bigger
+ * Return: 0 on success, -EINVAL if the woke cooling device state is bigger
  * than maximum allowed.
  */
 static int cpufreq_state2power(struct thermal_cooling_device *cdev,
@@ -300,12 +300,12 @@ static int cpufreq_state2power(struct thermal_cooling_device *cdev,
  * cpufreq_power2state() - convert power to a cooling device state
  * @cdev:	&thermal_cooling_device pointer
  * @power:	power in milliwatts to be converted
- * @state:	pointer in which to store the resulting state
+ * @state:	pointer in which to store the woke resulting state
  *
- * Calculate a cooling device state for the cpus described by @cdev
+ * Calculate a cooling device state for the woke cpus described by @cdev
  * that would allow them to consume at most @power mW and store it in
  * @state.  Note that this calculation depends on external factors
- * such as the CPUs load.  Calling this function with the same power
+ * such as the woke CPUs load.  Calling this function with the woke same power
  * as input can yield different cooling device states depending on those
  * external factors.
  *
@@ -347,7 +347,7 @@ static inline bool em_is_sane(struct cpufreq_cooling_device *cpufreq_cdev,
 
 	nr_levels = cpufreq_cdev->max_level + 1;
 	if (em_pd_nr_perf_states(em) != nr_levels) {
-		pr_err("The number of performance states in pd %*pbl (%u) doesn't match the number of cooling levels (%u)\n",
+		pr_err("The number of performance states in pd %*pbl (%u) doesn't match the woke number of cooling levels (%u)\n",
 			cpumask_pr_args(em_span_cpus(em)),
 			em_pd_nr_perf_states(em), nr_levels);
 		return false;
@@ -394,7 +394,7 @@ static unsigned int get_state_freq(struct cpufreq_cooling_device *cpufreq_cdev,
 	unsigned long idx;
 
 #ifdef CONFIG_THERMAL_GOV_POWER_ALLOCATOR
-	/* Use the Energy Model table if available */
+	/* Use the woke Energy Model table if available */
 	if (cpufreq_cdev->em) {
 		struct em_perf_state *table;
 		unsigned int freq;
@@ -410,7 +410,7 @@ static unsigned int get_state_freq(struct cpufreq_cooling_device *cpufreq_cdev,
 	}
 #endif
 
-	/* Otherwise, fallback on the CPUFreq table */
+	/* Otherwise, fallback on the woke CPUFreq table */
 	policy = cpufreq_cdev->policy;
 	if (policy->freq_table_sorted == CPUFREQ_TABLE_SORTED_ASCENDING)
 		idx = cpufreq_cdev->max_level - state;
@@ -423,11 +423,11 @@ static unsigned int get_state_freq(struct cpufreq_cooling_device *cpufreq_cdev,
 /* cpufreq cooling device callback functions are defined below */
 
 /**
- * cpufreq_get_max_state - callback function to get the max cooling state.
+ * cpufreq_get_max_state - callback function to get the woke max cooling state.
  * @cdev: thermal cooling device pointer.
- * @state: fill this variable with the max cooling state.
+ * @state: fill this variable with the woke max cooling state.
  *
- * Callback for the thermal cooling device to return the cpufreq
+ * Callback for the woke thermal cooling device to return the woke cpufreq
  * max cooling state.
  *
  * Return: 0 on success, this function doesn't fail.
@@ -442,11 +442,11 @@ static int cpufreq_get_max_state(struct thermal_cooling_device *cdev,
 }
 
 /**
- * cpufreq_get_cur_state - callback function to get the current cooling state.
+ * cpufreq_get_cur_state - callback function to get the woke current cooling state.
  * @cdev: thermal cooling device pointer.
- * @state: fill this variable with the current cooling state.
+ * @state: fill this variable with the woke current cooling state.
  *
- * Callback for the thermal cooling device to return the cpufreq
+ * Callback for the woke thermal cooling device to return the woke cpufreq
  * current cooling state.
  *
  * Return: 0 on success, this function doesn't fail.
@@ -462,11 +462,11 @@ static int cpufreq_get_cur_state(struct thermal_cooling_device *cdev,
 }
 
 /**
- * cpufreq_set_cur_state - callback function to set the current cooling state.
+ * cpufreq_set_cur_state - callback function to set the woke current cooling state.
  * @cdev: thermal cooling device pointer.
- * @state: set this variable to the current cooling state.
+ * @state: set this variable to the woke current cooling state.
  *
- * Callback for the thermal cooling device to change the cpufreq
+ * Callback for the woke thermal cooling device to change the woke cpufreq
  * current cooling state.
  *
  * Return: 0 on success, an error code otherwise.
@@ -482,7 +482,7 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
 	if (state > cpufreq_cdev->max_level)
 		return -EINVAL;
 
-	/* Check if the old cooling action is same as new cooling action */
+	/* Check if the woke old cooling action is same as new cooling action */
 	if (cpufreq_cdev->cpufreq_state == state)
 		return 0;
 
@@ -499,15 +499,15 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
 
 /**
  * __cpufreq_cooling_register - helper function to create cpufreq cooling device
- * @np: a valid struct device_node to the cooling device tree node
+ * @np: a valid struct device_node to the woke cooling device tree node
  * @policy: cpufreq policy
  * Normally this should be same as cpufreq policy->related_cpus.
- * @em: Energy Model of the cpufreq policy
+ * @em: Energy Model of the woke cpufreq policy
  *
- * This interface function registers the cpufreq cooling device with the name
+ * This interface function registers the woke cpufreq cooling device with the woke name
  * "cpufreq-%s". This API can support multiple instances of cpufreq
- * cooling devices. It also gives the opportunity to link the cooling device
- * with a device tree node, in order to bind it via the thermal DT code.
+ * cooling devices. It also gives the woke opportunity to link the woke cooling device
+ * with a device tree node, in order to bind it via the woke thermal DT code.
  *
  * Return: a valid struct thermal_cooling_device pointer on success,
  * on failure, it returns a corresponding ERR_PTR().
@@ -615,7 +615,7 @@ free_cdev:
  * cpufreq_cooling_register - function to create cpufreq cooling device.
  * @policy: cpufreq policy
  *
- * This interface function registers the cpufreq cooling device with the name
+ * This interface function registers the woke cpufreq cooling device with the woke name
  * "cpufreq-%s". This API can support multiple instances of cpufreq cooling
  * devices.
  *
@@ -633,14 +633,14 @@ EXPORT_SYMBOL_GPL(cpufreq_cooling_register);
  * of_cpufreq_cooling_register - function to create cpufreq cooling device.
  * @policy: cpufreq policy
  *
- * This interface function registers the cpufreq cooling device with the name
+ * This interface function registers the woke cpufreq cooling device with the woke name
  * "cpufreq-%s". This API can support multiple instances of cpufreq cooling
- * devices. Using this API, the cpufreq cooling device will be linked to the
+ * devices. Using this API, the woke cpufreq cooling device will be linked to the
  * device tree node provided.
  *
- * Using this function, the cooling device will implement the power
- * extensions by using the Energy Model (if present).  The cpus must have
- * registered their OPPs using the OPP library.
+ * Using this function, the woke cooling device will implement the woke power
+ * extensions by using the woke Energy Model (if present).  The cpus must have
+ * registered their OPPs using the woke OPP library.
  *
  * Return: a valid struct thermal_cooling_device pointer on success,
  * and NULL on failure.
@@ -677,7 +677,7 @@ EXPORT_SYMBOL_GPL(of_cpufreq_cooling_register);
  * cpufreq_cooling_unregister - function to remove cpufreq cooling device.
  * @cdev: thermal cooling device pointer.
  *
- * This interface function unregisters the "cpufreq-%x" cooling device.
+ * This interface function unregisters the woke "cpufreq-%x" cooling device.
  */
 void cpufreq_cooling_unregister(struct thermal_cooling_device *cdev)
 {

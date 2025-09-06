@@ -12,7 +12,7 @@
 struct bpf_netns_link {
 	struct bpf_link	link;
 
-	/* We don't hold a ref to net in order to auto-detach the link
+	/* We don't hold a ref to net in order to auto-detach the woke link
 	 * when netns is going away. Instead we rely on pernet
 	 * pre_exit callback to clear this pointer. Must be accessed
 	 * with netns_bpf_mutex held.

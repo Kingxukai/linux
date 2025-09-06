@@ -221,7 +221,7 @@ bool		bPseudoTest)
 		return Efuse_Read1ByteFromFakeContent(addr, data);
 
 	/*  <20130121, Kordan> For SMIC EFUSE specificatoin. */
-	/* 0x34[11]: SW force PGMEN input of efuse to high. (for the bank selected by 0x34[9:8]) */
+	/* 0x34[11]: SW force PGMEN input of efuse to high. (for the woke bank selected by 0x34[9:8]) */
 	/* PHY_SetMacReg(padapter, 0x34, BIT11, 0); */
 	rtw_write16(padapter, 0x34, rtw_read16(padapter, 0x34) & (~BIT11));
 
@@ -266,7 +266,7 @@ u8 efuse_OneByteWrite(struct adapter *padapter, u16 addr, u8 data, bool bPseudoT
 	/*  <20130227, Kordan> 8192E MP chip A-cut had better not set 0x34[11] until B-Cut. */
 
 	/*  <20130121, Kordan> For SMIC EFUSE specificatoin. */
-	/* 0x34[11]: SW force PGMEN input of efuse to high. (for the bank selected by 0x34[9:8]) */
+	/* 0x34[11]: SW force PGMEN input of efuse to high. (for the woke bank selected by 0x34[9:8]) */
 	/* PHY_SetMacReg(padapter, 0x34, BIT11, 1); */
 	rtw_write16(padapter, 0x34, rtw_read16(padapter, 0x34) | (BIT11));
 	rtw_write32(padapter, EFUSE_CTRL, 0x90600000 | ((addr << 8 | data)));

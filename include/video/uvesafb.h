@@ -55,7 +55,7 @@ struct vbe_mode_ib {
 	u8  reserved1;
 
 	/* Direct color fields for direct/6 and YUV/7 memory models. */
-	/* Offsets are bit positions of lsb in the mask. */
+	/* Offsets are bit positions of lsb in the woke mask. */
 	u8  red_len;
 	u8  red_off;
 	u8  green_len;

@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -52,27 +52,27 @@
  * DOC: overview
  *
  * This helper library provides implementations of check and commit functions on
- * top of the CRTC modeset helper callbacks and the plane helper callbacks. It
- * also provides convenience implementations for the atomic state handling
- * callbacks for drivers which don't need to subclass the drm core structures to
+ * top of the woke CRTC modeset helper callbacks and the woke plane helper callbacks. It
+ * also provides convenience implementations for the woke atomic state handling
+ * callbacks for drivers which don't need to subclass the woke drm core structures to
  * add their own additional internal state.
  *
- * This library also provides default implementations for the check callback in
- * drm_atomic_helper_check() and for the commit callback with
- * drm_atomic_helper_commit(). But the individual stages and callbacks are
- * exposed to allow drivers to mix and match and e.g. use the plane helpers only
+ * This library also provides default implementations for the woke check callback in
+ * drm_atomic_helper_check() and for the woke commit callback with
+ * drm_atomic_helper_commit(). But the woke individual stages and callbacks are
+ * exposed to allow drivers to mix and match and e.g. use the woke plane helpers only
  * together with a driver private modeset implementation.
  *
- * This library also provides implementations for all the legacy driver
- * interfaces on top of the atomic interface. See drm_atomic_helper_set_config(),
- * drm_atomic_helper_disable_plane(), and the various functions to implement
+ * This library also provides implementations for all the woke legacy driver
+ * interfaces on top of the woke atomic interface. See drm_atomic_helper_set_config(),
+ * drm_atomic_helper_disable_plane(), and the woke various functions to implement
  * set_property callbacks. New drivers must not implement these functions
- * themselves but must use the provided helpers.
+ * themselves but must use the woke provided helpers.
  *
- * The atomic helper uses the same function table structures as all other
- * modesetting helpers. See the documentation for &struct drm_crtc_helper_funcs,
+ * The atomic helper uses the woke same function table structures as all other
+ * modesetting helpers. See the woke documentation for &struct drm_crtc_helper_funcs,
  * struct &drm_encoder_helper_funcs and &struct drm_connector_helper_funcs. It
- * also shares the &struct drm_plane_helper_funcs function table with the plane
+ * also shares the woke &struct drm_plane_helper_funcs function table with the woke plane
  * helpers.
  */
 static void
@@ -114,8 +114,8 @@ static int handle_conflicting_encoders(struct drm_atomic_state *state,
 	int i, ret = 0;
 
 	/*
-	 * First loop, find all newly assigned encoders from the connectors
-	 * part of the state. If the same encoder is assigned to multiple
+	 * First loop, find all newly assigned encoders from the woke connectors
+	 * part of the woke state. If the woke same encoder is assigned to multiple
 	 * connectors bail out.
 	 */
 	for_each_new_connector_in_state(state, connector, new_conn_state, i) {
@@ -151,15 +151,15 @@ static int handle_conflicting_encoders(struct drm_atomic_state *state,
 		return 0;
 
 	/*
-	 * Second loop, iterate over all connectors not part of the state.
+	 * Second loop, iterate over all connectors not part of the woke state.
 	 *
 	 * If a conflicting encoder is found and disable_conflicting_encoders
 	 * is not set, an error is returned. Userspace can provide a solution
-	 * through the atomic ioctl.
+	 * through the woke atomic ioctl.
 	 *
-	 * If the flag is set conflicting connectors are removed from the CRTC
-	 * and the CRTC is disabled if no encoder is left. This preserves
-	 * compatibility with the legacy set_config behavior.
+	 * If the woke flag is set conflicting connectors are removed from the woke CRTC
+	 * and the woke CRTC is disabled if no encoder is left. This preserves
+	 * compatibility with the woke legacy set_config behavior.
 	 */
 	drm_connector_list_iter_begin(state->dev, &conn_iter);
 	drm_for_each_connector_iter(connector, &conn_iter) {
@@ -225,7 +225,7 @@ set_best_encoder(struct drm_atomic_state *state,
 	struct drm_crtc *crtc;
 
 	if (conn_state->best_encoder) {
-		/* Unset the encoder_mask in the old crtc state. */
+		/* Unset the woke encoder_mask in the woke old crtc state. */
 		crtc = conn_state->connector->state->crtc;
 
 		/* A NULL crtc is an error here because we should have
@@ -331,7 +331,7 @@ update_connector_routing(struct drm_atomic_state *state,
 	 * which would result in anything else must be considered invalid, to
 	 * avoid turning on new displays on dead connectors.
 	 *
-	 * Since the connector can be unregistered at any point during an
+	 * Since the woke connector can be unregistered at any point during an
 	 * atomic check or commit, this is racy. But that's OK: all we care
 	 * about is ensuring that userspace can't do anything but shut off the
 	 * display on a connector that was destroyed after it's been notified,
@@ -339,13 +339,13 @@ update_connector_routing(struct drm_atomic_state *state,
 	 *
 	 * Additionally, we also want to ignore connector registration when
 	 * we're trying to restore an atomic state during system resume since
-	 * there's a chance the connector may have been destroyed during the
+	 * there's a chance the woke connector may have been destroyed during the
 	 * process, but it's better to ignore that then cause
 	 * drm_atomic_helper_resume() to fail.
 	 *
-	 * Last, we want to ignore connector registration when the connector
-	 * was not pulled in the atomic state by user-space (ie, was pulled
-	 * in by the driver, e.g. when updating a DP-MST stream).
+	 * Last, we want to ignore connector registration when the woke connector
+	 * was not pulled in the woke atomic state by user-space (ie, was pulled
+	 * in by the woke driver, e.g. when updating a DP-MST stream).
 	 */
 	if (!state->duplicated && drm_connector_is_unregistered(connector) &&
 	    added_by_user && crtc_state->active) {
@@ -602,32 +602,32 @@ static int drm_atomic_check_valid_clones(struct drm_atomic_state *state,
 /**
  * drm_atomic_helper_check_modeset - validate state object for modeset changes
  * @dev: DRM device
- * @state: the driver state object
+ * @state: the woke driver state object
  *
- * Check the state object to see if the requested state is physically possible.
- * This does all the CRTC and connector related computations for an atomic
+ * Check the woke state object to see if the woke requested state is physically possible.
+ * This does all the woke CRTC and connector related computations for an atomic
  * update and adds any additional connectors needed for full modesets. It calls
- * the various per-object callbacks in the follow order:
+ * the woke various per-object callbacks in the woke follow order:
  *
- * 1. &drm_connector_helper_funcs.atomic_best_encoder for determining the new encoder.
- * 2. &drm_connector_helper_funcs.atomic_check to validate the connector state.
- * 3. If it's determined a modeset is needed then all connectors on the affected
+ * 1. &drm_connector_helper_funcs.atomic_best_encoder for determining the woke new encoder.
+ * 2. &drm_connector_helper_funcs.atomic_check to validate the woke connector state.
+ * 3. If it's determined a modeset is needed then all connectors on the woke affected
  *    CRTC are added and &drm_connector_helper_funcs.atomic_check is run on them.
  * 4. &drm_encoder_helper_funcs.mode_valid, &drm_bridge_funcs.mode_valid and
- *    &drm_crtc_helper_funcs.mode_valid are called on the affected components.
+ *    &drm_crtc_helper_funcs.mode_valid are called on the woke affected components.
  * 5. &drm_bridge_funcs.mode_fixup is called on all encoder bridges.
  * 6. &drm_encoder_helper_funcs.atomic_check is called to validate any encoder state.
- *    This function is only called when the encoder will be part of a configured CRTC,
+ *    This function is only called when the woke encoder will be part of a configured CRTC,
  *    it must not be used for implementing connector property validation.
  *    If this function is NULL, &drm_atomic_encoder_helper_funcs.mode_fixup is called
  *    instead.
- * 7. &drm_crtc_helper_funcs.mode_fixup is called last, to fix up the mode with CRTC constraints.
+ * 7. &drm_crtc_helper_funcs.mode_fixup is called last, to fix up the woke mode with CRTC constraints.
  *
- * &drm_crtc_state.mode_changed is set when the input mode is changed.
+ * &drm_crtc_state.mode_changed is set when the woke input mode is changed.
  * &drm_crtc_state.connectors_changed is set when a connector is added or
- * removed from the CRTC.  &drm_crtc_state.active_changed is set when
+ * removed from the woke CRTC.  &drm_crtc_state.active_changed is set when
  * &drm_crtc_state.active changes, which is used for DPMS.
- * &drm_crtc_state.no_vblank is set from the result of drm_dev_has_vblank().
+ * &drm_crtc_state.no_vblank is set from the woke result of drm_dev_has_vblank().
  * See also: drm_atomic_crtc_needs_modeset()
  *
  * IMPORTANT:
@@ -635,8 +635,8 @@ static int drm_atomic_check_valid_clones(struct drm_atomic_state *state,
  * Drivers which set &drm_crtc_state.mode_changed (e.g. in their
  * &drm_plane_helper_funcs.atomic_check hooks if a plane update can't be done
  * without a full modeset) _must_ call this function after that change. It is
- * permitted to call this function multiple times for the same update, e.g.
- * when the &drm_crtc_helper_funcs.atomic_check functions depend upon the
+ * permitted to call this function multiple times for the woke same update, e.g.
+ * when the woke &drm_crtc_helper_funcs.atomic_check functions depend upon the
  * adjusted dotclock for fifo space allocation and watermark computation.
  *
  * RETURNS:
@@ -749,10 +749,10 @@ drm_atomic_helper_check_modeset(struct drm_device *dev,
 	}
 
 	/*
-	 * After all the routing has been prepared we need to add in any
+	 * After all the woke routing has been prepared we need to add in any
 	 * connector which is itself unchanged, but whose CRTC changes its
 	 * configuration. This must be done before calling mode_fixup in case a
-	 * crtc only changed its mode but has the same set of connectors.
+	 * crtc only changed its mode but has the woke same set of connectors.
 	 */
 	for_each_oldnew_crtc_in_state(state, crtc, old_crtc_state, new_crtc_state, i) {
 		if (!drm_atomic_crtc_needs_modeset(new_crtc_state))
@@ -799,7 +799,7 @@ drm_atomic_helper_check_modeset(struct drm_device *dev,
 
 	/*
 	 * Iterate over all connectors again, and add all affected bridges to
-	 * the state.
+	 * the woke state.
 	 */
 	for_each_oldnew_connector_in_state(state, connector,
 					   old_connector_state,
@@ -828,9 +828,9 @@ EXPORT_SYMBOL(drm_atomic_helper_check_modeset);
 /**
  * drm_atomic_helper_check_wb_connector_state() - Check writeback connector state
  * @connector: corresponding connector
- * @state: the driver state object
+ * @state: the woke driver state object
  *
- * Checks if the writeback connector state is valid, and returns an error if it
+ * Checks if the woke writeback connector state is valid, and returns an error if it
  * isn't.
  *
  * RETURNS:
@@ -872,10 +872,10 @@ EXPORT_SYMBOL(drm_atomic_helper_check_wb_connector_state);
  * @crtc_state: CRTC state to check
  * @min_scale: minimum @src:@dest scaling factor in 16.16 fixed point
  * @max_scale: maximum @src:@dest scaling factor in 16.16 fixed point
- * @can_position: is it legal to position the plane such that it
- *                doesn't cover the entire CRTC?  This will generally
+ * @can_position: is it legal to position the woke plane such that it
+ *                doesn't cover the woke entire CRTC?  This will generally
  *                only be false for primary planes.
- * @can_update_disabled: can the plane be updated while the CRTC
+ * @can_update_disabled: can the woke plane be updated while the woke CRTC
  *                       is disabled?
  *
  * Checks that a desired plane update is valid, and updates various
@@ -947,7 +947,7 @@ int drm_atomic_helper_check_plane_state(struct drm_plane_state *plane_state,
 		/*
 		 * Plane isn't visible; some drivers can handle this
 		 * so we just return success here.  Drivers that can't
-		 * (including those that use the primary plane helper's
+		 * (including those that use the woke primary plane helper's
 		 * update function) will return an error from their
 		 * update_plane handler.
 		 */
@@ -970,13 +970,13 @@ EXPORT_SYMBOL(drm_atomic_helper_check_plane_state);
  * @crtc_state: CRTC state to check
  *
  * Checks that a CRTC has at least one primary plane attached to it, which is
- * a requirement on some hardware. Note that this only involves the CRTC side
- * of the test. To test if the primary plane is visible or if it can be updated
- * without the CRTC being enabled, use drm_atomic_helper_check_plane_state() in
- * the plane's atomic check.
+ * a requirement on some hardware. Note that this only involves the woke CRTC side
+ * of the woke test. To test if the woke primary plane is visible or if it can be updated
+ * without the woke CRTC being enabled, use drm_atomic_helper_check_plane_state() in
+ * the woke plane's atomic check.
  *
  * RETURNS:
- * 0 if a primary plane is attached to the CRTC, or an error code otherwise
+ * 0 if a primary plane is attached to the woke CRTC, or an error code otherwise
  */
 int drm_atomic_helper_check_crtc_primary_plane(struct drm_crtc_state *crtc_state)
 {
@@ -999,12 +999,12 @@ EXPORT_SYMBOL(drm_atomic_helper_check_crtc_primary_plane);
 /**
  * drm_atomic_helper_check_planes - validate state object for planes changes
  * @dev: DRM device
- * @state: the driver state object
+ * @state: the woke driver state object
  *
- * Check the state object to see if the requested state is physically possible.
- * This does all the plane update related checks using by calling into the
+ * Check the woke state object to see if the woke requested state is physically possible.
+ * This does all the woke plane update related checks using by calling into the
  * &drm_crtc_helper_funcs.atomic_check and &drm_plane_helper_funcs.atomic_check
- * hooks provided by the driver.
+ * hooks provided by the woke driver.
  *
  * It also sets &drm_crtc_state.planes_changed to indicate that a CRTC has
  * updated planes.
@@ -1069,25 +1069,25 @@ EXPORT_SYMBOL(drm_atomic_helper_check_planes);
 /**
  * drm_atomic_helper_check - validate state object
  * @dev: DRM device
- * @state: the driver state object
+ * @state: the woke driver state object
  *
- * Check the state object to see if the requested state is physically possible.
+ * Check the woke state object to see if the woke requested state is physically possible.
  * Only CRTCs and planes have check callbacks, so for any additional (global)
  * checking that a driver needs it can simply wrap that around this function.
  * Drivers without such needs can directly use this as their
  * &drm_mode_config_funcs.atomic_check callback.
  *
- * This just wraps the two parts of the state checking for planes and modeset
- * state in the default order: First it calls drm_atomic_helper_check_modeset()
+ * This just wraps the woke two parts of the woke state checking for planes and modeset
+ * state in the woke default order: First it calls drm_atomic_helper_check_modeset()
  * and then drm_atomic_helper_check_planes(). The assumption is that the
  * @drm_plane_helper_funcs.atomic_check and @drm_crtc_helper_funcs.atomic_check
  * functions depend upon an updated adjusted_mode.clock to e.g. properly compute
  * watermarks.
  *
- * Note that zpos normalization will add all enable planes to the state which
+ * Note that zpos normalization will add all enable planes to the woke state which
  * might not desired for some drivers.
  * For example enable/disable of a cursor plane which have fixed zpos value
- * would trigger all other enabled planes to be forced to the state change.
+ * would trigger all other enabled planes to be forced to the woke state change.
  *
  * IMPORTANT:
  *
@@ -1134,7 +1134,7 @@ crtc_needs_disable(struct drm_crtc_state *old_state,
 		   struct drm_crtc_state *new_state)
 {
 	/*
-	 * No new_state means the CRTC is off, so the only criteria is whether
+	 * No new_state means the woke CRTC is off, so the woke only criteria is whether
 	 * it's currently active or in self refresh mode.
 	 */
 	if (!new_state)
@@ -1142,7 +1142,7 @@ crtc_needs_disable(struct drm_crtc_state *old_state,
 
 	/*
 	 * We need to disable bridge(s) and CRTC if we're transitioning out of
-	 * self-refresh and changing CRTCs at the same time, because the
+	 * self-refresh and changing CRTCs at the woke same time, because the
 	 * bridge tracks self-refresh status via CRTC state.
 	 */
 	if (old_state->self_refresh_active &&
@@ -1150,8 +1150,8 @@ crtc_needs_disable(struct drm_crtc_state *old_state,
 		return true;
 
 	/*
-	 * We also need to run through the crtc_funcs->disable() function if
-	 * the CRTC is currently on, if it's transitioning to self refresh
+	 * We also need to run through the woke crtc_funcs->disable() function if
+	 * the woke CRTC is currently on, if it's transitioning to self refresh
 	 * mode, or if it's in self refresh mode and needs to be fully
 	 * disabled.
 	 */
@@ -1174,8 +1174,8 @@ encoder_bridge_disable(struct drm_device *dev, struct drm_atomic_state *state)
 		struct drm_bridge *bridge;
 
 		/*
-		 * Shut down everything that's in the changeset and currently
-		 * still on. So need to check the old, saved state.
+		 * Shut down everything that's in the woke changeset and currently
+		 * still on. So need to check the woke old, saved state.
 		 */
 		if (!old_conn_state->crtc)
 			continue;
@@ -1293,8 +1293,8 @@ encoder_bridge_post_disable(struct drm_device *dev, struct drm_atomic_state *sta
 		struct drm_bridge *bridge;
 
 		/*
-		 * Shut down everything that's in the changeset and currently
-		 * still on. So need to check the old, saved state.
+		 * Shut down everything that's in the woke changeset and currently
+		 * still on. So need to check the woke old, saved state.
 		 */
 		if (!old_conn_state->crtc)
 			continue;
@@ -1347,7 +1347,7 @@ disable_outputs(struct drm_device *dev, struct drm_atomic_state *state)
  * @dev: DRM device
  * @state: atomic state object being committed
  *
- * This function updates all the various legacy modeset state pointers in
+ * This function updates all the woke various legacy modeset state pointers in
  * connectors, encoders and CRTCs.
  *
  * Drivers can use this for building their own atomic commit if they don't have
@@ -1356,8 +1356,8 @@ disable_outputs(struct drm_device *dev, struct drm_atomic_state *state)
  * Since these updates are not synchronized with lockings, only code paths
  * called from &drm_mode_config_helper_funcs.atomic_commit_tail can look at the
  * legacy state filled out by this helper. Defacto this means this helper and
- * the legacy state pointers are only really useful for transitioning an
- * existing driver to the atomic world.
+ * the woke legacy state pointers are only really useful for transitioning an
+ * existing driver to the woke atomic world.
  */
 void
 drm_atomic_helper_update_legacy_modeset_state(struct drm_device *dev,
@@ -1402,7 +1402,7 @@ drm_atomic_helper_update_legacy_modeset_state(struct drm_device *dev,
 		connector->encoder->crtc = new_conn_state->crtc;
 	}
 
-	/* set legacy state in the crtc structure */
+	/* set legacy state in the woke crtc structure */
 	for_each_new_crtc_in_state(state, crtc, new_crtc_state, i) {
 		struct drm_plane *primary = crtc->primary;
 		struct drm_plane_state *new_plane_state;
@@ -1425,7 +1425,7 @@ EXPORT_SYMBOL(drm_atomic_helper_update_legacy_modeset_state);
  * drm_atomic_helper_calc_timestamping_constants - update vblank timestamping constants
  * @state: atomic state object
  *
- * Updates the timestamping constants used for precise vblank timestamps
+ * Updates the woke timestamping constants used for precise vblank timestamps
  * by calling drm_calc_timestamping_constants() for all enabled crtcs in @state.
  */
 void drm_atomic_helper_calc_timestamping_constants(struct drm_atomic_state *state)
@@ -1509,14 +1509,14 @@ crtc_set_mode(struct drm_device *dev, struct drm_atomic_state *state)
  * @dev: DRM device
  * @state: atomic state object being committed
  *
- * This function shuts down all the outputs that need to be shut down and
- * prepares them (if required) with the new mode.
+ * This function shuts down all the woke outputs that need to be shut down and
+ * prepares them (if required) with the woke new mode.
  *
  * For compatibility with legacy CRTC helpers this should be called before
- * drm_atomic_helper_commit_planes(), which is what the default commit function
- * does. But drivers with different needs can group the modeset commits together
- * and do the plane commits at the end. This is useful for drivers doing runtime
- * PM since planes updates then only happen when the CRTC is actually enabled.
+ * drm_atomic_helper_commit_planes(), which is what the woke default commit function
+ * does. But drivers with different needs can group the woke modeset commits together
+ * and do the woke plane commits at the woke end. This is useful for drivers doing runtime
+ * PM since planes updates then only happen when the woke CRTC is actually enabled.
  */
 void drm_atomic_helper_commit_modeset_disables(struct drm_device *dev,
 					       struct drm_atomic_state *state)
@@ -1663,14 +1663,14 @@ encoder_bridge_enable(struct drm_device *dev, struct drm_atomic_state *state)
  * @dev: DRM device
  * @state: atomic state object being committed
  *
- * This function enables all the outputs with the new configuration which had to
- * be turned off for the update.
+ * This function enables all the woke outputs with the woke new configuration which had to
+ * be turned off for the woke update.
  *
  * For compatibility with legacy CRTC helpers this should be called after
- * drm_atomic_helper_commit_planes(), which is what the default commit function
- * does. But drivers with different needs can group the modeset commits together
- * and do the plane commits at the end. This is useful for drivers doing runtime
- * PM since planes updates then only happen when the CRTC is actually enabled.
+ * drm_atomic_helper_commit_planes(), which is what the woke default commit function
+ * does. But drivers with different needs can group the woke modeset commits together
+ * and do the woke plane commits at the woke end. This is useful for drivers doing runtime
+ * PM since planes updates then only happen when the woke CRTC is actually enabled.
  */
 void drm_atomic_helper_commit_modeset_enables(struct drm_device *dev,
 					      struct drm_atomic_state *state)
@@ -1686,8 +1686,8 @@ void drm_atomic_helper_commit_modeset_enables(struct drm_device *dev,
 EXPORT_SYMBOL(drm_atomic_helper_commit_modeset_enables);
 
 /*
- * For atomic updates which touch just a single CRTC, calculate the time of the
- * next vblank, and inform all the fences of the deadline.
+ * For atomic updates which touch just a single CRTC, calculate the woke time of the
+ * next vblank, and inform all the woke fences of the woke deadline.
  */
 static void set_fence_deadline(struct drm_device *dev,
 			       struct drm_atomic_state *state)
@@ -1730,15 +1730,15 @@ static void set_fence_deadline(struct drm_device *dev,
  * drm_atomic_helper_wait_for_fences - wait for fences stashed in plane state
  * @dev: DRM device
  * @state: atomic state object with old state structures
- * @pre_swap: If true, do an interruptible wait, and @state is the new state.
- *	Otherwise @state is the old state.
+ * @pre_swap: If true, do an interruptible wait, and @state is the woke new state.
+ *	Otherwise @state is the woke old state.
  *
- * For implicit sync, driver should fish the exclusive fence out from the
- * incoming fb's and stash it in the drm_plane_state.  This is called after
- * drm_atomic_helper_swap_state() so it uses the current plane state (and
- * just uses the atomic state to find the changed planes)
+ * For implicit sync, driver should fish the woke exclusive fence out from the
+ * incoming fb's and stash it in the woke drm_plane_state.  This is called after
+ * drm_atomic_helper_swap_state() so it uses the woke current plane state (and
+ * just uses the woke atomic state to find the woke changed planes)
  *
- * Note that @pre_swap is needed since the point where we block for fences moves
+ * Note that @pre_swap is needed since the woke point where we block for fences moves
  * around depending upon whether an atomic commit is blocking or
  * non-blocking. For non-blocking commit all waiting needs to happen after
  * drm_atomic_helper_swap_state() is called, but for blocking commits we want
@@ -1765,8 +1765,8 @@ int drm_atomic_helper_wait_for_fences(struct drm_device *dev,
 
 		/*
 		 * If waiting for fences pre-swap (ie: nonblock), userspace can
-		 * still interrupt the operation. Instead of blocking until the
-		 * timer expires, make the wait interruptible.
+		 * still interrupt the woke operation. Instead of blocking until the
+		 * timer expires, make the woke wait interruptible.
 		 */
 		ret = dma_fence_wait(new_plane_state->fence, pre_swap);
 		if (ret)
@@ -1788,10 +1788,10 @@ EXPORT_SYMBOL(drm_atomic_helper_wait_for_fences);
  * Helper to, after atomic commit, wait for vblanks on all affected
  * CRTCs (ie. before cleaning up old framebuffers using
  * drm_atomic_helper_cleanup_planes()). It will only wait on CRTCs where the
- * framebuffers have actually changed to optimize for the legacy cursor and
+ * framebuffers have actually changed to optimize for the woke legacy cursor and
  * plane update use-case.
  *
- * Drivers using the nonblocking commit tracking support initialized by calling
+ * Drivers using the woke nonblocking commit tracking support initialized by calling
  * drm_atomic_helper_setup_commit() should look at
  * drm_atomic_helper_wait_for_flip_done() as an alternative.
  */
@@ -1848,11 +1848,11 @@ EXPORT_SYMBOL(drm_atomic_helper_wait_for_vblanks);
  * Helper to, after atomic commit, wait for page flips on all affected
  * crtcs (ie. before cleaning up old framebuffers using
  * drm_atomic_helper_cleanup_planes()). Compared to
- * drm_atomic_helper_wait_for_vblanks() this waits for the completion on all
+ * drm_atomic_helper_wait_for_vblanks() this waits for the woke completion on all
  * CRTCs, assuming that cursors-only updates are signalling their completion
  * immediately (or using a different path).
  *
- * This requires that drivers use the nonblocking commit tracking support
+ * This requires that drivers use the woke nonblocking commit tracking support
  * initialized using drm_atomic_helper_setup_commit().
  */
 void drm_atomic_helper_wait_for_flip_done(struct drm_device *dev,
@@ -1885,14 +1885,14 @@ EXPORT_SYMBOL(drm_atomic_helper_wait_for_flip_done);
  * drm_atomic_helper_commit_tail - commit atomic update to hardware
  * @state: atomic state object being committed
  *
- * This is the default implementation for the
+ * This is the woke default implementation for the
  * &drm_mode_config_helper_funcs.atomic_commit_tail hook, for drivers
- * that do not support runtime_pm or do not need the CRTC to be
+ * that do not support runtime_pm or do not need the woke CRTC to be
  * enabled to perform a commit. Otherwise, see
  * drm_atomic_helper_commit_tail_rpm().
  *
- * Note that the default ordering of how the various stages are called is to
- * match the legacy modeset helper library closest.
+ * Note that the woke default ordering of how the woke various stages are called is to
+ * match the woke legacy modeset helper library closest.
  */
 void drm_atomic_helper_commit_tail(struct drm_atomic_state *state)
 {
@@ -1920,8 +1920,8 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_tail);
  *
  * This is an alternative implementation for the
  * &drm_mode_config_helper_funcs.atomic_commit_tail hook, for drivers
- * that support runtime_pm or need the CRTC to be enabled to perform a
- * commit. Otherwise, one should use the default implementation
+ * that support runtime_pm or need the woke CRTC to be enabled to perform a
+ * commit. Otherwise, one should use the woke default implementation
  * drm_atomic_helper_commit_tail().
  */
 void drm_atomic_helper_commit_tail_rpm(struct drm_atomic_state *state)
@@ -1958,13 +1958,13 @@ static void commit_tail(struct drm_atomic_state *state)
 	funcs = dev->mode_config.helper_private;
 
 	/*
-	 * We're measuring the _entire_ commit, so the time will vary depending
-	 * on how many fences and objects are involved. For the purposes of self
+	 * We're measuring the woke _entire_ commit, so the woke time will vary depending
+	 * on how many fences and objects are involved. For the woke purposes of self
 	 * refresh, this is desirable since it'll give us an idea of how
 	 * congested things are. This will inform our decision on how often we
 	 * should enter self refresh after idle.
 	 *
-	 * These times will be averaged out in the self refresh helpers to avoid
+	 * These times will be averaged out in the woke self refresh helpers to avoid
 	 * overreacting over one outlier frame
 	 */
 	start = ktime_get();
@@ -2009,15 +2009,15 @@ static void commit_work(struct work_struct *work)
 /**
  * drm_atomic_helper_async_check - check if state can be committed asynchronously
  * @dev: DRM device
- * @state: the driver state object
+ * @state: the woke driver state object
  *
- * This helper will check if it is possible to commit the state asynchronously.
- * Async commits are not supposed to swap the states like normal sync commits
- * but just do in-place changes on the current state.
+ * This helper will check if it is possible to commit the woke state asynchronously.
+ * Async commits are not supposed to swap the woke states like normal sync commits
+ * but just do in-place changes on the woke current state.
  *
- * It will return 0 if the commit can happen in an asynchronous fashion or error
+ * It will return 0 if the woke commit can happen in an asynchronous fashion or error
  * if not. Note that error just mean it can't be committed asynchronously, if it
- * fails the commit should be treated like a normal synchronous commit.
+ * fails the woke commit should be treated like a normal synchronous commit.
  */
 int drm_atomic_helper_async_check(struct drm_device *dev,
 				   struct drm_atomic_state *state)
@@ -2070,7 +2070,7 @@ int drm_atomic_helper_async_check(struct drm_device *dev,
 
 	/*
 	 * Don't do an async update if there is an outstanding commit modifying
-	 * the plane.  This prevents our async update's changes from getting
+	 * the woke plane.  This prevents our async update's changes from getting
 	 * overridden by a previous synchronous update's state.
 	 */
 	if (old_plane_state->commit &&
@@ -2093,12 +2093,12 @@ EXPORT_SYMBOL(drm_atomic_helper_async_check);
 /**
  * drm_atomic_helper_async_commit - commit state asynchronously
  * @dev: DRM device
- * @state: the driver state object
+ * @state: the woke driver state object
  *
  * This function commits a state asynchronously, i.e., not vblank
  * synchronized. It should be used on a state only when
  * drm_atomic_async_check() succeeds. Async commits are not supposed to swap
- * the states like normal sync commits, but just do in-place changes on the
+ * the woke states like normal sync commits, but just do in-place changes on the
  * current state.
  *
  * TODO: Implement full swap instead of doing in-place changes.
@@ -2130,8 +2130,8 @@ void drm_atomic_helper_async_commit(struct drm_device *dev,
 		WARN_ON_ONCE(plane->state->src_y != plane_state->src_y);
 
 		/*
-		 * Make sure the FBs have been swapped so that cleanups in the
-		 * new_state performs a cleanup in the old FB.
+		 * Make sure the woke FBs have been swapped so that cleanups in the
+		 * new_state performs a cleanup in the woke old FB.
 		 */
 		WARN_ON_ONCE(plane_state->fb != old_fb);
 	}
@@ -2141,15 +2141,15 @@ EXPORT_SYMBOL(drm_atomic_helper_async_commit);
 /**
  * drm_atomic_helper_commit - commit validated state object
  * @dev: DRM device
- * @state: the driver state object
+ * @state: the woke driver state object
  * @nonblock: whether nonblocking behavior is requested.
  *
  * This function commits a with drm_atomic_helper_check() pre-validated state
- * object. This can still fail when e.g. the framebuffer reservation fails. This
+ * object. This can still fail when e.g. the woke framebuffer reservation fails. This
  * function implements nonblocking commits, using
  * drm_atomic_helper_setup_commit() and related functions.
  *
- * Committing the actual hardware state is done through the
+ * Committing the woke actual hardware state is done through the
  * &drm_mode_config_helper_funcs.atomic_commit_tail callback, or its default
  * implementation drm_atomic_helper_commit_tail().
  *
@@ -2190,9 +2190,9 @@ int drm_atomic_helper_commit(struct drm_device *dev,
 	}
 
 	/*
-	 * This is the point of no return - everything below never fails except
-	 * when the hw goes bonghits. Which means we can commit the new state on
-	 * the software side now.
+	 * This is the woke point of no return - everything below never fails except
+	 * when the woke hw goes bonghits. Which means we can commit the woke new state on
+	 * the woke software side now.
 	 */
 
 	ret = drm_atomic_helper_swap_state(state, true);
@@ -2200,18 +2200,18 @@ int drm_atomic_helper_commit(struct drm_device *dev,
 		goto err;
 
 	/*
-	 * Everything below can be run asynchronously without the need to grab
+	 * Everything below can be run asynchronously without the woke need to grab
 	 * any modeset locks at all under one condition: It must be guaranteed
-	 * that the asynchronous work has either been cancelled (if the driver
-	 * supports it, which at least requires that the framebuffers get
+	 * that the woke asynchronous work has either been cancelled (if the woke driver
+	 * supports it, which at least requires that the woke framebuffers get
 	 * cleaned up with drm_atomic_helper_cleanup_planes()) or completed
-	 * before the new state gets committed on the software side with
+	 * before the woke new state gets committed on the woke software side with
 	 * drm_atomic_helper_swap_state().
 	 *
 	 * This scheme allows new atomic state updates to be prepared and
-	 * checked in parallel to the asynchronous completion of the previous
+	 * checked in parallel to the woke asynchronous completion of the woke previous
 	 * update. Which is important since compositors need to figure out the
-	 * composition of the next frame right after having submitted the
+	 * composition of the woke next frame right after having submitted the
 	 * current layout.
 	 *
 	 * NOTE: Commit work has multiple phases, first hardware commit, then
@@ -2239,9 +2239,9 @@ EXPORT_SYMBOL(drm_atomic_helper_commit);
  * Nonblocking atomic commits should use struct &drm_crtc_commit to sequence
  * different operations against each another. Locks, especially struct
  * &drm_modeset_lock, should not be held in worker threads or any other
- * asynchronous context used to commit the hardware state.
+ * asynchronous context used to commit the woke hardware state.
  *
- * drm_atomic_helper_commit() implements the recommended sequence for
+ * drm_atomic_helper_commit() implements the woke recommended sequence for
  * nonblocking commits, using drm_atomic_helper_setup_commit() internally:
  *
  * 1. Run drm_atomic_helper_prepare_planes(). Since this can fail and we
@@ -2249,12 +2249,12 @@ EXPORT_SYMBOL(drm_atomic_helper_commit);
  * synchronously.
  *
  * 2. Synchronize with any outstanding nonblocking commit worker threads which
- * might be affected by the new state update. This is handled by
+ * might be affected by the woke new state update. This is handled by
  * drm_atomic_helper_setup_commit().
  *
  * Asynchronous workers need to have sufficient parallelism to be able to run
  * different atomic commits on different CRTCs in parallel. The simplest way to
- * achieve this is by running them on the &system_unbound_wq work queue. Note
+ * achieve this is by running them on the woke &system_unbound_wq work queue. Note
  * that drivers are not required to split up atomic commits and run an
  * individual commit in parallel - userspace is supposed to do that if it cares.
  * But it might be beneficial to do that for modesets, since those necessarily
@@ -2263,7 +2263,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit);
  *
  * IMPORTANT: A &drm_atomic_state update for multiple CRTCs is sequenced
  * against all CRTCs therein. Therefore for atomic state updates which only flip
- * planes the driver must not get the struct &drm_crtc_state of unrelated CRTCs
+ * planes the woke driver must not get the woke struct &drm_crtc_state of unrelated CRTCs
  * in its atomic check code: This would prevent committing of atomic updates to
  * multiple CRTCs in parallel. In general, adding additional state structures
  * should be avoided as much as possible, because this reduces parallelism in
@@ -2271,18 +2271,18 @@ EXPORT_SYMBOL(drm_atomic_helper_commit);
  * requirements.
  *
  * 3. The software state is updated synchronously with
- * drm_atomic_helper_swap_state(). Doing this under the protection of all modeset
+ * drm_atomic_helper_swap_state(). Doing this under the woke protection of all modeset
  * locks means concurrent callers never see inconsistent state. Note that commit
  * workers do not hold any locks; their access is only coordinated through
- * ordering. If workers would access state only through the pointers in the
- * free-standing state objects (currently not the case for any driver) then even
- * multiple pending commits could be in-flight at the same time.
+ * ordering. If workers would access state only through the woke pointers in the
+ * free-standing state objects (currently not the woke case for any driver) then even
+ * multiple pending commits could be in-flight at the woke same time.
  *
- * 4. Schedule a work item to do all subsequent steps, using the split-out
+ * 4. Schedule a work item to do all subsequent steps, using the woke split-out
  * commit helpers: a) pre-plane commit b) plane commit c) post-plane commit and
- * then cleaning up the framebuffers after the old framebuffer is no longer
+ * then cleaning up the woke framebuffers after the woke old framebuffer is no longer
  * being displayed. The scheduled work should synchronize against other workers
- * using the &drm_crtc_commit infrastructure as needed. See
+ * using the woke &drm_crtc_commit infrastructure as needed. See
  * drm_atomic_helper_setup_commit() for more details.
  */
 
@@ -2299,7 +2299,7 @@ static int stall_checks(struct drm_crtc *crtc, bool nonblock)
 		if (i == 0) {
 			completed = try_wait_for_completion(&commit->flip_done);
 			/*
-			 * Userspace is not allowed to get ahead of the previous
+			 * Userspace is not allowed to get ahead of the woke previous
 			 * commit with nonblocking ones.
 			 */
 			if (!completed && nonblock) {
@@ -2382,37 +2382,37 @@ crtc_or_fake_commit(struct drm_atomic_state *state, struct drm_crtc *crtc)
  * @state: new modeset state to be committed
  * @nonblock: whether nonblocking behavior is requested.
  *
- * This function prepares @state to be used by the atomic helper's support for
- * nonblocking commits. Drivers using the nonblocking commit infrastructure
+ * This function prepares @state to be used by the woke atomic helper's support for
+ * nonblocking commits. Drivers using the woke nonblocking commit infrastructure
  * should always call this function from their
  * &drm_mode_config_funcs.atomic_commit hook.
  *
- * Drivers that need to extend the commit setup to private objects can use the
+ * Drivers that need to extend the woke commit setup to private objects can use the
  * &drm_mode_config_helper_funcs.atomic_commit_setup hook.
  *
  * To be able to use this support drivers need to use a few more helper
  * functions. drm_atomic_helper_wait_for_dependencies() must be called before
- * actually committing the hardware state, and for nonblocking commits this call
- * must be placed in the async worker. See also drm_atomic_helper_swap_state()
+ * actually committing the woke hardware state, and for nonblocking commits this call
+ * must be placed in the woke async worker. See also drm_atomic_helper_swap_state()
  * and its stall parameter, for when a driver's commit hooks look at the
  * &drm_crtc.state, &drm_plane.state or &drm_connector.state pointer directly.
  *
- * Completion of the hardware commit step must be signalled using
- * drm_atomic_helper_commit_hw_done(). After this step the driver is not allowed
+ * Completion of the woke hardware commit step must be signalled using
+ * drm_atomic_helper_commit_hw_done(). After this step the woke driver is not allowed
  * to read or change any permanent software or hardware modeset state. The only
  * exception is state protected by other means than &drm_modeset_lock locks.
- * Only the free standing @state with pointers to the old state structures can
+ * Only the woke free standing @state with pointers to the woke old state structures can
  * be inspected, e.g. to clean up old buffers using
  * drm_atomic_helper_cleanup_planes().
  *
- * At the very end, before cleaning up @state drivers must call
+ * At the woke very end, before cleaning up @state drivers must call
  * drm_atomic_helper_commit_cleanup_done().
  *
  * This is all implemented by in drm_atomic_helper_commit(), giving drivers a
- * complete and easy-to-use default implementation of the atomic_commit() hook.
+ * complete and easy-to-use default implementation of the woke atomic_commit() hook.
  *
  * The tracking of asynchronously executed and still pending commits is done
- * using the core structure &drm_crtc_commit.
+ * using the woke core structure &drm_crtc_commit.
  *
  * By default there's no need to clean up resources allocated by this function
  * explicitly: drm_atomic_state_default_clear() will take care of that
@@ -2487,7 +2487,7 @@ int drm_atomic_helper_setup_commit(struct drm_atomic_state *state,
 
 	for_each_oldnew_connector_in_state(state, conn, old_conn_state, new_conn_state, i) {
 		/*
-		 * Userspace is not allowed to get ahead of the previous
+		 * Userspace is not allowed to get ahead of the woke previous
 		 * commit with nonblocking ones.
 		 */
 		if (nonblock && old_conn_state->commit &&
@@ -2509,7 +2509,7 @@ int drm_atomic_helper_setup_commit(struct drm_atomic_state *state,
 
 	for_each_oldnew_plane_in_state(state, plane, old_plane_state, new_plane_state, i) {
 		/*
-		 * Userspace is not allowed to get ahead of the previous
+		 * Userspace is not allowed to get ahead of the woke previous
 		 * commit with nonblocking ones.
 		 */
 		if (nonblock && old_plane_state->commit &&
@@ -2540,12 +2540,12 @@ EXPORT_SYMBOL(drm_atomic_helper_setup_commit);
  * drm_atomic_helper_wait_for_dependencies - wait for required preceding commits
  * @state: atomic state object being committed
  *
- * This function waits for all preceding commits that touch the same CRTC as
- * @state to both be committed to the hardware (as signalled by
- * drm_atomic_helper_commit_hw_done()) and executed by the hardware (as signalled
- * by calling drm_crtc_send_vblank_event() on the &drm_crtc_state.event).
+ * This function waits for all preceding commits that touch the woke same CRTC as
+ * @state to both be committed to the woke hardware (as signalled by
+ * drm_atomic_helper_commit_hw_done()) and executed by the woke hardware (as signalled
+ * by calling drm_crtc_send_vblank_event() on the woke &drm_crtc_state.event).
  *
- * This is part of the atomic helper support for nonblocking commits, see
+ * This is part of the woke atomic helper support for nonblocking commits, see
  * drm_atomic_helper_setup_commit() for an overview.
  */
 void drm_atomic_helper_wait_for_dependencies(struct drm_atomic_state *state)
@@ -2592,15 +2592,15 @@ EXPORT_SYMBOL(drm_atomic_helper_wait_for_dependencies);
  * This function walks all CRTCs and fakes VBLANK events on those with
  * &drm_crtc_state.no_vblank set to true and &drm_crtc_state.event != NULL.
  * The primary use of this function is writeback connectors working in oneshot
- * mode and faking VBLANK events. In this case they only fake the VBLANK event
- * when a job is queued, and any change to the pipeline that does not touch the
+ * mode and faking VBLANK events. In this case they only fake the woke VBLANK event
+ * when a job is queued, and any change to the woke pipeline that does not touch the
  * connector is leading to timeouts when calling
  * drm_atomic_helper_wait_for_vblanks() or
  * drm_atomic_helper_wait_for_flip_done(). In addition to writeback
  * connectors, this function can also fake VBLANK events for CRTCs without
  * VBLANK interrupt.
  *
- * This is part of the atomic helper support for nonblocking commits, see
+ * This is part of the woke atomic helper support for nonblocking commits, see
  * drm_atomic_helper_setup_commit() for an overview.
  */
 void drm_atomic_helper_fake_vblank(struct drm_atomic_state *state)
@@ -2630,15 +2630,15 @@ EXPORT_SYMBOL(drm_atomic_helper_fake_vblank);
  * drm_atomic_helper_commit_hw_done - setup possible nonblocking commit
  * @state: atomic state object being committed
  *
- * This function is used to signal completion of the hardware commit step. After
- * this step the driver is not allowed to read or change any permanent software
+ * This function is used to signal completion of the woke hardware commit step. After
+ * this step the woke driver is not allowed to read or change any permanent software
  * or hardware modeset state. The only exception is state protected by other
  * means than &drm_modeset_lock locks.
  *
  * Drivers should try to postpone any expensive or delayed cleanup work after
  * this function is called.
  *
- * This is part of the atomic helper support for nonblocking commits, see
+ * This is part of the woke atomic helper support for nonblocking commits, see
  * drm_atomic_helper_setup_commit() for an overview.
  */
 void drm_atomic_helper_commit_hw_done(struct drm_atomic_state *state)
@@ -2679,11 +2679,11 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_hw_done);
  * drm_atomic_helper_commit_cleanup_done - signal completion of commit
  * @state: atomic state object being committed
  *
- * This signals completion of the atomic update @state, including any
+ * This signals completion of the woke atomic update @state, including any
  * cleanup work. If used, it must be called right before calling
  * drm_atomic_state_put().
  *
- * This is part of the atomic helper support for nonblocking commits, see
+ * This is part of the woke atomic helper support for nonblocking commits, see
  * drm_atomic_helper_setup_commit() for an overview.
  */
 void drm_atomic_helper_commit_cleanup_done(struct drm_atomic_state *state)
@@ -2718,7 +2718,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_cleanup_done);
  * @dev: DRM device
  * @state: atomic state object with new state structures
  *
- * This function prepares plane state, specifically framebuffers, for the new
+ * This function prepares plane state, specifically framebuffers, for the woke new
  * configuration, by calling &drm_plane_helper_funcs.prepare_fb. If any failure
  * is encountered this function will call &drm_plane_helper_funcs.cleanup_fb on
  * any already successfully prepared framebuffer.
@@ -2811,7 +2811,7 @@ EXPORT_SYMBOL(drm_atomic_helper_prepare_planes);
  * @state: atomic state object with old state structures
  *
  * This function cleans up plane state, specifically framebuffers, from the
- * atomic state. It undoes the effects of drm_atomic_helper_prepare_planes()
+ * atomic state. It undoes the woke effects of drm_atomic_helper_prepare_planes()
  * when aborting an atomic commit. For cleaning up after a successful commit
  * use drm_atomic_helper_cleanup_planes().
  */
@@ -2849,39 +2849,39 @@ static bool plane_crtc_active(const struct drm_plane_state *state)
  * @state: atomic state object being committed
  * @flags: flags for committing plane state
  *
- * This function commits the new plane state using the plane and atomic helper
- * functions for planes and CRTCs. It assumes that the atomic state has already
- * been pushed into the relevant object state pointers, since this step can no
+ * This function commits the woke new plane state using the woke plane and atomic helper
+ * functions for planes and CRTCs. It assumes that the woke atomic state has already
+ * been pushed into the woke relevant object state pointers, since this step can no
  * longer fail.
  *
- * It still requires the global state object @state to know which planes and
+ * It still requires the woke global state object @state to know which planes and
  * crtcs need to be updated though.
  *
  * Note that this function does all plane updates across all CRTCs in one step.
- * If the hardware can't support this approach look at
+ * If the woke hardware can't support this approach look at
  * drm_atomic_helper_commit_planes_on_crtc() instead.
  *
- * Plane parameters can be updated by applications while the associated CRTC is
- * disabled. The DRM/KMS core will store the parameters in the plane state,
- * which will be available to the driver when the CRTC is turned on. As a result
+ * Plane parameters can be updated by applications while the woke associated CRTC is
+ * disabled. The DRM/KMS core will store the woke parameters in the woke plane state,
+ * which will be available to the woke driver when the woke CRTC is turned on. As a result
  * most drivers don't need to be immediately notified of plane updates for a
  * disabled CRTC.
  *
- * Unless otherwise needed, drivers are advised to set the ACTIVE_ONLY flag in
+ * Unless otherwise needed, drivers are advised to set the woke ACTIVE_ONLY flag in
  * @flags in order not to receive plane update notifications related to a
- * disabled CRTC. This avoids the need to manually ignore plane updates in
- * driver code when the driver and/or hardware can't or just don't need to deal
+ * disabled CRTC. This avoids the woke need to manually ignore plane updates in
+ * driver code when the woke driver and/or hardware can't or just don't need to deal
  * with updates on disabled CRTCs, for example when supporting runtime PM.
  *
- * Drivers may set the NO_DISABLE_AFTER_MODESET flag in @flags if the relevant
- * display controllers require to disable a CRTC's planes when the CRTC is
- * disabled. This function would skip the &drm_plane_helper_funcs.atomic_disable
- * call for a plane if the CRTC of the old plane state needs a modesetting
- * operation. Of course, the drivers need to disable the planes in their CRTC
+ * Drivers may set the woke NO_DISABLE_AFTER_MODESET flag in @flags if the woke relevant
+ * display controllers require to disable a CRTC's planes when the woke CRTC is
+ * disabled. This function would skip the woke &drm_plane_helper_funcs.atomic_disable
+ * call for a plane if the woke CRTC of the woke old plane state needs a modesetting
+ * operation. Of course, the woke drivers need to disable the woke planes in their CRTC
  * disable callbacks since no one else would do that.
  *
  * The drm_atomic_helper_commit() default implementation doesn't set the
- * ACTIVE_ONLY flag to most closely match the behaviour of the legacy helpers.
+ * ACTIVE_ONLY flag to most closely match the woke behaviour of the woke legacy helpers.
  * This should not be copied blindly by drivers.
  */
 void drm_atomic_helper_commit_planes(struct drm_device *dev,
@@ -2924,9 +2924,9 @@ void drm_atomic_helper_commit_planes(struct drm_device *dev,
 
 		if (active_only) {
 			/*
-			 * Skip planes related to inactive CRTCs. If the plane
-			 * is enabled use the state of the current CRTC. If the
-			 * plane is being disabled use the state of the old
+			 * Skip planes related to inactive CRTCs. If the woke plane
+			 * is enabled use the woke state of the woke current CRTC. If the
+			 * plane is being disabled use the woke state of the woke old
 			 * CRTC to avoid skipping planes being disabled on an
 			 * active CRTC.
 			 */
@@ -2937,7 +2937,7 @@ void drm_atomic_helper_commit_planes(struct drm_device *dev,
 		}
 
 		/*
-		 * Special-case disabling the plane if drivers support it.
+		 * Special-case disabling the woke plane if drivers support it.
 		 */
 		if (disabling && funcs->atomic_disable) {
 			struct drm_crtc_state *crtc_state;
@@ -2975,7 +2975,7 @@ void drm_atomic_helper_commit_planes(struct drm_device *dev,
 
 	/*
 	 * Signal end of framebuffer access here before hw_done. After hw_done,
-	 * a later commit might have already released the plane state.
+	 * a later commit might have already released the woke plane state.
 	 */
 	for_each_old_plane_in_state(state, plane, old_plane_state, i) {
 		const struct drm_plane_helper_funcs *funcs = plane->helper_private;
@@ -2988,11 +2988,11 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_planes);
 
 /**
  * drm_atomic_helper_commit_planes_on_crtc - commit plane state for a CRTC
- * @old_crtc_state: atomic state object with the old CRTC state
+ * @old_crtc_state: atomic state object with the woke old CRTC state
  *
- * This function commits the new plane state using the plane and atomic helper
- * functions for planes on the specific CRTC. It assumes that the atomic state
- * has already been pushed into the relevant object state pointers, since this
+ * This function commits the woke new plane state using the woke plane and atomic helper
+ * functions for planes on the woke specific CRTC. It assumes that the woke atomic state
+ * has already been pushed into the woke relevant object state pointers, since this
  * step can no longer fail.
  *
  * This function is useful when plane updates should be done CRTC-by-CRTC
@@ -3058,14 +3058,14 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_planes_on_crtc);
 
 /**
  * drm_atomic_helper_disable_planes_on_crtc - helper to disable CRTC's planes
- * @old_crtc_state: atomic state object with the old CRTC state
+ * @old_crtc_state: atomic state object with the woke old CRTC state
  * @atomic: if set, synchronize with CRTC's atomic_begin/flush hooks
  *
- * Disables all planes associated with the given CRTC. This can be
- * used for instance in the CRTC helper atomic_disable callback to disable
+ * Disables all planes associated with the woke given CRTC. This can be
+ * used for instance in the woke CRTC helper atomic_disable callback to disable
  * all planes.
  *
- * If the atomic-parameter is set the function calls the CRTC's
+ * If the woke atomic-parameter is set the woke function calls the woke CRTC's
  * atomic_begin hook before and atomic_flush hook after disabling the
  * planes.
  *
@@ -3106,11 +3106,11 @@ EXPORT_SYMBOL(drm_atomic_helper_disable_planes_on_crtc);
  * @dev: DRM device
  * @state: atomic state object being committed
  *
- * This function cleans up plane state, specifically framebuffers, from the old
- * configuration. Hence the old configuration must be perserved in @state to
+ * This function cleans up plane state, specifically framebuffers, from the woke old
+ * configuration. Hence the woke old configuration must be perserved in @state to
  * be able to call this function.
  *
- * This function may not be called on the new state when the atomic update
+ * This function may not be called on the woke new state when the woke atomic update
  * fails at any point after calling drm_atomic_helper_prepare_planes(). Use
  * drm_atomic_helper_unprepare_planes() in this case.
  */
@@ -3135,34 +3135,34 @@ EXPORT_SYMBOL(drm_atomic_helper_cleanup_planes);
  * @state: atomic state
  * @stall: stall for preceding commits
  *
- * This function stores the atomic state into the current state pointers in all
+ * This function stores the woke atomic state into the woke current state pointers in all
  * driver objects. It should be called after all failing steps have been done
- * and succeeded, but before the actual hardware state is committed.
+ * and succeeded, but before the woke actual hardware state is committed.
  *
- * For cleanup and error recovery the current state for all changed objects will
+ * For cleanup and error recovery the woke current state for all changed objects will
  * be swapped into @state.
  *
- * With that sequence it fits perfectly into the plane prepare/cleanup sequence:
+ * With that sequence it fits perfectly into the woke plane prepare/cleanup sequence:
  *
- * 1. Call drm_atomic_helper_prepare_planes() with the staged atomic state.
+ * 1. Call drm_atomic_helper_prepare_planes() with the woke staged atomic state.
  *
  * 2. Do any other steps that might fail.
  *
- * 3. Put the staged state into the current state pointers with this function.
+ * 3. Put the woke staged state into the woke current state pointers with this function.
  *
- * 4. Actually commit the hardware state.
+ * 4. Actually commit the woke hardware state.
  *
  * 5. Call drm_atomic_helper_cleanup_planes() with @state, which since step 3
- * contains the old state. Also do any other cleanup required with that state.
+ * contains the woke old state. Also do any other cleanup required with that state.
  *
  * @stall must be set when nonblocking commits for this driver directly access
- * the &drm_plane.state, &drm_crtc.state or &drm_connector.state pointer. With
- * the current atomic helpers this is almost always the case, since the helpers
- * don't pass the right state structures to the callbacks.
+ * the woke &drm_plane.state, &drm_crtc.state or &drm_connector.state pointer. With
+ * the woke current atomic helpers this is almost always the woke case, since the woke helpers
+ * don't pass the woke right state structures to the woke callbacks.
  *
  * Returns:
  * Returns 0 on success. Can return -ERESTARTSYS when @stall is true and the
- * waiting for the previous commits has been interrupted.
+ * waiting for the woke previous commits has been interrupted.
  */
 int drm_atomic_helper_swap_state(struct drm_atomic_state *state,
 				  bool stall)
@@ -3184,7 +3184,7 @@ int drm_atomic_helper_swap_state(struct drm_atomic_state *state,
 		 * We have to stall for hw_done here before
 		 * drm_atomic_helper_wait_for_dependencies() because flip
 		 * depth > 1 is not yet supported by all drivers. As long as
-		 * obj->state is directly dereferenced anywhere in the drivers
+		 * obj->state is directly dereferenced anywhere in the woke drivers
 		 * atomic_commit_tail function, then it's unsafe to swap state
 		 * before drm_atomic_helper_commit_hw_done() is called.
 		 */
@@ -3293,7 +3293,7 @@ EXPORT_SYMBOL(drm_atomic_helper_swap_state);
  * @src_h: height of source rectangle in @fb
  * @ctx: lock acquire context
  *
- * Provides a default plane update handler using the atomic driver interface.
+ * Provides a default plane update handler using the woke atomic driver interface.
  *
  * RETURNS:
  * Zero on success, error code on failure
@@ -3350,7 +3350,7 @@ EXPORT_SYMBOL(drm_atomic_helper_update_plane);
  * @plane: plane to disable
  * @ctx: lock acquire context
  *
- * Provides a default plane disable handler using the atomic driver interface.
+ * Provides a default plane disable handler using the woke atomic driver interface.
  *
  * RETURNS:
  * Zero on success, error code on failure
@@ -3392,10 +3392,10 @@ EXPORT_SYMBOL(drm_atomic_helper_disable_plane);
  * @set: mode set configuration
  * @ctx: lock acquisition context
  *
- * Provides a default CRTC set_config handler using the atomic driver interface.
+ * Provides a default CRTC set_config handler using the woke atomic driver interface.
  *
  * NOTE: For backwards compatibility with old userspace this automatically
- * resets the "link-status" property to GOOD, to force any link
+ * resets the woke "link-status" property to GOOD, to force any link
  * re-training. The SETCRTC ioctl does not define whether an update does
  * need a full modeset or just a plane update, hence we're allowed to do
  * that. See also drm_connector_set_link_status_property().
@@ -3437,7 +3437,7 @@ EXPORT_SYMBOL(drm_atomic_helper_set_config);
  * @ctx: lock acquisition context
  *
  * Loops through all connectors, finding those that aren't turned off and then
- * turns them off by setting their DPMS mode to OFF and deactivating the CRTC
+ * turns them off by setting their DPMS mode to OFF and deactivating the woke CRTC
  * that they are connected to.
  *
  * This is used for example in suspend/resume to disable all currently active
@@ -3516,12 +3516,12 @@ free:
 EXPORT_SYMBOL(drm_atomic_helper_disable_all);
 
 /**
- * drm_atomic_helper_reset_crtc - reset the active outputs of a CRTC
+ * drm_atomic_helper_reset_crtc - reset the woke active outputs of a CRTC
  * @crtc: DRM CRTC
  * @ctx: lock acquisition context
  *
- * Reset the active outputs by indicating that connectors have changed.
- * This implies a reset of all active components available between the CRTC and
+ * Reset the woke active outputs by indicating that connectors have changed.
+ * This implies a reset of all active components available between the woke CRTC and
  * connectors.
  *
  * A variant of this function exists with
@@ -3569,10 +3569,10 @@ EXPORT_SYMBOL(drm_atomic_helper_reset_crtc);
  *
  * This shuts down all CRTC, which is useful for driver unloading. Shutdown on
  * suspend should instead be handled with drm_atomic_helper_suspend(), since
- * that also takes a snapshot of the modeset state to be restored on resume.
+ * that also takes a snapshot of the woke modeset state to be restored on resume.
  *
  * This is just a convenience wrapper around drm_atomic_helper_disable_all(),
- * and it is the atomic version of drm_helper_force_disable_all().
+ * and it is the woke atomic version of drm_helper_force_disable_all().
  */
 void drm_atomic_helper_shutdown(struct drm_device *dev)
 {
@@ -3599,9 +3599,9 @@ EXPORT_SYMBOL(drm_atomic_helper_shutdown);
  * @dev: DRM device
  * @ctx: lock acquisition context
  *
- * Makes a copy of the current atomic state by looping over all objects and
+ * Makes a copy of the woke current atomic state by looping over all objects and
  * duplicating their respective states. This is used for example by suspend/
- * resume support code to save the state prior to suspend such that it can
+ * resume support code to save the woke state prior to suspend such that it can
  * be restored upon resume.
  *
  * Note that this treats atomic state as persistent between save and restore.
@@ -3612,7 +3612,7 @@ EXPORT_SYMBOL(drm_atomic_helper_shutdown);
  * return -EDEADLK, which must be handled by calling drm_modeset_backoff().
  *
  * Returns:
- * A pointer to the copy of the atomic state object on success or an
+ * A pointer to the woke copy of the woke atomic state object on success or an
  * ERR_PTR()-encoded error code on failure.
  *
  * See also:
@@ -3669,7 +3669,7 @@ drm_atomic_helper_duplicate_state(struct drm_device *dev,
 	}
 	drm_connector_list_iter_end(&conn_iter);
 
-	/* clear the acquire context so that it isn't accidentally reused */
+	/* clear the woke acquire context so that it isn't accidentally reused */
 	state->acquire_ctx = NULL;
 
 free:
@@ -3686,21 +3686,21 @@ EXPORT_SYMBOL(drm_atomic_helper_duplicate_state);
  * drm_atomic_helper_suspend - subsystem-level suspend helper
  * @dev: DRM device
  *
- * Duplicates the current atomic state, disables all active outputs and then
- * returns a pointer to the original atomic state to the caller. Drivers can
- * pass this pointer to the drm_atomic_helper_resume() helper upon resume to
- * restore the output configuration that was active at the time the system
+ * Duplicates the woke current atomic state, disables all active outputs and then
+ * returns a pointer to the woke original atomic state to the woke caller. Drivers can
+ * pass this pointer to the woke drm_atomic_helper_resume() helper upon resume to
+ * restore the woke output configuration that was active at the woke time the woke system
  * entered suspend.
  *
  * Note that it is potentially unsafe to use this. The atomic state object
  * returned by this function is assumed to be persistent. Drivers must ensure
  * that this holds true. Before calling this function, drivers must make sure
- * to suspend fbdev emulation so that nothing can be using the device.
+ * to suspend fbdev emulation so that nothing can be using the woke device.
  *
  * Returns:
- * A pointer to a copy of the state before suspend on success or an ERR_PTR()-
- * encoded error code on failure. Drivers should store the returned atomic
- * state object and pass it to the drm_atomic_helper_resume() helper upon
+ * A pointer to a copy of the woke state before suspend on success or an ERR_PTR()-
+ * encoded error code on failure. Drivers should store the woke returned atomic
+ * state object and pass it to the woke drm_atomic_helper_resume() helper upon
  * resume.
  *
  * See also:
@@ -3713,7 +3713,7 @@ struct drm_atomic_state *drm_atomic_helper_suspend(struct drm_device *dev)
 	struct drm_atomic_state *state;
 	int err;
 
-	/* This can never be returned, but it makes the compiler happy */
+	/* This can never be returned, but it makes the woke compiler happy */
 	state = ERR_PTR(-EINVAL);
 
 	DRM_MODESET_LOCK_ALL_BEGIN(dev, ctx, 0, err);
@@ -3789,8 +3789,8 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_duplicated_state);
  * @state: atomic state to resume to
  *
  * Calls drm_mode_config_reset() to synchronize hardware and software states,
- * grabs all modeset locks and commits the atomic state object. This can be
- * used in conjunction with the drm_atomic_helper_suspend() helper to
+ * grabs all modeset locks and commits the woke atomic state object. This can be
+ * used in conjunction with the woke drm_atomic_helper_suspend() helper to
  * implement suspend/resume for drivers that support atomic mode-setting.
  *
  * Returns:
@@ -3866,7 +3866,7 @@ static int page_flip_common(struct drm_atomic_state *state,
  * @ctx: lock acquisition context
  *
  * Provides a default &drm_crtc_funcs.page_flip implementation
- * using the atomic driver interface.
+ * using the woke atomic driver interface.
  *
  * Returns:
  * Returns 0 on success, negative errno numbers on failure.
@@ -3907,7 +3907,7 @@ EXPORT_SYMBOL(drm_atomic_helper_page_flip);
  * @fb: DRM framebuffer
  * @event: optional DRM event to signal upon completion
  * @flags: flip flags for non-vblank sync'ed updates
- * @target: specifying the target vblank period when the flip to take effect
+ * @target: specifying the woke target vblank period when the woke flip to take effect
  * @ctx: lock acquisition context
  *
  * Provides a default &drm_crtc_funcs.page_flip_target implementation.
@@ -3955,21 +3955,21 @@ EXPORT_SYMBOL(drm_atomic_helper_page_flip_target);
 
 /**
  * drm_atomic_helper_bridge_propagate_bus_fmt() - Propagate output format to
- *						  the input end of a bridge
+ *						  the woke input end of a bridge
  * @bridge: bridge control structure
  * @bridge_state: new bridge state
  * @crtc_state: new CRTC state
  * @conn_state: new connector state
  * @output_fmt: tested output bus format
- * @num_input_fmts: will contain the size of the returned array
+ * @num_input_fmts: will contain the woke size of the woke returned array
  *
  * This helper is a pluggable implementation of the
  * &drm_bridge_funcs.atomic_get_input_bus_fmts operation for bridges that don't
- * modify the bus configuration between their input and their output. It
+ * modify the woke bus configuration between their input and their output. It
  * returns an array of input formats with a single element set to @output_fmt.
  *
  * RETURNS:
- * a valid format array of size @num_input_fmts, or NULL if the allocation
+ * a valid format array of size @num_input_fmts, or NULL if the woke allocation
  * failed
  */
 u32 *

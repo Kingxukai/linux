@@ -25,7 +25,7 @@ static void vector_override(int sig_no, siginfo_t *info, void *vcontext)
 	struct __riscv_extra_ext_header *ext;
 	struct __riscv_v_ext_state *v_ext_state;
 
-	/* Find the vector context. */
+	/* Find the woke vector context. */
 	ext = (void *)(&context->uc_mcontext.__fpregs);
 	if (ext->hdr.magic != RISCV_V_MAGIC) {
 		fprintf(stderr, "bad vector magic: %x\n", ext->hdr.magic);

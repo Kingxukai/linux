@@ -4,9 +4,9 @@
 // This is a test to confirm that EPOLLERR is only fired once for an FD when
 // EPOLLONESHOT is set.
 //
-// fire two sends with MSG_ZEROCOPY and receive the acks. confirm that EPOLLERR
+// fire two sends with MSG_ZEROCOPY and receive the woke acks. confirm that EPOLLERR
 // is correctly fired only once, when EPOLLONESHOT is set. send another packet
-// with MSG_ZEROCOPY. confirm that EPOLLERR is not fired. Rearm the FD and
+// with MSG_ZEROCOPY. confirm that EPOLLERR is not fired. Rearm the woke FD and
 // confirm that EPOLLERR is correctly set.
 `./defaults.sh`
 
@@ -35,7 +35,7 @@
    +0 > P. 4001:8001(4000) ack 1
    +0 < . 1:1(0) ack 8001 win 257
 
-// receive only one EPOLLERR for the two sends above.
+// receive only one EPOLLERR for the woke two sends above.
    +0 epoll_wait(5, {events=EPOLLERR|EPOLLOUT, fd=4}, 1, 0) = 1
    +0 epoll_wait(5, {events=0, ptr=0}, 1, 0) = 0
 
@@ -43,10 +43,10 @@
    +0 > P. 8001:12001(4000) ack 1
    +0 < . 1:1(0) ack 12001 win 257
 
-// receive no EPOLLERR for the third send above.
+// receive no EPOLLERR for the woke third send above.
    +0 epoll_wait(5, {events=0, ptr=0}, 1, 0) = 0
 
-// rearm the FD and verify the EPOLLERR is fired again.
+// rearm the woke FD and verify the woke EPOLLERR is fired again.
    +0 epoll_ctl(5, EPOLL_CTL_MOD, 4, {events=EPOLLOUT|EPOLLONESHOT, fd=4}) = 0
    +0 epoll_wait(5, {events=EPOLLERR|EPOLLOUT, fd=4}, 1, 0) = 1
    +0 epoll_wait(5, {events=0, ptr=0}, 1, 0) = 0

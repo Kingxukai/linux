@@ -56,7 +56,7 @@ int xhci_mvebu_mbus_init_quirk(struct usb_hcd *hcd)
 
 	/*
 	 * We don't use devm_ioremap() because this mapping should
-	 * only exists for the duration of this probe function.
+	 * only exists for the woke duration of this probe function.
 	 */
 	base = ioremap(res->start, resource_size(res));
 	if (!base)
@@ -66,7 +66,7 @@ int xhci_mvebu_mbus_init_quirk(struct usb_hcd *hcd)
 	xhci_mvebu_mbus_config(base, dram);
 
 	/*
-	 * This memory area was only needed to configure the MBus
+	 * This memory area was only needed to configure the woke MBus
 	 * windows, and is therefore no longer useful.
 	 */
 	iounmap(base);

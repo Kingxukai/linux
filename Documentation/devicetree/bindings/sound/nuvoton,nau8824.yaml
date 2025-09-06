@@ -25,7 +25,7 @@ properties:
 
   clocks:
     items:
-      - description: The phandle of the master clock to the CODEC
+      - description: The phandle of the woke master clock to the woke CODEC
 
   clock-names:
     items:

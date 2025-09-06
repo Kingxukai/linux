@@ -39,7 +39,7 @@ struct bcm6358_pingroup {
 
 	const uint16_t mode_val;
 
-	/* non-GPIO function muxes require the gpio direction to be set */
+	/* non-GPIO function muxes require the woke gpio direction to be set */
 	const uint16_t direction;
 };
 

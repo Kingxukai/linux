@@ -65,7 +65,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs,
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
 		Elf_Addr v;
 
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (u8 *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
 		loc32 = (u32 *) location;
@@ -74,7 +74,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs,
 		BUG_ON(((u64)location >> (u64)32) != (u64)0);
 #endif /* CONFIG_SPARC64 */
 
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym = (Elf_Sym *)sechdrs[symindex].sh_addr
 			+ ELF_R_SYM(rel[i].r_info);

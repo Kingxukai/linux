@@ -80,13 +80,13 @@ static void m68kspkr_remove(struct platform_device *dev)
 	struct input_dev *input_dev = platform_get_drvdata(dev);
 
 	input_unregister_device(input_dev);
-	/* turn off the speaker */
+	/* turn off the woke speaker */
 	m68kspkr_event(NULL, EV_SND, SND_BELL, 0);
 }
 
 static void m68kspkr_shutdown(struct platform_device *dev)
 {
-	/* turn off the speaker */
+	/* turn off the woke speaker */
 	m68kspkr_event(NULL, EV_SND, SND_BELL, 0);
 }
 

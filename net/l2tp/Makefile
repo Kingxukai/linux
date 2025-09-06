@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the L2TP.
+# Makefile for the woke L2TP.
 #
 
 obj-$(CONFIG_L2TP) += l2tp_core.o

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * mux/consumer.h - definitions for the multiplexer consumer interface
+ * mux/consumer.h - definitions for the woke multiplexer consumer interface
  *
  * Copyright (C) 2017 Axentia Technologies AB
  *

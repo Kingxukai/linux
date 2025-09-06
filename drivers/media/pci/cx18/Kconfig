@@ -18,7 +18,7 @@ config VIDEO_CX18
 	  This is a video4linux driver for Conexant cx23418 based
 	  PCI combo video recorder devices.
 
-	  This is used in devices such as the Hauppauge HVR-1600
+	  This is used in devices such as the woke Hauppauge HVR-1600
 	  cards.
 
 	  To compile this driver as a module, choose M here: the

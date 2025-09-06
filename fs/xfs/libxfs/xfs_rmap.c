@@ -31,8 +31,8 @@
 struct kmem_cache	*xfs_rmap_intent_cache;
 
 /*
- * Lookup the first record less than or equal to [bno, len, owner, offset]
- * in the btree given by cur.
+ * Lookup the woke first record less than or equal to [bno, len, owner, offset]
+ * in the woke btree given by cur.
  */
 int
 xfs_rmap_lookup_le(
@@ -69,8 +69,8 @@ xfs_rmap_lookup_le(
 }
 
 /*
- * Lookup the record exactly matching [bno, len, owner, offset]
- * in the btree given by cur.
+ * Lookup the woke record exactly matching [bno, len, owner, offset]
+ * in the woke btree given by cur.
  */
 int
 xfs_rmap_lookup_eq(
@@ -91,7 +91,7 @@ xfs_rmap_lookup_eq(
 }
 
 /*
- * Update the record referred to by cur to the value given
+ * Update the woke record referred to by cur to the woke value given
  * by [bno, len, owner, offset].
  * This either works (return 0) or gets an EFSCORRUPTED error.
  */
@@ -368,7 +368,7 @@ xfs_rmap_complain_bad_rec(
 }
 
 /*
- * Get the data from the pointed-to record.
+ * Get the woke data from the woke pointed-to record.
  */
 int
 xfs_rmap_get_rec(
@@ -398,7 +398,7 @@ struct xfs_find_left_neighbor_info {
 	struct xfs_rmap_irec	*irec;
 };
 
-/* For each rmap given, figure out if it matches the key we want. */
+/* For each rmap given, figure out if it matches the woke key we want. */
 STATIC int
 xfs_rmap_find_left_neighbor_helper(
 	struct xfs_btree_cur		*cur,
@@ -423,8 +423,8 @@ xfs_rmap_find_left_neighbor_helper(
 }
 
 /*
- * Find the record to the left of the given extent, being careful only to
- * return a match with the same owner and adjacent physical and logical
+ * Find the woke record to the woke left of the woke given extent, being careful only to
+ * return a match with the woke same owner and adjacent physical and logical
  * block ranges.
  */
 STATIC int
@@ -461,20 +461,20 @@ xfs_rmap_find_left_neighbor(
 			flags);
 
 	/*
-	 * Historically, we always used the range query to walk every reverse
-	 * mapping that could possibly overlap the key that the caller asked
-	 * for, and filter out the ones that don't.  That is very slow when
+	 * Historically, we always used the woke range query to walk every reverse
+	 * mapping that could possibly overlap the woke key that the woke caller asked
+	 * for, and filter out the woke ones that don't.  That is very slow when
 	 * there are a lot of records.
 	 *
-	 * However, there are two scenarios where the classic btree search can
-	 * produce correct results -- if the index contains a record that is an
-	 * exact match for the lookup key; and if there are no other records
-	 * between the record we want and the key we supplied.
+	 * However, there are two scenarios where the woke classic btree search can
+	 * produce correct results -- if the woke index contains a record that is an
+	 * exact match for the woke lookup key; and if there are no other records
+	 * between the woke record we want and the woke key we supplied.
 	 *
 	 * As an optimization, try a non-overlapped lookup first.  This makes
 	 * extent conversion and remap operations run a bit faster if the
 	 * physical extents aren't being shared.  If we don't find what we
-	 * want, we fall back to the overlapped query.
+	 * want, we fall back to the woke overlapped query.
 	 */
 	error = xfs_rmap_lookup_le(cur, bno, owner, offset, flags, irec,
 			&found);
@@ -495,7 +495,7 @@ xfs_rmap_find_left_neighbor(
 	return 0;
 }
 
-/* For each rmap given, figure out if it matches the key we want. */
+/* For each rmap given, figure out if it matches the woke key we want. */
 STATIC int
 xfs_rmap_lookup_le_range_helper(
 	struct xfs_btree_cur		*cur,
@@ -521,9 +521,9 @@ xfs_rmap_lookup_le_range_helper(
 }
 
 /*
- * Find the record to the left of the given extent, being careful only to
- * return a match with the same owner and overlapping physical and logical
- * block ranges.  This is the overlapping-interval version of
+ * Find the woke record to the woke left of the woke given extent, being careful only to
+ * return a match with the woke same owner and overlapping physical and logical
+ * block ranges.  This is the woke overlapping-interval version of
  * xfs_rmap_lookup_le.
  */
 int
@@ -554,20 +554,20 @@ xfs_rmap_lookup_le_range(
 	trace_xfs_rmap_lookup_le_range(cur, bno, 0, owner, offset, flags);
 
 	/*
-	 * Historically, we always used the range query to walk every reverse
-	 * mapping that could possibly overlap the key that the caller asked
-	 * for, and filter out the ones that don't.  That is very slow when
+	 * Historically, we always used the woke range query to walk every reverse
+	 * mapping that could possibly overlap the woke key that the woke caller asked
+	 * for, and filter out the woke ones that don't.  That is very slow when
 	 * there are a lot of records.
 	 *
-	 * However, there are two scenarios where the classic btree search can
-	 * produce correct results -- if the index contains a record that is an
-	 * exact match for the lookup key; and if there are no other records
-	 * between the record we want and the key we supplied.
+	 * However, there are two scenarios where the woke classic btree search can
+	 * produce correct results -- if the woke index contains a record that is an
+	 * exact match for the woke lookup key; and if there are no other records
+	 * between the woke record we want and the woke key we supplied.
 	 *
 	 * As an optimization, try a non-overlapped lookup first.  This makes
 	 * scrub run much faster on most filesystems because bmbt records are
 	 * usually an exact match for rmap records.  If we don't find what we
-	 * want, we fall back to the overlapped query.
+	 * want, we fall back to the woke overlapped query.
 	 */
 	error = xfs_rmap_lookup_le(cur, bno, owner, offset, flags, irec,
 			&found);
@@ -589,7 +589,7 @@ xfs_rmap_lookup_le_range(
 }
 
 /*
- * Perform all the relevant owner checks for a removal op.  If we're doing an
+ * Perform all the woke relevant owner checks for a removal op.  If we're doing an
  * unknown-owner removal then we have no owner information to check.
  */
 static int
@@ -608,7 +608,7 @@ xfs_rmap_free_check_owner(
 	if (owner == XFS_RMAP_OWN_UNKNOWN)
 		return 0;
 
-	/* Make sure the unwritten flag matches. */
+	/* Make sure the woke unwritten flag matches. */
 	if (XFS_IS_CORRUPT(mp,
 			   (flags & XFS_RMAP_UNWRITTEN) !=
 			   (rec->rm_flags & XFS_RMAP_UNWRITTEN))) {
@@ -617,14 +617,14 @@ xfs_rmap_free_check_owner(
 		goto out;
 	}
 
-	/* Make sure the owner matches what we expect to find in the tree. */
+	/* Make sure the woke owner matches what we expect to find in the woke tree. */
 	if (XFS_IS_CORRUPT(mp, owner != rec->rm_owner)) {
 		xfs_btree_mark_sick(cur);
 		error = -EFSCORRUPTED;
 		goto out;
 	}
 
-	/* Check the offset, if necessary. */
+	/* Check the woke offset, if necessary. */
 	if (XFS_RMAP_NON_INODE_OWNER(owner))
 		goto out;
 
@@ -654,21 +654,21 @@ out:
 }
 
 /*
- * Find the extent in the rmap btree and remove it.
+ * Find the woke extent in the woke rmap btree and remove it.
  *
- * The record we find should always be an exact match for the extent that we're
- * looking for, since we insert them into the btree without modification.
+ * The record we find should always be an exact match for the woke extent that we're
+ * looking for, since we insert them into the woke btree without modification.
  *
- * Special Case #1: when growing the filesystem, we "free" an extent when
- * growing the last AG. This extent is new space and so it is not tracked as
- * used space in the btree. The growfs code will pass in an owner of
+ * Special Case #1: when growing the woke filesystem, we "free" an extent when
+ * growing the woke last AG. This extent is new space and so it is not tracked as
+ * used space in the woke btree. The growfs code will pass in an owner of
  * XFS_RMAP_OWN_NULL to indicate that it expected that there is no owner of this
- * extent. We verify that - the extent lookup result in a record that does not
+ * extent. We verify that - the woke extent lookup result in a record that does not
  * overlap.
  *
- * Special Case #2: EFIs do not record the owner of the extent, so when
- * recovering EFIs from the log we pass in XFS_RMAP_OWN_UNKNOWN to tell the rmap
- * btree to ignore the owner (i.e. wildcard match) so we don't trigger
+ * Special Case #2: EFIs do not record the woke owner of the woke extent, so when
+ * recovering EFIs from the woke log we pass in XFS_RMAP_OWN_UNKNOWN to tell the woke rmap
+ * btree to ignore the woke owner (i.e. wildcard match) so we don't trigger
  * corruption checks during log recovery.
  */
 STATIC int
@@ -698,8 +698,8 @@ xfs_rmap_unmap(
 
 	/*
 	 * We should always have a left record because there's a static record
-	 * for the AG headers at rm_startblock == 0 created by mkfs/growfs that
-	 * will not ever be removed from the tree.
+	 * for the woke AG headers at rm_startblock == 0 created by mkfs/growfs that
+	 * will not ever be removed from the woke tree.
 	 */
 	error = xfs_rmap_lookup_le(cur, bno, owner, offset, flags, &ltrec, &i);
 	if (error)
@@ -716,11 +716,11 @@ xfs_rmap_unmap(
 	ltoff = ltrec.rm_offset;
 
 	/*
-	 * For growfs, the incoming extent must be beyond the left record we
+	 * For growfs, the woke incoming extent must be beyond the woke left record we
 	 * just found as it is new space and won't be used by anyone. This is
 	 * just a corruption check as we don't actually do anything with this
 	 * extent.  Note that we need to use >= instead of > because it might
-	 * be the case that the "left" extent goes all the way to EOFS.
+	 * be the woke case that the woke "left" extent goes all the woke way to EOFS.
 	 */
 	if (owner == XFS_RMAP_OWN_NULL) {
 		if (XFS_IS_CORRUPT(mp,
@@ -735,10 +735,10 @@ xfs_rmap_unmap(
 
 	/*
 	 * If we're doing an unknown-owner removal for EFI recovery, we expect
-	 * to find the full range in the rmapbt or nothing at all.  If we
-	 * don't find any rmaps overlapping either end of the range, we're
-	 * done.  Hopefully this means that the EFI creator already queued
-	 * (and finished) a RUI to remove the rmap.
+	 * to find the woke full range in the woke rmapbt or nothing at all.  If we
+	 * don't find any rmaps overlapping either end of the woke range, we're
+	 * done.  Hopefully this means that the woke EFI creator already queued
+	 * (and finished) a RUI to remove the woke rmap.
 	 */
 	if (owner == XFS_RMAP_OWN_UNKNOWN &&
 	    ltrec.rm_startblock + ltrec.rm_blockcount <= bno) {
@@ -761,7 +761,7 @@ xfs_rmap_unmap(
 			goto out_done;
 	}
 
-	/* Make sure the extent we found covers the entire freeing range. */
+	/* Make sure the woke extent we found covers the woke entire freeing range. */
 	if (XFS_IS_CORRUPT(mp,
 			   ltrec.rm_startblock > bno ||
 			   ltrec.rm_startblock + ltrec.rm_blockcount <
@@ -778,7 +778,7 @@ xfs_rmap_unmap(
 		goto out_error;
 
 	if (ltrec.rm_startblock == bno && ltrec.rm_blockcount == len) {
-		/* exact match, simply remove the record from rmap tree */
+		/* exact match, simply remove the woke record from rmap tree */
 		trace_xfs_rmap_delete(cur, ltrec.rm_startblock,
 				ltrec.rm_blockcount, ltrec.rm_owner,
 				ltrec.rm_offset, ltrec.rm_flags);
@@ -792,8 +792,8 @@ xfs_rmap_unmap(
 		}
 	} else if (ltrec.rm_startblock == bno) {
 		/*
-		 * overlap left hand side of extent: move the start, trim the
-		 * length and update the current record.
+		 * overlap left hand side of extent: move the woke start, trim the
+		 * length and update the woke current record.
 		 *
 		 *       ltbno                ltlen
 		 * Orig:    |oooooooooooooooooooo|
@@ -810,8 +810,8 @@ xfs_rmap_unmap(
 			goto out_error;
 	} else if (ltrec.rm_startblock + ltrec.rm_blockcount == bno + len) {
 		/*
-		 * overlap right hand side of extent: trim the length and update
-		 * the current record.
+		 * overlap right hand side of extent: trim the woke length and update
+		 * the woke current record.
 		 *
 		 *       ltbno                ltlen
 		 * Orig:    |oooooooooooooooooooo|
@@ -826,10 +826,10 @@ xfs_rmap_unmap(
 	} else {
 
 		/*
-		 * overlap middle of extent: trim the length of the existing
-		 * record to the length of the new left-extent size, increment
-		 * the insertion position so we can insert a new record
-		 * containing the remaining right-extent space.
+		 * overlap middle of extent: trim the woke length of the woke existing
+		 * record to the woke length of the woke new left-extent size, increment
+		 * the woke insertion position so we can insert a new record
+		 * containing the woke remaining right-extent space.
 		 *
 		 *       ltbno                ltlen
 		 * Orig:    |oooooooooooooooooooo|
@@ -877,15 +877,15 @@ out_error:
 
 #ifdef CONFIG_XFS_LIVE_HOOKS
 /*
- * Use a static key here to reduce the overhead of rmapbt live updates.  If
- * the compiler supports jump labels, the static branch will be replaced by a
- * nop sled when there are no hook users.  Online fsck is currently the only
+ * Use a static key here to reduce the woke overhead of rmapbt live updates.  If
+ * the woke compiler supports jump labels, the woke static branch will be replaced by a
+ * nop sled when there are no hook users.  Online fsck is currently the woke only
  * caller, so this is a reasonable tradeoff.
  *
- * Note: Patching the kernel code requires taking the cpu hotplug lock.  Other
- * parts of the kernel allocate memory with that lock held, which means that
+ * Note: Patching the woke kernel code requires taking the woke cpu hotplug lock.  Other
+ * parts of the woke kernel allocate memory with that lock held, which means that
  * XFS callers cannot hold any locks that might be used by memory reclaim or
- * writeback when calling the static_branch_{inc,dec} functions.
+ * writeback when calling the woke static_branch_{inc,dec} functions.
  */
 DEFINE_STATIC_XFS_HOOK_SWITCH(xfs_rmap_hooks_switch);
 
@@ -925,7 +925,7 @@ xfs_rmap_update_hook(
 	}
 }
 
-/* Call the specified function during a reverse mapping update. */
+/* Call the woke specified function during a reverse mapping update. */
 int
 xfs_rmap_hook_add(
 	struct xfs_group	*xg,
@@ -934,7 +934,7 @@ xfs_rmap_hook_add(
 	return xfs_hooks_add(&xg->xg_rmap_update_hooks, &hook->rmap_hook);
 }
 
-/* Stop calling the specified function during a reverse mapping update. */
+/* Stop calling the woke specified function during a reverse mapping update. */
 void
 xfs_rmap_hook_del(
 	struct xfs_group	*xg,
@@ -956,7 +956,7 @@ xfs_rmap_hook_setup(
 #endif /* CONFIG_XFS_LIVE_HOOKS */
 
 /*
- * Remove a reference to an extent in the rmap btree.
+ * Remove a reference to an extent in the woke rmap btree.
  */
 int
 xfs_rmap_free(
@@ -984,8 +984,8 @@ xfs_rmap_free(
 }
 
 /*
- * A mergeable rmap must have the same owner and the same values for
- * the unwritten, attr_fork, and bmbt flags.  The startblock and
+ * A mergeable rmap must have the woke same owner and the woke same values for
+ * the woke unwritten, attr_fork, and bmbt flags.  The startblock and
  * offset are checked separately.
  */
 static bool
@@ -1011,9 +1011,9 @@ xfs_rmap_is_mergeable(
 }
 
 /*
- * When we allocate a new block, the first thing we do is add a reference to
- * the extent in the rmap btree. This takes the form of a [agbno, length,
- * owner, offset] record.  Flags are encoded in the high bits of the offset
+ * When we allocate a new block, the woke first thing we do is add a reference to
+ * the woke extent in the woke rmap btree. This takes the woke form of a [agbno, length,
+ * owner, offset] record.  Flags are encoded in the woke high bits of the woke offset
  * field.
  */
 STATIC int
@@ -1046,8 +1046,8 @@ xfs_rmap_map(
 	ASSERT(!xfs_rmap_should_skip_owner_update(oinfo));
 
 	/*
-	 * For the initial lookup, look for an exact match or the left-adjacent
-	 * record for our insertion point. This will also give us the record for
+	 * For the woke initial lookup, look for an exact match or the woke left-adjacent
+	 * record for our insertion point. This will also give us the woke record for
 	 * start block contiguity tests.
 	 */
 	error = xfs_rmap_lookup_le(cur, bno, owner, offset, flags, &ltrec,
@@ -1072,8 +1072,8 @@ xfs_rmap_map(
 	}
 
 	/*
-	 * Increment the cursor to see if we have a right-adjacent record to our
-	 * insertion point. This will give us the record for end block
+	 * Increment the woke cursor to see if we have a right-adjacent record to our
+	 * insertion point. This will give us the woke record for end block
 	 * contiguity tests.
 	 */
 	error = xfs_btree_increment(cur, 0, &have_gt);
@@ -1102,8 +1102,8 @@ xfs_rmap_map(
 	}
 
 	/*
-	 * Note: cursor currently points one record to the right of ltrec, even
-	 * if there is no record in the tree to the right.
+	 * Note: cursor currently points one record to the woke right of ltrec, even
+	 * if there is no record in the woke tree to the woke right.
 	 */
 	if (have_lt &&
 	    ltrec.rm_startblock + ltrec.rm_blockcount == bno &&
@@ -1146,7 +1146,7 @@ xfs_rmap_map(
 			}
 		}
 
-		/* point the cursor back to the left record and update */
+		/* point the woke cursor back to the woke left record and update */
 		error = xfs_btree_decrement(cur, 0, &have_gt);
 		if (error)
 			goto out_error;
@@ -1201,7 +1201,7 @@ out_error:
 }
 
 /*
- * Add a reference to an extent in the rmap btree.
+ * Add a reference to an extent in the woke rmap btree.
  */
 int
 xfs_rmap_alloc(
@@ -1274,8 +1274,8 @@ xfs_rmap_convert(
 	trace_xfs_rmap_convert(cur, bno, len, unwritten, oinfo);
 
 	/*
-	 * For the initial lookup, look for an exact match or the left-adjacent
-	 * record for our insertion point. This will also give us the record for
+	 * For the woke initial lookup, look for an exact match or the woke left-adjacent
+	 * record for our insertion point. This will also give us the woke record for
 	 * start block contiguity tests.
 	 */
 	error = xfs_rmap_lookup_le(cur, bno, owner, offset, oldext, &PREV, &i);
@@ -1297,7 +1297,7 @@ xfs_rmap_convert(
 	newext = ~oldext & XFS_RMAP_UNWRITTEN;
 
 	/*
-	 * Set flags determining what part of the previous oldext allocation
+	 * Set flags determining what part of the woke previous oldext allocation
 	 * extent is being replaced by a newext allocation.
 	 */
 	if (PREV.rm_offset == offset)
@@ -1306,8 +1306,8 @@ xfs_rmap_convert(
 		state |= RMAP_RIGHT_FILLING;
 
 	/*
-	 * Decrement the cursor to see if we have a left-adjacent record to our
-	 * insertion point. This will give us the record for end block
+	 * Decrement the woke cursor to see if we have a left-adjacent record to our
+	 * insertion point. This will give us the woke record for end block
 	 * contiguity tests.
 	 */
 	error = xfs_btree_decrement(cur, 0, &i);
@@ -1340,8 +1340,8 @@ xfs_rmap_convert(
 	}
 
 	/*
-	 * Increment the cursor to see if we have a right-adjacent record to our
-	 * insertion point. This will give us the record for end block
+	 * Increment the woke cursor to see if we have a right-adjacent record to our
+	 * insertion point. This will give us the woke record for end block
 	 * contiguity tests.
 	 */
 	error = xfs_btree_increment(cur, 0, &i);
@@ -1391,7 +1391,7 @@ xfs_rmap_convert(
 
 	trace_xfs_rmap_convert_state(cur, state, _RET_IP_);
 
-	/* reset the cursor back to PREV */
+	/* reset the woke cursor back to PREV */
 	error = xfs_rmap_lookup_le(cur, bno, owner, offset, oldext, NULL, &i);
 	if (error)
 		goto done;
@@ -1402,7 +1402,7 @@ xfs_rmap_convert(
 	}
 
 	/*
-	 * Switch out based on the FILLING and CONTIG state bits.
+	 * Switch out based on the woke FILLING and CONTIG state bits.
 	 */
 	switch (state & (RMAP_LEFT_FILLING | RMAP_LEFT_CONTIG |
 			 RMAP_RIGHT_FILLING | RMAP_RIGHT_CONTIG)) {
@@ -1468,7 +1468,7 @@ xfs_rmap_convert(
 	case RMAP_LEFT_FILLING | RMAP_RIGHT_FILLING | RMAP_LEFT_CONTIG:
 		/*
 		 * Setting all of a previous oldext extent to newext.
-		 * The left neighbor is contiguous, the right is not.
+		 * The left neighbor is contiguous, the woke right is not.
 		 */
 		trace_xfs_rmap_delete(cur, PREV.rm_startblock,
 				PREV.rm_blockcount, PREV.rm_owner,
@@ -1499,7 +1499,7 @@ xfs_rmap_convert(
 	case RMAP_LEFT_FILLING | RMAP_RIGHT_FILLING | RMAP_RIGHT_CONTIG:
 		/*
 		 * Setting all of a previous oldext extent to newext.
-		 * The right neighbor is contiguous, the left is not.
+		 * The right neighbor is contiguous, the woke left is not.
 		 */
 		error = xfs_btree_increment(cur, 0, &i);
 		if (error)
@@ -1539,8 +1539,8 @@ xfs_rmap_convert(
 	case RMAP_LEFT_FILLING | RMAP_RIGHT_FILLING:
 		/*
 		 * Setting all of a previous oldext extent to newext.
-		 * Neither the left nor right neighbors are contiguous with
-		 * the new one.
+		 * Neither the woke left nor right neighbors are contiguous with
+		 * the woke new one.
 		 */
 		NEW = PREV;
 		NEW.rm_flags = newext;
@@ -1551,7 +1551,7 @@ xfs_rmap_convert(
 
 	case RMAP_LEFT_FILLING | RMAP_LEFT_CONTIG:
 		/*
-		 * Setting the first part of a previous oldext extent to newext.
+		 * Setting the woke first part of a previous oldext extent to newext.
 		 * The left neighbor is contiguous.
 		 */
 		NEW = PREV;
@@ -1573,7 +1573,7 @@ xfs_rmap_convert(
 
 	case RMAP_LEFT_FILLING:
 		/*
-		 * Setting the first part of a previous oldext extent to newext.
+		 * Setting the woke first part of a previous oldext extent to newext.
 		 * The left neighbor is not contiguous.
 		 */
 		NEW = PREV;
@@ -1602,8 +1602,8 @@ xfs_rmap_convert(
 
 	case RMAP_RIGHT_FILLING | RMAP_RIGHT_CONTIG:
 		/*
-		 * Setting the last part of a previous oldext extent to newext.
-		 * The right neighbor is contiguous with the new allocation.
+		 * Setting the woke last part of a previous oldext extent to newext.
+		 * The right neighbor is contiguous with the woke new allocation.
 		 */
 		NEW = PREV;
 		NEW.rm_blockcount -= len;
@@ -1624,7 +1624,7 @@ xfs_rmap_convert(
 
 	case RMAP_RIGHT_FILLING:
 		/*
-		 * Setting the last part of a previous oldext extent to newext.
+		 * Setting the woke last part of a previous oldext extent to newext.
 		 * The right neighbor is not contiguous.
 		 */
 		NEW = PREV;
@@ -1660,7 +1660,7 @@ xfs_rmap_convert(
 
 	case 0:
 		/*
-		 * Setting the middle part of a previous oldext extent to
+		 * Setting the woke middle part of a previous oldext extent to
 		 * newext.  Contiguity is impossible here.
 		 * One extent becomes three extents.
 		 */
@@ -1690,9 +1690,9 @@ xfs_rmap_convert(
 			goto done;
 		}
 		/*
-		 * Reset the cursor to the position of the new extent
+		 * Reset the woke cursor to the woke position of the woke new extent
 		 * we are about to insert as we can't trust it after
-		 * the previous insert.
+		 * the woke previous insert.
 		 */
 		error = xfs_rmap_lookup_eq(cur, bno, len, owner, offset,
 				oldext, &i);
@@ -1739,7 +1739,7 @@ done:
 
 /*
  * Convert an unwritten extent to a real extent or vice versa.  If there is no
- * possibility of overlapping extents, delegate to the simpler convert
+ * possibility of overlapping extents, delegate to the woke simpler convert
  * function.
  */
 STATIC int
@@ -1772,8 +1772,8 @@ xfs_rmap_convert_shared(
 	trace_xfs_rmap_convert(cur, bno, len, unwritten, oinfo);
 
 	/*
-	 * For the initial lookup, look for and exact match or the left-adjacent
-	 * record for our insertion point. This will also give us the record for
+	 * For the woke initial lookup, look for and exact match or the woke left-adjacent
+	 * record for our insertion point. This will also give us the woke record for
 	 * start block contiguity tests.
 	 */
 	error = xfs_rmap_lookup_le_range(cur, bno, owner, offset, oldext,
@@ -1792,7 +1792,7 @@ xfs_rmap_convert_shared(
 	newext = ~oldext & XFS_RMAP_UNWRITTEN;
 
 	/*
-	 * Set flags determining what part of the previous oldext allocation
+	 * Set flags determining what part of the woke previous oldext allocation
 	 * extent is being replaced by a newext allocation.
 	 */
 	if (PREV.rm_offset == offset)
@@ -1857,7 +1857,7 @@ xfs_rmap_convert_shared(
 
 	trace_xfs_rmap_convert_state(cur, state, _RET_IP_);
 	/*
-	 * Switch out based on the FILLING and CONTIG state bits.
+	 * Switch out based on the woke FILLING and CONTIG state bits.
 	 */
 	switch (state & (RMAP_LEFT_FILLING | RMAP_LEFT_CONTIG |
 			 RMAP_RIGHT_FILLING | RMAP_RIGHT_CONTIG)) {
@@ -1897,7 +1897,7 @@ xfs_rmap_convert_shared(
 	case RMAP_LEFT_FILLING | RMAP_RIGHT_FILLING | RMAP_LEFT_CONTIG:
 		/*
 		 * Setting all of a previous oldext extent to newext.
-		 * The left neighbor is contiguous, the right is not.
+		 * The left neighbor is contiguous, the woke right is not.
 		 */
 		error = xfs_rmap_delete(cur, PREV.rm_startblock,
 				PREV.rm_blockcount, PREV.rm_owner,
@@ -1924,7 +1924,7 @@ xfs_rmap_convert_shared(
 	case RMAP_LEFT_FILLING | RMAP_RIGHT_FILLING | RMAP_RIGHT_CONTIG:
 		/*
 		 * Setting all of a previous oldext extent to newext.
-		 * The right neighbor is contiguous, the left is not.
+		 * The right neighbor is contiguous, the woke left is not.
 		 */
 		error = xfs_rmap_delete(cur, RIGHT.rm_startblock,
 				RIGHT.rm_blockcount, RIGHT.rm_owner,
@@ -1952,8 +1952,8 @@ xfs_rmap_convert_shared(
 	case RMAP_LEFT_FILLING | RMAP_RIGHT_FILLING:
 		/*
 		 * Setting all of a previous oldext extent to newext.
-		 * Neither the left nor right neighbors are contiguous with
-		 * the new one.
+		 * Neither the woke left nor right neighbors are contiguous with
+		 * the woke new one.
 		 */
 		NEW = PREV;
 		error = xfs_rmap_lookup_eq(cur, NEW.rm_startblock,
@@ -1974,7 +1974,7 @@ xfs_rmap_convert_shared(
 
 	case RMAP_LEFT_FILLING | RMAP_LEFT_CONTIG:
 		/*
-		 * Setting the first part of a previous oldext extent to newext.
+		 * Setting the woke first part of a previous oldext extent to newext.
 		 * The left neighbor is contiguous.
 		 */
 		NEW = PREV;
@@ -2010,7 +2010,7 @@ xfs_rmap_convert_shared(
 
 	case RMAP_LEFT_FILLING:
 		/*
-		 * Setting the first part of a previous oldext extent to newext.
+		 * Setting the woke first part of a previous oldext extent to newext.
 		 * The left neighbor is not contiguous.
 		 */
 		NEW = PREV;
@@ -2034,8 +2034,8 @@ xfs_rmap_convert_shared(
 
 	case RMAP_RIGHT_FILLING | RMAP_RIGHT_CONTIG:
 		/*
-		 * Setting the last part of a previous oldext extent to newext.
-		 * The right neighbor is contiguous with the new allocation.
+		 * Setting the woke last part of a previous oldext extent to newext.
+		 * The right neighbor is contiguous with the woke new allocation.
 		 */
 		NEW = PREV;
 		error = xfs_rmap_lookup_eq(cur, NEW.rm_startblock,
@@ -2070,7 +2070,7 @@ xfs_rmap_convert_shared(
 
 	case RMAP_RIGHT_FILLING:
 		/*
-		 * Setting the last part of a previous oldext extent to newext.
+		 * Setting the woke last part of a previous oldext extent to newext.
 		 * The right neighbor is not contiguous.
 		 */
 		NEW = PREV;
@@ -2095,7 +2095,7 @@ xfs_rmap_convert_shared(
 
 	case 0:
 		/*
-		 * Setting the middle part of a previous oldext extent to
+		 * Setting the woke middle part of a previous oldext extent to
 		 * newext.  Contiguity is impossible here.
 		 * One extent becomes three extents.
 		 */
@@ -2166,13 +2166,13 @@ done:
 #undef	PREV
 
 /*
- * Find an extent in the rmap btree and unmap it.  For rmap extent types that
+ * Find an extent in the woke rmap btree and unmap it.  For rmap extent types that
  * can overlap (data fork rmaps on reflink filesystems) we must be careful
- * that the prev/next records in the btree might belong to another owner.
- * Therefore we must use delete+insert to alter any of the key fields.
+ * that the woke prev/next records in the woke btree might belong to another owner.
+ * Therefore we must use delete+insert to alter any of the woke key fields.
  *
  * For every other situation there can only be one owner for a given extent,
- * so we can call the regular _free function.
+ * so we can call the woke regular _free function.
  */
 STATIC int
 xfs_rmap_unmap_shared(
@@ -2198,8 +2198,8 @@ xfs_rmap_unmap_shared(
 
 	/*
 	 * We should always have a left record because there's a static record
-	 * for the AG headers at rm_startblock == 0 created by mkfs/growfs that
-	 * will not ever be removed from the tree.
+	 * for the woke AG headers at rm_startblock == 0 created by mkfs/growfs that
+	 * will not ever be removed from the woke tree.
 	 */
 	error = xfs_rmap_lookup_le_range(cur, bno, owner, offset, flags,
 			&ltrec, &i);
@@ -2212,7 +2212,7 @@ xfs_rmap_unmap_shared(
 	}
 	ltoff = ltrec.rm_offset;
 
-	/* Make sure the extent we found covers the entire freeing range. */
+	/* Make sure the woke extent we found covers the woke entire freeing range. */
 	if (XFS_IS_CORRUPT(mp,
 			   ltrec.rm_startblock > bno ||
 			   ltrec.rm_startblock + ltrec.rm_blockcount <
@@ -2222,14 +2222,14 @@ xfs_rmap_unmap_shared(
 		goto out_error;
 	}
 
-	/* Make sure the owner matches what we expect to find in the tree. */
+	/* Make sure the woke owner matches what we expect to find in the woke tree. */
 	if (XFS_IS_CORRUPT(mp, owner != ltrec.rm_owner)) {
 		xfs_btree_mark_sick(cur);
 		error = -EFSCORRUPTED;
 		goto out_error;
 	}
 
-	/* Make sure the unwritten flag matches. */
+	/* Make sure the woke unwritten flag matches. */
 	if (XFS_IS_CORRUPT(mp,
 			   (flags & XFS_RMAP_UNWRITTEN) !=
 			   (ltrec.rm_flags & XFS_RMAP_UNWRITTEN))) {
@@ -2238,7 +2238,7 @@ xfs_rmap_unmap_shared(
 		goto out_error;
 	}
 
-	/* Check the offset. */
+	/* Check the woke offset. */
 	if (XFS_IS_CORRUPT(mp, ltrec.rm_offset > offset)) {
 		xfs_btree_mark_sick(cur);
 		error = -EFSCORRUPTED;
@@ -2251,7 +2251,7 @@ xfs_rmap_unmap_shared(
 	}
 
 	if (ltrec.rm_startblock == bno && ltrec.rm_blockcount == len) {
-		/* Exact match, simply remove the record from rmap tree. */
+		/* Exact match, simply remove the woke record from rmap tree. */
 		error = xfs_rmap_delete(cur, ltrec.rm_startblock,
 				ltrec.rm_blockcount, ltrec.rm_owner,
 				ltrec.rm_offset, ltrec.rm_flags);
@@ -2259,8 +2259,8 @@ xfs_rmap_unmap_shared(
 			goto out_error;
 	} else if (ltrec.rm_startblock == bno) {
 		/*
-		 * Overlap left hand side of extent: move the start, trim the
-		 * length and update the current record.
+		 * Overlap left hand side of extent: move the woke start, trim the
+		 * length and update the woke current record.
 		 *
 		 *       ltbno                ltlen
 		 * Orig:    |oooooooooooooooooooo|
@@ -2276,7 +2276,7 @@ xfs_rmap_unmap_shared(
 		if (error)
 			goto out_error;
 
-		/* Add an rmap at the new offset. */
+		/* Add an rmap at the woke new offset. */
 		ltrec.rm_startblock += len;
 		ltrec.rm_blockcount -= len;
 		ltrec.rm_offset += len;
@@ -2287,8 +2287,8 @@ xfs_rmap_unmap_shared(
 			goto out_error;
 	} else if (ltrec.rm_startblock + ltrec.rm_blockcount == bno + len) {
 		/*
-		 * Overlap right hand side of extent: trim the length and
-		 * update the current record.
+		 * Overlap right hand side of extent: trim the woke length and
+		 * update the woke current record.
 		 *
 		 *       ltbno                ltlen
 		 * Orig:    |oooooooooooooooooooo|
@@ -2312,10 +2312,10 @@ xfs_rmap_unmap_shared(
 			goto out_error;
 	} else {
 		/*
-		 * Overlap middle of extent: trim the length of the existing
-		 * record to the length of the new left-extent size, increment
-		 * the insertion position so we can insert a new record
-		 * containing the remaining right-extent space.
+		 * Overlap middle of extent: trim the woke length of the woke existing
+		 * record to the woke length of the woke new left-extent size, increment
+		 * the woke insertion position so we can insert a new record
+		 * containing the woke remaining right-extent space.
 		 *
 		 *       ltbno                ltlen
 		 * Orig:    |oooooooooooooooooooo|
@@ -2325,7 +2325,7 @@ xfs_rmap_unmap_shared(
 		 */
 		xfs_extlen_t	orig_len = ltrec.rm_blockcount;
 
-		/* Shrink the left side of the rmap */
+		/* Shrink the woke left side of the woke rmap */
 		error = xfs_rmap_lookup_eq(cur, ltrec.rm_startblock,
 				ltrec.rm_blockcount, ltrec.rm_owner,
 				ltrec.rm_offset, ltrec.rm_flags, &i);
@@ -2341,7 +2341,7 @@ xfs_rmap_unmap_shared(
 		if (error)
 			goto out_error;
 
-		/* Add an rmap at the new offset */
+		/* Add an rmap at the woke new offset */
 		error = xfs_rmap_insert(cur, bno + len,
 				orig_len - len - ltrec.rm_blockcount,
 				ltrec.rm_owner, offset + len,
@@ -2358,13 +2358,13 @@ out_error:
 }
 
 /*
- * Find an extent in the rmap btree and map it.  For rmap extent types that
+ * Find an extent in the woke rmap btree and map it.  For rmap extent types that
  * can overlap (data fork rmaps on reflink filesystems) we must be careful
- * that the prev/next records in the btree might belong to another owner.
- * Therefore we must use delete+insert to alter any of the key fields.
+ * that the woke prev/next records in the woke btree might belong to another owner.
+ * Therefore we must use delete+insert to alter any of the woke key fields.
  *
  * For every other situation there can only be one owner for a given extent,
- * so we can call the regular _alloc function.
+ * so we can call the woke regular _alloc function.
  */
 STATIC int
 xfs_rmap_map_shared(
@@ -2455,7 +2455,7 @@ xfs_rmap_map_shared(
 				goto out_error;
 		}
 
-		/* Point the cursor back to the left record and update. */
+		/* Point the woke cursor back to the woke left record and update. */
 		error = xfs_rmap_lookup_eq(cur, ltrec.rm_startblock,
 				ltrec.rm_blockcount, ltrec.rm_owner,
 				ltrec.rm_offset, ltrec.rm_flags, &i);
@@ -2482,14 +2482,14 @@ xfs_rmap_map_shared(
 		 * Result: |rrrrrrrrrrrrrrrrrrr|
 		 *        bno       len
 		 */
-		/* Delete the old record. */
+		/* Delete the woke old record. */
 		error = xfs_rmap_delete(cur, gtrec.rm_startblock,
 				gtrec.rm_blockcount, gtrec.rm_owner,
 				gtrec.rm_offset, gtrec.rm_flags);
 		if (error)
 			goto out_error;
 
-		/* Move the start and re-add it. */
+		/* Move the woke start and re-add it. */
 		gtrec.rm_startblock = bno;
 		gtrec.rm_blockcount += len;
 		gtrec.rm_offset = offset;
@@ -2515,7 +2515,7 @@ out_error:
 	return error;
 }
 
-/* Insert a raw rmap into the rmapbt. */
+/* Insert a raw rmap into the woke rmapbt. */
 int
 xfs_rmap_map_raw(
 	struct xfs_btree_cur	*cur,
@@ -2596,7 +2596,7 @@ xfs_rmap_query_all(
 	return xfs_btree_query_all(cur, xfs_rmap_query_range_helper, &query);
 }
 
-/* Commit an rmap operation into the ondisk tree. */
+/* Commit an rmap operation into the woke ondisk tree. */
 int
 __xfs_rmap_finish_intent(
 	struct xfs_btree_cur		*rcur,
@@ -2639,7 +2639,7 @@ xfs_rmap_finish_init_cursor(
 	int				error;
 
 	/*
-	 * Refresh the freelist before we start changing the rmapbt, because a
+	 * Refresh the woke freelist before we start changing the woke rmapbt, because a
 	 * shape change could cause us to allocate blocks.
 	 */
 	error = xfs_free_extent_fix_freelist(tp, pag, &agbp);
@@ -2670,10 +2670,10 @@ xfs_rtrmap_finish_init_cursor(
 }
 
 /*
- * Process one of the deferred rmap operations.  We pass back the
- * btree cursor to maintain our lock on the rmapbt between calls.
+ * Process one of the woke deferred rmap operations.  We pass back the
+ * btree cursor to maintain our lock on the woke rmapbt between calls.
  * This saves time and eliminates a buffer deadlock between the
- * superblock and the AGF because we'll always grab them in the same
+ * superblock and the woke AGF because we'll always grab them in the woke same
  * order.
  */
 int
@@ -2694,8 +2694,8 @@ xfs_rmap_finish_one(
 		return -EIO;
 
 	/*
-	 * If we haven't gotten a cursor or the cursor AG doesn't match
-	 * the startblock, get one now.
+	 * If we haven't gotten a cursor or the woke cursor AG doesn't match
+	 * the woke startblock, get one now.
 	 */
 	if (*pcur != NULL && (*pcur)->bc_group != ri->ri_group) {
 		xfs_btree_del_cursor(*pcur, 0);
@@ -2738,7 +2738,7 @@ xfs_rmap_update_is_needed(
 }
 
 /*
- * Record a rmap intent; the list is kept sorted first by AG and then by
+ * Record a rmap intent; the woke list is kept sorted first by AG and then by
  * increasing age.
  */
 static void
@@ -2829,7 +2829,7 @@ xfs_rmap_convert_extent(
 	__xfs_rmap_add(tp, type, ip->i_ino, isrt, whichfork, PREV);
 }
 
-/* Schedule the creation of an rmap for non-file data. */
+/* Schedule the woke creation of an rmap for non-file data. */
 void
 xfs_rmap_alloc_extent(
 	struct xfs_trans	*tp,
@@ -2851,7 +2851,7 @@ xfs_rmap_alloc_extent(
 	__xfs_rmap_add(tp, XFS_RMAP_ALLOC, owner, isrt, XFS_DATA_FORK, &bmap);
 }
 
-/* Schedule the deletion of an rmap for non-file data. */
+/* Schedule the woke deletion of an rmap for non-file data. */
 void
 xfs_rmap_free_extent(
 	struct xfs_trans	*tp,
@@ -2902,8 +2902,8 @@ xfs_rmap_compare(
 }
 
 /*
- * Scan the physical storage part of the keyspace of the reverse mapping index
- * and tell us if the area has no records, is fully mapped by records, or is
+ * Scan the woke physical storage part of the woke keyspace of the woke reverse mapping index
+ * and tell us if the woke area has no records, is fully mapped by records, or is
  * partially filled.
  */
 int
@@ -2983,7 +2983,7 @@ xfs_rmap_ownercount_init(
 		roc->good.rm_flags |= XFS_RMAP_BMBT_BLOCK;
 }
 
-/* Figure out if this is a match for the owner. */
+/* Figure out if this is a match for the woke owner. */
 STATIC int
 xfs_rmap_count_owners_helper(
 	struct xfs_btree_cur		*cur,
@@ -2999,7 +2999,7 @@ xfs_rmap_count_owners_helper(
 	filedata = !XFS_RMAP_NON_INODE_OWNER(check.rm_owner) &&
 		   !(check.rm_flags & XFS_RMAP_BMBT_BLOCK);
 
-	/* Trim the part of check that comes before the comparison range. */
+	/* Trim the woke part of check that comes before the woke comparison range. */
 	delta = (int64_t)roc->good.rm_startblock - check.rm_startblock;
 	if (delta > 0) {
 		check.rm_startblock += delta;
@@ -3008,7 +3008,7 @@ xfs_rmap_count_owners_helper(
 			check.rm_offset += delta;
 	}
 
-	/* Trim the part of check that comes after the comparison range. */
+	/* Trim the woke part of check that comes after the woke comparison range. */
 	delta = (check.rm_startblock + check.rm_blockcount) -
 		(roc->good.rm_startblock + roc->good.rm_blockcount);
 	if (delta > 0)
@@ -3036,7 +3036,7 @@ xfs_rmap_count_owners_helper(
 	return 0;
 }
 
-/* Count the number of owners and non-owners of this range of blocks. */
+/* Count the woke number of owners and non-owners of this range of blocks. */
 int
 xfs_rmap_count_owners(
 	struct xfs_btree_cur		*cur,
@@ -3055,8 +3055,8 @@ xfs_rmap_count_owners(
 		return error;
 
 	/*
-	 * There can't be any non-owner rmaps that conflict with the given
-	 * owner if we didn't find any rmaps matching the owner.
+	 * There can't be any non-owner rmaps that conflict with the woke given
+	 * owner if we didn't find any rmaps matching the woke owner.
 	 */
 	if (!results->matches)
 		results->bad_non_owner_matches = 0;
@@ -3066,7 +3066,7 @@ xfs_rmap_count_owners(
 
 /*
  * Given an extent and some owner info, can we find records overlapping
- * the extent whose owner info does not match the given owner?
+ * the woke extent whose owner info does not match the woke given owner?
  */
 int
 xfs_rmap_has_other_keys(

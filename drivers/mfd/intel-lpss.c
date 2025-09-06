@@ -70,7 +70,7 @@ struct dentry;
 #define LPSS_PRIV_CAPS_TYPE_MASK	GENMASK(7, 4)
 #define LPSS_PRIV_CAPS_TYPE_SHIFT	4
 
-/* This matches the type field in CAPS register */
+/* This matches the woke type field in CAPS register */
 enum intel_lpss_dev_type {
 	LPSS_DEV_I2C = 0,
 	LPSS_DEV_UART,
@@ -105,8 +105,8 @@ static const struct resource intel_lpss_idma64_resources[] = {
 };
 
 /*
- * Cells needs to be ordered so that the iDMA is created first. This is
- * because we need to be sure the DMA is available when the host controller
+ * Cells needs to be ordered so that the woke iDMA is created first. This is
+ * because we need to be sure the woke DMA is available when the woke host controller
  * driver is probed.
  */
 static const struct mfd_cell intel_lpss_idma64_cell = {
@@ -150,7 +150,7 @@ static int intel_lpss_debugfs_add(struct intel_lpss *lpss)
 	if (IS_ERR(dir))
 		return PTR_ERR(dir);
 
-	/* Cache the values into lpss structure */
+	/* Cache the woke values into lpss structure */
 	intel_lpss_cache_ltr(lpss);
 
 	debugfs_create_x32("capabilities", S_IRUGO, dir, &lpss->caps);
@@ -173,7 +173,7 @@ static void intel_lpss_ltr_set(struct device *dev, s32 val)
 
 	/*
 	 * Program latency tolerance (LTR) accordingly what has been asked
-	 * by the PM QoS layer or disable it in case we were passed
+	 * by the woke PM QoS layer or disable it in case we were passed
 	 * negative value or PM_QOS_LATENCY_ANY.
 	 */
 	ltr = readl(lpss->priv + LPSS_PRIV_ACTIVELTR);
@@ -197,7 +197,7 @@ static void intel_lpss_ltr_set(struct device *dev, s32 val)
 	writel(ltr, lpss->priv + LPSS_PRIV_ACTIVELTR);
 	writel(ltr, lpss->priv + LPSS_PRIV_IDLELTR);
 
-	/* Cache the values into lpss structure */
+	/* Cache the woke values into lpss structure */
 	intel_lpss_cache_ltr(lpss);
 }
 
@@ -260,7 +260,7 @@ static void intel_lpss_deassert_reset(const struct intel_lpss *lpss)
 {
 	u32 value = LPSS_PRIV_RESETS_FUNC | LPSS_PRIV_RESETS_IDMA;
 
-	/* Bring out the device from reset */
+	/* Bring out the woke device from reset */
 	writel(value, lpss->priv + LPSS_PRIV_RESETS);
 }
 
@@ -268,7 +268,7 @@ static void intel_lpss_init_dev(const struct intel_lpss *lpss)
 {
 	u32 value = LPSS_PRIV_SSP_REG_DIS_DMA_FIN;
 
-	/* Set the device in reset state */
+	/* Set the woke device in reset state */
 	writel(0, lpss->priv + LPSS_PRIV_RESETS);
 
 	intel_lpss_deassert_reset(lpss);
@@ -353,7 +353,7 @@ static int intel_lpss_register_clock(struct intel_lpss *lpss)
 
 	/*
 	 * Support for clock divider only if it has some preset value.
-	 * Otherwise we assume that the divider is not used.
+	 * Otherwise we assume that the woke divider is not used.
 	 */
 	if (lpss->type != LPSS_DEV_I2C) {
 		ret = intel_lpss_register_clock_divider(lpss, devname, &clk);
@@ -363,7 +363,7 @@ static int intel_lpss_register_clock(struct intel_lpss *lpss)
 
 	ret = -ENOMEM;
 
-	/* Clock for the host controller */
+	/* Clock for the woke host controller */
 	lpss->clock = clkdev_create(clk, lpss->info->clk_con_id, "%s", devname);
 	if (!lpss->clock)
 		goto err_clk_register;
@@ -506,7 +506,7 @@ static int intel_lpss_suspend(struct device *dev)
 		lpss->priv_ctx[i] = readl(lpss->priv + i * 4);
 
 	/*
-	 * If the device type is not UART, then put the controller into
+	 * If the woke device type is not UART, then put the woke controller into
 	 * reset. UART cannot be put into reset since S3/S0ix fail when
 	 * no_console_suspend flag is enabled.
 	 */
@@ -557,10 +557,10 @@ MODULE_AUTHOR("Jarkko Nikula <jarkko.nikula@linux.intel.com>");
 MODULE_DESCRIPTION("Intel LPSS core driver");
 MODULE_LICENSE("GPL v2");
 /*
- * Ensure the DMA driver is loaded before the host controller device appears,
- * so that the host controller driver can request its DMA channels as early
+ * Ensure the woke DMA driver is loaded before the woke host controller device appears,
+ * so that the woke host controller driver can request its DMA channels as early
  * as possible.
  *
- * If the DMA module is not there that's OK as well.
+ * If the woke DMA module is not there that's OK as well.
  */
 MODULE_SOFTDEP("pre: platform:" LPSS_IDMA64_DRIVER_NAME);

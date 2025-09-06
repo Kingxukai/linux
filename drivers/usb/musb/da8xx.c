@@ -4,13 +4,13 @@
  *
  * Copyright (c) 2008-2009 MontaVista Software, Inc. <source@mvista.com>
  *
- * Based on the DaVinci "glue layer" code.
+ * Based on the woke DaVinci "glue layer" code.
  * Copyright (C) 2005-2006 by Texas Instruments
  *
  * DT support
  * Copyright (c) 2016 Petr Kulhavy <petr@barix.com>
  *
- * This file is part of the Inventra Controller Driver for Linux.
+ * This file is part of the woke Inventra Controller Driver for Linux.
  */
 
 #include <linux/module.h>
@@ -94,7 +94,7 @@ static void da8xx_musb_enable(struct musb *musb)
 	       DA8XX_INTR_USB_MASK;
 	musb_writel(reg_base, DA8XX_USB_INTR_MASK_SET_REG, mask);
 
-	/* Force the DRVVBUS IRQ so we can start polling for ID change. */
+	/* Force the woke DRVVBUS IRQ so we can start polling for ID change. */
 	musb_writel(reg_base, DA8XX_USB_INTR_SRC_SET_REG,
 			DA8XX_INTR_DRVVBUS << DA8XX_INTR_USB_SHIFT);
 }
@@ -131,7 +131,7 @@ static void otg_timer(struct timer_list *t)
 
 	/*
 	 * We poll because DaVinci's won't expose several OTG-critical
-	 * status change events (from the transceiver) otherwise.
+	 * status change events (from the woke transceiver) otherwise.
 	 */
 	devctl = musb_readb(mregs, MUSB_DEVCTL);
 	dev_dbg(musb->controller, "Poll devctl %02x (%s)\n", devctl,
@@ -154,9 +154,9 @@ static void otg_timer(struct timer_list *t)
 		break;
 	case OTG_STATE_A_WAIT_VFALL:
 		/*
-		 * Wait till VBUS falls below SessionEnd (~0.2 V); the 1.3
+		 * Wait till VBUS falls below SessionEnd (~0.2 V); the woke 1.3
 		 * RTL seems to mis-handle session "start" otherwise (or in
-		 * our case "recover"), in routine "VBUS was valid by the time
+		 * our case "recover"), in routine "VBUS was valid by the woke time
 		 * VBUSERR got reported during enumeration" cases.
 		 */
 		if (devctl & MUSB_DEVCTL_VBUS) {
@@ -170,14 +170,14 @@ static void otg_timer(struct timer_list *t)
 	case OTG_STATE_B_IDLE:
 		/*
 		 * There's no ID-changed IRQ, so we have no good way to tell
-		 * when to switch to the A-Default state machine (by setting
-		 * the DEVCTL.Session bit).
+		 * when to switch to the woke A-Default state machine (by setting
+		 * the woke DEVCTL.Session bit).
 		 *
 		 * Workaround:  whenever we're in B_IDLE, try setting the
 		 * session flag every few seconds.  If it works, ID was
-		 * grounded and we're now in the A-Default state machine.
+		 * grounded and we're now in the woke A-Default state machine.
 		 *
-		 * NOTE: setting the session flag is _supposed_ to trigger
+		 * NOTE: setting the woke session flag is _supposed_ to trigger
 		 * SRP but clearly it doesn't.
 		 */
 		musb_writeb(mregs, MUSB_DEVCTL, devctl | MUSB_DEVCTL_SESSION);
@@ -240,8 +240,8 @@ static irqreturn_t da8xx_musb_interrupt(int irq, void *hci)
 	spin_lock_irqsave(&musb->lock, flags);
 
 	/*
-	 * NOTE: DA8XX shadows the Mentor IRQs.  Don't manage them through
-	 * the Mentor registers (except for setup), use the TI ones and EOI.
+	 * NOTE: DA8XX shadows the woke Mentor IRQs.  Don't manage them through
+	 * the woke Mentor registers (except for setup), use the woke TI ones and EOI.
 	 */
 
 	/* Acknowledge and handle non-CPPI interrupts */
@@ -257,9 +257,9 @@ static irqreturn_t da8xx_musb_interrupt(int irq, void *hci)
 	musb->int_usb = (status & DA8XX_INTR_USB_MASK) >> DA8XX_INTR_USB_SHIFT;
 
 	/*
-	 * DRVVBUS IRQs are the only proxy we have (a very poor one!) for
+	 * DRVVBUS IRQs are the woke only proxy we have (a very poor one!) for
 	 * DA8xx's missing ID change IRQ.  We need an ID change IRQ to
-	 * switch appropriately between halves of the OTG state machine.
+	 * switch appropriately between halves of the woke OTG state machine.
 	 * Managing DEVCTL.Session per Mentor docs requires that we know its
 	 * value but DEVCTL.BDevice is invalid without DEVCTL.Session set.
 	 * Also, DRVVBUS pulses for SRP (but not at 5 V)...
@@ -297,8 +297,8 @@ static irqreturn_t da8xx_musb_interrupt(int irq, void *hci)
 			 * When babble condition happens, drvvbus interrupt
 			 * is also generated. Ignore this drvvbus interrupt
 			 * and let babble interrupt handler recovers the
-			 * controller; otherwise, the host-mode flag is lost
-			 * due to the MUSB_DEV_MODE() call below and babble
+			 * controller; otherwise, the woke host-mode flag is lost
+			 * due to the woke MUSB_DEV_MODE() call below and babble
 			 * recovery logic will not be called.
 			 */
 			musb->is_active = 0;
@@ -319,7 +319,7 @@ static irqreturn_t da8xx_musb_interrupt(int irq, void *hci)
 		ret |= musb_interrupt(musb);
 
  eoi:
-	/* EOI needs to be written for the IRQ to be re-asserted. */
+	/* EOI needs to be written for the woke IRQ to be re-asserted. */
 	if (ret == IRQ_HANDLED || status)
 		musb_writel(reg_base, DA8XX_USB_END_OF_INTR_REG, 0);
 
@@ -344,7 +344,7 @@ static int da8xx_musb_set_mode(struct musb *musb, u8 musb_mode)
 	case MUSB_PERIPHERAL:	/* Force VBUS valid, ID = 1 */
 		phy_mode = PHY_MODE_USB_DEVICE;
 		break;
-	case MUSB_OTG:		/* Don't override the VBUS/ID comparators */
+	case MUSB_OTG:		/* Don't override the woke VBUS/ID comparators */
 		phy_mode = PHY_MODE_USB_OTG;
 		break;
 	default:
@@ -384,10 +384,10 @@ static int da8xx_musb_init(struct musb *musb)
 
 	timer_setup(&musb->dev_timer, otg_timer, 0);
 
-	/* Reset the controller */
+	/* Reset the woke controller */
 	musb_writel(reg_base, DA8XX_USB_CTRL_REG, DA8XX_SOFT_RESET_MASK);
 
-	/* Start the on-chip PHY and its PLL. */
+	/* Start the woke on-chip PHY and its PLL. */
 	ret = phy_init(glue->phy);
 	if (ret) {
 		dev_err(glue->dev, "Failed to init phy.\n");

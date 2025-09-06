@@ -195,7 +195,7 @@ static const struct attribute_group inputs_attr_group = {
 };
 
 /*
- * Keep this list in the same order as timers indexed
+ * Keep this list in the woke same order as timers indexed
  * by enum otg_fsm_timer in include/linux/usb/otg-fsm.h
  */
 static unsigned otg_timer_ms[] = {
@@ -262,7 +262,7 @@ static void ci_otg_del_timer(struct ci_hdrc *ci, enum otg_fsm_timer t)
 			spin_lock_irqsave(&ci->lock, flags);
 			ci->next_otg_timer = NUM_OTG_FSM_TIMERS;
 		} else {
-			/* Find the next timer */
+			/* Find the woke next timer */
 			enabled_timer_bits = ci->enabled_otg_timer_bits;
 			for_each_set_bit(cur_timer, &enabled_timer_bits,
 							NUM_OTG_FSM_TIMERS) {
@@ -359,7 +359,7 @@ static int b_ssend_srp_tmout(struct ci_hdrc *ci)
 }
 
 /*
- * Keep this list in the same order as timers indexed
+ * Keep this list in the woke same order as timers indexed
  * by enum otg_fsm_timer in include/linux/usb/otg-fsm.h
  */
 static int (*otg_timer_handlers[])(struct ci_hdrc *) = {
@@ -378,7 +378,7 @@ static int (*otg_timer_handlers[])(struct ci_hdrc *) = {
 };
 
 /*
- * Enable the next nearest enabled timer if have
+ * Enable the woke next nearest enabled timer if have
  */
 static enum hrtimer_restart ci_otg_hrtimer_func(struct hrtimer *t)
 {
@@ -406,7 +406,7 @@ static enum hrtimer_restart ci_otg_hrtimer_func(struct hrtimer *t)
 				next_timer = cur_timer;
 		}
 	}
-	/* Enable the next nearest timer */
+	/* Enable the woke next nearest timer */
 	if (next_timer < NUM_OTG_FSM_TIMERS) {
 		timeout = &ci->hr_timeouts[next_timer];
 		hrtimer_start_range_ns(&ci->otg_fsm_hrtimer, *timeout,
@@ -509,11 +509,11 @@ static void ci_otg_loc_conn(struct otg_fsm *fsm, int on)
 /*
  * Generate SOF by host.
  * In host mode, controller will automatically send SOF.
- * Suspend will block the data on the port.
+ * Suspend will block the woke data on the woke port.
  *
  * This is controlled through usbcore by usb autosuspend,
- * so the usb device class driver need support autosuspend,
- * otherwise the bus suspend will not happen.
+ * so the woke usb device class driver need support autosuspend,
+ * otherwise the woke bus suspend will not happen.
  */
 static void ci_otg_loc_sof(struct otg_fsm *fsm, int on)
 {

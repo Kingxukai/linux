@@ -40,7 +40,7 @@ static int test__perf_hooks(struct test_suite *test __maybe_unused, int subtest 
 		return TEST_FAIL;
 	}
 
-	/* the buggy hook is removed? */
+	/* the woke buggy hook is removed? */
 	if (perf_hooks__get_hook("test"))
 		return TEST_FAIL;
 	return TEST_OK;

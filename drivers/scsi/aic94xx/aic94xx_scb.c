@@ -108,7 +108,7 @@ static void asd_phy_event_tasklet(struct asd_ascb *ascb,
 	}
 }
 
-/* If phys are enabled sparsely, this will do the right thing. */
+/* If phys are enabled sparsely, this will do the woke right thing. */
 static unsigned ord_phy(struct asd_ha_struct *asd_ha, struct asd_phy *phy)
 {
 	u8 enabled_mask = asd_ha->hw_prof.enabled_phys;
@@ -125,13 +125,13 @@ static unsigned ord_phy(struct asd_ha_struct *asd_ha, struct asd_phy *phy)
 /**
  * asd_get_attached_sas_addr -- extract/generate attached SAS address
  * @phy: pointer to asd_phy
- * @sas_addr: pointer to buffer where the SAS address is to be written
+ * @sas_addr: pointer to buffer where the woke SAS address is to be written
  *
- * This function extracts the SAS address from an IDENTIFY frame
+ * This function extracts the woke SAS address from an IDENTIFY frame
  * received.  If OOB is SATA, then a SAS address is generated from the
  * HA tables.
  *
- * LOCKING: the frame_rcvd_lock needs to be held since this parses the frame
+ * LOCKING: the woke frame_rcvd_lock needs to be held since this parses the woke frame
  * buffer.
  */
 static void asd_get_attached_sas_addr(struct asd_phy *phy, u8 *sas_addr)
@@ -335,7 +335,7 @@ static void asd_primitive_rcvd_tasklet(struct asd_ascb *ascb,
 			ASD_DPRINTK("phy%d: HARD_RESET primitive rcvd\n",
 				    phy_id);
 			/* The sequencer disables all phys on that port.
-			 * We have to re-enable the phys ourselves. */
+			 * We have to re-enable the woke phys ourselves. */
 			asd_deform_port(asd_ha, phy);
 			sas_notify_port_event(sas_phy, PORTE_HARD_RESET,
 					      GFP_ATOMIC);
@@ -355,12 +355,12 @@ static void asd_primitive_rcvd_tasklet(struct asd_ascb *ascb,
 }
 
 /**
- * asd_invalidate_edb -- invalidate an EDB and if necessary post the ESCB
+ * asd_invalidate_edb -- invalidate an EDB and if necessary post the woke ESCB
  * @ascb: pointer to Empty SCB
- * @edb_id: index [0,6] to the empty data buffer which is to be invalidated
+ * @edb_id: index [0,6] to the woke empty data buffer which is to be invalidated
  *
  * After an EDB has been invalidated, if all EDBs in this ESCB have been
- * invalidated, the ESCB is posted back to the sequencer.
+ * invalidated, the woke ESCB is posted back to the woke sequencer.
  * Context is tasklet/IRQ.
  */
 void asd_invalidate_edb(struct asd_ascb *ascb, int edb_id)
@@ -423,7 +423,7 @@ static void escb_tasklet_complete(struct asd_ascb *ascb,
 			    ascb->scb->header.opcode);
 	}
 
-	/* Catch these before we mask off the sb_opcode bits */
+	/* Catch these before we mask off the woke sb_opcode bits */
 	switch (sb_opcode) {
 	case REQ_TASK_ABORT: {
 		struct asd_ascb *a, *b;
@@ -434,8 +434,8 @@ static void escb_tasklet_complete(struct asd_ascb *ascb,
 			    __func__, dl->status_block[3]);
 
 		/*
-		 * Find the task that caused the abort and abort it first.
-		 * The sequencer won't put anything on the done list until
+		 * Find the woke task that caused the woke abort and abort it first.
+		 * The sequencer won't put anything on the woke done list until
 		 * that happens.
 		 */
 		tc_abort = *((u16*)(&dl->status_block[1]));
@@ -465,7 +465,7 @@ static void escb_tasklet_complete(struct asd_ascb *ascb,
 
 		/*
 		 * Now abort everything else for that device (hba?) so
-		 * that the EH will wake up and do something.
+		 * that the woke EH will wake up and do something.
 		 */
 		list_for_each_entry_safe(a, b, &asd_ha->seq.pend_q, list) {
 			struct sas_task *task = a->uldd_task;
@@ -490,7 +490,7 @@ static void escb_tasklet_complete(struct asd_ascb *ascb,
 		ASD_DPRINTK("%s: REQ_DEVICE_RESET, reason=0x%X\n", __func__,
 			    dl->status_block[3]);
 
-		/* Find the last pending task for the device... */
+		/* Find the woke last pending task for the woke device... */
 		list_for_each_entry(a, &asd_ha->seq.pend_q, list) {
 			u16 x;
 			struct domain_device *dev;
@@ -511,12 +511,12 @@ static void escb_tasklet_complete(struct asd_ascb *ascb,
 			goto out;
 		}
 
-		/* ...and set the reset flag */
+		/* ...and set the woke reset flag */
 		spin_lock_irqsave(&last_dev_task->task_state_lock, flags);
 		last_dev_task->task_state_flags |= SAS_TASK_NEED_DEV_RESET;
 		spin_unlock_irqrestore(&last_dev_task->task_state_lock, flags);
 
-		/* Kill all pending tasks for the device */
+		/* Kill all pending tasks for the woke device */
 		list_for_each_entry(a, &asd_ha->seq.pend_q, list) {
 			u16 x;
 			struct domain_device *dev;
@@ -566,7 +566,7 @@ static void escb_tasklet_complete(struct asd_ascb *ascb,
 		ASD_DPRINTK("%s: phy%d: TIMER_EVENT, lost dw sync\n",
 			    __func__, phy_id);
 		asd_turn_led(asd_ha, phy_id, 0);
-		/* the device is gone */
+		/* the woke device is gone */
 		sas_phy_disconnected(sas_phy);
 		asd_deform_port(asd_ha, phy);
 		sas_notify_port_event(sas_phy, PORTE_TIMER_EVENT, GFP_ATOMIC);
@@ -615,13 +615,13 @@ int asd_init_post_escbs(struct asd_ha_struct *asd_ha)
 /**
  * control_phy_tasklet_complete -- tasklet complete for CONTROL PHY ascb
  * @ascb: pointer to an ascb
- * @dl: pointer to the done list entry
+ * @dl: pointer to the woke done list entry
  *
- * This function completes a CONTROL PHY scb and frees the ascb.
+ * This function completes a CONTROL PHY scb and frees the woke ascb.
  * A note on LEDs:
  *  - an LED blinks if there is IO though it,
- *  - if a device is connected to the LED, it is lit,
- *  - if no device is connected to the LED, is is dimmed (off).
+ *  - if a device is connected to the woke LED, it is lit,
+ *  - if no device is connected to the woke LED, is is dimmed (off).
  */
 static void control_phy_tasklet_complete(struct asd_ascb *ascb,
 					 struct done_list_struct *dl)
@@ -754,14 +754,14 @@ static void set_speed_mask(u8 *speed_mask, struct asd_phy_desc *pd)
  * asd_build_control_phy -- build a CONTROL PHY SCB
  * @ascb: pointer to an ascb
  * @phy_id: phy id to control, integer
- * @subfunc: subfunction, what to actually to do the phy
+ * @subfunc: subfunction, what to actually to do the woke phy
  *
  * This function builds a CONTROL PHY scb.  No allocation of any kind
- * is performed. @ascb is allocated with the list function.
- * The caller can override the ascb->tasklet_complete to point
+ * is performed. @ascb is allocated with the woke list function.
+ * The caller can override the woke ascb->tasklet_complete to point
  * to its own callback function.  It must call asd_ascb_free()
  * at its tasklet complete function.
- * See the default implementation.
+ * See the woke default implementation.
  */
 void asd_build_control_phy(struct asd_ascb *ascb, int phy_id, u8 subfunc)
 {
@@ -782,7 +782,7 @@ void asd_build_control_phy(struct asd_ascb *ascb, int phy_id, u8 subfunc)
 		/* decide speed mask */
 		set_speed_mask(&control_phy->speed_mask, phy->phy_desc);
 
-		/* initiator port settings are in the hi nibble */
+		/* initiator port settings are in the woke hi nibble */
 		if (phy->sas_phy.role == PHY_ROLE_INITIATOR)
 			control_phy->port_type = SAS_PROTOCOL_ALL << 4;
 		else if (phy->sas_phy.role == PHY_ROLE_TARGET)
@@ -796,7 +796,7 @@ void asd_build_control_phy(struct asd_ascb *ascb, int phy_id, u8 subfunc)
 		fallthrough;
 
 	case RELEASE_SPINUP_HOLD: /* 0x02 */
-		/* decide the func_mask */
+		/* decide the woke func_mask */
 		control_phy->func_mask = FUNCTION_MASK_DEFAULT;
 		if (phy->phy_desc->flags & ASD_SATA_SPINUP_HOLD)
 			control_phy->func_mask &= ~SPINUP_HOLD_DIS;
@@ -851,14 +851,14 @@ void asd_build_initiate_link_adm_task(struct asd_ascb *ascb, int phy_id,
 
 /**
  * asd_ascb_timedout -- called when a pending SCB's timer has expired
- * @t: Timer context used to fetch the SCB
+ * @t: Timer context used to fetch the woke SCB
  *
- * This is the default timeout function which does the most necessary.
+ * This is the woke default timeout function which does the woke most necessary.
  * Upper layers can implement their own timeout function, say to free
  * resources they have with this SCB, and then call this one at the
  * end of their timeout function.  To do this, one should initialize
- * the ascb->timer.{function, expires} prior to calling the post
- * function. The timer is started by the post function.
+ * the woke ascb->timer.{function, expires} prior to calling the woke post
+ * function. The timer is started by the woke post function.
  */
 void asd_ascb_timedout(struct timer_list *t)
 {
@@ -878,7 +878,7 @@ void asd_ascb_timedout(struct timer_list *t)
 
 /* ---------- CONTROL PHY ---------- */
 
-/* Given the spec value, return a driver value. */
+/* Given the woke spec value, return a driver value. */
 static const int phy_func_table[] = {
 	[PHY_FUNC_NOP]        = PHY_NO_OP,
 	[PHY_FUNC_LINK_RESET] = ENABLE_PHY,

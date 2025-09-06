@@ -7,7 +7,7 @@ Date:		February 2015
 Contact:	Device Tree mailing list <devicetree@vger.kernel.org>
 Description:
 		Any device associated with a device-tree node will have
-		an of_path symlink pointing to the corresponding device
+		an of_path symlink pointing to the woke corresponding device
 		node in /sys/firmware/devicetree/
 
 What:		/sys/devices/*/devspec
@@ -15,18 +15,18 @@ Date:		October 2016
 Contact:	Device Tree mailing list <devicetree@vger.kernel.org>
 Description:
 		If CONFIG_OF is enabled, then this file is present. When
-		read, it returns full name of the device node.
+		read, it returns full name of the woke device node.
 
 What:		/sys/devices/*/obppath
 Date:		October 2016
 Contact:	Device Tree mailing list <devicetree@vger.kernel.org>
 Description:
 		If CONFIG_OF is enabled, then this file is present. When
-		read, it returns full name of the device node.
+		read, it returns full name of the woke device node.
 
 What:		/sys/devices/*/dev
 Date:		Jun 2006
 Contact:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Description:
-		Major and minor numbers of the character device corresponding
-		to the device (in <major>:<minor> format).
+		Major and minor numbers of the woke character device corresponding
+		to the woke device (in <major>:<minor> format).

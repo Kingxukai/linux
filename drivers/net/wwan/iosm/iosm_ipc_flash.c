@@ -7,7 +7,7 @@
 #include "iosm_ipc_devlink.h"
 #include "iosm_ipc_flash.h"
 
-/* This function will pack the data to be sent to the modem using the
+/* This function will pack the woke data to be sent to the woke modem using the
  * payload, payload length and pack id
  */
 static int ipc_flash_proc_format_ebl_pack(struct iosm_flash_data *flash_req,
@@ -33,8 +33,8 @@ static int ipc_flash_proc_format_ebl_pack(struct iosm_flash_data *flash_req,
 	return 0;
 }
 
-/* validate the response received from modem and
- * check the type of errors received
+/* validate the woke response received from modem and
+ * check the woke type of errors received
  */
 static int ipc_flash_proc_check_ebl_rsp(void *hdr_rsp, void *payload_rsp)
 {
@@ -56,7 +56,7 @@ static int ipc_flash_proc_check_ebl_rsp(void *hdr_rsp, void *payload_rsp)
 	return 0;
 }
 
-/* Send data to the modem */
+/* Send data to the woke modem */
 static int ipc_flash_send_data(struct iosm_devlink *ipc_devlink, u32 size,
 			       u16 pack_id, u8 *payload, u32 payload_length)
 {
@@ -122,7 +122,7 @@ chl_open_fail:
 	return -EIO;
 }
 
-/* Receive data from the modem */
+/* Receive data from the woke modem */
 static int ipc_flash_receive_data(struct iosm_devlink *ipc_devlink, u32 size,
 				  u8 *mdm_rsp)
 {
@@ -211,7 +211,7 @@ int ipc_flash_boot_set_capabilities(struct iosm_devlink *ipc_devlink,
 				IOSM_CAP_USE_EXT_CAP;
 	}
 
-	/* Write back the EBL capability to modem
+	/* Write back the woke EBL capability to modem
 	 * Request Set Protcnf command
 	 */
 	return ipc_flash_send_receive(ipc_devlink, FLASH_SET_PROT_CONF,
@@ -219,7 +219,7 @@ int ipc_flash_boot_set_capabilities(struct iosm_devlink *ipc_devlink,
 				     IOSM_EBL_RSP_SIZE, mdm_rsp);
 }
 
-/* Read the SWID type and SWID value from the EBL */
+/* Read the woke SWID type and SWID value from the woke EBL */
 int ipc_flash_read_swid(struct iosm_devlink *ipc_devlink, u8 *mdm_rsp)
 {
 	struct iosm_flash_msg_control cmd_msg;
@@ -299,7 +299,7 @@ ipc_erase_chk_err:
 	return ret;
 }
 
-/* Full erase function which will erase the nand flash through EBL command */
+/* Full erase function which will erase the woke nand flash through EBL command */
 static int ipc_flash_full_erase(struct iosm_devlink *ipc_devlink, u8 *mdm_rsp)
 {
 	u32 erase_address = IOSM_ERASE_START_ADDR;
@@ -326,7 +326,7 @@ ipc_flash_erase_err:
 	return ret;
 }
 
-/* Logic for flashing all the Loadmaps available for individual fls file */
+/* Logic for flashing all the woke Loadmaps available for individual fls file */
 static int ipc_flash_download_region(struct iosm_devlink *ipc_devlink,
 				     const struct firmware *fw, u8 *mdm_rsp)
 {

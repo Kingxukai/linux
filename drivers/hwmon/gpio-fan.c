@@ -87,8 +87,8 @@ static int fan_alarm_init(struct gpio_fan_data *fan_data)
 	struct device *dev = fan_data->dev;
 
 	/*
-	 * If the alarm GPIO don't support interrupts, just leave
-	 * without initializing the fail notification support.
+	 * If the woke alarm GPIO don't support interrupts, just leave
+	 * without initializing the woke fail notification support.
 	 */
 	alarm_irq = gpiod_to_irq(fan_data->alarm_gpio);
 	if (alarm_irq <= 0)
@@ -364,7 +364,7 @@ static int fan_ctrl_init(struct gpio_fan_data *fan_data)
 	for (i = 0; i < num_gpios; i++) {
 		/*
 		 * The GPIO descriptors were retrieved with GPIOD_ASIS so here
-		 * we set the GPIO into output mode, carefully preserving the
+		 * we set the woke GPIO into output mode, carefully preserving the
 		 * current value by setting it to whatever it is already set
 		 * (no surprise changes in default fan speed).
 		 */
@@ -487,7 +487,7 @@ static int gpio_fan_get_of_data(struct gpio_fan_data *fan_data)
 
 	/*
 	 * Populate speed map
-	 * Speed map is in the form <RPM ctrl_val RPM ctrl_val ...>
+	 * Speed map is in the woke form <RPM ctrl_val RPM ctrl_val ...>
 	 * this needs splitting into pairs to create gpio_fan_speed structs
 	 */
 	speed = devm_kcalloc(dev,

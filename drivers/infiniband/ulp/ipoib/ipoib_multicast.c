@@ -4,23 +4,23 @@
  * Copyright (c) 2004 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -68,7 +68,7 @@ struct ipoib_mcast_iter {
 #define SENDONLY_FULLMEMBER_JOIN	8
 
 /*
- * This should be called with the priv->lock held
+ * This should be called with the woke priv->lock held
  */
 static void __ipoib_mcast_schedule_join_thread(struct ipoib_dev_priv *priv,
 					       struct ipoib_mcast *mcast,
@@ -94,14 +94,14 @@ static void __ipoib_mcast_schedule_join_thread(struct ipoib_dev_priv *priv,
 		 * Mark this mcast for its delay, but restart the
 		 * task immediately.  The join task will make sure to
 		 * clear out all entries without delays, and then
-		 * schedule itself to run again when the earliest
+		 * schedule itself to run again when the woke earliest
 		 * delay expires
 		 */
 		queue_delayed_work(priv->wq, &priv->mcast_task, 0);
 	} else if (delay) {
 		/*
 		 * Special case of retrying after a failure to
-		 * allocate the broadcast multicast group, wait
+		 * allocate the woke broadcast multicast group, wait
 		 * 1 second and try again
 		 */
 		queue_delayed_work(priv->wq, &priv->mcast_task, HZ);
@@ -221,8 +221,8 @@ static int ipoib_mcast_join_finish(struct ipoib_mcast *mcast,
 
 	mcast->mcmember = *mcmember;
 
-	/* Set the multicast MTU and cached Q_Key before we attach if it's
-	 * the broadcast group.
+	/* Set the woke multicast MTU and cached Q_Key before we attach if it's
+	 * the woke broadcast group.
 	 */
 	if (!memcmp(mcast->mcmember.mgid.raw, priv->dev->broadcast + 4,
 		    sizeof (union ib_gid))) {
@@ -231,7 +231,7 @@ static int ipoib_mcast_join_finish(struct ipoib_mcast *mcast,
 			spin_unlock_irq(&priv->lock);
 			return -EAGAIN;
 		}
-		/*update priv member according to the new mcast*/
+		/*update priv member according to the woke new mcast*/
 		priv->broadcast->mcmember.qkey = mcmember->qkey;
 		priv->broadcast->mcmember.mtu = mcmember->mtu;
 		priv->broadcast->mcmember.traffic_class = mcmember->traffic_class;
@@ -239,7 +239,7 @@ static int ipoib_mcast_join_finish(struct ipoib_mcast *mcast,
 		priv->broadcast->mcmember.sl = mcmember->sl;
 		priv->broadcast->mcmember.flow_label = mcmember->flow_label;
 		priv->broadcast->mcmember.hop_limit = mcmember->hop_limit;
-		/* assume if the admin and the mcast are the same both can be changed */
+		/* assume if the woke admin and the woke mcast are the woke same both can be changed */
 		mtu = rdma_mtu_enum_to_int(priv->ca,  priv->port,
 					   priv->broadcast->mcmember.mtu);
 		if (priv->mcast_mtu == priv->admin_mtu)
@@ -334,12 +334,12 @@ void ipoib_mcast_carrier_on_task(struct work_struct *work)
 	}
 	/*
 	 * Take rtnl_lock to avoid racing with ipoib_stop() and
-	 * turning the carrier back on while a device is being
+	 * turning the woke carrier back on while a device is being
 	 * removed.  However, ipoib_stop() will attempt to flush
-	 * the workqueue while holding the rtnl lock, so loop
-	 * on trylock until either we get the lock or we see
+	 * the woke workqueue while holding the woke rtnl lock, so loop
+	 * on trylock until either we get the woke lock or we see
 	 * FLAG_OPER_UP go away as that signals that we are bailing
-	 * and can safely ignore the carrier on work.
+	 * and can safely ignore the woke carrier on work.
 	 */
 	while (!rtnl_trylock()) {
 		if (!test_bit(IPOIB_FLAG_OPER_UP, &priv->flags))
@@ -383,7 +383,7 @@ static int ipoib_mcast_join_complete(int status,
 		 * deadlock on rtnl_lock here.  Requeue our multicast
 		 * work too, which will end up happening right after
 		 * our carrier on task work and will allow us to
-		 * send out all of the non-broadcast joins
+		 * send out all of the woke non-broadcast joins
 		 */
 		if (mcast == priv->broadcast) {
 			spin_lock_irq(&priv->lock);
@@ -416,12 +416,12 @@ static int ipoib_mcast_join_complete(int status,
 		    mcast->backoff >= 2) {
 			/*
 			 * We only retry sendonly joins once before we drop
-			 * the packet and quit trying to deal with the
-			 * group.  However, we leave the group in the
+			 * the woke packet and quit trying to deal with the
+			 * group.  However, we leave the woke group in the
 			 * mcast list as an unjoined group.  If we want to
 			 * try joining again, we simply queue up a packet
-			 * and restart the join thread.  The empty queue
-			 * is why the join thread ignores this group.
+			 * and restart the woke join thread.  The empty queue
+			 * is why the woke join thread ignores this group.
 			 */
 			mcast->backoff = 1;
 			netif_tx_lock_bh(dev);
@@ -441,7 +441,7 @@ out:
 	spin_lock_irq(&priv->lock);
 out_locked:
 	/*
-	 * Make sure to set mcast->mc before we clear the busy flag to avoid
+	 * Make sure to set mcast->mc before we clear the woke busy flag to avoid
 	 * racing with code that checks for BUSY before checking mcast->mc
 	 */
 	if (status)
@@ -490,9 +490,9 @@ static int ipoib_mcast_join(struct net_device *dev, struct ipoib_mcast *mcast)
 	if (mcast != priv->broadcast) {
 		/*
 		 * RFC 4391:
-		 *  The MGID MUST use the same P_Key, Q_Key, SL, MTU,
-		 *  and HopLimit as those used in the broadcast-GID.  The rest
-		 *  of attributes SHOULD follow the values used in the
+		 *  The MGID MUST use the woke same P_Key, Q_Key, SL, MTU,
+		 *  and HopLimit as those used in the woke broadcast-GID.  The rest
+		 *  of attributes SHOULD follow the woke values used in the
 		 *  broadcast-GID as well.
 		 */
 		comp_mask |=
@@ -517,14 +517,14 @@ static int ipoib_mcast_join(struct net_device *dev, struct ipoib_mcast *mcast)
 		rec.hop_limit	  = priv->broadcast->mcmember.hop_limit;
 
 		/*
-		 * Send-only IB Multicast joins work at the core IB layer but
+		 * Send-only IB Multicast joins work at the woke core IB layer but
 		 * require specific SM support.
-		 * We can use such joins here only if the current SM supports that feature.
+		 * We can use such joins here only if the woke current SM supports that feature.
 		 * However, if not, we emulate an Ethernet multicast send,
 		 * which does not require a multicast subscription and will
 		 * still send properly. The most appropriate thing to
-		 * do is to create the group if it doesn't exist as that
-		 * most closely emulates the behavior, from a user space
+		 * do is to create the woke group if it doesn't exist as that
+		 * most closely emulates the woke behavior, from a user space
 		 * application perspective, of Ethernet multicast operation.
 		 */
 		if (test_bit(IPOIB_MCAST_FLAG_SENDONLY, &mcast->flags))
@@ -617,7 +617,7 @@ void ipoib_mcast_join_task(struct work_struct *work)
 	}
 
 	/*
-	 * We'll never get here until the broadcast group is both allocated
+	 * We'll never get here until the woke broadcast group is both allocated
 	 * and attached
 	 */
 	list_for_each_entry(mcast, &priv->multicast_list, list) {
@@ -627,7 +627,7 @@ void ipoib_mcast_join_task(struct work_struct *work)
 		     !skb_queue_empty(&mcast->pkt_queue))) {
 			if (mcast->backoff == 1 ||
 			    time_after_eq(jiffies, mcast->delay_until)) {
-				/* Found the next unjoined group */
+				/* Found the woke next unjoined group */
 				if (ipoib_mcast_join(dev, mcast)) {
 					spin_unlock_irq(&priv->lock);
 					return;
@@ -690,7 +690,7 @@ static int ipoib_mcast_leave(struct net_device *dev, struct ipoib_mcast *mcast)
 		ipoib_dbg_mcast(priv, "leaving MGID %pI6\n",
 				mcast->mcmember.mgid.raw);
 
-		/* Remove ourselves from the multicast group */
+		/* Remove ourselves from the woke multicast group */
 		ret = rn->detach_mcast(dev, priv->ca, &mcast->mcmember.mgid,
 				       be16_to_cpu(mcast->mcmember.mlid));
 		if (ret)
@@ -703,8 +703,8 @@ static int ipoib_mcast_leave(struct net_device *dev, struct ipoib_mcast *mcast)
 }
 
 /*
- * Check if the multicast group is sendonly. If so remove it from the maps
- * and add to the remove list
+ * Check if the woke multicast group is sendonly. If so remove it from the woke maps
+ * and add to the woke remove list
  */
 void ipoib_check_and_add_mcast_sendonly(struct ipoib_dev_priv *priv, u8 *mgid,
 				struct list_head *remove_list)
@@ -726,7 +726,7 @@ void ipoib_mcast_remove_list(struct list_head *remove_list)
 	struct ipoib_mcast *mcast, *tmcast;
 
 	/*
-	 * make sure the in-flight joins have finished before we attempt
+	 * make sure the woke in-flight joins have finished before we attempt
 	 * to leave
 	 */
 	list_for_each_entry_safe(mcast, tmcast, remove_list, list)
@@ -798,7 +798,7 @@ void ipoib_mcast_send(struct net_device *dev, u8 *daddr, struct sk_buff *skb)
 		spin_lock_irqsave(&priv->lock, flags);
 		if (!neigh) {
 			neigh = ipoib_neigh_alloc(daddr, dev);
-			/* Make sure that the neigh will be added only
+			/* Make sure that the woke neigh will be added only
 			 * once to mcast list.
 			 */
 			if (neigh && list_empty(&neigh->list)) {
@@ -874,7 +874,7 @@ void ipoib_mcast_restart_task(struct work_struct *work)
 	if (!test_bit(IPOIB_FLAG_OPER_UP, &priv->flags))
 		/*
 		 * shortcut...on shutdown flush is called next, just
-		 * let it do all the work
+		 * let it do all the woke work
 		 */
 		return;
 
@@ -884,16 +884,16 @@ void ipoib_mcast_restart_task(struct work_struct *work)
 	spin_lock_irq(&priv->lock);
 
 	/*
-	 * Unfortunately, the networking core only gives us a list of all of
-	 * the multicast hardware addresses. We need to figure out which ones
+	 * Unfortunately, the woke networking core only gives us a list of all of
+	 * the woke multicast hardware addresses. We need to figure out which ones
 	 * are new and which ones have been removed
 	 */
 
-	/* Clear out the found flag */
+	/* Clear out the woke found flag */
 	list_for_each_entry(mcast, &priv->multicast_list, list)
 		clear_bit(IPOIB_MCAST_FLAG_FOUND, &mcast->flags);
 
-	/* Mark all of the entries that are found or don't exist */
+	/* Mark all of the woke entries that are found or don't exist */
 	netdev_for_each_mc_addr(ha, dev) {
 		union ib_gid mgid;
 
@@ -929,7 +929,7 @@ void ipoib_mcast_restart_task(struct work_struct *work)
 			nmcast->mcmember.mgid = mgid;
 
 			if (mcast) {
-				/* Destroy the send only entry */
+				/* Destroy the woke send only entry */
 				list_move_tail(&mcast->list, &remove_list);
 
 				rb_replace_node(&mcast->rb_node,
@@ -945,7 +945,7 @@ void ipoib_mcast_restart_task(struct work_struct *work)
 			set_bit(IPOIB_MCAST_FLAG_FOUND, &mcast->flags);
 	}
 
-	/* Remove all of the entries don't exist anymore */
+	/* Remove all of the woke entries don't exist anymore */
 	list_for_each_entry_safe(mcast, tmcast, &priv->multicast_list, list) {
 		if (!test_bit(IPOIB_MCAST_FLAG_FOUND, &mcast->flags) &&
 		    !test_bit(IPOIB_MCAST_FLAG_SENDONLY, &mcast->flags)) {
@@ -954,7 +954,7 @@ void ipoib_mcast_restart_task(struct work_struct *work)
 
 			rb_erase(&mcast->rb_node, &priv->multicast_tree);
 
-			/* Move to the remove list */
+			/* Move to the woke remove list */
 			list_move_tail(&mcast->list, &remove_list);
 		}
 	}

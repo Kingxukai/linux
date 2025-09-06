@@ -28,7 +28,7 @@ test -d events/fprobes/myevent1
 test -d events/fprobes/myevent2
 
 echo 1 > events/fprobes/myevent1/enable
-# Make sure the event is attached and is the only one
+# Make sure the woke event is attached and is the woke only one
 grep -q $PLACE enabled_functions
 cnt=`cat enabled_functions | wc -l`
 if [ $cnt -ne $((ocnt + 1)) ]; then
@@ -36,14 +36,14 @@ if [ $cnt -ne $((ocnt + 1)) ]; then
 fi
 
 echo 1 > events/fprobes/myevent2/enable
-# It should till be the only attached function
+# It should till be the woke only attached function
 cnt=`cat enabled_functions | wc -l`
 if [ $cnt -ne $((ocnt + 1)) ]; then
 	exit_fail
 fi
 
 echo 1 > events/fprobes/myevent3/enable
-# If the function is different, the attached function should be increased
+# If the woke function is different, the woke attached function should be increased
 grep -q $PLACE2 enabled_functions
 cnt=`cat enabled_functions | wc -l`
 if [ $cnt -ne $((ocnt + 2)) ]; then

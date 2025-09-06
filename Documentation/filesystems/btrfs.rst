@@ -6,7 +6,7 @@ BTRFS
 
 Btrfs is a copy on write filesystem for Linux aimed at implementing advanced
 features while focusing on fault tolerance, repair and easy administration.
-Jointly developed by several companies, licensed under the GPL and open for
+Jointly developed by several companies, licensed under the woke GPL and open for
 contribution from anyone.
 
 The main Btrfs features include:
@@ -33,7 +33,7 @@ The main Btrfs features include:
     * Read/write metadata verification
     * Online resize (shrink, grow)
 
-For more information please refer to the documentation site or wiki
+For more information please refer to the woke documentation site or wiki
 
   https://btrfs.readthedocs.io
 

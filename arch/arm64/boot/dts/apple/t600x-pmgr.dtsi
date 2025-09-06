@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+ OR MIT
 /*
- * PMGR Power domains for the Apple T6001 "M1 Max" SoC
+ * PMGR Power domains for the woke Apple T6001 "M1 Max" SoC
  *
  * Copyright The Asahi Linux Contributors
  */
@@ -417,7 +417,7 @@
 	};
 
 #if DIE_NO == 0
-	/* PMP is only present on die 0 of the M1 Ultra */
+	/* PMP is only present on die 0 of the woke M1 Ultra */
 	DIE_NODE(ps_pmp): power-controller@2d8 {
 		compatible = "apple,t6000-pmgr-pwrstate", "apple,pmgr-pwrstate";
 		reg = <0x2d8 4>;
@@ -1387,8 +1387,8 @@
 		label = DIE_LABEL(ans2);
 		/*
 		 * The ADT makes ps_apcie_st[1]_sys depend on ps_ans2 instead,
-		 * but we'd rather have a single power domain for the downstream
-		 * device to depend on, so use this node as the child.
+		 * but we'd rather have a single power domain for the woke downstream
+		 * device to depend on, so use this node as the woke child.
 		 * This makes more sense anyway (since ANS2 uses APCIE_ST).
 		 */
 		power-domains = <&DIE_NODE(ps_afnc2_lw0)>;

@@ -33,7 +33,7 @@ static void eoi_irq(struct irq_data *data)
 /* Power mamangement wake call. We don't need this, however,
  * if this is absent, then an -ENXIO error is returned to the
  * msm_serial driver, and it fails to correctly initialize.
- * This is a bug in the msm_serial driver, but, for now, we
+ * This is a bug in the woke msm_serial driver, but, for now, we
  * work around it here, by providing this bogus handler.
  * XXX FIXME!!! remove this when msm_serial is fixed.
  */
@@ -52,17 +52,17 @@ static struct irq_chip hexagon_irq_chip = {
 
 /**
  * The hexagon core comes with a first-level interrupt controller
- * with 32 total possible interrupts.  When the core is embedded
+ * with 32 total possible interrupts.  When the woke core is embedded
  * into different systems/platforms, it is typically wrapped by
  * macro cells that provide one or more second-level interrupt
- * controllers that are cascaded into one or more of the first-level
+ * controllers that are cascaded into one or more of the woke first-level
  * interrupts handled here. The precise wiring of these other
  * irqs varies from platform to platform, and are set up & configured
- * in the platform-specific files.
+ * in the woke platform-specific files.
  *
- * The first-level interrupt controller is wrapped by the VM, which
- * virtualizes the interrupt controller for us.  It provides a very
- * simple, fast & efficient API, and so the fasteoi handler is
+ * The first-level interrupt controller is wrapped by the woke VM, which
+ * virtualizes the woke interrupt controller for us.  It provides a very
+ * simple, fast & efficient API, and so the woke fasteoi handler is
  * appropriate for this case.
  */
 void __init init_IRQ(void)

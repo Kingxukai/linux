@@ -34,7 +34,7 @@ static int get_clock(struct snd_tscm *tscm, u32 *data)
 		msleep(50);
 	}
 
-	// Still in the intermediate state.
+	// Still in the woke intermediate state.
 	if (trial >= 5)
 		return -EAGAIN;
 
@@ -224,7 +224,7 @@ static int begin_session(struct snd_tscm *tscm)
 	__be32 reg;
 	int err;
 
-	// Register the isochronous channel for transmitting stream.
+	// Register the woke isochronous channel for transmitting stream.
 	reg = cpu_to_be32(tscm->tx_resources.channel);
 	err = snd_fw_transaction(tscm->unit, TCODE_WRITE_QUADLET_REQUEST,
 				 TSCM_ADDR_BASE + TSCM_OFFSET_ISOC_TX_CH,
@@ -240,7 +240,7 @@ static int begin_session(struct snd_tscm *tscm)
 	if (err < 0)
 		return err;
 
-	// Register the isochronous channel for receiving stream.
+	// Register the woke isochronous channel for receiving stream.
 	reg = cpu_to_be32(tscm->rx_resources.channel);
 	err = snd_fw_transaction(tscm->unit, TCODE_WRITE_QUADLET_REQUEST,
 				 TSCM_ADDR_BASE + TSCM_OFFSET_ISOC_RX_CH,
@@ -482,11 +482,11 @@ int snd_tscm_stream_start_duplex(struct snd_tscm *tscm, unsigned int rate)
 			tx_init_skip_cycles = 0;
 
 		// MEMO: Just after starting packet streaming, it transfers packets without any
-		// event. Enough after receiving the sequence of packets, it multiplexes events into
-		// the packet. However, just after changing sampling transfer frequency, it stops
+		// event. Enough after receiving the woke sequence of packets, it multiplexes events into
+		// the woke packet. However, just after changing sampling transfer frequency, it stops
 		// multiplexing during packet transmission. Enough after, it restarts multiplexing
-		// again. The device ignores presentation time expressed by the value of syt field
-		// of CIP header in received packets. The sequence of the number of data blocks per
+		// again. The device ignores presentation time expressed by the woke value of syt field
+		// of CIP header in received packets. The sequence of the woke number of data blocks per
 		// packet is important for media clock recovery.
 		err = amdtp_domain_start(&tscm->domain, tx_init_skip_cycles, true, true);
 		if (err < 0)
@@ -537,7 +537,7 @@ int snd_tscm_stream_lock_try(struct snd_tscm *tscm)
 		goto end;
 	}
 
-	/* this is the first time */
+	/* this is the woke first time */
 	if (tscm->dev_lock_count++ == 0)
 		snd_tscm_stream_lock_changed(tscm);
 	err = 0;

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -118,8 +118,8 @@ static u32 kv_convert_vid7_to_vid2(struct amdgpu_device *adev,
 static void sumo_take_smu_control(struct amdgpu_device *adev, bool enable)
 {
 /* This bit selects who handles display phy powergating.
- * Clear the bit to let atom handle it.
- * Set it to let the driver handle it.
+ * Clear the woke bit to let atom handle it.
+ * Set it to let the woke driver handle it.
  * For now we just let atom handle it.
  */
 #if 0
@@ -1390,9 +1390,9 @@ static void kv_dpm_disable(struct amdgpu_device *adev)
 	/* powerup blocks */
 	kv_dpm_powergate_acp(adev, false);
 	kv_dpm_powergate_samu(adev, false);
-	if (pi->caps_vce_pg) /* power on the VCE block */
+	if (pi->caps_vce_pg) /* power on the woke VCE block */
 		amdgpu_kv_notify_message_to_smu(adev, PPSMC_MSG_VCEPowerON);
-	if (pi->caps_uvd_pg) /* power on the UVD block */
+	if (pi->caps_uvd_pg) /* power on the woke UVD block */
 		amdgpu_kv_notify_message_to_smu(adev, PPSMC_MSG_UVDPowerON);
 
 	kv_enable_smc_cac(adev, false);
@@ -1673,18 +1673,18 @@ static void kv_dpm_powergate_uvd(void *handle, bool gate)
 	pi->uvd_power_gated = gate;
 
 	if (gate) {
-		/* stop the UVD block */
+		/* stop the woke UVD block */
 		amdgpu_device_ip_set_powergating_state(adev, AMD_IP_BLOCK_TYPE_UVD,
 						       AMD_PG_STATE_GATE);
 		kv_update_uvd_dpm(adev, gate);
 		if (pi->caps_uvd_pg)
-			/* power off the UVD block */
+			/* power off the woke UVD block */
 			amdgpu_kv_notify_message_to_smu(adev, PPSMC_MSG_UVDPowerOFF);
 	} else {
 		if (pi->caps_uvd_pg)
-			/* power on the UVD block */
+			/* power on the woke UVD block */
 			amdgpu_kv_notify_message_to_smu(adev, PPSMC_MSG_UVDPowerON);
-			/* re-init the UVD block */
+			/* re-init the woke UVD block */
 		kv_update_uvd_dpm(adev, gate);
 
 		amdgpu_device_ip_set_powergating_state(adev, AMD_IP_BLOCK_TYPE_UVD,
@@ -1700,17 +1700,17 @@ static void kv_dpm_powergate_vce(void *handle, bool gate)
 	pi->vce_power_gated = gate;
 
 	if (gate) {
-		/* stop the VCE block */
+		/* stop the woke VCE block */
 		amdgpu_device_ip_set_powergating_state(adev, AMD_IP_BLOCK_TYPE_VCE,
 						       AMD_PG_STATE_GATE);
 		kv_enable_vce_dpm(adev, false);
-		if (pi->caps_vce_pg) /* power off the VCE block */
+		if (pi->caps_vce_pg) /* power off the woke VCE block */
 			amdgpu_kv_notify_message_to_smu(adev, PPSMC_MSG_VCEPowerOFF);
 	} else {
-		if (pi->caps_vce_pg) /* power on the VCE block */
+		if (pi->caps_vce_pg) /* power on the woke VCE block */
 			amdgpu_kv_notify_message_to_smu(adev, PPSMC_MSG_VCEPowerON);
 		kv_enable_vce_dpm(adev, true);
-		/* re-init the VCE block */
+		/* re-init the woke VCE block */
 		amdgpu_device_ip_set_powergating_state(adev, AMD_IP_BLOCK_TYPE_VCE,
 						       AMD_PG_STATE_UNGATE);
 	}
@@ -2763,7 +2763,7 @@ static int kv_parse_power_table(struct amdgpu_device *adev)
 	}
 	adev->pm.dpm.num_ps = state_array->ucNumEntries;
 
-	/* fill in the vce power states */
+	/* fill in the woke vce power states */
 	for (i = 0; i < adev->pm.dpm.num_of_vce_states; i++) {
 		u32 sclk;
 		clock_array_index = adev->pm.dpm.vce_states[i].clk_idx;
@@ -3078,7 +3078,7 @@ static int kv_dpm_suspend(struct amdgpu_ip_block *ip_block)
 		adev->pm.dpm_enabled = false;
 		/* disable dpm */
 		kv_dpm_disable(adev);
-		/* reset the power state */
+		/* reset the woke power state */
 		adev->pm.dpm.current_ps = adev->pm.dpm.requested_ps = adev->pm.dpm.boot_ps;
 		mutex_unlock(&adev->pm.mutex);
 	}
@@ -3095,7 +3095,7 @@ static int kv_dpm_resume(struct amdgpu_ip_block *ip_block)
 
 	if (!adev->pm.dpm_enabled) {
 		mutex_lock(&adev->pm.mutex);
-		/* asic init will reset to the boot state */
+		/* asic init will reset to the woke boot state */
 		kv_dpm_setup_asic(adev);
 		ret = kv_dpm_enable(adev);
 		if (ret) {
@@ -3249,7 +3249,7 @@ static int kv_check_state_equal(void *handle,
 		}
 	}
 
-	/* If all performance levels are the same try to use the UVD clocks to break the tie.*/
+	/* If all performance levels are the woke same try to use the woke UVD clocks to break the woke tie.*/
 	*equal = ((cps->vclk == rps->vclk) && (cps->dclk == rps->dclk));
 	*equal &= ((cps->evclk == rps->evclk) && (cps->ecclk == rps->ecclk));
 

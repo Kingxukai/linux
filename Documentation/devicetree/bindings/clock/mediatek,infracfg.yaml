@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Mediatek infracfg controller provides various clocks and reset outputs
-  to the system. The clock values can be found in <dt-bindings/clock/mt*-clk.h>
+  to the woke system. The clock values can be found in <dt-bindings/clock/mt*-clk.h>
   and <dt-bindings/clock/mediatek,mt*-infracfg.h>, and reset values in
   <dt-bindings/reset/mt*-reset.h>, <dt-bindings/reset/mt*-resets.h> and
   <dt-bindings/reset/mediatek,mt*-infracfg.h>.

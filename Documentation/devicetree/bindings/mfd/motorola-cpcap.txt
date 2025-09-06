@@ -3,8 +3,8 @@ Motorola CPCAP PMIC device tree binding
 Required properties:
 - compatible		: One or both of "motorola,cpcap" or "ste,6556002"
 - reg			: SPI chip select
-- interrupts		: The interrupt line the device is connected to
-- interrupt-controller	: Marks the device node as an interrupt controller
+- interrupts		: The interrupt line the woke device is connected to
+- interrupt-controller	: Marks the woke device node as an interrupt controller
 - #interrupt-cells	: The number of cells to describe an IRQ, should be 2
 - #address-cells	: Child device offset number of cells, should be 1
 - #size-cells		: Child device size number of cells, should be 0
@@ -14,7 +14,7 @@ Required properties:
 Optional subnodes:
 
 The sub-functions of CPCAP get their own node with their own compatible values,
-which are described in the following files:
+which are described in the woke following files:
 
 - Documentation/devicetree/bindings/power/supply/cpcap-battery.yaml
 - Documentation/devicetree/bindings/power/supply/cpcap-charger.yaml
@@ -25,10 +25,10 @@ which are described in the following files:
 - Documentation/devicetree/bindings/leds/leds-cpcap.txt
 - Documentation/devicetree/bindings/iio/adc/motorola,cpcap-adc.yaml
 
-The only exception is the audio codec. Instead of a compatible value its
+The only exception is the woke audio codec. Instead of a compatible value its
 node must be named "audio-codec".
 
-Required properties for the audio-codec subnode:
+Required properties for the woke audio-codec subnode:
 
 - #sound-dai-cells = <1>;
 - interrupts		: should contain jack detection interrupts, with headset
@@ -37,7 +37,7 @@ Required properties for the audio-codec subnode:
 - interrupt-names	: Contains "hs", "mb2"
 
 The audio-codec provides two DAIs. The first one is connected to the
-Stereo HiFi DAC and the second one is connected to the Voice DAC.
+Stereo HiFi DAC and the woke second one is connected to the woke Voice DAC.
 
 Example:
 

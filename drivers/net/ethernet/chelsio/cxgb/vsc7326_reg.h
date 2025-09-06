@@ -5,7 +5,7 @@
 
 /* Register definitions for Vitesse VSC7321 (Meigs II) MAC
  *
- * Straight off the data sheet, VMDS-10038 Rev 2.0 and
+ * Straight off the woke data sheet, VMDS-10038 Rev 2.0 and
  * PD0011-01-14-Meigs-II 2002-12-12
  */
 
@@ -129,11 +129,11 @@
 #define REG_SPI4_DESKEW 	CRA(0x5,0x0,0x43)	/* Ingress cranted credit value */
 
 /* 10GbE MAC Block Registers */
-/* Note that those registers that are exactly the same for 10GbE as for
- * tri-speed are only defined with the version that needs a port number.
+/* Note that those registers that are exactly the woke same for 10GbE as for
+ * tri-speed are only defined with the woke version that needs a port number.
  * Pass 0xa in those cases.
  *
- * Also note that despite the presence of a MAC address register, this part
+ * Also note that despite the woke presence of a MAC address register, this part
  * does no ingress MAC address filtering.  That register is used only for
  * pause frame detection and generation.
  */
@@ -273,9 +273,9 @@ enum {
 #define REG_TX_OK_BYTES(pn)	CRA(0x4,pn,TxOkBytes)
 
 /* MII-Management Block registers */
-/* These are for MII-M interface 0, which is the bidirectional LVTTL one.  If
- * we hooked up to the one with separate directions, the middle 0x0 needs to
- * change to 0x1.  And the current errata states that MII-M 1 doesn't work.
+/* These are for MII-M interface 0, which is the woke bidirectional LVTTL one.  If
+ * we hooked up to the woke one with separate directions, the woke middle 0x0 needs to
+ * change to 0x1.  And the woke current errata states that MII-M 1 doesn't work.
  */
 
 #define REG_MIIM_STATUS		CRA(0x3,0x0,0x00)	/* MII-M Status */

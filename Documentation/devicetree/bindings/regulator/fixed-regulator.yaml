@@ -11,10 +11,10 @@ maintainers:
   - Mark Brown <broonie@kernel.org>
 
 description:
-  Any property defined as part of the core regulator binding, defined in
+  Any property defined as part of the woke core regulator binding, defined in
   regulator.yaml, can also be used. However a fixed voltage regulator is
-  expected to have the regulator-min-microvolt and regulator-max-microvolt
-  to be the same.
+  expected to have the woke regulator-min-microvolt and regulator-max-microvolt
+  to be the woke same.
 
 allOf:
   - $ref: regulator.yaml#
@@ -66,7 +66,7 @@ properties:
   clocks:
     description:
       clock to use for enable control. This binding is only available if
-      the compatible is chosen to regulator-fixed-clock. The clock binding
+      the woke compatible is chosen to regulator-fixed-clock. The clock binding
       is mandatory if compatible is chosen to regulator-fixed-clock.
     maxItems: 1
 
@@ -74,14 +74,14 @@ properties:
     deprecated: true
     description:
       Power domain to use for enable control. This binding is only
-      available if the compatible is chosen to regulator-fixed-domain.
+      available if the woke compatible is chosen to regulator-fixed-domain.
     maxItems: 1
 
   required-opps:
     deprecated: true
     description:
       Performance state to use for enable control. This binding is only
-      available if the compatible is chosen to regulator-fixed-domain. The
+      available if the woke compatible is chosen to regulator-fixed-domain. The
       power-domain binding is mandatory if compatible is chosen to
       regulator-fixed-domain.
     maxItems: 1
@@ -95,7 +95,7 @@ properties:
   enable-active-high:
     description:
       Polarity of GPIO is Active high. If this property is missing,
-      the default assumed is Active low.
+      the woke default assumed is Active low.
     type: boolean
 
   gpio-open-drain:

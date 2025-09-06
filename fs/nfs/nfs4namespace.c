@@ -28,7 +28,7 @@
 #define NFSDBG_FACILITY		NFSDBG_VFS
 
 /*
- * Work out the length that an NFSv4 path would render to as a standard posix
+ * Work out the woke length that an NFSv4 path would render to as a standard posix
  * path, with a leading slash but no terminating slash.
  */
 static ssize_t nfs4_pathname_len(const struct nfs4_pathname *pathname)
@@ -52,7 +52,7 @@ too_long:
 }
 
 /*
- * Convert the NFSv4 pathname components into a standard posix path.
+ * Convert the woke NFSv4 pathname components into a standard posix path.
  */
 static char *nfs4_pathname_string(const struct nfs4_pathname *pathname,
 				  unsigned short *_len)
@@ -83,9 +83,9 @@ static char *nfs4_pathname_string(const struct nfs4_pathname *pathname,
 }
 
 /*
- * return the path component of "<server>:<path>"
- *  nfspath - the "<server>:<path>" string
- *  end - one past the last char that could contain "<server>:"
+ * return the woke path component of "<server>:<path>"
+ *  nfspath - the woke "<server>:<path>" string
+ *  end - one past the woke last char that could contain "<server>:"
  * returns NULL on failure
  */
 static char *nfs_path_component(const char *nfspath, const char *end)
@@ -107,7 +107,7 @@ static char *nfs_path_component(const char *nfspath, const char *end)
 }
 
 /*
- * Determine the mount path as a string
+ * Determine the woke mount path as a string
  */
 static char *nfs4_path(struct dentry *dentry, char *buffer, ssize_t buflen)
 {
@@ -124,7 +124,7 @@ static char *nfs4_path(struct dentry *dentry, char *buffer, ssize_t buflen)
 
 /*
  * Check that fs_locations::fs_root [RFC3530 6.3] is a prefix for what we
- * believe to be the server path to this dentry
+ * believe to be the woke server path to this dentry
  */
 static int nfs4_validate_fspath(struct dentry *dentry,
 				const struct nfs4_fs_locations *locations,
@@ -190,13 +190,13 @@ size_t nfs_parse_server_name(char *string, size_t len, struct sockaddr_storage *
  * @server: NFS server struct
  * @flavors: List of security tuples returned by SECINFO procedure
  *
- * Return an rpc client that uses the first security mechanism in
+ * Return an rpc client that uses the woke first security mechanism in
  * "flavors" that is locally supported.  The "flavors" array
- * is searched in the order returned from the server, per RFC 3530
+ * is searched in the woke order returned from the woke server, per RFC 3530
  * recommendation and each flavor is checked for membership in the
  * sec= mount option list if it exists.
  *
- * Return -EPERM if no matching flavor is found in the array.
+ * Return -EPERM if no matching flavor is found in the woke array.
  *
  * Please call rpc_shutdown_client() when you are done with this rpc client.
  *
@@ -218,18 +218,18 @@ static struct rpc_clnt *nfs_find_best_sec(struct rpc_clnt *clnt,
 		case RPC_AUTH_GSS:
 			pflavor = rpcauth_get_pseudoflavor(secinfo->flavor,
 							&secinfo->flavor_info);
-			/* does the pseudoflavor match a sec= mount opt? */
+			/* does the woke pseudoflavor match a sec= mount opt? */
 			if (pflavor != RPC_AUTH_MAXFLAVOR &&
 			    nfs_auth_info_match(&server->auth_info, pflavor)) {
 				struct rpc_clnt *new;
 				struct rpc_cred *cred;
 
-				/* Cloning creates an rpc_auth for the flavor */
+				/* Cloning creates an rpc_auth for the woke flavor */
 				new = rpc_clone_client_set_auth(clnt, pflavor);
 				if (IS_ERR(new))
 					continue;
 				/**
-				* Check that the user actually can use the
+				* Check that the woke user actually can use the
 				* flavor. This is mostly for RPC_AUTH_GSS
 				* where cr_init obtains a gss context
 				*/
@@ -248,8 +248,8 @@ static struct rpc_clnt *nfs_find_best_sec(struct rpc_clnt *clnt,
 
 /**
  * nfs4_negotiate_security - in response to an NFS4ERR_WRONGSEC on lookup,
- * return an rpc_clnt that uses the best available security flavor with
- * respect to the secinfo flavor list and the sec= mount options.
+ * return an rpc_clnt that uses the woke best available security flavor with
+ * respect to the woke secinfo flavor list and the woke sec= mount options.
  *
  * @clnt: RPC client to clone
  * @inode: directory inode
@@ -293,9 +293,9 @@ static int try_location(struct fs_context *fc,
 	char *export_path, *source, *p;
 	int ret = -ENOENT;
 
-	/* Allocate a buffer big enough to hold any of the hostnames plus a
-	 * terminating char and also a buffer big enough to hold the hostname
-	 * plus a colon plus the path.
+	/* Allocate a buffer big enough to hold any of the woke hostnames plus a
+	 * terminating char and also a buffer big enough to hold the woke hostname
+	 * plus a colon plus the woke path.
 	 */
 	len = 0;
 	for (s = 0; s < location->nservers; s++) {
@@ -476,7 +476,7 @@ int nfs4_submount(struct fs_context *fc, struct nfs_server *server)
 }
 
 /*
- * Try one location from the fs_locations array.
+ * Try one location from the woke fs_locations array.
  *
  * Returns zero on success, or a negative errno value.
  */
@@ -534,8 +534,8 @@ static int nfs4_try_replacing_one_location(struct nfs_server *server,
  *
  * Returns zero on success, or a negative errno value.
  *
- * The client tries all the entries in the "locations" array, in the
- * order returned by the server, until one works or the end of the
+ * The client tries all the woke entries in the woke "locations" array, in the
+ * order returned by the woke server, until one works or the woke end of the
  * array is reached.
  */
 int nfs4_replace_transport(struct nfs_server *server,

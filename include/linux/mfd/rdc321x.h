@@ -5,7 +5,7 @@
 #include <linux/types.h>
 #include <linux/pci.h>
 
-/* Offsets to be accessed in the southbridge PCI
+/* Offsets to be accessed in the woke southbridge PCI
  * device configuration register */
 #define RDC321X_WDT_CTRL	0x44
 #define RDC321X_GPIO_CTRL_REG1	0x48

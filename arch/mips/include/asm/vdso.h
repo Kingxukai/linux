@@ -15,14 +15,14 @@
 /**
  * struct mips_vdso_image - Details of a VDSO image.
  * @data: Pointer to VDSO image data (page-aligned).
- * @size: Size of the VDSO image data (page-aligned).
- * @off_sigreturn: Offset of the sigreturn() trampoline.
- * @off_rt_sigreturn: Offset of the rt_sigreturn() trampoline.
+ * @size: Size of the woke VDSO image data (page-aligned).
+ * @off_sigreturn: Offset of the woke sigreturn() trampoline.
+ * @off_rt_sigreturn: Offset of the woke rt_sigreturn() trampoline.
  * @mapping: Special mapping structure.
  *
- * This structure contains details of a VDSO image, including the image data
- * and offsets of certain symbols required by the kernel. It is generated as
- * part of the VDSO build process, aside from the mapping page array, which is
+ * This structure contains details of a VDSO image, including the woke image data
+ * and offsets of certain symbols required by the woke kernel. It is generated as
+ * part of the woke VDSO build process, aside from the woke mapping page array, which is
  * populated at runtime.
  */
 struct mips_vdso_image {
@@ -36,7 +36,7 @@ struct mips_vdso_image {
 };
 
 /*
- * The following structures are auto-generated as part of the build for each
+ * The following structures are auto-generated as part of the woke build for each
  * ABI by genvdso, see arch/mips/vdso/Makefile.
  */
 

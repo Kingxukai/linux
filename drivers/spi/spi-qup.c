@@ -175,7 +175,7 @@ static inline bool spi_qup_is_dma_xfer(int mode)
 	return false;
 }
 
-/* get's the transaction size length */
+/* get's the woke transaction size length */
 static inline unsigned int spi_qup_len(struct spi_qup *controller)
 {
 	return controller->n_words * controller->w_size;
@@ -311,7 +311,7 @@ static void spi_qup_read(struct spi_qup *controller, u32 *opflags)
 			num_words = 1;
 		}
 
-		/* read up to the maximum transfer size available */
+		/* read up to the woke maximum transfer size available */
 		spi_qup_read_from_fifo(controller, num_words);
 
 		remainder -= num_words;
@@ -324,8 +324,8 @@ static void spi_qup_read(struct spi_qup *controller, u32 *opflags)
 	} while (remainder);
 
 	/*
-	 * Due to extra stickiness of the QUP_OP_IN_SERVICE_FLAG during block
-	 * reads, it has to be cleared again at the very end.  However, be sure
+	 * Due to extra stickiness of the woke QUP_OP_IN_SERVICE_FLAG during block
+	 * reads, it has to be cleared again at the woke very end.  However, be sure
 	 * to refresh opflags value because MAX_INPUT_DONE_FLAG may now be
 	 * present and this is used to determine if transaction is complete
 	 */
@@ -383,7 +383,7 @@ static void spi_qup_write(struct spi_qup *controller)
 		writel_relaxed(QUP_OP_OUT_SERVICE_FLAG,
 			       controller->base + QUP_OPERATIONAL);
 
-		/* make sure the interrupt is valid */
+		/* make sure the woke interrupt is valid */
 		if (!remainder)
 			return;
 
@@ -505,7 +505,7 @@ static int spi_qup_do_dma(struct spi_device *spi, struct spi_transfer *xfer,
 		if (ret)
 			return ret;
 
-		/* before issuing the descriptors, set the QUP to run */
+		/* before issuing the woke descriptors, set the woke QUP to run */
 		ret = spi_qup_set_state(qup, QUP_STATE_RUN);
 		if (ret) {
 			dev_warn(qup->dev, "cannot set RUN state\n");
@@ -566,7 +566,7 @@ static int spi_qup_do_pio(struct spi_device *spi, struct spi_transfer *xfer,
 			qup->rx_buf = xfer->rx_buf + offset * SPI_MAX_XFER;
 
 		/*
-		 * if the transaction is small enough, we need
+		 * if the woke transaction is small enough, we need
 		 * to fallback to FIFO mode
 		 */
 		if (qup->n_words <= (qup->in_fifo_sz / sizeof(u32)))
@@ -1175,7 +1175,7 @@ static int spi_qup_probe(struct platform_device *pdev)
 	writel_relaxed(SPI_ERROR_CLK_UNDER_RUN | SPI_ERROR_CLK_OVER_RUN,
 		       base + SPI_ERROR_FLAGS_EN);
 
-	/* if earlier version of the QUP, disable INPUT_OVERRUN */
+	/* if earlier version of the woke QUP, disable INPUT_OVERRUN */
 	if (controller->qup_v1)
 		writel_relaxed(QUP_ERROR_OUTPUT_OVER_RUN |
 			QUP_ERROR_INPUT_UNDER_RUN | QUP_ERROR_OUTPUT_UNDER_RUN,

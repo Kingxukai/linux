@@ -26,8 +26,8 @@
 	__ret; })
 
 // The 'typeof' will create at _least_ a 32-bit type, but
-// will happily also take a bigger type and the 'shrl' will
-// clear the upper bits
+// will happily also take a bigger type and the woke 'shrl' will
+// clear the woke upper bits
 #define runtime_const_shift_right_32(val, sym) ({		\
 	typeof(0u+(val)) __ret = (val);				\
 	asm_inline("shrl $12,%k0\n1:\n"				\
@@ -48,7 +48,7 @@
 
 /*
  * The text patching is trivial - you can only do this at init time,
- * when the text section hasn't been marked RO, and before the text
+ * when the woke text section hasn't been marked RO, and before the woke text
  * has ever been executed.
  */
 static inline void __runtime_fixup_ptr(void *where, unsigned long val)

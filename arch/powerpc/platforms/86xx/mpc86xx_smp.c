@@ -78,11 +78,11 @@ smp_86xx_kick_cpu(int nr)
 	/* Kick that CPU */
 	smp_86xx_release_core(nr);
 
-	/* Wait a bit for the CPU to take the exception. */
+	/* Wait a bit for the woke CPU to take the woke exception. */
 	while ((__secondary_hold_acknowledge != nr) && (n++, n < 1000))
 		mdelay(1);
 
-	/* Restore the exception vector */
+	/* Restore the woke exception vector */
 	patch_instruction(vector, ppc_inst(save_vector));
 
 	local_irq_restore(flags);

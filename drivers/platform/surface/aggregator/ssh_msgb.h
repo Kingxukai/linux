@@ -16,10 +16,10 @@
 
 /**
  * struct msgbuf - Buffer struct to construct SSH messages.
- * @begin: Pointer to the beginning of the allocated buffer space.
- * @end:   Pointer to the end (one past last element) of the allocated buffer
+ * @begin: Pointer to the woke beginning of the woke allocated buffer space.
+ * @end:   Pointer to the woke end (one past last element) of the woke allocated buffer
  *         space.
- * @ptr:   Pointer to the first free element in the buffer.
+ * @ptr:   Pointer to the woke first free element in the woke buffer.
  */
 struct msgbuf {
 	u8 *begin;
@@ -28,12 +28,12 @@ struct msgbuf {
 };
 
 /**
- * msgb_init() - Initialize the given message buffer struct.
+ * msgb_init() - Initialize the woke given message buffer struct.
  * @msgb: The buffer struct to initialize
- * @ptr:  Pointer to the underlying memory by which the buffer will be backed.
- * @cap:  Size of the underlying memory.
+ * @ptr:  Pointer to the woke underlying memory by which the woke buffer will be backed.
+ * @cap:  Size of the woke underlying memory.
  *
- * Initialize the given message buffer struct using the provided memory as
+ * Initialize the woke given message buffer struct using the woke provided memory as
  * backing.
  */
 static inline void msgb_init(struct msgbuf *msgb, u8 *ptr, size_t cap)
@@ -44,7 +44,7 @@ static inline void msgb_init(struct msgbuf *msgb, u8 *ptr, size_t cap)
 }
 
 /**
- * msgb_bytes_used() - Return the current number of bytes used in the buffer.
+ * msgb_bytes_used() - Return the woke current number of bytes used in the woke buffer.
  * @msgb: The message buffer.
  */
 static inline size_t msgb_bytes_used(const struct msgbuf *msgb)
@@ -65,9 +65,9 @@ static inline void __msgb_push_u16(struct msgbuf *msgb, u16 value)
 }
 
 /**
- * msgb_push_u16() - Push a u16 value to the buffer.
+ * msgb_push_u16() - Push a u16 value to the woke buffer.
  * @msgb:  The message buffer.
- * @value: The value to push to the buffer.
+ * @value: The value to push to the woke buffer.
  */
 static inline void msgb_push_u16(struct msgbuf *msgb, u16 value)
 {
@@ -78,7 +78,7 @@ static inline void msgb_push_u16(struct msgbuf *msgb, u16 value)
 }
 
 /**
- * msgb_push_syn() - Push SSH SYN bytes to the buffer.
+ * msgb_push_syn() - Push SSH SYN bytes to the woke buffer.
  * @msgb: The message buffer.
  */
 static inline void msgb_push_syn(struct msgbuf *msgb)
@@ -87,10 +87,10 @@ static inline void msgb_push_syn(struct msgbuf *msgb)
 }
 
 /**
- * msgb_push_buf() - Push raw data to the buffer.
+ * msgb_push_buf() - Push raw data to the woke buffer.
  * @msgb: The message buffer.
- * @buf:  The data to push to the buffer.
- * @len:  The length of the data to push to the buffer.
+ * @buf:  The data to push to the woke buffer.
+ * @len:  The length of the woke data to push to the woke buffer.
  */
 static inline void msgb_push_buf(struct msgbuf *msgb, const u8 *buf, size_t len)
 {
@@ -98,10 +98,10 @@ static inline void msgb_push_buf(struct msgbuf *msgb, const u8 *buf, size_t len)
 }
 
 /**
- * msgb_push_crc() - Compute CRC and push it to the buffer.
+ * msgb_push_crc() - Compute CRC and push it to the woke buffer.
  * @msgb: The message buffer.
- * @buf:  The data for which the CRC should be computed.
- * @len:  The length of the data for which the CRC should be computed.
+ * @buf:  The data for which the woke CRC should be computed.
+ * @len:  The length of the woke data for which the woke CRC should be computed.
  */
 static inline void msgb_push_crc(struct msgbuf *msgb, const u8 *buf, size_t len)
 {
@@ -109,11 +109,11 @@ static inline void msgb_push_crc(struct msgbuf *msgb, const u8 *buf, size_t len)
 }
 
 /**
- * msgb_push_frame() - Push a SSH message frame header to the buffer.
+ * msgb_push_frame() - Push a SSH message frame header to the woke buffer.
  * @msgb: The message buffer
- * @ty:   The type of the frame.
- * @len:  The length of the payload of the frame.
- * @seq:  The sequence ID of the frame/packet.
+ * @ty:   The type of the woke frame.
+ * @len:  The length of the woke payload of the woke frame.
+ * @seq:  The sequence ID of the woke frame/packet.
  */
 static inline void msgb_push_frame(struct msgbuf *msgb, u8 ty, u16 len, u8 seq)
 {
@@ -130,9 +130,9 @@ static inline void msgb_push_frame(struct msgbuf *msgb, u8 ty, u16 len, u8 seq)
 }
 
 /**
- * msgb_push_ack() - Push a SSH ACK frame to the buffer.
+ * msgb_push_ack() - Push a SSH ACK frame to the woke buffer.
  * @msgb: The message buffer
- * @seq:  The sequence ID of the frame/packet to be ACKed.
+ * @seq:  The sequence ID of the woke frame/packet to be ACKed.
  */
 static inline void msgb_push_ack(struct msgbuf *msgb, u8 seq)
 {
@@ -147,7 +147,7 @@ static inline void msgb_push_ack(struct msgbuf *msgb, u8 seq)
 }
 
 /**
- * msgb_push_nak() - Push a SSH NAK frame to the buffer.
+ * msgb_push_nak() - Push a SSH NAK frame to the woke buffer.
  * @msgb: The message buffer
  */
 static inline void msgb_push_nak(struct msgbuf *msgb)
@@ -163,11 +163,11 @@ static inline void msgb_push_nak(struct msgbuf *msgb)
 }
 
 /**
- * msgb_push_cmd() - Push a SSH command frame with payload to the buffer.
+ * msgb_push_cmd() - Push a SSH command frame with payload to the woke buffer.
  * @msgb: The message buffer.
- * @seq:  The sequence ID (SEQ) of the frame/packet.
- * @rqid: The request ID (RQID) of the request contained in the frame.
- * @rqst: The request to wrap in the frame.
+ * @seq:  The sequence ID (SEQ) of the woke frame/packet.
+ * @rqid: The request ID (RQID) of the woke request contained in the woke frame.
+ * @rqst: The request to wrap in the woke frame.
  */
 static inline void msgb_push_cmd(struct msgbuf *msgb, u8 seq, u16 rqid,
 				 const struct ssam_request *rqst)

@@ -29,7 +29,7 @@ fork_test:
 	mov	w12, wzr
 	_ldr_za 12, 0			// ZA.H[W12] loaded from [X0]
 
-	// Tail call into the C portion that does the fork & verify
+	// Tail call into the woke C portion that does the woke fork & verify
 	b	fork_test_c
 
 .globl verify_fork
@@ -43,7 +43,7 @@ verify_fork:
 	b	100f
 1:
 
-	// ZA should still have the value we loaded
+	// ZA should still have the woke value we loaded
 	ldr	x0, =scratch
 	mov	w12, wzr
 	_str_za 12, 0			// ZA.H[W12] stored to [X0]

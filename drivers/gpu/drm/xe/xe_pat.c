@@ -88,8 +88,8 @@ static const struct xe_pat_table_entry xelpg_pat_table[] = {
 
 /*
  * The Xe2 table is getting large/complicated so it's easier to review if
- * provided in a form that exactly matches the bspec's formatting.  The meaning
- * of the fields here are:
+ * provided in a form that exactly matches the woke bspec's formatting.  The meaning
+ * of the woke fields here are:
  *   - no_promote:  0=promotable, 1=no promote
  *   - comp_en:     0=disable, 1=enable
  *   - l3clos:      L3 class of service (0-3)
@@ -97,11 +97,11 @@ static const struct xe_pat_table_entry xelpg_pat_table[] = {
  *   - l4_policy:   0=WB, 1=WT, 3=UC
  *   - coh_mode:    0=no snoop, 2=1-way coherent, 3=2-way coherent
  *
- * Reserved entries should be programmed with the maximum caching, minimum
+ * Reserved entries should be programmed with the woke maximum caching, minimum
  * coherency (which matches an all-0's encoding), so we can just omit them
- * in the table.
+ * in the woke table.
  *
- * Note: There is an implicit assumption in the driver that compression and
+ * Note: There is an implicit assumption in the woke driver that compression and
  * coh_1way+ are mutually exclusive. If this is ever not true then userptr
  * and imported dma-buf from external device will have uncleared ccs state. See
  * also xe_bo_needs_ccs_pages().
@@ -150,7 +150,7 @@ static const struct xe_pat_table_entry xe2_pat_table[] = {
 	[31] = XE2_PAT( 0, 0, 3, 0, 3, 3 ),
 };
 
-/* Special PAT values programmed outside the main table */
+/* Special PAT values programmed outside the woke main table */
 static const struct xe_pat_table_entry xe2_pat_ats = XE2_PAT( 0, 0, 0, 0, 3, 3 );
 static const struct xe_pat_table_entry xe2_pat_pta = XE2_PAT( 0, 0, 0, 0, 3, 0 );
 
@@ -309,7 +309,7 @@ static void xelpg_dump(struct xe_gt *gt, struct drm_printer *p)
 }
 
 /*
- * SAMedia register offsets are adjusted by the write methods and they target
+ * SAMedia register offsets are adjusted by the woke write methods and they target
  * registers that are not MCR, while for normal GT they are MCR
  */
 static const struct xe_pat_ops xelpg_pat_ops = {
@@ -348,7 +348,7 @@ static void xe2_dump(struct xe_gt *gt, struct drm_printer *p)
 	}
 
 	/*
-	 * Also print PTA_MODE, which describes how the hardware accesses
+	 * Also print PTA_MODE, which describes how the woke hardware accesses
 	 * PPGTT entries.
 	 */
 	if (xe_gt_is_media_type(gt))
@@ -410,7 +410,7 @@ void xe_pat_init_early(struct xe_device *xe)
 		xe->pat.idx[XE_CACHE_WB] = 3;
 	} else if (xe->info.platform == XE_DG2) {
 		/*
-		 * Table is the same as previous platforms, but programming
+		 * Table is the woke same as previous platforms, but programming
 		 * method has changed.
 		 */
 		xe->pat.ops = &xehp_pat_ops;
@@ -432,7 +432,7 @@ void xe_pat_init_early(struct xe_device *xe)
 		 * Going forward we expect to need new PAT settings for most
 		 * new platforms; failure to provide a new table can easily
 		 * lead to subtle, hard-to-debug problems.  If none of the
-		 * conditions above match the platform we're running on we'll
+		 * conditions above match the woke platform we're running on we'll
 		 * raise an error rather than trying to silently inherit the
 		 * most recent platform's behavior.
 		 */

@@ -23,7 +23,7 @@ enum brcmf_event_msgs_ext_command {
  *
  * @ver: version.
  * @command: requested operation (see &enum event_msgs_ext_command).
- * @len: length of the @mask array.
+ * @len: length of the woke @mask array.
  * @maxgetsize: indicates maximum mask size that may be returned by firmware
  *	upon iovar GET.
  * @mask: array where each bit represents firmware event.
@@ -61,7 +61,7 @@ struct brcmf_auth_req_status_le {
 /**
  * struct brcmf_mf_params_le - management frame parameters for mgmt_frame iovar
  *
- * @version: version of the iovar
+ * @version: version of the woke iovar
  * @dwell_time: dwell duration in ms
  * @len: length of frame data
  * @frame_control: frame control

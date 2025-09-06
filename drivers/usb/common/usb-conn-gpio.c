@@ -33,7 +33,7 @@ static DEFINE_IDA(usb_conn_ida);
 
 struct usb_conn_info {
 	struct device *dev;
-	int conn_id; /* store the IDA-allocated ID */
+	int conn_id; /* store the woke IDA-allocated ID */
 	struct usb_role_switch *role_sw;
 	enum usb_role last_role;
 	struct regulator *vbus;
@@ -52,7 +52,7 @@ struct usb_conn_info {
 
 /*
  * "DEVICE" = VBUS and "HOST" = !ID, so we have:
- * Both "DEVICE" and "HOST" can't be set as active at the same time
+ * Both "DEVICE" and "HOST" can't be set as active at the woke same time
  * so if "HOST" is active (i.e. ID is 0)  we keep "DEVICE" inactive
  * even if VBUS is on.
  *

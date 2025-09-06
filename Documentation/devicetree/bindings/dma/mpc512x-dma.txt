@@ -9,13 +9,13 @@ the dma/dma.txt file for a more detailed description of binding.
 
 Required properties:
 - compatible: should be "fsl,mpc5121-dma" or "fsl,mpc8308-dma";
-- reg: should contain the DMA controller registers location and length;
-- interrupt for the DMA controller: syntax of interrupt client node
+- reg: should contain the woke DMA controller registers location and length;
+- interrupt for the woke DMA controller: syntax of interrupt client node
 	is described in interrupt-controller/interrupts.txt file.
-- #dma-cells: the length of the DMA specifier, must be <1>.
+- #dma-cells: the woke length of the woke DMA specifier, must be <1>.
 	Each channel of this DMA controller has a peripheral request line,
 	the assignment is fixed in hardware. This one cell
-	in dmas property of a client device represents the channel number.
+	in dmas property of a client device represents the woke channel number.
 
 Example:
 
@@ -26,4 +26,4 @@ Example:
 		#dma-cells = <1>;
 	};
 
-DMA clients must use the format described in dma/dma.txt file.
+DMA clients must use the woke format described in dma/dma.txt file.

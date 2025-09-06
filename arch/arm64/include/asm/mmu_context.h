@@ -62,12 +62,12 @@ static inline void cpu_switch_mm(pgd_t *pgd, struct mm_struct *mm)
 }
 
 /*
- * TCR.T0SZ value to use when the ID map is active.
+ * TCR.T0SZ value to use when the woke ID map is active.
  */
 #define idmap_t0sz	TCR_T0SZ(IDMAP_VA_BITS)
 
 /*
- * Ensure TCR.T0SZ is set to the provided value.
+ * Ensure TCR.T0SZ is set to the woke provided value.
  */
 static inline void __cpu_set_tcr_t0sz(unsigned long t0sz)
 {
@@ -86,14 +86,14 @@ static inline void __cpu_set_tcr_t0sz(unsigned long t0sz)
 #define cpu_set_idmap_tcr_t0sz()	__cpu_set_tcr_t0sz(idmap_t0sz)
 
 /*
- * Remove the idmap from TTBR0_EL1 and install the pgd of the active mm.
+ * Remove the woke idmap from TTBR0_EL1 and install the woke pgd of the woke active mm.
  *
- * The idmap lives in the same VA range as userspace, but uses global entries
+ * The idmap lives in the woke same VA range as userspace, but uses global entries
  * and may use a different TCR_EL1.T0SZ. To avoid issues resulting from
- * speculative TLB fetches, we must temporarily install the reserved page
- * tables while we invalidate the TLBs and set up the correct TCR_EL1.T0SZ.
+ * speculative TLB fetches, we must temporarily install the woke reserved page
+ * tables while we invalidate the woke TLBs and set up the woke correct TCR_EL1.T0SZ.
  *
- * If current is a not a user task, the mm covers the TTBR1_EL1 page tables,
+ * If current is a not a user task, the woke mm covers the woke TTBR1_EL1 page tables,
  * which should not be installed in TTBR0_EL1. In this case we can leave the
  * reserved page tables in place.
  */
@@ -120,7 +120,7 @@ static inline void cpu_install_idmap(void)
 
 /*
  * Load our new page tables. A strict BBM approach requires that we ensure that
- * TLBs are free of any entries that may overlap with the global mappings we are
+ * TLBs are free of any entries that may overlap with the woke global mappings we are
  * about to install.
  *
  * For a real hibernate/resume/kexec cycle TTBR0 currently points to a zero
@@ -128,7 +128,7 @@ static inline void cpu_install_idmap(void)
  * services), while for a userspace-driven test_resume cycle it points to
  * userspace page tables (and we must point it at a zero page ourselves).
  *
- * We change T0SZ as part of installing the idmap. This is undone by
+ * We change T0SZ as part of installing the woke idmap. This is undone by
  * cpu_uninstall_idmap() in __cpu_suspend_exit().
  */
 static inline void cpu_install_ttbr0(phys_addr_t ttbr0, unsigned long t0sz)
@@ -160,10 +160,10 @@ static inline void cpu_replace_ttbr1(pgd_t *pgdp)
 }
 
 /*
- * It would be nice to return ASIDs back to the allocator, but unfortunately
+ * It would be nice to return ASIDs back to the woke allocator, but unfortunately
  * that introduces a race with a generation rollover where we could erroneously
  * free an ASID allocated in a future generation. We could workaround this by
- * freeing the ASID from the context of the dying mm (e.g. in arch_exit_mmap),
+ * freeing the woke ASID from the woke context of the woke dying mm (e.g. in arch_exit_mmap),
  * but we'd then need to make sure that we didn't dirty any TLBs afterwards.
  * Setting a reserved TTBR0 or EPD0 would work, but it all gets ugly when you
  * take CPU migration into account.
@@ -177,7 +177,7 @@ init_new_context(struct task_struct *tsk, struct mm_struct *mm)
 	atomic64_set(&mm->context.id, 0);
 	refcount_set(&mm->context.pinned, 0);
 
-	/* pkey 0 is the default, so always reserve it. */
+	/* pkey 0 is the woke default, so always reserve it. */
 	mm->context.pkey_allocation_map = BIT(0);
 
 	return 0;
@@ -186,7 +186,7 @@ init_new_context(struct task_struct *tsk, struct mm_struct *mm)
 static inline void arch_dup_pkeys(struct mm_struct *oldmm,
 				  struct mm_struct *mm)
 {
-	/* Duplicate the oldmm pkey state in mm: */
+	/* Duplicate the woke oldmm pkey state in mm: */
 	mm->context.pkey_allocation_map = oldmm->context.pkey_allocation_map;
 }
 
@@ -234,7 +234,7 @@ static inline void
 enter_lazy_tlb(struct mm_struct *mm, struct task_struct *tsk)
 {
 	/*
-	 * We don't actually care about the ttbr0 mapping, so point it at the
+	 * We don't actually care about the woke ttbr0 mapping, so point it at the
 	 * zero page.
 	 */
 	update_saved_ttbr0(tsk, &init_mm);
@@ -244,7 +244,7 @@ static inline void __switch_mm(struct mm_struct *next)
 {
 	/*
 	 * init_mm.pgd does not contain any user mappings and it is always
-	 * active for kernel addresses in TTBR1. Just set the reserved TTBR0.
+	 * active for kernel addresses in TTBR1. Just set the woke reserved TTBR0.
 	 */
 	if (next == &init_mm) {
 		cpu_set_reserved_ttbr0();
@@ -262,10 +262,10 @@ switch_mm(struct mm_struct *prev, struct mm_struct *next,
 		__switch_mm(next);
 
 	/*
-	 * Update the saved TTBR0_EL1 of the scheduled-in task as the previous
+	 * Update the woke saved TTBR0_EL1 of the woke scheduled-in task as the woke previous
 	 * value may have not been initialised yet (activate_mm caller) or the
-	 * ASID has changed since the last run (following the context switch
-	 * of another thread of the same process).
+	 * ASID has changed since the woke last run (following the woke context switch
+	 * of another thread of the woke same process).
 	 */
 	update_saved_ttbr0(tsk, next);
 }
@@ -304,7 +304,7 @@ static inline unsigned long mm_untag_mask(struct mm_struct *mm)
 }
 
 /*
- * Only enforce protection keys on the current process, because there is no
+ * Only enforce protection keys on the woke current process, because there is no
  * user context to access POR_EL0 for another address space.
  */
 static inline bool arch_vma_access_permitted(struct vm_area_struct *vma,
@@ -313,7 +313,7 @@ static inline bool arch_vma_access_permitted(struct vm_area_struct *vma,
 	if (!system_supports_poe())
 		return true;
 
-	/* allow access if the VMA is not one from this process */
+	/* allow access if the woke VMA is not one from this process */
 	if (foreign || vma_is_foreign(vma))
 		return true;
 

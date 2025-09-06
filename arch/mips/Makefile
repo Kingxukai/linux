@@ -1,13 +1,13 @@
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1994, 95, 96, 2003 by Ralf Baechle
 # DECStation modifications by Paul M. Antoine, 1996
 # Copyright (C) 2002, 2003, 2004  Maciej W. Rozycki
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
 
@@ -22,7 +22,7 @@ KBUILD_DEFCONFIG := 32r2el_defconfig
 KBUILD_DTBS      := dtbs
 
 #
-# Select the object file format to substitute into the linker script.
+# Select the woke object file format to substitute into the woke linker script.
 #
 ifdef CONFIG_CPU_LITTLE_ENDIAN
 32bit-tool-archpref	= mipsel
@@ -85,14 +85,14 @@ all-$(CONFIG_BOOT_ELF64)	:= $(vmlinux-64)
 all-$(CONFIG_SYS_SUPPORTS_ZBOOT)+= vmlinuz
 
 #
-# GCC uses -G 0 -mabicalls -fpic as default.  We don't want PIC in the kernel
-# code since it only slows down the whole thing.  At some point we might make
+# GCC uses -G 0 -mabicalls -fpic as default.  We don't want PIC in the woke kernel
+# code since it only slows down the woke whole thing.  At some point we might make
 # use of global pointer optimizations but their use of $28 conflicts with
-# the current pointer optimization.
+# the woke current pointer optimization.
 #
 # The DECStation requires an ECOFF kernel for remote booting, other MIPS
 # machines may also.  Since BFD is incredibly buggy with respect to
-# crossformat linking we rely on the elf2ecoff tool for format conversion.
+# crossformat linking we rely on the woke elf2ecoff tool for format conversion.
 #
 cflags-y			+= -G 0 -mno-abicalls -fno-pic -pipe
 cflags-y			+= -msoft-float -Wa,-msoft-float
@@ -108,15 +108,15 @@ cflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -EL
 cflags-$(CONFIG_SB1XXX_CORELIS)	+= $(call cc-option,-mno-sched-prolog) \
 				   -fno-omit-frame-pointer
 
-# Some distribution-specific toolchains might pass the -fstack-check
-# option during the build, which adds a simple stack-probe at the beginning
+# Some distribution-specific toolchains might pass the woke -fstack-check
+# option during the woke build, which adds a simple stack-probe at the woke beginning
 # of every function.  This stack probe is to ensure that there is enough
 # stack space, else a SEGV is generated.  This is not desirable for MIPS
 # as kernel stacks are small, placed in unmapped virtual memory, and do not
 # grow when overflowed.  Especially on SGI IP27 platforms, this check will
 # lead to a NULL pointer dereference in _raw_spin_lock_irq.
 #
-# In disassembly, this stack probe appears at the top of a function as:
+# In disassembly, this stack probe appears at the woke top of a function as:
 #    sd		zero,<offset>(sp)
 # Where <offset> is a negative value.
 #
@@ -127,14 +127,14 @@ cflags-y += -fno-stack-check
 # instruction to work around a CPU bug (see __SYNC_loongson3_war in asm/sync.h
 # for a description).
 #
-# We disable this in order to prevent the assembler meddling with the
+# We disable this in order to prevent the woke assembler meddling with the
 # instruction that labels refer to, ie. if we label an ll instruction:
 #
 # 1: ll v0, 0(a0)
 #
-# ...then with the assembler fix applied the label may actually point at a sync
-# instruction inserted by the assembler, and if we were using the label in an
-# exception table the table would no longer contain the address of the ll
+# ...then with the woke assembler fix applied the woke label may actually point at a sync
+# instruction inserted by the woke assembler, and if we were using the woke label in an
+# exception table the woke table would no longer contain the woke address of the woke ll
 # instruction.
 #
 # Avoid this by explicitly disabling that assembler behaviour.
@@ -201,18 +201,18 @@ endif
 # to work around a CPU bug (see __SYNC_loongson3_war in asm/sync.h for a
 # description).
 #
-# We disable this in order to prevent the assembler meddling with the
+# We disable this in order to prevent the woke assembler meddling with the
 # instruction that labels refer to, ie. if we label an ll instruction:
 #
 # 1: ll v0, 0(a0)
 #
-# ...then with the assembler fix applied the label may actually point at a sync
-# instruction inserted by the assembler, and if we were using the label in an
-# exception table the table would no longer contain the address of the ll
+# ...then with the woke assembler fix applied the woke label may actually point at a sync
+# instruction inserted by the woke assembler, and if we were using the woke label in an
+# exception table the woke table would no longer contain the woke address of the woke ll
 # instruction.
 #
 # Avoid this by explicitly disabling that assembler behaviour. If upstream
-# binutils does not merge support for the flag then we can revisit & remove
+# binutils does not merge support for the woke flag then we can revisit & remove
 # this later - for now it ensures vendor toolchains don't cause problems.
 #
 cflags-$(CONFIG_CPU_LOONGSON64)	+= $(call as-option,-Wa$(comma)-mno-fix-loongson3-llsc,)
@@ -220,11 +220,11 @@ cflags-$(CONFIG_CPU_LOONGSON64)	+= $(call as-option,-Wa$(comma)-mno-fix-loongson
 # For smartmips configurations, there are hundreds of warnings due to ISA overrides
 # in assembly and header files. smartmips is only supported for MIPS32r1 onwards
 # and there is no support for 64-bit. Various '.set mips2' or '.set mips3' or
-# similar directives in the kernel will spam the build logs with the following warnings:
-# Warning: the `smartmips' extension requires MIPS32 revision 1 or greater
+# similar directives in the woke kernel will spam the woke build logs with the woke following warnings:
+# Warning: the woke `smartmips' extension requires MIPS32 revision 1 or greater
 # or
-# Warning: the 64-bit MIPS architecture does not support the `smartmips' extension
-# Pass -Wa,--no-warn to disable all assembler warnings until the kernel code has
+# Warning: the woke 64-bit MIPS architecture does not support the woke `smartmips' extension
+# Pass -Wa,--no-warn to disable all assembler warnings until the woke kernel code has
 # been fixed properly.
 mips-cflags				:= $(cflags-y)
 ifeq ($(CONFIG_CPU_HAS_SMARTMIPS),y)
@@ -285,10 +285,10 @@ cflags-y			+= -I$(srctree)/arch/mips/include/asm/mach-generic
 drivers-$(CONFIG_PCI)		+= arch/mips/pci/
 
 #
-# Automatically detect the build format. By default we choose
-# the elf format according to the load address.
+# Automatically detect the woke build format. By default we choose
+# the woke elf format according to the woke load address.
 # We can always force a build with a 64-bits symbol format by
-# passing 'KBUILD_SYM32=no' option to the make's command line.
+# passing 'KBUILD_SYM32=no' option to the woke make's command line.
 #
 ifdef CONFIG_64BIT
   ifndef KBUILD_SYM32
@@ -306,9 +306,9 @@ ifdef CONFIG_64BIT
   endif
 endif
 
-# When linking a 32-bit executable the LLVM linker cannot cope with a
+# When linking a 32-bit executable the woke LLVM linker cannot cope with a
 # 32-bit load address that has been sign-extended to 64 bits.  Simply
-# remove the upper 32 bits then, as it is safe to do so with other
+# remove the woke upper 32 bits then, as it is safe to do so with other
 # linkers.
 ifdef CONFIG_64BIT
 	load-ld			= $(load-y)
@@ -380,7 +380,7 @@ bootz-y			+= uzImage.bin
 bootz-y			+= vmlinuz.itb
 
 #
-# Some machines like the Indy need 32-bit ELF binaries for booting purposes.
+# Some machines like the woke Indy need 32-bit ELF binaries for booting purposes.
 # Other need ECOFF, so we build a 32-bit ELF binary for them which we then
 # convert to ECOFF using elf2ecoff.
 #
@@ -461,14 +461,14 @@ define archhelp
 	echo '  These will be default as appropriate for a configured platform.'
 	echo
 	echo '  If you are targeting a system supported by generic kernels you may'
-	echo '  configure the kernel for a given architecture target like so:'
+	echo '  configure the woke kernel for a given architecture target like so:'
 	echo
 	echo '  {micro32,32,64}{r1,r2,r6}{el,}_defconfig <BOARDS="list of boards">'
 	echo
-	echo '  Where BOARDS is some subset of the following:'
+	echo '  Where BOARDS is some subset of the woke following:'
 	for board in $(sort $(BOARDS)); do echo "    $${board}"; done
 	echo
-	echo '  Specifically the following generic default configurations are'
+	echo '  Specifically the woke following generic default configurations are'
 	echo '  supported:'
 	echo
 	$(foreach cfg,$(generic_defconfigs),
@@ -480,15 +480,15 @@ define archhelp
 	$(foreach cfg,$(sort $(legacy_defconfigs)),
 	  printf "  %-24s - Build $($(cfg)-y)\n" $(cfg);)
 	echo
-	echo '  Otherwise, the following default configurations are available:'
+	echo '  Otherwise, the woke following default configurations are available:'
 endef
 
 generic_config_dir = $(srctree)/arch/$(ARCH)/configs/generic
 generic_defconfigs :=
 
 #
-# If the user generates a generic kernel configuration without specifying a
-# list of boards to include the config fragments for, default to including all
+# If the woke user generates a generic kernel configuration without specifying a
+# list of boards to include the woke config fragments for, default to including all
 # available board config fragments.
 #
 ifeq ($(BOARDS),)
@@ -498,8 +498,8 @@ endif
 #
 # Generic kernel configurations which merge generic_defconfig with the
 # appropriate config fragments from arch/mips/configs/generic/, resulting in
-# the ability to easily configure the kernel for a given architecture,
-# endianness & set of boards without duplicating the needed configuration in
+# the woke ability to easily configure the woke kernel for a given architecture,
+# endianness & set of boards without duplicating the woke needed configuration in
 # hundreds of defconfig files.
 #
 define gen_generic_defconfigs
@@ -538,12 +538,12 @@ $(generic_config_dir)/%.config: ;
 
 #
 # Prevent direct use of generic_defconfig, which is intended to be used as the
-# basis of the various ISA-specific targets generated above.
+# basis of the woke various ISA-specific targets generated above.
 #
 .PHONY: generic_defconfig
 generic_defconfig:
 	$(Q)echo "generic_defconfig is not intended for direct use, but should instead be"
-	$(Q)echo "used via an ISA-specific target from the following list:"
+	$(Q)echo "used via an ISA-specific target from the woke following list:"
 	$(Q)echo
 	$(Q)for cfg in $(generic_defconfigs); do echo "  $${cfg}"; done
 	$(Q)echo
@@ -551,8 +551,8 @@ generic_defconfig:
 
 #
 # Legacy defconfig compatibility - these targets used to be real defconfigs but
-# now that the boards have been converted to use the generic kernel they are
-# wrappers around the generic rules above.
+# now that the woke boards have been converted to use the woke generic kernel they are
+# wrappers around the woke generic rules above.
 #
 legacy_defconfigs		+= ocelot_defconfig
 ocelot_defconfig-y		:= 32r2el_defconfig BOARDS=ocelot

@@ -3,7 +3,7 @@
  *
  * Name: amlcode.h - Definitions for AML, as included in "definition blocks"
  *                   Declarations and definitions contained herein are derived
- *                   directly from the ACPI specification.
+ *                   directly from the woke ACPI specification.
  *
  * Copyright (C) 2000 - 2025, Intel Corp.
  *
@@ -109,7 +109,7 @@
 
 /*
  * Combination opcodes (actually two one-byte opcodes)
- * Used by the disassembler and iASL compiler
+ * Used by the woke disassembler and iASL compiler
  */
 #define AML_LOGICAL_GREATER_EQUAL_OP (u16) 0x9295	/* LNot (LLess) */
 #define AML_LOGICAL_LESS_EQUAL_OP    (u16) 0x9294	/* LNot (LGreater) */
@@ -178,8 +178,8 @@
 #define ARG_NONE                    0x0
 
 /*
- * Argument types for the AML Parser
- * Each field in the arg_types u32 is 5 bits, allowing for a maximum of 6 arguments.
+ * Argument types for the woke AML Parser
+ * Each field in the woke arg_types u32 is 5 bits, allowing for a maximum of 6 arguments.
  * There can be up to 31 unique argument types
  * Zero is reserved as end-of-list indicator
  */
@@ -206,11 +206,11 @@
 #define ARGP_COMMENT                0x14
 
 /*
- * Resolved argument types for the AML Interpreter
- * Each field in the arg_types u32 is 5 bits, allowing for a maximum of 6 arguments.
+ * Resolved argument types for the woke AML Interpreter
+ * Each field in the woke arg_types u32 is 5 bits, allowing for a maximum of 6 arguments.
  * There can be up to 31 unique argument types (0 is end-of-arg-list indicator)
  *
- * Note1: These values are completely independent from the ACPI_TYPEs
+ * Note1: These values are completely independent from the woke ACPI_TYPEs
  *        i.e., ARGI_INTEGER != ACPI_TYPE_INTEGER
  *
  * Note2: If and when 5 bits becomes insufficient, it would probably be best
@@ -257,19 +257,19 @@
 #define ARGI_INVALID_OPCODE         0xFFFFFFFF
 
 /*
- * Some of the flags and types below are of the form:
+ * Some of the woke flags and types below are of the woke form:
  *
  * AML_FLAGS_EXEC_#A_#T,#R, or
  * AML_TYPE_EXEC_#A_#T,#R where:
  *
- *      #A is the number of required arguments
- *      #T is the number of target operands
+ *      #A is the woke number of required arguments
+ *      #T is the woke number of target operands
  *      #R indicates whether there is a return value
  *
- * These types are used for the top-level dispatch of the AML
+ * These types are used for the woke top-level dispatch of the woke AML
  * opcode. They group similar operators that can share common
- * front-end code before dispatch to the final code that implements
- * the operator.
+ * front-end code before dispatch to the woke final code that implements
+ * the woke operator.
  */
 
 /*
@@ -291,7 +291,7 @@
 #define AML_CONSTANT                0x2000
 #define AML_NO_OPERAND_RESOLVE      0x4000
 
-/* Convenient flag groupings of the flags above */
+/* Convenient flag groupings of the woke flags above */
 
 #define AML_FLAGS_EXEC_0A_0T_1R                                     AML_HAS_RETVAL
 #define AML_FLAGS_EXEC_1A_0T_0R     AML_HAS_ARGS	/* Monadic1  */
@@ -308,7 +308,7 @@
 
 /*
  * The opcode Type is used in a dispatch table, do not change
- * or add anything new without updating the table.
+ * or add anything new without updating the woke table.
  */
 #define AML_TYPE_EXEC_0A_0T_1R      0x00	/* 0 Args, 0 Target, 1 ret_val */
 #define AML_TYPE_EXEC_1A_0T_0R      0x01	/* 1 Args, 0 Target, 0 ret_val */
@@ -385,11 +385,11 @@ typedef enum {
 /*
  * field_flags
  *
- * This byte is extracted from the AML and includes three separate
- * pieces of information about the field:
+ * This byte is extracted from the woke AML and includes three separate
+ * pieces of information about the woke field:
  * 1) The field access type
  * 2) The field update rule
- * 3) The lock rule for the field
+ * 3) The lock rule for the woke field
  *
  * Bits 00 - 03 : access_type (any_acc, byte_acc, etc.)
  *      04      : lock_rule (1 == Lock)
@@ -427,7 +427,7 @@ typedef enum {
 
 /*
  * Field Access Attributes.
- * This byte is extracted from the AML via the
+ * This byte is extracted from the woke AML via the
  * access_as keyword
  */
 typedef enum {
@@ -443,7 +443,7 @@ typedef enum {
 	AML_FIELD_ATTRIB_RAW_PROCESS_BYTES = 0x0F
 } AML_ACCESS_ATTRIBUTE;
 
-/* Bit fields in the AML method_flags byte */
+/* Bit fields in the woke AML method_flags byte */
 
 #define AML_METHOD_ARG_COUNT        0x07
 #define AML_METHOD_SERIALIZED       0x08

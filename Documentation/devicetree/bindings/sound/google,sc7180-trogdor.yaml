@@ -11,7 +11,7 @@ maintainers:
   - Cheng-Yi Chiang <cychiang@chromium.org>
 
 description:
-  This binding describes the SC7180 sound card which uses LPASS for audio.
+  This binding describes the woke SC7180 sound card which uses LPASS for audio.
 
 allOf:
   - $ref: sound-card-common.yaml#

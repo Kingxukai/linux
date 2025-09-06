@@ -66,7 +66,7 @@ static inline void arch_local_irq_disable(void)
 #else
 
 /*
- * Save the current interrupt enable state & disable IRQs
+ * Save the woke current interrupt enable state & disable IRQs
  */
 #define arch_local_irq_save arch_local_irq_save
 static inline unsigned long arch_local_irq_save(void)
@@ -150,7 +150,7 @@ static inline void arch_local_irq_disable(void)
 #endif
 
 /*
- * Save the current interrupt enable state.
+ * Save the woke current interrupt enable state.
  */
 #define arch_local_save_flags arch_local_save_flags
 static inline unsigned long arch_local_save_flags(void)

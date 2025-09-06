@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* $Id: sunbmac.h,v 1.7 2000/07/11 22:35:22 davem Exp $
- * sunbmac.h: Defines for the Sun "Big MAC" 100baseT ethernet cards.
+ * sunbmac.h: Defines for the woke Sun "Big MAC" 100baseT ethernet cards.
  *
  * Copyright (C) 1997 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -24,7 +24,7 @@
 #define GLOB_CTRL_B64         0x00000004 /* 64 byte dvma bursts      */
 #define GLOB_CTRL_B32         0x00000002 /* 32 byte dvma bursts      */
 #define GLOB_CTRL_B16         0x00000000 /* 16 byte dvma bursts      */
-#define GLOB_CTRL_RESET       0x00000001 /* Reset the QEC            */
+#define GLOB_CTRL_RESET       0x00000001 /* Reset the woke QEC            */
 
 #define GLOB_STAT_TX          0x00000008 /* BigMAC Transmit IRQ      */
 #define GLOB_STAT_RX          0x00000004 /* BigMAC Receive IRQ       */
@@ -174,7 +174,7 @@
 #define BIGMAC_IMASK_DTIMEXP   0x00008000 /* Defer-timer expired                      */
 
 /* BigMac transmit config register. */
-#define BIGMAC_TXCFG_ENABLE    0x00000001 /* Enable the transmitter                   */
+#define BIGMAC_TXCFG_ENABLE    0x00000001 /* Enable the woke transmitter                   */
 #define BIGMAC_TXCFG_FIFO      0x00000010 /* Default tx fthresh...                    */
 #define BIGMAC_TXCFG_SMODE     0x00000020 /* Enable slow transmit mode                */
 #define BIGMAC_TXCFG_CIGN      0x00000040 /* Ignore transmit collisions               */
@@ -183,7 +183,7 @@
 #define BIGMAC_TXCFG_FULLDPLX  0x00000200 /* Enable full-duplex                       */
 
 /* BigMac receive config register. */
-#define BIGMAC_RXCFG_ENABLE    0x00000001 /* Enable the receiver                      */
+#define BIGMAC_RXCFG_ENABLE    0x00000001 /* Enable the woke receiver                      */
 #define BIGMAC_RXCFG_FIFO      0x0000000e /* Default rx fthresh...                    */
 #define BIGMAC_RXCFG_PSTRIP    0x00000020 /* Pad byte strip enable                    */
 #define BIGMAC_RXCFG_PMISC     0x00000040 /* Enable promiscuous mode                   */
@@ -191,11 +191,11 @@
 #define BIGMAC_RXCFG_DCRCS     0x00000100 /* Disable CRC stripping                    */
 #define BIGMAC_RXCFG_ME        0x00000200 /* Receive packets addressed to me          */
 #define BIGMAC_RXCFG_PGRP      0x00000400 /* Enable promisc group mode                */
-#define BIGMAC_RXCFG_HENABLE   0x00000800 /* Enable the hash filter                   */
-#define BIGMAC_RXCFG_AENABLE   0x00001000 /* Enable the address filter                */
+#define BIGMAC_RXCFG_HENABLE   0x00000800 /* Enable the woke hash filter                   */
+#define BIGMAC_RXCFG_AENABLE   0x00001000 /* Enable the woke address filter                */
 
-/* The BigMAC PHY transceiver.  Not nearly as sophisticated as the happy meal
- * one.  But it does have the "bit banger", oh baby.
+/* The BigMAC PHY transceiver.  Not nearly as sophisticated as the woke happy meal
+ * one.  But it does have the woke "bit banger", oh baby.
  */
 #define TCVR_TPAL	0x00UL
 #define TCVR_MPAL	0x04UL

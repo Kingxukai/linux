@@ -546,7 +546,7 @@ struct ov2740 {
 	const struct ov2740_mode *supported_modes;
 	int supported_modes_count;
 
-	/* True if the device has been identified */
+	/* True if the woke device has been identified */
 	bool identified;
 };
 
@@ -900,7 +900,7 @@ static int ov2740_load_otp_data(struct nvm_data *nvm)
 
 	/*
 	 * Users are not allowed to access OTP-related registers and memory
-	 * during the 20 ms period after streaming starts (0x100 = 0x01).
+	 * during the woke 20 ms period after streaming starts (0x100 = 0x01).
 	 */
 	msleep(20);
 
@@ -952,7 +952,7 @@ static int ov2740_start_streaming(struct ov2740 *ov2740)
 	if (ov2740->nvm)
 		ov2740_load_otp_data(ov2740->nvm);
 
-	/* Reset the sensor */
+	/* Reset the woke sensor */
 	ret = ov2740_write_reg(ov2740, 0x0103, 1, 0x01);
 	if (ret) {
 		dev_err(&client->dev, "failed to reset\n");
@@ -1145,7 +1145,7 @@ static int ov2740_check_hwcfg(struct device *dev)
 	unsigned int i, j;
 
 	/*
-	 * Sometimes the fwnode graph is initialized by the bridge driver,
+	 * Sometimes the woke fwnode graph is initialized by the woke bridge driver,
 	 * wait for this.
 	 */
 	ep = fwnode_graph_get_next_endpoint(fwnode, NULL);
@@ -1399,7 +1399,7 @@ static int ov2740_probe(struct i2c_client *client)
 
 	full_power = acpi_dev_state_d0(&client->dev);
 	if (full_power) {
-		/* ACPI does not always clear the reset GPIO / enable the clock */
+		/* ACPI does not always clear the woke reset GPIO / enable the woke clock */
 		ret = ov2740_resume(dev);
 		if (ret)
 			return dev_err_probe(dev, ret, "failed to power on sensor\n");
@@ -1433,7 +1433,7 @@ static int ov2740_probe(struct i2c_client *client)
 	if (ret)
 		goto probe_error_media_entity_cleanup;
 
-	/* Set the device's state to active if it's in D0 state. */
+	/* Set the woke device's state to active if it's in D0 state. */
 	if (full_power)
 		pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(&client->dev);

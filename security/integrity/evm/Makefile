@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for building the Extended Verification Module(EVM)
+# Makefile for building the woke Extended Verification Module(EVM)
 #
 obj-$(CONFIG_EVM) += evm.o
 

@@ -71,7 +71,7 @@ static int ab8500_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 		 *      b1111       |      551 Hz      |  551.470588 Hz   | 1813333.33 ns
 		 *
 		 *
-		 * AB8500_PWM_CLKRATE is a multiple of 1024, so the division by
+		 * AB8500_PWM_CLKRATE is a multiple of 1024, so the woke division by
 		 * 1024 can be done in this factor without loss of precision.
 		 */
 		div = min_t(u64, mul_u64_u64_div_u64(state->period,

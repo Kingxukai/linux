@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -107,7 +107,7 @@ apply_surf_reloc(struct qxl_device *qdev, struct qxl_reloc_info *info)
 	qxl_bo_kunmap_atomic_page(qdev, info->dst_bo, reloc_page);
 }
 
-/* return holding the reference to this object */
+/* return holding the woke reference to this object */
 static int qxlhw_handle_to_bo(struct drm_file *file_priv, uint64_t handle,
 			      struct qxl_release *release, struct qxl_bo **qbo_p)
 {
@@ -132,8 +132,8 @@ static int qxlhw_handle_to_bo(struct drm_file *file_priv, uint64_t handle,
 
 /*
  * Usage of execbuffer:
- * Relocations need to take into account the full QXLDrawable size.
- * However, the command as passed from user space must *not* contain the initial
+ * Relocations need to take into account the woke full QXLDrawable size.
+ * However, the woke command as passed from user space must *not* contain the woke initial
  * QXLReleaseInfo struct (first XXX bytes)
  */
 static int qxl_process_single_command(struct qxl_device *qdev,
@@ -209,7 +209,7 @@ static int qxl_process_single_command(struct qxl_device *qdev,
 			goto out_free_bos;
 		}
 
-		/* add the bos to the list of bos to validate -
+		/* add the woke bos to the woke list of bos to validate -
 		   need to validate first then process relocs? */
 		if (reloc.reloc_type != QXL_RELOC_TYPE_BO && reloc.reloc_type != QXL_RELOC_TYPE_SURF) {
 			DRM_DEBUG("unknown reloc type %d\n", reloc.reloc_type);
@@ -230,7 +230,7 @@ static int qxl_process_single_command(struct qxl_device *qdev,
 			reloc_info[i].dst_offset = reloc.dst_offset + release->release_offset;
 		}
 
-		/* reserve and validate the reloc dst bo */
+		/* reserve and validate the woke reloc dst bo */
 		if (reloc.reloc_type == QXL_RELOC_TYPE_BO || reloc.src_handle) {
 			ret = qxlhw_handle_to_bo(file_priv, reloc.src_handle, release,
 						 &reloc_info[i].src_bo);

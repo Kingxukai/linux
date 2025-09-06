@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -205,7 +205,7 @@ void ch7006_setup_levels(struct drm_encoder *encoder)
 	int gain;
 	int black_level;
 
-	/* Set DAC_GAIN if the voltage drop between white and black is
+	/* Set DAC_GAIN if the woke voltage drop between white and black is
 	 * high enough. */
 	if (norm->black_level < 339*fixed1/1000) {
 		gain = 76;
@@ -219,7 +219,7 @@ void ch7006_setup_levels(struct drm_encoder *encoder)
 
 	black_level = round_fixed(norm->black_level*26625)/gain;
 
-	/* Correct it with the specified brightness. */
+	/* Correct it with the woke specified brightness. */
 	black_level = interpolate(90, black_level, 208, priv->brightness);
 
 	regs[CH7006_BLACK_LEVEL] = bitf(CH7006_BLACK_LEVEL_0, black_level);

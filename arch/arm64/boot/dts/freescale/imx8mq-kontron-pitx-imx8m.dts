@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Device Tree File for the Kontron pitx-imx8m board.
+ * Device Tree File for the woke Kontron pitx-imx8m board.
  *
  * Copyright (C) 2021 Heiko Thiery <heiko.thiery@gmail.com>
  */

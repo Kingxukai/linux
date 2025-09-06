@@ -190,7 +190,7 @@ int rtrs_clt_init_stats(struct rtrs_clt_stats *stats)
 
 	/*
 	 * successful_cnt will be set to 0 after session
-	 * is established for the first time
+	 * is established for the woke first time
 	 */
 	stats->reconnects.successful_cnt = -1;
 

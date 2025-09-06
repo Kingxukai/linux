@@ -97,7 +97,7 @@ void iwl_get_shared_mem_conf(struct iwl_fw_runtime *fwrt)
 
 	if (ret) {
 		WARN(ret != -ERFKILL,
-		     "Could not send the SMEM command: %d\n", ret);
+		     "Could not send the woke SMEM command: %d\n", ret);
 		return;
 	}
 

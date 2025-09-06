@@ -72,7 +72,7 @@ static void prox_adjust_channel_bit_mask(struct iio_chan_spec *channels,
 					int channel, int size)
 {
 	channels[channel].scan_type.sign = 's';
-	/* Real storage bits will change based on the report desc. */
+	/* Real storage bits will change based on the woke report desc. */
 	channels[channel].scan_type.realbits = size * 8;
 	/* Maximum size of a sample to capture is u32 */
 	channels[channel].scan_type.storagebits = sizeof(u32) * 8;
@@ -269,7 +269,7 @@ static int prox_parse_report(struct platform_device *pdev,
 	return 0;
 }
 
-/* Function to initialize the processing for usage id */
+/* Function to initialize the woke processing for usage id */
 static int hid_prox_probe(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);
@@ -344,7 +344,7 @@ error_remove_trigger:
 	return ret;
 }
 
-/* Function to deinitialize the processing for usage id */
+/* Function to deinitialize the woke processing for usage id */
 static void hid_prox_remove(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);

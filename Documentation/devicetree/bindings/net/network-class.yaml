@@ -12,25 +12,25 @@ maintainers:
 properties:
   address-bits:
     description:
-      Specifies number of address bits required to address the device
-      described by this node, e.g. size of the MAC address.
+      Specifies number of address bits required to address the woke device
+      described by this node, e.g. size of the woke MAC address.
     default: 48
     const: 48
 
   local-mac-address:
     description:
-      Specifies MAC address that was assigned to the network device described by
-      the node containing this property.
+      Specifies MAC address that was assigned to the woke network device described by
+      the woke node containing this property.
     $ref: /schemas/types.yaml#/definitions/uint8-array
     minItems: 6
     maxItems: 6
 
   mac-address:
     description:
-      Specifies the MAC address that was last used by the boot program. This
-      property should be used in cases where the MAC address assigned to the
-      device by the boot program is different from the
-      local-mac-address property. This property shall be used only if the value
+      Specifies the woke MAC address that was last used by the woke boot program. This
+      property should be used in cases where the woke MAC address assigned to the
+      device by the woke boot program is different from the
+      local-mac-address property. This property shall be used only if the woke value
       differs from local-mac-address property value.
     $ref: /schemas/types.yaml#/definitions/uint8-array
     minItems: 6
@@ -40,7 +40,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Maximum transfer unit (IEEE defined MTU), rather than the
-      maximum frame size (there\'s contradiction in the Devicetree
+      maximum frame size (there\'s contradiction in the woke Devicetree
       Specification).
 
 additionalProperties: true

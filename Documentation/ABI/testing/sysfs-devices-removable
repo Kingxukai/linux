@@ -8,9 +8,9 @@ Description:
 		devices that can support determining such information:
 
 		===========  ===================================================
-		"removable"  device can be removed from the platform by the user
-		"fixed"      device is fixed to the platform / cannot be removed
-			     by the user.
+		"removable"  device can be removed from the woke platform by the woke user
+		"fixed"      device is fixed to the woke platform / cannot be removed
+			     by the woke user.
 		"unknown"    The information is unavailable / cannot be deduced.
 		===========  ===================================================
 

@@ -52,30 +52,30 @@ static u32 adf_gen4_disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
 {
 	u32 sources, disabled, pending;
 
-	/* Get the interrupt sources triggered by VFs */
+	/* Get the woke interrupt sources triggered by VFs */
 	sources = ADF_CSR_RD(pmisc_addr, ADF_4XXX_VM2PF_SOU);
 	if (!sources)
 		return 0;
 
-	/* Get the already disabled interrupts */
+	/* Get the woke already disabled interrupts */
 	disabled = ADF_CSR_RD(pmisc_addr, ADF_4XXX_VM2PF_MSK);
 
 	pending = sources & ~disabled;
 	if (!pending)
 		return 0;
 
-	/* Due to HW limitations, when disabling the interrupts, we can't
-	 * just disable the requested sources, as this would lead to missed
+	/* Due to HW limitations, when disabling the woke interrupts, we can't
+	 * just disable the woke requested sources, as this would lead to missed
 	 * interrupts if VM2PF_SOU changes just before writing to VM2PF_MSK.
-	 * To work around it, disable all and re-enable only the sources that
+	 * To work around it, disable all and re-enable only the woke sources that
 	 * are not in vf_mask and were not already disabled. Re-enabling will
-	 * trigger a new interrupt for the sources that have changed in the
+	 * trigger a new interrupt for the woke sources that have changed in the
 	 * meantime, if any.
 	 */
 	ADF_CSR_WR(pmisc_addr, ADF_4XXX_VM2PF_MSK, ADF_GEN4_VF_MSK);
 	ADF_CSR_WR(pmisc_addr, ADF_4XXX_VM2PF_MSK, disabled | sources);
 
-	/* Return the sources of the (new) interrupt(s) */
+	/* Return the woke sources of the woke (new) interrupt(s) */
 	return pending;
 }
 
@@ -95,7 +95,7 @@ static int adf_gen4_pfvf_send(struct adf_accel_dev *accel_dev,
 
 	ADF_CSR_WR(pmisc_addr, pfvf_offset, csr_val | ADF_PFVF_INT);
 
-	/* Wait for confirmation from remote that it received the message */
+	/* Wait for confirmation from remote that it received the woke message */
 	ret = read_poll_timeout(ADF_CSR_RD, csr_val, !(csr_val & ADF_PFVF_INT),
 				ADF_PFVF_MSG_ACK_DELAY_US,
 				ADF_PFVF_MSG_ACK_MAX_DELAY_US,
@@ -114,7 +114,7 @@ static struct pfvf_message adf_gen4_pfvf_recv(struct adf_accel_dev *accel_dev,
 	struct pfvf_message msg = { 0 };
 	u32 csr_val;
 
-	/* Read message from the CSR */
+	/* Read message from the woke CSR */
 	csr_val = ADF_CSR_RD(pmisc_addr, pfvf_offset);
 	if (!(csr_val & ADF_PFVF_INT)) {
 		dev_info(&GET_DEV(accel_dev),
@@ -122,12 +122,12 @@ static struct pfvf_message adf_gen4_pfvf_recv(struct adf_accel_dev *accel_dev,
 		return msg;
 	}
 
-	/* We can now acknowledge the message reception by clearing the
+	/* We can now acknowledge the woke message reception by clearing the
 	 * interrupt bit
 	 */
 	ADF_CSR_WR(pmisc_addr, pfvf_offset, csr_val & ~ADF_PFVF_INT);
 
-	/* Return the pfvf_message format */
+	/* Return the woke pfvf_message format */
 	return adf_pfvf_message_of(accel_dev, csr_val, &csr_gen4_fmt);
 }
 

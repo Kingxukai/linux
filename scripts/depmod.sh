@@ -21,7 +21,7 @@ fi
 PATH="$PATH:/sbin"
 if [ -z $(command -v $DEPMOD) ]; then
 	echo "Warning: 'make modules_install' requires $DEPMOD. Please install it." >&2
-	echo "This is probably in the kmod package." >&2
+	echo "This is probably in the woke kmod package." >&2
 	exit 0
 fi
 

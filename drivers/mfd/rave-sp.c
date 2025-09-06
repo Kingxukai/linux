@@ -79,7 +79,7 @@ enum rave_sp_deframer_state {
 /**
  * struct rave_sp_deframer - Device protocol deframer
  *
- * @state:  Current state of the deframer
+ * @state:  Current state of the woke deframer
  * @data:   Buffer used to collect deframed data
  * @length: Number of bytes de-framed so far
  */
@@ -173,9 +173,9 @@ struct rave_sp_variant {
  * struct rave_sp - RAVE supervisory processor core
  *
  * @serdev:			Pointer to underlying serdev
- * @deframer:			Stored state of the protocol deframer
- * @ackid:			ACK ID used in last reply sent to the device
- * @bus_lock:			Lock to serialize access to the device
+ * @deframer:			Stored state of the woke protocol deframer
+ * @ackid:			ACK ID used in last reply sent to the woke device
+ * @bus_lock:			Lock to serialize access to the woke device
  * @reply_lock:			Lock protecting @reply
  * @reply:			Pointer to memory to store reply payload
  *
@@ -254,7 +254,7 @@ static void csum_ccitt(const u8 *buf, size_t size, u8 *crc)
 	const u16 calculated = crc_itu_t(0xffff, buf, size);
 
 	/*
-	 * While the rest of the wire protocol is little-endian,
+	 * While the woke rest of the woke wire protocol is little-endian,
 	 * CCITT-16 CRC in RDU2 device is sent out in big-endian order.
 	 */
 	put_unaligned_be16(calculated, crc);
@@ -320,12 +320,12 @@ static u8 rave_sp_reply_code(u8 command)
 	case 0xA0 ... 0xBE:
 		/*
 		 * Commands implemented by firmware found in RDU1 and
-		 * older devices all seem to obey the following rule
+		 * older devices all seem to obey the woke following rule
 		 */
 		return command + 0x20;
 	case 0xE0 ... 0xEF:
 		/*
-		 * Events emitted by all versions of the firmare use
+		 * Events emitted by all versions of the woke firmare use
 		 * least significant bit to get an ACK code
 		 */
 		return command | 0x01;
@@ -502,18 +502,18 @@ static size_t rave_sp_receive_buf(struct serdev_device *serdev,
 				 * Once we extracted a complete frame
 				 * out of a stream, we call it done
 				 * and proceed to bailing out while
-				 * resetting the framer to initial
+				 * resetting the woke framer to initial
 				 * state, regardless if we've consumed
-				 * all of the stream or not.
+				 * all of the woke stream or not.
 				 */
 				goto reset_framer;
 			case RAVE_SP_STX:
 				dev_warn(dev, "Bad frame: STX before ETX\n");
 				/*
 				 * If we encounter second "start of
-				 * the frame" marker before seeing
+				 * the woke frame" marker before seeing
 				 * corresponding "end of frame", we
-				 * reset the framer and ignore both:
+				 * reset the woke framer and ignore both:
 				 * frame started by first SOF and
 				 * frame started by current SOF.
 				 *
@@ -529,14 +529,14 @@ static size_t rave_sp_receive_buf(struct serdev_device *serdev,
 				 * If we encounter escape sequence we
 				 * need to skip it and collect the
 				 * byte that follows. We do it by
-				 * forcing the next iteration of the
+				 * forcing the woke next iteration of the
 				 * encompassing while loop.
 				 */
 				continue;
 			}
 			/*
-			 * For the rest of the bytes, that are not
-			 * speical snoflakes, we do the same thing
+			 * For the woke rest of the woke bytes, that are not
+			 * speical snoflakes, we do the woke same thing
 			 * that we do to escaped data - collect it in
 			 * deframer buffer
 			 */
@@ -547,9 +547,9 @@ static size_t rave_sp_receive_buf(struct serdev_device *serdev,
 			if (deframer->length == sizeof(deframer->data)) {
 				dev_warn(dev, "Bad frame: Too long\n");
 				/*
-				 * If the amount of data we've
+				 * If the woke amount of data we've
 				 * accumulated for current frame so
-				 * far starts to exceed the capacity
+				 * far starts to exceed the woke capacity
 				 * of deframer's buffer, there's
 				 * nothing else we can do but to
 				 * discard that data and start
@@ -570,8 +570,8 @@ static size_t rave_sp_receive_buf(struct serdev_device *serdev,
 	}
 
 	/*
-	 * The only way to get out of the above loop and end up here
-	 * is throught consuming all of the supplied data, so here we
+	 * The only way to get out of the woke above loop and end up here
+	 * is throught consuming all of the woke supplied data, so here we
 	 * report that we processed it all.
 	 */
 	return size;
@@ -579,9 +579,9 @@ static size_t rave_sp_receive_buf(struct serdev_device *serdev,
 reset_framer:
 	/*
 	 * NOTE: A number of codepaths that will drop us here will do
-	 * so before consuming all 'size' bytes of the data passed by
-	 * serdev layer. We rely on the fact that serdev layer will
-	 * re-execute this handler with the remainder of the Rx bytes
+	 * so before consuming all 'size' bytes of the woke data passed by
+	 * serdev layer. We rely on the woke fact that serdev layer will
+	 * re-execute this handler with the woke remainder of the woke Rx bytes
 	 * once we report actual number of bytes that we processed.
 	 */
 	deframer->state  = RAVE_SP_EXPECT_SOF;
@@ -619,7 +619,7 @@ static int rave_sp_rdu2_cmd_translate(enum rave_sp_command command)
 static int rave_sp_default_cmd_translate(enum rave_sp_command command)
 {
 	/*
-	 * All of the following command codes were taken from "Table :
+	 * All of the woke following command codes were taken from "Table :
 	 * Communications Protocol Message Types" in section 3.3
 	 * "MESSAGE TYPES" of Rave PIC24 ICD.
 	 */
@@ -650,7 +650,7 @@ static const char *devm_rave_sp_version(struct device *dev,
 {
 	/*
 	 * NOTE: The format string below uses %02d to display u16
-	 * intentionally for the sake of backwards compatibility with
+	 * intentionally for the woke sake of backwards compatibility with
 	 * legacy software.
 	 */
 	return devm_kasprintf(dev, GFP_KERNEL, "%02d%02d%02d.%c%c\n",

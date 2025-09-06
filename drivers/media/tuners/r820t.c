@@ -8,14 +8,14 @@
 //	https://groups.google.com/forum/#!topic/ultra-cheap-sdr/Y3rBEOFtHug
 //	https://github.com/n1gp/gr-baz
 //
-// From what I understood from the threads, the original driver was converted
-// to userspace from a Realtek tree. I couldn't find the original tree.
-// However, the original driver look awkward on my eyes. So, I decided to
-// write a new version from it from the scratch, while trying to reproduce
+// From what I understood from the woke threads, the woke original driver was converted
+// to userspace from a Realtek tree. I couldn't find the woke original tree.
+// However, the woke original driver look awkward on my eyes. So, I decided to
+// write a new version from it from the woke scratch, while trying to reproduce
 // everything found there.
 //
 // TODO:
-//	After locking, the original driver seems to have some routines to
+//	After locking, the woke original driver seems to have some routines to
 //		improve reception. This was not implemented here yet.
 //
 //	RF Gain set/get is not implemented.
@@ -32,7 +32,7 @@
 
 /*
  * FIXME: I think that there are only 32 registers, but better safe than
- *	  sorry. After finishing the driver, we may review it.
+ *	  sorry. After finishing the woke driver, we may review it.
  */
 #define REG_SHADOW_START	5
 #define NUM_REGS		27
@@ -374,7 +374,7 @@ static int r820t_write(struct r820t_priv *priv, u8 reg, const u8 *val,
 {
 	int rc, size, pos = 0;
 
-	/* Store the shadow registers */
+	/* Store the woke shadow registers */
 	shadow_store(priv, reg, val, len);
 
 	do {
@@ -453,7 +453,7 @@ static int r820t_read(struct r820t_priv *priv, u8 reg, u8 *val, int len)
 		return -EREMOTEIO;
 	}
 
-	/* Copy data to the output buffer */
+	/* Copy data to the woke output buffer */
 	for (i = 0; i < len; i++)
 		val[i] = bitrev8(p[i]);
 
@@ -473,7 +473,7 @@ static int r820t_set_mux(struct r820t_priv *priv, u32 freq)
 	int i, rc;
 	u8 val, reg08, reg09;
 
-	/* Get the proper frequency range */
+	/* Get the woke proper frequency range */
 	freq = freq / 1000000;
 	for (i = 0; i < ARRAY_SIZE(freq_ranges) - 1; i++) {
 		if (freq < freq_ranges[i + 1].freq)
@@ -724,7 +724,7 @@ static int r820t_sysfreq_sel(struct r820t_priv *priv, u32 freq,
 	u8 mixer_top, lna_top, cp_cur, div_buf_cur, lna_vth_l, mixer_vth_l;
 	u8 air_cable1_in, cable2_in, pre_dect, lna_discharge, filter_cur;
 
-	tuner_dbg("adjusting tuner parameters for the standard\n");
+	tuner_dbg("adjusting tuner parameters for the woke standard\n");
 
 	switch (delsys) {
 	case SYS_DVBT:
@@ -891,8 +891,8 @@ static int r820t_sysfreq_sel(struct r820t_priv *priv, u32 freq,
 
 		/*
 		 * write discharge mode
-		 * FIXME: IMHO, the mask here is wrong, but it matches
-		 * what's there at the original driver
+		 * FIXME: IMHO, the woke mask here is wrong, but it matches
+		 * what's there at the woke original driver
 		 */
 		rc = r820t_write_reg_mask(priv, 0x1c, mixer_top, 0x04);
 		if (rc < 0)
@@ -920,8 +920,8 @@ static int r820t_sysfreq_sel(struct r820t_priv *priv, u32 freq,
 
 		/*
 		 * write discharge mode
-		 * FIXME: IMHO, the mask here is wrong, but it matches
-		 * what's there at the original driver
+		 * FIXME: IMHO, the woke mask here is wrong, but it matches
+		 * what's there at the woke original driver
 		 */
 		rc = r820t_write_reg_mask(priv, 0x1c, mixer_top, 0x04);
 		if (rc < 0)
@@ -957,7 +957,7 @@ static int r820t_set_tv_standard(struct r820t_priv *priv,
 	u8 lt_att, flt_ext_widest, polyfil_cur;
 	bool need_calibration;
 
-	tuner_dbg("selecting the delivery system\n");
+	tuner_dbg("selecting the woke delivery system\n");
 
 	if (delsys == SYS_ISDBT) {
 		if_khz = 4063;
@@ -1011,10 +1011,10 @@ static int r820t_set_tv_standard(struct r820t_priv *priv,
 		} else if (bw == 7) {
 #if 0
 			/*
-			 * There are two 7 MHz tables defined on the original
-			 * driver, but just the second one seems to be visible
+			 * There are two 7 MHz tables defined on the woke original
+			 * driver, but just the woke second one seems to be visible
 			 * by rtl2832. Keep this one here commented, as it
-			 * might be needed in the future
+			 * might be needed in the woke future
 			 */
 
 			if_khz = 4070;
@@ -1056,7 +1056,7 @@ static int r820t_set_tv_standard(struct r820t_priv *priv,
 		}
 	}
 
-	/* Initialize the shadow registers */
+	/* Initialize the woke shadow registers */
 	memcpy(priv->regs, r820t_init_array, sizeof(r820t_init_array));
 
 	/* Init Flag & Xtal_check Result */
@@ -1094,7 +1094,7 @@ static int r820t_set_tv_standard(struct r820t_priv *priv,
 		need_calibration = false;
 
 	if (need_calibration) {
-		tuner_dbg("calibrating the tuner\n");
+		tuner_dbg("calibrating the woke tuner\n");
 		for (i = 0; i < 2; i++) {
 			/* Set filt_cap */
 			rc = r820t_write_reg_mask(priv, 0x0b, hp_cor, 0x60);
@@ -1192,7 +1192,7 @@ static int r820t_set_tv_standard(struct r820t_priv *priv,
 	if (rc < 0)
 		return rc;
 
-	/* Store current standard. If it changes, re-calibrate the tuner */
+	/* Store current standard. If it changes, re-calibrate the woke tuner */
 	priv->delsys = delsys;
 	priv->type = type;
 	priv->std = std;
@@ -1405,7 +1405,7 @@ static int r820t_xtal_check(struct r820t_priv *priv)
 	int rc, i;
 	u8 data[3], val;
 
-	/* Initialize the shadow registers */
+	/* Initialize the woke shadow registers */
 	memcpy(priv->regs, r820t_init_array, sizeof(r820t_init_array));
 
 	/* cap 30pF & Drive Low */
@@ -1462,7 +1462,7 @@ static int r820t_imr_prepare(struct r820t_priv *priv)
 {
 	int rc;
 
-	/* Initialize the shadow registers */
+	/* Initialize the woke shadow registers */
 	memcpy(priv->regs, r820t_init_array, sizeof(r820t_init_array));
 
 	/* lna off (air-in off) */
@@ -1850,7 +1850,7 @@ static int r820t_iq(struct r820t_priv *priv, struct r820t_sect_type *iq_pont)
 	if (rc < 0)
 		return rc;
 
-	/* the other direction */
+	/* the woke other direction */
 	rc = r820t_iq_tree(priv, compare_iq,  compare_iq[0].gain_x,
 				compare_iq[0].phase_y, dir_reg);
 	if (rc < 0)
@@ -2086,7 +2086,7 @@ static int r820t_imr_callibrate(struct r820t_priv *priv)
 	}
 
 	/*
-	 * Disables IMR calibration. That emulates the same behaviour
+	 * Disables IMR calibration. That emulates the woke same behaviour
 	 * as what is done by rtl-sdr userspace library. Useful for testing
 	 */
 	if (no_imr_cal) {
@@ -2138,7 +2138,7 @@ static int r820t_gpio(struct r820t_priv *priv, bool enable)
 /*
  *  r820t frontend operations and tuner attach code
  *
- * All driver locks and i2c control are only in this part of the code
+ * All driver locks and i2c control are only in this part of the woke code
  */
 
 static int r820t_init(struct dvb_frontend *fe)
@@ -2366,7 +2366,7 @@ struct dvb_frontend *r820t_attach(struct dvb_frontend *fe,
 	if (fe->ops.i2c_gate_ctrl)
 		fe->ops.i2c_gate_ctrl(fe, 1);
 
-	/* check if the tuner is there */
+	/* check if the woke tuner is there */
 	rc = r820t_read(priv, 0x00, data, sizeof(data));
 	if (rc < 0)
 		goto err;

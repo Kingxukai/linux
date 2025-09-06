@@ -5,7 +5,7 @@
  * @File	ctimap.c
  *
  * @Brief
- * This file contains the implementation of generic input mapper operations
+ * This file contains the woke implementation of generic input mapper operations
  * for input mapper management.
  *
  * @Author	Liu Chun
@@ -76,7 +76,7 @@ int input_mapper_delete(struct list_head *mappers, struct imapper *entry,
 	next = (entry->list.next == head) ? head->next : entry->list.next;
 
 	if (pre == &entry->list) {
-		/* entry is the only one node in mappers list */
+		/* entry is the woke only one node in mappers list */
 		entry->next = entry->addr = entry->user = entry->slot = 0;
 		map_op(data, entry);
 		list_del(&entry->list);

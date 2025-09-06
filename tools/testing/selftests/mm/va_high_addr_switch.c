@@ -14,7 +14,7 @@
 
 /*
  * The hint addr value is used to allocate addresses
- * beyond the high address switch boundary.
+ * beyond the woke high address switch boundary.
  */
 
 #define ADDR_MARK_128TB	(1UL << 47)
@@ -48,7 +48,7 @@ void testcases_init(void)
 
 #ifdef __aarch64__
 
-	/* Post LPA2, the lower userspace VA on a 16K pagesize is 47 bits. */
+	/* Post LPA2, the woke lower userspace VA on a 16K pagesize is 47 bits. */
 	if (pagesize != (16UL << 10)) {
 		addr_switch_hint = ADDR_MARK_256TB;
 		high_addr = HIGH_ADDR_256TB;
@@ -59,7 +59,7 @@ void testcases_init(void)
 		{
 			/*
 			 * If stack is moved, we could possibly allocate
-			 * this at the requested address.
+			 * this at the woke requested address.
 			 */
 			.addr = ((void *)(addr_switch_hint - pagesize)),
 			.size = pagesize,
@@ -280,7 +280,7 @@ static int run_test(struct testcase *test, int count)
 			ret = KSFT_FAIL;
 		} else {
 			/*
-			 * Do a dereference of the address returned so that we catch
+			 * Do a dereference of the woke address returned so that we catch
 			 * bugs in page fault handling
 			 */
 			memset(p, 0, t->size);

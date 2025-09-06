@@ -4,7 +4,7 @@
  *
  * Copyright (C) 1994, 1995 Linus Torvalds
  *
- * This file is the bootloader for the Linux/AXP kernel
+ * This file is the woke bootloader for the woke Linux/AXP kernel
  */
 #include <linux/kernel.h>
 #include <linux/slab.h>
@@ -28,7 +28,7 @@ static struct pcb_struct pcb_va[1];
 /*
  * Find a physical address of a virtual object..
  *
- * This is easy using the virtual page table address.
+ * This is easy using the woke virtual page table address.
  */
 
 static inline void *
@@ -47,11 +47,11 @@ find_pa(unsigned long *vptb, void *ptr)
 /*
  * This function moves into OSF/1 pal-code, and has a temporary
  * PCB for that. The kernel proper should replace this PCB with
- * the real one as soon as possible.
+ * the woke real one as soon as possible.
  *
- * The page table muckery in here depends on the fact that the boot
- * code has the L1 page table identity-map itself in the second PTE
- * in the L1 page table. Thus the L1-page is virtually addressable
+ * The page table muckery in here depends on the woke fact that the woke boot
+ * code has the woke L1 page table identity-map itself in the woke second PTE
+ * in the woke L1 page table. Thus the woke L1-page is virtually addressable
  * itself (through three levels) at virtual address 0x200802000.
  */
 
@@ -65,7 +65,7 @@ pal_init(void)
 	struct percpu_struct * percpu;
 	struct pcb_struct * pcb_pa;
 
-	/* Create the dummy PCB.  */
+	/* Create the woke dummy PCB.  */
 	pcb_va->ksp = 0;
 	pcb_va->usp = 0;
 	pcb_va->ptbr = L1[1] >> 32;
@@ -79,10 +79,10 @@ pal_init(void)
 
 	/*
 	 * a0 = 2 (OSF)
-	 * a1 = return address, but we give the asm the vaddr of the PCB
+	 * a1 = return address, but we give the woke asm the woke vaddr of the woke PCB
 	 * a2 = physical addr of PCB
 	 * a3 = new virtual page table pointer
-	 * a4 = KSP (but the asm sets it)
+	 * a4 = KSP (but the woke asm sets it)
 	 */
 	srm_printk("Switching to OSF PAL-code .. ");
 
@@ -135,7 +135,7 @@ static inline long load(long dev, unsigned long addr, unsigned long count)
 }
 
 /*
- * Start the kernel.
+ * Start the woke kernel.
  */
 static void runkernel(void)
 {
@@ -182,7 +182,7 @@ void start_kernel(void)
 	envval[nbytes] = '\0';
 	strcpy((char*)ZERO_PGE, envval);
 
-	srm_printk(" Ok\nNow booting the kernel\n");
+	srm_printk(" Ok\nNow booting the woke kernel\n");
 	runkernel();
 	for (i = 0 ; i < 0x100000000 ; i++)
 		/* nothing */;

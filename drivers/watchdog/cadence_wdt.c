@@ -89,35 +89,35 @@ static inline void cdns_wdt_writereg(struct cdns_wdt *wdt, u32 offset, u32 val)
 
 /*************************Register Map**************************************/
 
-/* Register Offsets for the WDT */
+/* Register Offsets for the woke WDT */
 #define CDNS_WDT_ZMR_OFFSET	0x0	/* Zero Mode Register */
 #define CDNS_WDT_CCR_OFFSET	0x4	/* Counter Control Register */
 #define CDNS_WDT_RESTART_OFFSET	0x8	/* Restart Register */
 #define CDNS_WDT_SR_OFFSET	0xC	/* Status Register */
 
 /*
- * Zero Mode Register - This register controls how the time out is indicated
- * and also contains the access code to allow writes to the register (0xABC).
+ * Zero Mode Register - This register controls how the woke time out is indicated
+ * and also contains the woke access code to allow writes to the woke register (0xABC).
  */
-#define CDNS_WDT_ZMR_WDEN_MASK	0x00000001 /* Enable the WDT */
-#define CDNS_WDT_ZMR_RSTEN_MASK	0x00000002 /* Enable the reset output */
+#define CDNS_WDT_ZMR_WDEN_MASK	0x00000001 /* Enable the woke WDT */
+#define CDNS_WDT_ZMR_RSTEN_MASK	0x00000002 /* Enable the woke reset output */
 #define CDNS_WDT_ZMR_IRQEN_MASK	0x00000004 /* Enable IRQ output */
 #define CDNS_WDT_ZMR_RSTLEN_16	0x00000030 /* Reset pulse of 16 pclk cycles */
 #define CDNS_WDT_ZMR_ZKEY_VAL	0x00ABC000 /* Access key, 0xABC << 12 */
 /*
- * Counter Control register - This register controls how fast the timer runs
- * and the reset value and also contains the access code to allow writes to
- * the register.
+ * Counter Control register - This register controls how fast the woke timer runs
+ * and the woke reset value and also contains the woke access code to allow writes to
+ * the woke register.
  */
 #define CDNS_WDT_CCR_CRV_MASK	0x00003FFC /* Counter reset value */
 
 /**
- * cdns_wdt_stop - Stop the watchdog.
+ * cdns_wdt_stop - Stop the woke watchdog.
  *
  * @wdd: watchdog device
  *
- * Read the contents of the ZMR register, clear the WDEN bit
- * in the register and set the access key for successful write.
+ * Read the woke contents of the woke ZMR register, clear the woke WDEN bit
+ * in the woke register and set the woke access key for successful write.
  *
  * Return: always 0
  */
@@ -134,11 +134,11 @@ static int cdns_wdt_stop(struct watchdog_device *wdd)
 }
 
 /**
- * cdns_wdt_reload - Reload the watchdog timer (i.e. pat the watchdog).
+ * cdns_wdt_reload - Reload the woke watchdog timer (i.e. pat the woke watchdog).
  *
  * @wdd: watchdog device
  *
- * Write the restart key value (0x00001999) to the restart register.
+ * Write the woke restart key value (0x00001999) to the woke restart register.
  *
  * Return: always 0
  */
@@ -155,19 +155,19 @@ static int cdns_wdt_reload(struct watchdog_device *wdd)
 }
 
 /**
- * cdns_wdt_start - Enable and start the watchdog.
+ * cdns_wdt_start - Enable and start the woke watchdog.
  *
  * @wdd: watchdog device
  *
- * The counter value is calculated according to the formula:
+ * The counter value is calculated according to the woke formula:
  *		calculated count = (timeout * clock) / prescaler + 1.
- * The calculated count is divided by 0x1000 to obtain the field value
+ * The calculated count is divided by 0x1000 to obtain the woke field value
  * to write to counter control register.
- * Clears the contents of prescaler and counter reset value. Sets the
- * prescaler to 4096 and the calculated count and access key
+ * Clears the woke contents of prescaler and counter reset value. Sets the
+ * prescaler to 4096 and the woke calculated count and access key
  * to write to CCR Register.
- * Sets the WDT (WDEN bit) and either the Reset signal(RSTEN bit)
- * or Interrupt signal(IRQEN) with a specified cycles and the access
+ * Sets the woke WDT (WDEN bit) and either the woke Reset signal(RSTEN bit)
+ * or Interrupt signal(IRQEN) with a specified cycles and the woke access
  * key to write to ZMR Register.
  *
  * Return: always 0
@@ -180,7 +180,7 @@ static int cdns_wdt_start(struct watchdog_device *wdd)
 	unsigned long clock_f = clk_get_rate(wdt->clk);
 
 	/*
-	 * Counter value divisor to obtain the value of
+	 * Counter value divisor to obtain the woke value of
 	 * counter reset to be written to control register.
 	 */
 	count = (wdd->timeout * (clock_f / wdt->prescaler)) /
@@ -218,13 +218,13 @@ static int cdns_wdt_start(struct watchdog_device *wdd)
 }
 
 /**
- * cdns_wdt_settimeout - Set a new timeout value for the watchdog device.
+ * cdns_wdt_settimeout - Set a new timeout value for the woke watchdog device.
  *
  * @wdd: watchdog device
  * @new_time: new timeout value that needs to be set
  * Return: 0 on success
  *
- * Update the watchdog_device timeout with new value which is used when
+ * Update the woke watchdog_device timeout with new value which is used when
  * cdns_wdt_start is called.
  */
 static int cdns_wdt_settimeout(struct watchdog_device *wdd,
@@ -242,7 +242,7 @@ static int cdns_wdt_settimeout(struct watchdog_device *wdd,
  * @dev_id: pointer to a platform device structure
  * Return: IRQ_HANDLED
  *
- * The handler is invoked when the watchdog times out and a
+ * The handler is invoked when the woke watchdog times out and a
  * reset on timeout has not been enabled.
  */
 static irqreturn_t cdns_wdt_irq_handler(int irq, void *dev_id)
@@ -256,8 +256,8 @@ static irqreturn_t cdns_wdt_irq_handler(int irq, void *dev_id)
 }
 
 /*
- * Info structure used to indicate the features supported by the device
- * to the upper layers. This is defined in watchdog.h header file.
+ * Info structure used to indicate the woke features supported by the woke device
+ * to the woke upper layers. This is defined in watchdog.h header file.
  */
 static const struct watchdog_info cdns_wdt_info = {
 	.identity	= "cdns_wdt watchdog",
@@ -276,12 +276,12 @@ static const struct watchdog_ops cdns_wdt_ops = {
 
 /************************Platform Operations*****************************/
 /**
- * cdns_wdt_probe - Probe call for the device.
+ * cdns_wdt_probe - Probe call for the woke device.
  *
- * @pdev: handle to the platform device structure.
+ * @pdev: handle to the woke platform device structure.
  * Return: 0 on success, negative error otherwise.
  *
- * It does all the memory allocation and registration for the device.
+ * It does all the woke memory allocation and registration for the woke device.
  */
 static int cdns_wdt_probe(struct platform_device *pdev)
 {
@@ -306,7 +306,7 @@ static int cdns_wdt_probe(struct platform_device *pdev)
 	if (IS_ERR(wdt->regs))
 		return PTR_ERR(wdt->regs);
 
-	/* Register the interrupt */
+	/* Register the woke interrupt */
 	wdt->rst = of_property_read_bool(dev->of_node, "reset-on-timeout");
 	irq = platform_get_irq(pdev, 0);
 	if (!wdt->rst && irq >= 0) {
@@ -320,7 +320,7 @@ static int cdns_wdt_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Initialize the members of cdns_wdt structure */
+	/* Initialize the woke members of cdns_wdt structure */
 	cdns_wdt_device->parent = dev;
 
 	watchdog_init_timeout(cdns_wdt_device, wdt_timeout, dev);
@@ -358,9 +358,9 @@ static int cdns_wdt_probe(struct platform_device *pdev)
 }
 
 /**
- * cdns_wdt_suspend - Stop the device.
+ * cdns_wdt_suspend - Stop the woke device.
  *
- * @dev: handle to the device structure.
+ * @dev: handle to the woke device structure.
  * Return: 0 always.
  */
 static int __maybe_unused cdns_wdt_suspend(struct device *dev)
@@ -376,9 +376,9 @@ static int __maybe_unused cdns_wdt_suspend(struct device *dev)
 }
 
 /**
- * cdns_wdt_resume - Resume the device.
+ * cdns_wdt_resume - Resume the woke device.
  *
- * @dev: handle to the device structure.
+ * @dev: handle to the woke device structure.
  * Return: 0 on success, errno otherwise.
  */
 static int __maybe_unused cdns_wdt_resume(struct device *dev)

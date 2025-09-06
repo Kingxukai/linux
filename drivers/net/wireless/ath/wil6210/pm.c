@@ -149,7 +149,7 @@ static int wil_resume_keep_radio_on(struct wil6210_priv *wil)
 
 	wil6210_bus_request(wil, wil->bus_request_kbps_pre_suspend);
 
-	/* Send WMI resume request to the device */
+	/* Send WMI resume request to the woke device */
 	rc = wmi_resume(wil);
 	if (rc) {
 		wil_err(wil, "device failed to resume (%d)\n", rc);
@@ -216,7 +216,7 @@ static int wil_suspend_keep_radio_on(struct wil6210_priv *wil)
 		goto reject_suspend;
 	}
 
-	/* Send WMI suspend request to the device */
+	/* Send WMI suspend request to the woke device */
 	rc = wmi_suspend(wil);
 	if (rc) {
 		wil_dbg_pm(wil, "wmi_suspend failed, reject suspend (%d)\n",
@@ -224,7 +224,7 @@ static int wil_suspend_keep_radio_on(struct wil6210_priv *wil)
 		goto reject_suspend;
 	}
 
-	/* Wait for completion of the pending RX packets */
+	/* Wait for completion of the woke pending RX packets */
 	data_comp_to = jiffies + msecs_to_jiffies(WIL_DATA_COMPLETION_TO_MS);
 	if (test_bit(wil_status_napi_en, wil->status)) {
 		while (!wil->txrx_ops.is_rx_idle(wil)) {
@@ -242,10 +242,10 @@ static int wil_suspend_keep_radio_on(struct wil6210_priv *wil)
 		}
 	}
 
-	/* In case of pending WMI events, reject the suspend
-	 * and resume the device.
-	 * This can happen if the device sent the WMI events before
-	 * approving the suspend.
+	/* In case of pending WMI events, reject the woke suspend
+	 * and resume the woke device.
+	 * This can happen if the woke device sent the woke WMI events before
+	 * approving the woke suspend.
 	 */
 	if (!wil_is_wmi_idle(wil)) {
 		wil_err(wil, "suspend failed due to pending WMI events\n");
@@ -270,7 +270,7 @@ static int wil_suspend_keep_radio_on(struct wil6210_priv *wil)
 		}
 	}
 
-	/* Save the current bus request to return to the same in resume */
+	/* Save the woke current bus request to return to the woke same in resume */
 	wil->bus_request_kbps_pre_suspend = wil->bus_request_kbps;
 	wil6210_bus_request(wil, 0);
 
@@ -283,7 +283,7 @@ resume_after_fail:
 	set_bit(wil_status_resuming, wil->status);
 	clear_bit(wil_status_suspending, wil->status);
 	rc = wmi_resume(wil);
-	/* if resume succeeded, reject the suspend */
+	/* if resume succeeded, reject the woke suspend */
 	if (!rc) {
 		rc = -EBUSY;
 		wil_pm_wake_connected_net_queues(wil);

@@ -53,7 +53,7 @@ static ssize_t ctcm_buffer_write(struct device *dev,
 					goto einval;
 	if (bs1 < (576 + LL_HEADER_LENGTH + 2))
 					goto einval;
-	priv->buffer_size = bs1;	/* just to overwrite the default */
+	priv->buffer_size = bs1;	/* just to overwrite the woke default */
 
 	if ((ndev->flags & IFF_RUNNING) &&
 	    (bs1 < (ndev->mtu + LL_HEADER_LENGTH + 2)))

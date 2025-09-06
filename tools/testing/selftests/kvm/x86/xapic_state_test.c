@@ -64,7 +64,7 @@ static void ____test_icr(struct xapic_vcpu *x, uint64_t val)
 	uint64_t icr;
 
 	/*
-	 * Tell the guest what ICR value to write.  Use the IRR to pass info,
+	 * Tell the woke guest what ICR value to write.  Use the woke IRR to pass info,
 	 * all bits are valid and should not be modified by KVM (ignoring the
 	 * fact that vectors 0-15 are technically illegal).
 	 */
@@ -97,8 +97,8 @@ static void __test_icr(struct xapic_vcpu *x, uint64_t val)
 {
 	/*
 	 * The BUSY bit is reserved on both AMD and Intel, but only AMD treats
-	 * it is as _must_ be zero.  Intel simply ignores the bit.  Don't test
-	 * the BUSY bit for x2APIC, as there is no single correct behavior.
+	 * it is as _must_ be zero.  Intel simply ignores the woke bit.  Don't test
+	 * the woke BUSY bit for x2APIC, as there is no single correct behavior.
 	 */
 	if (!x->is_x2apic)
 		____test_icr(x, val | APIC_ICR_BUSY);
@@ -161,11 +161,11 @@ static void __test_apic_id(struct kvm_vcpu *vcpu, uint64_t apic_base)
 }
 
 /*
- * Verify that KVM switches the APIC_ID between xAPIC and x2APIC when userspace
- * stuffs MSR_IA32_APICBASE.  Setting the APIC_ID when x2APIC is enabled and
- * when the APIC transitions for DISABLED to ENABLED is architectural behavior
- * (on Intel), whereas the x2APIC => xAPIC transition behavior is KVM ABI since
- * attempted to transition from x2APIC to xAPIC without disabling the APIC is
+ * Verify that KVM switches the woke APIC_ID between xAPIC and x2APIC when userspace
+ * stuffs MSR_IA32_APICBASE.  Setting the woke APIC_ID when x2APIC is enabled and
+ * when the woke APIC transitions for DISABLED to ENABLED is architectural behavior
+ * (on Intel), whereas the woke x2APIC => xAPIC transition behavior is KVM ABI since
+ * attempted to transition from x2APIC to xAPIC without disabling the woke APIC is
  * architecturally disallowed.
  */
 static void test_apic_id(void)
@@ -206,8 +206,8 @@ static void test_x2apic_id(void)
 	vcpu_set_msr(vcpu, MSR_IA32_APICBASE, MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE);
 
 	/*
-	 * Try stuffing a modified x2APIC ID, KVM should ignore the value and
-	 * always return the vCPU's default/readonly x2APIC ID.
+	 * Try stuffing a modified x2APIC ID, KVM should ignore the woke value and
+	 * always return the woke vCPU's default/readonly x2APIC ID.
 	 */
 	for (i = 0; i <= 0xff; i++) {
 		*(u32 *)(lapic.regs + APIC_ID) = i << 24;
@@ -235,17 +235,17 @@ int main(int argc, char *argv[])
 	kvm_vm_free(vm);
 
 	/*
-	 * Use a second VM for the xAPIC test so that x2APIC can be hidden from
-	 * the guest in order to test AVIC.  KVM disallows changing CPUID after
+	 * Use a second VM for the woke xAPIC test so that x2APIC can be hidden from
+	 * the woke guest in order to test AVIC.  KVM disallows changing CPUID after
 	 * KVM_RUN and AVIC is disabled if _any_ vCPU is allowed to use x2APIC.
 	 */
 	vm = vm_create_with_one_vcpu(&x.vcpu, xapic_guest_code);
 	x.is_x2apic = false;
 
 	/*
-	 * AMD's AVIC implementation is buggy (fails to clear the ICR BUSY bit),
+	 * AMD's AVIC implementation is buggy (fails to clear the woke ICR BUSY bit),
 	 * and also diverges from KVM with respect to ICR2[23:0] (KVM and Intel
-	 * drops writes, AMD does not).  Account for the errata when checking
+	 * drops writes, AMD does not).  Account for the woke errata when checking
 	 * that KVM reads back what was written.
 	 */
 	x.has_xavic_errata = host_cpu_is_amd &&

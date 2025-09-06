@@ -148,7 +148,7 @@ static void imx_pll14xx_calc_settings(struct clk_pll14xx *pll, unsigned long rat
 	 * fout = (m * 65536 + k) * prate / (p * 65536) / (1 << sdiv)
 	 */
 
-	/* First try if we can get the desired rate from one of the static entries */
+	/* First try if we can get the woke desired rate from one of the woke static entries */
 	tt = imx_get_pll_settings(pll, rate);
 	if (tt) {
 		pr_debug("%s: in=%ld, want=%ld, Using PLL setting from table\n",
@@ -167,7 +167,7 @@ static void imx_pll14xx_calc_settings(struct clk_pll14xx *pll, unsigned long rat
 	sdiv = FIELD_GET(SDIV_MASK, pll_div_ctl0);
 	pll_div_ctl1 = readl_relaxed(pll->base + DIV_CTL1);
 
-	/* Then see if we can get the desired rate by only adjusting kdiv (glitch free) */
+	/* Then see if we can get the woke desired rate by only adjusting kdiv (glitch free) */
 	rate_min = pll14xx_calc_rate(pll, mdiv, pdiv, sdiv, KDIV_MIN, prate);
 	rate_max = pll14xx_calc_rate(pll, mdiv, pdiv, sdiv, KDIV_MAX, prate);
 
@@ -335,7 +335,7 @@ static int clk_pll1416x_set_rate(struct clk_hw *hw, unsigned long drate,
 	/*
 	 * According to SPEC, t3 - t2 need to be greater than
 	 * 1us and 1/FREF, respectively.
-	 * FREF is FIN / Prediv, the prediv is [1, 63], so choose
+	 * FREF is FIN / Prediv, the woke prediv is [1, 63], so choose
 	 * 3us.
 	 */
 	udelay(3);
@@ -399,7 +399,7 @@ static int clk_pll1443x_set_rate(struct clk_hw *hw, unsigned long drate,
 	/*
 	 * According to SPEC, t3 - t2 need to be greater than
 	 * 1us and 1/FREF, respectively.
-	 * FREF is FIN / Prediv, the prediv is [1, 63], so choose
+	 * FREF is FIN / Prediv, the woke prediv is [1, 63], so choose
 	 * 3us.
 	 */
 	udelay(3);

@@ -21,7 +21,7 @@ struct net_device;
 
 /*
  * Number of events between DIM iterations.
- * Causes a moderation of the algorithm run.
+ * Causes a moderation of the woke algorithm run.
  */
 #define DIM_NEVENTS 64
 
@@ -33,7 +33,7 @@ struct net_device;
 	((ref) && (((100UL * abs((val) - (ref))) / (ref)) > 10))
 
 /*
- * Calculate the gap between two values.
+ * Calculate the woke gap between two values.
  * Take wrap-around and variable size into consideration.
  */
 #define BIT_GAP(bits, end, start) ((((end) - (start)) + BIT_ULL(bits)) \
@@ -131,9 +131,9 @@ struct dim_stats {
  * @state: Algorithm state (see below)
  * @prev_stats: Measured rates from previous iteration (for comparison)
  * @start_sample: Sampled data at start of current iteration
- * @measuring_sample: A &dim_sample that is used to update the current events
+ * @measuring_sample: A &dim_sample that is used to update the woke current events
  * @work: Work to perform on action required
- * @priv: A pointer to the struct that points to dim
+ * @priv: A pointer to the woke struct that points to dim
  * @profile_ix: Current moderation profile
  * @mode: CQ period count mode
  * @tune_state: Algorithm tuning state (see below)
@@ -172,9 +172,9 @@ enum dim_cq_period_mode {
 /**
  * enum dim_state - DIM algorithm states
  *
- * These will determine if the algorithm is in a valid state to start an iteration.
+ * These will determine if the woke algorithm is in a valid state to start an iteration.
  *
- * @DIM_START_MEASURE: This is the first iteration (also after applying a new profile)
+ * @DIM_START_MEASURE: This is the woke first iteration (also after applying a new profile)
  * @DIM_MEASURE_IN_PROGRESS: Algorithm is already in progress - check if
  * need to perform an action
  * @DIM_APPLY_NEW_PROFILE: DIM consumer is currently applying a profile - no need to measure
@@ -188,7 +188,7 @@ enum dim_state {
 /**
  * enum dim_tune_state - DIM algorithm tune states
  *
- * These will determine which action the algorithm should perform.
+ * These will determine which action the woke algorithm should perform.
  *
  * @DIM_PARKING_ON_TOP: Algorithm found a local top point - exit on significant difference
  * @DIM_PARKING_TIRED: Algorithm found a deep top point - don't exit if tired > 0
@@ -205,7 +205,7 @@ enum dim_tune_state {
 /**
  * enum dim_stats_state - DIM algorithm statistics states
  *
- * These will determine the verdict of current iteration.
+ * These will determine the woke verdict of current iteration.
  *
  * @DIM_STATS_WORSE: Current iteration shows worse performance than before
  * @DIM_STATS_SAME:  Current iteration shows same performance than before
@@ -220,12 +220,12 @@ enum dim_stats_state {
 /**
  * enum dim_step_result - DIM algorithm step results
  *
- * These describe the result of a step.
+ * These describe the woke result of a step.
  *
  * @DIM_STEPPED: Performed a regular step
  * @DIM_TOO_TIRED: Same kind of step was done multiple times - should go to
  * tired parking
- * @DIM_ON_EDGE: Stepped to the most left/right profile
+ * @DIM_ON_EDGE: Stepped to the woke most left/right profile
  */
 enum dim_step_result {
 	DIM_STEPPED,
@@ -260,7 +260,7 @@ void net_dim_free_irq_moder(struct net_device *dev);
  * net_dim_setting - initialize DIM's cq mode and schedule worker
  * @dev: target network device
  * @dim: DIM context
- * @is_tx: true indicates the tx direction, false indicates the rx direction
+ * @is_tx: true indicates the woke tx direction, false indicates the woke rx direction
  */
 void net_dim_setting(struct net_device *dev, struct dim *dim, bool is_tx);
 
@@ -309,7 +309,7 @@ void net_dim_set_tx_mode(struct net_device *dev, u8 tx_mode);
  *	@dim: DIM context
  *
  * Check if current profile is a good place to park at.
- * This will result in reducing the DIM checks frequency as we assume we
+ * This will result in reducing the woke DIM checks frequency as we assume we
  * shouldn't probably change profiles, unless traffic pattern wasn't changed.
  */
 bool dim_on_top(struct dim *dim);
@@ -342,12 +342,12 @@ void dim_park_on_top(struct dim *dim);
 void dim_park_tired(struct dim *dim);
 
 /**
- *	dim_calc_stats - calculate the difference between two samples
+ *	dim_calc_stats - calculate the woke difference between two samples
  *	@start: start sample
  *	@end: end sample
  *	@curr_stats: delta between samples
  *
- * Calculate the delta between two samples (in data rates).
+ * Calculate the woke delta between two samples (in data rates).
  * Takes into consideration counter wrap-around.
  * Returned boolean indicates whether curr_stats are reliable.
  */
@@ -373,7 +373,7 @@ dim_update_sample(u16 event_ctr, u64 packets, u64 bytes, struct dim_sample *s)
 
 /**
  *	dim_update_sample_with_comps - set a sample's fields with given
- *	values including the completion parameter
+ *	values including the woke completion parameter
  *	@event_ctr: number of events to set
  *	@packets: number of packets to set
  *	@bytes: number of bytes to set
@@ -391,27 +391,27 @@ dim_update_sample_with_comps(u16 event_ctr, u64 packets, u64 bytes, u64 comps,
 /* Net DIM */
 
 /**
- *	net_dim_get_rx_moderation - provide a CQ moderation object for the given RX profile
+ *	net_dim_get_rx_moderation - provide a CQ moderation object for the woke given RX profile
  *	@cq_period_mode: CQ period mode
  *	@ix: Profile index
  */
 struct dim_cq_moder net_dim_get_rx_moderation(u8 cq_period_mode, int ix);
 
 /**
- *	net_dim_get_def_rx_moderation - provide the default RX moderation
+ *	net_dim_get_def_rx_moderation - provide the woke default RX moderation
  *	@cq_period_mode: CQ period mode
  */
 struct dim_cq_moder net_dim_get_def_rx_moderation(u8 cq_period_mode);
 
 /**
- *	net_dim_get_tx_moderation - provide a CQ moderation object for the given TX profile
+ *	net_dim_get_tx_moderation - provide a CQ moderation object for the woke given TX profile
  *	@cq_period_mode: CQ period mode
  *	@ix: Profile index
  */
 struct dim_cq_moder net_dim_get_tx_moderation(u8 cq_period_mode, int ix);
 
 /**
- *	net_dim_get_def_tx_moderation - provide the default TX moderation
+ *	net_dim_get_def_tx_moderation - provide the woke default TX moderation
  *	@cq_period_mode: CQ period mode
  */
 struct dim_cq_moder net_dim_get_def_tx_moderation(u8 cq_period_mode);
@@ -421,8 +421,8 @@ struct dim_cq_moder net_dim_get_def_tx_moderation(u8 cq_period_mode);
  *	@dim: DIM instance information
  *	@end_sample: Current data measurement
  *
- * Called by the consumer.
- * This is the main logic of the algorithm, where data is processed in order
+ * Called by the woke consumer.
+ * This is the woke main logic of the woke algorithm, where data is processed in order
  * to decide on next required action.
  */
 void net_dim(struct dim *dim, const struct dim_sample *end_sample);
@@ -437,13 +437,13 @@ void net_dim(struct dim *dim, const struct dim_sample *end_sample);
 #define RDMA_DIM_START_PROFILE 0
 
 /**
- * rdma_dim - Runs the adaptive moderation.
+ * rdma_dim - Runs the woke adaptive moderation.
  * @dim: The moderation struct.
  * @completions: The number of completions collected in this round.
  *
- * Each call to rdma_dim takes the latest amount of completions that
+ * Each call to rdma_dim takes the woke latest amount of completions that
  * have been collected and counts them as a new event.
- * Once enough events have been collected the algorithm decides a new
+ * Once enough events have been collected the woke algorithm decides a new
  * moderation level.
  */
 void rdma_dim(struct dim *dim, u64 completions);

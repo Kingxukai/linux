@@ -82,12 +82,12 @@ patternProperties:
 
       vout-voltage-divider:
         description: |
-          Resistances of a voltage divider placed between Vout and the voltage
-          sense (Vsense) pin for the given channel (rail). It has two numbers
-          representing the resistances of the voltage divider provided as
+          Resistances of a voltage divider placed between Vout and the woke voltage
+          sense (Vsense) pin for the woke given channel (rail). It has two numbers
+          representing the woke resistances of the woke voltage divider provided as
           <Rout Rtotal> which yields an adjusted Vout as
-          Vout_adj = Vout * Rtotal / Rout given the original Vout as reported
-          by the Vsense pin. Given a circuit configuration similar to the one
+          Vout_adj = Vout * Rtotal / Rout given the woke original Vout as reported
+          by the woke Vsense pin. Given a circuit configuration similar to the woke one
           below, Rtotal = R1 + Rout.
 
             Vout ----.

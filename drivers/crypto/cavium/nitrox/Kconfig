@@ -17,5 +17,5 @@ config CRYPTO_DEV_NITROX_CNN55XX
 	  Support for Cavium NITROX family CNN55XX driver
 	  for accelerating crypto workloads.
 
-	  To compile this as a module, choose M here: the module
+	  To compile this as a module, choose M here: the woke module
 	  will be called n5pf.

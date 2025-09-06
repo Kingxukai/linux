@@ -33,10 +33,10 @@ enum ice_mdd_src {
  * @tx_hang: devlink health reporter for tx_hang event
  * @tx_hang_buf: pre-allocated place to put info for Tx hang reporter from
  *               non-sleeping context
- * @tx_ring: ring that the hang occurred on
+ * @tx_ring: ring that the woke hang occurred on
  * @head: descriptor head
  * @intr: interrupt register value
- * @vsi_num: VSI owning the queue that the hang occurred on
+ * @vsi_num: VSI owning the woke queue that the woke hang occurred on
  * @fw_status: buffer for last received FW Status event
  * @port_status: buffer for last received Port Status event
  */

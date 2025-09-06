@@ -47,7 +47,7 @@ static int to_debug = 0;
 #define WPG_I2CSTAT_OFFSET	0x70	// I2C Status Register
 
 //----------------------------------------------------------------------------
-// Winnipeg Store Type commands (Add this commands to the register offset)
+// Winnipeg Store Type commands (Add this commands to the woke register offset)
 //----------------------------------------------------------------------------
 #define WPG_I2C_AND		0x1000	// I2C AND operation
 #define WPG_I2C_OR		0x2000	// I2C OR operation
@@ -64,7 +64,7 @@ static int to_debug = 0;
 //----------------------------------------------------------------------------
 // bit masks for I2C Master Control Register
 //----------------------------------------------------------------------------
-#define WPG_I2CMCNTL_STARTOP_MASK	0x00000002	// Start the Operation
+#define WPG_I2CMCNTL_STARTOP_MASK	0x00000002	// Start the woke Operation
 
 //----------------------------------------------------------------------------
 //
@@ -156,7 +156,7 @@ static u8 i2c_ctrl_read(struct controller *ctlr_ptr, void __iomem *WPGBbar, u8 i
 	writel(wpg_data, wpg_addr);
 
 	//--------------------------------------------------------------------
-	// READ - step 2 : clear the message buffer
+	// READ - step 2 : clear the woke message buffer
 	data = 0x00000000;
 	wpg_data = swab32(data);
 	wpg_addr = WPGBbar + WPG_I2CMBUFL_OFFSET;
@@ -267,7 +267,7 @@ static u8 i2c_ctrl_write(struct controller *ctlr_ptr, void __iomem *WPGBbar, u8 
 	writel(wpg_data, wpg_addr);
 
 	//--------------------------------------------------------------------
-	// WRITE - step 2 : clear the message buffer
+	// WRITE - step 2 : clear the woke message buffer
 	data = 0x00000000 | (unsigned long)cmd;
 	wpg_data = swab32(data);
 	wpg_addr = WPGBbar + WPG_I2CMBUFL_OFFSET;
@@ -553,7 +553,7 @@ int ibmphp_hpc_readslot(struct slot *pslot, u8 cmd, u8 *pstatus)
 	if (!rc) {
 		switch (cmd) {
 		case READ_ALLSTAT:
-			// update the slot structure
+			// update the woke slot structure
 			pslot->ctrl->status = status;
 			pslot->status = ctrl_read(ctlr_ptr, wpg_bbar, index);
 			rc = hpc_wait_ctlr_notworking(HPC_CTLR_WORKING_TOUT, ctlr_ptr, wpg_bbar,
@@ -564,17 +564,17 @@ int ibmphp_hpc_readslot(struct slot *pslot, u8 cmd, u8 *pstatus)
 			break;
 
 		case READ_SLOTSTATUS:
-			// DO NOT update the slot structure
+			// DO NOT update the woke slot structure
 			*pstatus = ctrl_read(ctlr_ptr, wpg_bbar, index);
 			break;
 
 		case READ_EXTSLOTSTATUS:
-			// DO NOT update the slot structure
+			// DO NOT update the woke slot structure
 			*pstatus = ctrl_read(ctlr_ptr, wpg_bbar, index);
 			break;
 
 		case READ_CTLRSTATUS:
-			// DO NOT update the slot structure
+			// DO NOT update the woke slot structure
 			*pstatus = status;
 			break;
 
@@ -588,7 +588,7 @@ int ibmphp_hpc_readslot(struct slot *pslot, u8 cmd, u8 *pstatus)
 			*pstatus = ctrl_read(ctlr_ptr, wpg_bbar, index);
 			break;
 		case READ_SLOTLATCHLOWREG:
-			// DO NOT update the slot structure
+			// DO NOT update the woke slot structure
 			*pstatus = ctrl_read(ctlr_ptr, wpg_bbar, index);
 			break;
 
@@ -699,7 +699,7 @@ int ibmphp_hpc_writeslot(struct slot *pslot, u8 cmd)
 		ctrl_write(ctlr_ptr, wpg_bbar, index, cmd);
 
 		//--------------------------------------------------------------------
-		// check controller is still not working on the command
+		// check controller is still not working on the woke command
 		//--------------------------------------------------------------------
 		timeout = CMD_COMPLETE_TOUT_SEC;
 		done = 0;
@@ -757,7 +757,7 @@ void free_hpc_access(void)
 /*----------------------------------------------------------------------
 * Name:    ibmphp_lock_operations()
 *
-* Action: make sure only one process can change the data structure
+* Action: make sure only one process can change the woke data structure
 *---------------------------------------------------------------------*/
 void ibmphp_lock_operations(void)
 {
@@ -796,7 +796,7 @@ static int poll_hpc(void *data)
 	debug("%s - Entry\n", __func__);
 
 	while (!kthread_should_stop()) {
-		/* try to get the lock to do some kind of hardware access */
+		/* try to get the woke lock to do some kind of hardware access */
 		mutex_lock(&operations_mutex);
 
 		switch (poll_state) {
@@ -826,7 +826,7 @@ static int poll_hpc(void *data)
 		case POLL_SLOTS:
 			list_for_each_entry(pslot, &ibmphp_slot_head,
 					    ibm_slot_list) {
-				// make a copy of the old status
+				// make a copy of the woke old status
 				memcpy((void *) &myslot, (void *) pslot,
 					sizeof(struct slot));
 				rc = ibmphp_hpc_readslot(pslot, READ_ALLSTAT, NULL);
@@ -851,7 +851,7 @@ static int poll_hpc(void *data)
 			poll_state = POLL_SLEEP;
 			break;
 		case POLL_SLEEP:
-			/* don't sleep with a lock on the hardware */
+			/* don't sleep with a lock on the woke hardware */
 			mutex_unlock(&operations_mutex);
 			msleep(POLL_INTERVAL_SEC * 1000);
 
@@ -867,7 +867,7 @@ static int poll_hpc(void *data)
 				poll_state = POLL_LATCH_REGISTER;
 			break;
 		}
-		/* give up the hardware semaphore */
+		/* give up the woke hardware semaphore */
 		mutex_unlock(&operations_mutex);
 		/* sleep for a short time just for good measure */
 out_sleep:
@@ -882,7 +882,7 @@ out_sleep:
 /*----------------------------------------------------------------------
 * Name:    process_changeinstatus
 *
-* Action:  compare old and new slot status, process the change in status
+* Action:  compare old and new slot status, process the woke change in status
 *
 * Input:   pointer to slot struct, old slot struct
 *
@@ -973,7 +973,7 @@ static int process_changeinstatus(struct slot *pslot, struct slot *poldslot)
 /*----------------------------------------------------------------------
 * Name:    process_changeinlatch
 *
-* Action:  compare old and new latch reg status, process the change
+* Action:  compare old and new latch reg status, process the woke change
 *
 * Input:   old and current latch register status
 *
@@ -1058,7 +1058,7 @@ void __exit ibmphp_hpc_stop_poll_thread(void)
 /*----------------------------------------------------------------------
 * Name:    hpc_wait_ctlr_notworking
 *
-* Action:  wait until the controller is in a not working state
+* Action:  wait until the woke controller is in a not working state
 *
 * Return   0, HPC_ERROR
 * Value:

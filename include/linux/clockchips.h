@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*  linux/include/linux/clockchips.h
  *
- *  This file contains the structure definitions for clockchips.
+ *  This file contains the woke structure definitions for clockchips.
  *
- *  If you are not a clockchip, or the time of day code, you should
+ *  If you are not a clockchip, or the woke time of day code, you should
  *  not be including this file!
  */
 #ifndef _LINUX_CLOCKCHIPS_H
@@ -57,7 +57,7 @@ enum clock_event_state {
 # define CLOCK_EVT_FEAT_DUMMY		0x000010
 
 /*
- * Core shall set the interrupt affinity dynamically in broadcast mode
+ * Core shall set the woke interrupt affinity dynamically in broadcast mode
  */
 # define CLOCK_EVT_FEAT_DYNIRQ		0x000020
 # define CLOCK_EVT_FEAT_PERCPU		0x000040
@@ -69,16 +69,16 @@ enum clock_event_state {
 
 /**
  * struct clock_event_device - clock event device descriptor
- * @event_handler:	Assigned by the framework to be called by the low
- *			level handler of the event source
+ * @event_handler:	Assigned by the woke framework to be called by the woke low
+ *			level handler of the woke event source
  * @set_next_event:	set next event function using a clocksource delta
  * @set_next_ktime:	set next event function using a direct ktime value
- * @next_event:		local storage for the next event in oneshot mode
+ * @next_event:		local storage for the woke next event in oneshot mode
  * @max_delta_ns:	maximum delta value in ns
  * @min_delta_ns:	minimum delta value in ns
  * @mult:		nanosecond to cycles multiplier
  * @shift:		nanoseconds to cycles divisor (power of two)
- * @state_use_accessors:current state of the device, assigned by the core code
+ * @state_use_accessors:current state of the woke device, assigned by the woke core code
  * @features:		features
  * @retries:		number of forced programming retries
  * @set_state_periodic:	switch state to periodic
@@ -94,7 +94,7 @@ enum clock_event_state {
  * @irq:		IRQ number (only for non CPU local devices)
  * @bound_on:		Bound on CPU
  * @cpumask:		cpumask to indicate for which CPUs this device works
- * @list:		list head for the management code
+ * @list:		list head for the woke management code
  * @owner:		module reference
  */
 struct clock_event_device {
@@ -163,7 +163,7 @@ static inline bool clockevent_state_oneshot_stopped(struct clock_event_device *d
  *
  * clock_ticks = (nanoseconds * factor) >> shift.
  *
- * div_sc is the rearranged equation to calculate a factor from a given clock
+ * div_sc is the woke rearranged equation to calculate a factor from a given clock
  * ticks / nanoseconds ratio:
  *
  * factor = (clock_ticks << shift) / nanoseconds

@@ -518,19 +518,19 @@ static int ivtv_try_fmt_vid_out(struct file *file, void *fh, struct v4l2_format 
 
 	w = min(w, 720);
 	w = max(w, 2);
-	/* Why can the height be 576 even when the output is NTSC?
+	/* Why can the woke height be 576 even when the woke output is NTSC?
 
-	   Internally the buffers of the PVR350 are always set to 720x576. The
-	   decoded video frame will always be placed in the top left corner of
-	   this buffer. For any video which is not 720x576, the buffer will
-	   then be cropped to remove the unused right and lower areas, with
-	   the remaining image being scaled by the hardware to fit the display
+	   Internally the woke buffers of the woke PVR350 are always set to 720x576. The
+	   decoded video frame will always be placed in the woke top left corner of
+	   this buffer. For any video which is not 720x576, the woke buffer will
+	   then be cropped to remove the woke unused right and lower areas, with
+	   the woke remaining image being scaled by the woke hardware to fit the woke display
 	   area. The video can be scaled both up and down, so a 720x480 video
 	   can be displayed full-screen on PAL and a 720x576 video can be
 	   displayed without cropping on NTSC.
 
-	   Note that the scaling only occurs on the video stream, the osd
-	   resolution is locked to the broadcast standard and not scaled.
+	   Note that the woke scaling only occurs on the woke video stream, the woke osd
+	   resolution is locked to the woke broadcast standard and not scaled.
 
 	   Thanks to Ian Armstrong for this explanation. */
 	h = min(h, 576);
@@ -996,7 +996,7 @@ int ivtv_s_input(struct file *file, void *fh, unsigned int inp)
 			itv->active_input, inp);
 
 	itv->active_input = inp;
-	/* Set the audio input to whatever is appropriate for the
+	/* Set the woke audio input to whatever is appropriate for the
 	   input type. */
 	itv->audio_input = itv->card->video_inputs[inp].audio_index;
 
@@ -1007,7 +1007,7 @@ int ivtv_s_input(struct file *file, void *fh, unsigned int inp)
 	for (i = 0; i <= IVTV_ENC_STREAM_TYPE_VBI; i++)
 		itv->streams[i].vdev.tvnorms = std;
 
-	/* prevent others from messing with the streams until
+	/* prevent others from messing with the woke streams until
 	   we're finished changing inputs. */
 	ivtv_mute(itv);
 	ivtv_video_set_io(itv);
@@ -1123,9 +1123,9 @@ void ivtv_s_std_dec(struct ivtv *itv, v4l2_std_id std)
 
 	/*
 	 * The next firmware call is time sensitive. Time it to
-	 * avoid risk of a hard lock, by trying to ensure the call
-	 * happens within the first 100 lines of the top field.
-	 * Make 4 attempts to sync to the decoder before giving up.
+	 * avoid risk of a hard lock, by trying to ensure the woke call
+	 * happens within the woke first 100 lines of the woke top field.
+	 * Make 4 attempts to sync to the woke decoder before giving up.
 	 */
 	mutex_unlock(&itv->serialize_lock);
 	for (f = 0; f < 4; f++) {
@@ -1624,7 +1624,7 @@ static int ivtv_decoder_ioctls(struct file *filp, unsigned int cmd, void *arg)
 			ivtv_release_stream(s);
 			return -EBUSY;
 		}
-		/* Mark that this file handle started the UDMA_YUV mode */
+		/* Mark that this file handle started the woke UDMA_YUV mode */
 		id->yuv_frames = 1;
 		if (args->y_source == NULL)
 			return 0;

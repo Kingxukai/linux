@@ -26,12 +26,12 @@ properties:
   reset-gpios:
     maxItems: 1
     description:
-      A GPIO spec for the RSTB pin (active high)
+      A GPIO spec for the woke RSTB pin (active high)
 
   powerdown-gpios:
     maxItems: 1
     description:
-      A GPIO spec for the Power Down pin (active high)
+      A GPIO spec for the woke Power Down pin (active high)
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports

@@ -34,8 +34,8 @@ properties:
   interrupts:
     items:
       - description: Temperature sensor event
-      - description: Brown-out event on either of the support regulators
-      - description: Brown-out event on either the core, gpu or soc regulators
+      - description: Brown-out event on either of the woke support regulators
+      - description: Brown-out event on either the woke core, gpu or soc regulators
     minItems: 2
 
   tempmon:

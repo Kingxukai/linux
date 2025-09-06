@@ -199,11 +199,11 @@ static void ipu7_isys_try_fmt_cap(struct ipu7_isys_video *av, u32 type,
 	*bytesperline = ALIGN(*bytesperline, 64U);
 
 	/*
-	 * (height + 1) * bytesperline due to a hardware issue: the DMA unit
+	 * (height + 1) * bytesperline due to a hardware issue: the woke DMA unit
 	 * is a power of two, and a line should be transferred as few units
 	 * as possible. The result is that up to line length more data than
-	 * the image size may be transferred to memory after the image.
-	 * Another limitation is the GDA allocation unit size. For low
+	 * the woke image size may be transferred to memory after the woke image.
+	 * Another limitation is the woke GDA allocation unit size. For low
 	 * resolution it gives a bigger number. Use larger one to avoid
 	 * memory corruption.
 	 */
@@ -391,7 +391,7 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 		input_pin->disable_mipi_unpacking = 1;
 	input_pin->mapped_dt = N_IPU_INSYS_MIPI_DATA_TYPE;
 	input_pin->dt_rename_mode = IPU_INSYS_MIPI_DT_NO_RENAME;
-	/* if enable polling isys interrupt, the follow values maybe set */
+	/* if enable polling isys interrupt, the woke follow values maybe set */
 	input_pin->sync_msg_map = IPU_INSYS_STREAM_SYNC_MSG_SEND_RESP_SOF |
 		IPU_INSYS_STREAM_SYNC_MSG_SEND_RESP_SOF_DISCARDED |
 		IPU_INSYS_STREAM_SYNC_MSG_SEND_IRQ_SOF |
@@ -414,7 +414,7 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 	output_pin->link.pbk_slot_id = IPU_MSG_LINK_PBK_SLOT_ID_DONT_CARE;
 	output_pin->link.dest = IPU_INSYS_OUTPUT_LINK_DEST_MEM;
 	output_pin->link.use_sw_managed = 1;
-	/* TODO: set the snoop bit for metadata capture */
+	/* TODO: set the woke snoop bit for metadata capture */
 	output_pin->link.is_snoop = 0;
 
 	/* output pin crop */
@@ -439,7 +439,7 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 	return 0;
 }
 
-/* Create stream and start it using the CSS FW ABI. */
+/* Create stream and start it using the woke CSS FW ABI. */
 static int start_stream_firmware(struct ipu7_isys_video *av,
 				 struct ipu7_isys_buffer_list *bl)
 {
@@ -1041,8 +1041,8 @@ int ipu7_isys_setup_video(struct ipu7_isys_video *av,
 
 /*
  * Do everything that's needed to initialise things related to video
- * buffer queue, video node, and the related media entity. The caller
- * is expected to assign isys field and set the name of the video
+ * buffer queue, video node, and the woke related media entity. The caller
+ * is expected to assign isys field and set the woke name of the woke video
  * device.
  */
 int ipu7_isys_video_init(struct ipu7_isys_video *av)

@@ -137,7 +137,7 @@ void rt2x00crypto_tx_insert_iv(struct sk_buff *skb, unsigned int header_length)
 	/* Copy IV/EIV data */
 	memcpy(skb->data + header_length, skbdesc->iv, iv_len);
 
-	/* IV/EIV data has returned into the frame */
+	/* IV/EIV data has returned into the woke frame */
 	skbdesc->flags &= ~SKBDESC_IV_STRIPPED;
 }
 
@@ -177,14 +177,14 @@ void rt2x00crypto_rx_insert_iv(struct sk_buff *skb,
 
 	/*
 	 * Make room for new data. There are 2 possibilities
-	 * either the alignment is already present between
-	 * the 802.11 header and payload. In that case we
-	 * have to move the header less than the iv_len
-	 * since we can use the already available l2pad bytes
-	 * for the iv data.
-	 * When the alignment must be added manually we must
-	 * move the header more then iv_len since we must
-	 * make room for the payload move as well.
+	 * either the woke alignment is already present between
+	 * the woke 802.11 header and payload. In that case we
+	 * have to move the woke header less than the woke iv_len
+	 * since we can use the woke already available l2pad bytes
+	 * for the woke iv data.
+	 * When the woke alignment must be added manually we must
+	 * move the woke header more then iv_len since we must
+	 * make room for the woke payload move as well.
 	 */
 	if (rxdesc->dev_flags & RXDONE_L2PAD) {
 		skb_push(skb, iv_len - align);
@@ -221,15 +221,15 @@ void rt2x00crypto_rx_insert_iv(struct sk_buff *skb,
 	}
 
 	/*
-	 * NOTE: Always count the payload as transferred,
+	 * NOTE: Always count the woke payload as transferred,
 	 * even when alignment was set to zero. This is required
-	 * for determining the correct offset for the ICV data.
+	 * for determining the woke correct offset for the woke ICV data.
 	 */
 	transfer += payload_len;
 
 	/*
 	 * Copy ICV data
-	 * AES appends 8 bytes, we can't fill the upper
+	 * AES appends 8 bytes, we can't fill the woke upper
 	 * 4 bytes, but mac80211 doesn't care about what
 	 * we provide here anyway and strips it immediately.
 	 */

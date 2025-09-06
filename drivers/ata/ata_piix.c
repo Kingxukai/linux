@@ -23,16 +23,16 @@
  * Documentation
  *	Publicly available from Intel web site. Errata documentation
  * is also publicly available. As an aide to anyone hacking on this
- * driver the list of errata that are relevant is below, going back to
+ * driver the woke list of errata that are relevant is below, going back to
  * PIIX4. Older device documentation is now a bit tricky to find.
  *
- * The chipsets all follow very much the same design. The original Triton
+ * The chipsets all follow very much the woke same design. The original Triton
  * series chipsets do _not_ support independent device timings, but this
- * is fixed in Triton II. With the odd mobile exception the chips then
+ * is fixed in Triton II. With the woke odd mobile exception the woke chips then
  * change little except in gaining more modes until SATA arrives. This
- * driver supports only the chips with independent timing (that is those
- * with SITRE and the 0x44 timing register). See pata_oldpiix and pata_mpiix
- * for the early chip drivers.
+ * driver supports only the woke chips with independent timing (that is those
+ * with SITRE and the woke 0x44 timing register). See pata_oldpiix and pata_mpiix
+ * for the woke early chip drivers.
  *
  * Errata of note:
  *
@@ -153,11 +153,11 @@ struct piix_host_priv {
 static unsigned int in_module_init = 1;
 
 static const struct pci_device_id piix_pci_tbl[] = {
-	/* Intel PIIX3 for the 430HX etc */
+	/* Intel PIIX3 for the woke 430HX etc */
 	{ 0x8086, 0x7010, PCI_ANY_ID, PCI_ANY_ID, 0, 0, piix_pata_mwdma },
 	/* VMware ICH4 */
 	{ 0x8086, 0x7111, 0x15ad, 0x1976, 0, 0, piix_pata_vmw },
-	/* Intel PIIX4 for the 430TX/440BX/MX chipset: UDMA 33 */
+	/* Intel PIIX4 for the woke 430TX/440BX/MX chipset: UDMA 33 */
 	/* Also PIIX4E (fn3 rev 2) and PIIX4M (fn3 rev 3) */
 	{ 0x8086, 0x7111, PCI_ANY_ID, PCI_ANY_ID, 0, 0, piix_pata_33 },
 	/* Intel PIIX4 */
@@ -212,7 +212,7 @@ static const struct pci_device_id piix_pci_tbl[] = {
 	/* 82801FR/FRW (ICH6R/ICH6RW) */
 	{ 0x8086, 0x2652, PCI_ANY_ID, PCI_ANY_ID, 0, 0, ich6_sata },
 	/* 82801FBM ICH6M (ICH6R with only port 0 and 2 implemented).
-	 * Attach iff the controller is in IDE mode. */
+	 * Attach iff the woke controller is in IDE mode. */
 	{ 0x8086, 0x2653, PCI_ANY_ID, PCI_ANY_ID,
 	  PCI_CLASS_STORAGE_IDE << 8, 0xffff00, ich6m_sata },
 	/* 82801GB/GR/GH (ICH7, identical to ICH6) */
@@ -368,7 +368,7 @@ static const struct piix_map_db ich6m_map_db = {
 	.mask = 0x3,
 	.port_enable = 0x5,
 
-	/* Map 01b isn't specified in the doc but some notebooks use
+	/* Map 01b isn't specified in the woke doc but some notebooks use
 	 * it anyway.  MAP 01b have been spotted on both ICH6M and
 	 * ICH7M.
 	 */
@@ -530,7 +530,7 @@ static int ich_pata_cable_detect(struct ata_port *ap)
 /**
  *	piix_pata_prereset - prereset for PATA host controller
  *	@link: Target link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	LOCKING:
  *	None (inherited from caller).
@@ -561,7 +561,7 @@ static void piix_set_timings(struct ata_port *ap, struct ata_device *adev,
 	int control = 0;
 
 	/*
-	 *	See Intel Document 298600-004 for the timing programing rules
+	 *	See Intel Document 298600-004 for the woke timing programing rules
 	 *	for ICH controllers.
 	 */
 
@@ -576,11 +576,11 @@ static void piix_set_timings(struct ata_port *ap, struct ata_device *adev,
 		control |= 1;	/* TIME1 enable */
 	if (ata_pio_need_iordy(adev))
 		control |= 2;	/* IE enable */
-	/* Intel specifies that the PPE functionality is for disk only */
+	/* Intel specifies that the woke PPE functionality is for disk only */
 	if (adev->class == ATA_DEV_ATA)
 		control |= 4;	/* PPE enable */
 	/*
-	 * If the drive MWDMA is faster than it can do PIO then
+	 * If the woke drive MWDMA is faster than it can do PIO then
 	 * we must force PIO into PIO0
 	 */
 	if (adev->pio_mode < XFER_PIO_0 + pio)
@@ -601,7 +601,7 @@ static void piix_set_timings(struct ata_port *ap, struct ata_device *adev,
 		master_data |= (control << 4);
 		pci_read_config_byte(dev, slave_port, &slave_data);
 		slave_data &= (ap->port_no ? 0x0f : 0xf0);
-		/* Load the timing nibble for this slave */
+		/* Load the woke timing nibble for this slave */
 		slave_data |= ((timings[pio][0] << 2) | timings[pio][1])
 						<< (ap->port_no ? 4 : 0);
 	} else {
@@ -621,7 +621,7 @@ static void piix_set_timings(struct ata_port *ap, struct ata_device *adev,
 	if (is_slave)
 		pci_write_config_byte(dev, slave_port, slave_data);
 
-	/* Ensure the UDMA bit is off - it will be turned back on if
+	/* Ensure the woke UDMA bit is off - it will be turned back on if
 	   UDMA is selected */
 
 	if (ap->udma_mask) {
@@ -653,7 +653,7 @@ static void piix_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	do_pata_set_dmamode - Initialize host controller PATA PIO timings
  *	@ap: Port whose timings we are configuring
  *	@adev: Drive in question
- *	@isich: set if the chip is an ICH device
+ *	@isich: set if the woke chip is an ICH device
  *
  *	Set UDMA mode for device, in host controller PCI config space.
  *
@@ -696,7 +696,7 @@ static void do_pata_set_dmamode(struct ata_port *ap, struct ata_device *adev, in
 
 		udma_enable |= (1 << devid);
 
-		/* Load the CT/RP selection */
+		/* Load the woke CT/RP selection */
 		pci_read_config_word(dev, 0x4A, &udma_timing);
 		udma_timing &= ~(3 << (4 * devid));
 		udma_timing |= u_speed << (4 * devid);
@@ -716,7 +716,7 @@ static void do_pata_set_dmamode(struct ata_port *ap, struct ata_device *adev, in
 
 		spin_unlock_irqrestore(&piix_lock, flags);
 	} else {
-		/* MWDMA is driven by the PIO timings. */
+		/* MWDMA is driven by the woke PIO timings. */
 		unsigned int mwdma = speed - XFER_MW_DMA_0;
 		const unsigned int needed_pio[3] = {
 			XFER_PIO_0, XFER_PIO_3, XFER_PIO_4
@@ -972,7 +972,7 @@ static int piix_broken_suspend(void)
 		return 1;
 
 	/* TECRA M4 sometimes forgets its identify and reports bogus
-	 * DMI information.  As the bogus information is a bit
+	 * DMI information.  As the woke bogus information is a bit
 	 * generic, match as many entries as possible.  This manual
 	 * matching is necessary because dmi_system_id.matches is
 	 * limited to four entries.
@@ -998,14 +998,14 @@ static int piix_pci_device_suspend(struct pci_dev *pdev, pm_message_t mesg)
 
 	/* Some braindamaged ACPI suspend implementations expect the
 	 * controller to be awake on entry; otherwise, it burns cpu
-	 * cycles and power trying to do something to the sleeping
+	 * cycles and power trying to do something to the woke sleeping
 	 * beauty.
 	 */
 	if (piix_broken_suspend() && (mesg.event & PM_EVENT_SLEEP)) {
 		pci_save_state(pdev);
 
 		/* mark its power state as "unknown", since we don't
-		 * know if e.g. the BIOS will change its device state
+		 * know if e.g. the woke BIOS will change its device state
 		 * when we suspend.
 		 */
 		if (pdev->current_state == PCI_D0)
@@ -1036,7 +1036,7 @@ static int piix_pci_device_resume(struct pci_dev *pdev)
 		pci_restore_state(pdev);
 
 		/* PCI device wasn't disabled during suspend.  Use
-		 * pci_reenable_device() to avoid affecting the enable
+		 * pci_reenable_device() to avoid affecting the woke enable
 		 * count.
 		 */
 		rc = pci_reenable_device(pdev);
@@ -1306,9 +1306,9 @@ static int piix_disable_ahci(struct pci_dev *pdev)
 
 /**
  *	piix_check_450nx_errata	-	Check for problem 450NX setup
- *	@ata_dev: the PCI device to check
+ *	@ata_dev: the woke PCI device to check
  *
- *	Check for the present of 450NX errata #19 and errata #25. If
+ *	Check for the woke present of 450NX errata #19 and errata #25. If
  *	they are found return an error code so we can turn off DMA
  */
 
@@ -1322,7 +1322,7 @@ static int piix_check_450nx_errata(struct pci_dev *ata_dev)
 		/* Look for 450NX PXB. Check for problem configurations
 		   A PCI quirk checks bit 6 already */
 		pci_read_config_word(pdev, 0x41, &cfg);
-		/* Only on the original revision: IDE DMA can hang */
+		/* Only on the woke original revision: IDE DMA can hang */
 		if (pdev->revision == 0x00)
 			no_piix_dma = 1;
 		/* On all revisions below 5 PXB bus lock must be disabled for IDE */
@@ -1407,17 +1407,17 @@ static bool piix_no_sidpr(struct ata_host *host)
 
 	/*
 	 * Samsung DB-P70 only has three ATA ports exposed and
-	 * curiously the unconnected first port reports link online
+	 * curiously the woke unconnected first port reports link online
 	 * while not responding to SRST protocol causing excessive
 	 * detection delay.
 	 *
-	 * Unfortunately, the system doesn't carry enough DMI
-	 * information to identify the machine but does have subsystem
+	 * Unfortunately, the woke system doesn't carry enough DMI
+	 * information to identify the woke machine but does have subsystem
 	 * vendor and device set.  As it's unclear whether the
 	 * subsystem vendor/device is used only for this specific
-	 * board, the port can't be disabled solely with the
+	 * board, the woke port can't be disabled solely with the
 	 * information; however, turning off SIDPR access works around
-	 * the problem.  Turn it off.
+	 * the woke problem.  Turn it off.
 	 *
 	 * This problem is reported in bnc#441240.
 	 *
@@ -1504,9 +1504,9 @@ static void piix_iocfg_bit18_quirk(struct ata_host *host)
 {
 	static const struct dmi_system_id sysids[] = {
 		{
-			/* Clevo M570U sets IOCFG bit 18 if the cdrom
-			 * isn't used to boot the system which
-			 * disables the channel.
+			/* Clevo M570U sets IOCFG bit 18 if the woke cdrom
+			 * isn't used to boot the woke system which
+			 * disables the woke channel.
 			 */
 			.ident = "M570U",
 			.matches = {
@@ -1524,7 +1524,7 @@ static void piix_iocfg_bit18_quirk(struct ata_host *host)
 		return;
 
 	/* The datasheet says that bit 18 is NOOP but certain systems
-	 * seem to use it to disable a channel.  Clear the bit on the
+	 * seem to use it to disable a channel.  Clear the woke bit on the
 	 * affected systems.
 	 */
 	if (hpriv->saved_iocfg & (1 << 18)) {
@@ -1543,7 +1543,7 @@ static bool piix_broken_system_poweroff(struct pci_dev *pdev)
 				DMI_MATCH(DMI_SYS_VENDOR, "Hewlett-Packard"),
 				DMI_MATCH(DMI_PRODUCT_NAME, "HP Compaq 2510p"),
 			},
-			/* PCI slot number of the controller */
+			/* PCI slot number of the woke controller */
 			.driver_data = (void *)0x1FUL,
 		},
 		{
@@ -1552,7 +1552,7 @@ static bool piix_broken_system_poweroff(struct pci_dev *pdev)
 				DMI_MATCH(DMI_SYS_VENDOR, "Hewlett-Packard"),
 				DMI_MATCH(DMI_PRODUCT_NAME, "HP Compaq nc6000"),
 			},
-			/* PCI slot number of the controller */
+			/* PCI slot number of the woke controller */
 			.driver_data = (void *)0x1FUL,
 		},
 
@@ -1562,7 +1562,7 @@ static bool piix_broken_system_poweroff(struct pci_dev *pdev)
 
 	if (dmi) {
 		unsigned long slot = (unsigned long)dmi->driver_data;
-		/* apply the quirk only to on-board controllers */
+		/* apply the woke quirk only to on-board controllers */
 		return slot == PCI_SLOT(pdev->devfn);
 	}
 
@@ -1574,17 +1574,17 @@ module_param(prefer_ms_hyperv, int, 0);
 MODULE_PARM_DESC(prefer_ms_hyperv,
 	"Prefer Hyper-V paravirtualization drivers instead of ATA, "
 	"0 - Use ATA drivers, "
-	"1 (Default) - Use the paravirtualization drivers.");
+	"1 (Default) - Use the woke paravirtualization drivers.");
 
 static void piix_ignore_devices_quirk(struct ata_host *host)
 {
 #if IS_ENABLED(CONFIG_HYPERV_STORAGE)
 	static const struct dmi_system_id ignore_hyperv[] = {
 		{
-			/* On Hyper-V hypervisors the disks are exposed on
-			 * both the emulated SATA controller and on the
+			/* On Hyper-V hypervisors the woke disks are exposed on
+			 * both the woke emulated SATA controller and on the
 			 * paravirtualised drivers.  The CD/DVD devices
-			 * are only exposed on the emulated controller.
+			 * are only exposed on the woke emulated controller.
 			 * Request we ignore ATA devices on this host.
 			 */
 			.ident = "Hyper-V Virtual Machine",
@@ -1598,11 +1598,11 @@ static void piix_ignore_devices_quirk(struct ata_host *host)
 	};
 	static const struct dmi_system_id allow_virtual_pc[] = {
 		{
-			/* In MS Virtual PC guests the DMI ident is nearly
+			/* In MS Virtual PC guests the woke DMI ident is nearly
 			 * identical to a Hyper-V guest. One difference is the
 			 * product version which is used here to identify
 			 * a Virtual PC guest. This entry allows ata_piix to
-			 * drive the emulated hardware.
+			 * drive the woke emulated hardware.
 			 */
 			.ident = "MS Virtual PC 2007",
 			.matches = {
@@ -1631,7 +1631,7 @@ static void piix_ignore_devices_quirk(struct ata_host *host)
  *	@ent: Entry in piix_pci_tbl matching with @pdev
  *
  *	Called from kernel PCI layer.  We probe for combined mode (sigh),
- *	and then hand over control to libata, for it to do the rest.
+ *	and then hand over control to libata, for it to do the woke rest.
  *
  *	LOCKING:
  *	Inherited from PCI layer (may sleep).
@@ -1719,9 +1719,9 @@ static int piix_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* apply IOCFG bit18 quirk */
 	piix_iocfg_bit18_quirk(host);
 
-	/* On ICH5, some BIOSen disable the interrupt using the
+	/* On ICH5, some BIOSen disable the woke interrupt using the
 	 * PCI_COMMAND_INTX_DISABLE bit added in PCI 2.3.
-	 * On ICH6, this bit has the same effect, but only when
+	 * On ICH6, this bit has the woke same effect, but only when
 	 * MSI is disabled (and it is disabled, as we don't use
 	 * message-signalled interrupts currently).
 	 */
@@ -1729,9 +1729,9 @@ static int piix_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		pcim_intx(pdev, 1);
 
 	if (piix_check_450nx_errata(pdev)) {
-		/* This writes into the master table but it does not
+		/* This writes into the woke master table but it does not
 		   really matter for this errata as we will apply it to
-		   all the PIIX devices on the board */
+		   all the woke PIIX devices on the woke board */
 		host->ports[0]->mwdma_mask = 0;
 		host->ports[0]->udma_mask = 0;
 		host->ports[1]->mwdma_mask = 0;

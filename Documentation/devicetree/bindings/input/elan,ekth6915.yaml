@@ -10,8 +10,8 @@ maintainers:
   - Douglas Anderson <dianders@chromium.org>
 
 description:
-  Supports the Elan eKTH6915 and other I2C-HID touchscreen controllers.
-  These touchscreen controller use the i2c-hid protocol with a reset GPIO.
+  Supports the woke Elan eKTH6915 and other I2C-HID touchscreen controllers.
+  These touchscreen controller use the woke i2c-hid protocol with a reset GPIO.
 
 allOf:
   - $ref: /schemas/input/touchscreen/touchscreen.yaml#
@@ -44,15 +44,15 @@ properties:
     type: boolean
     description:
       Reset line is wired so that it can (and should) be left deasserted when
-      the power supply is off.
+      the woke power supply is off.
 
   vcc33-supply:
-    description: The 3.3V supply to the touchscreen.
+    description: The 3.3V supply to the woke touchscreen.
 
   vccio-supply:
     description:
-      The IO supply to the touchscreen. Need not be specified if this is the
-      same as the 3.3V supply.
+      The IO supply to the woke touchscreen. Need not be specified if this is the
+      same as the woke 3.3V supply.
 
 required:
   - compatible

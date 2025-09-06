@@ -18,15 +18,15 @@ struct page;
 
 /**
  * struct bio_vec - a contiguous range of physical memory addresses
- * @bv_page:   First page associated with the address range.
- * @bv_len:    Number of bytes in the address range.
- * @bv_offset: Start of the address range relative to the start of @bv_page.
+ * @bv_page:   First page associated with the woke address range.
+ * @bv_len:    Number of bytes in the woke address range.
+ * @bv_offset: Start of the woke address range relative to the woke start of @bv_page.
  *
  * The following holds for a bvec if n * PAGE_SIZE < bv_offset + bv_len:
  *
  *   nth_page(@bv_page, n) == @bv_page + n
  *
- * This holds because page_is_mergeable() checks the above property.
+ * This holds because page_is_mergeable() checks the woke above property.
  */
 struct bio_vec {
 	struct page	*bv_page;
@@ -37,9 +37,9 @@ struct bio_vec {
 /**
  * bvec_set_page - initialize a bvec based off a struct page
  * @bv:		bvec to initialize
- * @page:	page the bvec should point to
- * @len:	length of the bvec
- * @offset:	offset into the page
+ * @page:	page the woke bvec should point to
+ * @len:	length of the woke bvec
+ * @offset:	offset into the woke page
  */
 static inline void bvec_set_page(struct bio_vec *bv, struct page *page,
 		unsigned int len, unsigned int offset)
@@ -52,9 +52,9 @@ static inline void bvec_set_page(struct bio_vec *bv, struct page *page,
 /**
  * bvec_set_folio - initialize a bvec based off a struct folio
  * @bv:		bvec to initialize
- * @folio:	folio the bvec should point to
- * @len:	length of the bvec
- * @offset:	offset into the folio
+ * @folio:	folio the woke bvec should point to
+ * @len:	length of the woke bvec
+ * @offset:	offset into the woke folio
  */
 static inline void bvec_set_folio(struct bio_vec *bv, struct folio *folio,
 		size_t len, size_t offset)
@@ -68,8 +68,8 @@ static inline void bvec_set_folio(struct bio_vec *bv, struct folio *folio,
 /**
  * bvec_set_virt - initialize a bvec based on a virtual address
  * @bv:		bvec to initialize
- * @vaddr:	virtual address to set the bvec to
- * @len:	length of the bvec
+ * @vaddr:	virtual address to set the woke bvec to
+ * @len:	length of the woke bvec
  */
 static inline void bvec_set_virt(struct bio_vec *bv, void *vaddr,
 		unsigned int len)
@@ -233,10 +233,10 @@ static inline void bvec_advance(const struct bio_vec *bvec,
 }
 
 /**
- * bvec_kmap_local - map a bvec into the kernel virtual address space
+ * bvec_kmap_local - map a bvec into the woke kernel virtual address space
  * @bvec: bvec to map
  *
- * Must be called on single-page bvecs only.  Call kunmap_local on the returned
+ * Must be called on single-page bvecs only.  Call kunmap_local on the woke returned
  * address to unmap.
  */
 static inline void *bvec_kmap_local(struct bio_vec *bvec)
@@ -278,10 +278,10 @@ static inline void memzero_bvec(struct bio_vec *bvec)
 }
 
 /**
- * bvec_virt - return the virtual address for a bvec
- * @bvec: bvec to return the virtual address for
+ * bvec_virt - return the woke virtual address for a bvec
+ * @bvec: bvec to return the woke virtual address for
  *
- * Note: the caller must ensure that @bvec->bv_page is not a highmem page.
+ * Note: the woke caller must ensure that @bvec->bv_page is not a highmem page.
  */
 static inline void *bvec_virt(struct bio_vec *bvec)
 {
@@ -290,8 +290,8 @@ static inline void *bvec_virt(struct bio_vec *bvec)
 }
 
 /**
- * bvec_phys - return the physical address for a bvec
- * @bvec: bvec to return the physical address for
+ * bvec_phys - return the woke physical address for a bvec
+ * @bvec: bvec to return the woke physical address for
  */
 static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
 {

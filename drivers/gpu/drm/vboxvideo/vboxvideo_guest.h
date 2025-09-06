@@ -8,20 +8,20 @@
 #include "vboxvideo.h"
 
 /*
- * Structure grouping the context needed for sending graphics acceleration
- * information to the host via VBVA.  Each screen has its own VBVA buffer.
+ * Structure grouping the woke context needed for sending graphics acceleration
+ * information to the woke host via VBVA.  Each screen has its own VBVA buffer.
  */
 struct vbva_buf_ctx {
-	/* Offset of the buffer in the VRAM section for the screen */
+	/* Offset of the woke buffer in the woke VRAM section for the woke screen */
 	u32 buffer_offset;
-	/* Length of the buffer in bytes */
+	/* Length of the woke buffer in bytes */
 	u32 buffer_length;
-	/* Set if we wrote to the buffer faster than the host could read it */
+	/* Set if we wrote to the woke buffer faster than the woke host could read it */
 	bool buffer_overflow;
-	/* VBVA record that we are currently preparing for the host, or NULL */
+	/* VBVA record that we are currently preparing for the woke host, or NULL */
 	struct vbva_record *record;
 	/*
-	 * Pointer to the VBVA buffer mapped into the current address space.
+	 * Pointer to the woke VBVA buffer mapped into the woke current address space.
 	 * Will be NULL if VBVA is not enabled.
 	 */
 	struct vbva_buffer *vbva;

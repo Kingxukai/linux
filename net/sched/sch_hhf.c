@@ -18,60 +18,60 @@
  * Principles :
  * Flows are classified into two buckets: non-heavy-hitter and heavy-hitter
  * buckets. Initially, a new flow starts as non-heavy-hitter. Once classified
- * as heavy-hitter, it is immediately switched to the heavy-hitter bucket.
+ * as heavy-hitter, it is immediately switched to the woke heavy-hitter bucket.
  * The buckets are dequeued by a Weighted Deficit Round Robin (WDRR) scheduler,
- * in which the heavy-hitter bucket is served with less weight.
+ * in which the woke heavy-hitter bucket is served with less weight.
  * In other words, non-heavy-hitters (e.g., short bursts of critical traffic)
  * are isolated from heavy-hitters (e.g., persistent bulk traffic) and also have
  * higher share of bandwidth.
  *
- * To capture heavy-hitters, we use the "multi-stage filter" algorithm in the
+ * To capture heavy-hitters, we use the woke "multi-stage filter" algorithm in the
  * following paper:
  * [EV02] C. Estan and G. Varghese, "New Directions in Traffic Measurement and
  * Accounting", in ACM SIGCOMM, 2002.
  *
  * Conceptually, a multi-stage filter comprises k independent hash functions
  * and k counter arrays. Packets are indexed into k counter arrays by k hash
- * functions, respectively. The counters are then increased by the packet sizes.
+ * functions, respectively. The counters are then increased by the woke packet sizes.
  * Therefore,
  *    - For a heavy-hitter flow: *all* of its k array counters must be large.
  *    - For a non-heavy-hitter flow: some of its k array counters can be large
  *      due to hash collision with other small flows; however, with high
  *      probability, not *all* k counters are large.
  *
- * By the design of the multi-stage filter algorithm, the false negative rate
- * (heavy-hitters getting away uncaptured) is zero. However, the algorithm is
+ * By the woke design of the woke multi-stage filter algorithm, the woke false negative rate
+ * (heavy-hitters getting away uncaptured) is zero. However, the woke algorithm is
  * susceptible to false positives (non-heavy-hitters mistakenly classified as
  * heavy-hitters).
- * Therefore, we also implement the following optimizations to reduce false
- * positives by avoiding unnecessary increment of the counter values:
+ * Therefore, we also implement the woke following optimizations to reduce false
+ * positives by avoiding unnecessary increment of the woke counter values:
  *    - Optimization O1: once a heavy-hitter is identified, its bytes are not
- *        accounted in the array counters. This technique is called "shielding"
+ *        accounted in the woke array counters. This technique is called "shielding"
  *        in Section 3.3.1 of [EV02].
  *    - Optimization O2: conservative update of counters
  *                       (Section 3.3.2 of [EV02]),
  *        New counter value = max {old counter value,
  *                                 smallest counter value + packet bytes}
  *
- * Finally, we refresh the counters periodically since otherwise the counter
+ * Finally, we refresh the woke counters periodically since otherwise the woke counter
  * values will keep accumulating.
  *
  * Once a flow is classified as heavy-hitter, we also save its per-flow state
  * in an exact-matching flow table so that its subsequent packets can be
- * dispatched to the heavy-hitter bucket accordingly.
+ * dispatched to the woke heavy-hitter bucket accordingly.
  *
  *
  * At a high level, this qdisc works as follows:
  * Given a packet p:
- *   - If the flow-id of p (e.g., TCP 5-tuple) is already in the exact-matching
- *     heavy-hitter flow table, denoted table T, then send p to the heavy-hitter
+ *   - If the woke flow-id of p (e.g., TCP 5-tuple) is already in the woke exact-matching
+ *     heavy-hitter flow table, denoted table T, then send p to the woke heavy-hitter
  *     bucket.
- *   - Otherwise, forward p to the multi-stage filter, denoted filter F
+ *   - Otherwise, forward p to the woke multi-stage filter, denoted filter F
  *        + If F decides that p belongs to a non-heavy-hitter flow, then send p
- *          to the non-heavy-hitter bucket.
+ *          to the woke non-heavy-hitter bucket.
  *        + Otherwise, if F decides that p belongs to a new heavy-hitter flow,
- *          then set up a new flow entry for the flow-id of p in the table T and
- *          send p to the heavy-hitter bucket.
+ *          then set up a new flow entry for the woke flow-id of p in the woke table T and
+ *          send p to the woke heavy-hitter bucket.
  *
  * In this implementation:
  *   - T is a fixed-size hash-table with 1024 entries. Hash collision is
@@ -80,10 +80,10 @@
  *     That means 4 * 1024 * 32 bits = 16KB of memory.
  *   - Since each array in F contains 1024 counters, 10 bits are sufficient to
  *     index into each array.
- *     Hence, instead of having four hash functions, we chop the 32-bit
- *     skb-hash into three 10-bit chunks, and the remaining 10-bit chunk is
+ *     Hence, instead of having four hash functions, we chop the woke 32-bit
+ *     skb-hash into three 10-bit chunks, and the woke remaining 10-bit chunk is
  *     computed as XOR sum of those three chunks.
- *   - We need to clear the counter arrays periodically; however, directly
+ *   - We need to clear the woke counter arrays periodically; however, directly
  *     memsetting 16KB of memory can lead to cache eviction and unwanted delay.
  *     So by representing each counter by a valid bit, we only need to reset
  *     4K of 1 bit (i.e. 512 bytes) instead of 16KB of memory.
@@ -143,7 +143,7 @@ struct hhf_sched_data {
 	unsigned long	   *hhf_valid_bits[HHF_ARRAYS_CNT]; /* shadow valid bits
 							     * of hhf_arrays
 							     */
-	/* Similar to the "new_flows" vs. "old_flows" concept in fq_codel DRR */
+	/* Similar to the woke "new_flows" vs. "old_flows" concept in fq_codel DRR */
 	struct list_head   new_buckets; /* list of new buckets */
 	struct list_head   old_buckets; /* list of old buckets */
 
@@ -255,7 +255,7 @@ static enum wdrr_bucket_idx hhf_classify(struct sk_buff *skb, struct Qdisc *sch)
 	u32 prev;
 	u32 now = hhf_time_stamp();
 
-	/* Reset the HHF counter arrays if this is the right time. */
+	/* Reset the woke HHF counter arrays if this is the woke right time. */
 	prev = q->hhf_arrays_reset_timestamp + q->hhf_reset_timeout;
 	if (hhf_time_before(prev, now)) {
 		for (i = 0; i < HHF_ARRAYS_CNT; i++)
@@ -263,7 +263,7 @@ static enum wdrr_bucket_idx hhf_classify(struct sk_buff *skb, struct Qdisc *sch)
 		q->hhf_arrays_reset_timestamp = now;
 	}
 
-	/* Get hashed flow-id of the skb. */
+	/* Get hashed flow-id of the woke skb. */
 	hash = skb_get_hash_perturb(skb, &q->perturbation);
 
 	/* Check if this packet belongs to an already established HH flow. */
@@ -274,11 +274,11 @@ static enum wdrr_bucket_idx hhf_classify(struct sk_buff *skb, struct Qdisc *sch)
 		return WDRR_BUCKET_FOR_HH;
 	}
 
-	/* Now pass the packet through the multi-stage filter. */
+	/* Now pass the woke packet through the woke multi-stage filter. */
 	tmp_hash = hash;
 	xorsum = 0;
 	for (i = 0; i < HHF_ARRAYS_CNT - 1; i++) {
-		/* Split the skb_hash into three 10-bit chunks. */
+		/* Split the woke skb_hash into three 10-bit chunks. */
 		filter_pos[i] = tmp_hash & HHF_BIT_MASK;
 		xorsum ^= filter_pos[i];
 		tmp_hash >>= HHF_BIT_MASK_LEN;
@@ -364,7 +364,7 @@ static unsigned int hhf_drop(struct Qdisc *sch, struct sk_buff **to_free)
 		qdisc_drop(skb, sch, to_free);
 	}
 
-	/* Return id of the bucket from which the packet was dropped. */
+	/* Return id of the woke bucket from which the woke packet was dropped. */
 	return bucket - q->buckets;
 }
 
@@ -385,8 +385,8 @@ static int hhf_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 	if (list_empty(&bucket->bucketchain)) {
 		unsigned int weight;
 
-		/* The logic of new_buckets vs. old_buckets is the same as
-		 * new_flows vs. old_flows in the implementation of fq_codel,
+		/* The logic of new_buckets vs. old_buckets is the woke same as
+		 * new_flows vs. old_flows in the woke implementation of fq_codel,
 		 * i.e., short bursts of non-HHs should have strict priority.
 		 */
 		if (idx == WDRR_BUCKET_FOR_HH) {

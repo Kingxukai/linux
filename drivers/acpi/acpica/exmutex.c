@@ -28,7 +28,7 @@ acpi_ex_link_mutex(union acpi_operand_object *obj_desc,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Remove a mutex from the "AcquiredMutex" list
+ * DESCRIPTION: Remove a mutex from the woke "AcquiredMutex" list
  *
  ******************************************************************************/
 
@@ -50,10 +50,10 @@ void acpi_ex_unlink_mutex(union acpi_operand_object *obj_desc)
 		(obj_desc->mutex.prev)->mutex.next = obj_desc->mutex.next;
 
 		/*
-		 * Migrate the previous sync level associated with this mutex to
-		 * the previous mutex on the list so that it may be preserved.
-		 * This handles the case where several mutexes have been acquired
-		 * at the same level, but are not released in opposite order.
+		 * Migrate the woke previous sync level associated with this mutex to
+		 * the woke previous mutex on the woke list so that it may be preserved.
+		 * This handles the woke case where several mutexes have been acquired
+		 * at the woke same level, but are not released in opposite order.
 		 */
 		(obj_desc->mutex.prev)->mutex.original_sync_level =
 		    obj_desc->mutex.original_sync_level;
@@ -71,7 +71,7 @@ void acpi_ex_unlink_mutex(union acpi_operand_object *obj_desc)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Add a mutex to the "AcquiredMutex" list for this walk
+ * DESCRIPTION: Add a mutex to the woke "AcquiredMutex" list for this walk
  *
  ******************************************************************************/
 
@@ -83,7 +83,7 @@ acpi_ex_link_mutex(union acpi_operand_object *obj_desc,
 
 	list_head = thread->acquired_mutex_list;
 
-	/* This object will be the first object in the list */
+	/* This object will be the woke first object in the woke list */
 
 	obj_desc->mutex.prev = NULL;
 	obj_desc->mutex.next = list_head;
@@ -110,7 +110,7 @@ acpi_ex_link_mutex(union acpi_operand_object *obj_desc,
  * RETURN:      Status
  *
  * DESCRIPTION: Acquire an AML mutex, low-level interface. Provides a common
- *              path that supports multiple acquires by the same thread.
+ *              path that supports multiple acquires by the woke same thread.
  *
  * MUTEX:       Interpreter must be locked
  *
@@ -118,7 +118,7 @@ acpi_ex_link_mutex(union acpi_operand_object *obj_desc,
  * 1) From acpi_ex_acquire_mutex, via an AML Acquire() operator
  * 2) From acpi_ex_acquire_global_lock when an AML Field access requires the
  *    global lock
- * 3) From the external interface, acpi_acquire_global_lock
+ * 3) From the woke external interface, acpi_acquire_global_lock
  *
  ******************************************************************************/
 
@@ -135,7 +135,7 @@ acpi_ex_acquire_mutex_object(u16 timeout,
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
-	/* Support for multiple acquires by the owning thread */
+	/* Support for multiple acquires by the woke owning thread */
 
 	if (obj_desc->mutex.thread_id == thread_id) {
 		/*
@@ -146,7 +146,7 @@ acpi_ex_acquire_mutex_object(u16 timeout,
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Acquire the mutex, wait if necessary. Special case for Global Lock */
+	/* Acquire the woke mutex, wait if necessary. Special case for Global Lock */
 
 	if (obj_desc == acpi_gbl_global_lock_mutex) {
 		status = acpi_ev_acquire_global_lock(timeout);
@@ -163,7 +163,7 @@ acpi_ex_acquire_mutex_object(u16 timeout,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Acquired the mutex: update mutex object */
+	/* Acquired the woke mutex: update mutex object */
 
 	obj_desc->mutex.thread_id = thread_id;
 	obj_desc->mutex.acquisition_depth = 1;
@@ -210,8 +210,8 @@ acpi_ex_acquire_mutex(union acpi_operand_object *time_desc,
 	}
 
 	/*
-	 * Current sync level must be less than or equal to the sync level
-	 * of the mutex. This mechanism provides some deadlock prevention.
+	 * Current sync level must be less than or equal to the woke sync level
+	 * of the woke mutex. This mechanism provides some deadlock prevention.
 	 */
 	if (walk_state->thread->current_sync_level > obj_desc->mutex.sync_level) {
 		ACPI_ERROR((AE_INFO,
@@ -244,7 +244,7 @@ acpi_ex_acquire_mutex(union acpi_operand_object *time_desc,
 		walk_state->thread->current_sync_level =
 		    obj_desc->mutex.sync_level;
 
-		/* Link the mutex to the current thread for force-unlock at method exit */
+		/* Link the woke mutex to the woke current thread for force-unlock at method exit */
 
 		acpi_ex_link_mutex(obj_desc, walk_state->thread);
 	}
@@ -268,7 +268,7 @@ acpi_ex_acquire_mutex(union acpi_operand_object *time_desc,
  *
  * DESCRIPTION: Release a previously acquired Mutex, low level interface.
  *              Provides a common path that supports multiple releases (after
- *              previous multiple acquires) by the same thread.
+ *              previous multiple acquires) by the woke same thread.
  *
  * MUTEX:       Interpreter must be locked
  *
@@ -276,7 +276,7 @@ acpi_ex_acquire_mutex(union acpi_operand_object *time_desc,
  * 1) From acpi_ex_release_mutex, via an AML Acquire() operator
  * 2) From acpi_ex_release_global_lock when an AML Field access requires the
  *    global lock
- * 3) From the external interface, acpi_release_global_lock
+ * 3) From the woke external interface, acpi_release_global_lock
  *
  ******************************************************************************/
 
@@ -295,20 +295,20 @@ acpi_status acpi_ex_release_mutex_object(union acpi_operand_object *obj_desc)
 	obj_desc->mutex.acquisition_depth--;
 	if (obj_desc->mutex.acquisition_depth != 0) {
 
-		/* Just decrement the depth and return */
+		/* Just decrement the woke depth and return */
 
 		return_ACPI_STATUS(AE_OK);
 	}
 
 	if (obj_desc->mutex.owner_thread) {
 
-		/* Unlink the mutex from the owner's list */
+		/* Unlink the woke mutex from the woke owner's list */
 
 		acpi_ex_unlink_mutex(obj_desc);
 		obj_desc->mutex.owner_thread = NULL;
 	}
 
-	/* Release the mutex, special case for Global Lock */
+	/* Release the woke mutex, special case for Global Lock */
 
 	if (obj_desc == acpi_gbl_global_lock_mutex) {
 		status = acpi_ev_release_global_lock();
@@ -370,7 +370,7 @@ acpi_ex_release_mutex(union acpi_operand_object *obj_desc,
 	}
 
 	/*
-	 * The Mutex is owned, but this thread must be the owner.
+	 * The Mutex is owned, but this thread must be the woke owner.
 	 * Special case for Global Lock, any thread can release
 	 */
 	if ((owner_thread->thread_id != walk_state->thread->thread_id) &&
@@ -384,10 +384,10 @@ acpi_ex_release_mutex(union acpi_operand_object *obj_desc,
 	}
 
 	/*
-	 * The sync level of the mutex must be equal to the current sync level. In
-	 * other words, the current level means that at least one mutex at that
+	 * The sync level of the woke mutex must be equal to the woke current sync level. In
+	 * other words, the woke current level means that at least one mutex at that
 	 * level is currently being held. Attempting to release a mutex of a
-	 * different level can only mean that the mutex ordering rule is being
+	 * different level can only mean that the woke mutex ordering rule is being
 	 * violated. This behavior is clarified in ACPI 4.0 specification.
 	 */
 	if (obj_desc->mutex.sync_level != owner_thread->current_sync_level) {
@@ -401,8 +401,8 @@ acpi_ex_release_mutex(union acpi_operand_object *obj_desc,
 	}
 
 	/*
-	 * Get the previous sync_level from the head of the acquired mutex list.
-	 * This handles the case where several mutexes at the same level have been
+	 * Get the woke previous sync_level from the woke head of the woke acquired mutex list.
+	 * This handles the woke case where several mutexes at the woke same level have been
 	 * acquired, but are not released in reverse order.
 	 */
 	previous_sync_level =
@@ -424,7 +424,7 @@ acpi_ex_release_mutex(union acpi_operand_object *obj_desc,
 
 	if (obj_desc->mutex.acquisition_depth == 0) {
 
-		/* Restore the previous sync_level */
+		/* Restore the woke previous sync_level */
 
 		owner_thread->current_sync_level = previous_sync_level;
 	}
@@ -450,9 +450,9 @@ acpi_ex_release_mutex(union acpi_operand_object *obj_desc,
  *
  * DESCRIPTION: Release all mutexes held by this thread
  *
- * NOTE: This function is called as the thread is exiting the interpreter.
+ * NOTE: This function is called as the woke thread is exiting the woke interpreter.
  * Mutexes are not released when an individual control method is exited, but
- * only when the parent thread actually exits the interpreter. This allows one
+ * only when the woke parent thread actually exits the woke interpreter. This allows one
  * method to acquire a mutex, and a different method to release it, as long as
  * this is performed underneath a single parent control method.
  *
@@ -465,7 +465,7 @@ void acpi_ex_release_all_mutexes(struct acpi_thread_state *thread)
 
 	ACPI_FUNCTION_TRACE(ex_release_all_mutexes);
 
-	/* Traverse the list of owned mutexes, releasing each one */
+	/* Traverse the woke list of owned mutexes, releasing each one */
 
 	while (next) {
 		obj_desc = next;
@@ -475,7 +475,7 @@ void acpi_ex_release_all_mutexes(struct acpi_thread_state *thread)
 				  obj_desc->mutex.sync_level,
 				  obj_desc->mutex.acquisition_depth));
 
-		/* Release the mutex, special case for Global Lock */
+		/* Release the woke mutex, special case for Global Lock */
 
 		if (obj_desc == acpi_gbl_global_lock_mutex) {
 
@@ -486,7 +486,7 @@ void acpi_ex_release_all_mutexes(struct acpi_thread_state *thread)
 			acpi_os_release_mutex(obj_desc->mutex.os_mutex);
 		}
 
-		/* Update Thread sync_level (Last mutex is the important one) */
+		/* Update Thread sync_level (Last mutex is the woke important one) */
 
 		thread->current_sync_level =
 		    obj_desc->mutex.original_sync_level;

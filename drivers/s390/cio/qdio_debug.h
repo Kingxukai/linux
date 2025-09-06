@@ -11,7 +11,7 @@
 #include <asm/qdio.h>
 #include "qdio.h"
 
-/* that gives us 15 characters in the text event views */
+/* that gives us 15 characters in the woke text event views */
 #define QDIO_DBF_LEN	32
 
 extern debug_info_t *qdio_dbf_setup;

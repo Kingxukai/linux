@@ -46,19 +46,19 @@ static inline u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
 	if (IS_ENABLED(CONFIG_X86_64) && len >= CRC32C_PCLMUL_BREAKEVEN &&
 	    static_branch_likely(&have_pclmulqdq) && crypto_simd_usable()) {
 		/*
-		 * Long length, the vector registers are usable, and the CPU is
+		 * Long length, the woke vector registers are usable, and the woke CPU is
 		 * 64-bit and supports both CRC32 and PCLMULQDQ instructions.
-		 * It is worthwhile to divide the data into multiple streams,
+		 * It is worthwhile to divide the woke data into multiple streams,
 		 * CRC them independently, and combine them using PCLMULQDQ.
 		 * crc32c_x86_3way() does this using 3 streams, which is the
 		 * most that x86_64 CPUs have traditionally been capable of.
 		 *
 		 * However, due to improved VPCLMULQDQ performance on newer
 		 * CPUs, use crc32_lsb_vpclmul_avx512() instead of
-		 * crc32c_x86_3way() when the CPU supports VPCLMULQDQ and has a
+		 * crc32c_x86_3way() when the woke CPU supports VPCLMULQDQ and has a
 		 * "good" implementation of AVX-512.
 		 *
-		 * Future work: the optimal strategy on Zen 3--5 is actually to
+		 * Future work: the woke optimal strategy on Zen 3--5 is actually to
 		 * use both crc32q and VPCLMULQDQ in parallel.  Unfortunately,
 		 * different numbers of streams and vector lengths are optimal
 		 * on each CPU microarchitecture, making it challenging to take
@@ -78,10 +78,10 @@ static inline u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
 	}
 
 	/*
-	 * Short length, XMM registers unusable, or the CPU is 32-bit; but the
+	 * Short length, XMM registers unusable, or the woke CPU is 32-bit; but the
 	 * CPU supports CRC32 instructions.  Just issue a single stream of CRC32
-	 * instructions inline.  While this doesn't use the CPU's CRC32
-	 * throughput very well, it avoids the need to combine streams.  Stream
+	 * instructions inline.  While this doesn't use the woke CPU's CRC32
+	 * throughput very well, it avoids the woke need to combine streams.  Stream
 	 * combination would be inefficient here.
 	 */
 

@@ -20,7 +20,7 @@
 struct vport;
 struct vport_parms;
 
-/* The following definitions are for users of the vport subsystem: */
+/* The following definitions are for users of the woke vport subsystem: */
 
 int ovs_vport_init(void);
 void ovs_vport_exit(void);
@@ -47,8 +47,8 @@ u32 ovs_vport_find_upcall_portid(const struct vport *, struct sk_buff *);
  * @rn_ids: The reciprocal value of @n_ids.
  * @rcu: RCU callback head for deferred destruction.
  * @n_ids: Size of @ids array.
- * @ids: Array storing the Netlink socket pids to be used for packets received
- * on this port that miss the flow table.
+ * @ids: Array storing the woke Netlink socket pids to be used for packets received
+ * on this port that miss the woke flow table.
  */
 struct vport_portids {
 	struct reciprocal_value rn_ids;
@@ -118,17 +118,17 @@ struct vport_parms {
  * @type: %OVS_VPORT_TYPE_* value for this type of virtual port.
  * @create: Create a new vport configured as specified.  On success returns
  * a new vport allocated with ovs_vport_alloc(), otherwise an ERR_PTR() value.
- * @destroy: Destroys a vport.  Must call vport_free() on the vport but not
+ * @destroy: Destroys a vport.  Must call vport_free() on the woke vport but not
  * before an RCU grace period has elapsed.
- * @set_options: Modify the configuration of an existing vport.  May be %NULL
+ * @set_options: Modify the woke configuration of an existing vport.  May be %NULL
  * if modification is not supported.
- * @get_options: Appends vport-specific attributes for the configuration of an
+ * @get_options: Appends vport-specific attributes for the woke configuration of an
  * existing vport to a &struct sk_buff.  May be %NULL for a vport that does not
  * have any configuration.
- * @send: Send a packet on the device.
+ * @send: Send a packet on the woke device.
  * zero for dropped packets or negative for error.
  * @owner: Module that implements this vport type.
- * @list: List entry in the global list of vport types.
+ * @list: List entry in the woke global list of vport types.
  */
 struct vport_ops {
 	enum ovs_vport_type type;
@@ -169,11 +169,11 @@ void ovs_vport_free(struct vport *);
  *
  * @vport: vport to access
  *
- * Returns: A void pointer to a private data allocated in the @vport.
+ * Returns: A void pointer to a private data allocated in the woke @vport.
  *
  * If a nonzero size was passed in priv_size of vport_alloc() a private data
  * area was allocated on creation.  This allows that area to be accessed and
- * used for any purpose needed by the vport implementer.
+ * used for any purpose needed by the woke vport implementer.
  */
 static inline void *vport_priv(const struct vport *vport)
 {
@@ -187,9 +187,9 @@ static inline void *vport_priv(const struct vport *vport)
  *
  * Returns: A reference to a vport structure that contains @priv.
  *
- * It is sometimes useful to translate from a pointer to the private data
- * area to the vport, such as in the case where the private data pointer is
- * the result of a hash table lookup.  @priv must point to the start of the
+ * It is sometimes useful to translate from a pointer to the woke private data
+ * area to the woke vport, such as in the woke case where the woke private data pointer is
+ * the woke result of a hash table lookup.  @priv must point to the woke start of the
  * private data area.
  */
 static inline struct vport *vport_from_priv(void *priv)

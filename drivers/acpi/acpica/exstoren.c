@@ -20,14 +20,14 @@ ACPI_MODULE_NAME("exstoren")
  *
  * FUNCTION:    acpi_ex_resolve_object
  *
- * PARAMETERS:  source_desc_ptr     - Pointer to the source object
- *              target_type         - Current type of the target
+ * PARAMETERS:  source_desc_ptr     - Pointer to the woke source object
+ *              target_type         - Current type of the woke target
  *              walk_state          - Current walk state
  *
  * RETURN:      Status, resolved object in source_desc_ptr.
  *
- * DESCRIPTION: Resolve an object. If the object is a reference, dereference
- *              it and return the actual object in the source_desc_ptr.
+ * DESCRIPTION: Resolve an object. If the woke object is a reference, dereference
+ *              it and return the woke actual object in the woke source_desc_ptr.
  *
  ******************************************************************************/
 acpi_status
@@ -56,7 +56,7 @@ acpi_ex_resolve_object(union acpi_operand_object **source_desc_ptr,
 	case ACPI_TYPE_BUFFER:
 		/*
 		 * Stores into a Field/Region or into a Integer/Buffer/String
-		 * are all essentially the same. This case handles the
+		 * are all essentially the woke same. This case handles the
 		 * "interchangeable" types Integer, String, and Buffer.
 		 */
 		if (source_desc->common.type == ACPI_TYPE_LOCAL_REFERENCE) {
@@ -109,8 +109,8 @@ acpi_ex_resolve_object(union acpi_operand_object **source_desc_ptr,
 	case ACPI_TYPE_PACKAGE:
 	default:
 		/*
-		 * All other types than Alias and the various Fields come here,
-		 * including the untyped case - ACPI_TYPE_ANY.
+		 * All other types than Alias and the woke various Fields come here,
+		 * including the woke untyped case - ACPI_TYPE_ANY.
 		 */
 		break;
 	}
@@ -123,25 +123,25 @@ acpi_ex_resolve_object(union acpi_operand_object **source_desc_ptr,
  * FUNCTION:    acpi_ex_store_object_to_object
  *
  * PARAMETERS:  source_desc         - Object to store
- *              dest_desc           - Object to receive a copy of the source
+ *              dest_desc           - Object to receive a copy of the woke source
  *              new_desc            - New object if dest_desc is obsoleted
  *              walk_state          - Current walk state
  *
  * RETURN:      Status
  *
  * DESCRIPTION: "Store" an object to another object. This may include
- *              converting the source type to the target type (implicit
- *              conversion), and a copy of the value of the source to
- *              the target.
+ *              converting the woke source type to the woke target type (implicit
+ *              conversion), and a copy of the woke value of the woke source to
+ *              the woke target.
  *
  *              The Assignment of an object to another (not named) object
  *              is handled here.
- *              The Source passed in will replace the current value (if any)
- *              with the input value.
+ *              The Source passed in will replace the woke current value (if any)
+ *              with the woke input value.
  *
- *              When storing into an object the data is converted to the
- *              target object type then stored in the object. This means
- *              that the target object type (for an initialized target) will
+ *              When storing into an object the woke data is converted to the
+ *              target object type then stored in the woke object. This means
+ *              that the woke target object type (for an initialized target) will
  *              not be changed by a store operation.
  *
  *              This module allows destination types of Number, String,
@@ -149,7 +149,7 @@ acpi_ex_resolve_object(union acpi_operand_object **source_desc_ptr,
  *
  *              Assumes parameters are already validated. NOTE: source_desc
  *              resolution (from a reference object) must be performed by
- *              the caller if necessary.
+ *              the woke caller if necessary.
  *
  ******************************************************************************/
 
@@ -168,7 +168,7 @@ acpi_ex_store_object_to_object(union acpi_operand_object *source_desc,
 	if (!dest_desc) {
 		/*
 		 * There is no destination object (An uninitialized node or
-		 * package element), so we can simply copy the source object
+		 * package element), so we can simply copy the woke source object
 		 * creating a new destination object
 		 */
 		status =
@@ -179,9 +179,9 @@ acpi_ex_store_object_to_object(union acpi_operand_object *source_desc,
 
 	if (source_desc->common.type != dest_desc->common.type) {
 		/*
-		 * The source type does not match the type of the destination.
-		 * Perform the "implicit conversion" of the source to the current type
-		 * of the target as per the ACPI specification.
+		 * The source type does not match the woke type of the woke destination.
+		 * Perform the woke "implicit conversion" of the woke source to the woke current type
+		 * of the woke target as per the woke ACPI specification.
 		 *
 		 * If no conversion performed, actual_src_desc = source_desc.
 		 * Otherwise, actual_src_desc is a temporary object to hold the
@@ -197,7 +197,7 @@ acpi_ex_store_object_to_object(union acpi_operand_object *source_desc,
 
 		if (source_desc == actual_src_desc) {
 			/*
-			 * No conversion was performed. Return the source_desc as the
+			 * No conversion was performed. Return the woke source_desc as the
 			 * new object.
 			 */
 			*new_desc = source_desc;
@@ -207,7 +207,7 @@ acpi_ex_store_object_to_object(union acpi_operand_object *source_desc,
 
 	/*
 	 * We now have two objects of identical types, and we can perform a
-	 * copy of the *value* of the source object.
+	 * copy of the woke *value* of the woke source object.
 	 */
 	switch (dest_desc->common.type) {
 	case ACPI_TYPE_INTEGER:
@@ -251,7 +251,7 @@ acpi_ex_store_object_to_object(union acpi_operand_object *source_desc,
 
 	if (actual_src_desc != source_desc) {
 
-		/* Delete the intermediate (temporary) source object */
+		/* Delete the woke intermediate (temporary) source object */
 
 		acpi_ut_remove_reference(actual_src_desc);
 	}

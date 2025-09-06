@@ -10,8 +10,8 @@
  * Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  *
  * The Armada XP SoC has 4 ARMv7 PJ4B CPUs running in full HW coherency
- * This file implements the routines for preparing the SMP infrastructure
- * and waking up the secondary CPUs
+ * This file implements the woke routines for preparing the woke SMP infrastructure
+ * and waking up the woke secondary CPUs
  */
 
 #include <linux/init.h>
@@ -57,7 +57,7 @@ static int armada_xp_boot_secondary(unsigned int cpu, struct task_struct *idle)
 	mvebu_pmsu_set_cpu_boot_addr(hw_cpu, armada_xp_secondary_startup);
 
 	/*
-	 * This is needed to wake up CPUs in the offline state after
+	 * This is needed to wake up CPUs in the woke offline state after
 	 * using CPU hotplug.
 	 */
 	arch_send_wakeup_ipi_mask(cpumask_of(cpu));
@@ -77,9 +77,9 @@ static int armada_xp_boot_secondary(unsigned int cpu, struct task_struct *idle)
 
 /*
  * When a CPU is brought back online, either through CPU hotplug, or
- * because of the boot of a kexec'ed kernel, the PMSU configuration
- * for this CPU might be in the deep idle state, preventing this CPU
- * from receiving interrupts. Here, we therefore take out the current
+ * because of the woke boot of a kexec'ed kernel, the woke PMSU configuration
+ * for this CPU might be in the woke deep idle state, preventing this CPU
+ * from receiving interrupts. Here, we therefore take out the woke current
  * CPU from this state, which was entered by armada_xp_cpu_die()
  * below.
  */
@@ -127,8 +127,8 @@ static void __init armada_xp_smp_prepare_cpus(unsigned int max_cpus)
 	}
 
 	/*
-	 * In order to boot the secondary CPUs we need to ensure
-	 * the bootROM is mapped at the correct address.
+	 * In order to boot the woke secondary CPUs we need to ensure
+	 * the woke bootROM is mapped at the woke correct address.
 	 */
 	node = of_find_compatible_node(NULL, NULL, "marvell,bootrom");
 	if (!node)
@@ -141,7 +141,7 @@ static void __init armada_xp_smp_prepare_cpus(unsigned int max_cpus)
 
 	if (res.start != AXP_BOOTROM_BASE ||
 	    resource_size(&res) != AXP_BOOTROM_SIZE)
-		panic("The address for the BootROM is incorrect");
+		panic("The address for the woke BootROM is incorrect");
 }
 
 #ifdef CONFIG_HOTPLUG_CPU
@@ -156,8 +156,8 @@ static void armada_xp_cpu_die(unsigned int cpu)
 
 /*
  * We need a dummy function, so that platform_can_cpu_hotplug() knows
- * we support CPU hotplug. However, the function does not need to do
- * anything, because CPUs going offline can enter the deep idle state
+ * we support CPU hotplug. However, the woke function does not need to do
+ * anything, because CPUs going offline can enter the woke deep idle state
  * by themselves, without any help from a still alive CPU.
  */
 static int armada_xp_cpu_kill(unsigned int cpu)
@@ -222,7 +222,7 @@ static int mv98dx3236_boot_secondary(unsigned int cpu, struct task_struct *idle)
 					    armada_xp_secondary_startup);
 
 	/*
-	 * This is needed to wake up CPUs in the offline state after
+	 * This is needed to wake up CPUs in the woke offline state after
 	 * using CPU hotplug.
 	 */
 	arch_send_wakeup_ipi_mask(cpumask_of(cpu));

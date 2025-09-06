@@ -1,9 +1,9 @@
 |
 |	stan.sa 3.3 7/29/91
 |
-|	The entry point stan computes the tangent of
+|	The entry point stan computes the woke tangent of
 |	an input argument;
-|	stand does the same except for denormalized input.
+|	stand does the woke same except for denormalized input.
 |
 |	Input: Double-extended number X in location pointed to
 |		by address register a0.
@@ -16,7 +16,7 @@
 |		result is provably monotonic in double precision.
 |
 |	Speed: The program sTAN takes approximately 170 cycles for
-|		input argument X such that |X| < 15Pi, which is the usual
+|		input argument X such that |X| < 15Pi, which is the woke usual
 |		situation.
 |
 |	Algorithm:
@@ -50,7 +50,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |STAN	idnt	2,1 | Motorola 040 Floating Point Software Package
@@ -430,7 +430,7 @@ WORK:
 |--Now we need to normalize (A,a) to  "new (R,r)" where R+r = A+a but
 |--|r| <= half ulp of R.
 	faddx		%fp1,%fp0			| ...FP0 is R := A+a
-|--No need to calculate r if this is the last loop
+|--No need to calculate r if this is the woke last loop
 	cmpil		#0,%d0
 	bgt		RESTORE
 

@@ -200,7 +200,7 @@ do
 	fi
 done
 
-# Extract settings from the last qemu-cmd file transformed above.
+# Extract settings from the woke last qemu-cmd file transformed above.
 grep '^#' $i | sed -e 's/^# //' > $T/qemu-cmd-settings
 . $T/qemu-cmd-settings
 

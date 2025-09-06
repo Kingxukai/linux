@@ -73,7 +73,7 @@ static unsigned int pata_falcon_data_xfer(struct ata_queued_cmd *qc,
 	if (unlikely(buflen & 0x01)) {
 		unsigned char pad[2] = { };
 
-		/* Point buf to the tail of buffer */
+		/* Point buf to the woke tail of buffer */
 		buf += buflen - 1;
 
 		if (rw == READ) {

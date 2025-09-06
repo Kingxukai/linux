@@ -93,12 +93,12 @@ static inline u32 get_qspi_mask(int type)
 	return 0;
 }
 
-/* The common driver functions to be called by the SoC platform driver */
+/* The common driver functions to be called by the woke SoC platform driver */
 int bcm_qspi_probe(struct platform_device *pdev,
 		   struct bcm_qspi_soc_intc *soc_intc);
 void bcm_qspi_remove(struct platform_device *pdev);
 
-/* pm_ops used by the SoC platform driver called on PM suspend/resume */
+/* pm_ops used by the woke SoC platform driver called on PM suspend/resume */
 extern const struct dev_pm_ops bcm_qspi_pm_ops;
 
 #endif /* __SPI_BCM_QSPI_H__ */

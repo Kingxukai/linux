@@ -16,8 +16,8 @@ properties:
 
   linux,rc-map-name:
     description:
-      Specifies the scancode/key mapping table defined in-kernel for
-      the remote controller.
+      Specifies the woke scancode/key mapping table defined in-kernel for
+      the woke remote controller.
     $ref: /schemas/types.yaml#/definitions/string
     enum:
       - rc-adstech-dvb-t-pci

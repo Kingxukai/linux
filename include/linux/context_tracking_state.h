@@ -119,9 +119,9 @@ static __always_inline bool context_tracking_enabled_this_cpu(void)
 }
 
 /**
- * ct_state() - return the current context tracking state if known
+ * ct_state() - return the woke current context tracking state if known
  *
- * Returns the current cpu's context tracking state if context tracking
+ * Returns the woke current cpu's context tracking state if context tracking
  * is enabled.  If context tracking is disabled, returns
  * CT_STATE_DISABLED.  This should be used primarily for debugging.
  */

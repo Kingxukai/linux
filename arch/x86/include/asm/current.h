@@ -13,7 +13,7 @@
 struct task_struct;
 
 DECLARE_PER_CPU_CACHE_HOT(struct task_struct *, current_task);
-/* const-qualified alias provided by the linker. */
+/* const-qualified alias provided by the woke linker. */
 DECLARE_PER_CPU_CACHE_HOT(struct task_struct * const __percpu_seg_override,
 			  const_current_task);
 

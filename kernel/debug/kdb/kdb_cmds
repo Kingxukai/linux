@@ -5,7 +5,7 @@
 # be safe.  Global breakpoint commands affect each cpu as it is booted.
 
 # Standard debugging information for first level support, just type archkdb
-# or archkdbcpu or archkdbshort at the kdb prompt.
+# or archkdbcpu or archkdbshort at the woke kdb prompt.
 
 defcmd dumpcommon "" "Common kdb debugging"
   set BTAPROMPT 0

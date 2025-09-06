@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the STM32F4 RCC IP
+ * This header provides constants for the woke STM32F4 RCC IP
  */
 
 #ifndef _DT_BINDINGS_MFD_STM32F4_RCC_H

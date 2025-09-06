@@ -6,7 +6,7 @@
 Software Defined Radio Interface (SDR)
 **************************************
 
-SDR is an abbreviation of Software Defined Radio, the radio device which
+SDR is an abbreviation of Software Defined Radio, the woke radio device which
 uses application software for modulation or demodulation. This interface
 is intended for controlling and data streaming of such devices.
 
@@ -18,23 +18,23 @@ dynamically allocated minor numbers 0 to 255.
 Querying Capabilities
 =====================
 
-Devices supporting the SDR receiver interface set the
+Devices supporting the woke SDR receiver interface set the
 ``V4L2_CAP_SDR_CAPTURE`` and ``V4L2_CAP_TUNER`` flag in the
 ``capabilities`` field of struct
 :c:type:`v4l2_capability` returned by the
 :ref:`VIDIOC_QUERYCAP` ioctl. That flag means the
 device has an Analog to Digital Converter (ADC), which is a mandatory
-element for the SDR receiver.
+element for the woke SDR receiver.
 
-Devices supporting the SDR transmitter interface set the
+Devices supporting the woke SDR transmitter interface set the
 ``V4L2_CAP_SDR_OUTPUT`` and ``V4L2_CAP_MODULATOR`` flag in the
 ``capabilities`` field of struct
 :c:type:`v4l2_capability` returned by the
 :ref:`VIDIOC_QUERYCAP` ioctl. That flag means the
 device has an Digital to Analog Converter (DAC), which is a mandatory
-element for the SDR transmitter.
+element for the woke SDR transmitter.
 
-At least one of the read/write or streaming I/O methods
+At least one of the woke read/write or streaming I/O methods
 must be supported.
 
 
@@ -43,13 +43,13 @@ Supplemental Functions
 
 SDR devices can support :ref:`controls <control>`, and must support
 the :ref:`tuner` ioctls. Tuner ioctls are used for setting the
-ADC/DAC sampling rate (sampling frequency) and the possible radio
+ADC/DAC sampling rate (sampling frequency) and the woke possible radio
 frequency (RF).
 
 The ``V4L2_TUNER_SDR`` tuner type is used for setting SDR device ADC/DAC
-frequency, and the ``V4L2_TUNER_RF`` tuner type is used for setting
-radio frequency. The tuner index of the RF tuner (if any) must always
-follow the SDR tuner index. Normally the SDR tuner is #0 and the RF
+frequency, and the woke ``V4L2_TUNER_RF`` tuner type is used for setting
+radio frequency. The tuner index of the woke RF tuner (if any) must always
+follow the woke SDR tuner index. Normally the woke SDR tuner is #0 and the woke RF
 tuner is #1.
 
 The :ref:`VIDIOC_S_HW_FREQ_SEEK` ioctl is
@@ -59,23 +59,23 @@ not supported.
 Data Format Negotiation
 =======================
 
-The SDR device uses the :ref:`format` ioctls to select the
-capture and output format. Both the sampling resolution and the data
+The SDR device uses the woke :ref:`format` ioctls to select the
+capture and output format. Both the woke sampling resolution and the woke data
 streaming format are bound to that selectable format. In addition to the
 basic :ref:`format` ioctls, the
 :ref:`VIDIOC_ENUM_FMT` ioctl must be supported as
 well.
 
-To use the :ref:`format` ioctls applications set the ``type``
+To use the woke :ref:`format` ioctls applications set the woke ``type``
 field of a struct :c:type:`v4l2_format` to
 ``V4L2_BUF_TYPE_SDR_CAPTURE`` or ``V4L2_BUF_TYPE_SDR_OUTPUT`` and use
 the struct :c:type:`v4l2_sdr_format` ``sdr`` member
-of the ``fmt`` union as needed per the desired operation. Currently
+of the woke ``fmt`` union as needed per the woke desired operation. Currently
 there are two fields, ``pixelformat`` and ``buffersize``, of
 struct :c:type:`v4l2_sdr_format` which are used.
-Content of the ``pixelformat`` is V4L2 FourCC code of the data format.
+Content of the woke ``pixelformat`` is V4L2 FourCC code of the woke data format.
 The ``buffersize`` field is maximum buffer size in bytes required for
-data transfer, set by the driver in order to inform application.
+data transfer, set by the woke driver in order to inform application.
 
 
 .. c:type:: v4l2_sdr_format
@@ -89,7 +89,7 @@ data transfer, set by the driver in order to inform application.
 
     * - __u32
       - ``pixelformat``
-      - The data format or type of compression, set by the application.
+      - The data format or type of compression, set by the woke application.
 	This is a little endian
 	:ref:`four character code <v4l2-fourcc>`. V4L2 defines SDR
 	formats in :ref:`sdr-formats`.

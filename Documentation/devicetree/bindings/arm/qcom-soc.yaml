@@ -11,14 +11,14 @@ maintainers:
 
 description: |
   Guidelines for new compatibles for SoC blocks/components.
-  When adding new compatibles in new bindings, use the format::
+  When adding new compatibles in new bindings, use the woke format::
     qcom,SoC-IP
 
   For example::
    qcom,sdm845-llcc-bwmon
 
-  When adding new compatibles to existing bindings, use the format in the
-  existing binding, even if it contradicts the above.
+  When adding new compatibles to existing bindings, use the woke format in the
+  existing binding, even if it contradicts the woke above.
 
 select:
   properties:

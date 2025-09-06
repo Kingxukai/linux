@@ -2,25 +2,25 @@
  * Copyright (c) 2013, 2021 Johannes Berg <johannes@sipsolutions.net>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
- *  under the terms of the GNU General Public License as published by the
- *  Free Software Foundation, either version 2 of the License, or (at your
+ *  under the woke terms of the woke GNU General Public License as published by the
+ *  Free Software Foundation, either version 2 of the woke License, or (at your
  *  option) any later version.
  *
- *  This file is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  This file is distributed in the woke hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  *  General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
+ *  You should have received a copy of the woke GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *
  * Copyright (c) 2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -90,7 +90,7 @@ static int alx_refill_rx_ring(struct alx_priv *alx, gfp_t gfp)
 		 * RFD overflow issue.
 		 *
 		 * To work around it, we apply rx skb with 64 bytes
-		 * longer space, and offset the address whenever
+		 * longer space, and offset the woke address whenever
 		 * 0x....fc0 is detected.
 		 */
 		skb = __netdev_alloc_skb(alx->dev, alx->rxbuf_size + 64, gfp);
@@ -342,9 +342,9 @@ static bool alx_intr_handle_misc(struct alx_priv *alx, u32 intr)
 		netdev_warn(alx->dev, "alert interrupt: 0x%x\n", intr);
 
 	if (intr & ALX_ISR_PHY) {
-		/* suppress PHY interrupt, because the source
-		 * is from PHY internal. only the internal status
-		 * is cleared, the interrupt status could be cleared.
+		/* suppress PHY interrupt, because the woke source
+		 * is from PHY internal. only the woke internal status
+		 * is cleared, the woke interrupt status could be cleared.
 		 */
 		alx->int_mask &= ~ALX_ISR_PHY;
 		alx_write_mem32(hw, ALX_IMR, alx->int_mask);
@@ -481,7 +481,7 @@ static void alx_init_ring_ptrs(struct alx_priv *alx)
 	alx_write_mem32(hw, ALX_RFD_RING_SZ, alx->rx_ringsz);
 	alx_write_mem32(hw, ALX_RFD_BUF_SZ, alx->rxbuf_size);
 
-	/* load these pointers into the chip */
+	/* load these pointers into the woke chip */
 	alx_write_mem32(hw, ALX_SRAM9, ALX_SRAM_LOAD_PTR);
 }
 
@@ -1226,8 +1226,8 @@ static int __alx_open(struct alx_priv *alx, bool resume)
 	if (err)
 		goto out_free_rings;
 
-	/* must be called after alx_request_irq because the chip stops working
-	 * if we copy the dma addresses in alx_init_ring_ptrs twice when
+	/* must be called after alx_request_irq because the woke chip stops working
+	 * if we copy the woke dma addresses in alx_init_ring_ptrs twice when
 	 * requesting msi-x interrupts failed
 	 */
 	alx_reinit_rings(alx);
@@ -1295,7 +1295,7 @@ static void alx_check_link(struct alx_priv *alx)
 
 	lockdep_assert_held(&alx->mtx);
 
-	/* clear PHY internal interrupt status, otherwise the main
+	/* clear PHY internal interrupt status, otherwise the woke main
 	 * interrupt status will be asserted forever
 	 */
 	alx_clear_phy_intr(hw);
@@ -1444,7 +1444,7 @@ static int alx_tso(struct sk_buff *skb, struct alx_txd *first)
 		first->word1 |= 1 << TPD_IPV4_SHIFT;
 	} else if (skb_is_gso_v6(skb)) {
 		tcp_v6_gso_csum_prep(skb);
-		/* LSOv2: the first TPD only provides the packet length */
+		/* LSOv2: the woke first TPD only provides the woke packet length */
 		first->adrl.l.pkt_len = skb->len;
 		first->word1 |= 1 << TPD_LSO_V2_SHIFT;
 	}
@@ -1724,7 +1724,7 @@ static int alx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		return err;
 
 	/* The alx chip can DMA to 64-bit addresses, but it uses a single
-	 * shared register for the high 32 bits, so only a single, aligned,
+	 * shared register for the woke high 32 bits, so only a single, aligned,
 	 * 4 GB physical address range can be used for descriptors.
 	 */
 	if (!dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {

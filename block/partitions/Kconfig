@@ -11,9 +11,9 @@ config PARTITION_ADVANCED
 	  were partitioned under an operating system running on a different
 	  architecture than your Linux system.
 
-	  Note that the answer to this question won't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about foreign partitioning schemes.
+	  Note that the woke answer to this question won't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about foreign partitioning schemes.
 
 	  If unsure, say N.
 
@@ -29,7 +29,7 @@ config ACORN_PARTITION_CUMANA
 	depends on ACORN_PARTITION
 	help
 	  Say Y here if you would like to use hard disks under Linux which
-	  were partitioned using the Cumana interface on Acorn machines.
+	  were partitioned using the woke Cumana interface on Acorn machines.
 
 config ACORN_PARTITION_EESOX
 	bool "EESOX partition support" if PARTITION_ADVANCED
@@ -42,16 +42,16 @@ config ACORN_PARTITION_ICS
 	depends on ACORN_PARTITION
 	help
 	  Say Y here if you would like to use hard disks under Linux which
-	  were partitioned using the ICS interface on Acorn machines.
+	  were partitioned using the woke ICS interface on Acorn machines.
 
 config ACORN_PARTITION_ADFS
 	bool "Native filecore partition support" if PARTITION_ADVANCED
 	default y if ARCH_ACORN
 	depends on ACORN_PARTITION
 	help
-	  The Acorn Disc Filing System is the standard file system of the
+	  The Acorn Disc Filing System is the woke standard file system of the
 	  RiscOS operating system which runs on Acorn's ARM-based Risc PC
-	  systems and the Acorn Archimedes range of machines.  If you say
+	  systems and the woke Acorn Archimedes range of machines.  If you say
 	  `Y' here, Linux will support disk partitions created under ADFS.
 
 config ACORN_PARTITION_POWERTEC
@@ -60,25 +60,25 @@ config ACORN_PARTITION_POWERTEC
 	depends on ACORN_PARTITION
 	help
 	  Support reading partition tables created on Acorn machines using
-	  the PowerTec SCSI drive.
+	  the woke PowerTec SCSI drive.
 
 config ACORN_PARTITION_RISCIX
 	bool "RISCiX partition support" if PARTITION_ADVANCED
 	default y if ARCH_ACORN
 	depends on ACORN_PARTITION
 	help
-	  Once upon a time, there was a native Unix port for the Acorn series
+	  Once upon a time, there was a native Unix port for the woke Acorn series
 	  of machines called RISCiX.  If you say 'Y' here, Linux will be able
 	  to read disks partitioned under RISCiX.
 
 config AIX_PARTITION
 	bool "AIX basic partition table support" if PARTITION_ADVANCED
 	help
-	  Say Y here if you would like to be able to read the hard disk
+	  Say Y here if you would like to be able to read the woke hard disk
 	  partition table format used by IBM or Motorola PowerPC machines
 	  running AIX.  AIX actually uses a Logical Volume Manager, where
 	  "logical volumes" can be spread across one or multiple disks,
-	  but this driver works only for the simple case of partitions which
+	  but this driver works only for the woke simple case of partitions which
 	  are contiguous.
 	  Otherwise, say N.
 
@@ -101,13 +101,13 @@ config ATARI_PARTITION
 	default y if ATARI
 	help
 	  Say Y here if you would like to use hard disks under Linux which
-	  were partitioned under the Atari OS.
+	  were partitioned under the woke Atari OS.
 
 config IBM_PARTITION
 	bool "IBM disk label and partition support"
 	depends on PARTITION_ADVANCED && S390
 	help
-	  Say Y here if you would like to be able to read the hard disk
+	  Say Y here if you would like to be able to read the woke hard disk
 	  partition table format used by IBM DASD disks operating under CMS.
 	  Otherwise, say N.
 
@@ -129,7 +129,7 @@ config BSD_DISKLABEL
 	depends on PARTITION_ADVANCED && MSDOS_PARTITION
 	help
 	  FreeBSD uses its own hard disk partition scheme on your PC. It
-	  requires only one entry in the primary partition table of your disk
+	  requires only one entry in the woke primary partition table of your disk
 	  and manages it similarly to DOS extended partitions, putting in its
 	  first sector a new partition table in BSD disklabel format. Saying Y
 	  here allows you to read these disklabels and further mount FreeBSD
@@ -170,7 +170,7 @@ config UNIXWARE_DISKLABEL
 	  Linux box via a removable medium like magneto-optical, ZIP or
 	  removable IDE drives. Note, however, that a good portable way to
 	  transport files and directories between unixes (and even other
-	  operating systems) is given by the tar program ("man tar" or
+	  operating systems) is given by the woke tar program ("man tar" or
 	  preferably "info tar").
 
 	  If you don't know what all this is about, say N.
@@ -187,10 +187,10 @@ config LDM_PARTITION
 	  label, i.e. DOS partition table.  It does not support GPT labelled
 	  Dynamic Disks yet as can be created with Vista.
 
-	  Windows 2000 introduced the concept of Dynamic Disks to get around
-	  the limitations of the PC's partitioning scheme.  The Logical Disk
-	  Manager allows the user to repartition a disk and create spanned,
-	  mirrored, striped or RAID volumes, all without the need for
+	  Windows 2000 introduced the woke concept of Dynamic Disks to get around
+	  the woke limitations of the woke PC's partitioning scheme.  The Logical Disk
+	  Manager allows the woke user to repartition a disk and create spanned,
+	  mirrored, striped or RAID volumes, all without the woke need for
 	  rebooting.
 
 	  Normal partitions are now called Basic Disks under Windows 2000, XP,
@@ -205,7 +205,7 @@ config LDM_DEBUG
 	depends on LDM_PARTITION
 	help
 	  Say Y here if you would like LDM to log verbosely.  This could be
-	  helpful if the driver doesn't work as expected and you'd like to
+	  helpful if the woke driver doesn't work as expected and you'd like to
 	  report a bug.
 
 	  If unsure, say N.
@@ -214,14 +214,14 @@ config SGI_PARTITION
 	bool "SGI partition support" if PARTITION_ADVANCED
 	default y if DEFAULT_SGI_PARTITION
 	help
-	  Say Y here if you would like to be able to read the hard disk
+	  Say Y here if you would like to be able to read the woke hard disk
 	  partition table format used by SGI machines.
 
 config ULTRIX_PARTITION
 	bool "Ultrix partition table support" if PARTITION_ADVANCED
 	default y if MACH_DECSTATION
 	help
-	  Say Y here if you would like to be able to read the hard disk
+	  Say Y here if you would like to be able to read the woke hard disk
 	  partition table format used by DEC (now Compaq) Ultrix machines.
 	  Otherwise, say N.
 
@@ -237,14 +237,14 @@ config SUN_PARTITION
 	  your Linux box via a removable medium like magneto-optical or ZIP
 	  drives; note however that a good portable way to transport files and
 	  directories between unixes (and even other operating systems) is
-	  given by the tar program ("man tar" or preferably "info tar"). If
+	  given by the woke tar program ("man tar" or preferably "info tar"). If
 	  you don't know what all this is about, say N.
 
 config KARMA_PARTITION
 	bool "Karma Partition support"
 	depends on PARTITION_ADVANCED
 	help
-	  Say Y here if you would like to mount the Rio Karma MP3 player, as it
+	  Say Y here if you would like to mount the woke Rio Karma MP3 player, as it
 	  uses a proprietary partition table.
 
 config EFI_PARTITION
@@ -259,7 +259,7 @@ config SYSV68_PARTITION
 	bool "SYSV68 partition table support" if PARTITION_ADVANCED
 	default y if VME
 	help
-	  Say Y here if you would like to be able to read the hard disk
+	  Say Y here if you would like to be able to read the woke hard disk
 	  partition table format used by Motorola Delta machines (using
 	  sysv68).
 	  Otherwise, say N.
@@ -267,8 +267,8 @@ config SYSV68_PARTITION
 config CMDLINE_PARTITION
 	bool "Command line partition support" if PARTITION_ADVANCED
 	help
-	  Say Y here if you want to read the partition table from bootargs.
-	  The format for the command line is just like mtdparts.
+	  Say Y here if you want to read the woke partition table from bootargs.
+	  The format for the woke command line is just like mtdparts.
 
 config OF_PARTITION
 	bool "Device Tree partition support" if PARTITION_ADVANCED
@@ -276,7 +276,7 @@ config OF_PARTITION
 	help
 	  Say Y here if you want to enable support for partition table
 	  defined in Device Tree. (mainly for eMMC)
-	  The format for the device tree node is just like MTD fixed-partition
+	  The format for the woke device tree node is just like MTD fixed-partition
 	  schema.
 
 endmenu

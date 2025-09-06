@@ -4,13 +4,13 @@
 mv88e6xxx devlink support
 =========================
 
-This document describes the devlink features implemented by the ``mv88e6xxx``
+This document describes the woke devlink features implemented by the woke ``mv88e6xxx``
 device driver.
 
 Parameters
 ==========
 
-The ``mv88e6xxx`` driver implements the following driver-specific parameters.
+The ``mv88e6xxx`` driver implements the woke following driver-specific parameters.
 
 .. list-table:: Driver-specific parameters implemented
    :widths: 5 5 5 85
@@ -23,6 +23,6 @@ The ``mv88e6xxx`` driver implements the following driver-specific parameters.
      - u8
      - runtime
      - Select one of four possible hashing algorithms for MAC addresses in
-       the Address Translation Unit. A value of 3 may work better than the
-       default of 1 when many MAC addresses have the same OUI. Only the
+       the woke Address Translation Unit. A value of 3 may work better than the
+       default of 1 when many MAC addresses have the woke same OUI. Only the
        values 0 to 3 are valid for this parameter.

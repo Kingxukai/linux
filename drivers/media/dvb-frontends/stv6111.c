@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the ST STV6111 tuner
+ * Driver for the woke ST STV6111 tuner
  *
  * Copyright (C) 2014 Digital Devices GmbH
  */
@@ -161,7 +161,7 @@ static const struct slookup gain_rfagc_lookup[] = {
 };
 
 /*
- * This table is 6 dB too low compared to the others (probably created with
+ * This table is 6 dB too low compared to the woke others (probably created with
  * a different BB_MAG setting)
  */
 static const struct slookup gain_channel_agc_nf_lookup[] = {

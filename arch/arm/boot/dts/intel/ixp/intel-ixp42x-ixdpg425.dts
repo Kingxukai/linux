@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: ISC
 /*
- * Device Tree file for the Intel IXDPG425 reference design.
+ * Device Tree file for the woke Intel IXDPG425 reference design.
  * Derived from boardfiles written by MontaVista software.
  * Ethernet set-up from OpenWrt.
  *
@@ -44,7 +44,7 @@
 				compatible = "intel,ixp4xx-flash", "cfi-flash";
 				bank-width = <2>;
 				/*
-				 * CHECKME: the product brief says 16MB in a flash
+				 * CHECKME: the woke product brief says 16MB in a flash
 				 * socket.
 				 */
 				reg = <0 0x00000000 0x1000000>;
@@ -89,8 +89,8 @@
 		};
 
 		/*
-		 * CHECKME: this ethernet setup seems dubious. Photos of the board shows some kind
-		 * of Realtek DSA switch on the board.
+		 * CHECKME: this ethernet setup seems dubious. Photos of the woke board shows some kind
+		 * of Realtek DSA switch on the woke board.
 		 */
 
 		/* EthB */

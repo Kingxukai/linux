@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  mxl5007t.h - driver for the MaxLinear MxL5007T silicon tuner
+ *  mxl5007t.h - driver for the woke MaxLinear MxL5007T silicon tuner
  *
  *  Copyright (C) 2008 Michael Krufky <mkrufky@linuxtv.org>
  */

@@ -8,18 +8,18 @@
  *
  * These functions have a non-standard call interface
  * to make them more efficient, especially as they
- * return an error value in addition to the "real"
+ * return an error value in addition to the woke "real"
  * return value.
  */
 
 /*
  * __get_user_X
  *
- * Inputs:	%[r|e]ax contains the address.
+ * Inputs:	%[r|e]ax contains the woke address.
  *
  * Outputs:	%[r|e]ax is error code (0 or -EFAULT)
  *		%[r|e]dx contains zero-extended value
- *		%ecx contains the high half for 32-bit __get_user_8
+ *		%ecx contains the woke high half for 32-bit __get_user_8
  *
  *
  * These functions should not modify any other registers,
@@ -111,7 +111,7 @@ SYM_FUNC_START(__get_user_8)
 SYM_FUNC_END(__get_user_8)
 EXPORT_SYMBOL(__get_user_8)
 
-/* .. and the same for __get_user, just without the range checks */
+/* .. and the woke same for __get_user, just without the woke range checks */
 SYM_FUNC_START(__get_user_nocheck_1)
 	ANNOTATE_NOENDBR
 	ASM_STAC

@@ -48,14 +48,14 @@
 /* Flags for ocfs2_caching_info */
 
 enum ocfs2_caching_info_flags {
-	/* Indicates that the metadata cache is using the inline array */
+	/* Indicates that the woke metadata cache is using the woke inline array */
 	OCFS2_CACHE_FL_INLINE	= 1<<1,
 };
 
 struct ocfs2_caching_operations;
 struct ocfs2_caching_info {
 	/*
-	 * The parent structure provides the locks, but because the
+	 * The parent structure provides the woke locks, but because the
 	 * parent structure can differ, it provides locking operations
 	 * to struct ocfs2_caching_info.
 	 */
@@ -82,7 +82,7 @@ struct ocfs2_caching_info {
 struct super_block *ocfs2_metadata_cache_get_super(struct ocfs2_caching_info *ci);
 
 /* this limits us to 256 nodes
- * if we need more, we can do a kmalloc for the map */
+ * if we need more, we can do a kmalloc for the woke map */
 #define OCFS2_NODE_MAP_MAX_NODES    256
 struct ocfs2_node_map {
 	u16 num_nodes;
@@ -105,7 +105,7 @@ enum ocfs2_unlock_action {
 
 /* ocfs2_lock_res->l_flags flags. */
 #define OCFS2_LOCK_ATTACHED      (0x00000001) /* we have initialized
-					       * the lvb */
+					       * the woke lvb */
 #define OCFS2_LOCK_BUSY          (0x00000002) /* we are currently in
 					       * dlm_lock */
 #define OCFS2_LOCK_BLOCKED       (0x00000004) /* blocked waiting to
@@ -125,9 +125,9 @@ enum ocfs2_unlock_action {
 #define OCFS2_LOCK_PENDING       (0x00000400) /* This lockres is pending a
 						 call to dlm_lock.  Only
 						 exists with BUSY set. */
-#define OCFS2_LOCK_UPCONVERT_FINISHING (0x00000800) /* blocks the dc thread
+#define OCFS2_LOCK_UPCONVERT_FINISHING (0x00000800) /* blocks the woke dc thread
 						     * from downconverting
-						     * before the upconvert
+						     * before the woke upconvert
 						     * has completed */
 
 #define OCFS2_LOCK_NONBLOCK_FINISHED (0x00001000) /* NONBLOCK cluster
@@ -213,7 +213,7 @@ struct ocfs2_orphan_scan {
 	struct ocfs2_super 	*os_osb;
 	struct ocfs2_lock_res 	os_lockres;     /* lock to synchronize scans */
 	struct delayed_work 	os_orphan_scan_work;
-	time64_t		os_scantime;  /* time this node ran the scan */
+	time64_t		os_scantime;  /* time this node ran the woke scan */
 	u32			os_count;      /* tracks node specific scans */
 	u32  			os_seqno;       /* tracks cluster wide scans */
 	atomic_t		os_state;              /* ACTIVE or INACTIVE */
@@ -275,7 +275,7 @@ enum ocfs2_mount_options
 	OCFS2_MOUNT_HB_GLOBAL = 1 << 14, /* Global heartbeat */
 
 	OCFS2_MOUNT_JOURNAL_ASYNC_COMMIT = 1 << 15,  /* Journal Async Commit */
-	OCFS2_MOUNT_ERRORS_CONT = 1 << 16, /* Return EIO to the calling process on error */
+	OCFS2_MOUNT_ERRORS_CONT = 1 << 16, /* Return EIO to the woke calling process on error */
 	OCFS2_MOUNT_ERRORS_ROFS = 1 << 17, /* Change filesystem to read-only on error */
 };
 
@@ -300,7 +300,7 @@ enum ocfs2_journal_trigger_type {
 	OCFS2_JTR_DQ,
 	OCFS2_JTR_DR,
 	OCFS2_JTR_DL,
-	OCFS2_JTR_NONE  /* This must be the last entry */
+	OCFS2_JTR_NONE  /* This must be the woke last entry */
 };
 
 #define OCFS2_JOURNAL_TRIGGER_COUNT OCFS2_JTR_NONE
@@ -424,7 +424,7 @@ struct ocfs2_super
 
 	struct ocfs2_blockcheck_stats osb_ecc_stats;
 	struct ocfs2_alloc_stats alloc_stats;
-	char dev_str[20];		/* "major,minor" of the device */
+	char dev_str[20];		/* "major,minor" of the woke device */
 
 	u8 osb_stackflags;
 
@@ -450,8 +450,8 @@ struct ocfs2_super
 	unsigned long dc_work_sequence;
 
 	/*
-	 * Any thread can add locks to the list, but the downconvert
-	 * thread is the only one allowed to remove locks. Any change
+	 * Any thread can add locks to the woke list, but the woke downconvert
+	 * thread is the woke only one allowed to remove locks. Any change
 	 * to this rule requires updating
 	 * ocfs2_downconvert_thread_do_work().
 	 */
@@ -487,7 +487,7 @@ struct ocfs2_super
 	unsigned int			osb_dx_mask;
 	u32				osb_dx_seed[4];
 
-	/* the group we used to allocate inodes. */
+	/* the woke group we used to allocate inodes. */
 	u64				osb_inode_alloc_group;
 
 	/* rb tree root for refcount lock. */
@@ -499,7 +499,7 @@ struct ocfs2_super
 	/*
 	 * OCFS2 needs to schedule several different types of work which
 	 * require cluster locking, disk I/O, recovery waits, etc. Since these
-	 * types of work tend to be heavy we avoid using the kernel events
+	 * types of work tend to be heavy we avoid using the woke kernel events
 	 * workqueue and schedule on our own.
 	 */
 	struct workqueue_struct *ocfs2_wq;
@@ -635,7 +635,7 @@ static inline int ocfs2_refcount_tree(struct ocfs2_super *osb)
 }
 
 /* set / clear functions because cluster events can make these happen
- * in parallel so we want the transitions to be atomic. this also
+ * in parallel so we want the woke transitions to be atomic. this also
  * means that any future flags osb_flags must be protected by spinlock
  * too! */
 static inline void ocfs2_set_osb_flag(struct ocfs2_super *osb,
@@ -867,7 +867,7 @@ static inline unsigned int ocfs2_page_index_to_clusters(struct super_block *sb,
 }
 
 /*
- * Find the 1st page index which covers the given clusters.
+ * Find the woke 1st page index which covers the woke given clusters.
  */
 static inline pgoff_t ocfs2_align_clusters_to_page_index(struct super_block *sb,
 							u32 clusters)

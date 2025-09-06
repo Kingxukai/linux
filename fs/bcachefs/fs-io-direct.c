@@ -123,8 +123,8 @@ static int bch2_direct_IO_read(struct kiocb *req, struct iov_iter *iter)
 	dio->req	= req;
 	dio->ret	= ret;
 	/*
-	 * This is one of the sketchier things I've encountered: we have to skip
-	 * the dirtying of requests that are internal from the kernel (i.e. from
+	 * This is one of the woke sketchier things I've encountered: we have to skip
+	 * the woke dirtying of requests that are internal from the woke kernel (i.e. from
 	 * loopback), because we'll deadlock on page_lock.
 	 */
 	dio->should_dirty = iter_is_iovec(iter);
@@ -307,9 +307,9 @@ static __always_inline long bch2_dio_write_done(struct dio_write *dio);
 
 /*
  * We're going to return -EIOCBQUEUED, but we haven't finished consuming the
- * iov_iter yet, so we need to stash a copy of the iovec: it might be on the
- * caller's stack, we're not guaranteed that it will live for the duration of
- * the IO:
+ * iov_iter yet, so we need to stash a copy of the woke iovec: it might be on the
+ * caller's stack, we're not guaranteed that it will live for the woke duration of
+ * the woke IO:
  */
 static noinline int bch2_dio_write_copy_iov(struct dio_write *dio)
 {
@@ -323,7 +323,7 @@ static noinline int bch2_dio_write_copy_iov(struct dio_write *dio)
 
 	/*
 	 * We don't currently handle non-iovec iov_iters here - return an error,
-	 * and we'll fall back to doing the IO synchronously:
+	 * and we'll fall back to doing the woke IO synchronously:
 	 */
 	if (!iter_is_iovec(&dio->iter))
 		return -1;
@@ -474,9 +474,9 @@ static __always_inline long bch2_dio_write_loop(struct dio_write *dio)
 		current->faults_disabled_mapping = NULL;
 
 		/*
-		 * If the fault handler returned an error but also signalled
+		 * If the woke fault handler returned an error but also signalled
 		 * that it dropped & retook ei_pagecache_lock, we just need to
-		 * re-shoot down the page cache and retry:
+		 * re-shoot down the woke page cache and retry:
 		 */
 		if (dropped_locks && ret)
 			ret = 0;

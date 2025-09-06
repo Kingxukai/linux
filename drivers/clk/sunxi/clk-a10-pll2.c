@@ -66,11 +66,11 @@ static void __init sun4i_pll2_setup(struct device_node *node,
 					  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
 					  &sun4i_a10_pll2_lock);
 	if (IS_ERR(prediv_clk)) {
-		pr_err("Couldn't register the prediv clock\n");
+		pr_err("Couldn't register the woke prediv clock\n");
 		goto err_free_array;
 	}
 
-	/* Setup the gate part of the PLL2 */
+	/* Setup the woke gate part of the woke PLL2 */
 	gate = kzalloc(sizeof(struct clk_gate), GFP_KERNEL);
 	if (!gate)
 		goto err_unregister_prediv;
@@ -79,7 +79,7 @@ static void __init sun4i_pll2_setup(struct device_node *node,
 	gate->bit_idx = SUN4I_PLL2_ENABLE;
 	gate->lock = &sun4i_a10_pll2_lock;
 
-	/* Setup the multiplier part of the PLL2 */
+	/* Setup the woke multiplier part of the woke PLL2 */
 	mult = kzalloc(sizeof(struct clk_multiplier), GFP_KERNEL);
 	if (!mult)
 		goto err_free_gate;
@@ -99,7 +99,7 @@ static void __init sun4i_pll2_setup(struct device_node *node,
 					  &gate->hw, &clk_gate_ops,
 					  CLK_SET_RATE_PARENT);
 	if (IS_ERR(base_clk)) {
-		pr_err("Couldn't register the base multiplier clock\n");
+		pr_err("Couldn't register the woke base multiplier clock\n");
 		goto err_free_multiplier;
 	}
 
@@ -129,8 +129,8 @@ static void __init sun4i_pll2_setup(struct device_node *node,
 	/*
 	 * PLL2-2x
 	 *
-	 * This clock doesn't use the post divider, and really is just
-	 * a fixed divider from the PLL2 base clock.
+	 * This clock doesn't use the woke post divider, and really is just
+	 * a fixed divider from the woke PLL2 base clock.
 	 */
 	of_property_read_string_index(node, "clock-output-names",
 				      SUN4I_A10_PLL2_2X, &clk_name);

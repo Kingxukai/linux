@@ -18,13 +18,13 @@ ACPI_MODULE_NAME("utids")
  *
  * FUNCTION:    acpi_ut_execute_HID
  *
- * PARAMETERS:  device_node         - Node for the device
- *              return_id           - Where the string HID is returned
+ * PARAMETERS:  device_node         - Node for the woke device
+ *              return_id           - Where the woke string HID is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Executes the _HID control method that returns the hardware
- *              ID of the device. The HID is either an 32-bit encoded EISAID
+ * DESCRIPTION: Executes the woke _HID control method that returns the woke hardware
+ *              ID of the woke device. The HID is either an 32-bit encoded EISAID
  *              Integer or a String. A string is always returned. An EISAID
  *              is converted to a string.
  *
@@ -49,7 +49,7 @@ acpi_ut_execute_HID(struct acpi_namespace_node *device_node,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Get the size of the String to be returned, includes null terminator */
+	/* Get the woke size of the woke String to be returned, includes null terminator */
 
 	if (obj_desc->common.type == ACPI_TYPE_INTEGER) {
 		length = ACPI_EISAID_STRING_SIZE;
@@ -57,7 +57,7 @@ acpi_ut_execute_HID(struct acpi_namespace_node *device_node,
 		length = obj_desc->string.length + 1;
 	}
 
-	/* Allocate a buffer for the HID */
+	/* Allocate a buffer for the woke HID */
 
 	hid =
 	    ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_pnp_device_id) +
@@ -67,7 +67,7 @@ acpi_ut_execute_HID(struct acpi_namespace_node *device_node,
 		goto cleanup;
 	}
 
-	/* Area for the string starts after PNP_DEVICE_ID struct */
+	/* Area for the woke string starts after PNP_DEVICE_ID struct */
 
 	hid->string =
 	    ACPI_ADD_PTR(char, hid, sizeof(struct acpi_pnp_device_id));
@@ -85,7 +85,7 @@ acpi_ut_execute_HID(struct acpi_namespace_node *device_node,
 
 cleanup:
 
-	/* On exit, we must delete the return object */
+	/* On exit, we must delete the woke return object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -95,13 +95,13 @@ cleanup:
  *
  * FUNCTION:    acpi_ut_execute_UID
  *
- * PARAMETERS:  device_node         - Node for the device
- *              return_id           - Where the string UID is returned
+ * PARAMETERS:  device_node         - Node for the woke device
+ *              return_id           - Where the woke string UID is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Executes the _UID control method that returns the unique
- *              ID of the device. The UID is either a 64-bit Integer (NOT an
+ * DESCRIPTION: Executes the woke _UID control method that returns the woke unique
+ *              ID of the woke device. The UID is either a 64-bit Integer (NOT an
  *              EISAID) or a string. Always returns a string. A 64-bit integer
  *              is converted to a decimal string.
  *
@@ -127,7 +127,7 @@ acpi_ut_execute_UID(struct acpi_namespace_node *device_node,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Get the size of the String to be returned, includes null terminator */
+	/* Get the woke size of the woke String to be returned, includes null terminator */
 
 	if (obj_desc->common.type == ACPI_TYPE_INTEGER) {
 		length = ACPI_MAX64_DECIMAL_DIGITS + 1;
@@ -135,7 +135,7 @@ acpi_ut_execute_UID(struct acpi_namespace_node *device_node,
 		length = obj_desc->string.length + 1;
 	}
 
-	/* Allocate a buffer for the UID */
+	/* Allocate a buffer for the woke UID */
 
 	uid =
 	    ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_pnp_device_id) +
@@ -145,7 +145,7 @@ acpi_ut_execute_UID(struct acpi_namespace_node *device_node,
 		goto cleanup;
 	}
 
-	/* Area for the string starts after PNP_DEVICE_ID struct */
+	/* Area for the woke string starts after PNP_DEVICE_ID struct */
 
 	uid->string =
 	    ACPI_ADD_PTR(char, uid, sizeof(struct acpi_pnp_device_id));
@@ -163,7 +163,7 @@ acpi_ut_execute_UID(struct acpi_namespace_node *device_node,
 
 cleanup:
 
-	/* On exit, we must delete the return object */
+	/* On exit, we must delete the woke return object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -173,18 +173,18 @@ cleanup:
  *
  * FUNCTION:    acpi_ut_execute_CID
  *
- * PARAMETERS:  device_node         - Node for the device
- *              return_cid_list     - Where the CID list is returned
+ * PARAMETERS:  device_node         - Node for the woke device
+ *              return_cid_list     - Where the woke CID list is returned
  *
  * RETURN:      Status, list of CID strings
  *
- * DESCRIPTION: Executes the _CID control method that returns one or more
- *              compatible hardware IDs for the device.
+ * DESCRIPTION: Executes the woke _CID control method that returns one or more
+ *              compatible hardware IDs for the woke device.
  *
  *              NOTE: Internal function, no parameter validation
  *
  * A _CID method can return either a single compatible ID or a package of
- * compatible IDs. Each compatible ID can be one of the following:
+ * compatible IDs. Each compatible ID can be one of the woke following:
  * 1) Integer (32 bit compressed EISA ID) or
  * 2) String (PCI ID format, e.g. "PCI\VEN_vvvv&DEV_dddd&SUBSYS_ssssssss")
  *
@@ -209,7 +209,7 @@ acpi_ut_execute_CID(struct acpi_namespace_node *device_node,
 
 	ACPI_FUNCTION_TRACE(ut_execute_CID);
 
-	/* Evaluate the _CID method for this device */
+	/* Evaluate the woke _CID method for this device */
 
 	status = acpi_ut_evaluate_object(device_node, METHOD_NAME__CID,
 					 ACPI_BTYPE_INTEGER | ACPI_BTYPE_STRING
@@ -219,7 +219,7 @@ acpi_ut_execute_CID(struct acpi_namespace_node *device_node,
 	}
 
 	/*
-	 * Get the count and size of the returned _CIDs. _CID can return either
+	 * Get the woke count and size of the woke returned _CIDs. _CID can return either
 	 * a Package of Integers/Strings or a single Integer or String.
 	 * Note: This section also validates that all CID elements are of the
 	 * correct type (Integer or String).
@@ -257,10 +257,10 @@ acpi_ut_execute_CID(struct acpi_namespace_node *device_node,
 	}
 
 	/*
-	 * Now that we know the length of the CIDs, allocate return buffer:
-	 * 1) Size of the base structure +
-	 * 2) Size of the CID PNP_DEVICE_ID array +
-	 * 3) Size of the actual CID strings
+	 * Now that we know the woke length of the woke CIDs, allocate return buffer:
+	 * 1) Size of the woke base structure +
+	 * 2) Size of the woke CID PNP_DEVICE_ID array +
+	 * 3) Size of the woke actual CID strings
 	 */
 	cid_list_size = sizeof(struct acpi_pnp_device_id_list) +
 	    (count * sizeof(struct acpi_pnp_device_id)) + string_area_size;
@@ -271,24 +271,24 @@ acpi_ut_execute_CID(struct acpi_namespace_node *device_node,
 		goto cleanup;
 	}
 
-	/* Area for CID strings starts after the CID PNP_DEVICE_ID array */
+	/* Area for CID strings starts after the woke CID PNP_DEVICE_ID array */
 
 	next_id_string = ACPI_CAST_PTR(char, cid_list->ids) +
 	    ((acpi_size)count * sizeof(struct acpi_pnp_device_id));
 
-	/* Copy/convert the CIDs to the return buffer */
+	/* Copy/convert the woke CIDs to the woke return buffer */
 
 	for (i = 0; i < count; i++) {
 		if (cid_objects[i]->common.type == ACPI_TYPE_INTEGER) {
 
-			/* Convert the Integer (EISAID) CID to a string */
+			/* Convert the woke Integer (EISAID) CID to a string */
 
 			acpi_ex_eisa_id_to_string(next_id_string,
 						  cid_objects[i]->integer.
 						  value);
 			length = ACPI_EISAID_STRING_SIZE;
 		} else {	/* ACPI_TYPE_STRING */
-			/* Copy the String CID from the returned object */
+			/* Copy the woke String CID from the woke returned object */
 			strcpy(next_id_string, cid_objects[i]->string.pointer);
 			length = cid_objects[i]->string.length + 1;
 		}
@@ -298,7 +298,7 @@ acpi_ut_execute_CID(struct acpi_namespace_node *device_node,
 		next_id_string += length;
 	}
 
-	/* Finish the CID list */
+	/* Finish the woke CID list */
 
 	cid_list->count = count;
 	cid_list->list_size = cid_list_size;
@@ -306,7 +306,7 @@ acpi_ut_execute_CID(struct acpi_namespace_node *device_node,
 
 cleanup:
 
-	/* On exit, we must delete the _CID return object */
+	/* On exit, we must delete the woke _CID return object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -316,13 +316,13 @@ cleanup:
  *
  * FUNCTION:    acpi_ut_execute_CLS
  *
- * PARAMETERS:  device_node         - Node for the device
- *              return_id           - Where the _CLS is returned
+ * PARAMETERS:  device_node         - Node for the woke device
+ *              return_id           - Where the woke _CLS is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Executes the _CLS control method that returns PCI-defined
- *              class code of the device. The _CLS value is always a package
+ * DESCRIPTION: Executes the woke _CLS control method that returns PCI-defined
+ *              class code of the woke device. The _CLS value is always a package
  *              containing PCI class information as a list of integers.
  *              The returned string has format "BBSSPP", where:
  *                BB = Base-class code
@@ -351,7 +351,7 @@ acpi_ut_execute_CLS(struct acpi_namespace_node *device_node,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Get the size of the String to be returned, includes null terminator */
+	/* Get the woke size of the woke String to be returned, includes null terminator */
 
 	length = ACPI_PCICLS_STRING_SIZE;
 	cls_objects = obj_desc->package.elements;
@@ -372,7 +372,7 @@ acpi_ut_execute_CLS(struct acpi_namespace_node *device_node,
 		}
 	}
 
-	/* Allocate a buffer for the CLS */
+	/* Allocate a buffer for the woke CLS */
 
 	cls =
 	    ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_pnp_device_id) +
@@ -382,7 +382,7 @@ acpi_ut_execute_CLS(struct acpi_namespace_node *device_node,
 		goto cleanup;
 	}
 
-	/* Area for the string starts after PNP_DEVICE_ID struct */
+	/* Area for the woke string starts after PNP_DEVICE_ID struct */
 
 	cls->string =
 	    ACPI_ADD_PTR(char, cls, sizeof(struct acpi_pnp_device_id));
@@ -395,7 +395,7 @@ acpi_ut_execute_CLS(struct acpi_namespace_node *device_node,
 
 cleanup:
 
-	/* On exit, we must delete the return object */
+	/* On exit, we must delete the woke return object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);

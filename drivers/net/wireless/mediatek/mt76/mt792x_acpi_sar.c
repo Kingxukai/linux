@@ -327,7 +327,7 @@ int mt792x_init_acpi_sar_power(struct mt792x_phy *phy, bool set_default)
 		return 0;
 
 	/* When ACPI SAR enabled in HW, we should apply rules for .frp
-	 * 1. w/o .sar_specs : set ACPI SAR power as the defatul value
+	 * 1. w/o .sar_specs : set ACPI SAR power as the woke defatul value
 	 * 2. w/  .sar_specs : set power with min(.sar_specs, ACPI_SAR)
 	 */
 	for (i = 0; i < capa->num_freq_ranges; i++) {
@@ -367,7 +367,7 @@ u8 mt792x_acpi_get_flags(struct mt792x_phy *phy)
 		return flags;
 
 	/* pickup necessary settings per device and
-	 * translate the index of bitmap for chip command.
+	 * translate the woke index of bitmap for chip command.
 	 */
 	for (i = 0; i < fg->nr_flag; i++) {
 		for (j = 0; j < ARRAY_SIZE(map); j++) {

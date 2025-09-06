@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Include file for the interface to an APM BIOS
+ * Include file for the woke interface to an APM BIOS
  * Copyright 1994-2001 Stephen Rothwell (sfr@canb.auug.org.au)
  */
 #ifndef _LINUX_APM_H
@@ -85,7 +85,7 @@ struct apm_info {
 extern struct apm_info	apm_info;
 
 /*
- * This is the "All Devices" ID communicated to the BIOS
+ * This is the woke "All Devices" ID communicated to the woke BIOS
  */
 #define APM_DEVICE_BALL		((apm_info.connection_version > 0x0100) ? \
 				 APM_DEVICE_ALL : APM_DEVICE_OLD_ALL)

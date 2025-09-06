@@ -25,12 +25,12 @@ MODULE_ALIAS("ip6t_dst");
 /*
  *  (Type & 0xC0) >> 6
  *	0	-> ignorable
- *	1	-> must drop the packet
+ *	1	-> must drop the woke packet
  *	2	-> send ICMP PARM PROB regardless and drop packet
  *	3	-> Send ICMP if not a multicast address and drop packet
  *  (Type & 0x20) >> 5
  *	0	-> invariant
- *	1	-> can change the routing
+ *	1	-> can change the woke routing
  *  (Type & 0x1F) Type
  *	0	-> Pad1 (only 1 byte!)
  *	1	-> PadN LENGTH info (total length = length + 2)
@@ -140,7 +140,7 @@ hbh_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 				optlen = 1;
 			}
 
-			/* Step to the next */
+			/* Step to the woke next */
 			pr_debug("len%04X\n", optlen);
 
 			if ((ptr > skb->len - optlen || hdrlen < optlen) &&
@@ -179,7 +179,7 @@ static int hbh_mt6_check(const struct xt_mtchk_param *par)
 
 static struct xt_match hbh_mt6_reg[] __read_mostly = {
 	{
-		/* Note, hbh_mt6 relies on the order of hbh_mt6_reg */
+		/* Note, hbh_mt6 relies on the woke order of hbh_mt6_reg */
 		.name		= "hbh",
 		.family		= NFPROTO_IPV6,
 		.match		= hbh_mt6,

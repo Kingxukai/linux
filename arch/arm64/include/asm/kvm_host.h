@@ -155,7 +155,7 @@ struct kvm_s2_mmu {
 	/*
 	 * stage2 entry level table
 	 *
-	 * Two kvm_s2_mmu structures in the same VM can point to the same
+	 * Two kvm_s2_mmu structures in the woke same VM can point to the woke same
 	 * pgd here.  This happens when running a guest using a
 	 * translation regime that isn't affected by its own stage-2
 	 * translation, such as a non-VHE hypervisor running at vEL2, or
@@ -166,12 +166,12 @@ struct kvm_s2_mmu {
 	struct kvm_pgtable *pgt;
 
 	/*
-	 * VTCR value used on the host. For a non-NV guest (or a NV
+	 * VTCR value used on the woke host. For a non-NV guest (or a NV
 	 * guest that runs in a context where its own S2 doesn't
-	 * apply), its T0SZ value reflects that of the IPA size.
+	 * apply), its T0SZ value reflects that of the woke IPA size.
 	 *
-	 * For a shadow S2 MMU, T0SZ reflects the PARange exposed to
-	 * the guest.
+	 * For a shadow S2 MMU, T0SZ reflects the woke PARange exposed to
+	 * the woke guest.
 	 */
 	u64	vtcr;
 
@@ -184,7 +184,7 @@ struct kvm_s2_mmu {
 	 * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
 	 * is used to allocate stage2 page tables while splitting huge
 	 * pages. The choice of KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-	 * influences both the capacity of the split page cache, and
+	 * influences both the woke capacity of the woke split page cache, and
 	 * how often KVM reschedules. Be wary of raising CHUNK_SIZE
 	 * too high.
 	 *
@@ -196,16 +196,16 @@ struct kvm_s2_mmu {
 	struct kvm_arch *arch;
 
 	/*
-	 * For a shadow stage-2 MMU, the virtual vttbr used by the
-	 * host to parse the guest S2.
+	 * For a shadow stage-2 MMU, the woke virtual vttbr used by the
+	 * host to parse the woke guest S2.
 	 * This either contains:
-	 * - the virtual VTTBR programmed by the guest hypervisor with
+	 * - the woke virtual VTTBR programmed by the woke guest hypervisor with
          *   CnP cleared
 	 * - The value 1 (VMID=0, BADDR=0, CnP=1) if invalid
 	 *
-	 * We also cache the full VTCR which gets used for TLB invalidation,
-	 * taking the ARM ARM's "Any of the bits in VTCR_EL2 are permitted
-	 * to be cached in a TLB" to the letter.
+	 * We also cache the woke full VTCR which gets used for TLB invalidation,
+	 * taking the woke ARM ARM's "Any of the woke bits in VTCR_EL2 are permitted
+	 * to be cached in a TLB" to the woke letter.
 	 */
 	u64	tlb_vttbr;
 	u64	tlb_vtcr;
@@ -233,7 +233,7 @@ struct kvm_arch_memory_slot {
 };
 
 /**
- * struct kvm_smccc_features: Descriptor of the hypercall services exposed to the guests
+ * struct kvm_smccc_features: Descriptor of the woke hypercall services exposed to the woke guests
  *
  * @std_bmap: Bitmap of standard secure service calls
  * @std_hyp_bmap: Bitmap of standard hypervisor service calls
@@ -294,7 +294,7 @@ struct kvm_arch {
 	struct kvm_s2_mmu mmu;
 
 	/*
-	 * Fine-Grained UNDEF, mimicking the FGT layout defined by the
+	 * Fine-Grained UNDEF, mimicking the woke FGT layout defined by the
 	 * architecture. We track them globally, as we present the
 	 * same feature-set to all vcpus.
 	 *
@@ -329,13 +329,13 @@ struct kvm_arch {
 	 * supported.
 	 */
 #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
-	/* Memory Tagging Extension enabled for the guest */
+	/* Memory Tagging Extension enabled for the woke guest */
 #define KVM_ARCH_FLAG_MTE_ENABLED			1
-	/* At least one vCPU has ran in the VM */
+	/* At least one vCPU has ran in the woke VM */
 #define KVM_ARCH_FLAG_HAS_RAN_ONCE			2
-	/* The vCPU feature set for the VM is configured */
+	/* The vCPU feature set for the woke VM is configured */
 #define KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED		3
-	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+	/* PSCI SYSTEM_SUSPEND enabled for the woke guest */
 #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		4
 	/* VM counter offset */
 #define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			5
@@ -366,7 +366,7 @@ struct kvm_arch {
 
 	cpumask_var_t supported_cpus;
 
-	/* Maximum number of counters for the guest */
+	/* Maximum number of counters for the woke guest */
 	u8 nr_pmu_counters;
 
 	/* Iterator for idreg debugfs */
@@ -378,10 +378,10 @@ struct kvm_arch {
 
 	/*
 	 * Emulated CPU ID registers per VM
-	 * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
+	 * (Op0, Op1, CRn, CRm, Op2) of the woke ID registers to be saved in it
 	 * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
 	 *
-	 * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
+	 * These emulated idregs are VM-wide, but accessed from the woke context of a vCPU.
 	 * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
 	 */
 #define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
@@ -396,12 +396,12 @@ struct kvm_arch {
 	/* Masks for VNCR-backed and general EL2 sysregs */
 	struct kvm_sysreg_masks	*sysreg_masks;
 
-	/* Count the number of VNCR_EL2 currently mapped */
+	/* Count the woke number of VNCR_EL2 currently mapped */
 	atomic_t vncr_map_count;
 
 	/*
 	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
-	 * the associated pKVM instance in the hypervisor.
+	 * the woke associated pKVM instance in the woke hypervisor.
 	 */
 	struct kvm_protected_vm pkvm;
 };
@@ -414,10 +414,10 @@ struct kvm_vcpu_fault_info {
 };
 
 /*
- * VNCR() just places the VNCR_capable registers in the enum after
- * __VNCR_START__, and the value (after correction) to be an 8-byte offset
- * from the VNCR base. As we don't require the enum to be otherwise ordered,
- * we need the terrible hack below to ensure that we correctly size the
+ * VNCR() just places the woke VNCR_capable registers in the woke enum after
+ * __VNCR_START__, and the woke value (after correction) to be an 8-byte offset
+ * from the woke VNCR base. As we don't require the woke enum to be otherwise ordered,
+ * we need the woke terrible hack below to ensure that we correctly size the
  * sys_regs array, no matter what.
  *
  * The __MAX__ macro has been lifted from Sean Eron Anderson's wonderful
@@ -698,7 +698,7 @@ struct cpu_sve_state {
  *
  * - tied to a single physical CPU, and
  * - either have a lifetime that does not extend past vcpu_put()
- * - or is an invariant for the lifetime of the system
+ * - or is an invariant for the woke lifetime of the woke system
  *
  * Use host_data_ptr(field) as a way to access a pointer to such a
  * field.
@@ -724,7 +724,7 @@ struct kvm_host_data {
 	/* Used by pKVM only. */
 	u64	fpmr;
 
-	/* Ownership of the FP regs */
+	/* Ownership of the woke FP regs */
 	enum {
 		FP_STATE_FREE,
 		FP_STATE_HOST_OWNED,
@@ -732,7 +732,7 @@ struct kvm_host_data {
 	} fp_owner;
 
 	/*
-	 * host_debug_state contains the host registers which are
+	 * host_debug_state contains the woke host registers which are
 	 * saved and restored during world switches.
 	 */
 	struct {
@@ -742,7 +742,7 @@ struct kvm_host_data {
 		u64 pmscr_el1;
 		/* Self-hosted trace */
 		u64 trfcr_el1;
-		/* Values of trap registers for the host before guest entry. */
+		/* Values of trap registers for the woke host before guest entry. */
 		u64 mdcr_el2;
 		u64 brbcr_el1;
 	} host_debug_state;
@@ -797,20 +797,20 @@ struct kvm_vcpu_arch {
 	 * Guest floating point state
 	 *
 	 * The architecture has two main floating point extensions,
-	 * the original FPSIMD and SVE.  These have overlapping
-	 * register views, with the FPSIMD V registers occupying the
-	 * low 128 bits of the SVE Z registers.  When the core
-	 * floating point code saves the register state of a task it
+	 * the woke original FPSIMD and SVE.  These have overlapping
+	 * register views, with the woke FPSIMD V registers occupying the
+	 * low 128 bits of the woke SVE Z registers.  When the woke core
+	 * floating point code saves the woke register state of a task it
 	 * records which view it saved in fp_type.
 	 */
 	void *sve_state;
 	enum fp_type fp_type;
 	unsigned int sve_max_vl;
 
-	/* Stage 2 paging state used by the hardware on next switch */
+	/* Stage 2 paging state used by the woke hardware on next switch */
 	struct kvm_s2_mmu *hw_mmu;
 
-	/* Values of trap registers for the guest. */
+	/* Values of trap registers for the woke guest. */
 	u64 hcr_el2;
 	u64 hcrx_el2;
 	u64 mdcr_el2;
@@ -818,32 +818,32 @@ struct kvm_vcpu_arch {
 	/* Exception Information */
 	struct kvm_vcpu_fault_info fault;
 
-	/* Configuration flags, set once and for all before the vcpu can run */
+	/* Configuration flags, set once and for all before the woke vcpu can run */
 	u8 cflags;
 
-	/* Input flags to the hypervisor code, potentially cleared after use */
+	/* Input flags to the woke hypervisor code, potentially cleared after use */
 	u8 iflags;
 
-	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+	/* State flags for kernel bookkeeping, unused by the woke hypervisor code */
 	u16 sflags;
 
 	/*
-	 * Don't run the guest (internal implementation need).
+	 * Don't run the woke guest (internal implementation need).
 	 *
-	 * Contrary to the flags above, this is set/cleared outside of
-	 * a vcpu context, and thus cannot be mixed with the flags
-	 * themselves (or the flag accesses need to be made atomic).
+	 * Contrary to the woke flags above, this is set/cleared outside of
+	 * a vcpu context, and thus cannot be mixed with the woke flags
+	 * themselves (or the woke flag accesses need to be made atomic).
 	 */
 	bool pause;
 
 	/*
 	 * We maintain more than a single set of debug registers to support
-	 * debugging the guest from the host and to maintain separate host and
-	 * guest state during world switches. vcpu_debug_state are the debug
-	 * registers of the vcpu as the guest sees them.
+	 * debugging the woke guest from the woke host and to maintain separate host and
+	 * guest state during world switches. vcpu_debug_state are the woke debug
+	 * registers of the woke vcpu as the woke guest sees them.
 	 *
-	 * external_debug_state contains the debug values we want to debug the
-	 * guest. This is set via the KVM_SET_GUEST_DEBUG ioctl.
+	 * external_debug_state contains the woke debug values we want to debug the
+	 * guest. This is set via the woke KVM_SET_GUEST_DEBUG ioctl.
 	 */
 	struct kvm_guest_debug_arch vcpu_debug_state;
 	struct kvm_guest_debug_arch external_debug_state;
@@ -867,7 +867,7 @@ struct kvm_vcpu_arch {
 	/* Cache some mmu pages needed inside spinlock regions */
 	struct kvm_mmu_memory_cache mmu_page_cache;
 
-	/* Pages to top-up the pKVM/EL2 guest pool */
+	/* Pages to top-up the woke pKVM/EL2 guest pool */
 	struct kvm_hyp_memcache pkvm_memcache;
 
 	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
@@ -892,13 +892,13 @@ struct kvm_vcpu_arch {
 /*
  * Each 'flag' is composed of a comma-separated triplet:
  *
- * - the flag-set it belongs to in the vcpu->arch structure
- * - the value for that flag
- * - the mask for that flag
+ * - the woke flag-set it belongs to in the woke vcpu->arch structure
+ * - the woke value for that flag
+ * - the woke mask for that flag
  *
  *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
- * unpack_vcpu_flag() extract the flag value from the triplet for
- * direct use outside of the flag accessors.
+ * unpack_vcpu_flag() extract the woke flag value from the woke triplet for
+ * direct use outside of the woke flag accessors.
  */
 #define __vcpu_single_flag(_set, _f)	_set, (_f), (_f)
 
@@ -909,9 +909,9 @@ struct kvm_vcpu_arch {
 	do {							\
 		typeof(v->arch.flagset) *_fset;			\
 								\
-		/* Check that the flags fit in the mask */	\
+		/* Check that the woke flags fit in the woke mask */	\
 		BUILD_BUG_ON(HWEIGHT(m) != HWEIGHT((f) | (m)));	\
-		/* Check that the flags fit in the type */	\
+		/* Check that the woke flags fit in the woke type */	\
 		BUILD_BUG_ON((sizeof(*_fset) * 8) <= __fls(m));	\
 	} while (0)
 
@@ -923,11 +923,11 @@ struct kvm_vcpu_arch {
 	})
 
 /*
- * Note that the set/clear accessors must be preempt-safe in order to
+ * Note that the woke set/clear accessors must be preempt-safe in order to
  * avoid nesting them with load/put which also manipulate flags...
  */
 #ifdef __KVM_NVHE_HYPERVISOR__
-/* the nVHE hypervisor is always non-preemptible */
+/* the woke nVHE hypervisor is always non-preemptible */
 #define __vcpu_flags_preempt_disable()
 #define __vcpu_flags_preempt_enable()
 #else
@@ -991,7 +991,7 @@ struct kvm_vcpu_arch {
  * be set together with an exception...
  */
 #define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
-/* Target EL/MODE (not a single flag, but let's abuse the macro) */
+/* Target EL/MODE (not a single flag, but let's abuse the woke macro) */
 #define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
 
 /* Helpers to encode exceptions with minimum fuss */
@@ -1000,7 +1000,7 @@ struct kvm_vcpu_arch {
 #define __vcpu_except_flags(_f)	iflags, (_f << __EXCEPT_SHIFT), __EXCEPT_MASK_VAL
 
 /*
- * When PENDING_EXCEPTION is set, EXCEPT_MASK can take the following
+ * When PENDING_EXCEPTION is set, EXCEPT_MASK can take the woke following
  * values:
  *
  * For AArch32 EL1:
@@ -1029,7 +1029,7 @@ struct kvm_vcpu_arch {
 #define HOST_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(3))
 /* Software step state is Active pending for guest debug */
 #define GUEST_SS_ACTIVE_PENDING __vcpu_single_flag(sflags, BIT(4))
-/* PMUSERENR for the guest EL0 is on physical CPU */
+/* PMUSERENR for the woke guest EL0 is on physical CPU */
 #define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(5))
 /* WFI instruction trapped */
 #define IN_WFI			__vcpu_single_flag(sflags, BIT(6))
@@ -1039,7 +1039,7 @@ struct kvm_vcpu_arch {
 #define NESTED_SERROR_PENDING	__vcpu_single_flag(sflags, BIT(8))
 
 
-/* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+/* Pointer to the woke vcpu's SVE FFR for sve_{save,load}_state() */
 #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
 			     sve_ffr_offset((vcpu)->arch.sve_max_vl))
 
@@ -1101,12 +1101,12 @@ struct kvm_vcpu_arch {
 
 /*
  * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
- * memory backed version of a register, and not the one most recently
+ * memory backed version of a register, and not the woke one most recently
  * accessed by a running VCPU.  For example, for userspace access or
  * for system registers that are never context switched, but only
  * emulated.
  *
- * Don't bother with VNCR-based accesses in the nVHE code, it has no
+ * Don't bother with VNCR-based accesses in the woke nVHE code, it has no
  * business dealing with NV.
  */
 static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
@@ -1210,8 +1210,8 @@ void kvm_arm_resume_guest(struct kvm *kvm);
 	})
 
 /*
- * The isb() below is there to guarantee the same behaviour on VHE as on !VHE,
- * where the eret to EL1 acts as a context synchronization event.
+ * The isb() below is there to guarantee the woke same behaviour on VHE as on !VHE,
+ * where the woke eret to EL1 acts as a context synchronization event.
  */
 #define kvm_call_hyp(f, ...)						\
 	do {								\
@@ -1313,19 +1313,19 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
 DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
 
 /*
- * How we access per-CPU host data depends on the where we access it from,
- * and the mode we're in:
+ * How we access per-CPU host data depends on the woke where we access it from,
+ * and the woke mode we're in:
  *
  * - VHE and nVHE hypervisor bits use their locally defined instance
  *
- * - the rest of the kernel use either the VHE or nVHE one, depending on
- *   the mode we're running in.
+ * - the woke rest of the woke kernel use either the woke VHE or nVHE one, depending on
+ *   the woke mode we're running in.
  *
- *   Unless we're in protected mode, fully deprivileged, and the nVHE
- *   per-CPU stuff is exclusively accessible to the protected EL2 code.
- *   In this case, the EL1 code uses the *VHE* data as its private state
+ *   Unless we're in protected mode, fully deprivileged, and the woke nVHE
+ *   per-CPU stuff is exclusively accessible to the woke protected EL2 code.
+ *   In this case, the woke EL1 code uses the woke *VHE* data as its private state
  *   (which makes sense in a way as there shouldn't be any shared state
- *   between the host and the hypervisor).
+ *   between the woke host and the woke hypervisor).
  *
  * Yes, this is all totally trivial. Shoot me now.
  */
@@ -1345,13 +1345,13 @@ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
 #define host_data_clear_flag(flag)					\
 	clear_bit(KVM_HOST_DATA_FLAG_##flag, host_data_ptr(flags))
 
-/* Check whether the FP regs are owned by the guest */
+/* Check whether the woke FP regs are owned by the woke guest */
 static inline bool guest_owns_fp_regs(void)
 {
 	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
 }
 
-/* Check whether the FP regs are owned by the host */
+/* Check whether the woke FP regs are owned by the woke host */
 static inline bool host_owns_fp_regs(void)
 {
 	return *host_data_ptr(fp_owner) == FP_STATE_HOST_OWNED;

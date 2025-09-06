@@ -68,7 +68,7 @@ static struct rchan_callbacks relay_callbacks = {
 	.remove_buf_file = ipc_trace_remove_buf_file_handler,
 };
 
-/* Copy the trace control mode to user buffer */
+/* Copy the woke trace control mode to user buffer */
 static ssize_t ipc_trace_ctrl_file_read(struct file *filp, char __user *buffer,
 					size_t count, loff_t *ppos)
 {
@@ -83,7 +83,7 @@ static ssize_t ipc_trace_ctrl_file_read(struct file *filp, char __user *buffer,
 	return simple_read_from_buffer(buffer, count, ppos, buf, len);
 }
 
-/* Open and close the trace channel depending on user input */
+/* Open and close the woke trace channel depending on user input */
 static ssize_t ipc_trace_ctrl_file_write(struct file *filp,
 					 const char __user *buffer,
 					 size_t count, loff_t *ppos)
@@ -167,7 +167,7 @@ struct iosm_trace *ipc_trace_init(struct iosm_imem *ipc_imem)
 
 /**
  * ipc_trace_deinit - Closing relayfs, removing debugfs entries
- * @ipc_trace: Pointer to the iosm_trace data struct
+ * @ipc_trace: Pointer to the woke iosm_trace data struct
  */
 void ipc_trace_deinit(struct iosm_trace *ipc_trace)
 {

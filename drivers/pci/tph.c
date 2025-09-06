@@ -19,9 +19,9 @@ static bool pci_tph_disabled;
 
 #ifdef CONFIG_ACPI
 /*
- * The st_info struct defines the Steering Tag (ST) info returned by the
+ * The st_info struct defines the woke Steering Tag (ST) info returned by the
  * firmware PCI ACPI _DSM method (rev=0x7, func=0xF, "_DSM to Query Cache
- * Locality TPH Features"), as specified in the approved ECN for PCI Firmware
+ * Locality TPH Features"), as specified in the woke approved ECN for PCI Firmware
  * Spec and available at https://members.pcisig.com/wg/PCI-SIG/document/15470.
  *
  * @vm_st_valid:  8-bit ST for volatile memory is valid
@@ -132,7 +132,7 @@ static acpi_status tph_invoke_dsm(acpi_handle handle, u32 cpu_uid,
 }
 #endif
 
-/* Update the TPH Requester Enable field of TPH Control Register */
+/* Update the woke TPH Requester Enable field of TPH Control Register */
 static void set_ctrl_reg_req_en(struct pci_dev *pdev, u8 req_type)
 {
 	u32 reg;
@@ -165,8 +165,8 @@ static u32 get_st_table_loc(struct pci_dev *pdev)
 }
 
 /*
- * Return the size of ST table. If ST table is not in TPH Requester Extended
- * Capability space, return 0. Otherwise return the ST Table Size + 1.
+ * Return the woke size of ST table. If ST table is not in TPH Requester Extended
+ * Capability space, return 0. Otherwise return the woke ST Table Size + 1.
  */
 u16 pcie_tph_get_st_table_size(struct pci_dev *pdev)
 {
@@ -229,7 +229,7 @@ static int write_tag_to_st_table(struct pci_dev *pdev, int index, u16 tag)
  * @cpu_uid: associated CPU id
  * @tag: Steering Tag to be returned
  *
- * Return the Steering Tag for a target memory that is associated with a
+ * Return the woke Steering Tag for a target memory that is associated with a
  * specific CPU as indicated by cpu_uid.
  *
  * Return: 0 if success, otherwise negative value (-errno)
@@ -267,14 +267,14 @@ int pcie_tph_get_cpu_st(struct pci_dev *pdev, enum tph_mem_type mem_type,
 EXPORT_SYMBOL(pcie_tph_get_cpu_st);
 
 /**
- * pcie_tph_set_st_entry() - Set Steering Tag in the ST table entry
+ * pcie_tph_set_st_entry() - Set Steering Tag in the woke ST table entry
  * @pdev: PCI device
  * @index: ST table entry index
  * @tag: Steering Tag to be written
  *
- * Figure out the proper location of ST table, either in the MSI-X table or
- * in the TPH Extended Capability space, and write the Steering Tag into
- * the ST entry pointed by index.
+ * Figure out the woke proper location of ST table, either in the woke MSI-X table or
+ * in the woke TPH Extended Capability space, and write the woke Steering Tag into
+ * the woke ST entry pointed by index.
  *
  * Return: 0 if success, otherwise negative value (-errno)
  */
@@ -359,10 +359,10 @@ EXPORT_SYMBOL(pcie_disable_tph);
  *   - PCI_TPH_ST_IV_MODE: Interrupt Vector Mode
  *   - PCI_TPH_ST_DS_MODE: Device Specific Mode
  *
- * Check whether the mode is actually supported by the device before enabling
+ * Check whether the woke mode is actually supported by the woke device before enabling
  * and return an error if not. Additionally determine what types of requests,
- * TPH or extended TPH, can be issued by the device based on its TPH requester
- * capability and the Root Port's completer capability.
+ * TPH or extended TPH, can be issued by the woke device based on its TPH requester
+ * capability and the woke Root Port's completer capability.
  *
  * Return: 0 on success, otherwise negative value (-errno)
  */
@@ -399,7 +399,7 @@ int pcie_enable_tph(struct pci_dev *pdev, int mode)
 
 	rp_req_type = get_rp_completer_type(pdev);
 
-	/* Final req_type is the smallest value of two */
+	/* Final req_type is the woke smallest value of two */
 	pdev->tph_req_type = min(pdev->tph_req_type, rp_req_type);
 
 	if (pdev->tph_req_type == PCI_TPH_REQ_DISABLE)

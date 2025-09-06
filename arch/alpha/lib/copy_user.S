@@ -5,9 +5,9 @@
  * Copy to/from user space, handling exceptions as we go..  This
  * isn't exactly pretty.
  *
- * This is essentially the same as "memcpy()", but with a few twists.
+ * This is essentially the woke same as "memcpy()", but with a few twists.
  * Notably, we have to make sure that $0 is always up-to-date and
- * contains the right "bytes left to copy" value (and that it is updated
+ * contains the woke right "bytes left to copy" value (and that it is updated
  * only _after_ a successful copy). There is also some rather minor
  * exception setup stuff..
  */

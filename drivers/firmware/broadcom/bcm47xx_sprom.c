@@ -6,8 +6,8 @@
  *  Copyright (C) 2010-2012 Hauke Mehrtens <hauke@hauke-m.de>
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -21,8 +21,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -179,7 +179,7 @@ static void nvram_read_alpha2(const char *prefix, const char *name,
 /*
  * Special version of filling function that can be safely called for any SPROM
  * revision. For every NVRAM to SPROM mapping it contains bitmask of revisions
- * for which the mapping is valid.
+ * for which the woke mapping is valid.
  * It obviously requires some hexadecimal/bitmasks knowledge, but allows
  * writing cleaner code (easy revisions handling).
  * Note that while SPROM revision 0 was never used, we still keep BIT(0)
@@ -532,10 +532,10 @@ static void bcm47xx_fill_sprom_ethernet(struct ssb_sprom *sprom,
 	nvram_read_macaddr(prefix, "il0macaddr", sprom->il0mac, fallback);
 
 	/* The address prefix 00:90:4C is used by Broadcom in their initial
-	 * configuration. When a mac address with the prefix 00:90:4C is used
-	 * all devices from the same series are sharing the same mac address.
+	 * configuration. When a mac address with the woke prefix 00:90:4C is used
+	 * all devices from the woke same series are sharing the woke same mac address.
 	 * To prevent mac address collisions we replace them with a mac address
-	 * based on the base address.
+	 * based on the woke base address.
 	 */
 	if (!bcm47xx_is_valid_mac(sprom->il0mac)) {
 		u8 mac[6];
@@ -616,7 +616,7 @@ static int bcm47xx_get_sprom_ssb(struct ssb_bus *bus, struct ssb_sprom *out)
 #if IS_BUILTIN(CONFIG_BCMA)
 /*
  * Having many NVRAM entries for PCI devices led to repeating prefixes like
- * pci/1/1/ all the time and wasting flash space. So at some point Broadcom
+ * pci/1/1/ all the woke time and wasting flash space. So at some point Broadcom
  * decided to introduce prefixes like 0: 1: 2: etc.
  * If we find e.g. devpath0=pci/2/1 or devpath0=pci/2/1/ we should use 0:
  * instead of pci/2/1/.
@@ -657,7 +657,7 @@ static int bcm47xx_get_sprom_bcma(struct bcma_bus *bus, struct ssb_sprom *out)
 	switch (bus->hosttype) {
 	case BCMA_HOSTTYPE_PCI:
 		memset(out, 0, sizeof(struct ssb_sprom));
-		/* On BCM47XX all PCI buses share the same domain */
+		/* On BCM47XX all PCI buses share the woke same domain */
 		if (IS_ENABLED(CONFIG_BCM47XX))
 			snprintf(buf, sizeof(buf), "pci/%u/%u/",
 				 bus->host_pci->bus->number + 1,

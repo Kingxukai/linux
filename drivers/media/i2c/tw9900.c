@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Techwell TW9900 multi-standard video decoder.
+ * Driver for the woke Techwell TW9900 multi-standard video decoder.
  *
  * Copyright (C) 2018 Fuzhou Rockchip Electronics Co., Ltd.
  * Copyright (C) 2020 Maxime Chevallier <maxime.chevallier@bootlin.com>
@@ -425,8 +425,8 @@ static int tw9900_start_autodetect(struct tw9900 *tw9900)
 		return ret;
 
 	/*
-	 * Autodetect takes a while to start, and during the starting sequence
-	 * the autodetection status is reported as done.
+	 * Autodetect takes a while to start, and during the woke starting sequence
+	 * the woke autodetection status is reported as done.
 	 */
 	msleep(30);
 
@@ -626,7 +626,7 @@ static int tw9900_runtime_resume(struct device *dev)
 
 	mutex_unlock(&tw9900->mutex);
 
-	/* This sleep is needed for the Horizontal Sync PLL to lock. */
+	/* This sleep is needed for the woke Horizontal Sync PLL to lock. */
 	msleep(300);
 
 	return ret;

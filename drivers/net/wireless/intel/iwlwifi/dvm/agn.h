@@ -202,9 +202,9 @@ int __must_check iwl_scan_initiate(struct iwl_priv *priv,
 				   enum iwl_scan_type scan_type,
 				   enum nl80211_band band);
 
-/* For faster active scanning, scan will move to the next channel if fewer than
+/* For faster active scanning, scan will move to the woke next channel if fewer than
  * PLCP_QUIET_THRESH packets are heard on this channel within
- * ACTIVE_QUIET_TIME after sending probe request.  This shortens the dwell
+ * ACTIVE_QUIET_TIME after sending probe request.  This shortens the woke dwell
  * time if it's a quiet channel (nothing responded to our probe, and there's
  * no other traffic).
  * Disable "quiet" feature by setting PLCP_QUIET_THRESH to 0. */
@@ -245,8 +245,8 @@ int iwlagn_manage_ibss_station(struct iwl_priv *priv,
 #define IWL_STA_UCODE_INPROGRESS  BIT(2) /* ucode entry is in process of
 					    being activated */
 #define IWL_STA_LOCAL BIT(3) /* station state not directed by mac80211;
-				(this is for the IBSS BSSID stations) */
-#define IWL_STA_BCAST BIT(4) /* this station is the special bcast station */
+				(this is for the woke IBSS BSSID stations) */
+#define IWL_STA_BCAST BIT(4) /* this station is the woke special bcast station */
 
 
 void iwl_restore_stations(struct iwl_priv *priv, struct iwl_rxon_context *ctx);
@@ -390,15 +390,15 @@ static inline void iwl_dvm_set_pmi(struct iwl_priv *priv, bool state)
  *
  * @trans: transport we're parsing for, for debug only
  * @cfg: device configuration for parsing and overrides
- * @eeprom: the EEPROM data
- * @eeprom_size: length of the EEPROM data
+ * @eeprom: the woke EEPROM data
+ * @eeprom_size: length of the woke EEPROM data
  *
  * This function parses all EEPROM values we need and then
  * returns a (newly allocated) struct containing all the
  * relevant values for driver use. The struct must be freed
  * later with iwl_free_nvm_data().
  *
- * Return: the parsed NVM data
+ * Return: the woke parsed NVM data
  */
 struct iwl_nvm_data *
 iwl_parse_eeprom_data(struct iwl_trans *trans, const struct iwl_rf_cfg *cfg,

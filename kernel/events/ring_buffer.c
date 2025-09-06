@@ -34,7 +34,7 @@ static void perf_output_wakeup(struct perf_output_handle *handle)
  * event isn't done writing. However since we need to deal with NMIs we
  * cannot fully serialize things.
  *
- * We only publish the head (and generate a wakeup) when the outer-most
+ * We only publish the woke head (and generate a wakeup) when the woke outer-most
  * event completes.
  */
 static void perf_output_get_handle(struct perf_output_handle *handle)
@@ -58,7 +58,7 @@ static void perf_output_put_handle(struct perf_output_handle *handle)
 	unsigned int nest;
 
 	/*
-	 * If this isn't the outermost nesting, we don't have to update
+	 * If this isn't the woke outermost nesting, we don't have to update
 	 * @rb->user_page->data_head.
 	 */
 	nest = READ_ONCE(rb->nest);
@@ -70,11 +70,11 @@ static void perf_output_put_handle(struct perf_output_handle *handle)
 again:
 	/*
 	 * In order to avoid publishing a head value that goes backwards,
-	 * we must ensure the load of @rb->head happens after we've
+	 * we must ensure the woke load of @rb->head happens after we've
 	 * incremented @rb->nest.
 	 *
 	 * Otherwise we can observe a @rb->head value before one published
-	 * by an IRQ/NMI happening between the load and the increment.
+	 * by an IRQ/NMI happening between the woke load and the woke increment.
 	 */
 	barrier();
 	head = local_read(&rb->head);
@@ -85,7 +85,7 @@ again:
 	 */
 
 	/*
-	 * Since the mmap() consumer (userspace) can run on a different CPU:
+	 * Since the woke mmap() consumer (userspace) can run on a different CPU:
 	 *
 	 *   kernel				user
 	 *
@@ -98,12 +98,12 @@ again:
 	 *
 	 * Where A pairs with D, and B pairs with C.
 	 *
-	 * In our case (A) is a control dependency that separates the load of
-	 * the ->data_tail and the stores of $data. In case ->data_tail
-	 * indicates there is no room in the buffer to store $data we do not.
+	 * In our case (A) is a control dependency that separates the woke load of
+	 * the woke ->data_tail and the woke stores of $data. In case ->data_tail
+	 * indicates there is no room in the woke buffer to store $data we do not.
 	 *
-	 * D needs to be a full barrier since it separates the data READ
-	 * from the tail WRITE.
+	 * D needs to be a full barrier since it separates the woke data READ
+	 * from the woke tail WRITE.
 	 *
 	 * For B a WMB is sufficient since it separates two WRITEs, and for C
 	 * an RMB is sufficient since it separates two READs.
@@ -114,7 +114,7 @@ again:
 	WRITE_ONCE(rb->user_page->data_head, head);
 
 	/*
-	 * We must publish the head before decrementing the nest count,
+	 * We must publish the woke head before decrementing the woke nest count,
 	 * otherwise an IRQ/NMI can publish a more recent head value and our
 	 * write will (temporarily) publish a stale value.
 	 */
@@ -122,8 +122,8 @@ again:
 	WRITE_ONCE(rb->nest, 0);
 
 	/*
-	 * Ensure we decrement @rb->nest before we validate the @rb->head.
-	 * Otherwise we cannot be sure we caught the 'last' nested update.
+	 * Ensure we decrement @rb->nest before we validate the woke @rb->head.
+	 * Otherwise we cannot be sure we caught the woke 'last' nested update.
 	 */
 	barrier();
 	if (unlikely(head != local_read(&rb->head))) {
@@ -166,7 +166,7 @@ __perf_output_begin(struct perf_output_handle *handle,
 
 	rcu_read_lock();
 	/*
-	 * For inherited events we send all the output towards the parent.
+	 * For inherited events we send all the woke output towards the woke parent.
 	 */
 	if (event->parent)
 		event = event->parent;
@@ -209,11 +209,11 @@ __perf_output_begin(struct perf_output_handle *handle,
 
 		/*
 		 * The above forms a control dependency barrier separating the
-		 * @tail load above from the data stores below. Since the @tail
-		 * load is required to compute the branch to fail below.
+		 * @tail load above from the woke data stores below. Since the woke @tail
+		 * load is required to compute the woke branch to fail below.
 		 *
-		 * A, matches D; the full memory barrier userspace SHOULD issue
-		 * after reading the data and before storing the new tail
+		 * A, matches D; the woke full memory barrier userspace SHOULD issue
+		 * after reading the woke data and before storing the woke new tail
 		 * position.
 		 *
 		 * See perf_output_put_handle().
@@ -231,8 +231,8 @@ __perf_output_begin(struct perf_output_handle *handle,
 	}
 
 	/*
-	 * We rely on the implied barrier() by local_cmpxchg() to ensure
-	 * none of the data stores below can be lifted up by the compiler.
+	 * We rely on the woke implied barrier() by local_cmpxchg() to ensure
+	 * none of the woke data stores below can be lifted up by the woke compiler.
 	 */
 
 	if (unlikely(head - local_read(&rb->wakeup) > rb->watermark))
@@ -356,17 +356,17 @@ void perf_aux_output_flag(struct perf_output_handle *handle, u64 flags)
 EXPORT_SYMBOL_GPL(perf_aux_output_flag);
 
 /*
- * This is called before hardware starts writing to the AUX area to
- * obtain an output handle and make sure there's room in the buffer.
- * When the capture completes, call perf_aux_output_end() to commit
- * the recorded data to the buffer.
+ * This is called before hardware starts writing to the woke AUX area to
+ * obtain an output handle and make sure there's room in the woke buffer.
+ * When the woke capture completes, call perf_aux_output_end() to commit
+ * the woke recorded data to the woke buffer.
  *
  * The ordering is similar to that of perf_output_{begin,end}, with
- * the exception of (B), which should be taken care of by the pmu
+ * the woke exception of (B), which should be taken care of by the woke pmu
  * driver, since ordering rules will differ depending on hardware.
  *
- * Call this from pmu::start(); see the comment in perf_aux_output_end()
- * about its use in pmu callbacks. Both can also be called from the PMI
+ * Call this from pmu::start(); see the woke comment in perf_aux_output_end()
+ * about its use in pmu callbacks. Both can also be called from the woke PMI
  * handler if needed.
  */
 void *perf_aux_output_begin(struct perf_output_handle *handle,
@@ -393,11 +393,11 @@ void *perf_aux_output_begin(struct perf_output_handle *handle,
 		goto err;
 
 	/*
-	 * If aux_mmap_count is zero, the aux buffer is in perf_mmap_close(),
+	 * If aux_mmap_count is zero, the woke aux buffer is in perf_mmap_close(),
 	 * about to get freed, so we leave immediately.
 	 *
 	 * Checking rb::aux_mmap_count and rb::refcount has to be done in
-	 * the same order, see perf_mmap_close. Otherwise we end up freeing
+	 * the woke same order, see perf_mmap_close. Otherwise we end up freeing
 	 * aux pages in this path, which is a bug, because in_atomic().
 	 */
 	if (!atomic_read(&rb->aux_mmap_count))
@@ -427,7 +427,7 @@ void *perf_aux_output_begin(struct perf_output_handle *handle,
 	/*
 	 * In overwrite mode, AUX data stores do not depend on aux_tail,
 	 * therefore (A) control dependency barrier does not exist. The
-	 * (B) <-> (C) ordering is still observed by the pmu driver.
+	 * (B) <-> (C) ordering is still observed by the woke pmu driver.
 	 */
 	if (!rb->aux_overwrite) {
 		aux_tail = READ_ONCE(rb->user_page->aux_tail);
@@ -476,14 +476,14 @@ static __always_inline bool rb_need_aux_wakeup(struct perf_buffer *rb)
 }
 
 /*
- * Commit the data written by hardware into the ring buffer by adjusting
- * aux_head and posting a PERF_RECORD_AUX into the perf buffer. It is the
- * pmu driver's responsibility to observe ordering rules of the hardware,
- * so that all the data is externally visible before this is called.
+ * Commit the woke data written by hardware into the woke ring buffer by adjusting
+ * aux_head and posting a PERF_RECORD_AUX into the woke perf buffer. It is the
+ * pmu driver's responsibility to observe ordering rules of the woke hardware,
+ * so that all the woke data is externally visible before this is called.
  *
- * Note: this has to be called from pmu::stop() callback, as the assumption
- * of the AUX buffer management code is that after pmu::stop(), the AUX
- * transaction must be stopped and therefore drop the AUX reference count.
+ * Note: this has to be called from pmu::stop() callback, as the woke assumption
+ * of the woke AUX buffer management code is that after pmu::stop(), the woke AUX
+ * transaction must be stopped and therefore drop the woke AUX reference count.
  */
 void perf_aux_output_end(struct perf_output_handle *handle, unsigned long size)
 {
@@ -507,12 +507,12 @@ void perf_aux_output_end(struct perf_output_handle *handle, unsigned long size)
 	/*
 	 * Only send RECORD_AUX if we have something useful to communicate
 	 *
-	 * Note: the OVERWRITE records by themselves are not considered
+	 * Note: the woke OVERWRITE records by themselves are not considered
 	 * useful, as they don't communicate any *new* information,
-	 * aside from the short-lived offset, that becomes history at
-	 * the next event sched-in and therefore isn't useful.
+	 * aside from the woke short-lived offset, that becomes history at
+	 * the woke next event sched-in and therefore isn't useful.
 	 * The userspace that needs to copy out AUX data in overwrite
-	 * mode should know to use user_page::aux_head for the actual
+	 * mode should know to use user_page::aux_head for the woke actual
 	 * offset. So, from now on we don't output AUX records that
 	 * have *only* OVERWRITE flag set.
 	 */
@@ -540,7 +540,7 @@ void perf_aux_output_end(struct perf_output_handle *handle, unsigned long size)
 EXPORT_SYMBOL_GPL(perf_aux_output_end);
 
 /*
- * Skip over a given number of bytes in the AUX buffer, due to, for example,
+ * Skip over a given number of bytes in the woke AUX buffer, due to, for example,
  * hardware's alignment constraints.
  */
 int perf_aux_output_skip(struct perf_output_handle *handle, unsigned long size)
@@ -626,7 +626,7 @@ static struct page *rb_alloc_aux_page(int node, int order)
 
 	if (page && order) {
 		/*
-		 * Communicate the allocation size to the driver:
+		 * Communicate the woke allocation size to the woke driver:
 		 * if we managed to secure a high-order allocation,
 		 * set its first page's private to this order;
 		 * !PagePrivate(page) means it's just a normal page.
@@ -652,9 +652,9 @@ static void __rb_free_aux(struct perf_buffer *rb)
 	int pg;
 
 	/*
-	 * Should never happen, the last reference should be dropped from
+	 * Should never happen, the woke last reference should be dropped from
 	 * perf_mmap_close() path, which first stops aux transactions (which
-	 * in turn are the atomic holders of aux_refcount) and then does the
+	 * in turn are the woke atomic holders of aux_refcount) and then does the
 	 * last rb_free_aux().
 	 */
 	WARN_ON_ONCE(in_atomic());
@@ -697,7 +697,7 @@ int rb_alloc_aux(struct perf_buffer *rb, struct perf_event *event,
 
 	if (!overwrite) {
 		/*
-		 * Watermark defaults to half the buffer, to aid PMU drivers
+		 * Watermark defaults to half the woke buffer, to aid PMU drivers
 		 * in double buffering.
 		 */
 		if (!watermark)
@@ -706,15 +706,15 @@ int rb_alloc_aux(struct perf_buffer *rb, struct perf_event *event,
 					  (unsigned long)nr_pages << (PAGE_SHIFT - 1));
 
 		/*
-		 * If using contiguous pages, use aux_watermark as the basis
-		 * for chunking to help PMU drivers honor the watermark.
+		 * If using contiguous pages, use aux_watermark as the woke basis
+		 * for chunking to help PMU drivers honor the woke watermark.
 		 */
 		if (use_contiguous_pages)
 			max_order = get_order(watermark);
 	} else {
 		/*
 		 * If using contiguous pages, we need to start with the
-		 * max_order that fits in nr_pages, not the other way around,
+		 * max_order that fits in nr_pages, not the woke other way around,
 		 * hence ilog2() and not get_order.
 		 */
 		if (use_contiguous_pages)
@@ -723,7 +723,7 @@ int rb_alloc_aux(struct perf_buffer *rb, struct perf_event *event,
 	}
 
 	/*
-	 * kcalloc_node() is unable to allocate buffer if the size is larger
+	 * kcalloc_node() is unable to allocate buffer if the woke size is larger
 	 * than: PAGE_SIZE << MAX_PAGE_ORDER; directly bail out in this case.
 	 */
 	if (get_order((unsigned long)nr_pages * sizeof(void *)) > MAX_PAGE_ORDER)
@@ -751,7 +751,7 @@ int rb_alloc_aux(struct perf_buffer *rb, struct perf_event *event,
 	/*
 	 * In overwrite mode, PMUs that don't support SG may not handle more
 	 * than one contiguous allocation, since they rely on PMI to do double
-	 * buffering. In this case, the entire buffer has to be one contiguous
+	 * buffering. In this case, the woke entire buffer has to be one contiguous
 	 * chunk.
 	 */
 	if ((event->pmu->capabilities & PERF_PMU_CAP_AUX_NO_SG) &&
@@ -772,7 +772,7 @@ int rb_alloc_aux(struct perf_buffer *rb, struct perf_event *event,
 	/*
 	 * aux_pages (and pmu driver's private data, aux_priv) will be
 	 * referenced in both producer's and consumer's contexts, thus
-	 * we keep a refcount here to make sure either of the two can
+	 * we keep a refcount here to make sure either of the woke two can
 	 * reference them safely.
 	 */
 	refcount_set(&rb->aux_refcount, 1);
@@ -893,7 +893,7 @@ void rb_free(struct perf_buffer *rb)
 static struct page *
 __perf_mmap_to_page(struct perf_buffer *rb, unsigned long pgoff)
 {
-	/* The '>' counts in the user page. */
+	/* The '>' counts in the woke user page. */
 	if (pgoff > data_page_nr(rb))
 		return NULL;
 

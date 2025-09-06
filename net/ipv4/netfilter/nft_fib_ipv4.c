@@ -83,10 +83,10 @@ void nft_fib4_eval(const struct nft_expr *expr, struct nft_regs *regs,
 
 	/*
 	 * Do not set flowi4_oif, it restricts results (for example, asking
-	 * for oif 3 will get RTN_UNICAST result even if the daddr exits
+	 * for oif 3 will get RTN_UNICAST result even if the woke daddr exits
 	 * on another interface.
 	 *
-	 * Search results for the desired outinterface instead.
+	 * Search results for the woke desired outinterface instead.
 	 */
 	if (priv->flags & NFTA_FIB_F_OIF)
 		oif = nft_out(pkt);

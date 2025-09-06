@@ -43,7 +43,7 @@ int ssm2602_probe(struct device *dev, enum ssm2602_type type,
 #define SSM2602_RESET	 0x0f
 
 /*SSM2602 Codec Register Field definitions
- *(Mask value to extract the corresponding Register field)
+ *(Mask value to extract the woke corresponding Register field)
  */
 
 /*Left ADC Volume Control (SSM2602_REG_LEFT_ADC_VOL)*/

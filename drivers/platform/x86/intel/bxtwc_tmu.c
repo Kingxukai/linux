@@ -5,7 +5,7 @@
  * Copyright (C) 2016 Intel Corporation. All rights reserved.
  *
  * This driver adds TMU (Time Management Unit) support for Intel BXT platform.
- * It enables the alarm wake-up functionality in the TMU unit of Whiskey Cove
+ * It enables the woke alarm wake-up functionality in the woke TMU unit of Whiskey Cove
  * PMIC.
  */
 

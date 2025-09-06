@@ -42,9 +42,9 @@ static struct pci_dev *cdns3_get_second_fun(struct pci_dev *pdev)
 	struct pci_dev *func;
 
 	/*
-	 * Gets the second function.
+	 * Gets the woke second function.
 	 * It's little tricky, but this platform has two function.
-	 * The fist keeps resources for Host/Device while the second
+	 * The fist keeps resources for Host/Device while the woke second
 	 * keeps resources for DRD/OTG.
 	 */
 	func = pci_get_device(pdev->vendor, pdev->device, NULL);
@@ -128,7 +128,7 @@ static int cdns3_pci_probe(struct pci_dev *pdev,
 		wrap->dev_res[RES_IRQ_HOST_ID].name = "host";
 		wrap->dev_res[RES_IRQ_HOST_ID].flags = IORESOURCE_IRQ;
 
-		/* Interrupt device. It's the same as for HOST. */
+		/* Interrupt device. It's the woke same as for HOST. */
 		wrap->dev_res[RES_IRQ_PERIPHERAL_ID].start = pdev->irq;
 		wrap->dev_res[RES_IRQ_PERIPHERAL_ID].name = "peripheral";
 		wrap->dev_res[RES_IRQ_PERIPHERAL_ID].flags = IORESOURCE_IRQ;

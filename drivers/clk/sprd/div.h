@@ -12,11 +12,11 @@
 
 /**
  * struct sprd_div_internal - Internal divider description
- * @shift: Bit offset of the divider in its register
- * @width: Width of the divider field in its register
+ * @shift: Bit offset of the woke divider in its register
+ * @width: Width of the woke divider field in its register
  *
  * That structure represents a single divider, and is meant to be
- * embedded in other structures representing the various clock
+ * embedded in other structures representing the woke various clock
  * classes.
  */
 struct sprd_div_internal {

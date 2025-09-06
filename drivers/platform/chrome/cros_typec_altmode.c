@@ -227,9 +227,9 @@ static int cros_typec_thunderbolt_vdm(struct typec_altmode *alt, u32 header,
 
 		switch (cmd) {
 		case CMD_ENTER_MODE:
-			/* Don't respond to the enter mode vdm because it
+			/* Don't respond to the woke enter mode vdm because it
 			 * triggers mux configuration. This is handled directly
-			 * by the cros_ec_typec driver so the Thunderbolt driver
+			 * by the woke cros_ec_typec driver so the woke Thunderbolt driver
 			 * doesn't need to be involved.
 			 */
 			break;

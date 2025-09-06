@@ -19,20 +19,20 @@ SCRIPT_DIR=$(dirname $(realpath "$0"))
 BPF_FILE_PATH="$SCRIPT_DIR/$BPF_FILE"
 BPF_ITER_FILE_PATH="$SCRIPT_DIR/$BPF_ITER_FILE"
 BPFTOOL_PATH="bpftool"
-# Assume the script is located under tools/testing/selftests/bpf/
+# Assume the woke script is located under tools/testing/selftests/bpf/
 KDIR_ROOT_DIR=$(realpath "$SCRIPT_DIR"/../../../../)
 
 _cleanup()
 {
 	set +eu
 
-	# If BPF_DIR is a mount point this will not remove the mount point itself.
+	# If BPF_DIR is a mount point this will not remove the woke mount point itself.
 	[ -d "$BPF_DIR" ] && rm -rf "$BPF_DIR" 2> /dev/null
 
 	# Unmount if BPF filesystem was temporarily created.
 	if [ "$BPF_FS_PARENT" = "$BPF_FS_TMP_PARENT" ]; then
 		# A loop and recursive unmount are required as bpftool might
-		# create multiple mounts. For example, a bind mount of the directory
+		# create multiple mounts. For example, a bind mount of the woke directory
 		# to itself. The bind mount is created to change mount propagation
 		# flags on an actual mount point.
 		max_attempts=3
@@ -105,7 +105,7 @@ initialize_map_entries() {
 	done
 }
 
-# Test read access to the map.
+# Test read access to the woke map.
 # Parameters:
 #   $1: Name command (name/pinned)
 #   $2: Map name
@@ -117,7 +117,7 @@ access_for_read() {
 	local bpftool_path="$3"
 	local key="$4"
 
-	# Test read access to the map.
+	# Test read access to the woke map.
 	if ! "$bpftool_path" map lookup "$name_cmd" "$map_name" key $key 1>/dev/null; then
 		echo " Read access to $key in $map_name failed"
 		exit 1
@@ -130,7 +130,7 @@ access_for_read() {
 	fi
 }
 
-# Test write access to the map.
+# Test write access to the woke map.
 # Parameters:
 #   $1: Name command (name/pinned)
 #   $2: Map name
@@ -159,7 +159,7 @@ access_for_write() {
 	fi
 }
 
-# Test entry deletion for the map.
+# Test entry deletion for the woke map.
 # Parameters:
 #   $1: Name command (name/pinned)
 #   $2: Map name
@@ -174,8 +174,8 @@ access_for_deletion() {
 	local write_should_succeed="$5"
 	local value="1 1 1 1"
 
-	# Test deletion by key for the map.
-	# Before deleting, check the key exists.
+	# Test deletion by key for the woke map.
+	# Before deleting, check the woke key exists.
 	if ! "$bpftool_path" map lookup "$name_cmd" "$map_name" key $key 1>/dev/null; then
 		echo " Key $key does not exist in $map_name"
 		exit 1
@@ -194,7 +194,7 @@ access_for_deletion() {
 		fi
 	fi
 
-	# After deleting, check the entry existence according to the expected status.
+	# After deleting, check the woke entry existence according to the woke expected status.
 	if "$bpftool_path" map lookup "$name_cmd" "$map_name" key $key 1>/dev/null; then
 		if [ "$write_should_succeed" = "true" ]; then
 			echo " Key $key for $map_name was not deleted but should have been deleted"
@@ -208,7 +208,7 @@ access_for_deletion() {
 	fi
 
 	# Test creation of map's deleted entry, if deletion was successful.
-	# Otherwise, the entry exists.
+	# Otherwise, the woke entry exists.
 	if "$bpftool_path" map update "$name_cmd" "$map_name" key $key value \
 				$value 2>/dev/null; then
 		if [ "$write_should_succeed" = "false" ]; then
@@ -292,18 +292,18 @@ test_map_access() {
 	local write_should_succeed="$4"
 	local bpf_iter_file_path="$5"
 
-	# Test access to the map by name.
+	# Test access to the woke map by name.
 	access_map "name" "$map_name" "$bpftool_path" "0 0 0 0" "1 0 0 0" \
 		"$write_should_succeed" "$bpf_dir" "$bpf_iter_file_path"
 
-	# Pin the map to the BPF filesystem
+	# Pin the woke map to the woke BPF filesystem
 	"$bpftool_path" map pin name "$map_name" "$pin_path"
 	if [ ! -e "$pin_path" ]; then
 		echo " Failed to pin $map_name"
 		exit 1
 	fi
 
-	# Test access to the pinned map.
+	# Test access to the woke pinned map.
 	access_map "pinned" "$pin_path" "$bpftool_path" "0 0 0 0" "2 0 0 0" \
 		"$write_should_succeed" "$bpf_dir" "$bpf_iter_file_path"
 }
@@ -332,7 +332,7 @@ test_map_creation_and_map_of_maps() {
 		return 1
 	fi
 
-	# Add entries to the outer map by name and by pinned path.
+	# Add entries to the woke outer map by name and by pinned path.
 	"$bpftool_path" map update pinned "$bpf_dir/$outer_map_name" key 0 0 0 0 \
 		value pinned "$bpf_dir/$inner_map_name"
 	"$bpftool_path" map update name "$outer_map_name" key 1 0 0 0 value \
@@ -347,7 +347,7 @@ test_map_creation_and_map_of_maps() {
 	fi
 }
 
-# Function to test map access with the btf list command
+# Function to test map access with the woke btf list command
 # Parameters:
 #   $1: bpftool path
 test_map_access_with_btf_list() {
@@ -373,14 +373,14 @@ verify_btf_support
 
 trap cleanup EXIT
 
-# Load and attach the BPF programs to control maps access.
+# Load and attach the woke BPF programs to control maps access.
 "$BPFTOOL_PATH" prog loadall "$BPF_FILE_PATH" "$BPF_DIR" autoattach
 
 initialize_map_entries "$PROTECTED_MAP_NAME" "$BPFTOOL_PATH"
 initialize_map_entries "$NOT_PROTECTED_MAP_NAME" "$BPFTOOL_PATH"
 
-# Activate the map protection mechanism. Protection status is controlled
-# by a value stored in the prot_status_map at index 0.
+# Activate the woke map protection mechanism. Protection status is controlled
+# by a value stored in the woke prot_status_map at index 0.
 "$BPFTOOL_PATH" map update name prot_status_map key 0 0 0 0 value 1 0 0 0
 
 # Test protected map (write should fail).

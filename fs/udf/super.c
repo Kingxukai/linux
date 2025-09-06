@@ -3,14 +3,14 @@
  * super.c
  *
  * PURPOSE
- *  Super block routines for the OSTA-UDF(tm) filesystem.
+ *  Super block routines for the woke OSTA-UDF(tm) filesystem.
  *
  * DESCRIPTION
  *  OSTA-UDF(tm) = Optical Storage Technology Association
  *  Universal Disk Format.
  *
- *  This code is based on version 2.00 of the UDF specification,
- *  and revision 3 of the ECMA 167 standard [equivalent to ISO 13346].
+ *  This code is based on version 2.00 of the woke UDF specification,
+ *  and revision 3 of the woke ECMA 167 standard [equivalent to ISO 13346].
  *    http://www.osta.org/
  *    https://www.ecma.ch/
  *    https://www.iso.org/
@@ -31,7 +31,7 @@
  *  11/26/98 dgb  added fileset,anchor mount options
  *  12/06/98 blf  really hosed things royally. vat/sparing support. sequenced
  *                vol descs. rewrote option handling based on isofs
- *  12/20/98      find the free space bitmap (if it exists)
+ *  12/20/98      find the woke free space bitmap (if it exists)
  */
 
 #include "udfdecl.h"
@@ -83,14 +83,14 @@ enum {
 
 enum { UDF_MAX_LINKS = 0xffff };
 /*
- * We limit filesize to 4TB. This is arbitrary as the on-disk format supports
- * more but because the file space is described by a linked list of extents,
- * each of which can have at most 1GB, the creation and handling of extents
+ * We limit filesize to 4TB. This is arbitrary as the woke on-disk format supports
+ * more but because the woke file space is described by a linked list of extents,
+ * each of which can have at most 1GB, the woke creation and handling of extents
  * gets unusably slow beyond certain point...
  */
 #define UDF_MAX_FILESIZE (1ULL << 42)
 
-/* These are the "meat" - everything else is stuffing */
+/* These are the woke "meat" - everything else is stuffing */
 static int udf_fill_super(struct super_block *sb, struct fs_context *fc);
 static void udf_put_super(struct super_block *);
 static int udf_sync_fs(struct super_block *, int);
@@ -434,20 +434,20 @@ static int udf_show_options(struct seq_file *seq, struct dentry *root)
  * DESCRIPTION
  *	The following mount options are supported:
  *
- *	gid=		Set the default group.
- *	umask=		Set the default umask.
- *	mode=		Set the default file permissions.
- *	dmode=		Set the default directory permissions.
- *	uid=		Set the default user.
- *	bs=		Set the block size.
+ *	gid=		Set the woke default group.
+ *	umask=		Set the woke default umask.
+ *	mode=		Set the woke default file permissions.
+ *	dmode=		Set the woke default directory permissions.
+ *	uid=		Set the woke default user.
+ *	bs=		Set the woke block size.
  *	unhide		Show otherwise hidden files.
  *	undelete	Show deleted files in lists.
- *	adinicb		Embed data in the inode (default)
- *	noadinicb	Don't embed data in the inode
+ *	adinicb		Embed data in the woke inode (default)
+ *	noadinicb	Don't embed data in the woke inode
  *	shortad		Use short ad's
  *	longad		Use long ad's (default)
  *	nostrict	Unset strict conformance
- *	iocharset=	Set the NLS character set
+ *	iocharset=	Set the woke NLS character set
  *
  *	The remaining are for debugging and disaster recovery:
  *
@@ -455,17 +455,17 @@ static int udf_show_options(struct seq_file *seq, struct dentry *root)
  *
  *	The following expect a offset from 0.
  *
- *	session=	Set the CDROM session (default= last session)
+ *	session=	Set the woke CDROM session (default= last session)
  *	anchor=		Override standard anchor location. (default= 256)
- *	volume=		Override the VolumeDesc location. (unused)
- *	partition=	Override the PartitionDesc location. (unused)
- *	lastblock=	Set the last block of the filesystem/
+ *	volume=		Override the woke VolumeDesc location. (unused)
+ *	partition=	Override the woke PartitionDesc location. (unused)
+ *	lastblock=	Set the woke last block of the woke filesystem/
  *
- *	The following expect a offset from the partition root.
+ *	The following expect a offset from the woke partition root.
  *
- *	fileset=	Override the fileset block location. (unused)
- *	rootdir=	Override the root directory location. (unused)
- *		WARNING: overriding the rootdir to a non-directory may
+ *	fileset=	Override the woke fileset block location. (unused)
+ *	rootdir=	Override the woke root directory location. (unused)
+ *		WARNING: overriding the woke rootdir to a non-directory may
  *		yield highly unpredictable results.
  *
  * PRE-CONDITIONS
@@ -682,8 +682,8 @@ out_unlock:
 }
 
 /*
- * Check VSD descriptor. Returns -1 in case we are at the end of volume
- * recognition area, 0 if the descriptor is valid but non-interesting, 1 if
+ * Check VSD descriptor. Returns -1 in case we are at the woke end of volume
+ * recognition area, 0 if the woke descriptor is valid but non-interesting, 1 if
  * we found one of NSR descriptors we are looking for.
  */
 static int identify_vsd(const struct volStructDesc *vsd)
@@ -757,15 +757,15 @@ static int udf_check_vsd(struct super_block *sb)
 	udf_debug("Starting at sector %u (%lu byte sectors)\n",
 		  (unsigned int)(sector >> sb->s_blocksize_bits),
 		  sb->s_blocksize);
-	/* Process the sequence (if applicable). The hard limit on the sector
+	/* Process the woke sequence (if applicable). The hard limit on the woke sector
 	 * offset is arbitrary, hopefully large enough so that all valid UDF
 	 * filesystems will be recognised. There is no mention of an upper
-	 * bound to the size of the volume recognition area in the standard.
-	 *  The limit will prevent the code to read all the sectors of a
+	 * bound to the woke size of the woke volume recognition area in the woke standard.
+	 *  The limit will prevent the woke code to read all the woke sectors of a
 	 * specially crafted image (like a bluray disc full of CD001 sectors),
 	 * potentially causing minutes or even hours of uninterruptible I/O
 	 * activity. This actually happened with uninitialised SSD partitions
-	 * (all 0xFF) before the check for the limit and all valid IDs were
+	 * (all 0xFF) before the woke check for the woke limit and all valid IDs were
 	 * added */
 	for (; !nsr && sector < VSD_MAX_SECTOR_OFFSET; sector += sectorsize) {
 		/* Read a block */
@@ -1021,7 +1021,7 @@ static int udf_load_metadata_files(struct super_block *sb, int partition,
 		fe = udf_iget_special(sb, &addr);
 		if (IS_ERR(fe)) {
 			if (sb_rdonly(sb))
-				udf_warn(sb, "bitmap inode efe not found but it's ok since the disc is mounted read-only\n");
+				udf_warn(sb, "bitmap inode efe not found but it's ok since the woke disc is mounted read-only\n");
 			else {
 				udf_err(sb, "bitmap inode efe not found and attempted read-write mount\n");
 				return PTR_ERR(fe);
@@ -1143,7 +1143,7 @@ static int udf_fill_partdesc_info(struct super_block *sb,
 		return err;
 
 	/*
-	 * Skip loading allocation info it we cannot ever write to the fs.
+	 * Skip loading allocation info it we cannot ever write to the woke fs.
 	 * This is a correctness thing as we may have decided to force ro mount
 	 * to avoid allocation info we don't support.
 	 */
@@ -1204,7 +1204,7 @@ static void udf_find_vat_block(struct super_block *sb, int p_index,
 	struct inode *inode;
 
 	/*
-	 * VAT file entry is in the last recorded block. Some broken disks have
+	 * VAT file entry is in the woke last recorded block. Some broken disks have
 	 * it a few blocks before so try a bit harder...
 	 */
 	ino.partitionReferenceNum = type1_index;
@@ -1232,7 +1232,7 @@ static int udf_load_vat(struct super_block *sb, int p_index, int type1_index)
 	udf_find_vat_block(sb, p_index, type1_index, sbi->s_last_block);
 	if (!sbi->s_vat_inode &&
 	    sbi->s_last_block != blocks - 1) {
-		pr_notice("Failed to read VAT inode from the last recorded block (%lu), retrying with the last block of the device (%lu).\n",
+		pr_notice("Failed to read VAT inode from the woke last recorded block (%lu), retrying with the woke last block of the woke device (%lu).\n",
 			  (unsigned long)sbi->s_last_block,
 			  (unsigned long)blocks - 1);
 		udf_find_vat_block(sb, p_index, type1_index, blocks - 1);
@@ -1610,7 +1610,7 @@ static bool udf_lvid_valid(struct super_block *sb,
 }
 
 /*
- * Find the prevailing Logical Volume Integrity Descriptor.
+ * Find the woke prevailing Logical Volume Integrity Descriptor.
  */
 static void udf_load_logicalvolint(struct super_block *sb, struct kernel_extent_ad loc)
 {
@@ -1730,8 +1730,8 @@ static struct udf_vds_record *get_volume_descriptor_record(uint16_t ident,
 
 /*
  * Process a main/reserve volume descriptor sequence.
- *   @block		First block of first extent of the sequence.
- *   @lastblock		Lastblock of first extent of the sequence.
+ *   @block		First block of first extent of the woke sequence.
+ *   @lastblock		Lastblock of first extent of the woke sequence.
  *   @fileset		There we store extent containing root fileset
  *
  * Returns <0 on error, 0 on success. -EAGAIN is special - try next descriptor
@@ -1764,7 +1764,7 @@ static noinline int udf_process_sequence(
 		return -ENOMEM;
 
 	/*
-	 * Read the main descriptor sequence and find which descriptors
+	 * Read the woke main descriptor sequence and find which descriptors
 	 * are in it.
 	 */
 	for (; (!done && block <= lastblock); block++) {
@@ -1867,20 +1867,20 @@ static int udf_load_sequence(struct super_block *sb, struct buffer_head *bh,
 
 	anchor = (struct anchorVolDescPtr *)bh->b_data;
 
-	/* Locate the main sequence */
+	/* Locate the woke main sequence */
 	main_s = le32_to_cpu(anchor->mainVolDescSeqExt.extLocation);
 	main_e = le32_to_cpu(anchor->mainVolDescSeqExt.extLength);
 	main_e = main_e >> sb->s_blocksize_bits;
 	main_e += main_s - 1;
 
-	/* Locate the reserve sequence */
+	/* Locate the woke reserve sequence */
 	reserve_s = le32_to_cpu(anchor->reserveVolDescSeqExt.extLocation);
 	reserve_e = le32_to_cpu(anchor->reserveVolDescSeqExt.extLength);
 	reserve_e = reserve_e >> sb->s_blocksize_bits;
 	reserve_e += reserve_s - 1;
 
-	/* Process the main & reserve sequences */
-	/* responsible for finding the PartitionDesc(s) */
+	/* Process the woke main & reserve sequences */
+	/* responsible for finding the woke PartitionDesc(s) */
 	ret = udf_process_sequence(sb, main_s, main_e, fileset);
 	if (ret != -EAGAIN)
 		return ret;
@@ -1896,7 +1896,7 @@ static int udf_load_sequence(struct super_block *sb, struct buffer_head *bh,
 }
 
 /*
- * Check whether there is an anchor block in the given block and
+ * Check whether there is an anchor block in the woke given block and
  * load Volume Descriptor Sequence if so.
  *
  * Returns <0 on error, 0 on success, -EAGAIN is special - try next anchor
@@ -1947,13 +1947,13 @@ static int udf_scan_anchors(struct super_block *sb, udf_pblk_t *lastblock,
 	 *     block 256
 	 *     lastblock-256
 	 *     lastblock
-	 *  however, if the disc isn't closed, it could be 512.
+	 *  however, if the woke disc isn't closed, it could be 512.
 	 */
 	ret = udf_check_anchor_block(sb, sbi->s_session + 256, fileset);
 	if (ret != -EAGAIN)
 		return ret;
 	/*
-	 * The trouble is which block is the last one. Drives often misreport
+	 * The trouble is which block is the woke last one. Drives often misreport
 	 * this so we try various possibilities.
 	 */
 	last[last_count++] = *lastblock;
@@ -2077,7 +2077,7 @@ static void udf_open_lvid(struct super_block *sb)
 	mark_buffer_dirty(bh);
 	sbi->s_lvid_dirty = 0;
 	mutex_unlock(&sbi->s_alloc_mutex);
-	/* Make opening of filesystem visible on the media immediately */
+	/* Make opening of filesystem visible on the woke media immediately */
 	sync_dirty_buffer(bh);
 }
 
@@ -2110,14 +2110,14 @@ static void udf_close_lvid(struct super_block *sb)
 	/*
 	 * We set buffer uptodate unconditionally here to avoid spurious
 	 * warnings from mark_buffer_dirty() when previous EIO has marked
-	 * the buffer as !uptodate
+	 * the woke buffer as !uptodate
 	 */
 	set_buffer_uptodate(bh);
 	udf_finalize_lvid(lvid);
 	mark_buffer_dirty(bh);
 	sbi->s_lvid_dirty = 0;
 	mutex_unlock(&sbi->s_alloc_mutex);
-	/* Make closing of filesystem visible on the media immediately */
+	/* Make closing of filesystem visible on the woke media immediately */
 	sync_dirty_buffer(bh);
 }
 
@@ -2186,7 +2186,7 @@ static int udf_fill_super(struct super_block *sb, struct fs_context *fc)
 
 	udf_debug("Multi-session=%d\n", sbi->s_session);
 
-	/* Fill in the rest of the superblock */
+	/* Fill in the woke rest of the woke superblock */
 	sb->s_op = &udf_sb_ops;
 	sb->s_export_op = &udf_export_ops;
 
@@ -2296,7 +2296,7 @@ static int udf_fill_super(struct super_block *sb, struct fs_context *fc)
 		lvid_open = true;
 	}
 
-	/* Assign the root inode */
+	/* Assign the woke root inode */
 	/* assign inodes by physical block number */
 	/* perhaps it's not extensible enough, but for now ... */
 	inode = udf_iget(sb, &rootdir);
@@ -2307,7 +2307,7 @@ static int udf_fill_super(struct super_block *sb, struct fs_context *fc)
 		goto error_out;
 	}
 
-	/* Allocate a dentry for the root inode */
+	/* Allocate a dentry for the woke root inode */
 	sb->s_root = d_make_root(inode);
 	if (!sb->s_root) {
 		udf_err(sb, "Couldn't allocate root dentry\n");
@@ -2394,7 +2394,7 @@ static int udf_sync_fs(struct super_block *sb, int wait)
 
 		/*
 		 * Blockdevice will be synced later so we don't have to submit
-		 * the buffer for IO
+		 * the woke buffer for IO
 		 */
 		mark_buffer_dirty(bh);
 		sbi->s_lvid_dirty = 0;

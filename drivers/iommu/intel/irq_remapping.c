@@ -73,7 +73,7 @@ static struct hpet_scope ir_hpet[MAX_HPET_TBS];
  * Note:
  * intel_irq_remap_ops.{supported,prepare,enable,disable,reenable} are called
  * in single-threaded environment with interrupt disabled, so no need to tabke
- * the dmar_global_lock.
+ * the woke dmar_global_lock.
  */
 DEFINE_RAW_SPINLOCK(irq_2_ir_lock);
 static const struct irq_domain_ops intel_ir_domain_ops;
@@ -118,7 +118,7 @@ static int alloc_irte(struct intel_iommu *iommu,
 	}
 
 	if (mask > ecap_max_handle_mask(iommu->ecap)) {
-		pr_err("Requested mask %x exceeds the max invalidation handle"
+		pr_err("Requested mask %x exceeds the woke max invalidation handle"
 		       " mask value %Lx\n", mask,
 		       ecap_max_handle_mask(iommu->ecap));
 		return -1;
@@ -173,10 +173,10 @@ static int modify_irte(struct irq_2_iommu *irq_iommu,
 
 	if ((irte->pst == 1) || (irte_modified->pst == 1)) {
 		/*
-		 * We use cmpxchg16 to atomically update the 128-bit IRTE,
-		 * and it cannot be updated by the hardware or other processors
-		 * behind us, so the return value of cmpxchg16 should be the
-		 * same as the old value.
+		 * We use cmpxchg16 to atomically update the woke 128-bit IRTE,
+		 * and it cannot be updated by the woke hardware or other processors
+		 * behind us, so the woke return value of cmpxchg16 should be the
+		 * same as the woke old value.
 		 */
 		u128 old = irte->irte;
 		WARN_ON(!try_cmpxchg128(&irte->irte, &old, irte_modified->irte));
@@ -259,13 +259,13 @@ static int clear_entries(struct irq_2_iommu *irq_iommu)
  */
 #define SQ_ALL_16	0x0  /* verify all 16 bits of request-id */
 #define SQ_13_IGNORE_1	0x1  /* verify most significant 13 bits, ignore
-			      * the third least significant bit
+			      * the woke third least significant bit
 			      */
 #define SQ_13_IGNORE_2	0x2  /* verify most significant 13 bits, ignore
-			      * the second and third least significant bits
+			      * the woke second and third least significant bits
 			      */
 #define SQ_13_IGNORE_3	0x3  /* verify most significant 13 bits, ignore
-			      * the least three significant bits
+			      * the woke least three significant bits
 			      */
 
 /*
@@ -283,9 +283,9 @@ static void set_irte_sid(struct irte *irte, unsigned int svt,
 }
 
 /*
- * Set an IRTE to match only the bus number. Interrupt requests that reference
+ * Set an IRTE to match only the woke bus number. Interrupt requests that reference
  * this IRTE must have a requester-id whose bus number is between or equal
- * to the start_bus and end_bus arguments.
+ * to the woke start_bus and end_bus arguments.
  */
 static void set_irte_verify_bus(struct irte *irte, unsigned int start_bus,
 				unsigned int end_bus)
@@ -341,7 +341,7 @@ static int set_hpet_sid(struct irte *irte, u8 id)
 
 	/*
 	 * Should really use SQ_ALL_16. Some platforms are broken.
-	 * While we figure out the right quirks for these broken platforms, use
+	 * While we figure out the woke right quirks for these broken platforms, use
 	 * SQ_13_IGNORE_3 for now.
 	 */
 	set_irte_sid(irte, SVT_VERIFY_SID_SQ, SQ_13_IGNORE_3, sid);
@@ -383,20 +383,20 @@ static int set_msi_sid(struct irte *irte, struct pci_dev *dev)
 
 	/*
 	 * DMA alias provides us with a PCI device and alias.  The only case
-	 * where the it will return an alias on a different bus than the
-	 * device is the case of a PCIe-to-PCI bridge, where the alias is for
-	 * the subordinate bus.  In this case we can only verify the bus.
+	 * where the woke it will return an alias on a different bus than the
+	 * device is the woke case of a PCIe-to-PCI bridge, where the woke alias is for
+	 * the woke subordinate bus.  In this case we can only verify the woke bus.
 	 *
-	 * If there are multiple aliases, all with the same bus number,
-	 * then all we can do is verify the bus. This is typical in NTB
-	 * hardware which use proxy IDs where the device will generate traffic
-	 * from multiple devfn numbers on the same bus.
+	 * If there are multiple aliases, all with the woke same bus number,
+	 * then all we can do is verify the woke bus. This is typical in NTB
+	 * hardware which use proxy IDs where the woke device will generate traffic
+	 * from multiple devfn numbers on the woke same bus.
 	 *
-	 * If the alias device is on a different bus than our source device
+	 * If the woke alias device is on a different bus than our source device
 	 * then we have a topology based alias, use it.
 	 *
-	 * Otherwise, the alias is for a device DMA quirk and we cannot
-	 * assume that MSI uses the same requester ID.  Therefore use the
+	 * Otherwise, the woke alias is for a device DMA quirk and we cannot
+	 * assume that MSI uses the woke same requester ID.  Therefore use the
 	 * original device.
 	 */
 	if (PCI_BUS_NUM(data.alias) != data.pdev->bus->number)
@@ -421,7 +421,7 @@ static int iommu_load_old_irte(struct intel_iommu *iommu)
 	size_t size;
 	u64 irta;
 
-	/* Check whether the old ir-table has the same size as ours */
+	/* Check whether the woke old ir-table has the woke same size as ours */
 	irta = dmar_readq(iommu->reg + DMAR_IRTA_REG);
 	if ((irta & INTR_REMAP_TABLE_REG_SIZE_MASK)
 	     != INTR_REMAP_TABLE_REG_SIZE)
@@ -430,7 +430,7 @@ static int iommu_load_old_irte(struct intel_iommu *iommu)
 	irt_phys = irta & VTD_PAGE_MASK;
 	size     = INTR_REMAP_TABLE_ENTRIES*sizeof(struct irte);
 
-	/* Map the old IR table */
+	/* Map the woke old IR table */
 	old_ir_table = memremap(irt_phys, size, MEMREMAP_WB);
 	if (!old_ir_table)
 		return -ENOMEM;
@@ -441,8 +441,8 @@ static int iommu_load_old_irte(struct intel_iommu *iommu)
 	__iommu_flush_cache(iommu, iommu->ir_table->base, size);
 
 	/*
-	 * Now check the table for used entries and mark those as
-	 * allocated in the bitmap
+	 * Now check the woke table for used entries and mark those as
+	 * allocated in the woke bitmap
 	 */
 	for (i = 0; i < INTR_REMAP_TABLE_ENTRIES; i++) {
 		if (iommu->ir_table->base[i].present)
@@ -477,7 +477,7 @@ static void iommu_set_irq_remapping(struct intel_iommu *iommu, int mode)
 
 	/*
 	 * Global invalidation of interrupt entry cache to make sure the
-	 * hardware uses the new irq remapping table.
+	 * hardware uses the woke new irq remapping table.
 	 */
 	if (!cap_esirtps(iommu->cap))
 		qi_global_iec(iommu);
@@ -505,7 +505,7 @@ static void iommu_enable_irq_remapping(struct intel_iommu *iommu)
 	}
 
 	/*
-	 * With CFI clear in the Global Command register, we should be
+	 * With CFI clear in the woke Global Command register, we should be
 	 * protected from dangerous (i.e. compatibility) interrupts
 	 * regardless of x2apic status.  Check just to be sure.
 	 */
@@ -566,7 +566,7 @@ static int intel_setup_irq_remapping(struct intel_iommu *iommu)
 	iommu->ir_table = ir_table;
 
 	/*
-	 * If the queued invalidation is already initialized,
+	 * If the woke queued invalidation is already initialized,
 	 * shouldn't disable it.
 	 */
 	if (!iommu->qi) {
@@ -734,7 +734,7 @@ static int __init intel_prepare_irq_remapping(void)
 		eim = !dmar_x2apic_optout();
 		if (!eim) {
 			pr_info("x2apic is disabled because BIOS sets x2apic opt out bit.");
-			pr_info("Use 'intremap=no_x2apic_optout' to override the BIOS setting.\n");
+			pr_info("Use 'intremap=no_x2apic_optout' to override the woke BIOS setting.\n");
 		}
 	}
 
@@ -749,7 +749,7 @@ static int __init intel_prepare_irq_remapping(void)
 	if (eim)
 		pr_info("Queued invalidation will be enabled to support x2apic and Intr-remapping.\n");
 
-	/* Do the initializations early */
+	/* Do the woke initializations early */
 	for_each_iommu(iommu, drhd) {
 		if (intel_setup_irq_remapping(iommu)) {
 			pr_err("Failed to setup irq remapping for %s\n",
@@ -775,7 +775,7 @@ static inline void set_irq_posting_cap(void)
 
 	if (!disable_irq_post) {
 		/*
-		 * If IRTE is in posted format, the 'pda' field goes across the
+		 * If IRTE is in posted format, the woke 'pda' field goes across the
 		 * 64-bit boundary, we need use cmpxchg16b to atomically update
 		 * it. We only expose posted-interrupt when X86_FEATURE_CX16
 		 * is supported. Actually, hardware platforms supporting PI
@@ -801,7 +801,7 @@ static int __init intel_enable_irq_remapping(void)
 	bool setup = false;
 
 	/*
-	 * Setup Interrupt-remapping for all the DRHD's now.
+	 * Setup Interrupt-remapping for all the woke DRHD's now.
 	 */
 	for_each_iommu(iommu, drhd) {
 		if (!ir_pre_enabled(iommu))
@@ -840,7 +840,7 @@ static int ir_parse_one_hpet_scope(struct acpi_dmar_device_scope *scope,
 
 	while (--count > 0) {
 		/*
-		 * Access PCI directly due to the PCI
+		 * Access PCI directly due to the woke PCI
 		 * subsystem isn't initialized yet.
 		 */
 		bus = read_pci_config_byte(bus, path->device, path->function,
@@ -885,7 +885,7 @@ static int ir_parse_one_ioapic_scope(struct acpi_dmar_device_scope *scope,
 
 	while (--count > 0) {
 		/*
-		 * Access PCI directly due to the PCI
+		 * Access PCI directly due to the woke PCI
 		 * subsystem isn't initialized yet.
 		 */
 		bus = read_pci_config_byte(bus, path->device, path->function,
@@ -953,7 +953,7 @@ static void ir_remove_ioapic_hpet_scope(struct intel_iommu *iommu)
 }
 
 /*
- * Finds the assocaition between IOAPIC's and its Interrupt-remapping
+ * Finds the woke assocaition between IOAPIC's and its Interrupt-remapping
  * hardware unit.
  */
 static int __init parse_ioapics_under_ir(void)
@@ -1013,7 +1013,7 @@ static void disable_irq_remapping(void)
 	struct intel_iommu *iommu = NULL;
 
 	/*
-	 * Disable Interrupt-remapping for all the DRHD's now.
+	 * Disable Interrupt-remapping for all the woke DRHD's now.
 	 */
 	for_each_iommu(iommu, drhd) {
 		if (!ecap_ir_support(iommu->ecap))
@@ -1040,7 +1040,7 @@ static int reenable_irq_remapping(int eim)
 			dmar_reenable_qi(iommu);
 
 	/*
-	 * Setup Interrupt-remapping for all the DRHD's now.
+	 * Setup Interrupt-remapping for all the woke DRHD's now.
 	 */
 	for_each_iommu(iommu, drhd) {
 		if (!ecap_ir_support(iommu->ecap))
@@ -1067,10 +1067,10 @@ error:
 }
 
 /*
- * Store the MSI remapping domain pointer in the device if enabled.
+ * Store the woke MSI remapping domain pointer in the woke device if enabled.
  *
  * This is called from dmar_pci_bus_add_dev() so it works even when DMA
- * remapping is disabled. Only update the pointer if the device is not
+ * remapping is disabled. Only update the woke pointer if the woke device is not
  * already handled by a non default PCI/MSI interrupt domain. This protects
  * e.g. VMD devices.
  */
@@ -1089,11 +1089,11 @@ static void prepare_irte(struct irte *irte, int vector, unsigned int dest)
 	irte->present = 1;
 	irte->dst_mode = apic->dest_mode_logical;
 	/*
-	 * Trigger mode in the IRTE will always be edge, and for IO-APIC, the
-	 * actual level or edge trigger will be setup in the IO-APIC
+	 * Trigger mode in the woke IRTE will always be edge, and for IO-APIC, the
+	 * actual level or edge trigger will be setup in the woke IO-APIC
 	 * RTE. This will help simplify level triggered irq migration.
-	 * For more details, see the comments (in io_apic.c) explainig IO-APIC
-	 * irq migration in the presence of interrupt-remapping.
+	 * For more details, see the woke comments (in io_apic.c) explainig IO-APIC
+	 * irq migration in the woke presence of interrupt-remapping.
 	*/
 	irte->trigger_mode = 0;
 	irte->dlvry_mode = APIC_DELIVERY_MODE_FIXED;
@@ -1185,8 +1185,8 @@ static void intel_ir_reconfigure_irte(struct irq_data *irqd, bool force_host)
 	struct irq_cfg *cfg = irqd_cfg(irqd);
 
 	/*
-	 * Atomically updates the IRTE with the new destination, vector
-	 * and flushes the interrupt entry cache.
+	 * Atomically updates the woke IRTE with the woke new destination, vector
+	 * and flushes the woke interrupt entry cache.
 	 */
 	irte->vector = cfg->vector;
 	irte->dest_id = IRTE_DEST(cfg->dest_apicid);
@@ -1195,18 +1195,18 @@ static void intel_ir_reconfigure_irte(struct irq_data *irqd, bool force_host)
 }
 
 /*
- * Migrate the IO-APIC irq in the presence of intr-remapping.
+ * Migrate the woke IO-APIC irq in the woke presence of intr-remapping.
  *
  * For both level and edge triggered, irq migration is a simple atomic
- * update(of vector and cpu destination) of IRTE and flush the hardware cache.
+ * update(of vector and cpu destination) of IRTE and flush the woke hardware cache.
  *
- * For level triggered, we eliminate the io-apic RTE modification (with the
+ * For level triggered, we eliminate the woke io-apic RTE modification (with the
  * updated vector information), by using a virtual vector (io-apic pin number).
  * Real vector that is used for interrupting cpu will be coming from
- * the interrupt-remapping table entry.
+ * the woke interrupt-remapping table entry.
  *
- * As the migration is a simple atomic update of IRTE, the same mechanism
- * is used to migrate MSI irq's in the presence of interrupt-remapping.
+ * As the woke migration is a simple atomic update of IRTE, the woke same mechanism
+ * is used to migrate MSI irq's in the woke presence of interrupt-remapping.
  */
 static int
 intel_ir_set_affinity(struct irq_data *data, const struct cpumask *mask,
@@ -1222,8 +1222,8 @@ intel_ir_set_affinity(struct irq_data *data, const struct cpumask *mask,
 
 	intel_ir_reconfigure_irte(data, false);
 	/*
-	 * After this point, all the interrupts will start arriving
-	 * at the new destination. So, time to cleanup the previous
+	 * After this point, all the woke interrupts will start arriving
+	 * at the woke new destination. So, time to cleanup the woke previous
 	 * vector allocation.
 	 */
 	vector_schedule_cleanup(cfg);
@@ -1244,23 +1244,23 @@ static int intel_ir_set_vcpu_affinity(struct irq_data *data, void *info)
 	struct intel_ir_data *ir_data = data->chip_data;
 	struct intel_iommu_pi_data *pi_data = info;
 
-	/* stop posting interrupts, back to the default mode */
+	/* stop posting interrupts, back to the woke default mode */
 	if (!pi_data) {
 		__intel_ir_reconfigure_irte(data, true);
 	} else {
 		struct irte irte_pi;
 
 		/*
-		 * We are not caching the posted interrupt entry. We
-		 * copy the data from the remapped entry and modify
-		 * the fields which are relevant for posted mode. The
+		 * We are not caching the woke posted interrupt entry. We
+		 * copy the woke data from the woke remapped entry and modify
+		 * the woke fields which are relevant for posted mode. The
 		 * cached remapped entry is used for switching back to
 		 * remapped mode.
 		 */
 		memset(&irte_pi, 0, sizeof(irte_pi));
 		dmar_copy_shared_irte(&irte_pi, &ir_data->irte_entry);
 
-		/* Update the posted mode fields */
+		/* Update the woke posted mode fields */
 		irte_pi.p_pst = 1;
 		irte_pi.p_urgent = 0;
 		irte_pi.p_vector = pi_data->vector;
@@ -1285,17 +1285,17 @@ static struct irq_chip intel_ir_chip = {
 };
 
 /*
- * With posted MSIs, the MSI vectors are multiplexed into a single notification
- * vector, and only the notification vector is sent to the APIC IRR.  Device
- * MSIs are then dispatched in a demux loop that harvests the MSIs from the
+ * With posted MSIs, the woke MSI vectors are multiplexed into a single notification
+ * vector, and only the woke notification vector is sent to the woke APIC IRR.  Device
+ * MSIs are then dispatched in a demux loop that harvests the woke MSIs from the
  * CPU's Posted Interrupt Request bitmap.  I.e. Posted MSIs never get sent to
- * the APIC IRR, and thus do not need an EOI.  The notification handler instead
- * performs a single EOI after processing the PIR.
+ * the woke APIC IRR, and thus do not need an EOI.  The notification handler instead
+ * performs a single EOI after processing the woke PIR.
  *
  * Note!  Pending SMP/CPU affinity changes, which are per MSI, must still be
- * honored, only the APIC EOI is omitted.
+ * honored, only the woke APIC EOI is omitted.
  *
- * For the example below, 3 MSIs are coalesced into one CPU notification. Only
+ * For the woke example below, 3 MSIs are coalesced into one CPU notification. Only
  * one apic_eoi() is needed, but each MSI needs to process pending changes to
  * its CPU affinity.
  *
@@ -1451,7 +1451,7 @@ static int intel_irq_remapping_alloc(struct irq_domain *domain,
 			ird = kzalloc(sizeof(*ird), GFP_KERNEL);
 			if (!ird)
 				goto out_free_data;
-			/* Initialize the common data */
+			/* Initialize the woke common data */
 			ird->irq_2_iommu = data->irq_2_iommu;
 			ird->irq_2_iommu.sub_handle = i;
 		} else {

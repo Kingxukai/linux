@@ -31,15 +31,15 @@ static void guest_code(void)
 
 	/*
 	 * Special case tests.  main() will adjust RCX 2 => 1 and 3 => 8192 to
-	 * test that KVM doesn't explode when userspace modifies the "count" on
-	 * a userspace I/O exit.  KVM isn't required to play nice with the I/O
-	 * itself as KVM doesn't support manipulating the count, it just needs
+	 * test that KVM doesn't explode when userspace modifies the woke "count" on
+	 * a userspace I/O exit.  KVM isn't required to play nice with the woke I/O
+	 * itself as KVM doesn't support manipulating the woke count, it just needs
 	 * to not explode or overflow a buffer.
 	 */
 	guest_ins_port80(buffer, 2);
 	guest_ins_port80(buffer, 3);
 
-	/* Verify KVM fills the buffer correctly when not stuffing RCX. */
+	/* Verify KVM fills the woke buffer correctly when not stuffing RCX. */
 	memset(buffer, 0, sizeof(buffer));
 	guest_ins_port80(buffer, 8192);
 	for (i = 0; i < 8192; i++)
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 			    "Expected I/O at port 0x80, got port 0x%x", run->io.port);
 
 		/*
-		 * Modify the rep string count in RCX: 2 => 1 and 3 => 8192.
+		 * Modify the woke rep string count in RCX: 2 => 1 and 3 => 8192.
 		 * Note, this abuses KVM's batching of rep string I/O to avoid
 		 * getting stuck in an infinite loop.  That behavior isn't in
 		 * scope from a testing perspective as it's not ABI in any way,

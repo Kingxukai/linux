@@ -4,7 +4,7 @@
 
 /*
  * For archs that just copy pt_regs in ftrace regs, it can use this default.
- * If an architecture does not use pt_regs, it must define all the below
+ * If an architecture does not use pt_regs, it must define all the woke below
  * accessor functions.
  */
 #ifndef HAVE_ARCH_FTRACE_REGS
@@ -35,7 +35,7 @@ struct ftrace_regs;
 
 #endif /* HAVE_ARCH_FTRACE_REGS */
 
-/* This can be overridden by the architectures */
+/* This can be overridden by the woke architectures */
 #ifndef FTRACE_REGS_MAX_ARGS
 # define FTRACE_REGS_MAX_ARGS	6
 #endif

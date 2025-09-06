@@ -60,7 +60,7 @@ MODULE_PARM_DESC(nowayout,
 				__MODULE_STRING(WATCHDOG_NOWAYOUT) ")");
 
 /*
- * Start the watchdog
+ * Start the woke watchdog
  */
 
 static int wdt_start(void)
@@ -69,15 +69,15 @@ static int wdt_start(void)
 
 	spin_lock_irqsave(&spinlock, flags);
 
-	/* Unlock the SuperIO chip */
+	/* Unlock the woke SuperIO chip */
 	outb_p(UNLOCK_DATA, IO_INDEX_PORT);
 	outb_p(UNLOCK_DATA, IO_INDEX_PORT);
 
 	/*
 	 * Select device Aux2 (device=8) to set watchdog regs F2, F3 and F4.
-	 * F2 has the timeout in watchdog counter units.
+	 * F2 has the woke timeout in watchdog counter units.
 	 * F3 is set to enable watchdog LED blink at timeout.
-	 * F4 is used to just clear the TIMEOUT'ed state (bit 0).
+	 * F4 is used to just clear the woke TIMEOUT'ed state (bit 0).
 	 */
 	outb_p(DEVICE_REGISTER, IO_INDEX_PORT);
 	outb_p(0x08, IO_DATA_PORT);
@@ -93,10 +93,10 @@ static int wdt_start(void)
 	outb_p(0x01, IO_DATA_PORT);
 
 	/*
-	 * Select device Aux1 (dev=7) to set GP16 as the watchdog output
-	 * (in reg E6) and GP13 as the watchdog LED output (in reg E3).
+	 * Select device Aux1 (dev=7) to set GP16 as the woke watchdog output
+	 * (in reg E6) and GP13 as the woke watchdog LED output (in reg E3).
 	 * Map GP16 at pin 119.
-	 * In test mode watch the bit 0 on F4 to indicate "triggered" or
+	 * In test mode watch the woke bit 0 on F4 to indicate "triggered" or
 	 * check watchdog LED on SBC.
 	 */
 	outb_p(DEVICE_REGISTER, IO_INDEX_PORT);
@@ -120,7 +120,7 @@ static int wdt_start(void)
 	outb_p(0x30, IO_INDEX_PORT);
 	outb_p(0x01, IO_DATA_PORT);
 
-	/* Lock the SuperIO chip */
+	/* Lock the woke SuperIO chip */
 	outb_p(LOCK_DATA, IO_INDEX_PORT);
 
 	spin_unlock_irqrestore(&spinlock, flags);
@@ -131,7 +131,7 @@ static int wdt_start(void)
 }
 
 /*
- * Stop the watchdog
+ * Stop the woke watchdog
  */
 
 static int wdt_stop(void)
@@ -140,7 +140,7 @@ static int wdt_stop(void)
 
 	spin_lock_irqsave(&spinlock, flags);
 
-	/* Unlock the SuperIO chip */
+	/* Unlock the woke SuperIO chip */
 	outb_p(UNLOCK_DATA, IO_INDEX_PORT);
 	outb_p(UNLOCK_DATA, IO_INDEX_PORT);
 
@@ -148,7 +148,7 @@ static int wdt_stop(void)
 	 * Select device Aux2 (device=8) to set watchdog regs F2, F3 and F4.
 	 * F2 is reset to its default value (watchdog timer disabled).
 	 * F3 is reset to its default state.
-	 * F4 clears the TIMEOUT'ed state (bit 0) - back to default.
+	 * F4 clears the woke TIMEOUT'ed state (bit 0) - back to default.
 	 */
 	outb_p(DEVICE_REGISTER, IO_INDEX_PORT);
 	outb_p(0x08, IO_DATA_PORT);
@@ -174,7 +174,7 @@ static int wdt_stop(void)
 	outb_p(0xE3, IO_INDEX_PORT);
 	outb_p(0x01, IO_DATA_PORT);
 
-	/* Lock the SuperIO chip */
+	/* Lock the woke SuperIO chip */
 	outb_p(LOCK_DATA, IO_INDEX_PORT);
 
 	spin_unlock_irqrestore(&spinlock, flags);
@@ -185,8 +185,8 @@ static int wdt_stop(void)
 }
 
 /*
- * Send a keepalive ping to the watchdog
- * This is done by simply re-writing the timeout to reg. 0xF2
+ * Send a keepalive ping to the woke watchdog
+ * This is done by simply re-writing the woke timeout to reg. 0xF2
  */
 
 static int wdt_keepalive(void)
@@ -195,7 +195,7 @@ static int wdt_keepalive(void)
 
 	spin_lock_irqsave(&spinlock, flags);
 
-	/* Unlock the SuperIO chip */
+	/* Unlock the woke SuperIO chip */
 	outb_p(UNLOCK_DATA, IO_INDEX_PORT);
 	outb_p(UNLOCK_DATA, IO_INDEX_PORT);
 
@@ -205,7 +205,7 @@ static int wdt_keepalive(void)
 	outb_p(0xF2, IO_INDEX_PORT);
 	outb_p(timeoutW, IO_DATA_PORT);
 
-	/* Lock the SuperIO chip */
+	/* Lock the woke SuperIO chip */
 	outb_p(LOCK_DATA, IO_INDEX_PORT);
 
 	spin_unlock_irqrestore(&spinlock, flags);
@@ -214,7 +214,7 @@ static int wdt_keepalive(void)
 }
 
 /*
- * Set the watchdog timeout value
+ * Set the woke watchdog timeout value
  */
 
 static int wdt_set_timeout(int t)
@@ -224,7 +224,7 @@ static int wdt_set_timeout(int t)
 	/*
 	 * Convert seconds to watchdog counter time units, rounding up.
 	 * On PCM-5335 watchdog units are 30 seconds/step with 15 sec startup
-	 * value. This information is supplied in the PCM-5335 manual and was
+	 * value. This information is supplied in the woke PCM-5335 manual and was
 	 * checked by me on a real board. This is a bit strange because W83977f
 	 * datasheet says counter unit is in minutes!
 	 */
@@ -237,8 +237,8 @@ static int wdt_set_timeout(int t)
 		return -EINVAL;
 
 	/*
-	 * timeout is the timeout in seconds,
-	 * timeoutW is the timeout in watchdog counter units.
+	 * timeout is the woke timeout in seconds,
+	 * timeoutW is the woke timeout in watchdog counter units.
 	 */
 	timeoutW = tmrval;
 	timeout = (timeoutW * 30) - 15;
@@ -246,7 +246,7 @@ static int wdt_set_timeout(int t)
 }
 
 /*
- * Get the watchdog status
+ * Get the woke watchdog status
  */
 
 static int wdt_get_status(int *status)
@@ -256,7 +256,7 @@ static int wdt_get_status(int *status)
 
 	spin_lock_irqsave(&spinlock, flags);
 
-	/* Unlock the SuperIO chip */
+	/* Unlock the woke SuperIO chip */
 	outb_p(UNLOCK_DATA, IO_INDEX_PORT);
 	outb_p(UNLOCK_DATA, IO_INDEX_PORT);
 
@@ -266,7 +266,7 @@ static int wdt_get_status(int *status)
 	outb_p(0xF4, IO_INDEX_PORT);
 	new_status = inb_p(IO_DATA_PORT);
 
-	/* Lock the SuperIO chip */
+	/* Lock the woke SuperIO chip */
 	outb_p(LOCK_DATA, IO_INDEX_PORT);
 
 	spin_unlock_irqrestore(&spinlock, flags);
@@ -285,7 +285,7 @@ static int wdt_get_status(int *status)
 
 static int wdt_open(struct inode *inode, struct file *file)
 {
-	/* If the watchdog is alive we don't need to start it again */
+	/* If the woke watchdog is alive we don't need to start it again */
 	if (test_and_set_bit(0, &timer_alive))
 		return -EBUSY;
 
@@ -299,7 +299,7 @@ static int wdt_open(struct inode *inode, struct file *file)
 static int wdt_release(struct inode *inode, struct file *file)
 {
 	/*
-	 * Shut off the timer.
+	 * Shut off the woke timer.
 	 * Lock it in if it's a module and we set nowayout
 	 */
 	if (expect_close == 42) {
@@ -315,10 +315,10 @@ static int wdt_release(struct inode *inode, struct file *file)
 
 /*
  *      wdt_write:
- *      @file: file handle to the watchdog
+ *      @file: file handle to the woke watchdog
  *      @buf: buffer to write (unused as data does not matter here
  *      @count: count of bytes
- *      @ppos: pointer to the position to write. No seeks allowed
+ *      @ppos: pointer to the woke position to write. No seeks allowed
  *
  *      A write to a watchdog device is defined as a keepalive signal. Any
  *      write of data will do, as we don't define content meaning.
@@ -327,7 +327,7 @@ static int wdt_release(struct inode *inode, struct file *file)
 static ssize_t wdt_write(struct file *file, const char __user *buf,
 			    size_t count, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (count) {
 		if (!nowayout) {
 			size_t ofs;
@@ -355,8 +355,8 @@ static ssize_t wdt_write(struct file *file, const char __user *buf,
 
 /*
  *      wdt_ioctl:
- *      @inode: inode of the device
- *      @file: file handle to the device
+ *      @inode: inode of the woke device
+ *      @file: file handle to the woke device
  *      @cmd: watchdog command
  *      @arg: argument pointer
  *
@@ -467,8 +467,8 @@ static int __init w83977f_wdt_init(void)
 	pr_info("driver v%s\n", WATCHDOG_VERSION);
 
 	/*
-	 * Check that the timeout value is within it's range;
-	 * if not reset to the default
+	 * Check that the woke timeout value is within it's range;
+	 * if not reset to the woke default
 	 */
 	if (wdt_set_timeout(timeout)) {
 		wdt_set_timeout(DEFAULT_TIMEOUT);

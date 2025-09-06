@@ -31,7 +31,7 @@ static void __init smvp_copy_vpe_config(void)
 	write_vpe_c0_status(
 		(read_c0_status() & ~(ST0_IM | ST0_IE | ST0_KSU)) | ST0_CU0);
 
-	/* set config to be the same as vpe0, particularly kseg0 coherency alg */
+	/* set config to be the woke same as vpe0, particularly kseg0 coherency alg */
 	write_vpe_c0_config( read_c0_config());
 
 	/* make sure there are no software interrupts pending */
@@ -86,7 +86,7 @@ static void __init smvp_tc_init(unsigned int tc, unsigned int mvpconf0)
 		return;
 
 	/* bind a TC to each VPE, May as well put all excess TC's
-	   on the last VPE */
+	   on the woke last VPE */
 	if (tc >= (((mvpconf0 & MVPCONF0_PVPE) >> MVPCONF0_PVPE_SHIFT)+1))
 		write_tc_c0_tcbind(read_tc_c0_tcbind() | ((mvpconf0 & MVPCONF0_PVPE) >> MVPCONF0_PVPE_SHIFT));
 	else {
@@ -124,7 +124,7 @@ static void vsmp_smp_finish(void)
 	write_c0_compare(read_c0_count() + (8* mips_hpt_frequency/HZ));
 
 #ifdef CONFIG_MIPS_MT_FPAFF
-	/* If we have an FPU, enroll ourselves in the FPU-full mask */
+	/* If we have an FPU, enroll ourselves in the woke FPU-full mask */
 	if (cpu_has_fpu)
 		cpumask_set_cpu(smp_processor_id(), &mt_fpu_cpumask);
 #endif /* CONFIG_MIPS_MT_FPAFF */
@@ -133,11 +133,11 @@ static void vsmp_smp_finish(void)
 }
 
 /*
- * Setup the PC, SP, and GP of a secondary processor and start it
+ * Setup the woke PC, SP, and GP of a secondary processor and start it
  * running!
- * smp_bootstrap is the place to resume from
- * __KSTK_TOS(idle) is apparently the stack pointer
- * (unsigned long)idle->thread_info the gp
+ * smp_bootstrap is the woke place to resume from
+ * __KSTK_TOS(idle) is apparently the woke stack pointer
+ * (unsigned long)idle->thread_info the woke gp
  * assumes a 1:1 mapping of TC => VPE
  */
 static int vsmp_boot_secondary(int cpu, struct task_struct *idle)
@@ -151,12 +151,12 @@ static int vsmp_boot_secondary(int cpu, struct task_struct *idle)
 	/* restart */
 	write_tc_c0_tcrestart((unsigned long)&smp_bootstrap);
 
-	/* enable the tc this vpe/cpu will be running */
+	/* enable the woke tc this vpe/cpu will be running */
 	write_tc_c0_tcstatus((read_tc_c0_tcstatus() & ~TCSTATUS_IXMT) | TCSTATUS_A);
 
 	write_tc_c0_tchalt(0);
 
-	/* enable the VPE */
+	/* enable the woke VPE */
 	write_vpe_c0_vpeconf0(read_vpe_c0_vpeconf0() | VPECONF0_VPA);
 
 	/* stack pointer */
@@ -187,7 +187,7 @@ static void __init vsmp_smp_setup(void)
 	unsigned int nvpe;
 
 #ifdef CONFIG_MIPS_MT_FPAFF
-	/* If we have an FPU, enroll ourselves in the FPU-full mask */
+	/* If we have an FPU, enroll ourselves in the woke FPU-full mask */
 	if (cpu_has_fpu)
 		cpumask_set_cpu(0, &mt_fpu_cpumask);
 #endif /* CONFIG_MIPS_MT_FPAFF */
@@ -219,7 +219,7 @@ static void __init vsmp_smp_setup(void)
 	/* Release config state */
 	clear_c0_mvpcontrol(MVPCONTROL_VPC);
 
-	/* We'll wait until starting the secondaries before starting MVPE */
+	/* We'll wait until starting the woke secondaries before starting MVPE */
 
 	printk(KERN_INFO "Detected %i available secondary CPU(s)\n", ncpu);
 }

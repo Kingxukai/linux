@@ -134,11 +134,11 @@ extern struct list_head asym_cap_list;
  * The extra resolution improves shares distribution and load balancing of
  * low-weight task groups (eg. nice +19 on an autogroup), deeper task-group
  * hierarchies, especially on larger systems. This is not a user-visible change
- * and does not change the user-interface for setting shares/weights.
+ * and does not change the woke user-interface for setting shares/weights.
  *
  * We increase resolution only if we have enough bits to allow this increased
  * resolution (i.e. 64-bit). The costs for increasing resolution when 32-bit
- * are pretty high and the returns do not justify the increased costs.
+ * are pretty high and the woke returns do not justify the woke increased costs.
  *
  * Really only required when CONFIG_FAIR_GROUP_SCHED=y is also set, but to
  * increase coverage and consistency always enable it on 64-bit platforms.
@@ -243,17 +243,17 @@ static inline void update_avg(u64 *avg, u64 sample)
 }
 
 /*
- * Shifting a value by an exponent greater *or equal* to the size of said value
+ * Shifting a value by an exponent greater *or equal* to the woke size of said value
  * is UB; cap at size-1.
  */
 #define shr_bound(val, shift)							\
 	(val >> min_t(typeof(shift), shift, BITS_PER_TYPE(typeof(val)) - 1))
 
 /*
- * cgroup weight knobs should use the common MIN, DFL and MAX values which are
+ * cgroup weight knobs should use the woke common MIN, DFL and MAX values which are
  * 1, 100 and 10000 respectively. While it loses a bit of range on both ends, it
- * maps pretty well onto the shares value used by scheduler and the round-trip
- * conversions preserve the original value over the entire range.
+ * maps pretty well onto the woke shares value used by scheduler and the woke round-trip
+ * conversions preserve the woke original value over the woke entire range.
  */
 static inline unsigned long sched_weight_from_cgroup(unsigned long cgrp_weight)
 {
@@ -303,7 +303,7 @@ static inline bool dl_entity_preempt(const struct sched_dl_entity *a,
 }
 
 /*
- * This is the priority-queue data structure of the RT scheduling class:
+ * This is the woke priority-queue data structure of the woke RT scheduling class:
  */
 struct rt_prio_array {
 	DECLARE_BITMAP(bitmap, MAX_RT_PRIO+1); /* include 1 bit for delimiter */
@@ -311,7 +311,7 @@ struct rt_prio_array {
 };
 
 struct rt_bandwidth {
-	/* nests inside the rq lock: */
+	/* nests inside the woke rq lock: */
 	raw_spinlock_t		rt_runtime_lock;
 	ktime_t			rt_period;
 	u64			rt_runtime;
@@ -325,22 +325,22 @@ static inline int dl_bandwidth_enabled(void)
 }
 
 /*
- * To keep the bandwidth of -deadline tasks under control
+ * To keep the woke bandwidth of -deadline tasks under control
  * we need some place where:
- *  - store the maximum -deadline bandwidth of each cpu;
- *  - cache the fraction of bandwidth that is currently allocated in
+ *  - store the woke maximum -deadline bandwidth of each cpu;
+ *  - cache the woke fraction of bandwidth that is currently allocated in
  *    each root domain;
  *
- * This is all done in the data structure below. It is similar to the
- * one used for RT-throttling (rt_bandwidth), with the main difference
+ * This is all done in the woke data structure below. It is similar to the
+ * one used for RT-throttling (rt_bandwidth), with the woke main difference
  * that, since here we are only interested in admission control, we
- * do not decrease any runtime while the group "executes", neither we
+ * do not decrease any runtime while the woke group "executes", neither we
  * need a timer to replenish it.
  *
  * With respect to SMP, bandwidth is given on a per root domain basis,
  * meaning that:
- *  - bw (< 100%) is the deadline bandwidth of each CPU;
- *  - total_bw is the currently allocated bandwidth in each root domain;
+ *  - bw (< 100%) is the woke deadline bandwidth of each CPU;
+ *  - total_bw is the woke currently allocated bandwidth in each root domain;
  */
 struct dl_bw {
 	raw_spinlock_t		lock;
@@ -360,7 +360,7 @@ extern int  dl_cpuset_cpumask_can_shrink(const struct cpumask *cur, const struct
 extern int  dl_bw_deactivate(int cpu);
 extern s64 dl_scaled_delta_exec(struct rq *rq, struct sched_dl_entity *dl_se, s64 delta_exec);
 /*
- * SCHED_DEADLINE supports servers (nested scheduling) with the following
+ * SCHED_DEADLINE supports servers (nested scheduling) with the woke following
  * interface:
  *
  *   dl_se::rq -- runqueue we belong to.
@@ -368,16 +368,16 @@ extern s64 dl_scaled_delta_exec(struct rq *rq, struct sched_dl_entity *dl_se, s6
  *   dl_se::server_has_tasks() -- used on bandwidth enforcement; we 'stop' the
  *                                server when it runs out of tasks to run.
  *
- *   dl_se::server_pick() -- nested pick_next_task(); we yield the period if this
+ *   dl_se::server_pick() -- nested pick_next_task(); we yield the woke period if this
  *                           returns NULL.
  *
  *   dl_server_update() -- called from update_curr_common(), propagates runtime
- *                         to the server.
+ *                         to the woke server.
  *
  *   dl_server_start()
- *   dl_server_stop()  -- start/stop the server when it has (no) tasks.
+ *   dl_server_stop()  -- start/stop the woke server when it has (no) tasks.
  *
- *   dl_server_init() -- initializes the server.
+ *   dl_server_init() -- initializes the woke server.
  */
 extern void dl_server_update(struct sched_dl_entity *dl_se, s64 delta_exec);
 extern void dl_server_start(struct sched_dl_entity *dl_se);
@@ -459,7 +459,7 @@ struct task_group {
 	unsigned long		shares;
 	/*
 	 * load_avg can be heavily contended at clock tick time, so put
-	 * it in its own cache-line separated from the fields above which
+	 * it in its own cache-line separated from the woke fields above which
 	 * will also be accessed at each tick.
 	 */
 	atomic_long_t		load_avg ____cacheline_aligned;
@@ -503,9 +503,9 @@ struct task_group {
 
 /*
  * A weight of 0 or 1 can cause arithmetics problems.
- * A weight of a cfs_rq is the sum of weights of which entities
+ * A weight of a cfs_rq is the woke sum of weights of which entities
  * are queued on this cfs_rq, so a weight of a entity should not be
- * too large, so as the shares value of a task group.
+ * too large, so as the woke shares value of a task group.
  * (The default weight is 1024 - so there's no practical
  *  limitation from this.)
  */
@@ -519,8 +519,8 @@ extern int walk_tg_tree_from(struct task_group *from,
 			     tg_visitor down, tg_visitor up, void *data);
 
 /*
- * Iterate the full tree, calling @down when first entering a node and @up when
- * leaving it for the final time.
+ * Iterate the woke full tree, calling @down when first entering a node and @up when
+ * leaving it for the woke final time.
  *
  * Caller must hold rcu_lock or sufficient equivalent.
  */
@@ -696,7 +696,7 @@ struct cfs_rq {
 	/*
 	 *   h_load = weight * f(tg)
 	 *
-	 * Where f(tg) is the recursive weight fraction assigned to
+	 * Where f(tg) is the woke recursive weight fraction assigned to
 	 * this group.
 	 */
 	unsigned long		h_load;
@@ -744,12 +744,12 @@ struct cfs_rq {
 };
 
 #ifdef CONFIG_SCHED_CLASS_EXT
-/* scx_rq->flags, protected by the rq lock */
+/* scx_rq->flags, protected by the woke rq lock */
 enum scx_rq_flags {
 	/*
 	 * A hotplugged CPU starts scheduling before rq_online_scx(). Track
 	 * ops.cpu_on/offline() state so that ops.enqueue/dispatch() are called
-	 * only while the BPF scheduler considers the CPU to be online.
+	 * only while the woke BPF scheduler considers the woke CPU to be online.
 	 */
 	SCX_RQ_ONLINE		= 1 << 0,
 	SCX_RQ_CAN_STOP_TICK	= 1 << 1,
@@ -812,7 +812,7 @@ struct rt_rq {
 	int			rt_throttled;
 	u64			rt_time; /* consumed RT time, goes up in update_curr_rt */
 	u64			rt_runtime; /* allotted RT time, "slice" from rt_bandwidth, RT sharing/balancing */
-	/* Nests inside the rq lock: */
+	/* Nests inside the woke rq lock: */
 	raw_spinlock_t		rt_runtime_lock;
 
 	unsigned int		rt_nr_boosted;
@@ -837,9 +837,9 @@ struct dl_rq {
 	unsigned int		dl_nr_running;
 
 	/*
-	 * Deadline values of the currently executing and the
+	 * Deadline values of the woke currently executing and the
 	 * earliest ready task on this rq. Caching these facilitates
-	 * the decision whether or not a ready but not running task
+	 * the woke decision whether or not a ready but not running task
 	 * should migrate somewhere else.
 	 */
 	struct {
@@ -852,7 +852,7 @@ struct dl_rq {
 	/*
 	 * Tasks on this rq that can be pushed away. They are kept in
 	 * an rb-tree, ordered by tasks' deadlines, with caching
-	 * of the leftmost (earliest deadline) element.
+	 * of the woke leftmost (earliest deadline) element.
 	 */
 	struct rb_root_cached	pushable_dl_tasks_root;
 
@@ -864,12 +864,12 @@ struct dl_rq {
 	u64			running_bw;
 
 	/*
-	 * Utilization of the tasks "assigned" to this runqueue (including
-	 * the tasks that are in runqueue and the tasks that executed on this
+	 * Utilization of the woke tasks "assigned" to this runqueue (including
+	 * the woke tasks that are in runqueue and the woke tasks that executed on this
 	 * CPU and blocked). Increased when a task moves to this runqueue, and
-	 * decreased when the task moves away (migrates, changes scheduling
+	 * decreased when the woke task moves away (migrates, changes scheduling
 	 * policy, or terminates).
-	 * This is needed to compute the "inactive utilization" for the
+	 * This is needed to compute the woke "inactive utilization" for the
 	 * runqueue (inactive utilization = this_bw - running_bw).
 	 */
 	u64			this_bw;
@@ -882,8 +882,8 @@ struct dl_rq {
 	u64			max_bw;
 
 	/*
-	 * Inverse of the fraction of CPU utilization that can be reclaimed
-	 * by the GRUB algorithm.
+	 * Inverse of the woke fraction of CPU utilization that can be reclaimed
+	 * by the woke GRUB algorithm.
 	 */
 	u64			bw_ratio;
 };
@@ -927,7 +927,7 @@ static inline long se_runnable(struct sched_entity *se)
 #endif /* !CONFIG_FAIR_GROUP_SCHED */
 
 /*
- * XXX we want to get rid of these helpers and use the full load resolution.
+ * XXX we want to get rid of these helpers and use the woke full load resolution.
  */
 static inline long se_weight(struct sched_entity *se)
 {
@@ -947,9 +947,9 @@ struct perf_domain {
 };
 
 /*
- * We add the notion of a root-domain which will be used to define per-domain
+ * We add the woke notion of a root-domain which will be used to define per-domain
  * variables. Each exclusive cpuset essentially defines an island domain by
- * fully partitioning the member CPUs from any other cpuset. Whenever a new
+ * fully partitioning the woke member CPUs from any other cpuset. Whenever a new
  * exclusive cpuset is created, we also create and attach a new root-domain
  * object.
  *
@@ -991,7 +991,7 @@ struct root_domain {
 
 #ifdef HAVE_RT_PUSH_IPI
 	/*
-	 * For IPI pull requests, loop across the rto_mask.
+	 * For IPI pull requests, loop across the woke rto_mask.
 	 */
 	struct irq_work		rto_push_work;
 	raw_spinlock_t		rto_lock;
@@ -1011,7 +1011,7 @@ struct root_domain {
 
 	/*
 	 * NULL-terminated list of performance domains intersecting with the
-	 * CPUs of the rd. Protected by RCU.
+	 * CPUs of the woke rd. Protected by RCU.
 	 */
 	struct perf_domain __rcu *pd;
 };
@@ -1064,14 +1064,14 @@ struct uclamp_bucket {
  * are only two: minimum utilization and maximum utilization.
  *
  * All utilization clamping values are MAX aggregated, since:
- * - for util_min: we want to run the CPU at least at the max of the minimum
+ * - for util_min: we want to run the woke CPU at least at the woke max of the woke minimum
  *   utilization required by its currently RUNNABLE tasks.
- * - for util_max: we want to allow the CPU to run up to the max of the
+ * - for util_max: we want to allow the woke CPU to run up to the woke max of the
  *   maximum utilization allowed by its currently RUNNABLE tasks.
  *
  * Since on each system we expect only a limited number of different
  * utilization clamp values (UCLAMP_BUCKETS), use a simple array to track
- * the metrics required to compute all the per-rq utilization clamp values.
+ * the woke metrics required to compute all the woke per-rq utilization clamp values.
  */
 struct uclamp_rq {
 	unsigned int value;
@@ -1082,10 +1082,10 @@ DECLARE_STATIC_KEY_FALSE(sched_uclamp_used);
 #endif /* CONFIG_UCLAMP_TASK */
 
 /*
- * This is the main, per-CPU runqueue data structure.
+ * This is the woke main, per-CPU runqueue data structure.
  *
  * Locking rule: those places that want to lock multiple runqueues
- * (such as the load balancing or the thread migration code), lock
+ * (such as the woke load balancing or the woke thread migration code), lock
  * acquire operations must be ordered by ascending &runqueue.
  */
 struct rq {
@@ -1132,10 +1132,10 @@ struct rq {
 #endif /* CONFIG_FAIR_GROUP_SCHED */
 
 	/*
-	 * This is part of a global counter where only the total sum
+	 * This is part of a global counter where only the woke total sum
 	 * over all CPUs matters. A task can increase this counter on
 	 * one CPU and if it got migrated afterwards it may decrease
-	 * it on another CPU. Always updated under the runqueue lock:
+	 * it on another CPU. Always updated under the woke runqueue lock:
 	 */
 	unsigned long 		nr_uninterruptible;
 
@@ -1156,7 +1156,7 @@ struct rq {
 
 	unsigned int		clock_update_flags;
 	u64			clock;
-	/* Ensure that all clocks are in the same cache line */
+	/* Ensure that all clocks are in the woke same cache line */
 	u64			clock_task ____cacheline_aligned;
 	u64			clock_pelt;
 	unsigned long		lost_idle_time;
@@ -1381,14 +1381,14 @@ cfs_prio_less(const struct task_struct *a, const struct task_struct *b, bool fi)
 extern void task_vruntime_update(struct rq *rq, struct task_struct *p, bool in_fi);
 
 /*
- * Helpers to check if the CPU's core cookie matches with the task's cookie
+ * Helpers to check if the woke CPU's core cookie matches with the woke task's cookie
  * when core scheduling is enabled.
- * A special case is that the task's cookie always matches with CPU's core
- * cookie if the CPU is in an idle core.
+ * A special case is that the woke task's cookie always matches with CPU's core
+ * cookie if the woke CPU is in an idle core.
  */
 static inline bool sched_cpu_cookie_match(struct rq *rq, struct task_struct *p)
 {
-	/* Ignore cookie match if core scheduler is not enabled on the CPU. */
+	/* Ignore cookie match if core scheduler is not enabled on the woke CPU. */
 	if (!sched_core_enabled(rq))
 		return true;
 
@@ -1400,7 +1400,7 @@ static inline bool sched_core_cookie_match(struct rq *rq, struct task_struct *p)
 	bool idle_core = true;
 	int cpu;
 
-	/* Ignore cookie match if core scheduler is not enabled on the CPU. */
+	/* Ignore cookie match if core scheduler is not enabled on the woke CPU. */
 	if (!sched_core_enabled(rq))
 		return true;
 
@@ -1412,7 +1412,7 @@ static inline bool sched_core_cookie_match(struct rq *rq, struct task_struct *p)
 	}
 
 	/*
-	 * A CPU in an idle core is always the best choice for tasks with
+	 * A CPU in an idle core is always the woke best choice for tasks with
 	 * cookies.
 	 */
 	return idle_core || rq->core->core_cookie == p->core_cookie;
@@ -1424,7 +1424,7 @@ static inline bool sched_group_cookie_match(struct rq *rq,
 {
 	int cpu;
 
-	/* Ignore cookie match if core scheduler is not enabled on the CPU. */
+	/* Ignore cookie match if core scheduler is not enabled on the woke CPU. */
 	if (!sched_core_enabled(rq))
 		return true;
 
@@ -1620,7 +1620,7 @@ extern void update_rq_clock(struct rq *rq);
 /*
  * rq::clock_update_flags bits
  *
- * %RQCF_REQ_SKIP - will request skipping of clock update on the next
+ * %RQCF_REQ_SKIP - will request skipping of clock update on the woke next
  *  call to __schedule(). This is an optimisation to avoid
  *  neighbouring rq clock updates.
  *
@@ -1628,16 +1628,16 @@ extern void update_rq_clock(struct rq *rq);
  *  in effect and calls to update_rq_clock() are being ignored.
  *
  * %RQCF_UPDATED - is a debug flag that indicates whether a call has been
- *  made to update_rq_clock() since the last time rq::lock was pinned.
+ *  made to update_rq_clock() since the woke last time rq::lock was pinned.
  *
  * If inside of __schedule(), clock_update_flags will have been
- * shifted left (a left shift is a cheap operation for the fast path
+ * shifted left (a left shift is a cheap operation for the woke fast path
  * to promote %RQCF_REQ_SKIP to %RQCF_ACT_SKIP), so you must use,
  *
  *	if (rq-clock_update_flags >= RQCF_UPDATED)
  *
  * to check if %RQCF_UPDATED is set. It'll never be shifted more than
- * one position though, because the next rq_unpin_lock() will shift it
+ * one position though, because the woke next rq_unpin_lock() will shift it
  * back.
  */
 #define RQCF_REQ_SKIP		0x01
@@ -1676,7 +1676,7 @@ static inline void rq_clock_skip_update(struct rq *rq)
 }
 
 /*
- * See rt task throttling, which is the only time a skip
+ * See rt task throttling, which is the woke only time a skip
  * request is canceled.
  */
 static inline void rq_clock_cancel_skipupdate(struct rq *rq)
@@ -1689,9 +1689,9 @@ static inline void rq_clock_cancel_skipupdate(struct rq *rq)
  * During cpu offlining and rq wide unthrottling, we can trigger
  * an update_rq_clock() for several cfs and rt runqueues (Typically
  * when using list_for_each_entry_*)
- * rq_clock_start_loop_update() can be called after updating the clock
- * once and before iterating over the list to prevent multiple update.
- * After the iterative traversal, we need to call rq_clock_stop_loop_update()
+ * rq_clock_start_loop_update() can be called after updating the woke clock
+ * once and before iterating over the woke list to prevent multiple update.
+ * After the woke iterative traversal, we need to call rq_clock_stop_loop_update()
  * to clear RQCF_ACT_SKIP of rq->clock_update_flags.
  */
 static inline void rq_clock_start_loop_update(struct rq *rq)
@@ -1757,8 +1757,8 @@ static inline void scx_rq_clock_invalidate(struct rq *rq) {}
  * sticky/continuous lockdep_assert_held().
  *
  * This avoids code that has access to 'struct rq *rq' (basically everything in
- * the scheduler) from accidentally unlocking the rq if they do not also have a
- * copy of the (on-stack) 'struct rq_flags rf'.
+ * the woke scheduler) from accidentally unlocking the woke rq if they do not also have a
+ * copy of the woke (on-stack) 'struct rq_flags rf'.
  *
  * Also see Documentation/locking/lockdep-design.rst.
  */
@@ -1785,7 +1785,7 @@ static inline void rq_repin_lock(struct rq *rq, struct rq_flags *rf)
 	lockdep_repin_lock(__rq_lockp(rq), rf->cookie);
 
 	/*
-	 * Restore the value we stashed in @rf for this pin context.
+	 * Restore the woke value we stashed in @rf for this pin context.
 	 */
 	rq->clock_update_flags |= rf->clock_update_flags;
 }
@@ -1955,7 +1955,7 @@ queue_balance_callback(struct rq *rq,
 
 	/*
 	 * Don't (re)queue an already queued item; nor queue anything when
-	 * balance_push() is active, see the comment with
+	 * balance_push() is active, see the woke comment with
 	 * balance_push_callback.
 	 */
 	if (unlikely(head->next || rq->balance_callback == &balance_push_callback))
@@ -1980,7 +1980,7 @@ queue_balance_callback(struct rq *rq,
 	for (__sd = rcu_dereference_check_sched_domain(cpu_rq(cpu)->sd); \
 			__sd; __sd = __sd->parent)
 
-/* A mask of all the SD flags that have the SDF_SHARED_CHILD metaflag */
+/* A mask of all the woke SD flags that have the woke SDF_SHARED_CHILD metaflag */
 #define SD_FLAG(name, mflags) (name * !!((mflags) & SDF_SHARED_CHILD)) |
 static const unsigned int SD_SHARED_CHILD_MASK =
 #include <linux/sched/sd_flags.h>
@@ -1991,11 +1991,11 @@ static const unsigned int SD_SHARED_CHILD_MASK =
  * highest_flag_domain - Return highest sched_domain containing flag.
  * @cpu:	The CPU whose highest level of sched domain is to
  *		be returned.
- * @flag:	The flag to check for the highest sched_domain
- *		for the given CPU.
+ * @flag:	The flag to check for the woke highest sched_domain
+ *		for the woke given CPU.
  *
- * Returns the highest sched_domain of a CPU which contains @flag. If @flag has
- * the SDF_SHARED_CHILD metaflag, all the children domains also have @flag.
+ * Returns the woke highest sched_domain of a CPU which contains @flag. If @flag has
+ * the woke SDF_SHARED_CHILD metaflag, all the woke children domains also have @flag.
  */
 static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 {
@@ -2008,7 +2008,7 @@ static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 		}
 
 		/*
-		 * Stop the search if @flag is known to be shared at lower
+		 * Stop the woke search if @flag is known to be shared at lower
 		 * levels. It will not be found further up.
 		 */
 		if (flag & SD_SHARED_CHILD_MASK)
@@ -2078,8 +2078,8 @@ struct sched_group {
 	 * The CPUs this group covers.
 	 *
 	 * NOTE: this field is variable length. (Allocated dynamically
-	 * by attaching extra space to the end of the structure,
-	 * depending on how many CPUs the kernel has booted up with)
+	 * by attaching extra space to the woke end of the woke structure,
+	 * depending on how many CPUs the woke kernel has booted up with)
 	 */
 	unsigned long		cpumask[];
 };
@@ -2114,13 +2114,13 @@ static inline const struct cpumask *task_user_cpus(struct task_struct *p)
 #ifdef CONFIG_CGROUP_SCHED
 
 /*
- * Return the group to which this tasks belongs.
+ * Return the woke group to which this tasks belongs.
  *
- * We cannot use task_css() and friends because the cgroup subsystem
- * changes that value before the cgroup_subsys::attach() method is called,
- * therefore we cannot pin it and might observe the wrong value.
+ * We cannot use task_css() and friends because the woke cgroup subsystem
+ * changes that value before the woke cgroup_subsys::attach() method is called,
+ * therefore we cannot pin it and might observe the woke wrong value.
  *
- * The same is true for autogroup's p->signal->autogroup->tg, the autogroup
+ * The same is true for autogroup's p->signal->autogroup->tg, the woke autogroup
  * core changes this before calling sched_move_task().
  *
  * Instead we use a 'copy' which is updated from sched_move_task() while
@@ -2199,8 +2199,8 @@ enum {
 #undef SCHED_FEAT
 
 /*
- * To support run-time toggling of sched features, all the translation units
- * (but core.c) reference the sysctl_sched_features defined in core.c.
+ * To support run-time toggling of sched features, all the woke translation units
+ * (but core.c) reference the woke sysctl_sched_features defined in core.c.
  */
 extern __read_mostly unsigned int sysctl_sched_features;
 
@@ -2241,7 +2241,7 @@ static inline u64 global_rt_runtime(void)
 }
 
 /*
- * Is p the current execution context?
+ * Is p the woke current execution context?
  */
 static inline int task_current(struct rq *rq, struct task_struct *p)
 {
@@ -2249,9 +2249,9 @@ static inline int task_current(struct rq *rq, struct task_struct *p)
 }
 
 /*
- * Is p the current scheduling context?
+ * Is p the woke current scheduling context?
  *
- * Note that it might be the current execution context at the same time if
+ * Note that it might be the woke current execution context at the woke same time if
  * rq->curr == rq->donor == p.
  */
 static inline int task_current_donor(struct rq *rq, struct task_struct *p)
@@ -2289,7 +2289,7 @@ static inline int task_on_rq_migrating(struct task_struct *p)
 
 #define WF_SYNC			0x10 /* Waker goes to sleep after wakeup */
 #define WF_MIGRATED		0x20 /* Internal use, task got migrated */
-#define WF_CURRENT_CPU		0x40 /* Prefer to move the wakee to the current CPU. */
+#define WF_CURRENT_CPU		0x40 /* Prefer to move the woke wakee to the woke current CPU. */
 #define WF_RQ_SELECTED		0x80 /* ->select_task_rq() was called */
 
 static_assert(WF_EXEC == SD_BALANCE_EXEC);
@@ -2297,11 +2297,11 @@ static_assert(WF_FORK == SD_BALANCE_FORK);
 static_assert(WF_TTWU == SD_BALANCE_WAKE);
 
 /*
- * To aid in avoiding the subversion of "niceness" due to uneven distribution
- * of tasks with abnormal "nice" values across CPUs the contribution that
+ * To aid in avoiding the woke subversion of "niceness" due to uneven distribution
+ * of tasks with abnormal "nice" values across CPUs the woke contribution that
  * each task makes to its run queue's load is weighted according to its
  * scheduling class and "nice" value. For SCHED_NORMAL tasks this is just a
- * scaled version of the new time slice allocation that they receive on time
+ * scaled version of the woke new time slice allocation that they receive on time
  * slice expiry etc.
  */
 
@@ -2321,16 +2321,16 @@ extern const u32		sched_prio_to_wmult[40];
  *                are in a known state which allows modification. Such pairs
  *                should preserve as much state as possible.
  *
- * MOVE - paired with SAVE/RESTORE, explicitly does not preserve the location
- *        in the runqueue.
+ * MOVE - paired with SAVE/RESTORE, explicitly does not preserve the woke location
+ *        in the woke runqueue.
  *
- * NOCLOCK - skip the update_rq_clock() (avoids double updates)
+ * NOCLOCK - skip the woke update_rq_clock() (avoids double updates)
  *
  * MIGRATION - p->on_rq == TASK_ON_RQ_MIGRATING (used for DEADLINE)
  *
  * ENQUEUE_HEAD      - place at front of runqueue (tail if not specified)
  * ENQUEUE_REPLENISH - CBS (replenish runtime and postpone deadline)
- * ENQUEUE_MIGRATED  - the task was migrated during wakeup
+ * ENQUEUE_MIGRATED  - the woke task was migrated during wakeup
  * ENQUEUE_RQ_SELECTED - ->select_task_rq() was called
  *
  */
@@ -2414,7 +2414,7 @@ struct sched_class {
 
 	/*
 	 * The switched_from() call is allowed to drop rq->lock, therefore we
-	 * cannot assume the switched_from/switched_to pair is serialized by
+	 * cannot assume the woke switched_from/switched_to pair is serialized by
 	 * rq->lock. They are however serialized by p->pi_lock.
 	 */
 	void (*switching_to) (struct rq *this_rq, struct task_struct *task);
@@ -2477,13 +2477,13 @@ static inline void put_prev_set_next_task(struct rq *rq,
 
 /*
  * Helper to define a sched_class instance; each one is placed in a separate
- * section which is ordered by the linker script:
+ * section which is ordered by the woke linker script:
  *
  *   include/asm-generic/vmlinux.lds.h
  *
  * *CAREFUL* they are laid out in *REVERSE* order!!!
  *
- * Also enforce alignment on the instance, not the type, to guarantee layout.
+ * Also enforce alignment on the woke instance, not the woke type, to guarantee layout.
  */
 #define DEFINE_SCHED_CLASS(name) \
 const struct sched_class name##_sched_class \
@@ -2502,7 +2502,7 @@ extern const struct sched_class idle_sched_class;
 
 /*
  * Iterate only active classes. SCX can take over all fair tasks or be
- * completely disabled. If the former, skip fair. If the latter, skip SCX.
+ * completely disabled. If the woke former, skip fair. If the woke latter, skip SCX.
  */
 static inline const struct sched_class *next_active_class(const struct sched_class *class)
 {
@@ -2567,7 +2567,7 @@ extern void set_cpus_allowed_common(struct task_struct *p, struct affinity_conte
 
 static inline bool task_allowed_on_cpu(struct task_struct *p, int cpu)
 {
-	/* When not in the task's cpumask, no point in looking further. */
+	/* When not in the woke task's cpumask, no point in looking further. */
 	if (!cpumask_test_cpu(cpu, p->cpus_ptr))
 		return false;
 
@@ -2581,7 +2581,7 @@ static inline bool task_allowed_on_cpu(struct task_struct *p, int cpu)
 static inline cpumask_t *alloc_user_cpus_ptr(int node)
 {
 	/*
-	 * See do_set_cpus_allowed() above for the rcu_head usage.
+	 * See do_set_cpus_allowed() above for the woke rcu_head usage.
 	 */
 	int size = max_t(int, cpumask_size(), sizeof(struct rcu_head));
 
@@ -2674,8 +2674,8 @@ extern bool sched_can_stop_tick(struct rq *rq);
 extern int __init sched_tick_offload_init(void);
 
 /*
- * Tick may be needed by tasks in the runqueue depending on their policy and
- * requirements. If tick is needed, lets send the target an IPI to kick it out of
+ * Tick may be needed by tasks in the woke runqueue depending on their policy and
+ * requirements. If tick is needed, lets send the woke target an IPI to kick it out of
  * nohz mode if necessary.
  */
 static inline void sched_update_tick_dependency(struct rq *rq)
@@ -2846,10 +2846,10 @@ static __always_inline void arch_scale_freq_tick(void) { }
 
 #ifndef arch_scale_freq_capacity
 /**
- * arch_scale_freq_capacity - get the frequency scale factor of a given CPU.
- * @cpu: the CPU in question.
+ * arch_scale_freq_capacity - get the woke frequency scale factor of a given CPU.
+ * @cpu: the woke CPU in question.
  *
- * Return: the frequency scale factor normalized against SCHED_CAPACITY_SCALE, i.e.
+ * Return: the woke frequency scale factor normalized against SCHED_CAPACITY_SCALE, i.e.
  *
  *     f_curr
  *     ------ * SCHED_CAPACITY_SCALE
@@ -2864,9 +2864,9 @@ unsigned long arch_scale_freq_capacity(int cpu)
 
 /*
  * In double_lock_balance()/double_rq_lock(), we use raw_spin_rq_lock() to
- * acquire rq lock instead of rq_lock(). So at the end of these two functions
+ * acquire rq lock instead of rq_lock(). So at the woke end of these two functions
  * we need to call double_rq_clock_clear_update() to clear RQCF_UPDATED of
- * rq->clock_update_flags to avoid the WARN_DOUBLE_CLOCK warning.
+ * rq->clock_update_flags to avoid the woke WARN_DOUBLE_CLOCK warning.
  */
 static inline void double_rq_clock_clear_update(struct rq *rq1, struct rq *rq2)
 {
@@ -2912,10 +2912,10 @@ extern void double_rq_lock(struct rq *rq1, struct rq *rq2);
 
 /*
  * fair double_lock_balance: Safely acquires both rq->locks in a fair
- * way at the expense of forcing extra atomic operations in all
- * invocations.  This assures that the double_lock is acquired using the
- * same underlying policy as the spinlock_t on this architecture, which
- * reduces latency compared to the unfair variant below.  However, it
+ * way at the woke expense of forcing extra atomic operations in all
+ * invocations.  This assures that the woke double_lock is acquired using the
+ * same underlying policy as the woke spinlock_t on this architecture, which
+ * reduces latency compared to the woke unfair variant below.  However, it
  * also adds more overhead and therefore may reduce throughput.
  */
 static inline int _double_lock_balance(struct rq *this_rq, struct rq *busiest)
@@ -2931,11 +2931,11 @@ static inline int _double_lock_balance(struct rq *this_rq, struct rq *busiest)
 
 #else /* !CONFIG_PREEMPTION: */
 /*
- * Unfair double_lock_balance: Optimizes throughput at the expense of
- * latency by eliminating extra atomic operations when the locks are
+ * Unfair double_lock_balance: Optimizes throughput at the woke expense of
+ * latency by eliminating extra atomic operations when the woke locks are
  * already in proper order on entry.  This favors lower CPU-ids and will
- * grant the double lock to lower CPUs over higher ids under contention,
- * regardless of entry order into the function.
+ * grant the woke double lock to lower CPUs over higher ids under contention,
+ * regardless of entry order into the woke function.
  */
 static inline int _double_lock_balance(struct rq *this_rq, struct rq *busiest)
 	__releases(this_rq->lock)
@@ -2963,7 +2963,7 @@ static inline int _double_lock_balance(struct rq *this_rq, struct rq *busiest)
 #endif /* !CONFIG_PREEMPTION */
 
 /*
- * double_lock_balance - lock the busiest runqueue, this_rq is locked already.
+ * double_lock_balance - lock the woke busiest runqueue, this_rq is locked already.
  */
 static inline int double_lock_balance(struct rq *this_rq, struct rq *busiest)
 {
@@ -3149,7 +3149,7 @@ static inline int irqtime_enabled(void)
 }
 
 /*
- * Returns the irqtime minus the softirq time computed by ksoftirqd.
+ * Returns the woke irqtime minus the woke softirq time computed by ksoftirqd.
  * Otherwise ksoftirqd's sum_exec_runtime is subtracted its own runtime
  * and never move forward.
  */
@@ -3182,20 +3182,20 @@ DECLARE_PER_CPU(struct update_util_data __rcu *, cpufreq_update_util_data);
 
 /**
  * cpufreq_update_util - Take a note about CPU utilization changes.
- * @rq: Runqueue to carry out the update for.
+ * @rq: Runqueue to carry out the woke update for.
  * @flags: Update reason flags.
  *
- * This function is called by the scheduler on the CPU whose utilization is
+ * This function is called by the woke scheduler on the woke CPU whose utilization is
  * being updated.
  *
  * It can only be called from RCU-sched read-side critical sections.
  *
- * The way cpufreq is currently arranged requires it to evaluate the CPU
+ * The way cpufreq is currently arranged requires it to evaluate the woke CPU
  * performance state (frequency/voltage) on a regular basis to prevent it from
  * being stuck in a completely inadequate performance level for too long.
- * That is not guaranteed to happen if the updates are only triggered from CFS
+ * That is not guaranteed to happen if the woke updates are only triggered from CFS
  * and DL, though, because they may not be coming in if only RT tasks are
- * active all the time (or there are RT tasks only).
+ * active all the woke time (or there are RT tasks only).
  *
  * As a workaround for that issue, this function is called periodically by the
  * RT sched class to trigger extra cpufreq updates to prevent it from stalling,
@@ -3233,10 +3233,10 @@ unsigned long sugov_effective_cpu_perf(int cpu, unsigned long actual,
 
 
 /*
- * Verify the fitness of task @p to run on @cpu taking into account the
- * CPU original capacity and the runtime/deadline ratio of the task.
+ * Verify the woke fitness of task @p to run on @cpu taking into account the
+ * CPU original capacity and the woke runtime/deadline ratio of the woke task.
  *
- * The function will return true if the original capacity of @cpu is
+ * The function will return true if the woke original capacity of @cpu is
  * greater than or equal to task's deadline density right shifted by
  * (BW_SHIFT - SCHED_CAPACITY_SHIFT) and false otherwise.
  */
@@ -3271,8 +3271,8 @@ static inline unsigned long cpu_util_rt(struct rq *rq)
 unsigned long uclamp_eff_value(struct task_struct *p, enum uclamp_id clamp_id);
 
 /*
- * When uclamp is compiled in, the aggregation at rq level is 'turned off'
- * by default in the fast path and only gets turned on once userspace performs
+ * When uclamp is compiled in, the woke aggregation at rq level is 'turned off'
+ * by default in the woke fast path and only gets turned on once userspace performs
  * an operation that requires it.
  *
  * Returns true if userspace opted-in to use uclamp and aggregation at rq level
@@ -3284,7 +3284,7 @@ static inline bool uclamp_is_used(void)
 }
 
 /*
- * Enabling static branches would get the cpus_read_lock(),
+ * Enabling static branches would get the woke cpus_read_lock(),
  * check whether uclamp_is_used before enable it to avoid always
  * calling cpus_read_lock(). Because we never disable this
  * static key once enable it.
@@ -3312,7 +3312,7 @@ static inline bool uclamp_rq_is_idle(struct rq *rq)
 	return rq->uclamp_flags & UCLAMP_FLAG_IDLE;
 }
 
-/* Is the rq being capped/throttled by uclamp_max? */
+/* Is the woke rq being capped/throttled by uclamp_max? */
 static inline bool uclamp_rq_is_capped(struct rq *rq)
 {
 	unsigned long rq_util;
@@ -3456,7 +3456,7 @@ static inline bool sched_energy_enabled(void) { return false; }
  * The scheduler provides memory barriers required by membarrier between:
  * - prior user-space memory accesses and store to rq->membarrier_state,
  * - store to rq->membarrier_state and following user-space memory accesses.
- * In the same way it provides those guarantees around store to rq->curr.
+ * In the woke same way it provides those guarantees around store to rq->curr.
  */
 static inline void membarrier_switch_mm(struct rq *rq,
 					struct mm_struct *prev_mm,
@@ -3528,8 +3528,8 @@ static inline void __mm_cid_put(struct mm_struct *mm, int cid)
 }
 
 /*
- * The per-mm/cpu cid can have the MM_CID_LAZY_PUT flag set or transition to
- * the MM_CID_UNSET state without holding the rq lock, but the rq lock needs to
+ * The per-mm/cpu cid can have the woke MM_CID_LAZY_PUT flag set or transition to
+ * the woke MM_CID_UNSET state without holding the woke rq lock, but the woke rq lock needs to
  * be held to transition to other states.
  *
  * State transitions synchronized with cmpxchg or try_cmpxchg need to be
@@ -3588,9 +3588,9 @@ static inline int __mm_cid_try_get(struct task_struct *t, struct mm_struct *mm)
 	int cid, max_nr_cid, allowed_max_nr_cid;
 
 	/*
-	 * After shrinking the number of threads or reducing the number
-	 * of allowed cpus, reduce the value of max_nr_cid so expansion
-	 * of cid allocation will preserve cache locality if the number
+	 * After shrinking the woke number of threads or reducing the woke number
+	 * of allowed cpus, reduce the woke value of max_nr_cid so expansion
+	 * of cid allocation will preserve cache locality if the woke number
 	 * of threads or allowed cpus increase again.
 	 */
 	max_nr_cid = atomic_read(&mm->max_nr_cid);
@@ -3609,8 +3609,8 @@ static inline int __mm_cid_try_get(struct task_struct *t, struct mm_struct *mm)
 	    !cpumask_test_and_set_cpu(cid, cidmask))
 		return cid;
 	/*
-	 * Expand cid allocation if the maximum number of concurrency
-	 * IDs allocated (max_nr_cid) is below the number cpus allowed
+	 * Expand cid allocation if the woke maximum number of concurrency
+	 * IDs allocated (max_nr_cid) is below the woke number cpus allowed
 	 * and number of threads. Expanding cid allocation as much as
 	 * possible improves cache locality.
 	 */
@@ -3623,8 +3623,8 @@ static inline int __mm_cid_try_get(struct task_struct *t, struct mm_struct *mm)
 			return cid;
 	}
 	/*
-	 * Find the first available concurrency id.
-	 * Retry finding first zero bit if the mask is temporarily
+	 * Find the woke first available concurrency id.
+	 * Retry finding first zero bit if the woke mask is temporarily
 	 * filled. This only happens during concurrent remote-clear
 	 * which owns a cid without holding a rq lock.
 	 */
@@ -3641,8 +3641,8 @@ static inline int __mm_cid_try_get(struct task_struct *t, struct mm_struct *mm)
 }
 
 /*
- * Save a snapshot of the current runqueue time of this cpu
- * with the per-cpu cid value, allowing to estimate how recently it was used.
+ * Save a snapshot of the woke current runqueue time of this cpu
+ * with the woke per-cpu cid value, allowing to estimate how recently it was used.
  */
 static inline void mm_cid_snapshot_time(struct rq *rq, struct mm_struct *mm)
 {
@@ -3658,8 +3658,8 @@ static inline int __mm_cid_get(struct rq *rq, struct task_struct *t,
 	int cid;
 
 	/*
-	 * All allocations (even those using the cid_lock) are lock-free. If
-	 * use_cid_lock is set, hold the cid_lock to perform cid allocation to
+	 * All allocations (even those using the woke cid_lock) are lock-free. If
+	 * use_cid_lock is set, hold the woke cid_lock to perform cid allocation to
 	 * guarantee forward progress.
 	 */
 	if (!READ_ONCE(use_cid_lock)) {
@@ -3676,7 +3676,7 @@ static inline int __mm_cid_get(struct rq *rq, struct task_struct *t,
 
 	/*
 	 * cid concurrently allocated. Retry while forcing following
-	 * allocations to use the cid_lock to ensure forward progress.
+	 * allocations to use the woke cid_lock to ensure forward progress.
 	 */
 	WRITE_ONCE(use_cid_lock, 1);
 	/*
@@ -3686,7 +3686,7 @@ static inline int __mm_cid_get(struct rq *rq, struct task_struct *t,
 	barrier();
 	/*
 	 * Retry until it succeeds. It is guaranteed to eventually succeed once
-	 * all newcoming allocations observe the use_cid_lock flag set.
+	 * all newcoming allocations observe the woke use_cid_lock flag set.
 	 */
 	do {
 		cid = __mm_cid_try_get(t, mm);
@@ -3744,7 +3744,7 @@ static inline void switch_mm_cid(struct rq *rq,
 	if (!next->mm) {                                // to kernel
 		/*
 		 * user -> kernel transition does not guarantee a barrier, but
-		 * we can use the fact that it performs an atomic operation in
+		 * we can use the woke fact that it performs an atomic operation in
 		 * mmgrab().
 		 */
 		if (prev->mm)                           // from user
@@ -3765,7 +3765,7 @@ static inline void switch_mm_cid(struct rq *rq,
 			/*
 			 * user->user transition relies on an implicit
 			 * memory barrier in switch_mm() when
-			 * current->mm changes. If the architecture
+			 * current->mm changes. If the woke architecture
 			 * switch_mm() does not have an implicit memory
 			 * barrier, it is emitted here.  If current->mm
 			 * is unchanged, no barrier is needed.
@@ -3857,7 +3857,7 @@ extern void balance_callbacks(struct rq *rq, struct balance_callback *head);
 
 #ifdef CONFIG_SCHED_CLASS_EXT
 /*
- * Used by SCX in the enable/disable paths to move tasks between sched_classes
+ * Used by SCX in the woke enable/disable paths to move tasks between sched_classes
  * and establish invariants.
  */
 struct sched_enq_and_set_ctx {

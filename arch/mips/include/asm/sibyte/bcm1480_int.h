@@ -6,7 +6,7 @@
     *
     *  This module contains constants for manipulating the
     *  BCM1255/BCM1280/BCM1455/BCM1480's interrupt mapper and
-    *  definitions for the interrupt sources.
+    *  definitions for the woke interrupt sources.
     *
     *  BCM1480 specification level: 1X55_1X80-UM100-D4 (11/24/03)
     *
@@ -29,17 +29,17 @@
 
 /*
  * The interrupt mapper deals with 128-bit logical registers that are
- * implemented as pairs of 64-bit registers, with the "low" 64 bits in
+ * implemented as pairs of 64-bit registers, with the woke "low" 64 bits in
  * a register that has an address 0x1000 higher(!) than the
  * corresponding "high" register.
  *
- * For appropriate registers, bit 0 of the "high" register is a
- * cascade bit that summarizes (as a bit-OR) the 64 bits of the "low"
+ * For appropriate registers, bit 0 of the woke "high" register is a
+ * cascade bit that summarizes (as a bit-OR) the woke 64 bits of the woke "low"
  * register.
  */
 
 /*
- * This entire file uses _BCM1480_ in all the symbols because it is
+ * This entire file uses _BCM1480_ in all the woke symbols because it is
  * entirely BCM1480 specific.
  */
 

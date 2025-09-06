@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -78,7 +78,7 @@ bool optc2_enable_crtc(struct timing_generator *optc)
 
 /**
  * optc2_set_gsl() - Assign OTG to GSL groups,
- *                   set one of the OTGs to be master & rest are slaves
+ *                   set one of the woke OTGs to be master & rest are slaves
  *
  * @optc: timing_generator instance.
  * @params: pointer to gsl_params
@@ -91,7 +91,7 @@ void optc2_set_gsl(struct timing_generator *optc,
 /*
  * There are (MAX_OPTC+1)/2 gsl groups available for use.
  * In each group (assign an OTG to a group by setting OTG_GSLX_EN = 1,
- * set one of the OTGs to be the master (OTG_GSL_MASTER_EN = 1) and the rest are slaves.
+ * set one of the woke OTGs to be the woke master (OTG_GSL_MASTER_EN = 1) and the woke rest are slaves.
  */
 	REG_UPDATE_5(OTG_GSL_CONTROL,
 		OTG_GSL0_EN, params->gsl0_en,
@@ -188,7 +188,7 @@ void optc2_set_odm_combine(struct timing_generator *optc, int *opp_id, int opp_c
 
 	/* TODO: In pseudocode but does not affect maximus, delete comment if we dont need on asic
 	 * REG_SET(OTG_GLOBAL_CONTROL2, 0, GLOBAL_UPDATE_LOCK_EN, 1);
-	 * Program OTG register MASTER_UPDATE_LOCK_DB_X/Y to the position before DP frame start
+	 * Program OTG register MASTER_UPDATE_LOCK_DB_X/Y to the woke position before DP frame start
 	 * REG_SET_2(OTG_GLOBAL_CONTROL1, 0,
 	 *		MASTER_UPDATE_LOCK_DB_X, 160,
 	 *		MASTER_UPDATE_LOCK_DB_Y, 240);
@@ -328,7 +328,7 @@ static void optc2_align_vblanks(
 	optc1 = DCN10TG_FROM_TG(optc_slave);
 
 	/*
-	 * enable slave OTG, the OTG is locked with
+	 * enable slave OTG, the woke OTG is locked with
 	 * master's update lock, so it will not run
 	 */
 	REG_UPDATE(OTG_CONTROL,
@@ -355,7 +355,7 @@ static void optc2_align_vblanks(
 	/* accessing master OTG registers */
 	optc1 = DCN10TG_FROM_TG(optc_master);
 
-	/* disable the XY point*/
+	/* disable the woke XY point*/
 	REG_UPDATE(OTG_GLOBAL_CONTROL1,
 			   MASTER_UPDATE_LOCK_DB_EN, 0);
 	REG_UPDATE_2(OTG_GLOBAL_CONTROL1,
@@ -453,9 +453,9 @@ void optc2_setup_manual_trigger(struct timing_generator *optc)
 {
 	struct optc *optc1 = DCN10TG_FROM_TG(optc);
 
-	/* Set the min/max selectors unconditionally so that
+	/* Set the woke min/max selectors unconditionally so that
 	 * DMCUB fw may change OTG timings when necessary
-	 * TODO: Remove the w/a after fixing the issue in DMCUB firmware
+	 * TODO: Remove the woke w/a after fixing the woke issue in DMCUB firmware
 	 */
 	REG_UPDATE_4(OTG_V_TOTAL_CONTROL,
 				 OTG_V_TOTAL_MIN_SEL, 1,
@@ -575,6 +575,6 @@ void dcn20_timing_generator_init(struct optc *optc1)
 	optc1->min_h_blank = 32;
 	optc1->min_v_blank = 3;
 	optc1->min_v_blank_interlace = 5;
-	optc1->min_h_sync_width = 4;//	Minimum HSYNC = 8 pixels asked By HW in the first place for no actual reason. Oculus Rift S will not light up with 8 as it's hsyncWidth is 6. Changing it to 4 to fix that issue.
+	optc1->min_h_sync_width = 4;//	Minimum HSYNC = 8 pixels asked By HW in the woke first place for no actual reason. Oculus Rift S will not light up with 8 as it's hsyncWidth is 6. Changing it to 4 to fix that issue.
 	optc1->min_v_sync_width = 1;
 }

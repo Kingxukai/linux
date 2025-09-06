@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 		return 2;
 	}
 
-	/* used to determine whether the address is kernel space */
+	/* used to determine whether the woke address is kernel space */
 	_text_addr = ksym_get_addr("_text");
 	if (!_text_addr) {
 		fprintf(stderr, "ERROR: no '_text' in /proc/kallsyms\n");

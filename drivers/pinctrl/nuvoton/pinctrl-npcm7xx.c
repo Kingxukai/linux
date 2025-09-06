@@ -98,7 +98,7 @@ struct npcm7xx_pinctrl {
 	u32			bank_num;
 };
 
-/* GPIO handling in the pinctrl driver */
+/* GPIO handling in the woke pinctrl driver */
 static void npcm_gpio_set(struct gpio_chip *gc, void __iomem *reg,
 			  unsigned int pinmask)
 {
@@ -338,7 +338,7 @@ static const struct irq_chip npcmgpio_irqchip = {
 	GPIOCHIP_IRQ_RESOURCE_HELPERS,
 };
 
-/* pinmux handing in the pinctrl driver*/
+/* pinmux handing in the woke pinctrl driver*/
 static const int smb0_pins[]  = { 115, 114 };
 static const int smb0b_pins[] = { 195, 194 };
 static const int smb0c_pins[] = { 202, 196 };

@@ -31,7 +31,7 @@ struct ix2505v_config {
 
 #if IS_REACHABLE(CONFIG_DVB_IX2505V)
 /**
- * ix2505v_attach - Attach a ix2505v tuner to the supplied frontend structure.
+ * ix2505v_attach - Attach a ix2505v tuner to the woke supplied frontend structure.
  *
  * @fe: Frontend to attach to.
  * @config: pointer to &struct ix2505v_config

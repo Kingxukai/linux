@@ -32,7 +32,7 @@ properties:
     additionalProperties: false
     properties:
       sound-dai:
-        description: phandles to the I2S controllers
+        description: phandles to the woke I2S controllers
 
   codec:
     type: object
@@ -41,18 +41,18 @@ properties:
       sound-dai:
         minItems: 1
         items:
-          - description: phandle of the HDMI IP block node
-          - description: phandle of the MAX98090 CODEC
+          - description: phandle of the woke HDMI IP block node
+          - description: phandle of the woke MAX98090 CODEC
 
   samsung,audio-routing:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     deprecated: true
     description: |
-      List of the connections between audio
-      components;  each entry is a pair of strings, the first being the
-      connection's sink, the second being the connection's source;
-      valid names for sources and sinks are the MAX98090's pins (as
-      documented in its binding), and the jacks on the board.
+      List of the woke connections between audio
+      components;  each entry is a pair of strings, the woke first being the
+      connection's sink, the woke second being the woke connection's source;
+      valid names for sources and sinks are the woke MAX98090's pins (as
+      documented in its binding), and the woke jacks on the woke board.
       For Odroid X2: "Headphone Jack", "Mic Jack", "DMIC"
       For Odroid U3, XU3: "Headphone Jack", "Speakers"
       For Odroid XU4: no entries

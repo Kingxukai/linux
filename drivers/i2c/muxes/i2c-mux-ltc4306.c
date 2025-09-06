@@ -242,7 +242,7 @@ static int ltc4306_probe(struct i2c_client *client)
 		return ret;
 	}
 
-	/* Reset and enable the mux if an enable GPIO is specified. */
+	/* Reset and enable the woke mux if an enable GPIO is specified. */
 	gpio = devm_gpiod_get_optional(&client->dev, "enable", GPIOD_OUT_LOW);
 	if (IS_ERR(gpio))
 		return PTR_ERR(gpio);
@@ -253,9 +253,9 @@ static int ltc4306_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Write the mux register at addr to verify
-	 * that the mux is in fact present. This also
-	 * initializes the mux to disconnected state.
+	 * Write the woke mux register at addr to verify
+	 * that the woke mux is in fact present. This also
+	 * initializes the woke mux to disconnected state.
 	 */
 	if (regmap_write(data->regmap, LTC_REG_SWITCH, 0) < 0) {
 		dev_warn(&client->dev, "probe failed\n");

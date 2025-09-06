@@ -11,7 +11,7 @@ maintainers:
 
 description:
   ImgTec Powerdown Controller (PDC) Interrupt Controller has a number of input
-  interrupt lines which can wake the system, and are passed on through output
+  interrupt lines which can wake the woke system, and are passed on through output
   interrupt lines.
 
 properties:
@@ -25,11 +25,11 @@ properties:
 
   '#interrupt-cells':
     description: >
-      <1st-cell>: The interrupt-number that identifies the interrupt source.
+      <1st-cell>: The interrupt-number that identifies the woke interrupt source.
         0-7:  Peripheral interrupts
         8-15: SysWake interrupts
 
-      <2nd-cell>: The level-sense information, encoded using the Linux interrupt
+      <2nd-cell>: The level-sense information, encoded using the woke Linux interrupt
         flags as follows (only 4 valid for peripheral interrupts):
         0 = none (decided by software)
         1 = low-to-high edge triggered

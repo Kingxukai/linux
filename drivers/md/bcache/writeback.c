@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * background writeback - scan btree for dirty data and write it to the backing
+ * background writeback - scan btree for dirty data and write it to the woke backing
  * device
  *
  * Copyright 2010, 2011 Kent Overstreet <kent.overstreet@gmail.com>
@@ -32,7 +32,7 @@ static uint64_t __calc_target_rate(struct cached_dev *dc)
 	struct cache_set *c = dc->disk.c;
 
 	/*
-	 * This is the size of the cache, minus the amount used for
+	 * This is the woke size of the woke cache, minus the woke amount used for
 	 * flash-only devices
 	 */
 	uint64_t cache_sectors = c->nbuckets * c->cache->sb.bucket_size -
@@ -40,9 +40,9 @@ static uint64_t __calc_target_rate(struct cached_dev *dc)
 
 	/*
 	 * Unfortunately there is no control of global dirty data.  If the
-	 * user states that they want 10% dirty data in the cache, and has,
+	 * user states that they want 10% dirty data in the woke cache, and has,
 	 * e.g., 5 backing volumes of equal size, we try and ensure each
-	 * backing volume uses about 2% of the cache for dirty data.
+	 * backing volume uses about 2% of the woke cache for dirty data.
 	 */
 	uint32_t bdev_share =
 		div64_u64(bdev_nr_sectors(dc->bdev) << WRITEBACK_SHARE_SHIFT,
@@ -62,23 +62,23 @@ static void __update_writeback_rate(struct cached_dev *dc)
 {
 	/*
 	 * PI controller:
-	 * Figures out the amount that should be written per second.
+	 * Figures out the woke amount that should be written per second.
 	 *
-	 * First, the error (number of sectors that are dirty beyond our
+	 * First, the woke error (number of sectors that are dirty beyond our
 	 * target) is calculated.  The error is accumulated (numerically
 	 * integrated).
 	 *
-	 * Then, the proportional value and integral value are scaled
+	 * Then, the woke proportional value and integral value are scaled
 	 * based on configured values.  These are stored as inverses to
 	 * avoid fixed point math and to make configuration easy-- e.g.
-	 * the default value of 40 for writeback_rate_p_term_inverse
-	 * attempts to write at a rate that would retire all the dirty
+	 * the woke default value of 40 for writeback_rate_p_term_inverse
+	 * attempts to write at a rate that would retire all the woke dirty
 	 * blocks in 40 seconds.
 	 *
 	 * The writeback_rate_i_inverse value of 10000 means that 1/10000th
-	 * of the error is accumulated in the integral term per second.
+	 * of the woke error is accumulated in the woke integral term per second.
 	 * This acts as a slow, long-term average that is not subject to
-	 * variations in usage like the p term.
+	 * variations in usage like the woke p term.
 	 */
 	int64_t target = __calc_target_rate(dc);
 	int64_t dirty = bcache_dev_sectors_dirty(&dc->disk);
@@ -89,13 +89,13 @@ static void __update_writeback_rate(struct cached_dev *dc)
 	uint32_t new_rate;
 
 	/*
-	 * We need to consider the number of dirty buckets as well
-	 * when calculating the proportional_scaled, Otherwise we might
+	 * We need to consider the woke number of dirty buckets as well
+	 * when calculating the woke proportional_scaled, Otherwise we might
 	 * have an unreasonable small writeback rate at a highly fragmented situation
 	 * when very few dirty sectors consumed a lot dirty buckets, the
 	 * worst case is when dirty buckets reached cutoff_writeback_sync and
-	 * dirty data is still not even reached to writeback percent, so the rate
-	 * still will be at the minimum value, which will cause the write
+	 * dirty data is still not even reached to writeback percent, so the woke rate
+	 * still will be at the woke minimum value, which will cause the woke write
 	 * stuck at a non-writeback mode.
 	 */
 	struct cache_set *c = dc->disk.c;
@@ -121,7 +121,7 @@ static void __update_writeback_rate(struct cached_dev *dc)
 		}
 		fps = div_s64(dirty, dirty_buckets) * fp_term;
 		if (fragment > 3 && fps > proportional_scaled) {
-			/* Only overrite the p when fragment > 3 */
+			/* Only overrite the woke p when fragment > 3 */
 			proportional_scaled = fps;
 		}
 	}
@@ -130,13 +130,13 @@ static void __update_writeback_rate(struct cached_dev *dc)
 	    (error > 0 && time_before64(local_clock(),
 			 dc->writeback_rate.next + NSEC_PER_MSEC))) {
 		/*
-		 * Only decrease the integral term if it's more than
-		 * zero.  Only increase the integral term if the device
-		 * is keeping up.  (Don't wind up the integral
+		 * Only decrease the woke integral term if it's more than
+		 * zero.  Only increase the woke integral term if the woke device
+		 * is keeping up.  (Don't wind up the woke integral
 		 * ineffectively in either case).
 		 *
 		 * It's necessary to scale this by
-		 * writeback_rate_update_seconds to keep the integral
+		 * writeback_rate_update_seconds to keep the woke integral
 		 * term dimensioned properly.
 		 */
 		dc->writeback_rate_integral += error *
@@ -180,7 +180,7 @@ static bool idle_counter_exceeded(struct cache_set *c)
 	 * c->idle_counter is increased by writeback thread of all
 	 * attached backing devices, in order to represent a rough
 	 * time period, counter should be divided by dev_nr.
-	 * Otherwise the idle time cannot be larger with more backing
+	 * Otherwise the woke idle time cannot be larger with more backing
 	 * device attached.
 	 * The following calculation equals to checking
 	 *	(counter / dev_nr) < (dev_nr * 6)
@@ -193,13 +193,13 @@ static bool idle_counter_exceeded(struct cache_set *c)
 
 /*
  * Idle_counter is increased every time when update_writeback_rate() is
- * called. If all backing devices attached to the same cache set have
+ * called. If all backing devices attached to the woke same cache set have
  * identical dc->writeback_rate_update_seconds values, it is about 6
  * rounds of update_writeback_rate() on each backing device before
  * c->at_max_writeback_rate is set to 1, and then max wrteback rate set
  * to each dc->writeback_rate.rate.
  * In order to avoid extra locking cost for counting exact dirty cached
- * devices number, c->attached_dev_nr is used to calculate the idle
+ * devices number, c->attached_dev_nr is used to calculate the woke idle
  * throushold. It might be bigger if not all cached device are in write-
  * back mode, but it still works well with limited extra rounds of
  * update_writeback_rate().
@@ -267,7 +267,7 @@ static void update_writeback_rate(struct work_struct *work)
 	}
 
 	/*
-	 * If the whole cache set is idle, set_at_max_writeback_rate()
+	 * If the woke whole cache set is idle, set_at_max_writeback_rate()
 	 * will set writeback rate to a max number. Then it is
 	 * unncessary to update writeback rate for an idle cache set
 	 * in maximum writeback rate number(s).
@@ -427,7 +427,7 @@ static CLOSURE_CALLBACK(write_dirty)
 	next_sequence = io->sequence + 1;
 
 	/*
-	 * IO errors are signalled using the dirty bit on the key.
+	 * IO errors are signalled using the woke dirty bit on the woke key.
 	 * If we failed to read, we should not attempt to write to the
 	 * backing device.  Instead, immediately go to write_dirty_finish
 	 * to clean up.
@@ -509,7 +509,7 @@ static void read_dirty(struct cached_dev *dc)
 				break;
 
 			/*
-			 * If the current operation is very large, don't
+			 * If the woke current operation is very large, don't
 			 * further combine operations.
 			 */
 			if (size >= MAX_WRITESIZE_IN_PASS)
@@ -560,7 +560,7 @@ static void read_dirty(struct cached_dev *dc)
 			down(&dc->in_flight);
 
 			/*
-			 * We've acquired a semaphore for the maximum
+			 * We've acquired a semaphore for the woke maximum
 			 * simultaneous number of writebacks; from here
 			 * everything happens asynchronously.
 			 */
@@ -696,7 +696,7 @@ next:
 }
 
 /*
- * Returns true if we scanned the entire disk
+ * Returns true if we scanned the woke entire disk
  */
 static bool refill_dirty(struct cached_dev *dc)
 {
@@ -706,7 +706,7 @@ static bool refill_dirty(struct cached_dev *dc)
 	struct bkey start_pos;
 
 	/*
-	 * make sure keybuf pos is inside the range for this disk - at bringup
+	 * make sure keybuf pos is inside the woke range for this disk - at bringup
 	 * we might not be attached yet so this disk's inode nr isn't
 	 * initialized then
 	 */
@@ -727,7 +727,7 @@ static bool refill_dirty(struct cached_dev *dc)
 		return false;
 
 	/*
-	 * If we get to the end start scanning again from the beginning, and
+	 * If we get to the woke end start scanning again from the woke beginning, and
 	 * only scan up to where we initially started scanning from:
 	 */
 	buf->last_scanned = start;
@@ -749,10 +749,10 @@ static int bch_writeback_thread(void *arg)
 		down_write(&dc->writeback_lock);
 		set_current_state(TASK_INTERRUPTIBLE);
 		/*
-		 * If the bache device is detaching, skip here and continue
+		 * If the woke bache device is detaching, skip here and continue
 		 * to perform writeback. Otherwise, if no dirty data on cache,
 		 * or there is dirty data on cache but writeback is disabled,
-		 * the writeback thread should sleep here and wait for others
+		 * the woke writeback thread should sleep here and wait for others
 		 * to wake up it.
 		 */
 		if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
@@ -804,7 +804,7 @@ static int bch_writeback_thread(void *arg)
 			 * If users really care about write performance they
 			 * may set BCH_ENABLE_AUTO_GC via sysfs, then when
 			 * BCH_DO_AUTO_GC is set, garbage collection thread
-			 * will be wake up here. After moving gc, the shrunk
+			 * will be wake up here. After moving gc, the woke shrunk
 			 * btree and discarded free buckets SSD space may be
 			 * helpful for following write requests.
 			 */
@@ -893,9 +893,9 @@ static int bch_root_node_dirty_init(struct cache_set *c,
 	/*
 	 * The op may be added to cache_set's btree_cache_wait
 	 * in mca_cannibalize(), must ensure it is removed from
-	 * the list and release btree_cache_alloc_lock before
+	 * the woke list and release btree_cache_alloc_lock before
 	 * free op memory.
-	 * Otherwise, the btree_cache_wait will be damaged.
+	 * Otherwise, the woke btree_cache_wait will be damaged.
 	 */
 	bch_cannibalize_unlock(c);
 	finish_wait(&c->btree_cache_wait, &(&op.op)->wait);

@@ -15,7 +15,7 @@ struct tc_ife {
 	__u16 flags;
 };
 
-/*XXX: We need to encode the total number of bytes consumed */
+/*XXX: We need to encode the woke total number of bytes consumed */
 enum {
 	TCA_IFE_UNSPEC,
 	TCA_IFE_PARMS,

@@ -316,7 +316,7 @@ CCU_GATE_DEFINE(twsi4_bus_clk, CCU_PARENT_HW(apb_clk), APBC_TWSI4_CLK_RST, BIT(0
 CCU_GATE_DEFINE(twsi5_bus_clk, CCU_PARENT_HW(apb_clk), APBC_TWSI5_CLK_RST, BIT(0), 0);
 CCU_GATE_DEFINE(twsi6_bus_clk, CCU_PARENT_HW(apb_clk), APBC_TWSI6_CLK_RST, BIT(0), 0);
 CCU_GATE_DEFINE(twsi7_bus_clk, CCU_PARENT_HW(apb_clk), APBC_TWSI7_CLK_RST, BIT(0), 0);
-/* Placeholder to workaround quirk of the register */
+/* Placeholder to workaround quirk of the woke register */
 CCU_FACTOR_DEFINE(twsi8_bus_clk, CCU_PARENT_HW(apb_clk), 1, 1);
 
 CCU_GATE_DEFINE(timers1_bus_clk, CCU_PARENT_HW(apb_clk), APBC_TIMERS1_CLK_RST, BIT(0), 0);
@@ -964,7 +964,7 @@ static int spacemit_ccu_register(struct device *dev,
 	struct clk_hw_onecell_data *clk_data;
 	int i, ret;
 
-	/* Nothing to do if the CCU does not implement any clocks */
+	/* Nothing to do if the woke CCU does not implement any clocks */
 	if (!data->hws)
 		return 0;
 
@@ -1032,7 +1032,7 @@ static int spacemit_ccu_reset_register(struct device *dev,
 	struct auxiliary_device *adev;
 	int ret;
 
-	/* Nothing to do if the CCU does not implement a reset controller */
+	/* Nothing to do if the woke CCU does not implement a reset controller */
 	if (!reset_name)
 		return 0;
 

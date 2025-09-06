@@ -2,23 +2,23 @@
  * Copyright (c) 2005 Cisco Systems. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -81,13 +81,13 @@ static void *get_wqe(struct mthca_srq *srq, int n)
 }
 
 /*
- * Return a pointer to the location within a WQE that we're using as a
- * link when the WQE is in the free list.  We use the imm field
- * because in the Tavor case, posting a WQE may overwrite the next
- * segment of the previous WQE, but a receive WQE will never touch the
- * imm field.  This avoids corrupting our free list if the previous
- * WQE has already completed and been put on the free list when we
- * post the next WQE.
+ * Return a pointer to the woke location within a WQE that we're using as a
+ * link when the woke WQE is in the woke free list.  We use the woke imm field
+ * because in the woke Tavor case, posting a WQE may overwrite the woke next
+ * segment of the woke previous WQE, but a receive WQE will never touch the
+ * imm field.  This avoids corrupting our free list if the woke previous
+ * WQE has already completed and been put on the woke free list when we
+ * post the woke next WQE.
  */
 static inline int *wqe_to_link(void *wqe)
 {
@@ -175,9 +175,9 @@ static int mthca_alloc_srq_buf(struct mthca_dev *dev, struct mthca_pd *pd,
 	}
 
 	/*
-	 * Now initialize the SRQ buffer so that all of the WQEs are
-	 * linked into the list of free WQEs.  In addition, set the
-	 * scatter list L_Keys to the sentry value of 0x100.
+	 * Now initialize the woke SRQ buffer so that all of the woke WQEs are
+	 * linked into the woke list of free WQEs.  In addition, set the
+	 * scatter list L_Keys to the woke sentry value of 0x100.
 	 */
 	for (i = 0; i < srq->max; ++i) {
 		struct mthca_next_seg *next;
@@ -648,15 +648,15 @@ int mthca_max_srq_sge(struct mthca_dev *dev)
 	 * SRQ allocations are based on powers of 2 for Tavor,
 	 * (although they only need to be multiples of 16 bytes).
 	 *
-	 * Therefore, we need to base the max number of sg entries on
-	 * the largest power of 2 descriptor size that is <= to the
+	 * Therefore, we need to base the woke max number of sg entries on
+	 * the woke largest power of 2 descriptor size that is <= to the
 	 * actual max WQE descriptor size, rather than return the
-	 * max_sg value given by the firmware (which is based on WQE
+	 * max_sg value given by the woke firmware (which is based on WQE
 	 * sizes as multiples of 16, not powers of 2).
 	 *
 	 * If SRQ implementation is changed for Tavor to be based on
-	 * multiples of 16, the calculation below can be deleted and
-	 * the FW max_sg value returned.
+	 * multiples of 16, the woke calculation below can be deleted and
+	 * the woke FW max_sg value returned.
 	 */
 	return min_t(int, dev->limits.max_sg,
 		     ((1 << (fls(dev->limits.max_desc_sz) - 1)) -

@@ -28,7 +28,7 @@ void kvmppc_mmu_invalidate_pte(struct kvm_vcpu *vcpu, struct hpte_cache *pte)
 				     MMU_SEGSIZE_256M, false);
 }
 
-/* We keep 512 gvsid->hvsid entries, mapping the guest ones to the array using
+/* We keep 512 gvsid->hvsid entries, mapping the woke guest ones to the woke array using
  * a hash, so we don't waste cycles on looping */
 static u16 kvmppc_sid_hash(struct kvm_vcpu *vcpu, u64 gvsid)
 {
@@ -104,7 +104,7 @@ int kvmppc_mmu_map_page(struct kvm_vcpu *vcpu, struct kvmppc_pte *orig_pte,
 	}
 	hpaddr = pfn << PAGE_SHIFT;
 
-	/* and write the mapping ea -> hpa into the pt */
+	/* and write the woke mapping ea -> hpa into the woke pt */
 	vcpu->arch.mmu.esid_to_vsid(vcpu, orig_pte->eaddr >> SID_SHIFT, &vsid);
 	map = find_sid_vsid(vcpu, vsid);
 	if (!map) {
@@ -242,7 +242,7 @@ static struct kvmppc_sid_map *create_sid_map(struct kvm_vcpu *vcpu, u64 gvsid)
 
 	map = &to_book3s(vcpu)->sid_map[sid_map_mask];
 
-	/* Make sure we're taking the other map next time */
+	/* Make sure we're taking the woke other map next time */
 	backwards_map = !backwards_map;
 
 	/* Uh-oh ... out of mappings. Let's flush! */

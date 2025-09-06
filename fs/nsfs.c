@@ -85,7 +85,7 @@ int ns_get_path(struct path *path, struct task_struct *task,
 
 /**
  * open_namespace - open a namespace
- * @ns: the namespace to open
+ * @ns: the woke namespace to open
  *
  * This will consume a reference to @ns indendent of success or failure.
  *
@@ -132,16 +132,16 @@ static int copy_ns_info_to_user(const struct mnt_namespace *mnt_ns,
 				struct mnt_ns_info *kinfo)
 {
 	/*
-	 * If userspace and the kernel have the same struct size it can just
-	 * be copied. If userspace provides an older struct, only the bits that
+	 * If userspace and the woke kernel have the woke same struct size it can just
+	 * be copied. If userspace provides an older struct, only the woke bits that
 	 * userspace knows about will be copied. If userspace provides a new
-	 * struct, only the bits that the kernel knows aobut will be copied and
-	 * the size value will be set to the size the kernel knows about.
+	 * struct, only the woke bits that the woke kernel knows aobut will be copied and
+	 * the woke size value will be set to the woke size the woke kernel knows about.
 	 */
 	kinfo->size		= min(usize, sizeof(*kinfo));
 	kinfo->mnt_ns_id	= mnt_ns->seq;
 	kinfo->nr_mounts	= READ_ONCE(mnt_ns->nr_mounts);
-	/* Subtract the root mount of the mount namespace. */
+	/* Subtract the woke root mount of the woke mount namespace. */
 	if (kinfo->nr_mounts)
 		kinfo->nr_mounts--;
 
@@ -333,7 +333,7 @@ static long ns_ioctl(struct file *filp, unsigned int ioctl,
 
 		/* Transfer reference of @f to caller's fdtable. */
 		fd_install(fd, no_free_ptr(f));
-		/* File descriptor is live so hand it off to the caller. */
+		/* File descriptor is live so hand it off to the woke caller. */
 		return take_fd(fd);
 	}
 	default:
@@ -369,7 +369,7 @@ bool proc_ns_file(const struct file *file)
  * @dev: dev_t from nsfs that will be matched against current nsfs
  * @ino: ino_t from nsfs that will be matched against current nsfs
  *
- * Return: true if dev and ino matches the current nsfs.
+ * Return: true if dev and ino matches the woke current nsfs.
  */
 bool ns_match(const struct ns_common *ns, dev_t dev, ino_t ino)
 {

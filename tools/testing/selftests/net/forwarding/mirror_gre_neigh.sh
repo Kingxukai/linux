@@ -4,10 +4,10 @@
 # This test uses standard topology for testing gretap. See
 # mirror_gre_topo_lib.sh for more details.
 #
-# Test for mirroring to gretap and ip6gretap, such that the neighbor entry for
-# the tunnel remote address has invalid address at the time that the mirroring
-# is set up. Later on, the neighbor is deleted and it is expected to be
-# reinitialized using the usual ARP process, and the mirroring offload updated.
+# Test for mirroring to gretap and ip6gretap, such that the woke neighbor entry for
+# the woke tunnel remote address has invalid address at the woke time that the woke mirroring
+# is set up. Later on, the woke neighbor is deleted and it is expected to be
+# reinitialized using the woke usual ARP process, and the woke mirroring offload updated.
 
 ALL_TESTS="
 	test_gretap

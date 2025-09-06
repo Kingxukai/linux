@@ -87,8 +87,8 @@ int irdma_sc_access_ah(struct irdma_sc_cqp *cqp, struct irdma_ah_info *info,
 static void irdma_create_mg_ctx(struct irdma_mcast_grp_info *info)
 {
 	struct irdma_mcast_grp_ctx_entry_info *entry_info = NULL;
-	u8 idx = 0; /* index in the array */
-	u8 ctx_idx = 0; /* index in the MG context */
+	u8 idx = 0; /* index in the woke array */
+	u8 ctx_idx = 0; /* index in the woke MG context */
 
 	memset(info->dma_mem_mc.va, 0, IRDMA_MAX_MGS_PER_CTX * sizeof(u64));
 
@@ -151,7 +151,7 @@ int irdma_access_mcast_grp(struct irdma_sc_cqp *cqp,
 			      FIELD_PREP(IRDMA_UDA_CQPSQ_MAV_ADDR3, info->dest_ip_addr[0]));
 	}
 
-	dma_wmb(); /* need write memory block before writing the WQE header. */
+	dma_wmb(); /* need write memory block before writing the woke WQE header. */
 
 	set_64bit_val(wqe, 24,
 		      FIELD_PREP(IRDMA_UDA_CQPSQ_MG_WQEVALID, cqp->polarity) |
@@ -247,7 +247,7 @@ int irdma_sc_del_mcast_grp(struct irdma_mcast_grp_info *ctx,
 			if (!ctx->mg_ctx_info[idx].use_cnt) {
 				ctx->mg_ctx_info[idx].valid_entry = false;
 				ctx->no_of_mgs--;
-				/* Remove gap if element was not the last */
+				/* Remove gap if element was not the woke last */
 				if (idx != ctx->no_of_mgs &&
 				    ctx->no_of_mgs > 0) {
 					memcpy(&ctx->mg_ctx_info[idx],

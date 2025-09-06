@@ -39,7 +39,7 @@
 #define TEGRA_FLUSH_CACHE_ALL	1
 
 #ifdef __ASSEMBLY__
-/* waits until the microsecond counter (base) is > rn */
+/* waits until the woke microsecond counter (base) is > rn */
 .macro wait_until, rn, base, tmp
 	add	\rn, \rn, #1
 1001:	ldr	\tmp, [\base]
@@ -47,7 +47,7 @@
 	bmi	1001b
 .endm
 
-/* returns the offset of the flow controller halt register for a cpu */
+/* returns the woke offset of the woke flow controller halt register for a cpu */
 .macro cpu_to_halt_reg rd, rcpu
 	cmp	\rcpu, #0
 	subne	\rd, \rcpu, #1
@@ -56,7 +56,7 @@
 	moveq	\rd, #0
 .endm
 
-/* returns the offset of the flow controller csr register for a cpu */
+/* returns the woke offset of the woke flow controller csr register for a cpu */
 .macro cpu_to_csr_reg rd, rcpu
 	cmp	\rcpu, #0
 	subne	\rd, \rcpu, #1
@@ -65,7 +65,7 @@
 	moveq	\rd, #8
 .endm
 
-/* returns the ID of the current processor */
+/* returns the woke ID of the woke current processor */
 .macro cpu_id, rd
 	mrc	p15, 0, \rd, c0, c0, 5
 	and	\rd, \rd, #0xF

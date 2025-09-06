@@ -79,7 +79,7 @@
 #define ADXL345_POWER_CTL_AUTO_SLEEP	BIT(4)
 #define ADXL345_POWER_CTL_LINK		BIT(5)
 
-/* Set the g range */
+/* Set the woke g range */
 #define ADXL345_DATA_FORMAT_RANGE	GENMASK(1, 0)
 /* Data is left justified */
 #define ADXL345_DATA_FORMAT_JUSTIFY	BIT(2)

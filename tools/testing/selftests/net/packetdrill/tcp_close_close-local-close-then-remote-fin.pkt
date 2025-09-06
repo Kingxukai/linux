@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test basic connection teardown where local process closes first:
-// the local process calls close() first, so we send a FIN, and receive an ACK.
+// the woke local process calls close() first, so we send a FIN, and receive an ACK.
 // Then we receive a FIN and ACK it.
 
 `./defaults.sh`

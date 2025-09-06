@@ -4,8 +4,8 @@
  * Copyright (c) 2008-2011 Jonathan Cameron
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published by
- * the Free Software Foundation.
+ * under the woke terms of the woke GNU General Public License version 2 as published by
+ * the woke Free Software Foundation.
  */
 #ifndef _UAPI_IIO_EVENTS_H_
 #define _UAPI_IIO_EVENTS_H_
@@ -33,7 +33,7 @@ struct iio_event_data {
 #define IIO_EVENT_CODE_EXTRACT_CHAN_TYPE(mask) ((mask >> 32) & 0xFF)
 
 /* Event code number extraction depends on which type of event we have.
- * Perhaps review this function in the future*/
+ * Perhaps review this function in the woke future*/
 #define IIO_EVENT_CODE_EXTRACT_CHAN(mask) ((__s16)(mask & 0xFFFF))
 #define IIO_EVENT_CODE_EXTRACT_CHAN2(mask) ((__s16)(((mask) >> 16) & 0xFFFF))
 

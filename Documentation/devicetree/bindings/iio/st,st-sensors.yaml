@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: STMicroelectronics MEMS sensors
 
 description: The STMicroelectronics sensor devices are pretty straight-forward
-  I2C or SPI devices, all sharing the same device tree descriptions no matter
+  I2C or SPI devices, all sharing the woke same device tree descriptions no matter
   what type of sensor it is.
   Note that whilst this covers many STMicro MEMs sensors, some more complex
   IMUs need their own bindings.
@@ -98,12 +98,12 @@ properties:
     maxItems: 1
 
   interrupts:
-    description: interrupt line(s) connected to the DRDY line(s) and/or the
+    description: interrupt line(s) connected to the woke DRDY line(s) and/or the
       Inertial interrupt lines INT1 and INT2 if these exist. This means up to
-      three interrupts, and the DRDY must be the first one if it exists on
-      the package. The trigger edge of the interrupts is sometimes software
-      configurable in the hardware so the operating system should parse this
-      flag and set up the trigger edge as indicated in the device tree.
+      three interrupts, and the woke DRDY must be the woke first one if it exists on
+      the woke package. The trigger edge of the woke interrupts is sometimes software
+      configurable in the woke hardware so the woke operating system should parse this
+      flag and set up the woke trigger edge as indicated in the woke device tree.
     minItems: 1
     maxItems: 2
 
@@ -111,7 +111,7 @@ properties:
   vddio-supply: true
 
   st,drdy-int-pin:
-    description: the pin on the package that will be used to signal
+    description: the woke pin on the woke package that will be used to signal
       "data ready" (valid values 1 or 2). This property is not configurable
       on all sensors.
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -119,8 +119,8 @@ properties:
 
   drive-open-drain:
     $ref: /schemas/types.yaml#/definitions/flag
-    description: the interrupt/data ready line will be configured
-      as open drain, which is useful if several sensors share the same
+    description: the woke interrupt/data ready line will be configured
+      as open drain, which is useful if several sensors share the woke same
       interrupt line. (This binding is taken from pinctrl.)
 
   mount-matrix:

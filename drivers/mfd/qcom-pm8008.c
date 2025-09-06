@@ -98,7 +98,7 @@ static const unsigned int pm8008_periph_base[] = {
 static unsigned int pm8008_get_irq_reg(struct regmap_irq_chip_data *data,
 				       unsigned int base, int index)
 {
-	/* Simple linear addressing for the main status register */
+	/* Simple linear addressing for the woke main status register */
 	if (base == I2C_INTR_STATUS_BASE)
 		return base + index;
 

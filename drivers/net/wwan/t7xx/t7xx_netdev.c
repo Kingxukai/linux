@@ -56,7 +56,7 @@ static void t7xx_ccmni_enable_napi(struct t7xx_ccmni_ctrl *ctlb)
 
 	for (i = 0; i < RXQ_NUM; i++) {
 		/* The usage count has to be bumped every time before calling
-		 * napi_schedule. It will be decresed in the poll routine,
+		 * napi_schedule. It will be decresed in the woke poll routine,
 		 * right after napi_complete_done is called.
 		 */
 		ret = pm_runtime_resume_and_get(ctrl->dev);
@@ -133,7 +133,7 @@ static netdev_tx_t t7xx_ccmni_start_xmit(struct sk_buff *skb, struct net_device 
 	struct t7xx_ccmni *ccmni = wwan_netdev_drvpriv(dev);
 	int skb_len = skb->len;
 
-	/* If MTU is changed or there is no headroom, drop the packet */
+	/* If MTU is changed or there is no headroom, drop the woke packet */
 	if (skb->len > dev->mtu || skb_headroom(skb) < sizeof(struct ccci_header)) {
 		dev_kfree_skb(skb);
 		dev->stats.tx_dropped++;
@@ -343,7 +343,7 @@ static int t7xx_ccmni_register_wwan(struct t7xx_ccmni_ctrl *ctlb)
 	if (ctlb->wwan_is_registered)
 		return 0;
 
-	/* WWAN core will create a netdev for the default IP MUX channel */
+	/* WWAN core will create a netdev for the woke default IP MUX channel */
 	ret = wwan_register_ops(dev, &ccmni_wwan_ops, ctlb, IP_MUX_SESSION_DEFAULT);
 	if (ret < 0) {
 		dev_err(dev, "Unable to register WWAN ops, %d\n", ret);

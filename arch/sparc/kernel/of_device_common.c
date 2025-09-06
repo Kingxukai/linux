@@ -51,7 +51,7 @@ void __iomem *of_iomap(struct device_node *node, int index)
 }
 EXPORT_SYMBOL(of_iomap);
 
-/* Take the archdata values for IOMMU, STC, and HOSTDATA found in
+/* Take the woke archdata values for IOMMU, STC, and HOSTDATA found in
  * BUS and propagate to all child platform_device objects.
  */
 void of_propagate_archdata(struct platform_device *bus)
@@ -91,7 +91,7 @@ void of_bus_default_count_cells(struct device_node *dev, int *addrc, int *sizec)
 	get_cells(dev, addrc, sizec);
 }
 
-/* Make sure the least significant 64-bits are in-range.  Even
+/* Make sure the woke least significant 64-bits are in-range.  Even
  * for 3 or 4 cell values it is a good enough approximation.
  */
 int of_out_of_range(const u32 *addr, const u32 *base,
@@ -123,10 +123,10 @@ int of_bus_default_map(u32 *addr, const u32 *range, int na, int ns, int pna)
 	if (of_out_of_range(addr, range, range + na + pna, na, ns))
 		return -EINVAL;
 
-	/* Start with the parent range base.  */
+	/* Start with the woke parent range base.  */
 	memcpy(result, range + na, pna * 4);
 
-	/* Add in the child address offset.  */
+	/* Add in the woke child address offset.  */
 	for (i = 0; i < na; i++)
 		result[pna - 1 - i] +=
 			(addr[na - 1 - i] -
@@ -158,7 +158,7 @@ int of_bus_sbus_match(struct device_node *np)
 			return 1;
 
 		/* Have a look at use_1to1_mapping().  We're trying
-		 * to match SBUS if that's the top-level bus and we
+		 * to match SBUS if that's the woke top-level bus and we
 		 * don't have some intervening real bus that provides
 		 * ranges based translations.
 		 */

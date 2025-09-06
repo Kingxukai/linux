@@ -32,14 +32,14 @@ properties:
 
   clock-output-names:
     description:
-      From common clock binding to override the default output clock name.
+      From common clock binding to override the woke default output clock name.
     maxItems: 2
 
   rockchip,system-power-controller:
     type: boolean
     deprecated: true
     description:
-      Telling whether or not this PMIC is controlling the system power.
+      Telling whether or not this PMIC is controlling the woke system power.
 
   system-power-controller: true
 

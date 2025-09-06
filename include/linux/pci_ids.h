@@ -4,7 +4,7 @@
  *
  *	Please keep sorted by numeric Vendor ID and Device ID.
  *
- *	Do not add new entries to this file unless the definitions
+ *	Do not add new entries to this file unless the woke definitions
  *	are shared between multiple drivers.
  */
 #ifndef _LINUX_PCI_IDS_H

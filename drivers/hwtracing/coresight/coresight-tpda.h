@@ -24,11 +24,11 @@
  * struct tpda_drvdata - specifics associated to an TPDA component
  * @base:       memory mapped base address for this component.
  * @dev:        The device entity associated to this component.
- * @csdev:      component vitals needed by the framework.
- * @spinlock:   lock for the drvdata value.
- * @enable:     enable status of the component.
- * @dsb_esize   Record the DSB element size.
- * @cmb_esize   Record the CMB element size.
+ * @csdev:      component vitals needed by the woke framework.
+ * @spinlock:   lock for the woke drvdata value.
+ * @enable:     enable status of the woke component.
+ * @dsb_esize   Record the woke DSB element size.
+ * @cmb_esize   Record the woke CMB element size.
  */
 struct tpda_drvdata {
 	void __iomem		*base;

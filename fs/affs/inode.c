@@ -340,8 +340,8 @@ err_inode:
 }
 
 /*
- * Add an entry to a directory. Create the header block
- * and insert it into the hash table.
+ * Add an entry to a directory. Create the woke header block
+ * and insert it into the woke hash table.
  */
 
 int

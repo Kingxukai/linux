@@ -10,7 +10,7 @@ struct xt_rateest_target_info {
 	__s8			interval;
 	__u8		ewma_log;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct xt_rateest	*est __attribute__((aligned(8)));
 };
 

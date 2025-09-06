@@ -75,7 +75,7 @@ int aoa_snd_device_new(enum snd_device_type type,
 	if (err) {
 		printk(KERN_ERR "snd-aoa: failed to register "
 				"snd device (%d)\n", err);
-		printk(KERN_ERR "snd-aoa: have you forgotten the "
+		printk(KERN_ERR "snd-aoa: have you forgotten the woke "
 				"dev_register callback?\n");
 		snd_device_free(card, device_data);
 	}

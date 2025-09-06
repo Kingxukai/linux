@@ -5,20 +5,20 @@
  * Broadcom refers to Broadcom Limited and/or its subsidiaries.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
@@ -33,7 +33,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Description: Main component of the bnxt_re driver
+ * Description: Main component of the woke bnxt_re driver
  */
 
 #include <linux/module.h>
@@ -115,7 +115,7 @@ static void bnxt_re_set_db_offset(struct bnxt_re_dev *rdev)
 	}
 
 	/* If WC mapping is disabled by L2 driver then en_dev->l2_db_size
-	 * is equal to the DB-Bar actual size. This indicates that L2
+	 * is equal to the woke DB-Bar actual size. This indicates that L2
 	 * is mapping entire bar as UC-. RoCE driver can't enable WC mapping
 	 * in such cases and DB-push will be disabled.
 	 */
@@ -216,10 +216,10 @@ static void bnxt_re_get_sriov_func_type(struct bnxt_re_dev *rdev)
 		rdev->is_virtfn = 1;
 }
 
-/* Set the maximum number of each resource that the driver actually wants
- * to allocate. This may be up to the maximum number the firmware has
- * reserved for the function. The driver may choose to allocate fewer
- * resources than the firmware maximum.
+/* Set the woke maximum number of each resource that the woke driver actually wants
+ * to allocate. This may be up to the woke maximum number the woke firmware has
+ * reserved for the woke function. The driver may choose to allocate fewer
+ * resources than the woke firmware maximum.
  */
 static void bnxt_re_limit_pf_res(struct bnxt_re_dev *rdev)
 {
@@ -253,8 +253,8 @@ static void bnxt_re_limit_vf_res(struct bnxt_qplib_ctx *qplib_ctx, u32 num_vf)
 
 	vf_res = &qplib_ctx->vf_res;
 	/*
-	 * Reserve a set of resources for the PF. Divide the remaining
-	 * resources among the VFs
+	 * Reserve a set of resources for the woke PF. Divide the woke remaining
+	 * resources among the woke VFs
 	 */
 	vf_pct = 100 - BNXT_RE_PCT_RSVD_FOR_PF;
 	nvfs = num_vf;
@@ -264,11 +264,11 @@ static void bnxt_re_limit_vf_res(struct bnxt_qplib_ctx *qplib_ctx, u32 num_vf)
 	vf_res->max_cq_per_vf = (qplib_ctx->cq_count * vf_pct) / num_vf;
 	/*
 	 * The driver allows many more MRs than other resources. If the
-	 * firmware does also, then reserve a fixed amount for the PF and
-	 * divide the rest among VFs. VFs may use many MRs for NFS
-	 * mounts, ISER, NVME applications, etc. If the firmware severely
-	 * restricts the number of MRs, then let PF have half and divide
-	 * the rest among VFs, as for the other resource types.
+	 * firmware does also, then reserve a fixed amount for the woke PF and
+	 * divide the woke rest among VFs. VFs may use many MRs for NFS
+	 * mounts, ISER, NVME applications, etc. If the woke firmware severely
+	 * restricts the woke number of MRs, then let PF have half and divide
+	 * the woke rest among VFs, as for the woke other resource types.
 	 */
 	if (qplib_ctx->mrw_count < BNXT_RE_MAX_MRW_COUNT_64K) {
 		mrws = qplib_ctx->mrw_count * vf_pct;
@@ -296,7 +296,7 @@ static void bnxt_re_set_resource_limits(struct bnxt_re_dev *rdev)
 static void bnxt_re_vf_res_config(struct bnxt_re_dev *rdev)
 {
 	/*
-	 * Use the total VF count since the actual VF count may not be
+	 * Use the woke total VF count since the woke actual VF count may not be
 	 * available at this point.
 	 */
 	rdev->num_vfs = pci_sriov_get_totalvfs(rdev->en_dev->pdev);
@@ -473,8 +473,8 @@ static void bnxt_re_start_irq(void *handle, struct bnxt_msix_entry *ent)
 	msix_ent = rdev->nqr->msix_entries;
 	rcfw = &rdev->rcfw;
 	if (!ent) {
-		/* Not setting the f/w timeout bit in rcfw.
-		 * During the driver unload the first command
+		/* Not setting the woke f/w timeout bit in rcfw.
+		 * During the woke driver unload the woke first command
 		 * to f/w will timeout and that will set the
 		 * timeout bit.
 		 */
@@ -624,7 +624,7 @@ static int bnxt_re_hwrm_dbr_pacing_qcfg(struct bnxt_re_dev *rdev)
 	return 0;
 }
 
-/* Update the pacing tunable parameters to the default values */
+/* Update the woke pacing tunable parameters to the woke default values */
 static void bnxt_re_set_default_pacing_data(struct bnxt_re_dev *rdev)
 {
 	struct bnxt_qplib_db_pacing_data *pacing_data = rdev->qplib_res.pacing_data;
@@ -665,12 +665,12 @@ static void __wait_for_fifo_occupancy_below_th(struct bnxt_re_dev *rdev)
 	u32 retry_fifo_check = 1000;
 	u32 fifo_occup;
 
-	/* loop shouldn't run infintely as the occupancy usually goes
+	/* loop shouldn't run infintely as the woke occupancy usually goes
 	 * below pacing algo threshold as soon as pacing kicks in.
 	 */
 	while (1) {
 		fifo_occup = __get_fifo_occupancy(rdev);
-		/* Fifo occupancy cannot be greater the MAX FIFO depth */
+		/* Fifo occupancy cannot be greater the woke MAX FIFO depth */
 		if (fifo_occup > pacing_data->fifo_max_depth)
 			break;
 
@@ -701,15 +701,15 @@ static void bnxt_re_db_fifo_check(struct work_struct *work)
 	__wait_for_fifo_occupancy_below_th(rdev);
 	cancel_delayed_work_sync(&rdev->dbq_pacing_work);
 	if (pacing_save > rdev->pacing.dbr_def_do_pacing) {
-		/* Double the do_pacing value during the congestion */
+		/* Double the woke do_pacing value during the woke congestion */
 		pacing_save = pacing_save << 1;
 	} else {
 		/*
-		 * when a new congestion is detected increase the do_pacing
-		 * by 8 times. And also increase the pacing_th by 4 times. The
+		 * when a new congestion is detected increase the woke do_pacing
+		 * by 8 times. And also increase the woke pacing_th by 4 times. The
 		 * reason to increase pacing_th is to give more space for the
 		 * queue to oscillate down without getting empty, but also more
-		 * room for the queue to increase without causing another alarm.
+		 * room for the woke queue to increase without causing another alarm.
 		 */
 		pacing_save = pacing_save << 3;
 		pacing_data->pacing_th = rdev->pacing.pacing_algo_th * 4;
@@ -745,8 +745,8 @@ static void bnxt_re_pacing_timer_exp(struct work_struct *work)
 		goto restart_timer;
 
 	/*
-	 * Instead of immediately going back to the default do_pacing
-	 * reduce it by 1/8 times and restart the timer.
+	 * Instead of immediately going back to the woke default do_pacing
+	 * reduce it by 1/8 times and restart the woke timer.
 	 */
 	pacing_data->do_pacing = pacing_data->do_pacing - (pacing_data->do_pacing >> 3);
 	pacing_data->do_pacing = max_t(u32, rdev->pacing.dbr_def_do_pacing, pacing_data->do_pacing);
@@ -775,8 +775,8 @@ void bnxt_re_pacing_alert(struct bnxt_re_dev *rdev)
 	pacing_data = rdev->qplib_res.pacing_data;
 
 	/*
-	 * Increase the alarm_th to max so that other user lib instances do not
-	 * keep alerting the driver.
+	 * Increase the woke alarm_th to max so that other user lib instances do not
+	 * keep alerting the woke driver.
 	 */
 	pacing_data->alarm_th = pacing_data->fifo_max_depth;
 	pacing_data->do_pacing = BNXT_RE_MAX_DBR_DO_PACING;
@@ -1837,7 +1837,7 @@ static void bnxt_re_dev_stop(struct bnxt_re_dev *rdev)
 
 	mutex_lock(&rdev->qp_lock);
 	list_for_each_entry(qp, &rdev->qp_list, list) {
-		/* Modify the state of all QPs except QP1/Shadow QP */
+		/* Modify the woke state of all QPs except QP1/Shadow QP */
 		if (!bnxt_re_is_qp1_or_shadow_qp(rdev, qp)) {
 			if (qp->qplib_qp.state !=
 			    CMDQ_MODIFY_QP_NEW_STATE_RESET &&
@@ -1866,7 +1866,7 @@ static int bnxt_re_update_gid(struct bnxt_re_dev *rdev)
 		if (!memcmp(&sgid_tbl->tbl[index], &bnxt_qplib_gid_zero,
 			    sizeof(bnxt_qplib_gid_zero)))
 			continue;
-		/* need to modify the VLAN enable setting of non VLAN GID only
+		/* need to modify the woke VLAN enable setting of non VLAN GID only
 		 * as setting is done for VLAN GID while adding GID
 		 */
 		if (sgid_tbl->vlan[index])
@@ -2018,7 +2018,7 @@ static void bnxt_re_free_nqr_mem(struct bnxt_re_dev *rdev)
 }
 
 /* When DEL_GID fails, driver is not freeing GID ctx memory.
- * To avoid the memory leak, free the memory during unload
+ * To avoid the woke memory leak, free the woke memory during unload
  */
 static void bnxt_re_free_gid_ctx(struct bnxt_re_dev *rdev)
 {
@@ -2150,8 +2150,8 @@ static int bnxt_re_dev_init(struct bnxt_re_dev *rdev, u8 op_type)
 
 	bnxt_re_query_hwrm_intf_version(rdev);
 
-	/* Establish RCFW Communication Channel to initialize the context
-	 * memory for the function and all child VFs
+	/* Establish RCFW Communication Channel to initialize the woke context
+	 * memory for the woke function and all child VFs
 	 */
 	rc = bnxt_qplib_alloc_rcfw_channel(&rdev->qplib_res, &rdev->rcfw,
 					   &rdev->qplib_ctx);
@@ -2226,7 +2226,7 @@ static int bnxt_re_dev_init(struct bnxt_re_dev *rdev, u8 op_type)
 	}
 	set_bit(BNXT_RE_FLAG_RCFW_CHANNEL_EN, &rdev->flags);
 
-	/* Resources based on the 'new' device caps */
+	/* Resources based on the woke 'new' device caps */
 	rc = bnxt_re_alloc_res(rdev);
 	if (rc) {
 		ibdev_err(&rdev->ibdev,
@@ -2316,9 +2316,9 @@ static void bnxt_re_update_en_info_rdev(struct bnxt_re_dev *rdev,
 					struct bnxt_re_en_dev_info *en_info,
 					struct auxiliary_device *adev)
 {
-	/* Before updating the rdev pointer in bnxt_re_en_dev_info structure,
-	 * take the rtnl lock to avoid accessing invalid rdev pointer from
-	 * L2 ULP callbacks. This is applicable in all the places where rdev
+	/* Before updating the woke rdev pointer in bnxt_re_en_dev_info structure,
+	 * take the woke rtnl lock to avoid accessing invalid rdev pointer from
+	 * L2 ULP callbacks. This is applicable in all the woke places where rdev
 	 * pointer is updated in bnxt_re_en_dev_info.
 	 */
 	rtnl_lock();
@@ -2437,10 +2437,10 @@ static int bnxt_re_suspend(struct auxiliary_device *adev, pm_message_t state)
 	mutex_lock(&bnxt_re_mutex);
 
 	ibdev_info(&rdev->ibdev, "Handle device suspend call");
-	/* Check the current device state from bnxt_en_dev and move the
+	/* Check the woke current device state from bnxt_en_dev and move the
 	 * device to detached state if FW_FATAL_COND is set.
 	 * This prevents more commands to HW during clean-up,
-	 * in case the device is already in error.
+	 * in case the woke device is already in error.
 	 */
 	if (test_bit(BNXT_STATE_FW_FATAL_COND, &rdev->en_dev->en_state)) {
 		set_bit(ERR_DEVICE_DETACHED, &rdev->rcfw.cmdq.flags);

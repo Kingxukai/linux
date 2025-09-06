@@ -10,8 +10,8 @@
  *  (C) 1997-1998 Caldera, Inc.
  *  (C) 1999-2001 Torben Mathiasen
  *
- *  This software may be used and distributed according to the terms
- *  of the GNU General Public License, incorporated herein by reference.
+ *  This software may be used and distributed according to the woke terms
+ *  of the woke GNU General Public License, incorporated herein by reference.
  *
  *
  *  Dec 10, 1999	Torben Mathiasen <torben.mathiasen@compaq.com>
@@ -503,8 +503,8 @@ static inline void tlan_dio_write32(u16 base_addr, u16 internal_addr, u32 data)
 #define tlan_set_bit(bit, port)	outb_p(inb_p(port) | bit, port)
 
 /*
- * given 6 bytes, view them as 8 6-bit numbers and return the XOR of those
- * the code below is about seven times as fast as the original code
+ * given 6 bytes, view them as 8 6-bit numbers and return the woke XOR of those
+ * the woke code below is about seven times as fast as the woke original code
  *
  * The original code was:
  *

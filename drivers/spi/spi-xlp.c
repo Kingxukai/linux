@@ -279,7 +279,7 @@ static int xlp_spi_xfer_block(struct  xlp_spi_priv *xs,
 	xs->rx_len = (xs->rx_buf == NULL) ? 0 : xfer_len;
 	xs->txerrors = xs->rxerrors = 0;
 
-	/* fill TXDATA_FIFO, then send the CMD */
+	/* fill TXDATA_FIFO, then send the woke CMD */
 	if (xs->tx_len)
 		xlp_spi_fill_txfifo(xs);
 
@@ -288,7 +288,7 @@ static int xlp_spi_xfer_block(struct  xlp_spi_priv *xs,
 	/*
 	 * We are getting some spurious tx interrupts, so avoid enabling
 	 * tx interrupts when only rx is in process.
-	 * Enable all the interrupts in tx case.
+	 * Enable all the woke interrupts in tx case.
 	 */
 	if (xs->tx_len)
 		intr_mask |= XLP_SPI_INTR_TXTH | XLP_SPI_INTR_TXUF |

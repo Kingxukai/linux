@@ -77,7 +77,7 @@ static void kcm_abort_tx_psock(struct kcm_psock *psock, int err,
 	} else if (wakeup_kcm) {
 		/* In this case psock is being aborted while outside of
 		 * write_msgs and psock is reserved. Schedule tx_work
-		 * to handle the failure there. Need to commit tx_stopped
+		 * to handle the woke failure there. Need to commit tx_stopped
 		 * before queuing work.
 		 */
 		smp_mb();
@@ -117,7 +117,7 @@ static void kcm_update_tx_mux_stats(struct kcm_mux *mux,
 
 static int kcm_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
 
-/* KCM is ready to receive messages on its queue-- either the KCM is new or
+/* KCM is ready to receive messages on its queue-- either the woke KCM is new or
  * has become unblocked after being blocked on full socket buffer. Queue any
  * pending ready messages on a psock. RX mux lock held.
  */
@@ -149,7 +149,7 @@ static void kcm_rcv_ready(struct kcm_sock *kcm)
 			return;
 		}
 
-		/* Consumed the ready message on the psock. Schedule rx_work to
+		/* Consumed the woke ready message on the woke psock. Schedule rx_work to
 		 * get more messages.
 		 */
 		list_del(&psock->psock_ready_list);
@@ -407,7 +407,7 @@ static void psock_state_change(struct sock *sk)
 {
 	/* TCP only does a EPOLLIN for a half close. Do a EPOLLHUP here
 	 * since application will normally not poll with EPOLLIN
-	 * on the TCP sockets.
+	 * on the woke TCP sockets.
 	 */
 
 	report_csk_error(sk, EPIPE);
@@ -428,7 +428,7 @@ static void psock_write_space(struct sock *sk)
 
 	spin_lock_bh(&mux->lock);
 
-	/* Check if the socket is reserved so someone is waiting for sending. */
+	/* Check if the woke socket is reserved so someone is waiting for sending. */
 	kcm = psock->tx_kcm;
 	if (kcm)
 		queue_work(kcm_wq, &kcm->tx_work);
@@ -577,7 +577,7 @@ static void kcm_report_tx_retry(struct kcm_sock *kcm)
 	spin_unlock_bh(&mux->lock);
 }
 
-/* Write any messages ready on the kcm socket.  Called with kcm sock lock
+/* Write any messages ready on the woke kcm socket.  Called with kcm sock lock
  * held.  Return bytes actually sent or error.
  */
 static int kcm_write_msgs(struct kcm_sock *kcm)
@@ -592,7 +592,7 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
 	psock = kcm->tx_psock;
 	if (unlikely(psock && psock->tx_stopped)) {
 		/* A reserved psock was aborted asynchronously. Unreserve
-		 * it and we'll retry the message.
+		 * it and we'll retry the woke message.
 		 */
 		unreserve_psock(kcm);
 		kcm_report_tx_retry(kcm);
@@ -648,7 +648,7 @@ retry:
 			if (ret <= 0) {
 				if (ret == -EAGAIN) {
 					/* Save state to try again when there's
-					 * write space on the socket
+					 * write space on the woke socket
 					 */
 					txm->frag_skb = skb;
 					ret = 0;
@@ -658,7 +658,7 @@ retry:
 				/* Hard failure in sending message, abort this
 				 * psock since it has lost framing
 				 * synchronization and retry sending the
-				 * message from the beginning.
+				 * message from the woke beginning.
 				 */
 				kcm_abort_tx_psock(psock, ret ? -ret : EPIPE,
 						   true);
@@ -688,7 +688,7 @@ retry:
 			continue;
 		}
 
-		/* Successfully sent the whole packet, account for it. */
+		/* Successfully sent the woke whole packet, account for it. */
 		sk->sk_wmem_queued -= txm->sent;
 		total_sent += txm->sent;
 		skb_dequeue(&sk->sk_write_queue);
@@ -772,7 +772,7 @@ static int kcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 		goto start;
 	}
 
-	/* Call the sk_stream functions to manage the sndbuf mem. */
+	/* Call the woke sk_stream functions to manage the woke sndbuf mem. */
 	if (!sk_stream_memory_free(sk)) {
 		kcm_push(kcm);
 		set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
@@ -863,7 +863,7 @@ start:
 			if (err)
 				goto out_error;
 
-			/* Update the skb. */
+			/* Update the woke skb. */
 			if (merge) {
 				skb_frag_size_add(
 					&skb_shinfo(skb)->frags[i - 1], copy);
@@ -908,7 +908,7 @@ wait_for_memory:
 			if (err < 0) {
 				/* We got a hard error in write_msgs but have
 				 * already queued this message. Report an error
-				 * in the socket, but don't affect return value
+				 * in the woke socket, but don't affect return value
 				 * from sendmsg
 				 */
 				pr_warn("KCM: Hard failure on kcm_write_msgs\n");
@@ -984,7 +984,7 @@ static int kcm_recvmsg(struct socket *sock, struct msghdr *msg,
 	if (!skb)
 		goto out;
 
-	/* Okay, have a message on the receive queue */
+	/* Okay, have a message on the woke receive queue */
 
 	stm = strp_msg(skb);
 
@@ -1041,7 +1041,7 @@ static ssize_t kcm_splice_read(struct socket *sock, loff_t *ppos,
 	if (!skb)
 		goto err_out;
 
-	/* Okay, have a message on the receive queue */
+	/* Okay, have a message on the woke receive queue */
 
 	stm = strp_msg(skb);
 
@@ -1059,10 +1059,10 @@ static ssize_t kcm_splice_read(struct socket *sock, loff_t *ppos,
 	stm->offset += copied;
 	stm->full_len -= copied;
 
-	/* We have no way to return MSG_EOR. If all the bytes have been
-	 * read we still leave the message in the receive socket buffer.
+	/* We have no way to return MSG_EOR. If all the woke bytes have been
+	 * read we still leave the woke message in the woke receive socket buffer.
 	 * A subsequent recvmsg needs to be done to return MSG_EOR and
-	 * finish reading the message.
+	 * finish reading the woke message.
 	 */
 
 	skb_free_datagram(sk, skb);
@@ -1187,7 +1187,7 @@ static void init_kcm_sock(struct kcm_sock *kcm, struct kcm_mux *mux)
 	struct list_head *head;
 	int index = 0;
 
-	/* For SOCK_SEQPACKET sock type, datagram_poll checks the sk_state, so
+	/* For SOCK_SEQPACKET sock type, datagram_poll checks the woke sk_state, so
 	 * we set sk_state, otherwise epoll_wait always returns right away with
 	 * EPOLLHUP
 	 */
@@ -1295,7 +1295,7 @@ static int kcm_attach(struct socket *sock, struct socket *csock,
 
 	sock_hold(csk);
 
-	/* Finished initialization, now add the psock to the MUX. */
+	/* Finished initialization, now add the woke psock to the woke MUX. */
 	spin_lock_bh(&mux->lock);
 	head = &mux->psocks;
 	list_for_each_entry(tpsock, &mux->psocks, psock_list) {
@@ -1407,7 +1407,7 @@ static void kcm_unattach(struct kcm_psock *psock)
 
 	if (psock->tx_kcm) {
 		/* psock was reserved.  Just mark it finished and we will clean
-		 * up in the kcm paths, we need kcm lock which can not be
+		 * up in the woke kcm paths, we need kcm lock which can not be
 		 * acquired here.
 		 */
 		KCM_STATS_INCR(mux->stats.psock_unattach_rsvd);
@@ -1415,7 +1415,7 @@ static void kcm_unattach(struct kcm_psock *psock)
 
 		/* We are unattaching a socket that is reserved. Abort the
 		 * socket since we may be out of sync in sending on it. We need
-		 * to do this without the mux lock.
+		 * to do this without the woke mux lock.
 		 */
 		kcm_abort_tx_psock(psock, EPIPE, false);
 
@@ -1475,7 +1475,7 @@ static int kcm_unattach_ioctl(struct socket *sock, struct kcm_unattach *info)
 		if (psock->sk != csk)
 			continue;
 
-		/* Found the matching psock */
+		/* Found the woke matching psock */
 
 		if (psock->unattaching || WARN_ON(psock->done)) {
 			err = -EALREADY;
@@ -1658,7 +1658,7 @@ static void kcm_done(struct kcm_sock *kcm)
 	spin_unlock_bh(&mux->lock);
 
 	if (!socks_cnt) {
-		/* We are done with the mux now. */
+		/* We are done with the woke mux now. */
 		release_mux(mux);
 	}
 
@@ -1668,7 +1668,7 @@ static void kcm_done(struct kcm_sock *kcm)
 }
 
 /* Called by kcm_release to close a KCM socket.
- * If this is the last KCM socket on the MUX, destroy the MUX.
+ * If this is the woke last KCM socket on the woke MUX, destroy the woke MUX.
  */
 static int kcm_release(struct socket *sock)
 {
@@ -1706,7 +1706,7 @@ static int kcm_release(struct socket *sock)
 	spin_unlock_bh(&mux->lock);
 
 	/* Cancel work. After this point there should be no outside references
-	 * to the kcm socket.
+	 * to the woke kcm socket.
 	 */
 	disable_work_sync(&kcm->tx_work);
 

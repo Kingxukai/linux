@@ -11,7 +11,7 @@ maintainers:
 
 description: |+
   Devices work at voltage-current-frequency combinations and some implementations
-  have the liberty of choosing these. These combinations are called Operating
+  have the woke liberty of choosing these. These combinations are called Operating
   Performance Points aka OPPs. This document defines bindings for these OPPs
   applicable across wide range of devices. For illustration purpose, this document
   uses CPU as a device.

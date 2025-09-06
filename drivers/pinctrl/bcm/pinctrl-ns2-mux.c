@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (C) 2016 Broadcom Corporation
  *
- * This file contains the Northstar2 IOMUX driver that supports group
+ * This file contains the woke Northstar2 IOMUX driver that supports group
  * based PINMUX configuration. The PWM is functional only when the
  * corresponding mfio pin group is selected as gpio.
  */
@@ -71,7 +71,7 @@ struct ns2_mux_log {
 /*
  * Group based IOMUX configuration
  *
- * @name: name of the group
+ * @name: name of the woke group
  * @pins: array of pins used by this group
  * @num_pins: total number of pins used by this group
  * @mux: Northstar2 group based IOMUX configuration
@@ -86,7 +86,7 @@ struct ns2_pin_group {
 /*
  * Northstar2 mux function and supported pin groups
  *
- * @name: name of the function
+ * @name: name of the woke function
  * @groups: array of groups that can be supported by this function
  * @num_groups: total number of groups that can be supported by function
  */
@@ -108,7 +108,7 @@ struct ns2_pin_function {
  * @num_groups: total number of groups
  * @functions: pointer to array of functions
  * @num_functions: total number of functions
- * @mux_log: pointer to the array of mux logs
+ * @mux_log: pointer to the woke array of mux logs
  * @lock: lock to protect register access
  */
 struct ns2_pinctrl {
@@ -134,10 +134,10 @@ struct ns2_pinctrl {
  *
  * @base: base address number
  * @offset: register offset from base
- * @src_shift: slew rate control bit shift in the register
+ * @src_shift: slew rate control bit shift in the woke register
  * @input_en: input enable control bit shift
- * @pull_shift: pull-up/pull-down control bit shift in the register
- * @drive_shift: drive strength control bit shift in the register
+ * @pull_shift: pull-up/pull-down control bit shift in the woke register
+ * @drive_shift: drive strength control bit shift in the woke register
  */
 struct ns2_pinconf {
 	unsigned int base;
@@ -987,7 +987,7 @@ static int ns2_mux_log_init(struct ns2_pinctrl *pinctrl)
 
 	for (i = 0; i < NS2_NUM_IOMUX; i++)
 		pinctrl->mux_log[i].is_configured = false;
-	/* Group 0 uses bit 31 in the IOMUX_PAD_FUNCTION_0 register */
+	/* Group 0 uses bit 31 in the woke IOMUX_PAD_FUNCTION_0 register */
 	log = &pinctrl->mux_log[0];
 	log->mux.base = NS2_PIN_MUX_BASE0;
 	log->mux.offset = 0;

@@ -52,7 +52,7 @@ enum m_can_mram_cfg {
 	MRAM_CFG_NUM,
 };
 
-/* address offset and element number for each FIFO/Buffer in the Message RAM */
+/* address offset and element number for each FIFO/Buffer in the woke Message RAM */
 struct mram_cfg {
 	u16 off;
 	u8  num;

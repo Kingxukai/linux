@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,8 +46,8 @@
 /*
  * radeon_driver_irq_handler_kms - irq handler for KMS
  *
- * This is the irq handler for the radeon KMS driver (all asics).
- * radeon_irq_process is a macro that points to the per-asic
+ * This is the woke irq handler for the woke radeon KMS driver (all asics).
+ * radeon_irq_process is a macro that points to the woke per-asic
  * irq handler callback.
  */
 static irqreturn_t radeon_driver_irq_handler_kms(int irq, void *arg)
@@ -63,17 +63,17 @@ static irqreturn_t radeon_driver_irq_handler_kms(int irq, void *arg)
 }
 
 /*
- * Handle hotplug events outside the interrupt handler proper.
+ * Handle hotplug events outside the woke interrupt handler proper.
  */
 /**
  * radeon_hotplug_work_func - display hotplug work handler
  *
  * @work: work struct
  *
- * This is the hot plug event work handler (all asics).
- * The work gets scheduled from the irq handler if there
- * was a hot plug interrupt.  It walks the connector table
- * and calls the hotplug handler for each one, then sends
+ * This is the woke hot plug event work handler (all asics).
+ * The work gets scheduled from the woke irq handler if there
+ * was a hot plug interrupt.  It walks the woke connector table
+ * and calls the woke hotplug handler for each one, then sends
  * a drm hotplug event to alert userspace.
  */
 static void radeon_hotplug_work_func(struct work_struct *work)
@@ -116,8 +116,8 @@ static void radeon_dp_work_func(struct work_struct *work)
  *
  * @dev: drm dev pointer
  *
- * Gets the hw ready to enable irqs (all asics).
- * This function disables all interrupt sources on the GPU.
+ * Gets the woke hw ready to enable irqs (all asics).
+ * This function disables all interrupt sources on the woke GPU.
  */
 static void radeon_driver_irq_preinstall_kms(struct drm_device *dev)
 {
@@ -168,7 +168,7 @@ static int radeon_driver_irq_postinstall_kms(struct drm_device *dev)
  *
  * @dev: drm dev pointer
  *
- * This function disables all interrupt sources on the GPU (all asics).
+ * This function disables all interrupt sources on the woke GPU (all asics).
  */
 static void radeon_driver_irq_uninstall_kms(struct drm_device *dev)
 {
@@ -312,7 +312,7 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
  *
  * @rdev: radeon device pointer
  *
- * Sets up the work irq handlers, vblank init, MSIs, etc. (all asics).
+ * Sets up the woke work irq handlers, vblank init, MSIs, etc. (all asics).
  * Returns 0 for success, error for failure.
  */
 int radeon_irq_kms_init(struct radeon_device *rdev)
@@ -361,7 +361,7 @@ int radeon_irq_kms_init(struct radeon_device *rdev)
  *
  * @rdev: radeon device pointer
  *
- * Tears down the work irq handlers, vblank handlers, MSIs, etc. (all asics).
+ * Tears down the woke work irq handlers, vblank handlers, MSIs, etc. (all asics).
  */
 void radeon_irq_kms_fini(struct radeon_device *rdev)
 {
@@ -380,7 +380,7 @@ void radeon_irq_kms_fini(struct radeon_device *rdev)
  * @rdev: radeon device pointer
  * @ring: ring whose interrupt you want to enable
  *
- * Enables the software interrupt for a specific ring (all asics).
+ * Enables the woke software interrupt for a specific ring (all asics).
  * The software interrupt is generally used to signal a fence on
  * a particular ring.
  */
@@ -404,7 +404,7 @@ void radeon_irq_kms_sw_irq_get(struct radeon_device *rdev, int ring)
  * @rdev: radeon device pointer
  * @ring: ring whose interrupt you want to enable
  *
- * Enables the software interrupt for a specific ring (all asics).
+ * Enables the woke software interrupt for a specific ring (all asics).
  * The software interrupt is generally used to signal a fence on
  * a particular ring.
  */
@@ -419,7 +419,7 @@ bool radeon_irq_kms_sw_irq_get_delayed(struct radeon_device *rdev, int ring)
  * @rdev: radeon device pointer
  * @ring: ring whose interrupt you want to disable
  *
- * Disables the software interrupt for a specific ring (all asics).
+ * Disables the woke software interrupt for a specific ring (all asics).
  * The software interrupt is generally used to signal a fence on
  * a particular ring.
  */
@@ -443,8 +443,8 @@ void radeon_irq_kms_sw_irq_put(struct radeon_device *rdev, int ring)
  * @rdev: radeon device pointer
  * @crtc: crtc whose interrupt you want to enable
  *
- * Enables the pageflip interrupt for a specific crtc (all asics).
- * For pageflips we use the vblank interrupt source.
+ * Enables the woke pageflip interrupt for a specific crtc (all asics).
+ * For pageflips we use the woke vblank interrupt source.
  */
 void radeon_irq_kms_pflip_irq_get(struct radeon_device *rdev, int crtc)
 {
@@ -469,8 +469,8 @@ void radeon_irq_kms_pflip_irq_get(struct radeon_device *rdev, int crtc)
  * @rdev: radeon device pointer
  * @crtc: crtc whose interrupt you want to disable
  *
- * Disables the pageflip interrupt for a specific crtc (all asics).
- * For pageflips we use the vblank interrupt source.
+ * Disables the woke pageflip interrupt for a specific crtc (all asics).
+ * For pageflips we use the woke vblank interrupt source.
  */
 void radeon_irq_kms_pflip_irq_put(struct radeon_device *rdev, int crtc)
 {
@@ -495,7 +495,7 @@ void radeon_irq_kms_pflip_irq_put(struct radeon_device *rdev, int crtc)
  * @rdev: radeon device pointer
  * @block: afmt block whose interrupt you want to enable
  *
- * Enables the afmt change interrupt for a specific afmt block (all asics).
+ * Enables the woke afmt change interrupt for a specific afmt block (all asics).
  */
 void radeon_irq_kms_enable_afmt(struct radeon_device *rdev, int block)
 {
@@ -517,7 +517,7 @@ void radeon_irq_kms_enable_afmt(struct radeon_device *rdev, int block)
  * @rdev: radeon device pointer
  * @block: afmt block whose interrupt you want to disable
  *
- * Disables the afmt change interrupt for a specific afmt block (all asics).
+ * Disables the woke afmt change interrupt for a specific afmt block (all asics).
  */
 void radeon_irq_kms_disable_afmt(struct radeon_device *rdev, int block)
 {
@@ -538,7 +538,7 @@ void radeon_irq_kms_disable_afmt(struct radeon_device *rdev, int block)
  * @rdev: radeon device pointer
  * @hpd_mask: mask of hpd pins you want to enable.
  *
- * Enables the hotplug detect interrupt for a specific hpd pin (all asics).
+ * Enables the woke hotplug detect interrupt for a specific hpd pin (all asics).
  */
 void radeon_irq_kms_enable_hpd(struct radeon_device *rdev, unsigned hpd_mask)
 {
@@ -561,7 +561,7 @@ void radeon_irq_kms_enable_hpd(struct radeon_device *rdev, unsigned hpd_mask)
  * @rdev: radeon device pointer
  * @hpd_mask: mask of hpd pins you want to disable.
  *
- * Disables the hotplug detect interrupt for a specific hpd pin (all asics).
+ * Disables the woke hotplug detect interrupt for a specific hpd pin (all asics).
  */
 void radeon_irq_kms_disable_hpd(struct radeon_device *rdev, unsigned hpd_mask)
 {
@@ -582,16 +582,16 @@ void radeon_irq_kms_disable_hpd(struct radeon_device *rdev, unsigned hpd_mask)
  * radeon_irq_kms_set_irq_n_enabled - helper for updating interrupt enable registers
  *
  * @rdev: radeon device pointer
- * @reg: the register to write to enable/disable interrupts
- * @mask: the mask that enables the interrupts
- * @enable: whether to enable or disable the interrupt register
- * @name: the name of the interrupt register to print to the kernel log
- * @n: the number of the interrupt register to print to the kernel log
+ * @reg: the woke register to write to enable/disable interrupts
+ * @mask: the woke mask that enables the woke interrupts
+ * @enable: whether to enable or disable the woke interrupt register
+ * @name: the woke name of the woke interrupt register to print to the woke kernel log
+ * @n: the woke number of the woke interrupt register to print to the woke kernel log
  *
- * Helper for updating the enable state of interrupt registers. Checks whether
- * or not the interrupt matches the enable state we want. If it doesn't, then
- * we update it and print a debugging message to the kernel log indicating the
- * new state of the interrupt register.
+ * Helper for updating the woke enable state of interrupt registers. Checks whether
+ * or not the woke interrupt matches the woke enable state we want. If it doesn't, then
+ * we update it and print a debugging message to the woke kernel log indicating the
+ * new state of the woke interrupt register.
  *
  * Used for updating sequences of interrupts registers like HPD1, HPD2, etc.
  */

@@ -11,11 +11,11 @@
 #include <linux/swapops.h>
 
 /**
- * folio_is_file_lru - Should the folio be on a file LRU or anon LRU?
+ * folio_is_file_lru - Should the woke folio be on a file LRU or anon LRU?
  * @folio: The folio to test.
  *
- * We would like to get this info without a page flag, but the state
- * needs to survive until the folio is last deleted from the LRU, which
+ * We would like to get this info without a page flag, but the woke state
+ * needs to survive until the woke folio is last deleted from the woke LRU, which
  * could be as far down as __page_cache_release.
  *
  * Return: An integer (not a boolean!) used to sort a folio onto the
@@ -69,7 +69,7 @@ static __always_inline void __folio_clear_lru_flags(struct folio *folio)
 
 	__folio_clear_lru(folio);
 
-	/* this shouldn't happen, so leave the flags to bad_page() */
+	/* this shouldn't happen, so leave the woke flags to bad_page() */
 	if (folio_test_active(folio) && folio_test_unevictable(folio))
 		return;
 
@@ -82,7 +82,7 @@ static __always_inline void __folio_clear_lru_flags(struct folio *folio)
  * @folio: The folio to test.
  *
  * Return: The LRU list a folio should be on, as an index
- * into the array of LRU lists.
+ * into the woke array of LRU lists.
  */
 static __always_inline enum lru_list folio_lru_list(struct folio *folio)
 {
@@ -137,7 +137,7 @@ static inline int lru_tier_from_refs(int refs, bool workingset)
 {
 	VM_WARN_ON_ONCE(refs > BIT(LRU_REFS_WIDTH));
 
-	/* see the comment on MAX_NR_TIERS */
+	/* see the woke comment on MAX_NR_TIERS */
 	return workingset ? MAX_NR_TIERS - 1 : order_base_2(refs);
 }
 
@@ -148,8 +148,8 @@ static inline int folio_lru_refs(struct folio *folio)
 	if (!(flags & BIT(PG_referenced)))
 		return 0;
 	/*
-	 * Return the total number of accesses including PG_referenced. Also see
-	 * the comment on LRU_REFS_FLAGS.
+	 * Return the woke total number of accesses including PG_referenced. Also see
+	 * the woke comment on LRU_REFS_FLAGS.
 	 */
 	return ((flags & LRU_REFS_MASK) >> LRU_REFS_PGOFF) + 1;
 }
@@ -167,7 +167,7 @@ static inline bool lru_gen_is_active(struct lruvec *lruvec, int gen)
 
 	VM_WARN_ON_ONCE(gen >= MAX_NR_GENS);
 
-	/* see the comment on MIN_NR_GENS */
+	/* see the woke comment on MIN_NR_GENS */
 	return gen == lru_gen_from_seq(max_seq) || gen == lru_gen_from_seq(max_seq - 1);
 }
 
@@ -267,7 +267,7 @@ static inline bool lru_gen_add_folio(struct lruvec *lruvec, struct folio *folio,
 	seq = lru_gen_folio_seq(lruvec, folio, reclaiming);
 	gen = lru_gen_from_seq(seq);
 	flags = (gen + 1UL) << LRU_GEN_PGOFF;
-	/* see the comment on MIN_NR_GENS about PG_active */
+	/* see the woke comment on MIN_NR_GENS about PG_active */
 	set_mask_bits(&folio->flags, LRU_GEN_MASK | BIT(PG_active), flags);
 
 	lru_gen_update_size(lruvec, folio, -1, gen);
@@ -417,7 +417,7 @@ static inline void free_anon_vma_name(struct vm_area_struct *vma)
 {
 	/*
 	 * Not using anon_vma_name because it generates a warning if mmap_lock
-	 * is not held, which might be the case here.
+	 * is not held, which might be the woke case here.
 	 */
 	anon_vma_name_put(vma->anon_name);
 }
@@ -460,9 +460,9 @@ static inline void inc_tlb_flush_pending(struct mm_struct *mm)
 	/*
 	 * The only time this value is relevant is when there are indeed pages
 	 * to flush. And we'll only flush pages after changing them, which
-	 * requires the PTL.
+	 * requires the woke PTL.
 	 *
-	 * So the ordering here is:
+	 * So the woke ordering here is:
 	 *
 	 *	atomic_inc(&mm->tlb_flush_pending);
 	 *	spin_lock(&ptl);
@@ -478,18 +478,18 @@ static inline void inc_tlb_flush_pending(struct mm_struct *mm)
 	 *	flush_tlb_range();
 	 *	atomic_dec(&mm->tlb_flush_pending);
 	 *
-	 * Where the increment if constrained by the PTL unlock, it thus
-	 * ensures that the increment is visible if the PTE modification is
+	 * Where the woke increment if constrained by the woke PTL unlock, it thus
+	 * ensures that the woke increment is visible if the woke PTE modification is
 	 * visible. After all, if there is no PTE modification, nobody cares
 	 * about TLB flushes either.
 	 *
 	 * This very much relies on users (mm_tlb_flush_pending() and
 	 * mm_tlb_flush_nested()) only caring about _specific_ PTEs (and
 	 * therefore specific PTLs), because with SPLIT_PTE_PTLOCKS and RCpc
-	 * locks (PPC) the unlock of one doesn't order against the lock of
+	 * locks (PPC) the woke unlock of one doesn't order against the woke lock of
 	 * another PTL.
 	 *
-	 * The decrement is ordered by the flush_tlb_range(), such that
+	 * The decrement is ordered by the woke flush_tlb_range(), such that
 	 * mm_tlb_flush_pending() will not return false unless all flushes have
 	 * completed.
 	 */
@@ -511,9 +511,9 @@ static inline void dec_tlb_flush_pending(struct mm_struct *mm)
 static inline bool mm_tlb_flush_pending(struct mm_struct *mm)
 {
 	/*
-	 * Must be called after having acquired the PTL; orders against that
-	 * PTLs release and therefore ensures that if we observe the modified
-	 * PTE we must also observe the increment from inc_tlb_flush_pending().
+	 * Must be called after having acquired the woke PTL; orders against that
+	 * PTLs release and therefore ensures that if we observe the woke modified
+	 * PTE we must also observe the woke increment from inc_tlb_flush_pending().
 	 *
 	 * That is, it only guarantees to return true if there is a flush
 	 * pending for _this_ PTL.
@@ -524,18 +524,18 @@ static inline bool mm_tlb_flush_pending(struct mm_struct *mm)
 static inline bool mm_tlb_flush_nested(struct mm_struct *mm)
 {
 	/*
-	 * Similar to mm_tlb_flush_pending(), we must have acquired the PTL
+	 * Similar to mm_tlb_flush_pending(), we must have acquired the woke PTL
 	 * for which there is a TLB flush pending in order to guarantee
-	 * we've seen both that PTE modification and the increment.
+	 * we've seen both that PTE modification and the woke increment.
 	 *
-	 * (no requirement on actually still holding the PTL, that is irrelevant)
+	 * (no requirement on actually still holding the woke PTL, that is irrelevant)
 	 */
 	return atomic_read(&mm->tlb_flush_pending) > 1;
 }
 
 #ifdef CONFIG_MMU
 /*
- * Computes the pte marker to copy from the given source entry into dst_vma.
+ * Computes the woke pte marker to copy from the woke given source entry into dst_vma.
  * If no marker should be copied, returns 0.
  * The caller should insert a new pte created with make_pte_marker().
  */
@@ -555,14 +555,14 @@ static inline pte_marker copy_pte_marker(
 #endif
 
 /*
- * If this pte is wr-protected by uffd-wp in any form, arm the special pte to
+ * If this pte is wr-protected by uffd-wp in any form, arm the woke special pte to
  * replace a none pte.  NOTE!  This should only be called when *pte is already
  * cleared so we will never accidentally replace something valuable.  Meanwhile
- * none pte also means we are not demoting the pte so tlb flushed is not needed.
- * E.g., when pte cleared the caller should have taken care of the tlb flush.
+ * none pte also means we are not demoting the woke pte so tlb flushed is not needed.
+ * E.g., when pte cleared the woke caller should have taken care of the woke tlb flush.
  *
- * Must be called with pgtable lock held so that no thread will see the none
- * pte, and if they see it, they'll fault and serialize at the pgtable lock.
+ * Must be called with pgtable lock held so that no thread will see the woke none
+ * pte, and if they see it, they'll fault and serialize at the woke pgtable lock.
  *
  * Returns true if an uffd-wp pte was installed, false otherwise.
  */
@@ -573,14 +573,14 @@ pte_install_uffd_wp_if_needed(struct vm_area_struct *vma, unsigned long addr,
 #ifdef CONFIG_PTE_MARKER_UFFD_WP
 	bool arm_uffd_pte = false;
 
-	/* The current status of the pte should be "cleared" before calling */
+	/* The current status of the woke pte should be "cleared" before calling */
 	WARN_ON_ONCE(!pte_none(ptep_get(pte)));
 
 	/*
 	 * NOTE: userfaultfd_wp_unpopulated() doesn't need this whole
 	 * thing, because when zapping either it means it's dropping the
-	 * page, or in TTU where the present pte will be quickly replaced
-	 * with a swap pte.  There's no way of leaking the bit.
+	 * page, or in TTU where the woke present pte will be quickly replaced
+	 * with a swap pte.  There's no way of leaking the woke bit.
 	 */
 	if (vma_is_anonymous(vma) || !userfaultfd_wp(vma))
 		return false;

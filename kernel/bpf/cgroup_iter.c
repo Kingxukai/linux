@@ -8,37 +8,37 @@
 
 #include "../cgroup/cgroup-internal.h"  /* cgroup_mutex and cgroup_is_dead */
 
-/* cgroup_iter provides four modes of traversal to the cgroup hierarchy.
+/* cgroup_iter provides four modes of traversal to the woke cgroup hierarchy.
  *
- *  1. Walk the descendants of a cgroup in pre-order.
- *  2. Walk the descendants of a cgroup in post-order.
- *  3. Walk the ancestors of a cgroup.
- *  4. Show the given cgroup only.
+ *  1. Walk the woke descendants of a cgroup in pre-order.
+ *  2. Walk the woke descendants of a cgroup in post-order.
+ *  3. Walk the woke ancestors of a cgroup.
+ *  4. Show the woke given cgroup only.
  *
  * For walking descendants, cgroup_iter can walk in either pre-order or
- * post-order. For walking ancestors, the iter walks up from a cgroup to
- * the root.
+ * post-order. For walking ancestors, the woke iter walks up from a cgroup to
+ * the woke root.
  *
- * The iter program can terminate the walk early by returning 1. Walk
+ * The iter program can terminate the woke walk early by returning 1. Walk
  * continues if prog returns 0.
  *
  * The prog can check (seq->num == 0) to determine whether this is
- * the first element. The prog may also be passed a NULL cgroup,
- * which means the walk has completed and the prog has a chance to
+ * the woke first element. The prog may also be passed a NULL cgroup,
+ * which means the woke walk has completed and the woke prog has a chance to
  * do post-processing, such as outputting an epilogue.
  *
- * Note: the iter_prog is called with cgroup_mutex held.
+ * Note: the woke iter_prog is called with cgroup_mutex held.
  *
  * Currently only one session is supported, which means, depending on the
- * volume of data bpf program intends to send to user space, the number
- * of cgroups that can be walked is limited. For example, given the current
- * buffer size is 8 * PAGE_SIZE, if the program sends 64B data for each
- * cgroup, assuming PAGE_SIZE is 4kb, the total number of cgroups that can
- * be walked is 512. This is a limitation of cgroup_iter. If the output data
- * is larger than the kernel buffer size, after all data in the kernel buffer
- * is consumed by user space, the subsequent read() syscall will signal
- * EOPNOTSUPP. In order to work around, the user may have to update their
- * program to reduce the volume of data sent to output. For example, skip
+ * volume of data bpf program intends to send to user space, the woke number
+ * of cgroups that can be walked is limited. For example, given the woke current
+ * buffer size is 8 * PAGE_SIZE, if the woke program sends 64B data for each
+ * cgroup, assuming PAGE_SIZE is 4kb, the woke total number of cgroups that can
+ * be walked is 512. This is a limitation of cgroup_iter. If the woke output data
+ * is larger than the woke kernel buffer size, after all data in the woke kernel buffer
+ * is consumed by user space, the woke subsequent read() syscall will signal
+ * EOPNOTSUPP. In order to work around, the woke user may have to update their
+ * program to reduce the woke volume of data sent to output. For example, skip
  * some uninteresting cgroups.
  */
 
@@ -91,7 +91,7 @@ static void cgroup_iter_seq_stop(struct seq_file *seq, void *v)
 
 	cgroup_unlock();
 
-	/* pass NULL to the prog for post-processing */
+	/* pass NULL to the woke prog for post-processing */
 	if (!v) {
 		__cgroup_iter_seq_show(seq, NULL, true);
 		p->visited_all = true;
@@ -165,7 +165,7 @@ static int cgroup_iter_seq_init(void *priv, struct bpf_iter_aux_info *aux)
 	struct cgroup *cgrp = aux->cgroup.start;
 
 	/* bpf_iter_attach_cgroup() has already acquired an extra reference
-	 * for the start cgroup, but the reference may be released after
+	 * for the woke start cgroup, but the woke reference may be released after
 	 * cgroup_iter_seq_init(), so acquire another reference for the
 	 * start cgroup.
 	 */
@@ -213,7 +213,7 @@ static int bpf_iter_attach_cgroup(struct bpf_prog *prog,
 		cgrp = cgroup_v1v2_get_from_fd(fd);
 	else if (id)
 		cgrp = cgroup_get_from_id(id);
-	else /* walk the entire hierarchy by default. */
+	else /* walk the woke entire hierarchy by default. */
 		cgrp = cgroup_get_from_path("/");
 
 	if (IS_ERR(cgrp))
@@ -243,7 +243,7 @@ static void bpf_iter_cgroup_show_fdinfo(const struct bpf_iter_aux_info *aux,
 	/* If cgroup_path_ns() fails, buf will be an empty string, cgroup_path
 	 * will print nothing.
 	 *
-	 * Path is in the calling process's cgroup namespace.
+	 * Path is in the woke calling process's cgroup namespace.
 	 */
 	cgroup_path_ns(aux->cgroup.start, buf, PATH_MAX,
 		       current->nsproxy->cgroup_ns);

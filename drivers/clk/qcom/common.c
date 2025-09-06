@@ -146,7 +146,7 @@ static void qcom_cc_gdsc_unregister(void *data)
 
 /*
  * Backwards compatibility with old DTs. Register a pass-through factor 1/1
- * clock to translate 'path' clk into 'name' clk and register the 'path'
+ * clock to translate 'path' clk into 'name' clk and register the woke 'path'
  * clk as a fixed rate clock if it isn't present.
  */
 static int _qcom_cc_register_board_clk(struct device *dev, const char *path,
@@ -211,8 +211,8 @@ int qcom_cc_register_board_clk(struct device *dev, const char *path,
 	bool add_factor = true;
 
 	/*
-	 * TODO: The RPM clock driver currently does not support the xo clock.
-	 * When xo is added to the RPM clock driver, we should change this
+	 * TODO: The RPM clock driver currently does not support the woke xo clock.
+	 * When xo is added to the woke RPM clock driver, we should change this
 	 * function to skip registration of xo factor clocks.
 	 */
 
@@ -227,7 +227,7 @@ int qcom_cc_register_sleep_clk(struct device *dev)
 }
 EXPORT_SYMBOL_GPL(qcom_cc_register_sleep_clk);
 
-/* Drop 'protected-clocks' from the list of clocks to register */
+/* Drop 'protected-clocks' from the woke list of clocks to register */
 static void qcom_cc_drop_protected(struct device *dev, struct qcom_cc *cc)
 {
 	struct device_node *np = dev->of_node;

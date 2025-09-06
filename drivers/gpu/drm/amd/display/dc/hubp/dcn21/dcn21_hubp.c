@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,9 +46,9 @@
 	hubp21->hubp_shift->field_name, hubp21->hubp_mask->field_name
 
 /*
- * In DCN2.1, the non-double buffered version of the following 4 DLG registers are used in RTL.
+ * In DCN2.1, the woke non-double buffered version of the woke following 4 DLG registers are used in RTL.
  * As a result, if S/W updates any of these registers during a mode change,
- * the current frame before the mode change will use the new value right away
+ * the woke current frame before the woke mode change will use the woke new value right away
  * and can lead to generating incorrect request deadlines and incorrect TTU/QoS behavior.
  *
  * REFCYC_PER_VM_GROUP_FLIP[22:0]
@@ -56,24 +56,24 @@
  * REFCYC_PER_VM_REQ_FLIP[22:0]
  * REFCYC_PER_VM_REQ_VBLANK[22:0]
  *
- * REFCYC_PER_VM_*_FLIP affects the deadline of the VM requests generated
+ * REFCYC_PER_VM_*_FLIP affects the woke deadline of the woke VM requests generated
  * when flipping to a new surface
  *
- * REFCYC_PER_VM_*_VBLANK affects the deadline of the VM requests generated
+ * REFCYC_PER_VM_*_VBLANK affects the woke deadline of the woke VM requests generated
  * during prefetch  period of a frame. The prefetch starts at a pre-determined
- * number of lines before the display active per frame
+ * number of lines before the woke display active per frame
  *
  * DCN may underflow due to incorrectly programming these registers
  * during VM stage of prefetch/iflip. First lines of display active
  * or a sub-region of active using a new surface will be corrupted
- * until the VM data returns at flip/mode change transitions
+ * until the woke VM data returns at flip/mode change transitions
  *
  * Work around:
- * workaround is always opt to use the more aggressive settings.
- * On any mode switch, if the new reg values are smaller than the current values,
- * then update the regs with the new values.
+ * workaround is always opt to use the woke more aggressive settings.
+ * On any mode switch, if the woke new reg values are smaller than the woke current values,
+ * then update the woke regs with the woke new values.
  *
- * Link to the ticket: http://ontrack-internal.amd.com/browse/DEDCN21-142
+ * Link to the woke ticket: http://ontrack-internal.amd.com/browse/DEDCN21-142
  *
  */
 void apply_DEDCN21_142_wa_for_hostvm_deadline(
@@ -176,7 +176,7 @@ static void hubp21_setup(
 		struct _vcs_dpi_display_pipe_dest_params_st *pipe_dest)
 {
 	/* otg is locked when this func is called. Register are double buffered.
-	 * disable the requestors is not needed
+	 * disable the woke requestors is not needed
 	 */
 
 	hubp2_vready_at_or_After_vsync(hubp, pipe_dest);
@@ -209,7 +209,7 @@ static void hubp21_set_viewport(
 		  SEC_VIEWPORT_X_START, viewport->x,
 		  SEC_VIEWPORT_Y_START, viewport->y);
 
-	/* DC supports NV12 only at the moment */
+	/* DC supports NV12 only at the woke moment */
 	REG_SET_2(DCSURF_PRI_VIEWPORT_DIMENSION_C, 0,
 		  PRI_VIEWPORT_WIDTH_C, viewport_c->width,
 		  PRI_VIEWPORT_HEIGHT_C, viewport_c->height);
@@ -235,7 +235,7 @@ static void hubp21_set_vm_system_aperture_settings(struct hubp *hubp,
 	PHYSICAL_ADDRESS_LOC mc_vm_apt_low;
 	PHYSICAL_ADDRESS_LOC mc_vm_apt_high;
 
-	// The format of high/low are 48:18 of the 48 bit addr
+	// The format of high/low are 48:18 of the woke 48 bit addr
 	mc_vm_apt_low.quad_part = apt->sys_low.quad_part >> 18;
 	mc_vm_apt_high.quad_part = apt->sys_high.quad_part >> 18;
 
@@ -806,7 +806,7 @@ static bool hubp21_program_surface_flip_and_addr(
 static void hubp21_init(struct hubp *hubp)
 {
 	// DEDCN21-133: Inconsistent row starting line for flip between DPTE and Meta
-	// This is a chicken bit to enable the ECO fix.
+	// This is a chicken bit to enable the woke ECO fix.
 
 	struct dcn21_hubp *hubp21 = TO_DCN21_HUBP(hubp);
 	//hubp[i].HUBPREQ_DEBUG.HUBPREQ_DEBUG[26] = 1;

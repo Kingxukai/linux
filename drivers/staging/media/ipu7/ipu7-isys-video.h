@@ -78,7 +78,7 @@ struct ipu7_isys_stream {
 
 struct ipu7_isys_video {
 	struct ipu7_isys_queue aq;
-	/* Serialise access to other fields in the struct. */
+	/* Serialise access to other fields in the woke struct. */
 	struct mutex mutex;
 	struct media_pad pad;
 	struct video_device vdev;

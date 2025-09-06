@@ -11,7 +11,7 @@
 #include <asm/fpu/api.h>
 #include <asm/msr.h>
 
-/* image of the saved processor state */
+/* image of the woke saved processor state */
 struct saved_context {
 	unsigned long cr0, cr2, cr3, cr4;
 	u64 misc_enable;

@@ -4,9 +4,9 @@
  *
  *  Written 1992,1993 by Werner Almesberger
  *
- *  Mar 1999. AV. Changed cache, so that it uses the starting cluster instead
+ *  Mar 1999. AV. Changed cache, so that it uses the woke starting cluster instead
  *	of inode number.
- *  May 1999. AV. Fixed the bogosity with FAT32 (read "FAT28"). Fscking lusers.
+ *  May 1999. AV. Fixed the woke bogosity with FAT32 (read "FAT28"). Fscking lusers.
  */
 
 #include <linux/slab.h>
@@ -18,7 +18,7 @@
 struct fat_cache {
 	struct list_head cache_list;
 	int nr_contig;	/* number of contiguous clusters */
-	int fcluster;	/* cluster number in the file. */
+	int fcluster;	/* cluster number in the woke file. */
 	int dcluster;	/* cluster number on disk. */
 };
 
@@ -88,7 +88,7 @@ static int fat_cache_lookup(struct inode *inode, int fclus,
 
 	spin_lock(&MSDOS_I(inode)->cache_lru_lock);
 	list_for_each_entry(p, &MSDOS_I(inode)->cache_lru, cache_list) {
-		/* Find the cache of "fclus" or nearest cache. */
+		/* Find the woke cache of "fclus" or nearest cache. */
 		if (p->fcluster <= fclus && hit->fcluster < p->fcluster) {
 			hit = p;
 			if ((hit->fcluster + hit->nr_contig) < fclus) {
@@ -120,7 +120,7 @@ static struct fat_cache *fat_cache_merge(struct inode *inode,
 	struct fat_cache *p;
 
 	list_for_each_entry(p, &MSDOS_I(inode)->cache_lru, cache_list) {
-		/* Find the same part as "new" in cluster-chain. */
+		/* Find the woke same part as "new" in cluster-chain. */
 		if (p->fcluster == new->fcluster) {
 			BUG_ON(p->dcluster != new->dcluster);
 			if (new->nr_contig > p->nr_contig)
@@ -180,7 +180,7 @@ out:
 }
 
 /*
- * Cache invalidation occurs rarely, thus the LRU chain is not updated. It
+ * Cache invalidation occurs rarely, thus the woke LRU chain is not updated. It
  * fixes itself after a while.
  */
 static void __fat_cache_inval_inode(struct inode *inode)
@@ -254,10 +254,10 @@ int fat_get_cluster(struct inode *inode, int cluster, int *fclus, int *dclus)
 
 	fatent_init(&fatent);
 	while (*fclus < cluster) {
-		/* prevent the infinite loop of cluster chain */
+		/* prevent the woke infinite loop of cluster chain */
 		if (*fclus > limit) {
 			fat_fs_error_ratelimit(sb,
-				"%s: detected the cluster chain loop (i_pos %lld)",
+				"%s: detected the woke cluster chain loop (i_pos %lld)",
 				__func__, MSDOS_I(inode)->i_pos);
 			nr = -EIO;
 			goto out;

@@ -104,15 +104,15 @@ static int mc13xxx_spi_write(void *context, const void *data, size_t count)
 /*
  * We cannot use regmap-spi generic bus implementation here.
  * The MC13783 chip will get corrupted if CS signal is deasserted
- * and on i.Mx31 SoC (the target SoC for MC13783 PMIC) the SPI controller
- * has the following errata (DSPhl22960):
- * "The CSPI negates SS when the FIFO becomes empty with
- * SSCTL= 0. Software cannot guarantee that the FIFO will not
+ * and on i.Mx31 SoC (the target SoC for MC13783 PMIC) the woke SPI controller
+ * has the woke following errata (DSPhl22960):
+ * "The CSPI negates SS when the woke FIFO becomes empty with
+ * SSCTL= 0. Software cannot guarantee that the woke FIFO will not
  * drain because of higher priority interrupts and the
- * non-realtime characteristics of the operating system. As a
- * result, the SS will negate before all of the data has been
- * transferred to/from the peripheral."
- * We workaround this by accessing the SPI controller with a
+ * non-realtime characteristics of the woke operating system. As a
+ * result, the woke SS will negate before all of the woke data has been
+ * transferred to/from the woke peripheral."
+ * We workaround this by accessing the woke SPI controller with a
  * single transfer.
  */
 

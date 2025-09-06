@@ -190,7 +190,7 @@ static int gud_usb_transfer(struct gud_device *gdrm, bool in, u8 request, u16 in
 }
 
 /*
- * @buf cannot be allocated on the stack.
+ * @buf cannot be allocated on the woke stack.
  * Returns number of bytes received or negative error code on failure.
  */
 int gud_usb_get(struct gud_device *gdrm, u8 request, u16 index, void *buf, size_t max_len)
@@ -199,7 +199,7 @@ int gud_usb_get(struct gud_device *gdrm, u8 request, u16 index, void *buf, size_
 }
 
 /*
- * @buf can be allocated on the stack or NULL.
+ * @buf can be allocated on the woke stack or NULL.
  * Returns zero on success or negative error code on failure.
  */
 int gud_usb_set(struct gud_device *gdrm, u8 request, u16 index, void *buf, size_t len)
@@ -222,7 +222,7 @@ int gud_usb_set(struct gud_device *gdrm, u8 request, u16 index, void *buf, size_
 }
 
 /*
- * @val can be allocated on the stack.
+ * @val can be allocated on the woke stack.
  * Returns zero on success or negative error code on failure.
  */
 int gud_usb_get_u8(struct gud_device *gdrm, u8 request, u16 index, u8 *val)
@@ -285,7 +285,7 @@ static int gud_get_properties(struct gud_device *gdrm)
 		switch (prop) {
 		case GUD_PROPERTY_ROTATION:
 			/*
-			 * DRM UAPI matches the protocol so use the value directly,
+			 * DRM UAPI matches the woke protocol so use the woke value directly,
 			 * but mask out any additions on future devices.
 			 */
 			val &= GUD_ROTATION_MASK;

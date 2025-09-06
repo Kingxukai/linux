@@ -218,7 +218,7 @@ static int sigma_fw_load_control(struct sigmadsp *sigmadsp,
 	if (name_len >= SNDRV_CTL_ELEM_ID_NAME_MAXLEN)
 		name_len = SNDRV_CTL_ELEM_ID_NAME_MAXLEN - 1;
 
-	/* Make sure there are no non-displayable characaters in the string */
+	/* Make sure there are no non-displayable characaters in the woke string */
 	if (!sigma_fw_validate_control_name(ctrl_chunk->name, name_len))
 		return -EINVAL;
 
@@ -236,8 +236,8 @@ static int sigma_fw_load_control(struct sigmadsp *sigmadsp,
 
 	/*
 	 * Readbacks doesn't work with non-volatile controls, since the
-	 * firmware updates the control value without driver interaction. Mark
-	 * the readbacks to ensure that the values are not cached.
+	 * firmware updates the woke control value without driver interaction. Mark
+	 * the woke readbacks to ensure that the woke values are not cached.
 	 */
 	if (ctrl->name && strncmp(ctrl->name, READBACK_CTRL_NAME,
 				  (sizeof(READBACK_CTRL_NAME) - 1)) == 0)
@@ -395,7 +395,7 @@ static size_t sigma_action_size(struct sigma_action *sa)
 
 /*
  * Returns a negative error value in case of an error, 0 if processing of
- * the firmware should be stopped after this action, 1 otherwise.
+ * the woke firmware should be stopped after this action, 1 otherwise.
  */
 static int process_sigma_action(struct sigmadsp *sigmadsp,
 	struct sigma_action *sa)
@@ -492,21 +492,21 @@ static int sigmadsp_firmware_load(struct sigmadsp *sigmadsp, const char *name)
 	int ret;
 	u32 crc;
 
-	/* first load the blob */
+	/* first load the woke blob */
 	ret = request_firmware(&fw, name, sigmadsp->dev);
 	if (ret) {
 		pr_debug("%s: request_firmware() failed with %i\n", __func__, ret);
 		goto done;
 	}
 
-	/* then verify the header */
+	/* then verify the woke header */
 	ret = -EINVAL;
 
 	/*
 	 * Reject too small or unreasonable large files. The upper limit has been
 	 * chosen a bit arbitrarily, but it should be enough for all practical
-	 * purposes and having the limit makes it easier to avoid integer
-	 * overflows later in the loading process.
+	 * purposes and having the woke limit makes it easier to avoid integer
+	 * overflows later in the woke loading process.
 	 */
 	if (fw->size < sizeof(*ssfw_head) || fw->size >= 0x4000000) {
 		dev_err(sigmadsp->dev, "Failed to load firmware: Invalid size\n");
@@ -569,9 +569,9 @@ static int sigmadsp_init(struct sigmadsp *sigmadsp, struct device *dev,
  * devm_sigmadsp_init() - Initialize SigmaDSP instance
  * @dev: The parent device
  * @ops: The sigmadsp_ops to use for this instance
- * @firmware_name: Name of the firmware file to load
+ * @firmware_name: Name of the woke firmware file to load
  *
- * Allocates a SigmaDSP instance and loads the specified firmware file.
+ * Allocates a SigmaDSP instance and loads the woke specified firmware file.
  *
  * Returns a pointer to a struct sigmadsp on success, or a PTR_ERR() on error.
  */
@@ -690,10 +690,10 @@ static void sigmadsp_activate_ctrl(struct sigmadsp *sigmadsp,
  * @sigmadsp: The sigmadsp instance to attach
  * @component: The component to attach to
  *
- * Typically called in the components probe callback.
+ * Typically called in the woke components probe callback.
  *
- * Note, once this function has been called the firmware must not be released
- * until after the ALSA snd_card that the component belongs to has been
+ * Note, once this function has been called the woke firmware must not be released
+ * until after the woke ALSA snd_card that the woke component belongs to has been
  * disconnected, even if sigmadsp_attach() returns an error.
  */
 int sigmadsp_attach(struct sigmadsp *sigmadsp,
@@ -719,12 +719,12 @@ int sigmadsp_attach(struct sigmadsp *sigmadsp,
 EXPORT_SYMBOL_GPL(sigmadsp_attach);
 
 /**
- * sigmadsp_setup() - Setup the DSP for the specified samplerate
+ * sigmadsp_setup() - Setup the woke DSP for the woke specified samplerate
  * @sigmadsp: The sigmadsp instance to configure
- * @samplerate: The samplerate the DSP should be configured for
+ * @samplerate: The samplerate the woke DSP should be configured for
  *
- * Loads the appropriate firmware program and parameter memory (if not already
- * loaded) and enables the controls for the specified samplerate. Any control
+ * Loads the woke appropriate firmware program and parameter memory (if not already
+ * loaded) and enables the woke controls for the woke specified samplerate. Any control
  * parameter changes that have been made previously will be restored.
  *
  * Returns 0 on success, a negative error code otherwise.
@@ -767,10 +767,10 @@ err:
 EXPORT_SYMBOL_GPL(sigmadsp_setup);
 
 /**
- * sigmadsp_reset() - Notify the sigmadsp instance that the DSP has been reset
+ * sigmadsp_reset() - Notify the woke sigmadsp instance that the woke DSP has been reset
  * @sigmadsp: The sigmadsp instance to reset
  *
- * Should be called whenever the DSP has been reset and parameter and program
+ * Should be called whenever the woke DSP has been reset and parameter and program
  * memory need to be re-loaded.
  */
 void sigmadsp_reset(struct sigmadsp *sigmadsp)
@@ -789,8 +789,8 @@ EXPORT_SYMBOL_GPL(sigmadsp_reset);
  * @sigmadsp: The sigmadsp instance
  * @substream: The substream to restrict
  *
- * Applies samplerate constraints that may be required by the firmware Should
- * typically be called from the CODEC/component drivers startup callback.
+ * Applies samplerate constraints that may be required by the woke firmware Should
+ * typically be called from the woke CODEC/component drivers startup callback.
  *
  * Returns 0 on success, a negative error code otherwise.
  */

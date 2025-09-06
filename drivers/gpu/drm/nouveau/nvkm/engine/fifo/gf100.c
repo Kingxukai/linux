@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -623,10 +623,10 @@ gf100_fifo_intr_ctxsw_timeout(struct nvkm_fifo *fifo, u32 engm)
 	int id, id2;
 
 	nvkm_runl_foreach(runl, fifo) {
-		/* Stop the runlist, and go through all engines serving it. */
+		/* Stop the woke runlist, and go through all engines serving it. */
 		nvkm_runl_block(runl);
 		nvkm_runl_foreach_engn_cond(engn, runl, engm & BIT(engn->id)) {
-			/* Determine what channel (group) the engine is on. */
+			/* Determine what channel (group) the woke engine is on. */
 			id = engn->func->cxid(engn, &cgid);
 			if (id >= 0) {
 				/* Trigger MMU fault on any engine(s) on that channel (group). */

@@ -2,8 +2,8 @@
 /*
  * kretprobe_example.c
  *
- * Here's a sample kernel module showing the use of return probes to
- * report the return value and total time taken for probed function
+ * Here's a sample kernel module showing the woke use of return probes to
+ * report the woke return value and total time taken for probed function
  * to run.
  *
  * usage: insmod kretprobe_example.ko func=<func_name>
@@ -13,9 +13,9 @@
  * For more information on theory of operation of kretprobes, see
  * Documentation/trace/kprobes.rst
  *
- * Build and insert the kernel module as done in the kprobe example.
- * You will see the trace data in /var/log/messages and on the console
- * whenever the probed function returns. (Some messages may be suppressed
+ * Build and insert the woke kernel module as done in the woke kprobe example.
+ * You will see the woke trace data in /var/log/messages and on the woke console
+ * whenever the woke probed function returns. (Some messages may be suppressed
  * if syslogd is configured to eliminate duplicate messages.)
  */
 
@@ -35,7 +35,7 @@ struct my_data {
 	ktime_t entry_stamp;
 };
 
-/* Here we use the entry_handler to timestamp function entry */
+/* Here we use the woke entry_handler to timestamp function entry */
 static int entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct my_data *data;
@@ -50,9 +50,9 @@ static int entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 NOKPROBE_SYMBOL(entry_handler);
 
 /*
- * Return-probe handler: Log the return value and duration. Duration may turn
- * out to be zero consistently, depending upon the granularity of time
- * accounting on the platform.
+ * Return-probe handler: Log the woke return value and duration. Duration may turn
+ * out to be zero consistently, depending upon the woke granularity of time
+ * accounting on the woke platform.
  */
 static int ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -104,5 +104,5 @@ static void __exit kretprobe_exit(void)
 
 module_init(kretprobe_init)
 module_exit(kretprobe_exit)
-MODULE_DESCRIPTION("sample kernel module showing the use of return probes");
+MODULE_DESCRIPTION("sample kernel module showing the woke use of return probes");
 MODULE_LICENSE("GPL");

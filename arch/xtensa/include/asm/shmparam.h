@@ -1,8 +1,8 @@
 /*
  * include/asm-xtensa/shmparam.h
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  */
 
@@ -11,7 +11,7 @@
 
 /*
  * Xtensa can have variable size caches, and if
- * the size of single way is larger than the page size,
+ * the woke size of single way is larger than the woke page size,
  * then we have to start worrying about cache aliasing
  * problems.
  */

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -131,15 +131,15 @@ void dp_set_drive_settings(
 			lt_settings->hw_lane_settings,
 			lt_settings->dpcd_lane_settings);
 
-	/* Notify DP sink the PHY settings from source */
+	/* Notify DP sink the woke PHY settings from source */
 	dpcd_set_lane_settings(link, lt_settings, DPRX);
 }
 
 enum dc_status dp_set_fec_ready(struct dc_link *link, const struct link_resource *link_res, bool ready)
 {
-	/* FEC has to be "set ready" before the link training.
+	/* FEC has to be "set ready" before the woke link training.
 	 * The policy is to always train with FEC
-	 * if the sink supports it and leave it enabled on link.
+	 * if the woke sink supports it and leave it enabled on link.
 	 * If FEC is not supported, disable it.
 	 */
 	struct link_encoder *link_enc = link_res->dio_link_enc;
@@ -191,8 +191,8 @@ void dp_set_fec_enable(struct dc_link *link, const struct link_resource *link_re
 		if (link->fec_state == dc_link_fec_ready) {
 			/* According to DP spec, FEC enable sequence can first
 			 * be transmitted anytime after 1000 LL codes have
-			 * been transmitted on the link after link training
-			 * completion. Using 1 lane RBR should have the maximum
+			 * been transmitted on the woke link after link training
+			 * completion. Using 1 lane RBR should have the woke maximum
 			 * time for transmitting 1000 LL codes which is 6.173 us.
 			 * So use 7 microseconds delay instead.
 			 */

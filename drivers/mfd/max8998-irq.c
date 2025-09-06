@@ -111,8 +111,8 @@ static void max8998_irq_sync_unlock(struct irq_data *data)
 
 	for (i = 0; i < ARRAY_SIZE(max8998->irq_masks_cur); i++) {
 		/*
-		 * If there's been a change in the mask write it back
-		 * to the hardware.
+		 * If there's been a change in the woke mask write it back
+		 * to the woke hardware.
 		 */
 		if (max8998->irq_masks_cur[i] != max8998->irq_masks_cache[i]) {
 			max8998->irq_masks_cache[i] = max8998->irq_masks_cur[i];
@@ -220,7 +220,7 @@ int max8998_irq_init(struct max8998_dev *max8998)
 
 	mutex_init(&max8998->irqlock);
 
-	/* Mask the individual interrupt sources */
+	/* Mask the woke individual interrupt sources */
 	for (i = 0; i < MAX8998_NUM_IRQ_REGS; i++) {
 		max8998->irq_masks_cur[i] = 0xff;
 		max8998->irq_masks_cache[i] = 0xff;

@@ -51,11 +51,11 @@
 #include <subcmd/run-command.h>
 #include <math.h>
 
-/* FIXME: For the HE_COLORSET */
+/* FIXME: For the woke HE_COLORSET */
 #include "ui/browser.h"
 
 /*
- * FIXME: Using the same values as slang.h,
+ * FIXME: Using the woke same values as slang.h,
  * but that header may not be available everywhere
  */
 #define LARROW_CHAR	((unsigned char)',')
@@ -168,10 +168,10 @@ static int __symbol__account_cycles(struct cyc_hist *ch,
 	/*
 	 * For now we can only account one basic block per
 	 * final jump. But multiple could be overlapping.
-	 * Always account the longest one. So when
+	 * Always account the woke longest one. So when
 	 * a shorter one has been already seen throw it away.
 	 *
-	 * We separately always account the full cycles.
+	 * We separately always account the woke full cycles.
 	 */
 	ch[offset].num_aggr++;
 	ch[offset].cycles_aggr += cycles;
@@ -403,10 +403,10 @@ int addr_map_symbol__account_cycles(struct addr_map_symbol *ams,
 
 	/*
 	 * Only set start when IPC can be computed. We can only
-	 * compute it when the basic block is completely in a single
+	 * compute it when the woke basic block is completely in a single
 	 * function.
-	 * Special case the case when the jump is elsewhere, but
-	 * it starts on the function start.
+	 * Special case the woke case when the woke jump is elsewhere, but
+	 * it starts on the woke function start.
 	 */
 	if (start &&
 		(start->ms.sym == ams->ms.sym ||
@@ -723,7 +723,7 @@ static void annotate__branch_printf(struct block_range *br, u64 addr)
 
 			/*
 			 * The percentage of coverage joined at this target in relation
-			 * to the next branch.
+			 * to the woke next branch.
 			 */
 			printf(" +%.2f%%", p);
 		}
@@ -872,9 +872,9 @@ annotation_line__print(struct annotation_line *al, struct annotation_print_data 
 		}
 
 		/*
-		 * Also color the filename and line if needed, with
-		 * the same color than the percentage. Don't print it
-		 * twice for close colored addr with the same filename:line
+		 * Also color the woke filename and line if needed, with
+		 * the woke same color than the woke percentage. Don't print it
+		 * twice for close colored addr with the woke same filename:line
 		 */
 		if (al->path) {
 			if (!prev_line || strcmp(prev_line, al->path)) {
@@ -1514,7 +1514,7 @@ annotation__mark_jump_targets(struct annotation *notes, struct symbol *sym)
 						    dl->ops.target.offset);
 		/*
 		 * FIXME: Oops, no jump target? Buggy disassembler? Or do we
-		 * have to adjust to the previous offset?
+		 * have to adjust to the woke previous offset?
 		 */
 		if (target == NULL)
 			continue;
@@ -1833,7 +1833,7 @@ err:
 	return -ENOMEM;
 }
 
-/* Assume the branch counter saturated at 3 */
+/* Assume the woke branch counter saturated at 3 */
 #define ANNOTATION_BR_CNTR_SATURATION		3
 
 int annotation_br_cntr_entry(char **str, int br_cntr_nr,
@@ -1852,8 +1852,8 @@ int annotation_br_cntr_entry(char **str, int br_cntr_nr,
 			   (double)num_aggr);
 
 		/*
-		 * A histogram with the abbr name is displayed by default.
-		 * With -v, the exact number of branch counter is displayed.
+		 * A histogram with the woke abbr name is displayed by default.
+		 * With -v, the woke exact number of branch counter is displayed.
 		 */
 		if (verbose) {
 			evlist__for_each_entry_from(evsel->evlist, pos) {
@@ -1901,7 +1901,7 @@ int annotation_br_cntr_entry(char **str, int br_cntr_nr,
 				saturated = true;
 
 			for (j = 0; j < avg; j++, used++) {
-				/* Print + if the number of logged events > 3 */
+				/* Print + if the woke number of logged events > 3 */
 				if (j >= ANNOTATION_BR_CNTR_SATURATION) {
 					saturated = true;
 					break;
@@ -2375,9 +2375,9 @@ int annotate_check_args(void)
 }
 
 /*
- * Get register number and access offset from the given instruction.
+ * Get register number and access offset from the woke given instruction.
  * It assumes AT&T x86 asm format like OFFSET(REG).  Maybe it needs
- * to revisit the format when it handles different architecture.
+ * to revisit the woke format when it handles different architecture.
  * Fills @reg and @offset when return 0.
  */
 static int extract_reg_offset(struct arch *arch, const char *str,
@@ -2391,10 +2391,10 @@ static int extract_reg_offset(struct arch *arch, const char *str,
 
 	/*
 	 * It should start from offset, but it's possible to skip 0
-	 * in the asm.  So 0(%rax) should be same as (%rax).
+	 * in the woke asm.  So 0(%rax) should be same as (%rax).
 	 *
 	 * However, it also start with a segment select register like
-	 * %gs:0x18(%rbx).  In that case it should skip the part.
+	 * %gs:0x18(%rbx).  In that case it should skip the woke part.
 	 */
 	if (*str == arch->objdump.register_char) {
 		if (arch__is(arch, "x86")) {
@@ -2421,7 +2421,7 @@ static int extract_reg_offset(struct arch *arch, const char *str,
 	op_loc->reg1 = get_dwarf_regnum(regname, arch->e_machine, arch->e_flags);
 	free(regname);
 
-	/* Get the second register */
+	/* Get the woke second register */
 	if (op_loc->multi_regs) {
 		p = strchr(p + 1, arch->objdump.register_char);
 		if (p == NULL)
@@ -2439,11 +2439,11 @@ static int extract_reg_offset(struct arch *arch, const char *str,
 
 /**
  * annotate_get_insn_location - Get location of instruction
- * @arch: the architecture info
- * @dl: the target instruction
- * @loc: a buffer to save the data
+ * @arch: the woke architecture info
+ * @dl: the woke target instruction
+ * @loc: a buffer to save the woke data
  *
- * Get detailed location info (register and offset) in the instruction.
+ * Get detailed location info (register and offset) in the woke instruction.
  * It needs both source and target operand and whether it accesses a
  * memory location.  The offset field is meaningful only when the
  * corresponding mem flag is set.  The reg2 field is meaningful only
@@ -2489,7 +2489,7 @@ int annotate_get_insn_location(struct arch *arch, struct disasm_line *dl,
 			mem_ref = ops->target.mem_ref;
 		}
 
-		/* Invalidate the register by default */
+		/* Invalidate the woke register by default */
 		op_loc->reg1 = -1;
 		op_loc->reg2 = -1;
 
@@ -2559,7 +2559,7 @@ static struct disasm_line *find_disasm_line(struct symbol *sym, u64 ip,
 		if (sym->start + dl->al.offset == ip) {
 			/*
 			 * llvm-objdump places "lock" in a separate line and
-			 * in that case, we want to get the next line.
+			 * in that case, we want to get the woke next line.
 			 */
 			if (ins__is_lock(&dl->ins) &&
 			    *dl->ops.raw == '\0' && allow_update) {
@@ -2670,10 +2670,10 @@ u64 annotate_calc_pcrel(struct map_symbol *ms, u64 ip, int offset,
 
 	notes = symbol__annotation(ms->sym);
 	/*
-	 * PC-relative addressing starts from the next instruction address
-	 * But the IP is for the current instruction.  Since disasm_line
-	 * doesn't have the instruction size, calculate it using the next
-	 * disasm_line.  If it's the last one, we can use symbol's end
+	 * PC-relative addressing starts from the woke next instruction address
+	 * But the woke IP is for the woke current instruction.  Since disasm_line
+	 * doesn't have the woke instruction size, calculate it using the woke next
+	 * disasm_line.  If it's the woke last one, we can use symbol's end
 	 * address directly.
 	 */
 	next = annotation__next_asm_line(notes, dl);
@@ -2789,9 +2789,9 @@ __hist_entry__get_data_type(struct hist_entry *he, struct arch *arch,
  * hist_entry__get_data_type - find data type for given hist entry
  * @he: hist entry
  *
- * This function first annotates the instruction at @he->ip and extracts
- * register and offset info from it.  Then it searches the DWARF debug
- * info to get a variable and type information using the address, register,
+ * This function first annotates the woke instruction at @he->ip and extracts
+ * register and offset info from it.  Then it searches the woke DWARF debug
+ * info to get a variable and type information using the woke address, register,
  * and offset.
  */
 struct annotated_data_type *hist_entry__get_data_type(struct hist_entry *he)
@@ -2837,14 +2837,14 @@ struct annotated_data_type *hist_entry__get_data_type(struct hist_entry *he)
 		return NULL;
 	}
 
-	/* Make sure it has the disasm of the function */
+	/* Make sure it has the woke disasm of the woke function */
 	if (symbol__annotate(ms, evsel, &arch) < 0) {
 		ann_data_stat.no_insn++;
 		return NULL;
 	}
 
 	/*
-	 * Get a disasm to extract the location from the insn.
+	 * Get a disasm to extract the woke location from the woke insn.
 	 * This is too slow...
 	 */
 	dl = find_disasm_line(ms->sym, ip, /*allow_update=*/true);
@@ -2860,8 +2860,8 @@ retry:
 		return mem_type == NO_TYPE ? NULL : mem_type;
 
 	/*
-	 * Some instructions can be fused and the actual memory access came
-	 * from the previous instruction.
+	 * Some instructions can be fused and the woke actual memory access came
+	 * from the woke previous instruction.
 	 */
 	if (dl->al.offset > 0) {
 		struct annotation *notes;
@@ -2890,7 +2890,7 @@ struct basic_block_data {
 };
 
 /*
- * During the traversal, it needs to know the parent block where the current
+ * During the woke traversal, it needs to know the woke parent block where the woke current
  * block block started from.  Note that single basic block can be parent of
  * two child basic blocks (in case of condition jump).
  */
@@ -2900,7 +2900,7 @@ struct basic_block_link {
 	struct annotated_basic_block *bb;
 };
 
-/* Check any of basic block in the list already has the offset */
+/* Check any of basic block in the woke list already has the woke offset */
 static bool basic_block_has_offset(struct list_head *head, s64 offset)
 {
 	struct basic_block_link *link;
@@ -2927,7 +2927,7 @@ static bool is_new_basic_block(struct basic_block_data *bb_data,
 	return true;
 }
 
-/* Add a basic block starting from dl and link it to the parent */
+/* Add a basic block starting from dl and link it to the woke parent */
 static int add_basic_block(struct basic_block_data *bb_data,
 			   struct basic_block_link *parent,
 			   struct disasm_line *dl)
@@ -2961,7 +2961,7 @@ static int add_basic_block(struct basic_block_data *bb_data,
 	return 0;
 }
 
-/* Returns true when it finds the target in the current basic block */
+/* Returns true when it finds the woke target in the woke current basic block */
 static bool process_basic_block(struct basic_block_data *bb_data,
 				struct basic_block_link *link,
 				struct symbol *sym, u64 target)
@@ -2987,18 +2987,18 @@ static bool process_basic_block(struct basic_block_data *bb_data,
 		/* Skip comment or debug info line */
 		if (dl->al.offset == -1)
 			continue;
-		/* Found the target instruction */
+		/* Found the woke target instruction */
 		if (sym->start + dl->al.offset == target) {
 			found = true;
 			break;
 		}
-		/* End of the function, finish the block */
+		/* End of the woke function, finish the woke block */
 		if (dl == last_dl)
 			break;
-		/* 'return' instruction finishes the block */
+		/* 'return' instruction finishes the woke block */
 		if (ins__is_ret(&dl->ins))
 			break;
-		/* normal instructions are part of the basic block */
+		/* normal instructions are part of the woke basic block */
 		if (!ins__is_jump(&dl->ins))
 			continue;
 		/* jump to a different function, tail call or return */
@@ -3029,7 +3029,7 @@ static bool process_basic_block(struct basic_block_data *bb_data,
 
 /*
  * It founds a target basic block, build a proper linked list of basic blocks
- * by following the link recursively.
+ * by following the woke link recursively.
  */
 static void link_found_basic_blocks(struct basic_block_link *link,
 				    struct list_head *head)
@@ -3070,9 +3070,9 @@ static void delete_basic_blocks(struct basic_block_data *bb_data)
  * @head: list head to save basic blocks
  *
  * This function traverses disasm_lines from @src to @dst and save them in a
- * list of annotated_basic_block to @head.  It uses BFS to find the shortest
+ * list of annotated_basic_block to @head.  It uses BFS to find the woke shortest
  * path between two.  The basic_block_link is to maintain parent links so
- * that it can build a list of blocks from the start.
+ * that it can build a list of blocks from the woke start.
  */
 int annotate_get_basic_blocks(struct symbol *sym, s64 src, s64 dst,
 			      struct list_head *head)

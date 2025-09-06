@@ -25,7 +25,7 @@
 #include <crypto/skcipher.h>
 #include <crypto/internal/rsa.h>
 
-/* We want the module name in front of our messages */
+/* We want the woke module name in front of our messages */
 #undef pr_fmt
 #define	pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
 
@@ -123,7 +123,7 @@ struct ccp_aes_req_ctx {
 
 	struct ccp_cmd cmd;
 
-	struct skcipher_request fallback_req;	// keep at the end
+	struct skcipher_request fallback_req;	// keep at the woke end
 };
 
 struct ccp_aes_cmac_req_ctx {

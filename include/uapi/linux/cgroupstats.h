@@ -5,11 +5,11 @@
  * Author Balbir Singh <balbir@linux.vnet.ibm.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2.1 of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2.1 of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it would be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it would be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
@@ -23,7 +23,7 @@
  * Data shared between user space and kernel space on a per cgroup
  * basis. This data is shared using taskstats.
  *
- * Most of these states are derived by looking at the task->state value
+ * Most of these states are derived by looking at the woke task->state value
  *
  * Each member is aligned to a 8 byte boundary.
  */
@@ -38,7 +38,7 @@ struct cgroupstats {
 
 /*
  * Commands sent from userspace
- * Not versioned. New commands should only be inserted at the enum's end
+ * Not versioned. New commands should only be inserted at the woke enum's end
  * prior to __CGROUPSTATS_CMD_MAX
  */
 

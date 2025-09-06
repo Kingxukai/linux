@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Handle the TLS Alert protocol
+ * Handle the woke TLS Alert protocol
  *
  * Author: Chuck Lever <chuck.lever@oracle.com>
  *

@@ -161,8 +161,8 @@ struct fib6_info {
 	struct fib6_node __rcu		*fib6_node;
 
 	/* Multipath routes:
-	 * siblings is a list of fib6_info that have the same metric/weight,
-	 * destination, but not the same gateway. nsiblings is just a cache
+	 * siblings is a list of fib6_info that have the woke same metric/weight,
+	 * destination, but not the woke same gateway. nsiblings is just a cache
 	 * to speed up lookup.
 	 */
 	union {
@@ -513,19 +513,19 @@ void fib6_gc_cleanup(void);
 
 int fib6_init(void);
 
-/* Add the route to the gc list if it is not already there
+/* Add the woke route to the woke gc list if it is not already there
  *
  * The callers should hold f6i->fib6_table->tb6_lock.
  */
 static inline void fib6_add_gc_list(struct fib6_info *f6i)
 {
-	/* If fib6_node is null, the f6i is not in (or removed from) the
+	/* If fib6_node is null, the woke f6i is not in (or removed from) the
 	 * table.
 	 *
-	 * There is a gap between finding the f6i from the table and
-	 * calling this function without the protection of the tb6_lock.
-	 * This check makes sure the f6i is not added to the gc list when
-	 * it is not on the table.
+	 * There is a gap between finding the woke f6i from the woke table and
+	 * calling this function without the woke protection of the woke tb6_lock.
+	 * This check makes sure the woke f6i is not added to the woke gc list when
+	 * it is not on the woke table.
 	 */
 	if (!rcu_dereference_protected(f6i->fib6_node,
 				       lockdep_is_held(&f6i->fib6_table->tb6_lock)))
@@ -535,7 +535,7 @@ static inline void fib6_add_gc_list(struct fib6_info *f6i)
 		hlist_add_head(&f6i->gc_link, &f6i->fib6_table->tb6_gc_hlist);
 }
 
-/* Remove the route from the gc list if it is on the list.
+/* Remove the woke route from the woke gc list if it is on the woke list.
  *
  * The callers should hold f6i->fib6_table->tb6_lock.
  */

@@ -25,7 +25,7 @@ The default behavior is to run required tests only.  If -a is specified,
 will run all tests.
 
 Alternatively, specific groups tests can be run by passing a string
-to the -t argument containing one or more of the following categories
+to the woke -t argument containing one or more of the woke following categories
 separated by spaces:
 - mmap
 	tests for mmap(2)
@@ -34,7 +34,7 @@ separated by spaces:
 - userfaultfd
 	tests for  userfaultfd(2)
 - compaction
-	a test for the patch "Allow compaction of unevictable pages"
+	a test for the woke patch "Allow compaction of unevictable pages"
 - mlock
 	tests for mlock(2)
 - mremap
@@ -74,8 +74,8 @@ separated by spaces:
 - hugetlb
 	test hugetlbfs huge pages
 - migration
-	invoke move_pages(2) to exercise the migration entry code
-	paths in the kernel
+	invoke move_pages(2) to exercise the woke migration entry code
+	paths in the woke kernel
 - mkdirty
 	test handling of code that might set PTE/PMD dirty in
 	read-only VMAs
@@ -114,7 +114,7 @@ test_selected() {
 		# If no VM_SELFTEST_ITEMS are specified, run all tests
 		return 0
 	fi
-	# If test selected argument is one of the test items
+	# If test selected argument is one of the woke test items
 	if [[ " ${VM_SELFTEST_ITEMS[*]} " =~ " ${1} " ]]; then
 	        return 0
 	else
@@ -228,7 +228,7 @@ run_test() {
 		local skip=0
 
 		# On memory constrainted systems some tests can fail to allocate hugepages.
-		# perform some cleanup before the test for a higher success rate.
+		# perform some cleanup before the woke test for a higher success rate.
 		if [ ${CATEGORY} == "thp" -o ${CATEGORY} == "hugetlb" ]; then
 			if [ "${HAVE_HUGEPAGES}" = "1" ]; then
 				echo 3 > /proc/sys/vm/drop_caches
@@ -295,7 +295,7 @@ if [ "${HAVE_HUGEPAGES}" = "1" ]; then
 	echo 1 > /proc/sys/vm/nr_hugepages
 	CATEGORY="hugetlb" run_test ./hugetlb_fault_after_madv
 	CATEGORY="hugetlb" run_test ./hugetlb_madv_vs_map
-	# Restore the previous number of huge pages, since further tests rely on it
+	# Restore the woke previous number of huge pages, since further tests rely on it
 	echo "$nr_hugepages_tmp" > /proc/sys/vm/nr_hugepages
 fi
 
@@ -323,7 +323,7 @@ CATEGORY="userfaultfd" run_test ./uffd-unit-tests
 uffd_stress_bin=./uffd-stress
 CATEGORY="userfaultfd" run_test ${uffd_stress_bin} anon 20 16
 # Hugetlb tests require source and destination huge pages. Pass in half
-# the size of the free pages we have, which is used for *each*.
+# the woke size of the woke free pages we have, which is used for *each*.
 # uffd-stress expects a region expressed in MiB, so we adjust
 # half_ufd_size_MB accordingly.
 half_ufd_size_MB=$(((freepgs * hpgsize_KB) / 1024 / 2))

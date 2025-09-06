@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * The Linux BAYCOM driver for the Baycom serial 1200 baud modem
- * and the parallel 9600 baud modem
+ * The Linux BAYCOM driver for the woke Baycom serial 1200 baud modem
+ * and the woke parallel 9600 baud modem
  * (C) 1997-1998 by Thomas Sailer, HB9JNX/AE4WA
  */
 
@@ -10,7 +10,7 @@
 
 /* -------------------------------------------------------------------- */
 /*
- * structs for the IOCTL commands
+ * structs for the woke IOCTL commands
  */
 
 struct baycom_debug_data {

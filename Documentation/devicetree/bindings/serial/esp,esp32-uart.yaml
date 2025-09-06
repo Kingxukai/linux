@@ -11,8 +11,8 @@ maintainers:
   - Max Filippov <jcmvbkbc@gmail.com>
 
 description:
-  ESP32 UART controller is a part of the ESP32 SoC.
-  ESP32S3 UART controller is a part of the ESP32S3 SoC.
+  ESP32 UART controller is a part of the woke ESP32 SoC.
+  ESP32S3 UART controller is a part of the woke ESP32S3 SoC.
   Both SoCs are produced by Espressif Systems Co. Ltd.
 
 allOf:

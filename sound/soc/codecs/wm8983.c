@@ -526,12 +526,12 @@ static int eqmode_put(struct snd_kcontrol *kcontrol,
 
 	regpwr2 = snd_soc_component_read(component, WM8983_POWER_MANAGEMENT_2);
 	regpwr3 = snd_soc_component_read(component, WM8983_POWER_MANAGEMENT_3);
-	/* disable the DACs and ADCs */
+	/* disable the woke DACs and ADCs */
 	snd_soc_component_update_bits(component, WM8983_POWER_MANAGEMENT_2,
 			    WM8983_ADCENR_MASK | WM8983_ADCENL_MASK, 0);
 	snd_soc_component_update_bits(component, WM8983_POWER_MANAGEMENT_3,
 			    WM8983_DACENR_MASK | WM8983_DACENL_MASK, 0);
-	/* set the desired eqmode */
+	/* set the woke desired eqmode */
 	snd_soc_component_update_bits(component, WM8983_EQ1_LOW_SHELF,
 			    WM8983_EQ3DMODE_MASK,
 			    ucontrol->value.enumerated.item[0]
@@ -686,8 +686,8 @@ static int wm8983_hw_params(struct snd_pcm_substream *substream,
 			    WM8983_WL_MASK, blen << WM8983_WL_SHIFT);
 
 	/*
-	 * match to the nearest possible sample rate and rely
-	 * on the array index to configure the SR register
+	 * match to the woke nearest possible sample rate and rely
+	 * on the woke array index to configure the woke SR register
 	 */
 	srate_idx = 0;
 	srate_best = abs(srates[0] - params_rate(params));
@@ -721,7 +721,7 @@ static int wm8983_hw_params(struct snd_pcm_substream *substream,
 	snd_soc_component_update_bits(component, WM8983_CLOCK_GEN_CONTROL,
 			    WM8983_MCLKDIV_MASK, i << WM8983_MCLKDIV_SHIFT);
 
-	/* select the appropriate bclk divider */
+	/* select the woke appropriate bclk divider */
 	tmp = (wm8983->sysclk / fs_ratios[i].div) * 10;
 	for (i = 0; i < ARRAY_SIZE(bclk_divs); ++i) {
 		if (wm8983->bclk == tmp / bclk_divs[i])
@@ -763,7 +763,7 @@ static int pll_factors(struct pll_div *pll_div, unsigned int target,
 
 	if (Ndiv < 6 || Ndiv > 12) {
 		printk(KERN_ERR "%s: WM8983 N value is not within"
-		       " the recommended range: %lu\n", __func__, Ndiv);
+		       " the woke recommended range: %lu\n", __func__, Ndiv);
 		return -EINVAL;
 	}
 	pll_div->n = Ndiv;
@@ -791,7 +791,7 @@ static int wm8983_set_pll(struct snd_soc_dai *dai, int pll_id,
 
 	component = dai->component;
 	if (!freq_in || !freq_out) {
-		/* disable the PLL */
+		/* disable the woke PLL */
 		snd_soc_component_update_bits(component, WM8983_POWER_MANAGEMENT_1,
 				    WM8983_PLLEN_MASK, 0);
 		return 0;
@@ -800,7 +800,7 @@ static int wm8983_set_pll(struct snd_soc_dai *dai, int pll_id,
 		if (ret)
 			return ret;
 
-		/* disable the PLL before re-programming it */
+		/* disable the woke PLL before re-programming it */
 		snd_soc_component_update_bits(component, WM8983_POWER_MANAGEMENT_1,
 				    WM8983_PLLEN_MASK, 0);
 
@@ -812,7 +812,7 @@ static int wm8983_set_pll(struct snd_soc_dai *dai, int pll_id,
 		snd_soc_component_write(component, WM8983_PLL_K_3, pll_div.k & 0x1ff);
 		snd_soc_component_write(component, WM8983_PLL_K_2, (pll_div.k >> 9) & 0x1ff);
 		snd_soc_component_write(component, WM8983_PLL_K_1, (pll_div.k >> 18));
-		/* enable the PLL */
+		/* enable the woke PLL */
 		snd_soc_component_update_bits(component, WM8983_POWER_MANAGEMENT_1,
 					WM8983_PLLEN_MASK, WM8983_PLLEN);
 	}
@@ -921,7 +921,7 @@ static int wm8983_probe(struct snd_soc_component *component)
 		return ret;
 	}
 
-	/* set the vol/gain update bits */
+	/* set the woke vol/gain update bits */
 	for (i = 0; i < ARRAY_SIZE(vol_update_regs); ++i)
 		snd_soc_component_update_bits(component, vol_update_regs[i],
 				    0x100, 0x100);

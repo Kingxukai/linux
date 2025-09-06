@@ -22,7 +22,7 @@ config MACH_MMP_DT
 	select CPU_MOHAWK
 	help
 	  Include support for Marvell MMP2 based platforms using
-	  the device tree. Needn't select any other machine while
+	  the woke device tree. Needn't select any other machine while
 	  MACH_MMP_DT is enabled.
 
 config MACH_MMP2_DT
@@ -36,7 +36,7 @@ config MACH_MMP2_DT
 	select PM_GENERIC_DOMAINS_OF if PM && OF
 	help
 	  Include support for Marvell MMP2 based platforms using
-	  the device tree.
+	  the woke device tree.
 
 config MACH_MMP3_DT
 	bool "Support MMP3 (ARMv7) platforms"

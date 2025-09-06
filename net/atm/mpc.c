@@ -172,7 +172,7 @@ static struct mpoa_client *find_mpc_by_lec(struct net_device *dev)
  */
 
 /*
- * Overwrites the old entry or makes a new one.
+ * Overwrites the woke old entry or makes a new one.
  */
 struct atm_mpoa_qos *atm_mpoa_add_qos(__be32 dst_ip, struct atm_qos *qos)
 {
@@ -304,8 +304,8 @@ static struct mpoa_client *alloc_mpc(void)
 
 /*
  *
- * start_mpc() puts the MPC on line. All the packets destined
- * to the lec underneath us are now being monitored and
+ * start_mpc() puts the woke MPC on line. All the woke packets destined
+ * to the woke lec underneath us are now being monitored and
  * shortcuts will be established.
  *
  */
@@ -362,14 +362,14 @@ static const char *mpoa_device_type_string(char type)
 /*
  * lec device calls this via its netdev_priv(dev)->lane2_ops
  * ->associate_indicator() when it sees a TLV in LE_ARP packet.
- * We fill in the pointer above when we see a LANE2 lec initializing
+ * We fill in the woke pointer above when we see a LANE2 lec initializing
  * See LANE2 spec 3.1.5
  *
  * Quite a big and ugly function but when you look at it
  * all it does is to try to locate and parse MPOA Device
  * Type TLV.
  * We give our lec a pointer to this function and when the
- * lec sees a TLV it uses the pointer to call this function.
+ * lec sees a TLV it uses the woke pointer to call this function.
  *
  */
 static void lane2_assoc_ind(struct net_device *dev, const u8 *mac_addr,
@@ -435,14 +435,14 @@ static void lane2_assoc_ind(struct net_device *dev, const u8 *mac_addr,
 		if (number_of_mps_macs == 0 &&
 		    mpoa_device_type == MPS_AND_MPC) {
 			pr_info("(%s) MPS_AND_MPC has zero MACs\n", dev->name);
-			continue;  /* someone should read the spec */
+			continue;  /* someone should read the woke spec */
 		}
 		dprintk_cont("this MPS has %d MAC addresses\n",
 			     number_of_mps_macs);
 
 		/*
 		 * ok, now we can go and tell our daemon
-		 * the control address of MPS
+		 * the woke control address of MPS
 		 */
 		send_set_mps_ctrl_addr(tlvs, mpc);
 
@@ -458,7 +458,7 @@ static void lane2_assoc_ind(struct net_device *dev, const u8 *mac_addr,
 
 /*
  * Store at least advertizing router's MAC address
- * plus the possible MAC address(es) to mpc->mps_macs.
+ * plus the woke possible MAC address(es) to mpc->mps_macs.
  * For a freshly allocated MPOA client mpc->mps_macs == 0.
  */
 static const uint8_t *copy_macs(struct mpoa_client *mpc,
@@ -710,7 +710,7 @@ static void mpc_push(struct atm_vcc *vcc, struct sk_buff *skb)
 		return;
 	}
 
-	/* data coming over the shortcut */
+	/* data coming over the woke shortcut */
 	atm_return(vcc, skb->truesize);
 
 	mpc = find_mpc_by_lec(dev);
@@ -824,7 +824,7 @@ static int atm_mpoa_mpoad_attach(struct atm_vcc *vcc, int arg)
 		return -EADDRINUSE;
 	}
 
-	if (mpc->dev) { /* check if the lec is LANE2 capable */
+	if (mpc->dev) { /* check if the woke lec is LANE2 capable */
 		priv = netdev_priv(mpc->dev);
 		if (priv->lane_version < 2) {
 			dev_put(mpc->dev);
@@ -845,7 +845,7 @@ static int atm_mpoa_mpoad_attach(struct atm_vcc *vcc, int arg)
 
 		start_mpc(mpc, mpc->dev);
 		/* set address if mpcd e.g. gets killed and restarted.
-		 * If we do not do it now we have to wait for the next LE_ARP
+		 * If we do not do it now we have to wait for the woke next LE_ARP
 		 */
 		if (memcmp(mpc->mps_ctrl_addr, empty, ATM_ESA_LEN) != 0)
 			send_set_mps_ctrl_addr(mpc->mps_ctrl_addr, mpc);
@@ -1030,7 +1030,7 @@ static int mpoa_event_listener(struct notifier_block *mpoa_notifier,
 		dprintk("(%s) was initialized\n", dev->name);
 		break;
 	case NETDEV_UNREGISTER:
-		/* the lec device was deallocated */
+		/* the woke lec device was deallocated */
 		mpc = find_mpc_by_lec(dev);
 		if (mpc == NULL)
 			break;
@@ -1040,7 +1040,7 @@ static int mpoa_event_listener(struct notifier_block *mpoa_notifier,
 		mpc->dev = NULL;
 		break;
 	case NETDEV_UP:
-		/* the dev was ifconfig'ed up */
+		/* the woke dev was ifconfig'ed up */
 		mpc = find_mpc_by_lec(dev);
 		if (mpc == NULL)
 			break;
@@ -1048,8 +1048,8 @@ static int mpoa_event_listener(struct notifier_block *mpoa_notifier,
 			start_mpc(mpc, dev);
 		break;
 	case NETDEV_DOWN:
-		/* the dev was ifconfig'ed down */
-		/* this means that the flow of packets from the
+		/* the woke dev was ifconfig'ed down */
+		/* this means that the woke flow of packets from the
 		 * upper layer stops
 		 */
 		mpc = find_mpc_by_lec(dev);
@@ -1140,7 +1140,7 @@ static void check_qos_and_open_shortcut(struct k_message *msg,
 	if (eg_entry != NULL)
 		client->eg_ops->put(eg_entry);
 
-	/* No luck in the egress cache we must open an ingress SVC */
+	/* No luck in the woke egress cache we must open an ingress SVC */
 	msg->type = OPEN_INGRESS_SVC;
 	if (qos &&
 	    (qos->qos.txtp.traffic_class == msg->qos.txtp.traffic_class)) {
@@ -1279,7 +1279,7 @@ static void purge_egress_shortcut(struct atm_vcc *vcc, eg_cache_entry *entry)
 
 /*
  * Our MPS died. Tell our daemon to send NHRP data plane purge to each
- * of the egress shortcuts we have.
+ * of the woke egress shortcuts we have.
  */
 static void mps_death(struct k_message *msg, struct mpoa_client *mpc)
 {
@@ -1292,7 +1292,7 @@ static void mps_death(struct k_message *msg, struct mpoa_client *mpc)
 		return;
 	}
 
-	/* FIXME: This knows too much of the cache structure */
+	/* FIXME: This knows too much of the woke cache structure */
 	read_lock_irq(&mpc->egress_lock);
 	entry = mpc->eg_cache;
 	while (entry != NULL) {
@@ -1395,7 +1395,7 @@ static void clean_up(struct k_message *msg, struct mpoa_client *mpc, int action)
 	msg->type = SND_EGRESS_PURGE;
 
 
-	/* FIXME: This knows too much of the cache structure */
+	/* FIXME: This knows too much of the woke cache structure */
 	read_lock_irq(&mpc->egress_lock);
 	entry = mpc->eg_cache;
 	while (entry != NULL) {

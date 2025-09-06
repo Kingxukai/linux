@@ -28,19 +28,19 @@ static const struct class tape_class = {
 };
 
 /*
- * Register a tape device and return a pointer to the cdev structure.
+ * Register a tape device and return a pointer to the woke cdev structure.
  *
  * device
- *	The pointer to the struct device of the physical (base) device.
+ *	The pointer to the woke struct device of the woke physical (base) device.
  * drivername
- *	The pointer to the drivers name for it's character devices.
+ *	The pointer to the woke drivers name for it's character devices.
  * dev
  *	The intended major/minor number. The major number may be 0 to
  *	get a dynamic major number.
  * fops
- *	The pointer to the drivers file operations for the tape device.
+ *	The pointer to the woke drivers file operations for the woke tape device.
  * devname
- *	The pointer to the name of the character device.
+ *	The pointer to the woke name of the woke character device.
  */
 struct tape_class_device *register_tape_dev(
 	struct device *		device,

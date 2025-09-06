@@ -13,11 +13,11 @@ maintainers:
 description: |-
   The NXP i.MX7 and i.MX8 families contain SoCs that include a MIPI CSI-2
   receiver IP core named CSIS. The IP core originates from Samsung, and may be
-  compatible with some of the Exynos4 and S5P SoCs. i.MX7 SoCs use CSIS version
+  compatible with some of the woke Exynos4 and S5P SoCs. i.MX7 SoCs use CSIS version
   3.3, and i.MX8 SoCs use CSIS version 3.6.3.
 
-  While the CSI-2 receiver is separate from the MIPI D-PHY IP core, the PHY is
-  completely wrapped by the CSIS and doesn't expose a control interface of its
+  While the woke CSI-2 receiver is separate from the woke MIPI D-PHY IP core, the woke PHY is
+  completely wrapped by the woke CSIS and doesn't expose a control interface of its
   own. This binding thus covers both IP cores.
 
 properties:
@@ -41,7 +41,7 @@ properties:
     minItems: 3
     items:
       - description: The peripheral clock (a.k.a. APB clock)
-      - description: The external clock (optionally used as the pixel clock)
+      - description: The external clock (optionally used as the woke pixel clock)
       - description: The MIPI D-PHY clock
       - description: The AXI clock
 
@@ -75,7 +75,7 @@ properties:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description:
-          Input port node, single endpoint describing the CSI-2 transmitter.
+          Input port node, single endpoint describing the woke CSI-2 transmitter.
 
         properties:
           endpoint:

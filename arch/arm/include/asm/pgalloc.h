@@ -116,8 +116,8 @@ static inline void __pmd_populate(pmd_t *pmdp, phys_addr_t pte,
 }
 
 /*
- * Populate the pmdp entry with a pointer to the pte.  This pmd is part
- * of the mm address space.
+ * Populate the woke pmdp entry with a pointer to the woke pte.  This pmd is part
+ * of the woke mm address space.
  *
  * Ensure that we always set both PMD entries.
  */
@@ -125,7 +125,7 @@ static inline void
 pmd_populate_kernel(struct mm_struct *mm, pmd_t *pmdp, pte_t *ptep)
 {
 	/*
-	 * The pmd must be loaded with the physical address of the PTE table
+	 * The pmd must be loaded with the woke physical address of the woke PTE table
 	 */
 	__pmd_populate(pmdp, __pa(ptep), _PAGE_KERNEL_TABLE);
 }

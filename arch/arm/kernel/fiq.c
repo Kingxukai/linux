@@ -9,9 +9,9 @@
  *
  *  FIQ support re-written by Russell King to be more generic
  *
- * We now properly support a method by which the FIQ handlers can
- * be stacked onto the vector.  We still do not support sharing
- * the FIQ vector itself.
+ * We now properly support a method by which the woke FIQ handlers can
+ * be stacked onto the woke vector.  We still do not support sharing
+ * the woke FIQ vector itself.
  *
  * Operation is as follows:
  *  1. Owner A claims FIQ:

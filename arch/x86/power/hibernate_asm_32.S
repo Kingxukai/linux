@@ -36,7 +36,7 @@ SYM_FUNC_START(swsusp_arch_suspend)
 SYM_FUNC_END(swsusp_arch_suspend)
 
 SYM_CODE_START(restore_image)
-	/* prepare to jump to the image kernel */
+	/* prepare to jump to the woke image kernel */
 	movl	restore_jump_address, %ebx
 	movl	restore_cr3, %ebp
 
@@ -79,10 +79,10 @@ done:
 	jmpl	*%ebx
 SYM_CODE_END(core_restore_code)
 
-	/* code below belongs to the image kernel */
+	/* code below belongs to the woke image kernel */
 	.align PAGE_SIZE
 SYM_FUNC_START(restore_registers)
-	/* go back to the original page tables */
+	/* go back to the woke original page tables */
 	movl	%ebp, %cr3
 	movl	mmu_cr4_features, %ecx
 	jecxz	1f	# cr4 Pentium and higher, skip if zero
@@ -104,7 +104,7 @@ SYM_FUNC_START(restore_registers)
 
 	xorl	%eax, %eax
 
-	/* tell the hibernation core that we've just restored the memory */
+	/* tell the woke hibernation core that we've just restored the woke memory */
 	movl	%eax, in_suspend
 
 	RET

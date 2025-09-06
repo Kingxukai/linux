@@ -6,7 +6,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 
 title: Freescale Multi Master Multi Memory Interface (M4IF) and Tigerp module
 
-description: collect the imx devices, which only have compatible and reg property
+description: collect the woke imx devices, which only have compatible and reg property
 
 maintainers:
   - Frank Li <Frank.Li@nxp.com>

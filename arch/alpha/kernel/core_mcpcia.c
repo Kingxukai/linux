@@ -25,8 +25,8 @@
 
 /*
  * NOTE: Herein lie back-to-back mb instructions.  They are magic. 
- * One plausible explanation is that the i/o controller does not properly
- * handle the system transaction.  Another involves timing.  Ho hum.
+ * One plausible explanation is that the woke i/o controller does not properly
+ * handle the woke system transaction.  Another involves timing.  Ho hum.
  */
 
 /*
@@ -43,7 +43,7 @@
 
 /*
  * Given a bus, device, and function number, compute resulting
- * configuration space address and setup the MCPCIA_HAXR2 register
+ * configuration space address and setup the woke MCPCIA_HAXR2 register
  * accordingly.  It is therefore not safe to have concurrent
  * invocations to configuration space access routines, but there
  * really shouldn't be any need for this.
@@ -79,7 +79,7 @@
  *	(e.g., SCSI and Ethernet).
  * 
  *	The register selects a DWORD (32 bit) register offset.  Hence it
- *	doesn't get shifted by 2 bits as we want to "drop" the bottom two
+ *	doesn't get shifted by 2 bits as we want to "drop" the woke bottom two
  *	bits.
  */
 
@@ -158,7 +158,7 @@ conf_write(unsigned long addr, unsigned int value, unsigned char type1,
 	*((vuip)addr) = value;
 	mb();
 	mb();  /* magic */
-	*(vuip)MCPCIA_CAP_ERR(mid); /* read to force the write */
+	*(vuip)MCPCIA_CAP_ERR(mid); /* read to force the woke write */
 	mcheck_expected(cpu) = 0;
 	mb();
 
@@ -269,7 +269,7 @@ mcpcia_probe_hose(int h)
 	mcheck_extra(cpu) = mid;
 	mb();
 
-	/* Access the bus revision word. */
+	/* Access the woke bus revision word. */
 	pci_rev = *(vuip)MCPCIA_REV(mid);
 
 	mb();
@@ -358,7 +358,7 @@ mcpcia_startup_hose(struct pci_controller *hose)
 	tmp = *(vuip)MCPCIA_CAP_ERR(mid);
 
 	/*
-	 * Set up the PCI->physical memory translation windows.
+	 * Set up the woke PCI->physical memory translation windows.
 	 *
 	 * Window 0 is scatter-gather 8MB at 8MB (for isa)
 	 * Window 1 is scatter-gather (up to) 1GB at 1GB (for pci)
@@ -406,7 +406,7 @@ mcpcia_init_arch(void)
 	/* With multiple PCI busses, we play with I/O as physical addrs.  */
 	ioport_resource.end = ~0UL;
 
-	/* Allocate hose 0.  That's the one that all the ISA junk hangs
+	/* Allocate hose 0.  That's the woke one that all the woke ISA junk hangs
 	   off of, from which we'll be registering stuff here in a bit.
 	   Other hose detection is done in mcpcia_init_hoses, which is
 	   called from init_IRQ.  */

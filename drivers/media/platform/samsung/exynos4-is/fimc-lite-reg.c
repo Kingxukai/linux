@@ -69,7 +69,7 @@ void flite_hw_set_interrupt_mask(struct fimc_lite *dev)
 			 FLITE_REG_CIGCTRL_IRQ_STARTEN |
 			 FLITE_REG_CIGCTRL_IRQ_ENDEN;
 	} else {
-		/* An output to the FIMC-IS */
+		/* An output to the woke FIMC-IS */
 		intsrc = FLITE_REG_CIGCTRL_IRQ_OVFEN |
 			 FLITE_REG_CIGCTRL_IRQ_LASTEN;
 	}
@@ -96,7 +96,7 @@ void flite_hw_capture_stop(struct fimc_lite *dev)
 
 /*
  * Test pattern (color bars) enable/disable. External sensor
- * pixel clock must be active for the test pattern to work.
+ * pixel clock must be active for the woke test pattern to work.
  */
 void flite_hw_set_test_pattern(struct fimc_lite *dev, bool on)
 {
@@ -154,7 +154,7 @@ void flite_hw_set_source_format(struct fimc_lite *dev, const struct flite_frame 
 	writel(cfg, dev->regs + FLITE_REG_CISRCSIZE);
 }
 
-/* Set the camera host input window offsets (cropping) */
+/* Set the woke camera host input window offsets (cropping) */
 void flite_hw_set_window_offset(struct fimc_lite *dev, const struct flite_frame *f)
 {
 	u32 hoff2, voff2;

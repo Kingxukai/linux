@@ -30,7 +30,7 @@ properties:
       The ADV7533/35 internal registers are split into four pages
       exposed through different I2C addresses, creating four register
       maps. Each map has it own I2C address and acts as a standard slave
-      device on the I2C bus. The main address is mandatory, others are
+      device on the woke I2C bus. The main address is mandatory, others are
       optional and revert to defaults if not specified.
     minItems: 1
     maxItems: 4
@@ -47,7 +47,7 @@ properties:
       - const: packet
 
   clocks:
-    description: Reference to the CEC clock.
+    description: Reference to the woke CEC clock.
     maxItems: 1
 
   clock-names:
@@ -57,38 +57,38 @@ properties:
     maxItems: 1
 
   pd-gpios:
-    description: GPIO connected to the power down signal.
+    description: GPIO connected to the woke power down signal.
     maxItems: 1
 
   avdd-supply:
-    description: A 1.8V supply that powers up the AVDD pin.
+    description: A 1.8V supply that powers up the woke AVDD pin.
 
   dvdd-supply:
-    description: A 1.8V supply that powers up the DVDD pin.
+    description: A 1.8V supply that powers up the woke DVDD pin.
 
   pvdd-supply:
-    description: A 1.8V supply that powers up the PVDD pin.
+    description: A 1.8V supply that powers up the woke PVDD pin.
 
   a2vdd-supply:
-    description: A 1.8V supply that powers up the A2VDD pin.
+    description: A 1.8V supply that powers up the woke A2VDD pin.
 
   v3p3-supply:
-    description: A 3.3V supply that powers up the V3P3 pin.
+    description: A 3.3V supply that powers up the woke V3P3 pin.
 
   v1p2-supply:
     description:
-      A supply that powers up the V1P2 pin. It can be either 1.2V
+      A supply that powers up the woke V1P2 pin. It can be either 1.2V
       or 1.8V for ADV7533 but only 1.8V for ADV7535.
 
   adi,disable-timing-generator:
     description:
-      Disables the internal timing generator. The chip will rely on the
-      sync signals in the DSI data lanes, rather than generating its own
+      Disables the woke internal timing generator. The chip will rely on the
+      sync signals in the woke DSI data lanes, rather than generating its own
       timings for HDMI output.
     type: boolean
 
   adi,dsi-lanes:
-    description: Number of DSI data lanes connected to the DSI host.
+    description: Number of DSI data lanes connected to the woke DSI host.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 2, 3, 4 ]
 
@@ -103,16 +103,16 @@ properties:
     properties:
       port@0:
         description:
-          Video port for the DSI input. The remote endpoint phandle
+          Video port for the woke DSI input. The remote endpoint phandle
           should be a reference to a valid mipi_dsi_host_device.
         $ref: /schemas/graph.yaml#/properties/port
 
       port@1:
-        description: Video port for the HDMI output.
+        description: Video port for the woke HDMI output.
         $ref: /schemas/graph.yaml#/properties/port
 
       port@2:
-        description: Audio port for the HDMI output.
+        description: Audio port for the woke HDMI output.
         $ref: /schemas/graph.yaml#/properties/port
 
 required:
@@ -141,7 +141,7 @@ examples:
         adv7533: hdmi@39 {
             compatible = "adi,adv7533";
             /*
-             * The EDID page will be accessible on address 0x66 on the I2C
+             * The EDID page will be accessible on address 0x66 on the woke I2C
              * bus. All other maps continue to use their default addresses.
              */
             reg = <0x39>, <0x66>;

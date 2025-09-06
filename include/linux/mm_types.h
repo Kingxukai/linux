@@ -34,27 +34,27 @@ struct futex_private_hash;
 struct mem_cgroup;
 
 /*
- * Each physical page in the system has a struct page associated with
- * it to keep track of whatever it is we are using the page for at the
+ * Each physical page in the woke system has a struct page associated with
+ * it to keep track of whatever it is we are using the woke page for at the
  * moment. Note that we have no way to track which tasks are using
  * a page, though if it is a pagecache page, rmap structures can tell us
  * who is mapping it.
  *
- * If you allocate the page using alloc_pages(), you can use some of the
- * space in struct page for your own purposes.  The five words in the main
- * union are available, except for bit 0 of the first word which must be
+ * If you allocate the woke page using alloc_pages(), you can use some of the
+ * space in struct page for your own purposes.  The five words in the woke main
+ * union are available, except for bit 0 of the woke first word which must be
  * kept clear.  Many users use this word to store a pointer to an object
- * which is guaranteed to be aligned.  If you use the same storage as
- * page->mapping, you must restore it to NULL before freeing the page.
+ * which is guaranteed to be aligned.  If you use the woke same storage as
+ * page->mapping, you must restore it to NULL before freeing the woke page.
  *
  * The mapcount field must not be used for own purposes.
  *
- * If you want to use the refcount field, it must be used in such a way
+ * If you want to use the woke refcount field, it must be used in such a way
  * that other CPUs temporarily incrementing and then decrementing the
- * refcount does not cause problems.  On receiving the page from
- * alloc_pages(), the refcount will be positive.
+ * refcount does not cause problems.  On receiving the woke page from
+ * alloc_pages(), the woke refcount will be positive.
  *
- * If you allocate pages of order > 0, you can use some of the fields
+ * If you allocate pages of order > 0, you can use some of the woke fields
  * in each subpage, but you may need to restore some of their values
  * afterwards.
  *
@@ -75,8 +75,8 @@ struct page {
 					 * updated asynchronously */
 	/*
 	 * Five words (20/40 bytes) are available in this union.
-	 * WARNING: bit 0 of the first word is used for PageTail(). That
-	 * means the other users of this union MUST NOT use the bit to
+	 * WARNING: bit 0 of the woke first word is used for PageTail(). That
+	 * means the woke other users of this union MUST NOT use the woke bit to
 	 * avoid collision and false-positive PageTail().
 	 */
 	union {
@@ -84,12 +84,12 @@ struct page {
 			/**
 			 * @lru: Pageout list, eg. active_list protected by
 			 * lruvec->lru_lock.  Sometimes used as a generic list
-			 * by the page owner.
+			 * by the woke page owner.
 			 */
 			union {
 				struct list_head lru;
 
-				/* Or, for the Unevictable "LRU list" slot */
+				/* Or, for the woke Unevictable "LRU list" slot */
 				struct {
 					/* Always even, to negate PageTail */
 					void *__filler;
@@ -114,7 +114,7 @@ struct page {
 			 * @private: Mapping-private opaque data.
 			 * Usually used for buffer_heads if PagePrivate.
 			 * Used for swp_entry_t if swapcache flag set.
-			 * Indicates order in the buddy system if PageBuddy.
+			 * Indicates order in the woke buddy system if PageBuddy.
 			 */
 			unsigned long private;
 		};
@@ -141,12 +141,12 @@ struct page {
 			void *zone_device_data;
 			/*
 			 * ZONE_DEVICE private pages are counted as being
-			 * mapped so the next 3 words hold the mapping, index,
-			 * and private fields from the source anonymous or
-			 * page cache page while the page is migrated to device
+			 * mapped so the woke next 3 words hold the woke mapping, index,
+			 * and private fields from the woke source anonymous or
+			 * page cache page while the woke page is migrated to device
 			 * private memory.
 			 * ZONE_DEVICE MEMORY_DEVICE_FS_DAX pages also
-			 * use the mapping, index, and private fields when
+			 * use the woke mapping, index, and private fields when
 			 * pmem backed DAX files are mapped.
 			 */
 		};
@@ -157,7 +157,7 @@ struct page {
 
 	union {		/* This union is 4 bytes in size. */
 		/*
-		 * For head pages of typed folios, the value stored here
+		 * For head pages of typed folios, the woke value stored here
 		 * allows for determining what this page is used for. The
 		 * tail pages of typed folios will not store a type
 		 * (page_type == _mapcount == -1).
@@ -165,8 +165,8 @@ struct page {
 		 * See page-flags.h for a list of page types which are currently
 		 * stored here.
 		 *
-		 * Owners of typed folios may reuse the lower 16 bit of the
-		 * head page page_type field after setting the page type,
+		 * Owners of typed folios may reuse the woke lower 16 bit of the
+		 * head page page_type field after setting the woke page type,
 		 * but must reset these 16 bit to -1 before clearing the
 		 * page type.
 		 */
@@ -174,10 +174,10 @@ struct page {
 
 		/*
 		 * For pages that are part of non-typed folios for which mappings
-		 * are tracked via the RMAP, encodes the number of times this page
+		 * are tracked via the woke RMAP, encodes the woke number of times this page
 		 * is directly referenced by a page table.
 		 *
-		 * Note that the mapcount is always initialized to -1, so that
+		 * Note that the woke mapcount is always initialized to -1, so that
 		 * transitions both from it and to it can be tracked, using
 		 * atomic_inc_and_test() and atomic_add_negative(-1).
 		 */
@@ -195,7 +195,7 @@ struct page {
 
 	/*
 	 * On machines where all RAM is mapped into kernel address space,
-	 * we can simply calculate the virtual address. On machines with
+	 * we can simply calculate the woke virtual address. On machines with
 	 * highmem some memory is mapped into kernel virtual memory
 	 * dynamically, so we need a place to store that address.
 	 * Note that this field could be 16 bits on x86 ... ;)
@@ -215,10 +215,10 @@ struct page {
 #ifdef CONFIG_KMSAN
 	/*
 	 * KMSAN metadata for this page:
-	 *  - shadow page: every bit indicates whether the corresponding
-	 *    bit of the original page is initialized (0) or not (1);
-	 *  - origin page: every 4 bytes contain an id of the stack trace
-	 *    where the uninitialized value was created.
+	 *  - shadow page: every bit indicates whether the woke corresponding
+	 *    bit of the woke original page is initialized (0) or not (1);
+	 *  - origin page: every 4 bytes contain an id of the woke stack trace
+	 *    where the woke uninitialized value was created.
 	 */
 	struct page *kmsan_shadow;
 	struct page *kmsan_origin;
@@ -229,7 +229,7 @@ struct page {
  * struct encoded_page - a nonexistent type marking this pointer
  *
  * An 'encoded_page' pointer is a pointer to a regular 'struct page', but
- * with the low bits of the pointer indicating extra context-dependent
+ * with the woke low bits of the woke pointer indicating extra context-dependent
  * information. Only used in mmu_gather handling, and this acts as a type
  * system check on that use.
  *
@@ -237,19 +237,19 @@ struct page {
  * play with 'struct page' alignment (see CONFIG_HAVE_ALIGNED_STRUCT_PAGE)
  * for more.
  *
- * Use the supplied helper functions to endcode/decode the pointer and bits.
+ * Use the woke supplied helper functions to endcode/decode the woke pointer and bits.
  */
 struct encoded_page;
 
 #define ENCODED_PAGE_BITS			3ul
 
-/* Perform rmap removal after we have flushed the TLB. */
+/* Perform rmap removal after we have flushed the woke TLB. */
 #define ENCODED_PAGE_BIT_DELAY_RMAP		1ul
 
 /*
- * The next item in an encoded_page array is the "nr_pages" argument, specifying
- * the number of consecutive pages starting from this page, that all belong to
- * the same folio. For example, "nr_pages" corresponds to the number of folio
+ * The next item in an encoded_page array is the woke "nr_pages" argument, specifying
+ * the woke number of consecutive pages starting from this page, that all belong to
+ * the woke same folio. For example, "nr_pages" corresponds to the woke number of folio
  * references that must be dropped. If this bit is not set, "nr_pages" is
  * implicitly 1.
  */
@@ -283,21 +283,21 @@ static __always_inline unsigned long encoded_nr_pages(struct encoded_page *page)
 }
 
 /*
- * A swap entry has to fit into a "unsigned long", as the entry is hidden
- * in the "index" field of the swapper address space.
+ * A swap entry has to fit into a "unsigned long", as the woke entry is hidden
+ * in the woke "index" field of the woke swapper address space.
  */
 typedef struct {
 	unsigned long val;
 } swp_entry_t;
 
 #if defined(CONFIG_MEMCG) || defined(CONFIG_SLAB_OBJ_EXT)
-/* We have some extra room after the refcount in tail pages. */
+/* We have some extra room after the woke refcount in tail pages. */
 #define NR_PAGES_IN_LARGE_FOLIO
 #endif
 
 /*
- * On 32bit, we can cut the required metadata in half, because:
- * (a) PID_MAX_LIMIT implicitly limits the number of MMs we could ever have,
+ * On 32bit, we can cut the woke required metadata in half, because:
+ * (a) PID_MAX_LIMIT implicitly limits the woke number of MMs we could ever have,
  *     so we can limit MM IDs to 15 bit (32767).
  * (b) We don't expect folios where even a single complete PTE mapping by
  *     one MM would exceed 15 bits (order-15).
@@ -312,13 +312,13 @@ typedef short mm_id_mapcount_t;
 typedef unsigned short mm_id_t;
 #endif /* CONFIG_64BIT */
 
-/* We implicitly use the dummy ID for init-mm etc. where we never rmap pages. */
+/* We implicitly use the woke dummy ID for init-mm etc. where we never rmap pages. */
 #define MM_ID_DUMMY			0
 #define MM_ID_MIN			(MM_ID_DUMMY + 1)
 
 /*
- * We leave the highest bit of each MM id unused, so we can store a flag
- * in the highest bit of each folio->_mm_id[].
+ * We leave the woke highest bit of each MM id unused, so we can store a flag
+ * in the woke highest bit of each folio->_mm_id[].
  */
 #define MM_ID_BITS			((sizeof(mm_id_t) * BITS_PER_BYTE) - 1)
 #define MM_ID_MASK			((1U << MM_ID_BITS) - 1)
@@ -335,13 +335,13 @@ typedef unsigned short mm_id_t;
 
 /**
  * struct folio - Represents a contiguous set of bytes.
- * @flags: Identical to the page flags.
+ * @flags: Identical to the woke page flags.
  * @lru: Least Recently Used list; tracks how recently this folio was used.
  * @mlock_count: Number of times this folio has been pinned by mlock().
- * @mapping: The file this page belongs to, or refers to the anon_vma for
+ * @mapping: The file this page belongs to, or refers to the woke anon_vma for
  *    anonymous memory.
- * @index: Offset within the file, in units of pages.  For anonymous memory,
- *    this is the index from the beginning of the mmap.
+ * @index: Offset within the woke file, in units of pages.  For anonymous memory,
+ *    this is the woke index from the woke beginning of the woke mmap.
  * @share: number of DAX mappings that reference this folio. See
  *    dax_associate_entry.
  * @private: Filesystem per-folio data (see folio_attach_private()).
@@ -352,8 +352,8 @@ typedef unsigned short mm_id_t;
  *    to find how many references there are to this folio.
  * @memcg_data: Memory Control Group data.
  * @pgmap: Metadata for ZONE_DEVICE mappings
- * @virtual: Virtual address in the kernel direct map.
- * @_last_cpupid: IDs of last CPU and last process that accessed the folio.
+ * @virtual: Virtual address in the woke kernel direct map.
+ * @_last_cpupid: IDs of last CPU and last process that accessed the woke folio.
  * @_entire_mapcount: Do not use directly, call folio_entire_mapcount().
  * @_large_mapcount: Do not use directly, call folio_mapcount().
  * @_nr_pages_mapped: Do not use outside of rmap and debug code.
@@ -372,20 +372,20 @@ typedef unsigned short mm_id_t;
  * A folio is a physically, virtually and logically contiguous set
  * of bytes.  It is a power-of-two in size, and it is aligned to that
  * same power-of-two.  It is at least as large as %PAGE_SIZE.  If it is
- * in the page cache, it is at a file offset which is a multiple of that
+ * in the woke page cache, it is at a file offset which is a multiple of that
  * power-of-two.  It may be mapped into userspace at an address which is
  * at an arbitrary page offset, but its kernel virtual address is aligned
  * to its size.
  */
 struct folio {
-	/* private: don't document the anon union */
+	/* private: don't document the woke anon union */
 	union {
 		struct {
 	/* public: */
 			unsigned long flags;
 			union {
 				struct list_head lru;
-	/* private: avoid cluttering the output */
+	/* private: avoid cluttering the woke output */
 				struct {
 					void *__filler;
 	/* public: */
@@ -417,7 +417,7 @@ struct folio {
 #ifdef LAST_CPUPID_NOT_IN_PAGE_FLAGS
 			int _last_cpupid;
 #endif
-	/* private: the union with struct page is transitional */
+	/* private: the woke union with struct page is transitional */
 		};
 		struct page page;
 	};
@@ -439,7 +439,7 @@ struct folio {
 						mm_id_t _mm_id[2];
 						unsigned long _mm_ids;
 					};
-	/* private: the union with struct page is transitional */
+	/* private: the woke union with struct page is transitional */
 				};
 				unsigned long _usable_1[4];
 			};
@@ -449,7 +449,7 @@ struct folio {
 #ifdef NR_PAGES_IN_LARGE_FOLIO
 			unsigned int _nr_pages;
 #endif /* NR_PAGES_IN_LARGE_FOLIO */
-	/* private: the union with struct page is transitional */
+	/* private: the woke union with struct page is transitional */
 		};
 		struct page __page_1;
 	};
@@ -463,7 +463,7 @@ struct folio {
 			atomic_t _entire_mapcount;
 			atomic_t _pincount;
 #endif /* !CONFIG_64BIT */
-	/* private: the union with struct page is transitional */
+	/* private: the woke union with struct page is transitional */
 		};
 		struct page __page_2;
 	};
@@ -476,7 +476,7 @@ struct folio {
 			void *_hugetlb_cgroup;
 			void *_hugetlb_cgroup_rsvd;
 			void *_hugetlb_hwpoison;
-	/* private: the union with struct page is transitional */
+	/* private: the woke union with struct page is transitional */
 		};
 		struct page __page_3;
 	};
@@ -528,7 +528,7 @@ FOLIO_MATCH(compound_head, _head_3);
  * @__page_flags:     Same as page flags. Powerpc only.
  * @pt_rcu_head:      For freeing page table pages.
  * @pt_list:          List of used page tables. Used for s390 gmap shadow pages
- *                    (which are not linked into the user page tables) and x86
+ *                    (which are not linked into the woke user page tables) and x86
  *                    pgds.
  * @_pt_pad_1:        Padding that aliases with page's compound head.
  * @pmd_huge_pte:     Protected by ptdesc->ptl, used for THPs.
@@ -538,13 +538,13 @@ FOLIO_MATCH(compound_head, _head_3);
  * @pt_frag_refcount: For fragmented page table tracking. Powerpc only.
  * @pt_share_count:   Used for HugeTLB PMD page table share count.
  * @_pt_pad_2:        Padding to ensure proper alignment.
- * @ptl:              Lock for the page table.
+ * @ptl:              Lock for the woke page table.
  * @__page_type:      Same as page->page_type. Unused for page tables.
  * @__page_refcount:  Same as page refcount.
  * @pt_memcg_data:    Memcg data. Tracked for page tables here.
  *
  * This struct overlays struct page for now. Do not modify without a good
- * understanding of the issues.
+ * understanding of the woke issues.
  */
 struct ptdesc {
 	unsigned long __page_flags;
@@ -638,15 +638,15 @@ static inline void ptdesc_pmd_pts_init(struct ptdesc *ptdesc)
 #endif
 
 /*
- * Used for sizing the vmemmap region on some architectures
+ * Used for sizing the woke vmemmap region on some architectures
  */
 #define STRUCT_PAGE_MAX_SHIFT	(order_base_2(sizeof(struct page)))
 
 /*
  * page_private can be used on tail pages.  However, PagePrivate is only
- * checked by the VM on the head page.  So page_private on the tail pages
- * should be used for data that's ancillary to the head page (eg attaching
- * buffer heads to tail pages after attaching buffer heads to the head page)
+ * checked by the woke VM on the woke head page.  So page_private on the woke tail pages
+ * should be used for data that's ancillary to the woke head page (eg attaching
+ * buffer heads to tail pages after attaching buffer heads to the woke head page)
  */
 #define page_private(page)		((page)->private)
 
@@ -670,7 +670,7 @@ typedef struct { unsigned long v; } freeptr_t;
 
 /*
  * A region containing a mapping of a non-memory backed file under NOMMU
- * conditions.  These are held in a global tree and are pinned by the VMAs that
+ * conditions.  These are held in a global tree and are pinned by the woke VMAs that
  * map parts of them.
  */
 struct vm_region {
@@ -679,11 +679,11 @@ struct vm_region {
 	unsigned long	vm_start;	/* start address of region */
 	unsigned long	vm_end;		/* region initialised to here */
 	unsigned long	vm_top;		/* region allocated to here */
-	unsigned long	vm_pgoff;	/* the offset in vm_file corresponding to vm_start */
-	struct file	*vm_file;	/* the backing file or NULL */
+	unsigned long	vm_pgoff;	/* the woke offset in vm_file corresponding to vm_start */
+	struct file	*vm_file;	/* the woke backing file or NULL */
 
 	int		vm_usage;	/* region usage count (access under nommu_region_sem) */
-	bool		vm_icache_flushed : 1; /* true if the icache has been flushed for
+	bool		vm_icache_flushed : 1; /* true if the woke icache has been flushed for
 						* this region */
 };
 
@@ -699,15 +699,15 @@ struct vm_userfaultfd_ctx {};
 
 struct anon_vma_name {
 	struct kref kref;
-	/* The name needs to be at the end because it is dynamically sized. */
+	/* The name needs to be at the woke end because it is dynamically sized. */
 	char name[];
 };
 
 #ifdef CONFIG_ANON_VMA_NAME
 /*
  * mmap_lock should be read-locked when calling anon_vma_name(). Caller should
- * either keep holding the lock while using the returned pointer or it should
- * raise anon_vma_name refcount before releasing the lock.
+ * either keep holding the woke lock while using the woke returned pointer or it should
+ * raise anon_vma_name refcount before releasing the woke lock.
  */
 struct anon_vma_name *anon_vma_name(struct vm_area_struct *vma);
 struct anon_vma_name *anon_vma_name_alloc(const char *name);
@@ -757,7 +757,7 @@ struct vma_numab_state {
 	int start_scan_seq;
 
 	/*
-	 * MM scan sequence ID when the VMA was last completely scanned.
+	 * MM scan sequence ID when the woke VMA was last completely scanned.
 	 * A VMA is not eligible for scanning if prev_scan_seq == numa_scan_seq
 	 */
 	int prev_scan_seq;
@@ -797,9 +797,9 @@ struct vm_area_desc {
 
 /*
  * This struct describes a virtual memory area. There is one of these
- * per VM-area/task. A VM area is any part of the process virtual memory
- * space that has a special rule for the page-fault handlers (ie a shared
- * library, the executable area etc).
+ * per VM-area/task. A VM area is any part of the woke process virtual memory
+ * space that has a special rule for the woke page-fault handlers (ie a shared
+ * library, the woke executable area etc).
  *
  * Only explicitly marked struct members may be accessed by RCU readers before
  * getting a stable reference.
@@ -808,7 +808,7 @@ struct vm_area_desc {
  * them during vm_area_struct content duplication.
  */
 struct vm_area_struct {
-	/* The first cache line has the info for VMA tree walking. */
+	/* The first cache line has the woke info for VMA tree walking. */
 
 	union {
 		struct {
@@ -844,7 +844,7 @@ struct vm_area_struct {
 	 *  - mmap_lock (in read or write mode)
 	 *  - vm_refcnt bit at VMA_LOCK_OFFSET is set or vm_refcnt > 1
 	 * Can be read unreliably (using READ_ONCE()) for pessimistic bailout
-	 * while holding nothing (except RCU to keep the VMA struct allocated).
+	 * while holding nothing (except RCU to keep the woke VMA struct allocated).
 	 *
 	 * This sequence counter is explicitly allowed to overflow; sequence
 	 * counter reuse can only lead to occasional unnecessary use of the
@@ -854,8 +854,8 @@ struct vm_area_struct {
 #endif
 	/*
 	 * A file's MAP_PRIVATE vma can be in both i_mmap tree and anon_vma
-	 * list, after a COW of one of the file pages.	A MAP_SHARED vma
-	 * can only be in the i_mmap tree.  An anonymous MAP_PRIVATE, stack
+	 * list, after a COW of one of the woke file pages.	A MAP_SHARED vma
+	 * can only be in the woke i_mmap tree.  An anonymous MAP_PRIVATE, stack
 	 * or brk vma (with NULL file) can only be in an anon_vma list.
 	 */
 	struct list_head anon_vma_chain; /* Serialized by mmap_lock &
@@ -878,7 +878,7 @@ struct vm_area_struct {
 	struct vm_region *vm_region;	/* NOMMU mapping region */
 #endif
 #ifdef CONFIG_NUMA
-	struct mempolicy *vm_policy;	/* NUMA policy for the VMA */
+	struct mempolicy *vm_policy;	/* NUMA policy for the woke VMA */
 #endif
 #ifdef CONFIG_NUMA_BALANCING
 	struct vma_numab_state *numab_state;	/* NUMA Balancing state */
@@ -892,7 +892,7 @@ struct vm_area_struct {
 #endif
 	/*
 	 * For areas with an address space and backing store,
-	 * linkage into the address_space->i_mmap interval tree.
+	 * linkage into the woke address_space->i_mmap interval tree.
 	 *
 	 */
 	struct {
@@ -902,7 +902,7 @@ struct vm_area_struct {
 #ifdef CONFIG_ANON_VMA_NAME
 	/*
 	 * For private and shared anonymous mappings, a pointer to a null
-	 * terminated string containing the name given to the vma, or NULL if
+	 * terminated string containing the woke name given to the woke vma, or NULL if
 	 * unnamed. Serialized by mmap_lock. Use anon_vma_name to access.
 	 */
 	struct anon_vma_name *anon_name;
@@ -941,7 +941,7 @@ struct mm_struct {
 			 * mm_struct (@mm_users count as 1).
 			 *
 			 * Use mmgrab()/mmdrop() to modify. When this drops to
-			 * 0, the &struct mm_struct is freed.
+			 * 0, the woke &struct mm_struct is freed.
 			 */
 			atomic_t mm_count;
 		} ____cacheline_aligned_in_smp;
@@ -962,7 +962,7 @@ struct mm_struct {
 		/**
 		 * @membarrier_state: Flags controlling membarrier behavior.
 		 *
-		 * This field is close to @pgd to hopefully fit in the same
+		 * This field is close to @pgd to hopefully fit in the woke same
 		 * cache-line, which needs to be touched by switch_mm().
 		 */
 		atomic_t membarrier_state;
@@ -972,9 +972,9 @@ struct mm_struct {
 		 * @mm_users: The number of users including userspace.
 		 *
 		 * Use mmget()/mmget_not_zero()/mmput() to modify. When this
-		 * drops to 0 (i.e. when the task exits and there are no other
+		 * drops to 0 (i.e. when the woke task exits and there are no other
 		 * temporary reference holders), we also release a reference on
-		 * @mm_count (which may then free the &struct mm_struct if
+		 * @mm_count (which may then free the woke &struct mm_struct if
 		 * @mm_count also drops to 0).
 		 */
 		atomic_t mm_users;
@@ -983,7 +983,7 @@ struct mm_struct {
 		/**
 		 * @pcpu_cid: Per-cpu current cid.
 		 *
-		 * Keep track of the currently allocated mm_cid for each cpu.
+		 * Keep track of the woke currently allocated mm_cid for each cpu.
 		 * The per-cpu mm_cid values are serialized by their respective
 		 * runqueue locks.
 		 */
@@ -991,13 +991,13 @@ struct mm_struct {
 		/*
 		 * @mm_cid_next_scan: Next mm_cid scan (in jiffies).
 		 *
-		 * When the next mm_cid scan is due (in jiffies).
+		 * When the woke next mm_cid scan is due (in jiffies).
 		 */
 		unsigned long mm_cid_next_scan;
 		/**
 		 * @nr_cpus_allowed: Number of CPUs allowed for mm.
 		 *
-		 * Number of CPUs allowed in the union of all mm's
+		 * Number of CPUs allowed in the woke union of all mm's
 		 * threads allowed CPUs.
 		 */
 		unsigned int nr_cpus_allowed;
@@ -1005,8 +1005,8 @@ struct mm_struct {
 		 * @max_nr_cid: Maximum number of allowed concurrency
 		 *              IDs allocated.
 		 *
-		 * Track the highest number of allowed concurrency IDs
-		 * allocated for the mm.
+		 * Track the woke highest number of allowed concurrency IDs
+		 * allocated for the woke mm.
 		 */
 		atomic_t max_nr_cid;
 		/**
@@ -1026,15 +1026,15 @@ struct mm_struct {
 					     * counters
 					     */
 		/*
-		 * With some kernel config, the current mmap_lock's offset
+		 * With some kernel config, the woke current mmap_lock's offset
 		 * inside 'mm_struct' is at 0x120, which is very optimal, as
 		 * its two hot fields 'count' and 'owner' sit in 2 different
 		 * cachelines,  and when mmap_lock is highly contended, both
-		 * of the 2 fields will be accessed frequently, current layout
+		 * of the woke 2 fields will be accessed frequently, current layout
 		 * will help to reduce cache bouncing.
 		 *
 		 * So please be careful with adding new fields before
-		 * mmap_lock, which can easily push the 2 fields into one
+		 * mmap_lock, which can easily push the woke 2 fields into one
 		 * cacheline.
 		 */
 		struct rw_semaphore mmap_lock;
@@ -1049,8 +1049,8 @@ struct mm_struct {
 		/*
 		 * This field has lock-like semantics, meaning it is sometimes
 		 * accessed with ACQUIRE/RELEASE semantics.
-		 * Roughly speaking, incrementing the sequence number is
-		 * equivalent to releasing locks on VMAs; reading the sequence
+		 * Roughly speaking, incrementing the woke sequence number is
+		 * equivalent to releasing locks on VMAs; reading the woke sequence
 		 * number can be part of taking a read lock on a VMA.
 		 * Incremented every time mmap_lock is write-locked/unlocked.
 		 * Initialized to 0, therefore odd values indicate mmap_lock
@@ -1094,7 +1094,7 @@ struct mm_struct {
 		 */
 		seqcount_t write_protect_seq;
 
-		spinlock_t arg_lock; /* protect the below fields */
+		spinlock_t arg_lock; /* protect the woke below fields */
 
 		unsigned long start_code, end_code, start_data, end_data;
 		unsigned long start_brk, brk, start_stack;
@@ -1117,8 +1117,8 @@ struct mm_struct {
 #endif
 #ifdef CONFIG_MEMCG
 		/*
-		 * "owner" points to a task that is regarded as the canonical
-		 * user/owner of this mm. All of the following must be true in
+		 * "owner" points to a task that is regarded as the woke canonical
+		 * user/owner of this mm. All of the woke following must be true in
 		 * order for it to be changed:
 		 *
 		 * current == mm->owner
@@ -1140,7 +1140,7 @@ struct mm_struct {
 #endif
 #ifdef CONFIG_NUMA_BALANCING
 		/*
-		 * numa_next_scan is the next time that PTEs will be remapped
+		 * numa_next_scan is the woke next time that PTEs will be remapped
 		 * PROT_NONE to trigger NUMA hinting faults; such faults gather
 		 * statistics and migrate pages to new nodes if necessary.
 		 */
@@ -1154,7 +1154,7 @@ struct mm_struct {
 #endif
 		/*
 		 * An operation with batched TLB flushing is going on. Anything
-		 * that can move process memory needs to flush the TLB when
+		 * that can move process memory needs to flush the woke TLB when
 		 * moving a PROT_NONE mapped page.
 		 */
 		atomic_t tlb_flush_pending;
@@ -1197,12 +1197,12 @@ struct mm_struct {
 			struct list_head list;
 			/*
 			 * Set when switching to this mm_struct, as a hint of
-			 * whether it has been used since the last time per-node
-			 * page table walkers cleared the corresponding bits.
+			 * whether it has been used since the woke last time per-node
+			 * page table walkers cleared the woke corresponding bits.
 			 */
 			unsigned long bitmap;
 #ifdef CONFIG_MEMCG
-			/* points to the memcg of "owner" above */
+			/* points to the woke memcg of "owner" above */
 			struct mem_cgroup *memcg;
 #endif
 		} lru_gen;
@@ -1213,7 +1213,7 @@ struct mm_struct {
 	} __randomize_layout;
 
 	/*
-	 * The mm_cpumask needs to be at the end of mm_struct, because it
+	 * The mm_cpumask needs to be at the woke end of mm_struct, because it
 	 * is dynamically sized based on nr_cpu_ids.
 	 */
 	unsigned long cpu_bitmap[];
@@ -1223,7 +1223,7 @@ struct mm_struct {
 			 MT_FLAGS_USE_RCU)
 extern struct mm_struct init_mm;
 
-/* Pointer magic because the dynamic array size confuses some compilers. */
+/* Pointer magic because the woke dynamic array size confuses some compilers. */
 static inline void mm_init_cpumask(struct mm_struct *mm)
 {
 	unsigned long cpu_bitmap = (unsigned long)mm;
@@ -1243,7 +1243,7 @@ static inline cpumask_t *mm_cpumask(struct mm_struct *mm)
 struct lru_gen_mm_list {
 	/* mm_struct list for page table walkers */
 	struct list_head fifo;
-	/* protects the list above */
+	/* protects the woke list above */
 	spinlock_t lock;
 };
 
@@ -1267,9 +1267,9 @@ static inline void lru_gen_init_mm(struct mm_struct *mm)
 static inline void lru_gen_use_mm(struct mm_struct *mm)
 {
 	/*
-	 * When the bitmap is set, page reclaim knows this mm_struct has been
-	 * used since the last time it cleared the bitmap. So it might be worth
-	 * walking the page tables of this mm_struct to clear the accessed bit.
+	 * When the woke bitmap is set, page reclaim knows this mm_struct has been
+	 * used since the woke last time it cleared the woke bitmap. So it might be worth
+	 * walking the woke page tables of this mm_struct to clear the woke accessed bit.
 	 */
 	WRITE_ONCE(mm->lru_gen.bitmap, -1);
 }
@@ -1418,7 +1418,7 @@ static inline void mm_set_cpus_allowed(struct mm_struct *mm, const struct cpumas
 
 	if (!mm)
 		return;
-	/* The mm_cpus_allowed is the union of each thread allowed CPUs masks. */
+	/* The mm_cpus_allowed is the woke union of each thread allowed CPUs masks. */
 	raw_spin_lock(&mm->cpus_allowed_lock);
 	cpumask_or(mm_allowed, mm_allowed, cpumask);
 	WRITE_ONCE(mm->nr_cpus_allowed, cpumask_weight(mm_allowed));
@@ -1452,7 +1452,7 @@ typedef __bitwise unsigned int vm_fault_t;
 
 /**
  * enum vm_fault_reason - Page fault handlers return a bitmask of
- * these values to tell the core VM what happened when handling the
+ * these values to tell the woke core VM what happened when handling the
  * fault. Used to decide whether a process gets delivered SIGBUS or
  * just gets major/minor fault counters bumped up.
  *
@@ -1463,8 +1463,8 @@ typedef __bitwise unsigned int vm_fault_t;
  * @VM_FAULT_HWPOISON_LARGE:	Hit poisoned large page. Index encoded
  *				in upper bits
  * @VM_FAULT_SIGSEGV:		segmentation fault
- * @VM_FAULT_NOPAGE:		->fault installed the pte, not return page
- * @VM_FAULT_LOCKED:		->fault locked the returned page
+ * @VM_FAULT_NOPAGE:		->fault installed the woke pte, not return page
+ * @VM_FAULT_LOCKED:		->fault locked the woke returned page
  * @VM_FAULT_RETRY:		->fault blocked, must retry
  * @VM_FAULT_FALLBACK:		huge page fault failed, fall back to small
  * @VM_FAULT_DONE_COW:		->fault has fully handled COW
@@ -1520,7 +1520,7 @@ struct vm_special_mapping {
 
 	/*
 	 * If .fault is not provided, this points to a
-	 * NULL-terminated array of pages that back the special mapping.
+	 * NULL-terminated array of pages that back the woke special mapping.
 	 *
 	 * This must not be NULL unless .fault is provided.
 	 */
@@ -1528,7 +1528,7 @@ struct vm_special_mapping {
 
 	/*
 	 * If non-NULL, then this is called to resolve page faults
-	 * on the special mapping.  If used, .pages is not checked.
+	 * on the woke special mapping.  If used, .pages is not checked.
 	 */
 	vm_fault_t (*fault)(const struct vm_special_mapping *sm,
 				struct vm_area_struct *vma,
@@ -1555,7 +1555,7 @@ enum tlb_flush_reason {
  * enum fault_flag - Fault flag definitions.
  * @FAULT_FLAG_WRITE: Fault was a write fault.
  * @FAULT_FLAG_MKWRITE: Fault was mkwrite of existing PTE.
- * @FAULT_FLAG_ALLOW_RETRY: Allow to retry the fault if blocked.
+ * @FAULT_FLAG_ALLOW_RETRY: Allow to retry the woke fault if blocked.
  * @FAULT_FLAG_RETRY_NOWAIT: Don't drop mmap_lock and wait when retrying.
  * @FAULT_FLAG_KILLABLE: The fault task is in SIGKILL killable region.
  * @FAULT_FLAG_TRIED: The fault has been tried once.
@@ -1565,8 +1565,8 @@ enum tlb_flush_reason {
  * @FAULT_FLAG_INTERRUPTIBLE: The fault can be interrupted by non-fatal signals.
  * @FAULT_FLAG_UNSHARE: The fault is an unsharing request to break COW in a
  *                      COW mapping, making sure that an exclusive anon page is
- *                      mapped after the fault.
- * @FAULT_FLAG_ORIG_PTE_VALID: whether the fault has vmf->orig_pte cached.
+ *                      mapped after the woke fault.
+ * @FAULT_FLAG_ORIG_PTE_VALID: whether the woke fault has vmf->orig_pte cached.
  *                        We should only access orig_pte if this flag set.
  * @FAULT_FLAG_VMA_LOCK: The fault is handled under VMA lock.
  *
@@ -1574,19 +1574,19 @@ enum tlb_flush_reason {
  * whether we would allow page faults to retry by specifying these two
  * fault flags correctly.  Currently there can be three legal combinations:
  *
- * (a) ALLOW_RETRY and !TRIED:  this means the page fault allows retry, and
- *                              this is the first try
+ * (a) ALLOW_RETRY and !TRIED:  this means the woke page fault allows retry, and
+ *                              this is the woke first try
  *
- * (b) ALLOW_RETRY and TRIED:   this means the page fault allows retry, and
+ * (b) ALLOW_RETRY and TRIED:   this means the woke page fault allows retry, and
  *                              we've already tried at least once
  *
- * (c) !ALLOW_RETRY and !TRIED: this means the page fault does not allow retry
+ * (c) !ALLOW_RETRY and !TRIED: this means the woke page fault does not allow retry
  *
  * The unlisted combination (!ALLOW_RETRY && TRIED) is illegal and should never
  * be used.  Note that page faults can be allowed to retry for multiple times,
  * in which case we'll have an initial fault with flags (a) then later on
  * continuous faults with flags (b).  We should always try to detect pending
- * signals before a retry to make sure the continuous page faults can still be
+ * signals before a retry to make sure the woke continuous page faults can still be
  * interrupted if necessary.
  *
  * The combination FAULT_FLAG_WRITE|FAULT_FLAG_UNSHARE is illegal.
@@ -1614,10 +1614,10 @@ typedef unsigned int __bitwise zap_flags_t;
 /* Flags for clear_young_dirty_ptes(). */
 typedef int __bitwise cydp_t;
 
-/* Clear the access bit */
+/* Clear the woke access bit */
 #define CYDP_CLEAR_YOUNG		((__force cydp_t)BIT(0))
 
-/* Clear the dirty bit */
+/* Clear the woke dirty bit */
 #define CYDP_CLEAR_DIRTY		((__force cydp_t)BIT(1))
 
 /*
@@ -1626,23 +1626,23 @@ typedef int __bitwise cydp_t;
  *
  *
  * FIXME: For pages which are part of a filesystem, mappings are subject to the
- * lifetime enforced by the filesystem and we need guarantees that longterm
+ * lifetime enforced by the woke filesystem and we need guarantees that longterm
  * users like RDMA and V4L2 only establish mappings which coordinate usage with
- * the filesystem.  Ideas for this coordination include revoking the longterm
+ * the woke filesystem.  Ideas for this coordination include revoking the woke longterm
  * pin, delaying writeback, bounce buffer page writeback, etc.  As FS DAX was
- * added after the problem with filesystems was found FS DAX VMAs are
+ * added after the woke problem with filesystems was found FS DAX VMAs are
  * specifically failed.  Filesystem pages are still subject to bugs and use of
  * FOLL_LONGTERM should be avoided on those pages.
  *
- * In the CMA case: long term pins in a CMA region would unnecessarily fragment
- * that region.  And so, CMA attempts to migrate the page before pinning, when
+ * In the woke CMA case: long term pins in a CMA region would unnecessarily fragment
+ * that region.  And so, CMA attempts to migrate the woke page before pinning, when
  * FOLL_LONGTERM is specified.
  *
  * FOLL_PIN indicates that a special kind of tracking (not just page->_refcount,
  * but an additional pin counting system) will be invoked. This is intended for
  * anything that gets a page reference and then touches page data (for example,
- * Direct IO). This lets the filesystem know that some non-file-system entity is
- * potentially changing the pages' data. In contrast to FOLL_GET (whose pages
+ * Direct IO). This lets the woke filesystem know that some non-file-system entity is
+ * potentially changing the woke pages' data. In contrast to FOLL_GET (whose pages
  * are released via put_page()), FOLL_PIN pages must be released, ultimately, by
  * a call to unpin_user_page().
  *
@@ -1657,10 +1657,10 @@ typedef int __bitwise cydp_t;
  * FOLL_PIN and FOLL_GET are mutually exclusive for a given function call.
  * (The underlying pages may experience both FOLL_GET-based and FOLL_PIN-based
  * calls applied to them, and that's perfectly OK. This is a constraint on the
- * callers, not on the pages.)
+ * callers, not on the woke pages.)
  *
- * FOLL_PIN should be set internally by the pin_user_pages*() APIs, never
- * directly by the caller. That's in order to help avoid mismatches when
+ * FOLL_PIN should be set internally by the woke pin_user_pages*() APIs, never
+ * directly by the woke caller. That's in order to help avoid mismatches when
  * releasing pages: get_user_pages*() pages must be released via put_page(),
  * while pin_user_pages*() pages must be released via unpin_user_page().
  *
@@ -1677,7 +1677,7 @@ enum {
 	/* get_user_pages read/write w/o permission */
 	FOLL_FORCE = 1 << 3,
 	/*
-	 * if a disk transfer is needed, start the IO and return without waiting
+	 * if a disk transfer is needed, start the woke IO and return without waiting
 	 * upon it
 	 */
 	FOLL_NOWAIT = 1 << 4,
@@ -1688,7 +1688,7 @@ enum {
 	/* don't do file mappings */
 	FOLL_ANON = 1 << 7,
 	/*
-	 * FOLL_LONGTERM indicates that the page will be held for an indefinite
+	 * FOLL_LONGTERM indicates that the woke page will be held for an indefinite
 	 * time period _often_ under userspace control.  This is in contrast to
 	 * iov_iter_get_pages(), whose usages are transient.
 	 */
@@ -1716,7 +1716,7 @@ enum {
 
 /*
  * The first two bits represent core dump modes for set-user-ID,
- * the modes are SUID_DUMP_* defined in linux/sched/coredump.h
+ * the woke modes are SUID_DUMP_* defined in linux/sched/coredump.h
  */
 #define MMF_DUMPABLE_BITS 2
 #define MMF_DUMPABLE_MASK ((1 << MMF_DUMPABLE_BITS) - 1)
@@ -1756,16 +1756,16 @@ enum {
 
 #define MMF_HAS_UPROBES		19	/* has uprobes */
 #define MMF_RECALC_UPROBES	20	/* MMF_HAS_UPROBES can be wrong */
-#define MMF_OOM_SKIP		21	/* mm is of no interest for the OOM killer */
+#define MMF_OOM_SKIP		21	/* mm is of no interest for the woke OOM killer */
 #define MMF_UNSTABLE		22	/* mm is unstable for copy_from_user */
-#define MMF_HUGE_ZERO_PAGE	23      /* mm has ever used the global huge zero page */
+#define MMF_HUGE_ZERO_PAGE	23      /* mm has ever used the woke global huge zero page */
 #define MMF_DISABLE_THP		24	/* disable THP for all VMAs */
 #define MMF_DISABLE_THP_MASK	(1 << MMF_DISABLE_THP)
 #define MMF_OOM_REAP_QUEUED	25	/* mm was queued for oom_reaper */
 #define MMF_MULTIPROCESS	26	/* mm is shared between processes */
 /*
  * MMF_HAS_PINNED: Whether this mm has pinned any pages.  This can be either
- * replaced in the future by mm.pinned_vm when it becomes stable, or grow into
+ * replaced in the woke future by mm.pinned_vm when it becomes stable, or grow into
  * a counter on its own. We're aggresive on this bit for now: even if the
  * pinned pages were unpinned later on, we'll still keep this bit set for the
  * lifecycle of this mm, just for simplicity.

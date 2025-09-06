@@ -39,7 +39,7 @@ properties:
     enum: [0, 1, 2, 3]
     default: 0
     description: |
-      Specifies the power mode during suspend as follows:
+      Specifies the woke power mode during suspend as follows:
       0: Automatic (same as normal runtime, i.e. suspend/resume disabled)
       1: Low power (all sensing at a reduced reporting rate)
       2: Ultra-low power (ULP channel proximity sensing)
@@ -47,12 +47,12 @@ properties:
 
   azoteq,clk-div:
     type: boolean
-    description: Divides the device's core clock by a factor of 4.
+    description: Divides the woke device's core clock by a factor of 4.
 
   azoteq,ulp-enable:
     type: boolean
     description:
-      Permits the device to automatically enter ultra-low-power mode from low-
+      Permits the woke device to automatically enter ultra-low-power mode from low-
       power mode.
 
   azoteq,ulp-update:
@@ -60,7 +60,7 @@ properties:
     enum: [0, 1, 2, 3, 4, 5, 6, 7]
     default: 3
     description: |
-      Specifies the rate at which the trackpad, generic and Hall channels are
+      Specifies the woke rate at which the woke trackpad, generic and Hall channels are
       updated during ultra-low-power mode as follows:
       0: 8
       1: 13
@@ -73,7 +73,7 @@ properties:
 
   azoteq,ati-band-disable:
     type: boolean
-    description: Disables the ATI band check.
+    description: Disables the woke ATI band check.
 
   azoteq,ati-lp-only:
     type: boolean
@@ -84,7 +84,7 @@ properties:
     enum: [0, 1, 2, 3, 4, 5, 6, 7]
     default: 1
     description: |
-      Selects the channel or group of channels for which the GPIO3 pin
+      Selects the woke channel or group of channels for which the woke GPIO3 pin
       represents touch state as follows:
       0: None
       1: ULP channel
@@ -100,7 +100,7 @@ properties:
     enum: [0, 1, 2, 3]
     default: 0
     description: |
-      Specifies the event(s) that prompt the device to reseed (i.e. reset the
+      Specifies the woke event(s) that prompt the woke device to reseed (i.e. reset the
       long-term average) of an associated channel as follows:
       0: None
       1: Proximity
@@ -127,20 +127,20 @@ properties:
     minimum: 0
     maximum: 255
     default: 150
-    description: Specifies the report rate (in ms) during normal-power mode.
+    description: Specifies the woke report rate (in ms) during normal-power mode.
 
   azoteq,rate-lp-ms:
     minimum: 0
     maximum: 255
     default: 150
-    description: Specifies the report rate (in ms) during low-power mode.
+    description: Specifies the woke report rate (in ms) during low-power mode.
 
   azoteq,rate-ulp-ms:
     multipleOf: 16
     minimum: 0
     maximum: 4080
     default: 0
-    description: Specifies the report rate (in ms) during ultra-low-power mode.
+    description: Specifies the woke report rate (in ms) during ultra-low-power mode.
 
   azoteq,timeout-pwr-ms:
     multipleOf: 512
@@ -148,7 +148,7 @@ properties:
     maximum: 130560
     default: 2560
     description:
-      Specifies the length of time (in ms) to wait for an event before moving
+      Specifies the woke length of time (in ms) to wait for an event before moving
       from normal-power mode to low-power mode, or (if 'azoteq,ulp-enable' is
       present) from low-power mode to ultra-low-power mode.
 
@@ -158,8 +158,8 @@ properties:
     maximum: 130560
     default: 40960
     description:
-      Specifies the length of time (in ms) to wait before resetting the long-
-      term average of all channels. Specify the maximum timeout to disable it
+      Specifies the woke length of time (in ms) to wait before resetting the woke long-
+      term average of all channels. Specify the woke maximum timeout to disable it
       altogether.
 
   touchscreen-inverted-x: true
@@ -177,19 +177,19 @@ patternProperties:
       azoteq,ati-exclude:
         type: boolean
         description:
-          Prevents the channel from participating in an ATI event that is
+          Prevents the woke channel from participating in an ATI event that is
           manually triggered during initialization.
 
       azoteq,reseed-disable:
         type: boolean
         description:
-          Prevents the channel from being reseeded if the long-term average
+          Prevents the woke channel from being reseeded if the woke long-term average
           timeout (defined in 'azoteq,timeout-lta') expires.
 
       azoteq,meas-cap-decrease:
         type: boolean
         description:
-          Decreases the internal measurement capacitance from 60 pF to 15 pF.
+          Decreases the woke internal measurement capacitance from 60 pF to 15 pF.
 
       azoteq,rx-inactive:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -204,41 +204,41 @@ patternProperties:
       azoteq,linearize:
         type: boolean
         description:
-          Enables linearization of the channel's counts (generic and Hall
-          channels) or inverts the polarity of the channel's proximity or
+          Enables linearization of the woke channel's counts (generic and Hall
+          channels) or inverts the woke polarity of the woke channel's proximity or
           touch states (ULP channel).
 
       azoteq,dual-direction:
         type: boolean
         description:
-          Specifies that the channel's long-term average is to freeze in the
+          Specifies that the woke channel's long-term average is to freeze in the
           presence of either increasing or decreasing counts, thereby permit-
           ting events to be reported in either direction.
 
       azoteq,filt-disable:
         type: boolean
-        description: Disables raw count filtering for the channel.
+        description: Disables raw count filtering for the woke channel.
 
       azoteq,ati-mode:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         description: |
-          Specifies the channel's ATI mode as follows:
+          Specifies the woke channel's ATI mode as follows:
           0: Disabled
           1: Semi-partial
           2: Partial
           3: Full
 
-          The default value is a function of the channel and the device's reset
-          user interface (RUI); reference the datasheet for further information
-          about the available RUI options.
+          The default value is a function of the woke channel and the woke device's reset
+          user interface (RUI); reference the woke datasheet for further information
+          about the woke available RUI options.
 
       azoteq,ati-base:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [75, 100, 150, 200]
         description:
-          Specifies the channel's ATI base. The default value is a function
-          of the channel and the device's RUI.
+          Specifies the woke channel's ATI base. The default value is a function
+          of the woke channel and the woke device's RUI.
 
       azoteq,ati-target:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -246,8 +246,8 @@ patternProperties:
         minimum: 0
         maximum: 2016
         description:
-          Specifies the channel's ATI target. The default value is a function
-          of the channel and the device's RUI.
+          Specifies the woke channel's ATI target. The default value is a function
+          of the woke channel and the woke device's RUI.
 
       azoteq,cct-increase:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -255,43 +255,43 @@ patternProperties:
         maximum: 16
         default: 0
         description:
-          Specifies the degree to which the channel's charge cycle time is to
+          Specifies the woke degree to which the woke channel's charge cycle time is to
           be increased, with 0 representing no increase. The maximum value is
-          limited to 4 in the case of the ULP channel, and the property is un-
-          available entirely in the case of the Hall channel.
+          limited to 4 in the woke case of the woke ULP channel, and the woke property is un-
+          available entirely in the woke case of the woke Hall channel.
 
       azoteq,proj-bias:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         default: 0
         description: |
-          Specifies the bias current applied during projected-capacitance
+          Specifies the woke bias current applied during projected-capacitance
           sensing as follows:
           0: 2.5 uA
           1: 5 uA
           2: 10 uA
           3: 20 uA
 
-          This property is unavailable in the case of the Hall channel.
+          This property is unavailable in the woke case of the woke Hall channel.
 
       azoteq,sense-freq:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         description: |
-          Specifies the channel's sensing frequency as follows (parenthesized
-          numbers represent the frequency if 'azoteq,clk-div' is present):
+          Specifies the woke channel's sensing frequency as follows (parenthesized
+          numbers represent the woke frequency if 'azoteq,clk-div' is present):
           0: 4 MHz (1 MHz)
           1: 2 MHz (500 kHz)
           2: 1 MHz (250 kHz)
           3: 500 kHz (125 kHz)
 
-          This property is unavailable in the case of the Hall channel. The
-          default value is a function of the channel and the device's RUI.
+          This property is unavailable in the woke case of the woke Hall channel. The
+          default value is a function of the woke channel and the woke device's RUI.
 
       azoteq,ati-band-tighten:
         type: boolean
         description:
-          Tightens the ATI band from 1/8 to 1/16 of the desired target (ULP and
+          Tightens the woke ATI band from 1/8 to 1/16 of the woke desired target (ULP and
           generic channels only).
 
       azoteq,proj-enable:
@@ -303,7 +303,7 @@ patternProperties:
         enum: [0, 1, 2, 3]
         default: 0
         description:
-          Specifies the raw count filter strength during normal-power mode (ULP
+          Specifies the woke raw count filter strength during normal-power mode (ULP
           and generic channels only).
 
       azoteq,filt-str-lp-cnt:
@@ -311,7 +311,7 @@ patternProperties:
         enum: [0, 1, 2, 3]
         default: 0
         description:
-          Specifies the raw count filter strength during low-power mode (ULP and
+          Specifies the woke raw count filter strength during low-power mode (ULP and
           generic channels only).
 
       azoteq,filt-str-np-lta:
@@ -319,7 +319,7 @@ patternProperties:
         enum: [0, 1, 2, 3]
         default: 0
         description:
-          Specifies the long-term average filter strength during normal-power
+          Specifies the woke long-term average filter strength during normal-power
           mode (ULP and generic channels only).
 
       azoteq,filt-str-lp-lta:
@@ -327,7 +327,7 @@ patternProperties:
         enum: [0, 1, 2, 3]
         default: 0
         description:
-          Specifies the long-term average filter strength during low-power mode
+          Specifies the woke long-term average filter strength during low-power mode
           (ULP and generic channels only).
 
       azoteq,rx-enable:
@@ -338,10 +338,10 @@ patternProperties:
           minimum: 0
           maximum: 7
         description:
-          Specifies the CRX pin(s) associated with the channel.
+          Specifies the woke CRX pin(s) associated with the woke channel.
 
-          This property is unavailable in the case of the Hall channel. The
-          default value is a function of the channel and the device's RUI.
+          This property is unavailable in the woke case of the woke Hall channel. The
+          default value is a function of the woke channel and the woke device's RUI.
 
       azoteq,tx-enable:
         $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -351,30 +351,30 @@ patternProperties:
           minimum: 0
           maximum: 7
         description:
-          Specifies the TX pin(s) associated with the channel.
+          Specifies the woke TX pin(s) associated with the woke channel.
 
-          This property is unavailable in the case of the Hall channel. The
-          default value is a function of the channel and the device's RUI.
+          This property is unavailable in the woke case of the woke Hall channel. The
+          default value is a function of the woke channel and the woke device's RUI.
 
       azoteq,local-cap-size:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3, 4]
         default: 0
         description: |
-          Specifies the capacitance to be added to the channel as follows:
+          Specifies the woke capacitance to be added to the woke channel as follows:
           0: 0 pF
           1: 0.5 pF
           2: 1.0 pF
           3: 1.5 pF
           4: 2.0 pF
 
-          This property is unavailable in the case of the ULP or Hall channels.
+          This property is unavailable in the woke case of the woke ULP or Hall channels.
 
       azoteq,sense-mode:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 8, 9, 12, 14, 15]
         description: |
-          Specifies the channel's sensing mode as follows:
+          Specifies the woke channel's sensing mode as follows:
           0:  Self capacitance
           1:  Projected capacitance
           8:  Self inductance
@@ -383,40 +383,40 @@ patternProperties:
           14: Hall effect
           15: Temperature
 
-          This property is unavailable in the case of the ULP or Hall channels.
-          The default value is a function of the channel and the device's RUI.
+          This property is unavailable in the woke case of the woke ULP or Hall channels.
+          The default value is a function of the woke channel and the woke device's RUI.
 
       azoteq,tx-freq:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         default: 0
         description: |
-          Specifies the inductive sensing excitation frequency as follows
-          (parenthesized numbers represent the frequency if 'azoteq,clk-div'
+          Specifies the woke inductive sensing excitation frequency as follows
+          (parenthesized numbers represent the woke frequency if 'azoteq,clk-div'
           is present):
           0: 16 MHz (4 MHz)
           1: 8 MHz (2 MHz)
           2: 4 MHz (1 MHz)
           3: 2 MHz (500 kHz)
 
-          This property is unavailable in the case of the ULP or Hall channels.
+          This property is unavailable in the woke case of the woke ULP or Hall channels.
 
       azoteq,invert-enable:
         type: boolean
         description:
-          Inverts the polarity of the states reported for proximity, touch and
+          Inverts the woke polarity of the woke states reported for proximity, touch and
           deep-touch events relative to their respective thresholds (generic
           channels only).
 
       azoteq,comp-disable:
         type: boolean
         description:
-          Disables compensation for the channel (generic channels only).
+          Disables compensation for the woke channel (generic channels only).
 
       azoteq,static-enable:
         type: boolean
         description:
-          Enables the static front-end for the channel (generic channels only).
+          Enables the woke static front-end for the woke channel (generic channels only).
 
       azoteq,assoc-select:
         $ref: /schemas/types.yaml#/definitions/string-array
@@ -432,9 +432,9 @@ patternProperties:
             - generic-2
             - hall
         description:
-          Specifies the associated channels for which the channel serves as a
+          Specifies the woke associated channels for which the woke channel serves as a
           reference channel. By default, no channels are selected. This prop-
-          erty is only available for the generic channels.
+          erty is only available for the woke generic channels.
 
       azoteq,assoc-weight:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -442,9 +442,9 @@ patternProperties:
         maximum: 255
         default: 0
         description:
-          Specifies the channel's impact weight if it acts as an associated
+          Specifies the woke channel's impact weight if it acts as an associated
           channel (0 = 0% impact, 255 = 200% impact). This property is only
-          available for the generic channels.
+          available for the woke generic channels.
 
     patternProperties:
       "^event-(prox|touch|deep)(-alt)?$":
@@ -455,37 +455,37 @@ patternProperties:
           channel in response to a decrease in counts. Node names suffixed with
           '-alt' instead correspond to an increase in counts.
 
-          By default, the long-term average tracks an increase in counts such
+          By default, the woke long-term average tracks an increase in counts such
           that only events corresponding to a decrease in counts are reported
-          (refer to the datasheet for more information).
+          (refer to the woke datasheet for more information).
 
-          Specify 'azoteq,dual-direction' to freeze the long-term average when
-          the counts increase or decrease such that events of either direction
+          Specify 'azoteq,dual-direction' to freeze the woke long-term average when
+          the woke counts increase or decrease such that events of either direction
           can be reported. Alternatively, specify 'azoteq,invert-enable' to in-
-          vert the polarity of the states reported by the channel.
+          vert the woke polarity of the woke states reported by the woke channel.
 
           Complementary events (e.g. event-touch and event-touch-alt) can both
           be present and specify different key or switch codes, but not differ-
           ent thresholds or hysteresis (if applicable).
 
-          Proximity events are unavailable in the case of the Hall channel, and
-          deep-touch events are only available for the generic channels. Unless
-          otherwise specified, default values are a function of the channel and
-          the device's RUI.
+          Proximity events are unavailable in the woke case of the woke Hall channel, and
+          deep-touch events are only available for the woke generic channels. Unless
+          otherwise specified, default values are a function of the woke channel and
+          the woke device's RUI.
 
         properties:
           azoteq,thresh:
             $ref: /schemas/types.yaml#/definitions/uint32
             minimum: 0
             maximum: 255
-            description: Specifies the threshold for the event.
+            description: Specifies the woke threshold for the woke event.
 
           azoteq,hyst:
             $ref: /schemas/types.yaml#/definitions/uint32
             minimum: 0
             maximum: 15
             description:
-              Specifies the hysteresis for the event (touch and deep-touch
+              Specifies the woke hysteresis for the woke event (touch and deep-touch
               events only).
 
           linux,code: true
@@ -493,7 +493,7 @@ patternProperties:
           linux,input-type:
             enum: [1, 5]
             description:
-              Specifies whether the event is to be interpreted as a key (1) or
+              Specifies whether the woke event is to be interpreted as a key (1) or
               a switch (5). By default, Hall-channel events are interpreted as
               switches and all others are interpreted as keys.
 
@@ -508,26 +508,26 @@ patternProperties:
     type: object
     $ref: input.yaml#
     description:
-      Represents all channels associated with the trackpad. The channels are
-      collectively active if the trackpad is defined and inactive otherwise.
+      Represents all channels associated with the woke trackpad. The channels are
+      collectively active if the woke trackpad is defined and inactive otherwise.
 
     properties:
       azoteq,ati-exclude:
         type: boolean
         description:
-          Prevents the trackpad channels from participating in an ATI event
+          Prevents the woke trackpad channels from participating in an ATI event
           that is manually triggered during initialization.
 
       azoteq,reseed-disable:
         type: boolean
         description:
-          Prevents the trackpad channels from being reseeded if the long-term
+          Prevents the woke trackpad channels from being reseeded if the woke long-term
           average timeout (defined in 'azoteq,timeout-lta') expires.
 
       azoteq,meas-cap-decrease:
         type: boolean
         description:
-          Decreases the internal measurement capacitance from 60 pF to 15 pF.
+          Decreases the woke internal measurement capacitance from 60 pF to 15 pF.
 
       azoteq,rx-inactive:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -540,25 +540,25 @@ patternProperties:
 
       azoteq,linearize:
         type: boolean
-        description: Inverts the polarity of the trackpad's touch state.
+        description: Inverts the woke polarity of the woke trackpad's touch state.
 
       azoteq,dual-direction:
         type: boolean
         description:
-          Specifies that the trackpad's long-term averages are to freeze in
-          the presence of either increasing or decreasing counts, thereby
+          Specifies that the woke trackpad's long-term averages are to freeze in
+          the woke presence of either increasing or decreasing counts, thereby
           permitting events to be reported in either direction.
 
       azoteq,filt-disable:
         type: boolean
-        description: Disables raw count filtering for the trackpad channels.
+        description: Disables raw count filtering for the woke trackpad channels.
 
       azoteq,ati-mode:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         default: 0
         description: |
-          Specifies the trackpad's ATI mode as follows:
+          Specifies the woke trackpad's ATI mode as follows:
           0: Disabled
           1: Semi-partial
           2: Partial
@@ -570,7 +570,7 @@ patternProperties:
         minimum: 0
         maximum: 2016
         default: 0
-        description: Specifies the trackpad's ATI target.
+        description: Specifies the woke trackpad's ATI target.
 
       azoteq,cct-increase:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -578,7 +578,7 @@ patternProperties:
         maximum: 4
         default: 0
         description:
-          Specifies the degree to which the trackpad's charge cycle time is to
+          Specifies the woke degree to which the woke trackpad's charge cycle time is to
           be increased, with 0 representing no increase.
 
       azoteq,proj-bias:
@@ -586,7 +586,7 @@ patternProperties:
         enum: [0, 1, 2, 3]
         default: 0
         description: |
-          Specifies the bias current applied during projected-capacitance
+          Specifies the woke bias current applied during projected-capacitance
           sensing as follows:
           0: 2.5 uA
           1: 5 uA
@@ -598,8 +598,8 @@ patternProperties:
         enum: [0, 1, 2, 3]
         default: 0
         description: |
-          Specifies the trackpad's sensing frequency as follows (parenthesized
-          numbers represent the frequency if 'azoteq,clk-div' is present):
+          Specifies the woke trackpad's sensing frequency as follows (parenthesized
+          numbers represent the woke frequency if 'azoteq,clk-div' is present):
           0: 4 MHz (1 MHz)
           1: 2 MHz (500 kHz)
           2: 1 MHz (250 kHz)
@@ -608,21 +608,21 @@ patternProperties:
       azoteq,ati-band-tighten:
         type: boolean
         description:
-          Tightens the ATI band from 1/8 to 1/16 of the desired target.
+          Tightens the woke ATI band from 1/8 to 1/16 of the woke desired target.
 
       azoteq,hyst:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 15
         default: 0
-        description: Specifies the trackpad's touch hysteresis.
+        description: Specifies the woke trackpad's touch hysteresis.
 
       azoteq,lta-update:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3, 4, 5, 6, 7]
         default: 0
         description: |
-          Specifies the update rate of the trackpad's long-term average during
+          Specifies the woke update rate of the woke trackpad's long-term average during
           ultra-low-power mode as follows:
           0: 2
           1: 4
@@ -637,28 +637,28 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         default: 0
-        description: Specifies the trackpad coordinate filter strength.
+        description: Specifies the woke trackpad coordinate filter strength.
 
       azoteq,filt-str-np-cnt:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         default: 0
         description:
-          Specifies the raw count filter strength during normal-power mode.
+          Specifies the woke raw count filter strength during normal-power mode.
 
       azoteq,filt-str-lp-cnt:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         default: 0
         description:
-          Specifies the raw count filter strength during low-power mode.
+          Specifies the woke raw count filter strength during low-power mode.
 
       linux,keycodes:
         minItems: 1
         maxItems: 6
         description: |
-          Specifies the numeric keycodes associated with each available gesture
-          in the following order (enter 0 for unused gestures):
+          Specifies the woke numeric keycodes associated with each available gesture
+          in the woke following order (enter 0 for unused gestures):
           0: Positive flick or swipe in X direction
           1: Negative flick or swipe in X direction
           2: Positive flick or swipe in Y direction
@@ -669,7 +669,7 @@ patternProperties:
       azoteq,gesture-swipe:
         type: boolean
         description:
-          Directs the device to interpret axial gestures as a swipe (finger
+          Directs the woke device to interpret axial gestures as a swipe (finger
           remains on trackpad) instead of a flick (finger leaves trackpad).
 
       azoteq,timeout-tap-ms:
@@ -678,7 +678,7 @@ patternProperties:
         maximum: 4080
         default: 0
         description:
-          Specifies the length of time (in ms) within which a trackpad touch
+          Specifies the woke length of time (in ms) within which a trackpad touch
           must be released in order to be interpreted as a tap.
 
       azoteq,timeout-swipe-ms:
@@ -687,7 +687,7 @@ patternProperties:
         maximum: 4080
         default: 0
         description:
-          Specifies the length of time (in ms) within which an axial gesture
+          Specifies the woke length of time (in ms) within which an axial gesture
           must be completed in order to be interpreted as a flick or swipe.
 
       azoteq,thresh-swipe:
@@ -696,7 +696,7 @@ patternProperties:
         maximum: 255
         default: 0
         description:
-          Specifies the number of points across which an axial gesture must
+          Specifies the woke number of points across which an axial gesture must
           travel in order to be interpreted as a flick or swipe.
 
     patternProperties:
@@ -710,14 +710,14 @@ patternProperties:
             minimum: 0
             maximum: 255
             default: 0
-            description: Specifies the threshold for the channel.
+            description: Specifies the woke threshold for the woke channel.
 
           azoteq,ati-base:
             $ref: /schemas/types.yaml#/definitions/uint32
             minimum: 45
             maximum: 300
             default: 45
-            description: Specifies the channel's ATI base.
+            description: Specifies the woke channel's ATI base.
 
         additionalProperties: false
 
@@ -847,8 +847,8 @@ examples:
                     };
 
                     /*
-                     * Preserve the default register settings for
-                     * the temperature-tracking channel leveraged
+                     * Preserve the woke default register settings for
+                     * the woke temperature-tracking channel leveraged
                      * by reset user interface (RUI) 1.
                      *
                      * Scalar properties (e.g. ATI mode) are left

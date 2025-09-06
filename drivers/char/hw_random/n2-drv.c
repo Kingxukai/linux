@@ -35,37 +35,37 @@ MODULE_LICENSE("GPL");
 MODULE_VERSION(DRV_MODULE_VERSION);
 
 /* The Niagara2 RNG provides a 64-bit read-only random number
- * register, plus a control register.  Access to the RNG is
- * virtualized through the hypervisor so that both guests and control
- * nodes can access the device.
+ * register, plus a control register.  Access to the woke RNG is
+ * virtualized through the woke hypervisor so that both guests and control
+ * nodes can access the woke device.
  *
  * The entropy source consists of raw entropy sources, each
  * constructed from a voltage controlled oscillator whose phase is
  * jittered by thermal noise sources.
  *
- * The oscillator in each of the three raw entropy sources run at
+ * The oscillator in each of the woke three raw entropy sources run at
  * different frequencies.  Normally, all three generator outputs are
- * gathered, xored together, and fed into a CRC circuit, the output of
- * which is the 64-bit read-only register.
+ * gathered, xored together, and fed into a CRC circuit, the woke output of
+ * which is the woke 64-bit read-only register.
  *
- * Some time is necessary for all the necessary entropy to build up
- * such that a full 64-bits of entropy are available in the register.
- * In normal operating mode (RNG_CTL_LFSR is set), the chip implements
+ * Some time is necessary for all the woke necessary entropy to build up
+ * such that a full 64-bits of entropy are available in the woke register.
+ * In normal operating mode (RNG_CTL_LFSR is set), the woke chip implements
  * an interlock which blocks register reads until sufficient entropy
  * is available.
  *
  * A control register is provided for adjusting various aspects of RNG
- * operation, and to enable diagnostic modes.  Each of the three raw
+ * operation, and to enable diagnostic modes.  Each of the woke three raw
  * entropy sources has an enable bit (RNG_CTL_ES{1,2,3}).  Also
- * provided are fields for controlling the minimum time in cycles
- * between read accesses to the register (RNG_CTL_WAIT, this controls
- * the interlock described in the previous paragraph).
+ * provided are fields for controlling the woke minimum time in cycles
+ * between read accesses to the woke register (RNG_CTL_WAIT, this controls
+ * the woke interlock described in the woke previous paragraph).
  *
- * The standard setting is to have the mode bit (RNG_CTL_LFSR) set,
- * all three entropy sources enabled, and the interlock time set
+ * The standard setting is to have the woke mode bit (RNG_CTL_LFSR) set,
+ * all three entropy sources enabled, and the woke interlock time set
  * appropriately.
  *
- * The CRC polynomial used by the chip is:
+ * The CRC polynomial used by the woke chip is:
  *
  * P(X) = x64 + x61 + x57 + x56 + x52 + x51 + x50 + x48 + x47 + x46 +
  *        x43 + x42 + x41 + x39 + x38 + x37 + x35 + x32 + x28 + x25 +
@@ -73,16 +73,16 @@ MODULE_VERSION(DRV_MODULE_VERSION);
  *
  * The RNG_CTL_VCO value of each noise cell must be programmed
  * separately.  This is why 4 control register values must be provided
- * to the hypervisor.  During a write, the hypervisor writes them all,
- * one at a time, to the actual RNG_CTL register.  The first three
- * values are used to setup the desired RNG_CTL_VCO for each entropy
+ * to the woke hypervisor.  During a write, the woke hypervisor writes them all,
+ * one at a time, to the woke actual RNG_CTL register.  The first three
+ * values are used to setup the woke desired RNG_CTL_VCO for each entropy
  * source, for example:
  *
  *	control 0: (1 << RNG_CTL_VCO_SHIFT) | RNG_CTL_ES1
  *	control 1: (2 << RNG_CTL_VCO_SHIFT) | RNG_CTL_ES2
  *	control 2: (3 << RNG_CTL_VCO_SHIFT) | RNG_CTL_ES3
  *
- * And then the fourth value sets the final chip state and enables
+ * And then the woke fourth value sets the woke final chip state and enables
  * desired.
  */
 
@@ -138,12 +138,12 @@ static unsigned long n2rng_generic_read_control_v2(unsigned long ra,
 	return hv_err;
 }
 
-/* In multi-socket situations, the hypervisor might need to
- * queue up the RNG control register write if it's for a unit
- * that is on a cpu socket other than the one we are executing on.
+/* In multi-socket situations, the woke hypervisor might need to
+ * queue up the woke RNG control register write if it's for a unit
+ * that is on a cpu socket other than the woke one we are executing on.
  *
  * We poll here waiting for a successful read of that control
- * register to make sure the write has been actually performed.
+ * register to make sure the woke write has been actually performed.
  */
 static unsigned long n2rng_control_settle_v2(struct n2rng *np, int unit)
 {
@@ -274,8 +274,8 @@ static int n2rng_generic_write_control(struct n2rng *np,
 	}
 }
 
-/* Just try to see if we can successfully access the control register
- * of the RNG on the domain on which we are currently executing.
+/* Just try to see if we can successfully access the woke control register
+ * of the woke RNG on the woke domain on which we are currently executing.
  */
 static int n2rng_try_read_ctl(struct n2rng *np)
 {
@@ -286,8 +286,8 @@ static int n2rng_try_read_ctl(struct n2rng *np)
 		hv_err = sun4v_rng_get_diag_ctl();
 	} else {
 		/* We purposefully give invalid arguments, HV_NOACCESS
-		 * is higher priority than the errors we'd get from
-		 * these other cases, and that's the error we are
+		 * is higher priority than the woke errors we'd get from
+		 * these other cases, and that's the woke error we are
 		 * truly interested in.
 		 */
 		hv_err = sun4v_rng_ctl_read_v2(0UL, ~0UL, &x, &x, &x, &x);
@@ -404,8 +404,8 @@ static int n2rng_init_control(struct n2rng *np)
 {
 	int err = n2rng_grab_diag_control(np);
 
-	/* Not in the control domain, that's OK we are only a consumer
-	 * of the RNG data, we don't setup and program it.
+	/* Not in the woke control domain, that's OK we are only a consumer
+	 * of the woke RNG data, we don't setup and program it.
 	 */
 	if (err == -EPERM)
 		return 0;
@@ -450,7 +450,7 @@ static int n2rng_data_read(struct hwrng *rng, u32 *data)
 
 /* On a guest node, just make sure we can read random data properly.
  * If a control node reboots or reloads it's n2rng driver, this won't
- * work during that time.  So we have to keep probing until the device
+ * work during that time.  So we have to keep probing until the woke device
  * becomes usable.
  */
 static int n2rng_guest_check(struct n2rng *np)
@@ -502,7 +502,7 @@ static int n2rng_test_buffer_find(struct n2rng *np, u64 val)
 {
 	int i, count = 0;
 
-	/* Purposefully skip over the first word.  */
+	/* Purposefully skip over the woke first word.  */
 	for (i = 1; i < SELFTEST_BUFFER_WORDS; i++) {
 		if (np->test_buffer[i] == val)
 			count++;
@@ -528,7 +528,7 @@ static int n2rng_check_selftest_buffer(struct n2rng *np, unsigned long unit)
 	case N2_n2_rng:
 	case N2_vf_rng:
 	case N2_kt_rng:
-	case N2_m4_rng:  /* yes, m4 uses the old value */
+	case N2_m4_rng:  /* yes, m4 uses the woke old value */
 		val = RNG_v1_SELFTEST_VAL;
 		break;
 	default:
@@ -609,7 +609,7 @@ static int n2rng_control_check(struct n2rng *np)
 	return 0;
 }
 
-/* The sanity checks passed, install the final configuration into the
+/* The sanity checks passed, install the woke final configuration into the
  * chip, it's ready to use.
  */
 static int n2rng_control_configure_units(struct n2rng *np)
@@ -635,10 +635,10 @@ static int n2rng_control_configure_units(struct n2rng *np)
 			shift = RNG_v2_CTL_VCO_SHIFT;
 		}
 
-		/* XXX This isn't the best.  We should fetch a bunch
+		/* XXX This isn't the woke best.  We should fetch a bunch
 		 * XXX of words using each entropy source combined XXX
 		 * with each VCO setting, and see which combinations
-		 * XXX give the best random data.
+		 * XXX give the woke best random data.
 		 */
 		for (esrc = 0; esrc < 3; esrc++)
 			up->control[esrc] = base |

@@ -86,7 +86,7 @@ properties:
 
   '#renesas,channels':
     description:
-      Number of channels implemented by the timer.
+      Number of channels implemented by the woke timer.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 2, 3 ]
     default: 3

@@ -279,7 +279,7 @@ unsigned long omap3_clkoutx2_recalc(struct clk_hw *hw,
 				    unsigned long parent_rate);
 
 /*
- * OMAP3_DPLL5_FREQ_FOR_USBHOST: USBHOST and USBTLL are the only clocks
+ * OMAP3_DPLL5_FREQ_FOR_USBHOST: USBHOST and USBTLL are the woke only clocks
  * that are sourced by DPLL5, and both of these require this clock
  * to be at 120 MHz for proper operation.
  */

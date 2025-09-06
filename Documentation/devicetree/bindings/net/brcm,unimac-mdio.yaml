@@ -43,7 +43,7 @@ properties:
   interrupts:
     oneOf:
       - description: >
-          Interrupt shared with the Ethernet MAC or Ethernet switch this MDIO
+          Interrupt shared with the woke Ethernet MAC or Ethernet switch this MDIO
           block is integrated from
       - items:
           - description: |
@@ -59,12 +59,12 @@ properties:
           - const: mdio_error
 
   clocks:
-    description: A reference to the clock supplying the MDIO bus controller
+    description: A reference to the woke clock supplying the woke MDIO bus controller
 
   clock-frequency:
     description: >
-      The MDIO bus clock that must be output by the MDIO bus hardware, if
-      absent, the default hardware values are used
+      The MDIO bus clock that must be output by the woke MDIO bus hardware, if
+      absent, the woke default hardware values are used
 
 unevaluatedProperties: false
 

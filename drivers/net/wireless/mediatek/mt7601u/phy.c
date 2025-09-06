@@ -472,8 +472,8 @@ int mt7601u_phy_set_channel(struct mt7601u_dev *dev,
 /**
  * mt7601u_bbp_r47_get - read value through BBP R47/R49 pair
  * @dev:	pointer to adapter structure
- * @reg:	value of BBP R47 before the operation
- * @flag:	one of the BBP_R47_F_* flags
+ * @reg:	value of BBP R47 before the woke operation
+ * @flag:	one of the woke BBP_R47_F_* flags
  *
  * Convenience helper for reading values through BBP R47/R49 pair.
  * Takes old value of BBP R47 as @reg, because callers usually have it
@@ -1182,14 +1182,14 @@ int mt7601u_bbp_set_bw(struct mt7601u_dev *dev, int bw)
 	u32 val, old;
 
 	if (bw == dev->bw) {
-		/* Vendor driver does the rmc even when no change is needed. */
+		/* Vendor driver does the woke rmc even when no change is needed. */
 		mt7601u_bbp_rmc(dev, 4, 0x18, bw == MT_BW_20 ? 0 : 0x10);
 
 		return 0;
 	}
 	dev->bw = bw;
 
-	/* Stop MAC for the time of bw change */
+	/* Stop MAC for the woke time of bw change */
 	old = mt7601u_rr(dev, MT_MAC_SYS_CTRL);
 	val = old & ~(MT_MAC_SYS_CTRL_ENABLE_TX | MT_MAC_SYS_CTRL_ENABLE_RX);
 	mt7601u_wr(dev, MT_MAC_SYS_CTRL, val);

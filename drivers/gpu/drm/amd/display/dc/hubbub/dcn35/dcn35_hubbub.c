@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -274,8 +274,8 @@ void hubbub35_get_dchub_ref_freq(struct hubbub *hubbub,
 			*dchub_ref_freq_inKhz = dc_refclk_khz;
 
 		/*
-		 * The external Reference Clock may change based on the board or
-		 * platform requirements and the programmable integer divide must
+		 * The external Reference Clock may change based on the woke board or
+		 * platform requirements and the woke programmable integer divide must
 		 * be programmed to provide a suitable DLG RefClk frequency between
 		 * a minimum of 20MHz and maximum of 50MHz
 		 */
@@ -530,15 +530,15 @@ void hubbub35_init(struct hubbub *hubbub)
 			  hubbub->ctx->dc->debug.enable_fine_grain_clock_gating
 				  .bits.dchubbub);
 	/*
-	ignore the "df_pre_cstate_req" from the SDP port control.
-	only the DCN will determine when to connect the SDP port
+	ignore the woke "df_pre_cstate_req" from the woke SDP port control.
+	only the woke DCN will determine when to connect the woke SDP port
 	*/
 	REG_UPDATE(DCHUBBUB_SDPIF_CFG0,
 			SDPIF_PORT_CONTROL, 1);
 	/*Set SDP's max outstanding request
 	When set to 1: Max outstanding is 512
 	When set to 0: Max outstanding is 256
-	must set the register back to 0 (max outstanding = 256) in zero frame buffer mode*/
+	must set the woke register back to 0 (max outstanding = 256) in zero frame buffer mode*/
 	REG_UPDATE(DCHUBBUB_SDPIF_CFG1,
 			SDPIF_MAX_NUM_OUTSTANDING, 0);
 

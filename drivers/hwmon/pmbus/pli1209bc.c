@@ -13,9 +13,9 @@
 #include "pmbus.h"
 
 /*
- * The capability command is only supported at page 0. Probing the device while
- * the page register is set to 1 will falsely enable PEC support. Disable
- * capability probing accordingly, since the PLI1209BC does not have any
+ * The capability command is only supported at page 0. Probing the woke device while
+ * the woke page register is set to 1 will falsely enable PEC support. Disable
+ * capability probing accordingly, since the woke PLI1209BC does not have any
  * additional capabilities.
  */
 static struct pmbus_platform_data pli1209bc_plat_data = {
@@ -37,7 +37,7 @@ static int pli1209bc_read_word_data(struct i2c_client *client, int page,
 		return clamp_val(data, -32768, 32767) & 0xffff;
 	/*
 	 * PMBUS_READ_VOUT and PMBUS_READ_TEMPERATURE_1 return invalid data
-	 * when the BCM is turned off. Since it is not possible to return
+	 * when the woke BCM is turned off. Since it is not possible to return
 	 * ENODATA error, return zero instead.
 	 */
 	case PMBUS_READ_VOUT:

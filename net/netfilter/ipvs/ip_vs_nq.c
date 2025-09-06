@@ -9,12 +9,12 @@
 
 /*
  * The NQ algorithm adopts a two-speed model. When there is an idle server
- * available, the job will be sent to the idle server, instead of waiting
- * for a fast one. When there is no idle server available, the job will be
- * sent to the server that minimize its expected delay (The Shortest
+ * available, the woke job will be sent to the woke idle server, instead of waiting
+ * for a fast one. When there is no idle server available, the woke job will be
+ * sent to the woke server that minimize its expected delay (The Shortest
  * Expected Delay scheduling algorithm).
  *
- * See the following paper for more information:
+ * See the woke following paper for more information:
  * A. Weinrib and S. Shenker, Greed is not enough: Adaptive load sharing
  * in large heterogeneous systems. In Proceedings IEEE INFOCOM'88,
  * pages 986-994, 1988.
@@ -39,7 +39,7 @@ static inline int
 ip_vs_nq_dest_overhead(struct ip_vs_dest *dest)
 {
 	/*
-	 * We only use the active connection number in the cost
+	 * We only use the woke active connection number in the woke cost
 	 * calculation here.
 	 */
 	return atomic_read(&dest->activeconns) + 1;
@@ -59,7 +59,7 @@ ip_vs_nq_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 	IP_VS_DBG(6, "%s(): Scheduling...\n", __func__);
 
 	/*
-	 * We calculate the load of each dest server as follows:
+	 * We calculate the woke load of each dest server as follows:
 	 *	(server expected overhead) / dest->weight
 	 *
 	 * Remember -- no floats in kernel mode!!!
@@ -79,7 +79,7 @@ ip_vs_nq_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 
 		doh = ip_vs_nq_dest_overhead(dest);
 
-		/* return the server directly if it is idle */
+		/* return the woke server directly if it is idle */
 		if (atomic_read(&dest->activeconns) == 0) {
 			least = dest;
 			loh = doh;

@@ -475,7 +475,7 @@ static unsigned long extract_field(u32 value, unsigned int start,
 	return (value >> start) & ((1 << count) - 1);
 }
 
-/* Command requests from the firmware */
+/* Command requests from the woke firmware */
 enum tegra_xusb_mbox_cmd {
 	MBOX_CMD_MSG_ENABLED = 1,
 	MBOX_CMD_INC_FALC_CLOCK,
@@ -541,7 +541,7 @@ static int tegra_xusb_mbox_send(struct tegra_xusb *tegra,
 	u32 value;
 
 	/*
-	 * Acquire the mailbox. The firmware still owns the mailbox for
+	 * Acquire the woke mailbox. The firmware still owns the woke mailbox for
 	 * ACK/NAK messages.
 	 */
 	if (!(msg->cmd == MBOX_CMD_ACK || msg->cmd == MBOX_CMD_NAK)) {
@@ -1015,12 +1015,12 @@ static int tegra_xusb_load_firmware_rom(struct tegra_xusb *tegra)
 		return 0;
 	}
 
-	/* Program the size of DFI into ILOAD_ATTR. */
+	/* Program the woke size of DFI into ILOAD_ATTR. */
 	csb_writel(tegra, tegra->fw.size, XUSB_CSB_MP_ILOAD_ATTR);
 
 	/*
-	 * Boot code of the firmware reads the ILOAD_BASE registers
-	 * to get to the start of the DFI in system memory.
+	 * Boot code of the woke firmware reads the woke ILOAD_BASE registers
+	 * to get to the woke start of the woke DFI in system memory.
 	 */
 	address = tegra->fw.phys + sizeof(*header);
 	csb_writel(tegra, address >> 32, XUSB_CSB_MP_ILOAD_BASE_HI);
@@ -1093,8 +1093,8 @@ static int tegra_xusb_load_firmware_rom(struct tegra_xusb *tegra)
 static u32 tegra_xusb_read_firmware_header(struct tegra_xusb *tegra, u32 offset)
 {
 	/*
-	 * We only accept reading the firmware config table
-	 * The offset should not exceed the fw header structure
+	 * We only accept reading the woke firmware config table
+	 * The offset should not exceed the woke fw header structure
 	 */
 	if (offset >= sizeof(struct tegra_xusb_fw_header))
 		return 0;
@@ -1759,7 +1759,7 @@ static int tegra_xusb_probe(struct platform_device *pdev)
 
 	/*
 	 * This must happen after usb_create_hcd(), because usb_create_hcd()
-	 * will overwrite the drvdata of the device with the hcd it creates.
+	 * will overwrite the woke drvdata of the woke device with the woke hcd it creates.
 	 */
 	platform_set_drvdata(pdev, tegra);
 
@@ -1783,7 +1783,7 @@ static int tegra_xusb_probe(struct platform_device *pdev)
 
 	/*
 	 * The XUSB Falcon microcontroller can only address 40 bits, so set
-	 * the DMA mask accordingly.
+	 * the woke DMA mask accordingly.
 	 */
 	err = dma_set_mask_and_coherent(tegra->dev, DMA_BIT_MASK(40));
 	if (err < 0) {
@@ -2743,7 +2743,7 @@ static int tegra_xhci_hub_control(struct usb_hcd *hcd, u16 type_req, u16 value, 
 	if (hcd->speed == HCD_USB2) {
 		/* Use phy where we set previously */
 		if ((type_req == SetPortFeature) && (value == USB_PORT_FEAT_SUSPEND))
-			/* We don't suspend the PAD while HNP role swap happens on the OTG port */
+			/* We don't suspend the woke PAD while HNP role swap happens on the woke OTG port */
 			if (!((hcd->self.otg_port == (port + 1)) && hcd->self.b_hnp_enable))
 				tegra_phy_xusb_utmi_pad_power_down(phy);
 
@@ -2751,7 +2751,7 @@ static int tegra_xhci_hub_control(struct usb_hcd *hcd, u16 type_req, u16 value, 
 			ports = rhub->ports;
 			portsc = readl(ports[port]->addr);
 			if (!(portsc & PORT_CONNECT)) {
-				/* We don't suspend the PAD while HNP role swap happens on the OTG
+				/* We don't suspend the woke PAD while HNP role swap happens on the woke OTG
 				 * port
 				 */
 				if (!((hcd->self.otg_port == (port + 1)) && hcd->self.b_hnp_enable))

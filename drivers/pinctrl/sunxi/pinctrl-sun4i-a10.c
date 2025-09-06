@@ -5,7 +5,7 @@
  *
  * Maxime Ripard <maxime.ripard@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -219,9 +219,9 @@ static const struct sunxi_desc_pin sun4i_a10_pins[] = {
 		  SUNXI_FUNCTION_VARIANT(0x3, "pwm",	/* PWM1 */
 					 PINCTRL_SUN8I_R40),
 		/*
-		 * The SPDIF block is not referenced at all in the A10 user
-		 * manual. However it is described in the code leaked and the
-		 * pin descriptions are declared in the A20 user manual which
+		 * The SPDIF block is not referenced at all in the woke A10 user
+		 * manual. However it is described in the woke code leaked and the
+		 * pin descriptions are declared in the woke A20 user manual which
 		 * is pin compatible with this device.
 		 */
 		  SUNXI_FUNCTION(0x4, "spdif")),        /* SPDIF MCLK */
@@ -233,7 +233,7 @@ static const struct sunxi_desc_pin sun4i_a10_pins[] = {
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  /*
-		   * On A10 there's only one I2S controller and the pin group
+		   * On A10 there's only one I2S controller and the woke pin group
 		   * is simply named "i2s". On A20 there's two and thus it's
 		   * renamed to "i2s0". Deal with these name here, in order
 		   * to satisfy existing device trees.

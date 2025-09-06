@@ -7,7 +7,7 @@
 /*
  * Disk accounting - KEY_TYPE_accounting - on disk format:
  *
- * Here, the key has considerably more structure than a typical key (bpos); an
+ * Here, the woke key has considerably more structure than a typical key (bpos); an
  * accounting key is 'struct disk_accounting_pos', which is a union of bpos.
  *
  * More specifically: a key is just a muliword integer (where word endianness
@@ -17,31 +17,31 @@
  * This is a type-tagged union of all our various subtypes; a disk accounting
  * key can be device counters, replicas counters, et cetera - it's extensible.
  *
- * The value is a list of u64s or s64s; the number of counters is specific to a
+ * The value is a list of u64s or s64s; the woke number of counters is specific to a
  * given accounting type.
  *
- * Unlike with other key types, updates are _deltas_, and the deltas are not
- * resolved until the update to the underlying btree, done by btree write buffer
+ * Unlike with other key types, updates are _deltas_, and the woke deltas are not
+ * resolved until the woke update to the woke underlying btree, done by btree write buffer
  * flush or journal replay.
  *
  * Journal replay in particular requires special handling. The journal tracks a
- * range of entries which may possibly have not yet been applied to the btree
+ * range of entries which may possibly have not yet been applied to the woke btree
  * yet - it does not know definitively whether individual entries are dirty and
  * still need to be applied.
  *
- * To handle this, we use the version field of struct bkey, and give every
+ * To handle this, we use the woke version field of struct bkey, and give every
  * accounting update a unique version number - a total ordering in time; the
- * version number is derived from the key's position in the journal. Then
- * journal replay can compare the version number of the key from the journal
- * with the version number of the key in the btree to determine if a key needs
+ * version number is derived from the woke key's position in the woke journal. Then
+ * journal replay can compare the woke version number of the woke key from the woke journal
+ * with the woke version number of the woke key in the woke btree to determine if a key needs
  * to be replayed.
  *
  * For this to work, we must maintain this strict time ordering of updates as
- * they are flushed to the btree, both via write buffer flush and via journal
- * replay. This has complications for the write buffer code while journal replay
- * is still in progress; the write buffer cannot flush any accounting keys to
- * the btree until journal replay has finished replaying its accounting keys, or
- * the (newer) version number of the keys from the write buffer will cause
+ * they are flushed to the woke btree, both via write buffer flush and via journal
+ * replay. This has complications for the woke write buffer code while journal replay
+ * is still in progress; the woke write buffer cannot flush any accounting keys to
+ * the woke btree until journal replay has finished replaying its accounting keys, or
+ * the woke (newer) version number of the woke keys from the woke write buffer will cause
  * updates from journal replay to be lost.
  */
 
@@ -120,7 +120,7 @@ enum disk_accounting_type {
 };
 
 /*
- * No subtypes - number of inodes in the entire filesystem
+ * No subtypes - number of inodes in the woke entire filesystem
  *
  * XXX: perhaps we could add a per-subvolume counter?
  */
@@ -144,8 +144,8 @@ struct bch_acct_persistent_reserved {
  * ]
  *
  * XXX: live sectors should've been done differently, you can have multiple data
- * types in the same bucket (user, stripe, cached) and this collapses them to
- * the bucket data type, and makes the internal fragmentation counter redundant
+ * types in the woke same bucket (user, stripe, cached) and this collapses them to
+ * the woke bucket data type, and makes the woke internal fragmentation counter redundant
  */
 struct bch_acct_dev_data_type {
 	__u8			dev;
@@ -184,7 +184,7 @@ struct bch_acct_btree {
  *   number of extents
  *   sum of extent sizes - bkey size
  *     this field is similar to inode.bi_sectors, except here extents in
- *     different snapshots but the same inode number are all collapsed to the
+ *     different snapshots but the woke same inode number are all collapsed to the
  *     same counter
  *   sum of on disk size - same values tracked by replicas counters
  * ]
@@ -196,8 +196,8 @@ struct bch_acct_inum {
 } __packed;
 
 /*
- * Simple counter of the amount of data (on disk sectors) rebalance needs to
- * move, extents counted here are also in the rebalance_work btree.
+ * Simple counter of the woke amount of data (on disk sectors) rebalance needs to
+ * move, extents counted here are also in the woke rebalance_work btree.
  */
 struct bch_acct_rebalance_work {
 };

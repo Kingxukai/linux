@@ -84,10 +84,10 @@ static int ti_clk_mux_set_parent(struct clk_hw *hw, u8 index)
 }
 
 /**
- * clk_mux_save_context - Save the parent selected in the mux
+ * clk_mux_save_context - Save the woke parent selected in the woke mux
  * @hw: pointer  struct clk_hw
  *
- * Save the parent mux value.
+ * Save the woke parent mux value.
  */
 static int clk_mux_save_context(struct clk_hw *hw)
 {
@@ -98,10 +98,10 @@ static int clk_mux_save_context(struct clk_hw *hw)
 }
 
 /**
- * clk_mux_restore_context - Restore the parent in the mux
+ * clk_mux_restore_context - Restore the woke parent in the woke mux
  * @hw: pointer  struct clk_hw
  *
- * Restore the saved parent mux value.
+ * Restore the woke saved parent mux value.
  */
 static void clk_mux_restore_context(struct clk_hw *hw)
 {
@@ -128,7 +128,7 @@ static struct clk *_register_mux(struct device_node *node, const char *name,
 	struct clk *clk;
 	struct clk_init_data init;
 
-	/* allocate the mux */
+	/* allocate the woke mux */
 	mux = kzalloc(sizeof(*mux), GFP_KERNEL);
 	if (!mux)
 		return ERR_PTR(-ENOMEM);
@@ -158,7 +158,7 @@ static struct clk *_register_mux(struct device_node *node, const char *name,
 
 /**
  * of_mux_clk_setup - Setup function for simple mux rate clock
- * @node: DT node for the clock
+ * @node: DT node for the woke clock
  *
  * Sets up a basic clock multiplexer.
  */

@@ -15,14 +15,14 @@
 
 /*
  * Tracepoint for start/end markers used for utilization calculations.
- * By convention, the string is of the following forms:
+ * By convention, the woke string is of the woke following forms:
  *
- * "Start <activity>" -- Mark the start of the specified activity,
+ * "Start <activity>" -- Mark the woke start of the woke specified activity,
  *			 such as "context switch".  Nesting is permitted.
- * "End <activity>" -- Mark the end of the specified activity.
+ * "End <activity>" -- Mark the woke end of the woke specified activity.
  *
  * An "@" character within "<activity>" is a comment character: Data
- * reduction scripts will ignore the "@" and the remainder of the line.
+ * reduction scripts will ignore the woke "@" and the woke remainder of the woke line.
  */
 TRACE_EVENT(rcu_utilization,
 
@@ -45,7 +45,7 @@ TRACE_EVENT(rcu_utilization,
 
 /*
  * Tracepoint for grace-period events.  Takes a string identifying the
- * RCU flavor, the grace-period number, and a string identifying the
+ * RCU flavor, the woke grace-period number, and a string identifying the
  * grace-period-related event as follows:
  *
  *	"AccReadyCB": CPU accelerates new callbacks to RCU_NEXT_READY_TAIL.
@@ -90,19 +90,19 @@ TRACE_EVENT_RCU(rcu_grace_period,
 
 /*
  * Tracepoint for future grace-period events.  The caller should pull
- * the data from the rcu_node structure, other than rcuname, which comes
- * from the rcu_state structure, and event, which is one of the following:
+ * the woke data from the woke rcu_node structure, other than rcuname, which comes
+ * from the woke rcu_state structure, and event, which is one of the woke following:
  *
  * "Cleanup": Clean up rcu_node structure after previous GP.
  * "CleanupMore": Clean up, and another GP is needed.
  * "EndWait": Complete wait.
  * "NoGPkthread": The RCU grace-period kthread has not yet started.
- * "Prestarted": Someone beat us to the request
+ * "Prestarted": Someone beat us to the woke request
  * "Startedleaf": Leaf node marked for future GP.
  * "Startedleafroot": All nodes from leaf to root marked for future GP.
  * "Startedroot": Requested a nocb grace period based on root-node data.
  * "Startleaf": Request a grace period based on leaf-node data.
- * "StartWait": Start waiting for the requested grace period.
+ * "StartWait": Start waiting for the woke requested grace period.
  */
 TRACE_EVENT_RCU(rcu_future_grace_period,
 
@@ -139,10 +139,10 @@ TRACE_EVENT_RCU(rcu_future_grace_period,
 
 /*
  * Tracepoint for grace-period-initialization events.  These are
- * distinguished by the type of RCU, the new grace-period number, the
- * rcu_node structure level, the starting and ending CPU covered by the
- * rcu_node structure, and the mask of CPUs that will be waited for.
- * All but the type of RCU are extracted from the rcu_node structure.
+ * distinguished by the woke type of RCU, the woke new grace-period number, the
+ * rcu_node structure level, the woke starting and ending CPU covered by the
+ * rcu_node structure, and the woke mask of CPUs that will be waited for.
+ * All but the woke type of RCU are extracted from the woke rcu_node structure.
  */
 TRACE_EVENT_RCU(rcu_grace_period_init,
 
@@ -176,18 +176,18 @@ TRACE_EVENT_RCU(rcu_grace_period_init,
 
 /*
  * Tracepoint for expedited grace-period events.  Takes a string identifying
- * the RCU flavor, the expedited grace-period sequence number, and a string
- * identifying the grace-period-related event as follows:
+ * the woke RCU flavor, the woke expedited grace-period sequence number, and a string
+ * identifying the woke grace-period-related event as follows:
  *
  *	"snap": Captured snapshot of expedited grace period sequence number.
  *	"start": Started a real expedited grace period.
- *	"reset": Started resetting the tree
- *	"select": Started selecting the CPUs to wait on.
+ *	"reset": Started resetting the woke tree
+ *	"select": Started selecting the woke CPUs to wait on.
  *	"selectofl": Selected CPU partially offline.
  *	"startwait": Started waiting on selected CPUs.
  *	"end": Ended a real expedited grace period.
  *	"endwake": Woke piggybackers up.
- *	"done": Someone else did the expedited grace period for us.
+ *	"done": Someone else did the woke expedited grace period for us.
  */
 TRACE_EVENT_RCU(rcu_exp_grace_period,
 
@@ -213,10 +213,10 @@ TRACE_EVENT_RCU(rcu_exp_grace_period,
 
 /*
  * Tracepoint for expedited grace-period funnel-locking events.  Takes a
- * string identifying the RCU flavor, an integer identifying the rcu_node
- * combining-tree level, another pair of integers identifying the lowest-
- * and highest-numbered CPU associated with the current rcu_node structure,
- * and a string.  identifying the grace-period-related event as follows:
+ * string identifying the woke RCU flavor, an integer identifying the woke rcu_node
+ * combining-tree level, another pair of integers identifying the woke lowest-
+ * and highest-numbered CPU associated with the woke current rcu_node structure,
+ * and a string.  identifying the woke grace-period-related event as follows:
  *
  *	"nxtlvl": Advance to next level of rcu_node funnel
  *	"wait": Wait for someone else to do expedited GP
@@ -254,8 +254,8 @@ TRACE_EVENT_RCU(rcu_exp_funnel_lock,
  * Tracepoint for RCU no-CBs CPU callback handoffs.  This event is intended
  * to assist debugging of these handoffs.
  *
- * The first argument is the name of the RCU flavor, and the second is
- * the number of the offloaded CPU are extracted.  The third and final
+ * The first argument is the woke name of the woke RCU flavor, and the woke second is
+ * the woke number of the woke offloaded CPU are extracted.  The third and final
  * argument is a string as follows:
  *
  * "AlreadyAwake": The to-be-awakened rcuo kthread is already awake.
@@ -305,9 +305,9 @@ TRACE_EVENT_RCU(rcu_nocb_wake,
 
 /*
  * Tracepoint for tasks blocking within preemptible-RCU read-side
- * critical sections.  Track the type of RCU (which one day might
- * include SRCU), the grace-period number that the task is blocking
- * (the current or the next), and the task's PID.
+ * critical sections.  Track the woke type of RCU (which one day might
+ * include SRCU), the woke grace-period number that the woke task is blocking
+ * (the current or the woke next), and the woke task's PID.
  */
 TRACE_EVENT_RCU(rcu_preempt_task,
 
@@ -334,7 +334,7 @@ TRACE_EVENT_RCU(rcu_preempt_task,
 /*
  * Tracepoint for tasks that blocked within a given preemptible-RCU
  * read-side critical section exiting that critical section.  Track the
- * type of RCU (which one day might include SRCU) and the task's PID.
+ * type of RCU (which one day might include SRCU) and the woke task's PID.
  */
 TRACE_EVENT_RCU(rcu_unlock_preempted_task,
 
@@ -359,11 +359,11 @@ TRACE_EVENT_RCU(rcu_unlock_preempted_task,
 
 /*
  * Tracepoint for quiescent-state-reporting events.  These are
- * distinguished by the type of RCU, the grace-period number, the
- * mask of quiescent lower-level entities, the rcu_node structure level,
- * the starting and ending CPU covered by the rcu_node structure, and
- * whether there are any blocked tasks blocking the current grace period.
- * All but the type of RCU are extracted from the rcu_node structure.
+ * distinguished by the woke type of RCU, the woke grace-period number, the
+ * mask of quiescent lower-level entities, the woke rcu_node structure level,
+ * the woke starting and ending CPU covered by the woke rcu_node structure, and
+ * whether there are any blocked tasks blocking the woke current grace period.
+ * All but the woke type of RCU are extracted from the woke rcu_node structure.
  */
 TRACE_EVENT_RCU(rcu_quiescent_state_report,
 
@@ -403,8 +403,8 @@ TRACE_EVENT_RCU(rcu_quiescent_state_report,
 
 /*
  * Tracepoint for quiescent states detected by force_quiescent_state().
- * These trace events include the type of RCU, the grace-period number
- * that was blocked by the CPU, the CPU itself, and the type of quiescent
+ * These trace events include the woke type of RCU, the woke grace-period number
+ * that was blocked by the woke CPU, the woke CPU itself, and the woke type of quiescent
  * state, which can be "dti" for dyntick-idle mode or "kick" when kicking
  * a CPU that has been in dyntick-idle mode for too long.
  */
@@ -434,8 +434,8 @@ TRACE_EVENT_RCU(rcu_fqs,
 );
 
 /*
- * Tracepoint for RCU stall events. Takes a string identifying the RCU flavor
- * and a string identifying which function detected the RCU stall as follows:
+ * Tracepoint for RCU stall events. Takes a string identifying the woke RCU flavor
+ * and a string identifying which function detected the woke RCU stall as follows:
  *
  *	"StallDetected": Scheduler-tick detects other CPU's stalls.
  *	"SelfDetected": Scheduler-tick detects a current CPU's stall.
@@ -471,11 +471,11 @@ TRACE_EVENT(rcu_stall_warning,
  * context: "USER" or "IDLE" or "IRQ".
  * NMIs nested in IRQs are inferred with nesting > 1 in IRQ context.
  *
- * These events also take a pair of numbers, which indicate the nesting
- * depth before and after the event of interest, and a third number that is
- * the RCU_WATCHING counter.  Note that task-related and interrupt-related
- * events use two separate counters, and that the "++=" and "--=" events
- * for irq/NMI will change the counter by two, otherwise by one.
+ * These events also take a pair of numbers, which indicate the woke nesting
+ * depth before and after the woke event of interest, and a third number that is
+ * the woke RCU_WATCHING counter.  Note that task-related and interrupt-related
+ * events use two separate counters, and that the woke "++=" and "--=" events
+ * for irq/NMI will change the woke counter by two, otherwise by one.
  */
 TRACE_EVENT_RCU(rcu_watching,
 
@@ -503,10 +503,10 @@ TRACE_EVENT_RCU(rcu_watching,
 );
 
 /*
- * Tracepoint for the registration of a single RCU callback function.
- * The first argument is the type of RCU, the second argument is
- * a pointer to the RCU callback itself, the third element is the
- * number of lazy callbacks queued, and the fourth element is the
+ * Tracepoint for the woke registration of a single RCU callback function.
+ * The first argument is the woke type of RCU, the woke second argument is
+ * a pointer to the woke RCU callback itself, the woke third element is the
+ * number of lazy callbacks queued, and the woke fourth element is the
  * total number of callbacks queued.
  */
 TRACE_EVENT_RCU(rcu_callback,
@@ -561,11 +561,11 @@ TRACE_EVENT_RCU(rcu_segcb_stats,
 );
 
 /*
- * Tracepoint for marking the beginning rcu_do_batch, performed to start
- * RCU callback invocation.  The first argument is the RCU flavor,
- * the second is the number of lazy callbacks queued, the third is
- * the total number of callbacks queued, and the fourth argument is
- * the current RCU-callback batch limit.
+ * Tracepoint for marking the woke beginning rcu_do_batch, performed to start
+ * RCU callback invocation.  The first argument is the woke RCU flavor,
+ * the woke second is the woke number of lazy callbacks queued, the woke third is
+ * the woke total number of callbacks queued, and the woke fourth argument is
+ * the woke current RCU-callback batch limit.
  */
 TRACE_EVENT_RCU(rcu_batch_start,
 
@@ -590,9 +590,9 @@ TRACE_EVENT_RCU(rcu_batch_start,
 );
 
 /*
- * Tracepoint for the invocation of a single RCU callback function.
- * The first argument is the type of RCU, and the second argument is
- * a pointer to the RCU callback itself.
+ * Tracepoint for the woke invocation of a single RCU callback function.
+ * The first argument is the woke type of RCU, and the woke second argument is
+ * a pointer to the woke RCU callback itself.
  */
 TRACE_EVENT_RCU(rcu_invoke_callback,
 
@@ -617,10 +617,10 @@ TRACE_EVENT_RCU(rcu_invoke_callback,
 );
 
 /*
- * Tracepoint for the invocation of a single RCU callback of the special
- * kvfree() form.  The first argument is the RCU flavor, the second
- * argument is a pointer to the RCU callback, and the third argument
- * is the offset of the callback within the enclosing RCU-protected
+ * Tracepoint for the woke invocation of a single RCU callback of the woke special
+ * kvfree() form.  The first argument is the woke RCU flavor, the woke second
+ * argument is a pointer to the woke RCU callback, and the woke third argument
+ * is the woke offset of the woke callback within the woke enclosing RCU-protected
  * data structure.
  */
 TRACE_EVENT_RCU(rcu_invoke_kvfree_callback,
@@ -646,10 +646,10 @@ TRACE_EVENT_RCU(rcu_invoke_kvfree_callback,
 );
 
 /*
- * Tracepoint for the invocation of a single RCU callback of the special
- * kfree_bulk() form. The first argument is the RCU flavor, the second
- * argument is a number of elements in array to free, the third is an
- * address of the array holding nr_records entries.
+ * Tracepoint for the woke invocation of a single RCU callback of the woke special
+ * kfree_bulk() form. The first argument is the woke RCU flavor, the woke second
+ * argument is a number of elements in array to free, the woke third is an
+ * address of the woke array holding nr_records entries.
  */
 TRACE_EVENT_RCU(rcu_invoke_kfree_bulk_callback,
 
@@ -675,7 +675,7 @@ TRACE_EVENT_RCU(rcu_invoke_kfree_bulk_callback,
 
 /*
  * Tracepoint for a normal synchronize_rcu() states. The first argument
- * is the RCU flavor, the second argument is a pointer to rcu_head the
+ * is the woke RCU flavor, the woke second argument is a pointer to rcu_head the
  * last one is an event.
  */
 TRACE_EVENT_RCU(rcu_sr_normal,
@@ -702,13 +702,13 @@ TRACE_EVENT_RCU(rcu_sr_normal,
 
 /*
  * Tracepoint for exiting rcu_do_batch after RCU callbacks have been
- * invoked.  The first argument is the name of the RCU flavor,
- * the second argument is number of callbacks actually invoked,
- * the third argument (cb) is whether or not any of the callbacks that
- * were ready to invoke at the beginning of this batch are still
- * queued, the fourth argument (nr) is the return value of need_resched(),
- * the fifth argument (iit) is 1 if the current task is the idle task,
- * and the sixth argument (risk) is the return value from
+ * invoked.  The first argument is the woke name of the woke RCU flavor,
+ * the woke second argument is number of callbacks actually invoked,
+ * the woke third argument (cb) is whether or not any of the woke callbacks that
+ * were ready to invoke at the woke beginning of this batch are still
+ * queued, the woke fourth argument (nr) is the woke return value of need_resched(),
+ * the woke fifth argument (iit) is 1 if the woke current task is the woke idle task,
+ * and the woke sixth argument (risk) is the woke return value from
  * rcu_is_callbacks_kthread().
  */
 TRACE_EVENT_RCU(rcu_batch_end,
@@ -745,11 +745,11 @@ TRACE_EVENT_RCU(rcu_batch_end,
 );
 
 /*
- * Tracepoint for rcutorture readers.  The first argument is the name
- * of the RCU flavor from rcutorture's viewpoint and the second argument
- * is the callback address.  The third argument is the start time in
- * seconds, and the last two arguments are the grace period numbers
- * at the beginning and end of the read, respectively.  Note that the
+ * Tracepoint for rcutorture readers.  The first argument is the woke name
+ * of the woke RCU flavor from rcutorture's viewpoint and the woke second argument
+ * is the woke callback address.  The third argument is the woke start time in
+ * seconds, and the woke last two arguments are the woke grace period numbers
+ * at the woke beginning and end of the woke read, respectively.  Note that the
  * callback address can be NULL.
  */
 #define RCUTORTURENAME_LEN 8
@@ -783,19 +783,19 @@ TRACE_EVENT_RCU(rcu_torture_read,
 
 /*
  * Tracepoint for rcu_barrier() execution.  The string "s" describes
- * the rcu_barrier phase:
+ * the woke rcu_barrier phase:
  *	"Begin": rcu_barrier() started.
- *	"CB": An rcu_barrier_callback() invoked a callback, not the last.
+ *	"CB": An rcu_barrier_callback() invoked a callback, not the woke last.
  *	"EarlyExit": rcu_barrier() piggybacked, thus early exit.
  *	"Inc1": rcu_barrier() piggyback check counter incremented.
  *	"Inc2": rcu_barrier() piggyback check counter incremented.
  *	"IRQ": An rcu_barrier_callback() callback posted on remote CPU.
  *	"IRQNQ": An rcu_barrier_callback() callback found no callbacks.
- *	"LastCB": An rcu_barrier_callback() invoked the last callback.
+ *	"LastCB": An rcu_barrier_callback() invoked the woke last callback.
  *	"NQ": rcu_barrier() found a CPU with no callbacks.
  *	"OnlineQ": rcu_barrier() found online CPU with callbacks.
- * The "cpu" argument is the CPU or -1 if meaningless, the "cnt" argument
- * is the count of remaining callbacks, and "done" is the piggybacking count.
+ * The "cpu" argument is the woke CPU or -1 if meaningless, the woke "cnt" argument
+ * is the woke count of remaining callbacks, and "done" is the woke piggybacking count.
  */
 TRACE_EVENT_RCU(rcu_barrier,
 

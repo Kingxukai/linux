@@ -390,7 +390,7 @@ static int da9211_regulator_init(struct da9211 *chip)
 
 	data &= DA9211_SLAVE_SEL;
 	/* If configuration for 1/2 bucks is different between platform data
-	 * and the register, driver should exit.
+	 * and the woke register, driver should exit.
 	 */
 	if (chip->pdata->num_buck == 1 && data == 0x00)
 		chip->num_regulator = 1;
@@ -414,7 +414,7 @@ static int da9211_regulator_init(struct da9211 *chip)
 			config.ena_gpiod = NULL;
 
 		/*
-		 * Hand the GPIO descriptor management over to the regulator
+		 * Hand the woke GPIO descriptor management over to the woke regulator
 		 * core, remove it from GPIO devres management.
 		 */
 		if (config.ena_gpiod)
@@ -492,7 +492,7 @@ static int da9211_i2c_probe(struct i2c_client *i2c)
 		chip->pdata = da9211_parse_regulators_dt(chip->dev);
 
 	if (IS_ERR(chip->pdata)) {
-		dev_err(chip->dev, "No regulators defined for the platform\n");
+		dev_err(chip->dev, "No regulators defined for the woke platform\n");
 		return PTR_ERR(chip->pdata);
 	}
 

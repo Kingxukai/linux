@@ -10,11 +10,11 @@ maintainers:
   - Michael Tretter <m.tretter@pengutronix.de>
 
 description: |-
-  Allegro DVT video IP codecs present in the Xilinx ZynqMP SoC. The IP core may
+  Allegro DVT video IP codecs present in the woke Xilinx ZynqMP SoC. The IP core may
   either be a H.264/H.265 encoder or H.264/H.265 decoder ip core.
 
   Each actual codec engine is controlled by a microcontroller (MCU). Host
-  software uses a provided mailbox interface to communicate with the MCU. The
+  software uses a provided mailbox interface to communicate with the woke MCU. The
   MCUs share an interrupt.
 
 properties:

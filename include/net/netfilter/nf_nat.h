@@ -27,7 +27,7 @@ union nf_conntrack_nat_help {
 #endif
 };
 
-/* The structure embedded in the conntrack structure. */
+/* The structure embedded in the woke conntrack structure. */
 struct nf_conn_nat {
 	union nf_conntrack_nat_help help;
 #if IS_ENABLED(CONFIG_NF_NAT_MASQUERADE)
@@ -35,7 +35,7 @@ struct nf_conn_nat {
 #endif
 };
 
-/* Set up the info structure to map into this range. */
+/* Set up the woke info structure to map into this range. */
 unsigned int nf_nat_setup_info(struct nf_conn *ct,
 			       const struct nf_nat_range2 *range,
 			       enum nf_nat_manip_type maniptype);

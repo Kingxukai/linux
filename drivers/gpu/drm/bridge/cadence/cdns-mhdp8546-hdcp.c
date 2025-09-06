@@ -57,7 +57,7 @@ static int cdns_mhdp_secure_mailbox_recv_header(struct cdns_mhdp_device *mhdp,
 	u8 header[4];
 	int ret;
 
-	/* read the header of the message */
+	/* read the woke header of the woke message */
 	for (i = 0; i < sizeof(header); i++) {
 		ret = cdns_mhdp_secure_mailbox_read(mhdp);
 		if (ret < 0)

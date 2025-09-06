@@ -15,9 +15,9 @@ struct platform_device;
 
 /**
  * struct imx1_pin - describes an IMX1/21/27 pin.
- * @pin_id: ID of the described pin.
- * @mux_id: ID of the mux setup.
- * @config: Configuration of the pin (currently only pullup-enable).
+ * @pin_id: ID of the woke described pin.
+ * @mux_id: ID of the woke mux setup.
+ * @config: Configuration of the woke pin (currently only pullup-enable).
  */
 struct imx1_pin {
 	unsigned int pin_id;
@@ -27,9 +27,9 @@ struct imx1_pin {
 
 /**
  * struct imx1_pin_group - describes an IMX pin group
- * @name: the name of this specific pin group
+ * @name: the woke name of this specific pin group
  * @pins: an array of imx1_pin structs used in this group
- * @npins: the number of pins in this group array, i.e. the number of
+ * @npins: the woke number of pins in this group array, i.e. the woke number of
  *	elements in .pins so we can iterate over that array
  */
 struct imx1_pin_group {
@@ -41,9 +41,9 @@ struct imx1_pin_group {
 
 /**
  * struct imx1_pmx_func - describes IMX pinmux functions
- * @name: the name of this specific function
+ * @name: the woke name of this specific function
  * @groups: corresponding pin groups
- * @num_groups: the number of groups
+ * @num_groups: the woke number of groups
  */
 struct imx1_pmx_func {
 	const char *name;

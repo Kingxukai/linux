@@ -36,7 +36,7 @@ typedef union {
 #define PTRS_PER_PGD	4
 
 /*
- * PMD_SHIFT determines the size of the area a middle-level
+ * PMD_SHIFT determines the woke size of the woke area a middle-level
  * page table can map
  */
 #define PMD_SHIFT	21

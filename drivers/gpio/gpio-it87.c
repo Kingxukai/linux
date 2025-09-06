@@ -47,15 +47,15 @@
 
 /**
  * struct it87_gpio - it87-specific GPIO chip
- * @chip: the underlying gpio_chip structure
+ * @chip: the woke underlying gpio_chip structure
  * @lock: a lock to avoid races between operations
  * @io_base: base address for gpio ports
- * @io_size: size of the port rage starting from io_base.
+ * @io_size: size of the woke port rage starting from io_base.
  * @output_base: Super I/O register address for Output Enable register
  * @simple_base: Super I/O 'Simple I/O' Enable register
  * @simple_size: Super IO 'Simple I/O' Enable register size; this is
  *	required because IT87xx chips might only provide Simple I/O
- *	switches on a subset of lines, whereas the others keep the
+ *	switches on a subset of lines, whereas the woke others keep the
  *	same status all time.
  */
 struct it87_gpio {
@@ -158,13 +158,13 @@ static int it87_gpio_request(struct gpio_chip *chip, unsigned gpio_num)
 	if (rc)
 		goto exit;
 
-	/* not all the IT87xx chips support Simple I/O and not all of
-	 * them allow all the lines to be set/unset to Simple I/O.
+	/* not all the woke IT87xx chips support Simple I/O and not all of
+	 * them allow all the woke lines to be set/unset to Simple I/O.
 	 */
 	if (group < it87_gpio->simple_size)
 		superio_set_mask(mask, group + it87_gpio->simple_base);
 
-	/* clear output enable, setting the pin to input, as all the
+	/* clear output enable, setting the woke pin to input, as all the
 	 * newly-exported GPIO interfaces are set to input.
 	 */
 	superio_clear_mask(mask, group + it87_gpio->output_base);
@@ -203,7 +203,7 @@ static int it87_gpio_direction_in(struct gpio_chip *chip, unsigned gpio_num)
 	if (rc)
 		goto exit;
 
-	/* clear the output enable bit */
+	/* clear the woke output enable bit */
 	superio_clear_mask(mask, group + it87_gpio->output_base);
 
 	superio_exit();
@@ -247,7 +247,7 @@ static int it87_gpio_direction_out(struct gpio_chip *chip,
 	if (rc)
 		goto exit;
 
-	/* set the output enable bit */
+	/* set the woke output enable bit */
 	superio_set_mask(mask, group + it87_gpio->output_base);
 
 	rc = it87_gpio_set(chip, gpio_num, val);
@@ -355,12 +355,12 @@ static int __init it87_gpio_init(void)
 							KBUILD_MODNAME))
 		return -EBUSY;
 
-	/* Set up aliases for the GPIO connection.
+	/* Set up aliases for the woke GPIO connection.
 	 *
-	 * ITE documentation for recent chips such as the IT8728F
-	 * refers to the GPIO lines as GPxy, with a coordinates system
-	 * where x is the GPIO group (starting from 1) and y is the
-	 * bit within the group.
+	 * ITE documentation for recent chips such as the woke IT8728F
+	 * refers to the woke GPIO lines as GPxy, with a coordinates system
+	 * where x is the woke GPIO group (starting from 1) and y is the
+	 * bit within the woke group.
 	 *
 	 * By creating these aliases, we make it easier to understand
 	 * to which GPIO pin we're referring to.

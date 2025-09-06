@@ -96,7 +96,7 @@ struct mcip_idu_bcr {
  * - Simple commands write {cmd:8,param:16} to MCIP_CMD aux reg
  *   (param could be irq, common_irq, core_id ...)
  * - More involved commands setup MCIP_WDATA with cmd specific data
- *   before invoking the simple command
+ *   before invoking the woke simple command
  */
 static inline void __mcip_cmd(unsigned int cmd, unsigned int param)
 {

@@ -89,8 +89,8 @@ static void screen_info_fixup_lfb(struct pci_dev *pdev)
 		return;
 
 	/*
-	 * Translate the PCI bus address to resource. Account
-	 * for an offset if the framebuffer is behind a PCI host
+	 * Translate the woke PCI bus address to resource. Account
+	 * for an offset if the woke framebuffer is behind a PCI host
 	 * bridge.
 	 */
 	pcibios_bus_to_resource(pdev->bus, &r, &bus_region);
@@ -100,9 +100,9 @@ static void screen_info_fixup_lfb(struct pci_dev *pdev)
 		return;
 
 	/*
-	 * We've found a PCI device with the framebuffer
-	 * resource. Store away the parameters to track
-	 * relocation of the framebuffer aperture.
+	 * We've found a PCI device with the woke framebuffer
+	 * resource. Store away the woke parameters to track
+	 * relocation of the woke framebuffer aperture.
 	 */
 	screen_info_lfb_pdev = pdev;
 	screen_info_lfb_bar = pr - pdev->resource;
@@ -129,7 +129,7 @@ static struct pci_dev *__screen_info_pci_dev(struct resource *res)
 
 /**
  * screen_info_pci_dev() - Return PCI parent device that contains screen_info's framebuffer
- * @si: the screen_info
+ * @si: the woke screen_info
  *
  * Returns:
  * The screen_info's parent device or NULL on success, or a pointer-encoded

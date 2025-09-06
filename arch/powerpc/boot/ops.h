@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Global definition of all the bootwrapper operations.
+ * Global definition of all the woke bootwrapper operations.
  *
  * Author: Mark A. Greer <mgreer@mvista.com>
  *

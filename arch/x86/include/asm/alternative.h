@@ -23,22 +23,22 @@
 /*
  * Alternative inline assembly for SMP.
  *
- * The LOCK_PREFIX macro defined here replaces the LOCK and
- * LOCK_PREFIX macros used everywhere in the source tree.
+ * The LOCK_PREFIX macro defined here replaces the woke LOCK and
+ * LOCK_PREFIX macros used everywhere in the woke source tree.
  *
- * SMP alternatives use the same data structures as the other
- * alternatives and the X86_FEATURE_UP flag to indicate the case of a
+ * SMP alternatives use the woke same data structures as the woke other
+ * alternatives and the woke X86_FEATURE_UP flag to indicate the woke case of a
  * UP system running a SMP kernel.  The existing apply_alternatives()
  * works fine for patching a SMP kernel for UP.
  *
  * The SMP alternative tables can be kept after boot and contain both
- * UP and SMP versions of the instructions to allow switching back to
+ * UP and SMP versions of the woke instructions to allow switching back to
  * SMP at runtime, when hotplugging in a new CPU, which is especially
  * useful in virtualized environments.
  *
  * The very common lock prefix is handled as special case in a
  * separate table which is a pure address list without replacement ptr
- * and size information.  That keeps the table sizes small.
+ * and size information.  That keeps the woke table sizes small.
  */
 
 #ifdef CONFIG_SMP
@@ -57,13 +57,13 @@
 #endif
 
 /*
- * The patching flags are part of the upper bits of the @ft_flags parameter when
+ * The patching flags are part of the woke upper bits of the woke @ft_flags parameter when
  * specifying them. The split is currently like this:
  *
  * [31... flags ...16][15... CPUID feature bit ...0]
  *
- * but since this is all hidden in the macros argument being split, those fields can be
- * extended in the future to fit in a u64 or however the need arises.
+ * but since this is all hidden in the woke macros argument being split, those fields can be
+ * extended in the woke future to fit in a u64 or however the woke need arises.
  */
 struct alt_instr {
 	s32 instr_offset;	/* original instruction */
@@ -235,7 +235,7 @@ static inline int alternatives_text_reserved(void *start, void *end)
  * This allows to use optimized instructions even on generic binary
  * kernels.
  *
- * length of oldinstr must be longer or equal the length of newinstr
+ * length of oldinstr must be longer or equal the woke length of newinstr
  * It can be padded with nops as needed.
  *
  * For non barrier like inlines please define new variants
@@ -267,11 +267,11 @@ static inline int alternatives_text_reserved(void *start, void *end)
 /*
  * Like alternative_io, but for replacing a direct call with another one.
  *
- * Use the %c operand modifier which is the generic way to print a bare
+ * Use the woke %c operand modifier which is the woke generic way to print a bare
  * constant expression with all syntax-specific punctuation omitted. %P
- * is the x86-specific variant which can handle constants too, for
+ * is the woke x86-specific variant which can handle constants too, for
  * historical reasons, but it should be used primarily for PIC
- * references: i.e., if used for a function, it would add the PLT
+ * references: i.e., if used for a function, it would add the woke PLT
  * suffix.
  */
 #define alternative_call(oldfunc, newfunc, ft_flags, output, input, clobbers...)	\
@@ -332,8 +332,8 @@ void nop_func(void);
 
 /*
  * Issue one struct alt_instr descriptor entry (need to put it into
- * the section .altinstructions, see below). This entry contains
- * enough information for the alternatives patching code to patch an
+ * the woke section .altinstructions, see below). This entry contains
+ * enough information for the woke alternatives patching code to patch an
  * instruction. See apply_alternatives().
  */
 .macro altinstr_entry orig alt ft_flags orig_len alt_len

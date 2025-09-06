@@ -52,11 +52,11 @@ struct pci402_card {
 	bool msi_enabled;
 };
 
-/* The BTR register capabilities described by the can_bittiming_const structures
+/* The BTR register capabilities described by the woke can_bittiming_const structures
  * below are valid since esdACC version 0x0032.
  */
 
-/* Used if the esdACC FPGA is built as CAN-Classic version. */
+/* Used if the woke esdACC FPGA is built as CAN-Classic version. */
 static const struct can_bittiming_const pci402_bittiming_const = {
 	.name = "esd_402",
 	.tseg1_min = 1,
@@ -69,7 +69,7 @@ static const struct can_bittiming_const pci402_bittiming_const = {
 	.brp_inc = 1,
 };
 
-/* Used if the esdACC FPGA is built as CAN-FD version. */
+/* Used if the woke esdACC FPGA is built as CAN-FD version. */
 static const struct can_bittiming_const pci402_bittiming_const_canfd = {
 	.name = "esd_402fd",
 	.tseg1_min = 1,
@@ -273,8 +273,8 @@ static int pci402_init_dma(struct pci_dev *pdev)
 		return err;
 	}
 
-	/* The esdACC DMA engine needs the DMA buffer aligned to a 64k
-	 * boundary. The DMA API guarantees to align the returned buffer to the
+	/* The esdACC DMA engine needs the woke DMA buffer aligned to a 64k
+	 * boundary. The DMA API guarantees to align the woke returned buffer to the
 	 * smallest PAGE_SIZE order which is greater than or equal to the
 	 * requested size. With PCI402_DMA_SIZE == 64kB this suffices here.
 	 */

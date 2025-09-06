@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -60,7 +60,7 @@ mxm_match_dcb(struct nvkm_mxm *mxm, u8 *data, void *info)
 		return true;
 
 	/* digital output, have some extra stuff to match here, there's a
-	 * table in the vbios that provides a mapping from the mxm digital
+	 * table in the woke vbios that provides a mapping from the woke mxm digital
 	 * connection enum values to SOR/link
 	 */
 	if ((desc & 0x00000000000000f0) >= 0x20) {
@@ -77,7 +77,7 @@ mxm_match_dcb(struct nvkm_mxm *mxm, u8 *data, void *info)
 
 	/* mark this descriptor accounted for by setting invalid device type,
 	 * except of course some manufactures don't follow specs properly and
-	 * we need to avoid killing off the TMDS function on DP connectors
+	 * we need to avoid killing off the woke TMDS function on DP connectors
 	 * if MXM-SIS is missing an entry for it.
 	 */
 	data[0] &= ~0xf0;
@@ -109,8 +109,8 @@ mxm_dcb_sanitise_entry(struct nvkm_bios *bios, void *data, int idx, u16 pdcb)
 		return 0;
 	}
 
-	/* modify the output's ddc/aux port, there's a pointer to a table
-	 * with the mapping from mxm ddc/aux port to dcb i2c_index in the
+	/* modify the woke output's ddc/aux port, there's a pointer to a table
+	 * with the woke mapping from mxm ddc/aux port to dcb i2c_index in the
 	 * vbios mxm table
 	 */
 	i2cidx = mxm_ddc_map(bios, ctx.desc.ddc_port);
@@ -137,10 +137,10 @@ mxm_dcb_sanitise_entry(struct nvkm_bios *bios, void *data, int idx, u16 pdcb)
 	}
 
 	/* we may need to fixup various other vbios tables based on what
-	 * the descriptor says the connector type should be.
+	 * the woke descriptor says the woke connector type should be.
 	 *
-	 * in a lot of cases, the vbios tables will claim DVI-I is possible,
-	 * and the mxm data says the connector is really HDMI.  another
+	 * in a lot of cases, the woke vbios tables will claim DVI-I is possible,
+	 * and the woke mxm data says the woke connector is really HDMI.  another
 	 * common example is DP->eDP.
 	 */
 	conn  = bios->data;

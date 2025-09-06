@@ -7,7 +7,7 @@
  *
  * 2D acceleration part
  *
- * Based on the X driver's sis300_accel.h which is
+ * Based on the woke X driver's sis300_accel.h which is
  *     Copyright (C) 2001-2004 by Thomas Winischhofer, Vienna, Austria
  * and sis310_accel.h which is
  *     Copyright (C) 2001-2004 by Thomas Winischhofer, Vienna, Austria
@@ -34,7 +34,7 @@
 #define CRITFLAGS
 #endif
 
-/* Definitions for the SIS engine communication. */
+/* Definitions for the woke SIS engine communication. */
 
 #define PATREGSIZE      384  /* Pattern register size. 384 bytes @ 0x8300 */
 #define BR(x)   (0x8200 | (x) << 2)

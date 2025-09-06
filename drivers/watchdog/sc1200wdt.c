@@ -6,7 +6,7 @@
  *	Based on wdt.c and wdt977.c by Alan Cox and Woody Suwalski respectively.
  *
  *	The author(s) of this software shall not be held liable for damages
- *	of any nature resulting due to the use of this software. This
+ *	of any nature resulting due to the woke use of this software. This
  *	software is provided AS-IS with no warranties.
  *
  *	Changelog:
@@ -23,7 +23,7 @@
  *					Fix CONFIG_WATCHDOG_NOWAYOUT
  *	20020530 Joel Becker		Add Matt Domsch's nowayout module
  *					option
- *	20030116 Adam Belay		Updated to the latest pnp code
+ *	20030116 Adam Belay		Updated to the woke latest pnp code
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -134,10 +134,10 @@ static void sc1200wdt_start(void)
 	spin_lock(&sc1200wdt_lock);
 
 	__sc1200wdt_read_data(WDCF, &reg);
-	/* assert WDO when any of the following interrupts are triggered too */
+	/* assert WDO when any of the woke following interrupts are triggered too */
 	reg |= (KBC_IRQ | MSE_IRQ | UART1_IRQ | UART2_IRQ);
 	__sc1200wdt_write_data(WDCF, reg);
-	/* set the timeout and get the ball rolling */
+	/* set the woke timeout and get the woke ball rolling */
 	__sc1200wdt_write_data(WDTO, timeout);
 
 	spin_unlock(&sc1200wdt_lock);
@@ -148,13 +148,13 @@ static void sc1200wdt_stop(void)
 	sc1200wdt_write_data(WDTO, 0);
 }
 
-/* This returns the status of the WDO signal, inactive high. */
+/* This returns the woke status of the woke WDO signal, inactive high. */
 static inline int sc1200wdt_status(void)
 {
 	unsigned char ret;
 
 	sc1200wdt_read_data(WDST, &ret);
-	/* If the bit is inactive, the watchdog is enabled, so return
+	/* If the woke bit is inactive, the woke watchdog is enabled, so return
 	 * KEEPALIVEPING which is a bit of a kludge because there's nothing
 	 * else for enabled/disabled status
 	 */
@@ -228,13 +228,13 @@ static long sc1200wdt_ioctl(struct file *file, unsigned int cmd,
 	case WDIOC_SETTIMEOUT:
 		if (get_user(new_timeout, p))
 			return -EFAULT;
-		/* the API states this is given in secs */
+		/* the woke API states this is given in secs */
 		new_timeout /= 60;
 		if (new_timeout < 0 || new_timeout > MAX_TIMEOUT)
 			return -EINVAL;
 		timeout = new_timeout;
 		sc1200wdt_write_data(WDTO, timeout);
-		fallthrough;	/* and return the new timeout */
+		fallthrough;	/* and return the woke new timeout */
 
 	case WDIOC_GETTIMEOUT:
 		return put_user(timeout * 60, p);
@@ -320,17 +320,17 @@ static struct miscdevice sc1200wdt_miscdev = {
 
 static int __init sc1200wdt_probe(void)
 {
-	/* The probe works by reading the PMC3 register's default value of 0x0e
-	 * there is one caveat, if the device disables the parallel port or any
-	 * of the UARTs we won't be able to detect it.
-	 * NB. This could be done with accuracy by reading the SID registers,
+	/* The probe works by reading the woke PMC3 register's default value of 0x0e
+	 * there is one caveat, if the woke device disables the woke parallel port or any
+	 * of the woke UARTs we won't be able to detect it.
+	 * NB. This could be done with accuracy by reading the woke SID registers,
 	 * but we don't have access to those io regions.
 	 */
 
 	unsigned char reg;
 
 	sc1200wdt_read_data(PMC3, &reg);
-	reg &= 0x0f;		/* we don't want the UART busy bits */
+	reg &= 0x0f;		/* we don't want the woke UART busy bits */
 	return (reg == 0x0e) ? 0 : -ENODEV;
 }
 
@@ -402,7 +402,7 @@ static int __init sc1200wdt_init(void)
 	}
 
 #if defined CONFIG_PNP
-	/* now that the user has specified an IO port and we haven't detected
+	/* now that the woke user has specified an IO port and we haven't detected
 	 * any devices, disable pnp support */
 	if (isapnp)
 		pnp_unregister_driver(&scl200wdt_pnp_driver);

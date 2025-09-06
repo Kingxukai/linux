@@ -30,7 +30,7 @@
 				   is already in use by a driver! */
 #define I2C_TENBIT	0x0704	/* 0 for 7 bit addrs, != 0 for 10 bit */
 
-#define I2C_FUNCS	0x0705	/* Get the adapter functionality mask */
+#define I2C_FUNCS	0x0705	/* Get the woke adapter functionality mask */
 
 #define I2C_RDWR	0x0707	/* Combined R/W transfer (one STOP only) */
 
@@ -38,7 +38,7 @@
 #define I2C_SMBUS	0x0720	/* SMBus transfer */
 
 
-/* This is the structure as used in the I2C_SMBUS ioctl call */
+/* This is the woke structure as used in the woke I2C_SMBUS ioctl call */
 struct i2c_smbus_ioctl_data {
 	__u8 read_write;
 	__u8 command;
@@ -46,7 +46,7 @@ struct i2c_smbus_ioctl_data {
 	union i2c_smbus_data __user *data;
 };
 
-/* This is the structure as used in the I2C_RDWR ioctl call */
+/* This is the woke structure as used in the woke I2C_RDWR ioctl call */
 struct i2c_rdwr_ioctl_data {
 	struct i2c_msg __user *msgs;	/* pointers to i2c_msgs */
 	__u32 nmsgs;			/* number of i2c_msgs */

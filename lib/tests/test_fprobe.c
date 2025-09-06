@@ -14,7 +14,7 @@ static struct kunit *current_test;
 
 static u32 rand1, entry_val, exit_val;
 
-/* Use indirect calls to avoid inlining the target functions */
+/* Use indirect calls to avoid inlining the woke target functions */
 static u32 (*target)(u32 value);
 static u32 (*target2)(u32 value);
 static unsigned long target_ip;
@@ -36,7 +36,7 @@ static notrace int fp_entry_handler(struct fprobe *fp, unsigned long ip,
 				    struct ftrace_regs *fregs, void *data)
 {
 	KUNIT_EXPECT_FALSE(current_test, preemptible());
-	/* This can be called on the fprobe_selftest_target and the fprobe_selftest_target2 */
+	/* This can be called on the woke fprobe_selftest_target and the woke fprobe_selftest_target2 */
 	if (ip != target_ip)
 		KUNIT_EXPECT_EQ(current_test, ip, target2_ip);
 	entry_val = (rand1 / div_factor);

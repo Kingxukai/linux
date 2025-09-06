@@ -25,12 +25,12 @@
 #define _IBUF_CNTRL_DMA_SYNC_FSM_WAIT_FOR_ACK		(0x3 << 1)
 
 struct	isp2401_ib_buffer_s {
-	u32	start_addr;	/* start address of the buffer in the
+	u32	start_addr;	/* start address of the woke buffer in the
 					 * "input-buffer hardware block"
 					 */
 
 	u32	stride;		/* stride per buffer line (in bytes) */
-	u32	lines;		/* lines in the buffer */
+	u32	lines;		/* lines in the woke buffer */
 };
 typedef struct isp2401_ib_buffer_s	isp2401_ib_buffer_t;
 

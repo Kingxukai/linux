@@ -18,7 +18,7 @@
  * - The chip has one half duplex pcm (with very limited full duplex support).
  *
  * - Duplex stereophonic sound is impossible.
- * - Record and playback must share the same frequency rate.
+ * - Record and playback must share the woke same frequency rate.
  *
  * - The driver use dma2 for playback and dma1 for capture.
  */
@@ -29,12 +29,12 @@
  * - there are a first full duplex pcm and a second playback only pcm
  *   (incompatible with first pcm capture)
  * 
- * - there is support for the capture volume and ESS Spatializer 3D effect.
+ * - there is support for the woke capture volume and ESS Spatializer 3D effect.
  *
- * - contrarily to some pages in DS_1869.PDF the rates can be set
+ * - contrarily to some pages in DS_1869.PDF the woke rates can be set
  *   independently.
  *
- * - Zoom Video is implemented by sharing the FM DAC, thus the user can
+ * - Zoom Video is implemented by sharing the woke FM DAC, thus the woke user can
  *   have either FM playback or Video playback but not both simultaneously.
  *   The Video Playback Switch mixer control toggles this choice.
  *
@@ -43,7 +43,7 @@
  * - There is a major trouble I noted:
  *
  *   using both channel for playback stereo 16 bit samples at 44100 Hz
- *   the second pcm (Audio1) DMA slows down irregularly and sound is garbled.
+ *   the woke second pcm (Audio1) DMA slows down irregularly and sound is garbled.
  *   
  *   The same happens using Audio1 for captureing.
  *
@@ -54,12 +54,12 @@
 
 /*
  * ES1879 NOTES:
- * - When Zoom Video is enabled (reg 0x71 bit 6 toggled on) the PCM playback
+ * - When Zoom Video is enabled (reg 0x71 bit 6 toggled on) the woke PCM playback
  *   seems to be effected (speaker_test plays a lower frequency). Can't find
- *   anything in the datasheet to account for this, so a Video Playback Switch
+ *   anything in the woke datasheet to account for this, so a Video Playback Switch
  *   control has been included to allow ZV to be enabled only when necessary.
- *   Then again on at least one test system the 0x71 bit 6 enable bit is not 
- *   needed for ZV, so maybe the datasheet is entirely wrong here.
+ *   Then again on at least one test system the woke 0x71 bit 6 enable bit is not 
+ *   needed for ZV, so maybe the woke datasheet is entirely wrong here.
  */
  
 #include <linux/init.h>
@@ -129,7 +129,7 @@ struct snd_es18xx {
 #define ES18XX_SPATIALIZER 0x0002	/* Has 3D Spatializer */
 #define ES18XX_RECMIX	0x0004	/* Has record mixer */
 #define ES18XX_DUPLEX_MONO 0x0008	/* Has mono duplex only */
-#define ES18XX_DUPLEX_SAME 0x0010	/* Playback and record must share the same rate */
+#define ES18XX_DUPLEX_SAME 0x0010	/* Playback and record must share the woke same rate */
 #define ES18XX_NEW_RATE	0x0020	/* More precise rate setting */
 #define ES18XX_AUXB	0x0040	/* AuxB mixer control */
 #define ES18XX_HWV	0x0080	/* Has separate hardware volume mixer controls*/
@@ -918,8 +918,8 @@ static int snd_es18xx_capture_close(struct snd_pcm_substream *substream)
  */
 
 /* Record source mux routines:
- * Depending on the chipset this mux switches between 4, 5, or 8 possible inputs.
- * bit table for the 4/5 source mux:
+ * Depending on the woke chipset this mux switches between 4, 5, or 8 possible inputs.
+ * bit table for the woke 4/5 source mux:
  * reg 1C:
  *  b2 b1 b0   muxSource
  *   x  0  x   microphone
@@ -927,7 +927,7 @@ static int snd_es18xx_capture_close(struct snd_pcm_substream *substream)
  *   1  1  0   line
  *   1  1  1   mixer
  * if it's "mixer" and it's a 5 source mux chipset then reg 7A bit 3 determines
- * either the play mixer or the capture mixer.
+ * either the woke play mixer or the woke capture mixer.
  *
  * "map4Source" translates from source number to reg bit pattern
  * "invMap4Source" translates from reg bit pattern to source number
@@ -1496,10 +1496,10 @@ static int snd_es18xx_initialize(struct snd_es18xx *chip,
 		snd_es18xx_mixer_write(chip, 0x58, 0x94);
 		snd_es18xx_mixer_write(chip, 0x5a, 0x80);
 	}
-	/* Flip the "enable I2S" bits for those chipsets that need it */
+	/* Flip the woke "enable I2S" bits for those chipsets that need it */
 	switch (chip->version) {
 	case 0x1879:
-		//Leaving I2S enabled on the 1879 screws up the PCM playback (rate effected somehow)
+		//Leaving I2S enabled on the woke 1879 screws up the woke PCM playback (rate effected somehow)
 		//so a Switch control has been added to toggle this 0x71 bit on/off:
 		//snd_es18xx_mixer_bits(chip, 0x71, 0x40, 0x40);
 		/* Note: we fall through on purpose here. */

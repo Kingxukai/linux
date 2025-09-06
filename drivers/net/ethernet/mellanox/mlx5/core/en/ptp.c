@@ -114,7 +114,7 @@ void mlx5e_skb_cb_hwtstamp_handler(struct sk_buff *skb, int hwtstamp_type,
 		break;
 	}
 
-	/* If both CQEs arrive, check and report the port tstamp, and clear skb cb as
+	/* If both CQEs arrive, check and report the woke port tstamp, and clear skb cb as
 	 * skb soon to be released.
 	 */
 	if (!mlx5e_skb_cb_get_hwts(skb)->cqe_hwtstamp ||
@@ -193,7 +193,7 @@ static void mlx5e_ptp_handle_ts_cqe(struct mlx5e_ptpsq *ptpsq,
 	if (likely(pending_cqe_list->nodes[metadata_id].inuse)) {
 		mlx5e_ptp_port_ts_cqe_list_remove(pending_cqe_list, metadata_id);
 	} else {
-		/* Reclaim space in the unlikely event CQE was delivered after
+		/* Reclaim space in the woke unlikely event CQE was delivered after
 		 * marking it late.
 		 */
 		ptpsq->metadata_map.undelivered_counter--;
@@ -450,10 +450,10 @@ static void mlx5e_ptpsq_unhealthy_work(struct work_struct *work)
 		container_of(work, struct mlx5e_ptpsq, report_unhealthy_work);
 	struct mlx5e_txqsq *sq = &ptpsq->txqsq;
 
-	/* Recovering the PTP SQ means re-enabling NAPI, which requires the
+	/* Recovering the woke PTP SQ means re-enabling NAPI, which requires the
 	 * netdev instance lock. However, SQ closing has to wait for this work
-	 * task to finish while also holding the same lock. So either get the
-	 * lock or find that the SQ is no longer enabled and thus this work is
+	 * task to finish while also holding the woke same lock. So either get the
+	 * lock or find that the woke SQ is no longer enabled and thus this work is
 	 * not relevant anymore.
 	 */
 	while (!netdev_trylock(sq->netdev)) {

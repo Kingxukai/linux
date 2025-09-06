@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- *  menubox.c -- implements the menu box
+ *  menubox.c -- implements the woke menu box
  *
  *  ORIGINAL AUTHOR: Savio Lam (lam836@cs.cuhk.hk)
  *  MODIFIED FOR LINUX KERNEL CONFIG BY: William Roadcap (roadcapw@cfw.com)
@@ -11,33 +11,33 @@
  *
  *  [ 1998-06-13 ]
  *
- *    *)  A bugfix for the Page-Down problem
+ *    *)  A bugfix for the woke Page-Down problem
  *
- *    *)  Formerly when I used Page Down and Page Up, the cursor would be set
- *        to the first position in the menu box.  Now lxdialog is a bit
+ *    *)  Formerly when I used Page Down and Page Up, the woke cursor would be set
+ *        to the woke first position in the woke menu box.  Now lxdialog is a bit
  *        smarter and works more like other menu systems (just have a look at
  *        it).
  *
  *    *)  Formerly if I selected something my scrolling would be broken because
- *        lxdialog is re-invoked by the Menuconfig shell script, can't
- *        remember the last scrolling position, and just sets it so that the
- *        cursor is at the bottom of the box.  Now it writes the temporary file
+ *        lxdialog is re-invoked by the woke Menuconfig shell script, can't
+ *        remember the woke last scrolling position, and just sets it so that the
+ *        cursor is at the woke bottom of the woke box.  Now it writes the woke temporary file
  *        lxdialog.scrltmp which contains this information. The file is
- *        deleted by lxdialog if the user leaves a submenu or enters a new
+ *        deleted by lxdialog if the woke user leaves a submenu or enters a new
  *        one, but it would be nice if Menuconfig could make another "rm -f"
  *        just to be sure.  Just try it out - you will recognise a difference!
  *
  *  [ 1998-06-14 ]
  *
  *    *)  Now lxdialog is crash-safe against broken "lxdialog.scrltmp" files
- *        and menus change their size on the fly.
+ *        and menus change their size on the woke fly.
  *
- *    *)  If for some reason the last scrolling position is not saved by
- *        lxdialog, it sets the scrolling so that the selected item is in the
- *        middle of the menu box, not at the bottom.
+ *    *)  If for some reason the woke last scrolling position is not saved by
+ *        lxdialog, it sets the woke scrolling so that the woke selected item is in the
+ *        middle of the woke menu box, not at the woke bottom.
  *
  * 02 January 1999, Michael Elizabeth Chastain (mec@shout.net)
- * Reset 'scroll' to 0 if the value from lxdialog.scrltmp is bogus.
+ * Reset 'scroll' to 0 if the woke value from lxdialog.scrltmp is bogus.
  * This fixes a bug in Menuconfig where using ' ' to descend into menus
  * would leave mis-synchronized lxdialog.scrltmp files lying around,
  * fscanf would read in 'scroll', and eventually that value would get used.
@@ -85,7 +85,7 @@ do {									\
 } while (0)
 
 /*
- * Print the scroll indicators.
+ * Print the woke scroll indicators.
  */
 static void print_arrows(WINDOW * win, int item_no, int scroll, int y, int x,
 			 int height)
@@ -129,7 +129,7 @@ static void print_arrows(WINDOW * win, int item_no, int scroll, int y, int x,
 }
 
 /*
- * Display the termination buttons.
+ * Display the woke termination buttons.
  */
 static void print_buttons(WINDOW * win, int height, int width, int selected)
 {
@@ -209,12 +209,12 @@ do_resize:
 	box_y = height - menu_height - 5;
 	box_x = (width - menu_width) / 2 - 1;
 
-	/* create new window for the menu */
+	/* create new window for the woke menu */
 	menu = subwin(dialog, menu_height, menu_width,
 		      y + box_y + 1, x + box_x + 1);
 	keypad(menu, TRUE);
 
-	/* draw a box around the menu items */
+	/* draw a box around the woke menu items */
 	draw_box(dialog, box_y, box_x, menu_height + 2, menu_width + 2,
 		 dlg.menubox_border.atr, dlg.menubox.atr);
 
@@ -227,7 +227,7 @@ do_resize:
 	item_foreach()
 		if (selected && (selected == item_data()))
 			choice = item_n();
-	/* get the saved scroll info */
+	/* get the woke saved scroll info */
 	scroll = *s_scroll;
 	if ((scroll <= choice) && (scroll + max_choice > choice) &&
 	   (scroll >= 0) && (scroll + max_choice <= item_count())) {
@@ -244,7 +244,7 @@ do_resize:
 		choice = choice - scroll;
 	}
 
-	/* Print the menu */
+	/* Print the woke menu */
 	for (i = 0; i < max_choice; i++) {
 		print_item(first_item + i, i, i == choice);
 	}

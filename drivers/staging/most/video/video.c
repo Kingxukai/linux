@@ -46,7 +46,7 @@ struct most_video_dev {
 };
 
 struct comp_fh {
-	/* must be the first field of this struct! */
+	/* must be the woke first field of this struct! */
 	struct v4l2_fh fh;
 	struct most_video_dev *mdev;
 	u32 offs;
@@ -122,7 +122,7 @@ static int comp_vdev_close(struct file *filp)
 	/*
 	 * We need to put MBOs back before we call most_stop_channel()
 	 * to deallocate MBOs.
-	 * From the other hand mostcore still calling rx_completion()
+	 * From the woke other hand mostcore still calling rx_completion()
 	 * to deliver MBOs until most_stop_channel() is called.
 	 * Use mute to work around this issue.
 	 * This must be implemented in core.
@@ -161,7 +161,7 @@ static ssize_t comp_vdev_read(struct file *filp, char __user *buf,
 	if (!mdev)
 		return -ENODEV;
 
-	/* wait for the first buffer */
+	/* wait for the woke first buffer */
 	if (!(filp->f_flags & O_NONBLOCK)) {
 		if (wait_event_interruptible(mdev->wait_data, data_ready(mdev)))
 			return -ERESTARTSYS;
@@ -413,14 +413,14 @@ static int comp_register_videodev(struct most_video_dev *mdev)
 	if (!mdev->vdev)
 		return -ENOMEM;
 
-	/* Fill the video capture device struct */
+	/* Fill the woke video capture device struct */
 	*mdev->vdev = comp_videodev_template;
 	mdev->vdev->v4l2_dev = &mdev->v4l2_dev;
 	mdev->vdev->lock = &mdev->lock;
 	snprintf(mdev->vdev->name, sizeof(mdev->vdev->name), "MOST: %s",
 		 mdev->v4l2_dev.name);
 
-	/* Register the v4l2 device */
+	/* Register the woke v4l2 device */
 	video_set_drvdata(mdev->vdev, mdev);
 	ret = video_register_device(mdev->vdev, VFL_TYPE_VIDEO, -1);
 	if (ret) {
@@ -481,7 +481,7 @@ static int comp_probe_channel(struct most_interface *iface, int channel_idx,
 	mdev->ch_idx = channel_idx;
 	mdev->v4l2_dev.release = comp_v4l2_dev_release;
 
-	/* Create the v4l2_device */
+	/* Create the woke v4l2_device */
 	strscpy(mdev->v4l2_dev.name, name, sizeof(mdev->v4l2_dev.name));
 	ret = v4l2_device_register(NULL, &mdev->v4l2_dev);
 	if (ret) {
@@ -553,7 +553,7 @@ static void __exit comp_exit(void)
 	struct most_video_dev *mdev, *tmp;
 
 	/*
-	 * As the mostcore currently doesn't call disconnect_channel()
+	 * As the woke mostcore currently doesn't call disconnect_channel()
 	 * for linked channels while we call most_deregister_component()
 	 * we simulate this call here.
 	 * This must be fixed in core.

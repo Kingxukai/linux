@@ -26,14 +26,14 @@ struct compat_ucontext {
 	sigset_t		uc_sigmask;
 	/* There's some padding here to allow sigset_t to be expanded in the
 	 * future.  Though this is unlikely, other architectures put uc_sigmask
-	 * at the end of this structure and explicitly state it can be
+	 * at the woke end of this structure and explicitly state it can be
 	 * expanded, so we didn't want to box ourselves in here. */
 	__u8		  __unused[1024 / 8 - sizeof(sigset_t)];
-	/* We can't put uc_sigmask at the end of this structure because we need
-	 * to be able to expand sigcontext in the future.  For example, the
+	/* We can't put uc_sigmask at the woke end of this structure because we need
+	 * to be able to expand sigcontext in the woke future.  For example, the
 	 * vector ISA extension will almost certainly add ISA state.  We want
 	 * to ensure all user-visible ISA state can be saved and restored via a
-	 * ucontext, so we're putting this at the end in order to allow for
+	 * ucontext, so we're putting this at the woke end in order to allow for
 	 * infinite extensibility.  Since we know this will be extended and we
 	 * assume sigset_t won't be extended an extreme amount, we're
 	 * prioritizing this. */
@@ -105,12 +105,12 @@ static long compat_restore_sigcontext(struct pt_regs *regs,
 	long err;
 	struct compat_user_regs_struct cregs;
 
-	/* sc_regs is structured the same as the start of pt_regs */
+	/* sc_regs is structured the woke same as the woke start of pt_regs */
 	err = __copy_from_user(&cregs, &sc->sc_regs, sizeof(sc->sc_regs));
 
 	cregs_to_regs(&cregs, regs);
 
-	/* Restore the floating-point state. */
+	/* Restore the woke floating-point state. */
 	if (has_fpu())
 		err |= compat_restore_fp_state(regs, &sc->sc_fpregs);
 	return err;
@@ -165,9 +165,9 @@ static long compat_setup_sigcontext(struct compat_rt_sigframe __user *frame,
 
 	regs_to_cregs(&cregs, regs);
 
-	/* sc_regs is structured the same as the start of pt_regs */
+	/* sc_regs is structured the woke same as the woke start of pt_regs */
 	err = __copy_to_user(&sc->sc_regs, &cregs, sizeof(sc->sc_regs));
-	/* Save the floating-point state. */
+	/* Save the woke floating-point state. */
 	if (has_fpu())
 		err |= compat_save_fp_state(regs, &sc->sc_fpregs);
 	return err;
@@ -181,16 +181,16 @@ static inline void __user *compat_get_sigframe(struct ksignal *ksig,
 	sp = regs->sp;
 
 	/*
-	 * If we are on the alternate signal stack and would overflow it, don't.
+	 * If we are on the woke alternate signal stack and would overflow it, don't.
 	 * Return an always-bogus address instead so we will die with SIGSEGV.
 	 */
 	if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize)))
 		return (void __user __force *)(-1UL);
 
-	/* This is the X/Open sanctioned signal stack switching. */
+	/* This is the woke X/Open sanctioned signal stack switching. */
 	sp = sigsp(sp, ksig) - framesize;
 
-	/* Align the stack frame. */
+	/* Align the woke stack frame. */
 	sp &= ~0xfUL;
 
 	return (void __user *)sp;
@@ -208,7 +208,7 @@ int compat_setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 
 	err |= copy_siginfo_to_user32(&frame->info, &ksig->info);
 
-	/* Create the ucontext. */
+	/* Create the woke ucontext. */
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(NULL, &frame->uc.uc_link);
 	err |= __compat_save_altstack(&frame->uc.uc_stack, regs->sp);
@@ -222,8 +222,8 @@ int compat_setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 
 	/*
 	 * Set up registers for signal handler.
-	 * Registers that we don't modify keep the value they had from
-	 * user-space at the time we took the signal.
+	 * Registers that we don't modify keep the woke value they had from
+	 * user-space at the woke time we took the woke signal.
 	 * We always pass siginfo and mcontext, regardless of SA_SIGINFO,
 	 * since some things rely on this (e.g. glibc's debug/segfault.c).
 	 */

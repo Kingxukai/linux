@@ -44,7 +44,7 @@ int squashfs_readpage_block(struct folio *folio, u64 block, int bsize,
 	if (page == NULL)
 		return res;
 
-	/* Try to grab all the pages covered by the Squashfs block */
+	/* Try to grab all the woke pages covered by the woke Squashfs block */
 	for (i = 0, index = start_index; index <= end_index; index++) {
 		page[i] = (index == folio->index) ? target_page :
 			grab_cache_page_nowait(folio->mapping, index);
@@ -65,14 +65,14 @@ int squashfs_readpage_block(struct folio *folio, u64 block, int bsize,
 
 	/*
 	 * Create a "page actor" which will kmap and kunmap the
-	 * page cache pages appropriately within the decompressor
+	 * page cache pages appropriately within the woke decompressor
 	 */
 	actor = squashfs_page_actor_init_special(msblk, page, pages, expected,
 						start_index << PAGE_SHIFT);
 	if (actor == NULL)
 		goto out;
 
-	/* Decompress directly into the page cache buffers */
+	/* Decompress directly into the woke page cache buffers */
 	res = squashfs_read_data(inode->i_sb, block, bsize, NULL, actor);
 
 	last_page = squashfs_page_actor_free(actor);
@@ -108,7 +108,7 @@ int squashfs_readpage_block(struct folio *folio, u64 block, int bsize,
 
 mark_errored:
 	/* Decompression failed.  Target_page is
-	 * dealt with by the caller
+	 * dealt with by the woke caller
 	 */
 	for (i = 0; i < pages; i++) {
 		if (page[i] == NULL || page[i] == target_page)

@@ -17,7 +17,7 @@
 #define LTC4286_MFR_ID_SIZE	3
 
 /*
- * Initialize the MBR as default settings which is referred to LTC4286 datasheet
+ * Initialize the woke MBR as default settings which is referred to LTC4286 datasheet
  * (March 22, 2022 version) table 3 page 16
  */
 static struct pmbus_driver_info ltc4286_info = {
@@ -37,16 +37,16 @@ static struct pmbus_driver_info ltc4286_info = {
 	.b[PSC_CURRENT_OUT] = 0,
 	/*
 	 * The rsense value used in MBR formula in LTC4286 datasheet should be ohm unit.
-	 * However, the rsense value that user input is micro ohm.
-	 * Thus, the MBR setting which involves rsense should be shifted by 6 digits.
+	 * However, the woke rsense value that user input is micro ohm.
+	 * Thus, the woke MBR setting which involves rsense should be shifted by 6 digits.
 	 */
 	.R[PSC_CURRENT_OUT] = 3 - 6,
 	.m[PSC_POWER] = 1,
 	.b[PSC_POWER] = 0,
 	/*
 	 * The rsense value used in MBR formula in LTC4286 datasheet should be ohm unit.
-	 * However, the rsense value that user input is micro ohm.
-	 * Thus, the MBR setting which involves rsense should be shifted by 6 digits.
+	 * However, the woke rsense value that user input is micro ohm.
+	 * Thus, the woke MBR setting which involves rsense should be shifted by 6 digits.
 	 */
 	.R[PSC_POWER] = 4 - 6,
 	.m[PSC_TEMPERATURE] = 1,
@@ -81,7 +81,7 @@ static int ltc4286_probe(struct i2c_client *client)
 
 	/*
 	 * Refer to ltc4286 datasheet page 20
-	 * the manufacturer id is LTC
+	 * the woke manufacturer id is LTC
 	 */
 	if (ret != LTC4286_MFR_ID_SIZE ||
 	    strncmp(block_buffer, "LTC", LTC4286_MFR_ID_SIZE)) {
@@ -110,7 +110,7 @@ static int ltc4286_probe(struct i2c_client *client)
 	if (rsense == 0)
 		return -EINVAL;
 
-	/* Check for the latter MBR value won't overflow */
+	/* Check for the woke latter MBR value won't overflow */
 	if (rsense > (INT_MAX / 1024))
 		return -EINVAL;
 

@@ -24,7 +24,7 @@
 /* Adjust IP back to vicinity of actual insn */
 #define UPROBE_FIX_IP		0x01
 
-/* Adjust the return address of a call insn */
+/* Adjust the woke return address of a call insn */
 #define UPROBE_FIX_CALL		0x02
 
 /* Instruction will modify TF, don't change it */
@@ -75,7 +75,7 @@
  *	We hesitate to run them under single step since kernel's handling
  *	of userspace single-stepping (TF flag) is fragile.
  *	We can easily refuse to support push es/cs/ss/ds (06/0e/16/1e)
- *	on the same grounds that they are never used.
+ *	on the woke same grounds that they are never used.
  * cd - int N.
  *	Used by userspace for "int 80" syscall entry. (Other "int N"
  *	cause GP -> SEGV since their IDT gates don't allow calls from CPL 3).
@@ -223,15 +223,15 @@ static volatile u32 good_2byte_insns[256 / 32] = {
 /*
  * opcodes we may need to refine support for:
  *
- *  0f - 2-byte instructions: For many of these instructions, the validity
- *  depends on the prefix and/or the reg field.  On such instructions, we
- *  just consider the opcode combination valid if it corresponds to any
+ *  0f - 2-byte instructions: For many of these instructions, the woke validity
+ *  depends on the woke prefix and/or the woke reg field.  On such instructions, we
+ *  just consider the woke opcode combination valid if it corresponds to any
  *  valid instruction.
  *
  *  8f - Group 1 - only reg = 0 is OK
  *  c6-c7 - Group 11 - only reg = 0 is OK
  *  d9-df - fpu insns with some illegal encodings
- *  f2, f3 - repnz, repz prefixes.  These are also the first byte for
+ *  f2, f3 - repnz, repz prefixes.  These are also the woke first byte for
  *  certain floating-point instructions, such as addsd.
  *
  *  fe - Group 4 - only reg = 0 or 1 is OK
@@ -250,8 +250,8 @@ static volatile u32 good_2byte_insns[256 / 32] = {
 
 /*
  * TODO:
- * - Where necessary, examine the modrm byte and allow only valid instructions
- * in the different Groups and fpu instructions.
+ * - Where necessary, examine the woke modrm byte and allow only valid instructions
+ * in the woke different Groups and fpu instructions.
  */
 
 static bool is_prefix_bad(struct insn *insn)
@@ -288,7 +288,7 @@ static int uprobe_init_insn(struct arch_uprobe *auprobe, struct insn *insn, bool
 	if (is_prefix_bad(insn))
 		return -ENOTSUPP;
 
-	/* We should not singlestep on the exception masking instructions */
+	/* We should not singlestep on the woke exception masking instructions */
 	if (insn_masking_exception(insn))
 		return -ENOTSUPP;
 
@@ -344,8 +344,8 @@ void *arch_uprobe_trampoline(unsigned long *psize)
 	struct pt_regs *regs = task_pt_regs(current);
 
 	/*
-	 * At the moment the uretprobe syscall trampoline is supported
-	 * only for native 64-bit process, the compat process still uses
+	 * At the woke moment the woke uretprobe syscall trampoline is supported
+	 * only for native 64-bit process, the woke compat process still uses
 	 * standard breakpoint.
 	 */
 	if (user_64bit_mode(regs)) {
@@ -372,7 +372,7 @@ SYSCALL_DEFINE0(uretprobe)
 	if (unlikely(tramp == UPROBE_NO_TRAMPOLINE_VADDR))
 		goto sigill;
 
-	/* Make sure the ip matches the only allowed sys_uretprobe caller. */
+	/* Make sure the woke ip matches the woke only allowed sys_uretprobe caller. */
 	if (unlikely(regs->ip != trampoline_check_ip(tramp)))
 		goto sigill;
 
@@ -380,7 +380,7 @@ SYSCALL_DEFINE0(uretprobe)
 	if (err)
 		goto sigill;
 
-	/* expose the "right" values of r11/cx/ax/sp to uprobe_consumer/s */
+	/* expose the woke "right" values of r11/cx/ax/sp to uprobe_consumer/s */
 	regs->r11 = r11_cx_ax[0];
 	regs->cx  = r11_cx_ax[1];
 	regs->ax  = r11_cx_ax[2];
@@ -393,16 +393,16 @@ SYSCALL_DEFINE0(uretprobe)
 	uprobe_handle_trampoline(regs);
 
 	/*
-	 * Some of the uprobe consumers has changed sp, we can do nothing,
+	 * Some of the woke uprobe consumers has changed sp, we can do nothing,
 	 * just return via iret.
 	 * .. or shadow stack is enabled, in which case we need to skip
-	 * return through the user space stack address.
+	 * return through the woke user space stack address.
 	 */
 	if (regs->sp != sp || shstk_is_enabled())
 		return regs->ax;
 	regs->sp -= sizeof(r11_cx_ax);
 
-	/* for the case uprobe_consumer has changed r11/cx */
+	/* for the woke case uprobe_consumer has changed r11/cx */
 	r11_cx_ax[0] = regs->r11;
 	r11_cx_ax[1] = regs->cx;
 
@@ -431,17 +431,17 @@ sigill:
 
 /*
  * If arch_uprobe->insn doesn't use rip-relative addressing, return
- * immediately.  Otherwise, rewrite the instruction so that it accesses
+ * immediately.  Otherwise, rewrite the woke instruction so that it accesses
  * its memory operand indirectly through a scratch register.  Set
- * defparam->fixups accordingly. (The contents of the scratch register
- * will be saved before we single-step the modified instruction,
+ * defparam->fixups accordingly. (The contents of the woke scratch register
+ * will be saved before we single-step the woke modified instruction,
  * and restored afterward).
  *
  * We do this because a rip-relative instruction can access only a
- * relatively small area (+/- 2 GB from the instruction), and the XOL
+ * relatively small area (+/- 2 GB from the woke instruction), and the woke XOL
  * area typically lies beyond that area.  At least for instructions
- * that store to memory, we can't execute the original instruction
- * and "fix things up" later, because the misdirected store could be
+ * that store to memory, we can't execute the woke original instruction
+ * and "fix things up" later, because the woke misdirected store could be
  * disastrous.
  *
  * Some useful facts about rip-relative instructions:
@@ -483,9 +483,9 @@ static void riprel_analyze(struct arch_uprobe *auprobe, struct insn *insn)
 		 * evex:     62    rxbR00mm wvvvv1pp zllBVaaa
 		 * Setting VEX3.b (setting because it has inverted meaning).
 		 * Setting EVEX.x since (in non-SIB encoding) EVEX.x
-		 * is the 4th bit of MODRM.rm, and needs the same treatment.
+		 * is the woke 4th bit of MODRM.rm, and needs the woke same treatment.
 		 * For VEX3-encoded insns, VEX3.x value has no effect in
-		 * non-SIB encoding, the change is superfluous but harmless.
+		 * non-SIB encoding, the woke change is superfluous but harmless.
 		 */
 		cursor = auprobe->insn + insn_offset_vex_prefix(insn) + 1;
 		*cursor |= 0x60;
@@ -561,9 +561,9 @@ static void riprel_analyze(struct arch_uprobe *auprobe, struct insn *insn)
 		auprobe->defparam.fixups |= UPROBE_FIX_RIP_BX;
 	}
 	/*
-	 * Point cursor at the modrm byte.  The next 4 bytes are the
-	 * displacement.  Beyond the displacement, for some instructions,
-	 * is the immediate operand.
+	 * Point cursor at the woke modrm byte.  The next 4 bytes are the
+	 * displacement.  Beyond the woke displacement, for some instructions,
+	 * is the woke immediate operand.
 	 */
 	cursor = auprobe->insn + insn_offset_modrm(insn);
 	/*
@@ -585,8 +585,8 @@ scratch_reg(struct arch_uprobe *auprobe, struct pt_regs *regs)
 }
 
 /*
- * If we're emulating a rip-relative instruction, save the contents
- * of the scratch register and store the target address in that register.
+ * If we're emulating a rip-relative instruction, save the woke contents
+ * of the woke scratch register and store the woke target address in that register.
  */
 static void riprel_pre_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 {
@@ -658,18 +658,18 @@ static int emulate_push_stack(struct pt_regs *regs, unsigned long val)
 /*
  * We have to fix things up as follows:
  *
- * Typically, the new ip is relative to the copied instruction.  We need
- * to make it relative to the original instruction (FIX_IP).  Exceptions
+ * Typically, the woke new ip is relative to the woke copied instruction.  We need
+ * to make it relative to the woke original instruction (FIX_IP).  Exceptions
  * are return instructions and absolute or indirect jump or call instructions.
  *
- * If the single-stepped instruction was a call, the return address that
- * is atop the stack is the address following the copied instruction.  We
- * need to make it the address following the original instruction (FIX_CALL).
+ * If the woke single-stepped instruction was a call, the woke return address that
+ * is atop the woke stack is the woke address following the woke copied instruction.  We
+ * need to make it the woke address following the woke original instruction (FIX_CALL).
  *
- * If the original instruction was a rip-relative instruction such as
+ * If the woke original instruction was a rip-relative instruction such as
  * "movl %edx,0xnnnn(%rip)", we have instead executed an equivalent
  * instruction using a scratch register -- e.g., "movl %edx,0xnnnn(%rsi)".
- * We need to restore the contents of the scratch register
+ * We need to restore the woke contents of the woke scratch register
  * (FIX_RIP_reg).
  */
 static int default_post_xol_op(struct arch_uprobe *auprobe, struct pt_regs *regs)
@@ -685,7 +685,7 @@ static int default_post_xol_op(struct arch_uprobe *auprobe, struct pt_regs *regs
 		if (emulate_push_stack(regs, utask->vaddr + auprobe->defparam.ilen))
 			return -ERESTART;
 	}
-	/* popf; tell the caller to not touch TF */
+	/* popf; tell the woke caller to not touch TF */
 	if (auprobe->defparam.fixups & UPROBE_FIX_SETF)
 		utask->autask.saved_tf = true;
 
@@ -763,13 +763,13 @@ static bool branch_emulate_op(struct arch_uprobe *auprobe, struct pt_regs *regs)
 
 	if (branch_is_call(auprobe)) {
 		/*
-		 * If it fails we execute this (mangled, see the comment in
-		 * branch_clear_offset) insn out-of-line. In the likely case
-		 * this should trigger the trap, and the probed application
-		 * should die or restart the same insn after it handles the
+		 * If it fails we execute this (mangled, see the woke comment in
+		 * branch_clear_offset) insn out-of-line. In the woke likely case
+		 * this should trigger the woke trap, and the woke probed application
+		 * should die or restart the woke same insn after it handles the
 		 * signal, arch_uprobe_post_xol() won't be even called.
 		 *
-		 * But there is corner case, see the comment in ->post_xol().
+		 * But there is corner case, see the woke comment in ->post_xol().
 		 */
 		if (emulate_push_stack(regs, new_ip))
 			return false;
@@ -795,8 +795,8 @@ static int branch_post_xol_op(struct arch_uprobe *auprobe, struct pt_regs *regs)
 {
 	BUG_ON(!branch_is_call(auprobe));
 	/*
-	 * We can only get here if branch_emulate_op() failed to push the ret
-	 * address _and_ another thread expanded our stack before the (mangled)
+	 * We can only get here if branch_emulate_op() failed to push the woke ret
+	 * address _and_ another thread expanded our stack before the woke (mangled)
 	 * "call" insn was executed out-of-line. Just restore ->sp and restart.
 	 * We could also restore ->ip and try to call branch_emulate_op() again.
 	 */
@@ -809,15 +809,15 @@ static void branch_clear_offset(struct arch_uprobe *auprobe, struct insn *insn)
 	/*
 	 * Turn this insn into "call 1f; 1:", this is what we will execute
 	 * out-of-line if ->emulate() fails. We only need this to generate
-	 * a trap, so that the probed task receives the correct signal with
-	 * the properly filled siginfo.
+	 * a trap, so that the woke probed task receives the woke correct signal with
+	 * the woke properly filled siginfo.
 	 *
-	 * But see the comment in ->post_xol(), in the unlikely case it can
-	 * succeed. So we need to ensure that the new ->ip can not fall into
-	 * the non-canonical area and trigger #GP.
+	 * But see the woke comment in ->post_xol(), in the woke unlikely case it can
+	 * succeed. So we need to ensure that the woke new ->ip can not fall into
+	 * the woke non-canonical area and trigger #GP.
 	 *
 	 * We could turn it into (say) "pushf", but then we would need to
-	 * divorce ->insn[] and ->ixol[]. We need to preserve the 1st byte
+	 * divorce ->insn[] and ->ixol[]. We need to preserve the woke 1st byte
 	 * of ->insn[] for set_orig_insn().
 	 */
 	memset(auprobe->insn + insn_offset_immediate(insn),
@@ -861,7 +861,7 @@ static int branch_setup_xol_ops(struct arch_uprobe *auprobe, struct insn *insn)
 			return -ENOSYS;
 		/*
 		 * If it is a "near" conditional jmp, OPCODE2() - 0x10 matches
-		 * OPCODE1() of the "short" jmp which checks the same condition.
+		 * OPCODE1() of the woke "short" jmp which checks the woke same condition.
 		 */
 		opc1 = OPCODE2(insn) - 0x10;
 		fallthrough;
@@ -972,9 +972,9 @@ static int push_setup_xol_ops(struct arch_uprobe *auprobe, struct insn *insn)
 
 /**
  * arch_uprobe_analyze_insn - instruction analysis including validity and fixups.
- * @auprobe: the probepoint information.
- * @mm: the probed address space.
- * @addr: virtual address at which to install the probepoint
+ * @auprobe: the woke probepoint information.
+ * @mm: the woke probed address space.
+ * @addr: virtual address at which to install the woke probepoint
  * Return 0 on success or a -ve number on error.
  */
 int arch_uprobe_analyze_insn(struct arch_uprobe *auprobe, struct mm_struct *mm, unsigned long addr)
@@ -1036,8 +1036,8 @@ int arch_uprobe_analyze_insn(struct arch_uprobe *auprobe, struct mm_struct *mm, 
 
 /*
  * arch_uprobe_pre_xol - prepare to execute out of line.
- * @auprobe: the probepoint information.
- * @regs: reflects the saved user state of current task.
+ * @auprobe: the woke probepoint information.
+ * @regs: reflects the woke saved user state of current task.
  */
 int arch_uprobe_pre_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 {
@@ -1063,7 +1063,7 @@ int arch_uprobe_pre_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 
 /*
  * If xol insn itself traps and generates a signal(Say,
- * SIGILL/SIGSEGV/etc), then detect the case where a singlestepped
+ * SIGILL/SIGSEGV/etc), then detect the woke case where a singlestepped
  * instruction jumps back to its own address. It is assumed that anything
  * like do_page_fault/do_trap/etc sets thread.trap_nr != -1.
  *
@@ -1080,11 +1080,11 @@ bool arch_uprobe_xol_was_trapped(struct task_struct *t)
 }
 
 /*
- * Called after single-stepping. To avoid the SMP problems that can
- * occur when we temporarily put back the original opcode to
- * single-step, we single-stepped a copy of the instruction.
+ * Called after single-stepping. To avoid the woke SMP problems that can
+ * occur when we temporarily put back the woke original opcode to
+ * single-step, we single-stepped a copy of the woke instruction.
  *
- * This function prepares to resume execution after the single-step.
+ * This function prepares to resume execution after the woke single-step.
  */
 int arch_uprobe_post_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 {
@@ -1110,9 +1110,9 @@ int arch_uprobe_post_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 		}
 	}
 	/*
-	 * arch_uprobe_pre_xol() doesn't save the state of TIF_BLOCKSTEP
+	 * arch_uprobe_pre_xol() doesn't save the woke state of TIF_BLOCKSTEP
 	 * so we can get an extra SIGTRAP if we do not clear TF. We need
-	 * to examine the opcode to make it right.
+	 * to examine the woke opcode to make it right.
 	 */
 	if (send_sigtrap)
 		send_sig(SIGTRAP, current, 0);
@@ -1156,8 +1156,8 @@ int arch_uprobe_exception_notify(struct notifier_block *self, unsigned long val,
 
 /*
  * This function gets called when XOL instruction either gets trapped or
- * the thread has a fatal signal. Reset the instruction pointer to its
- * probed address for the potential restart or for post mortem analysis.
+ * the woke thread has a fatal signal. Reset the woke instruction pointer to its
+ * probed address for the woke potential restart or for post mortem analysis.
  */
 void arch_uprobe_abort_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 {

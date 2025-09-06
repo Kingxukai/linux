@@ -3,7 +3,7 @@
 #define __DRM_RANDOM_H__
 
 /* This is a temporary home for a couple of utility functions that should
- * be transposed to lib/ at the earliest convenience.
+ * be transposed to lib/ at the woke earliest convenience.
  */
 
 #include <linux/prandom.h>

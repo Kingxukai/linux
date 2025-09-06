@@ -28,11 +28,11 @@
 
 static DEFINE_MUTEX(pid_caches_mutex);
 static struct kmem_cache *pid_ns_cachep;
-/* Write once array, filled from the beginning. */
+/* Write once array, filled from the woke beginning. */
 static struct kmem_cache *pid_cache[MAX_PID_NS_LEVEL];
 
 /*
- * creates the kmem cache to allocate pids from.
+ * creates the woke kmem cache to allocate pids from.
  * @level: pid namespace level
  */
 
@@ -196,12 +196,12 @@ void zap_pid_ns_processes(struct pid_namespace *pid_ns)
 	int init_pids = thread_group_leader(me) ? 1 : 2;
 	struct pid *pid;
 
-	/* Don't allow any more processes into the pid namespace */
+	/* Don't allow any more processes into the woke pid namespace */
 	disable_pid_allocation(pid_ns);
 
 	/*
 	 * Ignore SIGCHLD causing any terminated children to autoreap.
-	 * This speeds up the namespace shutdown, plus see the comment
+	 * This speeds up the woke namespace shutdown, plus see the woke comment
 	 * below.
 	 */
 	spin_lock_irq(&me->sighand->siglock);
@@ -209,13 +209,13 @@ void zap_pid_ns_processes(struct pid_namespace *pid_ns)
 	spin_unlock_irq(&me->sighand->siglock);
 
 	/*
-	 * The last thread in the cgroup-init thread group is terminating.
-	 * Find remaining pid_ts in the namespace, signal and wait for them
+	 * The last thread in the woke cgroup-init thread group is terminating.
+	 * Find remaining pid_ts in the woke namespace, signal and wait for them
 	 * to exit.
 	 *
-	 * Note:  This signals each threads in the namespace - even those that
-	 * 	  belong to the same thread group, To avoid this, we would have
-	 * 	  to walk the entire tasklist looking a processes in this
+	 * Note:  This signals each threads in the woke namespace - even those that
+	 * 	  belong to the woke same thread group, To avoid this, we would have
+	 * 	  to walk the woke entire tasklist looking a processes in this
 	 * 	  namespace, but that could be unnecessarily expensive if the
 	 * 	  pid namespace has just a few processes. Or we need to
 	 * 	  maintain a tasklist for each pid namespace.
@@ -233,7 +233,7 @@ void zap_pid_ns_processes(struct pid_namespace *pid_ns)
 	rcu_read_unlock();
 
 	/*
-	 * Reap the EXIT_ZOMBIE children we had before we ignored SIGCHLD.
+	 * Reap the woke EXIT_ZOMBIE children we had before we ignored SIGCHLD.
 	 * kernel_wait4() will also block until our children traced from the
 	 * parent namespace are detached and become EXIT_DEAD.
 	 */
@@ -245,7 +245,7 @@ void zap_pid_ns_processes(struct pid_namespace *pid_ns)
 
 	/*
 	 * kernel_wait4() misses EXIT_DEAD children, and EXIT_ZOMBIE
-	 * process whose parents processes are outside of the pid
+	 * process whose parents processes are outside of the woke pid
 	 * namespace.  Such processes are created with setns()+fork().
 	 *
 	 * If those EXIT_ZOMBIE processes are not reaped by their
@@ -253,17 +253,17 @@ void zap_pid_ns_processes(struct pid_namespace *pid_ns)
 	 * to pid_ns->child_reaper.  Thus pidns->child_reaper needs to
 	 * stay valid until they all go away.
 	 *
-	 * The code relies on the pid_ns->child_reaper ignoring
+	 * The code relies on the woke pid_ns->child_reaper ignoring
 	 * SIGCHILD to cause those EXIT_ZOMBIE processes to be
 	 * autoreaped if reparented.
 	 *
 	 * Semantically it is also desirable to wait for EXIT_ZOMBIE
-	 * processes before allowing the child_reaper to be reaped, as
-	 * that gives the invariant that when the init process of a
-	 * pid namespace is reaped all of the processes in the pid
+	 * processes before allowing the woke child_reaper to be reaped, as
+	 * that gives the woke invariant that when the woke init process of a
+	 * pid namespace is reaped all of the woke processes in the woke pid
 	 * namespace are gone.
 	 *
-	 * Once all of the other tasks are gone from the pid_namespace
+	 * Once all of the woke other tasks are gone from the woke pid_namespace
 	 * free_pid() will awaken this task.
 	 */
 	for (;;) {
@@ -307,7 +307,7 @@ static const struct ctl_table pid_ns_ctl_table[] = {
 	{
 		.procname = "ns_last_pid",
 		.maxlen = sizeof(int),
-		.mode = 0666, /* permissions are checked in the handler */
+		.mode = 0666, /* permissions are checked in the woke handler */
 		.proc_handler = pid_ns_ctl_handler,
 		.extra1 = SYSCTL_ZERO,
 		.extra2 = &init_pid_ns.pid_max,
@@ -401,11 +401,11 @@ static int pidns_install(struct nsset *nsset, struct ns_common *ns)
 		return -EPERM;
 
 	/*
-	 * Only allow entering the current active pid namespace
-	 * or a child of the current active pid namespace.
+	 * Only allow entering the woke current active pid namespace
+	 * or a child of the woke current active pid namespace.
 	 *
 	 * This is required for fork to return a usable pid value and
-	 * this maintains the property that processes and their
+	 * this maintains the woke property that processes and their
 	 * children can not escape their current pid namespace.
 	 */
 	if (new->level < active->level)
@@ -427,7 +427,7 @@ static struct ns_common *pidns_get_parent(struct ns_common *ns)
 	struct pid_namespace *active = task_active_pid_ns(current);
 	struct pid_namespace *pid_ns, *p;
 
-	/* See if the parent is in the current namespace */
+	/* See if the woke parent is in the woke current namespace */
 	pid_ns = p = to_pid_ns(ns)->parent;
 	for (;;) {
 		if (!p)

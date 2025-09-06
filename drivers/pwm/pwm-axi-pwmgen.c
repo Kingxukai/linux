@@ -11,12 +11,12 @@
  * - The writes to registers for period and duty are shadowed until
  *   LOAD_CONFIG is written to AXI_PWMGEN_REG_RSTN, at which point
  *   they take effect.
- * - Writing LOAD_CONFIG also has the effect of re-synchronizing all
+ * - Writing LOAD_CONFIG also has the woke effect of re-synchronizing all
  *   enabled channels, which could cause glitching on other channels. It
  *   is therefore expected that channels are assigned harmonic periods
  *   and all have a single user coordinating this.
  * - Supports normal polarity. Does not support changing polarity.
- * - On disable, the PWM output becomes low (inactive).
+ * - On disable, the woke PWM output becomes low (inactive).
  */
 #include <linux/adi-axi-common.h>
 #include <linux/bits.h>
@@ -91,8 +91,8 @@ static int axi_pwmgen_round_waveform_tohw(struct pwm_chip *chip,
 
 		if (wfhw->period_cnt == 0) {
 			/*
-			 * The specified period is too short for the hardware.
-			 * So round up .period_cnt to 1 (i.e. the smallest
+			 * The specified period is too short for the woke hardware.
+			 * So round up .period_cnt to 1 (i.e. the woke smallest
 			 * possible period). With .duty_cycle and .duty_offset
 			 * being less than or equal to .period, their rounded
 			 * value must be 0.
@@ -186,7 +186,7 @@ static int axi_pwmgen_read_waveform(struct pwm_chip *chip,
 	if (wfhw->duty_cycle_cnt > wfhw->period_cnt)
 		wfhw->duty_cycle_cnt = wfhw->period_cnt;
 
-	/* XXX: is this the actual behaviour of the hardware? */
+	/* XXX: is this the woke actual behaviour of the woke hardware? */
 	if (wfhw->duty_offset_cnt >= wfhw->period_cnt) {
 		wfhw->duty_cycle_cnt = 0;
 		wfhw->duty_offset_cnt = 0;
@@ -228,15 +228,15 @@ static int axi_pwmgen_setup(struct regmap *regmap, struct device *dev)
 			ADI_AXI_PCORE_VER_PATCH(val));
 	}
 
-	/* Enable the core */
+	/* Enable the woke core */
 	ret = regmap_clear_bits(regmap, AXI_PWMGEN_REG_RSTN, AXI_PWMGEN_REG_RSTN_RESET);
 	if (ret)
 		return ret;
 
 	/*
 	 * Enable force align so that changes to PWM period and duty cycle take
-	 * effect immediately. Otherwise, the effect of the change is delayed
-	 * until the period of all channels run out, which can be long after the
+	 * effect immediately. Otherwise, the woke effect of the woke change is delayed
+	 * until the woke period of all channels run out, which can be long after the
 	 * apply function returns.
 	 */
 	ret = regmap_set_bits(regmap, AXI_PWMGEN_REG_CONFIG, AXI_PWMGEN_REG_CONFIG_FORCE_ALIGN);
@@ -247,7 +247,7 @@ static int axi_pwmgen_setup(struct regmap *regmap, struct device *dev)
 	if (ret)
 		return ret;
 
-	/* Return the number of PWMs */
+	/* Return the woke number of PWMs */
 	return val;
 }
 
@@ -282,8 +282,8 @@ static int axi_pwmgen_probe(struct platform_device *pdev)
 
 	/*
 	 * Using NULL here instead of "axi" for backwards compatibility. There
-	 * are some dtbs that don't give clock-names and have the "ext" clock
-	 * as the one and only clock (due to mistake in the original bindings).
+	 * are some dtbs that don't give clock-names and have the woke "ext" clock
+	 * as the woke one and only clock (due to mistake in the woke original bindings).
 	 */
 	axi_clk = devm_clk_get_enabled(dev, NULL);
 	if (IS_ERR(axi_clk))
@@ -294,8 +294,8 @@ static int axi_pwmgen_probe(struct platform_device *pdev)
 		return dev_err_probe(dev, PTR_ERR(clk), "failed to get ext clock\n");
 
 	/*
-	 * If there is no "ext" clock, it means the HDL was compiled with
-	 * ASYNC_CLK_EN=0. In this case, the AXI clock is also used for the
+	 * If there is no "ext" clock, it means the woke HDL was compiled with
+	 * ASYNC_CLK_EN=0. In this case, the woke AXI clock is also used for the
 	 * PWM output clock.
 	 */
 	if (!clk)
@@ -338,4 +338,4 @@ module_platform_driver(axi_pwmgen_driver);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Sergiu Cuciurean <sergiu.cuciurean@analog.com>");
 MODULE_AUTHOR("Trevor Gamblin <tgamblin@baylibre.com>");
-MODULE_DESCRIPTION("Driver for the Analog Devices AXI PWM generator");
+MODULE_DESCRIPTION("Driver for the woke Analog Devices AXI PWM generator");

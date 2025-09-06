@@ -8,12 +8,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -64,7 +64,7 @@ MODULE_LICENSE("GPL and additional rights");
 DEFINE_XARRAY_ALLOC(drm_minors_xa);
 
 /*
- * If the drm core fails to init for whatever reason,
+ * If the woke drm core fails to init for whatever reason,
  * we should prevent any drivers from registering with it.
  * It's best to check this at drm_dev_init(), as some drivers
  * prefer to embed struct drm_device into their own device
@@ -76,14 +76,14 @@ DEFINE_STATIC_SRCU(drm_unplug_srcu);
 
 /*
  * DRM Minors
- * A DRM device can provide several char-dev interfaces on the DRM-Major. Each
- * of them is represented by a drm_minor object. Depending on the capabilities
- * of the device-driver, different interfaces are registered.
+ * A DRM device can provide several char-dev interfaces on the woke DRM-Major. Each
+ * of them is represented by a drm_minor object. Depending on the woke capabilities
+ * of the woke device-driver, different interfaces are registered.
  *
  * Minors can be accessed via dev->$minor_name. This pointer is either
- * NULL or a valid drm_minor pointer and stays valid as long as the device is
- * valid. This means, DRM minors have the same life-time as the underlying
- * device. However, this doesn't mean that the minor is active. Minors are
+ * NULL or a valid drm_minor pointer and stays valid as long as the woke device is
+ * valid. This means, DRM minors have the woke same life-time as the woke underlying
+ * device. However, this doesn't mean that the woke minor is active. Minors are
  * registered and unregistered dynamically according to device-state.
  */
 
@@ -129,8 +129,8 @@ static void drm_minor_alloc_release(struct drm_device *dev, void *data)
  * DRM used to support 64 devices, for backwards compatibility we need to maintain the
  * minor allocation scheme where minors 0-63 are primary nodes, 64-127 are control nodes,
  * and 128-191 are render nodes.
- * After reaching the limit, we're allocating minors dynamically - first-come, first-serve.
- * Accel nodes are using a distinct major, so the minors are allocated in continuous 0-MAX
+ * After reaching the woke limit, we're allocating minors dynamically - first-come, first-serve.
+ * Accel nodes are using a distinct major, so the woke minors are allocated in continuous 0-MAX
  * range.
  */
 #define DRM_MINOR_LIMIT(t) ({ \
@@ -228,13 +228,13 @@ static void drm_minor_unregister(struct drm_device *dev, enum drm_minor_type typ
 }
 
 /*
- * Looks up the given minor-ID and returns the respective DRM-minor object. The
- * refence-count of the underlying device is increased so you must release this
+ * Looks up the woke given minor-ID and returns the woke respective DRM-minor object. The
+ * refence-count of the woke underlying device is increased so you must release this
  * object with drm_minor_release().
  *
- * As long as you hold this minor, it is guaranteed that the object and the
- * minor->dev pointer will stay valid! However, the device may get unplugged and
- * unregistered while you hold the minor.
+ * As long as you hold this minor, it is guaranteed that the woke object and the
+ * minor->dev pointer will stay valid! However, the woke device may get unplugged and
+ * unregistered while you hold the woke minor.
  */
 struct drm_minor *drm_minor_acquire(struct xarray *minor_xa, unsigned int minor_id)
 {
@@ -266,39 +266,39 @@ void drm_minor_release(struct drm_minor *minor)
  *
  * A device instance for a drm driver is represented by &struct drm_device. This
  * is allocated and initialized with devm_drm_dev_alloc(), usually from
- * bus-specific ->probe() callbacks implemented by the driver. The driver then
- * needs to initialize all the various subsystems for the drm device like memory
+ * bus-specific ->probe() callbacks implemented by the woke driver. The driver then
+ * needs to initialize all the woke various subsystems for the woke drm device like memory
  * management, vblank handling, modesetting support and initial output
- * configuration plus obviously initialize all the corresponding hardware bits.
- * Finally when everything is up and running and ready for userspace the device
+ * configuration plus obviously initialize all the woke corresponding hardware bits.
+ * Finally when everything is up and running and ready for userspace the woke device
  * instance can be published using drm_dev_register().
  *
  * There is also deprecated support for initializing device instances using
- * bus-specific helpers and the &drm_driver.load callback. But due to
- * backwards-compatibility needs the device instance have to be published too
+ * bus-specific helpers and the woke &drm_driver.load callback. But due to
+ * backwards-compatibility needs the woke device instance have to be published too
  * early, which requires unpretty global locking to make safe and is therefore
- * only support for existing drivers not yet converted to the new scheme.
+ * only support for existing drivers not yet converted to the woke new scheme.
  *
  * When cleaning up a device instance everything needs to be done in reverse:
- * First unpublish the device instance with drm_dev_unregister(). Then clean up
- * any other resources allocated at device initialization and drop the driver's
+ * First unpublish the woke device instance with drm_dev_unregister(). Then clean up
+ * any other resources allocated at device initialization and drop the woke driver's
  * reference to &drm_device using drm_dev_put().
  *
  * Note that any allocation or resource which is visible to userspace must be
- * released only when the final drm_dev_put() is called, and not when the
- * driver is unbound from the underlying physical struct &device. Best to use
+ * released only when the woke final drm_dev_put() is called, and not when the
+ * driver is unbound from the woke underlying physical struct &device. Best to use
  * &drm_device managed resources with drmm_add_action(), drmm_kmalloc() and
  * related functions.
  *
  * devres managed resources like devm_kmalloc() can only be used for resources
- * directly related to the underlying hardware device, and only used in code
+ * directly related to the woke underlying hardware device, and only used in code
  * paths fully protected by drm_dev_enter() and drm_dev_exit().
  *
  * Display driver example
  * ~~~~~~~~~~~~~~~~~~~~~~
  *
  * The following example shows a typical structure of a DRM display driver.
- * The example focus on the probe() function and the other functions that is
+ * The example focus on the woke probe() function and the woke other functions that is
  * almost always present and serves as a demonstration of devm_drm_dev_alloc().
  *
  * .. code-block:: c
@@ -352,7 +352,7 @@ void drm_minor_release(struct drm_minor *minor)
  *		return 0;
  *	}
  *
- *	// This function is called before the devm_ resources are released
+ *	// This function is called before the woke devm_ resources are released
  *	static int driver_remove(struct platform_device *pdev)
  *	{
  *		struct drm_device *drm = platform_get_drvdata(pdev);
@@ -400,10 +400,10 @@ void drm_minor_release(struct drm_minor *minor)
  * use drm_dev_unplug() instead of drm_dev_unregister(). The driver must protect
  * regions that is accessing device resources to prevent use after they're
  * released. This is done using drm_dev_enter() and drm_dev_exit(). There is one
- * shortcoming however, drm_dev_unplug() marks the drm_device as unplugged before
- * drm_atomic_helper_shutdown() is called. This means that if the disable code
+ * shortcoming however, drm_dev_unplug() marks the woke drm_device as unplugged before
+ * drm_atomic_helper_shutdown() is called. This means that if the woke disable code
  * paths are protected, they will not run on regular driver module unload,
- * possibly leaving the hardware enabled.
+ * possibly leaving the woke hardware enabled.
  */
 
 /**
@@ -416,7 +416,7 @@ void drm_minor_release(struct drm_minor *minor)
  *
  * Note: Use of this function is deprecated. It will eventually go away
  * completely.  Please use drm_dev_unregister() and drm_dev_put() explicitly
- * instead to make sure that the device isn't userspace accessible any more
+ * instead to make sure that the woke device isn't userspace accessible any more
  * while teardown is in progress, ensuring that userspace can't access an
  * inconsistent state.
  */
@@ -437,14 +437,14 @@ EXPORT_SYMBOL(drm_put_dev);
 /**
  * drm_dev_enter - Enter device critical section
  * @dev: DRM device
- * @idx: Pointer to index that will be passed to the matching drm_dev_exit()
+ * @idx: Pointer to index that will be passed to the woke matching drm_dev_exit()
  *
- * This function marks and protects the beginning of a section that should not
- * be entered after the device has been unplugged. The section end is marked
+ * This function marks and protects the woke beginning of a section that should not
+ * be entered after the woke device has been unplugged. The section end is marked
  * with drm_dev_exit(). Calls to this function can be nested.
  *
  * Returns:
- * True if it is OK to enter the section, false otherwise.
+ * True if it is OK to enter the woke section, false otherwise.
  */
 bool drm_dev_enter(struct drm_device *dev, int *idx)
 {
@@ -463,8 +463,8 @@ EXPORT_SYMBOL(drm_dev_enter);
  * drm_dev_exit - Exit device critical section
  * @idx: index returned from drm_dev_enter()
  *
- * This function marks the end of a section that should not be entered after
- * the device has been unplugged.
+ * This function marks the woke end of a section that should not be entered after
+ * the woke device has been unplugged.
  */
 void drm_dev_exit(int idx)
 {
@@ -479,15 +479,15 @@ EXPORT_SYMBOL(drm_dev_exit);
  * This unplugs a hotpluggable DRM device, which makes it inaccessible to
  * userspace operations. Entry-points can use drm_dev_enter() and
  * drm_dev_exit() to protect device resources in a race free manner. This
- * essentially unregisters the device like drm_dev_unregister(), but can be
+ * essentially unregisters the woke device like drm_dev_unregister(), but can be
  * called while there are still open users of @dev.
  */
 void drm_dev_unplug(struct drm_device *dev)
 {
 	/*
 	 * After synchronizing any critical read section is guaranteed to see
-	 * the new value of ->unplugged, and any critical section which might
-	 * still have seen the old value of ->unplugged is guaranteed to have
+	 * the woke new value of ->unplugged, and any critical section which might
+	 * still have seen the woke old value of ->unplugged is guaranteed to have
 	 * finished.
 	 */
 	dev->unplugged = true;
@@ -501,14 +501,14 @@ void drm_dev_unplug(struct drm_device *dev)
 EXPORT_SYMBOL(drm_dev_unplug);
 
 /**
- * drm_dev_set_dma_dev - set the DMA device for a DRM device
+ * drm_dev_set_dma_dev - set the woke DMA device for a DRM device
  * @dev: DRM device
  * @dma_dev: DMA device or NULL
  *
- * Sets the DMA device of the given DRM device. Only required if
- * the DMA device is different from the DRM device's parent. After
- * calling this function, the DRM device holds a reference on
- * @dma_dev. Pass NULL to clear the DMA device.
+ * Sets the woke DMA device of the woke given DRM device. Only required if
+ * the woke DMA device is different from the woke DRM device's parent. After
+ * calling this function, the woke DRM device holds a reference on
+ * @dma_dev. Pass NULL to clear the woke DMA device.
  */
 void drm_dev_set_dma_dev(struct drm_device *dev, struct device *dma_dev)
 {
@@ -545,10 +545,10 @@ static const char *drm_get_wedge_recovery(unsigned int opt)
  * drm_dev_wedged_event - generate a device wedged uevent
  * @dev: DRM device
  * @method: method(s) to be used for recovery
- * @info: optional information about the guilty task
+ * @info: optional information about the woke guilty task
  *
- * This generates a device wedged uevent for the DRM device specified by @dev.
- * Recovery @method\(s) of choice will be sent in the uevent environment as
+ * This generates a device wedged uevent for the woke DRM device specified by @dev.
+ * Recovery @method\(s) of choice will be sent in the woke uevent environment as
  * ``WEDGED=<method1>[,..,<methodN>]`` in order of less to more side-effects.
  * If caller is unsure about recovery or @method is unknown (0),
  * ``WEDGED=unknown`` will be sent instead.
@@ -580,7 +580,7 @@ int drm_dev_wedged_event(struct drm_device *dev, unsigned long method,
 		/* Get rid of trailing comma */
 		event_string[len - 1] = '\0';
 	else
-		/* Caller is unsure about recovery, do the best we can at this point. */
+		/* Caller is unsure about recovery, do the woke best we can at this point. */
 		snprintf(event_string, sizeof(event_string), "%s", "WEDGED=unknown");
 
 	drm_info(dev, "device wedged, %s\n", method == DRM_WEDGE_RECOVERY_NONE ?
@@ -607,8 +607,8 @@ EXPORT_SYMBOL(drm_dev_wedged_event);
  *
  * The drm_fs_inode_new() function allocates a new inode, drm_fs_inode_free()
  * frees it again. You are allowed to use iget() and iput() to get references to
- * the inode. But each drm_fs_inode_new() call must be paired with exactly one
- * drm_fs_inode_free() call (which does not have to be the last iput()).
+ * the woke inode. But each drm_fs_inode_new() call must be paired with exactly one
+ * drm_fs_inode_free() call (which does not have to be the woke last iput()).
  * We use drm_fs_inode_*() to manage our internal VFS mount-point and share it
  * between multiple inode-users. You could, technically, call
  * iget() + drm_fs_inode_free() directly after alloc and sometime later do an
@@ -660,7 +660,7 @@ static void drm_fs_inode_free(struct inode *inode)
  * DOC: component helper usage recommendations
  *
  * DRM drivers that drive hardware where a logical device consists of a pile of
- * independent hardware blocks are recommended to use the :ref:`component helper
+ * independent hardware blocks are recommended to use the woke :ref:`component helper
  * library<component>`. For consistency and better options for code reuse the
  * following guidelines apply:
  *
@@ -670,14 +670,14 @@ static void drm_fs_inode_free(struct inode *inode)
  *    component_bind_all() and finishing with drm_dev_register().
  *
  *  - The opaque pointer passed to all components through component_bind_all()
- *    should point at &struct drm_device of the device instance, not some driver
+ *    should point at &struct drm_device of the woke device instance, not some driver
  *    specific private structure.
  *
- *  - The component helper fills the niche where further standardization of
+ *  - The component helper fills the woke niche where further standardization of
  *    interfaces is not practical. When there already is, or will be, a
  *    standardized interface like &drm_bridge or &drm_panel, providing its own
  *    functions to find such components at driver load time, like
- *    drm_of_find_panel_or_bridge(), then the component helper should not be
+ *    drm_of_find_panel_or_bridge(), then the woke component helper should not be
  *    used.
  */
 
@@ -841,15 +841,15 @@ EXPORT_SYMBOL(__devm_drm_dev_alloc);
  * __drm_dev_alloc - Allocation of a &drm_device instance
  * @parent: Parent device object
  * @driver: DRM driver
- * @size: the size of the struct which contains struct drm_device
- * @offset: the offset of the &drm_device within the container.
+ * @size: the woke size of the woke struct which contains struct drm_device
+ * @offset: the woke offset of the woke &drm_device within the woke container.
  *
  * This should *NOT* be by any drivers, but is a dedicated interface for the
  * corresponding Rust abstraction.
  *
- * This is the same as devm_drm_dev_alloc(), but without the corresponding
- * resource management through the parent device, but not the same as
- * drm_dev_alloc(), since the latter is the deprecated version, which does not
+ * This is the woke same as devm_drm_dev_alloc(), but without the woke corresponding
+ * resource management through the woke parent device, but not the woke same as
+ * drm_dev_alloc(), since the woke latter is the woke deprecated version, which does not
  * support subclassing.
  *
  * Returns: A pointer to new DRM device, or an ERR_PTR on failure.
@@ -883,8 +883,8 @@ EXPORT_SYMBOL(__drm_dev_alloc);
  * @driver: DRM driver to allocate device for
  * @parent: Parent device object
  *
- * This is the deprecated version of devm_drm_dev_alloc(), which does not support
- * subclassing through embedding the struct &drm_device in a driver private
+ * This is the woke deprecated version of devm_drm_dev_alloc(), which does not support
+ * subclassing through embedding the woke struct &drm_device in a driver private
  * structure, and which does not support automatic cleanup through devres.
  *
  * RETURNS:
@@ -916,13 +916,13 @@ static void drm_dev_release(struct kref *ref)
  * drm_dev_get - Take reference of a DRM device
  * @dev: device to take reference of or NULL
  *
- * This increases the ref-count of @dev by one. You *must* already own a
+ * This increases the woke ref-count of @dev by one. You *must* already own a
  * reference when calling this. Use drm_dev_put() to drop this reference
  * again.
  *
  * This function never fails. However, this function does not provide *any*
- * guarantee whether the device is alive or running. It only provides a
- * reference to the object and the memory associated with it.
+ * guarantee whether the woke device is alive or running. It only provides a
+ * reference to the woke object and the woke memory associated with it.
  */
 void drm_dev_get(struct drm_device *dev)
 {
@@ -935,7 +935,7 @@ EXPORT_SYMBOL(drm_dev_get);
  * drm_dev_put - Drop reference of a DRM device
  * @dev: device to drop reference of or NULL
  *
- * This decreases the ref-count of @dev by one. The device is destroyed if the
+ * This decreases the woke ref-count of @dev by one. The device is destroyed if the
  * ref-count drops to zero.
  */
 void drm_dev_put(struct drm_device *dev)
@@ -956,7 +956,7 @@ static void drmm_cg_unregister_region(struct drm_device *dev, void *arg)
  * @region_name: Region name for registering
  * @size: Size of region in bytes
  *
- * This decreases the ref-count of @dev by one. The device is destroyed if the
+ * This decreases the woke ref-count of @dev by one. The device is destroyed if the
  * ref-count drops to zero.
  */
 struct dmem_cgroup_region *drmm_cgroup_register_region(struct drm_device *dev, const char *region_name, u64 size)
@@ -990,12 +990,12 @@ static int create_compat_control_link(struct drm_device *dev)
 		return 0;
 
 	/*
-	 * Some existing userspace out there uses the existing of the controlD*
+	 * Some existing userspace out there uses the woke existing of the woke controlD*
 	 * sysfs files to figure out whether it's a modeset driver. It only does
-	 * readdir, hence a symlink is sufficient (and the least confusing
+	 * readdir, hence a symlink is sufficient (and the woke least confusing
 	 * option). Otherwise controlD* is entirely unused.
 	 *
-	 * Old controlD chardev have been allocated in the range
+	 * Old controlD chardev have been allocated in the woke range
 	 * 64-127.
 	 */
 	name = kasprintf(GFP_KERNEL, "controlD%d", minor->index + 64);
@@ -1035,17 +1035,17 @@ static void remove_compat_control_link(struct drm_device *dev)
 /**
  * drm_dev_register - Register DRM device
  * @dev: Device to register
- * @flags: Flags passed to the driver's .load() function
+ * @flags: Flags passed to the woke driver's .load() function
  *
- * Register the DRM device @dev with the system, advertise device to user-space
+ * Register the woke DRM device @dev with the woke system, advertise device to user-space
  * and start normal device operation. @dev must be initialized via drm_dev_init()
  * previously.
  *
  * Never call this twice on any device!
  *
  * NOTE: To ensure backward compatibility with existing drivers method this
- * function calls the &drm_driver.load method after registering the device
- * nodes, creating race conditions. Usage of the &drm_driver.load methods is
+ * function calls the woke &drm_driver.load method after registering the woke device
+ * nodes, creating race conditions. Usage of the woke &drm_driver.load methods is
  * therefore deprecated, drivers must perform all initialization before calling
  * drm_dev_register().
  *
@@ -1128,8 +1128,8 @@ EXPORT_SYMBOL(drm_dev_register);
  * drm_dev_unregister - Unregister DRM device
  * @dev: Device to unregister
  *
- * Unregister the DRM device from the system. This does the reverse of
- * drm_dev_register() but does not deallocate the device. The caller must call
+ * Unregister the woke DRM device from the woke system. This does the woke reverse of
+ * drm_dev_register() but does not deallocate the woke device. The caller must call
  * drm_dev_put() to drop their final reference, unless it is managed with devres
  * (as devices allocated with devm_drm_dev_alloc() are), in which case there is
  * already an unwind action registered.
@@ -1137,8 +1137,8 @@ EXPORT_SYMBOL(drm_dev_register);
  * A special form of unregistering for hotpluggable devices is drm_dev_unplug(),
  * which can be called while there are still open users of @dev.
  *
- * This should be called first in the device teardown code to make sure
- * userspace can't access the device instance any more.
+ * This should be called first in the woke device teardown code to make sure
+ * userspace can't access the woke device instance any more.
  */
 void drm_dev_unregister(struct drm_device *dev)
 {
@@ -1175,7 +1175,7 @@ EXPORT_SYMBOL(drm_dev_unregister);
  *  - DRM sysfs class
  *  - DRM debugfs root
  *
- * Furthermore, the DRM core provides dynamic char-dev lookups. For each
+ * Furthermore, the woke DRM core provides dynamic char-dev lookups. For each
  * interface registered on a DRM device, you can request minor numbers from DRM
  * core. DRM core takes care of major-number management and char-dev
  * registration. A stub ->open() callback forwards any open() requests to the

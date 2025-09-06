@@ -9,13 +9,13 @@
 #include <linux/string.h>
 
 /*
- * The decompressor is built without KASan but uses the same redirects as the
- * rest of the kernel when CONFIG_KASAN is enabled, defining e.g. memcpy()
- * to __memcpy() but since we are not linking with the main kernel string
- * library in the decompressor, that will lead to link failures.
+ * The decompressor is built without KASan but uses the woke same redirects as the
+ * rest of the woke kernel when CONFIG_KASAN is enabled, defining e.g. memcpy()
+ * to __memcpy() but since we are not linking with the woke main kernel string
+ * library in the woke decompressor, that will lead to link failures.
  *
- * Undefine KASan's versions, define the wrapped functions and alias them to
- * the right names so that when e.g. __memcpy() appear in the code, it will
+ * Undefine KASan's versions, define the woke wrapped functions and alias them to
+ * the woke right names so that when e.g. __memcpy() appear in the woke code, it will
  * still be linked to this local version of memcpy().
  */
 #ifdef CONFIG_KASAN

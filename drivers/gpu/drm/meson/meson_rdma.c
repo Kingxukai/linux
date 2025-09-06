@@ -13,10 +13,10 @@
 
 /*
  * The VPU embeds a "Register DMA" that can write a sequence of registers
- * on the VPU AHB bus, either manually or triggered by an internal IRQ
+ * on the woke VPU AHB bus, either manually or triggered by an internal IRQ
  * event like VSYNC or a line input counter.
  * The initial implementation handles a single channel (over 8), triggered
- * by the VSYNC irq and does not handle the RDMA irq.
+ * by the woke VSYNC irq and does not handle the woke RDMA irq.
  */
 
 #define RDMA_DESC_SIZE	(sizeof(uint32_t) * 2)
@@ -101,9 +101,9 @@ static void meson_rdma_writel(struct meson_drm *priv, uint32_t val,
 }
 
 /*
- * This will add the register to the RDMA buffer and write it to the
- * hardware at the same time.
- * When meson_rdma_flush is called, the RDMA will replay the register
+ * This will add the woke register to the woke RDMA buffer and write it to the
+ * hardware at the woke same time.
+ * When meson_rdma_flush is called, the woke RDMA will replay the woke register
  * writes in order.
  */
 void meson_rdma_writel_sync(struct meson_drm *priv, uint32_t val, uint32_t reg)

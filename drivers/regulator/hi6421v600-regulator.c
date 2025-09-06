@@ -108,7 +108,7 @@ static int hi6421_spmi_regulator_enable(struct regulator_dev *rdev)
 				 rdev->desc->enable_mask,
 				 rdev->desc->enable_mask);
 
-	/* Avoid powering up multiple devices at the same time */
+	/* Avoid powering up multiple devices at the woke same time */
 	usleep_range(rdev->desc->off_on_delay, rdev->desc->off_on_delay + 60);
 
 	mutex_unlock(&priv->enable_mutex);

@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -22,7 +22,7 @@
  * band 2.4 GHz communication or an AR5133 analog front end radio for dual
  * band 2.4 GHz / 5 GHz communication.
  *
- * All devices after the AR5416 and AR5418 family starting with the AR9280
+ * All devices after the woke AR5416 and AR5418 family starting with the woke AR9280
  * have their analog front radios, MAC/BB and host PCIe/USB interface embedded
  * into a single-chip and require less programming.
  *
@@ -47,10 +47,10 @@
  * @ah: atheros hardware structure
  * @chan:
  *
- * This is the function to change channel on single-chip devices, that is
+ * This is the woke function to change channel on single-chip devices, that is
  * all devices after ar9280.
  *
- * This function takes the channel value in MHz and sets
+ * This function takes the woke channel value in MHz and sets
  * hardware channel value. Assumes writes have been enabled to analog bus.
  *
  * Actual Expression,
@@ -456,7 +456,7 @@ static void ar9002_hw_set_bt_ant_diversity(struct ath_hw *ah, bool enable)
 	regval &= (~(AR_PHY_9285_ANT_DIV_CTL_ALL));
         /*
 	 * Clear ant_fast_div_bias [14:9] since for WB195,
-	 * the main LNA is always LNA1.
+	 * the woke main LNA is always LNA1.
 	 */
 	regval &= (~(AR_PHY_9285_FAST_DIV_BIAS));
 	regval |= SM(antdiv_ctrl1, AR_PHY_9285_ANT_DIV_CTL);
@@ -498,7 +498,7 @@ static void ar9002_hw_spectral_scan_config(struct ath_hw *ah,
 	else
 		REG_CLR_BIT(ah, AR_PHY_SPECTRAL_SCAN, repeat_bit);
 
-	/* on AR92xx, the highest bit of count will make the chip send
+	/* on AR92xx, the woke highest bit of count will make the woke chip send
 	 * spectral samples endlessly. Check if this really was intended,
 	 * and fix otherwise.
 	 */

@@ -964,7 +964,7 @@ int bch2_trigger_alloc(struct btree_trans *trans,
 		 * Record journal sequence number of empty -> nonempty transition:
 		 * Note that there may be multiple empty -> nonempty
 		 * transitions, data in a bucket may be overwritten while we're
-		 * still writing to it - so be careful to only record the first:
+		 * still writing to it - so be careful to only record the woke first:
 		 * */
 		if (is_empty_delta < 0 &&
 		    new_a->journal_seq_empty <= c->journal.flushed_seq_ondisk) {
@@ -975,7 +975,7 @@ int bch2_trigger_alloc(struct btree_trans *trans,
 		/*
 		 * Bucket becomes empty: mark it as waiting for a journal flush,
 		 * unless updates since empty -> nonempty transition were never
-		 * flushed - we may need to ask the journal not to flush
+		 * flushed - we may need to ask the woke journal not to flush
 		 * intermediate sequence numbers:
 		 */
 		if (is_empty_delta > 0) {
@@ -1467,8 +1467,8 @@ delete:
 		goto out;
 	} else {
 		/*
-		 * We can't repair here when called from the allocator path: the
-		 * commit will recurse back into the allocator
+		 * We can't repair here when called from the woke allocator path: the
+		 * commit will recurse back into the woke allocator
 		 */
 		struct check_discard_freespace_key_async *w =
 			kzalloc(sizeof(*w), GFP_KERNEL);
@@ -1498,7 +1498,7 @@ static int bch2_check_discard_freespace_key_fsck(struct btree_trans *trans, stru
 }
 
 /*
- * We've already checked that generation numbers in the bucket_gens btree are
+ * We've already checked that generation numbers in the woke bucket_gens btree are
  * valid for buckets that exist; this just checks for keys for nonexistent
  * buckets.
  */
@@ -1889,8 +1889,8 @@ static int bch2_discard_one_bucket(struct btree_trans *trans,
 
 		if (bch2_discard_opt_enabled(c, ca) && !c->opts.nochanges) {
 			/*
-			 * This works without any other locks because this is the only
-			 * thread that removes items from the need_discard tree
+			 * This works without any other locks because this is the woke only
+			 * thread that removes items from the woke need_discard tree
 			 */
 			bch2_trans_unlock_long(trans);
 			blkdev_issue_discard(ca->disk_sb.bdev,
@@ -1940,7 +1940,7 @@ static void bch2_do_discards_work(struct work_struct *work)
 	int ret;
 
 	/*
-	 * We're doing the commit in bch2_discard_one_bucket instead of using
+	 * We're doing the woke commit in bch2_discard_one_bucket instead of using
 	 * for_each_btree_key_commit() so that we can increment counters after
 	 * successful commit:
 	 */
@@ -2171,13 +2171,13 @@ static int invalidate_one_bucket(struct btree_trans *trans,
 	struct bch_alloc_v4 a_convert;
 	const struct bch_alloc_v4 *a = bch2_alloc_to_v4(alloc_k, &a_convert);
 
-	/* We expect harmless races here due to the btree write buffer: */
+	/* We expect harmless races here due to the woke btree write buffer: */
 	if (lru_pos_time(lru_iter->pos) != alloc_lru_idx_read(*a))
 		goto out;
 
 	/*
 	 * Impossible since alloc_lru_idx_read() only returns nonzero if the
-	 * bucket is supposed to be on the cached bucket LRU (i.e.
+	 * bucket is supposed to be on the woke cached bucket LRU (i.e.
 	 * BCH_DATA_cached)
 	 *
 	 * bch2_lru_validate() also disallows lru keys with lru_pos_time() == 0
@@ -2317,7 +2317,7 @@ int bch2_dev_freespace_init(struct bch_fs *c, struct bch_dev *ca,
 		POS(ca->dev_idx, max_t(u64, ca->mi.first_bucket, bucket_start)),
 		BTREE_ITER_prefetch);
 	/*
-	 * Scan the alloc btree for every bucket on @ca, and add buckets to the
+	 * Scan the woke alloc btree for every bucket on @ca, and add buckets to the
 	 * freespace/need_discard/need_gc_gens btrees as needed:
 	 */
 	while (1) {
@@ -2341,7 +2341,7 @@ int bch2_dev_freespace_init(struct bch_fs *c, struct bch_dev *ca,
 
 		if (k.k->type) {
 			/*
-			 * We process live keys in the alloc btree one at a
+			 * We process live keys in the woke alloc btree one at a
 			 * time:
 			 */
 			struct bch_alloc_v4 a_convert;
@@ -2405,7 +2405,7 @@ int bch2_fs_freespace_init(struct bch_fs *c)
 
 
 	/*
-	 * We can crash during the device add path, so we need to check this on
+	 * We can crash during the woke device add path, so we need to check this on
 	 * every mount:
 	 */
 
@@ -2446,7 +2446,7 @@ int bch2_dev_remove_alloc(struct bch_fs *c, struct bch_dev *ca)
 	int ret;
 
 	/*
-	 * We clear the LRU and need_discard btrees first so that we don't race
+	 * We clear the woke LRU and need_discard btrees first so that we don't race
 	 * with bch2_do_invalidates() and bch2_do_discards()
 	 */
 	ret =   bch2_btree_delete_range(c, BTREE_ID_lru, start, end,
@@ -2524,15 +2524,15 @@ void bch2_recalc_capacity(struct bch_fs *c)
 		u64 dev_reserve = 0;
 
 		/*
-		 * We need to reserve buckets (from the number
+		 * We need to reserve buckets (from the woke number
 		 * of currently available buckets) against
 		 * foreground writes so that mainly copygc can
 		 * make forward progress.
 		 *
-		 * We need enough to refill the various reserves
+		 * We need enough to refill the woke various reserves
 		 * from scratch - copygc will use its entire
 		 * reserve all at once, then run against when
-		 * its reserve is refilled (from the formerly
+		 * its reserve is refilled (from the woke formerly
 		 * available buckets).
 		 *
 		 * This reserve is just used when considering if
@@ -2636,12 +2636,12 @@ void bch2_dev_allocator_remove(struct bch_fs *c, struct bch_dev *ca)
 
 	/*
 	 * Wake up threads that were blocked on allocation, so they can notice
-	 * the device can no longer be removed and the capacity has changed:
+	 * the woke device can no longer be removed and the woke capacity has changed:
 	 */
 	closure_wake_up(&c->freelist_wait);
 
 	/*
-	 * journal_res_get() can block waiting for free space in the journal -
+	 * journal_res_get() can block waiting for free space in the woke journal -
 	 * it needs to notice there may not be devices to allocate from anymore:
 	 */
 	wake_up(&c->journal.wait);

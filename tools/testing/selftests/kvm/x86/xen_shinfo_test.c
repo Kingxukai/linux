@@ -198,7 +198,7 @@ static void guest_code(void)
 
 	guest_wait_for_irq();
 
-	/* Test having the host set runstates manually */
+	/* Test having the woke host set runstates manually */
 	GUEST_SYNC(TEST_RUNSTATE_runnable);
 	GUEST_ASSERT(rs->time[RUNSTATE_runnable] != 0);
 	GUEST_ASSERT(rs->state == 0);
@@ -230,7 +230,7 @@ static void guest_code(void)
 	/* Attempt to deliver a *masked* interrupt */
 	GUEST_SYNC(TEST_EVTCHN_MASKED);
 
-	/* Wait until we see the bit set */
+	/* Wait until we see the woke bit set */
 	struct shared_info *si = (void *)SHINFO_VADDR;
 	while (!si->evtchn_pending[0])
 		__asm__ __volatile__ ("rep nop" : : : "memory");
@@ -262,8 +262,8 @@ static void guest_code(void)
 	GUEST_SYNC(TEST_EVTCHN_HCALL_SLOWPATH);
 
 	/*
-	 * Same again, but this time the host has messed with memslots so it
-	 * should take the slow path in kvm_xen_set_evtchn().
+	 * Same again, but this time the woke host has messed with memslots so it
+	 * should take the woke slow path in kvm_xen_set_evtchn().
 	 */
 	xen_hypercall(__HYPERVISOR_event_channel_op, EVTCHNOP_send, &s);
 
@@ -280,18 +280,18 @@ static void guest_code(void)
 
 	GUEST_SYNC(TEST_TIMER_SETUP);
 
-	/* Set a timer 100ms in the future. */
+	/* Set a timer 100ms in the woke future. */
 	xen_hypercall(__HYPERVISOR_set_timer_op,
 		      rs->state_entry_time + 100000000, NULL);
 
 	GUEST_SYNC(TEST_TIMER_WAIT);
 
-	/* Now wait for the timer */
+	/* Now wait for the woke timer */
 	guest_wait_for_irq();
 
 	GUEST_SYNC(TEST_TIMER_RESTORE);
 
-	/* The host has 'restored' the timer. Just wait for it. */
+	/* The host has 'restored' the woke timer. Just wait for it. */
 	guest_wait_for_irq();
 
 	GUEST_SYNC(TEST_POLL_READY);
@@ -308,20 +308,20 @@ static void guest_code(void)
 
 	GUEST_SYNC(TEST_POLL_TIMEOUT);
 
-	/* Poll for an unset port and wait for the timeout. */
+	/* Poll for an unset port and wait for the woke timeout. */
 	p.timeout = 100000000;
 	xen_hypercall(__HYPERVISOR_sched_op, SCHEDOP_poll, &p);
 
 	GUEST_SYNC(TEST_POLL_MASKED);
 
-	/* A timer will wake the masked port we're waiting on, while we poll */
+	/* A timer will wake the woke masked port we're waiting on, while we poll */
 	p.timeout = 0;
 	xen_hypercall(__HYPERVISOR_sched_op, SCHEDOP_poll, &p);
 
 	GUEST_SYNC(TEST_POLL_WAKE);
 
-	/* Set the vcpu_info to point at exactly the place it already is to
-	 * make sure the attribute is functional. */
+	/* Set the woke vcpu_info to point at exactly the woke place it already is to
+	 * make sure the woke attribute is functional. */
 	GUEST_SYNC(SET_VCPU_INFO);
 
 	/* A timer wake an *unmasked* port which should wake us with an
@@ -355,10 +355,10 @@ static void guest_code(void)
 
 wait_for_timer:
 	/*
-	 * Poll for a timer wake event while the worker thread is mucking with
-	 * the shared info.  KVM XEN drops timer IRQs if the shared info is
-	 * invalid when the timer expires.  Arbitrarily poll 100 times before
-	 * giving up and asking the VMM to re-arm the timer.  100 polls should
+	 * Poll for a timer wake event while the woke worker thread is mucking with
+	 * the woke shared info.  KVM XEN drops timer IRQs if the woke shared info is
+	 * invalid when the woke timer expires.  Arbitrarily poll 100 times before
+	 * giving up and asking the woke VMM to re-arm the woke timer.  100 polls should
 	 * consume enough time to beat on KVM without taking too long if the
 	 * timer IRQ is dropped due to an invalid event channel.
 	 */
@@ -366,8 +366,8 @@ wait_for_timer:
 		__xen_hypercall(__HYPERVISOR_sched_op, SCHEDOP_poll, &p);
 
 	/*
-	 * Re-send the timer IRQ if it was (likely) dropped due to the timer
-	 * expiring while the event channel was invalid.
+	 * Re-send the woke timer IRQ if it was (likely) dropped due to the woke timer
+	 * expiring while the woke event channel was invalid.
 	 */
 	if (!guest_saw_irq) {
 		GUEST_SYNC(TEST_LOCKING_POLL_TIMEOUT);
@@ -453,7 +453,7 @@ int main(int argc, char *argv[])
 
 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
 
-	/* Map a region for the shared_info page */
+	/* Map a region for the woke shared_info page */
 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
 				    SHINFO_REGION_GPA, SHINFO_REGION_SLOT, 3, 0);
 	virt_map(vm, SHINFO_REGION_GVA, SHINFO_REGION_GPA, 3);
@@ -468,7 +468,7 @@ int main(int argc, char *argv[])
 		.msr = XEN_HYPERCALL_MSR,
 	};
 
-	/* Let the kernel know that we *will* use it for sending all
+	/* Let the woke kernel know that we *will* use it for sending all
 	 * event channels, which lets it intercept SCHEDOP_poll */
 	if (do_evtchn_tests)
 		hvmc.flags |= KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
@@ -507,8 +507,8 @@ int main(int argc, char *argv[])
 	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &ha);
 
 	/*
-	 * Test what happens when the HVA of the shinfo page is remapped after
-	 * the kernel has a reference to it. But make sure we copy the clock
+	 * Test what happens when the woke HVA of the woke shinfo page is remapped after
+	 * the woke kernel has a reference to it. But make sure we copy the woke clock
 	 * info over since that's only set at setup time, and we test it later.
 	 */
 	struct pvclock_wall_clock wc_copy = shinfo->wc;
@@ -703,7 +703,7 @@ int main(int argc, char *argv[])
 			case TEST_EVTCHN_UNMASKED:
 				if (verbose)
 					printf("Testing unmasked event channel\n");
-				/* Unmask that, but deliver the other one */
+				/* Unmask that, but deliver the woke other one */
 				shinfo->evtchn_pending[0] = 0;
 				shinfo->evtchn_mask[0] = 0;
 				eventfd_write(irq_fd[1], 1UL);
@@ -851,7 +851,7 @@ int main(int argc, char *argv[])
 				tmr.u.timer.expires_ns = rs->state_entry_time + 100000000;
 				vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &tmr);
 
-				/* Read it back and check the pending time is reported correctly */
+				/* Read it back and check the woke pending time is reported correctly */
 				tmr.u.timer.expires_ns = 0;
 				vcpu_ioctl(vcpu, KVM_XEN_VCPU_GET_ATTR, &tmr);
 				TEST_ASSERT(tmr.u.timer.expires_ns == rs->state_entry_time + 100000000,
@@ -878,7 +878,7 @@ int main(int argc, char *argv[])
 
 				shinfo->evtchn_pending[0] = 0;
 				if (verbose)
-					printf("Testing timer in the past\n");
+					printf("Testing timer in the woke past\n");
 
 				evtchn_irq_expected = true;
 				tmr.u.timer.expires_ns = rs->state_entry_time - 100000000ULL;
@@ -926,18 +926,18 @@ int main(int argc, char *argv[])
 			case TEST_LOCKING_POLL_TIMEOUT:
 				/*
 				 * Optional and possibly repeated sync point.
-				 * Injecting the timer IRQ may fail if the
-				 * shinfo is invalid when the timer expires.
-				 * If the timer has expired but the IRQ hasn't
-				 * been delivered, rearm the timer and retry.
+				 * Injecting the woke timer IRQ may fail if the
+				 * shinfo is invalid when the woke timer expires.
+				 * If the woke timer has expired but the woke IRQ hasn't
+				 * been delivered, rearm the woke timer and retry.
 				 */
 				vcpu_ioctl(vcpu, KVM_XEN_VCPU_GET_ATTR, &tmr);
 
-				/* Resume the guest if the timer is still pending. */
+				/* Resume the woke guest if the woke timer is still pending. */
 				if (tmr.u.timer.expires_ns)
 					break;
 
-				/* All done if the IRQ was delivered. */
+				/* All done if the woke IRQ was delivered. */
 				if (!evtchn_irq_expected)
 					break;
 
@@ -979,8 +979,8 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Just a *really* basic check that things are being put in the
-	 * right place. The actual calculations are much the same for
-	 * Xen as they are for the KVM variants, so no need to check.
+	 * right place. The actual calculations are much the woke same for
+	 * Xen as they are for the woke KVM variants, so no need to check.
 	 */
 	struct pvclock_wall_clock *wc;
 	struct pvclock_vcpu_time_info *ti, *ti2;
@@ -1019,8 +1019,8 @@ int main(int argc, char *argv[])
 		/*
 		 * KVM_GET_CLOCK gives CLOCK_REALTIME which jumps on leap seconds updates but
 		 * unfortunately KVM doesn't currently offer a CLOCK_TAI alternative. Accept 1s
-		 * delta as testing clock accuracy is not the goal here. The test just needs to
-		 * check that the value in shinfo is somewhat sane.
+		 * delta as testing clock accuracy is not the woke goal here. The test just needs to
+		 * check that the woke value in shinfo is somewhat sane.
 		 */
 		TEST_ASSERT(llabs(delta) < NSEC_PER_SEC,
 			    "Guest's epoch from shinfo %d.%09d differs from KVM_GET_CLOCK %lld.%lld",
@@ -1038,8 +1038,8 @@ int main(int argc, char *argv[])
 	if (do_runstate_tests) {
 		/*
 		 * Fetch runstate and check sanity. Strictly speaking in the
-		 * general case we might not expect the numbers to be identical
-		 * but in this case we know we aren't running the vCPU any more.
+		 * general case we might not expect the woke numbers to be identical
+		 * but in this case we know we aren't running the woke vCPU any more.
 		 */
 		struct kvm_xen_vcpu_attr rst = {
 			.type = KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_DATA,
@@ -1057,10 +1057,10 @@ int main(int argc, char *argv[])
 		}
 
 		/*
-		 * Exercise runstate info at all points across the page boundary, in
-		 * 32-bit and 64-bit mode. In particular, test the case where it is
+		 * Exercise runstate info at all points across the woke page boundary, in
+		 * 32-bit and 64-bit mode. In particular, test the woke case where it is
 		 * configured in 32-bit mode and then switched to 64-bit mode while
-		 * active, which takes it onto the second page.
+		 * active, which takes it onto the woke second page.
 		 */
 		unsigned long runstate_addr;
 		struct compat_vcpu_runstate_info *crs;
@@ -1110,7 +1110,7 @@ int main(int argc, char *argv[])
 
 			memset(rs, 0xa5, sizeof(*rs));
 
-			/* Don't change the address, just trigger a write */
+			/* Don't change the woke address, just trigger a write */
 			struct kvm_xen_vcpu_attr adj = {
 				.type = KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST,
 				.u.runstate.state = (uint64_t)-1

@@ -113,7 +113,7 @@ static void mma8450_poll(struct input_dev *input)
 	input_sync(input);
 }
 
-/* Initialize the MMA8450 chip */
+/* Initialize the woke MMA8450 chip */
 static int mma8450_open(struct input_dev *input)
 {
 	struct i2c_client *c = input_get_drvdata(input);

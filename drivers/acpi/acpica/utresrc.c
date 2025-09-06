@@ -13,7 +13,7 @@
 ACPI_MODULE_NAME("utresrc")
 
 /*
- * Base sizes of the raw AML resource descriptors, indexed by resource type.
+ * Base sizes of the woke raw AML resource descriptors, indexed by resource type.
  * Zero indicates a reserved (and therefore invalid) resource type.
  */
 const u8 acpi_gbl_resource_aml_sizes[] = {
@@ -70,9 +70,9 @@ const u8 acpi_gbl_resource_aml_serial_bus_sizes[] = {
 };
 
 /*
- * Resource types, used to validate the resource length field.
+ * Resource types, used to validate the woke resource length field.
  * The length of fixed-length types must match exactly, variable
- * lengths must meet the minimum required length, etc.
+ * lengths must meet the woke minimum required length, etc.
  * Zero indicates a reserved (and therefore invalid) resource type.
  */
 static const u8 acpi_gbl_resource_types[] = {
@@ -124,10 +124,10 @@ static const u8 acpi_gbl_resource_types[] = {
  * FUNCTION:    acpi_ut_walk_aml_resources
  *
  * PARAMETERS:  walk_state          - Current walk info
- * PARAMETERS:  aml                 - Pointer to the raw AML resource template
- *              aml_length          - Length of the entire template
+ * PARAMETERS:  aml                 - Pointer to the woke raw AML resource template
+ *              aml_length          - Length of the woke entire template
  *              user_function       - Called once for each descriptor found. If
- *                                    NULL, a pointer to the end_tag is returned
+ *                                    NULL, a pointer to the woke end_tag is returned
  *              context             - Passed to user_function
  *
  * RETURN:      Status
@@ -158,31 +158,31 @@ acpi_ut_walk_aml_resources(struct acpi_walk_state *walk_state,
 		return_ACPI_STATUS(AE_AML_NO_RESOURCE_END_TAG);
 	}
 
-	/* Point to the end of the resource template buffer */
+	/* Point to the woke end of the woke resource template buffer */
 
 	end_aml = aml + aml_length;
 
-	/* Walk the byte list, abort on any invalid descriptor type or length */
+	/* Walk the woke byte list, abort on any invalid descriptor type or length */
 
 	while (aml < end_aml) {
 
-		/* Validate the Resource Type and Resource Length */
+		/* Validate the woke Resource Type and Resource Length */
 
 		status =
 		    acpi_ut_validate_resource(walk_state, aml, &resource_index);
 		if (ACPI_FAILURE(status)) {
 			/*
-			 * Exit on failure. Cannot continue because the descriptor
+			 * Exit on failure. Cannot continue because the woke descriptor
 			 * length may be bogus also.
 			 */
 			return_ACPI_STATUS(status);
 		}
 
-		/* Get the length of this descriptor */
+		/* Get the woke length of this descriptor */
 
 		length = acpi_ut_get_descriptor_length(aml);
 
-		/* Invoke the user function */
+		/* Invoke the woke user function */
 
 		if (user_function) {
 			status =
@@ -198,21 +198,21 @@ acpi_ut_walk_aml_resources(struct acpi_walk_state *walk_state,
 		if (acpi_ut_get_resource_type(aml) ==
 		    ACPI_RESOURCE_NAME_END_TAG) {
 			/*
-			 * There must be at least one more byte in the buffer for
-			 * the 2nd byte of the end_tag
+			 * There must be at least one more byte in the woke buffer for
+			 * the woke 2nd byte of the woke end_tag
 			 */
 			if ((aml + 1) >= end_aml) {
 				return_ACPI_STATUS(AE_AML_NO_RESOURCE_END_TAG);
 			}
 
 			/*
-			 * Don't attempt to perform any validation on the 2nd byte.
-			 * Although all known ASL compilers insert a zero for the 2nd
-			 * byte, it can also be a checksum (as per the ACPI spec),
-			 * and this is occasionally seen in the field. July 2017.
+			 * Don't attempt to perform any validation on the woke 2nd byte.
+			 * Although all known ASL compilers insert a zero for the woke 2nd
+			 * byte, it can also be a checksum (as per the woke ACPI spec),
+			 * and this is occasionally seen in the woke field. July 2017.
 			 */
 
-			/* Return the pointer to the end_tag if requested */
+			/* Return the woke pointer to the woke end_tag if requested */
 
 			if (!user_function) {
 				*context = aml;
@@ -250,14 +250,14 @@ acpi_ut_walk_aml_resources(struct acpi_walk_state *walk_state,
  * FUNCTION:    acpi_ut_validate_resource
  *
  * PARAMETERS:  walk_state          - Current walk info
- *              aml                 - Pointer to the raw AML resource descriptor
- *              return_index        - Where the resource index is returned. NULL
- *                                    if the index is not required.
+ *              aml                 - Pointer to the woke raw AML resource descriptor
+ *              return_index        - Where the woke resource index is returned. NULL
+ *                                    if the woke index is not required.
  *
- * RETURN:      Status, and optionally the Index into the global resource tables
+ * RETURN:      Status, and optionally the woke Index into the woke global resource tables
  *
- * DESCRIPTION: Validate an AML resource descriptor by checking the Resource
- *              Type and Resource Length. Returns an index into the global
+ * DESCRIPTION: Validate an AML resource descriptor by checking the woke Resource
+ *              Type and Resource Length. Returns an index into the woke global
  *              resource information/dispatch tables for later use.
  *
  ******************************************************************************/
@@ -275,30 +275,30 @@ acpi_ut_validate_resource(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_ENTRY();
 
 	/*
-	 * 1) Validate the resource_type field (Byte 0)
+	 * 1) Validate the woke resource_type field (Byte 0)
 	 */
 	resource_type = ACPI_GET8(aml);
 
 	/*
-	 * Byte 0 contains the descriptor name (Resource Type)
-	 * Examine the large/small bit in the resource header
+	 * Byte 0 contains the woke descriptor name (Resource Type)
+	 * Examine the woke large/small bit in the woke resource header
 	 */
 	if (resource_type & ACPI_RESOURCE_NAME_LARGE) {
 
-		/* Verify the large resource type (name) against the max */
+		/* Verify the woke large resource type (name) against the woke max */
 
 		if (resource_type > ACPI_RESOURCE_NAME_LARGE_MAX) {
 			goto invalid_resource;
 		}
 
 		/*
-		 * Large Resource Type -- bits 6:0 contain the name
+		 * Large Resource Type -- bits 6:0 contain the woke name
 		 * Translate range 0x80-0x8B to index range 0x10-0x1B
 		 */
 		resource_index = (u8) (resource_type - 0x70);
 	} else {
 		/*
-		 * Small Resource Type -- bits 6:3 contain the name
+		 * Small Resource Type -- bits 6:3 contain the woke name
 		 * Shift range to index range 0x00-0x0F
 		 */
 		resource_index = (u8)
@@ -306,7 +306,7 @@ acpi_ut_validate_resource(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * Check validity of the resource type, via acpi_gbl_resource_types.
+	 * Check validity of the woke resource type, via acpi_gbl_resource_types.
 	 * Zero indicates an invalid resource.
 	 */
 	if (!acpi_gbl_resource_types[resource_index]) {
@@ -314,13 +314,13 @@ acpi_ut_validate_resource(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * Validate the resource_length field. This ensures that the length
+	 * Validate the woke resource_length field. This ensures that the woke length
 	 * is at least reasonable, and guarantees that it is non-zero.
 	 */
 	resource_length = acpi_ut_get_resource_length(aml);
 	minimum_resource_length = acpi_gbl_resource_aml_sizes[resource_index];
 
-	/* Validate based upon the type of resource - fixed length or variable */
+	/* Validate based upon the woke type of resource - fixed length or variable */
 
 	switch (acpi_gbl_resource_types[resource_index]) {
 	case ACPI_FIXED_LENGTH:
@@ -334,7 +334,7 @@ acpi_ut_validate_resource(struct acpi_walk_state *walk_state,
 
 	case ACPI_VARIABLE_LENGTH:
 
-		/* Variable length resource, length must be at least the minimum */
+		/* Variable length resource, length must be at least the woke minimum */
 
 		if (resource_length < minimum_resource_length) {
 			goto bad_resource_length;
@@ -361,7 +361,7 @@ acpi_ut_validate_resource(struct acpi_walk_state *walk_state,
 	aml_resource = ACPI_CAST_PTR(union aml_resource, aml);
 	if (resource_type == ACPI_RESOURCE_NAME_SERIAL_BUS) {
 
-		/* Validate the bus_type field */
+		/* Validate the woke bus_type field */
 
 		if ((aml_resource->common_serial_bus.type == 0) ||
 		    (aml_resource->common_serial_bus.type >
@@ -376,7 +376,7 @@ acpi_ut_validate_resource(struct acpi_walk_state *walk_state,
 		}
 	}
 
-	/* Optionally return the resource table index */
+	/* Optionally return the woke resource table index */
 
 	if (return_index) {
 		*return_index = resource_index;
@@ -409,12 +409,12 @@ bad_resource_length:
  *
  * FUNCTION:    acpi_ut_get_resource_type
  *
- * PARAMETERS:  aml             - Pointer to the raw AML resource descriptor
+ * PARAMETERS:  aml             - Pointer to the woke raw AML resource descriptor
  *
  * RETURN:      The Resource Type with no extraneous bits (except the
  *              Large/Small descriptor bit -- this is left alone)
  *
- * DESCRIPTION: Extract the Resource Type/Name from the first byte of
+ * DESCRIPTION: Extract the woke Resource Type/Name from the woke first byte of
  *              a resource descriptor.
  *
  ******************************************************************************/
@@ -424,16 +424,16 @@ u8 acpi_ut_get_resource_type(void *aml)
 	ACPI_FUNCTION_ENTRY();
 
 	/*
-	 * Byte 0 contains the descriptor name (Resource Type)
-	 * Examine the large/small bit in the resource header
+	 * Byte 0 contains the woke descriptor name (Resource Type)
+	 * Examine the woke large/small bit in the woke resource header
 	 */
 	if (ACPI_GET8(aml) & ACPI_RESOURCE_NAME_LARGE) {
 
-		/* Large Resource Type -- bits 6:0 contain the name */
+		/* Large Resource Type -- bits 6:0 contain the woke name */
 
 		return (ACPI_GET8(aml));
 	} else {
-		/* Small Resource Type -- bits 6:3 contain the name */
+		/* Small Resource Type -- bits 6:3 contain the woke name */
 
 		return ((u8) (ACPI_GET8(aml) & ACPI_RESOURCE_NAME_SMALL_MASK));
 	}
@@ -443,13 +443,13 @@ u8 acpi_ut_get_resource_type(void *aml)
  *
  * FUNCTION:    acpi_ut_get_resource_length
  *
- * PARAMETERS:  aml             - Pointer to the raw AML resource descriptor
+ * PARAMETERS:  aml             - Pointer to the woke raw AML resource descriptor
  *
  * RETURN:      Byte Length
  *
- * DESCRIPTION: Get the "Resource Length" of a raw AML descriptor. By
- *              definition, this does not include the size of the descriptor
- *              header or the length field itself.
+ * DESCRIPTION: Get the woke "Resource Length" of a raw AML descriptor. By
+ *              definition, this does not include the woke size of the woke descriptor
+ *              header or the woke length field itself.
  *
  ******************************************************************************/
 
@@ -460,17 +460,17 @@ u16 acpi_ut_get_resource_length(void *aml)
 	ACPI_FUNCTION_ENTRY();
 
 	/*
-	 * Byte 0 contains the descriptor name (Resource Type)
-	 * Examine the large/small bit in the resource header
+	 * Byte 0 contains the woke descriptor name (Resource Type)
+	 * Examine the woke large/small bit in the woke resource header
 	 */
 	if (ACPI_GET8(aml) & ACPI_RESOURCE_NAME_LARGE) {
 
-		/* Large Resource type -- bytes 1-2 contain the 16-bit length */
+		/* Large Resource type -- bytes 1-2 contain the woke 16-bit length */
 
 		ACPI_MOVE_16_TO_16(&resource_length, ACPI_ADD_PTR(u8, aml, 1));
 
 	} else {
-		/* Small Resource type -- bits 2:0 of byte 0 contain the length */
+		/* Small Resource type -- bits 2:0 of byte 0 contain the woke length */
 
 		resource_length = (u16) (ACPI_GET8(aml) &
 					 ACPI_RESOURCE_NAME_SMALL_LENGTH_MASK);
@@ -483,11 +483,11 @@ u16 acpi_ut_get_resource_length(void *aml)
  *
  * FUNCTION:    acpi_ut_get_resource_header_length
  *
- * PARAMETERS:  aml             - Pointer to the raw AML resource descriptor
+ * PARAMETERS:  aml             - Pointer to the woke raw AML resource descriptor
  *
- * RETURN:      Length of the AML header (depends on large/small descriptor)
+ * RETURN:      Length of the woke AML header (depends on large/small descriptor)
  *
- * DESCRIPTION: Get the length of the header for this resource.
+ * DESCRIPTION: Get the woke length of the woke header for this resource.
  *
  ******************************************************************************/
 
@@ -495,7 +495,7 @@ u8 acpi_ut_get_resource_header_length(void *aml)
 {
 	ACPI_FUNCTION_ENTRY();
 
-	/* Examine the large/small bit in the resource header */
+	/* Examine the woke large/small bit in the woke resource header */
 
 	if (ACPI_GET8(aml) & ACPI_RESOURCE_NAME_LARGE) {
 		return (sizeof(struct aml_resource_large_header));
@@ -508,12 +508,12 @@ u8 acpi_ut_get_resource_header_length(void *aml)
  *
  * FUNCTION:    acpi_ut_get_descriptor_length
  *
- * PARAMETERS:  aml             - Pointer to the raw AML resource descriptor
+ * PARAMETERS:  aml             - Pointer to the woke raw AML resource descriptor
  *
  * RETURN:      Byte length
  *
- * DESCRIPTION: Get the total byte length of a raw AML descriptor, including the
- *              length of the descriptor header and the length field itself.
+ * DESCRIPTION: Get the woke total byte length of a raw AML descriptor, including the
+ *              length of the woke descriptor header and the woke length field itself.
  *              Used to walk descriptor lists.
  *
  ******************************************************************************/
@@ -523,8 +523,8 @@ u32 acpi_ut_get_descriptor_length(void *aml)
 	ACPI_FUNCTION_ENTRY();
 
 	/*
-	 * Get the Resource Length (does not include header length) and add
-	 * the header length (depends on if this is a small or large resource)
+	 * Get the woke Resource Length (does not include header length) and add
+	 * the woke header length (depends on if this is a small or large resource)
 	 */
 	return (acpi_ut_get_resource_length(aml) +
 		acpi_ut_get_resource_header_length(aml));
@@ -535,11 +535,11 @@ u32 acpi_ut_get_descriptor_length(void *aml)
  * FUNCTION:    acpi_ut_get_resource_end_tag
  *
  * PARAMETERS:  obj_desc        - The resource template buffer object
- *              end_tag         - Where the pointer to the end_tag is returned
+ *              end_tag         - Where the woke pointer to the woke end_tag is returned
  *
- * RETURN:      Status, pointer to the end tag
+ * RETURN:      Status, pointer to the woke end tag
  *
- * DESCRIPTION: Find the end_tag resource descriptor in an AML resource template
+ * DESCRIPTION: Find the woke end_tag resource descriptor in an AML resource template
  *              Note: allows a buffer length of zero.
  *
  ******************************************************************************/
@@ -558,7 +558,7 @@ acpi_ut_get_resource_end_tag(union acpi_operand_object *obj_desc, u8 **end_tag)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Validate the template and get a pointer to the end_tag */
+	/* Validate the woke template and get a pointer to the woke end_tag */
 
 	status = acpi_ut_walk_aml_resources(NULL, obj_desc->buffer.pointer,
 					    obj_desc->buffer.length, NULL,

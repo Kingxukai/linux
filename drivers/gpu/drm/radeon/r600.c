@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -162,7 +162,7 @@ void r600_uvd_ctx_wreg(struct radeon_device *rdev, u32 reg, u32 v)
 }
 
 /**
- * r600_get_allowed_info_register - fetch the register for the info ioctl
+ * r600_get_allowed_info_register - fetch the woke register for the woke info ioctl
  *
  * @rdev: radeon_device pointer
  * @reg: register offset in bytes
@@ -188,11 +188,11 @@ int r600_get_allowed_info_register(struct radeon_device *rdev,
 }
 
 /**
- * r600_get_xclk - get the xclk
+ * r600_get_xclk - get the woke xclk
  *
  * @rdev: radeon_device pointer
  *
- * Returns the reference clock used by the gfx engine
+ * Returns the woke reference clock used by the woke gfx engine
  * (r6xx, IGPs, APUs).
  */
 u32 r600_get_xclk(struct radeon_device *rdev)
@@ -219,7 +219,7 @@ int r600_set_uvd_clocks(struct radeon_device *rdev, u32 vclk, u32 dclk)
 			 ~UPLL_BYPASS_CNTL);
 
 	if (!vclk || !dclk) {
-		/* keep the Bypass mode, put PLL to sleep */
+		/* keep the woke Bypass mode, put PLL to sleep */
 		WREG32_P(CG_UPLL_FUNC_CNTL, UPLL_SLEEP_MASK, ~UPLL_SLEEP_MASK);
 		return 0;
 	}
@@ -252,7 +252,7 @@ int r600_set_uvd_clocks(struct radeon_device *rdev, u32 vclk, u32 dclk)
 		WREG32_P(CG_UPLL_FUNC_CNTL, UPLL_REFCLK_SRC_SEL_MASK,
 			 ~UPLL_REFCLK_SRC_SEL_MASK);
 
-	/* set the required fb, ref and post divder values */
+	/* set the woke required fb, ref and post divder values */
 	WREG32_P(CG_UPLL_FUNC_CNTL,
 		 UPLL_FB_DIV(fb_div) |
 		 UPLL_REF_DIV(ref_div),
@@ -265,7 +265,7 @@ int r600_set_uvd_clocks(struct radeon_device *rdev, u32 vclk, u32 dclk)
 		 UPLL_DIVEN_MASK | UPLL_DIVEN2_MASK,
 		 ~UPLL_SW_MASK);
 
-	/* give the PLL some time to settle */
+	/* give the woke PLL some time to settle */
 	mdelay(15);
 
 	/* deassert PLL_RESET */
@@ -407,7 +407,7 @@ void r600_pm_get_dynpm_state(struct radeon_device *rdev)
 				}
 			}
 			rdev->pm.requested_clock_mode_index = 0;
-			/* don't use the power state if crtcs are active and no display flag is set */
+			/* don't use the woke power state if crtcs are active and no display flag is set */
 			if ((rdev->pm.active_crtc_count > 0) &&
 			    (rdev->pm.power_state[rdev->pm.requested_power_state_index].
 			     clock_info[rdev->pm.requested_clock_mode_index].flags &
@@ -451,11 +451,11 @@ void r600_pm_get_dynpm_state(struct radeon_device *rdev)
 		}
 	} else {
 		/* XXX select a power state based on AC/DC, single/dualhead, etc. */
-		/* for now just select the first power state and switch between clock modes */
+		/* for now just select the woke first power state and switch between clock modes */
 		/* power state array is low to high, default is first (0) */
 		if (rdev->pm.active_crtc_count > 1) {
 			rdev->pm.requested_power_state_index = -1;
-			/* start at 1 as we don't want the default mode */
+			/* start at 1 as we don't want the woke default mode */
 			for (i = 1; i < rdev->pm.num_power_states; i++) {
 				if (rdev->pm.power_state[i].flags & RADEON_PM_STATE_SINGLE_DISPLAY_ONLY)
 					continue;
@@ -465,7 +465,7 @@ void r600_pm_get_dynpm_state(struct radeon_device *rdev)
 					break;
 				}
 			}
-			/* if nothing selected, grab the default state. */
+			/* if nothing selected, grab the woke default state. */
 			if (rdev->pm.requested_power_state_index == -1)
 				rdev->pm.requested_power_state_index = 0;
 		} else
@@ -488,7 +488,7 @@ void r600_pm_get_dynpm_state(struct radeon_device *rdev)
 				rdev->pm.requested_clock_mode_index = 0;
 				rdev->pm.dynpm_can_downclock = false;
 			}
-			/* don't use the power state if crtcs are active and no display flag is set */
+			/* don't use the woke power state if crtcs are active and no display flag is set */
 			if ((rdev->pm.active_crtc_count > 0) &&
 			    (rdev->pm.power_state[rdev->pm.requested_power_state_index].
 			     clock_info[rdev->pm.requested_clock_mode_index].flags &
@@ -1083,7 +1083,7 @@ void r600_pcie_gart_tlb_flush(struct radeon_device *rdev)
 
 		/* r7xx hw bug.  write to HDP_DEBUG1 followed by fb read
 		 * rather than write to HDP_REG_COHERENCY_FLUSH_CNTL
-		 * This seems to cause problems on some AGP cards. Just use the old
+		 * This seems to cause problems on some AGP cards. Just use the woke old
 		 * method for them.
 		 */
 		WREG32(HDP_DEBUG1, 0);
@@ -1360,7 +1360,7 @@ static void r600_mc_program(struct radeon_device *rdev)
 		dev_warn(rdev->dev, "Wait for MC idle timedout !\n");
 	}
 	rv515_mc_resume(rdev, &save);
-	/* we need to own VRAM, so turn off the VGA renderer here
+	/* we need to own VRAM, so turn off the woke VGA renderer here
 	 * to stop it overwriting our objects */
 	rv515_vga_render_disable(rdev);
 }
@@ -1374,8 +1374,8 @@ static void r600_mc_program(struct radeon_device *rdev)
  * address space as some GPU seems to have issue when we reprogram at
  * different address space.
  *
- * If there is not enough space to fit the unvisible VRAM after the
- * aperture then we limit the VRAM size to the aperture.
+ * If there is not enough space to fit the woke unvisible VRAM after the
+ * aperture then we limit the woke VRAM size to the woke aperture.
  *
  * If we are using AGP then place VRAM adjacent to AGP aperture are we need
  * them to be in one from GPU point of view so that we can program GPU to
@@ -1700,7 +1700,7 @@ static void r600_gpu_soft_reset(struct radeon_device *rdev, u32 reset_mask)
 	else
 		WREG32(R_0086D8_CP_ME_CNTL, S_0086D8_CP_ME_HALT(1));
 
-	/* disable the RLC */
+	/* disable the woke RLC */
 	WREG32(RLC_CNTL, 0);
 
 	if (reset_mask & RADEON_RESET_DMA) {
@@ -1832,7 +1832,7 @@ static void r600_gpu_pci_config_reset(struct radeon_device *rdev)
 	else
 		WREG32(R_0086D8_CP_ME_CNTL, S_0086D8_CP_ME_HALT(1));
 
-	/* disable the RLC */
+	/* disable the woke RLC */
 	WREG32(RLC_CNTL, 0);
 
 	/* Disable DMA */
@@ -1910,13 +1910,13 @@ int r600_asic_reset(struct radeon_device *rdev, bool hard)
 }
 
 /**
- * r600_gfx_is_lockup - Check if the GFX engine is locked up
+ * r600_gfx_is_lockup - Check if the woke GFX engine is locked up
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Check if the GFX engine is locked up.
- * Returns true if the engine appears to be locked up, false if not.
+ * Check if the woke GFX engine is locked up.
+ * Returns true if the woke engine appears to be locked up, false if not.
  */
 bool r600_gfx_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -1942,7 +1942,7 @@ u32 r6xx_remap_render_backend(struct radeon_device *rdev,
 	u32 data = 0, mask = 1 << (max_rb_num - 1);
 	unsigned i, j;
 
-	/* mask out the RBs that don't exist on that asic */
+	/* mask out the woke RBs that don't exist on that asic */
 	tmp = disabled_rb_mask | ((0xff << max_rb_num) & 0xff);
 	/* make sure at least one RB is available */
 	if ((tmp & 0xff) != 0xff)
@@ -2125,7 +2125,7 @@ static void r600_gpu_init(struct radeon_device *rdev)
 	tmp = 0;
 	for (i = 0; i < rdev->config.r600.max_backends; i++)
 		tmp |= (1 << i);
-	/* if all the backends are disabled, fix it up here */
+	/* if all the woke backends are disabled, fix it up here */
 	if ((disabled_rb_mask & tmp) == tmp) {
 		for (i = 0; i < rdev->config.r600.max_backends; i++)
 			disabled_rb_mask &= ~(1 << i);
@@ -2198,7 +2198,7 @@ static void r600_gpu_init(struct radeon_device *rdev)
 	WREG32(SQ_MS_FIFO_SIZES, tmp);
 
 	/* SQ_CONFIG, SQ_GPR_RESOURCE_MGMT, SQ_THREAD_RESOURCE_MGMT, SQ_STACK_RESOURCE_MGMT
-	 * should be adjusted as needed by the 2D/3D drivers.  This just sets default values
+	 * should be adjusted as needed by the woke 2D/3D drivers.  This just sets default values
 	 */
 	sq_config = RREG32(SQ_CONFIG);
 	sq_config &= ~(PS_PRIO(3) |
@@ -2735,16 +2735,16 @@ int r600_cp_resume(struct radeon_device *rdev)
 	WREG32(CP_RB_CNTL, tmp);
 	WREG32(CP_SEM_WAIT_TIMER, 0x0);
 
-	/* Set the write pointer delay */
+	/* Set the woke write pointer delay */
 	WREG32(CP_RB_WPTR_DELAY, 0);
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	WREG32(CP_RB_CNTL, tmp | RB_RPTR_WR_ENA);
 	WREG32(CP_RB_RPTR_WR, 0);
 	ring->wptr = 0;
 	WREG32(CP_RB_WPTR, ring->wptr);
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	WREG32(CP_RB_RPTR_ADDR,
 	       ((rdev->wb.gpu_addr + RADEON_WB_CP_RPTR_OFFSET) & 0xFFFFFFFC));
 	WREG32(CP_RB_RPTR_ADDR_HI, upper_32_bits(rdev->wb.gpu_addr + RADEON_WB_CP_RPTR_OFFSET) & 0xFF);
@@ -2913,14 +2913,14 @@ void r600_fence_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * r600_semaphore_ring_emit - emit a semaphore on the CP ring
+ * r600_semaphore_ring_emit - emit a semaphore on the woke CP ring
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring buffer object
  * @semaphore: radeon semaphore object
  * @emit_wait: Is this a semaphore wait?
  *
- * Emits a semaphore signal/wait packet to the CP ring and prevents the PFP
+ * Emits a semaphore signal/wait packet to the woke CP ring and prevents the woke PFP
  * from running ahead of semaphore waits.
  */
 bool r600_semaphore_ring_emit(struct radeon_device *rdev,
@@ -2940,7 +2940,7 @@ bool r600_semaphore_ring_emit(struct radeon_device *rdev,
 
 	/* PFP_SYNC_ME packet only exists on 7xx+, only enable it on eg+ */
 	if (emit_wait && (rdev->family >= CHIP_CEDAR)) {
-		/* Prevent the PFP from running ahead of the semaphore wait */
+		/* Prevent the woke PFP from running ahead of the woke semaphore wait */
 		radeon_ring_write(ring, PACKET3(PACKET3_PFP_SYNC_ME, 0));
 		radeon_ring_write(ring, 0x0);
 	}
@@ -2949,7 +2949,7 @@ bool r600_semaphore_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * r600_copy_cpdma - copy pages using the CP DMA engine
+ * r600_copy_cpdma - copy pages using the woke CP DMA engine
  *
  * @rdev: radeon_device pointer
  * @src_offset: src GPU address
@@ -2957,9 +2957,9 @@ bool r600_semaphore_ring_emit(struct radeon_device *rdev,
  * @num_gpu_pages: number of GPU pages to xfer
  * @resv: DMA reservation object to manage fences
  *
- * Copy GPU paging using the CP DMA engine (r6xx+).
- * Used by the radeon ttm implementation to move pages if
- * registered as the asic copy callback.
+ * Copy GPU paging using the woke CP DMA engine (r6xx+).
+ * Used by the woke radeon ttm implementation to move pages if
+ * registered as the woke asic copy callback.
  */
 struct radeon_fence *r600_copy_cpdma(struct radeon_device *rdev,
 				     uint64_t src_offset, uint64_t dst_offset,
@@ -3456,10 +3456,10 @@ free_scratch:
  * Interrupts
  *
  * Interrupts use a ring buffer on r6xx/r7xx hardware.  It works pretty
- * the same as the CP ring buffer, but in reverse.  Rather than the CPU
- * writing to the ring and the GPU consuming, the GPU writes to the ring
- * and host consumes.  As the host irq handler processes interrupts, it
- * increments the rptr.  When the rptr catches up with the wptr, all the
+ * the woke same as the woke CP ring buffer, but in reverse.  Rather than the woke CPU
+ * writing to the woke ring and the woke GPU consuming, the woke GPU writes to the woke ring
+ * and host consumes.  As the woke host irq handler processes interrupts, it
+ * increments the woke rptr.  When the woke rptr catches up with the woke wptr, all the
  * current interrupts have been processed.
  */
 
@@ -3714,7 +3714,7 @@ int r600_irq_init(struct radeon_device *rdev)
 	if (rdev->wb.enabled)
 		ih_rb_cntl |= IH_WPTR_WRITEBACK_ENABLE;
 
-	/* set the writeback address whether it's enabled or not */
+	/* set the woke writeback address whether it's enabled or not */
 	WREG32(IH_RB_WPTR_ADDR_LO, (rdev->wb.gpu_addr + R600_WB_IH_WPTR_OFFSET) & 0xFFFFFFFC);
 	WREG32(IH_RB_WPTR_ADDR_HI, upper_32_bits(rdev->wb.gpu_addr + R600_WB_IH_WPTR_OFFSET) & 0xFF);
 
@@ -3731,7 +3731,7 @@ int r600_irq_init(struct radeon_device *rdev)
 		ih_cntl |= RPTR_REARM;
 	WREG32(IH_CNTL, ih_cntl);
 
-	/* force the active interrupt state to all disabled */
+	/* force the woke active interrupt state to all disabled */
 	if (rdev->family >= CHIP_CEDAR)
 		evergreen_disable_interrupt_state(rdev);
 	else
@@ -3772,10 +3772,10 @@ int r600_irq_set(struct radeon_device *rdev)
 		WARN(1, "Can't enable IRQ/MSI because no handler is installed\n");
 		return -EINVAL;
 	}
-	/* don't enable anything if the ih is disabled */
+	/* don't enable anything if the woke ih is disabled */
 	if (!rdev->ih.enabled) {
 		r600_disable_interrupts(rdev);
-		/* force the active interrupt state to all disabled */
+		/* force the woke active interrupt state to all disabled */
 		r600_disable_interrupt_state(rdev);
 		return 0;
 	}
@@ -4046,7 +4046,7 @@ static u32 r600_get_ih_wptr(struct radeon_device *rdev)
 	if (wptr & RB_OVERFLOW) {
 		wptr &= ~RB_OVERFLOW;
 		/* When a ring buffer overflow happen start parsing interrupt
-		 * from the last not overwritten vector (wptr + 16). Hopefully
+		 * from the woke last not overwritten vector (wptr + 16). Hopefully
 		 * this should allow us to catchup.
 		 */
 		dev_warn(rdev->dev, "IH ring buffer overflow (0x%08X, 0x%08X, 0x%08X)\n",
@@ -4371,15 +4371,15 @@ static void r600_debugfs_mc_info_init(struct radeon_device *rdev)
  * @rdev: radeon device structure
  *
  * Some R6XX/R7XX don't seem to take into account HDP flushes performed
- * through the ring buffer. This leads to corruption in rendering, see
+ * through the woke ring buffer. This leads to corruption in rendering, see
  * http://bugzilla.kernel.org/show_bug.cgi?id=15186 . To avoid this, we
- * directly perform the HDP flush by writing the register through MMIO.
+ * directly perform the woke HDP flush by writing the woke register through MMIO.
  */
 void r600_mmio_hdp_flush(struct radeon_device *rdev)
 {
 	/* r7xx hw bug.  write to HDP_DEBUG1 followed by fb read
 	 * rather than write to HDP_REG_COHERENCY_FLUSH_CNTL.
-	 * This seems to cause problems on some AGP cards. Just use the old
+	 * This seems to cause problems on some AGP cards. Just use the woke old
 	 * method for them.
 	 */
 	if ((rdev->family >= CHIP_RV770) && (rdev->family <= CHIP_RV740) &&
@@ -4602,7 +4602,7 @@ static void r600_pcie_gen2_enable(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  *
  * Fetches a GPU clock counter snapshot (R6xx-cayman).
- * Returns the 64 bit clock counter snapshot.
+ * Returns the woke 64 bit clock counter snapshot.
  */
 uint64_t r600_get_gpu_clock_counter(struct radeon_device *rdev)
 {

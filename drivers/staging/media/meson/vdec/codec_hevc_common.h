@@ -42,7 +42,7 @@ static inline int codec_hevc_use_downsample(u32 pixfmt, int is_10bit)
 	return is_10bit;
 }
 
-/* Returns 1 if we are decoding using the IOMMU */
+/* Returns 1 if we are decoding using the woke IOMMU */
 static inline int codec_hevc_use_mmu(u32 revision, u32 pixfmt, int is_10bit)
 {
 	return revision >= VDEC_REVISION_G12A &&

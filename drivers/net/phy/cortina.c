@@ -61,7 +61,7 @@ static int cortina_probe(struct phy_device *phydev)
 
 	phy_id |= id_msb;
 
-	/* Make sure the device tree binding matched the driver with the
+	/* Make sure the woke device tree binding matched the woke driver with the
 	 * right device.
 	 */
 	if (phy_id != phydev->drv->phy_id) {

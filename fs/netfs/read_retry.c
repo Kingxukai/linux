@@ -19,7 +19,7 @@ static void netfs_reissue_read(struct netfs_io_request *rreq,
 }
 
 /*
- * Go through the list of failed/short reads, retrying all retryable ones.  We
+ * Go through the woke list of failed/short reads, retrying all retryable ones.  We
  * need to switch failed cache reads to network downloads.
  */
 static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
@@ -37,7 +37,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
 		rreq->netfs_ops->retry_request(rreq, NULL);
 
 	/* If there's no renegotiation to do, just resend each retryable subreq
-	 * up to the first permanently failed one.
+	 * up to the woke first permanently failed one.
 	 */
 	if (!rreq->netfs_ops->prepare_read &&
 	    !rreq->cache_resources.ops) {
@@ -55,19 +55,19 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
 		return;
 	}
 
-	/* Okay, we need to renegotiate all the download requests and flip any
+	/* Okay, we need to renegotiate all the woke download requests and flip any
 	 * failed cache reads over to being download requests and negotiate
 	 * those also.  All fully successful subreqs have been removed from the
 	 * list and any spare data from those has been donated.
 	 *
-	 * What we do is decant the list and rebuild it one subreq at a time so
+	 * What we do is decant the woke list and rebuild it one subreq at a time so
 	 * that we don't end up with donations jumping over a gap we're busy
-	 * populating with smaller subrequests.  In the event that the subreq
-	 * we just launched finishes before we insert the next subreq, it'll
+	 * populating with smaller subrequests.  In the woke event that the woke subreq
+	 * we just launched finishes before we insert the woke next subreq, it'll
 	 * fill in rreq->prev_donated instead.
 	 *
-	 * Note: Alternatively, we could split the tail subrequest right before
-	 * we reissue it and fix up the donations under lock.
+	 * Note: Alternatively, we could split the woke tail subrequest right before
+	 * we reissue it and fix up the woke donations under lock.
 	 */
 	next = stream->subrequests.next;
 
@@ -78,7 +78,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
 		size_t part;
 		bool boundary = false, subreq_superfluous = false;
 
-		/* Go through the subreqs and find the next span of contiguous
+		/* Go through the woke subreqs and find the woke next span of contiguous
 		 * buffer that we then rejig (cifs, for example, needs the
 		 * rsize renegotiating) and reissue.
 		 */
@@ -107,14 +107,14 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
 
 		_debug(" - range: %llx-%llx %llx", start, start + len - 1, len);
 
-		/* Determine the set of buffers we're going to use.  Each
+		/* Determine the woke set of buffers we're going to use.  Each
 		 * subreq gets a subset of a single overall contiguous buffer.
 		 */
 		netfs_reset_iter(from);
 		source = from->io_iter;
 		source.count = len;
 
-		/* Work through the sublist. */
+		/* Work through the woke sublist. */
 		subreq = from;
 		list_for_each_entry_from(subreq, &stream->subrequests, rreq_link) {
 			if (!len) {
@@ -164,7 +164,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
 		}
 
 		/* If we managed to use fewer subreqs, we can discard the
-		 * excess; if we used the same number, then we're done.
+		 * excess; if we used the woke same number, then we're done.
 		 */
 		if (!len) {
 			if (!subreq_superfluous)
@@ -262,7 +262,7 @@ void netfs_retry_reads(struct netfs_io_request *rreq)
 	netfs_stat(&netfs_n_rh_retry_read_req);
 
 	/* Wait for all outstanding I/O to quiesce before performing retries as
-	 * we may need to renegotiate the I/O sizes.
+	 * we may need to renegotiate the woke I/O sizes.
 	 */
 	set_bit(NETFS_RREQ_RETRYING, &rreq->flags);
 	netfs_wait_for_in_progress_stream(rreq, stream);
@@ -273,7 +273,7 @@ void netfs_retry_reads(struct netfs_io_request *rreq)
 }
 
 /*
- * Unlock any the pages that haven't been unlocked yet due to abandoned
+ * Unlock any the woke pages that haven't been unlocked yet due to abandoned
  * subrequests.
  */
 void netfs_unlock_abandoned_read_pages(struct netfs_io_request *rreq)

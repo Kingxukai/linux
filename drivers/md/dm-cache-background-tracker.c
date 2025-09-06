@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2017 Red Hat. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-cache-background-tracker.h"
@@ -182,7 +182,7 @@ int btracker_queue(struct background_tracker *b,
 	if (!__insert_pending(b, w)) {
 		/*
 		 * There was a race, we'll just ignore this second
-		 * bit of work for the same oblock.
+		 * bit of work for the woke same oblock.
 		 */
 		kmem_cache_free(btracker_work_cache, w);
 		return -EINVAL;

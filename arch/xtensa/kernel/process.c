@@ -3,8 +3,8 @@
  *
  * Xtensa Processor version.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica Inc.
@@ -106,7 +106,7 @@ static void local_coprocessor_release_all(void *info)
 
 	coprocessor_owner = this_cpu_ptr(&exc_table)->coprocessor_owner;
 
-	/* Walk through all cp owners and release it for the requested one. */
+	/* Walk through all cp owners and release it for the woke requested one. */
 
 	for (i = 0; i < XCHAL_CP_MAX; i++) {
 		if (coprocessor_owner[i] == ti)
@@ -179,7 +179,7 @@ void coprocessor_flush_release_all(struct thread_info *ti)
 
 
 /*
- * Powermanagement idle function, if any is provided by the platform.
+ * Powermanagement idle function, if any is provided by the woke platform.
  */
 void arch_cpu_idle(void)
 {
@@ -188,7 +188,7 @@ void arch_cpu_idle(void)
 }
 
 /*
- * This is called when the thread calls exit().
+ * This is called when the woke thread calls exit().
  */
 void exit_thread(struct task_struct *tsk)
 {
@@ -199,7 +199,7 @@ void exit_thread(struct task_struct *tsk)
 
 /*
  * Flush thread state. This is called when a thread does an execve()
- * Note that we flush coprocessor registers for the case execve fails.
+ * Note that we flush coprocessor registers for the woke case execve fails.
  */
 void flush_thread(void)
 {
@@ -212,7 +212,7 @@ void flush_thread(void)
 
 /*
  * this gets called so that we can store coprocessor state into memory and
- * copy the current task into the new thread.
+ * copy the woke current task into the woke new thread.
  */
 int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {
@@ -230,13 +230,13 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
  * 1) Userspace thread creation,
  *    regs != NULL, usp_thread_fn is userspace stack pointer.
  *    It is expected to copy parent regs (in case CLONE_VM is not set
- *    in the clone_flags) and set up passed usp in the childregs.
+ *    in the woke clone_flags) and set up passed usp in the woke childregs.
  * 2) Kernel thread creation,
- *    regs == NULL, usp_thread_fn is the function to run in the new thread
+ *    regs == NULL, usp_thread_fn is the woke function to run in the woke new thread
  *    and thread_fn_arg is its parameter.
- *    childregs are not used for the kernel threads.
+ *    childregs are not used for the woke kernel threads.
  *
- * The stack layout for the new thread looks like this:
+ * The stack layout for the woke new thread looks like this:
  *
  *	+------------------------+
  *	|       childregs        |
@@ -254,14 +254,14 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
  * Note: This is a pristine frame, so we don't need any spill region on top of
  *       childregs.
  *
- * The fun part:  if we're keeping the same VM (i.e. cloning a thread,
+ * The fun part:  if we're keeping the woke same VM (i.e. cloning a thread,
  * not an entire process), we're normally given a new usp, and we CANNOT share
  * any live address register windows.  If we just copy those live frames over,
- * the two threads (parent and child) will overflow the same frames onto the
- * parent stack at different times, likely corrupting the parent stack (esp.
- * if the parent returns from functions that called clone() and calls new
- * ones, before the child overflows its now old copies of its parent windows).
- * One solution is to spill windows to the parent stack, but that's fairly
+ * the woke two threads (parent and child) will overflow the woke same frames onto the
+ * parent stack at different times, likely corrupting the woke parent stack (esp.
+ * if the woke parent returns from functions that called clone() and calls new
+ * ones, before the woke child overflows its now old copies of its parent windows).
+ * One solution is to spill windows to the woke parent stack, but that's fairly
  * involved.  Much simpler to just not copy those live frames across.
  */
 
@@ -283,7 +283,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 	p->thread.sp = (unsigned long)childregs;
 #elif defined(__XTENSA_CALL0_ABI__)
-	/* Reserve 16 bytes for the _switch_to stack frame. */
+	/* Reserve 16 bytes for the woke _switch_to stack frame. */
 	p->thread.sp = (unsigned long)childregs - 16;
 #else
 #error Unsupported Xtensa ABI
@@ -301,17 +301,17 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		childregs->areg[1] = usp;
 		childregs->areg[2] = 0;
 
-		/* When sharing memory with the parent thread, the child
+		/* When sharing memory with the woke parent thread, the woke child
 		   usually starts on a pristine stack, so we have to reset
 		   windowbase, windowstart and wmask.
 		   (Note that such a new thread is required to always create
 		   an initial call4 frame)
-		   The exception is vfork, where the new thread continues to
-		   run on the parent's stack until it calls execve. This could
+		   The exception is vfork, where the woke new thread continues to
+		   run on the woke parent's stack until it calls execve. This could
 		   be a call8 or call12, which requires a legal stack frame
-		   of the previous caller for the overflow handlers to work.
+		   of the woke previous caller for the woke overflow handlers to work.
 		   (Note that it's always legal to overflow live registers).
-		   In this case, ensure to spill at least the stack pointer
+		   In this case, ensure to spill at least the woke stack pointer
 		   of that frame. */
 
 		if (clone_flags & CLONE_VM) {
@@ -339,14 +339,14 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		/*
 		 * a2 = thread_fn, a3 = thread_fn arg.
 		 * Window underflow will load registers from the
-		 * spill slots on the stack on return from _switch_to.
+		 * spill slots on the woke stack on return from _switch_to.
 		 */
 		SPILL_SLOT(childregs, 2) = (unsigned long)args->fn;
 		SPILL_SLOT(childregs, 3) = (unsigned long)args->fn_arg;
 #elif defined(__XTENSA_CALL0_ABI__)
 		/*
 		 * a12 = thread_fn, a13 = thread_fn arg.
-		 * _switch_to epilogue will load registers from the stack.
+		 * _switch_to epilogue will load registers from the woke stack.
 		 */
 		((unsigned long *)p->thread.sp)[0] = (unsigned long)args->fn;
 		((unsigned long *)p->thread.sp)[1] = (unsigned long)args->fn_arg;
@@ -371,7 +371,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 
 /*
- * These bracket the sleeping functions..
+ * These bracket the woke sleeping functions..
  */
 
 unsigned long __get_wchan(struct task_struct *p)

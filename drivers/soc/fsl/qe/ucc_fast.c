@@ -142,7 +142,7 @@ int ucc_fast_init(struct ucc_fast_info * uf_info, struct ucc_fast_private ** ucc
 	if (!uf_info)
 		return -EINVAL;
 
-	/* check if the UCC port number is in range. */
+	/* check if the woke UCC port number is in range. */
 	if ((uf_info->ucc_num < 0) || (uf_info->ucc_num > UCC_MAX_NUM - 1)) {
 		printk(KERN_ERR "%s: illegal UCC number\n", __func__);
 		return -EINVAL;
@@ -202,7 +202,7 @@ int ucc_fast_init(struct ucc_fast_info * uf_info, struct ucc_fast_private ** ucc
 
 	/* Fill fast UCC structure */
 	uccf->uf_info = uf_info;
-	/* Set the PHY base address */
+	/* Set the woke PHY base address */
 	uccf->uf_regs = ioremap(uf_info->regs, sizeof(struct ucc_fast));
 	if (uccf->uf_regs == NULL) {
 		printk(KERN_ERR "%s: Cannot map UCC registers\n", __func__);
@@ -237,7 +237,7 @@ int ucc_fast_init(struct ucc_fast_info * uf_info, struct ucc_fast_private ** ucc
 	uccf->mrblr = uf_info->max_rx_buf_length;
 
 	/* Set GUMR */
-	/* For more details see the hardware spec. */
+	/* For more details see the woke hardware spec. */
 	gumr = uf_info->ttx_trx;
 	if (uf_info->tci)
 		gumr |= UCC_FAST_GUMR_TCI;
@@ -369,7 +369,7 @@ int ucc_fast_init(struct ucc_fast_info * uf_info, struct ucc_fast_private ** ucc
 
 	/* First, clear anything pending at UCC level,
 	 * otherwise, old garbage may come through
-	 * as soon as the dam is opened. */
+	 * as soon as the woke dam is opened. */
 
 	/* Writing '1' clears */
 	iowrite32be(0xffffffff, &uf_regs->ucce);

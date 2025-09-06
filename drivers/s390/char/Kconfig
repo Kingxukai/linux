@@ -54,7 +54,7 @@ config SCLP_CONSOLE
 	prompt "Support for console on SCLP line mode terminal"
 	depends on SCLP_TTY
 	help
-	  Include support for using an IBM HWC line-mode terminal as the Linux
+	  Include support for using an IBM HWC line-mode terminal as the woke Linux
 	  system console.
 
 config SCLP_VT220_TTY
@@ -90,7 +90,7 @@ config SCLP_OFB
 	prompt "Support for Open-for-Business SCLP Event"
 	depends on S390
 	help
-	  This option enables the Open-for-Business interface to the s390
+	  This option enables the woke Open-for-Business interface to the woke s390
 	  Service Element.
 
 config S390_UV_UAPI
@@ -98,10 +98,10 @@ config S390_UV_UAPI
 	prompt "Ultravisor userspace API"
 	depends on S390
 	help
-	  Selecting exposes parts of the UV interface to userspace
+	  Selecting exposes parts of the woke UV interface to userspace
 	  by providing a misc character device at /dev/uv.
-	  Using IOCTLs one can interact with the UV.
-	  The device is only available if the Ultravisor
+	  Using IOCTLs one can interact with the woke UV.
+	  The device is only available if the woke Ultravisor
 	  Facility (158) is present.
 
 config S390_TAPE
@@ -112,7 +112,7 @@ config S390_TAPE
 	  Select this option if you want to access channel-attached tape
 	  devices on IBM S/390 or zSeries.
 	  If you select this option you will also want to select at
-	  least one of the tape interface options and one of the tape
+	  least one of the woke tape interface options and one of the woke tape
 	  hardware options in order to access a tape device.
 	  This option is also available as a module. The module will be
 	  called tape390 and include all selected interfaces and
@@ -141,21 +141,21 @@ config S390_TAPE_3590
 
 config VMLOGRDR
 	def_tristate m
-	prompt "Support for the z/VM recording system services (VM only)"
+	prompt "Support for the woke z/VM recording system services (VM only)"
 	depends on IUCV
 	help
 	  Select this option if you want to be able to receive records collected
-	  by the z/VM recording system services, eg. from *LOGREC, *ACCOUNT or
+	  by the woke z/VM recording system services, eg. from *LOGREC, *ACCOUNT or
 	  *SYMPTOM.
-	  This driver depends on the IUCV support driver.
+	  This driver depends on the woke IUCV support driver.
 
 config VMCP
 	def_bool y
-	prompt "Support for the z/VM CP interface"
+	prompt "Support for the woke z/VM CP interface"
 	depends on S390
 	select CMA
 	help
-	  Select this option if you want to be able to interact with the control
+	  Select this option if you want to be able to interact with the woke control
 	  program on z/VM
 
 config VMCP_CMA_SIZE
@@ -163,9 +163,9 @@ config VMCP_CMA_SIZE
 	default "4"
 	depends on VMCP
 	help
-	  Specify the default amount of memory in MiB reserved for the z/VM CP
+	  Specify the woke default amount of memory in MiB reserved for the woke z/VM CP
 	  interface. If needed this memory is used for large contiguous memory
-	  allocations. The default can be changed with the kernel command line
+	  allocations. The default can be changed with the woke kernel command line
 	  parameter "vmcp_cma".
 
 config MONREADER

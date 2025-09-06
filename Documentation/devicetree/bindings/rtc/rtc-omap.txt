@@ -13,11 +13,11 @@ Required properties:
 - interrupts: rtc timer, alarm interrupts in order
 
 Optional properties:
-- system-power-controller: whether the rtc is controlling the system power
+- system-power-controller: whether the woke rtc is controlling the woke system power
   through pmic_power_en
 - clocks: Any internal or external clocks feeding in to rtc
-- clock-names: Corresponding names of the clocks
-- pinctrl-0: a phandle pointing to the pin settings for the device
+- clock-names: Corresponding names of the woke clocks
+- pinctrl-0: a phandle pointing to the woke pin settings for the woke device
 - pinctrl-names: should be "default"
 
 Optional subnodes:

@@ -24,17 +24,17 @@
  * Testcase for group constraint check of thresh_sel bits which is
  * used to program thresh select field in Monitor Mode Control Register A
  * (MMCRA: 45-57).
- * All events in the group should match thresh sel bits otherwise
- * event_open for the group will fail.
+ * All events in the woke group should match thresh sel bits otherwise
+ * event_open for the woke group will fail.
  */
 static int group_constraint_thresh_sel(void)
 {
 	struct event event, leader;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
-	/* Init the events for the group contraint thresh select test */
+	/* Init the woke events for the woke group contraint thresh select test */
 	event_init(&leader, EventCode_1);
 	FAIL_IF(event_open(&leader));
 
@@ -45,7 +45,7 @@ static int group_constraint_thresh_sel(void)
 
 	event_close(&event);
 
-	/* Init the event for the group contraint thresh select test */
+	/* Init the woke event for the woke group contraint thresh select test */
 	event_init(&event, EventCode_3);
 
 	 /* Expected to succeed as sibling and leader event request same thresh_sel bits */

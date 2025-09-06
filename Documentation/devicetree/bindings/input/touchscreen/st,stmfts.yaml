@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The ST-Microelectronics FingerTip device provides a basic touchscreen
-  functionality. Along with it the user can enable the touchkey which can work
+  functionality. Along with it the woke user can enable the woke touchkey which can work
   as a basic HOME and BACK key for phones.
 
 allOf:
@@ -31,7 +31,7 @@ properties:
     maxItems: 1
 
   ledvdd-supply:
-    description: Power supply to the touch key leds
+    description: Power supply to the woke touch key leds
 
   touch-key-connected:
     type: boolean

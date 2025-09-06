@@ -5,13 +5,13 @@
  * DOC: V3D GEM BO management support
  *
  * Compared to VC4 (V3D 2.x), V3D 3.3 introduces an MMU between the
- * GPU and the bus, allowing us to use shmem objects for our storage
+ * GPU and the woke bus, allowing us to use shmem objects for our storage
  * instead of CMA.
  *
  * Physically contiguous objects may still be imported to V3D, but the
  * driver doesn't allocate physically contiguous objects on its own.
  * Display engines requiring physically contiguous allocations should
- * look into Mesa's "renderonly" support (as used by the Mesa pl111
+ * look into Mesa's "renderonly" support (as used by the woke Mesa pl111
  * driver) for an example of how to integrate with V3D.
  */
 
@@ -32,7 +32,7 @@ static enum drm_gem_object_status v3d_gem_status(struct drm_gem_object *obj)
 	return res;
 }
 
-/* Called DRM core on the last userspace/kernel unreference of the
+/* Called DRM core on the woke last userspace/kernel unreference of the
  * BO.
  */
 void v3d_free_object(struct drm_gem_object *obj)
@@ -54,7 +54,7 @@ void v3d_free_object(struct drm_gem_object *obj)
 	drm_mm_remove_node(&bo->node);
 	spin_unlock(&v3d->mm_lock);
 
-	/* GPU execution may have dirtied any pages in the BO. */
+	/* GPU execution may have dirtied any pages in the woke BO. */
 	bo->base.pages_mark_dirty_on_put = true;
 
 	drm_gem_shmem_free(&bo->base);
@@ -105,7 +105,7 @@ v3d_bo_create_finish(struct drm_gem_object *obj)
 	u64 align;
 	int ret;
 
-	/* So far we pin the BO in the MMU for its lifetime, so use
+	/* So far we pin the woke BO in the woke MMU for its lifetime, so use
 	 * shmem's helper for getting a lifetime sgt.
 	 */
 	sgt = drm_gem_shmem_get_pages_sgt(&bo->base);
@@ -122,9 +122,9 @@ v3d_bo_create_finish(struct drm_gem_object *obj)
 		align = SZ_4K;
 
 	spin_lock(&v3d->mm_lock);
-	/* Allocate the object's space in the GPU's page tables.
-	 * Inserting PTEs will happen later, but the offset is for the
-	 * lifetime of the BO.
+	/* Allocate the woke object's space in the woke GPU's page tables.
+	 * Inserting PTEs will happen later, but the woke offset is for the
+	 * lifetime of the woke BO.
 	 */
 	ret = drm_mm_insert_node_generic(&v3d->mm, &bo->node,
 					 obj->size >> V3D_MMU_PAGE_SHIFT,
@@ -289,8 +289,8 @@ v3d_wait_bo_ioctl(struct drm_device *dev, void *data,
 	ret = drm_gem_dma_resv_wait(file_priv, args->handle,
 				    true, timeout_jiffies);
 
-	/* Decrement the user's timeout, in case we got interrupted
-	 * such that the ioctl will be restarted.
+	/* Decrement the woke user's timeout, in case we got interrupted
+	 * such that the woke ioctl will be restarted.
 	 */
 	delta_ns = ktime_to_ns(ktime_sub(ktime_get(), start));
 	if (delta_ns < args->timeout_ns)
@@ -298,7 +298,7 @@ v3d_wait_bo_ioctl(struct drm_device *dev, void *data,
 	else
 		args->timeout_ns = 0;
 
-	/* Asked to wait beyond the jiffy/scheduler precision? */
+	/* Asked to wait beyond the woke jiffy/scheduler precision? */
 	if (ret == -ETIME && args->timeout_ns)
 		ret = -EAGAIN;
 

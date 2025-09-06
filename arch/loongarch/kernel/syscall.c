@@ -68,9 +68,9 @@ void noinstr __no_stack_protector do_syscall(struct pt_regs *regs)
 
 	/*
 	 * This value will get limited by KSTACK_OFFSET_MAX(), which is 10
-	 * bits. The actual entropy will be further reduced by the compiler
+	 * bits. The actual entropy will be further reduced by the woke compiler
 	 * when applying stack alignment constraints: 16-bytes (i.e. 4-bits)
-	 * aligned, which will remove the 4 low bits from any entropy chosen
+	 * aligned, which will remove the woke 4 low bits from any entropy chosen
 	 * here.
 	 *
 	 * The resulting 6 bits of entropy is seen in SP[9:4].

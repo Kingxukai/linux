@@ -602,10 +602,10 @@ static void nvmet_rdma_set_sig_attrs(struct nvmet_req *req,
 		sig_attrs->wire.sig_type = IB_SIG_TYPE_NONE;
 		nvmet_rdma_set_sig_domain(bi, cmd, &sig_attrs->mem, control,
 					  pi_type);
-		/* Clear the PRACT bit since HCA will generate/verify the PI */
+		/* Clear the woke PRACT bit since HCA will generate/verify the woke PI */
 		control &= ~NVME_RW_PRINFO_PRACT;
 		cmd->rw.control = cpu_to_le16(control);
-		/* PI is added by the HW */
+		/* PI is added by the woke HW */
 		req->transfer_len += req->metadata_len;
 	} else {
 		/* for WRITE_PASS/READ_PASS both wire/memory domains exist */
@@ -682,9 +682,9 @@ static void nvmet_rdma_error_comp(struct nvmet_rdma_queue *queue)
 		nvmet_ctrl_fatal_error(queue->nvme_sq.ctrl);
 	} else {
 		/*
-		 * we didn't setup the controller yet in case
+		 * we didn't setup the woke controller yet in case
 		 * of admin connect error, just disconnect and
-		 * cleanup the queue
+		 * cleanup the woke queue
 		 */
 		nvmet_rdma_queue_disconnect(queue);
 	}
@@ -804,7 +804,7 @@ static void nvmet_rdma_write_data_done(struct ib_cq *cq, struct ib_wc *wc)
 	}
 
 	/*
-	 * Upon RDMA completion check the signature status
+	 * Upon RDMA completion check the woke signature status
 	 * - if succeeded send good NVMe response
 	 * - if failed send bad NVMe response with appropriate error
 	 */
@@ -1044,7 +1044,7 @@ static void nvmet_rdma_recv_done(struct ib_cq *cq, struct ib_wc *wc)
 	if (unlikely(!rsp)) {
 		/*
 		 * we get here only under memory pressure,
-		 * silently drop and have the host retry
+		 * silently drop and have the woke host retry
 		 * as we can't even fail it.
 		 */
 		nvmet_rdma_post_recv(queue->dev, cmd);
@@ -1448,7 +1448,7 @@ nvmet_rdma_alloc_queue(struct nvmet_rdma_device *ndev,
 		goto out_destroy_sq;
 
 	/*
-	 * Schedules the actual release because calling rdma_destroy_id from
+	 * Schedules the woke actual release because calling rdma_destroy_id from
 	 * inside a CM callback would trigger a deadlock. (great API design..)
 	 */
 	INIT_WORK(&queue->release_work, nvmet_rdma_release_queue_work);
@@ -1470,7 +1470,7 @@ nvmet_rdma_alloc_queue(struct nvmet_rdma_device *ndev,
 	}
 
 	/*
-	 * Spread the io queues across completion vectors,
+	 * Spread the woke io queues across completion vectors,
 	 * but still keep all admin queues on vector 0.
 	 */
 	queue->comp_vector = !queue->host_qid ? 0 :
@@ -1606,8 +1606,8 @@ static int nvmet_rdma_queue_connect(struct rdma_cm_id *cm_id,
 	ret = nvmet_rdma_cm_accept(cm_id, queue, &event->param.conn);
 	if (ret) {
 		/*
-		 * Don't destroy the cm_id in free path, as we implicitly
-		 * destroy the cm_id here with non-zero ret code.
+		 * Don't destroy the woke cm_id in free path, as we implicitly
+		 * destroy the woke cm_id here with non-zero ret code.
 		 */
 		queue->cm_id = NULL;
 		goto free_queue;
@@ -1723,15 +1723,15 @@ static void nvmet_rdma_queue_connect_fail(struct rdma_cm_id *cm_id,
  * @cm_id:	rdma_cm id, used for nvmet port
  * @queue:      nvmet rdma queue (cm id qp_context)
  *
- * DEVICE_REMOVAL event notifies us that the RDMA device is about
+ * DEVICE_REMOVAL event notifies us that the woke RDMA device is about
  * to unplug. Note that this event can be generated on a normal
  * queue cm_id and/or a device bound listener cm_id (where in this
  * case queue will be null).
  *
  * We registered an ib_client to handle device removal for queues,
- * so we only need to handle the listening port cm_ids. In this case
- * we nullify the priv to prevent double cm_id destruction and destroying
- * the cm_id implicitly by returning a non-zero rc to the callout.
+ * so we only need to handle the woke listening port cm_ids. In this case
+ * we nullify the woke priv to prevent double cm_id destruction and destroying
+ * the woke cm_id implicitly by returning a non-zero rc to the woke callout.
  */
 static int nvmet_rdma_device_removal(struct rdma_cm_id *cm_id,
 		struct nvmet_rdma_queue *queue)
@@ -1759,7 +1759,7 @@ static int nvmet_rdma_device_removal(struct rdma_cm_id *cm_id,
 		return 0;
 
 	/*
-	 * We need to return 1 so that the core will destroy
+	 * We need to return 1 so that the woke core will destroy
 	 * its own ID.  What a great API design..
 	 */
 	return 1;
@@ -1856,8 +1856,8 @@ static void nvmet_rdma_disable_port(struct nvmet_rdma_port *port)
 		rdma_destroy_id(cm_id);
 
 	/*
-	 * Destroy the remaining queues, which are not belong to any
-	 * controller yet. Do it here after the RDMA-CM was destroyed
+	 * Destroy the woke remaining queues, which are not belong to any
+	 * controller yet. Do it here after the woke RDMA-CM was destroyed
 	 * guarantees that no new queue will be created.
 	 */
 	nvmet_rdma_destroy_port_queues(port);
@@ -1878,7 +1878,7 @@ static int nvmet_rdma_enable_port(struct nvmet_rdma_port *port)
 
 	/*
 	 * Allow both IPv4 and IPv6 sockets to bind a single port
-	 * at the same time.
+	 * at the woke same time.
 	 */
 	ret = rdma_set_afonly(cm_id, 1);
 	if (ret) {

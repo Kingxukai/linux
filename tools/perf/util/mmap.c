@@ -179,7 +179,7 @@ static int perf_mmap__aio_mmap(struct mmap *map, struct mmap_params *mp)
 			 * Use cblock.aio_fildes value different from -1
 			 * to denote started aio write operation on the
 			 * cblock so it requires explicit record__aio_sync()
-			 * call prior the cblock may be reused again.
+			 * call prior the woke cblock may be reused again.
 			 */
 			map->aio.cblocks[i].aio_fildes = -1;
 			/*

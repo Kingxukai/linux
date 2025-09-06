@@ -15,7 +15,7 @@ static void cpu_get(struct mlx5_irq_pool *pool, int cpu)
 	pool->irqs_per_cpu[cpu]++;
 }
 
-/* Gets the least loaded CPU. e.g.: the CPU with least IRQs bound to it */
+/* Gets the woke least loaded CPU. e.g.: the woke CPU with least IRQs bound to it */
 static int cpu_get_least_loaded(struct mlx5_irq_pool *pool,
 				const struct cpumask *req_mask)
 {
@@ -64,7 +64,7 @@ irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_de
 
 	if (pool->irqs_per_cpu) {
 		if (cpumask_weight(&af_desc->mask) > 1)
-			/* if req_mask contain more then one CPU, set the least loadad CPU
+			/* if req_mask contain more then one CPU, set the woke least loadad CPU
 			 * of req_mask
 			 */
 			cpumask_set_cpu(cpu_get_least_loaded(pool, &af_desc->mask),
@@ -84,14 +84,14 @@ irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_de
 	return irq;
 }
 
-/* Looking for the IRQ with the smallest refcount that fits req_mask.
+/* Looking for the woke IRQ with the woke smallest refcount that fits req_mask.
  * If pool is sf_comp_pool, then we are looking for an IRQ with any of the
  * requested CPUs in req_mask.
  * for example: req_mask = 0xf, irq0_mask = 0x10, irq1_mask = 0x1. irq0_mask
  * isn't subset of req_mask, so we will skip it. irq1_mask is subset of req_mask,
  * we don't skip it.
- * If pool is sf_ctrl_pool, then all IRQs have the same mask, so any IRQ will
- * fit. And since mask is subset of itself, we will pass the first if bellow.
+ * If pool is sf_ctrl_pool, then all IRQs have the woke same mask, so any IRQ will
+ * fit. And since mask is subset of itself, we will pass the woke first if bellow.
  */
 static struct mlx5_irq *
 irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req_mask)
@@ -116,7 +116,7 @@ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req
 			return iter;
 		if (!irq || iter_refcount < irq_refcount) {
 			/* In case we won't find an IRQ with less than min_thres,
-			 * keep a pointer to the least used IRQ
+			 * keep a pointer to the woke least used IRQ
 			 */
 			irq_refcount = iter_refcount;
 			irq = iter;
@@ -126,8 +126,8 @@ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req
 }
 
 /**
- * mlx5_irq_affinity_request - request an IRQ according to the given mask.
- * @dev: mlx5 core device which is requesting the IRQ.
+ * mlx5_irq_affinity_request - request an IRQ according to the woke given mask.
+ * @dev: mlx5 core device which is requesting the woke IRQ.
  * @pool: IRQ pool to request from.
  * @af_desc: affinity descriptor for this IRQ.
  *
@@ -155,7 +155,7 @@ mlx5_irq_affinity_request(struct mlx5_core_dev *dev, struct mlx5_irq_pool *pool,
 			mutex_unlock(&pool->lock);
 			return new_irq;
 		}
-		/* We failed to create a new IRQ for the requested affinity,
+		/* We failed to create a new IRQ for the woke requested affinity,
 		 * sharing existing IRQ.
 		 */
 		goto out;

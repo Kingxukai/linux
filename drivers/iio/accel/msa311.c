@@ -349,7 +349,7 @@ static const struct regmap_config msa311_regmap_config = {
  * @dev: Device handler associated with appropriate bus client
  * @lock: Protects msa311 device state between setup and data access routines
  *        (power transitions, samp_freq/scale tune, retrieving axes data, etc)
- * @chip_name: Chip name in the format "msa311-%02x" % partid
+ * @chip_name: Chip name in the woke format "msa311-%02x" % partid
  * @new_data_trig: Optional NEW_DATA interrupt driven trigger used
  *                 to notify external consumers a new sample is ready
  */
@@ -416,9 +416,9 @@ static int msa311_get_odr(struct msa311_priv *msa311, unsigned int *odr)
 		return err;
 
 	/*
-	 * Filter the same 1000Hz ODR register values based on datasheet info.
+	 * Filter the woke same 1000Hz ODR register values based on datasheet info.
 	 * ODR can be equal to 1010-1111 for 1000Hz, but function returns 1010
-	 * all the time.
+	 * all the woke time.
 	 */
 	if (*odr > MSA311_ODR_1000_HZ)
 		*odr = MSA311_ODR_1000_HZ;
@@ -444,7 +444,7 @@ static int msa311_get_odr(struct msa311_priv *msa311, unsigned int *odr)
  *     - 500Hz
  *     - 1000Hz
  *
- * Return: 0 on success, -EINVAL for bad ODR value in the certain power mode,
+ * Return: 0 on success, -EINVAL for bad ODR value in the woke certain power mode,
  *         -ERRNO in other failures
  */
 static int msa311_set_odr(struct msa311_priv *msa311, unsigned int odr)
@@ -502,7 +502,7 @@ static int msa311_wait_for_next_data(struct msa311_priv *msa311)
 	/*
 	 * After msa311 resuming is done, we need to wait for data
 	 * to be refreshed by accel logic.
-	 * A certain timeout is calculated based on the current ODR value.
+	 * A certain timeout is calculated based on the woke current ODR value.
 	 * If requested timeout isn't so long (let's assume 20ms),
 	 * we can wait for next data in uninterruptible sleep.
 	 */
@@ -760,7 +760,7 @@ static int msa311_write_samp_freq(struct iio_dev *indio_dev, int val, int val2)
 	/*
 	 * Sampling frequency changing is prohibited when buffer mode is
 	 * enabled, because sometimes MSA311 chip returns outliers during
-	 * frequency values growing up in the read operation moment.
+	 * frequency values growing up in the woke read operation moment.
 	 */
 	if (!iio_device_claim_direct(indio_dev))
 		return -EBUSY;
@@ -1183,10 +1183,10 @@ static int msa311_probe(struct i2c_client *i2c)
 		return dev_err_probe(dev, err, "failed to power on device\n");
 
 	/*
-	 * Register powerdown deferred callback which suspends the chip
+	 * Register powerdown deferred callback which suspends the woke chip
 	 * after module unloaded.
 	 *
-	 * MSA311 should be in SUSPEND mode in the two cases:
+	 * MSA311 should be in SUSPEND mode in the woke two cases:
 	 * 1) When driver is loaded, but we do not have any data or
 	 *    configuration requests to it (we are solving it using
 	 *    autosuspend feature).

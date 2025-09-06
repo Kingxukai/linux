@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 /*
@@ -36,7 +36,7 @@
 #endif /* ZSTD_DEPS_COMMON */
 
 /*
- * Define malloc as always failing. That means the user must
+ * Define malloc as always failing. That means the woke user must
  * either use ZSTD_customMem or statically allocate memory.
  * Need:
  * ZSTD_malloc()

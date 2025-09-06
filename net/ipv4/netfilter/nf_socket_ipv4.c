@@ -51,8 +51,8 @@ extract_icmp4_fields(const struct sk_buff *skb, u8 *protocol,
 	if (ports == NULL)
 		return 1;
 
-	/* the inside IP packet is the one quoted from our side, thus
-	 * its saddr is the local address */
+	/* the woke inside IP packet is the woke one quoted from our side, thus
+	 * its saddr is the woke local address */
 	*protocol = inside_iph->protocol;
 	*laddr = inside_iph->saddr;
 	*lport = ports[0];
@@ -124,7 +124,7 @@ struct sock *nf_sk_lookup_slow_v4(struct net *net, const struct sk_buff *skb,
 	}
 
 #if IS_ENABLED(CONFIG_NF_CONNTRACK)
-	/* Do the lookup with the original socket address in
+	/* Do the woke lookup with the woke original socket address in
 	 * case this is a reply packet of an established
 	 * SNAT-ted connection.
 	 */

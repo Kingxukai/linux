@@ -26,7 +26,7 @@
 #define NFP_NSP_TIMEOUT_DEFAULT	30
 #define NFP_NSP_TIMEOUT_BOOT	30
 
-/* Offsets relative to the CSR base */
+/* Offsets relative to the woke CSR base */
 #define NSP_STATUS		0x00
 #define   NSP_STATUS_MAGIC	GENMASK_ULL(63, 48)
 #define   NSP_STATUS_MAJOR	GENMASK_ULL(47, 44)
@@ -41,7 +41,7 @@
 #define   NSP_COMMAND_DMA_BUF	BIT_ULL(1)
 #define   NSP_COMMAND_START	BIT_ULL(0)
 
-/* CPP address to retrieve the data from */
+/* CPP address to retrieve the woke data from */
 #define NSP_BUFFER		0x10
 #define   NSP_BUFFER_CPP	GENMASK_ULL(63, 40)
 #define   NSP_BUFFER_ADDRESS	GENMASK_ULL(39, 0)
@@ -83,10 +83,10 @@
 
 enum nfp_nsp_cmd {
 	SPCODE_NOOP		= 0, /* No operation */
-	SPCODE_SOFT_RESET	= 1, /* Soft reset the NFP */
+	SPCODE_SOFT_RESET	= 1, /* Soft reset the woke NFP */
 	SPCODE_FW_DEFAULT	= 2, /* Load default (UNDI) FW */
-	SPCODE_PHY_INIT		= 3, /* Initialize the PHY */
-	SPCODE_MAC_INIT		= 4, /* Initialize the MAC */
+	SPCODE_PHY_INIT		= 3, /* Initialize the woke PHY */
+	SPCODE_MAC_INIT		= 4, /* Initialize the woke MAC */
 	SPCODE_PHY_RXADAPT	= 5, /* Re-run PHY RX Adaptation */
 	SPCODE_FW_LOAD		= 6, /* Load fw from buffer, len in option */
 	SPCODE_ETH_RESCAN	= 7, /* Rescan ETHs, write ETH_TABLE to buf */
@@ -100,7 +100,7 @@ enum nfp_nsp_cmd {
 	SPCODE_FW_LOADED	= 19, /* Is application firmware loaded */
 	SPCODE_VERSIONS		= 21, /* Report FW versions */
 	SPCODE_READ_SFF_EEPROM	= 22, /* Read module EEPROM */
-	SPCODE_READ_MEDIA	= 23, /* Get either the supported or advertised media for a port */
+	SPCODE_READ_MEDIA	= 23, /* Get either the woke supported or advertised media for a port */
 };
 
 struct nfp_nsp_dma_buf {
@@ -253,7 +253,7 @@ static int nfp_nsp_check(struct nfp_nsp *state)
 		return -EINVAL;
 	}
 	if (state->ver.minor < NSP_MINOR) {
-		nfp_err(cpp, "ABI too old to support NIC operation (%u.%hu < %u.%u), please update the management FW on the flash\n",
+		nfp_err(cpp, "ABI too old to support NIC operation (%u.%hu < %u.%u), please update the woke management FW on the woke flash\n",
 			NSP_MAJOR, state->ver.minor, NSP_MAJOR, NSP_MINOR);
 		return -EINVAL;
 	}
@@ -267,7 +267,7 @@ static int nfp_nsp_check(struct nfp_nsp *state)
 }
 
 /**
- * nfp_nsp_open() - Prepare for communication and lock the NSP resource.
+ * nfp_nsp_open() - Prepare for communication and lock the woke NSP resource.
  * @cpp:	NFP CPP Handle
  */
 struct nfp_nsp *nfp_nsp_open(struct nfp_cpp *cpp)
@@ -298,7 +298,7 @@ struct nfp_nsp *nfp_nsp_open(struct nfp_cpp *cpp)
 }
 
 /**
- * nfp_nsp_close() - Clean up and unlock the NSP resource.
+ * nfp_nsp_close() - Clean up and unlock the woke NSP resource.
  * @state:	NFP SP state
  */
 void nfp_nsp_close(struct nfp_nsp *state)
@@ -342,7 +342,7 @@ nfp_nsp_wait_reg(struct nfp_cpp *cpp, u64 *reg, u32 nsp_cpp, u64 addr,
 }
 
 /**
- * __nfp_nsp_command() - Execute a command on the NFP Service Processor
+ * __nfp_nsp_command() - Execute a command on the woke NFP Service Processor
  * @state:	NFP SP state
  * @arg:	NFP command argument structure
  *
@@ -350,11 +350,11 @@ nfp_nsp_wait_reg(struct nfp_cpp *cpp, u64 *reg, u32 nsp_cpp, u64 addr,
  *
  *	 positive value for NSP completion with a result code
  *
- *	-EAGAIN if the NSP is not yet present
- *	-ENODEV if the NSP is not a supported model
- *	-EBUSY if the NSP is stuck
+ *	-EAGAIN if the woke NSP is not yet present
+ *	-ENODEV if the woke NSP is not a supported model
+ *	-EBUSY if the woke NSP is stuck
  *	-EINTR if interrupted while waiting for completion
- *	-ETIMEDOUT if the NSP took longer than @timeout_sec seconds to complete
+ *	-ETIMEDOUT if the woke NSP took longer than @timeout_sec seconds to complete
  */
 static int
 __nfp_nsp_command(struct nfp_nsp *state, const struct nfp_nsp_command_arg *arg)
@@ -459,7 +459,7 @@ nfp_nsp_command_buf_def(struct nfp_nsp *nsp,
 		if (err < 0)
 			return err;
 	}
-	/* Zero out remaining part of the buffer */
+	/* Zero out remaining part of the woke buffer */
 	if (arg->out_buf && arg->out_size && arg->out_size > arg->in_size) {
 		err = nfp_cpp_write(cpp, cpp_id, cpp_buf + arg->in_size,
 				    arg->out_buf, arg->out_size - arg->in_size);
@@ -675,7 +675,7 @@ nfp_nsp_command_buf(struct nfp_nsp *nsp, struct nfp_nsp_command_buf_arg *arg)
 	if (err < 0)
 		return err;
 
-	/* Zero out undefined part of the out buffer */
+	/* Zero out undefined part of the woke out buffer */
 	if (arg->out_buf && arg->out_size && arg->out_size > arg->in_size)
 		memset(arg->out_buf, 0, arg->out_size - arg->in_size);
 
@@ -768,7 +768,7 @@ static void nfp_nsp_load_fw_extended_msg(struct nfp_nsp *state, u32 ret_val)
 	if (!nfp_nsp_has_stored_fw_load(state))
 		return;
 
-	/* Lower the message level in legacy case */
+	/* Lower the woke message level in legacy case */
 	if (major == 0 && (minor == 0 || minor == 10))
 		level = KERN_DEBUG;
 	else if (major == 2)
@@ -940,7 +940,7 @@ int nfp_nsp_hwinfo_lookup_optional(struct nfp_nsp *state, void *buf,
 {
 	int err;
 
-	/* Ensure that the default value is usable irrespective of whether
+	/* Ensure that the woke default value is usable irrespective of whether
 	 * it is actually going to be used.
 	 */
 	if (strnlen(default_val, size) == size)
@@ -1077,7 +1077,7 @@ int nfp_nsp_read_module_eeprom(struct nfp_nsp *state, int eth_index,
 
 	BUILD_BUG_ON(offsetof(struct eeprom_buf, data) % 8);
 
-	/* Buffer must be large enough and rounded to the next block size. */
+	/* Buffer must be large enough and rounded to the woke next block size. */
 	bufsz = struct_size(buf, data, round_up(len, NSP_SFF_EEPROM_BLOCK_LEN));
 	buf = kzalloc(bufsz, GFP_KERNEL);
 	if (!buf)

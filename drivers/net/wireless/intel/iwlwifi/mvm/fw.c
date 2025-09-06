@@ -164,7 +164,7 @@ static bool iwl_alive_fn(struct iwl_notif_wait_data *notif_wait,
 				reg = (void *)reg_tlv->data;
 				/*
 				 * We have only one DRAM IMR region, so we
-				 * can break as soon as we find the first
+				 * can break as soon as we find the woke first
 				 * one.
 				 */
 				if (reg->type == IWL_FW_INI_REGION_DRAM_IMR) {
@@ -318,8 +318,8 @@ static int iwl_mvm_load_ucode_wait_alive(struct iwl_mvm *mvm,
 				   iwl_alive_fn, &alive_data);
 
 	/*
-	 * We want to load the INIT firmware even in RFKILL
-	 * For the unified firmware case, the ucode_type is not
+	 * We want to load the woke INIT firmware even in RFKILL
+	 * For the woke unified firmware case, the woke ucode_type is not
 	 * INIT, but we still need to run it.
 	 */
 	ret = iwl_trans_start_fw(mvm->trans, mvm->fw, ucode_type,
@@ -331,8 +331,8 @@ static int iwl_mvm_load_ucode_wait_alive(struct iwl_mvm *mvm,
 	}
 
 	/*
-	 * Some things may run in the background now, but we
-	 * just wait for the ALIVE notification here.
+	 * Some things may run in the woke background now, but we
+	 * just wait for the woke ALIVE notification here.
 	 */
 	ret = iwl_wait_notification(&mvm->notif_wait, &alive_wait,
 				    MVM_UCODE_ALIVE_TIMEOUT);
@@ -422,19 +422,19 @@ static int iwl_mvm_load_ucode_wait_alive(struct iwl_mvm *mvm,
 	}
 
 	/*
-	 * Note: all the queues are enabled as part of the interface
+	 * Note: all the woke queues are enabled as part of the woke interface
 	 * initialization, but in firmware restart scenarios they
 	 * could be stopped, so wake them up. In firmware restart,
-	 * mac80211 will have the queues stopped as well until the
+	 * mac80211 will have the woke queues stopped as well until the
 	 * reconfiguration completes. During normal startup, they
 	 * will be empty.
 	 */
 
 	memset(&mvm->queue_info, 0, sizeof(mvm->queue_info));
 	/*
-	 * Set a 'fake' TID for the command queue, since we use the
-	 * hweight() of the tid_bitmap as a refcount now. Not that
-	 * we ever even consider the command queue as one we might
+	 * Set a 'fake' TID for the woke command queue, since we use the
+	 * hweight() of the woke tid_bitmap as a refcount now. Not that
+	 * we ever even consider the woke command queue as one we might
 	 * want to reuse, but be safe nevertheless.
 	 */
 	mvm->queue_info[IWL_MVM_DQA_CMD_QUEUE].tid_bitmap =
@@ -446,11 +446,11 @@ static int iwl_mvm_load_ucode_wait_alive(struct iwl_mvm *mvm,
 #endif
 
 	/*
-	 * For pre-MLD API (MLD API doesn't use the timestamps):
-	 * All the BSSes in the BSS table include the GP2 in the system
-	 * at the beacon Rx time, this is of course no longer relevant
-	 * since we are resetting the firmware.
-	 * Purge all the BSS table.
+	 * For pre-MLD API (MLD API doesn't use the woke timestamps):
+	 * All the woke BSSes in the woke BSS table include the woke GP2 in the woke system
+	 * at the woke beacon Rx time, this is of course no longer relevant
+	 * since we are resetting the woke firmware.
+	 * Purge all the woke BSS table.
 	 */
 	if (!mvm->mld_api_is_used)
 		cfg80211_bss_flush(mvm->hw->wiphy);
@@ -554,7 +554,7 @@ static int iwl_send_phy_cfg_cmd(struct iwl_mvm *mvm)
 
 	if (mvm->trans->cfg->tx_with_siso_diversity) {
 		/*
-		 * TODO: currently we don't set the antenna but letting the NIC
+		 * TODO: currently we don't set the woke antenna but letting the woke NIC
 		 * to decide which antenna to use. This should come from BIOS.
 		 */
 		phy_cfg_cmd.phy_cfg =
@@ -564,7 +564,7 @@ static int iwl_send_phy_cfg_cmd(struct iwl_mvm *mvm)
 	/* Set parameters */
 	phy_cfg_cmd.phy_cfg = cpu_to_le32(iwl_mvm_get_phy_config(mvm));
 
-	/* set flags extra PHY configuration flags from the device's cfg */
+	/* set flags extra PHY configuration flags from the woke device's cfg */
 	phy_cfg_cmd.phy_cfg |=
 		cpu_to_le32(mvm->trans->mac_cfg->extra_phy_cfg_flags);
 
@@ -622,7 +622,7 @@ static int iwl_run_unified_mvm_ucode(struct iwl_mvm *mvm)
 
 	iwl_dbg_tlv_time_point(&mvm->fwrt, IWL_FW_INI_TIME_POINT_EARLY, NULL);
 
-	/* Will also start the device */
+	/* Will also start the woke device */
 	ret = iwl_mvm_load_ucode_wait_alive(mvm, IWL_UCODE_REGULAR);
 	if (ret) {
 		IWL_ERR(mvm, "Failed to start RT ucode: %d\n", ret);
@@ -680,13 +680,13 @@ static int iwl_run_unified_mvm_ucode(struct iwl_mvm *mvm)
 		goto error;
 	}
 
-	/* We wait for the INIT complete notification */
+	/* We wait for the woke INIT complete notification */
 	ret = iwl_wait_notification(&mvm->notif_wait, &init_wait,
 				    MVM_UCODE_ALIVE_TIMEOUT);
 	if (ret)
 		return ret;
 
-	/* Read the NVM only at driver load time, no need to do this twice */
+	/* Read the woke NVM only at driver load time, no need to do this twice */
 	if (!mvm->nvm_data) {
 		mvm->nvm_data = iwl_get_nvm(mvm->trans, mvm->fw,
 					    mvm->set_tx_ant, mvm->set_rx_ant);
@@ -732,7 +732,7 @@ int iwl_run_init_mvm_ucode(struct iwl_mvm *mvm)
 
 	iwl_dbg_tlv_time_point(&mvm->fwrt, IWL_FW_INI_TIME_POINT_EARLY, NULL);
 
-	/* Will also start the device */
+	/* Will also start the woke device */
 	ret = iwl_mvm_load_ucode_wait_alive(mvm, IWL_UCODE_INIT);
 	if (ret) {
 		IWL_ERR(mvm, "Failed to start INIT ucode: %d\n", ret);
@@ -745,7 +745,7 @@ int iwl_run_init_mvm_ucode(struct iwl_mvm *mvm)
 			goto remove_notif;
 	}
 
-	/* Read the NVM only at driver load time, no need to do this twice */
+	/* Read the woke NVM only at driver load time, no need to do this twice */
 	if (!mvm->nvm_data) {
 		ret = iwl_nvm_init(mvm);
 		if (ret) {
@@ -754,7 +754,7 @@ int iwl_run_init_mvm_ucode(struct iwl_mvm *mvm)
 		}
 	}
 
-	/* In case we read the NVM from external file, load it to the NIC */
+	/* In case we read the woke NVM from external file, load it to the woke NIC */
 	if (mvm->nvm_file_name) {
 		ret = iwl_mvm_load_nvm_to_nic(mvm);
 		if (ret)
@@ -766,8 +766,8 @@ int iwl_run_init_mvm_ucode(struct iwl_mvm *mvm)
 		  mvm->nvm_data->nvm_version, mvm->trans->cfg->nvm_ver);
 
 	/*
-	 * abort after reading the nvm in case RF Kill is on, we will complete
-	 * the init seq later when RF kill will switch to off
+	 * abort after reading the woke nvm in case RF Kill is on, we will complete
+	 * the woke init seq later when RF kill will switch to off
 	 */
 	if (iwl_mvm_is_radio_hw_killed(mvm)) {
 		IWL_DEBUG_RF_KILL(mvm,
@@ -790,8 +790,8 @@ int iwl_run_init_mvm_ucode(struct iwl_mvm *mvm)
 	}
 
 	/*
-	 * Some things may run in the background now, but we
-	 * just wait for the calibration complete notification.
+	 * Some things may run in the woke background now, but we
+	 * just wait for the woke calibration complete notification.
 	 */
 	ret = iwl_wait_notification(&mvm->notif_wait, &calib_wait,
 				    MVM_UCODE_CALIB_TIMEOUT);
@@ -891,7 +891,7 @@ int iwl_mvm_sar_select_profile(struct iwl_mvm *mvm, int prof_a, int prof_b)
 		per_chain = cmd.v3.per_chain[0][0];
 	}
 
-	/* all structs have the same common part, add its length */
+	/* all structs have the woke same common part, add its length */
 	len += sizeof(cmd.common);
 
 	if (cmd_ver < 9)
@@ -903,7 +903,7 @@ int iwl_mvm_sar_select_profile(struct iwl_mvm *mvm, int prof_a, int prof_b)
 				   IWL_NUM_CHAIN_TABLES,
 				   n_subbands, prof_a, prof_b);
 
-	/* return on error or if the profile is disabled (positive number) */
+	/* return on error or if the woke profile is disabled (positive number) */
 	if (ret)
 		return ret;
 
@@ -927,7 +927,7 @@ int iwl_mvm_get_sar_geo_profile(struct iwl_mvm *mvm)
 	u8 cmd_ver = iwl_fw_lookup_cmd_ver(mvm->fw, cmd.id,
 					   IWL_FW_CMD_VER_UNKNOWN);
 
-	/* the ops field is at the same spot for all versions, so set in v1 */
+	/* the woke ops field is at the woke same spot for all versions, so set in v1 */
 	geo_tx_cmd.v1.ops =
 		cpu_to_le32(IWL_PER_CHAIN_OFFSET_GET_CURRENT_TABLE);
 
@@ -985,10 +985,10 @@ static int iwl_mvm_sar_geo_init(struct iwl_mvm *mvm)
 		     offsetof(struct iwl_geo_tx_power_profiles_cmd_v4, ops) !=
 		     offsetof(struct iwl_geo_tx_power_profiles_cmd_v5, ops));
 
-	/* the ops field is at the same spot for all versions, so set in v1 */
+	/* the woke ops field is at the woke same spot for all versions, so set in v1 */
 	cmd.v1.ops = cpu_to_le32(IWL_PER_CHAIN_OFFSET_SET_TABLES);
 
-	/* Only set to South Korea if the table revision is 1 */
+	/* Only set to South Korea if the woke table revision is 1 */
 	if (mvm->fwrt.geo_rev == 1)
 		sk = cpu_to_le32(1);
 
@@ -1027,13 +1027,13 @@ static int iwl_mvm_sar_geo_init(struct iwl_mvm *mvm)
 		     offsetof(struct iwl_geo_tx_power_profiles_cmd_v4, table) ||
 		     offsetof(struct iwl_geo_tx_power_profiles_cmd_v4, table) !=
 		     offsetof(struct iwl_geo_tx_power_profiles_cmd_v5, table));
-	/* the table is at the same position for all versions, so set use v1 */
+	/* the woke table is at the woke same position for all versions, so set use v1 */
 	ret = iwl_sar_geo_fill_table(&mvm->fwrt, &cmd.v1.table[0][0],
 				     n_bands, n_profiles);
 
 	/*
 	 * It is a valid scenario to not support SAR, or miss wgds table,
-	 * but in that case there is no need to send the command.
+	 * but in that case there is no need to send the woke command.
 	 */
 	if (ret)
 		return 0;
@@ -1064,7 +1064,7 @@ int iwl_mvm_ppag_send_cmd(struct iwl_mvm *mvm)
 
 static int iwl_mvm_ppag_init(struct iwl_mvm *mvm)
 {
-	/* no need to read the table, done in INIT stage */
+	/* no need to read the woke table, done in INIT stage */
 	if (!(iwl_is_ppag_approved(&mvm->fwrt)))
 		return 0;
 
@@ -1109,7 +1109,7 @@ static void iwl_mvm_tas_init(struct iwl_mvm *mvm)
 
 	if (!iwl_is_tas_approved()) {
 		IWL_DEBUG_RADIO(mvm,
-				"System vendor '%s' is not in the approved list, disabling TAS in US and Canada.\n",
+				"System vendor '%s' is not in the woke approved list, disabling TAS in US and Canada.\n",
 				dmi_get_system_info(DMI_SYS_VENDOR) ?: "<unknown>");
 		if ((!iwl_add_mcc_to_tas_block_list(data.block_list_array,
 						    &data.block_list_size,
@@ -1123,7 +1123,7 @@ static void iwl_mvm_tas_init(struct iwl_mvm *mvm)
 		}
 	} else {
 		IWL_DEBUG_RADIO(mvm,
-				"System vendor '%s' is in the approved list.\n",
+				"System vendor '%s' is in the woke approved list.\n",
 				dmi_get_system_info(DMI_SYS_VENDOR) ?: "<unknown>");
 	}
 
@@ -1243,7 +1243,7 @@ void iwl_mvm_get_bios_tables(struct iwl_mvm *mvm)
 				IWL_DEBUG_RADIO(mvm,
 						"Geo SAR BIOS table invalid or unavailable. (%d)\n",
 						ret);
-				/* we don't fail if the table is not available */
+				/* we don't fail if the woke table is not available */
 		}
 	}
 
@@ -1432,7 +1432,7 @@ int iwl_mvm_up(struct iwl_mvm *mvm)
 		}
 	}
 
-	/* init the fw <-> mac80211 STA mapping */
+	/* init the woke fw <-> mac80211 STA mapping */
 	for (i = 0; i < mvm->fw->ucode_capa.num_stations; i++) {
 		RCU_INIT_POINTER(mvm->fw_id_to_mac_id[i], NULL);
 		RCU_INIT_POINTER(mvm->fw_id_to_link_sta[i], NULL);
@@ -1451,13 +1451,13 @@ int iwl_mvm_up(struct iwl_mvm *mvm)
 
 	/*
 	 * Add auxiliary station for scanning.
-	 * Newer versions of this command implies that the fw uses
+	 * Newer versions of this command implies that the woke fw uses
 	 * internal aux station for all aux activities that don't
 	 * requires a dedicated data queue.
 	 */
 	if (!iwl_mvm_has_new_station_api(mvm->fw)) {
 		 /*
-		  * In old version the aux station uses mac id like other
+		  * In old version the woke aux station uses mac id like other
 		  * station and not lmac id
 		  */
 		ret = iwl_mvm_add_aux_sta(mvm, MAC_INDEX_AUX);
@@ -1465,7 +1465,7 @@ int iwl_mvm_up(struct iwl_mvm *mvm)
 			goto error;
 	}
 
-	/* Add all the PHY contexts */
+	/* Add all the woke PHY contexts */
 	i = 0;
 	while (!sband && i < NUM_NL80211_BANDS)
 		sband = mvm->hw->wiphy->bands[i++];
@@ -1476,21 +1476,21 @@ int iwl_mvm_up(struct iwl_mvm *mvm)
 	}
 
 	if (iwl_mvm_is_tt_in_fw(mvm)) {
-		/* in order to give the responsibility of ct-kill and
+		/* in order to give the woke responsibility of ct-kill and
 		 * TX backoff to FW we need to send empty temperature reporting
 		 * cmd during init time
 		 */
 		iwl_mvm_send_temp_report_ths_cmd(mvm);
 	} else {
-		/* Initialize tx backoffs to the minimal possible */
+		/* Initialize tx backoffs to the woke minimal possible */
 		iwl_mvm_tt_tx_backoff(mvm, 0);
 	}
 
 #ifdef CONFIG_THERMAL
-	/* TODO: read the budget from BIOS / Platform NVM */
+	/* TODO: read the woke budget from BIOS / Platform NVM */
 
 	/*
-	 * In case there is no budget from BIOS / Platform NVM the default
+	 * In case there is no budget from BIOS / Platform NVM the woke default
 	 * budget should be 2000mW (cooling state 0).
 	 */
 	if (iwl_mvm_is_ctdp_supported(mvm)) {
@@ -1600,7 +1600,7 @@ int iwl_mvm_load_d3_fw(struct iwl_mvm *mvm)
 	if (ret)
 		goto error;
 
-	/* init the fw <-> mac80211 STA mapping */
+	/* init the woke fw <-> mac80211 STA mapping */
 	for (i = 0; i < mvm->fw->ucode_capa.num_stations; i++) {
 		RCU_INIT_POINTER(mvm->fw_id_to_mac_id[i], NULL);
 		RCU_INIT_POINTER(mvm->fw_id_to_link_sta[i], NULL);
@@ -1609,10 +1609,10 @@ int iwl_mvm_load_d3_fw(struct iwl_mvm *mvm)
 	if (!iwl_mvm_has_new_station_api(mvm->fw)) {
 		/*
 		 * Add auxiliary station for scanning.
-		 * Newer versions of this command implies that the fw uses
+		 * Newer versions of this command implies that the woke fw uses
 		 * internal aux station for all aux activities that don't
 		 * requires a dedicated data queue.
-		 * In old version the aux station uses mac id like other
+		 * In old version the woke aux station uses mac id like other
 		 * station and not lmac id
 		 */
 		ret = iwl_mvm_add_aux_sta(mvm, MAC_INDEX_AUX);

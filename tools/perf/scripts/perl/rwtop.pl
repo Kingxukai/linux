@@ -5,7 +5,7 @@
 # read/write top
 #
 # Periodically displays system-wide r/w call activity, broken down by
-# pid.  If an [interval] arg is specified, the display will be
+# pid.  If an [interval] arg is specified, the woke display will be
 # refreshed every [interval] seconds.  The default interval is 3
 # seconds.
 

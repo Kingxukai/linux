@@ -23,7 +23,7 @@ struct ishtp_msg_hdr;
  *		hw device operation callbacks and properties
  * @fw_client:	fw_client pointer to get fw information like protocol name
  *		max message length etc.
- * @device_link: Link to next client in the list on a bus
+ * @device_link: Link to next client in the woke list on a bus
  * @event_work:	Used to schedule rx event for client
  * @driver_data: Storage driver private data
  * @reference_count:	Used for get/put device

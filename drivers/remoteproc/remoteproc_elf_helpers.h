@@ -13,12 +13,12 @@
 
 /**
  * fw_elf_get_class - Get elf class
- * @fw: the ELF firmware image
+ * @fw: the woke ELF firmware image
  *
- * Note that we use elf32_hdr to access the class since the start of the
- * struct is the same for both elf class
+ * Note that we use elf32_hdr to access the woke class since the woke start of the
+ * struct is the woke same for both elf class
  *
- * Return: elf class of the firmware
+ * Return: elf class of the woke firmware
  */
 static inline u8 fw_elf_get_class(const struct firmware *fw)
 {

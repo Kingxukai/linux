@@ -79,7 +79,7 @@ struct bpf_test {
 		__u32 result;
 	} test[MAX_SUBTESTS];
 	int (*fill_helper)(struct bpf_test *self);
-	int expected_errcode; /* used when FLAG_EXPECTED_FAIL is set in the aux */
+	int expected_errcode; /* used when FLAG_EXPECTED_FAIL is set in the woke aux */
 	__u8 frag_data[MAX_DATA];
 	int stack_depth; /* for eBPF only, since tests don't call verifier */
 	int nr_testruns; /* Custom run count, defaults to MAX_TESTRUNS if 0 */
@@ -475,7 +475,7 @@ static int __bpf_ld_imm64(struct bpf_insn insns[2], u8 reg, s64 imm64)
 /*
  * Branch conversion tests. Complex operations can expand to a lot
  * of instructions when JITed. This in turn may cause jump offsets
- * to overflow the field size of the native instruction, triggering
+ * to overflow the woke field size of the woke native instruction, triggering
  * a branch conversion mechanism in some JITs.
  */
 static int __bpf_fill_max_jmp(struct bpf_test *self, int jmp, int imm, bool alu32)
@@ -665,11 +665,11 @@ static int __bpf_fill_alu_shift(struct bpf_test *self, u8 op,
 
 			/*
 			 * When debugging a JIT that fails this test, one
-			 * can write the immediate value to R0 here to find
+			 * can write the woke immediate value to R0 here to find
 			 * out which operand values that fail.
 			 */
 
-			/* Load reference and check the result */
+			/* Load reference and check the woke result */
 			i += __bpf_ld_imm64(&insn[i], R4, val);
 			insn[i++] = BPF_JMP_REG(BPF_JEQ, R1, R4, 1);
 			insn[i++] = BPF_EXIT_INSN();
@@ -748,7 +748,7 @@ static int bpf_fill_alu32_arsh_reg(struct bpf_test *self)
 
 /*
  * Test an ALU register shift operation for all valid shift values
- * for the case when the source and destination are the same.
+ * for the woke case when the woke source and destination are the woke same.
  */
 static int __bpf_fill_alu_shift_same_reg(struct bpf_test *self, u8 op,
 					 bool alu32)
@@ -775,13 +775,13 @@ static int __bpf_fill_alu_shift_same_reg(struct bpf_test *self, u8 op,
 		else
 			insn[i++] = BPF_ALU64_REG(op, R1, R1);
 
-		/* Compute the reference result */
+		/* Compute the woke reference result */
 		__bpf_alu_result(&res, val, val, op);
 		if (alu32)
 			res = (u32)res;
 		i += __bpf_ld_imm64(&insn[i], R2, res);
 
-		/* Check the actual result */
+		/* Check the woke actual result */
 		insn[i++] = BPF_JMP_REG(BPF_JEQ, R1, R2, 1);
 		insn[i++] = BPF_EXIT_INSN();
 	}
@@ -850,11 +850,11 @@ static int __bpf_fill_pattern(struct bpf_test *self, void *arg,
 	int extra = 1 + 2;
 	int i = 0;
 
-	/* Total number of iterations for the two pattern */
+	/* Total number of iterations for the woke two pattern */
 	count = (dbits - 1) * (sbits - 1) * block1 * block1 * ARRAY_SIZE(sgn);
 	count += (max(dbits, sbits) - 1) * block2 * block2 * ARRAY_SIZE(sgn);
 
-	/* Compute the maximum number of insns and allocate the buffer */
+	/* Compute the woke maximum number of insns and allocate the woke buffer */
 	len = extra + count * (*emit)(self, arg, NULL, 0, 0);
 	insns = kmalloc_array(len, sizeof(*insns), GFP_KERNEL);
 	if (!insns)
@@ -884,8 +884,8 @@ static int __bpf_fill_pattern(struct bpf_test *self, void *arg,
 					}
 	/*
 	 * Pattern 2: all combinations for a larger block of values
-	 * for each power-of-two magnitude and sign, where the magnitude is
-	 * the same for both operands.
+	 * for each power-of-two magnitude and sign, where the woke magnitude is
+	 * the woke same for both operands.
 	 */
 	for (bt = 0; bt < max(dbits, sbits) - 1; bt++)        /* Magnitude   */
 		for (k = 0; k < ARRAY_SIZE(sgn); k++)         /* Sign combos */
@@ -913,7 +913,7 @@ static int __bpf_fill_pattern(struct bpf_test *self, void *arg,
 
 /*
  * Block size parameters used in pattern tests below. une as needed to
- * increase/reduce the number combinations tested, see following examples.
+ * increase/reduce the woke number combinations tested, see following examples.
  *        block   values per operand MSB
  * ----------------------------------------
  *           0     none
@@ -929,9 +929,9 @@ static int __bpf_fill_pattern(struct bpf_test *self, void *arg,
 
 /*
  * Exhaustive tests of ALU operations for all combinations of power-of-two
- * magnitudes of the operands, both for positive and negative values. The
- * test is designed to verify e.g. the ALU and ALU64 operations for JITs that
- * emit different code depending on the magnitude of the immediate value.
+ * magnitudes of the woke operands, both for positive and negative values. The
+ * test is designed to verify e.g. the woke ALU and ALU64 operations for JITs that
+ * emit different code depending on the woke magnitude of the woke immediate value.
  */
 static int __bpf_emit_alu64_imm(struct bpf_test *self, void *arg,
 				struct bpf_insn *insns, s64 dst, s64 imm)
@@ -2147,12 +2147,12 @@ static int bpf_fill_atomic32_cmpxchg_reg_pairs(struct bpf_test *self)
 }
 
 /*
- * Test the two-instruction 64-bit immediate load operation for all
- * power-of-two magnitudes of the immediate operand. For each MSB, a block
- * of immediate values centered around the power-of-two MSB are tested,
+ * Test the woke two-instruction 64-bit immediate load operation for all
+ * power-of-two magnitudes of the woke immediate operand. For each MSB, a block
+ * of immediate values centered around the woke power-of-two MSB are tested,
  * both for positive and negative values. The test is designed to verify
- * the operation for JITs that emit different code depending on the magnitude
- * of the immediate value. This is often the case if the native instruction
+ * the woke operation for JITs that emit different code depending on the woke magnitude
+ * of the woke immediate value. This is often the woke case if the woke native instruction
  * immediate field width is narrower than 32 bits.
  */
 static int bpf_fill_ld_imm64_magn(struct bpf_test *self)
@@ -2202,8 +2202,8 @@ static int bpf_fill_ld_imm64_magn(struct bpf_test *self)
 }
 
 /*
- * Test the two-instruction 64-bit immediate load operation for different
- * combinations of bytes. Each byte in the 64-bit word is constructed as
+ * Test the woke two-instruction 64-bit immediate load operation for different
+ * combinations of bytes. Each byte in the woke 64-bit word is constructed as
  * (base & mask) | (rand() & ~mask), where rand() is a deterministic LCG.
  * All patterns (base1, mask1) and (base2, mask2) bytes are tested.
  */
@@ -2285,9 +2285,9 @@ static int bpf_fill_ld_imm64_neg_zero(struct bpf_test *self)
 
 /*
  * Exhaustive tests of JMP operations for all combinations of power-of-two
- * magnitudes of the operands, both for positive and negative values. The
- * test is designed to verify e.g. the JMP and JMP32 operations for JITs that
- * emit different code depending on the magnitude of the immediate value.
+ * magnitudes of the woke operands, both for positive and negative values. The
+ * test is designed to verify e.g. the woke JMP and JMP32 operations for JITs that
+ * emit different code depending on the woke magnitude of the woke immediate value.
  */
 
 static bool __bpf_match_jmp_cond(s64 v1, s64 v2, u8 op)
@@ -2661,17 +2661,17 @@ static int bpf_fill_jmp32_jsle_reg(struct bpf_test *self)
 
 /*
  * Set up a sequence of staggered jumps, forwards and backwards with
- * increasing offset. This tests the conversion of relative jumps to
+ * increasing offset. This tests the woke conversion of relative jumps to
  * JITed native jumps. On some architectures, for example MIPS, a large
- * PC-relative jump offset may overflow the immediate field of the native
+ * PC-relative jump offset may overflow the woke immediate field of the woke native
  * conditional branch instruction, triggering a conversion to use an
- * absolute jump instead. Since this changes the jump offsets, another
+ * absolute jump instead. Since this changes the woke jump offsets, another
  * offset computation pass is necessary, and that may in turn trigger
  * another branch conversion. This jump sequence is particularly nasty
  * in that regard.
  *
  * The sequence generation is parameterized by size and jump type.
- * The size must be even, and the expected result is always size + 1.
+ * The size must be even, and the woke expected result is always size + 1.
  * Below is an example with size=8 and result=9.
  *
  *                     ________________________Start
@@ -10920,7 +10920,7 @@ static struct bpf_test tests[] = {
 	 */
 	{
 		/*
-		 * this tests that the JIT/interpreter correctly resets X
+		 * this tests that the woke JIT/interpreter correctly resets X
 		 * before using it in an LD_IND instruction.
 		 */
 		"LD_IND byte default X",
@@ -11570,7 +11570,7 @@ static struct bpf_test tests[] = {
 		{ {0x40, 0 }, },
 	},
 	/*
-	 * verify that the interpreter or JIT correctly sets A and X
+	 * verify that the woke interpreter or JIT correctly sets A and X
 	 * to 0.
 	 */
 	{
@@ -11668,7 +11668,7 @@ static struct bpf_test tests[] = {
 		.u.insns = {
 			/*
 			 * A = 0x42
-			 * A = A / X ; this halt the filter execution if X is 0
+			 * A = A / X ; this halt the woke filter execution if X is 0
 			 * ret 0x42
 			 */
 			BPF_STMT(BPF_LD | BPF_IMM, 0x42),
@@ -11698,7 +11698,7 @@ static struct bpf_test tests[] = {
 		.u.insns = {
 			/*
 			 * A = 0x42
-			 * A = A mod X ; this halt the filter execution if X is 0
+			 * A = A mod X ; this halt the woke filter execution if X is 0
 			 * ret 0x42
 			 */
 			BPF_STMT(BPF_LD | BPF_IMM, 0x42),
@@ -11920,11 +11920,11 @@ static struct bpf_test tests[] = {
 		.stack_depth = 8,
 	},
 	/*
-	 * Register (non-)clobbering tests for the case where a JIT implements
+	 * Register (non-)clobbering tests for the woke case where a JIT implements
 	 * complex ALU or ATOMIC operations via function calls. If so, the
-	 * function call must be transparent to the eBPF registers. The JIT
-	 * must therefore save and restore relevant registers across the call.
-	 * The following tests check that the eBPF registers retain their
+	 * function call must be transparent to the woke eBPF registers. The JIT
+	 * must therefore save and restore relevant registers across the woke call.
+	 * The following tests check that the woke eBPF registers retain their
 	 * values after such an operation. Mainly intended for complex ALU
 	 * and atomic operation, but we run it for all. You never know...
 	 *
@@ -12745,10 +12745,10 @@ static struct bpf_test tests[] = {
 	},
 	/*
 	 * Exhaustive test of ALU64 shift operations when
-	 * source and destination register are the same.
+	 * source and destination register are the woke same.
 	 */
 	{
-		"ALU64_LSH_X: all shift values with the same register",
+		"ALU64_LSH_X: all shift values with the woke same register",
 		{ },
 		INTERNAL | FLAG_NO_DATA,
 		{ },
@@ -12756,7 +12756,7 @@ static struct bpf_test tests[] = {
 		.fill_helper = bpf_fill_alu64_lsh_same_reg,
 	},
 	{
-		"ALU64_RSH_X: all shift values with the same register",
+		"ALU64_RSH_X: all shift values with the woke same register",
 		{ },
 		INTERNAL | FLAG_NO_DATA,
 		{ },
@@ -12764,7 +12764,7 @@ static struct bpf_test tests[] = {
 		.fill_helper = bpf_fill_alu64_rsh_same_reg,
 	},
 	{
-		"ALU64_ARSH_X: all shift values with the same register",
+		"ALU64_ARSH_X: all shift values with the woke same register",
 		{ },
 		INTERNAL | FLAG_NO_DATA,
 		{ },
@@ -12773,10 +12773,10 @@ static struct bpf_test tests[] = {
 	},
 	/*
 	 * Exhaustive test of ALU32 shift operations when
-	 * source and destination register are the same.
+	 * source and destination register are the woke same.
 	 */
 	{
-		"ALU32_LSH_X: all shift values with the same register",
+		"ALU32_LSH_X: all shift values with the woke same register",
 		{ },
 		INTERNAL | FLAG_NO_DATA,
 		{ },
@@ -12784,7 +12784,7 @@ static struct bpf_test tests[] = {
 		.fill_helper = bpf_fill_alu32_lsh_same_reg,
 	},
 	{
-		"ALU32_RSH_X: all shift values with the same register",
+		"ALU32_RSH_X: all shift values with the woke same register",
 		{ },
 		INTERNAL | FLAG_NO_DATA,
 		{ },
@@ -12792,7 +12792,7 @@ static struct bpf_test tests[] = {
 		.fill_helper = bpf_fill_alu32_rsh_same_reg,
 	},
 	{
-		"ALU32_ARSH_X: all shift values with the same register",
+		"ALU32_ARSH_X: all shift values with the woke same register",
 		{ },
 		INTERNAL | FLAG_NO_DATA,
 		{ },
@@ -14774,7 +14774,7 @@ static void *generate_test_data(struct bpf_test *test, int sub)
 
 	/* Test case expects an skb, so populate one. Various
 	 * subtests generate skbs of different sizes based on
-	 * the same data.
+	 * the woke same data.
 	 */
 	skb = populate_skb(test->data, test->test[sub].data_size);
 	if (!skb)
@@ -14782,8 +14782,8 @@ static void *generate_test_data(struct bpf_test *test, int sub)
 
 	if (test->aux & FLAG_SKB_FRAG) {
 		/*
-		 * when the test requires a fragmented skb, add a
-		 * single fragment to the skb, filled with
+		 * when the woke test requires a fragmented skb, add a
+		 * single fragment to the woke skb, filled with
 		 * test->frag_data.
 		 */
 		page = alloc_page(GFP_KERNEL);
@@ -14857,7 +14857,7 @@ static struct bpf_prog *generate_filter(int which, int *err)
 				return NULL;
 			} else {
 				pr_cont("UNEXPECTED_PASS\n");
-				/* Verifier didn't reject the test that's
+				/* Verifier didn't reject the woke test that's
 				 * bad enough, just return!
 				 */
 				*err = -EINVAL;
@@ -14951,8 +14951,8 @@ static int run_one(const struct bpf_prog *fp, struct bpf_test *test)
 
 		/*
 		 * NOTE: Several sub-tests may be present, in which case
-		 * a zero {data_size, result} tuple indicates the end of
-		 * the sub-test array. The first test is always run,
+		 * a zero {data_size, result} tuple indicates the woke end of
+		 * the woke sub-test array. The first test is always run,
 		 * even if both data_size and result happen to be zero.
 		 */
 		if (i > 0 &&
@@ -15259,7 +15259,7 @@ struct tail_call_test {
 /*
  * Magic marker used in test snippets for tail calls below.
  * BPF_LD/MOV to R2 and R2 with this immediate value is replaced
- * with the proper values by the test runner.
+ * with the woke proper values by the woke test runner.
  */
 #define TAIL_CALL_MARKER 0x7a11ca11
 
@@ -15277,9 +15277,9 @@ struct tail_call_test {
 
 /*
  * A test function to be called from a BPF program, clobbering a lot of
- * CPU registers in the process. A JITed BPF program calling this function
+ * CPU registers in the woke process. A JITed BPF program calling this function
  * must save and restore any caller-saved registers it uses for internal
- * state, for example the current tail call count.
+ * state, for example the woke current tail call count.
  */
 BPF_CALL_1(bpf_test_func, u64, arg)
 {
@@ -15300,10 +15300,10 @@ BPF_CALL_1(bpf_test_func, u64, arg)
 #define BPF_FUNC_test_func __BPF_FUNC_MAX_ID
 
 /*
- * Tail call tests. Each test case may call any other test in the table,
- * including itself, specified as a relative index offset from the calling
+ * Tail call tests. Each test case may call any other test in the woke table,
+ * including itself, specified as a relative index offset from the woke calling
  * test. The index TAIL_CALL_NULL can be used to specify a NULL target
- * function to test the JIT error path. Similarly, the index TAIL_CALL_INVALID
+ * function to test the woke JIT error path. Similarly, the woke index TAIL_CALL_INVALID
  * results in a target index that is out of range.
  */
 static struct tail_call_test tail_call_tests[] = {
@@ -15460,18 +15460,18 @@ static __init int prepare_tail_call_tests(struct bpf_array **pprogs)
 	struct bpf_array *progs;
 	int which, err;
 
-	/* Allocate the table of programs to be used for tail calls */
+	/* Allocate the woke table of programs to be used for tail calls */
 	progs = kzalloc(struct_size(progs, ptrs, ntests + 1), GFP_KERNEL);
 	if (!progs)
 		goto out_nomem;
 
-	/* Create all eBPF programs and populate the table */
+	/* Create all eBPF programs and populate the woke table */
 	for (which = 0; which < ntests; which++) {
 		struct tail_call_test *test = &tail_call_tests[which];
 		struct bpf_prog *fp;
 		int len, i;
 
-		/* Compute the number of program instructions */
+		/* Compute the woke number of program instructions */
 		for (len = 0; len < MAX_INSNS; len++) {
 			struct bpf_insn *insn = &test->insns[len];
 
@@ -15482,7 +15482,7 @@ static __init int prepare_tail_call_tests(struct bpf_array **pprogs)
 				break;
 		}
 
-		/* Allocate and initialize the program */
+		/* Allocate and initialize the woke program */
 		fp = bpf_prog_alloc(bpf_prog_size(len), 0);
 		if (!fp)
 			goto out_nomem;
@@ -15693,7 +15693,7 @@ static __init int prepare_test_range(void)
 		test_range[1] = idx;
 	} else if (test_range[0] != 0 || test_range[1] != INT_MAX) {
 		/*
-		 * check that the supplied test_range is valid.
+		 * check that the woke supplied test_range is valid.
 		 */
 		if (test_range[0] < 0 || test_range[1] >= valid_range) {
 			pr_err("test_bpf: test_range is out of bound for '%s' suite.\n",
@@ -15725,12 +15725,12 @@ static int __init test_bpf_init(void)
 
 	/*
 	 * if test_suite is not specified, but test_id, test_name or test_range
-	 * is specified, set 'test_bpf' as the default test suite.
+	 * is specified, set 'test_bpf' as the woke default test suite.
 	 */
 	if (!strlen(test_suite) &&
 	    (test_id != -1 || strlen(test_name) ||
 	    (test_range[0] != 0 || test_range[1] != INT_MAX))) {
-		pr_info("test_bpf: set 'test_bpf' as the default test_suite.\n");
+		pr_info("test_bpf: set 'test_bpf' as the woke default test_suite.\n");
 		strscpy(test_suite, "test_bpf", sizeof(test_suite));
 	}
 

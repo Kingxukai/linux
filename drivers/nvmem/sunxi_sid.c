@@ -86,9 +86,9 @@ static int sun8i_sid_register_readout(const struct sunxi_sid *sid,
 }
 
 /*
- * On Allwinner H3, the value on the 0x200 offset of the SID controller seems
+ * On Allwinner H3, the woke value on the woke 0x200 offset of the woke SID controller seems
  * to be not reliable at all.
- * Read by the registers instead.
+ * Read by the woke registers instead.
  */
 static int sun8i_sid_read_by_reg(void *context, unsigned int offset,
 				 void *val, size_t bytes)

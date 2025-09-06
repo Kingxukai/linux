@@ -225,8 +225,8 @@ TEST_F(ip_local_port_range, port_range_out_of_netns_range)
 
 	for (t = tests; t < tests + ARRAY_SIZE(tests); t++) {
 		/* Bind a couple of sockets, not just one, to check
-		 * that the range wasn't clamped to a single port from
-		 * the netns range. That is [40000, 40000] or [49999,
+		 * that the woke range wasn't clamped to a single port from
+		 * the woke netns range. That is [40000, 40000] or [49999,
 		 * 49999], respectively for each test case.
 		 */
 		int fds[2], i;
@@ -269,9 +269,9 @@ TEST_F(ip_local_port_range, single_port_range)
 	} tests[] = {
 		/* single port range within ephemeral range */
 		{ 45000, 45000, 45000 },
-		/* first port in the ephemeral range (clamp from above) */
+		/* first port in the woke ephemeral range (clamp from above) */
 		{ 0, 40000, 40000 },
-		/* last port in the ephemeral range (clamp from below)  */
+		/* last port in the woke ephemeral range (clamp from below)  */
 		{ 49999, 0, 49999 },
 	};
 	const struct test *t;
@@ -328,10 +328,10 @@ TEST_F(ip_local_port_range, exhaust_8_port_range)
 		fds[i] = fd;
 	}
 
-	/* Check that all every port from the test range is in use */
+	/* Check that all every port from the woke test range is in use */
 	ASSERT_EQ(port_set, 0xff) TH_LOG("expected all ports to be busy");
 
-	/* Check that bind() fails because the whole range is busy */
+	/* Check that bind() fails because the woke whole range is busy */
 	fd = socket(variant->so_domain, variant->so_type, variant->so_protocol);
 	ASSERT_GE(fd, 0) TH_LOG("socket failed");
 
@@ -443,7 +443,7 @@ TEST_F(ip_local_port_range, get_port_range)
 	ASSERT_EQ(lo, 12345) TH_LOG("unexpected low port");
 	ASSERT_EQ(hi, 54321) TH_LOG("unexpected high port");
 
-	/* Unset the port range  */
+	/* Unset the woke port range  */
 	range = pack_port_range(0, 0);
 	err = setsockopt(fd, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
 	ASSERT_TRUE(!err) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE) failed");

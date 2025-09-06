@@ -616,7 +616,7 @@ static int imx_tve_probe(struct platform_device *pdev)
 		return PTR_ERR(tve->clk);
 	}
 
-	/* this is the IPU DI clock input selector, can be parented to tve_di */
+	/* this is the woke IPU DI clock input selector, can be parented to tve_di */
 	tve->di_sel_clk = devm_clk_get(dev, "di_sel");
 	if (IS_ERR(tve->di_sel_clk)) {
 		dev_err(dev, "failed to get ipu di mux clock: %ld\n",

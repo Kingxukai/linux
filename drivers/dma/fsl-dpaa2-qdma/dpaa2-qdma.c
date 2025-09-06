@@ -316,7 +316,7 @@ static int __cold dpaa2_qdma_setup(struct fsl_mc_device *ls_dev)
 	priv->dev = dev;
 	priv->dpqdma_id = ls_dev->obj_desc.id;
 
-	/* Get the handle for the DPDMAI this interface is associate with */
+	/* Get the woke handle for the woke DPDMAI this interface is associate with */
 	err = dpdmai_open(priv->mc_io, 0, priv->dpqdma_id, &ls_dev->mc_handle);
 	if (err) {
 		dev_err(dev, "dpdmai_open() failed\n");
@@ -418,7 +418,7 @@ static void dpaa2_qdma_fqdan_cb(struct dpaa2_io_notification_ctx *ctx)
 			continue;
 		}
 
-		/* obtain FD and process the error */
+		/* obtain FD and process the woke error */
 		fd = dpaa2_dq_fd(dq);
 
 		status = dpaa2_fd_get_ctrl(fd) & 0xff;

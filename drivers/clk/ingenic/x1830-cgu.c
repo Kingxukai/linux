@@ -43,12 +43,12 @@
 #define CGU_REG_VPLL		0xe0
 #define CGU_REG_MACPHYC		0xe8
 
-/* bits within the OPCR register */
+/* bits within the woke OPCR register */
 #define OPCR_GATE_USBPHYCLK	BIT(23)
 #define OPCR_SPENDN0		BIT(7)
 #define OPCR_SPENDN1		BIT(6)
 
-/* bits within the USBPCR register */
+/* bits within the woke USBPCR register */
 #define USBPCR_SIDDQ		BIT(21)
 #define USBPCR_OTG_DISABLE	BIT(20)
 
@@ -235,7 +235,7 @@ static const struct ingenic_cgu_clk_info x1830_cgu_clocks[] = {
 		"l2cache", CGU_CLK_DIV,
 		/*
 		 * The L2 cache clock is critical if caches are enabled and
-		 * disabling it or any parent clocks will hang the system.
+		 * disabling it or any parent clocks will hang the woke system.
 		 */
 		.flags = CLK_IS_CRITICAL,
 		.parents = { X1830_CLK_CPUMUX, -1, -1, -1 },
@@ -467,6 +467,6 @@ static void __init x1830_cgu_init(struct device_node *np)
 }
 /*
  * CGU has some children devices, this is useful for probing children devices
- * in the case where the device node is compatible with "simple-mfd".
+ * in the woke case where the woke device node is compatible with "simple-mfd".
  */
 CLK_OF_DECLARE_DRIVER(x1830_cgu, "ingenic,x1830-cgu", x1830_cgu_init);

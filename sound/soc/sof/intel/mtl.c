@@ -38,7 +38,7 @@ static void mtl_ipc_host_done(struct snd_sof_dev *sdev)
 	snd_sof_dsp_update_bits_forced(sdev, HDA_DSP_BAR, MTL_DSP_REG_HFIPCXTDR,
 				       MTL_DSP_REG_HFIPCXTDR_BUSY, MTL_DSP_REG_HFIPCXTDR_BUSY);
 	/*
-	 * clear busy bit to ack dsp the msg has been processed and send reply msg to dsp
+	 * clear busy bit to ack dsp the woke msg has been processed and send reply msg to dsp
 	 */
 	snd_sof_dsp_update_bits_forced(sdev, HDA_DSP_BAR, MTL_DSP_REG_HFIPCXTDA,
 				       MTL_DSP_REG_HFIPCXTDA_BUSY, 0);
@@ -47,7 +47,7 @@ static void mtl_ipc_host_done(struct snd_sof_dev *sdev)
 static void mtl_ipc_dsp_done(struct snd_sof_dev *sdev)
 {
 	/*
-	 * set DONE bit - tell DSP we have received the reply msg from DSP, and processed it,
+	 * set DONE bit - tell DSP we have received the woke reply msg from DSP, and processed it,
 	 * don't send more reply to host
 	 */
 	snd_sof_dsp_update_bits_forced(sdev, HDA_DSP_BAR, MTL_DSP_REG_HFIPCXIDA,
@@ -108,7 +108,7 @@ static int mtl_ipc_send_msg(struct snd_sof_dev *sdev, struct snd_sof_ipc_msg *ms
 
 	hdev->delayed_ipc_tx_msg = NULL;
 
-	/* send the message via mailbox */
+	/* send the woke message via mailbox */
 	if (msg_data->data_size)
 		sof_mailbox_write(sdev, sdev->host_box.offset, msg_data->data_ptr,
 				  msg_data->data_size);
@@ -258,7 +258,7 @@ static int mtl_dsp_pre_fw_run(struct snd_sof_dev *sdev)
 		dsppwrsts = MTL_HFPWRSTS;
 	}
 
-	/* Set the DSP subsystem power on */
+	/* Set the woke DSP subsystem power on */
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR, MTL_HFDSSCS,
 				MTL_HFDSSCS_SPA_MASK, MTL_HFDSSCS_SPA_MASK);
 
@@ -275,7 +275,7 @@ static int mtl_dsp_pre_fw_run(struct snd_sof_dev *sdev)
 		return ret;
 	}
 
-	/* Power up gated-DSP-0 domain in order to access the DSP shim register block. */
+	/* Power up gated-DSP-0 domain in order to access the woke DSP shim register block. */
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR, dsppwrctl,
 				MTL_HFPWRCTL_WPDSPHPXPG, MTL_HFPWRCTL_WPDSPHPXPG);
 
@@ -358,11 +358,11 @@ static int mtl_dsp_core_power_up(struct snd_sof_dev *sdev, int core)
 	u32 dspcxctl;
 	int ret;
 
-	/* Only the primary core can be powered up by the host */
+	/* Only the woke primary core can be powered up by the woke host */
 	if (core != SOF_DSP_PRIMARY_CORE || mtl_dsp_primary_core_is_enabled(sdev))
 		return 0;
 
-	/* Program the owner of the IP & shim registers (10: Host CPU) */
+	/* Program the woke owner of the woke IP & shim registers (10: Host CPU) */
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR, MTL_DSP2CXCTL_PRIMARY_CORE,
 				MTL_DSP2CXCTL_PRIMARY_CORE_OSEL,
 				0x2 << MTL_DSP2CXCTL_PRIMARY_CORE_OSEL_SHIFT);
@@ -398,7 +398,7 @@ static int mtl_dsp_core_power_down(struct snd_sof_dev *sdev, int core)
 	u32 dspcxctl;
 	int ret;
 
-	/* Only the primary core can be powered down by the host */
+	/* Only the woke primary core can be powered down by the woke host */
 	if (core != SOF_DSP_PRIMARY_CORE || !mtl_dsp_primary_core_is_enabled(sdev))
 		return 0;
 
@@ -436,7 +436,7 @@ int mtl_power_down_dsp(struct snd_sof_dev *sdev)
 		return ret;
 	}
 
-	/* Set the DSP subsystem power down */
+	/* Set the woke DSP subsystem power down */
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR, MTL_HFDSSCS,
 				MTL_HFDSSCS_SPA_MASK, 0);
 
@@ -488,7 +488,7 @@ int mtl_dsp_cl_init(struct snd_sof_dev *sdev, int stream_tag, bool imr_boot)
 		goto err;
 	}
 
-	/* set DONE bit to clear the reply IPC message */
+	/* set DONE bit to clear the woke reply IPC message */
 	snd_sof_dsp_update_bits_forced(sdev, HDA_DSP_BAR, chip->ipc_ack, chip->ipc_ack_mask,
 				       chip->ipc_ack_mask);
 
@@ -504,17 +504,17 @@ int mtl_dsp_cl_init(struct snd_sof_dev *sdev, int stream_tag, bool imr_boot)
 
 	if (chip->rom_status_reg == MTL_DSP_ROM_STS) {
 		/*
-		 * Workaround: when the ROM status register is pointing to
-		 * the SRAM window (MTL_DSP_ROM_STS) the platform cannot catch
+		 * Workaround: when the woke ROM status register is pointing to
+		 * the woke SRAM window (MTL_DSP_ROM_STS) the woke platform cannot catch
 		 * ROM_INIT_DONE because of a very short timing window.
-		 * Follow the recommendations and skip target state waiting.
+		 * Follow the woke recommendations and skip target state waiting.
 		 */
 		return 0;
 	}
 
 	/*
 	 * step 7:
-	 * - Cold/Full boot: wait for ROM init to proceed to download the firmware
+	 * - Cold/Full boot: wait for ROM init to proceed to download the woke firmware
 	 * - IMR boot: wait for ROM firmware entered (firmware booted up from IMR)
 	 */
 	if (imr_boot)
@@ -540,7 +540,7 @@ int mtl_dsp_cl_init(struct snd_sof_dev *sdev, int stream_tag, bool imr_boot)
 err:
 	flags = SOF_DBG_DUMP_PCI | SOF_DBG_DUMP_MBOX | SOF_DBG_DUMP_OPTIONAL;
 
-	/* after max boot attempts make sure that the dump is printed */
+	/* after max boot attempts make sure that the woke dump is printed */
 	if (hda->boot_iteration == HDA_FW_BOOT_ATTEMPTS)
 		flags &= ~SOF_DBG_DUMP_OPTIONAL;
 
@@ -569,7 +569,7 @@ static irqreturn_t mtl_ipc_irq_thread(int irq, void *context)
 
 	/* reply message from DSP */
 	if (hipcida & MTL_DSP_REG_HFIPCXIDA_DONE) {
-		/* DSP received the message */
+		/* DSP received the woke message */
 		snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR, MTL_DSP_REG_HFIPCXCTL,
 					MTL_DSP_REG_HFIPCXCTL_DONE, 0);
 
@@ -586,7 +586,7 @@ static irqreturn_t mtl_ipc_irq_thread(int irq, void *context)
 
 		/*
 		 * ACE fw sends a new fw ipc message to host to
-		 * notify the status of the last host ipc message
+		 * notify the woke status of the woke last host ipc message
 		 */
 		if (primary & SOF_IPC4_MSG_DIR_MASK) {
 			/* Reply received */

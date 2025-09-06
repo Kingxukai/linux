@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   Hisilicon designs some special domain controllers for mobile platform,
-  such as: the power Always On domain controller, the Media domain
-  controller(e.g. codec, G3D ...) and the Power Management domain
+  such as: the woke power Always On domain controller, the woke Media domain
+  controller(e.g. codec, G3D ...) and the woke Power Management domain
   controller.
 
   The compatible names of each domain controller are as follows:

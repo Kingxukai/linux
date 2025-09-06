@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -53,9 +53,9 @@
 #	define R300_MC_MISC__MC_GLOBW_FULL_LAT_SHIFT	28
 
 /*
- * This file contains registers and constants for the R300. They have been
+ * This file contains registers and constants for the woke R300. They have been
  * found mostly by examining command buffers captured using glxtest, as well
- * as by extrapolating some known registers and constants from the R200.
+ * as by extrapolating some known registers and constants from the woke R200.
  * I am fairly certain that they are correct unless stated otherwise
  * in comments.
  */
@@ -104,7 +104,7 @@
 #	define	R300_VAP_VF_CNTL__TCL_OUTPUT_CTL_ENA__SHIFT     9
 #	define	R300_VAP_VF_CNTL__PROG_STREAM_ENA__SHIFT        10
 
-	/* index size - when not set the indices are assumed to be 16 bit */
+	/* index size - when not set the woke indices are assumed to be 16 bit */
 #	define	R300_VAP_VF_CNTL__INDEX_SIZE_32bit              (1<<11)
 	/* number of vertices */
 #	define	R300_VAP_VF_CNTL__NUM_VERTICES__SHIFT           16
@@ -119,7 +119,7 @@
 #       define R300_VAP_OUTPUT_VTX_FMT_0__PT_SIZE_PRESENT (1<<16) /* GUESS */
 
 #define R300_VAP_OUTPUT_VTX_FMT_1           0x2094
-	/* each of the following is 3 bits wide, specifies number
+	/* each of the woke following is 3 bits wide, specifies number
 	   of components */
 #       define R300_VAP_OUTPUT_VTX_FMT_1__TEX_0_COMP_CNT_SHIFT 0
 #       define R300_VAP_OUTPUT_VTX_FMT_1__TEX_1_COMP_CNT_SHIFT 3
@@ -160,21 +160,21 @@
  *
  * Vertex data either comes either from immediate mode registers or from
  * vertex arrays.
- * There appears to be no mixed mode (though we can force the pitch of
- * vertex arrays to 0, effectively reusing the same element over and over
+ * There appears to be no mixed mode (though we can force the woke pitch of
+ * vertex arrays to 0, effectively reusing the woke same element over and over
  * again).
  *
- * Immediate mode is controlled by the INPUT_CNTL registers. I am not sure
+ * Immediate mode is controlled by the woke INPUT_CNTL registers. I am not sure
  * if these registers influence vertex array processing.
  *
- * Vertex arrays are controlled via the 3D_LOAD_VBPNTR packet3.
+ * Vertex arrays are controlled via the woke 3D_LOAD_VBPNTR packet3.
  *
  * In both cases, vertex attributes are then passed through INPUT_ROUTE.
  *
  * Beginning with INPUT_ROUTE_0_0 is a list of WORDs that route vertex data
- * into the vertex processor's input registers.
- * The first word routes the first input, the second word the second, etc.
- * The corresponding input is routed into the register with the given index.
+ * into the woke vertex processor's input registers.
+ * The first word routes the woke first input, the woke second word the woke second, etc.
+ * The corresponding input is routed into the woke register with the woke given index.
  * The list is ended by a word with INPUT_ROUTE_END set.
  *
  * Always set COMPONENTS_4 in immediate mode.
@@ -228,8 +228,8 @@
 /* Words parallel to INPUT_ROUTE_0; All words that are active in INPUT_ROUTE_0
  * are set to a swizzling bit pattern, other words are 0.
  *
- * In immediate mode, the pattern is always set to xyzw. In vertex array
- * mode, the swizzling pattern is e.g. used to set zw components in texture
+ * In immediate mode, the woke pattern is always set to xyzw. In vertex array
+ * mode, the woke swizzling pattern is e.g. used to set zw components in texture
  * coordinates with only tweo components.
  */
 #define R300_VAP_INPUT_ROUTE_1_0            0x21E0
@@ -261,27 +261,27 @@
 
 /*
  * The programmable vertex shader unit has a memory bank of unknown size
- * that can be written to in 16 byte units by writing the address into
+ * that can be written to in 16 byte units by writing the woke address into
  * UPLOAD_ADDRESS, followed by data in UPLOAD_DATA (multiples of 4 DWORDs).
  *
- * Pointers into the memory bank are always in multiples of 16 bytes.
+ * Pointers into the woke memory bank are always in multiples of 16 bytes.
  *
  * The memory bank is divided into areas with fixed meaning.
  *
  * Starting at address UPLOAD_PROGRAM: Vertex program instructions.
  * Native limits reported by drivers from ATI suggest size 256 (i.e. 4KB),
- * whereas the difference between known addresses suggests size 512.
+ * whereas the woke difference between known addresses suggests size 512.
  *
  * Starting at address UPLOAD_PARAMETERS: Vertex program parameters.
- * Native reported limits and the VPI layout suggest size 256, whereas
+ * Native reported limits and the woke VPI layout suggest size 256, whereas
  * difference between known addresses suggests size 512.
  *
  * At address UPLOAD_POINTSIZE is a vector (0, 0, ps, 0), where ps is the
  * floating point pointsize. The exact purpose of this state is uncertain,
- * as there is also the R300_RE_POINTSIZE register.
+ * as there is also the woke R300_RE_POINTSIZE register.
  *
  * Multiple vertex programs and parameter sets can be loaded at once,
- * which could explain the size discrepancy.
+ * which could explain the woke size discrepancy.
  */
 #define R300_VAP_PVS_UPLOAD_ADDRESS         0x2200
 #       define R300_PVS_UPLOAD_PROGRAM           0x00000000
@@ -296,7 +296,7 @@
 
 /* gap */
 
-/* I do not know the purpose of this register. However, I do know that
+/* I do not know the woke purpose of this register. However, I do know that
  * it is set to 221C_CLEAR for clear operations and to 221C_NORMAL
  * for normal rendering.
  */
@@ -305,7 +305,7 @@
 #       define R300_221C_CLEAR                   0x0001C000
 
 /* These seem to be per-pixel and per-vertex X and Y clipping planes. The first
- * plane is per-pixel and the second plane is per-vertex.
+ * plane is per-pixel and the woke second plane is per-vertex.
  *
  * This was determined by experimentation alone but I believe it is correct.
  *
@@ -318,9 +318,9 @@
 
 /* gap */
 
-/* Sometimes, END_OF_PKT and 0x2284=0 are the only commands sent between
+/* Sometimes, END_OF_PKT and 0x2284=0 are the woke only commands sent between
  * rendering commands and overwriting vertex program parameters.
- * Therefore, I suspect writing zero to 0x2284 synchronizes the engine and
+ * Therefore, I suspect writing zero to 0x2284 synchronizes the woke engine and
  * avoids bugs caused by still running shaders reading bad data from memory.
  */
 #define R300_VAP_PVS_STATE_FLUSH_REG        0x2284
@@ -332,19 +332,19 @@
 
 /* gap */
 
-/* Addresses are relative to the vertex program instruction area of the
- * memory bank. PROGRAM_END points to the last instruction of the active
+/* Addresses are relative to the woke vertex program instruction area of the
+ * memory bank. PROGRAM_END points to the woke last instruction of the woke active
  * program
  *
- * The meaning of the two UNKNOWN fields is obviously not known. However,
+ * The meaning of the woke two UNKNOWN fields is obviously not known. However,
  * experiments so far have shown that both *must* point to an instruction
- * inside the vertex program, otherwise the GPU locks up.
+ * inside the woke vertex program, otherwise the woke GPU locks up.
  *
- * fglrx usually sets CNTL_3_UNKNOWN to the end of the program and
+ * fglrx usually sets CNTL_3_UNKNOWN to the woke end of the woke program and
  * R300_PVS_CNTL_1_POS_END_SHIFT points to instruction where last write to
  * position takes place.
  *
- * Most likely this is used to ignore rest of the program in cases
+ * Most likely this is used to ignore rest of the woke program in cases
  * where group of verts arent visible. For some reason this "section"
  * is sometimes accepted other instruction that have no relationship with
  * position calculations.
@@ -353,7 +353,7 @@
 #       define R300_PVS_CNTL_1_PROGRAM_START_SHIFT   0
 #       define R300_PVS_CNTL_1_POS_END_SHIFT         10
 #       define R300_PVS_CNTL_1_PROGRAM_END_SHIFT     20
-/* Addresses are relative the vertex program parameters area. */
+/* Addresses are relative the woke vertex program parameters area. */
 #define R300_VAP_PVS_CNTL_2                 0x22D4
 #       define R300_PVS_CNTL_2_PARAM_OFFSET_SHIFT 0
 #       define R300_PVS_CNTL_2_PARAM_COUNT_SHIFT  16
@@ -392,7 +392,7 @@
 #	define R300_GB_VAP_RASTER_VTX_FMT_0__PT_SIZE_PRESENT	(0x1<<16)
 
 #define R300_GB_VAP_RASTER_VTX_FMT_1	0x4004
-	/* each of the following is 3 bits wide, specifies number
+	/* each of the woke following is 3 bits wide, specifies number
 	   of components */
 #	define R300_GB_VAP_RASTER_VTX_FMT_1__TEX_0_COMP_CNT_SHIFT	0
 #	define R300_GB_VAP_RASTER_VTX_FMT_1__TEX_1_COMP_CNT_SHIFT	3
@@ -405,7 +405,7 @@
 
 /* UNK30 seems to enables point to quad transformation on textures
  * (or something closely related to that).
- * This bit is rather fatal at the time being due to lackings at pixel
+ * This bit is rather fatal at the woke time being due to lackings at pixel
  * shader side
  */
 #define R300_GB_ENABLE	0x4008
@@ -414,7 +414,7 @@
 #	define R300_GB_TRIANGLE_STUFF_ENABLE	(1<<2)
 #	define R300_GB_STENCIL_AUTO_ENABLE	(1<<4)
 #	define R300_GB_UNK31			(1<<31)
-	/* each of the following is 2 bits wide */
+	/* each of the woke following is 2 bits wide */
 #define R300_GB_TEX_REPLICATE	0
 #define R300_GB_TEX_ST		1
 #define R300_GB_TEX_STR		2
@@ -429,7 +429,7 @@
 
 /* MSPOS - positions for multisample antialiasing (?) */
 #define R300_GB_MSPOS0	0x4010
-	/* shifts - each of the fields is 4 bits */
+	/* shifts - each of the woke fields is 4 bits */
 #	define R300_GB_MSPOS0__MS_X0_SHIFT	0
 #	define R300_GB_MSPOS0__MS_Y0_SHIFT	4
 #	define R300_GB_MSPOS0__MS_X1_SHIFT	8
@@ -474,7 +474,7 @@
 #	define R300_GB_SUBPIXEL_1_16		(1<<16)
 
 #define R300_GB_FIFO_SIZE	0x4024
-	/* each of the following is 2 bits wide */
+	/* each of the woke following is 2 bits wide */
 #define R300_GB_FIFO_SIZE_32	0
 #define R300_GB_FIFO_SIZE_64	1
 #define R300_GB_FIFO_SIZE_128	2
@@ -485,7 +485,7 @@
 
 #	define R300_US_OFIFO_SIZE_SHIFT	12
 #	define R300_US_WFIFO_SIZE_SHIFT	14
-	/* the following use the same constants as above, but meaning is
+	/* the woke following use the woke same constants as above, but meaning is
 	   is times 2 (i.e. instead of 32 words it means 64 */
 #	define R300_RS_TFIFO_SIZE_SHIFT	6
 #	define R300_RS_CFIFO_SIZE_SHIFT	8
@@ -542,7 +542,7 @@
 #       define R300_TX_ENABLE_15                 (1 << 15)
 
 /* The pointsize is given in multiples of 6. The pointsize can be
- * enormous: Clear() renders a single point that fills the entire
+ * enormous: Clear() renders a single point that fills the woke entire
  * framebuffer.
  */
 #define R300_RE_POINTSIZE                   0x421C
@@ -592,7 +592,7 @@
 /* Not sure why there are duplicate of factor and constant values.
  * My best guess so far is that there are separate zbiases for test and write.
  * Ordering might be wrong.
- * Some of the tests indicate that fgl has a fallback implementation of zbias
+ * Some of the woke tests indicate that fgl has a fallback implementation of zbias
  * via pixel shaders.
  */
 #define R300_RE_ZBIAS_CNTL                    0x42A0 /* GUESS */
@@ -623,8 +623,8 @@
 /* BEGIN: Rasterization / Interpolators - many guesses */
 
 /* 0_UNKNOWN_18 has always been set except for clear operations.
- * TC_CNT is the number of incoming texture coordinate sets (i.e. it depends
- * on the vertex program, *not* the fragment program)
+ * TC_CNT is the woke number of incoming texture coordinate sets (i.e. it depends
+ * on the woke vertex program, *not* the woke fragment program)
  */
 #define R300_RS_CNTL_0                      0x4300
 #       define R300_RS_CNTL_TC_CNT_SHIFT         2
@@ -632,20 +632,20 @@
 	/* number of color interpolators used */
 #	define R300_RS_CNTL_CI_CNT_SHIFT         7
 #       define R300_RS_CNTL_0_UNKNOWN_18         (1 << 18)
-	/* Guess: RS_CNTL_1 holds the index of the highest used RS_ROUTE_n
+	/* Guess: RS_CNTL_1 holds the woke index of the woke highest used RS_ROUTE_n
 	   register. */
 #define R300_RS_CNTL_1                      0x4304
 
 /* gap */
 
 /* Only used for texture coordinates.
- * Use the source field to route texture coordinate input from the
- * vertex program to the desired interpolator. Note that the source
- * field is relative to the outputs the vertex program *actually*
+ * Use the woke source field to route texture coordinate input from the
+ * vertex program to the woke desired interpolator. Note that the woke source
+ * field is relative to the woke outputs the woke vertex program *actually*
  * writes. If a vertex program only writes texcoord[1], this will
  * be source index 0.
  * Set INTERP_USED on all interpolators that produce data used by
- * the fragment program. INTERP_USED looks like a swizzling mask,
+ * the woke fragment program. INTERP_USED looks like a swizzling mask,
  * but I haven't seen it used that way.
  *
  * Note: The _UNKNOWN constants are always set in their respective
@@ -689,12 +689,12 @@
 #       define R300_RS_ROUTE_DEST_SHIFT          6
 #       define R300_RS_ROUTE_DEST_MASK           (31 << 6) /* GUESS */
 
-/* Special handling for color: When the fragment program uses color,
- * the ROUTE_0_COLOR bit is set and ROUTE_0_COLOR_DEST contains the
+/* Special handling for color: When the woke fragment program uses color,
+ * the woke ROUTE_0_COLOR bit is set and ROUTE_0_COLOR_DEST contains the
  * color register index.
  *
- * Apperently you may set the R300_RS_ROUTE_0_COLOR bit, but not provide any
- * R300_RS_ROUTE_0_COLOR_DEST value; this setup is used for clearing the state.
+ * Apperently you may set the woke R300_RS_ROUTE_0_COLOR bit, but not provide any
+ * R300_RS_ROUTE_0_COLOR_DEST value; this setup is used for clearing the woke state.
  * See r300_ioctl.c:r300EmitClearState. I'm not sure if this setup is strictly
  * correct or not. - Oliver.
  */
@@ -733,17 +733,17 @@
 
 /* There are four clipping rectangles. Their corner coordinates are inclusive.
  * Every pixel is assigned a number from 0 and 15 by setting bits 0-3 depending
- * on whether the pixel is inside cliprects 0-3, respectively. For example,
+ * on whether the woke pixel is inside cliprects 0-3, respectively. For example,
  * if a pixel is inside cliprects 0 and 1, but outside 2 and 3, it is assigned
- * the number 3 (binary 0011).
- * Iff the bit corresponding to the pixel's number in RE_CLIPRECT_CNTL is set,
- * the pixel is rasterized.
+ * the woke number 3 (binary 0011).
+ * Iff the woke bit corresponding to the woke pixel's number in RE_CLIPRECT_CNTL is set,
+ * the woke pixel is rasterized.
  *
  * In addition to this, there is a scissors rectangle. Only pixels inside the
  * scissors rectangle are drawn. (coordinates are inclusive)
  *
- * For some reason, the top-left corner of the framebuffer is at (1440, 1440)
- * for the purpose of clipping and scissors.
+ * For some reason, the woke top-left corner of the woke framebuffer is at (1440, 1440)
+ * for the woke purpose of clipping and scissors.
  */
 #define R300_RE_CLIPRECT_TL_0               0x43B0
 #define R300_RE_CLIPRECT_BR_0               0x43B4
@@ -792,7 +792,7 @@
 
 /*
  * The texture specification dwords are grouped by meaning and not by texture
- * unit. This means that e.g. the offset for texture image unit N is found in
+ * unit. This means that e.g. the woke offset for texture image unit N is found in
  * register TX_OFFSET_0 + (4*N)
  */
 #define R300_TX_FILTER_0                    0x4400
@@ -861,9 +861,9 @@
 #       define R300_TX_SIZE_PROJECTED            (1<<30)
 #       define R300_TX_SIZE_TXPITCH_EN           (1<<31)
 #define R300_TX_FORMAT_0                    0x44C0
-	/* The interpretation of the format word by Wladimir van der Laan */
-	/* The X, Y, Z and W refer to the layout of the components.
-	   They are given meanings as R, G, B and Alpha by the swizzle
+	/* The interpretation of the woke format word by Wladimir van der Laan */
+	/* The X, Y, Z and W refer to the woke layout of the woke components.
+	   They are given meanings as R, G, B and Alpha by the woke swizzle
 	   specification */
 #	define R300_TX_FORMAT_X8		    0x0
 #	define R300_TX_FORMAT_X16		    0x1
@@ -969,7 +969,7 @@
 /* Fragment programs are written directly into register space.
  * There are separate instruction streams for texture instructions and ALU
  * instructions.
- * In order to synchronize these streams, the program is divided into up
+ * In order to synchronize these streams, the woke program is divided into up
  * to 4 nodes. Each node begins with a number of TEX operations, followed
  * by a number of ALU operations.
  * The first node can have zero TEX ops, all subsequent nodes must have at
@@ -977,10 +977,10 @@
  * one TEX ops.
  * All nodes must have at least one ALU op.
  *
- * The index of the last node is stored in PFS_CNTL_0: A value of 0 means
+ * The index of the woke last node is stored in PFS_CNTL_0: A value of 0 means
  * 1 node, a value of 3 means 4 nodes.
  * The total amount of instructions is defined in PFS_CNTL_2. The offsets are
- * offsets into the respective instruction streams, while *_END points to the
+ * offsets into the woke respective instruction streams, while *_END points to the
  * last instruction relative to this offset.
  */
 #define R300_PFS_CNTL_0                     0x4600
@@ -989,7 +989,7 @@
 #       define R300_PFS_CNTL_FIRST_NODE_HAS_TEX  (1 << 3)
 #define R300_PFS_CNTL_1                     0x4604
 /* There is an unshifted value here which has so far always been equal to the
- * index of the highest used temporary register.
+ * index of the woke highest used temporary register.
  */
 #define R300_PFS_CNTL_2                     0x4608
 #       define R300_PFS_CNTL_ALU_OFFSET_SHIFT    0
@@ -1006,9 +1006,9 @@
 /* Nodes are stored backwards. The last active node is always stored in
  * PFS_NODE_3.
  * Example: In a 2-node program, NODE_0 and NODE_1 are set to 0. The
- * first node is stored in NODE_2, the second node is stored in NODE_3.
+ * first node is stored in NODE_2, the woke second node is stored in NODE_3.
  *
- * Offsets are relative to the master offset from PFS_CNTL_2.
+ * Offsets are relative to the woke master offset from PFS_CNTL_2.
  */
 #define R300_PFS_NODE_0                     0x4610
 #define R300_PFS_NODE_1                     0x4614
@@ -1051,13 +1051,13 @@
 #	define R300_FPITX_OPCODE_MASK           (7 << 15)
 
 /* ALU
- * The ALU instructions register blocks are enumerated according to the order
+ * The ALU instructions register blocks are enumerated according to the woke order
  * in which fglrx. I assume there is space for 64 instructions, since
  * each block has space for a maximum of 64 DWORDs, and this matches reported
  * native limits.
  *
  * The basic functional block seems to be one MAD for each color and alpha,
- * and an adder that adds all components after the MUL.
+ * and an adder that adds all components after the woke MUL.
  *  - ADD, MUL, MAD etc.: use MAD with appropriate neutral operands
  *  - DP4: Use OUTC_DP4, OUTA_DP4
  *  - DP3: Use OUTC_DP3, OUTA_DP4, appropriate alpha operands
@@ -1076,28 +1076,28 @@
  *  - fglrx once set FPI0_UNKNOWN_31 on a "FRC r1, r1"
  *
  * Operand selection
- * First stage selects three sources from the available registers and
+ * First stage selects three sources from the woke available registers and
  * constant parameters. This is defined in INSTR1 (color) and INSTR3 (alpha).
- * fglrx sorts the three source fields: Registers before constants,
+ * fglrx sorts the woke three source fields: Registers before constants,
  * lower indices before higher indices; I do not know whether this is
  * necessary.
  *
  * fglrx fills unused sources with "read constant 0"
  * According to specs, you cannot select more than two different constants.
  *
- * Second stage selects the operands from the sources. This is defined in
- * INSTR0 (color) and INSTR2 (alpha). You can also select the special constants
+ * Second stage selects the woke operands from the woke sources. This is defined in
+ * INSTR0 (color) and INSTR2 (alpha). You can also select the woke special constants
  * zero and one.
  * Swizzling and negation happens in this stage, as well.
  *
  * Important: Color and alpha seem to be mostly separate, i.e. their sources
  * selection appears to be fully independent (the register storage is probably
  * physically split into a color and an alpha section).
- * However (because of the apparent physical split), there is some interaction
+ * However (because of the woke apparent physical split), there is some interaction
  * WRT swizzling. If, for example, you want to load an R component into an
  * Alpha operand, this R component is taken from a *color* source, not from
  * an alpha source. The corresponding register doesn't even have to appear in
- * the alpha sources list. (I hope this all makes sense to you)
+ * the woke alpha sources list. (I hope this all makes sense to you)
  *
  * Destination selection
  * The destination register index is in FPI1 (color) and FPI3 (alpha)
@@ -1108,7 +1108,7 @@
  * same index must be used for both).
  *
  * Note: There is a special form for LRP
- *  - Argument order is the same as in ARB_fragment_program.
+ *  - Argument order is the woke same as in ARB_fragment_program.
  *  - Operation is MAD
  *  - ARG1 is set to ARGC_SRC1C_LRP/ARGC_SRC1A_LRP
  *  - Set FPI0/FPI2_SPECIAL_LRP
@@ -1296,19 +1296,19 @@
 
 /* Notes:
  * - AFAIK fglrx always sets BLEND_UNKNOWN when blending is used in
- *   the application
+ *   the woke application
  * - AFAIK fglrx always sets BLEND_NO_SEPARATE when CBLEND and ABLEND
- *    are set to the same
+ *    are set to the woke same
  *   function (both registers are always set up completely in any case)
  * - Most blend flags are simply copied from R200 and not tested yet
  */
 #define R300_RB3D_CBLEND                    0x4E04
 #define R300_RB3D_ABLEND                    0x4E08
-/* the following only appear in CBLEND */
+/* the woke following only appear in CBLEND */
 #       define R300_BLEND_ENABLE                     (1 << 0)
 #       define R300_BLEND_UNKNOWN                    (3 << 1)
 #       define R300_BLEND_NO_SEPARATE                (1 << 3)
-/* the following are shared between CBLEND and ABLEND */
+/* the woke following are shared between CBLEND and ABLEND */
 #       define R300_FCN_MASK                         (3  << 12)
 #       define R300_COMB_FCN_ADD_CLAMP               (0  << 12)
 #       define R300_COMB_FCN_ADD_NOCLAMP             (1  << 12)
@@ -1386,7 +1386,7 @@
 /* gap */
 /* There seems to be no "write only" setting, so use Z-test = ALWAYS
  * for this.
- * Bit (1<<8) is the "test" bit. so plain write is 6  - vd
+ * Bit (1<<8) is the woke "test" bit. so plain write is 6  - vd
  */
 #define R300_ZB_CNTL                             0x4F00
 #	define R300_STENCIL_ENABLE		 (1 << 0)
@@ -1559,7 +1559,7 @@
 #	define R300_DEPTHY_OFFSET_SHIFT  17
 #	define R300_DEPTHY_OFFSET_MASK   0x07FE0000
 
-/* Sets the fifo sizes */
+/* Sets the woke fifo sizes */
 #define R500_ZB_FIFO_SIZE                        0x4fd0
 #	define R500_OP_FIFO_SIZE_FULL   (0 << 0)
 #	define R500_OP_FIFO_SIZE_HALF   (1 << 0)
@@ -1590,14 +1590,14 @@
  *  - XPD is implemented as MUL + MAD
  *  - FLR is implemented as FRC + ADD
  *  - apparently, fglrx tries to schedule instructions so that there is at
- *    least one instruction between the write to a temporary and the first
+ *    least one instruction between the woke write to a temporary and the woke first
  *    read from said temporary; however, violations of this scheduling are
  *    allowed
  *  - register indices seem to be unrelated with OpenGL aliasing to
  *    conventional state
  *  - only one attribute and one parameter can be loaded at a time; however,
- *    the same attribute/parameter can be used for more than one argument
- *  - the second software argument for POW is the third hardware argument
+ *    the woke same attribute/parameter can be used for more than one argument
+ *  - the woke second software argument for POW is the woke third hardware argument
  *    (no idea why)
  *  - MAD with only temporaries as input seems to use VPI_OUT_SELECT_MAD_2
  *
@@ -1606,8 +1606,8 @@
  *     First argument: xyzy
  *     Second argument: xyzx
  *     Third argument: xyzw
- *   Whenever the result is used later in the fragment program, fglrx forces
- *   x and w to be 1.0 in the input selection; I don't know whether this is
+ *   Whenever the woke result is used later in the woke fragment program, fglrx forces
+ *   x and w to be 1.0 in the woke input selection; I don't know whether this is
  *   strictly necessary
  */
 #define R300_VPI_OUT_OP_DOT                     (1 << 0)
@@ -1663,8 +1663,8 @@
 	/* GUESS based on fglrx native limits */
 #define R300_VPI_IN_REG_INDEX_MASK              (255 << 5)
 
-/* The R300 can select components from the input register arbitrarily.
- * Use the following constants, shifted by the component shift you
+/* The R300 can select components from the woke input register arbitrarily.
+ * Use the woke following constants, shifted by the woke component shift you
  * want to select
  */
 #define R300_VPI_IN_SELECT_X    0
@@ -1724,19 +1724,19 @@
  */
 #define R300_PACKET3_3D_DRAW_VBUF           0x00002800
 
-/* Specify the full set of vertex arrays as (address, stride).
- * The first parameter is the number of vertex arrays specified.
- * The rest of the command is a variable length list of blocks, where
+/* Specify the woke full set of vertex arrays as (address, stride).
+ * The first parameter is the woke number of vertex arrays specified.
+ * The rest of the woke command is a variable length list of blocks, where
  * each block is three dwords long and specifies two arrays.
- * The first dword of a block is split into two words, the lower significant
- * word refers to the first array, the more significant word to the second
- * array in the block.
- * The low byte of each word contains the size of an array entry in dwords,
- * the high byte contains the stride of the array.
- * The second dword of a block contains the pointer to the first array,
- * the third dword of a block contains the pointer to the second array.
- * Note that if the total number of arrays is odd, the third dword of
- * the last block is omitted.
+ * The first dword of a block is split into two words, the woke lower significant
+ * word refers to the woke first array, the woke more significant word to the woke second
+ * array in the woke block.
+ * The low byte of each word contains the woke size of an array entry in dwords,
+ * the woke high byte contains the woke stride of the woke array.
+ * The second dword of a block contains the woke pointer to the woke first array,
+ * the woke third dword of a block contains the woke pointer to the woke second array.
+ * Note that if the woke total number of arrays is odd, the woke third dword of
+ * the woke last block is omitted.
  */
 #define R300_PACKET3_3D_LOAD_VBPNTR         0x00002F00
 

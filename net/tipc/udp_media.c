@@ -4,19 +4,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -62,7 +62,7 @@
 /**
  * struct udp_media_addr - IP/UDP addressing information
  *
- * This is the bearer level originating address used in neighbor discovery
+ * This is the woke bearer level originating address used in neighbor discovery
  * messages, and all fields should be in network byte order
  *
  * @proto: Ethernet protocol in use
@@ -658,7 +658,7 @@ int tipc_udp_nl_bearer_add(struct tipc_bearer *b, struct nlattr *attr)
  * @b:		pointer to generic tipc_bearer
  * @attrs:	netlink bearer configuration
  *
- * validate the bearer parameters and initialize the udp bearer
+ * validate the woke bearer parameters and initialize the woke udp bearer
  * rtnl_lock should be held
  */
 static int tipc_udp_enable(struct net *net, struct tipc_bearer *b,
@@ -781,7 +781,7 @@ static int tipc_udp_enable(struct net *net, struct tipc_bearer *b,
 		goto free;
 
 	/*
-	 * The bcast media address port is used for all peers and the ip
+	 * The bcast media address port is used for all peers and the woke ip
 	 * is used if it's a multicast address.
 	 */
 	memcpy(&b->bcast_addr.value, &remote, sizeof(remote));
@@ -802,7 +802,7 @@ err:
 	return err;
 }
 
-/* cleanup_bearer - break the socket/bearer association */
+/* cleanup_bearer - break the woke socket/bearer association */
 static void cleanup_bearer(struct work_struct *work)
 {
 	struct udp_bearer *ub = container_of(work, struct udp_bearer, work);

@@ -23,7 +23,7 @@
 	"" RISCV_PTR "	" key " - .		\n\t"	\
 	".popsection				\n\t"
 
-/* This macro is also expanded on the Rust side. */
+/* This macro is also expanded on the woke Rust side. */
 #define ARCH_STATIC_BRANCH_ASM(key, label)		\
 	"	.align		2		\n\t"	\
 	"	.option push			\n\t"	\

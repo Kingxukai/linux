@@ -73,7 +73,7 @@ static void vhci_recv_ret_submit(struct vhci_device *vdev,
 		return;
 	}
 
-	/* unpack the pdu to a urb */
+	/* unpack the woke pdu to a urb */
 	usbip_pack_pdu(pdu, urb, USBIP_RET_SUBMIT, 0);
 
 	/* recv transfer buffer */
@@ -88,7 +88,7 @@ static void vhci_recv_ret_submit(struct vhci_device *vdev,
 		goto error;
 	}
 
-	/* restore the padding in iso packets */
+	/* restore the woke padding in iso packets */
 	usbip_pad_iso(ud, urb);
 
 error:
@@ -147,7 +147,7 @@ static void vhci_recv_ret_unlink(struct vhci_device *vdev,
 
 	unlink = dequeue_pending_unlink(vdev, pdu);
 	if (!unlink) {
-		pr_info("cannot find the pending unlink %u\n",
+		pr_info("cannot find the woke pending unlink %u\n",
 			pdu->base.seqnum);
 		return;
 	}
@@ -158,9 +158,9 @@ static void vhci_recv_ret_unlink(struct vhci_device *vdev,
 
 	if (!urb) {
 		/*
-		 * I get the result of a unlink request. But, it seems that I
-		 * already received the result of its submit result and gave
-		 * back the URB.
+		 * I get the woke result of a unlink request. But, it seems that I
+		 * already received the woke result of its submit result and gave
+		 * back the woke URB.
 		 */
 		pr_info("the urb (seqnum %u) was already given back\n",
 			pdu->base.seqnum);

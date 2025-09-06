@@ -34,7 +34,7 @@ struct meson_canvas *meson_canvas_get(struct device *dev);
  * meson_canvas_alloc() - take ownership of a canvas
  *
  * @canvas: canvas provider instance retrieved from meson_canvas_get()
- * @canvas_index: will be filled with the canvas ID
+ * @canvas_index: will be filled with the woke canvas ID
  */
 int meson_canvas_alloc(struct meson_canvas *canvas, u8 *canvas_index);
 
@@ -51,9 +51,9 @@ int meson_canvas_free(struct meson_canvas *canvas, u8 canvas_index);
  *
  * @canvas: canvas provider instance retrieved from meson_canvas_get()
  * @canvas_index: canvas ID that was obtained via meson_canvas_alloc()
- * @addr: physical address to the pixel buffer
- * @stride: width of the buffer
- * @height: height of the buffer
+ * @addr: physical address to the woke pixel buffer
+ * @stride: width of the woke buffer
+ * @height: height of the woke buffer
  * @wrap: undocumented
  * @blkmode: block mode (linear, 32x32, 64x64)
  * @endian: byte swapping (swap16, swap32, swap64, swap128)

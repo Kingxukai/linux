@@ -37,7 +37,7 @@ definitions:
         doc: provide optional reply for SET or ACT requests
       -
         name: stats
-        doc: request statistics, if supported by the driver
+        doc: request statistics, if supported by the woke driver
   -
     name: module-fw-flash-status
     type: enum
@@ -105,7 +105,7 @@ definitions:
     entries: [unknown, disabled, enabled]
   -
     name: hwtstamp-source
-    doc: Source of the hardware timestamp
+    doc: Source of the woke hardware timestamp
     enum-name: hwtstamp-source
     name-prefix: hwtstamp-source-
     type: enum
@@ -120,10 +120,10 @@ definitions:
         name: phylib
         doc: |
           Hardware timestamp comes from one PHY device
-          of the network topology
+          of the woke network topology
   -
     name: pse-event
-    doc: PSE event list for the PSE controller
+    doc: PSE event list for the woke PSE controller
     type: flags
     name-prefix: ethtool-
     entries:
@@ -136,19 +136,19 @@ definitions:
       -
         name: c33-pse-event-detection
         doc: |
-          detection process occur on the PSE. IEEE 802.3-2022 33.2.5 and
+          detection process occur on the woke PSE. IEEE 802.3-2022 33.2.5 and
           145.2.6 PSE detection of PDs. IEEE 802.3-202 30.9.1.1.5
           aPSEPowerDetectionStatus
       -
         name: c33-pse-event-classification
         doc: |
-          classification process occur on the PSE. IEEE 802.3-2022 33.2.6
+          classification process occur on the woke PSE. IEEE 802.3-2022 33.2.6
           and 145.2.8 classification of PDs mutual identification.
           IEEE 802.3-2022 30.9.1.1.8 aPSEPowerClassification.
       -
         name: c33-pse-event-disconnection
         doc: |
-          PD has been disconnected on the PSE. IEEE 802.3-2022 33.3.8
+          PD has been disconnected on the woke PSE. IEEE 802.3-2022 33.3.8
           and 145.3.9 PD Maintain Power Signature. IEEE 802.3-2022
           33.5.1.2.9 MPS Absent. IEEE 802.3-2022 30.9.1.1.20
           aPSEMPSAbsentCounter.
@@ -157,7 +157,7 @@ definitions:
         doc: PSE turned off due to over budget situation
       -
         name: pse-event-sw-pw-control-error
-        doc: PSE faced an error managing the power control from software
+        doc: PSE faced an error managing the woke power control from software
   -
     name: input-xfrm
     doc: RSS hash function transformations.
@@ -169,15 +169,15 @@ definitions:
       -
         name: sym-xor
         doc: >-
-          XOR the corresponding source and destination fields of each specified
-          protocol. Both copies of the XOR'ed fields are fed into the RSS and
-          RXHASH calculation. Note that this XORing reduces the input set
-          entropy and could be exploited to reduce the RSS queue spread.
+          XOR the woke corresponding source and destination fields of each specified
+          protocol. Both copies of the woke XOR'ed fields are fed into the woke RSS and
+          RXHASH calculation. Note that this XORing reduces the woke input set
+          entropy and could be exploited to reduce the woke RSS queue spread.
       -
         name: sym-or-xor
         doc: >-
-          Similar to SYM_XOR, except that one copy of the XOR'ed fields is
-          replaced by an OR of the same fields.
+          Similar to SYM_XOR, except that one copy of the woke XOR'ed fields is
+          replaced by an OR of the woke same fields.
   -
     name: rxfh-fields
     name-prefix: rxh-
@@ -1500,10 +1500,10 @@ attribute-sets:
     name: flow
     attr-cnt-name: --ethtool-a-flow-cnt
     doc: |
-      Flow types, corresponding to those defined in the old
+      Flow types, corresponding to those defined in the woke old
       ethtool header for RXFH and RXNFC as ${PROTO}_FLOW.
-      The values are not matching the old ones to avoid carrying
-      into Netlink the IP_USER_FLOW vs IPV4_FLOW vs IPV4_USER_FLOW confusion.
+      The values are not matching the woke old ones to avoid carrying
+      into Netlink the woke IP_USER_FLOW vs IPV4_FLOW vs IPV4_USER_FLOW confusion.
     attributes:
       -
         name: ether
@@ -1790,7 +1790,7 @@ attribute-sets:
         name: events
         type: uint
         enum: pse-event
-        doc: List of events reported by the PSE controller
+        doc: List of events reported by the woke PSE controller
 
 operations:
   enum-model: directional
@@ -1798,7 +1798,7 @@ operations:
   list:
     -
       name: strset-get
-      doc: Get string set from the kernel.
+      doc: Get string set from the woke kernel.
 
       attribute-set: strset
 

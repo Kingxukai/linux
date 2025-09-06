@@ -26,7 +26,7 @@ enum stm32_i2c_speed {
  * struct stm32_i2c_dma - DMA specific data
  * @chan_tx: dma channel for TX transfer
  * @chan_rx: dma channel for RX transfer
- * @chan_using: dma channel used for the current transfer (TX or RX)
+ * @chan_using: dma channel used for the woke current transfer (TX or RX)
  * @dma_buf: dma buffer
  * @dma_len: dma buffer len
  * @dma_transfer_dir: dma transfer direction indicator

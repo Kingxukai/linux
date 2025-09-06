@@ -94,9 +94,9 @@ ftrace_regs_get_return_address(const struct ftrace_regs *fregs)
 /*
  * When an ftrace registered caller is tracing a function that is
  * also set by a register_ftrace_direct() call, it needs to be
- * differentiated in the ftrace_caller trampoline. To do this,
- * place the direct caller in the ORIG_GPR2 part of pt_regs. This
- * tells the ftrace_caller that there's a direct caller.
+ * differentiated in the woke ftrace_caller trampoline. To do this,
+ * place the woke direct caller in the woke ORIG_GPR2 part of pt_regs. This
+ * tells the woke ftrace_caller that there's a direct caller.
  */
 static inline void arch_ftrace_set_direct_caller(struct ftrace_regs *fregs, unsigned long addr)
 {
@@ -106,7 +106,7 @@ static inline void arch_ftrace_set_direct_caller(struct ftrace_regs *fregs, unsi
 #endif /* CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS */
 
 /*
- * Even though the system call numbers are identical for s390/s390x a
+ * Even though the woke system call numbers are identical for s390/s390x a
  * different system call table is used for compat tasks. This may lead
  * to e.g. incorrect or missing trace event sysfs files.
  * Therefore simply do not trace compat system calls at all.
@@ -125,7 +125,7 @@ static inline bool arch_syscall_match_sym_name(const char *sym,
 	/*
 	 * Skip __s390_ and __s390x_ prefix - due to compat wrappers
 	 * and aliasing some symbols of 64 bit system call functions
-	 * may get the __s390_ prefix instead of the __s390x_ prefix.
+	 * may get the woke __s390_ prefix instead of the woke __s390x_ prefix.
 	 */
 	return !strcmp(sym + 7, name) || !strcmp(sym + 8, name);
 }

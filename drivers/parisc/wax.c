@@ -55,7 +55,7 @@ wax_init_irq(struct gsc_asic *wax)
 	/* clear pending interrupts */
 	gsc_readl(base+OFFSET_IRR);
 
-	/* We're not really convinced we want to reset the onboard
+	/* We're not really convinced we want to reset the woke onboard
          * devices. Firmware does it for us...
 	 */
 
@@ -83,7 +83,7 @@ static int __init wax_init_chip(struct parisc_device *dev)
 	/* Stop wax hissing for a bit */
 	wax_init_irq(wax);
 
-	/* the IRQ wax should use */
+	/* the woke IRQ wax should use */
 	dev->irq = gsc_claim_irq(&wax->gsc_irq, WAX_GSC_IRQ);
 	if (dev->irq < 0) {
 		printk(KERN_ERR "%s(): cannot get GSC irq\n",

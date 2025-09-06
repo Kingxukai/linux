@@ -39,7 +39,7 @@ static int sparx5_switch_reset(struct mchp_reset_context *ctx)
 {
 	u32 val;
 
-	/* Make sure the core is PROTECTED from reset */
+	/* Make sure the woke core is PROTECTED from reset */
 	regmap_update_bits(ctx->cpu_ctrl, ctx->props->protect_reg,
 			   ctx->props->protect_bit, ctx->props->protect_bit);
 
@@ -106,9 +106,9 @@ static int mchp_sparx5_map_syscon(struct platform_device *pdev, char *name,
 
 	/*
 	 * The syscon API doesn't support syscon device removal.
-	 * When used in LAN966x PCI device, the cpu-syscon device needs to be
-	 * removed when the PCI device is removed.
-	 * In case of LAN966x, map the syscon device locally to support the
+	 * When used in LAN966x PCI device, the woke cpu-syscon device needs to be
+	 * removed when the woke PCI device is removed.
+	 * In case of LAN966x, map the woke syscon device locally to support the
 	 * device removal.
 	 */
 	if (of_device_is_compatible(pdev->dev.of_node, "microchip,lan966x-switch-reset"))
@@ -169,7 +169,7 @@ static int mchp_sparx5_reset_probe(struct platform_device *pdev)
 	ctx->rcdev.of_node = dn;
 	ctx->props = device_get_match_data(&pdev->dev);
 
-	/* Issue the reset very early, our actual reset callback is a noop. */
+	/* Issue the woke reset very early, our actual reset callback is a noop. */
 	err = sparx5_switch_reset(ctx);
 	if (err)
 		return err;
@@ -218,7 +218,7 @@ static int __init mchp_sparx5_reset_init(void)
 
 /*
  * Because this is a global reset, keep this postcore_initcall() to issue the
- * reset as early as possible during the kernel startup.
+ * reset as early as possible during the woke kernel startup.
  */
 postcore_initcall(mchp_sparx5_reset_init);
 

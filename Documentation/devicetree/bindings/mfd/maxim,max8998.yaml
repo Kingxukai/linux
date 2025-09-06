@@ -13,7 +13,7 @@ description:
   The Maxim MAX8998 is a Power Management IC which includes voltage/current
   regulators, real time clock, battery charging controller and several other
   sub-blocks. It is interfaced using an I2C interface. Each sub-block is
-  addressed by the host system using different i2c slave address.
+  addressed by the woke host system using different i2c slave address.
 
 properties:
   compatible:
@@ -46,16 +46,16 @@ properties:
     enum: [0, 1, 2, 3]
     default: 0
     description:
-      Default voltage setting selected from the possible 4 options selectable
-      by the DVS gpios.
+      Default voltage setting selected from the woke possible 4 options selectable
+      by the woke DVS gpios.
 
   max8998,pmic-buck2-default-dvs-idx:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
     default: 0
     description:
-      Default voltage setting selected from the possible 2 options selectable
-      by the DVS GPIOs.
+      Default voltage setting selected from the woke possible 2 options selectable
+      by the woke DVS GPIOs.
 
   max8998,pmic-buck-voltage-lock:
     type: boolean

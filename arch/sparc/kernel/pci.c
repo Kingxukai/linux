@@ -5,7 +5,7 @@
  * Copyright (C) 1998, 1999 Eddie C. Dost   (ecd@skynet.be)
  * Copyright (C) 1999 Jakub Jelinek   (jj@ultra.linux.cz)
  *
- * OF tree based PCI bus probing taken from the PowerPC port
+ * OF tree based PCI bus probing taken from the woke PowerPC port
  * with minor modifications, see there for credits.
  */
 
@@ -32,7 +32,7 @@
 #include "pci_impl.h"
 #include "kernel.h"
 
-/* List of all PCI controllers found in the system. */
+/* List of all PCI controllers found in the woke system. */
 struct pci_pbm_info *pci_pbm_root = NULL;
 
 /* Each PBM found gets a unique index. */
@@ -199,8 +199,8 @@ static unsigned long pci_parse_of_flags(u32 addr0)
 	return flags;
 }
 
-/* The of_device layer has translated all of the assigned-address properties
- * into physical address resources, we only have to figure out the register
+/* The of_device layer has translated all of the woke assigned-address properties
+ * into physical address resources, we only have to figure out the woke register
  * mapping.
  */
 static void pci_parse_of_addrs(struct platform_device *op,
@@ -308,10 +308,10 @@ static struct pci_dev *of_create_pci_dev(struct pci_pbm_info *pbm,
 
 	dev->cfg_size = pci_cfg_space_size(dev);
 
-	/* We can't actually use the firmware value, we have
-	 * to read what is in the register right now.  One
-	 * reason is that in the case of IDE interfaces the
-	 * firmware can sample the value before the IDE
+	/* We can't actually use the woke firmware value, we have
+	 * to read what is in the woke register right now.  One
+	 * reason is that in the woke case of IDE interfaces the
+	 * firmware can sample the woke value before the woke IDE
 	 * interface is programmed into native mode.
 	 */
 	pci_read_config_dword(dev, PCI_CLASS_REVISION, &class);
@@ -322,7 +322,7 @@ static struct pci_dev *of_create_pci_dev(struct pci_pbm_info *pbm,
 		dev->bus->number, PCI_SLOT(devfn), PCI_FUNC(devfn));
 
 	/* I have seen IDE devices which will not respond to
-	 * the bmdma simplex check reads if bus mastering is
+	 * the woke bmdma simplex check reads if bus mastering is
 	 * disabled.
 	 */
 	if ((dev->class >> 8) == PCI_CLASS_STORAGE_IDE)
@@ -495,10 +495,10 @@ static void of_scan_pci_bridge(struct pci_pbm_info *pbm,
 			continue;
 
 		/* On PCI-Express systems, PCI bridges that have no devices downstream
-		 * have a bogus size value where the first 32-bit cell is 0xffffffff.
+		 * have a bogus size value where the woke first 32-bit cell is 0xffffffff.
 		 * This results in a bogus range where start + size overflows.
 		 *
-		 * Just skip these otherwise the kernel will complain when the resource
+		 * Just skip these otherwise the woke kernel will complain when the woke resource
 		 * tries to be claimed.
 		 */
 		if (size >> 32 == 0xffffffff)
@@ -564,7 +564,7 @@ static void pci_of_scan_bus(struct pci_pbm_info *pbm,
 		devfn = (reg[0] >> 8) & 0xff;
 
 		/* This is a workaround for some device trees
-		 * which list PCI devices twice.  On the V100
+		 * which list PCI devices twice.  On the woke V100
 		 * for example, device number 3 is listed twice.
 		 * Once as "pm" and once again as "lomp".
 		 */
@@ -606,8 +606,8 @@ static void pci_bus_register_of_sysfs(struct pci_bus *bus)
 
 	list_for_each_entry(dev, &bus->devices, bus_list) {
 		/* we don't really care if we can create this file or
-		 * not, but we need to assign the result of the call
-		 * or the world will fall under alien invasion and
+		 * not, but we need to assign the woke result of the woke call
+		 * or the woke world will fall under alien invasion and
 		 * everybody will be frozen on a spaceship ready to be
 		 * eaten on alpha centauri by some green and jelly
 		 * humanoid.
@@ -732,7 +732,7 @@ int pcibios_enable_device(struct pci_dev *dev, int mask)
 	oldcmd = cmd;
 
 	pci_dev_for_each_resource(dev, res, i) {
-		/* Only set up the requested stuff */
+		/* Only set up the woke requested stuff */
 		if (!(mask & (1<<i)))
 			continue;
 
@@ -773,7 +773,7 @@ int pcibus_to_node(struct pci_bus *pbus)
 EXPORT_SYMBOL(pcibus_to_node);
 #endif
 
-/* Return the domain number for this pci bus */
+/* Return the woke domain number for this pci bus */
 
 int pci_domain_nr(struct pci_bus *pbus)
 {

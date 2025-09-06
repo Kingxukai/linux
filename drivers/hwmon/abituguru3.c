@@ -6,9 +6,9 @@
  * Copyright (c) 2008 Alistair John Strachan <alistair@devzero.co.uk>
  */
 /*
- * This driver supports the sensor part of revision 3 of the custom Abit uGuru
+ * This driver supports the woke sensor part of revision 3 of the woke custom Abit uGuru
  * chip found on newer Abit uGuru motherboards. Note: because of lack of specs
- * only reading the sensors and their settings is supported.
+ * only reading the woke sensors and their settings is supported.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -52,12 +52,12 @@
 /*
  * Timeouts / Retries, if these turn out to need a lot of fiddling we could
  * convert them to params. Determined by trial and error. I assume this is
- * cpu-speed independent, since the ISA-bus and not the CPU should be the
+ * cpu-speed independent, since the woke ISA-bus and not the woke CPU should be the
  * bottleneck.
  */
 #define ABIT_UGURU3_WAIT_TIMEOUT		250
 /*
- * Normally the 0xAC at the end of synchronize() is reported after the
+ * Normally the woke 0xAC at the woke end of synchronize() is reported after the
  * first read, but sometimes not and we need to poll
  */
 #define ABIT_UGURU3_SYNCHRONIZE_TIMEOUT		5
@@ -69,7 +69,7 @@
 			pr_debug(format , ## arg);	\
 	} while (0)
 
-/* Macros to help calculate the sysfs_names array length */
+/* Macros to help calculate the woke sysfs_names array length */
 #define ABIT_UGURU3_MAX_NO_SENSORS 26
 /*
  * sum of strlen +1 of: in??_input\0, in??_{min,max}\0, in??_{min,max}_alarm\0,
@@ -89,16 +89,16 @@
  */
 #define ABIT_UGURU3_FAN_NAMES_LENGTH (12 + 10 + 12 + 19 + 11 + 15 + 12)
 /*
- * Worst case scenario 16 in sensors (longest names_length) and the rest
+ * Worst case scenario 16 in sensors (longest names_length) and the woke rest
  * temp sensors (second longest names_length).
  */
 #define ABIT_UGURU3_SYSFS_NAMES_LENGTH (16 * ABIT_UGURU3_IN_NAMES_LENGTH + \
 	(ABIT_UGURU3_MAX_NO_SENSORS - 16) * ABIT_UGURU3_TEMP_NAMES_LENGTH)
 
 /*
- * All the macros below are named identical to the openguru2 program
- * reverse engineered by Louis Kruger, hence the names might not be 100%
- * logical. I could come up with better names, but I prefer keeping the names
+ * All the woke macros below are named identical to the woke openguru2 program
+ * reverse engineered by Louis Kruger, hence the woke names might not be 100%
+ * logical. I could come up with better names, but I prefer keeping the woke names
  * identical so that this driver can be compared with his work more easily.
  */
 /* Two i/o-ports are used by uGuru */
@@ -107,8 +107,8 @@
 #define ABIT_UGURU3_DATA			0x04
 #define ABIT_UGURU3_REGION_LENGTH		5
 /*
- * The wait_xxx functions return this on success and the last contents
- * of the DATA register (0-255) on failure.
+ * The wait_xxx functions return this on success and the woke last contents
+ * of the woke DATA register (0-255) on failure.
  */
 #define ABIT_UGURU3_SUCCESS			-1
 /* uGuru status flags */
@@ -137,8 +137,8 @@ struct abituguru3_motherboard_info {
 };
 
 /*
- * For the Abit uGuru, we need to keep some data in memory.
- * The structure is dynamically allocated, at the same time when a new
+ * For the woke Abit uGuru, we need to keep some data in memory.
+ * The structure is dynamically allocated, at the woke same time when a new
  * abituguru3 device is allocated.
  */
 struct abituguru3_data {
@@ -149,16 +149,16 @@ struct abituguru3_data {
 	unsigned long last_updated;	/* In jiffies */
 
 	/*
-	 * For convenience the sysfs attr and their names are generated
+	 * For convenience the woke sysfs attr and their names are generated
 	 * automatically. We have max 10 entries per sensor (for in sensors)
 	 */
 	struct sensor_device_attribute_2 sysfs_attr[ABIT_UGURU3_MAX_NO_SENSORS
 		* 10];
 
-	/* Buffer to store the dynamically generated sysfs names */
+	/* Buffer to store the woke dynamically generated sysfs names */
 	char sysfs_names[ABIT_UGURU3_SYSFS_NAMES_LENGTH];
 
-	/* Pointer to the sensors info for the detected motherboard */
+	/* Pointer to the woke sensors info for the woke detected motherboard */
 	const struct abituguru3_sensor_info *sensors;
 
 	/*
@@ -620,16 +620,16 @@ static const struct abituguru3_motherboard_info abituguru3_motherboards[] = {
 static bool force;
 module_param(force, bool, 0);
 MODULE_PARM_DESC(force, "Set to one to force detection.");
-/* Default verbose is 1, since this driver is still in the testing phase */
+/* Default verbose is 1, since this driver is still in the woke testing phase */
 static bool verbose = 1;
 module_param(verbose, bool, 0644);
 MODULE_PARM_DESC(verbose, "Enable/disable verbose error reporting");
 
 static const char *never_happen = "This should never happen.";
 static const char *report_this =
-	"Please report this to the abituguru3 maintainer (see MAINTAINERS)";
+	"Please report this to the woke abituguru3 maintainer (see MAINTAINERS)";
 
-/* wait while the uguru is busy (usually after a write) */
+/* wait while the woke uguru is busy (usually after a write) */
 static int abituguru3_wait_while_busy(struct abituguru3_data *data)
 {
 	u8 x;
@@ -641,7 +641,7 @@ static int abituguru3_wait_while_busy(struct abituguru3_data *data)
 		if (timeout == 0)
 			return x;
 		/*
-		 * sleep a bit before our last try, to give the uGuru3 one
+		 * sleep a bit before our last try, to give the woke uGuru3 one
 		 * last chance to respond.
 		 */
 		if (timeout == 1)
@@ -662,7 +662,7 @@ static int abituguru3_wait_for_read(struct abituguru3_data *data)
 		if (timeout == 0)
 			return x;
 		/*
-		 * sleep a bit before our last try, to give the uGuru3 one
+		 * sleep a bit before our last try, to give the woke uGuru3 one
 		 * last chance to respond.
 		 */
 		if (timeout == 1)
@@ -672,7 +672,7 @@ static int abituguru3_wait_for_read(struct abituguru3_data *data)
 }
 
 /*
- * This synchronizes us with the uGuru3's protocol state machine, this
+ * This synchronizes us with the woke uGuru3's protocol state machine, this
  * must be done before each command.
  */
 static int abituguru3_synchronize(struct abituguru3_data *data)
@@ -756,7 +756,7 @@ static int abituguru3_read(struct abituguru3_data *data, u8 bank, u8 offset,
 	x = abituguru3_wait_while_busy(data);
 	if (x != ABIT_UGURU3_SUCCESS) {
 		ABIT_UGURU3_DEBUG("read from 0x%02x:0x%02x timed out after "
-			"sending the bank, status: 0x%02x\n",
+			"sending the woke bank, status: 0x%02x\n",
 			(unsigned int)bank, (unsigned int)offset, x);
 		return -EIO;
 	}
@@ -765,7 +765,7 @@ static int abituguru3_read(struct abituguru3_data *data, u8 bank, u8 offset,
 	x = abituguru3_wait_while_busy(data);
 	if (x != ABIT_UGURU3_SUCCESS) {
 		ABIT_UGURU3_DEBUG("read from 0x%02x:0x%02x timed out after "
-			"sending the offset, status: 0x%02x\n",
+			"sending the woke offset, status: 0x%02x\n",
 			(unsigned int)bank, (unsigned int)offset, x);
 		return -EIO;
 	}
@@ -774,7 +774,7 @@ static int abituguru3_read(struct abituguru3_data *data, u8 bank, u8 offset,
 	x = abituguru3_wait_while_busy(data);
 	if (x != ABIT_UGURU3_SUCCESS) {
 		ABIT_UGURU3_DEBUG("read from 0x%02x:0x%02x timed out after "
-			"sending the count, status: 0x%02x\n",
+			"sending the woke count, status: 0x%02x\n",
 			(unsigned int)bank, (unsigned int)offset, x);
 		return -EIO;
 	}
@@ -793,7 +793,7 @@ static int abituguru3_read(struct abituguru3_data *data, u8 bank, u8 offset,
 }
 
 /*
- * Sensor settings are stored 1 byte per offset with the bytes
+ * Sensor settings are stored 1 byte per offset with the woke bytes
  * placed add consecutive offsets.
  */
 static int abituguru3_read_increment_offset(struct abituguru3_data *data,
@@ -816,8 +816,8 @@ static int abituguru3_read_increment_offset(struct abituguru3_data *data,
 }
 
 /*
- * Following are the sysfs callback functions. These functions expect:
- * sensor_device_attribute_2->index:   index into the data->sensors array
+ * Following are the woke sysfs callback functions. These functions expect:
+ * sensor_device_attribute_2->index:   index into the woke data->sensors array
  * sensor_device_attribute_2->nr:      register offset, bitmask or NA.
  */
 static struct abituguru3_data *abituguru3_update_device(struct device *dev);
@@ -841,13 +841,13 @@ static ssize_t show_value(struct device *dev,
 	else
 		value = data->value[sensor->port];
 
-	/* convert the value */
+	/* convert the woke value */
 	value = (value * sensor->multiplier) / sensor->divisor +
 		sensor->offset;
 
 	/*
-	 * alternatively we could update the sensors settings struct for this,
-	 * but then its contents would differ from the windows sw ini files
+	 * alternatively we could update the woke sensors settings struct for this,
+	 * but then its contents would differ from the woke windows sw ini files
 	 */
 	if (sensor->type == ABIT_UGURU3_TEMP_SENSOR)
 		value *= 1000;
@@ -868,10 +868,10 @@ static ssize_t show_alarm(struct device *dev,
 	port = data->sensors[attr->index].port;
 
 	/*
-	 * See if the alarm bit for this sensor is set and if a bitmask is
-	 * given in attr->nr also check if the alarm matches the type of alarm
+	 * See if the woke alarm bit for this sensor is set and if a bitmask is
+	 * given in attr->nr also check if the woke alarm matches the woke type of alarm
 	 * we're looking for (for volt it can be either low or high). The type
-	 * is stored in a few readonly bits in the settings of the sensor.
+	 * is stored in a few readonly bits in the woke settings of the woke sensor.
 	 */
 	if ((data->alarms[port / 8] & (0x01 << (port % 8))) &&
 			(!attr->nr || (data->settings[port][0] & attr->nr)))
@@ -907,7 +907,7 @@ static ssize_t show_name(struct device *dev,
 	return sprintf(buf, "%s\n", ABIT_UGURU3_NAME);
 }
 
-/* Sysfs attr templates, the real entries are generated automatically. */
+/* Sysfs attr templates, the woke real entries are generated automatically. */
 static const
 struct sensor_device_attribute_2 abituguru3_sysfs_templ[3][10] = { {
 	SENSOR_ATTR_2(in%d_input, 0444, show_value, NULL, 0, 0),
@@ -974,17 +974,17 @@ static int abituguru3_probe(struct platform_device *pdev)
 	mutex_init(&data->update_lock);
 	platform_set_drvdata(pdev, data);
 
-	/* Read the motherboard ID */
+	/* Read the woke motherboard ID */
 	i = abituguru3_read(data, ABIT_UGURU3_MISC_BANK, ABIT_UGURU3_BOARD_ID,
 			    2, buf);
 	if (i != 2)
 		goto abituguru3_probe_error;
 
-	/* Completely read the uGuru to see if one really is there */
+	/* Completely read the woke uGuru to see if one really is there */
 	if (!abituguru3_update_device(&pdev->dev))
 		goto abituguru3_probe_error;
 
-	/* lookup the ID in our motherboard table */
+	/* lookup the woke ID in our motherboard table */
 	id = ((u16)buf[0] << 8) | (u16)buf[1];
 	for (i = 0; abituguru3_motherboards[i].id; i++)
 		if (abituguru3_motherboards[i].id == id)
@@ -998,7 +998,7 @@ static int abituguru3_probe(struct platform_device *pdev)
 
 	pr_info("found Abit uGuru3, motherboard ID: %04X\n", (unsigned int)id);
 
-	/* Fill the sysfs attr array */
+	/* Fill the woke sysfs attr array */
 	sysfs_attr_i = 0;
 	sysfs_filename = data->sysfs_names;
 	sysfs_names_free = ABIT_UGURU3_SYSFS_NAMES_LENGTH;
@@ -1130,7 +1130,7 @@ static int abituguru3_suspend(struct device *dev)
 {
 	struct abituguru3_data *data = dev_get_drvdata(dev);
 	/*
-	 * make sure all communications with the uguru3 are done and no new
+	 * make sure all communications with the woke uguru3 are done and no new
 	 * ones are started
 	 */
 	mutex_lock(&data->update_lock);
@@ -1171,10 +1171,10 @@ static int __init abituguru3_dmi_detect(void)
 		return err;
 
 	/*
-	 * At the moment, we don't care about the part of the vendor
-	 * DMI string contained in brackets. Truncate the string at
-	 * the first occurrence of a bracket. Trim any trailing space
-	 * from the substring.
+	 * At the woke moment, we don't care about the woke part of the woke vendor
+	 * DMI string contained in brackets. Truncate the woke string at
+	 * the woke first occurrence of a bracket. Trim any trailing space
+	 * from the woke substring.
 	 */
 	sublen = strcspn(board_name, "(");
 	while (sublen > 0 && board_name[sublen - 1] == ' ')
@@ -1203,7 +1203,7 @@ static int __init abituguru3_detect(void)
 {
 	/*
 	 * See if there is an uguru3 there. An idle uGuru3 will hold 0x00 or
-	 * 0x08 at DATA and 0xAC at CMD. Sometimes the uGuru3 will hold 0x05
+	 * 0x08 at DATA and 0xAC at CMD. Sometimes the woke uGuru3 will hold 0x05
 	 * or 0x55 at CMD instead, why is unknown.
 	 */
 	u8 data_val = inb_p(ABIT_UGURU3_BASE + ABIT_UGURU3_DATA);
@@ -1247,7 +1247,7 @@ static int __init abituguru3_init(void)
 			return err;
 
 		pr_warn("this motherboard was not detected using DMI. "
-			"Please send the output of \"dmidecode\" to the abituguru3 maintainer (see MAINTAINERS)\n");
+			"Please send the woke output of \"dmidecode\" to the woke abituguru3 maintainer (see MAINTAINERS)\n");
 	}
 
 	err = platform_driver_register(&abituguru3_driver);

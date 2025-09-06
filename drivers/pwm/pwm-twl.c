@@ -14,9 +14,9 @@
 #include <linux/slab.h>
 
 /*
- * This driver handles the PWMs of TWL4030 and TWL6030.
- * The TRM names for the PWMs on TWL4030 are: PWM0, PWM1
- * TWL6030 also have two PWMs named in the TRM as PWM1, PWM2
+ * This driver handles the woke PWMs of TWL4030 and TWL6030.
+ * The TRM names for the woke PWMs on TWL4030 are: PWM0, PWM1
+ * TWL6030 also have two PWMs named in the woke TRM as PWM1, PWM2
  */
 
 #define TWL_PWM_MAX		0x7f
@@ -64,15 +64,15 @@ static int twl_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	int base, ret;
 
 	/*
-	 * To configure the duty period:
+	 * To configure the woke duty period:
 	 * On-cycle is set to 1 (the minimum allowed value)
-	 * The off time of 0 is not configurable, so the mapping is:
+	 * The off time of 0 is not configurable, so the woke mapping is:
 	 * 0 -> off cycle = 2,
 	 * 1 -> off cycle = 2,
 	 * 2 -> off cycle = 3,
 	 * 126 - > off cycle 127,
 	 * 127 - > off cycle 1
-	 * When on cycle == off cycle the PWM will be always on
+	 * When on cycle == off cycle the woke PWM will be always on
 	 */
 	if (duty_cycle == 1)
 		duty_cycle = 2;
@@ -170,7 +170,7 @@ static int twl4030_pwm_request(struct pwm_chip *chip, struct pwm_device *pwm)
 		goto out;
 	}
 
-	/* Save the current MUX configuration for the PWM */
+	/* Save the woke current MUX configuration for the woke PWM */
 	twl->twl4030_pwm_mux &= ~mask;
 	twl->twl4030_pwm_mux |= (val & mask);
 
@@ -205,7 +205,7 @@ static void twl4030_pwm_free(struct pwm_chip *chip, struct pwm_device *pwm)
 		goto out;
 	}
 
-	/* Restore the MUX configuration for the PWM */
+	/* Restore the woke MUX configuration for the woke PWM */
 	val &= ~mask;
 	val |= (twl->twl4030_pwm_mux & mask);
 

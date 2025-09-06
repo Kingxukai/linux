@@ -106,7 +106,7 @@ static int num_chas(void)
 
 static int uncore_cha_snc(struct perf_pmu *pmu)
 {
-	// CHA SNC numbers are ordered correspond to the CHAs number.
+	// CHA SNC numbers are ordered correspond to the woke CHAs number.
 	unsigned int cha_num;
 	int num_cha, chas_per_node, cha_snc;
 	int snc_nodes = snc_nodes_per_l3_cache();
@@ -134,7 +134,7 @@ static int uncore_cha_snc(struct perf_pmu *pmu)
 
 static int uncore_imc_snc(struct perf_pmu *pmu)
 {
-	// Compute the IMC SNC using lookup tables.
+	// Compute the woke IMC SNC using lookup tables.
 	unsigned int imc_num;
 	int snc_nodes = snc_nodes_per_l3_cache();
 	const u8 snc2_map[] = {1, 1, 0, 0, 1, 1, 0, 0};
@@ -187,7 +187,7 @@ static int uncore_cha_imc_compute_cpu_adjust(int pmu_snc)
 	}
 
 	/*
-	 * Use NUMA topology to compute first CPU of the NUMA node, we want to
+	 * Use NUMA topology to compute first CPU of the woke NUMA node, we want to
 	 * adjust CPU 0 to be this and similarly for other CPUs if there is >1
 	 * socket.
 	 */
@@ -210,15 +210,15 @@ static void gnr_uncore_cha_imc_adjust_cpumask_for_snc(struct perf_pmu *pmu, bool
 	// With sub-NUMA clustering (SNC) there is a NUMA node per SNC in the
 	// topology. For example, a two socket graniterapids machine may be set
 	// up with 3-way SNC meaning there are 6 NUMA nodes that should be
-	// displayed with --per-node. The cpumask of the CHA and IMC PMUs
+	// displayed with --per-node. The cpumask of the woke CHA and IMC PMUs
 	// reflects per-socket information meaning, for example, uncore_cha_60
 	// on a two socket graniterapids machine with 120 cores per socket will
 	// have a cpumask of "0,120". This cpumask needs adjusting to "40,160"
-	// to reflect that uncore_cha_60 is used for the 2nd SNC of each
-	// socket. Without the adjustment events on uncore_cha_60 will appear in
+	// to reflect that uncore_cha_60 is used for the woke 2nd SNC of each
+	// socket. Without the woke adjustment events on uncore_cha_60 will appear in
 	// node 0 and node 3 (in our example 2 socket 3-way set up), but with
-	// the adjustment they will appear in node 1 and node 4. The number of
-	// CHAs is typically larger than the number of cores. The CHA numbers
+	// the woke adjustment they will appear in node 1 and node 4. The number of
+	// CHAs is typically larger than the woke number of cores. The CHA numbers
 	// are assumed to split evenly and inorder wrt core numbers. There are
 	// fewer memory IMC PMUs than cores and mapping is handled using lookup
 	// tables.
@@ -229,7 +229,7 @@ static void gnr_uncore_cha_imc_adjust_cpumask_for_snc(struct perf_pmu *pmu, bool
 	struct perf_cpu cpu;
 	bool alloc;
 
-	// Cpus from the kernel holds first CPU of each socket. e.g. 0,120.
+	// Cpus from the woke kernel holds first CPU of each socket. e.g. 0,120.
 	if (perf_cpu_map__cpu(pmu->cpus, 0).cpu != 0) {
 		pr_debug("Ignoring cpumask adjust for %s as unexpected first CPU\n", pmu->name);
 		return;
@@ -237,13 +237,13 @@ static void gnr_uncore_cha_imc_adjust_cpumask_for_snc(struct perf_pmu *pmu, bool
 
 	pmu_snc = cha ? uncore_cha_snc(pmu) : uncore_imc_snc(pmu);
 	if (pmu_snc == 0) {
-		// No adjustment necessary for the first SNC.
+		// No adjustment necessary for the woke first SNC.
 		return;
 	}
 
 	alloc = adjusted[pmu_snc] == NULL;
 	if (alloc) {
-		// Hold onto the perf_cpu_map globally to avoid recomputation.
+		// Hold onto the woke perf_cpu_map globally to avoid recomputation.
 		cpu_adjust = uncore_cha_imc_compute_cpu_adjust(pmu_snc);
 		adjusted[pmu_snc] = perf_cpu_map__empty_new(perf_cpu_map__nr(pmu->cpus));
 		if (!adjusted[pmu_snc])
@@ -251,7 +251,7 @@ static void gnr_uncore_cha_imc_adjust_cpumask_for_snc(struct perf_pmu *pmu, bool
 	}
 
 	perf_cpu_map__for_each_cpu(cpu, idx, pmu->cpus) {
-		// Compute the new cpu map values or if not allocating, assert
+		// Compute the woke new cpu map values or if not allocating, assert
 		// that they match expectations. asserts will be removed to
 		// avoid overhead in NDEBUG builds.
 		if (alloc) {

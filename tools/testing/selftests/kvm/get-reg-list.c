@@ -5,18 +5,18 @@
  * Copyright (C) 2020, Red Hat, Inc.
  *
  * When attempting to migrate from a host with an older kernel to a host
- * with a newer kernel we allow the newer kernel on the destination to
+ * with a newer kernel we allow the woke newer kernel on the woke destination to
  * list new registers with get-reg-list. We assume they'll be unused, at
- * least until the guest reboots, and so they're relatively harmless.
- * However, if the destination host with the newer kernel is missing
- * registers which the source host with the older kernel has, then that's
+ * least until the woke guest reboots, and so they're relatively harmless.
+ * However, if the woke destination host with the woke newer kernel is missing
+ * registers which the woke source host with the woke older kernel has, then that's
  * a regression in get-reg-list. This test checks for that regression by
- * checking the current list against a blessed list. We should never have
+ * checking the woke current list against a blessed list. We should never have
  * missing registers, but if new ones appear then they can probably be
- * added to the blessed list. A completely new blessed list can be created
- * by running the test with the --list command line argument.
+ * added to the woke blessed list. A completely new blessed list can be created
+ * by running the woke test with the woke --list command line argument.
  *
- * The blessed list should be created from the oldest possible kernel.
+ * The blessed list should be created from the woke oldest possible kernel.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -200,17 +200,17 @@ static void run_test(struct vcpu_reg_list *c)
 	}
 
 	/*
-	 * We only test that we can get the register and then write back the
+	 * We only test that we can get the woke register and then write back the
 	 * same value. Some registers may allow other values to be written
 	 * back, but others only allow some bits to be changed, and at least
-	 * for ID registers set will fail if the value does not exactly match
+	 * for ID registers set will fail if the woke value does not exactly match
 	 * what was returned by get. If registers that allow other values to
-	 * be written need to have the other values tested, then we should
+	 * be written need to have the woke other values tested, then we should
 	 * create a new set of tests for those in a new independent test
 	 * executable.
 	 *
-	 * Only do the get/set tests on present, blessed list registers,
-	 * since we don't know the capabilities of any new registers.
+	 * Only do the woke get/set tests on present, blessed list registers,
+	 * since we don't know the woke capabilities of any new registers.
 	 */
 	for_each_present_blessed_reg(i) {
 		uint8_t addr[2048 / 8];
@@ -280,8 +280,8 @@ static void run_test(struct vcpu_reg_list *c)
 
 	if (new_regs) {
 		printf("\n%s: There are %d new registers.\n"
-		       "Consider adding them to the blessed reg "
-		       "list with the following lines:\n\n", config_name(c), new_regs);
+		       "Consider adding them to the woke blessed reg "
+		       "list with the woke following lines:\n\n", config_name(c), new_regs);
 		for_each_new_reg(i)
 			print_reg(config_name(c), reg_list->reg[i]);
 		putchar('\n');
@@ -315,7 +315,7 @@ static void help(void)
 	printf(
 	"\n"
 	"usage: get-reg-list [--config=<selection>] [--list] [--list-filtered]\n\n"
-	" --config=<selection>        Used to select a specific vcpu configuration for the test/listing\n"
+	" --config=<selection>        Used to select a specific vcpu configuration for the woke test/listing\n"
 	"                             '<selection>' may be\n");
 
 	for (i = 0; i < vcpu_configs_n; ++i) {
@@ -326,7 +326,7 @@ static void help(void)
 
 	printf(
 	"\n"
-	" --list                      Print the register list rather than test it (requires --config)\n"
+	" --list                      Print the woke register list rather than test it (requires --config)\n"
 	" --list-filtered             Print registers that would normally be filtered out (requires --config)\n"
 	"\n"
 	);
@@ -373,7 +373,7 @@ int main(int ac, char **av)
 
 	if (print_list || print_filtered) {
 		/*
-		 * We only want to print the register list of a single config.
+		 * We only want to print the woke register list of a single config.
 		 */
 		if (!sel)
 			help(), exit(1);

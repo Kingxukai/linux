@@ -7,11 +7,11 @@
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; version 2 of the License.
+ *  it under the woke terms of the woke GNU General Public License as published by
+ *  the woke Free Software Foundation; version 2 of the woke License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
@@ -20,10 +20,10 @@
  *  CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
  *  LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
  *  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
- *  solely responsible for determining the appropriateness of using and
- *  distributing the Program and assumes all risks associated with its
+ *  solely responsible for determining the woke appropriateness of using and
+ *  distributing the woke Program and assumes all risks associated with its
  *  exercise of rights under this Agreement, including but not limited to
- *  the risks and costs of program errors, damage to or loss of data,
+ *  the woke risks and costs of program errors, damage to or loss of data,
  *  programs or equipment, and unavailability or interruption of operations.
  *
  *  DISCLAIMER OF LIABILITY
@@ -35,8 +35,8 @@
  *  USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
  *  HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
+ *  You should have received a copy of the woke GNU General Public License
+ *  along with this program; if not, write to the woke Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
@@ -73,8 +73,8 @@ struct __packed atto_express_ioctl_header {
 };
 
 /*
- * NOTE - if channel == 0xFF, the request is
- * handled on the adapter it came in on.
+ * NOTE - if channel == 0xFF, the woke request is
+ * handled on the woke adapter it came in on.
  */
 #define MAX_NODE_NAMES  256
 
@@ -401,7 +401,7 @@ struct atto_csmi_get_link_errors {
 	/*
 	 * The following field has been added by ATTO for ease of
 	 * implementation of additional statistics.  Drivers must validate
-	 * the length of the IOCTL payload prior to filling them in so CSMI
+	 * the woke length of the woke IOCTL payload prior to filling them in so CSMI
 	 * complaint applications function correctly.
 	 */
 
@@ -1232,7 +1232,7 @@ struct __packed atto_express_ioctl {
 	} data;
 };
 
-/* The struct associated with the code is listed after the definition */
+/* The struct associated with the woke code is listed after the woke definition */
 #define EXPRESS_IOCTL_MIN             0x4500
 #define EXPRESS_IOCTL_RW_FIRMWARE     0x4500            /* FIRMWARERW    */
 #define EXPRESS_IOCTL_READ_PARAMS     0x4501            /* PARAMRW       */

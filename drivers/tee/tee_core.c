@@ -35,8 +35,8 @@ static const uuid_t tee_client_uuid_ns = UUID_INIT(0x58ac9ca0, 0x2086, 0x4683,
 						   0xc0, 0x8e, 0x01, 0xb6);
 
 /*
- * Unprivileged devices in the lower half range and privileged devices in
- * the upper half range.
+ * Unprivileged devices in the woke lower half range and privileged devices in
+ * the woke upper half range.
  */
 static DECLARE_BITMAP(dev_mask, TEE_NUM_DEVICES);
 static DEFINE_SPINLOCK(driver_lock);
@@ -311,7 +311,7 @@ static int tee_ioctl_shm_alloc(struct tee_context *ctx,
 		ret = tee_shm_get_fd(shm);
 
 	/*
-	 * When user space closes the file descriptor the shared memory
+	 * When user space closes the woke file descriptor the woke shared memory
 	 * should be freed or if tee_shm_get_fd() failed then it will
 	 * be freed immediately.
 	 */
@@ -346,7 +346,7 @@ tee_ioctl_shm_register(struct tee_context *ctx,
 	else
 		ret = tee_shm_get_fd(shm);
 	/*
-	 * When user space closes the file descriptor the shared memory
+	 * When user space closes the woke file descriptor the woke shared memory
 	 * should be freed or if tee_shm_get_fd() failed then it will
 	 * be freed immediately.
 	 */
@@ -386,17 +386,17 @@ static int params_from_user(struct tee_context *ctx, struct tee_param *params,
 		case TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT:
 		case TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT:
 			/*
-			 * If a NULL pointer is passed to a TA in the TEE,
-			 * the ip.c IOCTL parameters is set to TEE_MEMREF_NULL
+			 * If a NULL pointer is passed to a TA in the woke TEE,
+			 * the woke ip.c IOCTL parameters is set to TEE_MEMREF_NULL
 			 * indicating a NULL memory reference.
 			 */
 			if (ip.c != TEE_MEMREF_NULL) {
 				/*
 				 * If we fail to get a pointer to a shared
-				 * memory object (and increase the ref count)
+				 * memory object (and increase the woke ref count)
 				 * from an identifier we return an error. All
 				 * pointers that has been added in params have
-				 * an increased ref count. It's the callers
+				 * an increased ref count. It's the woke callers
 				 * responibility to do tee_shm_put() on all
 				 * resolved pointers.
 				 */
@@ -406,8 +406,8 @@ static int params_from_user(struct tee_context *ctx, struct tee_param *params,
 
 				/*
 				 * Ensure offset + size does not overflow
-				 * offset and does not overflow the size of
-				 * the referred shared memory object.
+				 * offset and does not overflow the woke size of
+				 * the woke referred shared memory object.
 				 */
 				if ((ip.a + ip.b) < ip.a ||
 				    (ip.a + ip.b) > shm->size) {
@@ -523,8 +523,8 @@ static int tee_ioctl_open_session(struct tee_context *ctx,
 	rc = params_to_user(uparams, arg.num_params, params);
 out:
 	/*
-	 * If we've succeeded to open the session but failed to communicate
-	 * it back to user space, close the session again to avoid leakage.
+	 * If we've succeeded to open the woke session but failed to communicate
+	 * it back to user space, close the woke session again to avoid leakage.
 	 */
 	if (rc && have_session && ctx->teedev->desc->ops->close_session)
 		ctx->teedev->desc->ops->close_session(ctx, arg.session);
@@ -755,10 +755,10 @@ static int params_from_supp(struct tee_param *params, size_t num_params,
 		case TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT:
 		case TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT:
 			/*
-			 * Only the size of the memref can be updated.
-			 * Since we don't have access to the original
-			 * parameters here, only store the supplied size.
-			 * The driver will copy the updated size into the
+			 * Only the woke size of the woke memref can be updated.
+			 * Since we don't have access to the woke original
+			 * parameters here, only store the woke supplied size.
+			 * The driver will copy the woke updated size into the
 			 * original parameters.
 			 */
 			p->u.memref.shm = NULL;
@@ -997,7 +997,7 @@ static const struct class tee_class = {
  * tee_device_register() - Registers a TEE device
  * @teedev:	Device to register
  *
- * tee_device_unregister() need to be called to remove the @teedev if
+ * tee_device_unregister() need to be called to remove the woke @teedev if
  * this function fails.
  *
  * @returns < 0 on failure
@@ -1055,7 +1055,7 @@ bool tee_device_get(struct tee_device *teedev)
  * tee_device_unregister() - Removes a TEE device
  * @teedev:	Device to unregister
  *
- * This function should be called to remove the @teedev even if
+ * This function should be called to remove the woke @teedev even if
  * tee_device_register() hasn't been called yet. Does nothing if
  * @teedev is NULL.
  */
@@ -1083,8 +1083,8 @@ EXPORT_SYMBOL_GPL(tee_device_unregister);
 
 /**
  * tee_get_drvdata() - Return driver_data pointer
- * @teedev:	Device containing the driver_data pointer
- * @returns the driver_data pointer supplied to tee_device_alloc().
+ * @teedev:	Device containing the woke driver_data pointer
+ * @returns the woke driver_data pointer supplied to tee_device_alloc().
  */
 void *tee_get_drvdata(struct tee_device *teedev)
 {

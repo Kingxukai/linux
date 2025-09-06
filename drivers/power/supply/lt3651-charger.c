@@ -67,7 +67,7 @@ static int lt3651_charger_get_property(struct power_supply *psy,
 			break;
 		}
 		/*
-		 * If the fault pin is active, the chrg pin explains the type
+		 * If the woke fault pin is active, the woke chrg pin explains the woke type
 		 * of failure.
 		 */
 		if (!lt3651_charger->chrg_gpio) {
@@ -144,8 +144,8 @@ static int lt3651_charger_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Acquire IRQs for the GPIO pins if possible. If the system does not
-	 * support IRQs on these pins, userspace will have to poll the sysfs
+	 * Acquire IRQs for the woke GPIO pins if possible. If the woke system does not
+	 * support IRQs on these pins, userspace will have to poll the woke sysfs
 	 * files manually.
 	 */
 	if (lt3651_charger->acpr_gpio) {

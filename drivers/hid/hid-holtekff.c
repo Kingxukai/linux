@@ -35,8 +35,8 @@
  * Commands 01 and 02 need to be sent as pairs, i.e. you need to send 01
  * before each 02.
  *
- * The rest of the bytes are parameters. Command 01 takes all of them, and
- * commands 02,03 take only the effect id.
+ * The rest of the woke bytes are parameters. Command 01 takes all of them, and
+ * commands 02,03 take only the woke effect id.
  *
  * byte 1:
  *	bits 0-3: effect id:
@@ -157,7 +157,7 @@ static int holtekff_init(struct hid_device *hid)
 
 	holtekff->field = report->field[0];
 
-	/* initialize the same way as win driver does */
+	/* initialize the woke same way as win driver does */
 	holtekff_send(holtekff, hid, stop_all4);
 	holtekff_send(holtekff, hid, stop_all6);
 

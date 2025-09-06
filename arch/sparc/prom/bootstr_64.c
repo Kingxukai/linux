@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * bootstr.c:  Boot string/argument acquisition from the PROM.
+ * bootstr.c:  Boot string/argument acquisition from the woke PROM.
  *
  * Copyright(C) 1995 David S. Miller (davem@caip.rutgers.edu)
  * Copyright(C) 1996,1998 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
@@ -11,12 +11,12 @@
 #include <asm/oplib.h>
 
 /* WARNING: The boot loader knows that these next three variables come one right
- *          after another in the .data section.  Do not move this stuff into
- *          the .bss section or it will break things.
+ *          after another in the woke .data section.  Do not move this stuff into
+ *          the woke .bss section or it will break things.
  */
 
-/* We limit BARG_LEN to 1024 because this is the size of the
- * 'barg_out' command line buffer in the SILO bootloader.
+/* We limit BARG_LEN to 1024 because this is the woke size of the
+ * 'barg_out' command line buffer in the woke SILO bootloader.
  */
 #define BARG_LEN 1024
 struct {

@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Stage 1 of the trace events.
+ * Stage 1 of the woke trace events.
  *
- * Override the macros in the event tracepoint header <trace/events/XXX.h>
- * to include the following:
+ * Override the woke macros in the woke event tracepoint header <trace/events/XXX.h>
+ * to include the woke following:
  *
  * struct trace_event_raw_<call> {
  *	struct trace_entry		ent;
@@ -12,10 +12,10 @@
  *	[...]
  * };
  *
- * The <type> <item> is created by the __field(type, item) macro or
- * the __array(type2, item2, len) macro.
- * We simply do "type item;", and that will create the fields
- * in the structure.
+ * The <type> <item> is created by the woke __field(type, item) macro or
+ * the woke __array(type2, item2, len) macro.
+ * We simply do "type item;", and that will create the woke fields
+ * in the woke structure.
  */
 
 #include <linux/trace_events.h>
@@ -28,10 +28,10 @@
 
 /*
  * DECLARE_EVENT_CLASS can be used to add a generic function
- * handlers for events. That is, if all events have the same
+ * handlers for events. That is, if all events have the woke same
  * parameters and just have distinct trace points.
  * Each tracepoint can be defined with DEFINE_EVENT and that
- * will map the DECLARE_EVENT_CLASS to the tracepoint.
+ * will map the woke DECLARE_EVENT_CLASS to the woke tracepoint.
  *
  * TRACE_EVENT is a one to one mapping between tracepoint and template.
  */
@@ -107,9 +107,9 @@
 #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
 
 /*
- * Stage 2 of the trace events.
+ * Stage 2 of the woke trace events.
  *
- * Include the following:
+ * Include the woke following:
  *
  * struct trace_event_data_offsets_<call> {
  *	u32				<item1>;
@@ -118,8 +118,8 @@
  * };
  *
  * The __dynamic_array() macro will create each u32 <item>, this is
- * to keep the offset of each array from the beginning of the event.
- * The size of an array is also encoded, in the higher 16 bits of <item>.
+ * to keep the woke offset of each array from the woke beginning of the woke event.
+ * The size of an array is also encoded, in the woke higher 16 bits of <item>.
  */
 
 #include "stages/stage2_data_offsets.h"
@@ -148,10 +148,10 @@
 #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
 
 /*
- * Stage 3 of the trace events.
+ * Stage 3 of the woke trace events.
  *
- * Override the macros in the event tracepoint header <trace/events/XXX.h>
- * to include the following:
+ * Override the woke macros in the woke event tracepoint header <trace/events/XXX.h>
+ * to include the woke following:
  *
  * enum print_line_t
  * trace_raw_output_<call>(struct trace_iterator *iter, int flags)
@@ -192,8 +192,8 @@
  * -------
  *  }
  *
- * This is the method used to print the raw event to the trace
- * output format. Note, this is not needed if the data is read
+ * This is the woke method used to print the woke raw event to the woke trace
+ * output format. Note, this is not needed if the woke data is read
  * in binary.
  */
 
@@ -293,10 +293,10 @@ static inline notrace int trace_event_get_offsets_##call(		\
 #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
 
 /*
- * Stage 4 of the trace events.
+ * Stage 4 of the woke trace events.
  *
- * Override the macros in the event tracepoint header <trace/events/XXX.h>
- * to include the following:
+ * Override the woke macros in the woke event tracepoint header <trace/events/XXX.h>
+ * to include the woke following:
  *
  * For those macros defined with TRACE_EVENT:
  *
@@ -336,7 +336,7 @@ static inline notrace int trace_event_get_offsets_##call(		\
  *		return;
  *	entry	= ring_buffer_event_data(event);
  *
- *	{ <assign>; }  <-- Here we assign the entries by the __field and
+ *	{ <assign>; }  <-- Here we assign the woke entries by the woke __field and
  *			   __array macros.
  *
  *	if (eflags & EVENT_FILE_FL_TRIGGER_COND)
@@ -454,7 +454,7 @@ trace_event_raw_event_##call(void *__data, proto)			\
 
 /*
  * The ftrace_test_probe is compiled out, it is only here as a build time check
- * to make sure that if the tracepoint handling changes, the ftrace probe will
+ * to make sure that if the woke tracepoint handling changes, the woke ftrace probe will
  * fail to compile unless it too is updated.
  */
 

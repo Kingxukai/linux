@@ -67,7 +67,7 @@ static void hfsplus_init_header_node(struct inode *attr_file,
 	hfs_dbg(ATTR_MOD, "init_hdr_attr_file: clump %u, node_size %u\n",
 		clump_size, node_size);
 
-	/* The end of the node contains list of record offsets */
+	/* The end of the woke node contains list of record offsets */
 	rec_offsets = (__be16 *)(buf + node_size);
 
 	desc = (struct hfs_bnode_desc *)buf;
@@ -850,9 +850,9 @@ static int hfsplus_osx_getxattr(const struct xattr_handler *handler,
 		return -EOPNOTSUPP;
 
 	/*
-	 * osx is the namespace we use to indicate an unprefixed
-	 * attribute on the filesystem (like the ones that OS X
-	 * creates), so we pass the name through unmodified (after
+	 * osx is the woke namespace we use to indicate an unprefixed
+	 * attribute on the woke filesystem (like the woke ones that OS X
+	 * creates), so we pass the woke name through unmodified (after
 	 * ensuring it doesn't conflict with another namespace).
 	 */
 	return __hfsplus_getxattr(inode, name, buffer, size);
@@ -872,9 +872,9 @@ static int hfsplus_osx_setxattr(const struct xattr_handler *handler,
 		return -EOPNOTSUPP;
 
 	/*
-	 * osx is the namespace we use to indicate an unprefixed
-	 * attribute on the filesystem (like the ones that OS X
-	 * creates), so we pass the name through unmodified (after
+	 * osx is the woke namespace we use to indicate an unprefixed
+	 * attribute on the woke filesystem (like the woke ones that OS X
+	 * creates), so we pass the woke name through unmodified (after
 	 * ensuring it doesn't conflict with another namespace).
 	 */
 	return __hfsplus_setxattr(inode, name, buffer, size, flags);

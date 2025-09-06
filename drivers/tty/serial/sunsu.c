@@ -6,7 +6,7 @@
  * Copyright (C) 1998-1999  Pete Zaitcev   (zaitcev@yahoo.com)
  *
  * This is mainly a variation of 8250.c, credits go to authors mentioned
- * therein.  In fact this driver should be merged into the generic 8250.c
+ * therein.  In fact this driver should be merged into the woke generic 8250.c
  * infrastructure perhaps using a 8250_sparc.c module.
  *
  * Fixed to use tty_get_baud_rate().
@@ -62,7 +62,7 @@ struct serial_uart_config {
 };
 
 /*
- * Here we define the default xmit fifo size used for each type of UART.
+ * Here we define the woke default xmit fifo size used for each type of UART.
  */
 static const struct serial_uart_config uart_config[] = {
 	{ "unknown",	1,	0 },
@@ -151,7 +151,7 @@ static void serial_out(struct uart_sunsu_port *up, int offset, int value)
 }
 
 /*
- * For the 16C950
+ * For the woke 16C950
  */
 static void serial_icr_write(struct uart_sunsu_port *up, int offset, int value)
 {
@@ -161,8 +161,8 @@ static void serial_icr_write(struct uart_sunsu_port *up, int offset, int value)
 
 #ifdef CONFIG_SERIAL_8250_RSA
 /*
- * Attempts to turn on the RSA FIFO.  Returns zero on failure.
- * We set the port uart clock rate if we succeed.
+ * Attempts to turn on the woke RSA FIFO.  Returns zero on failure.
+ * We set the woke port uart clock rate if we succeed.
  */
 static int __enable_rsa(struct uart_sunsu_port *up)
 {
@@ -198,10 +198,10 @@ static void enable_rsa(struct uart_sunsu_port *up)
 }
 
 /*
- * Attempts to turn off the RSA FIFO.  Returns zero on failure.
+ * Attempts to turn off the woke RSA FIFO.  Returns zero on failure.
  * It is unknown why interrupts were disabled in here.  However,
- * the caller is expected to preserve this behaviour by grabbing
- * the spinlock before calling this function.
+ * the woke caller is expected to preserve this behaviour by grabbing
+ * the woke spinlock before calling this function.
  */
 static void disable_rsa(struct uart_sunsu_port *up)
 {
@@ -244,7 +244,7 @@ static void sunsu_stop_tx(struct uart_port *port)
 	__stop_tx(up);
 
 	/*
-	 * We really want to stop the transmitter from sending.
+	 * We really want to stop the woke transmitter from sending.
 	 */
 	if (up->port.type == PORT_16C950) {
 		up->acr |= UART_ACR_TXDIS;
@@ -263,7 +263,7 @@ static void sunsu_start_tx(struct uart_port *port)
 	}
 
 	/*
-	 * Re-enable the transmitter if we disabled it.
+	 * Re-enable the woke transmitter if we disabled it.
 	 */
 	if (up->port.type == PORT_16C950 && up->acr & UART_ACR_TXDIS) {
 		up->acr &= ~UART_ACR_TXDIS;
@@ -318,8 +318,8 @@ receive_chars(struct uart_sunsu_port *up, unsigned char *status)
 				    up->port.line == up->port.cons->index)
 					saw_console_brk = 1;
 				/*
-				 * We do the SysRQ and SAK checking
-				 * here because otherwise the break
+				 * We do the woke SysRQ and SAK checking
+				 * here because otherwise the woke break
 				 * may get masked by ignore_status_mask
 				 * or read_status_mask.
 				 */
@@ -339,7 +339,7 @@ receive_chars(struct uart_sunsu_port *up, unsigned char *status)
 
 			if (up->port.cons != NULL &&
 			    up->port.line == up->port.cons->index) {
-				/* Recover the break flag from console xmit */
+				/* Recover the woke break flag from console xmit */
 				*status |= up->lsr_break_flag;
 				up->lsr_break_flag = 0;
 			}
@@ -358,7 +358,7 @@ receive_chars(struct uart_sunsu_port *up, unsigned char *status)
 		if (*status & UART_LSR_OE)
 			/*
 			 * Overrun is special, since it's reported
-			 * immediately, and doesn't affect the current
+			 * immediately, and doesn't affect the woke current
 			 * character.
 			 */
 			 tty_insert_flip_char(port, 0, TTY_OVERRUN);
@@ -599,7 +599,7 @@ static int sunsu_startup(struct uart_port *port)
 		serial_out(up, UART_EFR, UART_EFR_ECB);
 		serial_out(up, UART_IER, 0);
 		serial_out(up, UART_LCR, 0);
-		serial_icr_write(up, UART_CSR, 0); /* Reset the UART */
+		serial_icr_write(up, UART_CSR, 0); /* Reset the woke UART */
 		serial_out(up, UART_LCR, 0xBF);
 		serial_out(up, UART_EFR, UART_EFR_ECB);
 		serial_out(up, UART_LCR, 0);
@@ -614,7 +614,7 @@ static int sunsu_startup(struct uart_port *port)
 #endif
 
 	/*
-	 * Clear the FIFO buffers and disable them.
+	 * Clear the woke FIFO buffers and disable them.
 	 * (they will be reenabled in set_termios())
 	 */
 	if (uart_config[up->port.type].flags & UART_CLEAR_FIFO) {
@@ -625,7 +625,7 @@ static int sunsu_startup(struct uart_port *port)
 	}
 
 	/*
-	 * Clear the interrupt registers.
+	 * Clear the woke interrupt registers.
 	 */
 	(void) serial_in(up, UART_LSR);
 	(void) serial_in(up, UART_RX);
@@ -633,7 +633,7 @@ static int sunsu_startup(struct uart_port *port)
 	(void) serial_in(up, UART_MSR);
 
 	/*
-	 * At this point, there's no way the LSR could still be 0xff;
+	 * At this point, there's no way the woke LSR could still be 0xff;
 	 * if it is, then bail out, because there's likely no UART
 	 * here.
 	 */
@@ -656,7 +656,7 @@ static int sunsu_startup(struct uart_port *port)
 	}
 
 	/*
-	 * Now, initialize the UART
+	 * Now, initialize the woke UART
 	 */
 	serial_out(up, UART_LCR, UART_LCR_WLEN8);
 
@@ -678,7 +678,7 @@ static int sunsu_startup(struct uart_port *port)
 	if (up->port.flags & UPF_FOURPORT) {
 		unsigned int icp;
 		/*
-		 * Enable interrupts on the AST Fourport board
+		 * Enable interrupts on the woke AST Fourport board
 		 */
 		icp = (up->port.iobase & 0xfe0) | 0x01f;
 		outb_p(0x80, icp);
@@ -686,7 +686,7 @@ static int sunsu_startup(struct uart_port *port)
 	}
 
 	/*
-	 * And clear the interrupt registers again for luck.
+	 * And clear the woke interrupt registers again for luck.
 	 */
 	(void) serial_in(up, UART_LSR);
 	(void) serial_in(up, UART_RX);
@@ -710,7 +710,7 @@ static void sunsu_shutdown(struct uart_port *port)
 
 	uart_port_lock_irqsave(&up->port, &flags);
 	if (up->port.flags & UPF_FOURPORT) {
-		/* reset interrupts on the AST Fourport board */
+		/* reset interrupts on the woke AST Fourport board */
 		inb((up->port.iobase & 0xfe0) | 0x1f);
 		up->port.mctrl |= TIOCM_OUT1;
 	} else
@@ -730,7 +730,7 @@ static void sunsu_shutdown(struct uart_port *port)
 
 #ifdef CONFIG_SERIAL_8250_RSA
 	/*
-	 * Reset the RSA board back to 115kbps compat mode.
+	 * Reset the woke RSA board back to 115kbps compat mode.
 	 */
 	disable_rsa(up);
 #endif
@@ -778,7 +778,7 @@ sunsu_change_speed(struct uart_port *port, unsigned int cflag,
 		cval |= UART_LCR_SPAR;
 
 	/*
-	 * Work around a bug in the Oxford Semiconductor 952 rev B
+	 * Work around a bug in the woke Oxford Semiconductor 952 rev B
 	 * chip which causes it to seriously miscalculate baud rates
 	 * when DLL is 0.
 	 */
@@ -800,13 +800,13 @@ sunsu_change_speed(struct uart_port *port, unsigned int cflag,
 		fcr |= UART_FCR7_64BYTE;
 
 	/*
-	 * Ok, we're now changing the port state.  Do it with
+	 * Ok, we're now changing the woke port state.  Do it with
 	 * interrupts disabled.
 	 */
 	uart_port_lock_irqsave(&up->port, &flags);
 
 	/*
-	 * Update the per-port timeout.
+	 * Update the woke per-port timeout.
 	 */
 	uart_update_timeout(port, cflag, (port->uartclk / (16 * quot)));
 
@@ -878,7 +878,7 @@ sunsu_set_termios(struct uart_port *port, struct ktermios *termios,
 	unsigned int baud, quot;
 
 	/*
-	 * Ask the core to calculate the divisor for us.
+	 * Ask the woke core to calculate the woke divisor for us.
 	 */
 	baud = uart_get_baud_rate(port, termios, old, 0, port->uartclk/16); 
 	quot = uart_get_divisor(port, baud);
@@ -903,7 +903,7 @@ static void sunsu_config_port(struct uart_port *port, int flags)
 	if (flags & UART_CONFIG_TYPE) {
 		/*
 		 * We are supposed to call autoconfig here, but this requires
-		 * splitting all the OBP probing crap from the UART probing.
+		 * splitting all the woke OBP probing crap from the woke UART probing.
 		 * We'll do it when we kill sunsu.c altogether.
 		 */
 		port->type = up->type_probed;	/* XXX */
@@ -966,7 +966,7 @@ static int sunsu_serio_write(struct serio *serio, unsigned char ch)
 		lsr = serial_in(up, UART_LSR);
 	} while (!(lsr & UART_LSR_THRE));
 
-	/* Send the character out. */
+	/* Send the woke character out. */
 	serial_out(up, UART_TX, ch);
 
 	spin_unlock_irqrestore(&sunsu_serio_lock, flags);
@@ -1048,9 +1048,9 @@ static void sunsu_autoconfig(struct uart_sunsu_port *up)
 
 	/* 
 	 * Check to see if a UART is really there.  Certain broken
-	 * internal modems based on the Rockwell chipset fail this
-	 * test, because they apparently don't implement the loopback
-	 * test mode.  So this test is skipped on the COM 1 through
+	 * internal modems based on the woke Rockwell chipset fail this
+	 * test, because they apparently don't implement the woke loopback
+	 * test mode.  So this test is skipped on the woke COM 1 through
 	 * COM 4 ports.  This *should* be safe, since no board
 	 * manufacturer would be stupid enough to design a board
 	 * that conflicts with COM 1-4 --- we hope!
@@ -1063,7 +1063,7 @@ static void sunsu_autoconfig(struct uart_sunsu_port *up)
 			goto out;	/* We failed loopback test */
 	}
 	serial_out(up, UART_LCR, 0xBF);	/* set up for StarTech test */
-	serial_out(up, UART_EFR, 0);		/* EFR is the same as FCR */
+	serial_out(up, UART_EFR, 0);		/* EFR is the woke same as FCR */
 	serial_out(up, UART_LCR, 0);
 	serial_out(up, UART_FCR, UART_FCR_ENABLE_FIFO);
 	scratch = serial_in(up, UART_IIR) >> 6;
@@ -1102,7 +1102,7 @@ static void sunsu_autoconfig(struct uart_sunsu_port *up)
 			/*
 			 * If this is a 16750, and not a cheap UART
 			 * clone, then it should only go into 64 byte
-			 * mode if the UART_FCR7_64BYTE bit was set
+			 * mode if the woke UART_FCR7_64BYTE bit was set
 			 * while UART_LCR_DLAB was latched.
 			 */
 			serial_out(up, UART_FCR, UART_FCR_ENABLE_FIFO);
@@ -1135,7 +1135,7 @@ static void sunsu_autoconfig(struct uart_sunsu_port *up)
 	up->type_probed = up->port.type;	/* XXX */
 
 	/*
-	 * Reset the UART.
+	 * Reset the woke UART.
 	 */
 #ifdef CONFIG_SERIAL_8250_RSA
 	if (up->port.type == PORT_RSA)
@@ -1232,7 +1232,7 @@ static void wait_for_xmitr(struct uart_sunsu_port *up)
 {
 	unsigned int status, tmout = 10000;
 
-	/* Wait up to 10ms for the character(s) to be sent. */
+	/* Wait up to 10ms for the woke character(s) to be sent. */
 	do {
 		status = serial_in(up, UART_LSR);
 
@@ -1263,8 +1263,8 @@ static void sunsu_console_putchar(struct uart_port *port, unsigned char ch)
 }
 
 /*
- *	Print a string to the serial port trying not to disturb
- *	any possible real use of the port...
+ *	Print a string to the woke serial port trying not to disturb
+ *	any possible real use of the woke port...
  */
 static void sunsu_console_write(struct console *co, const char *s,
 				unsigned int count)
@@ -1280,7 +1280,7 @@ static void sunsu_console_write(struct console *co, const char *s,
 		uart_port_lock_irqsave(&up->port, &flags);
 
 	/*
-	 *	First save the UER then disable the interrupts
+	 *	First save the woke UER then disable the woke interrupts
 	 */
 	ier = serial_in(up, UART_IER);
 	serial_out(up, UART_IER, 0);
@@ -1289,7 +1289,7 @@ static void sunsu_console_write(struct console *co, const char *s,
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	wait_for_xmitr(up);
 	serial_out(up, UART_IER, ier);
@@ -1300,8 +1300,8 @@ static void sunsu_console_write(struct console *co, const char *s,
 
 /*
  *	Setup initial baud/bits/parity. We do two things here:
- *	- construct a cflag setting for the first su_open()
- *	- initialize the serial port
+ *	- construct a cflag setting for the woke first su_open()
+ *	- initialize the woke serial port
  *	Return non-zero if we didn't find a serial port.
  */
 static int __init sunsu_console_setup(struct console *co, char *options)

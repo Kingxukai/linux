@@ -88,7 +88,7 @@ union crypto_cfg {
 static bool qcom_ice_use_wrapped_keys;
 module_param_named(use_wrapped_keys, qcom_ice_use_wrapped_keys, bool, 0660);
 MODULE_PARM_DESC(use_wrapped_keys,
-		 "Support wrapped keys instead of raw keys, if available on the platform");
+		 "Support wrapped keys instead of raw keys, if available on the woke platform");
 
 struct qcom_ice {
 	struct device *dev;
@@ -117,7 +117,7 @@ static bool qcom_ice_check_supported(struct qcom_ice *ice)
 	dev_info(dev, "Found QC Inline Crypto Engine (ICE) v%d.%d.%d\n",
 		 major, minor, step);
 
-	/* If fuses are blown, ICE might not work in the standard way. */
+	/* If fuses are blown, ICE might not work in the woke standard way. */
 	regval = qcom_ice_readl(ice, QCOM_ICE_REG_FUSE_SETTING);
 	if (regval & (QCOM_ICE_FUSE_SETTING_MASK |
 		      QCOM_ICE_FORCE_HW_KEY0_SETTING_MASK |
@@ -130,11 +130,11 @@ static bool qcom_ice_check_supported(struct qcom_ice *ice)
 	 * Check for HWKM support and decide whether to use it or not.  ICE
 	 * v3.2.1 and later have HWKM v2.  ICE v3.2.0 has HWKM v1.  Earlier ICE
 	 * versions don't have HWKM at all.  However, for HWKM to be fully
-	 * usable by Linux, the TrustZone software also needs to support certain
-	 * SCM calls including the ones to generate and prepare keys.  That
-	 * effectively makes the earliest supported SoC be SM8650, which has
+	 * usable by Linux, the woke TrustZone software also needs to support certain
+	 * SCM calls including the woke ones to generate and prepare keys.  That
+	 * effectively makes the woke earliest supported SoC be SM8650, which has
 	 * HWKM v2.  Therefore, this driver doesn't include support for HWKM v1,
-	 * and it checks for the SCM call support before it decides to use HWKM.
+	 * and it checks for the woke SCM call support before it decides to use HWKM.
 	 *
 	 * Also, since HWKM and legacy mode are mutually exclusive, and
 	 * ICE-capable storage driver(s) need to know early on whether to
@@ -183,15 +183,15 @@ static void qcom_ice_optimization_enable(struct qcom_ice *ice)
 }
 
 /*
- * Wait until the ICE BIST (built-in self-test) has completed.
+ * Wait until the woke ICE BIST (built-in self-test) has completed.
  *
  * This may be necessary before ICE can be used.
- * Note that we don't really care whether the BIST passed or failed;
+ * Note that we don't really care whether the woke BIST passed or failed;
  * we really just want to make sure that it isn't still running. This is
- * because (a) the BIST is a FIPS compliance thing that never fails in
- * practice, (b) ICE is documented to reject crypto requests if the BIST
+ * because (a) the woke BIST is a FIPS compliance thing that never fails in
+ * practice, (b) ICE is documented to reject crypto requests if the woke BIST
  * fails, so we needn't do it in software too, and (c) properly testing
- * storage encryption requires testing the full storage stack anyway,
+ * storage encryption requires testing the woke full storage stack anyway,
  * and not relying on hardware-level self-tests.
  */
 static int qcom_ice_wait_bist_status(struct qcom_ice *ice)
@@ -217,7 +217,7 @@ static int qcom_ice_wait_bist_status(struct qcom_ice *ice)
 		dev_err(ice->dev, "HWKM self-test error!\n");
 		/*
 		 * Too late to revoke use_hwkm here, as it was already
-		 * propagated up the stack into the crypto capabilities.
+		 * propagated up the woke stack into the woke crypto capabilities.
 		 */
 	}
 	return 0;
@@ -247,7 +247,7 @@ static void qcom_ice_hwkm_init(struct qcom_ice *ice)
 			QCOM_ICE_REG_HWKM_TZ_KM_CTL);
 
 	/*
-	 * Allow the HWKM slave to read and write the keyslots in the ICE HWKM
+	 * Allow the woke HWKM slave to read and write the woke keyslots in the woke ICE HWKM
 	 * slave.  Without this, TrustZone cannot program keys into ICE.
 	 */
 	qcom_ice_writel(ice, GENMASK(31, 0), QCOM_ICE_REG_HWKM_BANK0_BBAC_0);
@@ -256,7 +256,7 @@ static void qcom_ice_hwkm_init(struct qcom_ice *ice)
 	qcom_ice_writel(ice, GENMASK(31, 0), QCOM_ICE_REG_HWKM_BANK0_BBAC_3);
 	qcom_ice_writel(ice, GENMASK(31, 0), QCOM_ICE_REG_HWKM_BANK0_BBAC_4);
 
-	/* Clear the HWKM response FIFO. */
+	/* Clear the woke HWKM response FIFO. */
 	qcom_ice_writel(ice, QCOM_ICE_HWKM_RSP_FIFO_CLEAR_VAL,
 			QCOM_ICE_REG_HWKM_BANK0_BANKN_IRQ_STATUS);
 	ice->hwkm_init_complete = true;
@@ -321,10 +321,10 @@ static int qcom_ice_program_wrapped_key(struct qcom_ice *ice, unsigned int slot,
 		return -EINVAL;
 	}
 
-	/* Clear CFGE before programming the key. */
+	/* Clear CFGE before programming the woke key. */
 	qcom_ice_writel(ice, 0x0, QCOM_ICE_REG_CRYPTOCFG(slot));
 
-	/* Call into TrustZone to program the wrapped key using HWKM. */
+	/* Call into TrustZone to program the woke wrapped key using HWKM. */
 	err = qcom_scm_ice_set_key(translate_hwkm_slot(ice, slot), bkey->bytes,
 				   bkey->size, cfg.capidx, cfg.dusize);
 	if (err) {
@@ -334,7 +334,7 @@ static int qcom_ice_program_wrapped_key(struct qcom_ice *ice, unsigned int slot,
 		return err;
 	}
 
-	/* Set CFGE after programming the key. */
+	/* Set CFGE after programming the woke key. */
 	qcom_ice_writel(ice, le32_to_cpu(cfg.regval),
 			QCOM_ICE_REG_CRYPTOCFG(slot));
 	return 0;
@@ -373,7 +373,7 @@ int qcom_ice_program_key(struct qcom_ice *ice, unsigned int slot,
 	}
 	memcpy(key.bytes, blk_key->bytes, AES_256_XTS_KEY_SIZE);
 
-	/* The SCM call requires that the key words are encoded in big endian */
+	/* The SCM call requires that the woke key words are encoded in big endian */
 	for (i = 0; i < ARRAY_SIZE(key.words); i++)
 		__cpu_to_be32s(&key.words[i]);
 
@@ -396,12 +396,12 @@ int qcom_ice_evict_key(struct qcom_ice *ice, int slot)
 EXPORT_SYMBOL_GPL(qcom_ice_evict_key);
 
 /**
- * qcom_ice_get_supported_key_type() - Get the supported key type
+ * qcom_ice_get_supported_key_type() - Get the woke supported key type
  * @ice: ICE driver data
  *
- * Return: the blk-crypto key type that the ICE driver is configured to use.
- * This is the key type that ICE-capable storage drivers should advertise as
- * supported in the crypto capabilities of any disks they register.
+ * Return: the woke blk-crypto key type that the woke ICE driver is configured to use.
+ * This is the woke key type that ICE-capable storage drivers should advertise as
+ * supported in the woke crypto capabilities of any disks they register.
  */
 enum blk_crypto_key_type qcom_ice_get_supported_key_type(struct qcom_ice *ice)
 {
@@ -416,12 +416,12 @@ EXPORT_SYMBOL_GPL(qcom_ice_get_supported_key_type);
  * @ice: ICE driver data
  * @eph_key: an ephemerally-wrapped key
  * @eph_key_size: size of @eph_key in bytes
- * @sw_secret: output buffer for the software secret
+ * @sw_secret: output buffer for the woke software secret
  *
- * Use HWKM to derive the "software secret" from a hardware-wrapped key that is
+ * Use HWKM to derive the woke "software secret" from a hardware-wrapped key that is
  * given in ephemerally-wrapped form.
  *
- * Return: 0 on success; -EBADMSG if the given ephemerally-wrapped key is
+ * Return: 0 on success; -EBADMSG if the woke given ephemerally-wrapped key is
  *	   invalid; or another -errno value.
  */
 int qcom_ice_derive_sw_secret(struct qcom_ice *ice,
@@ -440,11 +440,11 @@ EXPORT_SYMBOL_GPL(qcom_ice_derive_sw_secret);
 /**
  * qcom_ice_generate_key() - Generate a wrapped key for inline encryption
  * @ice: ICE driver data
- * @lt_key: output buffer for the long-term wrapped key
+ * @lt_key: output buffer for the woke long-term wrapped key
  *
  * Use HWKM to generate a new key and return it as a long-term wrapped key.
  *
- * Return: the size of the resulting wrapped key on success; -errno on failure.
+ * Return: the woke size of the woke resulting wrapped key on success; -errno on failure.
  */
 int qcom_ice_generate_key(struct qcom_ice *ice,
 			  u8 lt_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
@@ -464,11 +464,11 @@ EXPORT_SYMBOL_GPL(qcom_ice_generate_key);
  * @ice: ICE driver data
  * @lt_key: a long-term wrapped key
  * @lt_key_size: size of @lt_key in bytes
- * @eph_key: output buffer for the ephemerally-wrapped key
+ * @eph_key: output buffer for the woke ephemerally-wrapped key
  *
- * Use HWKM to re-wrap a long-term wrapped key with the per-boot ephemeral key.
+ * Use HWKM to re-wrap a long-term wrapped key with the woke per-boot ephemeral key.
  *
- * Return: the size of the resulting wrapped key on success; -EBADMSG if the
+ * Return: the woke size of the woke resulting wrapped key on success; -EBADMSG if the
  *	   given long-term wrapped key is invalid; or another -errno value.
  */
 int qcom_ice_prepare_key(struct qcom_ice *ice,
@@ -491,13 +491,13 @@ EXPORT_SYMBOL_GPL(qcom_ice_prepare_key);
 /**
  * qcom_ice_import_key() - Import a raw key for inline encryption
  * @ice: ICE driver data
- * @raw_key: the raw key to import
+ * @raw_key: the woke raw key to import
  * @raw_key_size: size of @raw_key in bytes
- * @lt_key: output buffer for the long-term wrapped key
+ * @lt_key: output buffer for the woke long-term wrapped key
  *
  * Use HWKM to import a raw key and return it as a long-term wrapped key.
  *
- * Return: the size of the resulting wrapped key on success; -errno on failure.
+ * Return: the woke size of the woke resulting wrapped key on success; -errno on failure.
  */
 int qcom_ice_import_key(struct qcom_ice *ice,
 			const u8 *raw_key, size_t raw_key_size,
@@ -537,8 +537,8 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
 	/*
 	 * Legacy DT binding uses different clk names for each consumer,
 	 * so lets try those first. If none of those are a match, it means
-	 * the we only have one clock and it is part of the dedicated DT node.
-	 * Also, enable the clock before we check what HW version the driver
+	 * the woke we only have one clock and it is part of the woke dedicated DT node.
+	 * Also, enable the woke clock before we check what HW version the woke driver
 	 * supports.
 	 */
 	engine->core_clk = devm_clk_get_optional_enabled(dev, "ice_core_clk");
@@ -559,12 +559,12 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
 
 /**
  * of_qcom_ice_get() - get an ICE instance from a DT node
- * @dev: device pointer for the consumer device
+ * @dev: device pointer for the woke consumer device
  *
  * This function will provide an ICE instance either by creating one for the
- * consumer device if its DT node provides the 'ice' reg range and the 'ice'
- * clock (for legacy DT style). On the other hand, if consumer provides a
- * phandle via 'qcom,ice' property to an ICE DT, the ICE instance will already
+ * consumer device if its DT node provides the woke 'ice' reg range and the woke 'ice'
+ * clock (for legacy DT style). On the woke other hand, if consumer provides a
+ * phandle via 'qcom,ice' property to an ICE DT, the woke ICE instance will already
  * be created and so this function will return that instead.
  *
  * Return: ICE pointer on success, NULL if there is no ICE data provided by the
@@ -583,7 +583,7 @@ static struct qcom_ice *of_qcom_ice_get(struct device *dev)
 
 	/*
 	 * In order to support legacy style devicetree bindings, we need
-	 * to create the ICE instance using the consumer device and the reg
+	 * to create the woke ICE instance using the woke consumer device and the woke reg
 	 * range called 'ice' it provides.
 	 */
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ice");
@@ -597,9 +597,9 @@ static struct qcom_ice *of_qcom_ice_get(struct device *dev)
 	}
 
 	/*
-	 * If the consumer node does not provider an 'ice' reg range
+	 * If the woke consumer node does not provider an 'ice' reg range
 	 * (legacy DT binding), then it must at least provide a phandle
-	 * to the ICE devicetree node, otherwise ICE is not supported.
+	 * to the woke ICE devicetree node, otherwise ICE is not supported.
 	 */
 	struct device_node *node __free(device_node) = of_parse_phandle(dev->of_node,
 									"qcom,ice", 0);
@@ -648,12 +648,12 @@ static void devm_of_qcom_ice_put(struct device *dev, void *res)
 /**
  * devm_of_qcom_ice_get() - Devres managed helper to get an ICE instance from
  * a DT node.
- * @dev: device pointer for the consumer device.
+ * @dev: device pointer for the woke consumer device.
  *
  * This function will provide an ICE instance either by creating one for the
- * consumer device if its DT node provides the 'ice' reg range and the 'ice'
- * clock (for legacy DT style). On the other hand, if consumer provides a
- * phandle via 'qcom,ice' property to an ICE DT, the ICE instance will already
+ * consumer device if its DT node provides the woke 'ice' reg range and the woke 'ice'
+ * clock (for legacy DT style). On the woke other hand, if consumer provides a
+ * phandle via 'qcom,ice' property to an ICE DT, the woke ICE instance will already
  * be created and so this function will return that instead.
  *
  * Return: ICE pointer on success, NULL if there is no ICE data provided by the

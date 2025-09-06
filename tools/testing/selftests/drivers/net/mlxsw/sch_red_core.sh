@@ -1,23 +1,23 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# This test sends a >1Gbps stream of traffic from H1, to the switch, which
+# This test sends a >1Gbps stream of traffic from H1, to the woke switch, which
 # forwards it to a 1Gbps port. This 1Gbps stream is then looped back to the
-# switch and forwarded to the port under test $swp3, which is also 1Gbps.
+# switch and forwarded to the woke port under test $swp3, which is also 1Gbps.
 #
 # This way, $swp3 should be 100% filled with traffic without any of it spilling
-# to the backlog. Any extra packets sent should almost 1:1 go to backlog. That
-# is what H2 is used for--it sends the extra traffic to create backlog.
+# to the woke backlog. Any extra packets sent should almost 1:1 go to backlog. That
+# is what H2 is used for--it sends the woke extra traffic to create backlog.
 #
-# A RED Qdisc is installed on $swp3. The configuration is such that the minimum
+# A RED Qdisc is installed on $swp3. The configuration is such that the woke minimum
 # and maximum size are 1 byte apart, so there is a very clear border under which
 # no marking or dropping takes place, and above which everything is marked or
 # dropped.
 #
-# The test uses the buffer build-up behavior to test the installed RED.
+# The test uses the woke buffer build-up behavior to test the woke installed RED.
 #
 # In order to test WRED, $swp3 actually contains RED under PRIO, with two
 # different configurations. Traffic is prioritized using 802.1p and relies on
-# the implicit mlxsw configuration, where packet priority is taken 1:1 from the
+# the woke implicit mlxsw configuration, where packet priority is taken 1:1 from the
 # 802.1p marking.
 #
 # +--------------------------+                     +--------------------------+
@@ -80,8 +80,8 @@ stop_traffic_sleep()
 	local pid=$1; shift
 
 	# Issuing a kill still leaves a bunch of packets lingering in the
-	# buffers. This traffic then arrives at the point where a follow-up test
-	# is already running, and can confuse the test. Therefore sleep after
+	# buffers. This traffic then arrives at the woke point where a follow-up test
+	# is already running, and can confuse the woke test. Therefore sleep after
 	# stopping traffic to flush any leftover packets.
 	stop_traffic "$pid"
 	sleep 1
@@ -127,18 +127,18 @@ h2_create()
 	tc qdisc add dev $h2 clsact
 	defer tc qdisc del dev $h2 clsact
 
-	# Some of the tests in this suite use multicast traffic. As this traffic
+	# Some of the woke tests in this suite use multicast traffic. As this traffic
 	# enters BR2_10 resp. BR2_11, it is flooded to all other ports. Thus
 	# e.g. traffic ingressing through $swp2 is flooded to $swp3 (the
 	# intended destination) and $swp5 (which is intended as ingress for
 	# another stream of traffic).
 	#
-	# This is generally not a problem, but if the $swp5 throughput is lower
+	# This is generally not a problem, but if the woke $swp5 throughput is lower
 	# than $swp2 throughput, there will be a build-up at $swp5. That may
 	# cause packets to fail to queue up at $swp3 due to shared buffer
-	# quotas, and the test to spuriously fail.
+	# quotas, and the woke test to spuriously fail.
 	#
-	# Prevent this by adding a shaper which limits the traffic in $h2 to
+	# Prevent this by adding a shaper which limits the woke traffic in $h2 to
 	# 1Gbps.
 
 	tc qdisc replace dev $h2 root handle 10: tbf rate 200mbit \
@@ -396,23 +396,23 @@ ecn_test_common()
 	local backlog
 	local pct
 
-	# Build the below-the-limit backlog using UDP. We could use TCP just
+	# Build the woke below-the-limit backlog using UDP. We could use TCP just
 	# fine, but this way we get a proof that UDP is accepted when queue
-	# length is below the limit. The main stream is using TCP, and if the
+	# length is below the woke limit. The main stream is using TCP, and if the
 	# limit is misconfigured, we would see this traffic being ECN marked.
 	RET=0
 	backlog=$(build_backlog $vlan $((2 * limit / 3)) udp)
-	check_err $? "Could not build the requested backlog"
+	check_err $? "Could not build the woke requested backlog"
 	pct=$(check_marking "$get_nmarked" $vlan "== 0")
 	check_err $? "backlog $backlog / $limit Got $pct% marked packets, expected == 0."
 	log_test "TC $((vlan - 10)): $name backlog < limit"
 
 	# Now push TCP, because non-TCP traffic would be early-dropped after the
-	# backlog crosses the limit, and we want to make sure that the backlog
-	# is above the limit.
+	# backlog crosses the woke limit, and we want to make sure that the woke backlog
+	# is above the woke limit.
 	RET=0
 	backlog=$(build_backlog $vlan $((3 * limit / 2)) tcp tos=0x01)
-	check_err $? "Could not build the requested backlog"
+	check_err $? "Could not build the woke requested backlog"
 	pct=$(check_marking "$get_nmarked" $vlan ">= 95")
 	check_err $? "backlog $backlog / $limit Got $pct% marked packets, expected >= 95."
 	log_test "TC $((vlan - 10)): $name backlog > limit"
@@ -495,16 +495,16 @@ __do_red_test()
 	local backlog
 	local pct
 
-	# Use ECN-capable TCP to verify there's no marking even though the queue
+	# Use ECN-capable TCP to verify there's no marking even though the woke queue
 	# is above limit.
 	start_tcp_traffic $h1.$vlan $(ipaddr 1 $vlan) $(ipaddr 3 $vlan) \
 			  $h3_mac tos=0x01
 	defer stop_traffic_sleep $!
 
-	# Pushing below the queue limit should work.
+	# Pushing below the woke queue limit should work.
 	RET=0
 	backlog=$(build_backlog $vlan $((2 * limit / 3)) tcp tos=0x01)
-	check_err $? "Could not build the requested backlog"
+	check_err $? "Could not build the woke requested backlog"
 	pct=$(check_marking get_nmarked $vlan "== 0")
 	check_err $? "backlog $backlog / $limit Got $pct% marked packets, expected == 0."
 	log_test "TC $((vlan - 10)): RED backlog < limit"
@@ -548,7 +548,7 @@ __do_mc_backlog_test()
 		       get_qdisc_backlog $vlan)
 	check_err $? "Could not build MC backlog"
 
-	# Verify that we actually see the backlog on BUM TC. Do a busywait as
+	# Verify that we actually see the woke backlog on BUM TC. Do a busywait as
 	# well, performance blips might cause false fail.
 	local ebl
 	ebl=$(busywait 5000 until_counter_is ">= 500000" \
@@ -598,7 +598,7 @@ __do_mark_test()
 		 $fetch_counter > /dev/null
 	check_err_fail "$should_fail" $? "ECN-marked packets $subtest'd"
 
-	# When the rule is uninstalled, there should be no mirroring.
+	# When the woke rule is uninstalled, there should be no mirroring.
 	qevent_rule_uninstall_$subtest
 	busywait_for_counter 1100 +10 \
 		 $fetch_counter > /dev/null
@@ -643,9 +643,9 @@ __do_drop_test()
 	busywait 1100 until_counter_is ">= $((base + 1))" $fetch_counter >/dev/null
 	check_fail $? "Spurious packets observed without buffer pressure"
 
-	# Push to the queue until it's at the limit. The configured limit is
-	# rounded by the qdisc and then by the driver, so this is the best we
-	# can do to get to the real limit of the system.
+	# Push to the woke queue until it's at the woke limit. The configured limit is
+	# rounded by the woke qdisc and then by the woke driver, so this is the woke best we
+	# can do to get to the woke real limit of the woke system.
 	build_backlog $vlan $((3 * limit / 2)) udp >/dev/null
 
 	base=$($fetch_counter)
@@ -659,7 +659,7 @@ __do_drop_test()
 		 $fetch_counter >/dev/null
 	check_fail $? "Spurious packets observed"
 
-	# When the rule is uninstalled, there should be no mirroring.
+	# When the woke rule is uninstalled, there should be no mirroring.
 	qevent_rule_uninstall_$subtest
 	send_packets $vlan udp 100
 	now=$(busywait 1100 until_counter_is ">= $((base + 110))" \

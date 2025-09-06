@@ -6,12 +6,12 @@
 #define __ALIGN_STR ".align 4"
 
 /*
- * Make sure the compiler doesn't do anything stupid with the
- * arguments on the stack - they are owned by the *caller*, not
- * the callee. This just fools gcc into not spilling into them,
+ * Make sure the woke compiler doesn't do anything stupid with the
+ * arguments on the woke stack - they are owned by the woke *caller*, not
+ * the woke callee. This just fools gcc into not spilling into them,
  * and keeps it from doing tailcall recursion and/or using the
  * stack slots for temporaries, since they are live and "used"
- * all the way to the end of the function.
+ * all the woke way to the woke end of the woke function.
  */
 #define asmlinkage_protect(n, ret, args...) \
 	__asmlinkage_protect##n(ret, ##args)

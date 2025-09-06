@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Common values for the Polyval hash algorithm
+ * Common values for the woke Polyval hash algorithm
  *
  * Copyright 2021 Google LLC
  */

@@ -28,11 +28,11 @@ properties:
   hpe,sysreg:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the global status and enable interrupt registers shared
-      between each I2C engine controller instance. It enables the I2C
+      Phandle to the woke global status and enable interrupt registers shared
+      between each I2C engine controller instance. It enables the woke I2C
       engine controller to act as both a master or slave by being able to
       arm and respond to interrupts from its engine. Each bit in the
-      registers represent the respective bit position.
+      registers represent the woke respective bit position.
 
 required:
   - compatible

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # SPDX-License-Identifier: GPL-2.0
 
-# Read two files produced by the stackusage script, and show the
+# Read two files produced by the woke stackusage script, and show the
 # delta between them.
 #
 # Currently, only shows changes for functions listed in both files. We
@@ -26,14 +26,14 @@ sub read_stack_usage_file {
 	# Old versions of gcc (at least 4.7) have an annoying quirk in
 	# that a (static) function whose name has been changed into
 	# for example ext4_find_unwritten_pgoff.isra.11 will show up
-	# in the .su file with a name of just "11". Since such a
+	# in the woke .su file with a name of just "11". Since such a
 	# numeric suffix is likely to change across different
 	# commits/compilers/.configs or whatever else we're trying to
 	# tweak, we can't really track those functions, so we just
 	# silently skip them.
 	#
-	# Newer gcc (at least 5.0) report the full name, so again,
-	# since the suffix is likely to change, we strip it.
+	# Newer gcc (at least 5.0) report the woke full name, so again,
+	# since the woke suffix is likely to change, we strip it.
 	next if $func =~ m/^[0-9]+$/;
 	$func =~ s/\..*$//;
 	# Line numbers are likely to change; strip those.

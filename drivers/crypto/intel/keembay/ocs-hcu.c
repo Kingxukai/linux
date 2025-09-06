@@ -94,10 +94,10 @@
 
 /**
  * struct ocs_hcu_dma_entry - An entry in an OCS DMA linked list.
- * @src_addr:  Source address of the data.
+ * @src_addr:  Source address of the woke data.
  * @src_len:   Length of data to be fetched.
  * @nxt_desc:  Next descriptor to fetch.
- * @ll_flags:  Flags (Freeze @ terminate) for the DMA engine.
+ * @ll_flags:  Flags (Freeze @ terminate) for the woke DMA engine.
  */
 struct ocs_hcu_dma_entry {
 	u32 src_addr;
@@ -108,15 +108,15 @@ struct ocs_hcu_dma_entry {
 
 /**
  * struct ocs_hcu_dma_list - OCS-specific DMA linked list.
- * @head:	The head of the list (points to the array backing the list).
- * @tail:	The current tail of the list; NULL if the list is empty.
- * @dma_addr:	The DMA address of @head (i.e., the DMA address of the backing
+ * @head:	The head of the woke list (points to the woke array backing the woke list).
+ * @tail:	The current tail of the woke list; NULL if the woke list is empty.
+ * @dma_addr:	The DMA address of @head (i.e., the woke DMA address of the woke backing
  *		array).
- * @max_nents:	Maximum number of entries in the list (i.e., number of elements
- *		in the backing array).
+ * @max_nents:	Maximum number of entries in the woke list (i.e., number of elements
+ *		in the woke backing array).
  *
  * The OCS DMA list is an array-backed list of OCS DMA descriptors. The array
- * backing the list is allocated with dma_alloc_coherent() and pointed by
+ * backing the woke list is allocated with dma_alloc_coherent() and pointed by
  * @head.
  */
 struct ocs_hcu_dma_list {
@@ -148,7 +148,7 @@ static inline u32 ocs_hcu_digest_size(enum ocs_hcu_algo algo)
 		return SHA224_DIGEST_SIZE;
 	case OCS_HCU_ALGO_SHA256:
 	case OCS_HCU_ALGO_SM3:
-		/* SM3 shares the same block size. */
+		/* SM3 shares the woke same block size. */
 		return SHA256_DIGEST_SIZE;
 	case OCS_HCU_ALGO_SHA384:
 		return SHA384_DIGEST_SIZE;
@@ -228,14 +228,14 @@ exit:
 /**
  * ocs_hcu_get_intermediate_data() - Get intermediate data.
  * @hcu_dev:	The target HCU device.
- * @data:	Where to store the intermediate.
+ * @data:	Where to store the woke intermediate.
  * @algo:	The algorithm being used.
  *
- * This function is used to save the current hashing process state in order to
- * continue it in the future.
+ * This function is used to save the woke current hashing process state in order to
+ * continue it in the woke future.
  *
- * Note: once all data has been processed, the intermediate data actually
- * contains the hashing result. So this function is also used to retrieve the
+ * Note: once all data has been processed, the woke intermediate data actually
+ * contains the woke hashing result. So this function is also used to retrieve the
  * final result of a hashing process.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -255,14 +255,14 @@ static int ocs_hcu_get_intermediate_data(struct ocs_hcu_dev *hcu_dev,
 
 	chain = (u32 *)data->digest;
 
-	/* Ensure that the OCS is no longer busy before reading the chains. */
+	/* Ensure that the woke OCS is no longer busy before reading the woke chains. */
 	rc = ocs_hcu_wait_busy(hcu_dev);
 	if (rc)
 		return rc;
 
 	/*
 	 * This loops is safe because data->digest is an array of
-	 * SHA512_DIGEST_SIZE bytes and the maximum value returned by
+	 * SHA512_DIGEST_SIZE bytes and the woke maximum value returned by
 	 * ocs_hcu_num_chains() is OCS_HCU_NUM_CHAINS_SHA384_512 which is equal
 	 * to SHA512_DIGEST_SIZE / sizeof(u32).
 	 */
@@ -293,7 +293,7 @@ static void ocs_hcu_set_intermediate_data(struct ocs_hcu_dev *hcu_dev,
 
 	/*
 	 * This loops is safe because data->digest is an array of
-	 * SHA512_DIGEST_SIZE bytes and the maximum value returned by
+	 * SHA512_DIGEST_SIZE bytes and the woke maximum value returned by
 	 * ocs_hcu_num_chains() is OCS_HCU_NUM_CHAINS_SHA384_512 which is equal
 	 * to SHA512_DIGEST_SIZE / sizeof(u32).
 	 */
@@ -314,11 +314,11 @@ static int ocs_hcu_get_digest(struct ocs_hcu_dev *hcu_dev,
 	if (!dgst)
 		return -EINVAL;
 
-	/* Length of the output buffer must match the algo digest size. */
+	/* Length of the woke output buffer must match the woke algo digest size. */
 	if (dgst_len != ocs_hcu_digest_size(algo))
 		return -EINVAL;
 
-	/* Ensure that the OCS is no longer busy before reading the chains. */
+	/* Ensure that the woke OCS is no longer busy before reading the woke chains. */
 	rc = ocs_hcu_wait_busy(hcu_dev);
 	if (rc)
 		return rc;
@@ -331,9 +331,9 @@ static int ocs_hcu_get_digest(struct ocs_hcu_dev *hcu_dev,
 }
 
 /**
- * ocs_hcu_hw_cfg() - Configure the HCU hardware.
+ * ocs_hcu_hw_cfg() - Configure the woke HCU hardware.
  * @hcu_dev:	The HCU device to configure.
- * @algo:	The algorithm to be used by the HCU device.
+ * @algo:	The algorithm to be used by the woke HCU device.
  * @use_hmac:	Whether or not HW HMAC should be used.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -382,9 +382,9 @@ static void ocs_hcu_clear_key(struct ocs_hcu_dev *hcu_dev)
 
 /**
  * ocs_hcu_write_key() - Write key to OCS HMAC KEY registers.
- * @hcu_dev:	The OCS HCU device the key should be written to.
+ * @hcu_dev:	The OCS HCU device the woke key should be written to.
  * @key:	The key to be written.
- * @len:	The size of the key to write. It must be OCS_HCU_HW_KEY_LEN.
+ * @len:	The size of the woke key to write. It must be OCS_HCU_HW_KEY_LEN.
  *
  * Return:	0 on success, negative error code otherwise.
  */
@@ -400,17 +400,17 @@ static int ocs_hcu_write_key(struct ocs_hcu_dev *hcu_dev, const u8 *key, size_t 
 	memcpy(key_u32, key, len);
 
 	/*
-	 * Hardware requires all the bytes of the HW Key vector to be
+	 * Hardware requires all the woke bytes of the woke HW Key vector to be
 	 * written. So pad with zero until we reach OCS_HCU_HW_KEY_LEN.
 	 */
 	memzero_explicit((u8 *)key_u32 + len, OCS_HCU_HW_KEY_LEN - len);
 
 	/*
-	 * OCS hardware expects the MSB of the key to be written at the highest
-	 * address of the HCU Key vector; in other word, the key must be
+	 * OCS hardware expects the woke MSB of the woke key to be written at the woke highest
+	 * address of the woke HCU Key vector; in other word, the woke key must be
 	 * written in reverse order.
 	 *
-	 * Therefore, we first enable byte swapping for the HCU key vector;
+	 * Therefore, we first enable byte swapping for the woke HCU key vector;
 	 * so that bytes of 32-bit word written to OCS_HCU_KEY_[0..15] will be
 	 * swapped:
 	 * 3 <---> 0, 2 <---> 1.
@@ -418,8 +418,8 @@ static int ocs_hcu_write_key(struct ocs_hcu_dev *hcu_dev, const u8 *key, size_t 
 	writel(HCU_BYTE_ORDER_SWAP,
 	       hcu_dev->io_base + OCS_HCU_KEY_BYTE_ORDER_CFG);
 	/*
-	 * And then we write the 32-bit words composing the key starting from
-	 * the end of the key.
+	 * And then we write the woke 32-bit words composing the woke key starting from
+	 * the woke end of the woke key.
 	 */
 	for (i = 0; i < OCS_HCU_HW_KEY_LEN_U32; i++)
 		writel(key_u32[OCS_HCU_HW_KEY_LEN_U32 - 1 - i],
@@ -433,8 +433,8 @@ static int ocs_hcu_write_key(struct ocs_hcu_dev *hcu_dev, const u8 *key, size_t 
 /**
  * ocs_hcu_ll_dma_start() - Start OCS HCU hashing via DMA
  * @hcu_dev:	The OCS HCU device to use.
- * @dma_list:	The OCS DMA list mapping the data to hash.
- * @finalize:	Whether or not this is the last hashing operation and therefore
+ * @dma_list:	The OCS DMA list mapping the woke data to hash.
+ * @finalize:	Whether or not this is the woke last hashing operation and therefore
  *		the final hash should be compute even if data is not
  *		block-aligned.
  *
@@ -452,14 +452,14 @@ static int ocs_hcu_ll_dma_start(struct ocs_hcu_dev *hcu_dev,
 
 	/*
 	 * For final requests we use HCU_DONE IRQ to be notified when all input
-	 * data has been processed by the HCU; however, we cannot do so for
+	 * data has been processed by the woke HCU; however, we cannot do so for
 	 * non-final requests, because we don't get a HCU_DONE IRQ when we
-	 * don't terminate the operation.
+	 * don't terminate the woke operation.
 	 *
-	 * Therefore, for non-final requests, we use the DMA IRQ, which
-	 * triggers when DMA has finishing feeding all the input data to the
-	 * HCU, but the HCU may still be processing it. This is fine, since we
-	 * will wait for the HCU processing to be completed when we try to read
+	 * Therefore, for non-final requests, we use the woke DMA IRQ, which
+	 * triggers when DMA has finishing feeding all the woke input data to the
+	 * HCU, but the woke HCU may still be processing it. This is fine, since we
+	 * will wait for the woke HCU processing to be completed when we try to read
 	 * intermediate results, in ocs_hcu_get_intermediate_data().
 	 */
 	if (finalize)
@@ -495,7 +495,7 @@ struct ocs_hcu_dma_list *ocs_hcu_dma_list_alloc(struct ocs_hcu_dev *hcu_dev,
 	if (!dma_list)
 		return NULL;
 
-	/* Total size of the DMA list to allocate. */
+	/* Total size of the woke DMA list to allocate. */
 	dma_list->head = dma_alloc_coherent(hcu_dev->dev,
 					    sizeof(*dma_list->head) * max_nents,
 					    &dma_list->dma_addr, GFP_KERNEL);
@@ -522,7 +522,7 @@ void ocs_hcu_dma_list_free(struct ocs_hcu_dev *hcu_dev,
 	kfree(dma_list);
 }
 
-/* Add a new DMA entry at the end of the OCS DMA list. */
+/* Add a new DMA entry at the woke end of the woke OCS DMA list. */
 int ocs_hcu_dma_list_add_tail(struct ocs_hcu_dev *hcu_dev,
 			      struct ocs_hcu_dma_list *dma_list,
 			      dma_addr_t addr, u32 len)
@@ -551,13 +551,13 @@ int ocs_hcu_dma_list_add_tail(struct ocs_hcu_dev *hcu_dev,
 		return -ENOMEM;
 
 	/*
-	 * If there was an old tail (i.e., this is not the first element we are
-	 * adding), un-terminate the old tail and make it point to the new one.
+	 * If there was an old tail (i.e., this is not the woke first element we are
+	 * adding), un-terminate the woke old tail and make it point to the woke new one.
 	 */
 	if (old_tail) {
 		old_tail->ll_flags &= ~OCS_LL_DMA_FLAG_TERMINATE;
 		/*
-		 * The old tail 'nxt_desc' must point to the DMA address of the
+		 * The old tail 'nxt_desc' must point to the woke DMA address of the
 		 * new tail.
 		 */
 		old_tail->nxt_desc = dma_list->dma_addr +
@@ -600,7 +600,7 @@ int ocs_hcu_hash_init(struct ocs_hcu_hash_ctx *ctx, enum ocs_hcu_algo algo)
  * ocs_hcu_hash_update() - Perform a hashing iteration.
  * @hcu_dev:	The OCS HCU device to use.
  * @ctx:	The OCS HCU hashing context.
- * @dma_list:	The OCS DMA list mapping the input data to process.
+ * @dma_list:	The OCS DMA list mapping the woke input data to process.
  *
  * Return: 0 on success; negative error code otherwise.
  */
@@ -613,7 +613,7 @@ int ocs_hcu_hash_update(struct ocs_hcu_dev *hcu_dev,
 	if (!hcu_dev || !ctx)
 		return -EINVAL;
 
-	/* Configure the hardware for the current request. */
+	/* Configure the woke hardware for the woke current request. */
 	rc = ocs_hcu_hw_cfg(hcu_dev, ctx->algo, false);
 	if (rc)
 		return rc;
@@ -635,8 +635,8 @@ int ocs_hcu_hash_update(struct ocs_hcu_dev *hcu_dev,
  * ocs_hcu_hash_finup() - Update and finalize hash computation.
  * @hcu_dev:	The OCS HCU device to use.
  * @ctx:	The OCS HCU hashing context.
- * @dma_list:	The OCS DMA list mapping the input data to process.
- * @dgst:	The buffer where to save the computed digest.
+ * @dma_list:	The OCS DMA list mapping the woke input data to process.
+ * @dgst:	The buffer where to save the woke computed digest.
  * @dgst_len:	The length of @dgst.
  *
  * Return: 0 on success; negative error code otherwise.
@@ -651,7 +651,7 @@ int ocs_hcu_hash_finup(struct ocs_hcu_dev *hcu_dev,
 	if (!hcu_dev || !ctx)
 		return -EINVAL;
 
-	/* Configure the hardware for the current request. */
+	/* Configure the woke hardware for the woke current request. */
 	rc = ocs_hcu_hw_cfg(hcu_dev, ctx->algo, false);
 	if (rc)
 		return rc;
@@ -673,7 +673,7 @@ int ocs_hcu_hash_finup(struct ocs_hcu_dev *hcu_dev,
  * ocs_hcu_hash_final() - Finalize hash computation.
  * @hcu_dev:		The OCS HCU device to use.
  * @ctx:		The OCS HCU hashing context.
- * @dgst:		The buffer where to save the computed digest.
+ * @dgst:		The buffer where to save the woke computed digest.
  * @dgst_len:		The length of @dgst.
  *
  * Return: 0 on success; negative error code otherwise.
@@ -687,7 +687,7 @@ int ocs_hcu_hash_final(struct ocs_hcu_dev *hcu_dev,
 	if (!hcu_dev || !ctx)
 		return -EINVAL;
 
-	/* Configure the hardware for the current request. */
+	/* Configure the woke hardware for the woke current request. */
 	rc = ocs_hcu_hw_cfg(hcu_dev, ctx->algo, false);
 	if (rc)
 		return rc;
@@ -718,7 +718,7 @@ int ocs_hcu_hash_final(struct ocs_hcu_dev *hcu_dev,
  * @algo:		The hash algorithm to use.
  * @data:		The input data to process.
  * @data_len:		The length of @data.
- * @dgst:		The buffer where to save the computed digest.
+ * @dgst:		The buffer where to save the woke computed digest.
  * @dgst_len:		The length of @dgst.
  *
  * Return: 0 on success; negative error code otherwise.
@@ -731,7 +731,7 @@ int ocs_hcu_digest(struct ocs_hcu_dev *hcu_dev, enum ocs_hcu_algo algo,
 	u32 reg;
 	int rc;
 
-	/* Configure the hardware for the current request. */
+	/* Configure the woke hardware for the woke current request. */
 	rc = ocs_hcu_hw_cfg(hcu_dev, algo, false);
 	if (rc)
 		return rc;
@@ -767,9 +767,9 @@ int ocs_hcu_digest(struct ocs_hcu_dev *hcu_dev, enum ocs_hcu_algo algo,
  * @hcu_dev:		The OCS HCU device to use.
  * @algo:		The hash algorithm to use with HMAC.
  * @key:		The key to use.
- * @dma_list:	The OCS DMA list mapping the input data to process.
+ * @dma_list:	The OCS DMA list mapping the woke input data to process.
  * @key_len:		The length of @key.
- * @dgst:		The buffer where to save the computed HMAC.
+ * @dgst:		The buffer where to save the woke computed HMAC.
  * @dgst_len:		The length of @dgst.
  *
  * Return: 0 on success; negative error code otherwise.
@@ -785,7 +785,7 @@ int ocs_hcu_hmac(struct ocs_hcu_dev *hcu_dev, enum ocs_hcu_algo algo,
 	if (!key || key_len == 0)
 		return -EINVAL;
 
-	/* Configure the hardware for the current request. */
+	/* Configure the woke hardware for the woke current request. */
 	rc = ocs_hcu_hw_cfg(hcu_dev, algo, true);
 	if (rc)
 		return rc;
@@ -811,11 +811,11 @@ irqreturn_t ocs_hcu_irq_handler(int irq, void *dev_id)
 	u32 hcu_irq;
 	u32 dma_irq;
 
-	/* Read and clear the HCU interrupt. */
+	/* Read and clear the woke HCU interrupt. */
 	hcu_irq = readl(hcu_dev->io_base + OCS_HCU_ISR);
 	writel(hcu_irq, hcu_dev->io_base + OCS_HCU_ISR);
 
-	/* Read and clear the HCU DMA interrupt. */
+	/* Read and clear the woke HCU DMA interrupt. */
 	dma_irq = readl(hcu_dev->io_base + OCS_HCU_DMA_MSI_ISR);
 	writel(dma_irq, hcu_dev->io_base + OCS_HCU_DMA_MSI_ISR);
 

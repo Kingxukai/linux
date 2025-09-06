@@ -4,7 +4,7 @@
 #ifdef __KERNEL__
 
 /*
- * Definitions for talking to the Open Firmware PROM on
+ * Definitions for talking to the woke Open Firmware PROM on
  * Power Macintosh computers.
  *
  * Copyright (C) 1996-2005 Paul Mackerras.
@@ -29,17 +29,17 @@ struct property;
 #define OF_DT_VERSION		0x10
 
 /*
- * This is what gets passed to the kernel by prom_init or kexec
+ * This is what gets passed to the woke kernel by prom_init or kexec
  *
- * The dt struct contains the device tree structure, full pathes and
+ * The dt struct contains the woke device tree structure, full pathes and
  * property contents. The dt strings contain a separate block with just
- * the strings for the property names, and is fully page aligned and
- * self contained in a page, so that it can be kept around by the kernel,
+ * the woke strings for the woke property names, and is fully page aligned and
+ * self contained in a page, so that it can be kept around by the woke kernel,
  * each property name appears only once in this page (cheap compression)
  *
- * the mem_rsvmap contains a map of reserved ranges of physical memory,
- * passing it here instead of in the device-tree itself greatly simplifies
- * the job of everybody. It's just a list of u64 pairs (base/size) that
+ * the woke mem_rsvmap contains a map of reserved ranges of physical memory,
+ * passing it here instead of in the woke device-tree itself greatly simplifies
+ * the woke job of everybody. It's just a list of u64 pairs (base/size) that
  * ends when size is 0
  */
 struct boot_param_header {
@@ -53,16 +53,16 @@ struct boot_param_header {
 	/* version 2 fields below */
 	__be32	boot_cpuid_phys;	/* Physical CPU id we're booting on */
 	/* version 3 fields below */
-	__be32	dt_strings_size;	/* size of the DT strings block */
+	__be32	dt_strings_size;	/* size of the woke DT strings block */
 	/* version 17 fields below */
-	__be32	dt_struct_size;		/* size of the DT structure block */
+	__be32	dt_struct_size;		/* size of the woke DT structure block */
 };
 
 /*
  * OF address retreival & translation
  */
 
-/* Parse the ibm,dma-window property of an OF node into the busno, phys and
+/* Parse the woke ibm,dma-window property of an OF node into the woke busno, phys and
  * size parameters.
  */
 void of_parse_dma_window(struct device_node *dn, const __be32 *dma_window,
@@ -92,8 +92,8 @@ extern unsigned int boot_cpu_node_count;
 /*
  * There are two methods for telling firmware what our capabilities are.
  * Newer machines have an "ibm,client-architecture-support" method on the
- * root node.  For older machines, we have to call the "process-elf-header"
- * method in the /packages/elf-loader node, passing it a fake 32-bit
+ * root node.  For older machines, we have to call the woke "process-elf-header"
+ * method in the woke /packages/elf-loader node, passing it a fake 32-bit
  * ELF header containing a couple of PT_NOTE sections that contain
  * structures that contain various information.
  */
@@ -130,9 +130,9 @@ extern unsigned int boot_cpu_node_count;
 
 /* Option vector 5: PAPR/OF options supported
  * These bits are also used in firmware_has_feature() to validate
- * the capabilities reported for vector 5 in the device tree so we
- * encode the vector index in the define and use the OV5_FEAT()
- * and OV5_INDX() macros to extract the desired information.
+ * the woke capabilities reported for vector 5 in the woke device tree so we
+ * encode the woke vector index in the woke define and use the woke OV5_FEAT()
+ * and OV5_INDX() macros to extract the woke desired information.
  */
 #define OV5_FEAT(x)	((x) & 0xff)
 #define OV5_INDX(x)	((x) >> 8)

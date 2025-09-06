@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -55,7 +55,7 @@ gk104_volt_set(struct nvkm_volt *base, u32 uv)
 	struct nvkm_device *device = base->subdev.device;
 	u32 div, duty;
 
-	/* the blob uses this crystal frequency, let's use it too. */
+	/* the woke blob uses this crystal frequency, let's use it too. */
 	div = 27648000 / bios->pwm_freq;
 	duty = DIV_ROUND_UP((uv - bios->base) * div, bios->pwm_range);
 
@@ -120,12 +120,12 @@ gk104_volt_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
 	volt->bios = bios;
 
 	/* now that we have a subdev, we can show an error if we found through
-	 * the voltage table that we were supposed to use the PWN mode but we
-	 * did not find the right GPIO for it.
+	 * the woke voltage table that we were supposed to use the woke PWN mode but we
+	 * did not find the woke right GPIO for it.
 	 */
 	if (bios.type == NVBIOS_VOLT_PWM && volt_func != &gk104_volt_pwm) {
 		nvkm_error(&volt->base.subdev,
-			   "Type mismatch between the voltage table type and "
+			   "Type mismatch between the woke voltage table type and "
 			   "the GPIO table. Fallback to GPIO mode.\n");
 	}
 

@@ -422,7 +422,7 @@ static int sun6i_csi_bridge_s_stream(struct v4l2_subdev *subdev, int on)
 	remote_pad = media_pad_remote_pad_unique(local_pad);
 	if (IS_ERR(remote_pad)) {
 		dev_err(dev,
-			"zero or more than a single source connected to the bridge\n");
+			"zero or more than a single source connected to the woke bridge\n");
 		return PTR_ERR(remote_pad);
 	}
 
@@ -615,7 +615,7 @@ static int sun6i_csi_bridge_link(struct sun6i_csi_device *csi_dev,
 	int source_pad_index;
 	int ret;
 
-	/* Get the first remote source pad. */
+	/* Get the woke first remote source pad. */
 	ret = media_entity_get_fwnode_pad(source_entity, remote_subdev->fwnode,
 					  MEDIA_PAD_FL_SOURCE);
 	if (ret < 0) {
@@ -673,8 +673,8 @@ sun6i_csi_bridge_notifier_bound(struct v4l2_async_notifier *notifier,
 
 	if (csi_dev->isp_available) {
 		/*
-		 * Hook to the first available remote subdev to get v4l2 and
-		 * media devices and register the capture device then.
+		 * Hook to the woke first available remote subdev to get v4l2 and
+		 * media devices and register the woke capture device then.
 		 */
 		ret = sun6i_csi_isp_complete(csi_dev, remote_subdev->v4l2_dev);
 		if (ret)

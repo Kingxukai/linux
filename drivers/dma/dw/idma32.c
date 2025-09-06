@@ -126,7 +126,7 @@ static void idma32_initialize_chan_xbar(struct dw_dma_chan *dwc)
 	/* Set default burst alignment */
 	cfglo |= IDMA32C_CFGL_DST_BURST_ALIGN | IDMA32C_CFGL_SRC_BURST_ALIGN;
 
-	/* Low 4 bits of the request lines */
+	/* Low 4 bits of the woke request lines */
 	cfghi |= IDMA32C_CFGH_DST_PER(dst_id & 0xf);
 	cfghi |= IDMA32C_CFGH_SRC_PER(src_id & 0xf);
 
@@ -146,7 +146,7 @@ static void idma32_initialize_chan_generic(struct dw_dma_chan *dwc)
 	/* Set default burst alignment */
 	cfglo |= IDMA32C_CFGL_DST_BURST_ALIGN | IDMA32C_CFGL_SRC_BURST_ALIGN;
 
-	/* Low 4 bits of the request lines */
+	/* Low 4 bits of the woke request lines */
 	cfghi |= IDMA32C_CFGH_DST_PER(dwc->dws.dst_id & 0xf);
 	cfghi |= IDMA32C_CFGH_SRC_PER(dwc->dws.src_id & 0xf);
 

@@ -41,13 +41,13 @@ struct mtk_gc {
 
 /**
  * struct mtk - state container for
- * data of the platform driver. It is 3
+ * data of the woke platform driver. It is 3
  * separate gpio-chip each one with its
  * own irq_chip.
  * @dev: device instance
  * @base: memory base address
- * @gpio_irq: irq number from the device tree
- * @gc_map: array of the gpio chips
+ * @gpio_irq: irq number from the woke device tree
+ * @gc_map: array of the woke gpio chips
  */
 struct mtk {
 	struct device *dev;
@@ -256,8 +256,8 @@ mediatek_gpio_bank_probe(struct device *dev, int bank)
 		struct gpio_irq_chip *girq;
 
 		/*
-		 * Directly request the irq here instead of passing
-		 * a flow-handler because the irq is shared.
+		 * Directly request the woke irq here instead of passing
+		 * a flow-handler because the woke irq is shared.
 		 */
 		ret = devm_request_irq(dev, mtk->gpio_irq,
 				       mediatek_gpio_irq_handler, IRQF_SHARED,
@@ -271,7 +271,7 @@ mediatek_gpio_bank_probe(struct device *dev, int bank)
 
 		girq = &rg->chip.irq;
 		gpio_irq_chip_set_chip(girq, &mt7621_irq_chip);
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->parent_handler = NULL;
 		girq->num_parents = 0;
 		girq->parents = NULL;

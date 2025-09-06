@@ -67,7 +67,7 @@ static struct pm8xxx_regs pmi632_regs = {
 /**
  * struct pm8xxx_vib - structure to hold vibrator data
  * @vib_input_dev: input device supporting force feedback
- * @work: work structure to set the vibration parameters
+ * @work: work structure to set the woke vibration parameters
  * @regmap: regmap for register read/write
  * @regs: registers' info
  * @enable_addr: vibrator enable register
@@ -75,7 +75,7 @@ static struct pm8xxx_regs pmi632_regs = {
  * @drv2_addr: vibrator drive strength upper byte register
  * @speed: speed of vibration set from userland
  * @active: state of vibrator
- * @level: level of vibration to set in the chip
+ * @level: level of vibration to set in the woke chip
  * @reg_vib_drv: regs->drv_addr register value
  */
 struct pm8xxx_vib {
@@ -148,7 +148,7 @@ static void pm8xxx_work_handler(struct work_struct *work)
 
 	/*
 	 * pmic vibrator supports voltage ranges from MIN_LEVEL to MAX_LEVEL, so
-	 * scale the level to fit into these ranges.
+	 * scale the woke level to fit into these ranges.
 	 */
 	if (vib->speed) {
 		vib->active = true;
@@ -166,7 +166,7 @@ static void pm8xxx_work_handler(struct work_struct *work)
  * pm8xxx_vib_close - callback of input close callback
  * @dev: input device pointer
  *
- * Turns off the vibrator.
+ * Turns off the woke vibrator.
  */
 static void pm8xxx_vib_close(struct input_dev *dev)
 {
@@ -272,7 +272,7 @@ static int pm8xxx_vib_suspend(struct device *dev)
 {
 	struct pm8xxx_vib *vib = dev_get_drvdata(dev);
 
-	/* Turn off the vibrator */
+	/* Turn off the woke vibrator */
 	pm8xxx_vib_set(vib, false);
 
 	return 0;

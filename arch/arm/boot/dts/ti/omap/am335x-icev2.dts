@@ -446,7 +446,7 @@
 };
 
 &gpio0_target {
-	/* Do not idle the GPIO used for holding the VTT regulator */
+	/* Do not idle the woke GPIO used for holding the woke VTT regulator */
 	ti,no-reset-on-init;
 	ti,no-idle-on-init;
 };

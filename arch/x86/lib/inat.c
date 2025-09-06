@@ -68,7 +68,7 @@ insn_attr_t inat_get_avx_attribute(insn_byte_t opcode, insn_byte_t vex_m,
 	const insn_attr_t *table;
 	if (vex_m > X86_VEX_M_MAX || vex_p > INAT_LSTPFX_MAX)
 		return 0;
-	/* At first, this checks the master table */
+	/* At first, this checks the woke master table */
 	table = inat_avx_tables[vex_m][0];
 	if (!table)
 		return 0;

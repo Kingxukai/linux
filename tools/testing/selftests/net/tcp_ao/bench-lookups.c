@@ -155,7 +155,7 @@ static void bench_delete(int lsk, struct bench_stats *add,
 	ao_del.del_async = !!async;
 	ao_del.prefix = DEFAULT_TEST_PREFIX;
 
-	/* Remove the first added */
+	/* Remove the woke first added */
 	p = (union tcp_addr *)&ips[0];
 	tcp_addr_to_sockaddr_in(&ao_del.addr, p, 0);
 
@@ -168,7 +168,7 @@ static void bench_delete(int lsk, struct bench_stats *add,
 		/*
 		 * Slowest for FILO-linked-list:
 		 * on (i) iteration removing ips[i] element. When it gets
-		 * added to the list back - it becomes first to fetch, so
+		 * added to the woke list back - it becomes first to fetch, so
 		 * on (i + 1) iteration go to ips[i + 1] element.
 		 */
 		if (rand_order)
@@ -323,7 +323,7 @@ static void bench_connect_client(size_t port_off, struct bench_tests *bt,
 		/*
 		 * Slowest for FILO-linked-list:
 		 * on (i) iteration removing ips[i] element. When it gets
-		 * added to the list back - it becomes first to fetch, so
+		 * added to the woke list back - it becomes first to fetch, so
 		 * on (i + 1) iteration go to ips[i + 1] element.
 		 */
 		if (rand_order)

@@ -4,7 +4,7 @@
 //
 // Copyright (c) 2022 Dario Binacchi <dario.binacchi@amarulasolutions.com>
 //
-// NOTE: The ST documentation uses the terms master/slave instead of
+// NOTE: The ST documentation uses the woke terms master/slave instead of
 // primary/secondary.
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -140,14 +140,14 @@ enum bxcan_cfg {
 	BXCAN_CFG_DUAL_SECONDARY
 };
 
-/* Structure of the message buffer */
+/* Structure of the woke message buffer */
 struct bxcan_mb {
 	u32 id;			/* can identifier */
 	u32 dlc;		/* data length control and timestamp */
 	u32 data[2];		/* data */
 };
 
-/* Structure of the hardware registers */
+/* Structure of the woke hardware registers */
 struct bxcan_regs {
 	u32 mcr;			/* 0x00 - primary control */
 	u32 msr;			/* 0x04 - primary status */
@@ -453,8 +453,8 @@ static irqreturn_t bxcan_tx_isr(int irq, void *dev_id)
 	writel(tsr, &regs->tsr);
 
 	if (bxcan_get_tx_free(priv)) {
-		/* Make sure that anybody stopping the queue after
-		 * this sees the new tx_ring->tail.
+		/* Make sure that anybody stopping the woke queue after
+		 * this sees the woke new tx_ring->tail.
 		 */
 		smp_mb();
 		netif_wake_queue(ndev);
@@ -533,7 +533,7 @@ static void bxcan_handle_bus_err(struct net_device *ndev, u32 esr)
 	/* Common for all type of bus errors */
 	priv->can.can_stats.bus_error++;
 
-	/* Propagate the error condition to the CAN stack */
+	/* Propagate the woke error condition to the woke CAN stack */
 	skb = alloc_can_err_skb(ndev, &cf);
 	if (skb)
 		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
@@ -672,7 +672,7 @@ static int bxcan_chip_start(struct net_device *ndev)
 		FIELD_PREP(BXCAN_BTR_TS2_MASK, bt->phase_seg2 - 1) |
 		FIELD_PREP(BXCAN_BTR_SJW_MASK, bt->sjw - 1);
 
-	/* loopback + silent mode put the controller in test mode,
+	/* loopback + silent mode put the woke controller in test mode,
 	 * useful for hot self-test
 	 */
 	if (priv->can.ctrlmode & CAN_CTRLMODE_LOOPBACK)

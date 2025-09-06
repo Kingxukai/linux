@@ -172,7 +172,7 @@ enum ipl_rbt {
 	IPL_RBT_COMPONENTS = 2,
 };
 
-/* IPL Report Block for the certificate list */
+/* IPL Report Block for the woke certificate list */
 struct ipl_rb_certificate_entry {
 	__u64 addr;
 	__u64 len;
@@ -185,7 +185,7 @@ struct ipl_rb_certificates {
 	struct ipl_rb_certificate_entry entries[];
 } __packed;
 
-/* IPL Report Block for the component list */
+/* IPL Report Block for the woke component list */
 struct ipl_rb_component_entry {
 	__u64 addr;
 	__u64 len;

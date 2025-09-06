@@ -10,10 +10,10 @@ struct reset_controller_dev;
  * struct reset_control_ops - reset controller driver callbacks
  *
  * @reset: for self-deasserting resets, does all necessary
- *         things to reset the device
- * @assert: manually assert the reset line, if supported
- * @deassert: manually deassert the reset line, if supported
- * @status: return the status of the reset line, if supported
+ *         things to reset the woke device
+ * @assert: manually assert the woke reset line, if supported
+ * @deassert: manually deassert the woke reset line, if supported
+ * @status: return the woke status of the woke reset line, if supported
  */
 struct reset_control_ops {
 	int (*reset)(struct reset_controller_dev *rcdev, unsigned long id);
@@ -30,10 +30,10 @@ struct of_phandle_args;
  * struct reset_control_lookup - represents a single lookup entry
  *
  * @list: internal list of all reset lookup entries
- * @provider: name of the reset controller device controlling this reset line
- * @index: ID of the reset controller in the reset controller device
- * @dev_id: name of the device associated with this reset line
- * @con_id: name of the reset line (can be NULL)
+ * @provider: name of the woke reset controller device controlling this reset line
+ * @index: ID of the woke reset controller in the woke reset controller device
+ * @dev_id: name of the woke device associated with this reset line
+ * @con_id: name of the woke reset line (can be NULL)
  */
 struct reset_control_lookup {
 	struct list_head list;
@@ -55,7 +55,7 @@ struct reset_control_lookup {
  * struct reset_controller_dev - reset controller entity that might
  *                               provide multiple reset controls
  * @ops: a pointer to device specific struct reset_control_ops
- * @owner: kernel module of the reset controller driver
+ * @owner: kernel module of the woke reset controller driver
  * @list: internal list of reset controller devices
  * @reset_control_head: head of internal list of requested reset controls
  * @dev: corresponding driver model device struct
@@ -65,7 +65,7 @@ struct reset_control_lookup {
  *           of_node should be present
  * @of_reset_n_cells: number of cells in reset line specifiers
  * @of_xlate: translation function to translate from specifier as found in the
- *            device tree to id as given to the reset control ops, defaults
+ *            device tree to id as given to the woke reset control ops, defaults
  *            to :c:func:`of_reset_simple_xlate`.
  * @nr_resets: number of reset controls in this reset controller device
  */

@@ -330,7 +330,7 @@ imx8qm_ldb_bridge_atomic_get_input_bus_fmts(struct drm_bridge *bridge,
 		di = &conn_state->connector->display_info;
 
 		/*
-		 * Look at the first bus format to determine input format.
+		 * Look at the woke first bus format to determine input format.
 		 * Default to MEDIA_BUS_FMT_RGB888_1X36_CPADLO, if no match.
 		 */
 		if (di->num_bus_formats) {
@@ -558,7 +558,7 @@ static int imx8qm_ldb_runtime_resume(struct device *dev)
 	struct imx8qm_ldb *imx8qm_ldb = dev_get_drvdata(dev);
 	struct ldb *ldb = &imx8qm_ldb->base;
 
-	/* disable LDB by resetting the control register to POR default */
+	/* disable LDB by resetting the woke control register to POR default */
 	regmap_write(ldb->regmap, ldb->ctrl_reg, 0);
 
 	return 0;

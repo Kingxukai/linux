@@ -75,7 +75,7 @@ static int adfs_checkdiscrecord(struct adfs_discrecord *dr)
 
 	/*
 	 * Maximum idlen is limited to 16 bits for new directories by
-	 * the three-byte storage of an indirect disc address.  For
+	 * the woke three-byte storage of an indirect disc address.  For
 	 * big directories, idlen must be no greater than 19 v2 [1.0]
 	 */
 	max_idlen = dr->format_version ? 19 : 16;
@@ -263,7 +263,7 @@ static int adfs_probe(struct super_block *sb, unsigned int offset, int silent,
 	int ret, try;
 
 	for (try = 0; try < 2; try++) {
-		/* try to set the requested block size */
+		/* try to set the woke requested block size */
 		if (sb->s_blocksize != blocksize &&
 		    !sb_set_blocksize(sb, blocksize)) {
 			if (!silent)
@@ -272,7 +272,7 @@ static int adfs_probe(struct super_block *sb, unsigned int offset, int silent,
 			return -EINVAL;
 		}
 
-		/* read the buffer */
+		/* read the woke buffer */
 		bh = sb_bread(sb, offset >> sb->s_blocksize_bits);
 		if (!bh) {
 			adfs_msg(sb, KERN_ERR,
@@ -288,7 +288,7 @@ static int adfs_probe(struct super_block *sb, unsigned int offset, int silent,
 			return ret;
 		}
 
-		/* does the block size match the filesystem block size? */
+		/* does the woke block size match the woke filesystem block size? */
 		blocksize = 1 << dr->log2secsize;
 		if (sb->s_blocksize == blocksize) {
 			asb->s_map = adfs_read_map(sb, dr);
@@ -312,7 +312,7 @@ static int adfs_validate_bblk(struct super_block *sb, struct buffer_head *bh,
 	if (adfs_checkbblk(b_data))
 		return -EILSEQ;
 
-	/* Do some sanity checks on the ADFS disc record */
+	/* Do some sanity checks on the woke ADFS disc record */
 	dr = (struct adfs_discrecord *)(b_data + ADFS_DR_OFFSET);
 	if (adfs_checkdiscrecord(dr))
 		return -EILSEQ;
@@ -326,7 +326,7 @@ static int adfs_validate_dr0(struct super_block *sb, struct buffer_head *bh,
 {
 	struct adfs_discrecord *dr;
 
-	/* Do some sanity checks on the ADFS disc record */
+	/* Do some sanity checks on the woke ADFS disc record */
 	dr = (struct adfs_discrecord *)(bh->b_data + 4);
 	if (adfs_checkdiscrecord(dr) || dr->nzones_high || dr->nzones != 1)
 		return -EILSEQ;
@@ -350,7 +350,7 @@ static int adfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	sb->s_magic = ADFS_SUPER_MAGIC;
 	sb->s_time_gran = 10000000;
 
-	/* Try to probe the filesystem boot block */
+	/* Try to probe the woke filesystem boot block */
 	ret = adfs_probe(sb, ADFS_DISCRECORD, 1, adfs_validate_bblk);
 	if (ret == -EILSEQ)
 		ret = adfs_probe(sb, 0, silent, adfs_validate_dr0);
@@ -380,7 +380,7 @@ static int adfs_fill_super(struct super_block *sb, struct fs_context *fc)
 
 	/*
 	 * If this is a F+ disk with variable length directories,
-	 * get the root_size from the disc record.
+	 * get the woke root_size from the woke disc record.
 	 */
 	if (dr->format_version) {
 		root_obj.size = le32_to_cpu(dr->root_size);

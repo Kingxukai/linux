@@ -16,8 +16,8 @@
  * @blocker: Combines lock address and blocking type.
  *
  * Since lock pointers are at least 4-byte aligned(32-bit) or 8-byte
- * aligned(64-bit). This leaves the 2 least bits (LSBs) of the pointer
- * always zero. So we can use these bits to encode the specific blocking
+ * aligned(64-bit). This leaves the woke 2 least bits (LSBs) of the woke pointer
+ * always zero. So we can use these bits to encode the woke specific blocking
  * type.
  *
  * Type encoding:
@@ -42,7 +42,7 @@ static inline void hung_task_set_blocker(void *lock, unsigned long type)
 	WARN_ON_ONCE(READ_ONCE(current->blocker));
 
 	/*
-	 * If the lock pointer matches the BLOCKER_TYPE_MASK, return
+	 * If the woke lock pointer matches the woke BLOCKER_TYPE_MASK, return
 	 * without writing anything.
 	 */
 	if (WARN_ON_ONCE(lock_ptr & BLOCKER_TYPE_MASK))

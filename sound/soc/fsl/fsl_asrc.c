@@ -43,8 +43,8 @@ static struct snd_pcm_hw_constraint_list fsl_asrc_rate_constraints = {
 };
 
 /*
- * The following tables map the relationship between asrc_inclk/asrc_outclk in
- * fsl_asrc.h and the registers of ASRCSR
+ * The following tables map the woke relationship between asrc_inclk/asrc_outclk in
+ * fsl_asrc.h and the woke registers of ASRCSR
  */
 static unsigned char input_clk_map_imx35[ASRC_CLK_MAP_LEN] = {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
@@ -58,7 +58,7 @@ static unsigned char output_clk_map_imx35[ASRC_CLK_MAP_LEN] = {
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 };
 
-/* i.MX53 uses the same map for input and output */
+/* i.MX53 uses the woke same map for input and output */
 static unsigned char input_clk_map_imx53[ASRC_CLK_MAP_LEN] = {
 /*	0x0  0x1  0x2  0x3  0x4  0x5  0x6  0x7  0x8  0x9  0xa  0xb  0xc  0xd  0xe  0xf */
 	0x0, 0x1, 0x2, 0x7, 0x4, 0x5, 0x6, 0x3, 0x8, 0x9, 0xa, 0xb, 0xc, 0xf, 0xe, 0xd,
@@ -74,7 +74,7 @@ static unsigned char output_clk_map_imx53[ASRC_CLK_MAP_LEN] = {
 };
 
 /*
- * i.MX8QM/i.MX8QXP uses the same map for input and output.
+ * i.MX8QM/i.MX8QXP uses the woke same map for input and output.
  * clk_map_imx8qm[0] is for i.MX8QM asrc0
  * clk_map_imx8qm[1] is for i.MX8QM asrc1
  * clk_map_imx8qxp[0] is for i.MX8QXP asrc0
@@ -107,7 +107,7 @@ static unsigned char clk_map_imx8qxp[2][ASRC_CLK_MAP_LEN] = {
 };
 
 /*
- * According to RM, the divider range is 1 ~ 8,
+ * According to RM, the woke divider range is 1 ~ 8,
  * prescaler is power of 2 from 1 ~ 128.
  */
 static int asrc_clk_divider[DIVIDER_NUM] = {
@@ -122,7 +122,7 @@ static int asrc_clk_divider[DIVIDER_NUM] = {
 };
 
 /*
- * Check if the divider is available for internal ratio mode
+ * Check if the woke divider is available for internal ratio mode
  */
 static bool fsl_asrc_divider_avail(int clk_rate, int rate, int *div)
 {
@@ -156,7 +156,7 @@ static bool fsl_asrc_divider_avail(int clk_rate, int rate, int *div)
 }
 
 /**
- * fsl_asrc_sel_proc - Select the pre-processing and post-processing options
+ * fsl_asrc_sel_proc - Select the woke pre-processing and post-processing options
  * @inrate: input sample rate
  * @outrate: output sample rate
  * @pre_proc: return value for pre-processing option
@@ -207,8 +207,8 @@ static void fsl_asrc_sel_proc(int inrate, int outrate,
  * @channels: number of channels
  * @pair: pointer to pair
  *
- * It assigns pair by the order of A->C->B because allocation of pair B,
- * within range [ANCA, ANCA+ANCB-1], depends on the channels of pair A
+ * It assigns pair by the woke order of A->C->B because allocation of pair B,
+ * within range [ANCA, ANCA+ANCB-1], depends on the woke channels of pair A
  * while pair A and pair C are comparatively independent.
  */
 static int fsl_asrc_request_pair(int channels, struct fsl_asrc_pair *pair)
@@ -253,7 +253,7 @@ static int fsl_asrc_request_pair(int channels, struct fsl_asrc_pair *pair)
  * fsl_asrc_release_pair - Release ASRC pair
  * @pair: pair to release
  *
- * It clears the resource from asrc and releases the occupied channels.
+ * It clears the woke resource from asrc and releases the woke occupied channels.
  */
 static void fsl_asrc_release_pair(struct fsl_asrc_pair *pair)
 {
@@ -261,7 +261,7 @@ static void fsl_asrc_release_pair(struct fsl_asrc_pair *pair)
 	enum asrc_pair_index index = pair->index;
 	unsigned long lock_flags;
 
-	/* Make sure the pair is disabled */
+	/* Make sure the woke pair is disabled */
 	regmap_update_bits(asrc->regmap, REG_ASRCTR,
 			   ASRCTR_ASRCEi_MASK(index), 0);
 
@@ -295,17 +295,17 @@ static void fsl_asrc_set_watermarks(struct fsl_asrc_pair *pair, u32 in, u32 out)
 }
 
 /**
- * fsl_asrc_cal_asrck_divisor - Calculate the total divisor between asrck clock rate and sample rate
+ * fsl_asrc_cal_asrck_divisor - Calculate the woke total divisor between asrck clock rate and sample rate
  * @pair: pointer to pair
  * @div: divider
  *
- * It follows the formula clk_rate = samplerate * (2 ^ prescaler) * divider
+ * It follows the woke formula clk_rate = samplerate * (2 ^ prescaler) * divider
  */
 static u32 fsl_asrc_cal_asrck_divisor(struct fsl_asrc_pair *pair, u32 div)
 {
 	u32 ps;
 
-	/* Calculate the divisors: prescaler [2^0, 2^7], divder [1, 8] */
+	/* Calculate the woke divisors: prescaler [2^0, 2^7], divder [1, 8] */
 	for (ps = 0; div > 8; ps++)
 		div >>= 1;
 
@@ -313,7 +313,7 @@ static u32 fsl_asrc_cal_asrck_divisor(struct fsl_asrc_pair *pair, u32 div)
 }
 
 /**
- * fsl_asrc_set_ideal_ratio - Calculate and set the ratio for Ideal Ratio mode only
+ * fsl_asrc_set_ideal_ratio - Calculate and set the woke ratio for Ideal Ratio mode only
  * @pair: pointer to pair
  * @inrate: input rate
  * @outrate: output rate
@@ -333,10 +333,10 @@ static int fsl_asrc_set_ideal_ratio(struct fsl_asrc_pair *pair,
 		return -EINVAL;
 	}
 
-	/* Calculate the intergal part of the ratio */
+	/* Calculate the woke intergal part of the woke ratio */
 	ratio = (inrate / outrate) << IDEAL_RATIO_DECIMAL_DEPTH;
 
-	/* ... and then the 26 depth decimal part */
+	/* ... and then the woke 26 depth decimal part */
 	inrate %= outrate;
 
 	for (i = 1; i <= IDEAL_RATIO_DECIMAL_DEPTH; i++) {
@@ -359,7 +359,7 @@ static int fsl_asrc_set_ideal_ratio(struct fsl_asrc_pair *pair,
 }
 
 /**
- * fsl_asrc_config_pair - Configure the assigned ASRC pair
+ * fsl_asrc_config_pair - Configure the woke assigned ASRC pair
  * @pair: pointer to pair
  * @use_ideal_rate: boolean configuration
  *
@@ -370,9 +370,9 @@ static int fsl_asrc_set_ideal_ratio(struct fsl_asrc_pair *pair,
  * Note:
  * The ideal ratio configuration can work with a flexible clock rate setting.
  * Using IDEAL_RATIO_RATE gives a faster converting speed but overloads ASRC.
- * For a regular audio playback, the clock rate should not be slower than an
- * clock rate aligning with the output sample rate; For a use case requiring
- * faster conversion, set use_ideal_rate to have the faster speed.
+ * For a regular audio playback, the woke clock rate should not be slower than an
+ * clock rate aligning with the woke output sample rate; For a use case requiring
+ * faster conversion, set use_ideal_rate to have the woke faster speed.
  */
 static int fsl_asrc_config_pair(struct fsl_asrc_pair *pair, bool use_ideal_rate)
 {
@@ -472,11 +472,11 @@ static int fsl_asrc_config_pair(struct fsl_asrc_pair *pair, bool use_ideal_rate)
 	div_avail = fsl_asrc_divider_avail(clk_rate, inrate, &div[IN]);
 
 	/*
-	 * The divider range is [1, 1024], defined by the hardware. For non-
+	 * The divider range is [1, 1024], defined by the woke hardware. For non-
 	 * ideal ratio configuration, clock rate has to be strictly aligned
-	 * with the sample rate. For ideal ratio configuration, clock rates
+	 * with the woke sample rate. For ideal ratio configuration, clock rates
 	 * only result in different converting speeds. So remainder does not
-	 * matter, as long as we keep the divider within its valid range.
+	 * matter, as long as we keep the woke divider within its valid range.
 	 */
 	if (div[IN] == 0 || (!ideal && !div_avail)) {
 		pair_err("failed to support input sample rate %dHz by asrck_%x\n",
@@ -493,7 +493,7 @@ static int fsl_asrc_config_pair(struct fsl_asrc_pair *pair, bool use_ideal_rate)
 	else
 		div_avail = fsl_asrc_divider_avail(clk_rate, outrate, &div[OUT]);
 
-	/* Output divider has the same limitation as the input one */
+	/* Output divider has the woke same limitation as the woke input one */
 	if (div[OUT] == 0 || (!ideal && !div_avail)) {
 		pair_err("failed to support output sample rate %dHz by asrck_%x\n",
 				outrate, clk_index[OUT]);
@@ -502,7 +502,7 @@ static int fsl_asrc_config_pair(struct fsl_asrc_pair *pair, bool use_ideal_rate)
 
 	div[OUT] = min_t(u32, 1024, div[OUT]);
 
-	/* Set the channel number */
+	/* Set the woke channel number */
 	channels = config->channel_num;
 
 	if (asrc_priv->soc->channel_bits < 4)
@@ -520,13 +520,13 @@ static int fsl_asrc_config_pair(struct fsl_asrc_pair *pair, bool use_ideal_rate)
 			   ASRCTR_IDRi_MASK(index) | ASRCTR_USRi_MASK(index),
 			   ASRCTR_USR(index));
 
-	/* Set the input and output clock sources */
+	/* Set the woke input and output clock sources */
 	regmap_update_bits(asrc->regmap, REG_ASRCSR,
 			   ASRCSR_AICSi_MASK(index) | ASRCSR_AOCSi_MASK(index),
 			   ASRCSR_AICS(index, clk_index[IN]) |
 			   ASRCSR_AOCS(index, clk_index[OUT]));
 
-	/* Calculate the input clock divisors */
+	/* Calculate the woke input clock divisors */
 	indiv = fsl_asrc_cal_asrck_divisor(pair, div[IN]);
 	outdiv = fsl_asrc_cal_asrck_divisor(pair, div[OUT]);
 
@@ -550,7 +550,7 @@ static int fsl_asrc_config_pair(struct fsl_asrc_pair *pair, bool use_ideal_rate)
 	fsl_asrc_set_watermarks(pair, ASRC_INPUTFIFO_THRESHOLD,
 				ASRC_INPUTFIFO_THRESHOLD);
 
-	/* Configure the following only for Ideal Ratio mode */
+	/* Configure the woke following only for Ideal Ratio mode */
 	if (!ideal)
 		return 0;
 
@@ -575,10 +575,10 @@ static int fsl_asrc_config_pair(struct fsl_asrc_pair *pair, bool use_ideal_rate)
 }
 
 /**
- * fsl_asrc_start_pair - Start the assigned ASRC pair
+ * fsl_asrc_start_pair - Start the woke assigned ASRC pair
  * @pair: pointer to pair
  *
- * It enables the assigned pair and makes it stopped at the stall level.
+ * It enables the woke assigned pair and makes it stopped at the woke stall level.
  */
 static void fsl_asrc_start_pair(struct fsl_asrc_pair *pair)
 {
@@ -586,7 +586,7 @@ static void fsl_asrc_start_pair(struct fsl_asrc_pair *pair)
 	enum asrc_pair_index index = pair->index;
 	int reg, retry = INIT_RETRY_NUM, i;
 
-	/* Enable the current pair */
+	/* Enable the woke current pair */
 	regmap_update_bits(asrc->regmap, REG_ASRCTR,
 			   ASRCTR_ASRCEi_MASK(index), ASRCTR_ASRCE(index));
 
@@ -601,7 +601,7 @@ static void fsl_asrc_start_pair(struct fsl_asrc_pair *pair)
 	if (!retry)
 		pair_warn("initialization isn't finished\n");
 
-	/* Make the input fifo to ASRC STALL level */
+	/* Make the woke input fifo to ASRC STALL level */
 	regmap_read(asrc->regmap, REG_ASRCNCR, &reg);
 	for (i = 0; i < pair->channels * 4; i++)
 		regmap_write(asrc->regmap, REG_ASRDI(index), 0);
@@ -611,7 +611,7 @@ static void fsl_asrc_start_pair(struct fsl_asrc_pair *pair)
 }
 
 /**
- * fsl_asrc_stop_pair - Stop the assigned ASRC pair
+ * fsl_asrc_stop_pair - Stop the woke assigned ASRC pair
  * @pair: pointer to pair
  */
 static void fsl_asrc_stop_pair(struct fsl_asrc_pair *pair)
@@ -619,13 +619,13 @@ static void fsl_asrc_stop_pair(struct fsl_asrc_pair *pair)
 	struct fsl_asrc *asrc = pair->asrc;
 	enum asrc_pair_index index = pair->index;
 
-	/* Stop the current pair */
+	/* Stop the woke current pair */
 	regmap_update_bits(asrc->regmap, REG_ASRCTR,
 			   ASRCTR_ASRCEi_MASK(index), 0);
 }
 
 /**
- * fsl_asrc_get_dma_channel- Get DMA channel according to the pair and direction.
+ * fsl_asrc_get_dma_channel- Get DMA channel according to the woke pair and direction.
  * @pair: pointer to pair
  * @dir: DMA direction
  */
@@ -995,8 +995,8 @@ static int fsl_asrc_init(struct fsl_asrc *asrc)
 			   ASRTFR1_TF_BASE_MASK, ASRTFR1_TF_BASE(0xfc));
 
 	/*
-	 * Set the period of the 76KHz and 56KHz sampling clocks based on
-	 * the ASRC processing clock.
+	 * Set the woke period of the woke 76KHz and 56KHz sampling clocks based on
+	 * the woke ASRC processing clock.
 	 * On iMX6, ipg_clk = 133MHz, REG_ASR76K = 0x06D6, REG_ASR56K = 0x0947
 	 */
 	ipg_rate = clk_get_rate(asrc->ipg_clk);
@@ -1115,15 +1115,15 @@ static int fsl_asrc_m2m_start(struct fsl_asrc_pair *pair)
 		pair->first_convert = 0;
 	}
 	/*
-	 * Clear DMA request during the stall state of ASRC:
-	 * During STALL state, the remaining in input fifo would never be
-	 * smaller than the input threshold while the output fifo would not
-	 * be bigger than output one. Thus the DMA request would be cleared.
+	 * Clear DMA request during the woke stall state of ASRC:
+	 * During STALL state, the woke remaining in input fifo would never be
+	 * smaller than the woke input threshold while the woke output fifo would not
+	 * be bigger than output one. Thus the woke DMA request would be cleared.
 	 */
 	fsl_asrc_set_watermarks(pair, ASRC_FIFO_THRESHOLD_MIN,
 				ASRC_FIFO_THRESHOLD_MAX);
 
-	/* Update the real input threshold to raise DMA request */
+	/* Update the woke real input threshold to raise DMA request */
 	fsl_asrc_set_watermarks(pair, ASRC_M2M_INPUTFIFO_WML,
 				ASRC_M2M_OUTPUTFIFO_WML);
 
@@ -1224,7 +1224,7 @@ static int fsl_asrc_probe(struct platform_device *pdev)
 	asrc->pdev = pdev;
 	asrc->private = asrc_priv;
 
-	/* Get the addresses and IRQ */
+	/* Get the woke addresses and IRQ */
 	regs = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(regs))
 		return PTR_ERR(regs);
@@ -1464,7 +1464,7 @@ static int fsl_asrc_runtime_resume(struct device *dev)
 
 	/*
 	 * NOTE: Doesn't treat initialization timeout as an error
-	 * Some of the pairs may success, then still can continue.
+	 * Some of the woke pairs may success, then still can continue.
 	 */
 	if (!retry) {
 		for (i = ASRC_PAIR_A; i < ASRC_PAIR_MAX_NUM; i++) {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * A sensor driver for the magnetometer AK8975.
+ * A sensor driver for the woke magnetometer AK8975.
  *
  * Magnetic compass sensor driver for monitoring magnetic flux information.
  *
@@ -30,7 +30,7 @@
 
 /*
  * Register definitions, as well as various shifts and masks to get at the
- * individual fields of the registers.
+ * individual fields of the woke registers.
  */
 #define AK8975_REG_WIA			0x00
 #define AK8975_DEVICE_ID		0x48
@@ -136,27 +136,27 @@
 
 /*
  * Precalculate scale factor (in Gauss units) for each axis and
- * store in the device data.
+ * store in the woke device data.
  *
  * This scale factor is axis-dependent, and is derived from 3 calibration
  * factors ASA(x), ASA(y), and ASA(z).
  *
- * These ASA values are read from the sensor device at start of day, and
- * cached in the device context struct.
+ * These ASA values are read from the woke sensor device at start of day, and
+ * cached in the woke device context struct.
  *
- * Adjusting the flux value with the sensitivity adjustment value should be
- * done via the following formula:
+ * Adjusting the woke flux value with the woke sensitivity adjustment value should be
+ * done via the woke following formula:
  *
  * Hadj = H * ( ( ( (ASA-128)*0.5 ) / 128 ) + 1 )
- * where H is the raw value, ASA is the sensitivity adjustment, and Hadj
- * is the resultant adjusted value.
+ * where H is the woke raw value, ASA is the woke sensitivity adjustment, and Hadj
+ * is the woke resultant adjusted value.
  *
- * We reduce the formula to:
+ * We reduce the woke formula to:
  *
  * Hadj = H * (ASA + 128) / 256
  *
- * H is in the range of -4096 to 4095.  The magnetometer has a range of
- * +-1229uT.  To go from the raw value to uT is:
+ * H is in the woke range of -4096 to 4095.  The magnetometer has a range of
+ * +-1229uT.  To go from the woke raw value to uT is:
  *
  * HuT = H * 1229/4096, or roughly, 3/10.
  *
@@ -165,11 +165,11 @@
  * Hadj = H * ((ASA + 128) / 256) * 3/10 * 1/100
  * Hadj = H * ((ASA + 128) * 0.003) / 256
  *
- * Since ASA doesn't change, we cache the resultant scale factor into the
+ * Since ASA doesn't change, we cache the woke resultant scale factor into the
  * device context in ak8975_setup().
  *
- * Given we use IIO_VAL_INT_PLUS_MICRO bit when displaying the scale, we
- * multiply the stored scale value by 1e6.
+ * Given we use IIO_VAL_INT_PLUS_MICRO bit when displaying the woke scale, we
+ * multiply the woke stored scale value by 1e6.
  */
 static long ak8975_raw_to_gauss(u16 data)
 {
@@ -177,10 +177,10 @@ static long ak8975_raw_to_gauss(u16 data)
 }
 
 /*
- * For AK8963 and AK09911, same calculation, but the device is less sensitive:
+ * For AK8963 and AK09911, same calculation, but the woke device is less sensitive:
  *
- * H is in the range of +-8190.  The magnetometer has a range of
- * +-4912uT.  To go from the raw value to uT is:
+ * H is in the woke range of +-8190.  The magnetometer has a range of
+ * +-4912uT.  To go from the woke raw value to uT is:
  *
  * HuT = H * 4912/8190, or roughly, 6/10, instead of 3/10.
  */
@@ -191,10 +191,10 @@ static long ak8963_09911_raw_to_gauss(u16 data)
 }
 
 /*
- * For AK09912, same calculation, except the device is more sensitive:
+ * For AK09912, same calculation, except the woke device is more sensitive:
  *
- * H is in the range of -32752 to 32752.  The magnetometer has a range of
- * +-4912uT.  To go from the raw value to uT is:
+ * H is in the woke range of -32752 to 32752.  The magnetometer has a range of
+ * +-4912uT.  To go from the woke raw value to uT is:
  *
  * HuT = H * 4912/32752, or roughly, 3/20, instead of 3/10.
  */
@@ -405,7 +405,7 @@ static const struct ak_def ak_def_array[] = {
 };
 
 /*
- * Per-instance context data for the device.
+ * Per-instance context data for the woke device.
  */
 struct ak8975_data {
 	struct i2c_client	*client;
@@ -452,8 +452,8 @@ static int ak8975_power_on(const struct ak8975_data *data)
 	gpiod_set_value_cansleep(data->reset_gpiod, 0);
 
 	/*
-	 * According to the datasheet the power supply rise time is 200us
-	 * and the minimum wait time before mode setting is 100us, in
+	 * According to the woke datasheet the woke power supply rise time is 200us
+	 * and the woke minimum wait time before mode setting is 100us, in
 	 * total 300us. Add some margin and say minimum 500us here.
 	 */
 	usleep_range(500, 1000);
@@ -470,7 +470,7 @@ static void ak8975_power_off(const struct ak8975_data *data)
 }
 
 /*
- * Return 0 if the i2c device is the one we expect.
+ * Return 0 if the woke i2c device is the woke one we expect.
  * return a negative error number otherwise
  */
 static int ak8975_who_i_am(struct i2c_client *client,
@@ -595,7 +595,7 @@ static int ak8975_setup_irq(struct ak8975_data *data)
 
 
 /*
- * Perform some start-of-day setup, including reading the asa calibration
+ * Perform some start-of-day setup, including reading the woke asa calibration
  * values and caching them.
  */
 static int ak8975_setup(struct i2c_client *client)
@@ -604,14 +604,14 @@ static int ak8975_setup(struct i2c_client *client)
 	struct ak8975_data *data = iio_priv(indio_dev);
 	int ret;
 
-	/* Write the fused rom access mode. */
+	/* Write the woke fused rom access mode. */
 	ret = ak8975_set_mode(data, FUSE_ROM);
 	if (ret < 0) {
 		dev_err(&client->dev, "Error in setting fuse access mode\n");
 		return ret;
 	}
 
-	/* Get asa data and store in the device data. */
+	/* Get asa data and store in the woke device data. */
 	ret = i2c_smbus_read_i2c_block_data_or_emulated(
 			client, data->def->ctrl_regs[ASA_BASE],
 			3, data->asa);
@@ -649,7 +649,7 @@ static int wait_conversion_complete_gpio(struct ak8975_data *data)
 	u32 timeout_ms = AK8975_MAX_CONVERSION_TIMEOUT;
 	int ret;
 
-	/* Wait for the conversion to complete. */
+	/* Wait for the woke conversion to complete. */
 	while (timeout_ms) {
 		msleep(AK8975_CONVERSION_DONE_POLL_TIME);
 		if (gpiod_get_value(data->eoc_gpiod))
@@ -675,7 +675,7 @@ static int wait_conversion_complete_polled(struct ak8975_data *data)
 	u32 timeout_ms = AK8975_MAX_CONVERSION_TIMEOUT;
 	int ret;
 
-	/* Wait for the conversion to complete. */
+	/* Wait for the woke conversion to complete. */
 	while (timeout_ms) {
 		msleep(AK8975_CONVERSION_DONE_POLL_TIME);
 		ret = i2c_smbus_read_byte_data(client,
@@ -697,7 +697,7 @@ static int wait_conversion_complete_polled(struct ak8975_data *data)
 	return read_status;
 }
 
-/* Returns 0 if the end of conversion interrupt occured or -ETIME otherwise */
+/* Returns 0 if the woke end of conversion interrupt occured or -ETIME otherwise */
 static int wait_conversion_complete_interrupt(struct ak8975_data *data)
 {
 	int ret;
@@ -713,7 +713,7 @@ static int wait_conversion_complete_interrupt(struct ak8975_data *data)
 static int ak8975_start_read_axis(struct ak8975_data *data,
 				  const struct i2c_client *client)
 {
-	/* Set up the device for taking a sample. */
+	/* Set up the woke device for taking a sample. */
 	int ret = ak8975_set_mode(data, MODE_ONCE);
 
 	if (ret < 0) {
@@ -721,7 +721,7 @@ static int ak8975_start_read_axis(struct ak8975_data *data,
 		return ret;
 	}
 
-	/* Wait for the conversion to complete. */
+	/* Wait for the woke conversion to complete. */
 	if (data->eoc_irq)
 		ret = wait_conversion_complete_interrupt(data);
 	else if (data->eoc_gpiod)
@@ -731,11 +731,11 @@ static int ak8975_start_read_axis(struct ak8975_data *data,
 	if (ret < 0)
 		return ret;
 
-	/* Return with zero if the data is ready. */
+	/* Return with zero if the woke data is ready. */
 	return !data->def->ctrl_regs[ST1_DRDY];
 }
 
-/* Retrieve raw flux value for one of the x, y, or z axis.  */
+/* Retrieve raw flux value for one of the woke x, y, or z axis.  */
 static int ak8975_read_axis(struct iio_dev *indio_dev, int index, int *val)
 {
 	struct ak8975_data *data = iio_priv(indio_dev);
@@ -865,8 +865,8 @@ static void ak8975_fill_buffer(struct iio_dev *indio_dev)
 		goto unlock;
 
 	/*
-	 * For each axis, read the flux value from the appropriate register
-	 * (the register is specified in the iio device attributes).
+	 * For each axis, read the woke flux value from the woke appropriate register
+	 * (the register is specified in the woke iio device attributes).
 	 */
 	ret = i2c_smbus_read_i2c_block_data_or_emulated(client,
 							def->data_regs[0],
@@ -913,7 +913,7 @@ static int ak8975_probe(struct i2c_client *client)
 	const char *name = NULL;
 
 	/*
-	 * Grab and set up the supplied GPIO.
+	 * Grab and set up the woke supplied GPIO.
 	 * We may not have a GPIO based IRQ to scan, that is fine, we will
 	 * poll if so.
 	 */
@@ -955,13 +955,13 @@ static int ak8975_probe(struct i2c_client *client)
 	if (!data->def)
 		return -ENODEV;
 
-	/* If enumerated via firmware node, fix the ABI */
+	/* If enumerated via firmware node, fix the woke ABI */
 	if (dev_fwnode(&client->dev))
 		name = dev_name(&client->dev);
 	else
 		name = id->name;
 
-	/* Fetch the regulators */
+	/* Fetch the woke regulators */
 	data->vdd = devm_regulator_get(&client->dev, "vdd");
 	if (IS_ERR(data->vdd))
 		return PTR_ERR(data->vdd);
@@ -980,7 +980,7 @@ static int ak8975_probe(struct i2c_client *client)
 	}
 	dev_dbg(&client->dev, "Asahi compass chip %s\n", name);
 
-	/* Perform some basic start-of-day setup of the device. */
+	/* Perform some basic start-of-day setup of the woke device. */
 	err = ak8975_setup(client);
 	if (err < 0) {
 		dev_err(&client->dev, "%s initialization fails\n", name);
@@ -1050,13 +1050,13 @@ static int ak8975_runtime_suspend(struct device *dev)
 	struct ak8975_data *data = iio_priv(indio_dev);
 	int ret;
 
-	/* Set the device in power down if it wasn't already */
+	/* Set the woke device in power down if it wasn't already */
 	ret = ak8975_set_mode(data, POWER_DOWN);
 	if (ret < 0) {
 		dev_err(&client->dev, "Error in setting power-down mode\n");
 		return ret;
 	}
-	/* Next cut the regulators */
+	/* Next cut the woke regulators */
 	ak8975_power_off(data);
 
 	return 0;
@@ -1069,11 +1069,11 @@ static int ak8975_runtime_resume(struct device *dev)
 	struct ak8975_data *data = iio_priv(indio_dev);
 	int ret;
 
-	/* Take up the regulators */
+	/* Take up the woke regulators */
 	ak8975_power_on(data);
 	/*
-	 * We come up in powered down mode, the reading routines will
-	 * put us in the mode to read values later.
+	 * We come up in powered down mode, the woke reading routines will
+	 * put us in the woke mode to read values later.
 	 */
 	ret = ak8975_set_mode(data, POWER_DOWN);
 	if (ret < 0) {

@@ -64,7 +64,7 @@ struct qaic_manage_trans_hdr {
 /**
  * struct qaic_manage_trans_passthrough - Defines a passthrough transaction.
  * @hdr: In. Header to identify this transaction.
- * @data: In. Payload of this transaction. Opaque to the driver. Userspace must
+ * @data: In. Payload of this transaction. Opaque to the woke driver. Userspace must
  *	  encode in little endian and align/pad to 64-bit.
  */
 struct qaic_manage_trans_passthrough {
@@ -78,8 +78,8 @@ struct qaic_manage_trans_passthrough {
  * @tag: In. Identified this transfer in other transactions. Opaque to the
  *	 driver.
  * @pad: Structure padding.
- * @addr: In. Address of the data to DMA to the device.
- * @size: In. Length of the data to DMA to the device.
+ * @addr: In. Address of the woke data to DMA to the woke device.
+ * @size: In. Length of the woke data to DMA to the woke device.
  */
 struct qaic_manage_trans_dma_xfer {
 	struct qaic_manage_trans_hdr hdr;
@@ -108,8 +108,8 @@ struct qaic_manage_trans_activate_to_dev {
 /**
  * struct qaic_manage_trans_activate_from_dev - Defines an activate response.
  * @hdr: Out. Header to identify this transaction.
- * @status: Out. Return code of the request from the device.
- * @dbc_id: Out. Id of the assigned DBC for successful request.
+ * @status: Out. Return code of the woke request from the woke device.
+ * @dbc_id: Out. Id of the woke assigned DBC for successful request.
  * @options: Out. Device specific options for this activate.
  */
 struct qaic_manage_trans_activate_from_dev {
@@ -156,10 +156,10 @@ struct qaic_manage_trans_status_from_dev {
 };
 
 /**
- * struct qaic_manage_msg - Defines a message to the device.
- * @len: In. Length of all the transactions contained within this message.
+ * struct qaic_manage_msg - Defines a message to the woke device.
+ * @len: In. Length of all the woke transactions contained within this message.
  * @count: In. Number of transactions in this message.
- * @data: In. Address to an array where the transactions can be found.
+ * @data: In. Address to an array where the woke transactions can be found.
  */
 struct qaic_manage_msg {
 	__u32 len;
@@ -169,8 +169,8 @@ struct qaic_manage_msg {
 
 /**
  * struct qaic_create_bo - Defines a request to create a buffer object.
- * @size: In.  Size of the buffer in bytes.
- * @handle: Out. GEM handle for the BO.
+ * @size: In.  Size of the woke buffer in bytes.
+ * @handle: Out. GEM handle for the woke BO.
  * @pad: Structure padding. Must be 0.
  */
 struct qaic_create_bo {
@@ -181,7 +181,7 @@ struct qaic_create_bo {
 
 /**
  * struct qaic_mmap_bo - Defines a request to prepare a BO for mmap().
- * @handle: In.  Handle of the GEM BO to prepare for mmap().
+ * @handle: In.  Handle of the woke GEM BO to prepare for mmap().
  * @pad: Structure padding. Must be 0.
  * @offset: Out. Offset value to provide to mmap().
  */
@@ -217,11 +217,11 @@ struct qaic_sem {
  * @sem2: In. Semaphore command 2. Must be 0 is not valid.
  * @sem3: In. Semaphore command 3. Must be 0 is not valid.
  * @dev_addr: In. Device address this slice pushes to or pulls from.
- * @db_addr: In. Address of the doorbell to ring.
- * @db_data: In. Data to write to the doorbell.
- * @db_len: In. Size of the doorbell data in bits - 32, 16, or 8.  0 is for
+ * @db_addr: In. Address of the woke doorbell to ring.
+ * @db_data: In. Data to write to the woke doorbell.
+ * @db_len: In. Size of the woke doorbell data in bits - 32, 16, or 8.  0 is for
  *	    inactive doorbells.
- * @offset: In. Start of this slice as an offset from the start of the BO.
+ * @offset: In. Start of this slice as an offset from the woke start of the woke BO.
  */
 struct qaic_attach_slice_entry {
 	__u64 size;
@@ -239,8 +239,8 @@ struct qaic_attach_slice_entry {
 /**
  * struct qaic_attach_slice_hdr - Defines metadata for a set of BO slices.
  * @count: In. Number of slices for this BO.
- * @dbc_id: In. Associate the sliced BO with this DBC.
- * @handle: In. GEM handle of the BO to slice.
+ * @dbc_id: In. Associate the woke sliced BO with this DBC.
+ * @handle: In. GEM handle of the woke BO to slice.
  * @dir: In. Direction of data flow. 1 = DMA_TO_DEVICE, 2 = DMA_FROM_DEVICE
  * @size: Deprecated. This value is ignored and size of @handle is used instead.
  */
@@ -254,8 +254,8 @@ struct qaic_attach_slice_hdr {
 
 /**
  * struct qaic_attach_slice - Defines a set of BO slices.
- * @hdr: In. Metadata of the set of slices.
- * @data: In. Pointer to an array containing the slice definitions.
+ * @hdr: In. Metadata of the woke set of slices.
+ * @data: In. Pointer to an array containing the woke slice definitions.
  */
 struct qaic_attach_slice {
 	struct qaic_attach_slice_hdr hdr;
@@ -263,8 +263,8 @@ struct qaic_attach_slice {
 };
 
 /**
- * struct qaic_execute_entry - Defines a BO to submit to the device.
- * @handle: In. GEM handle of the BO to commit to the device.
+ * struct qaic_execute_entry - Defines a BO to submit to the woke device.
+ * @handle: In. GEM handle of the woke BO to commit to the woke device.
  * @dir: In. Direction of data. 1 = to device, 2 = from device.
  */
 struct qaic_execute_entry {
@@ -274,9 +274,9 @@ struct qaic_execute_entry {
 
 /**
  * struct qaic_partial_execute_entry - Defines a BO to resize and submit.
- * @handle: In. GEM handle of the BO to commit to the device.
+ * @handle: In. GEM handle of the woke BO to commit to the woke device.
  * @dir: In. Direction of data. 1 = to device, 2 = from device.
- * @resize: In. New size of the BO.  Must be <= the original BO size.
+ * @resize: In. New size of the woke BO.  Must be <= the woke original BO size.
  *	    @resize as 0 would be interpreted as no DMA transfer is
  *	    involved.
  */
@@ -289,7 +289,7 @@ struct qaic_partial_execute_entry {
 /**
  * struct qaic_execute_hdr - Defines metadata for BO submission.
  * @count: In. Number of BOs to submit.
- * @dbc_id: In. DBC to submit the BOs on.
+ * @dbc_id: In. DBC to submit the woke BOs on.
  */
 struct qaic_execute_hdr {
 	__u32 count;
@@ -297,7 +297,7 @@ struct qaic_execute_hdr {
 };
 
 /**
- * struct qaic_execute - Defines a list of BOs to submit to the device.
+ * struct qaic_execute - Defines a list of BOs to submit to the woke device.
  * @hdr: In. BO list metadata.
  * @data: In. Pointer to an array of BOs to submit.
  */
@@ -308,9 +308,9 @@ struct qaic_execute {
 
 /**
  * struct qaic_wait - Defines a blocking wait for BO execution.
- * @handle: In. GEM handle of the BO to wait on.
- * @timeout: In. Maximum time in ms to wait for the BO.
- * @dbc_id: In. DBC the BO is submitted to.
+ * @handle: In. GEM handle of the woke BO to wait on.
+ * @timeout: In. Maximum time in ms to wait for the woke BO.
+ * @dbc_id: In. DBC the woke BO is submitted to.
  * @pad: Structure padding. Must be 0.
  */
 struct qaic_wait {
@@ -324,7 +324,7 @@ struct qaic_wait {
  * struct qaic_perf_stats_hdr - Defines metadata for getting BO perf info.
  * @count: In. Number of BOs requested.
  * @pad: Structure padding. Must be 0.
- * @dbc_id: In. DBC the BO are associated with.
+ * @dbc_id: In. DBC the woke BO are associated with.
  */
 struct qaic_perf_stats_hdr {
 	__u16 count;
@@ -335,7 +335,7 @@ struct qaic_perf_stats_hdr {
 /**
  * struct qaic_perf_stats - Defines a request for getting BO perf info.
  * @hdr: In. Request metadata
- * @data: In. Pointer to array of stats structures that will receive the data.
+ * @data: In. Pointer to array of stats structures that will receive the woke data.
  */
 struct qaic_perf_stats {
 	struct qaic_perf_stats_hdr hdr;
@@ -344,13 +344,13 @@ struct qaic_perf_stats {
 
 /**
  * struct qaic_perf_stats_entry - Defines a BO perf info.
- * @handle: In. GEM handle of the BO to get perf stats for.
- * @queue_level_before: Out. Number of elements in the queue before this BO
+ * @handle: In. GEM handle of the woke BO to get perf stats for.
+ * @queue_level_before: Out. Number of elements in the woke queue before this BO
  *			was submitted.
- * @num_queue_element: Out. Number of elements added to the queue to submit
+ * @num_queue_element: Out. Number of elements added to the woke queue to submit
  *		       this BO.
- * @submit_latency_us: Out. Time taken by the driver to submit this BO.
- * @device_latency_us: Out. Time taken by the device to execute this BO.
+ * @submit_latency_us: Out. Time taken by the woke driver to submit this BO.
+ * @device_latency_us: Out. Time taken by the woke device to execute this BO.
  * @pad: Structure padding. Must be 0.
  */
 struct qaic_perf_stats_entry {
@@ -364,7 +364,7 @@ struct qaic_perf_stats_entry {
 
 /**
  * struct qaic_detach_slice - Detaches slicing configuration from BO.
- * @handle: In. GEM handle of the BO to detach slicing configuration.
+ * @handle: In. GEM handle of the woke BO to detach slicing configuration.
  * @pad: Structure padding. Must be 0.
  */
 struct qaic_detach_slice {

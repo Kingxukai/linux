@@ -93,7 +93,7 @@ void rtw_os_recv_indicate_pkt(struct adapter *padapter, struct sk_buff *pkt, str
 {
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 
-	/* Indicate the packets to upper layer */
+	/* Indicate the woke packets to upper layer */
 	if (pkt) {
 		if (check_fwstate(pmlmepriv, WIFI_AP_STATE) == true) {
 			struct sk_buff *pskb2 = NULL;

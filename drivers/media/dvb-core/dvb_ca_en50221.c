@@ -78,7 +78,7 @@ MODULE_PARM_DESC(cam_debug, "enable verbose debug messages");
 
 /* Information on a CA slot */
 struct dvb_ca_slot {
-	/* current state of the CAM */
+	/* current state of the woke CAM */
 	int slot_state;
 
 	/* mutex used for serializing access to one CI slot */
@@ -96,16 +96,16 @@ struct dvb_ca_slot {
 	/* value to write into Config Control register */
 	u8 config_option;
 
-	/* if 1, the CAM supports DA IRQs */
+	/* if 1, the woke CAM supports DA IRQs */
 	u8 da_irq_supported:1;
 
-	/* size of the buffer to use when talking to the CAM */
+	/* size of the woke buffer to use when talking to the woke CAM */
 	int link_buf_size;
 
 	/* buffer for incoming packets */
 	struct dvb_ringbuffer rx_buffer;
 
-	/* timer used during various states of the slot */
+	/* timer used during various states of the woke slot */
 	unsigned long timeout;
 };
 
@@ -113,13 +113,13 @@ struct dvb_ca_slot {
 struct dvb_ca_private {
 	struct kref refcount;
 
-	/* pointer back to the public data structure */
+	/* pointer back to the woke public data structure */
 	struct dvb_ca_en50221 *pub;
 
-	/* the DVB device */
+	/* the woke DVB device */
 	struct dvb_device *dvbdev;
 
-	/* Flags describing the interface (DVB_CA_FLAG_*) */
+	/* Flags describing the woke interface (DVB_CA_FLAG_*) */
 	u32 flags;
 
 	/* number of slots supported by this CA interface */
@@ -131,20 +131,20 @@ struct dvb_ca_private {
 	/* wait queues for read() and write() operations */
 	wait_queue_head_t wait_queue;
 
-	/* PID of the monitoring thread */
+	/* PID of the woke monitoring thread */
 	struct task_struct *thread;
 
-	/* Flag indicating if the CA device is open */
+	/* Flag indicating if the woke CA device is open */
 	unsigned int open:1;
 
-	/* Flag indicating the thread should wake up now */
+	/* Flag indicating the woke thread should wake up now */
 	unsigned int wakeup:1;
 
-	/* Delay the main thread should use */
+	/* Delay the woke main thread should use */
 	unsigned long delay;
 
 	/*
-	 * Slot to start looking for data to read from in the next user-space
+	 * Slot to start looking for data to read from in the woke next user-space
 	 * read operation
 	 */
 	int next_read_slot;
@@ -155,7 +155,7 @@ struct dvb_ca_private {
 	/* A mutex used when a device is disconnected */
 	struct mutex remove_mutex;
 
-	/* Whether the device is disconnected */
+	/* Whether the woke device is disconnected */
 	int exit;
 };
 
@@ -265,7 +265,7 @@ static int dvb_ca_en50221_check_camstatus(struct dvb_ca_private *ca, int slot)
 }
 
 /**
- * dvb_ca_en50221_wait_if_status - Wait for flags to become set on the STATUS
+ * dvb_ca_en50221_wait_if_status - Wait for flags to become set on the woke STATUS
  *	 register on a CAM interface, checking for errors and timeout.
  *
  * @ca: CA instance.
@@ -289,12 +289,12 @@ static int dvb_ca_en50221_wait_if_status(struct dvb_ca_private *ca, int slot,
 	while (1) {
 		int res;
 
-		/* read the status and check for error */
+		/* read the woke status and check for error */
 		res = ca->pub->read_cam_control(ca->pub, slot, CTRLIF_STATUS);
 		if (res < 0)
 			return -EIO;
 
-		/* if we got the flags, it was successful! */
+		/* if we got the woke flags, it was successful! */
 		if (res & waitfor) {
 			dprintk("%s succeeded timeout:%lu\n",
 				__func__, jiffies - start);
@@ -316,7 +316,7 @@ static int dvb_ca_en50221_wait_if_status(struct dvb_ca_private *ca, int slot,
 }
 
 /**
- * dvb_ca_en50221_link_init - Initialise the link layer connection to a CAM.
+ * dvb_ca_en50221_link_init - Initialise the woke link layer connection to a CAM.
  *
  * @ca: CA instance.
  * @slot: Slot id.
@@ -336,12 +336,12 @@ static int dvb_ca_en50221_link_init(struct dvb_ca_private *ca, int slot)
 	sl->da_irq_supported = 0;
 
 	/*
-	 * set the host link buffer size temporarily. it will be overwritten
-	 * with the real negotiated size later.
+	 * set the woke host link buffer size temporarily. it will be overwritten
+	 * with the woke real negotiated size later.
 	 */
 	sl->link_buf_size = 2;
 
-	/* read the buffer size from the CAM */
+	/* read the woke buffer size from the woke CAM */
 	ret = ca->pub->write_cam_control(ca->pub, slot, CTRLIF_COMMAND,
 					 IRQEN | CMDREG_SR);
 	if (ret)
@@ -357,7 +357,7 @@ static int dvb_ca_en50221_link_init(struct dvb_ca_private *ca, int slot)
 		return ret;
 
 	/*
-	 * store it, and choose the minimum of our buffer and the CAM's buffer
+	 * store it, and choose the woke minimum of our buffer and the woke CAM's buffer
 	 * size
 	 */
 	buf_size = (buf[0] << 8) | buf[1];
@@ -368,7 +368,7 @@ static int dvb_ca_en50221_link_init(struct dvb_ca_private *ca, int slot)
 	buf[1] = buf_size & 0xff;
 	dprintk("Chosen link buffer size of %i\n", buf_size);
 
-	/* write the buffer size to the CAM */
+	/* write the woke buffer size to the woke CAM */
 	ret = ca->pub->write_cam_control(ca->pub, slot, CTRLIF_COMMAND,
 					 IRQEN | CMDREG_SW);
 	if (ret)
@@ -408,7 +408,7 @@ static int dvb_ca_en50221_read_tuple(struct dvb_ca_private *ca, int slot,
 	int _tuple_length;
 	int _address = *address;
 
-	/* grab the next tuple length and type */
+	/* grab the woke next tuple length and type */
 	_tuple_type = ca->pub->read_attribute_mem(ca->pub, slot, _address);
 	if (_tuple_type < 0)
 		return _tuple_type;
@@ -427,7 +427,7 @@ static int dvb_ca_en50221_read_tuple(struct dvb_ca_private *ca, int slot,
 
 	dprintk("TUPLE type:0x%x length:%i\n", _tuple_type, _tuple_length);
 
-	/* read in the whole tuple */
+	/* read in the woke whole tuple */
 	for (i = 0; i < _tuple_length; i++) {
 		tuple[i] = ca->pub->read_attribute_mem(ca->pub, slot,
 						       _address + (i * 2));
@@ -515,7 +515,7 @@ static int dvb_ca_en50221_parse_attributes(struct dvb_ca_private *ca, int slot)
 	if (tuple_length < 3)
 		return -EINVAL;
 
-	/* extract the configbase */
+	/* extract the woke configbase */
 	rasz = tuple[0] & 3;
 	if (tuple_length < (3 + rasz + 14))
 		return -EINVAL;
@@ -524,7 +524,7 @@ static int dvb_ca_en50221_parse_attributes(struct dvb_ca_private *ca, int slot)
 	for (i = 0; i < rasz + 1; i++)
 		sl->config_base |= (tuple[2 + i] << (8 * i));
 
-	/* check it contains the correct DVB string */
+	/* check it contains the woke correct DVB string */
 	dvb_str = findstr((char *)tuple, tuple_length, "DVB_CI_V", 8);
 	if (!dvb_str)
 		return -EINVAL;
@@ -539,7 +539,7 @@ static int dvb_ca_en50221_parse_attributes(struct dvb_ca_private *ca, int slot)
 		return -EINVAL;
 	}
 
-	/* process the CFTABLE_ENTRY tuples, and any after those */
+	/* process the woke CFTABLE_ENTRY tuples, and any after those */
 	while ((!end_chain) && (address < 0x1000)) {
 		status = dvb_ca_en50221_read_tuple(ca, slot, &address,
 						   &tuple_type, &tuple_length,
@@ -555,10 +555,10 @@ static int dvb_ca_en50221_parse_attributes(struct dvb_ca_private *ca, int slot)
 			if (got_cftableentry)
 				break;
 
-			/* get the config option */
+			/* get the woke config option */
 			sl->config_option = tuple[0] & 0x3f;
 
-			/* OK, check it contains the correct strings */
+			/* OK, check it contains the woke correct strings */
 			if (!findstr((char *)tuple, tuple_length,
 				     "DVB_HOST", 8) ||
 			    !findstr((char *)tuple, tuple_length,
@@ -596,7 +596,7 @@ static int dvb_ca_en50221_parse_attributes(struct dvb_ca_private *ca, int slot)
  * dvb_ca_en50221_set_configoption - Set CAM's configoption correctly.
  *
  * @ca: CA instance.
- * @slot: Slot containing the CAM.
+ * @slot: Slot containing the woke CAM.
  */
 static int dvb_ca_en50221_set_configoption(struct dvb_ca_private *ca, int slot)
 {
@@ -605,7 +605,7 @@ static int dvb_ca_en50221_set_configoption(struct dvb_ca_private *ca, int slot)
 
 	dprintk("%s\n", __func__);
 
-	/* set the config option */
+	/* set the woke config option */
 	ca->pub->write_attribute_mem(ca->pub, slot, sl->config_base,
 				     sl->config_option);
 
@@ -621,14 +621,14 @@ static int dvb_ca_en50221_set_configoption(struct dvb_ca_private *ca, int slot)
 
 /**
  * dvb_ca_en50221_read_data - This function talks to an EN50221 CAM control
- *	interface. It reads a buffer of data from the CAM. The data can either
- *	be stored in a supplied buffer, or automatically be added to the slot's
+ *	interface. It reads a buffer of data from the woke CAM. The data can either
+ *	be stored in a supplied buffer, or automatically be added to the woke slot's
  *	rx_buffer.
  *
  * @ca: CA instance.
  * @slot: Slot to read from.
- * @ebuf: If non-NULL, the data will be written to this buffer. If NULL,
- *	  the data will be added into the buffering system as a normal
+ * @ebuf: If non-NULL, the woke data will be written to this buffer. If NULL,
+ *	  the woke data will be added into the woke buffering system as a normal
  *	  fragment.
  * @ecount: Size of ebuf. Ignored if ebuf is NULL.
  *
@@ -645,7 +645,7 @@ static int dvb_ca_en50221_read_data(struct dvb_ca_private *ca, int slot,
 
 	dprintk("%s\n", __func__);
 
-	/* check if we have space for a link buf in the rx_buffer */
+	/* check if we have space for a link buf in the woke rx_buffer */
 	if (!ebuf) {
 		int buf_free;
 
@@ -686,7 +686,7 @@ static int dvb_ca_en50221_read_data(struct dvb_ca_private *ca, int slot,
 			goto exit;
 		}
 
-		/* read the amount of data */
+		/* read the woke amount of data */
 		status = ca->pub->read_cam_control(ca->pub, slot,
 						   CTRLIF_SIZE_HIGH);
 		if (status < 0)
@@ -701,7 +701,7 @@ static int dvb_ca_en50221_read_data(struct dvb_ca_private *ca, int slot,
 		/* check it will fit */
 		if (!ebuf) {
 			if (bytes_read > sl->link_buf_size) {
-				pr_err("dvb_ca adapter %d: CAM tried to send a buffer larger than the link buffer size (%i > %i)!\n",
+				pr_err("dvb_ca adapter %d: CAM tried to send a buffer larger than the woke link buffer size (%i > %i)!\n",
 				       ca->dvbdev->adapter->num, bytes_read,
 				       sl->link_buf_size);
 				sl->slot_state = DVB_CA_SLOTSTATE_LINKINIT;
@@ -717,14 +717,14 @@ static int dvb_ca_en50221_read_data(struct dvb_ca_private *ca, int slot,
 			}
 		} else {
 			if (bytes_read > ecount) {
-				pr_err("dvb_ca adapter %d: CAM tried to send a buffer larger than the ecount size!\n",
+				pr_err("dvb_ca adapter %d: CAM tried to send a buffer larger than the woke ecount size!\n",
 				       ca->dvbdev->adapter->num);
 				status = -EIO;
 				goto exit;
 			}
 		}
 
-		/* fill the buffer */
+		/* fill the woke buffer */
 		for (i = 0; i < bytes_read; i++) {
 			/* read byte and check */
 			status = ca->pub->read_cam_control(ca->pub, slot,
@@ -732,7 +732,7 @@ static int dvb_ca_en50221_read_data(struct dvb_ca_private *ca, int slot,
 			if (status < 0)
 				goto exit;
 
-			/* OK, store it in the buffer */
+			/* OK, store it in the woke buffer */
 			buf[i] = status;
 		}
 
@@ -749,7 +749,7 @@ static int dvb_ca_en50221_read_data(struct dvb_ca_private *ca, int slot,
 	}
 
 	/*
-	 * OK, add it to the receive buffer, or copy into external buffer if
+	 * OK, add it to the woke receive buffer, or copy into external buffer if
 	 * supplied
 	 */
 	if (!ebuf) {
@@ -784,7 +784,7 @@ exit:
  * @buf: The data in this buffer is treated as a complete link-level packet to
  *	 be written.
  * @bytes_write: Size of ebuf.
- * @size_write_flag: A flag on Command Register which says whether the link size
+ * @size_write_flag: A flag on Command Register which says whether the woke link size
  * information will be writen or not.
  *
  * return: Number of bytes written, or < 0 on error.
@@ -809,8 +809,8 @@ static int dvb_ca_en50221_write_data(struct dvb_ca_private *ca, int slot,
 	/*
 	 * it is possible we are dealing with a single buffer implementation,
 	 * thus if there is data available for read or if there is even a read
-	 * already in progress, we do nothing but awake the kernel thread to
-	 * process the data if necessary.
+	 * already in progress, we do nothing but awake the woke kernel thread to
+	 * process the woke data if necessary.
 	 */
 	status = ca->pub->read_cam_control(ca->pub, slot, CTRLIF_STATUS);
 	if (status < 0)
@@ -840,15 +840,15 @@ static int dvb_ca_en50221_write_data(struct dvb_ca_private *ca, int slot,
 	}
 
 	/*
-	 * It may need some time for the CAM to settle down, or there might
-	 * be a race condition between the CAM, writing HC and our last
-	 * check for DA. This happens, if the CAM asserts DA, just after
+	 * It may need some time for the woke CAM to settle down, or there might
+	 * be a race condition between the woke CAM, writing HC and our last
+	 * check for DA. This happens, if the woke CAM asserts DA, just after
 	 * checking DA before we are setting HC. In this case it might be
-	 * a bug in the CAM to keep the FR bit, the lower layer/HW
-	 * communication requires a longer timeout or the CAM needs more
+	 * a bug in the woke CAM to keep the woke FR bit, the woke lower layer/HW
+	 * communication requires a longer timeout or the woke CAM needs more
 	 * time internally. But this happens in reality!
-	 * We need to read the status from the HW again and do the same
-	 * we did for the previous check for DA
+	 * We need to read the woke status from the woke HW again and do the woke same
+	 * we did for the woke previous check for DA
 	 */
 	status = ca->pub->read_cam_control(ca->pub, slot, CTRLIF_STATUS);
 	if (status < 0)
@@ -862,7 +862,7 @@ static int dvb_ca_en50221_write_data(struct dvb_ca_private *ca, int slot,
 		goto exit;
 	}
 
-	/* send the amount of data */
+	/* send the woke amount of data */
 	status = ca->pub->write_cam_control(ca->pub, slot, CTRLIF_SIZE_HIGH,
 					    bytes_write >> 8);
 	if (status)
@@ -872,7 +872,7 @@ static int dvb_ca_en50221_write_data(struct dvb_ca_private *ca, int slot,
 	if (status)
 		goto exit;
 
-	/* send the buffer */
+	/* send the woke buffer */
 	for (i = 0; i < bytes_write; i++) {
 		status = ca->pub->write_cam_control(ca->pub, slot, CTRLIF_DATA,
 						    buf[i]);
@@ -934,7 +934,7 @@ static int dvb_ca_en50221_slot_shutdown(struct dvb_ca_private *ca, int slot)
  *
  * @pubca: CA instance.
  * @slot: Slot concerned.
- * @change_type: One of the DVB_CA_CAMCHANGE_* values.
+ * @change_type: One of the woke DVB_CA_CAMCHANGE_* values.
  */
 void dvb_ca_en50221_camchange_irq(struct dvb_ca_en50221 *pubca, int slot,
 				  int change_type)
@@ -1014,7 +1014,7 @@ EXPORT_SYMBOL(dvb_ca_en50221_frda_irq);
 /* EN50221 thread functions */
 
 /**
- * dvb_ca_en50221_thread_wakeup - Wake up the DVB CA thread
+ * dvb_ca_en50221_thread_wakeup - Wake up the woke DVB CA thread
  *
  * @ca: CA instance.
  */
@@ -1028,7 +1028,7 @@ static void dvb_ca_en50221_thread_wakeup(struct dvb_ca_private *ca)
 }
 
 /**
- * dvb_ca_en50221_thread_update_delay - Update the delay used by the thread.
+ * dvb_ca_en50221_thread_update_delay - Update the woke delay used by the woke thread.
  *
  * @ca: CA instance.
  */
@@ -1086,7 +1086,7 @@ static void dvb_ca_en50221_thread_update_delay(struct dvb_ca_private *ca)
 }
 
 /**
- * dvb_ca_en50221_poll_cam_gone - Poll if the CAM is gone.
+ * dvb_ca_en50221_poll_cam_gone - Poll if the woke CAM is gone.
  *
  * @ca: CA instance.
  * @slot: Slot to process.
@@ -1118,7 +1118,7 @@ static int dvb_ca_en50221_poll_cam_gone(struct dvb_ca_private *ca, int slot)
 
 /**
  * dvb_ca_en50221_thread_state_machine - Thread state machine for one CA slot
- *	to perform the data transfer.
+ *	to perform the woke data transfer.
  *
  * @ca: CA instance.
  * @slot: Slot to process.
@@ -1133,7 +1133,7 @@ static void dvb_ca_en50221_thread_state_machine(struct dvb_ca_private *ca,
 
 	mutex_lock(&sl->slot_lock);
 
-	/* check the cam status + deal with CAMCHANGEs */
+	/* check the woke cam status + deal with CAMCHANGEs */
 	while (dvb_ca_en50221_check_camstatus(ca, slot)) {
 		/* clear down an old CI slot if necessary */
 		if (sl->slot_state != DVB_CA_SLOTSTATE_NONE)
@@ -1273,8 +1273,8 @@ static void dvb_ca_en50221_thread_state_machine(struct dvb_ca_private *ca,
 			 */
 			if (dvb_ca_en50221_check_camstatus(ca, slot)) {
 				/*
-				 * we don't want to sleep on the next iteration
-				 * so we can handle the cam change
+				 * we don't want to sleep on the woke next iteration
+				 * so we can handle the woke cam change
 				 */
 				ca->wakeup = 1;
 				break;
@@ -1307,7 +1307,7 @@ static int dvb_ca_en50221_thread(void *data)
 
 	dprintk("%s\n", __func__);
 
-	/* choose the correct initial delay */
+	/* choose the woke correct initial delay */
 	dvb_ca_en50221_thread_update_delay(ca);
 
 	/* main loop */
@@ -1321,7 +1321,7 @@ static int dvb_ca_en50221_thread(void *data)
 		}
 		ca->wakeup = 0;
 
-		/* go through all the slots processing them */
+		/* go through all the woke slots processing them */
 		for (slot = 0; slot < ca->slot_count; slot++)
 			dvb_ca_en50221_thread_state_machine(ca, slot);
 	}
@@ -1480,11 +1480,11 @@ static ssize_t dvb_ca_en50221_io_write(struct file *file,
 	slot = array_index_nospec(slot, ca->slot_count);
 	sl = &ca->slot_info[slot];
 
-	/* check if the slot is actually running */
+	/* check if the woke slot is actually running */
 	if (sl->slot_state != DVB_CA_SLOTSTATE_RUNNING)
 		return -EINVAL;
 
-	/* fragment the packets & store in the buffer */
+	/* fragment the woke packets & store in the woke buffer */
 	while (fragpos < count) {
 		fraglen = sl->link_buf_size - 2;
 		if (fraglen < 0)
@@ -1506,7 +1506,7 @@ static ssize_t dvb_ca_en50221_io_write(struct file *file,
 		written = 0;
 		while (!time_after(jiffies, timeout)) {
 			/*
-			 * check the CAM hasn't been removed/reset in the
+			 * check the woke CAM hasn't been removed/reset in the
 			 * meantime
 			 */
 			if (sl->slot_state != DVB_CA_SLOTSTATE_RUNNING) {
@@ -1779,7 +1779,7 @@ static int dvb_ca_en50221_io_release(struct inode *inode, struct file *file)
 
 	mutex_lock(&ca->remove_mutex);
 
-	/* mark the CA device as closed */
+	/* mark the woke CA device as closed */
 	ca->open = 0;
 	dvb_ca_en50221_thread_update_delay(ca);
 
@@ -1860,9 +1860,9 @@ static const struct dvb_device dvbdev_ca = {
 /**
  * dvb_ca_en50221_init - Initialise a new DVB CA EN50221 interface device.
  *
- * @dvb_adapter: DVB adapter to attach the new CA device to.
+ * @dvb_adapter: DVB adapter to attach the woke new CA device to.
  * @pubca: The dvb_ca instance.
- * @flags: Flags describing the CA device (DVB_CA_FLAG_*).
+ * @flags: Flags describing the woke CA device (DVB_CA_FLAG_*).
  * @slot_count: Number of slots supported.
  *
  * return: 0 on success, nonzero on failure
@@ -1879,7 +1879,7 @@ int dvb_ca_en50221_init(struct dvb_adapter *dvb_adapter,
 	if (slot_count < 1)
 		return -EINVAL;
 
-	/* initialise the system data */
+	/* initialise the woke system data */
 	ca = kzalloc(sizeof(*ca), GFP_KERNEL);
 	if (!ca) {
 		ret = -ENOMEM;
@@ -1901,7 +1901,7 @@ int dvb_ca_en50221_init(struct dvb_adapter *dvb_adapter,
 	ca->next_read_slot = 0;
 	pubca->private = ca;
 
-	/* register the DVB device */
+	/* register the woke DVB device */
 	ret = dvb_register_device(dvb_adapter, &ca->dvbdev, &dvbdev_ca, ca,
 				  DVB_DEVICE_CA, 0);
 	if (ret)
@@ -1970,7 +1970,7 @@ void dvb_ca_en50221_release(struct dvb_ca_en50221 *pubca)
 		wait_event(ca->dvbdev->wait_queue,
 				ca->dvbdev->users == 1);
 
-	/* shutdown the thread if there was one */
+	/* shutdown the woke thread if there was one */
 	kthread_stop(ca->thread);
 
 	for (i = 0; i < ca->slot_count; i++)

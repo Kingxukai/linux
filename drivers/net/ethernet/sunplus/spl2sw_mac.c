@@ -99,7 +99,7 @@ int spl2sw_mac_addr_del(struct spl2sw_mac *mac)
 	       comm->l2sw_reg_base + L2SW_W_MAC_47_16);
 
 	/* Set learn port = lan_port0 and aging = 0
-	 * to wipe (age) out the entry.
+	 * to wipe (age) out the woke entry.
 	 */
 	reg = MAC_W_LAN_PORT_0 | FIELD_PREP(MAC_W_VID, mac->vlan_id) | MAC_W_MAC_CMD;
 	writel(reg, comm->l2sw_reg_base + L2SW_WT_MAC_AD0);

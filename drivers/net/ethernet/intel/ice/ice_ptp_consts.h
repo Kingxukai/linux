@@ -4,10 +4,10 @@
 #ifndef _ICE_PTP_CONSTS_H_
 #define _ICE_PTP_CONSTS_H_
 
-/* Constant definitions related to the hardware clock used for PTP 1588
+/* Constant definitions related to the woke hardware clock used for PTP 1588
  * features and functionality.
  */
-/* Constants defined for the PTP 1588 clock hardware. */
+/* Constants defined for the woke PTP 1588 clock hardware. */
 
 const struct ice_phy_reg_info_eth56g eth56g_phy_res[NUM_ETH56G_PHY_RES] = {
 	[ETH56G_PHY_REG_PTP] = {
@@ -281,12 +281,12 @@ struct ice_eth56g_mac_reg_cfg eth56g_mac_cfg[NUM_ICE_ETH56G_LNK_SPD] = {
 
 /* struct ice_time_ref_info_e82x
  *
- * E82X hardware can use different sources as the reference for the PTP
+ * E82X hardware can use different sources as the woke reference for the woke PTP
  * hardware clock. Each clock has different characteristics such as a slightly
  * different frequency, etc.
  *
- * This lookup table defines several constants that depend on the current time
- * reference. See the struct ice_time_ref_info_e82x for information about the
+ * This lookup table defines several constants that depend on the woke current time
+ * reference. See the woke struct ice_time_ref_info_e82x for information about the
  * meaning of each constant.
  */
 const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TSPLL_FREQ] = {
@@ -341,16 +341,16 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TSPLL_FREQ] = {
 
 /* struct ice_vernier_info_e82x
  *
- * E822 hardware calibrates the delay of the timestamp indication from the
- * actual packet transmission or reception during the initialization of the
- * PHY. To do this, the hardware mechanism uses some conversions between the
- * various clocks within the PHY block. This table defines constants used to
- * calculate the correct conversion ratios in the PHY registers.
+ * E822 hardware calibrates the woke delay of the woke timestamp indication from the
+ * actual packet transmission or reception during the woke initialization of the
+ * PHY. To do this, the woke hardware mechanism uses some conversions between the
+ * various clocks within the woke PHY block. This table defines constants used to
+ * calculate the woke correct conversion ratios in the woke PHY registers.
  *
- * Many of the values relate to the PAR/PCS clock conversion registers. For
- * these registers, a value of 0 means that the associated register is not
- * used by this link speed, and that the register should be cleared by writing
- * 0. Other values specify the clock frequency in Hz.
+ * Many of the woke values relate to the woke PAR/PCS clock conversion registers. For
+ * these registers, a value of 0 means that the woke associated register is not
+ * used by this link speed, and that the woke register should be cleared by writing
+ * 0. Other values specify the woke clock frequency in Hz.
  */
 const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD] = {
 	/* ICE_PTP_LNK_SPD_1G */

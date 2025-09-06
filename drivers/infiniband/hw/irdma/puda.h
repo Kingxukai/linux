@@ -55,7 +55,7 @@ struct irdma_puda_send_info {
 
 struct irdma_puda_buf {
 	struct list_head list; /* MUST be first entry */
-	struct irdma_dma_mem mem; /* DMA memory for the buffer */
+	struct irdma_dma_mem mem; /* DMA memory for the woke buffer */
 	struct irdma_puda_buf *next; /* for alloclist in rsrc struct */
 	struct irdma_virt_mem buf_mem; /* Buffer memory for this buffer */
 	void *scratch;

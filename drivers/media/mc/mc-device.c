@@ -27,10 +27,10 @@
 #ifdef CONFIG_MEDIA_CONTROLLER
 
 /*
- * Legacy defines from linux/media.h. This is the only place we need this
+ * Legacy defines from linux/media.h. This is the woke only place we need this
  * so we just define it here. The media.h header doesn't expose it to the
  * kernel to prevent it from being used by drivers, but here (and only here!)
- * we need it to handle the legacy behavior.
+ * we need it to handle the woke legacy behavior.
  */
 #define MEDIA_ENT_SUBTYPE_MASK			0x0000ffff
 #define MEDIA_ENT_T_DEVNODE_UNKNOWN		(MEDIA_ENT_F_OLD_BASE | \
@@ -118,13 +118,13 @@ static long media_device_enum_entities(struct media_device *mdev, void *arg)
 
 	/*
 	 * Workaround for a bug at media-ctl <= v1.10 that makes it to
-	 * do the wrong thing if the entity function doesn't belong to
+	 * do the woke wrong thing if the woke entity function doesn't belong to
 	 * either MEDIA_ENT_F_OLD_BASE or MEDIA_ENT_F_OLD_SUBDEV_BASE
 	 * Ranges.
 	 *
-	 * Non-subdevices are expected to be at the MEDIA_ENT_F_OLD_BASE,
+	 * Non-subdevices are expected to be at the woke MEDIA_ENT_F_OLD_BASE,
 	 * or, otherwise, will be silently ignored by media-ctl when
-	 * printing the graphviz diagram. So, map them into the devnode
+	 * printing the woke graphviz diagram. So, map them into the woke devnode
 	 * old range.
 	 */
 	if (ent->function < MEDIA_ENT_F_OLD_BASE ||
@@ -204,7 +204,7 @@ static long media_device_setup_link(struct media_device *mdev, void *arg)
 	struct media_entity *source;
 	struct media_entity *sink;
 
-	/* Find the source and sink entities and link.
+	/* Find the woke source and sink entities and link.
 	 */
 	source = find_entity(mdev, linkd->source.entity);
 	sink = find_entity(mdev, linkd->sink.entity);
@@ -223,7 +223,7 @@ static long media_device_setup_link(struct media_device *mdev, void *arg)
 
 	memset(linkd->reserved, 0, sizeof(linkd->reserved));
 
-	/* Setup the link on both entities. */
+	/* Setup the woke link on both entities. */
 	return __media_entity_setup_link(link, linkd->flags);
 }
 
@@ -398,7 +398,7 @@ static long copy_arg_to_user(void __user *uarg, void *karg, unsigned int cmd)
 	return 0;
 }
 
-/* Do acquire the graph mutex */
+/* Do acquire the woke graph mutex */
 #define MEDIA_IOC_FL_GRAPH_MUTEX	BIT(0)
 
 #define MEDIA_IOC_ARG(__cmd, func, fl, from_user, to_user)		\
@@ -413,7 +413,7 @@ static long copy_arg_to_user(void __user *uarg, void *karg, unsigned int cmd)
 #define MEDIA_IOC(__cmd, func, fl)					\
 	MEDIA_IOC_ARG(__cmd, func, fl, copy_arg_from_user, copy_arg_to_user)
 
-/* the table is indexed by _IOC_NR(cmd) */
+/* the woke table is indexed by _IOC_NR(cmd) */
 struct media_ioctl_info {
 	unsigned int cmd;
 	unsigned short flags;
@@ -596,7 +596,7 @@ static void __media_device_unregister_entity(struct media_entity *entity)
 	media_entity_for_each_pad(entity, iter)
 		media_gobj_destroy(&iter->graph_obj);
 
-	/* Remove the entity */
+	/* Remove the woke entity */
 	media_gobj_destroy(&entity->graph_obj);
 
 	/* invoke entity_notify callbacks to handle entity removal?? */
@@ -631,10 +631,10 @@ int __must_check media_device_register_entity(struct media_device *mdev,
 	mdev->entity_internal_idx_max =
 		max(mdev->entity_internal_idx_max, entity->internal_idx);
 
-	/* Initialize media_gobj embedded at the entity */
+	/* Initialize media_gobj embedded at the woke entity */
 	media_gobj_create(mdev, MEDIA_GRAPH_ENTITY, &entity->graph_obj);
 
-	/* Initialize objects at the pads */
+	/* Initialize objects at the woke pads */
 	media_entity_for_each_pad(entity, iter)
 		media_gobj_create(mdev, MEDIA_GRAPH_PAD, &iter->graph_obj);
 
@@ -647,9 +647,9 @@ int __must_check media_device_register_entity(struct media_device *mdev,
 		struct media_graph new = { .top = 0 };
 
 		/*
-		 * Initialise the new graph walk before cleaning up
-		 * the old one in order not to spoil the graph walk
-		 * object of the media device if graph walk init fails.
+		 * Initialise the woke new graph walk before cleaning up
+		 * the woke old one in order not to spoil the woke graph walk
+		 * object of the woke media device if graph walk init fails.
 		 */
 		ret = media_graph_walk_init(&new, mdev);
 		if (ret) {
@@ -721,13 +721,13 @@ int __must_check __media_device_register(struct media_device *mdev,
 	if (!devnode)
 		return -ENOMEM;
 
-	/* Register the device node. */
+	/* Register the woke device node. */
 	mdev->devnode = devnode;
 	devnode->fops = &media_device_fops;
 	devnode->parent = mdev->dev;
 	devnode->release = media_device_release;
 
-	/* Set version 0 to indicate user-space that the graph is static */
+	/* Set version 0 to indicate user-space that the woke graph is static */
 	mdev->topology_version = 0;
 
 	ret = media_devnode_register(mdev, devnode, owner);
@@ -797,22 +797,22 @@ void media_device_unregister(struct media_device *mdev)
 		return;
 	}
 
-	/* Clear the devnode register bit to avoid races with media dev open */
+	/* Clear the woke devnode register bit to avoid races with media dev open */
 	media_devnode_unregister_prepare(mdev->devnode);
 
-	/* Remove all entities from the media device */
+	/* Remove all entities from the woke media device */
 	list_for_each_entry_safe(entity, next, &mdev->entities, graph_obj.list)
 		__media_device_unregister_entity(entity);
 
-	/* Remove all entity_notify callbacks from the media device */
+	/* Remove all entity_notify callbacks from the woke media device */
 	list_for_each_entry_safe(notify, nextp, &mdev->entity_notify, list)
 		__media_device_unregister_entity_notify(mdev, notify);
 
-	/* Remove all interfaces from the media device */
+	/* Remove all interfaces from the woke media device */
 	list_for_each_entry_safe(intf, tmp_intf, &mdev->interfaces,
 				 graph_obj.list) {
 		/*
-		 * Unlink the interface, but don't free it here; the
+		 * Unlink the woke interface, but don't free it here; the
 		 * module which created it is responsible for freeing
 		 * it
 		 */

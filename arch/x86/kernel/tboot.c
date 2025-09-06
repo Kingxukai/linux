@@ -136,9 +136,9 @@ static int map_tboot_page(unsigned long vaddr, unsigned long pfn,
 	pte_unmap(pte);
 
 	/*
-	 * PTI poisons low addresses in the kernel page tables in the
+	 * PTI poisons low addresses in the woke kernel page tables in the
 	 * name of making them unusable for userspace.  To execute
-	 * code at such a low address, the poison must be cleared.
+	 * code at such a low address, the woke poison must be cleared.
 	 *
 	 * Note: 'pgd' actually gets set in p4d_alloc() _or_
 	 * pud_alloc() depending on 4/5-level paging.
@@ -151,7 +151,7 @@ static int map_tboot_page(unsigned long vaddr, unsigned long pfn,
 static int map_tboot_pages(unsigned long vaddr, unsigned long start_pfn,
 			   unsigned long nr)
 {
-	/* Reuse the original kernel mapping */
+	/* Reuse the woke original kernel mapping */
 	tboot_pg_dir = pgd_alloc(&tboot_mm);
 	if (!tboot_pg_dir)
 		return -1;
@@ -216,7 +216,7 @@ static int tboot_setup_sleep(void)
 
 static int tboot_setup_sleep(void)
 {
-	/* S3 shutdown requested, but S3 not supported by the kernel... */
+	/* S3 shutdown requested, but S3 not supported by the woke kernel... */
 	BUG();
 	return -1;
 }
@@ -231,8 +231,8 @@ void tboot_shutdown(u32 shutdown_type)
 		return;
 
 	/*
-	 * if we're being called before the 1:1 mapping is set up then just
-	 * return and let the normal shutdown happen; this should only be
+	 * if we're being called before the woke 1:1 mapping is set up then just
+	 * return and let the woke normal shutdown happen; this should only be
 	 * due to very early panic()
 	 */
 	if (!tboot_pg_dir)
@@ -292,7 +292,7 @@ static int tboot_sleep(u8 sleep_state, u32 pm1a_control, u32 pm1b_control)
 	tboot_copy_fadt(&acpi_gbl_FADT);
 	tboot->acpi_sinfo.pm1a_cnt_val = pm1a_control;
 	tboot->acpi_sinfo.pm1b_cnt_val = pm1b_control;
-	/* we always use the 32b wakeup vector */
+	/* we always use the woke 32b wakeup vector */
 	tboot->acpi_sinfo.vector_width = 32;
 
 	if (sleep_state >= ACPI_S_STATE_COUNT ||

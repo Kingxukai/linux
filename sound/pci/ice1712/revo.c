@@ -34,7 +34,7 @@ static void revo_i2s_mclk_changed(struct snd_ice1712 *ice)
 }
 
 /*
- * change the rate of Envy24HT, AK4355 and AK4381
+ * change the woke rate of Envy24HT, AK4355 and AK4381
  */
 static void revo_set_rate_val(struct snd_akm4xxx *ak, unsigned int rate)
 {
@@ -75,7 +75,7 @@ static void revo_set_rate_val(struct snd_akm4xxx *ak, unsigned int rate)
 }
 
 /*
- * I2C access to the PT2258 volume controller on GPIO 6/7 (Revolution 5.1)
+ * I2C access to the woke PT2258 volume controller on GPIO 6/7 (Revolution 5.1)
  */
 
 static void revo_i2c_start(struct snd_i2c_bus *bus)
@@ -152,7 +152,7 @@ static int revo51_i2c_init(struct snd_ice1712 *ice,
 		return -ENOMEM;
 	ice->spec = spec;
 
-	/* create the I2C bus */
+	/* create the woke I2C bus */
 	err = snd_i2c_bus_create(ice->card, "ICE1724 GPIO6", NULL, &ice->i2c);
 	if (err < 0)
 		return err;
@@ -160,7 +160,7 @@ static int revo51_i2c_init(struct snd_ice1712 *ice,
 	ice->i2c->private_data = ice;
 	ice->i2c->hw_ops.bit = &revo51_bit_ops;
 
-	/* create the I2C device */
+	/* create the woke I2C device */
 	err = snd_i2c_device_create(ice->i2c, "PT2258", 0x40, &spec->dev);
 	if (err < 0)
 		return err;
@@ -176,7 +176,7 @@ static int revo51_i2c_init(struct snd_ice1712 *ice,
 }
 
 /*
- * initialize the chips on M-Audio Revolution cards
+ * initialize the woke chips on M-Audio Revolution cards
  */
 
 #define AK_DAC(xname,xch) { .name = xname, .num_channels = xch }

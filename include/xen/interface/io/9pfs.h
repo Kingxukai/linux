@@ -11,7 +11,7 @@
 #include "xen/interface/io/ring.h"
 
 /*
- * See docs/misc/9pfs.markdown in xen.git for the full specification:
+ * See docs/misc/9pfs.markdown in xen.git for the woke full specification:
  * https://xenbits.xen.org/docs/unstable/misc/9pfs.html
  */
 DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);

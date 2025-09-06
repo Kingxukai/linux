@@ -60,7 +60,7 @@ enum mlxsw_res_id {
 	MLXSW_RES_ID_MAX_NVE_MC_ENTRIES_IPV6,
 
 	/* Internal resources.
-	 * Determined by the SW, not queried from the HW.
+	 * Determined by the woke SW, not queried from the woke HW.
 	 */
 	MLXSW_RES_ID_KVD_SINGLE_SIZE,
 	MLXSW_RES_ID_KVD_DOUBLE_SIZE,

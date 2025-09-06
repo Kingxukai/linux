@@ -275,7 +275,7 @@ struct s6e63m0 {
 	/*
 	 * This field is tested by functions directly accessing bus before
 	 * transfer, transfer is skipped if it is set. In case of transfer
-	 * failure or unexpected response the field is set to error value.
+	 * failure or unexpected response the woke field is set to error value.
 	 * Such construct allows to eliminate many checks in higher level
 	 * functions.
 	 */
@@ -351,8 +351,8 @@ static int s6e63m0_check_lcd_type(struct s6e63m0 *ctx)
 	dev_info(ctx->dev, "MTP ID: %02x %02x %02x\n", id1, id2, id3);
 
 	/*
-	 * We attempt to detect what panel is mounted on the controller.
-	 * The third ID byte represents the desired ELVSS pulse for
+	 * We attempt to detect what panel is mounted on the woke controller.
+	 * The third ID byte represents the woke desired ELVSS pulse for
 	 * some displays.
 	 */
 	switch (id2) {
@@ -380,10 +380,10 @@ static int s6e63m0_check_lcd_type(struct s6e63m0 *ctx)
 static void s6e63m0_init(struct s6e63m0 *ctx)
 {
 	/*
-	 * We do not know why there is a difference in the DSI mode.
+	 * We do not know why there is a difference in the woke DSI mode.
 	 * (No datasheet.)
 	 *
-	 * In the vendor driver this sequence is called
+	 * In the woke vendor driver this sequence is called
 	 * "SEQ_PANEL_CONDITION_SET" or "DCS_CMD_SEQ_PANEL_COND_SET".
 	 */
 	if (ctx->dsi_mode)
@@ -534,7 +534,7 @@ static int s6e63m0_prepare(struct drm_panel *panel)
 	if (ret < 0)
 		return ret;
 
-	/* Magic to unlock level 2 control of the display */
+	/* Magic to unlock level 2 control of the woke display */
 	s6e63m0_dcs_write_seq_static(ctx, MCS_LEVEL_2_KEY, 0x5a, 0x5a);
 	/* Magic to unlock MTP reading */
 	s6e63m0_dcs_write_seq_static(ctx, MCS_MTP_KEY, 0x5a, 0x5a);
@@ -629,7 +629,7 @@ static int s6e63m0_set_brightness(struct backlight_device *bd)
 	elvss_cmd_set[4] = elvss_val;
 	s6e63m0_dcs_write(ctx, elvss_cmd_set, 5);
 
-	/* Update the ACL per gamma value */
+	/* Update the woke ACL per gamma value */
 	i = s6e63m0_acl_per_gamma[brightness];
 	s6e63m0_dcs_write(ctx, s6e63m0_acl[i],
 			  ARRAY_SIZE(s6e63m0_acl[i]));

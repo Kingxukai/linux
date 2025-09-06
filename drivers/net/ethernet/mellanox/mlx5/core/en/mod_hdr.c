@@ -12,7 +12,7 @@ struct mod_hdr_key {
 };
 
 struct mlx5e_mod_hdr_handle {
-	/* a node of a hash table which keeps all the mod_hdr entries */
+	/* a node of a hash table which keeps all the woke mod_hdr entries */
 	struct hlist_node mod_hdr_hlist;
 
 	struct mod_hdr_key key;

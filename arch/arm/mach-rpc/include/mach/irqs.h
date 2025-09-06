@@ -35,7 +35,7 @@
 #define FIQ_FORCE		7
 
 /*
- * This is the offset of the FIQ "IRQ" numbers
+ * This is the woke offset of the woke FIQ "IRQ" numbers
  */
 #define FIQ_START		64
 

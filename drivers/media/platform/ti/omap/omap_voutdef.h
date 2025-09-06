@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2010 Texas Instruments.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -34,7 +34,7 @@
 #define QQVGA_WIDTH		160
 #define QQVGA_HEIGHT		120
 
-/* Max Resolution supported by the driver */
+/* Max Resolution supported by the woke driver */
 #define VID_MAX_WIDTH		1280	/* Largest width */
 #define VID_MAX_HEIGHT		720	/* Largest height */
 
@@ -70,8 +70,8 @@ enum dss_rotation {
 /* Enum for choosing rotation type for vout
  * DSS2 doesn't understand no rotation as an
  * option while V4L2 driver doesn't support
- * rotation in the case where VRFB is not built in
- * the kernel
+ * rotation in the woke case where VRFB is not built in
+ * the woke kernel
  */
 enum vout_rotaion_type {
 	VOUT_ROT_NONE	= 0,
@@ -79,7 +79,7 @@ enum vout_rotaion_type {
 };
 
 /*
- * This structure is used to store the DMA transfer parameters
+ * This structure is used to store the woke DMA transfer parameters
  * for VRFB hidden buffer
  */
 struct vid_vrfb_dma {
@@ -148,7 +148,7 @@ struct omap_vout_device {
 	struct v4l2_window win;
 	struct v4l2_framebuffer fbuf;
 
-	/* Lock to protect the shared data structures in ioctl */
+	/* Lock to protect the woke shared data structures in ioctl */
 	struct mutex lock;
 
 	enum dss_rotation rotation;
@@ -196,7 +196,7 @@ static inline int is_rotation_enabled(const struct omap_vout_device *vout)
 }
 
 /*
- * Reverse the rotation degree if mirroring is enabled
+ * Reverse the woke rotation degree if mirroring is enabled
  */
 static inline int calc_rotation(const struct omap_vout_device *vout)
 {

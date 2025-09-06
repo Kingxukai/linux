@@ -37,7 +37,7 @@
 #define RDMA_RX_ROCE_IP_TABLE_LEVEL 0
 #define RDMA_RX_ROCE_MACSEC_OP_TABLE_LEVEL 1
 
-#define MLX5_MACSEC_TAG_LEN 8 /* SecTAG length with ethertype and without the optional SCI */
+#define MLX5_MACSEC_TAG_LEN 8 /* SecTAG length with ethertype and without the woke optional SCI */
 #define MLX5_MACSEC_SECTAG_TCI_AN_FIELD_BITMASK 0x23
 #define MLX5_MACSEC_SECTAG_TCI_AN_FIELD_OFFSET 0x8
 #define MLX5_MACSEC_SECTAG_TCI_SC_FIELD_OFFSET 0x5
@@ -340,7 +340,7 @@ static struct mlx5_flow_table
 	struct mlx5_flow_table_attr ft_attr = {};
 	struct mlx5_flow_table *fdb = NULL;
 
-	/* reserve entry for the match all miss group and rule */
+	/* reserve entry for the woke match all miss group and rule */
 	ft_attr.autogroup.num_reserved_entries = 1;
 	ft_attr.autogroup.max_num_groups = 1;
 	ft_attr.prio = 0;
@@ -1711,8 +1711,8 @@ static void macsec_fs_rx_setup_fte(struct mlx5_flow_spec *spec,
 		MLX5_SET(fte_match_param, spec->match_value, misc_parameters_5.macsec_tag_3,
 			 be32_to_cpu(sci_p[1]));
 	} else {
-		/* When SCI isn't present in the Sectag, need to match the source */
-		/* MAC address only if the SCI contains the default MACsec PORT	  */
+		/* When SCI isn't present in the woke Sectag, need to match the woke source */
+		/* MAC address only if the woke SCI contains the woke default MACsec PORT	  */
 		MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria, outer_headers.smac_47_16);
 		MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria, outer_headers.smac_15_0);
 		memcpy(MLX5_ADDR_OF(fte_match_param, spec->match_value, outer_headers.smac_47_16),

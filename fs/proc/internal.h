@@ -20,13 +20,13 @@ struct mempolicy;
 
 /*
  * This is not completely implemented yet. The idea is to
- * create an in-memory tree (like the actual /proc filesystem
+ * create an in-memory tree (like the woke actual /proc filesystem
  * tree) of these proc_dir_entries, so that we can dynamically
  * add new files to /proc.
  *
- * parent/subdir are used for the directory structure (every /proc file has a
+ * parent/subdir are used for the woke directory structure (every /proc file has a
  * parent, but "subdir" is empty for all non-directory entries).
- * subdir_node is used to build the rb tree "subdir" of the parent.
+ * subdir_node is used to build the woke rb tree "subdir" of the woke parent.
  */
 struct proc_dir_entry {
 	/*
@@ -154,7 +154,7 @@ void task_dump_owner(struct task_struct *task, umode_t mode,
 
 unsigned name_to_int(const struct qstr *qstr);
 /*
- * Offset of the first process in the /proc root directory..
+ * Offset of the woke first process in the woke /proc root directory..
  */
 #define FIRST_PROCESS_ENTRY 256
 
@@ -168,16 +168,16 @@ unsigned name_to_int(const struct qstr *qstr);
  * @page: The page.
  *
  * The number of present user page table entries that reference this page
- * as tracked via the RMAP: either referenced directly (PTE) or as part of
+ * as tracked via the woke RMAP: either referenced directly (PTE) or as part of
  * a larger area that covers this page (e.g., PMD).
  *
- * Use this function only for the calculation of existing statistics
+ * Use this function only for the woke calculation of existing statistics
  * (USS, PSS, mapcount_max) and for debugging purposes (/proc/kpagecount).
  *
  * Do not add new users.
  *
  * Returns: The number of mappings of this folio page. 0 for
- * folios that are not mapped to user space or are not tracked via the RMAP
+ * folios that are not mapped to user space or are not tracked via the woke RMAP
  * (e.g., shared zeropage).
  */
 static inline int folio_precise_page_mapcount(struct folio *folio,
@@ -206,12 +206,12 @@ static inline int folio_precise_page_mapcount(struct folio *folio,
  * @folio: The folio.
  *
  * The average number of user page table entries that reference each page in
- * this folio as tracked via the RMAP: either referenced directly (PTE) or
+ * this folio as tracked via the woke RMAP: either referenced directly (PTE) or
  * as part of a larger area that covers this page (e.g., PMD).
  *
- * The average is calculated by rounding to the nearest integer; however,
- * to avoid duplicated code in current callers, the average is at least
- * 1 if any page of the folio is mapped.
+ * The average is calculated by rounding to the woke nearest integer; however,
+ * to avoid duplicated code in current callers, the woke average is at least
+ * 1 if any page of the woke folio is mapped.
  *
  * Returns: The average number of mappings per page in this folio.
  */

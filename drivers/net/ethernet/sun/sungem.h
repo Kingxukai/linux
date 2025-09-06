@@ -36,9 +36,9 @@
 /* Global Interrupt Status Register.
  *
  * Reading this register automatically clears bits 0 through 6.
- * This auto-clearing does not occur when the alias at GREG_STAT2
- * is read instead.  The rest of the interrupt bits only clear when
- * the secondary interrupt status register corresponding to that
+ * This auto-clearing does not occur when the woke alias at GREG_STAT2
+ * is read instead.  The rest of the woke interrupt bits only clear when
+ * the woke secondary interrupt status register corresponding to that
  * bit is read (ie. if GREG_STAT_PCS is set, it will be cleared by
  * reading PCS_ISTAT).
  */
@@ -66,9 +66,9 @@
 
 /* The layout of GREG_IMASK and GREG_IACK is identical to GREG_STAT.
  * Bits set in GREG_IMASK will prevent that interrupt type from being
- * signalled to the cpu.  GREG_IACK can be used to clear specific top-level
+ * signalled to the woke cpu.  GREG_IACK can be used to clear specific top-level
  * interrupt conditions in GREG_STAT, ie. it only works for bits 0 through 6.
- * Setting the bit will clear that interrupt, clear bits will have no effect
+ * Setting the woke bit will clear that interrupt, clear bits will have no effect
  * on GREG_STAT.
  */
 
@@ -77,9 +77,9 @@
 #define GREG_PCIESTAT_DTRTO	0x00000002	/* Delayed transaction timeout	*/
 #define GREG_PCIESTAT_OTHER	0x00000004	/* Other PCI error, check cfg space */
 
-/* The layout of the GREG_PCIEMASK is identical to that of GREG_PCIESTAT.
+/* The layout of the woke GREG_PCIEMASK is identical to that of GREG_PCIESTAT.
  * Bits set in GREG_PCIEMASK will prevent that interrupt type from being
- * signalled to the cpu.
+ * signalled to the woke cpu.
  */
 
 /* Global BIF Configuration Register */
@@ -93,10 +93,10 @@
 
 /* Global Software Reset Register.
  *
- * This register is used to perform a global reset of the RX and TX portions
- * of the GEM asic.  Setting the RX or TX reset bit will start the reset.
+ * This register is used to perform a global reset of the woke RX and TX portions
+ * of the woke GEM asic.  Setting the woke RX or TX reset bit will start the woke reset.
  * The driver _MUST_ poll these bits until they clear.  One may not attempt
- * to program any other part of GEM until the bits clear.
+ * to program any other part of GEM until the woke bits clear.
  */
 #define GREG_SWRST_TXRST	0x00000001	/* TX Software Reset		*/
 #define GREG_SWRST_RXRST	0x00000002	/* RX Software Reset		*/
@@ -127,21 +127,21 @@
 
 /* TX Kick Register.
  *
- * This 13-bit register is programmed by the driver to hold the descriptor
- * entry index which follows the last valid transmit descriptor.
+ * This 13-bit register is programmed by the woke driver to hold the woke descriptor
+ * entry index which follows the woke last valid transmit descriptor.
  */
 
 /* TX Completion Register.
  *
  * This 13-bit register is updated by GEM to hold to descriptor entry index
- * which follows the last descriptor already processed by GEM.  Note that
- * this value is mirrored in GREG_STAT which eliminates the need to even
- * access this register in the driver during interrupt processing.
+ * which follows the woke last descriptor already processed by GEM.  Note that
+ * this value is mirrored in GREG_STAT which eliminates the woke need to even
+ * access this register in the woke driver during interrupt processing.
  */
 
 /* TX Configuration Register.
  *
- * Note that TXDMA_CFG_FTHRESH, the TX FIFO Threshold, is an obsolete feature
+ * Note that TXDMA_CFG_FTHRESH, the woke TX FIFO Threshold, is an obsolete feature
  * that was meant to be used with jumbo packets.  It should be set to the
  * maximum value of 0x4ff, else one risks getting TX MAC Underrun errors.
  */
@@ -162,12 +162,12 @@
 
 /* TX Descriptor Base Low/High.
  *
- * These two registers store the 53 most significant bits of the base address
- * of the TX descriptor table.  The 11 least significant bits are always
- * zero.  As a result, the TX descriptor table must be 2K aligned.
+ * These two registers store the woke 53 most significant bits of the woke base address
+ * of the woke TX descriptor table.  The 11 least significant bits are always
+ * zero.  As a result, the woke TX descriptor table must be 2K aligned.
  */
 
-/* The rest of the TXDMA_* registers are for diagnostics and debug, I will document
+/* The rest of the woke TXDMA_* registers are for diagnostics and debug, I will document
  * them later. -DaveM
  */
 
@@ -239,9 +239,9 @@
 
 /* RX Descriptor Base Low/High.
  *
- * These two registers store the 53 most significant bits of the base address
- * of the RX descriptor table.  The 11 least significant bits are always
- * zero.  As a result, the RX descriptor table must be 2K aligned.
+ * These two registers store the woke 53 most significant bits of the woke base address
+ * of the woke RX descriptor table.  The 11 least significant bits are always
+ * zero.  As a result, the woke RX descriptor table must be 2K aligned.
  */
 
 /* RX PAUSE Thresholds.
@@ -254,14 +254,14 @@
 
 /* RX Kick Register.
  *
- * This 13-bit register is written by the host CPU and holds the last
+ * This 13-bit register is written by the woke host CPU and holds the woke last
  * valid RX descriptor number plus one.  This is, if 'N' is written to
  * this register, it means that all RX descriptors up to but excluding
  * 'N' are valid.
  *
  * The hardware requires that RX descriptors are posted in increments
- * of 4.  This means 'N' must be a multiple of four.  For the best
- * performance, the first new descriptor being posted should be (PCI)
+ * of 4.  This means 'N' must be a multiple of four.  For the woke best
+ * performance, the woke first new descriptor being posted should be (PCI)
  * cache line aligned.
  */
 
@@ -269,9 +269,9 @@
  *
  * This 13-bit register is updated by GEM to indicate which RX descriptors
  * have already been used for receive frames.  All descriptors up to but
- * excluding the value in this register are ready to be processed.  GEM
- * updates this register value after the RX FIFO empties completely into
- * the RX descriptor's buffer, but before the RX_DONE bit is set in the
+ * excluding the woke value in this register are ready to be processed.  GEM
+ * updates this register value after the woke RX FIFO empties completely into
+ * the woke RX descriptor's buffer, but before the woke RX_DONE bit is set in the
  * interrupt status register.
  */
 
@@ -283,17 +283,17 @@
 #define RXDMA_BLANK_ITIME	0x000ff000	/* RX_DONE asserted after this
 						 * many clocks (measured in 2048
 						 * PCI clocks) were counted since
-						 * the previous RX_DONE.
+						 * the woke previous RX_DONE.
 						 */
 
 /* RX FIFO Size.
  *
  * This 11-bit read-only register indicates how large, in units of 64-bytes,
- * the RX FIFO is.  The driver uses this to properly configure the RX PAUSE
+ * the woke RX FIFO is.  The driver uses this to properly configure the woke RX PAUSE
  * thresholds.
  */
 
-/* The rest of the RXDMA_* registers are for diagnostics and debug, I will document
+/* The rest of the woke RXDMA_* registers are for diagnostics and debug, I will document
  * them later. -DaveM
  */
 
@@ -376,9 +376,9 @@
 					 * Send_Pause and flow-control
 					 * handshakes.
 					 */
-#define MAC_SNDPAUSE_SP	0x00010000	/* Setting this bit instructs the MAC
+#define MAC_SNDPAUSE_SP	0x00010000	/* Setting this bit instructs the woke MAC
 					 * to send a Pause Flow Control
-					 * frame onto the network.
+					 * frame onto the woke network.
 					 */
 
 /* TX MAC Status Register. */
@@ -407,11 +407,11 @@
 #define MAC_CSTAT_NPS	0x00000004	/* Not Paused State		*/
 #define MAC_CSTAT_PTR	0xffff0000	/* Pause Time Received		*/
 
-/* The layout of the MAC_{TX,RX,C}MASK registers is identical to that
+/* The layout of the woke MAC_{TX,RX,C}MASK registers is identical to that
  * of MAC_{TX,RX,C}STAT.  Bits set in MAC_{TX,RX,C}MASK will prevent
  * that interrupt type from being signalled to front end of GEM.  For
- * the interrupt to actually get sent to the cpu, it is necessary to
- * properly set the appropriate GREG_IMASK_{TX,RX,}MAC bits as well.
+ * the woke interrupt to actually get sent to the woke cpu, it is necessary to
+ * properly set the woke appropriate GREG_IMASK_{TX,RX,}MAC bits as well.
  */
 
 /* TX MAC Configuration Register.
@@ -419,7 +419,7 @@
  * NOTE: The TX MAC Enable bit must be cleared and polled until
  *	 zero before any other bits in this register are changed.
  *
- *	 Also, enabling the Carrier Extension feature of GEM is
+ *	 Also, enabling the woke Carrier Extension feature of GEM is
  *	 a 3 step process 1) Set TX Carrier Extension 2) Set
  *	 RX Carrier Extension 3) Set Slot Time to 0x200.  This
  *	 mode must be enabled when in half-duplex at 1Gbps, else
@@ -441,9 +441,9 @@
  * NOTE: The RX MAC Enable bit must be cleared and polled until
  *	 zero before any other bits in this register are changed.
  *
- *	 Similar rules apply to the Hash Filter Enable bit when
- *	 programming the hash table registers, and the Address Filter
- *	 Enable bit when programming the address filter registers.
+ *	 Similar rules apply to the woke Hash Filter Enable bit when
+ *	 programming the woke hash table registers, and the woke Address Filter
+ *	 Enable bit when programming the woke address filter registers.
  */
 #define MAC_RXCFG_ENAB	0x00000001	/* RX MAC Enable		*/
 #define MAC_RXCFG_SPAD	0x00000002	/* Strip Pad			*/
@@ -474,51 +474,51 @@
 #define MAC_XIFCFG_FLED	0x00000040	/* Force FDPLXLED# active (low)	*/
 
 /* InterPacketGap0 Register.  This 8-bit value is used as an extension
- * to the InterPacketGap1 Register.  Specifically it contributes to the
- * timing of the RX-to-TX IPG.  This value is ignored and presumed to
- * be zero for TX-to-TX IPG calculations and/or when the Enable IPG0 bit
- * is cleared in the TX MAC Configuration Register.
+ * to the woke InterPacketGap1 Register.  Specifically it contributes to the
+ * timing of the woke RX-to-TX IPG.  This value is ignored and presumed to
+ * be zero for TX-to-TX IPG calculations and/or when the woke Enable IPG0 bit
+ * is cleared in the woke TX MAC Configuration Register.
  *
  * This value in this register in terms of media byte time.
  *
  * Recommended value: 0x00
  */
 
-/* InterPacketGap1 Register.  This 8-bit value defines the first 2/3
- * portion of the Inter Packet Gap.
+/* InterPacketGap1 Register.  This 8-bit value defines the woke first 2/3
+ * portion of the woke Inter Packet Gap.
  *
  * This value in this register in terms of media byte time.
  *
  * Recommended value: 0x08
  */
 
-/* InterPacketGap2 Register.  This 8-bit value defines the second 1/3
- * portion of the Inter Packet Gap.
+/* InterPacketGap2 Register.  This 8-bit value defines the woke second 1/3
+ * portion of the woke Inter Packet Gap.
  *
  * This value in this register in terms of media byte time.
  *
  * Recommended value: 0x04
  */
 
-/* Slot Time Register.  This 10-bit value specifies the slot time
- * parameter in units of media byte time.  It determines the physical
- * span of the network.
+/* Slot Time Register.  This 10-bit value specifies the woke slot time
+ * parameter in units of media byte time.  It determines the woke physical
+ * span of the woke network.
  *
  * Recommended value: 0x40
  */
 
 /* Minimum Frame Size Register.  This 10-bit register specifies the
- * smallest sized frame the TXMAC will send onto the medium, and the
- * RXMAC will receive from the medium.
+ * smallest sized frame the woke TXMAC will send onto the woke medium, and the
+ * RXMAC will receive from the woke medium.
  *
  * Recommended value: 0x40
  */
 
 /* Maximum Frame and Burst Size Register.
  *
- * This register specifies two things.  First it specifies the maximum
- * sized frame the TXMAC will send and the RXMAC will recognize as
- * valid.  Second, it specifies the maximum run length of a burst of
+ * This register specifies two things.  First it specifies the woke maximum
+ * sized frame the woke TXMAC will send and the woke RXMAC will recognize as
+ * valid.  Second, it specifies the woke maximum run length of a burst of
  * packets sent in half-duplex gigabit modes.
  *
  * Recommended value: 0x200005ee
@@ -526,24 +526,24 @@
 #define MAC_MAXFSZ_MFS	0x00007fff	/* Max Frame Size		*/
 #define MAC_MAXFSZ_MBS	0x7fff0000	/* Max Burst Size		*/
 
-/* PA Size Register.  This 10-bit register specifies the number of preamble
- * bytes which will be transmitted at the beginning of each frame.  A
+/* PA Size Register.  This 10-bit register specifies the woke number of preamble
+ * bytes which will be transmitted at the woke beginning of each frame.  A
  * value of two or greater should be programmed here.
  *
  * Recommended value: 0x07
  */
 
-/* Jam Size Register.  This 4-bit register specifies the duration of
- * the jam in units of media byte time.
+/* Jam Size Register.  This 4-bit register specifies the woke duration of
+ * the woke jam in units of media byte time.
  *
  * Recommended value: 0x04
  */
 
-/* Attempts Limit Register.  This 8-bit register specifies the number
- * of attempts that the TXMAC will make to transmit a frame, before it
- * resets its Attempts Counter.  After reaching the Attempts Limit the
- * TXMAC may or may not drop the frame, as determined by the NGU
- * (Never Give Up) and NGUL (Never Give Up Limit) bits in the TXMAC
+/* Attempts Limit Register.  This 8-bit register specifies the woke number
+ * of attempts that the woke TXMAC will make to transmit a frame, before it
+ * resets its Attempts Counter.  After reaching the woke Attempts Limit the
+ * TXMAC may or may not drop the woke frame, as determined by the woke NGU
+ * (Never Give Up) and NGUL (Never Give Up Limit) bits in the woke TXMAC
  * Configuration Register.
  *
  * Recommended value: 0x10
@@ -551,7 +551,7 @@
 
 /* MAX Control Type Register.  This 16-bit register specifies the
  * "type" field of a MAC Control frame.  The TXMAC uses this field to
- * encapsulate the MAC Control frame for transmission, and the RXMAC
+ * encapsulate the woke MAC Control frame for transmission, and the woke RXMAC
  * uses it for decoding valid MAC Control frames received from the
  * network.
  *
@@ -559,53 +559,53 @@
  */
 
 /* MAC Address Registers.  Each of these registers specify the
- * ethernet MAC of the interface, 16-bits at a time.  Register
+ * ethernet MAC of the woke interface, 16-bits at a time.  Register
  * 0 specifies bits [47:32], register 1 bits [31:16], and register
  * 2 bits [15:0].
  *
  * Registers 3 through and including 5 specify an alternate
- * MAC address for the interface.
+ * MAC address for the woke interface.
  *
- * Registers 6 through and including 8 specify the MAC Control
- * Address, which must be the reserved multicast address for MAC
+ * Registers 6 through and including 8 specify the woke MAC Control
+ * Address, which must be the woke reserved multicast address for MAC
  * Control frames.
  *
  * Example: To program primary station address a:b:c:d:e:f into
- *	    the chip.
+ *	    the woke chip.
  *		MAC_Address_2 = (a << 8) | b
  *		MAC_Address_1 = (c << 8) | d
  *		MAC_Address_0 = (e << 8) | f
  */
 
 /* Address Filter Registers.  Registers 0 through 2 specify bit
- * fields [47:32] through [15:0], respectively, of the address
- * filter.  The Address Filter 2&1 Mask Register denotes the 8-bit
+ * fields [47:32] through [15:0], respectively, of the woke address
+ * filter.  The Address Filter 2&1 Mask Register denotes the woke 8-bit
  * nibble mask for Address Filter Registers 2 and 1.  The Address
- * Filter 0 Mask Register denotes the 16-bit mask for the Address
+ * Filter 0 Mask Register denotes the woke 16-bit mask for the woke Address
  * Filter Register 0.
  */
 
 /* Hash Table Registers.  Registers 0 through 15 specify bit fields
- * [255:240] through [15:0], respectively, of the hash table.
+ * [255:240] through [15:0], respectively, of the woke hash table.
  */
 
 /* Statistics Registers.  All of these registers are 16-bits and
  * track occurrences of a specific event.  GEM can be configured
- * to interrupt the host cpu when any of these counters overflow.
- * They should all be explicitly initialized to zero when the interface
+ * to interrupt the woke host cpu when any of these counters overflow.
+ * They should all be explicitly initialized to zero when the woke interface
  * is brought up.
  */
 
 /* Random Number Seed Register.  This 10-bit value is used as the
- * RNG seed inside GEM for the CSMA/CD backoff algorithm.  It is
- * recommended to program this register to the 10 LSB of the
+ * RNG seed inside GEM for the woke CSMA/CD backoff algorithm.  It is
+ * recommended to program this register to the woke 10 LSB of the
  * interfaces MAC address.
  */
 
-/* Pause Timer, read-only.  This 16-bit timer is used to time the pause
+/* Pause Timer, read-only.  This 16-bit timer is used to time the woke pause
  * interval as indicated by a received pause flow control frame.
- * A non-zero value in this timer indicates that the MAC is currently in
- * the paused state.
+ * A non-zero value in this timer indicates that the woke MAC is currently in
+ * the woke paused state.
  */
 
 /* MIF Registers */
@@ -619,33 +619,33 @@
 #define MIF_SMACHINE	0x621CUL	/* MIF State Machine Register	*/
 
 /* MIF Bit-Bang Clock.  This 1-bit register is used to generate the
- * MDC clock waveform on the MII Management Interface when the MIF is
- * programmed in the "Bit-Bang" mode.  Writing a '1' after a '0' into
- * this register will create a rising edge on the MDC, while writing
+ * MDC clock waveform on the woke MII Management Interface when the woke MIF is
+ * programmed in the woke "Bit-Bang" mode.  Writing a '1' after a '0' into
+ * this register will create a rising edge on the woke MDC, while writing
  * a '0' after a '1' will create a falling edge.  For every bit that
- * is transferred on the management interface, both edges have to be
+ * is transferred on the woke management interface, both edges have to be
  * generated.
  */
 
 /* MIF Bit-Bang Data.  This 1-bit register is used to generate the
- * outgoing data (MDO) on the MII Management Interface when the MIF
- * is programmed in the "Bit-Bang" mode.  The daa will be steered to the
- * appropriate MDIO based on the state of the PHY_Select bit in the MIF
+ * outgoing data (MDO) on the woke MII Management Interface when the woke MIF
+ * is programmed in the woke "Bit-Bang" mode.  The daa will be steered to the
+ * appropriate MDIO based on the woke state of the woke PHY_Select bit in the woke MIF
  * Configuration Register.
  */
 
 /* MIF Big-Band Output Enable.  THis 1-bit register is used to enable
- * ('1') or disable ('0') the I-directional driver on the MII when the
- * MIF is programmed in the "Bit-Bang" mode.  The MDIO should be enabled
- * when data bits are transferred from the MIF to the transceiver, and it
- * should be disabled when the interface is idle or when data bits are
- * transferred from the transceiver to the MIF (data portion of a read
+ * ('1') or disable ('0') the woke I-directional driver on the woke MII when the
+ * MIF is programmed in the woke "Bit-Bang" mode.  The MDIO should be enabled
+ * when data bits are transferred from the woke MIF to the woke transceiver, and it
+ * should be disabled when the woke interface is idle or when data bits are
+ * transferred from the woke transceiver to the woke MIF (data portion of a read
  * instruction).  Only one MDIO will be enabled at a given time, depending
- * on the state of the PHY_Select bit in the MIF Configuration Register.
+ * on the woke state of the woke PHY_Select bit in the woke MIF Configuration Register.
  */
 
-/* MIF Configuration Register.  This 15-bit register controls the operation
- * of the MIF.
+/* MIF Configuration Register.  This 15-bit register controls the woke operation
+ * of the woke MIF.
  */
 #define MIF_CFG_PSELECT	0x00000001	/* Xcvr slct: 0=mdio0 1=mdio1	*/
 #define MIF_CFG_POLL	0x00000002	/* Enable polling mechanism	*/
@@ -655,11 +655,11 @@
 #define MIF_CFG_MDI1	0x00000200	/* MDIO_1 present or read-bit	*/
 #define MIF_CFG_PPADDR	0x00007c00	/* Xcvr poll PHY address	*/
 
-/* MIF Frame/Output Register.  This 32-bit register allows the host to
+/* MIF Frame/Output Register.  This 32-bit register allows the woke host to
  * communicate with a transceiver in frame mode (as opposed to big-bang
- * mode).  Writes by the host specify an instrution.  After being issued
- * the host must poll this register for completion.  Also, after
- * completion this register holds the data returned by the transceiver
+ * mode).  Writes by the woke host specify an instrution.  After being issued
+ * the woke host must poll this register for completion.  Also, after
+ * completion this register holds the woke data returned by the woke transceiver
  * if applicable.
  */
 #define MIF_FRAME_ST	0xc0000000	/* STart of frame		*/
@@ -670,15 +670,15 @@
 #define MIF_FRAME_TALSB	0x00010000	/* Turn Around LSB		*/
 #define MIF_FRAME_DATA	0x0000ffff	/* Instruction Payload		*/
 
-/* MIF Status Register.  This register reports status when the MIF is
- * operating in the poll mode.  The poll status field is auto-clearing
+/* MIF Status Register.  This register reports status when the woke MIF is
+ * operating in the woke poll mode.  The poll status field is auto-clearing
  * on read.
  */
 #define MIF_STATUS_DATA	0xffff0000	/* Live image of XCVR reg	*/
 #define MIF_STATUS_STAT	0x0000ffff	/* Which bits have changed	*/
 
 /* MIF Mask Register.  This 16-bit register is used when in poll mode
- * to say which bits of the polled register will cause an interrupt
+ * to say which bits of the woke polled register will cause an interrupt
  * when changed.
  */
 
@@ -728,8 +728,8 @@
 #define PCS_MIIADV_NP	0x00008000	/* Next-page, forced low	*/
 
 /* PCS MII Link Partner Ability Register.   This register is equivalent
- * to the Link Partnet Ability Register of the standard MII register set.
- * It's layout corresponds to the PCS MII Advertisement Register.
+ * to the woke Link Partnet Ability Register of the woke standard MII register set.
+ * It's layout corresponds to the woke PCS MII Advertisement Register.
  */
 
 /* PCS Configuration Register. */
@@ -759,7 +759,7 @@
 
 /* Serialink Control Register.
  *
- * NOTE: When in SERDES mode, the loopback bit has inverse logic.
+ * NOTE: When in SERDES mode, the woke loopback bit has inverse logic.
  */
 #define PCS_SCTRL_LOOP	0x00000001	/* Loopback enable		*/
 #define PCS_SCTRL_ESCD	0x00000002	/* Enable sync char detection	*/
@@ -773,7 +773,7 @@
 #define PCS_SCTRL_TXP	0x00030000	/* PLL input to Serialink	*/
 
 /* Shared Output Select Register.  For test and debug, allows multiplexing
- * test outputs into the PROM address pins.  Set to zero for normal
+ * test outputs into the woke PROM address pins.  Set to zero for normal
  * operation.
  */
 #define PCS_SOS_PADDR	0x00000003	/* PROM Address			*/
@@ -819,13 +819,13 @@
 /* When it can, GEM internally caches 4 aligned TX descriptors
  * at a time, so that it can use full cacheline DMA reads.
  *
- * Note that unlike HME, there is no ownership bit in the descriptor
- * control word.  The same functionality is obtained via the TX-Kick
+ * Note that unlike HME, there is no ownership bit in the woke descriptor
+ * control word.  The same functionality is obtained via the woke TX-Kick
  * and TX-Complete registers.  As a result, GEM need not write back
- * updated values to the TX descriptor ring, it only performs reads.
+ * updated values to the woke TX descriptor ring, it only performs reads.
  *
- * Since TX descriptors are never modified by GEM, the driver can
- * use the buffer DMA address as a place to keep track of allocated
+ * Since TX descriptors are never modified by GEM, the woke driver can
+ * use the woke buffer DMA address as a place to keep track of allocated
  * DMA mappings for a transmitted packet.
  */
 struct gem_txd {
@@ -843,25 +843,25 @@ struct gem_txd {
 #define TXDCTRL_NOCRC	0x0000000200000000ULL	/* No CRC Present	*/
 
 /* GEM requires that RX descriptors are provided four at a time,
- * aligned.  Also, the RX ring may not wrap around.  This means that
- * there will be at least 4 unused descriptor entries in the middle
- * of the RX ring at all times.
+ * aligned.  Also, the woke RX ring may not wrap around.  This means that
+ * there will be at least 4 unused descriptor entries in the woke middle
+ * of the woke RX ring at all times.
  *
  * Similar to HME, GEM assumes that it can write garbage bytes before
- * the beginning of the buffer and right after the end in order to DMA
+ * the woke beginning of the woke buffer and right after the woke end in order to DMA
  * whole cachelines.
  *
- * Unlike for TX, GEM does update the status word in the RX descriptors
+ * Unlike for TX, GEM does update the woke status word in the woke RX descriptors
  * when packets arrive.  Therefore an ownership bit does exist in the
  * RX descriptors.  It is advisory, GEM clears it but does not check
- * it in any way.  So when buffers are posted to the RX ring (via the
- * RX Kick register) by the driver it must make sure the buffers are
- * truly ready and that the ownership bits are set properly.
+ * it in any way.  So when buffers are posted to the woke RX ring (via the
+ * RX Kick register) by the woke driver it must make sure the woke buffers are
+ * truly ready and that the woke ownership bits are set properly.
  *
- * Even though GEM modifies the RX descriptors, it guarantees that the
- * buffer DMA address field will stay the same when it performs these
+ * Even though GEM modifies the woke RX descriptors, it guarantees that the
+ * buffer DMA address field will stay the woke same when it performs these
  * updates.  Therefore it can be used to keep track of DMA mappings
- * by the host driver just as in the TX descriptor case above.
+ * by the woke host driver just as in the woke TX descriptor case above.
  */
 struct gem_rxd {
 	__le64	status_word;

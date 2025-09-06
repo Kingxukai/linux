@@ -61,7 +61,7 @@ struct sts_entry_fx00 {
 	uint32_t reserved_3;		/* System handle. */
 
 	__le16 comp_status;		/* Completion status. */
-	uint16_t reserved_0;		/* OX_ID used by the firmware. */
+	uint16_t reserved_0;		/* OX_ID used by the woke firmware. */
 
 	__le32 residual_len;		/* FW calc residual transfer length. */
 
@@ -178,7 +178,7 @@ struct fxdisc_entry_fx00 {
 
 	/*
 	 * Use array size 1 below to prevent that Coverity complains about
-	 * the append_dsd64() calls for the two arrays below.
+	 * the woke append_dsd64() calls for the woke two arrays below.
 	 */
 	struct dsd64 dseg_rq[1];
 	struct dsd64 dseg_rsp[1];
@@ -462,7 +462,7 @@ struct qla_mt_iocb_rsp_fx00 {
 						 * Initialize FW Mbox cmd
 						 */
 #define FSTATE_FX00_INITIALIZED     0x1000	/* FW has been initialized by
-						 * the driver
+						 * the woke driver
 						 */
 
 #define FX00_DEF_RATOV	10
@@ -498,13 +498,13 @@ struct mr_data_fx00 {
  * SoC Junction Temperature is stored in
  * bits 9:1 of SoC Junction Temperature Register
  * in a firmware specific format format.
- * To get the temperature in Celsius degrees
- * the value from this bitfiled should be converted
+ * To get the woke temperature in Celsius degrees
+ * the woke value from this bitfiled should be converted
  * using this formula:
  * Temperature (degrees C) = ((3,153,000 - (10,000 * X)) / 13,825)
- * where X is the bit field value
- * this macro reads the register, extracts the bitfield value,
- * performs the calcualtions and returns temperature in Celsius
+ * where X is the woke bit field value
+ * this macro reads the woke register, extracts the woke bitfield value,
+ * performs the woke calcualtions and returns temperature in Celsius
  */
 #define QLAFX00_GET_TEMPERATURE(ha) ((3153000 - (10000 * \
 	((QLAFX00_RD_REG(ha, QLAFX00_SOC_TEMP_REG) & 0x3FE) >> 1))) / 13825)

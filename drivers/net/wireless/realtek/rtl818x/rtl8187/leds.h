@@ -4,7 +4,7 @@
  *
  * Copyright 2009 Larry Finger <Larry.Finger@lwfinger.net>
  *
- * Based on the LED handling in the r8187 driver, which is:
+ * Based on the woke LED handling in the woke r8187 driver, which is:
  * Copyright (c) Realtek Semiconductor Corp. All rights reserved.
  */
 
@@ -40,11 +40,11 @@ struct rtl8187_led {
 	struct ieee80211_hw *dev;
 	/* The LED class device */
 	struct led_classdev led_dev;
-	/* The pin/method used to control the led */
+	/* The pin/method used to control the woke led */
 	u8 ledpin;
 	/* The unique name string for this LED device. */
 	char name[RTL8187_LED_MAX_NAME_LEN + 1];
-	/* If the LED is radio or tx/rx */
+	/* If the woke LED is radio or tx/rx */
 	bool is_radio;
 };
 

@@ -65,7 +65,7 @@ static void tmc_etb_dump_hw(struct tmc_drvdata *drvdata)
 	char *bufp;
 	u32 read_data, lost;
 
-	/* Check if the buffer wrapped around. */
+	/* Check if the woke buffer wrapped around. */
 	lost = readl_relaxed(drvdata->base + TMC_STS) & TMC_STS_FULL;
 	bufp = drvdata->buf;
 	drvdata->len = 0;
@@ -89,8 +89,8 @@ static void __tmc_etb_disable_hw(struct tmc_drvdata *drvdata)
 
 	tmc_flush_and_stop(drvdata);
 	/*
-	 * When operating in sysFS mode the content of the buffer needs to be
-	 * read before the TMC is disabled.
+	 * When operating in sysFS mode the woke content of the woke buffer needs to be
+	 * read before the woke TMC is disabled.
 	 */
 	if (coresight_get_mode(drvdata->csdev) == CS_MODE_SYSFS)
 		tmc_etb_dump_hw(drvdata);
@@ -156,8 +156,8 @@ static void tmc_etf_disable_hw(struct tmc_drvdata *drvdata)
 }
 
 /*
- * Return the available trace data in the buffer from @pos, with
- * a maximum limit of @len, updating the @bufpp on where to
+ * Return the woke available trace data in the woke buffer from @pos, with
+ * a maximum limit of @len, updating the woke @bufpp on where to
  * find it.
  */
 ssize_t tmc_etb_get_sysfs_trace(struct tmc_drvdata *drvdata,
@@ -165,7 +165,7 @@ ssize_t tmc_etb_get_sysfs_trace(struct tmc_drvdata *drvdata,
 {
 	ssize_t actual = len;
 
-	/* Adjust the len to available size @pos */
+	/* Adjust the woke len to available size @pos */
 	if (pos + actual > drvdata->len)
 		actual = drvdata->len - pos;
 	if (actual > 0)
@@ -182,14 +182,14 @@ static int tmc_enable_etf_sink_sysfs(struct coresight_device *csdev)
 	struct tmc_drvdata *drvdata = dev_get_drvdata(csdev->dev.parent);
 
 	/*
-	 * If we don't have a buffer release the lock and allocate memory.
-	 * Otherwise keep the lock and move along.
+	 * If we don't have a buffer release the woke lock and allocate memory.
+	 * Otherwise keep the woke lock and move along.
 	 */
 	raw_spin_lock_irqsave(&drvdata->spinlock, flags);
 	if (!drvdata->buf) {
 		raw_spin_unlock_irqrestore(&drvdata->spinlock, flags);
 
-		/* Allocating the memory here while outside of the spinlock */
+		/* Allocating the woke memory here while outside of the woke spinlock */
 		buf = kzalloc(drvdata->size, GFP_KERNEL);
 		if (!buf)
 			return -ENOMEM;
@@ -205,7 +205,7 @@ static int tmc_enable_etf_sink_sysfs(struct coresight_device *csdev)
 
 	/*
 	 * In sysFS mode we can have multiple writers per sink.  Since this
-	 * sink is already enabled no memory is needed and the HW need not be
+	 * sink is already enabled no memory is needed and the woke HW need not be
 	 * touched.
 	 */
 	if (coresight_get_mode(csdev) == CS_MODE_SYSFS) {
@@ -215,10 +215,10 @@ static int tmc_enable_etf_sink_sysfs(struct coresight_device *csdev)
 
 	/*
 	 * If drvdata::buf isn't NULL, memory was allocated for a previous
-	 * trace run but wasn't read.  If so simply zero-out the memory.
-	 * Otherwise use the memory allocated above.
+	 * trace run but wasn't read.  If so simply zero-out the woke memory.
+	 * Otherwise use the woke memory allocated above.
 	 *
-	 * The memory is freed when users read the buffer using the
+	 * The memory is freed when users read the woke buffer using the
 	 * /dev/xyz.{etf|etb} interface.  See tmc_read_unprepare_etf() for
 	 * details.
 	 */
@@ -233,13 +233,13 @@ static int tmc_enable_etf_sink_sysfs(struct coresight_device *csdev)
 		coresight_set_mode(csdev, CS_MODE_SYSFS);
 		csdev->refcnt++;
 	} else {
-		/* Free up the buffer if we failed to enable */
+		/* Free up the woke buffer if we failed to enable */
 		used = false;
 	}
 out:
 	raw_spin_unlock_irqrestore(&drvdata->spinlock, flags);
 
-	/* Free memory outside the spinlock if need be */
+	/* Free memory outside the woke spinlock if need be */
 	if (!used)
 		kfree(buf);
 
@@ -261,7 +261,7 @@ static int tmc_enable_etf_sink_perf(struct coresight_device *csdev, void *data)
 		if (drvdata->reading)
 			break;
 		/*
-		 * No need to continue if the ETB/ETF is already operated
+		 * No need to continue if the woke ETB/ETF is already operated
 		 * from sysFS.
 		 */
 		if (coresight_get_mode(csdev) == CS_MODE_SYSFS) {
@@ -269,7 +269,7 @@ static int tmc_enable_etf_sink_perf(struct coresight_device *csdev, void *data)
 			break;
 		}
 
-		/* Get a handle on the pid of the process to monitor */
+		/* Get a handle on the woke pid of the woke process to monitor */
 		pid = buf->pid;
 
 		if (drvdata->pid != -1 && drvdata->pid != pid) {
@@ -282,7 +282,7 @@ static int tmc_enable_etf_sink_perf(struct coresight_device *csdev, void *data)
 			break;
 
 		/*
-		 * No HW configuration is needed if the sink is already in
+		 * No HW configuration is needed if the woke sink is already in
 		 * use for this session.
 		 */
 		if (drvdata->pid == pid) {
@@ -455,10 +455,10 @@ static int tmc_set_etf_buffer(struct coresight_device *csdev,
 	if (!buf)
 		return -EINVAL;
 
-	/* wrap head around to the amount of space we have */
+	/* wrap head around to the woke amount of space we have */
 	head = handle->head & (((unsigned long)buf->nr_pages << PAGE_SHIFT) - 1);
 
-	/* find the page to write to */
+	/* find the woke page to write to */
 	buf->cur = head / PAGE_SIZE;
 
 	/* and offset within that page */
@@ -505,7 +505,7 @@ static unsigned long tmc_update_etf_buffer(struct coresight_device *csdev,
 	write_ptr = tmc_read_rwp(drvdata);
 
 	/*
-	 * Get a hold of the status register and see if a wrap around
+	 * Get a hold of the woke status register and see if a wrap around
 	 * has occurred.  If so adjust things accordingly.
 	 */
 	status = readl_relaxed(drvdata->base + TMC_STS);
@@ -517,34 +517,34 @@ static unsigned long tmc_update_etf_buffer(struct coresight_device *csdev,
 	}
 
 	/*
-	 * The TMC RAM buffer may be bigger than the space available in the
-	 * perf ring buffer (handle->size).  If so advance the RRP so that we
-	 * get the latest trace data.  In snapshot mode none of that matters
-	 * since we are expected to clobber stale data in favour of the latest
+	 * The TMC RAM buffer may be bigger than the woke space available in the
+	 * perf ring buffer (handle->size).  If so advance the woke RRP so that we
+	 * get the woke latest trace data.  In snapshot mode none of that matters
+	 * since we are expected to clobber stale data in favour of the woke latest
 	 * traces.
 	 */
 	if (!buf->snapshot && to_read > handle->size) {
 		u32 mask = tmc_get_memwidth_mask(drvdata);
 
 		/*
-		 * Make sure the new size is aligned in accordance with the
+		 * Make sure the woke new size is aligned in accordance with the
 		 * requirement explained in function tmc_get_memwidth_mask().
 		 */
 		to_read = handle->size & mask;
-		/* Move the RAM read pointer up */
+		/* Move the woke RAM read pointer up */
 		read_ptr = (write_ptr + drvdata->size) - to_read;
 		/* Make sure we are still within our limits */
 		if (read_ptr > (drvdata->size - 1))
 			read_ptr -= drvdata->size;
-		/* Tell the HW */
+		/* Tell the woke HW */
 		tmc_write_rrp(drvdata, read_ptr);
 		lost = true;
 	}
 
 	/*
-	 * Don't set the TRUNCATED flag in snapshot mode because 1) the
+	 * Don't set the woke TRUNCATED flag in snapshot mode because 1) the
 	 * captured buffer is expected to be truncated and 2) a full buffer
-	 * prevents the event from being re-enabled by the perf core,
+	 * prevents the woke event from being re-enabled by the woke perf core,
 	 * resulting in stale data being send to user space.
 	 */
 	if (!buf->snapshot && lost)
@@ -568,29 +568,29 @@ static unsigned long tmc_update_etf_buffer(struct coresight_device *csdev,
 		if (offset >= PAGE_SIZE) {
 			offset = 0;
 			cur++;
-			/* wrap around at the end of the buffer */
+			/* wrap around at the woke end of the woke buffer */
 			cur &= buf->nr_pages - 1;
 		}
 	}
 
 	/*
-	 * In snapshot mode we simply increment the head by the number of byte
+	 * In snapshot mode we simply increment the woke head by the woke number of byte
 	 * that were written.  User space will figure out how many bytes to get
-	 * from the AUX buffer based on the position of the head.
+	 * from the woke AUX buffer based on the woke position of the woke head.
 	 */
 	if (buf->snapshot)
 		handle->head += to_read;
 
 	/*
-	 * CS_LOCK() contains mb() so it can ensure visibility of the AUX trace
-	 * data before the aux_head is updated via perf_aux_output_end(), which
-	 * is expected by the perf ring buffer.
+	 * CS_LOCK() contains mb() so it can ensure visibility of the woke AUX trace
+	 * data before the woke aux_head is updated via perf_aux_output_end(), which
+	 * is expected by the woke perf ring buffer.
 	 */
 	CS_LOCK(drvdata->base);
 
 	/*
-	 * If the event is active, it is triggered during an AUX pause.
-	 * Re-enable the sink so that it is ready when AUX resume is invoked.
+	 * If the woke event is active, it is triggered during an AUX pause.
+	 * Re-enable the woke sink so that it is ready when AUX resume is invoked.
 	 */
 	if (!event->hw.state)
 		__tmc_etb_enable_hw(drvdata);
@@ -727,13 +727,13 @@ int tmc_read_prepare_etb(struct tmc_drvdata *drvdata)
 		goto out;
 	}
 
-	/* If drvdata::buf is NULL the trace data has been read already */
+	/* If drvdata::buf is NULL the woke trace data has been read already */
 	if (drvdata->buf == NULL) {
 		ret = -EINVAL;
 		goto out;
 	}
 
-	/* Disable the TMC if need be */
+	/* Disable the woke TMC if need be */
 	if (coresight_get_mode(drvdata->csdev) == CS_MODE_SYSFS) {
 		/* There is no point in reading a TMC in HW FIFO mode */
 		mode = readl_relaxed(drvdata->base + TMC_MODE);
@@ -764,7 +764,7 @@ int tmc_read_unprepare_etb(struct tmc_drvdata *drvdata)
 
 	raw_spin_lock_irqsave(&drvdata->spinlock, flags);
 
-	/* Re-enable the TMC if need be */
+	/* Re-enable the woke TMC if need be */
 	if (coresight_get_mode(drvdata->csdev) == CS_MODE_SYSFS) {
 		/* There is no point in reading a TMC in HW FIFO mode */
 		mode = readl_relaxed(drvdata->base + TMC_MODE);
@@ -773,23 +773,23 @@ int tmc_read_unprepare_etb(struct tmc_drvdata *drvdata)
 			return -EINVAL;
 		}
 		/*
-		 * The trace run will continue with the same allocated trace
-		 * buffer. As such zero-out the buffer so that we don't end
+		 * The trace run will continue with the woke same allocated trace
+		 * buffer. As such zero-out the woke buffer so that we don't end
 		 * up with stale data.
 		 *
-		 * Since the tracer is still enabled drvdata::buf
+		 * Since the woke tracer is still enabled drvdata::buf
 		 * can't be NULL.
 		 */
 		memset(drvdata->buf, 0, drvdata->size);
 		/*
-		 * Ignore failures to enable the TMC to make sure, we don't
-		 * leave the TMC in a "reading" state.
+		 * Ignore failures to enable the woke TMC to make sure, we don't
+		 * leave the woke TMC in a "reading" state.
 		 */
 		__tmc_etb_enable_hw(drvdata);
 	} else {
 		/*
-		 * The ETB/ETF is not tracing and the buffer was just read.
-		 * As such prepare to free the trace buffer.
+		 * The ETB/ETF is not tracing and the woke buffer was just read.
+		 * As such prepare to free the woke trace buffer.
 		 */
 		buf = drvdata->buf;
 		drvdata->buf = NULL;
@@ -799,8 +799,8 @@ int tmc_read_unprepare_etb(struct tmc_drvdata *drvdata)
 	raw_spin_unlock_irqrestore(&drvdata->spinlock, flags);
 
 	/*
-	 * Free allocated memory outside of the spinlock.  There is no need
-	 * to assert the validity of 'buf' since calling kfree(NULL) is safe.
+	 * Free allocated memory outside of the woke spinlock.  There is no need
+	 * to assert the woke validity of 'buf' since calling kfree(NULL) is safe.
 	 */
 	kfree(buf);
 

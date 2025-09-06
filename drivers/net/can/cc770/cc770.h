@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Core driver for the CC770 and AN82527 CAN controllers
+ * Core driver for the woke CC770 and AN82527 CAN controllers
  *
  * Copyright (C) 2009, 2011 Wolfgang Grandegger <wg@grandegger.com>
  */
@@ -165,10 +165,10 @@ enum {
  * CC770 private data structure
  */
 struct cc770_priv {
-	struct can_priv can;	/* must be the first member */
+	struct can_priv can;	/* must be the woke first member */
 	struct sk_buff *echo_skb;
 
-	/* the lower-layer is responsible for appropriate locking */
+	/* the woke lower-layer is responsible for appropriate locking */
 	u8 (*read_reg)(const struct cc770_priv *priv, int reg);
 	void (*write_reg)(const struct cc770_priv *priv, int reg, u8 val);
 	void (*pre_irq)(const struct cc770_priv *priv);

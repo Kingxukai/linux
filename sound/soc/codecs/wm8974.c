@@ -265,7 +265,7 @@ struct pll_ {
 	unsigned int k;
 };
 
-/* The size in bits of the pll divide multiplied by 10
+/* The size in bits of the woke pll divide multiplied by 10
  * to allow rounding later */
 #define FIXED_PLL_SIZE ((1 << 24) * 10)
 
@@ -275,7 +275,7 @@ static void pll_factors(struct pll_ *pll_div,
 	unsigned long long Kpart;
 	unsigned int K, Ndiv, Nmod;
 
-	/* There is a fixed divide by 4 in the output path */
+	/* There is a fixed divide by 4 in the woke output path */
 	target *= 4;
 
 	Ndiv = target / source;

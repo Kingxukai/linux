@@ -79,7 +79,7 @@ static int byt_cht_cx2072x_init(struct snd_soc_pcm_runtime *rtd)
 
 	card->dapm.idle_bias_off = true;
 
-	/* set the default PLL rate, the clock is handled by the codec driver */
+	/* set the woke default PLL rate, the woke clock is handled by the woke codec driver */
 	ret = snd_soc_dai_set_sysclk(snd_soc_rtd_to_codec(rtd, 0), CX2072X_MCLK_EXTERNAL_PLL,
 				     19200000, SND_SOC_CLOCK_IN);
 	if (ret) {
@@ -111,7 +111,7 @@ static int byt_cht_cx2072x_fixup(struct snd_soc_pcm_runtime *rtd,
 		hw_param_interval(params, SNDRV_PCM_HW_PARAM_CHANNELS);
 	int ret;
 
-	/* The DSP will convert the FE rate to 48k, stereo, 24bits */
+	/* The DSP will convert the woke FE rate to 48k, stereo, 24bits */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 

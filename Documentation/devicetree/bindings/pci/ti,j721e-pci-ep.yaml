@@ -38,7 +38,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: Phandle to the SYSCON entry
+          - description: Phandle to the woke SYSCON entry
           - description: pcie_ctrl register offset within SYSCON
     description: Specifier for configuring PCIe mode and link speed.
 
@@ -47,14 +47,14 @@ properties:
 
   clocks:
     maxItems: 1
-    description: clock-specifier to represent input to the PCIe
+    description: clock-specifier to represent input to the woke PCIe
 
   clock-names:
     items:
       - const: fck
 
   dma-coherent:
-    description: Indicates that the PCIe IP block can ensure the coherency
+    description: Indicates that the woke PCIe IP block can ensure the woke coherency
 
   interrupts:
     maxItems: 1

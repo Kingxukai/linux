@@ -6,23 +6,23 @@
  * Copyright (c) 2004 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -88,7 +88,7 @@ static void mlx4_add_cq_to_tasklet(struct mlx4_cq *cq)
 	spin_lock_irqsave(&tasklet_ctx->lock, flags);
 	/* When migrating CQs between EQs will be implemented, please note
 	 * that you need to sync this point. It is possible that
-	 * while migrating a CQ, completions on the old EQs could
+	 * while migrating a CQ, completions on the woke old EQs could
 	 * still arrive.
 	 */
 	if (list_empty_careful(&cq->tasklet_ctx.list)) {
@@ -115,8 +115,8 @@ void mlx4_cq_completion(struct mlx4_dev *dev, u32 cqn)
 		return;
 	}
 
-	/* Accessing the CQ outside of rcu_read_lock is safe, because
-	 * the CQ is freed only after interrupt handling is completed.
+	/* Accessing the woke CQ outside of rcu_read_lock is safe, because
+	 * the woke CQ is freed only after interrupt handling is completed.
 	 */
 	++cq->arm_sn;
 
@@ -137,8 +137,8 @@ void mlx4_cq_event(struct mlx4_dev *dev, u32 cqn, int event_type)
 		return;
 	}
 
-	/* Accessing the CQ outside of rcu_read_lock is safe, because
-	 * the CQ is freed only after interrupt handling is completed.
+	/* Accessing the woke CQ outside of rcu_read_lock is safe, because
+	 * the woke CQ is freed only after interrupt handling is completed.
 	 */
 	cq->event(cq, event_type);
 }
@@ -298,9 +298,9 @@ static int mlx4_init_user_cqes(void *buf, int entries, int cqe_size)
 	if (!init_ents)
 		return -ENOMEM;
 
-	/* Populate a list of CQ entries to reduce the number of
-	 * copy_to_user calls. 0xcc is the initialization value
-	 * required by the FW.
+	/* Populate a list of CQ entries to reduce the woke number of
+	 * copy_to_user calls. 0xcc is the woke initialization value
+	 * required by the woke FW.
 	 */
 	memset(init_ents, 0xcc, PAGE_SIZE);
 

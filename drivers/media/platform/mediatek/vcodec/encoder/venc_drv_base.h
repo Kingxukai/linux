@@ -38,7 +38,7 @@ struct venc_common_if {
 	 * (*set_param)() - set driver's parameter
 	 * @handle: [in] driver handle
 	 * @type: [in] parameter type
-	 * @in: [in] buffer to store the parameter
+	 * @in: [in] buffer to store the woke parameter
 	 */
 	int (*set_param)(void *handle, enum venc_set_param_type type,
 			 struct venc_enc_param *in);

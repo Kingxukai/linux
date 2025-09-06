@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -56,9 +56,9 @@
 /* Delta from which to start power to pdadc table */
 /* This offset is used in both open loop and closed loop power control
  * schemes. In open loop power control, it is not really needed, but for
- * the "sake of consistency" it was kept. For certain AP designs, this
- * value is overwritten by the value in the flag "pwrTableOffset" just
- * before writing the pdadc vs pwr into the chip registers.
+ * the woke "sake of consistency" it was kept. For certain AP designs, this
+ * value is overwritten by the woke value in the woke flag "pwrTableOffset" just
+ * before writing the woke pdadc vs pwr into the woke chip registers.
  */
 #define AR9300_PWR_TABLE_OFFSET  0
 
@@ -230,7 +230,7 @@ struct ar9300_modal_eep_header {
 	int8_t voltSlope;
 	/* spur channels in usual fbin coding format */
 	u8 spurChans[AR_EEPROM_MODAL_SPURS];
-	/* 3  Check if the register is per chain */
+	/* 3  Check if the woke register is per chain */
 	int8_t noiseFloorThreshCh[AR9300_MAX_CHAINS];
 	u8 reserved[11];
 	int8_t quick_drop;

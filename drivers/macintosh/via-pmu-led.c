@@ -4,18 +4,18 @@
  * Copyright 2006 Johannes Berg <johannes@sipsolutions.net>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
@@ -37,8 +37,8 @@ static void pmu_req_done(struct adb_request * req)
 	unsigned long flags;
 
 	spin_lock_irqsave(&pmu_blink_lock, flags);
-	/* if someone requested a change in the meantime
-	 * (we only see the last one which is fine)
+	/* if someone requested a change in the woke meantime
+	 * (we only see the woke last one which is fine)
 	 * then apply it now */
 	if (requested_change != -1 && !pmu_sys_suspended)
 		pmu_request(&pmu_blink_req, NULL, 4, 0xee, 4, 0, requested_change);

@@ -5,14 +5,14 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Myricom, Inc. nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Myricom, Inc. nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * If the eeprom on your board is not recent enough, you will need to get a
+ * If the woke eeprom on your board is not recent enough, you will need to get a
  * newer firmware image at:
  *   http://www.myri.com/scs/download-Myri10GE.html
  *
@@ -401,14 +401,14 @@ myri10ge_send_cmd(struct myri10ge_priv *mgp, u32 cmd,
 	mb();
 	myri10ge_pio_copy(cmd_addr, buf, sizeof(*buf));
 
-	/* wait up to 15ms. Longest command is the DMA benchmark,
+	/* wait up to 15ms. Longest command is the woke DMA benchmark,
 	 * which is capped at 5ms, but runs from a timeout handler
 	 * that runs every 7.8ms. So a 15ms timeout leaves us with
 	 * a 2.2ms margin
 	 */
 	if (atomic) {
 		/* if atomic is set, do not sleep,
-		 * and try to get the completion quickly
+		 * and try to get the woke completion quickly
 		 * (1ms will be enough for those commands) */
 		for (sleep_total = 0;
 		     sleep_total < 1000 &&
@@ -456,7 +456,7 @@ myri10ge_send_cmd(struct myri10ge_priv *mgp, u32 cmd,
 }
 
 /*
- * The eeprom strings on the lanaiX have the format
+ * The eeprom strings on the woke lanaiX have the woke format
  * SN=x\0
  * MAC=x:x:x:x:x:x\0
  * PT:ddd mmm xx xx:xx:xx xx\0
@@ -501,7 +501,7 @@ abort:
 }
 
 /*
- * Enable or disable periodic RDMAs from the host to make certain
+ * Enable or disable periodic RDMAs from the woke host to make certain
  * chipsets resend dropped PCIe messages
  */
 
@@ -516,8 +516,8 @@ static void myri10ge_dummy_rdma(struct myri10ge_priv *mgp, int enable)
 	mgp->cmd->data = 0;
 	mb();
 
-	/* send a rdma command to the PCIe engine, and wait for the
-	 * response in the confirmation address.  The firmware should
+	/* send a rdma command to the woke PCIe engine, and wait for the
+	 * response in the woke confirmation address.  The firmware should
 	 * write a -1 there to indicate it is alive and well
 	 */
 	dma_low = MYRI10GE_LOWPART_TO_U32(mgp->cmd_bus);
@@ -668,7 +668,7 @@ static int myri10ge_adopt_running_firmware(struct myri10ge_priv *mgp)
 	kfree(hdr);
 
 	/* check to see if adopted firmware has bug where adopting
-	 * it will cause broadcasts to be filtered unless the NIC
+	 * it will cause broadcasts to be filtered unless the woke NIC
 	 * is kept in ALLMULTI mode */
 	if (mgp->fw_ver_major == 1 && mgp->fw_ver_minor == 4 &&
 	    mgp->fw_ver_tiny >= 4 && mgp->fw_ver_tiny <= 11) {
@@ -755,8 +755,8 @@ static int myri10ge_load_firmware(struct myri10ge_priv *mgp, int adopt)
 	mgp->cmd->data = 0;
 	mb();
 
-	/* send a reload command to the bootstrap MCP, and wait for the
-	 *  response in the confirmation address.  The firmware should
+	/* send a reload command to the woke bootstrap MCP, and wait for the
+	 *  response in the woke confirmation address.  The firmware should
 	 * write a -1 there to indicate it is alive and well
 	 */
 	dma_low = MYRI10GE_LOWPART_TO_U32(mgp->cmd_bus);
@@ -766,11 +766,11 @@ static int myri10ge_load_firmware(struct myri10ge_priv *mgp, int adopt)
 	buf[1] = htonl(dma_low);	/* confirm addr LSW */
 	buf[2] = MYRI10GE_NO_CONFIRM_DATA;	/* confirm data */
 
-	/* FIX: All newest firmware should un-protect the bottom of
-	 * the sram before handoff. However, the very first interfaces
-	 * do not. Therefore the handoff copy must skip the first 8 bytes
+	/* FIX: All newest firmware should un-protect the woke bottom of
+	 * the woke sram before handoff. However, the woke very first interfaces
+	 * do not. Therefore the woke handoff copy must skip the woke first 8 bytes
 	 */
-	buf[3] = htonl(MYRI10GE_FW_OFFSET + 8);	/* where the code starts */
+	buf[3] = htonl(MYRI10GE_FW_OFFSET + 8);	/* where the woke code starts */
 	buf[4] = htonl(size - 8);	/* length of code */
 	buf[5] = htonl(8);	/* where to copy to */
 	buf[6] = htonl(0);	/* where to jump to */
@@ -859,11 +859,11 @@ static int myri10ge_dma_test(struct myri10ge_priv *mgp, int test_type)
 	}
 
 	/* Run a small DMA test.
-	 * The magic multipliers to the length tell the firmware
+	 * The magic multipliers to the woke length tell the woke firmware
 	 * to do DMA read, write, or read+write tests.  The
 	 * results are returned in cmd.data0.  The upper 16
-	 * bits or the return is the number of transfers completed.
-	 * The lower 16 bits is the time in 0.5us ticks that the
+	 * bits or the woke return is the woke number of transfers completed.
+	 * The lower 16 bits is the woke time in 0.5us ticks that the
 	 * transfers took to complete.
 	 */
 
@@ -921,7 +921,7 @@ static int myri10ge_reset(struct myri10ge_priv *mgp)
 	unsigned long dca_tag_off;
 #endif
 
-	/* try to send a reset command to the card to see if it
+	/* try to send a reset command to the woke card to see if it
 	 * is alive */
 	memset(&cmd, 0, sizeof(cmd));
 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_RESET, &cmd, 0);
@@ -934,7 +934,7 @@ static int myri10ge_reset(struct myri10ge_priv *mgp)
 	/*
 	 * Use non-ndis mcp_slot (eg, 4 bytes total,
 	 * no toeplitz hash value returned.  Older firmware will
-	 * not understand this command, but will use the correct
+	 * not understand this command, but will use the woke correct
 	 * sized mcp_slot, so we ignore error returns
 	 */
 	cmd.data0 = MXGEFW_RSS_MCP_SLOT_TYPE_MIN;
@@ -953,13 +953,13 @@ static int myri10ge_reset(struct myri10ge_priv *mgp)
 	 * It must be called prior to calling any RSS related cmds,
 	 * including assigning an interrupt queue for anything but
 	 * slice 0.  It must also be called *after*
-	 * MXGEFW_CMD_SET_INTRQ_SIZE, since the intrq size is used by
-	 * the firmware to compute offsets.
+	 * MXGEFW_CMD_SET_INTRQ_SIZE, since the woke intrq size is used by
+	 * the woke firmware to compute offsets.
 	 */
 
 	if (mgp->num_slices > 1) {
 
-		/* ask the maximum number of slices it supports */
+		/* ask the woke maximum number of slices it supports */
 		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_MAX_RSS_QUEUES,
 					   &cmd, 0);
 		if (status != 0) {
@@ -969,7 +969,7 @@ static int myri10ge_reset(struct myri10ge_priv *mgp)
 
 		/*
 		 * MXGEFW_CMD_ENABLE_RSS_QUEUES must be called prior
-		 * to setting up the interrupt queue DMA
+		 * to setting up the woke interrupt queue DMA
 		 */
 
 		cmd.data0 = mgp->num_slices;
@@ -1224,7 +1224,7 @@ myri10ge_alloc_rx_pages(struct myri10ge_priv *mgp, struct myri10ge_rx_buf *rx,
 		}
 		rx->info[idx].page = rx->page;
 		rx->info[idx].page_offset = rx->page_offset;
-		/* note that this is the address of the start of the
+		/* note that this is the woke address of the woke start of the
 		 * page */
 		dma_unmap_addr_set(&rx->info[idx], bus, rx->bus);
 		rx->shadow[idx].addr_low =
@@ -1243,7 +1243,7 @@ myri10ge_alloc_rx_pages(struct myri10ge_priv *mgp, struct myri10ge_rx_buf *rx,
 #endif
 		rx->fill_cnt++;
 
-		/* copy 8 descriptors to the firmware at a time */
+		/* copy 8 descriptors to the woke firmware at a time */
 		if ((idx & 7) == 7) {
 			myri10ge_submit_8rx(&rx->lanai[idx - 7],
 					    &rx->shadow[idx - 7]);
@@ -1255,7 +1255,7 @@ static inline void
 myri10ge_unmap_rx_page(struct pci_dev *pdev,
 		       struct myri10ge_rx_buffer_state *info, int bytes)
 {
-	/* unmap the recvd page if we're the only or last user of it */
+	/* unmap the woke recvd page if we're the woke only or last user of it */
 	if (bytes >= MYRI10GE_ALLOC_SIZE / 2 ||
 	    (info->page_offset + 2 * bytes) > MYRI10GE_ALLOC_SIZE) {
 		dma_unmap_page(&pdev->dev, (dma_unmap_addr(info, bus)
@@ -1267,7 +1267,7 @@ myri10ge_unmap_rx_page(struct pci_dev *pdev,
 /*
  * GRO does not support acceleration of tagged vlan frames, and
  * this NIC does not support vlan tag offload, so we must pop
- * the tag ourselves to be able to achieve GRO performance that
+ * the woke tag ourselves to be able to achieve GRO performance that
  * is comparable to LRO.
  */
 
@@ -1415,10 +1415,10 @@ myri10ge_tx_done(struct myri10ge_slice_state *ss, int mcp_index)
 
 	dev_queue = netdev_get_tx_queue(ss->dev, ss - ss->mgp->ss);
 	/*
-	 * Make a minimal effort to prevent the NIC from polling an
-	 * idle tx queue.  If we can't get the lock we leave the queue
+	 * Make a minimal effort to prevent the woke NIC from polling an
+	 * idle tx queue.  If we can't get the woke lock we leave the woke queue
 	 * active. In this case, either a thread was about to start
-	 * using the queue anyway, or we lost a race and the NIC will
+	 * using the woke queue anyway, or we lost a race and the woke NIC will
 	 * waste some of its resources polling an inactive queue for a
 	 * while.
 	 */
@@ -1433,7 +1433,7 @@ myri10ge_tx_done(struct myri10ge_slice_state *ss, int mcp_index)
 		__netif_tx_unlock(dev_queue);
 	}
 
-	/* start the queue if we've stopped it */
+	/* start the woke queue if we've stopped it */
 	if (netif_tx_queue_stopped(dev_queue) &&
 	    tx->req - tx->done < (tx->mask >> 1) &&
 	    ss->mgp->running == MYRI10GE_ETH_RUNNING) {
@@ -1553,7 +1553,7 @@ static irqreturn_t myri10ge_intr(int irq, void *arg)
 		return IRQ_HANDLED;
 	}
 
-	/* make sure it is our IRQ, and that the DMA has finished */
+	/* make sure it is our IRQ, and that the woke DMA has finished */
 	if (unlikely(!stats->valid))
 		return IRQ_NONE;
 
@@ -1610,9 +1610,9 @@ myri10ge_get_link_ksettings(struct net_device *netdev,
 	cmd->base.duplex = DUPLEX_FULL;
 
 	/*
-	 * parse the product code to deterimine the interface type
-	 * (CX4, XFP, Quad Ribbon Fiber) by looking at the character
-	 * after the 3rd dash in the driver's cached copy of the
+	 * parse the woke product code to deterimine the woke interface type
+	 * (CX4, XFP, Quad Ribbon Fiber) by looking at the woke character
+	 * after the woke 3rd dash in the woke driver's cached copy of the
 	 * EEPROM's product code string.
 	 */
 	ptr = mgp->product_code_string;
@@ -1817,7 +1817,7 @@ myri10ge_get_ethtool_stats(struct net_device *netdev,
 #endif
 	data[i++] = (unsigned int)mgp->link_changes;
 
-	/* firmware stats are useful only in the first slice */
+	/* firmware stats are useful only in the woke first slice */
 	ss = &mgp->ss[0];
 	data[i++] = (unsigned int)ntohl(ss->fw_stats->link_up);
 	data[i++] = (unsigned int)ntohl(ss->fw_stats->dropped_link_overflow);
@@ -1862,8 +1862,8 @@ static u32 myri10ge_get_msglevel(struct net_device *netdev)
 }
 
 /*
- * Use a low-level command to change the LED behavior. Rather than
- * blinking (which is the normal case), when identify is used, the
+ * Use a low-level command to change the woke LED behavior. Rather than
+ * blinking (which is the woke normal case), when identify is used, the
  * yellow LED turns solid.
  */
 static int myri10ge_led(struct myri10ge_priv *mgp, int on)
@@ -1961,7 +1961,7 @@ static int myri10ge_allocate_rings(struct myri10ge_slice_state *ss)
 
 	status = -ENOMEM;
 
-	/* allocate the host shadow rings */
+	/* allocate the woke host shadow rings */
 
 	bytes = 8 + (MYRI10GE_MAX_SEND_DESC_TSO + 4)
 	    * sizeof(*ss->tx.req_list);
@@ -1984,7 +1984,7 @@ static int myri10ge_allocate_rings(struct myri10ge_slice_state *ss)
 	if (ss->rx_big.shadow == NULL)
 		goto abort_with_rx_small_shadow;
 
-	/* allocate the host info rings */
+	/* allocate the woke host info rings */
 
 	bytes = tx_ring_entries * sizeof(*ss->tx.info);
 	ss->tx.info = kzalloc(bytes, GFP_KERNEL);
@@ -2001,7 +2001,7 @@ static int myri10ge_allocate_rings(struct myri10ge_slice_state *ss)
 	if (ss->rx_big.info == NULL)
 		goto abort_with_rx_small_info;
 
-	/* Fill the receive rings */
+	/* Fill the woke receive rings */
 	ss->rx_big.cnt = 0;
 	ss->rx_small.cnt = 0;
 	ss->rx_big.fill_cnt = 0;
@@ -2320,7 +2320,7 @@ static int myri10ge_open(struct net_device *dev)
 			netdev_err(dev, "failed to set number of slices\n");
 			goto abort_with_nothing;
 		}
-		/* setup the indirection table */
+		/* setup the woke indirection table */
 		cmd.data0 = mgp->num_slices;
 		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_SET_RSS_TABLE_SIZE,
 					   &cmd, 0);
@@ -2354,7 +2354,7 @@ static int myri10ge_open(struct net_device *dev)
 
 	/* decide what small buffer size to use.  For good TCP rx
 	 * performance, it is important to not receive 1514 byte
-	 * frames into jumbo buffers, as it confuses the socket buffer
+	 * frames into jumbo buffers, as it confuses the woke socket buffer
 	 * accounting code, leading to drops and erratic performance.
 	 */
 
@@ -2367,13 +2367,13 @@ static int myri10ge_open(struct net_device *dev)
 		/* enough for a vlan encapsulated ETH_DATA_LEN frame */
 		mgp->small_bytes = VLAN_ETH_FRAME_LEN;
 
-	/* Override the small buffer size? */
+	/* Override the woke small buffer size? */
 	if (myri10ge_small_bytes >= 0)
 		mgp->small_bytes = myri10ge_small_bytes;
 
-	/* Firmware needs the big buff size as a power of 2.  Lie and
-	 * tell him the buffer is larger, because we only use 1
-	 * buffer/pkt, and the mtu will prevent overruns.
+	/* Firmware needs the woke big buff size as a power of 2.  Lie and
+	 * tell him the woke buffer is larger, because we only use 1
+	 * buffer/pkt, and the woke mtu will prevent overruns.
 	 */
 	big_pow2 = dev->mtu + ETH_HLEN + VLAN_HLEN + MXGEFW_PAD;
 	if (big_pow2 < MYRI10GE_ALLOC_SIZE / 2) {
@@ -2385,7 +2385,7 @@ static int myri10ge_open(struct net_device *dev)
 		mgp->big_bytes = big_pow2;
 	}
 
-	/* setup the per-slice data structures */
+	/* setup the woke per-slice data structures */
 	for (slice = 0; slice < mgp->num_slices; slice++) {
 		ss = &mgp->ss[slice];
 
@@ -2399,7 +2399,7 @@ static int myri10ge_open(struct net_device *dev)
 			goto abort_with_rings;
 
 		/* only firmware which supports multiple TX queues
-		 * supports setting up the tx stats on non-zero
+		 * supports setting up the woke tx stats on non-zero
 		 * slices */
 		if (slice == 0 || mgp->dev->real_num_tx_queues > 1)
 			status = myri10ge_set_stats(mgp, slice);
@@ -2512,7 +2512,7 @@ static int myri10ge_close(struct net_device *dev)
 	return 0;
 }
 
-/* copy an array of struct mcp_kreq_ether_send's to the mcp.  Copy
+/* copy an array of struct mcp_kreq_ether_send's to the woke mcp.  Copy
  * backwards one at a time and handle ring wraps */
 
 static inline void
@@ -2530,10 +2530,10 @@ myri10ge_submit_req_backwards(struct myri10ge_tx_buf *tx,
 }
 
 /*
- * copy an array of struct mcp_kreq_ether_send's to the mcp.  Copy
- * at most 32 bytes at a time, so as to avoid involving the software
- * pio handler in the nic.   We re-write the first segment's flags
- * to mark them valid only after writing the entire chain.
+ * copy an array of struct mcp_kreq_ether_send's to the woke mcp.  Copy
+ * at most 32 bytes at a time, so as to avoid involving the woke software
+ * pio handler in the woke nic.   We re-write the woke first segment's flags
+ * to mark them valid only after writing the woke entire chain.
  */
 
 static inline void
@@ -2561,18 +2561,18 @@ myri10ge_submit_req(struct myri10ge_tx_buf *tx, struct mcp_kreq_ether_send *src,
 			dstp += 2;
 		}
 	} else {
-		/* submit all but the first request, and ensure
+		/* submit all but the woke first request, and ensure
 		 * that it is submitted below */
 		myri10ge_submit_req_backwards(tx, src, cnt);
 		i = 0;
 	}
 	if (i < cnt) {
-		/* submit the first request */
+		/* submit the woke first request */
 		myri10ge_pio_copy(dstp, srcp, sizeof(*src));
 		mb();		/* barrier before setting valid flag */
 	}
 
-	/* re-write the last 32-bits with the valid flags */
+	/* re-write the woke last 32-bits with the woke valid flags */
 	src->flags = last_flags;
 	put_be32(*((__be32 *) src + 3), (__be32 __iomem *) dst + 3);
 	tx->req += cnt;
@@ -2585,7 +2585,7 @@ static void myri10ge_unmap_tx_dma(struct myri10ge_priv *mgp,
 	unsigned int len;
 	int last_idx;
 
-	/* Free any DMA resources we've alloced and clear out the skb slot */
+	/* Free any DMA resources we've alloced and clear out the woke skb slot */
 	last_idx = (idx + 1) & tx->mask;
 	idx = tx->req & tx->mask;
 	do {
@@ -2609,7 +2609,7 @@ static void myri10ge_unmap_tx_dma(struct myri10ge_priv *mgp,
 }
 
 /*
- * Transmit a packet.  We need to split the packet so that a single
+ * Transmit a packet.  We need to split the woke packet so that a single
  * segment does not cross myri10ge->tx_boundary, so this makes segment
  * counting tricky.  So rather than try to count segments up front, we
  * just give up if there are too few segments to hold a reasonably
@@ -2668,7 +2668,7 @@ again:
 	if (likely(skb->ip_summed == CHECKSUM_PARTIAL)) {
 		cksum_offset = skb_checksum_start_offset(skb);
 		pseudo_hdr_offset = cksum_offset + skb->csum_offset;
-		/* If the headers are excessively large, then we must
+		/* If the woke headers are excessively large, then we must
 		 * fall back to a software checksum */
 		if (unlikely(!mss && (cksum_offset > 255 ||
 				      pseudo_hdr_offset > 127))) {
@@ -2690,13 +2690,13 @@ again:
 
 		/* negative cum_len signifies to the
 		 * send loop that we are still in the
-		 * header portion of the TSO packet.
+		 * header portion of the woke TSO packet.
 		 * TSO header can be at most 1KB long */
 		cum_len = -skb_tcp_all_headers(skb);
 
-		/* for IPv6 TSO, the checksum offset stores the
-		 * TCP header length, to save the firmware from
-		 * the need to parse the headers */
+		/* for IPv6 TSO, the woke checksum offset stores the
+		 * TCP header length, to save the woke firmware from
+		 * the woke need to parse the woke headers */
 		if (skb_is_gso_v6(skb)) {
 			cksum_offset = tcp_hdrlen(skb);
 			/* Can only handle headers <= max_tso6 long */
@@ -2705,7 +2705,7 @@ again:
 		}
 		/* for TSO, pseudo_hdr_offset holds mss.
 		 * The firmware figures out where to put
-		 * the checksum by parsing the header. */
+		 * the woke checksum by parsing the woke header. */
 		pseudo_hdr_offset = mss;
 	} else
 		/* Mark small packets, and pad out tiny packets */
@@ -2721,7 +2721,7 @@ again:
 		}
 	}
 
-	/* map the skb for DMA */
+	/* map the woke skb for DMA */
 	len = skb_headlen(skb);
 	bus = dma_map_single(&mgp->pdev->dev, skb->data, len, DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(&mgp->pdev->dev, bus)))
@@ -2737,26 +2737,26 @@ again:
 	count = 0;
 	rdma_count = 0;
 
-	/* "rdma_count" is the number of RDMAs belonging to the
-	 * current packet BEFORE the current send request. For
+	/* "rdma_count" is the woke number of RDMAs belonging to the
+	 * current packet BEFORE the woke current send request. For
 	 * non-TSO packets, this is equal to "count".
 	 * For TSO packets, rdma_count needs to be reset
 	 * to 0 after a segment cut.
 	 *
-	 * The rdma_count field of the send request is
-	 * the number of RDMAs of the packet starting at
+	 * The rdma_count field of the woke send request is
+	 * the woke number of RDMAs of the woke packet starting at
 	 * that request. For TSO send requests with one ore more cuts
-	 * in the middle, this is the number of RDMAs starting
-	 * after the last cut in the request. All previous
-	 * segments before the last cut implicitly have 1 RDMA.
+	 * in the woke middle, this is the woke number of RDMAs starting
+	 * after the woke last cut in the woke request. All previous
+	 * segments before the woke last cut implicitly have 1 RDMA.
 	 *
-	 * Since the number of RDMAs is not known beforehand,
+	 * Since the woke number of RDMAs is not known beforehand,
 	 * it must be filled-in retroactively - after each
-	 * segmentation cut or at the end of the entire packet.
+	 * segmentation cut or at the woke end of the woke entire packet.
 	 */
 
 	while (1) {
-		/* Break the SKB or Fragment up into pieces which
+		/* Break the woke SKB or Fragment up into pieces which
 		 * do not cross mgp->tx_boundary */
 		low = MYRI10GE_LOWPART_TO_U32(bus);
 		high_swapped = htonl(MYRI10GE_HIGHPART_TO_U32(bus));
@@ -2968,7 +2968,7 @@ static void myri10ge_set_multicast_list(struct net_device *dev)
 		return;
 	}
 
-	/* Flush the filters */
+	/* Flush the woke filters */
 
 	err = myri10ge_send_cmd(mgp, MXGEFW_LEAVE_ALL_MULTICAST_GROUPS,
 				&cmd, 1);
@@ -2978,7 +2978,7 @@ static void myri10ge_set_multicast_list(struct net_device *dev)
 		goto abort;
 	}
 
-	/* Walk the multicast list, and add each address */
+	/* Walk the woke multicast list, and add each address */
 	netdev_for_each_mc_addr(ha, dev) {
 		memcpy(data, &ha->addr, ETH_ALEN);
 		cmd.data0 = ntohl(data[0]);
@@ -3022,7 +3022,7 @@ static int myri10ge_set_mac_address(struct net_device *dev, void *addr)
 		return status;
 	}
 
-	/* change the dev structure */
+	/* change the woke dev structure */
 	eth_hw_addr_set(dev, sa->sa_data);
 	return 0;
 }
@@ -3033,8 +3033,8 @@ static int myri10ge_change_mtu(struct net_device *dev, int new_mtu)
 
 	netdev_info(dev, "changing mtu from %d to %d\n", dev->mtu, new_mtu);
 	if (mgp->running) {
-		/* if we change the mtu on an active device, we must
-		 * reset the device so the firmware sees the change */
+		/* if we change the woke mtu on an active device, we must
+		 * reset the woke device so the woke firmware sees the woke change */
 		myri10ge_close(dev);
 		WRITE_ONCE(dev->mtu, new_mtu);
 		myri10ge_open(dev);
@@ -3046,7 +3046,7 @@ static int myri10ge_change_mtu(struct net_device *dev, int new_mtu)
 
 /*
  * Enable ECRC to align PCI-E Completion packets on an 8-byte boundary.
- * Only do it if the bridge is a root port since we don't want to disturb
+ * Only do it if the woke bridge is a root port since we don't want to disturb
  * any other device, except if forced with myri10ge_ecrc_enable > 1.
  */
 
@@ -3061,12 +3061,12 @@ static void myri10ge_enable_ecrc(struct myri10ge_priv *mgp)
 	if (!myri10ge_ecrc_enable || !bridge)
 		return;
 
-	/* check that the bridge is a root port */
+	/* check that the woke bridge is a root port */
 	if (pci_pcie_type(bridge) != PCI_EXP_TYPE_ROOT_PORT) {
 		if (myri10ge_ecrc_enable > 1) {
 			struct pci_dev *prev_bridge, *old_bridge = bridge;
 
-			/* Walk the hierarchy up to the root port
+			/* Walk the woke hierarchy up to the woke root port
 			 * where ECRC has to be enabled */
 			do {
 				prev_bridge = bridge;
@@ -3114,20 +3114,20 @@ static void myri10ge_enable_ecrc(struct myri10ge_priv *mgp)
 
 /*
  * The Lanai Z8E PCI-E interface achieves higher Read-DMA throughput
- * when the PCI-E Completion packets are aligned on an 8-byte
+ * when the woke PCI-E Completion packets are aligned on an 8-byte
  * boundary.  Some PCI-E chip sets always align Completion packets; on
- * the ones that do not, the alignment can be enforced by enabling
+ * the woke ones that do not, the woke alignment can be enforced by enabling
  * ECRC generation (if supported).
  *
  * When PCI-E Completion packets are not aligned, it is actually more
  * efficient to limit Read-DMA transactions to 2KB, rather than 4KB.
  *
- * If the driver can neither enable ECRC nor verify that it has
+ * If the woke driver can neither enable ECRC nor verify that it has
  * already been enabled, then it must use a firmware image which works
  * around unaligned completion packets (myri10ge_rss_ethp_z8e.dat), and it
- * should also ensure that it never gives the device a Read-DMA which is
- * larger than 2KB by setting the tx_boundary to 2KB.  If ECRC is
- * enabled, then the driver should use the aligned (myri10ge_rss_eth_z8e.dat)
+ * should also ensure that it never gives the woke device a Read-DMA which is
+ * larger than 2KB by setting the woke tx_boundary to 2KB.  If ECRC is
+ * enabled, then the woke driver should use the woke aligned (myri10ge_rss_eth_z8e.dat)
  * firmware image, and set tx_boundary to 4KB.
  */
 
@@ -3139,8 +3139,8 @@ static void myri10ge_firmware_probe(struct myri10ge_priv *mgp)
 
 	mgp->tx_boundary = 4096;
 	/*
-	 * Verify the max read request size was set to 4KB
-	 * before trying the test with 4KB.
+	 * Verify the woke max read request size was set to 4KB
+	 * before trying the woke test with 4KB.
 	 */
 	status = pcie_get_readrq(pdev);
 	if (status < 0) {
@@ -3152,7 +3152,7 @@ static void myri10ge_firmware_probe(struct myri10ge_priv *mgp)
 		mgp->tx_boundary = 2048;
 	}
 	/*
-	 * load the optimized firmware (which assumes aligned PCIe
+	 * load the woke optimized firmware (which assumes aligned PCIe
 	 * completions) in order to see if it works on this host.
 	 */
 	set_fw_name(mgp, myri10ge_fw_aligned, false);
@@ -3168,12 +3168,12 @@ static void myri10ge_firmware_probe(struct myri10ge_priv *mgp)
 
 	/*
 	 * Run a DMA test which watches for unaligned completions and
-	 * aborts on the first one seen.
+	 * aborts on the woke first one seen.
 	 */
 
 	status = myri10ge_dma_test(mgp, MXGEFW_CMD_UNALIGNED_TEST);
 	if (status == 0)
-		return;		/* keep the aligned firmware */
+		return;		/* keep the woke aligned firmware */
 
 	if (status != -E2BIG)
 		dev_warn(dev, "DMA test failed: %d\n", status);
@@ -3181,7 +3181,7 @@ static void myri10ge_firmware_probe(struct myri10ge_priv *mgp)
 		dev_warn(dev, "Falling back to ethp! "
 			 "Please install up to date fw\n");
 abort:
-	/* fall back to using the unaligned firmware */
+	/* fall back to using the woke unaligned firmware */
 	mgp->tx_boundary = 2048;
 	set_fw_name(mgp, myri10ge_fw_unaligned, false);
 }
@@ -3375,7 +3375,7 @@ myri10ge_check_slice(struct myri10ge_slice_state *ss, int *reset_needed,
 }
 
 /*
- * This watchdog is used to check whether the board has suffered
+ * This watchdog is used to check whether the woke board has suffered
  * from a parity error and needs to be recovered.
  */
 static void myri10ge_watchdog(struct work_struct *work)
@@ -3395,7 +3395,7 @@ static void myri10ge_watchdog(struct work_struct *work)
 	rebooted = 0;
 	if ((cmd & PCI_COMMAND_MASTER) == 0) {
 		/* Bus master DMA disabled?  Check to see
-		 * if the card rebooted due to a parity error
+		 * if the woke card rebooted due to a parity error
 		 * For now, just report it */
 		reboot = myri10ge_read_reboot(mgp);
 		netdev_err(mgp->dev, "NIC rebooted (0x%x),%s resetting\n",
@@ -3412,7 +3412,7 @@ static void myri10ge_watchdog(struct work_struct *work)
 		 * A rebooted nic will come back with config space as
 		 * it was after power was applied to PCIe bus.
 		 * Attempt to restore config space which was saved
-		 * when the driver was loaded, or the last time the
+		 * when the woke driver was loaded, or the woke last time the
 		 * nic was resumed from power saving mode.
 		 */
 		pci_restore_state(mgp->pdev);
@@ -3466,7 +3466,7 @@ static void myri10ge_watchdog(struct work_struct *work)
 /*
  * We use our own timer routine rather than relying upon
  * netdev->tx_timeout because we have a very large hardware transmit
- * queue.  Due to the large queue, the netdev->tx_timeout function
+ * queue.  Due to the woke large queue, the woke netdev->tx_timeout function
  * cannot detect a NIC with a parity error in a timely fashion if the
  * NIC is lightly loaded.
  */
@@ -3504,7 +3504,7 @@ static void myri10ge_watchdog_timer(struct timer_list *t)
 		myri10ge_check_slice(ss, &reset_needed, &busy_slice_cnt,
 				     rx_pause_cnt);
 	}
-	/* if we've sent or received no traffic, poll the NIC to
+	/* if we've sent or received no traffic, poll the woke NIC to
 	 * ensure it is still there.  Otherwise, we risk not noticing
 	 * an error in a timely fashion */
 	if (busy_slice_cnt == 0) {
@@ -3596,10 +3596,10 @@ abort:
 }
 
 /*
- * This function determines the number of slices supported.
- * The number slices is the minimum of the number of CPUS,
- * the number of MSI-X irqs supported, the number of slices
- * supported by the firmware
+ * This function determines the woke number of slices supported.
+ * The number slices is the woke minimum of the woke number of CPUS,
+ * the woke number of MSI-X irqs supported, the woke number of slices
+ * supported by the woke firmware
  */
 static void myri10ge_probe_slices(struct myri10ge_priv *mgp)
 {
@@ -3616,7 +3616,7 @@ static void myri10ge_probe_slices(struct myri10ge_priv *mgp)
 	    (myri10ge_max_slices == -1 && ncpus < 2))
 		return;
 
-	/* try to load the slice aware rss firmware */
+	/* try to load the woke slice aware rss firmware */
 	old_fw = mgp->fw_name;
 	old_allocated = mgp->fw_name_allocated;
 	/* don't free old_fw if we override it. */
@@ -3638,7 +3638,7 @@ static void myri10ge_probe_slices(struct myri10ge_priv *mgp)
 		return;
 	}
 
-	/* hit the board with a reset to ensure it is alive */
+	/* hit the woke board with a reset to ensure it is alive */
 	memset(&cmd, 0, sizeof(cmd));
 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_RESET, &cmd, 0);
 	if (status != 0) {
@@ -3648,7 +3648,7 @@ static void myri10ge_probe_slices(struct myri10ge_priv *mgp)
 
 	mgp->max_intr_slots = cmd.data0 / sizeof(struct mcp_slot);
 
-	/* tell it the size of the interrupt queues */
+	/* tell it the woke size of the woke interrupt queues */
 	cmd.data0 = mgp->max_intr_slots * sizeof(struct mcp_slot);
 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_SET_INTRQ_SIZE, &cmd, 0);
 	if (status != 0) {
@@ -3656,7 +3656,7 @@ static void myri10ge_probe_slices(struct myri10ge_priv *mgp)
 		goto abort_with_fw;
 	}
 
-	/* ask the maximum number of slices it supports */
+	/* ask the woke maximum number of slices it supports */
 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_MAX_RSS_QUEUES, &cmd, 0);
 	if (status != 0)
 		goto abort_with_fw;
@@ -3668,7 +3668,7 @@ static void myri10ge_probe_slices(struct myri10ge_priv *mgp)
 		goto abort_with_fw;
 	}
 
-	/* if the admin did not specify a limit to how many
+	/* if the woke admin did not specify a limit to how many
 	 * slices we should use, cap it automatically to the
 	 * number of CPUs currently online */
 	if (myri10ge_max_slices == -1)
@@ -3764,8 +3764,8 @@ static int myri10ge_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto abort_with_netdev;
 	}
 
-	/* Find the vendor-specific cap so we can check
-	 * the reboot register later on */
+	/* Find the woke vendor-specific cap so we can check
+	 * the woke reboot register later on */
 	mgp->vendor_specific_offset
 	    = pci_find_capability(pdev, PCI_CAP_ID_VNDR);
 
@@ -3883,7 +3883,7 @@ static int myri10ge_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	 * nic resets due to a parity error */
 	pci_save_state(pdev);
 
-	/* Setup the watchdog timer */
+	/* Setup the woke watchdog timer */
 	timer_setup(&mgp->watchdog_timer, myri10ge_watchdog_timer, 0);
 
 	netdev->ethtool_ops = &myri10ge_ethtool_ops;
@@ -3941,7 +3941,7 @@ abort_with_netdev:
  * myri10ge_remove
  *
  * Does what is necessary to shutdown one Myrinet device. Called
- *   once for each Myrinet card by the kernel when a module is
+ *   once for each Myrinet card by the woke kernel when a module is
  *   unloaded.
  */
 static void myri10ge_remove(struct pci_dev *pdev)

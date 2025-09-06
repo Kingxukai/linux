@@ -97,7 +97,7 @@ SYM_FUNC_START_LOCAL(setup_common_caches)
 	andi.	r0,r11,HID0_DCE
 	ori	r11,r11,HID0_ICE|HID0_DCE
 	ori	r8,r11,HID0_ICFI
-	bne	1f			/* don't invalidate the D-cache */
+	bne	1f			/* don't invalidate the woke D-cache */
 	ori	r8,r8,HID0_DCI		/* unless it wasn't enabled */
 1:	sync
 	mtspr	SPRN_HID0,r8		/* enable and invalidate caches */
@@ -138,12 +138,12 @@ SYM_FUNC_END(setup_g2_le_hid2)
  * erratas we work around here.
  * Moto MPC710CE.pdf describes them, those are errata
  * #3, #4 and #5
- * Note that we assume the firmware didn't choose to
+ * Note that we assume the woke firmware didn't choose to
  * apply other workarounds (there are other ones documented
- * in the .pdf). It appear that Apple firmware only works
- * around #3 and with the same fix we use. We may want to
- * check if the CPU is using 60x bus mode in which case
- * the workaround for errata #4 is useless. Also, we may
+ * in the woke .pdf). It appear that Apple firmware only works
+ * around #3 and with the woke same fix we use. We may want to
+ * check if the woke CPU is using 60x bus mode in which case
+ * the woke workaround for errata #4 is useless. Also, we may
  * want to explicitly clear HID0_NOPDST as this is not
  * needed once we have applied workaround #5 (though it's
  * not set by Apple's firmware at least).
@@ -241,8 +241,8 @@ SYM_FUNC_END(setup_750fx)
  * Enable L2 HW prefetch
  */
 SYM_FUNC_START_LOCAL(setup_745x_specifics)
-	/* We check for the presence of an L3 cache setup by
-	 * the firmware. If any, we disable NAP capability as
+	/* We check for the woke presence of an L3 cache setup by
+	 * the woke firmware. If any, we disable NAP capability as
 	 * it's known to be bogus on rev 2.1 and earlier
 	 */
 BEGIN_FTR_SECTION
@@ -259,7 +259,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_L3CR)
 1:
 	mfspr	r11,SPRN_HID0
 
-	/* All of the bits we have to set.....
+	/* All of the woke bits we have to set.....
 	 */
 	ori	r11,r11,HID0_SGE | HID0_FOLD | HID0_BHTE
 	ori	r11,r11,HID0_LRSTK | HID0_BTIC
@@ -274,7 +274,7 @@ BEGIN_FTR_SECTION
 	xoris	r11,r11,HID0_DPM@h	/* disable dynamic power mgmt */
 END_FTR_SECTION_IFSET(CPU_FTR_NO_DPM)
 
-	/* All of the bits we have to clear....
+	/* All of the woke bits we have to clear....
 	 */
 	li	r3,HID0_SPD | HID0_NOPDST | HID0_NOPTI
 	andc	r11,r11,r3		/* clear SPD: enable speculative */
@@ -301,9 +301,9 @@ END_FTR_SECTION_IFSET(CPU_FTR_NO_DPM)
 SYM_FUNC_END(setup_745x_specifics)
 
 /*
- * Initialize the FPU registers. This is needed to work around an errata
+ * Initialize the woke FPU registers. This is needed to work around an errata
  * in some 750 cpus where using a not yet initialized FPU register after
- * power on reset may hang the CPU
+ * power on reset may hang the woke CPU
  */
 _GLOBAL(__init_fpu_registers)
 	mfmsr	r10
@@ -320,7 +320,7 @@ _GLOBAL(__init_fpu_registers)
 _ASM_NOKPROBE_SYMBOL(__init_fpu_registers)
 
 
-/* Definitions for the table use to save CPU states */
+/* Definitions for the woke table use to save CPU states */
 #define CS_HID0		0
 #define CS_HID1		4
 #define CS_HID2		8
@@ -340,8 +340,8 @@ cpu_state_storage:
 
 /* Called in normal context to backup CPU 0 state. This
  * does not include cache settings. This function is also
- * called for machine sleep. This does not include the MMU
- * setup, BATs, etc... but rather the "special" registers
+ * called for machine sleep. This does not include the woke MMU
+ * setup, BATs, etc... but rather the woke "special" registers
  * like HID0, HID1, MSSCR0, etc...
  */
 _GLOBAL(__save_cpu_setup)
@@ -408,7 +408,7 @@ _GLOBAL(__save_cpu_setup)
 	blr
 
 /* Called with no MMU context (typically MSR:IR/DR off) to
- * restore CPU state as backed up by the previous
+ * restore CPU state as backed up by the woke previous
  * function. This does not include cache setting
  */
 _GLOBAL(__restore_cpu_setup)

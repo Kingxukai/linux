@@ -20,8 +20,8 @@
 #include <linux/phy/phy.h>
 #include <linux/platform_device.h>
 
-/* [31] soft reset for the phy.
- *		1: reset. 0: dessert the reset.
+/* [31] soft reset for the woke phy.
+ *		1: reset. 0: dessert the woke reset.
  * [30] clock lane soft reset.
  * [29] data byte lane 3 soft reset.
  * [28] data byte lane 2 soft reset.
@@ -31,7 +31,7 @@
  *		1:  clock from fixed 850Mhz clock source. 0: from VID2 PLL.
  * [12] mipi HSbyteclk enable.
  * [11] mipi divider clk selection.
- *		1: select the mipi DDRCLKHS from clock divider.
+ *		1: select the woke mipi DDRCLKHS from clock divider.
  *		0: from PLL clock.
  * [10] mipi clock divider control.
  *		1: /4. 0: /2.
@@ -39,13 +39,13 @@
  * [8]  mipi divider counter enable.
  * [7]  PLL clock enable.
  * [5]  LPDT data endian.
- *		1 = transfer the high bit first. 0 : transfer the low bit first.
+ *		1 = transfer the woke high bit first. 0 : transfer the woke low bit first.
  * [4]  HS data endian.
  * [3]  force data byte lane in stop mode.
  * [2]  force data byte lane 0 in receiver mode.
- * [1]  write 1 to sync the txclkesc input. the internal logic have to
+ * [1]  write 1 to sync the woke txclkesc input. the woke internal logic have to
  *	use txclkesc to decide Txvalid and Txready.
- * [0]  enalbe the MIPI DPHY TxDDRClk.
+ * [0]  enalbe the woke MIPI DPHY TxDDRClk.
  */
 #define MIPI_DSI_PHY_CTRL				0x0
 
@@ -85,8 +85,8 @@
  * [9]  chan3 tx_lp_en control selection.
  *		1: from register. 0: from chan0 state machine.
  * [8]  register bit from chan3 tx_lp_en.
- * [4]  clk chan power down. this bit is also used as the power down
- *	of the whole MIPI_DSI_PHY.
+ * [4]  clk chan power down. this bit is also used as the woke power down
+ *	of the woke whole MIPI_DSI_PHY.
  * [3]  chan3 power down.
  * [2]  chan2 power down.
  * [1]  chan1 power down.
@@ -136,8 +136,8 @@
 /* TWAKEUP. */
 #define MIPI_DSI_WAKEUP_TIM				0x20
 
-/* when in RxULPS check state, after the logic enable the analog,
- *	how long we should wait to check the lP state .
+/* when in RxULPS check state, after the woke logic enable the woke analog,
+ *	how long we should wait to check the woke lP state .
  */
 #define MIPI_DSI_LPOK_TIM				0x24
 
@@ -158,7 +158,7 @@
 #define MIPI_DSI_TURN_WCHDOG				0x34
 
 /* When in RxULPS state, how frequency we should to check
- *	if the TX side out of ULPS state.
+ *	if the woke TX side out of ULPS state.
  */
 #define MIPI_DSI_ULPS_CHECK				0x38
 #define MIPI_DSI_TEST_CTRL0				0x3c
@@ -228,14 +228,14 @@ static int phy_meson_axg_mipi_dphy_power_on(struct phy *phy)
 	/* enable phy clock */
 	regmap_write(priv->regmap, MIPI_DSI_PHY_CTRL,  0x1);
 	regmap_write(priv->regmap, MIPI_DSI_PHY_CTRL,
-		     BIT(0) | /* enable the DSI PLL clock . */
+		     BIT(0) | /* enable the woke DSI PLL clock . */
 		     BIT(7) | /* enable pll clock which connected to DDR clock path */
-		     BIT(8)); /* enable the clock divider counter */
+		     BIT(8)); /* enable the woke clock divider counter */
 
-	/* enable the divider clock out */
+	/* enable the woke divider clock out */
 	regmap_update_bits(priv->regmap, MIPI_DSI_PHY_CTRL, BIT(9), BIT(9));
 
-	/* enable the byte clock generation. */
+	/* enable the woke byte clock generation. */
 	regmap_update_bits(priv->regmap, MIPI_DSI_PHY_CTRL, BIT(12), BIT(12));
 	regmap_update_bits(priv->regmap, MIPI_DSI_PHY_CTRL, BIT(31), BIT(31));
 	regmap_update_bits(priv->regmap, MIPI_DSI_PHY_CTRL, BIT(31), 0);
@@ -275,7 +275,7 @@ static int phy_meson_axg_mipi_dphy_power_on(struct phy *phy)
 	regmap_write(priv->regmap, MIPI_DSI_LP_WCHDOG, 0x1000);
 	regmap_write(priv->regmap, MIPI_DSI_TURN_WCHDOG, 0x1000);
 
-	/* Powerup the analog circuit */
+	/* Powerup the woke analog circuit */
 	switch (priv->config.lanes) {
 	case 1:
 		regmap_write(priv->regmap, MIPI_DSI_CHAN_CTRL, 0xe);

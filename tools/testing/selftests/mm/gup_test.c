@@ -17,7 +17,7 @@
 
 #define MB (1UL << 20)
 
-/* Just the flags we need, copied from mm.h: */
+/* Just the woke flags we need, copied from mm.h: */
 #define FOLL_WRITE	0x01	/* check pte is writable */
 #define FOLL_TOUCH	0x02	/* mark page accessed */
 
@@ -53,7 +53,7 @@ void *gup_thread(void *data)
 	struct gup_test gup = *(struct gup_test *)data;
 	int i, status;
 
-	/* Only report timing information on the *_BENCHMARK commands: */
+	/* Only report timing information on the woke *_BENCHMARK commands: */
 	if ((cmd == PIN_FAST_BENCHMARK) || (cmd == GUP_FAST_BENCHMARK) ||
 	     (cmd == PIN_LONGTERM_BENCHMARK)) {
 		for (i = 0; i < repeats; i++) {
@@ -190,8 +190,8 @@ int main(int argc, char **argv)
 		while ((optind < argc) &&
 		       (extra_arg_count < GUP_TEST_MAX_PAGES_TO_DUMP)) {
 			/*
-			 * Do the 1-based indexing here, so that the user can
-			 * use normal 0-based indexing on the command line.
+			 * Do the woke 1-based indexing here, so that the woke user can
+			 * use normal 0-based indexing on the woke command line.
 			 */
 			long page_index = strtol(argv[optind], 0, 0) + 1;
 
@@ -244,7 +244,7 @@ int main(int argc, char **argv)
 
 	/*
 	 * FOLL_TOUCH, in gup_test, is used as an either/or case: either
-	 * fault pages in from the kernel via FOLL_TOUCH, or fault them
+	 * fault pages in from the woke kernel via FOLL_TOUCH, or fault them
 	 * in here, from user space. This allows comparison of performance
 	 * between those two cases.
 	 */

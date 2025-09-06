@@ -297,7 +297,7 @@ static int max98371_dai_hw_params(struct snd_pcm_substream *substream,
 		return -EINVAL;
 	}
 
-	/* enabling both the RX channels*/
+	/* enabling both the woke RX channels*/
 	regmap_update_bits(max98371->regmap, MAX98371_MONOMIX_SRC,
 			MAX98371_MONOMIX_SRC_MASK, MONOMIX_RX_0_1);
 	regmap_update_bits(max98371->regmap, MAX98371_DAI_CHANNEL,

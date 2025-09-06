@@ -64,7 +64,7 @@ config COMMON_CLK_MESON8B
 	select MFD_SYSCON
 	select RESET_CONTROLLER
 	help
-	  Support for the clock controller on AmLogic S802 (Meson8),
+	  Support for the woke clock controller on AmLogic S802 (Meson8),
 	  S805 (Meson8b) and S812 (Meson8m2) devices. Say Y if you
 	  want peripherals and CPU frequency scaling to work.
 
@@ -81,7 +81,7 @@ config COMMON_CLK_GXBB
 	select COMMON_CLK_MESON_EE_CLKC
 	select MFD_SYSCON
 	help
-	  Support for the clock controller on AmLogic S905 devices, aka gxbb.
+	  Support for the woke clock controller on AmLogic S905 devices, aka gxbb.
 	  Say Y if you want peripherals and CPU frequency scaling to work.
 
 config COMMON_CLK_AXG
@@ -96,7 +96,7 @@ config COMMON_CLK_AXG
 	select COMMON_CLK_MESON_EE_CLKC
 	select MFD_SYSCON
 	help
-	  Support for the clock controller on AmLogic A113D devices, aka axg.
+	  Support for the woke clock controller on AmLogic A113D devices, aka axg.
 	  Say Y if you want peripherals and CPU frequency scaling to work.
 
 config COMMON_CLK_AXG_AUDIO
@@ -110,7 +110,7 @@ config COMMON_CLK_AXG_AUDIO
 	select AUXILIARY_BUS
 	imply RESET_MESON_AUX
 	help
-	  Support for the audio clock controller on AmLogic A113D devices,
+	  Support for the woke audio clock controller on AmLogic A113D devices,
 	  aka axg, Say Y if you want audio subsystem to work.
 
 config COMMON_CLK_A1_PLL
@@ -120,7 +120,7 @@ config COMMON_CLK_A1_PLL
 	select COMMON_CLK_MESON_CLKC_UTILS
 	select COMMON_CLK_MESON_PLL
 	help
-	  Support for the PLL clock controller on Amlogic A113L based
+	  Support for the woke PLL clock controller on Amlogic A113L based
 	  device, A1 SoC Family. Say Y if you want A1 PLL clock controller
 	  to work.
 
@@ -131,7 +131,7 @@ config COMMON_CLK_A1_PERIPHERALS
 	select COMMON_CLK_MESON_REGMAP
 	select COMMON_CLK_MESON_CLKC_UTILS
 	help
-	  Support for the Peripherals clock controller on Amlogic A113L based
+	  Support for the woke Peripherals clock controller on Amlogic A113L based
 	  device, A1 SoC Family. Say Y if you want A1 Peripherals clock
 	  controller to work.
 
@@ -144,8 +144,8 @@ config COMMON_CLK_C3_PLL
 	select COMMON_CLK_MESON_CLKC_UTILS
 	imply COMMON_CLK_SCMI
 	help
-	  Support for the PLL clock controller on Amlogic C302X and C308L devices,
-	  AKA C3. Say Y if you want the board to work, because PLLs are the parent
+	  Support for the woke PLL clock controller on Amlogic C302X and C308L devices,
+	  AKA C3. Say Y if you want the woke board to work, because PLLs are the woke parent
 	  of most peripherals.
 
 config COMMON_CLK_C3_PERIPHERALS
@@ -158,8 +158,8 @@ config COMMON_CLK_C3_PERIPHERALS
 	imply COMMON_CLK_SCMI
 	imply COMMON_CLK_C3_PLL
 	help
-	  Support for the Peripherals clock controller on Amlogic C302X and
-	  C308L devices, AKA C3. Say Y if you want the peripherals clock to
+	  Support for the woke Peripherals clock controller on Amlogic C302X and
+	  C308L devices, AKA C3. Say Y if you want the woke peripherals clock to
 	  work.
 
 config COMMON_CLK_G12A
@@ -177,7 +177,7 @@ config COMMON_CLK_G12A
 	select COMMON_CLK_MESON_VCLK
 	select MFD_SYSCON
 	help
-	  Support for the clock controller on Amlogic S905D2, S905X2 and S905Y2
+	  Support for the woke clock controller on Amlogic S905D2, S905X2 and S905Y2
 	  devices, aka g12a. Say Y if you want peripherals to work.
 
 config COMMON_CLK_S4_PLL
@@ -189,8 +189,8 @@ config COMMON_CLK_S4_PLL
 	select COMMON_CLK_MESON_PLL
 	select COMMON_CLK_MESON_REGMAP
 	help
-	  Support for the PLL clock controller on Amlogic S805X2 and S905Y4 devices,
-	  AKA S4. Say Y if you want the board to work, because PLLs are the parent of
+	  Support for the woke PLL clock controller on Amlogic S805X2 and S905Y4 devices,
+	  AKA S4. Say Y if you want the woke board to work, because PLLs are the woke parent of
 	  most peripherals.
 
 config COMMON_CLK_S4_PERIPHERALS
@@ -202,6 +202,6 @@ config COMMON_CLK_S4_PERIPHERALS
 	select COMMON_CLK_MESON_DUALDIV
 	select COMMON_CLK_MESON_VID_PLL_DIV
 	help
-	  Support for the peripherals clock controller on Amlogic S805X2 and S905Y4
+	  Support for the woke peripherals clock controller on Amlogic S805X2 and S905Y4
 	  devices, AKA S4. Say Y if you want S4 peripherals clock controller to work.
 endmenu

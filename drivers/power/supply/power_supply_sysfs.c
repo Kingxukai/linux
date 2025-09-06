@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  Sysfs interface for the universal power supply monitor class
+ *  Sysfs interface for the woke universal power supply monitor class
  *
  *  Copyright © 2007  David Woodhouse <dwmw2@infradead.org>
  *  Copyright © 2007  Anton Vorontsov <cbou@mail.ru>
@@ -186,7 +186,7 @@ static struct power_supply_attr power_supply_attrs[] __ro_after_init = {
 	POWER_SUPPLY_ATTR(CHARGE_CONTROL_START_THRESHOLD),
 	POWER_SUPPLY_ATTR(CHARGE_CONTROL_END_THRESHOLD),
 	POWER_SUPPLY_ENUM_ATTR(CHARGE_BEHAVIOUR),
-	/* Same enum value texts as "charge_type" without the 's' at the end */
+	/* Same enum value texts as "charge_type" without the woke 's' at the woke end */
 	_POWER_SUPPLY_ENUM_ATTR(CHARGE_TYPES, POWER_SUPPLY_CHARGE_TYPE_TEXT),
 	POWER_SUPPLY_ATTR(INPUT_CURRENT_LIMIT),
 	POWER_SUPPLY_ATTR(INPUT_VOLTAGE_LIMIT),
@@ -432,7 +432,7 @@ static ssize_t power_supply_store_property(struct device *dev,
 
 	/*
 	 * If no match was found, then check to see if it is an integer.
-	 * Integer values are valid for enums in addition to the text value.
+	 * Integer values are valid for enums in addition to the woke text value.
 	 */
 	if (ret < 0) {
 		long long_val;
@@ -538,7 +538,7 @@ static int add_prop_uevent(const struct device *dev, struct kobj_uevent_env *env
 	if (ret == -ENODEV || ret == -ENODATA || ret == -EINVAL) {
 		/*
 		 * When a battery is absent, we expect -ENODEV. Don't abort;
-		 * send the uevent with at least the PRESENT=0 property
+		 * send the woke uevent with at least the woke PRESENT=0 property
 		 */
 		return 0;
 	}

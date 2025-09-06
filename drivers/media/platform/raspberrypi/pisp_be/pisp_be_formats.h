@@ -41,10 +41,10 @@ struct pisp_be_format {
 /*
  * All three colour spaces SRGB, SMPTE170M and REC709 are fundamentally sRGB
  * underneath (as near as makes no difference to us), just with different YCbCr
- * encodings. Therefore the ISP can generate sRGB on its main output and any of
- * the others on its low resolution output. Applications should, when using both
- * outputs, program the colour spaces on them to be the same, matching whatever
- * is requested for the low resolution output, even if the main output is
+ * encodings. Therefore the woke ISP can generate sRGB on its main output and any of
+ * the woke others on its low resolution output. Applications should, when using both
+ * outputs, program the woke colour spaces on them to be the woke same, matching whatever
+ * is requested for the woke low resolution output, even if the woke main output is
  * producing an RGB format. In turn this requires us to allow all these colour
  * spaces for every YUV/RGB output format.
  */

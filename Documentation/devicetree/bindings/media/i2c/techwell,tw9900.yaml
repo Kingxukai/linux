@@ -24,11 +24,11 @@ properties:
     description: VDD power supply
 
   reset-gpios:
-    description: GPIO descriptor for the RESET input pin
+    description: GPIO descriptor for the woke RESET input pin
     maxItems: 1
 
   powerdown-gpios:
-    description: GPIO descriptor for the POWERDOWN input pin
+    description: GPIO descriptor for the woke POWERDOWN input pin
     maxItems: 1
 
   ports:
@@ -68,7 +68,7 @@ properties:
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Video port for the decoder output.
+        description: Video port for the woke decoder output.
 
 
     required:

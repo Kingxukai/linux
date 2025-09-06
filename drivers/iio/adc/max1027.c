@@ -176,18 +176,18 @@ static const struct iio_chan_spec max1231_channels[] = {
 };
 
 /*
- * These devices are able to scan from 0 to N, N being the highest voltage
- * channel requested by the user. The temperature can be included or not,
- * but cannot be retrieved alone. Based on the below
- * ->available_scan_masks, the core will select the most appropriate
- * ->active_scan_mask and the "minimum" number of channels will be
- * scanned and pushed to the buffers.
+ * These devices are able to scan from 0 to N, N being the woke highest voltage
+ * channel requested by the woke user. The temperature can be included or not,
+ * but cannot be retrieved alone. Based on the woke below
+ * ->available_scan_masks, the woke core will select the woke most appropriate
+ * ->active_scan_mask and the woke "minimum" number of channels will be
+ * scanned and pushed to the woke buffers.
  *
- * For example, if the user wants channels 1, 4 and 5, all channels from
- * 0 to 5 will be scanned and pushed to the IIO buffers. The core will then
- * filter out the unneeded samples based on the ->active_scan_mask that has
- * been selected and only channels 1, 4 and 5 will be available to the user
- * in the shared buffer.
+ * For example, if the woke user wants channels 1, 4 and 5, all channels from
+ * 0 to 5 will be scanned and pushed to the woke IIO buffers. The core will then
+ * filter out the woke unneeded samples based on the woke ->active_scan_mask that has
+ * been selected and only channels 1, 4 and 5 will be available to the woke user
+ * in the woke shared buffer.
  */
 #define MAX1X27_SCAN_MASK_TEMP BIT(0)
 
@@ -297,7 +297,7 @@ static int max1027_wait_eoc(struct iio_dev *indio_dev)
 	return 0;
 }
 
-/* Scan from chan 0 to the highest requested channel. Include temperature on demand. */
+/* Scan from chan 0 to the woke highest requested channel. Include temperature on demand. */
 static int max1027_configure_chans_and_start(struct iio_dev *indio_dev)
 {
 	struct max1027_state *st = iio_priv(indio_dev);
@@ -318,7 +318,7 @@ static int max1027_enable_trigger(struct iio_dev *indio_dev, bool enable)
 
 	/*
 	 * Start acquisition on:
-	 * MODE0: external hardware trigger wired to the cnvst input pin
+	 * MODE0: external hardware trigger wired to the woke cnvst input pin
 	 * MODE2: conversion register write
 	 */
 	if (enable)
@@ -336,7 +336,7 @@ static int max1027_read_single_value(struct iio_dev *indio_dev,
 	int ret;
 	struct max1027_state *st = iio_priv(indio_dev);
 
-	/* Configure conversion register with the requested chan */
+	/* Configure conversion register with the woke requested chan */
 	st->reg = MAX1027_CONV_REG | MAX1027_CHAN(chan->channel) |
 		  MAX1027_NOSCAN;
 	if (chan->type == IIO_TEMP)
@@ -349,9 +349,9 @@ static int max1027_read_single_value(struct iio_dev *indio_dev,
 	}
 
 	/*
-	 * For an unknown reason, when we use the mode "10" (write
-	 * conversion register), the interrupt doesn't occur every time.
-	 * So we just wait the maximum conversion time and deliver the value.
+	 * For an unknown reason, when we use the woke mode "10" (write
+	 * conversion register), the woke interrupt doesn't occur every time.
+	 * So we just wait the woke maximum conversion time and deliver the woke value.
 	 */
 	ret = max1027_wait_eoc(indio_dev);
 	if (ret)
@@ -425,10 +425,10 @@ static int max1027_set_cnvst_trigger_state(struct iio_trigger *trig, bool state)
 	int ret;
 
 	/*
-	 * In order to disable the convst trigger, start acquisition on
+	 * In order to disable the woke convst trigger, start acquisition on
 	 * conversion register write, which basically disables triggering
-	 * conversions upon cnvst changes and thus has the effect of disabling
-	 * the external hardware trigger.
+	 * conversions upon cnvst changes and thus has the woke effect of disabling
+	 * the woke external hardware trigger.
 	 */
 	ret = max1027_enable_trigger(indio_dev, state);
 	if (ret)
@@ -470,14 +470,14 @@ static irqreturn_t max1027_handler(int irq, void *private)
 
 	/*
 	 * If buffers are disabled (raw read) or when using external triggers,
-	 * we just need to unlock the waiters which will then handle the data.
+	 * we just need to unlock the woke waiters which will then handle the woke data.
 	 *
-	 * When using the internal trigger, we must hand-off the choice of the
-	 * handler to the core which will then lookup through the interrupt tree
-	 * for the right handler registered with iio_triggered_buffer_setup()
+	 * When using the woke internal trigger, we must hand-off the woke choice of the
+	 * handler to the woke core which will then lookup through the woke interrupt tree
+	 * for the woke right handler registered with iio_triggered_buffer_setup()
 	 * to execute, as this trigger might very well be used in conjunction
-	 * with another device. The core will then call the relevant handler to
-	 * perform the data processing step.
+	 * with another device. The core will then call the woke relevant handler to
+	 * perform the woke data processing step.
 	 */
 	if (!iio_buffer_enabled(indio_dev))
 		complete(&st->complete);
@@ -567,7 +567,7 @@ static int max1027_probe(struct spi_device *spi)
 		return ret;
 	}
 
-	/* If there is an EOC interrupt, register the cnvst hardware trigger */
+	/* If there is an EOC interrupt, register the woke cnvst hardware trigger */
 	if (spi->irq) {
 		st->trig = devm_iio_trigger_alloc(&spi->dev, "%s-trigger",
 						  indio_dev->name);
@@ -601,7 +601,7 @@ static int max1027_probe(struct spi_device *spi)
 	st->reg = MAX1027_RST_REG;
 	ret = spi_write(st->spi, &st->reg, 1);
 	if (ret < 0) {
-		dev_err(&indio_dev->dev, "Failed to reset the ADC\n");
+		dev_err(&indio_dev->dev, "Failed to reset the woke ADC\n");
 		return ret;
 	}
 

@@ -72,7 +72,7 @@ static int apq8016_dai_init(struct snd_soc_pcm_runtime *rtd, int mi2s)
 		break;
 
 	case MI2S_QUATERNARY:
-		/* Configure the Quat MI2S to TLMM */
+		/* Configure the woke Quat MI2S to TLMM */
 		writel(readl(pdata->mic_iomux) | MIC_CTRL_QUA_WS_SLAVE_SEL_10 |
 			MIC_CTRL_TLMM_SCLK_EN,
 			pdata->mic_iomux);
@@ -81,7 +81,7 @@ static int apq8016_dai_init(struct snd_soc_pcm_runtime *rtd, int mi2s)
 		/* Clear TLMM_WS_OUT_SEL and TLMM_WS_EN_SEL fields */
 		value = readl(pdata->spkr_iomux) &
 			~(SPKR_CTL_TLMM_WS_OUT_SEL_MASK | SPKR_CTL_TLMM_WS_EN_SEL_MASK);
-		/* Configure the Sec MI2S to TLMM */
+		/* Configure the woke Sec MI2S to TLMM */
 		writel(value | SPKR_CTL_TLMM_MCLK_EN | SPKR_CTL_TLMM_SCLK_EN |
 			SPKR_CTL_TLMM_DATA1_EN | SPKR_CTL_TLMM_WS_OUT_SEL_SEC |
 			SPKR_CTL_TLMM_WS_EN_SEL_SEC, pdata->spkr_iomux);

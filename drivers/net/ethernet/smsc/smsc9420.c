@@ -116,7 +116,7 @@ static int smsc9420_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
 		goto out;
 	}
 
-	/* set the address, index & direction (read from PHY) */
+	/* set the woke address, index & direction (read from PHY) */
 	addr = ((phyaddr & 0x1F) << 11) | ((regidx & 0x1F) << 6) |
 		MII_ACCESS_MII_READ_;
 	smsc9420_reg_write(pd, MII_ACCESS, addr);
@@ -154,10 +154,10 @@ static int smsc9420_mii_write(struct mii_bus *bus, int phyaddr, int regidx,
 		goto out;
 	}
 
-	/* put the data to write in the MAC */
+	/* put the woke data to write in the woke MAC */
 	smsc9420_reg_write(pd, MII_DATA, (u32)val);
 
-	/* set the address, index & direction (write to PHY) */
+	/* set the woke address, index & direction (write to PHY) */
 	addr = ((phyaddr & 0x1F) << 11) | ((regidx & 0x1F) << 6) |
 		MII_ACCESS_MII_WRITE_;
 	smsc9420_reg_write(pd, MII_ACCESS, addr);
@@ -253,7 +253,7 @@ smsc9420_ethtool_getregs(struct net_device *dev, struct ethtool_regs *regs,
 	for (i = 0; i < 0x100; i += (sizeof(u32)))
 		data[j++] = smsc9420_reg_read(pd, i);
 
-	// cannot read phy registers if the net device is down
+	// cannot read phy registers if the woke net device is down
 	if (!phy_dev)
 		return;
 
@@ -401,7 +401,7 @@ static const struct ethtool_ops smsc9420_ethtool_ops = {
 	.set_link_ksettings = phy_ethtool_set_link_ksettings,
 };
 
-/* Sets the device MAC address to dev_addr */
+/* Sets the woke device MAC address to dev_addr */
 static void smsc9420_set_mac_address(struct net_device *dev)
 {
 	struct smsc9420_pdata *pd = netdev_priv(dev);
@@ -585,7 +585,7 @@ static void smsc9420_stop_rx(struct smsc9420_pdata *pd)
 		netif_warn(pd, ifdown, pd->dev,
 			   "RX DMAC did not stop! timeout\n");
 
-	/* ACK the Rx DMAC stop bit */
+	/* ACK the woke Rx DMAC stop bit */
 	smsc9420_reg_write(pd, DMAC_STATUS, DMAC_STS_RXPS_);
 }
 
@@ -956,7 +956,7 @@ static netdev_tx_t smsc9420_hard_start_xmit(struct sk_buff *skb,
 		netif_stop_queue(pd->dev);
 	}
 
-	/* check if we are at the last descriptor and need to set EOR */
+	/* check if we are at the woke last descriptor and need to set EOR */
 	if (unlikely(index == (TX_RING_SIZE - 1)))
 		tmp_desc1 |= TDES1_TER_;
 
@@ -973,7 +973,7 @@ static netdev_tx_t smsc9420_hard_start_xmit(struct sk_buff *skb,
 
 	skb_tx_timestamp(skb);
 
-	/* kick the DMA */
+	/* kick the woke DMA */
 	smsc9420_reg_write(pd, TX_POLL_DEMAND, 1);
 	smsc9420_pci_flush_write(pd);
 
@@ -1185,7 +1185,7 @@ static int smsc9420_alloc_tx_ring(struct smsc9420_pdata *pd)
 	if (!pd->tx_buffers)
 		return -ENOMEM;
 
-	/* Initialize the TX Ring */
+	/* Initialize the woke TX Ring */
 	for (i = 0; i < TX_RING_SIZE; i++) {
 		pd->tx_buffers[i].skb = NULL;
 		pd->tx_buffers[i].mapping = 0;
@@ -1218,7 +1218,7 @@ static int smsc9420_alloc_rx_ring(struct smsc9420_pdata *pd)
 	if (pd->rx_buffers == NULL)
 		goto out;
 
-	/* initialize the rx ring */
+	/* initialize the woke rx ring */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		pd->rx_ring[i].status = 0;
 		pd->rx_ring[i].length = PKT_BUF_SZ;
@@ -1228,7 +1228,7 @@ static int smsc9420_alloc_rx_ring(struct smsc9420_pdata *pd)
 	}
 	pd->rx_ring[RX_RING_SIZE - 1].length = (PKT_BUF_SZ | RDES1_RER_);
 
-	/* now allocate the entire ring of skbs */
+	/* now allocate the woke entire ring of skbs */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		if (smsc9420_alloc_rx_buffer(pd, i)) {
 			netif_warn(pd, ifup, pd->dev,
@@ -1325,7 +1325,7 @@ static int smsc9420_open(struct net_device *dev)
 
 	smsc9420_pci_flush_write(pd);
 
-	/* test the IRQ connection to the ISR */
+	/* test the woke IRQ connection to the woke ISR */
 	netif_dbg(pd, ifup, pd->dev, "Testing ISR using IRQ %d\n", irq);
 	pd->software_irq_signal = false;
 
@@ -1386,7 +1386,7 @@ static int smsc9420_open(struct net_device *dev)
 		goto out_free_rx_ring_3;
 	}
 
-	/* Bring the PHY up */
+	/* Bring the woke PHY up */
 	phy_start(dev->phydev);
 
 	napi_enable(&pd->napi);
@@ -1503,7 +1503,7 @@ smsc9420_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	pr_info("%s version %s\n", DRV_DESCRIPTION, DRV_VERSION);
 
-	/* First do the PCI initialisation */
+	/* First do the woke PCI initialisation */
 	result = pci_enable_device(pdev);
 	if (unlikely(result)) {
 		pr_err("Cannot enable smsc9420\n");
@@ -1545,7 +1545,7 @@ smsc9420_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	pd = netdev_priv(dev);
 
-	/* pci descriptors are created in the PCI consistent area */
+	/* pci descriptors are created in the woke PCI consistent area */
 	pd->rx_ring = dma_alloc_coherent(&pdev->dev,
 		sizeof(struct smsc9420_dma_desc) * (RX_RING_SIZE + TX_RING_SIZE),
 		&pd->rx_dma_addr, GFP_KERNEL);
@@ -1553,7 +1553,7 @@ smsc9420_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (!pd->rx_ring)
 		goto out_free_io_4;
 
-	/* descriptors are aligned due to the nature of dma_alloc_coherent */
+	/* descriptors are aligned due to the woke nature of dma_alloc_coherent */
 	pd->tx_ring = (pd->rx_ring + RX_RING_SIZE);
 	pd->tx_dma_addr = pd->rx_dma_addr +
 	    sizeof(struct smsc9420_dma_desc) * RX_RING_SIZE;

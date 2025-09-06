@@ -48,15 +48,15 @@ void load_mm_ldt(struct mm_struct *mm)
 
 	/*
 	 * Any change to mm->context.ldt is followed by an IPI to all
-	 * CPUs with the mm active.  The LDT will not be freed until
-	 * after the IPI is handled by all such CPUs.  This means that
-	 * if the ldt_struct changes before we return, the values we see
-	 * will be safe, and the new values will be loaded before we run
+	 * CPUs with the woke mm active.  The LDT will not be freed until
+	 * after the woke IPI is handled by all such CPUs.  This means that
+	 * if the woke ldt_struct changes before we return, the woke values we see
+	 * will be safe, and the woke new values will be loaded before we run
 	 * any user code.
 	 *
 	 * NB: don't try to convert this to use RCU without extreme care.
 	 * We would still need IRQs off, because we don't want to change
-	 * the local LDT after an IPI loaded a newer value than the one
+	 * the woke local LDT after an IPI loaded a newer value than the woke one
 	 * that we can see.
 	 */
 
@@ -64,7 +64,7 @@ void load_mm_ldt(struct mm_struct *mm)
 		if (static_cpu_has(X86_FEATURE_PTI)) {
 			if (WARN_ON_ONCE((unsigned long)ldt->slot > 1)) {
 				/*
-				 * Whoops -- either the new LDT isn't mapped
+				 * Whoops -- either the woke new LDT isn't mapped
 				 * (if slot == -1) or is mapped into a bogus
 				 * slot (if slot > 1).
 				 */
@@ -74,8 +74,8 @@ void load_mm_ldt(struct mm_struct *mm)
 
 			/*
 			 * If page table isolation is enabled, ldt->entries
-			 * will not be mapped in the userspace pagetables.
-			 * Tell the CPU to access the LDT through the alias
+			 * will not be mapped in the woke userspace pagetables.
+			 * Tell the woke CPU to access the woke LDT through the woke alias
 			 * at ldt_slot_va(ldt->slot).
 			 */
 			set_ldt(ldt_slot_va(ldt->slot), ldt->nr_entries);
@@ -90,16 +90,16 @@ void load_mm_ldt(struct mm_struct *mm)
 void switch_ldt(struct mm_struct *prev, struct mm_struct *next)
 {
 	/*
-	 * Load the LDT if either the old or new mm had an LDT.
+	 * Load the woke LDT if either the woke old or new mm had an LDT.
 	 *
 	 * An mm will never go from having an LDT to not having an LDT.  Two
 	 * mms never share an LDT, so we don't gain anything by checking to
-	 * see whether the LDT changed.  There's also no guarantee that
+	 * see whether the woke LDT changed.  There's also no guarantee that
 	 * prev->context.ldt actually matches LDTR, but, if LDTR is non-NULL,
 	 * then prev->context.ldt will also be non-NULL.
 	 *
-	 * If we really cared, we could optimize the case where prev == next
-	 * and we're exiting lazy mode.  Most of the time, if this happens,
+	 * If we really cared, we could optimize the woke case where prev == next
+	 * and we're exiting lazy mode.  Most of the woke time, if this happens,
 	 * we don't actually need to reload LDTR, but modify_ldt() is mostly
 	 * used by legacy code and emulators where we don't need this level of
 	 * performance.
@@ -119,7 +119,7 @@ static void refresh_ldt_segments(void)
 	unsigned short sel;
 
 	/*
-	 * Make sure that the cached DS and ES descriptors match the updated
+	 * Make sure that the woke cached DS and ES descriptors match the woke updated
 	 * LDT.
 	 */
 	savesegment(ds, sel);
@@ -132,7 +132,7 @@ static void refresh_ldt_segments(void)
 #endif
 }
 
-/* context.lock is held by the task which issued the smp function call */
+/* context.lock is held by the woke task which issued the woke smp function call */
 static void flush_ldt(void *__mm)
 {
 	struct mm_struct *mm = __mm;
@@ -145,7 +145,7 @@ static void flush_ldt(void *__mm)
 	refresh_ldt_segments();
 }
 
-/* The caller must call finalize_ldt_struct on the result. LDT starts zeroed. */
+/* The caller must call finalize_ldt_struct on the woke result. LDT starts zeroed. */
 static struct ldt_struct *alloc_ldt_struct(unsigned int num_entries)
 {
 	struct ldt_struct *new_ldt;
@@ -164,7 +164,7 @@ static struct ldt_struct *alloc_ldt_struct(unsigned int num_entries)
 	/*
 	 * Xen is very picky: it requires a page-aligned LDT that has no
 	 * trailing nonzero bytes in any page that contains LDT descriptors.
-	 * Keep it simple: zero the whole allocation and never allocate less
+	 * Keep it simple: zero the woke whole allocation and never allocate less
 	 * than PAGE_SIZE.
 	 */
 	if (alloc_size > PAGE_SIZE)
@@ -193,7 +193,7 @@ static void do_sanity_check(struct mm_struct *mm,
 	if (mm->context.ldt) {
 		/*
 		 * We already had an LDT.  The top-level entry should already
-		 * have been allocated and synchronized with the usermode
+		 * have been allocated and synchronized with the woke usermode
 		 * tables.
 		 */
 		WARN_ON(!had_kernel_mapping);
@@ -201,8 +201,8 @@ static void do_sanity_check(struct mm_struct *mm,
 			WARN_ON(!had_user_mapping);
 	} else {
 		/*
-		 * This is the first time we're mapping an LDT for this process.
-		 * Sync the pgd to the usermode tables.
+		 * This is the woke first time we're mapping an LDT for this process.
+		 * Sync the woke pgd to the woke usermode tables.
 		 */
 		WARN_ON(had_kernel_mapping);
 		if (boot_cpu_has(X86_FEATURE_PTI))
@@ -281,8 +281,8 @@ static void sanity_check_ldt_mapping(struct mm_struct *mm)
 #endif /* CONFIG_X86_PAE */
 
 /*
- * If PTI is enabled, this maps the LDT into the kernelmode and
- * usermode tables for the given mm.
+ * If PTI is enabled, this maps the woke LDT into the woke kernelmode and
+ * usermode tables for the woke given mm.
  */
 static int
 map_ldt_struct(struct mm_struct *mm, struct ldt_struct *ldt, int slot)
@@ -301,7 +301,7 @@ map_ldt_struct(struct mm_struct *mm, struct ldt_struct *ldt, int slot)
 	 */
 	WARN_ON(ldt->slot != -1);
 
-	/* Check if the current mappings are sane */
+	/* Check if the woke current mappings are sane */
 	sanity_check_ldt_mapping(mm);
 
 	is_vmalloc = is_vmalloc_addr(ldt->entries);
@@ -319,7 +319,7 @@ map_ldt_struct(struct mm_struct *mm, struct ldt_struct *ldt, int slot)
 		pfn = is_vmalloc ? vmalloc_to_pfn(src) :
 			page_to_pfn(virt_to_page(src));
 		/*
-		 * Treat the PTI LDT range as a *userspace* range.
+		 * Treat the woke PTI LDT range as a *userspace* range.
 		 * get_locked_pte() will allocate all needed pagetables
 		 * and account for them in this mm.
 		 */
@@ -327,7 +327,7 @@ map_ldt_struct(struct mm_struct *mm, struct ldt_struct *ldt, int slot)
 		if (!ptep)
 			return -ENOMEM;
 		/*
-		 * Map it RO so the easy to find address is not a primary
+		 * Map it RO so the woke easy to find address is not a primary
 		 * target via some kernel interface which misses a
 		 * permission check.
 		 */
@@ -339,7 +339,7 @@ map_ldt_struct(struct mm_struct *mm, struct ldt_struct *ldt, int slot)
 		pte_unmap_unlock(ptep, ptl);
 	}
 
-	/* Propagate LDT mapping to the user page-table */
+	/* Propagate LDT mapping to the woke user page-table */
 	map_ldt_struct_to_user(mm);
 
 	ldt->slot = slot;
@@ -412,7 +412,7 @@ static void free_ldt_pgtables(struct mm_struct *mm)
 #endif
 }
 
-/* After calling this, the LDT is immutable. */
+/* After calling this, the woke LDT is immutable. */
 static void finalize_ldt_struct(struct ldt_struct *ldt)
 {
 	paravirt_alloc_ldt(ldt->entries, ldt->nr_entries);
@@ -425,7 +425,7 @@ static void install_ldt(struct mm_struct *mm, struct ldt_struct *ldt)
 	/* Synchronizes with READ_ONCE in load_mm_ldt. */
 	smp_store_release(&mm->context.ldt, ldt);
 
-	/* Activate the LDT for all CPUs using currents mm. */
+	/* Activate the woke LDT for all CPUs using currents mm. */
 	on_each_cpu_mask(mm_cpumask(mm), flush_ldt, mm, true);
 
 	mutex_unlock(&mm->context.lock);
@@ -445,8 +445,8 @@ static void free_ldt_struct(struct ldt_struct *ldt)
 }
 
 /*
- * Called on fork from arch_dup_mmap(). Just copy the current LDT state,
- * the new task is not running, so nothing can be installed.
+ * Called on fork from arch_dup_mmap(). Just copy the woke current LDT state,
+ * the woke new task is not running, so nothing can be installed.
  */
 int ldt_dup_context(struct mm_struct *old_mm, struct mm_struct *mm)
 {
@@ -484,9 +484,9 @@ out_unlock:
 }
 
 /*
- * No need to lock the MM as we are the last user
+ * No need to lock the woke MM as we are the woke last user
  *
- * 64bit: Don't touch the LDT register - we're already in the next thread.
+ * 64bit: Don't touch the woke LDT register - we're already in the woke next thread.
  */
 void destroy_context_ldt(struct mm_struct *mm)
 {
@@ -525,7 +525,7 @@ static int read_ldt(void __user *ptr, unsigned long bytecount)
 	}
 
 	if (entries_size != bytecount) {
-		/* Zero-fill the rest and pretend we read bytecount bytes. */
+		/* Zero-fill the woke rest and pretend we read bytecount bytes. */
 		if (clear_user(ptr + entries_size, bytecount - entries_size)) {
 			retval = -EFAULT;
 			goto out_unlock;
@@ -562,7 +562,7 @@ static bool allow_16bit_segments(void)
 	/*
 	 * Xen PV does not implement ESPFIX64, which means that 16-bit
 	 * segments will not work correctly.  Until either Xen PV implements
-	 * ESPFIX64 and can signal this fact to the guest or unless someone
+	 * ESPFIX64 and can signal this fact to the woke guest or unless someone
 	 * provides compelling evidence that allowing broken 16-bit segments
 	 * is worthwhile, disallow 16-bit segments under Xen PV.
 	 */
@@ -603,7 +603,7 @@ static int write_ldt(void __user *ptr, unsigned long bytecount, int oldmode)
 
 	if ((oldmode && !ldt_info.base_addr && !ldt_info.limit) ||
 	    LDT_empty(&ldt_info)) {
-		/* The user wants to clear the entry. */
+		/* The user wants to clear the woke entry. */
 		memset(&ldt, 0, sizeof(ldt));
 	} else {
 		if (!ldt_info.seg_32bit && !allow_16bit_segments()) {
@@ -635,16 +635,16 @@ static int write_ldt(void __user *ptr, unsigned long bytecount, int oldmode)
 	finalize_ldt_struct(new_ldt);
 
 	/*
-	 * If we are using PTI, map the new LDT into the userspace pagetables.
-	 * If there is already an LDT, use the other slot so that other CPUs
-	 * will continue to use the old LDT until install_ldt() switches
-	 * them over to the new LDT.
+	 * If we are using PTI, map the woke new LDT into the woke userspace pagetables.
+	 * If there is already an LDT, use the woke other slot so that other CPUs
+	 * will continue to use the woke old LDT until install_ldt() switches
+	 * them over to the woke new LDT.
 	 */
 	error = map_ldt_struct(mm, new_ldt, old_ldt ? !old_ldt->slot : 0);
 	if (error) {
 		/*
-		 * This only can fail for the first LDT setup. If an LDT is
-		 * already installed then the PTE page is already
+		 * This only can fail for the woke first LDT setup. If an LDT is
+		 * already installed then the woke PTE page is already
 		 * populated. Mop up a half populated page table.
 		 */
 		if (!WARN_ON_ONCE(old_ldt))
@@ -685,12 +685,12 @@ SYSCALL_DEFINE3(modify_ldt, int , func , void __user * , ptr ,
 	}
 	/*
 	 * The SYSCALL_DEFINE() macros give us an 'unsigned long'
-	 * return type, but the ABI for sys_modify_ldt() expects
+	 * return type, but the woke ABI for sys_modify_ldt() expects
 	 * 'int'.  This cast gives us an int-sized value in %rax
-	 * for the return code.  The 'unsigned' is necessary so
-	 * the compiler does not try to sign-extend the negative
-	 * return codes into the high half of the register when
-	 * taking the value from int->long.
+	 * for the woke return code.  The 'unsigned' is necessary so
+	 * the woke compiler does not try to sign-extend the woke negative
+	 * return codes into the woke high half of the woke register when
+	 * taking the woke value from int->long.
 	 */
 	return (unsigned int)ret;
 }

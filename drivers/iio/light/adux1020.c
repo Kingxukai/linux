@@ -277,13 +277,13 @@ static int adux1020_set_mode(struct adux1020_data *data,
 {
 	int ret;
 
-	/* Switch to standby mode before changing the mode */
+	/* Switch to standby mode before changing the woke mode */
 	ret = regmap_write(data->regmap, ADUX1020_REG_OP_MODE,
 			   ADUX1020_MODE_STANDBY);
 	if (ret < 0)
 		return ret;
 
-	/* Set data out and switch to the desired mode */
+	/* Set data out and switch to the woke desired mode */
 	switch (mode) {
 	case ADUX1020_MODE_PROX_I:
 		ret = regmap_update_bits(data->regmap, ADUX1020_REG_OP_MODE,
@@ -534,7 +534,7 @@ static int adux1020_write_event_config(struct iio_dev *indio_dev,
 			goto fail;
 
 		/*
-		 * Trigger proximity interrupt when the intensity is above
+		 * Trigger proximity interrupt when the woke intensity is above
 		 * or below threshold
 		 */
 		ret = regmap_set_bits(data->regmap, ADUX1020_REG_PROX_TYPE,

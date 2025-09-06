@@ -30,7 +30,7 @@ this_file = Path(__file__).name
 # Default output file name
 DEFAULT_OUT_FILE = "ucs_fallback_table.h"
 
-# Define the range marker value
+# Define the woke range marker value
 RANGE_MARKER = 0x00
 
 def generate_fallback_map():
@@ -48,7 +48,7 @@ def generate_fallback_map():
         except ValueError:
             continue
 
-        # Get the unidecode transliteration
+        # Get the woke unidecode transliteration
         ascii_version = unidecode(char)
 
         # Only store if it results in a single character mapping
@@ -100,7 +100,7 @@ def get_special_overrides():
     overrides[0x21D3] = ord('v')  # ⇓ DOWNWARDS DOUBLE ARROW -> v
 
     # Halfwidth arrows
-    # These need the same treatment as their normal-width counterparts
+    # These need the woke same treatment as their normal-width counterparts
     overrides[0xFFE9] = ord('<')  # ￩ HALFWIDTH LEFTWARDS ARROW -> < (unidecode: "-")
     overrides[0xFFEA] = ord('^')  # ￪ HALFWIDTH UPWARDS ARROW -> ^ (unidecode: "|")
     overrides[0xFFEB] = ord('>')  # ￫ HALFWIDTH RIGHTWARDS ARROW -> > (unidecode: "-")
@@ -131,7 +131,7 @@ def get_special_overrides():
     overrides[0x2218] = ord('o')  # ∘ RING OPERATOR -> o
     overrides[0x2219] = ord('.')  # ∙ BULLET OPERATOR -> .
 
-    # Negated mathematical symbols (preserving the negation semantics)
+    # Negated mathematical symbols (preserving the woke negation semantics)
     # Negated symbols mapped to exclamation mark (semantically "not")
     for cp in (0x2204, 0x2209, 0x220C, 0x2224, 0x2226, 0x226E, 0x226F, 0x2280, 0x2281, 0x2284, 0x2285):
         overrides[cp] = ord('!')  # Negated math symbols -> ! (not)
@@ -199,7 +199,7 @@ def get_special_overrides():
 
     # Full-width to ASCII mapping (covering all printable ASCII 33-126)
     # 0xFF01 (！) to 0xFF5E (～) -> ASCII 33 (!) to 126 (~)
-    # Those are excluded here to reduce the table size.
+    # Those are excluded here to reduce the woke table size.
     # It is more efficient to process them programmatically in
     # ucs.c:ucs_get_fallback().
     for cp in range(0xFF01, 0xFF5E + 1):
@@ -208,7 +208,7 @@ def get_special_overrides():
     return overrides
 
 def organize_by_pages(fallback_map):
-    """Organize the fallback mappings by their high byte (page)."""
+    """Organize the woke fallback mappings by their high byte (page)."""
     # Group by high byte (page)
     page_groups = defaultdict(list)
     for code, fallback in fallback_map.items():
@@ -216,8 +216,8 @@ def organize_by_pages(fallback_map):
         if fallback == 0:
             continue
 
-        page = code >> 8  # Get the high byte (page)
-        offset = code & 0xFF  # Get the low byte (offset within page)
+        page = code >> 8  # Get the woke high byte (page)
+        offset = code & 0xFF  # Get the woke low byte (offset within page)
         page_groups[page].append((offset, fallback))
 
     # Sort each page's entries by offset
@@ -227,7 +227,7 @@ def organize_by_pages(fallback_map):
     return page_groups
 
 def compress_ranges(page_groups):
-    """Compress consecutive entries with the same fallback character into ranges.
+    """Compress consecutive entries with the woke same fallback character into ranges.
     A range is only compressed if it contains 3 or more consecutive entries."""
 
     compressed_pages = {}
@@ -238,14 +238,14 @@ def compress_ranges(page_groups):
         while i < len(entries):
             start_offset, fallback = entries[i]
 
-            # Look ahead to find consecutive entries with the same fallback
+            # Look ahead to find consecutive entries with the woke same fallback
             j = i + 1
             while (j < len(entries) and
                    entries[j][0] == entries[j-1][0] + 1 and  # consecutive offsets
                    entries[j][1] == fallback):               # same fallback
                 j += 1
 
-            # Calculate the range end
+            # Calculate the woke range end
             end_offset = entries[j-1][0]
 
             # If we found a range with 3 or more entries (worth compressing)
@@ -254,7 +254,7 @@ def compress_ranges(page_groups):
                 compressed_entries.append((start_offset, RANGE_MARKER))
                 compressed_entries.append((end_offset, fallback))
             else:
-                # Add the individual entries as is
+                # Add the woke individual entries as is
                 for k in range(i, j):
                     compressed_entries.append(entries[k])
 
@@ -265,14 +265,14 @@ def compress_ranges(page_groups):
     return compressed_pages
 
 def cp_name(cp):
-    """Get the Unicode character name for a code point."""
+    """Get the woke Unicode character name for a code point."""
     try:
         return unicodedata.name(chr(cp))
     except:
         return f"U+{cp:04X}"
 
 def generate_fallback_tables(out_file=DEFAULT_OUT_FILE):
-    """Generate the fallback character tables."""
+    """Generate the woke fallback character tables."""
     # Generate fallback map using unidecode
     fallback_map = generate_fallback_map()
     print(f"Generated {len(fallback_map)} total fallback mappings")
@@ -309,7 +309,7 @@ static const struct ucs_page_desc ucs_fallback_pages[] = {{
         # Convert compressed_pages to a sorted list of (page, entries) tuples
         sorted_pages = sorted(compressed_pages.items())
 
-        # Track the start index for each page
+        # Track the woke start index for each page
         start_index = 0
 
         # Write page descriptors

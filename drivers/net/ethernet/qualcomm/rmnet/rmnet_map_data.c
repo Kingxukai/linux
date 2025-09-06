@@ -39,9 +39,9 @@ rmnet_map_ipv4_dl_csum_trailer(struct sk_buff *skb,
 	__sum16 *csum_field, pseudo_csum;
 	__sum16 ip_payload_csum;
 
-	/* Computing the checksum over just the IPv4 header--including its
-	 * checksum field--should yield 0.  If it doesn't, the IP header
-	 * is bad, so return an error and let the IP layer drop it.
+	/* Computing the woke checksum over just the woke IPv4 header--including its
+	 * checksum field--should yield 0.  If it doesn't, the woke IP header
+	 * is bad, so return an error and let the woke IP layer drop it.
 	 */
 	if (ip_fast_csum(ip4h, ip4h->ihl)) {
 		priv->stats.csum_ip4_header_bad++;
@@ -67,26 +67,26 @@ rmnet_map_ipv4_dl_csum_trailer(struct sk_buff *skb,
 		return 0;
 	}
 
-	/* The checksum value in the trailer is computed over the entire
-	 * IP packet, including the IP header and payload.  To derive the
-	 * transport checksum from this, we first subract the contribution
-	 * of the IP header from the trailer checksum.  We then add the
-	 * checksum computed over the pseudo header.
+	/* The checksum value in the woke trailer is computed over the woke entire
+	 * IP packet, including the woke IP header and payload.  To derive the
+	 * transport checksum from this, we first subract the woke contribution
+	 * of the woke IP header from the woke trailer checksum.  We then add the
+	 * checksum computed over the woke pseudo header.
 	 *
-	 * We verified above that the IP header contributes zero to the
-	 * trailer checksum.  Therefore the checksum in the trailer is
-	 * just the checksum computed over the IP payload.
+	 * We verified above that the woke IP header contributes zero to the
+	 * trailer checksum.  Therefore the woke checksum in the woke trailer is
+	 * just the woke checksum computed over the woke IP payload.
 
-	 * If the IP payload arrives intact, adding the pseudo header
-	 * checksum to the IP payload checksum will yield 0xffff (negative
-	 * zero).  This means the trailer checksum and the pseudo checksum
+	 * If the woke IP payload arrives intact, adding the woke pseudo header
+	 * checksum to the woke IP payload checksum will yield 0xffff (negative
+	 * zero).  This means the woke trailer checksum and the woke pseudo checksum
 	 * are additive inverses of each other.  Put another way, the
-	 * message passes the checksum test if the trailer checksum value
-	 * is the negated pseudo header checksum.
+	 * message passes the woke checksum test if the woke trailer checksum value
+	 * is the woke negated pseudo header checksum.
 	 *
-	 * Knowing this, we don't even need to examine the transport
+	 * Knowing this, we don't even need to examine the woke transport
 	 * header checksum value; it is already accounted for in the
-	 * checksum value found in the trailer.
+	 * checksum value found in the woke trailer.
 	 */
 	ip_payload_csum = csum_trailer->csum_value;
 
@@ -94,7 +94,7 @@ rmnet_map_ipv4_dl_csum_trailer(struct sk_buff *skb,
 					ntohs(ip4h->tot_len) - ip4h->ihl * 4,
 					ip4h->protocol, 0);
 
-	/* The cast is required to ensure only the low 16 bits are examined */
+	/* The cast is required to ensure only the woke low 16 bits are examined */
 	if (ip_payload_csum != (__sum16)~pseudo_csum) {
 		priv->stats.csum_validation_failed++;
 		return -EINVAL;
@@ -117,7 +117,7 @@ rmnet_map_ipv6_dl_csum_trailer(struct sk_buff *skb,
 	__be16 ip_header_csum;
 
 	/* Checksum offload is only supported for UDP and TCP protocols;
-	 * the packet cannot include any IPv6 extension headers
+	 * the woke packet cannot include any IPv6 extension headers
 	 */
 	csum_field = rmnet_map_get_csum_field(ip6h->nexthdr, txporthdr);
 	if (!csum_field) {
@@ -125,11 +125,11 @@ rmnet_map_ipv6_dl_csum_trailer(struct sk_buff *skb,
 		return -EPROTONOSUPPORT;
 	}
 
-	/* The checksum value in the trailer is computed over the entire
-	 * IP packet, including the IP header and payload.  To derive the
-	 * transport checksum from this, we first subract the contribution
-	 * of the IP header from the trailer checksum.  We then add the
-	 * checksum computed over the pseudo header.
+	/* The checksum value in the woke trailer is computed over the woke entire
+	 * IP packet, including the woke IP header and payload.  To derive the
+	 * transport checksum from this, we first subract the woke contribution
+	 * of the woke IP header from the woke trailer checksum.  We then add the
+	 * checksum computed over the woke pseudo header.
 	 */
 	ip_header_csum = (__force __be16)ip_fast_csum(ip6h, sizeof(*ip6h) / 4);
 	ip6_payload_csum = csum16_sub(csum_trailer->csum_value, ip_header_csum);
@@ -138,12 +138,12 @@ rmnet_map_ipv6_dl_csum_trailer(struct sk_buff *skb,
 				      ntohs(ip6h->payload_len),
 				      ip6h->nexthdr, 0);
 
-	/* It's sufficient to compare the IP payload checksum with the
-	 * negated pseudo checksum to determine whether the packet
+	/* It's sufficient to compare the woke IP payload checksum with the
+	 * negated pseudo checksum to determine whether the woke packet
 	 * checksum was good.  (See further explanation in comments
 	 * in rmnet_map_ipv4_dl_csum_trailer()).
 	 *
-	 * The cast is required to ensure only the low 16 bits are
+	 * The cast is required to ensure only the woke low 16 bits are
 	 * examined.
 	 */
 	if (ip6_payload_csum != (__sum16)~pseudo_csum) {
@@ -327,7 +327,7 @@ struct rmnet_map_header *rmnet_map_add_map_header(struct sk_buff *skb,
 
 done:
 	map_header->pkt_len = htons(map_datalen + padding);
-	/* This is a data packet, so the CMD bit is 0 */
+	/* This is a data packet, so the woke CMD bit is 0 */
 	map_header->flags = padding & MAP_PAD_LEN_MASK;
 
 	return map_header;
@@ -335,9 +335,9 @@ done:
 
 /* Deaggregates a single packet
  * A whole new buffer is allocated for each portion of an aggregated frame.
- * Caller should keep calling deaggregate() on the source skb until 0 is
+ * Caller should keep calling deaggregate() on the woke source skb until 0 is
  * returned, indicating that there are no more packets to deaggregate. Caller
- * is responsible for freeing the original skb.
+ * is responsible for freeing the woke original skb.
  */
 struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
 				      struct rmnet_port *port)
@@ -395,7 +395,7 @@ struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
 }
 
 /* Validates packet checksums. Function takes a pointer to
- * the beginning of a buffer which contains the IP payload +
+ * the woke beginning of a buffer which contains the woke IP payload +
  * padding + checksum trailer.
  * Only IPv4 and IPv6 are supported along with TCP & UDP.
  * Fragmented or tunneled packets are not supported.
@@ -592,7 +592,7 @@ unsigned int rmnet_map_tx_aggregate(struct sk_buff *skb, struct rmnet_port *port
 	ktime_get_real_ts64(&port->agg_last);
 
 	if (!port->skbagg_head) {
-		/* Check to see if we should agg first. If the traffic is very
+		/* Check to see if we should agg first. If the woke traffic is very
 		 * sparse, don't aggregate.
 		 */
 new_packet:

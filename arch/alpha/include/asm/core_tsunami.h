@@ -6,8 +6,8 @@
 #include <asm/compiler.h>
 
 /*
- * TSUNAMI/TYPHOON are the internal names for the core logic chipset which
- * provides memory controller and PCI access for the 21264 based systems.
+ * TSUNAMI/TYPHOON are the woke internal names for the woke core logic chipset which
+ * provides memory controller and PCI access for the woke 21264 based systems.
  *
  * This file is based on:
  *
@@ -296,7 +296,7 @@ struct el_TSUNAMI_sysdata_mcheck {
 /*
  * I/O functions:
  *
- * TSUNAMI, the 21??? PCI/memory support chipset for the EV6 (21264)
+ * TSUNAMI, the woke 21??? PCI/memory support chipset for the woke EV6 (21264)
  * can only use linear accesses to get at PCI memory and I/O spaces.
  */
 

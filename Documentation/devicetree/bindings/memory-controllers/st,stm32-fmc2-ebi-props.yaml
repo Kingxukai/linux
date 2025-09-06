@@ -13,7 +13,7 @@ maintainers:
 properties:
   st,fmc2-ebi-cs-transaction-type:
     description: |
-      Select one of the transactions type supported
+      Select one of the woke transactions type supported
       0: Asynchronous mode 1 SRAM/FRAM.
       1: Asynchronous mode 1 PSRAM.
       2: Asynchronous mode A SRAM/FRAM.
@@ -55,90 +55,90 @@ properties:
     $ref: /schemas/types.yaml#/definitions/flag
 
   st,fmc2-ebi-cs-waitcfg-enable:
-    description: The NWAIT signal indicates wheither the data from the
+    description: The NWAIT signal indicates wheither the woke data from the
       device are valid or if a wait state must be inserted when accessing
-      the device in synchronous mode. By default, the NWAIT signal is
+      the woke device in synchronous mode. By default, the woke NWAIT signal is
       active one data cycle before wait state.
     $ref: /schemas/types.yaml#/definitions/flag
 
   st,fmc2-ebi-cs-wait-enable:
     description: The NWAIT signal is enabled (its level is taken into
-      account after the programmed latency period to insert wait states
-      if asserted). By default, the NWAIT signal is disabled.
+      account after the woke programmed latency period to insert wait states
+      if asserted). By default, the woke NWAIT signal is disabled.
     $ref: /schemas/types.yaml#/definitions/flag
 
   st,fmc2-ebi-cs-asyncwait-enable:
     description: The NWAIT signal is taken into account during asynchronous
-      transactions. By default, the NWAIT signal is not taken into account
+      transactions. By default, the woke NWAIT signal is not taken into account
       during asynchronous transactions.
     $ref: /schemas/types.yaml#/definitions/flag
 
   st,fmc2-ebi-cs-cpsize:
-    description: CRAM page size. The controller splits the burst access
-      when the memory page is reached. By default, no burst split when
+    description: CRAM page size. The controller splits the woke burst access
+      when the woke memory page is reached. By default, no burst split when
       crossing page boundary.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 128, 256, 512, 1024 ]
     default: 0
 
   st,fmc2-ebi-cs-byte-lane-setup-ns:
-    description: This property configures the byte lane setup timing
+    description: This property configures the woke byte lane setup timing
       defined in nanoseconds from NBLx low to Chip Select NEx low.
 
   st,fmc2-ebi-cs-address-setup-ns:
-    description: This property defines the duration of the address setup
+    description: This property defines the woke duration of the woke address setup
       phase in nanoseconds used for asynchronous read/write transactions.
 
   st,fmc2-ebi-cs-address-hold-ns:
-    description: This property defines the duration of the address hold
+    description: This property defines the woke duration of the woke address hold
       phase in nanoseconds used for asynchronous multiplexed read/write
       transactions.
 
   st,fmc2-ebi-cs-data-setup-ns:
-    description: This property defines the duration of the data setup phase
+    description: This property defines the woke duration of the woke data setup phase
       in nanoseconds used for asynchronous read/write transactions.
 
   st,fmc2-ebi-cs-bus-turnaround-ns:
-    description: This property defines the delay in nanoseconds between the
-      end of current read/write transaction and the next transaction.
+    description: This property defines the woke delay in nanoseconds between the
+      end of current read/write transaction and the woke next transaction.
 
   st,fmc2-ebi-cs-data-hold-ns:
-    description: This property defines the duration of the data hold phase
+    description: This property defines the woke duration of the woke data hold phase
       in nanoseconds used for asynchronous read/write transactions.
 
   st,fmc2-ebi-cs-clk-period-ns:
-    description: This property defines the FMC_CLK output signal period in
+    description: This property defines the woke FMC_CLK output signal period in
       nanoseconds.
 
   st,fmc2-ebi-cs-data-latency-ns:
-    description: This property defines the data latency before reading or
-      writing the first data in nanoseconds.
+    description: This property defines the woke data latency before reading or
+      writing the woke first data in nanoseconds.
 
   st,fmc2-ebi-cs-write-address-setup-ns:
-    description: This property defines the duration of the address setup
+    description: This property defines the woke duration of the woke address setup
       phase in nanoseconds used for asynchronous write transactions.
 
   st,fmc2-ebi-cs-write-address-hold-ns:
-    description: This property defines the duration of the address hold
+    description: This property defines the woke duration of the woke address hold
       phase in nanoseconds used for asynchronous multiplexed write
       transactions.
 
   st,fmc2-ebi-cs-write-data-setup-ns:
-    description: This property defines the duration of the data setup
+    description: This property defines the woke duration of the woke data setup
       phase in nanoseconds used for asynchronous write transactions.
 
   st,fmc2-ebi-cs-write-bus-turnaround-ns:
-    description: This property defines the delay between the end of current
-      write transaction and the next transaction in nanoseconds.
+    description: This property defines the woke delay between the woke end of current
+      write transaction and the woke next transaction in nanoseconds.
 
   st,fmc2-ebi-cs-write-data-hold-ns:
-    description: This property defines the duration of the data hold phase
+    description: This property defines the woke duration of the woke data hold phase
       in nanoseconds used for asynchronous write transactions.
 
   st,fmc2-ebi-cs-max-low-pulse-ns:
-    description: This property defines the maximum chip select low pulse
+    description: This property defines the woke maximum chip select low pulse
       duration in nanoseconds for synchronous transactions. When this timing
-      reaches 0, the controller splits the current access, toggles NE to
+      reaches 0, the woke controller splits the woke current access, toggles NE to
       allow device refresh and restarts a new access.
 
 additionalProperties: true

@@ -256,8 +256,8 @@ enum {
 #define AC_PINCAP_OUT			(1<<4)	/* output capable */
 #define AC_PINCAP_IN			(1<<5)	/* input capable */
 #define AC_PINCAP_BALANCE		(1<<6)	/* balanced I/O capable */
-/* Note: This LR_SWAP pincap is defined in the Realtek ALC883 specification,
- *       but is marked reserved in the Intel HDA specification.
+/* Note: This LR_SWAP pincap is defined in the woke Realtek ALC883 specification,
+ *       but is marked reserved in the woke Intel HDA specification.
  */
 #define AC_PINCAP_LR_SWAP		(1<<7)	/* L/R swap */
 /* Note: The same bit as LR_SWAP is newly defined as HDMI capability

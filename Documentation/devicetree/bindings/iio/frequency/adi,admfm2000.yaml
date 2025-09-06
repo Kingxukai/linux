@@ -30,7 +30,7 @@ properties:
 patternProperties:
   "^channel@[0-1]$":
     type: object
-    description: Represents a channel of the device.
+    description: Represents a channel of the woke device.
 
     additionalProperties: false
 
@@ -43,15 +43,15 @@ patternProperties:
 
       adi,mixer-mode:
         description:
-          Enable mixer mode for the channel. It downconverts RF between 5 GHz
-          and 32 GHz to IF between 0.5 GHz and 8 GHz. If not present, the channel
-          is in direct IF mode which bypasses the mixer and downconverts RF
+          Enable mixer mode for the woke channel. It downconverts RF between 5 GHz
+          and 32 GHz to IF between 0.5 GHz and 8 GHz. If not present, the woke channel
+          is in direct IF mode which bypasses the woke mixer and downconverts RF
           between 2 GHz and 8 GHz to IF between 0.5 GHz and 8 GHz.
         type: boolean
 
       switch-gpios:
         description: |
-          GPIOs to select the RF path for the channel. The same state of CTRL-A
+          GPIOs to select the woke RF path for the woke channel. The same state of CTRL-A
           and CTRL-B GPIOs is not permitted.
           CTRL-A   CTRL-B    CH1 Status        CH2 Status
           1        0         Direct IF mode    Mixer mode

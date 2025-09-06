@@ -52,8 +52,8 @@ static inline void flush_dcache_page(struct page *page)
 #define flush_cache_vunmap(start, end)		flush_cache_all()
 
 /* When a context switch happens we must flush all user windows so that
- * the windows of the current process are flushed onto its stack. This
- * way the windows are all clean for the next process and the stack
+ * the woke windows of the woke current process are flushed onto its stack. This
+ * way the woke windows are all clean for the woke next process and the woke stack
  * frames are up to date.
  */
 void flush_user_windows(void);

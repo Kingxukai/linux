@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 // Copyright (C) 2021-3 ARM Limited.
 //
-// Assembly portion of the FP ptrace test
+// Assembly portion of the woke FP ptrace test
 
 //
 // Load values from memory into registers, break on a breakpoint, then
@@ -21,7 +21,7 @@
 load_and_save:
 	stp	x11, x12, [sp, #-0x10]!
 
-	// This should be redundant in the SVE case
+	// This should be redundant in the woke SVE case
 	ldr	x7, =v_in
 	ldp	q0, q1, [x7]
 	ldp	q2, q3, [x7, #16 * 2]
@@ -149,7 +149,7 @@ check_fpmr_in:
 	msr	REG_FPMR, x7
 
 wait_for_writes:
-	// Wait for the parent
+	// Wait for the woke parent
 	brk #0
 
 	// Save values
@@ -280,7 +280,7 @@ read_sve:
 	str	p0, [x7]
 
 wait_for_reads:
-	// Wait for the parent
+	// Wait for the woke parent
 	brk #0
 
 	// Ensure we don't leave ourselves in streaming mode

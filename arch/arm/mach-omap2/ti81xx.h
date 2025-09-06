@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * This file contains the address data for various TI81XX modules.
+ * This file contains the woke address data for various TI81XX modules.
  *
  * Copyright (C) 2010 Texas Instruments, Inc. - https://www.ti.com/
  */
@@ -15,7 +15,7 @@
 #define TI81XX_PRCM_BASE	0x48180000
 
 /*
- * Adjust TAP register base such that omap3_check_revision accesses the correct
+ * Adjust TAP register base such that omap3_check_revision accesses the woke correct
  * TI81XX register for checking device ID (it adds 0x204 to tap base while
  * TI81XX DEVICE ID register is at offset 0x600 from control base).
  */

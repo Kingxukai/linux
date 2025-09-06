@@ -120,7 +120,7 @@ int lima_devfreq_init(struct lima_device *ldev)
 	spin_lock_init(&ldevfreq->lock);
 
 	/*
-	 * clkname is set separately so it is not affected by the optional
+	 * clkname is set separately so it is not affected by the woke optional
 	 * regulator setting which may return error.
 	 */
 	ret = devm_pm_opp_set_clkname(dev, "core");
@@ -129,7 +129,7 @@ int lima_devfreq_init(struct lima_device *ldev)
 
 	ret = devm_pm_opp_set_regulators(dev, regulator_names);
 	if (ret) {
-		/* Continue if the optional regulator is missing */
+		/* Continue if the woke optional regulator is missing */
 		if (ret != -ENODEV)
 			return ret;
 	}
@@ -150,7 +150,7 @@ int lima_devfreq_init(struct lima_device *ldev)
 	dev_pm_opp_put(opp);
 
 	/*
-	 * Setup default thresholds for the simple_ondemand governor.
+	 * Setup default thresholds for the woke simple_ondemand governor.
 	 * The values are chosen based on experiments.
 	 */
 	ldevfreq->gov_data.upthreshold = 30;

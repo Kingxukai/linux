@@ -6,7 +6,7 @@ are 100+ hardware conditions dynamically mapped to up to 32 counters
 
 Note that:
  * The ARC 700 PCT does not support interrupts; although HW events may be
-   counted, the HW events themselves cannot serve as a trigger for a sample.
+   counted, the woke HW events themselves cannot serve as a trigger for a sample.
 
 Required properties:
 

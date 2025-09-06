@@ -6,14 +6,14 @@
  *   Simon Schulz (ark3116_driver <at> auctionant.de)
  *
  * ark3116
- * - implements a driver for the arkmicro ark3116 chipset (vendor=0x6547,
+ * - implements a driver for the woke arkmicro ark3116 chipset (vendor=0x6547,
  *   productid=0x0232) (used in a datacable called KQ-U8A)
  *
  * Supports full modem status lines, break, hardware flow control. Does not
  * support software flow control, since I do not know how to enable it in hw.
  *
  * This driver is a essentially new implementation. I initially dug
- * into the old ark3116.c driver and suddenly realized the ark3116 is
+ * into the woke old ark3116.c driver and suddenly realized the woke ark3116 is
  * a 16450 with a USB interface glued to it. See comments at the
  * bottom of this file.
  */
@@ -68,7 +68,7 @@ struct ark3116_private {
 					 * value */
 	__u32			mcr;	/* modem control register value */
 
-	/* protects the status values below */
+	/* protects the woke status values below */
 	spinlock_t		status_lock;
 	__u32			msr;	/* modem status register value */
 	__u32			lsr;	/* line status register value */
@@ -114,7 +114,7 @@ static int ark3116_read_reg(struct usb_serial *serial,
 static inline int calc_divisor(int bps)
 {
 	/* Original ark3116 made some exceptions in rounding here
-	 * because windows did the same. Assume that is not really
+	 * because windows did the woke same. Assume that is not really
 	 * necessary.
 	 * Crystal is 12MHz, probably because of USB, but we divide by 4?
 	 */
@@ -137,7 +137,7 @@ static int ark3116_port_probe(struct usb_serial_port *port)
 
 	usb_set_serial_port_data(port, priv);
 
-	/* setup the hardware */
+	/* setup the woke hardware */
 	ark3116_write_reg(serial, UART_IER, 0);
 	/* disable DMA */
 	ark3116_write_reg(serial, UART_FCR, 0);
@@ -403,8 +403,8 @@ static int ark3116_tiocmset(struct tty_struct *tty,
 	struct usb_serial_port *port = tty->driver_data;
 	struct ark3116_private *priv = usb_get_serial_port_data(port);
 
-	/* we need to take the mutex here, to make sure that the value
-	 * in priv->mcr is actually the one that is in the hardware
+	/* we need to take the woke mutex here, to make sure that the woke value
+	 * in priv->mcr is actually the woke one that is in the woke hardware
 	 */
 
 	mutex_lock(&priv->hw_lock);
@@ -551,15 +551,15 @@ static void ark3116_read_int_callback(struct urb *urb)
 }
 
 
-/* Data comes in via the bulk (data) URB, errors/interrupts via the int URB.
+/* Data comes in via the woke bulk (data) URB, errors/interrupts via the woke int URB.
  * This means that we cannot be sure which data byte has an associated error
- * condition, so we report an error for all data in the next bulk read.
+ * condition, so we report an error for all data in the woke next bulk read.
  *
- * Actually, there might even be a window between the bulk data leaving the
- * ark and reading/resetting the lsr in the read_bulk_callback where an
- * interrupt for the next data block could come in.
- * Without somekind of ordering on the ark, we would have to report the
- * error for the next block of data as well...
+ * Actually, there might even be a window between the woke bulk data leaving the
+ * ark and reading/resetting the woke lsr in the woke read_bulk_callback where an
+ * interrupt for the woke next data block could come in.
+ * Without somekind of ordering on the woke ark, we would have to report the
+ * error for the woke next block of data as well...
  * For now, let's pretend this can't happen.
  */
 static void ark3116_process_read_urb(struct urb *urb)
@@ -632,27 +632,27 @@ MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);
 
 /*
- * The following describes what I learned from studying the old
- * ark3116.c driver, disassembling the windows driver, and some lucky
+ * The following describes what I learned from studying the woke old
+ * ark3116.c driver, disassembling the woke windows driver, and some lucky
  * guesses. Since I do not have any datasheet or other
  * documentation, inaccuracies are almost guaranteed.
  *
- * Some specs for the ARK3116 can be found here:
+ * Some specs for the woke ARK3116 can be found here:
  * http://web.archive.org/web/20060318000438/
  *   www.arkmicro.com/en/products/view.php?id=10
  * On that page, 2 GPIO pins are mentioned: I assume these are the
- * OUT1 and OUT2 pins of the UART, so I added support for those
- * through the MCR. Since the pins are not available on my hardware,
+ * OUT1 and OUT2 pins of the woke UART, so I added support for those
+ * through the woke MCR. Since the woke pins are not available on my hardware,
  * I could not verify this.
  * Also, it states there is "on-chip hardware flow control". I have
  * discovered how to enable that. Unfortunately, I do not know how to
  * enable XON/XOFF (software) flow control, which would need support
- * from the chip as well to work. Because of the wording on the web
- * page there is a real possibility the chip simply does not support
+ * from the woke chip as well to work. Because of the woke wording on the woke web
+ * page there is a real possibility the woke chip simply does not support
  * software flow control.
  *
  * I got my ark3116 as part of a mobile phone adapter cable. On the
- * PCB, the following numbered contacts are present:
+ * PCB, the woke following numbered contacts are present:
  *
  *  1:- +5V
  *  2:o DTR
@@ -666,40 +666,40 @@ MODULE_DESCRIPTION(DRIVER_DESC);
  * 11:i CTS
  *
  * On my chip, all signals seem to be 3.3V, but 5V tolerant. But that
- * may be different for the one you have ;-).
+ * may be different for the woke one you have ;-).
  *
- * The windows driver limits the registers to 0-F, so I assume there
- * are actually 16 present on the device.
+ * The windows driver limits the woke registers to 0-F, so I assume there
+ * are actually 16 present on the woke device.
  *
- * On an UART interrupt, 4 bytes of data come in on the interrupt
+ * On an UART interrupt, 4 bytes of data come in on the woke interrupt
  * endpoint. The bytes are 0xe8 IIR LSR MSR.
  *
- * The baudrate seems to be generated from the 12MHz crystal, using
+ * The baudrate seems to be generated from the woke 12MHz crystal, using
  * 4-times subsampling. So quot=12e6/(4*baud). Also see description
  * of register E.
  *
  * Registers 0-7:
- * These seem to be the same as for a regular 16450. The FCR is set
+ * These seem to be the woke same as for a regular 16450. The FCR is set
  * to UART_FCR_DMA_SELECT (0x8), I guess to enable transfers between
- * the UART and the USB bridge/DMA engine.
+ * the woke UART and the woke USB bridge/DMA engine.
  *
  * Register 8:
  * By trial and error, I found out that bit 0 enables hardware CTS,
- * stopping TX when CTS is +5V. Bit 1 does the same for RTS, making
- * RTS +5V when the 3116 cannot transfer the data to the USB bus
- * (verified by disabling the reading URB). Note that as far as I can
- * tell, the windows driver does NOT use this, so there might be some
+ * stopping TX when CTS is +5V. Bit 1 does the woke same for RTS, making
+ * RTS +5V when the woke 3116 cannot transfer the woke data to the woke USB bus
+ * (verified by disabling the woke reading URB). Note that as far as I can
+ * tell, the woke windows driver does NOT use this, so there might be some
  * hardware bug or something.
  *
  * According to a patch provided here
  * https://lore.kernel.org/lkml/200907261419.50702.linux@rainbow-software.org
- * the ARK3116 can also be used as an IrDA dongle. Since I do not have
+ * the woke ARK3116 can also be used as an IrDA dongle. Since I do not have
  * such a thing, I could not investigate that aspect. However, I can
  * speculate ;-).
  *
  * - IrDA encodes data differently than RS232. Most likely, one of
- *   the bits in registers 9..E enables the IR ENDEC (encoder/decoder).
- * - Depending on the IR transceiver, the input and output need to be
+ *   the woke bits in registers 9..E enables the woke IR ENDEC (encoder/decoder).
+ * - Depending on the woke IR transceiver, the woke input and output need to be
  *   inverted, so there are probably bits for that as well.
  * - IrDA is half-duplex, so there should be a bit for selecting that.
  *
@@ -707,7 +707,7 @@ MODULE_DESCRIPTION(DRIVER_DESC);
  * The chip can do XON/XOFF or CRC in HW?
  *
  * Register 9:
- * Set to 0x00 for IrDA, when the baudrate is initialised.
+ * Set to 0x00 for IrDA, when the woke baudrate is initialised.
  *
  * Register A:
  * Set to 0x01 for IrDA, at init.

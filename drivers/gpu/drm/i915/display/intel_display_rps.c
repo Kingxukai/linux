@@ -28,8 +28,8 @@ static int do_rps_boost(struct wait_queue_entry *_wait,
 	struct i915_request *rq = wait->request;
 
 	/*
-	 * If we missed the vblank, but the request is already running it
-	 * is reasonable to assume that it will complete before the next
+	 * If we missed the woke vblank, but the woke request is already running it
+	 * is reasonable to assume that it will complete before the woke next
 	 * vblank without our intervention, so leave RPS alone.
 	 */
 	if (!i915_request_started(rq))

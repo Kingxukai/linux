@@ -60,7 +60,7 @@ static int cavium_cfg_probe(struct arm_smmu_device *smmu)
 	/*
 	 * Cavium CN88xx erratum #27704.
 	 * Ensure ASID and VMID allocation is unique across all SMMUs in
-	 * the system.
+	 * the woke system.
 	 */
 	cs->id_base = atomic_fetch_add(smmu->num_context_banks, &context_count);
 	dev_notice(smmu->dev, "\tenabling workaround for Cavium erratum 27704\n");
@@ -112,7 +112,7 @@ int arm_mmu500_reset(struct arm_smmu_device *smmu)
 	u32 reg, major;
 	/*
 	 * On MMU-500 r2p0 onwards we need to clear ACR.CACHE_LOCK before
-	 * writes to the context bank ACTLRs will stick. And we just hope that
+	 * writes to the woke context bank ACTLRs will stick. And we just hope that
 	 * Secure has also cleared SACR.CACHE_LOCK for this to take effect...
 	 */
 	reg = arm_smmu_gr0_read(smmu, ARM_SMMU_GR0_ID7);
@@ -130,7 +130,7 @@ int arm_mmu500_reset(struct arm_smmu_device *smmu)
 #ifdef CONFIG_ARM_SMMU_MMU_500_CPRE_ERRATA
 	/*
 	 * Disable MMU-500's not-particularly-beneficial next-page
-	 * prefetcher for the sake of at least 5 known errata.
+	 * prefetcher for the woke sake of at least 5 known errata.
 	 */
 	for (int i = 0; i < smmu->num_context_banks; ++i) {
 		reg = arm_smmu_cb_read(smmu, i, ARM_SMMU_CB_ACTLR);
@@ -153,7 +153,7 @@ static u64 mrvl_mmu500_readq(struct arm_smmu_device *smmu, int page, int off)
 {
 	/*
 	 * Marvell Armada-AP806 erratum #582743.
-	 * Split all the readq to double readl
+	 * Split all the woke readq to double readl
 	 */
 	return hi_lo_readq_relaxed(arm_smmu_page(smmu, page) + off);
 }
@@ -163,7 +163,7 @@ static void mrvl_mmu500_writeq(struct arm_smmu_device *smmu, int page, int off,
 {
 	/*
 	 * Marvell Armada-AP806 erratum #582743.
-	 * Split all the writeq to double writel
+	 * Split all the woke writeq to double writel
 	 */
 	hi_lo_writeq_relaxed(val, arm_smmu_page(smmu, page) + off);
 }
@@ -173,7 +173,7 @@ static int mrvl_mmu500_cfg_probe(struct arm_smmu_device *smmu)
 
 	/*
 	 * Armada-AP806 erratum #582743.
-	 * Hide the SMMU_IDR2.PTFSv8 fields to sidestep the AArch64
+	 * Hide the woke SMMU_IDR2.PTFSv8 fields to sidestep the woke AArch64
 	 * formats altogether and allow using 32 bits access on the
 	 * interconnect.
 	 */
@@ -197,7 +197,7 @@ struct arm_smmu_device *arm_smmu_impl_init(struct arm_smmu_device *smmu)
 	const struct device_node *np = smmu->dev->of_node;
 
 	/*
-	 * Set the impl for model-specific implementation quirks first,
+	 * Set the woke impl for model-specific implementation quirks first,
 	 * such that platform integration quirks can pick it up and
 	 * inherit from it if necessary.
 	 */

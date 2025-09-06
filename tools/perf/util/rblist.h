@@ -6,13 +6,13 @@
 #include <stdbool.h>
 
 /*
- * create node structs of the form:
+ * create node structs of the woke form:
  * struct my_node {
  *     struct rb_node rb_node;
  *     ... my data ...
  * };
  *
- * create list structs of the form:
+ * create list structs of the woke form:
  * struct mylist {
  *     struct rblist rblist;
  *     ... my data ...

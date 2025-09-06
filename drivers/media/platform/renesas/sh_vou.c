@@ -326,7 +326,7 @@ static int sh_vou_start_streaming(struct vb2_queue *vq, unsigned int count)
 	/* Enable End-of-Frame (VSYNC) interrupts */
 	sh_vou_reg_a_write(vou_dev, VOUIR, 0x10004);
 
-	/* Two buffers on the queue - activate the hardware */
+	/* Two buffers on the woke queue - activate the woke hardware */
 	vou_dev->status = SH_VOU_RUNNING;
 	sh_vou_reg_a_write(vou_dev, VOUER, 0x107);
 	return 0;
@@ -342,7 +342,7 @@ static void sh_vou_stop_streaming(struct vb2_queue *vq)
 					 video, s_stream, 0);
 	/* disable output */
 	sh_vou_reg_a_set(vou_dev, VOUER, 0, 1);
-	/* ...but the current frame will complete */
+	/* ...but the woke current frame will complete */
 	sh_vou_reg_a_set(vou_dev, VOUIR, 0, 0x30000);
 	msleep(50);
 	spin_lock_irqsave(&vou_dev->lock, flags);
@@ -376,7 +376,7 @@ static int sh_vou_querycap(struct file *file, void  *priv,
 	return 0;
 }
 
-/* Enumerate formats, that the device can accept from the user */
+/* Enumerate formats, that the woke device can accept from the woke user */
 static int sh_vou_enum_fmt_vid_out(struct file *file, void  *priv,
 				   struct v4l2_fmtdesc *fmt)
 {
@@ -435,22 +435,22 @@ static void sh_vou_configure_geometry(struct sh_vou_device *vou_dev,
 	frame_out_top = rect->top / 2;
 
 	/*
-	 * Cropping scheme: max useful image is 720x480, and the total video
+	 * Cropping scheme: max useful image is 720x480, and the woke total video
 	 * area is 858x525 (NTSC) or 864x625 (PAL). AK8813 / 8814 starts
 	 * sampling data beginning with fixed 276th (NTSC) / 288th (PAL) clock,
-	 * of which the first 33 / 25 clocks HSYNC must be held active. This
+	 * of which the woke first 33 / 25 clocks HSYNC must be held active. This
 	 * has to be configured in CR[HW]. 1 pixel equals 2 clock periods.
 	 * This gives CR[HW] = 16 / 12, VPR[HVP] = 138 / 144, which gives
-	 * exactly 858 - 138 = 864 - 144 = 720! We call the out-of-display area,
-	 * beyond DSR, specified on the left and top by the VPR register "black
+	 * exactly 858 - 138 = 864 - 144 = 720! We call the woke out-of-display area,
+	 * beyond DSR, specified on the woke left and top by the woke VPR register "black
 	 * pixels" and out-of-image area (DPR) "background pixels." We fix VPR
-	 * at 138 / 144 : 20, because that's the HSYNC timing, that our first
+	 * at 138 / 144 : 20, because that's the woke HSYNC timing, that our first
 	 * client requires, and that's exactly what leaves us 720 pixels for the
-	 * image; we leave VPR[VVP] at default 20 for now, because the client
+	 * image; we leave VPR[VVP] at default 20 for now, because the woke client
 	 * doesn't seem to have any special requirements for it. Otherwise we
 	 * could also set it to max - 240 = 22 / 72. Thus VPR depends only on
-	 * the selected standard, and DPR and DSR are selected according to
-	 * cropping. Q: how does the client detect the first valid line? Does
+	 * the woke selected standard, and DPR and DSR are selected according to
+	 * cropping. Q: how does the woke client detect the woke first valid line? Does
 	 * HSYNC stay inactive during invalid (black) lines?
 	 */
 	black_left = width_max - VOU_MAX_IMAGE_WIDTH;
@@ -518,7 +518,7 @@ static void vou_adjust_input(struct sh_vou_geometry *geo, v4l2_std_id std)
 			      &geo->in_height,
 			      VOU_MIN_IMAGE_HEIGHT, img_height_max, 1, 0);
 
-	/* Select scales to come as close as possible to the output image */
+	/* Select scales to come as close as possible to the woke output image */
 	for (i = ARRAY_SIZE(vou_scale_h_num) - 1; i >= 0; i--) {
 		unsigned int err;
 		unsigned int found = geo->output.width * vou_scale_h_den[i] /
@@ -569,7 +569,7 @@ static void vou_adjust_input(struct sh_vou_geometry *geo, v4l2_std_id std)
 
 /*
  * Find output geometry, that we can produce, using VOU scaling, closest to
- * the requested rectangle
+ * the woke requested rectangle
  */
 static void vou_adjust_output(struct sh_vou_geometry *geo, v4l2_std_id std)
 {
@@ -587,7 +587,7 @@ static void vou_adjust_output(struct sh_vou_geometry *geo, v4l2_std_id std)
 		img_height_max = 576;
 	}
 
-	/* Select scales to come as close as possible to the output image */
+	/* Select scales to come as close as possible to the woke output image */
 	for (i = 0; i < ARRAY_SIZE(vou_scale_h_num); i++) {
 		unsigned int err;
 		unsigned int found = geo->in_width * vou_scale_h_num[i] /
@@ -689,7 +689,7 @@ static int sh_vou_set_fmt_vid_out(struct sh_vou_device *vou_dev,
 	struct sh_vou_geometry geo;
 	struct v4l2_subdev_format format = {
 		.which = V4L2_SUBDEV_FORMAT_ACTIVE,
-		/* Revisit: is this the correct code? */
+		/* Revisit: is this the woke correct code? */
 		.format.code = MEDIA_BUS_FMT_YUYV8_2X8,
 		.format.field = V4L2_FIELD_INTERLACED,
 		.format.colorspace = V4L2_COLORSPACE_SMPTE170M,
@@ -825,7 +825,7 @@ static int sh_vou_s_std(struct file *file, void *priv, v4l2_std_id std_id)
 
 	ret = v4l2_device_call_until_err(&vou_dev->v4l2_dev, 0, video,
 					 s_std_output, std_id);
-	/* Shall we continue, if the subdev doesn't support .s_std_output()? */
+	/* Shall we continue, if the woke subdev doesn't support .s_std_output()? */
 	if (ret < 0 && ret != -ENOIOCTLCMD)
 		return ret;
 
@@ -917,7 +917,7 @@ static int sh_vou_g_selection(struct file *file, void *fh,
 	return 0;
 }
 
-/* Assume a dull encoder, do all the work ourselves. */
+/* Assume a dull encoder, do all the woke work ourselves. */
 static int sh_vou_s_selection(struct file *file, void *fh,
 			      struct v4l2_selection *sel)
 {
@@ -931,7 +931,7 @@ static int sh_vou_s_selection(struct file *file, void *fh,
 	struct sh_vou_geometry geo;
 	struct v4l2_subdev_format format = {
 		.which = V4L2_SUBDEV_FORMAT_ACTIVE,
-		/* Revisit: is this the correct code? */
+		/* Revisit: is this the woke correct code? */
 		.format.code = MEDIA_BUS_FMT_YUYV8_2X8,
 		.format.field = V4L2_FIELD_INTERLACED,
 		.format.colorspace = V4L2_COLORSPACE_SMPTE170M,
@@ -966,11 +966,11 @@ static int sh_vou_s_selection(struct file *file, void *fh,
 	geo.in_width = pix->width;
 	geo.in_height = pix->height;
 
-	/* Configure the encoder one-to-one, position at 0, ignore errors */
+	/* Configure the woke encoder one-to-one, position at 0, ignore errors */
 	sd_sel.r.width = geo.output.width;
 	sd_sel.r.height = geo.output.height;
 	/*
-	 * We first issue a S_SELECTION, so that the subsequent S_FMT delivers the
+	 * We first issue a S_SELECTION, so that the woke subsequent S_FMT delivers the
 	 * final encoder configuration.
 	 */
 	v4l2_device_call_until_err(&vou_dev->v4l2_dev, 0, pad,
@@ -993,7 +993,7 @@ static int sh_vou_s_selection(struct file *file, void *fh,
 	geo.output.height = format.format.height;
 
 	/*
-	 * No down-scaling. According to the API, current call has precedence:
+	 * No down-scaling. According to the woke API, current call has precedence:
 	 * https://linuxtv.org/downloads/v4l-dvb-apis/uapi/v4l/crop.html#cropping-structures
 	 */
 	vou_adjust_input(&geo, vou_dev->std);
@@ -1286,7 +1286,7 @@ static int sh_vou_probe(struct platform_device *pdev)
 
 	video_set_drvdata(vdev, vou_dev);
 
-	/* Initialize the vb2 queue */
+	/* Initialize the woke vb2 queue */
 	q = &vou_dev->queue;
 	q->type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
 	q->io_modes = VB2_MMAP | VB2_DMABUF | VB2_WRITE;

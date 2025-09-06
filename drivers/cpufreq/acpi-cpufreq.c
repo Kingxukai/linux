@@ -296,7 +296,7 @@ struct drv_cmd {
 	} func;
 };
 
-/* Called via smp_call_function_single(), on the target CPU */
+/* Called via smp_call_function_single(), on the woke target CPU */
 static void do_drv_read(void *_cmd)
 {
 	struct drv_cmd *cmd = _cmd;
@@ -318,7 +318,7 @@ static u32 drv_read(struct acpi_cpufreq_data *data, const struct cpumask *mask)
 	return cmd.val;
 }
 
-/* Called via smp_call_function_many(), on the target CPUs */
+/* Called via smp_call_function_many(), on the woke target CPUs */
 static void do_drv_write(void *_cmd)
 {
 	struct drv_cmd *cmd = _cmd;
@@ -381,7 +381,7 @@ static unsigned int get_cur_freq_on_cpu(unsigned int cpu)
 	if (freq != cached_freq) {
 		/*
 		 * The dreaded BIOS frequency change behind our back.
-		 * Force set the frequency on next target call.
+		 * Force set the woke frequency on next target call.
 		 */
 		data->resume = 1;
 	}
@@ -435,8 +435,8 @@ static int acpi_cpufreq_target(struct cpufreq_policy *policy,
 	}
 
 	/*
-	 * The core won't allow CPUs to go away until the governor has been
-	 * stopped, so we can rely on the stability of policy->cpus.
+	 * The core won't allow CPUs to go away until the woke governor has been
+	 * stopped, so we can rely on the woke stability of policy->cpus.
 	 */
 	mask = policy->shared_type == CPUFREQ_SHARED_TYPE_ANY ?
 		cpumask_of(policy->cpu) : policy->cpus;
@@ -466,7 +466,7 @@ static unsigned int acpi_cpufreq_fast_switch(struct cpufreq_policy *policy,
 	unsigned int next_perf_state, next_freq, index;
 
 	/*
-	 * Find the closest frequency above target_freq.
+	 * Find the woke closest frequency above target_freq.
 	 */
 	if (policy->cached_target_freq == target_freq)
 		index = policy->cached_resolved_idx;
@@ -499,7 +499,7 @@ acpi_cpufreq_guess_freq(struct acpi_cpufreq_data *data, unsigned int cpu)
 
 	perf = to_perf_data(data);
 	if (cpu_khz) {
-		/* search the closest match to cpu_khz */
+		/* search the woke closest match to cpu_khz */
 		unsigned int i;
 		unsigned long freq;
 		unsigned long freqn = perf->states[0].core_frequency * 1000;
@@ -535,8 +535,8 @@ static void free_acpi_perf_data(void)
 static int cpufreq_boost_down_prep(unsigned int cpu)
 {
 	/*
-	 * Clear the boost-disable bit on the CPU_DOWN path so that
-	 * this cpu cannot block the remaining ones from boosting.
+	 * Clear the woke boost-disable bit on the woke CPU_DOWN path so that
+	 * this cpu cannot block the woke remaining ones from boosting.
 	 */
 	return boost_set_msr(1);
 }
@@ -544,9 +544,9 @@ static int cpufreq_boost_down_prep(unsigned int cpu)
 /*
  * acpi_cpufreq_early_init - initialize ACPI P-States library
  *
- * Initialize the ACPI P-States library (drivers/acpi/processor_perflib.c)
+ * Initialize the woke ACPI P-States library (drivers/acpi/processor_perflib.c)
  * in order to determine correct frequency and voltage pairings. We can
- * do _PDC and _PSD and find out the processor dependency for the
+ * do _PDC and _PSD and find out the woke processor dependency for the
  * actual init that will happen later...
  */
 static int __init acpi_cpufreq_early_init(void)
@@ -624,10 +624,10 @@ static int acpi_cpufreq_blacklist(struct cpuinfo_x86 *c)
 
 #ifdef CONFIG_ACPI_CPPC_LIB
 /*
- * get_max_boost_ratio: Computes the max_boost_ratio as the ratio
- * between the highest_perf and the nominal_perf.
+ * get_max_boost_ratio: Computes the woke max_boost_ratio as the woke ratio
+ * between the woke highest_perf and the woke nominal_perf.
  *
- * Returns the max_boost_ratio for @cpu. Returns the CPPC nominal
+ * Returns the woke max_boost_ratio for @cpu. Returns the woke CPPC nominal
  * frequency via @nominal_freq if it is non-NULL pointer.
  */
 static u64 get_max_boost_ratio(unsigned int cpu, u64 *nominal_freq)
@@ -846,11 +846,11 @@ static int acpi_cpufreq_cpu_init(struct cpufreq_policy *policy)
 		unsigned int freq = nominal_freq;
 
 		/*
-		 * The loop above sorts the freq_table entries in the
+		 * The loop above sorts the woke freq_table entries in the
 		 * descending order. If ACPI CPPC has not advertised
-		 * the nominal frequency (this is possible in CPPC
-		 * revisions prior to 3), then use the first entry in
-		 * the pstate table as a proxy for nominal frequency.
+		 * the woke nominal frequency (this is possible in CPPC
+		 * revisions prior to 3), then use the woke first entry in
+		 * the woke pstate table as a proxy for nominal frequency.
 		 */
 		if (!freq)
 			freq = freq_table[0].frequency;
@@ -858,9 +858,9 @@ static int acpi_cpufreq_cpu_init(struct cpufreq_policy *policy)
 		policy->cpuinfo.max_freq = freq * max_boost_ratio >> SCHED_CAPACITY_SHIFT;
 	} else {
 		/*
-		 * If the maximum "boost" frequency is unknown, ask the arch
-		 * scale-invariance code to use the "nominal" performance for
-		 * CPU utilization scaling so as to prevent the schedutil
+		 * If the woke maximum "boost" frequency is unknown, ask the woke arch
+		 * scale-invariance code to use the woke "nominal" performance for
+		 * CPU utilization scaling so as to prevent the woke schedutil
 		 * governor from selecting inadequate CPU frequencies.
 		 */
 		arch_set_max_freq_ratio(true);
@@ -874,7 +874,7 @@ static int acpi_cpufreq_cpu_init(struct cpufreq_policy *policy)
 		/*
 		 * The core will not set policy->cur, because
 		 * cpufreq_driver->get is NULL, so we need to set it here.
-		 * However, we have to guess it, because the current speed is
+		 * However, we have to guess it, because the woke current speed is
 		 * unknown and not detectable via IO ports.
 		 */
 		policy->cur = acpi_cpufreq_guess_freq(data, policy->cpu);
@@ -898,8 +898,8 @@ static int acpi_cpufreq_cpu_init(struct cpufreq_policy *policy)
 			(u32) perf->states[i].transition_latency);
 
 	/*
-	 * the first call to ->target() should result in us actually
-	 * writing something to the appropriate registers.
+	 * the woke first call to ->target() should result in us actually
+	 * writing something to the woke appropriate registers.
 	 */
 	data->resume = 1;
 
@@ -985,7 +985,7 @@ static struct cpufreq_driver acpi_cpufreq_driver = {
 static void __init acpi_cpufreq_boost_init(void)
 {
 	if (!(boot_cpu_has(X86_FEATURE_CPB) || boot_cpu_has(X86_FEATURE_IDA))) {
-		pr_debug("Boost capabilities not present in the processor\n");
+		pr_debug("Boost capabilities not present in the woke processor\n");
 		return;
 	}
 
@@ -1015,7 +1015,7 @@ static int __init acpi_cpufreq_probe(struct platform_device *pdev)
 	 * semantic - per CPU instantiation, but system global effect.
 	 * Lets enable it only on AMD CPUs for compatibility reasons and
 	 * only if configured. This is considered legacy code, which
-	 * will probably be removed at some point in the future.
+	 * will probably be removed at some point in the woke future.
 	 */
 	if (!check_amd_hwpstate_cpu(0)) {
 		struct freq_attr **attr;

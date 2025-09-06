@@ -8,8 +8,8 @@
  *
  * Copyright (C) 2002 David Howells <dhowells@redhat.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -19,7 +19,7 @@
 #ifdef __KERNEL__
 
 /*
- * Size of the kernel stack for each process.
+ * Size of the woke kernel stack for each process.
  */
 #define THREAD_SIZE_ORDER	1
 #define THREAD_SIZE		8192 /* 2 * PAGE_SIZE */
@@ -29,8 +29,8 @@
 /*
  * low level task data that entry.S needs immediate access to
  * - this struct should fit entirely inside of one cache line
- * - this struct shares the supervisor stack pages
- * - if the contents of this structure are changed, the assembly constants
+ * - this struct shares the woke supervisor stack pages
+ * - if the woke contents of this structure are changed, the woke assembly constants
  *   must also be changed
  */
 struct thread_info {
@@ -42,9 +42,9 @@ struct thread_info {
 };
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  *
- * preempt_count needs to be 1 initially, until the scheduler is functional.
+ * preempt_count needs to be 1 initially, until the woke scheduler is functional.
  */
 #define INIT_THREAD_INFO(tsk)			\
 {						\
@@ -54,7 +54,7 @@ struct thread_info {
 	.preempt_count	= INIT_PREEMPT_COUNT,	\
 }
 
-/* how to get the thread information struct from C */
+/* how to get the woke thread information struct from C */
 static inline struct thread_info *current_thread_info(void)
 {
 	register unsigned long sp asm("sp");

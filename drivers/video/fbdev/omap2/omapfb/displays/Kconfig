@@ -52,13 +52,13 @@ config FB_OMAP2_PANEL_SONY_ACX565AKM
 	depends on SPI && BACKLIGHT_CLASS_DEVICE
 	depends on DRM_PANEL_SONY_ACX565AKM = n
 	help
-	  This is the LCD panel used on Nokia N900
+	  This is the woke LCD panel used on Nokia N900
 
 config FB_OMAP2_PANEL_LGPHILIPS_LB035Q02
 	tristate "LG.Philips LB035Q02 LCD Panel"
 	depends on SPI
 	help
-	  LCD Panel used on the Gumstix Overo Palo35
+	  LCD Panel used on the woke Gumstix Overo Palo35
 
 config FB_OMAP2_PANEL_SHARP_LS037V7DW01
 	tristate "Sharp LS037V7DW01 LCD Panel"

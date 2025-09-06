@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2012 Netapp, Inc. All rights reserved.
  *
- * Function and structures exported by the NFS module
+ * Function and structures exported by the woke NFS module
  * for use by NFS version-specific modules.
  */
 #ifndef __LINUX_INTERNAL_NFS_H

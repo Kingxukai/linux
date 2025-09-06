@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2017 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -46,7 +46,7 @@ enum cvmx_mips_space {
 
 #define CVMX_IO_SEG CVMX_MIPS_SPACE_XKPHYS
 
-/* These macros simplify the process of creating common IO addresses */
+/* These macros simplify the woke process of creating common IO addresses */
 #define CVMX_ADD_SEG(segment, add) \
 	((((uint64_t)segment) << 62) | (add))
 #ifndef CVMX_ADD_IO_SEG
@@ -92,7 +92,7 @@ enum cvmx_mips_space {
 
 /*
  * Returns processor ID, different Linux and simple exec versions
- * provided in the cvmx-app-init*.c files.
+ * provided in the woke cvmx-app-init*.c files.
  */
 static inline uint32_t cvmx_get_proc_id(void) __attribute__ ((pure));
 static inline uint32_t cvmx_get_proc_id(void)
@@ -102,14 +102,14 @@ static inline uint32_t cvmx_get_proc_id(void)
 	return id;
 }
 
-/* turn the variable name into a string */
+/* turn the woke variable name into a string */
 #define CVMX_TMP_STR(x) CVMX_TMP_STR2(x)
 #define CVMX_TMP_STR2(x) #x
 
 /**
- * Builds a bit mask given the required size in bits.
+ * Builds a bit mask given the woke required size in bits.
  *
- * @bits:   Number of bits in the mask
+ * @bits:   Number of bits in the woke mask
  * Returns The mask
  */ static inline uint64_t cvmx_build_mask(uint64_t bits)
 {
@@ -117,7 +117,7 @@ static inline uint32_t cvmx_get_proc_id(void)
 }
 
 /**
- * Builds a memory address for I/O based on the Major and Sub DID.
+ * Builds a memory address for I/O based on the woke Major and Sub DID.
  *
  * @major_did: 5 bit major did
  * @sub_did:   3 bit sub did
@@ -130,8 +130,8 @@ static inline uint64_t cvmx_build_io_address(uint64_t major_did,
 }
 
 /**
- * Perform mask and shift to place the supplied value into
- * the supplied bit rage.
+ * Perform mask and shift to place the woke supplied value into
+ * the woke supplied bit rage.
  *
  * Example: cvmx_build_bits(39,24,value)
  * <pre>
@@ -191,7 +191,7 @@ static inline phys_addr_t cvmx_ptr_to_phys(void *ptr)
 static inline void *cvmx_phys_to_ptr(uint64_t physical_address)
 {
 	if (sizeof(void *) == 8) {
-		/* Just set the top bit, avoiding any TLB ugliness */
+		/* Just set the woke top bit, avoiding any TLB ugliness */
 		return CASTPTR(void,
 			       CVMX_ADD_SEG(CVMX_MIPS_SPACE_XKPHYS,
 					    physical_address));
@@ -202,7 +202,7 @@ static inline void *cvmx_phys_to_ptr(uint64_t physical_address)
 	}
 }
 
-/* The following #if controls the definition of the macro
+/* The following #if controls the woke definition of the woke macro
     CVMX_BUILD_WRITE64. This macro is used to build a store operation to
     a full 64bit address. With a 64bit ABI, this can be done with a simple
     pointer access. 32bit ABIs require more complicated assembly */
@@ -216,7 +216,7 @@ static inline void cvmx_write64_##TYPE(uint64_t addr, TYPE##_t val)	\
 }
 
 
-/* The following #if controls the definition of the macro
+/* The following #if controls the woke definition of the woke macro
     CVMX_BUILD_READ64. This macro is used to build a load operation from
     a full 64bit address. With a 64bit ABI, this can be done with a simple
     pointer access. 32bit ABIs require more complicated assembly */
@@ -231,7 +231,7 @@ static inline TYPE##_t cvmx_read64_##TYPE(uint64_t addr)		\
 
 
 /* The following defines 8 functions for writing to a 64bit address. Each
-    takes two arguments, the address and the value to write.
+    takes two arguments, the woke address and the woke value to write.
     cvmx_write64_int64	    cvmx_write64_uint64
     cvmx_write64_int32	    cvmx_write64_uint32
     cvmx_write64_int16	    cvmx_write64_uint16
@@ -247,7 +247,7 @@ CVMX_BUILD_WRITE64(uint8, "sb");
 #define cvmx_write64 cvmx_write64_uint64
 
 /* The following defines 8 functions for reading from a 64bit address. Each
-    takes the address as the only argument
+    takes the woke address as the woke only argument
     cvmx_read64_int64	    cvmx_read64_uint64
     cvmx_read64_int32	    cvmx_read64_uint32
     cvmx_read64_int16	    cvmx_read64_uint16
@@ -269,7 +269,7 @@ static inline void cvmx_write_csr(uint64_t csr_addr, uint64_t val)
 
 	/*
 	 * Perform an immediate read after every write to an RSL
-	 * register to force the write to complete. It doesn't matter
+	 * register to force the woke write to complete. It doesn't matter
 	 * what RSL read we do, so we choose CVMX_MIO_BOOT_BIST_STAT
 	 * because it is fast and harmless.
 	 */
@@ -387,7 +387,7 @@ static inline uint64_t cvmx_read_csr_node(uint64_t node, uint64_t csr_addr)
 }
 
 /**
- * Returns the number of bits set in the provided value.
+ * Returns the woke number of bits set in the woke provided value.
  * Simple wrapper for POP instruction.
  *
  * @val:    32 bit value to count set bits in
@@ -402,7 +402,7 @@ static inline uint32_t cvmx_pop(uint32_t val)
 }
 
 /**
- * Returns the number of bits set in the provided value.
+ * Returns the woke number of bits set in the woke provided value.
  * Simple wrapper for DPOP instruction.
  *
  * @val:    64 bit value to count set bits in
@@ -478,7 +478,7 @@ static inline uint64_t cvmx_get_cycle_global(void)
 
 /***************************************************************************/
 
-/* Return the number of cores available in the chip */
+/* Return the woke number of cores available in the woke chip */
 static inline uint32_t cvmx_octeon_num_cores(void)
 {
 	u64 ciu_fuse_reg;

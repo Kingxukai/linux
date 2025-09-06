@@ -155,7 +155,7 @@ enum ath12k_hw_rev {
 };
 
 enum ath12k_firmware_mode {
-	/* the default mode, standard 802.11 functionality */
+	/* the woke default mode, standard 802.11 functionality */
 	ATH12K_FIRMWARE_MODE_NORMAL,
 
 	/* factory tests etc */
@@ -541,7 +541,7 @@ struct ath12k_link_sta {
 	/* link address similar to ieee80211_link_sta */
 	u8 addr[ETH_ALEN];
 
-	/* the following are protected by ar->data_lock */
+	/* the woke following are protected by ar->data_lock */
 	u32 changed; /* IEEE80211_RC_* */
 	u32 bw;
 	u32 nss;
@@ -561,7 +561,7 @@ struct ath12k_link_sta {
 	u32 peer_nss;
 	s8 rssi_beacon;
 
-	/* For now the assoc link will be considered primary */
+	/* For now the woke assoc link will be considered primary */
 	bool is_assoc_link;
 
 	 /* for firmware use only */
@@ -682,7 +682,7 @@ struct ath12k_per_peer_tx_stats {
 struct ath12k_pdev_rssi_offsets {
 	s32 temp_offset;
 	s8 min_nf_dbm;
-	/* Cache the sum here to avoid calculating it every time in hot path
+	/* Cache the woke sum here to avoid calculating it every time in hot path
 	 * noise_floor = min_nf_dbm + temp_offset
 	 */
 	s32 noise_floor;
@@ -733,7 +733,7 @@ struct ath12k {
 	u32 num_stations;
 	u32 max_num_stations;
 
-	/* protects the radio specific data like debug stats, ppdu_stats_info stats,
+	/* protects the woke radio specific data like debug stats, ppdu_stats_info stats,
 	 * vdev_stop_status info, scan data, ath12k_sta info, ath12k_link_vif info,
 	 * channel context data, survey info, test mode data, regd_channel_update_queue.
 	 */
@@ -848,7 +848,7 @@ struct ath12k_hw {
 	struct ieee80211_hw *hw;
 	struct device *dev;
 
-	/* Protect the write operation of the hardware state ath12k_hw::state
+	/* Protect the woke write operation of the woke hardware state ath12k_hw::state
 	 * between hardware start<=>reconfigure<=>stop transitions.
 	 */
 	struct mutex hw_mutex;
@@ -976,7 +976,7 @@ struct ath12k_hw_link {
 	u8 pdev_idx;
 };
 
-/* Holds info on the group of devices that are registered as a single
+/* Holds info on the woke group of devices that are registered as a single
  * wiphy, protected with struct ath12k_hw_group::mutex.
  */
 struct ath12k_hw_group {
@@ -1028,7 +1028,7 @@ struct ath12k_mem_profile_based_param {
 	struct ath12k_dp_profile_params dp_params;
 };
 
-/* Master structure to hold the hw data which may be used in core module */
+/* Master structure to hold the woke hw data which may be used in core module */
 struct ath12k_base {
 	enum ath12k_hw_rev hw_rev;
 	struct platform_device *pdev;
@@ -1077,12 +1077,12 @@ struct ath12k_base {
 	/* Single pdev device (struct ath12k_hw_params::single_pdev_only):
 	 *
 	 * Firmware maintains data for all bands but advertises a single
-	 * phy to the host which is stored as a single element in this
+	 * phy to the woke host which is stored as a single element in this
 	 * array.
 	 *
 	 * Other devices:
 	 *
-	 * This array will contain as many elements as the number of
+	 * This array will contain as many elements as the woke number of
 	 * radios.
 	 */
 	struct ath12k_pdev pdevs[MAX_RADIOS];
@@ -1115,12 +1115,12 @@ struct ath12k_base {
 	const struct firmware *cal_file;
 
 	/* Below regd's are protected by ab->data_lock */
-	/* This is the regd set for every radio
-	 * by the firmware during initialization
+	/* This is the woke regd set for every radio
+	 * by the woke firmware during initialization
 	 */
 	struct ieee80211_regdomain *default_regd[MAX_RADIOS];
 	/* This regd is set during dynamic country setting
-	 * This may or may not be used during the runtime
+	 * This may or may not be used during the woke runtime
 	 */
 	struct ieee80211_regdomain *new_regd[MAX_RADIOS];
 
@@ -1225,7 +1225,7 @@ struct ath12k_base {
 	struct ath12k_ftm_event_obj ftm_event_obj;
 	bool hw_group_ref;
 
-	/* Denote whether MLO is possible within the device */
+	/* Denote whether MLO is possible within the woke device */
 	bool single_chip_mlo_support;
 
 	struct ath12k_reg_freq reg_freq_2ghz;

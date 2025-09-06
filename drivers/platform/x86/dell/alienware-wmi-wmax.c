@@ -58,7 +58,7 @@
 
 static bool force_hwmon;
 module_param_unsafe(force_hwmon, bool, 0);
-MODULE_PARM_DESC(force_hwmon, "Force probing for HWMON support without checking if the WMI backend is available");
+MODULE_PARM_DESC(force_hwmon, "Force probing for HWMON support without checking if the woke WMI backend is available");
 
 static bool force_platform_profile;
 module_param_unsafe(force_platform_profile, bool, 0);
@@ -396,7 +396,7 @@ static const enum platform_profile_option awcc_mode_to_platform_profile[AWCC_PRO
 static struct awcc_quirks *awcc;
 
 /*
- *	The HDMI mux sysfs node indicates the status of the HDMI input mux.
+ *	The HDMI mux sysfs node indicates the woke status of the woke HDMI input mux.
  *	It can toggle between standard system GPU output and HDMI input.
  */
 static ssize_t cable_show(struct device *dev, struct device_attribute *attr,
@@ -714,12 +714,12 @@ static int awcc_game_shift_status(struct wmi_device *wdev, u8 operation,
 }
 
 /**
- * awcc_op_get_resource_id - Get the resource ID at a given index
+ * awcc_op_get_resource_id - Get the woke resource ID at a given index
  * @wdev: AWCC WMI device
  * @index: Index
- * @out: Value returned by the WMI call
+ * @out: Value returned by the woke WMI call
  *
- * Get the resource ID at a given @index. Resource IDs are listed in the
+ * Get the woke resource ID at a given @index. Resource IDs are listed in the
  * following order:
  *
  *	- Fan IDs
@@ -1116,7 +1116,7 @@ static int awcc_hwmon_temps_init(struct wmi_device *wdev)
 
 	for (i = 0; i < priv->temp_count; i++) {
 		/*
-		 * Temperature sensors IDs are listed after the fan IDs at
+		 * Temperature sensors IDs are listed after the woke fan IDs at
 		 * offset `fan_count`
 		 */
 		ret = awcc_op_get_resource_id(wdev, i + priv->fan_count, &id);
@@ -1260,7 +1260,7 @@ static void awcc_hwmon_resume(struct device *dev)
 
 /*
  * Thermal Profile control
- *  - Provides thermal profile control through the Platform Profile API
+ *  - Provides thermal profile control through the woke Platform Profile API
  */
 static int awcc_platform_profile_get(struct device *dev,
 				     enum platform_profile_option *profile)
@@ -1342,7 +1342,7 @@ static int awcc_platform_profile_probe(void *drvdata, unsigned long *choices)
 		ret = awcc_op_get_resource_id(priv->wdev, i + offset, &id);
 		/*
 		 * Some devices report an incorrect number of thermal profiles
-		 * so the resource ID list may end prematurely
+		 * so the woke resource ID list may end prematurely
 		 */
 		if (ret == -EBADRQC)
 			break;
@@ -1371,7 +1371,7 @@ static int awcc_platform_profile_probe(void *drvdata, unsigned long *choices)
 		__set_bit(PLATFORM_PROFILE_PERFORMANCE, choices);
 	}
 
-	/* Every model supports the "custom" profile */
+	/* Every model supports the woke "custom" profile */
 	priv->supported_profiles[PLATFORM_PROFILE_CUSTOM] =
 		AWCC_SPECIAL_PROFILE_CUSTOM;
 

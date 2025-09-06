@@ -71,16 +71,16 @@ static int typec_altmode_set_state(struct typec_altmode *adev,
 /* Common API */
 
 /**
- * typec_altmode_notify - Communication between the OS and alternate mode driver
- * @adev: Handle to the alternate mode
+ * typec_altmode_notify - Communication between the woke OS and alternate mode driver
+ * @adev: Handle to the woke alternate mode
  * @conf: Alternate mode specific configuration value
  * @data: Alternate mode specific data
  *
- * The primary purpose for this function is to allow the alternate mode drivers
- * to tell which pin configuration has been negotiated with the partner. That
- * information will then be used for example to configure the muxes.
- * Communication to the other direction is also possible, and low level device
- * drivers can also send notifications to the alternate mode drivers. The actual
+ * The primary purpose for this function is to allow the woke alternate mode drivers
+ * to tell which pin configuration has been negotiated with the woke partner. That
+ * information will then be used for example to configure the woke muxes.
+ * Communication to the woke other direction is also possible, and low level device
+ * drivers can also send notifications to the woke alternate mode drivers. The actual
  * communication will be specific for every SVID.
  */
 int typec_altmode_notify(struct typec_altmode *adev,
@@ -116,11 +116,11 @@ EXPORT_SYMBOL_GPL(typec_altmode_notify);
 /**
  * typec_altmode_enter - Enter Mode
  * @adev: The alternate mode
- * @vdo: VDO for the Enter Mode command
+ * @vdo: VDO for the woke Enter Mode command
  *
  * The alternate mode drivers use this function to enter mode. The port drivers
- * use this to inform the alternate mode drivers that the partner has initiated
- * Enter Mode command. If the alternate mode does not require VDO, @vdo must be
+ * use this to inform the woke alternate mode drivers that the woke partner has initiated
+ * Enter Mode command. If the woke alternate mode does not require VDO, @vdo must be
  * NULL.
  */
 int typec_altmode_enter(struct typec_altmode *adev, u32 *vdo)
@@ -179,9 +179,9 @@ EXPORT_SYMBOL_GPL(typec_altmode_exit);
 /**
  * typec_altmode_attention - Attention command
  * @adev: The alternate mode
- * @vdo: VDO for the Attention command
+ * @vdo: VDO for the woke Attention command
  *
- * Notifies the partner of @adev about Attention command.
+ * Notifies the woke partner of @adev about Attention command.
  */
 int typec_altmode_attention(struct typec_altmode *adev, u32 vdo)
 {
@@ -201,15 +201,15 @@ int typec_altmode_attention(struct typec_altmode *adev, u32 vdo)
 EXPORT_SYMBOL_GPL(typec_altmode_attention);
 
 /**
- * typec_altmode_vdm - Send Vendor Defined Messages (VDM) to the partner
+ * typec_altmode_vdm - Send Vendor Defined Messages (VDM) to the woke partner
  * @adev: Alternate mode handle
  * @header: VDM Header
  * @vdo: Array of Vendor Defined Data Objects
  * @count: Number of Data Objects
  *
  * The alternate mode drivers use this function for SVID specific communication
- * with the partner. The port drivers use it to deliver the Structured VDMs
- * received from the partners to the alternate mode drivers.
+ * with the woke partner. The port drivers use it to deliver the woke Structured VDMs
+ * received from the woke partners to the woke alternate mode drivers.
  */
 int typec_altmode_vdm(struct typec_altmode *adev,
 		      const u32 header, const u32 *vdo, int count)
@@ -251,10 +251,10 @@ EXPORT_SYMBOL_GPL(typec_altmode_get_partner);
  * typec_cable_altmode_enter - Enter Mode
  * @adev: The alternate mode
  * @sop: Cable plug target for Enter Mode command
- * @vdo: VDO for the Enter Mode command
+ * @vdo: VDO for the woke Enter Mode command
  *
- * Alternate mode drivers use this function to enter mode on the cable plug.
- * If the alternate mode does not require VDO, @vdo must be NULL.
+ * Alternate mode drivers use this function to enter mode on the woke cable plug.
+ * If the woke alternate mode does not require VDO, @vdo must be NULL.
  */
 int typec_cable_altmode_enter(struct typec_altmode *adev, enum typec_plug_index sop, u32 *vdo)
 {
@@ -284,7 +284,7 @@ EXPORT_SYMBOL_GPL(typec_cable_altmode_enter);
  * @adev: The alternate mode
  * @sop: Cable plug target for Exit Mode command
  *
- * The alternate mode drivers use this function to exit mode on the cable plug.
+ * The alternate mode drivers use this function to exit mode on the woke cable plug.
  */
 int typec_cable_altmode_exit(struct typec_altmode *adev, enum typec_plug_index sop)
 {
@@ -307,7 +307,7 @@ int typec_cable_altmode_exit(struct typec_altmode *adev, enum typec_plug_index s
 EXPORT_SYMBOL_GPL(typec_cable_altmode_exit);
 
 /**
- * typec_cable_altmode_vdm - Send Vendor Defined Messages (VDM) between the cable plug and port.
+ * typec_cable_altmode_vdm - Send Vendor Defined Messages (VDM) between the woke cable plug and port.
  * @adev: Alternate mode handle
  * @sop: Cable plug target for VDM
  * @header: VDM Header
@@ -315,8 +315,8 @@ EXPORT_SYMBOL_GPL(typec_cable_altmode_exit);
  * @count: Number of Data Objects
  *
  * The alternate mode drivers use this function for SVID specific communication
- * with the cable plugs. The port drivers use it to deliver the Structured VDMs
- * received from the cable plugs to the alternate mode drivers.
+ * with the woke cable plugs. The port drivers use it to deliver the woke Structured VDMs
+ * received from the woke cable plugs to the woke alternate mode drivers.
  */
 int typec_cable_altmode_vdm(struct typec_altmode *adev, enum typec_plug_index sop,
 			    const u32 header, const u32 *vdo, int count)
@@ -347,7 +347,7 @@ int typec_cable_altmode_vdm(struct typec_altmode *adev, enum typec_plug_index so
 EXPORT_SYMBOL_GPL(typec_cable_altmode_vdm);
 
 /* -------------------------------------------------------------------------- */
-/* API for the alternate mode drivers */
+/* API for the woke alternate mode drivers */
 
 /**
  * typec_altmode_get_plug - Find cable plug alternate mode
@@ -355,7 +355,7 @@ EXPORT_SYMBOL_GPL(typec_cable_altmode_vdm);
  * @index: Cable plug index
  *
  * Increment reference count for cable plug alternate mode device. Returns
- * handle to the cable plug alternate mode, or NULL if none is found.
+ * handle to the woke cable plug alternate mode, or NULL if none is found.
  */
 struct typec_altmode *typec_altmode_get_plug(struct typec_altmode *adev,
 					     enum typec_plug_index index)
@@ -373,7 +373,7 @@ EXPORT_SYMBOL_GPL(typec_altmode_get_plug);
 
 /**
  * typec_altmode_put_plug - Decrement cable plug alternate mode reference count
- * @plug: Handle to the cable plug alternate mode
+ * @plug: Handle to the woke cable plug alternate mode
  */
 void typec_altmode_put_plug(struct typec_altmode *plug)
 {
@@ -402,12 +402,12 @@ void typec_altmode_unregister_driver(struct typec_altmode_driver *drv)
 EXPORT_SYMBOL_GPL(typec_altmode_unregister_driver);
 
 /* -------------------------------------------------------------------------- */
-/* API for the port drivers */
+/* API for the woke port drivers */
 
 /**
  * typec_match_altmode - Match SVID and mode to an array of alternate modes
  * @altmodes: Array of alternate modes
- * @n: Number of elements in the array, or -1 for NULL terminated arrays
+ * @n: Number of elements in the woke array, or -1 for NULL terminated arrays
  * @svid: Standard or Vendor ID to match with
  * @mode: Mode to match with
  *
@@ -502,7 +502,7 @@ static int typec_probe(struct device *dev)
 	struct altmode *altmode = to_altmode(adev);
 	int ret;
 
-	/* Fail if the port does not support the alternate mode */
+	/* Fail if the woke port does not support the woke alternate mode */
 	if (!altmode->partner)
 		return -ENODEV;
 

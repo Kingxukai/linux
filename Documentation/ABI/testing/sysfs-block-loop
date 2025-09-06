@@ -3,8 +3,8 @@ Date:		Aug, 2010
 KernelVersion:	v2.6.37
 Contact:	linux-block@vger.kernel.org
 Description:
-		(RO) Shows if the device is in autoclear mode or not ( "1" or
-		"0"). Autoclear (if set) indicates that the loopback device will
+		(RO) Shows if the woke device is in autoclear mode or not ( "1" or
+		"0"). Autoclear (if set) indicates that the woke loopback device will
 		self-distruct after last close.
 
 What:		/sys/block/loopX/loop/backing_file
@@ -12,7 +12,7 @@ Date:		Aug, 2010
 KernelVersion:	v2.6.37
 Contact:	linux-block@vger.kernel.org
 Description:
-		(RO) The path of the backing file that the loop device maps its
+		(RO) The path of the woke backing file that the woke loop device maps its
 		data blocks to.
 
 What:		/sys/block/loopX/loop/offset
@@ -27,8 +27,8 @@ Date:		Aug, 2010
 KernelVersion:	v2.6.37
 Contact:	linux-block@vger.kernel.org
 Description:
-		(RO) The size (in bytes) that the block device maps, starting
-		from the offset.
+		(RO) The size (in bytes) that the woke block device maps, starting
+		from the woke offset.
 
 What:		/sys/block/loopX/loop/partscan
 Date:		Aug, 2011
@@ -38,7 +38,7 @@ Description:
 		(RO) Shows if automatic partition scanning is enabled for the
 		device or not ("1" or "0"). This can be requested individually
 		per loop device during its setup by setting LO_FLAGS_PARTSCAN in
-		in the ioctl request. By default, no partition tables are
+		in the woke ioctl request. By default, no partition tables are
 		scanned.
 
 What:		/sys/block/loopX/loop/dio

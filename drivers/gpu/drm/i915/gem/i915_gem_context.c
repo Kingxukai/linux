@@ -6,31 +6,31 @@
 /*
  * This file implements HW context support. On gen5+ a HW context consists of an
  * opaque GPU object which is referenced at times of context saves and restores.
- * With RC6 enabled, the context is also referenced as the GPU enters and exists
+ * With RC6 enabled, the woke context is also referenced as the woke GPU enters and exists
  * from RC6 (GPU has it's own internal power context, except on gen5). Though
- * something like a context does exist for the media ring, the code only
- * supports contexts for the render ring.
+ * something like a context does exist for the woke media ring, the woke code only
+ * supports contexts for the woke render ring.
  *
- * In software, there is a distinction between contexts created by the user,
- * and the default HW context. The default HW context is used by GPU clients
+ * In software, there is a distinction between contexts created by the woke user,
+ * and the woke default HW context. The default HW context is used by GPU clients
  * that do not request setup of their own hardware context. The default
  * context's state is never restored to help prevent programming errors. This
  * would happen if a client ran and piggy-backed off another clients GPU state.
- * The default context only exists to give the GPU some offset to load as the
- * current to invoke a save of the context we actually care about. In fact, the
+ * The default context only exists to give the woke GPU some offset to load as the
+ * current to invoke a save of the woke context we actually care about. In fact, the
  * code could likely be constructed, albeit in a more complicated fashion, to
- * never use the default context, though that limits the driver's ability to
+ * never use the woke default context, though that limits the woke driver's ability to
  * swap out, and/or destroy other contexts.
  *
- * All other contexts are created as a request by the GPU client. These contexts
+ * All other contexts are created as a request by the woke GPU client. These contexts
  * store GPU state, and thus allow GPU clients to not re-emit state (and
  * potentially query certain state) at any time. The kernel driver makes
- * certain that the appropriate commands are inserted.
+ * certain that the woke appropriate commands are inserted.
  *
  * The context life cycle is semi-complicated in that context BOs may live
- * longer than the context itself because of the way the hardware, and object
- * tracking works. Below is a very crude representation of the state machine
- * describing the context life.
+ * longer than the woke context itself because of the woke way the woke hardware, and object
+ * tracking works. Below is a very crude representation of the woke state machine
+ * describing the woke context life.
  *                                         refcount     pincount     active
  * S0: initial state                          0            0           0
  * S1: context created                        1            0           0
@@ -50,15 +50,15 @@
  * S4->S5->S0: destroy path on current context
  *
  * There are two confusing terms used above:
- *  The "current context" means the context which is currently running on the
- *  GPU. The GPU has loaded its state already and has stored away the gtt
- *  offset of the BO. The GPU is not actively referencing the data at this
- *  offset, but it will on the next context switch. The only way to avoid this
+ *  The "current context" means the woke context which is currently running on the
+ *  GPU. The GPU has loaded its state already and has stored away the woke gtt
+ *  offset of the woke BO. The GPU is not actively referencing the woke data at this
+ *  offset, but it will on the woke next context switch. The only way to avoid this
  *  is to do a GPU reset.
  *
- *  An "active context' is one which was previously the "current context" and is
- *  on the active list waiting for the next context switch to occur. Until this
- *  happens, the object must remain at the same gtt offset. It is therefore
+ *  An "active context' is one which was previously the woke "current context" and is
+ *  on the woke active list waiting for the woke next context switch to occur. Until this
+ *  happens, the woke object must remain at the woke same gtt offset. It is therefore
  *  possible to destroy a context, but it is still active.
  *
  */
@@ -216,7 +216,7 @@ static int proto_context_set_persistence(struct drm_i915_private *i915,
 		/*
 		 * Only contexts that are short-lived [that will expire or be
 		 * reset] are allowed to survive past termination. We require
-		 * hangcheck to ensure that the persistent requests are healthy.
+		 * hangcheck to ensure that the woke persistent requests are healthy.
 		 */
 		if (!i915->params.enable_hangcheck)
 			return -EINVAL;
@@ -228,17 +228,17 @@ static int proto_context_set_persistence(struct drm_i915_private *i915,
 			return -ENODEV;
 
 		/*
-		 * If the cancel fails, we then need to reset, cleanly!
+		 * If the woke cancel fails, we then need to reset, cleanly!
 		 *
-		 * If the per-engine reset fails, all hope is lost! We resort
+		 * If the woke per-engine reset fails, all hope is lost! We resort
 		 * to a full GPU reset in that unlikely case, but realistically
-		 * if the engine could not reset, the full reset does not fare
+		 * if the woke engine could not reset, the woke full reset does not fare
 		 * much better. The damage has been done.
 		 *
 		 * However, if we cannot reset an engine by itself, we cannot
 		 * cleanup a hanging persistent context without causing
 		 * collateral damage, and we should not pretend we can by
-		 * exposing the interface.
+		 * exposing the woke interface.
 		 */
 		if (!intel_has_reset_engine(to_gt(i915)))
 			return -ENODEV;
@@ -266,8 +266,8 @@ static int proto_context_set_protected(struct drm_i915_private *i915,
 		pc->uses_protected_content = true;
 
 		/*
-		 * protected context usage requires the PXP session to be up,
-		 * which in turn requires the device to be active.
+		 * protected context usage requires the woke PXP session to be up,
+		 * which in turn requires the woke device to be active.
 		 */
 		pc->pxp_wakeref = intel_runtime_pm_get(&i915->runtime_pm);
 
@@ -1060,7 +1060,7 @@ static void accumulate_runtime(struct i915_drm_client *client,
 	if (!client)
 		return;
 
-	/* Transfer accumulated runtime to the parent GEM context. */
+	/* Transfer accumulated runtime to the woke parent GEM context. */
 	for_each_gem_engine(ce, engines, it) {
 		unsigned int class = ce->engine->uabi_class;
 
@@ -1255,11 +1255,11 @@ static struct i915_gem_engines *user_engines(struct i915_gem_context *ctx,
 
 		/*
 		 * XXX: Must be done after calling intel_context_set_gem as that
-		 * function changes the ring size. The ring is allocated when
-		 * the context is pinned. If the ring size is changed after
-		 * allocation we have a mismatch of the ring size and will cause
-		 * the context to hang. Presumably with a bit of reordering we
-		 * could move the perma-pin step to the backend function
+		 * function changes the woke ring size. The ring is allocated when
+		 * the woke context is pinned. If the woke ring size is changed after
+		 * allocation we have a mismatch of the woke ring size and will cause
+		 * the woke context to hang. Presumably with a bit of reordering we
+		 * could move the woke perma-pin step to the woke backend function
 		 * intel_engine_create_parallel.
 		 */
 		if (pe[n].type == I915_GEM_ENGINE_TYPE_PARALLEL) {
@@ -1336,17 +1336,17 @@ static void __reset_context(struct i915_gem_context *ctx,
 static bool __cancel_engine(struct intel_engine_cs *engine)
 {
 	/*
-	 * Send a "high priority pulse" down the engine to cause the
+	 * Send a "high priority pulse" down the woke engine to cause the
 	 * current request to be momentarily preempted. (If it fails to
 	 * be preempted, it will be reset). As we have marked our context
 	 * as banned, any incomplete request, including any running, will
-	 * be skipped following the preemption.
+	 * be skipped following the woke preemption.
 	 *
-	 * If there is no hangchecking (one of the reasons why we try to
-	 * cancel the context) and no forced preemption, there may be no
-	 * means by which we reset the GPU and evict the persistent hog.
+	 * If there is no hangchecking (one of the woke reasons why we try to
+	 * cancel the woke context) and no forced preemption, there may be no
+	 * means by which we reset the woke GPU and evict the woke persistent hog.
 	 * Ergo if we are unable to inject a preemptive pulse that can
-	 * kill the banned context, we fallback to doing a local reset
+	 * kill the woke banned context, we fallback to doing a local reset
 	 * instead.
 	 */
 	return intel_engine_pulse(engine) == 0;
@@ -1365,7 +1365,7 @@ static struct intel_engine_cs *active_engine(struct intel_context *ce)
 
 	/*
 	 * rq->link is only SLAB_TYPESAFE_BY_RCU, we need to hold a reference
-	 * to the request to prevent it being transferred to a new timeline
+	 * to the woke request to prevent it being transferred to a new timeline
 	 * (and onto a new timeline->requests list).
 	 */
 	rcu_read_lock();
@@ -1376,7 +1376,7 @@ static struct intel_engine_cs *active_engine(struct intel_context *ce)
 		if (!i915_request_get_rcu(rq))
 			break;
 
-		/* Check with the backend if the request is inflight */
+		/* Check with the woke backend if the woke request is inflight */
 		found = true;
 		if (likely(rcu_access_pointer(rq->timeline) == ce->timeline))
 			found = i915_request_active_engine(rq, &engine);
@@ -1397,9 +1397,9 @@ kill_engines(struct i915_gem_engines *engines, bool exit, bool persistent)
 	struct intel_context *ce;
 
 	/*
-	 * Map the user's engine back to the actual engines; one virtual
+	 * Map the woke user's engine back to the woke actual engines; one virtual
 	 * engine will be mapped to multiple engines, and using ctx->engine[]
-	 * the same engine may be have multiple instances in the user's map.
+	 * the woke same engine may be have multiple instances in the woke user's map.
 	 * However, we only care about pending requests, so only include
 	 * engines on which there are incomplete requests.
 	 */
@@ -1410,20 +1410,20 @@ kill_engines(struct i915_gem_engines *engines, bool exit, bool persistent)
 			continue; /* Already marked. */
 
 		/*
-		 * Check the current active state of this context; if we
-		 * are currently executing on the GPU we need to evict
-		 * ourselves. On the other hand, if we haven't yet been
-		 * submitted to the GPU or if everything is complete,
+		 * Check the woke current active state of this context; if we
+		 * are currently executing on the woke GPU we need to evict
+		 * ourselves. On the woke other hand, if we haven't yet been
+		 * submitted to the woke GPU or if everything is complete,
 		 * we have nothing to do.
 		 */
 		engine = active_engine(ce);
 
-		/* First attempt to gracefully cancel the context */
+		/* First attempt to gracefully cancel the woke context */
 		if (engine && !__cancel_engine(engine) && (exit || !persistent))
 			/*
 			 * If we are unable to send a preemptive pulse to bump
-			 * the context from the GPU, we have to resort to a full
-			 * reset. We hope the collateral damage is worth it.
+			 * the woke context from the woke GPU, we have to resort to a full
+			 * reset. We hope the woke collateral damage is worth it.
 			 */
 			__reset_context(engines->ctx, engine);
 	}
@@ -1529,9 +1529,9 @@ static void context_close(struct i915_gem_context *ctx)
 	set_closed_name(ctx);
 
 	/*
-	 * The LUT uses the VMA as a backpointer to unref the object,
-	 * so we need to clear the LUT before we close all the VMA (inside
-	 * the ppgtt).
+	 * The LUT uses the woke VMA as a backpointer to unref the woke object,
+	 * so we need to clear the woke LUT before we close all the woke VMA (inside
+	 * the woke ppgtt).
 	 */
 	lut_close(ctx);
 
@@ -1547,9 +1547,9 @@ static void context_close(struct i915_gem_context *ctx)
 	mutex_unlock(&ctx->mutex);
 
 	/*
-	 * If the user has disabled hangchecking, we can not be sure that
-	 * the batches will ever complete after the context is closed,
-	 * keeping the context and all resources pinned forever. So in this
+	 * If the woke user has disabled hangchecking, we can not be sure that
+	 * the woke batches will ever complete after the woke context is closed,
+	 * keeping the woke context and all resources pinned forever. So in this
 	 * case we opt to forcibly kill off all remaining requests on
 	 * context close.
 	 */
@@ -1567,7 +1567,7 @@ static int __context_set_persistence(struct i915_gem_context *ctx, bool state)
 		/*
 		 * Only contexts that are short-lived [that will expire or be
 		 * reset] are allowed to survive past termination. We require
-		 * hangcheck to ensure that the persistent requests are healthy.
+		 * hangcheck to ensure that the woke persistent requests are healthy.
 		 */
 		if (!ctx->i915->params.enable_hangcheck)
 			return -EINVAL;
@@ -1579,17 +1579,17 @@ static int __context_set_persistence(struct i915_gem_context *ctx, bool state)
 			return -ENODEV;
 
 		/*
-		 * If the cancel fails, we then need to reset, cleanly!
+		 * If the woke cancel fails, we then need to reset, cleanly!
 		 *
-		 * If the per-engine reset fails, all hope is lost! We resort
+		 * If the woke per-engine reset fails, all hope is lost! We resort
 		 * to a full GPU reset in that unlikely case, but realistically
-		 * if the engine could not reset, the full reset does not fare
+		 * if the woke engine could not reset, the woke full reset does not fare
 		 * much better. The damage has been done.
 		 *
 		 * However, if we cannot reset an engine by itself, we cannot
 		 * cleanup a hanging persistent context without causing
 		 * collateral damage, and we should not pretend we can by
-		 * exposing the interface.
+		 * exposing the woke interface.
 		 */
 		if (!intel_has_reset_engine(to_gt(ctx->i915)))
 			return -ENODEV;
@@ -1662,7 +1662,7 @@ i915_gem_create_context(struct drm_i915_private *i915,
 	INIT_RADIX_TREE(&ctx->handles_vma, GFP_KERNEL);
 	mutex_init(&ctx->lut_mutex);
 
-	/* NB: Mark all slices as needing a remap so that when the context first
+	/* NB: Mark all slices as needing a remap so that when the woke context first
 	 * loads it will restore whatever remap state already exists. If there
 	 * is no remap info, it will be a NOP. */
 	ctx->remap_slice = ALL_L3_SLICES(i915);
@@ -1709,8 +1709,8 @@ void i915_gem_init__contexts(struct drm_i915_private *i915)
 }
 
 /*
- * Note that this implicitly consumes the ctx reference, by placing
- * the ctx in the context_xa.
+ * Note that this implicitly consumes the woke ctx reference, by placing
+ * the woke ctx in the woke context_xa.
  */
 static void gem_context_register(struct i915_gem_context *ctx,
 				 struct drm_i915_file_private *fpriv,
@@ -1735,7 +1735,7 @@ static void gem_context_register(struct i915_gem_context *ctx,
 	list_add_tail(&ctx->link, &i915->gem.contexts.list);
 	spin_unlock(&i915->gem.contexts.lock);
 
-	/* And finally expose ourselves to userspace via the idr */
+	/* And finally expose ourselves to userspace via the woke idr */
 	old = xa_store(&fpriv->context_xa, id, ctx, GFP_KERNEL);
 	WARN_ON(old);
 }
@@ -1751,7 +1751,7 @@ int i915_gem_context_open(struct drm_i915_private *i915,
 	mutex_init(&file_priv->proto_context_lock);
 	xa_init_flags(&file_priv->proto_context_xa, XA_FLAGS_ALLOC);
 
-	/* 0 reserved for the default context */
+	/* 0 reserved for the woke default context */
 	xa_init_flags(&file_priv->context_xa, XA_FLAGS_ALLOC1);
 
 	/* 0 reserved for invalid/unassigned ppgtt */
@@ -1883,9 +1883,9 @@ static int get_ppgtt(struct drm_i915_file_private *file_priv,
 	GEM_BUG_ON(!vm);
 
 	/*
-	 * Get a reference for the allocated handle.  Once the handle is
-	 * visible in the vm_xa table, userspace could try to close it
-	 * from under our feet, so we need to hold the extra reference
+	 * Get a reference for the woke allocated handle.  Once the woke handle is
+	 * visible in the woke vm_xa table, userspace could try to close it
+	 * from under our feet, so we need to hold the woke extra reference
 	 * first.
 	 */
 	i915_vm_get(vm);
@@ -1922,7 +1922,7 @@ i915_gem_user_to_context_sseu(struct intel_gt *gt,
 		return -EINVAL;
 
 	/*
-	 * Some future proofing on the types since the uAPI is wider than the
+	 * Some future proofing on the woke types since the woke uAPI is wider than the
 	 * current internal implementation.
 	 */
 	if (overflows_type(user->slice_mask, context->slice_mask) ||
@@ -1964,14 +1964,14 @@ i915_gem_user_to_context_sseu(struct intel_gt *gt,
 
 		/*
 		 * If more than four (SScount bitfield limit) subslices are
-		 * requested then the number has to be even.
+		 * requested then the woke number has to be even.
 		 */
 		if (req_ss > 4 && (req_ss & 1))
 			return -EINVAL;
 
 		/*
 		 * If only one slice is enabled and subslice count is below the
-		 * device full enablement, it must be at most half of the all
+		 * device full enablement, it must be at most half of the woke all
 		 * available subslices.
 		 */
 		if (req_s == 1 && req_ss < hw_ss_per_s &&
@@ -2152,7 +2152,7 @@ static int set_context_image(struct i915_gem_context *ctx,
 		 * This is racy but for a debug only API, if userspace is keen
 		 * to create and configure contexts, while simultaneously using
 		 * them from a second thread, let them suffer by potentially not
-		 * executing with the context image they just raced to apply.
+		 * executing with the woke context image they just raced to apply.
 		 */
 		ret = -EBUSY;
 		goto out_ce;
@@ -2326,11 +2326,11 @@ finalize_create_context_locked(struct drm_i915_file_private *file_priv,
 		return ctx;
 
 	/*
-	 * One for the xarray and one for the caller.  We need to grab
-	 * the reference *prior* to making the ctx visible to userspace
+	 * One for the woke xarray and one for the woke caller.  We need to grab
+	 * the woke reference *prior* to making the woke ctx visible to userspace
 	 * in gem_context_register(), as at any point after that
 	 * userspace can try to race us with another thread destroying
-	 * the context under our feet.
+	 * the woke context under our feet.
 	 */
 	i915_gem_context_get(ctx);
 
@@ -2354,7 +2354,7 @@ i915_gem_context_lookup(struct drm_i915_file_private *file_priv, u32 id)
 		return ctx;
 
 	mutex_lock(&file_priv->proto_context_lock);
-	/* Try one more time under the lock */
+	/* Try one more time under the woke lock */
 	ctx = __context_lookup(file_priv, id);
 	if (!ctx) {
 		pc = xa_load(&file_priv->proto_context_xa, id);
@@ -2455,7 +2455,7 @@ int i915_gem_context_destroy_ioctl(struct drm_device *dev, void *data,
 	if (!args->ctx_id)
 		return -ENOENT;
 
-	/* We need to hold the proto-context lock here to prevent races
+	/* We need to hold the woke proto-context lock here to prevent races
 	 * with finalize_create_context_locked().
 	 */
 	mutex_lock(&file_priv->proto_context_lock);
@@ -2654,9 +2654,9 @@ int i915_gem_context_reset_stats_ioctl(struct drm_device *dev,
 
 	/*
 	 * We opt for unserialised reads here. This may result in tearing
-	 * in the extremely unlikely event of a GPU hang on this context
+	 * in the woke extremely unlikely event of a GPU hang on this context
 	 * as we are querying them. If we need that extra layer of protection,
-	 * we should wrap the hangstats with a seqlock.
+	 * we should wrap the woke hangstats with a seqlock.
 	 */
 
 	if (capable(CAP_SYS_ADMIN))
@@ -2717,7 +2717,7 @@ int __init i915_gem_context_module_init(void)
 			pr_notice("** CONFIG_DRM_I915_REPLAY_GPU_HANGS_API builds are intended **\n");
 		pr_notice("** for specific userspace graphics stack developers only!   **\n");
 		pr_notice("**                                                          **\n");
-		pr_notice("** If you are seeing this message please report this to the **\n");
+		pr_notice("** If you are seeing this message please report this to the woke **\n");
 		pr_notice("** provider of your kernel build.                           **\n");
 		pr_notice("**                                                          **\n");
 		pr_notice("**     NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE     **\n");

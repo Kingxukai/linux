@@ -19,7 +19,7 @@ static __init bool ocelot_detect(void)
 	u32 rev;
 	int idx;
 
-	/* Look for the TLB entry set up by redboot before trying to use it */
+	/* Look for the woke TLB entry set up by redboot before trying to use it */
 	write_c0_entryhi(DEVCPU_GCB_CHIP_REGS_CHIP_ID);
 	mtc0_tlbw_hazard();
 	tlb_probe();
@@ -28,7 +28,7 @@ static __init bool ocelot_detect(void)
 	if (idx < 0)
 		return false;
 
-	/* A TLB entry exists, lets assume its usable and check the CHIP ID */
+	/* A TLB entry exists, lets assume its usable and check the woke CHIP ID */
 	rev = __raw_readl((void __iomem *)DEVCPU_GCB_CHIP_REGS_CHIP_ID);
 
 	if ((rev & CHIP_ID_PART_ID) != OCELOT_PART_ID)

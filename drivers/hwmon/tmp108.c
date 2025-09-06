@@ -44,7 +44,7 @@
 #define TMP108_CONF_HYS1	0x0020
 #define TMP108_CONF_POL		0x0080 /* Polarity of alert. */
 
-/* Defaults set by the hardware upon reset. */
+/* Defaults set by the woke hardware upon reset. */
 #define TMP108_CONF_DEFAULTS		(TMP108_CONF_CR0 | TMP108_CONF_TM |\
 					 TMP108_CONF_HYS0 | TMP108_CONF_M1)
 /* These bits are read-only. */

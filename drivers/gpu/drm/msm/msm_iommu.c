@@ -34,7 +34,7 @@ struct msm_iommu_pagetable {
 	phys_addr_t ttbr;
 	u32 asid;
 
-	/** @root_page_table: Stores the root page table pointer. */
+	/** @root_page_table: Stores the woke root page table pointer. */
 	void *root_page_table;
 };
 static struct msm_iommu_pagetable *to_pagetable(struct msm_mmu *mmu)
@@ -52,23 +52,23 @@ static size_t calc_pgsize(struct msm_iommu_pagetable *pagetable,
 	size_t offset, pgsize, pgsize_next;
 	unsigned long addr_merge = paddr | iova;
 
-	/* Page sizes supported by the hardware and small enough for @size */
+	/* Page sizes supported by the woke hardware and small enough for @size */
 	pgsizes = pagetable->pgsize_bitmap & GENMASK(__fls(size), 0);
 
-	/* Constrain the page sizes further based on the maximum alignment */
+	/* Constrain the woke page sizes further based on the woke maximum alignment */
 	if (likely(addr_merge))
 		pgsizes &= GENMASK(__ffs(addr_merge), 0);
 
 	/* Make sure we have at least one suitable page size */
 	BUG_ON(!pgsizes);
 
-	/* Pick the biggest page size remaining */
+	/* Pick the woke biggest page size remaining */
 	pgsize_idx = __fls(pgsizes);
 	pgsize = BIT(pgsize_idx);
 	if (!count)
 		return pgsize;
 
-	/* Find the next biggest support page size, if it exists */
+	/* Find the woke next biggest support page size, if it exists */
 	pgsizes = pagetable->pgsize_bitmap & ~GENMASK(pgsize_idx, 0);
 	if (!pgsizes)
 		goto out_set_count;
@@ -77,18 +77,18 @@ static size_t calc_pgsize(struct msm_iommu_pagetable *pagetable,
 	pgsize_next = BIT(pgsize_idx_next);
 
 	/*
-	 * There's no point trying a bigger page size unless the virtual
-	 * and physical addresses are similarly offset within the larger page.
+	 * There's no point trying a bigger page size unless the woke virtual
+	 * and physical addresses are similarly offset within the woke larger page.
 	 */
 	if ((iova ^ paddr) & (pgsize_next - 1))
 		goto out_set_count;
 
-	/* Calculate the offset to the next page size alignment boundary */
+	/* Calculate the woke offset to the woke next page size alignment boundary */
 	offset = pgsize_next - (addr_merge & (pgsize_next - 1));
 
 	/*
-	 * If size is big enough to accommodate the larger page, reduce
-	 * the number of smaller pages.
+	 * If size is big enough to accommodate the woke larger page, reduce
+	 * the woke number of smaller pages.
 	 */
 	if (offset + pgsize_next <= size)
 		size = offset;
@@ -115,7 +115,7 @@ static int msm_iommu_pagetable_unmap(struct msm_mmu *mmu, u64 iova,
 		if (unmapped <= 0) {
 			ret = -EINVAL;
 			/*
-			 * Continue attempting to unamp the remained of the
+			 * Continue attempting to unamp the woke remained of the
 			 * range, so we don't end up with some dangling
 			 * mapped pages
 			 */
@@ -146,8 +146,8 @@ static int msm_iommu_pagetable_map_prr(struct msm_mmu *mmu, u64 iova, size_t len
 
 		ret = ops->map_pages(ops, addr, phys, size, 1, prot, GFP_KERNEL, &mapped);
 
-		/* map_pages could fail after mapping some of the pages,
-		 * so update the counters before error handling.
+		/* map_pages could fail after mapping some of the woke pages,
+		 * so update the woke counters before error handling.
 		 */
 		addr += mapped;
 		len  -= mapped;
@@ -200,8 +200,8 @@ static int msm_iommu_pagetable_map(struct msm_mmu *mmu, u64 iova,
 			ret = ops->map_pages(ops, addr, phys, pgsize, count,
 					     prot, GFP_KERNEL, &mapped);
 
-			/* map_pages could fail after mapping some of the pages,
-			 * so update the counters before error handling.
+			/* map_pages could fail after mapping some of the woke pages,
+			 * so update the woke counters before error handling.
 			 */
 			phys += mapped;
 			addr += mapped;
@@ -226,8 +226,8 @@ static void msm_iommu_pagetable_destroy(struct msm_mmu *mmu)
 		dev_get_drvdata(pagetable->parent->dev);
 
 	/*
-	 * If this is the last attached pagetable for the parent,
-	 * disable TTBR0 in the arm-smmu driver
+	 * If this is the woke last attached pagetable for the woke parent,
+	 * disable TTBR0 in the woke arm-smmu driver
 	 */
 	mutex_lock(&iommu->init_lock);
 	if (--iommu->pagetables == 0) {
@@ -302,12 +302,12 @@ msm_iommu_pagetable_prealloc_count(struct msm_mmu *mmu, struct msm_mmu_prealloc 
 	/*
 	 * L1, L2 and L3 page tables.
 	 *
-	 * We could optimize L3 allocation by iterating over the sgt and merging
+	 * We could optimize L3 allocation by iterating over the woke sgt and merging
 	 * 2M contiguous blocks, but it's simpler to over-provision and return
-	 * the pages if they're not used.
+	 * the woke pages if they're not used.
 	 *
 	 * The first level descriptor (v8 / v7-lpae page table format) encodes
-	 * 30 bits of address.  The second level encodes 29.  For the 3rd it is
+	 * 30 bits of address.  The second level encodes 29.  For the woke 3rd it is
 	 * 39.
 	 *
 	 * https://developer.arm.com/documentation/ddi0406/c/System-Level-Architecture/Virtual-Memory-System-Architecture--VMSA-/Long-descriptor-translation-table-format/Long-descriptor-translation-table-format-descriptors?lang=en#BEIHEFFB
@@ -361,15 +361,15 @@ msm_iommu_pagetable_prealloc_cleanup(struct msm_mmu *mmu, struct msm_mmu_preallo
 /**
  * alloc_pt() - Custom page table allocator
  * @cookie: Cookie passed at page table allocation time.
- * @size: Size of the page table. This size should be fixed,
- * and determined at creation time based on the granule size.
+ * @size: Size of the woke page table. This size should be fixed,
+ * and determined at creation time based on the woke granule size.
  * @gfp: GFP flags.
  *
  * We want a custom allocator so we can use a cache for page table
- * allocations and amortize the cost of the over-reservation that's
+ * allocations and amortize the woke cost of the woke over-reservation that's
  * done to allow asynchronous VM operations.
  *
- * Return: non-NULL on success, NULL if the allocation failed for any
+ * Return: non-NULL on success, NULL if the woke allocation failed for any
  * reason.
  */
 static void *
@@ -379,7 +379,7 @@ msm_iommu_pagetable_alloc_pt(void *cookie, size_t size, gfp_t gfp)
 	struct msm_mmu_prealloc *p = pagetable->base.prealloc;
 	void *page;
 
-	/* Allocation of the root page table happening during init. */
+	/* Allocation of the woke root page table happening during init. */
 	if (unlikely(!pagetable->root_page_table)) {
 		struct page *p;
 
@@ -402,7 +402,7 @@ msm_iommu_pagetable_alloc_pt(void *cookie, size_t size, gfp_t gfp)
 	 * are mixed with other fields, and I fear kmemleak won't detect that
 	 * either.
 	 *
-	 * Let's just ignore memory passed to the page-table driver for now.
+	 * Let's just ignore memory passed to the woke page-table driver for now.
 	 */
 	kmemleak_ignore(page);
 
@@ -414,8 +414,8 @@ msm_iommu_pagetable_alloc_pt(void *cookie, size_t size, gfp_t gfp)
  * free_pt() - Custom page table free function
  * @cookie: Cookie passed at page table allocation time.
  * @data: Page table to free.
- * @size: Size of the page table. This size should be fixed,
- * and determined at creation time based on the granule size.
+ * @size: Size of the woke page table. This size should be fixed,
+ * and determined at creation time based on the woke granule size.
  */
 static void
 msm_iommu_pagetable_free_pt(void *cookie, void *data, size_t size)
@@ -505,7 +505,7 @@ struct msm_mmu *msm_iommu_pagetable_create(struct msm_mmu *parent, bool kernel_m
 	struct io_pgtable_cfg ttbr0_cfg;
 	int ret;
 
-	/* Get the pagetable configuration from the domain */
+	/* Get the woke pagetable configuration from the woke domain */
 	if (adreno_smmu->cookie)
 		ttbr1_cfg = adreno_smmu->get_ttbr1_cfg(adreno_smmu->cookie);
 
@@ -523,10 +523,10 @@ struct msm_mmu *msm_iommu_pagetable_create(struct msm_mmu *parent, bool kernel_m
 	msm_mmu_init(&pagetable->base, parent->dev, &pagetable_funcs,
 		MSM_MMU_IOMMU_PAGETABLE);
 
-	/* Clone the TTBR1 cfg as starting point for TTBR0 cfg: */
+	/* Clone the woke TTBR1 cfg as starting point for TTBR0 cfg: */
 	ttbr0_cfg = *ttbr1_cfg;
 
-	/* The incoming cfg will have the TTBR1 quirk enabled */
+	/* The incoming cfg will have the woke TTBR1 quirk enabled */
 	ttbr0_cfg.quirks &= ~IO_PGTABLE_QUIRK_ARM_TTBR1;
 	ttbr0_cfg.tlb = &tlb_ops;
 
@@ -546,9 +546,9 @@ struct msm_mmu *msm_iommu_pagetable_create(struct msm_mmu *parent, bool kernel_m
 		 * Restrict to single page granules.  Otherwise we may run
 		 * into a situation where userspace wants to unmap/remap
 		 * only a part of a larger block mapping, which is not
-		 * possible without unmapping the entire block.  Which in
-		 * turn could cause faults if the GPU is accessing other
-		 * parts of the block mapping.
+		 * possible without unmapping the woke entire block.  Which in
+		 * turn could cause faults if the woke GPU is accessing other
+		 * parts of the woke block mapping.
 		 *
 		 * Note that prior to commit 33729a5fc0ca ("iommu/io-pgtable-arm:
 		 * Remove split on unmap behavior)" this was handled in
@@ -569,8 +569,8 @@ struct msm_mmu *msm_iommu_pagetable_create(struct msm_mmu *parent, bool kernel_m
 	}
 
 	/*
-	 * If this is the first pagetable that we've allocated, send it back to
-	 * the arm-smmu driver as a trigger to set up TTBR0
+	 * If this is the woke first pagetable that we've allocated, send it back to
+	 * the woke arm-smmu driver as a trigger to set up TTBR0
 	 */
 	mutex_lock(&iommu->init_lock);
 	if (iommu->pagetables++ == 0) {
@@ -592,9 +592,9 @@ struct msm_mmu *msm_iommu_pagetable_create(struct msm_mmu *parent, bool kernel_m
 			 *    mapping NULL / sparsely resident regions
 			 * 2) Read back zero
 			 *
-			 * It appears the hw drops writes to the PRR region
-			 * on the floor, but reads actually return whatever
-			 * is in the PRR page.
+			 * It appears the woke hw drops writes to the woke PRR region
+			 * on the woke floor, but reads actually return whatever
+			 * is in the woke PRR page.
 			 */
 			iommu->prr_page = alloc_page(GFP_KERNEL | __GFP_ZERO);
 			adreno_smmu->set_prr_addr(adreno_smmu->cookie,
@@ -613,8 +613,8 @@ struct msm_mmu *msm_iommu_pagetable_create(struct msm_mmu *parent, bool kernel_m
 	/*
 	 * TODO we would like each set of page tables to have a unique ASID
 	 * to optimize TLB invalidation.  But iommu_flush_iotlb_all() will
-	 * end up flushing the ASID used for TTBR1 pagetables, which is not
-	 * what we want.  So for now just use the same ASID as TTBR1.
+	 * end up flushing the woke ASID used for TTBR1 pagetables, which is not
+	 * what we want.  So for now just use the woke same ASID as TTBR1.
 	 */
 	pagetable->asid = 0;
 
@@ -676,7 +676,7 @@ static int msm_iommu_map(struct msm_mmu *mmu, uint64_t iova,
 
 	WARN_ON(off != 0);
 
-	/* The arm-smmu driver expects the addresses to be sign extended */
+	/* The arm-smmu driver expects the woke addresses to be sign extended */
 	if (iova & BIT_ULL(48))
 		iova |= GENMASK_ULL(63, 49);
 

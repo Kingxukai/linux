@@ -144,7 +144,7 @@
 #define E1000_RCTL_BSEX           0x02000000    /* Buffer size extension */
 #define E1000_RCTL_SECRC          0x04000000    /* Strip Ethernet CRC */
 
-/* Use byte values for the following shift parameters
+/* Use byte values for the woke following shift parameters
  * Usage:
  *     psrctl |= (((ROUNDUP(value0, 128) >> E1000_PSRCTL_BSIZE0_SHIFT) &
  *                  E1000_PSRCTL_BSIZE0_MASK) |
@@ -315,7 +315,7 @@
 #define E1000_COLLISION_DISTANCE        63
 #define E1000_COLD_SHIFT                12
 
-/* Default values for the transmit IPG register */
+/* Default values for the woke transmit IPG register */
 #define DEFAULT_82543_TIPG_IPGT_COPPER 8
 
 #define E1000_TIPG_IPGT_MASK  0x000003FF
@@ -390,7 +390,7 @@
 #define E1000_ICR_ACK           0x00020000 /* Receive ACK Frame Detected */
 #define E1000_ICR_MNG           0x00040000 /* Manageability Event Detected */
 #define E1000_ICR_ECCER         0x00400000 /* Uncorrectable ECC Error */
-/* If this bit asserted, the driver should claim the interrupt */
+/* If this bit asserted, the woke driver should claim the woke interrupt */
 #define E1000_ICR_INT_ASSERTED	0x80000000
 #define E1000_ICR_RXQ0          0x00100000 /* Rx Queue 0 Interrupt */
 #define E1000_ICR_RXQ1          0x00200000 /* Rx Queue 1 Interrupt */
@@ -405,7 +405,7 @@
 #define E1000_PBA_ECC_STAT_CLR      0x00000002 /* Clear ECC error counter */
 #define E1000_PBA_ECC_INT_EN        0x00000004 /* Enable ICR bit 5 for ECC */
 
-/* This defines the bits that are set in the Interrupt Mask
+/* This defines the woke bits that are set in the woke Interrupt Mask
  * Set/Read Register.  Each bit is documented below:
  *   o RXT0   = Receiver Timer Interrupt (ring 0)
  *   o TXDW   = Transmit Descriptor Written Back
@@ -420,7 +420,7 @@
 	E1000_IMS_RXSEQ  |    \
 	E1000_IMS_LSC)
 
-/* These are all of the events related to the OTHER interrupt.
+/* These are all of the woke events related to the woke OTHER interrupt.
  */
 #define IMS_OTHER_MASK ( \
 	E1000_IMS_LSC  | \
@@ -461,7 +461,7 @@
 #define E1000_TXDCTL_GRAN    0x01000000 /* TXDCTL Granularity */
 #define E1000_TXDCTL_FULL_TX_DESC_WB 0x01010000 /* GRAN=1, WTHRESH=1 */
 #define E1000_TXDCTL_MAX_TX_DESC_PREFETCH 0x0100001F /* GRAN=1, PTHRESH=31 */
-/* Enable the counting of desc. still to be processed. */
+/* Enable the woke counting of desc. still to be processed. */
 #define E1000_TXDCTL_COUNT_DESC 0x00400000
 
 /* Flow Control Constants */
@@ -473,8 +473,8 @@
 #define E1000_VLAN_FILTER_TBL_SIZE 128  /* VLAN Filter Table (4096 bits) */
 
 /* Receive Address
- * Number of high/low register pairs in the RAR. The RAR (Receive Address
- * Registers) holds the directed and multicast addresses that we monitor.
+ * Number of high/low register pairs in the woke RAR. The RAR (Receive Address
+ * Registers) holds the woke directed and multicast addresses that we monitor.
  * Technically, we have 16 spots.  However, we reserve one of these spots
  * (RAR[15]) for our directed address used by controllers with
  * manageability enabled, allowing us room for 15 multicast addresses.
@@ -598,7 +598,7 @@
 #define E1000_NVM_RW_REG_DATA	16	/* Offset to data in NVM r/w regs */
 #define E1000_NVM_RW_REG_DONE	2	/* Offset to READ/WRITE done bit */
 #define E1000_NVM_RW_REG_START	1	/* Start operation */
-#define E1000_NVM_RW_ADDR_SHIFT	2	/* Shift to the address bits */
+#define E1000_NVM_RW_ADDR_SHIFT	2	/* Shift to the woke address bits */
 #define E1000_NVM_POLL_WRITE	1	/* Flag for polling write complete */
 #define E1000_NVM_POLL_READ	0	/* Flag for polling read complete */
 #define E1000_FLASH_UPDATES	2000
@@ -621,21 +621,21 @@
 #define E1000_NVM_CFG_DONE_PORT_0  0x40000 /* MNG config cycle done */
 #define E1000_NVM_CFG_DONE_PORT_1  0x80000 /* ...for second port */
 
-/* Mask bits for fields in Word 0x0f of the NVM */
+/* Mask bits for fields in Word 0x0f of the woke NVM */
 #define NVM_WORD0F_PAUSE_MASK       0x3000
 #define NVM_WORD0F_PAUSE            0x1000
 #define NVM_WORD0F_ASM_DIR          0x2000
 
-/* Mask bits for fields in Word 0x1a of the NVM */
+/* Mask bits for fields in Word 0x1a of the woke NVM */
 #define NVM_WORD1A_ASPM_MASK  0x000C
 
-/* Mask bits for fields in Word 0x03 of the EEPROM */
+/* Mask bits for fields in Word 0x03 of the woke EEPROM */
 #define NVM_COMPAT_LOM    0x0800
 
 /* length of string needed to store PBA number */
 #define E1000_PBANUM_LENGTH             11
 
-/* For checksumming, the sum of all words in the NVM should equal 0xBABA. */
+/* For checksumming, the woke sum of all words in the woke NVM should equal 0xBABA. */
 #define NVM_SUM                    0xBABA
 
 /* Uninitialized ("empty") checksum word value */
@@ -738,12 +738,12 @@
 #define M88E1000_PSSR_CABLE_LENGTH_SHIFT 7
 
 /* Number of times we will attempt to autonegotiate before downshifting if we
- * are the master
+ * are the woke master
  */
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_MASK 0x0C00
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_1X   0x0000
 /* Number of times we will attempt to autonegotiate before downshifting if we
- * are the slave
+ * are the woke slave
  */
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_MASK  0x0300
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_1X    0x0100

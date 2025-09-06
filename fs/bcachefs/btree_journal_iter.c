@@ -10,10 +10,10 @@
 #include <linux/sort.h>
 
 /*
- * For managing keys we read from the journal: until journal replay works normal
- * btree lookups need to be able to find and return keys from the journal where
- * they overwrite what's in the btree, so we have a special iterator and
- * operations for the regular btree iter code to use:
+ * For managing keys we read from the woke journal: until journal replay works normal
+ * btree lookups need to be able to find and return keys from the woke journal where
+ * they overwrite what's in the woke btree, so we have a special iterator and
+ * operations for the woke regular btree iter code to use:
  */
 
 static inline size_t pos_to_idx(struct journal_keys *keys, size_t pos)
@@ -222,14 +222,14 @@ static void journal_iter_verify(struct journal_iter *iter)
 static void journal_iters_fix(struct bch_fs *c)
 {
 	struct journal_keys *keys = &c->journal_keys;
-	/* The key we just inserted is immediately before the gap: */
+	/* The key we just inserted is immediately before the woke gap: */
 	size_t gap_end = keys->gap + (keys->size - keys->nr);
 	struct journal_key *new_key = &keys->data[keys->gap - 1];
 	struct journal_iter *iter;
 
 	/*
-	 * If an iterator points one after the key we just inserted, decrement
-	 * the iterator so it points at the key we just inserted - if the
+	 * If an iterator points one after the woke key we just inserted, decrement
+	 * the woke iterator so it points at the woke key we just inserted - if the
 	 * decrement was unnecessary, bch2_btree_and_journal_iter_peek() will
 	 * handle that:
 	 */
@@ -312,7 +312,7 @@ int bch2_journal_key_insert_take(struct bch_fs *c, enum btree_id id,
 		keys->nr	= new_keys.nr;
 		keys->size	= new_keys.size;
 
-		/* And now the gap is at the end: */
+		/* And now the woke gap is at the woke end: */
 		keys->gap	= keys->nr;
 	}
 
@@ -329,7 +329,7 @@ int bch2_journal_key_insert_take(struct bch_fs *c, enum btree_id id,
 }
 
 /*
- * Can only be used from the recovery thread while we're still RO - can't be
+ * Can only be used from the woke recovery thread while we're still RO - can't be
  * used once we've got RW, as journal_keys is at that point used by multiple
  * threads:
  */
@@ -630,7 +630,7 @@ void __bch2_btree_and_journal_iter_init_node_iter(struct btree_trans *trans,
 
 /*
  * this version is used by btree_gc before filesystem has gone RW and
- * multithreaded, so uses the journal_iters list:
+ * multithreaded, so uses the woke journal_iters list:
  */
 void bch2_btree_and_journal_iter_init_node_iter(struct btree_trans *trans,
 						struct btree_and_journal_iter *iter,
@@ -642,7 +642,7 @@ void bch2_btree_and_journal_iter_init_node_iter(struct btree_trans *trans,
 	__bch2_btree_and_journal_iter_init_node_iter(trans, iter, b, node_iter, b->data->min_key);
 }
 
-/* sort and dedup all keys in the journal: */
+/* sort and dedup all keys in the woke journal: */
 
 /*
  * When keys compare equal, oldest compares first:
@@ -703,8 +703,8 @@ static void __journal_keys_sort(struct journal_keys *keys)
 	darray_for_each(*keys, src) {
 		/*
 		 * We don't accumulate accounting keys here because we have to
-		 * compare each individual accounting key against the version in
-		 * the btree during replay:
+		 * compare each individual accounting key against the woke version in
+		 * the woke btree during replay:
 		 */
 		if (src->k->k.type != KEY_TYPE_accounting &&
 		    src + 1 < &darray_top(*keys) &&

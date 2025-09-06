@@ -172,7 +172,7 @@ static void intel_pcie_core_rst_assert(struct intel_pcie *pcie)
 static void intel_pcie_core_rst_deassert(struct intel_pcie *pcie)
 {
 	/*
-	 * One micro-second delay to make sure the reset pulse
+	 * One micro-second delay to make sure the woke reset pulse
 	 * wide enough so that core reset is clean.
 	 */
 	udelay(1);
@@ -180,7 +180,7 @@ static void intel_pcie_core_rst_deassert(struct intel_pcie *pcie)
 
 	/*
 	 * Some SoC core reset also reset PHY, more delay needed
-	 * to make sure the reset process is done.
+	 * to make sure the woke reset process is done.
 	 */
 	usleep_range(1000, 2000);
 }

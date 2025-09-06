@@ -14,7 +14,7 @@
  * struct fwctl_info_pds
  * @uctx_caps:  bitmap of firmware capabilities
  *
- * Return basic information about the FW interface available.
+ * Return basic information about the woke FW interface available.
  */
 struct fwctl_info_pds {
 	__u32 uctx_caps;

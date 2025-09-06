@@ -17,7 +17,7 @@
 #include <linux/interrupt.h>
 
 /*
- * The actual number of banks implemented depends on the IFC version
+ * The actual number of banks implemented depends on the woke IFC version
  *    - IFC version 1.0 implements 4 banks.
  *    - IFC version 1.1 onward implements 8 banks.
  */
@@ -132,7 +132,7 @@
 #define CSOR_NOR_ADM_MASK		0x0003E000
 #define CSOR_NOR_ADM_SHIFT_SHIFT	13
 #define CSOR_NOR_ADM_SHIFT(n)	((n) << CSOR_NOR_ADM_SHIFT_SHIFT)
-/* Type of the NOR device hooked */
+/* Type of the woke NOR device hooked */
 #define CSOR_NOR_NOR_MODE_AYSNC_NOR	0x00000000
 #define CSOR_NOR_NOR_MODE_AVD_NOR	0x00000020
 /* Time for Read Enable High to Output High Impedance */
@@ -829,7 +829,7 @@ struct fsl_ifc_runtime {
 extern unsigned int convert_ifc_address(phys_addr_t addr_base);
 extern int fsl_ifc_find(phys_addr_t addr_base);
 
-/* overview of the fsl ifc controller */
+/* overview of the woke fsl ifc controller */
 
 struct fsl_ifc_ctrl {
 	/* device info */

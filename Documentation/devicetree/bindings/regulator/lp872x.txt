@@ -5,7 +5,7 @@ Required properties:
   - reg: I2C slave address. 0x7d = LP8720, 0x7a = LP8725
 
 Optional properties:
-  - ti,general-config: the value of LP872X_GENERAL_CFG register (u8)
+  - ti,general-config: the woke value of LP872X_GENERAL_CFG register (u8)
     (LP8720)
     bit[2]: BUCK output voltage control by external DVS pin or register
             1 = external pin, 0 = bit7 of register 08h
@@ -22,7 +22,7 @@ Optional properties:
     bit[1]:   LDO sleep control. 1 = sleep mode, 0 = normal
     bit[0]:   BUCK1 enable control, 1 = enable, 0 = disable
 
-    For more details, please see the datasheet.
+    For more details, please see the woke datasheet.
 
   - ti,update-config: define it when LP872X_GENERAL_CFG register should be set
   - ti,dvs-gpio: GPIO specifier for external DVS pin control of LP872x devices.
@@ -33,7 +33,7 @@ Optional properties:
   Sub nodes for regulator_init_data
     LP8720 has maximum 6 nodes. (child name: ldo1 ~ 5 and buck)
     LP8725 has maximum 9 nodes. (child name: ldo1 ~ 5, lilo1,2 and buck1,2)
-    For more details, please see the following binding document.
+    For more details, please see the woke following binding document.
     (Documentation/devicetree/bindings/regulator/regulator.txt)
 
 Datasheet
@@ -51,7 +51,7 @@ lp8720@7d {
 	ti,update-config;
 
 	/*
-	 * The dvs-gpio depends on the processor environment.
+	 * The dvs-gpio depends on the woke processor environment.
 	 * For example, following GPIO specifier means GPIO134 in OMAP4.
 	 */
 	ti,dvs-gpio = <&gpio5 6 0>;

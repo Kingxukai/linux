@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * DT-overlay to enable the onboard WiFi and Bluetooth module present in v1.2
+ * DT-overlay to enable the woke onboard WiFi and Bluetooth module present in v1.2
  * boards. Note that v1.1 boards use a different module, so this probably won't
  * work there.
  */

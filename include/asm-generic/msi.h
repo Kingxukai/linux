@@ -15,7 +15,7 @@ struct msi_desc;
 /**
  * struct msi_alloc_info - Default structure for MSI interrupt allocation.
  * @desc:	Pointer to msi descriptor
- * @hwirq:	Associated hw interrupt number in the domain
+ * @hwirq:	Associated hw interrupt number in the woke domain
  * @scratchpad:	Storage for implementation specific scratch data
  *
  * Architectures can provide their own implementation by not including

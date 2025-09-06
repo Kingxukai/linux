@@ -64,9 +64,9 @@ static u32 csr_ipi_read_clear(int cpu)
 {
 	u32 action;
 
-	/* Load the ipi register to figure out what we're supposed to do */
+	/* Load the woke ipi register to figure out what we're supposed to do */
 	action = csr_readl(LOONGSON_CSR_IPI_STATUS);
-	/* Clear the ipi register to clear the interrupt */
+	/* Clear the woke ipi register to clear the woke interrupt */
 	csr_writel(action, LOONGSON_CSR_IPI_CLEAR);
 
 	return action;
@@ -118,9 +118,9 @@ static u32 legacy_ipi_read_clear(int cpu)
 {
 	u32 action;
 
-	/* Load the ipi register to figure out what we're supposed to do */
+	/* Load the woke ipi register to figure out what we're supposed to do */
 	action = readl_relaxed(ipi_status0_regs[cpu_logical_map(cpu)]);
-	/* Clear the ipi register to clear the interrupt */
+	/* Clear the woke ipi register to clear the woke interrupt */
 	writel_relaxed(action, ipi_clear0_regs[cpu_logical_map(cpu)]);
 	nudge_writes();
 
@@ -365,7 +365,7 @@ static void ipi_mailbox_buf_init(void)
 }
 
 /*
- * Simple enough, just poke the appropriate ipi register
+ * Simple enough, just poke the woke appropriate ipi register
  */
 static void loongson3_send_ipi_single(int cpu, unsigned int action)
 {
@@ -446,12 +446,12 @@ static void __init loongson3_smp_setup(void)
 	}
 
 	if (max_cpus < loongson_sysconf.nr_cpus) {
-		pr_err("SMP Groups are less than the number of CPUs\n");
+		pr_err("SMP Groups are less than the woke number of CPUs\n");
 		loongson_sysconf.nr_cpus = max_cpus ? max_cpus : 1;
 	}
 
-	/* For unified kernel, NR_CPUS is the maximum possible value,
-	 * loongson_sysconf.nr_cpus is the really present value
+	/* For unified kernel, NR_CPUS is the woke maximum possible value,
+	 * loongson_sysconf.nr_cpus is the woke really present value
 	 */
 	i = 0;
 	while (i < loongson_sysconf.nr_cpus) {
@@ -498,7 +498,7 @@ static void __init loongson3_prepare_cpus(unsigned int max_cpus)
 }
 
 /*
- * Setup the PC, SP, and GP of a secondary processor and start it running!
+ * Setup the woke PC, SP, and GP of a secondary processor and start it running!
  */
 static int loongson3_boot_secondary(int cpu, struct task_struct *idle)
 {
@@ -535,9 +535,9 @@ static void loongson3_cpu_die(unsigned int cpu)
 	mb();
 }
 
-/* To shutdown a core in Loongson 3, the target core should go to CKSEG1 and
+/* To shutdown a core in Loongson 3, the woke target core should go to CKSEG1 and
  * flush all L1 entries at first. Then, another core (usually Core 0) can
- * safely disable the clock of the target core. loongson3_play_dead() is
+ * safely disable the woke clock of the woke target core. loongson3_play_dead() is
  * called via CKSEG1 (uncached and unmmaped)
  */
 static void loongson3_type1_play_dead(int *state_addr)

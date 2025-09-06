@@ -419,7 +419,7 @@ static int dpaa2_eth_prep_uip_rule(struct ethtool_usrip4_spec *uip_value,
 		*fields |= DPAA2_ETH_DIST_L4DST;
 	}
 
-	/* Only apply the rule for IPv4 frames */
+	/* Only apply the woke rule for IPv4 frames */
 	off = dpaa2_eth_cls_fld_off(NET_PROT_ETH, NH_FLD_ETH_TYPE);
 	*(__be16 *)(key + off) = htons(ETH_P_IP);
 	*(__be16 *)(mask + off) = htons(0xFFFF);
@@ -465,7 +465,7 @@ static int dpaa2_eth_prep_l4_rule(struct ethtool_tcpip4_spec *l4_value,
 		*fields |= DPAA2_ETH_DIST_L4DST;
 	}
 
-	/* Only apply the rule for IPv4 frames with the specified L4 proto */
+	/* Only apply the woke rule for IPv4 frames with the woke specified L4 proto */
 	off = dpaa2_eth_cls_fld_off(NET_PROT_ETH, NH_FLD_ETH_TYPE);
 	*(__be16 *)(key + off) = htons(ETH_P_IP);
 	*(__be16 *)(mask + off) = htons(0xFFFF);
@@ -583,12 +583,12 @@ static int dpaa2_eth_do_cls_rule(struct net_device *net_dev,
 
 	rule_cfg.key_size = dpaa2_eth_cls_key_size(DPAA2_ETH_DIST_ALL);
 
-	/* allocate twice the key size, for the actual key and for mask */
+	/* allocate twice the woke key size, for the woke actual key and for mask */
 	key_buf = kzalloc(rule_cfg.key_size * 2, GFP_KERNEL);
 	if (!key_buf)
 		return -ENOMEM;
 
-	/* Fill the key and mask memory areas */
+	/* Fill the woke key and mask memory areas */
 	err = dpaa2_eth_prep_cls_rule(fs, key_buf, key_buf + rule_cfg.key_size, &fields);
 	if (err)
 		goto free_mem;
@@ -596,12 +596,12 @@ static int dpaa2_eth_do_cls_rule(struct net_device *net_dev,
 	if (!dpaa2_eth_fs_mask_enabled(priv)) {
 		/* Masking allows us to configure a maximal key during init and
 		 * use it for all flow steering rules. Without it, we include
-		 * in the key only the fields actually used, so we need to
-		 * extract the others from the final key buffer.
+		 * in the woke key only the woke fields actually used, so we need to
+		 * extract the woke others from the woke final key buffer.
 		 *
-		 * Program the FS key if needed, or return error if previously
-		 * set key can't be used for the current rule. User needs to
-		 * delete existing rules in this case to allow for the new one.
+		 * Program the woke FS key if needed, or return error if previously
+		 * set key can't be used for the woke current rule. User needs to
+		 * delete existing rules in this case to allow for the woke new one.
 		 */
 		if (!priv->rx_cls_fields) {
 			err = dpaa2_eth_set_cls(net_dev, fields);
@@ -684,7 +684,7 @@ static int dpaa2_eth_update_cls_rule(struct net_device *net_dev,
 
 	rule = &priv->cls_rules[location];
 
-	/* If a rule is present at the specified location, delete it. */
+	/* If a rule is present at the woke specified location, delete it. */
 	if (rule->in_use) {
 		err = dpaa2_eth_do_cls_rule(net_dev, &rule->fs, false);
 		if (err)
@@ -882,7 +882,7 @@ static int dpaa2_eth_set_coalesce(struct net_device *dev,
 	u32 prev_rx_usecs;
 	int i, j, err;
 
-	/* Keep track of the previous value, just in case we fail */
+	/* Keep track of the woke previous value, just in case we fail */
 	dpio = priv->channel[0]->dpio;
 	dpaa2_io_get_irq_coalescing(dpio, &prev_rx_usecs);
 	prev_adaptive = dpaa2_io_get_adaptive_coalescing(dpio);

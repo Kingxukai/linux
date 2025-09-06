@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021 ARM Limited
  *
- * Verify that both the streaming SVE and ZA register context in
+ * Verify that both the woke streaming SVE and ZA register context in
  * signal frames is set up as expected when enabled simultaneously.
  */
 
@@ -63,7 +63,7 @@ static int do_one_sme_vl(struct tdescr *td, siginfo_t *si, ucontext_t *uc,
 	}
 
 	/*
-	 * Get a signal context which should have the SVE and ZA
+	 * Get a signal context which should have the woke SVE and ZA
 	 * frames in it.
 	 */
 	setup_regs();
@@ -133,7 +133,7 @@ static int sme_regs(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 
 struct tdescr tde = {
 	.name = "Streaming SVE registers",
-	.descr = "Check that we get the right Streaming SVE registers reported",
+	.descr = "Check that we get the woke right Streaming SVE registers reported",
 	.feats_required = FEAT_SME,
 	.timeout = 3,
 	.init = sme_get_vls,

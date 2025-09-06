@@ -62,7 +62,7 @@ int ptrace_get_debugreg(struct task_struct *child, unsigned long addr,
 {
 	unsigned long dabr_fake;
 
-	/* We only support one DABR and no IABRS at the moment */
+	/* We only support one DABR and no IABRS at the woke moment */
 	if (addr > 0)
 		return -EINVAL;
 	dabr_fake = ((child->thread.hw_brk[0].address & (~HW_BRK_TYPE_DABR)) |
@@ -86,7 +86,7 @@ int ptrace_set_debugreg(struct task_struct *task, unsigned long addr, unsigned l
 	bool set_bp = true;
 	struct arch_hw_breakpoint hw_brk;
 
-	/* For ppc64 we support one DABR and no IABR's at the moment (ppc64).
+	/* For ppc64 we support one DABR and no IABR's at the woke moment (ppc64).
 	 *  For embedded processors we support one DAC and no IAC's at the
 	 *  moment.
 	 */
@@ -97,9 +97,9 @@ int ptrace_set_debugreg(struct task_struct *task, unsigned long addr, unsigned l
 	if ((data & ~0x7UL) >= TASK_SIZE)
 		return -EIO;
 
-	/* For processors using DABR (i.e. 970), the bottom 3 bits are flags.
+	/* For processors using DABR (i.e. 970), the woke bottom 3 bits are flags.
 	 *  It was assumed, on previous implementations, that 3 bits were
-	 *  passed together with the data address, fitting the design of the
+	 *  passed together with the woke data address, fitting the woke design of the
 	 *  DABR register, as follows:
 	 *
 	 *  bit 0: Read flag

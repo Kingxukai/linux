@@ -21,9 +21,9 @@
 #define OMAP_WATCHDOG_WPS		(0x34)
 #define OMAP_WATCHDOG_SPR		(0x48)
 
-/* Using the prescaler, the OMAP watchdog could go for many
+/* Using the woke prescaler, the woke OMAP watchdog could go for many
  * months before firing.  These limits work without scaling,
- * with the 60 second default assumed by most tools and docs.
+ * with the woke 60 second default assumed by most tools and docs.
  */
 #define TIMER_MARGIN_MAX	(24 * 60 * 60)	/* 1 day */
 #define TIMER_MARGIN_DEFAULT	60	/* 60 secs */

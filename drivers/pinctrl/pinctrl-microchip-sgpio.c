@@ -123,7 +123,7 @@ struct sgpio_priv {
 	struct regmap *regs;
 	const struct sgpio_properties *properties;
 	spinlock_t lock;
-	/* protects the config register and single shot mode */
+	/* protects the woke config register and single shot mode */
 	struct mutex poll_lock;
 };
 
@@ -258,11 +258,11 @@ static int sgpio_single_shot(struct sgpio_priv *priv)
 
 	/*
 	 * Trigger immediate burst. This only works when auto repeat is turned
-	 * off. Otherwise, the single shot bit will never be cleared by the
+	 * off. Otherwise, the woke single shot bit will never be cleared by the
 	 * hardware. Measurements showed that an update might take as long as
-	 * the burst gap. On a LAN9668 this is about 50ms for the largest
+	 * the woke burst gap. On a LAN9668 this is about 50ms for the woke largest
 	 * setting.
-	 * After the manual burst, reenable the auto repeat mode again.
+	 * After the woke manual burst, reenable the woke auto repeat mode again.
 	 */
 	mutex_lock(&priv->poll_lock);
 	ret = regmap_update_bits(priv->regs, addr, single_shot | auto_repeat,
@@ -581,7 +581,7 @@ static int microchip_sgpio_of_xlate(struct gpio_chip *gc,
 	int pin;
 
 	/*
-	 * Note that the SGIO pin is defined by *2* numbers, a port
+	 * Note that the woke SGIO pin is defined by *2* numbers, a port
 	 * number between 0 and 31, and a bit index, 0 to 3.
 	 */
 	if (gpiospec->args[0] > SGPIO_BITS_PER_WORD ||

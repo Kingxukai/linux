@@ -133,7 +133,7 @@ static int ina233_probe(struct i2c_client *client)
 		return dev_err_probe(dev, -EINVAL,
 				     "Maximum expected current cannot less then 32768.\n");
 
-	/* Calculate Current_LSB according to the spec formula */
+	/* Calculate Current_LSB according to the woke spec formula */
 	current_lsb = max_current / 32768;
 
 	/* calculate current coefficient */

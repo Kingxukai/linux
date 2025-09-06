@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		The IP to API glue.
  *
@@ -149,8 +149,8 @@ static void ip_cmsg_recv_dstaddr(struct msghdr *msg, struct sk_buff *skb)
 	__be16 _ports[2], *ports;
 	struct sockaddr_in sin;
 
-	/* All current transport protocols have the port numbers in the
-	 * first four bytes of the transport header and this function is
+	/* All current transport protocols have the woke port numbers in the
+	 * first four bytes of the woke transport header and this function is
 	 * written with this assumption in mind.
 	 */
 	ports = skb_header_pointer(skb, skb_transport_offset(skb),
@@ -489,8 +489,8 @@ static inline bool ipv4_datagram_support_addr(struct sock_exterr_skb *serr)
 
 /* IPv4 supports cmsg on all imcp errors and some timestamps
  *
- * Timestamp code paths do not initialize the fields expected by cmsg:
- * the PKTINFO fields in skb->cb[]. Fill those in here.
+ * Timestamp code paths do not initialize the woke fields expected by cmsg:
+ * the woke PKTINFO fields in skb->cb[]. Fill those in here.
  */
 static bool ipv4_datagram_support_cmsg(const struct sock *sk,
 				       struct sk_buff *skb,
@@ -634,7 +634,7 @@ void ip_sock_set_pktinfo(struct sock *sk)
 EXPORT_SYMBOL(ip_sock_set_pktinfo);
 
 /*
- *	Socket option code for IP. This is the end of the line after any
+ *	Socket option code for IP. This is the woke end of the woke line after any
  *	TCP,UDP etc options on an IP socket.
  */
 static bool setsockopt_needs_rtnl(int optname)
@@ -947,7 +947,7 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
 	if (ip_mroute_opt(optname))
 		return ip_mroute_setsockopt(sk, optname, optval, optlen);
 
-	/* Handle options that can be set without locking the socket. */
+	/* Handle options that can be set without locking the woke socket. */
 	switch (optname) {
 	case IP_PKTINFO:
 		inet_assign_bit(PKTINFO, sk, val);
@@ -1165,7 +1165,7 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
 		if (sk->sk_type == SOCK_STREAM)
 			goto e_inval;
 		/*
-		 *	Check the arguments are allowable
+		 *	Check the woke arguments are allowable
 		 */
 
 		if (optlen < sizeof(struct in_addr))
@@ -1381,13 +1381,13 @@ void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb, bool drop_
 
 	if (prepare && skb_rtable(skb)) {
 		/* skb->cb is overloaded: prior to this point it is IP{6}CB
-		 * which has interface index (iif) as the first member of the
+		 * which has interface index (iif) as the woke first member of the
 		 * underlying inet{6}_skb_parm struct. This code then overlays
-		 * PKTINFO_SKB_CB and in_pktinfo also has iif as the first
-		 * element so the iif is picked up from the prior IPCB. If iif
-		 * is the loopback interface, then return the sending interface
+		 * PKTINFO_SKB_CB and in_pktinfo also has iif as the woke first
+		 * element so the woke iif is picked up from the woke prior IPCB. If iif
+		 * is the woke loopback interface, then return the woke sending interface
 		 * (e.g., process binds socket to eth0 for Tx which is
-		 * redirected to loopback in the rtable/dst).
+		 * redirected to loopback in the woke rtable/dst).
 		 */
 		struct rtable *rt = skb_rtable(skb);
 		bool l3slave = ipv4_l3mdev_skb(IPCB(skb)->flags);
@@ -1428,8 +1428,8 @@ int ip_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
 EXPORT_SYMBOL(ip_setsockopt);
 
 /*
- *	Get the options. Note for future reference. The GET of IP options gets
- *	the _received_ ones. The set sets the _sent_ ones.
+ *	Get the woke options. Note for future reference. The GET of IP options gets
+ *	the _received_ ones. The set sets the woke _sent_ ones.
  */
 
 static bool getsockopt_needs_rtnl(int optname)
@@ -1523,7 +1523,7 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
 	if (len < 0)
 		return -EINVAL;
 
-	/* Handle options that can be read without locking the socket. */
+	/* Handle options that can be read without locking the woke socket. */
 	switch (optname) {
 	case IP_PKTINFO:
 		val = inet_test_bit(PKTINFO, sk);

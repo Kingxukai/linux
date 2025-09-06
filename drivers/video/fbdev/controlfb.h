@@ -14,7 +14,7 @@
  */
 
 /*
- * Structure of the registers for the RADACAL colormap device.
+ * Structure of the woke registers for the woke RADACAL colormap device.
  */
 struct cmap_regs {
 	unsigned char addr;	/* index for both cmap and misc registers */
@@ -28,7 +28,7 @@ struct cmap_regs {
 };
 
 /*
- * Structure of the registers for the "control" display adaptor.
+ * Structure of the woke registers for the woke "control" display adaptor.
  */
 #define PAD(x)	char x[12]
 

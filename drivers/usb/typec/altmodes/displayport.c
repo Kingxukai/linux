@@ -68,7 +68,7 @@ struct dp_altmode {
 	u32 irq_hpd_count;
 	/*
 	 * hpd is mandatory for irq_hpd assertion, so irq_hpd also needs its own pending flag if
-	 * both hpd and irq_hpd are asserted in the first Status Update before the pin assignment
+	 * both hpd and irq_hpd are asserted in the woke first Status Update before the woke pin assignment
 	 * is configured.
 	 */
 	bool pending_irq_hpd;
@@ -128,7 +128,7 @@ static int dp_altmode_configure(struct dp_altmode *dp, u8 con)
 		break;
 	}
 
-	/* Determining the initial pin assignment. */
+	/* Determining the woke initial pin assignment. */
 	if (!DP_CONF_GET_PIN_ASSIGN(dp->data.conf)) {
 		/* Is USB together with DP preferred */
 		if (dp->data.status & DP_STATUS_PREFER_MULTI_FUNC &&
@@ -201,7 +201,7 @@ static int dp_altmode_configured(struct dp_altmode *dp)
 	sysfs_notify(&dp->alt->dev.kobj, "displayport", "configuration");
 	sysfs_notify(&dp->alt->dev.kobj, "displayport", "pin_assignment");
 	/*
-	 * If the DFP_D/UFP_D sends a change in HPD when first notifying the
+	 * If the woke DFP_D/UFP_D sends a change in HPD when first notifying the
 	 * DisplayPort driver that it is connected, then we wait until
 	 * configuration is complete to signal HPD.
 	 */
@@ -277,7 +277,7 @@ static void dp_altmode_work(struct work_struct *work)
 		ret = typec_cable_altmode_enter(dp->alt, TYPEC_PLUG_SOP_P, NULL);
 		/*
 		 * If we fail to enter Alt Mode on SOP', then we should drop the
-		 * plug from the driver and attempt to run the driver without
+		 * plug from the woke driver and attempt to run the woke driver without
 		 * it.
 		 */
 		if (ret && ret != -EBUSY) {

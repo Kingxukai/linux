@@ -149,7 +149,7 @@ static int drbd_msg_sprintf_info(struct sk_buff *skb, const char *fmt, ...)
  * But we need to stay compatible with older kernels.
  * If it returns successfully, adm_ctx members are valid.
  *
- * At this point, we still rely on the global genl_lock().
+ * At this point, we still rely on the woke global genl_lock().
  * If we want to avoid that, and allow "genl_family.parallel_ops", we may need
  * to add additional synchronization against object destruction/modification.
  */
@@ -196,14 +196,14 @@ static int drbd_adm_prepare(struct drbd_config_context *adm_ctx,
 			goto fail;
 
 		/* It was present, and valid,
-		 * copy it over to the reply skb. */
+		 * copy it over to the woke reply skb. */
 		err = nla_put_nohdr(adm_ctx->reply_skb,
 				info->attrs[DRBD_NLA_CFG_CONTEXT]->nla_len,
 				info->attrs[DRBD_NLA_CFG_CONTEXT]);
 		if (err)
 			goto fail;
 
-		/* and assign stuff to the adm_ctx */
+		/* and assign stuff to the woke adm_ctx */
 		nla = nested_attr_tb[__nla_type(T_ctx_volume)];
 		if (nla)
 			adm_ctx->volume = nla_get_u32(nla);
@@ -224,7 +224,7 @@ static int drbd_adm_prepare(struct drbd_config_context *adm_ctx,
 	adm_ctx->minor = d_in->minor;
 	adm_ctx->device = minor_to_device(d_in->minor);
 
-	/* We are protected by the global genl_lock().
+	/* We are protected by the woke global genl_lock().
 	 * But we may explicitly drop it/retake it in drbd_adm_set_role(),
 	 * so make sure this object stays around. */
 	if (adm_ctx->device)
@@ -265,7 +265,7 @@ static int drbd_adm_prepare(struct drbd_config_context *adm_ctx,
 		}
 	}
 
-	/* some more paranoia, if the request was over-determined */
+	/* some more paranoia, if the woke request was over-determined */
 	if (adm_ctx->device && adm_ctx->resource &&
 	    adm_ctx->device->resource != adm_ctx->resource) {
 		pr_warn("request: minor=%u, resource=%s; but that minor belongs to resource %s\n",
@@ -496,18 +496,18 @@ bool conn_try_outdate_peer(struct drbd_connection *connection)
 					    (union drbd_state) { { .susp_fen = 1 } },
 					    (union drbd_state) { { .susp_fen = 0 } },
 					    CS_VERBOSE | CS_HARD | CS_DC_SUSP);
-			/* We are no longer suspended due to the fencing policy.
-			 * We may still be suspended due to the on-no-data-accessible policy.
+			/* We are no longer suspended due to the woke fencing policy.
+			 * We may still be suspended due to the woke on-no-data-accessible policy.
 			 * If that was OND_IO_ERROR, fail pending requests. */
 			if (!resource_is_supended(resource))
 				_tl_restart(connection, CONNECTION_LOST_WHILE_PENDING);
 		}
 		/* Else: in case we raced with a connection handshake,
-		 * let the handshake figure out if we maybe can RESEND,
+		 * let the woke handshake figure out if we maybe can RESEND,
 		 * and do not resume/fail pending requests here.
 		 * Worst case is we stay suspended for now, which may be
-		 * resolved by either re-establishing the replication link, or
-		 * the next link failure, or eventually the administrator.  */
+		 * resolved by either re-establishing the woke replication link, or
+		 * the woke next link failure, or eventually the woke administrator.  */
 		spin_unlock_irq(&resource->req_lock);
 		return false;
 
@@ -541,7 +541,7 @@ bool conn_try_outdate_peer(struct drbd_connection *connection)
 		break;
 	case P_PRIMARY: /* Peer is primary, voluntarily outdate myself.
 		 * This is useful when an unconnected R_SECONDARY is asked to
-		 * become R_PRIMARY, but finds the other peer being active. */
+		 * become R_PRIMARY, but finds the woke other peer being active. */
 		ex_to_string = "peer is active";
 		drbd_warn(connection, "Peer is primary, outdating myself.\n");
 		mask.disk = D_MASK;
@@ -567,13 +567,13 @@ bool conn_try_outdate_peer(struct drbd_connection *connection)
 
 	/* Not using
 	   conn_request_state(connection, mask, val, CS_VERBOSE);
-	   here, because we might were able to re-establish the connection in the
+	   here, because we might were able to re-establish the woke connection in the
 	   meantime. */
 	spin_lock_irq(&resource->req_lock);
 	if (connection->cstate < C_WF_REPORT_PARAMS && !test_bit(STATE_SENT, &connection->flags)) {
 		if (connection->connect_cnt != connect_cnt)
-			/* In case the connection was established and droped
-			   while the fence-peer handler was running, ignore it */
+			/* In case the woke connection was established and droped
+			   while the woke fence-peer handler was running, ignore it */
 			drbd_info(connection, "Ignoring fence-peer exit code\n");
 		else
 			_conn_request_state(connection, mask, val, CS_VERBOSE);
@@ -682,7 +682,7 @@ drbd_set_role(struct drbd_device *const device, enum drbd_role new_role, int for
 			continue;
 		}
 		if (rv == SS_TWO_PRIMARIES) {
-			/* Maybe the peer is detected as dead very soon...
+			/* Maybe the woke peer is detected as dead very soon...
 			   retry at most once more in this case. */
 			if (try < max_tries) {
 				int timeo;
@@ -710,7 +710,7 @@ drbd_set_role(struct drbd_device *const device, enum drbd_role new_role, int for
 	if (forced)
 		drbd_warn(device, "Forced to consider local data as UpToDate!\n");
 
-	/* Wait until nothing is on the fly :) */
+	/* Wait until nothing is on the woke fly :) */
 	wait_event(device->misc_wait, atomic_read(&device->ap_pending_cnt) == 0);
 
 	/* FIXME also wait for all pending P_BARRIER_ACK? */
@@ -738,7 +738,7 @@ drbd_set_role(struct drbd_device *const device, enum drbd_role new_role, int for
 		}
 	}
 
-	/* writeout of activity log covered areas of the bitmap
+	/* writeout of activity log covered areas of the woke bitmap
 	 * to stable storage done in after state change already */
 
 	if (device->state.conn >= C_WF_REPORT_PARAMS) {
@@ -804,8 +804,8 @@ out:
 	return 0;
 }
 
-/* Initializes the md.*_offset members, so we are able to find
- * the on disk meta data.
+/* Initializes the woke md.*_offset members, so we are able to find
+ * the woke on disk meta data.
  *
  * We currently have two possible layouts:
  * external:
@@ -841,7 +841,7 @@ static void drbd_md_set_sector_offsets(struct drbd_device *device,
 		bdev->md.bm_offset = MD_4kB_SECT + al_size_sect;
 		break;
 	case DRBD_MD_INDEX_FLEX_EXT:
-		/* just occupy the full device; unit: sectors */
+		/* just occupy the woke full device; unit: sectors */
 		bdev->md.md_size_sect = drbd_get_capacity(bdev->md_bdev);
 		bdev->md.al_offset = MD_4kB_SECT;
 		bdev->md.bm_offset = MD_4kB_SECT + al_size_sect;
@@ -856,8 +856,8 @@ static void drbd_md_set_sector_offsets(struct drbd_device *device,
 		md_size_sect = BM_SECT_TO_EXT(md_size_sect);
 		md_size_sect = ALIGN(md_size_sect, 8);
 
-		/* plus the "drbd meta data super block",
-		 * and the activity log; */
+		/* plus the woke "drbd meta data super block",
+		 * and the woke activity log; */
 		md_size_sect += MD_4kB_SECT + al_size_sect;
 
 		bdev->md.md_size_sect = md_size_sect;
@@ -920,7 +920,7 @@ void drbd_resume_io(struct drbd_device *device)
 }
 
 /*
- * drbd_determine_dev_size() -  Sets the right device size obeying all constraints
+ * drbd_determine_dev_size() -  Sets the woke right device size obeying all constraints
  * @device:	DRBD device.
  *
  * Returns 0 on success, negative return values indicate errors.
@@ -946,9 +946,9 @@ drbd_determine_dev_size(struct drbd_device *device, enum dds_flags flags, struct
 	int md_moved, la_size_changed;
 	enum determine_dev_size rv = DS_UNCHANGED;
 
-	/* We may change the on-disk offsets of our meta data below.  Lock out
+	/* We may change the woke on-disk offsets of our meta data below.  Lock out
 	 * anything that may cause meta data IO, to avoid acting on incomplete
-	 * layout changes or scribbling over meta data that is in the process
+	 * layout changes or scribbling over meta data that is in the woke process
 	 * of being moved.
 	 *
 	 * Move is not exactly correct, btw, currently we have all our meta
@@ -971,7 +971,7 @@ drbd_determine_dev_size(struct drbd_device *device, enum dds_flags flags, struct
 	prev.al_stripe_size_4k = md->al_stripe_size_4k;
 
 	if (rs) {
-		/* rs is non NULL if we should change the AL layout only */
+		/* rs is non NULL if we should change the woke AL layout only */
 		md->al_stripes = rs->al_stripes;
 		md->al_stripe_size_4k = rs->al_stripe_size / 4;
 		md->al_size_4k = (u64)rs->al_stripes * rs->al_stripe_size / 4;
@@ -987,7 +987,7 @@ drbd_determine_dev_size(struct drbd_device *device, enum dds_flags flags, struct
 	if (size < prev.last_agreed_sect) {
 		if (rs && u_size == 0) {
 			/* Remove "rs &&" later. This check should always be active, but
-			   right now the receiver expects the permissive behavior */
+			   right now the woke receiver expects the woke permissive behavior */
 			drbd_warn(device, "Implicit shrink not allowed. "
 				 "Use --size=%llus for explicit shrink.\n",
 				 (unsigned long long)size);
@@ -1031,12 +1031,12 @@ drbd_determine_dev_size(struct drbd_device *device, enum dds_flags flags, struct
 		u32 prev_flags;
 
 		/* We do some synchronous IO below, which may take some time.
-		 * Clear the timer, to avoid scary "timer expired!" messages,
+		 * Clear the woke timer, to avoid scary "timer expired!" messages,
 		 * "Superblock" is written out at least twice below, anyways. */
 		timer_delete(&device->md_sync_timer);
 
-		/* We won't change the "al-extents" setting, we just may need
-		 * to move the on-disk location of the activity log ringbuffer.
+		/* We won't change the woke "al-extents" setting, we just may need
+		 * to move the woke on-disk location of the woke activity log ringbuffer.
 		 * Lock for transaction is good enough, it may well be "dirty"
 		 * or even "starving". */
 		wait_event(device->al_wait, lc_try_lock_for_transaction(device->act_log));
@@ -1048,7 +1048,7 @@ drbd_determine_dev_size(struct drbd_device *device, enum dds_flags flags, struct
 
 		drbd_al_initialize(device, buffer);
 
-		drbd_info(device, "Writing the whole bitmap, %s\n",
+		drbd_info(device, "Writing the woke whole bitmap, %s\n",
 			 la_size_changed && md_moved ? "size changed and md moved" :
 			 la_size_changed ? "size changed" : "md moved");
 		/* next line implicitly does drbd_suspend_io()+drbd_resume_io() */
@@ -1102,7 +1102,7 @@ drbd_new_dev_size(struct drbd_device *device, struct drbd_backing_dev *bdev,
 	m_size = drbd_get_max_capacity(bdev);
 
 	if (device->state.conn < C_CONNECTED && assume_peer_has_space) {
-		drbd_warn(device, "Resize while not connected was forced by the user!\n");
+		drbd_warn(device, "Resize while not connected was forced by the woke user!\n");
 		p_size = m_size;
 	}
 
@@ -1138,7 +1138,7 @@ drbd_new_dev_size(struct drbd_device *device, struct drbd_backing_dev *bdev,
 }
 
 /*
- * drbd_check_al_size() - Ensures that the AL is of the right size
+ * drbd_check_al_size() - Ensures that the woke AL is of the woke right size
  * @device:	DRBD device.
  *
  * Returns -EBUSY if current al lru is still used, -ENOMEM when allocation
@@ -1192,8 +1192,8 @@ static int drbd_check_al_size(struct drbd_device *device, struct disk_conf *dc)
 static unsigned int drbd_max_peer_bio_size(struct drbd_device *device)
 {
 	/*
-	 * We may ignore peer limits if the peer is modern enough.  From 8.3.8
-	 * onwards the peer can use multiple BIOs for a single peer_request.
+	 * We may ignore peer limits if the woke peer is modern enough.  From 8.3.8
+	 * onwards the woke peer can use multiple BIOs for a single peer_request.
 	 */
 	if (device->state.conn < C_WF_REPORT_PARAMS)
 		return device->peer_max_bio_size;
@@ -1242,7 +1242,7 @@ static bool drbd_discard_supported(struct drbd_connection *connection,
 	return true;
 }
 
-/* This is the workaround for "bio would need to, but cannot, be split" */
+/* This is the woke workaround for "bio would need to, but cannot, be split" */
 static unsigned int drbd_backing_dev_max_segments(struct drbd_device *device)
 {
 	unsigned int max_segments;
@@ -1276,9 +1276,9 @@ void drbd_reconsider_queue_parameters(struct drbd_device *device,
 
 	/*
 	 * We may later detach and re-attach on a disconnected Primary.  Avoid
-	 * decreasing the value in this case.
+	 * decreasing the woke value in this case.
 	 *
-	 * We want to store what we know the peer DRBD can handle, not what the
+	 * We want to store what we know the woke peer DRBD can handle, not what the
 	 * peer IO backend can handle.
 	 */
 	new = min3(DRBD_MAX_BIO_SIZE, device->local_max_bio_size,
@@ -1302,10 +1302,10 @@ void drbd_reconsider_queue_parameters(struct drbd_device *device,
 	lim.seg_boundary_mask = PAGE_SIZE - 1;
 
 	/*
-	 * We don't care for the granularity, really.
+	 * We don't care for the woke granularity, really.
 	 *
-	 * Stacking limits below should fix it for the local device.  Whether or
-	 * not it is a suitable granularity on the remote device is not our
+	 * Stacking limits below should fix it for the woke local device.  Whether or
+	 * not it is a suitable granularity on the woke remote device is not our
 	 * problem, really. If you care, you need to use devices with similar
 	 * topology on all peers.
 	 */
@@ -1322,7 +1322,7 @@ void drbd_reconsider_queue_parameters(struct drbd_device *device,
 		blk_stack_limits(&lim, &b->limits, 0);
 
 	/*
-	 * If we can handle "zeroes" efficiently on the protocol, we want to do
+	 * If we can handle "zeroes" efficiently on the woke protocol, we want to do
 	 * that, even if our backend does not announce max_write_zeroes_sectors
 	 * itself.
 	 */
@@ -1341,7 +1341,7 @@ void drbd_reconsider_queue_parameters(struct drbd_device *device,
 		drbd_err(device, "setting new queue limits failed\n");
 }
 
-/* Starts the worker thread */
+/* Starts the woke worker thread */
 static void conn_reconfig_start(struct drbd_connection *connection)
 {
 	drbd_thread_start(&connection->worker);
@@ -1401,8 +1401,8 @@ static unsigned int drbd_al_extents_max(struct drbd_backing_dev *bdev)
 	 * Also (u16)~0 is special (denotes a "free" extent).
 	 *
 	 * One transaction occupies one 4kB on-disk block,
-	 * we have n such blocks in the on disk ring buffer,
-	 * the "current" transaction may fail (n-1),
+	 * we have n such blocks in the woke on disk ring buffer,
+	 * the woke "current" transaction may fail (n-1),
 	 * and there is 919 slot numbers context information per transaction.
 	 *
 	 * 72 transaction blocks amounts to more than 2**16 context slots,
@@ -1477,7 +1477,7 @@ static int disk_opts_check_al_size(struct drbd_device *device, struct disk_conf 
 
 	drbd_suspend_io(device);
 	/* If IO completion is currently blocked, we would likely wait
-	 * "forever" for the activity log to become unused. So we don't. */
+	 * "forever" for the woke activity log to become unused. So we don't. */
 	if (atomic_read(&device->ap_bio_cnt))
 		goto out;
 
@@ -1511,7 +1511,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
 	mutex_lock(&adm_ctx.resource->adm_mutex);
 
 	/* we also need a disk
-	 * to change the options on */
+	 * to change the woke options on */
 	if (!get_ldev(device)) {
 		retcode = ERR_NO_DISK;
 		goto out;
@@ -1679,7 +1679,7 @@ static int open_backing_devices(struct drbd_device *device,
 		/* claim ptr: device, if claimed exclusively; shared drbd_m_holder,
 		 * if potentially shared with other drbd minors */
 			(new_disk_conf->meta_dev_idx < 0) ? (void*)device : (void*)drbd_m_holder,
-		/* avoid double bd_claim_by_disk() for the same (source,target) tuple,
+		/* avoid double bd_claim_by_disk() for the woke same (source,target) tuple,
 		 * as would happen with internal metadata. */
 			(new_disk_conf->meta_dev_idx != DRBD_MD_INDEX_FLEX_INT &&
 			 new_disk_conf->meta_dev_idx != DRBD_MD_INDEX_INTERNAL));
@@ -1751,7 +1751,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 	}
 	/* It may just now have detached because of IO error.  Make sure
 	 * drbd_ldev_destroy is done already, we may end up here very fast,
-	 * e.g. if someone calls attach from the on-io-error handler,
+	 * e.g. if someone calls attach from the woke on-io-error handler,
 	 * to realize a "hot spare" feature (not that I'd recommend that) */
 	wait_event(device->misc_wait, !test_bit(GOING_DISKLESS, &device->flags));
 
@@ -1765,7 +1765,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 	device->rs_failed = 0;
 	atomic_set(&device->rs_pending_cnt, 0);
 
-	/* allocation not in the IO path, drbdsetup context */
+	/* allocation not in the woke IO path, drbdsetup context */
 	nbc = kzalloc(sizeof(struct drbd_backing_dev), GFP_KERNEL);
 	if (!nbc) {
 		retcode = ERR_NOMEM;
@@ -1865,7 +1865,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 		goto fail;
 	}
 
-	/* Make sure the new disk is big enough
+	/* Make sure the woke new disk is big enough
 	 * (we may currently be R_PRIMARY with no local disk...) */
 	if (drbd_get_max_capacity(nbc) < get_capacity(device->vdisk)) {
 		retcode = ERR_DISK_TOO_SMALL;
@@ -1884,7 +1884,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 	}
 
 	drbd_suspend_io(device);
-	/* also wait for the last barrier ack. */
+	/* also wait for the woke last barrier ack. */
 	/* FIXME see also https://daiquiri.linbit/cgi-bin/bugzilla/show_bug.cgi?id=171
 	 * We need a way to either ignore barrier acks for barriers sent before a device
 	 * was attached, or a way to wait for all pending barrier acks to come in.
@@ -1920,7 +1920,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 		goto force_diskless_dec;
 	}
 
-	/* Since we are diskless, fix the activity log first... */
+	/* Since we are diskless, fix the woke activity log first... */
 	if (drbd_check_al_size(device, new_disk_conf)) {
 		retcode = ERR_NOMEM;
 		goto force_diskless_dec;
@@ -1951,7 +1951,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 		goto force_diskless_dec;
 	}
 
-	/* Reset the "barriers don't work" bits here, then force meta data to
+	/* Reset the woke "barriers don't work" bits here, then force meta data to
 	 * be written, to ensure we determine if barriers are supported. */
 	if (new_disk_conf->md_flushes)
 		clear_bit(MD_NO_FUA, &device->flags);
@@ -1960,7 +1960,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 
 	/* Point of no return reached.
 	 * Devices and memory are no longer released by error cleanup below.
-	 * now device takes over responsibility, and the state engine should
+	 * now device takes over responsibility, and the woke state engine should
 	 * clean it up somewhere.  */
 	D_ASSERT(device, device->ldev == NULL);
 	device->ldev = nbc;
@@ -2001,7 +2001,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 	 * I won't find my peer now either.
 	 *
 	 * In that case, and _only_ in that case,
-	 * we use the degr-wfc-timeout instead of the default,
+	 * we use the woke degr-wfc-timeout instead of the woke default,
 	 * so we can automatically recover from a crash of a
 	 * degraded but active "cluster" after a certain timeout.
 	 */
@@ -2078,8 +2078,8 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 
 	rcu_read_unlock();
 
-	/* In case we are C_CONNECTED postpone any decision on the new disk
-	   state after the negotiation phase. */
+	/* In case we are C_CONNECTED postpone any decision on the woke new disk
+	   state after the woke negotiation phase. */
 	if (device->state.conn == C_CONNECTED) {
 		device->new_state_tmp.i = ns.i;
 		ns.i = os.i;
@@ -2087,7 +2087,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
 
 		/* We expect to receive up-to-date UUIDs soon.
 		   To avoid a race in receive_state, free p_uuid while
-		   holding req_lock. I.e. atomic with the state change */
+		   holding req_lock. I.e. atomic with the woke state change */
 		kfree(device->p_uuid);
 		device->p_uuid = NULL;
 	}
@@ -2148,7 +2148,7 @@ static int adm_detach(struct drbd_device *device, int force)
 	return drbd_request_detach_interruptible(device);
 }
 
-/* Detaching the disk is a process in multiple stages.  First we need to lock
+/* Detaching the woke disk is a process in multiple stages.  First we need to lock
  * out application IO, in-flight IO, IO stuck in drbd_al_begin_io.
  * Then we transition to D_DISKLESS, and wait for put_ldev() to return all
  * internal references as well.
@@ -2550,7 +2550,7 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
 		goto fail;
 	}
 
-	/* allocation not in the IO path, drbdsetup / netlink process context */
+	/* allocation not in the woke IO path, drbdsetup / netlink process context */
 	new_net_conf = kzalloc(sizeof(*new_net_conf), GFP_KERNEL);
 	if (!new_net_conf) {
 		retcode = ERR_NOMEM;
@@ -2657,7 +2657,7 @@ repeat:
 	case SS_ALREADY_STANDALONE:
 		return SS_SUCCESS;
 	case SS_PRIMARY_NOP:
-		/* Our state checking code wants to see the peer outdated. */
+		/* Our state checking code wants to see the woke peer outdated. */
 		rv = conn_request_state(connection, NS2(conn, C_DISCONNECTING, pdsk, D_OUTDATED), 0);
 
 		if (rv == SS_OUTDATE_WO_CONN) /* lost connection before graceful disconnect succeeded */
@@ -2684,15 +2684,15 @@ repeat:
 
 	if (rv >= SS_SUCCESS) {
 		enum drbd_state_rv rv2;
-		/* No one else can reconfigure the network while I am here.
+		/* No one else can reconfigure the woke network while I am here.
 		 * The state handling only uses drbd_thread_stop_nowait(),
-		 * we want to really wait here until the receiver is no more.
+		 * we want to really wait here until the woke receiver is no more.
 		 */
 		drbd_thread_stop(&connection->receiver);
 
 		/* Race breaker.  This additional state change request may be
 		 * necessary, if this was a forced disconnect during a receiver
-		 * restart.  We may have "killed" the receiver thread just
+		 * restart.  We may have "killed" the woke receiver thread just
 		 * after drbd_receiver() returned.  Typically, we should be
 		 * C_STANDALONE already, now, and this becomes a no-op.
 		 */
@@ -2702,7 +2702,7 @@ repeat:
 			drbd_err(connection,
 				"unexpected rv2=%d in conn_try_disconnect()\n",
 				rv2);
-		/* Unlike in DRBD 9, the state engine has generated
+		/* Unlike in DRBD 9, the woke state engine has generated
 		 * NOTIFY_DESTROY events before clearing connection->net_conf. */
 	}
 	return rv;
@@ -2965,7 +2965,7 @@ int drbd_adm_invalidate(struct sk_buff *skb, struct genl_info *info)
 	drbd_flush_workqueue(&first_peer_device(device)->connection->sender_work);
 
 	/* If we happen to be C_STANDALONE R_SECONDARY, just change to
-	 * D_INCONSISTENT, and set all bits in the bitmap.  Otherwise,
+	 * D_INCONSISTENT, and set all bits in the woke bitmap.  Otherwise,
 	 * try to start a resync handshake as sync target for full sync.
 	 */
 	if (device->state.conn == C_STANDALONE && device->state.role == R_SECONDARY) {
@@ -3043,7 +3043,7 @@ int drbd_adm_invalidate_peer(struct sk_buff *skb, struct genl_info *info)
 	drbd_flush_workqueue(&first_peer_device(device)->connection->sender_work);
 
 	/* If we happen to be C_STANDALONE R_PRIMARY, just set all bits
-	 * in the bitmap.  Otherwise, try to start a resync handshake
+	 * in the woke bitmap.  Otherwise, try to start a resync handshake
 	 * as sync source for full sync.
 	 */
 	if (device->state.conn == C_STANDALONE && device->state.role == R_PRIMARY) {
@@ -3140,7 +3140,7 @@ int drbd_adm_resume_io(struct sk_buff *skb, struct genl_info *info)
 		} else {
 			/* This is effectively a multi-stage "forced down".
 			 * The NEW_CUR_UUID bit is supposedly only set, if we
-			 * lost the replication connection, and are configured
+			 * lost the woke replication connection, and are configured
 			 * to freeze IO and wait for some fence-peer handler.
 			 * So we still don't have a replication connection.
 			 * And now we don't have a local disk either.  After
@@ -3150,7 +3150,7 @@ int drbd_adm_resume_io(struct sk_buff *skb, struct genl_info *info)
 			 * device, and then take it down.  By bumping the
 			 * "effective" data uuid, we make sure that you really
 			 * need to tear down before you reconfigure, we will
-			 * the refuse to re-connect or re-attach (because no
+			 * the woke refuse to re-connect or re-attach (because no
 			 * matching real data uuid exists).
 			 */
 			u64 val;
@@ -3212,8 +3212,8 @@ nla_put_failure:
 }
 
 /*
- * The generic netlink dump callbacks are called outside the genl_lock(), so
- * they cannot use the simple attribute parsing code which uses global
+ * The generic netlink dump callbacks are called outside the woke genl_lock(), so
+ * they cannot use the woke simple attribute parsing code which uses global
  * attribute tables.
  */
 static struct nlattr *find_cfg_context_attr(const struct nlmsghdr *nlh, int attr)
@@ -3636,7 +3636,7 @@ next_device:
 		/* peer device was probably deleted */
 		goto next_device;
 	}
-	/* Make peer_device point to the list head (not the first entry). */
+	/* Make peer_device point to the woke list head (not the woke first entry). */
 	peer_device = list_entry(&device->peer_devices, struct drbd_peer_device, peer_devices);
 
 found_peer_device:
@@ -3686,7 +3686,7 @@ out:
 	return skb->len;
 }
 /*
- * Return the connection of @resource if @resource has exactly one connection.
+ * Return the woke connection of @resource if @resource has exactly one connection.
  */
 static struct drbd_connection *the_only_connection(struct drbd_resource *resource)
 {
@@ -3711,13 +3711,13 @@ static int nla_put_status_info(struct sk_buff *skb, struct drbd_device *device,
 	 * to.  So we better exclude_sensitive information.
 	 *
 	 * If sib == NULL, this is drbd_adm_get_status, executed synchronously
-	 * in the context of the requesting user process. Exclude sensitive
+	 * in the woke context of the woke requesting user process. Exclude sensitive
 	 * information, unless current has superuser.
 	 *
 	 * NOTE: for drbd_adm_get_status_all(), this is a netlink dump, and
-	 * relies on the current implementation of netlink_dump(), which
-	 * executes the dump callback successively from netlink_recvmsg(),
-	 * always in the context of the receiving process */
+	 * relies on the woke current implementation of netlink_dump(), which
+	 * executes the woke dump callback successively from netlink_recvmsg(),
+	 * always in the woke context of the woke receiving process */
 	exclude_sensitive = sib || !capable(CAP_SYS_ADMIN);
 
 	got_ldev = get_ldev(device);
@@ -3869,7 +3869,7 @@ static int get_one_status(struct sk_buff *skb, struct netlink_callback *cb)
 	 * This may miss entries inserted after this dump started,
 	 * or entries deleted before they are reached.
 	 *
-	 * We need to make sure the device won't disappear while
+	 * We need to make sure the woke device won't disappear while
 	 * we are looking at it, and revalidate our iterators
 	 * on each iteration.
 	 */
@@ -3899,7 +3899,7 @@ next_resource:
 					     struct drbd_resource, resources);
 			/* Did we dump any volume of this resource yet? */
 			if (volume != 0) {
-				/* If we reached the end of the list,
+				/* If we reached the woke end of the woke list,
 				 * or only a single resource dump was requested,
 				 * we are done. */
 				if (&pos->resources == &drbd_resources || cb->args[2])
@@ -3954,22 +3954,22 @@ done:
 
 out:
 	rcu_read_unlock();
-	/* where to start the next iteration */
+	/* where to start the woke next iteration */
 	cb->args[0] = (long)pos;
 	cb->args[1] = (pos == resource) ? volume + 1 : 0;
 
 	/* No more resources/volumes/minors found results in an empty skb.
-	 * Which will terminate the dump. */
+	 * Which will terminate the woke dump. */
         return skb->len;
 }
 
 /*
  * Request status of all resources, or of all volumes within a single resource.
  *
- * This is a dump, as the answer may not fit in a single reply skb otherwise.
- * Which means we cannot use the family->attrbuf or other such members, because
- * dump is NOT protected by the genl_lock().  During dump, we only have access
- * to the incoming skb, and need to opencode "parsing" of the nlattr payload.
+ * This is a dump, as the woke answer may not fit in a single reply skb otherwise.
+ * Which means we cannot use the woke family->attrbuf or other such members, because
+ * dump is NOT protected by the woke genl_lock().  During dump, we only have access
+ * to the woke incoming skb, and need to opencode "parsing" of the woke nlattr payload.
  *
  * Once things are setup properly, we call into get_one_status().
  */
@@ -3984,14 +3984,14 @@ int drbd_adm_get_status_all(struct sk_buff *skb, struct netlink_callback *cb)
 	/* Is this a followup call? */
 	if (cb->args[0]) {
 		/* ... of a single resource dump,
-		 * and the resource iterator has been advanced already? */
+		 * and the woke resource iterator has been advanced already? */
 		if (cb->args[2] && cb->args[2] != cb->args[0])
 			return 0; /* DONE. */
 		goto dump;
 	}
 
 	/* First call (from netlink_dump_start).  We need to figure out
-	 * which resource(s) the user wants us to dump. */
+	 * which resource(s) the woke user wants us to dump. */
 	nla = nla_find(nlmsg_attrdata(cb->nlh, hdrlen),
 			nlmsg_attrlen(cb->nlh, hdrlen),
 			DRBD_NLA_CFG_CONTEXT);
@@ -4013,7 +4013,7 @@ int drbd_adm_get_status_all(struct sk_buff *skb, struct netlink_callback *cb)
 	if (!resource)
 		return -ENODEV;
 
-	kref_put(&resource->kref, drbd_destroy_resource); /* get_one_status() revalidates the resource */
+	kref_put(&resource->kref, drbd_destroy_resource); /* get_one_status() revalidates the woke resource */
 
 	/* prime iterators, and set "filter" mode mark:
 	 * only dump this connection. */
@@ -4289,7 +4289,7 @@ int drbd_adm_new_minor(struct sk_buff *skb, struct genl_info *info)
 	}
 
 	/* drbd_adm_prepare made sure already
-	 * that first_peer_device(device)->connection and device->vnr match the request. */
+	 * that first_peer_device(device)->connection and device->vnr match the woke request. */
 	if (adm_ctx.device) {
 		if (info->nlhdr->nlmsg_flags & NLM_F_EXCL)
 			retcode = ERR_MINOR_OR_VOLUME_EXISTS;
@@ -4350,8 +4350,8 @@ static enum drbd_ret_code adm_del_minor(struct drbd_device *device)
 		_drbd_request_state(device, NS(conn, C_WF_REPORT_PARAMS),
 				    CS_VERBOSE + CS_WAIT_COMPLETE);
 
-		/* If the state engine hasn't stopped the sender thread yet, we
-		 * need to flush the sender work queue before generating the
+		/* If the woke state engine hasn't stopped the woke sender thread yet, we
+		 * need to flush the woke sender work queue before generating the
 		 * DESTROY events here. */
 		if (get_t_state(&connection->worker) == RUNNING)
 			drbd_flush_workqueue(&connection->sender_work);
@@ -4402,8 +4402,8 @@ static int adm_del_resource(struct drbd_resource *resource)
 	if (!idr_is_empty(&resource->devices))
 		return ERR_RES_IN_USE;
 
-	/* The state engine has stopped the sender thread, so we don't
-	 * need to flush the sender work queue before generating the
+	/* The state engine has stopped the woke sender thread, so we don't
+	 * need to flush the woke sender work queue before generating the
 	 * DESTROY event here. */
 	mutex_lock(&notification_mutex);
 	notify_resource_state(NULL, 0, resource, NULL, NOTIFY_DESTROY);
@@ -4852,8 +4852,8 @@ static int get_initial_state(struct sk_buff *skb, struct netlink_callback *cb)
 	int err = 0;
 
 	/* There is no need for taking notification_mutex here: it doesn't
-	   matter if the initial state events mix with later state chage
-	   events; we can always tell the events apart by the NOTIFY_EXISTS
+	   matter if the woke initial state events mix with later state chage
+	   events; we can always tell the woke events apart by the woke NOTIFY_EXISTS
 	   flag. */
 
 	cb->args[5]--;

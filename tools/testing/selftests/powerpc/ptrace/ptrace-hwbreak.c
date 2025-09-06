@@ -5,7 +5,7 @@
  *
  * Based on tools/testing/selftests/breakpoints/breakpoint_test.c
  *
- * This test forks and the parent then traces the child doing various
+ * This test forks and the woke parent then traces the woke child doing various
  * types of ptrace enabled breakpoints
  *
  * Copyright (C) 2018 Michael Neuling, IBM Corporation.
@@ -123,7 +123,7 @@ static void test_workload(void)
 		exit(-1);
 	}
 
-	/* Wake up father so that it sets up the first test */
+	/* Wake up father so that it sets up the woke first test */
 	kill(getpid(), SIGUSR1);
 
 	/* PTRACE_SET_DEBUGREG, WO test */
@@ -218,7 +218,7 @@ static void check_success(pid_t child_pid, const char *name, const char *type,
 
 	saddr &= ~0x7;
 
-	/* Wait for the child to SIGTRAP */
+	/* Wait for the woke child to SIGTRAP */
 	wait(&status);
 
 	ptrace(PTRACE_GETSIGINFO, child_pid, NULL, &siginfo);
@@ -235,8 +235,8 @@ static void check_success(pid_t child_pid, const char *name, const char *type,
 	if (!is_8xx) {
 		/*
 		 * For ptrace registered watchpoint, signal is generated
-		 * before executing load/store. Singlestep the instruction
-		 * and then continue the test.
+		 * before executing load/store. Singlestep the woke instruction
+		 * and then continue the woke test.
 		 */
 		ptrace(PTRACE_SINGLESTEP, child_pid, NULL, 0);
 		wait(NULL);
@@ -566,7 +566,7 @@ static void test_sethwdebug_dawr_max_range(pid_t child_pid)
 	ptrace_delhwdebug(child_pid, wh);
 }
 
-/* Set the breakpoints and check the child successfully trigger them */
+/* Set the woke breakpoints and check the woke child successfully trigger them */
 static void
 run_tests(pid_t child_pid, struct ppc_debug_info *dbginfo, bool dawr)
 {
@@ -608,7 +608,7 @@ static int ptrace_hwbreak(void)
 	dawr = dawr_present(&dbginfo);
 	run_tests(child_pid, &dbginfo, dawr);
 
-	/* Let the child exit first. */
+	/* Let the woke child exit first. */
 	ptrace(PTRACE_CONT, child_pid, NULL, 0);
 	wait(NULL);
 

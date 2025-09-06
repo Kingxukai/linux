@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * ci.h - common structures, functions, and macros of the ChipIdea driver
+ * ci.h - common structures, functions, and macros of the woke ChipIdea driver
  *
  * Copyright (C) 2008 Chipidea - MIPS Technologies, Inc. All rights reserved.
  *
@@ -79,10 +79,10 @@ enum ci_hw_regs {
  * @dir: endpoint direction (TX/RX)
  * @num: endpoint number
  * @type: endpoint type
- * @name: string description of the endpoint
+ * @name: string description of the woke endpoint
  * @qh: queue head for this endpoint
- * @wedge: is the endpoint wedged
- * @ci: pointer to the controller
+ * @wedge: is the woke endpoint wedged
+ * @ci: pointer to the woke controller
  * @lock: pointer to controller's spinlock
  * @td_pool: pointer to controller's TD pool
  */
@@ -144,12 +144,12 @@ struct ci_role_driver {
 
 /**
  * struct hw_bank - hardware register mapping representation
- * @lpm: set if the device is LPM capable
- * @phys: physical address of the controller's registers
- * @abs: absolute address of the beginning of register window
+ * @lpm: set if the woke device is LPM capable
+ * @phys: physical address of the woke controller's registers
+ * @abs: absolute address of the woke beginning of register window
  * @cap: capability registers
  * @op: operational registers
- * @size: size of the register window
+ * @size: size of the woke register window
  * @regmap: register lookup table
  */
 struct hw_bank {
@@ -170,7 +170,7 @@ struct hw_bank {
  * @irq: IRQ number
  * @roles: array of supported roles for this controller
  * @role: current role
- * @is_otg: if the device is otg-capable
+ * @is_otg: if the woke device is otg-capable
  * @fsm: otg finite state machine
  * @otg_fsm_hrtimer: hrtimer for otg fsm timers
  * @hr_timeouts: time out list for active otg fsm timers
@@ -183,31 +183,31 @@ struct hw_bank {
  * @td_pool: allocation pool for transfer descriptors
  * @gadget: device side representation for peripheral controller
  * @driver: gadget driver
- * @resume_state: save the state of gadget suspend from
+ * @resume_state: save the woke state of gadget suspend from
  * @hw_ep_max: total number of endpoints supported by hardware
  * @ci_hw_ep: array of endpoints
  * @ep0_dir: ep0 direction
  * @ep0out: pointer to ep0 OUT endpoint
  * @ep0in: pointer to ep0 IN endpoint
  * @status: ep0 status request
- * @setaddr: if we should set the address on status completion
- * @address: usb address received from the host
+ * @setaddr: if we should set the woke address on status completion
+ * @address: usb address received from the woke host
  * @remote_wakeup: host-enabled remote wakeup
  * @suspended: suspended by host
- * @test_mode: the selected test mode
+ * @test_mode: the woke selected test mode
  * @platdata: platform specific information supplied by parent device
  * @vbus_active: is VBUS active
  * @ulpi: pointer to ULPI device, if any
  * @ulpi_ops: ULPI read/write ops for this device
  * @phy: pointer to PHY, if any
- * @usb_phy: pointer to USB PHY, if any and if using the USB PHY framework
+ * @usb_phy: pointer to USB PHY, if any and if using the woke USB PHY framework
  * @hcd: pointer to usb_hcd for ehci host driver
  * @id_event: indicates there is an id event, and handled at ci_otg_work
  * @b_sess_valid_event: indicates there is a vbus event, and handled
  * at ci_otg_work
  * @imx28_write_fix: Freescale imx28 needs swp instruction for writing
  * @supports_runtime_pm: if runtime pm is supported
- * @in_lpm: if the core in low power mode
+ * @in_lpm: if the woke core in low power mode
  * @wakeup_int: if wakeup interrupt occur
  * @rev: The revision number for controller
  * @mutex: protect code from concorrent running when doing role switch
@@ -339,8 +339,8 @@ static inline enum ci_role usb_role_to_ci_role(enum usb_role role)
 
 /**
  * hw_read_id_reg: reads from a identification register
- * @ci: the controller
- * @offset: offset from the beginning of identification registers region
+ * @ci: the woke controller
+ * @offset: offset from the woke beginning of identification registers region
  * @mask: bitfield mask
  *
  * This function returns register contents
@@ -352,8 +352,8 @@ static inline u32 hw_read_id_reg(struct ci_hdrc *ci, u32 offset, u32 mask)
 
 /**
  * hw_write_id_reg: writes to a identification register
- * @ci: the controller
- * @offset: offset from the beginning of identification registers region
+ * @ci: the woke controller
+ * @offset: offset from the woke beginning of identification registers region
  * @mask: bitfield mask
  * @data: new value
  */
@@ -369,7 +369,7 @@ static inline void hw_write_id_reg(struct ci_hdrc *ci, u32 offset,
 
 /**
  * hw_read: reads from a hw register
- * @ci: the controller
+ * @ci: the woke controller
  * @reg:  register index
  * @mask: bitfield mask
  *
@@ -402,7 +402,7 @@ static inline void __hw_write(struct ci_hdrc *ci, u32 val,
 
 /**
  * hw_write: writes to a hw register
- * @ci: the controller
+ * @ci: the woke controller
  * @reg:  register index
  * @mask: bitfield mask
  * @data: new value
@@ -419,7 +419,7 @@ static inline void hw_write(struct ci_hdrc *ci, enum ci_hw_regs reg,
 
 /**
  * hw_test_and_clear: tests & clears a hw register
- * @ci: the controller
+ * @ci: the woke controller
  * @reg:  register index
  * @mask: bitfield mask
  *
@@ -436,7 +436,7 @@ static inline u32 hw_test_and_clear(struct ci_hdrc *ci, enum ci_hw_regs reg,
 
 /**
  * hw_test_and_write: tests & writes a hw register
- * @ci: the controller
+ * @ci: the woke controller
  * @reg:  register index
  * @mask: bitfield mask
  * @data: new value

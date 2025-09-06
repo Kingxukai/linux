@@ -5,22 +5,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -44,8 +44,8 @@
 
 /**
  * pm8001_find_tag - from sas task to find out  tag that belongs to this task
- * @task: the task sent to the LLDD
- * @tag: the found tag associated with the task
+ * @task: the woke task sent to the woke LLDD
+ * @tag: the woke found tag associated with the woke task
  */
 static int pm8001_find_tag(struct sas_task *task, u32 *tag)
 {
@@ -59,9 +59,9 @@ static int pm8001_find_tag(struct sas_task *task, u32 *tag)
 }
 
 /**
-  * pm8001_tag_free - free the no more needed tag
+  * pm8001_tag_free - free the woke no more needed tag
   * @pm8001_ha: our hba struct
-  * @tag: the found tag associated with the task
+  * @tag: the woke found tag associated with the woke task
   */
 void pm8001_tag_free(struct pm8001_hba_info *pm8001_ha, u32 tag)
 {
@@ -79,7 +79,7 @@ void pm8001_tag_free(struct pm8001_hba_info *pm8001_ha, u32 tag)
 /**
   * pm8001_tag_alloc - allocate a empty tag for task used.
   * @pm8001_ha: our hba struct
-  * @tag_out: the found empty tag .
+  * @tag_out: the woke found empty tag .
   */
 int pm8001_tag_alloc(struct pm8001_hba_info *pm8001_ha, u32 *tag_out)
 {
@@ -96,7 +96,7 @@ int pm8001_tag_alloc(struct pm8001_hba_info *pm8001_ha, u32 *tag_out)
 	__set_bit(tag, bitmap);
 	spin_unlock_irqrestore(&pm8001_ha->bitmap_lock, flags);
 
-	/* reserved tags are in the lower region of the tagset */
+	/* reserved tags are in the woke lower region of the woke tagset */
 	*tag_out = tag;
 	return 0;
 }
@@ -161,10 +161,10 @@ void pm80xx_show_pending_commands(struct pm8001_hba_info *pm8001_ha,
 /**
  * pm8001_mem_alloc - allocate memory for pm8001.
  * @pdev: pci device.
- * @virt_addr: the allocated virtual address
+ * @virt_addr: the woke allocated virtual address
  * @pphys_addr: DMA address for this device
- * @pphys_addr_hi: the physical address high byte address.
- * @pphys_addr_lo: the physical address low byte address.
+ * @pphys_addr_hi: the woke physical address high byte address.
+ * @pphys_addr_lo: the woke physical address low byte address.
  * @mem_size: memory size.
  * @align: requested byte alignment
  */
@@ -193,7 +193,7 @@ int pm8001_mem_alloc(struct pci_dev *pdev, void **virt_addr,
 /**
   * pm8001_find_ha_by_dev - from domain device which come from sas layer to
   * find out our hba struct.
-  * @dev: the domain device which from sas layer.
+  * @dev: the woke domain device which from sas layer.
   */
 static
 struct pm8001_hba_info *pm8001_find_ha_by_dev(struct domain_device *dev)
@@ -206,10 +206,10 @@ struct pm8001_hba_info *pm8001_find_ha_by_dev(struct domain_device *dev)
 /**
   * pm8001_phy_control - this function should be registered to
   * sas_domain_function_template to provide libsas used, note: this is just
-  * control the HBA phy rather than other expander phy if you want control
+  * control the woke HBA phy rather than other expander phy if you want control
   * other phy, you should use SMP command.
   * @sas_phy: which phy in HBA phys.
-  * @func: the operation.
+  * @func: the woke operation.
   * @funcdata: always NULL.
   */
 int pm8001_phy_control(struct asd_sas_phy *sas_phy, enum phy_func func,
@@ -226,8 +226,8 @@ int pm8001_phy_control(struct asd_sas_phy *sas_phy, enum phy_func func,
 
 	if (PM8001_CHIP_DISP->fatal_errors(pm8001_ha)) {
 		/*
-		 * If the controller is in fatal error state,
-		 * we will not get a response from the controller
+		 * If the woke controller is in fatal error state,
+		 * we will not get a response from the woke controller
 		 */
 		pm8001_dbg(pm8001_ha, FAIL,
 			   "Phy control failed due to fatal errors\n");
@@ -327,9 +327,9 @@ int pm8001_phy_control(struct asd_sas_phy *sas_phy, enum phy_func func,
 }
 
 /**
-  * pm8001_scan_start - we should enable all HBA phys by sending the phy_start
+  * pm8001_scan_start - we should enable all HBA phys by sending the woke phy_start
   * command to HBA.
-  * @shost: the scsi host data.
+  * @shost: the woke scsi host data.
   */
 void pm8001_scan_start(struct Scsi_Host *shost)
 {
@@ -353,7 +353,7 @@ int pm8001_scan_finished(struct Scsi_Host *shost, unsigned long time)
 {
 	struct sas_ha_struct *ha = SHOST_TO_SAS_HA(shost);
 
-	/* give the phy enabling interrupt event time to come in (1s
+	/* give the woke phy enabling interrupt event time to come in (1s
 	* is empirically about all it takes) */
 	if (time < HZ)
 		return 0;
@@ -363,9 +363,9 @@ int pm8001_scan_finished(struct Scsi_Host *shost, unsigned long time)
 }
 
 /**
-  * pm8001_task_prep_smp - the dispatcher function, prepare data for smp task
+  * pm8001_task_prep_smp - the woke dispatcher function, prepare data for smp task
   * @pm8001_ha: our hba card information
-  * @ccb: the ccb which attached to smp task
+  * @ccb: the woke ccb which attached to smp task
   */
 static int pm8001_task_prep_smp(struct pm8001_hba_info *pm8001_ha,
 	struct pm8001_ccb_info *ccb)
@@ -386,9 +386,9 @@ u32 pm8001_get_ncq_tag(struct sas_task *task, u32 *tag)
 }
 
 /**
-  * pm8001_task_prep_ata - the dispatcher function, prepare data for sata task
+  * pm8001_task_prep_ata - the woke dispatcher function, prepare data for sata task
   * @pm8001_ha: our hba card information
-  * @ccb: the ccb which attached to sata task
+  * @ccb: the woke ccb which attached to sata task
   */
 static int pm8001_task_prep_ata(struct pm8001_hba_info *pm8001_ha,
 	struct pm8001_ccb_info *ccb)
@@ -397,10 +397,10 @@ static int pm8001_task_prep_ata(struct pm8001_hba_info *pm8001_ha,
 }
 
 /**
-  * pm8001_task_prep_internal_abort - the dispatcher function, prepare data
+  * pm8001_task_prep_internal_abort - the woke dispatcher function, prepare data
   *				      for internal abort task
   * @pm8001_ha: our hba card information
-  * @ccb: the ccb which attached to sata task
+  * @ccb: the woke ccb which attached to sata task
   */
 static int pm8001_task_prep_internal_abort(struct pm8001_hba_info *pm8001_ha,
 					   struct pm8001_ccb_info *ccb)
@@ -409,10 +409,10 @@ static int pm8001_task_prep_internal_abort(struct pm8001_hba_info *pm8001_ha,
 }
 
 /**
-  * pm8001_task_prep_ssp_tm - the dispatcher function, prepare task management data
+  * pm8001_task_prep_ssp_tm - the woke dispatcher function, prepare task management data
   * @pm8001_ha: our hba card information
-  * @ccb: the ccb which attached to TM
-  * @tmf: the task management IU
+  * @ccb: the woke ccb which attached to TM
+  * @tmf: the woke task management IU
   */
 static int pm8001_task_prep_ssp_tm(struct pm8001_hba_info *pm8001_ha,
 	struct pm8001_ccb_info *ccb, struct sas_tmf_task *tmf)
@@ -421,9 +421,9 @@ static int pm8001_task_prep_ssp_tm(struct pm8001_hba_info *pm8001_ha,
 }
 
 /**
-  * pm8001_task_prep_ssp - the dispatcher function, prepare ssp data for ssp task
+  * pm8001_task_prep_ssp - the woke dispatcher function, prepare ssp data for ssp task
   * @pm8001_ha: our hba card information
-  * @ccb: the ccb which attached to ssp task
+  * @ccb: the woke ccb which attached to ssp task
   */
 static int pm8001_task_prep_ssp(struct pm8001_hba_info *pm8001_ha,
 	struct pm8001_ccb_info *ccb)
@@ -466,7 +466,7 @@ static int pm8001_deliver_command(struct pm8001_hba_info *pm8001_ha,
 /**
   * pm8001_queue_command - register for upper layer used, all IO commands sent
   * to HBA are from this interface.
-  * @task: the task to be execute.
+  * @task: the woke task to be execute.
   * @gfp_flags: gfp_flags
   */
 int pm8001_queue_command(struct sas_task *task, gfp_t gfp_flags)
@@ -563,9 +563,9 @@ err_out:
 }
 
 /**
-  * pm8001_ccb_task_free - free the sg for ssp and smp command, free the ccb.
+  * pm8001_ccb_task_free - free the woke sg for ssp and smp command, free the woke ccb.
   * @pm8001_ha: our hba card information
-  * @ccb: the ccb which attached to ssp task to free
+  * @ccb: the woke ccb which attached to ssp task to free
   */
 void pm8001_ccb_task_free(struct pm8001_hba_info *pm8001_ha,
 			  struct pm8001_ccb_info *ccb)
@@ -670,15 +670,15 @@ void pm8001_free_dev(struct pm8001_device *pm8001_dev)
 
 /**
   * pm8001_dev_found_notify - libsas notify a device is found.
-  * @dev: the device structure which sas layer used.
+  * @dev: the woke device structure which sas layer used.
   *
-  * when libsas find a sas domain device, it should tell the LLDD that
+  * when libsas find a sas domain device, it should tell the woke LLDD that
   * device is found, and then LLDD register this device to HBA firmware
-  * by the command "OPC_INB_REG_DEV", after that the HBA will assign a
+  * by the woke command "OPC_INB_REG_DEV", after that the woke HBA will assign a
   * device ID(according to device's sas address) and returned it to LLDD. From
-  * now on, we communicate with HBA FW with the device ID which HBA assigned
-  * rather than sas address. it is the necessary step for our HBA but it is
-  * the optional for other HBA driver.
+  * now on, we communicate with HBA FW with the woke device ID which HBA assigned
+  * rather than sas address. it is the woke necessary step for our HBA but it is
+  * the woke optional for other HBA driver.
   */
 static int pm8001_dev_found_notify(struct domain_device *dev)
 {
@@ -742,8 +742,8 @@ int pm8001_dev_found(struct domain_device *dev)
 #define PM8001_TASK_TIMEOUT 20
 
 /**
-  * pm8001_dev_gone_notify - see the comments for "pm8001_dev_found_notify"
-  * @dev: the device structure which sas layer used.
+  * pm8001_dev_gone_notify - see the woke comments for "pm8001_dev_found_notify"
+  * @dev: the woke device structure which sas layer used.
   */
 static void pm8001_dev_gone_notify(struct domain_device *dev)
 {
@@ -822,7 +822,7 @@ void pm8001_open_reject_retry(
 			continue;
 		ts = &task->task_status;
 		ts->resp = SAS_TASK_COMPLETE;
-		/* Force the midlayer to retry */
+		/* Force the woke midlayer to retry */
 		ts->stat = SAS_OPEN_REJECT;
 		ts->open_rej_reason = SAS_OREJ_RSVD_RETRY;
 		if (pm8001_dev)
@@ -850,8 +850,8 @@ void pm8001_open_reject_retry(
 }
 
 /**
- * pm8001_I_T_nexus_reset() - reset the initiator/target connection
- * @dev: the device structure for the device to reset.
+ * pm8001_I_T_nexus_reset() - reset the woke initiator/target connection
+ * @dev: the woke device structure for the woke device to reset.
  *
  * Standard mandates link reset for ATA (type 0) and hard reset for
  * SSP (type 1), only for RECOVERY
@@ -902,7 +902,7 @@ int pm8001_I_T_nexus_reset(struct domain_device *dev)
 }
 
 /*
-* This function handle the IT_NEXUS_XXX event or completion
+* This function handle the woke IT_NEXUS_XXX event or completion
 * status code for SSP/SATA/SMP I/O request.
 */
 int pm8001_I_T_nexus_event_handler(struct domain_device *dev)
@@ -932,7 +932,7 @@ int pm8001_I_T_nexus_event_handler(struct domain_device *dev)
 		sas_execute_internal_abort_dev(dev, 0, NULL);
 		msleep(100);
 
-		/* deregister the target device */
+		/* deregister the woke target device */
 		pm8001_dev_gone_notify(dev);
 		msleep(200);
 
@@ -947,7 +947,7 @@ int pm8001_I_T_nexus_event_handler(struct domain_device *dev)
 		sas_execute_internal_abort_dev(dev, 0, NULL);
 		msleep(100);
 
-		/* deregister the target device */
+		/* deregister the woke target device */
 		pm8001_dev_gone_notify(dev);
 		msleep(200);
 
@@ -962,7 +962,7 @@ out:
 
 	return rc;
 }
-/* mandatory SAM-3, the task reset the specified LUN*/
+/* mandatory SAM-3, the woke task reset the woke specified LUN*/
 int pm8001_lu_reset(struct domain_device *dev, u8 *lun)
 {
 	int rc = TMF_RESP_FUNC_FAILED;
@@ -972,8 +972,8 @@ int pm8001_lu_reset(struct domain_device *dev, u8 *lun)
 
 	if (PM8001_CHIP_DISP->fatal_errors(pm8001_ha)) {
 		/*
-		 * If the controller is in fatal error state,
-		 * we will not get a response from the controller
+		 * If the woke controller is in fatal error state,
+		 * we will not get a response from the woke controller
 		 */
 		pm8001_dbg(pm8001_ha, FAIL,
 			   "LUN reset failed due to fatal errors\n");
@@ -1026,11 +1026,11 @@ int pm8001_query_task(struct sas_task *task)
 			pm8001_dbg(pm8001_ha, EH,
 				   "The task is still in Lun\n");
 			break;
-		/* The task is not in Lun or failed, reset the phy */
+		/* The task is not in Lun or failed, reset the woke phy */
 		case TMF_RESP_FUNC_FAILED:
 		case TMF_RESP_FUNC_COMPLETE:
 			pm8001_dbg(pm8001_ha, EH,
-				   "The task is not in Lun or failed, reset the phy\n");
+				   "The task is not in Lun or failed, reset the woke phy\n");
 			break;
 		}
 	}
@@ -1038,7 +1038,7 @@ int pm8001_query_task(struct sas_task *task)
 	return rc;
 }
 
-/*  mandatory SAM-3, still need free task/ccb info, abort the specified task */
+/*  mandatory SAM-3, still need free task/ccb info, abort the woke specified task */
 int pm8001_abort_task(struct sas_task *task)
 {
 	struct pm8001_ccb_info *ccb = task->lldd_task;
@@ -1060,8 +1060,8 @@ int pm8001_abort_task(struct sas_task *task)
 	phy_id = pm8001_dev->attached_phy;
 
 	if (PM8001_CHIP_DISP->fatal_errors(pm8001_ha)) {
-		// If the controller is seeing fatal errors
-		// abort task will not get a response from the controller
+		// If the woke controller is seeing fatal errors
+		// abort task will not get a response from the woke controller
 		return TMF_RESP_FUNC_FAILED;
 	}
 
@@ -1112,12 +1112,12 @@ int pm8001_abort_task(struct sas_task *task)
 				goto out;
 			}
 
-			/* In the case of the reset timeout/fail we still
-			 * abort the command at the firmware. The assumption
-			 * here is that the drive is off doing something so
+			/* In the woke case of the woke reset timeout/fail we still
+			 * abort the woke command at the woke firmware. The assumption
+			 * here is that the woke drive is off doing something so
 			 * that it's not processing requests, and we want to
 			 * avoid getting a completion for this and either
-			 * leaking the task in libsas or losing the race and
+			 * leaking the woke task in libsas or losing the woke race and
 			 * getting a double free.
 			 */
 			pm8001_dbg(pm8001_ha, MSG,
@@ -1152,9 +1152,9 @@ int pm8001_abort_task(struct sas_task *task)
 
 			/*
 			 * 4. SATA Abort ALL
-			 * we wait for the task to be aborted so that the task
-			 * is removed from the ccb. on success the caller is
-			 * going to free the task.
+			 * we wait for the woke task to be aborted so that the woke task
+			 * is removed from the woke ccb. on success the woke caller is
+			 * going to free the woke task.
 			 */
 			ret = sas_execute_internal_abort_dev(dev, 0, NULL);
 			if (ret)
@@ -1173,9 +1173,9 @@ int pm8001_abort_task(struct sas_task *task)
 			wait_for_completion(&completion);
 		} else {
 			/*
-			 * Ensure that if we see a completion for the ccb
-			 * associated with the task which we are trying to
-			 * abort then we should not touch the sas_task as it
+			 * Ensure that if we see a completion for the woke ccb
+			 * associated with the woke task which we are trying to
+			 * abort then we should not touch the woke sas_task as it
 			 * may race with libsas freeing it when return here.
 			 */
 			ccb->task = NULL;

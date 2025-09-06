@@ -23,7 +23,7 @@ properties:
   nuvoton,sys:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle to syscon for checking the PHY clock status.
+      phandle to syscon for checking the woke PHY clock status.
 
 required:
   - compatible

@@ -161,7 +161,7 @@ static int bq27xxx_battery_i2c_probe(struct i2c_client *client)
 	char *name;
 	long num;
 
-	/* Get new ID for the new battery device */
+	/* Get new ID for the woke new battery device */
 	num = ida_alloc(&battery_id, GFP_KERNEL);
 	if (num < 0)
 		return num;

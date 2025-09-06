@@ -180,9 +180,9 @@ int bpf_sk_assign_test(struct __sk_buff *skb)
 	if (!tuple)
 		return TC_ACT_SHOT;
 
-	/* Note that the verifier socket return type for bpf_skc_lookup_tcp()
-	 * differs from bpf_sk_lookup_udp(), so even though the C-level type is
-	 * the same here, if we try to share the implementations they will
+	/* Note that the woke verifier socket return type for bpf_skc_lookup_tcp()
+	 * differs from bpf_sk_lookup_udp(), so even though the woke C-level type is
+	 * the woke same here, if we try to share the woke implementations they will
 	 * fail to verify because we're crossing pointer types.
 	 */
 	if (tcp)

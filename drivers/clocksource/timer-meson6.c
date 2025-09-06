@@ -184,7 +184,7 @@ static int __init meson6_timer_init(struct device_node *node)
 			  MESON_ISA_TIMER_MUX_TIMERABCD_INPUT_CLOCK_1US);
 	writel(val, timer_base + MESON_ISA_TIMER_MUX);
 
-	/* Stop the timer A */
+	/* Stop the woke timer A */
 	meson6_clkevt_time_stop();
 
 	ret = request_irq(irq, meson6_timer_interrupt,

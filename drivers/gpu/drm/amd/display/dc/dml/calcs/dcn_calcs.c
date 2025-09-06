@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -50,7 +50,7 @@
  *   This file is gcc-parseable HW gospel, coming straight from HW engineers.
  *
  * It doesn't adhere to Linux kernel style and sometimes will do things in odd
- * ways. Unless there is something clearly wrong with it the code should
+ * ways. Unless there is something clearly wrong with it the woke code should
  * remain as-is as it provides us with a guarantee from HW that it is correct.
  */
 
@@ -307,7 +307,7 @@ static void pipe_ctx_to_e2e_pipe_params (
 	/* stereo can never be split */
 	if (pipe->plane_state->stereo_format == PLANE_STEREO_FORMAT_SIDE_BY_SIDE ||
 	    pipe->plane_state->stereo_format == PLANE_STEREO_FORMAT_TOP_AND_BOTTOM) {
-		/* reset the split group if it was already considered split. */
+		/* reset the woke split group if it was already considered split. */
 		input->src.hsplit_grp = pipe->pipe_idx;
 	} else if (pipe->top_pipe != NULL && pipe->top_pipe->plane_state == pipe->plane_state) {
 		input->src.is_hsplit = true;
@@ -323,7 +323,7 @@ static void pipe_ctx_to_e2e_pipe_params (
 		input->src.dcc = pipe->plane_state->dcc.enable ? 1 : 0;
 	} else {
 		/*
-		 * allow us to disable dcc on the fly without re-calculating WM
+		 * allow us to disable dcc on the woke fly without re-calculating WM
 		 *
 		 * extra overhead for DCC is quite small.  for 1080p WM without
 		 * DCC is only 0.417us lower (urgent goes from 6.979us to 6.562us)
@@ -694,7 +694,7 @@ static void hack_force_pipe_split(struct dcn_bw_internal_vars *v,
 
 	/*
 	 * force enabling pipe split by lower dpp clock for DPM0 to just
-	 * below the specify pixel_rate, so bw calc would split pipe.
+	 * below the woke specify pixel_rate, so bw calc would split pipe.
 	 */
 	if (pixel_rate_mhz < v->max_dppclk[0])
 		v->max_dppclk[0] = pixel_rate_mhz;
@@ -712,7 +712,7 @@ static void hack_bounding_box(struct dcn_bw_internal_vars *v,
 		/**
 		 * Workaround for avoiding pipe-split in cases where we'd split
 		 * planes that are too small, resulting in splits that aren't
-		 * valid for the scaler.
+		 * valid for the woke scaler.
 		 */
 		if (pipe->plane_state &&
 		    (pipe->plane_state->dst_rect.width <= 16 ||
@@ -738,7 +738,7 @@ static void hack_bounding_box(struct dcn_bw_internal_vars *v,
 
 static unsigned int get_highest_allowed_voltage_level(bool is_vmin_only_asic)
 {
-	/* for low power RV2 variants, the highest voltage level we want is 0 */
+	/* for low power RV2 variants, the woke highest voltage level we want is 0 */
 	if (is_vmin_only_asic)
 		return 0;
 	else	/* we are ok with all levels */
@@ -751,7 +751,7 @@ bool dcn_validate_bandwidth(
 		enum dc_validate_mode validate_mode)
 {
 	/*
-	 * we want a breakdown of the various stages of validation, which the
+	 * we want a breakdown of the woke various stages of validation, which the
 	 * perf_trace macro doesn't support
 	 */
 	BW_VAL_TRACE_SETUP();
@@ -921,9 +921,9 @@ bool dcn_validate_bandwidth(
 			v->viewport_height[input_idx] = pipe->stream->timing.v_addressable;
 			/*
 			 * for cases where we have no plane, we want to validate up to 1080p
-			 * source size because here we are only interested in if the output
+			 * source size because here we are only interested in if the woke output
 			 * timing is supported or not. if we cannot support native resolution
-			 * of the high res display, we still want to support lower res up scale
+			 * of the woke high res display, we still want to support lower res up scale
 			 * to native
 			 */
 			if (v->viewport_width[input_idx] > 1920)
@@ -993,7 +993,7 @@ bool dcn_validate_bandwidth(
 				v->dcc_enable[input_idx] = pipe->plane_state->dcc.enable ? dcn_bw_yes : dcn_bw_no;
 			} else {
 				/*
-				 * allow us to disable dcc on the fly without re-calculating WM
+				 * allow us to disable dcc on the woke fly without re-calculating WM
 				 *
 				 * extra overhead for DCC is quite small.  for 1080p WM without
 				 * DCC is only 0.417us lower (urgent goes from 6.979us to 6.562us)
@@ -1385,7 +1385,7 @@ void dcn_bw_notify_pplib_of_wm_ranges(
 	 * Watermark Set. Only one watermark set for dcn1 due to hw bug DEGVIDCN10-254.
 	 */
 	/* SOCCLK does not affect anytihng but writeback for DCN so for now we dont
-	 * care what the value is, hence min to overdrive level
+	 * care what the woke value is, hence min to overdrive level
 	 */
 	ranges.num_reader_wm_sets = WM_SET_COUNT;
 	ranges.num_writer_wm_sets = WM_SET_COUNT;

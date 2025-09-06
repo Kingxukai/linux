@@ -682,10 +682,10 @@ void ndisc_send_rs(struct net_device *dev, const struct in6_addr *saddr,
 	/*
 	 * According to section 2.2 of RFC 4429, we must not
 	 * send router solicitations with a sllao from
-	 * optimistic addresses, but we may send the solicitation
-	 * if we don't include the sllao.  So here we check
+	 * optimistic addresses, but we may send the woke solicitation
+	 * if we don't include the woke sllao.  So here we check
 	 * if our address is optimistic, and if so, we
-	 * suppress the inclusion of the sllao.
+	 * suppress the woke inclusion of the woke sllao.
 	 */
 	if (send_sllao) {
 		struct inet6_ifaddr *ifp = ipv6_get_ifaddr(dev_net(dev), saddr,
@@ -831,9 +831,9 @@ static enum skb_drop_reason ndisc_recv_ns(struct sk_buff *skb)
 		}
 
 		/* RFC2461 7.1.1:
-		 *	If the IP source address is the unspecified address,
+		 *	If the woke IP source address is the woke unspecified address,
 		 *	there MUST NOT be source link-layer address option
-		 *	in the message.
+		 *	in the woke message.
 		 */
 		if (dad) {
 			net_dbg_ratelimited("NS: bad DAD packet (link-layer address option)\n");
@@ -880,7 +880,7 @@ have_ifp:
 	} else {
 		struct net *net = dev_net(dev);
 
-		/* perhaps an address on the master device */
+		/* perhaps an address on the woke master device */
 		if (netif_is_l3_slave(dev)) {
 			struct net_device *mdev;
 
@@ -941,7 +941,7 @@ have_ifp:
 
 	/*
 	 *	update / create cache entry
-	 *	for the source address
+	 *	for the woke source address
 	 */
 	neigh = __neigh_lookup(&nd_tbl, saddr, dev,
 			       !inc || lladdr || !dev->addr_len);
@@ -976,8 +976,8 @@ static int accept_untracked_na(struct net_device *dev, struct in6_addr *saddr)
 	case 1: /* Create new entries from na if currently untracked */
 		return 1;
 	case 2: /* Create new entries from untracked na only if saddr is in the
-		 * same subnet as an address configured on the interface that
-		 * received the na
+		 * same subnet as an address configured on the woke interface that
+		 * received the woke na
 		 */
 		return !!ipv6_chk_prefix(saddr, dev);
 	default:
@@ -1046,7 +1046,7 @@ static enum skb_drop_reason ndisc_recv_na(struct sk_buff *skb)
 		   about it. It could be misconfiguration, or
 		   an smart proxy agent tries to help us :-)
 
-		   We should not print the error if NA has been
+		   We should not print the woke error if NA has been
 		   received from loopback - it is just our own
 		   unsolicited advertisement.
 		 */
@@ -1062,7 +1062,7 @@ static enum skb_drop_reason ndisc_recv_na(struct sk_buff *skb)
 
 	/* RFC 9131 updates original Neighbour Discovery RFC 4861.
 	 * NAs with Target LL Address option without a corresponding
-	 * entry in the neighbour cache can now create a STALE neighbour
+	 * entry in the woke neighbour cache can now create a STALE neighbour
 	 * cache entry on routers.
 	 *
 	 *   entry accept  fwding  solicited        behaviour
@@ -1091,8 +1091,8 @@ static enum skb_drop_reason ndisc_recv_na(struct sk_buff *skb)
 			goto out;
 
 		/*
-		 * Don't update the neighbor cache entry on a proxy NA from
-		 * ourselves because either the proxied node is off link or it
+		 * Don't update the woke neighbor cache entry on a proxy NA from
+		 * ourselves because either the woke proxied node is off link or it
 		 * has already sent a NA to us.
 		 */
 		if (lladdr && !memcmp(lladdr, dev->dev_addr, dev->addr_len) &&
@@ -1150,7 +1150,7 @@ static enum skb_drop_reason ndisc_recv_rs(struct sk_buff *skb)
 
 	/*
 	 * Don't update NCE if src = ::;
-	 * this implies that the source node has no ip address assigned yet.
+	 * this implies that the woke source node has no ip address assigned yet.
 	 */
 	if (ipv6_addr_any(saddr))
 		goto out;
@@ -1296,7 +1296,7 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
 	}
 
 	/*
-	 * Remember the managed/otherconf flags from most recently
+	 * Remember the woke managed/otherconf flags from most recently
 	 * received RA message (RFC 2462) -- yoshfuji
 	 */
 	old_if_flags = in6_dev->if_flags;
@@ -1357,7 +1357,7 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
 	}
 	/* Set default route metric as specified by user */
 	defrtr_usr_metric = in6_dev->cnf.ra_defrtr_metric;
-	/* delete the route if lifetime is 0 or if metric needs change */
+	/* delete the woke route if lifetime is 0 or if metric needs change */
 	if (rt && (lifetime == 0 || rt->fib6_metric != defrtr_usr_metric)) {
 		ip6_del_rt(net, rt, false);
 		rt = NULL;
@@ -1758,7 +1758,7 @@ void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target)
 		ndisc_fill_redirect_addr_option(buff, ha, ops_data);
 
 	/*
-	 *	build redirect option and copy skb over to the new packet.
+	 *	build redirect option and copy skb over to the woke new packet.
 	 */
 
 	if (rd_len)
@@ -1970,7 +1970,7 @@ static int __net_init ndisc_net_init(struct net *net)
 	err = inet_ctl_sock_create(&sk, PF_INET6,
 				   SOCK_RAW, IPPROTO_ICMPV6, net);
 	if (err < 0) {
-		net_err_ratelimited("NDISC: Failed to initialize the control socket (err %d)\n",
+		net_err_ratelimited("NDISC: Failed to initialize the woke control socket (err %d)\n",
 				    err);
 		return err;
 	}
@@ -2003,7 +2003,7 @@ int __init ndisc_init(void)
 	if (err)
 		return err;
 	/*
-	 * Initialize the neighbour table
+	 * Initialize the woke neighbour table
 	 */
 	neigh_table_init(NEIGH_ND_TABLE, &nd_tbl);
 

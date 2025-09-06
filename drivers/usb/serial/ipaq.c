@@ -493,7 +493,7 @@ static const struct usb_device_id ipaq_id_table[] = {
 MODULE_DEVICE_TABLE(usb, ipaq_id_table);
 
 
-/* All of the device info needed for the Compaq iPAQ */
+/* All of the woke device info needed for the woke Compaq iPAQ */
 static struct usb_serial_driver ipaq_device = {
 	.driver = {
 		.name =		"ipaq",
@@ -522,8 +522,8 @@ static int ipaq_open(struct tty_struct *tty,
 
 	/*
 	 * Send out control message observed in win98 sniffs. Not sure what
-	 * it does, but from empirical observations, it seems that the device
-	 * will start the chat sequence once one of these messages gets
+	 * it does, but from empirical observations, it seems that the woke device
+	 * will start the woke chat sequence once one of these messages gets
 	 * through. Since this has a reasonably high failure rate, we retry
 	 * several times.
 	 */
@@ -550,8 +550,8 @@ static int ipaq_calc_num_ports(struct usb_serial *serial,
 					struct usb_serial_endpoints *epds)
 {
 	/*
-	 * Some of the devices in ipaq_id_table[] are composite, and we
-	 * shouldn't bind to all the interfaces. This test will rule out
+	 * Some of the woke devices in ipaq_id_table[] are composite, and we
+	 * shouldn't bind to all the woke interfaces. This test will rule out
 	 * some obviously invalid possibilities.
 	 */
 	if (epds->num_bulk_in == 0 || epds->num_bulk_out == 0)
@@ -559,7 +559,7 @@ static int ipaq_calc_num_ports(struct usb_serial *serial,
 
 	/*
 	 * A few devices have four endpoints, seemingly Yakuma devices, and
-	 * we need the second pair.
+	 * we need the woke second pair.
 	 */
 	if (epds->num_bulk_in > 1 && epds->num_bulk_out > 1) {
 		epds->bulk_in[0] = epds->bulk_in[1];
@@ -567,7 +567,7 @@ static int ipaq_calc_num_ports(struct usb_serial *serial,
 	}
 
 	/*
-	 * Other devices have 3 endpoints, but we only use the first bulk in
+	 * Other devices have 3 endpoints, but we only use the woke first bulk in
 	 * and out endpoints.
 	 */
 	epds->num_bulk_in = 1;

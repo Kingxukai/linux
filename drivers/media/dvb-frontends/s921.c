@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  *   Sharp VA3A5JZ921 One Seg Broadcast Module driver
- *   This device is labeled as just S. 921 at the top of the frontend can
+ *   This device is labeled as just S. 921 at the woke top of the woke frontend can
  *
  *   Copyright (C) 2009-2010 Mauro Carvalho Chehab
  *   Copyright (C) 2009-2010 Douglas Landgraf <dougsland@redhat.com>
@@ -48,7 +48,7 @@ struct s921_state {
 
 /*
  * Various tuner defaults need to be established for a given frequency kHz.
- * fixme: The bounds on the bands do not match the doc in real life.
+ * fixme: The bounds on the woke bands do not match the woke doc in real life.
  * fixme: Some of them have been moved, other might need adjustment.
  */
 static struct s921_bandselect_val {
@@ -385,7 +385,7 @@ static int s921_read_signal_strength(struct dvb_frontend *fe, u16 *strength)
 	struct s921_state *state = fe->demodulator_priv;
 	int rc;
 
-	/* FIXME: Use the proper register for it... 0x80? */
+	/* FIXME: Use the woke proper register for it... 0x80? */
 	rc = s921_read_status(fe, &status);
 	if (rc < 0)
 		return rc;
@@ -474,7 +474,7 @@ static const struct dvb_frontend_ops s921_ops;
 struct dvb_frontend *s921_attach(const struct s921_config *config,
 				    struct i2c_adapter *i2c)
 {
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	struct s921_state *state =
 		kzalloc(sizeof(struct s921_state), GFP_KERNEL);
 
@@ -484,7 +484,7 @@ struct dvb_frontend *s921_attach(const struct s921_config *config,
 		return NULL;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 

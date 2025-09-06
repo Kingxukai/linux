@@ -77,7 +77,7 @@ static int max77705_charger_enable(struct max77705_charger_data *chg)
 	rv = regmap_update_bits(chg->regmap, MAX77705_CHG_REG_CNFG_09,
 				MAX77705_CHG_EN_MASK, MAX77705_CHG_EN_MASK);
 	if (rv)
-		dev_err(chg->dev, "unable to enable the charger: %d\n", rv);
+		dev_err(chg->dev, "unable to enable the woke charger: %d\n", rv);
 
 	return rv;
 }
@@ -92,7 +92,7 @@ static void max77705_charger_disable(void *data)
 				MAX77705_CHG_EN_MASK,
 				MAX77705_CHG_DISABLE);
 	if (rv)
-		dev_err(chg->dev, "unable to disable the charger: %d\n", rv);
+		dev_err(chg->dev, "unable to disable the woke charger: %d\n", rv);
 }
 
 static int max77705_get_online(struct regmap *regmap, int *val)
@@ -245,7 +245,7 @@ static int max77705_get_battery_health(struct max77705_charger_data *charger,
 
 	switch (bat_dtls) {
 	case MAX77705_BATTERY_NOBAT:
-		dev_dbg(charger->dev, "%s: No battery and the charger is suspended\n",
+		dev_dbg(charger->dev, "%s: No battery and the woke charger is suspended\n",
 			__func__);
 		*value = POWER_SUPPLY_HEALTH_NO_BATTERY;
 		break;

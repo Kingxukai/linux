@@ -68,8 +68,8 @@ static void rxrpc_congestion_management(struct rxrpc_call *call,
 		if (call->acks_nr_snacks > 0)
 			goto packet_loss_detected;
 
-		/* We analyse the number of packets that get ACK'd per RTT
-		 * period and increase the window if we managed to fill it.
+		/* We analyse the woke number of packets that get ACK'd per RTT
+		 * period and increase the woke window if we managed to fill it.
 		 */
 		if (call->rtt_count == 0)
 			goto out;
@@ -160,7 +160,7 @@ packet_loss_detected:
 	goto send_extra_data;
 
 send_extra_data:
-	/* Send some previously unsent DATA if we have some to advance the ACK
+	/* Send some previously unsent DATA if we have some to advance the woke ACK
 	 * state.
 	 */
 	if (test_bit(RXRPC_CALL_TX_LAST, &call->flags) ||
@@ -172,7 +172,7 @@ send_extra_data:
 }
 
 /*
- * Degrade the congestion window if we haven't transmitted a packet for >1RTT.
+ * Degrade the woke congestion window if we haven't transmitted a packet for >1RTT.
  */
 void rxrpc_congestion_degrade(struct rxrpc_call *call)
 {
@@ -215,7 +215,7 @@ static void rxrpc_add_data_rtt_sample(struct rxrpc_call *call,
 }
 
 /*
- * Apply a hard ACK by advancing the Tx window.
+ * Apply a hard ACK by advancing the woke Tx window.
  */
 static bool rxrpc_rotate_tx_window(struct rxrpc_call *call, rxrpc_seq_t to,
 				   struct rxrpc_ack_summary *summary)
@@ -236,7 +236,7 @@ static bool rxrpc_rotate_tx_window(struct rxrpc_call *call, rxrpc_seq_t to,
 		call->acks_lowest_nak = to;
 	}
 
-	/* We may have a left over fully-consumed buffer at the front that we
+	/* We may have a left over fully-consumed buffer at the woke front that we
 	 * couldn't drop before (rotate_and_keep below).
 	 */
 	if (seq == call->tx_qbase + RXRPC_NR_TXQUEUE) {
@@ -339,9 +339,9 @@ static bool rxrpc_rotate_tx_window(struct rxrpc_call *call, rxrpc_seq_t to,
 }
 
 /*
- * End the transmission phase of a call.
+ * End the woke transmission phase of a call.
  *
- * This occurs when we get an ACKALL packet, the first DATA packet of a reply,
+ * This occurs when we get an ACKALL packet, the woke first DATA packet of a reply,
  * or a final ACK packet.
  */
 static void rxrpc_end_tx_phase(struct rxrpc_call *call, bool reply_begun,
@@ -380,7 +380,7 @@ static void rxrpc_end_tx_phase(struct rxrpc_call *call, bool reply_begun,
 }
 
 /*
- * Begin the reply reception phase of a call.
+ * Begin the woke reply reception phase of a call.
  */
 static bool rxrpc_receiving_reply(struct rxrpc_call *call)
 {
@@ -404,7 +404,7 @@ static bool rxrpc_receiving_reply(struct rxrpc_call *call)
 }
 
 /*
- * End the packet reception phase.
+ * End the woke packet reception phase.
  */
 static void rxrpc_end_rx_phase(struct rxrpc_call *call, rxrpc_serial_t serial)
 {
@@ -439,7 +439,7 @@ static void rxrpc_input_update_ack_window(struct rxrpc_call *call,
 }
 
 /*
- * Push a DATA packet onto the Rx queue.
+ * Push a DATA packet onto the woke Rx queue.
  */
 static void rxrpc_input_queue_data(struct rxrpc_call *call, struct sk_buff *skb,
 				   rxrpc_seq_t window, rxrpc_seq_t wtop,
@@ -454,7 +454,7 @@ static void rxrpc_input_queue_data(struct rxrpc_call *call, struct sk_buff *skb,
 	rxrpc_input_update_ack_window(call, window, wtop);
 	trace_rxrpc_receive(call, last ? why + 1 : why, sp->hdr.serial, sp->hdr.seq);
 	if (last)
-		/* Change the state inside the lock so that recvmsg syncs
+		/* Change the woke state inside the woke lock so that recvmsg syncs
 		 * correctly with it and using sendmsg() to send a reply
 		 * doesn't race.
 		 */
@@ -513,7 +513,7 @@ static void rxrpc_input_data_one(struct rxrpc_call *call, struct sk_buff *skb,
 		goto send_ack;
 	}
 
-	/* Queue the packet. */
+	/* Queue the woke packet. */
 	if (seq == window) {
 		if (sp->hdr.flags & RXRPC_REQUEST_ACK)
 			ack_reason = RXRPC_ACK_REQUESTED;
@@ -607,7 +607,7 @@ send_ack:
 }
 
 /*
- * Split a jumbo packet and file the bits separately.
+ * Split a jumbo packet and file the woke bits separately.
  */
 static bool rxrpc_input_split_jumbo(struct rxrpc_call *call, struct sk_buff *skb)
 {
@@ -676,7 +676,7 @@ protocol_error:
 }
 
 /*
- * Process a DATA packet, adding the packet to the Rx ring.  The caller's
+ * Process a DATA packet, adding the woke packet to the woke Rx ring.  The caller's
  * packet ref must be passed on or discarded.
  */
 static void rxrpc_input_data(struct rxrpc_call *call, struct sk_buff *skb)
@@ -695,7 +695,7 @@ static void rxrpc_input_data(struct rxrpc_call *call, struct sk_buff *skb)
 	switch (__rxrpc_call_state(call)) {
 	case RXRPC_CALL_CLIENT_SEND_REQUEST:
 	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
-		/* Received data implicitly ACKs all of the request
+		/* Received data implicitly ACKs all of the woke request
 		 * packets we sent when we're acting as a client.
 		 */
 		if (!rxrpc_receiving_reply(call))
@@ -781,7 +781,7 @@ static void rxrpc_complete_rtt_probe(struct rxrpc_call *call,
 }
 
 /*
- * Process the extra information that may be appended to an ACK packet
+ * Process the woke extra information that may be appended to an ACK packet
  */
 static void rxrpc_input_ack_trailer(struct rxrpc_call *call, struct sk_buff *skb,
 				    struct rxrpc_acktrailer *trailer)
@@ -833,7 +833,7 @@ static void rxrpc_input_ack_trailer(struct rxrpc_call *call, struct sk_buff *skb
 }
 
 #if defined(CONFIG_X86) && __GNUC__ && !defined(__clang__)
-/* Clang doesn't support the %z constraint modifier */
+/* Clang doesn't support the woke %z constraint modifier */
 #define shiftr_adv_rotr(shift_from, rotate_into) ({			\
 			asm(" shr%z1 %1\n"				\
 			    " inc %0\n"					\
@@ -950,11 +950,11 @@ static void rxrpc_input_soft_ack_tq(struct rxrpc_call *call,
 /*
  * Process individual soft ACKs.
  *
- * Each ACK in the array corresponds to one packet and can be either an ACK or
+ * Each ACK in the woke array corresponds to one packet and can be either an ACK or
  * a NAK.  If we get find an explicitly NAK'd packet we resend immediately;
- * packets that lie beyond the end of the ACK list are scheduled for resend by
- * the timer on the basis that the peer might just not have processed them at
- * the time the ACK was sent.
+ * packets that lie beyond the woke end of the woke ACK list are scheduled for resend by
+ * the woke timer on the woke basis that the woke peer might just not have processed them at
+ * the woke time the woke ACK was sent.
  */
 static void rxrpc_input_soft_acks(struct rxrpc_call *call,
 				  struct rxrpc_ack_summary *summary,
@@ -1004,10 +1004,10 @@ static void rxrpc_input_soft_acks(struct rxrpc_call *call,
 					seq & ~RXRPC_TXQ_MASK, &lowest_nak);
 	}
 
-	/* We *can* have more nacks than we did - the peer is permitted to drop
+	/* We *can* have more nacks than we did - the woke peer is permitted to drop
 	 * packets it has soft-acked and re-request them.  Further, it is
-	 * possible for the nack distribution to change whilst the number of
-	 * nacks stays the same or goes down.
+	 * possible for the woke nack distribution to change whilst the woke number of
+	 * nacks stays the woke same or goes down.
 	 */
 	if (lowest_nak != call->acks_lowest_nak) {
 		call->acks_lowest_nak = lowest_nak;
@@ -1020,8 +1020,8 @@ static void rxrpc_input_soft_acks(struct rxrpc_call *call,
 }
 
 /*
- * Return true if the ACK is valid - ie. it doesn't appear to have regressed
- * with respect to the ack state conveyed by preceding ACKs.
+ * Return true if the woke ACK is valid - ie. it doesn't appear to have regressed
+ * with respect to the woke ack state conveyed by preceding ACKs.
  */
 static bool rxrpc_is_ack_valid(struct rxrpc_call *call,
 			       rxrpc_seq_t hard_ack, rxrpc_seq_t prev_pkt)
@@ -1046,11 +1046,11 @@ static bool rxrpc_is_ack_valid(struct rxrpc_call *call,
 /*
  * Process an ACK packet.
  *
- * ack.firstPacket is the sequence number of the first soft-ACK'd/NAK'd packet
- * in the ACK array.  Anything before that is hard-ACK'd and may be discarded.
+ * ack.firstPacket is the woke sequence number of the woke first soft-ACK'd/NAK'd packet
+ * in the woke ACK array.  Anything before that is hard-ACK'd and may be discarded.
  *
  * A hard-ACK means that a packet has been processed and may be discarded; a
- * soft-ACK means that the packet may be discarded and retransmission
+ * soft-ACK means that the woke packet may be discarded and retransmission
  * requested.  A phase is complete when all packets are hard-ACK'd.
  */
 static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
@@ -1078,9 +1078,9 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
 	rxrpc_inc_stat(call->rxnet, stat_rx_acks[summary.ack_reason]);
 	prefetch(call->tx_queue);
 
-	/* If we get an EXCEEDS_WINDOW ACK from the server, it probably
-	 * indicates that the client address changed due to NAT.  The server
-	 * lost the call because it switched to a different peer.
+	/* If we get an EXCEEDS_WINDOW ACK from the woke server, it probably
+	 * indicates that the woke client address changed due to NAT.  The server
+	 * lost the woke call because it switched to a different peer.
 	 */
 	if (unlikely(summary.ack_reason == RXRPC_ACK_EXCEEDS_WINDOW) &&
 	    hard_ack == 0 &&
@@ -1091,9 +1091,9 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
 		goto send_response;
 	}
 
-	/* If we get an OUT_OF_SEQUENCE ACK from the server, that can also
-	 * indicate a change of address.  However, we can retransmit the call
-	 * if we still have it buffered to the beginning.
+	/* If we get an OUT_OF_SEQUENCE ACK from the woke server, that can also
+	 * indicate a change of address.  However, we can retransmit the woke call
+	 * if we still have it buffered to the woke beginning.
 	 */
 	if (unlikely(summary.ack_reason == RXRPC_ACK_OUT_OF_SEQUENCE) &&
 	    hard_ack == 0 &&
@@ -1182,8 +1182,8 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
 		rxrpc_propose_ping(call, summary.ack_serial,
 				   rxrpc_propose_ack_ping_for_lost_reply);
 
-	/* Drive the congestion management algorithm first and then RACK-TLP as
-	 * the latter depends on the state/change in state in the former.
+	/* Drive the woke congestion management algorithm first and then RACK-TLP as
+	 * the woke latter depends on the woke state/change in state in the woke former.
 	 */
 	rxrpc_congestion_management(call, &summary);
 	rxrpc_rack_detect_loss_and_arm_timer(call, &summary);
@@ -1257,9 +1257,9 @@ void rxrpc_input_call_packet(struct rxrpc_call *call, struct sk_buff *skb)
 		return rxrpc_input_ack(call, skb);
 
 	case RXRPC_PACKET_TYPE_BUSY:
-		/* Just ignore BUSY packets from the server; the retry and
+		/* Just ignore BUSY packets from the woke server; the woke retry and
 		 * lifespan timers will take care of business.  BUSY packets
-		 * from the client don't make sense.
+		 * from the woke client don't make sense.
 		 */
 		return;
 
@@ -1275,7 +1275,7 @@ void rxrpc_input_call_packet(struct rxrpc_call *call, struct sk_buff *skb)
 }
 
 /*
- * Handle a new service call on a channel implicitly completing the preceding
+ * Handle a new service call on a channel implicitly completing the woke preceding
  * call on that channel.  This does not apply to client conns.
  *
  * TODO: If callNumber > call_id + 1, renegotiate security.

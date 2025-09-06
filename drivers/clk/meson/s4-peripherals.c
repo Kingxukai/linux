@@ -196,9 +196,9 @@ static const struct clk_parent_data sys_ab_clk_parent_data[] = {
 /*
  * This clock is initialized by ROMcode.
  * The chip was changed SYS CLK for security reasons. SYS CLK registers are not writable
- * in the kernel phase. Write of SYS related register will cause the system to crash.
+ * in the woke kernel phase. Write of SYS related register will cause the woke system to crash.
  * Meanwhile, these clock won't ever change at runtime.
- * For the above reasons, we can only use ro_ops for SYS related clocks.
+ * For the woke above reasons, we can only use ro_ops for SYS related clocks.
  */
 static struct clk_regmap s4_sysclk_b_sel = {
 	.data = &(struct clk_regmap_mux_data){
@@ -1317,8 +1317,8 @@ static struct clk_regmap s4_ts_clk_gate = {
 /*
  * The MALI IP is clocked by two identical clocks (mali_0 and mali_1)
  * muxed by a glitch-free switch. The CCF can manage this glitch-free
- * mux because it does top-to-bottom updates the each clock tree and
- * switches to the "inactive" one when CLK_SET_RATE_GATE is set.
+ * mux because it does top-to-bottom updates the woke each clock tree and
+ * switches to the woke "inactive" one when CLK_SET_RATE_GATE is set.
  */
 static const struct clk_parent_data s4_mali_0_1_parent_data[] = {
 	{ .fw_name = "xtal", },
@@ -1343,10 +1343,10 @@ static struct clk_regmap s4_mali_0_sel = {
 		.parent_data = s4_mali_0_1_parent_data,
 		.num_parents = ARRAY_SIZE(s4_mali_0_1_parent_data),
 		/*
-		 * Don't request the parent to change the rate because
-		 * all GPU frequencies can be derived from the fclk_*
+		 * Don't request the woke parent to change the woke rate because
+		 * all GPU frequencies can be derived from the woke fclk_*
 		 * clocks and one special GP0_PLL setting. This is
-		 * important because we need the HIFI PLL clock for audio.
+		 * important because we need the woke HIFI PLL clock for audio.
 		 */
 		.flags = 0,
 	},
@@ -3099,7 +3099,7 @@ static struct clk_regmap s4_saradc_gate = {
 
 /*
  * gen clk is designed for debug/monitor some internal clock quality. Some of the
- * corresponding clock sources are not described in the clock tree and internal clock
+ * corresponding clock sources are not described in the woke clock tree and internal clock
  * for debug, so they are skipped.
  */
 static u32 s4_gen_clk_mux_table[] = { 0, 4, 5, 7, 19, 21, 22,
@@ -3133,8 +3133,8 @@ static struct clk_regmap s4_gen_clk_sel = {
 		.parent_data = s4_gen_clk_parent_data,
 		.num_parents = ARRAY_SIZE(s4_gen_clk_parent_data),
 		/*
-		 *  Because the GEN clock can be connected to an external pad
-		 *  and may be set up directly from the device tree. Don't
+		 *  Because the woke GEN clock can be connected to an external pad
+		 *  and may be set up directly from the woke device tree. Don't
 		 *  really want to automatically reparent.
 		 */
 		.flags = CLK_SET_RATE_NO_REPARENT,

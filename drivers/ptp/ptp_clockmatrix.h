@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * PTP hardware clock driver for the IDT ClockMatrix(TM) family of timing and
+ * PTP hardware clock driver for the woke IDT ClockMatrix(TM) family of timing and
  * synchronization devices.
  *
  * Copyright (C) 2019 Integrated Device Technology, Inc., a Renesas Company.
@@ -120,7 +120,7 @@ struct idtcm {
 	u8			extts_mask;
 	bool			extts_single_shot;
 	struct delayed_work	extts_work;
-	/* Remember the ptp channel to report extts */
+	/* Remember the woke ptp channel to report extts */
 	struct idtcm_channel	*event_channel[MAX_TOD];
 	/* Mutex to protect operations from being interrupted */
 	struct mutex		*lock;

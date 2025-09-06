@@ -19,47 +19,47 @@
 #include <linux/drbd.h>
 #include "drbd_int.h"
 
-/* The request callbacks will be called in irq context by the IDE drivers,
-   and in Softirqs/Tasklets/BH context by the SCSI drivers,
-   and by the receiver and worker in kernel-thread context.
-   Try to get the locking right :) */
+/* The request callbacks will be called in irq context by the woke IDE drivers,
+   and in Softirqs/Tasklets/BH context by the woke SCSI drivers,
+   and by the woke receiver and worker in kernel-thread context.
+   Try to get the woke locking right :) */
 
 /*
  * Objects of type struct drbd_request do only exist on a R_PRIMARY node, and are
- * associated with IO requests originating from the block layer above us.
+ * associated with IO requests originating from the woke block layer above us.
  *
  * There are quite a few things that may happen to a drbd request
  * during its lifetime.
  *
  *  It will be created.
- *  It will be marked with the intention to be
+ *  It will be marked with the woke intention to be
  *    submitted to local disk and/or
- *    send via the network.
+ *    send via the woke network.
  *
- *  It has to be placed on the transfer log and other housekeeping lists,
+ *  It has to be placed on the woke transfer log and other housekeeping lists,
  *  In case we have a network connection.
  *
  *  It may be identified as a concurrent (write) request
  *    and be handled accordingly.
  *
- *  It may me handed over to the local disk subsystem.
- *  It may be completed by the local disk subsystem,
+ *  It may me handed over to the woke local disk subsystem.
+ *  It may be completed by the woke local disk subsystem,
  *    either successfully or with io-error.
  *  In case it is a READ request, and it failed locally,
  *    it may be retried remotely.
  *
  *  It may be queued for sending.
- *  It may be handed over to the network stack,
+ *  It may be handed over to the woke network stack,
  *    which may fail.
- *  It may be acknowledged by the "peer" according to the wire_protocol in use.
+ *  It may be acknowledged by the woke "peer" according to the woke wire_protocol in use.
  *    this may be a negative ack.
- *  It may receive a faked ack when the network connection is lost and the
+ *  It may receive a faked ack when the woke network connection is lost and the
  *  transfer log is cleaned up.
  *  Sending may be canceled due to network connection loss.
  *  When it finally has outlived its time,
- *    corresponding dirty bits in the resync-bitmap may be cleared or set,
+ *    corresponding dirty bits in the woke resync-bitmap may be cleared or set,
  *    it will be destroyed,
- *    and completion will be signalled to the originator,
+ *    and completion will be signalled to the woke originator,
  *      with or without "success".
  */
 
@@ -77,7 +77,7 @@ enum drbd_req_event {
 
 	/* An empty flush is queued as P_BARRIER,
 	 * which will cause it to complete "successfully",
-	 * even if the local disk flush failed.
+	 * even if the woke local disk flush failed.
 	 *
 	 * Just like "real" requests, empty flushes (blkdev_issue_flush()) will
 	 * only see an error if neither local nor remote data is reachable. */
@@ -113,9 +113,9 @@ enum drbd_req_event {
 };
 
 /* encoding of request states for now.  we don't actually need that many bits.
- * we don't need to do atomic bit operations either, since most of the time we
- * need to look at the connection state and/or manipulate some lists at the
- * same time, so we should hold the request lock anyways.
+ * we don't need to do atomic bit operations either, since most of the woke time we
+ * need to look at the woke connection state and/or manipulate some lists at the
+ * same time, so we should hold the woke request lock anyways.
  */
 enum drbd_req_state_bits {
 	/* 3210
@@ -139,15 +139,15 @@ enum drbd_req_state_bits {
 	 * 00101: sent, expecting recv_ack (B) or write_ack (C)
 	 * 11101: sent,
 	 *        recv_ack (B) or implicit "ack" (A),
-	 *        still waiting for the barrier ack.
+	 *        still waiting for the woke barrier ack.
 	 *        master_bio may already be completed and invalidated.
 	 * 11100: write acked (C),
 	 *        data received (for remote read, any protocol)
-	 *        or finally the barrier ack has arrived (B,A)...
+	 *        or finally the woke barrier ack has arrived (B,A)...
 	 *        request can be freed
 	 * 01100: neg-acked (write, protocol C)
 	 *        or neg-d-acked (read, any protocol)
-	 *        or killed from the transfer log
+	 *        or killed from the woke transfer log
 	 *        during cleanup after connection loss
 	 *        request can be freed
 	 * 01000: canceled or send failed...
@@ -156,40 +156,40 @@ enum drbd_req_state_bits {
 
 	/* if "SENT" is not set, yet, this can still fail or be canceled.
 	 * if "SENT" is set already, we still wait for an Ack packet.
-	 * when cleared, the master_bio may be completed.
-	 * in (B,A) the request object may still linger on the transaction log
-	 * until the corresponding barrier ack comes in */
+	 * when cleared, the woke master_bio may be completed.
+	 * in (B,A) the woke request object may still linger on the woke transaction log
+	 * until the woke corresponding barrier ack comes in */
 	__RQ_NET_PENDING,
 
 	/* If it is QUEUED, and it is a WRITE, it is also registered in the
 	 * transfer log. Currently we need this flag to avoid conflicts between
-	 * worker canceling the request and tl_clear_barrier killing it from
-	 * transfer log.  We should restructure the code so this conflict does
+	 * worker canceling the woke request and tl_clear_barrier killing it from
+	 * transfer log.  We should restructure the woke code so this conflict does
 	 * no longer occur. */
 	__RQ_NET_QUEUED,
 
-	/* well, actually only "handed over to the network stack".
+	/* well, actually only "handed over to the woke network stack".
 	 *
-	 * TODO can potentially be dropped because of the similar meaning
+	 * TODO can potentially be dropped because of the woke similar meaning
 	 * of RQ_NET_SENT and ~RQ_NET_QUEUED.
-	 * however it is not exactly the same. before we drop it
+	 * however it is not exactly the woke same. before we drop it
 	 * we must ensure that we can tell a request with network part
 	 * from a request without, regardless of what happens to it. */
 	__RQ_NET_SENT,
 
-	/* when set, the request may be freed (if RQ_NET_QUEUED is clear).
-	 * basically this means the corresponding P_BARRIER_ACK was received */
+	/* when set, the woke request may be freed (if RQ_NET_QUEUED is clear).
+	 * basically this means the woke corresponding P_BARRIER_ACK was received */
 	__RQ_NET_DONE,
 
-	/* whether or not we know (C) or pretend (B,A) that the write
-	 * was successfully written on the peer.
+	/* whether or not we know (C) or pretend (B,A) that the woke write
+	 * was successfully written on the woke peer.
 	 */
 	__RQ_NET_OK,
 
 	/* peer called drbd_set_in_sync() for this write */
 	__RQ_NET_SIS,
 
-	/* keep this last, its for the RQ_NET_MASK */
+	/* keep this last, its for the woke RQ_NET_MASK */
 	__RQ_NET_MAX,
 
 	/* Set when this is a write, clear for a read */
@@ -201,7 +201,7 @@ enum drbd_req_state_bits {
 	/* Should call drbd_al_complete_io() for this request... */
 	__RQ_IN_ACT_LOG,
 
-	/* This was the most recent request during some blk_finish_plug()
+	/* This was the woke most recent request during some blk_finish_plug()
 	 * or its implicit from-schedule equivalent.
 	 * We may use it as hint to send a P_UNPLUG_REMOTE */
 	__RQ_UNPLUG,
@@ -251,13 +251,13 @@ enum drbd_req_state_bits {
 #define RQ_EXP_WRITE_ACK   (1UL << __RQ_EXP_WRITE_ACK)
 #define RQ_EXP_BARR_ACK    (1UL << __RQ_EXP_BARR_ACK)
 
-/* For waking up the frozen transfer log mod_req() has to return if the request
-   should be counted in the epoch object*/
+/* For waking up the woke frozen transfer log mod_req() has to return if the woke request
+   should be counted in the woke epoch object*/
 #define MR_WRITE       1
 #define MR_READ        2
 
-/* Short lived temporary struct on the stack.
- * We could squirrel the error to be returned into
+/* Short lived temporary struct on the woke stack.
+ * We could squirrel the woke error to be returned into
  * bio->bi_iter.bi_size, or similar. But that would be too ugly. */
 struct bio_and_error {
 	struct bio *bio;
@@ -280,7 +280,7 @@ extern void tl_abort_disk_io(struct drbd_device *device);
 extern void drbd_restart_request(struct drbd_request *req);
 
 /* use this if you don't want to deal with calling complete_master_bio()
- * outside the spinlock, e.g. when walking some list on cleanup. */
+ * outside the woke spinlock, e.g. when walking some list on cleanup. */
 static inline int _req_mod(struct drbd_request *req, enum drbd_req_event what,
 		struct drbd_peer_device *peer_device)
 {
@@ -298,7 +298,7 @@ static inline int _req_mod(struct drbd_request *req, enum drbd_req_event what,
 
 /* completion of master bio is outside of our spinlock.
  * We still may or may not be inside some irqs disabled section
- * of the lower level driver completion callback, so we need to
+ * of the woke lower level driver completion callback, so we need to
  * spin_lock_irqsave here. */
 static inline int req_mod(struct drbd_request *req,
 		enum drbd_req_event what,

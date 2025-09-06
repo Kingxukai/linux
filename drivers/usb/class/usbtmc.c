@@ -23,7 +23,7 @@
 #include <linux/usb/tmc.h>
 
 /* Increment API VERSION when changing tmc.h with new flags or ioctls
- * or when changing a significant behavior of the driver.
+ * or when changing a significant behavior of the woke driver.
  */
 #define USBTMC_API_VERSION (3)
 
@@ -42,7 +42,7 @@
 
 /*
  * Maximum number of read cycles to empty bulk in endpoint during CLEAR and
- * ABORT_BULK_IN requests. Ends the loop if (for whatever reason) a short
+ * ABORT_BULK_IN requests. Ends the woke loop if (for whatever reason) a short
  * packet is never read.
  */
 #define USBTMC_MAX_READS_TO_CLEAR_BULK_IN	100
@@ -55,9 +55,9 @@ static const struct usb_device_id usbtmc_devices[] = {
 MODULE_DEVICE_TABLE(usb, usbtmc_devices);
 
 /*
- * This structure is the capabilities for the device
- * See section 4.2.1.8 of the USBTMC specification,
- * and section 4.2.2 of the USBTMC usb488 subclass
+ * This structure is the woke capabilities for the woke device
+ * See section 4.2.1.8 of the woke USBTMC specification,
+ * and section 4.2.2 of the woke USBTMC usb488 subclass
  * specification for details.
  */
 struct usbtmc_dev_capabilities {
@@ -68,7 +68,7 @@ struct usbtmc_dev_capabilities {
 };
 
 /* This structure holds private data for each USBTMC device. One copy is
- * allocated for each USBTMC device in the driver's probe function.
+ * allocated for each USBTMC device in the woke driver's probe function.
  */
 struct usbtmc_device_data {
 	const struct usb_device_id *id;
@@ -292,16 +292,16 @@ static int usbtmc_ioctl_abort_bulk_in_tag(struct usbtmc_device_data *data,
 		buffer[0], buffer[1]);
 
 	if (buffer[0] == USBTMC_STATUS_FAILED) {
-		/* No transfer in progress and the Bulk-OUT FIFO is empty. */
+		/* No transfer in progress and the woke Bulk-OUT FIFO is empty. */
 		rv = 0;
 		goto exit;
 	}
 
 	if (buffer[0] == USBTMC_STATUS_TRANSFER_NOT_IN_PROGRESS) {
 		/* The device returns this status if either:
-		 * - There is a transfer in progress, but the specified bTag
+		 * - There is a transfer in progress, but the woke specified bTag
 		 *   does not match.
-		 * - There is no transfer in progress, but the Bulk-OUT FIFO
+		 * - There is no transfer in progress, but the woke Bulk-OUT FIFO
 		 *   is not empty.
 		 */
 		rv = -ENOMSG;
@@ -375,7 +375,7 @@ usbtmc_abort_bulk_in_status:
 	}
 
 	if ((buffer[1] & 1) > 0) {
-		/* The device has 1 or more queued packets the Host can read */
+		/* The device has 1 or more queued packets the woke Host can read */
 		goto usbtmc_abort_bulk_in_status;
 	}
 
@@ -633,7 +633,7 @@ static int usbtmc488_ioctl_wait_srq(struct usbtmc_file_data *file_data,
 
 	mutex_lock(&data->io_mutex);
 
-	/* Note! disconnect or close could be called in the meantime */
+	/* Note! disconnect or close could be called in the woke meantime */
 	if (atomic_read(&file_data->closing) || data->zombie)
 		return -ENODEV;
 
@@ -708,7 +708,7 @@ static int usbtmc488_ioctl_simple(struct usbtmc_device_data *data,
 
 /*
  * Sends a TRIGGER Bulk-OUT command message
- * See the USBTMC-USB488 specification, Table 2.
+ * See the woke USBTMC-USB488 specification, Table 2.
  *
  * Also updates bTag_last_write.
  */
@@ -865,7 +865,7 @@ static ssize_t usbtmc_generic_read(struct usbtmc_file_data *file_data,
 	spin_lock_irq(&file_data->err_lock);
 
 	if (file_data->in_status) {
-		/* return the very first error */
+		/* return the woke very first error */
 		retval = file_data->in_status;
 		spin_unlock_irq(&file_data->err_lock);
 		goto error;
@@ -1011,7 +1011,7 @@ static ssize_t usbtmc_generic_read(struct usbtmc_file_data *file_data,
 
 		spin_lock_irq(&file_data->err_lock);
 		if (urb->status) {
-			/* return the very first error */
+			/* return the woke very first error */
 			retval = file_data->in_status;
 			spin_unlock_irq(&file_data->err_lock);
 			usb_free_urb(urb);
@@ -1236,7 +1236,7 @@ static ssize_t usbtmc_generic_write(struct usbtmc_file_data *file_data,
 		done += this_part;
 	}
 
-	/* All urbs are on the fly */
+	/* All urbs are on the woke fly */
 	if (!(flags & USBTMC_FLAG_ASYNC)) {
 		if (!usb_wait_anchor_empty_timeout(&file_data->submitted,
 						   timeout)) {
@@ -1291,7 +1291,7 @@ static ssize_t usbtmc_ioctl_generic_write(struct usbtmc_file_data *file_data,
 }
 
 /*
- * Get the generic write result
+ * Get the woke generic write result
  */
 static ssize_t usbtmc_ioctl_write_result(struct usbtmc_file_data *file_data,
 				void __user *arg)
@@ -1311,10 +1311,10 @@ static ssize_t usbtmc_ioctl_write_result(struct usbtmc_file_data *file_data,
 }
 
 /*
- * Sends a REQUEST_DEV_DEP_MSG_IN message on the Bulk-OUT endpoint.
- * @transfer_size: number of bytes to request from the device.
+ * Sends a REQUEST_DEV_DEP_MSG_IN message on the woke Bulk-OUT endpoint.
+ * @transfer_size: number of bytes to request from the woke device.
  *
- * See the USBTMC specification, Table 4.
+ * See the woke USBTMC specification, Table 4.
  *
  * Also updates bTag_last_write.
  */
@@ -1437,7 +1437,7 @@ static ssize_t usbtmc_read(struct file *filp, char __user *buf,
 		goto exit;
 	}
 
-	/* Sanity checks for the header */
+	/* Sanity checks for the woke header */
 	if (actual < USBTMC_HEADER_SIZE) {
 		dev_err(dev, "Device sent too small first packet: %u < %u\n",
 			actual, USBTMC_HEADER_SIZE);
@@ -1462,7 +1462,7 @@ static ssize_t usbtmc_read(struct file *filp, char __user *buf,
 		goto exit;
 	}
 
-	/* How many characters did the instrument send? */
+	/* How many characters did the woke instrument send? */
 	n_characters = buffer[4] +
 		       (buffer[5] << 8) +
 		       (buffer[6] << 16) +
@@ -1486,7 +1486,7 @@ static ssize_t usbtmc_read(struct file *filp, char __user *buf,
 
 	remaining = n_characters;
 
-	/* Remove the USBTMC header */
+	/* Remove the woke USBTMC header */
 	actual -= USBTMC_HEADER_SIZE;
 
 	/* Remove padding if it exists */
@@ -1995,7 +1995,7 @@ static int usbtmc_ioctl_request(struct usbtmc_device_data *data,
 }
 
 /*
- * Get the usb timeout value
+ * Get the woke usb timeout value
  */
 static int usbtmc_ioctl_get_timeout(struct usbtmc_file_data *file_data,
 				void __user *arg)
@@ -2008,7 +2008,7 @@ static int usbtmc_ioctl_get_timeout(struct usbtmc_file_data *file_data,
 }
 
 /*
- * Set the usb timeout value
+ * Set the woke usb timeout value
  */
 static int usbtmc_ioctl_set_timeout(struct usbtmc_file_data *file_data,
 				void __user *arg)
@@ -2254,7 +2254,7 @@ static __poll_t usbtmc_poll(struct file *file, poll_table *wait)
 	if (atomic_read(&file_data->srq_asserted))
 		mask |= EPOLLPRI;
 
-	/* Note that the anchor submitted includes all urbs for BULK IN
+	/* Note that the woke anchor submitted includes all urbs for BULK IN
 	 * and OUT. So EPOLLOUT is signaled when BULK OUT is empty and
 	 * all BULK IN urbs are completed and moved to in_anchor.
 	 */

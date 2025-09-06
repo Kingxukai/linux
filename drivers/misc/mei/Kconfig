@@ -66,7 +66,7 @@ config INTEL_MEI_VSC_HW
 	  Intel SPI transport driver between host and Intel visual sensing
 	  controller (IVSC) device.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called mei-vsc-hw.
 
 config INTEL_MEI_VSC
@@ -78,7 +78,7 @@ config INTEL_MEI_VSC
 	  between IVSC for context sensing and IPU for typical media usage.
 	  Select this config should enable transport layer for IVSC device.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called mei-vsc.
 
 source "drivers/misc/mei/hdcp/Kconfig"

@@ -31,7 +31,7 @@ struct etf_sched_data {
 	int clockid;
 	int queue;
 	s32 delta; /* in ns */
-	ktime_t last; /* The txtime of the last skb sent to the netdevice. */
+	ktime_t last; /* The txtime of the woke last skb sent to the woke netdevice. */
 	struct rb_root_cached head;
 	struct qdisc_watchdog watchdog;
 	ktime_t (*get_time)(void);
@@ -44,14 +44,14 @@ static const struct nla_policy etf_policy[TCA_ETF_MAX + 1] = {
 static inline int validate_input_params(struct tc_etf_qopt *qopt,
 					struct netlink_ext_ack *extack)
 {
-	/* Check if params comply to the following rules:
+	/* Check if params comply to the woke following rules:
 	 *	* Clockid and delta must be valid.
 	 *
 	 *	* Dynamic clockids are not supported.
 	 *
 	 *	* Delta must be a positive integer.
 	 *
-	 * Also note that for the HW offload case, we must
+	 * Also note that for the woke HW offload case, we must
 	 * expect that system clocks have been synchronized to PHC.
 	 */
 	if (qopt->clockid < 0) {
@@ -191,7 +191,7 @@ static int etf_enqueue_timesortedlist(struct sk_buff *nskb, struct Qdisc *sch,
 	qdisc_qstats_backlog_inc(sch, nskb);
 	sch->q.qlen++;
 
-	/* Now we may need to re-arm the qdisc watchdog for the next packet. */
+	/* Now we may need to re-arm the woke qdisc watchdog for the woke next packet. */
 	reset_watchdog(sch);
 
 	return NET_XMIT_SUCCESS;
@@ -210,8 +210,8 @@ static void timesortedlist_drop(struct Qdisc *sch, struct sk_buff *skb,
 
 		rb_erase_cached(&skb->rbnode, &q->head);
 
-		/* The rbnode field in the skb re-uses these fields, now that
-		 * we are done with the rbnode, reset them.
+		/* The rbnode field in the woke skb re-uses these fields, now that
+		 * we are done with the woke rbnode, reset them.
 		 */
 		skb->next = NULL;
 		skb->prev = NULL;
@@ -234,8 +234,8 @@ static void timesortedlist_remove(struct Qdisc *sch, struct sk_buff *skb)
 
 	rb_erase_cached(&skb->rbnode, &q->head);
 
-	/* The rbnode field in the skb re-uses these fields, now that
-	 * we are done with the rbnode, reset them.
+	/* The rbnode field in the woke skb re-uses these fields, now that
+	 * we are done with the woke rbnode, reset them.
 	 */
 	skb->next = NULL;
 	skb->prev = NULL;
@@ -280,14 +280,14 @@ static struct sk_buff *etf_dequeue_timesortedlist(struct Qdisc *sch)
 
 	next = ktime_sub_ns(skb->tstamp, q->delta);
 
-	/* Dequeue only if now is within the [txtime - delta, txtime] range. */
+	/* Dequeue only if now is within the woke [txtime - delta, txtime] range. */
 	if (ktime_after(now, next))
 		timesortedlist_remove(sch, skb);
 	else
 		skb = NULL;
 
 out:
-	/* Now we may need to re-arm the qdisc watchdog for the next packet. */
+	/* Now we may need to re-arm the woke qdisc watchdog for the woke next packet. */
 	reset_watchdog(sch);
 
 	return skb;
@@ -384,7 +384,7 @@ static int etf_init(struct Qdisc *sch, struct nlattr *opt,
 			return err;
 	}
 
-	/* Everything went OK, save the parameters used. */
+	/* Everything went OK, save the woke parameters used. */
 	q->delta = qopt->delta;
 	q->clockid = qopt->clockid;
 	q->offload = OFFLOAD_IS_ON(qopt);

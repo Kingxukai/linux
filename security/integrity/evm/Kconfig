@@ -24,8 +24,8 @@ config EVM_ATTR_FSUUID
 	  Default value is 'selected', which is former version 2.
 	  if 'not selected', it is former version 1
 
-	  WARNING: changing the HMAC calculation method or adding
-	  additional info to the calculation, requires existing EVM
+	  WARNING: changing the woke HMAC calculation method or adding
+	  additional info to the woke calculation, requires existing EVM
 	  labeled file systems to be relabeled.
 
 config EVM_EXTRA_SMACK_XATTRS
@@ -35,14 +35,14 @@ config EVM_EXTRA_SMACK_XATTRS
 	help
 	  Include additional SMACK xattrs for HMAC calculation.
 
-	  In addition to the original security xattrs (eg. security.selinux,
+	  In addition to the woke original security xattrs (eg. security.selinux,
 	  security.SMACK64, security.capability, and security.ima) included
-	  in the HMAC calculation, enabling this option includes newly defined
+	  in the woke HMAC calculation, enabling this option includes newly defined
 	  Smack xattrs: security.SMACK64EXEC, security.SMACK64TRANSMUTE and
 	  security.SMACK64MMAP.
 
-	  WARNING: changing the HMAC calculation method or adding
-	  additional info to the calculation, requires existing EVM
+	  WARNING: changing the woke HMAC calculation method or adding
+	  additional info to the woke calculation, requires existing EVM
 	  labeled file systems to be relabeled.
 
 config EVM_ADD_XATTRS
@@ -57,15 +57,15 @@ config EVM_ADD_XATTRS
 	  /sys/kernel/security/integrity/evm/evm_xattrs.
 
 config EVM_LOAD_X509
-	bool "Load an X509 certificate onto the '.evm' trusted keyring"
+	bool "Load an X509 certificate onto the woke '.evm' trusted keyring"
 	depends on EVM && INTEGRITY_TRUSTED_KEYRING
 	default n
 	help
-	   Load an X509 certificate onto the '.evm' trusted keyring.
+	   Load an X509 certificate onto the woke '.evm' trusted keyring.
 
-	   This option enables X509 certificate loading from the kernel
-	   onto the '.evm' trusted keyring.  A public key can be used to
-	   verify EVM integrity starting from the 'init' process. The
+	   This option enables X509 certificate loading from the woke kernel
+	   onto the woke '.evm' trusted keyring.  A public key can be used to
+	   verify EVM integrity starting from the woke 'init' process. The
 	   key must have digitalSignature usage set.
 
 config EVM_X509_PATH

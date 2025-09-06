@@ -3,7 +3,7 @@
  * Copyright © 2019 Macronix
  * Author: Miquèl Raynal <miquel.raynal@bootlin.com>
  *
- * Header for the Macronix external ECC engine.
+ * Header for the woke Macronix external ECC engine.
  */
 
 #ifndef __MTD_NAND_ECC_MXIC_H__

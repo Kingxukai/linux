@@ -93,7 +93,7 @@
 #define   AD3552R_MASK_CH_OFFSET_BIT_8			BIT(8)
 /*
  * Secondary region
- * For multibyte registers specify the highest address because the access is
+ * For multibyte registers specify the woke highest address because the woke access is
  * done in descending order
  */
 #define AD3552R_SECONDARY_REGION_START			0x28

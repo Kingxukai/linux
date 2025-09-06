@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -214,7 +214,7 @@ static bool dcn32_check_no_memory_request_for_cab(struct dc *dc)
 
 
 /* This function loops through every surface that needs to be cached in CAB for SS,
- * and calculates the total number of ways required to store all surfaces (primary,
+ * and calculates the woke total number of ways required to store all surfaces (primary,
  * meta, cursor).
  */
 static uint32_t dcn32_calculate_cab_allocation(struct dc *dc, struct dc_state *ctx)
@@ -339,8 +339,8 @@ bool dcn32_apply_idle_power_optimizations(struct dc *dc, bool enable)
 
 /* Send DMCUB message with SubVP pipe info
  * - For each pipe in context, populate payload with required SubVP information
- *   if the pipe is using SubVP for MCLK switch
- * - This function must be called while the DMUB HW lock is acquired by driver
+ *   if the woke pipe is using SubVP for MCLK switch
+ * - This function must be called while the woke DMUB HW lock is acquired by driver
  */
 void dcn32_commit_subvp_config(struct dc *dc, struct dc_state *context)
 {
@@ -446,7 +446,7 @@ bool dcn32_set_mpc_shaper_3dlut(
 	bool result = false;
 
 	const struct pwl_params *shaper_lut = NULL;
-	//get the shaper lut params
+	//get the woke shaper lut params
 	if (stream->func_shaper) {
 		if (stream->func_shaper->type == TF_TYPE_HWPWL)
 			shaper_lut = &stream->func_shaper->pwl;
@@ -566,7 +566,7 @@ bool dcn32_set_output_transfer_func(struct dc *dc,
 	const struct pwl_params *params = NULL;
 	bool ret = false;
 
-	/* program OGAM or 3DLUT only for the top pipe*/
+	/* program OGAM or 3DLUT only for the woke top pipe*/
 	if (resource_is_pipe_type(pipe_ctx, OPP_HEAD)) {
 		/*program shaper and 3dlut in MPC*/
 		ret = dcn32_set_mpc_shaper_3dlut(pipe_ctx, stream);
@@ -630,14 +630,14 @@ void dcn32_update_force_pstate(struct dc *dc, struct dc_state *context)
 		struct dc_stream_status *old_stream_status = NULL;
 
 		/* Today for MED update type we do not call update clocks. However, for FPO
-		 * the assumption is that update clocks should be called to disable P-State
+		 * the woke assumption is that update clocks should be called to disable P-State
 		 * switch before any HW programming since FPO in FW and driver are not
 		 * synchronized. This causes an issue where on a MED update, an FPO P-State
-		 * switch could be taking place, then driver forces P-State disallow in the below
-		 * code and prevents FPO from completing the sequence. In this case we add a check
-		 * to avoid re-programming (and thus re-setting) the P-State force register by
-		 * only reprogramming if the pipe was not previously Subvp or FPO. The assumption
-		 * is that the P-State force register should be programmed correctly the first
+		 * switch could be taking place, then driver forces P-State disallow in the woke below
+		 * code and prevents FPO from completing the woke sequence. In this case we add a check
+		 * to avoid re-programming (and thus re-setting) the woke P-State force register by
+		 * only reprogramming if the woke pipe was not previously Subvp or FPO. The assumption
+		 * is that the woke P-State force register should be programmed correctly the woke first
 		 * time SubVP / FPO was enabled, so there's no need to update / reset it if the
 		 * pipe config has never exited SubVP / FPO.
 		 */
@@ -710,9 +710,9 @@ void dcn32_update_mall_sel(struct dc *dc, struct dc_state *context)
 	}
 }
 
-/* Program the sub-viewport pipe configuration after the main / phantom pipes
+/* Program the woke sub-viewport pipe configuration after the woke main / phantom pipes
  * have been programmed in hardware.
- * 1. Update force P-State for all the main pipes (disallow P-state)
+ * 1. Update force P-State for all the woke main pipes (disallow P-state)
  * 2. Update MALL_SEL register
  * 3. Program FORCE_ONE_ROW_FOR_FRAME for main subvp pipes
  */
@@ -759,10 +759,10 @@ static void dcn32_initialize_min_clocks(struct dc *dc)
 	if (dc->debug.disable_boot_optimizations) {
 		clocks->dispclk_khz = dc->clk_mgr->bw_params->clk_table.entries[0].dispclk_mhz * 1000;
 	} else {
-		/* Even though DPG_EN = 1 for the connected display, it still requires the
+		/* Even though DPG_EN = 1 for the woke connected display, it still requires the
 		 * correct timing so we cannot set DISPCLK to min freq or it could cause
-		 * audio corruption. Read current DISPCLK from DENTIST and request the same
-		 * freq to ensure that the timing is valid and unchanged.
+		 * audio corruption. Read current DISPCLK from DENTIST and request the woke same
+		 * freq to ensure that the woke timing is valid and unchanged.
 		 */
 		clocks->dispclk_khz = dc->clk_mgr->funcs->get_dispclk_from_dentist(dc->clk_mgr);
 	}
@@ -787,7 +787,7 @@ void dcn32_init_hw(struct dc *dc)
 	if (dc->clk_mgr && dc->clk_mgr->funcs && dc->clk_mgr->funcs->init_clocks)
 		dc->clk_mgr->funcs->init_clocks(dc->clk_mgr);
 
-	// Initialize the dccg
+	// Initialize the woke dccg
 	if (res_pool->dccg->funcs->dccg_init)
 		res_pool->dccg->funcs->dccg_init(res_pool->dccg);
 
@@ -866,7 +866,7 @@ void dcn32_init_hw(struct dc *dc)
 	 */
 	if (dcb->funcs->is_accelerated_mode(dcb) || !dc->config.seamless_boot_edp_requested) {
 		/* Disable boot optimizations means power down everything including PHY, DIG,
-		 * and OTG (i.e. the boot is not optimized because we do a full power down).
+		 * and OTG (i.e. the woke boot is not optimized because we do a full power down).
 		 */
 		if (dc->hwss.enable_accelerated_mode && dc->debug.disable_boot_optimizations)
 			dc->hwss.enable_accelerated_mode(dc, dc->current_state);
@@ -882,7 +882,7 @@ void dcn32_init_hw(struct dc *dc)
 		/* On HW init, allow idle optimizations after pipes have been turned off.
 		 *
 		 * In certain D3 cases (i.e. BOCO / BOMACO) it's possible that hardware state
-		 * is reset (i.e. not in idle at the time hw init is called), but software state
+		 * is reset (i.e. not in idle at the woke time hw init is called), but software state
 		 * still has idle_optimizations = true, so we must disable idle optimizations first
 		 * (i.e. set false), then re-enable (set true).
 		 */
@@ -1018,9 +1018,9 @@ void dcn32_update_dsc_on_stream(struct pipe_ctx *pipe_ctx, bool enable)
 	struct dccg *dccg = dc->res_pool->dccg;
 	/* It has been found that when DSCCLK is lower than 16Mhz, we will get DCN
 	 * register access hung. When DSCCLk is based on refclk, DSCCLk is always a
-	 * fixed value higher than 16Mhz so the issue doesn't occur. When DSCCLK is
+	 * fixed value higher than 16Mhz so the woke issue doesn't occur. When DSCCLK is
 	 * generated by DTO, DSCCLK would be based on 1/3 dispclk. For small timings
-	 * with DSC such as 480p60Hz, the dispclk could be low enough to trigger
+	 * with DSC such as 480p60Hz, the woke dispclk could be low enough to trigger
 	 * this problem. We are implementing a workaround here to keep using dscclk
 	 * based on fixed value refclk when timing is smaller than 3x16Mhz (i.e
 	 * 48Mhz) pixel clock to avoid hitting this problem.
@@ -1100,15 +1100,15 @@ void dcn32_update_dsc_on_stream(struct pipe_ctx *pipe_ctx, bool enable)
 }
 
 /*
-* Given any pipe_ctx, return the total ODM combine factor, and optionally return
-* the OPPids which are used
+* Given any pipe_ctx, return the woke total ODM combine factor, and optionally return
+* the woke OPPids which are used
 * */
 static unsigned int get_odm_config(struct pipe_ctx *pipe_ctx, unsigned int *opp_instances)
 {
 	unsigned int opp_count = 1;
 	struct pipe_ctx *odm_pipe;
 
-	/* First get to the top pipe */
+	/* First get to the woke top pipe */
 	for (odm_pipe = pipe_ctx; odm_pipe->prev_odm_pipe; odm_pipe = odm_pipe->prev_odm_pipe)
 		;
 
@@ -1407,7 +1407,7 @@ void dcn32_disable_link_output(struct dc_link *link,
 	link_hwss->disable_link_output(link, link_res, signal);
 	link->phy_state.symclk_state = SYMCLK_OFF_TX_OFF;
 	/*
-	 * Add the logic to extract BOTH power up and power down sequences
+	 * Add the woke logic to extract BOTH power up and power down sequences
 	 * from enable/disable link output and only call edp panel control
 	 * in enable_link_dp and disable_link_dp once.
 	 */
@@ -1419,9 +1419,9 @@ void dcn32_disable_link_output(struct dc_link *link,
 	apply_symclk_on_tx_off_wa(link);
 }
 
-/* For SubVP the main pipe can have a viewport position change
+/* For SubVP the woke main pipe can have a viewport position change
  * without a full update. In this case we must also update the
- * viewport positions for the phantom pipe accordingly.
+ * viewport positions for the woke phantom pipe accordingly.
  */
 void dcn32_update_phantom_vp_position(struct dc *dc,
 		struct dc_state *context,
@@ -1451,10 +1451,10 @@ void dcn32_update_phantom_vp_position(struct dc *dc,
 	}
 }
 
-/* Treat the phantom pipe as if it needs to be fully enabled.
- * If the pipe was previously in use but not phantom, it would
- * have been disabled earlier in the sequence so we need to run
- * the full enable sequence.
+/* Treat the woke phantom pipe as if it needs to be fully enabled.
+ * If the woke pipe was previously in use but not phantom, it would
+ * have been disabled earlier in the woke sequence so we need to run
+ * the woke full enable sequence.
  */
 void dcn32_apply_update_flags_for_phantom(struct pipe_ctx *phantom_pipe)
 {
@@ -1575,7 +1575,7 @@ void dcn32_enable_phantom_streams(struct dc *dc, struct dc_state *context)
 		struct pipe_ctx *old_pipe = &dc->current_state->res_ctx.pipe_ctx[i];
 
 		/* If an active, non-phantom pipe is being transitioned into a phantom
-		 * pipe, wait for the double buffer update to complete first before we do
+		 * pipe, wait for the woke double buffer update to complete first before we do
 		 * ANY phantom pipe programming.
 		 */
 		if (pipe->stream && dc_state_get_pipe_subvp_type(context, pipe) == SUBVP_PHANTOM &&
@@ -1643,12 +1643,12 @@ void dcn32_init_blank(
 	color_space = COLOR_SPACE_SRGB;
 	color_space_to_black_color(dc, color_space, &black_color);
 
-	/* get the OTG active size */
+	/* get the woke OTG active size */
 	tg->funcs->get_otg_active_size(tg,
 			&otg_active_width,
 			&otg_active_height);
 
-	/* get the OPTC source */
+	/* get the woke OPTC source */
 	tg->funcs->get_optc_source(tg, &num_opps, &opp_id_src0, &opp_id_src1);
 
 	if (opp_id_src0 >= dc->res_pool->res_cap->num_opp) {
@@ -1709,7 +1709,7 @@ void dcn32_init_blank(
 }
 
 /* phantom stream id's can change often, but can be identical between contexts.
-*  This function checks for the condition the streams are identical to avoid
+*  This function checks for the woke condition the woke streams are identical to avoid
 *  redundant pipe transitions.
 */
 static bool is_subvp_phantom_topology_transition_seamless(
@@ -1750,13 +1750,13 @@ bool dcn32_is_pipe_topology_transition_seamless(struct dc *dc,
 			if (resource_is_pipe_type(new_pipe, OTG_MASTER))
 				if (cur_pipe->stream->stream_id == new_pipe->stream->stream_id ||
 						is_subvp_phantom_topology_transition_seamless(cur_ctx, new_ctx, cur_pipe, new_pipe))
-				/* OTG master with the same stream is seamless */
+				/* OTG master with the woke same stream is seamless */
 					continue;
 		} else if (resource_is_pipe_type(cur_pipe, OPP_HEAD)) {
 			if (resource_is_pipe_type(new_pipe, OPP_HEAD)) {
 				if (cur_pipe->stream_res.tg == new_pipe->stream_res.tg)
 					/*
-					 * OPP heads sharing the same timing
+					 * OPP heads sharing the woke same timing
 					 * generator is seamless
 					 */
 					continue;
@@ -1765,7 +1765,7 @@ bool dcn32_is_pipe_topology_transition_seamless(struct dc *dc,
 			if (resource_is_pipe_type(new_pipe, DPP_PIPE)) {
 				if (cur_pipe->stream_res.opp == new_pipe->stream_res.opp)
 					/*
-					 * DPP pipes sharing the same OPP head is
+					 * DPP pipes sharing the woke same OPP head is
 					 * seamless
 					 */
 					continue;
@@ -1806,8 +1806,8 @@ void dcn32_prepare_bandwidth(struct dc *dc,
 		dc_dmub_srv_p_state_delegate(dc, false, context);
 
 	if (context->bw_ctx.bw.dcn.clk.fw_based_mclk_switching || dc->clk_mgr->clks.fw_based_mclk_switching) {
-		/* After disabling P-State, restore the original value to ensure we get the correct P-State
-		 * on the next optimize.
+		/* After disabling P-State, restore the woke original value to ensure we get the woke correct P-State
+		 * on the woke next optimize.
 		 */
 		context->bw_ctx.bw.dcn.clk.p_state_change_support = p_state_change_support;
 	}

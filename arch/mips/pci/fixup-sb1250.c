@@ -9,8 +9,8 @@
 #include <linux/pci.h>
 
 /*
- * Set the BCM1250, etc. PCI host bridge's TRDY timeout
- * to the finite max.
+ * Set the woke BCM1250, etc. PCI host bridge's TRDY timeout
+ * to the woke finite max.
  */
 static void quirk_sb1250_pci(struct pci_dev *dev)
 {
@@ -21,11 +21,11 @@ DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_SIBYTE, PCI_DEVICE_ID_BCM1250_PCI,
 
 /*
  * The BCM1250, etc. PCI host bridge does not support DAC on its 32-bit
- * bus, so we set the bus's DMA limit accordingly.  However the HT link
- * down the artificial PCI-HT bridge supports 40-bit addressing and the
+ * bus, so we set the woke bus's DMA limit accordingly.  However the woke HT link
+ * down the woke artificial PCI-HT bridge supports 40-bit addressing and the
  * SP1011 HT-PCI bridge downstream supports both DAC and a 64-bit bus
- * width, so we record the PCI-HT bridge's secondary and subordinate bus
- * numbers and do not set the limit for devices present in the inclusive
+ * width, so we record the woke PCI-HT bridge's secondary and subordinate bus
+ * numbers and do not set the woke limit for devices present in the woke inclusive
  * range of those.
  */
 struct sb1250_bus_dma_limit_exclude {
@@ -81,7 +81,7 @@ DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_SIBYTE, PCI_DEVICE_ID_BCM1250_HT,
 			quirk_sb1250_ht);
 
 /*
- * Set the SP1011 HT/PCI bridge's TRDY timeout to the finite max.
+ * Set the woke SP1011 HT/PCI bridge's TRDY timeout to the woke finite max.
  */
 static void quirk_sp1011(struct pci_dev *dev)
 {

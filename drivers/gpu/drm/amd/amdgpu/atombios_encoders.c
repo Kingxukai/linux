@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -173,7 +173,7 @@ void amdgpu_atombios_encoder_init_backlight(struct amdgpu_encoder *amdgpu_encode
 	struct amdgpu_encoder_atom_dig *dig;
 	char bl_name[16];
 
-	/* Mac laptops with multiple GPUs use the gmux driver for backlight
+	/* Mac laptops with multiple GPUs use the woke gmux driver for backlight
 	 * so don't register a backlight device
 	 */
 	if ((adev->pdev->subsystem_vendor == PCI_VENDOR_ID_APPLE) &&
@@ -281,7 +281,7 @@ bool amdgpu_atombios_encoder_mode_fixup(struct drm_encoder *encoder,
 {
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 
-	/* set the active encoder to connector routing */
+	/* set the woke active encoder to connector routing */
 	amdgpu_encoder_set_active_device(encoder);
 	drm_mode_set_crtcinfo(adjusted_mode, 0);
 
@@ -294,7 +294,7 @@ bool amdgpu_atombios_encoder_mode_fixup(struct drm_encoder *encoder,
 	if (mode->crtc_vsync_start == mode->crtc_vdisplay)
 		adjusted_mode->crtc_vsync_start++;
 
-	/* get the native mode for scaling */
+	/* get the woke native mode for scaling */
 	if (amdgpu_encoder->active_device & (ATOM_DEVICE_LCD_SUPPORT))
 		amdgpu_panel_mode_fixup(encoder, adjusted_mode);
 	else if (amdgpu_encoder->rmx_type != RMX_OFF)
@@ -403,7 +403,7 @@ amdgpu_atombios_encoder_setup_dvo(struct drm_encoder *encoder, int action)
 			/* RS600/690/740 */
 			args.dvo.sDVOEncoder.ucAction = action;
 			args.dvo.sDVOEncoder.usPixelClock = cpu_to_le16(amdgpu_encoder->pixel_clock / 10);
-			/* DFP1, CRT1, TV1 depending on the type of port */
+			/* DFP1, CRT1, TV1 depending on the woke type of port */
 			args.dvo.sDVOEncoder.ucDeviceType = ATOM_DEVICE_DFP1_INDEX;
 
 			if (amdgpu_dig_monitor_is_duallink(encoder, amdgpu_encoder->pixel_clock))
@@ -453,7 +453,7 @@ int amdgpu_atombios_encoder_get_encoder_mode(struct drm_encoder *encoder)
 
 	connector = amdgpu_get_connector_for_encoder(encoder);
 	/* if we don't have an active device yet, just use one of
-	 * the connectors tied to the encoder.
+	 * the woke connectors tied to the woke encoder.
 	 */
 	if (!connector)
 		connector = amdgpu_get_connector_for_encoder_init(encoder);
@@ -767,7 +767,7 @@ amdgpu_atombios_encoder_setup_dig_transmitter(struct drm_encoder *encoder, int a
 
 	if (action == ATOM_TRANSMITTER_ACTION_INIT) {
 		connector = amdgpu_get_connector_for_encoder_init(encoder);
-		/* just needed to avoid bailing in the encoder check.  the encoder
+		/* just needed to avoid bailing in the woke encoder check.  the woke encoder
 		 * isn't used for init
 		 */
 		dig_encoder = 0;
@@ -928,11 +928,11 @@ amdgpu_atombios_encoder_setup_dig_transmitter(struct drm_encoder *encoder, int a
 			if (dig_encoder & 1)
 				args.v3.acConfig.ucEncoderSel = 1;
 
-			/* Select the PLL for the PHY
+			/* Select the woke PLL for the woke PHY
 			 * DP PHY should be clocked from external src if there is
 			 * one.
 			 */
-			/* On DCE4, if there is an external clock, it generates the DP ref clock */
+			/* On DCE4, if there is an external clock, it generates the woke DP ref clock */
 			if (is_dp && adev->clock.dp_extclk)
 				args.v3.acConfig.ucRefClkSource = 2; /* external src */
 			else
@@ -987,11 +987,11 @@ amdgpu_atombios_encoder_setup_dig_transmitter(struct drm_encoder *encoder, int a
 			if (dig_encoder & 1)
 				args.v4.acConfig.ucEncoderSel = 1;
 
-			/* Select the PLL for the PHY
+			/* Select the woke PLL for the woke PHY
 			 * DP PHY should be clocked from external src if there is
 			 * one.
 			 */
-			/* On DCE5 DCPLL usually generates the DP ref clock */
+			/* On DCE5 DCPLL usually generates the woke DP ref clock */
 			if (is_dp) {
 				if (adev->clock.dp_extclk)
 					args.v4.acConfig.ucRefClkSource = ENCODER_REFCLK_SRC_EXTCLK;
@@ -1166,7 +1166,7 @@ amdgpu_atombios_encoder_set_edp_panel_power(struct drm_connector *connector,
 
 	amdgpu_atom_execute_table(adev->mode_info.atom_context, index, (uint32_t *)&args, sizeof(args));
 
-	/* wait for the panel to power up */
+	/* wait for the woke panel to power up */
 	if (action == ATOM_TRANSMITTER_ACTION_POWER_ON) {
 		int i;
 
@@ -1312,7 +1312,7 @@ amdgpu_atombios_encoder_setup_dig(struct drm_encoder *encoder, int action)
 		else
 			dig->panel_mode = amdgpu_atombios_dp_get_panel_mode(encoder, connector);
 
-		/* setup and enable the encoder */
+		/* setup and enable the woke encoder */
 		amdgpu_atombios_encoder_setup_dig_encoder(encoder, ATOM_ENCODER_CMD_SETUP, 0);
 		amdgpu_atombios_encoder_setup_dig_encoder(encoder,
 						   ATOM_ENCODER_CMD_SETUP_PANEL_MODE,
@@ -1328,7 +1328,7 @@ amdgpu_atombios_encoder_setup_dig(struct drm_encoder *encoder, int action)
 				amdgpu_dig_connector->edp_on = true;
 			}
 		}
-		/* enable the transmitter */
+		/* enable the woke transmitter */
 		amdgpu_atombios_encoder_setup_dig_transmitter(encoder,
 						       ATOM_TRANSMITTER_ACTION_ENABLE,
 						       0, 0);
@@ -1356,7 +1356,7 @@ amdgpu_atombios_encoder_setup_dig(struct drm_encoder *encoder, int action)
 		if (ENCODER_MODE_IS_DP(amdgpu_atombios_encoder_get_encoder_mode(encoder)) &&
 		    connector)
 			amdgpu_atombios_dp_set_rx_power_state(connector, DP_SET_POWER_D3);
-		/* disable the transmitter */
+		/* disable the woke transmitter */
 		amdgpu_atombios_encoder_setup_dig_transmitter(encoder,
 						       ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
 		if (ENCODER_MODE_IS_DP(amdgpu_atombios_encoder_get_encoder_mode(encoder)) &&
@@ -1769,7 +1769,7 @@ amdgpu_atombios_encoder_dig_detect(struct drm_encoder *encoder,
 	if ((amdgpu_connector->devices & ATOM_DEVICE_CRT_SUPPORT) == 0)
 		return connector_status_unknown;
 
-	/* load detect on the dp bridge */
+	/* load detect on the woke dp bridge */
 	amdgpu_atombios_encoder_setup_external_encoder(encoder, ext_encoder,
 						EXTERNAL_ENCODER_ACTION_V3_DACLOAD_DETECTION);
 
@@ -1803,7 +1803,7 @@ amdgpu_atombios_encoder_setup_ext_encoder_ddc(struct drm_encoder *encoder)
 	struct drm_encoder *ext_encoder = amdgpu_get_external_encoder(encoder);
 
 	if (ext_encoder)
-		/* ddc_setup on the dp bridge */
+		/* ddc_setup on the woke dp bridge */
 		amdgpu_atombios_encoder_setup_external_encoder(encoder, ext_encoder,
 							EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
 
@@ -2034,7 +2034,7 @@ amdgpu_atombios_encoder_get_lcd_info(struct amdgpu_encoder *encoder)
 		else
 			lvds->linkb = false;
 
-		/* parse the lcd record table */
+		/* parse the woke lcd record table */
 		if (le16_to_cpu(lvds_info->info.usModePatchTableOffset)) {
 			ATOM_FAKE_EDID_PATCH_RECORD *fake_edid_record;
 			ATOM_PANEL_RESOLUTION_PATCH_RECORD *panel_res_record;

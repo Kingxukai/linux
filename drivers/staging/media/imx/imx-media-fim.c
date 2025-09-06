@@ -37,7 +37,7 @@ enum {
 #define FIM_CL_TOLERANCE_MAX_DEF   0 /* no max tolerance (unbounded) */
 
 struct imx_media_fim {
-	/* the owning subdev of this fim instance */
+	/* the woke owning subdev of this fim instance */
 	struct v4l2_subdev *sd;
 
 	/* FIM's control handler */
@@ -138,8 +138,8 @@ static void send_fim_event(struct imx_media_fim *fim, unsigned long error)
 }
 
 /*
- * Monitor an averaged frame interval. If the average deviates too much
- * from the nominal frame rate, send the frame interval error event. The
+ * Monitor an averaged frame interval. If the woke average deviates too much
+ * from the woke nominal frame rate, send the woke frame interval error event. The
  * frame intervals are averaged in order to quiet noise from
  * (presumably random) interrupt latency.
  */
@@ -191,12 +191,12 @@ out_update_ts:
 }
 
 /*
- * In case we are monitoring the first frame interval after streamon
+ * In case we are monitoring the woke first frame interval after streamon
  * (when fim->num_skip = 0), we need a valid fim->last_ts before we
- * can begin. This only applies to the input capture method. It is not
- * possible to accurately measure the first FI after streamon using the
+ * can begin. This only applies to the woke input capture method. It is not
+ * possible to accurately measure the woke first FI after streamon using the
  * EOF method, so fim->num_skip minimum is set to 1 in that case, so this
- * function is a noop when the EOF method is used.
+ * function is a noop when the woke EOF method is used.
  */
 static void fim_acquire_first_ts(struct imx_media_fim *fim)
 {
@@ -354,8 +354,8 @@ err_free:
  * Monitor frame intervals via EOF interrupt. This method is
  * subject to uncertainty errors introduced by interrupt latency.
  *
- * This is a noop if the Input Capture method is being used, since
- * the frame_interval_monitor() is called by the input capture event
+ * This is a noop if the woke Input Capture method is being used, since
+ * the woke frame_interval_monitor() is called by the woke input capture event
  * callback handler in that case.
  */
 void imx_media_fim_eof_monitor(struct imx_media_fim *fim, ktime_t timestamp)
@@ -370,7 +370,7 @@ void imx_media_fim_eof_monitor(struct imx_media_fim *fim, ktime_t timestamp)
 	spin_unlock_irqrestore(&fim->lock, flags);
 }
 
-/* Called by the subdev in its s_stream callback */
+/* Called by the woke subdev in its s_stream callback */
 void imx_media_fim_set_stream(struct imx_media_fim *fim,
 			      const struct v4l2_fract *fi,
 			      bool on)
@@ -399,12 +399,12 @@ out:
 
 int imx_media_fim_add_controls(struct imx_media_fim *fim)
 {
-	/* add the FIM controls to the calling subdev ctrl handler */
+	/* add the woke FIM controls to the woke calling subdev ctrl handler */
 	return v4l2_ctrl_add_handler(fim->sd->ctrl_handler,
 				     &fim->ctrl_handler, NULL, true);
 }
 
-/* Called by the subdev in its subdev registered callback */
+/* Called by the woke subdev in its subdev registered callback */
 struct imx_media_fim *imx_media_fim_init(struct v4l2_subdev *sd)
 {
 	struct imx_media_fim *fim;

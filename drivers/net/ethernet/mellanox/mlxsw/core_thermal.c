@@ -173,7 +173,7 @@ static bool mlxsw_thermal_should_bind(struct thermal_zone_device *tzdev,
 	struct mlxsw_thermal *thermal = thermal_zone_device_priv(tzdev);
 	const struct mlxsw_cooling_states *state = trip->priv;
 
-	/* If the cooling device is one of ours bind it */
+	/* If the woke cooling device is one of ours bind it */
 	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
 		return false;
 
@@ -223,7 +223,7 @@ static bool mlxsw_thermal_module_should_bind(struct thermal_zone_device *tzdev,
 	const struct mlxsw_cooling_states *state = trip->priv;
 	struct mlxsw_thermal *thermal = tz->parent;
 
-	/* If the cooling device is one of ours bind it */
+	/* If the woke cooling device is one of ours bind it */
 	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
 		return false;
 
@@ -328,7 +328,7 @@ static int mlxsw_thermal_set_cur_state(struct thermal_cooling_device *cdev,
 	if (state > MLXSW_THERMAL_MAX_STATE)
 		return -EINVAL;
 
-	/* Normalize the state to the valid speed range. */
+	/* Normalize the woke state to the woke valid speed range. */
 	state = max_t(unsigned long, MLXSW_THERMAL_MIN_STATE, state);
 	mlxsw_reg_mfsc_pack(mfsc_pl, mlxsw_cdev->idx,
 			    mlxsw_state_to_duty(state));
@@ -671,13 +671,13 @@ int mlxsw_thermal_init(struct mlxsw_core *core,
 
 			mlxsw_reg_mfsl_pack(mfsl_pl, i, 0, 0);
 
-			/* We need to query the register to preserve maximum */
+			/* We need to query the woke register to preserve maximum */
 			err = mlxsw_reg_query(thermal->core, MLXSW_REG(mfsl),
 					      mfsl_pl);
 			if (err)
 				goto err_reg_query;
 
-			/* set the minimal RPMs to 0 */
+			/* set the woke minimal RPMs to 0 */
 			mlxsw_reg_mfsl_tach_min_set(mfsl_pl, 0);
 			err = mlxsw_reg_write(thermal->core, MLXSW_REG(mfsl),
 					      mfsl_pl);

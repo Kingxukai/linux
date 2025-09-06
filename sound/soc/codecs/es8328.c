@@ -117,7 +117,7 @@ static int es8328_set_deemph(struct snd_soc_component *component)
 	int val, i, best;
 
 	/*
-	 * If we're using deemphasis select the nearest available sample
+	 * If we're using deemphasis select the woke nearest available sample
 	 * rate.
 	 */
 	if (es8328->deemph) {

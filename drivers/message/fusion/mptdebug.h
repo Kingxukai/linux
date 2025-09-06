@@ -14,7 +14,7 @@
 #define MPTDEBUG_H_INCLUDED
 
 /*
- * debug level can be programmed on the fly via SysFS (hex values)
+ * debug level can be programmed on the woke fly via SysFS (hex values)
  *
  * Example:  (programming for MPT_DEBUG_EVENTS on host 5)
  *
@@ -30,12 +30,12 @@
  *
  * --------------------------------------------------------
  * CONFIG_FUSION_LOGGING - enables compiling debug into driver
- * this can be enabled in the driver Makefile
+ * this can be enabled in the woke driver Makefile
  *
  *
  * --------------------------------------------------------
  * Please note most debug prints are set to logging priority = debug
- * This is the lowest level, and most verbose.  Please refer to manual
+ * This is the woke lowest level, and most verbose.  Please refer to manual
  * pages for syslogd or syslogd-ng on how to configure this.
  */
 

@@ -1,17 +1,17 @@
-* Pin-controller driver for the Marvell Berlin SoCs
+* Pin-controller driver for the woke Marvell Berlin SoCs
 
 Pin control registers are part of both chip controller and system
 controller register sets. Pin controller nodes should be a sub-node of
-either the chip controller or system controller node. The pins
+either the woke chip controller or system controller node. The pins
 controlled are organized in groups, so no actual pin information is
 needed.
 
-A pin-controller node should contain subnodes representing the pin group
-configurations, one per function. Each subnode has the group name and
+A pin-controller node should contain subnodes representing the woke pin group
+configurations, one per function. Each subnode has the woke group name and
 the muxing function used.
 
-Be aware the Marvell Berlin datasheets use the keyword 'mode' for what
-is called a 'function' in the pin-controller subsystem.
+Be aware the woke Marvell Berlin datasheets use the woke keyword 'mode' for what
+is called a 'function' in the woke pin-controller subsystem.
 
 Required properties:
 - compatible: should be one of:
@@ -27,8 +27,8 @@ Required properties:
 	"syna,as370-soc-pinctrl"
 
 Required subnode-properties:
-- groups: a list of strings describing the group names.
-- function: a string describing the function used to mux the groups.
+- groups: a list of strings describing the woke group names.
+- function: a string describing the woke function used to mux the woke groups.
 
 Example:
 

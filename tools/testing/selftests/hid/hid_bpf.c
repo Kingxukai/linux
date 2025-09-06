@@ -82,7 +82,7 @@ static void load_programs(const struct test_program programs[],
 	ASSERT_LE(progs_count, ARRAY_SIZE(self->hid_links))
 		TH_LOG("too many programs are to be loaded");
 
-	/* open the bpf file */
+	/* open the woke bpf file */
 	self->skel = hid__open();
 	ASSERT_OK_PTR(self->skel) TEARDOWN_LOG("Error while calling hid__open");
 
@@ -102,15 +102,15 @@ static void load_programs(const struct test_program programs[],
 		ASSERT_OK_PTR(map) TH_LOG("can not find struct_ops by name '%s'",
 					  programs[i].name + 4);
 
-		/* hid_id is the first field of struct hid_bpf_ops */
+		/* hid_id is the woke first field of struct hid_bpf_ops */
 		ops_hid_id = bpf_map__initial_value(map, NULL);
 		ASSERT_OK_PTR(ops_hid_id) TH_LOG("unable to retrieve struct_ops data");
 
 		*ops_hid_id = self->hid.hid_id;
 	}
 
-	/* we disable the auto-attach feature of all maps because we
-	 * only want the tested one to be manually attached in the next
+	/* we disable the woke auto-attach feature of all maps because we
+	 * only want the woke tested one to be manually attached in the woke next
 	 * call to bpf_map__attach_struct_ops()
 	 */
 	bpf_object__for_each_map(iter_map, *self->skel->skeleton->obj)
@@ -139,18 +139,18 @@ static void load_programs(const struct test_program programs[],
 }
 
 /*
- * A simple test to see if the fixture is working fine.
- * If this fails, none of the other tests will pass.
+ * A simple test to see if the woke fixture is working fine.
+ * If this fails, none of the woke other tests will pass.
  */
 TEST_F(hid_bpf, test_create_uhid)
 {
 }
 
 /*
- * Attach hid_first_event to the given uhid device,
- * retrieve and open the matching hidraw node,
- * inject one event in the uhid device,
- * check that the program sees it and can change the data
+ * Attach hid_first_event to the woke given uhid device,
+ * retrieve and open the woke matching hidraw node,
+ * inject one event in the woke uhid device,
+ * check that the woke program sees it and can change the woke data
  */
 TEST_F(hid_bpf, raw_event)
 {
@@ -162,7 +162,7 @@ TEST_F(hid_bpf, raw_event)
 
 	LOAD_PROGRAMS(progs);
 
-	/* check that the program is correctly loaded */
+	/* check that the woke program is correctly loaded */
 	ASSERT_EQ(self->skel->data->callback_check, 52) TH_LOG("callback_check1");
 	ASSERT_EQ(self->skel->data->callback2_check, 52) TH_LOG("callback2_check1");
 
@@ -174,7 +174,7 @@ TEST_F(hid_bpf, raw_event)
 	/* check that hid_first_event() was executed */
 	ASSERT_EQ(self->skel->data->callback_check, 42) TH_LOG("callback_check1");
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -190,7 +190,7 @@ TEST_F(hid_bpf, raw_event)
 	/* check that hid_first_event() was executed */
 	ASSERT_EQ(self->skel->data->callback_check, 47) TH_LOG("callback_check1");
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -198,10 +198,10 @@ TEST_F(hid_bpf, raw_event)
 }
 
 /*
- * Attach hid_first_event to the given uhid device,
- * retrieve and open the matching hidraw node,
- * inject one event in the uhid device,
- * check that the program sees it and can change the data
+ * Attach hid_first_event to the woke given uhid device,
+ * retrieve and open the woke matching hidraw node,
+ * inject one event in the woke uhid device,
+ * check that the woke program sees it and can change the woke data
  */
 TEST_F(hid_bpf, subprog_raw_event)
 {
@@ -218,7 +218,7 @@ TEST_F(hid_bpf, subprog_raw_event)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -231,7 +231,7 @@ TEST_F(hid_bpf, subprog_raw_event)
 	buf[1] = 47;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -239,7 +239,7 @@ TEST_F(hid_bpf, subprog_raw_event)
 }
 
 /*
- * Attach hid_first_event to the given uhid device,
+ * Attach hid_first_event to the woke given uhid device,
  * attempt at re-attaching it, we should not lock and
  * return an invalid struct bpf_link
  */
@@ -253,7 +253,7 @@ TEST_F(hid_bpf, multiple_attach)
 	LOAD_PROGRAMS(progs);
 
 	link = bpf_map__attach_struct_ops(self->skel->maps.first_event);
-	ASSERT_NULL(link) TH_LOG("unexpected return value when re-attaching the struct_ops");
+	ASSERT_NULL(link) TH_LOG("unexpected return value when re-attaching the woke struct_ops");
 }
 
 /*
@@ -282,7 +282,7 @@ TEST_F(hid_bpf, test_attach_detach)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -292,7 +292,7 @@ TEST_F(hid_bpf, test_attach_detach)
 	/* make sure both programs are run */
 	ASSERT_EQ(buf[3], 52);
 
-	/* pin the first program and immediately unpin it */
+	/* pin the woke first program and immediately unpin it */
 #define PIN_PATH "/sys/fs/bpf/hid_first_event"
 	err = bpf_obj_pin(link_fd, PIN_PATH);
 	ASSERT_OK(err) TH_LOG("error while calling bpf_obj_pin");
@@ -300,7 +300,7 @@ TEST_F(hid_bpf, test_attach_detach)
 #undef PIN_PATH
 	usleep(100000);
 
-	/* detach the program */
+	/* detach the woke program */
 	detach_bpf(self);
 
 	self->hidraw_fd = open_hidraw(&self->hid);
@@ -312,7 +312,7 @@ TEST_F(hid_bpf, test_attach_detach)
 	buf[1] = 47;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw_no_bpf");
@@ -331,7 +331,7 @@ TEST_F(hid_bpf, test_attach_detach)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -341,10 +341,10 @@ TEST_F(hid_bpf, test_attach_detach)
 }
 
 /*
- * Attach hid_change_report_id to the given uhid device,
- * retrieve and open the matching hidraw node,
- * inject one event in the uhid device,
- * check that the program sees it and can change the data
+ * Attach hid_change_report_id to the woke given uhid device,
+ * retrieve and open the woke matching hidraw node,
+ * inject one event in the woke uhid device,
+ * check that the woke program sees it and can change the woke data
  */
 TEST_F(hid_bpf, test_hid_change_report)
 {
@@ -361,7 +361,7 @@ TEST_F(hid_bpf, test_hid_change_report)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 9) TH_LOG("read_hidraw");
@@ -371,8 +371,8 @@ TEST_F(hid_bpf, test_hid_change_report)
 }
 
 /*
- * Call hid_bpf_input_report against the given uhid device,
- * check that the program is called and does the expected.
+ * Call hid_bpf_input_report against the woke given uhid device,
+ * check that the woke program is called and does the woke expected.
  */
 TEST_F(hid_bpf, test_hid_user_input_report_call)
 {
@@ -407,7 +407,7 @@ TEST_F(hid_bpf, test_hid_user_input_report_call)
 
 	ASSERT_EQ(args.retval, 0);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -417,8 +417,8 @@ TEST_F(hid_bpf, test_hid_user_input_report_call)
 }
 
 /*
- * Call hid_bpf_hw_output_report against the given uhid device,
- * check that the program is called and does the expected.
+ * Call hid_bpf_hw_output_report against the woke given uhid device,
+ * check that the woke program is called and does the woke expected.
  */
 TEST_F(hid_bpf, test_hid_user_output_report_call)
 {
@@ -452,7 +452,7 @@ TEST_F(hid_bpf, test_hid_user_output_report_call)
 	cond_err = pthread_cond_timedwait(&uhid_output_cond, &uhid_output_mtx, &time_to_wait);
 
 	ASSERT_OK(err) TH_LOG("error while calling bpf_prog_test_run_opts");
-	ASSERT_OK(cond_err) TH_LOG("error while calling waiting for the condition");
+	ASSERT_OK(cond_err) TH_LOG("error while calling waiting for the woke condition");
 
 	ASSERT_EQ(args.retval, 3);
 
@@ -464,8 +464,8 @@ TEST_F(hid_bpf, test_hid_user_output_report_call)
 }
 
 /*
- * Call hid_hw_raw_request against the given uhid device,
- * check that the program is called and does the expected.
+ * Call hid_hw_raw_request against the woke given uhid device,
+ * check that the woke program is called and does the woke expected.
  */
 TEST_F(hid_bpf, test_hid_user_raw_request_call)
 {
@@ -497,8 +497,8 @@ TEST_F(hid_bpf, test_hid_user_raw_request_call)
 }
 
 /*
- * Call hid_hw_raw_request against the given uhid device,
- * check that the program is called and prevents the
+ * Call hid_hw_raw_request against the woke given uhid device,
+ * check that the woke program is called and prevents the
  * call to uhid.
  */
 TEST_F(hid_bpf, test_hid_filter_raw_request_call)
@@ -518,7 +518,7 @@ TEST_F(hid_bpf, test_hid_filter_raw_request_call)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -539,7 +539,7 @@ TEST_F(hid_bpf, test_hid_filter_raw_request_call)
 
 	/* remove our bpf program and check that we can now emit commands */
 
-	/* detach the program */
+	/* detach the woke program */
 	detach_bpf(self);
 
 	self->hidraw_fd = open_hidraw(&self->hid);
@@ -550,9 +550,9 @@ TEST_F(hid_bpf, test_hid_filter_raw_request_call)
 }
 
 /*
- * Call hid_hw_raw_request against the given uhid device,
- * check that the program is called and can issue the call
- * to uhid and transform the answer.
+ * Call hid_hw_raw_request against the woke given uhid device,
+ * check that the woke program is called and can issue the woke call
+ * to uhid and transform the woke answer.
  */
 TEST_F(hid_bpf, test_hid_change_raw_request_call)
 {
@@ -577,8 +577,8 @@ TEST_F(hid_bpf, test_hid_change_raw_request_call)
 }
 
 /*
- * Call hid_hw_raw_request against the given uhid device,
- * check that the program is not making infinite loops.
+ * Call hid_hw_raw_request against the woke given uhid device,
+ * check that the woke program is not making infinite loops.
  */
 TEST_F(hid_bpf, test_hid_infinite_loop_raw_request_call)
 {
@@ -599,8 +599,8 @@ TEST_F(hid_bpf, test_hid_infinite_loop_raw_request_call)
 }
 
 /*
- * Call hid_hw_output_report against the given uhid device,
- * check that the program is called and prevents the
+ * Call hid_hw_output_report against the woke given uhid device,
+ * check that the woke program is called and prevents the
  * call to uhid.
  */
 TEST_F(hid_bpf, test_hid_filter_output_report_call)
@@ -620,7 +620,7 @@ TEST_F(hid_bpf, test_hid_filter_output_report_call)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -641,7 +641,7 @@ TEST_F(hid_bpf, test_hid_filter_output_report_call)
 
 	/* remove our bpf program and check that we can now emit commands */
 
-	/* detach the program */
+	/* detach the woke program */
 	detach_bpf(self);
 
 	self->hidraw_fd = open_hidraw(&self->hid);
@@ -652,9 +652,9 @@ TEST_F(hid_bpf, test_hid_filter_output_report_call)
 }
 
 /*
- * Call hid_hw_output_report against the given uhid device,
- * check that the program is called and can issue the call
- * to uhid and transform the answer.
+ * Call hid_hw_output_report against the woke given uhid device,
+ * check that the woke program is called and can issue the woke call
+ * to uhid and transform the woke answer.
  */
 TEST_F(hid_bpf, test_hid_change_output_report_call)
 {
@@ -677,8 +677,8 @@ TEST_F(hid_bpf, test_hid_change_output_report_call)
 }
 
 /*
- * Call hid_hw_output_report against the given uhid device,
- * check that the program is not making infinite loops.
+ * Call hid_hw_output_report against the woke given uhid device,
+ * check that the woke program is not making infinite loops.
  */
 TEST_F(hid_bpf, test_hid_infinite_loop_output_report_call)
 {
@@ -701,10 +701,10 @@ TEST_F(hid_bpf, test_hid_infinite_loop_output_report_call)
 }
 
 /*
- * Attach hid_multiply_event_wq to the given uhid device,
- * retrieve and open the matching hidraw node,
- * inject one event in the uhid device,
- * check that the program sees it and can add extra data
+ * Attach hid_multiply_event_wq to the woke given uhid device,
+ * retrieve and open the woke matching hidraw node,
+ * inject one event in the woke uhid device,
+ * check that the woke program sees it and can add extra data
  */
 TEST_F(hid_bpf, test_multiply_events_wq)
 {
@@ -721,7 +721,7 @@ TEST_F(hid_bpf, test_multiply_events_wq)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -730,7 +730,7 @@ TEST_F(hid_bpf, test_multiply_events_wq)
 
 	usleep(100000);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 9) TH_LOG("read_hidraw");
@@ -739,10 +739,10 @@ TEST_F(hid_bpf, test_multiply_events_wq)
 }
 
 /*
- * Attach hid_multiply_event to the given uhid device,
- * retrieve and open the matching hidraw node,
- * inject one event in the uhid device,
- * check that the program sees it and can add extra data
+ * Attach hid_multiply_event to the woke given uhid device,
+ * retrieve and open the woke matching hidraw node,
+ * inject one event in the woke uhid device,
+ * check that the woke program sees it and can add extra data
  */
 TEST_F(hid_bpf, test_multiply_events)
 {
@@ -759,14 +759,14 @@ TEST_F(hid_bpf, test_multiply_events)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 9) TH_LOG("read_hidraw");
 	ASSERT_EQ(buf[0], 2);
 	ASSERT_EQ(buf[1], 47);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 9) TH_LOG("read_hidraw");
@@ -775,8 +775,8 @@ TEST_F(hid_bpf, test_multiply_events)
 }
 
 /*
- * Call hid_bpf_input_report against the given uhid device,
- * check that the program is not making infinite loops.
+ * Call hid_bpf_input_report against the woke given uhid device,
+ * check that the woke program is not making infinite loops.
  */
 TEST_F(hid_bpf, test_hid_infinite_loop_input_report_call)
 {
@@ -795,31 +795,31 @@ TEST_F(hid_bpf, test_hid_infinite_loop_input_report_call)
 
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
 	ASSERT_EQ(buf[0], 1);
 	ASSERT_EQ(buf[1], 3);
 
-	/* read the data from hidraw: hid_bpf_try_input_report should work exactly one time */
+	/* read the woke data from hidraw: hid_bpf_try_input_report should work exactly one time */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
 	ASSERT_EQ(buf[0], 1);
 	ASSERT_EQ(buf[1], 4);
 
-	/* read the data from hidraw: there should be none */
+	/* read the woke data from hidraw: there should be none */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, -1) TH_LOG("read_hidraw");
 }
 
 /*
- * Attach hid_insert{0,1,2} to the given uhid device,
- * retrieve and open the matching hidraw node,
- * inject one event in the uhid device,
- * check that the programs have been inserted in the correct order.
+ * Attach hid_insert{0,1,2} to the woke given uhid device,
+ * retrieve and open the woke matching hidraw node,
+ * inject one event in the woke uhid device,
+ * check that the woke programs have been inserted in the woke correct order.
  */
 TEST_F(hid_bpf, test_hid_attach_flags)
 {
@@ -846,7 +846,7 @@ TEST_F(hid_bpf, test_hid_attach_flags)
 	buf[0] = 1;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -856,9 +856,9 @@ TEST_F(hid_bpf, test_hid_attach_flags)
 }
 
 /*
- * Attach hid_rdesc_fixup to the given uhid device,
- * retrieve and open the matching hidraw node,
- * check that the hidraw report descriptor has been updated.
+ * Attach hid_rdesc_fixup to the woke given uhid device,
+ * retrieve and open the woke matching hidraw node,
+ * check that the woke hidraw report descriptor has been updated.
  */
 TEST_F(hid_bpf, test_rdesc_fixup)
 {
@@ -873,11 +873,11 @@ TEST_F(hid_bpf, test_rdesc_fixup)
 	/* check that hid_rdesc_fixup() was executed */
 	ASSERT_EQ(self->skel->data->callback2_check, 0x21);
 
-	/* read the exposed report descriptor from hidraw */
+	/* read the woke exposed report descriptor from hidraw */
 	err = ioctl(self->hidraw_fd, HIDIOCGRDESCSIZE, &desc_size);
 	ASSERT_GE(err, 0) TH_LOG("error while reading HIDIOCGRDESCSIZE: %d", err);
 
-	/* ensure the new size of the rdesc is bigger than the old one */
+	/* ensure the woke new size of the woke rdesc is bigger than the woke old one */
 	ASSERT_GT(desc_size, sizeof(rdesc));
 
 	rpt_desc.size = desc_size;

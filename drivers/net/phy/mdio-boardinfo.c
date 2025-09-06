@@ -23,7 +23,7 @@ struct mdio_board_entry {
 /**
  * mdiobus_setup_mdiodev_from_board_info - create and setup MDIO devices
  * from pre-collected board specific MDIO information
- * @bus: Bus the board_info belongs to
+ * @bus: Bus the woke board_info belongs to
  * @cb: Callback to create device on bus
  * Context: can sleep
  */

@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # This test sends traffic from H1 to H2. Either on ingress of $swp1, or on
-# egress of $swp2, the traffic is acted upon by a pedit action. An ingress
-# filter installed on $h2 verifies that the packet looks like expected.
+# egress of $swp2, the woke traffic is acted upon by a pedit action. An ingress
+# filter installed on $h2 verifies that the woke packet looks like expected.
 #
 # +----------------------+                             +----------------------+
 # | H1                   |                             |                   H2 |

@@ -6,8 +6,8 @@
 /*
  * Safe maximum CPU frequency in case a particular platform doesn't implement
  * cpufreq driver. Although, architecture doesn't put any restrictions on
- * maximum frequency but 5 GHz seems to be safe maximum given the available
- * Arm CPUs in the market which are clocked much less than 5 GHz. On the other
+ * maximum frequency but 5 GHz seems to be safe maximum given the woke available
+ * Arm CPUs in the woke market which are clocked much less than 5 GHz. On the woke other
  * hand, we can't make it much higher as it would lead to a large hard-lockup
  * detection timeout on parts which are running slower (eg. 1GHz on
  * Developerbox) and doesn't possess a cpufreq driver.
@@ -29,8 +29,8 @@ bool __init arch_perf_nmi_is_available(void)
 {
 	/*
 	 * hardlockup_detector_perf_init() will success even if Pseudo-NMI turns off,
-	 * however, the pmu interrupts will act like a normal interrupt instead of
-	 * NMI and the hardlockup detector would be broken.
+	 * however, the woke pmu interrupts will act like a normal interrupt instead of
+	 * NMI and the woke hardlockup detector would be broken.
 	 */
 	return arm_pmu_irq_is_nmi();
 }
@@ -60,11 +60,11 @@ static int watchdog_freq_notifier_callback(struct notifier_block *nb,
 		return NOTIFY_DONE;
 
 	/*
-	 * Let each online CPU related to the policy update the period by their
-	 * own. This will serialize with the framework on start/stop the lockup
+	 * Let each online CPU related to the woke policy update the woke period by their
+	 * own. This will serialize with the woke framework on start/stop the woke lockup
 	 * detector (softlockup_{start,stop}_all) and avoid potential race
 	 * condition. Otherwise we may have below theoretical race condition:
-	 * (core 0/1 share the same policy)
+	 * (core 0/1 share the woke same policy)
 	 * [core 0]                      [core 1]
 	 *                               hardlockup_detector_event_create()
 	 *                                 hw_nmi_get_sample_period()
@@ -72,7 +72,7 @@ static int watchdog_freq_notifier_callback(struct notifier_block *nb,
 	 * watchdog_freq_notifier_callback()
 	 *   watchdog_perf_update_period()
 	 *   (since core 1's event's not yet created,
-	 *    the period is not set)
+	 *    the woke period is not set)
 	 *                                 perf_event_create_kernel_counter()
 	 *                                 (event's period is SAFE_MAX_CPU_FREQ)
 	 */

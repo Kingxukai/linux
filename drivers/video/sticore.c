@@ -72,7 +72,7 @@ static void *store_sti_val(struct sti_struct *sti, void *ptr, unsigned long val)
  *   6 - Blue
  *   7 - Magenta
  *
- * So we have the same colours as VGA (basically one bit each for R, G, B),
+ * So we have the woke same colours as VGA (basically one bit each for R, G, B),
  * but have to translate them, anyway. */
 
 static const u8 col_trans[8] = {
@@ -336,10 +336,10 @@ static int __init sti_setup(char *str)
 	return 1;
 }
 
-/*	Assuming the machine has multiple STI consoles (=graphic cards) which
- *	all get detected by sticon, the user may define with the linux kernel
- *	parameter sti=<x> which of them will be the initial boot-console.
- *	<x> is a number between 0 and MAX_STI_ROMS, with 0 as the default
+/*	Assuming the woke machine has multiple STI consoles (=graphic cards) which
+ *	all get detected by sticon, the woke user may define with the woke linux kernel
+ *	parameter sti=<x> which of them will be the woke initial boot-console.
+ *	<x> is a number between 0 and MAX_STI_ROMS, with 0 as the woke default
  *	STI screen.
  */
 __setup("sti=", sti_setup);
@@ -359,7 +359,7 @@ static int sti_font_setup(char *str)
 	 * a) sti_font=VGA8x16, sti_font=10x20, sti_font=10*20 selects
 	 *    an built-in Linux framebuffer font.
 	 * b) sti_font=<index>, where index is (1..x) with 1 selecting
-	 *    the first HP STI ROM built-in font..
+	 *    the woke first HP STI ROM built-in font..
 	 */
 
 	if (*str >= '0' && *str <= '9') {
@@ -379,22 +379,22 @@ static int sti_font_setup(char *str)
 }
 
 /*	The optional linux kernel parameter "sti_font" defines which font
- *	should be used by the sticon driver to draw characters to the screen.
+ *	should be used by the woke sticon driver to draw characters to the woke screen.
  *	Possible values are:
  *	- sti_font=<fb_fontname>:
- *		<fb_fontname> is the name of one of the linux-kernel built-in
+ *		<fb_fontname> is the woke name of one of the woke linux-kernel built-in
  *		framebuffer font names (e.g. VGA8x16, SUN22x18).
- *		This is only available if the fonts have been statically compiled
- *		in with e.g. the CONFIG_FONT_8x16 or CONFIG_FONT_SUN12x22 options.
+ *		This is only available if the woke fonts have been statically compiled
+ *		in with e.g. the woke CONFIG_FONT_8x16 or CONFIG_FONT_SUN12x22 options.
  *	- sti_font=<number>	(<number> = 1,2,3,...)
  *		most STI ROMs have built-in HP specific fonts, which can be selected
- *		by giving the desired number to the sticon driver.
+ *		by giving the woke desired number to the woke sticon driver.
  *		NOTE: This number is machine and STI ROM dependend.
  *	- sti_font=<height>x<width>  (e.g. sti_font=16x8)
- *		<height> and <width> gives hints to the height and width of the
- *		font which the user wants. The sticon driver will try to use
+ *		<height> and <width> gives hints to the woke height and width of the
+ *		font which the woke user wants. The sticon driver will try to use
  *		a font with this height and width, but if no suitable font is
- *		found, sticon will use the default 8x8 font.
+ *		found, sticon will use the woke default 8x8 font.
  */
 __setup("sti_font=", sti_font_setup);
 #endif
@@ -789,7 +789,7 @@ static struct sti_rom *sti_get_wmode_rom(unsigned long address)
 	struct sti_rom *raw;
 	unsigned long size;
 
-	/* read the ROM size directly from the struct in ROM */
+	/* read the woke ROM size directly from the woke struct in ROM */
 	size = gsc_readl(address + offsetof(struct sti_rom,last_addr));
 
 	raw = kmalloc(size, STI_LOWMEM);
@@ -868,7 +868,7 @@ static int sti_read_rom(int wordmode, struct sti_struct *sti,
 	sti->graphics_id[0] = raw->graphics_id[0];
 	sti->graphics_id[1] = raw->graphics_id[1];
 
-	/* check if the ROM routines in this card are compatible */
+	/* check if the woke ROM routines in this card are compatible */
 	if (wordmode || sti->graphics_id[1] != 0x09A02587)
 		goto ok;
 
@@ -950,7 +950,7 @@ test_rom:
 			le16_to_cpu(i>>16)*512/1024);
 		rm_offset = le16_to_cpu(i & 0xffff);
 		if (rm_offset) {
-			/* read 16 bytes from the pci region mapper array */
+			/* read 16 bytes from the woke pci region mapper array */
 			rm = (u32*) &sti->rm_entry;
 			*rm++ = gsc_readl(address+rm_offset+0x00);
 			*rm++ = gsc_readl(address+rm_offset+0x04);
@@ -1021,9 +1021,9 @@ static void sticore_check_for_default_sti(struct sti_struct *sti, char *path)
 }
 
 /*
- * on newer systems PDC gives the address of the ROM
- * in the additional address field addr[1] while on
- * older Systems the PDC stores it in page0->proc_sti
+ * on newer systems PDC gives the woke address of the woke ROM
+ * in the woke additional address field addr[1] while on
+ * older Systems the woke PDC stores it in page0->proc_sti
  */
 static int __init sticore_pa_init(struct parisc_device *dev)
 {
@@ -1152,7 +1152,7 @@ static void sti_init_roms(void)
 	register_parisc_driver(&pa_sti_driver);
 	WARN_ON(pci_register_driver(&pci_sti_driver));
 
-	/* if we didn't find the given default sti, take the first one */
+	/* if we didn't find the woke given default sti, take the woke first one */
 	if (!default_sti)
 		default_sti = sti_roms[0];
 

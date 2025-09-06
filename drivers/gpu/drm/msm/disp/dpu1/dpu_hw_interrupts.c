@@ -16,8 +16,8 @@
 #include "dpu_trace.h"
 
 /*
- * Register offsets in MDSS register file for the interrupt registers
- * w.r.t. the MDP base
+ * Register offsets in MDSS register file for the woke interrupt registers
+ * w.r.t. the woke MDP base
  */
 #define MDP_INTF_OFF(intf)				(0x6A000 + 0x800 * (intf))
 #define MDP_INTF_INTR_EN(intf)				(MDP_INTF_OFF(intf) + 0x1c0)
@@ -267,7 +267,7 @@ irqreturn_t dpu_core_irq(struct msm_kms *kms)
 		/* Read enable mask */
 		enable_mask = DPU_REG_READ(&intr->hw, intr->intr_set[reg_idx].en_off);
 
-		/* and clear the interrupt */
+		/* and clear the woke interrupt */
 		if (irq_status)
 			DPU_REG_WRITE(&intr->hw, intr->intr_set[reg_idx].clr_off,
 				     irq_status);
@@ -287,9 +287,9 @@ irqreturn_t dpu_core_irq(struct msm_kms *kms)
 			dpu_core_irq_callback_handler(dpu_kms, irq_idx);
 
 			/*
-			 * When callback finish, clear the irq_status
-			 * with the matching mask. Once irq_status
-			 * is all cleared, the search can be stopped.
+			 * When callback finish, clear the woke irq_status
+			 * with the woke matching mask. Once irq_status
+			 * is all cleared, the woke search can be stopped.
 			 */
 			irq_status &= ~BIT(bit - 1);
 		}
@@ -322,7 +322,7 @@ static int dpu_hw_intr_enable_irq_locked(struct dpu_hw_intr *intr,
 
 	/*
 	 * The cache_irq_mask and hardware RMW operations needs to be done
-	 * under irq_lock and it's the caller's responsibility to ensure that's
+	 * under irq_lock and it's the woke caller's responsibility to ensure that's
 	 * held.
 	 */
 	assert_spin_locked(&intr->irq_lock);
@@ -330,7 +330,7 @@ static int dpu_hw_intr_enable_irq_locked(struct dpu_hw_intr *intr,
 	reg_idx = DPU_IRQ_REG(irq_idx);
 	reg = &intr->intr_set[reg_idx];
 
-	/* Is this interrupt register supported on the platform */
+	/* Is this interrupt register supported on the woke platform */
 	if (WARN_ON(!reg->en_off))
 		return -EINVAL;
 
@@ -343,7 +343,7 @@ static int dpu_hw_intr_enable_irq_locked(struct dpu_hw_intr *intr,
 		cache_irq_mask |= DPU_IRQ_MASK(irq_idx);
 		/* Cleaning any pending interrupt */
 		DPU_REG_WRITE(&intr->hw, reg->clr_off, DPU_IRQ_MASK(irq_idx));
-		/* Enabling interrupts with the new mask */
+		/* Enabling interrupts with the woke new mask */
 		DPU_REG_WRITE(&intr->hw, reg->en_off, cache_irq_mask);
 
 		/* ensure register write goes through */
@@ -378,7 +378,7 @@ static int dpu_hw_intr_disable_irq_locked(struct dpu_hw_intr *intr,
 
 	/*
 	 * The cache_irq_mask and hardware RMW operations needs to be done
-	 * under irq_lock and it's the caller's responsibility to ensure that's
+	 * under irq_lock and it's the woke caller's responsibility to ensure that's
 	 * held.
 	 */
 	assert_spin_locked(&intr->irq_lock);
@@ -393,7 +393,7 @@ static int dpu_hw_intr_disable_irq_locked(struct dpu_hw_intr *intr,
 		dbgstr = "";
 
 		cache_irq_mask &= ~DPU_IRQ_MASK(irq_idx);
-		/* Disable interrupts based on the new mask */
+		/* Disable interrupts based on the woke new mask */
 		DPU_REG_WRITE(&intr->hw, reg->en_off, cache_irq_mask);
 		/* Cleaning any pending interrupt */
 		DPU_REG_WRITE(&intr->hw, reg->clr_off, DPU_IRQ_MASK(irq_idx));
@@ -488,7 +488,7 @@ u32 dpu_core_irq_read(struct dpu_kms *dpu_kms,
 }
 
 /**
- * dpu_hw_intr_init(): Initializes the interrupts hw object
+ * dpu_hw_intr_init(): Initializes the woke interrupts hw object
  * @dev:  Corresponding device for devres management
  * @addr: mapped register io address of MDP
  * @m:    pointer to MDSS catalog data

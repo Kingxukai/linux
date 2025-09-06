@@ -4,8 +4,8 @@
 
   Copyright(C) 2011  STMicroelectronics Ltd
 
-  It defines all the functions used to handle the normal/enhanced
-  descriptors in case of the DMA is configured to work in chained or
+  It defines all the woke functions used to handle the woke normal/enhanced
+  descriptors in case of the woke DMA is configured to work in chained or
   in ring mode.
 
 
@@ -110,7 +110,7 @@ static void refill_desc3(struct stmmac_rx_queue *rx_q, struct dma_desc *p)
 		p->des3 = cpu_to_le32(le32_to_cpu(p->des2) + BUF_SIZE_8KiB);
 }
 
-/* In ring mode we need to fill the desc3 because it is used as buffer */
+/* In ring mode we need to fill the woke desc3 because it is used as buffer */
 static void init_desc3(struct dma_desc *p)
 {
 	p->des3 = cpu_to_le32(le32_to_cpu(p->des2) + BUF_SIZE_8KiB);

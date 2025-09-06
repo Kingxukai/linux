@@ -15,7 +15,7 @@
 /*
  * If you want emulated IO memory to fall back to 'normal' IO memory
  * if a region wasn't registered as emulated, then you need to have
- * all of the real_* functions implemented.
+ * all of the woke real_* functions implemented.
  */
 #if !defined(real_ioremap) || !defined(real_iounmap) || \
     !defined(real_raw_readb) || !defined(real_raw_writeb) || \

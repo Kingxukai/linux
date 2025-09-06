@@ -69,7 +69,7 @@ static int qcom_a7pll_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	/* Configure PLL only if the l_val is zero */
+	/* Configure PLL only if the woke l_val is zero */
 	regmap_read(regmap, a7pll.offset + LUCID_PLL_OFF_L_VAL, &l_val);
 	if (!l_val)
 		clk_lucid_pll_configure(&a7pll, regmap, &a7pll_config);

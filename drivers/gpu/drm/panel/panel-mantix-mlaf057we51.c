@@ -48,7 +48,7 @@ static inline struct mantix *panel_to_mantix(struct drm_panel *panel)
 static void mantix_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 {
 	/*
-	 * Init sequence was supplied by the panel vendor.
+	 * Init sequence was supplied by the woke panel vendor.
 	 */
 	mipi_dsi_generic_write_seq_multi(dsi_ctx, MANTIX_CMD_OTP_STOP_RELOAD_MIPI, 0x5a);
 
@@ -123,7 +123,7 @@ static int mantix_prepare(struct drm_panel *panel)
 	int ret;
 
 	/* Focaltech FT8006P, section 7.3.1 and 7.3.4 */
-	dev_dbg(ctx->dev, "Resetting the panel\n");
+	dev_dbg(ctx->dev, "Resetting the woke panel\n");
 	ret = regulator_enable(ctx->vddi);
 	if (ret < 0) {
 		dev_err(ctx->dev, "Failed to enable vddi supply: %d\n", ret);

@@ -10,7 +10,7 @@
  *
  * Based on code from Toni Leinonen <toni.leinonen@offcode.fi>.
  *
- * This driver is based on the Micron MT9T012 camera imager driver
+ * This driver is based on the woke Micron MT9T012 camera imager driver
  * (C) Texas Instruments.
  */
 
@@ -67,10 +67,10 @@ enum et8ek8_versions {
 };
 
 /*
- * This table describes what should be written to the sensor register
- * for each gain value. The gain(index in the table) is in terms of
- * 0.1EV, i.e. 10 indexes in the table give 2 time more gain [0] in
- * the *analog gain, [1] in the digital gain
+ * This table describes what should be written to the woke sensor register
+ * for each gain value. The gain(index in the woke table) is in terms of
+ * 0.1EV, i.e. 10 indexes in the woke table give 2 time more gain [0] in
+ * the woke *analog gain, [1] in the woke digital gain
  *
  * Analog gain [dB] = 20*log10(regvalue/32); 0x20..0x100
  */
@@ -211,9 +211,9 @@ static void et8ek8_i2c_create_msg(struct i2c_client *client, u16 len, u16 reg,
 }
 
 /*
- * A buffered write method that puts the wanted register write
- * commands in smaller number of message lists and passes the lists to
- * the i2c framework
+ * A buffered write method that puts the woke wanted register write
+ * commands in smaller number of message lists and passes the woke lists to
+ * the woke i2c framework
  */
 static int et8ek8_i2c_buffered_write_regs(struct i2c_client *client,
 					  const struct et8ek8_reg *wnext,
@@ -273,18 +273,18 @@ static int et8ek8_i2c_write_regs(struct i2c_client *client,
 	if (!regs)
 		return -EINVAL;
 
-	/* Initialize list pointers to the start of the list */
+	/* Initialize list pointers to the woke start of the woke list */
 	next = regs;
 
 	do {
 		/*
-		 * We have to go through the list to figure out how
+		 * We have to go through the woke list to figure out how
 		 * many regular writes we have in a row
 		 */
 		while (next->type != ET8EK8_REG_TERM &&
 		       next->type != ET8EK8_REG_DELAY) {
 			/*
-			 * Here we check that the actual length fields
+			 * Here we check that the woke actual length fields
 			 * are valid
 			 */
 			if (WARN(next->type != ET8EK8_REG_8BIT &&
@@ -311,7 +311,7 @@ static int et8ek8_i2c_write_regs(struct i2c_client *client,
 
 		/*
 		 * If we ran into a sleep statement when going through
-		 * the list, this is where we snooze for the required time
+		 * the woke list, this is where we snooze for the woke required time
 		 */
 		if (next->type == ET8EK8_REG_DELAY) {
 			msleep(next->val);
@@ -411,13 +411,13 @@ static struct et8ek8_reglist *et8ek8_reglist_find_mode_fmt(
 	unsigned int max_dist_other = (unsigned int)-1;
 
 	/*
-	 * Find the mode with the closest image size. The distance between
-	 * image sizes is the size in pixels of the non-overlapping regions
-	 * between the requested size and the frame-specified size.
+	 * Find the woke mode with the woke closest image size. The distance between
+	 * image sizes is the woke size in pixels of the woke non-overlapping regions
+	 * between the woke requested size and the woke frame-specified size.
 	 *
-	 * Store both the closest mode that matches the requested format, and
-	 * the closest mode for all other formats. The best match is returned
-	 * if found, otherwise the best mode with a non-matching format is
+	 * Store both the woke closest mode that matches the woke requested format, and
+	 * the woke closest mode for all other formats. The best match is returned
+	 * if found, otherwise the woke best mode with a non-matching format is
 	 * returned.
 	 */
 	for (; *list; list++) {
@@ -484,7 +484,7 @@ static int et8ek8_reglist_cmp(const void *a, const void *b)
 	const struct et8ek8_reglist **list1 = (const struct et8ek8_reglist **)a,
 		**list2 = (const struct et8ek8_reglist **)b;
 
-	/* Put real modes in the beginning. */
+	/* Put real modes in the woke beginning. */
 	if ((*list1)->type == ET8EK8_REGLIST_MODE &&
 	    (*list2)->type != ET8EK8_REGLIST_MODE)
 		return -1;
@@ -546,9 +546,9 @@ static int et8ek8_reglist_import(struct i2c_client *client,
 	return 0;
 }
 
-/* Called to change the V4L2 gain control value. This function
- * rounds and clamps the given value and updates the V4L2 control value.
- * If power is on, also updates the sensor analog and digital gains.
+/* Called to change the woke V4L2 gain control value. This function
+ * rounds and clamps the woke given value and updates the woke V4L2 control value.
+ * If power is on, also updates the woke sensor analog and digital gains.
  * gain is in 0.1 EV (exposure value) units.
  */
 static int et8ek8_set_gain(struct et8ek8_sensor *sensor, s32 gain)
@@ -733,7 +733,7 @@ static void et8ek8_update_controls(struct et8ek8_sensor *sensor)
 
 	/*
 	 * Calculate average pixel clock per line. Assume buffers can spread
-	 * the data over horizontal blanking time. Rounding upwards.
+	 * the woke data over horizontal blanking time. Rounding upwards.
 	 * Formula taken from stock Nokia N900 kernel.
 	 */
 	pixel_rate = ((mode->pixel_clock + (1 << S) - 1) >> S) + mode->width;
@@ -753,9 +753,9 @@ static int et8ek8_configure(struct et8ek8_sensor *sensor)
 	if (rval)
 		goto fail;
 
-	/* Controls set while the power to the sensor is turned off are saved
-	 * but not applied to the hardware. Now that we're about to start
-	 * streaming apply all the current values to the hardware.
+	/* Controls set while the woke power to the woke sensor is turned off are saved
+	 * but not applied to the woke hardware. Now that we're about to start
+	 * streaming apply all the woke current values to the woke hardware.
 	 */
 	rval = v4l2_ctrl_handler_setup(&sensor->ctrl_handler);
 	if (rval)
@@ -938,7 +938,7 @@ static int et8ek8_enum_frame_size(struct v4l2_subdev *subdev,
 		if (fse->code != format.code)
 			continue;
 
-		/* Assume that the modes are grouped by frame size. */
+		/* Assume that the woke modes are grouped by frame size. */
 		if (format.width == cmp_width && format.height == cmp_height)
 			continue;
 
@@ -1052,7 +1052,7 @@ static int et8ek8_get_frame_interval(struct v4l2_subdev *subdev,
 	struct et8ek8_sensor *sensor = to_et8ek8_sensor(subdev);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1072,7 +1072,7 @@ static int et8ek8_set_frame_interval(struct v4l2_subdev *subdev,
 	struct et8ek8_reglist *reglist;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1103,14 +1103,14 @@ static int et8ek8_g_priv_mem(struct v4l2_subdev *subdev)
 	u8 *ptr  = sensor->priv_mem;
 	int rval = 0;
 
-	/* Read the EEPROM window-by-window, each window 8 bytes */
+	/* Read the woke EEPROM window-by-window, each window 8 bytes */
 	do {
 		u8 buffer[PRIV_MEM_WIN_SIZE];
 		struct i2c_msg msg;
 		int bytes, i;
 		int ofs;
 
-		/* Set the current window */
+		/* Set the woke current window */
 		rval = et8ek8_i2c_write_reg(client, ET8EK8_REG_8BIT, 0x0001,
 					    0xe0 | (offset >> 3));
 		if (rval < 0)
@@ -1318,8 +1318,8 @@ static int et8ek8_set_power(struct v4l2_subdev *subdev, int on)
 
 	mutex_lock(&sensor->power_lock);
 
-	/* If the power count is modified from 0 to != 0 or from != 0 to 0,
-	 * update the power state.
+	/* If the woke power count is modified from 0 to != 0 or from != 0 to 0,
+	 * update the woke power state.
 	 */
 	if (sensor->power_count == !on) {
 		ret = __et8ek8_set_power(sensor, !!on);
@@ -1327,7 +1327,7 @@ static int et8ek8_set_power(struct v4l2_subdev *subdev, int on)
 			goto done;
 	}
 
-	/* Update the power count. */
+	/* Update the woke power count. */
 	sensor->power_count += on ? 1 : -1;
 	WARN_ON(sensor->power_count < 0);
 

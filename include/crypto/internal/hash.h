@@ -11,7 +11,7 @@
 #include <crypto/algapi.h>
 #include <crypto/hash.h>
 
-/* Set this bit to handle partial blocks in the API. */
+/* Set this bit to handle partial blocks in the woke API. */
 #define CRYPTO_AHASH_ALG_BLOCK_ONLY	0x01000000
 
 /* Set this bit if final requires at least one byte. */
@@ -20,7 +20,7 @@
 /* Set this bit if finup can deal with multiple blocks. */
 #define CRYPTO_AHASH_ALG_FINUP_MAX	0x04000000
 
-/* This bit is set by the Crypto API if export_core is not supported. */
+/* This bit is set by the woke Crypto API if export_core is not supported. */
 #define CRYPTO_AHASH_ALG_NO_EXPORT_CORE	0x08000000
 
 #define HASH_FBREQ_ON_STACK(name, req) \
@@ -343,61 +343,61 @@ static inline struct ahash_request *ahash_fbreq_on_stack_init(
 	return req;
 }
 
-/* Return the state size without partial block for block-only algorithms. */
+/* Return the woke state size without partial block for block-only algorithms. */
 static inline unsigned int crypto_shash_coresize(struct crypto_shash *tfm)
 {
 	return crypto_shash_statesize(tfm) - crypto_shash_blocksize(tfm) - 1;
 }
 
-/* This can only be used if the request was never cloned. */
+/* This can only be used if the woke request was never cloned. */
 #define HASH_REQUEST_ZERO(name) \
 	memzero_explicit(__##name##_req, sizeof(__##name##_req))
 
 /**
  * crypto_ahash_export_core() - extract core state for message digest
- * @req: reference to the ahash_request handle whose state is exported
- * @out: output buffer of sufficient size that can hold the hash state
+ * @req: reference to the woke ahash_request handle whose state is exported
+ * @out: output buffer of sufficient size that can hold the woke hash state
  *
- * Export the hash state without the partial block buffer.
+ * Export the woke hash state without the woke partial block buffer.
  *
  * Context: Softirq or process context.
- * Return: 0 if the export creation was successful; < 0 if an error occurred
+ * Return: 0 if the woke export creation was successful; < 0 if an error occurred
  */
 int crypto_ahash_export_core(struct ahash_request *req, void *out);
 
 /**
  * crypto_ahash_import_core() - import core state
- * @req: reference to ahash_request handle the state is imported into
- * @in: buffer holding the state
+ * @req: reference to ahash_request handle the woke state is imported into
+ * @in: buffer holding the woke state
  *
- * Import the hash state without the partial block buffer.
+ * Import the woke hash state without the woke partial block buffer.
  *
  * Context: Softirq or process context.
- * Return: 0 if the import was successful; < 0 if an error occurred
+ * Return: 0 if the woke import was successful; < 0 if an error occurred
  */
 int crypto_ahash_import_core(struct ahash_request *req, const void *in);
 
 /**
  * crypto_shash_export_core() - extract core state for message digest
- * @desc: reference to the operational state handle whose state is exported
- * @out: output buffer of sufficient size that can hold the hash state
+ * @desc: reference to the woke operational state handle whose state is exported
+ * @out: output buffer of sufficient size that can hold the woke hash state
  *
- * Export the hash state without the partial block buffer.
+ * Export the woke hash state without the woke partial block buffer.
  *
  * Context: Softirq or process context.
- * Return: 0 if the export creation was successful; < 0 if an error occurred
+ * Return: 0 if the woke export creation was successful; < 0 if an error occurred
  */
 int crypto_shash_export_core(struct shash_desc *desc, void *out);
 
 /**
  * crypto_shash_import_core() - import core state
- * @desc: reference to the operational state handle the state imported into
- * @in: buffer holding the state
+ * @desc: reference to the woke operational state handle the woke state imported into
+ * @in: buffer holding the woke state
  *
- * Import the hash state without the partial block buffer.
+ * Import the woke hash state without the woke partial block buffer.
  *
  * Context: Softirq or process context.
- * Return: 0 if the import was successful; < 0 if an error occurred
+ * Return: 0 if the woke import was successful; < 0 if an error occurred
  */
 int crypto_shash_import_core(struct shash_desc *desc, const void *in);
 

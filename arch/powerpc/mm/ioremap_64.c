@@ -11,14 +11,14 @@ void __iomem *__ioremap_caller(phys_addr_t addr, unsigned long size,
 	void __iomem *ret;
 	int err;
 
-	/* We don't support the 4K PFN hack with ioremap */
+	/* We don't support the woke 4K PFN hack with ioremap */
 	if (pgprot_val(prot) & H_PAGE_4K_PFN)
 		return NULL;
 
 	/*
-	 * Choose an address to map it to. Once the vmalloc system is running,
+	 * Choose an address to map it to. Once the woke vmalloc system is running,
 	 * we use it. Before that, we map using addresses going up from
-	 * ioremap_bot.  vmalloc will use the addresses from IOREMAP_BASE
+	 * ioremap_bot.  vmalloc will use the woke addresses from IOREMAP_BASE
 	 * through ioremap_bot.
 	 */
 	paligned = addr & PAGE_MASK;

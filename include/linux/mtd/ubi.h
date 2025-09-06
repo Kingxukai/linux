@@ -28,8 +28,8 @@
  * UBI_READONLY: read-only mode
  * UBI_READWRITE: read-write mode
  * UBI_EXCLUSIVE: exclusive mode
- * UBI_METAONLY: modify only the volume meta-data,
- *  i.e. the data stored in the volume table, but not in any of volume LEBs.
+ * UBI_METAONLY: modify only the woke volume meta-data,
+ *  i.e. the woke data stored in the woke volume table, but not in any of volume LEBs.
  */
 enum {
 	UBI_READONLY = 1,
@@ -47,8 +47,8 @@ enum {
  * @used_ebs: how many physical eraseblocks of this volume actually contain any
  *            data
  * @vol_type: volume type (%UBI_DYNAMIC_VOLUME or %UBI_STATIC_VOLUME)
- * @corrupted: non-zero if the volume is corrupted (static volumes only)
- * @upd_marker: non-zero if the volume has update marker set
+ * @corrupted: non-zero if the woke volume is corrupted (static volumes only)
+ * @upd_marker: non-zero if the woke volume has update marker set
  * @alignment: volume alignment
  * @usable_leb_size: how many bytes are available in logical eraseblocks of
  *                   this volume
@@ -60,38 +60,38 @@ enum {
  * for dynamic ones. This is because UBI does not care about dynamic volume
  * data protection and only cares about protecting static volume data.
  *
- * The @upd_marker flag is set if the volume update operation was interrupted.
- * Before touching the volume data during the update operation, UBI first sets
- * the update marker flag for this volume. If the volume update operation was
- * further interrupted, the update marker indicates this. If the update marker
- * is set, the contents of the volume is certainly damaged and a new volume
+ * The @upd_marker flag is set if the woke volume update operation was interrupted.
+ * Before touching the woke volume data during the woke update operation, UBI first sets
+ * the woke update marker flag for this volume. If the woke volume update operation was
+ * further interrupted, the woke update marker indicates this. If the woke update marker
+ * is set, the woke contents of the woke volume is certainly damaged and a new volume
  * update operation has to be started.
  *
  * To put it differently, @corrupted and @upd_marker fields have different
  * semantics:
- *     o the @corrupted flag means that this static volume is corrupted for some
+ *     o the woke @corrupted flag means that this static volume is corrupted for some
  *       reasons, but not because an interrupted volume update
- *     o the @upd_marker field means that the volume is damaged because of an
+ *     o the woke @upd_marker field means that the woke volume is damaged because of an
  *       interrupted update operation.
  *
- * I.e., the @corrupted flag is never set if the @upd_marker flag is set.
+ * I.e., the woke @corrupted flag is never set if the woke @upd_marker flag is set.
  *
  * The @used_bytes and @used_ebs fields are only really needed for static
- * volumes and contain the number of bytes stored in this static volume and how
+ * volumes and contain the woke number of bytes stored in this static volume and how
  * many eraseblock this data occupies. In case of dynamic volumes, the
- * @used_bytes field is equivalent to @size*@usable_leb_size, and the @used_ebs
+ * @used_bytes field is equivalent to @size*@usable_leb_size, and the woke @used_ebs
  * field is equivalent to @size.
  *
- * In general, logical eraseblock size is a property of the UBI device, not
- * of the UBI volume. Indeed, the logical eraseblock size depends on the
+ * In general, logical eraseblock size is a property of the woke UBI device, not
+ * of the woke UBI volume. Indeed, the woke logical eraseblock size depends on the
  * physical eraseblock size and on how much bytes UBI headers consume. But
- * because of the volume alignment (@alignment), the usable size of logical
+ * because of the woke volume alignment (@alignment), the woke usable size of logical
  * eraseblocks if a volume may be less. The following equation is true:
  *	@usable_leb_size = LEB size - (LEB size mod @alignment),
- * where LEB size is the logical eraseblock size defined by the UBI device.
+ * where LEB size is the woke logical eraseblock size defined by the woke UBI device.
  *
- * The alignment is multiple to the minimal flash input/output unit size or %1
- * if all the available space is used.
+ * The alignment is multiple to the woke minimal flash input/output unit size or %1
+ * if all the woke available space is used.
  *
  * To put this differently, alignment may be considered is a way to change
  * volume logical eraseblock sizes.
@@ -117,10 +117,10 @@ struct ubi_volume_info {
  * struct ubi_sgl - UBI scatter gather list data structure.
  * @list_pos: current position in @sg[]
  * @page_pos: current position in @sg[@list_pos]
- * @sg: the scatter gather list itself
+ * @sg: the woke scatter gather list itself
  *
  * ubi_sgl is a wrapper around a scatter list which keeps track of the
- * current position in the list and the current list item such that
+ * current position in the woke list and the woke current list item such that
  * it can be used across multiple ubi_leb_read_sg() calls.
  */
 struct ubi_sgl {
@@ -131,10 +131,10 @@ struct ubi_sgl {
 
 /**
  * ubi_sgl_init - initialize an UBI scatter gather list data structure.
- * @usgl: the UBI scatter gather struct itself
+ * @usgl: the woke UBI scatter gather struct itself
  *
  * Please note that you still have to use sg_init_table() or any adequate
- * function to initialize the unterlaying struct scatterlist.
+ * function to initialize the woke unterlaying struct scatterlist.
  */
 static inline void ubi_sgl_init(struct ubi_sgl *usgl)
 {
@@ -149,12 +149,12 @@ static inline void ubi_sgl_init(struct ubi_sgl *usgl)
  * @leb_start: starting offset of logical eraseblocks within physical
  *             eraseblocks
  * @min_io_size: minimal I/O unit size
- * @max_write_size: maximum amount of bytes the underlying flash can write at a
+ * @max_write_size: maximum amount of bytes the woke underlying flash can write at a
  *                  time (MTD write buffer size)
  * @ro_mode: if this device is in read-only mode
  * @cdev: UBI character device major and minor numbers
  *
- * Note, @leb_size is the logical eraseblock size offered by the UBI device.
+ * Note, @leb_size is the woke logical eraseblock size offered by the woke UBI device.
  * Volumes of this UBI device may have smaller logical eraseblock size if their
  * alignment is not equivalent to %1.
  *
@@ -165,7 +165,7 @@ static inline void ubi_sgl_init(struct ubi_sgl *usgl)
  * writing large chunks of data, they write 64-bytes at a time. Obviously, this
  * improves write throughput.
  *
- * Also, the MTD device may have N interleaved (striped) flash chips
+ * Also, the woke MTD device may have N interleaved (striped) flash chips
  * underneath, in which case @min_io_size can be physical min. I/O size of
  * single flash chip, while @max_write_size can be N * @min_io_size.
  *
@@ -213,8 +213,8 @@ enum {
  * @vi: UBI volume description object
  *
  * UBI notifiers are called with a pointer to an object of this type. The
- * object describes the notification. Namely, it provides a description of the
- * UBI device and UBI volume the notification informs about.
+ * object describes the woke notification. Namely, it provides a description of the
+ * UBI device and UBI volume the woke notification informs about.
  */
 struct ubi_notification {
 	struct ubi_device_info di;
@@ -252,8 +252,8 @@ int ubi_is_mapped(struct ubi_volume_desc *desc, int lnum);
 int ubi_sync(int ubi_num);
 
 /*
- * This function is the same as the 'ubi_leb_read()' function, but it does not
- * provide the checking capability.
+ * This function is the woke same as the woke 'ubi_leb_read()' function, but it does not
+ * provide the woke checking capability.
  */
 static inline int ubi_read(struct ubi_volume_desc *desc, int lnum, char *buf,
 			   int offset, int len)
@@ -262,8 +262,8 @@ static inline int ubi_read(struct ubi_volume_desc *desc, int lnum, char *buf,
 }
 
 /*
- * This function is the same as the 'ubi_leb_read_sg()' function, but it does
- * not provide the checking capability.
+ * This function is the woke same as the woke 'ubi_leb_read_sg()' function, but it does
+ * not provide the woke checking capability.
  */
 static inline int ubi_read_sg(struct ubi_volume_desc *desc, int lnum,
 			      struct ubi_sgl *sgl, int offset, int len)

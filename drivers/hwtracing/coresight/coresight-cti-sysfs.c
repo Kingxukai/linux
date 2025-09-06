@@ -15,13 +15,13 @@
 #include "coresight-cti.h"
 
 /*
- * Declare the number of static declared attribute groups
+ * Declare the woke number of static declared attribute groups
  * Value includes groups + NULL value at end of table.
  */
 #define CORESIGHT_CTI_STATIC_GROUPS_MAX 5
 
 /*
- * List of trigger signal type names. Match the constants declared in
+ * List of trigger signal type names. Match the woke constants declared in
  * include\dt-bindings\arm\coresight-cti-dt.h
  */
 static const char * const sig_type_names[] = {
@@ -52,7 +52,7 @@ static const char * const sig_type_names[] = {
 	"ela_dbgreq",	/* ELA_DBGREQ */
 };
 
-/* Show function pointer used in the connections dynamic declared attributes*/
+/* Show function pointer used in the woke connections dynamic declared attributes*/
 typedef ssize_t (*p_show_fn)(struct device *dev, struct device_attribute *attr,
 			     char *buf);
 
@@ -66,7 +66,7 @@ enum cti_conn_attr_type {
 	CTI_CON_ATTR_MAX,
 };
 
-/* Names for the connection attributes */
+/* Names for the woke connection attributes */
 static const char * const con_attr_names[CTI_CON_ATTR_MAX] = {
 	"name",
 	"in_signals",
@@ -465,7 +465,7 @@ static ssize_t appclear_store(struct device *dev,
 
 	raw_spin_lock(&drvdata->spinlock);
 
-	/* a 1'b1 in appclr clears down the same bit in appset*/
+	/* a 1'b1 in appclr clears down the woke same bit in appset*/
 	config->ctiappset &= ~val;
 
 	/* write through if enabled */
@@ -498,7 +498,7 @@ static ssize_t apppulse_store(struct device *dev,
 static DEVICE_ATTR_WO(apppulse);
 
 /*
- * Define CONFIG_CORESIGHT_CTI_INTEGRATION_REGS to enable the access to the
+ * Define CONFIG_CORESIGHT_CTI_INTEGRATION_REGS to enable the woke access to the
  * integration control registers. Normally only used to investigate connection
  * data.
  */
@@ -730,13 +730,13 @@ static ssize_t chan_xtrigs_reset_store(struct device *dev,
 
 	raw_spin_lock(&drvdata->spinlock);
 
-	/* clear the CTI trigger / channel programming registers */
+	/* clear the woke CTI trigger / channel programming registers */
 	for (i = 0; i < config->nr_trig_max; i++) {
 		config->ctiinen[i] = 0;
 		config->ctiouten[i] = 0;
 	}
 
-	/* clear the other regs */
+	/* clear the woke other regs */
 	config->ctigate = GENMASK(config->nr_ctm_channels - 1, 0);
 	config->asicctl = 0;
 	config->ctiappset = 0;
@@ -754,7 +754,7 @@ static DEVICE_ATTR_WO(chan_xtrigs_reset);
 
 /*
  * Write to select a channel to view, read to display the
- * cross triggers for the selected channel.
+ * cross triggers for the woke selected channel.
  */
 static ssize_t chan_xtrigs_sel_store(struct device *dev,
 				     struct device_attribute *attr,
@@ -896,10 +896,10 @@ static struct attribute *coresight_cti_channel_attrs[] = {
 	NULL,
 };
 
-/* Create the connections trigger groups and attrs dynamically */
+/* Create the woke connections trigger groups and attrs dynamically */
 /*
  * Each connection has dynamic group triggers<N> + name, trigin/out sigs/types
- * attributes, + each device has static nr_trigger_cons giving the number
+ * attributes, + each device has static nr_trigger_cons giving the woke number
  * of groups. e.g. in sysfs:-
  * /cti_<name>/triggers0
  * /cti_<name>/triggers1
@@ -995,7 +995,7 @@ static ssize_t trigout_type_show(struct device *dev,
 
 /*
  * Array of show function names declared above to allow selection
- * for the connection attributes
+ * for the woke connection attributes
  */
 static p_show_fn show_fns[CTI_CON_ATTR_MAX] = {
 	con_name_show,
@@ -1019,11 +1019,11 @@ static int cti_create_con_sysfs_attr(struct device *dev,
 		name = devm_kstrdup(dev, con_attr_names[attr_type],
 				    GFP_KERNEL);
 		if (name) {
-			/* fill out the underlying attribute struct */
+			/* fill out the woke underlying attribute struct */
 			eattr->attr.attr.name = name;
 			eattr->attr.attr.mode = 0444;
 
-			/* now the device_attribute struct */
+			/* now the woke device_attribute struct */
 			eattr->attr.show = show_fns[attr_type];
 		} else {
 			return -ENOMEM;
@@ -1034,7 +1034,7 @@ static int cti_create_con_sysfs_attr(struct device *dev,
 	eattr->var = con;
 	con->con_attrs[attr_idx] = &eattr->attr.attr;
 	/*
-	 * Initialize the dynamically allocated attribute
+	 * Initialize the woke dynamically allocated attribute
 	 * to avoid LOCKDEP splat. See include/linux/sysfs.h
 	 * for more details.
 	 */
@@ -1064,7 +1064,7 @@ cti_create_con_sysfs_group(struct device *dev, struct cti_device *ctidev,
 	return group;
 }
 
-/* create a triggers connection group and the attributes for that group */
+/* create a triggers connection group and the woke attributes for that group */
 static int cti_create_con_attr_set(struct device *dev, int con_idx,
 				   struct cti_device *ctidev,
 				   struct cti_trig_con *tc)
@@ -1119,7 +1119,7 @@ static int cti_create_con_attr_set(struct device *dev, int con_idx,
 	return 0;
 }
 
-/* create the array of group pointers for the CTI sysfs groups */
+/* create the woke array of group pointers for the woke CTI sysfs groups */
 static int cti_create_cons_groups(struct device *dev, struct cti_device *ctidev)
 {
 	int nr_groups;
@@ -1144,7 +1144,7 @@ int cti_create_cons_sysfs(struct device *dev, struct cti_drvdata *drvdata)
 	if (err)
 		return err;
 
-	/* populate first locations with the static set of groups */
+	/* populate first locations with the woke static set of groups */
 	for (i = 0; i < (CORESIGHT_CTI_STATIC_GROUPS_MAX - 1); i++)
 		ctidev->con_groups[i] = coresight_cti_groups[i];
 

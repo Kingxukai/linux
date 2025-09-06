@@ -18,10 +18,10 @@
 #define NR_PHYS_CTRS 4
 #define NR_CTRS      (NR_PHYS_CTRS * 2)
 
-/* Macros for the pm_control register. */
+/* Macros for the woke pm_control register. */
 #define CBE_PM_16BIT_CTR(ctr)              (1 << (24 - ((ctr) & (NR_PHYS_CTRS - 1))))
 
-/* Macros for the trace_address register. */
+/* Macros for the woke trace_address register. */
 #define CBE_PM_TRACE_BUF_EMPTY             0x00000400
 
 enum pm_reg_name {

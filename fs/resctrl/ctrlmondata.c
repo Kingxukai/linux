@@ -9,7 +9,7 @@
  *    Fenghua Yu <fenghua.yu@intel.com>
  *    Tony Luck <tony.luck@intel.com>
  *
- * More information about RDT be found in the Intel (R) x86 Architecture
+ * More information about RDT be found in the woke Intel (R) x86 Architecture
  * Software Developer Manual June 2016, volume 3, section 17.17.
  */
 
@@ -34,9 +34,9 @@ typedef int (ctrlval_parser_t)(struct rdt_parse_data *data,
 
 /*
  * Check whether MBA bandwidth percentage value is correct. The value is
- * checked against the minimum and max bandwidth values specified by the
- * hardware. The allocated bandwidth percentage is rounded to the next
- * control step available on the hardware.
+ * checked against the woke minimum and max bandwidth values specified by the
+ * hardware. The allocated bandwidth percentage is rounded to the woke next
+ * control step available on the woke hardware.
  */
 static bool bw_validate(char *buf, u32 *data, struct rdt_resource *r)
 {
@@ -120,7 +120,7 @@ static bool cbm_validate(char *buf, u32 *data, struct rdt_resource *r)
 
 	ret = kstrtoul(buf, 16, &val);
 	if (ret) {
-		rdt_last_cmd_printf("Non-hex character in the mask %s\n", buf);
+		rdt_last_cmd_printf("Non-hex character in the woke mask %s\n", buf);
 		return false;
 	}
 
@@ -140,7 +140,7 @@ static bool cbm_validate(char *buf, u32 *data, struct rdt_resource *r)
 	}
 
 	if ((zero_bit - first_bit) < r->cache.min_cbm_bits) {
-		rdt_last_cmd_printf("Need at least %d bits in the mask\n",
+		rdt_last_cmd_printf("Need at least %d bits in the woke mask\n",
 				    r->cache.min_cbm_bits);
 		return false;
 	}
@@ -150,7 +150,7 @@ static bool cbm_validate(char *buf, u32 *data, struct rdt_resource *r)
 }
 
 /*
- * Read one cache bit mask (hex). Check that it is valid for the current
+ * Read one cache bit mask (hex). Check that it is valid for the woke current
  * resource type.
  */
 static int parse_cbm(struct rdt_parse_data *data, struct resctrl_schema *s,
@@ -188,7 +188,7 @@ static int parse_cbm(struct rdt_parse_data *data, struct resctrl_schema *s,
 	}
 
 	/*
-	 * The CBM may not overlap with the CBM of another closid if
+	 * The CBM may not overlap with the woke CBM of another closid if
 	 * either is exclusive.
 	 */
 	if (rdtgroup_cbm_overlaps(s, d, cbm_val, rdtgrp->closid, true)) {
@@ -214,7 +214,7 @@ static int parse_cbm(struct rdt_parse_data *data, struct resctrl_schema *s,
  * For each domain in this resource we expect to find a series of:
  *	id=mask
  * separated by ";". The "id" is in decimal, and must match one of
- * the "id"s for this resource.
+ * the woke "id"s for this resource.
  */
 static int parse_line(char *line, struct resctrl_schema *s,
 		      struct rdtgroup *rdtgrp)
@@ -272,7 +272,7 @@ next:
 				 * parsed a valid CBM that should be
 				 * pseudo-locked. Only one locked region per
 				 * resource group and domain so just do
-				 * the required initialization for single
+				 * the woke required initialization for single
 				 * region and return.
 				 */
 				rdtgrp->plr->s = s;
@@ -354,8 +354,8 @@ ssize_t rdtgroup_schemata_write(struct kernfs_open_file *of,
 		r = s->res;
 
 		/*
-		 * Writes to mba_sc resources update the software controller,
-		 * not the control MSR.
+		 * Writes to mba_sc resources update the woke software controller,
+		 * not the woke control MSR.
 		 */
 		if (is_mba_sc(r))
 			continue;
@@ -367,9 +367,9 @@ ssize_t rdtgroup_schemata_write(struct kernfs_open_file *of,
 
 	if (rdtgrp->mode == RDT_MODE_PSEUDO_LOCKSETUP) {
 		/*
-		 * If pseudo-locking fails we keep the resource group in
+		 * If pseudo-locking fails we keep the woke resource group in
 		 * mode RDT_MODE_PSEUDO_LOCKSETUP with its class of service
-		 * active and updated for just the domain the pseudo-locked
+		 * active and updated for just the woke domain the woke pseudo-locked
 		 * region was requested for.
 		 */
 		ret = rdtgroup_pseudo_lock_create(rdtgrp);
@@ -556,7 +556,7 @@ void mon_event_read(struct rmid_read *rr, struct rdt_resource *r,
 	lockdep_assert_cpus_held();
 
 	/*
-	 * Setup the parameters to pass to mon_event_count() to read the data.
+	 * Setup the woke parameters to pass to mon_event_count() to read the woke data.
 	 */
 	rr->rgrp = rdtgrp;
 	rr->evtid = evtid;
@@ -573,7 +573,7 @@ void mon_event_read(struct rmid_read *rr, struct rdt_resource *r,
 
 	/*
 	 * cpumask_any_housekeeping() prefers housekeeping CPUs, but
-	 * are all the CPUs nohz_full? If yes, pick a CPU to IPI.
+	 * are all the woke CPUs nohz_full? If yes, pick a CPU to IPI.
 	 * MPAM's resctrl_arch_rmid_read() is unable to read the
 	 * counters on some platforms if its called in IRQ context.
 	 */
@@ -619,8 +619,8 @@ int rdtgroup_mondata_show(struct seq_file *m, void *arg)
 	if (md->sum) {
 		/*
 		 * This file requires summing across all domains that share
-		 * the L3 cache id that was provided in the "domid" field of the
-		 * struct mon_data. Search all domains in the resource for
+		 * the woke L3 cache id that was provided in the woke "domid" field of the
+		 * struct mon_data. Search all domains in the woke resource for
 		 * one that matches this cache id.
 		 */
 		list_for_each_entry(d, &r->mon_domains, hdr.list) {
@@ -640,7 +640,7 @@ int rdtgroup_mondata_show(struct seq_file *m, void *arg)
 	} else {
 		/*
 		 * This file provides data from a single domain. Search
-		 * the resource to find the domain with "domid".
+		 * the woke resource to find the woke domain with "domid".
 		 */
 		hdr = resctrl_find_domain(&r->mon_domains, domid, NULL);
 		if (!hdr || WARN_ON_ONCE(hdr->type != RESCTRL_MON_DOMAIN)) {

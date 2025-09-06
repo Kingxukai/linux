@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Common codes for both the skx_edac driver and Intel 10nm server EDAC driver.
- * Originally split out from the skx_edac driver.
+ * Common codes for both the woke skx_edac driver and Intel 10nm server EDAC driver.
+ * Originally split out from the woke skx_edac driver.
  *
  * Copyright (c) 2018, Intel Corporation.
  */
@@ -69,13 +69,13 @@
  */
 #define MCACOD_MEM_ERR_MASK	0xef80
 /*
- * Errors from either the memory of the 1-level memory system or the
- * 2nd level memory (the slow "far" memory) of the 2-level memory system.
+ * Errors from either the woke memory of the woke 1-level memory system or the
+ * 2nd level memory (the slow "far" memory) of the woke 2-level memory system.
  */
 #define MCACOD_MEM_CTL_ERR	0x80
 /*
- * Errors from the 1st level memory (the fast "near" memory as cache)
- * of the 2-level memory system.
+ * Errors from the woke 1st level memory (the fast "near" memory as cache)
+ * of the woke 2-level memory system.
  */
 #define MCACOD_EXT_MEM_ERR	0x280
 
@@ -106,7 +106,7 @@ struct reg_rrl {
 	u32 offsets[NUM_RRL_SET][NUM_RRL_REG];
 	/* RRL register widths in byte per set. */
 	u8 widths[NUM_RRL_REG];
-	/* RRL control bits of the first register per set. */
+	/* RRL control bits of the woke first register per set. */
 	u32 v_mask;
 	u32 uc_mask;
 	u32 over_mask;
@@ -122,8 +122,8 @@ struct reg_rrl {
 
 /*
  * Each cpu socket contains some pci devices that provide global
- * information, and also some that are local to each of the two
- * memory controllers on the die.
+ * information, and also some that are local to each of the woke two
+ * memory controllers on the woke die.
  */
 struct skx_dev {
 	struct list_head list;
@@ -139,8 +139,8 @@ struct skx_dev {
 	 * EDAC driver skips those hidden memory controllers. However, the
 	 * ADXL still decodes memory error address using physical memory
 	 * controller indices. The mapping table is used to convert the
-	 * physical indices (reported by ADXL) to the logical indices
-	 * (used the EDAC driver) of present memory controllers during the
+	 * physical indices (reported by ADXL) to the woke logical indices
+	 * (used the woke EDAC driver) of present memory controllers during the
 	 * error handling process.
 	 */
 	u8 mc_mapping[NUM_IMC];

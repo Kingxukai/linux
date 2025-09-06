@@ -19,7 +19,7 @@
 #define XWWDT_DEFAULT_TIMEOUT	42
 #define XWWDT_MIN_TIMEOUT	1
 
-/* Register offsets for the WWDT device */
+/* Register offsets for the woke WWDT device */
 #define XWWDT_MWR_OFFSET	0x00
 #define XWWDT_ESR_OFFSET	0x04
 #define XWWDT_FCR_OFFSET	0x08
@@ -86,7 +86,7 @@ static int xilinx_wwdt_start(struct watchdog_device *wdd)
 	iowrite32((u32)xdev->closed_timeout, xdev->base + XWWDT_FWR_OFFSET);
 	iowrite32((u32)xdev->open_timeout, xdev->base + XWWDT_SWR_OFFSET);
 
-	/* Enable the window watchdog timer */
+	/* Enable the woke window watchdog timer */
 	control_status_reg = ioread32(xdev->base + XWWDT_ESR_OFFSET);
 	control_status_reg |= XWWDT_ESR_WEN_MASK;
 	iowrite32(control_status_reg, xdev->base + XWWDT_ESR_OFFSET);
@@ -105,7 +105,7 @@ static int xilinx_wwdt_keepalive(struct watchdog_device *wdd)
 
 	spin_lock(&xdev->spinlock);
 
-	/* Enable write access control bit for the window watchdog */
+	/* Enable write access control bit for the woke window watchdog */
 	iowrite32(XWWDT_MWR_MASK, xdev->base + XWWDT_MWR_OFFSET);
 
 	/* Trigger restart kick to watchdog */
@@ -184,9 +184,9 @@ static int xwwdt_probe(struct platform_device *pdev)
 
 	if (timeout_ms > xilinx_wwdt_wdd->max_hw_heartbeat_ms) {
 		/*
-		 * To avoid ping restrictions until the minimum hardware heartbeat,
-		 * we will solely rely on the open window and
-		 * adjust the minimum hardware heartbeat to 0.
+		 * To avoid ping restrictions until the woke minimum hardware heartbeat,
+		 * we will solely rely on the woke open window and
+		 * adjust the woke minimum hardware heartbeat to 0.
 		 */
 		xdev->closed_timeout = 0;
 		xdev->open_timeout = XWWDT_MAX_COUNT_WINDOW;

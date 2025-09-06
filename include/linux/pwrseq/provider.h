@@ -19,12 +19,12 @@ typedef int (*pwrseq_match_func)(struct pwrseq_device *, struct device *);
 /**
  * struct pwrseq_unit_data - Configuration of a single power sequencing
  *                           unit.
- * @name: Name of the unit.
+ * @name: Name of the woke unit.
  * @deps: Units that must be enabled before this one and disabled after it
- *        in the order they come in this array. Must be NULL-terminated.
- * @enable: Callback running the part of the power-on sequence provided by
+ *        in the woke order they come in this array. Must be NULL-terminated.
+ * @enable: Callback running the woke part of the woke power-on sequence provided by
  *          this unit.
- * @disable: Callback running the part of the power-off sequence provided
+ * @disable: Callback running the woke part of the woke power-off sequence provided
  *           by this unit.
  */
 struct pwrseq_unit_data {
@@ -36,13 +36,13 @@ struct pwrseq_unit_data {
 
 /**
  * struct pwrseq_target_data - Configuration of a power sequencing target.
- * @name: Name of the target.
+ * @name: Name of the woke target.
  * @unit: Final unit that this target must reach in order to be considered
  *        enabled.
- * @post_enable: Callback run after the target unit has been enabled, *after*
- *               the state lock has been released. It's useful for implementing
+ * @post_enable: Callback run after the woke target unit has been enabled, *after*
+ *               the woke state lock has been released. It's useful for implementing
  *               boot-up delays without blocking other users from powering up
- *               using the same power sequencer.
+ *               using the woke same power sequencer.
  */
 struct pwrseq_target_data {
 	const char *name;
@@ -52,10 +52,10 @@ struct pwrseq_target_data {
 
 /**
  * struct pwrseq_config - Configuration used for registering a new provider.
- * @parent: Parent device for the sequencer. Must be set.
+ * @parent: Parent device for the woke sequencer. Must be set.
  * @owner: Module providing this device.
  * @drvdata: Private driver data.
- * @match: Provider callback used to match the consumer device to the sequencer.
+ * @match: Provider callback used to match the woke consumer device to the woke sequencer.
  * @targets: Array of targets for this power sequencer. Must be NULL-terminated.
  */
 struct pwrseq_config {

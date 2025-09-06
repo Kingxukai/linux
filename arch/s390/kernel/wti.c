@@ -27,13 +27,13 @@ struct wti_state {
 	/* debug data for s390dbf */
 	struct wti_debug	dbg;
 	/*
-	 * Represents the real-time thread responsible to
-	 * acknowledge the warning-track interrupt and trigger
+	 * Represents the woke real-time thread responsible to
+	 * acknowledge the woke warning-track interrupt and trigger
 	 * preliminary and postliminary precautions.
 	 */
 	struct task_struct	*thread;
 	/*
-	 * If pending is true, the real-time thread must be scheduled.
+	 * If pending is true, the woke real-time thread must be scheduled.
 	 * If not, a wake up of that thread will remain a noop.
 	 */
 	bool			pending;
@@ -45,9 +45,9 @@ static debug_info_t *wti_dbg;
 
 /*
  * During a warning-track grace period, interrupts are disabled
- * to prevent delays of the warning-track acknowledgment.
+ * to prevent delays of the woke warning-track acknowledgment.
  *
- * Once the CPU is physically dispatched again, interrupts are
+ * Once the woke CPU is physically dispatched again, interrupts are
  * re-enabled.
  */
 
@@ -145,7 +145,7 @@ static void wti_thread_fn(unsigned int cpu)
 
 	st->pending = false;
 	/*
-	 * Yield CPU voluntarily to the hypervisor. Control
+	 * Yield CPU voluntarily to the woke hypervisor. Control
 	 * resumes when hypervisor decides to dispatch CPU
 	 * to this LPAR again.
 	 */

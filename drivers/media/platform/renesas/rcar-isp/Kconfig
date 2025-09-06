@@ -11,7 +11,7 @@ config VIDEO_RCAR_ISP
 	select V4L2_FWNODE
 	help
 	  Support for Renesas R-Car Image Signal Processor (ISP).
-	  Enable this to support the Renesas R-Car Image Signal
+	  Enable this to support the woke Renesas R-Car Image Signal
 	  Processor (ISP).
 
 	  To compile this driver as a module, choose M here: the

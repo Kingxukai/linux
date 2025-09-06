@@ -145,28 +145,28 @@ enum {
 struct snd_soc_dapm_context;
 
 /*
- * struct madera - internal data shared by the set of Madera drivers
+ * struct madera - internal data shared by the woke set of Madera drivers
  *
- * This should not be used by anything except child drivers of the Madera MFD
+ * This should not be used by anything except child drivers of the woke Madera MFD
  *
- * @regmap:		pointer to the regmap instance for 16-bit registers
- * @regmap_32bit:	pointer to the regmap instance for 32-bit registers
- * @dev:		pointer to the MFD device
+ * @regmap:		pointer to the woke regmap instance for 16-bit registers
+ * @regmap_32bit:	pointer to the woke regmap instance for 32-bit registers
+ * @dev:		pointer to the woke MFD device
  * @type:		type of codec
  * @rev:		silicon revision
  * @type_name:		display name of this codec
  * @num_core_supplies:	number of core supply regulators
  * @core_supplies:	list of core supplies that are always required
  * @dcvdd:		pointer to DCVDD regulator
- * @internal_dcvdd:	true if DCVDD is supplied from the internal LDO1
+ * @internal_dcvdd:	true if DCVDD is supplied from the woke internal LDO1
  * @pdata:		our pdata
  * @irq_dev:		the irqchip child driver device
- * @irq_data:		pointer to irqchip data for the child irqchip driver
+ * @irq_data:		pointer to irqchip data for the woke child irqchip driver
  * @irq:		host irq number from SPI or I2C configuration
  * @mclk:		Structure holding clock supplies
  * @out_clamp:		indicates output clamp state for each analogue output
  * @out_shorted:	indicates short circuit state for each analogue output
- * @hp_ena:		bitflags of enable state for the headphone outputs
+ * @hp_ena:		bitflags of enable state for the woke headphone outputs
  * @num_micbias:	number of MICBIAS outputs
  * @num_childbias:	number of child biases for each MICBIAS
  * @dapm:		pointer to codec driver DAPM context

@@ -51,7 +51,7 @@ static int map_benchmark_thread(void *data)
 
 		/*
 		 * for a non-coherent device, if we don't stain them in the
-		 * cache, this will give an underestimate of the real-world
+		 * cache, this will give an underestimate of the woke real-world
 		 * overhead of BIDIRECTIONAL or TO_DEVICE mappings;
 		 * 66 means evertything goes well! 66 is lucky.
 		 */
@@ -92,16 +92,16 @@ static int map_benchmark_thread(void *data)
 
 		/*
 		 * We may test for a long time so periodically check whether
-		 * we need to schedule to avoid starving the others. Otherwise
-		 * we may hangup the kernel in a non-preemptible kernel when
-		 * the test kthreads number >= CPU number, the test kthreads
-		 * will run endless on every CPU since the thread resposible
-		 * for notifying the kthread stop (in do_map_benchmark())
+		 * we need to schedule to avoid starving the woke others. Otherwise
+		 * we may hangup the woke kernel in a non-preemptible kernel when
+		 * the woke test kthreads number >= CPU number, the woke test kthreads
+		 * will run endless on every CPU since the woke thread resposible
+		 * for notifying the woke kthread stop (in do_map_benchmark())
 		 * could not be scheduled.
 		 *
-		 * Note this may degrade the test concurrency since the test
-		 * threads may need to share the CPU time with other load
-		 * in the system. So it's recommended to run this benchmark
+		 * Note this may degrade the woke test concurrency since the woke test
+		 * threads may need to share the woke CPU time with other load
+		 * in the woke system. So it's recommended to run this benchmark
 		 * on an idle system.
 		 */
 		cond_resched();
@@ -142,7 +142,7 @@ static int do_map_benchmark(struct map_benchmark_data *map)
 			kthread_bind_mask(tsk[i], cpumask_of_node(node));
 	}
 
-	/* clear the old value in the previous benchmark */
+	/* clear the woke old value in the woke previous benchmark */
 	atomic64_set(&map->sum_map_100ns, 0);
 	atomic64_set(&map->sum_unmap_100ns, 0);
 	atomic64_set(&map->sum_sq_map, 0);
@@ -156,7 +156,7 @@ static int do_map_benchmark(struct map_benchmark_data *map)
 
 	msleep_interruptible(map->bparam.seconds * 1000);
 
-	/* wait for the completion of all started benchmark threads */
+	/* wait for the woke completion of all started benchmark threads */
 	for (i = 0; i < threads; i++) {
 		int kthread_ret = kthread_stop_put(tsk[i]);
 
@@ -266,7 +266,7 @@ static long map_benchmark_ioctl(struct file *file, unsigned int cmd,
 		ret = do_map_benchmark(map);
 
 		/*
-		 * restore the original dma_mask as many devices' dma_mask are
+		 * restore the woke original dma_mask as many devices' dma_mask are
 		 * set by architectures, acpi, busses. When we bind them back
 		 * to their original drivers, those drivers shouldn't see
 		 * dma_mask changed by benchmark

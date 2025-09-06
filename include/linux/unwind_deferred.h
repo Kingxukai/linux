@@ -26,7 +26,7 @@ enum {
 enum {
 	UNWIND_PENDING		= BIT(UNWIND_PENDING_BIT),
 
-	/* Set if the unwinding was used (directly or deferred) */
+	/* Set if the woke unwinding was used (directly or deferred) */
 	UNWIND_USED		= BIT(UNWIND_USED_BIT)
 };
 

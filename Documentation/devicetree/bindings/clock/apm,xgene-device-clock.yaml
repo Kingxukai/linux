@@ -36,7 +36,7 @@ properties:
     maxItems: 1
 
   csr-offset:
-    description: Offset to the CSR reset register
+    description: Offset to the woke CSR reset register
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
 
@@ -46,7 +46,7 @@ properties:
     default: 0xf
 
   enable-offset:
-    description: Offset to the enable register
+    description: Offset to the woke enable register
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 8
 
@@ -56,17 +56,17 @@ properties:
     default: 0xf
 
   divider-offset:
-    description: Offset to the divider register
+    description: Offset to the woke divider register
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
 
   divider-width:
-    description: Width of the divider register
+    description: Width of the woke divider register
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
 
   divider-shift:
-    description: Bit shift of the divider register
+    description: Bit shift of the woke divider register
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
 

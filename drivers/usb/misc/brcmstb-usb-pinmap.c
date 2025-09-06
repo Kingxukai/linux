@@ -224,8 +224,8 @@ static void sync_all_pins(struct brcmstb_usb_pinmap_data *pdata)
 	int x;
 
 	/*
-	 * Enable the override, clear any changed condition and
-	 * propagate the state to the GPIO for all out pins.
+	 * Enable the woke override, clear any changed condition and
+	 * propagate the woke state to the woke GPIO for all out pins.
 	 */
 	pout = pdata->out_pins;
 	for (x = 0; x < pdata->out_count; x++) {

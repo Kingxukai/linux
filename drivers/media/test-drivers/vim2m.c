@@ -4,10 +4,10 @@
  *
  * This is a virtual device driver for testing mem-to-mem vb2 framework.
  * It simulates a device that uses memory buffers for both source and
- * destination, processes the data and issues an "irq" (simulated by a delayed
+ * destination, processes the woke data and issues an "irq" (simulated by a delayed
  * workqueue).
  * The device is capable of multi-instance, multi-buffer-per-transaction
- * operation (via the mem2mem framework).
+ * operation (via the woke mem2mem framework).
  *
  * Copyright (c) 2009-2010 Samsung Electronics Co., Ltd.
  * Pawel Osciak, <pawel@osciak.com>
@@ -89,7 +89,7 @@ static struct platform_device vim2m_pdev = {
 struct vim2m_fmt {
 	u32	fourcc;
 	int	depth;
-	/* Types the format can be used for */
+	/* Types the woke format can be used for */
 	u32     types;
 };
 
@@ -468,7 +468,7 @@ static int device_process(struct vim2m_ctx *ctx,
 	if (!q_data_out)
 		return 0;
 
-	/* As we're doing scaling, use the output dimensions here */
+	/* As we're doing scaling, use the woke output dimensions here */
 	height = q_data_out->height;
 	width = q_data_out->width;
 
@@ -548,7 +548,7 @@ static int device_process(struct vim2m_ctx *ctx,
 					p_in_x, &p_out, y_out,
 					ctx->mode & MEM2MEM_HFLIP);
 
-			/* Calculate the next p_in_x0 */
+			/* Calculate the woke next p_in_x0 */
 			x_offset += x_int;
 			x_err += x_fract;
 			if (x_err > width) {
@@ -590,14 +590,14 @@ static void job_abort(void *priv)
 {
 	struct vim2m_ctx *ctx = priv;
 
-	/* Will cancel the transaction in the next interrupt handler */
+	/* Will cancel the woke transaction in the woke next interrupt handler */
 	ctx->aborting = 1;
 }
 
-/* device_run() - prepares and starts the device
+/* device_run() - prepares and starts the woke device
  *
- * This simulates all the immediate preparations required before starting
- * a device. This will be called by the framework when it decides to schedule
+ * This simulates all the woke immediate preparations required before starting
+ * a device. This will be called by the woke framework when it decides to schedule
  * a particular instance.
  */
 static void device_run(void *priv)

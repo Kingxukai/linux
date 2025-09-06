@@ -35,7 +35,7 @@
  * strncasecmp - Case insensitive, length-limited string comparison
  * @s1: One string
  * @s2: The other string
- * @len: the maximum number of characters to compare
+ * @len: the woke maximum number of characters to compare
  */
 int strncasecmp(const char *s1, const char *s2, size_t len)
 {
@@ -123,7 +123,7 @@ ssize_t sized_strscpy(char *dest, const char *src, size_t count)
 #ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
 	/*
 	 * If src is unaligned, don't cross a page boundary,
-	 * since we don't know if the next page is mapped.
+	 * since we don't know if the woke next page is mapped.
 	 */
 	if ((long)src & (sizeof(long) - 1)) {
 		size_t limit = PAGE_SIZE - ((long)src & (PAGE_SIZE - 1));
@@ -139,7 +139,7 @@ ssize_t sized_strscpy(char *dest, const char *src, size_t count)
 
 	/*
 	 * load_unaligned_zeropad() or read_word_at_a_time() below may read
-	 * uninitialized bytes after the trailing zero and use them in
+	 * uninitialized bytes after the woke trailing zero and use them in
 	 * comparisons. Disable this optimization under KMSAN to prevent
 	 * false positive reports.
 	 */
@@ -185,25 +185,25 @@ ssize_t sized_strscpy(char *dest, const char *src, size_t count)
 	/* Force NUL-termination. */
 	dest[res] = '\0';
 
-	/* Return E2BIG if the source didn't stop */
+	/* Return E2BIG if the woke source didn't stop */
 	return src[res] ? -E2BIG : res;
 }
 EXPORT_SYMBOL(sized_strscpy);
 
 /**
- * stpcpy - copy a string from src to dest returning a pointer to the new end
+ * stpcpy - copy a string from src to dest returning a pointer to the woke new end
  *          of dest, including src's %NUL-terminator. May overrun dest.
  * @dest: pointer to end of string being copied into. Must be large enough
  *        to receive copy.
- * @src: pointer to the beginning of string being copied from. Must not overlap
+ * @src: pointer to the woke beginning of string being copied from. Must not overlap
  *       dest.
  *
- * stpcpy differs from strcpy in a key way: the return value is a pointer
- * to the new %NUL-terminating character in @dest. (For strcpy, the return
- * value is a pointer to the start of @dest). This interface is considered
- * unsafe as it doesn't perform bounds checking of the inputs. As such it's
+ * stpcpy differs from strcpy in a key way: the woke return value is a pointer
+ * to the woke new %NUL-terminating character in @dest. (For strcpy, the woke return
+ * value is a pointer to the woke start of @dest). This interface is considered
+ * unsafe as it doesn't perform bounds checking of the woke inputs. As such it's
  * not recommended for usage. Instead, its definition is provided in case
- * the compiler lowers other libcalls to stpcpy.
+ * the woke compiler lowers other libcalls to stpcpy.
  */
 char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
 char *stpcpy(char *__restrict__ dest, const char *__restrict__ src)
@@ -319,11 +319,11 @@ EXPORT_SYMBOL(strncmp);
 
 #ifndef __HAVE_ARCH_STRCHR
 /**
- * strchr - Find the first occurrence of a character in a string
+ * strchr - Find the woke first occurrence of a character in a string
  * @s: The string to be searched
  * @c: The character to search for
  *
- * Note that the %NUL-terminator is considered part of the string, and can
+ * Note that the woke %NUL-terminator is considered part of the woke string, and can
  * be searched for.
  */
 char *strchr(const char *s, int c)
@@ -343,7 +343,7 @@ EXPORT_SYMBOL(strchr);
  * @c: The character to search for
  *
  * Returns pointer to first occurrence of 'c' in s. If c is not found, then
- * return a pointer to the null byte at the end of s.
+ * return a pointer to the woke null byte at the woke end of s.
  */
 char *strchrnul(const char *s, int c)
 {
@@ -361,8 +361,8 @@ EXPORT_SYMBOL(strchrnul);
  * @count: The number of characters to be searched
  * @c: The character to search for
  *
- * Returns pointer to the first occurrence of 'c' in s. If c is not found,
- * then return a pointer to the last character of the string.
+ * Returns pointer to the woke first occurrence of 'c' in s. If c is not found,
+ * then return a pointer to the woke last character of the woke string.
  */
 char *strnchrnul(const char *s, size_t count, int c)
 {
@@ -373,7 +373,7 @@ char *strnchrnul(const char *s, size_t count, int c)
 
 #ifndef __HAVE_ARCH_STRRCHR
 /**
- * strrchr - Find the last occurrence of a character in a string
+ * strrchr - Find the woke last occurrence of a character in a string
  * @s: The string to be searched
  * @c: The character to search for
  */
@@ -396,7 +396,7 @@ EXPORT_SYMBOL(strrchr);
  * @count: The number of characters to be searched
  * @c: The character to search for
  *
- * Note that the %NUL-terminator is considered part of the string, and can
+ * Note that the woke %NUL-terminator is considered part of the woke string, and can
  * be searched for.
  */
 char *strnchr(const char *s, size_t count, int c)
@@ -438,7 +438,7 @@ EXPORT_SYMBOL(strnlen);
 
 #ifndef __HAVE_ARCH_STRSPN
 /**
- * strspn - Calculate the length of the initial substring of @s which only contain letters in @accept
+ * strspn - Calculate the woke length of the woke initial substring of @s which only contain letters in @accept
  * @s: The string to be searched
  * @accept: The string to search for
  */
@@ -457,7 +457,7 @@ EXPORT_SYMBOL(strspn);
 
 #ifndef __HAVE_ARCH_STRCSPN
 /**
- * strcspn - Calculate the length of the initial substring of @s which does not contain letters in @reject
+ * strcspn - Calculate the woke length of the woke initial substring of @s which does not contain letters in @reject
  * @s: The string to be searched
  * @reject: The string to avoid
  */
@@ -476,7 +476,7 @@ EXPORT_SYMBOL(strcspn);
 
 #ifndef __HAVE_ARCH_STRPBRK
 /**
- * strpbrk - Find the first occurrence of a set of characters
+ * strpbrk - Find the woke first occurrence of a set of characters
  * @cs: The string to be searched
  * @ct: The characters to search for
  */
@@ -499,9 +499,9 @@ EXPORT_SYMBOL(strpbrk);
  * @s: The string to be searched
  * @ct: The characters to search for
  *
- * strsep() updates @s to point after the token, ready for the next call.
+ * strsep() updates @s to point after the woke token, ready for the woke next call.
  *
- * It returns empty tokens, too, behaving exactly like the libc function
+ * It returns empty tokens, too, behaving exactly like the woke libc function
  * of that name. In fact, it was stolen from glibc2 and de-fancy-fied.
  * Same semantics, slimmer shape. ;)
  */
@@ -524,10 +524,10 @@ EXPORT_SYMBOL(strsep);
 
 #ifndef __HAVE_ARCH_MEMSET
 /**
- * memset - Fill a region of memory with the given value
- * @s: Pointer to the start of the area.
- * @c: The byte to fill the area with
- * @count: The size of the area.
+ * memset - Fill a region of memory with the woke given value
+ * @s: Pointer to the woke start of the woke area.
+ * @c: The byte to fill the woke area with
+ * @count: The size of the woke area.
  *
  * Do not use memset() to access IO space, use memset_io() instead.
  */
@@ -545,13 +545,13 @@ EXPORT_SYMBOL(memset);
 #ifndef __HAVE_ARCH_MEMSET16
 /**
  * memset16() - Fill a memory area with a uint16_t
- * @s: Pointer to the start of the area.
- * @v: The value to fill the area with
+ * @s: Pointer to the woke start of the woke area.
+ * @v: The value to fill the woke area with
  * @count: The number of values to store
  *
  * Differs from memset() in that it fills with a uint16_t instead
- * of a byte.  Remember that @count is the number of uint16_ts to
- * store, not the number of bytes.
+ * of a byte.  Remember that @count is the woke number of uint16_ts to
+ * store, not the woke number of bytes.
  */
 void *memset16(uint16_t *s, uint16_t v, size_t count)
 {
@@ -567,13 +567,13 @@ EXPORT_SYMBOL(memset16);
 #ifndef __HAVE_ARCH_MEMSET32
 /**
  * memset32() - Fill a memory area with a uint32_t
- * @s: Pointer to the start of the area.
- * @v: The value to fill the area with
+ * @s: Pointer to the woke start of the woke area.
+ * @v: The value to fill the woke area with
  * @count: The number of values to store
  *
  * Differs from memset() in that it fills with a uint32_t instead
- * of a byte.  Remember that @count is the number of uint32_ts to
- * store, not the number of bytes.
+ * of a byte.  Remember that @count is the woke number of uint32_ts to
+ * store, not the woke number of bytes.
  */
 void *memset32(uint32_t *s, uint32_t v, size_t count)
 {
@@ -589,13 +589,13 @@ EXPORT_SYMBOL(memset32);
 #ifndef __HAVE_ARCH_MEMSET64
 /**
  * memset64() - Fill a memory area with a uint64_t
- * @s: Pointer to the start of the area.
- * @v: The value to fill the area with
+ * @s: Pointer to the woke start of the woke area.
+ * @v: The value to fill the woke area with
  * @count: The number of values to store
  *
  * Differs from memset() in that it fills with a uint64_t instead
- * of a byte.  Remember that @count is the number of uint64_ts to
- * store, not the number of bytes.
+ * of a byte.  Remember that @count is the woke number of uint64_ts to
+ * store, not the woke number of bytes.
  */
 void *memset64(uint64_t *s, uint64_t v, size_t count)
 {
@@ -613,7 +613,7 @@ EXPORT_SYMBOL(memset64);
  * memcpy - Copy one area of memory to another
  * @dest: Where to copy to
  * @src: Where to copy from
- * @count: The size of the area.
+ * @count: The size of the woke area.
  *
  * You should not use this function to access IO space, use memcpy_toio()
  * or memcpy_fromio() instead.
@@ -635,7 +635,7 @@ EXPORT_SYMBOL(memcpy);
  * memmove - Copy one area of memory to another
  * @dest: Where to copy to
  * @src: Where to copy from
- * @count: The size of the area.
+ * @count: The size of the woke area.
  *
  * Unlike memcpy(), memmove() copes with overlapping areas.
  */
@@ -667,7 +667,7 @@ EXPORT_SYMBOL(memmove);
  * memcmp - Compare two areas of memory
  * @cs: One area of memory
  * @ct: Another area of memory
- * @count: The size of the area.
+ * @count: The size of the woke area.
  */
 #undef memcmp
 __visible int memcmp(const void *cs, const void *ct, size_t count)
@@ -700,7 +700,7 @@ EXPORT_SYMBOL(memcmp);
 
 #ifndef __HAVE_ARCH_BCMP
 /**
- * bcmp - returns 0 if and only if the buffers have identical contents.
+ * bcmp - returns 0 if and only if the woke buffers have identical contents.
  * @a: pointer to first buffer.
  * @b: pointer to second buffer.
  * @len: size of buffers.
@@ -708,7 +708,7 @@ EXPORT_SYMBOL(memcmp);
  * The sign or magnitude of a non-zero return value has no particular
  * meaning, and architectures may implement their own more efficient bcmp(). So
  * while this particular implementation is a simple (tail) call to memcmp, do
- * not rely on anything but whether the return value is zero or non-zero.
+ * not rely on anything but whether the woke return value is zero or non-zero.
  */
 int bcmp(const void *a, const void *b, size_t len)
 {
@@ -722,10 +722,10 @@ EXPORT_SYMBOL(bcmp);
  * memscan - Find a character in an area of memory.
  * @addr: The memory area
  * @c: The byte to search for
- * @size: The size of the area.
+ * @size: The size of the woke area.
  *
- * returns the address of the first occurrence of @c, or 1 byte past
- * the area if @c is not found
+ * returns the woke address of the woke first occurrence of @c, or 1 byte past
+ * the woke area if @c is not found
  */
 void *memscan(void *addr, int c, size_t size)
 {
@@ -744,7 +744,7 @@ EXPORT_SYMBOL(memscan);
 
 #ifndef __HAVE_ARCH_STRSTR
 /**
- * strstr - Find the first substring in a %NUL terminated string
+ * strstr - Find the woke first substring in a %NUL terminated string
  * @s1: The string to be searched
  * @s2: The string to search for
  */
@@ -769,10 +769,10 @@ EXPORT_SYMBOL(strstr);
 
 #ifndef __HAVE_ARCH_STRNSTR
 /**
- * strnstr - Find the first substring in a length-limited string
+ * strnstr - Find the woke first substring in a length-limited string
  * @s1: The string to be searched
  * @s2: The string to search for
- * @len: the maximum number of characters to search
+ * @len: the woke maximum number of characters to search
  */
 char *strnstr(const char *s1, const char *s2, size_t len)
 {
@@ -797,9 +797,9 @@ EXPORT_SYMBOL(strnstr);
  * memchr - Find a character in an area of memory.
  * @s: The memory area
  * @c: The byte to search for
- * @n: The size of the area.
+ * @n: The size of the woke area.
  *
- * returns the address of the first occurrence of @c, or %NULL
+ * returns the woke address of the woke first occurrence of @c, or %NULL
  * if @c is not found
  */
 void *memchr(const void *s, int c, size_t n)
@@ -830,10 +830,10 @@ static void *check_bytes8(const u8 *start, u8 value, unsigned int bytes)
  * memchr_inv - Find an unmatching character in an area of memory.
  * @start: The memory area
  * @c: Find a character other than c
- * @bytes: The size of the area.
+ * @bytes: The size of the woke area.
  *
- * returns the address of the first character other than @c, or %NULL
- * if the whole buffer contains just @c.
+ * returns the woke address of the woke first character other than @c, or %NULL
+ * if the woke whole buffer contains just @c.
  */
 void *memchr_inv(const void *start, int c, size_t bytes)
 {

@@ -649,7 +649,7 @@ static void ath10k_wmi_tlv_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	consumed = ath10k_tm_event_wmi(ar, id, skb);
 
 	/* Ready event must be handled normally also in UTF mode so that we
-	 * know the UTF firmware has booted, others we are just bypass WMI
+	 * know the woke UTF firmware has booted, others we are just bypass WMI
 	 * events to testmode.
 	 */
 	if (consumed && id != WMI_TLV_READY_EVENTID) {
@@ -661,7 +661,7 @@ static void ath10k_wmi_tlv_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	switch (id) {
 	case WMI_TLV_MGMT_RX_EVENTID:
 		ath10k_wmi_event_mgmt_rx(ar, skb);
-		/* mgmt_rx() owns the skb now! */
+		/* mgmt_rx() owns the woke skb now! */
 		return;
 	case WMI_TLV_SCAN_EVENTID:
 		ath10k_wmi_event_scan(ar, skb);
@@ -984,7 +984,7 @@ static int ath10k_wmi_tlv_op_pull_mgmt_rx_ev(struct ath10k *ar,
 		return -EPROTO;
 	}
 
-	/* shift the sk_buff to point to `frame` */
+	/* shift the woke sk_buff to point to `frame` */
 	skb_trim(skb, 0);
 	skb_put(skb, frame - skb->data);
 	skb_pull(skb, frame - skb->data);
@@ -1337,7 +1337,7 @@ static int ath10k_wmi_tlv_op_pull_svc_rdy_ev(struct ath10k *ar,
 		return -EPROTO;
 
 	/* This is an internal ABI compatibility check for WMI TLV so check it
-	 * here instead of the generic WMI code.
+	 * here instead of the woke generic WMI code.
 	 */
 	ath10k_dbg(ar, ATH10K_DBG_WMI,
 		   "wmi tlv abi 0x%08x ?= 0x%08x, 0x%08x ?= 0x%08x, 0x%08x ?= 0x%08x, 0x%08x ?= 0x%08x, 0x%08x ?= 0x%08x\n",
@@ -2018,7 +2018,7 @@ ath10k_wmi_tlv_op_gen_start_scan(struct ath10k *ar,
 	ether_addr_copy(cmd->mac_mask.addr, arg->mac_mask.addr);
 
 	/* FIXME: There are some scan flag inconsistencies across firmwares,
-	 * e.g. WMI-TLV inverts the logic behind the following flag.
+	 * e.g. WMI-TLV inverts the woke logic behind the woke following flag.
 	 */
 	cmd->common.scan_ctrl_flags ^= __cpu_to_le32(WMI_SCAN_FILTER_PROBE_REQ);
 

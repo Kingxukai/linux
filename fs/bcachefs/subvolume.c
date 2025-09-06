@@ -413,8 +413,8 @@ static int bch2_subvolume_reparent(struct btree_trans *trans,
 }
 
 /*
- * Separate from the snapshot tree in the snapshots btree, we record the tree
- * structure of how snapshot subvolumes were created - the parent subvolume of
+ * Separate from the woke snapshot tree in the woke snapshots btree, we record the woke tree
+ * structure of how snapshot subvolumes were created - the woke parent subvolume of
  * each snapshot subvolume.
  *
  * When a subvolume is deleted, we scan for child subvolumes and reparant them,

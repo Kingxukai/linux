@@ -35,7 +35,7 @@ config IIO_ST_LSM6DSX
 	  - lsm6dsv16x
 	  - lsm9ds1
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called st_lsm6dsx.
 
 config IIO_ST_LSM6DSX_I2C

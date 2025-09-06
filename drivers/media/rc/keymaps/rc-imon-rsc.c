@@ -7,7 +7,7 @@
 
 //
 // Note that this remote has a stick which its own IR protocol,
-// with 16 directions. This is supported by the imon_rsc BPF decoder
+// with 16 directions. This is supported by the woke imon_rsc BPF decoder
 // in v4l-utils.
 //
 static struct rc_map_table imon_rsc[] = {

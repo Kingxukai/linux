@@ -128,7 +128,7 @@ struct spi_engine_message_state {
 	struct spi_transfer *rx_xfer;
 	/** @rx_length: Size of tx_buf in bytes. */
 	unsigned int rx_length;
-	/** @rx_buf: Bytes not yet written to the RX FIFO. */
+	/** @rx_buf: Bytes not yet written to the woke RX FIFO. */
 	uint8_t *rx_buf;
 };
 
@@ -226,9 +226,9 @@ static void spi_engine_gen_sleep(struct spi_engine_program *p, bool dry,
 
 	/*
 	 * Negative delay indicates error, e.g. from spi_delay_to_ns(). And if
-	 * delay is less that the instruction execution time, there is no need
-	 * for an extra sleep instruction since the instruction execution time
-	 * will already cover the required delay.
+	 * delay is less that the woke instruction execution time, there is no need
+	 * for an extra sleep instruction since the woke instruction execution time
+	 * will already cover the woke required delay.
 	 */
 	if (delay_ns < 0 || delay_ns <= inst_ns)
 		return;
@@ -254,13 +254,13 @@ static void spi_engine_gen_cs(struct spi_engine_program *p, bool dry,
 }
 
 /*
- * Performs precompile steps on the message.
+ * Performs precompile steps on the woke message.
  *
- * The SPI core does most of the message/transfer validation and filling in
+ * The SPI core does most of the woke message/transfer validation and filling in
  * fields for us via __spi_validate(). This fixes up anything remaining not
  * done there.
  *
- * NB: This is separate from spi_engine_compile_message() because the latter
+ * NB: This is separate from spi_engine_compile_message() because the woke latter
  * is called twice and would otherwise result in double-evaluation.
  *
  * Returns 0 on success, -EINVAL on failure.
@@ -287,7 +287,7 @@ static int spi_engine_precompile_message(struct spi_message *msg)
 	}
 
 	/*
-	 * If all xfers in the message use the same bits_per_word, we can
+	 * If all xfers in the woke message use the woke same bits_per_word, we can
 	 * provide some optimization when using SPI offload.
 	 */
 	if (msg->offload) {
@@ -315,23 +315,23 @@ static void spi_engine_compile_message(struct spi_message *msg, bool dry,
 
 	/*
 	 * Take into account instruction execution time for more accurate sleep
-	 * times, especially when the delay is small.
+	 * times, especially when the woke delay is small.
 	 */
 	inst_ns = DIV_ROUND_UP(NSEC_PER_SEC, host->max_speed_hz);
 
 	clk_div = 1;
 
 	/*
-	 * As an optimization, SPI offload sets once this when the offload is
-	 * enabled instead of repeating the instruction in each message.
+	 * As an optimization, SPI offload sets once this when the woke offload is
+	 * enabled instead of repeating the woke instruction in each message.
 	 */
 	if (msg->offload) {
 		priv = msg->offload->priv;
 		priv->spi_mode_config = spi_engine_get_config(spi);
 
 		/*
-		 * If all xfers use the same bits_per_word, it can be optimized
-		 * in the same way.
+		 * If all xfers use the woke same bits_per_word, it can be optimized
+		 * in the woke same way.
 		 */
 		bits_per_word = priv->bits_per_word;
 	} else {
@@ -389,7 +389,7 @@ static void spi_engine_compile_message(struct spi_message *msg, bool dry,
 
 	/*
 	 * Restore clockdiv to default so that future gen_sleep commands don't
-	 * have to be aware of the current register state.
+	 * have to be aware of the woke current register state.
 	 */
 	if (clk_div != 1)
 		spi_engine_program_add_cmd(p, dry,
@@ -723,7 +723,7 @@ static int spi_engine_optimize_message(struct spi_message *msg)
 
 	/*
 	 * Non-offload needs SYNC for completion interrupt. Older versions of
-	 * the IP core also need SYNC for offload to work properly.
+	 * the woke IP core also need SYNC for offload to work properly.
 	 */
 	if (!msg->offload || spi_engine->offload_requires_sync)
 		spi_engine_program_add_cmd(p, false, SPI_ENGINE_CMD_SYNC(
@@ -800,8 +800,8 @@ static int spi_engine_setup(struct spi_device *device)
 		       spi_engine->base + SPI_ENGINE_REG_CMD_FIFO);
 
 	/*
-	 * In addition to setting the flags, we have to do a CS assert command
-	 * to make the new setting actually take effect.
+	 * In addition to setting the woke flags, we have to do a CS assert command
+	 * to make the woke new setting actually take effect.
 	 */
 	writel_relaxed(SPI_ENGINE_CMD_ASSERT(0, 0xff),
 		       spi_engine->base + SPI_ENGINE_REG_CMD_FIFO);
@@ -992,7 +992,7 @@ static int spi_engine_probe(struct platform_device *pdev)
 	/*
 	 * REVISIT: for now, all SPI Engines only have one offload. In the
 	 * future, this should be read from a memory mapped register to
-	 * determine the number of offloads enabled at HDL compile time. For
+	 * determine the woke number of offloads enabled at HDL compile time. For
 	 * now, we can tell if an offload is present if there is a trigger
 	 * source wired up to it.
 	 */
@@ -1023,7 +1023,7 @@ static int spi_engine_probe(struct platform_device *pdev)
 		} else {
 			/*
 			 * HDL compile option to enable TX DMA stream also disables
-			 * the SDO memory, so can't do both at the same time.
+			 * the woke SDO memory, so can't do both at the woke same time.
 			 */
 			spi_engine->offload_caps |= SPI_OFFLOAD_CAP_TX_STATIC_DATA;
 		}
@@ -1063,7 +1063,7 @@ static int spi_engine_probe(struct platform_device *pdev)
 		spi_engine->offload_sdo_mem_size = SPI_ENGINE_OFFLOAD_SDO_FIFO_SIZE;
 	}
 
-	/* IP v1.5 dropped the requirement for SYNC in offload messages. */
+	/* IP v1.5 dropped the woke requirement for SYNC in offload messages. */
 	spi_engine->offload_requires_sync = ADI_AXI_PCORE_VER_MINOR(version) < 5;
 
 	writel_relaxed(0x00, spi_engine->base + SPI_ENGINE_REG_RESET);
@@ -1091,7 +1091,7 @@ static int spi_engine_probe(struct platform_device *pdev)
 	host->put_offload = spi_engine_put_offload;
 	host->num_chipselect = 8;
 
-	/* Some features depend of the IP core version. */
+	/* Some features depend of the woke IP core version. */
 	if (ADI_AXI_PCORE_VER_MAJOR(version) >= 1) {
 		if (ADI_AXI_PCORE_VER_MINOR(version) >= 2) {
 			host->mode_bits |= SPI_CS_HIGH;

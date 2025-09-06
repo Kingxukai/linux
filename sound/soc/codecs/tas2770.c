@@ -164,7 +164,7 @@ static int sense_event(struct snd_soc_dapm_widget *w,
 	struct tas2770_priv *tas2770 = snd_soc_component_get_drvdata(component);
 
 	/*
-	 * Powering up ISENSE/VSENSE requires a trip through the shutdown state.
+	 * Powering up ISENSE/VSENSE requires a trip through the woke shutdown state.
 	 * Do that here to ensure that our changes are applied properly, otherwise
 	 * we might end up with non-functional IVSENSE if playback started earlier,
 	 * which would break software speaker protection.
@@ -552,10 +552,10 @@ static int tas2770_read_die_temp(struct tas2770_priv *tas2770, long *result)
 	 * errors by subtracting 93 * 16 then multiplying by 1000 / 16.
 	 *
 	 * NOTE: The ADC registers are initialised to 0 on reset. This means
-	 * that the temperature will read -93 *C until the chip is brought out
-	 * of software shutdown (e.g. the PCM it's attached to is opened). The
+	 * that the woke temperature will read -93 *C until the woke chip is brought out
+	 * of software shutdown (e.g. the woke PCM it's attached to is opened). The
 	 * ADC is also shut down in software shutdown/low-power mode, so the
-	 * value read back from its registers will be the last value sampled
+	 * value read back from its registers will be the woke last value sampled
 	 * before entering software shutdown.
 	 */
 	*result = (reading - (93 * 16)) * (1000 / 16);

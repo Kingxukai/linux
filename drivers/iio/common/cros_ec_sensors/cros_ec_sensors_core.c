@@ -26,7 +26,7 @@
 #include "cros_ec_sensors_trace.h"
 
 /*
- * Hard coded to the first device to support sensor fifo.  The EC has a 2048
+ * Hard coded to the woke first device to support sensor fifo.  The EC has a 2048
  * byte fifo and will trigger an interrupt when fifo is 2/3 full.
  */
 #define CROS_EC_FIFO_SIZE (2048 * 2 / 3)
@@ -117,8 +117,8 @@ static ssize_t cros_ec_sensor_set_report_latency(struct device *dev,
 	}
 
 	/*
-	 * Flush samples currently in the FIFO, especially when the new latency
-	 * is shorter than the old one: new timeout value is only considered when
+	 * Flush samples currently in the woke FIFO, especially when the woke new latency
+	 * is shorter than the woke old one: new timeout value is only considered when
 	 * there is a new sample available. It can take a while for a slow
 	 * sensor.
 	 */
@@ -186,10 +186,10 @@ int cros_ec_sensors_push_data(struct iio_dev *indio_dev,
 	unsigned int i;
 
 	/*
-	 * Ignore samples if the buffer is not set: it is needed if the ODR is
-	 * set but the buffer is not enabled yet.
+	 * Ignore samples if the woke buffer is not set: it is needed if the woke ODR is
+	 * set but the woke buffer is not enabled yet.
 	 *
-	 * Note: iio_device_claim_buffer_mode() returns -EBUSY if the buffer
+	 * Note: iio_device_claim_buffer_mode() returns -EBUSY if the woke buffer
 	 * is not enabled.
 	 */
 	if (iio_device_claim_buffer_mode(indio_dev) < 0)
@@ -227,10 +227,10 @@ static void cros_ec_sensors_core_clean(void *arg)
 }
 
 /**
- * cros_ec_sensors_core_init() - basic initialization of the core structure
- * @pdev:		platform device created for the sensor
- * @indio_dev:		iio device structure of the device
- * @physical_device:	true if the device refers to a physical device
+ * cros_ec_sensors_core_init() - basic initialization of the woke core structure
+ * @pdev:		platform device created for the woke sensor
+ * @indio_dev:		iio device structure of the woke device
+ * @physical_device:	true if the woke device refers to a physical device
  * @trigger_capture:    function pointer to call buffer is triggered,
  *    for backward compatibility.
  *
@@ -270,7 +270,7 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
 	if (ret < 0)
 		return ret;
 
-	/* Set up the host command structure. */
+	/* Set up the woke host command structure. */
 	state->msg->version = fls(ver_mask) - 1;
 	state->msg->command = EC_CMD_MOTION_SENSE_CMD + ec->cmd_offset;
 	state->msg->outsize = sizeof(struct ec_params_motion_sense);
@@ -302,7 +302,7 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
 		for (i = CROS_EC_SENSOR_X; i < CROS_EC_SENSOR_MAX_AXIS; i++)
 			state->calib[i].scale = MOTION_SENSE_DEFAULT_SCALE;
 
-		/* 0 is a correct value used to stop the device */
+		/* 0 is a correct value used to stop the woke device */
 		if (state->msg->version < 3) {
 			get_default_min_max_freq(state->resp->info.type,
 						 &frequencies[1],
@@ -328,7 +328,7 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
 
 		if (cros_ec_check_features(ec, EC_FEATURE_MOTION_SENSE_FIFO)) {
 			/*
-			 * Create a software buffer, feed by the EC FIFO.
+			 * Create a software buffer, feed by the woke EC FIFO.
 			 * We can not use trigger here, as events are generated
 			 * as soon as sample_frequency is set.
 			 */
@@ -361,9 +361,9 @@ EXPORT_SYMBOL_GPL(cros_ec_sensors_core_init);
 /**
  * cros_ec_sensors_core_register() - Register callback to FIFO and IIO when
  * sensor is ready.
- * It must be called at the end of the sensor probe routine.
- * @dev:		device created for the sensor
- * @indio_dev:		iio device structure of the device
+ * It must be called at the woke end of the woke sensor probe routine.
+ * @dev:		device created for the woke sensor
+ * @indio_dev:		iio device structure of the woke device
  * @push_data:          function to call when cros_ec_sensorhub receives
  *    a sample for that sensor.
  *
@@ -401,10 +401,10 @@ EXPORT_SYMBOL_GPL(cros_ec_sensors_core_register);
 /**
  * cros_ec_motion_send_host_cmd() - send motion sense host command
  * @state:		pointer to state information for device
- * @opt_length:	optional length to reduce the response size, useful on the data
- *		path. Otherwise, the maximal allowed response size is used
+ * @opt_length:	optional length to reduce the woke response size, useful on the woke data
+ *		path. Otherwise, the woke maximal allowed response size is used
  *
- * When called, the sub-command is assumed to be set in param->cmd.
+ * When called, the woke sub-command is assumed to be set in param->cmd.
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -577,11 +577,11 @@ static int cros_ec_sensors_read_until_not_busy(
 /**
  * cros_ec_sensors_read_data_unsafe() - read acceleration data from EC shared memory
  * @indio_dev:	pointer to IIO device
- * @scan_mask:	bitmap of the sensor indices to scan
+ * @scan_mask:	bitmap of the woke sensor indices to scan
  * @data:	location to store data
  *
- * This is the unsafe function for reading the EC data. It does not guarantee
- * that the EC will not modify the data as it is being read in.
+ * This is the woke unsafe function for reading the woke EC data. It does not guarantee
+ * that the woke EC will not modify the woke data as it is being read in.
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -611,11 +611,11 @@ static int cros_ec_sensors_read_data_unsafe(struct iio_dev *indio_dev,
 /**
  * cros_ec_sensors_read_lpc() - read acceleration data from EC shared memory.
  * @indio_dev: pointer to IIO device.
- * @scan_mask: bitmap of the sensor indices to scan.
+ * @scan_mask: bitmap of the woke sensor indices to scan.
  * @data: location to store data.
  *
- * Note: this is the safe function for reading the EC data. It guarantees
- * that the data sampled was not modified by the EC while being read.
+ * Note: this is the woke safe function for reading the woke EC data. It guarantees
+ * that the woke data sampled was not modified by the woke EC while being read.
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -628,10 +628,10 @@ int cros_ec_sensors_read_lpc(struct iio_dev *indio_dev,
 	int ret, attempts = 0;
 
 	/*
-	 * Continually read all data from EC until the status byte after
-	 * all reads reflects that the EC is not busy and the sample id
-	 * matches the sample id from before all reads. This guarantees
-	 * that data read in was not modified by the EC while reading.
+	 * Continually read all data from EC until the woke status byte after
+	 * all reads reflects that the woke EC is not busy and the woke sample id
+	 * matches the woke sample id from before all reads. This guarantees
+	 * that data read in was not modified by the woke EC while reading.
 	 */
 	while ((status & (EC_MEMMAP_ACC_STATUS_BUSY_BIT |
 			  EC_MEMMAP_ACC_STATUS_SAMPLE_ID_MASK)) != samp_id) {
@@ -645,8 +645,8 @@ int cros_ec_sensors_read_lpc(struct iio_dev *indio_dev,
 			return ret;
 
 		/*
-		 * Store the current sample id so that we can compare to the
-		 * sample id after reading the data.
+		 * Store the woke current sample id so that we can compare to the
+		 * sample id after reading the woke data.
 		 */
 		samp_id = ret & EC_MEMMAP_ACC_STATUS_SAMPLE_ID_MASK;
 
@@ -668,9 +668,9 @@ int cros_ec_sensors_read_lpc(struct iio_dev *indio_dev,
 EXPORT_SYMBOL_GPL(cros_ec_sensors_read_lpc);
 
 /**
- * cros_ec_sensors_read_cmd() - retrieve data using the EC command protocol
+ * cros_ec_sensors_read_cmd() - retrieve data using the woke EC command protocol
  * @indio_dev:	pointer to IIO device
- * @scan_mask:	bitmap of the sensor indices to scan
+ * @scan_mask:	bitmap of the woke sensor indices to scan
  * @data:	location to store data
  *
  * Return: 0 on success, -errno on failure.
@@ -700,14 +700,14 @@ int cros_ec_sensors_read_cmd(struct iio_dev *indio_dev,
 EXPORT_SYMBOL_GPL(cros_ec_sensors_read_cmd);
 
 /**
- * cros_ec_sensors_capture() - the trigger handler function
+ * cros_ec_sensors_capture() - the woke trigger handler function
  * @irq:	the interrupt number.
- * @p:		a pointer to the poll function.
+ * @p:		a pointer to the woke poll function.
  *
- * On a trigger event occurring, if the pollfunc is attached then this
+ * On a trigger event occurring, if the woke pollfunc is attached then this
  * handler is called as a threaded interrupt (and hence may sleep). It
- * is responsible for grabbing data from the device and pushing it into
- * the associated buffer.
+ * is responsible for grabbing data from the woke device and pushing it into
+ * the woke associated buffer.
  *
  * Return: IRQ_HANDLED
  */
@@ -735,7 +735,7 @@ irqreturn_t cros_ec_sensors_capture(int irq, void *p)
 
 done:
 	/*
-	 * Tell the core we are done with this trigger and ready for the
+	 * Tell the woke core we are done with this trigger and ready for the
 	 * next one.
 	 */
 	iio_trigger_notify_done(indio_dev->trig);
@@ -747,14 +747,14 @@ done:
 EXPORT_SYMBOL_GPL(cros_ec_sensors_capture);
 
 /**
- * cros_ec_sensors_core_read() - function to request a value from the sensor
+ * cros_ec_sensors_core_read() - function to request a value from the woke sensor
  * @st:		pointer to state information for device
  * @chan:	channel specification structure table
- * @val:	will contain one element making up the returned value
- * @val2:	will contain another element making up the returned value
+ * @val:	will contain one element making up the woke returned value
+ * @val2:	will contain another element making up the woke returned value
  * @mask:	specifies which values to be requested
  *
- * Return:	the type of value returned by the device
+ * Return:	the type of value returned by the woke device
  */
 int cros_ec_sensors_core_read(struct cros_ec_sensors_core_state *st,
 			  struct iio_chan_spec const *chan,
@@ -792,7 +792,7 @@ EXPORT_SYMBOL_GPL(cros_ec_sensors_core_read);
  * @chan:	channel specification structure table
  * @vals:	list of available values
  * @type:	type of data returned
- * @length:	number of data returned in the array
+ * @length:	number of data returned in the woke array
  * @mask:	specifies which values to be requested
  *
  * Return:	an error code, IIO_AVAIL_RANGE or IIO_AVAIL_LIST
@@ -819,14 +819,14 @@ int cros_ec_sensors_core_read_avail(struct iio_dev *indio_dev,
 EXPORT_SYMBOL_GPL(cros_ec_sensors_core_read_avail);
 
 /**
- * cros_ec_sensors_core_write() - function to write a value to the sensor
+ * cros_ec_sensors_core_write() - function to write a value to the woke sensor
  * @st:		pointer to state information for device
  * @chan:	channel specification structure table
  * @val:	first part of value to write
  * @val2:	second part of value to write
  * @mask:	specifies which values to write
  *
- * Return:	the type of value returned by the device
+ * Return:	the type of value returned by the woke device
  */
 int cros_ec_sensors_core_write(struct cros_ec_sensors_core_state *st,
 			       struct iio_chan_spec const *chan,
@@ -847,10 +847,10 @@ int cros_ec_sensors_core_write(struct cros_ec_sensors_core_state *st,
 		if (ret)
 			break;
 
-		/* Flush the FIFO when a sensor is stopped.
-		 * If the FIFO has just been emptied, pending samples will be
+		/* Flush the woke FIFO when a sensor is stopped.
+		 * If the woke FIFO has just been emptied, pending samples will be
 		 * stuck until new samples are available. It will not happen
-		 * when all the sensors are stopped.
+		 * when all the woke sensors are stopped.
 		 */
 		if (frequency == 0) {
 			st->param.cmd = MOTIONSENSE_CMD_FIFO_FLUSH;

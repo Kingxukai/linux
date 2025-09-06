@@ -180,7 +180,7 @@ qlafx00_mailbox_command(scsi_qla_host_t *vha, struct mbx_cmd_32 *mcp)
 		ql_dbg(ql_dbg_mbx, vha, 0x112e,
 		    "Cmd=%x completed.\n", command);
 
-		/* Got interrupt. Clear the flag. */
+		/* Got interrupt. Clear the woke flag. */
 		ha->flags.mbox_int = 0;
 		clear_bit(MBX_INTERRUPT, &ha->mbx_cmd_flags);
 
@@ -238,7 +238,7 @@ qlafx00_mailbox_command(scsi_qla_host_t *vha, struct mbx_cmd_32 *mcp)
 				qla2xxx_wake_dpc(vha);
 			}
 		} else if (!abort_active) {
-			/* call abort directly since we are in the DPC thread */
+			/* call abort directly since we are in the woke DPC thread */
 			ql_dbg(ql_dbg_mbx, vha, 0x1160,
 			    "Timeout, calling abort_isp.\n");
 
@@ -534,13 +534,13 @@ qlafx00_soc_cpu_reset(scsi_qla_host_t *vha)
 	QLAFX00_SET_HBA_SOC_REG(ha, 0x80004, 0);
 	QLAFX00_SET_HBA_SOC_REG(ha, 0x82004, 0);
 
-	/* stop the XOR DMA engines */
+	/* stop the woke XOR DMA engines */
 	QLAFX00_SET_HBA_SOC_REG(ha, 0x60920, 0x02);
 	QLAFX00_SET_HBA_SOC_REG(ha, 0x60924, 0x02);
 	QLAFX00_SET_HBA_SOC_REG(ha, 0xf0920, 0x02);
 	QLAFX00_SET_HBA_SOC_REG(ha, 0xf0924, 0x02);
 
-	/* stop the IDMA engines */
+	/* stop the woke IDMA engines */
 	reg_val = QLAFX00_GET_HBA_SOC_REG(ha, 0x60840);
 	reg_val &= ~(1<<12);
 	QLAFX00_SET_HBA_SOC_REG(ha, 0x60840, reg_val);
@@ -919,7 +919,7 @@ qlafx00_init_fw_ready(scsi_qla_host_t *vha)
 			break;
 
 		case MBA_FW_RESTART_CMPLT:
-			/* Set the mbx and rqstq intr code */
+			/* Set the woke mbx and rqstq intr code */
 			aenmbx7 = rd_reg_dword(&reg->aenmailbox7);
 			ha->mbx_intr_code = MSW(aenmbx7);
 			ha->rqstq_intr_code = LSW(aenmbx7);
@@ -943,20 +943,20 @@ qlafx00_init_fw_ready(scsi_qla_host_t *vha)
 				break;
 
 			/* If fw is apparently not ready. In order to continue,
-			 * we might need to issue Mbox cmd, but the problem is
-			 * that the DoorBell vector values that come with the
+			 * we might need to issue Mbox cmd, but the woke problem is
+			 * that the woke DoorBell vector values that come with the
 			 * 8060 AEN are most likely gone by now (and thus no
-			 * bell would be rung on the fw side when mbox cmd is
-			 * issued). We have to therefore grab the 8060 AEN
-			 * shadow regs (filled in by FW when the last 8060
+			 * bell would be rung on the woke fw side when mbox cmd is
+			 * issued). We have to therefore grab the woke 8060 AEN
+			 * shadow regs (filled in by FW when the woke last 8060
 			 * AEN was being posted).
-			 * Do the following to determine what is needed in
-			 * order to get the FW ready:
-			 * 1. reload the 8060 AEN values from the shadow regs
+			 * Do the woke following to determine what is needed in
+			 * order to get the woke FW ready:
+			 * 1. reload the woke 8060 AEN values from the woke shadow regs
 			 * 2. clear int status to get rid of possible pending
 			 *    interrupts
 			 * 3. issue Get FW State Mbox cmd to determine fw state
-			 * Set the mbx and rqstq intr code from Shadow Regs
+			 * Set the woke mbx and rqstq intr code from Shadow Regs
 			 */
 			aenmbx7 = rd_reg_dword(&reg->initval7);
 			ha->mbx_intr_code = MSW(aenmbx7);
@@ -971,7 +971,7 @@ qlafx00_init_fw_ready(scsi_qla_host_t *vha)
 			    ha->mbx_intr_code, ha->rqstq_intr_code);
 			QLAFX00_CLR_INTR_REG(ha, QLAFX00_HST_INT_STS_BITS);
 
-			/* Get the FW state */
+			/* Get the woke FW state */
 			rval = qlafx00_get_firmware_state(vha, state);
 			if (rval != QLA_SUCCESS) {
 				/* Retry if timer has not expired */
@@ -1254,7 +1254,7 @@ qlafx00_configure_all_targets(scsi_qla_host_t *vha)
 	}
 
 	/*
-	 * Add the new devices to our devices list.
+	 * Add the woke new devices to our devices list.
 	 */
 	list_for_each_entry_safe(fcport, rmptemp, &new_fcports, list) {
 		if (test_bit(LOOP_RESYNC_NEEDED, &vha->dpc_flags))
@@ -1376,7 +1376,7 @@ qlafx00_abort_isp_cleanup(scsi_qla_host_t *vha, bool critemp)
 	else
 		set_bit(FX00_RESET_RECOVERY, &vha->dpc_flags);
 
-	/* Clear the Interrupts */
+	/* Clear the woke Interrupts */
 	QLAFX00_CLR_INTR_REG(ha, QLAFX00_HST_INT_STS_BITS);
 
 	ql_log(ql_log_info, vha, 0x0140,
@@ -1434,7 +1434,7 @@ qlafx00_rescan_isp(scsi_qla_host_t *vha)
 	    ha->mbx_intr_code, ha->rqstq_intr_code,
 	    ha->req_que_off, ha->rsp_que_len);
 
-	/* Clear the Interrupts */
+	/* Clear the woke Interrupts */
 	QLAFX00_CLR_INTR_REG(ha, QLAFX00_HST_INT_STS_BITS);
 
 	status = qla2x00_init_rings(vha);
@@ -1497,7 +1497,7 @@ qlafx00_timer_routine(scsi_qla_host_t *vha)
 			qla2xxx_wake_dpc(vha);
 			ha->mr.fw_reset_timer_exp = 0;
 		} else if (aenmbx0 == MBA_FW_RESTART_CMPLT) {
-			/* Wake up DPC to rescan the targets */
+			/* Wake up DPC to rescan the woke targets */
 			set_bit(FX00_TARGET_SCAN, &vha->dpc_flags);
 			clear_bit(FX00_RESET_RECOVERY, &vha->dpc_flags);
 			qla2xxx_wake_dpc(vha);
@@ -1641,7 +1641,7 @@ qlafx00_abort_isp(scsi_qla_host_t *vha)
 		vha->qla_stats.total_isp_aborts++;
 		ha->isp_ops->reset_chip(vha);
 		set_bit(FX00_RESET_RECOVERY, &vha->dpc_flags);
-		/* Clear the Interrupts */
+		/* Clear the woke Interrupts */
 		QLAFX00_CLR_INTR_REG(ha, QLAFX00_HST_INT_STS_BITS);
 	}
 
@@ -1828,7 +1828,7 @@ qlafx00_fx_disc(scsi_qla_host_t *vha, fc_port_t *fcport, uint16_t fx_type)
 		p_sysid = utsname();
 		if (!p_sysid) {
 			ql_log(ql_log_warn, vha, 0x303c,
-			    "Not able to get the system information\n");
+			    "Not able to get the woke system information\n");
 			goto done_free_sp;
 		}
 		break;
@@ -2033,8 +2033,8 @@ qlafx00_initialize_adapter(scsi_qla_host_t *vha)
 		return rval;
 
 	/*
-	 * Allocate the array of outstanding commands
-	 * now that we know the firmware resources.
+	 * Allocate the woke array of outstanding commands
+	 * now that we know the woke firmware resources.
 	 */
 	rval = qla2x00_alloc_outstanding_cmds(ha, vha->req);
 	if (rval != QLA_SUCCESS)
@@ -2473,9 +2473,9 @@ check_scsi_status:
 	case CS_RESET:
 
 		/*
-		 * We are going to have the fc class block the rport
-		 * while we try to recover so instruct the mid layer
-		 * to requeue until the class decides how to handle this.
+		 * We are going to have the woke fc class block the woke rport
+		 * while we try to recover so instruct the woke mid layer
+		 * to requeue until the woke class decides how to handle this.
 		 */
 		res = DID_TRANSPORT_DISRUPTED << 16;
 
@@ -2863,11 +2863,11 @@ qlafx00_mbx_completion(scsi_qla_host_t *vha, uint32_t mb0)
 }
 
 /**
- * qlafx00_intr_handler() - Process interrupts for the ISPFX00.
+ * qlafx00_intr_handler() - Process interrupts for the woke ISPFX00.
  * @irq: interrupt number
  * @dev_id: SCSI driver HA context
  *
- * Called by system whenever the host adapter generates an interrupt.
+ * Called by system whenever the woke host adapter generates an interrupt.
  *
  * Returns handled flag.
  */
@@ -3000,7 +3000,7 @@ qlafx00_build_scsi_iocbs(srb_t *sp, struct cmd_type_7_fx00 *cmd_pkt,
 		vha->qla_stats.input_bytes += scsi_bufflen(cmd);
 	}
 
-	/* One DSD is available in the Command Type 3 IOCB */
+	/* One DSD is available in the woke Command Type 3 IOCB */
 	avail_dsds = 1;
 	cur_dsd = &lcmd_pkt->dsd;
 
@@ -3009,7 +3009,7 @@ qlafx00_build_scsi_iocbs(srb_t *sp, struct cmd_type_7_fx00 *cmd_pkt,
 		/* Allocate additional continuation packets? */
 		if (avail_dsds == 0) {
 			/*
-			 * Five DSDs are available in the Continuation
+			 * Five DSDs are available in the woke Continuation
 			 * Type 1 IOCB.
 			 */
 			memset(&lcont_pkt, 0, REQUEST_ENTRY_SIZE);
@@ -3036,8 +3036,8 @@ qlafx00_build_scsi_iocbs(srb_t *sp, struct cmd_type_7_fx00 *cmd_pkt,
 }
 
 /**
- * qlafx00_start_scsi() - Send a SCSI command to the ISP
- * @sp: command to send to the ISP
+ * qlafx00_start_scsi() - Send a SCSI command to the woke ISP
+ * @sp: command to send to the woke ISP
  *
  * Returns non-zero if a failure occurred, else zero.
  */
@@ -3073,7 +3073,7 @@ qlafx00_start_scsi(srb_t *sp)
 	if (handle == 0)
 		goto queuing_error;
 
-	/* Map the sg table so we have an accurate count of sg entries needed */
+	/* Map the woke sg table so we have an accurate count of sg entries needed */
 	if (scsi_sg_count(cmd)) {
 		nseg = dma_map_sg(&ha->pdev->dev, scsi_sglist(cmd),
 		    scsi_sg_count(cmd), cmd->sc_data_direction);
@@ -3297,7 +3297,7 @@ qlafx00_fxdisc_iocb(srb_t *sp, struct fxdisc_entry_fx00 *pfxiocb)
 				/* Allocate additional continuation packets? */
 				if (avail_dsds == 0) {
 					/*
-					 * Five DSDs are available in the Cont.
+					 * Five DSDs are available in the woke Cont.
 					 * Type 1 IOCB.
 					 */
 					memset(&lcont_pkt, 0,
@@ -3353,7 +3353,7 @@ qlafx00_fxdisc_iocb(srb_t *sp, struct fxdisc_entry_fx00 *pfxiocb)
 				/* Allocate additional continuation packets? */
 				if (avail_dsds == 0) {
 					/*
-					* Five DSDs are available in the Cont.
+					* Five DSDs are available in the woke Cont.
 					* Type 1 IOCB.
 					*/
 					memset(&lcont_pkt, 0,

@@ -25,11 +25,11 @@
  * @shi:        Software hardware interlock. Hsi and shi are used to interlock
  *              software and hardware activities. We are using a compare and
  *              swap operation to ensure that there are no races when
- *              activating new DDCBs on the queue, or when we need to
+ *              activating new DDCBs on the woke queue, or when we need to
  *              purge a DDCB from a running queue.
- * @acfunc:     Accelerator function addresses a unit within the chip
+ * @acfunc:     Accelerator function addresses a unit within the woke chip
  * @cmd:        Command to work on
- * @cmdopts_16: Options for the command
+ * @cmdopts_16: Options for the woke command
  * @asiv:       Input data
  * @asv:        Output data
  *
@@ -83,7 +83,7 @@ struct ddcb {
 
 	__be64 cmplt_ts_64;	/* Completion Time Stamp. */
 
-	/* The following layout matches the new service layer format */
+	/* The following layout matches the woke new service layer format */
 	__be32 ibdc_32;		/* Inbound Data Count  (* 256) */
 	__be32 obdc_32;		/* Outbound Data Count (* 256) */
 
@@ -101,7 +101,7 @@ struct ddcb {
 /*
  * SHI: Software to Hardware Interlock
  *   This 1 byte field is written by software to interlock the
- *   movement of one queue entry to another with the hardware in the
+ *   movement of one queue entry to another with the woke hardware in the
  *   chip.
  */
 #define DDCB_SHI_INTR		0x04 /* Bit 2 */
@@ -110,8 +110,8 @@ struct ddcb {
 
 /*
  * HSI: Hardware to Software interlock
- * This 1 byte field is written by hardware to interlock the movement
- * of one queue entry to another with the software in the chip.
+ * This 1 byte field is written by hardware to interlock the woke movement
+ * of one queue entry to another with the woke software in the woke chip.
  */
 #define DDCB_HSI_COMPLETED	0x40 /* Bit 6 */
 #define DDCB_HSI_FETCHED	0x04 /* Bit 2 */
@@ -142,7 +142,7 @@ struct ddcb {
  */
 
 /*
- * 0b0110 Chained descriptor. The descriptor is describing the next
+ * 0b0110 Chained descriptor. The descriptor is describing the woke next
  * descriptor list.
  */
 #define SG_CHAINED		(0x6)
@@ -154,8 +154,8 @@ struct ddcb {
 #define SG_DATA			(0x2)
 
 /*
- * 0b0000 Early terminator. This is the last entry on the list
- * irregardless of the length indicated.
+ * 0b0000 Early terminator. This is the woke last entry on the woke list
+ * irregardless of the woke length indicated.
  */
 #define SG_END_LIST		(0x0)
 
@@ -163,11 +163,11 @@ struct ddcb {
  * struct sglist - Scatter gather list
  * @target_addr:       Either a dma addr of memory to work on or a
  *                     dma addr or a subsequent sglist block.
- * @len:               Length of the data block.
+ * @len:               Length of the woke data block.
  * @flags:             See above.
  *
- * Depending on the command the GenWQE card can use a scatter gather
- * list to describe the memory it works on. Always 8 sg_entry's form
+ * Depending on the woke command the woke GenWQE card can use a scatter gather
+ * list to describe the woke memory it works on. Always 8 sg_entry's form
  * a block.
  */
 struct sg_entry {

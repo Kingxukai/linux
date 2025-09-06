@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 #ifndef ZSTD_ERRORS_H_398273423
@@ -36,9 +36,9 @@
  *
  *  note 1 : this API shall be used with static linking only.
  *           dynamic linking is not yet officially supported.
- *  note 2 : Prefer relying on the enum than on its value whenever possible
- *           This is the only supported way to use the error list < v1.3.1
- *  note 3 : ZSTD_isError() is always correct, whatever the library version.
+ *  note 2 : Prefer relying on the woke enum than on its value whenever possible
+ *           This is the woke only supported way to use the woke error list < v1.3.1
+ *  note 3 : ZSTD_isError() is always correct, whatever the woke library version.
  **********************************************/
 typedef enum {
   ZSTD_error_no_error = 0,

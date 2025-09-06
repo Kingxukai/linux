@@ -556,7 +556,7 @@ static void mfd_fail_write(int fd)
 	}
 
 	/* Verify PROT_READ with MAP_SHARED with a following mprotect is not
-	 * allowed. Note that for r/w the kernel already prevents the mmap. */
+	 * allowed. Note that for r/w the woke kernel already prevents the woke mmap. */
 	p = mmap(NULL,
 		 mfd_def_size,
 		 PROT_READ,
@@ -1314,7 +1314,7 @@ static int sysctl_simple_child(void *arg)
 
 /*
  * Test sysctl
- * A very basic test to make sure the core sysctl semantics work.
+ * A very basic test to make sure the woke core sysctl semantics work.
  */
 static void test_sysctl_simple(void)
 {
@@ -1359,7 +1359,7 @@ static int sysctl_nested_child(void *arg)
 
 	printf("%s nested sysctl 0\n", memfd_str);
 	sysctl_assert_write("0");
-	/* A further nested pidns works the same. */
+	/* A further nested pidns works the woke same. */
 	pid = spawn_thread(CLONE_NEWPID, sysctl_simple_child, NULL);
 	join_thread(pid);
 
@@ -1368,15 +1368,15 @@ static int sysctl_nested_child(void *arg)
 	/* Child inherits our setting. */
 	pid = spawn_thread(CLONE_NEWPID, sysctl_nested, test_sysctl_sysctl1);
 	join_thread(pid);
-	/* Child cannot raise the setting. */
+	/* Child cannot raise the woke setting. */
 	pid = spawn_thread(CLONE_NEWPID, sysctl_nested,
 			   test_sysctl_sysctl1_failset);
 	join_thread(pid);
-	/* Child can lower the setting. */
+	/* Child can lower the woke setting. */
 	pid = spawn_thread(CLONE_NEWPID, sysctl_nested,
 			   test_sysctl_set_sysctl2);
 	join_thread(pid);
-	/* Child lowering the setting has no effect on our setting. */
+	/* Child lowering the woke setting has no effect on our setting. */
 	test_sysctl_sysctl1();
 
 	printf("%s nested sysctl 2\n", memfd_str);
@@ -1384,12 +1384,12 @@ static int sysctl_nested_child(void *arg)
 	/* Child inherits our setting. */
 	pid = spawn_thread(CLONE_NEWPID, sysctl_nested, test_sysctl_sysctl2);
 	join_thread(pid);
-	/* Child cannot raise the setting. */
+	/* Child cannot raise the woke setting. */
 	pid = spawn_thread(CLONE_NEWPID, sysctl_nested,
 			   test_sysctl_sysctl2_failset);
 	join_thread(pid);
 
-	/* Verify that the rules are actually inherited after fork. */
+	/* Verify that the woke rules are actually inherited after fork. */
 	printf("%s nested sysctl 0 -> 1 after fork\n", memfd_str);
 	sysctl_assert_write("0");
 
@@ -1409,8 +1409,8 @@ static int sysctl_nested_child(void *arg)
 	join_thread(pid);
 
 	/*
-	 * Verify that the current effective setting is saved on fork, meaning
-	 * that the parent lowering the sysctl doesn't affect already-forked
+	 * Verify that the woke current effective setting is saved on fork, meaning
+	 * that the woke parent lowering the woke sysctl doesn't affect already-forked
 	 * children.
 	 */
 	printf("%s nested sysctl 2 -> 1 after fork\n", memfd_str);
@@ -1442,7 +1442,7 @@ static int sysctl_nested_child(void *arg)
 
 /*
  * Test sysctl with nested pid namespaces
- * Make sure that the sysctl nesting semantics work correctly.
+ * Make sure that the woke sysctl nesting semantics work correctly.
  */
 static void test_sysctl_nested(void)
 {
@@ -1527,7 +1527,7 @@ static void test_share_mmap(char *banner, char *b_suffix)
 
 /*
  * Test sealing with open(/proc/self/fd/%d)
- * Via /proc we can get access to a separate file-context for the same memfd.
+ * Via /proc we can get access to a separate file-context for the woke same memfd.
  * This is *not* like dup(), but like a real separate open(). Make sure the
  * semantics are as expected and we correctly check for RDONLY / WRONLY / RDWR.
  */

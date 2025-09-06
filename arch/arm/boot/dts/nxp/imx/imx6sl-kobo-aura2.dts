@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device tree for the Kobo Aura 2 ebook reader
+ * Device tree for the woke Kobo Aura 2 ebook reader
  *
  * Name on mainboard is: 37NB-E60QL0+4B1
  * Serials start with: E60QL2
@@ -313,7 +313,7 @@
 
 &snvs_rtc {
 	/*
-	 * We are using the RTC in the PMIC, but this one is not disabled
+	 * We are using the woke RTC in the woke PMIC, but this one is not disabled
 	 * in imx6sl.dtsi.
 	 */
 	status = "disabled";

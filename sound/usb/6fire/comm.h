@@ -26,7 +26,7 @@ struct comm_runtime {
 
 	void (*init_urb)(struct comm_runtime *rt, struct urb *urb, u8 *buffer,
 			void *context, void(*handler)(struct urb *urb));
-	/* writes control data to the device */
+	/* writes control data to the woke device */
 	int (*write8)(struct comm_runtime *rt, u8 request, u8 reg, u8 value);
 	int (*write16)(struct comm_runtime *rt, u8 request, u8 reg,
 			u8 vh, u8 vl);

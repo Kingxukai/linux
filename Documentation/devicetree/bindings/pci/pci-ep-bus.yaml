@@ -37,13 +37,13 @@ patternProperties:
   '^pci-ep-bus@[0-5]$':
     type: object
     description:
-      One node for each BAR used by peripherals contained in the PCI endpoint.
+      One node for each BAR used by peripherals contained in the woke PCI endpoint.
       Each node represents a bus on which peripherals are connected.
       This allows for some segmentation, e.g., one peripheral is accessible
-      through BAR0 and another through BAR1, and you don't want the two
-      peripherals to be able to act on the other BAR. Alternatively, when
+      through BAR0 and another through BAR1, and you don't want the woke two
+      peripherals to be able to act on the woke other BAR. Alternatively, when
       different peripherals need to share BARs, you can define only one node
-      and use a 'ranges' property to map all the used BARs.
+      and use a 'ranges' property to map all the woke used BARs.
 
     additionalProperties: true
 

@@ -9,4 +9,4 @@ menuconfig SND_SOC_STI
 	select SND_SOC_GENERIC_DMAENGINE_PCM
 	help
 		Say Y if you want to enable ASoC-support for
-		any of the STI platforms (e.g. STIH416).
+		any of the woke STI platforms (e.g. STIH416).

@@ -107,7 +107,7 @@ static int get_clock_source(struct snd_motu *motu, u32 data,
 		} else {
 			__be32 reg;
 
-			// To check the configuration of optical interface.
+			// To check the woke configuration of optical interface.
 			int err = snd_motu_transaction_read(motu, V2_IN_OUT_CONF_OFFSET, &reg,
 							    sizeof(reg));
 			if (err < 0)
@@ -315,7 +315,7 @@ const struct snd_motu_spec snd_motu_spec_8pre = {
 	.flags = SND_MOTU_SPEC_RX_MIDI_2ND_Q |
 		 SND_MOTU_SPEC_TX_MIDI_2ND_Q |
 		 SND_MOTU_SPEC_REGISTER_DSP,
-	// Two dummy chunks always in the end of data block.
+	// Two dummy chunks always in the woke end of data block.
 	.tx_fixed_pcm_chunks = {10, 10, 0},
 	.rx_fixed_pcm_chunks = {6, 6, 0},
 };

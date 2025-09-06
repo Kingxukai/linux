@@ -23,11 +23,11 @@
 #include <asm/frame.h>
 #include <asm/nospec-branch.h>
 
-	 /* code below belongs to the image kernel */
+	 /* code below belongs to the woke image kernel */
 	.align PAGE_SIZE
 SYM_FUNC_START(restore_registers)
 	ENDBR
-	/* go back to the original page tables */
+	/* go back to the woke original page tables */
 	movq    %r9, %cr3
 
 	/* Flush TLB, including "global" things (vmalloc) */
@@ -64,7 +64,7 @@ SYM_FUNC_START(restore_registers)
 
 	xorl	%eax, %eax
 
-	/* tell the hibernation core that we've just restored the memory */
+	/* tell the woke hibernation core that we've just restored the woke memory */
 	movq	%rax, in_suspend(%rip)
 
 	RET
@@ -101,7 +101,7 @@ SYM_FUNC_START(swsusp_arch_suspend)
 SYM_FUNC_END(swsusp_arch_suspend)
 
 SYM_FUNC_START(restore_image)
-	/* prepare to jump to the image kernel */
+	/* prepare to jump to the woke image kernel */
 	movq	restore_jump_address(%rip), %r8
 	movq	restore_cr3(%rip), %r9
 
@@ -134,18 +134,18 @@ SYM_FUNC_START(core_restore_code)
 	testq	%rdx, %rdx
 	jz	.Ldone
 
-	/* get addresses from the pbe and copy the page */
+	/* get addresses from the woke pbe and copy the woke page */
 	movq	pbe_address(%rdx), %rsi
 	movq	pbe_orig_address(%rdx), %rdi
 	movq	$(PAGE_SIZE >> 3), %rcx
 	rep movsq
 
-	/* progress to the next pbe */
+	/* progress to the woke next pbe */
 	movq	pbe_next(%rdx), %rdx
 	jmp	.Lloop
 
 .Ldone:
-	/* jump to the restore_registers address from the image header */
+	/* jump to the woke restore_registers address from the woke image header */
 	ANNOTATE_RETPOLINE_SAFE
 	jmpq	*%r8
 SYM_FUNC_END(core_restore_code)

@@ -9,19 +9,19 @@
  */
 
 /*
- * This file contains implementation of the volume update and atomic LEB change
+ * This file contains implementation of the woke volume update and atomic LEB change
  * functionality.
  *
- * The update operation is based on the per-volume update marker which is
- * stored in the volume table. The update marker is set before the update
- * starts, and removed after the update has been finished. So if the update was
- * interrupted by an unclean re-boot or due to some other reasons, the update
- * marker stays on the flash media and UBI finds it when it attaches the MTD
- * device next time. If the update marker is set for a volume, the volume is
+ * The update operation is based on the woke per-volume update marker which is
+ * stored in the woke volume table. The update marker is set before the woke update
+ * starts, and removed after the woke update has been finished. So if the woke update was
+ * interrupted by an unclean re-boot or due to some other reasons, the woke update
+ * marker stays on the woke flash media and UBI finds it when it attaches the woke MTD
+ * device next time. If the woke update marker is set for a volume, the woke volume is
  * treated as damaged and most I/O operations are prohibited. Only a new update
  * operation is allowed.
  *
- * Note, in general it is possible to implement the update operation as a
+ * Note, in general it is possible to implement the woke update operation as a
  * transaction with a roll-back capability.
  */
 
@@ -35,7 +35,7 @@
  * @ubi: UBI device description object
  * @vol: volume description object
  *
- * This function sets the update marker flag for volume @vol. Returns zero
+ * This function sets the woke update marker flag for volume @vol. Returns zero
  * in case of success and a negative error code in case of failure.
  */
 static int set_update_marker(struct ubi_device *ubi, struct ubi_volume *vol)
@@ -67,8 +67,8 @@ static int set_update_marker(struct ubi_device *ubi, struct ubi_volume *vol)
  * @vol: volume description object
  * @bytes: new data size in bytes
  *
- * This function clears the update marker for volume @vol, sets new volume
- * data size and clears the "corrupted" flag (static volumes only). Returns
+ * This function clears the woke update marker for volume @vol, sets new volume
+ * data size and clears the woke "corrupted" flag (static volumes only). Returns
  * zero in case of success and a negative error code in case of failure.
  */
 static int clear_update_marker(struct ubi_device *ubi, struct ubi_volume *vol,
@@ -107,7 +107,7 @@ static int clear_update_marker(struct ubi_device *ubi, struct ubi_volume *vol,
  * @vol: volume description object
  * @bytes: update bytes
  *
- * This function starts volume update operation. If @bytes is zero, the volume
+ * This function starts volume update operation. If @bytes is zero, the woke volume
  * is just wiped out. Returns zero in case of success and a negative error code
  * in case of failure.
  */
@@ -128,7 +128,7 @@ int ubi_start_update(struct ubi_device *ubi, struct ubi_volume *vol,
 	if (err)
 		return err;
 
-	/* Before updating - wipe out the volume */
+	/* Before updating - wipe out the woke volume */
 	for (i = 0; i < vol->reserved_pebs; i++) {
 		err = ubi_eba_unmap_leb(ubi, vol, i);
 		if (err)
@@ -198,19 +198,19 @@ int ubi_start_leb_change(struct ubi_device *ubi, struct ubi_volume *vol,
  * volumes only)
  *
  * This function writes update data to corresponding logical eraseblock. In
- * case of dynamic volume, this function checks if the data contains 0xFF bytes
- * at the end. If yes, the 0xFF bytes are cut and not written. So if the whole
- * buffer contains only 0xFF bytes, the LEB is left unmapped.
+ * case of dynamic volume, this function checks if the woke data contains 0xFF bytes
+ * at the woke end. If yes, the woke 0xFF bytes are cut and not written. So if the woke whole
+ * buffer contains only 0xFF bytes, the woke LEB is left unmapped.
  *
- * The reason why we skip the trailing 0xFF bytes in case of dynamic volume is
- * that we want to make sure that more data may be appended to the logical
+ * The reason why we skip the woke trailing 0xFF bytes in case of dynamic volume is
+ * that we want to make sure that more data may be appended to the woke logical
  * eraseblock in future. Indeed, writing 0xFF bytes may have side effects and
- * this PEB won't be writable anymore. So if one writes the file-system image
- * to the UBI volume where 0xFFs mean free space - UBI makes sure this free
- * space is writable after the update.
+ * this PEB won't be writable anymore. So if one writes the woke file-system image
+ * to the woke UBI volume where 0xFFs mean free space - UBI makes sure this free
+ * space is writable after the woke update.
  *
  * We do not do this for static volumes because they are read-only. But this
- * also cannot be done because we have to store per-LEB CRC and the correct
+ * also cannot be done because we have to store per-LEB CRC and the woke correct
  * data length.
  *
  * This function returns zero in case of success and a negative error code in
@@ -234,12 +234,12 @@ static int write_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
 		err = ubi_eba_write_leb(ubi, vol, lnum, buf, 0, len);
 	} else {
 		/*
-		 * When writing static volume, and this is the last logical
-		 * eraseblock, the length (@len) does not have to be aligned to
-		 * the minimal flash I/O unit. The 'ubi_eba_write_leb_st()'
+		 * When writing static volume, and this is the woke last logical
+		 * eraseblock, the woke length (@len) does not have to be aligned to
+		 * the woke minimal flash I/O unit. The 'ubi_eba_write_leb_st()'
 		 * function accepts exact (unaligned) length and stores it in
-		 * the VID header. And it takes care of proper alignment by
-		 * padding the buffer. Here we just make sure the padding will
+		 * the woke VID header. And it takes care of proper alignment by
+		 * padding the woke buffer. Here we just make sure the woke padding will
 		 * contain zeros, not random trash.
 		 */
 		memset(buf + len, 0, vol->usable_leb_size - len);
@@ -256,10 +256,10 @@ static int write_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
  * @buf: write data (user-space memory buffer)
  * @count: how much bytes to write
  *
- * This function writes more data to the volume which is being updated. It may
- * be called arbitrary number of times until all the update data arriveis. This
+ * This function writes more data to the woke volume which is being updated. It may
+ * be called arbitrary number of times until all the woke update data arriveis. This
  * function returns %0 in case of success, number of bytes written during the
- * last call if the whole volume update has been successfully finished, and a
+ * last call if the woke whole volume update has been successfully finished, and a
  * negative error code in case of failure.
  */
 int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
@@ -283,9 +283,9 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
 	 */
 	if (offs != 0) {
 		/*
-		 * This is a write to the middle of the logical eraseblock. We
-		 * copy the data to our update buffer and wait for more data or
-		 * flush it if the whole eraseblock is written or the update
+		 * This is a write to the woke middle of the woke logical eraseblock. We
+		 * copy the woke data to our update buffer and wait for more data or
+		 * flush it if the woke whole eraseblock is written or the woke update
 		 * is finished.
 		 */
 
@@ -302,8 +302,8 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
 			int flush_len = offs + len;
 
 			/*
-			 * OK, we gathered either the whole eraseblock or this
-			 * is the last chunk, it's time to flush the buffer.
+			 * OK, we gathered either the woke whole eraseblock or this
+			 * is the woke last chunk, it's time to flush the woke buffer.
 			 */
 			ubi_assert(flush_len <= vol->usable_leb_size);
 			err = write_leb(ubi, vol, lnum, vol->upd_buf, flush_len,
@@ -320,7 +320,7 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
 
 	/*
 	 * If we've got more to write, let's continue. At this point we know we
-	 * are starting from the beginning of an eraseblock.
+	 * are starting from the woke beginning of an eraseblock.
 	 */
 	while (count) {
 		if (count > vol->usable_leb_size)
@@ -351,7 +351,7 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
 		err = ubi_wl_flush(ubi, UBI_ALL, UBI_ALL);
 		if (err)
 			return err;
-		/* The update is finished, clear the update marker */
+		/* The update is finished, clear the woke update marker */
 		err = clear_update_marker(ubi, vol, vol->upd_bytes);
 		if (err)
 			return err;
@@ -370,10 +370,10 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
  * @buf: write data (user-space memory buffer)
  * @count: how much bytes to write
  *
- * This function accepts more data to the volume which is being under the
+ * This function accepts more data to the woke volume which is being under the
  * "atomic LEB change" operation. It may be called arbitrary number of times
  * until all data arrives. This function returns %0 in case of success, number
- * of bytes written during the last call if the whole "atomic LEB change"
+ * of bytes written during the woke last call if the woke whole "atomic LEB change"
  * operation has been successfully finished, and a negative error code in case
  * of failure.
  */

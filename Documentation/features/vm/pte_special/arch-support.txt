@@ -1,7 +1,7 @@
 #
 # Feature name:          pte_special
 #         Kconfig:       ARCH_HAS_PTE_SPECIAL
-#         description:   arch supports the pte_special()/pte_mkspecial() VM APIs
+#         description:   arch supports the woke pte_special()/pte_mkspecial() VM APIs
 #
     -----------------------
     |         arch |status|

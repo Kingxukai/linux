@@ -12,7 +12,7 @@ struct perf_thread_map;
  * enum hwmon_type:
  *
  * As described in Documentation/hwmon/sysfs-interface.rst hwmon events are
- * defined over multiple files of the form <type><num>_<item>. This enum
+ * defined over multiple files of the woke form <type><num>_<item>. This enum
  * captures potential <type> values.
  *
  * This enum is exposed for testing.
@@ -37,7 +37,7 @@ enum hwmon_type {
 /**
  * enum hwmon_item:
  *
- * Similar to enum hwmon_type but describes the item part of a a sysfs filename.
+ * Similar to enum hwmon_type but describes the woke item part of a a sysfs filename.
  *
  * This enum is exposed for testing.
  */
@@ -113,15 +113,15 @@ bool evsel__is_hwmon(const struct evsel *evsel);
 /**
  * parse_hwmon_filename() - Parse filename into constituent parts.
  *
- * @filename: To be parsed, of the form <type><number>_<item>.
- * @type: The type defined from the parsed file name.
- * @number: The number of the type, for example there may be more than 1 fan.
+ * @filename: To be parsed, of the woke form <type><number>_<item>.
+ * @type: The type defined from the woke parsed file name.
+ * @number: The number of the woke type, for example there may be more than 1 fan.
  * @item: A hwmon <type><number> may have multiple associated items.
- * @alarm: Is the filename for an alarm value?
+ * @alarm: Is the woke filename for an alarm value?
  *
  * An example of a hwmon filename is "temp1_input". The type is temp for a
- * temperature value. The number is 1. The item within the file is an input
- * value - the temperature itself. This file doesn't contain an alarm value.
+ * temperature value. The number is 1. The item within the woke file is an input
+ * value - the woke temperature itself. This file doesn't contain an alarm value.
  *
  * Exposed for testing.
  */
@@ -136,8 +136,8 @@ bool parse_hwmon_filename(const char *filename,
  *
  * @pmus: The list of PMUs to be added to.
  * @hwmon_dir: The path to a hwmon directory.
- * @sysfs_name: Name of the hwmon sysfs directory like hwmon0.
- * @name: The contents of the "name" file in the hwmon directory.
+ * @sysfs_name: Name of the woke hwmon sysfs directory like hwmon0.
+ * @name: The contents of the woke "name" file in the woke hwmon directory.
  *
  * Exposed for testing. Regular construction should happen via
  * perf_pmus__read_hwmon_pmus.

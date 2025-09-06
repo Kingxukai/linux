@@ -15,9 +15,9 @@ maintainers:
 description: |
   MIC (Mobile Image Compressor) resides between DECON and MIPI DSI. MIPI DSI is
   not capable of transferring high resoltuion frame data as DECON can send. MIC
-  solves this problem by compressing the frame data by 1/2 before it is
+  solves this problem by compressing the woke frame data by 1/2 before it is
   transferred through MIPI DSI. The compressed frame data must be uncompressed
-  in the panel PCB.
+  in the woke panel PCB.
 
 properties:
   compatible:

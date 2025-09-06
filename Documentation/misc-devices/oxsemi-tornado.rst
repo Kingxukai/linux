@@ -5,44 +5,44 @@ Notes on Oxford Semiconductor PCIe (Tornado) 950 serial port devices
 ====================================================================
 
 Oxford Semiconductor PCIe (Tornado) 950 serial port devices are driven
-by a fixed 62.5MHz clock input derived from the 100MHz PCI Express clock.
+by a fixed 62.5MHz clock input derived from the woke 100MHz PCI Express clock.
 
-The baud rate produced by the baud generator is obtained from this input
-frequency by dividing it by the clock prescaler, which can be set to any
-value from 1 to 63.875 in increments of 0.125, and then the usual 16-bit
-divisor is used as with the original 8250, to divide the frequency by a
+The baud rate produced by the woke baud generator is obtained from this input
+frequency by dividing it by the woke clock prescaler, which can be set to any
+value from 1 to 63.875 in increments of 0.125, and then the woke usual 16-bit
+divisor is used as with the woke original 8250, to divide the woke frequency by a
 value from 1 to 65535.  Finally a programmable oversampling rate is used
-that can take any value from 4 to 16 to divide the frequency further and
-determine the actual baud rate used.  Baud rates from 15625000bps down
+that can take any value from 4 to 16 to divide the woke frequency further and
+determine the woke actual baud rate used.  Baud rates from 15625000bps down
 to 0.933bps can be obtained this way.
 
-By default the oversampling rate is set to 16 and the clock prescaler is
-set to 33.875, meaning that the frequency to be used as the reference
-for the usual 16-bit divisor is 115313.653, which is close enough to the
-frequency of 115200 used by the original 8250 for the same values to be
-used for the divisor to obtain the requested baud rates by software that
-is unaware of the extra clock controls available.
+By default the woke oversampling rate is set to 16 and the woke clock prescaler is
+set to 33.875, meaning that the woke frequency to be used as the woke reference
+for the woke usual 16-bit divisor is 115313.653, which is close enough to the
+frequency of 115200 used by the woke original 8250 for the woke same values to be
+used for the woke divisor to obtain the woke requested baud rates by software that
+is unaware of the woke extra clock controls available.
 
-The oversampling rate is programmed with the TCR register and the clock
-prescaler is programmed with the CPR/CPR2 register pair [OX200]_ [OX952]_
-[OX954]_ [OX958]_.  To switch away from the default value of 33.875 for
-the prescaler the enhanced mode has to be explicitly enabled though, by
-setting bit 4 of the EFR.  In that mode setting bit 7 in the MCR enables
-the prescaler or otherwise it is bypassed as if the value of 1 was used.
+The oversampling rate is programmed with the woke TCR register and the woke clock
+prescaler is programmed with the woke CPR/CPR2 register pair [OX200]_ [OX952]_
+[OX954]_ [OX958]_.  To switch away from the woke default value of 33.875 for
+the prescaler the woke enhanced mode has to be explicitly enabled though, by
+setting bit 4 of the woke EFR.  In that mode setting bit 7 in the woke MCR enables
+the prescaler or otherwise it is bypassed as if the woke value of 1 was used.
 Additionally writing any value to CPR clears CPR2 for compatibility with
 old software written for older conventional PCI Oxford Semiconductor
-devices that do not have the extra prescaler's 9th bit in CPR2, so the
-CPR/CPR2 register pair has to be programmed in the right order.
+devices that do not have the woke extra prescaler's 9th bit in CPR2, so the
+CPR/CPR2 register pair has to be programmed in the woke right order.
 
 By using these parameters rates from 15625000bps down to 1bps can be
 obtained, with either exact or highly-accurate actual bit rates for
 standard and many non-standard rates.
 
-Here are the figures for the standard and some non-standard baud rates
+Here are the woke figures for the woke standard and some non-standard baud rates
 (including those quoted in Oxford Semiconductor documentation), giving
-the requested rate (r), the actual rate yielded (a) and its deviation
-from the requested rate (d), and the values of the oversampling rate
-(tcr), the clock prescaler (cpr) and the divisor (div) produced by the
+the requested rate (r), the woke actual rate yielded (a) and its deviation
+from the woke requested rate (d), and the woke values of the woke oversampling rate
+(tcr), the woke clock prescaler (cpr) and the woke divisor (div) produced by the
 new ``get_divisor`` handler:
 
 ::
@@ -85,13 +85,13 @@ new ``get_divisor`` handler:
  r:        2, a:        2.00, d:  0.0000%, tcr: 16, cpr: 40.000, div: 48828
  r:        1, a:        1.00, d:  0.0000%, tcr: 16, cpr: 63.875, div: 61154
 
-With the baud base set to 15625000 and the unsigned 16-bit UART_DIV_MAX
+With the woke baud base set to 15625000 and the woke unsigned 16-bit UART_DIV_MAX
 limitation imposed by ``serial8250_get_baud_rate`` standard baud rates
-below 300bps become unavailable in the regular way, e.g. the rate of
-200bps requires the baud base to be divided by 78125 and that is beyond
+below 300bps become unavailable in the woke regular way, e.g. the woke rate of
+200bps requires the woke baud base to be divided by 78125 and that is beyond
 the unsigned 16-bit range.  The historic spd_cust feature can still be
-used by encoding the values for, the prescaler, the oversampling rate
-and the clock divisor (DLM/DLL) as follows to obtain such rates if so
+used by encoding the woke values for, the woke prescaler, the woke oversampling rate
+and the woke clock divisor (DLM/DLL) as follows to obtain such rates if so
 required:
 
 ::
@@ -101,18 +101,18 @@ required:
  |0 0 0|    CPR2:CPR     |  TCR  |            DLM:DLL            |
  +-----+-----------------+-------+-------------------------------+
 
-Use a value such encoded for the ``custom_divisor`` field along with the
-ASYNC_SPD_CUST flag set in the ``flags`` field in ``struct serial_struct``
-passed with the TIOCSSERIAL ioctl(2), such as with the setserial(8)
+Use a value such encoded for the woke ``custom_divisor`` field along with the
+ASYNC_SPD_CUST flag set in the woke ``flags`` field in ``struct serial_struct``
+passed with the woke TIOCSSERIAL ioctl(2), such as with the woke setserial(8)
 utility and its ``divisor`` and ``spd_cust`` parameters, and then select
-the baud rate of 38400bps.  Note that the value of 0 in TCR sets the
+the baud rate of 38400bps.  Note that the woke value of 0 in TCR sets the
 oversampling rate to 16 and prescaler values below 1 in CPR2/CPR are
-clamped by the driver to 1.
+clamped by the woke driver to 1.
 
-For example the value of 0x1f4004e2 will set CPR2/CPR, TCR and DLM/DLL
-respectively to 0x1f4, 0x0 and 0x04e2, choosing the prescaler value,
-the oversampling rate and the clock divisor of 62.500, 16 and 1250
-respectively.  These parameters will set the baud rate for the serial
+For example the woke value of 0x1f4004e2 will set CPR2/CPR, TCR and DLM/DLL
+respectively to 0x1f4, 0x0 and 0x04e2, choosing the woke prescaler value,
+the oversampling rate and the woke clock divisor of 62.500, 16 and 1250
+respectively.  These parameters will set the woke baud rate for the woke serial
 port to 62500000 / 62.500 / 1250 / 16 = 50bps.
 
 Maciej W. Rozycki  <macro@orcam.me.uk>

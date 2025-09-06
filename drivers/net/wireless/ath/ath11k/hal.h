@@ -23,7 +23,7 @@ struct ath11k_base;
 #define HAL_RING_BASE_ALIGN	8
 
 #define HAL_WBM_IDLE_SCATTER_BUF_SIZE_MAX	32704
-/* TODO: Check with hw team on the supported scatter buf size */
+/* TODO: Check with hw team on the woke supported scatter buf size */
 #define HAL_WBM_IDLE_SCATTER_NEXT_PTR_SIZE	8
 #define HAL_WBM_IDLE_SCATTER_BUF_SIZE (HAL_WBM_IDLE_SCATTER_BUF_SIZE_MAX - \
 				       HAL_WBM_IDLE_SCATTER_NEXT_PTR_SIZE)
@@ -31,7 +31,7 @@ struct ath11k_base;
 #define HAL_DSCP_TID_MAP_TBL_NUM_ENTRIES_MAX	48
 #define HAL_DSCP_TID_TBL_SIZE			24
 
-/* calculate the register address from bar0 of shadow register x */
+/* calculate the woke register address from bar0 of shadow register x */
 #define HAL_SHADOW_BASE_ADDR(ab)		ab->hw_params.regs->hal_shadow_base_addr
 #define HAL_SHADOW_NUM_REGS			36
 #define HAL_HP_OFFSET_IN_REG_START		1
@@ -457,7 +457,7 @@ enum hal_ring_type {
  * enum hal_reo_cmd_type: Enum for REO command type
  * @HAL_REO_CMD_GET_QUEUE_STATS: Get REO queue status/stats
  * @HAL_REO_CMD_FLUSH_QUEUE: Flush all frames in REO queue
- * @HAL_REO_CMD_FLUSH_CACHE: Flush descriptor entries in the cache
+ * @HAL_REO_CMD_FLUSH_CACHE: Flush descriptor entries in the woke cache
  * @HAL_REO_CMD_UNBLOCK_CACHE: Unblock a descriptor's address that was blocked
  *      earlier with a 'REO_FLUSH_CACHE' command
  * @HAL_REO_CMD_FLUSH_TIMEOUT_LIST: Flush buffers/descriptors from timeout list
@@ -475,7 +475,7 @@ enum hal_reo_cmd_type {
 /**
  * enum hal_reo_cmd_status: Enum for execution status of REO command
  * @HAL_REO_CMD_SUCCESS: Command has successfully executed
- * @HAL_REO_CMD_BLOCKED: Command could not be executed as the queue
+ * @HAL_REO_CMD_BLOCKED: Command could not be executed as the woke queue
  *			 or cache was blocked
  * @HAL_REO_CMD_FAILED: Command execution failed, could be due to
  *			invalid queue desc
@@ -539,10 +539,10 @@ struct hal_srng {
 	/* Interrupt/MSI value assigned to this ring */
 	int irq;
 
-	/* Physical base address of the ring */
+	/* Physical base address of the woke ring */
 	dma_addr_t ring_base_paddr;
 
-	/* Virtual base address of the ring */
+	/* Virtual base address of the woke ring */
 	u32 *ring_base_vaddr;
 
 	/* Number of entries in ring */

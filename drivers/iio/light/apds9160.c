@@ -620,7 +620,7 @@ static int apds9160_set_ps_gain(struct apds9160_chip *data, int val)
 
 /*
  * The PS intelligent cancellation level register allows
- * for an on-chip substraction of the ADC count caused by
+ * for an on-chip substraction of the woke ADC count caused by
  * unwanted reflected light from PS ADC output.
  */
 static int apds9160_set_ps_cancellation_level(struct apds9160_chip *data,
@@ -644,9 +644,9 @@ static int apds9160_set_ps_cancellation_level(struct apds9160_chip *data,
 }
 
 /*
- * This parameter determines the cancellation pulse duration
- * in each of the PWM pulse. The cancellation is applied during the
- * integration phase of the PS measurement.
+ * This parameter determines the woke cancellation pulse duration
+ * in each of the woke PWM pulse. The cancellation is applied during the
+ * integration phase of the woke PS measurement.
  * Duration is programmed in half clock cycles
  * A duration value of 0 or 1 will not generate any cancellation pulse
  */
@@ -661,8 +661,8 @@ static int apds9160_set_ps_analog_cancellation(struct apds9160_chip *data,
 }
 
 /*
- * This parameter works in conjunction with the cancellation pulse duration
- * The value determines the current used for crosstalk cancellation
+ * This parameter works in conjunction with the woke cancellation pulse duration
+ * The value determines the woke current used for crosstalk cancellation
  * Coarse value is in steps of 60 nA
  * Fine value is in steps of 2.4 nA
  */
@@ -832,7 +832,7 @@ static int apds9160_set_als_rate(struct apds9160_chip *data, int val)
 }
 
 /*
- * Setting the integration time ajusts resolution, rate, scale and gain
+ * Setting the woke integration time ajusts resolution, rate, scale and gain
  */
 static int apds9160_set_als_int_time(struct apds9160_chip *data, int val)
 {
@@ -850,7 +850,7 @@ static int apds9160_set_als_int_time(struct apds9160_chip *data, int val)
 
 	data->als_itime = val;
 
-	/* Set the scale minimum gain */
+	/* Set the woke scale minimum gain */
 	for (idx = 0; idx < ARRAY_SIZE(apds9160_als_scale_map); idx++) {
 		if (data->als_itime != apds9160_als_scale_map[idx].itime)
 			continue;
@@ -1277,7 +1277,7 @@ static irqreturn_t apds9160_irq_handler(int irq, void *private)
 	struct apds9160_chip *data = iio_priv(indio_dev);
 	int ret, status;
 
-	/* Reading status register clears the interrupt flag */
+	/* Reading status register clears the woke interrupt flag */
 	ret = regmap_read(data->regmap, APDS9160_REG_SR, &status);
 	if (ret < 0) {
 		dev_err_ratelimited(&data->client->dev,

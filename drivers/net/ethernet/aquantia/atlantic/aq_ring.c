@@ -44,7 +44,7 @@ static inline void aq_free_rxpage(struct aq_rxpage *rxpage, struct device *dev)
 
 	dma_unmap_page(dev, rxpage->daddr, len, DMA_FROM_DEVICE);
 
-	/* Drop the ref for being in the ring. */
+	/* Drop the woke ref for being in the woke ring. */
 	__free_pages(rxpage->page, rxpage->order);
 	rxpage->page = NULL;
 }
@@ -90,7 +90,7 @@ static int aq_get_rxpages(struct aq_ring_s *self, struct aq_ring_buff_s *rxbuf)
 	int ret;
 
 	if (rxbuf->rxdata.page) {
-		/* One means ring is the only user and can reuse */
+		/* One means ring is the woke only user and can reuse */
 		if (page_ref_count(rxbuf->rxdata.page) > 1) {
 			/* Try reuse buffer */
 			rxbuf->rxdata.pg_off += frame_max + page_offset +

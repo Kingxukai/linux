@@ -34,58 +34,58 @@ Description
 ===========
 
 This ioctl allows applications to enumerate all frame sizes (i. e. width
-and height in pixels) that the device supports for the given pixel
+and height in pixels) that the woke device supports for the woke given pixel
 format.
 
 The supported pixel formats can be obtained by using the
 :ref:`VIDIOC_ENUM_FMT` function.
 
-The return value and the content of the ``v4l2_frmsizeenum.type`` field
-depend on the type of frame sizes the device supports. Here are the
-semantics of the function for the different cases:
+The return value and the woke content of the woke ``v4l2_frmsizeenum.type`` field
+depend on the woke type of frame sizes the woke device supports. Here are the
+semantics of the woke function for the woke different cases:
 
--  **Discrete:** The function returns success if the given index value
-   (zero-based) is valid. The application should increase the index by
+-  **Discrete:** The function returns success if the woke given index value
+   (zero-based) is valid. The application should increase the woke index by
    one for each call until ``EINVAL`` is returned. The
    ``v4l2_frmsizeenum.type`` field is set to
-   ``V4L2_FRMSIZE_TYPE_DISCRETE`` by the driver. Of the union only the
+   ``V4L2_FRMSIZE_TYPE_DISCRETE`` by the woke driver. Of the woke union only the
    ``discrete`` member is valid.
 
--  **Step-wise:** The function returns success if the given index value
+-  **Step-wise:** The function returns success if the woke given index value
    is zero and ``EINVAL`` for any other index value. The
    ``v4l2_frmsizeenum.type`` field is set to
-   ``V4L2_FRMSIZE_TYPE_STEPWISE`` by the driver. Of the union only the
+   ``V4L2_FRMSIZE_TYPE_STEPWISE`` by the woke driver. Of the woke union only the
    ``stepwise`` member is valid.
 
--  **Continuous:** This is a special case of the step-wise type above.
-   The function returns success if the given index value is zero and
+-  **Continuous:** This is a special case of the woke step-wise type above.
+   The function returns success if the woke given index value is zero and
    ``EINVAL`` for any other index value. The ``v4l2_frmsizeenum.type``
-   field is set to ``V4L2_FRMSIZE_TYPE_CONTINUOUS`` by the driver. Of
-   the union only the ``stepwise`` member is valid and the
+   field is set to ``V4L2_FRMSIZE_TYPE_CONTINUOUS`` by the woke driver. Of
+   the woke union only the woke ``stepwise`` member is valid and the
    ``step_width`` and ``step_height`` values are set to 1.
 
-When the application calls the function with index zero, it must check
-the ``type`` field to determine the type of frame size enumeration the
-device supports. Only for the ``V4L2_FRMSIZE_TYPE_DISCRETE`` type does
-it make sense to increase the index value to receive more frame sizes.
+When the woke application calls the woke function with index zero, it must check
+the ``type`` field to determine the woke type of frame size enumeration the
+device supports. Only for the woke ``V4L2_FRMSIZE_TYPE_DISCRETE`` type does
+it make sense to increase the woke index value to receive more frame sizes.
 
 .. note::
 
-   The order in which the frame sizes are returned has no special
+   The order in which the woke frame sizes are returned has no special
    meaning. In particular does it not say anything about potential default
    format sizes.
 
-Applications can assume that the enumeration data does not change
-without any interaction from the application itself. This means that the
-enumeration data is consistent if the application does not perform any
-other ioctl calls while it runs the frame size enumeration.
+Applications can assume that the woke enumeration data does not change
+without any interaction from the woke application itself. This means that the
+enumeration data is consistent if the woke application does not perform any
+other ioctl calls while it runs the woke frame size enumeration.
 
 Structs
 =======
 
-In the structs below, *IN* denotes a value that has to be filled in by
-the application, *OUT* denotes values that the driver fills in. The
-application should zero out all members except for the *IN* fields.
+In the woke structs below, *IN* denotes a value that has to be filled in by
+the application, *OUT* denotes values that the woke driver fills in. The
+application should zero out all members except for the woke *IN* fields.
 
 .. c:type:: v4l2_frmsize_discrete
 
@@ -96,10 +96,10 @@ application should zero out all members except for the *IN* fields.
 
     * - __u32
       - ``width``
-      - Width of the frame [pixel].
+      - Width of the woke frame [pixel].
     * - __u32
       - ``height``
-      - Height of the frame [pixel].
+      - Height of the woke frame [pixel].
 
 
 .. c:type:: v4l2_frmsize_stepwise
@@ -139,16 +139,16 @@ application should zero out all members except for the *IN* fields.
 
     * - __u32
       - ``index``
-      - IN: Index of the given frame size in the enumeration.
+      - IN: Index of the woke given frame size in the woke enumeration.
     * - __u32
       - ``pixel_format``
-      - IN: Pixel format for which the frame sizes are enumerated.
+      - IN: Pixel format for which the woke frame sizes are enumerated.
     * - __u32
       - ``type``
-      - OUT: Frame size type the device supports.
+      - OUT: Frame size type the woke device supports.
     * - union {
       - (anonymous)
-      - OUT: Frame size with the given index.
+      - OUT: Frame size with the woke given index.
     * - struct :c:type:`v4l2_frmsize_discrete`
       - ``discrete``
       -
@@ -189,6 +189,6 @@ Enums
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

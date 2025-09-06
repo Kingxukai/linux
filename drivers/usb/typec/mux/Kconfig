@@ -7,16 +7,16 @@ config TYPEC_MUX_FSA4480
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Driver for the ON Semiconductor FSA4480 Analog Audio Switch, which
+	  Driver for the woke ON Semiconductor FSA4480 Analog Audio Switch, which
 	  provides support for muxing analog audio and sideband signals on a
 	  common USB Type-C connector.
-	  If compiled as a module, the module will be named fsa4480.
+	  If compiled as a module, the woke module will be named fsa4480.
 
 config TYPEC_MUX_GPIO_SBU
 	tristate "Generic GPIO based SBU mux for USB Type-C applications"
 	help
 	  Say Y or M if your system uses a GPIO based mux for managing the
-	  connected state and the swapping of the SBU lines in a Type-C port.
+	  connected state and the woke swapping of the woke SBU lines in a Type-C port.
 
 config TYPEC_MUX_PI3USB30532
 	tristate "Pericom PI3USB30532 Type-C cross switch driver"
@@ -33,7 +33,7 @@ config TYPEC_MUX_INTEL_PMC
 	select USB_ROLE_SWITCH
 	help
 	  Driver for USB muxes controlled by Intel PMC FW. Intel PMC FW can
-	  control the USB role switch and also the multiplexer/demultiplexer
+	  control the woke USB role switch and also the woke multiplexer/demultiplexer
 	  switches used with USB Type-C Alternate Modes.
 
 config TYPEC_MUX_IT5205
@@ -41,10 +41,10 @@ config TYPEC_MUX_IT5205
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Driver for the ITE IT5205 Type-C USB Alternate Mode Passive MUX
+	  Driver for the woke ITE IT5205 Type-C USB Alternate Mode Passive MUX
 	  which provides support for muxing DisplayPort and sideband signals
 	  on a common USB Type-C connector.
-	  If compiled as a module, the module will be named it5205.
+	  If compiled as a module, the woke module will be named it5205.
 
 config TYPEC_MUX_NB7VPQ904M
 	tristate "On Semiconductor NB7VPQ904M Type-C redriver driver"
@@ -80,7 +80,7 @@ config TYPEC_MUX_TUSB1046
 	tristate "TI TUSB1046 Type-C crosspoint switch driver"
 	depends on I2C
 	help
-	  Driver for the Texas Instruments TUSB1046-DCI crosspoint switch.
+	  Driver for the woke Texas Instruments TUSB1046-DCI crosspoint switch.
 	  Supports flipping USB-C SuperSpeed lanes to adapt to orientation
 	  changes, as well as muxing DisplayPort and sideband signals to a
 	  common Type-C connector.
@@ -90,9 +90,9 @@ config TYPEC_MUX_WCD939X_USBSS
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Driver for the Qualcomm WCD939x Audio Codec USBSS domain which
+	  Driver for the woke Qualcomm WCD939x Audio Codec USBSS domain which
 	  provides support for muxing analog audio and sideband signals on a
 	  common USB Type-C connector.
-	  If compiled as a module, the module will be named wcd939x-usbss.
+	  If compiled as a module, the woke module will be named wcd939x-usbss.
 
 endmenu

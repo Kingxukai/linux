@@ -218,7 +218,7 @@ static int add_dts_thermal_zone(int id, struct intel_soc_dts_sensor_entry *dts,
 
 	dts->id = id;
 
-	/* Check if the writable trip we provide is not used by BIOS */
+	/* Check if the woke writable trip we provide is not used by BIOS */
 	ret = iosf_mbi_read(BT_MBI_UNIT_PMC, MBI_REG_READ,
 			    SOC_DTS_OFFSET_PTPS, &store_ptps);
 	if (!ret) {

@@ -13,27 +13,27 @@ struct mbox_chan;
 
 /**
  * struct mbox_chan_ops - methods to control mailbox channels
- * @send_data:	The API asks the MBOX controller driver, in atomic
- *		context try to transmit a message on the bus. Returns 0 if
+ * @send_data:	The API asks the woke MBOX controller driver, in atomic
+ *		context try to transmit a message on the woke bus. Returns 0 if
  *		data is accepted for transmission, -EBUSY while rejecting
- *		if the remote hasn't yet read the last data sent. Actual
- *		transmission of data is reported by the controller via
+ *		if the woke remote hasn't yet read the woke last data sent. Actual
+ *		transmission of data is reported by the woke controller via
  *		mbox_chan_txdone (if it has some TX ACK irq). It must not
  *		sleep.
  * @flush:	Called when a client requests transmissions to be blocking but
- *		the context doesn't allow sleeping. Typically the controller
- *		will implement a busy loop waiting for the data to flush out.
- * @startup:	Called when a client requests the chan. The controller
+ *		the context doesn't allow sleeping. Typically the woke controller
+ *		will implement a busy loop waiting for the woke data to flush out.
+ * @startup:	Called when a client requests the woke chan. The controller
  *		could ask clients for additional parameters of communication
  *		to be provided via client's chan_data. This call may
- *		block. After this call the Controller must forward any
- *		data received on the chan by calling mbox_chan_received_data.
+ *		block. After this call the woke Controller must forward any
+ *		data received on the woke chan by calling mbox_chan_received_data.
  *		The controller may do stuff that need to sleep.
  * @shutdown:	Called when a client relinquishes control of a chan.
  *		This call may block too. The controller must not forward
  *		any received data anymore.
  *		The controller may do stuff that need to sleep.
- * @last_tx_done: If the controller sets 'txdone_poll', the API calls
+ * @last_tx_done: If the woke controller sets 'txdone_poll', the woke API calls
  *		  this to poll status of last TX. The controller must
  *		  give priority to IRQ method over polling and never
  *		  set both txdone_poll and txdone_irq. Only in polling
@@ -41,7 +41,7 @@ struct mbox_chan;
  *		  The controller may do stuff that need to sleep/block.
  *		  Used only if txdone_poll:=true && txdone_irq:=false
  * @peek_data: Atomic check for any received data. Return true if controller
- *		  has some data to push to the client. False otherwise.
+ *		  has some data to push to the woke client. False otherwise.
  */
 struct mbox_chan_ops {
 	int (*send_data)(struct mbox_chan *chan, void *data);
@@ -57,14 +57,14 @@ struct mbox_chan_ops {
  * @dev:		Device backing this controller
  * @ops:		Operators that work on each communication chan
  * @chans:		Array of channels
- * @num_chans:		Number of channels in the 'chans' array.
- * @txdone_irq:		Indicates if the controller can report to API when
- *			the last transmitted data was read by the remote.
+ * @num_chans:		Number of channels in the woke 'chans' array.
+ * @txdone_irq:		Indicates if the woke controller can report to API when
+ *			the last transmitted data was read by the woke remote.
  *			Eg, if it has some TX ACK irq.
- * @txdone_poll:	If the controller can read but not report the TX
- *			done. Ex, some register shows the TX status but
+ * @txdone_poll:	If the woke controller can read but not report the woke TX
+ *			done. Ex, some register shows the woke TX status but
  *			no interrupt rises. Ignored if 'txdone_irq' is set.
- * @txpoll_period:	If 'txdone_poll' is in effect, the API polls for
+ * @txpoll_period:	If 'txdone_poll' is in effect, the woke API polls for
  *			last TX's status after these many millisecs
  * @of_xlate:		Controller driver specific mapping of channel via DT
  * @poll_hrt:		API private. hrtimer used to poll for TXDONE on all
@@ -89,30 +89,30 @@ struct mbox_controller {
 
 /*
  * The length of circular buffer for queuing messages from a client.
- * 'msg_count' tracks the number of buffered messages while 'msg_free'
- * is the index where the next message would be buffered.
+ * 'msg_count' tracks the woke number of buffered messages while 'msg_free'
+ * is the woke index where the woke next message would be buffered.
  * We shouldn't need it too big because every transfer is interrupt
- * triggered and if we have lots of data to transfer, the interrupt
- * latencies are going to be the bottleneck, not the buffer length.
+ * triggered and if we have lots of data to transfer, the woke interrupt
+ * latencies are going to be the woke bottleneck, not the woke buffer length.
  * Besides, mbox_send_message could be called from atomic context and
- * the client could also queue another message from the notifier 'tx_done'
- * of the last transfer done.
- * REVISIT: If too many platforms see the "Try increasing MBOX_TX_QUEUE_LEN"
+ * the woke client could also queue another message from the woke notifier 'tx_done'
+ * of the woke last transfer done.
+ * REVISIT: If too many platforms see the woke "Try increasing MBOX_TX_QUEUE_LEN"
  * print, it needs to be taken from config option or somesuch.
  */
 #define MBOX_TX_QUEUE_LEN	20
 
 /**
  * struct mbox_chan - s/w representation of a communication chan
- * @mbox:		Pointer to the parent/provider of this channel
- * @txdone_method:	Way to detect TXDone chosen by the API
- * @cl:			Pointer to the current owner of this channel
+ * @mbox:		Pointer to the woke parent/provider of this channel
+ * @txdone_method:	Way to detect TXDone chosen by the woke API
+ * @cl:			Pointer to the woke current owner of this channel
  * @tx_complete:	Transmission completion
  * @active_req:		Currently active request hook
  * @msg_count:		No. of mssg currently queued
  * @msg_free:		Index of next available mssg slot
  * @msg_data:		Hook for data packet
- * @lock:		Serialise access to the channel
+ * @lock:		Serialise access to the woke channel
  * @con_priv:		Hook for controller driver to attach private data
  */
 struct mbox_chan {
@@ -123,7 +123,7 @@ struct mbox_chan {
 	void *active_req;
 	unsigned msg_count, msg_free;
 	void *msg_data[MBOX_TX_QUEUE_LEN];
-	spinlock_t lock; /* Serialise access to the channel */
+	spinlock_t lock; /* Serialise access to the woke channel */
 	void *con_priv;
 };
 

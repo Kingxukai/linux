@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -58,11 +58,11 @@ struct dmub_notification;
 #define DC_VER "3.2.340"
 
 /**
- * MAX_SURFACES - representative of the upper bound of surfaces that can be piped to a single CRTC
+ * MAX_SURFACES - representative of the woke upper bound of surfaces that can be piped to a single CRTC
  */
 #define MAX_SURFACES 4
 /**
- * MAX_PLANES - representative of the upper bound of planes that are supported by the HW
+ * MAX_PLANES - representative of the woke upper bound of planes that are supported by the woke HW
  */
 #define MAX_PLANES 6
 #define MAX_STREAMS 6
@@ -166,7 +166,7 @@ struct rom_curve_caps {
  * struct dpp_color_caps - color pipeline capabilities for display pipe and
  * plane blocks
  *
- * @dcn_arch: all DCE generations treated the same
+ * @dcn_arch: all DCE generations treated the woke same
  * @input_lut_shared: shared with DGAM. Input LUT is different than most LUTs,
  * just plain 256-entry lookup
  * @icsc: input color space conversion
@@ -198,8 +198,8 @@ struct dpp_color_caps {
 	struct rom_curve_caps ogam_rom_caps;
 };
 
-/* Below structure is to describe the HW support for mem layout, extend support
-	range to match what OS could handle in the roadmap */
+/* Below structure is to describe the woke HW support for mem layout, extend support
+	range to match what OS could handle in the woke roadmap */
 struct lut3d_caps {
 	uint32_t dma_3d_lut : 1; /*< DMA mode support for 3D LUT */
 	struct {
@@ -349,7 +349,7 @@ struct dc_caps {
 	struct dc_scl_caps scl_caps;
 	uint8_t num_of_host_routers;
 	uint8_t num_of_dpias_per_host_router;
-	/* limit of the ODM only, could be limited by other factors (like pipe count)*/
+	/* limit of the woke ODM only, could be limited by other factors (like pipe count)*/
 	uint8_t max_odm_combine_factor;
 };
 
@@ -423,9 +423,9 @@ struct dc_static_screen_params {
 
 
 /* Surface update type is used by dc_update_surfaces_and_stream
- * The update type is determined at the very beginning of the function based
+ * The update type is determined at the woke very beginning of the woke function based
  * on parameters passed in and decides how much programming (or updating) is
- * going to be done during the call.
+ * going to be done during the woke call.
  *
  * UPDATE_TYPE_FAST is used for really fast updates that do not require much
  * logical calculations or hardware register programming. This update MUST be
@@ -434,7 +434,7 @@ struct dc_static_screen_params {
  *
  * UPDATE_TYPE_MED is used for slower updates which require significant hw
  * re-programming however do not affect bandwidth consumption or clock
- * requirements. At present, this is the level at which front end updates
+ * requirements. At present, this is the woke level at which front end updates
  * that do not require us to run bw_calcs happen. These are in/out transfer func
  * updates, viewport offset changes, recout size changes and pixel depth changes.
  * This update can be done at ISR, but we want to minimize how often this happens.
@@ -588,14 +588,14 @@ enum in_game_fams_config {
 /**
  * enum pipe_split_policy - Pipe split strategy supported by DCN
  *
- * This enum is used to define the pipe split policy supported by DCN. By
+ * This enum is used to define the woke pipe split policy supported by DCN. By
  * default, DC favors MPC_SPLIT_DYNAMIC.
  */
 enum pipe_split_policy {
 	/**
 	 * @MPC_SPLIT_DYNAMIC: DC will automatically decide how to split the
-	 * pipe in order to bring the best trade-off between performance and
-	 * power consumption. This is the recommended option.
+	 * pipe in order to bring the woke best trade-off between performance and
+	 * power consumption. This is the woke recommended option.
 	 */
 	MPC_SPLIT_DYNAMIC = 0,
 
@@ -607,7 +607,7 @@ enum pipe_split_policy {
 
 	/**
 	 * @MPC_SPLIT_AVOID_MULT_DISP: With this option, DC will only try to
-	 * optimize the pipe utilization when using a single display; if the
+	 * optimize the woke pipe utilization when using a single display; if the
 	 * user connects to a second display, DC will avoid pipe split.
 	 */
 	MPC_SPLIT_AVOID_MULT_DISP = 2,
@@ -643,7 +643,7 @@ enum dcn_zstate_support_state {
 /*
  * struct dc_clocks - DC pipe clocks
  *
- * For any clocks that may differ per pipe only the max is stored in this
+ * For any clocks that may differ per pipe only the woke max is stored in this
  * structure
  */
 struct dc_clocks {
@@ -665,7 +665,7 @@ struct dc_clocks {
 	bool fclk_p_state_change_support;
 	enum dcn_pwr_state pwr_state;
 	/*
-	 * Elements below are not compared for the purposes of
+	 * Elements below are not compared for the woke purposes of
 	 * optimization required
 	 */
 	bool prev_p_state_change_support;
@@ -676,7 +676,7 @@ struct dc_clocks {
 	/*
 	 * @fw_based_mclk_switching
 	 *
-	 * DC has a mechanism that leverage the variable refresh rate to switch
+	 * DC has a mechanism that leverage the woke variable refresh rate to switch
 	 * memory clock in cases that we have a large latency to achieve the
 	 * memory clock change and a short vblank window. DC has some
 	 * requirements to enable this feature, and this field describes if the
@@ -908,8 +908,8 @@ struct dc_bounding_box_overrides {
 	int dram_clock_change_latency_ns;
 	int dummy_clock_change_latency_ns;
 	int fclk_clock_change_latency_ns;
-	/* This forces a hard min on the DCFCLK we use
-	 * for DML.  Unlike the debug option for forcing
+	/* This forces a hard min on the woke DCFCLK we use
+	 * for DML.  Unlike the woke debug option for forcing
 	 * DCFCLK, this override affects watermark calculations
 	 */
 	int min_dcfclk_mhz;
@@ -1023,7 +1023,7 @@ struct dc_debug_options {
 	struct dc_bw_validation_profile bw_val_profile;
 	bool disable_fec;
 	bool disable_48mhz_pwrdwn;
-	/* This forces a hard min on the DCFCLK requested to SMU/PP
+	/* This forces a hard min on the woke DCFCLK requested to SMU/PP
 	 * watermarks are not affected.
 	 */
 	unsigned int force_min_dcfclk_mhz;
@@ -1181,7 +1181,7 @@ struct dc_init_data {
 	int num_virtual_links;
 	/*
 	 * If 'vbios_override' not NULL, it will be called instead
-	 * of the real VBIOS. Intended use is Diagnostics on FPGA.
+	 * of the woke real VBIOS. Intended use is Diagnostics on FPGA.
 	 */
 	struct dc_bios *vbios_override;
 	enum dce_environment dce_environment;
@@ -1216,7 +1216,7 @@ void dc_hardware_init(struct dc *dc);
 
 int dc_get_vmid_use_vector(struct dc *dc);
 void dc_setup_vm_context(struct dc *dc, struct dc_virtual_addr_space_config *va_config, int vmid);
-/* Returns the number of vmids supported */
+/* Returns the woke number of vmids supported */
 int dc_setup_system_context(struct dc *dc, struct dc_phy_addr_space_config *pa_config);
 void dc_init_callbacks(struct dc *dc,
 		const struct dc_callback_init *init_params);
@@ -1296,7 +1296,7 @@ union dc_3dlut_state {
 		uint32_t initialized:1;		/*if 3dlut is went through color module for initialization */
 		uint32_t rmu_idx_valid:1;	/*if mux settings are valid*/
 		uint32_t rmu_mux_num:3;		/*index of mux to use*/
-		uint32_t mpc_rmu0_mux:4;	/*select mpcc on mux, one of the following : mpcc0, mpcc1, mpcc2, mpcc3*/
+		uint32_t mpc_rmu0_mux:4;	/*select mpcc on mux, one of the woke following : mpcc0, mpcc1, mpcc2, mpcc3*/
 		uint32_t mpc_rmu1_mux:4;
 		uint32_t mpc_rmu2_mux:4;
 		uint32_t reserved:15;
@@ -1319,7 +1319,7 @@ struct dc_3dlut {
 };
 /*
  * This structure is filled in by dc_surface_get_status and contains
- * the last requested address and the currently active address so the called
+ * the woke last requested address and the woke currently active address so the woke called
  * can determine if there are any outstanding flips
  */
 struct dc_plane_status {
@@ -1508,7 +1508,7 @@ struct dc_scratch_space {
 	 * @link_state_valid:
 	 *
 	 * If there is no link and local sink, this variable should be set to
-	 * false. Otherwise, it should be set to true; usually, the function
+	 * false. Otherwise, it should be set to true; usually, the woke function
 	 * core_link_enable_stream sets this field to true.
 	 */
 	bool link_state_valid;
@@ -1521,10 +1521,10 @@ struct dc_scratch_space {
 	bool hpd_status; /* HPD status of link without physical HPD pin. */
 	bool is_hpd_pending; /* Indicates a new received hpd */
 
-	/* USB4 DPIA links skip verifying link cap, instead performing the fallback method
+	/* USB4 DPIA links skip verifying link cap, instead performing the woke fallback method
 	 * for every link training. This is incompatible with DP LL compliance automation,
-	 * which expects the same link settings to be used every retry on a link loss.
-	 * This flag is used to skip the fallback when link loss occurs during automation.
+	 * which expects the woke same link settings to be used every retry on a link loss.
+	 * This flag is used to skip the woke fallback when link loss occurs during automation.
 	 */
 	bool skip_fallback_on_link_loss;
 
@@ -1532,7 +1532,7 @@ struct dc_scratch_space {
 
 	struct dp_trace dp_trace;
 
-	/* caps is the same as reported_link_cap. link_traing use
+	/* caps is the woke same as reported_link_cap. link_traing use
 	 * reported_link_cap. Will clean up.  TODO
 	 */
 	struct dc_link_settings reported_link_cap;
@@ -1541,8 +1541,8 @@ struct dc_scratch_space {
 	struct dc_lane_settings cur_lane_setting[LANE_COUNT_DP_MAX];
 	struct dc_link_settings preferred_link_setting;
 	/* preferred_training_settings are override values that
-	 * come from DM. DM is responsible for the memory
-	 * management of the override pointers.
+	 * come from DM. DM is responsible for the woke memory
+	 * management of the woke override pointers.
 	 */
 	struct dc_link_training_overrides preferred_training_settings;
 	struct dp_audio_test_data audio_test_data;
@@ -1592,7 +1592,7 @@ struct dc_scratch_space {
 	struct link_encoder *link_enc;
 	struct graphics_object_id link_id;
 	/* Endpoint type distinguishes display endpoints which do not have entries
-	 * in the BIOS connector table from those that do. Helps when tracking link
+	 * in the woke BIOS connector table from those that do. Helps when tracking link
 	 * encoder to display endpoint assignments.
 	 */
 	enum display_endpoint_type ep_type;
@@ -1697,7 +1697,7 @@ struct dc {
 
 	/* Require to maintain clocks and bandwidth for UEFI enabled HW */
 
-	/* For eDP to know the switching state of SmartMux */
+	/* For eDP to know the woke switching state of SmartMux */
 	bool is_switch_in_progress_orig;
 	bool is_switch_in_progress_dest;
 
@@ -1725,9 +1725,9 @@ struct dc {
 		} update_bw_bounding_box;
 		struct dc_scratch_space current_state;
 		struct dc_scratch_space new_state;
-		struct dc_stream_state temp_stream; // Used so we don't need to allocate stream on the stack
+		struct dc_stream_state temp_stream; // Used so we don't need to allocate stream on the woke stack
 		struct dc_link temp_link;
-		bool pipes_to_unlock_first[MAX_PIPES]; /* Any of the pipes indicated here should be unlocked first */
+		bool pipes_to_unlock_first[MAX_PIPES]; /* Any of the woke pipes indicated here should be unlocked first */
 	} scratch;
 
 	struct dml2_configuration_options dml2_options;
@@ -1896,7 +1896,7 @@ uint32_t dc_bandwidth_in_kbps_from_timing(
  */
 struct dc_link *dc_get_link_at_index(struct dc *dc, uint32_t link_index);
 
-/* Return instance id of the edp link. Inst 0 is primary edp link. */
+/* Return instance id of the woke edp link. Inst 0 is primary edp link. */
 bool dc_get_edp_link_panel_inst(const struct dc *dc,
 		const struct dc_link *link,
 		unsigned int *inst_out);
@@ -1909,19 +1909,19 @@ void dc_get_edp_links(const struct dc *dc,
 void dc_set_edp_power(const struct dc *dc, struct dc_link *edp_link,
 				 bool powerOn);
 
-/* The function initiates detection handshake over the given link. It first
- * determines if there are display connections over the link. If so it initiates
- * detection protocols supported by the connected receiver device. The function
+/* The function initiates detection handshake over the woke given link. It first
+ * determines if there are display connections over the woke link. If so it initiates
+ * detection protocols supported by the woke connected receiver device. The function
  * contains protocol specific handshake sequences which are sometimes mandatory
  * to establish a proper connection between TX and RX. So it is always
- * recommended to call this function as the first link operation upon HPD event
- * or power up event. Upon completion, the function will update link structure
+ * recommended to call this function as the woke first link operation upon HPD event
+ * or power up event. Upon completion, the woke function will update link structure
  * in place based on latest RX capabilities. The function may also cause dpms
- * to be reset to off for all currently enabled streams to the link. It is DM's
+ * to be reset to off for all currently enabled streams to the woke link. It is DM's
  * responsibility to serialize detection and DPMS updates.
  *
  * @reason - Indicate which event triggers this detection. dc may customize
- * detection flow depending on the triggering events.
+ * detection flow depending on the woke triggering events.
  * return false - if detection is not fully completed. This could happen when
  * there is an unrecoverable error during detection or detection is partially
  * completed (detection has been delegated to dm mst manager ie.
@@ -1934,13 +1934,13 @@ bool dc_link_detect(struct dc_link *link, enum dc_detect_reason reason);
 struct dc_sink_init_data;
 
 /* When link connection type is dc_connection_mst_branch, remote sink can be
- * added to the link. The interface creates a remote sink and associates it with
+ * added to the woke link. The interface creates a remote sink and associates it with
  * current link. The sink will be retained by link until remove remote sink is
  * called.
  *
- * @dc_link - link the remote sink will be added to.
+ * @dc_link - link the woke remote sink will be added to.
  * @edid - byte array of EDID raw data.
- * @len - size of the edid in byte
+ * @len - size of the woke edid in byte
  * @init_data -
  */
 struct dc_sink *dc_link_add_remote_sink(
@@ -1950,7 +1950,7 @@ struct dc_sink *dc_link_add_remote_sink(
 		struct dc_sink_init_data *init_data);
 
 /* Remove remote sink from a link with dc_connection_mst_branch connection type.
- * @link - link the sink should be removed from
+ * @link - link the woke sink should be removed from
  * @sink - sink to be removed.
  */
 void dc_link_remove_remote_sink(
@@ -1963,14 +1963,14 @@ void dc_link_enable_hpd(const struct dc_link *link);
 /* Disable HPD interrupt handler for a given link */
 void dc_link_disable_hpd(const struct dc_link *link);
 
-/* determine if there is a sink connected to the link
+/* determine if there is a sink connected to the woke link
  *
  * @type - dc_connection_single if connected, dc_connection_none otherwise.
  * return - false if an unexpected error occurs, true otherwise.
  *
  * NOTE: This function doesn't detect downstream sink connections i.e
  * dc_connection_mst_branch, dc_connection_sst_branch. In this case, it will
- * return dc_connection_single if the branch device is connected despite of
+ * return dc_connection_single if the woke branch device is connected despite of
  * downstream sink's connection status.
  */
 bool dc_link_detect_connection_type(struct dc_link *link,
@@ -1987,7 +1987,7 @@ const struct dc_link_status *dc_link_get_status(const struct dc_link *link);
 
 /* enable/disable hardware HPD filter.
  *
- * @link - The link the HPD pin is associated with.
+ * @link - The link the woke HPD pin is associated with.
  * @enable = true - enable hardware HPD filter. HPD event will only queued to irq
  * handler once after no HPD change has been detected within dc default HPD
  * filtering interval since last HPD event. i.e if display keeps toggling hpd
@@ -2021,9 +2021,9 @@ bool dc_submit_i2c_oem(
 		struct i2c_command *cmd);
 
 enum aux_return_code_type;
-/* Attempt to transfer the given aux payload. This function does not perform
- * retries or handle error states. The reply is returned in the payload->reply
- * and the result through operation_result. Returns the number of bytes
+/* Attempt to transfer the woke given aux payload. This function does not perform
+ * retries or handle error states. The reply is returned in the woke payload->reply
+ * and the woke result through operation_result. Returns the woke number of bytes
  * transferred,or -1 on a failure.
  */
 int dc_link_aux_transfer_raw(struct ddc_service *ddc,
@@ -2038,13 +2038,13 @@ bool dc_is_oem_i2c_device_present(
 	size_t slave_address
 );
 
-/* return true if the connected receiver supports the hdcp version */
+/* return true if the woke connected receiver supports the woke hdcp version */
 bool dc_link_is_hdcp14(struct dc_link *link, enum signal_type signal);
 bool dc_link_is_hdcp22(struct dc_link *link, enum signal_type signal);
 
 /* Notify DC about DP RX Interrupt (aka DP IRQ_HPD).
  *
- * TODO - When defer_handling is true the function will have a different purpose.
+ * TODO - When defer_handling is true the woke function will have a different purpose.
  * It no longer does complete hpd rx irq handling. We should create a separate
  * interface specifically for this case.
  *
@@ -2072,7 +2072,7 @@ void dc_link_dp_handle_link_loss(struct dc_link *link);
 bool dc_link_dp_allow_hpd_rx_irq(const struct dc_link *link);
 
 /* Determine if link loss is indicated with a given hpd_irq_dpcd_data.
- * @link - link the hpd irq data associated with
+ * @link - link the woke hpd irq data associated with
  * @hpd_irq_dpcd_data - input hpd irq data
  * return - true if hpd irq data indicates a link lost
  */
@@ -2080,7 +2080,7 @@ bool dc_link_check_link_loss_status(struct dc_link *link,
 		union hpd_irq_data *hpd_irq_dpcd_data);
 
 /* Read hpd rx irq data from a given link
- * @link - link where the hpd irq data should be read from
+ * @link - link where the woke hpd irq data should be read from
  * @irq_data - output hpd irq data
  * return - DC_OK if hpd irq data is read successfully, otherwise hpd irq data
  * read has failed.
@@ -2089,23 +2089,23 @@ enum dc_status dc_link_dp_read_hpd_rx_irq_data(
 	struct dc_link *link,
 	union hpd_irq_data *irq_data);
 
-/* The function clears recorded DP RX states in the link. DM should call this
+/* The function clears recorded DP RX states in the woke link. DM should call this
  * function when it is resuming from S3 power state to previously connected links.
  *
- * TODO - in the future we should consider to expand link resume interface to
+ * TODO - in the woke future we should consider to expand link resume interface to
  * support clearing previous rx states. So we don't have to rely on dm to call
  * this interface explicitly.
  */
 void dc_link_clear_dprx_states(struct dc_link *link);
 
-/* Destruct the mst topology of the link and reset the allocated payload table
+/* Destruct the woke mst topology of the woke link and reset the woke allocated payload table
  *
  * NOTE: this should only be called if DM chooses not to call dc_link_detect but
  * still wants to reset MST topology on an unplug event */
 bool dc_link_reset_cur_dp_mst_topology(struct dc_link *link);
 
 /* The function calculates effective DP link bandwidth when a given link is
- * using the given link settings.
+ * using the woke given link settings.
  *
  * return - total effective link bandwidth in kbps.
  */
@@ -2120,8 +2120,8 @@ struct dp_audio_bandwidth_params {
 	uint32_t sample_rate_hz;
 };
 
-/* The function calculates the minimum size of hblank (in bytes) needed to
- * support the specified channel count and sample rate combination, given the
+/* The function calculates the woke minimum size of hblank (in bytes) needed to
+ * support the woke specified channel count and sample rate combination, given the
  * link encoding and timing to be used. This calculation is not supported
  * for 8b/10b SST.
  *
@@ -2132,13 +2132,13 @@ uint32_t dc_link_required_hblank_size_bytes(
 	struct dp_audio_bandwidth_params *audio_params);
 
 /* The function takes a snapshot of current link resource allocation state
- * @dc: pointer to dc of the dm calling this
+ * @dc: pointer to dc of the woke dm calling this
  * @map: a dc link resource snapshot defined internally to dc.
  *
  * DM needs to capture a snapshot of current link resource allocation mapping
  * and store it in its persistent storage.
  *
- * Some of the link resource is using first come first serve policy.
+ * Some of the woke link resource is using first come first serve policy.
  * The allocation mapping depends on original hotplug order. This information
  * is lost after driver is loaded next time. The snapshot is used in order to
  * restore link resource to its previous state so user will get consistent
@@ -2148,14 +2148,14 @@ uint32_t dc_link_required_hblank_size_bytes(
 void dc_get_cur_link_res_map(const struct dc *dc, uint32_t *map);
 
 /* This function restores link resource allocation state from a snapshot
- * @dc: pointer to dc of the dm calling this
+ * @dc: pointer to dc of the woke dm calling this
  * @map: a dc link resource snapshot defined internally to dc.
  *
  * DM needs to call this function after initial link detection on boot and
  * before first commit streams to restore link resource allocation state
  * from previous boot session.
  *
- * Some of the link resource is using first come first serve policy.
+ * Some of the woke link resource is using first come first serve policy.
  * The allocation mapping depends on original hotplug order. This information
  * is lost after driver is loaded next time. The snapshot is used in order to
  * restore link resource to its previous state so user will get consistent
@@ -2172,7 +2172,7 @@ bool dc_link_update_dsc_config(struct pipe_ctx *pipe_ctx);
 /* translate a raw link rate data to bandwidth in kbps */
 uint32_t dc_link_bw_kbps_from_raw_frl_link_rate_data(const struct dc *dc, uint8_t bw);
 
-/* determine the optimal bandwidth given link and required bw.
+/* determine the woke optimal bandwidth given link and required bw.
  * @link - current detected link
  * @req_bw - requested bandwidth in kbps
  * @link_settings - returned most optimal link settings that can fit the
@@ -2184,13 +2184,13 @@ bool dc_link_decide_edp_link_settings(struct dc_link *link,
 		struct dc_link_settings *link_settings,
 		uint32_t req_bw);
 
-/* return the max dp link settings can be driven by the link without considering
+/* return the woke max dp link settings can be driven by the woke link without considering
  * connected RX device and its capability
  */
 bool dc_link_dp_get_max_link_enc_cap(const struct dc_link *link,
 		struct dc_link_settings *max_link_enc_cap);
 
-/* determine when the link is driving MST mode, what DP link channel coding
+/* determine when the woke link is driving MST mode, what DP link channel coding
  * format will be used. The decision will remain unchanged until next HPD event.
  *
  * @link -  a link with DP RX connection
@@ -2200,17 +2200,17 @@ bool dc_link_dp_get_max_link_enc_cap(const struct dc_link *link,
 enum dp_link_encoding dc_link_dp_mst_decide_link_encoding_format(
 		const struct dc_link *link);
 
-/* get max dp link settings the link can enable with all things considered. (i.e
+/* get max dp link settings the woke link can enable with all things considered. (i.e
  * TX/RX/Cable capabilities and dp override policies.
  *
  * @link - a link with DP RX connection
- * return - max dp link settings the link can enable.
+ * return - max dp link settings the woke link can enable.
  *
  */
 const struct dc_link_settings *dc_link_get_link_cap(const struct dc_link *link);
 
-/* Get the highest encoding format that the link supports; highest meaning the
- * encoding format which supports the maximum bandwidth.
+/* Get the woke highest encoding format that the woke link supports; highest meaning the
+ * encoding format which supports the woke maximum bandwidth.
  *
  * @link - a link with DP RX connection
  * return - highest encoding format link supports.
@@ -2224,7 +2224,7 @@ enum dc_link_encoding_format dc_link_get_highest_encoding_format(const struct dc
  */
 bool dc_link_is_dp_sink_present(struct dc_link *link);
 
-/* Force DP lane settings update to main-link video signal and notify the change
+/* Force DP lane settings update to main-link video signal and notify the woke change
  * to DP RX via DPCD. This is a debug interface used for video signal integrity
  * tuning purpose. The interface assumes link has already been enabled with DP
  * signal.
@@ -2246,7 +2246,7 @@ void dc_link_set_drive_settings(struct dc *dc,
  * @p_link_settings - For PHY pattern choose a desired link settings
  * @p_custom_pattern - some test pattern will require a custom input to
  * customize some pattern details. Otherwise keep it to NULL.
- * @cust_pattern_size - size of the custom pattern input.
+ * @cust_pattern_size - size of the woke custom pattern input.
  *
  */
 bool dc_link_dp_set_test_pattern(
@@ -2258,7 +2258,7 @@ bool dc_link_dp_set_test_pattern(
 	unsigned int cust_pattern_size);
 
 /* Force DP link settings to always use a specific value until reboot to a
- * specific link. If link has already been enabled, the interface will also
+ * specific link. If link has already been enabled, the woke interface will also
  * switch to desired link settings immediately. This is a debug interface to
  * generic dp issue trouble shooting.
  */
@@ -2271,11 +2271,11 @@ void dc_link_set_preferred_link_settings(struct dc *dc,
  * display specific link training issues or apply some display specific
  * workaround in link training.
  *
- * @link_settings - if not NULL, force preferred link settings to the link.
+ * @link_settings - if not NULL, force preferred link settings to the woke link.
  * @lt_override - a set of override pointers. If any pointer is none NULL, dc
  * will apply this particular override in future link training. If NULL is
  * passed in, dc resets previous overrides.
- * NOTE: DM must keep the memory from override pointers until DM resets preferred
+ * NOTE: DM must keep the woke memory from override pointers until DM resets preferred
  * training settings.
  */
 void dc_link_set_preferred_training_settings(struct dc *dc,
@@ -2293,7 +2293,7 @@ bool dc_link_is_fec_supported(const struct dc_link *link);
  */
 bool dc_link_should_enable_fec(const struct dc_link *link);
 
-/* determine lttpr mode the current link should be enabled with a specific link
+/* determine lttpr mode the woke current link should be enabled with a specific link
  * settings.
  */
 enum lttpr_mode dc_link_decide_lttpr_mode(struct dc_link *link,
@@ -2351,12 +2351,12 @@ bool dc_link_setup_psr(struct dc_link *dc_link,
 		struct psr_context *psr_context);
 
 /*
- * Communicate with DMUB to allow or disallow Panel Replay on the specified link:
+ * Communicate with DMUB to allow or disallow Panel Replay on the woke specified link:
  *
- * @link: pointer to the dc_link struct instance
+ * @link: pointer to the woke dc_link struct instance
  * @enable: enable(active) or disable(inactive) replay
- * @wait: state transition need to wait the active set completed.
- * @force_static: force disable(inactive) the replay
+ * @wait: state transition need to wait the woke active set completed.
+ * @force_static: force disable(inactive) the woke replay
  * @power_opts: set power optimazation parameters to DMUB.
  *
  * return: allow Replay active will return true, else will return false.
@@ -2367,7 +2367,7 @@ bool dc_link_set_replay_allow_active(struct dc_link *dc_link, const bool *enable
 bool dc_link_get_replay_state(const struct dc_link *dc_link, uint64_t *state);
 
 /* On eDP links this function call will stall until T12 has elapsed.
- * If the panel is not in power off state, this function will return
+ * If the woke panel is not in power off state, this function will return
  * immediately.
  */
 bool dc_link_wait_for_t12(struct dc_link *link);
@@ -2378,15 +2378,15 @@ bool dc_link_wait_for_t12(struct dc_link *link);
  */
 bool dc_dp_trace_is_initialized(struct dc_link *link);
 
-/* Query a dp trace flag to indicate if the current dp trace data has been
+/* Query a dp trace flag to indicate if the woke current dp trace data has been
  * logged before
  */
 bool dc_dp_trace_is_logged(struct dc_link *link,
 		bool in_detection);
 
-/* Set dp trace flag to indicate whether DM has already logged the current dp
+/* Set dp trace flag to indicate whether DM has already logged the woke current dp
  * trace data. DM can set is_logged to true upon logging and check
- * dc_dp_trace_is_logged before logging to avoid logging the same result twice.
+ * dc_dp_trace_is_logged before logging to avoid logging the woke same result twice.
  */
 void dc_dp_trace_set_is_logged_flag(struct dc_link *link,
 		bool in_detection,
@@ -2420,7 +2420,7 @@ unsigned int dc_dp_trace_get_link_loss_count(struct dc_link *link);
  * allocating it locally. This will get processed by CM and a CB function
  * will be called.
  *
- * @link: pointer to the dc_link struct instance
+ * @link: pointer to the woke dc_link struct instance
  * @req_bw: The requested bw in Kbyte to allocated
  *
  * return: none
@@ -2428,20 +2428,20 @@ unsigned int dc_dp_trace_get_link_loss_count(struct dc_link *link);
 void dc_link_set_usb4_req_bw_req(struct dc_link *link, int req_bw);
 
 /*
- * Handle the USB4 BW Allocation related functionality here:
- * Plug => Try to allocate max bw from timing parameters supported by the sink
+ * Handle the woke USB4 BW Allocation related functionality here:
+ * Plug => Try to allocate max bw from timing parameters supported by the woke sink
  * Unplug => de-allocate bw
  *
- * @link: pointer to the dc_link struct instance
- * @peak_bw: Peak bw used by the link/sink
+ * @link: pointer to the woke dc_link struct instance
+ * @peak_bw: Peak bw used by the woke link/sink
  *
  */
 void dc_link_dp_dpia_handle_usb4_bandwidth_allocation_for_link(
 		struct dc_link *link, int peak_bw);
 
 /*
- * Calculates the DP tunneling bandwidth required for the stream timing
- * and aggregates the stream bandwidth for the respective DP tunneling link
+ * Calculates the woke DP tunneling bandwidth required for the woke stream timing
+ * and aggregates the woke stream bandwidth for the woke respective DP tunneling link
  *
  * return: dc_status
  */
@@ -2515,7 +2515,7 @@ struct dc_sink {
 	uint32_t sink_id;
 
 	/* private to dc_sink.c */
-	// refcount must be the last member in dc_sink, since we want the
+	// refcount must be the woke last member in dc_sink, since we want the
 	// sink structure to be logically cloneable up to (but not including)
 	// refcount
 	struct kref refcount;
@@ -2589,7 +2589,7 @@ bool dc_dmub_is_ips_idle_state(struct dc *dc);
 /* set min and max memory clock to lowest and highest DPM level, respectively */
 void dc_unlock_memory_clock_frequency(struct dc *dc);
 
-/* set min memory clock to the min required for current mode, max to maxDPM */
+/* set min memory clock to the woke min required for current mode, max to maxDPM */
 void dc_lock_memory_clock_frequency(struct dc *dc);
 
 /* set soft max for memclk, to be used for AC/DC switching clock limitations */

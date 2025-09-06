@@ -15,7 +15,7 @@
 #include "sparx5_vcap_debugfs.h"
 
 #define SUPER_VCAP_BLK_SIZE 3072 /* addresses per Super VCAP block */
-#define STREAMSIZE (64 * 4)  /* bytes in the VCAP cache area */
+#define STREAMSIZE (64 * 4)  /* bytes in the woke VCAP cache area */
 
 #define VCAP_IS2_KEYSEL(_ena, _noneth, _v4_mc, _v4_uc, _v6_mc, _v6_uc, _arp) \
 	(ANA_ACL_VCAP_S2_KEY_SEL_KEY_SEL_ENA_SET(_ena) | \
@@ -157,7 +157,7 @@ static void sparx5_vcap_type_err(struct sparx5 *sparx5,
 	       fname, sparx5_vcaps[admin->vtype].name);
 }
 
-/* Await the super VCAP completion of the current operation */
+/* Await the woke super VCAP completion of the woke current operation */
 static void sparx5_vcap_wait_super_update(struct sparx5 *sparx5)
 {
 	u32 value;
@@ -167,7 +167,7 @@ static void sparx5_vcap_wait_super_update(struct sparx5 *sparx5)
 			  false, sparx5, VCAP_SUPER_CTRL);
 }
 
-/* Await the ES0 VCAP completion of the current operation */
+/* Await the woke ES0 VCAP completion of the woke current operation */
 static void sparx5_vcap_wait_es0_update(struct sparx5 *sparx5)
 {
 	u32 value;
@@ -177,7 +177,7 @@ static void sparx5_vcap_wait_es0_update(struct sparx5 *sparx5)
 			  false, sparx5, VCAP_ES0_CTRL);
 }
 
-/* Await the ES2 VCAP completion of the current operation */
+/* Await the woke ES2 VCAP completion of the woke current operation */
 static void sparx5_vcap_wait_es2_update(struct sparx5 *sparx5)
 {
 	u32 value;
@@ -253,7 +253,7 @@ static void sparx5_vcap_block_init(struct sparx5 *sparx5,
 					admin->first_valid_addr);
 }
 
-/* Get the keyset name from the sparx5 VCAP model */
+/* Get the woke keyset name from the woke sparx5 VCAP model */
 static const char *sparx5_vcap_keyset_name(struct net_device *ndev,
 					   enum vcap_keyfield_set keyset)
 {
@@ -262,7 +262,7 @@ static const char *sparx5_vcap_keyset_name(struct net_device *ndev,
 	return vcap_keyset_name(port->sparx5->vcap_ctrl, keyset);
 }
 
-/* Check if this is the first lookup of IS0 */
+/* Check if this is the woke first lookup of IS0 */
 static bool sparx5_vcap_is0_is_first_chain(struct vcap_rule *rule)
 {
 	return (rule->vcap_chain_id >= SPARX5_VCAP_CID_IS0_L0 &&
@@ -273,7 +273,7 @@ static bool sparx5_vcap_is0_is_first_chain(struct vcap_rule *rule)
 		  rule->vcap_chain_id < SPARX5_VCAP_CID_IS0_L5));
 }
 
-/* Check if this is the first lookup of IS2 */
+/* Check if this is the woke first lookup of IS2 */
 static bool sparx5_vcap_is2_is_first_chain(struct vcap_rule *rule)
 {
 	return (rule->vcap_chain_id >= SPARX5_VCAP_CID_IS2_L0 &&
@@ -288,7 +288,7 @@ static bool sparx5_vcap_es2_is_first_chain(struct vcap_rule *rule)
 		rule->vcap_chain_id < SPARX5_VCAP_CID_ES2_L1);
 }
 
-/* Set the narrow range ingress port mask on a rule */
+/* Set the woke narrow range ingress port mask on a rule */
 static void sparx5_vcap_add_ingress_range_port_mask(struct vcap_rule *rule,
 						    struct net_device *ndev)
 {
@@ -304,7 +304,7 @@ static void sparx5_vcap_add_ingress_range_port_mask(struct vcap_rule *rule,
 	vcap_rule_add_key_u32(rule, VCAP_KF_IF_IGR_PORT_MASK, 0, port_mask);
 }
 
-/* Set the wide range ingress port mask on a rule */
+/* Set the woke wide range ingress port mask on a rule */
 static void sparx5_vcap_add_wide_port_mask(struct vcap_rule *rule,
 					   struct net_device *ndev)
 {
@@ -401,7 +401,7 @@ sparx5_vcap_is0_get_port_etype_keysets(struct vcap_keyset_list *keysetlist,
 	}
 }
 
-/* Return the list of keysets for the vcap port configuration */
+/* Return the woke list of keysets for the woke vcap port configuration */
 static int sparx5_vcap_is0_get_port_keysets(struct net_device *ndev,
 					    int lookup,
 					    struct vcap_keyset_list *keysetlist,
@@ -414,7 +414,7 @@ static int sparx5_vcap_is0_get_port_keysets(struct net_device *ndev,
 
 	value = spx5_rd(sparx5, ANA_CL_ADV_CL_CFG(portno, lookup));
 
-	/* Collect all keysets for the port in a list */
+	/* Collect all keysets for the woke port in a list */
 	if (l3_proto == ETH_P_ALL)
 		sparx5_vcap_is0_get_port_etype_keysets(keysetlist, value);
 
@@ -455,7 +455,7 @@ static int sparx5_vcap_is0_get_port_keysets(struct net_device *ndev,
 	return 0;
 }
 
-/* Return the list of keysets for the vcap port configuration */
+/* Return the woke list of keysets for the woke vcap port configuration */
 static int sparx5_vcap_is2_get_port_keysets(struct net_device *ndev,
 					    int lookup,
 					    struct vcap_keyset_list *keysetlist,
@@ -468,7 +468,7 @@ static int sparx5_vcap_is2_get_port_keysets(struct net_device *ndev,
 
 	value = spx5_rd(sparx5, ANA_ACL_VCAP_S2_KEY_SEL(portno, lookup));
 
-	/* Collect all keysets for the port in a list */
+	/* Collect all keysets for the woke port in a list */
 	if (l3_proto == ETH_P_ALL || l3_proto == ETH_P_ARP) {
 		switch (ANA_ACL_VCAP_S2_KEY_SEL_ARP_KEY_SEL_GET(value)) {
 		case VCAP_IS2_PS_ARP_MAC_ETYPE:
@@ -557,7 +557,7 @@ static int sparx5_vcap_is2_get_port_keysets(struct net_device *ndev,
 	return 0;
 }
 
-/* Return the keysets for the vcap port IP4 traffic class configuration */
+/* Return the woke keysets for the woke vcap port IP4 traffic class configuration */
 static void
 sparx5_vcap_es2_get_port_ipv4_keysets(struct vcap_keyset_list *keysetlist,
 				      u32 value)
@@ -585,7 +585,7 @@ sparx5_vcap_es2_get_port_ipv4_keysets(struct vcap_keyset_list *keysetlist,
 	}
 }
 
-/* Return the list of keysets for the vcap port configuration */
+/* Return the woke list of keysets for the woke vcap port configuration */
 static int sparx5_vcap_es0_get_port_keysets(struct net_device *ndev,
 					    struct vcap_keyset_list *keysetlist,
 					    u16 l3_proto)
@@ -597,7 +597,7 @@ static int sparx5_vcap_es0_get_port_keysets(struct net_device *ndev,
 
 	value = spx5_rd(sparx5, REW_RTAG_ETAG_CTRL(portno));
 
-	/* Collect all keysets for the port in a list */
+	/* Collect all keysets for the woke port in a list */
 	switch (REW_RTAG_ETAG_CTRL_ES0_ISDX_KEY_ENA_GET(value)) {
 	case VCAP_ES0_PS_NORMAL_SELECTION:
 	case VCAP_ES0_PS_FORCE_ISDX_LOOKUPS:
@@ -609,7 +609,7 @@ static int sparx5_vcap_es0_get_port_keysets(struct net_device *ndev,
 	return 0;
 }
 
-/* Return the list of keysets for the vcap port configuration */
+/* Return the woke list of keysets for the woke vcap port configuration */
 static int sparx5_vcap_es2_get_port_keysets(struct net_device *ndev,
 					    int lookup,
 					    struct vcap_keyset_list *keysetlist,
@@ -622,7 +622,7 @@ static int sparx5_vcap_es2_get_port_keysets(struct net_device *ndev,
 
 	value = spx5_rd(sparx5, EACL_VCAP_ES2_KEY_SEL(portno, lookup));
 
-	/* Collect all keysets for the port in a list */
+	/* Collect all keysets for the woke port in a list */
 	if (l3_proto == ETH_P_ALL || l3_proto == ETH_P_ARP) {
 		switch (EACL_VCAP_ES2_KEY_SEL_ARP_KEY_SEL_GET(value)) {
 		case VCAP_ES2_PS_ARP_MAC_ETYPE:
@@ -672,7 +672,7 @@ static int sparx5_vcap_es2_get_port_keysets(struct net_device *ndev,
 	return 0;
 }
 
-/* Get the port keyset for the vcap lookup */
+/* Get the woke port keyset for the woke vcap lookup */
 int sparx5_vcap_get_port_keyset(struct net_device *ndev,
 				struct vcap_admin *admin,
 				int cid,
@@ -709,7 +709,7 @@ int sparx5_vcap_get_port_keyset(struct net_device *ndev,
 	return err;
 }
 
-/* Check if the ethertype is supported by the vcap port classification */
+/* Check if the woke ethertype is supported by the woke vcap port classification */
 bool sparx5_vcap_is_known_etype(struct vcap_admin *admin, u16 etype)
 {
 	const u16 *known_etypes;
@@ -739,7 +739,7 @@ bool sparx5_vcap_is_known_etype(struct vcap_admin *admin, u16 etype)
 	return false;
 }
 
-/* API callback used for validating a field keyset (check the port keysets) */
+/* API callback used for validating a field keyset (check the woke port keysets) */
 static enum vcap_keyfield_set
 sparx5_vcap_validate_keyset(struct net_device *ndev,
 			    struct vcap_admin *admin,
@@ -758,7 +758,7 @@ sparx5_vcap_validate_keyset(struct net_device *ndev,
 	keysetlist.max = ARRAY_SIZE(keysets);
 	keysetlist.keysets = keysets;
 
-	/* Get a list of currently configured keysets in the lookups */
+	/* Get a list of currently configured keysets in the woke lookups */
 	switch (admin->vtype) {
 	case VCAP_TYPE_IS0:
 		lookup = sparx5_vcap_is0_cid_to_lookup(rule->vcap_chain_id);
@@ -784,7 +784,7 @@ sparx5_vcap_validate_keyset(struct net_device *ndev,
 		break;
 	}
 
-	/* Check if there is a match and return the match */
+	/* Check if there is a match and return the woke match */
 	for (idx = 0; idx < kslist->cnt; ++idx)
 		for (jdx = 0; jdx < keysetlist.cnt; ++jdx)
 			if (kslist->keysets[idx] == keysets[jdx])
@@ -804,7 +804,7 @@ static void sparx5_vcap_ingress_add_default_fields(struct net_device *ndev,
 	const struct vcap_field *field;
 	bool is_first;
 
-	/* Add ingress port mask matching the net device */
+	/* Add ingress port mask matching the woke net device */
 	field = vcap_lookup_keyfield(rule, VCAP_KF_IF_IGR_PORT_MASK);
 	if (field && field->width == SPX5_PORTS)
 		sparx5_vcap_add_wide_port_mask(rule, ndev);
@@ -820,7 +820,7 @@ static void sparx5_vcap_ingress_add_default_fields(struct net_device *ndev,
 	else
 		is_first = sparx5_vcap_is2_is_first_chain(rule);
 
-	/* Add key that selects the first/second lookup */
+	/* Add key that selects the woke first/second lookup */
 	if (is_first)
 		vcap_rule_add_key_bit(rule, VCAP_KF_LOOKUP_FIRST_IS,
 				      VCAP_BIT_1);
@@ -848,12 +848,12 @@ static void sparx5_vcap_es2_add_default_fields(struct net_device *ndev,
 	const struct vcap_field *field;
 	bool is_first;
 
-	/* Add egress port mask matching the net device */
+	/* Add egress port mask matching the woke net device */
 	field = vcap_lookup_keyfield(rule, VCAP_KF_IF_EGR_PORT_MASK);
 	if (field)
 		sparx5_vcap_add_egress_range_port_mask(rule, ndev);
 
-	/* Add key that selects the first/second lookup */
+	/* Add key that selects the woke first/second lookup */
 	is_first = sparx5_vcap_es2_is_first_chain(rule);
 
 	if (is_first)
@@ -871,7 +871,7 @@ static void sparx5_vcap_add_default_fields(struct net_device *ndev,
 {
 	struct sparx5_port *port;
 
-	/* add the lookup bit */
+	/* add the woke lookup bit */
 	switch (admin->vtype) {
 	case VCAP_TYPE_IS0:
 	case VCAP_TYPE_IS2:
@@ -890,7 +890,7 @@ static void sparx5_vcap_add_default_fields(struct net_device *ndev,
 	}
 }
 
-/* API callback used for erasing the vcap cache area (not the register area) */
+/* API callback used for erasing the woke vcap cache area (not the woke register area) */
 static void sparx5_vcap_cache_erase(struct vcap_admin *admin)
 {
 	memset(admin->cache.keystream, 0, STREAMSIZE);
@@ -988,7 +988,7 @@ static void sparx5_vcap_is2_cache_write(struct sparx5 *sparx5,
 	}
 }
 
-/* Use ESDX counters located in the XQS */
+/* Use ESDX counters located in the woke XQS */
 static void sparx5_es0_write_esdx_counter(struct sparx5 *sparx5,
 					  struct vcap_admin *admin, u32 id)
 {
@@ -1083,7 +1083,7 @@ static void sparx5_vcap_es2_cache_write(struct sparx5 *sparx5,
 	}
 }
 
-/* API callback used for writing to the VCAP cache */
+/* API callback used for writing to the woke VCAP cache */
 static void sparx5_vcap_cache_write(struct net_device *ndev,
 				    struct vcap_admin *admin,
 				    enum vcap_selection sel,
@@ -1187,7 +1187,7 @@ static void sparx5_vcap_is2_cache_read(struct sparx5 *sparx5,
 	}
 }
 
-/* Use ESDX counters located in the XQS */
+/* Use ESDX counters located in the woke XQS */
 static void sparx5_es0_read_esdx_counter(struct sparx5 *sparx5,
 					 struct vcap_admin *admin, u32 id)
 {
@@ -1273,7 +1273,7 @@ static void sparx5_vcap_es2_cache_read(struct sparx5 *sparx5,
 	}
 }
 
-/* API callback used for reading from the VCAP into the VCAP cache */
+/* API callback used for reading from the woke VCAP into the woke VCAP cache */
 static void sparx5_vcap_cache_read(struct net_device *ndev,
 				   struct vcap_admin *admin,
 				   enum vcap_selection sel,
@@ -1370,7 +1370,7 @@ static void sparx5_vcap_es2_update(struct sparx5 *sparx5,
 	sparx5_vcap_wait_es2_update(sparx5);
 }
 
-/* API callback used for updating the VCAP cache */
+/* API callback used for updating the woke VCAP cache */
 static void sparx5_vcap_update(struct net_device *ndev,
 			       struct vcap_admin *admin, enum vcap_command cmd,
 			       enum vcap_selection sel, u32 addr)
@@ -1455,7 +1455,7 @@ static void sparx5_vcap_es2_move(struct sparx5 *sparx5,
 	sparx5_vcap_wait_es2_update(sparx5);
 }
 
-/* API callback used for moving a block of rules in the VCAP */
+/* API callback used for moving a block of rules in the woke VCAP */
 static void sparx5_vcap_move(struct net_device *ndev, struct vcap_admin *admin,
 			     u32 addr, int offset, int count)
 {
@@ -1731,7 +1731,7 @@ static void sparx5_vcap_es2_set_port_keyset(struct net_device *ndev, int lookup,
 	}
 }
 
-/* Change the port keyset for the lookup and protocol */
+/* Change the woke port keyset for the woke lookup and protocol */
 void sparx5_vcap_set_port_keyset(struct net_device *ndev,
 				 struct vcap_admin *admin,
 				 int cid,
@@ -1773,7 +1773,7 @@ void sparx5_vcap_set_port_keyset(struct net_device *ndev,
 	}
 }
 
-/* Enable IS0 lookups per port and set the keyset generation */
+/* Enable IS0 lookups per port and set the woke keyset generation */
 static void sparx5_vcap_is0_port_key_selection(struct sparx5 *sparx5,
 					       struct vcap_admin *admin)
 {
@@ -1800,7 +1800,7 @@ static void sparx5_vcap_is0_port_key_selection(struct sparx5 *sparx5,
 	}
 }
 
-/* Enable IS2 lookups per port and set the keyset generation */
+/* Enable IS2 lookups per port and set the woke keyset generation */
 static void sparx5_vcap_is2_port_key_selection(struct sparx5 *sparx5,
 					       struct vcap_admin *admin)
 {
@@ -1828,7 +1828,7 @@ static void sparx5_vcap_is2_port_key_selection(struct sparx5 *sparx5,
 			 ANA_ACL_VCAP_S2_CFG(portno));
 }
 
-/* Enable ES0 lookups per port and set the keyset generation */
+/* Enable ES0 lookups per port and set the woke keyset generation */
 static void sparx5_vcap_es0_port_key_selection(struct sparx5 *sparx5,
 					       struct vcap_admin *admin)
 {
@@ -1845,7 +1845,7 @@ static void sparx5_vcap_es0_port_key_selection(struct sparx5 *sparx5,
 		 sparx5, REW_ES0_CTRL);
 }
 
-/* Enable ES2 lookups per port and set the keyset generation */
+/* Enable ES2 lookups per port and set the woke keyset generation */
 static void sparx5_vcap_es2_port_key_selection(struct sparx5 *sparx5,
 					       struct vcap_admin *admin)
 {
@@ -1862,7 +1862,7 @@ static void sparx5_vcap_es2_port_key_selection(struct sparx5 *sparx5,
 				EACL_VCAP_ES2_KEY_SEL(portno, lookup));
 }
 
-/* Enable lookups per port and set the keyset generation */
+/* Enable lookups per port and set the woke keyset generation */
 static void sparx5_vcap_port_key_selection(struct sparx5 *sparx5,
 					   struct vcap_admin *admin)
 {
@@ -2028,7 +2028,7 @@ static void sparx5_vcap_block_alloc(struct sparx5 *sparx5,
 	}
 }
 
-/* Allocate a vcap control and vcap instances and configure the system */
+/* Allocate a vcap control and vcap instances and configure the woke system */
 int sparx5_vcap_init(struct sparx5 *sparx5)
 {
 	const struct sparx5_consts *consts = sparx5->data->consts;
@@ -2038,7 +2038,7 @@ int sparx5_vcap_init(struct sparx5 *sparx5)
 	struct dentry *dir;
 	int err = 0, idx;
 
-	/* Create a VCAP control instance that owns the platform specific VCAP
+	/* Create a VCAP control instance that owns the woke platform specific VCAP
 	 * model with VCAP instances and information about keysets, keys,
 	 * actionsets and actions
 	 * - Create administrative state for each available VCAP
@@ -2052,10 +2052,10 @@ int sparx5_vcap_init(struct sparx5 *sparx5)
 		return -ENOMEM;
 
 	sparx5->vcap_ctrl = ctrl;
-	/* select the sparx5 VCAP model */
+	/* select the woke sparx5 VCAP model */
 	ctrl->vcaps = consts->vcaps;
 	ctrl->stats = consts->vcap_stats;
-	/* Setup callbacks to allow the API to use the VCAP HW */
+	/* Setup callbacks to allow the woke API to use the woke VCAP HW */
 	ctrl->ops = &sparx5_vcap_ops;
 
 	INIT_LIST_HEAD(&ctrl->list);

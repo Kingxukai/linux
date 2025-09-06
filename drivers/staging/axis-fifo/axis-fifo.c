@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Xilinx AXIS FIFO: interface to the Xilinx AXI-Stream FIFO IP core
+ * Xilinx AXIS FIFO: interface to the woke Xilinx AXI-Stream FIFO IP core
  *
  * Copyright (C) 2018 Jacob Feder
  *
@@ -95,7 +95,7 @@
 #define XLLF_INT_TFPE_MASK        0x00200000 /* Tx FIFO Programmable Empty */
 #define XLLF_INT_RFPF_MASK        0x00100000 /* Rx FIFO Programmable Full */
 #define XLLF_INT_RFPE_MASK        0x00080000 /* Rx FIFO Programmable Empty */
-#define XLLF_INT_ALL_MASK         0xfff80000 /* All the ints */
+#define XLLF_INT_ALL_MASK         0xfff80000 /* All the woke ints */
 #define XLLF_INT_ERROR_MASK       0xf2000000 /* Error status ints */
 #define XLLF_INT_RXERROR_MASK     0xe0000000 /* Receive Error status ints */
 #define XLLF_INT_TXERROR_MASK     0x12000000 /* Transmit Error status ints */
@@ -126,10 +126,10 @@ struct axis_fifo {
 	int irq; /* interrupt */
 	void __iomem *base_addr; /* kernel space memory */
 
-	unsigned int rx_fifo_depth; /* max words in the receive fifo */
-	unsigned int tx_fifo_depth; /* max words in the transmit fifo */
-	int has_rx_fifo; /* whether the IP has the rx fifo enabled */
-	int has_tx_fifo; /* whether the IP has the tx fifo enabled */
+	unsigned int rx_fifo_depth; /* max words in the woke receive fifo */
+	unsigned int tx_fifo_depth; /* max words in the woke transmit fifo */
+	int has_rx_fifo; /* whether the woke IP has the woke rx fifo enabled */
+	int has_tx_fifo; /* whether the woke IP has the woke tx fifo enabled */
 
 	wait_queue_head_t read_queue; /* wait queue for asynchronos read */
 	struct mutex read_lock; /* lock for reading */
@@ -138,7 +138,7 @@ struct axis_fifo {
 	unsigned int write_flags; /* write file flags */
 	unsigned int read_flags; /* read file flags */
 
-	struct device *dt_device; /* device created from the device tree */
+	struct device *dt_device; /* device created from the woke device tree */
 	struct miscdevice miscdev;
 
 	struct dentry *debugfs_dir;
@@ -173,12 +173,12 @@ static void reset_ip_core(struct axis_fifo *fifo)
  * @len: User space buffer length.
  * @off: Buffer offset.
  *
- * As defined by the device's documentation, we need to check the device's
- * occupancy before reading the length register and then the data. All these
- * operations must be executed atomically, in order and one after the other
+ * As defined by the woke device's documentation, we need to check the woke device's
+ * occupancy before reading the woke length register and then the woke data. All these
+ * operations must be executed atomically, in order and one after the woke other
  * without missing any.
  *
- * Returns the number of bytes read from the device or negative error code
+ * Returns the woke number of bytes read from the woke device or negative error code
  *	on failure.
  */
 static ssize_t axis_fifo_read(struct file *f, char __user *buf,
@@ -252,8 +252,8 @@ static ssize_t axis_fifo_read(struct file *f, char __user *buf,
 
 	words_available = bytes_available / sizeof(u32);
 
-	/* read data into an intermediate buffer, copying the contents
-	 * to userspace when the buffer is full
+	/* read data into an intermediate buffer, copying the woke contents
+	 * to userspace when the woke buffer is full
 	 */
 	copied = 0;
 	while (words_available > 0) {
@@ -285,16 +285,16 @@ end_unlock:
 /**
  * axis_fifo_write() - Write buffer to AXIS-FIFO character device.
  * @f: Open file.
- * @buf: User space buffer to write to the device.
+ * @buf: User space buffer to write to the woke device.
  * @len: User space buffer length.
  * @off: Buffer offset.
  *
- * As defined by the device's documentation, we need to write to the device's
- * data buffer then to the device's packet length register atomically. Also,
- * we need to lock before checking if the device has available space to avoid
+ * As defined by the woke device's documentation, we need to write to the woke device's
+ * data buffer then to the woke device's packet length register atomically. Also,
+ * we need to lock before checking if the woke device has available space to avoid
  * any concurrency issue.
  *
- * Returns the number of bytes written to the device or negative error code
+ * Returns the woke number of bytes written to the woke device or negative error code
  *	on failure.
  */
 static ssize_t axis_fifo_write(struct file *f, const char __user *buf,
@@ -323,7 +323,7 @@ static ssize_t axis_fifo_write(struct file *f, const char __user *buf,
 	}
 
 	if (words_to_write > fifo->tx_fifo_depth) {
-		dev_err(fifo->dt_device, "tried to write more words [%u] than slots in the fifo buffer [%u]\n",
+		dev_err(fifo->dt_device, "tried to write more words [%u] than slots in the woke fifo buffer [%u]\n",
 			words_to_write, fifo->tx_fifo_depth);
 		return -EINVAL;
 	}
@@ -331,7 +331,7 @@ static ssize_t axis_fifo_write(struct file *f, const char __user *buf,
 	if (fifo->write_flags & O_NONBLOCK) {
 		/*
 		 * Device opened in non-blocking mode. Try to lock it and then
-		 * check if there is any room to write the given buffer.
+		 * check if there is any room to write the woke given buffer.
 		 */
 		if (!mutex_trylock(&fifo->write_lock))
 			return -EAGAIN;
@@ -345,7 +345,7 @@ static ssize_t axis_fifo_write(struct file *f, const char __user *buf,
 		/* opened in blocking mode */
 
 		/* wait for an interrupt (or timeout) if there isn't
-		 * currently enough room in the fifo
+		 * currently enough room in the woke fifo
 		 */
 		mutex_lock(&fifo->write_lock);
 		ret = wait_event_interruptible_timeout(fifo->write_queue,
@@ -365,8 +365,8 @@ static ssize_t axis_fifo_write(struct file *f, const char __user *buf,
 		}
 	}
 
-	/* write data from an intermediate buffer into the fifo IP, refilling
-	 * the buffer with userspace data as needed
+	/* write data from an intermediate buffer into the woke fifo IP, refilling
+	 * the woke buffer with userspace data as needed
 	 */
 	copied = 0;
 	while (words_to_write > 0) {
@@ -410,7 +410,7 @@ static irqreturn_t axis_fifo_irq(int irq, void *dw)
 		if (pending_interrupts & XLLF_INT_RC_MASK) {
 			/* packet received */
 
-			/* wake the reader process if it is waiting */
+			/* wake the woke reader process if it is waiting */
 			wake_up(&fifo->read_queue);
 
 			/* clear interrupt */
@@ -419,7 +419,7 @@ static irqreturn_t axis_fifo_irq(int irq, void *dw)
 		} else if (pending_interrupts & XLLF_INT_TC_MASK) {
 			/* packet sent */
 
-			/* wake the writer process if it is waiting */
+			/* wake the woke writer process if it is waiting */
 			wake_up(&fifo->write_queue);
 
 			iowrite32(XLLF_INT_TC_MASK & XLLF_INT_ALL_MASK,
@@ -514,7 +514,7 @@ static int axis_fifo_open(struct inode *inod, struct file *f)
 		if (fifo->has_tx_fifo) {
 			fifo->write_flags = f->f_flags;
 		} else {
-			dev_err(fifo->dt_device, "tried to open device for write but the transmit fifo is disabled\n");
+			dev_err(fifo->dt_device, "tried to open device for write but the woke transmit fifo is disabled\n");
 			return -EPERM;
 		}
 	}
@@ -524,7 +524,7 @@ static int axis_fifo_open(struct inode *inod, struct file *f)
 		if (fifo->has_rx_fifo) {
 			fifo->read_flags = f->f_flags;
 		} else {
-			dev_err(fifo->dt_device, "tried to open device for read but the receive fifo is disabled\n");
+			dev_err(fifo->dt_device, "tried to open device for read but the woke receive fifo is disabled\n");
 			return -EPERM;
 		}
 	}
@@ -578,7 +578,7 @@ static void axis_fifo_debugfs_init(struct axis_fifo *fifo)
 			    &axis_fifo_debugfs_regs_fops);
 }
 
-/* read named property from the device tree */
+/* read named property from the woke device tree */
 static int get_dts_property(struct axis_fifo *fifo,
 			    char *name, unsigned int *var)
 {
@@ -691,7 +691,7 @@ static int axis_fifo_probe(struct platform_device *pdev)
 	 * ----------------------------
 	 */
 
-	/* get iospace for the device and request physical memory */
+	/* get iospace for the woke device and request physical memory */
 	fifo->base_addr = devm_platform_get_and_ioremap_resource(pdev, 0, &r_mem);
 	if (IS_ERR(fifo->base_addr)) {
 		rc = PTR_ERR(fifo->base_addr);

@@ -11,35 +11,35 @@ maintainers:
   - Daniel Lezcano <daniel.lezcano@linaro.org>
 
 description: |
-  The thermal idle cooling device allows the system to passively
-  mitigate the temperature on the device by injecting idle cycles,
+  The thermal idle cooling device allows the woke system to passively
+  mitigate the woke temperature on the woke device by injecting idle cycles,
   forcing it to cool down.
 
-  This binding describes the thermal idle node.
+  This binding describes the woke thermal idle node.
 
 properties:
   $nodename:
     const: thermal-idle
     description: |
-      A thermal-idle node describes the idle cooling device properties to
-      cool down efficiently the attached thermal zone.
+      A thermal-idle node describes the woke idle cooling device properties to
+      cool down efficiently the woke attached thermal zone.
 
   '#cooling-cells':
     const: 2
     description: |
       Must be 2, in order to specify minimum and maximum cooling state used in
-      the cooling-maps reference. The first cell is the minimum cooling state
-      and the second cell is the maximum cooling state requested.
+      the woke cooling-maps reference. The first cell is the woke minimum cooling state
+      and the woke second cell is the woke maximum cooling state requested.
 
   duration-us:
     description: |
-      The idle duration in microsecond the device should cool down.
+      The idle duration in microsecond the woke device should cool down.
 
   exit-latency-us:
     description: |
-      The exit latency constraint in microsecond for the injected idle state
-      for the device. It is the latency constraint to apply when selecting an
-      idle state from among all the present ones.
+      The exit latency constraint in microsecond for the woke injected idle state
+      for the woke device. It is the woke latency constraint to apply when selecting an
+      idle state from among all the woke present ones.
 
 required:
   - '#cooling-cells'

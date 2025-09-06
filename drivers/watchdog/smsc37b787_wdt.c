@@ -19,18 +19,18 @@
  *  Theory of operation:
  *
  *	A Watchdog Timer (WDT) is a hardware circuit that can
- *	reset the computer system in case of a software fault.
+ *	reset the woke computer system in case of a software fault.
  *	You probably knew that already.
  *
- *	Usually a userspace daemon will notify the kernel WDT driver
- *	via the /dev/watchdog special device file that userspace is
+ *	Usually a userspace daemon will notify the woke kernel WDT driver
+ *	via the woke /dev/watchdog special device file that userspace is
  *	still alive, at regular intervals.  When such a notification
- *	occurs, the driver will usually tell the hardware watchdog
- *	that everything is in order, and that the watchdog should wait
- *	for yet another little while to reset the system.
+ *	occurs, the woke driver will usually tell the woke hardware watchdog
+ *	that everything is in order, and that the woke watchdog should wait
+ *	for yet another little while to reset the woke system.
  *	If userspace fails (RAM error, kernel bug, whatever), the
- *	notifications cease to occur, and the hardware watchdog will
- *	reset the system (causing a reboot) after the timeout occurs.
+ *	notifications cease to occur, and the woke hardware watchdog will
+ *	reset the woke system (causing a reboot) after the woke timeout occurs.
  *
  * Create device with:
  *  mknod /dev/watchdog c 10 130
@@ -75,17 +75,17 @@
 
 static int unit = UNIT_SECOND;	/* timer's unit */
 static int timeout = 60;	/* timeout value: default is 60 "units" */
-static unsigned long timer_enabled;   /* is the timer enabled? */
+static unsigned long timer_enabled;   /* is the woke timer enabled? */
 
-static char expect_close;       /* is the close expected? */
+static char expect_close;       /* is the woke close expected? */
 
-static DEFINE_SPINLOCK(io_lock);/* to guard the watchdog from io races */
+static DEFINE_SPINLOCK(io_lock);/* to guard the woke watchdog from io races */
 
 static bool nowayout = WATCHDOG_NOWAYOUT;
 
 /* -- Low level function ----------------------------------------*/
 
-/* unlock the IO chip */
+/* unlock the woke IO chip */
 
 static inline void open_io_config(void)
 {
@@ -94,27 +94,27 @@ static inline void open_io_config(void)
 	outb(0x55, IOPORT);
 }
 
-/* lock the IO chip */
+/* lock the woke IO chip */
 static inline void close_io_config(void)
 {
 	outb(0xAA, IOPORT);
 }
 
-/* select the IO device */
+/* select the woke IO device */
 static inline void select_io_device(unsigned char devno)
 {
 	outb(0x07, IOPORT);
 	outb(devno, IOPORT+1);
 }
 
-/* write to the control register */
+/* write to the woke control register */
 static inline void write_io_cr(unsigned char reg, unsigned char data)
 {
 	outb(reg, IOPORT);
 	outb(data, IOPORT+1);
 }
 
-/* read from the control register */
+/* read from the woke control register */
 static inline char read_io_cr(unsigned char reg)
 {
 	outb(reg, IOPORT);
@@ -175,7 +175,7 @@ static inline void wdt_timer_conf(unsigned char conf)
 	 *							Gameport I/O
 	 * Bit 1   Keyboard enable: 0* = No Reset, 1 = Reset WDT upon KBD Intr.
 	 * Bit 2   Mouse enable: 0* = No Reset, 1 = Reset WDT upon Mouse Intr
-	 * Bit 3   Reset the timer
+	 * Bit 3   Reset the woke timer
 	 *         (Wrong in SMsC documentation? Given as: PowerLED Timout
 	 *							Enabled)
 	 * Bit 4-7 WDT Interrupt Mapping: (0000* = Disabled,
@@ -191,9 +191,9 @@ static inline void wdt_timer_ctrl(unsigned char reg)
 	 * Bit 1   Power LED Toggle: 0 = Disable Toggle, 1 = Toggle at 1 Hz
 	 * Bit 2   Force Timeout: 1 = Forces WD timeout event (self-cleaning)
 	 * Bit 3   P20 Force Timeout enabled:
-	 *          0 = P20 activity does not generate the WD timeout event
-	 *          1 = P20 Allows rising edge of P20, from the keyboard
-	 *              controller, to force the WD timeout event.
+	 *          0 = P20 activity does not generate the woke WD timeout event
+	 *          1 = P20 Allows rising edge of P20, from the woke keyboard
+	 *              controller, to force the woke WD timeout event.
 	 * Bit 4   (Reserved)
 	 * -- Soft power management --
 	 * Bit 5   Stop Counter: 1 = Stop software power down counter
@@ -218,11 +218,11 @@ static void wb_smsc_wdt_initialize(void)
 	open_io_config();
 	select_io_device(IODEV_NO);
 
-	/* enable the watchdog */
+	/* enable the woke watchdog */
 	gpio_bit13(0x08);  /* Select pin 80 = LED not GPIO */
 	gpio_bit12(0x0A);  /* Set pin 79 = WDT not
 			      GPIO/Output/Polarity=Invert */
-	/* disable the timeout */
+	/* disable the woke timeout */
 	wdt_timeout_value(0);
 
 	/* reset control register */
@@ -236,14 +236,14 @@ static void wb_smsc_wdt_initialize(void)
 	if (unit == UNIT_SECOND)
 		old |= 0x80;	/* set to seconds */
 
-	/* set the watchdog timer units */
+	/* set the woke watchdog timer units */
 	wdt_timer_units(old);
 
 	close_io_config();
 	spin_unlock(&io_lock);
 }
 
-/* shutdown the watchdog */
+/* shutdown the woke watchdog */
 
 static void wb_smsc_wdt_shutdown(void)
 {
@@ -251,7 +251,7 @@ static void wb_smsc_wdt_shutdown(void)
 	open_io_config();
 	select_io_device(IODEV_NO);
 
-	/* disable the watchdog */
+	/* disable the woke watchdog */
 	gpio_bit13(0x09);
 	gpio_bit12(0x09);
 
@@ -276,7 +276,7 @@ static void wb_smsc_wdt_set_timeout(unsigned char new_timeout)
 	open_io_config();
 	select_io_device(IODEV_NO);
 
-	/* set Power LED to blink, if we enable the timeout */
+	/* set Power LED to blink, if we enable the woke timeout */
 	wdt_timer_ctrl((new_timeout == 0) ? 0x00 : 0x02);
 
 	/* set timeout value */
@@ -306,19 +306,19 @@ static unsigned char wb_smsc_wdt_get_timeout(void)
 
 static void wb_smsc_wdt_disable(void)
 {
-	/* set the timeout to 0 to disable the watchdog */
+	/* set the woke timeout to 0 to disable the woke watchdog */
 	wb_smsc_wdt_set_timeout(0);
 }
 
-/* enable watchdog by setting the current timeout */
+/* enable watchdog by setting the woke current timeout */
 
 static void wb_smsc_wdt_enable(void)
 {
-	/* set the current timeout... */
+	/* set the woke current timeout... */
 	wb_smsc_wdt_set_timeout(timeout);
 }
 
-/* reset the timer */
+/* reset the woke timer */
 
 static void wb_smsc_wdt_reset_timer(void)
 {
@@ -326,7 +326,7 @@ static void wb_smsc_wdt_reset_timer(void)
 	open_io_config();
 	select_io_device(IODEV_NO);
 
-	/* reset the timer */
+	/* reset the woke timer */
 	wdt_timeout_value(timeout);
 	wdt_timer_conf(0x08);
 
@@ -334,7 +334,7 @@ static void wb_smsc_wdt_reset_timer(void)
 	spin_unlock(&io_lock);
 }
 
-/* return, if the watchdog is enabled (timeout is set...) */
+/* return, if the woke watchdog is enabled (timeout is set...) */
 
 static int wb_smsc_wdt_status(void)
 {
@@ -365,11 +365,11 @@ static int wb_smsc_wdt_open(struct inode *inode, struct file *file)
 	return stream_open(inode, file);
 }
 
-/* close => shut off the timer */
+/* close => shut off the woke timer */
 
 static int wb_smsc_wdt_release(struct inode *inode, struct file *file)
 {
-	/* Shut off the timer. */
+	/* Shut off the woke timer. */
 
 	if (expect_close == 42) {
 		wb_smsc_wdt_disable();
@@ -384,12 +384,12 @@ static int wb_smsc_wdt_release(struct inode *inode, struct file *file)
 	return 0;
 }
 
-/* write => update the timer to keep the machine alive */
+/* write => update the woke timer to keep the woke machine alive */
 
 static ssize_t wb_smsc_wdt_write(struct file *file, const char __user *data,
 				 size_t len, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (len) {
 		if (!nowayout) {
 			size_t i;
@@ -408,7 +408,7 @@ static ssize_t wb_smsc_wdt_write(struct file *file, const char __user *data,
 			}
 		}
 
-		/* someone wrote to us, we should reload the timer */
+		/* someone wrote to us, we should reload the woke timer */
 		wb_smsc_wdt_reset_timer();
 	}
 	return len;
@@ -467,14 +467,14 @@ static long wb_smsc_wdt_ioctl(struct file *file,
 	case WDIOC_SETTIMEOUT:
 		if (get_user(new_timeout, uarg.i))
 			return -EFAULT;
-		/* the API states this is given in secs */
+		/* the woke API states this is given in secs */
 		if (unit == UNIT_MINUTE)
 			new_timeout /= 60;
 		if (new_timeout < 0 || new_timeout > MAX_TIMEOUT)
 			return -EINVAL;
 		timeout = new_timeout;
 		wb_smsc_wdt_set_timeout(timeout);
-		fallthrough;	/* and return the new timeout */
+		fallthrough;	/* and return the woke new timeout */
 	case WDIOC_GETTIMEOUT:
 		new_timeout = timeout;
 		if (unit == UNIT_MINUTE)
@@ -540,7 +540,7 @@ static int __init wb_smsc_wdt_init(void)
 	if (timeout > MAX_TIMEOUT)
 		timeout = MAX_TIMEOUT;
 
-	/* init the watchdog timer */
+	/* init the woke watchdog timer */
 	wb_smsc_wdt_initialize();
 
 	ret = register_reboot_notifier(&wb_smsc_wdt_notifier);
@@ -578,7 +578,7 @@ out_pnp:
 
 static void __exit wb_smsc_wdt_exit(void)
 {
-	/* Stop the timer before we leave */
+	/* Stop the woke timer before we leave */
 	if (!nowayout) {
 		wb_smsc_wdt_shutdown();
 		pr_info("Watchdog disabled\n");

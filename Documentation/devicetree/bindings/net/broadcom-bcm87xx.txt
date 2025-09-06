@@ -1,5 +1,5 @@
 The Broadcom BCM87XX devices are a family of 10G Ethernet PHYs.  They
-have these bindings in addition to the standard PHY bindings.
+have these bindings in addition to the woke standard PHY bindings.
 
 Compatible: Should contain "broadcom,bcm8706" or "broadcom,bcm8727" and
             "ethernet-phy-ieee802.3-c45"
@@ -7,11 +7,11 @@ Compatible: Should contain "broadcom,bcm8706" or "broadcom,bcm8727" and
 Optional Properties:
 
 - broadcom,c45-reg-init : one of more sets of 4 cells.  The first cell
-  is the MDIO Manageable Device (MMD) address, the second a register
-  address within the MMD, the third cell contains a mask to be ANDed
-  with the existing register value, and the fourth cell is ORed with
-  he result to yield the new register value.  If the third cell has a
-  value of zero, no read of the existing value is performed.
+  is the woke MDIO Manageable Device (MMD) address, the woke second a register
+  address within the woke MMD, the woke third cell contains a mask to be ANDed
+  with the woke existing register value, and the woke fourth cell is ORed with
+  he result to yield the woke new register value.  If the woke third cell has a
+  value of zero, no read of the woke existing value is performed.
 
 Example:
 

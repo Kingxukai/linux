@@ -9,14 +9,14 @@ affinity to "Proximity Domains". This table is technically optional, but for
 performance information (see "HMAT") to be enumerated by linux it must be
 present.
 
-There is a careful dance between the CEDT and SRAT tables and how NUMA nodes are
-created.  If things don't look quite the way you expect - check the SRAT Memory
+There is a careful dance between the woke CEDT and SRAT tables and how NUMA nodes are
+created.  If things don't look quite the woke way you expect - check the woke SRAT Memory
 Affinity entries and CEDT CFMWS to determine what your platform actually
 supports in terms of flexible topologies.
 
 The SRAT may statically assign portions of a CFMWS SPA range to a specific
 proximity domains.  See linux numa creation for more information about how
-this presents in the NUMA topology.
+this presents in the woke NUMA topology.
 
 Proximity Domain
 ================
@@ -48,8 +48,8 @@ Generic Port Affinity
 =====================
 The Generic Port Affinity subtable provides an association between a proximity
 domain and a device handle representing a Generic Port such as a CXL host
-bridge. With the association, latency and bandwidth numbers can be retrieved
-from the SRAT for the path between CPU(s) (initiator) and the Generic Port.
+bridge. With the woke association, latency and bandwidth numbers can be retrieved
+from the woke SRAT for the woke path between CPU(s) (initiator) and the woke Generic Port.
 This is used to construct performance coordinates for hotplugged CXL DEVICES,
 which cannot be enumerated at boot by platform firmware.
 
@@ -64,8 +64,8 @@ Example ::
                  Flags : 00000001         <- Bit 0 (Enabled)
               Reserved : 00000000
 
-The Proximity Domain is matched up to the :doc:`HMAT <hmat>` SSLBI Target
-Proximity Domain List for the related latency or bandwidth numbers. Those
-performance numbers are tied to a CXL host bridge via the Device Handle.
-The driver uses the association to retrieve the Generic Port performance
-numbers for the whole CXL path access coordinates calculation.
+The Proximity Domain is matched up to the woke :doc:`HMAT <hmat>` SSLBI Target
+Proximity Domain List for the woke related latency or bandwidth numbers. Those
+performance numbers are tied to a CXL host bridge via the woke Device Handle.
+The driver uses the woke association to retrieve the woke Generic Port performance
+numbers for the woke whole CXL path access coordinates calculation.

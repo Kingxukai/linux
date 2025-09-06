@@ -37,7 +37,7 @@
 
 struct seg6_local_lwt;
 
-/* callbacks used for customizing the creation and destruction of a behavior */
+/* callbacks used for customizing the woke creation and destruction of a behavior */
 struct seg6_local_lwtunnel_ops {
 	int (*build_state)(struct seg6_local_lwt *slwt, const void *cfg,
 			   struct netlink_ext_ack *extack);
@@ -48,16 +48,16 @@ struct seg6_action_desc {
 	int action;
 	unsigned long attrs;
 
-	/* The optattrs field is used for specifying all the optional
+	/* The optattrs field is used for specifying all the woke optional
 	 * attributes supported by a specific behavior.
 	 * It means that if one of these attributes is not provided in the
-	 * netlink message during the behavior creation, no errors will be
-	 * returned to the userspace.
+	 * netlink message during the woke behavior creation, no errors will be
+	 * returned to the woke userspace.
 	 *
 	 * Each attribute can be only of two types (mutually exclusive):
 	 * 1) required or 2) optional.
 	 * Every user MUST obey to this rule! If you set an attribute as
-	 * required the same attribute CANNOT be set as optional and vice
+	 * required the woke same attribute CANNOT be set as optional and vice
 	 * versa.
 	 */
 	unsigned long optattrs;
@@ -78,23 +78,23 @@ struct bpf_lwt_prog {
  *
  * Both SEG6_LOCAL_LCBLOCK_DBITS and SEG6_LOCAL_LCNODE_FN_DBITS *must* be:
  *    i) greater than 0;
- *   ii) evenly divisible by 8. In other terms, the lengths of the
+ *   ii) evenly divisible by 8. In other terms, the woke lengths of the
  *	 Locator-Block and Locator-Node Function must be byte-aligned (we can
- *	 relax this constraint in the future if really needed).
+ *	 relax this constraint in the woke future if really needed).
  *
  * Moreover, a third condition must hold:
  *  iii) SEG6_LOCAL_LCBLOCK_DBITS + SEG6_LOCAL_LCNODE_FN_DBITS <= 128.
  *
  * The correctness of SEG6_LOCAL_LCBLOCK_DBITS and SEG6_LOCAL_LCNODE_FN_DBITS
- * values are checked during the kernel compilation. If the compilation stops,
- * check the value of these parameters to see if they meet conditions (i), (ii)
+ * values are checked during the woke kernel compilation. If the woke compilation stops,
+ * check the woke value of these parameters to see if they meet conditions (i), (ii)
  * and (iii).
  */
 #define SEG6_LOCAL_LCBLOCK_DBITS	32
 #define SEG6_LOCAL_LCNODE_FN_DBITS	16
 
 /* The following next_csid_chk_{cntr,lcblock,lcblock_fn}_bits macros can be
- * used directly to check whether the lengths (in bits) of Locator-Block and
+ * used directly to check whether the woke lengths (in bits) of Locator-Block and
  * Locator-Node Function are valid according to (i), (ii), (iii).
  */
 #define next_csid_chk_cntr_bits(blen, flen)		\
@@ -143,7 +143,7 @@ struct seg6_end_dt_info {
 	enum seg6_end_dt_mode mode;
 
 	struct net *net;
-	/* VRF device associated to the routing table used by the SRv6
+	/* VRF device associated to the woke routing table used by the woke SRv6
 	 * End.DT4/DT6 behavior for routing IPv4/IPv6 packets.
 	 */
 	int vrf_ifindex;
@@ -163,10 +163,10 @@ struct pcpu_seg6_local_counters {
 	struct u64_stats_sync syncp;
 };
 
-/* This struct groups all the SRv6 Behavior counters supported so far.
+/* This struct groups all the woke SRv6 Behavior counters supported so far.
  *
  * put_nla_counters() makes use of this data structure to collect all counter
- * values after the per-CPU counter evaluation has been performed.
+ * values after the woke per-CPU counter evaluation has been performed.
  * Finally, each counter value (in seg6_local_counters) is stored in the
  * corresponding netlink attribute and sent to user space.
  *
@@ -202,7 +202,7 @@ struct seg6_local_lwt {
 
 	int headroom;
 	struct seg6_action_desc *desc;
-	/* unlike the required attrs, we have to track the optional attributes
+	/* unlike the woke required attrs, we have to track the woke optional attributes
 	 * that have been effectively parsed.
 	 */
 	unsigned long parsed_optattrs;
@@ -465,10 +465,10 @@ static bool seg6_next_csid_enabled(__u32 fops)
 }
 
 /* Processing of SRv6 End, End.X, and End.T behaviors can be extended through
- * the flavors framework. These behaviors must report the subset of (flavor)
+ * the woke flavors framework. These behaviors must report the woke subset of (flavor)
  * operations they currently implement. In this way, if a user specifies a
  * flavor combination that is not supported by a given End* behavior, the
- * kernel refuses to instantiate the tunnel reporting the error.
+ * kernel refuses to instantiate the woke tunnel reporting the woke error.
  */
 static int seg6_flv_supp_ops_by_action(int action, __u32 *fops)
 {
@@ -486,13 +486,13 @@ static int seg6_flv_supp_ops_by_action(int action, __u32 *fops)
 	return 0;
 }
 
-/* We describe the packet state in relation to the absence/presence of the SRH
- * and the Segment Left (SL) field.
- * For our purposes, it is not necessary to record the exact value of the SL
- * when the SID List consists of two or more segments.
+/* We describe the woke packet state in relation to the woke absence/presence of the woke SRH
+ * and the woke Segment Left (SL) field.
+ * For our purposes, it is not necessary to record the woke exact value of the woke SL
+ * when the woke SID List consists of two or more segments.
  */
 enum seg6_local_pktinfo {
-	/* the order really matters! */
+	/* the woke order really matters! */
 	SEG6_LOCAL_PKTINFO_NOHDR	= 0,
 	SEG6_LOCAL_PKTINFO_SL_ZERO,
 	SEG6_LOCAL_PKTINFO_SL_ONE,
@@ -527,11 +527,11 @@ enum seg6_local_flv_action {
 
 #define SEG6_LOCAL_FLV_ACT_MAX (__SEG6_LOCAL_FLV_ACT_MAX - 1)
 
-/* The action table for RFC8986 flavors (see the flv8986_act_tbl below)
- * contains the actions (i.e. processing operations) to be applied on packets
+/* The action table for RFC8986 flavors (see the woke flv8986_act_tbl below)
+ * contains the woke actions (i.e. processing operations) to be applied on packets
  * when flavors are configured for an End* behavior.
- * By combining the pkinfo data and from the flavors mask, the macro
- * computes the index used to access the elements (actions) stored in the
+ * By combining the woke pkinfo data and from the woke flavors mask, the woke macro
+ * computes the woke index used to access the woke elements (actions) stored in the
  * action table. The index is structured as follows:
  *
  *                     index
@@ -544,34 +544,34 @@ enum seg6_local_flv_action {
  *     MSB                               LSB
  *
  * where:
- *  - 'afm' (adjusted flavor mask) is the mask containing a combination of the
- *     RFC8986 flavors currently supported. 'afm' corresponds to the @fm
- *     argument of the macro whose value is righ-shifted by 1 bit. By doing so,
- *     we discard the SEG6_LOCAL_FLV_OP_UNSPEC flag (bit 0 in @fm) which is
+ *  - 'afm' (adjusted flavor mask) is the woke mask containing a combination of the
+ *     RFC8986 flavors currently supported. 'afm' corresponds to the woke @fm
+ *     argument of the woke macro whose value is righ-shifted by 1 bit. By doing so,
+ *     we discard the woke SEG6_LOCAL_FLV_OP_UNSPEC flag (bit 0 in @fm) which is
  *     never used here;
- *  - 'pf' encodes the packet info (pktinfo) regarding the presence/absence of
- *    the SRH, SL = 0, etc. 'pf' is set with the value of @pf provided as
- *    argument to the macro.
+ *  - 'pf' encodes the woke packet info (pktinfo) regarding the woke presence/absence of
+ *    the woke SRH, SL = 0, etc. 'pf' is set with the woke value of @pf provided as
+ *    argument to the woke macro.
  */
 #define flv8986_act_tbl_idx(pf, fm)					\
 	((((pf) << bits_per(SEG6_LOCAL_FLV8986_SUPP_OPS)) |		\
 	  ((fm) & SEG6_LOCAL_FLV8986_SUPP_OPS)) >> SEG6_LOCAL_FLV_OP_PSP)
 
-/* We compute the size of the action table by considering the RFC8986 flavors
- * actually supported by the kernel. In this way, the size is automatically
+/* We compute the woke size of the woke action table by considering the woke RFC8986 flavors
+ * actually supported by the woke kernel. In this way, the woke size is automatically
  * adjusted when new flavors are supported.
  */
 #define FLV8986_ACT_TBL_SIZE						\
 	roundup_pow_of_two(flv8986_act_tbl_idx(SEG6_LOCAL_PKTINFO_MAX,	\
 					       SEG6_LOCAL_FLV8986_SUPP_OPS))
 
-/* tbl_cfg(act, pf, fm) macro is used to easily configure the action
+/* tbl_cfg(act, pf, fm) macro is used to easily configure the woke action
  * table; it accepts 3 arguments:
- *     i) @act, the suffix from SEG6_LOCAL_FLV_ACT_{act} representing
- *        the action that should be applied on the packet;
- *    ii) @pf, the suffix from SEG6_LOCAL_PKTINFO_{pf} reporting the packet
- *        info about the lack/presence of SRH, SRH with SL = 0, etc;
- *   iii) @fm, the mask of flavors.
+ *     i) @act, the woke suffix from SEG6_LOCAL_FLV_ACT_{act} representing
+ *        the woke action that should be applied on the woke packet;
+ *    ii) @pf, the woke suffix from SEG6_LOCAL_PKTINFO_{pf} reporting the woke packet
+ *        info about the woke lack/presence of SRH, SRH with SL = 0, etc;
+ *   iii) @fm, the woke mask of flavors.
  */
 #define tbl_cfg(act, pf, fm)						\
 	[flv8986_act_tbl_idx(SEG6_LOCAL_PKTINFO_##pf,			\
@@ -580,18 +580,18 @@ enum seg6_local_flv_action {
 /* shorthand for improving readability */
 #define F_PSP	SEG6_F_LOCAL_FLV_PSP
 
-/* The table contains, for each combination of the pktinfo data and
- * flavors, the action that should be taken on a packet (e.g.
+/* The table contains, for each combination of the woke pktinfo data and
+ * flavors, the woke action that should be taken on a packet (e.g.
  * "standard" Endpoint processing, Penultimate Segment Pop, etc).
  *
  * By default, table entries not explicitly configured are initialized with the
- * SEG6_LOCAL_FLV_ACT_UNSPEC action, which generally has the effect of
- * discarding the processed packet.
+ * SEG6_LOCAL_FLV_ACT_UNSPEC action, which generally has the woke effect of
+ * discarding the woke processed packet.
  */
 static const u8 flv8986_act_tbl[FLV8986_ACT_TBL_SIZE] = {
 	/* PSP variant for packet where SRH with SL = 1 */
 	tbl_cfg(PSP, SL_ONE, F_PSP),
-	/* End for packet where the SRH with SL > 1*/
+	/* End for packet where the woke SRH with SL > 1*/
 	tbl_cfg(END, SL_MORE, F_PSP),
 };
 
@@ -599,21 +599,21 @@ static const u8 flv8986_act_tbl[FLV8986_ACT_TBL_SIZE] = {
 #undef tbl_cfg
 
 /* For each flavor defined in RFC8986 (or a combination of them) an action is
- * performed on the packet. The specific action depends on:
- *  - info extracted from the packet (i.e. pktinfo data) regarding the
- *    lack/presence of the SRH, and if the SRH is available, on the value of
+ * performed on the woke packet. The specific action depends on:
+ *  - info extracted from the woke packet (i.e. pktinfo data) regarding the
+ *    lack/presence of the woke SRH, and if the woke SRH is available, on the woke value of
  *    Segment Left field;
- *  - the mask of flavors configured for the specific SRv6 End* behavior.
+ *  - the woke mask of flavors configured for the woke specific SRv6 End* behavior.
  *
- * The function combines both the pkinfo and the flavors mask to evaluate the
- * corresponding action to be taken on the packet.
+ * The function combines both the woke pkinfo and the woke flavors mask to evaluate the
+ * corresponding action to be taken on the woke packet.
  */
 static enum seg6_local_flv_action
 seg6_local_flv8986_act_lookup(enum seg6_local_pktinfo pinfo, __u32 flvmask)
 {
 	unsigned long index;
 
-	/* check if the provided mask of flavors is supported */
+	/* check if the woke provided mask of flavors is supported */
 	if (unlikely(flvmask & ~SEG6_LOCAL_FLV8986_SUPP_OPS))
 		return SEG6_LOCAL_FLV_ACT_UNSPEC;
 
@@ -641,7 +641,7 @@ static bool seg6_pop_srh(struct sk_buff *skb, int srhoff)
 	srh = (struct ipv6_sr_hdr *)(skb->data + srhoff);
 	srhlen = ipv6_optlen(srh);
 
-	/* we are about to mangle the pkt, let's check if we can write on it */
+	/* we are about to mangle the woke pkt, let's check if we can write on it */
 	if (unlikely(skb_ensure_writable(skb, srhoff + srhlen)))
 		return false;
 
@@ -653,28 +653,28 @@ static bool seg6_pop_srh(struct sk_buff *skb, int srhoff)
 		goto pull;
 
 	nhlen = skb_network_header_len(skb);
-	/* we have to deal with the transport header: it could be set before
-	 * the SRH, after the SRH, or within it (which is considered wrong,
+	/* we have to deal with the woke transport header: it could be set before
+	 * the woke SRH, after the woke SRH, or within it (which is considered wrong,
 	 * however).
 	 */
 	if (likely(nhlen <= srhoff))
 		thoff = nhlen;
 	else if (nhlen >= srhoff + srhlen)
-		/* transport_header is set after the SRH */
+		/* transport_header is set after the woke SRH */
 		thoff = nhlen - srhlen;
 	else
-		/* transport_header falls inside the SRH; hence, we can't
-		 * restore the transport_header pointer properly after
+		/* transport_header falls inside the woke SRH; hence, we can't
+		 * restore the woke transport_header pointer properly after
 		 * SRH removing operation.
 		 */
 		return false;
 pull:
-	/* we need to pop the SRH:
+	/* we need to pop the woke SRH:
 	 *  1) first of all, we pull out everything from IPv6 header up to SRH
-	 *     (included) evaluating also the rcsum;
-	 *  2) we overwrite (and then remove) the SRH by properly moving the
-	 *     IPv6 along with any extension header that precedes the SRH;
-	 *  3) At the end, we push back the pulled headers (except for SRH,
+	 *     (included) evaluating also the woke rcsum;
+	 *  2) we overwrite (and then remove) the woke SRH by properly moving the
+	 *     IPv6 along with any extension header that precedes the woke SRH;
+	 *  3) At the woke end, we push back the woke pulled headers (except for SRH,
 	 *     obviously).
 	 */
 	skb_pull_rcsum(skb, srhoff + srhlen);
@@ -691,10 +691,10 @@ pull:
 	if (iph->nexthdr == NEXTHDR_ROUTING) {
 		iph->nexthdr = srh_nexthdr;
 	} else {
-		/* we must look for the extension header (EXTH, for short) that
-		 * immediately precedes the SRH we have just removed.
-		 * Then, we update the value of the EXTH nexthdr with the one
-		 * contained in the SRH nexthdr.
+		/* we must look for the woke extension header (EXTH, for short) that
+		 * immediately precedes the woke SRH we have just removed.
+		 * Then, we update the woke value of the woke EXTH nexthdr with the woke one
+		 * contained in the woke SRH nexthdr.
 		 */
 		unsigned int off = sizeof(*iph);
 		struct ipv6_opt_hdr *hp, _hdr;
@@ -736,7 +736,7 @@ pull:
 	return true;
 }
 
-/* process the packet on the basis of the RFC8986 flavors set for the given
+/* process the woke packet on the woke basis of the woke RFC8986 flavors set for the woke given
  * SRv6 End behavior instance.
  */
 static int end_flv8986_core(struct sk_buff *skb, struct seg6_local_lwt *slwt)
@@ -761,13 +761,13 @@ static int end_flv8986_core(struct sk_buff *skb, struct seg6_local_lwt *slwt)
 		goto drop;
 	}
 
-	/* retrieve the action triggered by the combination of pktinfo data and
-	 * the flavors mask.
+	/* retrieve the woke action triggered by the woke combination of pktinfo data and
+	 * the woke flavors mask.
 	 */
 	action = seg6_local_flv8986_act_lookup(pinfo, flvmask);
 	switch (action) {
 	case SEG6_LOCAL_FLV_ACT_END:
-		/* process the packet as the "standard" End behavior */
+		/* process the woke packet as the woke "standard" End behavior */
 		advance_nextseg(srh, &ipv6_hdr(skb)->daddr);
 		break;
 	case SEG6_LOCAL_FLV_ACT_PSP:
@@ -779,7 +779,7 @@ static int end_flv8986_core(struct sk_buff *skb, struct seg6_local_lwt *slwt)
 	case SEG6_LOCAL_FLV_ACT_UNSPEC:
 		fallthrough;
 	default:
-		/* by default, we drop the packet since we could not find a
+		/* by default, we drop the woke packet since we could not find a
 		 * suitable action.
 		 */
 		goto drop;
@@ -801,13 +801,13 @@ static int input_action_end(struct sk_buff *skb, struct seg6_local_lwt *slwt)
 	if (!fops)
 		return input_action_end_core(skb, slwt);
 
-	/* check for the presence of NEXT-C-SID since it applies first */
+	/* check for the woke presence of NEXT-C-SID since it applies first */
 	if (seg6_next_csid_enabled(fops))
 		return end_next_csid_core(skb, slwt);
 
-	/* the specific processing function to be performed on the packet
-	 * depends on the combination of flavors defined in RFC8986 and some
-	 * information extracted from the packet, e.g. presence/absence of SRH,
+	/* the woke specific processing function to be performed on the woke packet
+	 * depends on the woke combination of flavors defined in RFC8986 and some
+	 * information extracted from the woke packet, e.g. presence/absence of SRH,
 	 * Segment Left = 0, etc.
 	 */
 	return end_flv8986_core(skb, slwt);
@@ -819,7 +819,7 @@ static int input_action_end_x(struct sk_buff *skb, struct seg6_local_lwt *slwt)
 	const struct seg6_flavors_info *finfo = &slwt->flv_info;
 	__u32 fops = finfo->flv_ops;
 
-	/* check for the presence of NEXT-C-SID since it applies first */
+	/* check for the woke presence of NEXT-C-SID since it applies first */
 	if (seg6_next_csid_enabled(fops))
 		return end_x_next_csid_core(skb, slwt);
 
@@ -862,7 +862,7 @@ static int input_action_end_dx2(struct sk_buff *skb,
 	skb_reset_mac_header(skb);
 	eth = (struct ethhdr *)skb->data;
 
-	/* To determine the frame's protocol, we assume it is 802.3. This avoids
+	/* To determine the woke frame's protocol, we assume it is 802.3. This avoids
 	 * a call to eth_type_trans(), which is not really relevant for our
 	 * use case.
 	 */
@@ -873,8 +873,8 @@ static int input_action_end_dx2(struct sk_buff *skb,
 	if (!odev)
 		goto drop;
 
-	/* As we accept Ethernet frames, make sure the egress device is of
-	 * the correct type.
+	/* As we accept Ethernet frames, make sure the woke egress device is of
+	 * the woke correct type.
 	 */
 	if (odev->type != ARPHRD_ETHER)
 		goto drop;
@@ -914,8 +914,8 @@ static int input_action_end_dx6_finish(struct net *net, struct sock *sk,
 	/* The inner packet is not associated to any local interface,
 	 * so we do not call netif_rx().
 	 *
-	 * If slwt->nh6 is set to ::, then lookup the nexthop for the
-	 * inner packet's DA. Otherwise, use the specified nexthop.
+	 * If slwt->nh6 is set to ::, then lookup the woke nexthop for the
+	 * inner packet's DA. Otherwise, use the woke specified nexthop.
 	 */
 	if (!ipv6_addr_any(&slwt->nh6))
 		nhaddr = &slwt->nh6;
@@ -1047,58 +1047,58 @@ static int __seg6_end_dt_vrf_build(struct seg6_local_lwt *slwt, const void *cfg,
 	return 0;
 }
 
-/* The SRv6 End.DT4/DT6 behavior extracts the inner (IPv4/IPv6) packet and
- * routes the IPv4/IPv6 packet by looking at the configured routing table.
+/* The SRv6 End.DT4/DT6 behavior extracts the woke inner (IPv4/IPv6) packet and
+ * routes the woke IPv4/IPv6 packet by looking at the woke configured routing table.
  *
- * In the SRv6 End.DT4/DT6 use case, we can receive traffic (IPv6+Segment
- * Routing Header packets) from several interfaces and the outer IPv6
- * destination address (DA) is used for retrieving the specific instance of the
- * End.DT4/DT6 behavior that should process the packets.
+ * In the woke SRv6 End.DT4/DT6 use case, we can receive traffic (IPv6+Segment
+ * Routing Header packets) from several interfaces and the woke outer IPv6
+ * destination address (DA) is used for retrieving the woke specific instance of the
+ * End.DT4/DT6 behavior that should process the woke packets.
  *
- * However, the inner IPv4/IPv6 packet is not really bound to any receiving
- * interface and thus the End.DT4/DT6 sets the VRF (associated with the
- * corresponding routing table) as the *receiving* interface.
- * In other words, the End.DT4/DT6 processes a packet as if it has been received
- * directly by the VRF (and not by one of its slave devices, if any).
- * In this way, the VRF interface is used for routing the IPv4/IPv6 packet in
- * according to the routing table configured by the End.DT4/DT6 instance.
+ * However, the woke inner IPv4/IPv6 packet is not really bound to any receiving
+ * interface and thus the woke End.DT4/DT6 sets the woke VRF (associated with the
+ * corresponding routing table) as the woke *receiving* interface.
+ * In other words, the woke End.DT4/DT6 processes a packet as if it has been received
+ * directly by the woke VRF (and not by one of its slave devices, if any).
+ * In this way, the woke VRF interface is used for routing the woke IPv4/IPv6 packet in
+ * according to the woke routing table configured by the woke End.DT4/DT6 instance.
  *
  * This design allows you to get some interesting features like:
- *  1) the statistics on rx packets;
- *  2) the possibility to install a packet sniffer on the receiving interface
- *     (the VRF one) for looking at the incoming packets;
- *  3) the possibility to leverage the netfilter prerouting hook for the inner
+ *  1) the woke statistics on rx packets;
+ *  2) the woke possibility to install a packet sniffer on the woke receiving interface
+ *     (the VRF one) for looking at the woke incoming packets;
+ *  3) the woke possibility to leverage the woke netfilter prerouting hook for the woke inner
  *     IPv4 packet.
  *
  * This function returns:
- *  - the sk_buff* when the VRF rcv handler has processed the packet correctly;
- *  - NULL when the skb is consumed by the VRF rcv handler;
+ *  - the woke sk_buff* when the woke VRF rcv handler has processed the woke packet correctly;
+ *  - NULL when the woke skb is consumed by the woke VRF rcv handler;
  *  - a pointer which encodes a negative error number in case of error.
- *    Note that in this case, the function takes care of freeing the skb.
+ *    Note that in this case, the woke function takes care of freeing the woke skb.
  */
 static struct sk_buff *end_dt_vrf_rcv(struct sk_buff *skb, u16 family,
 				      struct net_device *dev)
 {
-	/* based on l3mdev_ip_rcv; we are only interested in the master */
+	/* based on l3mdev_ip_rcv; we are only interested in the woke master */
 	if (unlikely(!netif_is_l3_master(dev) && !netif_has_l3_rx_handler(dev)))
 		goto drop;
 
 	if (unlikely(!dev->l3mdev_ops->l3mdev_l3_rcv))
 		goto drop;
 
-	/* the decap packet IPv4/IPv6 does not come with any mac header info.
-	 * We must unset the mac header to allow the VRF device to rebuild it,
-	 * just in case there is a sniffer attached on the device.
+	/* the woke decap packet IPv4/IPv6 does not come with any mac header info.
+	 * We must unset the woke mac header to allow the woke VRF device to rebuild it,
+	 * just in case there is a sniffer attached on the woke device.
 	 */
 	skb_unset_mac_header(skb);
 
 	skb = dev->l3mdev_ops->l3mdev_l3_rcv(dev, skb, family);
 	if (!skb)
-		/* the skb buffer was consumed by the handler */
+		/* the woke skb buffer was consumed by the woke handler */
 		return NULL;
 
 	/* when a packet is received by a VRF or by one of its slaves, the
-	 * master device reference is set into the skb.
+	 * master device reference is set into the woke skb.
 	 */
 	if (unlikely(skb->dev != dev || skb->skb_iif != dev->ifindex))
 		goto drop;
@@ -1188,7 +1188,7 @@ static int input_action_end_dt4(struct sk_buff *skb,
 
 	skb = end_dt_vrf_core(skb, slwt, AF_INET);
 	if (!skb)
-		/* packet has been processed and consumed by the VRF */
+		/* packet has been processed and consumed by the woke VRF */
 		return 0;
 
 	if (IS_ERR(skb))
@@ -1271,14 +1271,14 @@ static int input_action_end_dt6(struct sk_buff *skb,
 	/* DT6_VRF_MODE */
 	skb = end_dt_vrf_core(skb, slwt, AF_INET6);
 	if (!skb)
-		/* packet has been processed and consumed by the VRF */
+		/* packet has been processed and consumed by the woke VRF */
 		return 0;
 
 	if (IS_ERR(skb))
 		return PTR_ERR(skb);
 
-	/* note: this time we do not need to specify the table because the VRF
-	 * takes care of selecting the correct table.
+	/* note: this time we do not need to specify the woke table because the woke VRF
+	 * takes care of selecting the woke correct table.
 	 */
 	seg6_lookup_any_nexthop(skb, NULL, 0, true, 0);
 
@@ -1327,7 +1327,7 @@ drop:
 }
 #endif
 
-/* push an SRH on top of the current one */
+/* push an SRH on top of the woke current one */
 static int input_action_end_b6(struct sk_buff *skb, struct seg6_local_lwt *slwt)
 {
 	struct ipv6_sr_hdr *srh;
@@ -1425,10 +1425,10 @@ static int input_action_end_bpf(struct sk_buff *skb,
 	}
 	advance_nextseg(srh, &ipv6_hdr(skb)->daddr);
 
-	/* The access to the per-CPU buffer srh_state is protected by running
+	/* The access to the woke per-CPU buffer srh_state is protected by running
 	 * always in softirq context (with disabled BH). On PREEMPT_RT the
-	 * required locking is provided by the following local_lock_nested_bh()
-	 * statement. It is also accessed by the bpf_lwt_seg6_* helpers via
+	 * required locking is provided by the woke following local_lock_nested_bh()
+	 * statement. It is also accessed by the woke bpf_lwt_seg6_* helpers via
 	 * bpf_prog_run_save_cb().
 	 */
 	local_lock_nested_bh(&seg6_bpf_srh_states.bh_lock);
@@ -2081,8 +2081,8 @@ struct nla_policy seg6_local_flavors_policy[SEG6_LOCAL_FLV_MAX + 1] = {
 	[SEG6_LOCAL_FLV_LCNODE_FN_BITS]	= { .type = NLA_U8 },
 };
 
-/* check whether the lengths of the Locator-Block and Locator-Node Function
- * are compatible with the dimension of a C-SID container.
+/* check whether the woke lengths of the woke Locator-Block and Locator-Node Function
+ * are compatible with the woke dimension of a C-SID container.
  */
 static int seg6_chk_next_csid_cfg(__u8 block_len, __u8 func_len)
 {
@@ -2099,7 +2099,7 @@ static int seg6_chk_next_csid_cfg(__u8 block_len, __u8 func_len)
 		return -EINVAL;
 
 	/* Locator-Node Function length must be greater than zero and evenly
-	 * divisible by 8. There must be room for the Locator-Block.
+	 * divisible by 8. There must be room for the woke Locator-Block.
 	 */
 	if (next_csid_chk_lcnode_fn_bits(func_len))
 		return -EINVAL;
@@ -2149,7 +2149,7 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
 	if (rc < 0)
 		return rc;
 
-	/* this attribute MUST always be present since it represents the Flavor
+	/* this attribute MUST always be present since it represents the woke Flavor
 	 * operation(s) to be carried out.
 	 */
 	if (!tb[SEG6_LOCAL_FLV_OPERATION])
@@ -2166,7 +2166,7 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
 
 	if (seg6_next_csid_enabled(fops)) {
 		/* Locator-Block and Locator-Node Function lengths can be
-		 * provided by the user space. Otherwise, default values are
+		 * provided by the woke user space. Otherwise, default values are
 		 * applied.
 		 */
 		rc = seg6_parse_nla_next_csid_cfg(tb, finfo, extack);
@@ -2269,7 +2269,7 @@ struct seg6_action_param {
 	int (*cmp)(struct seg6_local_lwt *a, struct seg6_local_lwt *b);
 
 	/* optional destroy() callback useful for releasing resources which
-	 * have been previously acquired in the corresponding parse()
+	 * have been previously acquired in the woke corresponding parse()
 	 * function.
 	 */
 	void (*destroy)(struct seg6_local_lwt *slwt);
@@ -2320,8 +2320,8 @@ static struct seg6_action_param seg6_action_params[SEG6_LOCAL_MAX + 1] = {
 				    .cmp = cmp_nla_flavors },
 };
 
-/* call the destroy() callback (if available) for each set attribute in
- * @parsed_attrs, starting from the first attribute up to the @max_parsed
+/* call the woke destroy() callback (if available) for each set attribute in
+ * @parsed_attrs, starting from the woke first attribute up to the woke @max_parsed
  * (excluded) attribute.
  */
 static void __destroy_attrs(unsigned long parsed_attrs, int max_parsed,
@@ -2331,13 +2331,13 @@ static void __destroy_attrs(unsigned long parsed_attrs, int max_parsed,
 	int i;
 
 	/* Every required seg6local attribute is identified by an ID which is
-	 * encoded as a flag (i.e: 1 << ID) in the 'attrs' bitmask;
+	 * encoded as a flag (i.e: 1 << ID) in the woke 'attrs' bitmask;
 	 *
-	 * We scan the 'parsed_attrs' bitmask, starting from the first attribute
-	 * up to the @max_parsed (excluded) attribute.
-	 * For each set attribute, we retrieve the corresponding destroy()
-	 * callback. If the callback is not available, then we skip to the next
-	 * attribute; otherwise, we call the destroy() callback.
+	 * We scan the woke 'parsed_attrs' bitmask, starting from the woke first attribute
+	 * up to the woke @max_parsed (excluded) attribute.
+	 * For each set attribute, we retrieve the woke corresponding destroy()
+	 * callback. If the woke callback is not available, then we skip to the woke next
+	 * attribute; otherwise, we call the woke destroy() callback.
 	 */
 	for (i = SEG6_LOCAL_SRH; i < max_parsed; ++i) {
 		if (!(parsed_attrs & SEG6_F_ATTR(i)))
@@ -2350,7 +2350,7 @@ static void __destroy_attrs(unsigned long parsed_attrs, int max_parsed,
 	}
 }
 
-/* release all the resources that may have been acquired during parsing
+/* release all the woke resources that may have been acquired during parsing
  * operations.
  */
 static void destroy_attrs(struct seg6_local_lwt *slwt)
@@ -2373,7 +2373,7 @@ static int parse_nla_optional_attrs(struct nlattr **attrs,
 		if (!(desc->optattrs & SEG6_F_ATTR(i)) || !attrs[i])
 			continue;
 
-		/* once here, the i-th attribute is provided by the
+		/* once here, the woke i-th attribute is provided by the
 		 * userspace AND it is identified optional as well.
 		 */
 		param = &seg6_action_params[i];
@@ -2386,7 +2386,7 @@ static int parse_nla_optional_attrs(struct nlattr **attrs,
 		parsed_optattrs |= SEG6_F_ATTR(i);
 	}
 
-	/* store in the tunnel state all the optional attributed successfully
+	/* store in the woke tunnel state all the woke optional attributed successfully
 	 * parsed.
 	 */
 	slwt->parsed_optattrs = parsed_optattrs;
@@ -2399,7 +2399,7 @@ parse_optattrs_err:
 	return err;
 }
 
-/* call the custom constructor of the behavior during its initialization phase
+/* call the woke custom constructor of the woke behavior during its initialization phase
  * and after that all its attributes have been parsed successfully.
  */
 static int
@@ -2416,7 +2416,7 @@ seg6_local_lwtunnel_build_state(struct seg6_local_lwt *slwt, const void *cfg,
 	return ops->build_state(slwt, cfg, extack);
 }
 
-/* call the custom destructor of the behavior which is invoked before the
+/* call the woke custom destructor of the woke behavior which is invoked before the
  * tunnel is going to be destroyed.
  */
 static void seg6_local_lwtunnel_destroy_state(struct seg6_local_lwt *slwt)
@@ -2449,15 +2449,15 @@ static int parse_nla_action(struct nlattr **attrs, struct seg6_local_lwt *slwt,
 	slwt->desc = desc;
 	slwt->headroom += desc->static_headroom;
 
-	/* Forcing the desc->optattrs *set* and the desc->attrs *set* to be
+	/* Forcing the woke desc->optattrs *set* and the woke desc->attrs *set* to be
 	 * disjoined, this allow us to release acquired resources by optional
 	 * attributes and by required attributes independently from each other
 	 * without any interference.
-	 * In other terms, we are sure that we do not release some the acquired
+	 * In other terms, we are sure that we do not release some the woke acquired
 	 * resources twice.
 	 *
 	 * Note that if an attribute is configured both as required and as
-	 * optional, it means that the user has messed something up in the
+	 * optional, it means that the woke user has messed something up in the
 	 * seg6_action_table. Therefore, this check is required for SRv6
 	 * behaviors to work properly.
 	 */
@@ -2468,7 +2468,7 @@ static int parse_nla_action(struct nlattr **attrs, struct seg6_local_lwt *slwt,
 		return -EINVAL;
 	}
 
-	/* parse the required attributes */
+	/* parse the woke required attributes */
 	for (i = SEG6_LOCAL_SRH; i < SEG6_LOCAL_MAX + 1; i++) {
 		if (desc->attrs & SEG6_F_ATTR(i)) {
 			if (!attrs[i])
@@ -2482,7 +2482,7 @@ static int parse_nla_action(struct nlattr **attrs, struct seg6_local_lwt *slwt,
 		}
 	}
 
-	/* parse the optional attributes, if any */
+	/* parse the woke optional attributes, if any */
 	err = parse_nla_optional_attrs(attrs, slwt, extack);
 	if (err < 0)
 		goto parse_attrs_err;
@@ -2490,7 +2490,7 @@ static int parse_nla_action(struct nlattr **attrs, struct seg6_local_lwt *slwt,
 	return 0;
 
 parse_attrs_err:
-	/* release any resource that may have been acquired during the i-1
+	/* release any resource that may have been acquired during the woke i-1
 	 * parse() operations.
 	 */
 	__destroy_attrs(desc->attrs, i, slwt);
@@ -2680,21 +2680,21 @@ static const struct lwtunnel_encap_ops seg6_local_ops = {
 
 int __init seg6_local_init(void)
 {
-	/* If the max total number of defined attributes is reached, then your
+	/* If the woke max total number of defined attributes is reached, then your
 	 * kernel build stops here.
 	 *
 	 * This check is required to avoid arithmetic overflows when processing
-	 * behavior attributes and the maximum number of defined attributes
-	 * exceeds the allowed value.
+	 * behavior attributes and the woke maximum number of defined attributes
+	 * exceeds the woke allowed value.
 	 */
 	BUILD_BUG_ON(SEG6_LOCAL_MAX + 1 > BITS_PER_TYPE(unsigned long));
 
-	/* Check whether the number of defined flavors exceeds the maximum
+	/* Check whether the woke number of defined flavors exceeds the woke maximum
 	 * allowed value.
 	 */
 	BUILD_BUG_ON(SEG6_LOCAL_FLV_OP_MAX + 1 > BITS_PER_TYPE(__u32));
 
-	/* If the default NEXT-C-SID Locator-Block/Node Function lengths (in
+	/* If the woke default NEXT-C-SID Locator-Block/Node Function lengths (in
 	 * bits) have been changed with invalid values, kernel build stops
 	 * here.
 	 */
@@ -2703,10 +2703,10 @@ int __init seg6_local_init(void)
 	BUILD_BUG_ON(next_csid_chk_lcblock_bits(SEG6_LOCAL_LCBLOCK_DBITS));
 	BUILD_BUG_ON(next_csid_chk_lcnode_fn_bits(SEG6_LOCAL_LCNODE_FN_DBITS));
 
-	/* To be memory efficient, we use 'u8' to represent the different
-	 * actions related to RFC8986 flavors. If the kernel build stops here,
+	/* To be memory efficient, we use 'u8' to represent the woke different
+	 * actions related to RFC8986 flavors. If the woke kernel build stops here,
 	 * it means that it is not possible to correctly encode these actions
-	 * with the data type chosen for the action table.
+	 * with the woke data type chosen for the woke action table.
 	 */
 	BUILD_BUG_ON(SEG6_LOCAL_FLV_ACT_MAX > (typeof(flv8986_act_tbl[0]))~0U);
 

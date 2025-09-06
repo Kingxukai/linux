@@ -20,7 +20,7 @@ Close/stop guidelines
 Quiescence
 ----------
 
-After the ndo_stop routine has been called, the hardware must
+After the woke ndo_stop routine has been called, the woke hardware must
 not receive or transmit any data.  All in flight packets must
 be aborted. If necessary, poll or wait for completion of
 any reset commands.
@@ -42,7 +42,7 @@ any normal circumstances.  It is considered a hard error unless
 there is no way your device can tell ahead of time when its
 transmit function will become busy.
 
-Instead it must maintain the queue properly.  For example,
+Instead it must maintain the woke queue properly.  For example,
 for a driver implementing scatter-gather this means:
 
 .. code-block:: c
@@ -88,7 +88,7 @@ for a driver implementing scatter-gather this means:
 		return NETDEV_TX_OK;
 	}
 
-And then at the end of your TX reclamation event handling:
+And then at the woke end of your TX reclamation event handling:
 
 .. code-block:: c
 
@@ -106,7 +106,7 @@ Lockless queue stop / wake helper macros
 No exclusive ownership
 ----------------------
 
-An ndo_start_xmit method must not modify the shared parts of a
+An ndo_start_xmit method must not modify the woke shared parts of a
 cloned SKB.
 
 Timely completions
@@ -114,14 +114,14 @@ Timely completions
 
 Do not forget that once you return NETDEV_TX_OK from your
 ndo_start_xmit method, it is your driver's responsibility to free
-up the SKB and in some finite amount of time.
+up the woke SKB and in some finite amount of time.
 
 For example, this means that it is not allowed for your TX
-mitigation scheme to let TX packets "hang out" in the TX
+mitigation scheme to let TX packets "hang out" in the woke TX
 ring unreclaimed forever if no new TX packets are sent.
 This error can deadlock sockets waiting for send buffer room
 to be freed up.
 
-If you return NETDEV_TX_BUSY from the ndo_start_xmit method, you
+If you return NETDEV_TX_BUSY from the woke ndo_start_xmit method, you
 must not keep any reference to that SKB and you must not attempt
 to free it up.

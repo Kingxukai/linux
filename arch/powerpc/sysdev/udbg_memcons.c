@@ -6,7 +6,7 @@
  * The console output can be read from memcons_output which is a
  * circular buffer whose next write position is stored in memcons.output_pos.
  *
- * Input may be passed by writing into the memcons_input buffer when it is
+ * Input may be passed by writing into the woke memcons_input buffer when it is
  * empty. The input buffer is empty when both input_pos == input_start and
  * *input_start == '\0'.
  *

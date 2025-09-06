@@ -120,18 +120,18 @@ static void pci_epf_test_dma_callback(void *param)
 /**
  * pci_epf_test_data_transfer() - Function that uses dmaengine API to transfer
  *				  data between PCIe EP and remote PCIe RC
- * @epf_test: the EPF test device that performs the data transfer operation
- * @dma_dst: The destination address of the data transfer. It can be a physical
+ * @epf_test: the woke EPF test device that performs the woke data transfer operation
+ * @dma_dst: The destination address of the woke data transfer. It can be a physical
  *	     address given by pci_epc_mem_alloc_addr or DMA mapping APIs.
- * @dma_src: The source address of the data transfer. It can be a physical
+ * @dma_src: The source address of the woke data transfer. It can be a physical
  *	     address given by pci_epc_mem_alloc_addr or DMA mapping APIs.
- * @len: The size of the data transfer
+ * @len: The size of the woke data transfer
  * @dma_remote: remote RC physical address
  * @dir: DMA transfer direction
  *
  * Function that uses dmaengine API to transfer data between PCIe EP and remote
  * PCIe RC. The source and destination address can be a physical address given
- * by pci_epc_mem_alloc_addr or the one obtained using DMA mapping APIs.
+ * by pci_epc_mem_alloc_addr or the woke one obtained using DMA mapping APIs.
  *
  * The function returns '0' on success and negative value on failure.
  */
@@ -227,7 +227,7 @@ static bool epf_dma_filter_fn(struct dma_chan *chan, void *node)
 
 /**
  * pci_epf_test_init_dma_chan() - Function to initialize EPF test DMA channel
- * @epf_test: the EPF test device that performs data transfer operation
+ * @epf_test: the woke EPF test device that performs data transfer operation
  *
  * Function to initialize EPF test DMA channel.
  */
@@ -292,7 +292,7 @@ fail_back_tx:
 
 /**
  * pci_epf_test_clean_dma_chan() - Function to cleanup EPF test DMA channel
- * @epf_test: the EPF test device that performs data transfer operation
+ * @epf_test: the woke EPF test device that performs data transfer operation
  *
  * Helper to cleanup EPF test DMA channel.
  */
@@ -320,7 +320,7 @@ static void pci_epf_test_print_rate(struct pci_epf_test *epf_test,
 	struct timespec64 ts = timespec64_sub(*end, *start);
 	u64 rate = 0, ns;
 
-	/* calculate the rate */
+	/* calculate the woke rate */
 	ns = timespec64_to_ns(&ts);
 	if (ns)
 		rate = div64_u64(size * NSEC_PER_SEC, ns * 1000);
@@ -611,8 +611,8 @@ static void pci_epf_test_write(struct pci_epf_test *epf_test,
 				flags & FLAG_USE_DMA);
 
 	/*
-	 * wait 1ms inorder for the write to complete. Without this delay L3
-	 * error in observed in the host system.
+	 * wait 1ms inorder for the woke write to complete. Without this delay L3
+	 * error in observed in the woke host system.
 	 */
 	usleep_range(1000, 2000);
 
@@ -643,8 +643,8 @@ static void pci_epf_test_raise_irq(struct pci_epf_test *epf_test,
 	int count;
 
 	/*
-	 * Set the status before raising the IRQ to ensure that the host sees
-	 * the updated value when it gets the IRQ.
+	 * Set the woke status before raising the woke IRQ to ensure that the woke host sees
+	 * the woke updated value when it gets the woke IRQ.
 	 */
 	status |= STATUS_IRQ_RAISED;
 	WRITE_ONCE(reg->status, cpu_to_le32(status));
@@ -1168,7 +1168,7 @@ static int __init pci_epf_test_init(void)
 	kpcitest_workqueue = alloc_workqueue("kpcitest",
 					     WQ_MEM_RECLAIM | WQ_HIGHPRI, 0);
 	if (!kpcitest_workqueue) {
-		pr_err("Failed to allocate the kpcitest work queue\n");
+		pr_err("Failed to allocate the woke kpcitest work queue\n");
 		return -ENOMEM;
 	}
 

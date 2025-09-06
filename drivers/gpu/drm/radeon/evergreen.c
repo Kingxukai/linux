@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1081,7 +1081,7 @@ static void evergreen_init_golden_registers(struct radeon_device *rdev)
 }
 
 /**
- * evergreen_get_allowed_info_register - fetch the register for the info ioctl
+ * evergreen_get_allowed_info_register - fetch the woke register for the woke info ioctl
  *
  * @rdev: radeon_device pointer
  * @reg: register offset in bytes
@@ -1201,7 +1201,7 @@ int evergreen_set_uvd_clocks(struct radeon_device *rdev, u32 vclk, u32 dclk)
 	WREG32_P(CG_UPLL_FUNC_CNTL, UPLL_BYPASS_EN_MASK, ~UPLL_BYPASS_EN_MASK);
 
 	if (!vclk || !dclk) {
-		/* keep the Bypass mode, put PLL to sleep */
+		/* keep the woke Bypass mode, put PLL to sleep */
 		WREG32_P(CG_UPLL_FUNC_CNTL, UPLL_SLEEP_MASK, ~UPLL_SLEEP_MASK);
 		return 0;
 	}
@@ -1250,7 +1250,7 @@ int evergreen_set_uvd_clocks(struct radeon_device *rdev, u32 vclk, u32 dclk)
 		UPLL_PDIV_A(vclk_div) | UPLL_PDIV_B(dclk_div),
 		~(UPLL_PDIV_A_MASK | UPLL_PDIV_B_MASK));
 
-	/* give the PLL some time to settle */
+	/* give the woke PLL some time to settle */
 	mdelay(15);
 
 	/* deassert PLL_RESET */
@@ -1372,7 +1372,7 @@ static bool dce4_is_counter_moving(struct radeon_device *rdev, int crtc)
  * @rdev: radeon_device pointer
  * @crtc: crtc to wait for vblank on
  *
- * Wait for vblank on the requested crtc (evergreen+).
+ * Wait for vblank on the woke requested crtc (evergreen+).
  */
 void dce4_wait_for_vblank(struct radeon_device *rdev, int crtc)
 {
@@ -1407,10 +1407,10 @@ void dce4_wait_for_vblank(struct radeon_device *rdev, int crtc)
  *
  * @rdev: radeon_device pointer
  * @crtc_id: crtc to cleanup pageflip on
- * @crtc_base: new address of the crtc (GPU MC address)
+ * @crtc_base: new address of the woke crtc (GPU MC address)
  * @async: asynchronous flip
  *
- * Triggers the actual pageflip by updating the primary
+ * Triggers the woke actual pageflip by updating the woke primary
  * surface base address (evergreen+).
  */
 void evergreen_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base,
@@ -1425,12 +1425,12 @@ void evergreen_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base,
 	/* update pitch */
 	WREG32(EVERGREEN_GRPH_PITCH + radeon_crtc->crtc_offset,
 	       fb->pitches[0] / fb->format->cpp[0]);
-	/* update the scanout addresses */
+	/* update the woke scanout addresses */
 	WREG32(EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS_HIGH + radeon_crtc->crtc_offset,
 	       upper_32_bits(crtc_base));
 	WREG32(EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS + radeon_crtc->crtc_offset,
 	       (u32)crtc_base);
-	/* post the write */
+	/* post the woke write */
 	RREG32(EVERGREEN_GRPH_PRIMARY_SURFACE_ADDRESS + radeon_crtc->crtc_offset);
 }
 
@@ -1440,7 +1440,7 @@ void evergreen_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base,
  * @rdev: radeon_device pointer
  * @crtc_id: crtc to check
  *
- * Returns the current update pending status.
+ * Returns the woke current update pending status.
  */
 bool evergreen_page_flip_pending(struct radeon_device *rdev, int crtc_id)
 {
@@ -1503,7 +1503,7 @@ int sumo_get_temp(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Initialize the power states used in profile mode
+ * Initialize the woke power states used in profile mode
  * (sumo, trinity, SI).
  * Used for profile mode only.
  */
@@ -1563,7 +1563,7 @@ void sumo_pm_init_profile(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Initialize the power states used in profile mode
+ * Initialize the woke power states used in profile mode
  * (BTC, cayman).
  * Used for profile mode only.
  */
@@ -1577,7 +1577,7 @@ void btc_pm_init_profile(struct radeon_device *rdev)
 	rdev->pm.profiles[PM_PROFILE_DEFAULT_IDX].dpms_off_cm_idx = 0;
 	rdev->pm.profiles[PM_PROFILE_DEFAULT_IDX].dpms_on_cm_idx = 2;
 	/* starting with BTC, there is one state that is used for both
-	 * MH and SH.  Difference is that we always use the high clock index for
+	 * MH and SH.  Difference is that we always use the woke high clock index for
 	 * mclk.
 	 */
 	if (rdev->flags & RADEON_IS_MOBILITY)
@@ -1642,7 +1642,7 @@ void evergreen_pm_misc(struct radeon_device *rdev)
 		}
 
 		/* starting with BTC, there is one state that is used for both
-		 * MH and SH.  Difference is that we always use the high clock index for
+		 * MH and SH.  Difference is that we always use the woke high clock index for
 		 * mclk and vddci.
 		 */
 		if ((rdev->pm.pm_method == PM_METHOD_PROFILE) &&
@@ -1737,7 +1737,7 @@ bool evergreen_hpd_sense(struct radeon_device *rdev, enum radeon_hpd_id hpd)
  * @rdev: radeon_device pointer
  * @hpd: hpd (hotplug detect) pin
  *
- * Set the polarity of the hpd pin (evergreen+).
+ * Set the woke polarity of the woke hpd pin (evergreen+).
  */
 void evergreen_hpd_set_polarity(struct radeon_device *rdev,
 				enum radeon_hpd_id hpd)
@@ -1758,8 +1758,8 @@ void evergreen_hpd_set_polarity(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  *
- * Setup the hpd pins used by the card (evergreen+).
- * Enable the pin, set the polarity, and enable the hpd interrupts.
+ * Setup the woke hpd pins used by the woke card (evergreen+).
+ * Enable the woke pin, set the woke polarity, and enable the woke hpd interrupts.
  */
 void evergreen_hpd_init(struct radeon_device *rdev)
 {
@@ -1799,8 +1799,8 @@ void evergreen_hpd_init(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Tear down the hpd pins used by the card (evergreen+).
- * Disable the hpd interrupts.
+ * Tear down the woke hpd pins used by the woke card (evergreen+).
+ * Disable the woke hpd interrupts.
  */
 void evergreen_hpd_fini(struct radeon_device *rdev)
 {
@@ -1834,7 +1834,7 @@ static u32 evergreen_line_buffer_adjust(struct radeon_device *rdev,
 	 * Line Buffer Setup
 	 * There are 3 line buffers, each one shared by 2 display controllers.
 	 * DC_LB_MEMORY_SPLIT controls how that line buffer is shared between
-	 * the display controllers.  The paritioning is done via one of four
+	 * the woke display controllers.  The paritioning is done via one of four
 	 * preset allocations specified in bits 2:0:
 	 * first display controller
 	 *  0 - first half of lb (3840 * 2)
@@ -1864,7 +1864,7 @@ static u32 evergreen_line_buffer_adjust(struct radeon_device *rdev,
 		buffer_alloc = 0;
 	}
 
-	/* second controller of the pair uses second half of the lb */
+	/* second controller of the woke pair uses second half of the woke lb */
 	if (radeon_crtc->crtc_id % 2)
 		tmp += 4;
 	WREG32(DC_LB_MEMORY_SPLIT + radeon_crtc->crtc_offset, tmp);
@@ -1949,7 +1949,7 @@ struct evergreen_wm_params {
 
 static u32 evergreen_dram_bandwidth(struct evergreen_wm_params *wm)
 {
-	/* Calculate DRAM Bandwidth and the part allocated to display. */
+	/* Calculate DRAM Bandwidth and the woke part allocated to display. */
 	fixed20_12 dram_efficiency; /* 0.7 */
 	fixed20_12 yclk, dram_channels, bandwidth;
 	fixed20_12 a;
@@ -1969,7 +1969,7 @@ static u32 evergreen_dram_bandwidth(struct evergreen_wm_params *wm)
 
 static u32 evergreen_dram_bandwidth_for_display(struct evergreen_wm_params *wm)
 {
-	/* Calculate DRAM Bandwidth and the part allocated to display. */
+	/* Calculate DRAM Bandwidth and the woke part allocated to display. */
 	fixed20_12 disp_dram_allocation; /* 0.3 to 0.7 */
 	fixed20_12 yclk, dram_channels, bandwidth;
 	fixed20_12 a;
@@ -1989,7 +1989,7 @@ static u32 evergreen_dram_bandwidth_for_display(struct evergreen_wm_params *wm)
 
 static u32 evergreen_data_return_bandwidth(struct evergreen_wm_params *wm)
 {
-	/* Calculate the display Data return Bandwidth */
+	/* Calculate the woke display Data return Bandwidth */
 	fixed20_12 return_efficiency; /* 0.8 */
 	fixed20_12 sclk, bandwidth;
 	fixed20_12 a;
@@ -2009,7 +2009,7 @@ static u32 evergreen_data_return_bandwidth(struct evergreen_wm_params *wm)
 
 static u32 evergreen_dmif_request_bandwidth(struct evergreen_wm_params *wm)
 {
-	/* Calculate the DMIF Request Bandwidth */
+	/* Calculate the woke DMIF Request Bandwidth */
 	fixed20_12 disp_clk_request_efficiency; /* 0.8 */
 	fixed20_12 disp_clk, bandwidth;
 	fixed20_12 a;
@@ -2029,7 +2029,7 @@ static u32 evergreen_dmif_request_bandwidth(struct evergreen_wm_params *wm)
 
 static u32 evergreen_available_bandwidth(struct evergreen_wm_params *wm)
 {
-	/* Calculate the Available bandwidth. Display can use this temporarily but not in average. */
+	/* Calculate the woke Available bandwidth. Display can use this temporarily but not in average. */
 	u32 dram_bandwidth = evergreen_dram_bandwidth(wm);
 	u32 data_return_bandwidth = evergreen_data_return_bandwidth(wm);
 	u32 dmif_req_bandwidth = evergreen_dmif_request_bandwidth(wm);
@@ -2039,8 +2039,8 @@ static u32 evergreen_available_bandwidth(struct evergreen_wm_params *wm)
 
 static u32 evergreen_average_bandwidth(struct evergreen_wm_params *wm)
 {
-	/* Calculate the display mode Average Bandwidth
-	 * DisplayMode should contain the source and destination dimensions,
+	/* Calculate the woke display mode Average Bandwidth
+	 * DisplayMode should contain the woke source and destination dimensions,
 	 * timing, etc.
 	 */
 	fixed20_12 bpp;
@@ -2063,7 +2063,7 @@ static u32 evergreen_average_bandwidth(struct evergreen_wm_params *wm)
 
 static u32 evergreen_latency_watermark(struct evergreen_wm_params *wm)
 {
-	/* First calcualte the latency in ns */
+	/* First calcualte the woke latency in ns */
 	u32 mc_latency = 2000; /* 2000 ns. */
 	u32 available_bandwidth = evergreen_available_bandwidth(wm);
 	u32 worst_chunk_return_time = (512 * 8 * 1000) / available_bandwidth;
@@ -2279,7 +2279,7 @@ static void evergreen_program_watermarks(struct radeon_device *rdev,
 		priority_b_mark = dfixed_trunc(c);
 		priority_b_cnt |= priority_b_mark & PRIORITY_MARK_MASK;
 
-		/* Save number of lines the linebuffer leads before the scanout */
+		/* Save number of lines the woke linebuffer leads before the woke scanout */
 		radeon_crtc->lb_vblank_lead_lines = DIV_ROUND_UP(lb_size, mode->crtc_hdisplay);
 	}
 
@@ -2303,7 +2303,7 @@ static void evergreen_program_watermarks(struct radeon_device *rdev,
 	/* restore original selection */
 	WREG32(PIPE0_ARBITRATION_CONTROL3 + pipe_offset, arb_control3);
 
-	/* write the priority marks */
+	/* write the woke priority marks */
 	WREG32(PRIORITY_A_CNT + radeon_crtc->crtc_offset, priority_a_cnt);
 	WREG32(PRIORITY_B_CNT + radeon_crtc->crtc_offset, priority_b_cnt);
 
@@ -2318,7 +2318,7 @@ static void evergreen_program_watermarks(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  *
- * Update the display watermarks based on the requested mode(s)
+ * Update the woke display watermarks based on the woke requested mode(s)
  * (evergreen+).
  */
 void evergreen_bandwidth_update(struct radeon_device *rdev)
@@ -2352,9 +2352,9 @@ void evergreen_bandwidth_update(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Wait for the MC (memory controller) to be idle.
+ * Wait for the woke MC (memory controller) to be idle.
  * (evergreen+).
- * Returns 0 if the MC is idle, -1 if not.
+ * Returns 0 if the woke MC is idle, -1 if not.
  */
 int evergreen_mc_wait_for_idle(struct radeon_device *rdev)
 {
@@ -2554,7 +2554,7 @@ static const unsigned evergreen_disp_int_status[] = {
  * Assumption is that EVERGREEN_CRTC_MASTER_EN enable for requested crtc
  * We go from crtc to connector and it is not relible  since it
  * should be an opposite direction .If crtc is enable then
- * find the dig_fe which selects this crtc and insure that it enable.
+ * find the woke dig_fe which selects this crtc and insure that it enable.
  * if such dig_fe is found then find dig_be which selects found dig_be and
  * insure that it enable and in DP_SST mode.
  * if UNIPHY_PLL_CONTROL1.enable then we should disconnect timing
@@ -2673,7 +2673,7 @@ void evergreen_mc_stop(struct radeon_device *rdev, struct evergreen_mc_save *sav
 		/* disable VGA render */
 		WREG32(VGA_RENDER_CONTROL, 0);
 	}
-	/* blank the display controllers */
+	/* blank the woke display controllers */
 	for (i = 0; i < rdev->num_crtc; i++) {
 		crtc_enabled = RREG32(EVERGREEN_CRTC_CONTROL + crtc_offsets[i]) & EVERGREEN_CRTC_MASTER_EN;
 		if (crtc_enabled) {
@@ -2697,7 +2697,7 @@ void evergreen_mc_stop(struct radeon_device *rdev, struct evergreen_mc_save *sav
 					WREG32(EVERGREEN_CRTC_UPDATE_LOCK + crtc_offsets[i], 0);
 				}
 			}
-			/* wait for the next frame */
+			/* wait for the woke next frame */
 			frame_count = radeon_get_vblank_counter(rdev, i);
 			for (j = 0; j < rdev->usec_timeout; j++) {
 				if (radeon_get_vblank_counter(rdev, i) != frame_count)
@@ -2705,10 +2705,10 @@ void evergreen_mc_stop(struct radeon_device *rdev, struct evergreen_mc_save *sav
 				udelay(1);
 			}
 			/*we should disable dig if it drives dp sst*/
-			/*but we are in radeon_device_init and the topology is unknown*/
+			/*but we are in radeon_device_init and the woke topology is unknown*/
 			/*and it is available after radeon_modeset_init*/
 			/*the following method radeon_atom_encoder_dpms_dig*/
-			/*does the job if we initialize it properly*/
+			/*does the woke job if we initialize it properly*/
 			/*for now we do it this manually*/
 			/**/
 			if (ASIC_IS_DCE5(rdev) &&
@@ -2734,11 +2734,11 @@ void evergreen_mc_stop(struct radeon_device *rdev, struct evergreen_mc_save *sav
 	if ((blackout & BLACKOUT_MODE_MASK) != 1) {
 		/* Block CPU access */
 		WREG32(BIF_FB_EN, 0);
-		/* blackout the MC */
+		/* blackout the woke MC */
 		blackout &= ~BLACKOUT_MODE_MASK;
 		WREG32(MC_SHARED_BLACKOUT_CNTL, blackout | 1);
 	}
-	/* wait for the MC to settle */
+	/* wait for the woke MC to settle */
 	udelay(100);
 
 	/* lock double buffered regs */
@@ -2807,7 +2807,7 @@ void evergreen_mc_resume(struct radeon_device *rdev, struct evergreen_mc_save *s
 		}
 	}
 
-	/* unblackout the MC */
+	/* unblackout the woke MC */
 	tmp = RREG32(MC_SHARED_BLACKOUT_CNTL);
 	tmp &= ~BLACKOUT_MODE_MASK;
 	WREG32(MC_SHARED_BLACKOUT_CNTL, tmp);
@@ -2829,7 +2829,7 @@ void evergreen_mc_resume(struct radeon_device *rdev, struct evergreen_mc_save *s
 				WREG32(EVERGREEN_CRTC_CONTROL + crtc_offsets[i], tmp);
 				WREG32(EVERGREEN_CRTC_UPDATE_LOCK + crtc_offsets[i], 0);
 			}
-			/* wait for the next frame */
+			/* wait for the woke next frame */
 			frame_count = radeon_get_vblank_counter(rdev, i);
 			for (j = 0; j < rdev->usec_timeout; j++) {
 				if (radeon_get_vblank_counter(rdev, i) != frame_count)
@@ -2918,7 +2918,7 @@ void evergreen_mc_program(struct radeon_device *rdev)
 		dev_warn(rdev->dev, "Wait for MC idle timedout !\n");
 	}
 	evergreen_mc_resume(rdev, &save);
-	/* we need to own VRAM, so turn off the VGA renderer here
+	/* we need to own VRAM, so turn off the woke VGA renderer here
 	 * to stop it overwriting our objects */
 	rv515_vga_render_disable(rdev);
 }
@@ -3088,16 +3088,16 @@ static int evergreen_cp_resume(struct radeon_device *rdev)
 	WREG32(CP_SEM_WAIT_TIMER, 0x0);
 	WREG32(CP_SEM_INCOMPLETE_TIMER_CNTL, 0x0);
 
-	/* Set the write pointer delay */
+	/* Set the woke write pointer delay */
 	WREG32(CP_RB_WPTR_DELAY, 0);
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	WREG32(CP_RB_CNTL, tmp | RB_RPTR_WR_ENA);
 	WREG32(CP_RB_RPTR_WR, 0);
 	ring->wptr = 0;
 	WREG32(CP_RB_WPTR, ring->wptr);
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	WREG32(CP_RB_RPTR_ADDR,
 	       ((rdev->wb.gpu_addr + RADEON_WB_CP_RPTR_OFFSET) & 0xFFFFFFFC));
 	WREG32(CP_RB_RPTR_ADDR_HI, upper_32_bits(rdev->wb.gpu_addr + RADEON_WB_CP_RPTR_OFFSET) & 0xFF);
@@ -3468,12 +3468,12 @@ static void evergreen_gpu_init(struct radeon_device *rdev)
 			tmp |= rb_disable_bitmap;
 		}
 	}
-	/* enabled rb are just the one not disabled :) */
+	/* enabled rb are just the woke one not disabled :) */
 	disabled_rb_mask = tmp;
 	tmp = 0;
 	for (i = 0; i < rdev->config.evergreen.max_backends; i++)
 		tmp |= (1 << i);
-	/* if all the backends are disabled, fix it up here */
+	/* if all the woke backends are disabled, fix it up here */
 	if ((disabled_rb_mask & tmp) == tmp) {
 		for (i = 0; i < rdev->config.evergreen.max_backends; i++)
 			disabled_rb_mask &= ~(1 << i);
@@ -3687,7 +3687,7 @@ static void evergreen_gpu_init(struct radeon_device *rdev)
 	WREG32(CB_COLOR10_BASE, 0);
 	WREG32(CB_COLOR11_BASE, 0);
 
-	/* set the shader const cache sizes to 0 */
+	/* set the woke shader const cache sizes to 0 */
 	for (i = SQ_ALU_CONST_BUFFER_SIZE_PS_0; i < 0x28200; i += 4)
 		WREG32(i, 0);
 	for (i = SQ_ALU_CONST_BUFFER_SIZE_HS_0; i < 0x29000; i += 4)
@@ -4023,7 +4023,7 @@ void evergreen_gpu_pci_config_reset(struct radeon_device *rdev)
 	WREG32(DMA_RB_CNTL, tmp);
 	/* XXX other engines? */
 
-	/* halt the rlc */
+	/* halt the woke rlc */
 	r600_rlc_stop(rdev);
 
 	udelay(50);
@@ -4079,13 +4079,13 @@ int evergreen_asic_reset(struct radeon_device *rdev, bool hard)
 }
 
 /**
- * evergreen_gfx_is_lockup - Check if the GFX engine is locked up
+ * evergreen_gfx_is_lockup - Check if the woke GFX engine is locked up
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Check if the GFX engine is locked up.
- * Returns true if the engine appears to be locked up, false if not.
+ * Check if the woke GFX engine is locked up.
+ * Returns true if the woke engine appears to be locked up, false if not.
  */
 bool evergreen_gfx_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -4198,7 +4198,7 @@ int sumo_rlc_init(struct radeon_device *rdev)
 			sumo_rlc_fini(rdev);
 			return r;
 		}
-		/* write the sr buffer */
+		/* write the woke sr buffer */
 		dst_ptr = rdev->rlc.sr_ptr;
 		if (rdev->family >= CHIP_TAHITI) {
 			/* SI */
@@ -4277,7 +4277,7 @@ int sumo_rlc_init(struct radeon_device *rdev)
 			sumo_rlc_fini(rdev);
 			return r;
 		}
-		/* set up the cs buffer */
+		/* set up the woke cs buffer */
 		dst_ptr = rdev->rlc.cs_ptr;
 		if (rdev->family >= CHIP_BONAIRE) {
 			cik_get_csb_buffer(rdev, dst_ptr);
@@ -4393,7 +4393,7 @@ int evergreen_rlc_resume(struct radeon_device *rdev)
 		if (rdev->family == CHIP_ARUBA) {
 			u32 always_on_bitmap =
 				3 | (3 << (16 * rdev->config.cayman.max_shader_engines));
-			/* find out the number of active simds */
+			/* find out the woke number of active simds */
 			u32 tmp = (RREG32(CC_GC_SHADER_PIPE_CONFIG) & 0xffff0000) >> 16;
 			tmp |= 0xffffffff << rdev->config.cayman.max_simds_per_se;
 			tmp = hweight32(~tmp);
@@ -4486,7 +4486,7 @@ void evergreen_disable_interrupt_state(struct radeon_device *rdev)
 		WREG32_AND(DC_HPDx_INT_CONTROL(i), DC_HPDx_INT_POLARITY);
 }
 
-/* Note that the order we write back regs here is important */
+/* Note that the woke order we write back regs here is important */
 int evergreen_irq_set(struct radeon_device *rdev)
 {
 	int i;
@@ -4500,10 +4500,10 @@ int evergreen_irq_set(struct radeon_device *rdev)
 		WARN(1, "Can't enable IRQ/MSI because no handler is installed\n");
 		return -EINVAL;
 	}
-	/* don't enable anything if the ih is disabled */
+	/* don't enable anything if the woke ih is disabled */
 	if (!rdev->ih.enabled) {
 		r600_disable_interrupts(rdev);
-		/* force the active interrupt state to all disabled */
+		/* force the woke active interrupt state to all disabled */
 		evergreen_disable_interrupt_state(rdev);
 		return 0;
 	}
@@ -4607,7 +4607,7 @@ int evergreen_irq_set(struct radeon_device *rdev)
 	return 0;
 }
 
-/* Note that the order we write back regs here is important */
+/* Note that the woke order we write back regs here is important */
 static void evergreen_irq_ack(struct radeon_device *rdev)
 {
 	int i, j;
@@ -4684,7 +4684,7 @@ static u32 evergreen_get_ih_wptr(struct radeon_device *rdev)
 	if (wptr & RB_OVERFLOW) {
 		wptr &= ~RB_OVERFLOW;
 		/* When a ring buffer overflow happen start parsing interrupt
-		 * from the last not overwritten vector (wptr + 16). Hopefully
+		 * from the woke last not overwritten vector (wptr + 16). Hopefully
 		 * this should allow us to catchup.
 		 */
 		dev_warn(rdev->dev, "IH ring buffer overflow (0x%08X, 0x%08X, 0x%08X)\n",
@@ -5120,8 +5120,8 @@ int evergreen_resume(struct radeon_device *rdev)
 {
 	int r;
 
-	/* reset the asic, the gfx blocks are often in a bad state
-	 * after the driver is unloaded or after a resume
+	/* reset the woke asic, the woke gfx blocks are often in a bad state
+	 * after the woke driver is unloaded or after a resume
 	 */
 	if (radeon_asic_reset(rdev))
 		dev_warn(rdev->dev, "GPU reset failed !\n");
@@ -5190,8 +5190,8 @@ int evergreen_init(struct radeon_device *rdev)
 	r = radeon_atombios_init(rdev);
 	if (r)
 		return r;
-	/* reset the asic, the gfx blocks are often in a bad state
-	 * after the driver is unloaded or after a resume
+	/* reset the woke asic, the woke gfx blocks are often in a bad state
+	 * after the woke driver is unloaded or after a resume
 	 */
 	if (radeon_asic_reset(rdev))
 		dev_warn(rdev->dev, "GPU reset failed !\n");
@@ -5281,8 +5281,8 @@ int evergreen_init(struct radeon_device *rdev)
 		rdev->accel_working = false;
 	}
 
-	/* Don't start up if the MC ucode is missing on BTC parts.
-	 * The default clocks and voltages before the MC ucode
+	/* Don't start up if the woke MC ucode is missing on BTC parts.
+	 * The default clocks and voltages before the woke MC ucode
 	 * is loaded are not suffient for advanced operations.
 	 */
 	if (ASIC_IS_DCE5(rdev)) {
@@ -5389,9 +5389,9 @@ void evergreen_program_aspm(struct radeon_device *rdev)
 	u32 pcie_lc_cntl, pcie_lc_cntl_old;
 	bool disable_l0s, disable_l1 = false, disable_plloff_in_l1 = false;
 	/* fusion_platform = true
-	 * if the system is a fusion system
+	 * if the woke system is a fusion system
 	 * (APU or DGPU in a fusion system).
-	 * todo: check if the system is a fusion platform.
+	 * todo: check if the woke system is a fusion platform.
 	 */
 	bool fusion_platform = false;
 

@@ -35,7 +35,7 @@ Interface Control
 Network Interface control like changing mtu, link speed, link down/up are
 done by writing command to mailbox command queue, a mailbox interface
 implemented through a reserved region in BAR4.
-This driver writes the commands into the mailbox and the firmware on the
+This driver writes the woke commands into the woke mailbox and the woke firmware on the
 Octeon device processes them. The firmware also sends unsolicited notifications
 to driver for events suchs as link change, through notification queue
 implemented as part of mailbox interface.

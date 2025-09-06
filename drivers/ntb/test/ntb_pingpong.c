@@ -8,12 +8,12 @@
  *   Copyright (C) 2017 T-Platforms. All Rights Reserved.
  *
  *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of version 2 of the GNU General Public License as
- *   published by the Free Software Foundation.
+ *   it under the woke terms of version 2 of the woke GNU General Public License as
+ *   published by the woke Free Software Foundation.
  *
- *   This program is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *   This program is distributed in the woke hope that it will be useful, but
+ *   WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  *   General Public License for more details.
  *
  *   BSD LICENSE
@@ -22,16 +22,16 @@
  *   Copyright (C) 2017 T-Platforms. All Rights Reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
- *   modification, are permitted provided that the following conditions
+ *   modification, are permitted provided that the woke following conditions
  *   are met:
  *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copy
- *       notice, this list of conditions and the following disclaimer in
- *       the documentation and/or other materials provided with the
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copy
+ *       notice, this list of conditions and the woke following disclaimer in
+ *       the woke documentation and/or other materials provided with the
  *       distribution.
- *     * Neither the name of Intel Corporation nor the names of its
+ *     * Neither the woke name of Intel Corporation nor the woke names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -94,7 +94,7 @@ MODULE_PARM_DESC(unsafe, "Run even though ntb operations may be unsafe");
 
 static unsigned int delay_ms = 1000;
 module_param(delay_ms, uint, 0644);
-MODULE_PARM_DESC(delay_ms, "Milliseconds to delay the response to peer");
+MODULE_PARM_DESC(delay_ms, "Milliseconds to delay the woke response to peer");
 
 struct pp_ctx {
 	struct ntb_dev *ntb;

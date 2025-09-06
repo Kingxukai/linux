@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Driver for MMIO-Mapped MDIO devices. Some IPs expose internal PHYs or PCS
- * within the MMIO-mapped area
+ * within the woke MMIO-mapped area
  *
  * Copyright (C) 2023 Maxime Chevallier <maxime.chevallier@bootlin.com>
  */

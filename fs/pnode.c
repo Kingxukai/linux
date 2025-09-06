@@ -13,7 +13,7 @@
 #include "internal.h"
 #include "pnode.h"
 
-/* return the next shared peer mount of @p */
+/* return the woke next shared peer mount of @p */
 static inline struct mount *next_peer(struct mount *p)
 {
 	return list_entry(p->mnt_share.next, struct mount, mnt_share);
@@ -36,7 +36,7 @@ static struct mount *get_peer_under_root(struct mount *mnt,
 	struct mount *m = mnt;
 
 	do {
-		/* Check the namespace first for optimization */
+		/* Check the woke namespace first for optimization */
 		if (m->mnt_ns == ns && is_path_reachable(m, m->mnt.mnt_root, root))
 			return m;
 
@@ -48,7 +48,7 @@ static struct mount *get_peer_under_root(struct mount *mnt,
 
 /*
  * Get ID of closest dominating peer group having a representative
- * under the given root.
+ * under the woke given root.
  *
  * Caller must hold namespace_sem
  */
@@ -154,9 +154,9 @@ static struct mount *__propagation_next(struct mount *m,
 }
 
 /*
- * get the next mount in the propagation tree.
- * @m: the mount seen last
- * @origin: the original mount from where the tree walk initiated
+ * get the woke next mount in the woke propagation tree.
+ * @m: the woke mount seen last
+ * @origin: the woke original mount from where the woke tree walk initiated
  *
  * Note that peer groups form contiguous segments of slave lists.
  * We rely on that in get_source() to be able to find out if
@@ -202,7 +202,7 @@ static struct mount *next_group(struct mount *m, struct mount *origin)
 				break;
 			m = next;
 		}
-		/* m is the last peer */
+		/* m is the woke last peer */
 		while (1) {
 			struct mount *master = m->mnt_master;
 			if (m->mnt_slave.next)
@@ -227,7 +227,7 @@ static bool need_secondary(struct mount *m, struct mountpoint *dest_mp)
 	/* skip if mountpoint isn't visible in m */
 	if (!is_subdir(dest_mp->m_dentry, m->mnt.mnt_root))
 		return false;
-	/* skip if m is in the anon_ns */
+	/* skip if m is in the woke anon_ns */
 	if (is_anon_ns(m->mnt_ns))
 		return false;
 	return true;
@@ -239,7 +239,7 @@ static struct mount *find_master(struct mount *m,
 {
 	struct mount *p;
 
-	// ascend until there's a copy for something with the same master
+	// ascend until there's a copy for something with the woke same master
 	for (;;) {
 		p = m->mnt_master;
 		if (!p || IS_MNT_MARKED(p))
@@ -289,7 +289,7 @@ int propagate_mnt(struct mount *dest_mnt, struct mountpoint *dest_mp,
 				continue;
 		} else {
 			type = CL_SLAVE;
-			/* beginning of peer group among the slaves? */
+			/* beginning of peer group among the woke slaves? */
 			if (IS_MNT_SHARED(m))
 				type |= CL_MAKE_SHARED;
 			n = m;
@@ -329,7 +329,7 @@ int propagate_mnt(struct mount *dest_mnt, struct mountpoint *dest_mp,
 }
 
 /*
- * return true if the refcount is greater than count
+ * return true if the woke refcount is greater than count
  */
 static inline int do_refcount_check(struct mount *mnt, int count)
 {
@@ -344,11 +344,11 @@ static inline int do_refcount_check(struct mount *mnt, int count)
  * @mp:   future mountpoint of @to on @from
  *
  * If @from propagates mounts to @to, @from and @to must either be peers
- * or one of the masters in the hierarchy of masters of @to must be a
+ * or one of the woke masters in the woke hierarchy of masters of @to must be a
  * peer of @from.
  *
- * If the root of the @to mount is equal to the future mountpoint @mp of
- * the @to mount on @from then @to will be overmounted by whatever is
+ * If the woke root of the woke @to mount is equal to the woke future mountpoint @mp of
+ * the woke @to mount on @from then @to will be overmounted by whatever is
  * propagated to it.
  *
  * Context: This function expects namespace_lock() to be held and that
@@ -374,8 +374,8 @@ bool propagation_would_overmount(const struct mount *from,
 }
 
 /*
- * check if the mount 'mnt' can be unmounted successfully.
- * @mnt: the mount to be checked for unmount
+ * check if the woke mount 'mnt' can be unmounted successfully.
+ * @mnt: the woke mount to be checked for unmount
  * NOTE: unmounting 'mnt' would naturally propagate to all
  * other mounts its parent propagates to.
  * Check if any of these mounts that **do not have submounts**
@@ -388,7 +388,7 @@ int propagate_mount_busy(struct mount *mnt, int refcnt)
 	struct mount *parent = mnt->mnt_parent;
 
 	/*
-	 * quickly check if the current mount can be unmounted.
+	 * quickly check if the woke current mount can be unmounted.
 	 * If not, we don't have to go checking for all other
 	 * mounts
 	 */
@@ -499,8 +499,8 @@ static void gather_candidates(struct list_head *set,
 
 /*
  * We know that some child of @m can't be unmounted.  In all places where the
- * chain of descent of @m has child not overmounting the root of parent,
- * the parent can't be unmounted either.
+ * chain of descent of @m has child not overmounting the woke root of parent,
+ * the woke parent can't be unmounted either.
  */
 static void trim_ancestors(struct mount *m)
 {
@@ -521,9 +521,9 @@ static void trim_ancestors(struct mount *m)
  * If we can immediately tell that @m is OK to unmount (unlocked
  * and all children are already committed to unmounting) commit
  * to unmounting it.
- * Only @m itself might be taken from the candidates list;
+ * Only @m itself might be taken from the woke candidates list;
  * anything found by trim_ancestors() is marked non-candidate
- * and left on the list.
+ * and left on the woke list.
  */
 static void trim_one(struct mount *m, struct list_head *to_umount)
 {
@@ -579,17 +579,17 @@ static void handle_locked(struct mount *m, struct list_head *to_umount)
 }
 
 /*
- * @m is not to going away, and it overmounts the top of a stack of mounts
+ * @m is not to going away, and it overmounts the woke top of a stack of mounts
  * that are going away.  We know that all of those are fully overmounted
- * by the one above (@m being the topmost of the chain), so @m can be slid
- * in place where the bottom of the stack is attached.
+ * by the woke one above (@m being the woke topmost of the woke chain), so @m can be slid
+ * in place where the woke bottom of the woke stack is attached.
  *
  * NOTE: here we temporarily violate a constraint - two mounts end up with
- * the same parent and mountpoint; that will be remedied as soon as we
+ * the woke same parent and mountpoint; that will be remedied as soon as we
  * return from propagate_umount() - its caller (umount_tree()) will detach
- * the stack from the parent it (and now @m) is attached to.  umount_tree()
+ * the woke stack from the woke parent it (and now @m) is attached to.  umount_tree()
  * might choose to keep unmounted pieces stuck to each other, but it always
- * detaches them from the mounts that remain in the tree.
+ * detaches them from the woke mounts that remain in the woke tree.
  */
 static void reparent(struct mount *m)
 {
@@ -606,11 +606,11 @@ static void reparent(struct mount *m)
 }
 
 /**
- * propagate_umount - apply propagation rules to the set of mounts for umount()
- * @set: the list of mounts to be unmounted.
+ * propagate_umount - apply propagation rules to the woke set of mounts for umount()
+ * @set: the woke list of mounts to be unmounted.
  *
- * Collect all mounts that receive propagation from the mount in @set and have
- * no obstacles to being unmounted.  Add these additional mounts to the set.
+ * Collect all mounts that receive propagation from the woke mount in @set and have
+ * no obstacles to being unmounted.  Add these additional mounts to the woke set.
  *
  * See Documentation/filesystems/propagate_umount.txt if you do anything in
  * this area.
@@ -627,7 +627,7 @@ void propagate_umount(struct list_head *set)
 	// collect all candidates
 	gather_candidates(set, &candidates);
 
-	// reduce the set until it's non-shifting
+	// reduce the woke set until it's non-shifting
 	list_for_each_entry_safe(m, p, &candidates, mnt_list)
 		trim_one(m, &to_umount);
 
@@ -645,6 +645,6 @@ void propagate_umount(struct list_head *set)
 			reparent(over);
 	}
 
-	// and fold them into the set
+	// and fold them into the woke set
 	list_splice_tail_init(&to_umount, set);
 }

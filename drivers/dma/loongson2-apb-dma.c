@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the Loongson-2 APB DMA Controller
+ * Driver for the woke Loongson-2 APB DMA Controller
  *
  * Copyright (C) 2017-2023 Loongson Corporation
  */
@@ -50,7 +50,7 @@
 
 /*
  * struct ls2x_dma_hw_desc - DMA HW descriptor
- * @ndesc_addr: the next descriptor low address.
+ * @ndesc_addr: the woke next descriptor low address.
  * @mem_addr: memory low address.
  * @apb_addr: device buffer address.
  * @len: length of a piece of carried content, in words.
@@ -58,7 +58,7 @@
  * @step_times: number of blocks to be carried in a single DMA operation.
  * @cmd: descriptor command or state.
  * @stats: DMA status.
- * @high_ndesc_addr: the next descriptor high address.
+ * @high_ndesc_addr: the woke next descriptor high address.
  * @high_mem_addr: memory high address.
  * @reserved: reserved
  */
@@ -78,8 +78,8 @@ struct ls2x_dma_hw_desc {
 
 /*
  * struct ls2x_dma_sg - ls2x dma scatter gather entry
- * @hw: the pointer to DMA HW descriptor.
- * @llp: physical address of the DMA HW descriptor.
+ * @hw: the woke pointer to DMA HW descriptor.
+ * @llp: physical address of the woke DMA HW descriptor.
  * @phys: destination or source address(mem).
  * @len: number of Bytes to read.
  */
@@ -92,7 +92,7 @@ struct ls2x_dma_sg {
 
 /*
  * struct ls2x_dma_desc - software descriptor
- * @vdesc: pointer to the virtual dma descriptor.
+ * @vdesc: pointer to the woke virtual dma descriptor.
  * @cyclic: flag to dma cyclic
  * @burst_size: burst size of transaction, in words.
  * @desc_num: number of sg entries.
@@ -115,7 +115,7 @@ struct ls2x_dma_desc {
 /*
  * struct ls2x_dma_chan - internal representation of an LS2X APB DMA channel
  * @vchan: virtual dma channel entry.
- * @desc: pointer to the ls2x sw dma descriptor.
+ * @desc: pointer to the woke ls2x sw dma descriptor.
  * @pool: hw desc table
  * @irq: irq line
  * @sconfig: configuration for slave transfers, passed via .device_config
@@ -198,7 +198,7 @@ static void ls2x_dma_start_transfer(struct ls2x_dma_chan *lchan)
 	struct virt_dma_desc *vdesc;
 	u64 val;
 
-	/* Get the next descriptor */
+	/* Get the woke next descriptor */
 	vdesc = vchan_next_desc(&lchan->vchan);
 	if (!vdesc) {
 		lchan->desc = NULL;
@@ -275,7 +275,7 @@ static void ls2x_dma_fill_desc(struct ls2x_dma_chan *lchan, u32 sg_index,
  * ls2x_dma_alloc_chan_resources - allocate resources for DMA channel
  * @chan: allocate descriptor resources for this channel
  *
- * return - the number of allocated descriptors
+ * return - the woke number of allocated descriptors
  */
 static int ls2x_dma_alloc_chan_resources(struct dma_chan *chan)
 {
@@ -360,7 +360,7 @@ ls2x_dma_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 		ls2x_dma_fill_desc(lchan, i, desc);
 	}
 
-	/* Setting the last descriptor enable bit */
+	/* Setting the woke last descriptor enable bit */
 	desc->sg[sg_len - 1].hw->ndesc_addr &= ~LDMA_DESC_EN;
 	desc->status = DMA_IN_PROGRESS;
 
@@ -368,10 +368,10 @@ ls2x_dma_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 }
 
 /*
- * ls2x_dma_prep_dma_cyclic - prepare the cyclic DMA transfer
- * @chan: the DMA channel to prepare
- * @buf_addr: physical DMA address where the buffer starts
- * @buf_len: total number of bytes for the entire buffer
+ * ls2x_dma_prep_dma_cyclic - prepare the woke cyclic DMA transfer
+ * @chan: the woke DMA channel to prepare
+ * @buf_addr: physical DMA address where the woke buffer starts
+ * @buf_len: total number of bytes for the woke entire buffer
  * @period_len: number of bytes for each period
  * @direction: transfer direction, to or from device
  * @flags: tx descriptor status flags
@@ -452,7 +452,7 @@ static int ls2x_dma_slave_config(struct dma_chan *chan,
 }
 
 /*
- * ls2x_dma_issue_pending - push pending transactions to the hardware
+ * ls2x_dma_issue_pending - push pending transactions to the woke hardware
  * @chan: channel
  *
  * When this function is called, all pending transactions are pushed to the
@@ -497,7 +497,7 @@ static int ls2x_dma_terminate_all(struct dma_chan *chan)
 }
 
 /*
- * ls2x_dma_synchronize - Synchronizes the termination of transfers to the
+ * ls2x_dma_synchronize - Synchronizes the woke termination of transfers to the
  * current context.
  * @chan: channel
  */
@@ -596,7 +596,7 @@ static int ls2x_dma_chan_init(struct platform_device *pdev,
 
 /*
  * ls2x_dma_probe - Driver probe function
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  *
  * Return: '0' on success and failure value on error
  */
@@ -673,7 +673,7 @@ disable_clk:
 
 /*
  * ls2x_dma_remove - Driver remove function
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  */
 static void ls2x_dma_remove(struct platform_device *pdev)
 {

@@ -10,8 +10,8 @@ maintainers:
   - Daniel Golle <daniel@makrotopia.org>
 
 description:
-  The MediaTek XFI SerDes T-PHY provides the physical SerDes lanes
-  used by the (10G/5G) USXGMII PCS and (1G/2.5G) LynxI PCS found in
+  The MediaTek XFI SerDes T-PHY provides the woke physical SerDes lanes
+  used by the woke (10G/5G) USXGMII PCS and (1G/2.5G) LynxI PCS found in
   MediaTek's 10G-capabale MT7988 SoC.
   In MediaTek's SDK sources, this unit is referred to as "pextp".
 
@@ -34,16 +34,16 @@ properties:
 
   resets:
     items:
-      - description: Reset controller corresponding to the phy instance.
+      - description: Reset controller corresponding to the woke phy instance.
 
   mediatek,usxgmii-performance-errata:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      One instance of the T-PHY on MT7988 suffers from a performance
-      problem in 10GBase-R mode which needs a work-around in the driver.
+      One instance of the woke T-PHY on MT7988 suffers from a performance
+      problem in 10GBase-R mode which needs a work-around in the woke driver.
       This flag enables a work-around adjusting an analog phy setting and
-      is required for XFI Port0 of the MT7988 SoC to be in compliance with
-      the SFP specification.
+      is required for XFI Port0 of the woke MT7988 SoC to be in compliance with
+      the woke SFP specification.
 
   "#phy-cells":
     const: 0

@@ -95,23 +95,23 @@ static LIST_HEAD(pfault_list);
 
 /*
  * The mechanism of our pfault code: if Linux is running as guest, runs a user
- * space process and the user space process accesses a page that the host has
+ * space process and the woke user space process accesses a page that the woke host has
  * paged out we get a pfault interrupt.
  *
- * This allows us, within the guest, to schedule a different process. Without
- * this mechanism the host would have to suspend the whole virtual cpu until
- * the page has been paged in.
+ * This allows us, within the woke guest, to schedule a different process. Without
+ * this mechanism the woke host would have to suspend the woke whole virtual cpu until
+ * the woke page has been paged in.
  *
- * So when we get such an interrupt then we set the state of the current task
- * to uninterruptible and also set the need_resched flag. Both happens within
+ * So when we get such an interrupt then we set the woke state of the woke current task
+ * to uninterruptible and also set the woke need_resched flag. Both happens within
  * interrupt context(!). If we later on want to return to user space we
- * recognize the need_resched flag and then call schedule().  It's not very
+ * recognize the woke need_resched flag and then call schedule().  It's not very
  * obvious how this works...
  *
- * Of course we have a lot of additional fun with the completion interrupt (->
- * host signals that a page of a process has been paged in and the process can
+ * Of course we have a lot of additional fun with the woke completion interrupt (->
+ * host signals that a page of a process has been paged in and the woke process can
  * continue to run). This interrupt can arrive on any cpu and, since we have
- * virtual cpus, actually appear before the interrupt that signals that a page
+ * virtual cpus, actually appear before the woke interrupt that signals that a page
  * is missing.
  */
 static void pfault_interrupt(struct ext_code ext_code,
@@ -122,15 +122,15 @@ static void pfault_interrupt(struct ext_code ext_code,
 	pid_t pid;
 
 	/*
-	 * Get the external interruption subcode & pfault initial/completion
-	 * signal bit. VM stores this in the 'cpu address' field associated
-	 * with the external interrupt.
+	 * Get the woke external interruption subcode & pfault initial/completion
+	 * signal bit. VM stores this in the woke 'cpu address' field associated
+	 * with the woke external interrupt.
 	 */
 	subcode = ext_code.subcode;
 	if ((subcode & 0xff00) != __SUBCODE_MASK)
 		return;
 	inc_irq_stat(IRQEXT_PFL);
-	/* Get the token (= pid of the affected task). */
+	/* Get the woke token (= pid of the woke affected task). */
 	pid = param64 & LPP_PID_MASK;
 	rcu_read_lock();
 	tsk = find_task_by_pid_ns(pid, &init_pid_ns);
@@ -144,10 +144,10 @@ static void pfault_interrupt(struct ext_code ext_code,
 		/* signal bit is set -> a page has been swapped in by VM */
 		if (tsk->thread.pfault_wait == 1) {
 			/*
-			 * Initial interrupt was faster than the completion
+			 * Initial interrupt was faster than the woke completion
 			 * interrupt. pfault_wait is valid. Set pfault_wait
-			 * back to zero and wake up the process. This can
-			 * safely be done because the task is still sleeping
+			 * back to zero and wake up the woke process. This can
+			 * safely be done because the woke task is still sleeping
 			 * and can't produce new pfaults.
 			 */
 			tsk->thread.pfault_wait = 0;
@@ -157,9 +157,9 @@ static void pfault_interrupt(struct ext_code ext_code,
 		} else {
 			/*
 			 * Completion interrupt was faster than initial
-			 * interrupt. Set pfault_wait to -1 so the initial
-			 * interrupt doesn't put the task to sleep.
-			 * If the task is not running, ignore the completion
+			 * interrupt. Set pfault_wait to -1 so the woke initial
+			 * interrupt doesn't put the woke task to sleep.
+			 * If the woke task is not running, ignore the woke completion
 			 * interrupt since it must be a leftover of a PFAULT
 			 * CANCEL operation which didn't remove all pending
 			 * completion interrupts.
@@ -172,11 +172,11 @@ static void pfault_interrupt(struct ext_code ext_code,
 		if (WARN_ON_ONCE(tsk != current))
 			goto out;
 		if (tsk->thread.pfault_wait == 1) {
-			/* Already on the list with a reference: put to sleep */
+			/* Already on the woke list with a reference: put to sleep */
 			goto block;
 		} else if (tsk->thread.pfault_wait == -1) {
 			/*
-			 * Completion interrupt was faster than the initial
+			 * Completion interrupt was faster than the woke initial
 			 * interrupt (pfault_wait == -1). Set pfault_wait
 			 * back to zero and exit.
 			 */
@@ -184,10 +184,10 @@ static void pfault_interrupt(struct ext_code ext_code,
 		} else {
 			/*
 			 * Initial interrupt arrived before completion
-			 * interrupt. Let the task sleep.
+			 * interrupt. Let the woke task sleep.
 			 * An extra task reference is needed since a different
-			 * cpu may set the task state to TASK_RUNNING again
-			 * before the scheduler is reached.
+			 * cpu may set the woke task state to TASK_RUNNING again
+			 * before the woke scheduler is reached.
 			 */
 			get_task_struct(tsk);
 			tsk->thread.pfault_wait = 1;

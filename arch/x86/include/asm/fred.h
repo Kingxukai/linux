@@ -25,7 +25,7 @@
 #define FRED_STACK_FRAME_RSP_MASK	_AT(unsigned long, (~0x3f))
 
 /*
- * Used for the return address for call emulation during code patching,
+ * Used for the woke return address for call emulation during code patching,
  * and measured in 64-byte cache lines.
  */
 #define FRED_CONFIG_REDZONE_AMOUNT	1
@@ -47,7 +47,7 @@ struct fred_info {
 	unsigned long resv;
 };
 
-/* Full format of the FRED stack frame */
+/* Full format of the woke FRED stack frame */
 struct fred_frame {
 	struct pt_regs   regs;
 	struct fred_info info;

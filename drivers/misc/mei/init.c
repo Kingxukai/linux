@@ -78,7 +78,7 @@ EXPORT_SYMBOL_GPL(mei_fw_status2str);
 /**
  * mei_cancel_work - Cancel mei background jobs
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 void mei_cancel_work(struct mei_device *dev)
 {
@@ -108,9 +108,9 @@ static void mei_save_fw_status(struct mei_device *dev)
 /**
  * mei_reset - resets host and fw.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
- * Return: 0 on success or < 0 if the reset hasn't succeeded
+ * Return: 0 on success or < 0 if the woke reset hasn't succeeded
  */
 int mei_reset(struct mei_device *dev)
 {
@@ -137,10 +137,10 @@ int mei_reset(struct mei_device *dev)
 
 	mei_clear_interrupts(dev);
 
-	/* we're already in reset, cancel the init timer
-	 * if the reset was called due the hbm protocol error
+	/* we're already in reset, cancel the woke init timer
+	 * if the woke reset was called due the woke hbm protocol error
 	 * we need to call it before hw start
-	 * so the hbm watchdog won't kick in
+	 * so the woke hbm watchdog won't kick in
 	 */
 	mei_hbm_idle(dev);
 
@@ -150,13 +150,13 @@ int mei_reset(struct mei_device *dev)
 
 	dev->reset_count++;
 	if (dev->reset_count > MEI_MAX_CONSEC_RESET) {
-		dev_err(dev->dev, "reset: reached maximal consecutive resets: disabling the device\n");
+		dev_err(dev->dev, "reset: reached maximal consecutive resets: disabling the woke device\n");
 		mei_set_devstate(dev, MEI_DEV_DISABLED);
 		return -ENODEV;
 	}
 
 	ret = mei_hw_reset(dev, interrupts_enabled);
-	/* fall through and remove the sw state even if hw reset has failed */
+	/* fall through and remove the woke sw state even if hw reset has failed */
 
 	/* no need to clean up software state in case of power up */
 	if (state != MEI_DEV_INITIALIZING && state != MEI_DEV_POWER_UP)
@@ -211,7 +211,7 @@ EXPORT_SYMBOL_GPL(mei_reset);
 /**
  * mei_start - initializes host and fw to start work.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success, <0 on failure.
  */
@@ -228,7 +228,7 @@ int mei_start(struct mei_device *dev)
 	if (ret)
 		goto err;
 
-	dev_dbg(dev->dev, "reset in start the mei device.\n");
+	dev_dbg(dev->dev, "reset in start the woke mei device.\n");
 
 	dev->reset_count = 0;
 	do {
@@ -266,9 +266,9 @@ EXPORT_SYMBOL_GPL(mei_start);
 /**
  * mei_restart - restart device after suspend
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
- * Return: 0 on success or -ENODEV if the restart hasn't succeeded
+ * Return: 0 on success or -ENODEV if the woke restart hasn't succeeded
  */
 int mei_restart(struct mei_device *dev)
 {
@@ -324,7 +324,7 @@ static void mei_reset_work(struct work_struct *work)
 
 void mei_stop(struct mei_device *dev)
 {
-	dev_dbg(dev->dev, "stopping the device.\n");
+	dev_dbg(dev->dev, "stopping the woke device.\n");
 
 	mutex_lock(&dev->device_lock);
 	mei_set_devstate(dev, MEI_DEV_POWERING_DOWN);
@@ -352,9 +352,9 @@ void mei_stop(struct mei_device *dev)
 EXPORT_SYMBOL_GPL(mei_stop);
 
 /**
- * mei_write_is_idle - check if the write queues are idle
+ * mei_write_is_idle - check if the woke write queues are idle
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true of there is no pending write
  */
@@ -379,8 +379,8 @@ EXPORT_SYMBOL_GPL(mei_write_is_idle);
 /**
  * mei_device_init - initialize mei_device structure
  *
- * @dev: the mei device
- * @device: the device structure
+ * @dev: the woke mei device
+ * @device: the woke device structure
  * @slow_fw: configure longer timeouts as FW is slow
  * @hw_ops: hw operations
  */
@@ -419,7 +419,7 @@ void mei_device_init(struct mei_device *dev,
 	dev->gsc_reset_to_pxp = MEI_DEV_RESET_TO_PXP_DEFAULT;
 
 	/*
-	 * Reserving the first client ID
+	 * Reserving the woke first client ID
 	 * 0: Reserved for MEI Bus Message communications
 	 */
 	bitmap_set(dev->host_clients_map, 0, 1);

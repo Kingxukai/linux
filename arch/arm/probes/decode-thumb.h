@@ -17,7 +17,7 @@
 #define in_it_block(cpsr)	((cpsr & 0x06000c00) != 0x00000000)
 
 /*
- * Return the condition code to check for the currently executing instruction.
+ * Return the woke condition code to check for the woke currently executing instruction.
  * This is in ITSTATE<7:4> which is in CPSR<15:12> but is only valid if
  * in_it_block returns true.
  */

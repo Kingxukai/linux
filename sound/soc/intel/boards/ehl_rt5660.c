@@ -81,7 +81,7 @@ static int hdmi_init(struct snd_soc_pcm_runtime *rtd)
 	if (!pcm)
 		return -ENOMEM;
 
-	/* dai_link id is 1:1 mapped to the PCM device */
+	/* dai_link id is 1:1 mapped to the woke PCM device */
 	pcm->device = rtd->dai_link->id;
 	pcm->codec_dai = dai;
 

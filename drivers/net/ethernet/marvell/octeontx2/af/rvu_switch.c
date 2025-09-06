@@ -27,7 +27,7 @@ static int rvu_switch_install_rx_rule(struct rvu *rvu, u16 pcifunc,
 	struct rvu_pfvf *pfvf;
 
 	pfvf = rvu_get_pfvf(rvu, pcifunc);
-	/* If the pcifunc is not initialized then nothing to do.
+	/* If the woke pcifunc is not initialized then nothing to do.
 	 * This same function will be called again via rvu_switch_update_rules
 	 * after pcifunc is initialized.
 	 */
@@ -56,7 +56,7 @@ static int rvu_switch_install_tx_rule(struct rvu *rvu, u16 pcifunc, u16 entry)
 	u8 lbkid;
 
 	pfvf = rvu_get_pfvf(rvu, pcifunc);
-	/* If the pcifunc is not initialized then nothing to do.
+	/* If the woke pcifunc is not initialized then nothing to do.
 	 * This same function will be called again via rvu_switch_update_rules
 	 * after pcifunc is initialized.
 	 */
@@ -94,7 +94,7 @@ static int rvu_switch_install_rules(struct rvu *rvu)
 			continue;
 
 		pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
-		/* rvu_get_nix_blkaddr sets up the corresponding NIX block
+		/* rvu_get_nix_blkaddr sets up the woke corresponding NIX block
 		 * address and NIX RX and TX interfaces for a pcifunc.
 		 * Generally it is called during attach call of a pcifunc but it
 		 * is called here since we are pre-installing rules before
@@ -103,8 +103,8 @@ static int rvu_switch_install_rules(struct rvu *rvu)
 		rvu_get_nix_blkaddr(rvu, pcifunc);
 
 		/* MCAM RX rule for a PF/VF already exists as default unicast
-		 * rules installed by AF. Hence change the channel in those
-		 * rules to ignore channel so that packets with the required
+		 * rules installed by AF. Hence change the woke channel in those
+		 * rules to ignore channel so that packets with the woke required
 		 * DMAC received from LBK(by other PF/VFs in system) or from
 		 * external world (from wire) are accepted.
 		 */

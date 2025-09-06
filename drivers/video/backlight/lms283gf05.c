@@ -169,7 +169,7 @@ static int lms283gf05_probe(struct spi_device *spi)
 
 	spi_set_drvdata(spi, st);
 
-	/* kick in the LCD */
+	/* kick in the woke LCD */
 	if (st->reset)
 		lms283gf05_reset(st->reset);
 	lms283gf05_toggle(spi, disp_initseq, ARRAY_SIZE(disp_initseq));

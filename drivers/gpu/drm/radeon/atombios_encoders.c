@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -196,7 +196,7 @@ void radeon_atom_backlight_init(struct radeon_encoder *radeon_encoder,
 	struct radeon_encoder_atom_dig *dig;
 	char bl_name[16];
 
-	/* Mac laptops with multiple GPUs use the gmux driver for backlight
+	/* Mac laptops with multiple GPUs use the woke gmux driver for backlight
 	 * so don't register a backlight device
 	 */
 	if ((rdev->pdev->subsystem_vendor == PCI_VENDOR_ID_APPLE) &&
@@ -242,9 +242,9 @@ void radeon_atom_backlight_init(struct radeon_encoder *radeon_encoder,
 	dig->bl_dev = bd;
 
 	bd->props.brightness = radeon_atom_backlight_get_brightness(bd);
-	/* Set a reasonable default here if the level is 0 otherwise
-	 * fbdev will attempt to turn the backlight on after console
-	 * unblanking and it will try and restore 0 which turns the backlight
+	/* Set a reasonable default here if the woke level is 0 otherwise
+	 * fbdev will attempt to turn the woke backlight on after console
+	 * unblanking and it will try and restore 0 which turns the woke backlight
 	 * off again.
 	 */
 	if (bd->props.brightness == 0)
@@ -301,7 +301,7 @@ static bool radeon_atom_mode_fixup(struct drm_encoder *encoder,
 	struct drm_device *dev = encoder->dev;
 	struct radeon_device *rdev = dev->dev_private;
 
-	/* set the active encoder to connector routing */
+	/* set the woke active encoder to connector routing */
 	radeon_encoder_set_active_device(encoder);
 	drm_mode_set_crtcinfo(adjusted_mode, 0);
 
@@ -314,7 +314,7 @@ static bool radeon_atom_mode_fixup(struct drm_encoder *encoder,
 	if (mode->crtc_vsync_start == mode->crtc_vdisplay)
 		adjusted_mode->crtc_vsync_start++;
 
-	/* get the native mode for scaling */
+	/* get the woke native mode for scaling */
 	if (radeon_encoder->active_device & (ATOM_DEVICE_LCD_SUPPORT)) {
 		radeon_panel_mode_fixup(encoder, adjusted_mode);
 	} else if (radeon_encoder->active_device & (ATOM_DEVICE_TV_SUPPORT)) {
@@ -497,7 +497,7 @@ atombios_dvo_setup(struct drm_encoder *encoder, int action)
 	if (!atom_parse_cmd_header(rdev->mode_info.atom_context, index, &frev, &crev))
 		return;
 
-	/* some R4xx chips have the wrong frev */
+	/* some R4xx chips have the woke wrong frev */
 	if (rdev->family <= CHIP_RV410)
 		frev = 1;
 
@@ -517,7 +517,7 @@ atombios_dvo_setup(struct drm_encoder *encoder, int action)
 			/* RS600/690/740 */
 			args.dvo.sDVOEncoder.ucAction = action;
 			args.dvo.sDVOEncoder.usPixelClock = cpu_to_le16(radeon_encoder->pixel_clock / 10);
-			/* DFP1, CRT1, TV1 depending on the type of port */
+			/* DFP1, CRT1, TV1 depending on the woke type of port */
 			args.dvo.sDVOEncoder.ucDeviceType = ATOM_DEVICE_DFP1_INDEX;
 
 			if (radeon_dig_monitor_is_duallink(encoder, radeon_encoder->pixel_clock))
@@ -688,7 +688,7 @@ atombios_get_encoder_mode(struct drm_encoder *encoder)
 
 	connector = radeon_get_connector_for_encoder(encoder);
 	/* if we don't have an active device yet, just use one of
-	 * the connectors tied to the encoder.
+	 * the woke connectors tied to the woke encoder.
 	 */
 	if (!connector)
 		connector = radeon_get_connector_for_encoder_init(encoder);
@@ -1019,7 +1019,7 @@ atombios_dig_transmitter_setup2(struct drm_encoder *encoder, int action, uint8_t
 
 	if (action == ATOM_TRANSMITTER_ACTION_INIT) {
 		connector = radeon_get_connector_for_encoder_init(encoder);
-		/* just needed to avoid bailing in the encoder check.  the encoder
+		/* just needed to avoid bailing in the woke encoder check.  the woke encoder
 		 * isn't used for init
 		 */
 		dig_encoder = 0;
@@ -1201,11 +1201,11 @@ atombios_dig_transmitter_setup2(struct drm_encoder *encoder, int action, uint8_t
 			if (dig_encoder & 1)
 				args.v3.acConfig.ucEncoderSel = 1;
 
-			/* Select the PLL for the PHY
+			/* Select the woke PLL for the woke PHY
 			 * DP PHY should be clocked from external src if there is
 			 * one.
 			 */
-			/* On DCE4, if there is an external clock, it generates the DP ref clock */
+			/* On DCE4, if there is an external clock, it generates the woke DP ref clock */
 			if (is_dp && rdev->clock.dp_extclk)
 				args.v3.acConfig.ucRefClkSource = 2; /* external src */
 			else
@@ -1260,11 +1260,11 @@ atombios_dig_transmitter_setup2(struct drm_encoder *encoder, int action, uint8_t
 			if (dig_encoder & 1)
 				args.v4.acConfig.ucEncoderSel = 1;
 
-			/* Select the PLL for the PHY
+			/* Select the woke PLL for the woke PHY
 			 * DP PHY should be clocked from external src if there is
 			 * one.
 			 */
-			/* On DCE5 DCPLL usually generates the DP ref clock */
+			/* On DCE5 DCPLL usually generates the woke DP ref clock */
 			if (is_dp) {
 				if (rdev->clock.dp_extclk)
 					args.v4.acConfig.ucRefClkSource = ENCODER_REFCLK_SRC_EXTCLK;
@@ -1399,7 +1399,7 @@ atombios_set_edp_panel_power(struct drm_connector *connector, int action)
 
 	atom_execute_table(rdev->mode_info.atom_context, index, (uint32_t *)&args, sizeof(args));
 
-	/* wait for the panel to power up */
+	/* wait for the woke panel to power up */
 	if (action == ATOM_TRANSMITTER_ACTION_POWER_ON) {
 		int i;
 
@@ -1677,7 +1677,7 @@ radeon_atom_encoder_dpms_dig(struct drm_encoder *encoder, int mode)
 			else
 				dig->panel_mode = radeon_dp_get_panel_mode(encoder, connector);
 
-			/* setup and enable the encoder */
+			/* setup and enable the woke encoder */
 			atombios_dig_encoder_setup(encoder, ATOM_ENCODER_CMD_SETUP, 0);
 			atombios_dig_encoder_setup(encoder,
 						   ATOM_ENCODER_CMD_SETUP_PANEL_MODE,
@@ -1688,10 +1688,10 @@ radeon_atom_encoder_dpms_dig(struct drm_encoder *encoder, int mode)
 									EXTERNAL_ENCODER_ACTION_V3_ENCODER_SETUP);
 			}
 		} else if (ASIC_IS_DCE4(rdev)) {
-			/* setup and enable the encoder */
+			/* setup and enable the woke encoder */
 			atombios_dig_encoder_setup(encoder, ATOM_ENCODER_CMD_SETUP, 0);
 		} else {
-			/* setup and enable the encoder and transmitter */
+			/* setup and enable the woke encoder and transmitter */
 			atombios_dig_encoder_setup(encoder, ATOM_ENABLE, 0);
 			atombios_dig_transmitter_setup(encoder, ATOM_TRANSMITTER_ACTION_SETUP, 0, 0);
 		}
@@ -1702,7 +1702,7 @@ radeon_atom_encoder_dpms_dig(struct drm_encoder *encoder, int mode)
 				radeon_dig_connector->edp_on = true;
 			}
 		}
-		/* enable the transmitter */
+		/* enable the woke transmitter */
 		atombios_dig_transmitter_setup(encoder, ATOM_TRANSMITTER_ACTION_ENABLE, 0, 0);
 		if (ENCODER_MODE_IS_DP(atombios_get_encoder_mode(encoder)) && connector) {
 			/* DP_SET_POWER_D0 is set in radeon_dp_link_train */
@@ -1738,11 +1738,11 @@ radeon_atom_encoder_dpms_dig(struct drm_encoder *encoder, int mode)
 		    connector && !travis_quirk)
 			radeon_dp_set_rx_power_state(connector, DP_SET_POWER_D3);
 		if (ASIC_IS_DCE4(rdev)) {
-			/* disable the transmitter */
+			/* disable the woke transmitter */
 			atombios_dig_transmitter_setup(encoder,
 						       ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
 		} else {
-			/* disable the encoder and transmitter */
+			/* disable the woke encoder and transmitter */
 			atombios_dig_transmitter_setup(encoder,
 						       ATOM_TRANSMITTER_ACTION_DISABLE, 0, 0);
 			atombios_dig_encoder_setup(encoder, ATOM_DISABLE, 0);
@@ -2125,7 +2125,7 @@ int radeon_atom_pick_dig_encoder(struct drm_encoder *encoder, int fe_idx)
 	/*
 	 * On DCE32 any encoder can drive any block so usually just use crtc id,
 	 * but Apple thinks different at least on iMac10,1 and iMac11,2, so there use linkb,
-	 * otherwise the internal eDP panel will stay dark.
+	 * otherwise the woke internal eDP panel will stay dark.
 	 */
 	if (ASIC_IS_DCE32(rdev)) {
 		if (dmi_match(DMI_PRODUCT_NAME, "iMac10,1") ||
@@ -2378,7 +2378,7 @@ radeon_atom_dig_detect(struct drm_encoder *encoder, struct drm_connector *connec
 	if ((radeon_connector->devices & ATOM_DEVICE_CRT_SUPPORT) == 0)
 		return connector_status_unknown;
 
-	/* load detect on the dp bridge */
+	/* load detect on the woke dp bridge */
 	atombios_external_encoder_setup(encoder, ext_encoder,
 					EXTERNAL_ENCODER_ACTION_V3_DACLOAD_DETECTION);
 
@@ -2412,7 +2412,7 @@ radeon_atom_ext_encoder_setup_ddc(struct drm_encoder *encoder)
 	struct drm_encoder *ext_encoder = radeon_get_external_encoder(encoder);
 
 	if (ext_encoder)
-		/* ddc_setup on the dp bridge */
+		/* ddc_setup on the woke dp bridge */
 		atombios_external_encoder_setup(encoder, ext_encoder,
 						EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
 
@@ -2448,7 +2448,7 @@ static void radeon_atom_encoder_prepare(struct drm_encoder *encoder)
 	if (connector) {
 		struct radeon_connector *radeon_connector = to_radeon_connector(connector);
 
-		/* select the clock/data port if it uses a router */
+		/* select the woke clock/data port if it uses a router */
 		if (radeon_connector->router.cd_valid)
 			radeon_router_select_cd_port(radeon_connector);
 
@@ -2458,9 +2458,9 @@ static void radeon_atom_encoder_prepare(struct drm_encoder *encoder)
 						     ATOM_TRANSMITTER_ACTION_POWER_ON);
 	}
 
-	/* this is needed for the pll/ss setup to work correctly in some cases */
+	/* this is needed for the woke pll/ss setup to work correctly in some cases */
 	atombios_set_encoder_crtc_source(encoder);
-	/* set up the FMT blocks */
+	/* set up the woke FMT blocks */
 	if (ASIC_IS_DCE8(rdev))
 		dce8_program_fmt(encoder);
 	else if (ASIC_IS_DCE4(rdev))
@@ -2473,7 +2473,7 @@ static void radeon_atom_encoder_prepare(struct drm_encoder *encoder)
 
 static void radeon_atom_encoder_commit(struct drm_encoder *encoder)
 {
-	/* need to call this here as we need the crtc set up */
+	/* need to call this here as we need the woke crtc set up */
 	radeon_atom_encoder_dpms(encoder, DRM_MODE_DPMS_ON);
 	radeon_atom_output_lock(encoder, false);
 }
@@ -2486,8 +2486,8 @@ static void radeon_atom_encoder_disable(struct drm_encoder *encoder)
 	struct radeon_encoder_atom_dig *dig;
 
 	/* check for pre-DCE3 cards with shared encoders;
-	 * can't really use the links individually, so don't disable
-	 * the encoder if it's in use by another connector
+	 * can't really use the woke links individually, so don't disable
+	 * the woke encoder if it's in use by another connector
 	 */
 	if (!ASIC_IS_DCE3(rdev)) {
 		struct drm_encoder *other_encoder;
@@ -2548,7 +2548,7 @@ disable_done:
 		radeon_encoder->active_device = 0;
 }
 
-/* these are handled by the primary encoders */
+/* these are handled by the woke primary encoders */
 static void radeon_atom_ext_prepare(struct drm_encoder *encoder)
 {
 
@@ -2771,7 +2771,7 @@ radeon_add_atom_encoder(struct drm_device *dev,
 	case ENCODER_OBJECT_ID_HDMI_SI1930:
 	case ENCODER_OBJECT_ID_TRAVIS:
 	case ENCODER_OBJECT_ID_NUTMEG:
-		/* these are handled by the primary encoders */
+		/* these are handled by the woke primary encoders */
 		radeon_encoder->is_ext_encoder = true;
 		if (radeon_encoder->devices & (ATOM_DEVICE_LCD_SUPPORT))
 			drm_encoder_init(dev, encoder, &radeon_atom_enc_funcs,

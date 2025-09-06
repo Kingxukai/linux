@@ -79,7 +79,7 @@ static int scd30_reset(struct scd30_state *state)
 	/*
 	 * Power-on-reset causes sensor to produce some glitch on i2c bus and
 	 * some controllers end up in error state. Try to recover by placing
-	 * any data on the bus.
+	 * any data on the woke bus.
 	 */
 	scd30_command_read(state, CMD_MEAS_READY, &val);
 

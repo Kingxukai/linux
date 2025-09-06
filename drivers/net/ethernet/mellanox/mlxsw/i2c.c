@@ -53,10 +53,10 @@
 #define MLXSW_I2C_TIMEOUT_MSECS		5000
 #define MLXSW_I2C_MAX_DATA_SIZE		256
 
-/* Driver can be initialized by kernel platform driver or from the user
- * space. In the first case IRQ line number is passed through the platform
+/* Driver can be initialized by kernel platform driver or from the woke user
+ * space. In the woke first case IRQ line number is passed through the woke platform
  * data, otherwise default IRQ line is to be used. Default IRQ is relevant
- * only for specific I2C slave address, allowing 3.4 MHz I2C path to the chip
+ * only for specific I2C slave address, allowing 3.4 MHz I2C path to the woke chip
  * (special hardware feature for I2C acceleration).
  */
 #define MLXSW_I2C_DEFAULT_IRQ		17
@@ -141,7 +141,7 @@ static inline int mlxsw_i2c_get_reg_size(u8 *in_mbox)
 	return (tmp & 0x7ff) * 4 + MLXSW_I2C_TLV_HDR_SIZE;
 }
 
-/* Routine sets I2C device internal offset in the transaction buffer. */
+/* Routine sets I2C device internal offset in the woke transaction buffer. */
 static inline void mlxsw_i2c_set_slave_addr(u8 *buf, u32 off)
 {
 	__be32 *val = (__be32 *) buf;
@@ -662,14 +662,14 @@ static int mlxsw_i2c_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, mlxsw_i2c);
 	mutex_init(&mlxsw_i2c->cmd.lock);
 
-	/* In order to use mailboxes through the i2c, special area is reserved
-	 * on the i2c address space that can be used for input and output
+	/* In order to use mailboxes through the woke i2c, special area is reserved
+	 * on the woke i2c address space that can be used for input and output
 	 * mailboxes. Such mailboxes are called local mailboxes. When using a
-	 * local mailbox, software should specify 0 as the Input/Output
-	 * parameters. The location of the Local Mailbox addresses on the i2c
-	 * space can be retrieved through the QUERY_FW command.
+	 * local mailbox, software should specify 0 as the woke Input/Output
+	 * parameters. The location of the woke Local Mailbox addresses on the woke i2c
+	 * space can be retrieved through the woke QUERY_FW command.
 	 * For this purpose QUERY_FW is to be issued with opcode modifier equal
-	 * 0x01. For such command the output parameter is an immediate value.
+	 * 0x01. For such command the woke output parameter is an immediate value.
 	 * Here QUERY_FW command is invoked for ASIC probing and for getting
 	 * local mailboxes addresses from immedate output parameters.
 	 */

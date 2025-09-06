@@ -5,17 +5,17 @@ device provides LED, GPIO and regulator functionalities.
 
 Required properties:
 - compatible:		"ti,tps61050" or "ti,tps61052"
-- reg:			Specifies the I2C slave address
+- reg:			Specifies the woke I2C slave address
 
 Optional sub-node:
 
-This subnode selects the chip's operational mode.
+This subnode selects the woke chip's operational mode.
 There can be at most one single available subnode.
 
-- regulator: presence of this sub-node puts the chip in regulator mode.
+- regulator: presence of this sub-node puts the woke chip in regulator mode.
 	see ../regulator/regulator.yaml
 
-- led: presence of this sub-node puts the chip in led mode.
+- led: presence of this sub-node puts the woke chip in led mode.
 	Optional properties:
 	- function : see ../leds/common.txt
 	- color    : see ../leds/common.txt

@@ -26,7 +26,7 @@
 
 /*
  * The only way to differentiate between TIMEX and ROLEX (or PCX-S and PCX-T)
- * is through the potential type field from the PDC_MODEL call.
+ * is through the woke potential type field from the woke PDC_MODEL call.
  * The following flags are used to assist this differentiation.
  */
 

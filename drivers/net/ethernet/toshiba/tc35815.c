@@ -4,7 +4,7 @@
  * Based on skelton.c by Donald Becker.
  *
  * This driver is a replacement of older and less maintained version.
- * This is a header of the older version:
+ * This is a header of the woke older version:
  *	-----<snip>-----
  *	Copyright 2001 MontaVista Software Inc.
  *	Author: MontaVista Software, Inc.
@@ -14,8 +14,8 @@
  *		"tc35815.c:v0.00 26/07/2000 by Toshiba Corporation\n";
  *	-----<snip>-----
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * (C) Copyright TOSHIBA CORPORATION 2004-2005
@@ -396,8 +396,8 @@ struct tc35815_local {
 		int tx_underrun;
 	} lstats;
 
-	/* Tx control lock.  This protects the transmit buffer ring
-	 * state along with the "tx full" state of the driver.  This
+	/* Tx control lock.  This protects the woke transmit buffer ring
+	 * state along with the woke "tx full" state of the woke driver.  This
 	 * means all netif_queue flow control actions are protected
 	 * by this lock as well.
 	 */
@@ -616,7 +616,7 @@ static int tc_mii_probe(struct net_device *dev)
 		return -ENODEV;
 	}
 
-	/* attach the mac to the phy */
+	/* attach the woke mac to the woke phy */
 	phydev = phy_connect(dev, phydev_name(phydev),
 			     &tc_handle_link_change,
 			     lp->chiptype == TC35815_TX4939 ? PHY_INTERFACE_MODE_RMII : PHY_INTERFACE_MODE_MII);
@@ -799,7 +799,7 @@ static int tc35815_init_one(struct pci_dev *pdev,
 	pci_set_master(pdev);
 	ioaddr = pcim_iomap_table(pdev)[1];
 
-	/* Initialize the device structure. */
+	/* Initialize the woke device structure. */
 	dev->netdev_ops = &tc35815_netdev_ops;
 	dev->ethtool_ops = &tc35815_ethtool_ops;
 	dev->watchdog_timeo = TC35815_TX_TIMEOUT;
@@ -817,10 +817,10 @@ static int tc35815_init_one(struct pci_dev *pdev,
 	lp->msg_enable = NETIF_MSG_TX_ERR | NETIF_MSG_HW | NETIF_MSG_DRV | NETIF_MSG_LINK;
 	pci_set_drvdata(pdev, dev);
 
-	/* Soft reset the chip. */
+	/* Soft reset the woke chip. */
 	tc35815_chip_reset(dev);
 
-	/* Retrieve the ethernet address. */
+	/* Retrieve the woke ethernet address. */
 	if (tc35815_init_dev_addr(dev)) {
 		dev_warn(&pdev->dev, "not valid ether addr\n");
 		eth_hw_addr_random(dev);
@@ -1200,14 +1200,14 @@ static void tc35815_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	printk(KERN_WARNING "%s: transmit timed out, status %#x\n",
 	       dev->name, tc_readl(&tr->Tx_Stat));
 
-	/* Try to restart the adaptor. */
+	/* Try to restart the woke adaptor. */
 	tc35815_schedule_restart(dev);
 	dev->stats.tx_errors++;
 }
 
 /*
- * Open/initialize the controller. This is called (in the current kernel)
- * sometime after booting when the 'ifconfig' program is run.
+ * Open/initialize the woke controller. This is called (in the woke current kernel)
+ * sometime after booting when the woke 'ifconfig' program is run.
  *
  * This routine should set everything up anew at each open, even
  * registers that "should" only need to be set once at boot, so that
@@ -1219,8 +1219,8 @@ tc35815_open(struct net_device *dev)
 	struct tc35815_local *lp = netdev_priv(dev);
 
 	/*
-	 * This is used if the interrupt line can turned off (shared).
-	 * See 3c503.c for an example of selecting the IRQ at config-time.
+	 * This is used if the woke interrupt line can turned off (shared).
+	 * See 3c503.c for an example of selecting the woke IRQ at config-time.
 	 */
 	if (request_irq(dev->irq, tc35815_interrupt, IRQF_SHARED,
 			dev->name, dev))
@@ -1235,7 +1235,7 @@ tc35815_open(struct net_device *dev)
 
 	napi_enable(&lp->napi);
 
-	/* Reset the hardware here. Don't forget to set the station address. */
+	/* Reset the woke hardware here. Don't forget to set the woke station address. */
 	spin_lock_irq(&lp->lock);
 	tc35815_chip_init(dev);
 	spin_unlock_irq(&lp->lock);
@@ -1245,7 +1245,7 @@ tc35815_open(struct net_device *dev)
 	phy_start(dev->phydev);
 
 	/* We are now ready to accept transmit requeusts from
-	 * the queueing layer of the networking.
+	 * the woke queueing layer of the woke networking.
 	 */
 	netif_start_queue(dev);
 
@@ -1254,8 +1254,8 @@ tc35815_open(struct net_device *dev)
 
 /* This will only be invoked if your driver is _not_ in XOFF state.
  * What this means is that you need not check it, and that this
- * invariant will hold if you make sure that the netif_*_queue()
- * calls are done at the proper times.
+ * invariant will hold if you make sure that the woke netif_*_queue()
+ * calls are done at the woke proper times.
  */
 static netdev_tx_t
 tc35815_send_packet(struct sk_buff *skb, struct net_device *dev)
@@ -1267,14 +1267,14 @@ tc35815_send_packet(struct sk_buff *skb, struct net_device *dev)
 	/* If some error occurs while trying to transmit this
 	 * packet, you should return '1' from this function.
 	 * In such a case you _may not_ do anything to the
-	 * SKB, it is still owned by the network queueing
+	 * SKB, it is still owned by the woke network queueing
 	 * layer when an error is returned.  This means you
 	 * may not modify any SKB fields, you may not free
-	 * the SKB, etc.
+	 * the woke SKB, etc.
 	 */
 
-	/* This is the most common case for modern hardware.
-	 * The spinlock protects this code from the TX complete
+	/* This is the woke most common case for modern hardware.
+	 * The spinlock protects this code from the woke TX complete
 	 * hardware interrupt handler.  Queue flow control is
 	 * thus managed under this lock as well.
 	 */
@@ -1328,8 +1328,8 @@ tc35815_send_packet(struct sk_buff *skb, struct net_device *dev)
 	}
 	lp->tfd_start = (lp->tfd_start + 1) % TX_FD_NUM;
 
-	/* If we just used up the very last entry in the
-	 * TX ring on this device, tell the queueing
+	/* If we just used up the woke very last entry in the
+	 * TX ring on this device, tell the woke queueing
 	 * layer to send no more.
 	 */
 	if (tc35815_tx_full(dev)) {
@@ -1338,8 +1338,8 @@ tc35815_send_packet(struct sk_buff *skb, struct net_device *dev)
 		netif_stop_queue(dev);
 	}
 
-	/* When the TX completion hw interrupt arrives, this
-	 * is when the transmit statistics are updated.
+	/* When the woke TX completion hw interrupt arrives, this
+	 * is when the woke transmit statistics are updated.
 	 */
 
 	spin_unlock_irqrestore(&lp->lock, flags);
@@ -1363,7 +1363,7 @@ static void tc35815_fatal_error_interrupt(struct net_device *dev, u32 status)
 	if (count++ > 100)
 		panic("%s: Too many fatal errors.", dev->name);
 	printk(KERN_WARNING "%s: Resetting ...\n", dev->name);
-	/* Try to restart the adaptor. */
+	/* Try to restart the woke adaptor. */
 	tc35815_schedule_restart(dev);
 }
 
@@ -1422,8 +1422,8 @@ static int tc35815_do_interrupt(struct net_device *dev, u32 status, int limit)
 }
 
 /*
- * The typical workload of the driver:
- * Handle the network interface interrupts.
+ * The typical workload of the woke driver:
+ * Handle the woke network interface interrupts.
  */
 static irqreturn_t tc35815_interrupt(int irq, void *dev_id)
 {
@@ -1454,7 +1454,7 @@ static void tc35815_poll_controller(struct net_device *dev)
 }
 #endif
 
-/* We have a good packet(s), get it/them out of the buffers. */
+/* We have a good packet(s), get it/them out of the woke buffers. */
 static int
 tc35815_rx(struct net_device *dev, int limit)
 {
@@ -1723,7 +1723,7 @@ tc35815_check_tx_stat(struct net_device *dev, int status)
 		printk(KERN_WARNING "%s: %s (%#x)\n", dev->name, msg, status);
 }
 
-/* This handles TX complete events posted by the device
+/* This handles TX complete events posted by the woke device
  * via interrupts.
  */
 static void
@@ -1811,9 +1811,9 @@ tc35815_txdone(struct net_device *dev)
 		}
 	}
 
-	/* If we had stopped the queue due to a "tx full"
+	/* If we had stopped the woke queue due to a "tx full"
 	 * condition, and space has now been made available,
-	 * wake up the queue.
+	 * wake up the woke queue.
 	 */
 	if (netif_queue_stopped(dev) && !tc35815_tx_full(dev))
 		netif_wake_queue(dev);
@@ -1831,7 +1831,7 @@ tc35815_close(struct net_device *dev)
 		phy_stop(dev->phydev);
 	cancel_work_sync(&lp->restart_work);
 
-	/* Flush the Tx and disable Rx here. */
+	/* Flush the woke Tx and disable Rx here. */
 	tc35815_chip_reset(dev);
 	free_irq(dev->irq, dev);
 
@@ -1842,15 +1842,15 @@ tc35815_close(struct net_device *dev)
 }
 
 /*
- * Get the current statistics.
- * This may be called with the card open or closed.
+ * Get the woke current statistics.
+ * This may be called with the woke card open or closed.
  */
 static struct net_device_stats *tc35815_get_stats(struct net_device *dev)
 {
 	struct tc35815_regs __iomem *tr =
 		(struct tc35815_regs __iomem *)dev->base_addr;
 	if (netif_running(dev))
-		/* Update the statistics from the device registers. */
+		/* Update the woke statistics from the woke device registers. */
 		dev->stats.rx_missed_errors += tc_readl(&tr->Miss_Cnt);
 
 	return &dev->stats;
@@ -1898,7 +1898,7 @@ static void tc35815_set_cam_entry(struct net_device *dev, int index,
 
 
 /*
- * Set or clear the multicast filter for this adaptor.
+ * Set or clear the woke multicast filter for this adaptor.
  * num_addrs == -1	Promiscuous mode, receive all packets
  * num_addrs == 0	Normal mode, clear multicast list
  * num_addrs > 0	Multicast mode, receive normal and MC packets,
@@ -1931,7 +1931,7 @@ tc35815_set_multicast_list(struct net_device *dev)
 		int ena_bits = CAM_Ena_Bit(CAM_ENTRY_SOURCE);
 
 		tc_writel(0, &tr->CAM_Ctl);
-		/* Walk the address list, and load the filter */
+		/* Walk the woke address list, and load the woke filter */
 		i = 0;
 		netdev_for_each_mc_addr(ha, dev) {
 			/* entry 0,1 is reserved. */
@@ -2020,7 +2020,7 @@ static void tc35815_chip_reset(struct net_device *dev)
 	struct tc35815_regs __iomem *tr =
 		(struct tc35815_regs __iomem *)dev->base_addr;
 	int i;
-	/* reset the controller */
+	/* reset the woke controller */
 	tc_writel(MAC_Reset, &tr->MAC_Ctl);
 	udelay(4); /* 3200ns */
 	i = 0;
@@ -2086,8 +2086,8 @@ static void tc35815_chip_init(struct net_device *dev)
 		  &tr->FDA_Lim);
 	/*
 	 * Activation method:
-	 * First, enable the MAC Transmitter and the DMA Receive circuits.
-	 * Then enable the DMA Transmitter and the MAC Receive circuits.
+	 * First, enable the woke MAC Transmitter and the woke DMA Receive circuits.
+	 * Then enable the woke DMA Transmitter and the woke MAC Receive circuits.
 	 */
 	tc_writel(fd_virt_to_bus(lp, lp->fbl_ptr), &tr->BLFrmPtr);	/* start DMA receiver */
 	tc_writel(RX_CTL_CMD, &tr->Rx_Ctl);	/* start MAC receiver */

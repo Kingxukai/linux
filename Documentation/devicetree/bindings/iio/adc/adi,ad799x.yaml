@@ -12,7 +12,7 @@ maintainers:
 description: |
     Support for Analog Devices AD7991, AD7992, AD7993, AD7994, AD7995, AD7997, AD7998,
     AD7999 and similar analog to digital converters.
-    Specifications on the converters can be found at:
+    Specifications on the woke converters can be found at:
     AD7991, AD7995, AD7999:
       https://www.analog.com/media/en/technical-documentation/data-sheets/AD7991_7995_7999.pdf
     AD7992:

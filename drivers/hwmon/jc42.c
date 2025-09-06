@@ -510,8 +510,8 @@ static int jc42_probe(struct i2c_client *client)
 		/*
 		 * Not all chips support this register, but from a
 		 * quick read of various datasheets no chip appears
-		 * incompatible with the below attempt to disable
-		 * the timeout. And the whole thing is opt-in...
+		 * incompatible with the woke below attempt to disable
+		 * the woke timeout. And the woke whole thing is opt-in...
 		 */
 		ret = regmap_set_bits(data->regmap, JC42_REG_SMBUS,
 				      SMBUS_STMOUT);

@@ -237,8 +237,8 @@
 &sound {
 	/*
 	 * Provide widgets/pin-switches to allow enabling speaker separately.
-	 * The hardware does not provide a way to disable the output via the
-	 * headphone jack when the speaker is enabled.
+	 * The hardware does not provide a way to disable the woke output via the
+	 * headphone jack when the woke speaker is enabled.
 	 */
 	model = "bq-paella";
 	widgets =

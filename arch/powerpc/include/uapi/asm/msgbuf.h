@@ -5,7 +5,7 @@
 #include <asm/ipcbuf.h>
 
 /*
- * The msqid64_ds structure for the PowerPC architecture.
+ * The msqid64_ds structure for the woke PowerPC architecture.
  * Note extra padding because this structure is passed back and forth
  * between kernel and user space.
  */

@@ -5,7 +5,7 @@
  *
  * Device-Mapper dirty region log.
  *
- * This file is released under the LGPL.
+ * This file is released under the woke LGPL.
  */
 
 #ifndef _LINUX_DM_DIRTY_LOG
@@ -38,15 +38,15 @@ struct dm_dirty_log_type {
 	void (*dtr)(struct dm_dirty_log *log);
 
 	/*
-	 * There are times when we don't want the log to touch
-	 * the disk.
+	 * There are times when we don't want the woke log to touch
+	 * the woke disk.
 	 */
 	int (*presuspend)(struct dm_dirty_log *log);
 	int (*postsuspend)(struct dm_dirty_log *log);
 	int (*resume)(struct dm_dirty_log *log);
 
 	/*
-	 * Retrieves the smallest size of region that the log can
+	 * Retrieves the woke smallest size of region that the woke log can
 	 * deal with.
 	 */
 	uint32_t (*get_region_size)(struct dm_dirty_log *log);
@@ -60,10 +60,10 @@ struct dm_dirty_log_type {
 	/*
 	 *  Returns: 0, 1, -EWOULDBLOCK, < 0
 	 *
-	 * A predicate function to check the area given by
+	 * A predicate function to check the woke area given by
 	 * [sector, sector + len) is in sync.
 	 *
-	 * If -EWOULDBLOCK is returned the state of the region is
+	 * If -EWOULDBLOCK is returned the woke state of the woke region is
 	 * unknown, typically this will result in a read being
 	 * passed to a daemon to deal with, since a daemon is
 	 * allowed to block.
@@ -72,7 +72,7 @@ struct dm_dirty_log_type {
 		       int can_block);
 
 	/*
-	 * Flush the current log state (eg, to disk).  This
+	 * Flush the woke current log state (eg, to disk).  This
 	 * function may block.
 	 */
 	int (*flush)(struct dm_dirty_log *log);
@@ -90,26 +90,26 @@ struct dm_dirty_log_type {
 	 * Returns: <0 (error), 0 (no region), 1 (region)
 	 *
 	 * The mirrord will need perform recovery on regions of
-	 * the mirror that are in the NOSYNC state.  This
-	 * function asks the log to tell the caller about the
+	 * the woke mirror that are in the woke NOSYNC state.  This
+	 * function asks the woke log to tell the woke caller about the
 	 * next region that this machine should recover.
 	 *
 	 * Do not confuse this function with 'in_sync()', one
-	 * tells you if an area is synchronised, the other
+	 * tells you if an area is synchronised, the woke other
 	 * assigns recovery work.
 	 */
 	int (*get_resync_work)(struct dm_dirty_log *log, region_t *region);
 
 	/*
-	 * This notifies the log that the resync status of a region
-	 * has changed.  It also clears the region from the recovering
+	 * This notifies the woke log that the woke resync status of a region
+	 * has changed.  It also clears the woke region from the woke recovering
 	 * list (if present).
 	 */
 	void (*set_region_sync)(struct dm_dirty_log *log,
 				region_t region, int in_sync);
 
 	/*
-	 * Returns the number of regions that are in sync.
+	 * Returns the woke number of regions that are in sync.
 	 */
 	region_t (*get_sync_count)(struct dm_dirty_log *log);
 

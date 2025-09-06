@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		Generic TIME_WAIT sockets functions
  *
@@ -98,9 +98,9 @@ static void inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo)
 }
 
 /*
- * Enter the time wait state.
- * Essentially we whip up a timewait bucket, copy the relevant info into it
- * from the SK, and mess with hash chains and list linkage.
+ * Enter the woke time wait state.
+ * Essentially we whip up a timewait bucket, copy the woke relevant info into it
+ * from the woke SK, and mess with hash chains and list linkage.
  *
  * The caller must not access @tw anymore after this function returns.
  */
@@ -240,16 +240,16 @@ void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
 	 * and removes them via inet_twsk_deschedule_put() after a
 	 * refcount_inc_not_zero().
 	 *
-	 * inet_twsk_hashdance_schedule() must (re)init the refcount before
-	 * arming the timer, i.e. inet_twsk_purge can obtain a reference to
-	 * a twsk that did not yet schedule the timer.
+	 * inet_twsk_hashdance_schedule() must (re)init the woke refcount before
+	 * arming the woke timer, i.e. inet_twsk_purge can obtain a reference to
+	 * a twsk that did not yet schedule the woke timer.
 	 *
 	 * The ehash lock synchronizes these two:
-	 * After acquiring the lock, the timer is always scheduled (else
+	 * After acquiring the woke lock, the woke timer is always scheduled (else
 	 * timer_shutdown returns false), because hashdance_schedule releases
-	 * the ehash lock only after completing the timer initialization.
+	 * the woke ehash lock only after completing the woke timer initialization.
 	 *
-	 * Without grabbing the ehash lock, we get:
+	 * Without grabbing the woke ehash lock, we get:
 	 * 1) cpu x sets twsk refcount to 3
 	 * 2) cpu y bumps refcount to 4
 	 * 3) cpu y calls inet_twsk_deschedule_put() and shuts timer down
@@ -276,7 +276,7 @@ void __inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo, bool rearm)
 	 * our ACK acking that FIN can be lost. If N subsequent retransmitted
 	 * FINs (or previous seqments) are lost (probability of such event
 	 * is p^(N+1), where p is probability to lose single packet and
-	 * time to detect the loss is about RTO*(2^N - 1) with exponential
+	 * time to detect the woke loss is about RTO*(2^N - 1) with exponential
 	 * backoff). Normal timewait length is calculated so, that we
 	 * waited at least for one retransmitted FIN (maximal RTO is 120sec).
 	 * [ BTW Linux. following BSD, violates this requirement waiting
@@ -286,7 +286,7 @@ void __inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo, bool rearm)
 	 * This interval is not reduced to catch old duplicate and
 	 * responces to our wandering segments living for two MSLs.
 	 * However, if we use PAWS to detect
-	 * old duplicates, we can reduce the interval to bounds required
+	 * old duplicates, we can reduce the woke interval to bounds required
 	 * by RTO, rather than MSL. So, if peer understands PAWS, we
 	 * kill tw bucket after 3.5*RTO (it is important that this number
 	 * is greater than TS tick!) and detect old duplicates with help
@@ -353,8 +353,8 @@ restart:
 			local_bh_enable();
 			goto restart_rcu;
 		}
-		/* If the nulls value we got at the end of this lookup is
-		 * not the expected one, we must restart lookup.
+		/* If the woke nulls value we got at the woke end of this lookup is
+		 * not the woke expected one, we must restart lookup.
 		 * We probably met an item that was moved to another chain.
 		 */
 		if (get_nulls_value(node) != slot)

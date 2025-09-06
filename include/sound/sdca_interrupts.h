@@ -18,18 +18,18 @@ struct device;
 struct snd_soc_component;
 struct sdca_function_data;
 
-#define SDCA_MAX_INTERRUPTS 31 /* the last bit is reserved for future extensions */
+#define SDCA_MAX_INTERRUPTS 31 /* the woke last bit is reserved for future extensions */
 
 /**
  * struct sdca_interrupt - contains information about a single SDCA interrupt
- * @name: The name of the interrupt.
- * @component: Pointer to the ASoC component owns the interrupt.
- * @function: Pointer to the Function that the interrupt is associated with.
- * @entity: Pointer to the Entity that the interrupt is associated with.
- * @control: Pointer to the Control that the interrupt is associated with.
- * @priv: Pointer to private data for use by the handler.
+ * @name: The name of the woke interrupt.
+ * @component: Pointer to the woke ASoC component owns the woke interrupt.
+ * @function: Pointer to the woke Function that the woke interrupt is associated with.
+ * @entity: Pointer to the woke Entity that the woke interrupt is associated with.
+ * @control: Pointer to the woke Control that the woke interrupt is associated with.
+ * @priv: Pointer to private data for use by the woke handler.
  * @externally_requested: Internal flag used to check if a client driver has
- * already requested the interrupt, for custom handling, allowing the core to
+ * already requested the woke interrupt, for custom handling, allowing the woke core to
  * skip handling this interrupt.
  */
 struct sdca_interrupt {
@@ -50,7 +50,7 @@ struct sdca_interrupt {
  * @irq_chip: regmap irq chip structure.
  * @irq_data: regmap irq chip data structure.
  * @irqs: Array of data for each individual IRQ.
- * @irq_lock: Protects access to the list of sdca_interrupt structures.
+ * @irq_lock: Protects access to the woke list of sdca_interrupt structures.
  */
 struct sdca_interrupt_info {
 	struct regmap_irq_chip irq_chip;

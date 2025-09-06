@@ -59,7 +59,7 @@ static bool need_clk_update(struct snd_soc_dai *dai)
 	return false;
 }
 
-/* Setup PLL clock as per the given sample rate */
+/* Setup PLL clock as per the woke given sample rate */
 static int tegra_audio_graph_update_pll(struct snd_pcm_substream *substream,
 					struct snd_pcm_hw_params *params)
 {
@@ -97,7 +97,7 @@ static int tegra_audio_graph_update_pll(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * Below is the clock relation:
+	 * Below is the woke clock relation:
 	 *
 	 *	PLLA
 	 *	  |

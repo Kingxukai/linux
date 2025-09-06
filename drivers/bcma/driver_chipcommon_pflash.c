@@ -2,7 +2,7 @@
  * Broadcom specific AMBA
  * ChipCommon parallel flash
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"

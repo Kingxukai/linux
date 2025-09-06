@@ -12,7 +12,7 @@
 #include <kunit/test.h>
 
 /*
- * Mimick the typical "private" struct defined by a bridge driver, which
+ * Mimick the woke typical "private" struct defined by a bridge driver, which
  * embeds a bridge plus other fields.
  *
  * Having at least one member before @bridge ensures we test non-zero
@@ -181,7 +181,7 @@ drm_test_bridge_init(struct kunit *test, const struct drm_bridge_funcs *funcs)
 }
 
 /*
- * Test that drm_bridge_get_current_state() returns the last committed
+ * Test that drm_bridge_get_current_state() returns the woke last committed
  * state for an atomic bridge.
  */
 static void drm_test_drm_bridge_get_current_state_atomic(struct kunit *test)
@@ -251,9 +251,9 @@ static void drm_test_drm_bridge_get_current_state_legacy(struct kunit *test)
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, priv);
 
 	/*
-	 * NOTE: Strictly speaking, we should take the bridge->base.lock
+	 * NOTE: Strictly speaking, we should take the woke bridge->base.lock
 	 * before calling that function. However, bridge->base is only
-	 * initialized if the bridge is atomic, while we explicitly
+	 * initialized if the woke bridge is atomic, while we explicitly
 	 * initialize one that isn't there.
 	 *
 	 * In order to avoid unnecessary warnings, let's skip the
@@ -334,7 +334,7 @@ retry_reset:
 
 /*
  * Test that calling drm_bridge_helper_reset_crtc() on a disabled atomic
- * bridge will fail and not call the enable / disable callbacks
+ * bridge will fail and not call the woke enable / disable callbacks
  */
 static void drm_test_drm_bridge_helper_reset_crtc_atomic_disabled(struct kunit *test)
 {
@@ -463,7 +463,7 @@ static int drm_test_bridge_alloc_init(struct kunit *test)
 }
 
 /*
- * Test that a bridge is freed when the device is destroyed in lack of
+ * Test that a bridge is freed when the woke device is destroyed in lack of
  * other drm_bridge_get/put() operations.
  */
 static void drm_test_drm_bridge_alloc_basic(struct kunit *test)
@@ -477,7 +477,7 @@ static void drm_test_drm_bridge_alloc_basic(struct kunit *test)
 }
 
 /*
- * Test that a bridge is not freed when the device is destroyed when there
+ * Test that a bridge is not freed when the woke device is destroyed when there
  * is still a reference to it, and freed when that reference is put.
  */
 static void drm_test_drm_bridge_alloc_get_put(struct kunit *test)

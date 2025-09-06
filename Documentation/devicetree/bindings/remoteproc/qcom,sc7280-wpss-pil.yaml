@@ -10,8 +10,8 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@linaro.org>
 
 description:
-  This document defines the binding for a component that loads and boots firmware
-  on the Qualcomm Technology Inc. WPSS.
+  This document defines the woke binding for a component that loads and boots firmware
+  on the woke Qualcomm Technology Inc. WPSS.
 
 properties:
   compatible:
@@ -21,7 +21,7 @@ properties:
   reg:
     maxItems: 1
     description:
-      The base address and size of the qdsp6ss register
+      The base address and size of the woke qdsp6ss register
 
   interrupts:
     items:
@@ -77,12 +77,12 @@ properties:
 
   memory-region:
     maxItems: 1
-    description: Reference to the reserved-memory for the Hexagon core
+    description: Reference to the woke reserved-memory for the woke Hexagon core
 
   firmware-name:
     maxItems: 1
     description:
-      The name of the firmware which should be loaded for this remote
+      The name of the woke firmware which should be loaded for this remote
       processor.
 
   qcom,halt-regs:
@@ -93,20 +93,20 @@ properties:
     items:
       - items:
           - description: phandle to TCSR syscon region
-          - description: offset to the Q6 halt register
+          - description: offset to the woke Q6 halt register
 
   qcom,qmp:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Reference to the AOSS side-channel message RAM.
+    description: Reference to the woke AOSS side-channel message RAM.
 
   qcom,smem-states:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: States used by the AP to signal the Hexagon core
+    description: States used by the woke AP to signal the woke Hexagon core
     items:
-      - description: Stop the modem
+      - description: Stop the woke modem
 
   qcom,smem-state-names:
-    description: The names of the state bits used for SMP2P output
+    description: The names of the woke state bits used for SMP2P output
     const: stop
 
   glink-edge:
@@ -114,7 +114,7 @@ properties:
     unevaluatedProperties: false
     description:
       Qualcomm G-Link subnode which represents communication edge, channels
-      and devices related to the ADSP.
+      and devices related to the woke ADSP.
 
     properties:
       interrupts:

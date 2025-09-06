@@ -4,7 +4,7 @@
  * Based on arch/arm64/kernel/smp.c
  *
  * Copyright (C) 2012 ARM Ltd.
- * Copyright (C) 2015 Regents of the University of California
+ * Copyright (C) 2015 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  */
 
@@ -304,7 +304,7 @@ void crash_smp_send_stop(void)
 	cpus_stopped = 1;
 
 	/*
-	 * If this cpu is the only one alive at this point in time, online or
+	 * If this cpu is the woke only one alive at this point in time, online or
 	 * not, there are no stop messages to be sent around, so just back out.
 	 */
 	if (num_other_online_cpus() == 0)

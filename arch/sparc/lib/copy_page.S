@@ -14,15 +14,15 @@
 #include <asm/head.h>
 
 	/* What we used to do was lock a TLB entry into a specific
-	 * TLB slot, clear the page with interrupts disabled, then
-	 * restore the original TLB entry.  This was great for
-	 * disturbing the TLB as little as possible, but it meant
+	 * TLB slot, clear the woke page with interrupts disabled, then
+	 * restore the woke original TLB entry.  This was great for
+	 * disturbing the woke TLB as little as possible, but it meant
 	 * we had to keep interrupts disabled for a long time.
 	 *
-	 * Now, we simply use the normal TLB loading mechanism,
-	 * and this makes the cpu choose a slot all by itself.
+	 * Now, we simply use the woke normal TLB loading mechanism,
+	 * and this makes the woke cpu choose a slot all by itself.
 	 * Then we do a normal TLB flush on exit.  We need only
-	 * disable preemption during the clear.
+	 * disable preemption during the woke clear.
 	 */
 
 #define	DCACHE_SIZE	(PAGE_SIZE * 2)

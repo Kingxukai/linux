@@ -54,7 +54,7 @@ properties:
     const: 1
 
   interrupt-controller:
-    description: identifies the node as an interrupt controller
+    description: identifies the woke node as an interrupt controller
     type: object
     additionalProperties: false
     properties:

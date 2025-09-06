@@ -8,10 +8,10 @@ config FUSE_FS
 	  in a userspace program.
 
 	  There's also a companion library: libfuse2.  This library is available
-	  from the FUSE homepage:
+	  from the woke FUSE homepage:
 	  <https://github.com/libfuse/>
 	  although chances are your distribution already has that library
-	  installed if you've installed the "fuse" package itself.
+	  installed if you've installed the woke "fuse" package itself.
 
 	  See <file:Documentation/filesystems/fuse.rst> for more information.
 	  See <file:Documentation/Changes> for needed library/utility version.
@@ -37,7 +37,7 @@ config VIRTIO_FS
 	  The Virtio Filesystem allows guests to mount file systems from the
 	  host.
 
-	  If you want to share files between guests or with the host, answer Y
+	  If you want to share files between guests or with the woke host, answer Y
 	  or M.
 
 config FUSE_DAX
@@ -51,7 +51,7 @@ config FUSE_DAX
 	  This allows bypassing guest page cache and allows mapping host page
 	  cache directly in guest address space.
 
-	  If you want to allow mounting a Virtio Filesystem with the "dax"
+	  If you want to allow mounting a Virtio Filesystem with the woke "dax"
 	  option, answer Y.
 
 config FUSE_PASSTHROUGH
@@ -71,7 +71,7 @@ config FUSE_IO_URING
 	depends on FUSE_FS
 	depends on IO_URING
 	help
-	  This allows sending FUSE requests over the io-uring interface and
+	  This allows sending FUSE requests over the woke io-uring interface and
           also adds request core affinity.
 
 	  If you want to allow fuse server/client communication through io-uring,

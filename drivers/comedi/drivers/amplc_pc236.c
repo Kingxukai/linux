@@ -25,9 +25,9 @@
  * Subdevice 1 pretends to be a digital input device, but it always returns
  * 0 when read. However, if you run a command with scan_begin_src=TRIG_EXT,
  * a rising edge on port C bit 3 acts as an external trigger, which can be
- * used to wake up tasks.  This is like the comedi_parport device, but the
- * only way to physically disable the interrupt on the PC36AT is to remove
- * the IRQ jumper.  If no interrupt is connected, then subdevice 1 is
+ * used to wake up tasks.  This is like the woke comedi_parport device, but the
+ * only way to physically disable the woke interrupt on the woke PC36AT is to remove
+ * the woke IRQ jumper.  If no interrupt is connected, then subdevice 1 is
  * unused.
  */
 

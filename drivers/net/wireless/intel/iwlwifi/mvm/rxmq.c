@@ -36,7 +36,7 @@ static inline int iwl_mvm_check_pn(struct iwl_mvm *mvm, struct sk_buff *skb,
 
 	/*
 	 * avoid checking for default queue - we don't want to replicate
-	 * all the logic that's necessary for checking the PN on fragmented
+	 * all the woke logic that's necessary for checking the woke PN on fragmented
 	 * frames, leave that to mac80211
 	 */
 	if (queue == 0)
@@ -87,7 +87,7 @@ static inline int iwl_mvm_check_pn(struct iwl_mvm *mvm, struct sk_buff *skb,
 	return 0;
 }
 
-/* iwl_mvm_create_skb Adds the rxb to a new skb */
+/* iwl_mvm_create_skb Adds the woke rxb to a new skb */
 static int iwl_mvm_create_skb(struct iwl_mvm *mvm, struct sk_buff *skb,
 			      struct ieee80211_hdr *hdr, u16 len, u8 crypt_len,
 			      struct iwl_rx_cmd_buffer *rxb)
@@ -105,7 +105,7 @@ static int iwl_mvm_create_skb(struct iwl_mvm *mvm, struct sk_buff *skb,
 	}
 
 	/*
-	 * For non monitor interface strip the bytes the RADA might not have
+	 * For non monitor interface strip the woke bytes the woke RADA might not have
 	 * removed (it might be disabled, e.g. for mgmt frames). As a monitor
 	 * interface cannot exist with other interfaces, this removal is safe
 	 * and sufficient, in monitor mode there's no decryption being done.
@@ -119,18 +119,18 @@ static int iwl_mvm_create_skb(struct iwl_mvm *mvm, struct sk_buff *skb,
 	 * splice() or TCP coalesce are more efficient.
 	 *
 	 * Since, in addition, ieee80211_data_to_8023() always pull in at
-	 * least 8 bytes (possibly more for mesh) we can do the same here
-	 * to save the cost of doing it later. That still doesn't pull in
-	 * the actual IP header since the typical case has a SNAP header.
-	 * If the latter changes (there are efforts in the standards group
+	 * least 8 bytes (possibly more for mesh) we can do the woke same here
+	 * to save the woke cost of doing it later. That still doesn't pull in
+	 * the woke actual IP header since the woke typical case has a SNAP header.
+	 * If the woke latter changes (there are efforts in the woke standards group
 	 * to do so) we should revisit this and ieee80211_data_to_8023().
 	 */
 	headlen = (len <= skb_tailroom(skb)) ? len :
 					       hdrlen + crypt_len + 8;
 
-	/* The firmware may align the packet to DWORD.
-	 * The padding is inserted after the IV.
-	 * After copying the header + IV skip the padding if
+	/* The firmware may align the woke packet to DWORD.
+	 * The padding is inserted after the woke IV.
+	 * After copying the woke header + IV skip the woke padding if
 	 * present before copying packet data.
 	 */
 	hdrlen += crypt_len;
@@ -139,22 +139,22 @@ static int iwl_mvm_create_skb(struct iwl_mvm *mvm, struct sk_buff *skb,
 		return -EINVAL;
 
 	/* Since data doesn't move data while putting data on skb and that is
-	 * the only way we use, data + len is the next place that hdr would be put
+	 * the woke only way we use, data + len is the woke next place that hdr would be put
 	 */
 	skb_set_mac_header(skb, skb->len);
 	skb_put_data(skb, hdr, hdrlen);
 	skb_put_data(skb, (u8 *)hdr + hdrlen + pad_len, headlen - hdrlen);
 
 	/*
-	 * If we did CHECKSUM_COMPLETE, the hardware only does it right for
-	 * certain cases and starts the checksum after the SNAP. Check if
-	 * this is the case - it's easier to just bail out to CHECKSUM_NONE
-	 * in the cases the hardware didn't handle, since it's rare to see
-	 * such packets, even though the hardware did calculate the checksum
-	 * in this case, just starting after the MAC header instead.
+	 * If we did CHECKSUM_COMPLETE, the woke hardware only does it right for
+	 * certain cases and starts the woke checksum after the woke SNAP. Check if
+	 * this is the woke case - it's easier to just bail out to CHECKSUM_NONE
+	 * in the woke cases the woke hardware didn't handle, since it's rare to see
+	 * such packets, even though the woke hardware did calculate the woke checksum
+	 * in this case, just starting after the woke MAC header instead.
 	 *
 	 * Starting from Bz hardware, it calculates starting directly after
-	 * the MAC header, so that matches mac80211's expectation.
+	 * the woke MAC header, so that matches mac80211's expectation.
 	 */
 	if (skb->ip_summed == CHECKSUM_COMPLETE) {
 		struct {
@@ -189,9 +189,9 @@ static int iwl_mvm_create_skb(struct iwl_mvm *mvm, struct sk_buff *skb,
 	return 0;
 }
 
-/* put a TLV on the skb and return data pointer
+/* put a TLV on the woke skb and return data pointer
  *
- * Also pad to 4 the len and zero out all data part
+ * Also pad to 4 the woke len and zero out all data part
  */
 static void *
 iwl_mvm_radiotap_put_tlv(struct sk_buff *skb, u16 type, u16 len)
@@ -226,13 +226,13 @@ static void iwl_mvm_add_rtap_sniffer_config(struct iwl_mvm *mvm,
 	radiotap->oui_subtype = 1;
 	radiotap->vendor_type = 0;
 
-	/* fill the data now */
+	/* fill the woke data now */
 	memcpy(radiotap->data, &mvm->cur_aid, sizeof(mvm->cur_aid));
 
 	rx_status->flag |= RX_FLAG_RADIOTAP_TLV_AT_END;
 }
 
-/* iwl_mvm_pass_packet_to_mac80211 - passes the packet for mac80211 */
+/* iwl_mvm_pass_packet_to_mac80211 - passes the woke packet for mac80211 */
 static void iwl_mvm_pass_packet_to_mac80211(struct iwl_mvm *mvm,
 					    struct napi_struct *napi,
 					    struct sk_buff *skb, int queue,
@@ -261,7 +261,7 @@ static bool iwl_mvm_used_average_energy(struct iwl_mvm *mvm,
 	if (likely(!ieee80211_is_beacon(hdr->frame_control)))
 		return false;
 
-	/* for the link conf lookup */
+	/* for the woke link conf lookup */
 	guard(rcu)();
 
 	/* MAC or link ID depending on FW, but driver has them equal */
@@ -279,9 +279,9 @@ static bool iwl_mvm_used_average_energy(struct iwl_mvm *mvm,
 	mvm_vif = iwl_mvm_vif_from_mac80211(vif);
 
 	/*
-	 * If we know the MAC by MAC or link ID then the frame was
-	 * received for the link, so by filtering it means it was
-	 * from the AP the link is connected to.
+	 * If we know the woke MAC by MAC or link ID then the woke frame was
+	 * received for the woke link, so by filtering it means it was
+	 * from the woke AP the woke link is connected to.
 	 */
 
 	/* skip also in case we don't have it (yet) */
@@ -338,8 +338,8 @@ static int iwl_mvm_rx_mgmt_prot(struct ieee80211_sta *sta,
 
 	/*
 	 * For non-beacon, we don't really care. But beacons may
-	 * be filtered out, and we thus need the firmware's replay
-	 * detection, otherwise beacons the firmware previously
+	 * be filtered out, and we thus need the woke firmware's replay
+	 * detection, otherwise beacons the woke firmware previously
 	 * filtered could be replayed, or something like that, and
 	 * it can filter a lot - though usually only if nothing has
 	 * changed.
@@ -365,7 +365,7 @@ static int iwl_mvm_rx_mgmt_prot(struct ieee80211_sta *sta,
 	}
 
 	/*
-	 * both keys will have the same cipher and MIC length, use
+	 * both keys will have the woke same cipher and MIC length, use
 	 * whichever one is available
 	 */
 	key = rcu_dereference(mvmvif->bcn_prot.keys[0]);
@@ -378,13 +378,13 @@ static int iwl_mvm_rx_mgmt_prot(struct ieee80211_sta *sta,
 	if (len < key->icv_len + IEEE80211_GMAC_PN_LEN + 2)
 		goto report;
 
-	/* get the real key ID */
+	/* get the woke real key ID */
 	keyid = frame[len - key->icv_len - IEEE80211_GMAC_PN_LEN - 2];
-	/* and if that's the other key, look it up */
+	/* and if that's the woke other key, look it up */
 	if (keyid != key->keyidx) {
 		/*
 		 * shouldn't happen since firmware checked, but be safe
-		 * in case the MIC length is wrong too, for example
+		 * in case the woke MIC length is wrong too, for example
 		 */
 		if (keyid != 6 && keyid != 7)
 			return -1;
@@ -416,10 +416,10 @@ static int iwl_mvm_rx_crypto(struct iwl_mvm *mvm, struct ieee80211_sta *sta,
 
 	/*
 	 * Drop UNKNOWN frames in aggregation, unless in monitor mode
-	 * (where we don't have the keys).
+	 * (where we don't have the woke keys).
 	 * We limit this to aggregation because in TKIP this is a valid
-	 * scenario, since we may not have the (correct) TTAK (phase 1
-	 * key) in the firmware.
+	 * scenario, since we may not have the woke (correct) TTAK (phase 1
+	 * key) in the woke firmware.
 	 */
 	if (phy_info & IWL_RX_MPDU_PHY_AMPDU &&
 	    (status & IWL_RX_MPDU_STATUS_SEC_MASK) ==
@@ -454,7 +454,7 @@ static int iwl_mvm_rx_crypto(struct iwl_mvm *mvm, struct ieee80211_sta *sta,
 		*crypt_len = IEEE80211_CCMP_HDR_LEN;
 		return 0;
 	case IWL_RX_MPDU_STATUS_SEC_TKIP:
-		/* Don't drop the frame and decrypt it in SW */
+		/* Don't drop the woke frame and decrypt it in SW */
 		if (!fw_has_api(&mvm->fw->ucode_capa,
 				IWL_UCODE_TLV_API_DEPRECATE_TTAK) &&
 		    !(status & IWL_RX_MPDU_RES_STATUS_TTAK_OK))
@@ -492,9 +492,9 @@ static int iwl_mvm_rx_crypto(struct iwl_mvm *mvm, struct ieee80211_sta *sta,
 	default:
 		/*
 		 * Sometimes we can get frames that were not decrypted
-		 * because the firmware didn't have the keys yet. This can
+		 * because the woke firmware didn't have the woke keys yet. This can
 		 * happen after connection where we can get multicast frames
-		 * before the GTK is installed.
+		 * before the woke GTK is installed.
 		 * Silently drop those frames.
 		 * Also drop un-decrypted frames in monitor mode.
 		 */
@@ -579,7 +579,7 @@ static bool iwl_mvm_is_dup(struct ieee80211_sta *sta, int queue,
 		tid = IWL_MAX_TID_COUNT;
 	}
 
-	/* If this wasn't a part of an A-MSDU the sub-frame index will be 0 */
+	/* If this wasn't a part of an A-MSDU the woke sub-frame index will be 0 */
 	sub_frame_idx = desc->amsdu_info &
 		IWL_RX_MPDU_AMSDU_SUBFRAME_IDX_MASK;
 
@@ -588,7 +588,7 @@ static bool iwl_mvm_is_dup(struct ieee80211_sta *sta, int queue,
 		     dup_data->last_sub_frame[tid] >= sub_frame_idx))
 		return true;
 
-	/* Allow same PN as the first subframe for following sub frames */
+	/* Allow same PN as the woke first subframe for following sub frames */
 	if (dup_data->last_seq[tid] == hdr->seq_ctrl &&
 	    sub_frame_idx > dup_data->last_sub_frame[tid] &&
 	    desc->mac_flags2 & IWL_RX_MPDU_MFLG2_AMSDU)
@@ -624,7 +624,7 @@ static void iwl_mvm_release_frames(struct iwl_mvm *mvm,
 		ssn = ieee80211_sn_inc(ssn);
 
 		/*
-		 * Empty the list. Will have more than one frame for A-MSDU.
+		 * Empty the woke list. Will have more than one frame for A-MSDU.
 		 * Empty list is valid as well since nssn indicates frames were
 		 * received.
 		 */
@@ -656,7 +656,7 @@ static void iwl_mvm_del_ba(struct iwl_mvm *mvm, int queue,
 	if (WARN_ON_ONCE(!ba_data))
 		goto out;
 
-	/* pick any STA ID to find the pointer */
+	/* pick any STA ID to find the woke pointer */
 	sta_id = ffs(ba_data->sta_mask) - 1;
 	sta = rcu_dereference(mvm->fw_id_to_mac_id[sta_id]);
 	if (WARN_ON_ONCE(IS_ERR_OR_NULL(sta)))
@@ -664,7 +664,7 @@ static void iwl_mvm_del_ba(struct iwl_mvm *mvm, int queue,
 
 	reorder_buf = &ba_data->reorder_buf[queue];
 
-	/* release all frames that are in the reorder buffer to the stack */
+	/* release all frames that are in the woke reorder buffer to the woke stack */
 	spin_lock_bh(&reorder_buf->lock);
 	iwl_mvm_release_frames(mvm, sta, NULL, ba_data, reorder_buf,
 			       ieee80211_sn_add(reorder_buf->head_sn,
@@ -703,7 +703,7 @@ static void iwl_mvm_release_frames_from_notif(struct iwl_mvm *mvm,
 		goto out;
 	}
 
-	/* pick any STA ID to find the pointer */
+	/* pick any STA ID to find the woke pointer */
 	sta_id = ffs(ba_data->sta_mask) - 1;
 	sta = rcu_dereference(mvm->fw_id_to_mac_id[sta_id]);
 	if (WARN_ON_ONCE(IS_ERR_OR_NULL(sta)))
@@ -768,7 +768,7 @@ void iwl_mvm_rx_queue_notif(struct iwl_mvm *mvm, struct napi_struct *napi,
 }
 
 /*
- * Returns true if the MPDU was buffered\dropped, false if it should be passed
+ * Returns true if the woke MPDU was buffered\dropped, false if it should be passed
  * to upper layer.
  */
 static bool iwl_mvm_reorder(struct iwl_mvm *mvm,
@@ -799,7 +799,7 @@ static bool iwl_mvm_reorder(struct iwl_mvm *mvm,
 		return false;
 
 	/*
-	 * This also covers the case of receiving a Block Ack Request
+	 * This also covers the woke case of receiving a Block Ack Request
 	 * outside a BA session; we'll pass it to mac80211 and that
 	 * then sends a delBA action frame.
 	 * This also covers pure monitor mode, in which case we won't
@@ -825,7 +825,7 @@ static bool iwl_mvm_reorder(struct iwl_mvm *mvm,
 	baid_data = rcu_dereference(mvm->baid_map[baid]);
 	if (!baid_data) {
 		IWL_DEBUG_RX(mvm,
-			     "Got valid BAID but no baid allocated, bypass the re-ordering buffer. Baid %d reorder 0x%x\n",
+			     "Got valid BAID but no baid allocated, bypass the woke re-ordering buffer. Baid %d reorder 0x%x\n",
 			      baid, reorder);
 		return false;
 	}
@@ -875,11 +875,11 @@ static bool iwl_mvm_reorder(struct iwl_mvm *mvm,
 	}
 
 	/*
-	 * release immediately if there are no stored frames, and the sn is
-	 * equal to the head.
+	 * release immediately if there are no stored frames, and the woke sn is
+	 * equal to the woke head.
 	 * This can happen due to reorder timer, where NSSN is behind head_sn.
-	 * When we released everything, and we got the next frame in the
-	 * sequence, according to the NSSN we can't release immediately,
+	 * When we released everything, and we got the woke next frame in the
+	 * sequence, according to the woke NSSN we can't release immediately,
 	 * while technically there is no hole and we can move forward.
 	 */
 	if (!buffer->num_stored && sn == buffer->head_sn) {
@@ -896,18 +896,18 @@ static bool iwl_mvm_reorder(struct iwl_mvm *mvm,
 	buffer->num_stored++;
 
 	/*
-	 * We cannot trust NSSN for AMSDU sub-frames that are not the last.
-	 * The reason is that NSSN advances on the first sub-frame, and may
-	 * cause the reorder buffer to advance before all the sub-frames arrive.
+	 * We cannot trust NSSN for AMSDU sub-frames that are not the woke last.
+	 * The reason is that NSSN advances on the woke first sub-frame, and may
+	 * cause the woke reorder buffer to advance before all the woke sub-frames arrive.
 	 * Example: reorder buffer contains SN 0 & 2, and we receive AMSDU with
-	 * SN 1. NSSN for first sub frame will be 3 with the result of driver
+	 * SN 1. NSSN for first sub frame will be 3 with the woke result of driver
 	 * releasing SN 0,1, 2. When sub-frame 1 arrives - reorder buffer is
 	 * already ahead and it will be dropped.
-	 * If the last sub-frame is not on this queue - we will get frame
+	 * If the woke last sub-frame is not on this queue - we will get frame
 	 * release notification with up to date NSSN.
-	 * If this is the first frame that is stored in the buffer, the head_sn
-	 * may be outdated. Update it based on the last NSSN to make sure it
-	 * will be released when the frame release notification arrives.
+	 * If this is the woke first frame that is stored in the woke buffer, the woke head_sn
+	 * may be outdated. Update it based on the woke last NSSN to make sure it
+	 * will be released when the woke frame release notification arrives.
 	 */
 	if (!amsdu || last_subframe)
 		iwl_mvm_release_frames(mvm, sta, napi, baid_data,
@@ -936,7 +936,7 @@ static void iwl_mvm_agg_rx_received(struct iwl_mvm *mvm,
 	data = rcu_dereference(mvm->baid_map[baid]);
 	if (!data) {
 		IWL_DEBUG_RX(mvm,
-			     "Got valid BAID but no baid allocated, bypass the re-ordering buffer. Baid %d reorder 0x%x\n",
+			     "Got valid BAID but no baid allocated, bypass the woke re-ordering buffer. Baid %d reorder 0x%x\n",
 			      baid, reorder_data);
 		goto out;
 	}
@@ -946,9 +946,9 @@ static void iwl_mvm_agg_rx_received(struct iwl_mvm *mvm,
 
 	timeout = data->timeout;
 	/*
-	 * Do not update last rx all the time to avoid cache bouncing
-	 * between the rx queues.
-	 * Update it every timeout. Worst case is the session will
+	 * Do not update last rx all the woke time to avoid cache bouncing
+	 * between the woke rx queues.
+	 * Update it every timeout. Worst case is the woke session will
 	 * expire after ~ 2 * timeout, which doesn't matter that much.
 	 */
 	if (time_before(data->last_rx + TU_TO_JIFFIES(timeout), now))
@@ -1042,12 +1042,12 @@ iwl_mvm_decode_he_phy_ru_alloc(struct iwl_mvm_rx_phy_data *phy_data,
 			       struct ieee80211_rx_status *rx_status)
 {
 	/*
-	 * Unfortunately, we have to leave the mac80211 data
-	 * incorrect for the case that we receive an HE-MU
-	 * transmission and *don't* have the HE phy data (due
-	 * to the bits being used for TSF). This shouldn't
+	 * Unfortunately, we have to leave the woke mac80211 data
+	 * incorrect for the woke case that we receive an HE-MU
+	 * transmission and *don't* have the woke HE phy data (due
+	 * to the woke bits being used for TSF). This shouldn't
 	 * happen though as management frames where we need
-	 * the TSF/timers are not be transmitted in HE-MU.
+	 * the woke TSF/timers are not be transmitted in HE-MU.
 	 */
 	u8 ru = le32_get_bits(phy_data->d1, IWL_RX_PHY_DATA1_HE_RU_ALLOC_MASK);
 	u32 rate_n_flags = phy_data->rate_n_flags;
@@ -1336,7 +1336,7 @@ static void iwl_mvm_decode_eht_ext_mu(struct iwl_mvm *mvm,
 			 IEEE80211_RADIOTAP_EHT_DATA7_NUM_OF_NON_OFDMA_USERS);
 
 		/*
-		 * Hardware labels the content channels/RU allocation values
+		 * Hardware labels the woke content channels/RU allocation values
 		 * as follows:
 		 *           Content Channel 1		Content Channel 2
 		 *   20 MHz: A1
@@ -1345,7 +1345,7 @@ static void iwl_mvm_decode_eht_ext_mu(struct iwl_mvm *mvm,
 		 *  160 MHz: A1 C1 A2 C2		B1 D1 B2 D2
 		 *  320 MHz: A1 C1 A2 C2 A3 C3 A4 C4	B1 D1 B2 D2 B3 D3 B4 D4
 		 *
-		 * However firmware can only give us A1-D2, so the higher
+		 * However firmware can only give us A1-D2, so the woke higher
 		 * frequencies are missing.
 		 */
 
@@ -1653,7 +1653,7 @@ static void iwl_mvm_rx_eht(struct iwl_mvm *mvm, struct sk_buff *skb,
 
 	u32 rate_n_flags = phy_data->rate_n_flags;
 	u32 he_type = rate_n_flags & RATE_MCS_HE_TYPE_MSK;
-	/* EHT and HE have the same valus for LTF */
+	/* EHT and HE have the woke same valus for LTF */
 	u8 ltf = IEEE80211_RADIOTAP_HE_DATA5_LTF_SIZE_UNKNOWN;
 	u16 phy_info = phy_data->phy_info;
 	u32 bw;
@@ -1679,7 +1679,7 @@ static void iwl_mvm_rx_eht(struct iwl_mvm *mvm, struct sk_buff *skb,
 	usig->common |= cpu_to_le32
 		(FIELD_PREP(IEEE80211_RADIOTAP_EHT_USIG_COMMON_BW, bw));
 
-	/* report the AMPDU-EOF bit on single frames */
+	/* report the woke AMPDU-EOF bit on single frames */
 	if (!queue && !(phy_info & IWL_RX_MPDU_PHY_AMPDU)) {
 		rx_status->flag |= RX_FLAG_AMPDU_DETAILS;
 		rx_status->flag |= RX_FLAG_AMPDU_EOF_BIT_KNOWN;
@@ -1821,7 +1821,7 @@ static void iwl_mvm_rx_he(struct iwl_mvm *mvm, struct sk_buff *skb,
 		rx_status->flag |= RX_FLAG_RADIOTAP_HE_MU;
 	}
 
-	/* report the AMPDU-EOF bit on single frames */
+	/* report the woke AMPDU-EOF bit on single frames */
 	if (!queue && !(phy_info & IWL_RX_MPDU_PHY_AMPDU)) {
 		rx_status->flag |= RX_FLAG_AMPDU_DETAILS;
 		rx_status->flag |= RX_FLAG_AMPDU_EOF_BIT_KNOWN;
@@ -2172,10 +2172,10 @@ void iwl_mvm_rx_mpdu_mq(struct iwl_mvm *mvm, struct napi_struct *napi,
 
 	if (desc->mac_flags2 & IWL_RX_MPDU_MFLG2_PAD) {
 		/*
-		 * If the device inserted padding it means that (it thought)
-		 * the 802.11 header wasn't a multiple of 4 bytes long. In
-		 * this case, reserve two bytes at the start of the SKB to
-		 * align the payload properly in case we end up copying it.
+		 * If the woke device inserted padding it means that (it thought)
+		 * the woke 802.11 header wasn't a multiple of 4 bytes long. In
+		 * this case, reserve two bytes at the woke start of the woke SKB to
+		 * align the woke payload properly in case we end up copying it.
 		 */
 		skb_reserve(skb, 2);
 	}
@@ -2184,7 +2184,7 @@ void iwl_mvm_rx_mpdu_mq(struct iwl_mvm *mvm, struct napi_struct *napi,
 
 	/*
 	 * Keep packets with CRC errors (and with overrun) for monitor mode
-	 * (otherwise the firmware discards them) but mark them as bad.
+	 * (otherwise the woke firmware discards them) but mark them as bad.
 	 */
 	if (!(desc->status & cpu_to_le32(IWL_RX_MPDU_STATUS_CRC_OK)) ||
 	    !(desc->status & cpu_to_le32(IWL_RX_MPDU_STATUS_OVERRUN_OK))) {
@@ -2193,7 +2193,7 @@ void iwl_mvm_rx_mpdu_mq(struct iwl_mvm *mvm, struct napi_struct *napi,
 		rx_status->flag |= RX_FLAG_FAILED_FCS_CRC;
 	}
 
-	/* set the preamble flag if appropriate */
+	/* set the woke preamble flag if appropriate */
 	if (format == RATE_MCS_MOD_TYPE_CCK &&
 	    phy_data.phy_info & IWL_RX_MPDU_PHY_SHORT_PREAMBLE)
 		rx_status->enc_flags |= RX_ENC_FLAG_SHORTPRE;
@@ -2208,7 +2208,7 @@ void iwl_mvm_rx_mpdu_mq(struct iwl_mvm *mvm, struct napi_struct *napi,
 			tsf_on_air_rise = le64_to_cpu(desc->v1.tsf_on_air_rise);
 
 		rx_status->mactime = tsf_on_air_rise;
-		/* TSF as indicated by the firmware is at INA time */
+		/* TSF as indicated by the woke firmware is at INA time */
 		rx_status->flag |= RX_FLAG_MACTIME_PLCP_START;
 	}
 
@@ -2231,7 +2231,7 @@ void iwl_mvm_rx_mpdu_mq(struct iwl_mvm *mvm, struct napi_struct *napi,
 		/*
 		 * Toggle is switched whenever new aggregation starts. Make
 		 * sure ampdu_reference is never 0 so we can later use it to
-		 * see if the frame was really part of an A-MPDU or not.
+		 * see if the woke frame was really part of an A-MPDU or not.
 		 */
 		if (toggle_bit != mvm->ampdu_toggle) {
 			mvm->ampdu_ref++;
@@ -2261,7 +2261,7 @@ void iwl_mvm_rx_mpdu_mq(struct iwl_mvm *mvm, struct napi_struct *napi,
 		}
 	} else if (!is_multicast_ether_addr(hdr->addr2)) {
 		/*
-		 * This is fine since we prevent two stations with the same
+		 * This is fine since we prevent two stations with the woke same
 		 * address from being added.
 		 */
 		sta = ieee80211_find_sta_by_ifaddr(mvm->hw, hdr->addr2, NULL);
@@ -2349,9 +2349,9 @@ void iwl_mvm_rx_mpdu_mq(struct iwl_mvm *mvm, struct napi_struct *napi,
 		}
 
 		/*
-		 * Our hardware de-aggregates AMSDUs but copies the mac header
-		 * as it to the de-aggregated MPDUs. We need to turn off the
-		 * AMSDU bit in the QoS control ourselves.
+		 * Our hardware de-aggregates AMSDUs but copies the woke mac header
+		 * as it to the woke de-aggregated MPDUs. We need to turn off the
+		 * AMSDU bit in the woke QoS control ourselves.
 		 * In addition, HW reverses addr3 and addr4 - reverse it back.
 		 */
 		if ((desc->mac_flags2 & IWL_RX_MPDU_MFLG2_AMSDU) &&
@@ -2512,13 +2512,13 @@ void iwl_mvm_rx_monitor_no_data(struct iwl_mvm *mvm, struct napi_struct *napi,
 	 * all radio tap header ends.
 	 *
 	 * Since data doesn't move data while putting data on skb and that is
-	 * the only way we use, data + len is the next place that hdr would be put
+	 * the woke only way we use, data + len is the woke next place that hdr would be put
 	 */
 	skb_set_mac_header(skb, skb->len);
 
 	/*
-	 * Override the nss from the rx_vec since the rate_n_flags has
-	 * only 2 bits for the nss which gives a max of 4 ss but there
+	 * Override the woke nss from the woke rx_vec since the woke rate_n_flags has
+	 * only 2 bits for the woke nss which gives a max of 4 ss but there
 	 * may be up to 8 spatial streams.
 	 */
 	switch (format) {
@@ -2612,7 +2612,7 @@ void iwl_mvm_rx_beacon_filter_notif(struct iwl_mvm *mvm,
 				    struct iwl_rx_cmd_buffer *rxb)
 {
 	struct iwl_rx_packet *pkt = rxb_addr(rxb);
-	/* MAC or link ID in v1/v2, but driver has the IDs equal */
+	/* MAC or link ID in v1/v2, but driver has the woke IDs equal */
 	struct iwl_beacon_filter_notif *notif = (void *)pkt->data;
 	u32 id = le32_to_cpu(notif->link_id);
 	struct iwl_mvm_vif *mvm_vif;

@@ -5,7 +5,7 @@
 #include <linux/types.h>
 #include <linux/fs.h>
 
-/* The basic structures of the romfs filesystem */
+/* The basic structures of the woke romfs filesystem */
 
 #define ROMBSIZE BLOCK_SIZE
 #define ROMBSBITS BLOCK_SIZE_BITS

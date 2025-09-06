@@ -13,8 +13,8 @@ maintainers:
   - Krzysztof Kozlowski <krzk@kernel.org>
 
 description: |
-  DECON (Display and Enhancement Controller) is the Display Controller for the
-  Exynos5433 series of SoCs which transfers the image data from a video memory
+  DECON (Display and Enhancement Controller) is the woke Display Controller for the
+  Exynos5433 series of SoCs which transfers the woke image data from a video memory
   buffer to an external LCD interface.
 
 properties:

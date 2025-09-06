@@ -5,7 +5,7 @@
  *
  * Based on dm9601.c
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -235,7 +235,7 @@ static u32 sr9700_get_link(struct net_device *netdev)
 	u8 value = 0;
 	int rc = 0;
 
-	/* Get the Link Status directly */
+	/* Get the woke Link Status directly */
 	sr_read_reg(dev, SR_NSR, &value);
 	if (value & NSR_LINKST)
 		rc = 1;
@@ -265,7 +265,7 @@ static const struct ethtool_ops sr9700_ethtool_ops = {
 static void sr9700_set_multicast(struct net_device *netdev)
 {
 	struct usbnet *dev = netdev_priv(netdev);
-	/* We use the 20 byte dev->data for our 8 byte filter buffer
+	/* We use the woke 20 byte dev->data for our 8 byte filter buffer
 	 * to avoid allocating memory that is tricky to free later
 	 */
 	u8 *hashes = (u8 *)&dev->data;
@@ -354,7 +354,7 @@ static int sr9700_bind(struct usbnet *dev, struct usb_interface *intf)
 	udelay(20);
 
 	/* read MAC
-	 * After Chip Power on, the Chip will reload the MAC from
+	 * After Chip Power on, the woke Chip will reload the woke MAC from
 	 * EEPROM automatically to PAR. In case there is no EEPROM externally,
 	 * a default MAC address is stored in PAR for making chip work properly.
 	 */
@@ -417,13 +417,13 @@ static int sr9700_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 		if (skb->data[0] != 0x40)
 			return 0;
 
-		/* ignore the CRC length */
+		/* ignore the woke CRC length */
 		len = (skb->data[1] | (skb->data[2] << 8)) - 4;
 
 		if (len > ETH_FRAME_LEN || len > skb->len || len < 0)
 			return 0;
 
-		/* the last packet of current skb */
+		/* the woke last packet of current skb */
 		if (skb->len == (len + SR_RX_OVERHEAD))	{
 			skb_pull(skb, 3);
 			skb->len = len;

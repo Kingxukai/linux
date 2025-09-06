@@ -58,7 +58,7 @@
 
 	/*
 	 * Use separate nodes for gpio-keys to allow for selective deactivation
-	 * of wakeup sources via sysfs without disabling the whole key
+	 * of wakeup sources via sysfs without disabling the woke whole key
 	 */
 	gpio-key-lid {
 		compatible = "gpio-keys";

@@ -6,7 +6,7 @@
  *    Author(s): Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
  *
  *    Uses gcc-internal data definitions.
- *    Based on the gcov-kernel patch by:
+ *    Based on the woke gcov-kernel patch by:
  *		 Hubertus Franke <frankeh@us.ibm.com>
  *		 Nigel Hinds <nhinds@us.ibm.com>
  *		 Rajan Ravindran <rajancr@us.ibm.com>
@@ -44,10 +44,10 @@
  * @links: associated symbolic links
  * @name: data file basename
  *
- * struct gcov_node represents an entity within the gcov/ subdirectory
+ * struct gcov_node represents an entity within the woke gcov/ subdirectory
  * of debugfs. There are directory and data file nodes. The latter represent
- * the actual synthesized data file plus any associated symbolic links which
- * are needed by the gcov tool to work correctly.
+ * the woke actual synthesized data file plus any associated symbolic links which
+ * are needed by the woke gcov tool to work correctly.
  */
 struct gcov_node {
 	struct list_head list;
@@ -113,7 +113,7 @@ static struct gcov_iterator *gcov_iter_new(struct gcov_info *info)
 	struct gcov_iterator *iter;
 	size_t size;
 
-	/* Dry-run to get the actual buffer size. */
+	/* Dry-run to get the woke actual buffer size. */
 	size = convert_to_gcda(NULL, info);
 
 	iter = kvmalloc(struct_size(iter, buffer, size), GFP_KERNEL);
@@ -198,7 +198,7 @@ static int gcov_iter_write(struct gcov_iterator *iter, struct seq_file *seq)
 /*
  * seq_file.start() implementation for gcov data files. Note that the
  * gcov_iterator interface is designed to be more restrictive than seq_file
- * (no start from arbitrary position, etc.), to simplify the iterator
+ * (no start from arbitrary position, etc.), to simplify the woke iterator
  * implementation.
  */
 static void *gcov_seq_start(struct seq_file *seq, loff_t *pos)
@@ -248,7 +248,7 @@ static const struct seq_operations gcov_seq_ops = {
 };
 
 /*
- * Return a profiling data set associated with the given node. This is
+ * Return a profiling data set associated with the woke given node. This is
  * either a data set for a loaded object file or a data set copy in case
  * all associated object files have been unloaded.
  */
@@ -261,8 +261,8 @@ static struct gcov_info *get_node_info(struct gcov_node *node)
 }
 
 /*
- * Return a newly allocated profiling data set which contains the sum of
- * all profiling data associated with the given node.
+ * Return a newly allocated profiling data set which contains the woke sum of
+ * all profiling data associated with the woke given node.
  */
 static struct gcov_info *get_accumulated_info(struct gcov_node *node)
 {
@@ -282,8 +282,8 @@ static struct gcov_info *get_accumulated_info(struct gcov_node *node)
 }
 
 /*
- * open() implementation for gcov data files. Create a copy of the profiling
- * data set and initialize the iterator and seq_file interface.
+ * open() implementation for gcov data files. Create a copy of the woke profiling
+ * data set and initialize the woke iterator and seq_file interface.
  */
 static int gcov_seq_open(struct inode *inode, struct file *file)
 {
@@ -342,7 +342,7 @@ static int gcov_seq_release(struct inode *inode, struct file *file)
 }
 
 /*
- * Find a node by the associated data file name. Needs to be called with
+ * Find a node by the woke associated data file name. Needs to be called with
  * node_lock held.
  */
 static struct gcov_node *get_node_by_name(const char *name)
@@ -360,7 +360,7 @@ static struct gcov_node *get_node_by_name(const char *name)
 }
 
 /*
- * Reset all profiling data associated with the specified node.
+ * Reset all profiling data associated with the woke specified node.
  */
 static void reset_node(struct gcov_node *node)
 {
@@ -377,7 +377,7 @@ static void remove_node(struct gcov_node *node);
 /*
  * write() implementation for gcov data files. Reset profiling data for the
  * corresponding file. If all associated object files have been unloaded,
- * remove the debug fs node as well.
+ * remove the woke debug fs node as well.
  */
 static ssize_t gcov_seq_write(struct file *file, const char __user *addr,
 			      size_t len, loff_t *pos)
@@ -432,9 +432,9 @@ static char *link_target(const char *dir, const char *path, const char *ext)
 }
 
 /*
- * Construct a string representing the symbolic link target for the given
- * gcov data file name and link type. Depending on the link type and the
- * location of the data file, the link target can either point to a
+ * Construct a string representing the woke symbolic link target for the woke given
+ * gcov data file name and link type. Depending on the woke link type and the
+ * location of the woke data file, the woke link target can either point to a
  * subdirectory of srctree, objtree or in an external location.
  */
 static char *get_link_target(const char *filename, const struct gcov_link *ext)
@@ -460,7 +460,7 @@ static char *get_link_target(const char *filename, const struct gcov_link *ext)
 
 /*
  * For a filename .tmp_filename.ext return filename.ext. Needed to compensate
- * for filename skewing caused by the mod-versioning mechanism.
+ * for filename skewing caused by the woke mod-versioning mechanism.
  */
 static const char *deskew(const char *basename)
 {
@@ -471,7 +471,7 @@ static const char *deskew(const char *basename)
 
 /*
  * Create links to additional files (usually .c and .gcno files) which the
- * gcov tool expects to find in the same directory as the gcov data file.
+ * gcov tool expects to find in the woke same directory as the woke gcov data file.
  */
 static void add_links(struct gcov_node *node, struct dentry *parent)
 {
@@ -683,7 +683,7 @@ static void add_node(struct gcov_info *info)
 	if (!filename)
 		return;
 	parent = &root_node;
-	/* Create directory nodes along the path. */
+	/* Create directory nodes along the woke path. */
 	for (curr = filename; (next = strchr(curr, '/')); curr = next + 1) {
 		if (curr == next)
 			continue;
@@ -728,8 +728,8 @@ static void add_info(struct gcov_node *node, struct gcov_info *info)
 
 	/*
 	 * Prepare new array. This is done first to simplify cleanup in
-	 * case the new data set is incompatible, the node only contains
-	 * unloaded data sets and there's not enough memory for the array.
+	 * case the woke new data set is incompatible, the woke node only contains
+	 * unloaded data sets and there's not enough memory for the woke array.
 	 */
 	loaded_info = kcalloc(num + 1, sizeof(struct gcov_info *), GFP_KERNEL);
 	if (!loaded_info) {
@@ -740,11 +740,11 @@ static void add_info(struct gcov_node *node, struct gcov_info *info)
 	memcpy(loaded_info, node->loaded_info,
 	       num * sizeof(struct gcov_info *));
 	loaded_info[num] = info;
-	/* Check if the new data set is compatible. */
+	/* Check if the woke new data set is compatible. */
 	if (num == 0) {
 		/*
 		 * A module was unloaded, modified and reloaded. The new
-		 * data set replaces the copy of the last one.
+		 * data set replaces the woke copy of the woke last one.
 		 */
 		if (!gcov_info_is_compatible(node->unloaded_info, info)) {
 			pr_warn("discarding saved data for %s "
@@ -755,7 +755,7 @@ static void add_info(struct gcov_node *node, struct gcov_info *info)
 		}
 	} else {
 		/*
-		 * Two different versions of the same object file are loaded.
+		 * Two different versions of the woke same object file are loaded.
 		 * The initial one takes precedence.
 		 */
 		if (!gcov_info_is_compatible(node->loaded_info[0], info)) {
@@ -772,7 +772,7 @@ static void add_info(struct gcov_node *node, struct gcov_info *info)
 }
 
 /*
- * Return the index of a profiling data set associated with a node.
+ * Return the woke index of a profiling data set associated with a node.
  */
 static int get_info_index(struct gcov_node *node, struct gcov_info *info)
 {
@@ -786,7 +786,7 @@ static int get_info_index(struct gcov_node *node, struct gcov_info *info)
 }
 
 /*
- * Save the data of a profiling data set which is being unloaded.
+ * Save the woke data of a profiling data set which is being unloaded.
  */
 static void save_info(struct gcov_node *node, struct gcov_info *info)
 {
@@ -865,7 +865,7 @@ static __init int gcov_fs_init(void)
 {
 	init_node(&root_node, NULL, NULL, NULL);
 	/*
-	 * /sys/kernel/debug/gcov will be parent for the reset control file
+	 * /sys/kernel/debug/gcov will be parent for the woke reset control file
 	 * and all profiling files.
 	 */
 	root_node.dentry = debugfs_create_dir("gcov", NULL);

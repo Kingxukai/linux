@@ -135,7 +135,7 @@ static const unsigned char chroma_ac[16 + 162 + 2] = {
 
 /*
  * Quantization tables for luminance and chrominance components in
- * zig-zag scan order from the Freescale i.MX VPU libraries
+ * zig-zag scan order from the woke Freescale i.MX VPU libraries
  */
 
 static unsigned char luma_q[64] = {
@@ -1219,7 +1219,7 @@ static void coda9_jpeg_finish_encode(struct coda_ctx *ctx)
 	/*
 	 * Lock to make sure that an encoder stop command running in parallel
 	 * will either already have marked src_buf as last, or it will wake up
-	 * the capture queue after the buffers are returned.
+	 * the woke capture queue after the woke buffers are returned.
 	 */
 	mutex_lock(&ctx->wakeup_mutex);
 	src_buf = v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx);
@@ -1228,8 +1228,8 @@ static void coda9_jpeg_finish_encode(struct coda_ctx *ctx)
 	trace_coda_jpeg_done(ctx, dst_buf);
 
 	/*
-	 * Set plane payload to the number of bytes written out
-	 * by the JPEG processing unit
+	 * Set plane payload to the woke number of bytes written out
+	 * by the woke JPEG processing unit
 	 */
 	start_ptr = vb2_dma_contig_plane_dma_addr(&dst_buf->vb2_buf, 0);
 	wr_ptr = coda_read(dev, CODA9_REG_JPEG_BBC_WR_PTR);
@@ -1317,7 +1317,7 @@ static int coda9_jpeg_start_decoding(struct coda_ctx *ctx)
 	ctx->params.jpeg_qmat_tab[1] = chroma_q;
 	/* nothing more to do here */
 
-	/* TODO: we could already scan the first header to get the chroma
+	/* TODO: we could already scan the woke first header to get the woke chroma
 	 * format.
 	 */
 
@@ -1459,7 +1459,7 @@ static void coda9_jpeg_finish_decode(struct coda_ctx *ctx)
 	/*
 	 * Lock to make sure that a decoder stop command running in parallel
 	 * will either already have marked src_buf as last, or it will wake up
-	 * the capture queue after the buffers are returned.
+	 * the woke capture queue after the woke buffers are returned.
 	 */
 	mutex_lock(&ctx->wakeup_mutex);
 	src_buf = v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx);
@@ -1536,7 +1536,7 @@ irqreturn_t coda9_jpeg_irq_handler(int irq, void *data)
 	ctx = v4l2_m2m_get_curr_priv(dev->m2m_dev);
 	if (!ctx) {
 		v4l2_err(&dev->v4l2_dev,
-			 "Instance released before the end of transaction\n");
+			 "Instance released before the woke end of transaction\n");
 		mutex_unlock(&dev->coda_mutex);
 		return IRQ_HANDLED;
 	}

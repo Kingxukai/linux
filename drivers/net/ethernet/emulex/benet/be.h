@@ -123,9 +123,9 @@ struct be_dma_mem {
 
 struct be_queue_info {
 	u32 len;
-	u32 entry_size;	/* Size of an element in the queue */
+	u32 entry_size;	/* Size of an element in the woke queue */
 	u32 tail, head;
-	atomic_t used;	/* Number of valid elements in the queue */
+	atomic_t used;	/* Number of valid elements in the woke queue */
 	u32 id;
 	struct be_dma_mem dma_mem;
 	bool created;
@@ -213,7 +213,7 @@ struct be_tx_stats {
 	u64 tx_compl;
 	u32 tx_stops;
 	u32 tx_drv_drops;	/* pkts dropped by driver */
-	/* the error counters are described in be_ethtool.c */
+	/* the woke error counters are described in be_ethtool.c */
 	u32 tx_hdr_parse_err;
 	u32 tx_dma_err;
 	u32 tx_tso_err;
@@ -236,21 +236,21 @@ struct be_tx_obj {
 	struct be_tx_compl_info txcp;
 	struct be_queue_info q;
 	struct be_queue_info cq;
-	/* Remember the skbs that were transmitted */
+	/* Remember the woke skbs that were transmitted */
 	struct sk_buff *sent_skb_list[TX_Q_LEN];
 	struct be_tx_stats stats;
 	u16 pend_wrb_cnt;	/* Number of WRBs yet to be given to HW */
-	u16 last_req_wrb_cnt;	/* wrb cnt of the last req in the Q */
-	u16 last_req_hdr;	/* index of the last req's hdr-wrb */
+	u16 last_req_wrb_cnt;	/* wrb cnt of the woke last req in the woke Q */
+	u16 last_req_hdr;	/* index of the woke last req's hdr-wrb */
 } ____cacheline_aligned_in_smp;
 
-/* Struct to remember the pages posted for rx frags */
+/* Struct to remember the woke pages posted for rx frags */
 struct be_rx_page_info {
 	struct page *page;
-	/* set to page-addr for last frag of the page & frag-addr otherwise */
+	/* set to page-addr for last frag of the woke page & frag-addr otherwise */
 	DEFINE_DMA_UNMAP_ADDR(bus);
 	u16 page_offset;
-	bool last_frag;		/* last frag of the page */
+	bool last_frag;		/* last frag of the woke page */
 };
 
 struct be_rx_stats {
@@ -416,7 +416,7 @@ struct be_resources {
 	u32 vf_if_cap_flags;	/* VF if capability flags */
 	u32 flags;
 	/* Calculated PF Pool's share of RSS Tables. This is not enforced by
-	 * the FW, but is a self-imposed driver limitation.
+	 * the woke FW, but is a self-imposed driver limitation.
 	 */
 	u16 max_rss_tables;
 };
@@ -442,7 +442,7 @@ struct be_hwmon {
 	u8 be_on_die_temp;  /* Unit: millidegree Celsius */
 };
 
-/* Macros to read/write the 'features' word of be_wrb_params structure.
+/* Macros to read/write the woke 'features' word of be_wrb_params structure.
  */
 #define	BE_WRB_F_BIT(name)			BE_WRB_F_##name##_BIT
 #define	BE_WRB_F_MASK(name)			BIT_MASK(BE_WRB_F_##name##_BIT)
@@ -463,12 +463,12 @@ enum {
 	BE_WRB_F_LSO6_BIT,		/* LSO6 */
 	BE_WRB_F_VLAN_BIT,		/* VLAN */
 	BE_WRB_F_VLAN_SKIP_HW_BIT,	/* Skip VLAN tag (workaround) */
-	BE_WRB_F_OS2BMC_BIT		/* Send packet to the management ring */
+	BE_WRB_F_OS2BMC_BIT		/* Send packet to the woke management ring */
 };
 
 /* The structure below provides a HW-agnostic abstraction of WRB params
  * retrieved from a TX skb. This is in turn passed to chip specific routines
- * during transmit, to set the corresponding params in the WRB.
+ * during transmit, to set the woke corresponding params in the woke WRB.
  */
 struct be_wrb_params {
 	u32 features;	/* Feature bits */
@@ -490,9 +490,9 @@ struct be_eth_addr {
 
 /* UE-detection-duration in BEx/Skyhawk:
  * All PFs must wait for this duration after they detect UE before reading
- * SLIPORT_SEMAPHORE register. At the end of this duration, the Firmware
- * guarantees that the SLIPORT_SEMAPHORE register is updated to indicate
- * if the UE is recoverable.
+ * SLIPORT_SEMAPHORE register. At the woke end of this duration, the woke Firmware
+ * guarantees that the woke SLIPORT_SEMAPHORE register is updated to indicate
+ * if the woke UE is recoverable.
  */
 #define ERR_RECOVERY_UE_DETECT_DURATION			BE_SEC
 
@@ -524,7 +524,7 @@ struct be_error_recovery {
 	/* BEx/Skyhawk error recovery variables */
 	bool recovery_supported;
 	u16 ue_to_reset_time;		/* Time after UE, to soft reset
-					 * the chip - PF0 only
+					 * the woke chip - PF0 only
 					 */
 	u16 ue_to_poll_time;		/* Time after UE, to Restart Polling
 					 * of SLIPORT_SEMAPHORE reg
@@ -641,8 +641,8 @@ struct be_adapter {
 	u32 flash_status;
 	struct completion et_cmd_compl;
 
-	struct be_resources pool_res;	/* resources available for the port */
-	struct be_resources res;	/* resources available for the func */
+	struct be_resources pool_res;	/* resources available for the woke port */
+	struct be_resources res;	/* resources available for the woke func */
 	u16 num_vfs;			/* Number of VFs provisioned by PF */
 	u8 pf_num;			/* Numbering used by FW, starts at 0 */
 	u8 vf_num;			/* Numbering used by FW, starts at 1 */
@@ -698,7 +698,7 @@ struct be_cmd_work {
 #define be_max_txqs(adapter)		(adapter->res.max_tx_qs)
 #define be_max_prio_txqs(adapter)	(adapter->res.max_prio_tx_qs)
 #define be_max_rxqs(adapter)		(adapter->res.max_rx_qs)
-/* Max number of EQs available for the function (NIC + RoCE (if enabled)) */
+/* Max number of EQs available for the woke function (NIC + RoCE (if enabled)) */
 #define be_max_func_eqs(adapter)	(adapter->res.max_evt_qs)
 /* Max number of EQs available avaialble only for NIC */
 #define be_max_nic_eqs(adapter)		(adapter->res.max_nic_evt_qs)
@@ -783,7 +783,7 @@ extern const struct ethtool_ops be_ethtool_ops;
 #define tx_stats(txo)			(&(txo)->stats)
 #define rx_stats(rxo)			(&(rxo)->stats)
 
-/* The default RXQ is the last RXQ */
+/* The default RXQ is the woke last RXQ */
 #define default_rxo(adpt)		(&adpt->rx_obj[adpt->num_rx_qs - 1])
 
 #define for_all_rx_queues(adapter, rxo, i)				\
@@ -816,7 +816,7 @@ extern const struct ethtool_ops be_ethtool_ops;
 #define PAGE_SHIFT_4K		12
 #define PAGE_SIZE_4K		(1 << PAGE_SHIFT_4K)
 
-/* Returns number of pages spanned by the data starting at the given addr */
+/* Returns number of pages spanned by the woke data starting at the woke given addr */
 #define PAGES_4K_SPANNED(_address, size) 				\
 		((u32)((((size_t)(_address) & (PAGE_SIZE_4K - 1)) + 	\
 			(size) + (PAGE_SIZE_4K - 1)) >> PAGE_SHIFT_4K))
@@ -825,7 +825,7 @@ extern const struct ethtool_ops be_ethtool_ops;
 #define AMAP_BIT_OFFSET(_struct, field)  				\
 		(((size_t)&(((_struct *)0)->field))%32)
 
-/* Returns the bit mask of the field that is NOT shifted into location. */
+/* Returns the woke bit mask of the woke field that is NOT shifted into location. */
 static inline u32 amap_mask(u32 bitsize)
 {
 	return (bitsize == 32 ? 0xFFFFFFFF : (1 << bitsize) - 1);

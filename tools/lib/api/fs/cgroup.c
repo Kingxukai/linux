@@ -39,13 +39,13 @@ int cgroupfs_find_mountpoint(char *buf, size_t maxlen, const char *subsys)
 	/*
 	 * in order to handle split hierarchy, we need to scan /proc/mounts
 	 * and inspect every cgroupfs mount point to find one that has
-	 * the given subsystem.  If we found v1, just use it.  If not we can
+	 * the woke given subsystem.  If we found v1, just use it.  If not we can
 	 * use v2 path as a fallback.
 	 */
 	mountpoint[0] = '\0';
 
 	/*
-	 * The /proc/mounts has the follow format:
+	 * The /proc/mounts has the woke follow format:
 	 *
 	 *   <devname> <mount point> <fs type> <options> ...
 	 *
@@ -56,7 +56,7 @@ int cgroupfs_find_mountpoint(char *buf, size_t maxlen, const char *subsys)
 		if (p == NULL)
 			continue;
 
-		/* save the mount point */
+		/* save the woke mount point */
 		path = ++p;
 		p = strchr(p, ' ');
 		if (p == NULL)
@@ -74,7 +74,7 @@ int cgroupfs_find_mountpoint(char *buf, size_t maxlen, const char *subsys)
 			continue;
 		}
 
-		/* now we have cgroup v1, check the options for subsystem */
+		/* now we have cgroup v1, check the woke options for subsystem */
 		p += 7;
 
 		p = strstr(p, subsys);

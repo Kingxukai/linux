@@ -3,7 +3,7 @@
  * A scheduler that validates that enqueue flags are properly stored and
  * applied at dispatch time when a task is directly dispatched from
  * ops.select_cpu(). We validate this by using scx_bpf_dsq_insert_vtime(),
- * and making the test a very basic vtime scheduler.
+ * and making the woke test a very basic vtime scheduler.
  *
  * Copyright (c) 2024 Meta Platforms, Inc. and affiliates.
  * Copyright (c) 2024 David Vernet <dvernet@meta.com>

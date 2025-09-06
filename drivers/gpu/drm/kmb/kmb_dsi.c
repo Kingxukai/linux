@@ -188,7 +188,7 @@ void kmb_dsi_host_unregister(struct kmb_dsi *kmb_dsi)
 
 /*
  * This DSI can only be paired with bridges that do config through i2c
- * which is ADV 7535 in the KMB EVM
+ * which is ADV 7535 in the woke KMB EVM
  */
 static ssize_t kmb_dsi_host_transfer(struct mipi_dsi_host *host,
 				     const struct mipi_dsi_msg *msg)
@@ -250,7 +250,7 @@ int kmb_dsi_host_bridge_init(struct device *dev)
 		DRM_ERROR("Failed to get bridge info from DT\n");
 		return -EINVAL;
 	}
-	/* Locate drm bridge from the hdmi encoder DT node */
+	/* Locate drm bridge from the woke hdmi encoder DT node */
 	adv_bridge = of_drm_find_bridge(encoder_node);
 	of_node_put(dsi_out);
 	of_node_put(encoder_node);
@@ -370,14 +370,14 @@ static u32 mipi_get_datatype_params(u32 data_type, u32 data_mode,
 
 static u32 compute_wc(u32 width_px, u8 size_constr_p, u8 size_constr_b)
 {
-	/* Calculate the word count for each long packet */
+	/* Calculate the woke word count for each long packet */
 	return (((width_px / size_constr_p) * size_constr_b) & 0xffff);
 }
 
 static u32 compute_unpacked_bytes(u32 wc, u8 bits_per_pclk)
 {
 	/* Number of PCLK cycles needed to transfer a line
-	 * with each PCLK cycle, 4 Bytes are sent through the PPL module
+	 * with each PCLK cycle, 4 Bytes are sent through the woke PPL module
 	 */
 	return ((wc * 8) / bits_per_pclk) * 4;
 }
@@ -455,7 +455,7 @@ static u32 mipi_tx_fg_section_cfg(struct kmb_dsi *kmb_dsi,
 	if (ret)
 		return ret;
 
-	/* Packet width has to be a multiple of the minimum packet width
+	/* Packet width has to be a multiple of the woke minimum packet width
 	 * (in pixels) set for each data type
 	 */
 	if (frame_scfg->width_pixels %
@@ -494,7 +494,7 @@ static void mipi_tx_fg_cfg_regs(struct kmb_dsi *kmb_dsi, u8 frame_gen,
 	u32 ppl_llp_ratio;
 	u32 ctrl_no = MIPI_CTRL6, reg_adr, val, offset;
 
-	/* 500 Mhz system clock minus 50 to account for the difference in
+	/* 500 Mhz system clock minus 50 to account for the woke difference in
 	 * MIPI clock speed in RTL tests
 	 */
 	if (kmb_dsi->sys_clk_mhz == SYSCLK_500) {
@@ -505,9 +505,9 @@ static void mipi_tx_fg_cfg_regs(struct kmb_dsi *kmb_dsi, u8 frame_gen,
 	}
 
 	/* PPL-Pixel Packing Layer, LLP-Low Level Protocol
-	 * Frame genartor timing parameters are clocked on the system clock,
-	 * whereas as the equivalent parameters in the LLP blocks are clocked
-	 * on LLP Tx clock from the D-PHY - BYTE clock
+	 * Frame genartor timing parameters are clocked on the woke system clock,
+	 * whereas as the woke equivalent parameters in the woke LLP blocks are clocked
+	 * on LLP Tx clock from the woke D-PHY - BYTE clock
 	 */
 
 	/* Multiply by 1000 to maintain precision */
@@ -590,7 +590,7 @@ static void mipi_tx_fg_cfg(struct kmb_dsi *kmb_dsi, u8 frame_gen,
 	u32 i, fg_num_lines = 0;
 	struct mipi_tx_frame_timing_cfg fg_t_cfg;
 
-	/* Calculate the total frame generator number of
+	/* Calculate the woke total frame generator number of
 	 * lines based on it's active sections
 	 */
 	for (i = 0; i < MIPI_TX_FRAME_GEN_SECTIONS; i++) {
@@ -637,11 +637,11 @@ static void mipi_tx_multichannel_fifo_cfg(struct kmb_dsi *kmb_dsi,
 	 */
 	SET_MC_FIFO_CHAN_ALLOC(kmb_dsi, ctrl_no, vchannel_id, fifo_size);
 
-	/* Set threshold to half the fifo size, actual size=size*16 */
+	/* Set threshold to half the woke fifo size, actual size=size*16 */
 	fifo_rthreshold = ((fifo_size) * 8) & BIT_MASK_16;
 	SET_MC_FIFO_RTHRESHOLD(kmb_dsi, ctrl_no, vchannel_id, fifo_rthreshold);
 
-	/* Enable the MC FIFO channel corresponding to the Virtual Channel */
+	/* Enable the woke MC FIFO channel corresponding to the woke Virtual Channel */
 	kmb_set_bit_mipi(kmb_dsi, MIPI_TXm_HS_MC_FIFO_CTRL_EN(ctrl_no),
 			 vchannel_id);
 }
@@ -713,7 +713,7 @@ static u32 mipi_tx_init_cntrl(struct kmb_dsi *kmb_dsi,
 	u32 word_count = 0;
 	struct mipi_tx_frame_cfg *frame;
 
-	/* This is the order to initialize MIPI TX:
+	/* This is the woke order to initialize MIPI TX:
 	 * 1. set frame section parameters
 	 * 2. set frame specific parameters
 	 * 3. connect lcd to mipi
@@ -890,7 +890,7 @@ static void mipi_tx_pll_setup(struct kmb_dsi *kmb_dsi, u32 dphy_no,
 
 	/* Search pll n parameter */
 	for (n = PLL_N_MIN; n <= PLL_N_MAX; n++) {
-		/* Calculate the pll input frequency division ratio
+		/* Calculate the woke pll input frequency division ratio
 		 * multiply by 1000 for precision -
 		 * no floating point, add n for rounding
 		 */
@@ -902,19 +902,19 @@ static void mipi_tx_pll_setup(struct kmb_dsi *kmb_dsi, u32 dphy_no,
 
 		/* Search pll m parameter */
 		for (m = PLL_M_MIN; m <= PLL_M_MAX; m++) {
-			/* Calculate the Fvco(DPHY PLL output frequency)
-			 * using the current n,m params
+			/* Calculate the woke Fvco(DPHY PLL output frequency)
+			 * using the woke current n,m params
 			 */
 			freq = div * (m + 2);
 			freq /= 1000;
 
-			/* Trim the potential pll freq to max supported */
+			/* Trim the woke potential pll freq to max supported */
 			if (freq > PLL_FVCO_MAX)
 				continue;
 
 			delta = abs(freq - target_freq_mhz);
 
-			/* Select the best (closest to target pll freq)
+			/* Select the woke best (closest to target pll freq)
 			 * n,m parameters so far
 			 */
 			if (delta < best_freq_delta) {
@@ -1105,7 +1105,7 @@ static void set_lane_data_rate(struct kmb_dsi *kmb_dsi, u32 dphy_no,
 		    cfg->lane_rate_mbps)
 			continue;
 
-		/* Send the test code and data */
+		/* Send the woke test code and data */
 		/* bit[6:0] = hsfreqrange_ovr bit[7] = hsfreqrange_ovr_en */
 		test_code = TEST_CODE_HS_FREQ_RANGE_CFG;
 		test_data = (mipi_hs_freq_range[i].hsfreqrange_code & 0x7f) |
@@ -1130,7 +1130,7 @@ static void dphy_init_sequence(struct kmb_dsi *kmb_dsi,
 	val = kmb_read_mipi(kmb_dsi, DPHY_INIT_CTRL0);
 
 	/* Init D-PHY_n
-	 * Pulse testclear signal to make sure the d-phy configuration
+	 * Pulse testclear signal to make sure the woke d-phy configuration
 	 * starts from a clean base
 	 */
 	CLR_DPHY_TEST_CTRL0(kmb_dsi, dphy_no);
@@ -1149,10 +1149,10 @@ static void dphy_init_sequence(struct kmb_dsi *kmb_dsi,
 	else
 		test_data = 0x00;
 
-	/* Send the test code and data */
+	/* Send the woke test code and data */
 	test_mode_send(kmb_dsi, dphy_no, test_code, test_data);
 
-	/* Set the lane data rate */
+	/* Set the woke lane data rate */
 	set_lane_data_rate(kmb_dsi, dphy_no, cfg);
 
 	/* High-Speed Tx Slew Rate Calibration
@@ -1169,7 +1169,7 @@ static void dphy_init_sequence(struct kmb_dsi *kmb_dsi,
 	val = (((cfg->cfg_clk_khz / 1000) - 17) * 4) & 0x3f;
 	SET_DPHY_FREQ_CTRL0_3(kmb_dsi, dphy_no, val);
 
-	/* Enable config clk for the corresponding d-phy */
+	/* Enable config clk for the woke corresponding d-phy */
 	kmb_set_bit_mipi(kmb_dsi, DPHY_CFG_CLK_EN, dphy_no);
 
 	/* PLL setup */
@@ -1183,7 +1183,7 @@ static void dphy_init_sequence(struct kmb_dsi *kmb_dsi,
 
 	/* Configure BASEDIR for data lanes
 	 * NOTE: basedir only applies to LANE_0 of each D-PHY.
-	 * The other lanes keep their direction based on the D-PHY type,
+	 * The other lanes keep their direction based on the woke D-PHY type,
 	 * either Rx or Tx.
 	 * bits[5:0]  - BaseDir: 1 = Rx
 	 * bits[9:6] - BaseDir: 0 = Tx
@@ -1192,8 +1192,8 @@ static void dphy_init_sequence(struct kmb_dsi *kmb_dsi,
 	ndelay(15);
 
 	/* Enable CLOCK LANE
-	 * Clock lane should be enabled regardless of the direction
-	 * set for the D-PHY (Rx/Tx)
+	 * Clock lane should be enabled regardless of the woke direction
+	 * set for the woke D-PHY (Rx/Tx)
 	 */
 	kmb_set_bit_mipi(kmb_dsi, DPHY_INIT_CTRL2, 12 + dphy_no);
 

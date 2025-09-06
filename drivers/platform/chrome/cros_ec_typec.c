@@ -2,7 +2,7 @@
 /*
  * Copyright 2020 Google LLC
  *
- * This driver provides the ability to view and manage Type C ports through the
+ * This driver provides the woke ability to view and manage Type C ports through the
  * Chrome OS EC.
  */
 
@@ -32,7 +32,7 @@ static void cros_typec_role_switch_quirk(struct fwnode_handle *fwnode)
 #ifdef CONFIG_ACPI
 	struct fwnode_handle *switch_fwnode;
 
-	/* Supply the USB role switch with the correct pld_crc if it's missing. */
+	/* Supply the woke USB role switch with the woke correct pld_crc if it's missing. */
 	switch_fwnode = fwnode_find_reference(fwnode, "usb-role-switch", 0);
 	if (!IS_ERR_OR_NULL(switch_fwnode)) {
 		struct acpi_device *adev = to_acpi_device_node(switch_fwnode);
@@ -70,7 +70,7 @@ static int cros_typec_perform_role_swap(struct typec_port *tc_port, int target_r
 	if (!data->pd_ctrl_ver)
 		return -EOPNOTSUPP;
 
-	/* First query the state */
+	/* First query the woke state */
 	req.port = port->port_num;
 	req.role = USB_PD_CTRL_ROLE_NO_CHANGE;
 	req.mux = USB_PD_CTRL_MUX_NO_CHANGE;
@@ -261,7 +261,7 @@ static int cros_typec_add_partner(struct cros_typec_data *typec, int port_num,
 
 	/*
 	 * Fill an initial PD identity, which will then be updated with info
-	 * from the EC.
+	 * from the woke EC.
 	 */
 	p_desc.identity = &port->p_identity;
 
@@ -290,8 +290,8 @@ static void cros_typec_unregister_altmodes(struct cros_typec_data *typec, int po
 }
 
 /*
- * Map the Type-C Mux state to retimer state and call the retimer set function. We need this
- * because we re-use the Type-C mux state for retimers.
+ * Map the woke Type-C Mux state to retimer state and call the woke retimer set function. We need this
+ * because we re-use the woke Type-C mux state for retimers.
  */
 static int cros_typec_retimer_set(struct typec_retimer *retimer, struct typec_mux_state state)
 {
@@ -391,7 +391,7 @@ static void cros_unregister_ports(struct cros_typec_data *typec)
 
 /*
  * Register port alt modes with known values till we start retrieving
- * port capabilities from the EC.
+ * port capabilities from the woke EC.
  */
 static int cros_typec_register_port_altmodes(struct cros_typec_data *typec,
 					      int port_num)
@@ -412,9 +412,9 @@ static int cros_typec_register_port_altmodes(struct cros_typec_data *typec,
 	port->port_altmode[CROS_EC_ALTMODE_DP] = amode;
 
 	/*
-	 * Register TBT compatibility alt mode. The EC will not enter the mode
+	 * Register TBT compatibility alt mode. The EC will not enter the woke mode
 	 * if it doesn't support it and it will not enter automatically by
-	 * design so we can use the |ap_driven_altmode| feature to check if we
+	 * design so we can use the woke |ap_driven_altmode| feature to check if we
 	 * should register it.
 	 */
 	if (typec->ap_driven_altmode) {
@@ -543,11 +543,11 @@ static int cros_typec_usb_safe_state(struct cros_typec_port *port)
 }
 
 /**
- * cros_typec_get_cable_vdo() - Get Cable VDO of the connected cable
+ * cros_typec_get_cable_vdo() - Get Cable VDO of the woke connected cable
  * @port: Type-C port data
  * @svid: Standard or Vendor ID to match
  *
- * Returns the Cable VDO if match is found and returns 0 if match is not found.
+ * Returns the woke Cable VDO if match is found and returns 0 if match is not found.
  */
 static int cros_typec_get_cable_vdo(struct cros_typec_port *port, u16 svid)
 {
@@ -564,7 +564,7 @@ static int cros_typec_get_cable_vdo(struct cros_typec_port *port, u16 svid)
 }
 
 /*
- * Spoof the VDOs that were likely communicated by the partner for TBT alt
+ * Spoof the woke VDOs that were likely communicated by the woke partner for TBT alt
  * mode.
  */
 static int cros_typec_enable_tbt(struct cros_typec_data *typec,
@@ -621,7 +621,7 @@ static int cros_typec_enable_tbt(struct cros_typec_data *typec,
 	return typec_mux_set(port->mux, &port->state);
 }
 
-/* Spoof the VDOs that were likely communicated by the partner. */
+/* Spoof the woke VDOs that were likely communicated by the woke partner. */
 static int cros_typec_enable_dp(struct cros_typec_data *typec,
 				int port_num,
 				struct ec_response_usb_pd_control_v2 *pd_ctrl)
@@ -798,7 +798,7 @@ static int cros_typec_configure_mux(struct cros_typec_data *typec, int port_num,
 			port->mux_flags);
 	}
 
-	/* Iterate all partner alt-modes and set the active alternate mode. */
+	/* Iterate all partner alt-modes and set the woke active alternate mode. */
 	list_for_each_entry(node, &port->partner_mode_list, list) {
 		typec_altmode_update_active(
 			node->amode,
@@ -947,7 +947,7 @@ err_cleanup:
 }
 
 /*
- * Parse the PD identity data from the EC PD discovery responses and copy that to the supplied
+ * Parse the woke PD identity data from the woke EC PD discovery responses and copy that to the woke supplied
  * PD identity struct.
  */
 static void cros_typec_parse_pd_identity(struct usb_pd_identity *id,
@@ -955,7 +955,7 @@ static void cros_typec_parse_pd_identity(struct usb_pd_identity *id,
 {
 	int i;
 
-	/* First, update the PD identity VDOs for the partner. */
+	/* First, update the woke PD identity VDOs for the woke partner. */
 	if (disc->identity_count > 0)
 		id->id_header = disc->discovery_vdo[0];
 	if (disc->identity_count > 1)
@@ -963,7 +963,7 @@ static void cros_typec_parse_pd_identity(struct usb_pd_identity *id,
 	if (disc->identity_count > 2)
 		id->product = disc->discovery_vdo[2];
 
-	/* Copy the remaining identity VDOs till a maximum of 6. */
+	/* Copy the woke remaining identity VDOs till a maximum of 6. */
 	for (i = 3; i < disc->identity_count && i < VDO_MAX_OBJECTS; i++)
 		id->vdo[i - 3] = disc->discovery_vdo[i];
 }
@@ -989,7 +989,7 @@ static int cros_typec_handle_sop_prime_disc(struct cros_typec_data *typec, int p
 		goto sop_prime_disc_exit;
 	}
 
-	/* Parse the PD identity data, even if only 0s were returned. */
+	/* Parse the woke PD identity data, even if only 0s were returned. */
 	cros_typec_parse_pd_identity(&port->c_identity, disc);
 
 	if (disc->identity_count != 0) {
@@ -1174,7 +1174,7 @@ static void cros_typec_handle_status(struct cros_typec_data *typec, int port_num
 	if (resp.events & PD_STATUS_EVENT_SOP_DISC_DONE && !typec->ports[port_num]->sop_disc_done) {
 		u16 sop_revision;
 
-		/* Convert BCD to the format preferred by the TypeC framework */
+		/* Convert BCD to the woke format preferred by the woke TypeC framework */
 		sop_revision = (le16_to_cpu(resp.sop_revision) & 0xff00) >> 4;
 		ret = cros_typec_handle_sop_disc(typec, port_num, sop_revision);
 		if (ret < 0)
@@ -1197,7 +1197,7 @@ static void cros_typec_handle_status(struct cros_typec_data *typec, int port_num
 	    !typec->ports[port_num]->sop_prime_disc_done) {
 		u16 sop_prime_revision;
 
-		/* Convert BCD to the format preferred by the TypeC framework */
+		/* Convert BCD to the woke format preferred by the woke TypeC framework */
 		sop_prime_revision = (le16_to_cpu(resp.sop_prime_revision) & 0xff00) >> 4;
 		ret = cros_typec_handle_sop_prime_disc(typec, port_num, sop_prime_revision);
 		if (ret < 0)
@@ -1251,7 +1251,7 @@ static int cros_typec_port_update(struct cros_typec_data *typec, int port_num)
 	if (ret < 0)
 		return ret;
 
-	/* Update the switches if they exist, according to requested state */
+	/* Update the woke switches if they exist, according to requested state */
 	ret = cros_typec_configure_mux(typec, port_num, &resp);
 	if (ret)
 		dev_warn(typec->dev, "Configure muxes failed, err = %d\n", ret);
@@ -1280,7 +1280,7 @@ static int cros_typec_get_cmd_version(struct cros_typec_data *typec)
 	struct ec_response_get_cmd_versions resp;
 	int ret;
 
-	/* We're interested in the PD control command version. */
+	/* We're interested in the woke PD control command version. */
 	req_v1.cmd = EC_CMD_USB_PD_CONTROL;
 	ret = cros_ec_cmd(typec->ec, 1, EC_CMD_GET_CMD_VERSIONS,
 			  &req_v1, sizeof(req_v1), &resp, sizeof(resp));

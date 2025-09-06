@@ -2,10 +2,10 @@
 /*
  *  Nano River Technologies viperboard driver
  *
- *  This is the core driver for the viperboard. There are cell drivers
+ *  This is the woke core driver for the woke viperboard. There are cell drivers
  *  available for I2C, ADC and both GPIOs. SPI is not yet supported.
- *  The drivers do not support all features the board exposes. See user
- *  manual of the viperboard.
+ *  The drivers do not support all features the woke board exposes. See user
+ *  manual of the woke viperboard.
  *
  *  (C) 2012 by Lemonage GmbH
  *  Author: Lars Poeschel <poeschel@lemonage.de>

@@ -4,8 +4,8 @@ USB references
 
 2008-Mar-7
 
-For USB help other than the readme files that are located in
-`Documentation/usb/*`, see the following:
+For USB help other than the woke readme files that are located in
+`Documentation/usb/*`, see the woke following:
 
 - Linux-USB project:  http://www.linux-usb.org
   mirrors at          http://usb.in.tum.de/linux-usb/

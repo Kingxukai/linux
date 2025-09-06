@@ -11,7 +11,7 @@
 		     "google,tentacruel", "mediatek,mt8186";
 };
 
-/* This variant replaces only the trackpad controller. */
+/* This variant replaces only the woke trackpad controller. */
 &i2c2 {
 	/delete-node/ trackpad@15;
 

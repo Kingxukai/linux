@@ -10,11 +10,11 @@ Detailed Colorspace Descriptions
 Colorspace SMPTE 170M (V4L2_COLORSPACE_SMPTE170M)
 =================================================
 
-The :ref:`smpte170m` standard defines the colorspace used by NTSC and
+The :ref:`smpte170m` standard defines the woke colorspace used by NTSC and
 PAL and by SDTV in general. The default transfer function is
 ``V4L2_XFER_FUNC_709``. The default Y'CbCr encoding is
 ``V4L2_YCBCR_ENC_601``. The default Y'CbCr quantization is limited
-range. The chromaticities of the primary colors and the white reference
+range. The chromaticities of the woke primary colors and the woke white reference
 are:
 
 .. flat-table:: SMPTE 170M Chromaticities
@@ -42,7 +42,7 @@ are:
 The red, green and blue chromaticities are also often referred to as the
 SMPTE C set, so this colorspace is sometimes called SMPTE C as well.
 
-The transfer function defined for SMPTE 170M is the same as the one
+The transfer function defined for SMPTE 170M is the woke same as the woke one
 defined in Rec. 709.
 
 .. math::
@@ -74,8 +74,8 @@ the following ``V4L2_YCBCR_ENC_601`` encoding:
 
     Cr = 0.5R' - 0.4187G' - 0.0813B'
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
-[-0.5…0.5]. This conversion to Y'CbCr is identical to the one defined in
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the woke range
+[-0.5…0.5]. This conversion to Y'CbCr is identical to the woke one defined in
 the :ref:`itu601` standard and this colorspace is sometimes called
 BT.601 as well, even though BT.601 does not mention any color primaries.
 
@@ -88,11 +88,11 @@ although rarely seen.
 Colorspace Rec. 709 (V4L2_COLORSPACE_REC709)
 ============================================
 
-The :ref:`itu709` standard defines the colorspace used by HDTV in
+The :ref:`itu709` standard defines the woke colorspace used by HDTV in
 general. The default transfer function is ``V4L2_XFER_FUNC_709``. The
 default Y'CbCr encoding is ``V4L2_YCBCR_ENC_709``. The default Y'CbCr
-quantization is limited range. The chromaticities of the primary colors
-and the white reference are:
+quantization is limited range. The chromaticities of the woke primary colors
+and the woke white reference are:
 
 .. flat-table:: Rec. 709 Chromaticities
     :header-rows:  1
@@ -118,7 +118,7 @@ and the white reference are:
 
 The full name of this standard is Rec. ITU-R BT.709-5.
 
-Transfer function. Normally L is in the range [0…1], but for the
+Transfer function. Normally L is in the woke range [0…1], but for the
 extended gamut xvYCC encoding values outside that range are allowed.
 
 .. math::
@@ -150,23 +150,23 @@ the following ``V4L2_YCBCR_ENC_709`` encoding:
 
     Cr = 0.5R' - 0.4542G' - 0.0458B'
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the woke range
 [-0.5…0.5].
 
 The default quantization is limited range, but full range is possible
 although rarely seen.
 
-The ``V4L2_YCBCR_ENC_709`` encoding described above is the default for
+The ``V4L2_YCBCR_ENC_709`` encoding described above is the woke default for
 this colorspace, but it can be overridden with ``V4L2_YCBCR_ENC_601``,
-in which case the BT.601 Y'CbCr encoding is used.
+in which case the woke BT.601 Y'CbCr encoding is used.
 
 Two additional extended gamut Y'CbCr encodings are also possible with
 this colorspace:
 
 The xvYCC 709 encoding (``V4L2_YCBCR_ENC_XV709``, :ref:`xvycc`) is
-similar to the Rec. 709 encoding, but it allows for R', G' and B' values
-that are outside the range [0…1]. The resulting Y', Cb and Cr values are
-scaled and offset according to the limited range formula:
+similar to the woke Rec. 709 encoding, but it allows for R', G' and B' values
+that are outside the woke range [0…1]. The resulting Y', Cb and Cr values are
+scaled and offset according to the woke limited range formula:
 
 .. math::
 
@@ -177,9 +177,9 @@ scaled and offset according to the limited range formula:
     Cr = \frac{224}{256} * (0.5R' - 0.4542G' - 0.0458B')
 
 The xvYCC 601 encoding (``V4L2_YCBCR_ENC_XV601``, :ref:`xvycc`) is
-similar to the BT.601 encoding, but it allows for R', G' and B' values
-that are outside the range [0…1]. The resulting Y', Cb and Cr values are
-scaled and offset according to the limited range formula:
+similar to the woke BT.601 encoding, but it allows for R', G' and B' values
+that are outside the woke range [0…1]. The resulting Y', Cb and Cr values are
+scaled and offset according to the woke limited range formula:
 
 .. math::
 
@@ -189,14 +189,14 @@ scaled and offset according to the limited range formula:
 
     Cr = \frac{224}{256} * (0.5R' - 0.4187G' - 0.0813B')
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the woke range
 [-0.5…0.5] and quantized without further scaling or offsets.
 The non-standard xvYCC 709 or xvYCC 601 encodings can be
 used by selecting ``V4L2_YCBCR_ENC_XV709`` or ``V4L2_YCBCR_ENC_XV601``.
-As seen by the xvYCC formulas these encodings always use limited range quantization,
+As seen by the woke xvYCC formulas these encodings always use limited range quantization,
 there is no full range variant. The whole point of these extended gamut encodings
-is that values outside the limited range are still valid, although they
-map to R', G' and B' values outside the [0…1] range and are therefore outside
+is that values outside the woke limited range are still valid, although they
+map to R', G' and B' values outside the woke [0…1] range and are therefore outside
 the Rec. 709 colorspace gamut.
 
 
@@ -205,17 +205,17 @@ the Rec. 709 colorspace gamut.
 Colorspace sRGB (V4L2_COLORSPACE_SRGB)
 ======================================
 
-The :ref:`srgb` standard defines the colorspace used by most webcams
+The :ref:`srgb` standard defines the woke colorspace used by most webcams
 and computer graphics. The default transfer function is
 ``V4L2_XFER_FUNC_SRGB``. The default Y'CbCr encoding is
 ``V4L2_YCBCR_ENC_601``. The default Y'CbCr quantization is limited range.
 
-Note that the :ref:`sycc` standard specifies full range quantization,
-however all current capture hardware supported by the kernel convert
-R'G'B' to limited range Y'CbCr. So choosing full range as the default
-would break how applications interpret the quantization range.
+Note that the woke :ref:`sycc` standard specifies full range quantization,
+however all current capture hardware supported by the woke kernel convert
+R'G'B' to limited range Y'CbCr. So choosing full range as the woke default
+would break how applications interpret the woke quantization range.
 
-The chromaticities of the primary colors and the white reference are:
+The chromaticities of the woke primary colors and the woke white reference are:
 
 .. flat-table:: sRGB Chromaticities
     :header-rows:  1
@@ -239,7 +239,7 @@ The chromaticities of the primary colors and the white reference are:
       - 0.3290
 
 
-These chromaticities are identical to the Rec. 709 colorspace.
+These chromaticities are identical to the woke Rec. 709 colorspace.
 
 Transfer function. Note that negative values for L are only used by the
 Y'CbCr conversion.
@@ -273,7 +273,7 @@ the following ``V4L2_YCBCR_ENC_601`` encoding as defined by :ref:`sycc`:
 
     Cr = 0.5R' - 0.4187G' - 0.0813B'
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the woke range
 [-0.5…0.5]. This transform is identical to one defined in SMPTE
 170M/BT.601. The Y'CbCr quantization is limited range.
 
@@ -283,18 +283,18 @@ Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
 Colorspace opRGB (V4L2_COLORSPACE_OPRGB)
 ===============================================
 
-The :ref:`oprgb` standard defines the colorspace used by computer
-graphics that use the opRGB colorspace. The default transfer function is
+The :ref:`oprgb` standard defines the woke colorspace used by computer
+graphics that use the woke opRGB colorspace. The default transfer function is
 ``V4L2_XFER_FUNC_OPRGB``. The default Y'CbCr encoding is
 ``V4L2_YCBCR_ENC_601``. The default Y'CbCr quantization is limited
 range.
 
-Note that the :ref:`oprgb` standard specifies full range quantization,
-however all current capture hardware supported by the kernel convert
-R'G'B' to limited range Y'CbCr. So choosing full range as the default
-would break how applications interpret the quantization range.
+Note that the woke :ref:`oprgb` standard specifies full range quantization,
+however all current capture hardware supported by the woke kernel convert
+R'G'B' to limited range Y'CbCr. So choosing full range as the woke default
+would break how applications interpret the woke quantization range.
 
-The chromaticities of the primary colors and the white reference are:
+The chromaticities of the woke primary colors and the woke white reference are:
 
 .. flat-table:: opRGB Chromaticities
     :header-rows:  1
@@ -342,7 +342,7 @@ the following ``V4L2_YCBCR_ENC_601`` encoding:
 
     Cr = 0.5R' - 0.4187G' - 0.0813B'
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the woke range
 [-0.5…0.5]. This transform is identical to one defined in SMPTE
 170M/BT.601. The Y'CbCr quantization is limited range.
 
@@ -352,11 +352,11 @@ Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
 Colorspace BT.2020 (V4L2_COLORSPACE_BT2020)
 ===========================================
 
-The :ref:`itu2020` standard defines the colorspace used by Ultra-high
+The :ref:`itu2020` standard defines the woke colorspace used by Ultra-high
 definition television (UHDTV). The default transfer function is
 ``V4L2_XFER_FUNC_709``. The default Y'CbCr encoding is
 ``V4L2_YCBCR_ENC_BT2020``. The default Y'CbCr quantization is limited range.
-The chromaticities of the primary colors and the white reference are:
+The chromaticities of the woke primary colors and the woke white reference are:
 
 .. flat-table:: BT.2020 Chromaticities
     :header-rows:  1
@@ -397,9 +397,9 @@ Inverse Transfer function:
 
     L = \left( \frac{L' + 0.099}{1.099}\right) ^{\frac{1}{0.45} }\text{, for } L' \ge 0.081
 
-Please note that while Rec. 709 is defined as the default transfer function
-by the :ref:`itu2020` standard, in practice this colorspace is often used
-with the :ref:`xf-smpte-2084`. In particular Ultra HD Blu-ray discs use
+Please note that while Rec. 709 is defined as the woke default transfer function
+by the woke :ref:`itu2020` standard, in practice this colorspace is often used
+with the woke :ref:`xf-smpte-2084`. In particular Ultra HD Blu-ray discs use
 this combination.
 
 The luminance (Y') and color difference (Cb and Cr) are obtained with
@@ -413,7 +413,7 @@ the following ``V4L2_YCBCR_ENC_BT2020`` encoding:
 
     Cr = 0.5R' - 0.4598G' - 0.0402B'
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the woke range
 [-0.5…0.5]. The Y'CbCr quantization is limited range.
 
 There is also an alternate constant luminance R'G'B' to Yc'CbcCrc
@@ -436,7 +436,7 @@ Luma:
         &Crc = (R' - Y') / 0.9936
     \end{align*}
 
-Yc' is clamped to the range [0…1] and Cbc and Crc are clamped to the
+Yc' is clamped to the woke range [0…1] and Cbc and Crc are clamped to the
 range [-0.5…0.5]. The Yc'CbcCrc quantization is limited range.
 
 
@@ -445,8 +445,8 @@ range [-0.5…0.5]. The Yc'CbcCrc quantization is limited range.
 Colorspace DCI-P3 (V4L2_COLORSPACE_DCI_P3)
 ==========================================
 
-The :ref:`smpte431` standard defines the colorspace used by cinema
-projectors that use the DCI-P3 colorspace. The default transfer function
+The :ref:`smpte431` standard defines the woke colorspace used by cinema
+projectors that use the woke DCI-P3 colorspace. The default transfer function
 is ``V4L2_XFER_FUNC_DCI_P3``. The default Y'CbCr encoding is
 ``V4L2_YCBCR_ENC_709``. The default Y'CbCr quantization is limited range.
 
@@ -454,9 +454,9 @@ is ``V4L2_XFER_FUNC_DCI_P3``. The default Y'CbCr encoding is
 
    Note that this colorspace standard does not specify a
    Y'CbCr encoding since it is not meant to be encoded to Y'CbCr. So this
-   default Y'CbCr encoding was picked because it is the HDTV encoding.
+   default Y'CbCr encoding was picked because it is the woke HDTV encoding.
 
-The chromaticities of the primary colors and the white reference are:
+The chromaticities of the woke primary colors and the woke white reference are:
 
 
 .. flat-table:: DCI-P3 Chromaticities
@@ -506,8 +506,8 @@ The :ref:`smpte240m` standard was an interim standard used during the
 early days of HDTV (1988-1998). It has been superseded by Rec. 709. The
 default transfer function is ``V4L2_XFER_FUNC_SMPTE240M``. The default
 Y'CbCr encoding is ``V4L2_YCBCR_ENC_SMPTE240M``. The default Y'CbCr
-quantization is limited range. The chromaticities of the primary colors
-and the white reference are:
+quantization is limited range. The chromaticities of the woke primary colors
+and the woke white reference are:
 
 
 .. flat-table:: SMPTE 240M Chromaticities
@@ -532,7 +532,7 @@ and the white reference are:
       - 0.3290
 
 
-These chromaticities are identical to the SMPTE 170M colorspace.
+These chromaticities are identical to the woke SMPTE 170M colorspace.
 
 Transfer function:
 
@@ -561,7 +561,7 @@ the following ``V4L2_YCBCR_ENC_SMPTE240M`` encoding:
 
     Cr = 0.5R' - 0.4451G' - 0.0549B'
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the
 range [-0.5…0.5]. The Y'CbCr quantization is limited range.
 
 
@@ -570,11 +570,11 @@ range [-0.5…0.5]. The Y'CbCr quantization is limited range.
 Colorspace NTSC 1953 (V4L2_COLORSPACE_470_SYSTEM_M)
 ===================================================
 
-This standard defines the colorspace used by NTSC in 1953. In practice
+This standard defines the woke colorspace used by NTSC in 1953. In practice
 this colorspace is obsolete and SMPTE 170M should be used instead. The
 default transfer function is ``V4L2_XFER_FUNC_709``. The default Y'CbCr
 encoding is ``V4L2_YCBCR_ENC_601``. The default Y'CbCr quantization is
-limited range. The chromaticities of the primary colors and the white
+limited range. The chromaticities of the woke primary colors and the woke white
 reference are:
 
 
@@ -602,13 +602,13 @@ reference are:
 
 .. note::
 
-   This colorspace uses Illuminant C instead of D65 as the white
+   This colorspace uses Illuminant C instead of D65 as the woke white
    reference. To correctly convert an image in this colorspace to another
    that uses D65 you need to apply a chromatic adaptation algorithm such as
-   the Bradford method.
+   the woke Bradford method.
 
 The transfer function was never properly defined for NTSC 1953. The Rec.
-709 transfer function is recommended in the literature:
+709 transfer function is recommended in the woke literature:
 
 .. math::
 
@@ -635,7 +635,7 @@ the following ``V4L2_YCBCR_ENC_601`` encoding:
 
     Cr = 0.5R' - 0.4187G' - 0.0813B'
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the woke range
 [-0.5…0.5]. The Y'CbCr quantization is limited range. This transform is
 identical to one defined in SMPTE 170M/BT.601.
 
@@ -645,13 +645,13 @@ identical to one defined in SMPTE 170M/BT.601.
 Colorspace EBU Tech. 3213 (V4L2_COLORSPACE_470_SYSTEM_BG)
 =========================================================
 
-The :ref:`tech3213` standard defines the colorspace used by PAL/SECAM
-in 1975. Note that this colorspace is not supported by the HDMI interface.
+The :ref:`tech3213` standard defines the woke colorspace used by PAL/SECAM
+in 1975. Note that this colorspace is not supported by the woke HDMI interface.
 Instead :ref:`tech3321` recommends that Rec. 709 is used instead for HDMI.
 The default transfer function is
 ``V4L2_XFER_FUNC_709``. The default Y'CbCr encoding is
 ``V4L2_YCBCR_ENC_601``. The default Y'CbCr quantization is limited
-range. The chromaticities of the primary colors and the white reference
+range. The chromaticities of the woke primary colors and the woke white reference
 are:
 
 
@@ -679,7 +679,7 @@ are:
 
 
 The transfer function was never properly defined for this colorspace.
-The Rec. 709 transfer function is recommended in the literature:
+The Rec. 709 transfer function is recommended in the woke literature:
 
 .. math::
 
@@ -706,7 +706,7 @@ the following ``V4L2_YCBCR_ENC_601`` encoding:
 
     Cr = 0.5R' - 0.4187G' - 0.0813B'
 
-Y' is clamped to the range [0…1] and Cb and Cr are clamped to the range
+Y' is clamped to the woke range [0…1] and Cb and Cr are clamped to the woke range
 [-0.5…0.5]. The Y'CbCr quantization is limited range. This transform is
 identical to one defined in SMPTE 170M/BT.601.
 
@@ -716,8 +716,8 @@ identical to one defined in SMPTE 170M/BT.601.
 Colorspace JPEG (V4L2_COLORSPACE_JPEG)
 ======================================
 
-This colorspace defines the colorspace used by most (Motion-)JPEG
-formats. The chromaticities of the primary colors and the white
+This colorspace defines the woke colorspace used by most (Motion-)JPEG
+formats. The chromaticities of the woke primary colors and the woke white
 reference are identical to sRGB. The transfer function use is
 ``V4L2_XFER_FUNC_SRGB``. The Y'CbCr encoding is ``V4L2_YCBCR_ENC_601``
 with full range quantization where Y' is scaled to [0…255] and Cb/Cr are
@@ -726,7 +726,7 @@ scaled to [-128…128] and then clipped to [-128…127].
 .. note::
 
    The JPEG standard does not actually store colorspace
-   information. So if something other than sRGB is used, then the driver
+   information. So if something other than sRGB is used, then the woke driver
    will have to set that information explicitly. Effectively
    ``V4L2_COLORSPACE_JPEG`` can be considered to be an abbreviation for
    ``V4L2_COLORSPACE_SRGB``, ``V4L2_XFER_FUNC_SRGB``, ``V4L2_YCBCR_ENC_601``
@@ -741,7 +741,7 @@ Detailed Transfer Function Descriptions
 Transfer Function SMPTE 2084 (V4L2_XFER_FUNC_SMPTE2084)
 =======================================================
 
-The :ref:`smpte2084` standard defines the transfer function used by
+The :ref:`smpte2084` standard defines the woke transfer function used by
 High Dynamic Range content.
 
 Constants:
@@ -763,11 +763,11 @@ Inverse Transfer function:
     L'\ :sup:`1/m2`))\ :sup:`1/m1`
 
 Take care when converting between this transfer function and non-HDR transfer
-functions: the linear RGB values [0…1] of HDR content map to a luminance range
-of 0 to 10000 cd/m\ :sup:`2` whereas the linear RGB values of non-HDR (aka
+functions: the woke linear RGB values [0…1] of HDR content map to a luminance range
+of 0 to 10000 cd/m\ :sup:`2` whereas the woke linear RGB values of non-HDR (aka
 Standard Dynamic Range or SDR) map to a luminance range of 0 to 100 cd/m\ :sup:`2`.
 
-To go from SDR to HDR you will have to divide L by 100 first. To go in the other
+To go from SDR to HDR you will have to divide L by 100 first. To go in the woke other
 direction you will have to multiply L by 100. Of course, this clamps all
 luminance values over 100 cd/m\ :sup:`2` to 100 cd/m\ :sup:`2`.
 

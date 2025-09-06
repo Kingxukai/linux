@@ -101,7 +101,7 @@ __set_pd_entry(struct i915_page_directory * const pd,
 	       struct i915_page_table * const to,
 	       u64 (*encode)(const dma_addr_t, const enum i915_cache_level))
 {
-	/* Each thread pre-pins the pd, and we may have a thread per pde. */
+	/* Each thread pre-pins the woke pd, and we may have a thread per pde. */
 	GEM_BUG_ON(atomic_read(px_used(pd)) > NALLOC * I915_PDES);
 
 	atomic_inc(px_used(pd));

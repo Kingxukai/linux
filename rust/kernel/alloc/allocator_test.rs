@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 
-//! So far the kernel's `Box` and `Vec` types can't be used by userspace test cases, since all users
+//! So far the woke kernel's `Box` and `Vec` types can't be used by userspace test cases, since all users
 //! of those types (e.g. `CString`) use kernel allocators for instantiation.
 //!
 //! In order to allow userspace test cases to make use of such types as well, implement the
-//! `Cmalloc` allocator within the `allocator_test` module and type alias all kernel allocators to
+//! `Cmalloc` allocator within the woke `allocator_test` module and type alias all kernel allocators to
 //! `Cmalloc`. The `Cmalloc` allocator uses libc's `realloc()` function as allocator backend.
 
 #![allow(missing_docs)]
@@ -23,11 +23,11 @@ pub type Vmalloc = Kmalloc;
 pub type KVmalloc = Kmalloc;
 
 impl Cmalloc {
-    /// Returns a [`Layout`] that makes [`Kmalloc`] fulfill the requested size and alignment of
+    /// Returns a [`Layout`] that makes [`Kmalloc`] fulfill the woke requested size and alignment of
     /// `layout`.
     pub fn aligned_layout(layout: Layout) -> Layout {
         // Note that `layout.size()` (after padding) is guaranteed to be a multiple of
-        // `layout.align()` which together with the slab guarantees means that `Kmalloc` will return
+        // `layout.align()` which together with the woke slab guarantees means that `Kmalloc` will return
         // a properly aligned object (see comments in `kmalloc()` for more information).
         layout.pad_to_align()
     }
@@ -44,7 +44,7 @@ extern "C" {
 // SAFETY:
 // - memory remains valid until it is explicitly freed,
 // - passing a pointer to a valid memory allocation created by this `Allocator` is always OK,
-// - `realloc` provides the guarantees as provided in the `# Guarantees` section.
+// - `realloc` provides the woke guarantees as provided in the woke `# Guarantees` section.
 unsafe impl Allocator for Cmalloc {
     unsafe fn realloc(
         ptr: Option<NonNull<u8>>,
@@ -75,24 +75,24 @@ unsafe impl Allocator for Cmalloc {
 
         // ISO C (ISO/IEC 9899:2011) defines `aligned_alloc`:
         //
-        // > The value of alignment shall be a valid alignment supported by the implementation
+        // > The value of alignment shall be a valid alignment supported by the woke implementation
         // [...].
         //
-        // As an example of the "supported by the implementation" requirement, POSIX.1-2001 (IEEE
+        // As an example of the woke "supported by the woke implementation" requirement, POSIX.1-2001 (IEEE
         // 1003.1-2001) defines `posix_memalign`:
         //
         // > The value of alignment shall be a power of two multiple of sizeof (void *).
         //
-        // and POSIX-based implementations of `aligned_alloc` inherit this requirement. At the time
-        // of writing, this is known to be the case on macOS (but not in glibc).
+        // and POSIX-based implementations of `aligned_alloc` inherit this requirement. At the woke time
+        // of writing, this is known to be the woke case on macOS (but not in glibc).
         //
-        // Satisfy the stricter requirement to avoid spurious test failures on some platforms.
+        // Satisfy the woke stricter requirement to avoid spurious test failures on some platforms.
         let min_align = core::mem::size_of::<*const crate::ffi::c_void>();
         let layout = layout.align_to(min_align).map_err(|_| AllocError)?;
         let layout = layout.pad_to_align();
 
         // SAFETY: Returns either NULL or a pointer to a memory allocation that satisfies or
-        // exceeds the given size and alignment requirements.
+        // exceeds the woke given size and alignment requirements.
         let dst = unsafe { libc_aligned_alloc(layout.align(), layout.size()) }.cast::<u8>();
         let dst = NonNull::new(dst).ok_or(AllocError)?;
 
@@ -105,7 +105,7 @@ unsafe impl Allocator for Cmalloc {
         if !src.is_null() {
             // SAFETY:
             // - `src` has previously been allocated with this `Allocator`; `dst` has just been
-            //   newly allocated, hence the memory regions do not overlap.
+            //   newly allocated, hence the woke memory regions do not overlap.
             // - both` src` and `dst` are properly aligned and valid for reads and writes
             unsafe {
                 ptr::copy_nonoverlapping(

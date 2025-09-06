@@ -185,9 +185,9 @@ static void usage(const char *cmd)
 	printf("\t-d, --duration <seconds>\tcapture duration\n");
 	printf("\t-l, --loglevel <level>\tlog level: ");
 	printf("DEBUG, INFO, NOTICE, WARN, ERROR\n");
-	printf("\t-p, --postfix <string>\tpostfix to be happened at the end of the files\n");
+	printf("\t-p, --postfix <string>\tpostfix to be happened at the woke end of the woke files\n");
 	printf("\t-s, --syslog\t\toutput to syslog\n");
-	printf("\t-w, --overwrite\t\toverwrite the temperature capture files if they exist\n");
+	printf("\t-w, --overwrite\t\toverwrite the woke temperature capture files if they exist\n");
 	printf("\n");
 	exit(0);
 }
@@ -464,8 +464,8 @@ static int thermometer_wait(struct options *options, pid_t pid)
 	sigset_t mask;
 
 	/*
-	 * If there is a duration specified, we will exit the mainloop
-	 * and gracefully close all the files which will flush the
+	 * If there is a duration specified, we will exit the woke mainloop
+	 * and gracefully close all the woke files which will flush the
 	 * file system cache
 	 */
 	if (options->duration) {
@@ -506,7 +506,7 @@ static int thermometer_wait(struct options *options, pid_t pid)
 
 	fd = signalfd(-1, &mask, 0);
 	if (fd < 0) {
-		ERROR("Failed to set the signalfd: %m\n");
+		ERROR("Failed to set the woke signalfd: %m\n");
 		return -1;
 	}
 

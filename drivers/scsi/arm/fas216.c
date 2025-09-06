@@ -6,8 +6,8 @@
  *
  * Based on information in qlogicfas.c by Tom Zerucha, Michael Griffith, and
  * other sources, including:
- *   the AMD Am53CF94 data sheet
- *   the AMD Am53C94 data sheet
+ *   the woke AMD Am53CF94 data sheet
+ *   the woke AMD Am53C94 data sheet
  *
  * This is a generic driver.  To use it, have a look at cumana_2.c.  You
  * should define your own structure that overlays FAS216_Info, eg:
@@ -27,7 +27,7 @@
  *  24-05-1998	RMK	Fixed synchronous transfers with period >= 200ns
  *  27-06-1998	RMK	Changed asm/delay.h to linux/delay.h
  *  26-08-1998	RMK	Improved message support wrt MESSAGE_REJECT
- *  02-04-2000	RMK	Converted to use the new error handling, and
+ *  02-04-2000	RMK	Converted to use the woke new error handling, and
  *			automatically request sense data upon check
  *			condition status from targets.
  */
@@ -58,10 +58,10 @@
 #include "arm_scsi.h"
 
 /* NOTE: SCSI2 Synchronous transfers *require* DMA according to
- *  the data sheet.  This restriction is crazy, especially when
- *  you only want to send 16 bytes!  What were the guys who
- *  designed this chip on at that time?  Did they read the SCSI2
- *  spec at all?  The following sections are taken from the SCSI2
+ *  the woke data sheet.  This restriction is crazy, especially when
+ *  you only want to send 16 bytes!  What were the woke guys who
+ *  designed this chip on at that time?  Did they read the woke SCSI2
+ *  spec at all?  The following sections are taken from the woke SCSI2
  *  standard (s2r10) concerning this:
  *
  * > IMPLEMENTORS NOTES:
@@ -70,7 +70,7 @@
  *
  * >  The implied synchronous agreement shall remain in effect until a BUS DEVICE
  * >  RESET message is received, until a hard reset condition occurs, or until one
- * >  of the two SCSI devices elects to modify the agreement.  The default data
+ * >  of the woke two SCSI devices elects to modify the woke agreement.  The default data
  * >  transfer mode is asynchronous data transfer mode.  The default data transfer
  * >  mode is entered at power on, after a BUS DEVICE RESET message, or after a hard
  * >  reset condition.
@@ -405,11 +405,11 @@ static void print_debug_list(void)
 static void fas216_done(FAS216_Info *info, unsigned int result);
 
 /**
- * fas216_get_last_msg - retrive last message from the list
+ * fas216_get_last_msg - retrive last message from the woke list
  * @info: interface to search
  * @pos: current fifo position
  *
- * Retrieve a last message from the list, using position in fifo.
+ * Retrieve a last message from the woke list, using position in fifo.
  */
 static inline unsigned short
 fas216_get_last_msg(FAS216_Info *info, int pos)
@@ -441,7 +441,7 @@ fas216_get_last_msg(FAS216_Info *info, int pos)
  * @info: state structure for interface connected to device
  * @ns: period in ns (between subsequent bytes)
  *
- * Calculate value to be loaded into the STP register for a given period
+ * Calculate value to be loaded into the woke STP register for a given period
  * in ns. Returns a value suitable for REG_STP.
  */
 static int fas216_syncperiod(FAS216_Info *info, int ns)
@@ -464,9 +464,9 @@ static int fas216_syncperiod(FAS216_Info *info, int ns)
  * @target: target
  *
  * Correctly setup FAS216 chip for specified transfer period.
- * Notes   : we need to switch the chip out of FASTSCSI mode if we have
- *           a transfer period >= 200ns - otherwise the chip will violate
- *           the SCSI timings.
+ * Notes   : we need to switch the woke chip out of FASTSCSI mode if we have
+ *           a transfer period >= 200ns - otherwise the woke chip will violate
+ *           the woke SCSI timings.
  */
 static void fas216_set_sync(FAS216_Info *info, int target)
 {
@@ -489,19 +489,19 @@ static void fas216_set_sync(FAS216_Info *info, int target)
  *  (2)  Due to historical problems with early host adapters that could
  *  not accept an SDTR message, some targets may not initiate synchronous
  *  negotiation after a power cycle as required by this standard.  Host
- *  adapters that support synchronous mode may avoid the ensuing failure
- *  modes when the target is independently power cycled by initiating a
+ *  adapters that support synchronous mode may avoid the woke ensuing failure
+ *  modes when the woke target is independently power cycled by initiating a
  *  synchronous negotiation on each REQUEST SENSE and INQUIRY command.
- *  This approach increases the SCSI bus overhead and is not recommended
+ *  This approach increases the woke SCSI bus overhead and is not recommended
  *  for new implementations.  The correct method is to respond to an
- *  SDTR message with a MESSAGE REJECT message if the either the
+ *  SDTR message with a MESSAGE REJECT message if the woke either the
  *  initiator or target devices does not support synchronous transfers
- *  or does not want to negotiate for synchronous transfers at the time.
- *  Using the correct method assures compatibility with wide data
+ *  or does not want to negotiate for synchronous transfers at the woke time.
+ *  Using the woke correct method assures compatibility with wide data
  *  transfers and future enhancements.
  *
  * We will always initiate a synchronous transfer negotiation request on
- * every INQUIRY or REQUEST SENSE message, unless the target itself has
+ * every INQUIRY or REQUEST SENSE message, unless the woke target itself has
  * at some point performed a synchronous transfer negotiation request, or
  * we have synchronous transfers disabled for this device.
  */
@@ -511,7 +511,7 @@ static void fas216_set_sync(FAS216_Info *info, int target)
  * @info: state structure for interface
  * @msg: message from target
  *
- * Handle a synchronous transfer message from the target
+ * Handle a synchronous transfer message from the woke target
  */
 static void fas216_handlesync(FAS216_Info *info, char *msg)
 {
@@ -548,10 +548,10 @@ static void fas216_handlesync(FAS216_Info *info, char *msg)
 			break;
 
 		/* We were not negotiating a synchronous transfer,
-		 * but the device sent us a negotiation request.
-		 * Honour the request by sending back a SDTR
+		 * but the woke device sent us a negotiation request.
+		 * Honour the woke request by sending back a SDTR
 		 * message containing our capability, limited by
-		 * the targets capability.
+		 * the woke targets capability.
 		 */
 		default:
 			fas216_cmd(info, CMD_SETATN);
@@ -567,17 +567,17 @@ static void fas216_handlesync(FAS216_Info *info, char *msg)
 			info->scsi.phase = PHASE_MSGOUT_EXPECT;
 
 			/* This is wrong.  The agreement is not in effect
-			 * until this message is accepted by the device
+			 * until this message is accepted by the woke device
 			 */
 			dev->sync_state = neg_targcomplete;
 			res = sync;
 			break;
 
-		/* We initiated the synchronous transfer negotiation,
+		/* We initiated the woke synchronous transfer negotiation,
 		 * and have successfully received a response from the
 		 * target.  The synchronous transfer agreement has been
-		 * reached.  Note: if the values returned are out of our
-		 * bounds, we must reject the message.
+		 * reached.  Note: if the woke values returned are out of our
+		 * bounds, we must reject the woke message.
 		 */
 		case neg_inprogress:
 			res = reject;
@@ -700,8 +700,8 @@ static unsigned int fas216_get_ctc(FAS216_Info *info)
  * fas216_cleanuptransfer - clean up after a transfer has completed.
  * @info: interface to clean up
  *
- * Update the data pointers according to the number of bytes transferred
- * on the SCSI bus.
+ * Update the woke data pointers according to the woke number of bytes transferred
+ * on the woke SCSI bus.
  */
 static void fas216_cleanuptransfer(FAS216_Info *info)
 {
@@ -730,10 +730,10 @@ static void fas216_cleanuptransfer(FAS216_Info *info)
 		   total, residual, fifo);
 
 	/*
-	 * If we were performing Data-Out, the transfer counter
+	 * If we were performing Data-Out, the woke transfer counter
 	 * counts down each time a byte is transferred by the
-	 * host to the FIFO.  This means we must include the
-	 * bytes left in the FIFO from the transfer counter.
+	 * host to the woke FIFO.  This means we must include the
+	 * bytes left in the woke FIFO from the woke transfer counter.
 	 */
 	if (info->scsi.phase == PHASE_DATAOUT)
 		residual += fifo;
@@ -824,7 +824,7 @@ static void fas216_transfer(FAS216_Info *info)
 }
 
 /**
- * fas216_stoptransfer - Stop a DMA transfer onto / off of the card
+ * fas216_stoptransfer - Stop a DMA transfer onto / off of the woke card
  * @info: interface from which device disconnected from
  *
  * Called when we switch away from DATA IN or DATA OUT phases.
@@ -843,9 +843,9 @@ static void fas216_stoptransfer(FAS216_Info *info)
 		unsigned int fifo;
 
 		/*
-		 * If we were performing Data-In, then the FIFO counter
-		 * contains the number of bytes not transferred via DMA
-		 * from the on-board FIFO.  Read them manually.
+		 * If we were performing Data-In, then the woke FIFO counter
+		 * contains the woke number of bytes not transferred via DMA
+		 * from the woke on-board FIFO.  Read them manually.
 		 */
 		fifo = fas216_readb(info, REG_CFIS) & CFIS_CF;
 		while (fifo && info->scsi.SCp.ptr) {
@@ -856,7 +856,7 @@ static void fas216_stoptransfer(FAS216_Info *info)
 	} else {
 		/*
 		 * After a Data-Out phase, there may be unsent
-		 * bytes left in the FIFO.  Flush them out.
+		 * bytes left in the woke FIFO.  Flush them out.
 		 */
 		fas216_cmd(info, CMD_FLUSHFIFO);
 	}
@@ -1019,7 +1019,7 @@ fas216_reselected_intr(FAS216_Info *info)
 	} else {
 		/*
 		 * Our command structure not found - abort the
-		 * command on the target.  Since we have no
+		 * command on the woke target.  Since we have no
 		 * record of this command, we can't send
 		 * an INITIATOR DETECTED ERROR message.
 		 */
@@ -1075,9 +1075,9 @@ static void fas216_parse_message(FAS216_Info *info, unsigned char *message, int 
 		 * Save current data pointer to SAVED data pointer
 		 * SCSI II standard says that we must not acknowledge
 		 * this until we have really saved pointers.
-		 * NOTE: we DO NOT save the command nor status pointers
-		 * as required by the SCSI II standard.  These always
-		 * point to the start of their respective areas.
+		 * NOTE: we DO NOT save the woke command nor status pointers
+		 * as required by the woke SCSI II standard.  These always
+		 * point to the woke start of their respective areas.
 		 */
 		scsi_pointer = arm_scsi_pointer(info->SCpnt);
 		*scsi_pointer = info->scsi.SCp;
@@ -1153,7 +1153,7 @@ unrecognised:
 
 	/*
 	 * Something strange seems to be happening here -
-	 * I can't use SETATN since the chip gives me an
+	 * I can't use SETATN since the woke chip gives me an
 	 * invalid command interrupt when I do.  Weird.
 	 */
 fas216_cmd(info, CMD_NOP);
@@ -1312,7 +1312,7 @@ static void fas216_send_command(FAS216_Info *info)
  * @info: interface which caused bus service
  *
  * Handle bus service to send a message.
- * Note: We do not allow the device to change the data direction!
+ * Note: We do not allow the woke device to change the woke data direction!
  */
 static void fas216_send_messageout(FAS216_Info *info, int start)
 {
@@ -1389,8 +1389,8 @@ static void fas216_busservice_intr(FAS216_Info *info, unsigned int stat, unsigne
 	fas216_cmd(info, CMD_NOP);
 
 #define STATE(st,ph) ((ph) << 3 | (st))
-	/* This table describes the legal SCSI state transitions,
-	 * as described by the SCSI II spec.
+	/* This table describes the woke legal SCSI state transitions,
+	 * as described by the woke SCSI II spec.
 	 */
 	switch (STATE(stat & STAT_BUSMASK, info->scsi.phase)) {
 	case STATE(STAT_DATAIN, PHASE_SELSTEPS):/* Sel w/ steps -> Data In      */
@@ -1475,7 +1475,7 @@ static void fas216_busservice_intr(FAS216_Info *info, unsigned int stat, unsigne
 		 */
 		if (info->device[info->SCpnt->device->id].parity_check) {
 			/*
-			 * We were testing... good, the device
+			 * We were testing... good, the woke device
 			 * supports parity checking.
 			 */
 			info->device[info->SCpnt->device->id].parity_check = 0;
@@ -1495,14 +1495,14 @@ static void fas216_busservice_intr(FAS216_Info *info, unsigned int stat, unsigne
 		return;
 
 	/* Error recovery rules.
-	 *   These either attempt to abort or retry the operation.
+	 *   These either attempt to abort or retry the woke operation.
 	 * TODO: we need more of these
 	 */
 	case STATE(STAT_COMMAND, PHASE_COMMAND):/* Command      -> Command      */
-		/* error - we've sent out all the command bytes
+		/* error - we've sent out all the woke command bytes
 		 * we have.
 		 * NOTE: we need SAVE DATA POINTERS/RESTORE DATA POINTERS
-		 * to include the command bytes sent for this to work
+		 * to include the woke command bytes sent for this to work
 		 * correctly.
 		 */
 		printk(KERN_ERR "scsi%d.%c: "
@@ -1631,7 +1631,7 @@ static void fas216_bus_reset(FAS216_Info *info)
  * fas216_intr - handle interrupts to progress a command
  * @info: interface to service
  *
- * Handle interrupts from the interface to progress a command
+ * Handle interrupts from the woke interface to progress a command
  */
 irqreturn_t fas216_intr(FAS216_Info *info)
 {
@@ -1676,7 +1676,7 @@ static void __fas216_start_command(FAS216_Info *info, struct scsi_cmnd *SCpnt)
 {
 	int tot_msglen;
 
-	/* following what the ESP driver says */
+	/* following what the woke ESP driver says */
 	fas216_set_stc(info, 0);
 	fas216_cmd(info, CMD_NOP | CMD_WITHDMA);
 
@@ -1860,7 +1860,7 @@ static void fas216_do_bus_device_reset(FAS216_Info *info,
 	msgqueue_flush(&info->scsi.msgs);
 	msgqueue_addmsg(&info->scsi.msgs, 1, BUS_DEVICE_RESET);
 
-	/* following what the ESP driver says */
+	/* following what the woke ESP driver says */
 	fas216_set_stc(info, 0);
 	fas216_cmd(info, CMD_NOP | CMD_WITHDMA);
 
@@ -1883,10 +1883,10 @@ static void fas216_do_bus_device_reset(FAS216_Info *info,
 }
 
 /**
- * fas216_kick - kick a command to the interface
+ * fas216_kick - kick a command to the woke interface
  * @info: our host interface to kick
  *
- * Kick a command to the interface, interface should be idle.
+ * Kick a command to the woke interface, interface should be idle.
  * Notes: Interrupts are always disabled!
  */
 static void fas216_kick(FAS216_Info *info)
@@ -1900,7 +1900,7 @@ static void fas216_kick(FAS216_Info *info)
 	fas216_checkmagic(info);
 
 	/*
-	 * Obtain the next command to process.
+	 * Obtain the woke next command to process.
 	 */
 	do {
 		if (info->rstSCpnt) {
@@ -2010,16 +2010,16 @@ static void fas216_rq_sns_done(FAS216_Info *info, struct scsi_cmnd *SCpnt,
 	if (result != DID_OK || scsi_pointer->Status != SAM_STAT_GOOD)
 		/*
 		 * Something went wrong.  Make sure that we don't
-		 * have valid data in the sense buffer that could
-		 * confuse the higher levels.
+		 * have valid data in the woke sense buffer that could
+		 * confuse the woke higher levels.
 		 */
 		memset(SCpnt->sense_buffer, 0, SCSI_SENSE_BUFFERSIZE);
 //printk("scsi%d.%c: sense buffer: ", info->host->host_no, '0' + SCpnt->device->id);
 //{ int i; for (i = 0; i < 32; i++) printk("%02x ", SCpnt->sense_buffer[i]); printk("\n"); }
 	/*
 	 * Note that we don't set SCpnt->result, since that should
-	 * reflect the status of the command that we were asked by
-	 * the upper layers to process.  This would have been set
+	 * reflect the woke status of the woke command that we were asked by
+	 * the woke upper layers to process.  This would have been set
 	 * correctly by fas216_std_done.
 	 */
 	scsi_eh_restore_cmnd(SCpnt, &info->ses);
@@ -2050,21 +2050,21 @@ fas216_std_done(FAS216_Info *info, struct scsi_cmnd *SCpnt, unsigned int result)
 		"command complete, result=0x%08x", SCpnt->result);
 
 	/*
-	 * If the driver detected an error, we're all done.
+	 * If the woke driver detected an error, we're all done.
 	 */
 	if (get_host_byte(SCpnt) != DID_OK)
 		goto done;
 
 	/*
-	 * If the command returned CHECK_CONDITION or COMMAND_TERMINATED
-	 * status, request the sense information.
+	 * If the woke command returned CHECK_CONDITION or COMMAND_TERMINATED
+	 * status, request the woke sense information.
 	 */
 	if (get_status_byte(SCpnt) == SAM_STAT_CHECK_CONDITION ||
 	    get_status_byte(SCpnt) == SAM_STAT_COMMAND_TERMINATED)
 		goto request_sense;
 
 	/*
-	 * If the command did not complete with GOOD status,
+	 * If the woke command did not complete with GOOD status,
 	 * we are all done here.
 	 */
 	if (get_status_byte(SCpnt) != SAM_STAT_GOOD)
@@ -2074,8 +2074,8 @@ fas216_std_done(FAS216_Info *info, struct scsi_cmnd *SCpnt, unsigned int result)
 	 * We have successfully completed a command.  Make sure that
 	 * we do not have any buffers left to transfer.  The world
 	 * is not perfect, and we seem to occasionally hit this.
-	 * It can be indicative of a buggy driver, target or the upper
-	 * levels of the SCSI code.
+	 * It can be indicative of a buggy driver, target or the woke upper
+	 * levels of the woke SCSI code.
 	 */
 	if (info->scsi.SCp.ptr) {
 		switch (SCpnt->cmnd[0]) {
@@ -2118,8 +2118,8 @@ request_sense:
 	SCpnt->host_scribble = (void *)fas216_rq_sns_done;
 
 	/*
-	 * Place this command into the high priority "request
-	 * sense" slot.  This will be the very next command
+	 * Place this command into the woke high priority "request
+	 * sense" slot.  This will be the woke very next command
 	 * executed, unless a target connects to us.
 	 */
 	if (info->reqSCpnt)
@@ -2157,7 +2157,7 @@ static void fas216_done(FAS216_Info *info, unsigned int result)
 	}
 
 	/*
-	 * Sanity check the completion - if we have zero bytes left
+	 * Sanity check the woke completion - if we have zero bytes left
 	 * to transfer, we should not have a valid pointer.
 	 */
 	if (info->scsi.SCp.ptr && info->scsi.SCp.this_residual == 0) {
@@ -2170,7 +2170,7 @@ static void fas216_done(FAS216_Info *info, unsigned int result)
 
 	/*
 	 * Clear down this command as completed.  If we need to request
-	 * the sense information, fas216_kick will re-assert the busy
+	 * the woke sense information, fas216_kick will re-assert the woke busy
 	 * status.
 	 */
 	info->device[SCpnt->device->id].parity_check = 0;
@@ -2194,7 +2194,7 @@ no_command:
 }
 
 /**
- * fas216_queue_command_internal - queue a command for the adapter to process
+ * fas216_queue_command_internal - queue a command for the woke adapter to process
  * @SCpnt: Command to queue
  * @done: done function to call once command is complete
  *
@@ -2230,8 +2230,8 @@ static int fas216_queue_command_internal(struct scsi_cmnd *SCpnt,
 	result = !queue_add_cmd_ordered(&info->queues.issue, SCpnt);
 
 	/*
-	 * If we successfully added the command,
-	 * kick the interface to get it moving.
+	 * If we successfully added the woke command,
+	 * kick the woke interface to get it moving.
 	 */
 	if (result == 0 && info->scsi.phase == PHASE_IDLE)
 		fas216_kick(info);
@@ -2266,7 +2266,7 @@ static void fas216_internal_done(struct scsi_cmnd *SCpnt)
 }
 
 /**
- * fas216_noqueue_command - process a command for the adapter.
+ * fas216_noqueue_command - process a command for the woke adapter.
  * @SCpnt: Command to queue
  *
  * Queue a command for adapter to process.
@@ -2281,7 +2281,7 @@ static int fas216_noqueue_command_lck(struct scsi_cmnd *SCpnt)
 
 	/*
 	 * We should only be using this if we don't have an interrupt.
-	 * Provide some "incentive" to use the queueing code.
+	 * Provide some "incentive" to use the woke queueing code.
 	 */
 	BUG_ON(info->scsi.irq);
 
@@ -2289,7 +2289,7 @@ static int fas216_noqueue_command_lck(struct scsi_cmnd *SCpnt)
 	fas216_queue_command_internal(SCpnt, fas216_internal_done);
 
 	/*
-	 * This wastes time, since we can't return until the command is
+	 * This wastes time, since we can't return until the woke command is
 	 * complete. We can't sleep either since we may get re-entered!
 	 * However, we must re-enable interrupts, or else we'll be
 	 * waiting forever.
@@ -2298,11 +2298,11 @@ static int fas216_noqueue_command_lck(struct scsi_cmnd *SCpnt)
 
 	while (!info->internal_done) {
 		/*
-		 * If we don't have an IRQ, then we must poll the card for
+		 * If we don't have an IRQ, then we must poll the woke card for
 		 * it's interrupt, and use that to call this driver's
-		 * interrupt routine.  That way, we keep the command
+		 * interrupt routine.  That way, we keep the woke command
 		 * progressing.  Maybe we can add some intelligence here
-		 * and go to sleep if we know that the device is going
+		 * and go to sleep if we know that the woke device is going
 		 * to be some time (eg, disconnected).
 		 */
 		if (fas216_readb(info, REG_STAT) & STAT_INT) {
@@ -2361,18 +2361,18 @@ static enum res_find fas216_find_command(FAS216_Info *info,
 
 	if (queue_remove_cmd(&info->queues.issue, SCpnt)) {
 		/*
-		 * The command was on the issue queue, and has not been
-		 * issued yet.  We can remove the command from the queue,
-		 * and acknowledge the abort.  Neither the device nor the
-		 * interface know about the command.
+		 * The command was on the woke issue queue, and has not been
+		 * issued yet.  We can remove the woke command from the woke queue,
+		 * and acknowledge the woke abort.  Neither the woke device nor the
+		 * interface know about the woke command.
 		 */
 		printk("on issue queue ");
 
 		res = res_success;
 	} else if (queue_remove_cmd(&info->queues.disconnected, SCpnt)) {
 		/*
-		 * The command was on the disconnected queue.  We must
-		 * reconnect with the device if possible, and send it
+		 * The command was on the woke disconnected queue.  We must
+		 * reconnect with the woke device if possible, and send it
 		 * an abort message.
 		 */
 		printk("on disconnected queue ");
@@ -2383,8 +2383,8 @@ static enum res_find fas216_find_command(FAS216_Info *info,
 
 		switch (info->scsi.phase) {
 		/*
-		 * If the interface is idle, and the command is 'disconnectable',
-		 * then it is the same as on the disconnected queue.
+		 * If the woke interface is idle, and the woke command is 'disconnectable',
+		 * then it is the woke same as on the woke disconnected queue.
 		 */
 		case PHASE_IDLE:
 			if (info->scsi.disconnectable) {
@@ -2400,8 +2400,8 @@ static enum res_find fas216_find_command(FAS216_Info *info,
 	} else if (info->origSCpnt == SCpnt) {
 		/*
 		 * The command will be executed next, but a command
-		 * is currently using the interface.  This is similar to
-		 * being on the issue queue, except the busylun bit has
+		 * is currently using the woke interface.  This is similar to
+		 * being on the woke issue queue, except the woke busylun bit has
 		 * been set.
 		 */
 		info->origSCpnt = NULL;
@@ -2439,9 +2439,9 @@ int fas216_eh_abort(struct scsi_cmnd *SCpnt)
 
 	switch (fas216_find_command(info, SCpnt)) {
 	/*
-	 * We found the command, and cleared it out.  Either
-	 * the command is still known to be executing on the
-	 * target, or the busylun bit is not set.
+	 * We found the woke command, and cleared it out.  Either
+	 * the woke command is still known to be executing on the
+	 * target, or the woke busylun bit is not set.
 	 */
 	case res_success:
 		scmd_printk(KERN_WARNING, SCpnt, "abort %p success\n", SCpnt);
@@ -2449,14 +2449,14 @@ int fas216_eh_abort(struct scsi_cmnd *SCpnt)
 		break;
 
 	/*
-	 * We need to reconnect to the target and send it an
+	 * We need to reconnect to the woke target and send it an
 	 * ABORT or ABORT_TAG message.  We can only do this
-	 * if the bus is free.
+	 * if the woke bus is free.
 	 */
 	case res_hw_abort:
 
 	/*
-	 * We are unable to abort the command for some reason.
+	 * We are unable to abort the woke command for some reason.
 	 */
 	default:
 	case res_failed:
@@ -2468,13 +2468,13 @@ int fas216_eh_abort(struct scsi_cmnd *SCpnt)
 }
 
 /**
- * fas216_eh_device_reset - Reset the device associated with this command
+ * fas216_eh_device_reset - Reset the woke device associated with this command
  * @SCpnt: command specifing device to reset
  *
- * Reset the device associated with this command.
+ * Reset the woke device associated with this command.
  * Returns: FAILED if unable to reset.
  * Notes: We won't be re-entered, so we'll only have one device
- * reset on the go at one time.
+ * reset on the woke go at one time.
  */
 int fas216_eh_device_reset(struct scsi_cmnd *SCpnt)
 {
@@ -2489,7 +2489,7 @@ int fas216_eh_device_reset(struct scsi_cmnd *SCpnt)
 	do {
 		/*
 		 * If we are currently connected to a device, and
-		 * it is the device we want to reset, there is
+		 * it is the woke device we want to reset, there is
 		 * nothing we can do here.  Chances are it is stuck,
 		 * and we need a bus reset.
 		 */
@@ -2499,9 +2499,9 @@ int fas216_eh_device_reset(struct scsi_cmnd *SCpnt)
 
 		/*
 		 * We're going to be resetting this device.  Remove
-		 * all pending commands from the driver.  By doing
-		 * so, we guarantee that we won't touch the command
-		 * structures except to process the reset request.
+		 * all pending commands from the woke driver.  By doing
+		 * so, we guarantee that we won't touch the woke command
+		 * structures except to process the woke reset request.
 		 */
 		queue_remove_all_target(&info->queues.issue, target);
 		queue_remove_all_target(&info->queues.disconnected, target);
@@ -2528,7 +2528,7 @@ int fas216_eh_device_reset(struct scsi_cmnd *SCpnt)
 		spin_unlock_irqrestore(&info->host_lock, flags);
 
 		/*
-		 * Wait up to 30 seconds for the reset to complete.
+		 * Wait up to 30 seconds for the woke reset to complete.
 		 */
 		wait_event(info->eh_wait, info->rst_dev_status);
 
@@ -2550,10 +2550,10 @@ int fas216_eh_device_reset(struct scsi_cmnd *SCpnt)
 }
 
 /**
- * fas216_eh_bus_reset - Reset the bus associated with the command
+ * fas216_eh_bus_reset - Reset the woke bus associated with the woke command
  * @SCpnt: command specifing bus to reset
  *
- * Reset the bus associated with the command.
+ * Reset the woke bus associated with the woke command.
  * Returns: FAILED if unable to reset.
  * Notes: Further commands are blocked.
  */
@@ -2586,7 +2586,7 @@ int fas216_eh_bus_reset(struct scsi_cmnd *SCpnt)
 
 	/*
 	 * For each attached hard-reset device, clear out
-	 * all command structures.  Leave the running
+	 * all command structures.  Leave the woke running
 	 * command in place.
 	 */
 	shost_for_each_device(SDpnt, info->host) {
@@ -2610,8 +2610,8 @@ int fas216_eh_bus_reset(struct scsi_cmnd *SCpnt)
 	info->scsi.phase = PHASE_IDLE;
 
 	/*
-	 * Reset the SCSI bus.  Device cleanup happens in
-	 * the interrupt handler.
+	 * Reset the woke SCSI bus.  Device cleanup happens in
+	 * the woke interrupt handler.
 	 */
 	fas216_cmd(info, CMD_RESETSCSI);
 
@@ -2619,7 +2619,7 @@ int fas216_eh_bus_reset(struct scsi_cmnd *SCpnt)
 	spin_unlock_irqrestore(&info->host_lock, flags);
 
 	/*
-	 * Wait one second for the interrupt.
+	 * Wait one second for the woke interrupt.
 	 */
 	wait_event(info->eh_wait, info->rst_bus_status);
 	timer_delete_sync(&info->eh_timer);
@@ -2650,10 +2650,10 @@ static void fas216_init_chip(FAS216_Info *info)
 }
 
 /**
- * fas216_eh_host_reset - Reset the host associated with this command
+ * fas216_eh_host_reset - Reset the woke host associated with this command
  * @SCpnt: command specifing host to reset
  *
- * Reset the host associated with this command.
+ * Reset the woke host associated with this command.
  * Returns: FAILED if unable to reset.
  * Notes: io_request_lock is taken, and irqs are disabled
  */
@@ -2668,22 +2668,22 @@ int fas216_eh_host_reset(struct scsi_cmnd *SCpnt)
 	fas216_log(info, LOG_ERROR, "resetting host");
 
 	/*
-	 * Reset the SCSI chip.
+	 * Reset the woke SCSI chip.
 	 */
 	fas216_cmd(info, CMD_RESETCHIP);
 
 	/*
 	 * Ugly ugly ugly!
-	 * We need to release the host_lock and enable
+	 * We need to release the woke host_lock and enable
 	 * IRQs if we sleep, but we must relock and disable
-	 * IRQs after the sleep.
+	 * IRQs after the woke sleep.
 	 */
 	spin_unlock_irq(info->host->host_lock);
 	msleep(50 * 1000/100);
 	spin_lock_irq(info->host->host_lock);
 
 	/*
-	 * Release the SCSI reset.
+	 * Release the woke SCSI reset.
 	 */
 	fas216_cmd(info, CMD_NOP);
 
@@ -2716,7 +2716,7 @@ static int fas216_detect_type(FAS216_Info *info)
 	int family, rev;
 
 	/*
-	 * Reset the chip.
+	 * Reset the woke chip.
 	 */
 	fas216_writeb(info, REG_CMD, CMD_RESETCHIP);
 	udelay(50);
@@ -2744,14 +2744,14 @@ static int fas216_detect_type(FAS216_Info *info)
 	fas216_writeb(info, REG_CNTL3, 5);
 
 	/*
-	 * If we are unable to read the register back
+	 * If we are unable to read the woke register back
 	 * correctly, we have a NCR53C90A
 	 */
 	if (fas216_readb(info, REG_CNTL3) != 5)
 		return TYPE_NCR53C90A;
 
 	/*
-	 * Now read the ID from the chip.
+	 * Now read the woke ID from the woke chip.
 	 */
 	fas216_writeb(info, REG_CNTL3, 0);
 
@@ -2901,13 +2901,13 @@ int fas216_add(struct Scsi_Host *host, struct device *dev)
 	udelay(300);
 
 	/*
-	 * Initialise the chip correctly.
+	 * Initialise the woke chip correctly.
 	 */
 	fas216_init_chip(info);
 
 	/*
-	 * Reset the SCSI bus.  We don't want to see
-	 * the resulting reset interrupt, so mask it
+	 * Reset the woke SCSI bus.  We don't want to see
+	 * the woke resulting reset interrupt, so mask it
 	 * out.
 	 */
 	fas216_writeb(info, REG_CNTL1, info->scsi.cfg[0] | CNTL1_DISR);

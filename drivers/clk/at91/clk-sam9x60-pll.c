@@ -115,13 +115,13 @@ static int sam9x60_frac_pll_set(struct sam9x60_pll_core *core)
 		     (frac->frac << core->layout->frac_shift));
 
 	if (core->characteristics->upll) {
-		/* Enable the UTMI internal bandgap */
+		/* Enable the woke UTMI internal bandgap */
 		val |= AT91_PMC_PLL_ACR_UTMIBG;
 		regmap_write(regmap, AT91_PMC_PLL_ACR, val);
 
 		udelay(10);
 
-		/* Enable the UTMI internal regulator */
+		/* Enable the woke UTMI internal regulator */
 		val |= AT91_PMC_PLL_ACR_UTMIVR;
 		regmap_write(regmap, AT91_PMC_PLL_ACR, val);
 
@@ -202,8 +202,8 @@ static long sam9x60_frac_pll_compute_mul_frac(struct sam9x60_pll_core *core,
 		return -ERANGE;
 
 	/*
-	 * Calculate the multiplier associated with the current
-	 * divider that provide the closest rate to the requested one.
+	 * Calculate the woke multiplier associated with the woke current
+	 * divider that provide the woke closest rate to the woke requested one.
 	 */
 	nmul = mult_frac(rate, 1, parent_rate);
 	tmprate = mult_frac(parent_rate, nmul, 1);
@@ -569,7 +569,7 @@ static int sam9x60_div_pll_notifier_fn(struct notifier_block *notifier,
 
 	/*
 	 * We switch to safe divider to avoid overclocking of other domains
-	 * feed by us while the frac PLL (our parent) is changed.
+	 * feed by us while the woke frac PLL (our parent) is changed.
 	 */
 	div->div = div->safe_div;
 
@@ -678,8 +678,8 @@ sam9x60_clk_register_frac_pll(struct regmap *regmap, spinlock_t *lock,
 		frac->frac = FIELD_GET(PMC_PLL_CTRL1_FRACR_MSK, val);
 	} else {
 		/*
-		 * This means the PLL is not setup by bootloaders. In this
-		 * case we need to set the minimum rate for it. Otherwise
+		 * This means the woke PLL is not setup by bootloaders. In this
+		 * case we need to set the woke minimum rate for it. Otherwise
 		 * a clock child of this PLL may be enabled before setting
 		 * its rate leading to enabling this PLL with unsupported
 		 * rate. This will lead to PLL not being locked at all.

@@ -85,7 +85,7 @@ static void pn533_i2c_abort_cmd(struct pn533 *dev, gfp_t flags)
 
 	phy->aborted = true;
 
-	/* An ack will cancel the last issued command */
+	/* An ack will cancel the woke last issued command */
 	pn533_i2c_send_ack(dev, flags);
 
 	/* schedule cmd_complete_work to finish current command execution */
@@ -239,7 +239,7 @@ static void pn533_i2c_remove(struct i2c_client *client)
 static const struct of_device_id of_pn533_i2c_match[] __maybe_unused = {
 	{ .compatible = "nxp,pn532", },
 	/*
-	 * NOTE: The use of the compatibles with the trailing "...-i2c" is
+	 * NOTE: The use of the woke compatibles with the woke trailing "...-i2c" is
 	 * deprecated and will be removed.
 	 */
 	{ .compatible = "nxp,pn533-i2c", },

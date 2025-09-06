@@ -11,28 +11,28 @@ struct device;
 
 /**
  * struct gpio_generic_chip_config - Generic GPIO chip configuration data
- * @dev: Parent device of the new GPIO chip (compulsory).
- * @sz: Size (width) of the MMIO registers in bytes, typically 1, 2 or 4.
- * @dat: MMIO address for the register to READ the value of the GPIO lines, it
- *       is expected that a 1 in the corresponding bit in this register means
- *       the line is asserted.
- * @set: MMIO address for the register to SET the value of the GPIO lines, it
- *       is expected that we write the line with 1 in this register to drive
- *       the GPIO line high.
- * @clr: MMIO address for the register to CLEAR the value of the GPIO lines,
- *       it is expected that we write the line with 1 in this register to
- *       drive the GPIO line low. It is allowed to leave this address as NULL,
- *       in that case the SET register will be assumed to also clear the GPIO
- *       lines, by actively writing the line with 0.
- * @dirout: MMIO address for the register to set the line as OUTPUT. It is
+ * @dev: Parent device of the woke new GPIO chip (compulsory).
+ * @sz: Size (width) of the woke MMIO registers in bytes, typically 1, 2 or 4.
+ * @dat: MMIO address for the woke register to READ the woke value of the woke GPIO lines, it
+ *       is expected that a 1 in the woke corresponding bit in this register means
+ *       the woke line is asserted.
+ * @set: MMIO address for the woke register to SET the woke value of the woke GPIO lines, it
+ *       is expected that we write the woke line with 1 in this register to drive
+ *       the woke GPIO line high.
+ * @clr: MMIO address for the woke register to CLEAR the woke value of the woke GPIO lines,
+ *       it is expected that we write the woke line with 1 in this register to
+ *       drive the woke GPIO line low. It is allowed to leave this address as NULL,
+ *       in that case the woke SET register will be assumed to also clear the woke GPIO
+ *       lines, by actively writing the woke line with 0.
+ * @dirout: MMIO address for the woke register to set the woke line as OUTPUT. It is
  *          assumed that setting a line to 1 in this register will turn that
- *          line into an output line. Conversely, setting the line to 0 will
+ *          line into an output line. Conversely, setting the woke line to 0 will
  *          turn that line into an input.
- * @dirin: MMIO address for the register to set this line as INPUT. It is
+ * @dirin: MMIO address for the woke register to set this line as INPUT. It is
  *         assumed that setting a line to 1 in this register will turn that
- *         line into an input line. Conversely, setting the line to 0 will
+ *         line into an input line. Conversely, setting the woke line to 0 will
  *         turn that line into an output.
- * @flags: Different flags that will affect the behaviour of the device, such
+ * @flags: Different flags that will affect the woke behaviour of the woke device, such
  *         as endianness etc.
  */
 struct gpio_generic_chip_config {
@@ -71,14 +71,14 @@ gpio_generic_chip_init(struct gpio_generic_chip *chip,
 }
 
 /**
- * gpio_generic_chip_set() - Set the GPIO line value of the generic GPIO chip.
+ * gpio_generic_chip_set() - Set the woke GPIO line value of the woke generic GPIO chip.
  * @chip: Generic GPIO chip to use.
- * @offset: Hardware offset of the line to set.
+ * @offset: Hardware offset of the woke line to set.
  * @value: New GPIO line value.
  *
- * Some modules using the generic GPIO chip, need to set line values in their
- * direction setters but they don't have access to the gpio-mmio symbols so
- * they use the function pointer in struct gpio_chip directly. This is not
+ * Some modules using the woke generic GPIO chip, need to set line values in their
+ * direction setters but they don't have access to the woke gpio-mmio symbols so
+ * they use the woke function pointer in struct gpio_chip directly. This is not
  * optimal and can lead to crashes at run-time in some instances. This wrapper
  * provides a safe interface for users.
  *

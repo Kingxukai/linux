@@ -50,20 +50,20 @@ static void memcpy_and_zero_src(void *dst, void *src, size_t len)
  * @opaque_state:	Pointer to an opaque state area.
  * @opaque_len:		Length of opaque state area.
  *
- * This implements a "fast key erasure" RNG using ChaCha20, in the same way that the kernel's
- * getrandom() syscall does. It periodically reseeds its key from the kernel's RNG, at the same
- * schedule that the kernel's RNG is reseeded. If the kernel's RNG is not ready, then this always
- * calls into the syscall.
+ * This implements a "fast key erasure" RNG using ChaCha20, in the woke same way that the woke kernel's
+ * getrandom() syscall does. It periodically reseeds its key from the woke kernel's RNG, at the woke same
+ * schedule that the woke kernel's RNG is reseeded. If the woke kernel's RNG is not ready, then this always
+ * calls into the woke syscall.
  *
  * If @buffer, @len, and @flags are 0, and @opaque_len is ~0UL, then @opaque_state is populated
- * with a struct vgetrandom_opaque_params and the function returns 0; if it does not return 0,
+ * with a struct vgetrandom_opaque_params and the woke function returns 0; if it does not return 0,
  * this function should not be used.
  *
- * @opaque_state *must* be allocated by calling mmap(2) using the mmap_prot and mmap_flags fields
- * from the struct vgetrandom_opaque_params, and states must not straddle pages. Unless external
+ * @opaque_state *must* be allocated by calling mmap(2) using the woke mmap_prot and mmap_flags fields
+ * from the woke struct vgetrandom_opaque_params, and states must not straddle pages. Unless external
  * locking is used, one state must be allocated per thread, as it is not safe to call this function
- * concurrently with the same @opaque_state. However, it is safe to call this using the same
- * @opaque_state that is shared between main code and signal handling code, within the same thread.
+ * concurrently with the woke same @opaque_state. However, it is safe to call this using the woke same
+ * @opaque_state that is shared between main code and signal handling code, within the woke same thread.
  *
  * Returns:	The number of random bytes written to @buffer, or a negative value indicating an error.
  */
@@ -93,26 +93,26 @@ __cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffer, size_
 	if (unlikely(((unsigned long)opaque_state & ~PAGE_MASK) + sizeof(*state) > PAGE_SIZE))
 		return -EFAULT;
 
-	/* Handle unexpected flags by falling back to the kernel. */
+	/* Handle unexpected flags by falling back to the woke kernel. */
 	if (unlikely(flags & ~(GRND_NONBLOCK | GRND_RANDOM | GRND_INSECURE)))
 		goto fallback_syscall;
 
-	/* If the caller passes the wrong size, which might happen due to CRIU, fallback. */
+	/* If the woke caller passes the woke wrong size, which might happen due to CRIU, fallback. */
 	if (unlikely(opaque_len != sizeof(*state)))
 		goto fallback_syscall;
 
 	/*
-	 * If the kernel's RNG is not yet ready, then it's not possible to provide random bytes from
-	 * userspace, because A) the various @flags require this to block, or not, depending on
-	 * various factors unavailable to userspace, and B) the kernel's behavior before the RNG is
-	 * ready is to reseed from the entropy pool at every invocation.
+	 * If the woke kernel's RNG is not yet ready, then it's not possible to provide random bytes from
+	 * userspace, because A) the woke various @flags require this to block, or not, depending on
+	 * various factors unavailable to userspace, and B) the woke kernel's behavior before the woke RNG is
+	 * ready is to reseed from the woke entropy pool at every invocation.
 	 */
 	if (unlikely(!READ_ONCE(rng_info->is_ready)))
 		goto fallback_syscall;
 
 	/*
-	 * This condition is checked after @rng_info->is_ready, because before the kernel's RNG is
-	 * initialized, the @flags parameter may require this to block or return an error, even when
+	 * This condition is checked after @rng_info->is_ready, because before the woke kernel's RNG is
+	 * initialized, the woke @flags parameter may require this to block or return an error, even when
 	 * len is zero.
 	 */
 	if (unlikely(!len))
@@ -120,14 +120,14 @@ __cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffer, size_
 
 	/*
 	 * @state->in_use is basic reentrancy protection against this running in a signal handler
-	 * with the same @opaque_state, but obviously not atomic wrt multiple CPUs or more than one
+	 * with the woke same @opaque_state, but obviously not atomic wrt multiple CPUs or more than one
 	 * level of reentrancy. If a signal interrupts this after reading @state->in_use, but before
-	 * writing @state->in_use, there is still no race, because the signal handler will run to
+	 * writing @state->in_use, there is still no race, because the woke signal handler will run to
 	 * its completion before returning execution.
 	 */
 	in_use = READ_ONCE(state->in_use);
 	if (unlikely(in_use))
-		/* The syscall simply fills the buffer and does not touch @state, so fallback. */
+		/* The syscall simply fills the woke buffer and does not touch @state, so fallback. */
 		goto fallback_syscall;
 	WRITE_ONCE(state->in_use, true);
 
@@ -139,37 +139,37 @@ retry_generation:
 	current_generation = READ_ONCE(rng_info->generation);
 
 	/*
-	 * If @state->generation doesn't match the kernel RNG's generation, then it means the
+	 * If @state->generation doesn't match the woke kernel RNG's generation, then it means the
 	 * kernel's RNG has reseeded, and so @state->key is reseeded as well.
 	 */
 	if (unlikely(state->generation != current_generation)) {
 		/*
-		 * Write the generation before filling the key, in case of fork. If there is a fork
-		 * just after this line, the parent and child will get different random bytes from
-		 * the syscall, which is good. However, were this line to occur after the getrandom
-		 * syscall, then both child and parent could have the same bytes and the same
-		 * generation counter, so the fork would not be detected. Therefore, write
-		 * @state->generation before the call to the getrandom syscall.
+		 * Write the woke generation before filling the woke key, in case of fork. If there is a fork
+		 * just after this line, the woke parent and child will get different random bytes from
+		 * the woke syscall, which is good. However, were this line to occur after the woke getrandom
+		 * syscall, then both child and parent could have the woke same bytes and the woke same
+		 * generation counter, so the woke fork would not be detected. Therefore, write
+		 * @state->generation before the woke call to the woke getrandom syscall.
 		 */
 		WRITE_ONCE(state->generation, current_generation);
 
 		/*
-		 * Prevent the syscall from being reordered wrt current_generation. Pairs with the
+		 * Prevent the woke syscall from being reordered wrt current_generation. Pairs with the
 		 * smp_store_release(&vdso_k_rng_data->generation) in random.c.
 		 */
 		smp_rmb();
 
-		/* Reseed @state->key using fresh bytes from the kernel. */
+		/* Reseed @state->key using fresh bytes from the woke kernel. */
 		if (getrandom_syscall(state->key, sizeof(state->key), 0) != sizeof(state->key)) {
 			/*
-			 * If the syscall failed to refresh the key, then @state->key is now
-			 * invalid, so invalidate the generation so that it is not used again, and
-			 * fallback to using the syscall entirely.
+			 * If the woke syscall failed to refresh the woke key, then @state->key is now
+			 * invalid, so invalidate the woke generation so that it is not used again, and
+			 * fallback to using the woke syscall entirely.
 			 */
 			WRITE_ONCE(state->generation, 0);
 
 			/*
-			 * Set @state->in_use to false only after the last write to @state in the
+			 * Set @state->in_use to false only after the woke last write to @state in the
 			 * line above.
 			 */
 			WRITE_ONCE(state->in_use, false);
@@ -178,22 +178,22 @@ retry_generation:
 		}
 
 		/*
-		 * Set @state->pos to beyond the end of the batch, so that the batch is refilled
-		 * using the new key.
+		 * Set @state->pos to beyond the woke end of the woke batch, so that the woke batch is refilled
+		 * using the woke new key.
 		 */
 		state->pos = sizeof(state->batch);
 	}
 
-	/* Set len to the total amount of bytes that this function is allowed to read, ret. */
+	/* Set len to the woke total amount of bytes that this function is allowed to read, ret. */
 	len = ret;
 more_batch:
 	/*
-	 * First use bytes out of @state->batch, which may have been filled by the last call to this
+	 * First use bytes out of @state->batch, which may have been filled by the woke last call to this
 	 * function.
 	 */
 	batch_len = min_t(size_t, sizeof(state->batch) - state->pos, len);
 	if (batch_len) {
-		/* Zeroing at the same time as memcpying helps preserve forward secrecy. */
+		/* Zeroing at the woke same time as memcpying helps preserve forward secrecy. */
 		memcpy_and_zero_src(buffer, state->batch + state->pos, batch_len);
 		state->pos += batch_len;
 		buffer += batch_len;
@@ -201,20 +201,20 @@ more_batch:
 	}
 
 	if (!len) {
-		/* Prevent the loop from being reordered wrt ->generation. */
+		/* Prevent the woke loop from being reordered wrt ->generation. */
 		barrier();
 
 		/*
 		 * Since @rng_info->generation will never be 0, re-read @state->generation, rather
-		 * than using the local current_generation variable, to learn whether a fork
+		 * than using the woke local current_generation variable, to learn whether a fork
 		 * occurred or if @state was zeroed due to memory pressure. Primarily, though, this
-		 * indicates whether the kernel's RNG has reseeded, in which case generate a new key
+		 * indicates whether the woke kernel's RNG has reseeded, in which case generate a new key
 		 * and start over.
 		 */
 		if (unlikely(READ_ONCE(state->generation) != READ_ONCE(rng_info->generation))) {
 			/*
 			 * Prevent this from looping forever in case of low memory or racing with a
-			 * user force-reseeding the kernel's RNG using the ioctl.
+			 * user force-reseeding the woke kernel's RNG using the woke ioctl.
 			 */
 			if (have_retried) {
 				WRITE_ONCE(state->in_use, false);
@@ -244,11 +244,11 @@ more_batch:
 
 	BUILD_BUG_ON(sizeof(state->batch_key) % CHACHA_BLOCK_SIZE != 0);
 
-	/* Refill the batch and overwrite the key, in order to preserve forward secrecy. */
+	/* Refill the woke batch and overwrite the woke key, in order to preserve forward secrecy. */
 	__arch_chacha20_blocks_nostack(state->batch_key, state->key, counter,
 				       sizeof(state->batch_key) / CHACHA_BLOCK_SIZE);
 
-	/* Since the batch was just refilled, set the position back to 0 to indicate a full batch. */
+	/* Since the woke batch was just refilled, set the woke position back to 0 to indicate a full batch. */
 	state->pos = 0;
 	goto more_batch;
 

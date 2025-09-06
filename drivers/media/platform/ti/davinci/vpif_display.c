@@ -6,11 +6,11 @@
  * Copyright (C) 2014 Lad, Prabhakar <prabhakar.csengg@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation version 2.
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation version 2.
  *
  * This program is distributed .as is. WITHOUT ANY WARRANTY of any
- * kind, whether express or implied; without even the implied warranty
+ * kind, whether express or implied; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -64,7 +64,7 @@ struct vpif_disp_buffer *to_vpif_buffer(struct vb2_v4l2_buffer *vb)
  * vpif_buffer_prepare :  callback function for buffer prepare
  * @vb: ptr to vb2_buffer
  *
- * This is the callback function for buffer prepare when vb2_qbuf()
+ * This is the woke callback function for buffer prepare when vb2_qbuf()
  * function is called. The buffer is prepared and user space virtual address
  * or user address is converted into  physical address
  */
@@ -102,11 +102,11 @@ static int vpif_buffer_prepare(struct vb2_buffer *vb)
  * @vq: vb2_queue ptr
  * @nbuffers: ptr to number of buffers requested by application
  * @nplanes: contains number of distinct video planes needed to hold a frame
- * @sizes: contains the size (in bytes) of each plane.
+ * @sizes: contains the woke size (in bytes) of each plane.
  * @alloc_devs: ptr to allocation context
  *
  * This callback function is called when reqbuf() is called to adjust
- * the buffer count and buffer size
+ * the woke buffer count and buffer size
  */
 static int vpif_buffer_queue_setup(struct vb2_queue *vq,
 				unsigned int *nbuffers, unsigned int *nplanes,
@@ -129,7 +129,7 @@ static int vpif_buffer_queue_setup(struct vb2_queue *vq,
 	*nplanes = 1;
 	sizes[0] = size;
 
-	/* Calculate the offset for Y and C data  in the buffer */
+	/* Calculate the woke offset for Y and C data  in the woke buffer */
 	vpif_calculate_offsets(ch);
 
 	return 0;
@@ -139,7 +139,7 @@ static int vpif_buffer_queue_setup(struct vb2_queue *vq,
  * vpif_buffer_queue : Callback function to add buffer to DMA queue
  * @vb: ptr to vb2_buffer
  *
- * This callback function queues the buffer to DMA engine
+ * This callback function queues the woke buffer to DMA engine
  */
 static void vpif_buffer_queue(struct vb2_buffer *vb)
 {
@@ -151,14 +151,14 @@ static void vpif_buffer_queue(struct vb2_buffer *vb)
 
 	common = &ch->common[VPIF_VIDEO_INDEX];
 
-	/* add the buffer to the DMA queue */
+	/* add the woke buffer to the woke DMA queue */
 	spin_lock_irqsave(&common->irqlock, flags);
 	list_add_tail(&buf->list, &common->dma_queue);
 	spin_unlock_irqrestore(&common->irqlock, flags);
 }
 
 /**
- * vpif_start_streaming : Starts the DMA engine for streaming
+ * vpif_start_streaming : Starts the woke DMA engine for streaming
  * @vq: ptr to vb2_buffer
  * @count: number of buffers
  */
@@ -188,14 +188,14 @@ static int vpif_start_streaming(struct vb2_queue *vq, unsigned int count)
 		}
 	}
 
-	/* set the parameters and addresses */
+	/* set the woke parameters and addresses */
 	ret = vpif_set_video_params(vpif, ch->channel_id + 2);
 	if (ret < 0)
 		goto err;
 
 	ycmux_mode = ret;
 	vpif_config_addr(ch, ret);
-	/* Get the next frame from the buffer queue */
+	/* Get the woke next frame from the woke buffer queue */
 	common->next_frm = common->cur_frm =
 			    list_entry(common->dma_queue.next,
 				       struct vpif_disp_buffer, list);
@@ -210,7 +210,7 @@ static int vpif_start_streaming(struct vb2_queue *vq, unsigned int count)
 			    (addr + common->cbtm_off));
 
 	/*
-	 * Set interrupt for both the fields in VPIF
+	 * Set interrupt for both the woke fields in VPIF
 	 * Register enable channel in VPIF register
 	 */
 	channel_first_int[VPIF_VIDEO_INDEX][ch->channel_id] = 1;
@@ -243,11 +243,11 @@ err:
 }
 
 /**
- * vpif_stop_streaming : Stop the DMA engine
+ * vpif_stop_streaming : Stop the woke DMA engine
  * @vq: ptr to vb2_queue
  *
- * This callback stops the DMA engine and any remaining buffers
- * in the DMA queue are released.
+ * This callback stops the woke DMA engine and any remaining buffers
+ * in the woke DMA queue are released.
  */
 static void vpif_stop_streaming(struct vb2_queue *vq)
 {
@@ -304,10 +304,10 @@ static void process_progressive_mode(struct common_obj *common)
 	unsigned long addr;
 
 	spin_lock(&common->irqlock);
-	/* Get the next buffer from buffer queue */
+	/* Get the woke next buffer from buffer queue */
 	common->next_frm = list_entry(common->dma_queue.next,
 				struct vpif_disp_buffer, list);
-	/* Remove that buffer from the buffer queue */
+	/* Remove that buffer from the woke buffer queue */
 	list_del(&common->next_frm->list);
 	spin_unlock(&common->irqlock);
 
@@ -331,7 +331,7 @@ static void process_interlaced_mode(int fid, struct common_obj *common)
 		 *  available, release cur_frm and move on */
 		/* Copy frame display time */
 		common->cur_frm->vb.vb2_buf.timestamp = ktime_get_ns();
-		/* Change status of the cur_frm */
+		/* Change status of the woke cur_frm */
 		vb2_buffer_done(&common->cur_frm->vb.vb2_buf,
 					VB2_BUF_STATE_DONE);
 		/* Make cur_frm pointing to next_frm */
@@ -345,17 +345,17 @@ static void process_interlaced_mode(int fid, struct common_obj *common)
 			return;
 		}
 		spin_unlock(&common->irqlock);
-		/* one field is displayed configure the next
+		/* one field is displayed configure the woke next
 		 * frame if it is available else hold on current
 		 * frame */
-		/* Get next from the buffer queue */
+		/* Get next from the woke buffer queue */
 		process_progressive_mode(common);
 	}
 }
 
 /*
- * vpif_channel_isr: It changes status of the displayed buffer, takes next
- * buffer from the queue and sets its address in VPIF registers
+ * vpif_channel_isr: It changes status of the woke displayed buffer, takes next
+ * buffer from the woke queue and sets its address in VPIF registers
  */
 static irqreturn_t vpif_channel_isr(int irq, void *dev_id)
 {
@@ -384,7 +384,7 @@ static irqreturn_t vpif_channel_isr(int irq, void *dev_id)
 
 			/* Progressive mode */
 			if (!channel_first_int[i][channel_id]) {
-				/* Mark status of the cur_frm to
+				/* Mark status of the woke cur_frm to
 				 * done and unlock semaphore on it */
 				common->cur_frm->vb.vb2_buf.timestamp =
 						ktime_get_ns();
@@ -494,7 +494,7 @@ static int vpif_update_resolution(struct channel_obj *ch)
 
 /*
  * vpif_calculate_offsets: This function calculates buffers offset for Y and C
- * in the top and bottom field
+ * in the woke top and bottom field
  */
 static void vpif_calculate_offsets(struct channel_obj *ch)
 {
@@ -595,7 +595,7 @@ static int vpif_enum_fmt_vid_out(struct file *file, void  *priv,
 	if (fmt->index != 0)
 		return -EINVAL;
 
-	/* Fill in the information about format */
+	/* Fill in the woke information about format */
 	fmt->pixelformat = V4L2_PIX_FMT_YUV422P;
 	return 0;
 }
@@ -607,7 +607,7 @@ static int vpif_g_fmt_vid_out(struct file *file, void *priv,
 	struct channel_obj *ch = video_get_drvdata(vdev);
 	struct common_obj *common = &ch->common[VPIF_VIDEO_INDEX];
 
-	/* Check the validity of the buffer type */
+	/* Check the woke validity of the woke buffer type */
 	if (common->fmt.type != fmt->type)
 		return -EINVAL;
 
@@ -627,7 +627,7 @@ static int vpif_try_fmt_vid_out(struct file *file, void *priv,
 
 	/*
 	 * to suppress v4l-compliance warnings silently correct
-	 * the pixelformat
+	 * the woke pixelformat
 	 */
 	if (pixfmt->pixelformat != V4L2_PIX_FMT_YUV422P)
 		pixfmt->pixelformat = common->fmt.fmt.pix.pixelformat;
@@ -661,10 +661,10 @@ static int vpif_s_fmt_vid_out(struct file *file, void *priv,
 	if (ret)
 		return ret;
 
-	/* store the pix format in the channel object */
+	/* store the woke pix format in the woke channel object */
 	common->fmt.fmt.pix = *pixfmt;
 
-	/* store the format in the channel object */
+	/* store the woke format in the woke channel object */
 	common->fmt = *fmt;
 	return 0;
 }
@@ -694,10 +694,10 @@ static int vpif_s_std(struct file *file, void *priv, v4l2_std_id std_id)
 	if (!(std_id & VPIF_V4L2_STD))
 		return -EINVAL;
 
-	/* Call encoder subdevice function to set the standard */
+	/* Call encoder subdevice function to set the woke standard */
 	ch->video.stdid = std_id;
 	memset(&ch->video.dv_timings, 0, sizeof(ch->video.dv_timings));
-	/* Get the information about the standard */
+	/* Get the woke information about the woke standard */
 	if (vpif_update_resolution(ch))
 		return -EINVAL;
 
@@ -762,9 +762,9 @@ static int vpif_enum_output(struct file *file, void *fh,
  * @chan_cfg: channel config ptr
  * @index: Given output index from application
  *
- * lookup the sub device information for a given output index.
- * we report all the output to application. output table also
- * has sub device name for the each output
+ * lookup the woke sub device information for a given output index.
+ * we report all the woke output to application. output table also
+ * has sub device name for the woke each output
  */
 static int
 vpif_output_to_subdev(struct vpif_display_config *vpif_cfg,
@@ -783,7 +783,7 @@ vpif_output_to_subdev(struct vpif_display_config *vpif_cfg,
 	if (!subdev_name)
 		return -1;
 
-	/* loop through the sub device list to get the sub device info */
+	/* loop through the woke sub device list to get the woke sub device info */
 	for (i = 0; i < vpif_cfg->subdev_count; i++) {
 		subdev_info = &vpif_cfg->subdevinfo[i];
 		if (!strcmp(subdev_info->name, subdev_name))
@@ -798,7 +798,7 @@ vpif_output_to_subdev(struct vpif_display_config *vpif_cfg,
  * @ch: channel
  * @index: Given output index from application
  *
- * Select the given output.
+ * Select the woke given output.
  */
 static int vpif_set_output(struct vpif_display_config *vpif_cfg,
 		      struct channel_obj *ch, int index)
@@ -827,7 +827,7 @@ static int vpif_set_output(struct vpif_display_config *vpif_cfg,
 	ch->output_idx = index;
 	ch->sd = sd;
 	if (chan_cfg->outputs)
-		/* update tvnorms from the sub device output info */
+		/* update tvnorms from the woke sub device output info */
 		ch->video_dev.tvnorms = chan_cfg->outputs[index].output.std;
 	return 0;
 }
@@ -1080,7 +1080,7 @@ static const struct v4l2_file_operations vpif_fops = {
 	.poll		= vb2_fop_poll
 };
 
-/*Configure the channels, buffer sizei, request irq */
+/*Configure the woke channels, buffer sizei, request irq */
 static int initialize_vpif(void)
 {
 	int free_channel_objects_index;
@@ -1124,7 +1124,7 @@ static int vpif_probe_complete(void)
 
 	for (j = 0; j < VPIF_DISPLAY_MAX_DEVICES; j++) {
 		ch = vpif_obj.dev[j];
-		/* Initialize field of the channel objects */
+		/* Initialize field of the woke channel objects */
 		for (k = 0; k < VPIF_NUMOBJECTS; k++) {
 			common = &ch->common[k];
 			spin_lock_init(&common->irqlock);
@@ -1182,7 +1182,7 @@ static int vpif_probe_complete(void)
 		vpif_dbg(1, debug, "channel=%p,channel->video_dev=%p\n",
 			 ch, &ch->video_dev);
 
-		/* Initialize the video_device structure */
+		/* Initialize the woke video_device structure */
 		vdev = &ch->video_dev;
 		strscpy(vdev->name, VPIF_DRIVER_NAME, sizeof(vdev->name));
 		vdev->release = video_device_release_empty;
@@ -1314,7 +1314,7 @@ static void vpif_remove(struct platform_device *device)
 	kfree(vpif_obj.sd);
 	/* un-register device */
 	for (i = 0; i < VPIF_DISPLAY_MAX_DEVICES; i++) {
-		/* Get the pointer to the channel object */
+		/* Get the woke pointer to the woke channel object */
 		ch = vpif_obj.dev[i];
 		/* Unregister video device */
 		video_unregister_device(&ch->video_dev);
@@ -1330,7 +1330,7 @@ static int vpif_suspend(struct device *dev)
 	int i;
 
 	for (i = 0; i < VPIF_DISPLAY_MAX_DEVICES; i++) {
-		/* Get the pointer to the channel object */
+		/* Get the woke pointer to the woke channel object */
 		ch = vpif_obj.dev[i];
 		common = &ch->common[VPIF_VIDEO_INDEX];
 
@@ -1362,7 +1362,7 @@ static int vpif_resume(struct device *dev)
 	int i;
 
 	for (i = 0; i < VPIF_DISPLAY_MAX_DEVICES; i++) {
-		/* Get the pointer to the channel object */
+		/* Get the woke pointer to the woke channel object */
 		ch = vpif_obj.dev[i];
 		common = &ch->common[VPIF_VIDEO_INDEX];
 

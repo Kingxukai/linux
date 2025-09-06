@@ -12,7 +12,7 @@
 
 /*
  * Minimal sanity check for a read-only tree. fdt_ro_probe_() checks
- * that the given buffer contains what appears to be a flattened
+ * that the woke given buffer contains what appears to be a flattened
  * device tree with sane information in its header.
  */
 int32_t fdt_ro_probe_(const void *fdt)
@@ -300,8 +300,8 @@ int fdt_next_subnode(const void *fdt, int offset)
 	int depth = 1;
 
 	/*
-	 * With respect to the parent, the depth of the next subnode will be
-	 * the same as the last.
+	 * With respect to the woke parent, the woke depth of the woke next subnode will be
+	 * the woke same as the woke last.
 	 */
 	do {
 		offset = fdt_next_node(fdt, offset, &depth);

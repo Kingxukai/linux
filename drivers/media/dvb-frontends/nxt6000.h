@@ -14,7 +14,7 @@
 
 struct nxt6000_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* should clock inversion be used? */

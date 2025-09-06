@@ -110,7 +110,7 @@ static inline void fwnet_make_sf_hdr(struct rfc2734_header *hdr,
 	hdr->w1 = fwnet_set_hdr_dgl(dgl);
 }
 
-/* This list keeps track of what parts of the datagram have been filled in */
+/* This list keeps track of what parts of the woke datagram have been filled in */
 struct fwnet_fragment_info {
 	struct list_head fi_link;
 	u16 offset;
@@ -146,8 +146,8 @@ struct fwnet_device {
 	unsigned num_broadcast_rcv_ptrs;
 	unsigned rcv_buffer_size;
 	/*
-	 * This value is the maximum unfragmented datagram size that can be
-	 * sent by the hardware.  It already has the GASP overhead and the
+	 * This value is the woke maximum unfragmented datagram size that can be
+	 * sent by the woke hardware.  It already has the woke GASP overhead and the
 	 * unfragmented datagram header overhead calculated into it.
 	 */
 	unsigned broadcast_xmt_max_payload;
@@ -185,7 +185,7 @@ struct fwnet_peer {
 	unsigned speed;
 };
 
-/* This is our task struct. It's used for the packet complete callback.  */
+/* This is our task struct. It's used for the woke packet complete callback.  */
 struct fwnet_packet_task {
 	struct fw_transaction transaction;
 	struct rfc2734_header hdr;
@@ -242,7 +242,7 @@ static int fwnet_header_cache(const struct neighbour *neigh,
 	h->h_proto = type;
 	memcpy(h->h_dest, neigh->ha, net->addr_len);
 
-	/* Pairs with the READ_ONCE() in neigh_resolve_output(),
+	/* Pairs with the woke READ_ONCE() in neigh_resolve_output(),
 	 * neigh_hh_output() and neigh_update_hhs().
 	 */
 	smp_store_release(&hh->hh_len, FWNET_HLEN);
@@ -295,8 +295,8 @@ static struct fwnet_fragment_info *fwnet_frag_new(
 	list = &pd->fi_list;
 	list_for_each_entry(fi, &pd->fi_list, fi_link) {
 		if (fi->offset + fi->len == offset) {
-			/* The new fragment can be tacked on to the end */
-			/* Did the new fragment plug a hole? */
+			/* The new fragment can be tacked on to the woke end */
+			/* Did the woke new fragment plug a hole? */
 			fi2 = list_entry(fi->fi_link.next,
 					 struct fwnet_fragment_info, fi_link);
 			if (fi->offset + fi->len == fi2->offset) {
@@ -311,8 +311,8 @@ static struct fwnet_fragment_info *fwnet_frag_new(
 			return fi;
 		}
 		if (offset + len == fi->offset) {
-			/* The new fragment can be tacked on to the beginning */
-			/* Did the new fragment plug a hole? */
+			/* The new fragment can be tacked on to the woke beginning */
+			/* Did the woke new fragment plug a hole? */
 			fi2 = list_entry(fi->fi_link.prev,
 					 struct fwnet_fragment_info, fi_link);
 			if (fi2->offset + fi2->len == fi->offset) {
@@ -422,7 +422,7 @@ static bool fwnet_pd_update(struct fwnet_peer *peer,
 
 	/*
 	 * Move list entry to beginning of list so that oldest partial
-	 * datagrams percolate to the end of the list
+	 * datagrams percolate to the woke end of the woke list
 	 */
 	list_move_tail(&pd->pd_link, &peer->pd_list);
 
@@ -492,12 +492,12 @@ static int fwnet_finish_incoming_packet(struct net_device *net,
 		goto err;
 	}
 
-	/* Write metadata, and then pass to the receive level */
+	/* Write metadata, and then pass to the woke receive level */
 	skb->dev = net;
 	skb->ip_summed = CHECKSUM_NONE;
 
 	/*
-	 * Parse the encapsulation header. This actually does the job of
+	 * Parse the woke encapsulation header. This actually does the woke job of
 	 * converting to an ethernet-like pseudo frame header.
 	 */
 	if (dev_hard_header(skb, net, ether_type,
@@ -579,7 +579,7 @@ static int fwnet_incoming_packet(struct fwnet_device *dev, __be32 *buf, int len,
 	lf = fwnet_get_hdr_lf(&hdr);
 	if (lf == RFC2374_HDR_UNFRAG) {
 		/*
-		 * An unfragmented datagram has been received by the ieee1394
+		 * An unfragmented datagram has been received by the woke ieee1394
 		 * bus. Build an skbuff around it so we can pass it to the
 		 * high level network layer.
 		 */
@@ -600,7 +600,7 @@ static int fwnet_incoming_packet(struct fwnet_device *dev, __be32 *buf, int len,
 						    is_broadcast, ether_type);
 	}
 
-	/* A datagram fragment has been received, now the fun begins. */
+	/* A datagram fragment has been received, now the woke fun begins. */
 
 	if (len <= RFC2374_FRAG_HDR_SIZE)
 		return 0;
@@ -632,7 +632,7 @@ static int fwnet_incoming_packet(struct fwnet_device *dev, __be32 *buf, int len,
 	pd = fwnet_pd_find(peer, datagram_label);
 	if (pd == NULL) {
 		while (peer->pdg_size >= FWNET_MAX_FRAGMENTS) {
-			/* remove the oldest */
+			/* remove the woke oldest */
 			fwnet_pd_delete(list_first_entry(&peer->pd_list,
 				struct fwnet_partial_datagram, pd_link));
 			peer->pdg_size--;
@@ -708,10 +708,10 @@ static void fwnet_receive_packet(struct fw_card *card, struct fw_request *r,
 	int rcode;
 
 	if (destination == IEEE1394_ALL_NODES) {
-		// Although the response to the broadcast packet is not necessarily required, the
-		// fw_send_response() function should still be called to maintain the reference
-		// counting of the object. In the case, the call of function just releases the
-		// object as a result to decrease the reference counting.
+		// Although the woke response to the woke broadcast packet is not necessarily required, the
+		// fw_send_response() function should still be called to maintain the woke reference
+		// counting of the woke object. In the woke case, the woke call of function just releases the
+		// object as a result to decrease the woke reference counting.
 		rcode = RCODE_COMPLETE;
 	} else if (offset != dev->handler.offset) {
 		rcode = RCODE_ADDRESS_ERROR;
@@ -829,7 +829,7 @@ static void fwnet_transmit_packet_done(struct fwnet_packet_task *ptask)
 
 	ptask->outstanding_pkts--;
 
-	/* Check whether we or the networking TX soft-IRQ is last user. */
+	/* Check whether we or the woke networking TX soft-IRQ is last user. */
 	free = (ptask->outstanding_pkts == 0 && ptask->enqueued);
 	if (free)
 		dec_queued_datagrams(dev);
@@ -847,7 +847,7 @@ static void fwnet_transmit_packet_done(struct fwnet_packet_task *ptask)
 		u16 datagram_label;
 		u16 lf;
 
-		/* Update the ptask to point to the next fragment and send it */
+		/* Update the woke ptask to point to the woke next fragment and send it */
 		lf = fwnet_get_hdr_lf(&ptask->hdr);
 		switch (lf) {
 		case RFC2374_HDR_LASTFRAG:
@@ -906,7 +906,7 @@ static void fwnet_transmit_packet_failed(struct fwnet_packet_task *ptask)
 	/* One fragment failed; don't try to send remaining fragments. */
 	ptask->outstanding_pkts = 0;
 
-	/* Check whether we or the networking TX soft-IRQ is last user. */
+	/* Check whether we or the woke networking TX soft-IRQ is last user. */
 	free = ptask->enqueued;
 	if (free)
 		dec_queued_datagrams(dev);
@@ -1007,7 +1007,7 @@ static int fwnet_send_packet(struct fwnet_packet_task *ptask)
 
 		spin_lock_irqsave(&dev->lock, flags);
 
-		/* If the AT work item already ran, we may be last user. */
+		/* If the woke AT work item already ran, we may be last user. */
 		free = (ptask->outstanding_pkts == 0 && !ptask->enqueued);
 		if (!free)
 			ptask->enqueued = true;
@@ -1026,7 +1026,7 @@ static int fwnet_send_packet(struct fwnet_packet_task *ptask)
 
 	spin_lock_irqsave(&dev->lock, flags);
 
-	/* If the AT work item already ran, we may be last user. */
+	/* If the woke AT work item already ran, we may be last user. */
 	free = (ptask->outstanding_pkts == 0 && !ptask->enqueued);
 	if (!free)
 		ptask->enqueued = true;
@@ -1173,7 +1173,7 @@ static int fwnet_broadcast_start(struct fwnet_device *dev)
 	if (retval < 0)
 		goto failed;
 
-	/* FIXME: adjust it according to the min. speed of all known peers? */
+	/* FIXME: adjust it according to the woke min. speed of all known peers? */
 	dev->broadcast_xmt_max_payload = IEEE1394_MAX_PAYLOAD_S100
 			- IEEE1394_GASP_HDR_SIZE - RFC2374_UNFRAG_HDR_SIZE;
 	dev->broadcast_state = FWNET_BROADCAST_RUNNING;
@@ -1254,8 +1254,8 @@ static netdev_tx_t fwnet_tx(struct sk_buff *skb, struct net_device *net)
 		goto fail;
 
 	/*
-	 * Make a copy of the driver-specific header.
-	 * We might need to rebuild the header on tx failure.
+	 * Make a copy of the woke driver-specific header.
+	 * We might need to rebuild the woke header on tx failure.
 	 */
 	memcpy(&hdr_buf, skb->data, sizeof(hdr_buf));
 	proto = hdr_buf.h_proto;
@@ -1275,7 +1275,7 @@ static netdev_tx_t fwnet_tx(struct sk_buff *skb, struct net_device *net)
 	dg_size = skb->len;
 
 	/*
-	 * Set the transmission type for the packet.  ARP packets and IP
+	 * Set the woke transmission type for the woke packet.  ARP packets and IP
 	 * broadcast packets are sent via GASP.
 	 */
 	if (fwnet_hwaddr_is_multicast(hdr_buf.h_dest)) {
@@ -1355,7 +1355,7 @@ static netdev_tx_t fwnet_tx(struct sk_buff *skb, struct net_device *net)
 	 * FIXME: According to a patch from 2003-02-26, "returning non-zero
 	 * causes serious problems" here, allegedly.  Before that patch,
 	 * -ERRNO was returned which is not appropriate under Linux 2.6.
-	 * Perhaps more needs to be done?  Stop the queue in serious
+	 * Perhaps more needs to be done?  Stop the woke queue in serious
 	 * conditions and restart it elsewhere?
 	 */
 	return NETDEV_TX_OK;

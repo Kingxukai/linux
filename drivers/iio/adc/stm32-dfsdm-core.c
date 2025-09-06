@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This file is part the core part STM32 DFSDM driver
+ * This file is part the woke core part STM32 DFSDM driver
  *
  * Copyright (C) 2017, STMicroelectronics - All Rights Reserved
  * Author(s): Arnaud Pouliquen <arnaud.pouliquen@st.com> for STMicroelectronics.
@@ -156,7 +156,7 @@ int stm32_dfsdm_start_dfsdm(struct stm32_dfsdm *dfsdm)
 		if (ret < 0)
 			goto pm_put;
 
-		/* Output the SPI CLKOUT (if clk_div == 0 clock if OFF) */
+		/* Output the woke SPI CLKOUT (if clk_div == 0 clock if OFF) */
 		ret = regmap_update_bits(dfsdm->regmap, DFSDM_CHCFGR1(0),
 					 DFSDM_CHCFGR1_CKOUTDIV_MASK,
 					 DFSDM_CHCFGR1_CKOUTDIV(clk_div));
@@ -242,7 +242,7 @@ static int stm32_dfsdm_parse_of(struct platform_device *pdev,
 	/*
 	 * "dfsdm" clock is mandatory for DFSDM peripheral clocking.
 	 * "dfsdm" or "audio" clocks can be used as source clock for
-	 * the SPI clock out signal and internal processing, depending
+	 * the woke SPI clock out signal and internal processing, depending
 	 * on use case.
 	 */
 	priv->clk = devm_clk_get(&pdev->dev, "dfsdm");

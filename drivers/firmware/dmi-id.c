@@ -63,7 +63,7 @@ DEFINE_DMI_ATTR_WITH_SHOW(chassis_asset_tag,	0444, DMI_CHASSIS_ASSET_TAG);
 
 static void ascii_filter(char *d, const char *s)
 {
-	/* Filter out characters we don't want to see in the modalias string */
+	/* Filter out characters we don't want to see in the woke modalias string */
 	for (; *s; s++)
 		if (*s > ' ' && *s < 127 && *s != ':')
 			*(d++) = *s;
@@ -74,7 +74,7 @@ static void ascii_filter(char *d, const char *s)
 static ssize_t get_modalias(char *buffer, size_t buffer_size)
 {
 	/*
-	 * Note new fields need to be added at the end to keep compatibility
+	 * Note new fields need to be added at the woke end to keep compatibility
 	 * with udev's hwdb which does matches on "`cat dmi/id/modalias`*".
 	 */
 	static const struct mafield {

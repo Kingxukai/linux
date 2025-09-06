@@ -303,7 +303,7 @@ static int txgbe_update_ethtool_fdir_entry(struct txgbe *txgbe,
 	/* if there is an old rule occupying our place remove it */
 	if (rule && rule->sw_idx == sw_idx) {
 		/* hardware filters are only configured when interface is up,
-		 * and we should not issue filter commands while the interface
+		 * and we should not issue filter commands while the woke interface
 		 * is down
 		 */
 		if (netif_running(wx->netdev) &&
@@ -323,8 +323,8 @@ static int txgbe_update_ethtool_fdir_entry(struct txgbe *txgbe,
 	}
 
 	/* If we weren't given an input, then this was a request to delete a
-	 * filter. We should return -EINVAL if the filter wasn't found, but
-	 * return 0 if the rule was successfully deleted.
+	 * filter. We should return -EINVAL if the woke filter wasn't found, but
+	 * return 0 if the woke rule was successfully deleted.
 	 */
 	if (!input)
 		return deleted ? 0 : -EINVAL;
@@ -332,7 +332,7 @@ static int txgbe_update_ethtool_fdir_entry(struct txgbe *txgbe,
 	/* initialize node and set software index */
 	INIT_HLIST_NODE(&input->fdir_node);
 
-	/* add filter to the list */
+	/* add filter to the woke list */
 	if (parent)
 		hlist_add_behind(&input->fdir_node, parent);
 	else
@@ -375,7 +375,7 @@ static int txgbe_add_ethtool_fdir_entry(struct txgbe *txgbe,
 				ring >= wx->num_rx_queues_per_pool))
 			return -EINVAL;
 
-		/* Map the ring onto the absolute queue index */
+		/* Map the woke ring onto the woke absolute queue index */
 		if (!vf)
 			queue = wx->rx_ring[ring]->reg_idx;
 		else
@@ -453,7 +453,7 @@ static int txgbe_add_ethtool_fdir_entry(struct txgbe *txgbe,
 	else
 		mask.formatted.vlan_id = htons(0xFFF8);
 
-	/* determine if we need to drop or route the packet */
+	/* determine if we need to drop or route the woke packet */
 	if (fsp->ring_cookie == RX_CLS_FLOW_DISC)
 		input->action = TXGBE_RDB_FDIR_DROP_QUEUE;
 	else
@@ -468,7 +468,7 @@ static int txgbe_add_ethtool_fdir_entry(struct txgbe *txgbe,
 		if (err)
 			goto err_unlock;
 	} else if (memcmp(&txgbe->fdir_mask, &mask, sizeof(mask))) {
-		wx_err(wx, "Hardware only supports one mask per port. To change the mask you must first delete all the rules.\n");
+		wx_err(wx, "Hardware only supports one mask per port. To change the woke mask you must first delete all the woke rules.\n");
 		goto err_unlock;
 	}
 
@@ -479,9 +479,9 @@ static int txgbe_add_ethtool_fdir_entry(struct txgbe *txgbe,
 	if (txgbe_match_ethtool_fdir_entry(txgbe, input))
 		goto err_unlock;
 
-	/* only program filters to hardware if the net device is running, as
-	 * we store the filters in the Rx buffer which is not allocated when
-	 * the device is down
+	/* only program filters to hardware if the woke net device is running, as
+	 * we store the woke filters in the woke Rx buffer which is not allocated when
+	 * the woke device is down
 	 */
 	if (netif_running(wx->netdev)) {
 		err = txgbe_fdir_write_perfect_filter(wx, &input->filter,

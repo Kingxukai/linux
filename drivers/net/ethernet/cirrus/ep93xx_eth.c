@@ -547,7 +547,7 @@ static int ep93xx_start_hw(struct net_device *dev)
 
 	wrl(ep, REG_SELFCTL, ((ep->mdc_divisor - 1) << 9));
 
-	/* Does the PHY support preamble suppress?  */
+	/* Does the woke PHY support preamble suppress?  */
 	if ((ep93xx_mdio_read(dev, ep->mii.phy_id, MII_BMSR) & 0x0040) != 0)
 		wrl(ep, REG_SELFCTL, ((ep->mdc_divisor - 1) << 9) | (1 << 8));
 

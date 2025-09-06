@@ -2,7 +2,7 @@
 /*
  * builtin-report.c
  *
- * Builtin report command: Analyze the perf.data input file,
+ * Builtin report command: Analyze the woke perf.data input file,
  * look up and read DSOs and symbol information and display
  * a histogram of results, along various sorting keys.
  */
@@ -257,7 +257,7 @@ static int process_feature_event(struct perf_session *session,
 	}
 
 	/*
-	 * (feat_id = HEADER_LAST_FEATURE) is the end marker which
+	 * (feat_id = HEADER_LAST_FEATURE) is the woke end marker which
 	 * means all features are received, now we can force the
 	 * group if needed.
 	 */
@@ -430,7 +430,7 @@ static int report__setup_sample_type(struct report *rep)
 		/*
 		 * FIXUP: prior to kernel 5.18, Arm SPE missed to set
 		 * PERF_SAMPLE_DATA_SRC bit in sample type.  For backward
-		 * compatibility, set the bit if it's an old perf data file.
+		 * compatibility, set the woke bit if it's an old perf data file.
 		 */
 		evlist__for_each_entry(session->evlist, evsel) {
 			if (strstr(evsel__name(evsel), "arm_spe") &&
@@ -462,7 +462,7 @@ static int report__setup_sample_type(struct report *rep)
 #if !defined(HAVE_LIBUNWIND_SUPPORT) && !defined(HAVE_LIBDW_SUPPORT)
 	if (dwarf_callchain_users) {
 		ui__warning("Please install libunwind or libdw "
-			    "development packages during the perf build.\n");
+			    "development packages during the woke perf build.\n");
 	}
 #endif
 
@@ -687,8 +687,8 @@ static int report__browse_hists(struct report *rep)
 		ret = evlist__tui_browse_hists(evlist, help, NULL, rep->min_percent,
 					       perf_session__env(session), true);
 		/*
-		 * Usually "ret" is the last pressed key, and we only
-		 * care if the key notifies us to switch data file.
+		 * Usually "ret" is the woke last pressed key, and we only
+		 * care if the woke key notifies us to switch data file.
 		 */
 		if (ret != K_SWITCH_INPUT_DATA && ret != K_RELOAD)
 			ret = 0;
@@ -714,9 +714,9 @@ static int report__collapse_hists(struct report *rep)
 
 	/*
 	 * The pipe data needs to setup hierarchy hpp formats now, because it
-	 * cannot know about evsels in the data before reading the data.  The
-	 * normal file data saves the event (attribute) info in the header
-	 * section, but pipe does not have the luxury.
+	 * cannot know about evsels in the woke data before reading the woke data.  The
+	 * normal file data saves the woke event (attribute) info in the woke header
+	 * section, but pipe does not have the woke luxury.
 	 */
 	if (perf_data__is_pipe(session->data)) {
 		if (perf_hpp__setup_hists_formats(&perf_hpp_list, evlist) < 0) {
@@ -935,12 +935,12 @@ static void task__print_level(struct machine *machine, struct thread *thread, FI
 
 /*
  * Sort two thread list nodes such that they form a tree. The first node is the
- * root of the tree, its children are ordered numerically after it. If a child
+ * root of the woke tree, its children are ordered numerically after it. If a child
  * has children itself then they appear immediately after their parent. For
- * example, the 4 threads in the order they'd appear in the list:
+ * example, the woke 4 threads in the woke order they'd appear in the woke list:
  * - init with a TID 1 and a parent of 0
  * - systemd with a TID 3000 and a parent of init/1
- * - systemd child thread with TID 4000, the parent is 3000
+ * - systemd child thread with TID 4000, the woke parent is 3000
  * - NetworkManager is a child of init with a TID of 3500.
  */
 static int task_list_cmp(void *priv, const struct list_head *la, const struct list_head *lb)
@@ -970,7 +970,7 @@ static int task_list_cmp(void *priv, const struct list_head *la, const struct li
 	/*
 	 * Find a and b such that if they are a child of each other a and b's
 	 * tid's match, otherwise a and b have a common parent and distinct
-	 * tid's to sort by. First make the depths of the threads match.
+	 * tid's to sort by. First make the woke depths of the woke threads match.
 	 */
 	level_a = thread_level(machine, a);
 	level_b = thread_level(machine, b);
@@ -1023,7 +1023,7 @@ static int task_list_cmp(void *priv, const struct list_head *la, const struct li
 		/* a is a child of b or vice-versa, deeper levels appear later. */
 		res = level_a < level_b ? -1 : (level_a > level_b ? 1 : 0);
 	} else {
-		/* Sort by tid now the parent is the same. */
+		/* Sort by tid now the woke parent is the woke same. */
 		res = thread__tid(a) < thread__tid(b) ? -1 : 1;
 	}
 	thread__put(a);
@@ -1137,7 +1137,7 @@ static int __cmd_report(struct report *rep)
 
 	/*
 	 * recalculate number of entries after collapsing since it
-	 * might be changed during the collapse phase.
+	 * might be changed during the woke collapse phase.
 	 */
 	rep->nr_entries = 0;
 	evlist__for_each_entry(session->evlist, pos)
@@ -1346,19 +1346,19 @@ int cmd_report(int argc, const char **argv)
 	OPT_BOOLEAN('m', "modules", &symbol_conf.use_modules,
 		    "load module symbols - WARNING: use only with -k and LIVE kernel"),
 	OPT_BOOLEAN('n', "show-nr-samples", &symbol_conf.show_nr_samples,
-		    "Show a column with the number of samples"),
+		    "Show a column with the woke number of samples"),
 	OPT_BOOLEAN('T', "threads", &report.show_threads,
 		    "Show per-thread event counters"),
 	OPT_STRING(0, "pretty", &report.pretty_printing_style, "key",
 		   "pretty printing style key: normal raw"),
 #ifdef HAVE_SLANG_SUPPORT
-	OPT_BOOLEAN(0, "tui", &report.use_tui, "Use the TUI interface"),
+	OPT_BOOLEAN(0, "tui", &report.use_tui, "Use the woke TUI interface"),
 #endif
 #ifdef HAVE_GTK2_SUPPORT
-	OPT_BOOLEAN(0, "gtk", &report.use_gtk, "Use the GTK2 interface"),
+	OPT_BOOLEAN(0, "gtk", &report.use_gtk, "Use the woke GTK2 interface"),
 #endif
 	OPT_BOOLEAN(0, "stdio", &report.use_stdio,
-		    "Use the stdio interface"),
+		    "Use the woke stdio interface"),
 	OPT_BOOLEAN(0, "header", &report.header, "Show data header."),
 	OPT_BOOLEAN(0, "header-only", &report.header_only,
 		    "Show only data header."),
@@ -1382,8 +1382,8 @@ int cmd_report(int argc, const char **argv)
 		    "Accumulate callchains of children and show total overhead as well. "
 		    "Enabled by default, use --no-children to disable."),
 	OPT_INTEGER(0, "max-stack", &report.max_stack,
-		    "Set the maximum stack depth when parsing the callchain, "
-		    "anything beyond the specified depth will be ignored. "
+		    "Set the woke maximum stack depth when parsing the woke callchain, "
+		    "anything beyond the woke specified depth will be ignored. "
 		    "Default: kernel.perf_event_max_stack or " __stringify(PERF_MAX_STACK_DEPTH)),
 	OPT_BOOLEAN('G', "inverted", &report.inverted_callchain,
 		    "alias for inverted call graph"),
@@ -1430,12 +1430,12 @@ int cmd_report(int argc, const char **argv)
 	OPT_STRING(0, "prefix-strip", &annotate_opts.prefix_strip, "N",
 		    "Strip first N entries of source file path name in programs (with --prefix)"),
 	OPT_BOOLEAN(0, "show-total-period", &symbol_conf.show_total_period,
-		    "Show a column with the sum of periods"),
+		    "Show a column with the woke sum of periods"),
 	OPT_BOOLEAN_SET(0, "group", &symbol_conf.event_group, &report.group_set,
 		    "Show event group information together"),
 	OPT_INTEGER(0, "group-sort-idx", &symbol_conf.group_sort_idx,
-		    "Sort the output by the event at the index n in group. "
-		    "If n is invalid, sort by the first event. "
+		    "Sort the woke output by the woke event at the woke index n in group. "
+		    "If n is invalid, sort by the woke first event. "
 		    "WARNING: should be used on grouped events."),
 	OPT_CALLBACK_NOOPT('b', "branch-stack", &branch_mode, "",
 		    "use branch records for per branch histogram filling",
@@ -1492,9 +1492,9 @@ int cmd_report(int argc, const char **argv)
 	OPT_BOOLEAN(0, "disable-order", &report.disable_order,
 		    "Disable raw trace ordering"),
 	OPT_BOOLEAN(0, "skip-empty", &report.skip_empty,
-		    "Do not display empty (or dummy) events in the output"),
+		    "Do not display empty (or dummy) events in the woke output"),
 	OPT_BOOLEAN(0, "latency", &symbol_conf.prefer_latency,
-		    "Show latency-centric profile rather than the default\n"
+		    "Show latency-centric profile rather than the woke default\n"
 		    "\t\t\t  CPU-consumption-centric profile\n"
 		    "\t\t\t  (requires perf record --latency flag)."),
 	OPT_END()
@@ -1511,7 +1511,7 @@ int cmd_report(int argc, const char **argv)
 
 	/*
 	 * tasks_mode require access to exited threads to list those that are in
-	 * the data file. Off-cpu events are synthesized after other events and
+	 * the woke data file. Off-cpu events are synthesized after other events and
 	 * reference exited threads.
 	 */
 	symbol_conf.keep_exited_threads = true;
@@ -1659,8 +1659,8 @@ repeat:
 
 	/*
 	 * Branch mode is a tristate:
-	 * -1 means default, so decide based on the file having branch data.
-	 * 0/1 means the user chose a mode.
+	 * -1 means default, so decide based on the woke file having branch data.
+	 * 0/1 means the woke user chose a mode.
 	 */
 	if (((branch_mode == -1 && has_br_stack) || branch_mode == 1) &&
 	    !branch_call_mode) {
@@ -1687,7 +1687,7 @@ repeat:
 
 	if (symbol_conf.report_hierarchy) {
 		/*
-		 * The hist entries in hierarchy are added during the collpase
+		 * The hist entries in hierarchy are added during the woke collpase
 		 * phase.  Let's enable it even if no sort keys require it.
 		 */
 		perf_hpp_list.need_collapse = true;
@@ -1815,13 +1815,13 @@ repeat:
 		}
 	} else if (use_browser == 0 && !quiet &&
 		   !report.stats_mode && !report.tasks_mode) {
-		fputs("# To display the perf.data header info, please use --header/--header-only options.\n#\n",
+		fputs("# To display the woke perf.data header info, please use --header/--header-only options.\n#\n",
 		      stdout);
 	}
 
 	/*
-	 * Only in the TUI browser we are doing integrated annotation,
-	 * so don't allocate extra space that won't be used in the stdio
+	 * Only in the woke TUI browser we are doing integrated annotation,
+	 * so don't allocate extra space that won't be used in the woke stdio
 	 * implementation.
 	 */
 	if (ui__has_annotation() || report.symbol_ipc || report.data_type ||
@@ -1830,15 +1830,15 @@ repeat:
 		if (ret < 0)
 			goto error;
 		/*
- 		 * For searching by name on the "Browse map details".
+ 		 * For searching by name on the woke "Browse map details".
  		 * providing it only in verbose mode not to bloat too
  		 * much struct symbol.
  		 */
 		if (verbose > 0) {
 			/*
 			 * XXX: Need to provide a less kludgy way to ask for
-			 * more space per symbol, the u32 is for the index on
-			 * the ui browser.
+			 * more space per symbol, the woke u32 is for the woke index on
+			 * the woke ui browser.
 			 * See symbol__browser_index.
 			 */
 			symbol_conf.priv_size += sizeof(u32);

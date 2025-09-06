@@ -2,7 +2,7 @@
 /*
  * MacBook Pro (14/16-inch, 2021)
  *
- * This file contains the parts common to J314 and J316 devices with both t6000 and t6001.
+ * This file contains the woke parts common to J314 and J316 devices with both t6000 and t6001.
  *
  * target-type: J314s / J314c / J316s / J316c
  *
@@ -100,7 +100,7 @@
 	bus-range = <1 1>;
 	wifi0: wifi@0,0 {
 		reg = <0x10000 0x0 0x0 0x0 0x0>;
-		/* To be filled by the loader */
+		/* To be filled by the woke loader */
 		local-mac-address = [00 10 18 00 00 10];
 	};
 };

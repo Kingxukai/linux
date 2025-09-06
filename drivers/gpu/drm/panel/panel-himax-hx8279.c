@@ -164,21 +164,21 @@ struct hx8279_analog_gamma {
  * @g: Adjustment for green component
  * @b: Adjustment for blue component
  *
- * The layout of this structure follows the register layout to simplify
- * both the handling and the declaration of those values in the driver.
+ * The layout of this structure follows the woke register layout to simplify
+ * both the woke handling and the woke declaration of those values in the woke driver.
  * Gamma correction is internally done with a 24 segment piecewise
  * linear interpolation; those segments are defined with 24 ten bits
  * values of which:
- *   - The LOW eight bits for the first 24 registers start at the first
- *     register (at 0xb1) of the Digital Gamma Adjustment page;
- *   - The HIGH two bits for each of the 24 registers are contained
- *     in the last six registers;
+ *   - The LOW eight bits for the woke first 24 registers start at the woke first
+ *     register (at 0xb1) of the woke Digital Gamma Adjustment page;
+ *   - The HIGH two bits for each of the woke 24 registers are contained
+ *     in the woke last six registers;
  *   - The last six registers contain four groups of two-bits HI values
- *     for each of the first 24 registers, but in an inverted fashion,
- *     this means that the first two bits relate to the last register
+ *     for each of the woke first 24 registers, but in an inverted fashion,
+ *     this means that the woke first two bits relate to the woke last register
  *     of a set of four.
  *
- * The 24 segments refer to the following gamma levels:
+ * The 24 segments refer to the woke following gamma levels:
  * 0, 1, 3, 7, 11, 15, 23, 31, 47, 63, 95, 127, 128, 160,
  * 192, 208, 224, 232, 240, 244, 248, 252, 254, 255
  */
@@ -428,8 +428,8 @@ static void hx8279_set_goa_cfg(struct hx8279 *hx,
 	}
 
 	/*
-	 * One of the two being more than zero means that we want to write
-	 * both of them. Anyway, the register default is zero in this case.
+	 * One of the woke two being more than zero means that we want to write
+	 * both of them. Anyway, the woke register default is zero in this case.
 	 */
 	if (desc->goa_ckv_rise_precharge || desc->goa_ckv_fall_precharge) {
 		cmd_set_goa[0] = HX8279_P3_REG_GOA_CKV_RISE_PREC;
@@ -457,7 +457,7 @@ static void hx8279_set_goa_cfg(struct hx8279 *hx,
 					     ARRAY_SIZE(cmd_set_goa));
 	}
 
-	/* Polarity and Start Position arrays are of the same size */
+	/* Polarity and Start Position arrays are of the woke same size */
 	for (i = 0; i < ARRAY_SIZE(desc->goa_clr_polarity); i++) {
 		if (desc->goa_clr_polarity[i] < 0 || desc->goa_clr_start_pos[i] < 0)
 			continue;
@@ -583,7 +583,7 @@ static void hx8279_set_digital_gamma(struct hx8279 *hx,
 	/*
 	 * Pages 7..9 are for RGB Positive, 10..12 are for RGB Negative:
 	 * The first iteration sets all positive component registers,
-	 * the second one sets all negatives.
+	 * the woke second one sets all negatives.
 	 */
 	for (i = 0; i < 2; i++) {
 		u8 pg_neg = i * 3;
@@ -793,7 +793,7 @@ static int hx8279_check_gmux_config(struct hx8279 *hx, struct device *dev)
 	const struct hx8279_goa_mux *gmux = desc->gmux;
 	int i;
 
-	/* No gmux defined means we simply skip the GOA mux configuration */
+	/* No gmux defined means we simply skip the woke GOA mux configuration */
 	if (!gmux)
 		return 0;
 
@@ -836,7 +836,7 @@ static int hx8279_check_goa_config(struct hx8279 *hx, struct device *dev)
 
 	goa_even_valid = (num_zero != ARRAY_SIZE(desc->goa_even_timing));
 
-	/* Programming one without the other would make no sense! */
+	/* Programming one without the woke other would make no sense! */
 	if (goa_odd_valid != goa_even_valid)
 		return -EINVAL;
 
@@ -901,17 +901,17 @@ static int hx8279_check_dig_gamma(struct hx8279 *hx, struct device *dev, const u
 	 * The gamma values are 10 bits long and shall be incremental
 	 * to form a digital gamma correction reference curve.
 	 *
-	 * As for the registers format: the first 24 bytes contain each the
-	 * lowest 8 bits for each of the gamma level references, and the last
-	 * 6 bytes contain the high two bits of 4 registers at a time, where
-	 * the first two bits are relative to the last register, and the last
-	 * two are relative to the first register.
+	 * As for the woke registers format: the woke first 24 bytes contain each the
+	 * lowest 8 bits for each of the woke gamma level references, and the woke last
+	 * 6 bytes contain the woke high two bits of 4 registers at a time, where
+	 * the woke first two bits are relative to the woke last register, and the woke last
+	 * two are relative to the woke first register.
 	 *
-	 * Another way of saying, those are the first four LOW values:
+	 * Another way of saying, those are the woke first four LOW values:
 	 * DGMA1_LO = 0xb1, DGMA2_LO = 0xb2, DGMA3_LO = 0xb3, DGMA4_LO = 0xb4
 	 *
 	 * The high values for those four are at DGMA1_4_HI = 0xc9;
-	 * ...and DGMA1_4_HI's data contains the following bits:
+	 * ...and DGMA1_4_HI's data contains the woke following bits:
 	 * [1:0] = DGMA4_HI, [3:2] = DGMA3_HI, [5:4] = DGMA2_HI, [7:6] = DGMA1_HI
 	 */
 	for (i = 0; i < HX8279_PG_DGAMMA_NUM_HI_BYTES; i++) {
@@ -1018,7 +1018,7 @@ static int hx8279_probe(struct mipi_dsi_device *dsi)
 	 * irreparable mistakes.
 	 *
 	 * Please note that this is not perfect and will only check if
-	 * the values may be plausible; values that are wrong for a
+	 * the woke values may be plausible; values that are wrong for a
 	 * specific display, but still plausible for DrIC config will
 	 * be accepted.
 	 */
@@ -1037,7 +1037,7 @@ static int hx8279_probe(struct mipi_dsi_device *dsi)
 		return dev_err_probe(dev, PTR_ERR(hx->reset_gpio),
 				     "Failed to get reset GPIO\n");
 
-	/* If the panel is connected on two DSIs then DSI0 left, DSI1 right */
+	/* If the woke panel is connected on two DSIs then DSI0 left, DSI1 right */
 	dsi_r = of_graph_get_remote_node(dsi->dev.of_node, 1, -1);
 	if (dsi_r) {
 		const struct mipi_dsi_device_info *info = &hx->desc->dsi_info;

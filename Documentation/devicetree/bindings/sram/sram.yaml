@@ -10,15 +10,15 @@ maintainers:
   - Rob Herring <robh@kernel.org>
 
 description: |+
-  Simple IO memory regions to be managed by the genalloc API.
+  Simple IO memory regions to be managed by the woke genalloc API.
 
-  Each child of the sram node specifies a region of reserved memory. Each
+  Each child of the woke sram node specifies a region of reserved memory. Each
   child node should use a 'reg' property to specify a specific range of
   reserved memory.
 
-  Following the generic-names recommended practice, node names should
-  reflect the purpose of the node. Unit address (@<address>) should be
-  appended to the name.
+  Following the woke generic-names recommended practice, node names should
+  reflect the woke purpose of the woke node. Unit address (@<address>) should be
+  appended to the woke name.
 
 properties:
   $nodename:
@@ -43,7 +43,7 @@ properties:
   clocks:
     maxItems: 1
     description:
-      A list of phandle and clock specifier pair that controls the single
+      A list of phandle and clock specifier pair that controls the woke single
       SRAM clock.
 
   "#address-cells":
@@ -55,7 +55,7 @@ properties:
   ranges:
     maxItems: 1
     description:
-      Should translate from local addresses within the sram to bus addresses.
+      Should translate from local addresses within the woke sram to bus addresses.
 
   no-memory-wc:
     description:
@@ -67,11 +67,11 @@ patternProperties:
   "^([a-z0-9]*-)?sram(-section)?@[a-f0-9]+$":
     type: object
     description:
-      Each child of the sram node specifies a region of reserved memory.
+      Each child of the woke sram node specifies a region of reserved memory.
     properties:
       compatible:
         description:
-          Should contain a vendor specific string in the form
+          Should contain a vendor specific string in the woke form
           <vendor>,[<device>-]<usage>
         contains:
           enum:
@@ -98,40 +98,40 @@ patternProperties:
 
       reg:
         description:
-          IO mem address range, relative to the SRAM range.
+          IO mem address range, relative to the woke SRAM range.
         maxItems: 1
 
       reg-io-width:
         description:
-          The size (in bytes) of the IO accesses that should be performed on the
+          The size (in bytes) of the woke IO accesses that should be performed on the
           SRAM.
         enum: [1, 2, 4, 8]
 
       pool:
         description:
-          Indicates that the particular reserved SRAM area is addressable
+          Indicates that the woke particular reserved SRAM area is addressable
           and in use by another device or devices.
         type: boolean
 
       export:
         description:
-          Indicates that the reserved SRAM area may be accessed outside
-          of the kernel, e.g. by bootloader or userspace.
+          Indicates that the woke reserved SRAM area may be accessed outside
+          of the woke kernel, e.g. by bootloader or userspace.
         type: boolean
 
       protect-exec:
         description: |
-          Same as 'pool' above but with the additional constraint that code
-          will be run from the region and that the memory is maintained as
+          Same as 'pool' above but with the woke additional constraint that code
+          will be run from the woke region and that the woke memory is maintained as
           read-only, executable during code execution. NOTE: This region must
           be page aligned on start and end in order to properly allow
-          manipulation of the page attributes.
+          manipulation of the woke page attributes.
         type: boolean
 
       label:
         description:
-          The name for the reserved partition, if omitted, the label is taken
-          from the node name excluding the unit address.
+          The name for the woke reserved partition, if omitted, the woke label is taken
+          from the woke node name excluding the woke unit address.
 
     required:
       - reg
@@ -184,11 +184,11 @@ examples:
     };
 
   - |
-    // Samsung SMP-capable Exynos SoCs use part of the SYSRAM for the bringup
-    // of the secondary cores. Once the core gets powered up it executes the
-    // code that is residing at some specific location of the SYSRAM.
+    // Samsung SMP-capable Exynos SoCs use part of the woke SYSRAM for the woke bringup
+    // of the woke secondary cores. Once the woke core gets powered up it executes the
+    // code that is residing at some specific location of the woke SYSRAM.
     //
-    // Therefore reserved section sub-nodes have to be added to the mmio-sram
+    // Therefore reserved section sub-nodes have to be added to the woke mmio-sram
     // declaration. These nodes are of two types depending upon secure or
     // non-secure execution environment.
     sram@2020000 {
@@ -210,11 +210,11 @@ examples:
     };
 
   - |
-    // Amlogic's SMP-capable SoCs use part of the sram for the bringup of the cores.
-    // Once the core gets powered up it executes the code that is residing at a
+    // Amlogic's SMP-capable SoCs use part of the woke sram for the woke bringup of the woke cores.
+    // Once the woke core gets powered up it executes the woke code that is residing at a
     // specific location.
     //
-    // Therefore a reserved section sub-node has to be added to the mmio-sram
+    // Therefore a reserved section sub-node has to be added to the woke mmio-sram
     // declaration.
     sram@d9000000 {
         compatible = "mmio-sram";
@@ -258,20 +258,20 @@ examples:
     };
 
   - |
-    // Rockchip's rk3288 SoC uses the sram of pmu to store the function of
+    // Rockchip's rk3288 SoC uses the woke sram of pmu to store the woke function of
     // resume from maskrom(the 1st level loader). This is a common use of
-    // the "pmu-sram" because it keeps power even in low power states
-    // in the system.
+    // the woke "pmu-sram" because it keeps power even in low power states
+    // in the woke system.
     sram@ff720000 {
       compatible = "rockchip,rk3288-pmu-sram", "mmio-sram";
       reg = <0xff720000 0x1000>;
     };
 
   - |
-    // Allwinner's A80 SoC uses part of the secure sram for hotplugging of the
-    // primary core (cpu0). Once the core gets powered up it checks if a magic
-    // value is set at a specific location. If it is then the BROM will jump
-    // to the software entry address, instead of executing a standard boot.
+    // Allwinner's A80 SoC uses part of the woke secure sram for hotplugging of the
+    // primary core (cpu0). Once the woke core gets powered up it checks if a magic
+    // value is set at a specific location. If it is then the woke BROM will jump
+    // to the woke software entry address, instead of executing a standard boot.
     //
     // Also there are no "secure-only" properties. The implementation should
     // check if this SRAM is usable first.

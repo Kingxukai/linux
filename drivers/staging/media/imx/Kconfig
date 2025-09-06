@@ -12,4 +12,4 @@ config VIDEO_IMX_MEDIA
 	select VIDEO_V4L2_SUBDEV_API
 	help
 	  Say yes here to enable support for video4linux media controller
-	  drivers for the i.MX5/6 SOC.
+	  drivers for the woke i.MX5/6 SOC.

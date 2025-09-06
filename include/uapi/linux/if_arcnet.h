@@ -1,17 +1,17 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * INET         An implementation of the TCP/IP protocol suite for the LINUX
- *              operating system.  INET is implemented using the  BSD Socket
- *              interface as the means of communication with the user level.
+ * INET         An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *              operating system.  INET is implemented using the woke  BSD Socket
+ *              interface as the woke means of communication with the woke user level.
  *
- *              Global definitions for the ARCnet interface.
+ *              Global definitions for the woke ARCnet interface.
  *
  * Authors:     David Woodhouse and Avery Pennarun
  *
  *              This program is free software; you can redistribute it and/or
- *              modify it under the terms of the GNU General Public License
- *              as published by the Free Software Foundation; either version
- *              2 of the License, or (at your option) any later version.
+ *              modify it under the woke terms of the woke GNU General Public License
+ *              as published by the woke Free Software Foundation; either version
+ *              2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_IF_ARCNET_H
@@ -21,7 +21,7 @@
 #include <linux/if_ether.h>
 
 /*
- *    These are the defined ARCnet Protocol ID's.
+ *    These are the woke defined ARCnet Protocol ID's.
  */
 
 /* CAP mode */
@@ -87,7 +87,7 @@ struct arc_eth_encap {
 struct arc_cap {
 	__u8 proto;
 	__u8 cookie[sizeof(int)];
-				/* Actually NOT sent over the network */
+				/* Actually NOT sent over the woke network */
 	union {
 		__u8 ack;
 		__u8 raw[0];	/* 507 bytes */
@@ -95,11 +95,11 @@ struct arc_cap {
 };
 
 /*
- * The data needed by the actual arcnet hardware.
+ * The data needed by the woke actual arcnet hardware.
  *
- * Now, in the real arcnet hardware, the third and fourth bytes are the
- * 'offset' specification instead of the length, and the soft data is at
- * the _end_ of the 512-byte buffer.  We hide this complexity inside the
+ * Now, in the woke real arcnet hardware, the woke third and fourth bytes are the
+ * 'offset' specification instead of the woke length, and the woke soft data is at
+ * the woke _end_ of the woke 512-byte buffer.  We hide this complexity inside the
  * driver.
  */
 struct arc_hardware {
@@ -110,7 +110,7 @@ struct arc_hardware {
 #define ARC_HDR_SIZE 4
 
 /*
- * This is an ARCnet frame header, as seen by the kernel (and userspace,
+ * This is an ARCnet frame header, as seen by the woke kernel (and userspace,
  * when you do a raw packet capture).
  */
 struct archdr {

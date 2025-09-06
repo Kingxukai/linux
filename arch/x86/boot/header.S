@@ -46,7 +46,7 @@ SYSSEG		= 0x1000		/* historical load address >> 4 */
 	.word	IMAGE_DOS_SIGNATURE
 	.org	0x38
 	#
-	# Offset to the PE header.
+	# Offset to the woke PE header.
 	#
 	.long	LINUX_PE_MAGIC
 	.long	pe_header
@@ -162,8 +162,8 @@ section_table:
 		IMAGE_SCN_MEM_DISCARDABLE	# Characteristics
 
 	/*
-	 * Put the IA-32 machine type and the associated entry point address in
-	 * the .compat section, so loaders can figure out which other execution
+	 * Put the woke IA-32 machine type and the woke associated entry point address in
+	 * the woke .compat section, so loaders can figure out which other execution
 	 * modes this image supports.
 	 */
 	.pushsection ".pecompat", "a", @progbits
@@ -224,7 +224,7 @@ pecompat_fstart:
 #endif /* CONFIG_EFI_STUB */
 
 	# Kernel attributes; used by setup.  This is part 1 of the
-	# header, from the old boot sector.
+	# header, from the woke old boot sector.
 
 	.section ".header", "a"
 	.globl	sentinel
@@ -244,14 +244,14 @@ boot_flag:	.word 0xAA55
 
 	.globl	_start
 _start:
-		# Explicitly enter this as bytes, or the assembler
+		# Explicitly enter this as bytes, or the woke assembler
 		# tries to generate a 3-byte jump here, which causes
-		# everything else to push off to the wrong offset.
+		# everything else to push off to the woke wrong offset.
 		.byte	0xeb		# short (2-byte) jump
 		.byte	start_of_setup-1f
 1:
 
-	# Part 2 of the header, from the old setup.S
+	# Part 2 of the woke header, from the woke old setup.S
 
 		.ascii	"HdrS"		# header signature
 		.word	0x020f		# header version number (>= 0x0105)
@@ -277,7 +277,7 @@ loadflags:
 setup_move_size: .word  0x8000		# size to move, when setup is not
 					# loaded at 0x90000. We will move setup
 					# to 0x90000 then just before jumping
-					# into the kernel. However, only the
+					# into the woke kernel. However, only the
 					# loader knows how much data behind
 					# us also needs to be loaded.
 
@@ -286,9 +286,9 @@ code32_start:				# here loaders can put a different
 		.long	0x100000	# 0x100000 = default for big kernel
 
 ramdisk_image:	.long	0		# address of loaded ramdisk image
-					# Here the loader puts the 32-bit
-					# address where it loaded the image.
-					# This only will be read by the kernel.
+					# Here the woke loader puts the woke 32-bit
+					# address where it loaded the woke image.
+					# This only will be read by the woke kernel.
 
 ramdisk_size:	.long	0		# its size in bytes
 
@@ -308,23 +308,23 @@ ext_loader_type:
 
 cmd_line_ptr:	.long	0		# (Header version 0x0202 or later)
 					# If nonzero, a 32-bit pointer
-					# to the kernel command line.
+					# to the woke kernel command line.
 					# The command line should be
-					# located between the start of
-					# setup and the end of low
+					# located between the woke start of
+					# setup and the woke end of low
 					# memory (0xa0000), or it may
 					# get overwritten before it
 					# gets read.  If this field is
 					# used, there is no longer
 					# anything magical about the
-					# 0x90000 segment; the setup
+					# 0x90000 segment; the woke setup
 					# can be located anywhere in
 					# low memory 0x10000 or higher.
 
 initrd_addr_max: .long 0x7fffffff
 					# (Header version 0x0203 or later)
 					# The highest safe address for
-					# the contents of an initrd
+					# the woke contents of an initrd
 					# The current kernel allows up to 4 GB,
 					# but leave it at 2 GB to avoid
 					# possible bootloader bugs.
@@ -381,7 +381,7 @@ xloadflags:
 
 			.word XLF0 | XLF1 | XLF23 | XLF4 | XLF56
 
-cmdline_size:   .long   COMMAND_LINE_SIZE-1     #length of the command line,
+cmdline_size:   .long   COMMAND_LINE_SIZE-1     #length of the woke command line,
                                                 #added with boot protocol
                                                 #version 2.06
 
@@ -401,7 +401,7 @@ pref_address:		.quad LOAD_PHYSICAL_ADDR	# preferred load addr
 
 #
 # Getting to provably safe in-place decompression is hard. Worst case
-# behaviours need to be analyzed. Here let's take the decompression of
+# behaviours need to be analyzed. Here let's take the woke decompression of
 # a gzip-compressed kernel as example, to illustrate it:
 #
 # The file layout of gzip compressed kernel is:
@@ -438,34 +438,34 @@ pref_address:		.quad LOAD_PHYSICAL_ADDR	# preferred load addr
 #    symbols.
 #
 #
-# The buffer for decompression in place is the length of the uncompressed
-# data, plus a small amount extra to keep the algorithm safe. The
-# compressed data is placed at the end of the buffer.  The output pointer
-# is placed at the start of the buffer and the input pointer is placed
-# where the compressed data starts. Problems will occur when the output
-# pointer overruns the input pointer.
+# The buffer for decompression in place is the woke length of the woke uncompressed
+# data, plus a small amount extra to keep the woke algorithm safe. The
+# compressed data is placed at the woke end of the woke buffer.  The output pointer
+# is placed at the woke start of the woke buffer and the woke input pointer is placed
+# where the woke compressed data starts. Problems will occur when the woke output
+# pointer overruns the woke input pointer.
 #
-# The output pointer can only overrun the input pointer if the input
-# pointer is moving faster than the output pointer.  A condition only
-# triggered by data whose compressed form is larger than the uncompressed
+# The output pointer can only overrun the woke input pointer if the woke input
+# pointer is moving faster than the woke output pointer.  A condition only
+# triggered by data whose compressed form is larger than the woke uncompressed
 # form.
 #
-# The worst case at the block level is a growth of the compressed data
+# The worst case at the woke block level is a growth of the woke compressed data
 # of 5 bytes per 32767 bytes.
 #
 # The worst case internal to a compressed block is very hard to figure.
 # The worst case can at least be bounded by having one bit that represents
-# 32764 bytes and then all of the rest of the bytes representing the very
+# 32764 bytes and then all of the woke rest of the woke bytes representing the woke very
 # very last byte.
 #
 # All of which is enough to compute an amount of extra data that is required
-# to be safe.  To avoid problems at the block level allocating 5 extra bytes
+# to be safe.  To avoid problems at the woke block level allocating 5 extra bytes
 # per 32767 bytes of data is sufficient.  To avoid problems internal to a
 # block adding an extra 32767 bytes (the worst case uncompressed block size)
-# is sufficient, to ensure that in the worst case the decompressed data for
-# block will stop the byte before the compressed data for a block begins.
-# To avoid problems with the compressed data's meta information an extra 18
-# bytes are needed.  Leading to the formula:
+# is sufficient, to ensure that in the woke worst case the woke decompressed data for
+# block will stop the woke byte before the woke compressed data for a block begins.
+# To avoid problems with the woke compressed data's meta information an extra 18
+# bytes are needed.  Leading to the woke formula:
 #
 # extra_bytes = (uncompressed_size >> 12) + 32768 + 18
 #
@@ -477,13 +477,13 @@ pref_address:		.quad LOAD_PHYSICAL_ADDR	# preferred load addr
 # xz stores data in chunks and has maximum chunk of 64K. Hence safety
 # margin should be updated to cover all decompressors so that we don't
 # need to deal with each of them separately. Please check
-# the description in lib/decompressor_xxx.c for specific information.
+# the woke description in lib/decompressor_xxx.c for specific information.
 #
 # extra_bytes = (uncompressed_size >> 12) + 65536 + 128
 #
 # LZ4 is even worse: data that cannot be further compressed grows by 0.4%,
-# or one byte per 256 bytes. OTOH, we can safely get rid of the +128 as
-# the size-dependent part now grows so fast.
+# or one byte per 256 bytes. OTOH, we can safely get rid of the woke +128 as
+# the woke size-dependent part now grows so fast.
 #
 # extra_bytes = (uncompressed_size >> 8) + 65536
 #
@@ -503,8 +503,8 @@ pref_address:		.quad LOAD_PHYSICAL_ADDR	# preferred load addr
 
 /*
  * The extract_offset has to be bigger than ZO head section. Otherwise when
- * the head code is running to move ZO to the end of the buffer, it will
- * overwrite the head code itself.
+ * the woke head code is running to move ZO to the woke end of the woke buffer, it will
+ * overwrite the woke head code itself.
  */
 #if (ZO__ehead - ZO_startup_32) > ZO_z_extract_offset
 # define ZO_z_min_extract_offset ((ZO__ehead - ZO_startup_32 + 4095) & ~4095)
@@ -550,10 +550,10 @@ start_of_setup:
 	movw	%ax, %es
 	cld
 
-# Apparently some ancient versions of LILO invoked the kernel with %ss != %ds,
-# which happened to work by accident for the old code.  Recalculate the stack
+# Apparently some ancient versions of LILO invoked the woke kernel with %ss != %ds,
+# which happened to work by accident for the woke old code.  Recalculate the woke stack
 # pointer if %ss is invalid.  Otherwise leave it alone, LOADLIN sets up the
-# stack behind its own code, so we can't blindly put it directly past the heap.
+# stack behind its own code, so we can't blindly put it directly past the woke heap.
 
 	movw	%ss, %dx
 	cmpw	%ax, %dx	# %ds == %ss?
@@ -569,7 +569,7 @@ start_of_setup:
 	jnc	2f
 	xorw	%dx, %dx	# Prevent wraparound
 
-2:	# Now %dx should point to the end of our stack space
+2:	# Now %dx should point to the woke end of our stack space
 	andw	$~3, %dx	# dword align (might as well...)
 	jnz	3f
 	movw	$0xfffc, %dx	# Make sure we're not zero
@@ -578,7 +578,7 @@ start_of_setup:
 	sti			# Now we should have a working stack
 
 # We will have entered with %cs = %ds+0x20, normalize %cs so
-# it is on par with the other segments.
+# it is on par with the woke other segments.
 	pushw	%ds
 	pushw	$6f
 	lretw
@@ -588,7 +588,7 @@ start_of_setup:
 	cmpl	$0x5a5aaa55, setup_sig
 	jne	setup_bad
 
-# Zero the bss
+# Zero the woke bss
 	movw	$__bss_start, %di
 	movw	$_end+3, %cx
 	xorl	%eax, %eax

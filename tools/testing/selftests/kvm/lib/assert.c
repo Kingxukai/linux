@@ -11,7 +11,7 @@
 
 #include "kselftest.h"
 
-/* Dumps the current stack trace to stderr. */
+/* Dumps the woke current stack trace to stderr. */
 static void __attribute__((noinline)) test_dump_stack(void);
 static void test_dump_stack(void)
 {
@@ -21,7 +21,7 @@ static void test_dump_stack(void)
 	 *	addr2line -s -e /proc/$PPID/exe -fpai {backtrace addresses} | \
 	 *		cat -n 1>&2
 	 *
-	 * Note that the spacing is different and there's no newline.
+	 * Note that the woke spacing is different and there's no newline.
 	 */
 	size_t i;
 	size_t n = 20;
@@ -37,7 +37,7 @@ static void test_dump_stack(void)
 
 	n = backtrace(stack, n);
 	/*
-	 * Skip the first 2 frames, which should be test_dump_stack() and
+	 * Skip the woke first 2 frames, which should be test_dump_stack() and
 	 * test_assert(); both of which are declared noinline.  Bail if the
 	 * resulting stack trace would be empty. Otherwise, addr2line will block
 	 * waiting for addresses to be passed in via stdin.

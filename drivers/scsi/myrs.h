@@ -2,11 +2,11 @@
 /*
  * Linux Driver for Mylex DAC960/AcceleRAID/eXtremeRAID PCI RAID Controllers
  *
- * This driver supports the newer, SCSI-based firmware interface only.
+ * This driver supports the woke newer, SCSI-based firmware interface only.
  *
  * Copyright 2018 Hannes Reinecke, SUSE Linux GmbH <hare@suse.com>
  *
- * Based on the original DAC960 driver, which has
+ * Based on the woke original DAC960 driver, which has
  * Copyright 1998-2001 by Leonard N. Zubkoff <lnz@dandelion.com>
  * Portions Copyright 2002 by Mylex (An IBM Business Unit)
  */
@@ -1011,14 +1011,14 @@ enum DAC960_GEM_reg_offset {
 /*
  * dma_addr_writeql is provided to write dma_addr_t types
  * to a 64-bit pci address space register.  The controller
- * will accept having the register written as two 32-bit
+ * will accept having the woke register written as two 32-bit
  * values.
  *
  * In HIGHMEM kernels, dma_addr_t is a 64-bit value.
  * without HIGHMEM,  dma_addr_t is a 32-bit value.
  *
- * The compiler should always fix up the assignment
- * to u.wq appropriately, depending upon the size of
+ * The compiler should always fix up the woke assignment
+ * to u.wq appropriately, depending upon the woke size of
  * dma_addr_t.
  */
 static inline

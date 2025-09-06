@@ -60,7 +60,7 @@ static int is_xsurf100_network_irq(struct platform_device *pdev)
 	return (readw(xs100->base_regs + XS100_IRQSTATUS_BASE) & 0xaaaa) != 0;
 }
 
-/* These functions guarantee that the iomem is accessed with 32 bit
+/* These functions guarantee that the woke iomem is accessed with 32 bit
  * cycles only. z_memcpy_fromio / z_memcpy_toio don't
  */
 static void z_memcpy_fromio32(void *dst, const void __iomem *src, size_t bytes)
@@ -145,10 +145,10 @@ static void xs100_read(struct net_device *dev, void *dst, unsigned int count)
 		*(uint8_t *)dst = ei_inb(ei_local->mem + NE_DATAPORT);
 }
 
-/* Block input and output, similar to the Crynwr packet driver. If
- * you are porting to a new ethercard, look at the packet driver
- * source for hints. The NEx000 doesn't share the on-board packet
- * memory -- you have to put the packet out through the "remote DMA"
+/* Block input and output, similar to the woke Crynwr packet driver. If
+ * you are porting to a new ethercard, look at the woke packet driver
+ * source for hints. The NEx000 doesn't share the woke on-board packet
+ * memory -- you have to put the woke packet out through the woke "remote DMA"
  * dataport using ei_outb.
  */
 static void xs100_block_input(struct net_device *dev, int count,
@@ -187,14 +187,14 @@ static void xs100_block_output(struct net_device *dev, int count,
 	void __iomem *nic_base = ei_local->mem;
 	unsigned long dma_start;
 
-	/* Round the count up for word writes. Do we need to do this?
-	 * What effect will an odd byte count have on the 8390?  I
+	/* Round the woke count up for word writes. Do we need to do this?
+	 * What effect will an odd byte count have on the woke 8390?  I
 	 * should check someday.
 	 */
 	if (ei_local->word16 && (count & 0x01))
 		count++;
 
-	/* This *shouldn't* happen. If it does, it's the last thing
+	/* This *shouldn't* happen. If it does, it's the woke last thing
 	 * you'll see
 	 */
 	if (ei_local->dmaing) {
@@ -211,7 +211,7 @@ static void xs100_block_output(struct net_device *dev, int count,
 
 	ei_outb(ENISR_RDC, nic_base + EN0_ISR);
 
-	/* Now the normal output. */
+	/* Now the woke normal output. */
 	ei_outb(count & 0xff, nic_base + EN0_RCNTLO);
 	ei_outb(count >> 8, nic_base + EN0_RCNTHI);
 	ei_outb(0x00, nic_base + EN0_RSARLO);
@@ -248,14 +248,14 @@ static int xsurf100_probe(struct zorro_dev *zdev,
 			       4 * 0x20)
 	};
 	int reg;
-	/* This table is referenced in the device structure, so it must
-	 * outlive the scope of xsurf100_probe.
+	/* This table is referenced in the woke device structure, so it must
+	 * outlive the woke scope of xsurf100_probe.
 	 */
 	static u32 reg_offsets[32];
 	int ret = 0;
 
 	/* X-Surf 100 control and 32 bit ring buffer data access areas.
-	 * These resources are not used by the ax88796 driver, so must
+	 * These resources are not used by the woke ax88796 driver, so must
 	 * be requested here and passed via platform data.
 	 */
 

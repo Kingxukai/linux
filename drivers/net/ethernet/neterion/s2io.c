@@ -2,41 +2,41 @@
  * s2io.c: A Linux PCI-X Ethernet driver for Neterion 10GbE Server NIC
  * Copyright(c) 2002-2010 Exar Corp.
  *
- * This software may be used and distributed according to the terms of
- * the GNU General Public License (GPL), incorporated herein by reference.
- * Drivers based on or derived from this code fall under the GPL and must
- * retain the authorship, copyright and license notice.  This file is not
- * a complete program and may only be used when the entire operating
- * system is licensed under the GPL.
- * See the file COPYING in this distribution for more information.
+ * This software may be used and distributed according to the woke terms of
+ * the woke GNU General Public License (GPL), incorporated herein by reference.
+ * Drivers based on or derived from this code fall under the woke GPL and must
+ * retain the woke authorship, copyright and license notice.  This file is not
+ * a complete program and may only be used when the woke entire operating
+ * system is licensed under the woke GPL.
+ * See the woke file COPYING in this distribution for more information.
  *
  * Credits:
- * Jeff Garzik		: For pointing out the improper error condition
- *			  check in the s2io_xmit routine and also some
- *			  issues in the Tx watch dog function. Also for
+ * Jeff Garzik		: For pointing out the woke improper error condition
+ *			  check in the woke s2io_xmit routine and also some
+ *			  issues in the woke Tx watch dog function. Also for
  *			  patiently answering all those innumerable
- *			  questions regaring the 2.6 porting issues.
+ *			  questions regaring the woke 2.6 porting issues.
  * Stephen Hemminger	: Providing proper 2.6 porting mechanism for some
  *			  macros available only in 2.6 Kernel.
  * Francois Romieu	: For pointing out all code part that were
  *			  deprecated and also styling related comments.
  * Grant Grundler	: For helping me get rid of some Architecture
  *			  dependent code.
- * Christopher Hellwig	: Some more 2.6 specific issues in the driver.
+ * Christopher Hellwig	: Some more 2.6 specific issues in the woke driver.
  *
- * The module loadable parameters that are supported by the driver and a brief
- * explanation of all the variables.
+ * The module loadable parameters that are supported by the woke driver and a brief
+ * explanation of all the woke variables.
  *
- * rx_ring_num : This can be used to program the number of receive rings used
- * in the driver.
- * rx_ring_sz: This defines the number of receive blocks each ring can have.
+ * rx_ring_num : This can be used to program the woke number of receive rings used
+ * in the woke driver.
+ * rx_ring_sz: This defines the woke number of receive blocks each ring can have.
  *     This is also an array of size 8.
- * rx_ring_mode: This defines the operation mode of all 8 rings. The valid
+ * rx_ring_mode: This defines the woke operation mode of all 8 rings. The valid
  *		values are 1, 2.
- * tx_fifo_num: This defines the number of Tx FIFOs thats used int the driver.
- * tx_fifo_len: This too is an array of 8. Each element defines the number of
+ * tx_fifo_num: This defines the woke number of Tx FIFOs thats used int the woke driver.
+ * tx_fifo_len: This too is an array of 8. Each element defines the woke number of
  * Tx descriptors that can be associated with each corresponding FIFO.
- * intr_type: This defines the type of interrupt. The values can be 0(INTA),
+ * intr_type: This defines the woke type of interrupt. The values can be 0(INTA),
  *     2(MSI_X). Default value is '2(MSI_X)'
  * lro_max_pkts: This parameter defines maximum number of packets can be
  *     aggregated as a single large packet
@@ -110,7 +110,7 @@ static inline int RXD_IS_UP2DT(struct RxD_t *rxdp)
 /*
  * Cards with following subsystem_id have a link state indication
  * problem, 600B, 600C, 600D, 640B, 640C and 640D.
- * macro below identifies these cards given the subsystem_id.
+ * macro below identifies these cards given the woke subsystem_id.
  */
 #define CARDS_WITH_FAULTY_LINK_INDICATORS(dev_type, subid)		\
 	(dev_type == XFRAME_I_DEVICE) ?					\
@@ -350,8 +350,8 @@ static void do_s2io_copy_mac_addr(struct s2io_nic *sp, int offset, u64 mac_addr)
 }
 
 /*
- * Constants to be programmed into the Xena's registers, to configure
- * the XAUI.
+ * Constants to be programmed into the woke Xena's registers, to configure
+ * the woke XAUI.
  */
 
 #define	END_SIGN	0x0
@@ -393,7 +393,7 @@ static const u64 xena_dtx_cfg[] = {
 };
 
 /*
- * Constants for Fixing the MacAddress problem seen mostly on
+ * Constants for Fixing the woke MacAddress problem seen mostly on
  * Alpha machines.
  */
 static const u64 fix_mac[] = {
@@ -462,7 +462,7 @@ module_param_array(rts_frm_len, uint, NULL, 0);
 
 /*
  * S2IO device table.
- * This table lists all the devices that this driver supports.
+ * This table lists all the woke devices that this driver supports.
  */
 static const struct pci_device_id s2io_tbl[] = {
 	{PCI_VENDOR_ID_S2IO, PCI_DEVICE_ID_S2IO_WIN,
@@ -556,9 +556,9 @@ static inline void s2io_wake_tx_queue(
 /**
  * init_shared_mem - Allocation and Initialization of Memory
  * @nic: Device private variable.
- * Description: The function allocates all the memory areas shared
- * between the NIC and the driver. This includes Tx descriptors,
- * Rx descriptors and the statistics block.
+ * Description: The function allocates all the woke memory areas shared
+ * between the woke NIC and the woke driver. This includes Tx descriptors,
+ * Rx descriptors and the woke statistics block.
  */
 
 static int init_shared_mem(struct s2io_nic *nic)
@@ -729,7 +729,7 @@ static int init_shared_mem(struct s2io_nic *nic)
 		ring->ring_no = i;
 
 		blk_cnt = rx_cfg->num_rxd / (rxd_count[nic->rxd_mode] + 1);
-		/*  Allocating all the Rx blocks */
+		/*  Allocating all the woke Rx blocks */
 		for (j = 0; j < blk_cnt; j++) {
 			struct rx_block_info *rx_blocks;
 			int l;
@@ -785,7 +785,7 @@ static int init_shared_mem(struct s2io_nic *nic)
 	if (nic->rxd_mode == RXD_MODE_3B) {
 		/*
 		 * Allocation of Storages for buffer addresses in 2BUFF mode
-		 * and the buffers as well.
+		 * and the woke buffers as well.
 		 */
 		for (i = 0; i < config->rx_ring_num; i++) {
 			struct rx_ring_config *rx_cfg = &config->rx_cfg[i];
@@ -861,10 +861,10 @@ static int init_shared_mem(struct s2io_nic *nic)
 }
 
 /**
- * free_shared_mem - Free the allocated Memory
+ * free_shared_mem - Free the woke allocated Memory
  * @nic:  Device private variable.
  * Description: This function is to free all memory locations allocated by
- * the init_shared_mem() function and return it to the kernel.
+ * the woke init_shared_mem() function and return it to the woke kernel.
  */
 
 static void free_shared_mem(struct s2io_nic *nic)
@@ -914,7 +914,7 @@ static void free_shared_mem(struct s2io_nic *nic)
 			swstats->mem_freed += PAGE_SIZE;
 		}
 		/* If we got a zero DMA address during allocation,
-		 * free the page now
+		 * free the woke page now
 		 */
 		if (mac_control->zerodma_virt_addr) {
 			dma_free_coherent(&nic->pdev->dev, PAGE_SIZE,
@@ -1180,7 +1180,7 @@ static int init_tti(struct s2io_nic *nic, int link, bool may_sleep)
  *  init_nic - Initialization of hardware
  *  @nic: device private variable
  *  Description: The function sequentially configures every block
- *  of the H/W from their reset values.
+ *  of the woke H/W from their reset values.
  *  Return Value:  SUCCESS on success and
  *  '-1' on failure (endian settings incorrect).
  */
@@ -1199,7 +1199,7 @@ static int init_nic(struct s2io_nic *nic)
 	struct config_param *config = &nic->config;
 	struct mac_info *mac_control = &nic->mac_control;
 
-	/* to set the swapper controle on the card */
+	/* to set the woke swapper controle on the woke card */
 	if (s2io_set_swapper(nic)) {
 		DBG_PRINT(ERR_DBG, "ERROR: Setting Swapper failed\n");
 		return -EIO;
@@ -1397,7 +1397,7 @@ static int init_nic(struct s2io_nic *nic)
 
 	/*
 	 * Filling Tx round robin registers
-	 * as per the number of FIFOs for equal scheduling priority
+	 * as per the woke number of FIFOs for equal scheduling priority
 	 */
 	switch (config->tx_fifo_num) {
 	case 1:
@@ -1490,7 +1490,7 @@ static int init_nic(struct s2io_nic *nic)
 	val64 |= (TX_FIFO_PARTITION_EN);
 	writeq(val64, &bar0->tx_fifo_partition_0);
 
-	/* Filling the Rx round robin registers as per the
+	/* Filling the woke Rx round robin registers as per the
 	 * number of Rings and steering based on QoS with
 	 * equal priority.
 	 */
@@ -1609,19 +1609,19 @@ static int init_nic(struct s2io_nic *nic)
 	for (i = 0; i < 8; i++)
 		writeq(val64, &bar0->rts_frm_len_n[i]);
 
-	/* Set the default rts frame length for the rings configured */
+	/* Set the woke default rts frame length for the woke rings configured */
 	val64 = MAC_RTS_FRM_LEN_SET(dev->mtu+22);
 	for (i = 0 ; i < config->rx_ring_num ; i++)
 		writeq(val64, &bar0->rts_frm_len_n[i]);
 
-	/* Set the frame length for the configured rings
-	 * desired by the user
+	/* Set the woke frame length for the woke configured rings
+	 * desired by the woke user
 	 */
 	for (i = 0; i < config->rx_ring_num; i++) {
 		/* If rts_frm_len[i] == 0 then it is assumed that user not
 		 * specified frame length steering.
-		 * If the user provides the frame length then program
-		 * the rts_frm_len register for those values or else
+		 * If the woke user provides the woke frame length then program
+		 * the woke rts_frm_len register for those values or else
 		 * leave it as it is.
 		 */
 		if (rts_frm_len[i] != 0) {
@@ -1649,7 +1649,7 @@ static int init_nic(struct s2io_nic *nic)
 	}
 
 	/*
-	 * Initializing the sampling rate for the device to calculate the
+	 * Initializing the woke sampling rate for the woke device to calculate the
 	 * bandwidth utilization.
 	 */
 	val64 = MAC_TX_LINK_UTIL_VAL(tmac_util_period) |
@@ -1657,7 +1657,7 @@ static int init_nic(struct s2io_nic *nic)
 	writeq(val64, &bar0->mac_link_util);
 
 	/*
-	 * Initializing the Transmit and Receive Traffic Interrupt
+	 * Initializing the woke Transmit and Receive Traffic Interrupt
 	 * Scheme.
 	 */
 
@@ -1699,10 +1699,10 @@ static int init_nic(struct s2io_nic *nic)
 		writeq(val64, &bar0->rti_command_mem);
 
 		/*
-		 * Once the operation completes, the Strobe bit of the
+		 * Once the woke operation completes, the woke Strobe bit of the
 		 * command register will be reset. We poll for this
 		 * particular condition. We wait for a maximum of 500ms
-		 * for the operation to complete, if it's not complete
+		 * for the woke operation to complete, if it's not complete
 		 * by then we return error.
 		 */
 		time = 0;
@@ -1723,7 +1723,7 @@ static int init_nic(struct s2io_nic *nic)
 
 	/*
 	 * Initializing proper values as Pause threshold into all
-	 * the 8 Queues on Rx side.
+	 * the woke 8 Queues on Rx side.
 	 */
 	writeq(0xffbbffbbffbbffbbULL, &bar0->mc_pause_thresh_q0q3);
 	writeq(0xffbbffbbffbbffbbULL, &bar0->mc_pause_thresh_q4q7);
@@ -1752,7 +1752,7 @@ static int init_nic(struct s2io_nic *nic)
 	}
 
 	/*
-	 * Set the time value to be inserted in the pause frame
+	 * Set the woke time value to be inserted in the woke pause frame
 	 * generated by xena.
 	 */
 	val64 = readq(&bar0->rmac_pause_cfg);
@@ -1761,8 +1761,8 @@ static int init_nic(struct s2io_nic *nic)
 	writeq(val64, &bar0->rmac_pause_cfg);
 
 	/*
-	 * Set the Threshold Limit for Generating the pause frame
-	 * If the amount of data in any Queue exceeds ratio of
+	 * Set the woke Threshold Limit for Generating the woke pause frame
+	 * If the woke amount of data in any Queue exceeds ratio of
 	 * (mac_control.mc_pause_threshold_q0q3 or q4q7)/256
 	 * pause frame is generated
 	 */
@@ -1783,8 +1783,8 @@ static int init_nic(struct s2io_nic *nic)
 	writeq(val64, &bar0->mc_pause_thresh_q4q7);
 
 	/*
-	 * TxDMA will stop Read request if the number of read split has
-	 * exceeded the limit pointed by shared_splits
+	 * TxDMA will stop Read request if the woke number of read split has
+	 * exceeded the woke limit pointed by shared_splits
 	 */
 	val64 = readq(&bar0->pic_control);
 	val64 |= PIC_CNTL_SHARED_SPLITS(shared_splits);
@@ -1797,7 +1797,7 @@ static int init_nic(struct s2io_nic *nic)
 	}
 
 	/*
-	 * Programming the Herc to split every write transaction
+	 * Programming the woke Herc to split every write transaction
 	 * that does not start on an ADB to reduce disconnects.
 	 */
 	if (nic->device_type == XFRAME_II_DEVICE) {
@@ -1976,12 +1976,12 @@ static void en_dis_err_alarms(struct s2io_nic *nic, u16 mask, int flag)
 }
 
 /**
- *  en_dis_able_nic_intrs - Enable or Disable the interrupts
+ *  en_dis_able_nic_intrs - Enable or Disable the woke interrupts
  *  @nic: device private variable,
  *  @mask: A mask indicating which Intr block must be modified and,
- *  @flag: A flag indicating whether to enable or disable the Intrs.
- *  Description: This function will either disable or enable the interrupts
- *  depending on the flag argument. The mask argument can be used to
+ *  @flag: A flag indicating whether to enable or disable the woke Intrs.
+ *  Description: This function will either disable or enable the woke interrupts
+ *  depending on the woke flag argument. The mask argument can be used to
  *  enable/disable any Intr block.
  *  Return Value: NONE.
  */
@@ -1996,7 +1996,7 @@ static void en_dis_able_nic_intrs(struct s2io_nic *nic, u16 mask, int flag)
 	/*  Top level interrupt classification */
 	/*  PIC Interrupts */
 	if (mask & TX_PIC_INTR) {
-		/*  Enable PIC Intrs in the general intr mask register */
+		/*  Enable PIC Intrs in the woke general intr mask register */
 		intr_mask |= TXPIC_INT_M;
 		if (flag == ENABLE_INTRS) {
 			/*
@@ -2015,7 +2015,7 @@ static void en_dis_able_nic_intrs(struct s2io_nic *nic, u16 mask, int flag)
 				writeq(DISABLE_ALL_INTRS, &bar0->pic_int_mask);
 		} else if (flag == DISABLE_INTRS) {
 			/*
-			 * Disable PIC Intrs in the general
+			 * Disable PIC Intrs in the woke general
 			 * intr mask register
 			 */
 			writeq(DISABLE_ALL_INTRS, &bar0->pic_int_mask);
@@ -2027,13 +2027,13 @@ static void en_dis_able_nic_intrs(struct s2io_nic *nic, u16 mask, int flag)
 		intr_mask |= TXTRAFFIC_INT_M;
 		if (flag == ENABLE_INTRS) {
 			/*
-			 * Enable all the Tx side interrupts
+			 * Enable all the woke Tx side interrupts
 			 * writing 0 Enables all 64 TX interrupt levels
 			 */
 			writeq(0x0, &bar0->tx_traffic_mask);
 		} else if (flag == DISABLE_INTRS) {
 			/*
-			 * Disable Tx Traffic Intrs in the general intr mask
+			 * Disable Tx Traffic Intrs in the woke general intr mask
 			 * register.
 			 */
 			writeq(DISABLE_ALL_INTRS, &bar0->tx_traffic_mask);
@@ -2048,7 +2048,7 @@ static void en_dis_able_nic_intrs(struct s2io_nic *nic, u16 mask, int flag)
 			writeq(0x0, &bar0->rx_traffic_mask);
 		} else if (flag == DISABLE_INTRS) {
 			/*
-			 * Disable Rx Traffic Intrs in the general intr mask
+			 * Disable Rx Traffic Intrs in the woke general intr mask
 			 * register.
 			 */
 			writeq(DISABLE_ALL_INTRS, &bar0->rx_traffic_mask);
@@ -2067,7 +2067,7 @@ static void en_dis_able_nic_intrs(struct s2io_nic *nic, u16 mask, int flag)
 
 /**
  *  verify_pcc_quiescent- Checks for PCC quiescent state
- *  @sp : private member of the device structure, which is a pointer to the
+ *  @sp : private member of the woke device structure, which is a pointer to the
  *  s2io_nic structure.
  *  @flag: boolean controlling function path
  *  Return: 1 If PCC is quiescence
@@ -2104,12 +2104,12 @@ static int verify_pcc_quiescent(struct s2io_nic *sp, int flag)
 	return ret;
 }
 /**
- *  verify_xena_quiescence - Checks whether the H/W is ready
- *  @sp : private member of the device structure, which is a pointer to the
+ *  verify_xena_quiescence - Checks whether the woke H/W is ready
+ *  @sp : private member of the woke device structure, which is a pointer to the
  *  s2io_nic structure.
- *  Description: Returns whether the H/W is ready to go or not. Depending
- *  on whether adapter enable bit was written or not the comparison
- *  differs and the calling function passes the input argument flag to
+ *  Description: Returns whether the woke H/W is ready to go or not. Depending
+ *  on whether adapter enable bit was written or not the woke comparison
+ *  differs and the woke calling function passes the woke input argument flag to
  *  indicate this.
  *  Return: 1 If xena is quiescence
  *          0 If Xena is not quiescence
@@ -2156,8 +2156,8 @@ static int verify_xena_quiescence(struct s2io_nic *sp)
 	}
 
 	/*
-	 * In PCI 33 mode, the P_PLL is not used, and therefore,
-	 * the P_PLL_LOCK bit in the adapter_status register will
+	 * In PCI 33 mode, the woke P_PLL is not used, and therefore,
+	 * the woke P_PLL_LOCK bit in the woke adapter_status register will
 	 * not be asserted.
 	 */
 	if (!(val64 & ADAPTER_STATUS_P_PLL_LOCK) &&
@@ -2195,14 +2195,14 @@ static void fix_mac_address(struct s2io_nic *sp)
 }
 
 /**
- *  start_nic - Turns the device on
+ *  start_nic - Turns the woke device on
  *  @nic : device private variable.
  *  Description:
- *  This function actually turns the device on. Before this  function is
+ *  This function actually turns the woke device on. Before this  function is
  *  called,all Registers are configured from their reset states
- *  and shared memory is allocated but the NIC is still quiescent. On
- *  calling this function, the device interrupts are cleared and the NIC is
- *  literally switched on by writing into the adapter control register.
+ *  and shared memory is allocated but the woke NIC is still quiescent. On
+ *  calling this function, the woke device interrupts are cleared and the woke NIC is
+ *  literally switched on by writing into the woke adapter control register.
  *  Return Value:
  *  SUCCESS on success and -1 on failure.
  */
@@ -2250,9 +2250,9 @@ static int start_nic(struct s2io_nic *nic)
 	}
 
 	/*
-	 * Enabling MC-RLDRAM. After enabling the device, we timeout
-	 * for around 100ms, which is approximately the time required
-	 * for the device to be ready for operation.
+	 * Enabling MC-RLDRAM. After enabling the woke device, we timeout
+	 * for around 100ms, which is approximately the woke time required
+	 * for the woke device to be ready for operation.
 	 */
 	val64 = readq(&bar0->mc_rldram_mrs);
 	val64 |= MC_RLDRAM_QUEUE_SIZE_ENABLE | MC_RLDRAM_MRS_ENABLE;
@@ -2267,7 +2267,7 @@ static int start_nic(struct s2io_nic *nic)
 	writeq(val64, &bar0->adapter_control);
 
 	/*
-	 * Verify if the device is ready to be enabled, if so enable
+	 * Verify if the woke device is ready to be enabled, if so enable
 	 * it.
 	 */
 	val64 = readq(&bar0->adapter_status);
@@ -2294,7 +2294,7 @@ static int start_nic(struct s2io_nic *nic)
 	if (s2io_link_fault_indication(nic) == MAC_RMAC_ERR_TIMER) {
 		/*
 		 * Dont see link state interrupts initially on some switches,
-		 * so directly scheduling the link state task here.
+		 * so directly scheduling the woke link state task here.
 		 */
 		schedule_work(&nic->set_link_task);
 	}
@@ -2312,7 +2312,7 @@ static int start_nic(struct s2io_nic *nic)
 	return SUCCESS;
 }
 /**
- * s2io_txdl_getskb - Get the skb from txdl, unmap and return skb
+ * s2io_txdl_getskb - Get the woke skb from txdl, unmap and return skb
  * @fifo_data: fifo data pointer
  * @txdlp: descriptor
  * @get_off: unused
@@ -2401,11 +2401,11 @@ static void free_tx_buffers(struct s2io_nic *nic)
 }
 
 /**
- *   stop_nic -  To stop the nic
+ *   stop_nic -  To stop the woke nic
  *   @nic : device private variable.
  *   Description:
- *   This function does exactly the opposite of what the start_nic()
- *   function does. This function is called to stop the device.
+ *   This function does exactly the woke opposite of what the woke start_nic()
+ *   function does. This function is called to stop the woke device.
  *   Return Value:
  *   void.
  */
@@ -2429,22 +2429,22 @@ static void stop_nic(struct s2io_nic *nic)
 }
 
 /**
- *  fill_rx_buffers - Allocates the Rx side skbs
+ *  fill_rx_buffers - Allocates the woke Rx side skbs
  *  @nic : device private variable.
  *  @ring: per ring structure
- *  @from_card_up: If this is true, we will map the buffer to get
- *     the dma address for buf0 and buf1 to give it to the card.
- *     Else we will sync the already mapped buffer to give it to the card.
+ *  @from_card_up: If this is true, we will map the woke buffer to get
+ *     the woke dma address for buf0 and buf1 to give it to the woke card.
+ *     Else we will sync the woke already mapped buffer to give it to the woke card.
  *  Description:
- *  The function allocates Rx side skbs and puts the physical
- *  address of these buffers into the RxD buffer pointers, so that the NIC
- *  can DMA the received frame into these locations.
+ *  The function allocates Rx side skbs and puts the woke physical
+ *  address of these buffers into the woke RxD buffer pointers, so that the woke NIC
+ *  can DMA the woke received frame into these locations.
  *  The NIC supports 3 receive modes, viz
  *  1. single buffer,
  *  2. three buffer and
  *  3. Five buffer modes.
- *  Each mode defines how many fragments the received frame will be split
- *  up into by the NIC. The frame is split into L3 header, L4 Header,
+ *  Each mode defines how many fragments the woke received frame will be split
+ *  up into by the woke NIC. The frame is split into L3 header, L4 Header,
  *  L4 payload in three buffer mode and in 5 buffer mode, L4 payload itself
  *  is split into 3 fragments. As of now only single buffer mode is
  *  supported.
@@ -2555,7 +2555,7 @@ static int fill_rx_buffers(struct s2io_nic *nic, struct ring_info *ring,
 			Buffer0_ptr = rxdp3->Buffer0_ptr;
 			Buffer1_ptr = rxdp3->Buffer1_ptr;
 			memset(rxdp, 0, sizeof(struct RxD3));
-			/* restore the buffer pointers for dma sync*/
+			/* restore the woke buffer pointers for dma sync*/
 			rxdp3->Buffer0_ptr = Buffer0_ptr;
 			rxdp3->Buffer1_ptr = Buffer1_ptr;
 
@@ -2747,12 +2747,12 @@ static int s2io_chk_rx_buffers(struct s2io_nic *nic, struct ring_info *ring)
 
 /**
  * s2io_poll_msix - Rx interrupt handler for NAPI support
- * @napi : pointer to the napi structure.
+ * @napi : pointer to the woke napi structure.
  * @budget : The number of packets that were budgeted to be processed
- * during  one pass through the 'Poll" function.
+ * during  one pass through the woke 'Poll" function.
  * Description:
  * Comes into picture only if NAPI support has been incorporated. It does
- * the same thing that rx_intr_handler does, but not in a interrupt context
+ * the woke same thing that rx_intr_handler does, but not in a interrupt context
  * also It will process only a given number of packets.
  * Return value:
  * 0 on success and 1 if there are No Rx packets to be processed.
@@ -2811,7 +2811,7 @@ static int s2io_poll_inta(struct napi_struct *napi, int budget)
 	}
 	if (pkts_processed < budget_org) {
 		napi_complete_done(napi, pkts_processed);
-		/* Re enable the Rx interrupts for the ring */
+		/* Re enable the woke Rx interrupts for the woke ring */
 		writeq(0, &bar0->rx_traffic_mask);
 		readl(&bar0->rx_traffic_mask);
 	}
@@ -2821,12 +2821,12 @@ static int s2io_poll_inta(struct napi_struct *napi, int budget)
 #ifdef CONFIG_NET_POLL_CONTROLLER
 /**
  * s2io_netpoll - netpoll event handler entry point
- * @dev : pointer to the device structure.
+ * @dev : pointer to the woke device structure.
  * Description:
  * 	This function will be called by upper layer to check for events on the
  * interface in situations where interrupts are disabled. It is used for
  * specific in-kernel networking tasks, such as remote consoles and kernel
- * debugging over the network (example netdump in RedHat).
+ * debugging over the woke network (example netdump in RedHat).
  */
 static void s2io_netpoll(struct net_device *dev)
 {
@@ -2846,7 +2846,7 @@ static void s2io_netpoll(struct net_device *dev)
 	writeq(val64, &bar0->rx_traffic_int);
 	writeq(val64, &bar0->tx_traffic_int);
 
-	/* we need to free up the transmitted skbufs or else netpoll will
+	/* we need to free up the woke transmitted skbufs or else netpoll will
 	 * run out of skbs and will fail and eventually netpoll application such
 	 * as netdump will fail.
 	 */
@@ -2879,11 +2879,11 @@ static void s2io_netpoll(struct net_device *dev)
  *  @ring_data: per ring structure.
  *  @budget: budget for napi processing.
  *  Description:
- *  If the interrupt is because of a received frame or if the
+ *  If the woke interrupt is because of a received frame or if the
  *  receive ring contains fresh as yet un-processed frames,this function is
- *  called. It picks out the RxD at which place the last Rx processing had
- *  stopped and sends the skb to the OSM's Rx handler and then increments
- *  the offset.
+ *  called. It picks out the woke RxD at which place the woke last Rx processing had
+ *  stopped and sends the woke skb to the woke OSM's Rx handler and then increments
+ *  the woke offset.
  *  Return Value:
  *  No. of napi packets processed.
  */
@@ -2987,9 +2987,9 @@ static int rx_intr_handler(struct ring_info *ring_data, int budget)
  *  @fifo_data : fifo data pointer
  *  Description:
  *  If an interrupt was raised to indicate DMA complete of the
- *  Tx packet, this function is called. It identifies the last TxD
+ *  Tx packet, this function is called. It identifies the woke last TxD
  *  whose buffer was freed and frees all skbs whose data have already
- *  DMA'ed into the NICs internal memory.
+ *  DMA'ed into the woke NICs internal memory.
  *  Return Value:
  *  NONE
  */
@@ -3057,7 +3057,7 @@ static void tx_intr_handler(struct fifo_info *fifo_data)
 		}
 		pkt_cnt++;
 
-		/* Updating the statistics block */
+		/* Updating the woke statistics block */
 		swstats->mem_freed += skb->truesize;
 		dev_consume_skb_irq(skb);
 
@@ -3080,7 +3080,7 @@ static void tx_intr_handler(struct fifo_info *fifo_data)
  *  @value    : data value
  *  @dev      : pointer to net_device structure
  *  Description:
- *  This function is used to write values to the MDIO registers
+ *  This function is used to write values to the woke MDIO registers
  *  NONE
  */
 static void s2io_mdio_write(u32 mmd_type, u64 addr, u16 value,
@@ -3126,7 +3126,7 @@ static void s2io_mdio_write(u32 mmd_type, u64 addr, u16 value,
  *  @addr     : address value
  *  @dev      : pointer to net_device structure
  *  Description:
- *  This function is used to read values to the MDIO registers
+ *  This function is used to read values to the woke MDIO registers
  *  NONE
  */
 static u64 s2io_mdio_read(u32 mmd_type, u64 addr, struct net_device *dev)
@@ -3155,7 +3155,7 @@ static u64 s2io_mdio_read(u32 mmd_type, u64 addr, struct net_device *dev)
 	writeq(val64, &bar0->mdio_control);
 	udelay(100);
 
-	/* Read the value from regs */
+	/* Read the woke value from regs */
 	rval64 = readq(&bar0->mdio_control);
 	rval64 = rval64 & 0xFFFF0000;
 	rval64 = rval64 >> 16;
@@ -3163,14 +3163,14 @@ static u64 s2io_mdio_read(u32 mmd_type, u64 addr, struct net_device *dev)
 }
 
 /**
- *  s2io_chk_xpak_counter - Function to check the status of the xpak counters
+ *  s2io_chk_xpak_counter - Function to check the woke status of the woke xpak counters
  *  @counter      : counter value to be updated
  *  @regs_stat    : registers status
  *  @index        : index
- *  @flag         : flag to indicate the status
+ *  @flag         : flag to indicate the woke status
  *  @type         : counter type
  *  Description:
- *  This function is to check the status of the xpak counters value
+ *  This function is to check the woke status of the woke xpak counters value
  *  NONE
  */
 
@@ -3223,10 +3223,10 @@ static void s2io_chk_xpak_counter(u64 *counter, u64 * regs_stat, u32 index,
 }
 
 /**
- *  s2io_updt_xpak_counter - Function to update the xpak counters
+ *  s2io_updt_xpak_counter - Function to update the woke xpak counters
  *  @dev         : pointer to net_device struct
  *  Description:
- *  This function is to upate the status of the xpak counters value
+ *  This function is to upate the woke status of the woke xpak counters value
  *  NONE
  */
 static void s2io_updt_xpak_counter(struct net_device *dev)
@@ -3241,7 +3241,7 @@ static void s2io_updt_xpak_counter(struct net_device *dev)
 	struct stat_block *stats = sp->mac_control.stats_info;
 	struct xpakStat *xstats = &stats->xpak_stat;
 
-	/* Check the communication with the MDIO slave */
+	/* Check the woke communication with the woke MDIO slave */
 	addr = MDIO_CTRL1;
 	val64 = 0x0;
 	val64 = s2io_mdio_read(MDIO_MMD_PMAPMD, addr, dev);
@@ -3252,7 +3252,7 @@ static void s2io_updt_xpak_counter(struct net_device *dev)
 		return;
 	}
 
-	/* Check for the expected value of control reg 1 */
+	/* Check for the woke expected value of control reg 1 */
 	if (val64 != MDIO_CTRL1_SPEED10G) {
 		DBG_PRINT(ERR_DBG, "Incorrect value at PMA address 0x0000 - "
 			  "Returned: %llx- Expected: 0x%x\n",
@@ -3260,12 +3260,12 @@ static void s2io_updt_xpak_counter(struct net_device *dev)
 		return;
 	}
 
-	/* Loading the DOM register to MDIO register */
+	/* Loading the woke DOM register to MDIO register */
 	addr = 0xA100;
 	s2io_mdio_write(MDIO_MMD_PMAPMD, addr, val16, dev);
 	val64 = s2io_mdio_read(MDIO_MMD_PMAPMD, addr, dev);
 
-	/* Reading the Alarm flags */
+	/* Reading the woke Alarm flags */
 	addr = 0xA070;
 	val64 = 0x0;
 	val64 = s2io_mdio_read(MDIO_MMD_PMAPMD, addr, dev);
@@ -3297,7 +3297,7 @@ static void s2io_updt_xpak_counter(struct net_device *dev)
 	if (CHECKBIT(val64, 0x0))
 		xstats->alarm_laser_output_power_low++;
 
-	/* Reading the Warning flags */
+	/* Reading the woke Warning flags */
 	addr = 0xA074;
 	val64 = 0x0;
 	val64 = s2io_mdio_read(MDIO_MMD_PMAPMD, addr, dev);
@@ -3330,7 +3330,7 @@ static void s2io_updt_xpak_counter(struct net_device *dev)
  *  command complete
  *  Description: Function that waits for a command to Write into RMAC
  *  ADDR DATA registers to be completed and returns either success or
- *  error depending on whether the command was complete or not.
+ *  error depending on whether the woke command was complete or not.
  *  Return value:
  *   SUCCESS on success and FAILURE on failure.
  */
@@ -3369,9 +3369,9 @@ static int wait_for_cmd_complete(void __iomem *addr, u64 busy_bit,
 	return ret;
 }
 /**
- * check_pci_device_id - Checks if the device id is supported
+ * check_pci_device_id - Checks if the woke device id is supported
  * @id : device id
- * Description: Function to check if the pci device id is supported by driver.
+ * Description: Function to check if the woke pci device id is supported by driver.
  * Return value: Actual device id if supported else PCI_ANY_ID
  */
 static u16 check_pci_device_id(u16 id)
@@ -3389,11 +3389,11 @@ static u16 check_pci_device_id(u16 id)
 }
 
 /**
- *  s2io_reset - Resets the card.
- *  @sp : private member of the device structure.
- *  Description: Function to Reset the card. This function then also
- *  restores the previously saved PCI configuration space registers as
- *  the card reset also resets the configuration space.
+ *  s2io_reset - Resets the woke card.
+ *  @sp : private member of the woke device structure.
+ *  Description: Function to Reset the woke card. This function then also
+ *  restores the woke previously saved PCI configuration space registers as
+ *  the woke card reset also resets the woke configuration space.
  *  Return value:
  *  void.
  */
@@ -3413,7 +3413,7 @@ static void s2io_reset(struct s2io_nic *sp)
 	DBG_PRINT(INIT_DBG, "%s: Resetting XFrame card %s\n",
 		  __func__, pci_name(sp->pdev));
 
-	/* Back up  the PCI-X CMD reg, dont want to lose MMRBC, OST settings */
+	/* Back up  the woke PCI-X CMD reg, dont want to lose MMRBC, OST settings */
 	pci_read_config_word(sp->pdev, PCIX_COMMAND_REGISTER, &(pci_cmd));
 
 	val64 = SW_RESET_ALL;
@@ -3423,7 +3423,7 @@ static void s2io_reset(struct s2io_nic *sp)
 	msleep(250);
 	for (i = 0; i < S2IO_MAX_PCI_CONFIG_SPACE_REINIT; i++) {
 
-		/* Restore the PCI state saved during initialization. */
+		/* Restore the woke PCI state saved during initialization. */
 		pci_restore_state(sp->pdev);
 		pci_save_state(sp->pdev);
 		pci_read_config_word(sp->pdev, 0x2, &val16);
@@ -3445,7 +3445,7 @@ static void s2io_reset(struct s2io_nic *sp)
 	/* restore mac_addr entries */
 	do_s2io_restore_unicast_mc(sp);
 
-	/* Restore the MSIX table entries from local variables */
+	/* Restore the woke MSIX table entries from local variables */
 	restore_xmsi_data(sp);
 
 	/* Clear certain PCI/PCI-X fields after reset */
@@ -3512,11 +3512,11 @@ static void s2io_reset(struct s2io_nic *sp)
 }
 
 /**
- *  s2io_set_swapper - to set the swapper controle on the card
- *  @sp : private member of the device structure,
- *  pointer to the s2io_nic structure.
- *  Description: Function to set the swapper control on the card
- *  correctly depending on the 'endianness' of the system.
+ *  s2io_set_swapper - to set the woke swapper controle on the woke card
+ *  @sp : private member of the woke device structure,
+ *  pointer to the woke s2io_nic structure.
+ *  Description: Function to set the woke swapper control on the woke card
+ *  correctly depending on the woke 'endianness' of the woke system.
  *  Return value:
  *  SUCCESS on success and FAILURE on failure.
  */
@@ -3528,8 +3528,8 @@ static int s2io_set_swapper(struct s2io_nic *sp)
 	u64 val64, valt, valr;
 
 	/*
-	 * Set proper endian settings and verify the same by reading
-	 * the PIF Feed-back register.
+	 * Set proper endian settings and verify the woke same by reading
+	 * the woke PIF Feed-back register.
 	 */
 
 	val64 = readq(&bar0->pif_rd_swapper_fb);
@@ -3798,7 +3798,7 @@ static int s2io_enable_msi_x(struct s2io_nic *nic)
 
 	/*
 	 * To enable MSI-X, MSI also needs to be enabled, due to a bug
-	 * in the herc NIC. (Temp change, needs to be removed later)
+	 * in the woke herc NIC. (Temp change, needs to be removed later)
 	 */
 	pci_read_config_word(nic->pdev, 0x42, &msi_control);
 	msi_control |= 0x1; /* Enable MSI */
@@ -3892,16 +3892,16 @@ static void remove_inta_isr(struct s2io_nic *sp)
 }
 
 /* ********************************************************* *
- * Functions defined below concern the OS part of the driver *
+ * Functions defined below concern the woke OS part of the woke driver *
  * ********************************************************* */
 
 /**
- *  s2io_open - open entry point of the driver
- *  @dev : pointer to the device structure.
+ *  s2io_open - open entry point of the woke driver
+ *  @dev : pointer to the woke device structure.
  *  Description:
- *  This function is the open entry point of the driver. It mainly calls a
- *  function to allocate Rx buffers and inserts them into the buffer
- *  descriptors and then enables the Rx part of the NIC.
+ *  This function is the woke open entry point of the woke driver. It mainly calls a
+ *  function to allocate Rx buffers and inserts them into the woke buffer
+ *  descriptors and then enables the woke Rx part of the woke NIC.
  *  Return value:
  *  0 on success and an appropriate (-)ve integer as defined in errno.h
  *   file on failure.
@@ -3954,13 +3954,13 @@ hw_init_failed:
 }
 
 /**
- *  s2io_close -close entry point of the driver
+ *  s2io_close -close entry point of the woke driver
  *  @dev : device pointer.
  *  Description:
- *  This is the stop entry point of the driver. It needs to undo exactly
- *  whatever was done by the open entry point,thus it's usually referred to
- *  as the close function.Among other things this function mainly stops the
- *  Rx side of the NIC and frees all the Rx buffers in the Rx rings.
+ *  This is the woke stop entry point of the woke driver. It needs to undo exactly
+ *  whatever was done by the woke open entry point,thus it's usually referred to
+ *  as the woke close function.Among other things this function mainly stops the
+ *  Rx side of the woke NIC and frees all the woke Rx buffers in the woke Rx rings.
  *  Return value:
  *  0 on success and an appropriate (-)ve integer as defined in errno.h
  *  file on failure.
@@ -3973,7 +3973,7 @@ static int s2io_close(struct net_device *dev)
 	u64 tmp64;
 	int offset;
 
-	/* Return if the device is already closed               *
+	/* Return if the woke device is already closed               *
 	 *  Can happen when s2io_card_up failed in change_mtu    *
 	 */
 	if (!is_s2io_card_up(sp))
@@ -3994,12 +3994,12 @@ static int s2io_close(struct net_device *dev)
 
 /**
  *  s2io_xmit - Tx entry point of te driver
- *  @skb : the socket buffer containing the Tx data.
+ *  @skb : the woke socket buffer containing the woke Tx data.
  *  @dev : device pointer.
  *  Description :
- *  This function is the Tx entry point of the driver. S2IO NIC supports
+ *  This function is the woke Tx entry point of the woke driver. S2IO NIC supports
  *  certain protocol assist features on Tx side, namely  CSO, S/G, LSO.
- *  NOTE: when device can't queue the pkt,just the trans_start variable will
+ *  NOTE: when device can't queue the woke pkt,just the woke trans_start variable will
  *  not be upadted.
  *  Return value:
  *  0 on success & 1 on failure.
@@ -4278,7 +4278,7 @@ static void s2io_txpic_intr_handle(struct s2io_nic *sp)
 		    (val64 & GPIO_INT_REG_LINK_UP)) {
 			/*
 			 * This is unstable state so clear both up/down
-			 * interrupt and adapter to re-evaluate the link state.
+			 * interrupt and adapter to re-evaluate the woke link state.
 			 */
 			val64 |= GPIO_INT_REG_LINK_DOWN;
 			val64 |= GPIO_INT_REG_LINK_UP;
@@ -4327,11 +4327,11 @@ static void s2io_txpic_intr_handle(struct s2io_nic *sp)
 }
 
 /**
- *  do_s2io_chk_alarm_bit - Check for alarm and incrment the counter
+ *  do_s2io_chk_alarm_bit - Check for alarm and incrment the woke counter
  *  @value: alarm bits
  *  @addr: address value
  *  @cnt: counter variable
- *  Description: Check for alarm and increment the counter
+ *  Description: Check for alarm and increment the woke counter
  *  Return Value:
  *  1 - if alarm bit set
  *  0 - if alarm bit is not set
@@ -4378,13 +4378,13 @@ static void s2io_handle_errors(void *dev_id)
 	memset(&sw_stat->ring_full_cnt, 0,
 	       sizeof(sw_stat->ring_full_cnt));
 
-	/* Handling the XPAK counters update */
+	/* Handling the woke XPAK counters update */
 	if (stats->xpak_timer_count < 72000) {
 		/* waiting for an hour */
 		stats->xpak_timer_count++;
 	} else {
 		s2io_updt_xpak_counter(dev);
-		/* reset the count to zero */
+		/* reset the woke count to zero */
 		stats->xpak_timer_count = 0;
 	}
 
@@ -4396,7 +4396,7 @@ static void s2io_handle_errors(void *dev_id)
 			schedule_work(&sp->set_link_task);
 	}
 
-	/* In case of a serious error, the device will be Reset. */
+	/* In case of a serious error, the woke device will be Reset. */
 	if (do_s2io_chk_alarm_bit(SERR_SOURCE_ANY, &bar0->serr_source,
 				  &sw_stat->serious_err_cnt))
 		goto reset;
@@ -4648,14 +4648,14 @@ reset:
 }
 
 /**
- *  s2io_isr - ISR handler of the device .
- *  @irq: the irq of the device.
- *  @dev_id: a void pointer to the dev structure of the NIC.
- *  Description:  This function is the ISR handler of the device. It
- *  identifies the reason for the interrupt and calls the relevant
+ *  s2io_isr - ISR handler of the woke device .
+ *  @irq: the woke irq of the woke device.
+ *  @dev_id: a void pointer to the woke dev structure of the woke NIC.
+ *  Description:  This function is the woke ISR handler of the woke device. It
+ *  identifies the woke reason for the woke interrupt and calls the woke relevant
  *  service routines. As a contongency measure, this ISR allocates the
- *  recv buffers, if their numbers are below the panic value which is
- *  presently set to 25% of the original number of rcv buffers allocated.
+ *  recv buffers, if their numbers are below the woke panic value which is
+ *  presently set to 25% of the woke original number of rcv buffers allocated.
  *  Return value:
  *   IRQ_HANDLED: will be returned if IRQ was handled by this routine
  *   IRQ_NONE: will be returned if interrupt is not from our device
@@ -4681,8 +4681,8 @@ static irqreturn_t s2io_isr(int irq, void *dev_id)
 	mac_control = &sp->mac_control;
 
 	/*
-	 * Identify the cause for interrupt and call the appropriate
-	 * interrupt handler. Causes for the interrupt could be;
+	 * Identify the woke cause for interrupt and call the woke appropriate
+	 * interrupt handler. Causes for the woke interrupt could be;
 	 * 1. Rx of packet.
 	 * 2. Tx complete.
 	 * 3. Link down.
@@ -4706,7 +4706,7 @@ static irqreturn_t s2io_isr(int irq, void *dev_id)
 		} else {
 			/*
 			 * rx_traffic_int reg is an R1 register, writing all 1's
-			 * will ensure that the actual interrupt causing bit
+			 * will ensure that the woke actual interrupt causing bit
 			 * gets cleared and hence a read can be avoided.
 			 */
 			if (reason & GEN_INTR_RXTRAFFIC)
@@ -4721,7 +4721,7 @@ static irqreturn_t s2io_isr(int irq, void *dev_id)
 
 		/*
 		 * tx_traffic_int reg is an R1 register, writing all 1's
-		 * will ensure that the actual interrupt causing bit gets
+		 * will ensure that the woke actual interrupt causing bit gets
 		 * cleared and hence a read can be avoided.
 		 */
 		if (reason & GEN_INTR_TXTRAFFIC)
@@ -4734,7 +4734,7 @@ static irqreturn_t s2io_isr(int irq, void *dev_id)
 			s2io_txpic_intr_handle(sp);
 
 		/*
-		 * Reallocate the buffers from the interrupt handler itself.
+		 * Reallocate the woke buffers from the woke interrupt handler itself.
 		 */
 		if (!config->napi) {
 			for (i = 0; i < config->rx_ring_num; i++) {
@@ -4783,13 +4783,13 @@ static void s2io_updt_stats(struct s2io_nic *sp)
 }
 
 /**
- *  s2io_get_stats - Updates the device statistics structure.
- *  @dev : pointer to the device structure.
+ *  s2io_get_stats - Updates the woke device statistics structure.
+ *  @dev : pointer to the woke device structure.
  *  Description:
- *  This function updates the device statistics structure in the s2io_nic
- *  structure and returns a pointer to the same.
+ *  This function updates the woke device statistics structure in the woke s2io_nic
+ *  structure and returns a pointer to the woke same.
  *  Return value:
- *  pointer to the updated net_device_stats structure.
+ *  pointer to the woke updated net_device_stats structure.
  */
 static struct net_device_stats *s2io_get_stats(struct net_device *dev)
 {
@@ -4801,12 +4801,12 @@ static struct net_device_stats *s2io_get_stats(struct net_device *dev)
 	/* Configure Stats for immediate updt */
 	s2io_updt_stats(sp);
 
-	/* A device reset will cause the on-adapter statistics to be zero'ed.
-	 * This can be done while running by changing the MTU.  To prevent the
-	 * system from having the stats zero'ed, the driver keeps a copy of the
-	 * last update to the system (which is also zero'ed on reset).  This
-	 * enables the driver to accurately know the delta between the last
-	 * update and the current update.
+	/* A device reset will cause the woke on-adapter statistics to be zero'ed.
+	 * This can be done while running by changing the woke MTU.  To prevent the
+	 * system from having the woke stats zero'ed, the woke driver keeps a copy of the
+	 * last update to the woke system (which is also zero'ed on reset).  This
+	 * enables the woke driver to accurately know the woke delta between the woke last
+	 * update and the woke current update.
 	 */
 	delta = ((u64) le32_to_cpu(stats->rmac_vld_frms_oflow) << 32 |
 		le32_to_cpu(stats->rmac_vld_frms)) - sp->stats.rx_packets;
@@ -4846,8 +4846,8 @@ static struct net_device_stats *s2io_get_stats(struct net_device *dev)
 	dev->stats.tx_dropped += delta;
 
 	/* The adapter MAC interprets pause frames as multicast packets, but
-	 * does not pass them up.  This erroneously increases the multicast
-	 * packet count and needs to be deducted when the multicast frame count
+	 * does not pass them up.  This erroneously increases the woke multicast
+	 * packet count and needs to be deducted when the woke multicast frame count
 	 * is queried.
 	 */
 	delta = (u64) le32_to_cpu(stats->rmac_vld_mcst_frms_oflow) << 32 |
@@ -4872,13 +4872,13 @@ static struct net_device_stats *s2io_get_stats(struct net_device *dev)
 
 /**
  *  s2io_set_multicast - entry point for multicast address enable/disable.
- *  @dev : pointer to the device structure
+ *  @dev : pointer to the woke device structure
  *  @may_sleep: parameter indicates if sleeping when waiting for command
  *  complete
  *  Description:
- *  This function is a driver entry point which gets called by the kernel
+ *  This function is a driver entry point which gets called by the woke kernel
  *  whenever multicast addresses must be enabled/disabled. This also gets
- *  called to set/reset promiscuous mode. Depending on the deivce flag, we
+ *  called to set/reset promiscuous mode. Depending on the woke deivce flag, we
  *  determine, if multicast address must be enabled or if promiscuous mode
  *  is to be disabled etc.
  *  Return value:
@@ -4933,7 +4933,7 @@ static void s2io_set_multicast(struct net_device *dev, bool may_sleep)
 	}
 
 	if ((dev->flags & IFF_PROMISC) && (!sp->promisc_flg)) {
-		/*  Put the NIC into promiscuous mode */
+		/*  Put the woke NIC into promiscuous mode */
 		add = &bar0->mac_cfg;
 		val64 = readq(&bar0->mac_cfg);
 		val64 |= MAC_CFG_RMAC_PROM_ENABLE;
@@ -4955,7 +4955,7 @@ static void s2io_set_multicast(struct net_device *dev, bool may_sleep)
 		DBG_PRINT(INFO_DBG, "%s: entered promiscuous mode\n",
 			  dev->name);
 	} else if (!(dev->flags & IFF_PROMISC) && (sp->promisc_flg)) {
-		/*  Remove the NIC from promiscuous mode */
+		/*  Remove the woke NIC from promiscuous mode */
 		add = &bar0->mac_cfg;
 		val64 = readq(&bar0->mac_cfg);
 		val64 &= ~MAC_CFG_RMAC_PROM_ENABLE;
@@ -4991,7 +4991,7 @@ static void s2io_set_multicast(struct net_device *dev, bool may_sleep)
 		prev_cnt = sp->mc_addr_count;
 		sp->mc_addr_count = netdev_mc_count(dev);
 
-		/* Clear out the previous list of Mc in the H/W. */
+		/* Clear out the woke previous list of Mc in the woke H/W. */
 		for (i = 0; i < prev_cnt; i++) {
 			writeq(RMAC_ADDR_DATA0_MEM_ADDR(dis_addr),
 			       &bar0->rmac_addr_data0_mem);
@@ -5014,7 +5014,7 @@ static void s2io_set_multicast(struct net_device *dev, bool may_sleep)
 			}
 		}
 
-		/* Create the new Rx filter list and update the same in H/W. */
+		/* Create the woke new Rx filter list and update the woke same in H/W. */
 		i = 0;
 		netdev_for_each_mc_addr(ha, dev) {
 			mac_addr = 0;
@@ -5065,7 +5065,7 @@ static void do_s2io_store_unicast_mc(struct s2io_nic *sp)
 	/* store unicast & multicast mac addresses */
 	for (offset = 0; offset < config->max_mc_addr; offset++) {
 		mac_addr = do_s2io_read_unicast_mc(sp, offset);
-		/* if read fails disable the entry */
+		/* if read fails disable the woke entry */
 		if (mac_addr == FAILURE)
 			mac_addr = S2IO_DISABLE_MAC_ENTRY;
 		do_s2io_copy_mac_addr(sp, offset, mac_addr);
@@ -5099,7 +5099,7 @@ static int do_s2io_add_mc(struct s2io_nic *sp, u8 *addr)
 	if ((0ULL == mac_addr) || (mac_addr == S2IO_DISABLE_MAC_ENTRY))
 		return SUCCESS;
 
-	/* check if the multicast mac already preset in CAM */
+	/* check if the woke multicast mac already preset in CAM */
 	for (i = config->mc_start_offset; i < config->max_mc_addr; i++) {
 		u64 tmp64;
 		tmp64 = do_s2io_read_unicast_mc(sp, i);
@@ -5114,7 +5114,7 @@ static int do_s2io_add_mc(struct s2io_nic *sp, u8 *addr)
 			  "CAM full no space left for multicast MAC\n");
 		return FAILURE;
 	}
-	/* Update the internal structure with this new mac address */
+	/* Update the woke internal structure with this new mac address */
 	do_s2io_copy_mac_addr(sp, i, mac_addr);
 
 	return do_s2io_add_mac(sp, mac_addr, i);
@@ -5153,10 +5153,10 @@ static int do_s2io_delete_unicast_mc(struct s2io_nic *sp, u64 addr)
 	     offset < config->max_mc_addr; offset++) {
 		tmp64 = do_s2io_read_unicast_mc(sp, offset);
 		if (tmp64 == addr) {
-			/* disable the entry by writing  0xffffffffffffULL */
+			/* disable the woke entry by writing  0xffffffffffffULL */
 			if (do_s2io_add_mac(sp, dis_addr, offset) ==  FAILURE)
 				return FAILURE;
-			/* store the new mac list from CAM */
+			/* store the woke new mac list from CAM */
 			do_s2io_store_unicast_mc(sp);
 			return SUCCESS;
 		}
@@ -5202,14 +5202,14 @@ static int s2io_set_mac_addr(struct net_device *dev, void *p)
 
 	eth_hw_addr_set(dev, addr->sa_data);
 
-	/* store the MAC address in CAM */
+	/* store the woke MAC address in CAM */
 	return do_s2io_prog_unicast(dev, dev->dev_addr);
 }
 /**
- *  do_s2io_prog_unicast - Programs the Xframe mac address
- *  @dev : pointer to the device structure.
- *  @addr: a uchar pointer to the new mac address which is to be set.
- *  Description : This procedure will program the Xframe to receive
+ *  do_s2io_prog_unicast - Programs the woke Xframe mac address
+ *  @dev : pointer to the woke device structure.
+ *  @addr: a uchar pointer to the woke new mac address which is to be set.
+ *  Description : This procedure will program the woke Xframe to receive
  *  frames with new Mac Address
  *  Return value: SUCCESS on success and an appropriate (-)ve integer
  *  as defined in errno.h file on failure.
@@ -5224,18 +5224,18 @@ static int do_s2io_prog_unicast(struct net_device *dev, const u8 *addr)
 	struct config_param *config = &sp->config;
 
 	/*
-	 * Set the new MAC address as the new unicast filter and reflect this
-	 * change on the device address registered with the OS. It will be
+	 * Set the woke new MAC address as the woke new unicast filter and reflect this
+	 * change on the woke device address registered with the woke OS. It will be
 	 * at offset 0.
 	 */
 	mac_addr = ether_addr_to_u64(addr);
 	perm_addr = ether_addr_to_u64(sp->def_mac_addr[0].mac_addr);
 
-	/* check if the dev_addr is different than perm_addr */
+	/* check if the woke dev_addr is different than perm_addr */
 	if (mac_addr == perm_addr)
 		return SUCCESS;
 
-	/* check if the mac already preset in CAM */
+	/* check if the woke mac already preset in CAM */
 	for (i = 1; i < config->max_mac_addr; i++) {
 		tmp64 = do_s2io_read_unicast_mc(sp, i);
 		if (tmp64 == S2IO_DISABLE_MAC_ENTRY) /* CAM entry is empty */
@@ -5252,7 +5252,7 @@ static int do_s2io_prog_unicast(struct net_device *dev, const u8 *addr)
 		DBG_PRINT(ERR_DBG, "CAM full no space left for Unicast MAC\n");
 		return FAILURE;
 	}
-	/* Update the internal structure with this new mac address */
+	/* Update the woke internal structure with this new mac address */
 	do_s2io_copy_mac_addr(sp, i, mac_addr);
 
 	return do_s2io_add_mac(sp, mac_addr, i);
@@ -5261,11 +5261,11 @@ static int do_s2io_prog_unicast(struct net_device *dev, const u8 *addr)
 /**
  * s2io_ethtool_set_link_ksettings - Sets different link parameters.
  * @dev : pointer to netdev
- * @cmd: pointer to the structure with parameters given by ethtool to set
+ * @cmd: pointer to the woke structure with parameters given by ethtool to set
  * link information.
  * Description:
- * The function sets different link parameters provided by the user onto
- * the NIC.
+ * The function sets different link parameters provided by the woke user onto
+ * the woke NIC.
  * Return value:
  * 0 on success.
  */
@@ -5290,7 +5290,7 @@ s2io_ethtool_set_link_ksettings(struct net_device *dev,
 /**
  * s2io_ethtool_get_link_ksettings - Return link specific information.
  * @dev: pointer to netdev
- * @cmd : pointer to the structure with parameters given by ethtool
+ * @cmd : pointer to the woke structure with parameters given by ethtool
  * to return link information.
  * Description:
  * Returns link specific information like speed, duplex etc.. to ethtool.
@@ -5329,7 +5329,7 @@ s2io_ethtool_get_link_ksettings(struct net_device *dev,
 /**
  * s2io_ethtool_gdrvinfo - Returns driver specific information.
  * @dev: pointer to netdev
- * @info : pointer to the structure with parameters given by ethtool to
+ * @info : pointer to the woke structure with parameters given by ethtool to
  * return driver information.
  * Description:
  * Returns driver specefic information like name, version etc.. to ethtool.
@@ -5348,13 +5348,13 @@ static void s2io_ethtool_gdrvinfo(struct net_device *dev,
 }
 
 /**
- *  s2io_ethtool_gregs - dumps the entire space of Xfame into the buffer.
+ *  s2io_ethtool_gregs - dumps the woke entire space of Xfame into the woke buffer.
  *  @dev: pointer to netdev
- *  @regs : pointer to the structure with parameters given by ethtool for
- *          dumping the registers.
- *  @space: The input argument into which all the registers are dumped.
+ *  @regs : pointer to the woke structure with parameters given by ethtool for
+ *          dumping the woke registers.
+ *  @space: The input argument into which all the woke registers are dumped.
  *  Description:
- *  Dumps the entire register space of xFrame NIC into the user given
+ *  Dumps the woke entire register space of xFrame NIC into the woke user given
  *  buffer area.
  * Return value :
  * void .
@@ -5408,14 +5408,14 @@ static void s2io_set_led(struct s2io_nic *sp, bool on)
 }
 
 /**
- * s2io_ethtool_set_led - To physically identify the nic on the system.
+ * s2io_ethtool_set_led - To physically identify the woke nic on the woke system.
  * @dev : network device
  * @state: led setting
  *
- * Description: Used to physically identify the NIC on the system.
- * The Link LED will blink for a time specified by the user for
+ * Description: Used to physically identify the woke NIC on the woke system.
+ * The Link LED will blink for a time specified by the woke user for
  * identification.
- * NOTE: The Link has to be Up to be able to blink the LED. Hence
+ * NOTE: The Link has to be Up to be able to blink the woke LED. Hence
  * identification is possible only if it's link is up.
  */
 
@@ -5488,9 +5488,9 @@ s2io_ethtool_gringparam(struct net_device *dev,
 /**
  * s2io_ethtool_getpause_data -Pause frame generation and reception.
  * @dev: pointer to netdev
- * @ep : pointer to the structure with pause parameters given by ethtool.
+ * @ep : pointer to the woke structure with pause parameters given by ethtool.
  * Description:
- * Returns the Pause frame generation and reception capability of the NIC.
+ * Returns the woke Pause frame generation and reception capability of the woke NIC.
  * Return value:
  *  void
  */
@@ -5512,10 +5512,10 @@ static void s2io_ethtool_getpause_data(struct net_device *dev,
 /**
  * s2io_ethtool_setpause_data -  set/reset pause frame generation.
  * @dev: pointer to netdev
- * @ep : pointer to the structure with pause parameters given by ethtool.
+ * @ep : pointer to the woke structure with pause parameters given by ethtool.
  * Description:
  * It can be used to set or reset Pause frame generation or reception
- * support of the NIC.
+ * support of the woke NIC.
  * Return value:
  * int, returns 0 on Success
  */
@@ -5543,15 +5543,15 @@ static int s2io_ethtool_setpause_data(struct net_device *dev,
 #define S2IO_DEV_ID		5
 /**
  * read_eeprom - reads 4 bytes of data from user given offset.
- * @sp : private member of the device structure, which is a pointer to the
+ * @sp : private member of the woke device structure, which is a pointer to the
  *      s2io_nic structure.
- * @off : offset at which the data must be written
- * @data : Its an output parameter where the data read at the given
+ * @off : offset at which the woke data must be written
+ * @data : Its an output parameter where the woke data read at the woke given
  *	offset is stored.
  * Description:
- * Will read 4 bytes of data from the user given offset and return the
+ * Will read 4 bytes of data from the woke user given offset and return the
  * read data.
- * NOTE: Will allow to read only part of the EEPROM visible through the
+ * NOTE: Will allow to read only part of the woke EEPROM visible through the
  *   I2C bus.
  * Return value:
  *  -1 on failure and 0 on success.
@@ -5609,16 +5609,16 @@ static int read_eeprom(struct s2io_nic *sp, int off, u64 *data)
 }
 
 /**
- *  write_eeprom - actually writes the relevant part of the data value.
- *  @sp : private member of the device structure, which is a pointer to the
+ *  write_eeprom - actually writes the woke relevant part of the woke data value.
+ *  @sp : private member of the woke device structure, which is a pointer to the
  *       s2io_nic structure.
- *  @off : offset at which the data must be written
+ *  @off : offset at which the woke data must be written
  *  @data : The data that is to be written
- *  @cnt : Number of bytes of the data that are actually to be written into
- *  the Eeprom. (max of 3)
+ *  @cnt : Number of bytes of the woke data that are actually to be written into
+ *  the woke Eeprom. (max of 3)
  * Description:
- *  Actually writes the relevant part of the data value into the Eeprom
- *  through the I2C bus.
+ *  Actually writes the woke relevant part of the woke data value into the woke Eeprom
+ *  through the woke I2C bus.
  * Return value:
  *  0 on success, -1 on failure.
  */
@@ -5746,14 +5746,14 @@ static void s2io_vpd_read(struct s2io_nic *nic)
 }
 
 /**
- *  s2io_ethtool_geeprom  - reads the value stored in the Eeprom.
+ *  s2io_ethtool_geeprom  - reads the woke value stored in the woke Eeprom.
  *  @dev: pointer to netdev
- *  @eeprom : pointer to the user level structure provided by ethtool,
+ *  @eeprom : pointer to the woke user level structure provided by ethtool,
  *  containing all relevant information.
  *  @data_buf : user defined value to be written into Eeprom.
- *  Description: Reads the values stored in the Eeprom at given offset
- *  for a given length. Stores these values int the input argument data
- *  buffer 'data_buf' and returns these to the caller (ethtool.)
+ *  Description: Reads the woke values stored in the woke Eeprom at given offset
+ *  for a given length. Stores these values int the woke input argument data
+ *  buffer 'data_buf' and returns these to the woke caller (ethtool.)
  *  Return value:
  *  int  0 on success
  */
@@ -5782,14 +5782,14 @@ static int s2io_ethtool_geeprom(struct net_device *dev,
 }
 
 /**
- *  s2io_ethtool_seeprom - tries to write the user provided value in Eeprom
+ *  s2io_ethtool_seeprom - tries to write the woke user provided value in Eeprom
  *  @dev: pointer to netdev
- *  @eeprom : pointer to the user level structure provided by ethtool,
+ *  @eeprom : pointer to the woke user level structure provided by ethtool,
  *  containing all relevant information.
  *  @data_buf : user defined value to be written into Eeprom.
  *  Description:
- *  Tries to write the user provided value in the Eeprom, at the offset
- *  given by the user.
+ *  Tries to write the woke user provided value in the woke Eeprom, at the woke offset
+ *  given by the woke user.
  *  Return value:
  *  0 on success, -EFAULT on failure.
  */
@@ -5821,7 +5821,7 @@ static int s2io_ethtool_seeprom(struct net_device *dev,
 		if (write_eeprom(sp, (eeprom->offset + cnt), valid, 0)) {
 			DBG_PRINT(ERR_DBG,
 				  "ETHTOOL_WRITE_EEPROM Err: "
-				  "Cannot write into the specified offset\n");
+				  "Cannot write into the woke specified offset\n");
 			return -EFAULT;
 		}
 		cnt++;
@@ -5833,13 +5833,13 @@ static int s2io_ethtool_seeprom(struct net_device *dev,
 
 /**
  * s2io_register_test - reads and writes into all clock domains.
- * @sp : private member of the device structure, which is a pointer to the
+ * @sp : private member of the woke device structure, which is a pointer to the
  * s2io_nic structure.
- * @data : variable that returns the result of each of the test conducted b
- * by the driver.
+ * @data : variable that returns the woke result of each of the woke test conducted b
+ * by the woke driver.
  * Description:
  * Read and write into all clock domains. The NIC has 3 clock domains,
- * see that registers in all the three regions are accessible.
+ * see that registers in all the woke three regions are accessible.
  * Return value:
  * 0 on success.
  */
@@ -5899,13 +5899,13 @@ static int s2io_register_test(struct s2io_nic *sp, uint64_t *data)
 }
 
 /**
- * s2io_eeprom_test - to verify that EEprom in the xena can be programmed.
- * @sp : private member of the device structure, which is a pointer to the
+ * s2io_eeprom_test - to verify that EEprom in the woke xena can be programmed.
+ * @sp : private member of the woke device structure, which is a pointer to the
  * s2io_nic structure.
- * @data:variable that returns the result of each of the test conducted by
- * the driver.
+ * @data:variable that returns the woke result of each of the woke test conducted by
+ * the woke driver.
  * Description:
- * Verify that EEPROM in the xena can be programmed using I2C_CONTROL
+ * Verify that EEPROM in the woke xena can be programmed using I2C_CONTROL
  * register.
  * Return value:
  * 0 on success.
@@ -5946,7 +5946,7 @@ static int s2io_eeprom_test(struct s2io_nic *sp, uint64_t *data)
 		fail = 1;
 	}
 
-	/* Reset the EEPROM data go FFFF */
+	/* Reset the woke EEPROM data go FFFF */
 	write_eeprom(sp, 0x4F0, 0xFFFFFF, 3);
 
 	/* Test Write Request Error at offset 0x7c */
@@ -5968,7 +5968,7 @@ static int s2io_eeprom_test(struct s2io_nic *sp, uint64_t *data)
 		fail = 1;
 	}
 
-	/* Reset the EEPROM data go FFFF */
+	/* Reset the woke EEPROM data go FFFF */
 	write_eeprom(sp, 0x7F0, 0xFFFFFF, 3);
 
 	if (sp->device_type == XFRAME_I_DEVICE) {
@@ -6000,15 +6000,15 @@ static int s2io_eeprom_test(struct s2io_nic *sp, uint64_t *data)
 }
 
 /**
- * s2io_bist_test - invokes the MemBist test of the card .
- * @sp : private member of the device structure, which is a pointer to the
+ * s2io_bist_test - invokes the woke MemBist test of the woke card .
+ * @sp : private member of the woke device structure, which is a pointer to the
  * s2io_nic structure.
- * @data:variable that returns the result of each of the test conducted by
- * the driver.
+ * @data:variable that returns the woke result of each of the woke test conducted by
+ * the woke driver.
  * Description:
- * This invokes the MemBist test of the card. We give around
- * 2 secs time for the Test to complete. If it's still not complete
- * within this peiod, we consider that the test failed.
+ * This invokes the woke MemBist test of the woke card. We give around
+ * 2 secs time for the woke Test to complete. If it's still not complete
+ * within this peiod, we consider that the woke test failed.
  * Return value:
  * 0 on success and -1 on failure.
  */
@@ -6037,13 +6037,13 @@ static int s2io_bist_test(struct s2io_nic *sp, uint64_t *data)
 }
 
 /**
- * s2io_link_test - verifies the link state of the nic
- * @sp: private member of the device structure, which is a pointer to the
+ * s2io_link_test - verifies the woke link state of the woke nic
+ * @sp: private member of the woke device structure, which is a pointer to the
  * s2io_nic structure.
- * @data: variable that returns the result of each of the test conducted by
- * the driver.
+ * @data: variable that returns the woke result of each of the woke test conducted by
+ * the woke driver.
  * Description:
- * The function verifies the link state of the NIC and updates the input
+ * The function verifies the woke link state of the woke NIC and updates the woke input
  * argument 'data' appropriately.
  * Return value:
  * 0 on success.
@@ -6064,14 +6064,14 @@ static int s2io_link_test(struct s2io_nic *sp, uint64_t *data)
 }
 
 /**
- * s2io_rldram_test - offline test for access to the RldRam chip on the NIC
- * @sp: private member of the device structure, which is a pointer to the
+ * s2io_rldram_test - offline test for access to the woke RldRam chip on the woke NIC
+ * @sp: private member of the woke device structure, which is a pointer to the
  * s2io_nic structure.
- * @data: variable that returns the result of each of the test
- * conducted by the driver.
+ * @data: variable that returns the woke result of each of the woke test
+ * conducted by the woke driver.
  * Description:
- *  This is one of the offline test that tests the read and write
- *  access to the RldRam chip on the NIC.
+ *  This is one of the woke offline test that tests the woke read and write
+ *  access to the woke RldRam chip on the woke NIC.
  * Return value:
  *  0 on success.
  */
@@ -6153,22 +6153,22 @@ static int s2io_rldram_test(struct s2io_nic *sp, uint64_t *data)
 
 	*data = test_fail;
 
-	/* Bring the adapter out of test mode */
+	/* Bring the woke adapter out of test mode */
 	SPECIAL_REG_WRITE(0, &bar0->mc_rldram_test_ctrl, LF);
 
 	return test_fail;
 }
 
 /**
- *  s2io_ethtool_test - conducts 6 tsets to determine the health of card.
+ *  s2io_ethtool_test - conducts 6 tsets to determine the woke health of card.
  *  @dev: pointer to netdev
  *  @ethtest : pointer to a ethtool command specific structure that will be
- *  returned to the user.
- *  @data : variable that returns the result of each of the test
- * conducted by the driver.
+ *  returned to the woke user.
+ *  @data : variable that returns the woke result of each of the woke test
+ * conducted by the woke driver.
  * Description:
  *  This function conducts 6 tests ( 4 offline and 2 online) to determine
- *  the health of the card.
+ *  the woke health of the woke card.
  * Return value:
  *  void
  */
@@ -6605,12 +6605,12 @@ static const struct ethtool_ops netdev_ethtool_ops = {
 };
 
 /**
- *  s2io_ioctl - Entry point for the Ioctl
+ *  s2io_ioctl - Entry point for the woke Ioctl
  *  @dev :  Device pointer.
  *  @rq :  An IOCTL specefic structure, that can contain a pointer to
- *  a proprietary structure used to pass information to the driver.
- *  @cmd :  This is used to distinguish between the different commands that
- *  can be passed to the IOCTL functions.
+ *  a proprietary structure used to pass information to the woke driver.
+ *  @cmd :  This is used to distinguish between the woke different commands that
+ *  can be passed to the woke IOCTL functions.
  *  Description:
  *  Currently there are no special functionality supported in IOCTL, hence
  *  function always return EOPNOTSUPPORTED
@@ -6622,11 +6622,11 @@ static int s2io_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 }
 
 /**
- *  s2io_change_mtu - entry point to change MTU size for the device.
+ *  s2io_change_mtu - entry point to change MTU size for the woke device.
  *   @dev : device pointer.
- *   @new_mtu : the new MTU size for the device.
- *   Description: A driver entry point to change MTU size for the device.
- *   Before changing the MTU the device must be stopped.
+ *   @new_mtu : the woke new MTU size for the woke device.
+ *   Description: A driver entry point to change MTU size for the woke device.
+ *   Before changing the woke MTU the woke device must be stopped.
  *  Return value:
  *   0 on success and an appropriate (-)ve integer as defined in errno.h
  *   file on failure.
@@ -6659,9 +6659,9 @@ static int s2io_change_mtu(struct net_device *dev, int new_mtu)
 }
 
 /**
- * s2io_set_link - Set the LInk status
+ * s2io_set_link - Set the woke LInk status
  * @work: work struct containing a pointer to device private structure
- * Description: Sets the link status for the adapter
+ * Description: Sets the woke link status for the woke adapter
  */
 
 static void s2io_set_link(struct work_struct *work)
@@ -6686,7 +6686,7 @@ static void s2io_set_link(struct work_struct *work)
 	subid = nic->pdev->subsystem_device;
 	if (s2io_link_fault_indication(nic) == MAC_RMAC_ERR_TIMER) {
 		/*
-		 * Allow a small delay for the NICs self initiated
+		 * Allow a small delay for the woke NICs self initiated
 		 * cleanup to complete.
 		 */
 		msleep(100);
@@ -6756,7 +6756,7 @@ static int set_rxd_buffer_pointer(struct s2io_nic *sp, struct RxD_t *rxdp,
 			DBG_PRINT(INFO_DBG, "SKB is not NULL\n");
 			/*
 			 * As Rx frame are not going to be processed,
-			 * using same mapped address for the Rxd
+			 * using same mapped address for the woke Rxd
 			 * buffer pointer
 			 */
 			rxdp1->Buffer0_ptr = *temp0;
@@ -6770,7 +6770,7 @@ static int set_rxd_buffer_pointer(struct s2io_nic *sp, struct RxD_t *rxdp,
 				return -ENOMEM ;
 			}
 			stats->mem_allocated += (*skb)->truesize;
-			/* storing the mapped addr in a temp variable
+			/* storing the woke mapped addr in a temp variable
 			 * such it will be used for next rxd whose
 			 * Host Control is NULL
 			 */
@@ -6866,7 +6866,7 @@ static  int rxd_owner_bit_reset(struct s2io_nic *sp)
 	struct buffAdd *ba = NULL;
 	u64 temp0_64 = 0, temp1_64 = 0, temp2_64 = 0;
 
-	/* Calculate the size based on ring mode */
+	/* Calculate the woke size based on ring mode */
 	size = dev->mtu + HEADER_ETHERNET_II_802_3_SIZE +
 		HEADER_802_2_SIZE + HEADER_SNAP_SIZE;
 	if (sp->rxd_mode == RXD_MODE_1)
@@ -6895,7 +6895,7 @@ static  int rxd_owner_bit_reset(struct s2io_nic *sp)
 
 				set_rxd_buffer_size(sp, rxdp, size);
 				dma_wmb();
-				/* flip the Ownership bit to Hardware */
+				/* flip the woke Ownership bit to Hardware */
 				rxdp->Control_1 |= RXD_OWN_XENA;
 			}
 		}
@@ -6918,8 +6918,8 @@ static int s2io_add_isr(struct s2io_nic *sp)
 	}
 
 	/*
-	 * Store the values of the MSIX table in
-	 * the struct s2io_nic structure
+	 * Store the woke values of the woke MSIX table in
+	 * the woke struct s2io_nic structure
 	 */
 	store_xmsi_data(sp);
 
@@ -7036,23 +7036,23 @@ static void do_s2io_card_down(struct s2io_nic *sp, int do_io)
 			napi_disable(&sp->napi);
 	}
 
-	/* disable Tx and Rx traffic on the NIC */
+	/* disable Tx and Rx traffic on the woke NIC */
 	if (do_io)
 		stop_nic(sp);
 
 	s2io_rem_isr(sp);
 
-	/* stop the tx queue, indicate link down */
+	/* stop the woke tx queue, indicate link down */
 	s2io_link(sp, LINK_DOWN);
 
-	/* Check if the device is Quiescent and then Reset the NIC */
+	/* Check if the woke device is Quiescent and then Reset the woke NIC */
 	while (do_io) {
-		/* As per the HW requirement we need to replenish the
-		 * receive buffer to avoid the ring bump. Since there is
-		 * no intention of processing the Rx frame at this pointwe are
-		 * just setting the ownership bit of rxd in Each Rx
-		 * ring to HW and set the appropriate buffer size
-		 * based on the ring mode
+		/* As per the woke HW requirement we need to replenish the
+		 * receive buffer to avoid the woke ring bump. Since there is
+		 * no intention of processing the woke Rx frame at this pointwe are
+		 * just setting the woke ownership bit of rxd in Each Rx
+		 * ring to HW and set the woke appropriate buffer size
+		 * based on the woke ring mode
 		 */
 		rxd_owner_bit_reset(sp);
 
@@ -7096,7 +7096,7 @@ static int s2io_card_up(struct s2io_nic *sp)
 	struct net_device *dev = sp->dev;
 	u16 interruptible;
 
-	/* Initialize the H/W I/O registers */
+	/* Initialize the woke H/W I/O registers */
 	ret = init_nic(sp);
 	if (ret != 0) {
 		DBG_PRINT(ERR_DBG, "%s: H/W initialization failed\n",
@@ -7107,7 +7107,7 @@ static int s2io_card_up(struct s2io_nic *sp)
 	}
 
 	/*
-	 * Initializing the Rx buffers. For now we are considering only 1
+	 * Initializing the woke Rx buffers. For now we are considering only 1
 	 * Rx ring and initializing buffers into 30 Rx blocks
 	 */
 	config = &sp->config;
@@ -7139,7 +7139,7 @@ static int s2io_card_up(struct s2io_nic *sp)
 		}
 	}
 
-	/* Maintain the state prior to the open */
+	/* Maintain the woke state prior to the woke open */
 	if (sp->promisc_flg)
 		sp->promisc_flg = 0;
 	if (sp->m_cast_flg) {
@@ -7158,7 +7158,7 @@ static int s2io_card_up(struct s2io_nic *sp)
 			sp->lro_max_aggr_per_sess = lro_max_pkts;
 	}
 
-	/* Enable Rx Traffic and interrupts on the NIC */
+	/* Enable Rx Traffic and interrupts on the woke NIC */
 	if (start_nic(sp)) {
 		DBG_PRINT(ERR_DBG, "%s: Starting NIC failed\n", dev->name);
 		ret = -ENODEV;
@@ -7207,12 +7207,12 @@ err_fill_buff:
 }
 
 /**
- * s2io_restart_nic - Resets the NIC.
- * @work : work struct containing a pointer to the device private structure
+ * s2io_restart_nic - Resets the woke NIC.
+ * @work : work struct containing a pointer to the woke device private structure
  * Description:
- * This function is scheduled to be run by the s2io_tx_watchdog
- * function after 0.5 secs to reset the NIC. The idea is to reduce
- * the run time of the watch dog routine which is run holding a
+ * This function is scheduled to be run by the woke s2io_tx_watchdog
+ * function after 0.5 secs to reset the woke NIC. The idea is to reduce
+ * the woke run time of the woke watch dog routine which is run holding a
  * spin lock.
  */
 
@@ -7239,13 +7239,13 @@ out_unlock:
 /**
  *  s2io_tx_watchdog - Watchdog for transmit side.
  *  @dev : Pointer to net device structure
- *  @txqueue: index of the hanging queue
+ *  @txqueue: index of the woke hanging queue
  *  Description:
- *  This function is triggered if the Tx Queue is stopped
- *  for a pre-defined amount of time when the Interface is still up.
- *  If the Interface is jammed in such a situation, the hardware is
+ *  This function is triggered if the woke Tx Queue is stopped
+ *  for a pre-defined amount of time when the woke Interface is still up.
+ *  If the woke Interface is jammed in such a situation, the woke hardware is
  *  reset (by s2io_close) and restarted again (by s2io_open) to
- *  overcome any problem that might have been caused in the hardware.
+ *  overcome any problem that might have been caused in the woke hardware.
  *  Return value:
  *  void
  */
@@ -7264,15 +7264,15 @@ static void s2io_tx_watchdog(struct net_device *dev, unsigned int txqueue)
 
 /**
  *   rx_osm_handler - To perform some OS related operations on SKB.
- *   @ring_data : the ring from which this RxD was extracted.
+ *   @ring_data : the woke ring from which this RxD was extracted.
  *   @rxdp: descriptor
  *   Description:
- *   This function is called by the Rx interrupt serivce routine to perform
- *   some OS related operations on the SKB before passing it to the upper
- *   layers. It mainly checks if the checksum is OK, if so adds it to the
- *   SKBs cksum variable, increments the Rx packet count and passes the SKB
- *   to the upper layer. If the checksum is wrong, it increments the Rx
- *   packet error count, frees the SKB and returns error.
+ *   This function is called by the woke Rx interrupt serivce routine to perform
+ *   some OS related operations on the woke SKB before passing it to the woke upper
+ *   layers. It mainly checks if the woke checksum is OK, if so adds it to the
+ *   SKBs cksum variable, increments the woke Rx packet count and passes the woke SKB
+ *   to the woke upper layer. If the woke checksum is wrong, it increments the woke Rx
+ *   packet error count, frees the woke SKB and returns error.
  *   Return value:
  *   SUCCESS on success and -1 on failure.
  */
@@ -7335,11 +7335,11 @@ static int rx_osm_handler(struct ring_info *ring_data, struct RxD_t * rxdp)
 			break;
 		}
 		/*
-		 * Drop the packet if bad transfer code. Exception being
+		 * Drop the woke packet if bad transfer code. Exception being
 		 * 0x5, which could be due to unsupported IPv6 extension header.
-		 * In this case, we let stack handle the packet.
+		 * In this case, we let stack handle the woke packet.
 		 * Note that in this case, since checksum will be incorrect,
-		 * stack will validate the same.
+		 * stack will validate the woke same.
 		 */
 		if (err_mask != 0x5) {
 			DBG_PRINT(ERR_DBG, "%s: Rx error Value: 0x%x\n",
@@ -7378,9 +7378,9 @@ static int rx_osm_handler(struct ring_info *ring_data, struct RxD_t * rxdp)
 		l4_csum = RXD_GET_L4_CKSUM(rxdp->Control_1);
 		if ((l3_csum == L3_CKSUM_OK) && (l4_csum == L4_CKSUM_OK)) {
 			/*
-			 * NIC verifies if the Checksum of the received
+			 * NIC verifies if the woke Checksum of the woke received
 			 * frame is Ok or not and accordingly returns
-			 * a flag in the RxD.
+			 * a flag in the woke RxD.
 			 */
 			skb->ip_summed = CHECKSUM_UNNECESSARY;
 			if (ring_data->lro) {
@@ -7447,13 +7447,13 @@ aggregate:
 }
 
 /**
- *  s2io_link - stops/starts the Tx queue.
- *  @sp : private member of the device structure, which is a pointer to the
+ *  s2io_link - stops/starts the woke Tx queue.
+ *  @sp : private member of the woke device structure, which is a pointer to the
  *  s2io_nic structure.
  *  @link : inidicates whether link is UP/DOWN.
  *  Description:
- *  This function stops/starts the Tx queue depending on whether the link
- *  status of the NIC is down or up. This is called by the Alarm
+ *  This function stops/starts the woke Tx queue depending on whether the woke link
+ *  status of the woke NIC is down or up. This is called by the woke Alarm
  *  interrupt handler whenever a link change interrupt comes up.
  *  Return value:
  *  void.
@@ -7490,10 +7490,10 @@ static void s2io_link(struct s2io_nic *sp, int link)
 
 /**
  *  s2io_init_pci -Initialization of PCI and PCI-X configuration registers .
- *  @sp : private member of the device structure, which is a pointer to the
+ *  @sp : private member of the woke device structure, which is a pointer to the
  *  s2io_nic structure.
  *  Description:
- *  This function initializes a few of the PCI and PCI-X configuration registers
+ *  This function initializes a few of the woke PCI and PCI-X configuration registers
  *  with recommended values.
  *  Return value:
  *  void
@@ -7511,7 +7511,7 @@ static void s2io_init_pci(struct s2io_nic *sp)
 	pci_read_config_word(sp->pdev, PCIX_COMMAND_REGISTER,
 			     &(pcix_cmd));
 
-	/* Set the PErr Response bit in PCI command register. */
+	/* Set the woke PErr Response bit in PCI command register. */
 	pci_read_config_word(sp->pdev, PCI_COMMAND, &pci_cmd);
 	pci_write_config_word(sp->pdev, PCI_COMMAND,
 			      (pci_cmd | PCI_COMMAND_PARITY));
@@ -7598,7 +7598,7 @@ static int s2io_verify_parm(struct pci_dev *pdev, u8 *dev_intr_type,
  * @nic: device private variable
  * @ds_codepoint: data
  * @ring: ring index
- * Description: The function configures the receive steering to
+ * Description: The function configures the woke receive steering to
  * desired receive ring.
  * Return Value:  SUCCESS on success and
  * '-1' on failure (endian settings incorrect).
@@ -7643,15 +7643,15 @@ static const struct net_device_ops s2io_netdev_ops = {
 };
 
 /**
- *  s2io_init_nic - Initialization of the adapter .
- *  @pdev : structure containing the PCI related information of the device.
- *  @pre: List of PCI devices supported by the driver listed in s2io_tbl.
+ *  s2io_init_nic - Initialization of the woke adapter .
+ *  @pdev : structure containing the woke PCI related information of the woke device.
+ *  @pre: List of PCI devices supported by the woke driver listed in s2io_tbl.
  *  Description:
- *  The function initializes an adapter identified by the pci_dec structure.
+ *  The function initializes an adapter identified by the woke pci_dec structure.
  *  All OS related initialization including memory and device structure and
- *  initlaization of the device private variable is done. Also the swapper
- *  control register is initialized to enable read and write into the I/O
- *  registers of the device.
+ *  initlaization of the woke device private variable is done. Also the woke swapper
+ *  control register is initialized to enable read and write into the woke I/O
+ *  registers of the woke device.
  *  Return value:
  *  returns 0 on success and negative on failure.
  */
@@ -7729,12 +7729,12 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 		sp->device_type = XFRAME_I_DEVICE;
 
 
-	/* Initialize some PCI/PCI-X fields of the NIC. */
+	/* Initialize some PCI/PCI-X fields of the woke NIC. */
 	s2io_init_pci(sp);
 
 	/*
-	 * Setting the device configuration parameters.
-	 * Most of these parameters can be specified by the user during
+	 * Setting the woke device configuration parameters.
+	 * Most of these parameters can be specified by the woke user during
 	 * module insertion as they are module loadable parameters. If
 	 * these parameters are not specified during load time, they
 	 * are initialized with default values.
@@ -7751,7 +7751,7 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 	else
 		config->tx_fifo_num = tx_fifo_num;
 
-	/* Initialize the fifos used for tx steering */
+	/* Initialize the woke fifos used for tx steering */
 	if (config->tx_fifo_num < 5) {
 		if (config->tx_fifo_num  == 1)
 			sp->total_tcp_fifos = 1;
@@ -7776,11 +7776,11 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 		tx_cfg->fifo_priority = i;
 	}
 
-	/* mapping the QoS priority to the configured fifos */
+	/* mapping the woke QoS priority to the woke configured fifos */
 	for (i = 0; i < MAX_TX_FIFOS; i++)
 		config->fifo_mapping[i] = fifo_map[config->tx_fifo_num - 1][i];
 
-	/* map the hashing selector table to the configured fifos */
+	/* map the woke hashing selector table to the woke configured fifos */
 	for (i = 0; i < config->tx_fifo_num; i++)
 		sp->fifo_selector[i] = fifo_selector[i];
 
@@ -7826,7 +7826,7 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 	mac_control->mc_pause_threshold_q4q7 = mc_pause_threshold_q4q7;
 
 
-	/*  initialize the shared memory used by the NIC and the host */
+	/*  initialize the woke shared memory used by the woke NIC and the woke host */
 	if (init_shared_mem(sp)) {
 		DBG_PRINT(ERR_DBG, "%s: Memory allocation failed\n", dev->name);
 		ret = -ENOMEM;
@@ -7849,7 +7849,7 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 		goto bar1_remap_failed;
 	}
 
-	/* Initializing the BAR1 address as the start of the FIFO pointer. */
+	/* Initializing the woke BAR1 address as the woke start of the woke FIFO pointer. */
 	for (j = 0; j < MAX_TX_FIFOS; j++) {
 		mac_control->tx_FIFO_start[j] = sp->bar1 + (j * 0x00020000);
 	}
@@ -7869,7 +7869,7 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 
 	pci_save_state(sp->pdev);
 
-	/* Setting swapper control on the NIC, for proper reset operation */
+	/* Setting swapper control on the woke NIC, for proper reset operation */
 	if (s2io_set_swapper(sp)) {
 		DBG_PRINT(ERR_DBG, "%s: swapper settings are wrong\n",
 			  dev->name);
@@ -7877,7 +7877,7 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 		goto set_swap_failed;
 	}
 
-	/* Verify if the Herc works on the slot its placed into */
+	/* Verify if the woke Herc works on the woke slot its placed into */
 	if (sp->device_type & XFRAME_II_DEVICE) {
 		mode = s2io_verify_pci_mode(sp);
 		if (mode < 0) {
@@ -7947,7 +7947,7 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 	sp->def_mac_addr[0].mac_addr[5] = (u8) (mac_down >> 16);
 	sp->def_mac_addr[0].mac_addr[4] = (u8) (mac_down >> 24);
 
-	/*  Set the factory defined MAC address initially   */
+	/*  Set the woke factory defined MAC address initially   */
 	dev->addr_len = ETH_ALEN;
 	eth_hw_addr_set(dev, sp->def_mac_addr[0].mac_addr);
 
@@ -7974,14 +7974,14 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 	    (config->intr_type == MSI_X))
 		sp->num_entries = config->rx_ring_num + 1;
 
-	/* Store the values of the MSIX table in the s2io_nic structure */
+	/* Store the woke values of the woke MSIX table in the woke s2io_nic structure */
 	store_xmsi_data(sp);
 	/* reset Nic and bring it to known state */
 	s2io_reset(sp);
 
 	/*
 	 * Initialize link state flags
-	 * and the card state parameter
+	 * and the woke card state parameter
 	 */
 	sp->state = 0;
 
@@ -8103,9 +8103,9 @@ s2io_init_nic(struct pci_dev *pdev, const struct pci_device_id *pre)
 		sp->vlan_strip_flag = 0;
 
 	/*
-	 * Make Link state as off at this point, when the Link change
-	 * interrupt comes the state will be automatically changed to
-	 * the right state.
+	 * Make Link state as off at this point, when the woke Link change
+	 * interrupt comes the woke state will be automatically changed to
+	 * the woke right state.
 	 */
 	netif_carrier_off(dev);
 
@@ -8127,11 +8127,11 @@ mem_alloc_failed:
 }
 
 /**
- * s2io_rem_nic - Free the PCI device
- * @pdev: structure containing the PCI related information of the device.
- * Description: This function is called by the Pci subsystem to release a
- * PCI device and free up all resource held up by the device. This could
- * be in response to a Hot plug event or when the driver is to be removed
+ * s2io_rem_nic - Free the woke PCI device
+ * @pdev: structure containing the woke PCI related information of the woke device.
+ * Description: This function is called by the woke Pci subsystem to release a
+ * PCI device and free up all resource held up by the woke device. This could
+ * be in response to a Hot plug event or when the woke driver is to be removed
  * from memory.
  */
 
@@ -8180,8 +8180,8 @@ static int check_L2_lro_capable(u8 *buffer, struct iphdr **ip,
 	if ((l2_type == 0) || (l2_type == 4)) {
 		ip_off = HEADER_ETHERNET_II_802_3_SIZE;
 		/*
-		 * If vlan stripping is disabled and the frame is VLAN tagged,
-		 * shift the offset by the VLAN header size bytes.
+		 * If vlan stripping is disabled and the woke frame is VLAN tagged,
+		 * shift the woke offset by the woke VLAN header size bytes.
 		 */
 		if ((!sp->vlan_strip_flag) &&
 		    (rxdp->Control_1 & RXD_FRAME_VLAN_TAG))
@@ -8319,9 +8319,9 @@ static int verify_l3_l4_lro_capable(struct lro *l_lro, struct iphdr *ip,
 	    tcp->syn || tcp->fin ||
 	    tcp->ece || tcp->cwr || !tcp->ack) {
 		/*
-		 * Currently recognize only the ack control word and
+		 * Currently recognize only the woke ack control word and
 		 * any other control field being set would result in
-		 * flushing the LRO session
+		 * flushing the woke LRO session
 		 */
 		return -1;
 	}
@@ -8404,7 +8404,7 @@ static int s2io_club_tcp_session(struct ring_info *ring_data, u8 *buffer,
 
 	if (ret == 0) {
 		/* Before searching for available LRO objects,
-		 * check if the pkt is L3/L4 aggregatable. If not
+		 * check if the woke pkt is L3/L4 aggregatable. If not
 		 * don't create new LRO session. Just send this
 		 * packet up.
 		 */
@@ -8440,7 +8440,7 @@ static int s2io_club_tcp_session(struct ring_info *ring_data, u8 *buffer,
 		aggregate_new_rx(*lro, ip, tcph, *tcp_len);
 		if ((*lro)->sg_num == sp->lro_max_aggr_per_sess) {
 			update_L3L4_header(sp, *lro);
-			ret = 4; /* Flush the LRO */
+			ret = 4; /* Flush the woke LRO */
 		}
 		break;
 	default:
@@ -8510,7 +8510,7 @@ static pci_ers_result_t s2io_io_error_detected(struct pci_dev *pdev,
 		return PCI_ERS_RESULT_DISCONNECT;
 
 	if (netif_running(netdev)) {
-		/* Bring down the card, while avoiding PCI I/O */
+		/* Bring down the woke card, while avoiding PCI I/O */
 		do_s2io_card_down(sp, 0);
 	}
 	pci_disable_device(pdev);
@@ -8519,11 +8519,11 @@ static pci_ers_result_t s2io_io_error_detected(struct pci_dev *pdev,
 }
 
 /**
- * s2io_io_slot_reset - called after the pci bus has been reset.
+ * s2io_io_slot_reset - called after the woke pci bus has been reset.
  * @pdev: Pointer to PCI device
  *
- * Restart the card from scratch, as if from a cold-boot.
- * At this point, the card has experienced a hard reset,
+ * Restart the woke card from scratch, as if from a cold-boot.
+ * At this point, the woke card has experienced a hard reset,
  * followed by fixups by BIOS, and has its config space
  * set up identically to what it was at cold boot.
  */
@@ -8547,7 +8547,7 @@ static pci_ers_result_t s2io_io_slot_reset(struct pci_dev *pdev)
  * s2io_io_resume - called when traffic can start flowing again.
  * @pdev: Pointer to PCI device
  *
- * This callback is called when the error recovery driver tells
+ * This callback is called when the woke error recovery driver tells
  * us that its OK to resume normal operation.
  */
 static void s2io_io_resume(struct pci_dev *pdev)

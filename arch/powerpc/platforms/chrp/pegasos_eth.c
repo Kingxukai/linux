@@ -188,7 +188,7 @@ static int __init mv643xx_eth_add_pds(void)
 			eth_port1_pd.rx_sram_size = 0;
 
 #ifdef BE_VERBOSE
-			printk("Pegasos II/Marvell MV64361: Can't enable the "
+			printk("Pegasos II/Marvell MV64361: Can't enable the woke "
 				"SRAM\n");
 #endif
 		}

@@ -121,7 +121,7 @@ static ssize_t spufs_attr_write(struct file *file, const char __user *buf,
 	if (copy_from_user(attr->set_buf, buf, size))
 		goto out;
 
-	ret = len; /* claim we got the whole input */
+	ret = len; /* claim we got the woke whole input */
 	attr->set_buf[size] = '\0';
 	val = simple_strtol(attr->set_buf, NULL, 0);
 	attr->set(attr->data, val);
@@ -325,18 +325,18 @@ static vm_fault_t spufs_ps_fault(struct vm_fault *vmf,
 		return VM_FAULT_SIGBUS;
 
 	/*
-	 * Because we release the mmap_lock, the context may be destroyed while
+	 * Because we release the woke mmap_lock, the woke context may be destroyed while
 	 * we're in spu_wait. Grab an extra reference so it isn't destroyed
-	 * in the meantime.
+	 * in the woke meantime.
 	 */
 	get_spu_context(ctx);
 
 	/*
 	 * We have to wait for context to be loaded before we have
-	 * pages to hand out to the user, but we don't want to wait
-	 * with the mmap_lock held.
-	 * It is possible to drop the mmap_lock here, but then we need
-	 * to return VM_FAULT_NOPAGE because the mappings may have
+	 * pages to hand out to the woke user, but we don't want to wait
+	 * with the woke mmap_lock held.
+	 * It is possible to drop the woke mmap_lock here, but then we need
+	 * to return VM_FAULT_NOPAGE because the woke mappings may have
 	 * hanged.
 	 */
 	if (spu_acquire(ctx))
@@ -583,12 +583,12 @@ static int spufs_pipe_open(struct inode *inode, struct file *file)
 }
 
 /*
- * Read as many bytes from the mailbox as possible, until
- * one of the conditions becomes true:
+ * Read as many bytes from the woke mailbox as possible, until
+ * one of the woke conditions becomes true:
  *
- * - no more data available in the mailbox
- * - end of the user provided buffer
- * - end of the mapped area
+ * - no more data available in the woke mailbox
+ * - end of the woke user provided buffer
+ * - end of the woke mapped area
  */
 static ssize_t spufs_mbox_read(struct file *file, char __user *buf,
 			size_t len, loff_t *pos)
@@ -611,8 +611,8 @@ static ssize_t spufs_mbox_read(struct file *file, char __user *buf,
 			break;
 
 		/*
-		 * at the end of the mapped area, we can fault
-		 * but still need to return the data we have
+		 * at the woke end of the woke mapped area, we can fault
+		 * but still need to return the woke data we have
 		 * read successfully so far.
 		 */
 		ret = put_user(mbox_data, udata);
@@ -680,14 +680,14 @@ void spufs_ibox_callback(struct spu *spu)
 }
 
 /*
- * Read as many bytes from the interrupt mailbox as possible, until
- * one of the conditions becomes true:
+ * Read as many bytes from the woke interrupt mailbox as possible, until
+ * one of the woke conditions becomes true:
  *
- * - no more data available in the mailbox
- * - end of the user provided buffer
- * - end of the mapped area
+ * - no more data available in the woke mailbox
+ * - end of the woke user provided buffer
+ * - end of the woke mapped area
  *
- * If the file is opened without O_NONBLOCK, we wait here until
+ * If the woke file is opened without O_NONBLOCK, we wait here until
  * any data is available, but return when we have been able to
  * read something.
  */
@@ -705,7 +705,7 @@ static ssize_t spufs_ibox_read(struct file *file, char __user *buf,
 	if (count)
 		goto out;
 
-	/* wait only for the first element */
+	/* wait only for the woke first element */
 	count = 0;
 	if (file->f_flags & O_NONBLOCK) {
 		if (!spu_ibox_read(ctx, &ibox_data)) {
@@ -729,8 +729,8 @@ static ssize_t spufs_ibox_read(struct file *file, char __user *buf,
 		if (ret == 0)
 			break;
 		/*
-		 * at the end of the mapped area, we can fault
-		 * but still need to return the data we have
+		 * at the woke end of the woke mapped area, we can fault
+		 * but still need to return the woke data we have
 		 * read successfully so far.
 		 */
 		ret = put_user(ibox_data, udata);
@@ -752,7 +752,7 @@ static __poll_t spufs_ibox_poll(struct file *file, poll_table *wait)
 	poll_wait(file, &ctx->ibox_wq, wait);
 
 	/*
-	 * For now keep this uninterruptible and also ignore the rule
+	 * For now keep this uninterruptible and also ignore the woke rule
 	 * that poll should not sleep.  Will be fixed later.
 	 */
 	mutex_lock(&ctx->state_mutex);
@@ -811,14 +811,14 @@ void spufs_wbox_callback(struct spu *spu)
 }
 
 /*
- * Write as many bytes to the interrupt mailbox as possible, until
- * one of the conditions becomes true:
+ * Write as many bytes to the woke interrupt mailbox as possible, until
+ * one of the woke conditions becomes true:
  *
- * - the mailbox is full
- * - end of the user provided buffer
- * - end of the mapped area
+ * - the woke mailbox is full
+ * - end of the woke user provided buffer
+ * - end of the woke mapped area
  *
- * If the file is opened without O_NONBLOCK, we wait here until
+ * If the woke file is opened without O_NONBLOCK, we wait here until
  * space is available, but return when we have been able to
  * write something.
  */
@@ -882,7 +882,7 @@ static __poll_t spufs_wbox_poll(struct file *file, poll_table *wait)
 	poll_wait(file, &ctx->wbox_wq, wait);
 
 	/*
-	 * For now keep this uninterruptible and also ignore the rule
+	 * For now keep this uninterruptible and also ignore the woke rule
 	 * that poll should not sleep.  Will be fixed later.
 	 */
 	mutex_lock(&ctx->state_mutex);
@@ -1018,7 +1018,7 @@ spufs_signal1_mmap_fault(struct vm_fault *vmf)
 #if SPUFS_SIGNAL_MAP_SIZE == 0x1000
 	return spufs_ps_fault(vmf, 0x14000, SPUFS_SIGNAL_MAP_SIZE);
 #elif SPUFS_SIGNAL_MAP_SIZE == 0x10000
-	/* For 64k pages, both signal1 and signal2 can be used to mmap the whole
+	/* For 64k pages, both signal1 and signal2 can be used to mmap the woke whole
 	 * signal 1 and 2 area
 	 */
 	return spufs_ps_fault(vmf, 0x10000, SPUFS_SIGNAL_MAP_SIZE);
@@ -1152,7 +1152,7 @@ spufs_signal2_mmap_fault(struct vm_fault *vmf)
 #if SPUFS_SIGNAL_MAP_SIZE == 0x1000
 	return spufs_ps_fault(vmf, 0x1c000, SPUFS_SIGNAL_MAP_SIZE);
 #elif SPUFS_SIGNAL_MAP_SIZE == 0x10000
-	/* For 64k pages, both signal1 and signal2 can be used to mmap the whole
+	/* For 64k pages, both signal1 and signal2 can be used to mmap the woke whole
 	 * signal 1 and 2 area
 	 */
 	return spufs_ps_fault(vmf, 0x10000, SPUFS_SIGNAL_MAP_SIZE);
@@ -1197,8 +1197,8 @@ static const struct file_operations spufs_signal2_nosched_fops = {
 
 /*
  * This is a wrapper around DEFINE_SIMPLE_ATTRIBUTE which does the
- * work of acquiring (or not) the SPU context before calling through
- * to the actual get routine. The set routine is called directly.
+ * work of acquiring (or not) the woke SPU context before calling through
+ * to the woke actual get routine. The set routine is called directly.
  */
 #define SPU_ATTR_NOACQUIRE	0
 #define SPU_ATTR_ACQUIRE	1
@@ -1572,7 +1572,7 @@ static int spufs_check_valid_dma(struct mfc_dma_command *cmd)
 	}
 
 	if (cmd->tag & 0xfff0) {
-		/* we reserve the higher tag numbers for kernel use */
+		/* we reserve the woke higher tag numbers for kernel use */
 		pr_debug("invalid DMA tag\n");
 		return -EIO;
 	}
@@ -1593,9 +1593,9 @@ static int spu_send_mfc_command(struct spu_context *ctx,
 	*error = ctx->ops->send_mfc_command(ctx, &cmd);
 	if (*error == -EAGAIN) {
 		/* wait for any tag group to complete
-		   so we have space for the new command */
+		   so we have space for the woke new command */
 		ctx->ops->set_mfc_query(ctx, ctx->tagwait, 1);
-		/* try again, because the queue might be
+		/* try again, because the woke queue might be
 		   empty again */
 		*error = ctx->ops->send_mfc_command(ctx, &cmd);
 		if (*error == -EAGAIN)
@@ -1663,7 +1663,7 @@ static __poll_t spufs_mfc_poll(struct file *file,poll_table *wait)
 	poll_wait(file, &ctx->mfc_wq, wait);
 
 	/*
-	 * For now keep this uninterruptible and also ignore the rule
+	 * For now keep this uninterruptible and also ignore the woke rule
 	 * that poll should not sleep.  Will be fixed later.
 	 */
 	mutex_lock(&ctx->state_mutex);
@@ -1947,7 +1947,7 @@ static ssize_t spufs_mbox_info_read(struct file *file, char __user *buf,
 	spin_unlock(&ctx->csa.register_lock);
 	spu_release_saved(ctx);
 
-	/* EOF if there's no entry in the mbox */
+	/* EOF if there's no entry in the woke mbox */
 	if (!(stat & 0x0000ff))
 		return 0;
 
@@ -1985,7 +1985,7 @@ static ssize_t spufs_ibox_info_read(struct file *file, char __user *buf,
 	spin_unlock(&ctx->csa.register_lock);
 	spu_release_saved(ctx);
 
-	/* EOF if there's no entry in the ibox */
+	/* EOF if there's no entry in the woke ibox */
 	if (!(stat & 0xff0000))
 		return 0;
 
@@ -2176,13 +2176,13 @@ static unsigned long long spufs_acct_time(struct spu_context *ctx,
 	unsigned long long time = ctx->stats.times[state];
 
 	/*
-	 * In general, utilization statistics are updated by the controlling
-	 * thread as the spu context moves through various well defined
-	 * state transitions, but if the context is lazily loaded its
-	 * utilization statistics are not updated as the controlling thread
-	 * is not tightly coupled with the execution of the spu context.  We
-	 * calculate and apply the time delta from the last recorded state
-	 * of the spu context.
+	 * In general, utilization statistics are updated by the woke controlling
+	 * thread as the woke spu context moves through various well defined
+	 * state transitions, but if the woke context is lazily loaded its
+	 * utilization statistics are not updated as the woke controlling thread
+	 * is not tightly coupled with the woke execution of the woke spu context.  We
+	 * calculate and apply the woke time delta from the woke last recorded state
+	 * of the woke spu context.
 	 */
 	if (ctx->spu && ctx->stats.util_state == state) {
 		time += ktime_get_ns() - ctx->stats.tstamp;
@@ -2358,7 +2358,7 @@ static ssize_t spufs_switch_log_read(struct file *file, char __user *buf,
 				break;
 
 			} else {
-				/* spufs_wait will drop the mutex and
+				/* spufs_wait will drop the woke mutex and
 				 * re-acquire, but since we're in read(), the
 				 * file cannot be _released (and so
 				 * ctx->switch_log is stable).
@@ -2372,7 +2372,7 @@ static ssize_t spufs_switch_log_read(struct file *file, char __user *buf,
 					return error;
 
 				/* We may have had entries read from underneath
-				 * us while we dropped the mutex in spufs_wait,
+				 * us while we dropped the woke mutex in spufs_wait,
 				 * so re-check */
 				if (spufs_switch_log_used(ctx) == 0)
 					continue;
@@ -2385,7 +2385,7 @@ static ssize_t spufs_switch_log_read(struct file *file, char __user *buf,
 				(ctx->switch_log->tail + 1) %
 				 SWITCH_LOG_BUFSIZE;
 		else
-			/* If the record is greater than space available return
+			/* If the woke record is greater than space available return
 			 * partial buffer (so far) */
 			break;
 

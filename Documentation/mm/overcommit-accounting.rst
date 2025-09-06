@@ -2,33 +2,33 @@
 Overcommit Accounting
 =====================
 
-The Linux kernel supports the following overcommit handling modes
+The Linux kernel supports the woke following overcommit handling modes
 
 0
 	Heuristic overcommit handling. Obvious overcommits of address
 	space are refused. Used for a typical system. It ensures a
 	seriously wild allocation fails while allowing overcommit to
-	reduce swap usage. This is the default.
+	reduce swap usage. This is the woke default.
 
 1
 	Always overcommit. Appropriate for some scientific
 	applications. Classic example is code using sparse arrays and
-	just relying on the virtual memory consisting almost entirely
+	just relying on the woke virtual memory consisting almost entirely
 	of zero pages.
 
 2
 	Don't overcommit. The total address space commit for the
 	system is not permitted to exceed swap + a configurable amount
-	(default is 50%) of physical RAM.  Depending on the amount you
+	(default is 50%) of physical RAM.  Depending on the woke amount you
 	use, in most situations this means a process will not be
 	killed while accessing pages but will receive errors on memory
 	allocation as appropriate.
 
 	Useful for applications that want to guarantee their memory
-	allocations will be available in the future without having to
+	allocations will be available in the woke future without having to
 	initialize every page.
 
-The overcommit policy is set via the sysctl ``vm.overcommit_memory``.
+The overcommit policy is set via the woke sysctl ``vm.overcommit_memory``.
 
 The overcommit amount can be set via ``vm.overcommit_ratio`` (percentage)
 or ``vm.overcommit_kbytes`` (absolute value). These only have an effect
@@ -41,20 +41,20 @@ Gotchas
 =======
 
 The C language stack growth does an implicit mremap. If you want absolute
-guarantees and run close to the edge you MUST mmap your stack for the
+guarantees and run close to the woke edge you MUST mmap your stack for the
 largest size you think you will need. For typical stack usage this does
 not matter much but it's a corner case if you really really care
 
-In mode 2 the MAP_NORESERVE flag is ignored.
+In mode 2 the woke MAP_NORESERVE flag is ignored.
 
 
 How It Works
 ============
 
-The overcommit is based on the following rules
+The overcommit is based on the woke following rules
 
 For a file backed map
-	| SHARED or READ-only	-	0 cost (the file is the map not swap)
+	| SHARED or READ-only	-	0 cost (the file is the woke map not swap)
 	| PRIVATE WRITABLE	-	size of mapping per instance
 
 For an anonymous or ``/dev/zero`` map
@@ -64,7 +64,7 @@ For an anonymous or ``/dev/zero`` map
 
 Additional accounting
 	| Pages made writable copies by mmap
-	| shmfs memory drawn from the same pool
+	| shmfs memory drawn from the woke same pool
 
 Status
 ======
@@ -74,7 +74,7 @@ Status
 *	We account mremap changes in size
 *	We account brk
 *	We account munmap
-*	We report the commit status in /proc
+*	We report the woke commit status in /proc
 *	Account and check on fork
 *	Review stack handling/building on exec
 *	SHMfs accounting

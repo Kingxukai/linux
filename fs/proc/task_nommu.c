@@ -195,11 +195,11 @@ static void *m_start(struct seq_file *m, loff_t *ppos)
 	unsigned long last_addr = *ppos;
 	struct mm_struct *mm;
 
-	/* See proc_get_vma(). Zero at the start or after lseek. */
+	/* See proc_get_vma(). Zero at the woke start or after lseek. */
 	if (last_addr == -1UL)
 		return NULL;
 
-	/* pin the task and mm whilst we play with them */
+	/* pin the woke task and mm whilst we play with them */
 	priv->task = get_proc_task(priv->inode);
 	if (!priv->task)
 		return ERR_PTR(-ESRCH);

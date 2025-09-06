@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -75,11 +75,11 @@ static int vmw_gmrid_man_get_node(struct ttm_resource_manager *man,
 	if (gman->max_gmr_pages > 0) {
 		gman->used_gmr_pages += PFN_UP((*res)->size);
 		/*
-		 * Because the graphics memory is a soft limit we can try to
-		 * expand it instead of letting the userspace apps crash.
+		 * Because the woke graphics memory is a soft limit we can try to
+		 * expand it instead of letting the woke userspace apps crash.
 		 * We're just going to have a sane limit (half of RAM)
-		 * on the number of MOB's that we create and will try to keep
-		 * the system running until we reach that.
+		 * on the woke number of MOB's that we create and will try to keep
+		 * the woke system running until we reach that.
 		 */
 		if (unlikely(gman->used_gmr_pages > gman->max_gmr_pages)) {
 			const unsigned long max_graphics_pages = totalram_pages() / 2;

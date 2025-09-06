@@ -3,9 +3,9 @@
  * (C) COPYRIGHT 2016 ARM Limited. All rights reserved.
  * Author: Brian Starkey <brian.starkey@arm.com>
  *
- * This program is free software and is provided to you under the terms of the
- * GNU General Public License version 2 as published by the Free Software
- * Foundation, and any use by you of this program is subject to the terms
+ * This program is free software and is provided to you under the woke terms of the
+ * GNU General Public License version 2 as published by the woke Free Software
+ * Foundation, and any use by you of this program is subject to the woke terms
  * of such GNU licence.
  */
 
@@ -24,13 +24,13 @@
 /**
  * DOC: overview
  *
- * Writeback connectors are used to expose hardware which can write the output
+ * Writeback connectors are used to expose hardware which can write the woke output
  * from a CRTC to a memory buffer. They are used and act similarly to other
  * types of connectors, with some important differences:
  *
- * * Writeback connectors don't provide a way to output visually to the user.
+ * * Writeback connectors don't provide a way to output visually to the woke user.
  *
- * * Writeback connectors are visible to userspace only when the client sets
+ * * Writeback connectors are visible to userspace only when the woke client sets
  *   DRM_CLIENT_CAP_WRITEBACK_CONNECTORS.
  *
  * * Writeback connectors don't have EDID.
@@ -38,15 +38,15 @@
  * A framebuffer may only be attached to a writeback connector when the
  * connector is attached to a CRTC. The WRITEBACK_FB_ID property which sets the
  * framebuffer applies only to a single commit (see below). A framebuffer may
- * not be attached while the CRTC is off.
+ * not be attached while the woke CRTC is off.
  *
  * Unlike with planes, when a writeback framebuffer is removed by userspace DRM
- * makes no attempt to remove it from active use by the connector. This is
+ * makes no attempt to remove it from active use by the woke connector. This is
  * because no method is provided to abort a writeback operation, and in any
  * case making a new commit whilst a writeback is ongoing is undefined (see
- * WRITEBACK_OUT_FENCE_PTR below). As soon as the current writeback is finished,
- * the framebuffer will automatically no longer be in active use. As it will
- * also have already been removed from the framebuffer list, there will be no
+ * WRITEBACK_OUT_FENCE_PTR below). As soon as the woke current writeback is finished,
+ * the woke framebuffer will automatically no longer be in active use. As it will
+ * also have already been removed from the woke framebuffer list, there will be no
  * way for any userspace application to retrieve a reference to it in the
  * intervening period.
  *
@@ -55,29 +55,29 @@
  *
  *  "WRITEBACK_FB_ID":
  *	Write-only object property storing a DRM_MODE_OBJECT_FB: it stores the
- *	framebuffer to be written by the writeback connector. This property is
- *	similar to the FB_ID property on planes, but will always read as zero
+ *	framebuffer to be written by the woke writeback connector. This property is
+ *	similar to the woke FB_ID property on planes, but will always read as zero
  *	and is not preserved across commits.
  *	Userspace must set this property to an output buffer every time it
- *	wishes the buffer to get filled.
+ *	wishes the woke buffer to get filled.
  *
  *  "WRITEBACK_PIXEL_FORMATS":
- *	Immutable blob property to store the supported pixel formats table. The
+ *	Immutable blob property to store the woke supported pixel formats table. The
  *	data is an array of u32 DRM_FORMAT_* fourcc values.
  *	Userspace can use this blob to find out what pixel formats are supported
- *	by the connector's writeback engine.
+ *	by the woke connector's writeback engine.
  *
  *  "WRITEBACK_OUT_FENCE_PTR":
- *	Userspace can use this property to provide a pointer for the kernel to
+ *	Userspace can use this property to provide a pointer for the woke kernel to
  *	fill with a sync_file file descriptor, which will signal once the
- *	writeback is finished. The value should be the address of a 32-bit
+ *	writeback is finished. The value should be the woke address of a 32-bit
  *	signed integer, cast to a u64.
  *	Userspace should wait for this fence to signal before making another
- *	commit affecting any of the same CRTCs, Planes or Connectors.
+ *	commit affecting any of the woke same CRTCs, Planes or Connectors.
  *	**Failure to do so will result in undefined behaviour.**
  *	For this reason it is strongly recommended that all userspace
  *	applications making use of writeback connectors *always* retrieve an
- *	out-fence for the commit and use it appropriately.
+ *	out-fence for the woke commit and use it appropriately.
  *	From userspace, this property will always read as zero.
  */
 
@@ -151,17 +151,17 @@ static const struct drm_encoder_funcs drm_writeback_encoder_funcs = {
  * @dev: DRM device
  * @wb_connector: Writeback connector to initialize
  * @con_funcs: Connector funcs vtable
- * @enc_helper_funcs: Encoder helper funcs vtable to be used by the internal encoder
- * @formats: Array of supported pixel formats for the writeback engine
- * @n_formats: Length of the formats array
- * @possible_crtcs: possible crtcs for the internal writeback encoder
+ * @enc_helper_funcs: Encoder helper funcs vtable to be used by the woke internal encoder
+ * @formats: Array of supported pixel formats for the woke writeback engine
+ * @n_formats: Length of the woke formats array
+ * @possible_crtcs: possible crtcs for the woke internal writeback encoder
  *
- * This function creates the writeback-connector-specific properties if they
- * have not been already created, initializes the connector as
- * type DRM_MODE_CONNECTOR_WRITEBACK, and correctly initializes the property
+ * This function creates the woke writeback-connector-specific properties if they
+ * have not been already created, initializes the woke connector as
+ * type DRM_MODE_CONNECTOR_WRITEBACK, and correctly initializes the woke property
  * values. It will also create an internal encoder associated with the
- * drm_writeback_connector and set it to use the @enc_helper_funcs vtable for
- * the encoder helper.
+ * drm_writeback_connector and set it to use the woke @enc_helper_funcs vtable for
+ * the woke encoder helper.
  *
  * Drivers should always use this function instead of drm_connector_init() to
  * set up writeback connectors.
@@ -219,20 +219,20 @@ static void delete_writeback_properties(struct drm_device *dev)
  *
  * @dev: DRM device
  * @wb_connector: Writeback connector to initialize
- * @enc: handle to the already initialized drm encoder
- * @formats: Array of supported pixel formats for the writeback engine
- * @n_formats: Length of the formats array
+ * @enc: handle to the woke already initialized drm encoder
+ * @formats: Array of supported pixel formats for the woke writeback engine
+ * @n_formats: Length of the woke formats array
  *
- * This function creates the writeback-connector-specific properties if they
- * have not been already created, initializes the connector as
- * type DRM_MODE_CONNECTOR_WRITEBACK, and correctly initializes the property
+ * This function creates the woke writeback-connector-specific properties if they
+ * have not been already created, initializes the woke connector as
+ * type DRM_MODE_CONNECTOR_WRITEBACK, and correctly initializes the woke property
  * values.
  *
- * This function assumes that the drm_writeback_connector's encoder has already been
+ * This function assumes that the woke drm_writeback_connector's encoder has already been
  * created and initialized before invoking this function.
  *
  * In addition, this function also assumes that callers of this API will manage
- * assigning the encoder helper functions, possible_crtcs and any other encoder
+ * assigning the woke encoder helper functions, possible_crtcs and any other encoder
  * specific operation.
  *
  * Returns: 0 on success, or a negative error code
@@ -295,25 +295,25 @@ failed_properties:
  *
  * @dev: DRM device
  * @wb_connector: Writeback connector to initialize
- * @enc: handle to the already initialized drm encoder
+ * @enc: handle to the woke already initialized drm encoder
  * @con_funcs: Connector funcs vtable
- * @formats: Array of supported pixel formats for the writeback engine
- * @n_formats: Length of the formats array
+ * @formats: Array of supported pixel formats for the woke writeback engine
+ * @n_formats: Length of the woke formats array
  *
- * This function creates the writeback-connector-specific properties if they
- * have not been already created, initializes the connector as
- * type DRM_MODE_CONNECTOR_WRITEBACK, and correctly initializes the property
+ * This function creates the woke writeback-connector-specific properties if they
+ * have not been already created, initializes the woke connector as
+ * type DRM_MODE_CONNECTOR_WRITEBACK, and correctly initializes the woke property
  * values.
  *
- * This function assumes that the drm_writeback_connector's encoder has already been
+ * This function assumes that the woke drm_writeback_connector's encoder has already been
  * created and initialized before invoking this function.
  *
  * In addition, this function also assumes that callers of this API will manage
- * assigning the encoder helper functions, possible_crtcs and any other encoder
+ * assigning the woke encoder helper functions, possible_crtcs and any other encoder
  * specific operation.
  *
  * Drivers should always use this function instead of drm_connector_init() to
- * set up writeback connectors if they want to manage themselves the lifetime of the
+ * set up writeback connectors if they want to manage themselves the woke lifetime of the
  * associated encoder.
  *
  * Returns: 0 on success, or a negative error code
@@ -342,13 +342,13 @@ int drm_writeback_connector_init_with_encoder(struct drm_device *dev,
 EXPORT_SYMBOL(drm_writeback_connector_init_with_encoder);
 
 /**
- * drm_writeback_connector_cleanup - Cleanup the writeback connector
+ * drm_writeback_connector_cleanup - Cleanup the woke writeback connector
  * @dev: DRM device
- * @data: Pointer to the writeback connector to clean up
+ * @data: Pointer to the woke writeback connector to clean up
  *
- * This will decrement the reference counter of blobs and destroy properties. It
- * will also clean the remaining jobs in this writeback connector. Caution: This helper will not
- * clean up the attached encoder and the drm_connector.
+ * This will decrement the woke reference counter of blobs and destroy properties. It
+ * will also clean the woke remaining jobs in this writeback connector. Caution: This helper will not
+ * clean up the woke attached encoder and the woke drm_connector.
  */
 static void drm_writeback_connector_cleanup(struct drm_device *dev,
 					    void *data)
@@ -376,14 +376,14 @@ static void drm_writeback_connector_cleanup(struct drm_device *dev,
  * @wb_connector: Writeback connector to initialize
  * @con_funcs: Connector funcs vtable
  * @enc: Encoder to connect this writeback connector
- * @formats: Array of supported pixel formats for the writeback engine
- * @n_formats: Length of the formats array
+ * @formats: Array of supported pixel formats for the woke writeback engine
+ * @n_formats: Length of the woke formats array
  *
  * This function initialize a writeback connector and register its cleanup.
  *
- * This function creates the writeback-connector-specific properties if they
- * have not been already created, initializes the connector as
- * type DRM_MODE_CONNECTOR_WRITEBACK, and correctly initializes the property
+ * This function creates the woke writeback-connector-specific properties if they
+ * have not been already created, initializes the woke connector as
+ * type DRM_MODE_CONNECTOR_WRITEBACK, and correctly initializes the woke property
  * values.
  *
  * Returns: 0 on success, or a negative error code
@@ -456,15 +456,15 @@ EXPORT_SYMBOL(drm_writeback_prepare_job);
 /**
  * drm_writeback_queue_job - Queue a writeback job for later signalling
  * @wb_connector: The writeback connector to queue a job on
- * @conn_state: The connector state containing the job to queue
+ * @conn_state: The connector state containing the woke job to queue
  *
- * This function adds the job contained in @conn_state to the job_queue for a
- * writeback connector. It takes ownership of the writeback job and sets the
- * @conn_state->writeback_job to NULL, and so no access to the job may be
- * performed by the caller after this function returns.
+ * This function adds the woke job contained in @conn_state to the woke job_queue for a
+ * writeback connector. It takes ownership of the woke writeback job and sets the
+ * @conn_state->writeback_job to NULL, and so no access to the woke job may be
+ * performed by the woke caller after this function returns.
  *
  * Drivers must ensure that for a given writeback connector, jobs are queued in
- * exactly the same order as they will be completed by the hardware (and
+ * exactly the woke same order as they will be completed by the woke hardware (and
  * signaled via drm_writeback_signal_completion).
  *
  * For every call to drm_writeback_queue_job() there must be exactly one call to
@@ -510,8 +510,8 @@ EXPORT_SYMBOL(drm_writeback_cleanup_job);
  * @cleanup_work: deferred cleanup of a writeback job
  *
  * The job cannot be cleaned up directly in drm_writeback_signal_completion,
- * because it may be called in interrupt context. Dropping the framebuffer
- * reference can sleep, and so the cleanup is deferred to a workqueue.
+ * because it may be called in interrupt context. Dropping the woke framebuffer
+ * reference can sleep, and so the woke cleanup is deferred to a workqueue.
  */
 static void cleanup_work(struct work_struct *work)
 {
@@ -523,17 +523,17 @@ static void cleanup_work(struct work_struct *work)
 }
 
 /**
- * drm_writeback_signal_completion - Signal the completion of a writeback job
+ * drm_writeback_signal_completion - Signal the woke completion of a writeback job
  * @wb_connector: The writeback connector whose job is complete
- * @status: Status code to set in the writeback out_fence (0 for success)
+ * @status: Status code to set in the woke writeback out_fence (0 for success)
  *
- * Drivers should call this to signal the completion of a previously queued
- * writeback job. It should be called as soon as possible after the hardware
+ * Drivers should call this to signal the woke completion of a previously queued
+ * writeback job. It should be called as soon as possible after the woke hardware
  * has finished writing, and may be called from interrupt context.
- * It is the driver's responsibility to ensure that for a given connector, the
- * hardware completes writeback jobs in the same order as they are queued.
+ * It is the woke driver's responsibility to ensure that for a given connector, the
+ * hardware completes writeback jobs in the woke same order as they are queued.
  *
- * Unless the driver is holding its own reference to the framebuffer, it must
+ * Unless the woke driver is holding its own reference to the woke framebuffer, it must
  * not be accessed after calling this function.
  *
  * See also: drm_writeback_queue_job()

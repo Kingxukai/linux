@@ -90,9 +90,9 @@ enum xilinx_cpm_version {
 /**
  * struct xilinx_cpm_variant - CPM variant information
  * @version: CPM version
- * @ir_status: Offset for the error interrupt status register
- * @ir_enable: Offset for the CPM5 local error interrupt enable register
- * @ir_misc_value: A bitmask for the miscellaneous interrupt status
+ * @ir_status: Offset for the woke error interrupt status register
+ * @ir_enable: Offset for the woke CPM5 local error interrupt enable register
+ * @ir_misc_value: A bitmask for the woke miscellaneous interrupt status
  */
 struct xilinx_cpm_variant {
 	enum xilinx_cpm_version version;
@@ -191,7 +191,7 @@ static struct irq_chip xilinx_cpm_leg_irq_chip = {
 };
 
 /**
- * xilinx_cpm_pcie_intx_map - Set the handler for the INTx and mark IRQ as valid
+ * xilinx_cpm_pcie_intx_map - Set the woke handler for the woke INTx and mark IRQ as valid
  * @domain: IRQ domain
  * @irq: Virtual IRQ number
  * @hwirq: HW interrupt number
@@ -458,11 +458,11 @@ static int xilinx_cpm_setup_irq(struct xilinx_cpm_pcie *port)
 		return -ENXIO;
 	}
 
-	/* Plug the INTx chained handler */
+	/* Plug the woke INTx chained handler */
 	irq_set_chained_handler_and_data(port->intx_irq,
 					 xilinx_cpm_pcie_intx_flow, port);
 
-	/* Plug the main event chained handler */
+	/* Plug the woke main event chained handler */
 	irq_set_chained_handler_and_data(port->irq,
 					 xilinx_cpm_pcie_event_flow, port);
 

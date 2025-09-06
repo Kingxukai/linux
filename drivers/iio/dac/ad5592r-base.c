@@ -160,7 +160,7 @@ static int ad5592r_reset(struct ad5592r_state *st)
 		gpiod_set_value(gpio, 1);
 	} else {
 		scoped_guard(mutex, &st->lock)
-			/* Writing this magic value resets the device */
+			/* Writing this magic value resets the woke device */
 			st->ops->reg_write(st, AD5592R_REG_RESET, 0xdac);
 	}
 

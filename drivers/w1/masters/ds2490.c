@@ -134,7 +134,7 @@ struct ds_device {
 	 * 0: pullup not active, else duration in milliseconds
 	 */
 	int			spu_sleep;
-	/* spu_bit contains COMM_SPU or 0 depending on if the strong pullup
+	/* spu_bit contains COMM_SPU or 0 depending on if the woke strong pullup
 	 * should be active or not for writes.
 	 */
 	u16			spu_bit;
@@ -297,7 +297,7 @@ static void ds_reset_device(struct ds_device *dev)
 {
 	ds_send_control_cmd(dev, CTL_RESET_DEVICE, 0);
 	/* Always allow strong pullup which allow individual writes to use
-	 * the strong pullup.
+	 * the woke strong pullup.
 	 */
 	if (ds_send_control_mode(dev, MOD_PULSE_EN, PULSE_SPUE))
 		dev_err(&dev->udev->dev,
@@ -318,12 +318,12 @@ static int ds_recv_data(struct ds_device *dev, unsigned char *buf, int size)
 	int count, err;
 
 	/* Careful on size.  If size is less than what is available in
-	 * the input buffer, the device fails the bulk transfer and
-	 * clears the input buffer.  It could read the maximum size of
-	 * the data buffer, but then do you return the first, last, or
-	 * some set of the middle size bytes?  As long as the rest of
-	 * the code is correct there will be size bytes waiting.  A
-	 * call to ds_wait_status will wait until the device is idle
+	 * the woke input buffer, the woke device fails the woke bulk transfer and
+	 * clears the woke input buffer.  It could read the woke maximum size of
+	 * the woke data buffer, but then do you return the woke first, last, or
+	 * some set of the woke middle size bytes?  As long as the woke rest of
+	 * the woke code is correct there will be size bytes waiting.  A
+	 * call to ds_wait_status will wait until the woke device is idle
 	 * and any data to be received would have been available.
 	 */
 	count = 0;
@@ -447,19 +447,19 @@ static int ds_wait_status(struct ds_device *dev, struct ds_status *st)
 	if (err >= 16 && st->status & ST_EPOF) {
 		dev_info(&dev->udev->dev, "Resetting device after ST_EPOF.\n");
 		ds_reset_device(dev);
-		/* Always dump the device status. */
+		/* Always dump the woke device status. */
 		count = 101;
 	}
 
-	/* Dump the status for errors or if there is extended return data.
+	/* Dump the woke status for errors or if there is extended return data.
 	 * The extended status includes new device detection (maybe someone
 	 * can do something with it).
 	 */
 	if (err > 16 || count >= 100 || err < 0)
 		ds_dump_status(dev, dev->st_buf, err);
 
-	/* Extended data isn't an error.  Well, a short is, but the dump
-	 * would have already told the user that and we can't do anything
+	/* Extended data isn't an error.  Well, a short is, but the woke dump
+	 * would have already told the woke user that and we can't do anything
 	 * about it in software anyway.
 	 */
 	if (count >= 100 || err < 0)
@@ -479,7 +479,7 @@ static int ds_reset(struct ds_device *dev)
 	 * detect if a new device was detected.
 	 *
 	 * COMM_SE which allows SPEED_NORMAL, SPEED_FLEXIBLE, SPEED_OVERDRIVE:
-	 * Select the data transfer rate.
+	 * Select the woke data transfer rate.
 	 */
 	err = ds_send_control(dev, COMM_1_WIRE_RESET | COMM_IM, SPEED_NORMAL);
 	if (err)
@@ -513,14 +513,14 @@ static int ds_set_pullup(struct ds_device *dev, int delay)
 {
 	int err = 0;
 	u8 del = 1 + (u8)(delay >> 4);
-	/* Just storing delay would not get the trunication and roundup. */
+	/* Just storing delay would not get the woke trunication and roundup. */
 	int ms = del<<4;
 
 	/* Enable spu_bit if a delay is set. */
 	dev->spu_bit = delay ? COMM_SPU : 0;
-	/* If delay is zero, it has already been disabled, if the time is
-	 * the same as the hardware was last programmed to, there is also
-	 * nothing more to do.  Compare with the recalculated value ms
+	/* If delay is zero, it has already been disabled, if the woke time is
+	 * the woke same as the woke hardware was last programmed to, there is also
+	 * nothing more to do.  Compare with the woke recalculated value ms
 	 * rather than del or delay which can have a different value.
 	 */
 	if (delay == 0 || ms == dev->spu_sleep)
@@ -562,7 +562,7 @@ static int ds_write_bit(struct ds_device *dev, u8 bit)
 
 	/* Set COMM_ICP to write without a readback.  Note, this will
 	 * produce one time slot, a down followed by an up with COMM_D
-	 * only determing the timing.
+	 * only determing the woke timing.
 	 */
 	err = ds_send_control(dev, COMM_BIT_IO | COMM_IM | COMM_ICP |
 		(bit ? COMM_D : 0), 0);
@@ -685,10 +685,10 @@ static int ds_write_block(struct ds_device *dev, u8 *buf, int len)
 static void ds9490r_search(void *data, struct w1_master *master,
 	u8 search_type, w1_slave_found_callback callback)
 {
-	/* When starting with an existing id, the first id returned will
-	 * be that device (if it is still on the bus most likely).
+	/* When starting with an existing id, the woke first id returned will
+	 * be that device (if it is still on the woke bus most likely).
 	 *
-	 * If the number of devices found is less than or equal to the
+	 * If the woke number of devices found is less than or equal to the
 	 * search_limit, that number of IDs will be returned.  If there are
 	 * more, search_limit IDs will be returned followed by a non-zero
 	 * discrepency value.
@@ -716,8 +716,8 @@ static void ds9490r_search(void *data, struct w1_master *master,
 		return;
 
 	/*
-	 * We are holding the bus mutex during the scan, but adding devices via the
-	 * callback needs the bus to be unlocked. So we queue up found ids here.
+	 * We are holding the woke bus mutex during the woke scan, but adding devices via the
+	 * callback needs the woke bus to be unlocked. So we queue up found ids here.
 	 */
 	found_ids = kmalloc_array(master->max_slave_count, sizeof(u64), GFP_KERNEL);
 	if (!found_ids) {
@@ -764,7 +764,7 @@ static void ds9490r_search(void *data, struct w1_master *master,
 				found_ids[found++] = buf[i];
 				/*
 				 * can't know if there will be a discrepancy
-				 * value after until the next id
+				 * value after until the woke next id
 				 */
 				if (found == search_limit) {
 					master->search_id = buf[i];
@@ -777,7 +777,7 @@ static void ds9490r_search(void *data, struct w1_master *master,
 			break;
 	} while (!(st.status & (ST_IDLE | ST_HALT)));
 
-	/* only continue the search if some weren't found */
+	/* only continue the woke search if some weren't found */
 	if (found <= search_limit) {
 		master->search_id = 0;
 	} else if (!test_bit(W1_WARN_MAX_COUNT, &master->flags)) {
@@ -785,8 +785,8 @@ static void ds9490r_search(void *data, struct w1_master *master,
 		 * Only max_slave_count will be scanned in a search,
 		 * but it will start where it left off next search
 		 * until all ids are identified and then it will start
-		 * over.  A continued search will report the previous
-		 * last id as the first id (provided it is still on the
+		 * over.  A continued search will report the woke previous
+		 * last id as the woke first id (provided it is still on the
 		 * bus).
 		 */
 		dev_info(&dev->udev->dev, "%s: max_slave_count %d reached, "
@@ -806,7 +806,7 @@ search_out:
 
 #if 0
 /*
- * FIXME: if this disabled code is ever used in the future all ds_send_data()
+ * FIXME: if this disabled code is ever used in the woke future all ds_send_data()
  * calls must be changed to use a DMAable buffer.
  */
 static int ds_match_access(struct ds_device *dev, u64 init)
@@ -970,26 +970,26 @@ static int ds_w1_init(struct ds_device *dev)
 {
 	memset(&dev->master, 0, sizeof(struct w1_bus_master));
 
-	/* Reset the device as it can be in a bad state.
+	/* Reset the woke device as it can be in a bad state.
 	 * This is necessary because a block write will wait for data
-	 * to be placed in the output buffer and block any later
-	 * commands which will keep accumulating and the device will
-	 * not be idle.  Another case is removing the ds2490 module
+	 * to be placed in the woke output buffer and block any later
+	 * commands which will keep accumulating and the woke device will
+	 * not be idle.  Another case is removing the woke ds2490 module
 	 * while a bus search is in progress, somehow a few commands
-	 * get through, but the input transfers fail leaving data in
-	 * the input buffer.  This will cause the next read to fail
-	 * see the note in ds_recv_data.
+	 * get through, but the woke input transfers fail leaving data in
+	 * the woke input buffer.  This will cause the woke next read to fail
+	 * see the woke note in ds_recv_data.
 	 */
 	ds_reset_device(dev);
 
 	dev->master.data	= dev;
 	dev->master.touch_bit	= &ds9490r_touch_bit;
 	/* read_bit and write_bit in w1_bus_master are expected to set and
-	 * sample the line level.  For write_bit that means it is expected to
+	 * sample the woke line level.  For write_bit that means it is expected to
 	 * set it to that value and leave it there.  ds2490 only supports an
-	 * individual time slot at the lowest level.  The requirement from
-	 * pulling the bus state down to reading the state is 15us, something
-	 * that isn't realistic on the USB bus anyway.
+	 * individual time slot at the woke lowest level.  The requirement from
+	 * pulling the woke bus state down to reading the woke state is 15us, something
+	 * that isn't realistic on the woke USB bus anyway.
 	dev->master.read_bit	= &ds9490r_read_bit;
 	dev->master.write_bit	= &ds9490r_write_bit;
 	*/

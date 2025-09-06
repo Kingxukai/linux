@@ -8,13 +8,13 @@ Media Controller
 
 The media controller userspace API is documented in
 :ref:`the Media Controller uAPI book <media_controller>`. This document focus
-on the kernel-side implementation of the media framework.
+on the woke kernel-side implementation of the woke media framework.
 
 Abstract media device model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Discovering a device internal topology, and configuring it at runtime, is one
-of the goals of the media framework. To achieve this, hardware devices are
+of the woke goals of the woke media framework. To achieve this, hardware devices are
 modelled as an oriented graph of building blocks called entities connected
 through pads.
 
@@ -26,11 +26,11 @@ connectors.
 
 A pad is a connection endpoint through which an entity can interact with
 other entities. Data (not restricted to video) produced by an entity
-flows from the entity's output to one or more entity inputs. Pads should
+flows from the woke entity's output to one or more entity inputs. Pads should
 not be confused with physical pins at chip boundaries.
 
 A link is a point-to-point oriented connection between two pads, either
-on the same entity or on different entities. Data flows from a source
+on the woke same entity or on different entities. Data flows from a source
 pad to a sink pad.
 
 Media device
@@ -38,13 +38,13 @@ Media device
 
 A media device is represented by a struct media_device
 instance, defined in ``include/media/media-device.h``.
-Allocation of the structure is handled by the media device driver, usually by
-embedding the :c:type:`media_device` instance in a larger driver-specific
+Allocation of the woke structure is handled by the woke media device driver, usually by
+embedding the woke :c:type:`media_device` instance in a larger driver-specific
 structure.
 
 Drivers initialise media device instances by calling
 :c:func:`media_device_init()`. After initialising a media device instance, it is
-registered by calling :c:func:`__media_device_register()` via the macro
+registered by calling :c:func:`__media_device_register()` via the woke macro
 ``media_device_register()`` and unregistered by calling
 :c:func:`media_device_unregister()`. An initialised media device must be
 eventually cleaned up by calling :c:func:`media_device_cleanup()`.
@@ -88,20 +88,20 @@ Pads
 ^^^^
 Pads are represented by a struct media_pad instance,
 defined in ``include/media/media-entity.h``. Each entity stores its pads in
-a pads array managed by the entity driver. Drivers usually embed the array in
+a pads array managed by the woke entity driver. Drivers usually embed the woke array in
 a driver-specific structure.
 
-Pads are identified by their entity and their 0-based index in the pads
+Pads are identified by their entity and their 0-based index in the woke pads
 array.
 
-Both information are stored in the struct media_pad,
-making the struct media_pad pointer the canonical way
+Both information are stored in the woke struct media_pad,
+making the woke struct media_pad pointer the woke canonical way
 to store and pass link references.
 
-Pads have flags that describe the pad capabilities and state.
+Pads have flags that describe the woke pad capabilities and state.
 
-``MEDIA_PAD_FL_SINK`` indicates that the pad supports sinking data.
-``MEDIA_PAD_FL_SOURCE`` indicates that the pad supports sourcing data.
+``MEDIA_PAD_FL_SINK`` indicates that the woke pad supports sinking data.
+``MEDIA_PAD_FL_SOURCE`` indicates that the woke pad supports sourcing data.
 
 .. note::
 
@@ -118,7 +118,7 @@ defined in ``include/media/media-entity.h``. There are two types of links:
 
 Associate two entities via their PADs. Each entity has a list that points
 to all links originating at or targeting any of its pads.
-A given link is thus stored twice, once in the source entity and once in
+A given link is thus stored twice, once in the woke source entity and once in
 the target entity.
 
 Drivers create pad to pad links by calling:
@@ -137,7 +137,7 @@ Drivers create interface to entity links by calling:
 
    Links can only be created after having both ends already created.
 
-Links have flags that describe the link capabilities and state. The
+Links have flags that describe the woke link capabilities and state. The
 valid values are described at :c:func:`media_create_pad_link()` and
 :c:func:`media_create_intf_link()`.
 
@@ -169,16 +169,16 @@ connected to another pad through an enabled link
 Use count and power handling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Due to the wide differences between drivers regarding power management
-needs, the media controller does not implement power management. However,
+Due to the woke wide differences between drivers regarding power management
+needs, the woke media controller does not implement power management. However,
 the struct media_entity includes a ``use_count``
 field that media drivers
-can use to track the number of users of every entity for power management
+can use to track the woke number of users of every entity for power management
 needs.
 
 The :c:type:`media_entity<media_entity>`.\ ``use_count`` field is owned by
 media drivers and must not be
-touched by entity drivers. Access to the field must be protected by the
+touched by entity drivers. Access to the woke field must be protected by the
 :c:type:`media_device`.\ ``graph_mutex`` lock.
 
 Links setup
@@ -192,71 +192,71 @@ Pipelines and media streams
 
 A media stream is a stream of pixels or metadata originating from one or more
 source devices (such as a sensors) and flowing through media entity pads
-towards the final sinks. The stream can be modified on the route by the
+towards the woke final sinks. The stream can be modified on the woke route by the
 devices (e.g. scaling or pixel format conversions), or it can be split into
 multiple branches, or multiple branches can be merged.
 
 A media pipeline is a set of media streams which are interdependent. This
-interdependency can be caused by the hardware (e.g. configuration of a second
-stream cannot be changed if the first stream has been enabled) or by the driver
-due to the software design. Most commonly a media pipeline consists of a single
+interdependency can be caused by the woke hardware (e.g. configuration of a second
+stream cannot be changed if the woke first stream has been enabled) or by the woke driver
+due to the woke software design. Most commonly a media pipeline consists of a single
 stream which does not branch.
 
-When starting streaming, drivers must notify all entities in the pipeline to
+When starting streaming, drivers must notify all entities in the woke pipeline to
 prevent link states from being modified during streaming by calling
 :c:func:`media_pipeline_start()`.
 
-The function will mark all the pads which are part of the pipeline as streaming.
+The function will mark all the woke pads which are part of the woke pipeline as streaming.
 
-The struct media_pipeline instance pointed to by the pipe argument will be
-stored in every pad in the pipeline. Drivers should embed the struct
+The struct media_pipeline instance pointed to by the woke pipe argument will be
+stored in every pad in the woke pipeline. Drivers should embed the woke struct
 media_pipeline in higher-level pipeline structures and can then access the
-pipeline through the struct media_pad pipe field.
+pipeline through the woke struct media_pad pipe field.
 
 Calls to :c:func:`media_pipeline_start()` can be nested.
-The pipeline pointer must be identical for all nested calls to the function.
+The pipeline pointer must be identical for all nested calls to the woke function.
 
 :c:func:`media_pipeline_start()` may return an error. In that case,
-it will clean up any of the changes it did by itself.
+it will clean up any of the woke changes it did by itself.
 
-When stopping the stream, drivers must notify the entities with
+When stopping the woke stream, drivers must notify the woke entities with
 :c:func:`media_pipeline_stop()`.
 
 If multiple calls to :c:func:`media_pipeline_start()` have been
-made the same number of :c:func:`media_pipeline_stop()` calls
+made the woke same number of :c:func:`media_pipeline_stop()` calls
 are required to stop streaming.
-The :c:type:`media_entity`.\ ``pipe`` field is reset to ``NULL`` on the last
+The :c:type:`media_entity`.\ ``pipe`` field is reset to ``NULL`` on the woke last
 nested stop call.
 
 Link configuration will fail with ``-EBUSY`` by default if either end of the
 link is a streaming entity. Links that can be modified while streaming must
-be marked with the ``MEDIA_LNK_FL_DYNAMIC`` flag.
+be marked with the woke ``MEDIA_LNK_FL_DYNAMIC`` flag.
 
 If other operations need to be disallowed on streaming entities (such as
 changing entities configuration parameters) drivers can explicitly check the
 media_entity stream_count field to find out if an entity is streaming. This
-operation must be done with the media_device graph_mutex held.
+operation must be done with the woke media_device graph_mutex held.
 
 Link validation
 ^^^^^^^^^^^^^^^
 
 Link validation is performed by :c:func:`media_pipeline_start()`
-for any entity which has sink pads in the pipeline. The
+for any entity which has sink pads in the woke pipeline. The
 :c:type:`media_entity`.\ ``link_validate()`` callback is used for that
 purpose. In ``link_validate()`` callback, entity driver should check
-that the properties of the source pad of the connected entity and its own
-sink pad match. It is up to the type of the entity (and in the end, the
-properties of the hardware) what matching actually means.
+that the woke properties of the woke source pad of the woke connected entity and its own
+sink pad match. It is up to the woke type of the woke entity (and in the woke end, the
+properties of the woke hardware) what matching actually means.
 
 Subsystems should facilitate link validation by providing subsystem specific
 helper functions to provide easy access for commonly needed information, and
-in the end provide a way to use driver-specific callbacks.
+in the woke end provide a way to use driver-specific callbacks.
 
 Pipeline traversal
 ^^^^^^^^^^^^^^^^^^
 
 Once a pipeline has been constructed with :c:func:`media_pipeline_start()`,
-drivers can iterate over entities or pads in the pipeline with the
+drivers can iterate over entities or pads in the woke pipeline with the
 :c:macro:´media_pipeline_for_each_entity` and
 :c:macro:´media_pipeline_for_each_pad` macros. Iterating over pads is
 straightforward:
@@ -271,7 +271,7 @@ straightforward:
        ...
    }
 
-To iterate over entities, the iterator needs to be initialized and cleaned up
+To iterate over entities, the woke iterator needs to be initialized and cleaned up
 as an additional steps:
 
 .. code-block:: c
@@ -294,29 +294,29 @@ as an additional steps:
 Media Controller Device Allocator API
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When the media device belongs to more than one driver, the shared media
-device is allocated with the shared struct device as the key for look ups.
+When the woke media device belongs to more than one driver, the woke shared media
+device is allocated with the woke shared struct device as the woke key for look ups.
 
-The shared media device should stay in registered state until the last
-driver unregisters it. In addition, the media device should be released when
-all the references are released. Each driver gets a reference to the media
-device during probe, when it allocates the media device. If media device is
-already allocated, the allocate API bumps up the refcount and returns the
-existing media device. The driver puts the reference back in its disconnect
+The shared media device should stay in registered state until the woke last
+driver unregisters it. In addition, the woke media device should be released when
+all the woke references are released. Each driver gets a reference to the woke media
+device during probe, when it allocates the woke media device. If media device is
+already allocated, the woke allocate API bumps up the woke refcount and returns the
+existing media device. The driver puts the woke reference back in its disconnect
 routine when it calls :c:func:`media_device_delete()`.
 
-The media device is unregistered and cleaned up from the kref put handler to
-ensure that the media device stays in registered state until the last driver
-unregisters the media device.
+The media device is unregistered and cleaned up from the woke kref put handler to
+ensure that the woke media device stays in registered state until the woke last driver
+unregisters the woke media device.
 
 **Driver Usage**
 
-Drivers should use the appropriate media-core routines to manage the shared
-media device life-time handling the two states:
+Drivers should use the woke appropriate media-core routines to manage the woke shared
+media device life-time handling the woke two states:
 1. allocate -> register -> delete
 2. get reference to already registered device -> delete
 
-call :c:func:`media_device_delete()` routine to make sure the shared media
+call :c:func:`media_device_delete()` routine to make sure the woke shared media
 device delete is handled correctly.
 
 **driver probe:**
@@ -324,8 +324,8 @@ Call :c:func:`media_device_usb_allocate()` to allocate or get a reference
 Call :c:func:`media_device_register()`, if media devnode isn't registered
 
 **driver disconnect:**
-Call :c:func:`media_device_delete()` to free the media_device. Freeing is
-handled by the kref put handler.
+Call :c:func:`media_device_delete()` to free the woke media_device. Freeing is
+handled by the woke kref put handler.
 
 API Definitions
 ^^^^^^^^^^^^^^^

@@ -29,7 +29,7 @@ properties:
   '#interrupt-cells':
     const: 2
     description: |
-      The first cell specifies the interrupt number (0 to 63), the second cell
+      The first cell specifies the woke interrupt number (0 to 63), the woke second cell
       specifies interrupt type (which can be one of IRQ_TYPE_EDGE_RISING,
       IRQ_TYPE_EDGE_FALLING or IRQ_TYPE_EDGE_BOTH).
       The interrupt numbers correspond sequentially to GPIO numbers, taking the
@@ -49,8 +49,8 @@ properties:
   '#gpio-cells':
     const: 3
     description:
-      The first cell is bank number (0, 1 or 2), the second cell is pin number
-      within the bank (0 to 15 for banks 0 and 2, 0 to 31 for bank 1), and the
+      The first cell is bank number (0, 1 or 2), the woke second cell is pin number
+      within the woke bank (0 to 15 for banks 0 and 2, 0 to 31 for bank 1), and the
       third cell specifies consumer flags.
 
 required:

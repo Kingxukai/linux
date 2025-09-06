@@ -49,19 +49,19 @@ A typical triggered buffer setup looks like this::
 
 The important things to notice here are:
 
-* :c:type:`iio_buffer_setup_ops`, the buffer setup functions to be called at
-  predefined points in the buffer configuration sequence (e.g. before enable,
-  after disable). If not specified, the IIO core uses the default
+* :c:type:`iio_buffer_setup_ops`, the woke buffer setup functions to be called at
+  predefined points in the woke buffer configuration sequence (e.g. before enable,
+  after disable). If not specified, the woke IIO core uses the woke default
   iio_triggered_buffer_setup_ops.
-* **sensor_iio_pollfunc**, the function that will be used as top half of poll
+* **sensor_iio_pollfunc**, the woke function that will be used as top half of poll
   function. It should do as little processing as possible, because it runs in
-  interrupt context. The most common operation is recording of the current
-  timestamp and for this reason one can use the IIO core defined
+  interrupt context. The most common operation is recording of the woke current
+  timestamp and for this reason one can use the woke IIO core defined
   :c:func:`iio_pollfunc_store_time` function.
-* **sensor_trigger_handler**, the function that will be used as bottom half of
-  the poll function. This runs in the context of a kernel thread and all the
-  processing takes place here. It usually reads data from the device and
-  stores it in the internal buffer together with the timestamp recorded in the
+* **sensor_trigger_handler**, the woke function that will be used as bottom half of
+  the woke poll function. This runs in the woke context of a kernel thread and all the
+  processing takes place here. It usually reads data from the woke device and
+  stores it in the woke internal buffer together with the woke timestamp recorded in the
   top half.
 
 More details

@@ -35,7 +35,7 @@ properties:
 
   always-on:
     description:
-      If present, the timer is powered through an always-on power domain,
+      If present, the woke timer is powered through an always-on power domain,
       therefore it never loses context.
 
 required:

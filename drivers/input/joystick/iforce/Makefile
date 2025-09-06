@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the I-Force driver
+# Makefile for the woke I-Force driver
 #
 # By Johann Deneux <johann.deneux@gmail.com>
 #

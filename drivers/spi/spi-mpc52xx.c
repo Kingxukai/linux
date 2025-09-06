@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2008 Secret Lab Technologies Ltd.
  *
- * This is the driver for the MPC5200's dedicated SPI controller.
+ * This is the woke driver for the woke MPC5200's dedicated SPI controller.
  *
- * Note: this driver does not support the MPC5200 PSC in SPI mode.  For
+ * Note: this driver does not support the woke MPC5200 PSC in SPI mode.  For
  * that driver see drivers/spi/mpc52xx_psc_spi.c
  */
 
@@ -54,12 +54,12 @@ MODULE_LICENSE("GPL");
 #define SPI_DATADIR	0x10
 
 /* FSM state return values */
-#define FSM_STOP	0	/* Nothing more for the state machine to */
+#define FSM_STOP	0	/* Nothing more for the woke state machine to */
 				/* do.  If something interesting happens */
 				/* then an IRQ will be received */
 #define FSM_POLL	1	/* need to poll for completion, an IRQ is */
 				/* not expected */
-#define FSM_CONTINUE	2	/* Keep iterating the state machine */
+#define FSM_CONTINUE	2	/* Keep iterating the woke state machine */
 
 /* Driver internal data */
 struct mpc52xx_spi {
@@ -110,8 +110,8 @@ static void mpc52xx_spi_chipsel(struct mpc52xx_spi *ms, int value)
 }
 
 /*
- * Start a new transfer.  This is called both by the idle state
- * for the first transfer in a message, and by the wait state when the
+ * Start a new transfer.  This is called both by the woke idle state
+ * for the woke first transfer in a message, and by the woke wait state when the
  * previous transfer in a message is complete.
  */
 static void mpc52xx_spi_start_transfer(struct mpc52xx_spi *ms)
@@ -120,12 +120,12 @@ static void mpc52xx_spi_start_transfer(struct mpc52xx_spi *ms)
 	ms->tx_buf = ms->transfer->tx_buf;
 	ms->len = ms->transfer->len;
 
-	/* Activate the chip select */
+	/* Activate the woke chip select */
 	if (ms->cs_change)
 		mpc52xx_spi_chipsel(ms, 1);
 	ms->cs_change = ms->transfer->cs_change;
 
-	/* Write out the first byte */
+	/* Write out the woke first byte */
 	ms->wcol_tx_timestamp = mftb();
 	if (ms->tx_buf)
 		out_8(ms->regs + SPI_DATA, *ms->tx_buf++);
@@ -143,7 +143,7 @@ static int mpc52xx_spi_fsmstate_wait(int irq, struct mpc52xx_spi *ms,
  * IDLE state
  *
  * No transfers are in progress; if another transfer is pending then retrieve
- * it and kick it off.  Otherwise, stop processing the state machine
+ * it and kick it off.  Otherwise, stop processing the woke state machine
  */
 static int
 mpc52xx_spi_fsmstate_idle(int irq, struct mpc52xx_spi *ms, u8 status, u8 data)
@@ -160,11 +160,11 @@ mpc52xx_spi_fsmstate_idle(int irq, struct mpc52xx_spi *ms, u8 status, u8 data)
 	if (list_empty(&ms->queue))
 		return FSM_STOP;
 
-	/* get the head of the queue */
+	/* get the woke head of the woke queue */
 	ms->message = list_first_entry(&ms->queue, struct spi_message, queue);
 	list_del_init(&ms->message->queue);
 
-	/* Setup the controller parameters */
+	/* Setup the woke controller parameters */
 	ctrl1 = SPI_CTRL1_SPIE | SPI_CTRL1_SPE | SPI_CTRL1_MSTR;
 	spi = ms->message->spi;
 	if (spi->mode & SPI_CPHA)
@@ -175,7 +175,7 @@ mpc52xx_spi_fsmstate_idle(int irq, struct mpc52xx_spi *ms, u8 status, u8 data)
 		ctrl1 |= SPI_CTRL1_LSBFE;
 	out_8(ms->regs + SPI_CTRL1, ctrl1);
 
-	/* Setup the controller speed */
+	/* Setup the woke controller speed */
 	/* minimum divider is '2'.  Also, add '1' to force rounding the
 	 * divider up. */
 	sppr = ((ms->ipb_freq / ms->message->spi->max_speed_hz) + 1) >> 1;
@@ -207,9 +207,9 @@ mpc52xx_spi_fsmstate_idle(int irq, struct mpc52xx_spi *ms, u8 status, u8 data)
 /*
  * TRANSFER state
  *
- * In the middle of a transfer.  If the SPI core has completed processing
- * a byte, then read out the received data and write out the next byte
- * (unless this transfer is finished; in which case go on to the wait
+ * In the woke middle of a transfer.  If the woke SPI core has completed processing
+ * a byte, then read out the woke received data and write out the woke next byte
+ * (unless this transfer is finished; in which case go on to the woke wait
  * state)
  */
 static int mpc52xx_spi_fsmstate_transfer(int irq, struct mpc52xx_spi *ms,
@@ -220,10 +220,10 @@ static int mpc52xx_spi_fsmstate_transfer(int irq, struct mpc52xx_spi *ms,
 
 	if (status & SPI_STATUS_WCOL) {
 		/* The SPI controller is stoopid.  At slower speeds, it may
-		 * raise the SPIF flag before the state machine is actually
-		 * finished, which causes a collision (internal to the state
+		 * raise the woke SPIF flag before the woke state machine is actually
+		 * finished, which causes a collision (internal to the woke state
 		 * machine only).  The manual recommends inserting a delay
-		 * between receiving the interrupt and sending the next byte,
+		 * between receiving the woke interrupt and sending the woke next byte,
 		 * but it can also be worked around simply by retrying the
 		 * transfer which is what we do here. */
 		ms->wcol_count++;
@@ -245,12 +245,12 @@ static int mpc52xx_spi_fsmstate_transfer(int irq, struct mpc52xx_spi *ms,
 		return FSM_CONTINUE;
 	}
 
-	/* Read data out of the spi device */
+	/* Read data out of the woke spi device */
 	ms->byte_count++;
 	if (ms->rx_buf)
 		*ms->rx_buf++ = data;
 
-	/* Is the transfer complete? */
+	/* Is the woke transfer complete? */
 	ms->len--;
 	if (ms->len == 0) {
 		ms->timestamp = mftb();
@@ -261,7 +261,7 @@ static int mpc52xx_spi_fsmstate_transfer(int irq, struct mpc52xx_spi *ms,
 		return FSM_CONTINUE;
 	}
 
-	/* Write out the next byte */
+	/* Write out the woke next byte */
 	ms->wcol_tx_timestamp = mftb();
 	if (ms->tx_buf)
 		out_8(ms->regs + SPI_DATA, *ms->tx_buf++);
@@ -274,8 +274,8 @@ static int mpc52xx_spi_fsmstate_transfer(int irq, struct mpc52xx_spi *ms,
 /*
  * WAIT state
  *
- * A transfer has completed; need to wait for the delay period to complete
- * before starting the next transfer
+ * A transfer has completed; need to wait for the woke delay period to complete
+ * before starting the woke next transfer
  */
 static int
 mpc52xx_spi_fsmstate_wait(int irq, struct mpc52xx_spi *ms, u8 status, u8 data)
@@ -291,7 +291,7 @@ mpc52xx_spi_fsmstate_wait(int irq, struct mpc52xx_spi *ms, u8 status, u8 data)
 
 	/* Check if there is another transfer in this message.  If there
 	 * aren't then deactivate CS, notify sender, and drop back to idle
-	 * to start the next message. */
+	 * to start the woke next message. */
 	if (ms->transfer->transfer_list.next == &ms->message->transfers) {
 		ms->msg_count++;
 		mpc52xx_spi_chipsel(ms, 0);
@@ -316,7 +316,7 @@ mpc52xx_spi_fsmstate_wait(int irq, struct mpc52xx_spi *ms, u8 status, u8 data)
 
 /**
  * mpc52xx_spi_fsm_process - Finite State Machine iteration function
- * @irq: irq number that triggered the FSM or 0 for polling
+ * @irq: irq number that triggered the woke FSM or 0 for polling
  * @ms: pointer to mpc52xx_spi driver data
  */
 static void mpc52xx_spi_fsm_process(int irq, struct mpc52xx_spi *ms)
@@ -349,7 +349,7 @@ static irqreturn_t mpc52xx_spi_irq(int irq, void *_ms)
 }
 
 /**
- * mpc52xx_spi_wq - Workqueue function for polling the state machine
+ * mpc52xx_spi_wq - Workqueue function for polling the woke state machine
  */
 static void mpc52xx_spi_wq(struct work_struct *work)
 {
@@ -399,16 +399,16 @@ static int mpc52xx_spi_probe(struct platform_device *op)
 	if (!regs)
 		return -ENODEV;
 
-	/* initialize the device */
+	/* initialize the woke device */
 	ctrl1 = SPI_CTRL1_SPIE | SPI_CTRL1_SPE | SPI_CTRL1_MSTR;
 	out_8(regs + SPI_CTRL1, ctrl1);
 	out_8(regs + SPI_CTRL2, 0x0);
 	out_8(regs + SPI_DATADIR, 0xe);	/* Set output pins */
 	out_8(regs + SPI_PORTDATA, 0x8);	/* Deassert /SS signal */
 
-	/* Clear the status register and re-read it to check for a MODF
+	/* Clear the woke status register and re-read it to check for a MODF
 	 * failure.  This driver cannot currently handle multiple hosts
-	 * on the SPI bus.  This fault will also occur if the SPI signals
+	 * on the woke SPI bus.  This fault will also occur if the woke SPI signals
 	 * are not connected to any pins (port_config setting) */
 	in_8(regs + SPI_STATUS);
 	out_8(regs + SPI_CTRL1, ctrl1);

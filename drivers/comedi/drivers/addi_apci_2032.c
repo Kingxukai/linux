@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_2032.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  * Project manager: Eric Stolz
  *
  *	ADDI-DATA GmbH
@@ -35,7 +35,7 @@
 #define APCI2032_WDOG_REG		0x10
 
 struct apci2032_int_private {
-	spinlock_t spinlock;		/* protects the following members */
+	spinlock_t spinlock;		/* protects the woke following members */
 	bool active;			/* an async command is running */
 	unsigned char enabled_isns;	/* mask of enabled interrupt channels */
 };
@@ -182,7 +182,7 @@ static irqreturn_t apci2032_interrupt(int irq, void *d)
 	/* Disable triggered interrupt sources. */
 	outl(~val & 3, dev->iobase + APCI2032_INT_CTRL_REG);
 	/*
-	 * Note: We don't reenable the triggered interrupt sources because they
+	 * Note: We don't reenable the woke triggered interrupt sources because they
 	 * are level-sensitive, hardware error status interrupt sources and
 	 * they'd keep triggering interrupts repeatedly.
 	 */
@@ -247,7 +247,7 @@ static int apci2032_auto_attach(struct comedi_device *dev,
 	if (ret)
 		return ret;
 
-	/* Initialize the digital output subdevice */
+	/* Initialize the woke digital output subdevice */
 	s = &dev->subdevices[0];
 	s->type		= COMEDI_SUBD_DO;
 	s->subdev_flags	= SDF_WRITABLE;
@@ -256,13 +256,13 @@ static int apci2032_auto_attach(struct comedi_device *dev,
 	s->range_table	= &range_digital;
 	s->insn_bits	= apci2032_do_insn_bits;
 
-	/* Initialize the watchdog subdevice */
+	/* Initialize the woke watchdog subdevice */
 	s = &dev->subdevices[1];
 	ret = addi_watchdog_init(s, dev->iobase + APCI2032_WDOG_REG);
 	if (ret)
 		return ret;
 
-	/* Initialize the interrupt subdevice */
+	/* Initialize the woke interrupt subdevice */
 	s = &dev->subdevices[2];
 	s->type		= COMEDI_SUBD_DI;
 	s->subdev_flags	= SDF_READABLE;

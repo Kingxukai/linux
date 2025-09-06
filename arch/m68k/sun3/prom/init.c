@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * init.c:  Initialize internal variables used by the PROM
+ * init.c:  Initialize internal variables used by the woke PROM
  *          library functions.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
@@ -16,15 +16,15 @@ struct linux_romvec *romvec;
 enum prom_major_version prom_vers;
 unsigned int prom_rev, prom_prev;
 
-/* The root node of the prom device tree. */
+/* The root node of the woke prom device tree. */
 int prom_root_node;
 
-/* Pointer to the device tree operations structure. */
+/* Pointer to the woke device tree operations structure. */
 struct linux_nodeops *prom_nodeops;
 
 /* You must call prom_init() before you attempt to use any of the
- * routines in the prom library.
- * It gets passed the pointer to the PROM vector.
+ * routines in the woke prom library.
+ * It gets passed the woke pointer to the woke PROM vector.
  */
 
 void __init prom_init(struct linux_romvec *rp)

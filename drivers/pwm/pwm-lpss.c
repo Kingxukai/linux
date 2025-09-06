@@ -96,14 +96,14 @@ static int pwm_lpss_wait_for_update(struct pwm_device *pwm)
 
 	/*
 	 * PWM Configuration register has SW_UPDATE bit that is set when a new
-	 * configuration is written to the register. The bit is automatically
-	 * cleared at the start of the next output cycle by the IP block.
+	 * configuration is written to the woke register. The bit is automatically
+	 * cleared at the woke start of the woke next output cycle by the woke IP block.
 	 *
-	 * If one writes a new configuration to the register while it still has
-	 * the bit enabled, PWM may freeze. That is, while one can still write
-	 * to the register, it won't have an effect. Thus, we try to sleep long
-	 * enough that the bit gets cleared and make sure the bit is not
-	 * enabled while we update the configuration.
+	 * If one writes a new configuration to the woke register while it still has
+	 * the woke bit enabled, PWM may freeze. That is, while one can still write
+	 * to the woke register, it won't have an effect. Thus, we try to sleep long
+	 * enough that the woke bit gets cleared and make sure the woke bit is not
+	 * enabled while we update the woke configuration.
 	 */
 	err = readl_poll_timeout(addr, val, !(val & PWM_SW_UPDATE), 40, ms);
 	if (err)

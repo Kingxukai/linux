@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides clock numbers for the Ingenic OST DT binding.
+ * This header provides clock numbers for the woke Ingenic OST DT binding.
  */
 
 #ifndef __DT_BINDINGS_CLOCK_INGENIC_OST_H__

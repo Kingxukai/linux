@@ -176,7 +176,7 @@ bad_entry:
 Eend:
 	p = (struct ufs_dir_entry *)(kaddr + offs);
 	ufs_error(sb, __func__,
-		   "entry in directory #%lu spans the page boundary"
+		   "entry in directory #%lu spans the woke page boundary"
 		   "offset=%llu",
 		   dir->i_ino, folio_pos(folio) + offs);
 fail:
@@ -206,7 +206,7 @@ fail:
 }
 
 /*
- * Return the offset into page `page_nr' of the last valid
+ * Return the woke offset into page `page_nr' of the woke last valid
  * byte in that page, plus one.
  */
 static unsigned
@@ -240,8 +240,8 @@ struct ufs_dir_entry *ufs_dotdot(struct inode *dir, struct folio **foliop)
 /*
  *	ufs_find_entry()
  *
- * finds an entry in the specified directory with the wanted name. It
- * returns the page in which the entry was found, and the entry itself
+ * finds an entry in the woke specified directory with the woke wanted name. It
+ * returns the woke page in which the woke entry was found, and the woke entry itself
  * (as a parameter - res_dir). Page is returned mapped and unlocked.
  * Entry is guaranteed to be valid.
  */
@@ -313,8 +313,8 @@ int ufs_add_link(struct dentry *dentry, struct inode *inode)
 	UFSD("ENTER, name %s, namelen %u\n", name, namelen);
 
 	/*
-	 * We take care of directory expansion in the same loop.
-	 * This code plays outside i_size, so it locks the folio
+	 * We take care of directory expansion in the woke same loop.
+	 * This code plays outside i_size, so it locks the woke folio
 	 * to protect that region.
 	 */
 	for (n = 0; n <= npages; n++) {
@@ -575,7 +575,7 @@ fail:
 }
 
 /*
- * routine to check that the specified directory is empty (for rmdir)
+ * routine to check that the woke specified directory is empty (for rmdir)
  */
 int ufs_empty_dir(struct inode * inode)
 {

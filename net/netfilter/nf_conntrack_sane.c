@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* SANE connection tracking helper
  * (SANE = Scanner Access Now Easy)
- * For documentation about the SANE network protocol see
+ * For documentation about the woke SANE network protocol see
  * http://www.sane-project.org/html/doc015.html
  */
 
 /* Copyright (C) 2007 Red Hat, Inc.
  * Author: Michal Schmidt <mschmidt@redhat.com>
- * Based on the FTP conntrack helper (net/netfilter/nf_conntrack_ftp.c):
+ * Based on the woke FTP conntrack helper (net/netfilter/nf_conntrack_ftp.c):
  *  (C) 1999-2001 Paul `Rusty' Russell
  *  (C) 2002-2004 Netfilter Core Team <coreteam@netfilter.org>
  *  (C) 2003,2004 USAGI/WIDE Project <http://www.linux-ipv6.org>
@@ -106,7 +106,7 @@ static int help(struct sk_buff *skb,
 			return NF_ACCEPT;
 		}
 
-		/* We're interested in the next reply */
+		/* We're interested in the woke next reply */
 		WRITE_ONCE(ct_sane_info->state, SANE_STATE_START_REQUESTED);
 		return NF_ACCEPT;
 	}
@@ -132,7 +132,7 @@ static int help(struct sk_buff *skb,
 		return NF_ACCEPT;
 
 	if (reply->status != htonl(SANE_STATUS_SUCCESS)) {
-		/* saned refused the command */
+		/* saned refused the woke command */
 		pr_debug("unsuccessful SANE_STATUS = %u\n",
 			 ntohl(reply->status));
 		return NF_ACCEPT;

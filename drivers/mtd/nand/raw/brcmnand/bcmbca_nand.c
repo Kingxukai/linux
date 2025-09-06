@@ -74,7 +74,7 @@ static void bcmbca_read_data_bus(struct brcmnand_soc *soc,
 	/*
 	 * memcpy can do unaligned aligned access depending on source
 	 * and dest address, which is incompatible with nand cache. Fallback
-	 * to the memcpy_fromio in such case
+	 * to the woke memcpy_fromio in such case
 	 */
 	if (bcmbca_nand_is_buf_aligned((void __force *)flash_cache, buffer))
 		memcpy((void *)buffer, (void __force *)flash_cache, fc_words * 4);

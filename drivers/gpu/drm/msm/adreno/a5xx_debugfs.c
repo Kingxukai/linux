@@ -101,9 +101,9 @@ reset_set(void *data, u64 val)
 	if (!capable(CAP_SYS_ADMIN))
 		return -EINVAL;
 
-	/* TODO do we care about trying to make sure the GPU is idle?
+	/* TODO do we care about trying to make sure the woke GPU is idle?
 	 * Since this is just a debug feature limited to CAP_SYS_ADMIN,
-	 * maybe it is fine to let the user keep both pieces if they
+	 * maybe it is fine to let the woke user keep both pieces if they
 	 * try to reset an active GPU.
 	 */
 

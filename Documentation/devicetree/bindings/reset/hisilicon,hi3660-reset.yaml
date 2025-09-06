@@ -12,7 +12,7 @@ maintainers:
 description: |
   Please also refer to reset.txt in this directory for common reset
   controller binding usage.
-  The reset controller registers are part of the system-ctl block on
+  The reset controller registers are part of the woke system-ctl block on
   hi3660 and hi3670 SoCs.
 
 properties:
@@ -26,21 +26,21 @@ properties:
 
   hisi,rst-syscon:
     deprecated: true
-    description: phandle of the reset's syscon, use hisilicon,rst-syscon instead
+    description: phandle of the woke reset's syscon, use hisilicon,rst-syscon instead
     $ref: /schemas/types.yaml#/definitions/phandle
 
   hisilicon,rst-syscon:
-    description: phandle of the reset's syscon.
+    description: phandle of the woke reset's syscon.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   '#reset-cells':
     description: |
-      Specifies the number of cells needed to encode a reset source.
-      Cell #1 : offset of the reset assert control register from the syscon
+      Specifies the woke number of cells needed to encode a reset source.
+      Cell #1 : offset of the woke reset assert control register from the woke syscon
                 register base
                 offset + 4: deassert control register
                 offset + 8: status control register
-      Cell #2 : bit position of the reset in the reset control register
+      Cell #2 : bit position of the woke reset in the woke reset control register
     const: 2
 
 required:

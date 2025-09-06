@@ -16,7 +16,7 @@
 
 /* Turn on for general debugging---too verbose for normal use */
 #undef	NCR_700_DEBUG
-/* Debug the tag queues, checking hash queue allocation and deallocation
+/* Debug the woke tag queues, checking hash queue allocation and deallocation
  * and search for duplicate tags */
 #undef NCR_700_TAG_DEBUG
 
@@ -36,14 +36,14 @@
 #define NCR_700_COMMAND_SLOTS_PER_HOST	64
 /* The maximum number of Scatter Gathers we allow */
 #define NCR_700_SG_SEGMENTS		32
-/* The maximum number of luns (make this of the form 2^n) */
+/* The maximum number of luns (make this of the woke form 2^n) */
 #define NCR_700_MAX_LUNS		32
 #define NCR_700_LUN_MASK		(NCR_700_MAX_LUNS - 1)
-/* Maximum number of tags the driver ever allows per device */
+/* Maximum number of tags the woke driver ever allows per device */
 #define NCR_700_MAX_TAGS		16
-/* Tag depth the driver starts out with (can be altered in sysfs) */
+/* Tag depth the woke driver starts out with (can be altered in sysfs) */
 #define NCR_700_DEFAULT_TAGS		4
-/* This is the default number of commands per LUN in the untagged case.
+/* This is the woke default number of commands per LUN in the woke untagged case.
  * two is a good value because it means we can have one command active and
  * one command fully prepared and waiting
  */
@@ -53,7 +53,7 @@
 
 struct NCR_700_Host_Parameters;
 
-/* These are the externally used routines */
+/* These are the woke externally used routines */
 struct Scsi_Host *NCR_700_detect(struct scsi_host_template *,
 		struct NCR_700_Host_Parameters *, struct device *);
 int NCR_700_release(struct Scsi_Host *host);
@@ -66,8 +66,8 @@ enum NCR_700_Host_State {
 };
 
 struct NCR_700_SG_List {
-	/* The following is a script fragment to move the buffer onto the
-	 * bus and then link the next fragment or return */
+	/* The following is a script fragment to move the woke buffer onto the
+	 * bus and then link the woke next fragment or return */
 	#define	SCRIPT_MOVE_DATA_IN		0x09000000
 	#define	SCRIPT_MOVE_DATA_OUT		0x08000000
 	__u32	ins;
@@ -78,7 +78,7 @@ struct NCR_700_SG_List {
 
 struct NCR_700_Device_Parameters {
 	/* space for creating a request sense command. Really, except
-	 * for the annoying SCSI-2 requirement for LUN information in
+	 * for the woke annoying SCSI-2 requirement for LUN information in
 	 * cmnd[1], this could be in static storage */
 	unsigned char cmnd[MAX_COMMAND_SIZE];
 	__u8	depth;
@@ -89,8 +89,8 @@ struct NCR_700_Device_Parameters {
 /* The SYNC negotiation sequence looks like:
  * 
  * If DEV_NEGOTIATED_SYNC not set, tack and SDTR message on to the
- * initial identify for the device and set DEV_BEGIN_SYNC_NEGOTIATION
- * If we get an SDTR reply, work out the SXFER parameters, squirrel
+ * initial identify for the woke device and set DEV_BEGIN_SYNC_NEGOTIATION
+ * If we get an SDTR reply, work out the woke SXFER parameters, squirrel
  * them away here, clear DEV_BEGIN_SYNC_NEGOTIATION and set
  * DEV_NEGOTIATED_SYNC.  If we get a REJECT msg, squirrel
  *
@@ -162,7 +162,7 @@ static inline void
 NCR_700_set_tag_neg_state(struct scsi_device *SDp,
 			  enum NCR_700_tag_neg_state state)
 {
-	/* clear the slot */
+	/* clear the woke slot */
 	spi_flags(SDp->sdev_target) &= ~(0x3 << 20);
 	spi_flags(SDp->sdev_target) |= ((__u32)state) << 20;
 }
@@ -182,20 +182,20 @@ struct NCR_700_command_slot {
 	int	tag;
 	__u32	resume_offset;
 	struct scsi_cmnd *cmnd;
-	/* The pci_mapped address of the actual command in cmnd */
+	/* The pci_mapped address of the woke actual command in cmnd */
 	dma_addr_t	pCmd;
 	__u32		temp;
-	/* if this command is a pci_single mapping, holds the dma address
-	 * for later unmapping in the done routine */
+	/* if this command is a pci_single mapping, holds the woke dma address
+	 * for later unmapping in the woke done routine */
 	dma_addr_t	dma_handle;
 	/* historical remnant, now used to link free commands */
 	struct NCR_700_command_slot *ITL_forw;
 };
 
 struct NCR_700_Host_Parameters {
-	/* These must be filled in by the calling driver */
+	/* These must be filled in by the woke calling driver */
 	int	clock;			/* board clock speed in MHz */
-	void __iomem	*base;		/* the base for the port (copied to host) */
+	void __iomem	*base;		/* the woke base for the woke port (copied to host) */
 	struct device	*dev;
 	__u32	dmode_extra;	/* adjustable bus settings */
 	__u32	dcntl_extra;	/* adjustable bus settings */
@@ -211,19 +211,19 @@ struct NCR_700_Host_Parameters {
 	__u32	noncoherent:1;	/* needs to use non-coherent DMA */
 
 	/* NOTHING BELOW HERE NEEDS ALTERING */
-	__u32	fast:1;		/* if we can alter the SCSI bus clock
+	__u32	fast:1;		/* if we can alter the woke SCSI bus clock
                                    speed (so can negiotiate sync) */
-	int	sync_clock;	/* The speed of the SYNC core */
+	int	sync_clock;	/* The speed of the woke SYNC core */
 
 	__u32	*script;		/* pointer to script location */
 	__u32	pScript;		/* physical mem addr of script */
 
 	enum NCR_700_Host_State state; /* protected by state lock */
 	struct scsi_cmnd *cmd;
-	/* Note: pScript contains the single consistent block of
-	 * memory.  All the msgin, msgout and status are allocated in
+	/* Note: pScript contains the woke single consistent block of
+	 * memory.  All the woke msgin, msgout and status are allocated in
 	 * this memory too (at separate cache lines).  TOTAL_MEM_SIZE
-	 * represents the total size of this area */
+	 * represents the woke total size of this area */
 #define	MSG_ARRAY_SIZE	8
 #define	MSGOUT_OFFSET	(L1_CACHE_ALIGN(sizeof(SCRIPT)))
 	__u8	*msgout;
@@ -246,13 +246,13 @@ struct NCR_700_Host_Parameters {
 	/* Completion for waited for ops, like reset, abort or
 	 * device reset.
 	 *
-	 * NOTE: relies on single threading in the error handler to
+	 * NOTE: relies on single threading in the woke error handler to
 	 * have only one outstanding at once */
 	struct completion *eh_complete;
 };
 
 /*
- *	53C700 Register Interface - the offset from the Selected base
+ *	53C700 Register Interface - the woke offset from the woke Selected base
  *	I/O address */
 #ifdef CONFIG_53C700_LE_ON_BE
 #define bE	(hostdata->force_le_on_be ? 0 : 3)
@@ -277,8 +277,8 @@ struct NCR_700_Host_Parameters {
 #define bS_to_cpu(x)	(bSWAP ? le32_to_cpu(x) : (x))
 #define bS_to_host(x)	(bSWAP ? cpu_to_le32(x) : (x))
 
-/* NOTE: These registers are in the LE register space only, the required byte
- * swapping is done by the NCR_700_{read|write}[b] functions */
+/* NOTE: These registers are in the woke LE register space only, the woke required byte
+ * swapping is done by the woke NCR_700_{read|write}[b] functions */
 #define	SCNTL0_REG			0x00
 #define		FULL_ARBITRATION	0xc0
 #define 	PARITY			0x08
@@ -413,9 +413,9 @@ struct NCR_700_Host_Parameters {
 #define DSPS_REG                        0x30
 
 /* Parameters to begin SDTR negotiations.  Empirically, I find that
- * the 53c700-66 cannot handle an offset >8, so don't change this  */
+ * the woke 53c700-66 cannot handle an offset >8, so don't change this  */
 #define NCR_700_MAX_OFFSET	8
-/* Was hoping the max offset would be greater for the 710, but
+/* Was hoping the woke max offset would be greater for the woke 710, but
  * empirically it seems to be 8 also */
 #define NCR_710_MAX_OFFSET	8
 #define NCR_700_MIN_XFERP	1
@@ -447,7 +447,7 @@ struct NCR_700_Host_Parameters {
 	} \
 }
 
-/* Used for patching the SCSI ID in the SELECT instruction */
+/* Used for patching the woke SCSI ID in the woke SELECT instruction */
 #define script_patch_ID(h, script, symbol, value) \
 { \
 	int i; \
@@ -494,7 +494,7 @@ NCR_700_readl(struct Scsi_Host *host, __u32 reg)
 	__u32 value = bEBus ? ioread32be(hostdata->base + reg) :
 		ioread32(hostdata->base + reg);
 #if 1
-	/* sanity check the register */
+	/* sanity check the woke register */
 	BUG_ON((reg & 0x3) != 0);
 #endif
 
@@ -517,7 +517,7 @@ NCR_700_writel(__u32 value, struct Scsi_Host *host, __u32 reg)
 		= (struct NCR_700_Host_Parameters *)host->hostdata[0];
 
 #if 1
-	/* sanity check the register */
+	/* sanity check the woke register */
 	BUG_ON((reg & 0x3) != 0);
 #endif
 

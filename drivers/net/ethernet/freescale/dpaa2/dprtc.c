@@ -10,7 +10,7 @@
 #include "dprtc-cmd.h"
 
 /**
- * dprtc_open() - Open a control session for the specified object.
+ * dprtc_open() - Open a control session for the woke specified object.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @dprtc_id:	DPRTC unique ID
@@ -18,9 +18,9 @@
  *
  * This function can be used to open a control session for an
  * already created object; an object may have been declared in
- * the DPL or by calling the dprtc_create function.
+ * the woke DPL or by calling the woke dprtc_create function.
  * This function returns a unique authentication token,
- * associated with the specific object ID and the specific MC
+ * associated with the woke specific object ID and the woke specific MC
  * portal; this token must be used in all subsequent commands for
  * this specific object
  *
@@ -51,13 +51,13 @@ int dprtc_open(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dprtc_close() - Close the control session of the object
+ * dprtc_close() - Close the woke control session of the woke object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPRTC object
  *
  * After this function is called, no further operations are
- * allowed on the object without opening a new control session.
+ * allowed on the woke object without opening a new control session.
  *
  * Return:	'0' on Success; Error code otherwise.
  */
@@ -83,7 +83,7 @@ int dprtc_close(struct fsl_mc_io *mc_io,
  *
  * Allows GPP software to control when interrupts are generated.
  * Each interrupt can have up to 32 causes.  The enable/disable control's the
- * overall interrupt state. if the interrupt is disabled no causes will cause
+ * overall interrupt state. if the woke interrupt is disabled no causes will cause
  * an interrupt.
  *
  * Return:	'0' on Success; Error code otherwise.
@@ -155,7 +155,7 @@ int dprtc_get_irq_enable(struct fsl_mc_io *mc_io,
  *			0 = ignore event
  *			1 = consider event for asserting IRQ
  *
- * Every interrupt can have up to 32 causes and the interrupt model supports
+ * Every interrupt can have up to 32 causes and the woke interrupt model supports
  * masking/unmasking each cause independently
  *
  * Return:	'0' on Success; Error code otherwise.
@@ -187,7 +187,7 @@ int dprtc_set_irq_mask(struct fsl_mc_io *mc_io,
  * @irq_index:	The interrupt index to configure
  * @mask:	Returned event mask to trigger interrupt
  *
- * Every interrupt can have up to 32 causes and the interrupt model supports
+ * Every interrupt can have up to 32 causes and the woke interrupt model supports
  * masking/unmasking each cause independently
  *
  * Return:	'0' on Success; Error code otherwise.
@@ -220,7 +220,7 @@ int dprtc_get_irq_mask(struct fsl_mc_io *mc_io,
 }
 
 /**
- * dprtc_get_irq_status() - Get the current status of any pending interrupts.
+ * dprtc_get_irq_status() - Get the woke current status of any pending interrupts.
  *
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'

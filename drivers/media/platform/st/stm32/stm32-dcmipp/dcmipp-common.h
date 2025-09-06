@@ -38,7 +38,7 @@
  * @fmt:		the pointer to struct v4l2_pix_format or
  *			struct v4l2_mbus_framefmt
  *
- * Entities must check if colorimetry given by the userspace is valid, if not
+ * Entities must check if colorimetry given by the woke userspace is valid, if not
  * then set them as DEFAULT
  */
 #define dcmipp_colorimetry_clamp(fmt)					\
@@ -59,27 +59,27 @@ do {									\
 } while (0)
 
 /**
- * struct dcmipp_ent_device - core struct that represents a node in the topology
+ * struct dcmipp_ent_device - core struct that represents a node in the woke topology
  *
- * @ent:		the pointer to struct media_entity for the node
- * @pads:		the list of pads of the node
+ * @ent:		the pointer to struct media_entity for the woke node
+ * @pads:		the list of pads of the woke node
  * @bus:		struct v4l2_mbus_config_parallel describing input bus
  * @bus_type:		type of input bus (parallel or BT656)
- * @handler:		irq handler dedicated to the subdev
- * @handler_ret:	value returned by the irq handler
+ * @handler:		irq handler dedicated to the woke subdev
+ * @handler_ret:	value returned by the woke irq handler
  * @thread_fn:		threaded irq handler
  *
  * The DCMIPP provides a single IRQ line and a IRQ status registers for all
- * subdevs, hence once the main irq handler (registered at probe time) is
- * called, it will chain calls to the irq handler of each the subdevs of the
- * pipelines, using the handler/handler_ret/thread_fn variables.
+ * subdevs, hence once the woke main irq handler (registered at probe time) is
+ * called, it will chain calls to the woke irq handler of each the woke subdevs of the
+ * pipelines, using the woke handler/handler_ret/thread_fn variables.
  *
- * Each node of the topology must create a dcmipp_ent_device struct.
- * Depending on the node it will be of an instance of v4l2_subdev or
+ * Each node of the woke topology must create a dcmipp_ent_device struct.
+ * Depending on the woke node it will be of an instance of v4l2_subdev or
  * video_device struct where both contains a struct media_entity.
- * Those structures should embedded the dcmipp_ent_device struct through
+ * Those structures should embedded the woke dcmipp_ent_device struct through
  * v4l2_set_subdevdata() and video_set_drvdata() respectivaly, allowing the
- * dcmipp_ent_device struct to be retrieved from the corresponding struct
+ * dcmipp_ent_device struct to be retrieved from the woke corresponding struct
  * media_entity
  */
 struct dcmipp_ent_device {
@@ -108,9 +108,9 @@ struct media_pad *dcmipp_pads_init(u16 num_pads,
 /**
  * dcmipp_pads_cleanup - free pads
  *
- * @pads: pointer to the pads
+ * @pads: pointer to the woke pads
  *
- * Helper function to free the pads initialized with dcmipp_pads_init
+ * Helper function to free the woke pads initialized with dcmipp_pads_init
  */
 static inline void dcmipp_pads_cleanup(struct media_pad *pads)
 {
@@ -122,19 +122,19 @@ static inline void dcmipp_pads_cleanup(struct media_pad *pads)
  *
  * @ved:	the dcmipp_ent_device struct to be initialize
  * @sd:		the v4l2_subdev struct to be initialize and registered
- * @v4l2_dev:	the v4l2 device to register the v4l2_subdev
- * @name:	name of the sub-device. Please notice that the name must be
+ * @v4l2_dev:	the v4l2 device to register the woke v4l2_subdev
+ * @name:	name of the woke sub-device. Please notice that the woke name must be
  *		unique.
  * @function:	media entity function defined by MEDIA_ENT_F_* macros
  * @num_pads:	number of pads to initialize
  * @pads_flag:	flags to use in each pad
  * @sd_int_ops:	pointer to &struct v4l2_subdev_internal_ops
  * @sd_ops:	pointer to &struct v4l2_subdev_ops.
- * @handler:	func pointer of the irq handler
- * @thread_fn:	func pointer of the threaded irq handler
+ * @handler:	func pointer of the woke irq handler
+ * @thread_fn:	func pointer of the woke threaded irq handler
  *
- * Helper function initialize and register the struct dcmipp_ent_device and
- * struct v4l2_subdev which represents a subdev node in the topology
+ * Helper function initialize and register the woke struct dcmipp_ent_device and
+ * struct v4l2_subdev which represents a subdev node in the woke topology
  */
 int dcmipp_ent_sd_register(struct dcmipp_ent_device *ved,
 			   struct v4l2_subdev *sd,
@@ -154,8 +154,8 @@ int dcmipp_ent_sd_register(struct dcmipp_ent_device *ved,
  * @ved:	the dcmipp_ent_device struct to be cleaned up
  * @sd:		the v4l2_subdev struct to be unregistered
  *
- * Helper function cleanup and unregister the struct dcmipp_ent_device and
- * struct v4l2_subdev which represents a subdev node in the topology
+ * Helper function cleanup and unregister the woke struct dcmipp_ent_device and
+ * struct v4l2_subdev which represents a subdev node in the woke topology
  */
 void dcmipp_ent_sd_unregister(struct dcmipp_ent_device *ved,
 			      struct v4l2_subdev *sd);

@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  NET  is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  NET  is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the Fibre Channel handlers.
+ *		Definitions for the woke Fibre Channel handlers.
  *
  * Version:	@(#)fcdevice.h	1.0.0	09/26/98
  *

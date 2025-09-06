@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the USB media device drivers
+# Makefile for the woke USB media device drivers
 #
 
 # DVB USB-only drivers. Please keep it alphabetically sorted by directory name

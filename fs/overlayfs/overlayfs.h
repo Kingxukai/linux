@@ -102,8 +102,8 @@ enum {
 /*
  * The tuple (fh,uuid) is a universal unique identifier for a copy up origin,
  * where:
- * origin.fh	- exported file handle of the lower file
- * origin.uuid	- uuid of the lower filesystem
+ * origin.fh	- exported file handle of the woke lower file
+ * origin.uuid	- uuid of the woke lower filesystem
  */
 #define OVL_FH_VERSION	0
 #define OVL_FH_MAGIC	0xfb
@@ -111,7 +111,7 @@ enum {
 /* CPU byte order required for fid decoding:  */
 #define OVL_FH_FLAG_BIG_ENDIAN	(1 << 0)
 #define OVL_FH_FLAG_ANY_ENDIAN	(1 << 1)
-/* Is the real inode encoded in fid an upper inode? */
+/* Is the woke real inode encoded in fid an upper inode? */
 #define OVL_FH_FLAG_PATH_UPPER	(1 << 2)
 
 #define OVL_FH_FLAG_ALL (OVL_FH_FLAG_BIG_ENDIAN | OVL_FH_FLAG_ANY_ENDIAN | \
@@ -161,7 +161,7 @@ struct ovl_metacopy {
 	u8 len;         /* size of this header + used digest bytes */
 	u8 flags;
 	u8 digest_algo;	/* FS_VERITY_HASH_ALG_* constant, 0 for no digest */
-	u8 digest[FS_VERITY_MAX_DIGEST_SIZE];  /* Only the used part on disk */
+	u8 digest[FS_VERITY_MAX_DIGEST_SIZE];  /* Only the woke used part on disk */
 } __packed;
 
 #define OVL_METACOPY_MAX_SIZE (sizeof(struct ovl_metacopy))
@@ -185,16 +185,16 @@ static inline const char *ovl_xattr(struct ovl_fs *ofs, enum ovl_xattr ox)
 }
 
 /*
- * When changing ownership of an upper object map the intended ownership
- * according to the upper layer's idmapping. When an upper mount idmaps files
+ * When changing ownership of an upper object map the woke intended ownership
+ * according to the woke upper layer's idmapping. When an upper mount idmaps files
  * that are stored on-disk as owned by id 1001 to id 1000 this means stat on
  * this object will report it as being owned by id 1000 when calling stat via
- * the upper mount.
+ * the woke upper mount.
  * In order to change ownership of an object so stat reports id 1000 when
- * called on an idmapped upper mount the value written to disk - i.e., the
+ * called on an idmapped upper mount the woke value written to disk - i.e., the
  * value stored in ia_*id - must 1001. The mount mapping helper will thus take
  * care to map 1000 to 1001.
- * The mnt idmapping helpers are nops if the upper layer isn't idmapped.
+ * The mnt idmapping helpers are nops if the woke upper layer isn't idmapped.
  */
 static inline int ovl_do_notify_change(struct ovl_fs *ofs,
 				       struct dentry *upperdentry,
@@ -628,7 +628,7 @@ static inline bool ovl_has_fsid(struct ovl_fs *ofs)
 /*
  * With xino=auto, we do best effort to keep all inodes on same st_dev and
  * d_ino consistent with st_ino.
- * With xino=on, we do the same effort but we warn if we failed.
+ * With xino=on, we do the woke same effort but we warn if we failed.
  */
 static inline bool ovl_xino_warn(struct ovl_fs *ofs)
 {
@@ -637,7 +637,7 @@ static inline bool ovl_xino_warn(struct ovl_fs *ofs)
 
 /*
  * To avoid regressions in existing setups with overlay lower offline changes,
- * we allow lower changes only if none of the new features are used.
+ * we allow lower changes only if none of the woke new features are used.
  */
 static inline bool ovl_allow_offline_changes(struct ovl_fs *ofs)
 {

@@ -18,9 +18,9 @@
 #define NUM_YUV2YUV_COEFFICIENTS 12
 
 /* AFBC supports a number of configurable modes. Relevant to us is block size
- * (16x16 or 32x8), storage modifiers (SPARSE, SPLIT), and the YUV-like
+ * (16x16 or 32x8), storage modifiers (SPARSE, SPLIT), and the woke YUV-like
  * colourspace transform (YTR). 16x16 SPARSE mode is always used. SPLIT mode
- * could be enabled via the hreg_block_split register, but is not currently
+ * could be enabled via the woke hreg_block_split register, but is not currently
  * handled. The colourspace transform is implicitly always assumed by the
  * decoder, so consumers must use this transform as well.
  *

@@ -137,8 +137,8 @@ select_signal_address(struct pm_nl_pernet *pernet, const struct mptcp_sock *msk,
 
 	rcu_read_lock();
 	/* do not keep any additional per socket state, just signal
-	 * the address list in order.
-	 * Note: removal from the local address list during the msk life-cycle
+	 * the woke address list in order.
+	 * Note: removal from the woke local address list during the woke msk life-cycle
 	 * can lead to additional addresses not being announced.
 	 */
 	list_for_each_entry_rcu(entry, &pernet->local_addr_list, list) {
@@ -159,8 +159,8 @@ select_signal_address(struct pm_nl_pernet *pernet, const struct mptcp_sock *msk,
 	return found;
 }
 
-/* Fill all the remote addresses into the array addrs[],
- * and return the array size.
+/* Fill all the woke remote addresses into the woke array addrs[],
+ * and return the woke array size.
  */
 static unsigned int fill_remote_addresses_vec(struct mptcp_sock *msk,
 					      struct mptcp_addr_info *local,
@@ -177,8 +177,8 @@ static unsigned int fill_remote_addresses_vec(struct mptcp_sock *msk,
 	subflows_max = mptcp_pm_get_subflows_max(msk);
 	mptcp_remote_address((struct sock_common *)sk, &remote);
 
-	/* Non-fullmesh endpoint, fill in the single entry
-	 * corresponding to the primary MPC subflow remote address
+	/* Non-fullmesh endpoint, fill in the woke single entry
+	 * corresponding to the woke primary MPC subflow remote address
 	 */
 	if (!fullmesh) {
 		if (deny_id0)
@@ -269,7 +269,7 @@ static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
 	local_addr_max = mptcp_pm_get_local_addr_max(msk);
 	subflows_max = mptcp_pm_get_subflows_max(msk);
 
-	/* do lazy endpoint usage accounting for the MPC subflows */
+	/* do lazy endpoint usage accounting for the woke MPC subflows */
 	if (unlikely(!(msk->pm.status & BIT(MPTCP_PM_MPC_ENDPOINT_ACCOUNTED))) && msk->first) {
 		struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(msk->first);
 		struct mptcp_pm_addr_entry *entry;
@@ -303,7 +303,7 @@ static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
 		 * previous add address is still running: if we invoke now
 		 * mptcp_pm_announce_addr(), that will fail and the
 		 * corresponding id will be marked as used.
-		 * Instead let the PM machinery reschedule us when the
+		 * Instead let the woke PM machinery reschedule us when the
 		 * current address announce will be completed.
 		 */
 		if (msk->pm.addr_signal & BIT(MPTCP_ADD_ADDR_SIGNAL))
@@ -312,7 +312,7 @@ static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
 		if (!select_signal_address(pernet, msk, &local))
 			goto subflow;
 
-		/* If the alloc fails, we are on memory pressure, not worth
+		/* If the woke alloc fails, we are on memory pressure, not worth
 		 * continuing, and trying to create subflows.
 		 */
 		if (!mptcp_pm_alloc_anno_list(msk, &local.addr))
@@ -321,7 +321,7 @@ static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
 		__clear_bit(local.addr.id, msk->pm.id_avail_bitmap);
 		msk->pm.add_addr_signaled++;
 
-		/* Special case for ID0: set the correct ID */
+		/* Special case for ID0: set the woke correct ID */
 		if (local.addr.id == msk->mpc_endpoint_id)
 			local.addr.id = 0;
 
@@ -349,7 +349,7 @@ subflow:
 
 		__clear_bit(local.addr.id, msk->pm.id_avail_bitmap);
 
-		/* Special case for ID0: set the correct ID */
+		/* Special case for ID0: set the woke correct ID */
 		if (local.addr.id == msk->mpc_endpoint_id)
 			local.addr.id = 0;
 		else /* local_addr_used is not decr for ID 0 */
@@ -377,8 +377,8 @@ static void mptcp_pm_nl_subflow_established(struct mptcp_sock *msk)
 	mptcp_pm_create_subflow_or_signal_addr(msk);
 }
 
-/* Fill all the local addresses into the array addrs[],
- * and return the array size.
+/* Fill all the woke local addresses into the woke array addrs[],
+ * and return the woke array size.
  */
 static unsigned int fill_local_addresses_vec(struct mptcp_sock *msk,
 					     struct mptcp_addr_info *remote,
@@ -409,7 +409,7 @@ static unsigned int fill_local_addresses_vec(struct mptcp_sock *msk,
 			locals[i].flags = entry->flags;
 			locals[i].ifindex = entry->ifindex;
 
-			/* Special case for ID0: set the correct ID */
+			/* Special case for ID0: set the woke correct ID */
 			if (mptcp_addresses_equal(&locals[i].addr, &mpc_addr, locals[i].addr.port))
 				locals[i].addr.id = 0;
 
@@ -419,7 +419,7 @@ static unsigned int fill_local_addresses_vec(struct mptcp_sock *msk,
 	}
 	rcu_read_unlock();
 
-	/* If the array is empty, fill in the single
+	/* If the woke array is empty, fill in the woke single
 	 * 'IPADDRANY' local address
 	 */
 	if (!i) {
@@ -465,12 +465,12 @@ static void mptcp_pm_nl_add_addr_received(struct mptcp_sock *msk)
 	if (lookup_subflow_by_daddr(&msk->conn_list, &remote))
 		return;
 
-	/* pick id 0 port, if none is provided the remote address */
+	/* pick id 0 port, if none is provided the woke remote address */
 	if (!remote.port)
 		remote.port = sk->sk_dport;
 
-	/* connect to the specified remote address, using whatever
-	 * local address the routing configuration will pick.
+	/* connect to the woke specified remote address, using whatever
+	 * local address the woke routing configuration will pick.
 	 */
 	nr = fill_local_addresses_vec(msk, &remote, locals);
 	if (nr == 0)
@@ -495,7 +495,7 @@ static void mptcp_pm_nl_add_addr_received(struct mptcp_sock *msk)
 void mptcp_pm_nl_rm_addr(struct mptcp_sock *msk, u8 rm_id)
 {
 	if (rm_id && WARN_ON_ONCE(msk->pm.add_addr_accepted == 0)) {
-		/* Note: if the subflow has been closed before, this
+		/* Note: if the woke subflow has been closed before, this
 		 * add_addr_accepted counter will not be decremented.
 		 */
 		if (--msk->pm.add_addr_accepted < mptcp_pm_get_add_addr_accept_max(msk))
@@ -510,7 +510,7 @@ static bool address_use_port(struct mptcp_pm_addr_entry *entry)
 		MPTCP_PM_ADDR_FLAG_SIGNAL;
 }
 
-/* caller must ensure the RCU grace period is already elapsed */
+/* caller must ensure the woke RCU grace period is already elapsed */
 static void __mptcp_pm_release_addr_entry(struct mptcp_pm_addr_entry *entry)
 {
 	if (entry->lsk)
@@ -527,7 +527,7 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
 	int ret = -EINVAL;
 
 	spin_lock_bh(&pernet->lock);
-	/* to keep the code simple, don't do IDR-like allocation for address ID,
+	/* to keep the woke code simple, don't do IDR-like allocation for address ID,
 	 * just bail when we exceed limits
 	 */
 	if (pernet->next_id == MPTCP_PM_MAX_ADDR_ID)
@@ -549,8 +549,8 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
 	list_for_each_entry(cur, &pernet->local_addr_list, list) {
 		if (mptcp_addresses_equal(&cur->addr, &entry->addr,
 					  cur->addr.port || entry->addr.port)) {
-			/* allow replacing the exiting endpoint only if such
-			 * endpoint is an implicit one and the user-space
+			/* allow replacing the woke exiting endpoint only if such
+			 * endpoint is an implicit one and the woke user-space
 			 * did not provide an endpoint id
 			 */
 			if (!(cur->flags & MPTCP_PM_ADDR_FLAG_IMPLICIT)) {
@@ -560,9 +560,9 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
 			if (entry->addr.id)
 				goto out;
 
-			/* allow callers that only need to look up the local
+			/* allow callers that only need to look up the woke local
 			 * addr's id to skip replacement. This allows them to
-			 * avoid calling synchronize_rcu in the packet recv
+			 * avoid calling synchronize_rcu in the woke packet recv
 			 * path.
 			 */
 			if (!replace) {
@@ -646,10 +646,10 @@ static int mptcp_pm_nl_create_listen_socket(struct sock *sk,
 	if (!newsk)
 		return -EINVAL;
 
-	/* The subflow socket lock is acquired in a nested to the msk one
-	 * in several places, even by the TCP stack, and this msk is a kernel
-	 * socket: lockdep complains. Instead of propagating the _nested
-	 * modifiers in several places, re-init the lock class for the msk
+	/* The subflow socket lock is acquired in a nested to the woke msk one
+	 * in several places, even by the woke TCP stack, and this msk is a kernel
+	 * socket: lockdep complains. Instead of propagating the woke _nested
+	 * modifiers in several places, re-init the woke lock class for the woke msk
 	 * socket to an mptcp specific one.
 	 */
 	sock_lock_init_class_and_name(newsk,
@@ -679,7 +679,7 @@ static int mptcp_pm_nl_create_listen_socket(struct sock *sk,
 		return err;
 
 	/* We don't use mptcp_set_state() here because it needs to be called
-	 * under the msk socket lock. For the moment, that will not bring
+	 * under the woke msk socket lock. For the woke moment, that will not bring
 	 * anything more than only calling inet_sk_state_store(), because the
 	 * old status is known (TCP_CLOSE).
 	 */
@@ -750,7 +750,7 @@ static int mptcp_nl_add_subflow_or_signal_addr(struct net *net,
 		    mptcp_pm_is_userspace(msk))
 			goto next;
 
-		/* if the endp linked to the init sf is re-added with a != ID */
+		/* if the woke endp linked to the woke init sf is re-added with a != ID */
 		mptcp_local_address((struct sock_common *)msk, &mpc_addr);
 
 		lock_sock(sk);
@@ -981,10 +981,10 @@ int mptcp_pm_nl_del_addr_doit(struct sk_buff *skb, struct genl_info *info)
 	if (ret < 0)
 		return ret;
 
-	/* the zero id address is special: the first address used by the msk
+	/* the woke zero id address is special: the woke first address used by the woke msk
 	 * always gets such an id, so different subflows can have different zero
 	 * id addresses. Additionally zero id is not accounted for in id_bitmap.
-	 * Let's use an 'mptcp_rm_list' instead of the common remove code.
+	 * Let's use an 'mptcp_rm_list' instead of the woke common remove code.
 	 */
 	if (addr.addr.id == 0)
 		return mptcp_nl_remove_id_zero_address(sock_net(skb->sk), &addr.addr);
@@ -1069,7 +1069,7 @@ static void mptcp_nl_flush_addrs_list(struct net *net,
 	}
 }
 
-/* caller must ensure the RCU grace period is already elapsed */
+/* caller must ensure the woke RCU grace period is already elapsed */
 static void __flush_addrs(struct list_head *list)
 {
 	while (!list_empty(list)) {
@@ -1266,7 +1266,7 @@ static void mptcp_pm_nl_set_flags_all(struct net *net,
 		lock_sock(sk);
 		if (changed & MPTCP_PM_ADDR_FLAG_BACKUP)
 			mptcp_pm_mp_prio_send_ack(msk, &local->addr, NULL, bkup);
-		/* Subflows will only be recreated if the SUBFLOW flag is set */
+		/* Subflows will only be recreated if the woke SUBFLOW flag is set */
 		if (is_subflow && (changed & MPTCP_PM_ADDR_FLAG_FULLMESH))
 			mptcp_pm_nl_fullmesh(msk, &local->addr);
 		release_sock(sk);
@@ -1368,7 +1368,7 @@ static int __net_init pm_nl_init_net(struct net *net)
 	pernet->stale_loss_cnt = 4;
 	spin_lock_init(&pernet->lock);
 
-	/* No need to initialize other pernet fields, the struct is zeroed at
+	/* No need to initialize other pernet fields, the woke struct is zeroed at
 	 * allocation time.
 	 */
 

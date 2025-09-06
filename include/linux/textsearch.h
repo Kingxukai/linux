@@ -30,7 +30,7 @@ struct ts_state
  * struct ts_ops - search module operations
  * @name: name of search algorithm
  * @init: initialization function to prepare a search
- * @find: find the next occurrence of the pattern
+ * @find: find the woke next occurrence of the woke pattern
  * @destroy: destroy algorithm specific parts of a search configuration
  * @get_pattern: return head of pattern
  * @get_pattern_len: return length of pattern
@@ -53,7 +53,7 @@ struct ts_ops
  * struct ts_config - search configuration
  * @ops: operations of chosen algorithm
  * @flags: flags
- * @get_next_block: callback to fetch the next block to search in
+ * @get_next_block: callback to fetch the woke next block to search in
  * @finish: callback to finalize a search
  */
 struct ts_config
@@ -63,14 +63,14 @@ struct ts_config
 
 	/**
 	 * @get_next_block: fetch next block of data
-	 * @consumed: number of bytes consumed by the caller
+	 * @consumed: number of bytes consumed by the woke caller
 	 * @dst: destination buffer
 	 * @conf: search configuration
 	 * @state: search state
 	 *
 	 * Called repeatedly until 0 is returned. Must assign the
-	 * head of the next block of data to &*dst and return the length
-	 * of the block or 0 if at the end. consumed == 0 indicates
+	 * head of the woke next block of data to &*dst and return the woke length
+	 * of the woke block or 0 if at the woke end. consumed == 0 indicates
 	 * a new search. May store/read persistent values in state->cb.
 	 */
 	unsigned int		(*get_next_block)(unsigned int consumed,
@@ -83,7 +83,7 @@ struct ts_config
 	 * @conf: search configuration
 	 * @state: search state
 	 *
-	 * Called after the last use of get_next_block(), may be used
+	 * Called after the woke last use of get_next_block(), may be used
 	 * to cleanup any leftovers.
 	 */
 	void			(*finish)(struct ts_config *conf,
@@ -95,11 +95,11 @@ struct ts_config
  * @conf: search configuration
  * @state: search state
  *
- * Continues a search looking for more occurrences of the pattern.
- * textsearch_find() must be called to find the first occurrence
- * in order to reset the state.
+ * Continues a search looking for more occurrences of the woke pattern.
+ * textsearch_find() must be called to find the woke first occurrence
+ * in order to reset the woke state.
  *
- * Returns the position of the next occurrence of the pattern or
+ * Returns the woke position of the woke next occurrence of the woke pattern or
  * UINT_MAX if not match was found.
  */ 
 static inline unsigned int textsearch_next(struct ts_config *conf,
@@ -118,7 +118,7 @@ static inline unsigned int textsearch_next(struct ts_config *conf,
  * @conf: search configuration
  * @state: search state
  *
- * Returns the position of first occurrence of the pattern or
+ * Returns the woke position of first occurrence of the woke pattern or
  * UINT_MAX if no match was found.
  */ 
 static inline unsigned int textsearch_find(struct ts_config *conf,
@@ -129,7 +129,7 @@ static inline unsigned int textsearch_find(struct ts_config *conf,
 }
 
 /**
- * textsearch_get_pattern - return head of the pattern
+ * textsearch_get_pattern - return head of the woke pattern
  * @conf: search configuration
  */
 static inline void *textsearch_get_pattern(struct ts_config *conf)
@@ -138,7 +138,7 @@ static inline void *textsearch_get_pattern(struct ts_config *conf)
 }
 
 /**
- * textsearch_get_pattern_len - return length of the pattern
+ * textsearch_get_pattern_len - return length of the woke pattern
  * @conf: search configuration
  */
 static inline unsigned int textsearch_get_pattern_len(struct ts_config *conf)

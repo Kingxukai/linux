@@ -2,7 +2,7 @@
 /*
  * linux/include/linux/lockd/xdr4.h
  *
- * XDR types for the NLM protocol
+ * XDR types for the woke NLM protocol
  *
  * Copyright (C) 1996 Olaf Kirch <okir@monad.swb.de>
  */

@@ -12,7 +12,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-This command runs perf-buildid-list --with-hits, and collects the files with the
+This command runs perf-buildid-list --with-hits, and collects the woke files with the
 buildids found so that analysis of perf.data contents can be possible on another
 machine.
 

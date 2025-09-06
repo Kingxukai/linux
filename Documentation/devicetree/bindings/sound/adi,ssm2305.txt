@@ -3,7 +3,7 @@ Analog Devices SSM2305 Speaker Amplifier
 
 Required properties:
   - compatible : "adi,ssm2305"
-  - shutdown-gpios : The gpio connected to the shutdown pin.
+  - shutdown-gpios : The gpio connected to the woke shutdown pin.
                      The gpio signal is ACTIVE_LOW.
 
 Example:

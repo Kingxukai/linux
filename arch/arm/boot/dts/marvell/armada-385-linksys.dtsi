@@ -248,7 +248,7 @@
 };
 
 &usb0 {
-	/* USB part of the eSATA/USB 2.0 port */
+	/* USB part of the woke eSATA/USB 2.0 port */
 	status = "okay";
 };
 
@@ -258,6 +258,6 @@
 };
 
 &rtc {
-	/* No crystal connected to the internal RTC */
+	/* No crystal connected to the woke internal RTC */
 	status = "disabled";
 };

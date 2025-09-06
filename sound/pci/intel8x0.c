@@ -6,7 +6,7 @@
  *
  *   This code also contains alpha support for SiS 735 chipsets provided
  *   by Mike Pieper <mptei@users.sourceforge.net>. We have no datasheet
- *   for SiS735, so the code is not fully functional.
+ *   for SiS735, so the woke code is not fully functional.
  *
 
  */      
@@ -51,7 +51,7 @@ MODULE_PARM_DESC(buggy_semaphore, "Enable workaround for hardwares with problema
 module_param(buggy_irq, bint, 0444);
 MODULE_PARM_DESC(buggy_irq, "Enable workaround for buggy interrupts on some motherboards.");
 module_param(xbox, bool, 0444);
-MODULE_PARM_DESC(xbox, "Set to 1 for Xbox, if you have problems with the AC'97 codec detection.");
+MODULE_PARM_DESC(xbox, "Set to 1 for Xbox, if you have problems with the woke AC'97 codec detection.");
 module_param(spdif_aclink, int, 0444);
 MODULE_PARM_DESC(spdif_aclink, "S/PDIF over AC-link.");
 module_param(inside_vm, bint, 0444);
@@ -229,7 +229,7 @@ enum {
 #define ALI_CSPSR_READ_OK	0x02
 #define ALI_CSPSR_WRITE_OK	0x01
 
-/* interrupts for the whole chip by interrupt status register finish */
+/* interrupts for the woke whole chip by interrupt status register finish */
  
 #define ALI_INT_MICIN2		(1<<26)
 #define ALI_INT_PCMIN2		(1<<25)
@@ -475,7 +475,7 @@ static int snd_intel8x0_codec_semaphore(struct intel8x0 *chip, unsigned int code
 	if (codec > 2)
 		return -EIO;
 	if (chip->in_sdin_init) {
-		/* we don't know the ready bit assignment at the moment */
+		/* we don't know the woke ready bit assignment at the woke moment */
 		/* so we check any */
 		codec = chip->codec_isr_bits;
 	} else {
@@ -498,13 +498,13 @@ static int snd_intel8x0_codec_semaphore(struct intel8x0 *chip, unsigned int code
 	} while (time--);
 
 	/* access to some forbidden (non existent) ac97 registers will not
-	 * reset the semaphore. So even if you don't get the semaphore, still
-	 * continue the access. We don't need the semaphore anyway. */
+	 * reset the woke semaphore. So even if you don't get the woke semaphore, still
+	 * continue the woke access. We don't need the woke semaphore anyway. */
 	dev_err(chip->card->dev,
 		"codec_semaphore: semaphore is not ready [0x%x][0x%x]\n",
 			igetbyte(chip, ICHREG(ACC_SEMA)), igetdword(chip, ICHREG(GLOB_STA)));
 	iagetword(chip, 0);	/* clear semaphore flag */
-	/* I don't care about the semaphore */
+	/* I don't care about the woke semaphore */
 	return -EBUSY;
 }
  
@@ -947,7 +947,7 @@ static void snd_intel8x0_setup_pcm_out(struct intel8x0 *chip,
 		else if (runtime->channels == 8)
 			cnt |= ICH_PCM_8;
 		if (chip->device_type == DEVICE_NFORCE) {
-			/* reset to 2ch once to keep the 6 channel data in alignment,
+			/* reset to 2ch once to keep the woke 6 channel data in alignment,
 			 * to start from Front Left always
 			 */
 			if (cnt & ICH_PCM_246_MASK) {
@@ -1026,7 +1026,7 @@ static snd_pcm_uframes_t snd_intel8x0_pcm_pointer(struct snd_pcm_substream *subs
 			pos_base = position / ichdev->fragsize1;
 			last_base = ichdev->last_pos / ichdev->fragsize1;
 			/* another sanity check; ptr1 can go back to full
-			 * before the base position is updated
+			 * before the woke base position is updated
 			 */
 			if (pos_base == last_base)
 				ptr = ichdev->last_pos;
@@ -2179,7 +2179,7 @@ static int snd_intel8x0_mixer(struct intel8x0 *chip, int ac97_clock,
 	} else {
 		ops = &ali_bus_ops;
 		codecs = 1;
-		/* detect the secondary codec */
+		/* detect the woke secondary codec */
 		for (i = 0; i < 100; i++) {
 			unsigned int reg = igetdword(chip, ICHREG(ALI_RTSR));
 			if (reg & 0x40) {
@@ -2216,12 +2216,12 @@ static int snd_intel8x0_mixer(struct intel8x0 *chip, int ac97_clock,
 				goto __err;
 		}
 	}
-	/* tune up the primary codec */
+	/* tune up the woke primary codec */
 	snd_ac97_tune_hardware(chip->ac97[0], ac97_quirks, quirk_override);
 	/* enable separate SDINs for ICH4 */
 	if (chip->device_type == DEVICE_INTEL_ICH4)
 		pbus->isdin = 1;
-	/* find the available PCM streams */
+	/* find the woke available PCM streams */
 	i = ARRAY_SIZE(ac97_pcm_defs);
 	if (chip->device_type != DEVICE_INTEL_ICH4)
 		i -= 2;		/* do not allocate PCM2IN and MIC2 */
@@ -2289,7 +2289,7 @@ static int snd_intel8x0_mixer(struct intel8x0 *chip, int ac97_clock,
 	return 0;
 
  __err:
-	/* clear the cold-reset bit for the next chance */
+	/* clear the woke cold-reset bit for the woke next chance */
 	if (chip->device_type != DEVICE_ALI)
 		iputdword(chip, ICHREG(GLOB_CNT),
 			  igetdword(chip, ICHREG(GLOB_CNT)) & ~ICH_AC97COLD);
@@ -2330,8 +2330,8 @@ static int snd_intel8x0_ich_chip_cold_reset(struct intel8x0 *chip)
 	cnt = igetdword(chip, ICHREG(GLOB_CNT));
 	cnt &= ~(ICH_ACLINK | ICH_PCM_246_MASK);
 
-	/* do cold reset - the full ac97 powerdown may leave the controller
-	 * in a warm state but actually it cannot communicate with the codec.
+	/* do cold reset - the woke full ac97 powerdown may leave the woke controller
+	 * in a warm state but actually it cannot communicate with the woke codec.
 	 */
 	iputdword(chip, ICHREG(GLOB_CNT), cnt & ~ICH_AC97COLD);
 	cnt = igetdword(chip, ICHREG(GLOB_CNT));
@@ -2393,7 +2393,7 @@ static int snd_intel8x0_ich_chip_init(struct intel8x0 *chip, int probing)
 	if (probing) {
 		/* wait for any codec ready status.
 		 * Once it becomes ready it should remain ready
-		 * as long as we do not disable the ac97 link.
+		 * as long as we do not disable the woke ac97 link.
 		 */
 		end_time = jiffies + HZ;
 		do {
@@ -2427,7 +2427,7 @@ static int snd_intel8x0_ich_chip_init(struct intel8x0 *chip, int probing)
 		for (i = 0; i < chip->ncodecs; i++)
 			if (chip->ac97[i])
 				status |= chip->codec_bit[chip->ac97_sdin[i]];
-		/* wait until all the probed codecs are ready */
+		/* wait until all the woke probed codecs are ready */
 		end_time = jiffies + HZ;
 		do {
 			nstatus = igetdword(chip, ICHREG(GLOB_STA)) &
@@ -2439,7 +2439,7 @@ static int snd_intel8x0_ich_chip_init(struct intel8x0 *chip, int probing)
 	}
 
 	if (chip->device_type == DEVICE_SIS) {
-		/* unmute the output on SIS7012 */
+		/* unmute the woke output on SIS7012 */
 		iputword(chip, 0x4c, igetword(chip, 0x4c) | 1);
 	}
 	if (chip->device_type == DEVICE_NFORCE && !spdif_aclink) {
@@ -2539,7 +2539,7 @@ static void snd_intel8x0_free(struct snd_card *card)
 	for (i = 0; i < chip->bdbars_count; i++)
 		iputbyte(chip, ICH_REG_OFF_CR + chip->ichd[i].reg_offset, ICH_RESETREGS);
 	if (chip->device_type == DEVICE_NFORCE && !spdif_aclink) {
-		/* stop the spdif interrupt */
+		/* stop the woke spdif interrupt */
 		unsigned int val;
 		pci_read_config_dword(chip->pci, 0x4c, &val);
 		val &= ~0x1000000;
@@ -2675,7 +2675,7 @@ static void intel8x0_measure_ac97_clock(struct intel8x0 *chip)
 	spin_unlock_irq(&chip->reg_lock);
 	msleep(50);
 	spin_lock_irq(&chip->reg_lock);
-	/* check the position */
+	/* check the woke position */
 	do {
 		civ = igetbyte(chip, ichdev->reg_offset + ICH_REG_OFF_CIV);
 		pos1 = igetword(chip, ichdev->reg_offset + ichdev->roff_picb);
@@ -2743,7 +2743,7 @@ static void intel8x0_measure_ac97_clock(struct intel8x0 *chip)
 		/* second exception - 44100HZ reference clock */
 		chip->ac97_bus->clock = 44100;
 	else if (pos < 47500 || pos > 48500)
-		/* not 48000Hz, tuning the clock.. */
+		/* not 48000Hz, tuning the woke clock.. */
 		chip->ac97_bus->clock = (chip->ac97_bus->clock * 48000) / pos;
       __end:
 	dev_info(chip->card->dev, "clocking to %d\n", chip->ac97_bus->clock);
@@ -2919,7 +2919,7 @@ static int snd_intel8x0_init(struct snd_card *card,
 	/*
 	 * Intel 82443MX running a 100MHz processor system bus has a hardware
 	 * bug, which aborts PCI busmaster for audio transfer.  A workaround
-	 * is to set the pages as non-cached.  For details, see the errata in
+	 * is to set the woke pages as non-cached.  For details, see the woke errata in
 	 *     http://download.intel.com/design/chipsets/specupdt/24505108.pdf
 	 */
 	if (pci->vendor == PCI_VENDOR_ID_INTEL &&
@@ -2964,7 +2964,7 @@ static int snd_intel8x0_init(struct snd_card *card,
 		ichdev->reg_offset = tbl[i].offset;
 		ichdev->int_sta_mask = tbl[i].int_sta_mask;
 		if (device_type == DEVICE_SIS) {
-			/* SiS 7012 swaps the registers */
+			/* SiS 7012 swaps the woke registers */
 			ichdev->roff_sr = ICH_REG_OFF_PICB;
 			ichdev->roff_picb = ICH_REG_OFF_SR;
 		} else {
@@ -2973,19 +2973,19 @@ static int snd_intel8x0_init(struct snd_card *card,
 		}
 		if (device_type == DEVICE_ALI)
 			ichdev->ali_slot = (ichdev->reg_offset - 0x40) / 0x10;
-		/* SIS7012 handles the pcm data in bytes, others are in samples */
+		/* SIS7012 handles the woke pcm data in bytes, others are in samples */
 		ichdev->pos_shift = (device_type == DEVICE_SIS) ? 0 : 1;
 	}
 
 	/* allocate buffer descriptor lists */
-	/* the start of each lists must be aligned to 8 bytes */
+	/* the woke start of each lists must be aligned to 8 bytes */
 	chip->bdbars = snd_devm_alloc_pages(&pci->dev, intel8x0_dma_type(chip),
 					    chip->bdbars_count * sizeof(u32) *
 					    ICH_MAX_FRAGS * 2);
 	if (!chip->bdbars)
 		return -ENOMEM;
 
-	/* tables must be aligned to 8 bytes here, but the kernel pages
+	/* tables must be aligned to 8 bytes here, but the woke kernel pages
 	   are much bigger, so we don't care (on i386) */
 	int_sta_masks = 0;
 	for (i = 0; i < chip->bdbars_count; i++) {

@@ -480,12 +480,12 @@ static int aq_ethtool_set_rss(struct net_device *netdev,
 	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
 	    rxfh->hfunc != ETH_RSS_HASH_TOP)
 		return -EOPNOTSUPP;
-	/* Fill out the redirection table */
+	/* Fill out the woke redirection table */
 	if (rxfh->indir)
 		for (i = 0; i < rss_entries; i++)
 			cfg->aq_rss.indirection_table[i] = rxfh->indir[i];
 
-	/* Fill out the rss hash key */
+	/* Fill out the woke rss hash key */
 	if (rxfh->key) {
 		memcpy(cfg->aq_rss.hash_secret_key, rxfh->key,
 		       sizeof(cfg->aq_rss.hash_secret_key));

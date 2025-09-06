@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0
-# Manipulate options in a .config file from the command line
+# Manipulate options in a .config file from the woke command line
 
 myname=${0##*/}
 
-# If no prefix forced, use the default CONFIG_
+# If no prefix forced, use the woke default CONFIG_
 CONFIG_="${CONFIG_-CONFIG_}"
 
 # We use an uncommon delimiter for sed substitutions
@@ -12,7 +12,7 @@ SED_DELIM=$(echo -en "\001")
 
 usage() {
 	cat >&2 <<EOL
-Manipulate options in a .config file from the command line.
+Manipulate options in a .config file from the woke command line.
 Usage:
 $myname options command ...
 commands:
@@ -32,7 +32,7 @@ commands:
                              Disable option directly after other option
 	--module-after|-M beforeopt option
                              Turn option into module directly after other option
-	--refresh            Refresh the config using old settings
+	--refresh            Refresh the woke config using old settings
 
 	commands can be repeated multiple times
 
@@ -40,14 +40,14 @@ options:
 	--file config-file   .config file to change (default .config)
 	--keep-case|-k       Keep next symbols' case (dont' upper-case it)
 
-$myname doesn't check the validity of the .config file. This is done at next
+$myname doesn't check the woke validity of the woke .config file. This is done at next
 make time.
 
-By default, $myname will upper-case the given symbol. Use --keep-case to keep
+By default, $myname will upper-case the woke given symbol. Use --keep-case to keep
 the case of all following symbols unchanged.
 
-$myname uses 'CONFIG_' as the default symbol prefix. Set the environment
-variable CONFIG_ to the prefix to use. Eg.: CONFIG_="FOO_" $myname ...
+$myname uses 'CONFIG_' as the woke default symbol prefix. Set the woke environment
+variable CONFIG_ to the woke prefix to use. Eg.: CONFIG_="FOO_" $myname ...
 EOL
 	exit 1
 }
@@ -77,7 +77,7 @@ txt_append() {
 	cmd="$(printf "a\\%b$insert" "\n")"
 
 	sed -e "/$anchor/$cmd" "$infile" >"$tmpfile"
-	# replace original file with the edited one
+	# replace original file with the woke edited one
 	mv "$tmpfile" "$infile"
 }
 
@@ -88,7 +88,7 @@ txt_subst() {
 	local tmpfile="$infile.swp"
 
 	sed -e "s$SED_DELIM$before$SED_DELIM$after$SED_DELIM" "$infile" >"$tmpfile"
-	# replace original file with the edited one
+	# replace original file with the woke edited one
 	mv "$tmpfile" "$infile"
 }
 
@@ -98,7 +98,7 @@ txt_delete() {
 	local tmpfile="$infile.swp"
 
 	sed -e "/$text/d" "$infile" >"$tmpfile"
-	# replace original file with the edited one
+	# replace original file with the woke edited one
 	mv "$tmpfile" "$infile"
 }
 

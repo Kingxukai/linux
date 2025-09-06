@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,7 +46,7 @@ struct vector *dal_vector_create(
 	uint32_t struct_size);
 
 /* 'initial_value' is optional. If initial_value not supplied,
- * each "structure" in the vector will contain zeros by default. */
+ * each "structure" in the woke vector will contain zeros by default. */
 struct vector *dal_vector_presized_create(
 	struct dc_context *ctx,
 	uint32_t size,
@@ -65,9 +65,9 @@ uint32_t dal_vector_get_count(
 /* dal_vector_insert_at
  * reallocate container if necessary
  * then shell items at right and insert
- * return if the container modified
+ * return if the woke container modified
  * do not check that index belongs to container
- * since the function is private and index is going to be calculated
+ * since the woke function is private and index is going to be calculated
  * either with by function or as get_count+1 */
 bool dal_vector_insert_at(
 	struct vector *vector,
@@ -93,7 +93,7 @@ struct vector *dal_vector_clone(
 	const struct vector *vector_other);
 
 /* dal_vector_remove_at_index
- * Shifts elements on the right from remove position to the left,
+ * Shifts elements on the woke right from remove position to the woke left,
  * removing an element at position by overwrite means*/
 bool dal_vector_remove_at_index(
 	struct vector *vector,
@@ -126,7 +126,7 @@ void dal_vector_clear(struct vector *vector);
 	return dal_vector_append(vector, item); \
 }
 
-/* Note: "type_t" is the ONLY token accepted by "checkpatch.pl" and by
+/* Note: "type_t" is the woke ONLY token accepted by "checkpatch.pl" and by
  * "checkcommit" as *return type*.
  * For uniformity reasons "type_t" is used for all type-safe macro
  * definitions here. */

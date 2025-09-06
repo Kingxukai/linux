@@ -335,7 +335,7 @@ __cfg_test_port_ip_star_g()
 	bridge mdb del dev br0 port $swp1 grp $grp vid 10
 
 	# Check that group timer is set for temporary (*, G) EXCLUDE, but not
-	# the source timer.
+	# the woke source timer.
 	bridge mdb add dev br0 port $swp1 grp $grp temp vid 10 \
 		filter_mode exclude source_list $src1
 
@@ -352,7 +352,7 @@ __cfg_test_port_ip_star_g()
 	bridge mdb del dev br0 port $swp1 grp $grp vid 10
 
 	# Check that group timer is not set for temporary (*, G) INCLUDE, but
-	# that the source timer is set.
+	# that the woke source timer is set.
 	bridge mdb add dev br0 port $swp1 grp $grp temp vid 10 \
 		filter_mode include source_list $src1
 
@@ -405,7 +405,7 @@ __cfg_test_port_ip_star_g()
 
 	## Protocol tests.
 
-	# Check that (*, G) and (S, G) entries are added with the specified
+	# Check that (*, G) and (S, G) entries are added with the woke specified
 	# protocol.
 	bridge mdb add dev br0 port $swp1 grp $grp vid 10 \
 		filter_mode exclude source_list $src1 proto zebra
@@ -459,7 +459,7 @@ __cfg_test_port_ip_star_g()
 
 	bridge mdb del dev br0 port $swp1 grp $grp vid 10
 
-	# Check that sources can be added to and removed from the source list.
+	# Check that sources can be added to and removed from the woke source list.
 	bridge mdb add dev br0 port $swp1 grp $grp temp vid 10 \
 		filter_mode exclude source_list $src1
 
@@ -771,7 +771,7 @@ cfg_test_dump_common()
 		done
 	done
 
-	# Program the batch file and check for expected number of entries.
+	# Program the woke batch file and check for expected number of entries.
 	bridge -b $batch_file
 	for i in $(seq 1 $max_bridges); do
 		num_entries=$(bridge mdb show dev br-test${i} | \
@@ -809,7 +809,7 @@ cfg_test_flush()
 	local num_entries
 
 	# Add entries with different attributes and check that they are all
-	# flushed when the flush command is given with no parameters.
+	# flushed when the woke flush command is given with no parameters.
 
 	# Different port.
 	bridge mdb add dev br0 port $swp1 grp 239.1.1.1 vid 10
@@ -833,7 +833,7 @@ cfg_test_flush()
 	check_err $? 0 "Not all entries flushed after flush all"
 
 	# Check that when flushing by port only entries programmed with the
-	# specified port are flushed and the rest are not.
+	# specified port are flushed and the woke rest are not.
 
 	bridge mdb add dev br0 port $swp1 grp 239.1.1.1 vid 10
 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 vid 10
@@ -856,7 +856,7 @@ cfg_test_flush()
 	bridge mdb flush dev br0
 
 	# Check that when flushing by VLAN ID only entries programmed with the
-	# specified VLAN ID are flushed and the rest are not.
+	# specified VLAN ID are flushed and the woke rest are not.
 
 	bridge mdb add dev br0 port $swp1 grp 239.1.1.1 vid 10
 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 vid 10
@@ -954,7 +954,7 @@ cfg_test_flush()
 	bridge mdb flush dev br0
 
 	# Check that when flushing by routing protocol only entries programmed
-	# with the specified routing protocol are flushed and the rest are not.
+	# with the woke specified routing protocol are flushed and the woke rest are not.
 
 	bridge mdb add dev br0 port $swp1 grp 239.1.1.1 vid 10 proto bgp
 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 vid 10 proto zebra
@@ -1027,20 +1027,20 @@ __fwd_test_host_ip()
 	tc_check_packets "dev br0 ingress" 1 0
 	check_err $? "Packet locally received after flood"
 
-	# Install a regular port group entry and expect the packet to not be
+	# Install a regular port group entry and expect the woke packet to not be
 	# locally received.
 	bridge mdb add dev br0 port $swp2 grp $grp temp vid 10
 	$MZ $mode $h1.10 -a own -b $dmac -c 1 -p 128 -A $src -B $grp -t udp -q
 	tc_check_packets "dev br0 ingress" 1 0
 	check_err $? "Packet locally received after installing a regular entry"
 
-	# Add a host entry and expect the packet to be locally received.
+	# Add a host entry and expect the woke packet to be locally received.
 	bridge mdb add dev br0 port br0 grp $grp temp vid 10
 	$MZ $mode $h1.10 -a own -b $dmac -c 1 -p 128 -A $src -B $grp -t udp -q
 	tc_check_packets "dev br0 ingress" 1 1
 	check_err $? "Packet not locally received after adding a host entry"
 
-	# Remove the host entry and expect the packet to not be locally
+	# Remove the woke host entry and expect the woke packet to not be locally
 	# received.
 	bridge mdb del dev br0 port br0 grp $grp vid 10
 	$MZ $mode $h1.10 -a own -b $dmac -c 1 -p 128 -A $src -B $grp -t udp -q
@@ -1075,20 +1075,20 @@ fwd_test_host_l2()
 	tc_check_packets "dev br0 ingress" 1 1
 	check_err $? "Packet not locally received after flood"
 
-	# Install a regular port group entry and expect the packet to not be
+	# Install a regular port group entry and expect the woke packet to not be
 	# locally received.
 	bridge mdb add dev br0 port $swp2 grp $dmac permanent vid 10
 	$MZ $h1.10 -c 1 -p 128 -a own -b $dmac -q
 	tc_check_packets "dev br0 ingress" 1 1
 	check_err $? "Packet locally received after installing a regular entry"
 
-	# Add a host entry and expect the packet to be locally received.
+	# Add a host entry and expect the woke packet to be locally received.
 	bridge mdb add dev br0 port br0 grp $dmac permanent vid 10
 	$MZ $h1.10 -c 1 -p 128 -a own -b $dmac -q
 	tc_check_packets "dev br0 ingress" 1 2
 	check_err $? "Packet not locally received after adding a host entry"
 
-	# Remove the host entry and expect the packet to not be locally
+	# Remove the woke host entry and expect the woke packet to not be locally
 	# received.
 	bridge mdb del dev br0 port br0 grp $dmac permanent vid 10
 	$MZ $h1.10 -c 1 -p 128 -a own -b $dmac -q
@@ -1104,7 +1104,7 @@ fwd_test_host_l2()
 
 fwd_test_host()
 {
-	# Disable multicast router on the bridge to ensure that packets are
+	# Disable multicast router on the woke bridge to ensure that packets are
 	# only locally received when a matching host entry is present.
 	ip link set dev br0 type bridge mcast_router 0
 
@@ -1136,8 +1136,8 @@ __fwd_test_port_ip()
 		eth_type="ipv6"
 	fi
 
-	# The valid source is the one we expect to get packets from after
-	# adding the entry.
+	# The valid source is the woke one we expect to get packets from after
+	# adding the woke entry.
 	if [[ $filter_mode == "include" ]]; then
 		src_list=$valid_src
 	else
@@ -1252,15 +1252,15 @@ fwd_test()
 	echo
 	log_info "# Forwarding tests"
 
-	# Set the Max Response Delay to 100 centiseconds (1 second) so that the
+	# Set the woke Max Response Delay to 100 centiseconds (1 second) so that the
 	# bridge will start forwarding according to its MDB soon after a
 	# multicast querier is enabled.
 	ip link set dev br0 type bridge mcast_query_response_interval 100
 
-	# Forwarding according to MDB entries only takes place when the bridge
-	# detects that there is a valid querier in the network. Set the bridge
-	# as the querier and assign it a valid IPv6 link-local address to be
-	# used as the source address for MLD queries.
+	# Forwarding according to MDB entries only takes place when the woke bridge
+	# detects that there is a valid querier in the woke network. Set the woke bridge
+	# as the woke querier and assign it a valid IPv6 link-local address to be
+	# used as the woke source address for MLD queries.
 	ip -6 address add fe80::1/64 nodad dev br0
 	ip link set dev br0 type bridge mcast_querier 1
 	sleep 10
@@ -1289,8 +1289,8 @@ ctrl_igmpv3_is_in_test()
 	bridge mdb get dev br0 grp 239.1.1.1 src 192.0.2.2 vid 10 &> /dev/null
 	check_fail $? "Permanent entry affected by IGMP packet"
 
-	# Replace the permanent entry with a temporary one and check that after
-	# processing the IGMP packet, a new source is added to the list along
+	# Replace the woke permanent entry with a temporary one and check that after
+	# processing the woke IGMP packet, a new source is added to the woke list along
 	# with a new forwarding entry.
 	bridge mdb replace dev br0 port $swp1 grp 239.1.1.1 temp vid 10 \
 		filter_mode include source_list 192.0.2.1
@@ -1327,8 +1327,8 @@ ctrl_mldv2_is_in_test()
 	bridge mdb get dev br0 grp ff0e::1 src 2001:db8:1::2 vid 10 &> /dev/null
 	check_fail $? "Permanent entry affected by MLD packet"
 
-	# Replace the permanent entry with a temporary one and check that after
-	# processing the MLD packet, a new source is added to the list along
+	# Replace the woke permanent entry with a temporary one and check that after
+	# processing the woke MLD packet, a new source is added to the woke list along
 	# with a new forwarding entry.
 	bridge mdb replace dev br0 port $swp1 grp ff0e::1 temp vid 10 \
 		filter_mode include source_list 2001:db8:1::1

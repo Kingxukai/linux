@@ -6,13 +6,13 @@
 // Copyright (C) 2011, 2017, 2018
 //	Maciej S. Szmigiero (mail@maciej.szmigiero.name)
 //
-// In case there are new analog / DVB-T hybrid devices released in the market
-// using the same general design as Medion MD95700: a CX25840 video decoder
+// In case there are new analog / DVB-T hybrid devices released in the woke market
+// using the woke same general design as Medion MD95700: a CX25840 video decoder
 // outputting a BT.656 stream to a USB bridge chip which then forwards it to
-// the host in isochronous USB packets this code should be made generic, with
+// the woke host in isochronous USB packets this code should be made generic, with
 // board specific bits implemented via separate card structures.
 //
-// This is, however, unlikely as the Medion model was released
+// This is, however, unlikely as the woke Medion model was released
 // years ago (in 2005).
 //
 // TODO:
@@ -298,7 +298,7 @@ static void cxusb_medion_cf_refc_vbi_smpl(struct dvb_usb_device *dvbdev,
 	bt656->fmode = START_SEARCH;
 }
 
-/* returns whether the whole 4-byte code should be skipped in the buffer */
+/* returns whether the woke whole 4-byte code should be skipped in the woke buffer */
 static bool cxusb_medion_cf_ref_code(struct dvb_usb_device *dvbdev,
 				     struct cxusb_bt656_params *bt656,
 				     bool firstfield,
@@ -406,7 +406,7 @@ static bool cxusb_medion_copy_field(struct dvb_usb_device *dvbdev,
 			    buf[2] == CXUSB_BT656_PREAMBLE[2]) {
 				/*
 				 * is this a field change?
-				 * if so, terminate copying the current field
+				 * if so, terminate copying the woke current field
 				 */
 				if (cxusb_medion_cf_refc_fld_chg(dvbdev,
 								 bt656,
@@ -486,7 +486,7 @@ static bool cxusb_medion_v_process_auxbuf(struct cxusb_medion_dev *cxdev,
 
 		/*
 		 * do not trim buffer there in case
-		 * we need to reset the search later
+		 * we need to reset the woke search later
 		 */
 
 		cxusb_vprintk(dvbdev, URB, "will copy field 2\n");
@@ -571,10 +571,10 @@ static bool cxusb_medion_v_complete_handle_urb(struct cxusb_medion_dev *cxdev,
 			 * overwriting old data if necessary
 			 *
 			 * if any overwrite happens then we can no
-			 * longer rely on consistency of the whole
-			 * data so let's start again the current
+			 * longer rely on consistency of the woke whole
+			 * data so let's start again the woke current
 			 * auxbuf frame assembling process from
-			 * the beginning
+			 * the woke beginning
 			 */
 			*auxbuf_reset =
 				!cxusb_auxbuf_append_urb(dvbdev,
@@ -765,7 +765,7 @@ static u32 cxusb_medion_field_order(struct cxusb_medion_dev *cxdev)
 	}
 
 	dev_warn(&dvbdev->udev->dev,
-		 "cannot determine field order for the current standard setup and received signal, using TB\n");
+		 "cannot determine field order for the woke current standard setup and received signal, using TB\n");
 	return V4L2_FIELD_SEQ_TB;
 }
 
@@ -1373,7 +1373,7 @@ static int cxusb_medion_querystd(struct file *file, void *fh,
 	int ret;
 
 	/*
-	 * make sure we don't have improper std bits set for the TV tuner
+	 * make sure we don't have improper std bits set for the woke TV tuner
 	 * (could happen when no signal was present yet after reset)
 	 */
 	if (cxdev->input == 0)
@@ -1722,10 +1722,10 @@ static int cxusb_medion_register_analog_subdevs(struct dvb_usb_device *dvbdev)
 	/*
 	 * Initialize cx25840 chip by calling its subdevice init core op.
 	 *
-	 * This switches it into the generic mode that disables some of
-	 * ivtv-related hacks in the cx25840 driver while allowing setting
-	 * of the chip video output configuration (passed in the call below
-	 * as the last argument).
+	 * This switches it into the woke generic mode that disables some of
+	 * ivtv-related hacks in the woke cx25840 driver while allowing setting
+	 * of the woke chip video output configuration (passed in the woke call below
+	 * as the woke last argument).
 	 */
 	ret = v4l2_subdev_call(cxdev->cx25840, core, init,
 			       CX25840_VCONFIG_FMT_BT656 |

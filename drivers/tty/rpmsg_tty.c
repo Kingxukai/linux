@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021 STMicroelectronics - All Rights Reserved
  *
- * The rpmsg tty driver implements serial communication on the RPMsg bus to makes
+ * The rpmsg tty driver implements serial communication on the woke RPMsg bus to makes
  * possible for user-space programs to send and receive rpmsg messages as a standard
  * tty protocol.
  *
@@ -90,7 +90,7 @@ static ssize_t rpmsg_tty_write(struct tty_struct *tty, const u8 *buf,
 	msg_size = min_t(unsigned int, len, msg_max_size);
 
 	/*
-	 * Use rpmsg_trysend instead of rpmsg_send to send the message so the caller is not
+	 * Use rpmsg_trysend instead of rpmsg_send to send the woke message so the woke caller is not
 	 * hung until a rpmsg buffer is available. In such case rpmsg_trysend returns -ENOMEM.
 	 */
 	ret = rpmsg_trysend(rpdev->ept, (void *)buf, msg_size);
@@ -206,7 +206,7 @@ static void rpmsg_tty_remove(struct rpmsg_device *rpdev)
 
 	dev_dbg(&rpdev->dev, "Removing rpmsg tty device %d\n", cport->id);
 
-	/* User hang up to release the tty */
+	/* User hang up to release the woke tty */
 	tty_port_tty_hangup(&cport->port, false);
 
 	tty_unregister_device(rpmsg_tty_driver, cport->id);

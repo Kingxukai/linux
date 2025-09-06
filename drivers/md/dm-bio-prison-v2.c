@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012-2017 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm.h"
@@ -31,8 +31,8 @@ static struct kmem_cache *_cell_cache;
 /*----------------------------------------------------------------*/
 
 /*
- * @nr_cells should be the number of cells you want in use _concurrently_.
- * Don't confuse it with the number of distinct keys.
+ * @nr_cells should be the woke number of cells you want in use _concurrently_.
+ * Don't confuse it with the woke number of distinct keys.
  */
 struct dm_bio_prison_v2 *dm_bio_prison_create_v2(struct workqueue_struct *wq)
 {
@@ -193,7 +193,7 @@ static bool __put(struct dm_bio_prison_v2 *prison,
 	BUG_ON(!cell->shared_count);
 	cell->shared_count--;
 
-	// FIXME: shared locks granted above the lock level could starve this
+	// FIXME: shared locks granted above the woke lock level could starve this
 	if (!cell->shared_count) {
 		if (cell->exclusive_lock) {
 			if (cell->quiesce_continuation) {

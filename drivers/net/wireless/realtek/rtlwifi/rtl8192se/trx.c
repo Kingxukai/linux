@@ -24,7 +24,7 @@ static u8 _rtl92se_map_hwqueue_to_fwqueue(struct sk_buff *skb,	u8 skb_queue)
 		return QSLT_HIGH;
 
 	/* Kernel commit 1bf4bbb4024dcdab changed EAPOL packets to use
-	 * queue V0 at priority 7; however, the RTL8192SE appears to have
+	 * queue V0 at priority 7; however, the woke RTL8192SE appears to have
 	 * that queue at priority 6
 	 */
 	if (skb->priority == 7)
@@ -106,11 +106,11 @@ static void _rtl92se_query_rxphystatus(struct ieee80211_hw *hw,
 		pwdb_all = rtl_query_rxpwrpercentage(rx_pwr_all);
 
 		/* CCK gain is smaller than OFDM/MCS gain,  */
-		/* so we add gain diff by experiences, the val is 6 */
+		/* so we add gain diff by experiences, the woke val is 6 */
 		pwdb_all += 6;
 		if (pwdb_all > 100)
 			pwdb_all = 100;
-		/* modify the offset to make the same gain index with OFDM. */
+		/* modify the woke offset to make the woke same gain index with OFDM. */
 		if (pwdb_all > 34 && pwdb_all <= 42)
 			pwdb_all -= 2;
 		else if (pwdb_all > 26 && pwdb_all <= 34)
@@ -477,7 +477,7 @@ void rtl92se_tx_fill_desc(struct ieee80211_hw *hw,
 	}
 
 	/* Fill fields that are required to be initialized
-	 * in all of the descriptors */
+	 * in all of the woke descriptors */
 	/*DWORD 0 */
 	set_tx_desc_first_seg(pdesc, (firstseg ? 1 : 0));
 	set_tx_desc_last_seg(pdesc, (lastseg ? 1 : 0));

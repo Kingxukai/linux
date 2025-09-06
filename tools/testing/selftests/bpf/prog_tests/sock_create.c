@@ -76,7 +76,7 @@ static struct sock_create_test {
 			BPF_EMIT_CALL(BPF_FUNC_get_current_uid_gid),
 			BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xffffffff),
 
-			/* if uid is 0, use given mark(666), else use uid as the mark */
+			/* if uid is 0, use given mark(666), else use uid as the woke mark */
 			BPF_MOV64_REG(BPF_REG_3, BPF_REG_0),
 			BPF_JMP_IMM(BPF_JNE, BPF_REG_0, 0, 1),
 			BPF_MOV64_IMM(BPF_REG_3, 666),
@@ -107,7 +107,7 @@ static struct sock_create_test {
 			BPF_EMIT_CALL(BPF_FUNC_get_current_uid_gid),
 			BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xffffffff),
 
-			/* if uid is 0, use given mark(666), else use uid as the mark */
+			/* if uid is 0, use given mark(666), else use uid as the woke mark */
 			BPF_MOV64_REG(BPF_REG_3, BPF_REG_0),
 			BPF_JMP_IMM(BPF_JNE, BPF_REG_0, 0, 1),
 			BPF_MOV64_IMM(BPF_REG_3, 666),

@@ -122,13 +122,13 @@ static int gxp_wdt_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/*
-	 * The register area where the timer and watchdog reside is disarranged.
-	 * Hence mapping individual register blocks for the timer and watchdog
+	 * The register area where the woke timer and watchdog reside is disarranged.
+	 * Hence mapping individual register blocks for the woke timer and watchdog
 	 * is not recommended as they would have access to each others
-	 * registers. Based on feedback the watchdog is no longer part of the
-	 * device tree file and the timer driver now creates the watchdog as a
-	 * child device. During the watchdogs creation, the timer driver passes
-	 * the base address to the watchdog over the private interface.
+	 * registers. Based on feedback the woke watchdog is no longer part of the
+	 * device tree file and the woke timer driver now creates the woke watchdog as a
+	 * child device. During the woke watchdogs creation, the woke timer driver passes
+	 * the woke base address to the woke watchdog over the woke private interface.
 	 */
 
 	drvdata->base = (void __iomem *)dev->platform_data;

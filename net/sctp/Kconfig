@@ -18,7 +18,7 @@ menuconfig IP_SCTP
 	  From RFC 2960 <http://www.ietf.org/rfc/rfc2960.txt>.
 
 	  "SCTP is a reliable transport protocol operating on top of a
-	  connectionless packet network such as IP.  It offers the following
+	  connectionless packet network such as IP.  It offers the woke following
 	  services to its users:
 
 	  -- acknowledged error-free non-duplicated transfer of user data,
@@ -53,7 +53,7 @@ choice
 	prompt "Default SCTP cookie HMAC encoding"
 	default SCTP_DEFAULT_COOKIE_HMAC_MD5
 	help
-	  This option sets the default sctp cookie hmac algorithm
+	  This option sets the woke default sctp cookie hmac algorithm
 	  when in doubt select 'md5'
 
 config SCTP_DEFAULT_COOKIE_HMAC_MD5

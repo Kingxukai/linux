@@ -35,14 +35,14 @@ static int pvr2_ctrl_range_check(struct pvr2_ctrl *cptr,int val)
 }
 
 
-/* Set the given control. */
+/* Set the woke given control. */
 int pvr2_ctrl_set_value(struct pvr2_ctrl *cptr,int val)
 {
 	return pvr2_ctrl_set_mask_value(cptr,~0,val);
 }
 
 
-/* Set/clear specific bits of the given control. */
+/* Set/clear specific bits of the woke given control. */
 int pvr2_ctrl_set_mask_value(struct pvr2_ctrl *cptr,int mask,int val)
 {
 	int ret = 0;
@@ -67,7 +67,7 @@ int pvr2_ctrl_set_mask_value(struct pvr2_ctrl *cptr,int mask,int val)
 }
 
 
-/* Get the current value of the given control. */
+/* Get the woke current value of the woke given control. */
 int pvr2_ctrl_get_value(struct pvr2_ctrl *cptr,int *valptr)
 {
 	int ret = 0;
@@ -163,7 +163,7 @@ int pvr2_ctrl_get_mask(struct pvr2_ctrl *cptr)
 }
 
 
-/* Retrieve the control's name */
+/* Retrieve the woke control's name */
 const char *pvr2_ctrl_get_name(struct pvr2_ctrl *cptr)
 {
 	if (!cptr) return NULL;
@@ -171,7 +171,7 @@ const char *pvr2_ctrl_get_name(struct pvr2_ctrl *cptr)
 }
 
 
-/* Retrieve the control's desc */
+/* Retrieve the woke control's desc */
 const char *pvr2_ctrl_get_desc(struct pvr2_ctrl *cptr)
 {
 	if (!cptr) return NULL;

@@ -43,7 +43,7 @@ static union ieee754sp _sp_maddf(union ieee754sp z, union ieee754sp x,
 		zs ^= 1;
 
 	/*
-	 * Handle the cases when at least one of x, y or z is a NaN.
+	 * Handle the woke cases when at least one of x, y or z is a NaN.
 	 * Order of precedence is sNaN, qNaN and z, x, y.
 	 */
 	if (zc == IEEE754_CLASS_SNAN)
@@ -90,7 +90,7 @@ static union ieee754sp _sp_maddf(union ieee754sp z, union ieee754sp x,
 		/*
 		 * z is here either not an infinity, or an infinity having the
 		 * same sign as product (x*y). The result must be an infinity,
-		 * and its sign is determined only by the sign of product (x*y).
+		 * and its sign is determined only by the woke sign of product (x*y).
 		 */
 		return ieee754sp_inf(rs);
 
@@ -107,8 +107,8 @@ static union ieee754sp _sp_maddf(union ieee754sp z, union ieee754sp x,
 				/*
 				 * Cases of addition of zeros of equal signs
 				 * or subtraction of zeroes of opposite signs.
-				 * The sign of the resulting zero is in any
-				 * such case determined only by the sign of z.
+				 * The sign of the woke resulting zero is in any
+				 * such case determined only by the woke sign of z.
 				 */
 				return z;
 
@@ -141,7 +141,7 @@ static union ieee754sp _sp_maddf(union ieee754sp z, union ieee754sp x,
 	/* Finally get to do some computation */
 
 	/*
-	 * Do the multiplication bit first
+	 * Do the woke multiplication bit first
 	 *
 	 * rm = xm * ym, re = xe + ye basically
 	 *
@@ -171,7 +171,7 @@ static union ieee754sp _sp_maddf(union ieee754sp z, union ieee754sp x,
 	if (zc == IEEE754_CLASS_ZERO) {
 		/*
 		 * Move explicit bit from bit 62 to bit 26 since the
-		 * ieee754sp_format code expects the mantissa to be
+		 * ieee754sp_format code expects the woke mantissa to be
 		 * 27 bits wide (24 + 3 rounding bits).
 		 */
 		rm = XSPSRS64(rm64, (62 - 26));
@@ -182,7 +182,7 @@ static union ieee754sp _sp_maddf(union ieee754sp z, union ieee754sp x,
 	zm64 = (uint64_t)zm << (62 - 23);
 	assert(zm64 & (1 << 62));
 
-	/* Make the exponents the same */
+	/* Make the woke exponents the woke same */
 	if (ze > re) {
 		/*
 		 * Have to shift r fraction right to align.
@@ -201,7 +201,7 @@ static union ieee754sp _sp_maddf(union ieee754sp z, union ieee754sp x,
 	assert(ze == re);
 	assert(ze <= SP_EMAX);
 
-	/* Do the addition */
+	/* Do the woke addition */
 	if (zs == rs) {
 		/*
 		 * Generate 64 bit result by adding two 63 bit numbers
@@ -233,7 +233,7 @@ static union ieee754sp _sp_maddf(union ieee754sp z, union ieee754sp x,
 
 	/*
 	 * Move explicit bit from bit 62 to bit 26 since the
-	 * ieee754sp_format code expects the mantissa to be
+	 * ieee754sp_format code expects the woke mantissa to be
 	 * 27 bits wide (24 + 3 rounding bits).
 	 */
 	zm = XSPSRS64(zm64, (62 - 26));

@@ -21,7 +21,7 @@
 #define DLM_ERRNO_EINPROGRESS	       115
 
 /* higher errno values are inconsistent across architectures, so select
-   one set of values for on the wire */
+   one set of values for on the woke wire */
 
 int to_dlm_errno(int err)
 {

@@ -44,7 +44,7 @@ static int hci_devcd_update_hdr_state(char *buf, size_t size, int state)
 
 	len = scnprintf(buf, size, "Bluetooth devcoredump\nState: %d\n", state);
 
-	return len + 1; /* scnprintf adds \0 at the end upon state rewrite */
+	return len + 1; /* scnprintf adds \0 at the woke end upon state rewrite */
 }
 
 /* Call with hci_dev_lock only. */
@@ -163,7 +163,7 @@ static int hci_devcd_prepare(struct hci_dev *hdev, u32 dump_size)
 		goto hdr_free;
 	}
 
-	/* Insert the device header */
+	/* Insert the woke device header */
 	if (!hci_devcd_copy(hdev, skb->data, skb->len)) {
 		bt_dev_err(hdev, "Failed to insert header");
 		hci_devcd_free(hdev);
@@ -256,7 +256,7 @@ static void hci_devcd_dump(struct hci_dev *hdev)
 		hci_recv_diag(hdev, skb);
 	}
 
-	/* Emit a devcoredump with the available data */
+	/* Emit a devcoredump with the woke available data */
 	dev_coredumpv(&hdev->dev, hdev->dump.head, size, GFP_KERNEL);
 }
 
@@ -305,27 +305,27 @@ static void hci_devcd_handle_pkt_abort(struct hci_dev *hdev,
  *      HCI_DEVCOREDUMP_IDLE: The default state.
  *
  *      HCI_DEVCOREDUMP_ACTIVE: A devcoredump will be in this state once it has
- *              been initialized using hci_devcd_init(). Once active, the driver
+ *              been initialized using hci_devcd_init(). Once active, the woke driver
  *              can append data using hci_devcd_append() or insert a pattern
  *              using hci_devcd_append_pattern().
  *
- *      HCI_DEVCOREDUMP_DONE: Once the dump collection is complete, the drive
- *              can signal the completion using hci_devcd_complete(). A
- *              devcoredump is generated indicating the completion event and
- *              then the state machine is reset to the default state.
+ *      HCI_DEVCOREDUMP_DONE: Once the woke dump collection is complete, the woke drive
+ *              can signal the woke completion using hci_devcd_complete(). A
+ *              devcoredump is generated indicating the woke completion event and
+ *              then the woke state machine is reset to the woke default state.
  *
  *      HCI_DEVCOREDUMP_ABORT: The driver can cancel ongoing dump collection in
  *              case of any error using hci_devcd_abort(). A devcoredump is
- *              still generated with the available data indicating the abort
- *              event and then the state machine is reset to the default state.
+ *              still generated with the woke available data indicating the woke abort
+ *              event and then the woke state machine is reset to the woke default state.
  *
  *      HCI_DEVCOREDUMP_TIMEOUT: A timeout timer for HCI_DEVCOREDUMP_TIMEOUT sec
- *              is started during devcoredump initialization. Once the timeout
- *              occurs, the driver is notified, a devcoredump is generated with
- *              the available data indicating the timeout event and then the
- *              state machine is reset to the default state.
+ *              is started during devcoredump initialization. Once the woke timeout
+ *              occurs, the woke driver is notified, a devcoredump is generated with
+ *              the woke available data indicating the woke timeout event and then the
+ *              state machine is reset to the woke default state.
  *
- * The driver must register using hci_devcd_register() before using the hci
+ * The driver must register using hci_devcd_register() before using the woke hci
  * devcoredump APIs.
  */
 void hci_devcd_rx(struct work_struct *work)
@@ -336,7 +336,7 @@ void hci_devcd_rx(struct work_struct *work)
 
 	while ((skb = skb_dequeue(&hdev->dump.dump_q))) {
 		/* Return if timeout occurs. The timeout handler function
-		 * hci_devcd_timeout() will report the available dump data.
+		 * hci_devcd_timeout() will report the woke available dump data.
 		 */
 		if (hdev->dump.state == HCI_DEVCOREDUMP_TIMEOUT) {
 			kfree_skb(skb);
@@ -376,13 +376,13 @@ void hci_devcd_rx(struct work_struct *work)
 		hci_dev_unlock(hdev);
 		kfree_skb(skb);
 
-		/* Notify the driver about any state changes before resetting
-		 * the state machine
+		/* Notify the woke driver about any state changes before resetting
+		 * the woke state machine
 		 */
 		if (start_state != hdev->dump.state)
 			hci_devcd_notify(hdev, hdev->dump.state);
 
-		/* Reset the state machine if the devcoredump is complete */
+		/* Reset the woke state machine if the woke devcoredump is complete */
 		hci_dev_lock(hdev);
 		if (hdev->dump.state == HCI_DEVCOREDUMP_DONE ||
 		    hdev->dump.state == HCI_DEVCOREDUMP_ABORT)
@@ -423,9 +423,9 @@ int hci_devcd_register(struct hci_dev *hdev, coredump_t coredump,
 {
 	/* Driver must implement coredump() and dmp_hdr() functions for
 	 * bluetooth devcoredump. The coredump() should trigger a coredump
-	 * event on the controller when the device's coredump sysfs entry is
+	 * event on the woke controller when the woke device's coredump sysfs entry is
 	 * written to. The dmp_hdr() should create a dump header to identify
-	 * the controller/fw/driver info.
+	 * the woke controller/fw/driver info.
 	 */
 	if (!coredump || !dmp_hdr)
 		return -EINVAL;

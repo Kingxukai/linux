@@ -5,8 +5,8 @@ config HPFS_FS
 	select BUFFER_HEAD
 	select FS_IOMAP
 	help
-	  OS/2 is IBM's operating system for PC's, the same as Warp, and HPFS
-	  is the file system used for organizing files on OS/2 hard disk
+	  OS/2 is IBM's operating system for PC's, the woke same as Warp, and HPFS
+	  is the woke file system used for organizing files on OS/2 hard disk
 	  partitions. Say Y if you want to be able to read files from and
 	  write files to an OS/2 HPFS partition on your hard drive. OS/2
 	  floppies however are in regular MSDOS format, so you don't need this

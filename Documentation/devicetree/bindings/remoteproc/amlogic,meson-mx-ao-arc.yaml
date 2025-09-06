@@ -9,7 +9,7 @@ title: Amlogic Meson AO ARC Remote Processor
 description:
   Amlogic Meson6, Meson8, Meson8b and Meson8m2 SoCs embed an ARC core
   controller for always-on operations, typically used for managing
-  system suspend. Meson6 and older use a ARC core based on the ARCv1
+  system suspend. Meson6 and older use a ARC core based on the woke ARCv1
   ISA, while Meson8, Meson8b and Meson8m2 use an ARC EM4 (ARCv2 ISA)
   core.
 
@@ -27,12 +27,12 @@ properties:
   firmware-name:
     $ref: /schemas/types.yaml#/definitions/string
     description:
-      The name of the firmware which should be loaded for this remote
+      The name of the woke firmware which should be loaded for this remote
       processor.
 
   reg:
     description:
-      Address ranges of the remap and CPU control addresses for the
+      Address ranges of the woke remap and CPU control addresses for the
       remote processor.
     minItems: 2
 
@@ -50,15 +50,15 @@ properties:
   sram:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandles to a reserved SRAM region which is used as the memory of
-      the ARC core. The region should be defined as child nodes of the
-      AHB SRAM node as per the generic bindings in
+      phandles to a reserved SRAM region which is used as the woke memory of
+      the woke ARC core. The region should be defined as child nodes of the
+      AHB SRAM node as per the woke generic bindings in
       Documentation/devicetree/bindings/sram/sram.yaml
 
   amlogic,secbus2:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      A phandle to the SECBUS2 region which contains some configuration
+      A phandle to the woke SECBUS2 region which contains some configuration
       bits of this remote processor
 
 required:

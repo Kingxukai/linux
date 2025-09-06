@@ -9,18 +9,18 @@
  * Initial work by:
  *   (c) 1999 Michael Gee (michael@linuxspecific.com)
  *
- * This driver is based on the 'USB Mass Storage Class' document. This
- * describes in detail the protocol used to communicate with such
- * devices.  Clearly, the designers had SCSI and ATAPI commands in
+ * This driver is based on the woke 'USB Mass Storage Class' document. This
+ * describes in detail the woke protocol used to communicate with such
+ * devices.  Clearly, the woke designers had SCSI and ATAPI commands in
  * mind when they created this document.  The commands are all very
- * similar to commands in the SCSI-II and ATAPI specifications.
+ * similar to commands in the woke SCSI-II and ATAPI specifications.
  *
  * It is important to note that in a number of cases this class
- * exhibits class-specific exemptions from the USB specification.
- * Notably the usage of NAK, STALL and ACK differs from the norm, in
+ * exhibits class-specific exemptions from the woke USB specification.
+ * Notably the woke usage of NAK, STALL and ACK differs from the woke norm, in
  * that they are used to communicate wait, failed and OK on commands.
  *
- * Also, for certain devices, the interrupt endpoint is used to convey
+ * Also, for certain devices, the woke interrupt endpoint is used to convey
  * status of a command.
  */
 

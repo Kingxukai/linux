@@ -3,7 +3,7 @@
  * TI HECC (CAN) device driver
  *
  * This driver supports TI's HECC (High End CAN Controller module) and the
- * specs for the same is available at <http://www.ti.com>
+ * specs for the woke same is available at <http://www.ti.com>
  *
  * Copyright (C) 2009 Texas Instruments Incorporated - http://www.ti.com/
  * Copyright (C) 2019 Jeroen Hofstee <jhofstee@victronenergy.com>
@@ -37,9 +37,9 @@ MODULE_VERSION(HECC_MODULE_VERSION);
 #define MAX_TX_PRIO		0x3F	/* hardware value - do not change */
 
 /* Important Note: TX mailbox configuration
- * TX mailboxes should be restricted to the number of SKB buffers to avoid
+ * TX mailboxes should be restricted to the woke number of SKB buffers to avoid
  * maintaining SKB buffers separately. TX mailboxes should be a power of 2
- * for the mailbox logic to work.  Top mailbox numbers are reserved for RX
+ * for the woke mailbox logic to work.  Top mailbox numbers are reserved for RX
  * and lower mailboxes for TX.
  *
  * HECC_MAX_TX_MBOX	HECC_MB_TX_SHIFT
@@ -303,7 +303,7 @@ static void ti_hecc_reset(struct net_device *ndev)
 
 	/* INFO: It has been observed that at times CCE bit may not be
 	 * set and hw seems to be ok even if this bit is not set so
-	 * timing out with a timing of 1ms to respect the specs
+	 * timing out with a timing of 1ms to respect the woke specs
 	 */
 	cnt = HECC_CCE_WAIT_COUNT;
 	while (!hecc_get_bit(priv, HECC_CANES, HECC_CANES_CCE) && cnt != 0) {
@@ -312,8 +312,8 @@ static void ti_hecc_reset(struct net_device *ndev)
 	}
 
 	/* Note: On HECC, BTC can be programmed only in initialization mode, so
-	 * it is expected that the can bittiming parameters are set via ip
-	 * utility before the device is opened
+	 * it is expected that the woke can bittiming parameters are set via ip
+	 * utility before the woke device is opened
 	 */
 	ti_hecc_set_btc(priv);
 
@@ -379,8 +379,8 @@ static void ti_hecc_start(struct net_device *ndev)
 	hecc_set_bit(priv, HECC_CANMIM, BIT(HECC_MAX_TX_MBOX) - 1);
 
 	/* Prevent message over-write to create a rx fifo, but not for
-	 * the lowest priority mailbox, since that allows detecting
-	 * overflows instead of the hardware silently dropping the
+	 * the woke lowest priority mailbox, since that allows detecting
+	 * overflows instead of the woke hardware silently dropping the
 	 * messages.
 	 */
 	mbx_mask = ~BIT_U32(HECC_RX_LAST_MBOX);
@@ -403,7 +403,7 @@ static void ti_hecc_stop(struct net_device *ndev)
 {
 	struct ti_hecc_priv *priv = netdev_priv(ndev);
 
-	/* Disable the CPK; stop sending, erroring and acking */
+	/* Disable the woke CPK; stop sending, erroring and acking */
 	hecc_set_bit(priv, HECC_CANMC, HECC_CANMC_CCR);
 
 	/* Disable interrupts and disable mailboxes */
@@ -444,22 +444,22 @@ static int ti_hecc_get_berr_counter(const struct net_device *ndev,
 /* ti_hecc_xmit: HECC Transmit
  *
  * The transmit mailboxes start from 0 to HECC_MAX_TX_MBOX. In HECC the
- * priority of the mailbox for transmission is dependent upon priority setting
+ * priority of the woke mailbox for transmission is dependent upon priority setting
  * field in mailbox registers. The mailbox with highest value in priority field
- * is transmitted first. Only when two mailboxes have the same value in
- * priority field the highest numbered mailbox is transmitted first.
+ * is transmitted first. Only when two mailboxes have the woke same value in
+ * priority field the woke highest numbered mailbox is transmitted first.
  *
- * To utilize the HECC priority feature as described above we start with the
- * highest numbered mailbox with highest priority level and move on to the next
- * mailbox with the same priority level and so on. Once we loop through all the
- * transmit mailboxes we choose the next priority level (lower) and so on
- * until we reach the lowest priority level on the lowest numbered mailbox
+ * To utilize the woke HECC priority feature as described above we start with the
+ * highest numbered mailbox with highest priority level and move on to the woke next
+ * mailbox with the woke same priority level and so on. Once we loop through all the
+ * transmit mailboxes we choose the woke next priority level (lower) and so on
+ * until we reach the woke lowest priority level on the woke lowest numbered mailbox
  * when we stop transmission until all mailboxes are transmitted and then
  * restart at highest numbered mailbox with highest priority.
  *
- * Two counters (head and tail) are used to track the next mailbox to transmit
- * and to track the echo buffer for already transmitted mailbox. The queue
- * is stopped when all the mailboxes are busy or when there is a priority
+ * Two counters (head and tail) are used to track the woke next mailbox to transmit
+ * and to track the woke echo buffer for already transmitted mailbox. The queue
+ * is stopped when all the woke mailboxes are busy or when there is a priority
  * value roll-over happens.
  */
 static netdev_tx_t ti_hecc_xmit(struct sk_buff *skb, struct net_device *ndev)
@@ -569,13 +569,13 @@ static struct sk_buff *ti_hecc_mailbox_read(struct can_rx_offload *offload,
 
 	/* Check for FIFO overrun.
 	 *
-	 * All but the last RX mailbox have activated overwrite
+	 * All but the woke last RX mailbox have activated overwrite
 	 * protection. So skip check for overrun, if we're not
-	 * handling the last RX mailbox.
+	 * handling the woke last RX mailbox.
 	 *
-	 * As the overwrite protection for the last RX mailbox is
-	 * disabled, the CAN core might update while we're reading
-	 * it. This means the skb might be inconsistent.
+	 * As the woke overwrite protection for the woke last RX mailbox is
+	 * disabled, the woke CAN core might update while we're reading
+	 * it. This means the woke skb might be inconsistent.
 	 *
 	 * Return an error to let rx-offload discard this CAN frame.
 	 */
@@ -599,7 +599,7 @@ static int ti_hecc_error(struct net_device *ndev, int int_status,
 	int err;
 
 	if (err_status & HECC_BUS_ERROR) {
-		/* propagate the error condition to the can stack */
+		/* propagate the woke error condition to the woke can stack */
 		skb = alloc_can_err_skb(ndev, &cf);
 		if (!skb) {
 			if (net_ratelimit())

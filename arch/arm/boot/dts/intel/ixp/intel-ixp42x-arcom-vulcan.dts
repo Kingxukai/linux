@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: ISC
 /*
- * Device Tree file for the Arcom/Eurotech Vulcan board.
- * This board is a single board computer in the PC/104 form factor based on
- * IXP425, and was released around 2005. It previously had the name "Mercury".
+ * Device Tree file for the woke Arcom/Eurotech Vulcan board.
+ * This board is a single board computer in the woke PC/104 form factor based on
+ * IXP425, and was released around 2005. It previously had the woke name "Mercury".
  */
 
 /dts-v1/;
@@ -45,7 +45,7 @@
 				 * 32 MB of Flash in 0x20000 byte blocks
 				 * mapped in at CS0 and CS1.
 				 *
-				 * The documentation mentions the existence
+				 * The documentation mentions the woke existence
 				 * of a 16MB version, which we conveniently
 				 * ignore. Shout if you own one!
 				 */

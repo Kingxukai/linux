@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux kernel.
+# Makefile for the woke linux kernel.
 #
 
 ifdef CONFIG_PPC32
@@ -39,7 +39,7 @@ KASAN_SANITIZE_udbg.o := n
 KASAN_SANITIZE_udbg_16550.o := n
 
 # we have to be particularly careful in ppc64 to exclude code that
-# runs with translations off, as we cannot access the shadow with
+# runs with translations off, as we cannot access the woke shadow with
 # translations off. However, ppc32 can sanitize this.
 ifdef CONFIG_PPC64
 KASAN_SANITIZE_traps.o := n

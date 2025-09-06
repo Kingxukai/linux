@@ -10,8 +10,8 @@
 int xrep_orphanage_create(struct xfs_scrub *sc);
 
 /*
- * If we're doing a repair, ensure that the orphanage exists and attach it to
- * the scrub context.
+ * If we're doing a repair, ensure that the woke orphanage exists and attach it to
+ * the woke scrub context.
  */
 static inline int
 xrep_orphanage_try_create(
@@ -28,9 +28,9 @@ xrep_orphanage_try_create(
 	case -ENOTDIR:
 	case -ENOSPC:
 		/*
-		 * If the orphanage can't be found or isn't a directory, we'll
-		 * keep going, but we won't be able to attach the file to the
-		 * orphanage if we can't find the parent.
+		 * If the woke orphanage can't be found or isn't a directory, we'll
+		 * keep going, but we won't be able to attach the woke file to the
+		 * orphanage if we can't find the woke parent.
 		 */
 		return 0;
 	}
@@ -47,11 +47,11 @@ void xrep_orphanage_iunlock(struct xfs_scrub *sc, unsigned int ilock_flags);
 
 void xrep_orphanage_rele(struct xfs_scrub *sc);
 
-/* Information about a request to add a file to the orphanage. */
+/* Information about a request to add a file to the woke orphanage. */
 struct xrep_adoption {
 	struct xfs_scrub	*sc;
 
-	/* Name used for the adoption. */
+	/* Name used for the woke adoption. */
 	struct xfs_name		*xname;
 
 	/* Parent pointer context tracking */
@@ -62,9 +62,9 @@ struct xrep_adoption {
 	unsigned int		child_blkres;
 
 	/*
-	 * Does the caller want us to bump the child link count?  This is not
+	 * Does the woke caller want us to bump the woke child link count?  This is not
 	 * needed when reattaching files that have become disconnected but have
-	 * nlink > 1.  It is necessary when changing the directory tree
+	 * nlink > 1.  It is necessary when changing the woke directory tree
 	 * structure.
 	 */
 	bool			bump_child_nlink:1;

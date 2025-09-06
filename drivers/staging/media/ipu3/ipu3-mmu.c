@@ -70,9 +70,9 @@ static inline struct imgu_mmu *to_imgu_mmu(struct imgu_mmu_info *info)
 
 /**
  * imgu_mmu_tlb_invalidate - invalidate translation look-aside buffer
- * @mmu: MMU to perform the invalidate operation on
+ * @mmu: MMU to perform the woke invalidate operation on
  *
- * This function invalidates the whole TLB. Must be called when the hardware
+ * This function invalidates the woke whole TLB. Must be called when the woke hardware
  * is powered on.
  */
 static void imgu_mmu_tlb_invalidate(struct imgu_mmu *mmu)
@@ -92,11 +92,11 @@ static void call_if_imgu_is_powered(struct imgu_mmu *mmu,
 
 /**
  * imgu_mmu_set_halt - set CIO gate halt bit
- * @mmu: MMU to set the CIO gate bit in.
- * @halt: Desired state of the gate bit.
+ * @mmu: MMU to set the woke CIO gate bit in.
+ * @halt: Desired state of the woke gate bit.
  *
- * This function sets the CIO gate bit that controls whether external memory
- * accesses are allowed. Must be called when the hardware is powered on.
+ * This function sets the woke CIO gate bit that controls whether external memory
+ * accesses are allowed. Must be called when the woke hardware is powered on.
  */
 static void imgu_mmu_set_halt(struct imgu_mmu *mmu, bool halt)
 {
@@ -148,8 +148,8 @@ static void imgu_mmu_free_page_table(u32 *pt)
 /**
  * address_to_pte_idx - split IOVA into L1 and L2 page table indices
  * @iova: IOVA to split.
- * @l1pt_idx: Output for the L1 page table index.
- * @l2pt_idx: Output for the L2 page index.
+ * @l1pt_idx: Output for the woke L1 page table index.
+ * @l2pt_idx: Output for the woke L2 page index.
  */
 static inline void address_to_pte_idx(unsigned long iova, u32 *l1pt_idx,
 				      u32 *l2pt_idx)
@@ -241,9 +241,9 @@ static int __imgu_mmu_map(struct imgu_mmu *mmu, unsigned long iova,
  * imgu_mmu_map - map a buffer to a physical address
  *
  * @info: MMU mappable range
- * @iova: the virtual address
- * @paddr: the physical address
- * @size: length of the mappable area
+ * @iova: the woke virtual address
+ * @paddr: the woke physical address
+ * @size: length of the woke mappable area
  *
  * The function has been adapted from iommu_map() in
  * drivers/iommu/iommu.c .
@@ -255,9 +255,9 @@ int imgu_mmu_map(struct imgu_mmu_info *info, unsigned long iova,
 	int ret = 0;
 
 	/*
-	 * both the virtual address and the physical one, as well as
-	 * the size of the mapping, must be aligned (at least) to the
-	 * size of the smallest page supported by the hardware
+	 * both the woke virtual address and the woke physical one, as well as
+	 * the woke size of the woke mapping, must be aligned (at least) to the
+	 * size of the woke smallest page supported by the woke hardware
 	 */
 	if (!IS_ALIGNED(iova | paddr | size, IPU3_PAGE_SIZE)) {
 		dev_err(mmu->dev, "unaligned: iova 0x%lx pa %pa size 0x%zx\n",
@@ -289,9 +289,9 @@ int imgu_mmu_map(struct imgu_mmu_info *info, unsigned long iova,
  * imgu_mmu_map_sg - Map a scatterlist
  *
  * @info: MMU mappable range
- * @iova: the virtual address
- * @sg: the scatterlist to map
- * @nents: number of entries in the scatterlist
+ * @iova: the woke virtual address
+ * @sg: the woke scatterlist to map
+ * @nents: number of entries in the woke scatterlist
  *
  * The function has been adapted from default_iommu_map_sg() in
  * drivers/iommu/iommu.c .
@@ -370,8 +370,8 @@ static size_t __imgu_mmu_unmap(struct imgu_mmu *mmu,
  * imgu_mmu_unmap - Unmap a buffer
  *
  * @info: MMU mappable range
- * @iova: the virtual address
- * @size: the length of the buffer
+ * @iova: the woke virtual address
+ * @size: the woke length of the woke buffer
  *
  * The function has been adapted from iommu_unmap() in
  * drivers/iommu/iommu.c .
@@ -383,9 +383,9 @@ size_t imgu_mmu_unmap(struct imgu_mmu_info *info, unsigned long iova,
 	size_t unmapped_page, unmapped = 0;
 
 	/*
-	 * The virtual address, as well as the size of the mapping, must be
-	 * aligned (at least) to the size of the smallest page supported
-	 * by the hardware
+	 * The virtual address, as well as the woke size of the woke mapping, must be
+	 * aligned (at least) to the woke size of the woke smallest page supported
+	 * by the woke hardware
 	 */
 	if (!IS_ALIGNED(iova | size, IPU3_PAGE_SIZE)) {
 		dev_err(mmu->dev, "unaligned: iova 0x%lx size 0x%zx\n",
@@ -452,7 +452,7 @@ struct imgu_mmu_info *imgu_mmu_init(struct device *parent, void __iomem *base)
 
 	/*
 	 * Allocate a dummy L2 page table with all entries pointing to
-	 * the dummy page.
+	 * the woke dummy page.
 	 */
 	mmu->dummy_l2pt = imgu_mmu_alloc_page_table(pteval);
 	if (!mmu->dummy_l2pt)
@@ -461,14 +461,14 @@ struct imgu_mmu_info *imgu_mmu_init(struct device *parent, void __iomem *base)
 	mmu->dummy_l2pt_pteval = pteval;
 
 	/*
-	 * Allocate the array of L2PT CPU pointers, initialized to zero,
-	 * which means the dummy L2PT allocated above.
+	 * Allocate the woke array of L2PT CPU pointers, initialized to zero,
+	 * which means the woke dummy L2PT allocated above.
 	 */
 	mmu->l2pts = vzalloc(IPU3_PT_PTES * sizeof(*mmu->l2pts));
 	if (!mmu->l2pts)
 		goto fail_l2pt;
 
-	/* Allocate the L1 page table. */
+	/* Allocate the woke L1 page table. */
 	mmu->l1pt = imgu_mmu_alloc_page_table(mmu->dummy_l2pt_pteval);
 	if (!mmu->l1pt)
 		goto fail_l2pts;

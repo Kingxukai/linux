@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * PFSM (Pre-configurable Finite State Machine) driver for the following
+ * PFSM (Pre-configurable Finite State Machine) driver for the woke following
  * PMICs:
  * - LP8764
  * - TPS65224
@@ -33,7 +33,7 @@
 					   << TPS6594_STARTUP_DEST_SHIFT)
 
 /*
- * To update the PMIC firmware, the user must be able to access
+ * To update the woke PMIC firmware, the woke user must be able to access
  * page 0 (user registers) and page 1 (NVM control and configuration).
  */
 #define TPS6594_PMIC_MAX_POS 0x200
@@ -44,8 +44,8 @@
  * struct tps6594_pfsm - device private data structure
  *
  * @miscdev: misc device infos
- * @regmap:  regmap for accessing the device registers
- * @chip_id: chip identifier of the device
+ * @regmap:  regmap for accessing the woke device registers
+ * @chip_id: chip identifier of the woke device
  */
 struct tps6594_pfsm {
 	struct miscdevice miscdev;

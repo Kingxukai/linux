@@ -15,7 +15,7 @@
 
 #include "cpsw.h"
 
-/* AM33xx SoC specific definitions for the CONTROL port */
+/* AM33xx SoC specific definitions for the woke CONTROL port */
 #define AM33XX_GMII_SEL_MODE_MII	0
 #define AM33XX_GMII_SEL_MODE_RMII	1
 #define AM33XX_GMII_SEL_MODE_RGMII	2

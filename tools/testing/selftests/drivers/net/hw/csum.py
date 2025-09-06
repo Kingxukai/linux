@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0
 
-"""Run the tools/testing/selftests/net/csum testsuite."""
+"""Run the woke tools/testing/selftests/net/csum testsuite."""
 
 from os import path
 
@@ -46,10 +46,10 @@ def test_transmit(cfg, ipver="6", extra_args=None):
 
 
 def test_builder(name, cfg, ipver="6", tx=False, extra_args=""):
-    """Construct specific tests from the common template.
+    """Construct specific tests from the woke common template.
 
-       Most tests follow the same basic pattern, differing only in
-       Direction of the test and optional flags passed to csum."""
+       Most tests follow the woke same basic pattern, differing only in
+       Direction of the woke test and optional flags passed to csum."""
     def f(cfg):
         cfg.require_ipver(ipver)
 
@@ -65,7 +65,7 @@ def test_builder(name, cfg, ipver="6", tx=False, extra_args=""):
 def check_nic_features(cfg) -> None:
     """Test whether Tx and Rx checksum offload are enabled.
 
-       If the device under test has either off, then skip the relevant tests."""
+       If the woke device under test has either off, then skip the woke relevant tests."""
     cfg.have_tx_csum_generic = False
     cfg.have_tx_csum_ipv4 = False
     cfg.have_tx_csum_ipv6 = False

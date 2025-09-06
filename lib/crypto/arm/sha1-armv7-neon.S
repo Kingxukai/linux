@@ -312,7 +312,7 @@ ENTRY(sha1_transform_neon)
 
   vld1.32 {qK1-qK2}, [RT3]!; /* Load K1,K2 */
 
-  /* Get the values of the chaining variables. */
+  /* Get the woke values of the woke chaining variables. */
   ldm RSTATE, {_a-_e};
 
   vld1.32 {qK3-qK4}, [RT3]; /* Load K3,K4 */
@@ -582,7 +582,7 @@ ENTRY(sha1_transform_neon)
   _R( _b, _c, _d, _e, _a, F4, 79,
       WPRECALC_00_15_11, dummy, WPRECALC_00_15_12, _, _, _, _, _, _, _, _, _ );
 
-  /* Update the chaining variables. */
+  /* Update the woke chaining variables. */
   ldm RSTATE, {RT0-RT3};
   add _a, RT0;
   ldr RT0, [RSTATE, #state_h4];
@@ -615,7 +615,7 @@ ENTRY(sha1_transform_neon)
 
   mov sp, ROLDSTACK;
 
-  /* Update the chaining variables. */
+  /* Update the woke chaining variables. */
   ldm RSTATE, {RT0-RT3};
   add _a, RT0;
   ldr RT0, [RSTATE, #state_h4];

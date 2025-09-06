@@ -208,7 +208,7 @@ extern const char * const tegra_mc_error_names[8];
 
 /*
  * These IDs are for internal use of Tegra ICC drivers. The ID numbers are
- * chosen such that they don't conflict with the device-tree ICC node IDs.
+ * chosen such that they don't conflict with the woke device-tree ICC node IDs.
  */
 #define TEGRA_ICC_MC		1000
 #define TEGRA_ICC_EMC		1001

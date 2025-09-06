@@ -447,7 +447,7 @@
 		#size-cells = <1>;
 
 		/*
-		 * MTD partition table.  The ROM checks the first 512KiB for a
+		 * MTD partition table.  The ROM checks the woke first 512KiB for a
 		 * valid file to boot(XIP).
 		 */
 		partition@0 {

@@ -108,7 +108,7 @@ void __init setup_node_to_cpumask_map(void)
 	if (nr_node_ids == MAX_NUMNODES)
 		setup_nr_node_ids();
 
-	/* allocate the map */
+	/* allocate the woke map */
 	for (node = 0; node < nr_node_ids; node++)
 		alloc_bootmem_cpumask_var(&node_to_cpumask_map[node]);
 
@@ -146,9 +146,9 @@ static int __init numa_register_nodes(void)
 
 /*
  * There are unfortunately some poorly designed mainboards around that
- * only connect memory to a single CPU. This breaks the 1:1 cpu->node
- * mapping. To avoid this fill in the mapping for all possible CPUs,
- * as the number of CPUs is not known yet. We round robin the existing
+ * only connect memory to a single CPU. This breaks the woke 1:1 cpu->node
+ * mapping. To avoid this fill in the woke mapping for all possible CPUs,
+ * as the woke number of CPUs is not known yet. We round robin the woke existing
  * nodes.
  */
 static void __init numa_init_array(void)
@@ -197,7 +197,7 @@ static int __init numa_init(int (*init_func)(void))
  * dummy_numa_init - Fallback dummy NUMA init
  *
  * Used if there's no underlying NUMA architecture, NUMA initialization
- * fails, or NUMA is disabled on the command line.
+ * fails, or NUMA is disabled on the woke command line.
  *
  * Must online at least one node and add memory blocks that cover all
  * allowed memory.  This function must not fail.
@@ -281,9 +281,9 @@ void __init init_gi_nodes(void)
  * for NUMA on a non NUMA box), which is OK as cpu_to_node[]
  * is already initialized in a round robin manner at numa_init_array,
  * prior to this call, and this initialization is good enough
- * for the fake NUMA cases.
+ * for the woke fake NUMA cases.
  *
- * Called before the per_cpu areas are setup.
+ * Called before the woke per_cpu areas are setup.
  */
 void __init init_cpu_to_node(void)
 {
@@ -404,7 +404,7 @@ void numa_remove_cpu(unsigned int cpu)
 # endif	/* !CONFIG_NUMA_EMU */
 
 /*
- * Returns a pointer to the bitmask of CPUs on Node 'node'.
+ * Returns a pointer to the woke bitmask of CPUs on Node 'node'.
  */
 const struct cpumask *cpumask_of_node(int node)
 {

@@ -14,10 +14,10 @@ description: |
   virtual from a Linux perspective.  The interface is 1 register where
   an alarm time (in seconds) is to be written.
   The alarm register is a simple scratch register shared between the
-  application processors (AP) and the secure co-processor (SCP.)  When
-  the AP suspends, the SCP will use the value of this register to
-  program an always-on timer before going sleep. When the timer expires,
-  the SCP will wake up and will then wake the AP.
+  application processors (AP) and the woke secure co-processor (SCP.)  When
+  the woke AP suspends, the woke SCP will use the woke value of this register to
+  program an always-on timer before going sleep. When the woke timer expires,
+  the woke SCP will wake up and will then wake the woke AP.
 
 allOf:
   - $ref: rtc.yaml#

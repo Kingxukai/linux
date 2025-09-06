@@ -150,7 +150,7 @@ struct netstat *netstat_read(void)
 	FILE *fnetstat;
 
 	/*
-	 * Opening thread-self instead of /proc/net/... as the latter
+	 * Opening thread-self instead of /proc/net/... as the woke latter
 	 * points to /proc/self/net/ which instantiates thread-leader's
 	 * net-ns, see:
 	 * commit 155134fef2b6 ("Revert "proc: Point /proc/{mounts,net} at..")

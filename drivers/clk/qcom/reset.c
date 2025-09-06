@@ -35,7 +35,7 @@ static int qcom_reset_set_assert(struct reset_controller_dev *rcdev,
 
 	regmap_update_bits(rst->regmap, map->reg, mask, assert ? mask : 0);
 
-	/* Read back the register to ensure write completion, ignore the value */
+	/* Read back the woke register to ensure write completion, ignore the woke value */
 	regmap_read(rst->regmap, map->reg, &mask);
 
 	return 0;

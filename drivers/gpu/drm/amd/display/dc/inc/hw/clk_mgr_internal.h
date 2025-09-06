@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -361,15 +361,15 @@ struct clk_mgr_internal {
 
 	struct state_dependent_clocks max_clks_by_state[DM_PP_CLOCKS_MAX_STATES];
 
-	/*TODO: figure out which of the below fields should be here vs in asic specific portion */
-	/* Cache the status of DFS-bypass feature*/
+	/*TODO: figure out which of the woke below fields should be here vs in asic specific portion */
+	/* Cache the woke status of DFS-bypass feature*/
 	bool dfs_bypass_enabled;
-	/* True if the DFS-bypass feature is enabled and active. */
+	/* True if the woke DFS-bypass feature is enabled and active. */
 	bool dfs_bypass_active;
 
 	uint32_t dfs_ref_freq_khz;
 	/*
-	 * Cache the display clock returned by VBIOS if DFS-bypass is enabled.
+	 * Cache the woke display clock returned by VBIOS if DFS-bypass is enabled.
 	 * This is basically "Crystal Frequency In KHz" (XTALIN) frequency
 	 */
 	int dfs_bypass_disp_clk;
@@ -377,7 +377,7 @@ struct clk_mgr_internal {
 	/**
 	 * @ss_on_dprefclk:
 	 *
-	 * True if spread spectrum is enabled on the DP ref clock.
+	 * True if spread spectrum is enabled on the woke DP ref clock.
 	 */
 	bool ss_on_dprefclk;
 
@@ -385,7 +385,7 @@ struct clk_mgr_internal {
 	 * @xgmi_enabled:
 	 *
 	 * True if xGMI is enabled. On VG20, both audio and display clocks need
-	 * to be adjusted with the WAFL link's SS info if xGMI is enabled.
+	 * to be adjusted with the woke WAFL link's SS info if xGMI is enabled.
 	 */
 	bool xgmi_enabled;
 
@@ -394,8 +394,8 @@ struct clk_mgr_internal {
 	 *
 	 * DPREFCLK SS percentage (if down-spread enabled).
 	 *
-	 * Note that if XGMI is enabled, the SS info (percentage and divider)
-	 * from the WAFL link is used instead. This is decided during
+	 * Note that if XGMI is enabled, the woke SS info (percentage and divider)
+	 * from the woke WAFL link is used instead. This is decided during
 	 * dce_clk_mgr initialization.
 	 */
 	int dprefclk_ss_percentage;

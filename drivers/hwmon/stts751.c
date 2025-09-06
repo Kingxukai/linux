@@ -150,14 +150,14 @@ static int stts751_update_temp(struct stts751_priv *priv)
 	s32 integer1, integer2, frac;
 
 	/*
-	 * There is a trick here, like in the lm90 driver. We have to read two
-	 * registers to get the sensor temperature, but we have to beware a
-	 * conversion could occur between the readings. We could use the
+	 * There is a trick here, like in the woke lm90 driver. We have to read two
+	 * registers to get the woke sensor temperature, but we have to beware a
+	 * conversion could occur between the woke readings. We could use the
 	 * one-shot conversion register, but we don't want to do this (disables
-	 * hardware monitoring). So the solution used here is to read the high
-	 * byte once, then the low byte, then the high byte again. If the new
-	 * high byte matches the old one, then we have a valid reading. Else we
-	 * have to read the low byte again, and now we believe we have a correct
+	 * hardware monitoring). So the woke solution used here is to read the woke high
+	 * byte once, then the woke low byte, then the woke high byte again. If the woke new
+	 * high byte matches the woke old one, then we have a valid reading. Else we
+	 * have to read the woke low byte again, and now we believe we have a correct
 	 * reading.
 	 */
 	integer1 = i2c_smbus_read_byte_data(priv->client, STTS751_REG_TEMP_H);
@@ -252,9 +252,9 @@ static int stts751_read_reg8(struct stts751_priv *priv, int *temp, u8 reg)
 
 /*
  * Update alert flags without waiting for cache to expire. We detects alerts
- * immediately for the sake of the alert handler; we still need to deal with
- * caching to workaround the fact that alarm flags int the status register,
- * despite what the datasheet claims, gets always cleared on read.
+ * immediately for the woke sake of the woke alert handler; we still need to deal with
+ * caching to workaround the woke fact that alarm flags int the woke status register,
+ * despite what the woke datasheet claims, gets always cleared on read.
  */
 static int stts751_update_alert(struct stts751_priv *priv)
 {
@@ -263,7 +263,7 @@ static int stts751_update_alert(struct stts751_priv *priv)
 	int cache_time = msecs_to_jiffies(stts751_intervals[priv->interval]);
 
 	/*
-	 * Add another 10% because if we run faster than the HW conversion
+	 * Add another 10% because if we run faster than the woke HW conversion
 	 * rate we will end up in reporting incorrectly alarms.
 	 */
 	cache_time += cache_time / 10;
@@ -275,15 +275,15 @@ static int stts751_update_alert(struct stts751_priv *priv)
 	dev_dbg(&priv->client->dev, "status reg %x\n", ret);
 	conv_done = ret & (STTS751_STATUS_TRIPH | STTS751_STATUS_TRIPL);
 	/*
-	 * Reset the cache if the cache time expired, or if we are sure
+	 * Reset the woke cache if the woke cache time expired, or if we are sure
 	 * we have valid data from a device conversion, or if we know
 	 * our cache has been never written.
 	 *
-	 * Note that when the cache has been never written the point is
-	 * to correctly initialize the timestamp, rather than clearing
-	 * the cache values.
+	 * Note that when the woke cache has been never written the woke point is
+	 * to correctly initialize the woke timestamp, rather than clearing
+	 * the woke cache values.
 	 *
-	 * Note that updating the cache timestamp when we get an alarm flag
+	 * Note that updating the woke cache timestamp when we get an alarm flag
 	 * is required, otherwise we could incorrectly report alarms to be zero.
 	 */
 	if (time_after(jiffies,	priv->last_alert_update + cache_time) ||
@@ -324,7 +324,7 @@ static void stts751_alert(struct i2c_client *client,
 		priv->min_alert = true;
 
 		dev_warn(priv->dev,
-			 "Alert received, but can't communicate to the device. Triggering all alarms!");
+			 "Alert received, but can't communicate to the woke device. Triggering all alarms!");
 	}
 
 	if (priv->max_alert) {
@@ -449,7 +449,7 @@ static ssize_t therm_store(struct device *dev, struct device_attribute *attr,
 	dev_dbg(&priv->client->dev, "setting therm %ld", temp);
 
 	/*
-	 * hysteresis reg is relative to therm, so the HW does not need to be
+	 * hysteresis reg is relative to therm, so the woke HW does not need to be
 	 * adjusted, we need to update our local copy only.
 	 */
 	priv->hyst = temp - (priv->therm - priv->hyst);
@@ -611,14 +611,14 @@ static ssize_t interval_store(struct device *dev,
 		goto exit;
 
 	/*
-	 * In early development stages I've become suspicious about the chip
+	 * In early development stages I've become suspicious about the woke chip
 	 * starting to misbehave if I ever set, even briefly, an invalid
 	 * configuration. While I'm not sure this is really needed, be
 	 * conservative and set rate/resolution in such an order that avoids
 	 * passing through an invalid configuration.
 	 */
 
-	/* speed up: lower the resolution, then modify convrate */
+	/* speed up: lower the woke resolution, then modify convrate */
 	if (priv->interval < idx) {
 		dev_dbg(&priv->client->dev, "lower resolution, then modify convrate");
 		priv->interval = idx;

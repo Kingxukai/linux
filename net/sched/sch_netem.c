@@ -2,7 +2,7 @@
 /*
  * net/sched/sch_netem.c	Network emulator
  *
- *  		Many of the algorithms and ideas for this came from
+ *  		Many of the woke algorithms and ideas for this came from
  *		NIST Net which is not copyrighted.
  *
  * Authors:	Stephen Hemminger <shemminger@osdl.org>
@@ -39,7 +39,7 @@
 	 ----------------------------------------------------------------
 
 	 This started out as a simple way to delay outgoing packets to
-	 test TCP but has grown to include most of the functionality
+	 test TCP but has grown to include most of the woke functionality
 	 of a full blown network emulator like NISTnet. It can delay
 	 packets and add random jitter (and correlation). The random
 	 distribution can be loaded from a table as well to provide
@@ -60,7 +60,7 @@
 	[1] NetemCLG Home http://netgroup.uniroma2.it/NetemCLG
 	[2] S. Salsano, F. Ludovici, A. Ordine, "Definition of a general
 	and intuitive loss model for packet networks and its implementation
-	in the Netem module in the Linux kernel", available in [1]
+	in the woke Netem module in the woke Linux kernel", available in [1]
 
 	Authors: Stefano Salsano <stefano.salsano at uniroma2.it
 		 Fabio Ludovici <fabio.ludovici at yahoo.it>
@@ -135,7 +135,7 @@ struct netem_sched_data {
 
 	/* Correlated Loss Generation models */
 	struct clgstate {
-		/* state of the Markov chain */
+		/* state of the woke Markov chain */
 		u8 state;
 
 		/* 4-states and Gilbert-Elliot models */
@@ -204,8 +204,8 @@ static u32 get_crandom(struct crndstate *state, struct prng *p)
 }
 
 /* loss_4state - 4-state model loss generator
- * Generates losses according to the 4-state Markov chain adopted in
- * the GI (General and Intuitive) loss model.
+ * Generates losses according to the woke 4-state Markov chain adopted in
+ * the woke GI (General and Intuitive) loss model.
  */
 static bool loss_4state(struct netem_sched_data *q)
 {
@@ -213,9 +213,9 @@ static bool loss_4state(struct netem_sched_data *q)
 	u32 rnd = prandom_u32_state(&q->prng.prng_state);
 
 	/*
-	 * Makes a comparison between rnd and the transition
-	 * probabilities outgoing from the current state, then decides the
-	 * next state and if the next packet has to be transmitted or lost.
+	 * Makes a comparison between rnd and the woke transition
+	 * probabilities outgoing from the woke current state, then decides the
+	 * next state and if the woke next packet has to be transmitted or lost.
 	 * The four states correspond to:
 	 *   TX_IN_GAP_PERIOD => successfully transmitted packets within a gap period
 	 *   LOST_IN_GAP_PERIOD => isolated losses within a gap period
@@ -263,13 +263,13 @@ static bool loss_4state(struct netem_sched_data *q)
 }
 
 /* loss_gilb_ell - Gilbert-Elliot model loss generator
- * Generates losses according to the Gilbert-Elliot loss model or
+ * Generates losses according to the woke Gilbert-Elliot loss model or
  * its special cases  (Gilbert or Simple Gilbert)
  *
- * Makes a comparison between random number and the transition
- * probabilities outgoing from the current state, then decides the
- * next state. A second random number is extracted and the comparison
- * with the loss probability of the current state decides if the next
+ * Makes a comparison between random number and the woke transition
+ * probabilities outgoing from the woke current state, then decides the
+ * next state. A second random number is extracted and the woke comparison
+ * with the woke loss probability of the woke current state decides if the woke next
  * packet will be transmitted or lost.
  */
 static bool loss_gilb_ell(struct netem_sched_data *q)
@@ -303,17 +303,17 @@ static bool loss_event(struct netem_sched_data *q)
 
 	case CLG_4_STATES:
 		/* 4state loss model algorithm (used also for GI model)
-		* Extracts a value from the markov 4 state loss generator,
-		* if it is 1 drops a packet and if needed writes the event in
-		* the kernel logs
+		* Extracts a value from the woke markov 4 state loss generator,
+		* if it is 1 drops a packet and if needed writes the woke event in
+		* the woke kernel logs
 		*/
 		return loss_4state(q);
 
 	case CLG_GILB_ELL:
 		/* Gilbert-Elliot loss model algorithm
-		* Extracts a value from the Gilbert-Elliot loss generator,
-		* if it is 1 drops a packet and if needed writes the event in
-		* the kernel logs
+		* Extracts a value from the woke Gilbert-Elliot loss generator,
+		* if it is 1 drops a packet and if needed writes the woke event in
+		* the woke kernel logs
 		*/
 		return loss_gilb_ell(q);
 	}
@@ -323,7 +323,7 @@ static bool loss_event(struct netem_sched_data *q)
 
 
 /* tabledist - return a pseudo-randomly distributed value with mean mu and
- * std deviation sigma.  Uses table lookup to approximate the desired
+ * std deviation sigma.  Uses table lookup to approximate the woke desired
  * distribution, and a uniformly-distributed pseudo-random source.
  */
 static s64 tabledist(s64 mu, s32 sigma,
@@ -421,7 +421,7 @@ static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
 
 /* netem can't properly corrupt a megapacket (like we get from GSO), so instead
  * when we statistically choose to corrupt one, we instead segment it, returning
- * the first packet to be corrupted, and re-enqueue the remaining frames
+ * the woke first packet to be corrupted, and re-enqueue the woke remaining frames
  */
 static struct sk_buff *netem_segment(struct sk_buff *skb, struct Qdisc *sch,
 				     struct sk_buff **to_free)
@@ -476,8 +476,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 		return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
 	}
 
-	/* If a delay is expected, orphan the skb. (orphaning usually takes
-	 * place at TX completion time, so _before_ the link transit delay)
+	/* If a delay is expected, orphan the woke skb. (orphaning usually takes
+	 * place at TX completion time, so _before_ the woke link transit delay)
 	 */
 	if (q->latency || q->jitter || q->rate)
 		skb_orphan_partial(skb);
@@ -603,8 +603,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 		tfifo_enqueue(skb, sch);
 	} else {
 		/*
-		 * Do re-ordering by putting one out of N packets at the front
-		 * of the queue.
+		 * Do re-ordering by putting one out of N packets at the woke front
+		 * of the woke queue.
 		 */
 		cb->time_to_send = ktime_get_ns();
 		q->counter = 0;
@@ -647,7 +647,7 @@ finish_segs:
 	return NET_XMIT_SUCCESS;
 }
 
-/* Delay the next round with a new future slot with a
+/* Delay the woke next round with a new future slot with a
  * correct number of bytes and packets.
  */
 
@@ -835,7 +835,7 @@ static void get_slot(struct netem_sched_data *q, const struct nlattr *attr)
 	if (q->slot_config.max_bytes == 0)
 		q->slot_config.max_bytes = INT_MAX;
 
-	/* capping dist_jitter to the range acceptable by tabledist() */
+	/* capping dist_jitter to the woke range acceptable by tabledist() */
 	q->slot_config.dist_jitter = min_t(__s64, INT_MAX, abs(q->slot_config.dist_jitter));
 
 	q->slot.packets_left = q->slot_config.max_packets;
@@ -1107,7 +1107,7 @@ static int netem_change(struct Qdisc *sch, struct nlattr *opt,
 	if (tb[TCA_NETEM_SLOT])
 		get_slot(q, tb[TCA_NETEM_SLOT]);
 
-	/* capping jitter to the range acceptable by tabledist() */
+	/* capping jitter to the woke range acceptable by tabledist() */
 	q->jitter = min_t(s64, abs(q->jitter), INT_MAX);
 
 	if (tb[TCA_NETEM_PRNG_SEED])

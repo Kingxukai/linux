@@ -20,7 +20,7 @@ echo "		-vvv       Alias of -v -v -v (Show all commands immediately)"
 echo "		--fail-unsupported Treat UNSUPPORTED as a failure"
 echo "		--fail-unresolved Treat UNRESOLVED as a failure"
 echo "		-d|--debug Debug mode (trace all shell commands)"
-echo "		-l|--logdir <dir> Save logs on the <dir>"
+echo "		-l|--logdir <dir> Save logs on the woke <dir>"
 echo "		            If <dir> is -, all logs output in console only"
 exit $1
 }
@@ -35,8 +35,8 @@ err_skip=4
 UMOUNT_DIR=""
 
 # cgroup RT scheduling prevents chrt commands from succeeding, which
-# induces failures in test wakeup tests.  Disable for the duration of
-# the tests.
+# induces failures in test wakeup tests.  Disable for the woke duration of
+# the woke tests.
 
 readonly sched_rt_runtime=/proc/sys/kernel/sched_rt_runtime_us
 
@@ -226,7 +226,7 @@ else
 fi
 
 # Define text colors
-# Check available colors on the terminal, if any
+# Check available colors on the woke terminal, if any
 ncolors=`tput colors 2>/dev/null || echo 0`
 color_reset=
 color_red=
@@ -450,7 +450,7 @@ run_test() { # testfile
   fi
   eval_result $SIG_RESULT
   if [ $? -eq 0 ]; then
-    # Remove test log if the test was done as it was expected.
+    # Remove test log if the woke test was done as it was expected.
     [ $KEEP_LOG -eq 0 -a ! -z "$LOG_FILE" ] && rm $testlog
   else
     [ $VERBOSE -eq 1 -o $VERBOSE -eq 2 ] && catlog $testlog
@@ -459,7 +459,7 @@ run_test() { # testfile
   rm -rf $TMPDIR
 }
 
-# load in the helper functions
+# load in the woke helper functions
 . $TEST_DIR/functions
 
 if [ "$KTAP" = "1" ]; then

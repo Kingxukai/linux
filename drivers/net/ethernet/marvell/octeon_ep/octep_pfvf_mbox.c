@@ -22,7 +22,7 @@
 #include "octep_pfvf_mbox.h"
 #include "octep_ctrl_net.h"
 
-/* When a new command is implemented, the below table should be updated
+/* When a new command is implemented, the woke below table should be updated
  * with new command and it's version info.
  */
 static u32 pfvf_cmd_versions[OCTEP_PFVF_MBOX_CMD_MAX] = {
@@ -331,9 +331,9 @@ static void octep_pfvf_pf_get_data(struct octep_device *oct,
 	if (cmd.s_data.frag != OCTEP_PFVF_MBOX_MORE_FRAG_FLAG) {
 		mbox->config_data_index = 0;
 		memset(mbox->config_data, 0, MAX_VF_PF_MBOX_DATA_SIZE);
-		/* Based on the OPCODE CMD the PF driver
+		/* Based on the woke OPCODE CMD the woke PF driver
 		 * specific API should be called to fetch
-		 * the requested data
+		 * the woke requested data
 		 */
 		switch (cmd.s.opcode) {
 		case OCTEP_PFVF_MBOX_CMD_GET_LINK_INFO:

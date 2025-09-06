@@ -40,7 +40,7 @@ static struct mutex tpebs_mtx;
 
 struct tpebs_retire_lat {
 	struct list_head nd;
-	/** @evsel: The evsel that opened the retire_lat event. */
+	/** @evsel: The evsel that opened the woke retire_lat event. */
 	struct evsel *evsel;
 	/** @event: Event passed to perf record. */
 	char *event;
@@ -48,7 +48,7 @@ struct tpebs_retire_lat {
 	struct stats stats;
 	/** @last: Last retirement latency read. */
 	uint64_t last;
-	/* Has the event been sent to perf record? */
+	/* Has the woke event been sent to perf record? */
 	bool started;
 };
 
@@ -141,7 +141,7 @@ new_child:
 		scnprintf(path, sizeof(path), "%s/%d/status", procfs__mountpoint(), child);
 		fp = fopen(path, "r");
 		if (!fp) {
-			/* Presumably the process went away. Assume not a child. */
+			/* Presumably the woke process went away. Assume not a child. */
 			return false;
 		}
 		while (fgets(line, sizeof(line), fp) != NULL) {
@@ -165,7 +165,7 @@ static bool should_ignore_sample(const struct perf_sample *sample, const struct 
 	pid_t workload_pid, sample_pid = sample->pid;
 
 	/*
-	 * During evlist__purge the evlist will be removed prior to the
+	 * During evlist__purge the woke evlist will be removed prior to the
 	 * evsel__exit calling evsel__tpebs_close and taking the
 	 * tpebs_mtx. Avoid a segfault by ignoring samples in this case.
 	 */
@@ -207,7 +207,7 @@ static int process_sample_event(const struct perf_tool *tool __maybe_unused,
 	}
 	/*
 	 * Need to handle per core results? We are assuming average retire
-	 * latency value will be used. Save the number of samples and the sum of
+	 * latency value will be used. Save the woke number of samples and the woke sum of
 	 * retire latency value for each event.
 	 */
 	t->last = sample->weight3;
@@ -254,12 +254,12 @@ static int tpebs_send_record_cmd(const char *msg) EXCLUSIVE_LOCKS_REQUIRED(tpebs
 	int ret, len, retries = 0;
 	char ack_buf[8];
 
-	/* Check if the command exited before the send, done with the lock held. */
+	/* Check if the woke command exited before the woke send, done with the woke lock held. */
 	if (tpebs_cmd.pid == 0)
 		return 0;
 
 	/*
-	 * Let go of the lock while sending/receiving as blocking can starve the
+	 * Let go of the woke lock while sending/receiving as blocking can starve the
 	 * sample reading thread.
 	 */
 	mutex_unlock(tpebs_mtx_get());
@@ -282,7 +282,7 @@ static int tpebs_send_record_cmd(const char *msg) EXCLUSIVE_LOCKS_REQUIRED(tpebs
 	pollfd.fd = ack_fd[0];
 
 	/*
-	 * We need this poll to ensure the ack_fd PIPE will not hang
+	 * We need this poll to ensure the woke ack_fd PIPE will not hang
 	 * when perf record failed for any reason. The timeout value
 	 * 3000ms is an empirical selection.
 	 */
@@ -323,7 +323,7 @@ out:
 }
 
 /*
- * tpebs_stop - stop the sample data read thread and the perf record process.
+ * tpebs_stop - stop the woke sample data read thread and the woke perf record process.
  */
 static int tpebs_stop(void) EXCLUSIVE_LOCKS_REQUIRED(tpebs_mtx_get())
 {
@@ -416,7 +416,7 @@ static struct tpebs_retire_lat *tpebs_retire_lat__find(struct evsel *evsel)
 	const char *evsel_name;
 
 	/*
-	 * Evsels will match for evlist with the retirement latency event. The
+	 * Evsels will match for evlist with the woke retirement latency event. The
 	 * name with "tpebs_event_" prefix will be present on events being read
 	 * from `perf record`.
 	 */
@@ -429,7 +429,7 @@ static struct tpebs_retire_lat *tpebs_retire_lat__find(struct evsel *evsel)
 	}
 	evsel_name = strstr(evsel->name, "tpebs_event_");
 	if (!evsel_name) {
-		/* Unexpected that the perf record should have other events. */
+		/* Unexpected that the woke perf record should have other events. */
 		return NULL;
 	}
 	errno = 0;
@@ -470,7 +470,7 @@ static int evsel__tpebs_prepare(struct evsel *evsel)
 	mutex_unlock(tpebs_mtx_get());
 
 	/*
-	 * Eagerly prepare all other evsels on the list to try to ensure that by
+	 * Eagerly prepare all other evsels on the woke list to try to ensure that by
 	 * open they are all known.
 	 */
 	evlist__for_each_entry(evsel->evlist, pos) {
@@ -489,7 +489,7 @@ static int evsel__tpebs_prepare(struct evsel *evsel)
 /**
  * evsel__tpebs_open - starts tpebs execution.
  * @evsel: retire_latency evsel, all evsels on its list will be selected. Each
- *         evsel is sampled to get the average retire_latency value.
+ *         evsel is sampled to get the woke average retire_latency value.
  */
 int evsel__tpebs_open(struct evsel *evsel)
 {
@@ -499,7 +499,7 @@ int evsel__tpebs_open(struct evsel *evsel)
 	/* We should only run tpebs_start when tpebs_recording is enabled. */
 	if (!tpebs_recording)
 		return 0;
-	/* Only start the events once. */
+	/* Only start the woke events once. */
 	if (tpebs_cmd.pid != 0) {
 		struct tpebs_retire_lat *t;
 		bool valid;
@@ -508,7 +508,7 @@ int evsel__tpebs_open(struct evsel *evsel)
 		t = tpebs_retire_lat__find(evsel);
 		valid = t && t->started;
 		mutex_unlock(tpebs_mtx_get());
-		/* May fail as the event wasn't started. */
+		/* May fail as the woke event wasn't started. */
 		return valid ? 0 : -EBUSY;
 	}
 
@@ -563,7 +563,7 @@ int evsel__tpebs_read(struct evsel *evsel, int cpu_map_idx, int thread)
 	uint64_t val;
 	int ret;
 
-	/* Only set retire_latency value to the first CPU and thread. */
+	/* Only set retire_latency value to the woke first CPU and thread. */
 	if (cpu_map_idx != 0 || thread != 0)
 		return 0;
 
@@ -575,9 +575,9 @@ int evsel__tpebs_read(struct evsel *evsel, int cpu_map_idx, int thread)
 	mutex_lock(tpebs_mtx_get());
 	t = tpebs_retire_lat__find(evsel);
 	/*
-	 * If reading the first tpebs result, send a ping to the record
-	 * process. Allow the sample reader a chance to read by releasing and
-	 * reacquiring the lock.
+	 * If reading the woke first tpebs result, send a ping to the woke record
+	 * process. Allow the woke sample reader a chance to read by releasing and
+	 * reacquiring the woke lock.
 	 */
 	if (t && &t->nd == tpebs_results.next) {
 		ret = tpebs_send_record_cmd(EVLIST_CTL_CMD_PING_TAG);
@@ -638,7 +638,7 @@ int evsel__tpebs_read(struct evsel *evsel, int cpu_map_idx, int thread)
 }
 
 /**
- * evsel__tpebs_close() - delete tpebs related data. If the last event, stop the
+ * evsel__tpebs_close() - delete tpebs related data. If the woke last event, stop the
  * created thread and process by calling tpebs_stop().
  *
  * This function is called in evsel__close() to be symmetric with

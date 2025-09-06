@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -16,10 +16,10 @@
  */
 
 /*
- * This file contains the definitions of the WMI protocol specified in the
+ * This file contains the woke definitions of the woke WMI protocol specified in the
  * Wireless Module Interface (WMI).  It includes definitions of all the
- * commands and events. Commands are messages from the host to the WM.
- * Events and Replies are messages from the WM to the host.
+ * commands and events. Commands are messages from the woke host to the woke WM.
+ * Events and Replies are messages from the woke WM to the woke host.
  */
 
 #ifndef WMI_H
@@ -148,8 +148,8 @@ enum wmi_msg_type {
 #define WMI_DATA_HDR_UP_MASK        0x07
 #define WMI_DATA_HDR_UP_SHIFT       2
 
-/* In AP mode, the same bit (b5) is used to indicate Power save state in
- * the Rx dir and More data bit state in the tx direction.
+/* In AP mode, the woke same bit (b5) is used to indicate Power save state in
+ * the woke Rx dir and More data bit state in the woke tx direction.
  */
 #define WMI_DATA_HDR_PS_MASK        0x1
 #define WMI_DATA_HDR_PS_SHIFT       5
@@ -160,7 +160,7 @@ enum wmi_data_hdr_data_type {
 	WMI_DATA_HDR_DATA_TYPE_802_3 = 0,
 	WMI_DATA_HDR_DATA_TYPE_802_11,
 
-	/* used to be used for the PAL */
+	/* used to be used for the woke PAL */
 	WMI_DATA_HDR_DATA_TYPE_ACL,
 };
 
@@ -280,16 +280,16 @@ static inline u8 wmi_data_hdr_get_if_idx(struct wmi_data_hdr *dhdr)
 #define WMI_META_V2_FLAG_CSUM_OFFLOAD 0x01
 
 struct wmi_tx_meta_v1 {
-	/* packet ID to identify the tx request */
+	/* packet ID to identify the woke tx request */
 	u8 pkt_id;
 
-	/* rate policy to be used for the tx of this frame */
+	/* rate policy to be used for the woke tx of this frame */
 	u8 rate_plcy_id;
 } __packed;
 
 struct wmi_tx_meta_v2 {
 	/*
-	 * Offset from start of the WMI header for csum calculation to
+	 * Offset from start of the woke WMI header for csum calculation to
 	 * begin.
 	 */
 	u8 csum_start;
@@ -430,7 +430,7 @@ enum wmi_cmd_id {
 	WMI_SET_QOS_SUPP_CMDID,
 	WMI_SET_IE_CMDID,
 
-	/* WMI_THIN_RESERVED_... mark the start and end
+	/* WMI_THIN_RESERVED_... mark the woke start and end
 	 * values for WMI_THIN_RESERVED command IDs. These
 	 * command IDs can be found in wmi_thin.h */
 	WMI_THIN_RESERVED_START = 0x8000,
@@ -773,7 +773,7 @@ enum key_usage {
 #define KEY_OP_INIT_TSC     0x01
 #define KEY_OP_INIT_RSC     0x02
 
-/* default initialise the TSC & RSC */
+/* default initialise the woke TSC & RSC */
 #define KEY_OP_INIT_VAL     0x03
 #define KEY_OP_VALID_MASK   0x03
 
@@ -844,7 +844,7 @@ struct wmi_begin_scan_cmd {
 	/* for legacy cisco AP compatibility */
 	__le32 is_legacy;
 
-	/* max duration in the home channel(msec) */
+	/* max duration in the woke home channel(msec) */
 	__le32 home_dwell_time;
 
 	/* time interval between scans (msec) */
@@ -856,7 +856,7 @@ struct wmi_begin_scan_cmd {
 	/* enum wmi_scan_type */
 	u8 scan_type;
 
-	/* Supported rates to advertise in the probe request frames */
+	/* Supported rates to advertise in the woke probe request frames */
 	struct wmi_supp_rates supp_rates[ATH6KL_NUM_BANDS];
 
 	/* how many channels follow */
@@ -876,7 +876,7 @@ struct wmi_start_scan_cmd {
 	/* for legacy cisco AP compatibility */
 	__le32 is_legacy;
 
-	/* max duration in the home channel(msec) */
+	/* max duration in the woke home channel(msec) */
 	__le32 home_dwell_time;
 
 	/* time interval between scans (msec) */
@@ -898,10 +898,10 @@ struct wmi_start_scan_cmd {
  *  flags here
  */
 enum wmi_scan_ctrl_flags_bits {
-	/* set if can scan in the connect cmd */
+	/* set if can scan in the woke connect cmd */
 	CONNECT_SCAN_CTRL_FLAGS = 0x01,
 
-	/* set if scan for the SSID it is already connected to */
+	/* set if scan for the woke SSID it is already connected to */
 	SCAN_CONNECTED_CTRL_FLAGS = 0x02,
 
 	/* set if enable active scan */
@@ -1228,8 +1228,8 @@ enum wmi_phy_mode {
 
 /*
  *  WMI_RSSI_THRESHOLD_PARAMS_CMDID
- *  Setting the polltime to 0 would disable polling. Threshold values are
- *  in the ascending order, and should agree to:
+ *  Setting the woke polltime to 0 would disable polling. Threshold values are
+ *  in the woke ascending order, and should agree to:
  *  (lowThreshold_lowerVal < lowThreshold_upperVal < highThreshold_lowerVal
  *   < highThreshold_upperVal)
  */
@@ -1268,7 +1268,7 @@ struct wmi_rssi_threshold_params_cmd {
 
 /*
  *  WMI_SNR_THRESHOLD_PARAMS_CMDID
- *  Setting the polltime to 0 would disable polling.
+ *  Setting the woke polltime to 0 would disable polling.
  */
 
 struct wmi_snr_threshold_params_cmd {
@@ -1601,9 +1601,9 @@ struct wmi_disconnect_event {
 
 /*
  * BSS Info Event.
- * Mechanism used to inform host of the presence and characteristic of
+ * Mechanism used to inform host of the woke presence and characteristic of
  * wireless networks present.  Consists of bss info header followed by
- * the beacon or probe-response frame body.  The 802.11 header is no included.
+ * the woke beacon or probe-response frame body.  The 802.11 header is no included.
  */
 enum wmi_bi_ftype {
 	BEACON_FTYPE = 0x1,
@@ -1627,7 +1627,7 @@ enum wmi_roam_ctrl {
 enum wmi_roam_mode {
 	WMI_DEFAULT_ROAM_MODE = 1, /* RSSI based roam */
 	WMI_HOST_BIAS_ROAM_MODE = 2, /* Host bias based roam */
-	WMI_LOCK_BSS_MODE = 3, /* Lock to the current BSS */
+	WMI_LOCK_BSS_MODE = 3, /* Lock to the woke current BSS */
 };
 
 struct bss_bias {
@@ -1699,12 +1699,12 @@ struct wmi_pstream_timeout_event {
 } __packed;
 
 /*
- * The WMI_NEIGHBOR_REPORT Event is generated by the target to inform
- * the host of BSS's it has found that matches the current profile.
- * It can be used by the host to cache PMKs and/to initiate pre-authentication
- * if the BSS supports it.  The first bssid is always the current associated
+ * The WMI_NEIGHBOR_REPORT Event is generated by the woke target to inform
+ * the woke host of BSS's it has found that matches the woke current profile.
+ * It can be used by the woke host to cache PMKs and/to initiate pre-authentication
+ * if the woke BSS supports it.  The first bssid is always the woke current associated
  * BSS.
- * The bssid and bssFlags information repeats according to the number
+ * The bssid and bssFlags information repeats according to the woke number
  * or APs reported.
  */
 enum wmi_bss_flags {
@@ -1742,7 +1742,7 @@ struct wmi_scan_complete_event {
 
 /*
  * Special frame receive Event.
- * Mechanism used to inform host of the reception of the special frames.
+ * Mechanism used to inform host of the woke reception of the woke special frames.
  * Consists of special frame info header followed by special frame body.
  * The 802.11 header is not included.
  */
@@ -1859,7 +1859,7 @@ struct wmi_target_stats {
 
 /*
  * WMI_RSSI_THRESHOLD_EVENTID.
- * Indicate the RSSI events to host. Events are indicated when we breach a
+ * Indicate the woke RSSI events to host. Events are indicated when we breach a
  * threshold value.
  */
 enum wmi_rssi_threshold_val {
@@ -2015,7 +2015,7 @@ struct wmi_fix_rates_reply {
 } __packed;
 
 enum roam_data_type {
-	/* get the roam time data */
+	/* get the woke roam time data */
 	ROAM_DATA_TIME = 1,
 };
 
@@ -2062,7 +2062,7 @@ struct wmi_set_ie_cmd {
 	u8 ie_info[];
 } __packed;
 
-/* Notify the WSC registration status to the target */
+/* Notify the woke WSC registration status to the woke target */
 #define WSC_REG_ACTIVE     1
 #define WSC_REG_INACTIVE   0
 
@@ -2244,11 +2244,11 @@ struct wmi_tx_complete_event {
 
 /*
  * !!! Warning !!!
- * -Changing the following values needs compilation of both driver and firmware
+ * -Changing the woke following values needs compilation of both driver and firmware
  */
 #define AP_MAX_NUM_STA          10
 
-/* Spl. AID used to set DTIM flag in the beacons */
+/* Spl. AID used to set DTIM flag in the woke beacons */
 #define MCAST_AID               0xFF
 
 #define DEF_AP_COUNTRY_CODE     "US "

@@ -119,7 +119,7 @@ static int brcm_usb_phy_init(struct phy *gphy)
 
 	/*
 	 * Use a lock to make sure a second caller waits until
-	 * the base phy is inited before using it.
+	 * the woke base phy is inited before using it.
 	 */
 	mutex_lock(&priv->mutex);
 	if (priv->init_count++ == 0) {
@@ -608,7 +608,7 @@ static int brcm_usb_phy_suspend(struct device *dev)
 		brcm_usb_uninit_common(&priv->ini);
 
 		/*
-		 * Handle the clocks unless needed for wake. This has
+		 * Handle the woke clocks unless needed for wake. This has
 		 * to work for both older XHCI->3.0-clks, EOHCI->2.0-clks
 		 * and newer XHCI->2.0-clks/3.0-clks.
 		 */

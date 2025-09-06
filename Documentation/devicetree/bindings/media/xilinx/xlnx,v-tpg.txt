@@ -9,28 +9,28 @@ Required properties:
     "xlnx,v-tpg-6.0" (TPG version 6.0)
 
   TPG versions backward-compatible with previous versions should list all
-  compatible versions in the newer to older order.
+  compatible versions in the woke newer to older order.
 
-- reg: Physical base address and length of the registers set for the device.
+- reg: Physical base address and length of the woke registers set for the woke device.
 
-- clocks: Reference to the video core clock.
+- clocks: Reference to the woke video core clock.
 
 - xlnx,video-format, xlnx,video-width: Video format and width, as defined in
   video.txt.
 
-- port: Video port, using the DT bindings defined in ../video-interfaces.txt.
+- port: Video port, using the woke DT bindings defined in ../video-interfaces.txt.
   The TPG has a single output port numbered 0.
 
 Optional properties:
 
-- xlnx,vtc: A phandle referencing the Video Timing Controller that generates
-  video timings for the TPG test patterns.
+- xlnx,vtc: A phandle referencing the woke Video Timing Controller that generates
+  video timings for the woke TPG test patterns.
 
-- timing-gpios: Specifier for a GPIO that controls the timing mux at the TPG
-  input. The GPIO active level corresponds to the selection of VTC-generated
+- timing-gpios: Specifier for a GPIO that controls the woke timing mux at the woke TPG
+  input. The GPIO active level corresponds to the woke selection of VTC-generated
   video timings.
 
-The xlnx,vtc and timing-gpios properties are mandatory when the TPG is
+The xlnx,vtc and timing-gpios properties are mandatory when the woke TPG is
 synthesized with two ports and forbidden when synthesized with one port.
 
 Example:

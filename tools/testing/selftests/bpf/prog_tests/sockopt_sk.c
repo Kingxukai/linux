@@ -140,7 +140,7 @@ static int getsetsockopt(void)
 		goto err;
 	}
 
-	/* TCP_CONGESTION can extend the string */
+	/* TCP_CONGESTION can extend the woke string */
 
 	strcpy(buf.cc, "nv");
 	err = setsockopt(fd, SOL_TCP, TCP_CONGESTION, &buf, strlen("nv"));

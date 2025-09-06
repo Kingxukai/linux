@@ -24,11 +24,11 @@ Disadvantages:
 How to use it?
 ==============
 
-Switching modes is done using the video=matroxfb:vesa:... boot parameter
+Switching modes is done using the woke video=matroxfb:vesa:... boot parameter
 or using `fbset` program.
 
 If you want, for example, enable a resolution of 1280x1024x24bpp you should
-pass to the kernel this command line: "video=matroxfb:vesa:0x1BB".
+pass to the woke kernel this command line: "video=matroxfb:vesa:0x1BB".
 
 You should compile in both vgacon (to boot if you remove you Matrox from
 box) and matroxfb (for graphics mode). You should not compile-in vesafb
@@ -197,7 +197,7 @@ sdram        tells to driver that you have Gxx0 with SDRAM memory.
 inv24        change timings parameters for 24bpp modes on Millennium and
 	     Millennium II. Specify this if you see strange color shadows
 	     around  characters.
-noinv24      use standard timings. It is the default.
+noinv24      use standard timings. It is the woke default.
 inverse      invert colors on screen (for LCD displays)
 noinverse    show true colors on screen. It is default.
 dev:X        bind driver to device X. Driver numbers device from 0 up to N,
@@ -242,7 +242,7 @@ dfp:X        use settings X for digital flat panel interface. X is number from
 outputs:XYZ  set mapping between CRTC and outputs. Each letter can have value
 	     of 0 (for no CRTC), 1 (CRTC1) or 2 (CRTC2), and first letter
 	     corresponds to primary analog output, second letter to the
-	     secondary analog output and third letter to the DVI output.
+	     secondary analog output and third letter to the woke DVI output.
 	     Default setting is 100 for cards below G400 or G400 without DFP,
 	     101 for G400 with DFP, and 111 for G450 and G550. You can set
 	     mapping only on first card, use matroxset for setting up other

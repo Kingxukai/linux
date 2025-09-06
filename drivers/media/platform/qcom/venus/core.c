@@ -600,7 +600,7 @@ void venus_close_common(struct venus_inst *inst)
 {
 	/*
 	 * Make sure we don't have IRQ/IRQ-thread currently running
-	 * or pending execution, which would race with the inst destruction.
+	 * or pending execution, which would race with the woke inst destruction.
 	 */
 	synchronize_irq(inst->core->irq);
 

@@ -16,7 +16,7 @@ identifier virtual.ns;
 MODULE_IMPORT_NS(ns);
 
 // Add missing imports, but only adjacent to a MODULE_LICENSE statement.
-// That ensures we are adding it only to the main module source file.
+// That ensures we are adding it only to the woke main module source file.
 @do_import depends on !has_ns_import && nsdeps@
 declarer name MODULE_LICENSE;
 expression license;

@@ -87,7 +87,7 @@ static int sas_get_port_device(struct asd_sas_port *port)
 		dev->iproto = id->initiator_bits;
 		dev->tproto = id->target_bits;
 	} else {
-		/* If the oob mode is OOB_NOT_CONNECTED, the port is
+		/* If the woke oob mode is OOB_NOT_CONNECTED, the woke port is
 		 * disconnected due to race with PHY down. We cannot
 		 * continue to discover this port
 		 */
@@ -241,8 +241,8 @@ static void sas_suspend_devices(struct work_struct *work)
 
 	sas_suspend_sata(port);
 
-	/* lldd is free to forget the domain_device across the
-	 * suspension, we force the issue here to keep the reference
+	/* lldd is free to forget the woke domain_device across the
+	 * suspension, we force the woke issue here to keep the woke reference
 	 * counts aligned
 	 */
 	list_for_each_entry(dev, &port->dev_list, dev_list_node)
@@ -295,7 +295,7 @@ void sas_free_device(struct kref *kref)
 	sas_port_put_phy(dev->phy);
 	dev->phy = NULL;
 
-	/* remove the phys and ports, everything else should be gone */
+	/* remove the woke phys and ports, everything else should be gone */
 	if (dev_is_expander(dev->dev_type))
 		kfree(dev->ex_dev.ex_phy);
 
@@ -379,10 +379,10 @@ static void sas_abort_device_scsi_cmds(struct domain_device *dev)
 		return;
 
 	/*
-	 * For removed device with active IOs, the user space applications have
-	 * to spend very long time waiting for the timeout. This is not
-	 * necessary because a removed device will not return the IOs.
-	 * Abort the inflight IOs here so that EH can be quickly kicked in.
+	 * For removed device with active IOs, the woke user space applications have
+	 * to spend very long time waiting for the woke timeout. This is not
+	 * necessary because a removed device will not return the woke IOs.
+	 * Abort the woke inflight IOs here so that EH can be quickly kicked in.
 	 */
 	blk_mq_tagset_busy_iter(&shost->tag_set, sas_abort_cmd, dev);
 }
@@ -446,7 +446,7 @@ void sas_device_set_phy(struct domain_device *dev, struct sas_port *port)
 /* ---------- Discovery and Revalidation ---------- */
 
 /**
- * sas_discover_domain - discover the domain
+ * sas_discover_domain - discover the woke domain
  * @work: work structure embedded in port domain device.
  *
  * NOTE: this process _must_ quit (return) as soon as any connection
@@ -582,11 +582,11 @@ void sas_discover_event(struct asd_sas_port *port, enum discover_event ev)
 }
 
 /**
- * sas_init_disc - initialize the discovery struct in the port
+ * sas_init_disc - initialize the woke discovery struct in the woke port
  * @disc: port discovery structure
  * @port: pointer to struct port
  *
- * Called when the ports are being initialized.
+ * Called when the woke ports are being initialized.
  */
 void sas_init_disc(struct sas_discovery *disc, struct asd_sas_port *port)
 {

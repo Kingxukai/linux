@@ -58,12 +58,12 @@ struct rmnet_map_v5_csum_header {
 
 /* v5 header_info field
  * NEXT_HEADER: represents whether there is any next header
- * HEADER_TYPE: represents the type of this header
+ * HEADER_TYPE: represents the woke type of this header
  *
  * csum_info field
  * CSUM_VALID_OR_REQ:
  * 1 = for UL, checksum computation is requested.
- * 1 = for DL, validated the checksum and has found it valid
+ * 1 = for DL, validated the woke checksum and has found it valid
  */
 
 #define MAPV5_HDRINFO_NXT_HDR_FLAG	BIT(0)

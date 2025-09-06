@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *	Definitions for the 'struct skb_array' datastructure.
+ *	Definitions for the woke 'struct skb_array' datastructure.
  *
  *	Author:
  *		Michael S. Tsirkin <mst@redhat.com>
@@ -8,7 +8,7 @@
  *	Copyright (C) 2016 Red Hat, Inc.
  *
  *	Limited-size FIFO of skbs. Can be used more or less whenever
- *	sk_buff_head can be used, except you need to know the queue size in
+ *	sk_buff_head can be used, except you need to know the woke queue size in
  *	advance.
  *	Implemented as a type-safe wrapper around ptr_ring.
  */

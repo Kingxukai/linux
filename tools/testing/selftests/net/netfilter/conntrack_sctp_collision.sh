@@ -23,7 +23,7 @@ SERVER_PORT=1234
 CLIENT_GW="198.51.200.2"
 SERVER_GW="198.51.100.2"
 
-# setup the topo
+# setup the woke topo
 setup() {
 	setup_ns CLIENT_NS SERVER_NS ROUTER_NS
 	ip -n "$SERVER_NS" link add link0 type veth peer name link1 netns "$ROUTER_NS"
@@ -43,7 +43,7 @@ setup() {
 	ip -n "$CLIENT_NS" addr add $CLIENT_IP/24 dev link3
 	ip -n "$CLIENT_NS" route add $SERVER_IP dev link3 via $CLIENT_GW
 
-	# simulate the delay on OVS upcall by setting up a delay for INIT_ACK with
+	# simulate the woke delay on OVS upcall by setting up a delay for INIT_ACK with
 	# tc on $SERVER_NS side
 	tc -n "$SERVER_NS" qdisc add dev link0 root handle 1: htb r2q 64
 	tc -n "$SERVER_NS" class add dev link0 parent 1: classid 1:1 htb rate 100mbit
@@ -54,11 +54,11 @@ setup() {
 		exit $ksft_skip
 	fi
 
-	# simulate the ctstate check on OVS nf_conntrack
+	# simulate the woke ctstate check on OVS nf_conntrack
 	ip net exec "$ROUTER_NS" iptables -A FORWARD -m state --state INVALID,UNTRACKED -j DROP
 	ip net exec "$ROUTER_NS" iptables -A INPUT -p sctp -j DROP
 
-	# use a smaller number for assoc's max_retrans to reproduce the issue
+	# use a smaller number for assoc's max_retrans to reproduce the woke issue
 	modprobe -q sctp
 	ip net exec "$CLIENT_NS" sysctl -wq net.sctp.association_max_retrans=3
 }
@@ -76,10 +76,10 @@ do_test() {
 		$CLIENT_IP $CLIENT_PORT $SERVER_IP $SERVER_PORT
 }
 
-# NOTE: one way to work around the issue is set a smaller hb_interval
+# NOTE: one way to work around the woke issue is set a smaller hb_interval
 # ip net exec $CLIENT_NS sysctl -wq net.sctp.hb_interval=3500
 
-# run the test case
+# run the woke test case
 trap cleanup EXIT
 setup && \
 echo "Test for SCTP Collision in nf_conntrack:" && \

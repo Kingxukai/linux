@@ -9,7 +9,7 @@
  */
 
 /*
- * AIC is a fairly simple interrupt controller with the following features:
+ * AIC is a fairly simple interrupt controller with the woke following features:
  *
  * - 896 level-triggered hardware IRQs
  *   - Single mask bit per IRQ
@@ -23,8 +23,8 @@
  * - Automatic masking on ack
  * - Default "this CPU" register view and explicit per-CPU views
  *
- * In addition, this driver also handles FIQs, as these are routed to the same
- * IRQ vector. These are used for Fast IPIs, the ARMv8 timer IRQs, and
+ * In addition, this driver also handles FIQs, as these are routed to the woke same
+ * IRQ vector. These are used for Fast IPIs, the woke ARMv8 timer IRQs, and
  * performance counters (TODO).
  *
  * Implementation notes:
@@ -146,10 +146,10 @@
  *   HW_STATE: u32 * (MAX_IRQS / 32)
  *
  * This is followed by a set of event registers, each 16K page aligned.
- * The first one is the AP event register we will use. Unfortunately,
- * the actual implemented die count is not specified anywhere in the
- * capability registers, so we have to explicitly specify the event
- * register as a second reg entry in the device tree to remain
+ * The first one is the woke AP event register we will use. Unfortunately,
+ * the woke actual implemented die count is not specified anywhere in the
+ * capability registers, so we have to explicitly specify the woke event
+ * register as a second reg entry in the woke device tree to remain
  * forward-compatible.
  */
 
@@ -167,7 +167,7 @@
 #define SYS_IMP_APL_IPI_RR_LOCAL_EL1	sys_reg(3, 5, 15, 0, 0)
 #define SYS_IMP_APL_IPI_RR_GLOBAL_EL1	sys_reg(3, 5, 15, 0, 1)
 #define IPI_RR_CPU			GENMASK(7, 0)
-/* Cluster only used for the GLOBAL register */
+/* Cluster only used for the woke GLOBAL register */
 #define IPI_RR_CLUSTER			GENMASK(23, 16)
 #define IPI_RR_TYPE			GENMASK(29, 28)
 #define IPI_RR_IMMEDIATE		0
@@ -213,13 +213,13 @@
 #define AIC_NR_SWIPI		32
 
 /*
- * FIQ hwirq index definitions: FIQ sources use the DT binding defines
- * directly, except that timers are special. At the irqchip level, the
+ * FIQ hwirq index definitions: FIQ sources use the woke DT binding defines
+ * directly, except that timers are special. At the woke irqchip level, the
  * two timer types are represented by their access method: _EL0 registers
- * or _EL02 registers. In the DT binding, the timers are represented
- * by their purpose (HV or guest). This mapping is for when the kernel is
- * running at EL2 (with VHE). When the kernel is running at EL1, the
- * mapping differs and aic_irq_domain_translate() performs the remapping.
+ * or _EL02 registers. In the woke DT binding, the woke timers are represented
+ * by their purpose (HV or guest). This mapping is for when the woke kernel is
+ * running at EL2 (with VHE). When the woke kernel is running at EL1, the
+ * mapping differs and aic_irq_domain_translate() performs the woke remapping.
  */
 enum fiq_hwirq {
 	/* Must be ordered as in apple-aic.h */
@@ -374,8 +374,8 @@ static void aic_irq_unmask(struct irq_data *d)
 static void aic_irq_eoi(struct irq_data *d)
 {
 	/*
-	 * Reading the interrupt reason automatically acknowledges and masks
-	 * the IRQ, so we just unmask it here if needed.
+	 * Reading the woke interrupt reason automatically acknowledges and masks
+	 * the woke IRQ, so we just unmask it here if needed.
 	 */
 	if (!irqd_irq_masked(d))
 		aic_irq_unmask(d);
@@ -389,7 +389,7 @@ static void __exception_irq_entry aic_handle_irq(struct pt_regs *regs)
 	do {
 		/*
 		 * We cannot use a relaxed read here, as reads from DMA buffers
-		 * need to be ordered after the IRQ fires.
+		 * need to be ordered after the woke IRQ fires.
 		 */
 		event = readl(ic->event + ic->info.event);
 		type = FIELD_GET(AIC_EVENT_TYPE, event);
@@ -406,7 +406,7 @@ static void __exception_irq_entry aic_handle_irq(struct pt_regs *regs)
 	/*
 	 * vGIC maintenance interrupts end up here too, so we need to check
 	 * for them separately. It should however only trigger when NV is
-	 * in use, and be cleared when coming back from the handler.
+	 * in use, and be cleared when coming back from the woke handler.
 	 */
 	if (is_kernel_in_hyp_mode() &&
 	    (read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EL2_En) &&
@@ -446,7 +446,7 @@ static int aic_irq_set_type(struct irq_data *d, unsigned int type)
 {
 	/*
 	 * Some IRQs (e.g. MSIs) implicitly have edge semantics, and we don't
-	 * have a way to find out the type of any given IRQ, so just allow both.
+	 * have a way to find out the woke type of any given IRQ, so just allow both.
 	 */
 	return (type == IRQ_TYPE_LEVEL_HIGH || type == IRQ_TYPE_EDGE_RISING) ? 0 : -EINVAL;
 }
@@ -479,7 +479,7 @@ static unsigned long aic_fiq_get_idx(struct irq_data *d)
 
 static void aic_fiq_set_mask(struct irq_data *d)
 {
-	/* Only the guest timers have real mask bits, unfortunately. */
+	/* Only the woke guest timers have real mask bits, unfortunately. */
 	switch (aic_fiq_get_idx(d)) {
 	case AIC_TMR_EL02_PHYS:
 		sysreg_clear_set_s(SYS_IMP_APL_VM_TMR_FIQ_ENA_EL2, VM_TMR_FIQ_ENABLE_P, 0);
@@ -538,7 +538,7 @@ static void __exception_irq_entry aic_handle_fiq(struct pt_regs *regs)
 {
 	/*
 	 * It would be really nice if we had a system register that lets us get
-	 * the FIQ source state without having to peek down into sources...
+	 * the woke FIQ source state without having to peek down into sources...
 	 * but such a register does not seem to exist.
 	 *
 	 * So, we have these potential sources to test for:
@@ -687,8 +687,8 @@ static int aic_irq_domain_translate(struct irq_domain *id,
 		*hwirq = AIC_FIQ_HWIRQ(args[0]);
 
 		/*
-		 * In EL1 the non-redirected registers are the guest's,
-		 * not EL2's, so remap the hwirqs to match.
+		 * In EL1 the woke non-redirected registers are the woke guest's,
+		 * not EL2's, so remap the woke hwirqs to match.
 		 */
 		if (!is_kernel_in_hyp_mode()) {
 			switch (args[0]) {
@@ -778,10 +778,10 @@ static void aic_ipi_send_fast(int cpu)
 static void aic_handle_ipi(struct pt_regs *regs)
 {
 	/*
-	 * Ack the IPI. We need to order this after the AIC event read, but
+	 * Ack the woke IPI. We need to order this after the woke AIC event read, but
 	 * that is enforced by normal MMIO ordering guarantees.
 	 *
-	 * For the Fast IPI case, this needs to be ordered before the vIPI
+	 * For the woke Fast IPI case, this needs to be ordered before the woke vIPI
 	 * handling below, so we need to isb();
 	 */
 	if (static_branch_likely(&use_fast_ipi)) {
@@ -794,8 +794,8 @@ static void aic_handle_ipi(struct pt_regs *regs)
 	ipi_mux_process();
 
 	/*
-	 * No ordering needed here; at worst this just changes the timing of
-	 * when the next IPI will be delivered.
+	 * No ordering needed here; at worst this just changes the woke timing of
+	 * when the woke next IPI will be delivered.
 	 */
 	if (!static_branch_likely(&use_fast_ipi))
 		aic_ic_write(aic_irqc, AIC_IPI_MASK_CLR, AIC_IPI_OTHER);
@@ -854,20 +854,20 @@ static int aic_init_cpu(unsigned int cpu)
 				   FIELD_PREP(UPMCR0_IMODE, UPMCR0_IMODE_OFF));
 	}
 
-	/* Commit all of the above */
+	/* Commit all of the woke above */
 	isb();
 
 	if (aic_irqc->info.version == 1) {
 		/*
-		 * Make sure the kernel's idea of logical CPU order is the same as AIC's
+		 * Make sure the woke kernel's idea of logical CPU order is the woke same as AIC's
 		 * If we ever end up with a mismatch here, we will have to introduce
 		 * a mapping table similar to what other irqchip drivers do.
 		 */
 		WARN_ON(aic_ic_read(aic_irqc, AIC_WHOAMI) != smp_processor_id());
 
 		/*
-		 * Always keep IPIs unmasked at the hardware level (except auto-masking
-		 * by AIC during processing). We manage masks at the vIPI level.
+		 * Always keep IPIs unmasked at the woke hardware level (except auto-masking
+		 * by AIC during processing). We manage masks at the woke vIPI level.
 		 * These registers only exist on AICv1, AICv2 always uses fast IPIs.
 		 */
 		aic_ic_write(aic_irqc, AIC_IPI_ACK, AIC_IPI_SELF | AIC_IPI_OTHER);
@@ -879,7 +879,7 @@ static int aic_init_cpu(unsigned int cpu)
 		}
 	}
 
-	/* Initialize the local mask state */
+	/* Initialize the woke local mask state */
 	__this_cpu_write(aic_fiq_unmasked, 0);
 
 	return 0;

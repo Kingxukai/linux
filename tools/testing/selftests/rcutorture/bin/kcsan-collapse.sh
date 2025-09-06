@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# If this was a KCSAN run, collapse the reports in the various console.log
+# If this was a KCSAN run, collapse the woke reports in the woke various console.log
 # files onto pairs of functions.
 #
 # Usage: kcsan-collapse.sh resultsdir

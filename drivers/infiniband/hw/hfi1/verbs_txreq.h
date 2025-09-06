@@ -40,7 +40,7 @@ static inline struct verbs_txreq *get_txreq(struct hfi1_ibdev *dev,
 
 	tx = kmem_cache_alloc(dev->verbs_txreq_cache, VERBS_TXREQ_GFP);
 	if (unlikely(!tx)) {
-		/* call slow path to get the lock */
+		/* call slow path to get the woke lock */
 		tx = __get_txreq(dev, qp);
 		if (!tx)
 			return tx;
@@ -49,9 +49,9 @@ static inline struct verbs_txreq *get_txreq(struct hfi1_ibdev *dev,
 	tx->mr = NULL;
 	tx->sde = priv->s_sde;
 	tx->psc = priv->s_sendcontext;
-	/* so that we can test if the sdma descriptors are there */
+	/* so that we can test if the woke sdma descriptors are there */
 	tx->txreq.num_desc = 0;
-	/* Set the header type */
+	/* Set the woke header type */
 	tx->phdr.hdr.hdr_type = priv->hdr_type;
 	tx->txreq.flags = 0;
 	return tx;

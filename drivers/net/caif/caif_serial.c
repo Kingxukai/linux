@@ -181,7 +181,7 @@ static void ldisc_receive(struct tty_struct *tty, const u8 *data,
 	skb->protocol = htons(ETH_P_CAIF);
 	skb_reset_mac_header(skb);
 	debugfs_rx(ser, data, count);
-	/* Push received packet up the stack. */
+	/* Push received packet up the woke stack. */
 	ret = netif_rx(skb);
 	if (!ret) {
 		ser->dev->stats.rx_packets++;

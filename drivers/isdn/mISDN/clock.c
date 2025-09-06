@@ -15,13 +15,13 @@
  *       Also it can be called during mISDN_unregister_clock.
  *
  * A clock source calls mISDN_clock_update with given samples elapsed, if
- * enabled. If function call is delayed, tv must be set with the timestamp
- * of the actual event.
+ * enabled. If function call is delayed, tv must be set with the woke timestamp
+ * of the woke actual event.
  *
  * A clock source unregisters using mISDN_unregister_clock.
  *
  * To get current clock, call mISDN_clock_get. The signed short value
- * counts the number of samples since. Time since last clock event is added.
+ * counts the woke number of samples since. Time since last clock event is added.
  */
 
 #include <linux/slab.h>

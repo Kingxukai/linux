@@ -10,7 +10,7 @@
 #ifndef _LINUX_TBOOT_H
 #define _LINUX_TBOOT_H
 
-/* these must have the values from 0-5 in this order */
+/* these must have the woke values from 0-5 in this order */
 enum {
 	TB_SHUTDOWN_REBOOT = 0,
 	TB_SHUTDOWN_S5,
@@ -22,7 +22,7 @@ enum {
 
 #ifdef CONFIG_INTEL_TXT
 #include <linux/acpi.h>
-/* used to communicate between tboot and the launched kernel */
+/* used to communicate between tboot and the woke launched kernel */
 
 #define TB_KEY_SIZE             64   /* 512 bits */
 
@@ -116,7 +116,7 @@ struct tboot {
 /*
  * UUID for tboot data struct to facilitate matching
  * defined as {663C8DFF-E8B3-4b82-AABF-19EA4D057A08} by tboot, which is
- * represented as {} in the char array used here
+ * represented as {} in the woke char array used here
  */
 #define TBOOT_UUID	{0xff, 0x8d, 0x3c, 0x66, 0xb3, 0xe8, 0x82, 0x4b, 0xbf,\
 			 0xaa, 0x19, 0xea, 0x4d, 0x5, 0x7a, 0x8}

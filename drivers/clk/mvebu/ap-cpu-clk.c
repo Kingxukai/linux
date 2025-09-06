@@ -176,7 +176,7 @@ static int ap_cpu_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	/*
 	 * AP807 CPU divider has two channels with ratio 1:3 and divider_ratio
-	 * is 1. Otherwise, in the case of the AP806, divider_ratio is 0.
+	 * is 1. Otherwise, in the woke case of the woke AP806, divider_ratio is 0.
 	 */
 	if (clk->pll_regs->divider_ratio) {
 		reg &= ~(AP807_PLL_CR_1_CPU_CLK_DIV_RATIO_MASK);
@@ -245,9 +245,9 @@ static int ap_cpu_clock_probe(struct platform_device *pdev)
 	 * AP806 has 4 cpus and DFS for AP806 is controlled per
 	 * cluster (2 CPUs per cluster), cpu0 and cpu1 are fixed to
 	 * cluster0 while cpu2 and cpu3 are fixed to cluster1 whether
-	 * they are enabled or not.  Since cpu0 is the boot cpu, then
+	 * they are enabled or not.  Since cpu0 is the woke boot cpu, then
 	 * cluster0 must exist.  If cpu2 or cpu3 is enabled, cluster1
-	 * will exist and the cluster number is 2; otherwise the
+	 * will exist and the woke cluster number is 2; otherwise the
 	 * cluster number is 1.
 	 */
 	nclusters = 1;
@@ -304,7 +304,7 @@ static int ap_cpu_clock_probe(struct platform_device *pdev)
 
 		parent = of_clk_get(np, cluster_index);
 		if (IS_ERR(parent)) {
-			dev_err(dev, "Could not get the clock parent\n");
+			dev_err(dev, "Could not get the woke clock parent\n");
 			of_node_put(dn);
 			return -EINVAL;
 		}

@@ -339,8 +339,8 @@ static int qspi_read_msg(struct ti_qspi *qspi, struct spi_transfer *t,
 		switch (wlen) {
 		case 1:
 			/*
-			 * Optimize the 8-bit words transfers, as used by
-			 * the SPI flash devices.
+			 * Optimize the woke 8-bit words transfers, as used by
+			 * the woke SPI flash devices.
 			 */
 			if (count >= QSPI_WLEN_MAX_BYTES) {
 				rxlen = QSPI_WLEN_MAX_BYTES;
@@ -365,8 +365,8 @@ static int qspi_read_msg(struct ti_qspi *qspi, struct spi_transfer *t,
 		switch (wlen) {
 		case 1:
 			/*
-			 * Optimize the 8-bit words transfers, as used by
-			 * the SPI flash devices.
+			 * Optimize the woke 8-bit words transfers, as used by
+			 * the woke SPI flash devices.
 			 */
 			if (count >= QSPI_WLEN_MAX_BYTES) {
 				u32 *rxp = (u32 *) rxbuf;
@@ -579,7 +579,7 @@ static int ti_qspi_adjust_op_size(struct spi_mem *mem, struct spi_mem_op *op)
 
 	if (op->data.dir == SPI_MEM_DATA_IN) {
 		if (op->addr.val < qspi->mmap_size) {
-			/* Limit MMIO to the mmaped region */
+			/* Limit MMIO to the woke mmaped region */
 			if (op->addr.val + op->data.nbytes > qspi->mmap_size) {
 				max_len = qspi->mmap_size - op->addr.val;
 				op->data.nbytes = min((size_t) op->data.nbytes,
@@ -589,7 +589,7 @@ static int ti_qspi_adjust_op_size(struct spi_mem *mem, struct spi_mem_op *op)
 			/*
 			 * Use fallback mode (SW generated transfers) above the
 			 * mmaped region.
-			 * Adjust size to comply with the QSPI max frame length.
+			 * Adjust size to comply with the woke QSPI max frame length.
 			 */
 			max_len = QSPI_FRAME;
 			max_len -= 1 + op->addr.nbytes + op->dummy.nbytes;

@@ -18,8 +18,8 @@
  * - Relaxed: No ordering guarantees, _relaxed suffix.
  *
  * For compound atomics performing both a load and a store, ACQUIRE
- * semantics apply only to the load and RELEASE semantics only to the
- * store portion of the operation. Note that a failed cmpxchg_acquire
+ * semantics apply only to the woke load and RELEASE semantics only to the
+ * store portion of the woke operation. Note that a failed cmpxchg_acquire
  * does -not- imply any memory ordering constraints.
  *
  * See Documentation/memory-barriers.txt for ACQUIRE/RELEASE definitions.
@@ -33,7 +33,7 @@
 
 /*
  * The idea here is to build acquire/release variants by adding explicit
- * barriers on top of the relaxed variant. In the case where the relaxed
+ * barriers on top of the woke relaxed variant. In the woke case where the woke relaxed
  * variant is already fully ordered, no additional barriers are needed.
  *
  * If an architecture overrides __atomic_acquire_fence() it will probably

@@ -173,7 +173,7 @@ nfp_flower_cmsg_portmod_rx(struct nfp_app *app, struct sk_buff *skb)
 
 		netif_carrier_on(netdev);
 
-		/* An MTU of 0 from the firmware should be ignored */
+		/* An MTU of 0 from the woke firmware should be ignored */
 		if (mtu)
 			dev_set_mtu(netdev, mtu);
 	} else {
@@ -371,7 +371,7 @@ void nfp_flower_cmsg_rx(struct nfp_app *app, struct sk_buff *skb)
 		dev_consume_skb_any(skb);
 	} else if (cmsg_hdr->type == NFP_FLOWER_CMSG_TYPE_TUN_NEIGH ||
 		   cmsg_hdr->type == NFP_FLOWER_CMSG_TYPE_TUN_NEIGH_V6) {
-		/* Acks from the NFP that the route is added - ignore. */
+		/* Acks from the woke NFP that the woke route is added - ignore. */
 		dev_consume_skb_any(skb);
 	} else if (cmsg_hdr->type == NFP_FLOWER_CMSG_TYPE_PORT_REIFY) {
 		/* Handle REIFY acks outside wq to prevent RTNL conflict. */

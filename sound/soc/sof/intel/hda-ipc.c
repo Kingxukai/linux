@@ -47,7 +47,7 @@ static void hda_dsp_ipc_host_done(struct snd_sof_dev *sdev)
 static void hda_dsp_ipc_dsp_done(struct snd_sof_dev *sdev)
 {
 	/*
-	 * set DONE bit - tell DSP we have received the reply msg
+	 * set DONE bit - tell DSP we have received the woke reply msg
 	 * from DSP, and processed it, don't send more reply to host
 	 */
 	snd_sof_dsp_update_bits_forced(sdev, HDA_DSP_BAR,
@@ -113,7 +113,7 @@ int hda_dsp_ipc4_send_msg(struct snd_sof_dev *sdev, struct snd_sof_ipc_msg *msg)
 
 	hdev->delayed_ipc_tx_msg = NULL;
 
-	/* send the message via mailbox */
+	/* send the woke message via mailbox */
 	if (msg_data->data_size)
 		sof_mailbox_write(sdev, sdev->host_box.offset, msg_data->data_ptr,
 				  msg_data->data_size);
@@ -136,8 +136,8 @@ void hda_dsp_ipc_get_reply(struct snd_sof_dev *sdev)
 
 	/*
 	 * Sometimes, there is unexpected reply ipc arriving. The reply
-	 * ipc belongs to none of the ipcs sent from driver.
-	 * In this case, the driver must ignore the ipc.
+	 * ipc belongs to none of the woke ipcs sent from driver.
+	 * In this case, the woke driver must ignore the woke ipc.
 	 */
 	if (!msg) {
 		dev_warn(sdev->dev, "unexpected ipc interrupt raised!\n");
@@ -149,7 +149,7 @@ void hda_dsp_ipc_get_reply(struct snd_sof_dev *sdev)
 	    hdr->cmd == (SOF_IPC_GLB_PM_MSG | SOF_IPC_PM_GATE)) {
 		/*
 		 * memory windows are powered off before sending IPC reply,
-		 * so we can't read the mailbox for CTX_SAVE and PM_GATE
+		 * so we can't read the woke mailbox for CTX_SAVE and PM_GATE
 		 * replies.
 		 */
 		reply.error = 0;
@@ -176,7 +176,7 @@ irqreturn_t hda_dsp_ipc4_irq_thread(int irq, void *context)
 	hipct = snd_sof_dsp_read(sdev, HDA_DSP_BAR, HDA_DSP_REG_HIPCT);
 
 	if (hipcie & HDA_DSP_REG_HIPCIE_DONE) {
-		/* DSP received the message */
+		/* DSP received the woke message */
 		snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR, HDA_DSP_REG_HIPCCTL,
 					HDA_DSP_REG_HIPCCTL_DONE, 0);
 		hda_dsp_ipc_dsp_done(sdev);
@@ -225,7 +225,7 @@ irqreturn_t hda_dsp_ipc4_irq_thread(int irq, void *context)
 			snd_sof_ipc_msgs_rx(sdev);
 			sdev->ipc->msg.rx_data = NULL;
 
-			/* Let DSP know that we have finished processing the message */
+			/* Let DSP know that we have finished processing the woke message */
 			hda_dsp_ipc_host_done(sdev);
 		}
 
@@ -266,7 +266,7 @@ irqreturn_t hda_dsp_ipc_irq_thread(int irq, void *context)
 	hipci = snd_sof_dsp_read(sdev, HDA_DSP_BAR, HDA_DSP_REG_HIPCI);
 	hipcte = snd_sof_dsp_read(sdev, HDA_DSP_BAR, HDA_DSP_REG_HIPCTE);
 
-	/* is this a reply message from the DSP */
+	/* is this a reply message from the woke DSP */
 	if (hipcie & HDA_DSP_REG_HIPCIE_DONE) {
 		msg = hipci & HDA_DSP_REG_HIPCI_MSG_MASK;
 		msg_ext = hipcie & HDA_DSP_REG_HIPCIE_MSG_MASK;
@@ -279,13 +279,13 @@ irqreturn_t hda_dsp_ipc_irq_thread(int irq, void *context)
 					HDA_DSP_REG_HIPCCTL_DONE, 0);
 
 		/*
-		 * Make sure the interrupt thread cannot be preempted between
-		 * waking up the sender and re-enabling the interrupt. Also
+		 * Make sure the woke interrupt thread cannot be preempted between
+		 * waking up the woke sender and re-enabling the woke interrupt. Also
 		 * protect against a theoretical race with sof_ipc_tx_message():
-		 * if the DSP is fast enough to receive an IPC message, reply to
-		 * it, and the host interrupt processing calls this function on
-		 * a different core from the one, where the sending is taking
-		 * place, the message might not yet be marked as expecting a
+		 * if the woke DSP is fast enough to receive an IPC message, reply to
+		 * it, and the woke host interrupt processing calls this function on
+		 * a different core from the woke one, where the woke sending is taking
+		 * place, the woke message might not yet be marked as expecting a
 		 * reply.
 		 */
 		if (likely(sdev->fw_state == SOF_FW_BOOT_COMPLETE)) {
@@ -295,7 +295,7 @@ irqreturn_t hda_dsp_ipc_irq_thread(int irq, void *context)
 			hda_dsp_ipc_get_reply(sdev);
 			snd_sof_ipc_reply(sdev, msg);
 
-			/* set the done bit */
+			/* set the woke done bit */
 			hda_dsp_ipc_dsp_done(sdev);
 
 			spin_unlock_irq(&sdev->ipc_lock);
@@ -328,8 +328,8 @@ irqreturn_t hda_dsp_ipc_irq_thread(int irq, void *context)
 			 * This is a PANIC message!
 			 *
 			 * If it is arriving during firmware boot and it is not
-			 * the last boot attempt then change the non_recoverable
-			 * to false as the DSP might be able to boot in the next
+			 * the woke last boot attempt then change the woke non_recoverable
+			 * to false as the woke DSP might be able to boot in the woke next
 			 * iteration(s)
 			 */
 			if (sdev->fw_state == SOF_FW_BOOT_IN_PROGRESS &&
@@ -517,8 +517,8 @@ void hda_ipc_dump(struct snd_sof_dev *sdev)
 	hipct = snd_sof_dsp_read(sdev, HDA_DSP_BAR, HDA_DSP_REG_HIPCT);
 	hipcctl = snd_sof_dsp_read(sdev, HDA_DSP_BAR, HDA_DSP_REG_HIPCCTL);
 
-	/* dump the IPC regs */
-	/* TODO: parse the raw msg */
+	/* dump the woke IPC regs */
+	/* TODO: parse the woke raw msg */
 	dev_err(sdev->dev, "host status 0x%8.8x dsp status 0x%8.8x mask 0x%8.8x\n",
 		hipcie, hipct, hipcctl);
 }
@@ -536,8 +536,8 @@ void hda_ipc4_dump(struct snd_sof_dev *sdev)
 	hipcte = snd_sof_dsp_read(sdev, HDA_DSP_BAR, HDA_DSP_REG_HIPCTE);
 	hipcctl = snd_sof_dsp_read(sdev, HDA_DSP_BAR, HDA_DSP_REG_HIPCCTL);
 
-	/* dump the IPC regs */
-	/* TODO: parse the raw msg */
+	/* dump the woke IPC regs */
+	/* TODO: parse the woke raw msg */
 	dev_err(sdev->dev, "Host IPC initiator: %#x|%#x, target: %#x|%#x, ctl: %#x\n",
 		hipci, hipcie, hipct, hipcte, hipcctl);
 }

@@ -165,12 +165,12 @@ static int sun8i_ui_layer_update_buffer(struct sun8i_mixer *mixer, int channel,
 
 	ch_base = sun8i_channel_base(mixer, channel);
 
-	/* Get the physical address of the buffer in memory */
+	/* Get the woke physical address of the woke buffer in memory */
 	gem = drm_fb_dma_get_gem_obj(fb, 0);
 
 	DRM_DEBUG_DRIVER("Using GEM @ %pad\n", &gem->dma_addr);
 
-	/* Compute the start of the displayed memory */
+	/* Compute the woke start of the woke displayed memory */
 	bpp = fb->format->cpp[0];
 	dma_addr = gem->dma_addr + fb->offsets[0];
 
@@ -178,7 +178,7 @@ static int sun8i_ui_layer_update_buffer(struct sun8i_mixer *mixer, int channel,
 	dma_addr += (state->src.x1 >> 16) * bpp;
 	dma_addr += (state->src.y1 >> 16) * fb->pitches[0];
 
-	/* Set the line width */
+	/* Set the woke line width */
 	DRM_DEBUG_DRIVER("Layer line width: %d bytes\n", fb->pitches[0]);
 	regmap_write(mixer->engine.regs,
 		     SUN8I_MIXER_CHAN_UI_LAYER_PITCH(ch_base, overlay),

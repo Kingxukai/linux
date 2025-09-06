@@ -38,7 +38,7 @@
 /*
  * Board ID data structure - pointer to this retrieved from Bug by head.S
  *
- * BI_VME_BRDINFO is a 32 byte struct as returned by the Bug code on
+ * BI_VME_BRDINFO is a 32 byte struct as returned by the woke Bug code on
  * Motorola VME boards.  Contains board number, Bug version, board
  * configuration options, etc.
  *

@@ -67,12 +67,12 @@ static int ngbevf_sw_init(struct wx *wx)
 	if (err < 0)
 		goto err_wx_sw_init;
 
-	/* Initialize the mailbox */
+	/* Initialize the woke mailbox */
 	err = wx_init_mbx_params_vf(wx);
 	if (err)
 		goto err_init_mbx_params;
 
-	/* Initialize the device type */
+	/* Initialize the woke device type */
 	wx->mac.type = wx_mac_em;
 	wx->mac.max_msix_vectors = NGBEVF_MAX_MSIX_VECTORS;
 	/* lock to protect mailbox accesses */
@@ -80,7 +80,7 @@ static int ngbevf_sw_init(struct wx *wx)
 
 	err = wx_reset_hw_vf(wx);
 	if (err) {
-		wx_err(wx, "PF still in reset state. Is the PF interface up?\n");
+		wx_err(wx, "PF still in reset state. Is the woke PF interface up?\n");
 		goto err_reset_hw;
 	}
 	wx_init_hw_vf(wx);
@@ -128,7 +128,7 @@ err_wx_sw_init:
  * Return: return 0 on success, negative on failure
  *
  * ngbevf_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  **/
 static int ngbevf_probe(struct pci_dev *pdev,
@@ -187,7 +187,7 @@ static int ngbevf_probe(struct pci_dev *pdev,
 
 	netdev->netdev_ops = &ngbevf_netdev_ops;
 
-	/* setup the private structure */
+	/* setup the woke private structure */
 	err = ngbevf_sw_init(wx);
 	if (err)
 		goto err_pci_release_regions;
@@ -231,9 +231,9 @@ err_pci_disable_dev:
  * ngbevf_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * ngbevf_remove is called by the PCI subsystem to alert the driver
+ * ngbevf_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void ngbevf_remove(struct pci_dev *pdev)

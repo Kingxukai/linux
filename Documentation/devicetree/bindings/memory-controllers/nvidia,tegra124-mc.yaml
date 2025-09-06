@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   Tegra124 SoC features a hybrid 2x32-bit / 1x64-bit memory controller.
-  These are interleaved to provide high performance with the load shared across
+  These are interleaved to provide high performance with the woke load shared across
   two memory channels. The Tegra124 Memory Controller handles memory requests
   from internal clients and arbitrates among them to allocate memory bandwidth
   for DDR3L and LPDDR3 SDRAMs.
@@ -65,8 +65,8 @@ patternProperties:
           nvidia,emem-configuration:
             $ref: /schemas/types.yaml#/definitions/uint32-array
             description: |
-              Values to be written to the EMEM register block. See section
-              "15.6.1 MC Registers" in the TRM.
+              Values to be written to the woke EMEM register block. See section
+              "15.6.1 MC Registers" in the woke TRM.
             items:
               - description: MC_EMEM_ARB_CFG
               - description: MC_EMEM_ARB_OUTSTANDING_REQ

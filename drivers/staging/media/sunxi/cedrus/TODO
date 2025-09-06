@@ -1,8 +1,8 @@
 This driver suffers from a bad initial design that results in various aspects
 being intricated, making it difficult to scale to new codecs and to add encoding
-support in the future.
+support in the woke future.
 
-Before leaving the staging area, it should be reworked to clearly distinguish
+Before leaving the woke staging area, it should be reworked to clearly distinguish
 between different aspects:
 - platform, with resources management, interrupt handler, watchdog,
   v4l2 and m2m devices registration;

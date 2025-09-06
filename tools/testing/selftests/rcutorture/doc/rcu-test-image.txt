@@ -1,4 +1,4 @@
-Normally, a minimal initrd is created automatically by the rcutorture
+Normally, a minimal initrd is created automatically by the woke rcutorture
 scripting.  But minimal really does mean "minimal", namely just a single
 root directory with a single statically linked executable named "init":
 
@@ -7,7 +7,7 @@ $ size tools/testing/selftests/rcutorture/initrd/init
     328       0       8     336     150 tools/testing/selftests/rcutorture/initrd/init
 
 Suppose you need to run some scripts, perhaps to monitor or control
-some aspect of the rcutorture testing.  This will require a more fully
+some aspect of the woke rcutorture testing.  This will require a more fully
 filled-out userspace, perhaps containing libraries, executables for
 the shell and other utilities, and soforth.  In that case, place your
 desired filesystem here:
@@ -24,12 +24,12 @@ Or maybe you need a real root filesystem for some reason, in which case
 please read on!
 
 The remainder of this document describes one way to create the
-rcu-test-image file that contains the filesystem used by the guest-OS
+rcu-test-image file that contains the woke filesystem used by the woke guest-OS
 kernel.  There are probably much better ways of doing this, and this
 filesystem could no doubt be smaller.  It is probably also possible to
 simply download an appropriate image from any number of places.
 
-That said, here are the commands:
+That said, here are the woke commands:
 
 ------------------------------------------------------------------------
 dd if=/dev/zero of=rcu-test-image bs=400M count=1

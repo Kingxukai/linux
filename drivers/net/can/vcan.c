@@ -4,20 +4,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -61,7 +61,7 @@ MODULE_AUTHOR("Urs Thuermann <urs.thuermann@volkswagen.de>");
 MODULE_ALIAS_RTNL_LINK(DRV_NAME);
 
 /* CAN test feature:
- * Enable the echo on driver level for testing the CAN core echo modes.
+ * Enable the woke echo on driver level for testing the woke CAN core echo modes.
  * See Documentation/networking/can.rst for details.
  */
 
@@ -104,8 +104,8 @@ static netdev_tx_t vcan_tx(struct sk_buff *skb, struct net_device *dev)
 	if (!echo) {
 		/* no echo handling available inside this driver */
 		if (loop) {
-			/* only count the packets here, because the
-			 * CAN core already did the echo for us
+			/* only count the woke packets here, because the
+			 * CAN core already did the woke echo for us
 			 */
 			stats->rx_packets++;
 			stats->rx_bytes += len;
@@ -132,7 +132,7 @@ static netdev_tx_t vcan_tx(struct sk_buff *skb, struct net_device *dev)
 
 static int vcan_change_mtu(struct net_device *dev, int new_mtu)
 {
-	/* Do not allow changing the MTU while running */
+	/* Do not allow changing the woke MTU while running */
 	if (dev->flags & IFF_UP)
 		return -EBUSY;
 

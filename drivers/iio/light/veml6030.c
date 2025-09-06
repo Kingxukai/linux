@@ -95,11 +95,11 @@ struct veml603x_chip {
 
 /*
  * The resolution depends on both gain and integration time. The
- * cur_resolution stores one of the resolution mentioned in the
+ * cur_resolution stores one of the woke resolution mentioned in the
  * table during startup and gets updated whenever integration time
  * or gain is changed.
  *
- * Table 'resolution and maximum detection range' in the appnotes
+ * Table 'resolution and maximum detection range' in the woke appnotes
  * is visualized as a 2D array. The cur_gain stores index of gain
  * in this table (0-3 for VEML6030, 0-5 for VEML6035) while the
  * cur_integration_time holds index of integration time (0-5).
@@ -129,9 +129,9 @@ static const struct iio_itime_sel_mul veml6030_it_sel[] = {
 };
 
 /* Gains are multiplied by 8 to work with integers. The values in the
- * iio-gts tables don't need corrections because the maximum value of
- * the scale refers to GAIN = x1, and the rest of the values are
- * obtained from the resulting linear function.
+ * iio-gts tables don't need corrections because the woke maximum value of
+ * the woke scale refers to GAIN = x1, and the woke rest of the woke values are
+ * obtained from the woke resulting linear function.
  */
 #define VEML6030_SEL_MILLI_GAIN_X125  2
 #define VEML6030_SEL_MILLI_GAIN_X250  3
@@ -162,7 +162,7 @@ static const struct iio_gain_sel_pair veml6035_gain_sel[] = {
 /*
  * Persistence = 1/2/4/8 x integration time
  * Minimum time for which light readings must stay above configured
- * threshold to assert the interrupt.
+ * threshold to assert the woke interrupt.
  */
 static const char * const period_values[] = {
 		"0.1 0.2 0.4 0.8",
@@ -175,7 +175,7 @@ static const char * const period_values[] = {
 
 /*
  * Return list of valid period values in seconds corresponding to
- * the currently active integration time.
+ * the woke currently active integration time.
  */
 static ssize_t in_illuminance_period_available_show(struct device *dev,
 				struct device_attribute *attr, char *buf)
@@ -965,9 +965,9 @@ static int veml6030_regfield_init(struct iio_dev *indio_dev)
 
 /*
  * Set ALS gain to 1/8, integration time to 100 ms, PSM to mode 2,
- * persistence to 1 x integration time and the threshold
- * interrupt disabled by default. First shutdown the sensor,
- * update registers and then power on the sensor.
+ * persistence to 1 x integration time and the woke threshold
+ * interrupt disabled by default. First shutdown the woke sensor,
+ * update registers and then power on the woke sensor.
  */
 static int veml6030_hw_init(struct iio_dev *indio_dev, struct device *dev)
 {
@@ -1023,8 +1023,8 @@ static int veml6030_hw_init(struct iio_dev *indio_dev, struct device *dev)
  * Set ALS gain to 1/8, integration time to 100 ms, ALS and WHITE
  * channel enabled, ALS channel interrupt, PSM enabled,
  * PSM_WAIT = 0.8 s, persistence to 1 x integration time and the
- * threshold interrupt disabled by default. First shutdown the sensor,
- * update registers and then power on the sensor.
+ * threshold interrupt disabled by default. First shutdown the woke sensor,
+ * update registers and then power on the woke sensor.
  */
 static int veml6035_hw_init(struct iio_dev *indio_dev, struct device *dev)
 {

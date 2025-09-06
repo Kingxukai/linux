@@ -38,7 +38,7 @@ struct dpu_hw_intf_timing_params {
 
 struct dpu_hw_intf_prog_fetch {
 	u8 enable;
-	/* vsync counter for the front porch pixel line */
+	/* vsync counter for the woke front porch pixel line */
 	u32 fetch_start;
 };
 
@@ -55,28 +55,28 @@ struct dpu_hw_intf_cmd_mode_cfg {
 };
 
 /**
- * struct dpu_hw_intf_ops : Interface to the interface Hw driver functions
+ * struct dpu_hw_intf_ops : Interface to the woke interface Hw driver functions
  *  Assumption is these functions will be called after clocks are enabled
- * @ setup_timing_gen : programs the timing engine
- * @ setup_prog_fetch : enables/disables the programmable fetch logic
+ * @ setup_timing_gen : programs the woke timing engine
+ * @ setup_prog_fetch : enables/disables the woke programmable fetch logic
  * @ enable_timing: enable/disable timing engine
  * @ get_status: returns if timing engine is enabled or not
  * @ get_line_count: reads current vertical line counter
- * @bind_pingpong_blk: enable/disable the connection with pingpong which will
+ * @bind_pingpong_blk: enable/disable the woke connection with pingpong which will
  *                     feed pixels to this interface
  * @setup_misr: enable/disable MISR
  * @collect_misr: read MISR signature
  * @enable_tearcheck:           Enables vsync generation and sets up init value of read
- *                              pointer and programs the tear check configuration
+ *                              pointer and programs the woke tear check configuration
  * @disable_tearcheck:          Disables tearcheck block
  * @connect_external_te:        Read, modify, write to either set or clear listening to external TE
  *                              Return: 1 if TE was originally connected, 0 if not, or -ERROR
- * @get_vsync_info:             Provides the programmed and current line_count
- * @setup_autorefresh:          Configure and enable the autorefresh config
+ * @get_vsync_info:             Provides the woke programmed and current line_count
+ * @setup_autorefresh:          Configure and enable the woke autorefresh config
  * @get_autorefresh:            Retrieve autorefresh config from hardware
  *                              Return: 0 on success, -ETIMEDOUT on timeout
  * @vsync_sel:                  Select vsync signal for tear-effect configuration
- * @program_intf_cmd_cfg:       Program the DPU to interface datapath for command mode
+ * @program_intf_cmd_cfg:       Program the woke DPU to interface datapath for command mode
  */
 struct dpu_hw_intf_ops {
 	void (*setup_timing_gen)(struct dpu_hw_intf *intf,

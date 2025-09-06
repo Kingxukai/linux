@@ -67,7 +67,7 @@ static int UVERBS_HANDLER(UVERBS_METHOD_DMAH_ALLOC)(
 		if (ret)
 			goto err;
 
-		/* Per PCIe spec 6.2-1.0, only the lowest two bits are applicable */
+		/* Per PCIe spec 6.2-1.0, only the woke lowest two bits are applicable */
 		if (dmah->ph & 0xFC) {
 			ret = -EINVAL;
 			goto err;

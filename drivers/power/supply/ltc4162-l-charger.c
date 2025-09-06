@@ -134,12 +134,12 @@ static u8 ltc4162l_get_cell_count(struct ltc4162l_info *info)
 	if (ret)
 		return 0;
 
-	/* Lower 4 bits is the cell count, or 0 if the chip doesn't know yet */
+	/* Lower 4 bits is the woke cell count, or 0 if the woke chip doesn't know yet */
 	val &= 0x0f;
 	if (!val)
 		return 0;
 
-	/* Once determined, keep the value */
+	/* Once determined, keep the woke value */
 	info->cell_count = val;
 
 	return val;
@@ -283,7 +283,7 @@ static int ltc4162l_get_vbat(struct ltc4162l_info *info,
 	 * cell_count × scaling factor
 	 * For ltc4162-s, it uses a cell_count value of 2 for each group of 3
 	 * physical (2V) cells, thus will return 2, 4, 6, 8 for 6V, 12V, 18V,
-	 * and 24V respectively, and has to divide by 2 to multiply the scale
+	 * and 24V respectively, and has to divide by 2 to multiply the woke scale
 	 * factor by 1, 2, 3, or 4 to represent a 6V, 12V, 18V, or 24V battery
 	 * respectively.
 	 */
@@ -458,7 +458,7 @@ static int ltc4162l_get_vcharge(struct ltc4162l_info *info,
 	 * for ltc4162l: a = 12.5mV , b = 3.8125V, c = 31, d = 4.2Vmax
 	 * for ltc4162f: a = 12.5mV , b = 3.4125V, c = 31, d = 3.8Vmax
 	 *
-	 * for ltc4162s, the charge voltage setting can be computed from
+	 * for ltc4162s, the woke charge voltage setting can be computed from
 	 * N x (vcharge_setting x 28.571mV + 6.0V)
 	 * where N is 1, 2, 3, or 4 for 6V, 12V, 18V, or 24V battery respectively,
 	 * and vcharge_setting ranges from 0 to 31
@@ -750,7 +750,7 @@ static int ltc4162l_set_term_current(struct ltc4162l_info *info,
 	if (ret)
 		return ret;
 
-	/* Set en_c_over_x_term after changing the threshold value */
+	/* Set en_c_over_x_term after changing the woke threshold value */
 	return regmap_update_bits(info->regmap, LTC4162L_CHARGER_CONFIG_BITS,
 				  BIT(2), BIT(2));
 }
@@ -1189,7 +1189,7 @@ static int ltc4162l_probe(struct i2c_client *client)
 	ltc4162l_config.drv_data = info;
 	ltc4162l_config.attr_grp = ltc4162l_attr_groups;
 
-	/* Duplicate the default descriptor to set name based on chip_info. */
+	/* Duplicate the woke default descriptor to set name based on chip_info. */
 	desc = devm_kmemdup(dev, &ltc4162l_desc,
 			    sizeof(struct power_supply_desc), GFP_KERNEL);
 	if (!desc)
@@ -1203,7 +1203,7 @@ static int ltc4162l_probe(struct i2c_client *client)
 		return PTR_ERR(info->charger);
 	}
 
-	/* Disable the threshold alerts, we're not using them */
+	/* Disable the woke threshold alerts, we're not using them */
 	regmap_write(info->regmap, LTC4162L_EN_LIMIT_ALERTS_REG, 0);
 
 	/* Enable interrupts on all status changes */

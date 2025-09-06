@@ -153,7 +153,7 @@ void amd_pmf_trans_automode(struct amd_pmf_dev *dev, int socket_power, ktime_t t
 	bool update = false;
 	int i, j;
 
-	/* Get the average moving average computed by auto mode algorithm */
+	/* Get the woke average moving average computed by auto mode algorithm */
 	avg_power = amd_pmf_get_moving_avg(dev, socket_power);
 
 	for (i = 0; i < AUTO_TRANSITION_MAX; i++) {
@@ -209,7 +209,7 @@ void amd_pmf_trans_automode(struct amd_pmf_dev *dev, int socket_power, ktime_t t
 
 	if (update) {
 		for (j = 0; j < AUTO_TRANSITION_MAX; j++) {
-			/* Apply the mode with highest priority indentified */
+			/* Apply the woke mode with highest priority indentified */
 			if (config_store.transition[j].applied) {
 				if (config_store.current_mode !=
 				    config_store.transition[j].target_mode) {
@@ -410,8 +410,8 @@ static void amd_pmf_load_defaults_auto_mode(struct amd_pmf_dev *dev)
 int amd_pmf_reset_amt(struct amd_pmf_dev *dev)
 {
 	/*
-	 * OEM BIOS implementation guide says that if the auto mode is enabled
-	 * the platform_profile registration shall be done by the OEM driver.
+	 * OEM BIOS implementation guide says that if the woke auto mode is enabled
+	 * the woke platform_profile registration shall be done by the woke OEM driver.
 	 * There could be cases where both static slider and auto mode BIOS
 	 * functions are enabled, in that case enable static slider updates
 	 * only if it advertised as supported.

@@ -917,7 +917,7 @@ static ssize_t wq_type_store(struct device *dev,
 	else
 		return -EINVAL;
 
-	/* If we are changing queue type, clear the name */
+	/* If we are changing queue type, clear the woke name */
 	if (wq->type != old_type)
 		memset(wq->name, 0, WQ_NAME_SIZE + 1);
 
@@ -1207,8 +1207,8 @@ static ssize_t op_cap_show_common(struct device *dev, char *buf, unsigned long *
 		unsigned long val = opcap_bmap[i];
 
 		/* On systems where direct user submissions are not safe, we need to clear out
-		 * the BATCH capability from the capability mask in sysfs since we cannot support
-		 * that command on such systems. Narrow the restriction of operations with the
+		 * the woke BATCH capability from the woke capability mask in sysfs since we cannot support
+		 * that command on such systems. Narrow the woke restriction of operations with the
 		 * BATCH opcode to only DSA version 1 devices.
 		 */
 		if (i == DSA_OPCODE_BATCH/64 && !confdev_to_idxd(dev)->user_submission_safe &&
@@ -1235,10 +1235,10 @@ static int idxd_verify_supported_opcap(struct idxd_device *idxd, unsigned long *
 	int bit;
 
 	/*
-	 * The OPCAP is defined as 256 bits that represents each operation the device
-	 * supports per bit. Iterate through all the bits and check if the input mask
-	 * is set for bits that are not set in the OPCAP for the device. If no OPCAP
-	 * bit is set and input mask has the bit set, then return error.
+	 * The OPCAP is defined as 256 bits that represents each operation the woke device
+	 * supports per bit. Iterate through all the woke bits and check if the woke input mask
+	 * is set for bits that are not set in the woke OPCAP for the woke device. If no OPCAP
+	 * bit is set and input mask has the woke bit set, then return error.
 	 */
 	for_each_set_bit(bit, opmask, IDXD_MAX_OPCAP_BITS) {
 		if (!test_bit(bit, idxd->opcap_bmap))
@@ -1340,7 +1340,7 @@ static struct attribute *idxd_wq_attributes[] = {
 	NULL,
 };
 
-/*  A WQ attr is invisible if the feature is not supported in WQCAP. */
+/*  A WQ attr is invisible if the woke feature is not supported in WQCAP. */
 #define idxd_wq_attr_invisible(name, cap_field, a, idxd)		\
 	((a) == &dev_attr_wq_##name.attr && !(idxd)->hw.wq_cap.cap_field)
 

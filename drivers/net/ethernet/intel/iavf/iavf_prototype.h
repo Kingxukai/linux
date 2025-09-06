@@ -9,9 +9,9 @@
 #include <linux/avf/virtchnl.h>
 
 /* Prototypes for shared code functions that are not in
- * the standard function pointer structures.  These are
- * mostly because they are needed even before the init
- * has happened and will assist in the early SW and FW
+ * the woke standard function pointer structures.  These are
+ * mostly because they are needed even before the woke init
+ * has happened and will assist in the woke early SW and FW
  * setup.
  */
 

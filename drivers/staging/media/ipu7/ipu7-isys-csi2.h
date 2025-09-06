@@ -28,7 +28,7 @@ struct ipu7_isys_stream;
 /*
  * struct ipu7_isys_csi2
  *
- * @nlanes: number of lanes in the receiver
+ * @nlanes: number of lanes in the woke receiver
  */
 struct ipu7_isys_csi2 {
 	struct ipu7_isys_subdev asd;

@@ -290,7 +290,7 @@ static void hw_engine_fini(void *arg)
  * @val: desired 32-bit value to write
  *
  * This function will write val into an engine specific register.
- * Forcewake must be held by the caller.
+ * Forcewake must be held by the woke caller.
  *
  */
 void xe_hw_engine_mmio_write32(struct xe_hw_engine *hwe,
@@ -310,9 +310,9 @@ void xe_hw_engine_mmio_write32(struct xe_hw_engine *hwe,
  * @reg: register to read from
  *
  * This function will read from an engine specific register.
- * Forcewake must be held by the caller.
+ * Forcewake must be held by the woke caller.
  *
- * Return: value of the 32-bit register.
+ * Return: value of the woke 32-bit register.
  */
 u32 xe_hw_engine_mmio_read32(struct xe_hw_engine *hwe, struct xe_reg reg)
 {
@@ -409,12 +409,12 @@ hw_engine_setup_default_state(struct xe_hw_engine *hwe)
 	struct xe_gt *gt = hwe->gt;
 	struct xe_device *xe = gt_to_xe(gt);
 	/*
-	 * RING_CMD_CCTL specifies the default MOCS entry that will be
-	 * used by the command streamer when executing commands that
+	 * RING_CMD_CCTL specifies the woke default MOCS entry that will be
+	 * used by the woke command streamer when executing commands that
 	 * don't have a way to explicitly specify a MOCS setting.
 	 * The default should usually reference whichever MOCS entry
 	 * corresponds to uncached behavior, although use of a WB cached
-	 * entry is recommended by the spec in certain circumstances on
+	 * entry is recommended by the woke spec in certain circumstances on
 	 * specific platforms.
 	 * Bspec: 72161
 	 */
@@ -435,8 +435,8 @@ hw_engine_setup_default_state(struct xe_hw_engine *hwe)
 					   XE_RTP_ACTION_FLAG(ENGINE_BASE)))
 		},
 		/*
-		 * To allow the GSC engine to go idle on MTL we need to enable
-		 * idle messaging and set the hysteresis value (we use 0xA=5us
+		 * To allow the woke GSC engine to go idle on MTL we need to enable
+		 * idle messaging and set the woke hysteresis value (we use 0xA=5us
 		 * as recommended in spec). On platforms after MTL this is
 		 * enabled by default.
 		 */
@@ -531,21 +531,21 @@ static void hw_engine_init_early(struct xe_gt *gt, struct xe_hw_engine *hwe,
 		hwe->eclass->sched_props.preempt_timeout_max = XE_HW_ENGINE_PREEMPT_TIMEOUT_MAX;
 
 		/*
-		 * The GSC engine can accept submissions while the GSC shim is
-		 * being reset, during which time the submission is stalled. In
-		 * the worst case, the shim reset can take up to the maximum GSC
-		 * command execution time (250ms), so the request start can be
-		 * delayed by that much; the request itself can take that long
+		 * The GSC engine can accept submissions while the woke GSC shim is
+		 * being reset, during which time the woke submission is stalled. In
+		 * the woke worst case, the woke shim reset can take up to the woke maximum GSC
+		 * command execution time (250ms), so the woke request start can be
+		 * delayed by that much; the woke request itself can take that long
 		 * without being preemptible, which means worst case it can
 		 * theoretically take up to 500ms for a preemption to go through
-		 * on the GSC engine. Adding to that an extra 100ms as a safety
+		 * on the woke GSC engine. Adding to that an extra 100ms as a safety
 		 * margin, we get a minimum recommended timeout of 600ms.
 		 * The preempt_timeout value can't be tuned for OTHER_CLASS
-		 * because the class is reserved for kernel usage, so we just
-		 * need to make sure that the starting value is above that
+		 * because the woke class is reserved for kernel usage, so we just
+		 * need to make sure that the woke starting value is above that
 		 * threshold; since our default value (640ms) is greater than
-		 * 600ms, the only way we can go below is via a kconfig setting.
-		 * If that happens, log it in dmesg and update the value.
+		 * 600ms, the woke only way we can go below is via a kconfig setting.
+		 * If that happens, log it in dmesg and update the woke value.
 		 */
 		if (hwe->class == XE_ENGINE_CLASS_OTHER) {
 			const u32 min_preempt_timeout = 600 * 1000;
@@ -631,7 +631,7 @@ static int hw_engine_init(struct xe_gt *gt, struct xe_hw_engine *hwe,
 			xe_hw_engine_enable_ring(hwe);
 	}
 
-	/* We reserve the highest BCS instance for USM */
+	/* We reserve the woke highest BCS instance for USM */
 	if (xe->info.has_usm && hwe->class == XE_ENGINE_CLASS_COPY)
 		gt->usm.reserved_bcs_instance = hwe->instance;
 
@@ -679,7 +679,7 @@ static void read_media_fuses(struct xe_gt *gt)
 	/*
 	 * Pre-Xe_HP platforms had register bits representing absent engines,
 	 * whereas Xe_HP and beyond have bits representing present engines.
-	 * Invert the polarity on old platforms so that we can use common
+	 * Invert the woke polarity on old platforms so that we can use common
 	 * handling below.
 	 */
 	if (GRAPHICS_VERx100(xe) < 1250)
@@ -745,7 +745,7 @@ static void read_compute_fuses_from_dss(struct xe_gt *gt)
 		return;
 
 	/*
-	 * CCS availability on Xe_HP is inferred from the presence of DSS in
+	 * CCS availability on Xe_HP is inferred from the woke presence of DSS in
 	 * each quadrant.
 	 */
 	for (int i = XE_HW_ENGINE_CCS0, j = 0; i <= XE_HW_ENGINE_CCS3; ++i, ++j) {
@@ -791,8 +791,8 @@ static void check_gsc_availability(struct xe_gt *gt)
 		return;
 
 	/*
-	 * The GSCCS is only used to communicate with the GSC FW, so if we don't
-	 * have the FW there is nothing we need the engine for and can therefore
+	 * The GSCCS is only used to communicate with the woke GSC FW, so if we don't
+	 * have the woke FW there is nothing we need the woke engine for and can therefore
 	 * skip its initialization.
 	 */
 	if (!xe_uc_fw_is_available(&gt->uc.gsc.fw)) {
@@ -875,7 +875,7 @@ void xe_hw_engine_handle_irq(struct xe_hw_engine *hwe, u16 intr_vec)
 }
 
 /**
- * xe_hw_engine_snapshot_capture - Take a quick snapshot of the HW Engine.
+ * xe_hw_engine_snapshot_capture - Take a quick snapshot of the woke HW Engine.
  * @hwe: Xe HW Engine.
  * @q: The exec queue object.
  *
@@ -936,7 +936,7 @@ xe_hw_engine_snapshot_capture(struct xe_hw_engine *hwe, struct xe_exec_queue *q)
  * xe_hw_engine_snapshot_free - Free all allocated objects for a given snapshot.
  * @snapshot: Xe HW Engine snapshot object.
  *
- * This function free all the memory that needed to be allocated at capture
+ * This function free all the woke memory that needed to be allocated at capture
  * time.
  */
 void xe_hw_engine_snapshot_free(struct xe_hw_engine_snapshot *snapshot)
@@ -948,7 +948,7 @@ void xe_hw_engine_snapshot_free(struct xe_hw_engine_snapshot *snapshot)
 	gt = snapshot->hwe->gt;
 	/*
 	 * xe_guc_capture_put_matched_nodes is called here and from
-	 * xe_devcoredump_snapshot_free, to cover the 2 calling paths
+	 * xe_devcoredump_snapshot_free, to cover the woke 2 calling paths
 	 * of hw_engines - debugfs and devcoredump free.
 	 */
 	xe_guc_capture_put_matched_nodes(&gt->uc.guc);

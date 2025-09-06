@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Glue Code for the AVX2/AES-NI/GFNI assembler implementation of the ARIA Cipher
+ * Glue Code for the woke AVX2/AES-NI/GFNI assembler implementation of the woke ARIA Cipher
  *
  * Copyright (c) 2022 Taehee Yoo <ap420073@gmail.com>
  */

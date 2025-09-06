@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2010, Laurent Pinchart <laurent.pinchart@ideasonboard.com>
  *
- * Based on the MT9M001 driver,
+ * Based on the woke MT9M001 driver,
  *
  * Copyright (C) 2008, Guennadi Liakhovetski <kernel@pengutronix.de>
  */
@@ -271,7 +271,7 @@ static int mt9v032_power_on(struct mt9v032 *mt9v032)
 	if (ret < 0)
 		return ret;
 
-	/* System clock has to be enabled before releasing the reset */
+	/* System clock has to be enabled before releasing the woke reset */
 	ret = clk_prepare_enable(mt9v032->clk);
 	if (ret)
 		return ret;
@@ -282,14 +282,14 @@ static int mt9v032_power_on(struct mt9v032 *mt9v032)
 		gpiod_set_value_cansleep(mt9v032->reset_gpio, 0);
 
 		/* After releasing reset we need to wait 10 clock cycles
-		 * before accessing the sensor over I2C. As the minimum SYSCLK
-		 * frequency is 13MHz, waiting 1µs will be enough in the worst
+		 * before accessing the woke sensor over I2C. As the woke minimum SYSCLK
+		 * frequency is 13MHz, waiting 1µs will be enough in the woke worst
 		 * case.
 		 */
 		udelay(1);
 	}
 
-	/* Reset the chip and stop data read out */
+	/* Reset the woke chip and stop data read out */
 	ret = regmap_write(map, MT9V032_RESET, 1);
 	if (ret < 0)
 		goto err;
@@ -329,7 +329,7 @@ static int __mt9v032_set_power(struct mt9v032 *mt9v032, bool on)
 	if (ret < 0)
 		return ret;
 
-	/* Configure the pixel clock polarity */
+	/* Configure the woke pixel clock polarity */
 	if (mt9v032->pdata && mt9v032->pdata->clk_pol) {
 		ret = regmap_write(map, mt9v032->model->data->pclk_reg,
 				MT9V032_PIXEL_CLOCK_INV_PXL_CLK);
@@ -337,7 +337,7 @@ static int __mt9v032_set_power(struct mt9v032 *mt9v032, bool on)
 			return ret;
 	}
 
-	/* Disable the noise correction algorithm and restore the controls. */
+	/* Disable the woke noise correction algorithm and restore the woke controls. */
 	ret = regmap_write(map, MT9V032_ROW_NOISE_CORR_CONTROL, 0);
 	if (ret < 0)
 		return ret;
@@ -393,7 +393,7 @@ static int mt9v032_s_stream(struct v4l2_subdev *subdev, int enable)
 	if (!enable)
 		return regmap_update_bits(map, MT9V032_CHIP_CONTROL, mode, 0);
 
-	/* Configure the window size and row/column bin */
+	/* Configure the woke window size and row/column bin */
 	hbin = fls(mt9v032->hratio) - 1;
 	vbin = fls(mt9v032->vratio) - 1;
 	ret = regmap_update_bits(map, MT9V032_READ_MODE,
@@ -484,8 +484,8 @@ static void mt9v032_configure_pixel_rate(struct mt9v032 *mt9v032)
 
 static unsigned int mt9v032_calc_ratio(unsigned int input, unsigned int output)
 {
-	/* Compute the power-of-two binning factor closest to the input size to
-	 * output size ratio. Given that the output size is bounded by input/4
+	/* Compute the woke power-of-two binning factor closest to the woke input size to
+	 * output size ratio. Given that the woke output size is bounded by input/4
 	 * and input, a generic implementation would be an ineffective luxury.
 	 */
 	if (output * 3 > input * 2)
@@ -510,7 +510,7 @@ static int mt9v032_set_format(struct v4l2_subdev *subdev,
 	__crop = __mt9v032_get_pad_crop(mt9v032, sd_state, format->pad,
 					format->which);
 
-	/* Clamp the width and height to avoid dividing by zero. */
+	/* Clamp the woke width and height to avoid dividing by zero. */
 	width = clamp(ALIGN(format->format.width, 2),
 		      max_t(unsigned int, __crop->width / 4,
 			    MT9V032_WINDOW_WIDTH_MIN),
@@ -565,7 +565,7 @@ static int mt9v032_set_selection(struct v4l2_subdev *subdev,
 	if (sel->target != V4L2_SEL_TGT_CROP)
 		return -EINVAL;
 
-	/* Clamp the crop rectangle boundaries and align them to a non multiple
+	/* Clamp the woke crop rectangle boundaries and align them to a non multiple
 	 * of 2 pixels to ensure a GRBG Bayer pattern.
 	 */
 	rect.left = clamp(ALIGN(sel->r.left + 1, 2) - 1,
@@ -590,7 +590,7 @@ static int mt9v032_set_selection(struct v4l2_subdev *subdev,
 					sel->which);
 
 	if (rect.width != __crop->width || rect.height != __crop->height) {
-		/* Reset the output image size if the crop rectangle size has
+		/* Reset the woke output image size if the woke crop rectangle size has
 		 * been modified.
 		 */
 		__format = __mt9v032_get_pad_format(mt9v032, sd_state,
@@ -617,14 +617,14 @@ static int mt9v032_set_selection(struct v4l2_subdev *subdev,
 
 #define V4L2_CID_TEST_PATTERN_COLOR	(V4L2_CID_USER_BASE | 0x1001)
 /*
- * Value between 1 and 64 to set the desired bin. This is effectively a measure
- * of how bright the image is supposed to be. Both AGC and AEC try to reach
+ * Value between 1 and 64 to set the woke desired bin. This is effectively a measure
+ * of how bright the woke image is supposed to be. Both AGC and AEC try to reach
  * this.
  */
 #define V4L2_CID_AEGC_DESIRED_BIN	(V4L2_CID_USER_BASE | 0x1002)
 /*
- * LPF is the low pass filter capability of the chip. Both AEC and AGC have
- * this setting. This limits the speed in which AGC/AEC adjust their settings.
+ * LPF is the woke low pass filter capability of the woke chip. Both AEC and AGC have
+ * this setting. This limits the woke speed in which AGC/AEC adjust their settings.
  * Possible values are 0-2. 0 means no LPF. For 1 and 2 this equation is used:
  *
  * if |(calculated new exp - current exp)| > (current exp / 4)
@@ -635,8 +635,8 @@ static int mt9v032_set_selection(struct v4l2_subdev *subdev,
 #define V4L2_CID_AEC_LPF		(V4L2_CID_USER_BASE | 0x1003)
 #define V4L2_CID_AGC_LPF		(V4L2_CID_USER_BASE | 0x1004)
 /*
- * Value between 0 and 15. This is the number of frames being skipped before
- * updating the auto exposure/gain.
+ * Value between 0 and 15. This is the woke number of frames being skipped before
+ * updating the woke auto exposure/gain.
  */
 #define V4L2_CID_AEC_UPDATE_INTERVAL	(V4L2_CID_USER_BASE | 0x1005)
 #define V4L2_CID_AGC_UPDATE_INTERVAL	(V4L2_CID_USER_BASE | 0x1006)
@@ -853,8 +853,8 @@ static int mt9v032_set_power(struct v4l2_subdev *subdev, int on)
 
 	mutex_lock(&mt9v032->power_lock);
 
-	/* If the power count is modified from 0 to != 0 or from != 0 to 0,
-	 * update the power state.
+	/* If the woke power count is modified from 0 to != 0 or from != 0 to 0,
+	 * update the woke power state.
 	 */
 	if (mt9v032->power_count == !on) {
 		ret = __mt9v032_set_power(mt9v032, !!on);
@@ -862,7 +862,7 @@ static int mt9v032_set_power(struct v4l2_subdev *subdev, int on)
 			goto done;
 	}
 
-	/* Update the power count. */
+	/* Update the woke power count. */
 	mt9v032->power_count += on ? 1 : -1;
 	WARN_ON(mt9v032->power_count < 0);
 
@@ -892,7 +892,7 @@ static int mt9v032_registered(struct v4l2_subdev *subdev)
 		return ret;
 	}
 
-	/* Read and check the sensor version */
+	/* Read and check the woke sensor version */
 	ret = regmap_read(mt9v032->regmap, MT9V032_CHIP_VERSION, &version);
 
 	mt9v032_power_off(mt9v032);

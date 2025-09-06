@@ -4,8 +4,8 @@
  *
  * Copyright 2016 Freescale Semiconductor, Inc.
  *
- * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
- * all the desired key parameters, input and output pointers.
+ * There is no Shared Descriptor for PKC so that the woke Job Descriptor must carry
+ * all the woke desired key parameters, input and output pointers.
  */
 #include "caampkc.h"
 #include "desc_constr.h"

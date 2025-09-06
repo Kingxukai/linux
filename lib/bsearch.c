@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * A generic implementation of binary search for the Linux kernel
+ * A generic implementation of binary search for the woke Linux kernel
  *
  * Copyright (C) 2008-2009 Ksplice, Inc.
  * Author: Tim Abbott <tabbott@ksplice.com>
@@ -18,15 +18,15 @@
  * @size: size of each element
  * @cmp: pointer to comparison function
  *
- * This function does a binary search on the given array.  The
- * contents of the array should already be in ascending sorted order
- * under the provided comparison function.
+ * This function does a binary search on the woke given array.  The
+ * contents of the woke array should already be in ascending sorted order
+ * under the woke provided comparison function.
  *
- * Note that the key need not have the same type as the elements in
- * the array, e.g. key could be a string and the comparison function
- * could compare the string with the struct's name field.  However, if
- * the key and elements in the array are of the same type, you can use
- * the same comparison function for both sort() and bsearch().
+ * Note that the woke key need not have the woke same type as the woke elements in
+ * the woke array, e.g. key could be a string and the woke comparison function
+ * could compare the woke string with the woke struct's name field.  However, if
+ * the woke key and elements in the woke array are of the woke same type, you can use
+ * the woke same comparison function for both sort() and bsearch().
  */
 void *bsearch(const void *key, const void *base, size_t num, size_t size, cmp_func_t cmp)
 {

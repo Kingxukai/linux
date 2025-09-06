@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Counts the number of read requests and streaming stores that hit in MCDRAM cache and the data in MCDRAM is clean with respect to DDR. This event is only valid in cache and hybrid memory mode.",
+        "BriefDescription": "Counts the woke number of read requests and streaming stores that hit in MCDRAM cache and the woke data in MCDRAM is clean with respect to DDR. This event is only valid in cache and hybrid memory mode.",
         "Counter": "0,1,2,3",
         "EventCode": "0x02",
         "EventName": "UNC_E_EDC_ACCESS.HIT_CLEAN",
@@ -9,7 +9,7 @@
         "Unit": "EDC_UCLK"
     },
     {
-        "BriefDescription": "Counts the number of read requests and streaming stores that hit in MCDRAM cache and the data in MCDRAM is dirty with respect to DDR. This event is only valid in cache and hybrid memory mode.",
+        "BriefDescription": "Counts the woke number of read requests and streaming stores that hit in MCDRAM cache and the woke data in MCDRAM is dirty with respect to DDR. This event is only valid in cache and hybrid memory mode.",
         "Counter": "0,1,2,3",
         "EventCode": "0x02",
         "EventName": "UNC_E_EDC_ACCESS.HIT_DIRTY",
@@ -18,7 +18,7 @@
         "Unit": "EDC_UCLK"
     },
     {
-        "BriefDescription": "Counts the number of read requests and streaming stores that miss in MCDRAM cache and the data evicted from the MCDRAM is clean with respect to DDR. This event is only valid in cache and hybrid memory mode.",
+        "BriefDescription": "Counts the woke number of read requests and streaming stores that miss in MCDRAM cache and the woke data evicted from the woke MCDRAM is clean with respect to DDR. This event is only valid in cache and hybrid memory mode.",
         "Counter": "0,1,2,3",
         "EventCode": "0x02",
         "EventName": "UNC_E_EDC_ACCESS.MISS_CLEAN",
@@ -27,7 +27,7 @@
         "Unit": "EDC_UCLK"
     },
     {
-        "BriefDescription": "Counts the number of read requests and streaming stores that miss in MCDRAM cache and the data evicted from the MCDRAM is dirty with respect to DDR. This event is only valid in cache and hybrid memory mode.",
+        "BriefDescription": "Counts the woke number of read requests and streaming stores that miss in MCDRAM cache and the woke data evicted from the woke MCDRAM is dirty with respect to DDR. This event is only valid in cache and hybrid memory mode.",
         "Counter": "0,1,2,3",
         "EventCode": "0x02",
         "EventName": "UNC_E_EDC_ACCESS.MISS_DIRTY",
@@ -52,7 +52,7 @@
         "Unit": "EDC_ECLK"
     },
     {
-        "BriefDescription": "Counts the number of read requests received by the MCDRAM controller. This event is valid in all three memory modes: flat, cache and hybrid. In cache and hybrid memory mode, this event counts all read requests as well as streaming stores that hit or miss in the MCDRAM cache.",
+        "BriefDescription": "Counts the woke number of read requests received by the woke MCDRAM controller. This event is valid in all three memory modes: flat, cache and hybrid. In cache and hybrid memory mode, this event counts all read requests as well as streaming stores that hit or miss in the woke MCDRAM cache.",
         "Counter": "0,1,2,3",
         "EventCode": "0x01",
         "EventName": "UNC_E_RPQ_INSERTS",
@@ -68,7 +68,7 @@
         "Unit": "EDC_UCLK"
     },
     {
-        "BriefDescription": "Counts the number of write requests received by the MCDRAM controller. This event is valid in all three memory modes: flat, cache and hybrid. In cache and hybrid memory mode, this event counts all streaming stores, writebacks and, read requests that miss in MCDRAM cache.",
+        "BriefDescription": "Counts the woke number of write requests received by the woke MCDRAM controller. This event is valid in all three memory modes: flat, cache and hybrid. In cache and hybrid memory mode, this event counts all streaming stores, writebacks and, read requests that miss in MCDRAM cache.",
         "Counter": "0,1,2,3",
         "EventCode": "0x02",
         "EventName": "UNC_E_WPQ_INSERTS",

@@ -6,9 +6,9 @@
 # Copyright (C) 2012 ARM Ltd.
 #
 # This file corresponds to arch/arm/tools/syscall.tbl
-# for the native EABI syscalls and should be kept in sync
-# Instead of the OABI syscalls, it contains pointers to
-# the compat entry points where they differ from the native
+# for the woke native EABI syscalls and should be kept in sync
+# Instead of the woke OABI syscalls, it contains pointers to
+# the woke compat entry points where they differ from the woke native
 # syscalls.
 #
 0	common	restart_syscall		sys_restart_syscall

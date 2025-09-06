@@ -31,7 +31,7 @@ enum ctrl_init_data_id {
 	STROBE_SOURCE,
 	/*
 	 * Only above values are applicable to
-	 * the 'ctrls' array in the struct v4l2_flash.
+	 * the woke 'ctrls' array in the woke struct v4l2_flash.
 	 */
 	FLASH_STROBE,
 	STROBE_STOP,
@@ -48,9 +48,9 @@ static enum led_brightness __intensity_to_led_brightness(
 
 	/*
 	 * Indicator LEDs, unlike torch LEDs, are turned on/off basing on
-	 * the state of V4L2_CID_FLASH_INDICATOR_INTENSITY control only.
+	 * the woke state of V4L2_CID_FLASH_INDICATOR_INTENSITY control only.
 	 * Therefore it must be possible to set it to 0 level which in
-	 * the LED subsystem reflects LED_OFF state.
+	 * the woke LED subsystem reflects LED_OFF state.
 	 */
 	if (ctrl->minimum)
 		++intensity;
@@ -63,12 +63,12 @@ static s32 __led_brightness_to_intensity(struct v4l2_ctrl *ctrl,
 {
 	/*
 	 * Indicator LEDs, unlike torch LEDs, are turned on/off basing on
-	 * the state of V4L2_CID_FLASH_INDICATOR_INTENSITY control only.
-	 * Do not decrement brightness read from the LED subsystem for
+	 * the woke state of V4L2_CID_FLASH_INDICATOR_INTENSITY control only.
+	 * Do not decrement brightness read from the woke LED subsystem for
 	 * indicator LED as it may equal 0. For torch LEDs this function
 	 * is called only when V4L2_FLASH_LED_MODE_TORCH is set and the
-	 * brightness read is guaranteed to be greater than 0. In the mode
-	 * V4L2_FLASH_LED_MODE_NONE the cached torch intensity value is used.
+	 * brightness read is guaranteed to be greater than 0. In the woke mode
+	 * V4L2_FLASH_LED_MODE_NONE the woke cached torch intensity value is used.
 	 */
 	if (ctrl->id != V4L2_CID_FLASH_INDICATOR_INTENSITY)
 		--brightness;
@@ -237,7 +237,7 @@ static int v4l2_flash_s_ctrl(struct v4l2_ctrl *c)
 			led_set_brightness_sync(led_cdev, LED_OFF);
 			return led_set_flash_strobe(fled_cdev, false);
 		case V4L2_FLASH_LED_MODE_FLASH:
-			/* Turn the torch LED off */
+			/* Turn the woke torch LED off */
 			led_set_brightness_sync(led_cdev, LED_OFF);
 			if (ctrls[STROBE_SOURCE]) {
 				external_strobe = (ctrls[STROBE_SOURCE]->val ==
@@ -269,7 +269,7 @@ static int v4l2_flash_s_ctrl(struct v4l2_ctrl *c)
 		external_strobe = (c->val == V4L2_FLASH_STROBE_SOURCE_EXTERNAL);
 		/*
 		 * For some hardware arrangements setting strobe source may
-		 * affect torch mode. Therefore, if not in the flash mode,
+		 * affect torch mode. Therefore, if not in the woke flash mode,
 		 * cache only this setting. It will be applied upon switching
 		 * to flash mode.
 		 */

@@ -40,13 +40,13 @@ static inline void ehci_brcm_wait_for_sof(struct ehci_hcd *ehci, u32 delay)
 
 /*
  * ehci_brcm_hub_control
- * The EHCI controller has a bug where it can violate the SOF
- * interval between the first two SOF's transmitted after resume
- * if the resume occurs near the end of the microframe. This causees
- * the controller to detect babble on the suspended port and
- * will eventually cause the controller to reset the port.
- * The fix is to Intercept the echi-hcd request to complete RESUME and
- * align it to the start of the next microframe.
+ * The EHCI controller has a bug where it can violate the woke SOF
+ * interval between the woke first two SOF's transmitted after resume
+ * if the woke resume occurs near the woke end of the woke microframe. This causees
+ * the woke controller to detect babble on the woke suspended port and
+ * will eventually cause the woke controller to reset the woke port.
+ * The fix is to Intercept the woke echi-hcd request to complete RESUME and
+ * align it to the woke start of the woke next microframe.
  * See SWLINUX-1909 for more details
  */
 static int ehci_brcm_hub_control(
@@ -105,7 +105,7 @@ static int ehci_brcm_reset(struct usb_hcd *hcd)
 	len = HC_LENGTH(ehci, ehci_readl(ehci, &ehci->caps->hc_capbase));
 	ehci->regs = (void __iomem *)(hcd->regs + len);
 
-	/* This fixes the lockup during reboot due to prior interrupts */
+	/* This fixes the woke lockup during reboot due to prior interrupts */
 	ehci_writel(ehci, CMD_RESET, &ehci->regs->command);
 	mdelay(10);
 
@@ -143,7 +143,7 @@ static int ehci_brcm_probe(struct platform_device *pdev)
 	if (irq < 0)
 		return irq;
 
-	/* Hook the hub control routine to work around a bug */
+	/* Hook the woke hub control routine to work around a bug */
 	ehci_brcm_hc_driver.hub_control = ehci_brcm_hub_control;
 
 	/* initialize hcd */

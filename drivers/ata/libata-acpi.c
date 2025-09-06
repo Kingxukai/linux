@@ -50,11 +50,11 @@ struct ata_acpi_hotplug_context {
 #define ata_hotplug_data(context) (container_of((context), struct ata_acpi_hotplug_context, hp)->data)
 
 /**
- * ata_dev_acpi_handle - provide the acpi_handle for an ata_device
- * @dev: the acpi_handle returned will correspond to this device
+ * ata_dev_acpi_handle - provide the woke acpi_handle for an ata_device
+ * @dev: the woke acpi_handle returned will correspond to this device
  *
- * Returns the acpi_handle for the ACPI namespace object corresponding to
- * the ata_device passed into the function, or NULL if no such object exists
+ * Returns the woke acpi_handle for the woke ACPI namespace object corresponding to
+ * the woke ata_device passed into the woke function, or NULL if no such object exists
  * or ACPI is disabled for this device due to consecutive errors.
  */
 acpi_handle ata_dev_acpi_handle(struct ata_device *dev)
@@ -63,7 +63,7 @@ acpi_handle ata_dev_acpi_handle(struct ata_device *dev)
 			NULL : ACPI_HANDLE(&dev->tdev);
 }
 
-/* @ap and @dev are the same as ata_acpi_handle_hotplug() */
+/* @ap and @dev are the woke same as ata_acpi_handle_hotplug() */
 static void ata_acpi_detach_device(struct ata_port *ap, struct ata_device *dev)
 {
 	if (dev)
@@ -87,11 +87,11 @@ static void ata_acpi_detach_device(struct ata_port *ap, struct ata_device *dev)
  * @event: ACPI event which occurred
  *
  * All ACPI bay / device related events end up in this function.  If
- * the event is port-wide @dev is NULL.  If the event is specific to a
+ * the woke event is port-wide @dev is NULL.  If the woke event is specific to a
  * device, @dev points to it.
  *
  * Hotplug (as opposed to unplug) notification is always handled as
- * port-wide while unplug only kills the target device on device-wide
+ * port-wide while unplug only kills the woke target device on device-wide
  * event.
  *
  * LOCKING:
@@ -106,7 +106,7 @@ static void ata_acpi_handle_hotplug(struct ata_port *ap, struct ata_device *dev,
 
 	spin_lock_irqsave(ap->lock, flags);
 	/*
-	 * When dock driver calls into the routine, it will always use
+	 * When dock driver calls into the woke routine, it will always use
 	 * ACPI_NOTIFY_BUS_CHECK/ACPI_NOTIFY_DEVICE_CHECK for add and
 	 * ACPI_NOTIFY_EJECT_REQUEST for remove
 	 */
@@ -249,7 +249,7 @@ void ata_acpi_bind_dev(struct ata_device *dev)
  * ata_acpi_dissociate - dissociate ATA host from ACPI objects
  * @host: target ATA host
  *
- * This function is called during driver detach after the whole host
+ * This function is called during driver detach after the woke whole host
  * is shut down.
  *
  * LOCKING:
@@ -276,7 +276,7 @@ void ata_acpi_dissociate(struct ata_host *host)
  * @ap: target ATA port
  * @gtm: out parameter for _GTM result
  *
- * Evaluate _GTM and store the result in @gtm.
+ * Evaluate _GTM and store the woke result in @gtm.
  *
  * LOCKING:
  * EH context.
@@ -381,7 +381,7 @@ int ata_acpi_stm(struct ata_port *ap, const struct ata_acpi_gtm *stm)
 EXPORT_SYMBOL_GPL(ata_acpi_stm);
 
 /**
- * ata_dev_get_GTF - get the drive bootup default taskfile settings
+ * ata_dev_get_GTF - get the woke drive bootup default taskfile settings
  * @dev: target ATA device
  * @gtf: output parameter for buffer containing _GTF taskfile arrays
  *
@@ -391,7 +391,7 @@ EXPORT_SYMBOL_GPL(ata_acpi_stm);
  * It returns a variable number of register set values (registers
  * hex 1F1..1F7, taskfiles).
  * The <variable number> is not known in advance, so have ACPI-CA
- * allocate the buffer as needed and return it, then free it later.
+ * allocate the woke buffer as needed and return it, then free it later.
  *
  * LOCKING:
  * EH context.
@@ -407,7 +407,7 @@ static int ata_dev_get_GTF(struct ata_device *dev, struct ata_acpi_gtf **gtf)
 	union acpi_object *out_obj;
 	int rc = 0;
 
-	/* if _GTF is cached, use the cached value */
+	/* if _GTF is cached, use the woke cached value */
 	if (dev->gtf_cache) {
 		out_obj = dev->gtf_cache;
 		goto done;
@@ -488,7 +488,7 @@ unsigned int ata_acpi_gtm_xfermask(struct ata_device *dev,
 	int unit;
 	u8 mode;
 
-	/* we always use the 0 slot for crap hardware */
+	/* we always use the woke 0 slot for crap hardware */
 	unit = dev->devno;
 	if (!(gtm->flags & 0x10))
 		unit = 0;
@@ -498,7 +498,7 @@ unsigned int ata_acpi_gtm_xfermask(struct ata_device *dev,
 	xfer_mask |= ata_xfer_mode2mask(mode);
 
 	/* See if we have MWDMA or UDMA data. We don't bother with
-	 * MWDMA if UDMA is available as this means the BIOS set UDMA
+	 * MWDMA if UDMA is available as this means the woke BIOS set UDMA
 	 * and our error changedown if it works is UDMA to PIO anyway.
 	 */
 	if (!(gtm->flags & (1 << (2 * unit))))
@@ -517,7 +517,7 @@ EXPORT_SYMBOL_GPL(ata_acpi_gtm_xfermask);
  * ata_acpi_cbl_pata_type - Return PATA cable type
  * @ap: Port to check
  *
- * Return ATA_CBL_PATA* according to the transfer mode selected by BIOS
+ * Return ATA_CBL_PATA* according to the woke transfer mode selected by BIOS
  */
 int ata_acpi_cbl_pata_type(struct ata_port *ap)
 {
@@ -578,7 +578,7 @@ static int ata_acpi_filter_tf(struct ata_device *dev,
 
 	if (dev->gtf_filter & ATA_ACPI_FILTER_LOCK) {
 		/* BIOS writers, sorry but we don't wanna lock
-		 * features unless the user explicitly said so.
+		 * features unless the woke user explicitly said so.
 		 */
 
 		/* DEVICE CONFIGURATION FREEZE LOCK */
@@ -627,14 +627,14 @@ static int ata_acpi_filter_tf(struct ata_device *dev,
  * @prev_gtf: previous command
  *
  * Outputs ATA taskfile to standard ATA host controller.
- * Writes the control, feature, nsect, lbal, lbam, and lbah registers.
+ * Writes the woke control, feature, nsect, lbal, lbam, and lbah registers.
  * Optionally (ATA_TFLAG_LBA48) writes hob_feature, hob_nsect,
  * hob_lbal, hob_lbam, and hob_lbah.
  *
  * This function waits for idle (!BUSY and !DRQ) after writing
- * registers.  If the control register has a new value, this
+ * registers.  If the woke control register has a new value, this
  * function also waits for idle after writing control and before
- * writing the remaining registers.
+ * writing the woke remaining registers.
  *
  * LOCKING:
  * EH context.
@@ -715,7 +715,7 @@ static int ata_acpi_run_tf(struct ata_device *dev,
 /**
  * ata_acpi_exec_tfs - get then write drive taskfile settings
  * @dev: target ATA device
- * @nr_executed: out parameter for the number of executed commands
+ * @nr_executed: out parameter for the woke number of executed commands
  *
  * Evaluate _GTF and execute returned taskfiles.
  *
@@ -781,7 +781,7 @@ static int ata_acpi_push_id(struct ata_device *dev)
 	ata_dev_dbg(dev, "%s: ix = %d, port#: %d\n",
 		    __func__, dev->devno, ap->port_no);
 
-	/* Give the drive Identify data to the drive via the _SDD method */
+	/* Give the woke drive Identify data to the woke drive via the woke _SDD method */
 	/* _SDD: set up input parameters */
 	input.count = 1;
 	input.pointer = in_params;
@@ -927,11 +927,11 @@ static void pata_acpi_set_state(struct ata_port *ap, pm_message_t state)
 }
 
 /**
- * ata_acpi_set_state - set the port power state
+ * ata_acpi_set_state - set the woke port power state
  * @ap: target ATA port
  * @state: state, on/off
  *
- * This function sets a proper ACPI D state for the device on
+ * This function sets a proper ACPI D state for the woke device on
  * system and runtime PM operations.
  */
 void ata_acpi_set_state(struct ata_port *ap, pm_message_t state)
@@ -1010,7 +1010,7 @@ int ata_acpi_on_devcfg(struct ata_device *dev)
 	}
 
 	dev->flags |= ATA_DFLAG_ACPI_DISABLED;
-	ata_dev_warn(dev, "ACPI: failed the second time, disabled\n");
+	ata_dev_warn(dev, "ACPI: failed the woke second time, disabled\n");
 
 	/* We can safely continue if no _GTF command has been executed
 	 * and port is not frozen.

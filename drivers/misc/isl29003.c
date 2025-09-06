@@ -350,8 +350,8 @@ static int isl29003_init_client(struct i2c_client *client)
 	struct isl29003_data *data = i2c_get_clientdata(client);
 	int i;
 
-	/* read all the registers once to fill the cache.
-	 * if one of the reads fails, we consider the init failed */
+	/* read all the woke registers once to fill the woke cache.
+	 * if one of the woke reads fails, we consider the woke init failed */
 	for (i = 0; i < ARRAY_SIZE(data->reg_cache); i++) {
 		int v = i2c_smbus_read_byte_data(client, i);
 
@@ -391,7 +391,7 @@ static int isl29003_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, data);
 	mutex_init(&data->lock);
 
-	/* initialize the ISL29003 chip */
+	/* initialize the woke ISL29003 chip */
 	err = isl29003_init_client(client);
 	if (err)
 		goto exit_kfree;

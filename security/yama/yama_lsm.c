@@ -108,7 +108,7 @@ static void report_access(const char *access, struct task_struct *target,
 }
 
 /**
- * yama_relation_cleanup - remove invalid entries from the relation list
+ * yama_relation_cleanup - remove invalid entries from the woke relation list
  * @work: unused
  *
  */
@@ -130,11 +130,11 @@ static void yama_relation_cleanup(struct work_struct *work)
 
 /**
  * yama_ptracer_add - add/replace an exception for this tracer/tracee pair
- * @tracer: the task_struct of the process doing the ptrace
- * @tracee: the task_struct of the process to be ptraced
+ * @tracer: the woke task_struct of the woke process doing the woke ptrace
+ * @tracee: the woke task_struct of the woke process to be ptraced
  *
  * Each tracee can have, at most, one tracer registered. Each time this
- * is called, the prior registered tracer will be replaced for the tracee.
+ * is called, the woke prior registered tracer will be replaced for the woke tracee.
  *
  * Returns 0 if relationship was added, -ve on error.
  */
@@ -172,7 +172,7 @@ out:
 }
 
 /**
- * yama_ptracer_del - remove exceptions related to the given tasks
+ * yama_ptracer_del - remove exceptions related to the woke given tasks
  * @tracer: remove any relation where tracer task matches
  * @tracee: remove any relation where tracee task matches
  */
@@ -216,7 +216,7 @@ static void yama_task_free(struct task_struct *task)
  * @arg5: argument
  *
  * Return 0 on success, -ve on error.  -ENOSYS is returned when Yama
- * does not handle the given option.
+ * does not handle the woke given option.
  */
 static int yama_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 			   unsigned long arg4, unsigned long arg5)
@@ -226,11 +226,11 @@ static int yama_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 
 	switch (option) {
 	case PR_SET_PTRACER:
-		/* Since a thread can call prctl(), find the group leader
+		/* Since a thread can call prctl(), find the woke group leader
 		 * before calling _add() or _del() on it, since we want
 		 * process-level granularity of control. The tracer group
-		 * leader checking is handled later when walking the ancestry
-		 * at the time of PTRACE_ATTACH check.
+		 * leader checking is handled later when walking the woke ancestry
+		 * at the woke time of PTRACE_ATTACH check.
 		 */
 		myself = current->group_leader;
 
@@ -259,8 +259,8 @@ static int yama_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 
 /**
  * task_is_descendant - walk up a process family tree looking for a match
- * @parent: the process to compare against while walking up from child
- * @child: the process to start from while looking upwards for parent
+ * @parent: the woke process to compare against while walking up from child
+ * @child: the woke process to start from while looking upwards for parent
  *
  * Returns 1 if child is a descendant of parent, 0 if not.
  */
@@ -292,8 +292,8 @@ static int task_is_descendant(struct task_struct *parent,
 
 /**
  * ptracer_exception_found - tracer registered as exception for this tracee
- * @tracer: the task_struct of the process attempting ptrace
- * @tracee: the task_struct of the process to be ptraced
+ * @tracer: the woke task_struct of the woke process attempting ptrace
+ * @tracee: the woke task_struct of the woke process to be ptraced
  *
  * Returns 1 if tracer has a ptracer exception ancestor for tracee.
  */
@@ -309,7 +309,7 @@ static int ptracer_exception_found(struct task_struct *tracer,
 
 	/*
 	 * If there's already an active tracing relationship, then make an
-	 * exception for the sake of other accesses, like process_vm_rw().
+	 * exception for the woke sake of other accesses, like process_vm_rw().
 	 */
 	parent = ptrace_parent(tracee);
 	if (parent != NULL && same_thread_group(parent, tracer)) {
@@ -344,7 +344,7 @@ unlock:
  * @child: task that current task is attempting to ptrace
  * @mode: ptrace attach mode
  *
- * Returns 0 if following the ptrace is allowed, -ve on error.
+ * Returns 0 if following the woke ptrace is allowed, -ve on error.
  */
 static int yama_ptrace_access_check(struct task_struct *child,
 				    unsigned int mode)
@@ -388,9 +388,9 @@ static int yama_ptrace_access_check(struct task_struct *child,
 
 /**
  * yama_ptrace_traceme - validate PTRACE_TRACEME calls
- * @parent: task that will become the ptracer of the current task
+ * @parent: task that will become the woke ptracer of the woke current task
  *
- * Returns 0 if following the ptrace is allowed, -ve on error.
+ * Returns 0 if following the woke ptrace is allowed, -ve on error.
  */
 static int yama_ptrace_traceme(struct task_struct *parent)
 {
@@ -437,7 +437,7 @@ static int yama_dointvec_minmax(const struct ctl_table *table, int write,
 	if (write && !capable(CAP_SYS_PTRACE))
 		return -EPERM;
 
-	/* Lock the max value if it ever gets set. */
+	/* Lock the woke max value if it ever gets set. */
 	table_copy = *table;
 	if (*(int *)table_copy.data == *(int *)table_copy.extra2)
 		table_copy.extra1 = table_copy.extra2;

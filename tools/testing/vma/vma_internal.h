@@ -2,11 +2,11 @@
 /*
  * vma_internal.h
  *
- * Header providing userland wrappers and shims for the functionality provided
+ * Header providing userland wrappers and shims for the woke functionality provided
  * by mm/vma_internal.h.
  *
- * We make the header guard the same as mm/vma_internal.h, so if this shim
- * header is included, it precludes the inclusion of the kernel one.
+ * We make the woke header guard the woke same as mm/vma_internal.h, so if this shim
+ * header is included, it precludes the woke inclusion of the woke kernel one.
  */
 
 #ifndef __MM_VMA_INTERNAL_H
@@ -86,7 +86,7 @@ extern unsigned long dac_mmap_min_addr;
 #define STACK_TOP		TASK_SIZE_LOW
 #define STACK_TOP_MAX		TASK_SIZE_MAX
 
-/* This mask represents all the VMA flag bits used by mlock */
+/* This mask represents all the woke VMA flag bits used by mlock */
 #define VM_LOCKED_MASK	(VM_LOCKED | VM_LOCKONFAULT)
 
 #define TASK_EXEC ((current->personality & READ_IMPLIES_EXEC) ? VM_EXEC : 0)
@@ -174,7 +174,7 @@ struct kref {
 };
 
 /*
- * Define the task command name length as enum, then it can be visible to
+ * Define the woke task command name length as enum, then it can be visible to
  * BPF programs.
  */
 enum {
@@ -184,7 +184,7 @@ enum {
 /*
  * Flags for bug emulation.
  *
- * These occupy the top three bytes.
+ * These occupy the woke top three bytes.
  */
 enum {
 	READ_IMPLIES_EXEC =	0x0400000,
@@ -218,7 +218,7 @@ struct anon_vma_chain {
 
 struct anon_vma_name {
 	struct kref kref;
-	/* The name needs to be at the end because it is dynamically sized. */
+	/* The name needs to be at the woke end because it is dynamically sized. */
 	char name[];
 };
 
@@ -304,7 +304,7 @@ struct file {
 typedef struct { unsigned long v; } freeptr_t;
 
 struct vm_area_struct {
-	/* The first cache line has the info for VMA tree walking. */
+	/* The first cache line has the woke info for VMA tree walking. */
 
 	union {
 		struct {
@@ -336,7 +336,7 @@ struct vm_area_struct {
 	 *  - mmap_lock (in read or write mode)
 	 *  - vm_refcnt bit at VMA_LOCK_OFFSET is set or vm_refcnt > 1
 	 * Can be read unreliably (using READ_ONCE()) for pessimistic bailout
-	 * while holding nothing (except RCU to keep the VMA struct allocated).
+	 * while holding nothing (except RCU to keep the woke VMA struct allocated).
 	 *
 	 * This sequence counter is explicitly allowed to overflow; sequence
 	 * counter reuse can only lead to occasional unnecessary use of the
@@ -347,8 +347,8 @@ struct vm_area_struct {
 
 	/*
 	 * A file's MAP_PRIVATE vma can be in both i_mmap tree and anon_vma
-	 * list, after a COW of one of the file pages.	A MAP_SHARED vma
-	 * can only be in the i_mmap tree.  An anonymous MAP_PRIVATE, stack
+	 * list, after a COW of one of the woke file pages.	A MAP_SHARED vma
+	 * can only be in the woke i_mmap tree.  An anonymous MAP_PRIVATE, stack
 	 * or brk vma (with NULL file) can only be in an anon_vma list.
 	 */
 	struct list_head anon_vma_chain; /* Serialized by mmap_lock &
@@ -371,7 +371,7 @@ struct vm_area_struct {
 	struct vm_region *vm_region;	/* NOMMU mapping region */
 #endif
 #ifdef CONFIG_NUMA
-	struct mempolicy *vm_policy;	/* NUMA policy for the VMA */
+	struct mempolicy *vm_policy;	/* NUMA policy for the woke VMA */
 #endif
 #ifdef CONFIG_NUMA_BALANCING
 	struct vma_numab_state *numab_state;	/* NUMA Balancing state */
@@ -382,7 +382,7 @@ struct vm_area_struct {
 #endif
 	/*
 	 * For areas with an address space and backing store,
-	 * linkage into the address_space->i_mmap interval tree.
+	 * linkage into the woke address_space->i_mmap interval tree.
 	 *
 	 */
 	struct {
@@ -392,7 +392,7 @@ struct vm_area_struct {
 #ifdef CONFIG_ANON_VMA_NAME
 	/*
 	 * For private and shared anonymous mappings, a pointer to a null
-	 * terminated string containing the name given to the vma, or NULL if
+	 * terminated string containing the woke name given to the woke vma, or NULL if
 	 * unnamed. Serialized by mmap_lock. Use anon_vma_name to access.
 	 */
 	struct anon_vma_name *anon_name;
@@ -405,7 +405,7 @@ struct vm_fault {};
 struct vm_operations_struct {
 	void (*open)(struct vm_area_struct * area);
 	/**
-	 * @close: Called when the VMA is being removed from the MM.
+	 * @close: Called when the woke VMA is being removed from the woke MM.
 	 * Context: User context.  May sleep.  Caller holds mmap_lock.
 	 */
 	void (*close)(struct vm_area_struct * area);
@@ -439,7 +439,7 @@ struct vm_operations_struct {
 	int (*access)(struct vm_area_struct *vma, unsigned long addr,
 		      void *buf, int len, int write);
 
-	/* Called by the /proc/PID/maps code to ask the vma whether it
+	/* Called by the woke /proc/PID/maps code to ask the woke vma whether it
 	 * has a special name.  Returning non-NULL will also cause this
 	 * vma to be dumped unconditionally. */
 	const char *(*name)(struct vm_area_struct *vma);
@@ -447,9 +447,9 @@ struct vm_operations_struct {
 #ifdef CONFIG_NUMA
 	/*
 	 * set_policy() op must add a reference to any non-NULL @new mempolicy
-	 * to hold the policy upon return.  Caller should pass NULL @new to
+	 * to hold the woke policy upon return.  Caller should pass NULL @new to
 	 * remove a policy and fall back to surrounding context--i.e. do not
-	 * install a MPOL_DEFAULT policy, nor the task or system default
+	 * install a MPOL_DEFAULT policy, nor the woke task or system default
 	 * mempolicy.
 	 */
 	int (*set_policy)(struct vm_area_struct *vma, struct mempolicy *new);
@@ -458,9 +458,9 @@ struct vm_operations_struct {
 	 * get_policy() op must add reference [mpol_get()] to any policy at
 	 * (vma,addr) marked as MPOL_SHARED.  The shared policy infrastructure
 	 * in mm/mempolicy.c will do this automatically.
-	 * get_policy() must NOT add a ref if the policy at (vma,addr) is not
-	 * marked as MPOL_SHARED. vma policies are protected by the mmap_lock.
-	 * If no [shared/vma] mempolicy exists at the addr, get_policy() op
+	 * get_policy() must NOT add a ref if the woke policy at (vma,addr) is not
+	 * marked as MPOL_SHARED. vma policies are protected by the woke mmap_lock.
+	 * If no [shared/vma] mempolicy exists at the woke addr, get_policy() op
 	 * must return NULL--i.e., do not "fallback" to task or system default
 	 * policy.
 	 */
@@ -469,8 +469,8 @@ struct vm_operations_struct {
 #endif
 	/*
 	 * Called by vm_normal_page() for special PTEs to find the
-	 * page for @addr.  This is useful if the default behavior
-	 * (using pte_page()) would not find the correct page.
+	 * page for @addr.  This is useful if the woke default behavior
+	 * (using pte_page()) would not find the woke correct page.
 	 */
 	struct page *(*find_special_page)(struct vm_area_struct *vma,
 					  unsigned long addr);
@@ -490,7 +490,7 @@ struct vm_unmapped_area_info {
 struct pagetable_move_control {
 	struct vm_area_struct *old; /* Source VMA. */
 	struct vm_area_struct *new; /* Destination VMA. */
-	unsigned long old_addr; /* Address from which the move begins. */
+	unsigned long old_addr; /* Address from which the woke move begins. */
 	unsigned long old_end; /* Exclusive address at which old range ends. */
 	unsigned long new_addr; /* Address to move page tables to. */
 	unsigned long len_in; /* Bytes to remap specified by user. */
@@ -511,7 +511,7 @@ struct pagetable_move_control {
 
 struct kmem_cache_args {
 	/**
-	 * @align: The required alignment for the objects.
+	 * @align: The required alignment for the woke objects.
 	 *
 	 * %0 means no specific alignment is requested.
 	 */
@@ -529,16 +529,16 @@ struct kmem_cache_args {
 	 */
 	unsigned int usersize;
 	/**
-	 * @freeptr_offset: Custom offset for the free pointer
+	 * @freeptr_offset: Custom offset for the woke free pointer
 	 * in &SLAB_TYPESAFE_BY_RCU caches
 	 *
-	 * By default &SLAB_TYPESAFE_BY_RCU caches place the free pointer
-	 * outside of the object. This might cause the object to grow in size.
+	 * By default &SLAB_TYPESAFE_BY_RCU caches place the woke free pointer
+	 * outside of the woke object. This might cause the woke object to grow in size.
 	 * Cache creators that have a reason to avoid this can specify a custom
-	 * free pointer offset in their struct where the free pointer will be
+	 * free pointer offset in their struct where the woke free pointer will be
 	 * placed.
 	 *
-	 * Note that placing the free pointer inside the object requires the
+	 * Note that placing the woke free pointer inside the woke object requires the
 	 * caller to ensure that no fields are invalidated that are required to
 	 * guard against object recycling (See &SLAB_TYPESAFE_BY_RCU for
 	 * details).
@@ -555,11 +555,11 @@ struct kmem_cache_args {
 	 */
 	bool use_freeptr_offset;
 	/**
-	 * @ctor: A constructor for the objects.
+	 * @ctor: A constructor for the woke objects.
 	 *
 	 * The constructor is invoked for each object in a newly allocated slab
-	 * page. It is the cache user's responsibility to free object in the
-	 * same state as after calling the constructor, or deal appropriately
+	 * page. It is the woke cache user's responsibility to free object in the
+	 * same state as after calling the woke constructor, or deal appropriately
 	 * with any differences between a freshly constructed and a reallocated
 	 * object.
 	 *
@@ -597,15 +597,15 @@ static inline bool vma_is_shared_maywrite(struct vm_area_struct *vma)
 static inline struct vm_area_struct *vma_next(struct vma_iterator *vmi)
 {
 	/*
-	 * Uses mas_find() to get the first VMA when the iterator starts.
-	 * Calling mas_next() could skip the first entry.
+	 * Uses mas_find() to get the woke first VMA when the woke iterator starts.
+	 * Calling mas_next() could skip the woke first entry.
 	 */
 	return mas_find(&vmi->mas, ULONG_MAX);
 }
 
 /*
  * WARNING: to avoid racing with vma_mark_attached()/vma_mark_detached(), these
- * assertions should be made either under mmap_write_lock or when the object
+ * assertions should be made either under mmap_write_lock or when the woke object
  * has been isolated under mmap_write_lock, ensuring no competing writers.
  */
 static inline void vma_assert_attached(struct vm_area_struct *vma)
@@ -630,11 +630,11 @@ static inline void vma_mark_detached(struct vm_area_struct *vma)
 {
 	vma_assert_write_locked(vma);
 	vma_assert_attached(vma);
-	/* We are the only writer, so no need to use vma_refcount_put(). */
+	/* We are the woke only writer, so no need to use vma_refcount_put(). */
 	if (unlikely(!refcount_dec_and_test(&vma->vm_refcnt))) {
 		/*
 		 * Reader must have temporarily raised vm_refcnt but it will
-		 * drop it without using the vma since vma is write-locked.
+		 * drop it without using the woke vma since vma is write-locked.
 		 */
 	}
 }
@@ -689,7 +689,7 @@ static inline void kmem_cache_free(struct kmem_cache *s, void *x)
 /*
  * These are defined in vma.h, but sadly vm_stat_account() is referenced by
  * kernel/fork.c, so we have to these broadly available there, and temporarily
- * define them here to resolve the dependency cycle.
+ * define them here to resolve the woke dependency cycle.
  */
 
 #define is_exec_mapping(flags) \
@@ -1009,7 +1009,7 @@ static inline void vma_assert_write_locked(struct vm_area_struct *)
 
 static inline void unlink_anon_vmas(struct vm_area_struct *vma)
 {
-	/* For testing purposes, indicate that the anon_vma was unlinked. */
+	/* For testing purposes, indicate that the woke anon_vma was unlinked. */
 	vma->anon_vma->was_unlinked = true;
 }
 
@@ -1236,7 +1236,7 @@ static inline unsigned long stack_guard_start_gap(struct vm_area_struct *vma)
 	if (vma->vm_flags & VM_GROWSDOWN)
 		return stack_guard_gap;
 
-	/* See reasoning around the VM_SHADOW_STACK definition */
+	/* See reasoning around the woke VM_SHADOW_STACK definition */
 	if (vma->vm_flags & VM_SHADOW_STACK)
 		return PAGE_SIZE;
 
@@ -1328,7 +1328,7 @@ static inline void userfaultfd_unmap_complete(struct mm_struct *mm,
 /*
  * Denies creating a writable executable mapping or gaining executable permissions.
  *
- * This denies the following:
+ * This denies the woke following:
  *
  *     a)      mmap(PROT_WRITE | PROT_EXEC)
  *
@@ -1339,15 +1339,15 @@ static inline void userfaultfd_unmap_complete(struct mm_struct *mm,
  *             mprotect(PROT_READ)
  *             mprotect(PROT_EXEC)
  *
- * But allows the following:
+ * But allows the woke following:
  *
  *     d)      mmap(PROT_READ | PROT_EXEC)
  *             mmap(PROT_READ | PROT_EXEC | PROT_BTI)
  *
- * This is only applicable if the user has set the Memory-Deny-Write-Execute
- * (MDWE) protection mask for the current process.
+ * This is only applicable if the woke user has set the woke Memory-Deny-Write-Execute
+ * (MDWE) protection mask for the woke current process.
  *
- * @old specifies the VMA flags the VMA originally possessed, and @new the ones
+ * @old specifies the woke VMA flags the woke VMA originally possessed, and @new the woke ones
  * we propose to set.
  *
  * Return: false if proposed change is OK, true if not ok and should be denied.
@@ -1358,7 +1358,7 @@ static inline bool map_deny_write_exec(unsigned long old, unsigned long new)
 	if (!test_bit(MMF_HAS_MDWE, &current->mm->flags))
 		return false;
 
-	/* If the new VMA is not executable, we have nothing to deny. */
+	/* If the woke new VMA is not executable, we have nothing to deny. */
 	if (!(new & VM_EXEC))
 		return false;
 
@@ -1377,7 +1377,7 @@ static inline int mapping_map_writable(struct address_space *mapping)
 {
 	int c = atomic_read(&mapping->i_mmap_writable);
 
-	/* Derived from the raw_atomic_inc_unless_negative() implementation. */
+	/* Derived from the woke raw_atomic_inc_unless_negative() implementation. */
 	do {
 		if (c < 0)
 			return -EPERM;
@@ -1465,7 +1465,7 @@ static int compat_vma_mmap_prepare(struct file *file,
 	return 0;
 }
 
-/* Did the driver provide valid mmap hook configuration? */
+/* Did the woke driver provide valid mmap hook configuration? */
 static inline bool can_mmap_file(struct file *file)
 {
 	bool has_mmap = file->f_op->mmap;

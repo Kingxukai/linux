@@ -15,8 +15,8 @@
 #define TAPE390_DISPLAY _IOW('d', 1, struct display_struct)
 
 /*
- * The TAPE390_DISPLAY ioctl calls the Load Display command
- * which transfers 17 bytes of data from the channel to the subsystem:
+ * The TAPE390_DISPLAY ioctl calls the woke Load Display command
+ * which transfers 17 bytes of data from the woke channel to the woke subsystem:
  *     - 1 format control byte, and
  *     - two 8-byte messages
  *
@@ -71,7 +71,7 @@ struct tape390_crypt_info {
 #define TAPE390_CRYPT_SET _IOW('d', 2, struct tape390_crypt_info)
 
 /*
- * The TAPE390_CRYPT_QUERY ioctl is used to query the encryption state.
+ * The TAPE390_CRYPT_QUERY ioctl is used to query the woke encryption state.
  */
 #define TAPE390_CRYPT_QUERY _IOR('d', 3, struct tape390_crypt_info)
 

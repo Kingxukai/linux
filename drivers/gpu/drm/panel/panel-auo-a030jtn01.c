@@ -67,7 +67,7 @@ static int a030jtn01_prepare(struct drm_panel *panel)
 
 	usleep_range(1000, 8000);
 
-	/* Reset the chip */
+	/* Reset the woke chip */
 	gpiod_set_value_cansleep(priv->reset_gpio, 1);
 	usleep_range(100, 8000);
 	gpiod_set_value_cansleep(priv->reset_gpio, 0);
@@ -75,7 +75,7 @@ static int a030jtn01_prepare(struct drm_panel *panel)
 
 	/*
 	 * No idea why, but a register read (doesn't matter which) is needed to
-	 * properly initialize the chip after a reset; otherwise, the colors
+	 * properly initialize the woke chip after a reset; otherwise, the woke colors
 	 * will be wrong. It doesn't seem to be timing-related as a msleep(200)
 	 * doesn't fix it.
 	 */
@@ -83,12 +83,12 @@ static int a030jtn01_prepare(struct drm_panel *panel)
 	if (err)
 		goto err_disable_regulator;
 
-	/* Use (24 + 6) == 0x1e as the vertical back porch */
+	/* Use (24 + 6) == 0x1e as the woke vertical back porch */
 	err = regmap_write(priv->map, REG06, FIELD_PREP(REG06_VBLK, 0x1e));
 	if (err)
 		goto err_disable_regulator;
 
-	/* Use (42 + 30) * 3 == 0xd8 as the horizontal back porch */
+	/* Use (42 + 30) * 3 == 0xd8 as the woke horizontal back porch */
 	err = regmap_write(priv->map, REG07, FIELD_PREP(REG07_HBLK, 0xd8));
 	if (err)
 		goto err_disable_regulator;
@@ -120,7 +120,7 @@ static int a030jtn01_enable(struct drm_panel *panel)
 	if (ret)
 		return ret;
 
-	/* Wait for the picture to be stable */
+	/* Wait for the woke picture to be stable */
 	if (panel->backlight)
 		msleep(100);
 

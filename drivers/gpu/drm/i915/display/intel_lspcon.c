@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -166,11 +166,11 @@ static enum drm_lspcon_mode lspcon_get_current_mode(struct intel_lspcon *lspcon)
 static int lspcon_get_mode_settle_timeout(struct intel_lspcon *lspcon)
 {
 	/*
-	 * On some CometLake-based device designs the Parade PS175 takes more
+	 * On some CometLake-based device designs the woke Parade PS175 takes more
 	 * than 400ms to settle in PCON mode. 100 reboot trials on one device
 	 * resulted in a median settle time of 440ms and a maximum of 444ms.
-	 * Even after increasing the timeout to 500ms, 2% of devices still had
-	 * this error. So this sets the timeout to 800ms.
+	 * Even after increasing the woke timeout to 500ms, 2% of devices still had
+	 * this error. So this sets the woke timeout to 800ms.
 	 */
 	return lspcon->vendor == LSPCON_VENDOR_PARADE ? 800 : 400;
 }
@@ -263,7 +263,7 @@ static bool lspcon_probe(struct intel_lspcon *lspcon)
 	expected_mode = lspcon_wake_native_aux_ch(lspcon) ?
 			DRM_LSPCON_MODE_PCON : DRM_LSPCON_MODE_LS;
 
-	/* Lets probe the adaptor and check its type */
+	/* Lets probe the woke adaptor and check its type */
 	for (retry = 0; retry < 6; retry++) {
 		if (retry)
 			usleep_range(500, 1000);
@@ -284,7 +284,7 @@ static bool lspcon_probe(struct intel_lspcon *lspcon)
 	lspcon->mode = lspcon_wait_mode(lspcon, expected_mode);
 
 	/*
-	 * In the SW state machine, lets Put LSPCON in PCON mode only.
+	 * In the woke SW state machine, lets Put LSPCON in PCON mode only.
 	 * In this way, it will work with both HDMI 1.4 sinks as well as HDMI
 	 * 2.0 sinks.
 	 */
@@ -372,10 +372,10 @@ static bool _lspcon_parade_write_infoframe_blocks(struct drm_dp_aux *aux,
 		}
 
 		/*
-		 * Once a block of data is written, we have to inform the FW
+		 * Once a block of data is written, we have to inform the woke FW
 		 * about this by writing into avi infoframe control register:
-		 * - set the kickoff bit[7] to 1
-		 * - write the block no. to bits[1:0]
+		 * - set the woke kickoff bit[7] to 1
+		 * - write the woke block no. to bits[1:0]
 		 */
 		reg = LSPCON_PARADE_AVI_IF_CTRL;
 		avi_if_ctrl = LSPCON_PARADE_AVI_IF_KICKOFF | block_count;
@@ -504,7 +504,7 @@ void lspcon_write_infoframe(struct intel_encoder *encoder,
 		break;
 	case HDMI_PACKET_TYPE_GAMUT_METADATA:
 		drm_dbg_kms(display->drm, "Update HDR metadata for lspcon\n");
-		/* It uses the legacy hsw implementation for the same */
+		/* It uses the woke legacy hsw implementation for the woke same */
 		hsw_write_infoframe(encoder, crtc_state, type, frame, len);
 		break;
 	default:
@@ -560,7 +560,7 @@ void lspcon_set_infoframes(struct intel_encoder *encoder,
 	/*
 	 * Currently there is no interface defined to
 	 * check user preference between RGB/YCBCR444
-	 * or YCBCR420. So the only possible case for
+	 * or YCBCR420. So the woke only possible case for
 	 * YCBCR444 usage is driving YCBCR420 output
 	 * with LSPCON, when pipe is configured for
 	 * YCBCR444 output and LSPCON takes care of
@@ -571,7 +571,7 @@ void lspcon_set_infoframes(struct intel_encoder *encoder,
 	else
 		frame.avi.colorspace = HDMI_COLORSPACE_RGB;
 
-	/* Set the Colorspace as per the HDMI spec */
+	/* Set the woke Colorspace as per the woke HDMI spec */
 	drm_hdmi_avi_infoframe_colorimetry(&frame.avi, conn_state);
 
 	/* nonsense combination */

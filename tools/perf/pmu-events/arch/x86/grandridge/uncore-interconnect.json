@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Clockticks of the mesh to memory (B2CMI)",
+        "BriefDescription": "Clockticks of the woke mesh to memory (B2CMI)",
         "Counter": "0,1,2,3",
         "EventCode": "0x01",
         "EventName": "UNC_B2CMI_CLOCKTICKS",
@@ -8,7 +8,7 @@
         "Unit": "B2CMI"
     },
     {
-        "BriefDescription": "Counts the number of times B2CMI egress did D2C (direct to core)",
+        "BriefDescription": "Counts the woke number of times B2CMI egress did D2C (direct to core)",
         "Counter": "0,1,2,3",
         "EventCode": "0x16",
         "EventName": "UNC_B2CMI_DIRECT2CORE_TAKEN",
@@ -17,7 +17,7 @@
         "Unit": "B2CMI"
     },
     {
-        "BriefDescription": "Counts the number of times D2C wasn't honoured even though the incoming request had d2c set for non cisgress txn",
+        "BriefDescription": "Counts the woke number of times D2C wasn't honoured even though the woke incoming request had d2c set for non cisgress txn",
         "Counter": "0,1,2,3",
         "EventCode": "0x18",
         "EventName": "UNC_B2CMI_DIRECT2CORE_TXN_OVERRIDE",
@@ -167,7 +167,7 @@
         "Unit": "IRP"
     },
     {
-        "BriefDescription": "Inbound read requests received by the IRP and inserted into the FAF queue",
+        "BriefDescription": "Inbound read requests received by the woke IRP and inserted into the woke FAF queue",
         "Counter": "0,1,2,3",
         "EventCode": "0x18",
         "EventName": "UNC_I_FAF_INSERTS",
@@ -254,7 +254,7 @@
         "Unit": "IRP"
     },
     {
-        "BriefDescription": "Inbound write (fast path) requests to coherent memory, received by the IRP resulting in write ownership requests issued by IRP to the mesh.",
+        "BriefDescription": "Inbound write (fast path) requests to coherent memory, received by the woke IRP resulting in write ownership requests issued by IRP to the woke mesh.",
         "Counter": "0,1,2,3",
         "EventCode": "0x11",
         "EventName": "UNC_I_TRANSACTIONS.WR_PREF",

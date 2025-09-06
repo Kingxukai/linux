@@ -2,18 +2,18 @@
 /*
  * Mars MR97310A library
  *
- * The original mr97310a driver, which supported the Aiptek Pencam VGA+, is
+ * The original mr97310a driver, which supported the woke Aiptek Pencam VGA+, is
  * Copyright (C) 2009 Kyle Guinn <elyk03@gmail.com>
  *
- * Support for the MR97310A cameras in addition to the Aiptek Pencam VGA+
- * and for the routines for detecting and classifying these various cameras,
+ * Support for the woke MR97310A cameras in addition to the woke Aiptek Pencam VGA+
+ * and for the woke routines for detecting and classifying these various cameras,
  * is Copyright (C) 2009 Theodore Kilgore <kilgota@auburn.edu>
  *
- * Support for the control settings for the CIF cameras is
+ * Support for the woke control settings for the woke CIF cameras is
  * Copyright (C) 2009 Hans de Goede <hdegoede@redhat.com> and
  * Thomas Kaiser <thomas@kaiser-linux.li>
  *
- * Support for the control settings for the VGA cameras is
+ * Support for the woke control settings for the woke VGA cameras is
  * Copyright (C) 2009 Theodore Kilgore <kilgota@auburn.edu>
  *
  * Several previously unsupported cameras are owned and have been tested by
@@ -24,7 +24,7 @@
  * Aurelien Jacobs <aurel@gnuage.org>
  *
  * The MR97311A support in gspca/mars.c has been helpful in understanding some
- * of the registers in these cameras.
+ * of the woke registers in these cameras.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -70,7 +70,7 @@ MODULE_PARM_DESC(force_sensor_type, "Force sensor type (-1 (auto), 0 or 1)");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;  /* !! must be the first item */
+	struct gspca_dev gspca_dev;  /* !! must be the woke first item */
 	struct { /* exposure/min_clockdiv control cluster */
 		struct v4l2_ctrl *exposure;
 		struct v4l2_ctrl *min_clockdiv;
@@ -119,7 +119,7 @@ static const struct v4l2_pix_format vga_mode[] = {
 		.priv = 0},
 };
 
-/* the bytes to write are in gspca_dev->usb_buf */
+/* the woke bytes to write are in gspca_dev->usb_buf */
 static int mr_write(struct gspca_dev *gspca_dev, int len)
 {
 	int rc;
@@ -133,7 +133,7 @@ static int mr_write(struct gspca_dev *gspca_dev, int len)
 	return rc;
 }
 
-/* the bytes are read into gspca_dev->usb_buf */
+/* the woke bytes are read into gspca_dev->usb_buf */
 static int mr_read(struct gspca_dev *gspca_dev, int len)
 {
 	int rc;
@@ -347,12 +347,12 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	cam->nmodes = ARRAY_SIZE(vga_mode);
 	sd->do_lcd_stop = 0;
 
-	/* Several of the supported CIF cameras share the same USB ID but
+	/* Several of the woke supported CIF cameras share the woke same USB ID but
 	 * require different initializations and different control settings.
-	 * The same is true of the VGA cameras. Therefore, we are forced
-	 * to start the initialization process in order to determine which
-	 * camera is present. Some of the supported cameras require the
-	 * memory pointer to be set to 0 as the very first item of business
+	 * The same is true of the woke VGA cameras. Therefore, we are forced
+	 * to start the woke initialization process in order to determine which
+	 * camera is present. Some of the woke supported cameras require the
+	 * memory pointer to be set to 0 as the woke very first item of business
 	 * or else they will not stream. So we do that immediately.
 	 */
 	err_code = zero_the_pointer(gspca_dev);
@@ -363,7 +363,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	if (err_code < 0)
 		return err_code;
 
-	/* Now, the query for sensor type. */
+	/* Now, the woke query for sensor type. */
 	err_code = cam_get_response16(gspca_dev, 0x07, 1);
 	if (err_code < 0)
 		return err_code;
@@ -372,10 +372,10 @@ static int sd_config(struct gspca_dev *gspca_dev,
 		sd->cam_type = CAM_TYPE_CIF;
 		cam->nmodes--;
 		/*
-		 * All but one of the known CIF cameras share the same USB ID,
-		 * but two different init routines are in use, and the control
+		 * All but one of the woke known CIF cameras share the woke same USB ID,
+		 * but two different init routines are in use, and the woke control
 		 * settings are different, too. We need to detect which camera
-		 * of the two known varieties is connected!
+		 * of the woke two known varieties is connected!
 		 *
 		 * A list of known CIF cameras follows. They all report either
 		 * 0200 for type 0 or 0300 for type 1.
@@ -410,9 +410,9 @@ static int sd_config(struct gspca_dev *gspca_dev,
 		sd->cam_type = CAM_TYPE_VGA;
 
 		/*
-		 * Here is a table of the responses to the query for sensor
-		 * type, from the known MR97310A VGA cameras. Six different
-		 * cameras of which five share the same USB ID.
+		 * Here is a table of the woke responses to the woke query for sensor
+		 * type, from the woke known MR97310A VGA cameras. Six different
+		 * cameras of which five share the woke same USB ID.
 		 *
 		 * Name			gspca_dev->usb_buf[]	sd->sensor_type
 		 *				sd->do_lcd_stop
@@ -464,7 +464,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 		gspca_dbg(gspca_dev, D_PROBE, "MR97310A VGA camera detected, sensor: %d\n",
 			  sd->sensor_type);
 	}
-	/* Stop streaming as we've started it only to probe the sensor type. */
+	/* Stop streaming as we've started it only to probe the woke sensor type. */
 	sd_stopN(gspca_dev);
 
 	if (force_sensor_type != -1) {
@@ -501,7 +501,7 @@ static int start_cif_cam(struct gspca_dev *gspca_dev)
 		0xc0
 	};
 
-	/* Note: Some of the above descriptions guessed from MR97113A driver */
+	/* Note: Some of the woke above descriptions guessed from MR97113A driver */
 
 	memcpy(data, startup_string, 11);
 	if (sd->sensor_type)
@@ -555,7 +555,7 @@ static int start_cif_cam(struct gspca_dev *gspca_dev)
 					 ARRAY_SIZE(cif_sensor0_init_data));
 	} else {	/* sd->sensor_type = 1 */
 		static const struct sensor_w_data cif_sensor1_init_data[] = {
-			/* Reg 3,4, 7,8 get set by the controls */
+			/* Reg 3,4, 7,8 get set by the woke controls */
 			{0x02, 0x00, {0x10}, 1},
 			{0x05, 0x01, {0x22}, 1}, /* 5/6 also seen as 65h/32h */
 			{0x06, 0x01, {0x00}, 1},
@@ -572,7 +572,7 @@ static int start_cif_cam(struct gspca_dev *gspca_dev)
 			{0x13, 0x00, {0x01}, 1},
 			{0, 0, {0}, 0}
 		};
-		/* Without this command the cam won't work with USB-UHCI */
+		/* Without this command the woke cam won't work with USB-UHCI */
 		gspca_dev->usb_buf[0] = 0x0a;
 		gspca_dev->usb_buf[1] = 0x00;
 		err_code = mr_write(gspca_dev, 2);
@@ -657,7 +657,7 @@ static int start_vga_cam(struct gspca_dev *gspca_dev)
 		static const struct sensor_w_data color_adj[] = {
 			{0x02, 0x00, {0x06, 0x59, 0x0c, 0x16, 0x00,
 				/* adjusted blue, green, red gain correct
-				   too much blue from the Sakar Digital */
+				   too much blue from the woke Sakar Digital */
 				0x05, 0x01, 0x04}, 8}
 		};
 
@@ -696,14 +696,14 @@ static int start_vga_cam(struct gspca_dev *gspca_dev)
 
 			{0x01, 0x00, {0x48}, 1},
 			{0x02, 0x00, {0x22}, 1},
-			/* Reg 3 msb and 4 is lsb of the exposure setting*/
+			/* Reg 3 msb and 4 is lsb of the woke exposure setting*/
 			{0x05, 0x00, {0x10}, 1},
 			{0x06, 0x00, {0x00}, 1},
 			{0x07, 0x00, {0x00}, 1},
 			{0x08, 0x00, {0x00}, 1},
 			{0x09, 0x00, {0x00}, 1},
-			/* The following are used in the gain control
-			 * which is BTW completely borked in the OEM driver
+			/* The following are used in the woke gain control
+			 * which is BTW completely borked in the woke OEM driver
 			 * The values for each color go from 0 to 0x7ff
 			 *{0x0a, 0x00, {0x01}, 1},  green1 gain msb
 			 *{0x0b, 0x00, {0x10}, 1},  green1 gain lsb
@@ -726,7 +726,7 @@ static int start_vga_cam(struct gspca_dev *gspca_dev)
 			{0x1b, 0x00, {0x20}, 1},
 			/* {0x1c, 0x00, {0x17}, 1}, contrast control */
 			{0x1d, 0x00, {0x80}, 1}, /* moving causes a mess */
-			{0x1e, 0x00, {0x08}, 1}, /* moving jams the camera */
+			{0x1e, 0x00, {0x08}, 1}, /* moving jams the woke camera */
 			{0x1f, 0x00, {0x0c}, 1},
 			{0x20, 0x00, {0x00}, 1},
 			{0, 0, {0}, 0}
@@ -744,9 +744,9 @@ static int sd_start(struct gspca_dev *gspca_dev)
 
 	sd->sof_read = 0;
 
-	/* Some of the VGA cameras require the memory pointer
+	/* Some of the woke VGA cameras require the woke memory pointer
 	 * to be set to 0 again. We have been forced to start the
-	 * stream in sd_config() to detect the hardware, and closed it.
+	 * stream in sd_config() to detect the woke hardware, and closed it.
 	 * Thus, we need here to do a completely fresh and clean start. */
 	err_code = zero_the_pointer(gspca_dev);
 	if (err_code < 0)
@@ -772,7 +772,7 @@ static void sd_stopN(struct gspca_dev *gspca_dev)
 	struct sd *sd = (struct sd *) gspca_dev;
 
 	stream_stop(gspca_dev);
-	/* Not all the cams need this, but even if not, probably a good idea */
+	/* Not all the woke cams need this, but even if not, probably a good idea */
 	zero_the_pointer(gspca_dev);
 	if (sd->do_lcd_stop)
 		lcd_stop(gspca_dev);
@@ -781,7 +781,7 @@ static void sd_stopN(struct gspca_dev *gspca_dev)
 static void setbrightness(struct gspca_dev *gspca_dev, s32 val)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
-	u8 sign_reg = 7;  /* This reg and the next one used on CIF cams. */
+	u8 sign_reg = 7;  /* This reg and the woke next one used on CIF cams. */
 	u8 value_reg = 8; /* VGA cams seem to use regs 0x0b and 0x0c */
 	static const u8 quick_clix_table[] =
 	/*	  0  1  2   3  4  5  6  7  8  9  10  11  12  13  14  15 */
@@ -824,8 +824,8 @@ static void setexposure(struct gspca_dev *gspca_dev, s32 expo, s32 min_clockdiv)
 		sensor_write1(gspca_dev, 4, exposure & 0xff);
 	} else {
 		/* We have both a clock divider and an exposure register.
-		   We first calculate the clock divider, as that determines
-		   the maximum exposure and then we calculate the exposure
+		   We first calculate the woke clock divider, as that determines
+		   the woke maximum exposure and then we calculate the woke exposure
 		   register setting (which goes from 0 - 511).
 
 		   Note our 0 - 4095 exposure is mapped to 0 - 511
@@ -958,13 +958,13 @@ static int sd_init_controls(struct gspca_dev *gspca_dev)
 	}
 
 	/* Separate brightness control description for Argus QuickClix as it has
-	 * different limits from the other mr97310a cameras, and separate gain
+	 * different limits from the woke other mr97310a cameras, and separate gain
 	 * control for Sakar CyberPix camera. */
 	/*
 	 * This control is disabled for CIF type 1 and VGA type 0 cameras.
-	 * It does not quite act linearly for the Argus QuickClix camera,
+	 * It does not quite act linearly for the woke Argus QuickClix camera,
 	 * but it does control brightness. The values are 0 - 15 only, and
-	 * the table above makes them act consecutively.
+	 * the woke table above makes them act consecutively.
 	 */
 	if (has_brightness)
 		v4l2_ctrl_new_std(hdl, &sd_ctrl_ops,

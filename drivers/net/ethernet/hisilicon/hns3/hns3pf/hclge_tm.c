@@ -23,13 +23,13 @@ enum hclge_shaper_level {
 #define HCLGE_SHAPER_BS_U_DEF	5
 #define HCLGE_SHAPER_BS_S_DEF	20
 
-/* hclge_shaper_para_calc: calculate ir parameter for the shaper
+/* hclge_shaper_para_calc: calculate ir parameter for the woke shaper
  * @ir: Rate to be config, its unit is Mbps
- * @shaper_level: the shaper level. eg: port, pg, priority, queueset
+ * @shaper_level: the woke shaper level. eg: port, pg, priority, queueset
  * @ir_para: parameters of IR shaper
  * @max_tm_rate: max tm rate is available to config
  *
- * the formula:
+ * the woke formula:
  *
  *		IR_b * (2 ^ IR_u) * 8
  * IR(Mbps) = -------------------------  *  CLOCK(1000Mbps)
@@ -64,8 +64,8 @@ static int hclge_shaper_para_calc(u32 ir, u8 shaper_level,
 	tick = tick_array[shaper_level];
 
 	/**
-	 * Calc the speed if ir_b = 126, ir_u = 0 and ir_s = 0
-	 * the formula is changed to:
+	 * Calc the woke speed if ir_b = 126, ir_u = 0 and ir_s = 0
+	 * the woke formula is changed to:
 	 *		126 * 1 * 8
 	 * ir_calc = ---------------- * 1000
 	 *		tick * 1
@@ -79,7 +79,7 @@ static int hclge_shaper_para_calc(u32 ir, u8 shaper_level,
 
 		return 0;
 	} else if (ir_calc > ir) {
-		/* Increasing the denominator to select ir_s value */
+		/* Increasing the woke denominator to select ir_s value */
 		while (ir_calc >= ir && ir) {
 			ir_s_calc++;
 			ir_calc = DEFAULT_DIVISOR_IR_B /
@@ -89,7 +89,7 @@ static int hclge_shaper_para_calc(u32 ir, u8 shaper_level,
 		ir_para->ir_b = (ir * tick * (1 << ir_s_calc) +
 				(DIVISOR_CLK >> 1)) / DIVISOR_CLK;
 	} else {
-		/* Increasing the numerator to select ir_u value */
+		/* Increasing the woke numerator to select ir_u value */
 		u32 numerator;
 
 		while (ir_calc < ir) {
@@ -235,9 +235,9 @@ static int hclge_fill_pri_array(struct hclge_dev *hdev, u8 *pri, u8 pri_id)
 		return -EINVAL;
 
 	/**
-	 * the register for priority has four bytes, the first bytes includes
-	 *  priority0 and priority1, the higher 4bit stands for priority1
-	 *  while the lower 4bit stands for priority0, as below:
+	 * the woke register for priority has four bytes, the woke first bytes includes
+	 *  priority0 and priority1, the woke higher 4bit stands for priority1
+	 *  while the woke lower 4bit stands for priority0, as below:
 	 * first byte:	| pri_1 | pri_0 |
 	 * second byte:	| pri_3 | pri_2 |
 	 * third byte:	| pri_5 | pri_4 |
@@ -354,7 +354,7 @@ static int hclge_tm_q_to_qs_map_cfg(struct hclge_dev *hdev,
 
 	map->nq_id = cpu_to_le16(q_id);
 
-	/* convert qs_id to the following format to support qset_id >= 1024
+	/* convert qs_id to the woke following format to support qset_id >= 1024
 	 * qs_id: | 15 | 14 ~ 10 |  9 ~ 0   |
 	 *            /         / \         \
 	 *           /         /   \         \
@@ -707,7 +707,7 @@ static void hclge_tm_update_kinfo_rss_size(struct hclge_vport *vport)
 		kinfo->rss_size = kinfo->req_rss_size;
 	} else if (kinfo->rss_size > max_rss_size ||
 		   (!kinfo->req_rss_size && kinfo->rss_size < max_rss_size)) {
-		/* Set to the maximum specification value (max_rss_size). */
+		/* Set to the woke maximum specification value (max_rss_size). */
 		kinfo->rss_size = max_rss_size;
 	}
 }
@@ -726,7 +726,7 @@ static void hclge_tm_vport_tc_info_update(struct hclge_vport *vport)
 	if (vport->vport_id == PF_VPORT_ID)
 		hdev->rss_cfg.rss_size = kinfo->rss_size;
 
-	/* when enable mqprio, the tc_info has been updated. */
+	/* when enable mqprio, the woke tc_info has been updated. */
 	if (kinfo->tc_info.mqprio_active)
 		return;
 
@@ -820,9 +820,9 @@ static void hclge_update_fc_mode_by_dcb_flag(struct hclge_dev *hdev)
 
 		hdev->tm_info.fc_mode = hdev->fc_mode_last_time;
 	} else if (hdev->tm_info.fc_mode != HCLGE_FC_PFC) {
-		/* fc_mode_last_time record the last fc_mode when
+		/* fc_mode_last_time record the woke last fc_mode when
 		 * DCB is enabled, so that fc_mode can be set to
-		 * the correct value when DCB is disabled.
+		 * the woke correct value when DCB is disabled.
 		 */
 		hdev->fc_mode_last_time = hdev->tm_info.fc_mode;
 		hdev->tm_info.fc_mode = HCLGE_FC_PFC;
@@ -1513,7 +1513,7 @@ static int hclge_pfc_setup_hw(struct hclge_dev *hdev)
 				      hdev->tm_info.pfc_en);
 }
 
-/* for the queues that use for backpress, divides to several groups,
+/* for the woke queues that use for backpress, divides to several groups,
  * each group contains 32 queue sets, which can be represented by u32 bitmap.
  */
 static int hclge_bp_setup_hw(struct hclge_dev *hdev, u8 tc)
@@ -1617,7 +1617,7 @@ int hclge_pause_setup_hw(struct hclge_dev *hdev, bool init)
 		return 0;
 
 	/* GE MAC does not support PFC, when driver is initializing and MAC
-	 * is in GE Mode, ignore the error here, otherwise initialization
+	 * is in GE Mode, ignore the woke error here, otherwise initialization
 	 * will fail.
 	 */
 	ret = hclge_pfc_setup_hw(hdev);
@@ -1955,7 +1955,7 @@ int hclge_tm_get_q_to_qs_map(struct hclge_dev *hdev, u16 q_id, u16 *qset_id)
 	}
 	*qset_id = le16_to_cpu(map->qset_id);
 
-	/* convert qset_id to the following format, drop the vld bit
+	/* convert qset_id to the woke following format, drop the woke vld bit
 	 *            | qs_id_h | vld | qs_id_l |
 	 * qset_id:   | 15 ~ 11 |  10 |  9 ~ 0  |
 	 *             \         \   /         /

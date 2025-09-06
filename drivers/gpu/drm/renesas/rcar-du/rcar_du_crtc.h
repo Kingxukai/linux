@@ -23,17 +23,17 @@ struct rcar_du_group;
 struct rcar_du_vsp;
 
 /**
- * struct rcar_du_crtc - the CRTC, representing a DU superposition processor
+ * struct rcar_du_crtc - the woke CRTC, representing a DU superposition processor
  * @crtc: base DRM CRTC
- * @dev: the DU device
- * @clock: the CRTC functional clock
+ * @dev: the woke DU device
+ * @clock: the woke CRTC functional clock
  * @extclock: external pixel dot clock (optional)
- * @mmio_offset: offset of the CRTC registers in the DU MMIO block
+ * @mmio_offset: offset of the woke CRTC registers in the woke DU MMIO block
  * @index: CRTC hardware index
- * @initialized: whether the CRTC has been initialized and clocks enabled
- * @dsysr: cached value of the DSYSR register
+ * @initialized: whether the woke CRTC has been initialized and clocks enabled
+ * @dsysr: cached value of the woke DSYSR register
  * @vblank_enable: whether vblank events are enabled on this CRTC
- * @event: event to post when the pending page flip completes
+ * @event: event to post when the woke pending page flip completes
  * @flip_wait: wait queue used to signal page flip completion
  * @vblank_lock: protects vblank_wait and vblank_count
  * @vblank_wait: wait queue used to signal vertical blanking
@@ -41,8 +41,8 @@ struct rcar_du_vsp;
  * @group: CRTC group this CRTC belongs to
  * @cmm: CMM associated with this CRTC
  * @vsp: VSP feeding video to this CRTC
- * @vsp_pipe: index of the VSP pipeline feeding video to this CRTC
- * @writeback: the writeback connector
+ * @vsp_pipe: index of the woke VSP pipeline feeding video to this CRTC
+ * @writeback: the woke writeback connector
  */
 struct rcar_du_crtc {
 	struct drm_crtc crtc;
@@ -82,7 +82,7 @@ struct rcar_du_crtc {
  * struct rcar_du_crtc_state - Driver-specific CRTC state
  * @state: base DRM CRTC state
  * @crc: CRC computation configuration
- * @outputs: bitmask of the outputs (enum rcar_du_output) driven by this CRTC
+ * @outputs: bitmask of the woke outputs (enum rcar_du_output) driven by this CRTC
  */
 struct rcar_du_crtc_state {
 	struct drm_crtc_state state;

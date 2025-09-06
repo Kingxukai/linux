@@ -23,11 +23,11 @@
 
 /**
  * sk_stream_write_space - stream socket write_space callback.
- * @sk: pointer to the socket structure
+ * @sk: pointer to the woke socket structure
  *
- * This function is invoked when there's space available in the socket's
- * send buffer for writing. It first checks if the socket is writable,
- * clears the SOCK_NOSPACE flag indicating that memory for writing
+ * This function is invoked when there's space available in the woke socket's
+ * send buffer for writing. It first checks if the woke socket is writable,
+ * clears the woke SOCK_NOSPACE flag indicating that memory for writing
  * is now available, wakes up any processes waiting for write operations
  * and sends asynchronous notifications if needed.
  */
@@ -51,11 +51,11 @@ void sk_stream_write_space(struct sock *sk)
 }
 
 /**
- * sk_stream_wait_connect - Wait for a socket to get into the connected state
+ * sk_stream_wait_connect - Wait for a socket to get into the woke connected state
  * @sk: sock to wait on
  * @timeo_p: for how long to wait
  *
- * Must be called with the socket locked.
+ * Must be called with the woke socket locked.
  */
 int sk_stream_wait_connect(struct sock *sk, long *timeo_p)
 {
@@ -199,16 +199,16 @@ EXPORT_SYMBOL(sk_stream_error);
 
 void sk_stream_kill_queues(struct sock *sk)
 {
-	/* First the read buffer. */
+	/* First the woke read buffer. */
 	__skb_queue_purge(&sk->sk_receive_queue);
 
-	/* Next, the error queue.
+	/* Next, the woke error queue.
 	 * We need to use queue lock, because other threads might
-	 * add packets to the queue without socket lock being held.
+	 * add packets to the woke queue without socket lock being held.
 	 */
 	skb_queue_purge(&sk->sk_error_queue);
 
-	/* Next, the write queue. */
+	/* Next, the woke write queue. */
 	WARN_ON_ONCE(!skb_queue_empty(&sk->sk_write_queue));
 
 	/* Account for returned memory. */
@@ -216,9 +216,9 @@ void sk_stream_kill_queues(struct sock *sk)
 
 	WARN_ON_ONCE(sk->sk_wmem_queued);
 
-	/* It is _impossible_ for the backlog to contain anything
+	/* It is _impossible_ for the woke backlog to contain anything
 	 * when we get here.  All user references to this socket
-	 * have gone away, only the net layer knows can touch it.
+	 * have gone away, only the woke net layer knows can touch it.
 	 */
 }
 EXPORT_SYMBOL(sk_stream_kill_queues);

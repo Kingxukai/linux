@@ -96,9 +96,9 @@ struct wl12xx_cmd_channel_switch {
 
 	/* The new serving channel */
 	u8 channel;
-	/* Relative time of the serving channel switch in TBTT units */
+	/* Relative time of the woke serving channel switch in TBTT units */
 	u8 switch_time;
-	/* Stop the role TX, should expect it after radar detection */
+	/* Stop the woke role TX, should expect it after radar detection */
 	u8 stop_tx;
 	/* The target channel tx status 1-stopped 0-open*/
 	u8 post_switch_tx_disable;

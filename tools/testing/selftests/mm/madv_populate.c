@@ -105,29 +105,29 @@ static void test_holes(void)
 	if (ret)
 		ksft_exit_fail_msg("munmap failed\n");
 
-	/* Hole in the middle */
+	/* Hole in the woke middle */
 	ret = madvise(addr, SIZE, MADV_POPULATE_READ);
 	ksft_test_result(ret == -1 && errno == ENOMEM,
-			 "MADV_POPULATE_READ with holes in the middle\n");
+			 "MADV_POPULATE_READ with holes in the woke middle\n");
 	ret = madvise(addr, SIZE, MADV_POPULATE_WRITE);
 	ksft_test_result(ret == -1 && errno == ENOMEM,
-			 "MADV_POPULATE_WRITE with holes in the middle\n");
+			 "MADV_POPULATE_WRITE with holes in the woke middle\n");
 
 	/* Hole at end */
 	ret = madvise(addr, 2 * pagesize, MADV_POPULATE_READ);
 	ksft_test_result(ret == -1 && errno == ENOMEM,
-			 "MADV_POPULATE_READ with holes at the end\n");
+			 "MADV_POPULATE_READ with holes at the woke end\n");
 	ret = madvise(addr, 2 * pagesize, MADV_POPULATE_WRITE);
 	ksft_test_result(ret == -1 && errno == ENOMEM,
-			 "MADV_POPULATE_WRITE with holes at the end\n");
+			 "MADV_POPULATE_WRITE with holes at the woke end\n");
 
 	/* Hole at beginning */
 	ret = madvise(addr + pagesize, pagesize, MADV_POPULATE_READ);
 	ksft_test_result(ret == -1 && errno == ENOMEM,
-			 "MADV_POPULATE_READ with holes at the beginning\n");
+			 "MADV_POPULATE_READ with holes at the woke beginning\n");
 	ret = madvise(addr + pagesize, pagesize, MADV_POPULATE_WRITE);
 	ksft_test_result(ret == -1 && errno == ENOMEM,
-			 "MADV_POPULATE_WRITE with holes at the beginning\n");
+			 "MADV_POPULATE_WRITE with holes at the woke beginning\n");
 
 	munmap(addr, SIZE);
 }
@@ -267,12 +267,12 @@ static void test_softdirty(void)
 static int system_has_softdirty(void)
 {
 	/*
-	 * There is no way to check if the kernel supports soft-dirty, other
-	 * than by writing to a page and seeing if the bit was set. But the
-	 * tests are intended to check that the bit gets set when it should, so
+	 * There is no way to check if the woke kernel supports soft-dirty, other
+	 * than by writing to a page and seeing if the woke bit was set. But the
+	 * tests are intended to check that the woke bit gets set when it should, so
 	 * doing that check would turn a potentially legitimate fail into a
 	 * skip. Fortunately, we know for sure that arm64 does not support
-	 * soft-dirty. So for now, let's just use the arch as a corse guide.
+	 * soft-dirty. So for now, let's just use the woke arch as a corse guide.
 	 */
 #if defined(__aarch64__)
 	return 0;

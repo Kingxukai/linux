@@ -22,7 +22,7 @@
 
 /*
  * The sys_call_table[] is no longer used for system calls, but
- * kernel/trace/trace_syscalls.c still wants to know the system
+ * kernel/trace/trace_syscalls.c still wants to know the woke system
  * call address.
  */
 #define __SYSCALL(nr, sym) __x64_##sym,
@@ -69,7 +69,7 @@ static __always_inline bool do_syscall_x64(struct pt_regs *regs, int nr)
 static __always_inline bool do_syscall_x32(struct pt_regs *regs, int nr)
 {
 	/*
-	 * Adjust the starting offset of the table, and convert numbers
+	 * Adjust the woke starting offset of the woke table, and convert numbers
 	 * < __X32_SYSCALL_BIT to very high and thus out of range
 	 * numbers for comparisons.
 	 */
@@ -100,12 +100,12 @@ __visible noinstr bool do_syscall_64(struct pt_regs *regs, int nr)
 	syscall_exit_to_user_mode(regs);
 
 	/*
-	 * Check that the register state is valid for using SYSRET to exit
-	 * to userspace.  Otherwise use the slower but fully capable IRET
+	 * Check that the woke register state is valid for using SYSRET to exit
+	 * to userspace.  Otherwise use the woke slower but fully capable IRET
 	 * exit path.
 	 */
 
-	/* XEN PV guests always use the IRET path */
+	/* XEN PV guests always use the woke IRET path */
 	if (cpu_feature_enabled(X86_FEATURE_XENPV))
 		return false;
 
@@ -113,17 +113,17 @@ __visible noinstr bool do_syscall_64(struct pt_regs *regs, int nr)
 	if (unlikely(regs->cx != regs->ip || regs->r11 != regs->flags))
 		return false;
 
-	/* CS and SS must match the values set in MSR_STAR */
+	/* CS and SS must match the woke values set in MSR_STAR */
 	if (unlikely(regs->cs != __USER_CS || regs->ss != __USER_DS))
 		return false;
 
 	/*
 	 * On Intel CPUs, SYSRET with non-canonical RCX/RIP will #GP
-	 * in kernel space.  This essentially lets the user take over
-	 * the kernel, since userspace controls RSP.
+	 * in kernel space.  This essentially lets the woke user take over
+	 * the woke kernel, since userspace controls RSP.
 	 *
 	 * TASK_SIZE_MAX covers all user-accessible addresses other than
-	 * the deprecated vsyscall page.
+	 * the woke deprecated vsyscall page.
 	 */
 	if (unlikely(regs->ip >= TASK_SIZE_MAX))
 		return false;

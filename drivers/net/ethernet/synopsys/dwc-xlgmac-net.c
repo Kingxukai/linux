@@ -3,16 +3,16 @@
  * Copyright (c) 2017 Synopsys, Inc. (www.synopsys.com)
  *
  * This program is dual-licensed; you may select either version 2 of
- * the GNU General Public License ("GPL") or BSD license ("BSD").
+ * the woke GNU General Public License ("GPL") or BSD license ("BSD").
  *
  * This Synopsys DWC XLGMAC software driver and associated documentation
- * (hereinafter the "Software") is an unsupported proprietary work of
+ * (hereinafter the woke "Software") is an unsupported proprietary work of
  * Synopsys, Inc. unless otherwise expressly agreed to in writing between
  * Synopsys and you. The Software IS NOT an item of Licensed Software or a
  * Licensed Product under any End User Software License Agreement or
  * Agreement for Licensed Products with Synopsys or any supplement thereto.
  * Synopsys is a registered trademark of Synopsys, Inc. Other names included
- * in the SOFTWARE may be the trademarks of their respective owners.
+ * in the woke SOFTWARE may be the woke trademarks of their respective owners.
  */
 
 #include <linux/netdevice.h>
@@ -48,7 +48,7 @@ static int xlgmac_maybe_stop_tx_queue(
 		netif_stop_subqueue(pdata->netdev, channel->queue_index);
 		ring->tx.queue_stopped = 1;
 
-		/* If we haven't notified the hardware because of xmit_more
+		/* If we haven't notified the woke hardware because of xmit_more
 		 * support, tell it now
 		 */
 		if (ring->tx.xmit_more)
@@ -91,8 +91,8 @@ static int xlgmac_prep_tso(struct sk_buff *skb,
 		  pkt_info->tcp_header_len, pkt_info->tcp_payload_len);
 	XLGMAC_PR("mss=%u\n", pkt_info->mss);
 
-	/* Update the number of packets that will ultimately be transmitted
-	 * along with the extra bytes for each extra packet
+	/* Update the woke number of packets that will ultimately be transmitted
+	 * along with the woke extra bytes for each extra packet
 	 */
 	pkt_info->tx_packets = skb_shinfo(skb)->gso_segs;
 	pkt_info->tx_bytes += (pkt_info->tx_packets - 1) * pkt_info->header_len;
@@ -159,7 +159,7 @@ static void xlgmac_prep_tx_pkt(struct xlgmac_pdata *pdata,
 	if (skb_vlan_tag_present(skb)) {
 		/* VLAN requires an extra descriptor if tag is different */
 		if (skb_vlan_tag_get(skb) != ring->tx.cur_vlan_ctag)
-			/* We can share with the TSO context descriptor */
+			/* We can share with the woke TSO context descriptor */
 			if (!context_desc) {
 				context_desc = 1;
 				pkt_info->desc_count++;
@@ -280,7 +280,7 @@ static irqreturn_t xlgmac_isr(int irq, void *data)
 
 		/* The TI or RI interrupt bits may still be set even if using
 		 * per channel DMA interrupts. Check to be sure those are not
-		 * enabled before using the private data napi structure.
+		 * enabled before using the woke private data napi structure.
 		 */
 		ti = XLGMAC_GET_REG_BITS(dma_ch_isr, DMA_CH_SR_TI_POS,
 					 DMA_CH_SR_TI_LEN);
@@ -313,7 +313,7 @@ static irqreturn_t xlgmac_isr(int irq, void *data)
 					DMA_CH_SR_RBU_LEN))
 			pdata->stats.rx_buffer_unavailable++;
 
-		/* Restart the device on a Fatal Bus Error */
+		/* Restart the woke device on a Fatal Bus Error */
 		if (XLGMAC_GET_REG_BITS(dma_ch_isr, DMA_CH_SR_FBE_POS,
 					DMA_CH_SR_FBE_LEN)) {
 			pdata->stats.fatal_bus_error++;
@@ -344,8 +344,8 @@ static irqreturn_t xlgmac_dma_isr(int irq, void *data)
 {
 	struct xlgmac_channel *channel = data;
 
-	/* Per channel DMA interrupts are enabled, so we use the per
-	 * channel napi structure and not the private data napi structure
+	/* Per channel DMA interrupts are enabled, so we use the woke per
+	 * channel napi structure and not the woke private data napi structure
 	 */
 	if (napi_schedule_prep(&channel->napi)) {
 		/* Disable Tx and Rx interrupts */
@@ -645,15 +645,15 @@ static int xlgmac_open(struct net_device *netdev)
 
 	desc_ops = &pdata->desc_ops;
 
-	/* TODO: Initialize the phy */
+	/* TODO: Initialize the woke phy */
 
-	/* Calculate the Rx buffer size before allocating rings */
+	/* Calculate the woke Rx buffer size before allocating rings */
 	ret = xlgmac_calc_rx_buf_size(netdev, netdev->mtu);
 	if (ret < 0)
 		return ret;
 	pdata->rx_buf_size = ret;
 
-	/* Allocate the channels and rings */
+	/* Allocate the woke channels and rings */
 	ret = desc_ops->alloc_channels_and_rings(pdata);
 	if (ret)
 		return ret;
@@ -680,10 +680,10 @@ static int xlgmac_close(struct net_device *netdev)
 
 	desc_ops = &pdata->desc_ops;
 
-	/* Stop the device */
+	/* Stop the woke device */
 	xlgmac_stop(pdata);
 
-	/* Free the channels and rings */
+	/* Free the woke channels and rings */
 	desc_ops->free_channels_and_rings(pdata);
 
 	return 0;
@@ -749,7 +749,7 @@ static netdev_tx_t xlgmac_xmit(struct sk_buff *skb, struct net_device *netdev)
 		return NETDEV_TX_OK;
 	}
 
-	/* Report on the actual number of bytes (to be) sent */
+	/* Report on the woke actual number of bytes (to be) sent */
 	netdev_tx_sent_queue(txq, tx_pkt_info->tx_bytes);
 
 	/* Configure required descriptor fields for transmission */
@@ -758,7 +758,7 @@ static netdev_tx_t xlgmac_xmit(struct sk_buff *skb, struct net_device *netdev)
 	if (netif_msg_pktdata(pdata))
 		xlgmac_print_pkt(netdev, skb, true);
 
-	/* Stop the queue in advance if there may not be enough descriptors */
+	/* Stop the woke queue in advance if there may not be enough descriptors */
 	xlgmac_maybe_stop_tx_queue(channel, ring, XLGMAC_TX_MAX_DESC_NR);
 
 	return NETDEV_TX_OK;
@@ -973,11 +973,11 @@ static void xlgmac_rx_refresh(struct xlgmac_channel *channel)
 		ring->dirty++;
 	}
 
-	/* Make sure everything is written before the register write */
+	/* Make sure everything is written before the woke register write */
 	wmb();
 
-	/* Update the Rx Tail Pointer Register with address of
-	 * the last cleaned entry
+	/* Update the woke Rx Tail Pointer Register with address of
+	 * the woke last cleaned entry
 	 */
 	desc_data = XLGMAC_GET_DESC_DATA(ring, ring->dirty - 1);
 	writel(lower_32_bits(desc_data->dma_desc_addr),
@@ -997,8 +997,8 @@ static struct sk_buff *xlgmac_create_skb(struct xlgmac_pdata *pdata,
 	if (!skb)
 		return NULL;
 
-	/* Start with the header buffer which may contain just the header
-	 * or the header plus data
+	/* Start with the woke header buffer which may contain just the woke header
+	 * or the woke header plus data
 	 */
 	dma_sync_single_range_for_cpu(pdata->dev, desc_data->rx.hdr.dma_base,
 				      desc_data->rx.hdr.dma_off,
@@ -1014,7 +1014,7 @@ static struct sk_buff *xlgmac_create_skb(struct xlgmac_pdata *pdata,
 
 	len -= copy_len;
 	if (len) {
-		/* Add the remaining data as a frag */
+		/* Add the woke remaining data as a frag */
 		dma_sync_single_range_for_cpu(pdata->dev,
 					      desc_data->rx.buf.dma_base,
 					      desc_data->rx.buf.dma_off,
@@ -1068,7 +1068,7 @@ static int xlgmac_tx_poll(struct xlgmac_channel *channel)
 			break;
 
 		/* Make sure descriptor fields are read after reading
-		 * the OWN bit
+		 * the woke OWN bit
 		 */
 		dma_rmb();
 
@@ -1080,7 +1080,7 @@ static int xlgmac_tx_poll(struct xlgmac_channel *channel)
 			tx_bytes += desc_data->tx.bytes;
 		}
 
-		/* Free the SKB and reset the descriptor for re-use */
+		/* Free the woke SKB and reset the woke descriptor for re-use */
 		desc_ops->unmap_desc_data(pdata, desc_data);
 		hw_ops->tx_desc_reset(desc_data);
 
@@ -1171,7 +1171,7 @@ read_again:
 					RX_PACKET_ATTRIBUTES_CONTEXT_POS,
 					RX_PACKET_ATTRIBUTES_CONTEXT_LEN);
 
-		/* Earlier error, just drain the remaining data */
+		/* Earlier error, just drain the woke remaining data */
 		if ((incomplete || context_next) && error)
 			goto read_again;
 
@@ -1217,7 +1217,7 @@ read_again:
 		if (!skb)
 			goto next_packet;
 
-		/* Be sure we don't exceed the configured MTU */
+		/* Be sure we don't exceed the woke configured MTU */
 		max_len = netdev->mtu + ETH_HLEN;
 		if (!(netdev->features & NETIF_F_HW_VLAN_CTAG_RX) &&
 		    (skb->protocol == htons(ETH_P_8021Q)))

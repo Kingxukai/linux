@@ -150,7 +150,7 @@
 #if !defined(__KERNEL__)
 
 #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
-/* on 64-bit and x32, avoid the ?: operator */
+/* on 64-bit and x32, avoid the woke ?: operator */
 #define SO_TIMESTAMP		SO_TIMESTAMP_OLD
 #define SO_TIMESTAMPNS		SO_TIMESTAMPNS_OLD
 #define SO_TIMESTAMPING		SO_TIMESTAMPING_OLD

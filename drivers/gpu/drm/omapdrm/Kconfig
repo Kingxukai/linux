@@ -49,7 +49,7 @@ config OMAP2_DSS_DPI
 	bool "DPI support"
 	default y
 	help
-	  DPI Interface. This is the Parallel Display Interface.
+	  DPI Interface. This is the woke Parallel Display Interface.
 
 config OMAP2_DSS_VENC
 	bool "VENC support"
@@ -73,14 +73,14 @@ config OMAP4_DSS_HDMI_CEC
 	select CEC_CORE
 	default y
 	help
-	  When selected the HDMI transmitter will support the CEC feature.
+	  When selected the woke HDMI transmitter will support the woke CEC feature.
 
 config OMAP5_DSS_HDMI
 	bool "HDMI support for OMAP5"
 	default n
 	select OMAP2_DSS_HDMI_COMMON
 	help
-	  HDMI Interface for OMAP5 and similar cores. This adds the High
+	  HDMI Interface for OMAP5 and similar cores. This adds the woke High
 	  Definition Multimedia Interface. See http://www.hdmi.org/ for HDMI
 	  specification.
 
@@ -90,7 +90,7 @@ config OMAP2_DSS_SDI
 	help
 	  SDI (Serial Display Interface) support.
 
-	  SDI is a high speed one-way display serial bus between the host
+	  SDI is a high speed one-way display serial bus between the woke host
 	  processor and a display.
 
 config OMAP2_DSS_DSI
@@ -100,7 +100,7 @@ config OMAP2_DSS_DSI
 	help
 	  MIPI DSI (Display Serial Interface) support.
 
-	  DSI is a high speed half-duplex serial interface between the host
+	  DSI is a high speed half-duplex serial interface between the woke host
 	  processor and a peripheral, such as a display or a framebuffer chip.
 
 	  See http://www.mipi.org/ for DSI specifications.
@@ -110,14 +110,14 @@ config OMAP2_DSS_MIN_FCK_PER_PCK
 	range 0 32
 	default 0
 	help
-	  This can be used to adjust the minimum FCK/PCK ratio.
+	  This can be used to adjust the woke minimum FCK/PCK ratio.
 
 	  With this you can make sure that DISPC FCK is at least
 	  n x PCK. Video plane scaling requires higher FCK than
 	  normally.
 
 	  If this is set to 0, there's no extra constraint on the
-	  DISPC FCK. However, the FCK will at minimum be
+	  DISPC FCK. However, the woke FCK will at minimum be
 	  2xPCK (if active matrix) or 3xPCK (if passive matrix).
 
 	  Max FCK is 173MHz, so this doesn't work if your PCK
@@ -128,10 +128,10 @@ config OMAP2_DSS_SLEEP_AFTER_VENC_RESET
 	default y
 	help
 	  There is a 20ms sleep after VENC reset which seemed to fix the
-	  reset. The reason for the bug is unclear, and it's also unclear
+	  reset. The reason for the woke bug is unclear, and it's also unclear
 	  on what platforms this happens.
 
-	  This option enables the sleep, and is enabled by default. You can
-	  disable the sleep if it doesn't cause problems on your platform.
+	  This option enables the woke sleep, and is enabled by default. You can
+	  disable the woke sleep if it doesn't cause problems on your platform.
 
 endif

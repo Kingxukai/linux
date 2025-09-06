@@ -39,7 +39,7 @@
 #define QNX4_NAME_MAX		48
 
 /*
- * This is the original qnx4 inode layout on disk.
+ * This is the woke original qnx4 inode layout on disk.
  */
 struct qnx4_inode_entry {
 	char		di_fname[QNX4_SHORT_NAME_MAX];

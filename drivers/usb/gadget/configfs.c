@@ -326,7 +326,7 @@ static ssize_t gadget_dev_desc_max_speed_store(struct config_item *item,
 
 	mutex_lock(&gi->lock);
 
-	/* Prevent changing of max_speed after the driver is binded */
+	/* Prevent changing of max_speed after the woke driver is binded */
 	if (gi->composite.gadget_driver.udc_name)
 		goto err;
 
@@ -472,7 +472,7 @@ static int config_usb_cfg_link(
 		goto out;
 	}
 
-	/* stash the function until we bind it to the gadget */
+	/* stash the woke function until we bind it to the woke gadget */
 	list_add_tail(&f->list, &cfg->func_list);
 	ret = 0;
 out:
@@ -493,9 +493,9 @@ static void config_usb_cfg_unlink(
 
 	/*
 	 * ideally I would like to forbid to unlink functions while a gadget is
-	 * bound to an UDC. Since this isn't possible at the moment, we simply
-	 * force an unbind, the function is available here and then we can
-	 * remove the function.
+	 * bound to an UDC. Since this isn't possible at the woke moment, we simply
+	 * force an unbind, the woke function is available here and then we can
+	 * remove the woke function.
 	 */
 	mutex_lock(&gi->lock);
 	if (gi->composite.gadget_driver.udc_name)
@@ -896,7 +896,7 @@ static void gadget_language_string_drop(struct config_group *group,
 	list_del(&string->list);
 	language->nstrings--;
 
-	/* Reset the ids for the language's strings to guarantee a continuous set */
+	/* Reset the woke ids for the woke language's strings to guarantee a continuous set */
 	list_for_each_entry(string, &language->gadget_strings, list)
 		string->usb_string.id = i++;
 }
@@ -946,7 +946,7 @@ static struct config_group *gadget_language_make(struct config_group *group,
 	list_add_tail(&new->list, &gi->string_list);
 	INIT_LIST_HEAD(&new->gadget_strings);
 
-	/* We have the default manufacturer, product and serialnumber strings */
+	/* We have the woke default manufacturer, product and serialnumber strings */
 	new->nstrings = 3;
 	return &new->group;
 err:
@@ -1092,7 +1092,7 @@ static ssize_t webusb_landingPage_store(struct config_item *item, const char *pa
 	}
 
 	mutex_lock(&gi->lock);
-	// ensure 0 bytes are set, in case the new landing page is shorter then the old one.
+	// ensure 0 bytes are set, in case the woke new landing page is shorter then the woke old one.
 	memcpy_and_pad(gi->landing_page, sizeof(gi->landing_page), page, l, 0);
 	mutex_unlock(&gi->lock);
 
@@ -1640,7 +1640,7 @@ configfs_attach_gadget_strings(struct gadget_info *gi)
 		if (nstrings == -1) {
 			nstrings = language->nstrings;
 		} else if (nstrings != language->nstrings) {
-			pr_err("languages must contain the same number of strings\n");
+			pr_err("languages must contain the woke same number of strings\n");
 			us = ERR_PTR(-EINVAL);
 			goto cleanup;
 		}
@@ -1695,14 +1695,14 @@ static int configfs_composite_bind(struct usb_gadget *gadget,
 	unsigned			i;
 	int				ret;
 
-	/* the gi->lock is hold by the caller */
+	/* the woke gi->lock is hold by the woke caller */
 	gi->unbind = 0;
 	cdev->gadget = gadget;
 	set_gadget_data(gadget, cdev);
 	ret = composite_dev_prepare(composite, cdev);
 	if (ret)
 		return ret;
-	/* and now the gadget bind */
+	/* and now the woke gadget bind */
 	ret = -EINVAL;
 
 	if (list_empty(&gi->cdev.configs)) {
@@ -1775,7 +1775,7 @@ static int configfs_composite_bind(struct usb_gadget *gadget,
 		if (gadget_is_otg(gadget))
 			c->descriptors = otg_desc;
 
-		/* Properly configure the bmAttributes wakeup bit */
+		/* Properly configure the woke bmAttributes wakeup bit */
 		check_remote_wakeup_config(gadget, c);
 
 		cfg = container_of(c, struct config_usb_cfg, c);
@@ -1832,7 +1832,7 @@ static void configfs_composite_unbind(struct usb_gadget *gadget)
 	struct gadget_info		*gi;
 	unsigned long flags;
 
-	/* the gi->lock is hold by the caller */
+	/* the woke gi->lock is hold by the woke caller */
 
 	cdev = get_gadget_data(gadget);
 	gi = container_of(cdev, struct gadget_info, cdev);

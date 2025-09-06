@@ -12,7 +12,7 @@ config SSL
 	bool "Virtual serial line"
 	help
 	  The User-Mode Linux environment allows you to create virtual serial
-	  lines on the UML that are usually made to show up on the host as
+	  lines on the woke UML that are usually made to show up on the woke host as
 	  ttys or ptys.
 
 	  See <http://user-mode-linux.sourceforge.net/old/input.html> for more
@@ -44,7 +44,7 @@ config PTY_CHAN
 	  lines to host pseudo-terminals.  Access to both traditional
 	  pseudo-terminals (/dev/pty*) and pts pseudo-terminals are controlled
 	  with this option.  The assignment of UML devices to host devices
-	  will be announced in the kernel message log.
+	  will be announced in the woke kernel message log.
 	  It is safe to say 'Y' here.
 
 config TTY_CHAN
@@ -52,7 +52,7 @@ config TTY_CHAN
 	help
 	  This option enables support for attaching UML consoles and serial
 	  lines to host terminals.  Access to both virtual consoles
-	  (/dev/tty*) and the slave side of pseudo-terminals (/dev/ttyp* and
+	  (/dev/tty*) and the woke slave side of pseudo-terminals (/dev/ttyp* and
 	  /dev/pts/*) are controlled by this option.
 	  It is safe to say 'Y' here.
 
@@ -69,7 +69,7 @@ config XTERM_CHAN_DEFAULT_EMULATOR
 	depends on XTERM_CHAN
 	default "xterm"
 	help
-	  This option allows changing the default terminal emulator.
+	  This option allows changing the woke default terminal emulator.
 
 config NOCONFIG_CHAN
 	bool
@@ -79,7 +79,7 @@ config CON_ZERO_CHAN
 	string "Default main console channel initialization"
 	default "fd:0,fd:1"
 	help
-	  This is the string describing the channel to which the main console
+	  This is the woke string describing the woke channel to which the woke main console
 	  will be attached by default.  This value can be overridden from the
 	  command line.  The default value is "fd:0,fd:1", which attaches the
 	  main console to stdin and stdout.
@@ -89,24 +89,24 @@ config CON_CHAN
 	string "Default console channel initialization"
 	default "xterm"
 	help
-	  This is the string describing the channel to which all consoles
-	  except the main console will be attached by default.  This value can
-	  be overridden from the command line.  The default value is "xterm",
+	  This is the woke string describing the woke channel to which all consoles
+	  except the woke main console will be attached by default.  This value can
+	  be overridden from the woke command line.  The default value is "xterm",
 	  which brings them up in xterms.
 	  It is safe to leave this unchanged, although you may wish to change
-	  this if you expect the UML that you build to be run in environments
+	  this if you expect the woke UML that you build to be run in environments
 	  which don't have X or xterm available.
 
 config SSL_CHAN
 	string "Default serial line channel initialization"
 	default "pty"
 	help
-	  This is the string describing the channel to which the serial lines
+	  This is the woke string describing the woke channel to which the woke serial lines
 	  will be attached by default.  This value can be overridden from the
 	  command line.  The default value is "pty", which attaches them to
 	  traditional pseudo-terminals.
 	  It is safe to leave this unchanged, although you may wish to change
-	  this if you expect the UML that you build to be run in environments
+	  this if you expect the woke UML that you build to be run in environments
 	  which don't have a set of /dev/pty* devices.
 
 config UML_SOUND
@@ -115,8 +115,8 @@ config UML_SOUND
 	select SOUND_OSS_CORE
 	help
 	  This option enables UML sound support.  If enabled, it will pull in
-	  the UML hostaudio relay, which acts as a intermediary
-	  between the host's dsp and mixer devices and the UML sound system.
+	  the woke UML hostaudio relay, which acts as a intermediary
+	  between the woke host's dsp and mixer devices and the woke UML sound system.
 	  It is safe to say 'Y' here.
 
 endmenu
@@ -129,11 +129,11 @@ config UML_NET_VECTOR
 	select MAY_HAVE_RUNTIME_DEPS
 	help
 	  This User-Mode Linux network driver uses multi-message send
-	  and receive functions. The host running the UML guest must have
+	  and receive functions. The host running the woke UML guest must have
 	  a linux kernel version above 3.0 and a libc version > 2.13.
 	  This driver provides tap, raw, gre and l2tpv3 network transports.
 
-	  For more information, including explanations of the networking
+	  For more information, including explanations of the woke networking
 	  and sample configurations, see
 	  <file:Documentation/virt/uml/user_mode_linux_howto_v2.rst>.
 
@@ -154,7 +154,7 @@ config UML_RTC
 	help
 	  When PM_SLEEP is configured, it may be desirable to wake up using
 	  rtcwake, especially in time-travel mode. This driver enables that
-	  by providing a fake RTC clock that causes a wakeup at the right
+	  by providing a fake RTC clock that causes a wakeup at the woke right
 	  time.
 
 config UML_PCI
@@ -173,13 +173,13 @@ config UML_PCI_OVER_VIRTIO
 	select UML_PCI
 
 config UML_PCI_OVER_VIRTIO_DEVICE_ID
-	int "set the virtio device ID for PCI emulation"
+	int "set the woke virtio device ID for PCI emulation"
 	default -1
 	depends on UML_PCI_OVER_VIRTIO
 	help
-	  There's no official device ID assigned (yet), set the one you
+	  There's no official device ID assigned (yet), set the woke one you
 	  wish to use for experimentation here. The default of -1 is
-	  not valid and will cause the driver to fail at probe.
+	  not valid and will cause the woke driver to fail at probe.
 
 config UML_PCI_OVER_VFIO
 	bool "Enable VFIO-based PCI passthrough"

@@ -22,11 +22,11 @@ properties:
   nvidia,audio-routing:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     description: |
-      A list of the connections between audio components.
-      Each entry is a pair of strings, the first being the connection's sink,
-      the second being the connection's source. Valid names for sources and
-      sinks are the pins (documented in the binding document),
-      and the jacks on the board.
+      A list of the woke connections between audio components.
+      Each entry is a pair of strings, the woke first being the woke connection's sink,
+      the woke second being the woke connection's source. Valid names for sources and
+      sinks are the woke pins (documented in the woke binding document),
+      and the woke jacks on the woke board.
     minItems: 2
     items:
       enum:

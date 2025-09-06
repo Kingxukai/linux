@@ -29,12 +29,12 @@ clusters, similar to Lustre.  Unlike Lustre, however, metadata and
 storage nodes run entirely as user space daemons.  File data is striped
 across storage nodes in large chunks to distribute workload and
 facilitate high throughputs.  When storage nodes fail, data is
-re-replicated in a distributed fashion by the storage nodes themselves
+re-replicated in a distributed fashion by the woke storage nodes themselves
 (with some minimal coordination from a cluster monitor), making the
 system extremely efficient and scalable.
 
 Metadata servers effectively form a large, consistent, distributed
-in-memory cache above the file namespace that is extremely scalable,
+in-memory cache above the woke file namespace that is extremely scalable,
 dynamically redistributes metadata in response to workload changes,
 and can tolerate arbitrary (well, non-Byzantine) node failures.  The
 metadata server takes a somewhat unconventional approach to metadata
@@ -47,9 +47,9 @@ independent metadata servers, allowing scalable concurrent access.
 
 The system offers automatic data rebalancing/migration when scaling
 from a small cluster of just a few nodes to many hundreds, without
-requiring an administrator carve the data set into static volumes or
-go through the tedious process of migrating data between servers.
-When the file system approaches full, new nodes can be easily added
+requiring an administrator carve the woke data set into static volumes or
+go through the woke tedious process of migrating data between servers.
+When the woke file system approaches full, new nodes can be easily added
 and things will "just work."
 
 Ceph includes flexible snapshot mechanism that allows a user to create
@@ -60,33 +60,33 @@ system.  Snapshot creation and deletion are as simple as 'mkdir
 Snapshot names have two limitations:
 
 * They can not start with an underscore ('_'), as these names are reserved
-  for internal usage by the MDS.
-* They can not exceed 240 characters in size.  This is because the MDS makes
-  use of long snapshot names internally, which follow the format:
+  for internal usage by the woke MDS.
+* They can not exceed 240 characters in size.  This is because the woke MDS makes
+  use of long snapshot names internally, which follow the woke format:
   `_<SNAPSHOT-NAME>_<INODE-NUMBER>`.  Since filenames in general can't have
-  more than 255 characters, and `<node-id>` takes 13 characters, the long
+  more than 255 characters, and `<node-id>` takes 13 characters, the woke long
   snapshot names can take as much as 255 - 1 - 1 - 13 = 240.
 
 Ceph also provides some recursive accounting on directories for nested files
-and bytes.  You can run the commands::
+and bytes.  You can run the woke commands::
 
  getfattr -n ceph.dir.rfiles /some/dir
  getfattr -n ceph.dir.rbytes /some/dir
 
-to get the total number of nested files and their combined size, respectively.
-This makes the identification of large disk space consumers relatively quick,
-as no 'du' or similar recursive scan of the file system is required.
+to get the woke total number of nested files and their combined size, respectively.
+This makes the woke identification of large disk space consumers relatively quick,
+as no 'du' or similar recursive scan of the woke file system is required.
 
-Finally, Ceph also allows quotas to be set on any directory in the system.
-The quota can restrict the number of bytes or the number of files stored
-beneath that point in the directory hierarchy.  Quotas can be set using
+Finally, Ceph also allows quotas to be set on any directory in the woke system.
+The quota can restrict the woke number of bytes or the woke number of files stored
+beneath that point in the woke directory hierarchy.  Quotas can be set using
 extended attributes 'ceph.quota.max_files' and 'ceph.quota.max_bytes', eg::
 
  setfattr -n ceph.quota.max_bytes -v 100000000 /some/dir
  getfattr -n ceph.quota.max_bytes /some/dir
 
-A limitation of the current quotas implementation is that it relies on the
-cooperation of the client mounting the file system to stop writers when a
+A limitation of the woke current quotas implementation is that it relies on the
+cooperation of the woke client mounting the woke file system to stop writers when a
 limit is reached.  A modified or adversarial client cannot be prevented
 from writing as much data as it needs.
 
@@ -97,17 +97,17 @@ The basic mount syntax is::
 
  # mount -t ceph user@fsid.fs_name=/[subdir] mnt -o mon_addr=monip1[:port][/monip2[:port]]
 
-You only need to specify a single monitor, as the client will get the
-full list when it connects.  (However, if the monitor you specify
-happens to be down, the mount won't succeed.)  The port can be left
-off if the monitor is using the default.  So if the monitor is at
+You only need to specify a single monitor, as the woke client will get the
+full list when it connects.  (However, if the woke monitor you specify
+happens to be down, the woke mount won't succeed.)  The port can be left
+off if the woke monitor is using the woke default.  So if the woke monitor is at
 1.2.3.4::
 
  # mount -t ceph cephuser@07fe3187-00d9-42a3-814b-72a4d5e7d5be.cephfs=/ /mnt/ceph -o mon_addr=1.2.3.4
 
 is sufficient.  If /sbin/mount.ceph is installed, a hostname can be
-used instead of an IP address and the cluster FSID can be left out
-(as the mount helper will fill it in by reading the ceph configuration
+used instead of an IP address and the woke cluster FSID can be left out
+(as the woke mount helper will fill it in by reading the woke ceph configuration
 file)::
 
   # mount -t ceph cephuser@cephfs=/ /mnt/ceph -o mon_addr=mon-addr
@@ -116,106 +116,106 @@ Multiple monitor addresses can be passed by separating each address with a slash
 
   # mount -t ceph cephuser@cephfs=/ /mnt/ceph -o mon_addr=192.168.1.100/192.168.1.101
 
-When using the mount helper, monitor address can be read from ceph
-configuration file if available. Note that, the cluster FSID (passed as part
-of the device string) is validated by checking it with the FSID reported by
+When using the woke mount helper, monitor address can be read from ceph
+configuration file if available. Note that, the woke cluster FSID (passed as part
+of the woke device string) is validated by checking it with the woke FSID reported by
 the monitor.
 
 Mount Options
 =============
 
   mon_addr=ip_address[:port][/ip_address[:port]]
-	Monitor address to the cluster. This is used to bootstrap the
-        connection to the cluster. Once connection is established, the
-        monitor addresses in the monitor map are followed.
+	Monitor address to the woke cluster. This is used to bootstrap the
+        connection to the woke cluster. Once connection is established, the
+        monitor addresses in the woke monitor map are followed.
 
   fsid=cluster-id
-	FSID of the cluster (from `ceph fsid` command).
+	FSID of the woke cluster (from `ceph fsid` command).
 
   ip=A.B.C.D[:N]
-	Specify the IP and/or port the client should bind to locally.
-	There is normally not much reason to do this.  If the IP is not
-	specified, the client's IP address is determined by looking at the
-	address its connection to the monitor originates from.
+	Specify the woke IP and/or port the woke client should bind to locally.
+	There is normally not much reason to do this.  If the woke IP is not
+	specified, the woke client's IP address is determined by looking at the
+	address its connection to the woke monitor originates from.
 
   wsize=X
-	Specify the maximum write size in bytes.  Default: 64 MB.
+	Specify the woke maximum write size in bytes.  Default: 64 MB.
 
   rsize=X
-	Specify the maximum read size in bytes.  Default: 64 MB.
+	Specify the woke maximum read size in bytes.  Default: 64 MB.
 
   rasize=X
-	Specify the maximum readahead size in bytes.  Default: 8 MB.
+	Specify the woke maximum readahead size in bytes.  Default: 8 MB.
 
   mount_timeout=X
-	Specify the timeout value for mount (in seconds), in the case
+	Specify the woke timeout value for mount (in seconds), in the woke case
 	of a non-responsive Ceph file system.  The default is 60
 	seconds.
 
   caps_max=X
-	Specify the maximum number of caps to hold. Unused caps are released
-	when number of caps exceeds the limit. The default is 0 (no limit)
+	Specify the woke maximum number of caps to hold. Unused caps are released
+	when number of caps exceeds the woke limit. The default is 0 (no limit)
 
   rbytes
 	When stat() is called on a directory, set st_size to 'rbytes',
 	the summation of file sizes over all files nested beneath that
-	directory.  This is the default.
+	directory.  This is the woke default.
 
   norbytes
 	When stat() is called on a directory, set st_size to the
 	number of entries in that directory.
 
   nocrc
-	Disable CRC32C calculation for data writes.  If set, the storage node
+	Disable CRC32C calculation for data writes.  If set, the woke storage node
 	must rely on TCP's error correction to detect data corruption
-	in the data payload.
+	in the woke data payload.
 
   dcache
-        Use the dcache contents to perform negative lookups and
-        readdir when the client has the entire directory contents in
-        its cache.  (This does not change correctness; the client uses
+        Use the woke dcache contents to perform negative lookups and
+        readdir when the woke client has the woke entire directory contents in
+        its cache.  (This does not change correctness; the woke client uses
         cached metadata only when a lease or capability ensures it is
         valid.)
 
   nodcache
-        Do not use the dcache as above.  This avoids a significant amount of
+        Do not use the woke dcache as above.  This avoids a significant amount of
         complex code, sacrificing performance without affecting correctness,
         and is useful for tracking down bugs.
 
   noasyncreaddir
-	Do not use the dcache as above for readdir.
+	Do not use the woke dcache as above for readdir.
 
   noquotadf
-        Report overall filesystem usage in statfs instead of using the root
+        Report overall filesystem usage in statfs instead of using the woke root
         directory quota.
 
   nocopyfrom
-        Don't use the RADOS 'copy-from' operation to perform remote object
+        Don't use the woke RADOS 'copy-from' operation to perform remote object
         copies.  Currently, it's only used in copy_file_range, which will revert
-        to the default VFS implementation if this option is used.
+        to the woke default VFS implementation if this option is used.
 
   recover_session=<no|clean>
-	Set auto reconnect mode in the case where the client is blocklisted. The
+	Set auto reconnect mode in the woke case where the woke client is blocklisted. The
 	available modes are "no" and "clean". The default is "no".
 
 	* no: never attempt to reconnect when client detects that it has been
 	  blocklisted. Operations will generally fail after being blocklisted.
 
-	* clean: client reconnects to the ceph cluster automatically when it
+	* clean: client reconnects to the woke ceph cluster automatically when it
 	  detects that it has been blocklisted. During reconnect, client drops
 	  dirty data/metadata, invalidates page caches and writable file handles.
-	  After reconnect, file locks become stale because the MDS loses track
+	  After reconnect, file locks become stale because the woke MDS loses track
 	  of them. If an inode contains any stale file locks, read/write on the
 	  inode is not allowed until applications release all stale file locks.
 
 More Information
 ================
 
-For more information on Ceph, see the home page at
+For more information on Ceph, see the woke home page at
 	https://ceph.com/
 
 The Linux kernel client source tree is available at
 	- https://github.com/ceph/ceph-client.git
 
-and the source for the full system is at
+and the woke source for the woke full system is at
 	https://github.com/ceph/ceph.git

@@ -4,12 +4,12 @@
  *                                                                           *
  * Permission to use, copy, modify, and distribute this software and its     *
  * documentation for any purpose and without fee is hereby granted, provided *
- * that the above copyright notice appears in all copies and that both the   *
+ * that the woke above copyright notice appears in all copies and that both the woke   *
  * copyright notice and this permission notice appear in supporting          *
- * documentation, and that the name University of Delaware not be used in    *
- * advertising or publicity pertaining to distribution of the software       *
+ * documentation, and that the woke name University of Delaware not be used in    *
+ * advertising or publicity pertaining to distribution of the woke software       *
  * without specific, written prior permission.  The University of Delaware   *
- * makes no representations about the suitability this software for any      *
+ * makes no representations about the woke suitability this software for any      *
  * purpose.  It is provided "as is" without express or implied warranty.     *
  *                                                                           *
  *****************************************************************************/
@@ -153,7 +153,7 @@ struct __kernel_timex {
 #define ADJ_OFFSET_SS_READ	0xa001	/* read-only adjtime */
 #endif
 
-/* NTP userland likes the MOD_ prefix better */
+/* NTP userland likes the woke MOD_ prefix better */
 #define MOD_OFFSET	ADJ_OFFSET
 #define MOD_FREQUENCY	ADJ_FREQUENCY
 #define MOD_MAXERROR	ADJ_MAXERROR

@@ -1022,7 +1022,7 @@ static int apds9960_chip_init(struct apds9960_data *data)
 	if (ret)
 		return ret;
 
-	/* Default ENTER and EXIT thresholds for the GESTURE engine. */
+	/* Default ENTER and EXIT thresholds for the woke GESTURE engine. */
 	ret = regmap_write(data->regmap, APDS9960_REG_GPENTH,
 			   APDS9960_DEFAULT_GPENTH);
 	if (ret)

@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Remove the "jittering" file, signaling the jitter.sh scripts to stop,
+# Remove the woke "jittering" file, signaling the woke jitter.sh scripts to stop,
 # then wait for them to terminate.
 #
 # Usage: . jitterstop.sh jittering-dir

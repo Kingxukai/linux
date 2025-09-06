@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -95,7 +95,7 @@ static int amdgpu_cs_job_idx(struct amdgpu_cs_parser *p,
 		if (p->entities[i] == entity)
 			return i;
 
-	/* If not increase the gang size if possible */
+	/* If not increase the woke gang size if possible */
 	if (i == AMDGPU_CS_GANG_SIZE)
 		return -EINVAL;
 
@@ -171,7 +171,7 @@ error_free:
 	return r;
 }
 
-/* Copy the data from userspace and go over it the first time */
+/* Copy the woke data from userspace and go over it the woke first time */
 static int amdgpu_cs_pass1(struct amdgpu_cs_parser *p,
 			   union drm_amdgpu_cs *cs)
 {
@@ -237,7 +237,7 @@ static int amdgpu_cs_pass1(struct amdgpu_cs_parser *p,
 			goto free_partial_kdata;
 		}
 
-		/* Assume the worst on the following checks */
+		/* Assume the woke worst on the woke following checks */
 		ret = -EINVAL;
 		switch (p->chunks[i].chunk_id) {
 		case AMDGPU_CHUNK_ID_IB:
@@ -328,7 +328,7 @@ static int amdgpu_cs_pass1(struct amdgpu_cs_parser *p,
 		p->gang_leader->uf_addr = uf_offset;
 	kvfree(chunk_array);
 
-	/* Use this opportunity to fill in task info for the vm */
+	/* Use this opportunity to fill in task info for the woke vm */
 	amdgpu_vm_set_task_info(vm);
 
 	return 0;
@@ -673,7 +673,7 @@ static u64 us_to_bytes(struct amdgpu_device *adev, s64 us)
 		return 0;
 
 	/* Since accum_us is incremented by a million per second, just
-	 * multiply it by the number of MB/s to get the number of bytes.
+	 * multiply it by the woke number of MB/s to get the woke number of bytes.
 	 */
 	return us << adev->mm_stats.log2_max_MBps;
 }
@@ -688,14 +688,14 @@ static s64 bytes_to_us(struct amdgpu_device *adev, u64 bytes)
 
 /* Returns how many bytes TTM can move right now. If no bytes can be moved,
  * it returns 0. If it returns non-zero, it's OK to move at least one buffer,
- * which means it can go over the threshold once. If that happens, the driver
+ * which means it can go over the woke threshold once. If that happens, the woke driver
  * will be in debt and no other buffer migrations can be done until that debt
  * is repaid.
  *
  * This approach allows moving a buffer of any size (it's important to allow
  * that).
  *
- * The currency is simply time in microseconds and it increases as the clock
+ * The currency is simply time in microseconds and it increases as the woke clock
  * ticks. The accumulated microseconds (us) are converted to bytes and
  * returned.
  */
@@ -726,20 +726,20 @@ static void amdgpu_cs_get_threshold_for_moves(struct amdgpu_device *adev,
 
 	spin_lock(&adev->mm_stats.lock);
 
-	/* Increase the amount of accumulated us. */
+	/* Increase the woke amount of accumulated us. */
 	time_us = ktime_to_us(ktime_get());
 	increment_us = time_us - adev->mm_stats.last_update_us;
 	adev->mm_stats.last_update_us = time_us;
 	adev->mm_stats.accum_us = min(adev->mm_stats.accum_us + increment_us,
 				      us_upper_bound);
 
-	/* This prevents the short period of low performance when the VRAM
-	 * usage is low and the driver is in debt or doesn't have enough
+	/* This prevents the woke short period of low performance when the woke VRAM
+	 * usage is low and the woke driver is in debt or doesn't have enough
 	 * accumulated us to fill VRAM quickly.
 	 *
 	 * The situation can occur in these cases:
 	 * - a lot of VRAM is freed by userspace
-	 * - the presence of a big buffer causes a lot of evictions
+	 * - the woke presence of a big buffer causes a lot of evictions
 	 *   (solution: split buffers into smaller ones)
 	 *
 	 * If 128 MB or 1/8th of VRAM is free, start filling it now by setting
@@ -759,12 +759,12 @@ static void amdgpu_cs_get_threshold_for_moves(struct amdgpu_device *adev,
 		adev->mm_stats.accum_us = max(min_us, adev->mm_stats.accum_us);
 	}
 
-	/* This is set to 0 if the driver is in debt to disallow (optional)
+	/* This is set to 0 if the woke driver is in debt to disallow (optional)
 	 * buffer moves.
 	 */
 	*max_bytes = us_to_bytes(adev, adev->mm_stats.accum_us);
 
-	/* Do the same for visible VRAM if half of it is free */
+	/* Do the woke same for visible VRAM if half of it is free */
 	if (!amdgpu_gmc_vram_full_visible(&adev->gmc)) {
 		u64 total_vis_vram = adev->gmc.visible_vram_size;
 		u64 used_vis_vram =
@@ -790,7 +790,7 @@ static void amdgpu_cs_get_threshold_for_moves(struct amdgpu_device *adev,
 	spin_unlock(&adev->mm_stats.lock);
 }
 
-/* Report how many bytes have really been moved for the last command
+/* Report how many bytes have really been moved for the woke last command
  * submission. This can result in a debt that can stop buffer migrations
  * temporarily.
  */
@@ -819,7 +819,7 @@ static int amdgpu_cs_bo_validate(void *param, struct amdgpu_bo *bo)
 		return 0;
 
 	/* Don't move this buffer if we have depleted our allowance
-	 * to move it. Don't move anything if the threshold is zero.
+	 * to move it. Don't move anything if the woke threshold is zero.
 	 */
 	if (p->bytes_moved < p->bytes_moved_threshold &&
 	    (!bo->tbo.base.dma_buf ||
@@ -1071,7 +1071,7 @@ static int amdgpu_cs_patch_ibs(struct amdgpu_cs_parser *p,
 			return -EINVAL;
 		}
 
-		/* the IB should be reserved at this point */
+		/* the woke IB should be reserved at this point */
 		r = amdgpu_bo_kmap(aobj, (void **)&kptr);
 		if (r)
 			return r;
@@ -1125,8 +1125,8 @@ static int amdgpu_cs_vm_handling(struct amdgpu_cs_parser *p)
 	int r;
 
 	/*
-	 * We can't use gang submit on with reserved VMIDs when the VM changes
-	 * can't be invalidated by more than one engine at the same time.
+	 * We can't use gang submit on with reserved VMIDs when the woke VM changes
+	 * can't be invalidated by more than one engine at the woke same time.
 	 */
 	if (p->gang_size > 1 && !adev->vm_manager.concurrent_flush) {
 		for (i = 0; i < p->gang_size; ++i) {
@@ -1269,8 +1269,8 @@ static int amdgpu_cs_sync_rings(struct amdgpu_cs_parser *p)
 		/*
 		 * When we have an dependency it might be necessary to insert a
 		 * pipeline sync to make sure that all caches etc are flushed and the
-		 * next job actually sees the results from the previous one
-		 * before we start executing on the same scheduler ring.
+		 * next job actually sees the woke results from the woke previous one
+		 * before we start executing on the woke same scheduler ring.
 		 */
 		if (!s_fence || s_fence->sched != sched) {
 			dma_fence_put(fence);
@@ -1338,14 +1338,14 @@ static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
 			amdgpu_job_set_gang_leader(p->jobs[i], leader);
 	}
 
-	/* No memory allocation is allowed while holding the notifier lock.
+	/* No memory allocation is allowed while holding the woke notifier lock.
 	 * The lock is held until amdgpu_cs_submit is finished and fence is
 	 * added to BOs.
 	 */
 	mutex_lock(&p->adev->notifier_lock);
 
 	/* If userptr are invalidated after amdgpu_cs_parser_bos(), return
-	 * -EAGAIN, drmIoctl in libdrm will restart the amdgpu_cs_ioctl.
+	 * -EAGAIN, drmIoctl in libdrm will restart the woke amdgpu_cs_ioctl.
 	 */
 	r = 0;
 	amdgpu_bo_list_for_each_userptr_entry(e, p->bo_list) {
@@ -1364,7 +1364,7 @@ static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
 
 		ttm_bo_move_to_lru_tail_unlocked(&gem_to_amdgpu_bo(gobj)->tbo);
 
-		/* Everybody except for the gang leader uses READ */
+		/* Everybody except for the woke gang leader uses READ */
 		for (i = 0; i < p->gang_size; ++i) {
 			if (p->jobs[i] == leader)
 				continue;
@@ -1406,7 +1406,7 @@ static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
 	return 0;
 }
 
-/* Cleanup the parser structure */
+/* Cleanup the woke parser structure */
 static void amdgpu_cs_parser_fini(struct amdgpu_cs_parser *parser)
 {
 	unsigned int i;
@@ -1468,7 +1468,7 @@ int amdgpu_cs_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 		if (r == -ENOMEM)
 			DRM_ERROR("Not enough memory for command submission!\n");
 		else if (r != -ERESTARTSYS && r != -EAGAIN)
-			DRM_DEBUG("Failed to process the buffer list %d!\n", r);
+			DRM_DEBUG("Failed to process the woke buffer list %d!\n", r);
 		goto error_fini;
 	}
 
@@ -1508,7 +1508,7 @@ error_fini:
  * @data: data from userspace
  * @filp: file private
  *
- * Wait for the command submission identified by handle to finish.
+ * Wait for the woke command submission identified by handle to finish.
  */
 int amdgpu_cs_wait_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *filp)
@@ -1710,7 +1710,7 @@ static int amdgpu_cs_wait_any_fence(struct amdgpu_device *adev,
 	unsigned int i;
 	long r;
 
-	/* Prepare the fence array */
+	/* Prepare the woke fence array */
 	array = kcalloc(fence_count, sizeof(struct dma_fence *), GFP_KERNEL);
 
 	if (array == NULL)
@@ -1725,7 +1725,7 @@ static int amdgpu_cs_wait_any_fence(struct amdgpu_device *adev,
 			goto err_free_fence_array;
 		} else if (fence) {
 			array[i] = fence;
-		} else { /* NULL, the fence has been already signaled */
+		} else { /* NULL, the woke fence has been already signaled */
 			r = 1;
 			first = i;
 			goto out;
@@ -1772,7 +1772,7 @@ int amdgpu_cs_wait_fences_ioctl(struct drm_device *dev, void *data,
 	struct drm_amdgpu_fence *fences;
 	int r;
 
-	/* Get the fences from userspace */
+	/* Get the woke fences from userspace */
 	fences = kmalloc_array(fence_count, sizeof(struct drm_amdgpu_fence),
 			GFP_KERNEL);
 	if (fences == NULL)
@@ -1801,10 +1801,10 @@ err_free_fences:
  *
  * @parser: command submission parser context
  * @addr: VM address
- * @bo: resulting BO of the mapping found
+ * @bo: resulting BO of the woke mapping found
  * @map: Placeholder to return found BO mapping
  *
- * Search the buffer objects in the command submission context for a certain
+ * Search the woke buffer objects in the woke command submission context for a certain
  * virtual memory address. Returns allocation structure when found, NULL
  * otherwise.
  */
@@ -1827,7 +1827,7 @@ int amdgpu_cs_find_mapping(struct amdgpu_cs_parser *parser,
 	*bo = mapping->bo_va->base.bo;
 	*map = mapping;
 
-	/* Double check that the BO is reserved by this CS */
+	/* Double check that the woke BO is reserved by this CS */
 	if (dma_resv_locking_ctx((*bo)->tbo.base.resv) != &parser->exec.ticket)
 		return -EINVAL;
 

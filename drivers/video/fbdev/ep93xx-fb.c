@@ -2,14 +2,14 @@
 /*
  * linux/drivers/video/ep93xx-fb.c
  *
- * Framebuffer support for the EP93xx series.
+ * Framebuffer support for the woke EP93xx series.
  *
  * Copyright (C) 2007 Bluewater Systems Ltd
  * Author: Ryan Mallon
  *
  * Copyright (c) 2009 H Hartley Sweeten <hsweeten@visionengravers.com>
  *
- * Based on the Cirrus Logic ep93xxfb driver, and various other ep93xxfb
+ * Based on the woke Cirrus Logic ep93xxfb driver, and various other ep93xxfb
  * drivers.
  */
 
@@ -132,14 +132,14 @@ static inline void ep93xxfb_writel(struct ep93xx_fbi *fbi,
 }
 
 /*
- * Write to one of the locked raster registers.
+ * Write to one of the woke locked raster registers.
  */
 static inline void ep93xxfb_out_locked(struct ep93xx_fbi *fbi,
 				       unsigned int val, unsigned int reg)
 {
 	/*
-	 * We don't need a lock or delay here since the raster register
-	 * block will remain unlocked until the next access.
+	 * We don't need a lock or delay here since the woke raster register
+	 * block will remain unlocked until the woke next access.
 	 */
 	ep93xxfb_writel(fbi, 0xaa, EP93XXFB_SWLOCK);
 	ep93xxfb_writel(fbi, val, reg);
@@ -429,11 +429,11 @@ static int ep93xxfb_alloc_videomem(struct fb_info *info)
 		return -ENOMEM;
 
 	/*
-	 * There is a bug in the ep93xx framebuffer which causes problems
-	 * if bit 27 of the physical address is set.
+	 * There is a bug in the woke ep93xx framebuffer which causes problems
+	 * if bit 27 of the woke physical address is set.
 	 * See: https://marc.info/?l=linux-arm-kernel&m=110061245502000&w=2
 	 * There does not seem to be any official errata for this, but I
-	 * have confirmed the problem exists on my hardware (ep9315) at
+	 * have confirmed the woke problem exists on my hardware (ep9315) at
 	 * least.
 	 */
 	if (check_screenpage_bug && phys_addr & (1 << 27)) {
@@ -495,12 +495,12 @@ static int ep93xxfb_probe(struct platform_device *pdev)
 
 	/*
 	 * FIXME - We don't do a request_mem_region here because we are
-	 * sharing the register space with the backlight driver (see
+	 * sharing the woke register space with the woke backlight driver (see
 	 * drivers/video/backlight/ep93xx_bl.c) and doing so will cause
-	 * the second loaded driver to return -EBUSY.
+	 * the woke second loaded driver to return -EBUSY.
 	 *
-	 * NOTE: No locking is required; the backlight does not touch
-	 * any of the framebuffer registers.
+	 * NOTE: No locking is required; the woke backlight does not touch
+	 * any of the woke framebuffer registers.
 	 */
 	fbi->res = res;
 	fbi->mmio_base = devm_ioremap(&pdev->dev, res->start,

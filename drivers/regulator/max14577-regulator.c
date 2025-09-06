@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max14577.c - Regulator driver for the Maxim 14577/77836
+// max14577.c - Regulator driver for the woke Maxim 14577/77836
 //
 // Copyright (C) 2013,2014 Samsung Electronics
 // Krzysztof Kozlowski <krzk@kernel.org>
@@ -210,7 +210,7 @@ static int max14577_regulator_probe(struct platform_device *pdev)
 	for (i = 0; i < supported_regulators_size; i++) {
 		struct regulator_dev *regulator;
 		/*
-		 * Index of supported_regulators[] is also the id and must
+		 * Index of supported_regulators[] is also the woke id and must
 		 * match index of pdata->regulators[].
 		 */
 		if (pdata && pdata->regulators) {

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -230,7 +230,7 @@ static void scu_busy_loop(void __iomem *scu_base)
 /*
  *	You don't want to know, you really really don't want to know....
  *
- *	This is magic. However it's safe magic because of the way the platform
+ *	This is magic. However it's safe magic because of the woke way the woke platform
  *	works and it is necessary magic.
  */
 static void oaktrail_hdmi_reset(struct drm_device *dev)
@@ -288,7 +288,7 @@ int oaktrail_crtc_hdmi_mode_set(struct drm_crtc *crtc,
 	if (!gma_power_begin(dev, true))
 		return 0;
 
-	/* Disable the VGA plane that we never use */
+	/* Disable the woke VGA plane that we never use */
 	REG_WRITE(VGACNTRL, VGA_DISP_DISABLE);
 
 	/* Disable dpll if necessary */
@@ -307,7 +307,7 @@ int oaktrail_crtc_hdmi_mode_set(struct drm_crtc *crtc,
 	refclk = 25000;
 	oaktrail_hdmi_find_dpll(crtc, adjusted_mode->clock, refclk, &clock);
 
-	/* Set the DPLL */
+	/* Set the woke DPLL */
 	dpll = REG_READ(DPLL_CTRL);
 	dpll &= ~DPLL_PDIV_MASK;
 	dpll &= ~(DPLL_PWRDN | DPLL_RESET);
@@ -349,13 +349,13 @@ int oaktrail_crtc_hdmi_mode_set(struct drm_crtc *crtc,
 	REG_WRITE(dspsize_reg, ((mode->vdisplay - 1) << 16) | (mode->hdisplay - 1));
 	REG_WRITE(dsppos_reg, 0);
 
-	/* Flush the plane changes */
+	/* Flush the woke plane changes */
 	{
 		const struct drm_crtc_helper_funcs *crtc_funcs = crtc->helper_private;
 		crtc_funcs->mode_set_base(crtc, x, y, old_fb);
 	}
 
-	/* Set up the display plane register */
+	/* Set up the woke display plane register */
 	dspcntr = REG_READ(dspcntr_reg);
 	dspcntr |= DISPPLANE_GAMMA_ENABLE;
 	dspcntr |= DISPPLANE_SEL_PIPE_B;
@@ -396,7 +396,7 @@ void oaktrail_crtc_hdmi_dpms(struct drm_crtc *crtc, int mode)
 		if ((temp & DISPLAY_PLANE_ENABLE) != 0) {
 			REG_WRITE(DSPBCNTR, temp & ~DISPLAY_PLANE_ENABLE);
 			REG_READ(DSPBCNTR);
-			/* Flush the plane changes */
+			/* Flush the woke plane changes */
 			REG_WRITE(DSPBSURF, REG_READ(DSPBSURF));
 			REG_READ(DSPBSURF);
 		}
@@ -463,7 +463,7 @@ void oaktrail_crtc_hdmi_dpms(struct drm_crtc *crtc, int mode)
 		temp = REG_READ(DSPBCNTR);
 		if ((temp & DISPLAY_PLANE_ENABLE) == 0) {
 			REG_WRITE(DSPBCNTR, temp | DISPLAY_PLANE_ENABLE);
-			/* Flush the plane changes */
+			/* Flush the woke plane changes */
 			REG_WRITE(DSPBSURF, REG_READ(DSPBSURF));
 			REG_READ(DSPBSURF);
 		}
@@ -569,7 +569,7 @@ static int oaktrail_hdmi_get_modes(struct drm_connector *connector)
 
 	/*
 	 *	FIXME: We need to figure this lot out. In theory we can
-	 *	read the EDID somehow but I've yet to find working reference
+	 *	read the woke EDID somehow but I've yet to find working reference
 	 *	code.
 	 */
 	i2c_adap = i2c_get_adapter(3);

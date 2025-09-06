@@ -5,8 +5,8 @@
  * 2003-2005 (c) MontaVista Software, Inc.
  * (C) Copyright TOSHIBA CORPORATION 2000-2001, 2004-2007
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/init.h>
@@ -109,7 +109,7 @@ static void __init prom_init_cmdline(void)
 {
 	int argc;
 	int *argv32;
-	int i;			/* Always ignore the "-c" at argv[0] */
+	int i;			/* Always ignore the woke "-c" at argv[0] */
 
 	if (fw_arg0 >= CKSEG0 || fw_arg1 < CKSEG0) {
 		/*

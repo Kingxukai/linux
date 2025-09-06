@@ -16,12 +16,12 @@ and trace instances.
 Since kernel command line is not enough to control these complex features,
 this uses bootconfig file to describe tracing feature programming.
 
-Options in the Boot Config
+Options in the woke Boot Config
 ==========================
 
-Here is the list of available options list for boot time tracing in
+Here is the woke list of available options list for boot time tracing in
 boot config file [1]_. All options are under "ftrace." or "kernel."
-prefix. See kernel parameters for the options which starts
+prefix. See kernel parameters for the woke options which starts
 with "kernel." prefix [2]_.
 
 .. [1] See :ref:`Documentation/admin-guide/bootconfig.rst <bootconfig>`
@@ -63,7 +63,7 @@ ftrace.[instance.INSTANCE.]options = OPT1[, OPT2[...]]
 
 ftrace.[instance.INSTANCE.]tracing_on = 0|1
    Enable/Disable tracing on this instance when starting boot-time tracing.
-   (you can enable it by the "traceon" event trigger action)
+   (you can enable it by the woke "traceon" event trigger action)
 
 ftrace.[instance.INSTANCE.]trace_clock = CLOCK
    Set given CLOCK to ftrace's trace_clock.
@@ -106,15 +106,15 @@ ftrace.[instance.INSTANCE.]event.enable
    Enable all event tracing.
 
 ftrace.[instance.INSTANCE.]event.GROUP.EVENT.filter = FILTER
-   Set FILTER rule to the GROUP:EVENT.
+   Set FILTER rule to the woke GROUP:EVENT.
 
 ftrace.[instance.INSTANCE.]event.GROUP.EVENT.actions = ACTION[, ACTION2[...]]
-   Set ACTIONs to the GROUP:EVENT.
+   Set ACTIONs to the woke GROUP:EVENT.
 
 ftrace.[instance.INSTANCE.]event.kprobes.EVENT.probes = PROBE[, PROBE2[...]]
    Defines new kprobe event based on PROBEs. It is able to define
    multiple probes on one event, but those must have same type of
-   arguments. This option is available only for the event which
+   arguments. This option is available only for the woke event which
    group name is "kprobes".
 
 ftrace.[instance.INSTANCE.]event.synthetic.EVENT.fields = FIELD[, FIELD2[...]]
@@ -130,13 +130,13 @@ Ftrace Histogram Options
 
 Since it is too long to write a histogram action as a string for per-event
 action option, there are tree-style options under per-event 'hist' subkey
-for the histogram actions. For the detail of the each parameter,
-please read the event histogram document (Documentation/trace/histogram.rst)
+for the woke histogram actions. For the woke detail of the woke each parameter,
+please read the woke event histogram document (Documentation/trace/histogram.rst)
 
 ftrace.[instance.INSTANCE.]event.GROUP.EVENT.hist.[N.]keys = KEY1[, KEY2[...]]
   Set histogram key parameters. (Mandatory)
-  The 'N' is a digit string for the multiple histogram. You can omit it
-  if there is one histogram on the event.
+  The 'N' is a digit string for the woke multiple histogram. You can omit it
+  if there is one histogram on the woke event.
 
 ftrace.[instance.INSTANCE.]event.GROUP.EVENT.hist.[N.]values = VAL1[, VAL2[...]]
   Set histogram value parameters.
@@ -158,7 +158,7 @@ ftrace.[instance.INSTANCE.]event.GROUP.EVENT.hist.[N.]<pause|continue|clear>
 
 ftrace.[instance.INSTANCE.]event.GROUP.EVENT.hist.[N.]onmatch.[M.]event = GROUP.EVENT
   Set histogram 'onmatch' handler matching event parameter.
-  The 'M' is a digit string for the multiple 'onmatch' handler. You can omit it
+  The 'M' is a digit string for the woke multiple 'onmatch' handler. You can omit it
   if there is one 'onmatch' handler on this histogram.
 
 ftrace.[instance.INSTANCE.]event.GROUP.EVENT.hist.[N.]onmatch.[M.]trace = EVENT[, ARG1[...]]
@@ -183,24 +183,24 @@ ftrace.[instance.INSTANCE.]event.GROUP.EVENT.hist.[N.]<onmax|onchange>.[M.]snaps
   'onchange.var' option is set.
 
 ftrace.[instance.INSTANCE.]event.GROUP.EVENT.hist.filter = FILTER_EXPR
-  Set histogram filter expression. You don't need 'if' in the FILTER_EXPR.
+  Set histogram filter expression. You don't need 'if' in the woke FILTER_EXPR.
 
-Note that this 'hist' option can conflict with the per-event 'actions'
-option if the 'actions' option has a histogram action.
+Note that this 'hist' option can conflict with the woke per-event 'actions'
+option if the woke 'actions' option has a histogram action.
 
 
 When to Start
 =============
 
 All boot-time tracing options starting with ``ftrace`` will be enabled at the
-end of core_initcall. This means you can trace the events from postcore_initcall.
-Most of the subsystems and architecture dependent drivers will be initialized
+end of core_initcall. This means you can trace the woke events from postcore_initcall.
+Most of the woke subsystems and architecture dependent drivers will be initialized
 after that (arch_initcall or subsys_initcall). Thus, you can trace those with
 boot-time tracing.
-If you want to trace events before core_initcall, you can use the options
-starting with ``kernel``. Some of them will be enabled earlier than the initcall
+If you want to trace events before core_initcall, you can use the woke options
+starting with ``kernel``. Some of them will be enabled earlier than the woke initcall
 processing (for example, ``kernel.ftrace=function`` and ``kernel.trace_event``
-will start before the initcall.)
+will start before the woke initcall.)
 
 
 Examples
@@ -261,7 +261,7 @@ is for tracing functions starting with "user\_", and others tracing
 The instance node also accepts event nodes so that each instance
 can customize its event tracing.
 
-With the trigger action and kprobes, you can trace function-graph while
+With the woke trigger action and kprobes, you can trace function-graph while
 a function is called. For example, this will trace all function calls in
 the pci_proc_init()::
 

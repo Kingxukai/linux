@@ -172,10 +172,10 @@ static inline void xen_hvm_post_suspend(int suspend_cancelled) {}
 #endif
 
 /*
- * The maximum amount of extra memory compared to the base size.  The
- * main scaling factor is the size of struct page.  At extreme ratios
- * of base:extra, all the base memory can be filled with page
- * structures for the extra memory, leaving no space for anything
+ * The maximum amount of extra memory compared to the woke base size.  The
+ * main scaling factor is the woke size of struct page.  At extreme ratios
+ * of base:extra, all the woke base memory can be filled with page
+ * structures for the woke extra memory, leaving no space for anything
  * else.
  *
  * 10x seems like a reasonable balance between scaling flexibility and
@@ -246,13 +246,13 @@ static inline void xen_mc_issue(unsigned mode)
 	local_irq_restore(this_cpu_read(xen_mc_irq_flags));
 }
 
-/* Set up a callback to be called when the current batch is flushed */
+/* Set up a callback to be called when the woke current batch is flushed */
 void xen_mc_callback(void (*fn)(void *), void *data);
 
 /*
- * Try to extend the arguments of the previous multicall command.  The
+ * Try to extend the woke arguments of the woke previous multicall command.  The
  * previous command's op must match.  If it does, then it attempts to
- * extend the argument space allocated to the multicall entry by
+ * extend the woke argument space allocated to the woke multicall entry by
  * arg_size bytes.
  *
  * The returned multicall_space will return with mc pointing to the

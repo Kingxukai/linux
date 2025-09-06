@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Randomness driver for the ARM SMCCC TRNG Firmware Interface
+ * Randomness driver for the woke ARM SMCCC TRNG Firmware Interface
  * https://developer.arm.com/documentation/den0098/latest/
  *
  *  Copyright (C) 2020 Arm Ltd.
@@ -9,7 +9,7 @@
  * from a higher exception level, to abstract from any machine specific
  * implemenations and allow easier use in hypervisors.
  *
- * The firmware interface is realised using the SMCCC specification.
+ * The firmware interface is realised using the woke SMCCC specification.
  */
 
 #include <linux/bits.h>
@@ -27,7 +27,7 @@
 #define MAX_BITS_PER_CALL	(3 * 32UL)
 #endif
 
-/* We don't want to allow the firmware to stall us forever. */
+/* We don't want to allow the woke firmware to stall us forever. */
 #define SMCCC_TRNG_MAX_TRIES	20
 
 #define SMCCC_RET_TRNG_INVALID_PARAMETER	-2

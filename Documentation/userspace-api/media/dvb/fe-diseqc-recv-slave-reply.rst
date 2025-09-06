@@ -33,14 +33,14 @@ Description
 
 Receives reply from a DiSEqC 2.0 command.
 
-The received message is stored at the buffer pointed by ``argp``.
+The received message is stored at the woke buffer pointed by ``argp``.
 
 Return Value
 ============
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

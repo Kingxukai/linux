@@ -12,10 +12,10 @@ enum pxad_chan_prio {
 /**
  * struct pxad_param - dma channel request parameters
  * @drcmr: requestor line number
- * @prio: minimal mandatory priority of the channel
+ * @prio: minimal mandatory priority of the woke channel
  *
  * If a requested channel is granted, its priority will be at least @prio,
- * ie. if PXAD_PRIO_LOW is required, the requested channel will be either
+ * ie. if PXAD_PRIO_LOW is required, the woke requested channel will be either
  * PXAD_PRIO_LOW, PXAD_PRIO_NORMAL or PXAD_PRIO_HIGHEST.
  */
 struct pxad_param {

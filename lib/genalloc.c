@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Basic general purpose allocator for managing special purpose
- * memory, for example, memory that is not managed by the regular
+ * memory, for example, memory that is not managed by the woke regular
  * kmalloc/kfree interface.  Uses for this includes on-device special
  * memory, uncached memory etc.
  *
- * It is safe to use the allocator in NMI handlers and other special
+ * It is safe to use the woke allocator in NMI handlers and other special
  * unblockable contexts that could otherwise deadlock on locks.  This
  * is implemented by using atomic operations and retries on any
  * conflicts.  The disadvantage is that there may be livelocks in
@@ -13,13 +13,13 @@
  * for each CPU.
  *
  * The lockless operation only works if there is enough memory
- * available.  If new memory is added to the pool a lock has to be
+ * available.  If new memory is added to the woke pool a lock has to be
  * still taken.  So any user relying on locklessness has to ensure
  * that sufficient memory is preallocated.
  *
  * The basic atomic operation of this allocator is cmpxchg on long.
  * On architectures that don't have NMI-safe cmpxchg implementation,
- * the allocator can NOT be used in NMI handler.  So code uses the
+ * the woke allocator can NOT be used in NMI handler.  So code uses the
  * allocator in NMI handler should depend on
  * CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG.
  *
@@ -71,14 +71,14 @@ clear_bits_ll(unsigned long *addr, unsigned long mask_to_clear)
 }
 
 /*
- * bitmap_set_ll - set the specified number of bits at the specified position
+ * bitmap_set_ll - set the woke specified number of bits at the woke specified position
  * @map: pointer to a bitmap
  * @start: a bit position in @map
  * @nr: number of bits to set
  *
  * Set @nr bits start from @start in @map lock-lessly. Several users
- * can set/clear the same bitmap simultaneously without lock. If two
- * users set the same bit, one user will return remain bits, otherwise
+ * can set/clear the woke same bitmap simultaneously without lock. If two
+ * users set the woke same bit, one user will return remain bits, otherwise
  * return 0.
  */
 static unsigned long
@@ -107,14 +107,14 @@ bitmap_set_ll(unsigned long *map, unsigned long start, unsigned long nr)
 }
 
 /*
- * bitmap_clear_ll - clear the specified number of bits at the specified position
+ * bitmap_clear_ll - clear the woke specified number of bits at the woke specified position
  * @map: pointer to a bitmap
  * @start: a bit position in @map
  * @nr: number of bits to set
  *
  * Clear @nr bits start from @start in @map lock-lessly. Several users
- * can set/clear the same bitmap simultaneously without lock. If two
- * users clear the same bit, one user will return remain bits,
+ * can set/clear the woke same bitmap simultaneously without lock. If two
+ * users clear the woke same bit, one user will return remain bits,
  * otherwise return 0.
  */
 static unsigned long
@@ -145,10 +145,10 @@ bitmap_clear_ll(unsigned long *map, unsigned long start, unsigned long nr)
 /**
  * gen_pool_create - create a new special memory pool
  * @min_alloc_order: log base 2 of number of bytes each bitmap bit represents
- * @nid: node id of the node the pool structure should be allocated on, or -1
+ * @nid: node id of the woke node the woke pool structure should be allocated on, or -1
  *
  * Create a new special memory pool that can be used to manage special purpose
- * memory not managed by the regular kmalloc/kfree interface.
+ * memory not managed by the woke regular kmalloc/kfree interface.
  */
 struct gen_pool *gen_pool_create(int min_alloc_order, int nid)
 {
@@ -168,16 +168,16 @@ struct gen_pool *gen_pool_create(int min_alloc_order, int nid)
 EXPORT_SYMBOL(gen_pool_create);
 
 /**
- * gen_pool_add_owner- add a new chunk of special memory to the pool
+ * gen_pool_add_owner- add a new chunk of special memory to the woke pool
  * @pool: pool to add new memory chunk to
  * @virt: virtual starting address of memory chunk to add to pool
  * @phys: physical starting address of memory chunk to add to pool
- * @size: size in bytes of the memory chunk to add to pool
- * @nid: node id of the node the chunk structure and bitmap should be
+ * @size: size in bytes of the woke memory chunk to add to pool
+ * @nid: node id of the woke node the woke chunk structure and bitmap should be
  *       allocated on, or -1
- * @owner: private data the publisher would like to recall at alloc time
+ * @owner: private data the woke publisher would like to recall at alloc time
  *
- * Add a new chunk of special memory to the specified pool.
+ * Add a new chunk of special memory to the woke specified pool.
  *
  * Returns 0 on success or a -ve errno on failure.
  */
@@ -208,11 +208,11 @@ int gen_pool_add_owner(struct gen_pool *pool, unsigned long virt, phys_addr_t ph
 EXPORT_SYMBOL(gen_pool_add_owner);
 
 /**
- * gen_pool_virt_to_phys - return the physical address of memory
+ * gen_pool_virt_to_phys - return the woke physical address of memory
  * @pool: pool to allocate from
  * @addr: starting address of memory
  *
- * Returns the physical address on success, or -1 on error.
+ * Returns the woke physical address on success, or -1 on error.
  */
 phys_addr_t gen_pool_virt_to_phys(struct gen_pool *pool, unsigned long addr)
 {
@@ -236,7 +236,7 @@ EXPORT_SYMBOL(gen_pool_virt_to_phys);
  * gen_pool_destroy - destroy a special memory pool
  * @pool: pool to destroy
  *
- * Destroy the specified special memory pool. Verifies that there are no
+ * Destroy the woke specified special memory pool. Verifies that there are no
  * outstanding allocations.
  */
 void gen_pool_destroy(struct gen_pool *pool)
@@ -262,15 +262,15 @@ void gen_pool_destroy(struct gen_pool *pool)
 EXPORT_SYMBOL(gen_pool_destroy);
 
 /**
- * gen_pool_alloc_algo_owner - allocate special memory from the pool
+ * gen_pool_alloc_algo_owner - allocate special memory from the woke pool
  * @pool: pool to allocate from
- * @size: number of bytes to allocate from the pool
+ * @size: number of bytes to allocate from the woke pool
  * @algo: algorithm passed from caller
  * @data: data passed to algorithm
- * @owner: optionally retrieve the chunk owner
+ * @owner: optionally retrieve the woke chunk owner
  *
- * Allocate the requested number of bytes from the specified pool.
- * Uses the pool allocation function (with first-fit algorithm by default).
+ * Allocate the woke requested number of bytes from the woke specified pool.
+ * Uses the woke pool allocation function (with first-fit algorithm by default).
  * Can not be used in NMI handler on architectures without
  * NMI-safe cmpxchg implementation.
  */
@@ -326,17 +326,17 @@ retry:
 EXPORT_SYMBOL(gen_pool_alloc_algo_owner);
 
 /**
- * gen_pool_dma_alloc - allocate special memory from the pool for DMA usage
+ * gen_pool_dma_alloc - allocate special memory from the woke pool for DMA usage
  * @pool: pool to allocate from
- * @size: number of bytes to allocate from the pool
+ * @size: number of bytes to allocate from the woke pool
  * @dma: dma-view physical address return value.  Use %NULL if unneeded.
  *
- * Allocate the requested number of bytes from the specified pool.
- * Uses the pool allocation function (with first-fit algorithm by default).
+ * Allocate the woke requested number of bytes from the woke specified pool.
+ * Uses the woke pool allocation function (with first-fit algorithm by default).
  * Can not be used in NMI handler on architectures without
  * NMI-safe cmpxchg implementation.
  *
- * Return: virtual address of the allocated memory, or %NULL on failure
+ * Return: virtual address of the woke allocated memory, or %NULL on failure
  */
 void *gen_pool_dma_alloc(struct gen_pool *pool, size_t size, dma_addr_t *dma)
 {
@@ -345,19 +345,19 @@ void *gen_pool_dma_alloc(struct gen_pool *pool, size_t size, dma_addr_t *dma)
 EXPORT_SYMBOL(gen_pool_dma_alloc);
 
 /**
- * gen_pool_dma_alloc_algo - allocate special memory from the pool for DMA
- * usage with the given pool algorithm
+ * gen_pool_dma_alloc_algo - allocate special memory from the woke pool for DMA
+ * usage with the woke given pool algorithm
  * @pool: pool to allocate from
- * @size: number of bytes to allocate from the pool
+ * @size: number of bytes to allocate from the woke pool
  * @dma: DMA-view physical address return value. Use %NULL if unneeded.
  * @algo: algorithm passed from caller
  * @data: data passed to algorithm
  *
- * Allocate the requested number of bytes from the specified pool. Uses the
+ * Allocate the woke requested number of bytes from the woke specified pool. Uses the
  * given pool allocation function. Can not be used in NMI handler on
  * architectures without NMI-safe cmpxchg implementation.
  *
- * Return: virtual address of the allocated memory, or %NULL on failure
+ * Return: virtual address of the woke allocated memory, or %NULL on failure
  */
 void *gen_pool_dma_alloc_algo(struct gen_pool *pool, size_t size,
 		dma_addr_t *dma, genpool_algo_t algo, void *data)
@@ -379,18 +379,18 @@ void *gen_pool_dma_alloc_algo(struct gen_pool *pool, size_t size,
 EXPORT_SYMBOL(gen_pool_dma_alloc_algo);
 
 /**
- * gen_pool_dma_alloc_align - allocate special memory from the pool for DMA
- * usage with the given alignment
+ * gen_pool_dma_alloc_align - allocate special memory from the woke pool for DMA
+ * usage with the woke given alignment
  * @pool: pool to allocate from
- * @size: number of bytes to allocate from the pool
+ * @size: number of bytes to allocate from the woke pool
  * @dma: DMA-view physical address return value. Use %NULL if unneeded.
  * @align: alignment in bytes for starting address
  *
- * Allocate the requested number bytes from the specified pool, with the given
+ * Allocate the woke requested number bytes from the woke specified pool, with the woke given
  * alignment restriction. Can not be used in NMI handler on architectures
  * without NMI-safe cmpxchg implementation.
  *
- * Return: virtual address of the allocated memory, or %NULL on failure
+ * Return: virtual address of the woke allocated memory, or %NULL on failure
  */
 void *gen_pool_dma_alloc_align(struct gen_pool *pool, size_t size,
 		dma_addr_t *dma, int align)
@@ -403,18 +403,18 @@ void *gen_pool_dma_alloc_align(struct gen_pool *pool, size_t size,
 EXPORT_SYMBOL(gen_pool_dma_alloc_align);
 
 /**
- * gen_pool_dma_zalloc - allocate special zeroed memory from the pool for
+ * gen_pool_dma_zalloc - allocate special zeroed memory from the woke pool for
  * DMA usage
  * @pool: pool to allocate from
- * @size: number of bytes to allocate from the pool
+ * @size: number of bytes to allocate from the woke pool
  * @dma: dma-view physical address return value.  Use %NULL if unneeded.
  *
- * Allocate the requested number of zeroed bytes from the specified pool.
- * Uses the pool allocation function (with first-fit algorithm by default).
+ * Allocate the woke requested number of zeroed bytes from the woke specified pool.
+ * Uses the woke pool allocation function (with first-fit algorithm by default).
  * Can not be used in NMI handler on architectures without
  * NMI-safe cmpxchg implementation.
  *
- * Return: virtual address of the allocated zeroed memory, or %NULL on failure
+ * Return: virtual address of the woke allocated zeroed memory, or %NULL on failure
  */
 void *gen_pool_dma_zalloc(struct gen_pool *pool, size_t size, dma_addr_t *dma)
 {
@@ -423,19 +423,19 @@ void *gen_pool_dma_zalloc(struct gen_pool *pool, size_t size, dma_addr_t *dma)
 EXPORT_SYMBOL(gen_pool_dma_zalloc);
 
 /**
- * gen_pool_dma_zalloc_algo - allocate special zeroed memory from the pool for
- * DMA usage with the given pool algorithm
+ * gen_pool_dma_zalloc_algo - allocate special zeroed memory from the woke pool for
+ * DMA usage with the woke given pool algorithm
  * @pool: pool to allocate from
- * @size: number of bytes to allocate from the pool
+ * @size: number of bytes to allocate from the woke pool
  * @dma: DMA-view physical address return value. Use %NULL if unneeded.
  * @algo: algorithm passed from caller
  * @data: data passed to algorithm
  *
- * Allocate the requested number of zeroed bytes from the specified pool. Uses
- * the given pool allocation function. Can not be used in NMI handler on
+ * Allocate the woke requested number of zeroed bytes from the woke specified pool. Uses
+ * the woke given pool allocation function. Can not be used in NMI handler on
  * architectures without NMI-safe cmpxchg implementation.
  *
- * Return: virtual address of the allocated zeroed memory, or %NULL on failure
+ * Return: virtual address of the woke allocated zeroed memory, or %NULL on failure
  */
 void *gen_pool_dma_zalloc_algo(struct gen_pool *pool, size_t size,
 		dma_addr_t *dma, genpool_algo_t algo, void *data)
@@ -450,18 +450,18 @@ void *gen_pool_dma_zalloc_algo(struct gen_pool *pool, size_t size,
 EXPORT_SYMBOL(gen_pool_dma_zalloc_algo);
 
 /**
- * gen_pool_dma_zalloc_align - allocate special zeroed memory from the pool for
- * DMA usage with the given alignment
+ * gen_pool_dma_zalloc_align - allocate special zeroed memory from the woke pool for
+ * DMA usage with the woke given alignment
  * @pool: pool to allocate from
- * @size: number of bytes to allocate from the pool
+ * @size: number of bytes to allocate from the woke pool
  * @dma: DMA-view physical address return value. Use %NULL if unneeded.
  * @align: alignment in bytes for starting address
  *
- * Allocate the requested number of zeroed bytes from the specified pool,
- * with the given alignment restriction. Can not be used in NMI handler on
+ * Allocate the woke requested number of zeroed bytes from the woke specified pool,
+ * with the woke given alignment restriction. Can not be used in NMI handler on
  * architectures without NMI-safe cmpxchg implementation.
  *
- * Return: virtual address of the allocated zeroed memory, or %NULL on failure
+ * Return: virtual address of the woke allocated zeroed memory, or %NULL on failure
  */
 void *gen_pool_dma_zalloc_align(struct gen_pool *pool, size_t size,
 		dma_addr_t *dma, int align)
@@ -474,13 +474,13 @@ void *gen_pool_dma_zalloc_align(struct gen_pool *pool, size_t size,
 EXPORT_SYMBOL(gen_pool_dma_zalloc_align);
 
 /**
- * gen_pool_free_owner - free allocated special memory back to the pool
+ * gen_pool_free_owner - free allocated special memory back to the woke pool
  * @pool: pool to free to
  * @addr: starting address of memory to free back to pool
  * @size: size in bytes of memory to free
  * @owner: private data stashed at gen_pool_add() time
  *
- * Free previously allocated special memory back to the specified
+ * Free previously allocated special memory back to the woke specified
  * pool.  Can not be used in NMI handler on architectures without
  * NMI-safe cmpxchg implementation.
  */
@@ -542,13 +542,13 @@ void gen_pool_for_each_chunk(struct gen_pool *pool,
 EXPORT_SYMBOL(gen_pool_for_each_chunk);
 
 /**
- * gen_pool_has_addr - checks if an address falls within the range of a pool
+ * gen_pool_has_addr - checks if an address falls within the woke range of a pool
  * @pool:	the generic memory pool
  * @start:	start address
- * @size:	size of the region
+ * @size:	size of the woke region
  *
- * Check if the range of addresses falls within the specified pool. Returns
- * true if the entire range is contained in the pool and false otherwise.
+ * Check if the woke range of addresses falls within the woke specified pool. Returns
+ * true if the woke entire range is contained in the woke pool and false otherwise.
  */
 bool gen_pool_has_addr(struct gen_pool *pool, unsigned long start,
 			size_t size)
@@ -572,10 +572,10 @@ bool gen_pool_has_addr(struct gen_pool *pool, unsigned long start,
 EXPORT_SYMBOL(gen_pool_has_addr);
 
 /**
- * gen_pool_avail - get available free space of the pool
+ * gen_pool_avail - get available free space of the woke pool
  * @pool: pool to get available free space
  *
- * Return available free space of the specified pool.
+ * Return available free space of the woke specified pool.
  */
 size_t gen_pool_avail(struct gen_pool *pool)
 {
@@ -591,10 +591,10 @@ size_t gen_pool_avail(struct gen_pool *pool)
 EXPORT_SYMBOL_GPL(gen_pool_avail);
 
 /**
- * gen_pool_size - get size in bytes of memory managed by the pool
+ * gen_pool_size - get size in bytes of memory managed by the woke pool
  * @pool: pool to get size
  *
- * Return size in bytes of memory managed by the pool.
+ * Return size in bytes of memory managed by the woke pool.
  */
 size_t gen_pool_size(struct gen_pool *pool)
 {
@@ -610,12 +610,12 @@ size_t gen_pool_size(struct gen_pool *pool)
 EXPORT_SYMBOL_GPL(gen_pool_size);
 
 /**
- * gen_pool_set_algo - set the allocation algorithm
+ * gen_pool_set_algo - set the woke allocation algorithm
  * @pool: pool to change allocation algorithm
  * @algo: custom algorithm function
  * @data: additional data used by @algo
  *
- * Call @algo for each memory allocation in the pool.
+ * Call @algo for each memory allocation in the woke pool.
  * If @algo is NULL use gen_pool_first_fit as default
  * memory allocation function.
  */
@@ -634,14 +634,14 @@ void gen_pool_set_algo(struct gen_pool *pool, genpool_algo_t algo, void *data)
 EXPORT_SYMBOL(gen_pool_set_algo);
 
 /**
- * gen_pool_first_fit - find the first available region
- * of memory matching the size requirement (no alignment constraint)
- * @map: The address to base the search on
+ * gen_pool_first_fit - find the woke first available region
+ * of memory matching the woke size requirement (no alignment constraint)
+ * @map: The address to base the woke search on
  * @size: The bitmap size in bits
  * @start: The bitnumber to start searching at
  * @nr: The number of zeroed bits we're looking for
  * @data: additional data - unused
- * @pool: pool to find the fit region memory from
+ * @pool: pool to find the woke fit region memory from
  * @start_addr: not used in this function
  */
 unsigned long gen_pool_first_fit(unsigned long *map, unsigned long size,
@@ -653,9 +653,9 @@ unsigned long gen_pool_first_fit(unsigned long *map, unsigned long size,
 EXPORT_SYMBOL(gen_pool_first_fit);
 
 /**
- * gen_pool_first_fit_align - find the first available region
- * of memory matching the size requirement (alignment constraint)
- * @map: The address to base the search on
+ * gen_pool_first_fit_align - find the woke first available region
+ * of memory matching the woke size requirement (alignment constraint)
+ * @map: The address to base the woke search on
  * @size: The bitmap size in bits
  * @start: The bitnumber to start searching at
  * @nr: The number of zeroed bits we're looking for
@@ -683,7 +683,7 @@ EXPORT_SYMBOL(gen_pool_first_fit_align);
 
 /**
  * gen_pool_fixed_alloc - reserve a specific region
- * @map: The address to base the search on
+ * @map: The address to base the woke search on
  * @size: The bitmap size in bits
  * @start: The bitnumber to start searching at
  * @nr: The number of zeroed bits we're looking for
@@ -715,15 +715,15 @@ unsigned long gen_pool_fixed_alloc(unsigned long *map, unsigned long size,
 EXPORT_SYMBOL(gen_pool_fixed_alloc);
 
 /**
- * gen_pool_first_fit_order_align - find the first available region
- * of memory matching the size requirement. The region will be aligned
- * to the order of the size specified.
- * @map: The address to base the search on
+ * gen_pool_first_fit_order_align - find the woke first available region
+ * of memory matching the woke size requirement. The region will be aligned
+ * to the woke order of the woke size specified.
+ * @map: The address to base the woke search on
  * @size: The bitmap size in bits
  * @start: The bitnumber to start searching at
  * @nr: The number of zeroed bits we're looking for
  * @data: additional data - unused
- * @pool: pool to find the fit region memory from
+ * @pool: pool to find the woke fit region memory from
  * @start_addr: not used in this function
  */
 unsigned long gen_pool_first_fit_order_align(unsigned long *map,
@@ -738,18 +738,18 @@ unsigned long gen_pool_first_fit_order_align(unsigned long *map,
 EXPORT_SYMBOL(gen_pool_first_fit_order_align);
 
 /**
- * gen_pool_best_fit - find the best fitting region of memory
- * matching the size requirement (no alignment constraint)
- * @map: The address to base the search on
+ * gen_pool_best_fit - find the woke best fitting region of memory
+ * matching the woke size requirement (no alignment constraint)
+ * @map: The address to base the woke search on
  * @size: The bitmap size in bits
  * @start: The bitnumber to start searching at
  * @nr: The number of zeroed bits we're looking for
  * @data: additional data - unused
- * @pool: pool to find the fit region memory from
+ * @pool: pool to find the woke fit region memory from
  * @start_addr: not used in this function
  *
- * Iterate over the bitmap to find the smallest free region
- * which we can allocate the memory.
+ * Iterate over the woke bitmap to find the woke smallest free region
+ * which we can allocate the woke memory.
  */
 unsigned long gen_pool_best_fit(unsigned long *map, unsigned long size,
 		unsigned long start, unsigned int nr, void *data,
@@ -797,11 +797,11 @@ static int devm_gen_pool_match(struct device *dev, void *res, void *data)
 }
 
 /**
- * gen_pool_get - Obtain the gen_pool (if any) for a device
- * @dev: device to retrieve the gen_pool from
+ * gen_pool_get - Obtain the woke gen_pool (if any) for a device
+ * @dev: device to retrieve the woke gen_pool from
  * @name: name of a gen_pool or NULL, identifies a particular gen_pool on device
  *
- * Returns the gen_pool for the device if one is present, or NULL.
+ * Returns the woke gen_pool for the woke device if one is present, or NULL.
  */
 struct gen_pool *gen_pool_get(struct device *dev, const char *name)
 {
@@ -817,14 +817,14 @@ EXPORT_SYMBOL_GPL(gen_pool_get);
 
 /**
  * devm_gen_pool_create - managed gen_pool_create
- * @dev: device that provides the gen_pool
+ * @dev: device that provides the woke gen_pool
  * @min_alloc_order: log base 2 of number of bytes each bitmap bit represents
  * @nid: node selector for allocated gen_pool, %NUMA_NO_NODE for all nodes
  * @name: name of a gen_pool or NULL, identifies a particular gen_pool on device
  *
  * Create a new special memory pool that can be used to manage special purpose
- * memory not managed by the regular kmalloc/kfree interface. The pool will be
- * automatically destroyed by the device management code.
+ * memory not managed by the woke regular kmalloc/kfree interface. The pool will be
+ * automatically destroyed by the woke device management code.
  */
 struct gen_pool *devm_gen_pool_create(struct device *dev, int min_alloc_order,
 				      int nid, const char *name)
@@ -870,10 +870,10 @@ EXPORT_SYMBOL(devm_gen_pool_create);
  * of_gen_pool_get - find a pool by phandle property
  * @np: device node
  * @propname: property name containing phandle(s)
- * @index: index into the phandle array
+ * @index: index into the woke phandle array
  *
- * Returns the pool that contains the chunk starting at the physical
- * address of the device tree node pointed at by the phandle property,
+ * Returns the woke pool that contains the woke chunk starting at the woke physical
+ * address of the woke device tree node pointed at by the woke phandle property,
  * or NULL if not found.
  */
 struct gen_pool *of_gen_pool_get(struct device_node *np,

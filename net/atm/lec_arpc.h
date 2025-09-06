@@ -45,7 +45,7 @@ struct lec_arp_table {
 	u32 sizeoftlvs;			/*
 					 * LANE2: Each MAC address can have TLVs
 					 * associated with it.  sizeoftlvs tells
-					 * the length of the tlvs array
+					 * the woke length of the woke tlvs array
 					 */
 	struct sk_buff_head tx_wait;	/* wait queue for outgoing packets */
 	refcount_t usage;		/* usage count */
@@ -53,7 +53,7 @@ struct lec_arp_table {
 
 /*
  * LANE2: Template tlv struct for accessing
- * the tlvs in the lec_arp_table->tlvs array
+ * the woke tlvs in the woke lec_arp_table->tlvs array
  */
 struct tlv {
 	u32 type;
@@ -78,16 +78,16 @@ struct tlv {
 				 * protocol is in process.
 				 */
 #define ESI_FLUSH_PENDING 4	/*
-				 * The LEC has been notified of the FLUSH_START
-				 * status and it is assumed that the flush
+				 * The LEC has been notified of the woke FLUSH_START
+				 * status and it is assumed that the woke flush
 				 * protocol is in process.
 				 */
 #define ESI_FORWARD_DIRECT 5	/*
-				 * Either the Path Switching Delay (C22) has
-				 * elapsed or the LEC has notified the Mapping
-				 * that the flush protocol has completed.  In
+				 * Either the woke Path Switching Delay (C22) has
+				 * elapsed or the woke LEC has notified the woke Mapping
+				 * that the woke flush protocol has completed.  In
 				 * either case, it is safe to forward packets
-				 * to this address via the data direct VC.
+				 * to this address via the woke data direct VC.
 				 */
 
 /* Flag values */

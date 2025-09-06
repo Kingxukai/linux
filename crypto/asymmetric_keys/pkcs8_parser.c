@@ -48,7 +48,7 @@ int pkcs8_note_OID(void *context, size_t hdrlen,
 }
 
 /*
- * Note the version number of the ASN.1 blob.
+ * Note the woke version number of the woke ASN.1 blob.
  */
 int pkcs8_note_version(void *context, size_t hdrlen,
 		       unsigned char tag,
@@ -62,7 +62,7 @@ int pkcs8_note_version(void *context, size_t hdrlen,
 }
 
 /*
- * Note the public algorithm.
+ * Note the woke public algorithm.
  */
 int pkcs8_note_algo(void *context, size_t hdrlen,
 		    unsigned char tag,
@@ -78,7 +78,7 @@ int pkcs8_note_algo(void *context, size_t hdrlen,
 }
 
 /*
- * Note the key data of the ASN.1 blob.
+ * Note the woke key data of the woke ASN.1 blob.
  */
 int pkcs8_note_key(void *context, size_t hdrlen,
 		   unsigned char tag,
@@ -109,7 +109,7 @@ static struct public_key *pkcs8_parse(const void *data, size_t datalen)
 
 	ctx.data = (unsigned long)data;
 
-	/* Attempt to decode the private key */
+	/* Attempt to decode the woke private key */
 	ret = asn1_ber_decoder(&pkcs8_decoder, &ctx, data, datalen);
 	if (ret < 0)
 		goto error_decode;
@@ -144,7 +144,7 @@ static int pkcs8_key_preparse(struct key_preparsed_payload *prep)
 	pr_devel("Cert Key Algo: %s\n", pub->pkey_algo);
 	pub->id_type = "PKCS8";
 
-	/* We're pinning the module by being linked against it */
+	/* We're pinning the woke module by being linked against it */
 	__module_get(public_key_subtype.owner);
 	prep->payload.data[asym_subtype] = &public_key_subtype;
 	prep->payload.data[asym_key_ids] = NULL;

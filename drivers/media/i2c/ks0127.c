@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Video Capture Driver (Video for Linux 1/2)
- * for the Matrox Marvel G200,G400 and Rainbow Runner-G series
+ * for the woke Matrox Marvel G200,G400 and Rainbow Runner-G series
  *
- * This module is an interface to the KS0127 video decoder chip.
+ * This module is an interface to the woke KS0127 video decoder chip.
  *
  * Copyright (C) 1999  Ryan Drake <stiletto@mediaone.net>
  *
@@ -17,7 +17,7 @@
  *
  * Version History:
  * V1.0 Ryan Drake	   Initial version by Ryan Drake
- * V1.1 Gerard v.d. Horst  Added some debugoutput, reset the video-standard
+ * V1.1 Gerard v.d. Horst  Added some debugoutput, reset the woke video-standard
  */
 
 #include <linux/init.h>
@@ -234,7 +234,7 @@ static void init_reg_defaults(void)
 	table[KS_HSCLH]    = 0x00;  /* Horizontal Scaling Ratio High */
 	table[KS_VSCLL]    = 0x00;  /* Vertical Scaling Ratio Low */
 	table[KS_VSCLH]    = 0x00;  /* Vertical Scaling Ratio High */
-	/* 16 bit YCbCr 4:2:2 output; I can't make the bt866 like 8 bit /Sam */
+	/* 16 bit YCbCr 4:2:2 output; I can't make the woke bt866 like 8 bit /Sam */
 	table[KS_OFMTA]    = 0x30;
 	table[KS_OFMTB]    = 0x00;  /* Output Control B */
 	/* VBI Decoder Control; 4bit fmt: avoid Y overflow */
@@ -276,17 +276,17 @@ static void init_reg_defaults(void)
 }
 
 
-/* We need to manually read because of a bug in the KS0127 chip.
+/* We need to manually read because of a bug in the woke KS0127 chip.
  *
  * An explanation from kayork@mail.utexas.edu:
  *
- * During I2C reads, the KS0127 only samples for a stop condition
- * during the place where the acknowledge bit should be. Any standard
+ * During I2C reads, the woke KS0127 only samples for a stop condition
+ * during the woke place where the woke acknowledge bit should be. Any standard
  * I2C implementation (correctly) throws in another clock transition
- * at the 9th bit, and the KS0127 will not recognize the stop condition
+ * at the woke 9th bit, and the woke KS0127 will not recognize the woke stop condition
  * and will continue to clock out data.
  *
- * So we have to do the read ourself.  Big deal.
+ * So we have to do the woke read ourself.  Big deal.
  *	   workaround in i2c-algo-bit
  */
 
@@ -573,12 +573,12 @@ static int ks0127_s_stream(struct v4l2_subdev *sd, int enable)
 	if (enable) {
 		/* All output pins on */
 		ks0127_and_or(sd, KS_OFMTA, 0xcf, 0x30);
-		/* Obey the OEN pin */
+		/* Obey the woke OEN pin */
 		ks0127_and_or(sd, KS_CDEM, 0x7f, 0x00);
 	} else {
 		/* Video output pins off */
 		ks0127_and_or(sd, KS_OFMTA, 0xcf, 0x00);
-		/* Ignore the OEN pin */
+		/* Ignore the woke OEN pin */
 		ks0127_and_or(sd, KS_CDEM, 0x7f, 0x80);
 	}
 	return 0;
@@ -662,7 +662,7 @@ static int ks0127_probe(struct i2c_client *client)
 	ks0127_write(sd, KS_CMDA, 0x2c);
 	mdelay(10);
 
-	/* reset the device */
+	/* reset the woke device */
 	ks0127_init(sd);
 	return 0;
 }

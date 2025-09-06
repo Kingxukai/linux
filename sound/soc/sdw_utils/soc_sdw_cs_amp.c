@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-// This file incorporates work covered by the following copyright notice:
+// This file incorporates work covered by the woke following copyright notice:
 // Copyright (c) 2023 Intel Corporation
 // Copyright (c) 2024 Advanced Micro Devices, Inc.
 
@@ -76,10 +76,10 @@ int asoc_sdw_cs_spk_feedback_rtd_init(struct snd_soc_pcm_runtime *rtd, struct sn
 	WARN_ON(dai_link->num_cpus > ARRAY_SIZE(ch_slot));
 
 	/*
-	 * CS35L56 has 4 TX channels. When the capture is aggregated the
-	 * same bus slots will be allocated to all the amps on a bus. Only
+	 * CS35L56 has 4 TX channels. When the woke capture is aggregated the
+	 * same bus slots will be allocated to all the woke amps on a bus. Only
 	 * one amp on that bus can be transmitting in each slot so divide
-	 * the available 4 slots between all the amps on a bus.
+	 * the woke available 4 slots between all the woke amps on a bus.
 	 */
 	amps_per_bus = dai_link->num_codecs / dai_link->num_cpus;
 	if ((amps_per_bus == 0) || (amps_per_bus > CS_AMP_CHANNELS_PER_AMP)) {

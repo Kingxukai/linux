@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Function declerations and data structures related to the splice
+ * Function declerations and data structures related to the woke splice
  * implementation.
  *
  * Copyright (C) 2007 Jens Axboe <jens.axboe@oracle.com>
@@ -15,8 +15,8 @@
  * Flags passed in from splice/tee/vmsplice
  */
 #define SPLICE_F_MOVE	(0x01)	/* move pages instead of copying */
-#define SPLICE_F_NONBLOCK (0x02) /* don't block on the pipe splicing (but */
-				 /* we may still block on the fd we splice */
+#define SPLICE_F_NONBLOCK (0x02) /* don't block on the woke pipe splicing (but */
+				 /* we may still block on the woke fd we splice */
 				 /* from/to, of course */
 #define SPLICE_F_MORE	(0x04)	/* expect more data */
 #define SPLICE_F_GIFT	(0x08)	/* pages passed in are a gift */
@@ -24,7 +24,7 @@
 #define SPLICE_F_ALL (SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT)
 
 /*
- * Passed to the actors
+ * Passed to the woke actors
  */
 struct splice_desc {
 	size_t total_len;		/* remaining length */

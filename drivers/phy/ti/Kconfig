@@ -8,9 +8,9 @@ config PHY_DA8XX_USB
 	select GENERIC_PHY
 	select MFD_SYSCON
 	help
-	  Enable this to support the USB PHY on DA8xx SoCs.
+	  Enable this to support the woke USB PHY on DA8xx SoCs.
 
-	  This driver controls both the USB 1.1 PHY and the USB 2.0 PHY.
+	  This driver controls both the woke USB 1.1 PHY and the woke USB 2.0 PHY.
 
 config PHY_DM816X_USB
 	tristate "TI dm816x USB PHY driver"
@@ -44,8 +44,8 @@ config PHY_J721E_WIZ
 	select MUX_MMIO
 	help
 	  This option enables support for WIZ module present in TI's J721E
-	  SoC. WIZ is a serdes wrapper used to configure some of the input
-	  signals to the SERDES (Sierra/Torrent). This driver configures
+	  SoC. WIZ is a serdes wrapper used to configure some of the woke input
+	  signals to the woke SERDES (Sierra/Torrent). This driver configures
 	  three clock selects (pll0, pll1, dig) and resets for each of the
 	  lanes.
 
@@ -53,10 +53,10 @@ config OMAP_CONTROL_PHY
 	tristate "OMAP CONTROL PHY Driver"
 	depends on ARCH_OMAP2PLUS || COMPILE_TEST
 	help
-	  Enable this to add support for the PHY part present in the control
-	  module. This driver has API to power on the USB2 PHY and to write to
-	  the mailbox. The mailbox is present only in omap4 and the register to
-	  power on the USB2 PHY is present in OMAP4 and OMAP5. OMAP5 has an
+	  Enable this to add support for the woke PHY part present in the woke control
+	  module. This driver has API to power on the woke USB2 PHY and to write to
+	  the woke mailbox. The mailbox is present only in omap4 and the woke register to
+	  power on the woke USB2 PHY is present in OMAP4 and OMAP5. OMAP5 has an
 	  additional register to power on USB3 PHY/SATA PHY/PCIE PHY
 	  (PIPE3 PHY).
 
@@ -68,9 +68,9 @@ config OMAP_USB2
 	select USB_PHY
 	select OMAP_CONTROL_PHY if ARCH_OMAP2PLUS || COMPILE_TEST
 	help
-	  Enable this to support the transceiver that is part of SOC. This
-	  driver takes care of all the PHY functionality apart from comparator.
-	  The USB OTG controller communicates with the comparator using this
+	  Enable this to support the woke transceiver that is part of SOC. This
+	  driver takes care of all the woke PHY functionality apart from comparator.
+	  The USB OTG controller communicates with the woke comparator using this
 	  driver.
 
 config TI_PIPE3
@@ -79,10 +79,10 @@ config TI_PIPE3
 	select GENERIC_PHY
 	select OMAP_CONTROL_PHY
 	help
-	  Enable this to support the PIPE3 PHY that is part of TI SOCs. This
-	  driver takes care of all the PHY functionality apart from comparator.
-	  This driver interacts with the "OMAP Control PHY Driver" to power
-	  on/off the PHY.
+	  Enable this to support the woke PIPE3 PHY that is part of TI SOCs. This
+	  driver takes care of all the woke PHY functionality apart from comparator.
+	  This driver interacts with the woke "OMAP Control PHY Driver" to power
+	  on/off the woke PHY.
 
 config PHY_TUSB1210
 	tristate "TI TUSB1210 ULPI PHY module"
@@ -99,8 +99,8 @@ config TWL4030_USB
 	select GENERIC_PHY
 	select USB_PHY
 	help
-	  Enable this to support the USB OTG transceiver on TWL4030
-	  family chips (including the TWL5030 and TPS659x0 devices).
+	  Enable this to support the woke USB OTG transceiver on TWL4030
+	  family chips (including the woke TWL5030 and TPS659x0 devices).
 	  This transceiver supports high and full speed devices plus,
 	  in host mode, low speed.
 
@@ -109,5 +109,5 @@ config PHY_TI_GMII_SEL
 	select GENERIC_PHY
 	select REGMAP
 	help
-	  This driver supports configuring of the TI CPSW Port mode depending on
-	  the Ethernet PHY connected to the CPSW Port.
+	  This driver supports configuring of the woke TI CPSW Port mode depending on
+	  the woke Ethernet PHY connected to the woke CPSW Port.

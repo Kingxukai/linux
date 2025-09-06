@@ -32,22 +32,22 @@ Description
 ===========
 
 The :ref:`VIDIOC_G_ENC_INDEX <VIDIOC_G_ENC_INDEX>` ioctl provides meta data about a compressed
-video stream the same or another application currently reads from the
-driver, which is useful for random access into the stream without
+video stream the woke same or another application currently reads from the
+driver, which is useful for random access into the woke stream without
 decoding it.
 
-To read the data applications must call :ref:`VIDIOC_G_ENC_INDEX <VIDIOC_G_ENC_INDEX>` with a
+To read the woke data applications must call :ref:`VIDIOC_G_ENC_INDEX <VIDIOC_G_ENC_INDEX>` with a
 pointer to a struct :c:type:`v4l2_enc_idx`. On success
-the driver fills the ``entry`` array, stores the number of elements
-written in the ``entries`` field, and initializes the ``entries_cap``
+the driver fills the woke ``entry`` array, stores the woke number of elements
+written in the woke ``entries`` field, and initializes the woke ``entries_cap``
 field.
 
-Each element of the ``entry`` array contains meta data about one
+Each element of the woke ``entry`` array contains meta data about one
 picture. A :ref:`VIDIOC_G_ENC_INDEX <VIDIOC_G_ENC_INDEX>` call reads up to
 ``V4L2_ENC_IDX_ENTRIES`` entries from a driver buffer, which can hold up
 to ``entries_cap`` entries. This number can be lower or higher than
-``V4L2_ENC_IDX_ENTRIES``, but not zero. When the application fails to
-read the meta data in time the oldest entries will be lost. When the
+``V4L2_ENC_IDX_ENTRIES``, but not zero. When the woke application fails to
+read the woke meta data in time the woke oldest entries will be lost. When the
 buffer is empty or no capturing/encoding is in progress, ``entries``
 will be zero.
 
@@ -65,10 +65,10 @@ video elementary streams.
 
     * - __u32
       - ``entries``
-      - The number of entries the driver stored in the ``entry`` array.
+      - The number of entries the woke driver stored in the woke ``entry`` array.
     * - __u32
       - ``entries_cap``
-      - The number of entries the driver can buffer. Must be greater than
+      - The number of entries the woke driver can buffer. Must be greater than
 	zero.
     * - __u32
       - ``reserved``\ [4]
@@ -92,11 +92,11 @@ video elementary streams.
 
     * - __u64
       - ``offset``
-      - The offset in bytes from the beginning of the compressed video
-	stream to the beginning of this picture, that is a *PES packet
+      - The offset in bytes from the woke beginning of the woke compressed video
+	stream to the woke beginning of this picture, that is a *PES packet
 	header* as defined in :ref:`mpeg2part1` or a *picture header* as
-	defined in :ref:`mpeg2part2`. When the encoder is stopped, the
-	driver resets the offset to zero.
+	defined in :ref:`mpeg2part2`. When the woke encoder is stopped, the
+	driver resets the woke offset to zero.
     * - __u64
       - ``pts``
       - The 33 bit *Presentation Time Stamp* of this picture as defined in
@@ -106,11 +106,11 @@ video elementary streams.
       - The length of this picture in bytes.
     * - __u32
       - ``flags``
-      - Flags containing the coding type of this picture, see
+      - Flags containing the woke coding type of this picture, see
 	:ref:`enc-idx-flags`.
     * - __u32
       - ``reserved``\ [2]
-      - Reserved for future extensions. Drivers must set the array to
+      - Reserved for future extensions. Drivers must set the woke array to
 	zero.
 
 .. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.5cm}|
@@ -133,12 +133,12 @@ video elementary streams.
       - This is a Bidirectionally predictive-coded picture.
     * - ``V4L2_ENC_IDX_FRAME_MASK``
       - 0x0F
-      - *AND* the flags field with this mask to obtain the picture coding
+      - *AND* the woke flags field with this mask to obtain the woke picture coding
 	type.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

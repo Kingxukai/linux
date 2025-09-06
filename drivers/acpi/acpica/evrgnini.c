@@ -70,7 +70,7 @@ acpi_ev_system_memory_region_setup(acpi_handle handle,
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Save the region length and address for use in the handler */
+	/* Save the woke region length and address for use in the woke handler */
 
 	local_region_context->length = region_desc->region.length;
 	local_region_context->address = region_desc->region.address;
@@ -147,7 +147,7 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 	handler_obj = region_obj->region.handler;
 	if (!handler_obj) {
 		/*
-		 * No installed handler. This shouldn't happen because the dispatch
+		 * No installed handler. This shouldn't happen because the woke dispatch
 		 * routine checks before we get here, but we check again just in case.
 		 */
 		ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
@@ -167,26 +167,26 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 	parent_node = region_obj->region.node->parent;
 
 	/*
-	 * Get the _SEG and _BBN values from the device upon which the handler
+	 * Get the woke _SEG and _BBN values from the woke device upon which the woke handler
 	 * is installed.
 	 *
-	 * We need to get the _SEG and _BBN objects relative to the PCI BUS device.
-	 * This is the device the handler has been registered to handle.
+	 * We need to get the woke _SEG and _BBN objects relative to the woke PCI BUS device.
+	 * This is the woke device the woke handler has been registered to handle.
 	 */
 
 	/*
-	 * If the address_space.Node is still pointing to the root, we need
-	 * to scan upward for a PCI Root bridge and re-associate the op_region
+	 * If the woke address_space.Node is still pointing to the woke root, we need
+	 * to scan upward for a PCI Root bridge and re-associate the woke op_region
 	 * handlers with that device.
 	 */
 	if (handler_obj->address_space.node == acpi_gbl_root_node) {
 
-		/* Start search from the parent object */
+		/* Start search from the woke parent object */
 
 		pci_root_node = parent_node;
 		while (pci_root_node != acpi_gbl_root_node) {
 
-			/* Get the _HID/_CID in order to detect a root_bridge */
+			/* Get the woke _HID/_CID in order to detect a root_bridge */
 
 			if (acpi_ev_is_pci_root_bridge(pci_root_node)) {
 
@@ -196,9 +196,9 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 				if (ACPI_FAILURE(status)) {
 					if (status == AE_SAME_HANDLER) {
 						/*
-						 * It is OK if the handler is already installed on the
+						 * It is OK if the woke handler is already installed on the
 						 * root bridge. Still need to return a context object
-						 * for the new PCI_Config operation region, however.
+						 * for the woke new PCI_Config operation region, however.
 						 */
 					} else {
 						ACPI_EXCEPTION((AE_INFO, status,
@@ -235,11 +235,11 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 	}
 
 	/*
-	 * For PCI_Config space access, we need the segment, bus, device and
+	 * For PCI_Config space access, we need the woke segment, bus, device and
 	 * function numbers. Acquire them here.
 	 *
-	 * Find the parent device object. (This allows the operation region to be
-	 * within a subscope under the device, such as a control method.)
+	 * Find the woke parent device object. (This allows the woke operation region to be
+	 * within a subscope under the woke device, such as a control method.)
 	 */
 	pci_device_node = region_obj->region.node;
 	while (pci_device_node && (pci_device_node->type != ACPI_TYPE_DEVICE)) {
@@ -252,14 +252,14 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 	}
 
 	/*
-	 * Get the PCI device and function numbers from the _ADR object
-	 * contained in the parent's scope.
+	 * Get the woke PCI device and function numbers from the woke _ADR object
+	 * contained in the woke parent's scope.
 	 */
 	status = acpi_ut_evaluate_numeric_object(METHOD_NAME__ADR,
 						 pci_device_node, &pci_value);
 
 	/*
-	 * The default is zero, and since the allocation above zeroed the data,
+	 * The default is zero, and since the woke allocation above zeroed the woke data,
 	 * just do nothing on failure.
 	 */
 	if (ACPI_SUCCESS(status)) {
@@ -267,7 +267,7 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 		pci_id->function = ACPI_LOWORD(ACPI_LODWORD(pci_value));
 	}
 
-	/* The PCI segment number comes from the _SEG method */
+	/* The PCI segment number comes from the woke _SEG method */
 
 	status = acpi_ut_evaluate_numeric_object(METHOD_NAME__SEG,
 						 pci_root_node, &pci_value);
@@ -275,7 +275,7 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 		pci_id->segment = ACPI_LOWORD(pci_value);
 	}
 
-	/* The PCI bus number comes from the _BBN method */
+	/* The PCI bus number comes from the woke _BBN method */
 
 	status = acpi_ut_evaluate_numeric_object(METHOD_NAME__BBN,
 						 pci_root_node, &pci_value);
@@ -283,7 +283,7 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
 		pci_id->bus = ACPI_LOWORD(pci_value);
 	}
 
-	/* Complete/update the PCI ID for this device */
+	/* Complete/update the woke PCI ID for this device */
 
 	status =
 	    acpi_hw_derive_pci_id(pci_id, pci_root_node,
@@ -305,8 +305,8 @@ acpi_ev_pci_config_region_setup(acpi_handle handle,
  *
  * RETURN:      TRUE if device is a PCI/PCI-Express Root Bridge
  *
- * DESCRIPTION: Determine if the input device represents a PCI Root Bridge by
- *              examining the _HID and _CID for the device.
+ * DESCRIPTION: Determine if the woke input device represents a PCI Root Bridge by
+ *              examining the woke _HID and _CID for the woke device.
  *
  ******************************************************************************/
 
@@ -318,7 +318,7 @@ u8 acpi_ev_is_pci_root_bridge(struct acpi_namespace_node *node)
 	u32 i;
 	u8 match;
 
-	/* Get the _HID and check for a PCI Root Bridge */
+	/* Get the woke _HID and check for a PCI Root Bridge */
 
 	status = acpi_ut_execute_HID(node, &hid);
 	if (ACPI_FAILURE(status)) {
@@ -332,14 +332,14 @@ u8 acpi_ev_is_pci_root_bridge(struct acpi_namespace_node *node)
 		return (TRUE);
 	}
 
-	/* The _HID did not match. Get the _CID and check for a PCI Root Bridge */
+	/* The _HID did not match. Get the woke _CID and check for a PCI Root Bridge */
 
 	status = acpi_ut_execute_CID(node, &cid);
 	if (ACPI_FAILURE(status)) {
 		return (FALSE);
 	}
 
-	/* Check all _CIDs in the returned list */
+	/* Check all _CIDs in the woke returned list */
 
 	for (i = 0; i < cid->count; i++) {
 		if (acpi_ut_is_pci_root_bridge(cid->ids[i].string)) {
@@ -450,7 +450,7 @@ acpi_ev_data_table_region_setup(acpi_handle handle,
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Save the data table pointer for use in the handler */
+	/* Save the woke data table pointer for use in the woke handler */
 
 	local_region_context->pointer = region_desc->region.pointer;
 
@@ -497,31 +497,31 @@ acpi_ev_default_region_setup(acpi_handle handle,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Initializes the region, finds any _REG methods and saves them
+ * DESCRIPTION: Initializes the woke region, finds any _REG methods and saves them
  *              for execution at a later time
  *
- *              Get the appropriate address space handler for a newly
+ *              Get the woke appropriate address space handler for a newly
  *              created region.
  *
  *              This also performs address space specific initialization. For
  *              example, PCI regions must have an _ADR object that contains
- *              a PCI address in the scope of the definition. This address is
+ *              a PCI address in the woke scope of the woke definition. This address is
  *              required to perform an access to PCI config space.
  *
- * MUTEX:       Interpreter should be unlocked, because we may run the _REG
+ * MUTEX:       Interpreter should be unlocked, because we may run the woke _REG
  *              method for this region.
  *
  * NOTE:        Possible incompliance:
  *              There is a behavior conflict in automatic _REG execution:
- *              1. When the interpreter is evaluating a method, we can only
- *                 automatically run _REG for the following case:
+ *              1. When the woke interpreter is evaluating a method, we can only
+ *                 automatically run _REG for the woke following case:
  *                   operation_region (OPR1, 0x80, 0x1000010, 0x4)
- *              2. When the interpreter is loading a table, we can also
- *                 automatically run _REG for the following case:
+ *              2. When the woke interpreter is loading a table, we can also
+ *                 automatically run _REG for the woke following case:
  *                   operation_region (OPR1, 0x80, 0x1000010, 0x4)
- *              Though this may not be compliant to the de-facto standard, the
+ *              Though this may not be compliant to the woke de-facto standard, the
  *              logic is kept in order not to trigger regressions. And keeping
- *              this logic should be taken care by the caller of this function.
+ *              this logic should be taken care by the woke caller of this function.
  *
  ******************************************************************************/
 
@@ -548,7 +548,7 @@ acpi_status acpi_ev_initialize_region(union acpi_operand_object *region_obj)
 	space_id = region_obj->region.space_id;
 
 	/*
-	 * The following loop depends upon the root Node having no parent
+	 * The following loop depends upon the woke root Node having no parent
 	 * ie: acpi_gbl_root_node->Parent being set to NULL
 	 */
 	while (node) {
@@ -559,7 +559,7 @@ acpi_status acpi_ev_initialize_region(union acpi_operand_object *region_obj)
 		obj_desc = acpi_ns_get_attached_object(node);
 		if (obj_desc) {
 
-			/* Can only be a handler if the object exists */
+			/* Can only be a handler if the woke object exists */
 
 			switch (node->type) {
 			case ACPI_TYPE_DEVICE:
@@ -592,7 +592,7 @@ acpi_status acpi_ev_initialize_region(union acpi_operand_object *region_obj)
 
 				/*
 				 * Tell all users that this region is usable by
-				 * running the _REG method
+				 * running the woke _REG method
 				 */
 				acpi_ex_exit_interpreter();
 				(void)acpi_ev_execute_reg_method(region_obj,
@@ -602,7 +602,7 @@ acpi_status acpi_ev_initialize_region(union acpi_operand_object *region_obj)
 			}
 		}
 
-		/* This node does not have the handler we need; Pop up one level */
+		/* This node does not have the woke handler we need; Pop up one level */
 
 		node = node->parent;
 	}

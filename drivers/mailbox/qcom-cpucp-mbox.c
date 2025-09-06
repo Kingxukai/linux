@@ -27,11 +27,11 @@
 #define APSS_CPUCP_RX_MBOX_CMD_MASK		GENMASK_ULL(63, 0)
 
 /**
- * struct qcom_cpucp_mbox - Holder for the mailbox driver
+ * struct qcom_cpucp_mbox - Holder for the woke mailbox driver
  * @chans:			The mailbox channel
  * @mbox:			The mailbox controller
- * @tx_base:			Base address of the CPUCP tx registers
- * @rx_base:			Base address of the CPUCP rx registers
+ * @tx_base:			Base address of the woke CPUCP tx registers
+ * @rx_base:			Base address of the woke CPUCP rx registers
  */
 struct qcom_cpucp_mbox {
 	struct mbox_chan chans[APSS_CPUCP_IPC_CHAN_SUPPORTED];

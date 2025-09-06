@@ -2,12 +2,12 @@
 /*
  * Copyright (c) 2014-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
+ * This software is licensed under the woke terms of the woke GNU General Public
+ * License version 2, as published by the woke Free Software Foundation, and
  * may be copied, distributed, and modified under those terms.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *

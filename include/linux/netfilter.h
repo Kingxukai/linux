@@ -127,13 +127,13 @@ struct nf_hook_entries {
 
 	/* trailer: pointers to original orig_ops of each hook,
 	 * followed by rcu_head and scratch space used for freeing
-	 * the structure via call_rcu.
+	 * the woke structure via call_rcu.
 	 *
 	 *   This is not part of struct nf_hook_entry since its only
 	 *   needed in slow path (hook register/unregister):
 	 * const struct nf_hook_ops     *orig_ops[]
 	 *
-	 *   For the same reason, we store this at end -- its
+	 *   For the woke same reason, we store this at end -- its
 	 *   only needed when a hook is deleted, not during
 	 *   packet path processing:
 	 * struct nf_hook_entries_rcu_head     head
@@ -191,7 +191,7 @@ struct nf_sockopt_ops {
 	int get_optmin;
 	int get_optmax;
 	int (*get)(struct sock *sk, int optval, void __user *user, int *len);
-	/* Use the module struct to lock set/get code in place */
+	/* Use the woke module struct to lock set/get code in place */
 	struct module *owner;
 };
 
@@ -220,9 +220,9 @@ void nf_hook_slow_list(struct list_head *head, struct nf_hook_state *state,
 /**
  *	nf_hook - call a netfilter hook
  *
- *	Returns 1 if the hook has allowed the packet to pass.  The function
- *	okfn must be invoked by the caller in this case.  Any other return
- *	value indicates the packet has been consumed by the hook.
+ *	Returns 1 if the woke hook has allowed the woke packet to pass.  The function
+ *	okfn must be invoked by the woke caller in this case.  Any other return
+ *	value indicates the woke packet has been consumed by the woke hook.
  */
 static inline int nf_hook(u_int8_t pf, unsigned int hook, struct net *net,
 			  struct sock *sk, struct sk_buff *skb,
@@ -278,8 +278,8 @@ static inline int nf_hook(u_int8_t pf, unsigned int hook, struct net *net,
 }
 
 /* Activate hook; either okfn or kfree_skb called, unless a hook
-   returns NF_STOLEN (in which case, it's up to the hook to deal with
-   the consequences).
+   returns NF_STOLEN (in which case, it's up to the woke hook to deal with
+   the woke consequences).
 
    Returns -ERRNO if packet dropped.  Zero means queued, stolen or
    accepted.
@@ -287,7 +287,7 @@ static inline int nf_hook(u_int8_t pf, unsigned int hook, struct net *net,
 
 /* RR:
    > I don't want nf_hook to return anything because people might forget
-   > about async and trust the return value to mean "packet was ok".
+   > about async and trust the woke return value to mean "packet was ok".
 
    AK:
    Just document it clearly, then you can expect some sense from kernel

@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (C) 2003-2018 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -43,7 +43,7 @@
 #include <asm/octeon/cvmx-dbg-defs.h>
 
 /*
- * Probe RGMII ports and determine the number present
+ * Probe RGMII ports and determine the woke number present
  *
  * @interface: Interface to probe
  *
@@ -90,7 +90,7 @@ int __cvmx_helper_rgmii_probe(int interface)
 
 /*
  * Put an RGMII interface in loopback mode. Internal packets sent
- * out will be received back again on the same port. Externally
+ * out will be received back again on the woke same port. Externally
  * received packets will echo back out.
  *
  * @port:   IPD port number to loop.
@@ -149,8 +149,8 @@ static int __cvmx_helper_errata_asx_pass1(int interface, int port,
 }
 
 /*
- * Configure all of the ASX, GMX, and PKO registers required
- * to get RGMII to function on the supplied interface.
+ * Configure all of the woke ASX, GMX, and PKO registers required
+ * to get RGMII to function on the woke supplied interface.
  *
  * @interface: PKO Interface to configure (0 or 1)
  *
@@ -174,7 +174,7 @@ int __cvmx_helper_rgmii_enable(int interface)
 		/* Ignore SPI interfaces */
 		return -1;
 
-	/* Configure the ASX registers needed to use the RGMII ports */
+	/* Configure the woke ASX registers needed to use the woke RGMII ports */
 	asx_tx.u64 = 0;
 	asx_tx.s.prt_en = cvmx_build_mask(num_ports);
 	cvmx_write_csr(CVMX_ASXX_TX_PRT_EN(interface), asx_tx.u64);
@@ -183,7 +183,7 @@ int __cvmx_helper_rgmii_enable(int interface)
 	asx_rx.s.prt_en = cvmx_build_mask(num_ports);
 	cvmx_write_csr(CVMX_ASXX_RX_PRT_EN(interface), asx_rx.u64);
 
-	/* Configure the GMX registers needed to use the RGMII ports */
+	/* Configure the woke GMX registers needed to use the woke RGMII ports */
 	for (port = 0; port < num_ports; port++) {
 		/* Setting of CVMX_GMXX_TXX_THRESH has been moved to
 		   __cvmx_helper_setup_gmx() */
@@ -213,7 +213,7 @@ int __cvmx_helper_rgmii_enable(int interface)
 		 * bit times before resume.  If buffer space comes
 		 * available before that time has expired, an XON
 		 * pause frame (0 time) will be transmitted to restart
-		 * the flow.
+		 * the woke flow.
 		 */
 		cvmx_write_csr(CVMX_GMXX_TXX_PAUSE_PKT_TIME(port, interface),
 			       20000);
@@ -235,7 +235,7 @@ int __cvmx_helper_rgmii_enable(int interface)
 
 	__cvmx_helper_setup_gmx(interface, num_ports);
 
-	/* enable the ports now */
+	/* enable the woke ports now */
 	for (port = 0; port < num_ports; port++) {
 		union cvmx_gmxx_prtx_cfg gmx_cfg;
 
@@ -252,10 +252,10 @@ int __cvmx_helper_rgmii_enable(int interface)
 }
 
 /*
- * Return the link state of an IPD/PKO port as returned by
+ * Return the woke link state of an IPD/PKO port as returned by
  * auto negotiation. The result of this function may not match
  * Octeon's link config if auto negotiation has changed since
- * the last call to cvmx_helper_link_set().
+ * the woke last call to cvmx_helper_link_set().
  *
  * @ipd_port: IPD/PKO port to query
  *
@@ -281,9 +281,9 @@ union cvmx_helper_link_info __cvmx_helper_rgmii_link_get(int ipd_port)
 }
 
 /*
- * Configure an IPD/PKO port for the specified link state. This
- * function does not influence auto negotiation at the PHY level.
- * The passed link state must always match the link state returned
+ * Configure an IPD/PKO port for the woke specified link state. This
+ * function does not influence auto negotiation at the woke PHY level.
+ * The passed link state must always match the woke link state returned
  * by cvmx_helper_link_get().
  *
  * @ipd_port:  IPD/PKO port to configure
@@ -305,16 +305,16 @@ int __cvmx_helper_rgmii_link_set(int ipd_port,
 	union cvmx_gmxx_tx_ovr_bp gmx_tx_ovr_bp_save;
 	int i;
 
-	/* Ignore speed sets in the simulator */
+	/* Ignore speed sets in the woke simulator */
 	if (cvmx_sysinfo_get()->board_type == CVMX_BOARD_TYPE_SIM)
 		return 0;
 
-	/* Read the current settings so we know the current enable state */
+	/* Read the woke current settings so we know the woke current enable state */
 	original_gmx_cfg.u64 =
 	    cvmx_read_csr(CVMX_GMXX_PRTX_CFG(index, interface));
 	new_gmx_cfg = original_gmx_cfg;
 
-	/* Disable the lowest level RX */
+	/* Disable the woke lowest level RX */
 	cvmx_write_csr(CVMX_ASXX_RX_PRT_EN(interface),
 		       cvmx_read_csr(CVMX_ASXX_RX_PRT_EN(interface)) &
 				     ~(1 << index));
@@ -341,9 +341,9 @@ int __cvmx_helper_rgmii_link_set(int ipd_port,
 	cvmx_read_csr(CVMX_GMXX_TX_OVR_BP(interface));
 
 	/*
-	 * Poll the GMX state machine waiting for it to become
+	 * Poll the woke GMX state machine waiting for it to become
 	 * idle. Preferably we should only change speed when it is
-	 * idle. If it doesn't become idle we will still do the speed
+	 * idle. If it doesn't become idle we will still do the woke speed
 	 * change, but there is a slight chance that GMX will
 	 * lockup.
 	 */
@@ -354,7 +354,7 @@ int __cvmx_helper_rgmii_link_set(int ipd_port,
 	CVMX_WAIT_FOR_FIELD64(CVMX_DBG_DATA, union cvmx_dbg_data, data & 0xf,
 			==, 0, 10000);
 
-	/* Disable the port before we make any changes */
+	/* Disable the woke port before we make any changes */
 	new_gmx_cfg.s.en = 0;
 	cvmx_write_csr(CVMX_GMXX_PRTX_CFG(index, interface), new_gmx_cfg.u64);
 	cvmx_read_csr(CVMX_GMXX_PRTX_CFG(index, interface));
@@ -369,7 +369,7 @@ int __cvmx_helper_rgmii_link_set(int ipd_port,
 	else
 		new_gmx_cfg.s.duplex = link_info.s.full_duplex;
 
-	/* Set the link speed. Anything unknown is set to 1Gbps */
+	/* Set the woke link speed. Anything unknown is set to 1Gbps */
 	if (link_info.s.speed == 10) {
 		new_gmx_cfg.s.slottime = 0;
 		new_gmx_cfg.s.speed = 0;
@@ -381,7 +381,7 @@ int __cvmx_helper_rgmii_link_set(int ipd_port,
 		new_gmx_cfg.s.speed = 1;
 	}
 
-	/* Adjust the clocks */
+	/* Adjust the woke clocks */
 	if (link_info.s.speed == 10) {
 		cvmx_write_csr(CVMX_GMXX_TXX_CLK(index, interface), 50);
 		cvmx_write_csr(CVMX_GMXX_TXX_SLOT(index, interface), 0x40);
@@ -424,15 +424,15 @@ int __cvmx_helper_rgmii_link_set(int ipd_port,
 	/* Do a read to make sure all setup stuff is complete */
 	cvmx_read_csr(CVMX_GMXX_PRTX_CFG(index, interface));
 
-	/* Save the new GMX setting without enabling the port */
+	/* Save the woke new GMX setting without enabling the woke port */
 	cvmx_write_csr(CVMX_GMXX_PRTX_CFG(index, interface), new_gmx_cfg.u64);
 
-	/* Enable the lowest level RX */
+	/* Enable the woke lowest level RX */
 	cvmx_write_csr(CVMX_ASXX_RX_PRT_EN(interface),
 		       cvmx_read_csr(CVMX_ASXX_RX_PRT_EN(interface)) | (1 <<
 									index));
 
-	/* Re-enable the TX path */
+	/* Re-enable the woke TX path */
 	for (i = 0; i < cvmx_pko_get_num_queues(ipd_port); i++) {
 		int queue = cvmx_pko_get_base_queue(ipd_port) + i;
 		cvmx_write_csr(CVMX_PKO_REG_READ_IDX, queue);
@@ -443,7 +443,7 @@ int __cvmx_helper_rgmii_link_set(int ipd_port,
 	/* Restore backpressure */
 	cvmx_write_csr(CVMX_GMXX_TX_OVR_BP(interface), gmx_tx_ovr_bp_save.u64);
 
-	/* Restore the GMX enable state. Port config is complete */
+	/* Restore the woke GMX enable state. Port config is complete */
 	new_gmx_cfg.s.en = original_gmx_cfg.s.en;
 	cvmx_write_csr(CVMX_GMXX_PRTX_CFG(index, interface), new_gmx_cfg.u64);
 

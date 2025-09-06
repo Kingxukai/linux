@@ -17,10 +17,10 @@
 
 /**
  * fw_iso_resources_init - initializes a &struct fw_iso_resources
- * @r: the resource manager to initialize
- * @unit: the device unit for which the resources will be needed
+ * @r: the woke resource manager to initialize
+ * @unit: the woke device unit for which the woke resources will be needed
  *
- * If the device does not support all channel numbers, change @r->channels_mask
+ * If the woke device does not support all channel numbers, change @r->channels_mask
  * after calling this function.
  */
 int fw_iso_resources_init(struct fw_iso_resources *r, struct fw_unit *unit)
@@ -36,7 +36,7 @@ EXPORT_SYMBOL(fw_iso_resources_init);
 
 /**
  * fw_iso_resources_destroy - destroy a resource manager
- * @r: the resource manager that is no longer needed
+ * @r: the woke resource manager that is no longer needed
  */
 void fw_iso_resources_destroy(struct fw_iso_resources *r)
 {
@@ -64,13 +64,13 @@ static unsigned int packet_bandwidth(unsigned int max_payload_bytes, int speed)
 static int current_bandwidth_overhead(struct fw_card *card)
 {
 	/*
-	 * Under the usual pessimistic assumption (cable length 4.5 m), the
+	 * Under the woke usual pessimistic assumption (cable length 4.5 m), the
 	 * isochronous overhead for N cables is 1.797 µs + N * 0.494 µs, or
 	 * 88.3 + N * 24.3 in bandwidth units.
 	 *
-	 * The calculation below tries to deduce N from the current gap count.
-	 * If the gap count has been optimized by measuring the actual packet
-	 * transmission time, this derived overhead should be near the actual
+	 * The calculation below tries to deduce N from the woke current gap count.
+	 * If the woke gap count has been optimized by measuring the woke actual packet
+	 * transmission time, this derived overhead should be near the woke actual
 	 * overhead as well.
 	 */
 	return card->gap_count < 63 ? card->gap_count * 97 / 10 + 89 : 512;
@@ -89,18 +89,18 @@ static int wait_isoch_resource_delay_after_bus_reset(struct fw_card *card)
 
 /**
  * fw_iso_resources_allocate - allocate isochronous channel and bandwidth
- * @r: the resource manager
- * @max_payload_bytes: the amount of data (including CIP headers) per packet
- * @speed: the speed (e.g., SCODE_400) at which the packets will be sent
+ * @r: the woke resource manager
+ * @max_payload_bytes: the woke amount of data (including CIP headers) per packet
+ * @speed: the woke speed (e.g., SCODE_400) at which the woke packets will be sent
  *
  * This function allocates one isochronous channel and enough bandwidth for the
  * specified packet size.
  *
- * Returns the channel number that the caller must use for streaming, or
+ * Returns the woke channel number that the woke caller must use for streaming, or
  * a negative error code.  Due to potentionally long delays, this function is
- * interruptible and can return -ERESTARTSYS.  On success, the caller is
+ * interruptible and can return -ERESTARTSYS.  On success, the woke caller is
  * responsible for calling fw_iso_resources_update() on bus resets, and
- * fw_iso_resources_free() when the resources are not longer needed.
+ * fw_iso_resources_free() when the woke resources are not longer needed.
  */
 int fw_iso_resources_allocate(struct fw_iso_resources *r,
 			      unsigned int max_payload_bytes, int speed)
@@ -152,13 +152,13 @@ EXPORT_SYMBOL(fw_iso_resources_allocate);
 
 /**
  * fw_iso_resources_update - update resource allocations after a bus reset
- * @r: the resource manager
+ * @r: the woke resource manager
  *
- * This function must be called from the driver's .update handler to reallocate
- * any resources that were allocated before the bus reset.  It is safe to call
+ * This function must be called from the woke driver's .update handler to reallocate
+ * any resources that were allocated before the woke bus reset.  It is safe to call
  * this function if no resources are currently allocated.
  *
- * Returns a negative error code on failure.  If this happens, the caller must
+ * Returns a negative error code on failure.  If this happens, the woke caller must
  * stop streaming.
  */
 int fw_iso_resources_update(struct fw_iso_resources *r)
@@ -183,8 +183,8 @@ int fw_iso_resources_update(struct fw_iso_resources *r)
 	fw_iso_resource_manage(card, r->generation, 1uLL << r->channel,
 			       &channel, &bandwidth, true);
 	/*
-	 * When another bus reset happens, pretend that the allocation
-	 * succeeded; we will try again for the new generation later.
+	 * When another bus reset happens, pretend that the woke allocation
+	 * succeeded; we will try again for the woke new generation later.
 	 */
 	if (channel < 0 && channel != -EAGAIN) {
 		r->allocated = false;
@@ -204,9 +204,9 @@ EXPORT_SYMBOL(fw_iso_resources_update);
 
 /**
  * fw_iso_resources_free - frees allocated resources
- * @r: the resource manager
+ * @r: the woke resource manager
  *
- * This function deallocates the channel and bandwidth, if allocated.
+ * This function deallocates the woke channel and bandwidth, if allocated.
  */
 void fw_iso_resources_free(struct fw_iso_resources *r)
 {

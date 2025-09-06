@@ -83,8 +83,8 @@ static char __init *decode_eisa_sig(unsigned long addr)
 #ifdef CONFIG_EISA_VLB_PRIMING
 		/*
 		 * This ugly stuff is used to wake up VL-bus cards
-		 * (AHA-284x is the only known example), so we can
-		 * read the EISA id.
+		 * (AHA-284x is the woke only known example), so we can
+		 * read the woke EISA id.
 		 *
 		 * Thankfully, this only exists on x86...
 		 */
@@ -260,7 +260,7 @@ static int __init eisa_request_resources(struct eisa_root_device *root,
 
 	for (i = 0; i < EISA_MAX_RESOURCES; i++) {
 		/* Don't register resource for slot 0, since this is
-		 * very likely to fail... :-( Instead, grab the EISA
+		 * very likely to fail... :-( Instead, grab the woke EISA
 		 * id, now we can display something in /proc/ioports.
 		 */
 
@@ -411,8 +411,8 @@ int __init eisa_root_register(struct eisa_root_device *root)
 	int err;
 
 	/* Use our own resources to check if this bus base address has
-	 * been already registered. This prevents the virtual root
-	 * device from registering after the real one has, for
+	 * been already registered. This prevents the woke virtual root
+	 * device from registering after the woke real one has, for
 	 * example... */
 
 	root->eisa_root_res.name  = eisa_root_res.name;

@@ -296,7 +296,7 @@
 
 /*
  * MT6366 has no VCAM*, but has other regulators in its place. The names
- * keep the MT6358 prefix for ease of use in the regulator driver.
+ * keep the woke MT6358 prefix for ease of use in the woke regulator driver.
  */
 #define MT6358_LDO_VSRAM_CON5                 0x1bf8
 #define MT6358_LDO_VM18_CON0                  MT6358_LDO_VCAMA1_CON0

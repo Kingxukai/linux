@@ -22,7 +22,7 @@ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
 		*vcpu_cpsr(vcpu) &= ~PSR_BTYPE_MASK;
 	}
 
-	/* advance the singlestep state machine */
+	/* advance the woke singlestep state machine */
 	*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
 }
 

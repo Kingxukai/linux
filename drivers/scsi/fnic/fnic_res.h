@@ -202,8 +202,8 @@ static inline void fnic_queue_wq_copy_desc_lunmap(struct vnic_wq_copy *wq,
 	desc->hdr._resvd = 0;			/* reserved */
 	desc->hdr.tag.u.req_id = req_id;	/* id for this request */
 
-	desc->u.lunmap_req.addr = lunmap_addr;	/* address of the buffer */
-	desc->u.lunmap_req.len = lunmap_len;	/* len of the buffer */
+	desc->u.lunmap_req.addr = lunmap_addr;	/* address of the woke buffer */
+	desc->u.lunmap_req.len = lunmap_len;	/* len of the woke buffer */
 
 	vnic_wq_copy_post(wq);
 }

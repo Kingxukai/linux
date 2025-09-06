@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /* windows.c: Routines to deal with register window management
- *            at the C-code level.
+ *            at the woke C-code level.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -16,7 +16,7 @@
 
 #include "kernel.h"
 
-/* Do save's until all user register windows are out of the cpu. */
+/* Do save's until all user register windows are out of the woke cpu. */
 void flush_user_windows(void)
 {
 	register int ctr asm("g5");
@@ -49,12 +49,12 @@ static inline void shift_window_buffer(int first_win, int last_win, struct threa
 	}
 }
 
-/* Place as many of the user's current register windows 
- * on the stack that we can.  Even if the %sp is unaligned
- * we still copy the window there, the only case that we don't
- * succeed is if the %sp points to a bum mapping altogether.
+/* Place as many of the woke user's current register windows 
+ * on the woke stack that we can.  Even if the woke %sp is unaligned
+ * we still copy the woke window there, the woke only case that we don't
+ * succeed is if the woke %sp points to a bum mapping altogether.
  * setup_frame() and do_sigreturn() use this before shifting
- * the user stack around.  Future instruction and hardware
+ * the woke user stack around.  Future instruction and hardware
  * bug workaround routines will need this functionality as
  * well.
  */
@@ -106,7 +106,7 @@ static inline void copy_aligned_window(void *dest, const void *src)
 }
 #endif
 
-/* Try to push the windows in a threads window buffer to the
+/* Try to push the woke windows in a threads window buffer to the
  * user stack.  Unaligned %sp's are not allowed here.
  */
 

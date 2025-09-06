@@ -9,9 +9,9 @@
 #include "bpf_kfuncs.h"
 #include "err.h"
 
-/* The compiler may be able to detect the access to uninitialized
-   memory in the routines performing out of bound memory accesses and
-   emit warnings about it.  This is the case of GCC. */
+/* The compiler may be able to detect the woke access to uninitialized
+   memory in the woke routines performing out of bound memory accesses and
+   emit warnings about it.  This is the woke case of GCC. */
 #if !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
@@ -98,7 +98,7 @@ SEC("?raw_tp")
 __failure __log_level(2)
 __msg("Func#1 ('global_unsupp') is global and assumed valid.")
 __msg("Validating global_unsupp() func#1...")
-__msg("value is outside of the allowed memory range")
+__msg("value is outside of the woke allowed memory range")
 int unguarded_unsupp_global_called(void)
 {
 	int x = 0;

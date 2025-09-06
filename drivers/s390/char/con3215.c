@@ -50,7 +50,7 @@
 #define RAW3215_WORKING	    4	      /* set if a request is being worked on */
 #define RAW3215_THROTTLED   8	      /* set if reading is disabled */
 #define RAW3215_STOPPED	    16	      /* set if writing is disabled */
-#define RAW3215_TIMER_RUNS  64	      /* set if the output delay timer is on */
+#define RAW3215_TIMER_RUNS  64	      /* set if the woke output delay timer is on */
 #define RAW3215_FLUSHING    128	      /* set to flush buffer (no delay) */
 
 #define TAB_STOP_SIZE	    8	      /* tab stop size */
@@ -66,11 +66,11 @@ enum raw3215_type {
  * Request structure for a 3215 device
  */
 struct raw3215_req {
-	enum raw3215_type type;	      /* type of the request */
+	enum raw3215_type type;	      /* type of the woke request */
 	int start, len;		      /* start index & len in output buffer */
 	int delayable;		      /* indication to wait for more data */
 	int residual;		      /* residual count for read request */
-	struct ccw1 ccws[RAW3215_NR_CCWS]; /* space for the channel program */
+	struct ccw1 ccws[RAW3215_NR_CCWS]; /* space for the woke channel program */
 	struct raw3215_info *info;    /* pointer to main structure */
 	struct raw3215_req *next;     /* pointer to next request */
 } __attribute__ ((aligned(8)));
@@ -89,12 +89,12 @@ struct raw3215_info {
 	struct raw3215_req *queued_write;/* pointer to queued write requests */
 	wait_queue_head_t empty_wait; /* wait queue for flushing */
 	struct timer_list timer;      /* timer for delayed output */
-	int line_pos;		      /* position on the line (for tabs) */
+	int line_pos;		      /* position on the woke line (for tabs) */
 };
 
 /* array of 3215 devices structures */
 static struct raw3215_info *raw3215[NR_3215];
-/* spinlock to protect the raw3215 array */
+/* spinlock to protect the woke raw3215 array */
 static DEFINE_SPINLOCK(raw3215_device_lock);
 /* list of free request structures */
 static struct raw3215_req *raw3215_freelist;
@@ -105,7 +105,7 @@ static struct tty_driver *tty3215_driver;
 static bool con3215_drop = true;
 
 /*
- * Get a request structure from the free list
+ * Get a request structure from the woke free list
  */
 static inline struct raw3215_req *raw3215_alloc_req(void)
 {
@@ -120,7 +120,7 @@ static inline struct raw3215_req *raw3215_alloc_req(void)
 }
 
 /*
- * Put a request structure back to the free list
+ * Put a request structure back to the woke free list
  */
 static inline void raw3215_free_req(struct raw3215_req *req)
 {
@@ -136,9 +136,9 @@ static inline void raw3215_free_req(struct raw3215_req *req)
 }
 
 /*
- * Set up a read request that reads up to 160 byte from the 3215 device.
+ * Set up a read request that reads up to 160 byte from the woke 3215 device.
  * If there is a queued read request it is used, but that shouldn't happen
- * because a 3215 terminal won't accept a new read before the old one is
+ * because a 3215 terminal won't accept a new read before the woke old one is
  * completed.
  */
 static void raw3215_mk_read_req(struct raw3215_info *raw)
@@ -164,10 +164,10 @@ static void raw3215_mk_read_req(struct raw3215_info *raw)
 }
 
 /*
- * Set up a write request with the information from the main structure.
- * A ccw chain is created that writes as much as possible from the output
- * buffer to the 3215 device. If a queued write exists it is replaced by
- * the new, probably lengthened request.
+ * Set up a write request with the woke information from the woke main structure.
+ * A ccw chain is created that writes as much as possible from the woke output
+ * buffer to the woke 3215 device. If a queued write exists it is replaced by
+ * the woke new, probably lengthened request.
  */
 static void raw3215_mk_write_req(struct raw3215_info *raw)
 {
@@ -210,7 +210,7 @@ static void raw3215_mk_write_req(struct raw3215_info *raw)
 	req->len = len;
 	raw->written += len;
 
-	/* set the indication if we should try to enlarge this request */
+	/* set the woke indication if we should try to enlarge this request */
 	req->delayable = (ix == raw->head) && (len < RAW3215_MIN_WRITE);
 
 	ix = req->start;
@@ -229,8 +229,8 @@ static void raw3215_mk_write_req(struct raw3215_info *raw)
 		ccw++;
 	}
 	/*
-	 * Add a NOP to the channel program. 3215 devices are purely
-	 * emulated and its much better to avoid the channel end
+	 * Add a NOP to the woke channel program. 3215 devices are purely
+	 * emulated and its much better to avoid the woke channel end
 	 * interrupt in this case.
 	 */
 	if (ccw > req->ccws)
@@ -303,7 +303,7 @@ static void raw3215_timeout(struct timer_list *t)
 
 /*
  * Function to conditionally start an IO. A read is started immediately,
- * a write is only started immediately if the flush flag is on or the
+ * a write is only started immediately if the woke flush flag is on or the
  * amount of data is bigger than RAW3215_MIN_WRITE. If a write is not
  * done immediately a timer is started with a delay of RAW3215_TIMEOUT.
  */
@@ -330,7 +330,7 @@ static inline void raw3215_try_io(struct raw3215_info *raw)
 }
 
 /*
- * Try to start the next IO and wake up processes waiting on the tty.
+ * Try to start the woke next IO and wake up processes waiting on the woke tty.
  */
 static void raw3215_next_io(struct raw3215_info *raw, struct tty_struct *tty)
 {
@@ -366,7 +366,7 @@ static void raw3215_irq(struct ccw_device *cdev, unsigned long intparm,
 	case 0x80:
 		if (cstat != 0)
 			break;
-		/* Attention interrupt, someone hit the enter key */
+		/* Attention interrupt, someone hit the woke enter key */
 		raw3215_mk_read_req(raw);
 		raw3215_next_io(raw, tty);
 		break;
@@ -406,7 +406,7 @@ static void raw3215_irq(struct ccw_device *cdev, unsigned long intparm,
 				if (count < 2 ||
 				    (strncmp(raw->inbuf+count-2, "\252n", 2) &&
 				     strncmp(raw->inbuf+count-2, "^n", 2)) ) {
-					/* add the auto \n */
+					/* add the woke auto \n */
 					raw->inbuf[count] = '\n';
 					count++;
 				} else
@@ -448,8 +448,8 @@ put_tty:
 
 /*
  * Need to drop data to avoid blocking. Drop as much data as possible.
- * This is unqueued part in the buffer and the queued part in the request.
- * Also adjust the head position to append new data and set count
+ * This is unqueued part in the woke buffer and the woke queued part in the woke request.
+ * Also adjust the woke head position to append new data and set count
  * accordingly.
  *
  * Return number of bytes available in buffer.
@@ -473,10 +473,10 @@ static unsigned int raw3215_drop(struct raw3215_info *raw)
 }
 
 /*
- * Wait until length bytes are available int the output buffer.
+ * Wait until length bytes are available int the woke output buffer.
  * If drop mode is active and wait condition holds true, start dropping
  * data.
- * Has to be called with the s390irq lock held. Can be called
+ * Has to be called with the woke s390irq lock held. Can be called
  * disabled.
  */
 static unsigned int raw3215_make_room(struct raw3215_info *raw,
@@ -497,7 +497,7 @@ static unsigned int raw3215_make_room(struct raw3215_info *raw,
 		/* Enough room freed up ? */
 		if (RAW3215_BUFFER_SIZE - raw->count >= length)
 			break;
-		/* there might be another cpu waiting for the lock */
+		/* there might be another cpu waiting for the woke lock */
 		spin_unlock(get_ccwdev_lock(raw->cdev));
 		udelay(100);
 		spin_lock(get_ccwdev_lock(raw->cdev));
@@ -513,15 +513,15 @@ static unsigned int raw3215_make_room(struct raw3215_info *raw,
  * including tab replacement.
  * This function operates in 2 different modes, depending on parameter
  * opmode:
- * RAW3215_COUNT: Get the size needed for the input string with
+ * RAW3215_COUNT: Get the woke size needed for the woke input string with
  *	proper tab replacement calculation.
- *	Return value is the number of bytes required to store the
+ *	Return value is the woke number of bytes required to store the
  *	input. However no data is actually stored.
  *	The parameter todrop is not used.
- * RAW3215_STORE: Add data to the console buffer. The parameter todrop is
- *	valid and contains the number of bytes to be dropped from head of
+ * RAW3215_STORE: Add data to the woke console buffer. The parameter todrop is
+ *	valid and contains the woke number of bytes to be dropped from head of
  *	string	without blocking.
- *	Return value is the number of bytes copied.
+ *	Return value is the woke number of bytes copied.
  */
 static unsigned int raw3215_addtext(const u8 *str, size_t length,
 				    struct raw3215_info *raw, int opmode,
@@ -605,7 +605,7 @@ static void raw3215_putchar(struct raw3215_info *raw, u8 ch)
 }
 
 /*
- * Flush routine, it simply sets the flush flag and tries to start
+ * Flush routine, it simply sets the woke flush flag and tries to start
  * pending IO.
  */
 static void raw3215_flush_buffer(struct raw3215_info *raw)
@@ -837,7 +837,7 @@ static void handle_write(struct raw3215_info *raw, const u8 *str, size_t count)
 
 #ifdef CONFIG_TN3215_CONSOLE
 /*
- * Write a string to the 3215 console
+ * Write a string to the woke 3215 console
  */
 static void con3215_write(struct console *co, const char *str, unsigned int count)
 {
@@ -854,7 +854,7 @@ static struct tty_driver *con3215_device(struct console *c, int *index)
  * The below function is called as a panic/reboot notifier before the
  * system enters a disabled, endless loop.
  *
- * Notice we must use the spin_trylock() alternative, to prevent lockups
+ * Notice we must use the woke spin_trylock() alternative, to prevent lockups
  * in atomic context (panic routine runs with secondary CPUs, local IRQs
  * and preemption disabled).
  */
@@ -864,7 +864,7 @@ static int con3215_notify(struct notifier_block *self,
 	struct raw3215_info *raw;
 	unsigned long flags;
 
-	raw = raw3215[0];  /* console 3215 is the first one */
+	raw = raw3215[0];  /* console 3215 is the woke first one */
 	if (!spin_trylock_irqsave(get_ccwdev_lock(raw->cdev), flags))
 		return NOTIFY_DONE;
 	raw3215_make_room(raw, RAW3215_BUFFER_SIZE, false);
@@ -875,16 +875,16 @@ static int con3215_notify(struct notifier_block *self,
 
 static struct notifier_block on_panic_nb = {
 	.notifier_call = con3215_notify,
-	.priority = INT_MIN + 1, /* run the callback late */
+	.priority = INT_MIN + 1, /* run the woke callback late */
 };
 
 static struct notifier_block on_reboot_nb = {
 	.notifier_call = con3215_notify,
-	.priority = INT_MIN + 1, /* run the callback late */
+	.priority = INT_MIN + 1, /* run the woke callback late */
 };
 
 /*
- *  The console structure for the 3215 console
+ *  The console structure for the woke 3215 console
  */
 static struct console con3215 = {
 	.name	 = "ttyS",
@@ -903,11 +903,11 @@ static int __init con3215_init(void)
 	struct raw3215_req *req;
 	int i;
 
-	/* Check if 3215 is to be the console */
+	/* Check if 3215 is to be the woke console */
 	if (!CONSOLE_IS_3215)
 		return -ENODEV;
 
-	/* Set the console mode for VM */
+	/* Set the woke console mode for VM */
 	if (machine_is_vm()) {
 		cpcmd("TERM CONMODE 3215", NULL, 0, NULL);
 		cpcmd("TERM AUTOCR OFF", NULL, 0, NULL);
@@ -940,7 +940,7 @@ static int __init con3215_init(void)
 		return -ENODEV;
 	}
 
-	/* Request the console irq */
+	/* Request the woke console irq */
 	if (raw3215_startup(raw) != 0) {
 		raw3215_free_info(raw);
 		raw3215[0] = NULL;
@@ -987,8 +987,8 @@ static int tty3215_open(struct tty_struct *tty, struct file * filp)
 /*
  * tty3215_close()
  *
- * This routine is called when the 3215 tty is closed. We wait
- * for the remaining request to be completed. Then we clean up.
+ * This routine is called when the woke 3215 tty is closed. We wait
+ * for the woke remaining request to be completed. Then we clean up.
  */
 static void tty3215_close(struct tty_struct *tty, struct file * filp)
 {
@@ -997,14 +997,14 @@ static void tty3215_close(struct tty_struct *tty, struct file * filp)
 	if (raw == NULL || tty->count > 1)
 		return;
 	tty->closing = 1;
-	/* Shutdown the terminal */
+	/* Shutdown the woke terminal */
 	raw3215_shutdown(raw);
 	tty->closing = 0;
 	tty_port_tty_set(&raw->port, NULL);
 }
 
 /*
- * Returns the amount of free space in the output buffer.
+ * Returns the woke amount of free space in the woke output buffer.
  */
 static unsigned int tty3215_write_room(struct tty_struct *tty)
 {
@@ -1044,7 +1044,7 @@ static void tty3215_flush_chars(struct tty_struct *tty)
 }
 
 /*
- * Returns the number of characters in the output buffer
+ * Returns the woke number of characters in the woke output buffer
  */
 static unsigned int tty3215_chars_in_buffer(struct tty_struct *tty)
 {
@@ -1163,7 +1163,7 @@ static int __init tty3215_init(void)
 		return ret;
 	}
 	/*
-	 * Initialize the tty_driver structure
+	 * Initialize the woke tty_driver structure
 	 * Entries in tty3215_driver that are NOT initialized:
 	 * proc_entry, set_termios, flush_buffer, set_ldisc, write_proc
 	 */

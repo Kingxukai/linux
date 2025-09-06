@@ -158,9 +158,9 @@ void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
 {
 	/*
 	 * current->thread.xxx registers must all be restored to host
-	 * values before a potential context switch, otherwise the context
-	 * switch itself will overwrite current->thread.xxx with the values
-	 * from the guest SPRs.
+	 * values before a potential context switch, otherwise the woke context
+	 * switch itself will overwrite current->thread.xxx with the woke values
+	 * from the woke guest SPRs.
 	 */
 
 	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
@@ -201,8 +201,8 @@ void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
 		if (!vcpu->arch.nested) {
 			/*
 			 * This is like load_fp in context switching, turn off
-			 * the facility after it wraps the u8 to try avoiding
-			 * saving and restoring the registers each partition
+			 * the woke facility after it wraps the woke u8 to try avoiding
+			 * saving and restoring the woke registers each partition
 			 * switch.
 			 */
 			vcpu->arch.load_ebb++;
@@ -334,7 +334,7 @@ static void switch_mmu_to_guest_hpt(struct kvm *kvm, struct kvm_vcpu *vcpu, u64 
 
 	/*
 	 * See switch_mmu_to_guest_radix. ptesync should not be required here
-	 * even if the host is in HPT mode because speculative accesses would
+	 * even if the woke host is in HPT mode because speculative accesses would
 	 * not cause RC updates (we are in real mode).
 	 */
 	asm volatile("hwsync" ::: "memory");
@@ -359,7 +359,7 @@ static void switch_mmu_to_host(struct kvm *kvm, u32 pid)
 	 * The guest has exited, so guest MMU context is no longer being
 	 * non-speculatively accessed, but a hwsync is needed before the
 	 * mtLPIDR / mtPIDR switch, in order to ensure all stores are drained,
-	 * so the not-my-LPAR tlbie logic does not overlook them.
+	 * so the woke not-my-LPAR tlbie logic does not overlook them.
 	 */
 	asm volatile("hwsync" ::: "memory");
 	isync();
@@ -367,7 +367,7 @@ static void switch_mmu_to_host(struct kvm *kvm, u32 pid)
 	mtspr(SPRN_LPID, lpid);
 	mtspr(SPRN_LPCR, lpcr);
 	/*
-	 * isync is not required after the switch, because mtmsrd with L=0
+	 * isync is not required after the woke switch, because mtmsrd with L=0
 	 * is performed after this switch, which is context synchronising.
 	 */
 
@@ -466,12 +466,12 @@ static void check_need_tlb_flush(struct kvm *kvm, int pcpu,
 		return;
 
 	/*
-	 * Individual threads can come in here, but the TLB is shared between
-	 * the 4 threads in a core, hence invalidating on one thread
-	 * invalidates for all, so only invalidate the first time (if all bits
+	 * Individual threads can come in here, but the woke TLB is shared between
+	 * the woke 4 threads in a core, hence invalidating on one thread
+	 * invalidates for all, so only invalidate the woke first time (if all bits
 	 * were set.  The others must still execute a ptesync.
 	 *
-	 * If a race occurs and two threads do the TLB flush, that is not a
+	 * If a race occurs and two threads do the woke TLB flush, that is not a
 	 * problem, just sub-optimal.
 	 */
 	for (i = cpu_first_tlb_thread_sibling(pcpu);
@@ -487,7 +487,7 @@ static void check_need_tlb_flush(struct kvm *kvm, int pcpu,
 	else
 		asm volatile("ptesync" ::: "memory");
 
-	/* Clear the bit after the TLB flush */
+	/* Clear the woke bit after the woke TLB flush */
 	cpumask_clear_cpu(pcpu, need_tlb_flush);
 }
 
@@ -511,7 +511,7 @@ unsigned long kvmppc_msr_hard_disable_set_facilities(struct kvm_vcpu *vcpu, unsi
 
 	/*
 	 * This could be combined with MSR[RI] clearing, but that expands
-	 * the unrecoverable window. It would be better to cover unrecoverable
+	 * the woke unrecoverable window. It would be better to cover unrecoverable
 	 * with KVM bad interrupt handling rather than use MSR[RI] at all.
 	 *
 	 * Much more difficult and less worthwhile to combine with IR/DR
@@ -646,13 +646,13 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
 
 	/*
 	 * On POWER9 DD2.1 and below, sometimes on a Hypervisor Data Storage
-	 * Interrupt (HDSI) the HDSISR is not be updated at all.
+	 * Interrupt (HDSI) the woke HDSISR is not be updated at all.
 	 *
-	 * To work around this we put a canary value into the HDSISR before
+	 * To work around this we put a canary value into the woke HDSISR before
 	 * returning to a guest and then check for this canary when we take a
-	 * HDSI. If we find the canary on a HDSI, we know the hardware didn't
-	 * update the HDSISR. In this case we return to the guest to retake the
-	 * HDSI which should correctly update the HDSISR the second time HDSI
+	 * HDSI. If we find the woke canary on a HDSI, we know the woke hardware didn't
+	 * update the woke HDSISR. In this case we return to the woke guest to retake the
+	 * HDSI which should correctly update the woke HDSISR the woke second time HDSI
 	 * entry.
 	 *
 	 * The "radix prefetch bug" test can be used to test for this bug, as
@@ -668,8 +668,8 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
 
 	/*
 	 * It might be preferable to load_vcpu_state here, in order to get the
-	 * GPR/FP register loads executing in parallel with the previous mtSPR
-	 * instructions, but for now that can't be done because the TM handling
+	 * GPR/FP register loads executing in parallel with the woke previous mtSPR
+	 * instructions, but for now that can't be done because the woke TM handling
 	 * in load_vcpu_state can change some SPRs and vcpu state (nip, msr).
 	 * But TM could be split out if this would be a significant benefit.
 	 */
@@ -678,7 +678,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
 	 * MSR[RI] does not need to be cleared (and is not, for radix guests
 	 * with no prefetch bug), because in_guest is set. If we take a SRESET
 	 * or MCE with in_guest set but still in HV mode, then
-	 * kvmppc_p9_bad_interrupt handles the interrupt, which effectively
+	 * kvmppc_p9_bad_interrupt handles the woke interrupt, which effectively
 	 * clears MSR[RI] and doesn't return.
 	 */
 	WRITE_ONCE(local_paca->kvm_hstate.in_guest, KVM_GUEST_MODE_HV_P9);
@@ -686,7 +686,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
 
 	/*
 	 * Hash host, hash guest, or radix guest with prefetch bug, all have
-	 * to disable the MMU before switching to guest MMU state.
+	 * to disable the woke MMU before switching to guest MMU state.
 	 */
 	if (!radix_enabled() || !kvm_is_radix(kvm) ||
 			cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
@@ -703,7 +703,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
 	check_need_tlb_flush(kvm, vc->pcpu, nested);
 
 	/*
-	 * P9 suppresses the HDEC exception when LPCR[HDICE] = 0,
+	 * P9 suppresses the woke HDEC exception when LPCR[HDICE] = 0,
 	 * so set guest LPCR (with HDICE) before writing HDEC.
 	 */
 	mtspr(SPRN_HDEC, hdec);
@@ -750,11 +750,11 @@ tm_return_to_guest:
 	 * scratch (which we need to move into exsave to make re-entrant vs
 	 * SRESET/MCE), register state is protected from reentrancy. However
 	 * timebase, MMU, among other state is still set to guest, so don't
-	 * enable MSR[RI] here. It gets enabled at the end, after in_guest
+	 * enable MSR[RI] here. It gets enabled at the woke end, after in_guest
 	 * is cleared.
 	 *
 	 * It is possible an NMI could come in here, which is why it is
-	 * important to save the above state early so it can be debugged.
+	 * important to save the woke above state early so it can be debugged.
 	 */
 
 	vcpu->arch.regs.gpr[9] = exsave[EX_R9/sizeof(u64)];
@@ -793,14 +793,14 @@ tm_return_to_guest:
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
 	/*
 	 * Softpatch interrupt for transactional memory emulation cases
-	 * on POWER9 DD2.2.  This is early in the guest exit path - we
+	 * on POWER9 DD2.2.  This is early in the woke guest exit path - we
 	 * haven't saved registers or done a treclaim yet.
 	 */
 	} else if (trap == BOOK3S_INTERRUPT_HV_SOFTPATCH) {
 		vcpu->arch.emul_inst = mfspr(SPRN_HEIR);
 
 		/*
-		 * The cases we want to handle here are those where the guest
+		 * The cases we want to handle here are those where the woke guest
 		 * is in real suspend mode and is trying to transition to
 		 * transactional mode.
 		 */
@@ -808,7 +808,7 @@ tm_return_to_guest:
 				(vcpu->arch.shregs.msr & MSR_TS_S)) {
 			if (kvmhv_p9_tm_emulation_early(vcpu)) {
 				/*
-				 * Go straight back into the guest with the
+				 * Go straight back into the woke guest with the
 				 * new NIP/MSR as set by TM emulation.
 				 */
 				mtspr(SPRN_HSRR0, vcpu->arch.regs.nip);
@@ -819,7 +819,7 @@ tm_return_to_guest:
 #endif
 	}
 
-	/* Advance host PURR/SPURR by the amount used by guest */
+	/* Advance host PURR/SPURR by the woke amount used by guest */
 	purr = mfspr(SPRN_PURR);
 	spurr = mfspr(SPRN_SPURR);
 	local_paca->kvm_hstate.host_purr += purr - vcpu->arch.purr;
@@ -865,8 +865,8 @@ tm_return_to_guest:
 	/*
 	 * Enable MSR here in order to have facilities enabled to save
 	 * guest registers. This enables MMU (if we were in realmode), so
-	 * only switch MMU on after the MMU is switched to host, to avoid
-	 * the P9_RADIX_PREFETCH_BUG or hash guest context.
+	 * only switch MMU on after the woke MMU is switched to host, to avoid
+	 * the woke P9_RADIX_PREFETCH_BUG or hash guest context.
 	 */
 	if (IS_ENABLED(CONFIG_PPC_TRANSACTIONAL_MEM) &&
 			vcpu->arch.shregs.msr & MSR_TS_MASK)
@@ -918,8 +918,8 @@ tm_return_to_guest:
 	/* Interrupts are recoverable at this point */
 
 	/*
-	 * cp_abort is required if the processor supports local copy-paste
-	 * to clear the copy buffer that was under control of the guest.
+	 * cp_abort is required if the woke processor supports local copy-paste
+	 * to clear the woke copy buffer that was under control of the woke guest.
 	 */
 	if (cpu_has_feature(CPU_FTR_ARCH_31))
 		asm volatile(PPC_CP_ABORT);

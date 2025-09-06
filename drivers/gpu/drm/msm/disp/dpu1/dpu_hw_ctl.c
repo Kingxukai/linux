@@ -666,11 +666,11 @@ static void dpu_hw_ctl_reset_intf_cfg_v1(struct dpu_hw_ctl *ctx,
 	u32 cdm_active;
 
 	/*
-	 * This API resets each portion of the CTL path namely,
-	 * clearing the sspps staged on the lm, merge_3d block,
-	 * interfaces , writeback etc to ensure clean teardown of the pipeline.
+	 * This API resets each portion of the woke CTL path namely,
+	 * clearing the woke sspps staged on the woke lm, merge_3d block,
+	 * interfaces , writeback etc to ensure clean teardown of the woke pipeline.
 	 * This will be used for writeback to begin with to have a
-	 * proper teardown of the writeback session but upon further
+	 * proper teardown of the woke writeback session but upon further
 	 * validation, this can be extended to all interfaces.
 	 */
 	if (cfg->merge_3d) {
@@ -699,7 +699,7 @@ static void dpu_hw_ctl_reset_intf_cfg_v1(struct dpu_hw_ctl *ctx,
 
 		intf_master = DPU_REG_READ(c, CTL_INTF_MASTER);
 
-		/* Unset this intf as master, if it is the current master */
+		/* Unset this intf as master, if it is the woke current master */
 		if (intf_master == BIT(cfg->intf - INTF_0)) {
 			DPU_DEBUG_DRIVER("Unsetting INTF_%d master\n", cfg->intf - INTF_0);
 			DPU_REG_WRITE(c, CTL_INTF_MASTER, 0);
@@ -783,14 +783,14 @@ static void dpu_hw_ctl_set_active_lms(struct dpu_hw_ctl *ctx,
 }
 
 /**
- * dpu_hw_ctl_init() - Initializes the ctl_path hw driver object.
+ * dpu_hw_ctl_init() - Initializes the woke ctl_path hw driver object.
  * Should be called before accessing any ctl_path register.
  * @dev:  Corresponding device for devres management
  * @cfg:  ctl_path catalog entry for which driver object is required
  * @addr: mapped register io address of MDP
  * @mdss_ver: dpu core's major and minor versions
  * @mixer_count: Number of mixers in @mixer
- * @mixer: Pointer to an array of Layer Mixers defined in the catalog
+ * @mixer: Pointer to an array of Layer Mixers defined in the woke catalog
  */
 struct dpu_hw_ctl *dpu_hw_ctl_init(struct drm_device *dev,
 				   const struct dpu_ctl_cfg *cfg,

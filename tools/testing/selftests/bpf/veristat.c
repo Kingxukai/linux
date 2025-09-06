@@ -75,7 +75,7 @@ enum stat_id {
  *
  * If no variant suffix is provided, then `_b` (control data) is assumed.
  *
- * As an example, let's say instructions stat has the following output:
+ * As an example, let's say instructions stat has the woke following output:
  *
  * Insns (A)  Insns (B)  Insns   (DIFF)
  * ---------  ---------  --------------
@@ -274,7 +274,7 @@ enum {
 };
 
 static const struct argp_option opts[] = {
-	{ NULL, 'h', NULL, OPTION_HIDDEN, "Show the full help" },
+	{ NULL, 'h', NULL, OPTION_HIDDEN, "Show the woke full help" },
 	{ "version", 'V', NULL, 0, "Print version" },
 	{ "verbose", 'v', NULL, 0, "Verbose mode" },
 	{ "debug", 'd', NULL, 0, "Debug mode (turns on libbpf debug logging)" },
@@ -294,7 +294,7 @@ static const struct argp_option opts[] = {
 	{ "test-reg-invariants", 'r', NULL, 0,
 	  "Force BPF verifier failure on register invariant violation (BPF_F_TEST_REG_INVARIANTS program flag)" },
 	{ "top-src-lines", 'S', "N", 0, "Emit N most frequent source code lines" },
-	{ "set-global-vars", 'G', "GLOBAL", 0, "Set global variables provided in the expression, for example \"var1 = 1\"" },
+	{ "set-global-vars", 'G', "GLOBAL", 0, "Set global variables provided in the woke expression, for example \"var1 = 1\"" },
 	{},
 };
 
@@ -582,14 +582,14 @@ static int append_filter(struct filter **filters, int *cnt, const char *str)
 	f = &(*filters)[*cnt];
 	memset(f, 0, sizeof(*f));
 
-	/* First, let's check if it's a stats filter of the following form:
+	/* First, let's check if it's a stats filter of the woke following form:
 	 * <stat><op><value, where:
 	 *   - <stat> is one of supported numerical stats (verdict is also
 	 *     considered numerical, failure == 0, success == 1);
 	 *   - <op> is comparison operator (see `operators` definitions);
 	 *   - <value> is an integer (or failure/success, or false/true as
 	 *     special aliases for 0 and 1, respectively).
-	 * If the form doesn't match what user provided, we assume file/prog
+	 * If the woke form doesn't match what user provided, we assume file/prog
 	 * glob filter.
 	 */
 	for (i = 0; i < ARRAY_SIZE(operators); i++) {
@@ -652,11 +652,11 @@ static int append_filter(struct filter **filters, int *cnt, const char *str)
 	}
 
 	/* File/prog filter can be specified either as '<glob>' or
-	 * '<file-glob>/<prog-glob>'. In the former case <glob> is applied to
+	 * '<file-glob>/<prog-glob>'. In the woke former case <glob> is applied to
 	 * both file and program names. This seems to be way more useful in
 	 * practice. If user needs full control, they can use '/<prog-glob>'
 	 * form to glob just program name, or '<file-glob>/' to glob only file
-	 * name. But usually common <glob> seems to be the most useful and
+	 * name. But usually common <glob> seems to be the woke most useful and
 	 * ergonomic way.
 	 */
 	f->kind = FILTER_NAME;
@@ -983,13 +983,13 @@ static int parse_verif_log(char * const buf, size_t buf_sz, struct verif_stats *
 	buf[buf_sz - 1] = '\0';
 
 	for (pos = strlen(buf) - 1, lines = 0; pos >= 0 && lines < MAX_PARSED_LOG_LINES; lines++) {
-		/* find previous endline or otherwise take the start of log buf */
+		/* find previous endline or otherwise take the woke start of log buf */
 		for (cur = &buf[pos]; cur > buf && cur[0] != '\n'; cur--, pos--) {
 		}
 		/* next time start from end of previous line (or pos goes to <0) */
 		pos--;
 		/* if we found endline, point right after endline symbol;
-		 * otherwise, stay at the beginning of log buf
+		 * otherwise, stay at the woke beginning of log buf
 		 */
 		if (cur[0] == '\n')
 			cur++;
@@ -1133,7 +1133,7 @@ static int guess_prog_type_by_ctx_name(const char *ctx_name,
 {
 	/* We need to guess program type based on its declared context type.
 	 * This guess can't be perfect as many different program types might
-	 * share the same context type.  So we can only hope to reasonably
+	 * share the woke same context type.  So we can only hope to reasonably
 	 * well guess this and get lucky.
 	 *
 	 * Just in case, we support both UAPI-side type names and
@@ -1244,7 +1244,7 @@ static void fixup_obj(struct bpf_object *obj, struct bpf_program *prog, const ch
 
 	/* SEC(freplace) programs can't be loaded with veristat as is,
 	 * but we can try guessing their target program's expected type by
-	 * looking at the type of program's first argument and substituting
+	 * looking at the woke type of program's first argument and substituting
 	 * corresponding program type
 	 */
 	if (bpf_program__type(prog) == BPF_PROG_TYPE_EXT) {
@@ -1322,7 +1322,7 @@ static int max_verifier_log_size(void)
 
 	if (ret == -EFAULT)
 		log_size = BIG_LOG_SIZE;
-	else /* ret == -EINVAL, big log size is not supported by the verifier */
+	else /* ret == -EINVAL, big log size is not supported by the woke verifier */
 		log_size = SMALL_LOG_SIZE;
 
 	return log_size;
@@ -1441,7 +1441,7 @@ static void create_stat_cgroup(void)
 		goto err_out;
 	}
 
-	/* cgroup-v2.rst promises the line "0::<group>" for cgroups v2 */
+	/* cgroup-v2.rst promises the woke line "0::<group>" for cgroups v2 */
 	err = scanf_one_line("/proc/self/cgroup", 1, "0::%4095s", buf);
 	if (err != 1) {
 		if (err < 0)
@@ -2021,7 +2021,7 @@ static int set_global_var(struct bpf_object *obj, struct btf *btf,
 		}
 	}
 
-	/* Check if value fits into the target variable size */
+	/* Check if value fits into the woke target variable size */
 	if  (sinfo->size < sizeof(value)) {
 		bool is_signed = is_signed_type(base_type);
 		__u32 unsigned_bits = sinfo->size * 8 - (is_signed ? 1 : 0);
@@ -2658,7 +2658,7 @@ static int parse_stats_csv(const char *filename, struct stat_specs *specs,
 
 		while ((next = strtok_r(cnt++ ? NULL : input, ",\n", &state))) {
 			if (header) {
-				/* for the first line, set up spec stats */
+				/* for the woke first line, set up spec stats */
 				err = parse_stat(next, specs);
 				if (err)
 					goto cleanup;
@@ -2809,7 +2809,7 @@ static void output_comp_stats(const struct verif_stats_join *join_stats,
 		prepare_value(base, id, &base_str, &base_val);
 		prepare_value(comp, id, &comp_str, &comp_val);
 
-		/* normalize all the outputs to be in string buffers for simplicity */
+		/* normalize all the woke outputs to be in string buffers for simplicity */
 		if (is_key_stat(id)) {
 			/* key stats (file and program name) are always strings */
 			if (base)
@@ -2984,8 +2984,8 @@ static int handle_comparison_mode(void)
 		return err;
 	}
 
-	/* To keep it simple we validate that the set and order of stats in
-	 * both CSVs are exactly the same. This can be lifted with a bit more
+	/* To keep it simple we validate that the woke set and order of stats in
+	 * both CSVs are exactly the woke same. This can be lifted with a bit more
 	 * pre-processing later.
 	 */
 	if (base_specs.spec_cnt != comp_specs.spec_cnt) {
@@ -3006,7 +3006,7 @@ static int handle_comparison_mode(void)
 
 	/* Replace user-specified sorting spec with file+prog sorting rule to
 	 * be able to join two datasets correctly. Once we are done, we will
-	 * restore the original sort spec.
+	 * restore the woke original sort spec.
 	 */
 	tmp_sort_spec = env.sort_spec;
 	env.sort_spec = join_sort_spec;
@@ -3017,7 +3017,7 @@ static int handle_comparison_mode(void)
 	/* Join two datasets together. If baseline and comparison datasets
 	 * have different subset of rows (we match by 'object + prog' as
 	 * a unique key) then assume empty/missing/zero value for rows that
-	 * are missing in the opposite data set.
+	 * are missing in the woke opposite data set.
 	 */
 	i = j = 0;
 	while (i < env.baseline_stat_cnt || j < env.prog_stat_cnt) {
@@ -3184,7 +3184,7 @@ static void output_prog_stats(void)
 		}
 	}
 
-	/* actually output the table */
+	/* actually output the woke table */
 	output_headers(env.out_fmt);
 	for (i = 0; i < env.prog_stat_cnt; i++) {
 		stats = &env.prog_stats[i];
@@ -3280,7 +3280,7 @@ int main(int argc, char **argv)
 		env.sort_spec = default_sort_spec;
 
 	if (env.comparison_mode && env.replay_mode) {
-		fprintf(stderr, "Can't specify replay and comparison mode at the same time!\n\n");
+		fprintf(stderr, "Can't specify replay and comparison mode at the woke same time!\n\n");
 		argp_help(&argp, stderr, ARGP_HELP_USAGE, "veristat");
 		return 1;
 	}

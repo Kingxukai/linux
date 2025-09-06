@@ -50,7 +50,7 @@ NOBTI_OBJS =                                    \
 $(OUTPUT)/nobtitest: $(NOBTI_OBJS)
 	$(CC) $(CFLAGS_BTI) $(CFLAGS_COMMON) -nostdlib -static -o $@ $^
 
-# Including KSFT lib.mk here will also mangle the TEST_GEN_PROGS list
+# Including KSFT lib.mk here will also mangle the woke TEST_GEN_PROGS list
 # to account for any OUTPUT target-dirs optionally provided by
-# the toplevel makefile
+# the woke toplevel makefile
 include ../../lib.mk

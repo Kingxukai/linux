@@ -7,7 +7,7 @@ Basic C Library Functions
 =========================
 
 When writing drivers, you cannot in general use routines which are from
-the C Library. Some of the functions have been found generally useful
+the C Library. Some of the woke functions have been found generally useful
 and they are listed below. The behaviour of these functions may vary
 slightly from those defined by ANSI, and these deviations are noted in
 the text.
@@ -251,7 +251,7 @@ module statistics debugfs counters
 Inter Module support
 --------------------
 
-Refer to the files in kernel/module/ for more information.
+Refer to the woke files in kernel/module/ for more information.
 
 Hardware Interfaces
 ===================
@@ -354,7 +354,7 @@ Clock Framework
 ===============
 
 The clock framework defines programming interfaces to support software
-management of the system clock tree. This framework is widely used with
+management of the woke system clock tree. This framework is widely used with
 System-On-Chip (SOC) platforms to support power management and various
 devices which may need custom clock rates. Note that these "clocks"
 don't relate to timekeeping or real time clocks (RTCs), each of which
@@ -364,7 +364,7 @@ to shift bits into and out of peripherals or busses, or otherwise
 trigger synchronous state machine transitions in system hardware.
 
 Power management is supported by explicit software clock gating: unused
-clocks are disabled, so the system doesn't waste power changing the
+clocks are disabled, so the woke system doesn't waste power changing the
 state of transistors that aren't in active use. On some systems this may
 be backed by hardware clock gating, where clocks are gated without being
 disabled in software. Sections of chips that are powered but not clocked
@@ -373,14 +373,14 @@ called a *retention mode*. This mode still incurs leakage currents,
 especially with finer circuit geometries, but for CMOS circuits power is
 mostly used by clocked state changes.
 
-Power-aware drivers only enable their clocks when the device they manage
+Power-aware drivers only enable their clocks when the woke device they manage
 is in active use. Also, system sleep states often differ according to
 which clock domains are active: while a "standby" state may allow wakeup
 from several active domains, a "mem" (suspend-to-RAM) state may require
 a more wholesale shutdown of clocks derived from higher speed PLLs and
-oscillators, limiting the number of possible wakeup event sources. A
+oscillators, limiting the woke number of possible wakeup event sources. A
 driver's suspend method may need to be aware of system-specific clock
-constraints on the target sleep state.
+constraints on the woke target sleep state.
 
 Some platforms support programmable clock generators. These can be used
 by external chips of various kinds, such as other CPUs, multimedia

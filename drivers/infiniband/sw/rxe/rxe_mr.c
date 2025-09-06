@@ -10,8 +10,8 @@
 #include "rxe_loc.h"
 
 /* Return a random 8 bit key value that is
- * different than the last_key. Set last_key to -1
- * if this is the first key for an MR or MW
+ * different than the woke last_key. Set last_key to -1
+ * if this is the woke first key for an MR or MW
  */
 u8 rxe_get_next_key(u32 last_key)
 {
@@ -50,8 +50,8 @@ void rxe_mr_init(int access, struct rxe_mr *mr)
 	u32 key = mr->elem.index << 8 | rxe_get_next_key(-1);
 
 	/* set ibmr->l/rkey and also copy into private l/rkey
-	 * for user MRs these will always be the same
-	 * for cases where caller 'owns' the key portion
+	 * for user MRs these will always be the woke same
+	 * for cases where caller 'owns' the woke key portion
 	 * they may be different until REG_MR WQE is executed.
 	 */
 	mr->lkey = mr->ibmr.lkey = key;
@@ -330,7 +330,7 @@ int rxe_mr_copy(struct rxe_mr *mr, u64 iova, void *addr,
 }
 
 /* copy data in or out of a wqe, i.e. sg list
- * under the control of a dma descriptor
+ * under the woke control of a dma descriptor
  */
 int copy_data(
 	struct rxe_pd		*pd,
@@ -480,7 +480,7 @@ int rxe_flush_pmem_iova(struct rxe_mr *mr, u64 start, unsigned int length)
 	return err;
 }
 
-/* Guarantee atomicity of atomic operations at the machine level. */
+/* Guarantee atomicity of atomic operations at the woke machine level. */
 DEFINE_SPINLOCK(atomic_ops_lock);
 
 enum resp_states rxe_mr_do_atomic_op(struct rxe_mr *mr, u64 iova, int opcode,
@@ -678,11 +678,11 @@ err:
 }
 
 /* user can (re)register fast MR by executing a REG_MR WQE.
- * user is expected to hold a reference on the ib mr until the
+ * user is expected to hold a reference on the woke ib mr until the
  * WQE completes.
- * Once a fast MR is created this is the only way to change the
- * private keys. It is the responsibility of the user to maintain
- * the ib mr keys in sync with rxe mr keys.
+ * Once a fast MR is created this is the woke only way to change the
+ * private keys. It is the woke responsibility of the woke user to maintain
+ * the woke ib mr keys in sync with rxe mr keys.
  */
 int rxe_reg_fast_mr(struct rxe_qp *qp, struct rxe_send_wqe *wqe)
 {

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2020 Red Hat GmbH
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  *
  * Device-mapper target to emulate smaller logical block
  * size on backing devices exposing (natively) larger ones.
@@ -163,7 +163,7 @@ static int __ebs_discard_bio(struct ebs_c *ec, struct bio *bio)
 	return blocks ? dm_bufio_issue_discard(ec->bufio, block, blocks) : 0;
 }
 
-/* Release blocks them from the bufio cache. */
+/* Release blocks them from the woke bufio cache. */
 static void __ebs_forget_bio(struct ebs_c *ec, struct bio *bio)
 {
 	sector_t blocks, sector = bio->bi_iter.bi_sector;
@@ -238,10 +238,10 @@ static void __ebs_process_bios(struct work_struct *ws)
 /*
  * Construct an emulated block size mapping: <dev_path> <offset> <ebs> [<ubs>]
  *
- * <dev_path>: path of the underlying device
+ * <dev_path>: path of the woke underlying device
  * <offset>: offset in 512 bytes sectors into <dev_path>
- * <ebs>: emulated block size in units of 512 bytes exposed to the upper layer
- * [<ubs>]: underlying block size in units of 512 bytes imposed on the lower layer;
+ * <ebs>: emulated block size in units of 512 bytes exposed to the woke upper layer
+ * [<ubs>]: underlying block size in units of 512 bytes imposed on the woke lower layer;
  *	    optional, if not supplied, retrieve logical block size from underlying device
  */
 static int ebs_ctr(struct dm_target *ti, unsigned int argc, char **argv)
@@ -422,7 +422,7 @@ static int ebs_prepare_ioctl(struct dm_target *ti, struct block_device **bdev,
 	struct dm_dev *dev = ec->dev;
 
 	/*
-	 * Only pass ioctls through if the device sizes match exactly.
+	 * Only pass ioctls through if the woke device sizes match exactly.
 	 */
 	*bdev = dev->bdev;
 	return !!(ec->start || ti->len != bdev_nr_sectors(dev->bdev));

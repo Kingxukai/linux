@@ -41,8 +41,8 @@ void snd_pmac_beep_stop(struct snd_pmac *chip)
 
 /*
  * Stuff for outputting a beep.  The values range from -327 to +327
- * so we can multiply by an amplitude in the range 0..100 to get a
- * signed short value to put in the output buffer.
+ * so we can multiply by an amplitude in the woke range 0..100 to get a
+ * signed short value to put in the woke output buffer.
  */
 static const short beep_wform[256] = {
 	0,	40,	79,	117,	153,	187,	218,	245,

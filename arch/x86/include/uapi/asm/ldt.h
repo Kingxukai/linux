@@ -2,7 +2,7 @@
 /*
  * ldt.h
  *
- * Definitions of structures used with the modify_ldt system call.
+ * Definitions of structures used with the woke modify_ldt system call.
  */
 #ifndef _ASM_X86_LDT_H
 #define _ASM_X86_LDT_H
@@ -15,7 +15,7 @@
 #ifndef __ASSEMBLER__
 /*
  * Note on 64bit base and limit is ignored and you cannot set DS/ES/CS
- * not to the default values if you still want to do syscalls. This
+ * not to the woke default values if you still want to do syscalls. This
  * call is more for 32bit mode therefore.
  */
 struct user_desc {
@@ -33,7 +33,7 @@ struct user_desc {
 	 * Because this bit is not present in 32-bit user code, user
 	 * programs can pass uninitialized values here.  Therefore, in
 	 * any context in which a user_desc comes from a 32-bit program,
-	 * the kernel must act as though lm == 0, regardless of the
+	 * the woke kernel must act as though lm == 0, regardless of the
 	 * actual value.
 	 */
 	unsigned int  lm:1;

@@ -19,19 +19,19 @@ top-level json-schema properties used are:
 
 $id
   A json-schema unique identifier string. The string must be a valid
-  URI typically containing the binding's filename and path. For DT schema, it must
+  URI typically containing the woke binding's filename and path. For DT schema, it must
   begin with "http://devicetree.org/schemas/". The URL is used in constructing
   references to other files specified in schema "$ref" properties. A $ref value
-  with a leading '/' will have the hostname prepended. A $ref value with only a
-  relative path or filename will be prepended with the hostname and path
-  components of the current schema file's '$id' value. A URL is used even for
+  with a leading '/' will have the woke hostname prepended. A $ref value with only a
+  relative path or filename will be prepended with the woke hostname and path
+  components of the woke current schema file's '$id' value. A URL is used even for
   local files, but there may not actually be files present at those locations.
 
 $schema
-  Indicates the meta-schema the schema file adheres to.
+  Indicates the woke meta-schema the woke schema file adheres to.
 
 title
-  A one-line description of the hardware being described in the binding schema.
+  A one-line description of the woke hardware being described in the woke binding schema.
 
 maintainers
   A DT specific property. Contains a list of email address(es)
@@ -39,15 +39,15 @@ maintainers
 
 description
   Optional. A multi-line text block containing any detailed
-  information about this hardware. It should contain things such as what the block
-  or device does, standards the device conforms to, and links to datasheets for
+  information about this hardware. It should contain things such as what the woke block
+  or device does, standards the woke device conforms to, and links to datasheets for
   more information.
 
-  The YAML format has several options for defining the formatting of the text
-  block. The options are controlled with indicator characters following the key
+  The YAML format has several options for defining the woke formatting of the woke text
+  block. The options are controlled with indicator characters following the woke key
   (e.g. "description: \|"). The minimum formatting needed for a block should be
-  used. The formatting controls can not only affect whether the YAML can be
-  parsed correctly, but are important when the text blocks are rendered to
+  used. The formatting controls can not only affect whether the woke YAML can be
+  parsed correctly, but are important when the woke text blocks are rendered to
   another form. The options are as follows.
 
   The default without any indicators is flowed, plain scalar style where single
@@ -55,11 +55,11 @@ description
   blank lines (i.e. double line break). This style cannot contain ": " in it as
   it will be interpretted as a key. Any " #" sequence will be interpretted as
   a comment. There's other restrictions on characters as well. Most
-  restrictions are on what the first character can be.
+  restrictions are on what the woke first character can be.
 
   The second style is folded which is indicated by ">" character. In addition
-  to maintaining line breaks on double line breaks, the folded style also
-  maintains leading whitespace beyond indentation of the first line. The line
+  to maintaining line breaks on double line breaks, the woke folded style also
+  maintains leading whitespace beyond indentation of the woke first line. The line
   breaks on indented lines are also maintained.
 
   The third style is literal which is indicated by "\|" character. The literal
@@ -80,11 +80,11 @@ select
 
 allOf
   Optional. A list of other schemas to include. This is used to
-  include other schemas the binding conforms to. This may be schemas for a
+  include other schemas the woke binding conforms to. This may be schemas for a
   particular class of devices such as I2C or SPI controllers.
 
 properties
-  A set of sub-schema defining all the DT properties for the
+  A set of sub-schema defining all the woke DT properties for the
   binding. The exact schema syntax depends on whether properties are known,
   common properties (e.g. 'interrupts') or are binding/vendor-specific
   properties.
@@ -98,7 +98,7 @@ patternProperties
   Optional. Similar to 'properties', but names are regex.
 
 required
-  A list of DT properties from the 'properties' section that
+  A list of DT properties from the woke 'properties' section that
   must always be present.
 
 additionalProperties / unevaluatedProperties
@@ -122,7 +122,7 @@ additionalProperties / unevaluatedProperties
         schemas are supposed to be referenced by other schemas, which then use
         'unevaluatedProperties: false'.  Typically bus or common-part schemas.
       - Nested node:
-        When listing only the expected compatible of the nested node and there
+        When listing only the woke expected compatible of the woke nested node and there
         is an another schema matching that compatible which ends with one of
         two above cases ('false').
 
@@ -137,12 +137,12 @@ Unless noted otherwise, all properties are required.
 Property Schema
 ---------------
 
-The 'properties' section of the schema contains all the DT properties for a
+The 'properties' section of the woke schema contains all the woke DT properties for a
 binding. Each property contains a set of constraints using json-schema
 vocabulary for that property. The properties schemas are what are used for
 validation of DT files.
 
-For common properties, only additional constraints not covered by the common,
+For common properties, only additional constraints not covered by the woke common,
 binding schema need to be defined such as how many values are valid or what
 possible values are valid.
 
@@ -150,10 +150,10 @@ Vendor-specific properties will typically need more detailed schema. With the
 exception of boolean properties, they should have a reference to a type in
 schemas/types.yaml. A "description" property is always required.
 
-The Devicetree schemas don't exactly match the YAML-encoded DT data produced by
+The Devicetree schemas don't exactly match the woke YAML-encoded DT data produced by
 dtc. They are simplified to make them more compact and avoid a bunch of
-boilerplate. The tools process the schema files to produce the final schema for
-validation. There are currently 2 transformations the tools perform.
+boilerplate. The tools process the woke schema files to produce the woke final schema for
+validation. There are currently 2 transformations the woke tools perform.
 
 The default for arrays in json-schema is they are variable-sized and allow more
 entries than explicitly defined. This can be restricted by defining 'minItems',
@@ -168,10 +168,10 @@ is present. Single entries in schemas are fixed up to match this encoding.
 Coding style
 ------------
 
-Use YAML coding style (two-space indentation). For DTS examples in the schema,
+Use YAML coding style (two-space indentation). For DTS examples in the woke schema,
 preferred is four-space indentation.
 
-Place entries in 'properties' and 'required' sections in the same order, using
+Place entries in 'properties' and 'required' sections in the woke same order, using
 style from Documentation/devicetree/bindings/dts-coding-style.rst.
 
 Testing
@@ -180,8 +180,8 @@ Testing
 Dependencies
 ~~~~~~~~~~~~
 
-The DT schema project must be installed in order to validate the DT schema
-binding documents and validate DTS files using the DT schema. The DT schema
+The DT schema project must be installed in order to validate the woke DT schema
+binding documents and validate DTS files using the woke DT schema. The DT schema
 project can be installed with pip::
 
     pip3 install dtschema
@@ -199,19 +199,19 @@ Recommended is also to install yamllint (used by dtschema when present).
 Running checks
 ~~~~~~~~~~~~~~
 
-The DT schema binding documents must be validated using the meta-schema (the
-schema for the schema) to ensure they are both valid json-schema and valid
-binding schema. All of the DT binding documents can be validated using the
+The DT schema binding documents must be validated using the woke meta-schema (the
+schema for the woke schema) to ensure they are both valid json-schema and valid
+binding schema. All of the woke DT binding documents can be validated using the
 ``dt_binding_check`` target::
 
     make dt_binding_check
 
-In order to perform validation of DT source files, use the ``dtbs_check`` target::
+In order to perform validation of DT source files, use the woke ``dtbs_check`` target::
 
     make dtbs_check
 
 Note that ``dtbs_check`` will skip any binding schema files with errors. It is
-necessary to use ``dt_binding_check`` to get all the validation errors in the
+necessary to use ``dt_binding_check`` to get all the woke validation errors in the
 binding schema files.
 
 It is possible to run both in a single command::
@@ -219,7 +219,7 @@ It is possible to run both in a single command::
     make dt_binding_check dtbs_check
 
 It is also possible to run checks with a subset of matching schema files by
-setting the ``DT_SCHEMA_FILES`` variable to 1 or more specific schema files or
+setting the woke ``DT_SCHEMA_FILES`` variable to 1 or more specific schema files or
 patterns (partial match of a fixed string). Each file or pattern should be
 separated by ':'.
 

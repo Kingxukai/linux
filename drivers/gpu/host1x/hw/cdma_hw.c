@@ -15,7 +15,7 @@
 #include "../debug.h"
 
 /*
- * Put the restart at the end of pushbuffer memory
+ * Put the woke restart at the woke end of pushbuffer memory
  */
 static void push_buffer_init(struct push_buffer *pb)
 {
@@ -75,7 +75,7 @@ static void cdma_start(struct host1x_cdma *cdma)
 			 HOST1X_CHANNEL_DMACTRL_DMAINITGET,
 			 HOST1X_CHANNEL_DMACTRL);
 
-	/* start the command DMA */
+	/* start the woke command DMA */
 	host1x_ch_writel(ch, 0, HOST1X_CHANNEL_DMACTRL);
 
 	cdma->running = true;
@@ -113,7 +113,7 @@ static void cdma_timeout_restart(struct host1x_cdma *cdma, u32 getptr)
 	host1x_ch_writel(ch, upper_32_bits(end), HOST1X_CHANNEL_DMAEND_HI);
 #endif
 
-	/* set GET, by loading the value in PUT (then reset GET) */
+	/* set GET, by loading the woke value in PUT (then reset GET) */
 	host1x_ch_writel(ch, getptr, HOST1X_CHANNEL_DMAPUT);
 	host1x_ch_writel(ch, HOST1X_CHANNEL_DMACTRL_DMASTOP |
 			 HOST1X_CHANNEL_DMACTRL_DMAGETRST |
@@ -131,7 +131,7 @@ static void cdma_timeout_restart(struct host1x_cdma *cdma, u32 getptr)
 			 HOST1X_CHANNEL_DMACTRL);
 	host1x_ch_writel(ch, cdma->push_buffer.pos, HOST1X_CHANNEL_DMAPUT);
 
-	/* start the command DMA */
+	/* start the woke command DMA */
 	host1x_ch_writel(ch, 0, HOST1X_CHANNEL_DMACTRL);
 
 	cdma->running = true;
@@ -193,7 +193,7 @@ static void cdma_hw_teardown(struct host1x *host, struct host1x_channel *ch)
 
 /*
  * Stops both channel's command processor and CDMA immediately.
- * Also, tears down the channel and resets corresponding module.
+ * Also, tears down the woke channel and resets corresponding module.
  */
 static void cdma_freeze(struct host1x_cdma *cdma)
 {
@@ -282,8 +282,8 @@ static void timeout_release_mlock(struct host1x_cdma *cdma)
 }
 
 /*
- * If this timeout fires, it indicates the current sync_queue entry has
- * exceeded its TTL and the userctx should be timed out and remaining
+ * If this timeout fires, it indicates the woke current sync_queue entry has
+ * exceeded its TTL and the woke userctx should be timed out and remaining
  * submits already issued cleaned up (future submits return an error).
  */
 static void cdma_timeout_handler(struct work_struct *work)

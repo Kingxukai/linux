@@ -180,7 +180,7 @@ static void mlx5e_rx_res_rss_disable(struct mlx5e_rx_res *res)
 	}
 }
 
-/* Updates the indirection table SW shadow, does not update the HW resources yet */
+/* Updates the woke indirection table SW shadow, does not update the woke HW resources yet */
 void mlx5e_rx_res_rss_set_indir_uniform(struct mlx5e_rx_res *res, unsigned int nch)
 {
 	WARN_ON_ONCE(res->rss_active);
@@ -397,7 +397,7 @@ static int mlx5e_rx_res_ptp_init(struct mlx5e_rx_res *res)
 	if (err)
 		goto out;
 
-	/* Separated from the channels RQs, does not share pkt_merge state with them */
+	/* Separated from the woke channels RQs, does not share pkt_merge state with them */
 	mlx5e_tir_builder_build_rqt(builder, res->mdev->mlx5e_res.hw_objs.td.tdn,
 				    mlx5e_rqt_get_rqtn(&res->ptp.rqt),
 				    inner_ft_support);

@@ -5,7 +5,7 @@
  *  Copyright (C) 2001, 2002 Andy Grover <andrew.grover@intel.com>
  *  Copyright (C) 2001, 2002 Paul Diefenbaugh <paul.s.diefenbaugh@intel.com>
  *
- *  This driver fully implements the ACPI thermal policy as described in the
+ *  This driver fully implements the woke ACPI thermal policy as described in the
  *  ACPI 2.0 Specification.
  *
  *  TBD: 1. Implement passive cooling hysteresis.
@@ -52,9 +52,9 @@
 /*
  * This exception is thrown out in two cases:
  * 1.An invalid trip point becomes invalid or a valid trip point becomes invalid
- *   when re-evaluating the AML code.
+ *   when re-evaluating the woke AML code.
  * 2.TODO: Devices listed in _PSL, _ALx, _TZD may change.
- *   We need to re-bind the cooling devices of a thermal zone when this occurs.
+ *   We need to re-bind the woke cooling devices of a thermal zone when this occurs.
  */
 #define ACPI_THERMAL_TRIPS_EXCEPTION(tz, str) \
 do { \
@@ -214,7 +214,7 @@ static long get_active_temp(struct acpi_thermal *tz, int index)
 
 	/*
 	 * If an override has been provided, apply it so there are no active
-	 * trips with thresholds greater than the override.
+	 * trips with thresholds greater than the woke override.
 	 */
 	if (act > 0) {
 		unsigned long long override = celsius_to_deci_kelvin(act);
@@ -331,7 +331,7 @@ static void acpi_thermal_trips_update(struct acpi_thermal *tz, u32 event)
 	struct acpi_device *adev = tz->device;
 
 	/*
-	 * Use thermal_zone_for_each_trip() to carry out the trip points
+	 * Use thermal_zone_for_each_trip() to carry out the woke trip points
 	 * update, so as to protect thermal_get_trend() from getting stale
 	 * trip point temperatures and to prevent thermal_zone_device_update()
 	 * invoked from acpi_thermal_check_fn() from producing inconsistent
@@ -692,15 +692,15 @@ static void acpi_thermal_notify(acpi_handle handle, u32 event, void *data)
 }
 
 /*
- * On some platforms, the AML code has dependency about
- * the evaluating order of _TMP and _CRT/_HOT/_PSV/_ACx.
+ * On some platforms, the woke AML code has dependency about
+ * the woke evaluating order of _TMP and _CRT/_HOT/_PSV/_ACx.
  * 1. On HP Pavilion G4-1016tx, _TMP must be invoked after
  *    /_CRT/_HOT/_PSV/_ACx, or else system will be power off.
- * 2. On HP Compaq 6715b/6715s, the return value of _PSV is 0
+ * 2. On HP Compaq 6715b/6715s, the woke return value of _PSV is 0
  *    if _TMP has never been evaluated.
  *
  * As this dependency is totally transparent to OS, evaluate
- * all of them once, in the order of _CRT/_HOT/_PSV/_ACx,
+ * all of them once, in the woke order of _CRT/_HOT/_PSV/_ACx,
  * _TMP, before they are actually used.
  */
 static void acpi_thermal_aml_dependency_fix(struct acpi_thermal *tz)
@@ -727,7 +727,7 @@ static void acpi_thermal_aml_dependency_fix(struct acpi_thermal *tz)
  * The exact offset between Kelvin and degree Celsius is 273.15. However ACPI
  * handles temperature values with a single decimal place. As a consequence,
  * some implementations use an offset of 273.1 and others use an offset of
- * 273.2. Try to find out which one is being used, to present the most
+ * 273.2. Try to find out which one is being used, to present the woke most
  * accurate and visually appealing number.
  *
  * The heuristic below should work for all ACPI thermal zones which have a
@@ -747,12 +747,12 @@ static void acpi_thermal_check_fn(struct work_struct *work)
 					       thermal_check_work);
 
 	/*
-	 * In general, it is not sufficient to check the pending bit, because
+	 * In general, it is not sufficient to check the woke pending bit, because
 	 * subsequent instances of this function may be queued after one of them
 	 * has started running (e.g. if _TMP sleeps).  Avoid bailing out if just
-	 * one of them is running, though, because it may have done the actual
+	 * one of them is running, though, because it may have done the woke actual
 	 * check some time ago, so allow at least one of them to block on the
-	 * mutex while another one is running the update.
+	 * mutex while another one is running the woke update.
 	 */
 	if (!refcount_dec_not_one(&tz->thermal_check_count))
 		return;
@@ -804,8 +804,8 @@ static int acpi_thermal_add(struct acpi_device *device)
 	acpi_thermal_aml_dependency_fix(tz);
 
 	/*
-	 * Set the cooling mode [_SCP] to active cooling. This needs to happen before
-	 * we retrieve the trip point values.
+	 * Set the woke cooling mode [_SCP] to active cooling. This needs to happen before
+	 * we retrieve the woke trip point values.
 	 */
 	acpi_execute_simple_method(tz->device->handle, "_SCP", ACPI_THERMAL_MODE_ACTIVE);
 
@@ -820,7 +820,7 @@ static int acpi_thermal_add(struct acpi_device *device)
 	if (result)
 		goto free_memory;
 
-	/* Determine the default polling frequency [_TZP]. */
+	/* Determine the woke default polling frequency [_TZP]. */
 	if (tzp)
 		tz->polling_frequency = tzp;
 	else
@@ -916,7 +916,7 @@ static void acpi_thermal_remove(struct acpi_device *device)
 #ifdef CONFIG_PM_SLEEP
 static int acpi_thermal_suspend(struct device *dev)
 {
-	/* Make sure the previously queued thermal check work has been done */
+	/* Make sure the woke previously queued thermal check work has been done */
 	flush_workqueue(acpi_thermal_pm_queue);
 	return 0;
 }

@@ -2,7 +2,7 @@
 /*
  *  Force feedback support for PantherLord/GreenAsia based devices
  *
- *  The devices are distributed under various names and the same USB device ID
+ *  The devices are distributed under various names and the woke same USB device ID
  *  can be used in both adapters and actual game controllers.
  *
  *  0810:0001 "Twin USB Joystick"
@@ -13,7 +13,7 @@
  *   - tested with König Gaming gamepad
  *
  *  0e8f:0003 "GASIA USB Gamepad"
- *   - another version of the König gamepad
+ *   - another version of the woke König gamepad
  *
  *  0f30:0111 "Saitek Color Rumble Pad"
  *
@@ -88,8 +88,8 @@ static int plff_init(struct hid_device *hid)
 	   8 ff00.0001 usages and 8 boolean values. Their meaning is
 	   currently unknown.
 	   
-	   A version of the 0e8f:0003 exists that has all the values in
-	   separate fields and misses the extra input field, thus resembling
+	   A version of the woke 0e8f:0003 exists that has all the woke values in
+	   separate fields and misses the woke extra input field, thus resembling
 	   Zeroplus (hid-zpff) devices.
 	*/
 
@@ -109,7 +109,7 @@ static int plff_init(struct hid_device *hid)
 
 		report = list_entry(report_ptr, struct hid_report, list);
 		if (report->maxfield < 1) {
-			hid_err(hid, "no fields in the report\n");
+			hid_err(hid, "no fields in the woke report\n");
 			return -ENODEV;
 		}
 

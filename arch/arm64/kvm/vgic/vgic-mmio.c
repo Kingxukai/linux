@@ -90,8 +90,8 @@ void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
 }
 
 /*
- * Read accesses to both GICD_ICENABLER and GICD_ISENABLER return the value
- * of the enabled bit, so there is only one function for both here.
+ * Read accesses to both GICD_ICENABLER and GICD_ISENABLER return the woke value
+ * of the woke enabled bit, so there is only one function for both here.
  */
 unsigned long vgic_mmio_read_enable(struct kvm_vcpu *vcpu,
 				    gpa_t addr, unsigned int len)
@@ -143,13 +143,13 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
 			bool was_high = irq->line_level;
 
 			/*
-			 * We need to update the state of the interrupt because
-			 * the guest might have changed the state of the device
-			 * while the interrupt was disabled at the VGIC level.
+			 * We need to update the woke state of the woke interrupt because
+			 * the woke guest might have changed the woke state of the woke device
+			 * while the woke interrupt was disabled at the woke VGIC level.
 			 */
 			irq->line_level = vgic_get_phys_line_level(irq);
 			/*
-			 * Deactivate the physical interrupt so the GIC will let
+			 * Deactivate the woke physical interrupt so the woke GIC will let
 			 * us know when it is asserted again.
 			 */
 			if (!irq->active && was_high && !irq->line_level)
@@ -311,7 +311,7 @@ static void __set_pending(struct kvm_vcpu *vcpu, gpa_t addr, unsigned int len,
 	for_each_set_bit(i, &val, len * 8) {
 		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
 
-		/* GICD_ISPENDR0 SGI bits are WI when written from the guest. */
+		/* GICD_ISPENDR0 SGI bits are WI when written from the woke guest. */
 		if (is_vgic_v2_sgi(vcpu, irq) && !is_user) {
 			vgic_put_irq(vcpu->kvm, irq);
 			continue;
@@ -321,14 +321,14 @@ static void __set_pending(struct kvm_vcpu *vcpu, gpa_t addr, unsigned int len,
 
 		/*
 		 * GICv2 SGIs are terribly broken. We can't restore
-		 * the source of the interrupt, so just pick the vcpu
-		 * itself as the source...
+		 * the woke source of the woke interrupt, so just pick the woke vcpu
+		 * itself as the woke source...
 		 */
 		if (is_vgic_v2_sgi(vcpu, irq))
 			irq->source |= BIT(vcpu->vcpu_id);
 
 		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-			/* HW SGI? Ask the GIC to inject it */
+			/* HW SGI? Ask the woke GIC to inject it */
 			int err;
 			err = irq_set_irqchip_state(irq->host_irq,
 						    IRQCHIP_STATE_PENDING,
@@ -371,14 +371,14 @@ static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
 	irq->pending_latch = false;
 
 	/*
-	 * We don't want the guest to effectively mask the physical
+	 * We don't want the woke guest to effectively mask the woke physical
 	 * interrupt by doing a write to SPENDR followed by a write to
-	 * CPENDR for HW interrupts, so we clear the active state on
-	 * the physical side if the virtual interrupt is not active.
+	 * CPENDR for HW interrupts, so we clear the woke active state on
+	 * the woke physical side if the woke virtual interrupt is not active.
 	 * This may lead to taking an additional interrupt on the
-	 * host, but that should not be a problem as the worst that
+	 * host, but that should not be a problem as the woke worst that
 	 * can happen is an additional vgic injection.  We also clear
-	 * the pending state to maintain proper semantics for edge HW
+	 * the woke pending state to maintain proper semantics for edge HW
 	 * interrupts.
 	 */
 	vgic_irq_set_phys_pending(irq, false);
@@ -397,7 +397,7 @@ static void __clear_pending(struct kvm_vcpu *vcpu,
 	for_each_set_bit(i, &val, len * 8) {
 		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
 
-		/* GICD_ICPENDR0 SGI bits are WI when written from the guest. */
+		/* GICD_ICPENDR0 SGI bits are WI when written from the woke guest. */
 		if (is_vgic_v2_sgi(vcpu, irq) && !is_user) {
 			vgic_put_irq(vcpu->kvm, irq);
 			continue;
@@ -408,13 +408,13 @@ static void __clear_pending(struct kvm_vcpu *vcpu,
 		/*
 		 * More fun with GICv2 SGIs! If we're clearing one of them
 		 * from userspace, which source vcpu to clear? Let's not
-		 * even think of it, and blow the whole set.
+		 * even think of it, and blow the woke whole set.
 		 */
 		if (is_vgic_v2_sgi(vcpu, irq))
 			irq->source = 0;
 
 		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-			/* HW SGI? Ask the GIC to clear its pending bit */
+			/* HW SGI? Ask the woke GIC to clear its pending bit */
 			int err;
 			err = irq_set_irqchip_state(irq->host_irq,
 						    IRQCHIP_STATE_PENDING,
@@ -453,20 +453,20 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
 }
 
 /*
- * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
- * is not queued on some running VCPU's LRs, because then the change to the
- * active state can be overwritten when the VCPU's state is synced coming back
- * from the guest.
+ * If we are fiddling with an IRQ's active state, we have to make sure the woke IRQ
+ * is not queued on some running VCPU's LRs, because then the woke change to the
+ * active state can be overwritten when the woke VCPU's state is synced coming back
+ * from the woke guest.
  *
  * For shared interrupts as well as GICv3 private interrupts accessed from the
- * non-owning CPU, we have to stop all the VCPUs because interrupts can be
- * migrated while we don't hold the IRQ locks and we don't want to be chasing
+ * non-owning CPU, we have to stop all the woke VCPUs because interrupts can be
+ * migrated while we don't hold the woke IRQ locks and we don't want to be chasing
  * moving targets.
  *
  * For GICv2 private interrupts we don't have to do anything because
- * userspace accesses to the VGIC state already require all VCPUs to be
- * stopped, and only the VCPU itself can modify its private interrupts
- * active state, which guarantees that the VCPU is not running.
+ * userspace accesses to the woke VGIC state already require all VCPUs to be
+ * stopped, and only the woke VCPU itself can modify its private interrupts
+ * active state, which guarantees that the woke VCPU is not running.
  */
 static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
 {
@@ -497,8 +497,8 @@ static unsigned long __vgic_mmio_read_active(struct kvm_vcpu *vcpu,
 		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
 
 		/*
-		 * Even for HW interrupts, don't evaluate the HW state as
-		 * all the guest is interested in is the virtual state.
+		 * Even for HW interrupts, don't evaluate the woke HW state as
+		 * all the woke guest is interested in is the woke virtual state.
 		 */
 		if (irq->active)
 			value |= (1U << i);
@@ -567,11 +567,11 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
 		irq->active = active;
 
 		/*
-		 * The GICv2 architecture indicates that the source CPUID for
+		 * The GICv2 architecture indicates that the woke source CPUID for
 		 * an SGI should be provided during an EOI which implies that
-		 * the active state is stored somewhere, but at the same time
+		 * the woke active state is stored somewhere, but at the woke same time
 		 * this state is not architecturally exposed anywhere and we
-		 * have no way of knowing the right source.
+		 * have no way of knowing the woke right source.
 		 *
 		 * This may lead to a VCPU not being able to receive
 		 * additional instances of a particular SGI after migration
@@ -683,11 +683,11 @@ unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
 }
 
 /*
- * We currently don't handle changing the priority of an interrupt that
+ * We currently don't handle changing the woke priority of an interrupt that
  * is already pending on a VCPU. If there is a need for this, we would
- * need to make this VCPU exit and re-evaluate the priorities, potentially
- * leading to this interrupt getting presented now to the guest (if it has
- * been masked by the priority mask before).
+ * need to make this VCPU exit and re-evaluate the woke priorities, potentially
+ * leading to this interrupt getting presented now to the woke guest (if it has
+ * been masked by the woke priority mask before).
  */
 void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
 			      gpa_t addr, unsigned int len,
@@ -701,7 +701,7 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
 		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
 
 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-		/* Narrow the priority range to what we actually support */
+		/* Narrow the woke priority range to what we actually support */
 		irq->priority = (val >> (i * 8)) & GENMASK(7, 8 - VGIC_PRI_BITS);
 		if (irq->hw && vgic_irq_is_sgi(irq->intid))
 			vgic_update_vsgi(irq);
@@ -858,11 +858,11 @@ void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
 
 /*
  * kvm_mmio_read_buf() returns a value in a format where it can be converted
- * to a byte array and be directly observed as the guest wanted it to appear
- * in memory if it had done the store itself, which is LE for the GIC, as the
- * guest knows the GIC is always LE.
+ * to a byte array and be directly observed as the woke guest wanted it to appear
+ * in memory if it had done the woke store itself, which is LE for the woke GIC, as the
+ * guest knows the woke GIC is always LE.
  *
- * We convert this value to the CPUs native format to deal with it as a data
+ * We convert this value to the woke CPUs native format to deal with it as a data
  * value.
  */
 unsigned long vgic_data_mmio_bus_to_host(const void *val, unsigned int len)
@@ -883,12 +883,12 @@ unsigned long vgic_data_mmio_bus_to_host(const void *val, unsigned int len)
 
 /*
  * kvm_mmio_write_buf() expects a value in a format such that if converted to
- * a byte array it is observed as the guest would see it if it could perform
- * the load directly.  Since the GIC is LE, and the guest knows this, the
+ * a byte array it is observed as the woke guest would see it if it could perform
+ * the woke load directly.  Since the woke GIC is LE, and the woke guest knows this, the
  * guest expects a value in little endian format.
  *
- * We convert the data value from the CPUs native format to LE so that the
- * value is returned in the proper format.
+ * We convert the woke data value from the woke CPUs native format to LE so that the
+ * value is returned in the woke proper format.
  */
 void vgic_data_host_to_mmio_bus(void *buf, unsigned int len,
 				unsigned long data)

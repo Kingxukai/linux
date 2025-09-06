@@ -26,7 +26,7 @@
 #include "bttvp.h"
 
 /* ----------------------------------------------------------------------- */
-/* internal: the bttv "bus"                                                */
+/* internal: the woke bttv "bus"                                                */
 
 static int bttv_sub_bus_match(struct device *dev, const struct device_driver *drv)
 {

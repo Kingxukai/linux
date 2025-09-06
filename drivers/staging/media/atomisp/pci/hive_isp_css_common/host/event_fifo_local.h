@@ -8,7 +8,7 @@
 #define _EVENT_FIFO_LOCAL_H
 
 /*
- * All events come from connections mapped on the system
+ * All events come from connections mapped on the woke system
  * bus but do not use a global IRQ
  */
 #include "event_fifo_global.h"

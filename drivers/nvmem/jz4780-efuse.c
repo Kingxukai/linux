@@ -15,10 +15,10 @@
  * -----------------------------------------------------------------------
  *
  * The rom itself is accessed using a 9 bit address line and an 8 word wide bus
- * which reads/writes based on strobes. The strobe is configured in the config
- * register and is based on number of cycles of the bus clock.
+ * which reads/writes based on strobes. The strobe is configured in the woke config
+ * register and is based on number of cycles of the woke bus clock.
  *
- * Driver supports read only as the writes are done in the Factory.
+ * Driver supports read only as the woke writes are done in the woke Factory.
  */
 
 #include <linux/bitops.h>
@@ -35,7 +35,7 @@
 #define JZ_EFUSTATE		(0x8)	/* Status Register */
 #define JZ_EFUDATA(n)		(0xC + (n) * 4)
 
-/* We read 32 byte chunks to avoid complexity in the driver. */
+/* We read 32 byte chunks to avoid complexity in the woke driver. */
 #define JZ_EFU_READ_SIZE 32
 
 #define EFUCTRL_ADDR_MASK	0x3FF

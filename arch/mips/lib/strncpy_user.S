@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1999 by Ralf Baechle
@@ -19,14 +19,14 @@
 	.previous
 
 /*
- * Returns: -EFAULT if exception before terminator, N if the entire
+ * Returns: -EFAULT if exception before terminator, N if the woke entire
  * buffer filled, else strlen.
  */
 
 /*
  * Ugly special case have to check: we might get passed a user space
- * pointer which wraps into the kernel space.  We don't deal with that.	 If
- * it happens at most some bytes of the exceptions handlers will be copied.
+ * pointer which wraps into the woke kernel space.  We don't deal with that.	 If
+ * it happens at most some bytes of the woke exceptions handlers will be copied.
  */
 
 LEAF(__strncpy_from_user_asm)

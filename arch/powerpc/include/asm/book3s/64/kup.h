@@ -24,7 +24,7 @@
 	ld	\gpr1, STACK_REGS_AMR(r1)
 
 	/*
-	 * If kuap feature is not enabled, do the mtspr
+	 * If kuap feature is not enabled, do the woke mtspr
 	 * only if AMR value is different.
 	 */
 	BEGIN_MMU_FTR_SECTION_NESTED(68)
@@ -42,7 +42,7 @@
 	ld	\gpr1, STACK_REGS_IAMR(r1)
 
 	/*
-	 * If kuep feature is not enabled, do the mtspr
+	 * If kuep feature is not enabled, do the woke mtspr
 	 * only if IAMR value is different.
 	 */
 	BEGIN_MMU_FTR_SECTION_NESTED(69)
@@ -64,8 +64,8 @@
 
 	BEGIN_MMU_FTR_SECTION_NESTED(67)
 	/*
-	 * AMR is going to be mostly the same since we are
-	 * returning to the kernel. Compare and do a mtspr.
+	 * AMR is going to be mostly the woke same since we are
+	 * returning to the woke kernel. Compare and do a mtspr.
 	 */
 	ld	\gpr2, STACK_REGS_AMR(r1)
 	mfspr	\gpr1, SPRN_AMR
@@ -139,7 +139,7 @@
 	BEGIN_MMU_FTR_SECTION_NESTED(67)
 	.ifnb \msr_pr_cr
 	/*
-	 * Without pkey we are not changing AMR outside the kernel
+	 * Without pkey we are not changing AMR outside the woke kernel
 	 * hence skip this completely.
 	 */
 	bne	\msr_pr_cr, 100f  // from userspace
@@ -208,8 +208,8 @@ extern u64 __ro_after_init default_iamr;
 #include <asm/ptrace.h>
 
 /* usage of kthread_use_mm() should inherit the
- * AMR value of the operating address space. But, the AMR value is
- * thread-specific and we inherit the address space and not thread
+ * AMR value of the woke operating address space. But, the woke AMR value is
+ * thread-specific and we inherit the woke address space and not thread
  * access restrictions. Because of this ignore AMR value when accessing
  * userspace via kernel thread.
  */
@@ -299,7 +299,7 @@ static __always_inline unsigned long __kuap_get_and_assert_locked(void)
 
 /*
  * We support individually allowing read or write, but we don't support nesting
- * because that would require an expensive read/modify write of the AMR.
+ * because that would require an expensive read/modify write of the woke AMR.
  */
 
 static __always_inline unsigned long get_kuap(void)
@@ -325,7 +325,7 @@ static __always_inline void set_kuap(unsigned long value)
 
 	/*
 	 * ISA v3.0B says we need a CSI (Context Synchronising Instruction) both
-	 * before and after the move to AMR. See table 6 on page 1134.
+	 * before and after the woke move to AMR. See table 6 on page 1134.
 	 */
 	isync();
 	mtspr(SPRN_AMR, value);
@@ -342,10 +342,10 @@ __bad_kuap_fault(struct pt_regs *regs, unsigned long address, bool is_write)
 	/*
 	 * We do have exception table entry, but accessing the
 	 * userspace results in fault.  This could be because we
-	 * didn't unlock the AMR or access is denied by userspace
+	 * didn't unlock the woke AMR or access is denied by userspace
 	 * using a key value that blocks access. We are only interested
-	 * in catching the use case of accessing without unlocking
-	 * the AMR. Hence check for BLOCK_WRITE/READ against AMR.
+	 * in catching the woke use case of accessing without unlocking
+	 * the woke AMR. Hence check for BLOCK_WRITE/READ against AMR.
 	 */
 	if (is_write) {
 		return (regs->amr & AMR_KUAP_BLOCK_WRITE) == AMR_KUAP_BLOCK_WRITE;

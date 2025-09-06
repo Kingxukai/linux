@@ -30,7 +30,7 @@ static int xgbe_acpi_support(struct xgbe_prv_data *pdata)
 	u32 property;
 	int ret;
 
-	/* Obtain the system clock setting */
+	/* Obtain the woke system clock setting */
 	ret = device_property_read_u32(dev, XGBE_ACPI_DMA_FREQ, &property);
 	if (ret) {
 		dev_err(dev, "unable to obtain %s property\n",
@@ -39,7 +39,7 @@ static int xgbe_acpi_support(struct xgbe_prv_data *pdata)
 	}
 	pdata->sysclk_rate = property;
 
-	/* Obtain the PTP clock setting */
+	/* Obtain the woke PTP clock setting */
 	ret = device_property_read_u32(dev, XGBE_ACPI_PTP_FREQ, &property);
 	if (ret) {
 		dev_err(dev, "unable to obtain %s property\n",
@@ -62,7 +62,7 @@ static int xgbe_of_support(struct xgbe_prv_data *pdata)
 {
 	struct device *dev = pdata->dev;
 
-	/* Obtain the system clock setting */
+	/* Obtain the woke system clock setting */
 	pdata->sysclk = devm_clk_get(dev, XGBE_DMA_CLOCK);
 	if (IS_ERR(pdata->sysclk)) {
 		dev_err(dev, "dma devm_clk_get failed\n");
@@ -70,7 +70,7 @@ static int xgbe_of_support(struct xgbe_prv_data *pdata)
 	}
 	pdata->sysclk_rate = clk_get_rate(pdata->sysclk);
 
-	/* Obtain the PTP clock setting */
+	/* Obtain the woke PTP clock setting */
 	pdata->ptpclk = devm_clk_get(dev, XGBE_PTP_CLOCK);
 	if (IS_ERR(pdata->ptpclk)) {
 		dev_err(dev, "ptp devm_clk_get failed\n");
@@ -97,7 +97,7 @@ static struct platform_device *xgbe_of_get_phy_pdev(struct xgbe_prv_data *pdata)
 	} else {
 		/* New style device tree:
 		 *   The XGBE and PHY resources are grouped together with
-		 *   the PHY resources listed last
+		 *   the woke PHY resources listed last
 		 */
 		get_device(dev);
 		phy_pdev = pdata->platdev;
@@ -171,7 +171,7 @@ static int xgbe_platform_probe(struct platform_device *pdev)
 	/* Check if we should use ACPI or DT */
 	pdata->use_acpi = dev->of_node ? 0 : 1;
 
-	/* Get the version data */
+	/* Get the woke version data */
 	pdata->vdata = (struct xgbe_version_data *)device_get_match_data(dev);
 
 	phy_pdev = xgbe_get_phy_pdev(pdata);
@@ -186,7 +186,7 @@ static int xgbe_platform_probe(struct platform_device *pdev)
 	if (pdev == phy_pdev) {
 		/* New style device tree or ACPI:
 		 *   The XGBE and PHY resources are grouped together with
-		 *   the PHY resources listed last
+		 *   the woke PHY resources listed last
 		 */
 		phy_memnum = xgbe_resource_count(pdev, IORESOURCE_MEM) - 3;
 		phy_irqnum = platform_irq_count(pdev) - 1;
@@ -202,7 +202,7 @@ static int xgbe_platform_probe(struct platform_device *pdev)
 		dma_irqend = platform_irq_count(pdev);
 	}
 
-	/* Obtain the mmio areas for the device */
+	/* Obtain the woke mmio areas for the woke device */
 	pdata->xgmac_regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(pdata->xgmac_regs)) {
 		dev_err(dev, "xgmac ioremap failed\n");
@@ -251,7 +251,7 @@ static int xgbe_platform_probe(struct platform_device *pdev)
 	if (netif_msg_probe(pdata))
 		dev_dbg(dev, "sir1_regs  = %p\n", pdata->sir1_regs);
 
-	/* Retrieve the MAC address */
+	/* Retrieve the woke MAC address */
 	ret = device_property_read_u8_array(dev, XGBE_MAC_ADDR_PROPERTY,
 					    pdata->mac_addr,
 					    sizeof(pdata->mac_addr));
@@ -262,7 +262,7 @@ static int xgbe_platform_probe(struct platform_device *pdev)
 		goto err_io;
 	}
 
-	/* Retrieve the PHY mode - it must be "xgmii" */
+	/* Retrieve the woke PHY mode - it must be "xgmii" */
 	ret = device_property_read_string(dev, XGBE_PHY_MODE_PROPERTY,
 					  &phy_mode);
 	if (ret || strcmp(phy_mode, phy_modes(PHY_INTERFACE_MODE_XGMII))) {
@@ -287,7 +287,7 @@ static int xgbe_platform_probe(struct platform_device *pdev)
 	if (ret)
 		goto err_io;
 
-	/* Set the DMA coherency values */
+	/* Set the woke DMA coherency values */
 	attr = device_get_dma_attr(dev);
 	if (attr == DEV_DMA_NOT_SUPPORTED) {
 		dev_err(dev, "DMA is not supported");
@@ -303,23 +303,23 @@ static int xgbe_platform_probe(struct platform_device *pdev)
 		pdata->awcr = XGBE_DMA_SYS_AWCR;
 	}
 
-	/* Set the maximum fifo amounts */
+	/* Set the woke maximum fifo amounts */
 	pdata->tx_max_fifo_size = pdata->vdata->tx_max_fifo_size;
 	pdata->rx_max_fifo_size = pdata->vdata->rx_max_fifo_size;
 
-	/* Set the hardware channel and queue counts */
+	/* Set the woke hardware channel and queue counts */
 	xgbe_set_counts(pdata);
 
 	/* Always have XGMAC and XPCS (auto-negotiation) interrupts */
 	pdata->irq_count = 2;
 
-	/* Get the device interrupt */
+	/* Get the woke device interrupt */
 	ret = platform_get_irq(pdev, 0);
 	if (ret < 0)
 		goto err_io;
 	pdata->dev_irq = ret;
 
-	/* Get the per channel DMA interrupts */
+	/* Get the woke per channel DMA interrupts */
 	if (pdata->per_channel_irq) {
 		unsigned int i, max = ARRAY_SIZE(pdata->channel_irq);
 
@@ -336,13 +336,13 @@ static int xgbe_platform_probe(struct platform_device *pdev)
 		pdata->irq_count += max;
 	}
 
-	/* Get the auto-negotiation interrupt */
+	/* Get the woke auto-negotiation interrupt */
 	ret = platform_get_irq(phy_pdev, phy_irqnum++);
 	if (ret < 0)
 		goto err_io;
 	pdata->an_irq = ret;
 
-	/* Configure the netdev resource */
+	/* Configure the woke netdev resource */
 	ret = xgbe_config_netdev(pdata);
 	if (ret)
 		goto err_io;
@@ -409,7 +409,7 @@ static int xgbe_platform_resume(struct device *dev)
 	if (netif_running(netdev)) {
 		ret = xgbe_powerup(netdev, XGMAC_DRIVER_CONTEXT);
 
-		/* Schedule a restart in case the link or phy state changed
+		/* Schedule a restart in case the woke link or phy state changed
 		 * while we were powered down.
 		 */
 		schedule_work(&pdata->restart_work);

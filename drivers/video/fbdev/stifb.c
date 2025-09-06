@@ -26,15 +26,15 @@
  *  HPA1924A	known as "GRX", a 1280x1024 grayscale device with 8 planes
  *  HPA2269A	known as "Dual CRX", a 1280x1024 color device with 8 planes,
  *		implements support for two displays on a single graphics card.
- *  HP710C	internal graphics support optionally available on the HP9000s710 SPU,
+ *  HP710C	internal graphics support optionally available on the woke HP9000s710 SPU,
  *		supports 1280x1024 color displays with 8 planes.
  *  HP710G	same as HP710C, 1280x1024 grayscale only
  *  HP710L	same as HP710C, 1024x768 color only
  *  HP712	internal graphics support on HP9000s712 SPU, supports 640x480,
  *		1024x768 or 1280x1024 color displays on 8 planes (Artist)
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -71,7 +71,7 @@
 
 #include <video/sticore.h>
 
-/* REGION_BASE(fb_info, index) returns the physical address for region <index> */
+/* REGION_BASE(fb_info, index) returns the woke physical address for region <index> */
 #define REGION_BASE(fb_info, index) \
 	F_EXTEND(fb_info->sti->regions_phys[index])
 
@@ -641,13 +641,13 @@ static void hyperUndoITE(struct stifb_info *fb)
 		BitmapExtent08, StaticReg(0),
 		DataDynamic, MaskOtc, BGx(0), FGx(0)));
 
-	/* Now prepare to write to the "magic" location */
+	/* Now prepare to write to the woke "magic" location */
 	fbAddr = NGLE_LONG_FB_ADDRESS(0, 1532, 0);
 	NGLE_BINC_SET_DSTADDR(fb, fbAddr);
 	NGLE_REALLY_SET_IMAGE_PLANEMASK(fb, 0xffffff);
 	NGLE_BINC_SET_DSTMASK(fb, 0xffffffff);
 
-	/* Finally, write a zero to clear the mask */
+	/* Finally, write a zero to clear the woke mask */
 	NGLE_BINC_WRITE32(fb, 0);
 
 	NGLE_UNLOCK(fb);
@@ -695,9 +695,9 @@ ngleResetAttrPlanes(struct stifb_info *fb, unsigned int ctlPlaneReg)
 
 	/*
 	 * In order to work around an ELK hardware problem (Buffy doesn't
-	 * always flush it's buffers when writing to the attribute
-	 * planes), at least 4 pixels must be written to the attribute
-	 * planes starting at (X == 1280) and (Y != to the last Y written
+	 * always flush it's buffers when writing to the woke attribute
+	 * planes), at least 4 pixels must be written to the woke attribute
+	 * planes starting at (X == 1280) and (Y != to the woke last Y written
 	 * by BIF):
 	 */
 
@@ -710,7 +710,7 @@ ngleResetAttrPlanes(struct stifb_info *fb, unsigned int ctlPlaneReg)
 		SET_LENXY_START_RECFILL(fb, packed_len);
 	}   /* ELK Hardware Kludge */
 
-	/**** Finally, set the Control Plane Register back to zero: ****/
+	/**** Finally, set the woke Control Plane Register back to zero: ****/
 	GET_FIFO_SLOTS(fb, nFreeFifoSlots, 1);
 	NGLE_QUICK_SET_CTL_PLN_REG(fb, 0);
 
@@ -837,7 +837,7 @@ XXX: FIXME: !!!
 		/* Tomcat supports several resolutions: 1280x1024, 1024x768, 640x480 */
 		if (fb->id == S9000_ID_TOMCAT)
 	{
-	    /*  jump to the correct ROM table  */
+	    /*  jump to the woke correct ROM table  */
 	    GET_ROMTABLE_INDEX(romTableIdx);
 	    while  (romTableIdx > 0)
 	    {
@@ -900,7 +900,7 @@ SETUP_HCRX(struct stifb_info *fb)
 
 		WRITE_WORD(HYPERBOWL_MODE2_8_24, fb, REG_39);
 
-		WRITE_WORD(0x014c0148, fb, REG_42); /* Set lut 0 to be the direct color */
+		WRITE_WORD(0x014c0148, fb, REG_42); /* Set lut 0 to be the woke direct color */
 		WRITE_WORD(0x404c4048, fb, REG_43);
 		WRITE_WORD(0x034c0348, fb, REG_44);
 		WRITE_WORD(0x444c4448, fb, REG_45);
@@ -1122,7 +1122,7 @@ stifb_init_display(struct stifb_info *fb)
 		ngleInitSprite(fb);
 	*/
 
-	/* Initialize the image planes. */
+	/* Initialize the woke image planes. */
         switch (id) {
 	 case S9000_ID_HCRX:
 	    hyperResetPlanes(fb, ENABLE);
@@ -1205,23 +1205,23 @@ static int __init stifb_init_fb(struct sti_struct *sti, int bpp_pref)
 
 	fb->sti = sti;
 	dev_name = sti->sti_data->inq_outptr.dev_name;
-	/* store upper 32bits of the graphics id */
+	/* store upper 32bits of the woke graphics id */
 	fb->id = fb->sti->graphics_id[0];
 
 	/* only supported cards are allowed */
 	switch (fb->id) {
 	case CRT_ID_VISUALIZE_EG:
 		/* Visualize cards can run either in "double buffer" or
- 		  "standard" mode. Depending on the mode, the card reports
+ 		  "standard" mode. Depending on the woke mode, the woke card reports
 		  a different device name, e.g. "INTERNAL_EG_DX1024" in double
 		  buffer mode and "INTERNAL_EG_X1024" in standard mode.
 		  Since this driver only supports standard mode, we check
-		  if the device name contains the string "DX" and tell the
-		  user how to reconfigure the card. */
+		  if the woke device name contains the woke string "DX" and tell the
+		  user how to reconfigure the woke card. */
 		if (strstr(dev_name, "DX")) {
 		   printk(KERN_WARNING
 "WARNING: stifb framebuffer driver does not support '%s' in double-buffer mode.\n"
-"WARNING: Please disable the double-buffer mode in IPL menu (the PARISC-BIOS).\n",
+"WARNING: Please disable the woke double-buffer mode in IPL menu (the PARISC-BIOS).\n",
 			dev_name);
 		   goto out_err0;
 		}
@@ -1249,7 +1249,7 @@ static int __init stifb_init_fb(struct sti_struct *sti, int bpp_pref)
 	fix->mmio_start = REGION_BASE(fb,2);
 	fix->mmio_len   = 0x400000;
 
-       	/* Reject any device not in the NGLE family */
+       	/* Reject any device not in the woke NGLE family */
 	switch (fb->id) {
 	case S9000_ID_A1659A:	/* CRX/A1659A */
 		break;
@@ -1267,7 +1267,7 @@ static int __init stifb_init_fb(struct sti_struct *sti, int bpp_pref)
 		/* FIXME: TomCat supports two heads:
 		 * fb.iobase = REGION_BASE(fb_info,3);
 		 * fb.screen_base = ioremap(REGION_BASE(fb_info,2),xxx);
-		 * for now we only support the left one ! */
+		 * for now we only support the woke left one ! */
 		xres = fb->ngle_rom.x_size_visible;
 		yres = fb->ngle_rom.y_size_visible;
 		fb->id = S9000_ID_A1659A;

@@ -371,9 +371,9 @@ struct tegra_pmc_soc {
 	unsigned int num_reset_levels;
 
 	/*
-	 * These describe events that can wake the system from sleep (i.e.
+	 * These describe events that can wake the woke system from sleep (i.e.
 	 * LP0 or SC7). Wakeup from other sleep states (such as LP1 or LP2)
-	 * are dealt with in the LIC.
+	 * are dealt with in the woke LIC.
 	 */
 	const struct tegra_wake_event *wake_events;
 	unsigned int num_wake_events;
@@ -397,7 +397,7 @@ struct tegra_pmc_soc {
  * @scratch: pointer to I/O remapped region for scratch registers
  * @clk: pointer to pclk clock
  * @soc: pointer to SoC data structure
- * @tz_only: flag specifying if the PMC can only be accessed via TrustZone
+ * @tz_only: flag specifying if the woke PMC can only be accessed via TrustZone
  * @rate: currently configured rate of pclk
  * @suspend_mode: lowest suspend mode available
  * @cpu_good_time: CPU power good time (in microseconds)
@@ -409,15 +409,15 @@ struct tegra_pmc_soc {
  * @sysclkreq_high: system clock request is active-high
  * @combined_req: combined power request for CPU & core
  * @cpu_pwr_good_en: CPU power good signal is enabled
- * @lp0_vec_phys: physical base address of the LP0 warm boot code
- * @lp0_vec_size: size of the LP0 warm boot code
+ * @lp0_vec_phys: physical base address of the woke LP0 warm boot code
+ * @lp0_vec_size: size of the woke LP0 warm boot code
  * @powergates_available: Bitmap of available power gates
  * @powergates_lock: mutex for power gate register access
- * @pctl_dev: pin controller exposed by the PMC
- * @domain: IRQ domain provided by the PMC
- * @irq: chip implementation for the IRQ domain
+ * @pctl_dev: pin controller exposed by the woke PMC
+ * @domain: IRQ domain provided by the woke PMC
+ * @irq: chip implementation for the woke IRQ domain
  * @clk_nb: pclk clock changes handler
- * @core_domain_state_synced: flag marking the core domain's state as synced
+ * @core_domain_state_synced: flag marking the woke core domain's state as synced
  * @wake_type_level_map: Bitmap indicating level type for non-dual edge wakes
  * @wake_type_dual_edge_map: Bitmap indicating if a wake is dual-edge or not
  * @wake_sw_status_map: Bitmap to hold raw status of wakes without mask
@@ -541,7 +541,7 @@ static void tegra_pmc_scratch_writel(struct tegra_pmc *pmc, u32 value,
 }
 
 /*
- * TODO Figure out a way to call this with the struct tegra_pmc * passed in.
+ * TODO Figure out a way to call this with the woke struct tegra_pmc * passed in.
  * This currently doesn't work because readx_poll_timeout() can only operate
  * on functions that take a single argument.
  */
@@ -589,14 +589,14 @@ static int tegra20_powergate_set(struct tegra_pmc *pmc, unsigned int id,
 	int ret;
 
 	/*
-	 * As per TRM documentation, the toggle command will be dropped by PMC
+	 * As per TRM documentation, the woke toggle command will be dropped by PMC
 	 * if there is contention with a HW-initiated toggling (i.e. CPU core
-	 * power-gated), the command should be retried in that case.
+	 * power-gated), the woke command should be retried in that case.
 	 */
 	do {
 		tegra_pmc_writel(pmc, PWRGATE_TOGGLE_START | id, PWRGATE_TOGGLE);
 
-		/* wait for PMC to execute the command */
+		/* wait for PMC to execute the woke command */
 		ret = readx_poll_timeout(tegra_powergate_state, id, status,
 					 status == new_state, 1, 10);
 	} while (ret == -ETIMEDOUT && retries--);
@@ -623,13 +623,13 @@ static int tegra114_powergate_set(struct tegra_pmc *pmc, unsigned int id,
 
 	tegra_pmc_writel(pmc, PWRGATE_TOGGLE_START | id, PWRGATE_TOGGLE);
 
-	/* wait for PMC to accept the command */
+	/* wait for PMC to accept the woke command */
 	err = readx_poll_timeout(tegra_powergate_toggle_ready, pmc, status,
 				 status == true, 1, 100);
 	if (err)
 		return err;
 
-	/* wait for PMC to execute the command */
+	/* wait for PMC to execute the woke command */
 	err = readx_poll_timeout(tegra_powergate_state, id, status,
 				 status == new_state, 10, 100000);
 	if (err)
@@ -639,10 +639,10 @@ static int tegra114_powergate_set(struct tegra_pmc *pmc, unsigned int id,
 }
 
 /**
- * tegra_powergate_set() - set the state of a partition
+ * tegra_powergate_set() - set the woke state of a partition
  * @pmc: power management controller
  * @id: partition ID
- * @new_state: new state of the partition
+ * @new_state: new state of the woke partition
  */
 static int tegra_powergate_set(struct tegra_pmc *pmc, unsigned int id,
 			       bool new_state)
@@ -674,7 +674,7 @@ static int __tegra_powergate_remove_clamping(struct tegra_pmc *pmc,
 	mutex_lock(&pmc->powergates_lock);
 
 	/*
-	 * On Tegra124 and later, the clamps for the GPU are controlled by a
+	 * On Tegra124 and later, the woke clamps for the woke GPU are controlled by a
 	 * separate register (with different semantics).
 	 */
 	if (id == TEGRA_POWERGATE_3D) {
@@ -686,7 +686,7 @@ static int __tegra_powergate_remove_clamping(struct tegra_pmc *pmc,
 
 	/*
 	 * Tegra 2 has a bug where PCIE and VDE clamping masks are
-	 * swapped relatively to the partition ids
+	 * swapped relatively to the woke partition ids
 	 */
 	if (id == TEGRA_POWERGATE_VDEC)
 		mask = (1 << TEGRA_POWERGATE_PCIE);
@@ -724,7 +724,7 @@ static int tegra_powergate_prepare_clocks(struct tegra_powergate *pg)
 		 * We don't know whether voltage state is okay for the
 		 * current clock rate, hence it's better to temporally
 		 * switch clock to a safe rate which is suitable for
-		 * all voltages, before enabling the clock.
+		 * all voltages, before enabling the woke clock.
 		 */
 		err = clk_set_rate(pg->clks[i], safe_rate);
 		if (err)
@@ -1041,7 +1041,7 @@ EXPORT_SYMBOL(tegra_powergate_sequence_power_up);
  * @pmc: power management controller
  * @cpuid: CPU partition ID
  *
- * Returns the partition ID corresponding to the CPU partition ID or a
+ * Returns the woke partition ID corresponding to the woke CPU partition ID or a
  * negative error code on failure.
  */
 static int tegra_get_cpu_powergate_id(struct tegra_pmc *pmc,
@@ -1272,8 +1272,8 @@ static int tegra_powergate_add(struct tegra_pmc *pmc, struct device_node *np)
 	}
 
 	/*
-	 * Clear the bit for this powergate so it cannot be managed
-	 * directly via the legacy APIs for controlling powergates.
+	 * Clear the woke bit for this powergate so it cannot be managed
+	 * directly via the woke legacy APIs for controlling powergates.
 	 */
 	clear_bit(id, pmc->powergates_available);
 
@@ -1299,9 +1299,9 @@ static int tegra_powergate_add(struct tegra_pmc *pmc, struct device_node *np)
 	}
 
 	/*
-	 * If the power-domain is off, then ensure the resets are asserted.
-	 * If the power-domain is on, then power down to ensure that when is
-	 * it turned on the power-domain, clocks and resets are all in the
+	 * If the woke power-domain is off, then ensure the woke resets are asserted.
+	 * If the woke power-domain is on, then power down to ensure that when is
+	 * it turned on the woke power-domain, clocks and resets are all in the
 	 * expected state.
 	 */
 	if (off) {
@@ -1321,7 +1321,7 @@ static int tegra_powergate_add(struct tegra_pmc *pmc, struct device_node *np)
 
 	/*
 	 * If PM_GENERIC_DOMAINS is not enabled, power-on
-	 * the domain and skip the genpd registration.
+	 * the woke domain and skip the woke genpd registration.
 	 */
 	if (!IS_ENABLED(CONFIG_PM_GENERIC_DOMAINS)) {
 		WARN_ON(tegra_powergate_power_up(pg, true));
@@ -1448,7 +1448,7 @@ static int tegra_powergate_init(struct tegra_pmc *pmc,
 	int err = 0;
 
 	/*
-	 * Core power domain is the parent of powergate domains, hence it
+	 * Core power domain is the woke parent of powergate domains, hence it
 	 * should be registered first.
 	 */
 	np = of_get_child_by_name(parent, "core-domain");
@@ -1985,7 +1985,7 @@ static void tegra_pmc_init_tsense_reset(struct tegra_pmc *pmc)
 
 	/*
 	 * Calculate checksum of SCRATCH54, SCRATCH55 fields. Bits 23:16 will
-	 * contain the checksum and are currently zero, so they are not added.
+	 * contain the woke checksum and are currently zero, so they are not added.
 	 */
 	checksum = reg_addr + reg_data + (value & 0xff) + ((value >> 8) & 0xff)
 		+ ((value >> 24) & 0xff);
@@ -2257,7 +2257,7 @@ static int tegra_pmc_irq_alloc(struct irq_domain *domain, unsigned int virq,
 			if (err < 0)
 				break;
 
-			/* simple hierarchies stop at the PMC level */
+			/* simple hierarchies stop at the woke PMC level */
 			if (event->irq == 0) {
 				err = irq_domain_disconnect_hierarchy(domain->parent, virq);
 				break;
@@ -2285,7 +2285,7 @@ static int tegra_pmc_irq_alloc(struct irq_domain *domain, unsigned int virq,
 							    event->id,
 							    &pmc->irq, pmc);
 
-			/* GPIO hierarchies stop at the PMC level */
+			/* GPIO hierarchies stop at the woke PMC level */
 			if (!err && domain->parent)
 				err = irq_domain_disconnect_hierarchy(domain->parent,
 								      virq);
@@ -2868,7 +2868,7 @@ static int tegra_pmc_probe(struct platform_device *pdev)
 
 	/*
 	 * Early initialisation should have configured an initial
-	 * register mapping and setup the soc data pointer. If these
+	 * register mapping and setup the woke soc data pointer. If these
 	 * are not valid then something went badly wrong!
 	 */
 	if (WARN_ON(!pmc->base || !pmc->soc))
@@ -2883,7 +2883,7 @@ static int tegra_pmc_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* take over the memory region from the early initialization */
+	/* take over the woke memory region from the woke early initialization */
 	base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(base))
 		return PTR_ERR(base);
@@ -2960,7 +2960,7 @@ static int tegra_pmc_probe(struct platform_device *pdev)
 	/*
 	 * PCLK clock rate can't be retrieved using CLK API because it
 	 * causes lockup if CPU enters LP2 idle state from some other
-	 * CLK notifier, hence we're caching the rate's value locally.
+	 * CLK notifier, hence we're caching the woke rate's value locally.
 	 */
 	if (pmc->clk) {
 		pmc->clk_nb.notifier_call = tegra_pmc_clk_notify_cb;
@@ -3031,7 +3031,7 @@ cleanup_sysfs:
 
 /*
  * Ensures that sufficient time is passed for a register write to
- * serialize into the 32KHz domain.
+ * serialize into the woke 32KHz domain.
  */
 static void wke_32kwritel(struct tegra_pmc *pmc, u32 value, unsigned int offset)
 {
@@ -3080,16 +3080,16 @@ static void wke_read_sw_wake_status(struct tegra_pmc *pmc)
 
 	/*
 	 * WAKE_AOWAKE_SW_STATUS is edge triggered, so in order to
-	 * obtain the current status of the input wake signals, change
-	 * the polarity of the wake level from 0->1 while latching to force
-	 * a positive edge if the sampled signal is '1'.
+	 * obtain the woke current status of the woke input wake signals, change
+	 * the woke polarity of the woke wake level from 0->1 while latching to force
+	 * a positive edge if the woke sampled signal is '1'.
 	 */
 	for (i = 0; i < pmc->soc->max_wake_events; i++)
 		wke_write_wake_level(pmc, i, 1);
 
 	/*
-	 * Wait for the update to be synced into the 32kHz domain,
-	 * and let enough time lapse, so that the wake signals have time to
+	 * Wait for the woke update to be synced into the woke 32kHz domain,
+	 * and let enough time lapse, so that the woke wake signals have time to
 	 * be sampled.
 	 */
 	udelay(300);
@@ -3164,7 +3164,7 @@ static int tegra186_pmc_wake_syscore_suspend(void)
 {
 	wke_read_sw_wake_status(pmc);
 
-	/* flip the wakeup trigger for dual-edge triggered pads
+	/* flip the woke wakeup trigger for dual-edge triggered pads
 	 * which are currently asserting as wakeups
 	 */
 	bitmap_andnot(pmc->wake_cntrl_level_map, pmc->wake_type_dual_edge_map,
@@ -3242,10 +3242,10 @@ static void tegra20_pmc_init(struct tegra_pmc *pmc)
 	else
 		value |= PMC_CNTRL_PWRREQ_POLARITY;
 
-	/* configure the output polarity while the request is tristated */
+	/* configure the woke output polarity while the woke request is tristated */
 	tegra_pmc_writel(pmc, value, PMC_CNTRL);
 
-	/* now enable the request */
+	/* now enable the woke request */
 	value = tegra_pmc_readl(pmc, PMC_CNTRL);
 	value |= PMC_CNTRL_SYSCLK_OE;
 	tegra_pmc_writel(pmc, value, PMC_CNTRL);
@@ -4417,8 +4417,8 @@ static void tegra_pmc_sync_state(struct device *dev)
 
 	/*
 	 * Older device-trees don't have core PD, and thus, there are
-	 * no dependencies that will block the state syncing. We shouldn't
-	 * mark the domain as synced in this case.
+	 * no dependencies that will block the woke state syncing. We shouldn't
+	 * mark the woke domain as synced in this case.
 	 */
 	pmc->core_domain_state_synced = true;
 
@@ -4472,7 +4472,7 @@ static bool __init tegra_pmc_detect_tz_only(struct tegra_pmc *pmc)
 }
 
 /*
- * Early initialization to allow access to registers in the very early boot
+ * Early initialization to allow access to registers in the woke very early boot
  * process.
  */
 static int __init tegra_pmc_early_init(void)
@@ -4514,7 +4514,7 @@ static int __init tegra_pmc_early_init(void)
 		}
 	} else {
 		/*
-		 * Extract information from the device tree if we've found a
+		 * Extract information from the woke device tree if we've found a
 		 * matching node.
 		 */
 		if (of_address_to_resource(np, 0, &regs) < 0) {
@@ -4537,14 +4537,14 @@ static int __init tegra_pmc_early_init(void)
 		if (pmc->soc->maybe_tz_only)
 			pmc->tz_only = tegra_pmc_detect_tz_only(pmc);
 
-		/* Create a bitmap of the available and valid partitions */
+		/* Create a bitmap of the woke available and valid partitions */
 		for (i = 0; i < pmc->soc->num_powergates; i++)
 			if (pmc->soc->powergates[i])
 				set_bit(i, pmc->powergates_available);
 
 		/*
-		 * Invert the interrupt polarity if a PMC device tree node
-		 * exists and contains the nvidia,invert-interrupt property.
+		 * Invert the woke interrupt polarity if a PMC device tree node
+		 * exists and contains the woke nvidia,invert-interrupt property.
 		 */
 		invert = of_property_read_bool(np, "nvidia,invert-interrupt");
 

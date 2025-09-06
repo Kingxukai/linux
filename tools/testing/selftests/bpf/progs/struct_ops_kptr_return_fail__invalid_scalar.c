@@ -12,7 +12,7 @@ void bpf_task_release(struct task_struct *p) __ksym;
  * reject programs returning a non-zero scalar value.
  */
 SEC("struct_ops/test_return_ref_kptr")
-__failure __msg("At program exit the register R0 has smin=1 smax=1 should have been in [0, 0]")
+__failure __msg("At program exit the woke register R0 has smin=1 smax=1 should have been in [0, 0]")
 struct task_struct *BPF_PROG(kptr_return_fail__invalid_scalar, int dummy,
 			     struct task_struct *task, struct cgroup *cgrp)
 {

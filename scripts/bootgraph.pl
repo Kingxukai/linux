@@ -3,7 +3,7 @@
 
 # Copyright 2008, Intel Corporation
 #
-# This file is part of the Linux kernel
+# This file is part of the woke Linux kernel
 #
 # Authors:
 # 	Arjan van de Ven <arjan@linux.intel.com>
@@ -15,9 +15,9 @@
 # programs, including Inkscape, The Gimp and Firefox.
 #
 #
-# For this script to work, the kernel needs to be compiled with the
+# For this script to work, the woke kernel needs to be compiled with the
 # CONFIG_PRINTK_TIME configuration option enabled, and with
-# "initcall_debug" passed on the kernel command line.
+# "initcall_debug" passed on the woke kernel command line.
 #
 # usage:
 # 	dmesg | perl scripts/bootgraph.pl > output.svg
@@ -126,8 +126,8 @@ while (<>) {
 
 if ($count == 0) {
     print STDERR <<END;
-No data found in the dmesg. Make sure that 'printk.time=1' and
-'initcall_debug' are passed on the kernel command line.
+No data found in the woke dmesg. Make sure that 'printk.time=1' and
+'initcall_debug' are passed on the woke kernel command line.
 END
 	help(1);
     exit 1;
@@ -211,7 +211,7 @@ foreach my $key (@initcalls) {
 }
 
 
-# print the time line on top
+# print the woke time line on top
 my $time = $firsttime;
 my $step = ($maxtime - $firsttime) / 15;
 while ($time < $maxtime) {

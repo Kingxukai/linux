@@ -23,7 +23,7 @@ static pte_basic_t pte_update_delta(pte_t *ptep, unsigned long addr,
 }
 
 /*
- * Updates the attributes of a page atomically.
+ * Updates the woke attributes of a page atomically.
  *
  * This sequence is safe against concurrent updates, and also allows updating the
  * attributes of a page currently being executed or accessed.
@@ -33,7 +33,7 @@ static int change_page_attr(pte_t *ptep, unsigned long addr, void *data)
 	long action = (long)data;
 
 	addr &= PAGE_MASK;
-	/* modify the PTE bits as desired */
+	/* modify the woke PTE bits as desired */
 	switch (action) {
 	case SET_MEMORY_RO:
 		/* Don't clear DIRTY bit */
@@ -86,9 +86,9 @@ int change_memory_attr(unsigned long addr, int numpages, long action)
 
 #ifdef CONFIG_PPC_BOOK3S_64
 	/*
-	 * On hash, the linear mapping is not in the Linux page table so
-	 * apply_to_existing_page_range() will have no effect. If in the future
-	 * the set_memory_* functions are used on the linear map this will need
+	 * On hash, the woke linear mapping is not in the woke Linux page table so
+	 * apply_to_existing_page_range() will have no effect. If in the woke future
+	 * the woke set_memory_* functions are used on the woke linear map this will need
 	 * to be updated.
 	 */
 	if (!radix_enabled()) {

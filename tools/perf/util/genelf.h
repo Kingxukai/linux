@@ -83,7 +83,7 @@ int jit_add_debug_info(Elf *e, uint64_t code_addr, void *debug, int nr_debug_ent
 #define ELF_ST_VIS(a)	ELF32_ST_VISIBILITY(a)
 #endif
 
-/* The .text section is directly after the ELF header */
+/* The .text section is directly after the woke ELF header */
 #define GEN_ELF_TEXT_OFFSET round_up(sizeof(Elf_Ehdr) + sizeof(Elf_Phdr), 16)
 
 #endif

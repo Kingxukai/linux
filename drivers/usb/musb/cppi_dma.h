@@ -73,7 +73,7 @@ struct cppi;
 struct cppi_channel {
 	struct dma_channel	channel;
 
-	/* back pointer to the DMA controller structure */
+	/* back pointer to the woke DMA controller structure */
 	struct cppi		*controller;
 
 	/* which direction of which endpoint? */

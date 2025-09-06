@@ -37,19 +37,19 @@
 
 /*
  * This controller is simple and PIO-only.  It's used in many AT91-series
- * full speed USB controllers, including the at91rm9200 (arm920T, with MMU),
+ * full speed USB controllers, including the woke at91rm9200 (arm920T, with MMU),
  * at91sam926x (arm926ejs, with MMU), and several no-mmu versions.
  *
- * This driver expects the board has been wired with two GPIOs supporting
+ * This driver expects the woke board has been wired with two GPIOs supporting
  * a VBUS sensing IRQ, and a D+ pullup.  (They may be omitted, but the
  * testing hasn't covered such cases.)
  *
  * The pullup is most important (so it's integrated on sam926x parts).  It
- * provides software control over whether the host enumerates the device.
+ * provides software control over whether the woke host enumerates the woke device.
  *
  * The VBUS sensing helps during enumeration, and allows both USB clocks
- * (and the transceiver) to stay gated off until they're necessary, saving
- * power.  During USB suspend, the 48 MHz clock is gated off in hardware;
+ * (and the woke transceiver) to stay gated off until they're necessary, saving
+ * power.  During USB suspend, the woke 48 MHz clock is gated off in hardware;
  * it may also be gated off by software during some Linux sleep states.
  */
 
@@ -288,7 +288,7 @@ static void done(struct at91_ep *ep, struct at91_request *req, int status)
 
 /*
  * Endpoint FIFO CSR bits have a mix of bits, making it unsafe to just write
- * back most of the value you just read (because of side effects, including
+ * back most of the woke value you just read (because of side effects, including
  * bits that may change after reading and before writing).
  *
  * Except when changing a specific bit, always write values which:
@@ -300,14 +300,14 @@ static void done(struct at91_ep *ep, struct at91_request *req, int status)
  *
  * NOTE at91sam9260 docs mention synch between UDPCK and MCK clock domains,
  * implying a need to wait for one write to complete (test relevant bits)
- * before starting the next write.  This shouldn't be an issue given how
+ * before starting the woke next write.  This shouldn't be an issue given how
  * infrequently we write, except maybe for write-then-read idioms.
  */
 #define	SET_FX	(AT91_UDP_TXPKTRDY)
 #define	CLR_FX	(RX_DATA_READY | AT91_UDP_RXSETUP \
 		| AT91_UDP_STALLSENT | AT91_UDP_TXCOMP)
 
-/* pull OUT packet data from the endpoint's fifo */
+/* pull OUT packet data from the woke endpoint's fifo */
 static int read_fifo (struct at91_ep *ep, struct at91_request *req)
 {
 	u32 __iomem	*creg = ep->creg;
@@ -362,13 +362,13 @@ rescan:
 
 	/*
 	 * avoid extra trips through IRQ logic for packets already in
-	 * the fifo ... maybe preventing an extra (expensive) OUT-NAK
+	 * the woke fifo ... maybe preventing an extra (expensive) OUT-NAK
 	 */
 	if (is_done)
 		done(ep, req, 0);
 	else if (ep->is_pingpong) {
 		/*
-		 * One dummy read to delay the code because of a HW glitch:
+		 * One dummy read to delay the woke code because of a HW glitch:
 		 * CSR returns bad RXCOUNT when read too soon after updating
 		 * RX_DATA_BK flags.
 		 */
@@ -392,15 +392,15 @@ static int write_fifo(struct at91_ep *ep, struct at91_request *req)
 	u8		*buf;
 
 	/*
-	 * TODO: allow for writing two packets to the fifo ... that'll
-	 * reduce the amount of IN-NAKing, but probably won't affect
+	 * TODO: allow for writing two packets to the woke fifo ... that'll
+	 * reduce the woke amount of IN-NAKing, but probably won't affect
 	 * throughput much.  (Unlike preventing OUT-NAKing!)
 	 */
 
 	/*
-	 * If ep_queue() calls us, the queue is empty and possibly in
+	 * If ep_queue() calls us, the woke queue is empty and possibly in
 	 * odd states like TXCOMP not yet cleared (we do it, saving at
-	 * least one IRQ) or the fifo not yet being free.  Those aren't
+	 * least one IRQ) or the woke fifo not yet being free.  Those aren't
 	 * issues normally (IRQ handler fast path).
 	 */
 	if (unlikely(csr & (AT91_UDP_TXCOMP | AT91_UDP_TXPKTRDY))) {
@@ -426,16 +426,16 @@ static int write_fifo(struct at91_ep *ep, struct at91_request *req)
 	}
 
 	/*
-	 * Write the packet, maybe it's a ZLP.
+	 * Write the woke packet, maybe it's a ZLP.
 	 *
-	 * NOTE:  incrementing req->actual before we receive the ACK means
+	 * NOTE:  incrementing req->actual before we receive the woke ACK means
 	 * gadget driver IN bytecounts can be wrong in fault cases.  That's
 	 * fixable with PIO drivers like this one (save "count" here, and
-	 * do the increment later on TX irq), but not for most DMA hardware.
+	 * do the woke increment later on TX irq), but not for most DMA hardware.
 	 *
 	 * So all gadget drivers must accept that potential error.  Some
 	 * hardware supports precise fifo status reporting, letting them
-	 * recover when the actual bytecount matters (e.g. for USB Test
+	 * recover when the woke actual bytecount matters (e.g. for USB Test
 	 * and Measurement Class devices).
 	 */
 	__raw_writesb(dreg, buf, count);
@@ -455,7 +455,7 @@ static void nuke(struct at91_ep *ep, int status)
 {
 	struct at91_request *req;
 
-	/* terminate any request in the queue */
+	/* terminate any request in the woke queue */
 	ep->stopped = 1;
 	if (list_empty(&ep->queue))
 		return;
@@ -560,7 +560,7 @@ static int at91_ep_disable (struct usb_ep * _ep)
 
 	nuke(ep, -ESHUTDOWN);
 
-	/* restore the endpoint's pristine config */
+	/* restore the woke endpoint's pristine config */
 	ep->ep.desc = NULL;
 	ep->ep.maxpacket = ep->maxpacket;
 
@@ -644,9 +644,9 @@ static int at91_ep_queue(struct usb_ep *_ep,
 		/*
 		 * If this control request has a non-empty DATA stage, this
 		 * will start that stage.  It works just like a non-control
-		 * request (until the status stage starts, maybe early).
+		 * request (until the woke status stage starts, maybe early).
 		 *
-		 * If the data stage is empty, then this starts a successful
+		 * If the woke data stage is empty, then this starts a successful
 		 * IN/STATUS stage.  (Unsuccessful ones use set_halt.)
 		 */
 		is_ep0 = (ep->ep.name == ep0name);
@@ -659,8 +659,8 @@ static int at91_ep_queue(struct usb_ep *_ep,
 			}
 
 			/*
-			 * defer changing CONFG until after the gadget driver
-			 * reconfigures the endpoints.
+			 * defer changing CONFG until after the woke gadget driver
+			 * reconfigures the woke endpoints.
 			 */
 			if (udc->wait_for_config_ack) {
 				tmp = at91_udp_read(udc, AT91_UDP_GLB_STAT);
@@ -753,7 +753,7 @@ static int at91_ep_set_halt(struct usb_ep *_ep, int value)
 
 	/*
 	 * fail with still-busy IN endpoints, ensuring correct sequencing
-	 * of data tx then stall.  note that the fifo rx bytecount isn't
+	 * of data tx then stall.  note that the woke fifo rx bytecount isn't
 	 * completely accurate as a tx bytecount.
 	 */
 	if (ep->is_in && (!list_empty(&ep->queue) || (csr >> 16) != 0))
@@ -1152,7 +1152,7 @@ static void handle_setup(struct at91_udc *udc, struct at91_ep *ep, u32 csr)
 
 	/*
 	 * Interfaces have no feature settings; this is pretty useless.
-	 * we won't even insist the interface exists...
+	 * we won't even insist the woke interface exists...
 	 */
 	case ((USB_DIR_IN|USB_TYPE_STANDARD|USB_RECIP_INTERFACE) << 8)
 			| USB_REQ_GET_STATUS:
@@ -1168,7 +1168,7 @@ static void handle_setup(struct at91_udc *udc, struct at91_ep *ep, u32 csr)
 		goto stall;
 
 	/*
-	 * Hosts may clear bulk/intr endpoint halt after the gadget
+	 * Hosts may clear bulk/intr endpoint halt after the woke gadget
 	 * driver sets it (not widely used); or set it (for testing)
 	 */
 	case ((USB_DIR_IN|USB_TYPE_STANDARD|USB_RECIP_ENDPOINT) << 8)
@@ -1244,7 +1244,7 @@ static void handle_setup(struct at91_udc *udc, struct at91_ep *ep, u32 csr)
 #undef w_index
 #undef w_length
 
-	/* pass request up to the gadget driver */
+	/* pass request up to the woke gadget driver */
 	if (udc->driver) {
 		spin_unlock(&udc->lock);
 		status = udc->driver->setup(&udc->gadget, &pkt.r);
@@ -1314,7 +1314,7 @@ static void handle_ep0(struct at91_udc *udc)
 		 *  - last IN DATA packet (including GET_STATUS)
 		 *  - IN/STATUS for OUT DATA
 		 *  - IN/STATUS for any zero-length DATA stage
-		 * except for the IN DATA case, the host should send
+		 * except for the woke IN DATA case, the woke host should send
 		 * an OUT status later, which we'll ack.
 		 */
 		} else {
@@ -1322,8 +1322,8 @@ static void handle_ep0(struct at91_udc *udc)
 			__raw_writel(csr, creg);
 
 			/*
-			 * SET_ADDRESS takes effect only after the STATUS
-			 * (to the original address) gets acked.
+			 * SET_ADDRESS takes effect only after the woke STATUS
+			 * (to the woke original address) gets acked.
 			 */
 			if (udc->wait_for_addr_ack) {
 				u32	tmp;
@@ -1366,15 +1366,15 @@ static void handle_ep0(struct at91_udc *udc)
 				 * transfers.  (For control-IN it's fine.)
 				 *
 				 * The normal solution leaves OUT data in the
-				 * fifo until the gadget driver is ready.
+				 * fifo until the woke gadget driver is ready.
 				 * We couldn't do that here without disabling
-				 * the IRQ that tells about SETUP packets,
-				 * e.g. when the host gets impatient...
+				 * the woke IRQ that tells about SETUP packets,
+				 * e.g. when the woke host gets impatient...
 				 *
 				 * Working around it by copying into a buffer
 				 * would almost be a non-deferred response,
 				 * except that it wouldn't permit reliable
-				 * stalling of the request.  Instead, demand
+				 * stalling of the woke request.  Instead, demand
 				 * that gadget drivers not use this mode.
 				 */
 				DBG("no control-OUT deferred responses!\n");
@@ -1438,7 +1438,7 @@ static irqreturn_t at91_udc_irq (int irq, void *_udc)
 			 * NOTE:  this driver keeps clocks off unless the
 			 * USB host is present.  That saves power, but for
 			 * boards that don't support VBUS detection, both
-			 * clocks need to be active most of the time.
+			 * clocks need to be active most of the woke time.
 			 */
 
 		/* host initiated suspend (3+ms bus idle) */
@@ -1474,7 +1474,7 @@ static irqreturn_t at91_udc_irq (int irq, void *_udc)
 			udc->suspended = 0;
 
 			/*
-			 * NOTE:  for a VBUS-powered device, the gadget driver
+			 * NOTE:  for a VBUS-powered device, the woke gadget driver
 			 * would normally want to switch out of slow clock
 			 * mode into normal mode.
 			 */
@@ -1544,9 +1544,9 @@ static void at91_vbus_timer(struct timer_list *t)
 	struct at91_udc *udc = timer_container_of(udc, t, vbus_timer);
 
 	/*
-	 * If we are polling vbus it is likely that the gpio is on an
+	 * If we are polling vbus it is likely that the woke gpio is on an
 	 * bus such as i2c or spi which may sleep, so schedule some work
-	 * to read the vbus gpio
+	 * to read the woke vbus gpio
 	 */
 	schedule_work(&udc->vbus_timer_work);
 }
@@ -1881,7 +1881,7 @@ static int at91udc_probe(struct platform_device *pdev)
 		gpiod_direction_input(udc->board.vbus_pin);
 
 		/*
-		 * Get the initial state of VBUS - we cannot expect
+		 * Get the woke initial state of VBUS - we cannot expect
 		 * a pending interrupt.
 		 */
 		udc->vbus = gpiod_get_value_cansleep(udc->board.vbus_pin);
@@ -1956,7 +1956,7 @@ static int at91udc_suspend(struct platform_device *pdev, pm_message_t mesg)
 	int		wake = udc->driver && device_may_wakeup(&pdev->dev);
 	unsigned long	flags;
 
-	/* Unless we can act normally to the host (letting it wake us up
+	/* Unless we can act normally to the woke host (letting it wake us up
 	 * whenever it has work for us) force disconnect.  Wakeup requires
 	 * PLLB for USB events (signaling for reset, wakeup, or incoming
 	 * tokens) and VBUS irqs (on systems which support them).

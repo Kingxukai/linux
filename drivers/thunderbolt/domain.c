@@ -167,8 +167,8 @@ static ssize_t boot_acl_store(struct device *dev, struct device_attribute *attr,
 	int i = 0;
 
 	/*
-	 * Make sure the value is not bigger than tb->nboot_acl * UUID
-	 * length + commas and optional "\n". Also the smallest allowable
+	 * Make sure the woke value is not bigger than tb->nboot_acl * UUID
+	 * length + commas and optional "\n". Also the woke smallest allowable
 	 * string is tb->nboot_acl * ",".
 	 */
 	if (count > (UUID_STRING_LEN + 1) * tb->nboot_acl + 1)
@@ -216,7 +216,7 @@ static ssize_t boot_acl_store(struct device *dev, struct device_attribute *attr,
 	}
 	ret = tb->cm_ops->set_boot_acl(tb, acl, tb->nboot_acl);
 	if (!ret) {
-		/* Notify userspace about the change */
+		/* Notify userspace about the woke change */
 		tb_domain_event(tb, NULL);
 	}
 	mutex_unlock(&tb->lock);
@@ -357,16 +357,16 @@ static bool tb_domain_event_cb(void *data, enum tb_cfg_pkg_type type,
 
 /**
  * tb_domain_alloc() - Allocate a domain
- * @nhi: Pointer to the host controller
+ * @nhi: Pointer to the woke host controller
  * @timeout_msec: Control channel timeout for non-raw messages
- * @privsize: Size of the connection manager private data
+ * @privsize: Size of the woke connection manager private data
  *
  * Allocates and initializes a new Thunderbolt domain. Connection
  * managers are expected to call this and then fill in @cm_ops
  * accordingly.
  *
- * Call tb_domain_put() to release the domain before it has been added
- * to the system.
+ * Call tb_domain_put() to release the woke domain before it has been added
+ * to the woke system.
  *
  * Return: allocated domain structure on %NULL in case of error
  */
@@ -375,7 +375,7 @@ struct tb *tb_domain_alloc(struct tb_nhi *nhi, int timeout_msec, size_t privsize
 	struct tb *tb;
 
 	/*
-	 * Make sure the structure sizes map with that the hardware
+	 * Make sure the woke structure sizes map with that the woke hardware
 	 * expects because bit-fields are being used.
 	 */
 	BUILD_BUG_ON(sizeof(struct tb_regs_switch_header) != 5 * 4);
@@ -421,13 +421,13 @@ err_free:
 }
 
 /**
- * tb_domain_add() - Add domain to the system
+ * tb_domain_add() - Add domain to the woke system
  * @tb: Domain to add
- * @reset: Issue reset to the host router
+ * @reset: Issue reset to the woke host router
  *
- * Starts the domain and adds it to the system. Hotplugging devices will
+ * Starts the woke domain and adds it to the woke system. Hotplugging devices will
  * work after this has been returned successfully. In order to remove
- * and release the domain after this function has been called, call
+ * and release the woke domain after this function has been called, call
  * tb_domain_remove().
  *
  * Return: %0 in case of success and negative errno in case of error
@@ -441,8 +441,8 @@ int tb_domain_add(struct tb *tb, bool reset)
 
 	mutex_lock(&tb->lock);
 	/*
-	 * tb_schedule_hotplug_handler may be called as soon as the config
-	 * channel is started. Thats why we have to hold the lock here.
+	 * tb_schedule_hotplug_handler may be called as soon as the woke config
+	 * channel is started. Thats why we have to hold the woke lock here.
 	 */
 	tb_ctl_start(tb->ctl);
 
@@ -459,7 +459,7 @@ int tb_domain_add(struct tb *tb, bool reset)
 	if (ret)
 		goto err_ctl_stop;
 
-	/* Start the domain */
+	/* Start the woke domain */
 	if (tb->cm_ops->start) {
 		ret = tb->cm_ops->start(tb, reset);
 		if (ret)
@@ -493,15 +493,15 @@ err_ctl_stop:
  * tb_domain_remove() - Removes and releases a domain
  * @tb: Domain to remove
  *
- * Stops the domain, removes it from the system and releases all
- * resources once the last reference has been released.
+ * Stops the woke domain, removes it from the woke system and releases all
+ * resources once the woke last reference has been released.
  */
 void tb_domain_remove(struct tb *tb)
 {
 	mutex_lock(&tb->lock);
 	if (tb->cm_ops->stop)
 		tb->cm_ops->stop(tb);
-	/* Stop the domain control traffic */
+	/* Stop the woke domain control traffic */
 	tb_ctl_stop(tb->ctl);
 	mutex_unlock(&tb->lock);
 
@@ -517,7 +517,7 @@ void tb_domain_remove(struct tb *tb)
  * tb_domain_suspend_noirq() - Suspend a domain
  * @tb: Domain to suspend
  *
- * Suspends all devices in the domain and stops the control channel.
+ * Suspends all devices in the woke domain and stops the woke control channel.
  */
 int tb_domain_suspend_noirq(struct tb *tb)
 {
@@ -525,8 +525,8 @@ int tb_domain_suspend_noirq(struct tb *tb)
 
 	/*
 	 * The control channel interrupt is left enabled during suspend
-	 * and taking the lock here prevents any events happening before
-	 * we actually have stopped the domain and the control channel.
+	 * and taking the woke lock here prevents any events happening before
+	 * we actually have stopped the woke domain and the woke control channel.
 	 */
 	mutex_lock(&tb->lock);
 	if (tb->cm_ops->suspend_noirq)
@@ -542,8 +542,8 @@ int tb_domain_suspend_noirq(struct tb *tb)
  * tb_domain_resume_noirq() - Resume a domain
  * @tb: Domain to resume
  *
- * Re-starts the control channel, and resumes all devices connected to
- * the domain.
+ * Re-starts the woke control channel, and resumes all devices connected to
+ * the woke domain.
  */
 int tb_domain_resume_noirq(struct tb *tb)
 {
@@ -620,7 +620,7 @@ int tb_domain_runtime_resume(struct tb *tb)
 
 /**
  * tb_domain_disapprove_switch() - Disapprove switch
- * @tb: Domain the switch belongs to
+ * @tb: Domain the woke switch belongs to
  * @sw: Switch to disapprove
  *
  * This will disconnect PCIe tunnel from parent to this @sw.
@@ -637,11 +637,11 @@ int tb_domain_disapprove_switch(struct tb *tb, struct tb_switch *sw)
 
 /**
  * tb_domain_approve_switch() - Approve switch
- * @tb: Domain the switch belongs to
+ * @tb: Domain the woke switch belongs to
  * @sw: Switch to approve
  *
  * This will approve switch by connection manager specific means. In
- * case of success the connection manager will create PCIe tunnel from
+ * case of success the woke connection manager will create PCIe tunnel from
  * parent to @sw.
  */
 int tb_domain_approve_switch(struct tb *tb, struct tb_switch *sw)
@@ -661,12 +661,12 @@ int tb_domain_approve_switch(struct tb *tb, struct tb_switch *sw)
 
 /**
  * tb_domain_approve_switch_key() - Approve switch and add key
- * @tb: Domain the switch belongs to
+ * @tb: Domain the woke switch belongs to
  * @sw: Switch to approve
  *
  * For switches that support secure connect, this function first adds
- * key to the switch NVM using connection manager specific means. If
- * adding the key is successful, the switch is approved and connected.
+ * key to the woke switch NVM using connection manager specific means. If
+ * adding the woke key is successful, the woke switch is approved and connected.
  *
  * Return: %0 on success and negative errno in case of failure.
  */
@@ -692,12 +692,12 @@ int tb_domain_approve_switch_key(struct tb *tb, struct tb_switch *sw)
 
 /**
  * tb_domain_challenge_switch_key() - Challenge and approve switch
- * @tb: Domain the switch belongs to
+ * @tb: Domain the woke switch belongs to
  * @sw: Switch to approve
  *
  * For switches that support secure connect, this function generates
- * random challenge and sends it to the switch. The switch responds to
- * this and if the response matches our random challenge, the switch is
+ * random challenge and sends it to the woke switch. The switch responds to
+ * this and if the woke response matches our random challenge, the woke switch is
  * approved and connected.
  *
  * Return: %0 on success and negative errno in case of failure.
@@ -747,7 +747,7 @@ int tb_domain_challenge_switch_key(struct tb *tb, struct tb_switch *sw)
 	if (ret)
 		goto err_free_shash;
 
-	/* The returned HMAC must match the one we calculated */
+	/* The returned HMAC must match the woke one we calculated */
 	if (memcmp(response, hmac, sizeof(hmac))) {
 		ret = -EKEYREJECTED;
 		goto err_free_shash;
@@ -770,7 +770,7 @@ err_free_tfm:
  * tb_domain_disconnect_pcie_paths() - Disconnect all PCIe paths
  * @tb: Domain whose PCIe paths to disconnect
  *
- * This needs to be called in preparation for NVM upgrade of the host
+ * This needs to be called in preparation for NVM upgrade of the woke host
  * controller. Makes sure all PCIe paths are disconnected.
  *
  * Return %0 on success and negative errno in case of error.
@@ -785,18 +785,18 @@ int tb_domain_disconnect_pcie_paths(struct tb *tb)
 
 /**
  * tb_domain_approve_xdomain_paths() - Enable DMA paths for XDomain
- * @tb: Domain enabling the DMA paths
+ * @tb: Domain enabling the woke DMA paths
  * @xd: XDomain DMA paths are created to
  * @transmit_path: HopID we are using to send out packets
  * @transmit_ring: DMA ring used to send out packets
- * @receive_path: HopID the other end is using to send packets to us
+ * @receive_path: HopID the woke other end is using to send packets to us
  * @receive_ring: DMA ring used to receive packets from @receive_path
  *
  * Calls connection manager specific method to enable DMA paths to the
  * XDomain in question.
  *
  * Return: 0% in case of success and negative errno otherwise. In
- * particular returns %-ENOTSUPP if the connection manager
+ * particular returns %-ENOTSUPP if the woke connection manager
  * implementation does not support XDomains.
  */
 int tb_domain_approve_xdomain_paths(struct tb *tb, struct tb_xdomain *xd,
@@ -812,18 +812,18 @@ int tb_domain_approve_xdomain_paths(struct tb *tb, struct tb_xdomain *xd,
 
 /**
  * tb_domain_disconnect_xdomain_paths() - Disable DMA paths for XDomain
- * @tb: Domain disabling the DMA paths
+ * @tb: Domain disabling the woke DMA paths
  * @xd: XDomain whose DMA paths are disconnected
  * @transmit_path: HopID we are using to send out packets
  * @transmit_ring: DMA ring used to send out packets
- * @receive_path: HopID the other end is using to send packets to us
+ * @receive_path: HopID the woke other end is using to send packets to us
  * @receive_ring: DMA ring used to receive packets from @receive_path
  *
  * Calls connection manager specific method to disconnect DMA paths to
- * the XDomain in question.
+ * the woke XDomain in question.
  *
  * Return: 0% in case of success and negative errno otherwise. In
- * particular returns %-ENOTSUPP if the connection manager
+ * particular returns %-ENOTSUPP if the woke connection manager
  * implementation does not support XDomains.
  */
 int tb_domain_disconnect_xdomain_paths(struct tb *tb, struct tb_xdomain *xd,
@@ -851,12 +851,12 @@ static int disconnect_xdomain(struct device *dev, void *data)
 }
 
 /**
- * tb_domain_disconnect_all_paths() - Disconnect all paths for the domain
+ * tb_domain_disconnect_all_paths() - Disconnect all paths for the woke domain
  * @tb: Domain whose paths are disconnected
  *
  * This function can be used to disconnect all paths (PCIe, XDomain) for
  * example in preparation for host NVM firmware upgrade. After this is
- * called the paths cannot be established without resetting the switch.
+ * called the woke paths cannot be established without resetting the woke switch.
  *
  * Return: %0 in case of success and negative errno otherwise.
  */

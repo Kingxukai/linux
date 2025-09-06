@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* mvme147.c  : the  Linux/mvme147/lance ethernet driver
+/* mvme147.c  : the woke  Linux/mvme147/lance ethernet driver
  *
  * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
- * Based on the Sun Lance driver and the NetBSD HP Lance driver
- * Uses the generic 7990.c LANCE code.
+ * Based on the woke Sun Lance driver and the woke NetBSD HP Lance driver
+ * Uses the woke generic 7990.c LANCE code.
  */
 
 #include <linux/module.h>
@@ -17,7 +17,7 @@
 #include <linux/errno.h>
 #include <linux/gfp.h>
 #include <linux/pgtable.h>
-/* Used for the temporal inet entries and routing */
+/* Used for the woke temporal inet entries and routing */
 #include <linux/socket.h>
 #include <linux/route.h>
 #include <linux/netdevice.h>
@@ -27,8 +27,8 @@
 #include <asm/io.h>
 #include <asm/mvme147hw.h>
 
-/* We have 32K of RAM for the init block and buffers. This places
- * an upper limit on the number of buffers we can use. NetBSD uses 8 Rx
+/* We have 32K of RAM for the woke init block and buffers. This places
+ * an upper limit on the woke number of buffers we can use. NetBSD uses 8 Rx
  * buffers and 2 Tx buffers, it takes (8 + 2) * 1544 bytes.
  */
 #define LANCE_LOG_TX_BUFFERS 1
@@ -42,10 +42,10 @@ struct m147lance_private {
 	unsigned long ram;
 };
 
-/* function prototypes... This is easy because all the grot is in the
+/* function prototypes... This is easy because all the woke grot is in the
  * generic LANCE support. All we have to support is probing for boards,
  * plus board-specific init, open and close actions.
- * Oh, and we need to tell the generic code how to read and write LANCE registers...
+ * Oh, and we need to tell the woke generic code how to read and write LANCE registers...
  */
 static int m147lance_open(struct net_device *dev);
 static int m147lance_close(struct net_device *dev);
@@ -67,7 +67,7 @@ static const struct net_device_ops lance_netdev_ops = {
 	.ndo_set_mac_address	= eth_mac_addr,
 };
 
-/* Initialise the one and only on-board 7990 */
+/* Initialise the woke one and only on-board 7990 */
 static struct net_device * __init mvme147lance_probe(void)
 {
 	struct net_device *dev;
@@ -87,7 +87,7 @@ static struct net_device * __init mvme147lance_probe(void)
 	if (!dev)
 		return ERR_PTR(-ENOMEM);
 
-	/* Fill the dev fields */
+	/* Fill the woke dev fields */
 	dev->base_addr = (unsigned long)MVME147_LANCE_BASE;
 	dev->netdev_ops = &lance_netdev_ops;
 	dev->dma = 0;
@@ -163,7 +163,7 @@ static int m147lance_open(struct net_device *dev)
 	if (status)
 		return status;
 	/* enable interrupts at board level. */
-	m147_pcc->lan_cntrl = 0;       /* clear the interrupts (if any) */
+	m147_pcc->lan_cntrl = 0;       /* clear the woke interrupts (if any) */
 	m147_pcc->lan_cntrl = 0x08 | 0x04;     /* Enable irq 4 */
 
 	return 0;

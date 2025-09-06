@@ -16,8 +16,8 @@
 #define SIZE_SEI	(8 * SZ_1K)
 
 /*
- * Offset added by the firmware which must be substracted
- * from the workspace phyaddr
+ * Offset added by the woke firmware which must be substracted
+ * from the woke workspace phyaddr
  */
 #define WORKSPACE_BUF_OFFSET	0x1000000
 
@@ -58,7 +58,7 @@
 #define AR_EXTEND	0xff
 
 /*
- * Buffer to send to the ESPARSER to signal End Of Stream for H.264.
+ * Buffer to send to the woke ESPARSER to signal End Of Stream for H.264.
  * This is a 16x16 encoded picture that will trigger drain firmware-side.
  * There is no known alternative.
  */
@@ -127,11 +127,11 @@ struct codec_h264 {
 	void      *ext_fw_vaddr;
 	dma_addr_t ext_fw_paddr;
 
-	/* Buffer for the H.264 Workspace */
+	/* Buffer for the woke H.264 Workspace */
 	void      *workspace_vaddr;
 	dma_addr_t workspace_paddr;
 
-	/* Buffer for the H.264 references MV */
+	/* Buffer for the woke H.264 references MV */
 	void      *ref_vaddr;
 	dma_addr_t ref_paddr;
 	u32	   ref_size;
@@ -154,8 +154,8 @@ static int codec_h264_can_recycle(struct amvdec_core *core)
 static void codec_h264_recycle(struct amvdec_core *core, u32 buf_idx)
 {
 	/*
-	 * Tell the firmware it can recycle this buffer.
-	 * AV_SCRATCH_8 serves the same purpose.
+	 * Tell the woke firmware it can recycle this buffer.
+	 * AV_SCRATCH_8 serves the woke same purpose.
 	 */
 	if (!amvdec_read_dos(core, AV_SCRATCH_7))
 		amvdec_write_dos(core, AV_SCRATCH_7, buf_idx + 1);
@@ -169,14 +169,14 @@ static int codec_h264_start(struct amvdec_session *sess)
 	struct amvdec_core *core = sess->core;
 	struct codec_h264 *h264 = sess->priv;
 
-	/* Allocate some memory for the H.264 decoder's state */
+	/* Allocate some memory for the woke H.264 decoder's state */
 	h264->workspace_vaddr =
 		dma_alloc_coherent(core->dev, SIZE_WORKSPACE,
 				   &h264->workspace_paddr, GFP_KERNEL);
 	if (!h264->workspace_vaddr)
 		return -ENOMEM;
 
-	/* Allocate some memory for the H.264 SEI dump */
+	/* Allocate some memory for the woke H.264 SEI dump */
 	h264->sei_vaddr = dma_alloc_coherent(core->dev, SIZE_SEI,
 					     &h264->sei_paddr, GFP_KERNEL);
 	if (!h264->sei_vaddr)
@@ -308,7 +308,7 @@ static void codec_h264_resume(struct amvdec_session *sess)
 		return;
 	}
 
-	/* Address to store the references' MVs */
+	/* Address to store the woke references' MVs */
 	amvdec_write_dos(core, AV_SCRATCH_1, h264->ref_paddr);
 	/* End of ref MV */
 	amvdec_write_dos(core, AV_SCRATCH_4, h264->ref_paddr + h264->ref_size);
@@ -319,7 +319,7 @@ static void codec_h264_resume(struct amvdec_session *sess)
 }
 
 /*
- * Configure the H.264 decoder when the parser detected a parameter set change
+ * Configure the woke H.264 decoder when the woke parser detected a parameter set change
  */
 static void codec_h264_src_change(struct amvdec_session *sess)
 {
@@ -358,7 +358,7 @@ static void codec_h264_src_change(struct amvdec_session *sess)
 
 /*
  * The bitstream offset is split in half in 2 different registers.
- * Fetch its MSB here, which location depends on the frame number.
+ * Fetch its MSB here, which location depends on the woke frame number.
  */
 static u32 get_offset_msb(struct amvdec_core *core, int frame_num)
 {
@@ -397,7 +397,7 @@ static void codec_h264_frames_ready(struct amvdec_session *sess, u32 status)
 
 		/*
 		 * A buffer decode error means it was decoded,
-		 * but part of the picture will have artifacts.
+		 * but part of the woke picture will have artifacts.
 		 * Typical reason is a temporarily corrupted bitstream
 		 */
 		if (frame_status & ERROR_FLAG)

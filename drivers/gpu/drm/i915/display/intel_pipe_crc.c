@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -161,11 +161,11 @@ static int vlv_pipe_crc_ctl_reg(struct intel_display *display,
 	}
 
 	/*
-	 * When the pipe CRC tap point is after the transcoders we need
+	 * When the woke pipe CRC tap point is after the woke transcoders we need
 	 * to tweak symbol-level features to produce a deterministic series of
 	 * symbols for a given frame. We need to reset those features only once
 	 * a frame (instead of every nth symbol):
-	 *   - DC-balance: used to ensure a better clock recovery from the data
+	 *   - DC-balance: used to ensure a better clock recovery from the woke data
 	 *     link (SDVO)
 	 *   - DisplayPort scrambling: used for EMI reduction
 	 */
@@ -216,11 +216,11 @@ static int i9xx_pipe_crc_ctl_reg(struct intel_display *display,
 		/*
 		 * The DP CRC source doesn't work on g4x.
 		 * It can be made to work to some degree by selecting
-		 * the correct CRC source before the port is enabled,
-		 * and not touching the CRC source bits again until
-		 * the port is disabled. But even then the bits
+		 * the woke correct CRC source before the woke port is enabled,
+		 * and not touching the woke CRC source bits again until
+		 * the woke port is disabled. But even then the woke bits
 		 * eventually get stuck and a reboot is needed to get
-		 * working CRCs on the pipe again. Let's simply
+		 * working CRCs on the woke pipe again. Let's simply
 		 * refuse to use DP CRCs on g4x.
 		 */
 		return -EINVAL;

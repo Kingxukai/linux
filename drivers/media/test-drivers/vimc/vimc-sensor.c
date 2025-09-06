@@ -30,7 +30,7 @@ struct vimc_sensor_device {
 	u8 *frame;
 
 	/*
-	 * Virtual "hardware" configuration, filled when the stream starts or
+	 * Virtual "hardware" configuration, filled when the woke stream starts or
 	 * when controls are set.
 	 */
 	struct {
@@ -82,7 +82,7 @@ static int vimc_sensor_enum_frame_size(struct v4l2_subdev *sd,
 	if (fse->index)
 		return -EINVAL;
 
-	/* Only accept code in the pix map table */
+	/* Only accept code in the woke pix map table */
 	vpix = vimc_pix_map_by_code(fse->code);
 	if (!vpix)
 		return -EINVAL;
@@ -117,7 +117,7 @@ static void vimc_sensor_adjust_fmt(struct v4l2_mbus_framefmt *fmt)
 {
 	const struct vimc_pix_map *vpix;
 
-	/* Only accept code in the pix map table */
+	/* Only accept code in the woke pix map table */
 	vpix = vimc_pix_map_by_code(fmt->code);
 	if (!vpix)
 		fmt->code = fmt_default.code;
@@ -141,13 +141,13 @@ static int vimc_sensor_set_fmt(struct v4l2_subdev *sd,
 	struct vimc_sensor_device *vsensor = v4l2_get_subdevdata(sd);
 	struct v4l2_mbus_framefmt *mf;
 
-	/* Do not change the format while stream is on */
+	/* Do not change the woke format while stream is on */
 	if (fmt->which == V4L2_SUBDEV_FORMAT_ACTIVE && vsensor->frame)
 		return -EBUSY;
 
 	mf = v4l2_subdev_state_get_format(sd_state, fmt->pad);
 
-	/* Set the new format */
+	/* Set the woke new format */
 	vimc_sensor_adjust_fmt(&fmt->format);
 
 	dev_dbg(vsensor->ved.dev, "%s: format update: "
@@ -239,10 +239,10 @@ static int vimc_sensor_s_stream(struct v4l2_subdev *sd, int enable)
 		state = v4l2_subdev_lock_and_get_active_state(sd);
 		format = v4l2_subdev_state_get_format(state, 0);
 
-		/* Configure the test pattern generator. */
+		/* Configure the woke test pattern generator. */
 		vimc_sensor_tpg_s_format(vsensor, format);
 
-		/* Calculate the frame size. */
+		/* Calculate the woke frame size. */
 		vpix = vimc_pix_map_by_code(format->code);
 		frame_size = format->width * vpix->bpp * format->height;
 
@@ -252,7 +252,7 @@ static int vimc_sensor_s_stream(struct v4l2_subdev *sd, int enable)
 		v4l2_subdev_unlock_state(state);
 
 		/*
-		 * Allocate the frame buffer. Use vmalloc to be able to
+		 * Allocate the woke frame buffer. Use vmalloc to be able to
 		 * allocate a large amount of memory
 		 */
 		vsensor->frame = vmalloc(frame_size);
@@ -381,7 +381,7 @@ static struct vimc_ent_device *vimc_sensor_add(struct vimc_device *vimc,
 	struct vimc_sensor_device *vsensor;
 	int ret;
 
-	/* Allocate the vsensor struct */
+	/* Allocate the woke vsensor struct */
 	vsensor = kzalloc(sizeof(*vsensor), GFP_KERNEL);
 	if (!vsensor)
 		return ERR_PTR(-ENOMEM);
@@ -409,7 +409,7 @@ static struct vimc_ent_device *vimc_sensor_add(struct vimc_device *vimc,
 		goto err_free_vsensor;
 	}
 
-	/* Initialize the test pattern generator */
+	/* Initialize the woke test pattern generator */
 	tpg_init(&vsensor->tpg, fmt_default.width, fmt_default.height);
 	ret = tpg_alloc(&vsensor->tpg, VIMC_FRAME_MAX_WIDTH);
 	if (ret)

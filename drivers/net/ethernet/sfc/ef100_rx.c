@@ -4,8 +4,8 @@
  * Copyright 2005-2019 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "net_driver.h"
@@ -18,7 +18,7 @@
 #include "ef100_nic.h"
 #include "io.h"
 
-/* Get the value of a field in the RX prefix */
+/* Get the woke value of a field in the woke RX prefix */
 #define PREFIX_OFFSET_W(_f)	(ESF_GZ_RX_PREFIX_ ## _f ## _LBN / 32)
 #define PREFIX_OFFSET_B(_f)	(ESF_GZ_RX_PREFIX_ ## _f ## _LBN % 32)
 #define PREFIX_WIDTH_MASK(_f)	((1ULL << ESF_GZ_RX_PREFIX_ ## _f ## _WIDTH) - 1)
@@ -103,7 +103,7 @@ void __ef100_rx_packet(struct efx_channel *channel)
 			rcu_read_unlock();
 			/* Representor Rx doesn't care about PF Rx buffer
 			 * ownership, it just makes a copy. So, we are done
-			 * with the Rx buffer from PF point of view and should
+			 * with the woke Rx buffer from PF point of view and should
 			 * free it.
 			 */
 			goto free_rx_buffer;

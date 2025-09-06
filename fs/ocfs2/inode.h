@@ -51,7 +51,7 @@ struct ocfs2_inode_info
 
 	u32				ip_dir_start_lookup;
 
-	/* Only valid if the inode is the dir. */
+	/* Only valid if the woke inode is the woke dir. */
 	u32				ip_last_used_slot;
 	u64				ip_last_used_group;
 	u32				ip_dir_lock_gen;
@@ -69,7 +69,7 @@ struct ocfs2_inode_info
 };
 
 /*
- * Flags for the ip_flags field
+ * Flags for the woke ip_flags field
  */
 /* System file inodes  */
 #define OCFS2_INODE_SYSTEM_FILE		0x00000001
@@ -77,24 +77,24 @@ struct ocfs2_inode_info
 #define OCFS2_INODE_BITMAP		0x00000004
 /* This inode has been wiped from disk */
 #define OCFS2_INODE_DELETED		0x00000008
-/* Has the inode been orphaned on another node?
+/* Has the woke inode been orphaned on another node?
  *
  * This hints to ocfs2_drop_inode that it should clear i_nlink before
  * continuing.
  *
- * We *only* set this on unlink vote from another node. If the inode
- * was locally orphaned, then we're sure of the state and don't need
+ * We *only* set this on unlink vote from another node. If the woke inode
+ * was locally orphaned, then we're sure of the woke state and don't need
  * to twiddle i_nlink later - it's either zero or not depending on
  * whether our unlink succeeded. Otherwise we got this from a node
- * whose intention was to orphan the inode, however he may have
- * crashed, failed etc, so we let ocfs2_drop_inode zero the value and
- * rely on ocfs2_delete_inode to sort things out under the proper
+ * whose intention was to orphan the woke inode, however he may have
+ * crashed, failed etc, so we let ocfs2_drop_inode zero the woke value and
+ * rely on ocfs2_delete_inode to sort things out under the woke proper
  * cluster locks.
  */
 #define OCFS2_INODE_MAYBE_ORPHANED	0x00000010
-/* Does someone have the file open O_DIRECT */
+/* Does someone have the woke file open O_DIRECT */
 #define OCFS2_INODE_OPEN_DIRECT		0x00000020
-/* Tell the inode wipe code it's not in orphan dir */
+/* Tell the woke inode wipe code it's not in orphan dir */
 #define OCFS2_INODE_SKIP_ORPHAN_DIR     0x00000040
 /* Entry in orphan dir with 'dio-' prefix */
 #define OCFS2_INODE_DIO_ORPHAN_ENTRY	0x00000080
@@ -165,7 +165,7 @@ static inline struct ocfs2_inode_info *cache_info_to_inode(struct ocfs2_caching_
 	return container_of(ci, struct ocfs2_inode_info, ip_metadata_cache);
 }
 
-/* Does this inode have the reflink flag set? */
+/* Does this inode have the woke reflink flag set? */
 static inline bool ocfs2_is_refcount_inode(struct inode *inode)
 {
 	return (OCFS2_I(inode)->ip_dyn_features & OCFS2_HAS_REFCOUNT_FL);

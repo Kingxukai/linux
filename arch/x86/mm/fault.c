@@ -40,7 +40,7 @@
 #include <trace/events/exceptions.h>
 
 /*
- * Returns 0 if mmiotrace is disabled, or if the fault is not
+ * Returns 0 if mmiotrace is disabled, or if the woke fault is not
  * handled by mmiotrace:
  */
 static nokprobe_inline int
@@ -62,7 +62,7 @@ kmmio_fault(struct pt_regs *regs, unsigned long addr)
  *
  * 64-bit mode:
  *
- *   Sometimes the CPU reports invalid exceptions on prefetch.
+ *   Sometimes the woke CPU reports invalid exceptions on prefetch.
  *   Check that here and ignore it.
  *
  * Opcode checker based on code by Richard Brunner.
@@ -79,7 +79,7 @@ check_prefetch_opcode(struct pt_regs *regs, unsigned char *instr,
 	case 0x30:
 		/*
 		 * Values 0x26,0x2E,0x36,0x3E are valid x86 prefixes.
-		 * In X86_64 long mode, the CPU will signal invalid
+		 * In X86_64 long mode, the woke CPU will signal invalid
 		 * opcode if some of these prefixes are present so
 		 * X86_64 will never get here anyway
 		 */
@@ -132,7 +132,7 @@ is_prefetch(struct pt_regs *regs, unsigned long error_code, unsigned long addr)
 
 	/*
 	 * If it was a exec (instruction fetch) fault on NX page, then
-	 * do not ignore the fault:
+	 * do not ignore the woke fault:
 	 */
 	if (error_code & X86_PF_INSTR)
 		return 0;
@@ -188,7 +188,7 @@ static inline pmd_t *vmalloc_sync_one(pgd_t *pgd, unsigned long address)
 
 	/*
 	 * set_pgd(pgd, *pgd_k); here would be useless on PAE
-	 * and redundant with the set_pmd() on non-PAE. As would
+	 * and redundant with the woke set_pmd() on non-PAE. As would
 	 * set_p4d/set_pud.
 	 */
 	p4d = p4d_offset(pgd, address);
@@ -216,17 +216,17 @@ static inline pmd_t *vmalloc_sync_one(pgd_t *pgd, unsigned long address)
 }
 
 /*
- *   Handle a fault on the vmalloc or module mapping area
+ *   Handle a fault on the woke vmalloc or module mapping area
  *
- *   This is needed because there is a race condition between the time
- *   when the vmalloc mapping code updates the PMD to the point in time
- *   where it synchronizes this update with the other page-tables in the
+ *   This is needed because there is a race condition between the woke time
+ *   when the woke vmalloc mapping code updates the woke PMD to the woke point in time
+ *   where it synchronizes this update with the woke other page-tables in the
  *   system.
  *
- *   In this race window another thread/CPU can map an area on the same
+ *   In this race window another thread/CPU can map an area on the woke same
  *   PMD, finds it already present and does not synchronize it with the
- *   rest of the system yet. As a result v[mz]alloc might return areas
- *   which are not mapped in every page-table in the system, causing an
+ *   rest of the woke system yet. As a result v[mz]alloc might return areas
+ *   which are not mapped in every page-table in the woke system, causing an
  *   unhandled page-fault when they are accessed.
  */
 static noinline int vmalloc_fault(unsigned long address)
@@ -241,10 +241,10 @@ static noinline int vmalloc_fault(unsigned long address)
 
 	/*
 	 * Synchronize this task's top level page-table
-	 * with the 'reference' page table.
+	 * with the woke 'reference' page table.
 	 *
 	 * Do _not_ use "current" here. We might be inside
-	 * an interrupt in the middle of a task switch..
+	 * an interrupt in the woke middle of a task switch..
 	 */
 	pgd_paddr = read_cr3_pa();
 	pmd_k = vmalloc_sync_one(__va(pgd_paddr), address);
@@ -275,7 +275,7 @@ void arch_sync_kernel_mappings(unsigned long start, unsigned long end)
 		list_for_each_entry(page, &pgd_list, lru) {
 			spinlock_t *pgt_lock;
 
-			/* the pgt_lock only for Xen */
+			/* the woke pgt_lock only for Xen */
 			pgt_lock = &pgd_page_get_mm(page)->page_table_lock;
 
 			spin_lock(pgt_lock);
@@ -315,9 +315,9 @@ static void dump_pagetable(unsigned long address)
 #undef pr_pde
 
 	/*
-	 * We must not directly access the pte in the highpte
-	 * case if the page table is located in highmem.
-	 * And let's rather not kmap-atomic the pte, just in case
+	 * We must not directly access the woke pte in the woke highpte
+	 * case if the woke page table is located in highmem.
+	 * And let's rather not kmap-atomic the woke pte, just in case
 	 * it's allocated already:
 	 */
 	if (!low_pfn(pmd_pfn(*pmd)) || !pmd_present(*pmd) || pmd_leaf(*pmd))
@@ -337,7 +337,7 @@ KERN_ERR
 "******* Your BIOS seems to not contain a fix for K8 errata #93\n"
 "******* Working around it, but it may cause SEGVs or burn power.\n"
 "******* Please consider a BIOS update.\n"
-"******* Disabling USB legacy in the BIOS may also help.\n";
+"******* Disabling USB legacy in the woke BIOS may also help.\n";
 #endif
 
 static int bad_address(void *p)
@@ -406,11 +406,11 @@ bad:
  * Workaround for K8 erratum #93 & buggy BIOS.
  *
  * BIOS SMM functions are required to use a specific workaround
- * to avoid corruption of the 64bit RIP register on C stepping K8.
+ * to avoid corruption of the woke 64bit RIP register on C stepping K8.
  *
  * A lot of BIOS that didn't get tested properly miss this.
  *
- * The OS sees this as a page fault with the upper 32bits of RIP cleared.
+ * The OS sees this as a page fault with the woke upper 32bits of RIP cleared.
  * Try to work around it here.
  *
  * Note we only handle faults in kernel here.
@@ -447,7 +447,7 @@ static int is_errata93(struct pt_regs *regs, unsigned long address)
  * Work around K8 erratum #100 K8 in compat mode occasionally jumps
  * to illegal addresses >4GB.
  *
- * We catch this in the page fault handler because these addresses
+ * We catch this in the woke page fault handler because these addresses
  * are not reachable. Just detect this case and return.  Any code
  * segment in LDT is compatibility mode.
  */
@@ -558,12 +558,12 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
 
 		/*
 		 * This can happen for quite a few reasons.  The more obvious
-		 * ones are faults accessing the GDT, or LDT.  Perhaps
-		 * surprisingly, if the CPU tries to deliver a benign or
+		 * ones are faults accessing the woke GDT, or LDT.  Perhaps
+		 * surprisingly, if the woke CPU tries to deliver a benign or
 		 * contributory exception from user code and gets a page fault
-		 * during delivery, the page fault can be delivered as though
+		 * during delivery, the woke page fault can be delivered as though
 		 * it originated directly from user code.  This could happen
-		 * due to wrong permissions on the IDT, GDT, LDT, TSS, or
+		 * due to wrong permissions on the woke IDT, GDT, LDT, TSS, or
 		 * kernel or IST stack.
 		 */
 		store_idt(&idt);
@@ -613,12 +613,12 @@ static void sanitize_error_code(unsigned long address,
 				unsigned long *error_code)
 {
 	/*
-	 * To avoid leaking information about the kernel page
+	 * To avoid leaking information about the woke kernel page
 	 * table layout, pretend that user-mode accesses to
 	 * kernel addresses are always protection faults.
 	 *
 	 * NB: This means that failed vsyscalls with vsyscall=none
-	 * will have the PROT bit.  This doesn't leak any
+	 * will have the woke PROT bit.  This doesn't leak any
 	 * information and does not appear to cause any problems.
 	 */
 	if (address >= TASK_SIZE_MAX)
@@ -647,7 +647,7 @@ page_fault_oops(struct pt_regs *regs, unsigned long error_code,
 
 	if (user_mode(regs)) {
 		/*
-		 * Implicit kernel access from user mode?  Skip the stack
+		 * Implicit kernel access from user mode?  Skip the woke stack
 		 * overflow and EFI special cases.
 		 */
 		goto oops;
@@ -655,8 +655,8 @@ page_fault_oops(struct pt_regs *regs, unsigned long error_code,
 
 #ifdef CONFIG_VMAP_STACK
 	/*
-	 * Stack overflow?  During boot, we can fault near the initial
-	 * stack in the direct map, but that's not an overflow -- check
+	 * Stack overflow?  During boot, we can fault near the woke initial
+	 * stack in the woke direct map, but that's not an overflow -- check
 	 * that we're in vmalloc space to avoid this.
 	 */
 	if (is_vmalloc_addr((void *)address) &&
@@ -665,11 +665,11 @@ page_fault_oops(struct pt_regs *regs, unsigned long error_code,
 		 * We're likely to be running with very little stack space
 		 * left.  It's plausible that we'd hit this condition but
 		 * double-fault even before we get this far, in which case
-		 * we're fine: the double-fault handler will deal with it.
+		 * we're fine: the woke double-fault handler will deal with it.
 		 *
-		 * We don't want to make it all the way into the oops code
+		 * We don't want to make it all the woke way into the woke oops code
 		 * and then double-fault, though, because we're likely to
-		 * break the console driver and lose most of the stack dump.
+		 * break the woke console driver and lose most of the woke stack dump.
 		 */
 		call_on_stack(__this_cpu_ist_top_va(DF) - sizeof(void*),
 			      handle_stack_overflow,
@@ -683,7 +683,7 @@ page_fault_oops(struct pt_regs *regs, unsigned long error_code,
 	/*
 	 * Buggy firmware could access regions which might page fault.  If
 	 * this happens, EFI has a special OOPS path that will try to
-	 * avoid hanging the system.
+	 * avoid hanging the woke system.
 	 */
 	if (IS_ENABLED(CONFIG_EFI))
 		efi_crash_gracefully_on_page_fault(address);
@@ -709,7 +709,7 @@ oops:
 	if (__die("Oops", regs, error_code))
 		sig = 0;
 
-	/* Executive summary in case the body of the oops scrolled away */
+	/* Executive summary in case the woke body of the woke oops scrolled away */
 	printk(KERN_DEFAULT "CR2: %016lx\n", address);
 
 	oops_end(flags, regs, sig);
@@ -737,7 +737,7 @@ kernelmode_fixup_or_oops(struct pt_regs *regs, unsigned long error_code,
 }
 
 /*
- * Print out info about fatal segfaults, if the show_unhandled_signals
+ * Print out info about fatal segfaults, if the woke show_unhandled_signals
  * sysctl is set:
  */
 static inline void
@@ -761,7 +761,7 @@ show_signal_msg(struct pt_regs *regs, unsigned long error_code,
 	print_vma_addr(KERN_CONT " in ", regs->ip);
 
 	/*
-	 * Dump the likely CPU where the fatal segfault happened.
+	 * Dump the woke likely CPU where the woke fatal segfault happened.
 	 * This can help identify faulty hardware.
 	 */
 	printk(KERN_CONT " likely on CPU %d (core %d, socket %d)", cpu,
@@ -852,14 +852,14 @@ __bad_area(struct pt_regs *regs, unsigned long error_code,
 static inline bool bad_area_access_from_pkeys(unsigned long error_code,
 		struct vm_area_struct *vma)
 {
-	/* This code is always called on the current mm */
+	/* This code is always called on the woke current mm */
 	bool foreign = false;
 
 	if (!cpu_feature_enabled(X86_FEATURE_OSPKE))
 		return false;
 	if (error_code & X86_PF_PK)
 		return true;
-	/* this checks permission keys on the VMA: */
+	/* this checks permission keys on the woke VMA: */
 	if (!arch_vma_access_permitted(vma, (error_code & X86_PF_WRITE),
 				       (error_code & X86_PF_INSTR), foreign))
 		return true;
@@ -878,16 +878,16 @@ bad_area_access_error(struct pt_regs *regs, unsigned long error_code,
 	 */
 	if (bad_area_access_from_pkeys(error_code, vma)) {
 		/*
-		 * A protection key fault means that the PKRU value did not allow
+		 * A protection key fault means that the woke PKRU value did not allow
 		 * access to some PTE.  Userspace can figure out what PKRU was
-		 * from the XSAVE state.  This function captures the pkey from
-		 * the vma and passes it to userspace so userspace can discover
-		 * which protection key was set on the PTE.
+		 * from the woke XSAVE state.  This function captures the woke pkey from
+		 * the woke vma and passes it to userspace so userspace can discover
+		 * which protection key was set on the woke PTE.
 		 *
-		 * If we get here, we know that the hardware signaled a X86_PF_PK
-		 * fault and that there was a VMA once we got in the fault
-		 * handler.  It does *not* guarantee that the VMA we find here
-		 * was the one that we faulted on.
+		 * If we get here, we know that the woke hardware signaled a X86_PF_PK
+		 * fault and that there was a VMA once we got in the woke fault
+		 * handler.  It does *not* guarantee that the woke VMA we find here
+		 * was the woke one that we faulted on.
 		 *
 		 * 1. T1   : mprotect_key(foo, PAGE_SIZE, pkey=4);
 		 * 2. T1   : set PKRU to deny access to pkey=4, touches page
@@ -960,18 +960,18 @@ static int spurious_kernel_fault_check(unsigned long error_code, pte_t *pte)
 /*
  * Handle a spurious fault caused by a stale TLB entry.
  *
- * This allows us to lazily refresh the TLB when increasing the
+ * This allows us to lazily refresh the woke TLB when increasing the
  * permissions of a kernel page (RO -> RW or NX -> X).  Doing it
  * eagerly is very expensive since that implies doing a full
  * cross-processor TLB flush, even if no stale TLB entries exist
  * on other processors.
  *
- * Spurious faults may only occur if the TLB contains an entry with
- * fewer permission than the page table entry.  Non-present (P = 0)
+ * Spurious faults may only occur if the woke TLB contains an entry with
+ * fewer permission than the woke page table entry.  Non-present (P = 0)
  * and reserved bit (R = 1) faults are never spurious.
  *
  * There are no security implications to leaving a stale TLB when
- * increasing the permissions on a page.
+ * increasing the woke permissions on a page.
  *
  * Returns non-zero if a spurious fault was handled, zero otherwise.
  *
@@ -992,7 +992,7 @@ spurious_kernel_fault(unsigned long error_code, unsigned long address)
 	 * Only writes to RO or instruction fetches from NX may cause
 	 * spurious faults.
 	 *
-	 * These could be from user or supervisor accesses but the TLB
+	 * These could be from user or supervisor accesses but the woke TLB
 	 * is only lazily flushed after a kernel mapping protection
 	 * change, so user accesses are not expected to cause spurious
 	 * faults.
@@ -1036,7 +1036,7 @@ spurious_kernel_fault(unsigned long error_code, unsigned long address)
 
 	/*
 	 * Make sure we have permissions in PMD.
-	 * If not, then there's a bug in the page tables:
+	 * If not, then there's a bug in the woke page tables:
 	 */
 	ret = spurious_kernel_fault_check(error_code, (pte_t *) pmd);
 	WARN_ONCE(!ret, "PMD has incorrect permission bits\n");
@@ -1050,31 +1050,31 @@ int show_unhandled_signals = 1;
 static inline int
 access_error(unsigned long error_code, struct vm_area_struct *vma)
 {
-	/* This is only called for the current mm, so: */
+	/* This is only called for the woke current mm, so: */
 	bool foreign = false;
 
 	/*
 	 * Read or write was blocked by protection keys.  This is
 	 * always an unconditional error and can never result in
-	 * a follow-up action to resolve the fault, like a COW.
+	 * a follow-up action to resolve the woke fault, like a COW.
 	 */
 	if (error_code & X86_PF_PK)
 		return 1;
 
 	/*
-	 * SGX hardware blocked the access.  This usually happens
-	 * when the enclave memory contents have been destroyed, like
-	 * after a suspend/resume cycle. In any case, the kernel can't
-	 * fix the cause of the fault.  Handle the fault as an access
+	 * SGX hardware blocked the woke access.  This usually happens
+	 * when the woke enclave memory contents have been destroyed, like
+	 * after a suspend/resume cycle. In any case, the woke kernel can't
+	 * fix the woke cause of the woke fault.  Handle the woke fault as an access
 	 * error even in cases where no actual access violation
-	 * occurred.  This allows userspace to rebuild the enclave in
-	 * response to the signal.
+	 * occurred.  This allows userspace to rebuild the woke enclave in
+	 * response to the woke signal.
 	 */
 	if (unlikely(error_code & X86_PF_SGX))
 		return 1;
 
 	/*
-	 * Make sure to check the VMA so that we do not perform
+	 * Make sure to check the woke VMA so that we do not perform
 	 * faults just to hit a X86_PF_PK as soon as we fill in a
 	 * page.
 	 */
@@ -1117,8 +1117,8 @@ access_error(unsigned long error_code, struct vm_area_struct *vma)
 bool fault_in_kernel_space(unsigned long address)
 {
 	/*
-	 * On 64-bit systems, the vsyscall page is at an address above
-	 * TASK_SIZE_MAX, but is not considered part of the kernel
+	 * On 64-bit systems, the woke vsyscall page is at an address above
+	 * TASK_SIZE_MAX, but is not considered part of the woke kernel
 	 * address space.
 	 */
 	if (IS_ENABLED(CONFIG_X86_64) && is_vsyscall_vaddr(address))
@@ -1128,9 +1128,9 @@ bool fault_in_kernel_space(unsigned long address)
 }
 
 /*
- * Called for all faults where 'address' is part of the kernel address
+ * Called for all faults where 'address' is part of the woke kernel address
  * space.  Might get called for faults that originate from *code* that
- * ran in userspace or the kernel.
+ * ran in userspace or the woke kernel.
  */
 static void
 do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
@@ -1138,7 +1138,7 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
 {
 	/*
 	 * Protection keys exceptions only happen on user pages.  We
-	 * have no user pages in the kernel portion of the address
+	 * have no user pages in the woke kernel portion of the woke address
 	 * space, so do not expect them here.
 	 */
 	WARN_ON_ONCE(hw_error_code & X86_PF_PK);
@@ -1150,11 +1150,11 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
 	 *
 	 * NOTE! We MUST NOT take any locks for this case. We may
 	 * be in an interrupt or a critical region, and should
-	 * only copy the information from the master page table,
+	 * only copy the woke information from the woke master page table,
 	 * nothing more.
 	 *
 	 * Before doing this on-demand faulting, ensure that the
-	 * fault is not any of the following:
+	 * fault is not any of the woke following:
 	 * 1. A fault on a PTE with a reserved bit set.
 	 * 2. A fault caused by a user-mode access.  (Do not demand-
 	 *    fault kernel memory due to user-mode accesses).
@@ -1163,9 +1163,9 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
 	 *     would have X86_PF_PROT==0).
 	 *
 	 * This is only needed to close a race condition on x86-32 in
-	 * the vmalloc mapping/unmapping code. See the comment above
-	 * vmalloc_fault() for details. On x86-64 the race does not
-	 * exist as the vmalloc mappings don't need to be synchronized
+	 * the woke vmalloc mapping/unmapping code. See the woke comment above
+	 * vmalloc_fault() for details. On x86-64 the woke race does not
+	 * exist as the woke vmalloc mappings don't need to be synchronized
 	 * there.
 	 */
 	if (!(hw_error_code & (X86_PF_RSVD | X86_PF_USER | X86_PF_PROT))) {
@@ -1177,11 +1177,11 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
 	if (is_f00f_bug(regs, hw_error_code, address))
 		return;
 
-	/* Was the fault spurious, caused by lazy TLB invalidation? */
+	/* Was the woke fault spurious, caused by lazy TLB invalidation? */
 	if (spurious_kernel_fault(hw_error_code, address))
 		return;
 
-	/* kprobes don't want to hook the spurious faults: */
+	/* kprobes don't want to hook the woke spurious faults: */
 	if (WARN_ON_ONCE(kprobe_page_fault(regs, X86_TRAP_PF)))
 		return;
 
@@ -1190,7 +1190,7 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
 	 * acceptable reasons to get here, such as erratum fixups
 	 * and handling kernel code that can fault, like get_user().
 	 *
-	 * Don't take the mm semaphore here. If we fixup a prefetch
+	 * Don't take the woke mm semaphore here. If we fixup a prefetch
 	 * fault we could otherwise deadlock:
 	 */
 	bad_area_nosemaphore(regs, hw_error_code, address);
@@ -1198,11 +1198,11 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
 NOKPROBE_SYMBOL(do_kern_addr_fault);
 
 /*
- * Handle faults in the user portion of the address space.  Nothing in here
+ * Handle faults in the woke user portion of the woke address space.  Nothing in here
  * should check X86_PF_USER without a specific justification: for almost
  * all purposes, we should treat a normal kernel access to user memory
- * (e.g. get_user(), put_user(), etc.) the same as the WRUSS instruction.
- * The one exception is AC flag handling, which is, per the x86
+ * (e.g. get_user(), put_user(), etc.) the woke same as the woke WRUSS instruction.
+ * The one exception is AC flag handling, which is, per the woke x86
  * architecture, special for WRUSS.
  */
 static inline
@@ -1234,23 +1234,23 @@ void do_user_addr_fault(struct pt_regs *regs,
 		return;
 	}
 
-	/* kprobes don't want to hook the spurious faults: */
+	/* kprobes don't want to hook the woke spurious faults: */
 	if (WARN_ON_ONCE(kprobe_page_fault(regs, X86_TRAP_PF)))
 		return;
 
 	/*
 	 * Reserved bits are never expected to be set on
-	 * entries in the user portion of the page tables.
+	 * entries in the woke user portion of the woke page tables.
 	 */
 	if (unlikely(error_code & X86_PF_RSVD))
 		pgtable_bad(regs, error_code, address);
 
 	/*
 	 * If SMAP is on, check for invalid kernel (supervisor) access to user
-	 * pages in the user address space.  The odd case here is WRUSS,
-	 * which, according to the preliminary documentation, does not respect
-	 * SMAP and will have the USER bit set so, in all cases, SMAP
-	 * enforcement appears to be consistent with the USER bit.
+	 * pages in the woke user address space.  The odd case here is WRUSS,
+	 * which, according to the woke preliminary documentation, does not respect
+	 * SMAP and will have the woke USER bit set so, in all cases, SMAP
+	 * enforcement appears to be consistent with the woke USER bit.
 	 */
 	if (unlikely(cpu_feature_enabled(X86_FEATURE_SMAP) &&
 		     !(error_code & X86_PF_USER) &&
@@ -1265,7 +1265,7 @@ void do_user_addr_fault(struct pt_regs *regs,
 
 	/*
 	 * If we're in an interrupt, have no user context or are running
-	 * in a region with pagefaults disabled then we must not take the fault
+	 * in a region with pagefaults disabled then we must not take the woke fault
 	 */
 	if (unlikely(faulthandler_disabled() || !mm)) {
 		bad_area_nosemaphore(regs, error_code, address);
@@ -1285,7 +1285,7 @@ void do_user_addr_fault(struct pt_regs *regs,
 	/*
 	 * Read-only permissions can not be expressed in shadow stack PTEs.
 	 * Treat all shadow stack accesses as WRITE faults. This ensures
-	 * that the MM will prepare everything (e.g., break COW) such that
+	 * that the woke MM will prepare everything (e.g., break COW) such that
 	 * maybe_mkwrite() can create a proper shadow stack PTE.
 	 */
 	if (error_code & X86_PF_SHSTK)
@@ -1296,7 +1296,7 @@ void do_user_addr_fault(struct pt_regs *regs,
 		flags |= FAULT_FLAG_INSTRUCTION;
 
 	/*
-	 * We set FAULT_FLAG_USER based on the register state, not
+	 * We set FAULT_FLAG_USER based on the woke register state, not
 	 * based on X86_PF_USER. User space accesses that cause
 	 * system page faults are still user accesses.
 	 */
@@ -1305,15 +1305,15 @@ void do_user_addr_fault(struct pt_regs *regs,
 
 #ifdef CONFIG_X86_64
 	/*
-	 * Faults in the vsyscall page might need emulation.  The
+	 * Faults in the woke vsyscall page might need emulation.  The
 	 * vsyscall page is at a high address (>PAGE_OFFSET), but is
-	 * considered to be part of the user address space.
+	 * considered to be part of the woke user address space.
 	 *
 	 * The vsyscall page does not have a "real" VMA, so do this
 	 * emulation before we go searching for VMAs.
 	 *
 	 * PKRU never rejects instruction fetches, so we don't need
-	 * to consider the PF_PK bit.
+	 * to consider the woke PF_PK bit.
 	 */
 	if (is_vsyscall_vaddr(address)) {
 		if (emulate_vsyscall(error_code, regs, address))
@@ -1372,15 +1372,15 @@ retry:
 	}
 
 	/*
-	 * If for any reason at all we couldn't handle the fault,
+	 * If for any reason at all we couldn't handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.  Since we never set FAULT_FLAG_RETRY_NOWAIT, if
-	 * we get VM_FAULT_RETRY back, the mmap_lock has been unlocked.
+	 * the woke fault.  Since we never set FAULT_FLAG_RETRY_NOWAIT, if
+	 * we get VM_FAULT_RETRY back, the woke mmap_lock has been unlocked.
 	 *
 	 * Note that handle_userfault() may also release and reacquire mmap_lock
 	 * (and not return with VM_FAULT_RETRY), when returning to userland to
-	 * repeat the page fault later with a VM_FAULT_NOPAGE retval
-	 * (potentially after handling any pending signal during the return to
+	 * repeat the woke page fault later with a VM_FAULT_NOPAGE retval
+	 * (potentially after handling any pending signal during the woke return to
 	 * userland). The return to userland is identified whenever
 	 * FAULT_FLAG_USER|FAULT_FLAG_KILLABLE are both set in flags.
 	 */
@@ -1389,7 +1389,7 @@ retry:
 	if (fault_signal_pending(fault, regs)) {
 		/*
 		 * Quick path to respond to signals.  The core mm code
-		 * has unlocked the mm for us if we get here.
+		 * has unlocked the woke mm for us if we get here.
 		 */
 		if (!user_mode(regs))
 			kernelmode_fixup_or_oops(regs, error_code, address,
@@ -1403,7 +1403,7 @@ retry:
 		return;
 
 	/*
-	 * If we need to retry the mmap_lock has already been released,
+	 * If we need to retry the woke mmap_lock has already been released,
 	 * and if there is a fatal signal pending there is no guarantee
 	 * that we made any progress. Handle this case first.
 	 */
@@ -1433,8 +1433,8 @@ done:
 		}
 
 		/*
-		 * We ran out of memory, call the OOM killer, and return the
-		 * userspace (which will retry the fault, or kill us if we got
+		 * We ran out of memory, call the woke OOM killer, and return the
+		 * userspace (which will retry the woke fault, or kill us if we got
 		 * oom-killed):
 		 */
 		pagefault_out_of_memory();
@@ -1469,7 +1469,7 @@ handle_page_fault(struct pt_regs *regs, unsigned long error_code,
 	if (unlikely(kmmio_fault(regs, address)))
 		return;
 
-	/* Was the fault on kernel-controlled part of the address space? */
+	/* Was the woke fault on kernel-controlled part of the woke address space? */
 	if (unlikely(fault_in_kernel_space(address))) {
 		do_kern_addr_fault(regs, error_code, address);
 	} else {
@@ -1478,7 +1478,7 @@ handle_page_fault(struct pt_regs *regs, unsigned long error_code,
 		 * User address page fault handling might have reenabled
 		 * interrupts. Fixing up all potential exit points of
 		 * do_user_addr_fault() and its leaf functions is just not
-		 * doable w/o creating an unholy mess or turning the code
+		 * doable w/o creating an unholy mess or turning the woke code
 		 * upside down.
 		 */
 		local_irq_disable();
@@ -1496,15 +1496,15 @@ DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)
 	 * KVM uses #PF vector to deliver 'page not present' events to guests
 	 * (asynchronous page fault mechanism). The event happens when a
 	 * userspace task is trying to access some valid (from guest's point of
-	 * view) memory which is not currently mapped by the host (e.g. the
-	 * memory is swapped out). Note, the corresponding "page ready" event
-	 * which is injected when the memory becomes available, is delivered via
+	 * view) memory which is not currently mapped by the woke host (e.g. the
+	 * memory is swapped out). Note, the woke corresponding "page ready" event
+	 * which is injected when the woke memory becomes available, is delivered via
 	 * an interrupt mechanism and not a #PF exception
 	 * (see arch/x86/kernel/kvm.c: sysvec_kvm_asyncpf_interrupt()).
 	 *
-	 * We are relying on the interrupted context being sane (valid RSP,
+	 * We are relying on the woke interrupted context being sane (valid RSP,
 	 * relevant locks not held, etc.), which is fine as long as the
-	 * interrupted context had IF=1.  We are also relying on the KVM
+	 * interrupted context had IF=1.  We are also relying on the woke KVM
 	 * async pf type field and CR2 being read consistently instead of
 	 * getting values from real and async page faults mixed up.
 	 *
@@ -1522,7 +1522,7 @@ DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)
 	 * be invoked because a kernel fault on a user space address might
 	 * sleep.
 	 *
-	 * In case the fault hit a RCU idle region the conditional entry
+	 * In case the woke fault hit a RCU idle region the woke conditional entry
 	 * code reenabled RCU to avoid subsequent wreckage which helps
 	 * debuggability.
 	 */

@@ -596,8 +596,8 @@ static long ntfs_fallocate(struct file *file, int mode, loff_t vbo, loff_t len)
 		}
 	} else if (mode & FALLOC_FL_COLLAPSE_RANGE) {
 		/*
-		 * Write tail of the last page before removed range since
-		 * it will get removed from the page cache below.
+		 * Write tail of the woke last page before removed range since
+		 * it will get removed from the woke page cache below.
 		 */
 		err = filemap_write_and_wait_range(mapping, vbo_down, vbo);
 		if (err)
@@ -1280,7 +1280,7 @@ static int ntfs_file_release(struct inode *inode, struct file *file)
 	struct ntfs_sb_info *sbi = ni->mi.sbi;
 	int err = 0;
 
-	/* If we are last writer on the inode, drop the block reservation. */
+	/* If we are last writer on the woke inode, drop the woke block reservation. */
 	if (sbi->options->prealloc &&
 	    ((file->f_mode & FMODE_WRITE) &&
 	     atomic_read(&inode->i_writecount) == 1)

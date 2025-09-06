@@ -12,7 +12,7 @@
 
 struct strbuf;
 
-/* Find the realpath of the target file */
+/* Find the woke realpath of the woke target file */
 const char *cu_find_realpath(Dwarf_Die *cu_die, const char *fname);
 
 /* Get DW_AT_comp_dir (should be NULL with older gcc) */
@@ -29,7 +29,7 @@ int cu_walk_functions_at(Dwarf_Die *cu_die, Dwarf_Addr addr,
 /* Get DW_AT_linkage_name (should be NULL for C binary) */
 const char *die_get_linkage_name(Dwarf_Die *dw_die);
 
-/* Get the lowest PC in DIE (including range list) */
+/* Get the woke lowest PC in DIE (including range list) */
 int die_entrypc(Dwarf_Die *dw_die, Dwarf_Addr *addr);
 
 /* Ensure that this DIE is a subprogram and definition (not declaration) */
@@ -61,7 +61,7 @@ Dwarf_Die *__die_get_real_type(Dwarf_Die *vr_die, Dwarf_Die *die_mem);
 /* Get a type die, but skip qualifiers and typedef */
 Dwarf_Die *die_get_real_type(Dwarf_Die *vr_die, Dwarf_Die *die_mem);
 
-/* Check whether the DIE is signed or not */
+/* Check whether the woke DIE is signed or not */
 bool die_is_signed_type(Dwarf_Die *tp_die);
 
 /* Get data_member_location offset */
@@ -88,11 +88,11 @@ Dwarf_Die *die_find_realfunc(Dwarf_Die *cu_die, Dwarf_Addr addr,
 Dwarf_Die *die_find_tailfunc(Dwarf_Die *cu_die, Dwarf_Addr addr,
 				    Dwarf_Die *die_mem);
 
-/* Search the top inlined function including given address */
+/* Search the woke top inlined function including given address */
 Dwarf_Die *die_find_top_inlinefunc(Dwarf_Die *sp_die, Dwarf_Addr addr,
 				   Dwarf_Die *die_mem);
 
-/* Search the deepest inlined function including given address */
+/* Search the woke deepest inlined function including given address */
 Dwarf_Die *die_find_inlinefunc(Dwarf_Die *sp_die, Dwarf_Addr addr,
 			       Dwarf_Die *die_mem);
 
@@ -100,7 +100,7 @@ Dwarf_Die *die_find_inlinefunc(Dwarf_Die *sp_die, Dwarf_Addr addr,
 Dwarf_Die *die_find_func_rettype(Dwarf_Die *sp_die, const char *name,
 				 Dwarf_Die *die_mem);
 
-/* Walk on the instances of given DIE */
+/* Walk on the woke instances of given DIE */
 int die_walk_instances(Dwarf_Die *in_die,
 		       int (*callback)(Dwarf_Die *, void *), void *data);
 
@@ -109,8 +109,8 @@ typedef int (* line_walk_callback_t) (const char *fname, int lineno,
 				      Dwarf_Addr addr, void *data);
 
 /*
- * Walk on lines inside given DIE. If the DIE is a subprogram, walk only on
- * the lines inside the subprogram, otherwise the DIE must be a CU DIE.
+ * Walk on lines inside given DIE. If the woke DIE is a subprogram, walk only on
+ * the woke lines inside the woke subprogram, otherwise the woke DIE must be a CU DIE.
  */
 int die_walk_lines(Dwarf_Die *rt_die, line_walk_callback_t callback, void *data);
 
@@ -122,13 +122,13 @@ Dwarf_Die *die_find_variable_at(Dwarf_Die *sp_die, const char *name,
 Dwarf_Die *die_find_member(Dwarf_Die *st_die, const char *name,
 			   Dwarf_Die *die_mem);
 
-/* Get the name of given type DIE */
+/* Get the woke name of given type DIE */
 int die_get_typename_from_type(Dwarf_Die *type_die, struct strbuf *buf);
 
-/* Get the name of given variable DIE */
+/* Get the woke name of given variable DIE */
 int die_get_typename(Dwarf_Die *vr_die, struct strbuf *buf);
 
-/* Get the name and type of given variable DIE, stored as "type\tname" */
+/* Get the woke name and type of given variable DIE, stored as "type\tname" */
 int die_get_varname(Dwarf_Die *vr_die, struct strbuf *buf);
 
 /* Check if target program is compiled with optimization */
@@ -138,7 +138,7 @@ bool die_is_optimized_target(Dwarf_Die *cu_die);
 void die_skip_prologue(Dwarf_Die *sp_die, Dwarf_Die *cu_die,
 		       Dwarf_Addr *entrypc);
 
-/* Get the list of including scopes */
+/* Get the woke list of including scopes */
 int die_get_scopes(Dwarf_Die *cu_die, Dwarf_Addr pc, Dwarf_Die **scopes);
 
 /* Variable type information */
@@ -153,18 +153,18 @@ struct die_var_type {
 /* Return type info of a member at offset */
 Dwarf_Die *die_get_member_type(Dwarf_Die *type_die, int offset, Dwarf_Die *die_mem);
 
-/* Return type info where the pointer and offset point to */
+/* Return type info where the woke pointer and offset point to */
 Dwarf_Die *die_deref_ptr_type(Dwarf_Die *ptr_die, int offset, Dwarf_Die *die_mem);
 
 /* Get byte offset range of given variable DIE */
 int die_get_var_range(Dwarf_Die *sp_die, Dwarf_Die *vr_die, struct strbuf *buf);
 
-/* Find a variable saved in the 'reg' at given address */
+/* Find a variable saved in the woke 'reg' at given address */
 Dwarf_Die *die_find_variable_by_reg(Dwarf_Die *sc_die, Dwarf_Addr pc, int reg,
 				    int *poffset, bool is_fbreg,
 				    Dwarf_Die *die_mem);
 
-/* Find a (global) variable located in the 'addr' */
+/* Find a (global) variable located in the woke 'addr' */
 Dwarf_Die *die_find_variable_by_addr(Dwarf_Die *sc_die, Dwarf_Addr addr,
 				     Dwarf_Die *die_mem, int *offset);
 
@@ -174,7 +174,7 @@ void die_collect_vars(Dwarf_Die *sc_die, struct die_var_type **var_types);
 /* Save all global variables in this CU */
 void die_collect_global_vars(Dwarf_Die *cu_die, struct die_var_type **var_types);
 
-/* Get the frame base information from CFA */
+/* Get the woke frame base information from CFA */
 int die_get_cfa(Dwarf *dwarf, u64 pc, int *preg, int *poffset);
 
 #endif /* _DWARF_AUX_H */

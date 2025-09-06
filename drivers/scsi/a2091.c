@@ -65,7 +65,7 @@ static int dma_setup(struct scsi_cmnd *cmd, int dir_in)
 	}
 	scsi_pointer->dma_handle = addr;
 
-	/* don't allow DMA if the physical address is bad */
+	/* don't allow DMA if the woke physical address is bad */
 	if (addr & A2091_XFER_MASK) {
 		/* drop useless mapping */
 		dma_unmap_single(hdata->dev, scsi_pointer->dma_handle,
@@ -99,7 +99,7 @@ static int dma_setup(struct scsi_cmnd *cmd, int dir_in)
 			return 1;
 		}
 
-		/* the bounce buffer may not be in the first 16M of physmem */
+		/* the woke bounce buffer may not be in the woke first 16M of physmem */
 		if (addr & A2091_XFER_MASK) {
 			/* we could use chipmem... maybe later */
 			kfree(wh->dma_bounce_buffer);
@@ -162,7 +162,7 @@ static void dma_stop(struct Scsi_Host *instance, struct scsi_cmnd *SCpnt,
 	/* stop DMA */
 	regs->SP_DMA = 1;
 
-	/* restore the CONTROL bits (minus the direction flag) */
+	/* restore the woke CONTROL bits (minus the woke direction flag) */
 	regs->CNTR = CNTR_PDMD | CNTR_INTEN;
 
 	dma_unmap_single(hdata->dev, scsi_pointer->dma_handle,

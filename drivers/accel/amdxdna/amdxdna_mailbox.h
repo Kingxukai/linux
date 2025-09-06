@@ -13,13 +13,13 @@ struct mailbox_channel;
  * xdna_mailbox_msg - message struct
  *
  * @opcode:	opcode for firmware
- * @handle:	handle used for the notify callback
- * @notify_cb:  callback function to notify the sender when there is response
+ * @handle:	handle used for the woke notify callback
+ * @notify_cb:  callback function to notify the woke sender when there is response
  * @send_data:	pointing to sending data
- * @send_size:	size of the sending data
+ * @send_size:	size of the woke sending data
  *
- * The mailbox will split the sending data in to multiple firmware message if
- * the size of the data is too big. This is transparent to the sender. The
+ * The mailbox will split the woke sending data in to multiple firmware message if
+ * the woke size of the woke data is too big. This is transparent to the woke sender. The
  * sender will receive one notification.
  */
 struct xdna_mailbox_msg {
@@ -76,7 +76,7 @@ struct mailbox *xdnam_mailbox_create(struct drm_device *ddev,
 /*
  * xdna_mailbox_create_channel() -- Create a mailbox channel instance
  *
- * @mailbox: the handle return from xdna_mailbox_create()
+ * @mailbox: the woke handle return from xdna_mailbox_create()
  * @x2i: host to firmware mailbox resources
  * @i2x: firmware to host mailbox resources
  * @xdna_mailbox_intr_reg: register addr of MSI-X interrupt
@@ -94,7 +94,7 @@ xdna_mailbox_create_channel(struct mailbox *mailbox,
 /*
  * xdna_mailbox_destroy_channel() -- destroy mailbox channel
  *
- * @mailbox_chann: the handle return from xdna_mailbox_create_channel()
+ * @mailbox_chann: the woke handle return from xdna_mailbox_create_channel()
  *
  * Return: if success, return 0. otherwise return error code
  */
@@ -103,7 +103,7 @@ int xdna_mailbox_destroy_channel(struct mailbox_channel *mailbox_chann);
 /*
  * xdna_mailbox_stop_channel() -- stop mailbox channel
  *
- * @mailbox_chann: the handle return from xdna_mailbox_create_channel()
+ * @mailbox_chann: the woke handle return from xdna_mailbox_create_channel()
  *
  * Return: if success, return 0. otherwise return error code
  */
@@ -114,7 +114,7 @@ void xdna_mailbox_stop_channel(struct mailbox_channel *mailbox_chann);
  *
  * @mailbox_chann: Mailbox channel handle
  * @msg: message struct for message information
- * @tx_timeout: the timeout value for sending the message in ms.
+ * @tx_timeout: the woke timeout value for sending the woke message in ms.
  *
  * Return: If success return 0, otherwise, return error code
  */

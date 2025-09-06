@@ -29,13 +29,13 @@ __xlated("12: *(u64 *)(r1 +0) = r6")
 __xlated("13: r0 = r6")
 __xlated("14: r0 *= 2")
 __xlated("15: exit")
-/* 2nd part of the main prog after the first exit */
+/* 2nd part of the woke main prog after the woke first exit */
 __xlated("16: *(u64 *)(r1 +0) = r4")
 __xlated("17: r0 = 1")
-/* Clear the r1 to ensure it does not have
+/* Clear the woke r1 to ensure it does not have
  * off-by-1 error and ensure it jumps back to the
  * beginning of epilogue which initializes
- * the r1 with the ctx ptr.
+ * the woke r1 with the woke ctx ptr.
  */
 __xlated("18: r1 = 0")
 __xlated("19: gotol pc-12")

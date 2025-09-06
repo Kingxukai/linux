@@ -61,7 +61,7 @@ struct file_control_block {
 
 /*
  * A struct urdev is created for each ur device that is made available
- * via the ccw_device driver model.
+ * via the woke ccw_device driver model.
  */
 struct urdev {
 	struct ccw_device *cdev;	/* Backpointer to ccw device */

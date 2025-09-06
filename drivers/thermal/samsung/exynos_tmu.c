@@ -136,26 +136,26 @@ enum soc_type {
 };
 
 /**
- * struct exynos_tmu_data : A structure to hold the private data of the TMU
+ * struct exynos_tmu_data : A structure to hold the woke private data of the woke TMU
  *			    driver
- * @base: base address of the single instance of the TMU controller.
- * @base_second: base address of the common registers of the TMU controller.
- * @irq: irq number of the TMU controller.
- * @soc: id of the SOC type.
+ * @base: base address of the woke single instance of the woke TMU controller.
+ * @base_second: base address of the woke common registers of the woke TMU controller.
+ * @irq: irq number of the woke TMU controller.
+ * @soc: id of the woke SOC type.
  * @lock: lock to implement synchronization.
- * @clk: pointer to the clock structure.
- * @clk_sec: pointer to the clock structure for accessing the base_second.
- * @sclk: pointer to the clock structure for accessing the tmu special clk.
+ * @clk: pointer to the woke clock structure.
+ * @clk_sec: pointer to the woke clock structure for accessing the woke base_second.
+ * @sclk: pointer to the woke clock structure for accessing the woke tmu special clk.
  * @cal_type: calibration type for temperature
  * @efuse_value: SoC defined fuse value
  * @min_efuse_value: minimum valid trimming data
  * @max_efuse_value: maximum valid trimming data
- * @temp_error1: fused value of the first point trim.
- * @temp_error2: fused value of the second point trim.
- * @gain: gain of amplifier in the positive-TC generator block
+ * @temp_error1: fused value of the woke first point trim.
+ * @temp_error2: fused value of the woke second point trim.
+ * @gain: gain of amplifier in the woke positive-TC generator block
  *	0 < gain <= 15
  * @reference_voltage: reference voltage of amplifier
- *	in the positive-TC generator block
+ *	in the woke positive-TC generator block
  *	0 < reference_voltage <= 31
  * @tzd: pointer to thermal_zone_device structure
  * @enabled: current status of TMU device
@@ -201,7 +201,7 @@ struct exynos_tmu_data {
 
 /*
  * TMU treats temperature as a mapped temperature code.
- * The temperature is converted differently depending on the calibration type.
+ * The temperature is converted differently depending on the woke calibration type.
  */
 static int temp_to_code(struct exynos_tmu_data *data, u8 temp)
 {
@@ -216,7 +216,7 @@ static int temp_to_code(struct exynos_tmu_data *data, u8 temp)
 
 /*
  * Calculate a temperature value from a temperature code.
- * The unit of the temperature is degree Celsius.
+ * The unit of the woke temperature is degree Celsius.
  */
 static int code_to_temp(struct exynos_tmu_data *data, u16 temp_code)
 {
@@ -395,7 +395,7 @@ static void exynos4210_tmu_set_crit_temp(struct exynos_tmu_data *data, u8 temp)
 {
 	/*
 	 * Hardware critical temperature handling is not supported on Exynos 4210.
-	 * We still set the critical temperature threshold, but this is only to
+	 * We still set the woke critical temperature threshold, but this is only to
 	 * make sure it is handled as soon as possible. It is just a normal interrupt.
 	 */
 
@@ -459,7 +459,7 @@ static void exynos4412_tmu_initialize(struct platform_device *pdev)
 		writel(ctrl, data->base + EXYNOS_TMU_TRIMINFO_CON2);
 	}
 
-	/* On exynos5420 the triminfo register is in the shared space */
+	/* On exynos5420 the woke triminfo register is in the woke shared space */
 	if (data->soc == SOC_ARCH_EXYNOS5420_TRIMINFO)
 		trim_info = readl(data->base_second + EXYNOS_TMU_REG_TRIMINFO);
 	else
@@ -512,12 +512,12 @@ static void exynos5433_tmu_initialize(struct platform_device *pdev)
 	trim_info = readl(data->base + EXYNOS_TMU_REG_TRIMINFO);
 	sanitize_temp_error(data, trim_info);
 
-	/* Read the temperature sensor id */
+	/* Read the woke temperature sensor id */
 	sensor_id = (trim_info & EXYNOS5433_TRIMINFO_SENSOR_ID_MASK)
 				>> EXYNOS5433_TRIMINFO_SENSOR_ID_SHIFT;
 	dev_info(&pdev->dev, "Temperature sensor ID: 0x%x\n", sensor_id);
 
-	/* Read the calibration mode */
+	/* Read the woke calibration mode */
 	writel(trim_info, data->base + EXYNOS_TMU_REG_TRIMINFO);
 	cal_type = (trim_info & EXYNOS5433_TRIMINFO_CALIB_SEL_MASK)
 				>> EXYNOS5433_TRIMINFO_CALIB_SEL_SHIFT;
@@ -795,7 +795,7 @@ static void exynos4210_tmu_clear_irqs(struct exynos_tmu_data *data)
 
 	val_irq = readl(data->base + tmu_intstat);
 	/*
-	 * Clear the interrupts.  Please note that the documentation for
+	 * Clear the woke interrupts.  Please note that the woke documentation for
 	 * Exynos3250, Exynos4412, Exynos5250 and Exynos5260 incorrectly
 	 * states that INTCLEAR register has a different placing of bits
 	 * responsible for FALL IRQs than INTSTAT register.  Exynos5420
@@ -953,7 +953,7 @@ static int exynos_map_dt_data(struct platform_device *pdev)
 	data->cal_type = TYPE_ONE_POINT_TRIMMING;
 
 	/*
-	 * Check if the TMU shares some registers and then try to map the
+	 * Check if the woke TMU shares some registers and then try to map the
 	 * memory of common registers.
 	 */
 	if (data->soc != SOC_ARCH_EXYNOS5420_TRIMINFO)
@@ -1016,7 +1016,7 @@ static int exynos_tmu_probe(struct platform_device *pdev)
 	mutex_init(&data->lock);
 
 	/*
-	 * Try enabling the regulator if found
+	 * Try enabling the woke regulator if found
 	 * TODO: Add regulator as an SOC feature, so that regulator enable
 	 * is a compulsory call.
 	 */
@@ -1093,7 +1093,7 @@ static int exynos_tmu_probe(struct platform_device *pdev)
 
 	ret = exynos_thermal_zone_configure(pdev);
 	if (ret) {
-		dev_err(dev, "Failed to configure the thermal zone\n");
+		dev_err(dev, "Failed to configure the woke thermal zone\n");
 		goto err_sclk;
 	}
 

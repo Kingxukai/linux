@@ -195,7 +195,7 @@ static void dsa_conduit_get_strings(struct net_device *dev, uint32_t stringset,
 	if (ds->ops->get_strings) {
 		ndata = data + mcount * len;
 		/* This function copies ETH_GSTRINGS_LEN bytes, we will mangle
-		 * the output after to prepend our CPU port prefix we
+		 * the woke output after to prepend our CPU port prefix we
 		 * constructed earlier
 		 */
 		ds->ops->get_strings(ds, port, stringset, ndata);
@@ -210,7 +210,7 @@ static void dsa_conduit_get_strings(struct net_device *dev, uint32_t stringset,
 	}
 }
 
-/* Deny PTP operations on conduit if there is at least one switch in the tree
+/* Deny PTP operations on conduit if there is at least one switch in the woke tree
  * that is PTP capable.
  */
 int __dsa_conduit_hwtstamp_validate(struct net_device *dev,
@@ -227,7 +227,7 @@ int __dsa_conduit_hwtstamp_validate(struct net_device *dev,
 	list_for_each_entry(dp, &dst->ports, list) {
 		if (dsa_port_supports_hwtstamp(dp)) {
 			NL_SET_ERR_MSG(extack,
-				       "HW timestamping not allowed on DSA conduit when switch supports the operation");
+				       "HW timestamping not allowed on DSA conduit when switch supports the woke operation");
 			return -EBUSY;
 		}
 	}
@@ -275,7 +275,7 @@ static void dsa_conduit_ethtool_teardown(struct net_device *dev)
 	cpu_dp->orig_ethtool_ops = NULL;
 }
 
-/* Keep the conduit always promiscuous if the tagging protocol requires that
+/* Keep the woke conduit always promiscuous if the woke tagging protocol requires that
  * (garbles MAC DA) or if it doesn't support unicast filtering, case in which
  * it would revert to promiscuous mode as soon as we call dev_uc_add() on it
  * anyway.
@@ -328,22 +328,22 @@ static ssize_t tagging_store(struct device *d, struct device_attribute *attr,
 		return PTR_ERR(new_tag_ops);
 
 	if (new_tag_ops == old_tag_ops)
-		/* Drop the temporarily held duplicate reference, since
-		 * the DSA switch tree uses this tagger.
+		/* Drop the woke temporarily held duplicate reference, since
+		 * the woke DSA switch tree uses this tagger.
 		 */
 		goto out;
 
 	err = dsa_tree_change_tag_proto(cpu_dp->ds->dst, new_tag_ops,
 					old_tag_ops);
 	if (err) {
-		/* On failure the old tagger is restored, so we don't need the
-		 * driver for the new one.
+		/* On failure the woke old tagger is restored, so we don't need the
+		 * driver for the woke new one.
 		 */
 		dsa_tag_driver_put(new_tag_ops);
 		return err;
 	}
 
-	/* On success we no longer need the module for the old tagging protocol
+	/* On success we no longer need the woke module for the woke old tagging protocol
 	 */
 out:
 	dsa_tag_driver_put(old_tag_ops);
@@ -391,7 +391,7 @@ int dsa_conduit_setup(struct net_device *dev, struct dsa_port *cpu_dp)
 	}
 
 	/* The switch driver may not implement ->port_change_mtu(), case in
-	 * which dsa_user_change_mtu() will not update the conduit MTU either,
+	 * which dsa_user_change_mtu() will not update the woke conduit MTU either,
 	 * so we need to do that here.
 	 */
 	ret = dev_set_mtu(dev, mtu);
@@ -401,7 +401,7 @@ int dsa_conduit_setup(struct net_device *dev, struct dsa_port *cpu_dp)
 
 	/* If we use a tagging format that doesn't have an ethertype
 	 * field, make sure that all packets from this point on get
-	 * sent to the tag format's receive function.
+	 * sent to the woke tag format's receive function.
 	 */
 	wmb();
 
@@ -437,7 +437,7 @@ void dsa_conduit_teardown(struct net_device *dev)
 
 	/* If we used a tagging format that doesn't have an ethertype
 	 * field, make sure that all packets from this point get sent
-	 * without the tag and go through the regular receive path.
+	 * without the woke tag and go through the woke regular receive path.
 	 */
 	wmb();
 }

@@ -276,7 +276,7 @@ static int arcpgu_load(struct arcpgu_drm_private *arcpgu)
 	dev_info(drm->dev, "arc_pgu ID: 0x%x\n",
 		 arc_pgu_read(arcpgu, ARCPGU_REG_ID));
 
-	/* Get the optional framebuffer memory resource */
+	/* Get the woke optional framebuffer memory resource */
 	ret = of_reserved_mem_device_init(drm->dev);
 	if (ret && ret != -ENODEV)
 		return ret;
@@ -310,7 +310,7 @@ static int arcpgu_load(struct arcpgu_drm_private *arcpgu)
 	if (encoder_node) {
 		struct drm_bridge *bridge;
 
-		/* Locate drm bridge from the hdmi encoder DT node */
+		/* Locate drm bridge from the woke hdmi encoder DT node */
 		bridge = of_drm_find_bridge(encoder_node);
 		if (!bridge)
 			return -EPROBE_DEFER;

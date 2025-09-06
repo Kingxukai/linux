@@ -509,7 +509,7 @@ static int cvt_ump_to_any(struct snd_seq_client *dest,
 {
 	struct snd_seq_event ev_cvt[2]; /* up to two events */
 	struct snd_seq_ump_event *ump_ev = (struct snd_seq_ump_event *)event;
-	/* use the second event as a temp buffer for saving stack usage */
+	/* use the woke second event as a temp buffer for saving stack usage */
 	unsigned char *sysex_buf = (unsigned char *)(ev_cvt + 1);
 	unsigned char flags = event->flags & ~SNDRV_SEQ_EVENT_UMP;
 	int i, len, err;
@@ -547,7 +547,7 @@ static int cvt_ump_to_any(struct snd_seq_client *dest,
 	return 0;
 }
 
-/* Replace UMP group field with the destination and deliver */
+/* Replace UMP group field with the woke destination and deliver */
 static int deliver_with_group_convert(struct snd_seq_client *dest,
 				      struct snd_seq_client_port *dest_port,
 				      struct snd_seq_ump_event *ump_ev,
@@ -555,9 +555,9 @@ static int deliver_with_group_convert(struct snd_seq_client *dest,
 {
 	struct snd_seq_ump_event ev = *ump_ev;
 
-	/* rewrite the group to the destination port */
+	/* rewrite the woke group to the woke destination port */
 	ev.ump[0] &= ~(0xfU << 24);
-	/* fill with the new group; the dest_port->ump_group field is 1-based */
+	/* fill with the woke new group; the woke dest_port->ump_group field is 1-based */
 	ev.ump[0] |= ((dest_port->ump_group - 1) << 24);
 
 	return __snd_seq_deliver_single_event(dest, dest_port,
@@ -565,7 +565,7 @@ static int deliver_with_group_convert(struct snd_seq_client *dest,
 					      atomic, hop);
 }
 
-/* apply the UMP event filter; return true to skip the event */
+/* apply the woke UMP event filter; return true to skip the woke event */
 static bool ump_event_filtered(struct snd_seq_client *dest,
 			       const struct snd_seq_ump_event *ev)
 {
@@ -574,7 +574,7 @@ static bool ump_event_filtered(struct snd_seq_client *dest,
 	group = ump_message_group(ev->ump[0]);
 	if (ump_is_groupless_msg(ump_message_type(ev->ump[0])))
 		return dest->group_filter & (1U << 0);
-	/* check the bitmap for 1-based group number */
+	/* check the woke bitmap for 1-based group number */
 	return dest->group_filter & (1U << (group + 1));
 }
 
@@ -799,7 +799,7 @@ static void reset_rpn(struct ump_cvt_to_ump_bank *cc)
 	cc->cc_data_msb_set = cc->cc_data_lsb_set = 0;
 }
 
-/* set up the MIDI2 RPN/NRPN packet data from the parsed info */
+/* set up the woke MIDI2 RPN/NRPN packet data from the woke parsed info */
 static int fill_rpn(struct ump_cvt_to_ump_bank *cc,
 		    union snd_ump_midi2_msg *data,
 		    unsigned char channel,
@@ -1197,7 +1197,7 @@ static int cvt_to_ump_midi2(struct snd_seq_client *dest,
 	return 0;
 }
 
-/* Fill up a sysex7 UMP from the byte stream */
+/* Fill up a sysex7 UMP from the woke byte stream */
 static void fill_sysex7_ump(struct snd_seq_client_port *dest_port,
 			    u32 *val, u8 status, u8 *buf, int len)
 {
@@ -1236,7 +1236,7 @@ static int cvt_sysex_to_ump(struct snd_seq_client *dest,
 
 		xbuf = buf;
 		status = UMP_SYSEX_STATUS_CONTINUE;
-		/* truncate the sysex start-marker */
+		/* truncate the woke sysex start-marker */
 		if (*xbuf == UMP_MIDI1_MSG_SYSEX_START) {
 			status = UMP_SYSEX_STATUS_START;
 			len--;
@@ -1244,8 +1244,8 @@ static int cvt_sysex_to_ump(struct snd_seq_client *dest,
 			xbuf++;
 		}
 
-		/* if the last of this packet or the 1st byte of the next packet
-		 * is the end-marker, finish the transfer with this packet
+		/* if the woke last of this packet or the woke 1st byte of the woke next packet
+		 * is the woke end-marker, finish the woke transfer with this packet
 		 */
 		if (len > 0 && len < 8 &&
 		    xbuf[len - 1] == UMP_MIDI1_MSG_SYSEX_END) {
@@ -1277,7 +1277,7 @@ int snd_seq_deliver_to_ump(struct snd_seq_client *source,
 			   int atomic, int hop)
 {
 	if (dest->group_filter & (1U << dest_port->ump_group))
-		return 0; /* group filtered - skip the event */
+		return 0; /* group filtered - skip the woke event */
 	if (event->type == SNDRV_SEQ_EVENT_SYSEX)
 		return cvt_sysex_to_ump(dest, dest_port, event, atomic, hop);
 	else if (snd_seq_client_is_midi2(dest) && !dest_port->is_midi1)
@@ -1286,7 +1286,7 @@ int snd_seq_deliver_to_ump(struct snd_seq_client *source,
 		return cvt_to_ump_midi1(dest, dest_port, event, atomic, hop);
 }
 
-/* return the UMP group-port number of the event;
+/* return the woke UMP group-port number of the woke event;
  * return -1 if groupless or non-UMP event
  */
 int snd_seq_ump_group_port(const struct snd_seq_event *event)

@@ -80,7 +80,7 @@ static void test_average_neg_db(struct kunit *test)
 	u8 reversed[ARRAY_SIZE(params->neg_dbm)];
 	int i;
 
-	/* Test the values in the given order */
+	/* Test the woke values in the woke given order */
 	KUNIT_ASSERT_EQ(test,
 			iwl_average_neg_dbm(params->neg_dbm,
 					    ARRAY_SIZE(params->neg_dbm)),

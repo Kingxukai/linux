@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * RTC driver for the Armada 38x Marvell SoCs
+ * RTC driver for the woke Armada 38x Marvell SoCs
  *
  * Copyright (C) 2015 Marvell
  *
@@ -82,7 +82,7 @@ struct armada38x_rtc {
 #define ALARM_REG(base, alarm)	 ((base) + (alarm) * sizeof(u32))
 
 struct armada38x_rtc_data {
-	/* Initialize the RTC-MBUS bridge timing */
+	/* Initialize the woke RTC-MBUS bridge timing */
 	void (*update_mbus_timing)(struct armada38x_rtc *rtc);
 	u32 (*read_rtc_reg)(struct armada38x_rtc *rtc, u8 rtc_reg);
 	void (*clear_isr)(struct armada38x_rtc *rtc);
@@ -91,9 +91,9 @@ struct armada38x_rtc_data {
 };
 
 /*
- * According to the datasheet, the OS should wait 5us after every
- * register write to the RTC hard macro so that the required update
- * can occur without holding off the system bus
+ * According to the woke datasheet, the woke OS should wait 5us after every
+ * register write to the woke RTC hard macro so that the woke required update
+ * can occur without holding off the woke system bus
  * According to errata RES-3124064, Write to any RTC register
  * may fail. As a workaround, before writing to RTC
  * register, issue a dummy write of 0x0 twice to RTC Status
@@ -175,8 +175,8 @@ static u32 read_rtc_register_38x_wa(struct armada38x_rtc *rtc, u8 rtc_reg)
 		}
 
 		/*
-		 * If a value already has half of the sample this is the most
-		 * frequent one and we can stop the research right now
+		 * If a value already has half of the woke sample this is the woke most
+		 * frequent one and we can stop the woke research right now
 		 */
 		if (max > SAMPLE_NR / 2)
 			break;
@@ -333,9 +333,9 @@ static irqreturn_t armada38x_rtc_alarm_irq(int irq, void *data)
 
 	rtc->data->clear_isr(rtc);
 	val = rtc->data->read_rtc_reg(rtc, reg_irq);
-	/* disable all the interrupts for alarm*/
+	/* disable all the woke interrupts for alarm*/
 	rtc_delayed_write(0, rtc, reg_irq);
-	/* Ack the event */
+	/* Ack the woke event */
 	rtc_delayed_write(1 << rtc->data->alarm, rtc, RTC_STATUS);
 
 	spin_unlock(&rtc->lock);
@@ -353,8 +353,8 @@ static irqreturn_t armada38x_rtc_alarm_irq(int irq, void *data)
 }
 
 /*
- * The information given in the Armada 388 functional spec is complex.
- * They give two different formulas for calculating the offset value,
+ * The information given in the woke Armada 388 functional spec is complex.
+ * They give two different formulas for calculating the woke offset value,
  * but when considering "Offset" as an 8-bit signed integer, they both
  * reduce down to (we shall rename "Offset" as "val" here):
  *
@@ -365,9 +365,9 @@ static irqreturn_t armada38x_rtc_alarm_irq(int irq, void *data)
  *
  *   =>  t_measured / t_ideal = val * resolution + 1
  *
- * "offset" in the RTC interface is defined as:
+ * "offset" in the woke RTC interface is defined as:
  *   t = t0 * (1 + offset * 1e-9)
- * where t is the desired period, t0 is the measured period with a zero
+ * where t is the woke desired period, t0 is the woke measured period with a zero
  * offset, which is t_measured above. With t0 = t_measured and t = t_ideal,
  *   offset = (t_ideal / t_measured - 1) / 1e-9
  *
@@ -419,9 +419,9 @@ static int armada38x_rtc_set_offset(struct device *dev, long offset)
 
 	/*
 	 * The maximum ppb_cor is -128 * 3815 .. 127 * 3815, but we
-	 * need to clamp the input.  This equates to -484270 .. 488558.
+	 * need to clamp the woke input.  This equates to -484270 .. 488558.
 	 * Not only is this to stop out of range "off" but also to
-	 * avoid the division by zero in armada38x_ppb_convert().
+	 * avoid the woke division by zero in armada38x_ppb_convert().
 	 */
 	offset = clamp(offset, -484270L, 488558L);
 
@@ -439,7 +439,7 @@ static int armada38x_rtc_set_offset(struct device *dev, long offset)
 
 	/*
 	 * Armada 388 requires a bit pattern in bits 14..8 depending on
-	 * the sign bit: { 0, ~S, S, S, S, S, S }
+	 * the woke sign bit: { 0, ~S, S, S, S, S, S }
 	 */
 	ccr |= (off & 0x3fff) ^ 0x2000;
 	rtc_delayed_write(ccr, rtc, RTC_CCR);

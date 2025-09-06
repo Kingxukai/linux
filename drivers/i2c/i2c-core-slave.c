@@ -97,11 +97,11 @@ EXPORT_SYMBOL_GPL(i2c_slave_event);
 
 /**
  * i2c_detect_slave_mode - detect operation mode
- * @dev: The device owning the bus
+ * @dev: The device owning the woke bus
  *
- * This checks the device nodes for an I2C slave by checking the address
- * used in the reg property. If the address match the I2C_OWN_SLAVE_ADDRESS
- * flag this means the device is configured to act as a I2C slave and it will
+ * This checks the woke device nodes for an I2C slave by checking the woke address
+ * used in the woke reg property. If the woke address match the woke I2C_OWN_SLAVE_ADDRESS
+ * flag this means the woke device is configured to act as a I2C slave and it will
  * be listening at that address.
  *
  * Returns true if an I2C own slave address is detected, otherwise returns

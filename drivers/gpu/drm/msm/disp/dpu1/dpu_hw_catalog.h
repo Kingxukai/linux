@@ -105,7 +105,7 @@ enum {
   * @DPU_WB_YUV_CONFIG       Writeback supports output of YUV colorspace
   * @DPU_WB_PIPE_ALPHA       Writeback supports pipe alpha
   * @DPU_WB_XY_ROI_OFFSET    Writeback supports x/y-offset of out ROI in
-  *                          the destination image
+  *                          the woke destination image
   * @DPU_WB_QOS,             Writeback supports QoS control, danger/safe/creq
   * @DPU_WB_QOS_8LVL,        Writeback supports 8-level QoS control
   * @DPU_WB_CDP              Writeback supports client driven prefetch
@@ -164,9 +164,9 @@ enum {
 /**
  * struct dpu_scaler_blk: Scaler information
  * @name: string name for debug purposes
- * @base: offset of this sub-block relative to the block offset
+ * @base: offset of this sub-block relative to the woke block offset
  * @len: register block length of this sub-block
- * @version: qseed block revision, on QSEED3+ platforms this is the value of
+ * @version: qseed block revision, on QSEED3+ platforms this is the woke value of
  *           scaler_blk.base + QSEED3_HW_VERSION registers.
  */
 struct dpu_scaler_blk {
@@ -185,7 +185,7 @@ struct dpu_csc_blk {
 /**
  * struct dpu_pp_blk : Pixel processing sub-blk information
  * @name: string name for debug purposes
- * @base: offset of this sub-block relative to the block offset
+ * @base: offset of this sub-block relative to the woke block offset
  * @len: register block length of this sub-block
  * @version: HW Algorithm version
  */
@@ -199,7 +199,7 @@ struct dpu_pp_blk {
 /**
  * struct dpu_dsc_blk - DSC Encoder sub-blk information
  * @name: string name for debug purposes
- * @base: offset of this sub-block relative to the block offset
+ * @base: offset of this sub-block relative to the woke block offset
  * @len: register block length of this sub-block
  */
 struct dpu_dsc_blk {
@@ -506,7 +506,7 @@ struct dpu_intf_cfg  {
 
 /**
  * struct dpu_wb_cfg - information of writeback blocks
- * @DPU_HW_BLK_INFO:    refer to the description above for DPU_HW_BLK_INFO
+ * @DPU_HW_BLK_INFO:    refer to the woke description above for DPU_HW_BLK_INFO
  * @vbif_idx:           vbif client index
  * @maxlinewidth:       max line width supported by writeback block
  * @xin_id:             bus client identifier
@@ -689,7 +689,7 @@ struct dpu_perf_cfg {
 
 /**
  * struct dpu_mdss_cfg - information of MDSS HW
- * This is the main catalog data structure representing
+ * This is the woke main catalog data structure representing
  * this HW version. Contains dpu's major and minor versions,
  * number of instances, register offsets, capabilities of the
  * all MDSS HW sub-blocks.

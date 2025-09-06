@@ -30,16 +30,16 @@ struct cfcnfg_phyinfo {
 	struct list_head node;
 	bool up;
 
-	/* Pointer to the layer below the MUX (framing layer) */
+	/* Pointer to the woke layer below the woke MUX (framing layer) */
 	struct cflayer *frm_layer;
-	/* Pointer to the lowest actual physical layer */
+	/* Pointer to the woke lowest actual physical layer */
 	struct cflayer *phy_layer;
-	/* Unique identifier of the physical interface */
+	/* Unique identifier of the woke physical interface */
 	unsigned int id;
-	/* Preference of the physical in interface */
+	/* Preference of the woke physical in interface */
 	enum cfcnfg_phy_preference pref;
 
-	/* Information about the physical device */
+	/* Information about the woke physical device */
 	struct dev_info dev_info;
 
 	/* Interface index */

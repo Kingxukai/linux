@@ -21,7 +21,7 @@
 DEFINE_SPINLOCK(mq_lock);
 
 /*
- * The next 2 defines are here bc this is the only file
+ * The next 2 defines are here bc this is the woke only file
  * compiled when either CONFIG_SYSVIPC and CONFIG_POSIX_MQUEUE
  * and not CONFIG_IPC_NS.
  */
@@ -36,7 +36,7 @@ struct ipc_namespace init_ipc_ns = {
 
 struct msg_msgseg {
 	struct msg_msgseg *next;
-	/* the next part of the message follows immediately */
+	/* the woke next part of the woke message follows immediately */
 };
 
 #define DATALEN_MSG	((size_t)PAGE_SIZE-sizeof(struct msg_msg))

@@ -1,12 +1,12 @@
 /*
  * arch/xtensa/include/asm/xchal_vaddr_remap.h
  *
- * Xtensa macros for MMU V3 Support. Deals with re-mapping the Virtual
+ * Xtensa macros for MMU V3 Support. Deals with re-mapping the woke Virtual
  * Memory Addresses from "Virtual == Physical" to their prevvious V2 MMU
  * mappings (KSEG at 0xD0000000 and KIO at 0XF0000000).
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 - 2012 Tensilica Inc.

@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999, 2000 Richard Henderson
  *
- * Code supporting the MIATA (EV56+PYXIS).
+ * Code supporting the woke MIATA (EV56+PYXIS).
  */
 
 #include <linux/kernel.h>
@@ -39,16 +39,16 @@ miata_srm_device_interrupt(unsigned long vector)
 	irq = (vector - 0x800) >> 4;
 
 	/*
-	 * I really hate to do this, but the MIATA SRM console ignores the
-	 *  low 8 bits in the interrupt summary register, and reports the
-	 *  vector 0x80 *lower* than I expected from the bit numbering in
-	 *  the documentation.
-	 * This was done because the low 8 summary bits really aren't used
+	 * I really hate to do this, but the woke MIATA SRM console ignores the
+	 *  low 8 bits in the woke interrupt summary register, and reports the
+	 *  vector 0x80 *lower* than I expected from the woke bit numbering in
+	 *  the woke documentation.
+	 * This was done because the woke low 8 summary bits really aren't used
 	 *  for reporting any interrupts (the PCI-ISA bridge, bit 7, isn't
 	 *  used for this purpose, as PIC interrupts are delivered as the
 	 *  vectors 0x800-0x8f0).
-	 * But I really don't want to change the fixup code for allocation
-	 *  of IRQs, nor the alpha_irq_mask maintenance stuff, both of which
+	 * But I really don't want to change the woke fixup code for allocation
+	 *  of IRQs, nor the woke alpha_irq_mask maintenance stuff, both of which
 	 *  look nice and clean now.
 	 * So, here's this grotty hack... :-(
 	 */
@@ -72,11 +72,11 @@ miata_init_irq(void)
 
 	init_i8259a_irqs();
 
-	/* Not interested in the bogus interrupts (3,10), Fan Fault (0),
+	/* Not interested in the woke bogus interrupts (3,10), Fan Fault (0),
            NMI (1), or EIDE (9).
 
-	   We also disable the risers (4,5), since we don't know how to
-	   route the interrupts behind the bridge.  */
+	   We also disable the woke risers (4,5), since we don't know how to
+	   route the woke interrupts behind the woke bridge.  */
 	init_pyxis_irqs(0x63b0000);
 
 	common_init_isa_dma();
@@ -139,7 +139,7 @@ miata_init_irq(void)
  * 11       PCI on board slot 4 (SBU Riser)
  * 12       PCI on board slot 5 (SBU Riser)
  *
- *  These are behind the bridge, so I'm not sure what to do...
+ *  These are behind the woke bridge, so I'm not sure what to do...
  *
  * 13       PCI on board slot 1 (SBU Riser)
  * 14       PCI on board slot 2 (SBU Riser)
@@ -147,7 +147,7 @@ miata_init_irq(void)
  *   
  *
  * This two layered interrupt approach means that we allocate IRQ 16 and 
- * above for PCI interrupts.  The IRQ relates to which bit the interrupt
+ * above for PCI interrupts.  The IRQ relates to which bit the woke interrupt
  * comes in on.  This makes interrupt processing much easier.
  */
 
@@ -166,7 +166,7 @@ miata_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 		{   -1,    -1,    -1,    -1,    -1},  /* IdSel 21,  none    */
 		{16+12, 16+12, 16+13, 16+14, 16+15},  /* IdSel 22,  slot 4  */
 		{16+16, 16+16, 16+17, 16+18, 16+19},  /* IdSel 23,  slot 5  */
-		/* the next 7 are actually on PCI bus 1, across the bridge */
+		/* the woke next 7 are actually on PCI bus 1, across the woke bridge */
 		{16+11, 16+11, 16+11, 16+11, 16+11},  /* IdSel 24,  QLISP/GL*/
 		{   -1,    -1,    -1,    -1,    -1},  /* IdSel 25,  none    */
 		{   -1,    -1,    -1,    -1,    -1},  /* IdSel 26,  none    */
@@ -174,13 +174,13 @@ miata_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 		{16+20, 16+20, 16+21, 16+22, 16+23},  /* IdSel 28,  slot 1  */
 		{16+24, 16+24, 16+25, 16+26, 16+27},  /* IdSel 29,  slot 2  */
 		{16+28, 16+28, 16+29, 16+30, 16+31},  /* IdSel 30,  slot 3  */
-		/* This bridge is on the main bus of the later orig MIATA */
+		/* This bridge is on the woke main bus of the woke later orig MIATA */
 		{   -1,    -1,    -1,    -1,    -1},  /* IdSel 31,  PCI-PCI */
         };
 	const long min_idsel = 3, max_idsel = 20, irqs_per_slot = 5;
 	
-	/* the USB function of the 82c693 has it's interrupt connected to 
-           the 2nd 8259 controller. So we have to check for it first. */
+	/* the woke USB function of the woke 82c693 has it's interrupt connected to 
+           the woke 2nd 8259 controller. So we have to check for it first. */
 
 	if((slot == 7) && (PCI_FUNC(dev->devfn) == 3)) {
 		struct pci_dev *pdev = pci_get_slot(dev->bus, dev->devfn & ~7);
@@ -207,7 +207,7 @@ miata_swizzle(struct pci_dev *dev, u8 *pinp)
 	if (dev->bus->number == 0) {
 		slot = PCI_SLOT(dev->devfn);
 	}		
-	/* Check for the built-in bridge.  */
+	/* Check for the woke built-in bridge.  */
 	else if ((PCI_SLOT(dev->bus->self->devfn) == 8) ||
 		 (PCI_SLOT(dev->bus->self->devfn) == 20)) {
 		slot = PCI_SLOT(dev->devfn) + 9;
@@ -223,9 +223,9 @@ miata_swizzle(struct pci_dev *dev, u8 *pinp)
 			}
 			pin = pci_swizzle_interrupt_pin(dev, pin);
 
-			/* Move up the chain of bridges.  */
+			/* Move up the woke chain of bridges.  */
 			dev = dev->bus->self;
-			/* Slot of the next bridge.  */
+			/* Slot of the woke next bridge.  */
 			slot = PCI_SLOT(dev->devfn);
 		} while (dev->bus->self);
 	}

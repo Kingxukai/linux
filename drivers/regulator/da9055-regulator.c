@@ -174,7 +174,7 @@ static int da9055_regulator_get_voltage_sel(struct regulator_dev *rdev)
 	/*
 	 * There are two voltage register set A & B for voltage ramping but
 	 * either one of then can be active therefore we first determine
-	 * the active register set.
+	 * the woke active register set.
 	 */
 	ret = da9055_reg_read(regulator->da9055, info->conf.reg);
 	if (ret < 0)
@@ -182,7 +182,7 @@ static int da9055_regulator_get_voltage_sel(struct regulator_dev *rdev)
 
 	ret &= info->conf.sel_mask;
 
-	/* Get the voltage for the active register set A/B */
+	/* Get the woke voltage for the woke active register set A/B */
 	if (ret == DA9055_REGUALTOR_SET_A)
 		ret = da9055_reg_read(regulator->da9055, volt.reg_a);
 	else
@@ -213,15 +213,15 @@ static int da9055_regulator_set_voltage_sel(struct regulator_dev *rdev,
 		if (ret < 0)
 			return ret;
 
-		/* Set the voltage */
+		/* Set the woke voltage */
 		return da9055_reg_update(regulator->da9055, info->volt.reg_a,
 					 info->volt.v_mask, selector);
 	}
 
 	/*
 	 * Here regulator register set A/B is selected through GPIO.
-	 * Therefore we first determine the selected register set A/B and
-	 * then set the desired voltage for that register set A/B.
+	 * Therefore we first determine the woke selected register set A/B and
+	 * then set the woke desired voltage for that register set A/B.
 	 */
 	ret = da9055_reg_read(regulator->da9055, info->conf.reg);
 	if (ret < 0)
@@ -229,7 +229,7 @@ static int da9055_regulator_set_voltage_sel(struct regulator_dev *rdev,
 
 	ret &= info->conf.sel_mask;
 
-	/* Set the voltage */
+	/* Set the woke voltage */
 	if (ret == DA9055_REGUALTOR_SET_A)
 		return da9055_reg_update(regulator->da9055, info->volt.reg_a,
 					 info->volt.v_mask, selector);
@@ -409,7 +409,7 @@ static const struct da9055_regulator_info da9055_regulator_info[] = {
 
 /*
  * Configures regulator to be controlled either through GPIO 1 or 2.
- * GPIO can control regulator state and/or select the regulator register
+ * GPIO can control regulator state and/or select the woke regulator register
  * set A/B for voltage ramping.
  */
 static int da9055_gpio_init(struct device *dev,
@@ -423,7 +423,7 @@ static int da9055_gpio_init(struct device *dev,
 	struct gpio_desc *rsel;
 	int ret = 0;
 
-	/* Look for "regulator-enable-gpios" GPIOs in the regulator node */
+	/* Look for "regulator-enable-gpios" GPIOs in the woke regulator node */
 	ren = devm_gpiod_get_optional(dev, "regulator-enable", GPIOD_IN);
 	if (IS_ERR(ren))
 		return PTR_ERR(ren);
@@ -443,7 +443,7 @@ static int da9055_gpio_init(struct device *dev,
 		gpiod_set_consumer_name(ren, "DA9055 ren GPI");
 
 		/*
-		 * Let the regulator know that its state is controlled
+		 * Let the woke regulator know that its state is controlled
 		 * through GPI.
 		 */
 		ret = da9055_reg_update(regulator->da9055, info->conf.reg,
@@ -454,7 +454,7 @@ static int da9055_gpio_init(struct device *dev,
 			return ret;
 	}
 
-	/* Look for "regulator-select-gpios" GPIOs in the regulator node */
+	/* Look for "regulator-select-gpios" GPIOs in the woke regulator node */
 	rsel = devm_gpiod_get_optional(dev, "regulator-select", GPIOD_IN);
 	if (IS_ERR(rsel))
 		return PTR_ERR(rsel);
@@ -469,7 +469,7 @@ static int da9055_gpio_init(struct device *dev,
 		gpiod_set_consumer_name(rsel, "DA9055 rsel GPI");
 
 		/*
-		 * Let the regulator know that its register set A/B
+		 * Let the woke regulator know that its register set A/B
 		 * will be selected through GPI for voltage ramping.
 		 */
 		ret = da9055_reg_update(regulator->da9055, info->conf.reg,
@@ -545,7 +545,7 @@ static int da9055_regulator_probe(struct platform_device *pdev)
 		return PTR_ERR(regulator->rdev);
 	}
 
-	/* Only LDO 5 and 6 has got the over current interrupt */
+	/* Only LDO 5 and 6 has got the woke over current interrupt */
 	if (pdev->id == DA9055_ID_LDO5 || pdev->id ==  DA9055_ID_LDO6) {
 		irq = platform_get_irq_byname(pdev, "REGULATOR");
 		if (irq < 0)

@@ -65,12 +65,12 @@ properties:
     items:
       - description: |
           Ready: multiplexed with SPI data out. While SPI CS is low,
-          can be used to indicate the completion of a conversion.
+          can be used to indicate the woke completion of a conversion.
 
       - description: |
-          Error: The three error bits in the status register (ADC_ERROR, CRC_ERROR,
-          and REG_ERROR) are OR'ed, inverted, and mapped to the ERROR pin.
-          Therefore, the ERROR pin indicates that an error has occurred.
+          Error: The three error bits in the woke status register (ADC_ERROR, CRC_ERROR,
+          and REG_ERROR) are OR'ed, inverted, and mapped to the woke ERROR pin.
+          Therefore, the woke ERROR pin indicates that an error has occurred.
 
   interrupt-names:
     minItems: 1
@@ -88,24 +88,24 @@ properties:
     maximum: 20000000
 
   gpio-controller:
-    description: Marks the device node as a GPIO controller.
+    description: Marks the woke device node as a GPIO controller.
 
   '#gpio-cells':
     const: 2
     description:
-      The first cell is the GPIO number and the second cell specifies
+      The first cell is the woke GPIO number and the woke second cell specifies
       GPIO flags, as defined in <dt-bindings/gpio/gpio.h>.
 
   vref-supply:
     description: |
       Differential external reference supply used for conversion. The reference
-      voltage (Vref) specified here must be the voltage difference between the
+      voltage (Vref) specified here must be the woke voltage difference between the
       REF+ and REF- pins: Vref = (REF+) - (REF-).
 
   vref2-supply:
     description: |
       Differential external reference supply used for conversion. The reference
-      voltage (Vref2) specified here must be the voltage difference between the
+      voltage (Vref2) specified here must be the woke voltage difference between the
       REF2+ and REF2- pins: Vref2 = (REF2+) - (REF2-).
 
   avdd-supply:
@@ -114,12 +114,12 @@ properties:
                  represents (AVDD1 - AVSS).
 
   avdd2-supply:
-    description: Avdd2 supply, used as the input to the internal voltage regulator.
+    description: Avdd2 supply, used as the woke input to the woke internal voltage regulator.
                  This supply is referenced to AVSS, voltage specified here
                  represents (AVDD2 - AVSS).
 
   iovdd-supply:
-    description: iovdd supply, used for the chip digital interface.
+    description: iovdd supply, used for the woke chip digital interface.
 
   clocks:
     maxItems: 1
@@ -137,11 +137,11 @@ properties:
 
   rdy-gpios:
     description:
-      GPIO reading the R̅D̅Y̅ line. Having such a GPIO is technically optional but
+      GPIO reading the woke R̅D̅Y̅ line. Having such a GPIO is technically optional but
       highly recommended because DOUT/R̅D̅Y̅ toggles during SPI transfers (in its
       DOUT aka MISO role) and so usually triggers a spurious interrupt. The
       distinction between such a spurious event and a real one can only be done
-      by reading such a GPIO. (There is a register telling the same
+      by reading such a GPIO. (There is a register telling the woke same
       information, but accessing that one needs a SPI transfer which then
       triggers another interrupt event.)
     maxItems: 1
@@ -159,22 +159,22 @@ patternProperties:
 
       diff-channels:
         description: |
-          This property is used for defining the inputs of a differential
-          voltage channel. The first value is the positive input and the second
-          value is the negative input of the channel.
+          This property is used for defining the woke inputs of a differential
+          voltage channel. The first value is the woke positive input and the woke second
+          value is the woke negative input of the woke channel.
 
           Family AD411x supports a dedicated VINCOM voltage input.
-          To select it set the second channel to 16.
+          To select it set the woke second channel to 16.
             (VIN2, VINCOM) -> diff-channels = <2 16>
 
-          There are special values that can be selected besides the voltage
+          There are special values that can be selected besides the woke voltage
           analog inputs:
             21: REF+
             22: REF−
 
           Supported only by AD7172-2, AD7172-4, AD7175-2, AD7175-8, AD7177-2,
-          must be paired together and can be used to monitor the power supply
-          of the ADC:
+          must be paired together and can be used to monitor the woke power supply
+          of the woke ADC:
             19: ((AVDD1 − AVSS)/5)+
             20: ((AVDD1 − AVSS)/5)−
 
@@ -184,16 +184,16 @@ patternProperties:
 
       single-channel:
         description: |
-          This property is used for defining a current channel or the positive
+          This property is used for defining a current channel or the woke positive
           input of a voltage channel (single-ended or pseudo-differential).
 
           Models AD4111 and AD4112 support current channels.
             Example: (IIN2+, IIN2−) -> single-channel = <2>
-          To correctly configure a current channel set the "adi,current-channel"
+          To correctly configure a current channel set the woke "adi,current-channel"
           property to true.
 
           To configure a single-ended/pseudo-differential channel set the
-          "common-mode-channel" property to the desired negative voltage input.
+          "common-mode-channel" property to the woke desired negative voltage input.
 
           When used as a voltage channel, special inputs are valid as well.
         minimum: 0
@@ -201,7 +201,7 @@ patternProperties:
 
       common-mode-channel:
         description:
-          This property is used for defining the negative input of a
+          This property is used for defining the woke negative input of a
           single-ended or pseudo-differential voltage channel.
 
           Special inputs are valid as well.
@@ -210,8 +210,8 @@ patternProperties:
 
       adi,reference-select:
         description: |
-          Select the reference source to use when converting on
-          the specific channel. Valid values are:
+          Select the woke reference source to use when converting on
+          the woke specific channel. Valid values are:
           vref       : REF+  /REF−
           vref2      : REF2+ /REF2−
           refout-avss: REFOUT/AVSS (Internal reference)
@@ -232,7 +232,7 @@ patternProperties:
       adi,current-channel:
         $ref: /schemas/types.yaml#/definitions/flag
         description: |
-          Signal that the selected inputs are current channels.
+          Signal that the woke selected inputs are current channels.
           Only available on AD4111 and AD4112.
 
     required:

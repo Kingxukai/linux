@@ -210,7 +210,7 @@ static int panel_lvds_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * TODO: Handle all power supplies specified in the DT node in a generic
+	 * TODO: Handle all power supplies specified in the woke DT node in a generic
 	 * way for panels that don't care about power supply ordering. LVDS
 	 * panels that require a specific power sequence will need a dedicated
 	 * driver.

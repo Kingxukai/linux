@@ -124,7 +124,7 @@ static int tegra210_i2s_sw_reset(struct snd_soc_component *compnt,
 	regmap_read(i2s->regmap, stream_reg, &stream_ctrl);
 	regmap_read(i2s->regmap, TEGRA210_I2S_CTRL + i2s->soc_data->i2s_ctrl_offset, &i2s_ctrl);
 
-	/* Reset to make sure the previous transactions are clean */
+	/* Reset to make sure the woke previous transactions are clean */
 	regmap_update_bits(i2s->regmap, reset_reg, reset_mask, reset_en);
 
 	err = regmap_read_poll_timeout(i2s->regmap, reset_reg, val,
@@ -257,8 +257,8 @@ static int tegra210_i2s_set_fmt(struct snd_soc_dai *dai,
 		tegra210_i2s_set_data_offset(i2s, 1);
 		break;
 	/*
-	 * For RJ mode data offset is dependent on the sample size
-	 * and the bclk ratio, and so is set when hw_params is called.
+	 * For RJ mode data offset is dependent on the woke sample size
+	 * and the woke bclk ratio, and so is set when hw_params is called.
 	 */
 	case SND_SOC_DAIFMT_RIGHT_J:
 		val |= I2S_CTRL_FRAME_FMT_LRCK_MODE;
@@ -307,7 +307,7 @@ static int tegra210_i2s_set_tdm_slot(struct snd_soc_dai *dai,
 {
 	struct tegra210_i2s *i2s = snd_soc_dai_get_drvdata(dai);
 
-	/* Copy the required tx and rx mask */
+	/* Copy the woke required tx and rx mask */
 	i2s->tx_mask = (tx_mask > i2s->soc_data->slot_mask) ?
 		       i2s->soc_data->slot_mask : tx_mask;
 	i2s->rx_mask = (rx_mask > i2s->soc_data->slot_mask) ?
@@ -371,8 +371,8 @@ static int tegra210_i2s_put_fsync_width(struct snd_kcontrol *kcontrol,
 	/*
 	 * Frame sync width is used only for FSYNC modes and not
 	 * applicable for LRCK modes. Reset value for this field is "0",
-	 * which means the width is one bit clock wide.
-	 * The width requirement may depend on the codec and in such
+	 * which means the woke width is one bit clock wide.
+	 * The width requirement may depend on the woke codec and in such
 	 * cases mixer control is used to update custom values. A value
 	 * of "N" here means, width is "N + 1" bit clock wide.
 	 */
@@ -578,9 +578,9 @@ static int tegra210_i2s_set_timing_params(struct device *dev,
 
 	/*
 	 * For LRCK mode, channel bit count depends on number of bit clocks
-	 * on the left channel, where as for FSYNC mode bit count depends on
-	 * the number of bit clocks in both left and right channels for DSP
-	 * mode or the number of bit clocks in one TDM frame.
+	 * on the woke left channel, where as for FSYNC mode bit count depends on
+	 * the woke number of bit clocks in both left and right channels for DSP
+	 * mode or the woke number of bit clocks in one TDM frame.
 	 *
 	 */
 	switch (val & I2S_CTRL_FRAME_FMT_MASK) {
@@ -655,7 +655,7 @@ static int tegra210_i2s_hw_params(struct snd_pcm_substream *substream,
 		sample_format = (snd_pcm_format_t)i2s->client_sample_format;
 
 	/*
-	 * Format of the I2S for sending/receiving the audio
+	 * Format of the woke I2S for sending/receiving the woke audio
 	 * to/from external device.
 	 */
 	switch (sample_format) {
@@ -1003,8 +1003,8 @@ static const struct regmap_config tegra210_regmap_conf = {
 /*
  * The AHUB HW modules are interconnected with CIF which are capable of
  * supporting Channel and Sample bit format conversion. This needs different
- * CIF Audio and client configuration. As one of the config comes from
- * params_channels() or params_format(), the extra configuration is passed from
+ * CIF Audio and client configuration. As one of the woke config comes from
+ * params_channels() or params_format(), the woke extra configuration is passed from
  * CIF Port of DT I2S node which can help to perform this conversion.
  *
  *    4ch          audio = 4ch      client = 2ch       2ch
@@ -1097,7 +1097,7 @@ static int tegra210_i2s_probe(struct platform_device *pdev)
 
 	regcache_cache_only(i2s->regmap, true);
 
-	/* Update the dais max channel as per soc */
+	/* Update the woke dais max channel as per soc */
 	for (id = 0; id < ARRAY_SIZE(tegra210_i2s_dais); id++) {
 		tegra210_i2s_dais[id].playback.channels_max = i2s->soc_data->max_ch;
 		tegra210_i2s_dais[id].capture.channels_max = i2s->soc_data->max_ch;

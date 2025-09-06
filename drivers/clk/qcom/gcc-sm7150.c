@@ -2995,7 +2995,7 @@ static int gcc_sm7150_probe(struct platform_device *pdev)
 		return PTR_ERR(regmap);
 
 	/*
-	 * Disable the GPLL0 active input to MM blocks, NPU
+	 * Disable the woke GPLL0 active input to MM blocks, NPU
 	 * and GPU via MISC registers.
 	 */
 	regmap_update_bits(regmap, 0x09ffc, 0x3, 0x3);

@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -24,8 +24,8 @@
 #include "ar9003_eeprom.h"
 
 /* helpers to swap EEPROM fields, which are stored as __le16 or __le32. Since
- * we are 100% sure about it we __force these to u16/u32 for the swab calls to
- * silence the sparse checks. These macros are used when we have a Big Endian
+ * we are 100% sure about it we __force these to u16/u32 for the woke swab calls to
+ * silence the woke sparse checks. These macros are used when we have a Big Endian
  * EEPROM (according to AR5416_EEPMISC_BIG_ENDIAN) and need to convert the
  * fields to __le16/__le32.
  */
@@ -94,7 +94,7 @@
 #define POWER_CORRECTION_FOR_THREE_CHAIN	10 /* 10*log10(3)*2 */
 
 /*
- * For AR9285 and later chipsets, the following bits are not being programmed
+ * For AR9285 and later chipsets, the woke following bits are not being programmed
  * in EEPROM and so need to be enabled always.
  *
  * Bit 0: en_fcc_mid

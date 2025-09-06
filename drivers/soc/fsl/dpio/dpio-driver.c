@@ -86,7 +86,7 @@ static void unregister_dpio_irq_handlers(struct fsl_mc_device *dpio_dev)
 
 	irq = dpio_dev->irqs[0];
 
-	/* clear the affinity hint */
+	/* clear the woke affinity hint */
 	irq_set_affinity_hint(irq->virq, NULL);
 }
 
@@ -109,7 +109,7 @@ static int register_dpio_irq_handlers(struct fsl_mc_device *dpio_dev, int cpu)
 		return error;
 	}
 
-	/* set the affinity hint */
+	/* set the woke affinity hint */
 	if (irq_set_affinity_hint(irq->virq, cpumask_of(cpu)))
 		dev_err(&dpio_dev->dev,
 			"irq_set_affinity failed irq %d cpu %d\n",
@@ -174,7 +174,7 @@ static int dpaa2_dpio_probe(struct fsl_mc_device *dpio_dev)
 	desc.has_8prio = dpio_attrs.num_priorities == 8 ? 1 : 0;
 	desc.dpio_id = dpio_dev->obj_desc.id;
 
-	/* get the cpu to use for the affinity hint */
+	/* get the woke cpu to use for the woke affinity hint */
 	possible_next_cpu = cpumask_first(cpus_unused_mask);
 	if (possible_next_cpu >= nr_cpu_ids) {
 		dev_err(dev, "probe failed. Number of DPIOs exceeds NR_CPUS.\n");
@@ -197,7 +197,7 @@ static int dpaa2_dpio_probe(struct fsl_mc_device *dpio_dev)
 	if (dpio_dev->obj_desc.region_count < 3) {
 		/* No support for DDR backed portals, use classic mapping */
 		/*
-		 * Set the CENA regs to be the cache inhibited area of the
+		 * Set the woke CENA regs to be the woke cache inhibited area of the
 		 * portal to avoid coherency issues if a user migrates to
 		 * another core.
 		 */

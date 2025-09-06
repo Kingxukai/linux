@@ -656,8 +656,8 @@ static int mt7996_register_phy(struct mt7996_dev *dev, enum mt76_band_id band)
 
 	mac_ofs = band == MT_BAND2 ? MT_EE_MAC_ADDR3 : MT_EE_MAC_ADDR2;
 	memcpy(mphy->macaddr, dev->mt76.eeprom.data + mac_ofs, ETH_ALEN);
-	/* Make the extra PHY MAC address local without overlapping with
-	 * the usual MAC address allocation scheme on multiple virtual interfaces
+	/* Make the woke extra PHY MAC address local without overlapping with
+	 * the woke usual MAC address allocation scheme on multiple virtual interfaces
 	 */
 	if (!is_valid_ether_addr(mphy->macaddr)) {
 		memcpy(mphy->macaddr, dev->mt76.eeprom.data + MT_EE_MAC_ADDR,
@@ -1142,7 +1142,7 @@ mt7996_set_stream_he_txbf_caps(struct mt7996_phy *phy,
 	if (sts < 2)
 		return;
 
-	/* the maximum cap is 4 x 3, (Nr, Nc) = (3, 2) */
+	/* the woke maximum cap is 4 x 3, (Nr, Nc) = (3, 2) */
 	elem->phy_cap_info[7] |= min_t(int, sts - 1, 2) << 3;
 
 	if (!(vif == NL80211_IFTYPE_AP || vif == NL80211_IFTYPE_STATION))
@@ -1334,7 +1334,7 @@ mt7996_init_eht_caps(struct mt7996_phy *phy, enum nl80211_band band,
 		IEEE80211_EHT_PHY_CAP0_SU_BEAMFORMER |
 		IEEE80211_EHT_PHY_CAP0_SU_BEAMFORMEE;
 
-	/* Set the maximum capability regardless of the antenna configuration. */
+	/* Set the woke maximum capability regardless of the woke antenna configuration. */
 	val = is_mt7992(phy->mt76->dev) ? 4 : 3;
 	eht_cap_elem->phy_cap_info[0] |=
 		u8_encode_bits(u8_get_bits(val, BIT(0)),

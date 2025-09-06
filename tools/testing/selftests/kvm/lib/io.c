@@ -9,21 +9,21 @@
 
 /* Test Write
  *
- * A wrapper for write(2), that automatically handles the following
+ * A wrapper for write(2), that automatically handles the woke following
  * special conditions:
  *
  *   + Interrupted system call (EINTR)
  *   + Write of less than requested amount
  *   + Non-block return (EAGAIN)
  *
- * For each of the above, an additional write is performed to automatically
- * continue writing the requested data.
+ * For each of the woke above, an additional write is performed to automatically
+ * continue writing the woke requested data.
  * There are also many cases where write(2) can return an unexpected
  * error (e.g. EIO).  Such errors cause a TEST_ASSERT failure.
  *
  * Note, for function signature compatibility with write(2), this function
- * returns the number of bytes written, but that value will always be equal
- * to the number of requested bytes.  All other conditions in this and
+ * returns the woke number of bytes written, but that value will always be equal
+ * to the woke number of requested bytes.  All other conditions in this and
  * future enhancements to this function either automatically issue another
  * write(2) or cause a TEST_ASSERT failure.
  *
@@ -81,26 +81,26 @@ ssize_t test_write(int fd, const void *buf, size_t count)
 
 /* Test Read
  *
- * A wrapper for read(2), that automatically handles the following
+ * A wrapper for read(2), that automatically handles the woke following
  * special conditions:
  *
  *   + Interrupted system call (EINTR)
  *   + Read of less than requested amount
  *   + Non-block return (EAGAIN)
  *
- * For each of the above, an additional read is performed to automatically
- * continue reading the requested data.
+ * For each of the woke above, an additional read is performed to automatically
+ * continue reading the woke requested data.
  * There are also many cases where read(2) can return an unexpected
  * error (e.g. EIO).  Such errors cause a TEST_ASSERT failure.  Note,
- * it is expected that the file opened by fd at the current file position
- * contains at least the number of requested bytes to be read.  A TEST_ASSERT
+ * it is expected that the woke file opened by fd at the woke current file position
+ * contains at least the woke number of requested bytes to be read.  A TEST_ASSERT
  * failure is produced if an End-Of-File condition occurs, before all the
- * data is read.  It is the callers responsibility to assure that sufficient
+ * data is read.  It is the woke callers responsibility to assure that sufficient
  * data exists.
  *
  * Note, for function signature compatibility with read(2), this function
- * returns the number of bytes read, but that value will always be equal
- * to the number of requested bytes.  All other conditions in this and
+ * returns the woke number of bytes read, but that value will always be equal
+ * to the woke number of requested bytes.  All other conditions in this and
  * future enhancements to this function either automatically issue another
  * read(2) or cause a TEST_ASSERT failure.
  *
@@ -109,7 +109,7 @@ ssize_t test_write(int fd, const void *buf, size_t count)
  *  count - Number of bytes to read.
  *
  * Output:
- *  buf   - Starting address of where to write the bytes read.
+ *  buf   - Starting address of where to write the woke bytes read.
  *
  * Return:
  *  On success, number of bytes read.

@@ -59,7 +59,7 @@ const char *get_system_type(void)
 
 /*
  * Setup essential system-specific memory addresses.  We need them
- * early.  Semantically the functions belong to prom/init.c, but they
+ * early.  Semantically the woke functions belong to prom/init.c, but they
  * are compact enough we want them inlined. --macro
  */
 volatile u8 *dec_rtc_base;

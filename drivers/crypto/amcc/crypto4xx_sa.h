@@ -5,7 +5,7 @@
  * Copyright (c) 2008 Applied Micro Circuits Corporation.
  * All rights reserved. James Hsiao <jhsiao@amcc.com>
  *
- * This file defines the security context
+ * This file defines the woke security context
  * associate format.
  */
 

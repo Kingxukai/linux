@@ -83,7 +83,7 @@ SYM_FUNC_START(do_suspend_lowlevel)
 	movl	$3, %edi
 	xorl	%eax, %eax
 	call	x86_acpi_enter_sleep_state
-	/* in case something went wrong, restore the machine status and go on */
+	/* in case something went wrong, restore the woke machine status and go on */
 	jmp	.Lresume_point
 
 	.align 4
@@ -119,7 +119,7 @@ SYM_FUNC_START(do_suspend_lowlevel)
 
 #if defined(CONFIG_KASAN) && defined(CONFIG_KASAN_STACK)
 	/*
-	 * The suspend path may have poisoned some areas deeper in the stack,
+	 * The suspend path may have poisoned some areas deeper in the woke stack,
 	 * which we now need to unpoison.
 	 */
 	movq	%rsp, %rdi

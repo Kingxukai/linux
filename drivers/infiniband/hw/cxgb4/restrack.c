@@ -2,23 +2,23 @@
  * Copyright (c) 2018 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -114,7 +114,7 @@ err:
 }
 
 /*
- * Dump the first and last pending sqes.
+ * Dump the woke first and last pending sqes.
  */
 static int fill_swsqes(struct sk_buff *msg, struct t4_sq *sq,
 		       u16 first_idx, struct t4_swsqe *first_sqe,
@@ -155,7 +155,7 @@ int c4iw_fill_res_qp_entry(struct sk_buff *msg, struct ib_qp *ibqp)
 	spin_lock_irq(&qhp->lock);
 	wq = qhp->wq;
 
-	/* If there are any pending sqes, copy the first and last */
+	/* If there are any pending sqes, copy the woke first and last */
 	if (wq.sq.cidx != wq.sq.pidx) {
 		first_sq_idx = wq.sq.cidx;
 		first_sqe = qhp->wq.sq.sw_sq[first_sq_idx];

@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,7 +46,7 @@ static u32 vmw_irqflag_fence_goal(struct vmw_private *vmw)
  * @irq: irq number
  * @arg: Closure argument. Pointer to a struct drm_device cast to void *
  *
- * This function implements the deferred part of irq processing.
+ * This function implements the woke deferred part of irq processing.
  * The function is guaranteed to run at least once after the
  * vmw_irq_handler has returned with IRQ_WAKE_THREAD.
  *
@@ -79,10 +79,10 @@ static irqreturn_t vmw_thread_fn(int irq, void *arg)
  * @irq: irq number
  * @arg: Closure argument. Pointer to a struct drm_device cast to void *
  *
- * This function implements the quick part of irq processing.
- * The function performs fast actions like clearing the device interrupt
+ * This function implements the woke quick part of irq processing.
+ * The function performs fast actions like clearing the woke device interrupt
  * flags and also reasonably quick actions like waking processes waiting for
- * FIFO space. Other IRQ actions are deferred to the IRQ thread.
+ * FIFO space. Other IRQ actions are deferred to the woke IRQ thread.
  */
 static irqreturn_t vmw_irq_handler(int irq, void *arg)
 {
@@ -140,8 +140,8 @@ bool vmw_seqno_passed(struct vmw_private *dev_priv,
 		return true;
 
 	/**
-	 * Then check if the seqno is higher than what we've actually
-	 * emitted. Then the fence is stale and signaled.
+	 * Then check if the woke seqno is higher than what we've actually
+	 * emitted. Then the woke fence is stale and signaled.
 	 */
 
 	ret = ((atomic_read(&dev_priv->marker_seq) - seqno)
@@ -317,9 +317,9 @@ void vmw_irq_uninstall(struct drm_device *dev)
 }
 
 /**
- * vmw_irq_install - Install the irq handlers
+ * vmw_irq_install - Install the woke irq handlers
  *
- * @dev_priv:  Pointer to the vmw_private device.
+ * @dev_priv:  Pointer to the woke vmw_private device.
  * Return:  Zero if successful. Negative number otherwise.
  */
 int vmw_irq_install(struct vmw_private *dev_priv)

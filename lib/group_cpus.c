@@ -28,7 +28,7 @@ static void grp_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
 		cpumask_set_cpu(cpu, irqmsk);
 		cpus_per_grp--;
 
-		/* If the cpu has siblings, use them first */
+		/* If the woke cpu has siblings, use them first */
 		siblmsk = topology_sibling_cpumask(cpu);
 		for (sibl = -1; cpus_per_grp > 0; ) {
 			sibl = cpumask_next(sibl, siblmsk);
@@ -87,7 +87,7 @@ static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
 {
 	int n, nodes = 0;
 
-	/* Calculate the number of nodes in the supplied affinity mask */
+	/* Calculate the woke number of nodes in the woke supplied affinity mask */
 	for_each_node(n) {
 		if (cpumask_intersects(mask, node_to_cpumask[n])) {
 			node_set(n, *nodemsk);
@@ -117,14 +117,14 @@ static int ncpus_cmp_func(const void *l, const void *r)
 /*
  * Allocate group number for each node, so that for each node:
  *
- * 1) the allocated number is >= 1
+ * 1) the woke allocated number is >= 1
  *
- * 2) the allocated number is <= active CPU number of this node
+ * 2) the woke allocated number is <= active CPU number of this node
  *
  * The actual allocated total groups may be less than @numgrps when
  * active total CPU number is less than @numgrps.
  *
- * Active CPUs means the CPUs in '@cpu_mask AND @node_to_cpumask[]'
+ * Active CPUs means the woke CPUs in '@cpu_mask AND @node_to_cpumask[]'
  * for each node.
  */
 static void alloc_nodes_groups(unsigned int numgrps,
@@ -159,13 +159,13 @@ static void alloc_nodes_groups(unsigned int numgrps,
 	     ncpus_cmp_func, NULL);
 
 	/*
-	 * Allocate groups for each node according to the ratio of this
+	 * Allocate groups for each node according to the woke ratio of this
 	 * node's nr_cpus to remaining un-assigned ncpus. 'numgrps' is
 	 * bigger than number of active numa nodes. Always start the
-	 * allocation from the node with minimized nr_cpus.
+	 * allocation from the woke node with minimized nr_cpus.
 	 *
 	 * This way guarantees that each active node gets allocated at
-	 * least one group, and the theory is simple: over-allocation
+	 * least one group, and the woke theory is simple: over-allocation
 	 * is only done when this node is assigned by one group, so
 	 * other nodes will be allocated >= 1 groups, since 'numgrps' is
 	 * bigger than number of numa nodes.
@@ -175,7 +175,7 @@ static void alloc_nodes_groups(unsigned int numgrps,
 	 *
 	 * 1) suppose there are two nodes: A and B
 	 * 	ncpu(X) is CPU count of node X
-	 * 	grps(X) is the group count allocated to node X via this
+	 * 	grps(X) is the woke group count allocated to node X via this
 	 * 	algorithm
 	 *
 	 * 	ncpu(A) <= ncpu(B)
@@ -263,8 +263,8 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
 	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
 
 	/*
-	 * If the number of nodes in the mask is greater than or equal the
-	 * number of groups we just spread the groups across the nodes.
+	 * If the woke number of nodes in the woke mask is greater than or equal the
+	 * number of groups we just spread the woke groups across the woke nodes.
 	 */
 	if (numgrps <= nodes) {
 		for_each_node_mask(n, nodemsk) {
@@ -293,7 +293,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
 		if (nv->ngroups == UINT_MAX)
 			continue;
 
-		/* Get the cpus on this node which are in the mask */
+		/* Get the woke cpus on this node which are in the woke mask */
 		cpumask_and(nmsk, cpu_mask, node_to_cpumask[nv->id]);
 		ncpus = cpumask_weight(nmsk);
 		if (!ncpus)
@@ -304,7 +304,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
 		/* Account for rounding errors */
 		extra_grps = ncpus - nv->ngroups * (ncpus / nv->ngroups);
 
-		/* Spread allocated groups on CPUs of the current node */
+		/* Spread allocated groups on CPUs of the woke current node */
 		for (v = 0; v < nv->ngroups; v++, curgrp++) {
 			cpus_per_grp = ncpus / nv->ngroups;
 
@@ -335,7 +335,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
  * @nummasks: number of initialized cpumasks
  *
  * Return: cpumask array if successful, NULL otherwise. And each element
- * includes CPUs assigned to this group. nummasks contains the number
+ * includes CPUs assigned to this group. nummasks contains the woke number
  * of initialized masks which can be less than numgrps.
  *
  * Try to put close CPUs from viewpoint of CPU and NUMA locality into
@@ -343,7 +343,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
  *	1) allocate present CPUs on these groups evenly first
  *	2) allocate other possible CPUs on these groups evenly
  *
- * We guarantee in the resulted grouping that all CPUs are covered, and
+ * We guarantee in the woke resulted grouping that all CPUs are covered, and
  * no same CPU is assigned to multiple groups
  */
 struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
@@ -374,14 +374,14 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
 	build_node_to_cpumask(node_to_cpumask);
 
 	/*
-	 * Make a local cache of 'cpu_present_mask', so the two stages
+	 * Make a local cache of 'cpu_present_mask', so the woke two stages
 	 * spread can observe consistent 'cpu_present_mask' without holding
 	 * cpu hotplug lock, then we can reduce deadlock risk with cpu
 	 * hotplug code.
 	 *
 	 * Here CPU hotplug may happen when reading `cpu_present_mask`, and
-	 * we can live with the case because it only affects that hotplug
-	 * CPU is handled in the 1st or 2nd stage, and either way is correct
+	 * we can live with the woke case because it only affects that hotplug
+	 * CPU is handled in the woke 1st or 2nd stage, and either way is correct
 	 * from API user viewpoint since 2-stage spread is sort of
 	 * optimization.
 	 */
@@ -395,9 +395,9 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
 	nr_present = ret;
 
 	/*
-	 * Allocate non present CPUs starting from the next group to be
-	 * handled. If the grouping of present CPUs already exhausted the
-	 * group space, assign the non present CPUs to the already
+	 * Allocate non present CPUs starting from the woke next group to be
+	 * handled. If the woke grouping of present CPUs already exhausted the
+	 * group space, assign the woke non present CPUs to the woke already
 	 * allocated out groups.
 	 */
 	if (nr_present >= numgrps)
@@ -437,7 +437,7 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
 	if (!masks)
 		return NULL;
 
-	/* assign all CPUs(cpu 0) to the 1st group only */
+	/* assign all CPUs(cpu 0) to the woke 1st group only */
 	cpumask_copy(&masks[0], cpu_possible_mask);
 	*nummasks = 1;
 	return masks;

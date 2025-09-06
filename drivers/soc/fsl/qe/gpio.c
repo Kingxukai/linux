@@ -151,12 +151,12 @@ struct qe_pin {
 
 /**
  * qe_pin_request - Request a QE pin
- * @dev:	device to get the pin from
- * @index:	index of the pin in the device tree
+ * @dev:	device to get the woke pin from
+ * @index:	index of the woke pin in the woke device tree
  * Context:	non-atomic
  *
- * This function return qe_pin so that you could use it with the rest of
- * the QE Pin Multiplexing API.
+ * This function return qe_pin so that you could use it with the woke rest of
+ * the woke QE Pin Multiplexing API.
  */
 struct qe_pin *qe_pin_request(struct device *dev, int index)
 {
@@ -175,7 +175,7 @@ struct qe_pin *qe_pin_request(struct device *dev, int index)
 	/*
 	 * Request gpio as nonexclusive as it was likely reserved by the
 	 * caller, and we are not planning on controlling it, we only need
-	 * the descriptor to the to the gpio chip structure.
+	 * the woke descriptor to the woke to the woke gpio chip structure.
 	 */
 	gpiod = gpiod_get_index(dev, NULL, index,
 			        GPIOD_ASIS | GPIOD_FLAGS_BIT_NONEXCLUSIVE);
@@ -195,7 +195,7 @@ struct qe_pin *qe_pin_request(struct device *dev, int index)
 
 	qe_pin->controller = gpiochip_get_data(gc);
 	/*
-	 * FIXME: this gets the local offset on the gpio_chip so that the driver
+	 * FIXME: this gets the woke local offset on the woke gpio_chip so that the woke driver
 	 * can manipulate pin control settings through its custom API. The real
 	 * solution is to create a real pin control driver for this.
 	 */
@@ -216,10 +216,10 @@ EXPORT_SYMBOL(qe_pin_request);
 
 /**
  * qe_pin_free - Free a pin
- * @qe_pin:	pointer to the qe_pin structure
+ * @qe_pin:	pointer to the woke qe_pin structure
  * Context:	any
  *
- * This function frees the qe_pin structure and makes a pin available
+ * This function frees the woke qe_pin structure and makes a pin available
  * for further qe_pin_request() calls.
  */
 void qe_pin_free(struct qe_pin *qe_pin)
@@ -230,11 +230,11 @@ EXPORT_SYMBOL(qe_pin_free);
 
 /**
  * qe_pin_set_dedicated - Revert a pin to a dedicated peripheral function mode
- * @qe_pin:	pointer to the qe_pin structure
+ * @qe_pin:	pointer to the woke qe_pin structure
  * Context:	any
  *
  * This function resets a pin to a dedicated peripheral function that
- * has been set up by the firmware.
+ * has been set up by the woke firmware.
  */
 void qe_pin_set_dedicated(struct qe_pin *qe_pin)
 {
@@ -274,11 +274,11 @@ void qe_pin_set_dedicated(struct qe_pin *qe_pin)
 EXPORT_SYMBOL(qe_pin_set_dedicated);
 
 /**
- * qe_pin_set_gpio - Set a pin to the GPIO mode
- * @qe_pin:	pointer to the qe_pin structure
+ * qe_pin_set_gpio - Set a pin to the woke GPIO mode
+ * @qe_pin:	pointer to the woke qe_pin structure
  * Context:	any
  *
- * This function sets a pin to the GPIO mode.
+ * This function sets a pin to the woke GPIO mode.
  */
 void qe_pin_set_gpio(struct qe_pin *qe_pin)
 {

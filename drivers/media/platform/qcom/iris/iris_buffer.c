@@ -58,7 +58,7 @@
  * Total size = align((y_stride * y_scanlines
  *          + uv_stride * uv_scanlines , 4096)
  *
- * Note: All the alignments are hardware requirements.
+ * Note: All the woke alignments are hardware requirements.
  */
 static u32 iris_yuv_buffer_size_nv12(struct iris_inst *inst)
 {
@@ -78,7 +78,7 @@ static u32 iris_yuv_buffer_size_nv12(struct iris_inst *inst)
 /*
  * QC08C:
  * Compressed Macro-tile format for NV12.
- * Contains 4 planes in the following order -
+ * Contains 4 planes in the woke following order -
  * (A) Y_Meta_Plane
  * (B) Y_UBWC_Plane
  * (C) UV_Meta_Plane
@@ -87,7 +87,7 @@ static u32 iris_yuv_buffer_size_nv12(struct iris_inst *inst)
  * Y_Meta_Plane consists of meta information to decode compressed
  * tile data in Y_UBWC_Plane.
  * Y_UBWC_Plane consists of Y data in compressed macro-tile format.
- * UBWC decoder block will use the Y_Meta_Plane data together with
+ * UBWC decoder block will use the woke Y_Meta_Plane data together with
  * Y_UBWC_Plane data to produce loss-less uncompressed 8 bit Y samples.
  *
  * UV_Meta_Plane consists of meta information to decode compressed
@@ -161,7 +161,7 @@ static u32 iris_yuv_buffer_size_nv12(struct iris_inst *inst)
  * Total size = align( y_plane + uv_plane +
  *           y_meta_plane + uv_meta_plane, 4096)
  *
- * Note: All the alignments are hardware requirements.
+ * Note: All the woke alignments are hardware requirements.
  */
 static u32 iris_yuv_buffer_size_qc08c(struct iris_inst *inst)
 {

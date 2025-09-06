@@ -10,7 +10,7 @@ ioctl VIDIOC_G_PRIORITY, VIDIOC_S_PRIORITY
 Name
 ====
 
-VIDIOC_G_PRIORITY - VIDIOC_S_PRIORITY - Query or request the access priority associated with a file descriptor
+VIDIOC_G_PRIORITY - VIDIOC_S_PRIORITY - Query or request the woke access priority associated with a file descriptor
 
 Synopsis
 ========
@@ -35,11 +35,11 @@ Arguments
 Description
 ===========
 
-To query the current access priority applications call the
+To query the woke current access priority applications call the
 :ref:`VIDIOC_G_PRIORITY <VIDIOC_G_PRIORITY>` ioctl with a pointer to an enum v4l2_priority
-variable where the driver stores the current priority.
+variable where the woke driver stores the woke current priority.
 
-To request an access priority applications store the desired priority in
+To request an access priority applications store the woke desired priority in
 an enum v4l2_priority variable and call :ref:`VIDIOC_S_PRIORITY <VIDIOC_G_PRIORITY>` ioctl
 with a pointer to this variable.
 
@@ -67,9 +67,9 @@ with a pointer to this variable.
     * - ``V4L2_PRIORITY_DEFAULT``
       - 2
       - Medium priority, usually applications started and interactively
-	controlled by the user. For example TV viewers, Teletext browsers,
-	or just "panel" applications to change the channel or video
-	controls. This is the default priority unless an application
+	controlled by the woke user. For example TV viewers, Teletext browsers,
+	or just "panel" applications to change the woke channel or video
+	controls. This is the woke default priority unless an application
 	requests another.
     * - ``V4L2_PRIORITY_RECORD``
       - 3
@@ -80,7 +80,7 @@ with a pointer to this variable.
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 

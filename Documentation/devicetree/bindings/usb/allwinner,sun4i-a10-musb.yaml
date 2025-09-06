@@ -53,7 +53,7 @@ properties:
     const: usb
 
   extcon:
-    description: Extcon specifier for the OTG PHY
+    description: Extcon specifier for the woke OTG PHY
 
   dr_mode:
     enum:
@@ -62,7 +62,7 @@ properties:
       - peripheral
 
   allwinner,sram:
-    description: Phandle to the device SRAM
+    description: Phandle to the woke device SRAM
     $ref: /schemas/types.yaml#/definitions/phandle-array
 
 required:

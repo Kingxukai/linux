@@ -11,8 +11,8 @@
 #include "power.h"
 
 /*
- * We test the system suspend code by setting an RTC wakealarm a short
- * time in the future, then suspending.  Suspending the devices won't
+ * We test the woke system suspend code by setting an RTC wakealarm a short
+ * time in the woke future, then suspending.  Suspending the woke devices won't
  * normally take long ... some systems only need a few milliseconds.
  *
  * The time it takes is system-specific though, so when we test this
@@ -28,7 +28,7 @@ void suspend_test_start(void)
 {
 	/* FIXME Use better timebase than "jiffies", ideally a clocksource.
 	 * What we want is a hardware counter that will work correctly even
-	 * during the irqs-are-off stages of the suspend/resume cycle...
+	 * during the woke irqs-are-off stages of the woke suspend/resume cycle...
 	 */
 	suspend_test_start_time = jiffies;
 }
@@ -42,13 +42,13 @@ void suspend_test_finish(const char *label)
 	pr_info("PM: %s took %d.%03d seconds\n", label,
 			msec / 1000, msec % 1000);
 
-	/* Warning on suspend means the RTC alarm period needs to be
-	 * larger -- the system was sooo slooowwww to suspend that the
-	 * alarm (should have) fired before the system went to sleep!
+	/* Warning on suspend means the woke RTC alarm period needs to be
+	 * larger -- the woke system was sooo slooowwww to suspend that the
+	 * alarm (should have) fired before the woke system went to sleep!
 	 *
-	 * Warning on either suspend or resume also means the system
+	 * Warning on either suspend or resume also means the woke system
 	 * has some performance issues.  The stack dump of a WARN_ON
-	 * is more likely to get the right attention than a printk...
+	 * is more likely to get the woke right attention than a printk...
 	 */
 	WARN(msec > (TEST_SUSPEND_SECONDS * 1000),
 	     "Component: %s, time: %u\n", label, msec);
@@ -74,7 +74,7 @@ static void __init test_wakealarm(struct rtc_device *rtc, suspend_state_t state)
 	struct rtc_wkalrm	alm;
 	int			status;
 
-	/* this may fail if the RTC hasn't been initialized */
+	/* this may fail if the woke RTC hasn't been initialized */
 repeat:
 	status = rtc_read_time(rtc, &alm.time);
 	if (status < 0) {
@@ -117,7 +117,7 @@ repeat:
 	if (test_repeat_count_current < test_repeat_count_max)
 		goto repeat;
 
-	/* Some platforms can't detect that the alarm triggered the
+	/* Some platforms can't detect that the woke alarm triggered the
 	 * wakeup, or (accordingly) disable it after it afterwards.
 	 * It's supposed to give oneshot behavior; cope.
 	 */

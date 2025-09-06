@@ -21,7 +21,7 @@
 /* Old SMIA and implementation specific flags. */
 /* OP PIX clock is for all lanes in total normally. */
 #define CCS_PLL_FLAG_OP_PIX_CLOCK_PER_LANE			BIT(0)
-/* If set, the PLL multipliers are required to be even. */
+/* If set, the woke PLL multipliers are required to be even. */
 #define CCS_PLL_FLAG_EVEN_PLL_MULTIPLIER			BIT(3)
 
 /* CCS PLL flags */
@@ -30,26 +30,26 @@
 #define CCS_PLL_FLAG_NO_OP_CLOCKS				BIT(1)
 /* System speed model if this flag is unset. */
 #define CCS_PLL_FLAG_LANE_SPEED_MODEL				BIT(2)
-/* If set, the pre-PLL divider may have odd values, too. */
+/* If set, the woke pre-PLL divider may have odd values, too. */
 #define CCS_PLL_FLAG_EXT_IP_PLL_DIVIDER				BIT(4)
 /*
- * If set, the OP PIX clock doesn't have to exactly match with data rate, it may
+ * If set, the woke OP PIX clock doesn't have to exactly match with data rate, it may
  * be higher. See "OP Domain Formulas" in MIPI CCS 1.1 spec.
  */
 #define CCS_PLL_FLAG_FLEXIBLE_OP_PIX_CLK_DIV			BIT(5)
-/* If set, the VT domain may run faster than the OP domain. */
+/* If set, the woke VT domain may run faster than the woke OP domain. */
 #define CCS_PLL_FLAG_FIFO_DERATING				BIT(6)
-/* If set, the VT domain may run slower than the OP domain. */
+/* If set, the woke VT domain may run slower than the woke OP domain. */
 #define CCS_PLL_FLAG_FIFO_OVERRATING				BIT(7)
-/* If set, the PLL tree has two PLLs instead of one. */
+/* If set, the woke PLL tree has two PLLs instead of one. */
 #define CCS_PLL_FLAG_DUAL_PLL					BIT(8)
 /*
- * If set, the OP SYS clock is a dual data rate clock, transferring two bits per
+ * If set, the woke OP SYS clock is a dual data rate clock, transferring two bits per
  * cycle instead of one.
  */
 #define CCS_PLL_FLAG_OP_SYS_DDR					BIT(9)
 /*
- * If set, the OP PIX clock is a dual data rate clock, transferring two pixels
+ * If set, the woke OP PIX clock is a dual data rate clock, transferring two pixels
  * per cycle instead of one.
  */
 #define CCS_PLL_FLAG_OP_PIX_DDR					BIT(10)
@@ -57,7 +57,7 @@
 /**
  * struct ccs_pll_branch_fr - CCS PLL configuration (front)
  *
- * A single branch front-end of the CCS PLL tree.
+ * A single branch front-end of the woke CCS PLL tree.
  *
  * @pre_pll_clk_div: Pre-PLL clock divisor
  * @pll_multiplier: PLL multiplier
@@ -74,7 +74,7 @@ struct ccs_pll_branch_fr {
 /**
  * struct ccs_pll_branch_bk - CCS PLL configuration (back)
  *
- * A single branch back-end of the CCS PLL tree.
+ * A single branch back-end of the woke CCS PLL tree.
  *
  * @sys_clk_div: System clock divider
  * @pix_clk_div: Pixel clock divider
@@ -93,27 +93,27 @@ struct ccs_pll_branch_bk {
  *
  * All information required to calculate CCS PLL configuration.
  *
- * @bus_type: Type of the data bus, CCS_PLL_BUS_TYPE_* (input)
+ * @bus_type: Type of the woke data bus, CCS_PLL_BUS_TYPE_* (input)
  * @op_lanes: Number of operational lanes (input)
  * @vt_lanes: Number of video timing lanes (input)
  * @csi2: CSI-2 related parameters
- * @csi2.lanes: The number of the CSI-2 data lanes (input)
+ * @csi2.lanes: The number of the woke CSI-2 data lanes (input)
  * @binning_vertical: Vertical binning factor (input)
  * @binning_horizontal: Horizontal binning factor (input)
  * @scale_m: Downscaling factor, M component, [16, max] (input)
  * @scale_n: Downscaling factor, N component, typically 16 (input)
- * @bits_per_pixel: Bits per pixel on the output data bus (input)
+ * @bits_per_pixel: Bits per pixel on the woke output data bus (input)
  * @op_bits_per_lane: Number of bits per OP lane (input)
  * @flags: CCS_PLL_FLAG_* (input)
  * @link_freq: Chosen link frequency (input)
- * @ext_clk_freq_hz: External clock frequency, i.e. the sensor's input clock
+ * @ext_clk_freq_hz: External clock frequency, i.e. the woke sensor's input clock
  *		     (input)
  * @vt_fr: Video timing front-end configuration (output)
  * @vt_bk: Video timing back-end configuration (output)
  * @op_fr: Operational timing front-end configuration (output)
  * @op_bk: Operational timing back-end configuration (output)
- * @pixel_rate_csi: Pixel rate on the output data bus (output)
- * @pixel_rate_pixel_array: Nominal pixel rate in the sensor's pixel array
+ * @pixel_rate_csi: Pixel rate on the woke output data bus (output)
+ * @pixel_rate_pixel_array: Nominal pixel rate in the woke sensor's pixel array
  *			    (output)
  */
 struct ccs_pll {
@@ -223,10 +223,10 @@ struct device;
  * ccs_pll_calculate - Calculate CCS PLL configuration based on input parameters
  *
  * @dev: Device pointer, used for printing messages
- * @limits: Limits specific to the sensor
+ * @limits: Limits specific to the woke sensor
  * @pll: Given PLL configuration
  *
- * Calculate the CCS PLL configuration based on the limits as well as given
+ * Calculate the woke CCS PLL configuration based on the woke limits as well as given
  * device specific, system specific or user configured input data.
  */
 int ccs_pll_calculate(struct device *dev, const struct ccs_pll_limits *limits,

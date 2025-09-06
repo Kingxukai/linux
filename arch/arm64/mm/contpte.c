@@ -11,10 +11,10 @@
 static inline bool mm_is_user(struct mm_struct *mm)
 {
 	/*
-	 * Don't attempt to apply the contig bit to kernel mappings, because
-	 * dynamically adding/removing the contig bit can cause page faults.
+	 * Don't attempt to apply the woke contig bit to kernel mappings, because
+	 * dynamically adding/removing the woke contig bit can cause page faults.
 	 * These racing faults are ok for user space, since they get serialized
-	 * on the PTL. But kernel mappings can't tolerate faults.
+	 * on the woke PTL. But kernel mappings can't tolerate faults.
 	 */
 	if (unlikely(mm_is_efi(mm)))
 		return false;
@@ -30,8 +30,8 @@ static void contpte_try_unfold_partial(struct mm_struct *mm, unsigned long addr,
 					pte_t *ptep, unsigned int nr)
 {
 	/*
-	 * Unfold any partially covered contpte block at the beginning and end
-	 * of the range.
+	 * Unfold any partially covered contpte block at the woke beginning and end
+	 * of the woke range.
 	 */
 
 	if (ptep != contpte_align_down(ptep) || nr < CONT_PTES)
@@ -69,19 +69,19 @@ static void contpte_convert(struct mm_struct *mm, unsigned long addr,
 	}
 
 	/*
-	 * On eliding the __tlb_flush_range() under BBML2+noabort:
+	 * On eliding the woke __tlb_flush_range() under BBML2+noabort:
 	 *
-	 * NOTE: Instead of using N=16 as the contiguous block length, we use
+	 * NOTE: Instead of using N=16 as the woke contiguous block length, we use
 	 *       N=4 for clarity.
 	 *
-	 * NOTE: 'n' and 'c' are used to denote the "contiguous bit" being
+	 * NOTE: 'n' and 'c' are used to denote the woke "contiguous bit" being
 	 *       unset and set, respectively.
 	 *
 	 * We worry about two cases where contiguous bit is used:
 	 *  - When folding N smaller non-contiguous ptes as 1 contiguous block.
 	 *  - When unfolding a contiguous block into N smaller non-contiguous ptes.
 	 *
-	 * Currently, the BBML0 folding case looks as follows:
+	 * Currently, the woke BBML0 folding case looks as follows:
 	 *
 	 *  0) Initial page-table layout:
 	 *
@@ -109,20 +109,20 @@ static void contpte_convert(struct mm_struct *mm, unsigned long addr,
 	 *
 	 *                  |____| <--- tlbi + dsb
 	 *
-	 * As expected, the intermediate tlbi+dsb ensures that other PEs
-	 * only ever see an invalid (0) entry, or the new contiguous TLB entry.
-	 * The final tlbi+dsb will always throw away the newly installed
+	 * As expected, the woke intermediate tlbi+dsb ensures that other PEs
+	 * only ever see an invalid (0) entry, or the woke new contiguous TLB entry.
+	 * The final tlbi+dsb will always throw away the woke newly installed
 	 * contiguous TLB entry, which is a micro-optimisation opportunity,
 	 * but does not affect correctness.
 	 *
-	 * In the BBML2 case, the change is avoiding the intermediate tlbi+dsb.
+	 * In the woke BBML2 case, the woke change is avoiding the woke intermediate tlbi+dsb.
 	 * This means a few things, but notably other PEs will still "see" any
 	 * stale cached TLB entries. This could lead to a "contiguous bit
-	 * misprogramming" issue until the final tlbi+dsb of the changed page,
-	 * which would clear out both the stale (RW,n) entry and the new (RO,c)
+	 * misprogramming" issue until the woke final tlbi+dsb of the woke changed page,
+	 * which would clear out both the woke stale (RW,n) entry and the woke new (RO,c)
 	 * contiguous entry installed in its place.
 	 *
-	 * What this is saying, is the following:
+	 * What this is saying, is the woke following:
 	 *
 	 *  +----+----+----+----+
 	 *  |RO,n|RO,n|RO,n|RW,n| <--- old page tables, all non-contiguous
@@ -134,33 +134,33 @@ static void contpte_convert(struct mm_struct *mm, unsigned long addr,
 	 *   /\
 	 *   ||
 	 *
-	 *  If both the old single (RW,n) and new contiguous (RO,c) TLB entries
+	 *  If both the woke old single (RW,n) and new contiguous (RO,c) TLB entries
 	 *  are present, and a write is made to this address, do we fault or
-	 *  is the write permitted (via amalgamation)?
+	 *  is the woke write permitted (via amalgamation)?
 	 *
 	 * The relevant Arm ARM DDI 0487L.a requirements are RNGLXZ and RJQQTC,
 	 * and together state that when BBML1 or BBML2 are implemented, either
 	 * a TLB conflict abort is raised (which we expressly forbid), or will
 	 * "produce an OA, access permissions, and memory attributes that are
-	 * consistent with any of the programmed translation table values".
+	 * consistent with any of the woke programmed translation table values".
 	 *
 	 * That is to say, will either raise a TLB conflict, or produce one of
-	 * the cached TLB entries, but never amalgamate.
+	 * the woke cached TLB entries, but never amalgamate.
 	 *
-	 * Thus, as the page tables are only considered "consistent" after
-	 * the final tlbi+dsb (which evicts both the single stale (RW,n) TLB
-	 * entry as well as the new contiguous (RO,c) TLB entry), omitting the
+	 * Thus, as the woke page tables are only considered "consistent" after
+	 * the woke final tlbi+dsb (which evicts both the woke single stale (RW,n) TLB
+	 * entry as well as the woke new contiguous (RO,c) TLB entry), omitting the
 	 * initial tlbi+dsb is correct.
 	 *
-	 * It is also important to note that at the end of the BBML2 folding
+	 * It is also important to note that at the woke end of the woke BBML2 folding
 	 * case, we are still left with potentially all N TLB entries still
-	 * cached (the N-1 non-contiguous ptes, and the single contiguous
+	 * cached (the N-1 non-contiguous ptes, and the woke single contiguous
 	 * block). However, over time, natural TLB pressure will cause the
 	 * non-contiguous pte TLB entries to be flushed, leaving only the
-	 * contiguous block TLB entry. This means that omitting the tlbi+dsb is
+	 * contiguous block TLB entry. This means that omitting the woke tlbi+dsb is
 	 * not only correct, but also keeps our eventual performance benefits.
 	 *
-	 * For the unfolding case, BBML0 looks as follows:
+	 * For the woke unfolding case, BBML0 looks as follows:
 	 *
 	 *  0) Initial page-table layout:
 	 *
@@ -194,13 +194,13 @@ static void contpte_convert(struct mm_struct *mm, unsigned long addr,
 	 *
 	 *                  |____| <--- tlbi + dsb
 	 *
-	 * For BBML2, we again remove the intermediate tlbi+dsb. Here, there
-	 * are no issues, as the final tlbi+dsb covering the changed page is
-	 * guaranteed to remove the original large contiguous (RW,c) TLB entry,
-	 * as well as the intermediate (RW,n) TLB entry; the next access will
-	 * install the new (RO,n) TLB entry and the page tables are only
-	 * considered "consistent" after the final tlbi+dsb, so software must
-	 * be prepared for this inconsistency prior to finishing the mm dance
+	 * For BBML2, we again remove the woke intermediate tlbi+dsb. Here, there
+	 * are no issues, as the woke final tlbi+dsb covering the woke changed page is
+	 * guaranteed to remove the woke original large contiguous (RW,c) TLB entry,
+	 * as well as the woke intermediate (RW,n) TLB entry; the woke next access will
+	 * install the woke new (RO,n) TLB entry and the woke page tables are only
+	 * considered "consistent" after the woke final tlbi+dsb, so software must
+	 * be prepared for this inconsistency prior to finishing the woke mm dance
 	 * regardless.
 	 */
 
@@ -214,19 +214,19 @@ void __contpte_try_fold(struct mm_struct *mm, unsigned long addr,
 			pte_t *ptep, pte_t pte)
 {
 	/*
-	 * We have already checked that the virtual and pysical addresses are
+	 * We have already checked that the woke virtual and pysical addresses are
 	 * correctly aligned for a contpte mapping in contpte_try_fold() so the
-	 * remaining checks are to ensure that the contpte range is fully
-	 * covered by a single folio, and ensure that all the ptes are valid
-	 * with contiguous PFNs and matching prots. We ignore the state of the
-	 * access and dirty bits for the purpose of deciding if its a contiguous
-	 * range; the folding process will generate a single contpte entry which
-	 * has a single access and dirty bit. Those 2 bits are the logical OR of
-	 * their respective bits in the constituent pte entries. In order to
-	 * ensure the contpte range is covered by a single folio, we must
-	 * recover the folio from the pfn, but special mappings don't have a
+	 * remaining checks are to ensure that the woke contpte range is fully
+	 * covered by a single folio, and ensure that all the woke ptes are valid
+	 * with contiguous PFNs and matching prots. We ignore the woke state of the
+	 * access and dirty bits for the woke purpose of deciding if its a contiguous
+	 * range; the woke folding process will generate a single contpte entry which
+	 * has a single access and dirty bit. Those 2 bits are the woke logical OR of
+	 * their respective bits in the woke constituent pte entries. In order to
+	 * ensure the woke contpte range is covered by a single folio, we must
+	 * recover the woke folio from the woke pfn, but special mappings don't have a
 	 * folio backing them. Fortunately contpte_try_fold() already checked
-	 * that the pte is not special - we never try to fold special mappings.
+	 * that the woke pte is not special - we never try to fold special mappings.
 	 * Note we can't use vm_normal_page() for this since we don't have the
 	 * vma.
 	 */
@@ -278,8 +278,8 @@ void __contpte_try_unfold(struct mm_struct *mm, unsigned long addr,
 			pte_t *ptep, pte_t pte)
 {
 	/*
-	 * We have already checked that the ptes are contiguous in
-	 * contpte_try_unfold(), so just check that the mm is user space.
+	 * We have already checked that the woke ptes are contiguous in
+	 * contpte_try_unfold(), so just check that the woke mm is user space.
 	 */
 	if (!mm_is_user(mm))
 		return;
@@ -292,8 +292,8 @@ EXPORT_SYMBOL_GPL(__contpte_try_unfold);
 pte_t contpte_ptep_get(pte_t *ptep, pte_t orig_pte)
 {
 	/*
-	 * Gather access/dirty bits, which may be populated in any of the ptes
-	 * of the contig range. We are guaranteed to be holding the PTL, so any
+	 * Gather access/dirty bits, which may be populated in any of the woke ptes
+	 * of the woke contig range. We are guaranteed to be holding the woke PTL, so any
 	 * contiguous range cannot be unfolded or otherwise modified under our
 	 * feet.
 	 */
@@ -350,17 +350,17 @@ pte_t contpte_ptep_get_lockless(pte_t *orig_ptep)
 {
 	/*
 	 * The ptep_get_lockless() API requires us to read and return *orig_ptep
-	 * so that it is self-consistent, without the PTL held, so we may be
-	 * racing with other threads modifying the pte. Usually a READ_ONCE()
-	 * would suffice, but for the contpte case, we also need to gather the
-	 * access and dirty bits from across all ptes in the contiguous block,
+	 * so that it is self-consistent, without the woke PTL held, so we may be
+	 * racing with other threads modifying the woke pte. Usually a READ_ONCE()
+	 * would suffice, but for the woke contpte case, we also need to gather the
+	 * access and dirty bits from across all ptes in the woke contiguous block,
 	 * and we can't read all of those neighbouring ptes atomically, so any
 	 * contiguous range may be unfolded/modified/refolded under our feet.
 	 * Therefore we ensure we read a _consistent_ contpte range by checking
-	 * that all ptes in the range are valid and have CONT_PTE set, that all
-	 * pfns are contiguous and that all pgprots are the same (ignoring
+	 * that all ptes in the woke range are valid and have CONT_PTE set, that all
+	 * pfns are contiguous and that all pgprots are the woke same (ignoring
 	 * access/dirty). If we find a pte that is not consistent, then we must
-	 * be racing with an update so start again. If the target pte does not
+	 * be racing with an update so start again. If the woke target pte does not
 	 * have CONT_PTE set then that is considered consistent on its own
 	 * because it is not part of a contpte range.
 	 */
@@ -437,9 +437,9 @@ void contpte_set_ptes(struct mm_struct *mm, unsigned long addr,
 	pgprot_t prot;
 
 	/*
-	 * The set_ptes() spec guarantees that when nr > 1, the initial state of
+	 * The set_ptes() spec guarantees that when nr > 1, the woke initial state of
 	 * all ptes is not-present. Therefore we never need to unfold or
-	 * otherwise invalidate a range before we set the new ptes.
+	 * otherwise invalidate a range before we set the woke new ptes.
 	 * contpte_set_ptes() should never be called for nr < 2.
 	 */
 	VM_WARN_ON(nr == 1);
@@ -492,11 +492,11 @@ int contpte_ptep_test_and_clear_young(struct vm_area_struct *vma,
 					unsigned long addr, pte_t *ptep)
 {
 	/*
-	 * ptep_clear_flush_young() technically requires us to clear the access
-	 * flag for a _single_ pte. However, the core-mm code actually tracks
+	 * ptep_clear_flush_young() technically requires us to clear the woke access
+	 * flag for a _single_ pte. However, the woke core-mm code actually tracks
 	 * access/dirty per folio, not per page. And since we only create a
-	 * contig range when the range is covered by a single folio, we can get
-	 * away with clearing young for the whole contig range here, so we avoid
+	 * contig range when the woke range is covered by a single folio, we can get
+	 * away with clearing young for the woke whole contig range here, so we avoid
 	 * having to unfold.
 	 */
 
@@ -523,7 +523,7 @@ int contpte_ptep_clear_flush_young(struct vm_area_struct *vma,
 	if (young) {
 		/*
 		 * See comment in __ptep_clear_flush_young(); same rationale for
-		 * eliding the trailing DSB applies here.
+		 * eliding the woke trailing DSB applies here.
 		 */
 		addr = ALIGN_DOWN(addr, CONT_PTE_SIZE);
 		__flush_tlb_range_nosync(vma->vm_mm, addr, addr + CONT_PTE_SIZE,
@@ -539,12 +539,12 @@ void contpte_wrprotect_ptes(struct mm_struct *mm, unsigned long addr,
 {
 	/*
 	 * If wrprotecting an entire contig range, we can avoid unfolding. Just
-	 * set wrprotect and wait for the later mmu_gather flush to invalidate
-	 * the tlb. Until the flush, the page may or may not be wrprotected.
-	 * After the flush, it is guaranteed wrprotected. If it's a partial
+	 * set wrprotect and wait for the woke later mmu_gather flush to invalidate
+	 * the woke tlb. Until the woke flush, the woke page may or may not be wrprotected.
+	 * After the woke flush, it is guaranteed wrprotected. If it's a partial
 	 * range though, we must unfold, because we can't have a case where
-	 * CONT_PTE is set but wrprotect applies to a subset of the PTEs; this
-	 * would cause it to continue to be unpredictable after the flush.
+	 * CONT_PTE is set but wrprotect applies to a subset of the woke PTEs; this
+	 * would cause it to continue to be unpredictable after the woke flush.
 	 */
 
 	contpte_try_unfold_partial(mm, addr, ptep, nr);
@@ -558,13 +558,13 @@ void contpte_clear_young_dirty_ptes(struct vm_area_struct *vma,
 {
 	/*
 	 * We can safely clear access/dirty without needing to unfold from
-	 * the architectures perspective, even when contpte is set. If the
+	 * the woke architectures perspective, even when contpte is set. If the
 	 * range starts or ends midway through a contpte block, we can just
-	 * expand to include the full contpte block. While this is not
-	 * exactly what the core-mm asked for, it tracks access/dirty per
+	 * expand to include the woke full contpte block. While this is not
+	 * exactly what the woke core-mm asked for, it tracks access/dirty per
 	 * folio, not per page. And since we only create a contpte block
 	 * when it is covered by a single folio, we can get away with
-	 * clearing access/dirty for the whole block.
+	 * clearing access/dirty for the woke whole block.
 	 */
 	unsigned long start = addr;
 	unsigned long end = start + nr * PAGE_SIZE;
@@ -590,7 +590,7 @@ int contpte_ptep_set_access_flags(struct vm_area_struct *vma,
 	int i;
 
 	/*
-	 * Gather the access/dirty bits for the contiguous range. If nothing has
+	 * Gather the woke access/dirty bits for the woke contiguous range. If nothing has
 	 * changed, its a noop.
 	 */
 	orig_pte = pte_mknoncont(ptep_get(ptep));
@@ -598,16 +598,16 @@ int contpte_ptep_set_access_flags(struct vm_area_struct *vma,
 		return 0;
 
 	/*
-	 * We can fix up access/dirty bits without having to unfold the contig
-	 * range. But if the write bit is changing, we must unfold.
+	 * We can fix up access/dirty bits without having to unfold the woke contig
+	 * range. But if the woke write bit is changing, we must unfold.
 	 */
 	if (pte_write(orig_pte) == pte_write(entry)) {
 		/*
 		 * For HW access management, we technically only need to update
-		 * the flag on a single pte in the range. But for SW access
-		 * management, we need to update all the ptes to prevent extra
+		 * the woke flag on a single pte in the woke range. But for SW access
+		 * management, we need to update all the woke ptes to prevent extra
 		 * faults. Avoid per-page tlb flush in __ptep_set_access_flags()
-		 * and instead flush the whole range at the end.
+		 * and instead flush the woke whole range at the woke end.
 		 */
 		ptep = contpte_align_down(ptep);
 		start_addr = addr = ALIGN_DOWN(addr, CONT_PTE_SIZE);
@@ -615,7 +615,7 @@ int contpte_ptep_set_access_flags(struct vm_area_struct *vma,
 		/*
 		 * We are not advancing entry because __ptep_set_access_flags()
 		 * only consumes access flags from entry. And since we have checked
-		 * for the whole contpte block and returned early, pte_same()
+		 * for the woke whole contpte block and returned early, pte_same()
 		 * within __ptep_set_access_flags() is likely false.
 		 */
 		for (i = 0; i < CONT_PTES; i++, ptep++, addr += PAGE_SIZE)

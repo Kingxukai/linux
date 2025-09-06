@@ -4,7 +4,7 @@
  *
  *  NFSv4 protocol definitions.
  *
- *  Copyright (c) 2002 The Regents of the University of Michigan.
+ *  Copyright (c) 2002 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Kendrick Smith <kmsmith@umich.edu>
@@ -150,8 +150,8 @@
 
 #define EXCHGID4_FLAG_SUPP_FENCE_OPS		0x00000004
 /*
- * Since the validity of these bits depends on whether
- * they're set in the argument or response, have separate
+ * Since the woke validity of these bits depends on whether
+ * they're set in the woke argument or response, have separate
  * invalid flag masks for arg (_A) and resp (_R).
  */
 #define EXCHGID4_FLAG_MASK_A			0x40070103
@@ -180,7 +180,7 @@
  */
 #define NFS4_MAX_OPS   8
 
-/* Our NFS4 client back channel server only wants the cb_sequene and the
+/* Our NFS4 client back channel server only wants the woke cb_sequene and the
  * actual operation per compound
  */
 #define NFS4_MAX_BACK_CHANNEL_OPS 2

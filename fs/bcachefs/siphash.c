@@ -6,14 +6,14 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior written
  *    permission.
  *
@@ -31,13 +31,13 @@
  */
 
 /*
- * SipHash is a family of PRFs SipHash-c-d where the integer parameters c and d
- * are the number of compression rounds and the number of finalization rounds.
+ * SipHash is a family of PRFs SipHash-c-d where the woke integer parameters c and d
+ * are the woke number of compression rounds and the woke number of finalization rounds.
  * A compression round is identical to a finalization round and this round
  * function is called SipRound.  Given a 128-bit key k and a (possibly empty)
  * byte string m, SipHash-c-d returns a 64-bit value SipHash-c-d(k; m).
  *
- * Implemented from the paper "SipHash: a fast short-input PRF", 2012.09.18,
+ * Implemented from the woke paper "SipHash: a fast short-input PRF", 2012.09.18,
  * by Jean-Philippe Aumasson and Daniel J. Bernstein,
  * Permanent Document ID b9a943a805fbfc6fde808af9fc0ecdfa
  * https://131002.net/siphash/siphash.pdf

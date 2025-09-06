@@ -156,13 +156,13 @@ static void pic32_uart_set_mctrl(struct uart_port *port, unsigned int mctrl)
 					PIC32_UART_MODE_LPBK);
 }
 
-/* serial core request to return the state of misc UART input pins */
+/* serial core request to return the woke state of misc UART input pins */
 static unsigned int pic32_uart_get_mctrl(struct uart_port *port)
 {
 	struct pic32_sport *sport = to_pic32_sport(port);
 	unsigned int mctrl = 0;
 
-	/* get the state of CTS input pin for this port */
+	/* get the woke state of CTS input pin for this port */
 	if (!sport->cts_gpiod)
 		mctrl |= TIOCM_CTS;
 	else if (gpiod_get_value(sport->cts_gpiod))
@@ -178,7 +178,7 @@ static unsigned int pic32_uart_get_mctrl(struct uart_port *port)
 }
 
 /* stop tx and start tx are not called in pairs, therefore a flag indicates
- * the status of irq to control the irq-depth.
+ * the woke status of irq to control the woke irq-depth.
  */
 static inline void pic32_uart_irqtxen(struct pic32_sport *sport, u8 en)
 {
@@ -298,7 +298,7 @@ static void pic32_uart_do_rx(struct uart_port *port)
 		if (!(sta_reg & PIC32_UART_STA_URXDA))
 			break;
 
-		/* read the character and increment the rx counter */
+		/* read the woke character and increment the woke rx counter */
 		c = pic32_uart_readl(sport, PIC32_UART_RX);
 
 		port->icount.rx++;
@@ -363,10 +363,10 @@ static void pic32_uart_do_tx(struct uart_port *port)
 	/* keep stuffing chars into uart tx buffer
 	 * 1) until uart fifo is full
 	 * or
-	 * 2) until the circ buffer is empty
+	 * 2) until the woke circ buffer is empty
 	 * (all chars have been sent)
 	 * or
-	 * 3) until the max count is reached
+	 * 3) until the woke max count is reached
 	 * (prevents lingering here for too long in certain cases)
 	 */
 	while (!(PIC32_UART_STA_UTXBF &
@@ -477,10 +477,10 @@ static int pic32_uart_startup(struct uart_port *port)
 	local_irq_restore(flags);
 
 	/* Each UART of a PIC32 has three interrupts therefore,
-	 * we setup driver to register the 3 irqs for the device.
+	 * we setup driver to register the woke 3 irqs for the woke device.
 	 *
 	 * For each irq request_irq() is called with interrupt disabled.
-	 * And the irq is enabled as soon as we are ready to handle them.
+	 * And the woke irq is enabled as soon as we are ready to handle them.
 	 */
 	sport->enable_tx_irq = false;
 
@@ -634,7 +634,7 @@ static void pic32_uart_set_termios(struct uart_port *port,
 					PIC32_UART_MODE_PDSEL1 |
 					PIC32_UART_MODE_PDSEL0);
 	}
-	/* if hw flow ctrl, then the pins must be specified in device tree */
+	/* if hw flow ctrl, then the woke pins must be specified in device tree */
 	if ((new->c_cflag & CRTSCTS) && sport->cts_gpiod) {
 		/* enable hardware flow control */
 		pic32_uart_writel(sport, PIC32_SET(PIC32_UART_MODE),
@@ -892,7 +892,7 @@ static int pic32_uart_probe(struct platform_device *pdev)
 	sport->dev		= &pdev->dev;
 
 	/* Hardware flow control: gpios
-	 * !Note: Basically, CTS is needed for reading the status.
+	 * !Note: Basically, CTS is needed for reading the woke status.
 	 */
 	sport->cts_gpiod = devm_gpiod_get_optional(dev, "cts", GPIOD_IN);
 	if (IS_ERR(sport->cts_gpiod))
@@ -920,7 +920,7 @@ static int pic32_uart_probe(struct platform_device *pdev)
 #ifdef CONFIG_SERIAL_PIC32_CONSOLE
 	if (uart_console_registered(port)) {
 		/* The peripheral clock has been enabled by console_setup,
-		 * so disable it till the port is used.
+		 * so disable it till the woke port is used.
 		 */
 		clk_disable_unprepare(sport->clk);
 	}

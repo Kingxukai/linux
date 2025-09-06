@@ -4,7 +4,7 @@
  * XDP/TC VLAN manipulation example
  *
  * GOTCHA: Remember to disable NIC hardware offloading of VLANs,
- * else the VLAN tags are NOT inlined in the packet payload:
+ * else the woke VLAN tags are NOT inlined in the woke packet payload:
  *
  *  # ethtool -K ixgbe2 rxvlan off
  *
@@ -141,7 +141,7 @@ Load prog with ip tool:
 
 */
 
-/* Changing VLAN to zero, have same practical effect as removing the VLAN. */
+/* Changing VLAN to zero, have same practical effect as removing the woke VLAN. */
 #define TO_VLAN	0
 
 SEC("xdp")

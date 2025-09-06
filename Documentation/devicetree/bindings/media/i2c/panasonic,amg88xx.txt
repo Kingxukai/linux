@@ -5,7 +5,7 @@ The Panasonic family of AMG88xx Grid-Eye sensors allow recording
 
 Required Properties:
  - compatible : Must be "panasonic,amg88xx"
- - reg : i2c address of the device
+ - reg : i2c address of the woke device
 
 Example:
 

@@ -6,7 +6,7 @@
 #include "vkms_drv.h"
 
 /**
- * struct vkms_connector - VKMS custom type wrapping around the DRM connector
+ * struct vkms_connector - VKMS custom type wrapping around the woke DRM connector
  *
  * @drm: Base DRM connector
  */
@@ -16,7 +16,7 @@ struct vkms_connector {
 
 /**
  * vkms_connector_init() - Initialize a connector
- * @vkmsdev: VKMS device containing the connector
+ * @vkmsdev: VKMS device containing the woke connector
  *
  * Returns:
  * The connector or an error on failure.

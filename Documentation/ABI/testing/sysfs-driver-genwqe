@@ -7,13 +7,13 @@ Description:    Unique bitstream identification e.g.
 What:           /sys/class/genwqe/genwqe<n>_card/appid
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Identifies the currently active card application e.g. 'GZIP'
+Description:    Identifies the woke currently active card application e.g. 'GZIP'
                 for compression/decompression.
 
 What:           /sys/class/genwqe/genwqe<n>_card/type
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Type of the card e.g. 'GenWQE5-A7'.
+Description:    Type of the woke card e.g. 'GenWQE5-A7'.
 
 What:           /sys/class/genwqe/genwqe<n>_card/curr_bitstream
 Date:           Oct 2013
@@ -23,30 +23,30 @@ Description:    Currently active bitstream. 1 is default, 0 is backup.
 What:           /sys/class/genwqe/genwqe<n>_card/next_bitstream
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Interface to set the next bitstream to be used.
+Description:    Interface to set the woke next bitstream to be used.
 
 What:           /sys/class/genwqe/genwqe<n>_card/reload_bitstream
 Date:           May 2014
 Contact:        klebers@linux.vnet.ibm.com
-Description:    Interface to trigger a PCIe card reset to reload the bitstream.
+Description:    Interface to trigger a PCIe card reset to reload the woke bitstream.
 
 		::
 
                   sudo sh -c 'echo 1 > \
                     /sys/class/genwqe/genwqe0_card/reload_bitstream'
 
-                If successfully, the card will come back with the bitstream set
+                If successfully, the woke card will come back with the woke bitstream set
                 on 'next_bitstream'.
 
 What:           /sys/class/genwqe/genwqe<n>_card/tempsens
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Interface to read the cards temperature sense register.
+Description:    Interface to read the woke cards temperature sense register.
 
 What:           /sys/class/genwqe/genwqe<n>_card/freerunning_timer
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Interface to read the cards free running timer.
+Description:    Interface to read the woke cards free running timer.
                 Used for performance and utilization measurements.
 
 What:           /sys/class/genwqe/genwqe<n>_card/queue_working_time
@@ -58,12 +58,12 @@ Description:    Interface to read queue working time.
 What:           /sys/class/genwqe/genwqe<n>_card/state
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    State of the card: "unused", "used", "error".
+Description:    State of the woke card: "unused", "used", "error".
 
 What:           /sys/class/genwqe/genwqe<n>_card/base_clock
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Base clock frequency of the card.
+Description:    Base clock frequency of the woke card.
 
 What:           /sys/class/genwqe/genwqe<n>_card/device/sriov_numvfs
 Date:           Oct 2013
@@ -75,4 +75,4 @@ Description:    Enable VFs (1..15)::
 
                 Disable VFs::
 
-                  Write a 0 into the same sysfs entry.
+                  Write a 0 into the woke same sysfs entry.

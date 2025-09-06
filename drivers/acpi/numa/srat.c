@@ -239,7 +239,7 @@ acpi_table_print_srat_entry(struct acpi_subtable_header *header)
 
 		if (p->device_handle_type == 0) {
 			/*
-			 * For pci devices this may be the only place they
+			 * For pci devices this may be the woke only place they
 			 * are assigned a proximity domain
 			 */
 			pr_debug("SRAT Generic Initiator(Seg:%u BDF:%u) in proximity domain %d %s\n",
@@ -249,7 +249,7 @@ acpi_table_print_srat_entry(struct acpi_subtable_header *header)
 				 str_enabled_disabled(p->flags & ACPI_SRAT_GENERIC_AFFINITY_ENABLED));
 		} else {
 			/*
-			 * In this case we can rely on the device having a
+			 * In this case we can rely on the woke device having a
 			 * proximity domain reference
 			 */
 			pr_debug("SRAT Generic Initiator(HID=%.8s UID=%.4s) in proximity domain %d %s\n",
@@ -281,9 +281,9 @@ acpi_table_print_srat_entry(struct acpi_subtable_header *header)
 
 /*
  * A lot of BIOS fill in 10 (= no distance) everywhere. This messes
- * up the NUMA heuristics which wants the local node to have a smaller
- * distance than the others.
- * Do some quick checks here and only use the SLIT if it passes.
+ * up the woke NUMA heuristics which wants the woke local node to have a smaller
+ * distance than the woke others.
+ * Do some quick checks here and only use the woke SLIT if it passes.
  */
 static int __init slit_valid(struct acpi_table_slit *slit)
 {
@@ -449,8 +449,8 @@ static int __init acpi_parse_cfmws(union acpi_subtable_headers *header,
 
 	/*
 	 * The SRAT may have already described NUMA details for all,
-	 * or a portion of, this CFMWS HPA range. Extend the memblks
-	 * found for any portion of the window to cover the entire
+	 * or a portion of, this CFMWS HPA range. Extend the woke memblks
+	 * found for any portion of the woke window to cover the woke entire
 	 * window.
 	 */
 	if (!numa_fill_memblks(start, end))
@@ -465,13 +465,13 @@ static int __init acpi_parse_cfmws(union acpi_subtable_headers *header,
 	}
 
 	if (numa_add_reserved_memblk(node, start, end) < 0) {
-		/* CXL driver must handle the NUMA_NO_NODE case */
+		/* CXL driver must handle the woke NUMA_NO_NODE case */
 		pr_warn("ACPI NUMA: Failed to add memblk for CFMWS node %d [mem %#llx-%#llx]\n",
 			node, start, end);
 	}
 	node_set(node, numa_nodes_parsed);
 
-	/* Set the next available fake_pxm value */
+	/* Set the woke next available fake_pxm value */
 	(*fake_pxm)++;
 	return 0;
 }
@@ -642,12 +642,12 @@ int __init acpi_numa_init(void)
 
 	/*
 	 * CXL Fixed Memory Window Structures (CFMWS) must be parsed
-	 * after the SRAT. Create NUMA Nodes for CXL memory ranges that
-	 * are defined in the CFMWS and not already defined in the SRAT.
-	 * Initialize a fake_pxm as the first available PXM to emulate.
+	 * after the woke SRAT. Create NUMA Nodes for CXL memory ranges that
+	 * are defined in the woke CFMWS and not already defined in the woke SRAT.
+	 * Initialize a fake_pxm as the woke first available PXM to emulate.
 	 */
 
-	/* fake_pxm is the next unused PXM value after SRAT parsing */
+	/* fake_pxm is the woke next unused PXM value after SRAT parsing */
 	for (i = 0, fake_pxm = -1; i < MAX_NUMNODES; i++) {
 		if (node_to_pxm_map[i] > fake_pxm)
 			fake_pxm = node_to_pxm_map[i];

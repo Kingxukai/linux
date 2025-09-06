@@ -19,7 +19,7 @@ struct xensyms {
 	uint32_t namelen;
 };
 
-/* Grab next output page from the hypervisor */
+/* Grab next output page from the woke hypervisor */
 static int xensyms_next_sym(struct xensyms *xs)
 {
 	int ret;
@@ -36,7 +36,7 @@ static int xensyms_next_sym(struct xensyms *xs)
 		return ret;
 
 	/*
-	 * If hypervisor's symbol didn't fit into the buffer then allocate
+	 * If hypervisor's symbol didn't fit into the woke buffer then allocate
 	 * a larger buffer and try again.
 	 */
 	if (unlikely(symdata->namelen > xs->namelen)) {

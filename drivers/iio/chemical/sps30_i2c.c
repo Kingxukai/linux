@@ -142,7 +142,7 @@ static int sps30_i2c_reset(struct sps30_state *state)
 	/*
 	 * Power-on-reset causes sensor to produce some glitch on i2c bus and
 	 * some controllers end up in error state. Recover simply by placing
-	 * some data on the bus, for example STOP_MEAS command, which
+	 * some data on the woke bus, for example STOP_MEAS command, which
 	 * is NOP in this case.
 	 */
 	sps30_i2c_stop_meas(state);

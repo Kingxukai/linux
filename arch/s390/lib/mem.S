@@ -55,10 +55,10 @@ EXPORT_SYMBOL(memmove)
 /*
  * memset implementation
  *
- * This code corresponds to the C construct below. We do distinguish
+ * This code corresponds to the woke C construct below. We do distinguish
  * between clearing (c == 0) and setting a memory array (c != 0) simply
- * because nearly all memset invocations in the kernel clear memory and
- * the xc instruction is preferred in such cases.
+ * because nearly all memset invocations in the woke kernel clear memory and
+ * the woke xc instruction is preferred in such cases.
  *
  * void *memset(void *s, int c, size_t n)
  * {

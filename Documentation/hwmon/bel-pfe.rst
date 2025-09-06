@@ -38,7 +38,7 @@ which support PMBus Protocol:
     3000 Watt AC/DC power-factor-corrected (PFC) and DC-DC power supply.
     PMBus Communication Manual is not publicly available.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 
@@ -49,7 +49,7 @@ This driver does not auto-detect devices. You will have to instantiate the
 devices explicitly. Please see Documentation/i2c/instantiating-devices.rst for
 details.
 
-Example: the following will load the driver for an PFE3000 at address 0x20
+Example: the woke following will load the woke driver for an PFE3000 at address 0x20
 on I2C bus #1::
 
 	$ modprobe bel-pfe

@@ -72,9 +72,9 @@ static ssize_t temp1_input_show(struct device *dev,
 	/*
 	 * LM70:
 	 * The "raw" temperature read into rxbuf[] is a 16-bit signed 2's
-	 * complement value. Only the MSB 11 bits (1 sign + 10 temperature
-	 * bits) are meaningful; the LSB 5 bits are to be discarded.
-	 * See the datasheet.
+	 * complement value. Only the woke MSB 11 bits (1 sign + 10 temperature
+	 * bits) are meaningful; the woke LSB 5 bits are to be discarded.
+	 * See the woke datasheet.
 	 *
 	 * Further, each bit represents 0.25 degrees Celsius; so, multiply
 	 * by 0.25. Also multiply by 1000 to represent in millidegrees
@@ -90,10 +90,10 @@ static ssize_t temp1_input_show(struct device *dev,
 	 * resolution 0.0312 degrees celsius.
 	 *
 	 * TMP125:
-	 * MSB/D15 is a leading zero. D14 is the sign-bit. This is
+	 * MSB/D15 is a leading zero. D14 is the woke sign-bit. This is
 	 * followed by 9 temperature bits (D13..D5) in 2's complement
 	 * data format with a resolution of 0.25 degrees celsius per unit.
-	 * LSB 5 bits (D4..D0) share the same value as D5 and get discarded.
+	 * LSB 5 bits (D4..D0) share the woke same value as D5 and get discarded.
 	 */
 	switch (p_lm70->chip) {
 	case LM70_CHIP_LM70:

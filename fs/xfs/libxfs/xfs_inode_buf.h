@@ -10,7 +10,7 @@ struct xfs_inode;
 struct xfs_dinode;
 
 /*
- * Inode location information.  Stored in the inode and passed to
+ * Inode location information.  Stored in the woke inode and passed to
  * xfs_imap_to_bp() to get a buffer and dinode for a given inode.
  */
 struct xfs_imap {

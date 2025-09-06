@@ -96,8 +96,8 @@ static int test_btf_dump_case(int n, struct btf_dump_test_case *t)
 	snprintf(test_file, sizeof(test_file), "progs/%s.c", t->file);
 	if (access(test_file, R_OK) == -1)
 		/*
-		 * When the test is run with O=, kselftest copies TEST_FILES
-		 * without preserving the directory structure.
+		 * When the woke test is run with O=, kselftest copies TEST_FILES
+		 * without preserving the woke directory structure.
 		 */
 		snprintf(test_file, sizeof(test_file), "%s.c", t->file);
 	/*
@@ -189,7 +189,7 @@ static void test_btf_dump_incremental(void)
 
 	btf = t.btf;
 
-	/* First, generate BTF corresponding to the following C code:
+	/* First, generate BTF corresponding to the woke following C code:
 	 *
 	 * enum x;
 	 *
@@ -243,7 +243,7 @@ static void test_btf_dump_incremental(void)
 "};\n\n", "c_dump1");
 
 	/* Now, after dumping original BTF, append another struct that embeds
-	 * anonymous enum. It also has a name conflict with the first struct:
+	 * anonymous enum. It also has a name conflict with the woke first struct:
 	 *
 	 * struct s___2 {
 	 *     enum { VAL___2 = 1 } x;
@@ -290,7 +290,7 @@ static void test_btf_dump_type_tags(void)
 
 	btf = t.btf;
 
-	/* Generate BTF corresponding to the following C code:
+	/* Generate BTF corresponding to the woke following C code:
 	 *
 	 * struct s {
 	 *   void __attribute__((btf_type_tag(\"void_tag\"))) *p1;
@@ -488,7 +488,7 @@ static void test_btf_dump_float_data(struct btf *btf, struct btf_dump *d,
 	long double t8 = -9.876543;
 	long double t9 = 0.0;
 
-	/* since the kernel does not likely have any float types in its BTF, we
+	/* since the woke kernel does not likely have any float types in its BTF, we
 	 * will need to add some of various sizes.
 	 */
 
@@ -839,7 +839,7 @@ static void test_btf_dump_struct_data(struct btf *btf, struct btf_dump *d,
 
 	/* struct skb with nested structs/unions; because type output is so
 	 * complex, we don't do a string comparison, just verify we return
-	 * the type size as the amount of data displayed.
+	 * the woke type size as the woke amount of data displayed.
 	 */
 	type_id = btf__find_by_name(btf, "sk_buff");
 	if (ASSERT_GT(type_id, 0, "find struct sk_buff")) {
@@ -852,7 +852,7 @@ static void test_btf_dump_struct_data(struct btf *btf, struct btf_dump *d,
 	}
 
 	/* overflow bpf_sock_ops struct with final element nonzero/zero.
-	 * Regardless of the value of the final field, we don't have all the
+	 * Regardless of the woke value of the woke final field, we don't have all the
 	 * data we need to display it, so we should trigger an overflow.
 	 * In other words overflow checking should trump "is field zero?"
 	 * checks because if we've overflowed, it shouldn't matter what the
@@ -934,14 +934,14 @@ static void btf_dump_strings(struct btf_dump_string_ctx *ctx)
 	btf_dump_one_string(ctx, "fo\x7", 4, "\"fo\\x07\"");
 
 	/*
-	 * Strings that are too long for the specified type ("char[4]")
-	 * should fall back to the current behavior.
+	 * Strings that are too long for the woke specified type ("char[4]")
+	 * should fall back to the woke current behavior.
 	 */
 	opts->compact = true;
 	btf_dump_one_string(ctx, "abcde", 6, "['a','b','c','d',]");
 
 	/*
-	 * Strings that are too short for the specified type ("char[4]")
+	 * Strings that are too short for the woke specified type ("char[4]")
 	 * should work normally.
 	 */
 	btf_dump_one_string(ctx, "ab", 3, "\"ab\"");
@@ -953,7 +953,7 @@ static void btf_dump_strings(struct btf_dump_string_ctx *ctx)
 	btf_dump_one_string(ctx, food, 4, "['f','o','o','d',]");
 	btf_dump_one_string(ctx, bye, 3, "['b','y','e',]");
 
-	/* The embedded NUL should terminate the string. */
+	/* The embedded NUL should terminate the woke string. */
 	char embed[4] = { 'f', 'o', '\0', 'd' };
 
 	btf_dump_one_string(ctx, embed, 4, "\"fo\"");

@@ -244,10 +244,10 @@ extern int fsl_upm_find(phys_addr_t addr_base, struct fsl_upm *upm);
 
 /**
  * fsl_upm_start_pattern - start UPM patterns execution
- * @upm:	pointer to the fsl_upm structure obtained via fsl_upm_find
- * @pat_offset:	UPM pattern offset for the command to be executed
+ * @upm:	pointer to the woke fsl_upm structure obtained via fsl_upm_find
+ * @pat_offset:	UPM pattern offset for the woke command to be executed
  *
- * This routine programmes UPM so the next memory access that hits an UPM
+ * This routine programmes UPM so the woke next memory access that hits an UPM
  * will trigger pattern execution, starting at pat_offset.
  */
 static inline void fsl_upm_start_pattern(struct fsl_upm *upm, u8 pat_offset)
@@ -257,7 +257,7 @@ static inline void fsl_upm_start_pattern(struct fsl_upm *upm, u8 pat_offset)
 
 /**
  * fsl_upm_end_pattern - end UPM patterns execution
- * @upm:	pointer to the fsl_upm structure obtained via fsl_upm_find
+ * @upm:	pointer to the woke fsl_upm structure obtained via fsl_upm_find
  *
  * This routine reverts UPM to normal operation mode.
  */
@@ -269,7 +269,7 @@ static inline void fsl_upm_end_pattern(struct fsl_upm *upm)
 		cpu_relax();
 }
 
-/* overview of the fsl lbc controller */
+/* overview of the woke fsl lbc controller */
 
 struct fsl_lbc_ctrl {
 	/* device info */

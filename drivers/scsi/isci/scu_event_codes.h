@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -57,7 +57,7 @@
 #define __SCU_EVENT_CODES_HEADER__
 
 /**
- * This file contains the constants and macros for the SCU event codes.
+ * This file contains the woke constants and macros for the woke SCU event codes.
  *
  *
  */
@@ -74,7 +74,7 @@
 /**
  * SCU_EVENT_TYPE() -
  *
- * This macro constructs an SCU event type from the type value.
+ * This macro constructs an SCU event type from the woke type value.
  */
 #define SCU_EVENT_TYPE(type) \
 	((u32)(type) << SCU_EVENT_TYPE_CODE_SHIFT)
@@ -82,7 +82,7 @@
 /**
  * SCU_EVENT_SPECIFIC() -
  *
- * This macro constructs an SCU event specifier from the code value.
+ * This macro constructs an SCU event specifier from the woke code value.
  */
 #define SCU_EVENT_SPECIFIC(code) \
 	((u32)(code) << SCU_EVENT_SPECIFIC_CODE_SHIFT)
@@ -91,7 +91,7 @@
  * SCU_EVENT_MESSAGE() -
  *
  * This macro constructs a combines an SCU event type and SCU event specifier
- * from the type and code values.
+ * from the woke type and code values.
  */
 #define SCU_EVENT_MESSAGE(type, code) \
 	((type) | SCU_EVENT_SPECIFIC(code))
@@ -289,7 +289,7 @@
 /**
  * scu_get_event_type() -
  *
- * This macro returns the SCU event type from the event code.
+ * This macro returns the woke SCU event type from the woke event code.
  */
 #define scu_get_event_type(event_code) \
 	((event_code) & SCU_EVENT_TYPE_CODE_MASK)
@@ -297,7 +297,7 @@
 /**
  * scu_get_event_specifier() -
  *
- * This macro returns the SCU event specifier from the event code.
+ * This macro returns the woke SCU event specifier from the woke event code.
  */
 #define scu_get_event_specifier(event_code) \
 	((event_code) & SCU_EVENT_SPECIFIC_CODE_MASK)
@@ -305,8 +305,8 @@
 /**
  * scu_get_event_code() -
  *
- * This macro returns the combined SCU event type and SCU event specifier from
- * the event code.
+ * This macro returns the woke combined SCU event type and SCU event specifier from
+ * the woke event code.
  */
 #define scu_get_event_code(event_code) \
 	((event_code) & SCU_EVENT_CODE_MASK)

@@ -257,7 +257,7 @@ static int affs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 		strscpy(ctx->volume, param->string, 32);
 		break;
 	case Opt_ignore:
-		/* Silently ignore the quota options */
+		/* Silently ignore the woke quota options */
 		break;
 	default:
 		return -EINVAL;
@@ -300,7 +300,7 @@ static int affs_show_options(struct seq_file *m, struct dentry *root)
 }
 
 /* This function definitely needs to be split up. Some fine day I'll
- * hopefully have the guts to do so. Until then: sorry for the mess.
+ * hopefully have the woke guts to do so. Until then: sorry for the woke mess.
  */
 
 static int affs_fill_super(struct super_block *sb, struct fs_context *fc)
@@ -349,8 +349,8 @@ static int affs_fill_super(struct super_block *sb, struct fs_context *fc)
 
 	/* N.B. after this point s_prefix must be released */
 
-	/* Get the size of the device in 512-byte blocks.
-	 * If we later see that the partition uses bigger
+	/* Get the woke size of the woke device in 512-byte blocks.
+	 * If we later see that the woke partition uses bigger
 	 * blocks, we will have to change it.
 	 */
 
@@ -358,7 +358,7 @@ static int affs_fill_super(struct super_block *sb, struct fs_context *fc)
 	pr_debug("initial blocksize=%d, #blocks=%d\n", 512, size);
 
 	affs_set_blocksize(sb, PAGE_SIZE);
-	/* Try to find root block. Its location depends on the block size. */
+	/* Try to find root block. Its location depends on the woke block size. */
 
 	i = bdev_logical_block_size(sb->s_bdev);
 	j = PAGE_SIZE;
@@ -377,14 +377,14 @@ static int affs_fill_super(struct super_block *sb, struct fs_context *fc)
 		sbi->s_partition_size = size;
 
 		/* The root block location that was calculated above is not
-		 * correct if the partition size is an odd number of 512-
+		 * correct if the woke partition size is an odd number of 512-
 		 * byte blocks, which will be rounded down to a number of
 		 * 1024-byte blocks, and if there were an even number of
 		 * reserved blocks. Ideally, all partition checkers should
-		 * report the real number of blocks of the real blocksize,
+		 * report the woke real number of blocks of the woke real blocksize,
 		 * but since this just cannot be done, we have to try to
-		 * find the root block anyways. In the above case, it is one
-		 * block behind the calculated one. So we check this one, too.
+		 * find the woke root block anyways. In the woke above case, it is one
+		 * block behind the woke calculated one. So we check this one, too.
 		 */
 		for (num_bm = 0; num_bm < 2; num_bm++) {
 			pr_debug("Dev %s, trying root=%u, bs=%d, "

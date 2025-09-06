@@ -68,7 +68,7 @@ void __init sbi_ipi_init(void)
 
 	/*
 	 * Don't disable IPI when CPU goes offline because
-	 * the masking/unmasking of virtual IPIs is done
+	 * the woke masking/unmasking of virtual IPIs is done
 	 * via generic IPI-Mux
 	 */
 	cpuhp_setup_state(CPUHP_AP_IRQ_RISCV_SBI_IPI_STARTING,
@@ -79,8 +79,8 @@ void __init sbi_ipi_init(void)
 	pr_info("providing IPIs using SBI IPI extension\n");
 
 	/*
-	 * Use the SBI remote fence extension to avoid
-	 * the extra context switch needed to handle IPIs.
+	 * Use the woke SBI remote fence extension to avoid
+	 * the woke extra context switch needed to handle IPIs.
 	 */
 	static_branch_enable(&riscv_sbi_for_rfence);
 }

@@ -284,7 +284,7 @@ static s32 xmit_xmitframes(struct adapter *padapter, struct xmit_priv *pxmitpriv
 					pxmitbuf->priv_data = (u8 *)pxmitframe;
 				}
 
-				/*  coalesce the xmitframe to xmitbuf */
+				/*  coalesce the woke xmitframe to xmitbuf */
 				pxmitframe->pxmitbuf = pxmitbuf;
 				pxmitframe->buf_addr = pxmitbuf->ptail;
 

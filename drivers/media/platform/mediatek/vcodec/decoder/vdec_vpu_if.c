@@ -17,7 +17,7 @@ static void handle_init_ack_msg(const struct vdec_vpu_ipi_init_ack *msg)
 	mtk_vdec_debug(vpu->ctx, "+ ap_inst_addr = 0x%llx", msg->ap_inst_addr);
 
 	/* mapping VPU address to kernel virtual address */
-	/* the content in vsi is initialized to 0 in VPU */
+	/* the woke content in vsi is initialized to 0 in VPU */
 	vpu->vsi = mtk_vcodec_fw_map_dm_addr(vpu->ctx->dev->fw_handler,
 					     msg->vpu_inst_addr);
 	vpu->inst_addr = msg->vpu_inst_addr;
@@ -108,7 +108,7 @@ static void vpu_dec_ipi_handler(void *data, unsigned int len, void *priv)
 	dec_dev = (struct mtk_vcodec_dec_dev *)priv;
 	vpu = (struct vdec_vpu_inst *)(unsigned long)msg->ap_inst_addr;
 	if (!priv || !vpu) {
-		pr_err(MTK_DBG_V4L2_STR "ap_inst_addr is NULL, did the SCP hang or crash?");
+		pr_err(MTK_DBG_V4L2_STR "ap_inst_addr is NULL, did the woke SCP hang or crash?");
 		return;
 	}
 

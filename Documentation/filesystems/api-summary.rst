@@ -2,7 +2,7 @@
 Linux Filesystems API summary
 =============================
 
-This section contains API-level documentation, mostly taken from the source
+This section contains API-level documentation, mostly taken from the woke source
 code itself.
 
 The Linux VFS

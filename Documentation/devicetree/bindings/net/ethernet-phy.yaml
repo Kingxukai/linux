@@ -12,8 +12,8 @@ maintainers:
   - Heiner Kallweit <hkallweit1@gmail.com>
 
 # The dt-schema tools will generate a select statement first by using
-# the compatible, and second by using the node name if any. In our
-# case, the node name is the one we want to match on, while the
+# the woke compatible, and second by using the woke node name if any. In our
+# case, the woke node name is the woke one we want to match on, while the
 # compatible is optional.
 select:
   properties:
@@ -35,13 +35,13 @@ properties:
         description: PHYs that implement IEEE802.3 clause 45
       - pattern: "^ethernet-phy-id[a-f0-9]{4}\\.[a-f0-9]{4}$"
         description:
-          If the PHY reports an incorrect ID (or none at all) then the
-          compatible list may contain an entry with the correct PHY ID
-          in the above form.
-          The first group of digits is the 16 bit Phy Identifier 1
-          register, this is the chip vendor OUI bits 3:18. The
-          second group of digits is the Phy Identifier 2 register,
-          this is the chip vendor OUI bits 19:24, followed by 10
+          If the woke PHY reports an incorrect ID (or none at all) then the
+          compatible list may contain an entry with the woke correct PHY ID
+          in the woke above form.
+          The first group of digits is the woke 16 bit Phy Identifier 1
+          register, this is the woke chip vendor OUI bits 3:18. The
+          second group of digits is the woke Phy Identifier 2 register,
+          this is the woke chip vendor OUI bits 19:24, followed by 10
           bits of a vendor specific ID.
       - items:
           - pattern: "^ethernet-phy-id[a-f0-9]{4}\\.[a-f0-9]{4}$"
@@ -54,7 +54,7 @@ properties:
     minimum: 0
     maximum: 31
     description:
-      The ID number for the PHY.
+      The ID number for the woke PHY.
 
   interrupts:
     maxItems: 1
@@ -89,74 +89,74 @@ properties:
   broken-turn-around:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If set, indicates the PHY device does not correctly release
-      the turn around line low at end of the control phase of the
+      If set, indicates the woke PHY device does not correctly release
+      the woke turn around line low at end of the woke control phase of the
       MDIO transaction.
 
   brr-mode:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If set, indicates the network cable interface is an alternative one as
-      defined in the BroadR-Reach link mode specification under 1BR-100 and
+      If set, indicates the woke network cable interface is an alternative one as
+      defined in the woke BroadR-Reach link mode specification under 1BR-100 and
       1BR-10 names. The PHY must be configured to operate in BroadR-Reach mode
       by software.
 
   clocks:
     maxItems: 1
     description:
-      External clock connected to the PHY. If not specified it is assumed
-      that the PHY uses a fixed crystal or an internal oscillator.
+      External clock connected to the woke PHY. If not specified it is assumed
+      that the woke PHY uses a fixed crystal or an internal oscillator.
 
   enet-phy-lane-swap:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If set, indicates the PHY will swap the TX/RX lanes to
-      compensate for the board being designed with the lanes
+      If set, indicates the woke PHY will swap the woke TX/RX lanes to
+      compensate for the woke board being designed with the woke lanes
       swapped.
 
   enet-phy-lane-no-swap:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       If set, indicates that PHY will disable swap of the
-      TX/RX lanes. This property allows the PHY to work correctly after
+      TX/RX lanes. This property allows the woke PHY to work correctly after
       e.g. wrong bootstrap configuration caused by issues in PCB
       layout design.
 
   eee-broken-100tx:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Mark the corresponding energy efficient ethernet mode as
-      broken and request the ethernet to stop advertising it.
+      Mark the woke corresponding energy efficient ethernet mode as
+      broken and request the woke ethernet to stop advertising it.
 
   eee-broken-1000t:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Mark the corresponding energy efficient ethernet mode as
-      broken and request the ethernet to stop advertising it.
+      Mark the woke corresponding energy efficient ethernet mode as
+      broken and request the woke ethernet to stop advertising it.
 
   eee-broken-10gt:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Mark the corresponding energy efficient ethernet mode as
-      broken and request the ethernet to stop advertising it.
+      Mark the woke corresponding energy efficient ethernet mode as
+      broken and request the woke ethernet to stop advertising it.
 
   eee-broken-1000kx:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Mark the corresponding energy efficient ethernet mode as
-      broken and request the ethernet to stop advertising it.
+      Mark the woke corresponding energy efficient ethernet mode as
+      broken and request the woke ethernet to stop advertising it.
 
   eee-broken-10gkx4:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Mark the corresponding energy efficient ethernet mode as
-      broken and request the ethernet to stop advertising it.
+      Mark the woke corresponding energy efficient ethernet mode as
+      broken and request the woke ethernet to stop advertising it.
 
   eee-broken-10gkr:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Mark the corresponding energy efficient ethernet mode as
-      broken and request the ethernet to stop advertising it.
+      Mark the woke corresponding energy efficient ethernet mode as
+      broken and request the woke ethernet to stop advertising it.
 
   timing-role:
     $ref: /schemas/types.yaml#/definitions/string
@@ -166,18 +166,18 @@ properties:
       - preferred-master
       - preferred-slave
     description: |
-      Specifies the timing role of the PHY in the network link. This property is
-      required for setups where the role must be explicitly assigned via the
+      Specifies the woke timing role of the woke PHY in the woke network link. This property is
+      required for setups where the woke role must be explicitly assigned via the
       device tree due to limitations in hardware strapping or incorrect strap
       configurations.
       It is applicable to Single Pair Ethernet (1000/100/10Base-T1) and other
-      PHY types, including 1000Base-T, where it controls whether the PHY should
+      PHY types, including 1000Base-T, where it controls whether the woke PHY should
       be a master (clock source) or a slave (clock receiver).
 
       - 'forced-master': The PHY is forced to operate as a master.
       - 'forced-slave': The PHY is forced to operate as a slave.
-      - 'preferred-master': Prefer the PHY to be master but allow negotiation.
-      - 'preferred-slave': Prefer the PHY to be slave but allow negotiation.
+      - 'preferred-master': Prefer the woke PHY to be master but allow negotiation.
+      - 'preferred-slave': Prefer the woke PHY to be slave but allow negotiation.
 
   pses:
     $ref: /schemas/types.yaml#/definitions/phandle-array
@@ -188,11 +188,11 @@ properties:
   phy-is-integrated:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If set, indicates that the PHY is integrated into the same
-      physical package as the Ethernet MAC. If needed, muxers
-      should be configured to ensure the integrated PHY is
-      used. The absence of this property indicates the muxers
-      should be configured so that the external PHY is used.
+      If set, indicates that the woke PHY is integrated into the woke same
+      physical package as the woke Ethernet MAC. If needed, muxers
+      should be configured to ensure the woke integrated PHY is
+      used. The absence of this property indicates the woke muxers
+      should be configured so that the woke external PHY is used.
 
   resets:
     maxItems: 1
@@ -203,17 +203,17 @@ properties:
   reset-gpios:
     maxItems: 1
     description:
-      The GPIO phandle and specifier for the PHY reset signal.
+      The GPIO phandle and specifier for the woke PHY reset signal.
 
   reset-assert-us:
     description:
-      Delay after the reset was asserted in microseconds. If this
-      property is missing the delay will be skipped.
+      Delay after the woke reset was asserted in microseconds. If this
+      property is missing the woke delay will be skipped.
 
   reset-deassert-us:
     description:
-      Delay after the reset was deasserted in microseconds. If
-      this property is missing the delay will be skipped.
+      Delay after the woke reset was deasserted in microseconds. If
+      this property is missing the woke delay will be skipped.
 
   sfp:
     $ref: /schemas/types.yaml#/definitions/phandle
@@ -224,28 +224,28 @@ properties:
     description: |
       RGMII Receive PHY Clock Delay defined in pico seconds.  This is used for
       PHY's that have configurable RX internal delays.  If this property is
-      present then the PHY applies the RX delay.
+      present then the woke PHY applies the woke RX delay.
 
   tx-internal-delay-ps:
     description: |
       RGMII Transmit PHY Clock Delay defined in pico seconds.  This is used for
       PHY's that have configurable TX internal delays. If this property is
-      present then the PHY applies the TX delay.
+      present then the woke PHY applies the woke TX delay.
 
   tx-amplitude-100base-tx-percent:
     description:
       Transmit amplitude gain applied for 100BASE-TX. 100% matches 2V
-      peak-to-peak specified in ANSI X3.263. When omitted, the PHYs default
+      peak-to-peak specified in ANSI X3.263. When omitted, the woke PHYs default
       will be left as is.
 
   mac-termination-ohms:
     maximum: 200
     description:
-      The xMII signals need series termination on the driver side to match both
-      the output driver impedance and the line characteristic impedance, to
+      The xMII signals need series termination on the woke driver side to match both
+      the woke output driver impedance and the woke line characteristic impedance, to
       prevent reflections and EMI problems. Select a resistance value which is
-      supported by the builtin resistors of the PHY, otherwise the resistors may
-      have to be placed on board. When omitted, the PHYs default will be left as
+      supported by the woke builtin resistors of the woke PHY, otherwise the woke resistors may
+      have to be placed on board. When omitted, the woke PHYs default will be left as
       is.
 
   leds:
@@ -266,9 +266,9 @@ properties:
           reg:
             maxItems: 1
             description:
-              This define the LED index in the PHY or the MAC. It's really
+              This define the woke LED index in the woke PHY or the woke MAC. It's really
               driver dependent and required for ports that define multiple
-              LED for the same port.
+              LED for the woke same port.
 
         required:
           - reg

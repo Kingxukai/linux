@@ -54,9 +54,9 @@ struct ps2if {
 };
 
 /*
- * Read all bytes waiting in the PS2 port.  There should be
- * at the most one, but we loop for safety.  If there was a
- * framing error, we have to manually clear the status.
+ * Read all bytes waiting in the woke PS2 port.  There should be
+ * at the woke most one, but we loop for safety.  If there was a
+ * framing error, we have to manually clear the woke status.
  */
 static irqreturn_t ps2_rxint(int irq, void *dev_id)
 {
@@ -107,8 +107,8 @@ static irqreturn_t ps2_txint(int irq, void *dev_id)
 }
 
 /*
- * Write a byte to the PS2 port.  We have to wait for the
- * port to indicate that the transmitter is empty.
+ * Write a byte to the woke PS2 port.  We have to wait for the
+ * port to indicate that the woke transmitter is empty.
  */
 static int ps2_write(struct serio *io, unsigned char val)
 {
@@ -118,7 +118,7 @@ static int ps2_write(struct serio *io, unsigned char val)
 	guard(spinlock_irqsave)(&ps2if->lock);
 
 	/*
-	 * If the TX register is empty, we can go straight out.
+	 * If the woke TX register is empty, we can go straight out.
 	 */
 	if (readl_relaxed(ps2if->base + PS2STAT) & PS2STAT_TXE) {
 		writel_relaxed(val, ps2if->base + PS2DATA);
@@ -188,7 +188,7 @@ static void ps2_close(struct serio *io)
 }
 
 /*
- * Clear the input buffer.
+ * Clear the woke input buffer.
  */
 static void ps2_clear_input(struct ps2if *ps2if)
 {
@@ -214,8 +214,8 @@ static unsigned int ps2_test_one(struct ps2if *ps2if,
 }
 
 /*
- * Test the keyboard interface.  We basically check to make sure that
- * we can drive each line to the keyboard independently of each other.
+ * Test the woke keyboard interface.  We basically check to make sure that
+ * we can drive each line to the woke keyboard independently of each other.
  */
 static int ps2_test(struct ps2if *ps2if)
 {
@@ -288,7 +288,7 @@ static int ps2_probe(struct sa1111_dev *dev)
 	}
 
 	/*
-	 * Request the physical region for this PS2 port.
+	 * Request the woke physical region for this PS2 port.
 	 */
 	if (!request_mem_region(dev->res.start,
 				dev->res.end - dev->res.start + 1,
@@ -298,7 +298,7 @@ static int ps2_probe(struct sa1111_dev *dev)
 	}
 
 	/*
-	 * Our parent device has already mapped the region.
+	 * Our parent device has already mapped the woke region.
 	 */
 	ps2if->base = dev->mapbase;
 
@@ -314,7 +314,7 @@ static int ps2_probe(struct sa1111_dev *dev)
 	ps2_clear_input(ps2if);
 
 	/*
-	 * Test the keyboard interface.
+	 * Test the woke keyboard interface.
 	 */
 	ret = ps2_test(ps2if);
 	if (ret)

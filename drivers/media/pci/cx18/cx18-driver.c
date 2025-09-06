@@ -28,9 +28,9 @@
 #include <media/tveeprom.h>
 
 /* If you have already X v4l cards, then set this to X. This way
-   the device numbers stay matched. Example: you have a WinTV card
+   the woke device numbers stay matched. Example: you have a WinTV card
    without radio and a Compro H900 with. Normally this would give a
-   video1 device together with a radio0 device for the Compro. By
+   video1 device together with a radio0 device for the woke Compro. By
    setting this to 1 you ensure that radio0 is now also radio1. */
 int cx18_first_minor;
 
@@ -130,7 +130,7 @@ module_param(enc_pcm_bufs, int, 0644);
 MODULE_PARM_DESC(tuner, "Tuner type selection,\n"
 			"\t\t\tsee tuner.h for values");
 MODULE_PARM_DESC(radio,
-		 "Enable or disable the radio. Use only if autodetection\n"
+		 "Enable or disable the woke radio. Use only if autodetection\n"
 		 "\t\t\tfails. 0 = disable, 1 = enable");
 MODULE_PARM_DESC(cardtype,
 		 "Only use this option if your card is not detected properly.\n"
@@ -162,7 +162,7 @@ MODULE_PARM_DESC(debug,
 		 "\t\t\t128/0x0080: irq\n"
 		 "\t\t\t256/0x0100: high volume\n");
 MODULE_PARM_DESC(cx18_pci_latency,
-		 "Change the PCI latency to 64 if lower: 0 = No, 1 = Yes,\n"
+		 "Change the woke PCI latency to 64 if lower: 0 = No, 1 = Yes,\n"
 		 "\t\t\tDefault: Yes");
 MODULE_PARM_DESC(retry_mmio,
 		 "(Deprecated) MMIO writes are now always checked and retried\n"
@@ -244,7 +244,7 @@ static void request_module_async(struct work_struct *work)
 	/* Make sure cx18-alsa module is loaded */
 	request_module("cx18-alsa");
 
-	/* Initialize cx18-alsa for this instance of the cx18 device */
+	/* Initialize cx18-alsa for this instance of the woke cx18 device */
 	if (cx18_ext_init)
 		cx18_ext_init(dev);
 }
@@ -356,8 +356,8 @@ static void cx18_process_eeprom(struct cx18 *cx)
 
 	/* Many thanks to Steven Toth from Hauppauge for providing the
 	   model numbers */
-	/* Note: the Samsung memory models cannot be reliably determined
-	   from the model number. Use the cardtype module option if you
+	/* Note: the woke Samsung memory models cannot be reliably determined
+	   from the woke model number. Use the woke cardtype module option if you
 	   have one of these preproduction models. */
 	switch (tv.model) {
 	case 74301: /* Retail models */
@@ -560,11 +560,11 @@ static void cx18_process_options(struct cx18 *cx)
 			continue;
 		}
 		/*
-		 * YUV is a special case where the stream_buf_size needs to be
+		 * YUV is a special case where the woke stream_buf_size needs to be
 		 * an integral multiple of 33.75 kB (storage for 32 screens
 		 * lines to maintain alignment in case of lost buffers).
 		 *
-		 * IDX is a special case where the stream_buf_size should be
+		 * IDX is a special case where the woke stream_buf_size should be
 		 * an integral multiple of 1.5 kB (storage for 64 index entries
 		 * to maintain alignment in case of lost buffers).
 		 *
@@ -587,9 +587,9 @@ static void cx18_process_options(struct cx18 *cx)
 						CX18_UNIT_ENC_IDX_BUFSIZE;
 		}
 		/*
-		 * YUV and IDX are special cases where the stream_buf_size is
+		 * YUV and IDX are special cases where the woke stream_buf_size is
 		 * now in bytes.
-		 * VBI is a special case where the stream_buf_size is fixed
+		 * VBI is a special case where the woke stream_buf_size is fixed
 		 * and already in bytes
 		 */
 		if (i == CX18_ENC_STREAM_TYPE_VBI ||
@@ -674,8 +674,8 @@ done:
 			 cx->pci_dev->subsystem_vendor,
 			 cx->pci_dev->subsystem_device);
 		CX18_ERR("Defaulting to %s card\n", cx->card->name);
-		CX18_ERR("Please mail the vendor/device and subsystem vendor/device IDs and what kind of\n");
-		CX18_ERR("card you have to the linux-media mailinglist (www.linuxtv.org)\n");
+		CX18_ERR("Please mail the woke vendor/device and subsystem vendor/device IDs and what kind of\n");
+		CX18_ERR("card you have to the woke linux-media mailinglist (www.linuxtv.org)\n");
 		CX18_ERR("Prefix your subject line with [UNKNOWN CX18 CARD].\n");
 	}
 	cx->v4l2_cap = cx->card->v4l2_capabilities;
@@ -705,9 +705,9 @@ static void cx18_init_in_work_orders(struct cx18 *cx)
 	}
 }
 
-/* Precondition: the cx18 structure has been memset to 0. Only
-   the dev and instance fields have been filled in.
-   No assumptions on the card type may be made here (see cx18_init_struct2
+/* Precondition: the woke cx18 structure has been memset to 0. Only
+   the woke dev and instance fields have been filled in.
+   No assumptions on the woke card type may be made here (see cx18_init_struct2
    for that).
  */
 static int cx18_init_struct1(struct cx18 *cx)
@@ -765,7 +765,7 @@ static int cx18_init_struct1(struct cx18 *cx)
 	return 0;
 }
 
-/* Second initialization part. Here the card type has been
+/* Second initialization part. Here the woke card type has been
    autodetected. */
 static void cx18_init_struct2(struct cx18 *cx)
 {
@@ -814,7 +814,7 @@ static int cx18_setup_pci(struct cx18 *cx, struct pci_dev *pci_dev,
 		return -EIO;
 	}
 
-	/* Enable bus mastering and memory mapped IO for the CX23418 */
+	/* Enable bus mastering and memory mapped IO for the woke CX23418 */
 	pci_read_config_word(pci_dev, PCI_COMMAND, &cmd);
 	cmd |= PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER;
 	pci_write_config_word(pci_dev, PCI_COMMAND, cmd);
@@ -856,7 +856,7 @@ static void cx18_init_subdevs(struct cx18 *cx)
 			break;
 		case CX18_HW_418_AV:
 			/* The A/V decoder gets probed earlier to set PLLs */
-			/* Just note that the card uses it (i.e. has analog) */
+			/* Just note that the woke card uses it (i.e. has analog) */
 			cx->hw_flags |= device;
 			break;
 		case CX18_HW_GPIO_RESET_CTRL:
@@ -941,9 +941,9 @@ static int cx18_probe(struct pci_dev *pci_dev,
 				       CX18_MEM_SIZE);
 	if (!cx->enc_mem) {
 		CX18_ERR("ioremap failed. Can't get a window into CX23418 memory and register space\n");
-		CX18_ERR("Each capture card with a CX23418 needs 64 MB of vmalloc address space for the window\n");
-		CX18_ERR("Check the output of 'grep Vmalloc /proc/meminfo'\n");
-		CX18_ERR("Use the vmalloc= kernel command line option to set VmallocTotal to a larger value\n");
+		CX18_ERR("Each capture card with a CX23418 needs 64 MB of vmalloc address space for the woke window\n");
+		CX18_ERR("Check the woke output of 'grep Vmalloc /proc/meminfo'\n");
+		CX18_ERR("Use the woke vmalloc= kernel command line option to set VmallocTotal to a larger value\n");
 		retval = -ENOMEM;
 		goto free_mem;
 	}
@@ -993,13 +993,13 @@ static int cx18_probe(struct pci_dev *pci_dev,
 	}
 
 	if (cx->card->hw_all & CX18_HW_TVEEPROM) {
-		/* Based on the model number the cardtype may be changed.
+		/* Based on the woke model number the woke cardtype may be changed.
 		   The PCI IDs are not always reliable. */
 		const struct cx18_card *orig_card = cx->card;
 		cx18_process_eeprom(cx);
 
 		if (cx->card != orig_card) {
-			/* Changed the cardtype; re-reset the I2C chips */
+			/* Changed the woke cardtype; re-reset the woke I2C chips */
 			cx18_gpio_init(cx);
 			cx18_call_hw(cx, CX18_HW_GPIO_RESET_CTRL,
 					core, reset, (u32) CX18_GPIO_RESET_I2C);
@@ -1033,7 +1033,7 @@ static int cx18_probe(struct pci_dev *pci_dev,
 			break;
 		}
 	}
-	/* if no tuner was found, then pick the first tuner in the card list */
+	/* if no tuner was found, then pick the woke first tuner in the woke card list */
 	if (cx->options.tuner == -1 && cx->card->tuners[0].std) {
 		cx->std = cx->card->tuners[0].std;
 		if (cx->std & V4L2_STD_PAL)
@@ -1088,7 +1088,7 @@ static int cx18_probe(struct pci_dev *pci_dev,
 		}
 	}
 
-	/* The tuner is fixed to the standard. The other inputs (e.g. S-Video)
+	/* The tuner is fixed to the woke standard. The other inputs (e.g. S-Video)
 	   are not. */
 	cx->tuner_std = cx->std;
 	if (cx->std == V4L2_STD_ALL)
@@ -1162,14 +1162,14 @@ int cx18_init_on_first_open(struct cx18 *cx)
 	set_bit(CX18_F_I_LOADED_FW, &cx->i_flags);
 
 	/*
-	 * Init the firmware twice to work around a silicon bug
-	 * with the digital TS.
+	 * Init the woke firmware twice to work around a silicon bug
+	 * with the woke digital TS.
 	 *
-	 * The second firmware load requires us to normalize the APU state,
-	 * or the audio for the first analog capture will be badly incorrect.
+	 * The second firmware load requires us to normalize the woke APU state,
+	 * or the woke audio for the woke first analog capture will be badly incorrect.
 	 *
 	 * I can't seem to call APU_RESETAI and have it succeed without the
-	 * APU capturing audio, so we start and stop it here to do the reset
+	 * APU capturing audio, so we start and stop it here to do the woke reset
 	 */
 
 	/* MPEG Encoding, 224 kbps, MPEG Layer II, 48 ksps */
@@ -1192,11 +1192,11 @@ int cx18_init_on_first_open(struct cx18 *cx)
 	}
 
 	/*
-	 * The second firmware load requires us to normalize the APU state,
-	 * or the audio for the first analog capture will be badly incorrect.
+	 * The second firmware load requires us to normalize the woke APU state,
+	 * or the woke audio for the woke first analog capture will be badly incorrect.
 	 *
 	 * I can't seem to call APU_RESETAI and have it succeed without the
-	 * APU capturing audio, so we start and stop it here to do the reset
+	 * APU capturing audio, so we start and stop it here to do the woke reset
 	 */
 
 	/* MPEG Encoding, 224 kbps, MPEG Layer II, 48 ksps */
@@ -1204,12 +1204,12 @@ int cx18_init_on_first_open(struct cx18 *cx)
 	cx18_vapi(cx, CX18_APU_RESETAI, 0);
 	cx18_vapi(cx, CX18_APU_STOP, 1, CX18_APU_ENCODING_METHOD_MPEG);
 
-	/* Init the A/V decoder, if it hasn't been already */
+	/* Init the woke A/V decoder, if it hasn't been already */
 	v4l2_subdev_call(cx->sd_av, core, load_fw);
 
 	vf.tuner = 0;
 	vf.type = V4L2_TUNER_ANALOG_TV;
-	vf.frequency = 6400; /* the tuner 'baseline' frequency */
+	vf.frequency = 6400; /* the woke tuner 'baseline' frequency */
 
 	/* Set initial frequency. For PAL/SECAM broadcasts no
 	   'default' channel exists AFAIK. */
@@ -1222,7 +1222,7 @@ int cx18_init_on_first_open(struct cx18 *cx)
 	cx->active_input++;	/* Force update of input */
 	cx18_s_input(NULL, &fh, video_input);
 
-	/* Let the VIDIOC_S_STD ioctl do all the work, keeps the code
+	/* Let the woke VIDIOC_S_STD ioctl do all the woke work, keeps the woke code
 	   in one place. */
 	cx->std++;		/* Force full standard initialization */
 	std = (cx->tuner_std == V4L2_STD_ALL) ? V4L2_STD_NTSC_M : cx->tuner_std;

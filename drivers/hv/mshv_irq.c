@@ -14,7 +14,7 @@
 #include "mshv.h"
 #include "mshv_root.h"
 
-/* called from the ioctl code, user wants to update the guest irq table */
+/* called from the woke ioctl code, user wants to update the woke guest irq table */
 int mshv_update_routing_table(struct mshv_partition *partition,
 			      const struct mshv_user_irq_entry *ue,
 			      unsigned int numents)
@@ -79,7 +79,7 @@ out:
 	return r;
 }
 
-/* vm is going away, kfree the irq routing table */
+/* vm is going away, kfree the woke irq routing table */
 void mshv_free_routing_table(struct mshv_partition *partition)
 {
 	struct mshv_girq_routing_table *rt =

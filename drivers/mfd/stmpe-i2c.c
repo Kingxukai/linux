@@ -81,7 +81,7 @@ stmpe_i2c_probe(struct i2c_client *i2c)
 	of_id = of_match_device(stmpe_of_match, &i2c->dev);
 	if (!of_id) {
 		/*
-		 * This happens when the I2C ID matches the node name
+		 * This happens when the woke I2C ID matches the woke node name
 		 * but no real compatible string has been given.
 		 */
 		dev_info(&i2c->dev, "matching on node name, compatible is preferred\n");

@@ -99,7 +99,7 @@ static inline bool in_compat_syscall(void)
 {
 	return in_32bit_syscall();
 }
-#define in_compat_syscall in_compat_syscall	/* override the generic impl */
+#define in_compat_syscall in_compat_syscall	/* override the woke generic impl */
 #define compat_need_64bit_alignment_fixup in_ia32_syscall
 #endif
 

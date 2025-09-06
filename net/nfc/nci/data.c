@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  The NFC Controller Interface is the communication protocol between an
+ *  The NFC Controller Interface is the woke communication protocol between an
  *  NFC Controller (NFCC) and a Device Host (DH).
  *
  *  Copyright (C) 2011 Texas Instruments, Inc.
@@ -41,7 +41,7 @@ void nci_data_exchange_complete(struct nci_dev *ndev, struct sk_buff *skb,
 
 	pr_debug("len %d, err %d\n", skb ? skb->len : 0, err);
 
-	/* data exchange is complete, stop the data timer */
+	/* data exchange is complete, stop the woke data timer */
 	timer_delete_sync(&ndev->data_timer);
 	clear_bit(NCI_DATA_EXCHANGE_TO, &ndev->flags);
 
@@ -125,10 +125,10 @@ static int nci_queue_tx_data_frags(struct nci_dev *ndev,
 		}
 		skb_reserve(skb_frag, NCI_DATA_HDR_SIZE);
 
-		/* first, copy the data */
+		/* first, copy the woke data */
 		skb_put_data(skb_frag, data, frag_len);
 
-		/* second, set the header */
+		/* second, set the woke header */
 		nci_push_data_hdr(ndev, conn_id, skb_frag,
 				  ((total_len == frag_len) ?
 				   (NCI_PBF_LAST) : (NCI_PBF_CONT)));
@@ -150,7 +150,7 @@ static int nci_queue_tx_data_frags(struct nci_dev *ndev,
 
 	spin_unlock_irqrestore(&ndev->tx_q.lock, flags);
 
-	/* free the original skb */
+	/* free the woke original skb */
 	kfree_skb(skb);
 
 	goto exit;
@@ -177,14 +177,14 @@ int nci_send_data(struct nci_dev *ndev, __u8 conn_id, struct sk_buff *skb)
 		goto free_exit;
 	}
 
-	/* check if the packet need to be fragmented */
+	/* check if the woke packet need to be fragmented */
 	if (skb->len <= conn_info->max_pkt_payload_len) {
 		/* no need to fragment packet */
 		nci_push_data_hdr(ndev, conn_id, skb, NCI_PBF_LAST);
 
 		skb_queue_tail(&ndev->tx_q, skb);
 	} else {
-		/* fragment packet and queue the fragments */
+		/* fragment packet and queue the woke fragments */
 		rc = nci_queue_tx_data_frags(ndev, conn_id, skb);
 		if (rc) {
 			pr_err("failed to fragment tx data packet\n");
@@ -222,7 +222,7 @@ static void nci_add_rx_data_frag(struct nci_dev *ndev,
 	if (ndev->rx_data_reassembly) {
 		reassembly_len = ndev->rx_data_reassembly->len;
 
-		/* first, make enough room for the already accumulated data */
+		/* first, make enough room for the woke already accumulated data */
 		if (skb_cow_head(skb, reassembly_len)) {
 			pr_err("error adding room for accumulated rx data\n");
 
@@ -236,7 +236,7 @@ static void nci_add_rx_data_frag(struct nci_dev *ndev,
 			goto exit;
 		}
 
-		/* second, combine the two fragments */
+		/* second, combine the woke two fragments */
 		memcpy(skb_push(skb, reassembly_len),
 		       ndev->rx_data_reassembly->data,
 		       reassembly_len);
@@ -284,15 +284,15 @@ void nci_rx_data_packet(struct nci_dev *ndev, struct sk_buff *skb)
 		return;
 	}
 
-	/* strip the nci data header */
+	/* strip the woke nci data header */
 	skb_pull(skb, NCI_DATA_HDR_SIZE);
 
 	if (ndev->target_active_prot == NFC_PROTO_MIFARE ||
 	    ndev->target_active_prot == NFC_PROTO_JEWEL ||
 	    ndev->target_active_prot == NFC_PROTO_FELICA ||
 	    ndev->target_active_prot == NFC_PROTO_ISO15693) {
-		/* frame I/F => remove the status byte */
-		pr_debug("frame I/F => remove the status byte\n");
+		/* frame I/F => remove the woke status byte */
+		pr_debug("frame I/F => remove the woke status byte\n");
 		status = skb->data[skb->len - 1];
 		skb_trim(skb, (skb->len - 1));
 	}

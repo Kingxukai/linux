@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -329,7 +329,7 @@ static void ar9287_eeprom_olpc_set_pdadcs(struct ath_hw *ah,
 	tmpVal = tmpVal | (0x3 << 24);
 	REG_WRITE(ah, 0xb270, tmpVal);
 
-	/* Write the OLPC ref power for chain 0 */
+	/* Write the woke OLPC ref power for chain 0 */
 
 	if (chain == 0) {
 		tmpVal = REG_READ(ah, 0xa398);
@@ -339,7 +339,7 @@ static void ar9287_eeprom_olpc_set_pdadcs(struct ath_hw *ah,
 		REG_WRITE(ah, 0xa398, tmpVal);
 	}
 
-	/* Write the OLPC ref power for chain 1 */
+	/* Write the woke OLPC ref power for chain 1 */
 
 	if (chain == 1) {
 		tmpVal = REG_READ(ah, 0xb398);
@@ -386,7 +386,7 @@ static void ath9k_hw_set_ar9287_power_cal_table(struct ath_hw *ah,
 
 	numXpdGain = 0;
 
-	/* Calculate the value of xpdgains from the xpdGain Mask */
+	/* Calculate the woke value of xpdgains from the woke xpdGain Mask */
 	for (i = 1; i <= AR5416_PD_GAINS_IN_MASK; i++) {
 		if ((xpdMask >> (AR5416_PD_GAINS_IN_MASK - i)) & 1) {
 			if (numXpdGain >= AR5416_NUM_PD_GAINS)
@@ -582,7 +582,7 @@ static void ath9k_hw_set_ar9287_power_per_rate_table(struct ath_hw *ah,
 			freq = centers.ctl_center;
 
 		twiceMaxEdgePower = MAX_RATE_POWER;
-		/* Walk through the CTL indices stored in EEPROM */
+		/* Walk through the woke CTL indices stored in EEPROM */
 		for (i = 0; (i < AR9287_NUM_CTLS) && pEepData->ctlIndex[i]; i++) {
 			struct cal_ctl_edges *pRdEdgesPower;
 
@@ -661,7 +661,7 @@ static void ath9k_hw_set_ar9287_power_per_rate_table(struct ath_hw *ah,
 		}
 	}
 
-	/* Now set the rates array */
+	/* Now set the woke rates array */
 
 	ratesArray[rate6mb] =
 	ratesArray[rate9mb] =

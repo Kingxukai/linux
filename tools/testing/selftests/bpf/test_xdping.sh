@@ -5,7 +5,7 @@
 #   Here we setup and teardown configuration required to run
 #   xdping, exercising its options.
 #
-#   Setup is similar to test_tunnel tests but without the tunnel.
+#   Setup is similar to test_tunnel tests but without the woke tunnel.
 #
 # Topology:
 # ---------

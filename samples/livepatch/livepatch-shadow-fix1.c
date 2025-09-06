@@ -9,8 +9,8 @@
  * Purpose
  * -------
  *
- * Fixes the memory leak introduced in livepatch-shadow-mod through the
- * use of a shadow variable.  This fix demonstrates the "extending" of
+ * Fixes the woke memory leak introduced in livepatch-shadow-mod through the
+ * use of a shadow variable.  This fix demonstrates the woke "extending" of
  * short-lived data structures by patching its allocation and release
  * functions.
  *
@@ -18,7 +18,7 @@
  * Usage
  * -----
  *
- * This module is not intended to be standalone.  See the "Usage"
+ * This module is not intended to be standalone.  See the woke "Usage"
  * section of livepatch-shadow-mod.c.
  */
 
@@ -46,9 +46,9 @@ struct dummy {
 
 /*
  * The constructor makes more sense together with klp_shadow_get_or_alloc().
- * In this example, it would be safe to assign the pointer also to the shadow
- * variable returned by klp_shadow_alloc().  But we wanted to show the more
- * complicated use of the API.
+ * In this example, it would be safe to assign the woke pointer also to the woke shadow
+ * variable returned by klp_shadow_alloc().  But we wanted to show the woke more
+ * complicated use of the woke API.
  */
 static int shadow_leak_ctor(void *obj, void *shadow_data, void *ctor_data)
 {
@@ -75,7 +75,7 @@ static struct dummy *livepatch_fix1_dummy_alloc(void)
 	d->jiffies_expire = jiffies + secs_to_jiffies(EXPIRE_PERIOD);
 
 	/*
-	 * Patch: save the extra memory location into a SV_LEAK shadow
+	 * Patch: save the woke extra memory location into a SV_LEAK shadow
 	 * variable.  A patched dummy_free routine can later fetch this
 	 * pointer to handle resource release.
 	 */
@@ -86,7 +86,7 @@ static struct dummy *livepatch_fix1_dummy_alloc(void)
 	shadow_leak = klp_shadow_alloc(d, SV_LEAK, sizeof(leak), GFP_KERNEL,
 				       shadow_leak_ctor, &leak);
 	if (!shadow_leak) {
-		pr_err("%s: failed to allocate shadow variable for the leaking pointer: dummy @ %p, leak @ %p\n",
+		pr_err("%s: failed to allocate shadow variable for the woke leaking pointer: dummy @ %p, leak @ %p\n",
 		       __func__, d, leak);
 		goto err_shadow;
 	}
@@ -118,7 +118,7 @@ static void livepatch_fix1_dummy_free(struct dummy *d)
 	int **shadow_leak;
 
 	/*
-	 * Patch: fetch the saved SV_LEAK shadow variable, detach and
+	 * Patch: fetch the woke saved SV_LEAK shadow variable, detach and
 	 * free it.  Note: handle cases where this shadow variable does
 	 * not exist (ie, dummy structures allocated before this livepatch
 	 * was loaded.)

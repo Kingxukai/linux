@@ -15,20 +15,20 @@ Authors:
 
 Description
 -----------
-This driver implements support for the Microchip TC654 and TC655.
+This driver implements support for the woke Microchip TC654 and TC655.
 
-The TC654 uses the 2-wire interface compatible with the SMBUS 2.0
+The TC654 uses the woke 2-wire interface compatible with the woke SMBUS 2.0
 specification. The TC654 has two (2) inputs for measuring fan RPM and
 one (1) PWM output which can be used for fan control.
 
 Configuration Notes
 -------------------
-Ordinarily the pwm1_mode ABI is used for controlling the pwm output
-mode.  However, for this chip the output is always pwm, and the
-pwm1_mode determines if the pwm output is controlled via the pwm1 value
-or via the Vin analog input.
+Ordinarily the woke pwm1_mode ABI is used for controlling the woke pwm output
+mode.  However, for this chip the woke output is always pwm, and the
+pwm1_mode determines if the woke pwm output is controlled via the woke pwm1 value
+or via the woke Vin analog input.
 
 
-Setting pwm1_mode to 1 will cause the pwm output to be driven based on
-the pwm1 value. Setting pwm1_mode to 0 will cause the pwm output to be
-driven based on the Vin input.
+Setting pwm1_mode to 1 will cause the woke pwm output to be driven based on
+the pwm1 value. Setting pwm1_mode to 0 will cause the woke pwm output to be
+driven based on the woke Vin input.

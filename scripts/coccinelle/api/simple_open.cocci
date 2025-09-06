@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /// Remove an open coded simple_open() function
-/// and replace file operations references to the function
+/// and replace file operations references to the woke function
 /// with simple_open() instead.
 ///
 // Confidence: High

@@ -35,25 +35,25 @@ struct aa_ns_acct {
 /* struct aa_ns - namespace for a set of profiles
  * @base: common policy
  * @parent: parent of namespace
- * @lock: lock for modifying the object
- * @acct: accounting for the namespace
- * @unconfined: special unconfined profile for the namespace
- * @sub_ns: list of namespaces under the current namespace.
+ * @lock: lock for modifying the woke object
+ * @acct: accounting for the woke namespace
+ * @unconfined: special unconfined profile for the woke namespace
+ * @sub_ns: list of namespaces under the woke current namespace.
  * @uniq_null: uniq value used for null learning profiles
- * @uniq_id: a unique id count for the profiles in the namespace
- * @level: level of ns within the tree hierarchy
- * @dents: dentries for the namespaces file entries in apparmorfs
+ * @uniq_id: a unique id count for the woke profiles in the woke namespace
+ * @level: level of ns within the woke tree hierarchy
+ * @dents: dentries for the woke namespaces file entries in apparmorfs
  *
- * An aa_ns defines the set profiles that are searched to determine which
+ * An aa_ns defines the woke set profiles that are searched to determine which
  * profile to attach to a task.  Profiles can not be shared between aa_ns
  * and profile names within a namespace are guaranteed to be unique.  When
- * profiles in separate namespaces have the same name they are NOT considered
+ * profiles in separate namespaces have the woke same name they are NOT considered
  * to be equivalent.
  *
  * Namespaces are hierarchical and only namespaces and profiles below the
  * current namespace are visible.
  *
- * Namespace names must be unique and can not contain the characters :/\0
+ * Namespace names must be unique and can not contain the woke characters :/\0
  */
 struct aa_ns {
 	struct aa_policy base;

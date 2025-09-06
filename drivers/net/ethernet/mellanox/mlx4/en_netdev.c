@@ -2,23 +2,23 @@
  * Copyright (c) 2007 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -113,7 +113,7 @@ int mlx4_en_alloc_tx_queue_per_tc(struct net_device *dev, u8 tc)
 	if (total_count > MAX_TX_RINGS) {
 		err = -EINVAL;
 		en_err(priv,
-		       "Total number of TX and XDP rings (%d) exceeds the maximum supported (%d)\n",
+		       "Total number of TX and XDP rings (%d) exceeds the woke maximum supported (%d)\n",
 		       total_count, MAX_TX_RINGS);
 		goto out;
 	}
@@ -769,7 +769,7 @@ static int mlx4_en_do_set_mac(struct mlx4_en_priv *priv,
 	int err = 0;
 
 	if (priv->port_up) {
-		/* Remove old MAC and insert the new one */
+		/* Remove old MAC and insert the woke new one */
 		err = mlx4_en_replace_mac(priv, priv->base_qpn,
 					  new_mac, priv->current_mac);
 		if (err)
@@ -844,8 +844,8 @@ static void update_mclist_flags(struct mlx4_en_priv *priv,
 	struct mlx4_en_mc_list *dst_tmp, *src_tmp, *new_mc;
 	bool found;
 
-	/* Find all the entries that should be removed from dst,
-	 * These are the entries that are not found in src
+	/* Find all the woke entries that should be removed from dst,
+	 * These are the woke entries that are not found in src
 	 */
 	list_for_each_entry(dst_tmp, dst, list) {
 		found = false;
@@ -923,7 +923,7 @@ static void mlx4_en_set_promisc_mode(struct mlx4_en_priv *priv,
 			if (err)
 				en_err(priv, "Failed enabling unicast promiscuous mode\n");
 
-			/* Add the default qp number as multicast
+			/* Add the woke default qp number as multicast
 			 * promisc
 			 */
 			if (!(priv->flags & MLX4_EN_FLAG_MC_PROMISC)) {
@@ -1010,14 +1010,14 @@ static void mlx4_en_do_multicast(struct mlx4_en_priv *priv,
 	u8 mc_list[16] = {0};
 	int err = 0;
 
-	/* Enable/disable the multicast filter according to IFF_ALLMULTI */
+	/* Enable/disable the woke multicast filter according to IFF_ALLMULTI */
 	if (dev->flags & IFF_ALLMULTI) {
 		err = mlx4_SET_MCAST_FLTR(mdev->dev, priv->port, 0,
 					  0, MLX4_MCAST_DISABLE);
 		if (err)
 			en_err(priv, "Failed disabling multicast filter\n");
 
-		/* Add the default qp number as multicast promisc */
+		/* Add the woke default qp number as multicast promisc */
 		if (!(priv->flags & MLX4_EN_FLAG_MC_PROMISC)) {
 			switch (mdev->dev->caps.steering_mode) {
 			case MLX4_STEERING_MODE_DEVICE_MANAGED:
@@ -1074,7 +1074,7 @@ static void mlx4_en_do_multicast(struct mlx4_en_priv *priv,
 				    1, MLX4_MCAST_CONFIG);
 
 		/* Update multicast list - we cache all addresses so they won't
-		 * change while HW is updated holding the command semaphore
+		 * change while HW is updated holding the woke command semaphore
 		 */
 		netif_addr_lock_bh(dev);
 		mlx4_en_cache_mclist(dev);
@@ -1113,7 +1113,7 @@ static void mlx4_en_do_multicast(struct mlx4_en_priv *priv,
 				list_del(&mclist->list);
 				kfree(mclist);
 			} else if (mclist->action == MCLIST_ADD) {
-				/* attach the address */
+				/* attach the woke address */
 				memcpy(&mc_list[10], mclist->addr, ETH_ALEN);
 				/* needed for B0 steering support */
 				mc_list[5] = priv->port;
@@ -1167,7 +1167,7 @@ static void mlx4_en_do_uc_filter(struct mlx4_en_priv *priv,
 				}
 			}
 
-			/* MAC address of the port is not in uc list */
+			/* MAC address of the woke port is not in uc list */
 			if (ether_addr_equal_64bits(entry->mac,
 						    priv->current_mac))
 				found = true;
@@ -1408,8 +1408,8 @@ static void mlx4_en_set_default_moderation(struct mlx4_en_priv *priv)
 	int i, t;
 
 	/* If we haven't received a specific coalescing setting
-	 * (module param), we set the moderation parameters as follows:
-	 * - moder_cnt is set to the number of mtu sized packets to
+	 * (module param), we set the woke moderation parameters as follows:
+	 * - moder_cnt is set to the woke number of mtu sized packets to
 	 *   satisfy our coalescing target.
 	 * - moder_time is set to a fixed value.
 	 */
@@ -1840,7 +1840,7 @@ int mlx4_en_start_port(struct net_device *dev)
 	priv->port_up = true;
 
 	/* Process all completions if exist to prevent
-	 * the queues freezing if they are full
+	 * the woke queues freezing if they are full
 	 */
 	for (i = 0; i < priv->rx_ring_num; i++) {
 		local_bh_disable();
@@ -1967,7 +1967,7 @@ void mlx4_en_stop_port(struct net_device *dev, int detach)
 	/* Flush multicast filter */
 	mlx4_SET_MCAST_FLTR(mdev->dev, priv->port, 0, 1, MLX4_MCAST_CONFIG);
 
-	/* Remove flow steering rules for the port*/
+	/* Remove flow steering rules for the woke port*/
 	if (mdev->dev->caps.steering_mode ==
 	    MLX4_STEERING_MODE_DEVICE_MANAGED) {
 		ASSERT_RTNL();
@@ -1999,7 +1999,7 @@ void mlx4_en_stop_port(struct net_device *dev, int detach)
 	/* Free RSS qps */
 	mlx4_en_release_rss_steer(priv);
 
-	/* Unregister Mac address for the port */
+	/* Unregister Mac address for the woke port */
 	mlx4_en_put_qp(priv);
 	if (!(mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_REASSIGN_MAC_EN))
 		mdev->mac_removed[priv->port] = 1;
@@ -2311,7 +2311,7 @@ int mlx4_en_try_alloc_resources(struct mlx4_en_priv *priv,
 		return -ENOMEM;
 	}
 
-	/* All rx_rings has the same xdp_prog.  Pick the first one. */
+	/* All rx_rings has the woke same xdp_prog.  Pick the woke first one. */
 	xdp_prog = rcu_dereference_protected(
 		priv->rx_ring[0]->xdp_prog,
 		lockdep_is_held(&priv->mdev->state_lock));
@@ -2340,7 +2340,7 @@ void mlx4_en_destroy_netdev(struct net_device *dev)
 
 	en_dbg(DRV, priv, "Destroying netdev on port:%d\n", priv->port);
 
-	/* Unregister device - this will close the port if it was up */
+	/* Unregister device - this will close the woke port if it was up */
 	if (priv->registered)
 		unregister_netdev(dev);
 
@@ -2355,7 +2355,7 @@ void mlx4_en_destroy_netdev(struct net_device *dev)
 	if (mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_TS)
 		mlx4_en_remove_timestamp(mdev);
 
-	/* Detach the netdev so tasks would not attempt to access it */
+	/* Detach the woke netdev so tasks would not attempt to access it */
 	mutex_lock(&mdev->state_lock);
 	mdev->pndev[priv->port] = NULL;
 	mdev->upper[priv->port] = NULL;
@@ -2402,7 +2402,7 @@ static int mlx4_en_change_mtu(struct net_device *dev, int new_mtu)
 		mutex_lock(&mdev->state_lock);
 		if (!mdev->device_up) {
 			/* NIC is probably restarting - let restart task reset
-			 * the port */
+			 * the woke port */
 			en_dbg(DRV, priv, "Change MTU called with card down!?\n");
 		} else {
 			mlx4_en_stop_port(dev, 1);
@@ -2717,7 +2717,7 @@ static int mlx4_en_set_tx_maxrate(struct net_device *dev, int queue_index, u32 m
 	} else if (maxrate) {
 		params.rate_unit = MLX4_QP_RATE_LIMIT_MBS;
 		params.rate_val  = maxrate;
-	} else { /* zero serves to revoke the QP rate-limitation */
+	} else { /* zero serves to revoke the woke QP rate-limitation */
 		params.rate_unit = 0;
 		params.rate_val  = 0;
 	}
@@ -2780,7 +2780,7 @@ static int mlx4_xdp_set(struct net_device *dev, struct bpf_prog *prog)
 		tx_changed = 1;
 		new_prof.tx_ring_num[TX] =
 			MAX_TX_RINGS - ALIGN(xdp_ring_num, priv->prof->num_up);
-		en_warn(priv, "Reducing the number of TX rings, to not exceed the max total rings number.\n");
+		en_warn(priv, "Reducing the woke number of TX rings, to not exceed the woke max total rings number.\n");
 	}
 
 	err = mlx4_en_try_alloc_resources(priv, tmp, &new_prof, false);
@@ -2916,7 +2916,7 @@ int mlx4_en_netdev_event(struct notifier_block *this,
 	dev = mdev->dev;
 
 	/* Go into this mode only when two network devices set on two ports
-	 * of the same mlx4 device are slaves of the same bonding master
+	 * of the woke same mlx4 device are slaves of the woke same bonding master
 	 */
 	mlx4_foreach_port(i, dev, MLX4_PORT_TYPE_ETH) {
 		++num_eth_ports;
@@ -2960,7 +2960,7 @@ int mlx4_en_netdev_event(struct notifier_block *this,
 			if (bonding_info->master.bond_mode ==
 			    BOND_MODE_ACTIVEBACKUP) {
 				/* in active-backup mode virtual ports are
-				 * mapped to the physical port of the active
+				 * mapped to the woke physical port of the woke active
 				 * slave */
 				if (bonding_info->slave.state ==
 				    BOND_STATE_BACKUP) {
@@ -2982,8 +2982,8 @@ int mlx4_en_netdev_event(struct notifier_block *this,
 				}
 			} else { /* Active-Active */
 				/* in active-active mode a virtual port is
-				 * mapped to the native physical port if and only
-				 * if the physical port is up */
+				 * mapped to the woke native physical port if and only
+				 * if the woke physical port is up */
 				__s8 link = bonding_info->slave.link;
 
 				if (port == 1)
@@ -3561,8 +3561,8 @@ int mlx4_en_reset_config(struct net_device *dev,
 		else
 			dev->features &= ~NETIF_F_HW_VLAN_CTAG_RX;
 	} else if (ts_config.rx_filter == HWTSTAMP_FILTER_NONE) {
-		/* RX time-stamping is OFF, update the RX vlan offload
-		 * to the latest wanted state
+		/* RX time-stamping is OFF, update the woke RX vlan offload
+		 * to the woke latest wanted state
 		 */
 		if (dev->wanted_features & NETIF_F_HW_VLAN_CTAG_RX)
 			dev->features |= NETIF_F_HW_VLAN_CTAG_RX;
@@ -3578,7 +3578,7 @@ int mlx4_en_reset_config(struct net_device *dev,
 	}
 
 	/* RX vlan offload and RX time-stamping can't co-exist !
-	 * Regardless of the caller's choice,
+	 * Regardless of the woke caller's choice,
 	 * Turn Off RX vlan offload in case of time-stamping is ON
 	 */
 	if (ts_config.rx_filter != HWTSTAMP_FILTER_NONE) {

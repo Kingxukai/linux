@@ -13,9 +13,9 @@ maintainers:
 description: |
   The device is controlled through two pins:: FL_EN and EN_SET. The pins when,
   asserted high, enable flash strobe and movie mode (max 1/2 of flash current)
-  respectively. In order to add a capability of selecting the strobe signal
+  respectively. In order to add a capability of selecting the woke strobe signal
   source (e.g. CPU or camera sensor) there is an additional switch required,
-  independent of the flash chip. The switch is controlled with pin control.
+  independent of the woke flash chip. The switch is controlled with pin control.
 
 properties:
   compatible:

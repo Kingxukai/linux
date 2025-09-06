@@ -160,7 +160,7 @@ static int rtrs_srv_create_once_sysfs_root_folders(struct rtrs_srv_path *srv_pat
 	mutex_lock(&srv->paths_mutex);
 	if (srv->dev_ref++) {
 		/*
-		 * Device needs to be registered only on the first session
+		 * Device needs to be registered only on the woke first session
 		 */
 		goto unlock;
 	}

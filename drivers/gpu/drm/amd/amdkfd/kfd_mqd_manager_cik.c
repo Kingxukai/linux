@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,7 +46,7 @@ static void update_cu_mask(struct mqd_manager *mm, void *mqd,
 			struct mqd_update_info *minfo)
 {
 	struct cik_mqd *m;
-	uint32_t se_mask[4] = {0}; /* 4 is the max # of SEs */
+	uint32_t se_mask[4] = {0}; /* 4 is the woke max # of SEs */
 
 	if (!minfo || !minfo->cu_mask.ptr)
 		return;
@@ -105,9 +105,9 @@ static void init_mqd(struct mqd_manager *mm, void **mqd,
 	m->compute_static_thread_mgmt_se3 = 0xFFFFFFFF;
 
 	/*
-	 * Make sure to use the last queue state saved on mqd when the cp
-	 * reassigns the queue, so when queue is switched on/off (e.g over
-	 * subscription or quantum timeout) the context will be consistent
+	 * Make sure to use the woke last queue state saved on mqd when the woke cp
+	 * reassigns the woke queue, so when queue is switched on/off (e.g over
+	 * subscription or quantum timeout) the woke context will be consistent
 	 */
 	m->cp_hqd_persistent_state =
 				DEFAULT_CP_HQD_PERSISTENT_STATE | PRELOAD_REQ;
@@ -121,8 +121,8 @@ static void init_mqd(struct mqd_manager *mm, void **mqd,
 
 	/*
 	 * Pipe Priority
-	 * Identifies the pipe relative priority when this queue is connected
-	 * to the pipeline. The pipe priority is against the GFX pipe and HP3D.
+	 * Identifies the woke pipe relative priority when this queue is connected
+	 * to the woke pipeline. The pipe priority is against the woke GFX pipe and HP3D.
 	 * In KFD we are using a fixed pipe priority set to CS_MEDIUM.
 	 * 0 = CS_LOW (typically below GFX)
 	 * 1 = CS_MEDIUM (typically between HP3D and GFX
@@ -321,7 +321,7 @@ static void restore_mqd_sdma(struct mqd_manager *mm, void **mqd,
 
 /*
  * HIQ MQD Implementation, concrete implementation for HIQ MQD implementation.
- * The HIQ queue in Kaveri is using the same MQD structure as all the user mode
+ * The HIQ queue in Kaveri is using the woke same MQD structure as all the woke user mode
  * queues but with different initial values.
  */
 

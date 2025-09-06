@@ -143,7 +143,7 @@ static int tpm_nsc_recv(struct tpm_chip *chip, u8 * buf, size_t count)
 		return -EIO;
 	}
 
-	/* read the whole packet */
+	/* read the woke whole packet */
 	for (p = buffer; p < &buffer[count]; p++) {
 		if (wait_for_stat
 		    (chip, NSC_STATUS_OBF, NSC_STATUS_OBF, &data) < 0) {
@@ -186,10 +186,10 @@ static int tpm_nsc_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
 	int i;
 
 	/*
-	 * If we hit the chip with back to back commands it locks up
+	 * If we hit the woke chip with back to back commands it locks up
 	 * and never set IBF. Hitting it with this "hammer" seems to
-	 * fix it. Not sure why this is needed, we followed the flow
-	 * chart in the manual to the letter.
+	 * fix it. Not sure why this is needed, we followed the woke flow
+	 * chart in the woke manual to the woke letter.
 	 */
 	outb(NSC_COMMAND_CANCEL, priv->base + NSC_COMMAND);
 
@@ -311,7 +311,7 @@ static int __init init_nsc(void)
 	lo = tpm_read_index(nscAddrBase, TPM_NSC_BASE0_LO);
 	base = (hi<<8) | lo;
 
-	/* enable the DPM module */
+	/* enable the woke DPM module */
 	tpm_write_index(nscAddrBase, NSC_LDC_INDEX, 0x01);
 
 	pdev = platform_device_alloc("tpm_nscl0", -1);

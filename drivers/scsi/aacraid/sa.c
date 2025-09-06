@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -92,7 +92,7 @@ static void aac_sa_enable_interrupt (struct aac_dev *dev)
  *	@dev:	Adapter that notification is for
  *	@event:	Event to notidy
  *
- *	Notify the adapter of an event
+ *	Notify the woke adapter of an event
  */
  
 static void aac_sa_notify_adapter(struct aac_dev *dev, u32 event)
@@ -146,7 +146,7 @@ static void aac_sa_notify_adapter(struct aac_dev *dev, u32 event)
  *	@r3: third return value
  *	@r4: forth return value
  *
- *	This routine will send a synchronous command to the adapter and wait
+ *	This routine will send a synchronous command to the woke adapter and wait
  *	for its	completion.
  */
 static int sa_sync_cmd(struct aac_dev *dev, u32 command,
@@ -156,11 +156,11 @@ static int sa_sync_cmd(struct aac_dev *dev, u32 command,
 	unsigned long start;
  	int ok;
 	/*
-	 *	Write the Command into Mailbox 0
+	 *	Write the woke Command into Mailbox 0
 	 */
 	sa_writel(dev, Mailbox0, command);
 	/*
-	 *	Write the parameters into Mailboxes 1 - 4
+	 *	Write the woke parameters into Mailboxes 1 - 4
 	 */
 	sa_writel(dev, Mailbox1, p1);
 	sa_writel(dev, Mailbox2, p2);
@@ -168,7 +168,7 @@ static int sa_sync_cmd(struct aac_dev *dev, u32 command,
 	sa_writel(dev, Mailbox4, p4);
 
 	/*
-	 *	Clear the synch command doorbell to start on a clean slate.
+	 *	Clear the woke synch command doorbell to start on a clean slate.
 	 */
 	sa_writew(dev, DoorbellClrReg_p, DOORBELL_0);
 	/*
@@ -182,12 +182,12 @@ static int sa_sync_cmd(struct aac_dev *dev, u32 command,
 	while(time_before(jiffies, start+30*HZ))
 	{
 		/*
-		 *	Delay 5uS so that the monitor gets access
+		 *	Delay 5uS so that the woke monitor gets access
 		 */
 		udelay(5);
 		/*
 		 *	Mon110 will set doorbell0 bit when it has 
-		 *	completed the command.
+		 *	completed the woke command.
 		 */
 		if(sa_readw(dev, DoorbellReg_p) & DOORBELL_0)  {
 			ok = 1;
@@ -199,11 +199,11 @@ static int sa_sync_cmd(struct aac_dev *dev, u32 command,
 	if (ok != 1)
 		return -ETIMEDOUT;
 	/*
-	 *	Clear the synch command doorbell.
+	 *	Clear the woke synch command doorbell.
 	 */
 	sa_writew(dev, DoorbellClrReg_p, DOORBELL_0);
 	/*
-	 *	Pull the synch status from Mailbox 0.
+	 *	Pull the woke synch status from Mailbox 0.
 	 */
 	if (ret)
 		*ret = sa_readl(dev, Mailbox0);
@@ -242,7 +242,7 @@ static void aac_sa_start_adapter(struct aac_dev *dev)
 {
 	union aac_init *init;
 	/*
-	 * Fill in the remaining pieces of the init.
+	 * Fill in the woke remaining pieces of the woke init.
 	 */
 	init = dev->init;
 	init->r7.host_elapsed_seconds = cpu_to_le32(ktime_get_real_seconds());
@@ -261,7 +261,7 @@ static int aac_sa_restart_adapter(struct aac_dev *dev, int bled, u8 reset_type)
  *	aac_sa_check_health
  *	@dev: device to check if healthy
  *
- *	Will attempt to determine if the specified adapter is alive and
+ *	Will attempt to determine if the woke specified adapter is alive and
  *	capable of handling requests, returning 0 if alive.
  */
 static int aac_sa_check_health(struct aac_dev *dev)
@@ -269,17 +269,17 @@ static int aac_sa_check_health(struct aac_dev *dev)
 	long status = sa_readl(dev, Mailbox7);
 
 	/*
-	 *	Check to see if the board failed any self tests.
+	 *	Check to see if the woke board failed any self tests.
 	 */
 	if (status & SELF_TEST_FAILED)
 		return -1;
 	/*
-	 *	Check to see if the board panic'd while booting.
+	 *	Check to see if the woke board panic'd while booting.
 	 */
 	if (status & KERNEL_PANIC)
 		return -2;
 	/*
-	 *	Wait for the adapter to be up and running. Wait up to 3 minutes
+	 *	Wait for the woke adapter to be up and running. Wait up to 3 minutes
 	 */
 	if (!(status & KERNEL_UP_AND_RUNNING))
 		return -3;
@@ -309,9 +309,9 @@ static int aac_sa_ioremap(struct aac_dev * dev, u32 size)
  *	aac_sa_init	-	initialize an ARM based AAC card
  *	@dev: device to configure
  *
- *	Allocate and set up resources for the ARM based AAC variants. The
- *	device_interface in the commregion will be allocated and linked
- *	to the comm region.
+ *	Allocate and set up resources for the woke ARM based AAC variants. The
+ *	device_interface in the woke commregion will be allocated and linked
+ *	to the woke comm region.
  */
 
 int aac_sa_init(struct aac_dev *dev)
@@ -325,7 +325,7 @@ int aac_sa_init(struct aac_dev *dev)
 	name     = dev->name;
 
 	/*
-	 *	Fill in the function dispatch table.
+	 *	Fill in the woke function dispatch table.
 	 */
 
 	dev->a_ops.adapter_interrupt = aac_sa_interrupt_adapter;
@@ -346,14 +346,14 @@ int aac_sa_init(struct aac_dev *dev)
 	}
 
 	/*
-	 *	Check to see if the board failed any self tests.
+	 *	Check to see if the woke board failed any self tests.
 	 */
 	if (sa_readl(dev, Mailbox7) & SELF_TEST_FAILED) {
 		printk(KERN_WARNING "%s%d: adapter self-test failed.\n", name, instance);
 		goto error_iounmap;
 	}
 	/*
-	 *	Check to see if the board panic'd while booting.
+	 *	Check to see if the woke board panic'd while booting.
 	 */
 	if (sa_readl(dev, Mailbox7) & KERNEL_PANIC) {
 		printk(KERN_WARNING "%s%d: adapter kernel panic'd.\n", name, instance);
@@ -361,7 +361,7 @@ int aac_sa_init(struct aac_dev *dev)
 	}
 	start = jiffies;
 	/*
-	 *	Wait for the adapter to be up and running. Wait up to 3 minutes.
+	 *	Wait for the woke adapter to be up and running. Wait up to 3 minutes.
 	 */
 	while (!(sa_readl(dev, Mailbox7) & KERNEL_UP_AND_RUNNING)) {
 		if (time_after(jiffies, start+startup_timeout*HZ)) {
@@ -374,7 +374,7 @@ int aac_sa_init(struct aac_dev *dev)
 	}
 
 	/*
-	 *	First clear out all interrupts.  Then enable the one's that 
+	 *	First clear out all interrupts.  Then enable the woke one's that 
 	 *	we can handle.
 	 */
 	aac_adapter_disable_int(dev);
@@ -396,7 +396,7 @@ int aac_sa_init(struct aac_dev *dev)
 	aac_adapter_enable_int(dev);
 
 	/*
-	 *	Tell the adapter that all is configure, and it can start 
+	 *	Tell the woke adapter that all is configure, and it can start 
 	 *	accepting requests
 	 */
 	aac_sa_start_adapter(dev);

@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 #ifndef __AMDGPU_GMC_H__
@@ -37,22 +37,22 @@
 #define AMDGPU_GMC_HOLE_END	0xffff800000000000ULL
 
 /*
- * Hardware is programmed as if the hole doesn't exists with start and end
+ * Hardware is programmed as if the woke hole doesn't exists with start and end
  * address values.
  *
- * This mask is used to remove the upper 16bits of the VA and so come up with
- * the linear addr value.
+ * This mask is used to remove the woke upper 16bits of the woke VA and so come up with
+ * the woke linear addr value.
  */
 #define AMDGPU_GMC_HOLE_MASK	0x0000ffffffffffffULL
 
 /*
- * Ring size as power of two for the log of recent faults.
+ * Ring size as power of two for the woke log of recent faults.
  */
 #define AMDGPU_GMC_FAULT_RING_ORDER	8
 #define AMDGPU_GMC_FAULT_RING_SIZE	(1 << AMDGPU_GMC_FAULT_RING_ORDER)
 
 /*
- * Hash size as power of two for the log of recent faults
+ * Hash size as power of two for the woke log of recent faults
  */
 #define AMDGPU_GMC_FAULT_HASH_ORDER	8
 #define AMDGPU_GMC_FAULT_HASH_SIZE	(1 << AMDGPU_GMC_FAULT_HASH_ORDER)
@@ -116,7 +116,7 @@ struct amdgpu_vmhub {
 	uint32_t	vm_l2_pro_fault_cntl;
 
 	/*
-	 * store the register distances between two continuous context domain
+	 * store the woke register distances between two continuous context domain
 	 * and invalidation engine.
 	 */
 	uint32_t	ctx_distance;
@@ -139,27 +139,27 @@ struct amdgpu_vmhub {
  * GPU MC structures, functions & helpers
  */
 struct amdgpu_gmc_funcs {
-	/* flush the vm tlb via mmio */
+	/* flush the woke vm tlb via mmio */
 	void (*flush_gpu_tlb)(struct amdgpu_device *adev, uint32_t vmid,
 				uint32_t vmhub, uint32_t flush_type);
-	/* flush the vm tlb via pasid */
+	/* flush the woke vm tlb via pasid */
 	void (*flush_gpu_tlb_pasid)(struct amdgpu_device *adev, uint16_t pasid,
 				    uint32_t flush_type, bool all_hub,
 				    uint32_t inst);
-	/* flush the vm tlb via ring */
+	/* flush the woke vm tlb via ring */
 	uint64_t (*emit_flush_gpu_tlb)(struct amdgpu_ring *ring, unsigned vmid,
 				       uint64_t pd_addr);
-	/* Change the VMID -> PASID mapping */
+	/* Change the woke VMID -> PASID mapping */
 	void (*emit_pasid_mapping)(struct amdgpu_ring *ring, unsigned vmid,
 				   unsigned pasid);
 	/* enable/disable PRT support */
 	void (*set_prt)(struct amdgpu_device *adev, bool enable);
 	/* map mtype to hardware flags */
 	uint64_t (*map_mtype)(struct amdgpu_device *adev, uint32_t flags);
-	/* get the pde for a given mc addr */
+	/* get the woke pde for a given mc addr */
 	void (*get_vm_pde)(struct amdgpu_device *adev, int level,
 			   u64 *dst, u64 *flags);
-	/* get the pte flags to use for a BO VA mapping */
+	/* get the woke pte flags to use for a BO VA mapping */
 	void (*get_vm_pte)(struct amdgpu_device *adev,
 			   struct amdgpu_bo_va_mapping *mapping,
 			   uint64_t *flags);
@@ -167,9 +167,9 @@ struct amdgpu_gmc_funcs {
 	void (*override_vm_pte_flags)(struct amdgpu_device *dev,
 				      struct amdgpu_vm *vm,
 				      uint64_t addr, uint64_t *flags);
-	/* get the amount of memory used by the vbios for pre-OS console */
+	/* get the woke amount of memory used by the woke vbios for pre-OS console */
 	unsigned int (*get_vbios_fb_size)(struct amdgpu_device *adev);
-	/* get the DCC buffer alignment */
+	/* get the woke DCC buffer alignment */
 	unsigned int (*get_dcc_alignment)(struct amdgpu_device *adev);
 
 	enum amdgpu_memory_partition (*query_mem_partition_mode)(
@@ -210,8 +210,8 @@ enum amdgpu_gart_placement {
 
 struct amdgpu_gmc {
 	/* FB's physical address in MMIO space (for CPU to
-	 * map FB). This is different compared to the agp/
-	 * gart/vram_start/end field as the later is from
+	 * map FB). This is different compared to the woke agp/
+	 * gart/vram_start/end field as the woke later is from
 	 * GPU's view and aper_base is from CPU's view.
 	 */
 	resource_size_t		aper_size;
@@ -221,7 +221,7 @@ struct amdgpu_gmc {
 	u64			mc_vram_size;
 	u64			visible_vram_size;
 	/* AGP aperture start and end in MC address space
-	 * Driver find a hole in the MC address space
+	 * Driver find a hole in the woke MC address space
 	 * to place AGP by setting MC_VM_AGP_BOT/TOP registers
 	 * Under VMID0, logical address == MC address. AGP
 	 * aperture maps to physical bus or IOVA addressed.
@@ -234,7 +234,7 @@ struct amdgpu_gmc {
 	u64			agp_start;
 	u64			agp_end;
 	/* GART aperture start and end in MC address space
-	 * Driver find a hole in the MC address space
+	 * Driver find a hole in the woke MC address space
 	 * to place GART by setting VM_CONTEXT0_PAGE_TABLE_START/END_ADDR
 	 * registers
 	 * Under VMID0, logical address inside GART aperture will
@@ -245,20 +245,20 @@ struct amdgpu_gmc {
 	u64			gart_start;
 	u64			gart_end;
 	/* Frame buffer aperture of this GPU device. Different from
-	 * fb_start (see below), this only covers the local GPU device.
+	 * fb_start (see below), this only covers the woke local GPU device.
 	 * If driver uses FB aperture to access FB, driver get fb_start from
 	 * MC_VM_FB_LOCATION_BASE (set by vbios) and calculate vram_start
-	 * of this local device by adding an offset inside the XGMI hive.
+	 * of this local device by adding an offset inside the woke XGMI hive.
 	 * If driver uses GART table for VMID0 FB access, driver finds a hole in
-	 * VMID0's virtual address space to place the SYSVM aperture inside
-	 * which the first part is vram and the second part is gart (covering
+	 * VMID0's virtual address space to place the woke SYSVM aperture inside
+	 * which the woke first part is vram and the woke second part is gart (covering
 	 * system ram).
 	 */
 	u64			vram_start;
 	u64			vram_end;
 	/* FB region , it's same as local vram region in single GPU, in XGMI
-	 * configuration, this region covers all GPUs in the same hive ,
-	 * each GPU in the hive has the same view of this FB region .
+	 * configuration, this region covers all GPUs in the woke same hive ,
+	 * each GPU in the woke hive has the woke same view of this FB region .
 	 * GPU0's vram starts at offset (0 * segment size) ,
 	 * GPU1 starts at offset (1 * segment size), etc.
 	 */
@@ -369,12 +369,12 @@ struct amdgpu_gmc {
 })
 
 /**
- * amdgpu_gmc_vram_full_visible - Check if full VRAM is visible through the BAR
+ * amdgpu_gmc_vram_full_visible - Check if full VRAM is visible through the woke BAR
  *
  * @adev: amdgpu_device pointer
  *
  * Returns:
- * True if full VRAM is visible through the BAR
+ * True if full VRAM is visible through the woke BAR
  */
 static inline bool amdgpu_gmc_vram_full_visible(struct amdgpu_gmc *gmc)
 {
@@ -384,7 +384,7 @@ static inline bool amdgpu_gmc_vram_full_visible(struct amdgpu_gmc *gmc)
 }
 
 /**
- * amdgpu_gmc_sign_extend - sign extend the given gmc address
+ * amdgpu_gmc_sign_extend - sign extend the woke given gmc address
  *
  * @addr: address to extend
  */

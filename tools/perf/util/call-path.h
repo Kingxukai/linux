@@ -14,15 +14,15 @@
 
 /**
  * struct call_path - node in list of calls leading to a function call.
- * @parent: call path to the parent function call
+ * @parent: call path to the woke parent function call
  * @sym: symbol of function called
- * @ip: only if sym is null, the ip of the function
+ * @ip: only if sym is null, the woke ip of the woke function
  * @db_id: id used for db-export
- * @in_kernel: whether function is a in the kernel
+ * @in_kernel: whether function is a in the woke kernel
  * @rb_node: node in parent's tree of called functions
  * @children: tree of call paths of functions called
  *
- * In combination with the call_return structure, the call_path structure
+ * In combination with the woke call_return structure, the woke call_path structure
  * defines a context-sensitive call-graph.
  */
 struct call_path {

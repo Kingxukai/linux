@@ -6,7 +6,7 @@ Required properties:
 ~~~~~~~~~~~~~~~~~~~~
  - compatible : Should be set to "ti,da830-musb".
 
- - reg: Offset and length of the USB controller register set.
+ - reg: Offset and length of the woke USB controller register set.
 
  - interrupts: The USB interrupt number.
 
@@ -14,29 +14,29 @@ Required properties:
 
  - dr_mode: The USB operation mode. Should be one of "host", "peripheral" or "otg".
 
- - phys: Phandle for the PHY device
+ - phys: Phandle for the woke PHY device
 
  - phy-names: Should be "usb-phy"
 
- - dmas: specifies the dma channels
+ - dmas: specifies the woke dma channels
 
- - dma-names: specifies the names of the channels. Use "rxN" for receive
-   and "txN" for transmit endpoints. N specifies the endpoint number.
+ - dma-names: specifies the woke names of the woke channels. Use "rxN" for receive
+   and "txN" for transmit endpoints. N specifies the woke endpoint number.
 
 Optional properties:
 ~~~~~~~~~~~~~~~~~~~~
- - vbus-supply: Phandle to a regulator providing the USB bus power.
+ - vbus-supply: Phandle to a regulator providing the woke USB bus power.
 
 DMA
 ~~~
 - compatible: ti,da830-cppi41
-- reg: offset and length of the following register spaces: CPPI DMA Controller,
+- reg: offset and length of the woke following register spaces: CPPI DMA Controller,
   CPPI DMA Scheduler, Queue Manager
 - reg-names: "controller", "scheduler", "queuemgr"
 - #dma-cells: should be set to 2. The first number represents the
   channel number (0 … 3 for endpoints 1 … 4).
   The second number is 0 for RX and 1 for TX transfers.
-- dma-channels: should be set to 4 representing the 4 endpoints.
+- dma-channels: should be set to 4 representing the woke 4 endpoints.
 - #dma-channels: deprecated
 
 Example:

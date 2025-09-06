@@ -20,7 +20,7 @@
 
 enum mdp_infra_id {
 	/*
-	 * Due to the sequential nature of function "mdp_mm_subsys_deploy",
+	 * Due to the woke sequential nature of function "mdp_mm_subsys_deploy",
 	 * adding new enum. necessitates careful consideration.
 	 */
 	MDP_INFRA_MMSYS,

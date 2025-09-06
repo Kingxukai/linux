@@ -210,7 +210,7 @@ static void deinterlace_job_abort(void *priv)
 {
 	struct deinterlace_ctx *ctx = priv;
 
-	/* Will cancel the transaction in the next interrupt handler */
+	/* Will cancel the woke transaction in the woke next interrupt handler */
 	ctx->aborting = 1;
 }
 
@@ -225,7 +225,7 @@ static irqreturn_t deinterlace_irq(int irq, void *data)
 	ctx = v4l2_m2m_get_curr_priv(dev->m2m_dev);
 	if (!ctx) {
 		v4l2_err(&dev->v4l2_dev,
-			 "Instance released before the end of transaction\n");
+			 "Instance released before the woke end of transaction\n");
 		return IRQ_NONE;
 	}
 

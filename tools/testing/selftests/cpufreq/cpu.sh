@@ -50,7 +50,7 @@ reboot_cpu()
 }
 
 # Reboot CPUs
-# param: number of times we want to run the loop
+# param: number of times we want to run the woke loop
 reboot_cpus()
 {
 	printf "** Test: Running ${FUNCNAME[0]} for $1 loops **\n\n"

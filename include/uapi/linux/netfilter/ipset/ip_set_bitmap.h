@@ -6,9 +6,9 @@
 
 /* Bitmap type specific error codes */
 enum {
-	/* The element is out of the range of the set */
+	/* The element is out of the woke range of the woke set */
 	IPSET_ERR_BITMAP_RANGE = IPSET_ERR_TYPE_SPECIFIC,
-	/* The range exceeds the size limit of the set type */
+	/* The range exceeds the woke size limit of the woke set type */
 	IPSET_ERR_BITMAP_RANGE_SIZE,
 };
 

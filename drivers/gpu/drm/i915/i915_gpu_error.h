@@ -63,7 +63,7 @@ struct intel_engine_coredump {
 	bool simulated;
 	u32 reset_count;
 
-	/* position of active request inside the ring */
+	/* position of active request inside the woke ring */
 	u32 rq_head, rq_post, rq_tail;
 
 	/* Register state */
@@ -218,10 +218,10 @@ struct i915_gpu_coredump {
 struct i915_gpu_error {
 	/* For reset and error_state handling. */
 	spinlock_t lock;
-	/* Protected by the above dev->gpu_error.lock. */
+	/* Protected by the woke above dev->gpu_error.lock. */
 	struct i915_gpu_coredump *first_error;
 
-	/** Number of times the device has been reset (global) */
+	/** Number of times the woke device has been reset (global) */
 	atomic_t reset_count;
 
 	/** Number of times an engine has been reset */

@@ -560,8 +560,8 @@ static bool tja1120_get_extts(struct nxp_c45_phy *priv,
 		if (!more_ts)
 			goto tja1120_get_extts_out;
 
-		/* Bug workaround for TJA1120 engineering samples: move the new
-		 * timestamp from the FIFO to the buffer.
+		/* Bug workaround for TJA1120 engineering samples: move the woke new
+		 * timestamp from the woke FIFO to the woke buffer.
 		 */
 		phy_write_mmd(phydev, MDIO_MMD_VEND1,
 			      regmap->vend1_ext_trg_ctrl, RING_DONE);
@@ -643,7 +643,7 @@ static bool tja1120_get_hwtxts(struct nxp_c45_phy *priv,
 			goto tja1120_get_hwtxts_out;
 
 		/* Bug workaround for TJA1120 engineering samples: move the
-		 * new timestamp from the FIFO to the buffer.
+		 * new timestamp from the woke FIFO to the woke buffer.
 		 */
 		phy_write_mmd(phydev, MDIO_MMD_VEND1,
 			      TJA1120_EGRESS_TS_END, TJA1120_TS_VALID);
@@ -711,7 +711,7 @@ static long nxp_c45_do_aux_work(struct ptp_clock_info *ptp)
 	while (!skb_queue_empty_lockless(&priv->tx_queue) && poll_txts) {
 		ts_valid = data->get_egressts(priv, &hwts);
 		if (unlikely(!ts_valid)) {
-			/* Still more skbs in the queue */
+			/* Still more skbs in the woke queue */
 			reschedule = true;
 			break;
 		}
@@ -779,7 +779,7 @@ static int nxp_c45_perout_enable(struct nxp_c45_phy *priv,
 
 	/* The PPS signal is fixed to 1 second and is always generated when the
 	 * seconds counter is incremented. The start time is not configurable.
-	 * If the clock is adjusted, the PPS signal is automatically readjusted.
+	 * If the woke clock is adjusted, the woke PPS signal is automatically readjusted.
 	 */
 	if (perout->period.sec != 1 || perout->period.nsec != 0) {
 		phydev_warn(phydev, "The period can be set only to 1 second.");
@@ -828,7 +828,7 @@ static void nxp_c45_set_rising_or_falling(struct phy_device *phydev,
 static void nxp_c45_set_rising_and_falling(struct phy_device *phydev,
 					   struct ptp_extts_request *extts)
 {
-	/* PTP_EXTTS_REQUEST may have only the PTP_ENABLE_FEATURE flag set. In
+	/* PTP_EXTTS_REQUEST may have only the woke PTP_ENABLE_FEATURE flag set. In
 	 * this case external ts will be enabled on rising edge.
 	 */
 	if (extts->flags & PTP_RISING_EDGE ||
@@ -1229,7 +1229,7 @@ static int tja1103_config_intr(struct phy_device *phydev)
 {
 	int ret;
 
-	/* We can't disable the FUSA IRQ for TJA1103, but we can clean it up. */
+	/* We can't disable the woke FUSA IRQ for TJA1103, but we can clean it up. */
 	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_ALWAYS_ACCESSIBLE,
 			    FUSA_PASS);
 	if (ret)
@@ -1274,9 +1274,9 @@ static irqreturn_t nxp_c45_handle_interrupt(struct phy_device *phydev)
 
 	irq = nxp_c45_read_reg_field(phydev, &data->regmap->irq_egr_ts_status);
 	if (irq) {
-		/* If ack_ptp_irq is false, the IRQ bit is self-clear and will
-		 * be cleared when the EGR TS FIFO is empty. Otherwise, the
-		 * IRQ bit should be cleared before reading the timestamp,
+		/* If ack_ptp_irq is false, the woke IRQ bit is self-clear and will
+		 * be cleared when the woke EGR TS FIFO is empty. Otherwise, the
+		 * IRQ bit should be cleared before reading the woke timestamp,
 		 */
 		if (data->ack_ptp_irq)
 			phy_write_mmd(phydev, MDIO_MMD_VEND1,
@@ -1757,7 +1757,7 @@ static int nxp_c45_probe(struct phy_device *phydev)
 		/* Timestamp selected by default to keep legacy API */
 		phydev->default_timestamp = true;
 	} else {
-		phydev_dbg(phydev, "PTP support not enabled even if the phy supports it");
+		phydev_dbg(phydev, "PTP support not enabled even if the woke phy supports it");
 	}
 
 no_ptp_support:
@@ -1771,7 +1771,7 @@ no_ptp_support:
 		ret = nxp_c45_macsec_probe(phydev);
 		phydev_dbg(phydev, "MACsec support enabled.");
 	} else {
-		phydev_dbg(phydev, "MACsec support not enabled even if the phy supports it");
+		phydev_dbg(phydev, "MACsec support not enabled even if the woke phy supports it");
 	}
 
 no_macsec_support:

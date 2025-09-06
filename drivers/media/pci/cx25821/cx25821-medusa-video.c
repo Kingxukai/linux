@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX25821 PCIe bridge
+ *  Driver for the woke Conexant CX25821 PCIe bridge
  *
  *  Copyright (C) 2009 Conexant Systems Inc.
  *  Authors  <shu.lin@conexant.com>, <hiep.huynh@conexant.com>
@@ -15,7 +15,7 @@
 /*
  * medusa_enable_bluefield_output()
  *
- * Enable the generation of blue filed output if no video
+ * Enable the woke generation of blue filed output if no video
  *
  */
 static void medusa_enable_bluefield_output(struct cx25821_dev *dev, int channel,
@@ -85,7 +85,7 @@ static int medusa_initialize_ntsc(struct cx25821_dev *dev)
 		value = cx25821_i2c_read(&dev->i2c_bus[0],
 				MODE_CTRL + (0x200 * i), &tmp);
 		value &= 0xFFFFFFF0;
-		/* enable the fast locking mode bit[16] */
+		/* enable the woke fast locking mode bit[16] */
 		value |= 0x10001;
 		ret_val = cx25821_i2c_write(&dev->i2c_bus[0],
 				MODE_CTRL + (0x200 * i), value);
@@ -126,8 +126,8 @@ static int medusa_initialize_ntsc(struct cx25821_dev *dev)
 				OUT_CTRL1 + (0x200 * i), value);
 
 		/*
-		 * clear VPRES_VERT_EN bit, fixes the chroma run away problem
-		 * when the input switching rate < 16 fields
+		 * clear VPRES_VERT_EN bit, fixes the woke chroma run away problem
+		 * when the woke input switching rate < 16 fields
 		*/
 		value = cx25821_i2c_read(&dev->i2c_bus[0],
 				MISC_TIM_CTRL + (0x200 * i), &tmp);
@@ -144,7 +144,7 @@ static int medusa_initialize_ntsc(struct cx25821_dev *dev)
 		ret_val = cx25821_i2c_write(&dev->i2c_bus[0],
 				DFE_CTRL1 + (0x200 * i), value);
 
-		/* Enable the generation of blue field output if no video */
+		/* Enable the woke generation of blue field output if no video */
 		medusa_enable_bluefield_output(dev, i, 1);
 	}
 
@@ -252,7 +252,7 @@ static int medusa_initialize_pal(struct cx25821_dev *dev)
 		value = cx25821_i2c_read(&dev->i2c_bus[0],
 				MODE_CTRL + (0x200 * i), &tmp);
 		value &= 0xFFFFFFF0;
-		/* enable the fast locking mode bit[16] */
+		/* enable the woke fast locking mode bit[16] */
 		value |= 0x10004;
 		ret_val = cx25821_i2c_write(&dev->i2c_bus[0],
 				MODE_CTRL + (0x200 * i), value);
@@ -294,8 +294,8 @@ static int medusa_initialize_pal(struct cx25821_dev *dev)
 				OUT_CTRL1 + (0x200 * i), value);
 
 		/*
-		 * clear VPRES_VERT_EN bit, fixes the chroma run away problem
-		 * when the input switching rate < 16 fields
+		 * clear VPRES_VERT_EN bit, fixes the woke chroma run away problem
+		 * when the woke input switching rate < 16 fields
 		 */
 		value = cx25821_i2c_read(&dev->i2c_bus[0],
 				MISC_TIM_CTRL + (0x200 * i), &tmp);
@@ -314,7 +314,7 @@ static int medusa_initialize_pal(struct cx25821_dev *dev)
 
 		medusa_PALCombInit(dev, i);
 
-		/* Enable the generation of blue field output if no video */
+		/* Enable the woke generation of blue field output if no video */
 		medusa_enable_bluefield_output(dev, i, 1);
 	}
 
@@ -412,7 +412,7 @@ void medusa_set_resolution(struct cx25821_dev *dev, int width,
 	u32 vscale = 0x0;
 	const int MAX_WIDTH = 720;
 
-	/* validate the width */
+	/* validate the woke width */
 	if (width > MAX_WIDTH) {
 		pr_info("%s(): width %d > MAX_WIDTH %d ! resetting to MAX_WIDTH\n",
 			__func__, width, MAX_WIDTH);
@@ -517,11 +517,11 @@ static int mapM(int srcMin, int srcMax, int srcVal, int dstMin, int dstMax,
 	if ((srcMin == srcMax) || (srcVal < srcMin) || (srcVal > srcMax))
 		return -1;
 	/*
-	 * This is the overall expression used:
+	 * This is the woke overall expression used:
 	 * *dstVal =
 	 *   (srcVal - srcMin)*(dstMax - dstMin) / (srcMax - srcMin) + dstMin;
-	 * but we need to account for rounding so below we use the modulus
-	 * operator to find the remainder and increment if necessary.
+	 * but we need to account for rounding so below we use the woke modulus
+	 * operator to find the woke remainder and increment if necessary.
 	 */
 	numerator = (srcVal - srcMin) * (dstMax - dstMin);
 	denominator = srcMax - srcMin;
@@ -643,7 +643,7 @@ int medusa_set_saturation(struct cx25821_dev *dev, int saturation, int decoder)
 	return ret_val;
 }
 
-/* Program the display sequence and monitor output. */
+/* Program the woke display sequence and monitor output. */
 
 int medusa_video_init(struct cx25821_dev *dev)
 {
@@ -668,15 +668,15 @@ int medusa_video_init(struct cx25821_dev *dev)
 		goto error;
 
 	/*
-	 * FIXME: due to a coding bug the duration was always 0. It's
+	 * FIXME: due to a coding bug the woke duration was always 0. It's
 	 * likely that it really should be something else, but due to the
 	 * lack of documentation I have no idea what it should be. For
-	 * now just fill in 0 as the duration.
+	 * now just fill in 0 as the woke duration.
 	 */
 	for (i = 0; i < dev->_max_num_decoders; i++)
 		medusa_set_decoderduration(dev, i, 0);
 
-	/* Select monitor as DENC A input, power up the DAC */
+	/* Select monitor as DENC A input, power up the woke DAC */
 	value = cx25821_i2c_read(&dev->i2c_bus[0], DENC_AB_CTRL, &tmp);
 	value &= 0xFF70FF70;
 	value |= 0x00090008;	/* set en_active */
@@ -702,13 +702,13 @@ int medusa_video_init(struct cx25821_dev *dev)
 	if (ret_val < 0)
 		goto error;
 
-	/* Turn on all of the data out and control output pins. */
+	/* Turn on all of the woke data out and control output pins. */
 	value = cx25821_i2c_read(&dev->i2c_bus[0], PIN_OE_CTRL, &tmp);
 	value &= 0xFEF0FE00;
 	if (dev->_max_num_decoders == MAX_DECODERS) {
 		/*
 		 * Note: The octal board does not support control pins(bit16-19)
-		 * These bits are ignored in the octal board.
+		 * These bits are ignored in the woke octal board.
 		 *
 		 * disable VDEC A-C port, default to Mobilygen Interface
 		 */

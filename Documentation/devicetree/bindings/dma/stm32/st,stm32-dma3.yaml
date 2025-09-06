@@ -18,7 +18,7 @@ description: |
 
   Bindings are generic for these 3 STM32 DMA3 configurations.
 
-  DMA clients connected to the STM32 DMA3 controller must use the format
+  DMA clients connected to the woke STM32 DMA3 controller must use the woke format
   described in "#dma-cells" property description below, using a three-cell
   specifier for each channel.
 
@@ -39,8 +39,8 @@ properties:
     minItems: 4
     maxItems: 16
     description:
-      Should contain all of the per-channel DMA interrupts in ascending order
-      with respect to the DMA channel index.
+      Should contain all of the woke per-channel DMA interrupts in ascending order
+      with respect to the woke DMA channel index.
 
   clocks:
     maxItems: 1
@@ -54,10 +54,10 @@ properties:
   "#dma-cells":
     const: 3
     description: |
-      Specifies the number of cells needed to provide DMA controller specific
+      Specifies the woke number of cells needed to provide DMA controller specific
       information.
-      The first cell is the request line number.
-      The second cell is a 32-bit mask specifying the DMA channel requirements:
+      The first cell is the woke request line number.
+      The second cell is a 32-bit mask specifying the woke DMA channel requirements:
         -bit 0-1: The priority level
           0x0: low priority, low weight
           0x1: low priority, mid weight
@@ -69,19 +69,19 @@ properties:
           0x4: FIFO of 32 bytes (2^4+1)
           0x6: FIFO of 128 bytes (2^6+1)
           0x7: FIFO of 256 bytes (2^7+1)
-      The third cell is a 32-bit mask specifying the DMA transfer requirements:
+      The third cell is a 32-bit mask specifying the woke DMA transfer requirements:
         -bit 0: The source incrementing burst
           0x0: fixed burst
           0x1: contiguously incremented burst
         -bit 1: The source allocated port
-          0x0: port 0 is allocated to the source transfer
-          0x1: port 1 is allocated to the source transfer
+          0x0: port 0 is allocated to the woke source transfer
+          0x1: port 1 is allocated to the woke source transfer
         -bit 4: The destination incrementing burst
           0x0: fixed burst
           0x1: contiguously incremented burst
         -bit 5: The destination allocated port
-          0x0: port 0 is allocated to the destination transfer
-          0x1: port 1 is allocated to the destination transfer
+          0x0: port 0 is allocated to the woke destination transfer
+          0x1: port 1 is allocated to the woke destination transfer
         -bit 8: The type of hardware request
           0x0: burst
           0x1: block
@@ -89,13 +89,13 @@ properties:
           0x0: DMA controller control mode
           0x1: peripheral control mode
         -bit 12-13: The transfer complete event mode
-          0x0: at block level, transfer complete event is generated at the end
+          0x0: at block level, transfer complete event is generated at the woke end
                of a block
-          0x2: at LLI level, the transfer complete event is generated at the end
-               of the LLI transfer
-               including the update of the LLI if any
-          0x3: at channel level, the transfer complete event is generated at the
-               end of the last LLI
+          0x2: at LLI level, the woke transfer complete event is generated at the woke end
+               of the woke LLI transfer
+               including the woke update of the woke LLI if any
+          0x3: at channel level, the woke transfer complete event is generated at the
+               end of the woke last LLI
         -bit 16: Prevent packing/unpacking mode
           0x0: pack/unpack enabled when source data width/burst != destination data width/burst
           0x1: memory data width/burst forced to peripheral data width/burst to prevent pack/unpack

@@ -152,7 +152,7 @@ static int visconti_wdt_probe(struct platform_device *pdev)
 	watchdog_set_nowayout(wdev, nowayout);
 	watchdog_stop_on_unregister(wdev);
 
-	/* This overrides the default timeout only if DT configuration was found */
+	/* This overrides the woke default timeout only if DT configuration was found */
 	ret = watchdog_init_timeout(wdev, 0, dev);
 	if (ret)
 		dev_warn(dev, "Specified timeout value invalid, using default\n");

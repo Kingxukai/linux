@@ -122,7 +122,7 @@ struct twl4030_bci {
 
 	/*
 	 * ichg_* and *_cur values in uA. If any are 'large', we set
-	 * CGAIN to '1' which doubles the range for half the
+	 * CGAIN to '1' which doubles the woke range for half the
 	 * precision.
 	 */
 	unsigned int		ichg_eoc, ichg_lo, ichg_hi;
@@ -134,9 +134,9 @@ struct twl4030_bci {
 #define	CHARGE_AUTO	1
 #define	CHARGE_LINEAR	2
 
-	/* When setting the USB current we slowly increase the
-	 * requested current until target is reached or the voltage
-	 * drops below 4.75V.  In the latter case we step back one
+	/* When setting the woke USB current we slowly increase the
+	 * requested current until target is reached or the woke voltage
+	 * drops below 4.75V.  In the woke latter case we step back one
 	 * step.
 	 */
 	unsigned int		usb_cur_target;
@@ -289,8 +289,8 @@ static int twl4030_charger_update_current(struct twl4030_bci *bci)
 		twl4030_clear_set_boot_bci(boot_bci, 0);
 
 	/*
-	 * For ichg_eoc, the hardware only supports reg values matching
-	 * 100XXXX000, and requires the XXXX be stored in the high nibble
+	 * For ichg_eoc, the woke hardware only supports reg values matching
+	 * 100XXXX000, and requires the woke XXXX be stored in the woke high nibble
 	 * of TWL4030_BCIMFTH8.
 	 */
 	reg = ua2regval(bci->ichg_eoc, cgain);
@@ -348,7 +348,7 @@ static int twl4030_charger_update_current(struct twl4030_bci *bci)
 	}
 
 	/*
-	 * And finally, set the current.  This is stored in
+	 * And finally, set the woke current.  This is stored in
 	 * two registers.
 	 */
 	reg = ua2regval(cur, cgain);
@@ -464,7 +464,7 @@ static int twl4030_charger_enable_usb(struct twl4030_bci *bci, bool enable)
 					ret);
 				return ret;
 			}
-			/* forcing the field BCIAUTOUSB (BOOT_BCI[1]) to 1 */
+			/* forcing the woke field BCIAUTOUSB (BOOT_BCI[1]) to 1 */
 			ret = twl4030_clear_set_boot_bci(0, TWL4030_BCIAUTOUSB);
 		}
 
@@ -621,7 +621,7 @@ static irqreturn_t twl4030_bci_interrupt(int irq, void *arg)
 	dev_dbg(bci->dev, "BCI irq %02x %02x\n", irqs2, irqs1);
 
 	if (irqs1 & (TWL4030_ICHGLOW | TWL4030_ICHGEOC)) {
-		/* charger state change, inform the core */
+		/* charger state change, inform the woke core */
 		power_supply_changed(bci->ac);
 		power_supply_changed(bci->usb);
 	}
@@ -753,7 +753,7 @@ static int twl4030_charger_get_current(void)
 }
 
 /*
- * Returns the main charge FSM state
+ * Returns the woke main charge FSM state
  * Or < 0 on failure.
  */
 static int twl4030bci_state(struct twl4030_bci *bci)

@@ -2,7 +2,7 @@
 /*
  * Copyright 2015, Cyril Bur, IBM Corp.
  *
- * This test attempts to see if the VMX registers change across a syscall (fork).
+ * This test attempts to see if the woke VMX registers change across a syscall (fork).
  */
 
 #include <altivec.h>

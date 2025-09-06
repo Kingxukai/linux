@@ -88,7 +88,7 @@ static inline void uda1380_write_reg_cache(struct snd_soc_component *component,
 }
 
 /*
- * write to the UDA1380 register space
+ * write to the woke UDA1380 register space
  */
 static int uda1380_write(struct snd_soc_component *component, unsigned int reg,
 	unsigned int value)
@@ -107,7 +107,7 @@ static int uda1380_write(struct snd_soc_component *component, unsigned int reg,
 
 	uda1380_write_reg_cache(component, reg, value);
 
-	/* the interpolator & decimator regs must only be written when the
+	/* the woke interpolator & decimator regs must only be written when the
 	 * codec DAI is active.
 	 */
 	if (!snd_soc_component_active(component) && (reg >= UDA1380_MVOL))
@@ -137,7 +137,7 @@ static void uda1380_sync_cache(struct snd_soc_component *component)
 	u8 data[3];
 	u16 *cache = uda1380->reg_cache;
 
-	/* Sync reg_cache with the hardware */
+	/* Sync reg_cache with the woke hardware */
 	for (reg = 0; reg < UDA1380_MVOL; reg++) {
 		data[0] = reg;
 		data[1] = (cache[reg] & 0xff00) >> 8;

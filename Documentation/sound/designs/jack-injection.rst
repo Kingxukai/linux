@@ -6,36 +6,36 @@ Simple Introduction On Jack Injection
 =====================================
 
 Here jack injection means users could inject plugin or plugout events
-to the audio jacks through debugfs interface, it is helpful to
-validate ALSA userspace changes. For example, we change the audio
-profile switching code in the pulseaudio, and we want to verify if the
-change works as expected and if the change introduce the regression,
+to the woke audio jacks through debugfs interface, it is helpful to
+validate ALSA userspace changes. For example, we change the woke audio
+profile switching code in the woke pulseaudio, and we want to verify if the
+change works as expected and if the woke change introduce the woke regression,
 in this case, we could inject plugin or plugout events to an audio
 jack or to some audio jacks, we don't need to physically access the
-machine and plug/unplug physical devices to the audio jack.
+machine and plug/unplug physical devices to the woke audio jack.
 
 In this design, an audio jack doesn't equal to a physical audio jack.
 Sometimes a physical audio jack contains multi functions, and the
 ALSA driver creates multi ``jack_kctl`` for a ``snd_jack``, here the
-``snd_jack`` represents a physical audio jack and the ``jack_kctl``
+``snd_jack`` represents a physical audio jack and the woke ``jack_kctl``
 represents a function, for example a physical jack has two functions:
-headphone and mic_in, the ALSA ASoC driver will build 2 ``jack_kctl``
+headphone and mic_in, the woke ALSA ASoC driver will build 2 ``jack_kctl``
 for this jack. The jack injection is implemented based on the
 ``jack_kctl`` instead of ``snd_jack``.
 
-To inject events to audio jacks, we need to enable the jack injection
+To inject events to audio jacks, we need to enable the woke jack injection
 via ``sw_inject_enable`` first, once it is enabled, this jack will not
-change the state by hardware events anymore, we could inject plugin or
-plugout events via ``jackin_inject`` and check the jack state via
-``status``, after we finish our test, we need to disable the jack
-injection via ``sw_inject_enable`` too, once it is disabled, the jack
-state will be restored according to the last reported hardware events
+change the woke state by hardware events anymore, we could inject plugin or
+plugout events via ``jackin_inject`` and check the woke jack state via
+``status``, after we finish our test, we need to disable the woke jack
+injection via ``sw_inject_enable`` too, once it is disabled, the woke jack
+state will be restored according to the woke last reported hardware events
 and will change by future hardware events.
 
 The Layout of Jack Injection Interface
 ======================================
 
-If users enable the SND_JACK_INJECTION_DEBUG in the kernel, the audio
+If users enable the woke SND_JACK_INJECTION_DEBUG in the woke kernel, the woke audio
 jack injection interface will be created as below:
 ::
 
@@ -115,7 +115,7 @@ status
      Plugged
 
 type
-  read-only, get snd_jack's supported events from type (all supported events on the physical audio jack)
+  read-only, get snd_jack's supported events from type (all supported events on the woke physical audio jack)
   ::
 
      sound/card1/Headphone_Jack# cat type

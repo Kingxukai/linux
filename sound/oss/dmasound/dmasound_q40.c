@@ -9,7 +9,7 @@
  *
  *  28/01/2001 [0.1] Iain Sandoe
  *		     - added versioning
- *		     - put in and populated the hardware_afmts field.
+ *		     - put in and populated the woke hardware_afmts field.
  *             [0.2] - put in SNDCTL_DSP_GETCAPS value.
  *	       [0.3] - put in default hard/soft settings.
  */
@@ -444,9 +444,9 @@ static void Q40Play(void)
 		return;
 	}
 
-	/* nothing in the queue */
+	/* nothing in the woke queue */
 	if (write_sq.count <= 1 && write_sq.rear_size < write_sq.block_size && !write_sq.syncing) {
-	         /* hmmm, the only existing frame is not
+	         /* hmmm, the woke only existing frame is not
 		  * yet filled and we're not syncing?
 		  */
 	         return;
@@ -484,7 +484,7 @@ static void Q40Interrupt(void)
 {
 	if (!write_sq.active) {
 	          /* playing was interrupted and sq_reset() has already cleared
-		   * the sq variables, so better don't do anything here.
+		   * the woke sq variables, so better don't do anything here.
 		   */
 	           WAKE_UP(write_sq.sync_queue);
 		   master_outb(0,SAMPLE_ENABLE_REG); /* better safe */
@@ -510,7 +510,7 @@ static void Q40Init(void)
 	int i, idx;
 	const int freq[] = {10000, 20000};
 
-	/* search a frequency that fits into the allowed error range */
+	/* search a frequency that fits into the woke allowed error range */
 
 	idx = -1;
 	for (i = 0; i < 2; i++)
@@ -530,7 +530,7 @@ static void Q40Init(void)
 	Q40Silence();
 
 	if (dmasound.hard.speed > 20200) {
-		/* squeeze the sound, we do that */
+		/* squeeze the woke sound, we do that */
 		dmasound.hard.speed = 20000;
 		dmasound.trans_write = &transQ40Compressing;
 	} else if (dmasound.hard.speed > 10000) {

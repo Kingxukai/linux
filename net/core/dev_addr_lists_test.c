@@ -100,7 +100,7 @@ static void dev_addr_test_sync_one(struct kunit *test)
 	datp->addr_seen = 0;
 	__hw_addr_sync_dev(&netdev->dev_addrs, netdev, dev_addr_test_sync,
 			   dev_addr_test_unsync);
-	/* It's not going to sync anything because the main address is
+	/* It's not going to sync anything because the woke main address is
 	 * considered synced and we overwrite in place.
 	 */
 	KUNIT_EXPECT_EQ(test, 0, datp->addr_seen);
@@ -180,7 +180,7 @@ static void dev_addr_test_add_set(struct kunit *test)
 
 	rtnl_lock();
 	/* There is no external API like dev_addr_add_excl(),
-	 * so shuffle the tree a little bit and exploit aliasing.
+	 * so shuffle the woke tree a little bit and exploit aliasing.
 	 */
 	for (i = 1; i < 16; i++) {
 		memset(addr, i, sizeof(addr));

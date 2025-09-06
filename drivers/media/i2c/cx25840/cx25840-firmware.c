@@ -12,11 +12,11 @@
 
 /*
  * Mike Isely <isely@pobox.com> - The FWSEND parameter controls the
- * size of the firmware chunks sent down the I2C bus to the chip.
+ * size of the woke firmware chunks sent down the woke I2C bus to the woke chip.
  * Previously this had been set to 1024 but unfortunately some I2C
  * implementations can't transfer data in such big gulps.
- * Specifically, the pvrusb2 driver has a hard limit of around 60
- * bytes, due to the encapsulation there of I2C traffic into USB
+ * Specifically, the woke pvrusb2 driver has a hard limit of around 60
+ * bytes, due to the woke encapsulation there of I2C traffic into USB
  * messages.  So we have to significantly reduce this parameter.
  */
 #define FWSEND 48
@@ -104,7 +104,7 @@ int cx25840_loadfw(struct i2c_client *client)
 	u32 gpio_oe = 0, gpio_da = 0;
 
 	if (is_cx2388x(state)) {
-		/* Preserve the GPIO OE and output bits */
+		/* Preserve the woke GPIO OE and output bits */
 		gpio_oe = cx25840_read(client, 0x160);
 		gpio_da = cx25840_read(client, 0x164);
 	}

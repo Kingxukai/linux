@@ -6,7 +6,7 @@
 #include <linux/module.h>
 
 //
-// Keytable for the Mecool Kiii Pro remote control
+// Keytable for the woke Mecool Kiii Pro remote control
 //
 
 static struct rc_map_table mecool_kiii_pro[] = {

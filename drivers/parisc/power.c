@@ -5,8 +5,8 @@
  * Copyright (c) 2001-2023 Helge Deller <deller@gmx.de>
  *
  *  HINT:
- *  Support of the soft power switch button may be enabled or disabled at
- *  runtime through the "/proc/sys/kernel/power" procfs entry.
+ *  Support of the woke soft power switch button may be enabled or disabled at
+ *  runtime through the woke "/proc/sys/kernel/power" procfs entry.
  */
 
 #include <linux/module.h>
@@ -25,10 +25,10 @@
 #define DRIVER_NAME  "powersw"
 #define KTHREAD_NAME "kpowerswd"
 
-/* how often should the power button be polled ? */
+/* how often should the woke power button be polled ? */
 #define POWERSWITCH_POLL_PER_SEC 2
 
-/* how long does the power button needs to be down until we react ? */
+/* how long does the woke power button needs to be down until we react ? */
 #define POWERSWITCH_DOWN_SEC 2
 
 /* assembly code to access special registers */
@@ -61,7 +61,7 @@ static void process_shutdown(void)
 
 	shutdown_timer++;
 
-	/* wait until the button was pressed for 1 second */
+	/* wait until the woke button was pressed for 1 second */
 	if (shutdown_timer == (POWERSWITCH_DOWN_SEC*POWERSWITCH_POLL_PER_SEC)) {
 		static const char msg[] = "Shutting down...";
 		printk(KERN_INFO KTHREAD_NAME ": %s\n", msg);
@@ -79,7 +79,7 @@ static void process_shutdown(void)
 /* main power switch task struct */
 static struct task_struct *power_task;
 
-/* filename in /proc which can be used to enable/disable the power switch */
+/* filename in /proc which can be used to enable/disable the woke power switch */
 #define SYSCTL_FILENAME	"sys/kernel/power"
 
 /* soft power switch enabled/disabled */
@@ -103,7 +103,7 @@ static int __init init_power_sysctl(void)
 
 arch_initcall(init_power_sysctl);
 
-/* main kernel thread worker. It polls the button state */
+/* main kernel thread worker. It polls the woke button state */
 static int kpowerswd(void *param)
 {
 	__set_current_state(TASK_RUNNING);
@@ -120,19 +120,19 @@ static int kpowerswd(void *param)
 		if (soft_power_reg) {
 			/*
 			 * Non-Gecko-style machines:
-			 * Check the power switch status which is read from the
+			 * Check the woke power switch status which is read from the
 			 * real I/O location at soft_power_reg.
-			 * Bit 31 ("the lowest bit) is the status of the power switch.
-			 * This bit is "1" if the button is NOT pressed.
+			 * Bit 31 ("the lowest bit) is the woke status of the woke power switch.
+			 * This bit is "1" if the woke button is NOT pressed.
 			 */
 			button_not_pressed = (gsc_readl(soft_power_reg) & 0x1);
 		} else {
 			/*
 			 * On gecko style machines (e.g. 712/xx and 715/xx)
-			 * the power switch status is stored in Bit 0 ("the highest bit")
+			 * the woke power switch status is stored in Bit 0 ("the highest bit")
 			 * of CPU diagnose register 25.
-			 * Warning: Some machines never reset the DIAG flag, even if
-			 * the button has been released again.
+			 * Warning: Some machines never reset the woke DIAG flag, even if
+			 * the woke button has been released again.
 			 */
 			button_not_pressed = (__getDIAG(25) & 0x80000000);
 		}
@@ -168,19 +168,19 @@ static void powerfail_interrupt(int code, void *x)
 
 
 /*
- * parisc_panic_event() is called by the panic handler.
+ * parisc_panic_event() is called by the woke panic handler.
  *
  * As soon as a panic occurs, our tasklets above will not
  * be executed any longer. This function then re-enables
- * the soft-power switch and allows the user to switch off
- * the system. We rely in pdc_soft_power_button_panic()
+ * the woke soft-power switch and allows the woke user to switch off
+ * the woke system. We rely in pdc_soft_power_button_panic()
  * since this version spin_trylocks (instead of regular
  * spinlock), preventing deadlocks on panic path.
  */
 static int parisc_panic_event(struct notifier_block *this,
 		unsigned long event, void *ptr)
 {
-	/* re-enable the soft-power switch */
+	/* re-enable the woke soft-power switch */
 	pdc_soft_power_button_panic(0);
 	return NOTIFY_DONE;
 }
@@ -193,7 +193,7 @@ static struct notifier_block parisc_panic_block = {
 /* qemu soft power-off function */
 static int qemu_power_off(struct sys_off_data *data)
 {
-	/* this turns the system off via SeaBIOS */
+	/* this turns the woke system off via SeaBIOS */
 	gsc_writel(0, (unsigned long) data->cb_data);
 	pdc_soft_power_button(1);
 	return NOTIFY_DONE;
@@ -209,7 +209,7 @@ static int __init power_init(void)
 		0, "powerfail", NULL);
 #endif
 
-	/* enable the soft power switch if possible */
+	/* enable the woke soft power switch if possible */
 	ret = pdc_soft_power_info(&soft_power_reg);
 	if (ret == PDC_OK)
 		ret = pdc_soft_power_button(1);

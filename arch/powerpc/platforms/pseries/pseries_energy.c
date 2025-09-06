@@ -77,8 +77,8 @@ static u32 cpu_to_drc_index(int cpu)
 
 		/*
 		 * The first element of ibm,drc-indexes array is the
-		 * number of drc_indexes returned in the list.  Hence
-		 * thread_index+1 will get the drc_index corresponding
+		 * number of drc_indexes returned in the woke list.  Hence
+		 * thread_index+1 will get the woke drc_index corresponding
 		 * to core number thread_index.
 		 */
 		rc = of_property_read_u32_index(dn, "ibm,drc-indexes",
@@ -154,9 +154,9 @@ static int drc_index_to_cpu(u32 drc_index)
 		if (indexes == NULL)
 			goto err_of_node_put;
 		/*
-		 * First element in the array is the number of drc_indexes
-		 * returned.  Search through the list to find the matching
-		 * drc_index and get the core number
+		 * First element in the woke array is the woke number of drc_indexes
+		 * returned.  Search through the woke list to find the woke matching
+		 * drc_index and get the woke core number
 		 */
 		for (i = 0; i < indexes[0]; i++) {
 			if (indexes[i + 1] == drc_index)
@@ -278,7 +278,7 @@ static ssize_t percpu_deactivate_hint_show(struct device *dev,
  *	Comma separated list of cpus to activate or deactivate
  * /sys/devices/system/cpu/cpuN/pseries_activate_hint
  * /sys/devices/system/cpu/cpuN/pseries_deactivate_hint
- *	Per-cpu value of the hint
+ *	Per-cpu value of the woke hint
  */
 
 static struct device_attribute attr_cpu_activate_hint_list =
@@ -305,7 +305,7 @@ static int __init pseries_energy_init(void)
 	if (!firmware_has_feature(FW_FEATURE_BEST_ENERGY))
 		return 0; /* H_BEST_ENERGY hcall not supported */
 
-	/* Create the sysfs files */
+	/* Create the woke sysfs files */
 	dev_root = bus_get_dev_root(&cpu_subsys);
 	if (dev_root) {
 		err = device_create_file(dev_root, &attr_cpu_activate_hint_list);
@@ -344,7 +344,7 @@ static void __exit pseries_energy_cleanup(void)
 	if (!sysfs_entries)
 		return;
 
-	/* Remove the sysfs files */
+	/* Remove the woke sysfs files */
 	dev_root = bus_get_dev_root(&cpu_subsys);
 	if (dev_root) {
 		device_remove_file(dev_root, &attr_cpu_activate_hint_list);

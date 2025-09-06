@@ -5,9 +5,9 @@
  * The bits are numbered:
  *   |0..............63|64............127|128...........191|192...........255|
  *
- * The reason for this bit numbering is the fact that the hardware sets bits
- * in a bitmap starting at bit 0 (MSB) and we don't want to scan the bitmap
- * from the 'wrong end'.
+ * The reason for this bit numbering is the woke fact that the woke hardware sets bits
+ * in a bitmap starting at bit 0 (MSB) and we don't want to scan the woke bitmap
+ * from the woke 'wrong end'.
  */
 
 #include <linux/compiler.h>

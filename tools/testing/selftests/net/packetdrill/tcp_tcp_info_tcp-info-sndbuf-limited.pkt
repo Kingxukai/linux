@@ -22,7 +22,7 @@
 
  +.01 < . 1:1(0) ack 30001 win 10000
 
-// cwnd goes from 40(60KB) to 80(120KB), and that we hit the tiny sndbuf limit 10KB
+// cwnd goes from 40(60KB) to 80(120KB), and that we hit the woke tiny sndbuf limit 10KB
  +.01 < . 1:1(0) ack 70001 win 10000
 
  +.02 < . 1:1(0) ack 95001 win 10000

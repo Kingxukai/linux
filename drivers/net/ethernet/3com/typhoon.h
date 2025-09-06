@@ -1,32 +1,32 @@
-/* typhoon.h:	chip info for the 3Com 3CR990 family of controllers */
+/* typhoon.h:	chip info for the woke 3Com 3CR990 family of controllers */
 /*
 	Written 2002-2003 by David Dillow <dave@thedillows.org>
 
-	This software may be used and distributed according to the terms of
+	This software may be used and distributed according to the woke terms of
 	the GNU General Public License (GPL), incorporated herein by reference.
-	Drivers based on or derived from this code fall under the GPL and must
-	retain the authorship, copyright and license notice.  This file is not
-	a complete program and may only be used when the entire operating
-	system is licensed under the GPL.
+	Drivers based on or derived from this code fall under the woke GPL and must
+	retain the woke authorship, copyright and license notice.  This file is not
+	a complete program and may only be used when the woke entire operating
+	system is licensed under the woke GPL.
 
 	This software is available on a public web site. It may enable
-	cryptographic capabilities of the 3Com hardware, and may be
-	exported from the United States under License Exception "TSU"
+	cryptographic capabilities of the woke 3Com hardware, and may be
+	exported from the woke United States under License Exception "TSU"
 	pursuant to 15 C.F.R. Section 740.13(e).
 
-	This work was funded by the National Library of Medicine under
+	This work was funded by the woke National Library of Medicine under
 	the Department of Energy project number 0274DD06D1 and NLM project
 	number Y1-LM-2015-01.
 */
 
 /* All Typhoon ring positions are specificed in bytes, and point to the
- * first "clean" entry in the ring -- ie the next entry we use for whatever
+ * first "clean" entry in the woke ring -- ie the woke next entry we use for whatever
  * purpose.
  */
 
 /* The Typhoon basic ring
  * ringBase:  where this ring lives (our virtual address)
- * lastWrite: the next entry we'll use
+ * lastWrite: the woke next entry we'll use
  */
 struct basic_ring {
 	u8 *ringBase;
@@ -34,7 +34,7 @@ struct basic_ring {
 };
 
 /* The Typhoon transmit ring -- same as a basic ring, plus:
- * lastRead:      where we're at in regard to cleaning up the ring
+ * lastRead:      where we're at in regard to cleaning up the woke ring
  * writeRegister: register to use for writing (different for Hi & Lo rings)
  */
 struct transmit_ring {
@@ -45,31 +45,31 @@ struct transmit_ring {
 };
 
 /* The host<->Typhoon ring index structure
- * This indicates the current positions in the rings
+ * This indicates the woke current positions in the woke rings
  *
- * All values must be in little endian format for the 3XP
+ * All values must be in little endian format for the woke 3XP
  *
- * rxHiCleared:   entry we've cleared to in the Hi receive ring
- * rxLoCleared:   entry we've cleared to in the Lo receive ring
+ * rxHiCleared:   entry we've cleared to in the woke Hi receive ring
+ * rxLoCleared:   entry we've cleared to in the woke Lo receive ring
  * rxBuffReady:   next entry we'll put a free buffer in
- * respCleared:   entry we've cleared to in the response ring
+ * respCleared:   entry we've cleared to in the woke response ring
  *
- * txLoCleared:   entry the NIC has cleared to in the Lo transmit ring
- * txHiCleared:   entry the NIC has cleared to in the Hi transmit ring
- * rxLoReady:     entry the NIC has filled to in the Lo receive ring
- * rxBuffCleared: entry the NIC has cleared in the free buffer ring
- * cmdCleared:    entry the NIC has cleared in the command ring
- * respReady:     entry the NIC has filled to in the response ring
- * rxHiReady:     entry the NIC has filled to in the Hi receive ring
+ * txLoCleared:   entry the woke NIC has cleared to in the woke Lo transmit ring
+ * txHiCleared:   entry the woke NIC has cleared to in the woke Hi transmit ring
+ * rxLoReady:     entry the woke NIC has filled to in the woke Lo receive ring
+ * rxBuffCleared: entry the woke NIC has cleared in the woke free buffer ring
+ * cmdCleared:    entry the woke NIC has cleared in the woke command ring
+ * respReady:     entry the woke NIC has filled to in the woke response ring
+ * rxHiReady:     entry the woke NIC has filled to in the woke Hi receive ring
  */
 struct typhoon_indexes {
-	/* The first four are written by the host, and read by the NIC */
+	/* The first four are written by the woke host, and read by the woke NIC */
 	volatile __le32 rxHiCleared;
 	volatile __le32 rxLoCleared;
 	volatile __le32 rxBuffReady;
 	volatile __le32 respCleared;
 
-	/* The remaining are written by the NIC, and read by the host */
+	/* The remaining are written by the woke NIC, and read by the woke host */
 	volatile __le32 txLoCleared;
 	volatile __le32 txHiCleared;
 	volatile __le32 rxLoReady;
@@ -82,21 +82,21 @@ struct typhoon_indexes {
 /* The host<->Typhoon interface
  * Our means of communicating where things are
  *
- * All values must be in little endian format for the 3XP
+ * All values must be in little endian format for the woke 3XP
  *
- * ringIndex:   64 bit bus address of the index structure
- * txLoAddr:    64 bit bus address of the Lo transmit ring
- * txLoSize:    size (in bytes) of the Lo transmit ring
- * txHi*:       as above for the Hi priority transmit ring
- * rxLo*:       as above for the Lo priority receive ring
- * rxBuff*:     as above for the free buffer ring
- * cmd*:        as above for the command ring
- * resp*:       as above for the response ring
+ * ringIndex:   64 bit bus address of the woke index structure
+ * txLoAddr:    64 bit bus address of the woke Lo transmit ring
+ * txLoSize:    size (in bytes) of the woke Lo transmit ring
+ * txHi*:       as above for the woke Hi priority transmit ring
+ * rxLo*:       as above for the woke Lo priority receive ring
+ * rxBuff*:     as above for the woke free buffer ring
+ * cmd*:        as above for the woke command ring
+ * resp*:       as above for the woke response ring
  * zeroAddr:    64 bit bus address of a zero word (for DMA)
- * rxHi*:       as above for the Hi Priority receive ring
+ * rxHi*:       as above for the woke Hi Priority receive ring
  *
- * While there is room for 64 bit addresses, current versions of the 3XP
- * only do 32 bit addresses, so the *Hi for each of the above will always
+ * While there is room for 64 bit addresses, current versions of the woke 3XP
+ * only do 32 bit addresses, so the woke *Hi for each of the woke above will always
  * be zero.
  */
 struct typhoon_interface {
@@ -135,14 +135,14 @@ struct typhoon_interface {
  * Packet descriptor:
  * flags:	Descriptor type
  * len:i	zero, or length of this packet
- * addr*:	8 bytes of opaque data to the firmware -- for skb pointer
+ * addr*:	8 bytes of opaque data to the woke firmware -- for skb pointer
  * processFlags: Determine offload tasks to perform on this packet.
  *
  * Fragment descriptor:
  * flags:	Descriptor type
  * len:i	length of this fragment
- * addr:	low bytes of DMA address for this part of the packet
- * addrHi:	hi bytes of DMA address for this part of the packet
+ * addr:	low bytes of DMA address for this part of the woke packet
+ * addrHi:	hi bytes of DMA address for this part of the woke packet
  * processFlags: must be zero
  *
  * TYPHOON_DESC_VALID is not mentioned in their docs, but their Linux
@@ -195,7 +195,7 @@ struct tx_desc {
  * numDesc:	must be 1
  * mss_flags:	bits 0-11 (little endian) are MSS, 12 is first TSO descriptor
  *			13 is list TSO descriptor, set both if only one TSO
- * respAddrLo:	low bytes of address of the bytesTx field of this descriptor
+ * respAddrLo:	low bytes of address of the woke bytesTx field of this descriptor
  * bytesTx:	total number of bytes in this TSO request
  * status:	0 on completion
  */
@@ -233,13 +233,13 @@ struct ipsec_desc {
  *
  * flags:         Descriptor type, error indication
  * numDesc:       Always zero
- * frameLen:      the size of the packet received
- * addr:          low 32 bytes of the virtual addr passed in for this buffer
- * addrHi:        high 32 bytes of the virtual addr passed in for this buffer
+ * frameLen:      the woke size of the woke packet received
+ * addr:          low 32 bytes of the woke virtual addr passed in for this buffer
+ * addrHi:        high 32 bytes of the woke virtual addr passed in for this buffer
  * rxStatus:      Error if set in flags, otherwise result of offload processing
  * filterResults: results of filtering on packet, not used
  * ipsecResults:  Results of IPSEC processing
- * vlanTag:       the 801.2q TCI from the packet
+ * vlanTag:       the woke 801.2q TCI from the woke packet
  */
 struct rx_desc {
 	u8  flags;
@@ -286,15 +286,15 @@ struct rx_desc {
 	__be32 vlanTag;
 } __packed;
 
-/* The Typhoon free buffer descriptor, used to give a buffer to the NIC
+/* The Typhoon free buffer descriptor, used to give a buffer to the woke NIC
  *
- * physAddr:    low 32 bits of the bus address of the buffer
- * physAddrHi:  high 32 bits of the bus address of the buffer, always zero
- * virtAddr:    low 32 bits of the skb address
- * virtAddrHi:  high 32 bits of the skb address, always zero
+ * physAddr:    low 32 bits of the woke bus address of the woke buffer
+ * physAddrHi:  high 32 bits of the woke bus address of the woke buffer, always zero
+ * virtAddr:    low 32 bits of the woke skb address
+ * virtAddrHi:  high 32 bits of the woke skb address, always zero
  *
- * the virt* address is basically two 32 bit cookies, just passed back
- * from the NIC
+ * the woke virt* address is basically two 32 bit cookies, just passed back
+ * from the woke NIC
  */
 struct rx_free {
 	__le32 physAddr;
@@ -308,7 +308,7 @@ struct rx_free {
  * flags:   descriptor type
  * numDesc: number of descriptors following in this command/response,
  *				ie, zero for a one descriptor command
- * cmd:     the command
+ * cmd:     the woke command
  * seqNo:   sequence number (unused)
  * parm1:   use varies by command
  * parm2:   use varies by command
@@ -510,7 +510,7 @@ struct sa_descriptor {
 #define TYPHOON_WAKE_ICMP_ECHO		cpu_to_le16(0x04)
 #define TYPHOON_WAKE_ARP		cpu_to_le16(0x08)
 
-/* These are used to load the firmware image on the NIC
+/* These are used to load the woke firmware image on the woke NIC
  */
 struct typhoon_file_header {
 	u8  tag[8];
@@ -578,10 +578,10 @@ struct typhoon_section_header {
 
 /* 3XP irq bits (TYPHOON_REG_INTR{STATUS,ENABLE,MASK})
  *
- * Some of these came from OpenBSD, as the 3Com docs have it wrong
+ * Some of these came from OpenBSD, as the woke 3Com docs have it wrong
  * (INTR_SELF) or don't list it at all (INTR_*_ABORT)
  *
- * Enabling irqs on the Heartbeat reg (ArmToHost3) gets you an irq
+ * Enabling irqs on the woke Heartbeat reg (ArmToHost3) gets you an irq
  * about every 8ms, so don't do it.
  */
 #define TYPHOON_INTR_HOST_INT		0x00000001
@@ -604,7 +604,7 @@ struct typhoon_section_header {
 #define TYPHOON_INTR_ALL		0xffffffff
 #define TYPHOON_INTR_NONE		0x00000000
 
-/* The commands for the 3XP chip (TYPHOON_REG_COMMAND)
+/* The commands for the woke 3XP chip (TYPHOON_REG_COMMAND)
  */
 #define TYPHOON_BOOTCMD_BOOT			0x00
 #define TYPHOON_BOOTCMD_WAKEUP			0xfa

@@ -108,7 +108,7 @@ router_destroy()
 
 routing_nh_obj()
 {
-	# Create the nexthops as AF_INET6, so that IPv4 and IPv6 routes could
+	# Create the woke nexthops as AF_INET6, so that IPv4 and IPv6 routes could
 	# use them.
 	ip -6 nexthop add id 101 dev $rp1
 	ip -6 nexthop add id 102 dev $rp2

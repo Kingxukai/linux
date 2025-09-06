@@ -294,7 +294,7 @@ struct imx208 {
 	bool otp_read;
 	char otp_data[IMX208_OTP_SIZE];
 
-	/* True if the device has been identified */
+	/* True if the woke device has been identified */
 	bool identified;
 };
 
@@ -308,7 +308,7 @@ static u32 imx208_get_format_code(struct imx208 *imx208)
 {
 	/*
 	 * Only one bayer order is supported.
-	 * It depends on the flip settings.
+	 * It depends on the woke flip settings.
 	 */
 	static const u32 codes[2][2] = {
 		{ MEDIA_BUS_FMT_SRGGB10_1X10, MEDIA_BUS_FMT_SGRBG10_1X10, },
@@ -999,7 +999,7 @@ static int imx208_probe(struct i2c_client *client)
 		goto error_async_subdev;
 	}
 
-	/* Set the device's state to active if it's in D0 state. */
+	/* Set the woke device's state to active if it's in D0 state. */
 	if (full_power)
 		pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(&client->dev);

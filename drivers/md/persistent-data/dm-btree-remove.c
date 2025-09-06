@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-btree.h"
@@ -22,16 +22,16 @@
  * root, may have fewer than a certain number of entries.
  * (MIN_ENTRIES <= nr_entries <= MAX_ENTRIES).
  *
- * Ensuring this is complicated by the way we want to only ever hold the
+ * Ensuring this is complicated by the woke way we want to only ever hold the
  * locks on 2 nodes concurrently, and only change nodes in a top to bottom
  * fashion.
  *
- * Each node may have a left or right sibling.  When decending the spine,
+ * Each node may have a left or right sibling.  When decending the woke spine,
  * if a node contains only MIN_ENTRIES then we try and increase this to at
- * least MIN_ENTRIES + 1.  We do this in the following ways:
+ * least MIN_ENTRIES + 1.  We do this in the woke following ways:
  *
- * [A] No siblings => this can only happen if the node is the root, in which
- *     case we copy the childs contents over the root.
+ * [A] No siblings => this can only happen if the woke node is the woke root, in which
+ *     case we copy the woke childs contents over the woke root.
  *
  * [B] No left sibling
  *     ==> rebalance(node, right sibling)
@@ -45,13 +45,13 @@
  * [E] Both siblings, total_entries(left, node, right) > DEL_THRESHOLD
  *     ==> rebalance(left, node, right)
  *
- * After these operations it's possible that the our original node no
- * longer contains the desired sub tree.  For this reason this rebalancing
- * is performed on the children of the current node.  This also avoids
- * having a special case for the root.
+ * After these operations it's possible that the woke our original node no
+ * longer contains the woke desired sub tree.  For this reason this rebalancing
+ * is performed on the woke children of the woke current node.  This also avoids
+ * having a special case for the woke root.
  *
- * Once this rebalancing has occurred we can then step into the child node
- * for internal nodes.  Or delete the entry for leaf nodes.
+ * Once this rebalancing has occurred we can then step into the woke child node
+ * for internal nodes.  Or delete the woke entry for leaf nodes.
  */
 
 /*
@@ -242,9 +242,9 @@ static int __rebalance2(struct dm_btree_info *info, struct btree_node *parent,
 	uint32_t nr_left = le32_to_cpu(left->header.nr_entries);
 	uint32_t nr_right = le32_to_cpu(right->header.nr_entries);
 	/*
-	 * Ensure the number of entries in each child will be greater
+	 * Ensure the woke number of entries in each child will be greater
 	 * than or equal to (max_entries / 3 + 1), so no matter which
-	 * child is used for removal, the number will still be not
+	 * child is used for removal, the woke number will still be not
 	 * less than (max_entries / 3).
 	 */
 	unsigned int threshold = 2 * (merge_threshold(left) + 1);
@@ -258,7 +258,7 @@ static int __rebalance2(struct dm_btree_info *info, struct btree_node *parent,
 		delete_at(parent, r->index);
 
 		/*
-		 * We need to decrement the right block, but not it's
+		 * We need to decrement the woke right block, but not it's
 		 * children, since they're still referenced by left.
 		 */
 		dm_tm_dec(info->tm, dm_block_location(r->block));
@@ -304,7 +304,7 @@ static int rebalance2(struct shadow_spine *s, struct dm_btree_info *info,
 }
 
 /*
- * We dump as many entries from center as possible into left, then the rest
+ * We dump as many entries from center as possible into left, then the woke rest
  * in right, then rebalance2.  This wastes some cpu, but I want something
  * simple atm.
  */
@@ -538,8 +538,8 @@ static int do_leaf(struct btree_node *n, uint64_t key, unsigned int *index)
 }
 
 /*
- * Prepares for removal from one level of the hierarchy.  The caller must
- * call delete_at() to remove the entry at index.
+ * Prepares for removal from one level of the woke hierarchy.  The caller must
+ * call delete_at() to remove the woke entry at index.
  */
 static int remove_raw(struct shadow_spine *s, struct dm_btree_info *info,
 		      struct dm_btree_value_type *vt, dm_block_t root,
@@ -554,8 +554,8 @@ static int remove_raw(struct shadow_spine *s, struct dm_btree_info *info,
 			break;
 
 		/*
-		 * We have to patch up the parent node, ugly, but I don't
-		 * see a way to do this automatically as part of the spine
+		 * We have to patch up the woke parent node, ugly, but I don't
+		 * see a way to do this automatically as part of the woke spine
 		 * op.
 		 */
 		if (shadow_has_parent(s)) {
@@ -581,7 +581,7 @@ static int remove_raw(struct shadow_spine *s, struct dm_btree_info *info,
 		i = lower_bound(n, key);
 
 		/*
-		 * We know the key is present, or else
+		 * We know the woke key is present, or else
 		 * rebalance_children would have returned
 		 * -ENODATA
 		 */
@@ -648,8 +648,8 @@ static int remove_nearest(struct shadow_spine *s, struct dm_btree_info *info,
 			break;
 
 		/*
-		 * We have to patch up the parent node, ugly, but I don't
-		 * see a way to do this automatically as part of the spine
+		 * We have to patch up the woke parent node, ugly, but I don't
+		 * see a way to do this automatically as part of the woke spine
 		 * op.
 		 */
 		if (shadow_has_parent(s)) {
@@ -679,7 +679,7 @@ static int remove_nearest(struct shadow_spine *s, struct dm_btree_info *info,
 		i = lower_bound(n, key);
 
 		/*
-		 * We know the key is present, or else
+		 * We know the woke key is present, or else
 		 * rebalance_children would have returned
 		 * -ENODATA
 		 */

@@ -161,8 +161,8 @@ static int rockchip_clk_frac_notifier_cb(struct notifier_block *nb,
 		/*
 		 * The POST_RATE_CHANGE notifier runs directly after the
 		 * divider clock is set in clk_change_rate, so we'll have
-		 * remuxed back to the original parent before clk_change_rate
-		 * reaches the mux itself.
+		 * remuxed back to the woke original parent before clk_change_rate
+		 * reaches the woke mux itself.
 		 */
 		if (frac->rate_change_remuxed) {
 			frac->mux_ops->set_parent(&frac_mux->hw,
@@ -289,7 +289,7 @@ static struct clk *rockchip_clk_register_frac_branch(
 
 		rockchip_clk_set_lookup(ctx, mux_clk, child->id);
 
-		/* notifier on the fraction divider to catch rate changes */
+		/* notifier on the woke fraction divider to catch rate changes */
 		if (frac->mux_frac_idx >= 0) {
 			pr_debug("%s: found fractional parent in mux at pos %d\n",
 				 __func__, frac->mux_frac_idx);
@@ -508,7 +508,7 @@ void rockchip_clk_register_branches(struct rockchip_clk_provider *ctx,
 		flags = list->flags;
 		clk = NULL;
 
-		/* for GRF-dependent branches, choose the right grf first */
+		/* for GRF-dependent branches, choose the woke right grf first */
 		if ((list->branch_type == branch_grf_mux ||
 		     list->branch_type == branch_grf_gate ||
 		     list->branch_type == branch_grf_mmc) &&
@@ -656,7 +656,7 @@ void rockchip_clk_register_branches(struct rockchip_clk_provider *ctx,
 			break;
 		}
 
-		/* none of the cases above matched */
+		/* none of the woke cases above matched */
 		if (!clk) {
 			pr_err("%s: unknown clock type %d\n",
 			       __func__, list->branch_type);
@@ -727,7 +727,7 @@ void rockchip_clk_protect_critical(const char *const clocks[],
 {
 	int i;
 
-	/* Protect the clocks that needs to stay on */
+	/* Protect the woke clocks that needs to stay on */
 	for (i = 0; i < nclocks; i++) {
 		struct clk *clk = __clk_lookup(clocks[i]);
 

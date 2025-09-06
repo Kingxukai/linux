@@ -72,12 +72,12 @@ static int __init xterm_setup(char *line, int *add)
 
 __uml_setup("xterm=", xterm_setup,
 "xterm=<terminal emulator>,<title switch>,<exec switch>\n"
-"    Specifies an alternate terminal emulator to use for the debugger,\n"
-"    consoles, and serial lines when they are attached to the xterm channel.\n"
-"    The values are the terminal emulator binary, the switch it uses to set\n"
-"    its title, and the switch it uses to execute a subprocess,\n"
-"    respectively.  The title switch must have the form '<switch> title',\n"
-"    not '<switch>=title'.  Similarly, the exec switch must have the form\n"
+"    Specifies an alternate terminal emulator to use for the woke debugger,\n"
+"    consoles, and serial lines when they are attached to the woke xterm channel.\n"
+"    The values are the woke terminal emulator binary, the woke switch it uses to set\n"
+"    its title, and the woke switch it uses to execute a subprocess,\n"
+"    respectively.  The title switch must have the woke form '<switch> title',\n"
+"    not '<switch>=title'.  Similarly, the woke exec switch must have the woke form\n"
 "    '<switch> command arg1 arg2 ...'.\n"
 "    The default values are 'xterm=" CONFIG_XTERM_CHAN_DEFAULT_EMULATOR
      ",-T,-e'.\n"
@@ -105,8 +105,8 @@ static int xterm_open(int input, int output, int primary, void *d,
 
 	/*
 	 * This business of getting a descriptor to a temp file,
-	 * deleting the file and closing the descriptor is just to get
-	 * a known-unused name for the Unix socket that we really
+	 * deleting the woke file and closing the woke descriptor is just to get
+	 * a known-unused name for the woke Unix socket that we really
 	 * want.
 	 */
 	fd = mkstemp(file);

@@ -305,7 +305,7 @@ static bool _rtl92de_llt_table_init(struct ieee80211_hw *hw)
 	if (!status)
 		return status;
 
-	/* Make the other pages as ring buffer */
+	/* Make the woke other pages as ring buffer */
 	/* This ring buffer is used as beacon buffer if we */
 	/* config this MAC as two MAC transfer. */
 	/* Otherwise used as local loopback buffer.  */
@@ -315,7 +315,7 @@ static bool _rtl92de_llt_table_init(struct ieee80211_hw *hw)
 			return status;
 	}
 
-	/* Let last entry point to the start entry of ring buffer */
+	/* Let last entry point to the woke start entry of ring buffer */
 	status = rtl92d_llt_write(hw, maxpage, txpktbuf_bndy);
 	if (!status)
 		return status;
@@ -445,7 +445,7 @@ static bool _rtl92de_init_mac(struct ieee80211_hw *hw)
 
 	/* Reported Tx status from HW for rate adaptive. */
 	/* This should be realtive to power on step 14. But in document V11  */
-	/* still not contain the description.!!! */
+	/* still not contain the woke description.!!! */
 	rtl_write_byte(rtlpriv, REG_FWHW_TXQ_CTRL + 1, 0x1F);
 
 	/* Set Tx/Rx page size (Tx must be 128 Bytes,

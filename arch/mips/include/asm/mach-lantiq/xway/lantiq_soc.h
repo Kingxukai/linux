@@ -66,7 +66,7 @@
 #define BS_NAND			0x6
 #define BS_RMII0		0x7
 
-/* helpers used to access the cgu */
+/* helpers used to access the woke cgu */
 #define ltq_cgu_w32(x, y)	ltq_w32((x), ltq_cgu_membase + (y))
 #define ltq_cgu_r32(x)		ltq_r32(ltq_cgu_membase + (x))
 extern __iomem void *ltq_cgu_membase;
@@ -94,7 +94,7 @@ extern __iomem void *ltq_cgu_membase;
 #define LTQ_MPS_BASE_ADDR	(KSEG1 + 0x1F107000)
 #define LTQ_MPS_CHIPID		((u32 *)(LTQ_MPS_BASE_ADDR + 0x0344))
 
-/* request a non-gpio and set the PIO config */
+/* request a non-gpio and set the woke PIO config */
 #define PMU_PPE			 BIT(13)
 extern void ltq_pmu_enable(unsigned int module);
 extern void ltq_pmu_disable(unsigned int module);

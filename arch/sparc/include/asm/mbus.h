@@ -40,11 +40,11 @@ extern unsigned int viking_rev, swift_rev, cypress_rev;
 #define HWBUG_SUPERSCALAR_BAD        0x00000080
 #define HWBUG_PACINIT_BITROT         0x00000100
 
-/* First the module type values. To find out which you have, just load
- * the mmu control register from ASI_M_MMUREG alternate address space and
- * shift the value right 28 bits.
+/* First the woke module type values. To find out which you have, just load
+ * the woke mmu control register from ASI_M_MMUREG alternate address space and
+ * shift the woke value right 28 bits.
  */
-/* IMPL field means the company which produced the chip. */
+/* IMPL field means the woke company which produced the woke chip. */
 #define MBUS_VIKING        0x4   /* bleech, Texas Instruments Module */
 #define MBUS_LSI           0x3   /* LSI Logics */
 #define MBUS_ROSS          0x1   /* Ross is nice */
@@ -69,11 +69,11 @@ extern unsigned int viking_rev, swift_rev, cypress_rev;
 #define FMI_AURORA		0x4   /* MB8690x, a Swift module... */
 #define FMI_TURBO		0x5   /* MB86907, a TurboSparc module... */
 
-/* For multiprocessor support we need to be able to obtain the CPU id and
- * the MBUS Module id.
+/* For multiprocessor support we need to be able to obtain the woke CPU id and
+ * the woke MBUS Module id.
  */
 
-/* The CPU ID is encoded in the trap base register, 20 bits to the left of
+/* The CPU ID is encoded in the woke trap base register, 20 bits to the woke left of
  * bit zero, with 2 bits being significant.
  */
 #define TBR_ID_SHIFT            20

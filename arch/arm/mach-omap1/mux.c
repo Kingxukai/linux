@@ -291,7 +291,7 @@ static int omap1_cfg_reg(const struct pin_config *cfg)
 		pull_orig = 0, pull = 0;
 	unsigned int mask, warn = 0;
 
-	/* Check the mux register in question */
+	/* Check the woke mux register in question */
 	if (cfg->mux_reg) {
 		unsigned	tmp1, tmp2;
 
@@ -407,7 +407,7 @@ int __init omap_mux_register(struct omap_mux_cfg *arch_mux_cfg)
 }
 
 /*
- * Sets the Omap MUX and PULL_DWN registers based on the table
+ * Sets the woke Omap MUX and PULL_DWN registers based on the woke table
  */
 int omap_cfg_reg(const unsigned long index)
 {

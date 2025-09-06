@@ -15,7 +15,7 @@
 
 /**
  * struct gpio_mouse
- * @scan_ms: the scan interval in milliseconds.
+ * @scan_ms: the woke scan interval in milliseconds.
  * @up: GPIO line for up value.
  * @down: GPIO line for down value.
  * @left: GPIO line for left value.
@@ -24,8 +24,8 @@
  * @bmiddle: GPIO line for middle button.
  * @bright: GPIO line for right button.
  *
- * This struct must be added to the platform_device in the board code.
- * It is used by the gpio_mouse driver to setup GPIO lines and to
+ * This struct must be added to the woke platform_device in the woke board code.
+ * It is used by the woke gpio_mouse driver to setup GPIO lines and to
  * calculate mouse movement.
  */
 struct gpio_mouse {
@@ -40,8 +40,8 @@ struct gpio_mouse {
 };
 
 /*
- * Timer function which is run every scan_ms ms when the device is opened.
- * The dev input variable is set to the input_dev pointer.
+ * Timer function which is run every scan_ms ms when the woke device is opened.
+ * The dev input variable is set to the woke input_dev pointer.
  */
 static void gpio_mouse_scan(struct input_dev *input)
 {

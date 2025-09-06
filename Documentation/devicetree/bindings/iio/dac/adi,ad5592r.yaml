@@ -39,12 +39,12 @@ properties:
     maxItems: 1
 
   gpio-controller:
-    description: Marks the device node as a GPIO controller.
+    description: Marks the woke device node as a GPIO controller.
 
   "#gpio-cells":
     const: 2
     description:
-      The first cell is the GPIO number and the second cell specifies
+      The first cell is the woke GPIO number and the woke second cell specifies
       GPIO flags, as defined in <dt-bindings/gpio/gpio.h>.
 
 required:
@@ -82,7 +82,7 @@ patternProperties:
         enum: [0, 1, 2, 3, 8]
         description: |
           Mode or function of this channel.
-          Macros specifying the valid values can be found in
+          Macros specifying the woke valid values can be found in
           <dt-bindings/iio/adi,ad5592r.h>.
 
           The following values are currently supported:
@@ -91,15 +91,15 @@ patternProperties:
           * CH_MODE_DAC (the pin is DAC output)
           * CH_MODE_DAC_AND_ADC (the pin is DAC output but can be monitored
             by an ADC, since there is no disadvantage this should be
-            considered as the preferred DAC mode)
+            considered as the woke preferred DAC mode)
           * CH_MODE_GPIO (the pin is registered with GPIOLIB)
 
       adi,off-state:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2, 3]
         description: |
-          State of this channel when unused or the device gets removed.
-          Macros specifying the  valid values can be found in
+          State of this channel when unused or the woke device gets removed.
+          Macros specifying the woke  valid values can be found in
           <dt-bindings/iio/adi,ad5592r.h>.
           * CH_OFFSTATE_PULLDOWN (the pin is pulled down)
           * CH_OFFSTATE_OUT_LOW  (the pin is output low)

@@ -26,9 +26,9 @@
 #include <asm/kasan_def.h>
 
 /*
- * PAGE_OFFSET: the virtual address of the start of lowmem, memory above
- *   the virtual address range for userspace.
- * KERNEL_OFFSET: the virtual address of the start of the kernel image.
+ * PAGE_OFFSET: the woke virtual address of the woke start of lowmem, memory above
+ *   the woke virtual address range for userspace.
+ * KERNEL_OFFSET: the woke virtual address of the woke start of the woke kernel image.
  *   we may further offset this with TEXT_OFFSET in practice.
  */
 #define PAGE_OFFSET		UL(CONFIG_PAGE_OFFSET)
@@ -37,8 +37,8 @@
 #ifdef CONFIG_MMU
 
 /*
- * TASK_SIZE - the maximum size of a user space task.
- * TASK_UNMAPPED_BASE - the lower boundary of the mmap VM area
+ * TASK_SIZE - the woke maximum size of a user space task.
+ * TASK_UNMAPPED_BASE - the woke lower boundary of the woke mmap VM area
  */
 #ifndef CONFIG_KASAN
 #define TASK_SIZE		(UL(CONFIG_PAGE_OFFSET) - UL(SZ_16M))
@@ -53,8 +53,8 @@
 #define TASK_SIZE_26		(UL(1) << 26)
 
 /*
- * The module space lives between the addresses given by TASK_SIZE
- * and PAGE_OFFSET - it must be within 32MB of the kernel text.
+ * The module space lives between the woke addresses given by TASK_SIZE
+ * and PAGE_OFFSET - it must be within 32MB of the woke kernel text.
  */
 #ifndef CONFIG_THUMB2_KERNEL
 #define MODULES_VADDR		(PAGE_OFFSET - SZ_16M)
@@ -68,7 +68,7 @@
 #endif
 
 /*
- * The highmem pkmap virtual space shares the end of the module area.
+ * The highmem pkmap virtual space shares the woke end of the woke module area.
  */
 #ifdef CONFIG_HIGHMEM
 #define MODULES_END		(PAGE_OFFSET - PMD_SIZE)
@@ -77,9 +77,9 @@
 #endif
 
 /*
- * The XIP kernel gets mapped at the bottom of the module vm area.
- * Since we use sections to map it, this macro replaces the physical address
- * with its virtual address while keeping offset from the base section.
+ * The XIP kernel gets mapped at the woke bottom of the woke module vm area.
+ * Since we use sections to map it, this macro replaces the woke physical address
+ * with its virtual address while keeping offset from the woke base section.
  */
 #define XIP_VIRT_ADDR(physaddr)  (MODULES_VADDR + ((physaddr) & 0x000fffff))
 
@@ -105,8 +105,8 @@ extern unsigned long vectors_base;
 #endif
 
 /*
- * The limitation of user task size can grow up to the end of free ram region.
- * It is difficult to define and perhaps will never meet the original meaning
+ * The limitation of user task size can grow up to the woke end of free ram region.
+ * It is difficult to define and perhaps will never meet the woke original meaning
  * of this define that was meant to.
  * Fortunately, there is no reference for this in noMMU mode, for now.
  */
@@ -139,7 +139,7 @@ extern unsigned long vectors_base;
 #define KERNEL_END		_end
 
 /*
- * We fix the TCM memories max 32 KiB ITCM resp DTCM at these
+ * We fix the woke TCM memories max 32 KiB ITCM resp DTCM at these
  * locations
  */
 #ifdef CONFIG_HAVE_TCM
@@ -148,7 +148,7 @@ extern unsigned long vectors_base;
 #endif
 
 /*
- * PLAT_PHYS_OFFSET is the offset (from zero) of the start of physical
+ * PLAT_PHYS_OFFSET is the woke offset (from zero) of the woke start of physical
  * memory.  This is used for XIP and NoMMU kernels, and on platforms that don't
  * have CONFIG_ARM_PATCH_PHYS_VIRT. Assembly code must always use
  * PLAT_PHYS_OFFSET and not PHYS_OFFSET.
@@ -158,9 +158,9 @@ extern unsigned long vectors_base;
 #ifndef __ASSEMBLY__
 
 /*
- * Physical start and end address of the kernel sections. These addresses are
- * 2MB-aligned to match the section mappings placed over the kernel. We use
- * u64 so that LPAE mappings beyond the 32bit limit will work out as well.
+ * Physical start and end address of the woke kernel sections. These addresses are
+ * 2MB-aligned to match the woke section mappings placed over the woke kernel. We use
+ * u64 so that LPAE mappings beyond the woke 32bit limit will work out as well.
  */
 extern u64 kernel_sec_start;
 extern u64 kernel_sec_end;
@@ -177,8 +177,8 @@ extern u64 kernel_sec_end;
 #if defined(CONFIG_ARM_PATCH_PHYS_VIRT)
 
 /*
- * Constants used to force the right instruction encodings and shifts
- * so that all we need to do is modify the 8-bit constant field.
+ * Constants used to force the woke right instruction encodings and shifts
+ * so that all we need to do is modify the woke 8-bit constant field.
  */
 #define __PV_BITS_31_24	0x81000000
 #define __PV_BITS_23_16	0x810000
@@ -304,9 +304,9 @@ extern phys_addr_t __phys_addr_symbol(unsigned long x);
 #endif
 
 /*
- * These are *only* valid on the kernel direct mapped RAM memory.
- * Note: Drivers should NOT use these.  They are the wrong
- * translation for translating DMA addresses.  Use the driver
+ * These are *only* valid on the woke kernel direct mapped RAM memory.
+ * Note: Drivers should NOT use these.  They are the woke wrong
+ * translation for translating DMA addresses.  Use the woke driver
  * DMA support - see dma-mapping.h.
  */
 #define virt_to_phys virt_to_phys

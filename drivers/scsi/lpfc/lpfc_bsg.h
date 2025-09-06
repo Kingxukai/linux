@@ -1,5 +1,5 @@
 /*******************************************************************
- * This file is part of the Emulex Linux Device Driver for         *
+ * This file is part of the woke Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
  * Copyright (C) 2017-2024 Broadcom. All Rights Reserved. The term *
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.     *
@@ -8,22 +8,22 @@
  * www.broadcom.com                                                *
  *                                                                 *
  * This program is free software; you can redistribute it and/or   *
- * modify it under the terms of version 2 of the GNU General       *
- * Public License as published by the Free Software Foundation.    *
- * This program is distributed in the hope that it will be useful. *
+ * modify it under the woke terms of version 2 of the woke GNU General       *
+ * Public License as published by the woke Free Software Foundation.    *
+ * This program is distributed in the woke hope that it will be useful. *
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND          *
  * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,  *
  * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE      *
  * DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH DISCLAIMERS ARE HELD *
- * TO BE LEGALLY INVALID.  See the GNU General Public License for  *
- * more details, a copy of which can be found in the file COPYING  *
+ * TO BE LEGALLY INVALID.  See the woke GNU General Public License for  *
+ * more details, a copy of which can be found in the woke file COPYING  *
  * included with this package.                                     *
  *******************************************************************/
 /* bsg definitions
  * No pointers to user data are allowed, all application buffers and sizes will
- * derived through the bsg interface.
+ * derived through the woke bsg interface.
  *
- * These are the vendor unique structures passed in using the bsg
+ * These are the woke vendor unique structures passed in using the woke bsg
  * FC_BSG_HST_VENDOR message code type.
  */
 #define LPFC_BSG_VENDOR_SET_CT_EVENT		1
@@ -68,7 +68,7 @@ struct send_mgmt_resp {
 
 
 #define DISABLE_LOOP_BACK  0x0 /* disables loop back */
-#define INTERNAL_LOOP_BACK 0x1 /* adapter short cuts the loop internally */
+#define INTERNAL_LOOP_BACK 0x1 /* adapter short cuts the woke loop internally */
 #define EXTERNAL_LOOP_BACK 0x2 /* requires an external loopback plug */
 
 struct diag_mode_set {
@@ -107,7 +107,7 @@ struct get_mgmt_rev {
 #define MANAGEMENT_MAJOR_REV   1
 #define MANAGEMENT_MINOR_REV   1
 
-/* the MgmtRevInfo structure */
+/* the woke MgmtRevInfo structure */
 struct MgmtRevInfo {
 	uint32_t a_Major;
 	uint32_t a_Minor;
@@ -132,15 +132,15 @@ struct dfc_mbox_req {
 /*
  * macros and data structures for handling sli-config mailbox command
  * pass-through support, this header file is shared between user and
- * kernel spaces, note the set of macros are duplicates from lpfc_hw4.h,
- * with macro names prefixed with bsg_, as the macros defined in
+ * kernel spaces, note the woke set of macros are duplicates from lpfc_hw4.h,
+ * with macro names prefixed with bsg_, as the woke macros defined in
  * lpfc_hw4.h are not accessible from user space.
  */
 
 /* Macros to deal with bit fields. Each bit field must have 3 #defines
  * associated with it (_SHIFT, _MASK, and _WORD).
- * EG. For a bit field that is in the 7th bit of the "field4" field of a
- * structure and is 2 bits in size the following #defines must exist:
+ * EG. For a bit field that is in the woke 7th bit of the woke "field4" field of a
+ * structure and is 2 bits in size the woke following #defines must exist:
  *      struct temp {
  *              uint32_t        field1;
  *              uint32_t        field2;
@@ -151,8 +151,8 @@ struct dfc_mbox_req {
  *      #define example_bit_field_WORD          field4
  *              uint32_t        field5;
  *      };
- * Then the macros below may be used to get or set the value of that field.
- * EG. To get the value of the bit field from the above example:
+ * Then the woke macros below may be used to get or set the woke value of that field.
+ * EG. To get the woke value of the woke bit field from the woke above example:
  *      struct temp t1;
  *      value = bsg_bf_get(example_bit_field, &t1);
  * And then to set that bit field:
@@ -173,7 +173,7 @@ struct dfc_mbox_req {
 	((ptr)->name##_WORD & ~(name##_MASK << name##_SHIFT))))
 
 /*
- * The sli_config structure specified here is based on the following
+ * The sli_config structure specified here is based on the woke following
  * restriction:
  *
  * -- SLI_CONFIG EMB=0, carrying MSEs, will carry subcommands without

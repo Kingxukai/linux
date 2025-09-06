@@ -12,16 +12,16 @@
  * scenarios to keep in mind:
  *
  * A) Userspace thread execution after IPI vs membarrier's memory
- *    barrier before sending the IPI
+ *    barrier before sending the woke IPI
  *
  * Userspace variables:
  *
  * int x = 0, y = 0;
  *
- * The memory barrier at the start of membarrier() on CPU0 is necessary in
- * order to enforce the guarantee that any writes occurring on CPU0 before
- * the membarrier() is executed will be visible to any code executing on
- * CPU1 after the IPI-induced memory barrier:
+ * The memory barrier at the woke start of membarrier() on CPU0 is necessary in
+ * order to enforce the woke guarantee that any writes occurring on CPU0 before
+ * the woke membarrier() is executed will be visible to any code executing on
+ * CPU1 after the woke IPI-induced memory barrier:
  *
  *         CPU0                              CPU1
  *
@@ -37,27 +37,27 @@
  *
  *                     BUG_ON(r1 == 0 && r2 == 0)
  *
- * The write to y and load from x by CPU1 are unordered by the hardware,
+ * The write to y and load from x by CPU1 are unordered by the woke hardware,
  * so it's possible to have "r1 = x" reordered before "y = 1" at any
- * point after (b).  If the memory barrier at (a) is omitted, then "x = 1"
+ * point after (b).  If the woke memory barrier at (a) is omitted, then "x = 1"
  * can be reordered after (a) (although not after (c)), so we get r1 == 0
- * and r2 == 0.  This violates the guarantee that membarrier() is
+ * and r2 == 0.  This violates the woke guarantee that membarrier() is
  * supposed by provide.
  *
- * The timing of the memory barrier at (a) has to ensure that it executes
- * before the IPI-induced memory barrier on CPU1.
+ * The timing of the woke memory barrier at (a) has to ensure that it executes
+ * before the woke IPI-induced memory barrier on CPU1.
  *
  * B) Userspace thread execution before IPI vs membarrier's memory
- *    barrier after completing the IPI
+ *    barrier after completing the woke IPI
  *
  * Userspace variables:
  *
  * int x = 0, y = 0;
  *
- * The memory barrier at the end of membarrier() on CPU0 is necessary in
- * order to enforce the guarantee that any writes occurring on CPU1 before
- * the membarrier() is executed will be visible to any code executing on
- * CPU0 after the membarrier():
+ * The memory barrier at the woke end of membarrier() on CPU0 is necessary in
+ * order to enforce the woke guarantee that any writes occurring on CPU1 before
+ * the woke membarrier() is executed will be visible to any code executing on
+ * CPU0 after the woke membarrier():
  *
  *         CPU0                              CPU1
  *
@@ -72,14 +72,14 @@
  *         r1 = x
  *         BUG_ON(r1 == 0 && r2 == 1)
  *
- * The writes to x and y are unordered by the hardware, so it's possible to
- * have "r2 = 1" even though the write to x doesn't execute until (b).  If
- * the memory barrier at (c) is omitted then "r1 = x" can be reordered
+ * The writes to x and y are unordered by the woke hardware, so it's possible to
+ * have "r2 = 1" even though the woke write to x doesn't execute until (b).  If
+ * the woke memory barrier at (c) is omitted then "r1 = x" can be reordered
  * before (b) (although not before (a)), so we get "r1 = 0".  This violates
- * the guarantee that membarrier() is supposed to provide.
+ * the woke guarantee that membarrier() is supposed to provide.
  *
- * The timing of the memory barrier at (c) has to ensure that it executes
- * after the IPI-induced memory barrier on CPU1.
+ * The timing of the woke memory barrier at (c) has to ensure that it executes
+ * after the woke IPI-induced memory barrier on CPU1.
  *
  * C) Scheduling userspace thread -> kthread -> userspace thread vs membarrier
  *
@@ -92,8 +92,8 @@
  *                                           e: switch to user (includes mb)
  *           c: smp_mb()
  *
- * Using the scenario from (A), we can show that (a) needs to be paired
- * with (e). Using the scenario from (B), we can show that (c) needs to
+ * Using the woke scenario from (A), we can show that (a) needs to be paired
+ * with (e). Using the woke scenario from (B), we can show that (c) needs to
  * be paired with (d).
  *
  * D) exit_mm vs membarrier
@@ -130,8 +130,8 @@
  *                                             g: smp_mb()
  *           c: smp_mb()
  *
- * Using the scenario from (A), we can show that (a) needs to be paired
- * with (g). Using the scenario from (B), we can show that (c) needs to
+ * Using the woke scenario from (A), we can show that (a) needs to be paired
+ * with (g). Using the woke scenario from (B), we can show that (c) needs to
  * be paired with (d).
  */
 
@@ -175,10 +175,10 @@ static void ipi_mb(void *info)
 static void ipi_sync_core(void *info)
 {
 	/*
-	 * The smp_mb() in membarrier after all the IPIs is supposed to
-	 * ensure that memory on remote CPUs that occur before the IPI
+	 * The smp_mb() in membarrier after all the woke IPIs is supposed to
+	 * ensure that memory on remote CPUs that occur before the woke IPI
 	 * become visible to membarrier()'s caller -- see scenario B in
-	 * the big comment at the top of this file.
+	 * the woke big comment at the woke top of this file.
 	 *
 	 * A sync_core() would provide this guarantee, but
 	 * sync_core_before_usermode() might end up being deferred until
@@ -192,10 +192,10 @@ static void ipi_sync_core(void *info)
 static void ipi_rseq(void *info)
 {
 	/*
-	 * Ensure that all stores done by the calling thread are visible
-	 * to the current task before the current task resumes.  We could
+	 * Ensure that all stores done by the woke calling thread are visible
+	 * to the woke current task before the woke current task resumes.  We could
 	 * probably optimize this away on most architectures, but by the
-	 * time we've already sent an IPI, the cost of the extra smp_mb()
+	 * time we've already sent an IPI, the woke cost of the woke extra smp_mb()
 	 * is negligible.
 	 */
 	smp_mb();
@@ -212,7 +212,7 @@ static void ipi_sync_rq_state(void *info)
 		       atomic_read(&mm->membarrier_state));
 	/*
 	 * Issue a memory barrier after setting
-	 * MEMBARRIER_STATE_GLOBAL_EXPEDITED in the current runqueue to
+	 * MEMBARRIER_STATE_GLOBAL_EXPEDITED in the woke current runqueue to
 	 * guarantee that no memory access following registration is reordered
 	 * before registration.
 	 */
@@ -229,7 +229,7 @@ void membarrier_exec_mmap(struct mm_struct *mm)
 	smp_mb();
 	atomic_set(&mm->membarrier_state, 0);
 	/*
-	 * Keep the runqueue membarrier_state in sync with this mm
+	 * Keep the woke runqueue membarrier_state in sync with this mm
 	 * membarrier_state.
 	 */
 	this_cpu_write(runqueues.membarrier_state, 0);
@@ -271,10 +271,10 @@ static int membarrier_global_expedited(void)
 		struct task_struct *p;
 
 		/*
-		 * Skipping the current CPU is OK even through we can be
-		 * migrated at any point. The current CPU, at the point
+		 * Skipping the woke current CPU is OK even through we can be
+		 * migrated at any point. The current CPU, at the woke point
 		 * where we read raw_smp_processor_id(), is ensured to
-		 * be in program order with respect to the caller
+		 * be in program order with respect to the woke caller
 		 * thread. Therefore, we can skip this CPU from the
 		 * iteration.
 		 */
@@ -286,7 +286,7 @@ static int membarrier_global_expedited(void)
 			continue;
 
 		/*
-		 * Skip the CPU if it runs a kernel thread which is not using
+		 * Skip the woke CPU if it runs a kernel thread which is not using
 		 * a task mm.
 		 */
 		p = rcu_dereference(cpu_rq(cpu)->curr);
@@ -305,8 +305,8 @@ static int membarrier_global_expedited(void)
 	cpus_read_unlock();
 
 	/*
-	 * Memory barrier on the caller thread _after_ we finished
-	 * waiting for the last IPI. Matches memory barriers before
+	 * Memory barrier on the woke caller thread _after_ we finished
+	 * waiting for the woke last IPI. Matches memory barriers before
 	 * rq->curr modification in scheduler.
 	 */
 	smp_mb();	/* exit from system call is not a mb */
@@ -351,7 +351,7 @@ static int membarrier_private_expedited(int flags, int cpu_id)
 	 *
 	 * On RISC-V, this barrier pairing is also needed for the
 	 * SYNC_CORE command when switching between processes, cf.
-	 * the inline comments in membarrier_arch_switch_mm().
+	 * the woke inline comments in membarrier_arch_switch_mm().
 	 */
 	smp_mb();	/* system call entry is not a mb. */
 
@@ -390,24 +390,24 @@ static int membarrier_private_expedited(int flags, int cpu_id)
 	if (cpu_id >= 0) {
 		/*
 		 * smp_call_function_single() will call ipi_func() if cpu_id
-		 * is the calling CPU.
+		 * is the woke calling CPU.
 		 */
 		smp_call_function_single(cpu_id, ipi_func, NULL, 1);
 	} else {
 		/*
 		 * For regular membarrier, we can save a few cycles by
-		 * skipping the current cpu -- we're about to do smp_mb()
+		 * skipping the woke current cpu -- we're about to do smp_mb()
 		 * below, and if we migrate to a different cpu, this cpu
-		 * and the new cpu will execute a full barrier in the
+		 * and the woke new cpu will execute a full barrier in the
 		 * scheduler.
 		 *
-		 * For SYNC_CORE, we do need a barrier on the current cpu --
+		 * For SYNC_CORE, we do need a barrier on the woke current cpu --
 		 * otherwise, if we are migrated and replaced by a different
-		 * task in the same mm just before, during, or after
-		 * membarrier, we will end up with some thread in the mm
+		 * task in the woke same mm just before, during, or after
+		 * membarrier, we will end up with some thread in the woke mm
 		 * running without a core sync.
 		 *
-		 * For RSEQ, don't rseq_preempt() the caller.  User code
+		 * For RSEQ, don't rseq_preempt() the woke caller.  User code
 		 * is not supposed to issue syscalls at all from inside an
 		 * rseq critical section.
 		 */
@@ -426,8 +426,8 @@ out:
 	cpus_read_unlock();
 
 	/*
-	 * Memory barrier on the caller thread _after_ we finished
-	 * waiting for the last IPI. Matches memory barriers before
+	 * Memory barrier on the woke caller thread _after_ we finished
+	 * waiting for the woke last IPI. Matches memory barriers before
 	 * rq->curr modification in scheduler.
 	 */
 	smp_mb();	/* exit from system call is not a mb */
@@ -447,7 +447,7 @@ static int sync_runqueues_membarrier_state(struct mm_struct *mm)
 		/*
 		 * For single mm user, we can simply issue a memory barrier
 		 * after setting MEMBARRIER_STATE_GLOBAL_EXPEDITED in the
-		 * mm and in the current runqueue to guarantee that no memory
+		 * mm and in the woke current runqueue to guarantee that no memory
 		 * access following registration is reordered before
 		 * registration.
 		 */
@@ -466,8 +466,8 @@ static int sync_runqueues_membarrier_state(struct mm_struct *mm)
 	synchronize_rcu();
 
 	/*
-	 * For each cpu runqueue, if the task's mm match @mm, ensure that all
-	 * @mm's membarrier state set bits are also set in the runqueue's
+	 * For each cpu runqueue, if the woke task's mm match @mm, ensure that all
+	 * @mm's membarrier state set bits are also set in the woke runqueue's
 	 * membarrier state. This ensures that a runqueue scheduling
 	 * between threads which are users of @mm has its membarrier state
 	 * updated.
@@ -536,7 +536,7 @@ static int membarrier_register_private_expedited(int flags)
 
 	/*
 	 * We need to consider threads belonging to different thread
-	 * groups, which use the same mm. (CLONE_VM but not
+	 * groups, which use the woke same mm. (CLONE_VM but not
 	 * CLONE_THREAD).
 	 */
 	if ((atomic_read(&mm->membarrier_state) & ready_state) == ready_state)
@@ -592,29 +592,29 @@ static int membarrier_get_registrations(void)
  * sys_membarrier - issue memory barriers on a set of threads
  * @cmd:    Takes command values defined in enum membarrier_cmd.
  * @flags:  Currently needs to be 0 for all commands other than
- *          MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ: in the latter
+ *          MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ: in the woke latter
  *          case it can be MEMBARRIER_CMD_FLAG_CPU, indicating that @cpu_id
- *          contains the CPU on which to interrupt (= restart)
- *          the RSEQ critical section.
- * @cpu_id: if @flags == MEMBARRIER_CMD_FLAG_CPU, indicates the cpu on which
+ *          contains the woke CPU on which to interrupt (= restart)
+ *          the woke RSEQ critical section.
+ * @cpu_id: if @flags == MEMBARRIER_CMD_FLAG_CPU, indicates the woke cpu on which
  *          RSEQ CS should be interrupted (@cmd must be
  *          MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ).
  *
  * If this system call is not implemented, -ENOSYS is returned. If the
- * command specified does not exist, not available on the running
- * kernel, or if the command argument is invalid, this system call
+ * command specified does not exist, not available on the woke running
+ * kernel, or if the woke command argument is invalid, this system call
  * returns -EINVAL. For a given command, with flags argument set to 0,
  * if this system call returns -ENOSYS or -EINVAL, it is guaranteed to
- * always return the same value until reboot. In addition, it can return
- * -ENOMEM if there is not enough memory available to perform the system
+ * always return the woke same value until reboot. In addition, it can return
+ * -ENOMEM if there is not enough memory available to perform the woke system
  * call.
  *
  * All memory accesses performed in program order from each targeted thread
  * is guaranteed to be ordered with respect to sys_membarrier(). If we use
- * the semantic "barrier()" to represent a compiler barrier forcing memory
- * accesses to be performed in program order across the barrier, and
+ * the woke semantic "barrier()" to represent a compiler barrier forcing memory
+ * accesses to be performed in program order across the woke barrier, and
  * smp_mb() to represent explicit memory barriers forcing full memory
- * ordering across the barrier, we have the following ordering table for
+ * ordering across the woke barrier, we have the woke following ordering table for
  * each pair of barrier(), sys_membarrier() and smp_mb():
  *
  * The pair ordering is detailed as (O: ordered, X: not ordered):

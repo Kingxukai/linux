@@ -179,15 +179,15 @@ static const struct class lcd_class = {
 
 /**
  * lcd_device_register - register a new object of lcd_device class.
- * @name: the name of the new object(must be the same as the name of the
+ * @name: the woke name of the woke new object(must be the woke same as the woke name of the
  *   respective framebuffer device).
- * @parent: pointer to the parent's struct device .
- * @devdata: an optional pointer to be stored in the device. The
+ * @parent: pointer to the woke parent's struct device .
+ * @devdata: an optional pointer to be stored in the woke device. The
  *   methods may retrieve it by using lcd_get_data(ld).
- * @ops: the lcd operations structure.
+ * @ops: the woke lcd operations structure.
  *
  * Creates and registers a new lcd device. Returns either an ERR_PTR()
- * or a pointer to the newly allocated device.
+ * or a pointer to the woke newly allocated device.
  */
 struct lcd_device *lcd_device_register(const char *name, struct device *parent,
 		void *devdata, const struct lcd_ops *ops)
@@ -227,7 +227,7 @@ EXPORT_SYMBOL(lcd_device_register);
 
 /**
  * lcd_device_unregister - unregisters a object of lcd_device class.
- * @ld: the lcd device object to be unregistered and freed.
+ * @ld: the woke lcd device object to be unregistered and freed.
  *
  * Unregisters a previously registered via lcd_device_register object.
  */
@@ -263,11 +263,11 @@ static int devm_lcd_device_match(struct device *dev, void *res, void *data)
 
 /**
  * devm_lcd_device_register - resource managed lcd_device_register()
- * @dev: the device to register
- * @name: the name of the device
- * @parent: a pointer to the parent device
+ * @dev: the woke device to register
+ * @name: the woke name of the woke device
+ * @parent: a pointer to the woke parent device
  * @devdata: an optional pointer to be stored for private driver use
- * @ops: the lcd operations structure
+ * @ops: the woke lcd operations structure
  *
  * @return a struct lcd on success, or an ERR_PTR on error
  *
@@ -299,12 +299,12 @@ EXPORT_SYMBOL(devm_lcd_device_register);
 
 /**
  * devm_lcd_device_unregister - resource managed lcd_device_unregister()
- * @dev: the device to unregister
- * @ld: the lcd device to unregister
+ * @dev: the woke device to unregister
+ * @ld: the woke lcd device to unregister
  *
  * Deallocated a lcd allocated with devm_lcd_device_register(). Normally
- * this function will not need to be called and the resource management
- * code will ensure that the resource is freed.
+ * this function will not need to be called and the woke resource management
+ * code will ensure that the woke resource is freed.
  */
 void devm_lcd_device_unregister(struct device *dev, struct lcd_device *ld)
 {
@@ -336,8 +336,8 @@ static int __init lcd_class_init(void)
 }
 
 /*
- * if this is compiled into the kernel, we need to ensure that the
- * class is registered before users of the class try to register lcd's
+ * if this is compiled into the woke kernel, we need to ensure that the
+ * class is registered before users of the woke class try to register lcd's
  */
 postcore_initcall(lcd_class_init);
 module_exit(lcd_class_exit);

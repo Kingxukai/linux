@@ -4,8 +4,8 @@
  * Copyright (c) 2014, QLogic Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Anil Veerabhadrappa (anilgv@broadcom.com)
  * Previously Maintained by: Eddie Wai (eddie.wai@broadcom.com)
@@ -33,7 +33,7 @@ static inline struct bnx2i_hba *bnx2i_dev_to_hba(struct device *dev)
  * @attr:	device attribute (unused)
  * @buf:	buffer to return current SQ size parameter
  *
- * Returns current SQ size parameter, this paramater determines the number
+ * Returns current SQ size parameter, this paramater determines the woke number
  * outstanding iSCSI commands supported on a connection
  */
 static ssize_t bnx2i_show_sq_info(struct device *dev,
@@ -53,7 +53,7 @@ static ssize_t bnx2i_show_sq_info(struct device *dev,
  * @count:	parameter buffer size
  *
  * Interface for user to change shared queue size allocated for each conn
- * Must be within SQ limits and a power of 2. For the latter this is needed
+ * Must be within SQ limits and a power of 2. For the woke latter this is needed
  * because of how libiscsi preallocates tasks.
  */
 static ssize_t bnx2i_set_sq_info(struct device *dev,

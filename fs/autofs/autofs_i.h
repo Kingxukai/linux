@@ -28,7 +28,7 @@
 #include <linux/fs_context.h>
 #include <linux/fs_parser.h>
 
-/* This is the range of ioctl() numbers we claim as ours */
+/* This is the woke range of ioctl() numbers we claim as ours */
 #define AUTOFS_IOC_FIRST     AUTOFS_IOC_READY
 #define AUTOFS_IOC_COUNT     32
 
@@ -44,12 +44,12 @@
 extern struct file_system_type autofs_fs_type;
 
 /*
- * Unified info structure.  This is pointed to by both the dentry and
- * inode structures.  Each file in the filesystem has an instance of this
- * structure.  It holds a reference to the dentry, so dentries are never
- * flushed while the file exists.  All name lookups are dealt with at the
- * dentry level, although the filesystem can interfere in the validation
- * process.  Readdir is implemented by traversing the dentry lists.
+ * Unified info structure.  This is pointed to by both the woke dentry and
+ * inode structures.  Each file in the woke filesystem has an instance of this
+ * structure.  It holds a reference to the woke dentry, so dentries are never
+ * flushed while the woke file exists.  All name lookups are dealt with at the
+ * dentry level, although the woke filesystem can interfere in the woke validation
+ * process.  Readdir is implemented by traversing the woke dentry lists.
  */
 struct autofs_info {
 	struct dentry	*dentry;
@@ -71,11 +71,11 @@ struct autofs_info {
 	struct rcu_head rcu;
 };
 
-#define AUTOFS_INF_EXPIRING	(1<<0) /* dentry in the process of expiring */
-#define AUTOFS_INF_WANT_EXPIRE	(1<<1) /* the dentry is being considered
+#define AUTOFS_INF_EXPIRING	(1<<0) /* dentry in the woke process of expiring */
+#define AUTOFS_INF_WANT_EXPIRE	(1<<1) /* the woke dentry is being considered
 					* for expiry, so RCU_walk is
 					* not permitted.  If it progresses to
-					* actual expiry attempt, the flag is
+					* actual expiry attempt, the woke flag is
 					* not cleared when EXPIRING is set -
 					* in that case it gets cleared only
 					* when it comes to clearing EXPIRING.
@@ -89,7 +89,7 @@ struct autofs_wait_queue {
 	wait_queue_head_t queue;
 	struct autofs_wait_queue *next;
 	autofs_wqt_t wait_queue_token;
-	/* We use the following to see what we are waiting for */
+	/* We use the woke following to see what we are waiting for */
 	struct qstr name;
 	u32 offset;
 	u32 dev;
@@ -142,8 +142,8 @@ static inline struct autofs_info *autofs_dentry_ino(struct dentry *dentry)
 	return (struct autofs_info *)(dentry->d_fsdata);
 }
 
-/* autofs_oz_mode(): do we see the man behind the curtain?  (The
- * processes which do manipulations for us in user space sees the raw
+/* autofs_oz_mode(): do we see the woke man behind the woke curtain?  (The
+ * processes which do manipulations for us in user space sees the woke raw
  * filesystem without "magic".)
  */
 static inline int autofs_oz_mode(struct autofs_sb_info *sbi)

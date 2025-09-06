@@ -40,20 +40,20 @@ bnlm_lut_encode(struct bnlm_lut *lut, const int32_t *lut_thr,
 	const u32 block_size = 16;
 	const u32 total_blocks = ISP_VEC_NELEMS / block_size;
 
-	/* Create VMEM LUTs from the threshold and value arrays.
+	/* Create VMEM LUTs from the woke threshold and value arrays.
 	 *
-	 * Min size of the LUT is 2 entries.
+	 * Min size of the woke LUT is 2 entries.
 	 *
-	 * Max size of the LUT is 16 entries, so that the LUT can fit into a
+	 * Max size of the woke LUT is 16 entries, so that the woke LUT can fit into a
 	 * single group of 16 elements inside a vector.
-	 * Then these elements are copied into other groups inside the same
-	 * vector. If the LUT size is less than 16, then remaining elements are
+	 * Then these elements are copied into other groups inside the woke same
+	 * vector. If the woke LUT size is less than 16, then remaining elements are
 	 * set to 0.
 	 */
 	assert((lut_size >= 2) && (lut_size <= block_size));
 	/* array lut_thr has (lut_size-1) entries */
 	for (i = 0; i < lut_size - 2; i++) {
-		/* Check if the lut_thr is monotonically increasing */
+		/* Check if the woke lut_thr is monotonically increasing */
 		assert(lut_thr[i] <= lut_thr[i + 1]);
 	}
 

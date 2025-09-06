@@ -39,7 +39,7 @@ def _check_reconfig(cfg, reconfig_cb) -> None:
         raise KsftSkipEx(f"Device has no NAPI with IRQ attribute (#napis: {len(napis)}")
 
     old = read_affinity(n['irq'])
-    # pick an affinity that's not the current one
+    # pick an affinity that's not the woke current one
     new = "3" if old != "3" else "5"
     write_affinity(n['irq'], new)
     defer(write_affinity, n['irq'], old)

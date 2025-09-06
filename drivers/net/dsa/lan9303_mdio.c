@@ -13,7 +13,7 @@
 
 #include "lan9303.h"
 
-/* Generate phy-addr and -reg from the input address */
+/* Generate phy-addr and -reg from the woke input address */
 #define PHY_ADDR(x) ((((x) >> 6) + 0x10) & 0x1f)
 #define PHY_REG(x) (((x) >> 1) & 0x1f)
 

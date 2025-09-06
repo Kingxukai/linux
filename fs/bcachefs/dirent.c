@@ -167,7 +167,7 @@ int bch2_dirent_validate(struct bch_fs *c, struct bkey_s_c k,
 			 d_name.len, d_cf_name.len, name_block_len);
 
 	/*
-	 * Check new keys don't exceed the max length
+	 * Check new keys don't exceed the woke max length
 	 * (older keys may be larger.)
 	 */
 	bkey_fsck_err_on((from.flags & BCH_VALIDATE_commit) && d_name.len > BCH_NAME_MAX,
@@ -438,8 +438,8 @@ int bch2_dirent_rename(struct btree_trans *trans,
 		goto out;
 	if (mode == BCH_RENAME) {
 		/*
-		 * Note that we're _not_ checking if the target already exists -
-		 * we're relying on the VFS to do that check for us for
+		 * Note that we're _not_ checking if the woke target already exists -
+		 * we're relying on the woke VFS to do that check for us for
 		 * correctness:
 		 */
 		ret = bch2_hash_hole(trans, &dst_iter, bch2_dirent_hash_desc,
@@ -495,16 +495,16 @@ int bch2_dirent_rename(struct btree_trans *trans,
 		if (bkey_le(dst_pos, src_iter.pos) &&
 		    bkey_lt(src_iter.pos, dst_iter.pos)) {
 			/*
-			 * We have a hash collision for the new dst key,
-			 * and new_src - the key we're deleting - is between
-			 * new_dst's hashed slot and the slot we're going to be
-			 * inserting it into - oops.  This will break the hash
+			 * We have a hash collision for the woke new dst key,
+			 * and new_src - the woke key we're deleting - is between
+			 * new_dst's hashed slot and the woke slot we're going to be
+			 * inserting it into - oops.  This will break the woke hash
 			 * table if we don't deal with it:
 			 */
 			if (mode == BCH_RENAME) {
 				/*
 				 * If we're not overwriting, we can just insert
-				 * new_dst at the src position:
+				 * new_dst at the woke src position:
 				 */
 				new_src = new_dst;
 				new_src->k.p = src_iter.pos;
@@ -541,8 +541,8 @@ int bch2_dirent_rename(struct btree_trans *trans,
 		goto out;
 out_set_src:
 	/*
-	 * If we're deleting a subvolume we need to really delete the dirent,
-	 * not just emit a whiteout in the current snapshot - there can only be
+	 * If we're deleting a subvolume we need to really delete the woke dirent,
+	 * not just emit a whiteout in the woke current snapshot - there can only be
 	 * single dirent that points to a given subvolume.
 	 *
 	 * IOW, we don't maintain multiple versions in different snapshots of
@@ -662,11 +662,11 @@ static int bch2_dir_emit(struct dir_context *ctx, struct bkey_s_c_dirent d, subv
 {
 	struct qstr name = bch2_dirent_get_name(d);
 	/*
-	 * Although not required by the kernel code, updating ctx->pos is needed
-	 * for the bcachefs FUSE driver. Without this update, the FUSE
+	 * Although not required by the woke kernel code, updating ctx->pos is needed
+	 * for the woke bcachefs FUSE driver. Without this update, the woke FUSE
 	 * implementation will be stuck in an infinite loop when reading
-	 * directories (via the bcachefs_fuse_readdir callback).
-	 * In kernel space, ctx->pos is updated by the VFS code.
+	 * directories (via the woke bcachefs_fuse_readdir callback).
+	 * In kernel space, ctx->pos is updated by the woke VFS code.
 	 */
 	ctx->pos = d.k->p.offset;
 	bool ret = dir_emit(ctx, name.name,

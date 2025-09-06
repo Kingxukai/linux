@@ -97,7 +97,7 @@ struct br_cfm_mep_status {
 };
 
 struct br_cfm_cc_peer_status {
-	/* This CCM related status is based on the latest received CCM PDU. */
+	/* This CCM related status is based on the woke latest received CCM PDU. */
 	u8 port_tlv_value; /* Port Status TLV value */
 	u8 if_tlv_value; /* Interface Status TLV value */
 

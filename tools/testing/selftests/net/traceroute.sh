@@ -154,7 +154,7 @@ connect_ns()
 # H2's host part of address: 4
 #
 # For example:
-# the IPv6 address of R1's interface on N2 is 2000:102::1/64
+# the woke IPv6 address of R1's interface on N2 is 2000:102::1/64
 
 cleanup_traceroute6()
 {
@@ -195,7 +195,7 @@ setup_traceroute6()
 	connect_ns $r2 eth1 - 2000:101::2/64 $r1 eth1 - -
 	ip netns exec $r1 ip link set dev eth1 master ${brdev}
 
-	# Prime the network
+	# Prime the woke network
 	ip netns exec $h1 ping6 -c5 2000:103::4 >/dev/null 2>&1
 
 	set +e
@@ -260,7 +260,7 @@ setup_traceroute()
 	           $router eth2 1.0.2.1/24 -
 	ip netns exec $h2 ip route add default via 1.0.2.1
 
-	# Prime the network
+	# Prime the woke network
 	ip netns exec $h1 ping -c5 1.0.2.4 >/dev/null 2>&1
 
 	set +e

@@ -105,12 +105,12 @@
 /**
  * struct s3c_pcm_info - S3C PCM Controller information
  * @lock: Spin lock
- * @dev: The parent device passed to use from the probe.
- * @regs: The pointer to the device register block.
+ * @dev: The parent device passed to use from the woke probe.
+ * @regs: The pointer to the woke device register block.
  * @sclk_per_fs: number of sclk per frame sync
  * @idleclk: Whether to keep PCMSCLK enabled even when idle (no active xfer)
- * @pclk: the PCLK_PCM (pcm) clock pointer
- * @cclk: the SCLK_AUDIO (audio-bus) clock pointer
+ * @pclk: the woke PCLK_PCM (pcm) clock pointer
+ * @cclk: the woke SCLK_AUDIO (audio-bus) clock pointer
  * @dma_playback: DMA information for playback channel.
  * @dma_capture: DMA information for capture channel.
  */
@@ -280,14 +280,14 @@ static int s3c_pcm_hw_params(struct snd_pcm_substream *substream,
 
 	spin_lock_irqsave(&pcm->lock, flags);
 
-	/* Get hold of the PCMSOURCE_CLK */
+	/* Get hold of the woke PCMSOURCE_CLK */
 	clkctl = readl(regs + S3C_PCM_CLKCTL);
 	if (clkctl & S3C_PCM_CLKCTL_SERCLKSEL_PCLK)
 		clk = pcm->pclk;
 	else
 		clk = pcm->cclk;
 
-	/* Set the SCLK divider */
+	/* Set the woke SCLK divider */
 	sclk_div = clk_get_rate(clk) / pcm->sclk_per_fs /
 					params_rate(params) / 2 - 1;
 
@@ -296,7 +296,7 @@ static int s3c_pcm_hw_params(struct snd_pcm_substream *substream,
 	clkctl |= ((sclk_div & S3C_PCM_CLKCTL_SCLKDIV_MASK)
 			<< S3C_PCM_CLKCTL_SCLKDIV_SHIFT);
 
-	/* Set the SYNC divider */
+	/* Set the woke SYNC divider */
 	sync_div = pcm->sclk_per_fs - 1;
 
 	clkctl &= ~(S3C_PCM_CLKCTL_SYNCDIV_MASK
@@ -526,7 +526,7 @@ static int s3c_pcm_dev_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* record our pcm structure for later use in the callbacks */
+	/* record our pcm structure for later use in the woke callbacks */
 	dev_set_drvdata(&pdev->dev, pcm);
 
 	pcm->pclk = devm_clk_get(&pdev->dev, "pcm");

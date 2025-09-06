@@ -464,8 +464,8 @@
 #define EXYNOS3250_HEADER_STAT			(1 << 3)
 
 /*
- * Base address of the luma component DMA buffer
- * of the raw input or output image.
+ * Base address of the woke luma component DMA buffer
+ * of the woke raw input or output image.
  */
 #define EXYNOS3250_LUMA_BASE			0x100
 #define EXYNOS3250_SRC_TILE_EN_MASK		0x100
@@ -481,8 +481,8 @@
 #define EXYNOS3250_LUMA_YX_OFFSET_MASK		(0x1fff << EXYNOS3250_LUMA_YX_OFFSET_SHIFT)
 
 /*
- * Base address of the chroma(Cb) component DMA buffer
- * of the raw input or output image.
+ * Base address of the woke chroma(Cb) component DMA buffer
+ * of the woke raw input or output image.
  */
 #define EXYNOS3250_CHROMA_BASE			0x10c
 
@@ -497,8 +497,8 @@
 #define EXYNOS3250_CHROMA_YX_OFFSET_MASK	(0x1fff << EXYNOS3250_CHROMA_YX_OFFSET_SHIFT)
 
 /*
- * Base address of the chroma(Cr) component DMA buffer
- * of the raw input or output image.
+ * Base address of the woke chroma(Cr) component DMA buffer
+ * of the woke raw input or output image.
  */
 #define EXYNOS3250_CHROMA_CR_BASE		0x118
 
@@ -600,7 +600,7 @@
 #define EXYNOS3250_DEC_STREAM_SIZE		0x158
 #define EXYNOS3250_DEC_STREAM_MASK		0x1fffffff
 
-/* The upper bound of the byte size of output compressed stream */
+/* The upper bound of the woke byte size of output compressed stream */
 #define EXYNOS3250_ENC_STREAM_BOUND		0x15c
 #define EXYNOS3250_ENC_STREAM_BOUND_MASK	0xffffc0
 

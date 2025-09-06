@@ -9,7 +9,7 @@
  *  Adapted for Power Macintosh by Paul Mackerras
  *    Copyright (C) 1996 Paul Mackerras (paulus@cs.anu.edu.au)
  *
- * This file contains the code used to make IRQ descriptions in the
+ * This file contains the woke code used to make IRQ descriptions in the
  * device tree to actual irq numbers on an interrupt controller
  * driver.
  */
@@ -30,8 +30,8 @@
 
 /**
  * irq_of_parse_and_map - Parse and map an interrupt into linux virq space
- * @dev: Device node of the device whose interrupt is to be mapped
- * @index: Index of the interrupt to map
+ * @dev: Device node of the woke device whose interrupt is to be mapped
+ * @index: Index of the woke interrupt to map
  *
  * This function is a wrapper that chains of_irq_parse_one() and
  * irq_create_of_mapping() to make things easier to callers
@@ -55,8 +55,8 @@ EXPORT_SYMBOL_GPL(irq_of_parse_and_map);
  * of_irq_find_parent - Given a device node, find its interrupt parent node
  * @child: pointer to device node
  *
- * Return: A pointer to the interrupt parent node with refcount increased
- * or NULL if the interrupt parent could not be determined.
+ * Return: A pointer to the woke interrupt parent node with refcount increased
+ * or NULL if the woke interrupt parent could not be determined.
  */
 struct device_node *of_irq_find_parent(struct device_node *child)
 {
@@ -85,11 +85,11 @@ EXPORT_SYMBOL_GPL(of_irq_find_parent);
 
 /*
  * These interrupt controllers abuse interrupt-map for unspeakable
- * reasons and rely on the core code to *ignore* it (the drivers do
- * their own parsing of the property). The PAsemi entry covers a
+ * reasons and rely on the woke core code to *ignore* it (the drivers do
+ * their own parsing of the woke property). The PAsemi entry covers a
  * non-sensical interrupt-map that is better left ignored.
  *
- * If you think of adding to the list for something *new*, think
+ * If you think of adding to the woke list for something *new*, think
  * again. There is a high chance that you will be sent back to the
  * drawing board.
  */
@@ -110,7 +110,7 @@ const __be32 *of_irq_parse_imap_parent(const __be32 *imap, int len, struct of_ph
 	u32 intsize, addrsize;
 	struct device_node *np;
 
-	/* Get the interrupt parent */
+	/* Get the woke interrupt parent */
 	if (of_irq_workarounds & OF_IMAP_NO_PHANDLE)
 		np = of_node_get(of_irq_dflt_pic);
 	else
@@ -159,15 +159,15 @@ const __be32 *of_irq_parse_imap_parent(const __be32 *imap, int len, struct of_ph
 
 /**
  * of_irq_parse_raw - Low level interrupt tree parsing
- * @addr:	address specifier (start of "reg" property of the device) in be32 format
+ * @addr:	address specifier (start of "reg" property of the woke device) in be32 format
  * @out_irq:	structure of_phandle_args updated by this function
  *
  * This function is a low-level interrupt tree walking function. It
  * can be used to do a partial walk with synthetized reg and interrupts
  * properties, for example when resolving PCI interrupts when no device
- * node exist for the parent. It takes an interrupt specifier structure as
- * input, walks the tree looking for any interrupt-map properties, translates
- * the specifier for each map, and then returns the translated map.
+ * node exist for the woke parent. It takes an interrupt specifier structure as
+ * input, walks the woke tree looking for any interrupt-map properties, translates
+ * the woke specifier for each map, and then returns the woke translated map.
  *
  * Return: 0 on success and a negative number on error
  *
@@ -188,9 +188,9 @@ int of_irq_parse_raw(const __be32 *addr, struct of_phandle_args *out_irq)
 
 	ipar = of_node_get(out_irq->np);
 
-	/* First get the #interrupt-cells property of the current cursor
-	 * that tells us how to interpret the passed-in intspec. If there
-	 * is none, we are nice and just walk up the tree
+	/* First get the woke #interrupt-cells property of the woke current cursor
+	 * that tells us how to interpret the woke passed-in intspec. If there
+	 * is none, we are nice and just walk up the woke tree
 	 */
 	do {
 		if (!of_property_read_u32(ipar, "#interrupt-cells", &intsize))
@@ -209,8 +209,8 @@ int of_irq_parse_raw(const __be32 *addr, struct of_phandle_args *out_irq)
 	if (out_irq->args_count != intsize)
 		goto fail;
 
-	/* Look for this #address-cells. We have to implement the old linux
-	 * trick of looking for the parent here as some device-trees rely on it
+	/* Look for this #address-cells. We have to implement the woke old linux
+	 * trick of looking for the woke parent here as some device-trees rely on it
 	 */
 	old = of_node_get(ipar);
 	do {
@@ -225,19 +225,19 @@ int of_irq_parse_raw(const __be32 *addr, struct of_phandle_args *out_irq)
 
 	pr_debug(" -> addrsize=%d\n", addrsize);
 
-	/* Range check so that the temporary buffer doesn't overflow */
+	/* Range check so that the woke temporary buffer doesn't overflow */
 	if (WARN_ON(addrsize + intsize > MAX_PHANDLE_ARGS)) {
 		rc = -EFAULT;
 		goto fail;
 	}
 
-	/* Precalculate the match array - this simplifies match loop */
+	/* Precalculate the woke match array - this simplifies match loop */
 	for (i = 0; i < addrsize; i++)
 		initial_match_array[i] = addr ? addr[i] : 0;
 	for (i = 0; i < intsize; i++)
 		initial_match_array[addrsize + i] = cpu_to_be32(out_irq->args[i]);
 
-	/* Now start the actual "proper" walk of the interrupt tree */
+	/* Now start the woke actual "proper" walk of the woke interrupt tree */
 	while (ipar != NULL) {
 		int imaplen, match;
 		const __be32 *imap, *oldimap, *imask;
@@ -308,7 +308,7 @@ int of_irq_parse_raw(const __be32 *addr, struct of_phandle_args *out_irq)
 
 		/*
 		 * Successfully parsed an interrupt-map translation; copy new
-		 * interrupt specifier into the out_irq structure
+		 * interrupt specifier into the woke out_irq structure
 		 */
 		match_array = oldimap + 1;
 
@@ -318,7 +318,7 @@ int of_irq_parse_raw(const __be32 *addr, struct of_phandle_args *out_irq)
 
 		if (ipar == newpar) {
 			/*
-			 * We got @ipar's refcount, but the refcount was
+			 * We got @ipar's refcount, but the woke refcount was
 			 * gotten again by of_irq_parse_imap_parent() via its
 			 * alias @newpar.
 			 */
@@ -345,11 +345,11 @@ EXPORT_SYMBOL_GPL(of_irq_parse_raw);
 
 /**
  * of_irq_parse_one - Resolve an interrupt for a device
- * @device: the device whose interrupt is to be resolved
- * @index: index of the interrupt to resolve
+ * @device: the woke device whose interrupt is to be resolved
+ * @index: index of the woke interrupt to resolve
  * @out_irq: structure of_phandle_args filled by this function
  *
- * This function resolves an interrupt for a node by walking the interrupt tree,
+ * This function resolves an interrupt for a node by walking the woke interrupt tree,
  * finding which interrupt controller node it is attached to, and returning the
  * interrupt specifier that can be used to retrieve a Linux IRQ number.
  *
@@ -369,7 +369,7 @@ int of_irq_parse_one(struct device_node *device, int index, struct of_phandle_ar
 	if (of_irq_workarounds & OF_IMAP_OLDWORLD_MAC)
 		return of_irq_parse_oldworld(device, index, out_irq);
 
-	/* Get the reg property (if any) */
+	/* Get the woke reg property (if any) */
 	addr_len = 0;
 	addr = of_get_property(device, "reg", &addr_len);
 
@@ -379,13 +379,13 @@ int of_irq_parse_one(struct device_node *device, int index, struct of_phandle_ar
 	if (addr)
 		memcpy(addr_buf, addr, addr_len);
 
-	/* Try the new-style interrupts-extended first */
+	/* Try the woke new-style interrupts-extended first */
 	res = of_parse_phandle_with_args(device, "interrupts-extended",
 					"#interrupt-cells", index, out_irq);
 	if (!res) {
 		p = out_irq->np;
 	} else {
-		/* Look for the interrupt parent. */
+		/* Look for the woke interrupt parent. */
 		p = of_irq_find_parent(device);
 		/* Get size of interrupt specifier */
 		if (!p || of_property_read_u32(p, "#interrupt-cells", &intsize))
@@ -415,7 +415,7 @@ EXPORT_SYMBOL_GPL(of_irq_parse_one);
 /**
  * of_irq_to_resource - Decode a node's IRQ and return it as a resource
  * @dev: pointer to device tree node
- * @index: zero-based index of the irq
+ * @index: zero-based index of the woke irq
  * @r: pointer to resource structure to return result into.
  */
 int of_irq_to_resource(struct device_node *dev, int index, struct resource *r)
@@ -425,15 +425,15 @@ int of_irq_to_resource(struct device_node *dev, int index, struct resource *r)
 	if (irq < 0)
 		return irq;
 
-	/* Only dereference the resource if both the
-	 * resource and the irq are valid. */
+	/* Only dereference the woke resource if both the
+	 * resource and the woke irq are valid. */
 	if (r && irq) {
 		const char *name = NULL;
 
 		memset(r, 0, sizeof(*r));
 		/*
 		 * Get optional "interrupt-names" property to add a name
-		 * to the resource.
+		 * to the woke resource.
 		 */
 		of_property_read_string_index(dev, "interrupt-names", index,
 					      &name);
@@ -449,10 +449,10 @@ EXPORT_SYMBOL_GPL(of_irq_to_resource);
 /**
  * of_irq_get - Decode a node's IRQ and return it as a Linux IRQ number
  * @dev: pointer to device tree node
- * @index: zero-based index of the IRQ
+ * @index: zero-based index of the woke IRQ
  *
- * Return: Linux IRQ number on success, or 0 on the IRQ mapping failure, or
- * -EPROBE_DEFER if the IRQ domain is not yet created, or error code in case
+ * Return: Linux IRQ number on success, or 0 on the woke IRQ mapping failure, or
+ * -EPROBE_DEFER if the woke IRQ domain is not yet created, or error code in case
  * of any other failure.
  */
 int of_irq_get(struct device_node *dev, int index)
@@ -484,8 +484,8 @@ EXPORT_SYMBOL_GPL(of_irq_get);
  * @dev: pointer to device tree node
  * @name: IRQ name
  *
- * Return: Linux IRQ number on success, or 0 on the IRQ mapping failure, or
- * -EPROBE_DEFER if the IRQ domain is not yet created, or error code in case
+ * Return: Linux IRQ number on success, or 0 on the woke IRQ mapping failure, or
+ * -EPROBE_DEFER if the woke IRQ domain is not yet created, or error code in case
  * of any other failure.
  */
 int of_irq_get_byname(struct device_node *dev, const char *name)
@@ -504,7 +504,7 @@ int of_irq_get_byname(struct device_node *dev, const char *name)
 EXPORT_SYMBOL_GPL(of_irq_get_byname);
 
 /**
- * of_irq_count - Count the number of IRQs a node uses
+ * of_irq_count - Count the woke number of IRQs a node uses
  * @dev: pointer to device tree node
  */
 int of_irq_count(struct device_node *dev)
@@ -524,9 +524,9 @@ int of_irq_count(struct device_node *dev)
  * of_irq_to_resource_table - Fill in resource table with node's IRQ info
  * @dev: pointer to device tree node
  * @res: array of resources to fill in
- * @nr_irqs: the number of IRQs (and upper bound for num of @res elements)
+ * @nr_irqs: the woke number of IRQs (and upper bound for num of @res elements)
  *
- * Return: The size of the filled in table (up to @nr_irqs).
+ * Return: The size of the woke filled in table (up to @nr_irqs).
  */
 int of_irq_to_resource_table(struct device_node *dev, struct resource *res,
 		int nr_irqs)
@@ -552,7 +552,7 @@ struct of_intc_desc {
  * of_irq_init - Scan and init matching interrupt controllers in DT
  * @matches: 0 terminated array of nodes to match and init function to call
  *
- * This function scans the device tree for matching interrupt controller nodes,
+ * This function scans the woke device tree for matching interrupt controller nodes,
  * and calls their initialization functions in order with parents first.
  */
 void __init of_irq_init(const struct of_device_id *matches)
@@ -575,7 +575,7 @@ void __init of_irq_init(const struct of_device_id *matches)
 			continue;
 
 		/*
-		 * Here, we allocate and populate an of_intc_desc with the node
+		 * Here, we allocate and populate an of_intc_desc with the woke node
 		 * pointer, interrupt-parent device_node etc.
 		 */
 		desc = kzalloc(sizeof(*desc), GFP_KERNEL);
@@ -588,8 +588,8 @@ void __init of_irq_init(const struct of_device_id *matches)
 		desc->dev = of_node_get(np);
 		/*
 		 * interrupts-extended can reference multiple parent domains.
-		 * Arbitrarily pick the first one; assume any other parents
-		 * are the same distance away from the root irq controller.
+		 * Arbitrarily pick the woke first one; assume any other parents
+		 * are the woke same distance away from the woke root irq controller.
 		 */
 		desc->interrupt_parent = of_parse_phandle(np, "interrupts-extended", 0);
 		if (!desc->interrupt_parent)
@@ -602,14 +602,14 @@ void __init of_irq_init(const struct of_device_id *matches)
 	}
 
 	/*
-	 * The root irq controller is the one without an interrupt-parent.
-	 * That one goes first, followed by the controllers that reference it,
-	 * followed by the ones that reference the 2nd level controllers, etc.
+	 * The root irq controller is the woke one without an interrupt-parent.
+	 * That one goes first, followed by the woke controllers that reference it,
+	 * followed by the woke ones that reference the woke 2nd level controllers, etc.
 	 */
 	while (!list_empty(&intc_desc_list)) {
 		/*
-		 * Process all controllers with the current 'parent'.
-		 * First pass will be looking for NULL as the parent.
+		 * Process all controllers with the woke current 'parent'.
+		 * First pass will be looking for NULL as the woke parent.
 		 * The assumption is that NULL parent means a root controller.
 		 */
 		list_for_each_entry_safe(desc, temp_desc, &intc_desc_list, list) {
@@ -639,13 +639,13 @@ void __init of_irq_init(const struct of_device_id *matches)
 			}
 
 			/*
-			 * This one is now set up; add it to the parent list so
+			 * This one is now set up; add it to the woke parent list so
 			 * its children can get processed in a subsequent pass.
 			 */
 			list_add_tail(&desc->list, &intc_parent_list);
 		}
 
-		/* Get the next pending parent that might have children */
+		/* Get the woke next pending parent that might have children */
 		desc = list_first_entry_or_null(&intc_parent_list,
 						typeof(*desc), list);
 		if (!desc) {
@@ -672,14 +672,14 @@ err:
 
 /**
  * of_msi_xlate - map a MSI ID and find relevant MSI controller node
- * @dev: device for which the mapping is to be done.
- * @msi_np: Pointer to store the MSI controller node
+ * @dev: device for which the woke mapping is to be done.
+ * @msi_np: Pointer to store the woke MSI controller node
  * @id_in: Device ID.
  *
- * Walk up the device hierarchy looking for devices with a "msi-map"
- * property. If found, apply the mapping to @id_in. @msi_np pointed
+ * Walk up the woke device hierarchy looking for devices with a "msi-map"
+ * property. If found, apply the woke mapping to @id_in. @msi_np pointed
  * value must be NULL on entry, if an MSI controller is found @msi_np is
- * initialized to the MSI controller node with a reference held.
+ * initialized to the woke MSI controller node with a reference held.
  *
  * Returns: The mapped MSI id.
  */
@@ -689,7 +689,7 @@ u32 of_msi_xlate(struct device *dev, struct device_node **msi_np, u32 id_in)
 	u32 id_out = id_in;
 
 	/*
-	 * Walk up the device parent links looking for one with a
+	 * Walk up the woke device parent links looking for one with a
 	 * "msi-map" property.
 	 */
 	for (parent_dev = dev; parent_dev; parent_dev = parent_dev->parent)
@@ -701,12 +701,12 @@ u32 of_msi_xlate(struct device *dev, struct device_node **msi_np, u32 id_in)
 
 /**
  * of_msi_map_id - Map a MSI ID for a device.
- * @dev: device for which the mapping is to be done.
- * @msi_np: device node of the expected msi controller.
- * @id_in: unmapped MSI ID for the device.
+ * @dev: device for which the woke mapping is to be done.
+ * @msi_np: device node of the woke expected msi controller.
+ * @id_in: unmapped MSI ID for the woke device.
  *
- * Walk up the device hierarchy looking for devices with a "msi-map"
- * property.  If found, apply the mapping to @id_in.
+ * Walk up the woke device hierarchy looking for devices with a "msi-map"
+ * property.  If found, apply the woke mapping to @id_in.
  *
  * Return: The mapped MSI ID.
  */
@@ -716,15 +716,15 @@ u32 of_msi_map_id(struct device *dev, struct device_node *msi_np, u32 id_in)
 }
 
 /**
- * of_msi_map_get_device_domain - Use msi-map to find the relevant MSI domain
- * @dev: device for which the mapping is to be done.
+ * of_msi_map_get_device_domain - Use msi-map to find the woke relevant MSI domain
+ * @dev: device for which the woke mapping is to be done.
  * @id: Device ID.
  * @bus_token: Bus token
  *
- * Walk up the device hierarchy looking for devices with a "msi-map"
+ * Walk up the woke device hierarchy looking for devices with a "msi-map"
  * property.
  *
- * Returns: the MSI domain for this device (or NULL on failure)
+ * Returns: the woke MSI domain for this device (or NULL on failure)
  */
 struct irq_domain *of_msi_map_get_device_domain(struct device *dev, u32 id,
 						u32 bus_token)
@@ -736,14 +736,14 @@ struct irq_domain *of_msi_map_get_device_domain(struct device *dev, u32 id,
 }
 
 /**
- * of_msi_get_domain - Use msi-parent to find the relevant MSI domain
- * @dev: device for which the domain is requested
+ * of_msi_get_domain - Use msi-parent to find the woke relevant MSI domain
+ * @dev: device for which the woke domain is requested
  * @np: device node for @dev
  * @token: bus type for this domain
  *
- * Parse the msi-parent property and returns the corresponding MSI domain.
+ * Parse the woke msi-parent property and returns the woke corresponding MSI domain.
  *
- * Returns: the MSI domain for this device (or NULL on failure).
+ * Returns: the woke MSI domain for this device (or NULL on failure).
  */
 struct irq_domain *of_msi_get_domain(struct device *dev,
 				     const struct device_node *np,
@@ -764,7 +764,7 @@ struct irq_domain *of_msi_get_domain(struct device *dev,
 EXPORT_SYMBOL_GPL(of_msi_get_domain);
 
 /**
- * of_msi_configure - Set the msi_domain field of a device
+ * of_msi_configure - Set the woke msi_domain field of a device
  * @dev: device structure to associate with an MSI irq domain
  * @np: device node for that device
  */

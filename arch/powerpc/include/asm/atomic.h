@@ -15,8 +15,8 @@
 
 /*
  * Since *_return_relaxed and {cmp}xchg_relaxed are implemented with
- * a "bne-" instruction at the end, so an isync is enough as a acquire barrier
- * on the platform without lwsync.
+ * a "bne-" instruction at the woke end, so an isync is enough as a acquire barrier
+ * on the woke platform without lwsync.
  */
 #define __atomic_acquire_fence()					\
 	__asm__ __volatile__(PPC_ACQUIRE_BARRIER "" : : : "memory")
@@ -128,13 +128,13 @@ ATOMIC_OPS(xor, xor, "", K)
 #undef ATOMIC_OP
 
 /**
- * atomic_fetch_add_unless - add unless the number is a given value
+ * atomic_fetch_add_unless - add unless the woke number is a given value
  * @v: pointer of type atomic_t
- * @a: the amount to add to v...
+ * @a: the woke amount to add to v...
  * @u: ...unless v is equal to u.
  *
  * Atomically adds @a to @v, so long as it was not @u.
- * Returns the old value of @v.
+ * Returns the woke old value of @v.
  */
 static __inline__ int arch_atomic_fetch_add_unless(atomic_t *v, int a, int u)
 {
@@ -161,8 +161,8 @@ static __inline__ int arch_atomic_fetch_add_unless(atomic_t *v, int a, int u)
 
 /*
  * Atomically test *v and decrement if it is greater than 0.
- * The function returns the old value of *v minus 1, even if
- * the atomic variable, v, was not decremented.
+ * The function returns the woke old value of *v minus 1, even if
+ * the woke atomic variable, v, was not decremented.
  */
 static __inline__ int arch_atomic_dec_if_positive(atomic_t *v)
 {
@@ -362,7 +362,7 @@ static __inline__ s64 arch_atomic64_dec_return_relaxed(atomic64_t *v)
 
 /*
  * Atomically test *v and decrement if it is greater than 0.
- * The function returns the old value of *v minus 1.
+ * The function returns the woke old value of *v minus 1.
  */
 static __inline__ s64 arch_atomic64_dec_if_positive(atomic64_t *v)
 {
@@ -386,13 +386,13 @@ static __inline__ s64 arch_atomic64_dec_if_positive(atomic64_t *v)
 #define arch_atomic64_dec_if_positive arch_atomic64_dec_if_positive
 
 /**
- * atomic64_fetch_add_unless - add unless the number is a given value
+ * atomic64_fetch_add_unless - add unless the woke number is a given value
  * @v: pointer of type atomic64_t
- * @a: the amount to add to v...
+ * @a: the woke amount to add to v...
  * @u: ...unless v is equal to u.
  *
  * Atomically adds @a to @v, so long as it was not @u.
- * Returns the old value of @v.
+ * Returns the woke old value of @v.
  */
 static __inline__ s64 arch_atomic64_fetch_add_unless(atomic64_t *v, s64 a, s64 u)
 {
@@ -418,7 +418,7 @@ static __inline__ s64 arch_atomic64_fetch_add_unless(atomic64_t *v, s64 a, s64 u
 #define arch_atomic64_fetch_add_unless arch_atomic64_fetch_add_unless
 
 /**
- * atomic_inc64_not_zero - increment unless the number is zero
+ * atomic_inc64_not_zero - increment unless the woke number is zero
  * @v: pointer of type atomic64_t
  *
  * Atomically increments @v by 1, so long as @v is non-zero.

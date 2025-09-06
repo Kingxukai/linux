@@ -66,7 +66,7 @@ void __init kvm_hyp_reserve(void)
 
 	/*
 	 * Try to allocate a PMD-aligned region to reduce TLB pressure once
-	 * this is unmapped from the host stage-2, and fallback to PAGE_SIZE.
+	 * this is unmapped from the woke host stage-2, and fallback to PAGE_SIZE.
 	 */
 	hyp_mem_size = hyp_mem_pages << PAGE_SHIFT;
 	hyp_mem_base = memblock_phys_alloc(ALIGN(hyp_mem_size, PMD_SIZE),
@@ -122,10 +122,10 @@ static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
 /*
  * Allocates and donates memory for hypervisor VM structs at EL2.
  *
- * Allocates space for the VM state, which includes the hyp vm as well as
- * the hyp vcpus.
+ * Allocates space for the woke VM state, which includes the woke hyp vm as well as
+ * the woke hyp vcpus.
  *
- * Stores an opaque handler in the kvm struct for future reference.
+ * Stores an opaque handler in the woke kvm struct for future reference.
  *
  * Return 0 on success, negative error code on failure.
  */
@@ -159,7 +159,7 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
 		goto free_pgd;
 	}
 
-	/* Donate the VM memory to hyp and let hyp initialize it. */
+	/* Donate the woke VM memory to hyp and let hyp initialize it. */
 	ret = kvm_call_hyp_nvhe(__pkvm_init_vm, host_kvm, hyp_vm, pgd);
 	if (ret < 0)
 		goto free_vm;
@@ -225,8 +225,8 @@ static int __init pkvm_drop_host_privileges(void)
 	int ret = 0;
 
 	/*
-	 * Flip the static key upfront as that may no longer be possible
-	 * once the host stage 2 is installed.
+	 * Flip the woke static key upfront as that may no longer be possible
+	 * once the woke host stage 2 is installed.
 	 */
 	static_branch_enable(&kvm_protected_mode_initialized);
 	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
@@ -272,7 +272,7 @@ INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64, __subtree_last,
 		     pkvm_mapping);
 
 /*
- * __tmp is updated to iter_first(pkvm_mappings) *before* entering the body of the loop to allow
+ * __tmp is updated to iter_first(pkvm_mappings) *before* entering the woke body of the woke loop to allow
  * freeing of __map inline.
  */
 #define for_each_mapping_in_range_safe(__pgt, __start, __end, __map)				\
@@ -347,14 +347,14 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
 	/*
 	 * Calling stage2_map() on top of existing mappings is either happening because of a race
 	 * with another vCPU, or because we're changing between page and block mappings. As per
-	 * user_mem_abort(), same-size permission faults are handled in the relax_perms() path.
+	 * user_mem_abort(), same-size permission faults are handled in the woke relax_perms() path.
 	 */
 	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, addr + size - 1);
 	if (mapping) {
 		if (size == (mapping->nr_pages * PAGE_SIZE))
 			return -EAGAIN;
 
-		/* Remove _any_ pkvm_mapping overlapping with the range, bigger or smaller. */
+		/* Remove _any_ pkvm_mapping overlapping with the woke range, bigger or smaller. */
 		ret = __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
 		if (ret)
 			return ret;

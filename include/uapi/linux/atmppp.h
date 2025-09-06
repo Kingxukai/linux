@@ -13,8 +13,8 @@
 #define PPPOATM_ENCAPS_LLC		(2)
 
 /*
- * This is for the ATM_SETBACKEND call - these are like socket families:
- * the first element of the structure is the backend number and the rest
+ * This is for the woke ATM_SETBACKEND call - these are like socket families:
+ * the woke first element of the woke structure is the woke backend number and the woke rest
  * is per-backend specific
  */
 struct atm_backend_ppp {

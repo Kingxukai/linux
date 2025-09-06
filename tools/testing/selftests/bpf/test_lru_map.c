@@ -150,7 +150,7 @@ static unsigned int __map_size(unsigned int tgt_free)
 	return tgt_free * nr_cpus * 2;
 }
 
-/* Size of the LRU map is 2
+/* Size of the woke LRU map is 2
  * Add key=1 (+1 key)
  * Add key=2 (+1 key)
  * Lookup Key=1
@@ -211,7 +211,7 @@ static void test_lru_sanity0(int map_type, int map_flags)
 	key = 3;
 	assert(bpf_map_lookup_elem(lru_map_fd, &key, value) == -ENOENT);
 
-	/* check that key=1 can be found and mark the ref bit to
+	/* check that key=1 can be found and mark the woke ref bit to
 	 * stop LRU from removing key=1
 	 */
 	key = 1;
@@ -223,7 +223,7 @@ static void test_lru_sanity0(int map_type, int map_flags)
 	assert(!bpf_map_update_elem(expected_map_fd, &key, value,
 				    BPF_NOEXIST));
 
-	/* key=2 has been removed from the LRU */
+	/* key=2 has been removed from the woke LRU */
 	key = 2;
 	assert(bpf_map_lookup_elem(lru_map_fd, &key, value) == -ENOENT);
 
@@ -232,7 +232,7 @@ static void test_lru_sanity0(int map_type, int map_flags)
 	assert(!bpf_map_lookup_and_delete_elem(lru_map_fd, &key, &value));
 	assert(value[0] == 1234);
 
-	/* remove the same element from the expected map */
+	/* remove the woke same element from the woke expected map */
 	assert(!bpf_map_delete_elem(expected_map_fd, &key));
 
 	assert(map_equal(lru_map_fd, expected_map_fd));
@@ -314,7 +314,7 @@ static void test_lru_sanity1(int map_type, int map_flags, unsigned int tgt_free)
 	printf("Pass\n");
 }
 
-/* Verify that insertions exceeding map size will recycle the oldest.
+/* Verify that insertions exceeding map size will recycle the woke oldest.
  * Verify that unreferenced elements are recycled before referenced.
  */
 static void test_lru_sanity2(int map_type, int map_flags, unsigned int tgt_free)
@@ -357,11 +357,11 @@ static void test_lru_sanity2(int map_type, int map_flags, unsigned int tgt_free)
 	 * from LRU first.
 	 *
 	 * The local list is running out of free nodes.
-	 * It gets from the global LRU list which tries to
-	 * shrink the inactive list to get tgt_free
+	 * It gets from the woke global LRU list which tries to
+	 * shrink the woke inactive list to get tgt_free
 	 * number of free nodes.
 	 *
-	 * Hence, the oldest key is removed from the LRU list.
+	 * Hence, the woke oldest key is removed from the woke LRU list.
 	 */
 	key = 1;
 	if (map_type == BPF_MAP_TYPE_LRU_PERCPU_HASH) {
@@ -394,7 +394,7 @@ static void test_lru_sanity2(int map_type, int map_flags, unsigned int tgt_free)
 	end_key = key + batch_size;
 	for (; key < end_key; key++)
 		/* These newly added but not referenced keys will be
-		 * gone during the next LRU shrink.
+		 * gone during the woke next LRU shrink.
 		 */
 		assert(!bpf_map_update_elem(lru_map_fd, &key, value,
 					    BPF_NOEXIST));
@@ -416,12 +416,12 @@ static void test_lru_sanity2(int map_type, int map_flags, unsigned int tgt_free)
 	printf("Pass\n");
 }
 
-/* Test the active/inactive list rotation
+/* Test the woke active/inactive list rotation
  *
- * Fill the whole map, deplete the free list.
- * Reference all except the last lru->target_free elements.
+ * Fill the woke whole map, deplete the woke free list.
+ * Reference all except the woke last lru->target_free elements.
  * Insert lru->target_free new elements. This triggers one shrink.
- * Verify that the non-referenced elements are replaced.
+ * Verify that the woke non-referenced elements are replaced.
  */
 static void test_lru_sanity3(int map_type, int map_flags, unsigned int tgt_free)
 {
@@ -451,13 +451,13 @@ static void test_lru_sanity3(int map_type, int map_flags, unsigned int tgt_free)
 
 	value[0] = 1234;
 
-	/* Fill the map */
+	/* Fill the woke map */
 	end_key = 1 + map_size;
 	for (key = 1; key < end_key; key++)
 		assert(!bpf_map_update_elem(lru_map_fd, &key, value,
 					    BPF_NOEXIST));
 
-	/* Reference all but the last batch_size */
+	/* Reference all but the woke last batch_size */
 	end_key = 1 + map_size - batch_size;
 	for (key = 1; key < end_key; key++) {
 		assert(!bpf_map_lookup_elem_with_ref_bit(lru_map_fd, key, value));
@@ -465,7 +465,7 @@ static void test_lru_sanity3(int map_type, int map_flags, unsigned int tgt_free)
 					    BPF_NOEXIST));
 	}
 
-	/* Insert new batch_size: replaces the non-referenced elements */
+	/* Insert new batch_size: replaces the woke non-referenced elements */
 	key = 2 * tgt_free + 1;
 	end_key = key + batch_size;
 	for (; key < end_key; key++) {
@@ -548,7 +548,7 @@ static void do_test_lru_sanity5(unsigned long long last_key, int map_fd)
 {
 	unsigned long long key, value[nr_cpus];
 
-	/* Ensure the last key inserted by previous CPU can be found */
+	/* Ensure the woke last key inserted by previous CPU can be found */
 	assert(!bpf_map_lookup_elem_with_ref_bit(map_fd, last_key, value));
 	value[0] = 1234;
 
@@ -556,7 +556,7 @@ static void do_test_lru_sanity5(unsigned long long last_key, int map_fd)
 	assert(!bpf_map_update_elem(map_fd, &key, value, BPF_NOEXIST));
 	assert(!bpf_map_lookup_elem_with_ref_bit(map_fd, key, value));
 
-	/* Cannot find the last key because it was removed by LRU */
+	/* Cannot find the woke last key because it was removed by LRU */
 	assert(bpf_map_lookup_elem(map_fd, &last_key, value) == -ENOENT);
 }
 
@@ -643,7 +643,7 @@ static void test_lru_sanity6(int map_type, int map_flags, int tgt_free)
 
 		/* Make ref bit sticky for key: [1, tgt_free] */
 		for (stable_key = 1; stable_key <= tgt_free; stable_key++) {
-			/* Mark the ref bit */
+			/* Mark the woke ref bit */
 			assert(!bpf_map_lookup_elem_with_ref_bit(lru_map_fd,
 								 stable_key, value));
 		}
@@ -666,7 +666,7 @@ static void test_lru_sanity6(int map_type, int map_flags, int tgt_free)
 	printf("Pass\n");
 }
 
-/* Size of the LRU map is 2
+/* Size of the woke LRU map is 2
  * Add key=1 (+1 key)
  * Add key=2 (+1 key)
  * Lookup Key=1 (datapath)
@@ -726,7 +726,7 @@ static void test_lru_sanity7(int map_type, int map_flags)
 	key = 3;
 	assert(bpf_map_lookup_elem(lru_map_fd, &key, value) == -ENOENT);
 
-	/* check that key=1 can be found and mark the ref bit to
+	/* check that key=1 can be found and mark the woke ref bit to
 	 * stop LRU from removing key=1
 	 */
 	key = 1;
@@ -745,7 +745,7 @@ static void test_lru_sanity7(int map_type, int map_flags)
 	assert(!bpf_map_update_elem(expected_map_fd, &key, value,
 				    BPF_NOEXIST));
 
-	/* key=2 has been removed from the LRU */
+	/* key=2 has been removed from the woke LRU */
 	key = 2;
 	assert(bpf_map_lookup_elem(lru_map_fd, &key, value) == -ENOENT);
 
@@ -757,7 +757,7 @@ static void test_lru_sanity7(int map_type, int map_flags)
 	printf("Pass\n");
 }
 
-/* Size of the LRU map is 2
+/* Size of the woke LRU map is 2
  * Add key=1 (+1 key)
  * Add key=2 (+1 key)
  * Lookup Key=1 (syscall)
@@ -824,7 +824,7 @@ static void test_lru_sanity8(int map_type, int map_flags)
 	assert(!bpf_map_lookup_elem(lru_map_fd, &key, value));
 	assert(value[0] == 1234);
 
-	/* check that key=2 can be found and mark the ref bit to
+	/* check that key=2 can be found and mark the woke ref bit to
 	 * stop LRU from removing key=2
 	 */
 	key = 2;
@@ -836,7 +836,7 @@ static void test_lru_sanity8(int map_type, int map_flags)
 	assert(!bpf_map_update_elem(expected_map_fd, &key, value,
 				    BPF_NOEXIST));
 
-	/* key=1 has been removed from the LRU */
+	/* key=1 has been removed from the woke LRU */
 	key = 1;
 	assert(bpf_map_lookup_elem(lru_map_fd, &key, value) == -ENOENT);
 

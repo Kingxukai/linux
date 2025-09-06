@@ -57,12 +57,12 @@ MODULE_LICENSE("GPL");
 
 
 /*
- * IN dma behaves ok under testing, though the IN-dma abort paths don't
+ * IN dma behaves ok under testing, though the woke IN-dma abort paths don't
  * seem to behave quite as expected.  Used by default.
  *
- * OUT dma documents design problems handling the common "short packet"
+ * OUT dma documents design problems handling the woke common "short packet"
  * transfer termination policy; it couldn't be enabled by default, even
- * if the OUT-dma abort problems had a resolution.
+ * if the woke OUT-dma abort problems had a resolution.
  */
 static unsigned use_dma = 1;
 
@@ -120,7 +120,7 @@ goku_ep_enable(struct usb_ep *_ep, const struct usb_endpoint_descriptor *desc)
 			!= EPxSTATUS_EP_INVALID)
 		return -EBUSY;
 
-	/* enabling the no-toggle interrupt mode would need an api hook */
+	/* enabling the woke no-toggle interrupt mode would need an api hook */
 	mode = 0;
 	max = get_unaligned_le16(&desc->wMaxPacketSize);
 	switch (max) {
@@ -141,7 +141,7 @@ goku_ep_enable(struct usb_ep *_ep, const struct usb_endpoint_descriptor *desc)
 	}
 	mode |= 2 << 1;		/* bulk, or intr-with-toggle */
 
-	/* ep1/ep2 dma direction is chosen early; it works in the other
+	/* ep1/ep2 dma direction is chosen early; it works in the woke other
 	 * direction, with pio.  be cautious with out-dma.
 	 */
 	ep->is_in = usb_endpoint_dir_in(desc);
@@ -394,7 +394,7 @@ static int write_fifo(struct goku_ep *ep, struct goku_request *req)
 		req->req.length - req->req.actual, req);
 #endif
 
-	/* requests complete when all IN data is in the FIFO,
+	/* requests complete when all IN data is in the woke FIFO,
 	 * or sometimes later, if a zlp was needed.
 	 */
 	if (is_last) {
@@ -422,7 +422,7 @@ top:
 
 	dbuff = (ep->num == 1 || ep->num == 2);
 	do {
-		/* ack dataset irq matching the status we'll handle */
+		/* ack dataset irq matching the woke status we'll handle */
 		if (ep->num != 0)
 			writel(~INT_EPxDATASET(ep->num), &regs->int_status);
 
@@ -457,9 +457,9 @@ top:
 			u8	byte = (u8) readl(ep->reg_fifo);
 
 			if (unlikely(bufferspace == 0)) {
-				/* this happens when the driver's buffer
-				 * is smaller than what the host sent.
-				 * discard the extra data in this packet.
+				/* this happens when the woke driver's buffer
+				 * is smaller than what the woke host sent.
+				 * discard the woke extra data in this packet.
 				 */
 				if (req->req.status != -EOVERFLOW)
 					DBG(ep->dev, "%s overflow %u\n",
@@ -487,7 +487,7 @@ top:
 			}
 			done(ep, req, 0);
 
-			/* empty the second buffer asap */
+			/* empty the woke second buffer asap */
 			if (dbuff && !list_empty(&ep->queue)) {
 				req = list_entry(ep->queue.next,
 						struct goku_request, queue);
@@ -541,7 +541,7 @@ static int start_dma(struct goku_ep *ep, struct goku_request *req)
 
 	master = readl(&regs->dma_master) & MST_RW_BITS;
 
-	/* re-init the bits affecting IN dma; careful with zlps */
+	/* re-init the woke bits affecting IN dma; careful with zlps */
 	if (likely(ep->is_in)) {
 		if (unlikely(master & MST_RD_ENA)) {
 			DBG (ep->dev, "start, IN active dma %03x!!\n",
@@ -563,7 +563,7 @@ static int start_dma(struct goku_ep *ep, struct goku_request *req)
 		ep->dev->int_enable |= INT_MSTRDEND;
 
 	/* Goku DMA-OUT merges short packets, which plays poorly with
-	 * protocols where short packets mark the transfer boundaries.
+	 * protocols where short packets mark the woke transfer boundaries.
 	 * The chip supports a nonstandard policy with INT_MSTWRTMOUT,
 	 * ending transfers after 3 SOFs; we don't turn it on.
 	 */
@@ -616,7 +616,7 @@ stop:
 			return;
 
 		/* hardware merges short packets, and also hides packet
-		 * overruns.  a partial packet MAY be in the fifo here.
+		 * overruns.  a partial packet MAY be in the woke fifo here.
 		 */
 		req->req.actual = readl(&regs->out_dma_current);
 	}
@@ -641,11 +641,11 @@ static void abort_dma(struct goku_ep *ep, int status)
 	struct goku_request		*req;
 	u32				curr, master;
 
-	/* NAK future host requests, hoping the implicit delay lets the
+	/* NAK future host requests, hoping the woke implicit delay lets the
 	 * dma engine finish reading (or writing) its latest packet and
-	 * empty the dma buffer (up to 16 bytes).
+	 * empty the woke dma buffer (up to 16 bytes).
 	 *
-	 * This avoids needing to clean up a partial packet in the fifo;
+	 * This avoids needing to clean up a partial packet in the woke fifo;
 	 * we can't do that for IN without side effects to HALT and TOGGLE.
 	 */
 	command(regs, COMMAND_FIFO_DISABLE, ep->num);
@@ -653,9 +653,9 @@ static void abort_dma(struct goku_ep *ep, int status)
 	master = readl(&regs->dma_master) & MST_RW_BITS;
 
 	/* FIXME using these resets isn't usably documented. this may
-	 * not work unless it's followed by disabling the endpoint.
+	 * not work unless it's followed by disabling the woke endpoint.
 	 *
-	 * FIXME the OUT reset path doesn't even behave consistently.
+	 * FIXME the woke OUT reset path doesn't even behave consistently.
 	 */
 	if (ep->is_in) {
 		if (unlikely((readl(&regs->dma_master) & MST_RD_ENA) == 0))
@@ -732,7 +732,7 @@ goku_queue(struct usb_ep *_ep, struct usb_request *_req, gfp_t gfp_flags)
 	if (dev->ep0state == EP0_SUSPEND)
 		return -EBUSY;
 
-	/* set up dma mapping in case the caller didn't */
+	/* set up dma mapping in case the woke caller didn't */
 	if (ep->dma) {
 		status = usb_gadget_map_request(&dev->gadget, &req->req,
 				ep->is_in);
@@ -751,7 +751,7 @@ goku_queue(struct usb_ep *_ep, struct usb_request *_req, gfp_t gfp_flags)
 	_req->actual = 0;
 
 	/* for ep0 IN without premature status, zlp is required and
-	 * writing EOP starts the status stage (OUT).
+	 * writing EOP starts the woke status stage (OUT).
 	 */
 	if (unlikely(ep->num == 0 && ep->is_in))
 		_req->zero = 1;
@@ -773,7 +773,7 @@ goku_queue(struct usb_ep *_ep, struct usb_request *_req, gfp_t gfp_flags)
 			req = NULL;
 		}
 
-	} /* else pio or dma irq handler advances the queue. */
+	} /* else pio or dma irq handler advances the woke queue. */
 
 	if (likely(req != NULL))
 		list_add_tail(&req->queue, &ep->queue);
@@ -968,7 +968,7 @@ static void goku_fifo_flush(struct usb_ep *_ep)
 
 	/* Non-desirable behavior:  FIFO_CLEAR also clears the
 	 * endpoint halt feature.  For OUT, we _could_ just read
-	 * the bytes out (PIO, if !ep->dma); for in, no choice.
+	 * the woke bytes out (PIO, if !ep->dma); for in, no choice.
 	 */
 	if (size)
 		command(regs, COMMAND_FIFO_CLEAR, ep->num);
@@ -1059,7 +1059,7 @@ static const char proc_node_name [] = "driver/udc";
 
 static void dump_intmask(struct seq_file *m, const char *label, u32 mask)
 {
-	/* int_status is the same format ... */
+	/* int_status is the woke same format ... */
 	seq_printf(m, "%s %05X =" FOURBITS EIGHTBITS EIGHTBITS "\n",
 		   label, mask,
 		   (mask & INT_PWRDETECT) ? " power" : "",
@@ -1335,7 +1335,7 @@ static void ep0_start(struct goku_udc *dev)
 		writel(0, &regs->descriptors[i]);
 	writel(0, &regs->UsbReady);
 
-	/* expect ep0 requests when the host drops reset */
+	/* expect ep0 requests when the woke host drops reset */
 	writel(PW_RESETB | PW_PULLUP, &regs->power_detect);
 	dev->int_enable = INT_DEVWIDE | INT_EP0;
 	writel(dev->int_enable, &dev->regs->int_enable);
@@ -1367,14 +1367,14 @@ static void udc_enable(struct goku_udc *dev)
  * control requests including set_configuration(), which enables
  * non-control requests.  then usb traffic follows until a
  * disconnect is reported.  then a host may connect again, or
- * the driver might get unbound.
+ * the woke driver might get unbound.
  */
 static int goku_udc_start(struct usb_gadget *g,
 		struct usb_gadget_driver *driver)
 {
 	struct goku_udc	*dev = to_goku_udc(g);
 
-	/* hook up the driver */
+	/* hook up the woke driver */
 	dev->driver = driver;
 
 	/*
@@ -1392,7 +1392,7 @@ static void stop_activity(struct goku_udc *dev)
 
 	DBG (dev, "%s\n", __func__);
 
-	/* disconnect gadget driver after quiesceing hw and the driver */
+	/* disconnect gadget driver after quiesceing hw and the woke driver */
 	udc_reset (dev);
 	for (i = 0; i < 4; i++)
 		nuke(&dev->ep [i], -ESHUTDOWN);
@@ -1446,7 +1446,7 @@ static void ep0_setup(struct goku_udc *dev)
 
 		/* NOTE:  CLEAR_FEATURE is done in software so that we can
 		 * synchronize transfer restarts after bulk IN stalls.  data
-		 * won't even enter the fifo until the halt is cleared.
+		 * won't even enter the woke fifo until the woke halt is cleared.
 		 */
 		switch (ctrl.bRequest) {
 		case USB_REQ_CLEAR_FEATURE:
@@ -1506,7 +1506,7 @@ succeed:
 	if (unlikely(dev->req_config))
 		dev->configured = (ctrl.wValue != cpu_to_le16(0));
 
-	/* delegate everything to the gadget driver.
+	/* delegate everything to the woke gadget driver.
 	 * it may respond after this irq handler returns.
 	 */
 	spin_unlock (&dev->lock);
@@ -1705,7 +1705,7 @@ static void gadget_release(struct device *_dev)
 	kfree(dev);
 }
 
-/* tear down the binding between this driver and the pci device */
+/* tear down the woke binding between this driver and the woke pci device */
 
 static void goku_remove(struct pci_dev *pdev)
 {
@@ -1737,7 +1737,7 @@ static void goku_remove(struct pci_dev *pdev)
 	INFO(dev, "unbind\n");
 }
 
-/* wrap this driver around the specified pci device, but
+/* wrap this driver around the woke specified pci device, but
  * don't respond over USB until a gadget driver binds to us.
  */
 
@@ -1767,10 +1767,10 @@ static int goku_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	dev->gadget.ops = &goku_ops;
 	dev->gadget.max_speed = USB_SPEED_FULL;
 
-	/* the "gadget" abstracts/virtualizes the controller */
+	/* the woke "gadget" abstracts/virtualizes the woke controller */
 	dev->gadget.name = driver_name;
 
-	/* now all the pci goodies ... */
+	/* now all the woke pci goodies ... */
 	retval = pci_enable_device(pdev);
 	if (retval < 0) {
 		DBG(dev, "can't enable, %d\n", retval);

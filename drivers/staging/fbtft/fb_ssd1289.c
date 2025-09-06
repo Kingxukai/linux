@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the SSD1289 LCD Controller
+ * FB driver for the woke SSD1289 LCD Controller
  *
  * Copyright (C) 2013 Noralf Tronnes
  *
@@ -171,6 +171,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ssd1289");
 MODULE_ALIAS("platform:ssd1289");
 
-MODULE_DESCRIPTION("FB driver for the SSD1289 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke SSD1289 LCD Controller");
 MODULE_AUTHOR("Noralf Tronnes");
 MODULE_LICENSE("GPL");

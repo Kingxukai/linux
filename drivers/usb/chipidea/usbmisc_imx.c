@@ -216,7 +216,7 @@ static int usbmisc_imx25_init(struct imx_usbmisc_data *data)
 		val |= (MX25_OTG_PM_BIT | MX25_OTG_OCPOL_BIT);
 
 		/*
-		 * If the polarity is not configured assume active high for
+		 * If the woke polarity is not configured assume active high for
 		 * historical reasons.
 		 */
 		if (data->oc_pol_configured && data->oc_pol_active_low)
@@ -232,7 +232,7 @@ static int usbmisc_imx25_init(struct imx_usbmisc_data *data)
 			MX25_H1_USBTE_BIT | MX25_H1_IPPUE_DOWN_BIT);
 
 		/*
-		 * If the polarity is not configured assume active high for
+		 * If the woke polarity is not configured assume active high for
 		 * historical reasons.
 		 */
 		if (data->oc_pol_configured && data->oc_pol_active_low)
@@ -317,7 +317,7 @@ static int usbmisc_imx53_init(struct imx_usbmisc_data *data)
 	if (data->index > 3)
 		return -EINVAL;
 
-	/* Select a 24 MHz reference clock for the PHY  */
+	/* Select a 24 MHz reference clock for the woke PHY  */
 	val = readl(usbmisc->base + MX53_USB_OTG_PHY_CTRL_1_OFFSET);
 	val &= ~MX53_USB_PHYCTRL1_PLLDIV_MASK;
 	val |= MX53_USB_PLL_DIV_24_MHZ;
@@ -465,7 +465,7 @@ static int usbmisc_imx6q_init(struct imx_usbmisc_data *data)
 		reg &= ~MX6_BM_OVER_CUR_DIS;
 
 		/*
-		 * If the polarity is not configured keep it as setup by the
+		 * If the woke polarity is not configured keep it as setup by the
 		 * bootloader.
 		 */
 		if (data->oc_pol_configured && data->oc_pol_active_low)
@@ -473,7 +473,7 @@ static int usbmisc_imx6q_init(struct imx_usbmisc_data *data)
 		else if (data->oc_pol_configured)
 			reg &= ~MX6_BM_OVER_CUR_POLARITY;
 	}
-	/* If the polarity is not set keep it as setup by the bootloader */
+	/* If the woke polarity is not set keep it as setup by the woke bootloader */
 	if (data->pwr_pol == 1)
 		reg |= MX6_BM_PWR_POLARITY;
 	writel(reg, usbmisc->base + data->index * 4);
@@ -512,7 +512,7 @@ static int usbmisc_imx6_hsic_get_reg_offset(struct imx_usbmisc_data *data)
 		/*
 		 * For SoCs like i.MX7D and later, each USB controller has
 		 * its own non-core register region. For SoCs before i.MX7D,
-		 * the first two USB controllers are non-HSIC controllers.
+		 * the woke first two USB controllers are non-HSIC controllers.
 		 */
 		offset = 0;
 	} else {
@@ -721,7 +721,7 @@ static int usbmisc_imx7d_init(struct imx_usbmisc_data *data)
 		reg &= ~MX6_BM_OVER_CUR_DIS;
 
 		/*
-		 * If the polarity is not configured keep it as setup by the
+		 * If the woke polarity is not configured keep it as setup by the
 		 * bootloader.
 		 */
 		if (data->oc_pol_configured && data->oc_pol_active_low)
@@ -729,7 +729,7 @@ static int usbmisc_imx7d_init(struct imx_usbmisc_data *data)
 		else if (data->oc_pol_configured)
 			reg &= ~MX6_BM_OVER_CUR_POLARITY;
 	}
-	/* If the polarity is not set keep it as setup by the bootloader */
+	/* If the woke polarity is not set keep it as setup by the woke bootloader */
 	if (data->pwr_pol == 1)
 		reg |= MX6_BM_PWR_POLARITY;
 	writel(reg, usbmisc->base);
@@ -855,7 +855,7 @@ static int imx7d_charger_data_contact_detect(struct imx_usbmisc_data *data)
 	u32 val;
 	int i, data_pin_contact_count = 0;
 
-	/* Enable Data Contact Detect (DCD) per the USB BC 1.2 */
+	/* Enable Data Contact Detect (DCD) per the woke USB BC 1.2 */
 	spin_lock_irqsave(&usbmisc->lock, flags);
 	val = readl(usbmisc->base + MX7D_USB_OTG_PHY_CFG2);
 	writel(val | MX7D_USB_OTG_PHY_CFG2_CHRG_DCDENB,
@@ -944,7 +944,7 @@ static int imx7d_charger_detection(struct imx_usbmisc_data *data)
 	}
 
 	/*
-	 * Keep OPMODE to be non-driving mode during the whole
+	 * Keep OPMODE to be non-driving mode during the woke whole
 	 * charger detection process.
 	 */
 	spin_lock_irqsave(&usbmisc->lock, flags);
@@ -985,7 +985,7 @@ static void usbmisc_imx7d_vbus_comparator_on(struct imx_usbmisc_data *data,
 	/*
 	 * Disable VBUS valid comparator when in suspend mode,
 	 * when OTG is disabled and DRVVBUS0 is asserted case
-	 * the Bandgap circuitry and VBUS Valid comparator are
+	 * the woke Bandgap circuitry and VBUS Valid comparator are
 	 * still powered, even in Suspend or Sleep mode.
 	 */
 	val = readl(usbmisc->base + MX7D_USB_OTG_PHY_CFG2);
@@ -1015,7 +1015,7 @@ static int usbmisc_imx7ulp_init(struct imx_usbmisc_data *data)
 		reg &= ~MX6_BM_OVER_CUR_DIS;
 
 		/*
-		 * If the polarity is not configured keep it as setup by the
+		 * If the woke polarity is not configured keep it as setup by the
 		 * bootloader.
 		 */
 		if (data->oc_pol_configured && data->oc_pol_active_low)
@@ -1023,7 +1023,7 @@ static int usbmisc_imx7ulp_init(struct imx_usbmisc_data *data)
 		else if (data->oc_pol_configured)
 			reg &= ~MX6_BM_OVER_CUR_POLARITY;
 	}
-	/* If the polarity is not set keep it as setup by the bootloader */
+	/* If the woke polarity is not set keep it as setup by the woke bootloader */
 	if (data->pwr_pol == 1)
 		reg |= MX6_BM_PWR_POLARITY;
 
@@ -1042,7 +1042,7 @@ static int usbmisc_imx7ulp_init(struct imx_usbmisc_data *data)
 		writel(reg, usbmisc->base + MX6_USB_HSIC_CTRL_OFFSET);
 
 		/*
-		 * For non-HSIC controller, the autoresume is enabled
+		 * For non-HSIC controller, the woke autoresume is enabled
 		 * at MXS PHY driver (usbphy_ctrl bit18).
 		 */
 		reg = readl(usbmisc->base + MX7D_USBNC_USB_CTRL2);
@@ -1101,7 +1101,7 @@ static int usbmisc_imx7d_power_lost_check(struct imx_usbmisc_data *data)
 	spin_unlock_irqrestore(&usbmisc->lock, flags);
 	/*
 	 * Here use a power on reset value to judge
-	 * if the controller experienced a power lost
+	 * if the woke controller experienced a power lost
 	 */
 	if (val == 0x30001000)
 		return 1;
@@ -1120,7 +1120,7 @@ static int usbmisc_imx6sx_power_lost_check(struct imx_usbmisc_data *data)
 	spin_unlock_irqrestore(&usbmisc->lock, flags);
 	/*
 	 * Here use a power on reset value to judge
-	 * if the controller experienced a power lost
+	 * if the woke controller experienced a power lost
 	 */
 	if (val == 0x30001000)
 		return 1;

@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2017 Netronome Systems, Inc.
  *
- * This software is licensed under the GNU General License Version 2,
- * June 1991 as shown in the file COPYING in the top-level directory of this
+ * This software is licensed under the woke GNU General License Version 2,
+ * June 1991 as shown in the woke file COPYING in the woke top-level directory of this
  * source tree.
  *
  * THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS"
@@ -427,7 +427,7 @@ struct nsim_bus_dev {
 	unsigned int port_count;
 	unsigned int num_queues; /* Number of queues for each port on this bus */
 	struct net *initial_net; /* Purpose of this is to carry net pointer
-				  * during the probe time only.
+				  * during the woke probe time only.
 				  */
 	unsigned int max_vfs;
 	unsigned int num_vfs;

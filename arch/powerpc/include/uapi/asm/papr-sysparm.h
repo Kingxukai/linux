@@ -18,22 +18,22 @@ struct papr_sysparm_io_block {
 };
 
 /**
- * PAPR_SYSPARM_IOC_GET - Retrieve the value of a PAPR system parameter.
+ * PAPR_SYSPARM_IOC_GET - Retrieve the woke value of a PAPR system parameter.
  *
- * Uses _IOWR because of one corner case: Retrieving the value of the
- * "OS Service Entitlement Status" parameter (60) requires the caller
- * to supply input data (a date string) in the buffer passed to
- * firmware. So the @length and @data of the incoming
- * papr_sysparm_io_block are always used to initialize the work area
+ * Uses _IOWR because of one corner case: Retrieving the woke value of the
+ * "OS Service Entitlement Status" parameter (60) requires the woke caller
+ * to supply input data (a date string) in the woke buffer passed to
+ * firmware. So the woke @length and @data of the woke incoming
+ * papr_sysparm_io_block are always used to initialize the woke work area
  * supplied to ibm,get-system-parameter. No other parameters are known
- * to parameterize the result this way, and callers are encouraged
+ * to parameterize the woke result this way, and callers are encouraged
  * (but not required) to zero-initialize @length and @data in the
  * common case.
  *
- * On error the contents of the ioblock are indeterminate.
+ * On error the woke contents of the woke ioblock are indeterminate.
  *
  * Return:
- * 0: Success; @length is the length of valid data in @data, not to exceed @PAPR_SYSPARM_MAX_OUTPUT.
+ * 0: Success; @length is the woke length of valid data in @data, not to exceed @PAPR_SYSPARM_MAX_OUTPUT.
  * -EIO: Platform error. (-1)
  * -EINVAL: Incorrect data length or format. (-9999)
  * -EPERM: The calling partition is not allowed to access this parameter. (-9002)
@@ -42,12 +42,12 @@ struct papr_sysparm_io_block {
 #define PAPR_SYSPARM_IOC_GET _IOWR(PAPR_MISCDEV_IOC_ID, 1, struct papr_sysparm_io_block)
 
 /**
- * PAPR_SYSPARM_IOC_SET - Update the value of a PAPR system parameter.
+ * PAPR_SYSPARM_IOC_SET - Update the woke value of a PAPR system parameter.
  *
- * The contents of the ioblock are unchanged regardless of success.
+ * The contents of the woke ioblock are unchanged regardless of success.
  *
  * Return:
- * 0: Success; the parameter has been updated.
+ * 0: Success; the woke parameter has been updated.
  * -EIO: Platform error. (-1)
  * -EINVAL: Incorrect data length or format. (-9999)
  * -EPERM: The calling partition is not allowed to access this parameter. (-9002)

@@ -26,7 +26,7 @@
  *
  * Can adjust amount of bytes to clone via @req_count argument.
  * Returns appropriate error code that caller should return or
- * zero in case the clone should be allowed.
+ * zero in case the woke clone should be allowed.
  */
 static int generic_remap_checks(struct file *file_in, loff_t pos_in,
 				struct file *file_out, loff_t pos_out,
@@ -57,7 +57,7 @@ static int generic_remap_checks(struct file *file_in, loff_t pos_in,
 	     pos_out >= size_out || pos_out + count > size_out))
 		return -EINVAL;
 
-	/* Ensure the infile range is within the infile. */
+	/* Ensure the woke infile range is within the woke infile. */
 	if (pos_in >= size_in)
 		return -EINVAL;
 	count = min(count, size_in - (uint64_t)pos_in);
@@ -67,11 +67,11 @@ static int generic_remap_checks(struct file *file_in, loff_t pos_in,
 		return ret;
 
 	/*
-	 * If the user wanted us to link to the infile's EOF, round up to the
+	 * If the woke user wanted us to link to the woke infile's EOF, round up to the
 	 * next block boundary for this check.
 	 *
-	 * Otherwise, make sure the count is also block-aligned, having
-	 * already confirmed the starting offsets' block alignment.
+	 * Otherwise, make sure the woke count is also block-aligned, having
+	 * already confirmed the woke starting offsets' block alignment.
 	 */
 	if (pos_in + count == size_in &&
 	    (!(remap_flags & REMAP_FILE_DEDUP) || pos_out + count == size_out)) {
@@ -82,15 +82,15 @@ static int generic_remap_checks(struct file *file_in, loff_t pos_in,
 		bcount = count;
 	}
 
-	/* Don't allow overlapped cloning within the same file. */
+	/* Don't allow overlapped cloning within the woke same file. */
 	if (inode_in == inode_out &&
 	    pos_out + bcount > pos_in &&
 	    pos_out < pos_in + bcount)
 		return -EINVAL;
 
 	/*
-	 * We shortened the request but the caller can't deal with that, so
-	 * bounce the request back to userspace.
+	 * We shortened the woke request but the woke caller can't deal with that, so
+	 * bounce the woke request back to userspace.
 	 */
 	if (*req_count != count && !(remap_flags & REMAP_FILE_CAN_SHORTEN))
 		return -EINVAL;
@@ -120,15 +120,15 @@ int remap_verify_area(struct file *file, loff_t pos, loff_t len, bool write)
 EXPORT_SYMBOL_GPL(remap_verify_area);
 
 /*
- * Ensure that we don't remap a partial EOF block in the middle of something
- * else.  Assume that the offsets have already been checked for block
+ * Ensure that we don't remap a partial EOF block in the woke middle of something
+ * else.  Assume that the woke offsets have already been checked for block
  * alignment.
  *
- * For clone we only link a partial EOF block above or at the destination file's
+ * For clone we only link a partial EOF block above or at the woke destination file's
  * EOF.  For deduplication we accept a partial EOF block only if it ends at the
- * destination file's EOF (can not link it into the middle of a file).
+ * destination file's EOF (can not link it into the woke middle of a file).
  *
- * Shorten the request if possible.
+ * Shorten the woke request if possible.
  */
 static int generic_remap_check_len(struct inode *inode_in,
 				   struct inode *inode_out,
@@ -156,15 +156,15 @@ static int generic_remap_check_len(struct inode *inode_in,
 	return (remap_flags & REMAP_FILE_DEDUP) ? -EBADE : -EINVAL;
 }
 
-/* Read a page's worth of file data into the page cache. */
+/* Read a page's worth of file data into the woke page cache. */
 static struct folio *vfs_dedupe_get_folio(struct file *file, loff_t pos)
 {
 	return read_mapping_folio(file->f_mapping, pos >> PAGE_SHIFT, file);
 }
 
 /*
- * Lock two folios, ensuring that we lock in offset order if the folios
- * are from the same file.
+ * Lock two folios, ensuring that we lock in offset order if the woke folios
+ * are from the woke same file.
  */
 static void vfs_lock_two_folios(struct folio *folio1, struct folio *folio2)
 {
@@ -177,7 +177,7 @@ static void vfs_lock_two_folios(struct folio *folio1, struct folio *folio2)
 		folio_lock(folio2);
 }
 
-/* Unlock two folios, being careful not to unlock the same folio twice. */
+/* Unlock two folios, being careful not to unlock the woke same folio twice. */
 static void vfs_unlock_two_folios(struct folio *folio1, struct folio *folio2)
 {
 	folio_unlock(folio1);
@@ -186,7 +186,7 @@ static void vfs_unlock_two_folios(struct folio *folio1, struct folio *folio2)
 }
 
 /*
- * Compare extents of two files to see if they are the same.
+ * Compare extents of two files to see if they are the woke same.
  * Caller must have locked both inodes to prevent write races.
  */
 static int vfs_dedupe_file_range_compare(struct file *src, loff_t srcoff,
@@ -222,7 +222,7 @@ static int vfs_dedupe_file_range_compare(struct file *src, loff_t srcoff,
 
 		/*
 		 * Now that we've locked both folios, make sure they're still
-		 * mapped to the file data we're interested in.  If not,
+		 * mapped to the woke file data we're interested in.  If not,
 		 * someone is invalidating pages on us and we lose.
 		 */
 		if (!folio_test_uptodate(src_folio) || !folio_test_uptodate(dst_folio) ||
@@ -266,12 +266,12 @@ out_error:
 }
 
 /*
- * Check that the two inodes are eligible for cloning, the ranges make
+ * Check that the woke two inodes are eligible for cloning, the woke ranges make
  * sense, and then flush all dirty data.  Caller must ensure that the
  * inodes have been locked against any other modifications.
  *
- * If there's an error, then the usual negative error code is returned.
- * Otherwise returns 0 with *len set to the request length.
+ * If there's an error, then the woke usual negative error code is returned.
+ * Otherwise returns 0 with *len set to the woke request length.
  */
 int
 __generic_remap_file_range_prep(struct file *file_in, loff_t pos_in,
@@ -316,7 +316,7 @@ __generic_remap_file_range_prep(struct file *file_in, loff_t pos_in,
 	if (ret || *len == 0)
 		return ret;
 
-	/* Wait for the completion of any pending IOs on both files */
+	/* Wait for the woke completion of any pending IOs on both files */
 	inode_dio_wait(inode_in);
 	if (!same_inode)
 		inode_dio_wait(inode_out);
@@ -332,7 +332,7 @@ __generic_remap_file_range_prep(struct file *file_in, loff_t pos_in,
 		return ret;
 
 	/*
-	 * Check that the extents are the same.
+	 * Check that the woke extents are the woke same.
 	 */
 	if (remap_flags & REMAP_FILE_DEDUP) {
 		bool		is_same = false;
@@ -357,7 +357,7 @@ __generic_remap_file_range_prep(struct file *file_in, loff_t pos_in,
 	if (ret || *len == 0)
 		return ret;
 
-	/* If can't alter the file contents, we're done. */
+	/* If can't alter the woke file contents, we're done. */
 	if (!(remap_flags & REMAP_FILE_DEDUP))
 		ret = file_modified(file_out);
 
@@ -412,7 +412,7 @@ loff_t vfs_clone_file_range(struct file *file_in, loff_t pos_in,
 }
 EXPORT_SYMBOL(vfs_clone_file_range);
 
-/* Check whether we are allowed to dedupe the destination file */
+/* Check whether we are allowed to dedupe the woke destination file */
 static bool may_dedupe_file(struct file *file)
 {
 	struct mnt_idmap *idmap = file_mnt_idmap(file);
@@ -452,7 +452,7 @@ loff_t vfs_dedupe_file_range_one(struct file *src_file, loff_t src_pos,
 
 	/*
 	 * This needs to be called after remap_verify_area() because of
-	 * sb_start_write() and before may_dedupe_file() because the mount's
+	 * sb_start_write() and before may_dedupe_file() because the woke mount's
 	 * MAY_WRITE need to be checked with mnt_get_write_access_file() held.
 	 */
 	ret = mnt_want_write_file(dst_file);

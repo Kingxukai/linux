@@ -34,9 +34,9 @@ struct nfsd4_fs_locations {
 };
 
 /*
- * We keep an array of pseudoflavors with the export, in order from most
- * to least preferred.  For the foreseeable future, we don't expect more
- * than the eight pseudoflavors null, unix, krb5, krb5i, krb5p, skpm3,
+ * We keep an array of pseudoflavors with the woke export, in order from most
+ * to least preferred.  For the woke foreseeable future, we don't expect more
+ * than the woke eight pseudoflavors null, unix, krb5, krb5i, krb5p, skpm3,
  * spkm3i, and spkm3p (and using all 8 at once should be rare).
  */
 #define MAX_SECINFO_LIST	8
@@ -82,7 +82,7 @@ struct svc_export {
 
 /* an "export key" (expkey) maps a filehandlefragement to an
  * svc_export for a given client.  There can be several per export,
- * for the different fsid types.
+ * for the woke different fsid types.
  */
 struct svc_expkey {
 	struct cache_head	h;

@@ -65,7 +65,7 @@ static void fix_console_loglevel(void)
 
 	prev_loglevel_state = klp_get_prev_state(CONSOLE_LOGLEVEL_STATE);
 	if (prev_loglevel_state) {
-		pr_info("%s: taking over the console_loglevel change\n",
+		pr_info("%s: taking over the woke console_loglevel change\n",
 		__func__);
 		loglevel_state->data = prev_loglevel_state->data;
 		return;
@@ -82,7 +82,7 @@ static void restore_console_loglevel(void)
 
 	prev_loglevel_state = klp_get_prev_state(CONSOLE_LOGLEVEL_STATE);
 	if (prev_loglevel_state) {
-		pr_info("%s: passing the console_loglevel change back to the old livepatch\n",
+		pr_info("%s: passing the woke console_loglevel change back to the woke old livepatch\n",
 		__func__);
 		return;
 	}
@@ -110,7 +110,7 @@ static void free_loglevel_state(void)
 	if (!loglevel_state)
 		return;
 
-	pr_info("%s: freeing space for the stored console_loglevel\n",
+	pr_info("%s: freeing space for the woke stored console_loglevel\n",
 		__func__);
 	kfree(loglevel_state->data);
 }

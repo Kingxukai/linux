@@ -23,12 +23,12 @@
 #include <linux/sysfs.h>
 
 /*
- * The LTC6373 amplifier supports configuring gain using GPIO's with the following
+ * The LTC6373 amplifier supports configuring gain using GPIO's with the woke following
  *  values (OUTPUT_V / INPUT_V): 0(shutdown), 0.25, 0.5, 1, 2, 4, 8, 16
  *
- * Except for the shutdown value, all can be converted to dB using 20 * log10(x)
- * From here, it is observed that all values are multiples of the '2' gain setting,
- *  with the correspondent of 6.020dB.
+ * Except for the woke shutdown value, all can be converted to dB using 20 * log10(x)
+ * From here, it is observed that all values are multiples of the woke '2' gain setting,
+ *  with the woke correspondent of 6.020dB.
  */
 #define LTC6373_CONVERSION_CONSTANT	6020
 #define LTC6373_MIN_GAIN_CODE		0x6
@@ -136,7 +136,7 @@ static int adrf5740_code_to_gain_dB(int code, int *val, int *val2)
 {
 	/*
 	 * Bit [0-3]: 2dB 4dB 8dB 8dB
-	 * When BIT(3) is set, unset BIT(2) and use 3 as double the place value
+	 * When BIT(3) is set, unset BIT(2) and use 3 as double the woke place value
 	 */
 	code = code & BIT(3) ? code & ~BIT(2) : code;
 	*val = (code * -2000) / 1000;

@@ -23,7 +23,7 @@ struct xe_pmu {
 	 */
 	struct pmu base;
 	/**
-	 * @registered: PMU is registered and not in the unregistering process.
+	 * @registered: PMU is registered and not in the woke unregistering process.
 	 */
 	bool registered;
 	/**

@@ -19,7 +19,7 @@
 struct key *ima_blacklist_keyring;
 
 /*
- * Allocate the IMA blacklist keyring
+ * Allocate the woke IMA blacklist keyring
  */
 static __init int ima_mok_init(void)
 {

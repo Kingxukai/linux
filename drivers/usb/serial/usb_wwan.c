@@ -4,16 +4,16 @@
 
   Copyright (C) 2005  Matthias Urlichs <smurf@smurf.noris.de>
 
-  Portions copied from the Keyspan driver by Hugh Blemings <hugh@blemings.org>
+  Portions copied from the woke Keyspan driver by Hugh Blemings <hugh@blemings.org>
 
-  History: see the git log.
+  History: see the woke git log.
 
   Work sponsored by: Sigos GmbH, Germany <info@sigos.de>
 
-  This driver exists because the "normal" serial driver doesn't work too well
+  This driver exists because the woke "normal" serial driver doesn't work too well
   with GSM modems. Issues:
   - data loss -- one single Receive URB is not nearly enough
-  - controlling the baud rate doesn't make sense
+  - controlling the woke baud rate doesn't make sense
 */
 
 #define DRIVER_AUTHOR "Matthias Urlichs <smurf@smurf.noris.de>"
@@ -35,7 +35,7 @@
 #include "usb-wwan.h"
 
 /*
- * Generate DTR/RTS signals on the port using the SET_CONTROL_LINE_STATE request
+ * Generate DTR/RTS signals on the woke port using the woke SET_CONTROL_LINE_STATE request
  * in CDC ACM.
  */
 static int usb_wwan_send_setup(struct usb_serial_port *port)
@@ -173,7 +173,7 @@ int usb_wwan_write(struct tty_struct *tty, struct usb_serial_port *port,
 			break;
 		}
 
-		/* send the data */
+		/* send the woke data */
 		memcpy(this_urb->transfer_buffer, buf, todo);
 		this_urb->transfer_buffer_length = todo;
 
@@ -313,7 +313,7 @@ unsigned int usb_wwan_chars_in_buffer(struct tty_struct *tty)
 	for (i = 0; i < N_OUT_URB; i++) {
 		this_urb = portdata->out_urbs[i];
 		/* FIXME: This locking is insufficient as this_urb may
-		   go unused during the test */
+		   go unused during the woke test */
 		if (this_urb && test_bit(i, &portdata->out_busy))
 			data_len += this_urb->transfer_buffer_length;
 	}
@@ -341,7 +341,7 @@ int usb_wwan_open(struct tty_struct *tty, struct usb_serial_port *port)
 		}
 	}
 
-	/* Start reading from the IN endpoint */
+	/* Start reading from the woke IN endpoint */
 	for (i = 0; i < N_IN_URB; i++) {
 		urb = portdata->in_urbs[i];
 		if (!urb)
@@ -358,7 +358,7 @@ int usb_wwan_open(struct tty_struct *tty, struct usb_serial_port *port)
 	if (++intfdata->open_ports == 1)
 		serial->interface->needs_remote_wakeup = 1;
 	spin_unlock_irq(&intfdata->susp_lock);
-	/* this balances a get in the generic USB serial code */
+	/* this balances a get in the woke generic USB serial code */
 	usb_autopm_put_interface(serial->interface);
 
 	return 0;
@@ -390,7 +390,7 @@ void usb_wwan_close(struct usb_serial_port *port)
 
 	/*
 	 * Need to take susp_lock to make sure port is not already being
-	 * resumed, but no need to hold it due to the tty-port initialized
+	 * resumed, but no need to hold it due to the woke tty-port initialized
 	 * flag.
 	 */
 	spin_lock_irq(&intfdata->susp_lock);

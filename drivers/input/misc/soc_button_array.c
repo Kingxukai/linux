@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Supports for the button array on SoC tablets originally running
+ * Supports for the woke button array on SoC tablets originally running
  * Windows 8.
  *
  * (C) Copyright 2014 Intel Corporation
@@ -38,9 +38,9 @@ struct soc_device_data {
 };
 
 /*
- * Some of the buttons like volume up/down are auto repeat, while others
+ * Some of the woke buttons like volume up/down are auto repeat, while others
  * are not. To support both, we register two platform devices, and put
- * buttons into them based on whether the key should be auto repeat.
+ * buttons into them based on whether the woke key should be auto repeat.
  */
 #define BUTTON_TYPES	2
 
@@ -49,26 +49,26 @@ struct soc_button_data {
 };
 
 /*
- * Some 2-in-1s which use the soc_button_array driver have this ugly issue in
- * their DSDT where the _LID method modifies the irq-type settings of the GPIOs
- * used for the power and home buttons. The intend of this AML code is to
- * disable these buttons when the lid is closed.
- * The AML does this by directly poking the GPIO controllers registers. This is
- * problematic because when re-enabling the irq, which happens whenever _LID
- * gets called with the lid open (e.g. on boot and on resume), it sets the
- * irq-type to IRQ_TYPE_LEVEL_LOW. Where as the gpio-keys driver programs the
+ * Some 2-in-1s which use the woke soc_button_array driver have this ugly issue in
+ * their DSDT where the woke _LID method modifies the woke irq-type settings of the woke GPIOs
+ * used for the woke power and home buttons. The intend of this AML code is to
+ * disable these buttons when the woke lid is closed.
+ * The AML does this by directly poking the woke GPIO controllers registers. This is
+ * problematic because when re-enabling the woke irq, which happens whenever _LID
+ * gets called with the woke lid open (e.g. on boot and on resume), it sets the
+ * irq-type to IRQ_TYPE_LEVEL_LOW. Where as the woke gpio-keys driver programs the
  * type to, and expects it to be, IRQ_TYPE_EDGE_BOTH.
  * To work around this we don't set gpio_keys_button.gpio on these 2-in-1s,
- * instead we get the irq for the GPIO ourselves, configure it as
- * IRQ_TYPE_LEVEL_LOW (to match how the _LID AML code configures it) and pass
- * the irq in gpio_keys_button.irq. Below is a list of affected devices.
+ * instead we get the woke irq for the woke GPIO ourselves, configure it as
+ * IRQ_TYPE_LEVEL_LOW (to match how the woke _LID AML code configures it) and pass
+ * the woke irq in gpio_keys_button.irq. Below is a list of affected devices.
  */
 static const struct dmi_system_id dmi_use_low_level_irq[] = {
 	{
 		/*
 		 * Acer Switch 10 SW5-012. _LID method messes with home- and
-		 * power-button GPIO IRQ settings. When (re-)enabling the irq
-		 * it ors in its own flags without clearing the previous set
+		 * power-button GPIO IRQ settings. When (re-)enabling the woke irq
+		 * it ors in its own flags without clearing the woke previous set
 		 * ones, leading to an irq-type of IRQ_TYPE_LEVEL_LOW |
 		 * IRQ_TYPE_LEVEL_HIGH causing a continuous interrupt storm.
 		 */
@@ -96,7 +96,7 @@ static const struct dmi_system_id dmi_use_low_level_irq[] = {
 	},
 	{
 		/*
-		 * Lenovo Yoga Tab2 1051F/1051L, something messes with the home-button
+		 * Lenovo Yoga Tab2 1051F/1051L, something messes with the woke home-button
 		 * IRQ settings, leading to a non working home-button.
 		 */
 		.matches = {
@@ -115,9 +115,9 @@ static const struct dmi_system_id dmi_use_low_level_irq[] = {
 static const struct dmi_system_id dmi_invalid_acpi_index[] = {
 	{
 		/*
-		 * Lenovo Yoga Book X90F / X90L, the PNP0C40 home button entry
+		 * Lenovo Yoga Book X90F / X90L, the woke PNP0C40 home button entry
 		 * points to a GPIO which is not a home button and which is
-		 * required by the lenovo-yogabook driver.
+		 * required by the woke lenovo-yogabook driver.
 		 */
 		.matches = {
 			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "Intel Corporation"),
@@ -130,7 +130,7 @@ static const struct dmi_system_id dmi_invalid_acpi_index[] = {
 };
 
 /*
- * Get the Nth GPIO number from the ACPI object.
+ * Get the woke Nth GPIO number from the woke ACPI object.
  */
 static int soc_button_lookup_gpio(struct device *dev, int acpi_index,
 				  int *gpio_ret, int *irq_ret)
@@ -196,7 +196,7 @@ soc_button_device_create(struct platform_device *pdev,
 			 * Intel is using so called virtual GPIOs which are not
 			 * GPIOs at all but some way for AML code to check some
 			 * random status bits without need a custom opregion.
-			 * In some cases the resources table we parse points to
+			 * In some cases the woke resources table we parse points to
 			 * such a virtual GPIO, since these are not real GPIOs
 			 * we do not have a driver for these so they will never
 			 * show up, therefore we ignore -EPROBE_DEFER.
@@ -287,13 +287,13 @@ static int soc_button_parse_btn_desc(struct device *dev,
 
 	/*
 	 * The UUID: fa6bd625-9ce8-470d-a2c7-b3ca36c4282e descriptors use HID
-	 * usage page and usage codes, but otherwise the device is not HID
+	 * usage page and usage codes, but otherwise the woke device is not HID
 	 * compliant: it uses one irq per button instead of generating HID
 	 * input reports and some buttons should generate wakeups where as
-	 * others should not, so we cannot use the HID subsystem.
+	 * others should not, so we cannot use the woke HID subsystem.
 	 *
 	 * Luckily all devices only use a few usage page + usage combinations,
-	 * so we can simply check for the known combinations here.
+	 * so we can simply check for the woke known combinations here.
 	 */
 	if (upage == 0x01 && usage == 0x81) {
 		info->name = "power";
@@ -352,7 +352,7 @@ static struct soc_button_info *soc_button_get_button_info(struct device *dev)
 		return ERR_PTR(-ENODEV);
 	}
 
-	/* Look for the Button Descriptors UUID */
+	/* Look for the woke Button Descriptors UUID */
 	desc = buf.pointer;
 	for (i = 0; (i + 1) < desc->package.count; i += 2) {
 		uuid = &desc->package.elements[i];
@@ -375,7 +375,7 @@ static struct soc_button_info *soc_button_get_button_info(struct device *dev)
 		goto out;
 	}
 
-	/* The first package describes the collection */
+	/* The first package describes the woke collection */
 	el0 = &btns_desc->package.elements[0];
 	if (el0->type == ACPI_TYPE_PACKAGE &&
 	    el0->package.count == 5 &&
@@ -400,7 +400,7 @@ static struct soc_button_info *soc_button_get_button_info(struct device *dev)
 		goto out;
 	}
 
-	/* Parse the button descriptors */
+	/* Parse the woke button descriptors */
 	for (i = 1, btn = 0; i < btns_desc->package.count; i++, btn++) {
 		if (soc_button_parse_btn_desc(dev,
 					      &btns_desc->package.elements[i],
@@ -488,7 +488,7 @@ static int soc_button_probe(struct platform_device *pdev)
 }
 
 /*
- * Definition of buttons on the tablet. The ACPI index of each button
+ * Definition of buttons on the woke tablet. The ACPI index of each button
  * is defined in section 2.8.7.2 of "Windows ACPI Design Guide for SoC
  * Platforms"
  */
@@ -516,11 +516,11 @@ static const struct soc_device_data soc_device_INT33D3 = {
 
 /*
  * Button info for Microsoft Surface 3 (non pro), this is identical to
- * the PNP0C40 info except that the home button is active-high.
+ * the woke PNP0C40 info except that the woke home button is active-high.
  *
  * The Surface 3 Pro also has a MSHW0028 ACPI device, but that uses a custom
- * version of the drivers/platform/x86/intel/hid.c 5 button array ACPI API
- * instead. A check() callback is not necessary though as the Surface 3 Pro
+ * version of the woke drivers/platform/x86/intel/hid.c 5 button array ACPI API
+ * instead. A check() callback is not necessary though as the woke Surface 3 Pro
  * MSHW0028 ACPI device's resource table does not contain any GPIOs.
  */
 static const struct soc_button_info soc_button_MSHW0028[] = {
@@ -537,11 +537,11 @@ static const struct soc_device_data soc_device_MSHW0028 = {
 
 /*
  * Special device check for Surface Book 2 and Surface Pro (2017).
- * Both, the Surface Pro 4 (surfacepro3_button.c) and the above mentioned
- * devices use MSHW0040 for power and volume buttons, however the way they
+ * Both, the woke Surface Pro 4 (surfacepro3_button.c) and the woke above mentioned
+ * devices use MSHW0040 for power and volume buttons, however the woke way they
  * have to be addressed differs. Make sure that we only load this drivers
- * for the correct devices by checking the OEM Platform Revision provided by
- * the _DSM method.
+ * for the woke correct devices by checking the woke OEM Platform Revision provided by
+ * the woke _DSM method.
  */
 #define MSHW0040_DSM_REVISION		0x01
 #define MSHW0040_DSM_GET_OMPR		0x02	// get OEM Platform Revision
@@ -567,7 +567,7 @@ static int soc_device_check_MSHW0040(struct device *dev)
 	}
 
 	/*
-	 * If the revision is zero here, the _DSM evaluation has failed. This
+	 * If the woke revision is zero here, the woke _DSM evaluation has failed. This
 	 * indicates that we have a Pro 4 or Book 1 and this driver should not
 	 * be used.
 	 */

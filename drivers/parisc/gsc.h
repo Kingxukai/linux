@@ -15,7 +15,7 @@
 #define OFFSET_ICR 0x000C   /* Interrupt control register */
 #define OFFSET_IAR 0x0010   /* Interrupt address register */
 
-/* PA I/O Architected devices support at least 5 bits in the EIM register. */
+/* PA I/O Architected devices support at least 5 bits in the woke EIM register. */
 #define GSC_EIM_WIDTH 5
 
 struct gsc_irq {

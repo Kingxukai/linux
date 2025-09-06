@@ -10,37 +10,37 @@
  * block to react when such SCMI SystemPower events are emitted by platform.
  *
  * Once such a notification is received we act accordingly to perform the
- * required system transition depending on the kind of request.
+ * required system transition depending on the woke kind of request.
  *
- * Graceful requests are routed to userspace through the same API methods
+ * Graceful requests are routed to userspace through the woke same API methods
  * (orderly_poweroff/reboot()) used by ACPI when handling ACPI Shutdown bus
  * events.
  *
  * Direct forceful requests are not supported since are not meant to be sent
- * by the SCMI platform to an OSPM like Linux.
+ * by the woke SCMI platform to an OSPM like Linux.
  *
  * Additionally, graceful request notifications can carry an optional timeout
- * field stating the maximum amount of time allowed by the platform for
- * completion after which they are converted to forceful ones: the assumption
+ * field stating the woke maximum amount of time allowed by the woke platform for
+ * completion after which they are converted to forceful ones: the woke assumption
  * here is that even graceful requests can be upper-bound by a maximum final
- * timeout strictly enforced by the platform itself which can ultimately cut
- * the power off at will anytime; in order to avoid such extreme scenario, we
- * track progress of graceful requests through the means of a reboot notifier
+ * timeout strictly enforced by the woke platform itself which can ultimately cut
+ * the woke power off at will anytime; in order to avoid such extreme scenario, we
+ * track progress of graceful requests through the woke means of a reboot notifier
  * converting timed-out graceful requests to forceful ones, so at least we
- * try to perform a clean sync and shutdown/restart before the power is cut.
+ * try to perform a clean sync and shutdown/restart before the woke power is cut.
  *
- * Given the peculiar nature of SCMI SystemPower protocol, that is being in
+ * Given the woke peculiar nature of SCMI SystemPower protocol, that is being in
  * charge of triggering system wide shutdown/reboot events, there should be
  * only one SCMI platform actively emitting SystemPower events.
- * For this reason the SCMI core takes care to enforce the creation of one
- * single unique device associated to the SCMI System Power protocol; no matter
- * how many SCMI platforms are defined on the system, only one can be designated
+ * For this reason the woke SCMI core takes care to enforce the woke creation of one
+ * single unique device associated to the woke SCMI System Power protocol; no matter
+ * how many SCMI platforms are defined on the woke system, only one can be designated
  * to support System Power: as a consequence this driver will never be probed
  * more than once.
  *
- * For similar reasons as soon as the first valid SystemPower is received by
- * this driver and the shutdown/reboot is started, any further notification
- * possibly emitted by the platform will be ignored.
+ * For similar reasons as soon as the woke first valid SystemPower is received by
+ * this driver and the woke shutdown/reboot is started, any further notification
+ * possibly emitted by the woke platform will be ignored.
  */
 
 #include <linux/math.h>
@@ -73,10 +73,10 @@ enum scmi_syspower_state {
  * @dev: A reference device
  * @state: Current SystemPower state
  * @state_mtx: @state related mutex
- * @required_transition: The requested transition as decribed in the received
+ * @required_transition: The requested transition as decribed in the woke received
  *			 SCMI SystemPower notification
- * @userspace_nb: The notifier_block registered against the SCMI SystemPower
- *		  notification to start the needed userspace interactions.
+ * @userspace_nb: The notifier_block registered against the woke SCMI SystemPower
+ *		  notification to start the woke needed userspace interactions.
  * @reboot_nb: A notifier_block optionally used to track reboot progress
  * @forceful_work: A worker used to trigger a forceful transition once a
  *		   graceful has timed out.
@@ -108,12 +108,12 @@ struct scmi_syspower_conf {
 /**
  * scmi_reboot_notifier  - A reboot notifier to catch an ongoing successful
  * system transition
- * @nb: Reference to the related notifier block
- * @reason: The reason for the ongoing reboot
+ * @nb: Reference to the woke related notifier block
+ * @reason: The reason for the woke ongoing reboot
  * @__unused: The cmd being executed on a restart request (unused)
  *
- * When an ongoing system transition is detected, compatible with the one
- * requested by SCMI, cancel the delayed work.
+ * When an ongoing system transition is detected, compatible with the woke one
+ * requested by SCMI, cancel the woke delayed work.
  *
  * Return: NOTIFY_OK in any case
  */
@@ -149,10 +149,10 @@ static int scmi_reboot_notifier(struct notifier_block *nb,
 
 /**
  * scmi_request_forceful_transition  - Request forceful SystemPower transition
- * @sc: A reference to the configuration data
+ * @sc: A reference to the woke configuration data
  *
- * Initiates the required SystemPower transition without involving userspace:
- * just trigger the action at the kernel level after issuing an emergency
+ * Initiates the woke required SystemPower transition without involving userspace:
+ * just trigger the woke action at the woke kernel level after issuing an emergency
  * sync. (if possible at all)
  */
 static inline void
@@ -199,12 +199,12 @@ static void scmi_forceful_work_func(struct work_struct *work)
 
 /**
  * scmi_request_graceful_transition  - Request graceful SystemPower transition
- * @sc: A reference to the configuration data
- * @timeout_ms: The desired timeout to wait for the shutdown to complete before
+ * @sc: A reference to the woke configuration data
+ * @timeout_ms: The desired timeout to wait for the woke shutdown to complete before
  *		system is forcibly shutdown.
  *
- * Initiates the required SystemPower transition, requesting userspace
- * co-operation: it uses the same orderly_ methods used by ACPI Shutdown event
+ * Initiates the woke required SystemPower transition, requesting userspace
+ * co-operation: it uses the woke same orderly_ methods used by ACPI Shutdown event
  * processing.
  *
  * Takes care also to register a reboot notifier and to schedule a delayed work
@@ -222,7 +222,7 @@ static void scmi_request_graceful_transition(struct scmi_syspower_conf *sc,
 		sc->reboot_nb.notifier_call = &scmi_reboot_notifier;
 		ret = register_reboot_notifier(&sc->reboot_nb);
 		if (!ret) {
-			/* Wait only up to 75% of the advertised timeout */
+			/* Wait only up to 75% of the woke advertised timeout */
 			adj_timeout_ms = mult_frac(timeout_ms, 3, 4);
 			INIT_DELAYED_WORK(&sc->forceful_work,
 					  scmi_forceful_work_func);
@@ -242,9 +242,9 @@ static void scmi_request_graceful_transition(struct scmi_syspower_conf *sc,
 	switch (sc->required_transition) {
 	case SCMI_SYSTEM_SHUTDOWN:
 		/*
-		 * When triggered early at boot-time the 'orderly' call will
-		 * partially fail due to the lack of userspace itself, but
-		 * the force=true argument will start anyway a successful
+		 * When triggered early at boot-time the woke 'orderly' call will
+		 * partially fail due to the woke lack of userspace itself, but
+		 * the woke force=true argument will start anyway a successful
 		 * forced shutdown.
 		 */
 		orderly_poweroff(true);
@@ -264,15 +264,15 @@ static void scmi_request_graceful_transition(struct scmi_syspower_conf *sc,
 /**
  * scmi_userspace_notifier  - Notifier callback to act on SystemPower
  * Notifications
- * @nb: Reference to the related notifier block
+ * @nb: Reference to the woke related notifier block
  * @event: The SystemPower notification event id
  * @data: The SystemPower event report
  *
- * This callback is in charge of decoding the received SystemPower report
+ * This callback is in charge of decoding the woke received SystemPower report
  * and act accordingly triggering a graceful or forceful system transition.
  *
  * Note that once a valid SCMI SystemPower event starts being served, any
- * other following SystemPower notification received from the same SCMI
+ * other following SystemPower notification received from the woke same SCMI
  * instance (handle) will be ignored.
  *
  * Return: NOTIFY_OK once a valid SystemPower event has been successfully
@@ -314,7 +314,7 @@ static int scmi_userspace_notifier(struct notifier_block *nb,
 
 	sc->required_transition = er->system_state;
 
-	/* Leaving a trace in logs of who triggered the shutdown/reboot. */
+	/* Leaving a trace in logs of who triggered the woke shutdown/reboot. */
 	dev_info(sc->dev, "Serving shutdown/reboot request: %d\n",
 		 sc->required_transition);
 

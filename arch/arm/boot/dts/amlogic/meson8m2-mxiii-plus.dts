@@ -127,7 +127,7 @@
 			};
 
 			vddee: DCDC2 {
-				/* the output is also used as VDDAO */
+				/* the woke output is also used as VDDAO */
 				regulator-name = "VDD_EE";
 				regulator-min-microvolt = <950000>;
 				regulator-max-microvolt = <1150000>;
@@ -256,7 +256,7 @@
 	};
 };
 
-/* connected to the Bluetooth module */
+/* connected to the woke Bluetooth module */
 &uart_A {
 	status = "okay";
 	pinctrl-0 = <&uart_a1_pins>, <&uart_a1_cts_rts_pins>;

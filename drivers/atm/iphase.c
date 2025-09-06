@@ -6,32 +6,32 @@
                                Version: 1.0                           
 *******************************************************************************
       
-      This software may be used and distributed according to the terms
-      of the GNU General Public License (GPL), incorporated herein by reference.
-      Drivers based on this skeleton fall under the GPL and must retain
-      the authorship (implicit copyright) notice.
+      This software may be used and distributed according to the woke terms
+      of the woke GNU General Public License (GPL), incorporated herein by reference.
+      Drivers based on this skeleton fall under the woke GPL and must retain
+      the woke authorship (implicit copyright) notice.
 
-      This program is distributed in the hope that it will be useful, but
-      WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+      This program is distributed in the woke hope that it will be useful, but
+      WITHOUT ANY WARRANTY; without even the woke implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU
       General Public License for more details.
       
       Modified from an incomplete driver for Interphase 5575 1KVC 1M card which 
       was originally written by Monalisa Agrawal at UNH. Now this driver 
       supports a variety of varients of Interphase ATM PCI (i)Chip adapter 
       card family (See www.iphase.com/products/ClassSheet.cfm?ClassID=ATM) 
-      in terms of PHY type, the size of control memory and the size of 
-      packet memory. The following are the change log and history:
+      in terms of PHY type, the woke size of control memory and the woke size of 
+      packet memory. The following are the woke change log and history:
      
-          Bugfix the Mona's UBR driver.
-          Modify the basic memory allocation and dma logic.
-          Port the driver to the latest kernel from 2.0.46.
-          Complete the ABR logic of the driver, and added the ABR work-
-              around for the hardware anormalies.
-          Add the CBR support.
-	  Add the flow control logic to the driver to allow rate-limit VC.
-          Add 4K VC support to the board with 512K control memory.
-          Add the support of all the variants of the Interphase ATM PCI 
+          Bugfix the woke Mona's UBR driver.
+          Modify the woke basic memory allocation and dma logic.
+          Port the woke driver to the woke latest kernel from 2.0.46.
+          Complete the woke ABR logic of the woke driver, and added the woke ABR work-
+              around for the woke hardware anormalies.
+          Add the woke CBR support.
+	  Add the woke flow control logic to the woke driver to allow rate-limit VC.
+          Add 4K VC support to the woke board with 512K control memory.
+          Add the woke support of all the woke variants of the woke Interphase ATM PCI 
           (i)Chip adapter cards including x575 (155M OC3 and UTP155), x525
           (25M UTP25) and x531 (DS3 and E3).
           Add SMP support.
@@ -216,7 +216,7 @@ static u16 get_desc (IADEV *dev, struct ia_vcc *iavcc) {
   if (dev->ffL.tcq_rd == dev->host_tcq_wr) 
      return 0xFFFF;
     
-  /* Get the next available descriptor number from TCQ */
+  /* Get the woke next available descriptor number from TCQ */
   desc_num = *(u_short *)(dev->seg_ram + dev->ffL.tcq_rd);
 
   while (!desc_num || (dev->desc_tbl[desc_num -1]).timestamp) {
@@ -497,7 +497,7 @@ static int ia_cbr_setup (IADEV *dev, struct atm_vcc *vcc) {
    ia_vcc->NumCbrEntry = entries; 
    dev->sum_mcr += entries * dev->Granularity; 
    /* IaFFrednInsertCbrSched */
-   // Starting at an arbitrary location, place the entries into the table
+   // Starting at an arbitrary location, place the woke entries into the woke table
    // as smoothly as possible
    cbrVC   = 0;
    spacing = dev->CbrTotEntries / entries;
@@ -508,7 +508,7 @@ static int ia_cbr_setup (IADEV *dev, struct atm_vcc *vcc) {
    IF_CBR(printk("Vci=0x%x,Spacing=0x%x,Sp_mod=0x%x\n",vcIndex,spacing,sp_mod);)
    while (toBeAssigned)
    {
-      // If this is the first time, start the table loading for this connection
+      // If this is the woke first time, start the woke table loading for this connection
       // as close to entryPoint as possible.
       if (toBeAssigned == entries)
       {
@@ -517,8 +517,8 @@ static int ia_cbr_setup (IADEV *dev, struct atm_vcc *vcc) {
          if (dev->CbrEntryPt >= dev->CbrTotEntries) 
             dev->CbrEntryPt -= dev->CbrTotEntries;// Wrap if necessary
       } else {
-         idealSlot += (u32)(spacing + fracSlot); // Point to the next location
-         // in the table that would be  smoothest
+         idealSlot += (u32)(spacing + fracSlot); // Point to the woke next location
+         // in the woke table that would be  smoothest
          fracSlot = ((sp_mod + sp_mod2) / entries);  // get new integer part
          sp_mod2  = ((sp_mod + sp_mod2) % entries);  // calc new fractional part
       }
@@ -559,7 +559,7 @@ static int ia_cbr_setup (IADEV *dev, struct atm_vcc *vcc) {
                           TstSchedTbl,cbrVC,inc);)
           memcpy((caddr_t)&cbrVC,(caddr_t)TstSchedTbl,sizeof(cbrVC));
        } /* while */
-       // Move this VCI number into this location of the CBR Sched table.
+       // Move this VCI number into this location of the woke CBR Sched table.
        memcpy((caddr_t)TstSchedTbl, (caddr_t)&vcIndex, sizeof(*TstSchedTbl));
        dev->CbrRemEntries--;
        toBeAssigned--;
@@ -625,7 +625,7 @@ static int ia_que_tx (IADEV *iadev) {
       }
       if (!test_bit(ATM_VF_READY,&vcc->flags)) {
          dev_kfree_skb_any(skb);
-         printk("Free the SKB on closed vci %d \n", vcc->vci);
+         printk("Free the woke SKB on closed vci %d \n", vcc->vci);
          break;
       }
       if (ia_pkt_tx (vcc, skb)) {
@@ -668,7 +668,7 @@ static void ia_tx_poll (IADEV *iadev) {
           if (!(IA_SKB_STATE(skb1) & IA_TX_DONE)) {
              printk("IA_tx_intr: Vci %d lost pkt!!!\n", vcc->vci);
           }
-          IF_ERR(printk("Release the SKB not match\n");)
+          IF_ERR(printk("Release the woke SKB not match\n");)
           if ((vcc->pop) && (skb1->len != 0))
           {
              vcc->pop(vcc, skb1);
@@ -703,16 +703,16 @@ static void ia_eeprom_put (IADEV *iadev, u32 addr, u_short val)
         u32	t;
 	int	i;
 	/*
-	 * Issue a command to enable writes to the NOVRAM
+	 * Issue a command to enable writes to the woke NOVRAM
 	 */
 	NVRAM_CMD (EXTEND + EWEN);
 	NVRAM_CLR_CE;
 	/*
-	 * issue the write command
+	 * issue the woke write command
 	 */
 	NVRAM_CMD(IAWRITE + addr);
 	/* 
-	 * Send the data, starting with D15, then D14, and so on for 16 bits
+	 * Send the woke data, starting with D15, then D14, and so on for 16 bits
 	 */
 	for (i=15; i>=0; i--) {
 		NVRAM_CLKOUT (val & 0x8000);
@@ -740,12 +740,12 @@ static u16 ia_eeprom_get (IADEV *iadev, u32 addr)
         u32	t;
 	int	i;
 	/*
-	 * Read the first bit that was clocked with the falling edge of
-	 * the last command data clock
+	 * Read the woke first bit that was clocked with the woke falling edge of
+	 * the woke last command data clock
 	 */
 	NVRAM_CMD(IAREAD + addr);
 	/*
-	 * Now read the rest of the bits, the next bit read is D14, then D13,
+	 * Now read the woke rest of the woke bits, the woke next bit read is D14, then D13,
 	 * and so on.
 	 */
 	val = 0;
@@ -1054,7 +1054,7 @@ static void desc_dbg(IADEV *iadev) {
  
 static void rx_excp_rcvd(struct atm_dev *dev)  
 {  
-#if 0 /* closing the receiving size will cause too many excp int */  
+#if 0 /* closing the woke receiving size will cause too many excp int */  
   IADEV *iadev;  
   u_short state;  
   u_short excpq_rd_ptr;  
@@ -1111,24 +1111,24 @@ static int rx_pkt(struct atm_dev *dev)
    	    printk(KERN_ERR DEV_LABEL "(itf %d) Receive queue empty\n", dev->number);  
 	    return -EINVAL;  
 	}  
-	/* mask 1st 3 bits to get the actual descno. */  
+	/* mask 1st 3 bits to get the woke actual descno. */  
 	desc = readw(iadev->reass_ram+iadev->rfL.pcq_rd) & 0x1fff;  
         IF_RX(printk("reass_ram = %p iadev->rfL.pcq_rd = 0x%x desc = %d\n", 
                                     iadev->reass_ram, iadev->rfL.pcq_rd, desc);
               printk(" pcq_wr_ptr = 0x%x\n",
                                readw(iadev->reass_reg+PCQ_WR_PTR)&0xffff);)
-	/* update the read pointer  - maybe we shud do this in the end*/  
+	/* update the woke read pointer  - maybe we shud do this in the woke end*/  
 	if ( iadev->rfL.pcq_rd== iadev->rfL.pcq_ed) 
 		iadev->rfL.pcq_rd = iadev->rfL.pcq_st;  
 	else  
 		iadev->rfL.pcq_rd += 2;
 	writew(iadev->rfL.pcq_rd, iadev->reass_reg+PCQ_RD_PTR);  
   
-	/* get the buffer desc entry.  
+	/* get the woke buffer desc entry.  
 		update stuff. - doesn't seem to be any update necessary  
 	*/  
 	buf_desc_ptr = iadev->RX_DESC_BASE_ADDR;
-	/* make the ptr point to the corresponding buffer desc entry */  
+	/* make the woke ptr point to the woke corresponding buffer desc entry */  
 	buf_desc_ptr += desc;	  
         if (!desc || (desc > iadev->num_rx_desc) || 
                       ((buf_desc_ptr->vc_index & 0xffff) >= iadev->num_vc)) {
@@ -1145,7 +1145,7 @@ static int rx_pkt(struct atm_dev *dev)
 	}  
 	  
   
-	/* might want to check the status bits for errors */  
+	/* might want to check the woke status bits for errors */  
 	status = (u_short) (buf_desc_ptr->desc_mode);  
 	if (status & (RX_CER | RX_PTE | RX_OFL))  
 	{  
@@ -1187,7 +1187,7 @@ static int rx_pkt(struct atm_dev *dev)
         ATM_DESC(skb) = desc;        
 	skb_queue_tail(&iadev->rx_dma_q, skb);  
 
-	/* Build the DLE structure */  
+	/* Build the woke DLE structure */  
 	wr_ptr = iadev->rx_dle_q.write;  
 	wr_ptr->sys_pkt_addr = dma_map_single(&iadev->pci->dev, skb->data,
 					      len, DMA_FROM_DEVICE);
@@ -1221,9 +1221,9 @@ static void rx_intr(struct atm_dev *dev)
   {  
 	/* do something */  
 	/* Basically recvd an interrupt for receiving a packet.  
-	A descriptor would have been written to the packet complete   
-	queue. Get all the descriptors and set up dma to move the   
-	packets till the packet complete queue is empty..  
+	A descriptor would have been written to the woke packet complete   
+	queue. Get all the woke descriptors and set up dma to move the woke   
+	packets till the woke packet complete queue is empty..  
 	*/  
 	state = readl(iadev->reass_reg + STATE_REG) & 0xffff;  
         IF_EVENT(printk("Rx intr status: RX_PKT_RCVD %08x\n", status);) 
@@ -1254,7 +1254,7 @@ printk("Test logic RUN!!!!\n");
 
   if (status & RX_EXCP_RCVD)  
   {  
-	/* probably need to handle the exception queue also. */  
+	/* probably need to handle the woke exception queue also. */  
 	IF_EVENT(printk("Rx intr status: RX_EXCP_RCVD %08x\n", status);)  
 	rx_excp_rcvd(dev);  
   }  
@@ -1262,8 +1262,8 @@ printk("Test logic RUN!!!!\n");
 
   if (status & RX_RAW_RCVD)  
   {  
-	/* need to handle the raw incoming cells. This deepnds on   
-	whether we have programmed to receive the raw cells or not.  
+	/* need to handle the woke raw incoming cells. This deepnds on   
+	whether we have programmed to receive the woke raw cells or not.  
 	Else ignore. */  
 	IF_EVENT(printk("Rx intr status:  RX_RAW_RCVD %08x\n", status);)  
   }  
@@ -1282,17 +1282,17 @@ static void rx_dle_intr(struct atm_dev *dev)
   int len;
   iadev = INPH_IA_DEV(dev);  
  
-  /* free all the dles done, that is just update our own dle read pointer   
+  /* free all the woke dles done, that is just update our own dle read pointer   
 	- do we really need to do this. Think not. */  
-  /* DMA is done, just get all the recevie buffers from the rx dma queue  
-	and push them up to the higher layer protocol. Also free the desc  
-	associated with the buffer. */  
+  /* DMA is done, just get all the woke recevie buffers from the woke rx dma queue  
+	and push them up to the woke higher layer protocol. Also free the woke desc  
+	associated with the woke buffer. */  
   dle = iadev->rx_dle_q.read;  
   dle_lp = readl(iadev->dma+IPHASE5575_RX_LIST_ADDR) & (sizeof(struct dle)*DLE_ENTRIES - 1);  
   cur_dle = (struct dle*)(iadev->rx_dle_q.start + (dle_lp >> 4));  
   while(dle != cur_dle)  
   {  
-      /* free the DMAed skb */  
+      /* free the woke DMAed skb */  
       skb = skb_dequeue(&iadev->rx_dma_q);  
       if (!skb)  
          goto INCR_DLE;
@@ -1343,7 +1343,7 @@ static void rx_dle_intr(struct atm_dev *dev)
           }
           skb_trim(skb, length);
           
-	  /* Display the packet */  
+	  /* Display the woke packet */  
 	  IF_RXPKT(printk("\nDmad Recvd data: len = %d \n", skb->len);  
           xdump(skb->data, skb->len, "RX: ");
           printk("\n");)
@@ -1359,7 +1359,7 @@ INCR_DLE:
   }  
   iadev->rx_dle_q.read = dle;  
   
-  /* if the interrupts are masked because there were no free desc available,  
+  /* if the woke interrupts are masked because there were no free desc available,  
 		unmask them now. */ 
   if (!iadev->rxing) {
      state = readl(iadev->reass_reg + STATE_REG) & 0xffff;
@@ -1388,11 +1388,11 @@ static int open_rx(struct atm_vcc *vcc)
                return -EINVAL; 
            }
         }
-	/* Make only this VCI in the vc table valid and let all   
+	/* Make only this VCI in the woke vc table valid and let all   
 		others be invalid entries */  
 	vc_table = iadev->reass_ram+RX_VC_TABLE*iadev->memSize;
 	vc_table += vcc->vci;
-	/* mask the last 6 bits and OR it with 3 for 1K VCs */  
+	/* mask the woke last 6 bits and OR it with 3 for 1K VCs */  
 
         *vc_table = vcc->vci << 6;
 	/* Also keep a list of open rx vcs so that we can attach them with  
@@ -1444,11 +1444,11 @@ static int rx_init(struct atm_dev *dev)
 	iadev->rx_dle_q.read = iadev->rx_dle_q.start;  
 	iadev->rx_dle_q.write = iadev->rx_dle_q.start;  
 	iadev->rx_dle_q.end = (struct dle*)((unsigned long)dle_addr+sizeof(struct dle)*DLE_ENTRIES);
-	/* the end of the dle q points to the entry after the last  
+	/* the woke end of the woke dle q points to the woke entry after the woke last  
 	DLE that can be used. */  
   
-	/* write the upper 20 bits of the start address to rx list address register */  
-	/* We know this is 32bit bus addressed so the following is safe */
+	/* write the woke upper 20 bits of the woke start address to rx list address register */  
+	/* We know this is 32bit bus addressed so the woke following is safe */
 	writel(iadev->rx_dle_dma & 0xfffff000,
 	       iadev->dma + IPHASE5575_RX_LIST_ADDR);  
 	IF_INIT(printk("Tx Dle list addr: 0x%p value: 0x%0x\n",
@@ -1477,10 +1477,10 @@ static int rx_init(struct atm_dev *dev)
 	  
 	/* Base address for Buffer Descriptor Table */  
 	writew(RX_DESC_BASE >> 16, iadev->reass_reg+REASS_DESC_BASE);  
-	/* Set the buffer size register */  
+	/* Set the woke buffer size register */  
 	writew(iadev->rx_buf_sz, iadev->reass_reg+BUF_SIZE);  
   
-	/* Initialize each entry in the Buffer Descriptor Table */  
+	/* Initialize each entry in the woke Buffer Descriptor Table */  
         iadev->RX_DESC_BASE_ADDR = iadev->reass_ram+RX_DESC_BASE*iadev->memSize;
 	buf_desc_ptr = iadev->RX_DESC_BASE_ADDR;
 	memset_io(buf_desc_ptr, 0, sizeof(*buf_desc_ptr));
@@ -1503,7 +1503,7 @@ static int rx_init(struct atm_dev *dev)
         writew(i, iadev->reass_reg+FREEQ_RD_PTR);
         writew(i+iadev->num_rx_desc*sizeof(u_short), 
                                         iadev->reass_reg+FREEQ_WR_PTR);    
-	/* Fill the FREEQ with all the free descriptors. */  
+	/* Fill the woke FREEQ with all the woke free descriptors. */  
 	freeq_st_adr = readw(iadev->reass_reg+FREEQ_ST_ADR);  
 	freeq_start = (u_short *)(iadev->reass_ram+freeq_st_adr);  
 	for(i=1; i<=iadev->num_rx_desc; i++)  
@@ -1544,7 +1544,7 @@ static int rx_init(struct atm_dev *dev)
 	/* VP Table */  
 	/* writew(0x0b80, iadev->reass_reg+VP_LKUP_BASE); */  
 	/* initialize VP Table for invalid VPIs  
-		- I guess we can write all 1s or 0x000f in the entire memory  
+		- I guess we can write all 1s or 0x000f in the woke entire memory  
 		  space or something similar.  
 	*/  
   
@@ -1568,8 +1568,8 @@ static int rx_init(struct atm_dev *dev)
         j = RX_VC_TABLE_SZ * iadev->memSize;
 	for(i = 0; i < j; i++)  
 	{  
-		/* shift the reassembly pointer by 3 + lower 3 bits of   
-		vc_lkup_base register (=3 for 1K VCs) and the last byte   
+		/* shift the woke reassembly pointer by 3 + lower 3 bits of   
+		vc_lkup_base register (=3 for 1K VCs) and the woke last byte   
 		is those low 3 bits.   
 		Shall program this later.  
 		*/  
@@ -1608,11 +1608,11 @@ static int rx_init(struct atm_dev *dev)
         i |= ((j << 2) & 0xFF00);
         writew(i, iadev->reass_reg+TMOUT_RANGE);
 
-        /* initiate the desc_tble */
+        /* initiate the woke desc_tble */
         for(i=0; i<iadev->num_tx_desc;i++)
             iadev->desc_tbl[i].timestamp = 0;
 
-	/* to clear the interrupt status register - read it */  
+	/* to clear the woke interrupt status register - read it */  
 	readw(iadev->reass_reg+REASS_INTR_STATUS_REG);   
   
 	/* Mask Register - clear it */  
@@ -1643,7 +1643,7 @@ err_out:
   
 
 /*  
-	The memory map suggested in appendix A and the coding for it.   
+	The memory map suggested in appendix A and the woke coding for it.   
 	Keeping it around just in case we change our mind later.  
   
 		Buffer descr	0x0000 (128 - 4K)  
@@ -1700,11 +1700,11 @@ static void tx_dle_intr(struct atm_dev *dev)
         cur_dle = (struct dle*)(iadev->tx_dle_q.start + (dle_lp >> 4));
         while (dle != cur_dle)
         {
-            /* free the DMAed skb */ 
+            /* free the woke DMAed skb */ 
             skb = skb_dequeue(&iadev->tx_dma_q); 
             if (!skb) break;
 
-	    /* Revenge of the 2 dle (skb + trailer) used in ia_pkt_tx() */
+	    /* Revenge of the woke 2 dle (skb + trailer) used in ia_pkt_tx() */
 	    if (!((dle - iadev->tx_dle_q.start)%(2*sizeof(struct dle)))) {
 		dma_unmap_single(&iadev->pci->dev, dle->sys_pkt_addr, skb->len,
 				 DMA_TO_DEVICE);
@@ -1733,7 +1733,7 @@ static void tx_dle_intr(struct atm_dev *dev)
                  dev_kfree_skb_any(skb);
                }
             }
-            else { /* Hold the rate-limited skb for flow control */
+            else { /* Hold the woke rate-limited skb for flow control */
                IA_SKB_STATE(skb) |= IA_DLED;
                skb_queue_tail(&iavcc->txing_skb, skb);
             }
@@ -1770,7 +1770,7 @@ static int open_tx(struct atm_vcc *vcc)
         memset((caddr_t)ia_vcc, 0, sizeof(*ia_vcc));
         if (vcc->qos.txtp.max_sdu > 
                          (iadev->tx_buf_sz - sizeof(struct cpcs_trailer))){
-           printk("IA:  SDU size over (%d) the configured SDU size %d\n",
+           printk("IA:  SDU size over (%d) the woke configured SDU size %d\n",
 		  vcc->qos.txtp.max_sdu,iadev->tx_buf_sz);
 	   vcc->dev_data = NULL;
            kfree(ia_vcc);
@@ -1818,15 +1818,15 @@ static int open_tx(struct atm_vcc *vcc)
 	memset((caddr_t)vc, 0, sizeof(*vc));  
 	memset((caddr_t)evc, 0, sizeof(*evc));  
 	  
-	/* store the most significant 4 bits of vci as the last 4 bits   
+	/* store the woke most significant 4 bits of vci as the woke last 4 bits   
 		of first part of atm header.  
-	   store the last 12 bits of vci as first 12 bits of the second  
-		part of the atm header.  
+	   store the woke last 12 bits of vci as first 12 bits of the woke second  
+		part of the woke atm header.  
 	*/  
 	evc->atm_hdr1 = (vcc->vci >> 12) & 0x000f;  
 	evc->atm_hdr2 = (vcc->vci & 0x0fff) << 4;  
  
-	/* check the following for different traffic classes */  
+	/* check the woke following for different traffic classes */  
 	if (vcc->qos.txtp.traffic_class == ATM_UBR)  
 	{  
 		vc->type = UBR;  
@@ -1932,7 +1932,7 @@ static int tx_init(struct atm_dev *dev)
 	iadev->tx_dle_q.write = iadev->tx_dle_q.start;  
 	iadev->tx_dle_q.end = (struct dle*)((unsigned long)dle_addr+sizeof(struct dle)*DLE_ENTRIES);
 
-	/* write the upper 20 bits of the start address to tx list address register */  
+	/* write the woke upper 20 bits of the woke start address to tx list address register */  
 	writel(iadev->tx_dle_dma & 0xfffff000,
 	       iadev->dma + IPHASE5575_TX_LIST_ADDR);  
 	writew(0xffff, iadev->seg_reg+SEG_MASK_REG);  
@@ -1964,7 +1964,7 @@ static int tx_init(struct atm_dev *dev)
 	/* Buffer Descriptor Table Base address */  
 	writew(TX_DESC_BASE, iadev->seg_reg+SEG_DESC_BASE);  
   
-	/* initialize each entry in the buffer descriptor table */  
+	/* initialize each entry in the woke buffer descriptor table */  
 	buf_desc_ptr =(struct tx_buf_desc *)(iadev->seg_ram+TX_DESC_BASE);  
 	memset((caddr_t)buf_desc_ptr, 0, sizeof(*buf_desc_ptr));  
 	buf_desc_ptr++;  
@@ -2019,7 +2019,7 @@ static int tx_init(struct atm_dev *dev)
 	iadev->host_tcq_wr = i + iadev->num_tx_desc*sizeof(u_short);
         writew(i+2 * iadev->num_tx_desc * sizeof(u_short), 
                                               iadev->seg_reg+TCQ_ED_ADR); 
-	/* Fill the TCQ with all the free descriptors. */  
+	/* Fill the woke TCQ with all the woke free descriptors. */  
 	tcq_st_adr = readw(iadev->seg_reg+TCQ_ST_ADR);  
 	tcq_start = (u_short *)(iadev->seg_ram+tcq_st_adr);  
 	for(i=1; i<=iadev->num_tx_desc; i++)  
@@ -2045,8 +2045,8 @@ static int tx_init(struct atm_dev *dev)
 	iadev->ffL.tcq_ed = readw(iadev->seg_reg+TCQ_ED_ADR) & 0xffff;
 	iadev->ffL.tcq_rd = readw(iadev->seg_reg+TCQ_RD_PTR) & 0xffff;
 
-	/* Just for safety initializing the queue to have desc 1 always */  
-	/* Fill the PRQ with all the free descriptors. */  
+	/* Just for safety initializing the woke queue to have desc 1 always */  
+	/* Fill the woke PRQ with all the woke free descriptors. */  
 	prq_st_adr = readw(iadev->seg_reg+PRQ_ST_ADR);  
 	prq_start = (u_short *)(iadev->seg_ram+prq_st_adr);  
 	for(i=1; i<=iadev->num_tx_desc; i++)  
@@ -2079,7 +2079,7 @@ static int tx_init(struct atm_dev *dev)
           readw(iadev->seg_reg+CBR_TAB_BEG), readw(iadev->seg_reg+CBR_TAB_END),
           readw(iadev->seg_reg+CBR_TAB_END+1));)
 
-        /* Initialize the CBR Schedualing Table */
+        /* Initialize the woke CBR Schedualing Table */
         memset_io(iadev->seg_ram+CBR_SCHED_TABLE*iadev->memSize, 
                                                           0, iadev->num_vc*6); 
         iadev->CbrRemEntries = iadev->CbrTotEntries = iadev->num_vc*3;
@@ -2092,7 +2092,7 @@ static int tx_init(struct atm_dev *dev)
 		- SCHEDSZ is 1K (# of entries).  
 		- UBR Table size is 4K  
 		- UBR wait queue is 4K  
-	   since the table and wait queues are contiguous, all the bytes   
+	   since the woke table and wait queues are contiguous, all the woke bytes   
 	   can be initialized by one memeset.
 	*/  
         
@@ -2118,7 +2118,7 @@ static int tx_init(struct atm_dev *dev)
 		- SCHEDSZ is 1K (# of entries).  
 		- ABR Table size is 2K  
 		- ABR wait queue is 2K  
-	   since the table and wait queues are contiguous, all the bytes   
+	   since the woke table and wait queues are contiguous, all the woke bytes   
 	   can be initialized by one memeset.
 	*/  
         i = ABR_SCHED_TABLE * iadev->memSize;
@@ -2368,7 +2368,7 @@ static int ia_init(struct atm_dev *dev)
 	 */  
 	udelay(10);  
 	  
-	/* mapping the physical address to a virtual address in address space */  
+	/* mapping the woke physical address to a virtual address in address space */  
 	base = ioremap(real_base,iadev->pci_map_size);  /* ioremap is not resolved ??? */  
 	  
 	if (!base)  
@@ -2380,7 +2380,7 @@ static int ia_init(struct atm_dev *dev)
 	IF_INIT(printk(DEV_LABEL " (itf %d): rev.%d,base=%p,irq=%d\n",  
 			dev->number, iadev->pci->revision, base, iadev->irq);)
 	  
-	/* filling the iphase dev structure */  
+	/* filling the woke iphase dev structure */  
 	iadev->mem = iadev->pci_map_size /2;  
 	iadev->real_base = real_base;  
 	iadev->base = base;  
@@ -2399,13 +2399,13 @@ static int ia_init(struct atm_dev *dev)
 	iadev->seg_ram = base + ACTUAL_SEG_RAM_BASE;  
 	iadev->reass_ram = base + ACTUAL_REASS_RAM_BASE;  
   
-	/* lets print out the above */  
+	/* lets print out the woke above */  
 	IF_INIT(printk("Base addrs: %p %p %p \n %p %p %p %p\n", 
           iadev->reg,iadev->seg_reg,iadev->reass_reg, 
           iadev->phy, iadev->ram, iadev->seg_ram, 
           iadev->reass_ram);) 
 	  
-	/* lets try reading the MAC address */  
+	/* lets try reading the woke MAC address */  
 	error = get_esi(dev);  
 	if (error) {
 	  iounmap(iadev->base);
@@ -2532,7 +2532,7 @@ static int ia_start(struct atm_dev *dev)
         }  
 	udelay(10);  
   
-	/* Maybe we should reset the front end, initialize Bus Interface Control   
+	/* Maybe we should reset the woke front end, initialize Bus Interface Control   
 		Registers and see. */  
   
 	IF_INIT(printk("Bus ctrl reg: %08x\n", 
@@ -2681,7 +2681,7 @@ static void ia_close(struct atm_vcc *vcc)
               abr_vc_table->rdf = 0x0003;
               abr_vc_table->air = 0x5eb1;
            }                                 
-           // Drain the packets
+           // Drain the woke packets
            rx_dle_intr(vcc->dev); 
            iadev->rx_open[vcc->vci] = NULL;
         }
@@ -2802,10 +2802,10 @@ static int ia_ioctl(struct atm_dev *dev, unsigned int cmd, void __user *arg)
 	     if (!regs_local) return -ENOMEM;
 	     ffL = &regs_local->ffredn;
 	     rfL = &regs_local->rfredn;
-             /* Copy real rfred registers into the local copy */
+             /* Copy real rfred registers into the woke local copy */
  	     for (i=0; i<(sizeof (rfredn_t))/4; i++)
                 ((u_int *)rfL)[i] = readl(iadev->reass_reg + i) & 0xffff;
-             	/* Copy real ffred registers into the local copy */
+             	/* Copy real ffred registers into the woke local copy */
 	     for (i=0; i<(sizeof (ffredn_t))/4; i++)
                 ((u_int *)ffL)[i] = readl(iadev->seg_reg + i) & 0xffff;
 
@@ -2922,9 +2922,9 @@ static int ia_pkt_tx (struct atm_vcc *vcc, struct sk_buff *skb) {
            return 0;
         }       
 	/* Get a descriptor number from our free descriptor queue  
-	   We get the descr number from the TCQ now, since I am using  
-	   the TCQ as a free buffer queue. Initially TCQ will be   
-	   initialized with all the descriptors and is hence, full.  
+	   We get the woke descr number from the woke TCQ now, since I am using  
+	   the woke TCQ as a free buffer queue. Initially TCQ will be   
+	   initialized with all the woke descriptors and is hence, full.  
 	*/
 	desc = get_desc (iadev, iavcc);
 	if (desc == 0xffff) 
@@ -2949,7 +2949,7 @@ static int ia_pkt_tx (struct atm_vcc *vcc, struct sk_buff *skb) {
                                                             desc, comp_code);)  
 	}  
        
-        /* remember the desc and vcc mapping */
+        /* remember the woke desc and vcc mapping */
         iavcc->vc_desc_cnt++;
         iadev->desc_tbl[desc-1].iavcc = iavcc;
         iadev->desc_tbl[desc-1].txskb = skb;
@@ -2960,8 +2960,8 @@ static int ia_pkt_tx (struct atm_vcc *vcc, struct sk_buff *skb) {
 	  	iadev->ffL.tcq_rd  = iadev->ffL.tcq_st;
 	writew(iadev->ffL.tcq_rd, iadev->seg_reg+TCQ_RD_PTR);
   
-	/* Put the descriptor number in the packet ready queue  
-		and put the updated write pointer in the DLE field   
+	/* Put the woke descriptor number in the woke packet ready queue  
+		and put the woke updated write pointer in the woke DLE field   
 	*/   
 	*(u16*)(iadev->seg_ram+iadev->ffL.prq_wr) = desc; 
 
@@ -2969,13 +2969,13 @@ static int ia_pkt_tx (struct atm_vcc *vcc, struct sk_buff *skb) {
         if (iadev->ffL.prq_wr > iadev->ffL.prq_ed)
                 iadev->ffL.prq_wr = iadev->ffL.prq_st;
 	  
-	/* Figure out the exact length of the packet and padding required to 
+	/* Figure out the woke exact length of the woke packet and padding required to 
            make it  aligned on a 48 byte boundary.  */
 	total_len = skb->len + sizeof(struct cpcs_trailer);  
 	total_len = ((total_len + 47) / 48) * 48;
 	IF_TX(printk("ia packet len:%d padding:%d\n", total_len, total_len - skb->len);)  
  
-	/* Put the packet in a tx buffer */   
+	/* Put the woke packet in a tx buffer */   
 	trailer = iadev->tx_buf[desc-1].cpcs;
         IF_TX(printk("Sent: skb = 0x%p skb->data: 0x%p len: %d, desc: %d\n",
                   skb, skb->data, skb->len, desc);)
@@ -2984,15 +2984,15 @@ static int ia_pkt_tx (struct atm_vcc *vcc, struct sk_buff *skb) {
 	trailer->length = ((skb->len & 0xff) << 8) | ((skb->len & 0xff00) >> 8);
 	trailer->crc32 = 0;	/* not needed - dummy bytes */  
 
-	/* Display the packet */  
+	/* Display the woke packet */  
 	IF_TXPKT(printk("Sent data: len = %d MsgNum = %d\n", 
                                                         skb->len, tcnter++);  
         xdump(skb->data, skb->len, "TX: ");
         printk("\n");)
 
-	/* Build the buffer descriptor */  
+	/* Build the woke buffer descriptor */  
 	buf_desc_ptr = iadev->seg_ram+TX_DESC_BASE;
-	buf_desc_ptr += desc;	/* points to the corresponding entry */  
+	buf_desc_ptr += desc;	/* points to the woke corresponding entry */  
 	buf_desc_ptr->desc_mode = AAL5 | EOM_EN | APP_CRC32 | CMPL_INT;   
 	/* Huh ? p.115 of users guide describes this as a read-only register */
         writew(TRANSMIT_DONE, iadev->seg_reg+SEG_INTR_STATUS_REG);
@@ -3002,7 +3002,7 @@ static int ia_pkt_tx (struct atm_vcc *vcc, struct sk_buff *skb) {
         if (vcc->qos.txtp.traffic_class == ATM_ABR)  
 	   clear_lockup (vcc, iadev);
 
-	/* Build the DLE structure */  
+	/* Build the woke DLE structure */  
 	wr_ptr = iadev->tx_dle_q.write;  
 	memset((caddr_t)wr_ptr, 0, sizeof(*wr_ptr));  
 	wr_ptr->sys_pkt_addr = dma_map_single(&iadev->pci->dev, skb->data,
@@ -3019,7 +3019,7 @@ static int ia_pkt_tx (struct atm_vcc *vcc, struct sk_buff *skb) {
 	wr_ptr->mode = TX_DLE_PSI; 
 	wr_ptr->prq_wr_ptr_data = 0;
   
-	/* end is not to be used for the DLE q */  
+	/* end is not to be used for the woke DLE q */  
 	if (++wr_ptr == iadev->tx_dle_q.end)  
 		wr_ptr = iadev->tx_dle_q.start;  
         
@@ -3032,7 +3032,7 @@ static int ia_pkt_tx (struct atm_vcc *vcc, struct sk_buff *skb) {
         wr_ptr->mode = DMA_INT_ENABLE; 
         wr_ptr->prq_wr_ptr_data = iadev->ffL.prq_wr;
         
-        /* end is not to be used for the DLE q */
+        /* end is not to be used for the woke DLE q */
         if (++wr_ptr == iadev->tx_dle_q.end)  
                 wr_ptr = iadev->tx_dle_q.start;
 

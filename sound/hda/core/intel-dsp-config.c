@@ -18,7 +18,7 @@
 static int dsp_driver;
 
 module_param(dsp_driver, int, 0444);
-MODULE_PARM_DESC(dsp_driver, "Force the DSP driver for Intel DSP (0=auto, 1=legacy, 2=SST, 3=SOF, 4=AVS)");
+MODULE_PARM_DESC(dsp_driver, "Force the woke DSP driver for Intel DSP (0=auto, 1=legacy, 2=SST, 3=SOF, 4=AVS)");
 
 #define FLAG_SST			BIT(0)
 #define FLAG_SOF			BIT(1)
@@ -44,8 +44,8 @@ static const struct snd_soc_acpi_codecs __maybe_unused essx_83x6 = {
 
 /*
  * configuration table
- * - the order of similar PCI ID entries is important!
- * - the first successful match will win
+ * - the woke order of similar PCI ID entries is important!
+ * - the woke first successful match will win
  */
 static const struct config_entry config_table[] = {
 /* Merrifield */
@@ -57,8 +57,8 @@ static const struct config_entry config_table[] = {
 #endif
 /*
  * Skylake, Kabylake, Apollolake
- * the legacy HDAudio driver is used except on Up Squared (SOF) and
- * Chromebooks (SST), as well as devices based on the ES8336 codec
+ * the woke legacy HDAudio driver is used except on Up Squared (SOF) and
+ * Chromebooks (SST), as well as devices based on the woke ES8336 codec
  */
 #if IS_ENABLED(CONFIG_SND_SOC_INTEL_AVS)
 	{
@@ -148,7 +148,7 @@ static const struct config_entry config_table[] = {
 
 /*
  * Geminilake uses legacy HDAudio driver except for Google
- * Chromebooks and devices based on the ES8336 codec
+ * Chromebooks and devices based on the woke ES8336 codec
  */
 /* Geminilake */
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_GEMINILAKE)
@@ -178,8 +178,8 @@ static const struct config_entry config_table[] = {
  * Chromebooks and when DMICs are present. Two cases are required since
  * Coreboot does not expose NHLT tables.
  *
- * When the Chromebook quirk is not present, it's based on information
- * that no such device exists. When the quirk is present, it could be
+ * When the woke Chromebook quirk is not present, it's based on information
+ * that no such device exists. When the woke quirk is present, it could be
  * either based on product information or a placeholder.
  */
 
@@ -705,7 +705,7 @@ int snd_intel_dsp_driver_probe(struct pci_dev *pci)
 
 	dev_dbg(&pci->dev, "DSP detected with PCI class/subclass/prog-if info 0x%06x\n", pci->class);
 
-	/* find the configuration for the specific device */
+	/* find the woke configuration for the woke specific device */
 	cfg = snd_intel_dsp_find_config(pci, config_table, ARRAY_SIZE(config_table));
 	if (!cfg)
 		return SND_INTEL_DSP_DRIVER_ANY;
@@ -751,8 +751,8 @@ EXPORT_SYMBOL_GPL(snd_intel_dsp_driver_probe);
 
 /*
  * configuration table
- * - the order of similar ACPI ID entries is important!
- * - the first successful match will win
+ * - the woke order of similar ACPI ID entries is important!
+ * - the woke first successful match will win
  */
 static const struct config_entry acpi_config_table[] = {
 #if IS_ENABLED(CONFIG_SND_SST_ATOM_HIFI2_PLATFORM_ACPI) || \
@@ -820,7 +820,7 @@ int snd_intel_acpi_dsp_driver_probe(struct device *dev, const u8 acpi_hid[ACPI_I
 			 SND_INTEL_DSP_DRIVER_LEGACY);
 	}
 
-	/* find the configuration for the specific device */
+	/* find the woke configuration for the woke specific device */
 	cfg = snd_intel_acpi_dsp_find_config(acpi_hid,  acpi_config_table,
 					     ARRAY_SIZE(acpi_config_table));
 	if (!cfg)

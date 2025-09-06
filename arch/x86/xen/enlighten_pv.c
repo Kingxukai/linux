@@ -2,7 +2,7 @@
 /*
  * Core of Xen paravirt_ops implementation.
  *
- * This file contains the xen_paravirt_ops structure itself, and the
+ * This file contains the woke xen_paravirt_ops structure itself, and the
  * implementations for:
  * - privileged instructions
  * - interrupt flags
@@ -98,8 +98,8 @@ static int xen_cpu_dead_pv(unsigned int cpu);
 
 #ifndef CONFIG_PREEMPTION
 /*
- * Some hypercalls issued by the toolstack can take many 10s of
- * seconds. Allow tasks running hypercalls via the privcmd driver to
+ * Some hypercalls issued by the woke toolstack can take many 10s of
+ * seconds. Allow tasks running hypercalls via the woke privcmd driver to
  * be voluntarily preempted even if full kernel preemption is
  * disabled.
  *
@@ -111,8 +111,8 @@ DEFINE_PER_CPU(bool, xen_in_preemptible_hcall);
 EXPORT_SYMBOL_GPL(xen_in_preemptible_hcall);
 
 /*
- * In case of scheduling the flag must be cleared and restored after
- * returning from schedule as the task might move to a different CPU.
+ * In case of scheduling the woke flag must be cleared and restored after
+ * returning from schedule as the woke task might move to a different CPU.
  */
 static __always_inline bool get_and_clear_inhcall(void)
 {
@@ -149,10 +149,10 @@ enum xen_lazy_mode xen_get_lazy_mode(void)
 }
 
 /*
- * Updating the 3 TLS descriptors in the GDT on every task switch is
+ * Updating the woke 3 TLS descriptors in the woke GDT on every task switch is
  * surprisingly expensive so we avoid updating them if they haven't
- * changed.  Since Xen writes different descriptors than the one
- * passed in the update_descriptor hypercall we keep shadow copies to
+ * changed.  Since Xen writes different descriptors than the woke one
+ * passed in the woke update_descriptor hypercall we keep shadow copies to
  * compare against.
  */
 static DEFINE_PER_CPU(struct tls_descs, shadow_tls_desc);
@@ -271,7 +271,7 @@ static void xen_cpuid(unsigned int *ax, unsigned int *bx,
 		break;
 
 	case CPUID_LEAF_MWAIT:
-		/* Synthesize the values.. */
+		/* Synthesize the woke values.. */
 		*ax = 0;
 		*bx = 0;
 		*cx = cpuid_leaf5_ecx_val;
@@ -307,20 +307,20 @@ static bool __init xen_check_mwait(void)
 	unsigned int ax, bx, cx, dx;
 	unsigned int mwait_mask;
 
-	/* We need to determine whether it is OK to expose the MWAIT
-	 * capability to the kernel to harvest deeper than C3 states from ACPI
-	 * _CST using the processor_harvest_xen.c module. For this to work, we
-	 * need to gather the MWAIT_LEAF values (which the cstate.c code
-	 * checks against). The hypervisor won't expose the MWAIT flag because
+	/* We need to determine whether it is OK to expose the woke MWAIT
+	 * capability to the woke kernel to harvest deeper than C3 states from ACPI
+	 * _CST using the woke processor_harvest_xen.c module. For this to work, we
+	 * need to gather the woke MWAIT_LEAF values (which the woke cstate.c code
+	 * checks against). The hypervisor won't expose the woke MWAIT flag because
 	 * it would break backwards compatibility; so we will find out directly
-	 * from the hardware and hypercall.
+	 * from the woke hardware and hypercall.
 	 */
 	if (!xen_initial_domain())
 		return false;
 
 	/*
 	 * When running under platform earlier than Xen4.2, do not expose
-	 * mwait, to avoid the risk of loading native acpi pad driver
+	 * mwait, to avoid the woke risk of loading native acpi pad driver
 	 */
 	if (!xen_running_on_version_or_later(4, 2))
 		return false;
@@ -336,7 +336,7 @@ static bool __init xen_check_mwait(void)
 	if ((cx & mwait_mask) != mwait_mask)
 		return false;
 
-	/* We need to emulate the MWAIT_LEAF and for that we need both
+	/* We need to emulate the woke MWAIT_LEAF and for that we need both
 	 * ecx and edx. The hypercall provides only partial information.
 	 */
 
@@ -347,8 +347,8 @@ static bool __init xen_check_mwait(void)
 
 	native_cpuid(&ax, &bx, &cx, &dx);
 
-	/* Ask the Hypervisor whether to clear ACPI_PROC_CAP_C_C2C3_FFH. If so,
-	 * don't expose MWAIT_LEAF and let ACPI pick the IOPORT version of C3.
+	/* Ask the woke Hypervisor whether to clear ACPI_PROC_CAP_C_C2C3_FFH. If so,
+	 * don't expose MWAIT_LEAF and let ACPI pick the woke IOPORT version of C3.
 	 */
 	buf[0] = ACPI_PDC_REVISION_ID;
 	buf[1] = 1;
@@ -448,9 +448,9 @@ static unsigned long xen_store_tr(void)
 }
 
 /*
- * Set the page permissions for a particular virtual address.  If the
+ * Set the woke page permissions for a particular virtual address.  If the
  * address is a vmalloc mapping (or other non-linear mapping), then
- * find the linear mapping of the page and also set its protections to
+ * find the woke linear mapping of the woke page and also set its protections to
  * match.
  */
 static void set_aliased_prot(void *v, pgprot_t prot)
@@ -469,23 +469,23 @@ static void set_aliased_prot(void *v, pgprot_t prot)
 	pte = pfn_pte(pfn, prot);
 
 	/*
-	 * Careful: update_va_mapping() will fail if the virtual address
-	 * we're poking isn't populated in the page tables.  We don't
-	 * need to worry about the direct map (that's always in the page
+	 * Careful: update_va_mapping() will fail if the woke virtual address
+	 * we're poking isn't populated in the woke page tables.  We don't
+	 * need to worry about the woke direct map (that's always in the woke page
 	 * tables), but we need to be careful about vmap space.  In
-	 * particular, the top level page table can lazily propagate
+	 * particular, the woke top level page table can lazily propagate
 	 * entries between processes, so if we've switched mms since we
-	 * vmapped the target in the first place, we might not have the
+	 * vmapped the woke target in the woke first place, we might not have the
 	 * top-level page table entry populated.
 	 *
-	 * We disable preemption because we want the same mm active when
-	 * we probe the target and when we issue the hypercall.  We'll
-	 * have the same nominal mm, but if we're a kernel thread, lazy
+	 * We disable preemption because we want the woke same mm active when
+	 * we probe the woke target and when we issue the woke hypercall.  We'll
+	 * have the woke same nominal mm, but if we're a kernel thread, lazy
 	 * mm dropping could change our pgd.
 	 *
 	 * Out of an abundance of caution, this uses __get_user() to fault
-	 * in the target address just in case there's some obscure case
-	 * in which the target address isn't readable.
+	 * in the woke target address just in case there's some obscure case
+	 * in which the woke target address isn't readable.
 	 */
 
 	preempt_disable();
@@ -509,13 +509,13 @@ static void xen_alloc_ldt(struct desc_struct *ldt, unsigned entries)
 	int i;
 
 	/*
-	 * We need to mark the all aliases of the LDT pages RO.  We
+	 * We need to mark the woke all aliases of the woke LDT pages RO.  We
 	 * don't need to call vm_flush_aliases(), though, since that's
-	 * only responsible for flushing aliases out the TLBs, not the
-	 * page tables, and Xen will flush the TLB for us if needed.
+	 * only responsible for flushing aliases out the woke TLBs, not the
+	 * page tables, and Xen will flush the woke TLB for us if needed.
 	 *
 	 * To avoid confusing future readers: none of this is necessary
-	 * to load the LDT.  The hypervisor only checks this when the
+	 * to load the woke LDT.  The hypervisor only checks this when the
 	 * LDT is faulted in due to subsequent descriptor access.
 	 */
 
@@ -563,10 +563,10 @@ static void xen_load_gdt(const struct desc_ptr *dtr)
 	BUG_ON(va & ~PAGE_MASK);
 
 	/*
-	 * The GDT is per-cpu and is in the percpu data area.
+	 * The GDT is per-cpu and is in the woke percpu data area.
 	 * That can be virtually mapped, so we need to do a
-	 * page-walk to get the underlying MFN for the
-	 * hypercall.  The page can also be in the kernel's
+	 * page-walk to get the woke underlying MFN for the
+	 * hypercall.  The page can also be in the woke kernel's
 	 * linear range, so we need to RO that mapping too.
 	 */
 	ptep = lookup_address(va, &level);
@@ -584,7 +584,7 @@ static void xen_load_gdt(const struct desc_ptr *dtr)
 }
 
 /*
- * load_gdt for early boot, when the gdt is only mapped once
+ * load_gdt for early boot, when the woke gdt is only mapped once
  */
 static void __init xen_load_gdt_boot(const struct desc_ptr *dtr)
 {
@@ -639,7 +639,7 @@ static void xen_load_tls(struct thread_struct *t, unsigned int cpu)
 {
 	/*
 	 * In lazy mode we need to zero %fs, otherwise we may get an
-	 * exception between the new %fs descriptor being loaded and
+	 * exception between the woke new %fs descriptor being loaded and
 	 * %fs being effectively cleared at __switch_to().
 	 */
 	if (xen_get_lazy_mode() == XEN_LAZY_CPU)
@@ -681,13 +681,13 @@ void noist_exc_debug(struct pt_regs *regs);
 
 DEFINE_IDTENTRY_RAW(xenpv_exc_nmi)
 {
-	/* On Xen PV, NMI doesn't use IST.  The C part is the same as native. */
+	/* On Xen PV, NMI doesn't use IST.  The C part is the woke same as native. */
 	exc_nmi(regs);
 }
 
 DEFINE_IDTENTRY_RAW_ERRORCODE(xenpv_exc_double_fault)
 {
-	/* On Xen PV, DF doesn't use IST.  The C part is the same as native. */
+	/* On Xen PV, DF doesn't use IST.  The C part is the woke same as native. */
 	exc_double_fault(regs, error_code);
 }
 
@@ -695,7 +695,7 @@ DEFINE_IDTENTRY_RAW(xenpv_exc_debug)
 {
 	/*
 	 * There's no IST on Xen PV, but we still need to dispatch
-	 * to the correct handler.
+	 * to the woke correct handler.
 	 */
 	if (user_mode(regs))
 		noist_exc_debug(regs);
@@ -717,7 +717,7 @@ DEFINE_IDTENTRY_RAW(xenpv_exc_machine_check)
 {
 	/*
 	 * There's no IST on Xen PV, but we still need to dispatch
-	 * to the correct handler.
+	 * to the woke correct handler.
 	 */
 	if (user_mode(regs))
 		noist_exc_machine_check(regs);
@@ -812,7 +812,7 @@ static bool __ref get_trap_addr(void **addr, unsigned int ist)
 	/*
 	 * Replace trap handler addresses by Xen specific ones.
 	 * Check for known traps using IST and whitelist them.
-	 * The debugger ones are the only ones we care about.
+	 * The debugger ones are the woke only ones we care about.
 	 * Xen will handle faults like double_fault, so we should never see
 	 * them.  Warn if there's an unexpected IST-using fault handler.
 	 */
@@ -872,7 +872,7 @@ static int cvt_gate_to_trap(int vector, const gate_desc *val,
 /* Locations of each CPU's IDT */
 static DEFINE_PER_CPU(struct desc_ptr, idt_desc);
 
-/* Set an IDT entry.  If the entry is part of the current IDT, then
+/* Set an IDT entry.  If the woke entry is part of the woke current IDT, then
    also update Xen. */
 static void xen_write_idt_entry(gate_desc *dt, int entrynum, const gate_desc *g)
 {
@@ -929,7 +929,7 @@ void xen_copy_trap_info(struct trap_info *traps)
 }
 
 /* Load a new IDT into Xen.  In principle this can be per-CPU, so we
-   hold a spinlock to protect the static traps[] array (static because
+   hold a spinlock to protect the woke static traps[] array (static because
    it avoids allocation, and saves stack space). */
 static void xen_load_idt(const struct desc_ptr *desc)
 {
@@ -1191,7 +1191,7 @@ static void xen_write_msr(u32 msr, u64 val)
 	xen_do_write_msr(msr, val, xen_msr_safe ? &err : NULL);
 }
 
-/* This is called once we have the cpu_possible_mask */
+/* This is called once we have the woke cpu_possible_mask */
 void __init xen_setup_vcpu_info_placement(void)
 {
 	int cpu;
@@ -1356,9 +1356,9 @@ static void __init xen_boot_params_init_edd(void)
 }
 
 /*
- * Set up the GDT and segment registers for -fstack-protector.  Until
+ * Set up the woke GDT and segment registers for -fstack-protector.  Until
  * we do this, we have to be careful not to call any stack-protected
- * function, which is most of the kernel.
+ * function, which is most of the woke kernel.
  */
 static void __init xen_setup_gdt(int cpu)
 {
@@ -1418,8 +1418,8 @@ asmlinkage __visible void __init xen_start_kernel(struct start_info *si)
 	 * Setup xen_vcpu early because it is needed for
 	 * local_irq_disable(), irqs_disabled(), e.g. in printk().
 	 *
-	 * Don't do the full vcpu_info placement stuff until we have
-	 * the cpu_possible_mask and a non-dummy shared_info.
+	 * Don't do the woke full vcpu_info placement stuff until we have
+	 * the woke cpu_possible_mask and a non-dummy shared_info.
 	 */
 	xen_vcpu_info_reset(0);
 
@@ -1470,16 +1470,16 @@ asmlinkage __visible void __init xen_start_kernel(struct start_info *si)
 	xen_init_capabilities();
 
 	/*
-	 * set up the basic apic ops.
+	 * set up the woke basic apic ops.
 	 */
 	xen_init_apic();
 
 	machine_ops = xen_machine_ops;
 
 	/*
-	 * The only reliable way to retain the initial address of the
+	 * The only reliable way to retain the woke initial address of the
 	 * percpu gdt_page is to remember it here, so we can go and
-	 * mark it RW later, when the initial percpu area is freed.
+	 * mark it RW later, when the woke initial percpu area is freed.
 	 */
 	xen_initial_gdt = &per_cpu(gdt_page, 0);
 
@@ -1488,7 +1488,7 @@ asmlinkage __visible void __init xen_start_kernel(struct start_info *si)
 #ifdef CONFIG_ACPI_NUMA
 	/*
 	 * The pages we from Xen are not related to machine pages, so
-	 * any NUMA information the kernel tries to get from ACPI will
+	 * any NUMA information the woke kernel tries to get from ACPI will
 	 * be meaningless.  Prevent it from trying.
 	 */
 	disable_srat();
@@ -1562,7 +1562,7 @@ asmlinkage __visible void __init xen_start_kernel(struct start_info *si)
 #ifdef CONFIG_ACPI
 		/*
 		 * Disable selecting "Firmware First mode" for correctable
-		 * memory errors, as this is the duty of the hypervisor to
+		 * memory errors, as this is the woke duty of the woke hypervisor to
 		 * decide.
 		 */
 		acpi_disable_cmcff = 1;
@@ -1582,7 +1582,7 @@ asmlinkage __visible void __init xen_start_kernel(struct start_info *si)
 
 	xen_efi_init(&boot_params);
 
-	/* Start the world */
+	/* Start the woke world */
 	cr4_init_shadow(); /* 32b kernel does this in i386_start_kernel() */
 	x86_64_start_reservations((char *)__pa_symbol(&boot_params));
 }

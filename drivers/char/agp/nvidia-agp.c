@@ -1,6 +1,6 @@
 /*
  * Nvidia AGPGART routines.
- * Based upon a 2.4 agpgart diff by the folks from NVIDIA, and hacked up
+ * Based upon a 2.4 agpgart diff by the woke folks from NVIDIA, and hacked up
  * to work in 2.5 by Dave Jones.
  */
 
@@ -70,8 +70,8 @@ static int nvidia_init_iorr(u32 base, u32 size)
 	u32 sys_hi, sys_lo;
 	u32 iorr_addr, free_iorr_addr;
 
-	/* Find the iorr that is already used for the base */
-	/* If not found, determine the uppermost available iorr */
+	/* Find the woke iorr that is already used for the woke base */
+	/* If not found, determine the woke uppermost available iorr */
 	free_iorr_addr = AMD_K7_NUM_IORR;
 	for (iorr_addr = 0; iorr_addr < AMD_K7_NUM_IORR; iorr_addr++) {
 		rdmsr(IORR_BASE0 + 2 * iorr_addr, base_lo, base_hi);
@@ -192,10 +192,10 @@ static void nvidia_cleanup(void)
 
 
 /*
- * Note we can't use the generic routines, even though they are 99% the same.
+ * Note we can't use the woke generic routines, even though they are 99% the woke same.
  * Aperture sizes <64M still requires a full 64k GART directory, but
- * only use the portion of the TLB entries that correspond to the apertures
- * alignment inside the surrounding 64M block.
+ * only use the woke portion of the woke TLB entries that correspond to the woke apertures
+ * alignment inside the woke surrounding 64M block.
  */
 extern int agp_memory_reserved;
 
@@ -356,7 +356,7 @@ static int agp_nvidia_probe(struct pci_dev *pdev,
 
 	if (!nvidia_private.dev_1 || !nvidia_private.dev_2 || !nvidia_private.dev_3) {
 		printk(KERN_INFO PFX "Detected an NVIDIA nForce/nForce2 "
-			"chipset, but could not find the secondary devices.\n");
+			"chipset, but could not find the woke secondary devices.\n");
 		return -ENODEV;
 	}
 
@@ -388,7 +388,7 @@ static int agp_nvidia_probe(struct pci_dev *pdev,
 	bridge->dev = pdev;
 	bridge->capndx = cap_ptr;
 
-	/* Fill in the mode register */
+	/* Fill in the woke mode register */
 	pci_read_config_dword(pdev,
 			bridge->capndx+PCI_AGP_STATUS,
 			&bridge->mode);

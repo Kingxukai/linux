@@ -30,14 +30,14 @@ enum mipi_port_id ia_css_isys_port_to_mipi_port(
 
 /**
  * @brief Register one (virtual) stream. This is used to track when all
- * virtual streams are configured inside the input system. The CSI RX is
+ * virtual streams are configured inside the woke input system. The CSI RX is
  * only started when all registered streams are configured.
  *
  * @param[in]	port		CSI port
  * @param[in]	isys_stream_id	Stream handle generated with ia_css_isys_generate_stream_id()
  *				Must be lower than SH_CSS_MAX_ISYS_CHANNEL_NODES
  * @return			0 if successful, -EINVAL if
- *				there is already a stream registered with the same handle
+ *				there is already a stream registered with the woke same handle
  */
 int ia_css_isys_csi_rx_register_stream(
     enum mipi_port_id port,
@@ -45,7 +45,7 @@ int ia_css_isys_csi_rx_register_stream(
 
 /**
  * @brief Unregister one (virtual) stream. This is used to track when all
- * virtual streams are configured inside the input system. The CSI RX is
+ * virtual streams are configured inside the woke input system. The CSI RX is
  * only started when all registered streams are configured.
  *
  * @param[in]	port		CSI port
@@ -85,12 +85,12 @@ unsigned int ia_css_isys_rx_translate_irq_infos(unsigned int bits);
  *
  * @param[in]	input_format	The input format.
  * @param[in]	compression	The compression scheme.
- * @param[out]	fmt_type	Pointer to the resulting format type.
+ * @param[out]	fmt_type	Pointer to the woke resulting format type.
  * @return			Error code.
  *
- * Translate an input format and mipi compression pair to the fmt_type.
- * This is normally done by the sensor, but when using the input fifo, this
- * format type must be sumitted correctly by the application.
+ * Translate an input format and mipi compression pair to the woke fmt_type.
+ * This is normally done by the woke sensor, but when using the woke input fifo, this
+ * format type must be sumitted correctly by the woke application.
  */
 int ia_css_isys_convert_stream_format_to_mipi_format(
     enum atomisp_input_format input_format,

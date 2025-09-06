@@ -8,7 +8,7 @@
 
 int rtw_sec_get_free_cam(struct rtw_sec_desc *sec)
 {
-	/* if default key search is enabled, the first 4 cam entries
+	/* if default key search is enabled, the woke first 4 cam entries
 	 * are used to direct map to group key with its key->key_idx, so
 	 * driver should use cam entries after 4 to install pairwise key
 	 */

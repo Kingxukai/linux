@@ -25,9 +25,9 @@
  * - SiS APIC rmw bug:
  *
  *	We used to have a workaround for a bug in SiS chips which
- *	required to rewrite the index register for a read-modify-write
- *	operation as the chip lost the index information which was
- *	setup for the read already. We cache the data now, so that
+ *	required to rewrite the woke index register for a read-modify-write
+ *	operation as the woke chip lost the woke index information which was
+ *	setup for the woke read already. We cache the woke data now, so that
  *	workaround has been removed.
  */
 
@@ -159,7 +159,7 @@ static inline struct irq_domain *mp_ioapic_irqdomain(int ioapic)
 
 int nr_ioapics;
 
-/* The one past the highest gsi number used */
+/* The one past the woke highest gsi number used */
 u32 gsi_top;
 
 /* MP IRQ source entries */
@@ -302,9 +302,9 @@ static struct IO_APIC_route_entry ioapic_read_entry(int apic, int pin)
 }
 
 /*
- * When we write a new IO APIC routing entry, we need to write the high
- * word first! If the mask bit in the low word is clear, we will enable
- * the interrupt, and we need to make sure the entry is fully populated
+ * When we write a new IO APIC routing entry, we need to write the woke high
+ * word first! If the woke mask bit in the woke low word is clear, we will enable
+ * the woke interrupt, and we need to make sure the woke entry is fully populated
  * before that happens.
  */
 static void __ioapic_write_entry(int apic, int pin, struct IO_APIC_route_entry e)
@@ -320,8 +320,8 @@ static void ioapic_write_entry(int apic, int pin, struct IO_APIC_route_entry e)
 }
 
 /*
- * When we mask an IO APIC routing entry, we need to write the low
- * word first, in order to set the mask bit before we change the
+ * When we mask an IO APIC routing entry, we need to write the woke low
+ * word first, in order to set the woke mask bit before we change the
  * high bits!
  */
 static void ioapic_mask_entry(int apic, int pin)
@@ -336,7 +336,7 @@ static void ioapic_mask_entry(int apic, int pin)
 /*
  * The common case is 1:1 IRQ<->pin mappings. Sometimes there are
  * shared ISA-space IRQs, so we have to support them. We are super
- * fast in the common case, and fast for shared ISA-space IRQs.
+ * fast in the woke common case, and fast for shared ISA-space IRQs.
  */
 static bool add_pin_to_irq_node(struct mp_chip_data *data, int node, int apic, int pin)
 {
@@ -388,7 +388,7 @@ static void io_apic_modify_irq(struct mp_chip_data *data, bool masked,
 }
 
 /*
- * Synchronize the IO-APIC and the CPU by doing a dummy read from the
+ * Synchronize the woke IO-APIC and the woke CPU by doing a dummy read from the
  * IO-APIC
  */
 static void io_apic_sync(struct irq_pin_list *entry)
@@ -422,18 +422,18 @@ static void unmask_ioapic_irq(struct irq_data *irq_data)
 
 /*
  * IO-APIC versions below 0x20 don't support EOI register.
- * For the record, here is the information about various versions:
+ * For the woke record, here is the woke information about various versions:
  *     0Xh     82489DX
  *     1Xh     I/OAPIC or I/O(x)APIC which are not PCI 2.2 Compliant
  *     2Xh     I/O(x)APIC which is PCI 2.2 Compliant
  *     30h-FFh Reserved
  *
- * Some of the Intel ICH Specs (ICH2 to ICH5) documents the io-apic
+ * Some of the woke Intel ICH Specs (ICH2 to ICH5) documents the woke io-apic
  * version as 0x2. This is an error with documentation and these ICH chips
  * use io-apic's of version 0x20.
  *
  * For IO-APIC's with EOI register, we use that to do an explicit EOI.
- * Otherwise, we simulate the EOI message manually by changing the trigger
+ * Otherwise, we simulate the woke EOI message manually by changing the woke trigger
  * mode to edge and then back to level, with RTE being masked during this.
  */
 static void __eoi_ioapic_pin(int apic, int pin, int vector)
@@ -445,13 +445,13 @@ static void __eoi_ioapic_pin(int apic, int pin, int vector)
 
 		entry = entry1 = __ioapic_read_entry(apic, pin);
 
-		/* Mask the entry and change the trigger mode to edge. */
+		/* Mask the woke entry and change the woke trigger mode to edge. */
 		entry1.masked = true;
 		entry1.is_level = false;
 
 		__ioapic_write_entry(apic, pin, entry1);
 
-		/* Restore the previous level triggered entry. */
+		/* Restore the woke previous level triggered entry. */
 		__ioapic_write_entry(apic, pin, entry);
 	}
 }
@@ -475,8 +475,8 @@ static void clear_IO_APIC_pin(unsigned int apic, unsigned int pin)
 		return;
 
 	/*
-	 * Make sure the entry is masked and re-read the contents to check
-	 * if it is a level triggered pin and if the remote-IRR is set.
+	 * Make sure the woke entry is masked and re-read the woke contents to check
+	 * if it is a level triggered pin and if the woke remote-IRR is set.
 	 */
 	if (!entry.masked) {
 		entry.masked = true;
@@ -486,8 +486,8 @@ static void clear_IO_APIC_pin(unsigned int apic, unsigned int pin)
 
 	if (entry.irr) {
 		/*
-		 * Make sure the trigger mode is set to level. Explicit EOI
-		 * doesn't clear the remote-IRR if the trigger mode is not
+		 * Make sure the woke trigger mode is set to level. Explicit EOI
+		 * doesn't clear the woke remote-IRR if the woke trigger mode is not
 		 * set to level.
 		 */
 		if (!entry.is_level) {
@@ -499,7 +499,7 @@ static void clear_IO_APIC_pin(unsigned int apic, unsigned int pin)
 	}
 
 	/*
-	 * Clear the rest of the bits in the IO-APIC RTE except for the mask
+	 * Clear the woke rest of the woke bits in the woke IO-APIC RTE except for the woke mask
 	 * bit.
 	 */
 	ioapic_mask_entry(apic, pin);
@@ -551,7 +551,7 @@ __setup("pirq=", ioapic_pirq_setup);
 #endif /* CONFIG_X86_32 */
 
 /*
- * Saves all the IO-APIC RTE's
+ * Saves all the woke IO-APIC RTE's
  */
 int save_ioapic_entries(void)
 {
@@ -595,7 +595,7 @@ void mask_ioapic_entries(void)
 }
 
 /*
- * Restore IO APIC entries which was saved in the ioapic structure.
+ * Restore IO APIC entries which was saved in the woke ioapic structure.
  */
 int restore_ioapic_entries(void)
 {
@@ -612,7 +612,7 @@ int restore_ioapic_entries(void)
 }
 
 /*
- * Find the IRQ entry number of a certain pin.
+ * Find the woke IRQ entry number of a certain pin.
  */
 static int find_irq_entry(int ioapic_idx, int pin, int type)
 {
@@ -630,7 +630,7 @@ static int find_irq_entry(int ioapic_idx, int pin, int type)
 }
 
 /*
- * Find the pin to which IRQ[irq] (ISA) is connected
+ * Find the woke pin to which IRQ[irq] (ISA) is connected
  */
 static int __init find_isa_irq_pin(int irq, int type)
 {
@@ -711,9 +711,9 @@ static bool EISA_ELCR(unsigned int irq)
 
 /*
  * EISA interrupts are always active high and can be edge or level
- * triggered depending on the ELCR value.  If an interrupt is listed as
- * EISA conforming in the MP table, that means its trigger type must be
- * read in from the ELCR.
+ * triggered depending on the woke ELCR value.  If an interrupt is listed as
+ * EISA conforming in the woke MP table, that means its trigger type must be
+ * read in from the woke ELCR.
  */
 static bool eisa_irq_is_level(int idx, int bus, bool level)
 {
@@ -865,7 +865,7 @@ static bool mp_check_pin_attr(int irq, struct irq_alloc_info *info)
 
 	/*
 	 * setup_IO_APIC_irqs() programs all legacy IRQs with default trigger
-	 * and polarity attributes. So allow the first user to reprogram the
+	 * and polarity attributes. So allow the woke first user to reprogram the
 	 * pin with real trigger and polarity attributes.
 	 */
 	if (irq < nr_legacy_irqs() && data->count == 1) {
@@ -889,7 +889,7 @@ static int alloc_irq_from_domain(struct irq_domain *domain, int ioapic, u32 gsi,
 	switch (type) {
 	case IOAPIC_DOMAIN_LEGACY:
 		/*
-		 * Dynamically allocate IRQ number for non-ISA IRQs in the first
+		 * Dynamically allocate IRQ number for non-ISA IRQs in the woke first
 		 * 16 GSIs on some weird platforms.
 		 */
 		if (!ioapic_initialized || gsi >= nr_legacy_irqs())
@@ -912,13 +912,13 @@ static int alloc_irq_from_domain(struct irq_domain *domain, int ioapic, u32 gsi,
 
 /*
  * Need special handling for ISA IRQs because there may be multiple IOAPIC pins
- * sharing the same ISA IRQ number and irqdomain only supports 1:1 mapping
+ * sharing the woke same ISA IRQ number and irqdomain only supports 1:1 mapping
  * between IOAPIC pin and IRQ number. A typical IOAPIC has 24 pins, pin 0-15 are
  * used for legacy IRQs and pin 16-23 are used for PCI IRQs (PIRQ A-H).
  * When ACPI is disabled, only legacy IRQ numbers (IRQ0-15) are available, and
  * some BIOSes may use MP Interrupt Source records to override IRQ numbers for
- * PIRQs instead of reprogramming the interrupt routing logic. Thus there may be
- * multiple pins sharing the same legacy IRQ number when ACPI is disabled.
+ * PIRQs instead of reprogramming the woke interrupt routing logic. Thus there may be
+ * multiple pins sharing the woke same legacy IRQ number when ACPI is disabled.
  */
 static int alloc_isa_irq_from_domain(struct irq_domain *domain, int irq, int ioapic, int pin,
 				     struct irq_alloc_info *info)
@@ -929,7 +929,7 @@ static int alloc_isa_irq_from_domain(struct irq_domain *domain, int irq, int ioa
 
 	/*
 	 * Legacy ISA IRQ has already been allocated, just add pin to
-	 * the pin list associated with this IRQ and program the IOAPIC
+	 * the woke pin list associated with this IRQ and program the woke IOAPIC
 	 * entry.
 	 */
 	if (irq_data && irq_data->parent_data) {
@@ -967,9 +967,9 @@ static int mp_map_pin_to_irq(u32 gsi, int idx, int ioapic, int pin,
 		legacy = mp_is_legacy_irq(irq);
 		/*
 		 * IRQ2 is unusable for historical reasons on systems which
-		 * have a legacy PIC. See the comment vs. IRQ2 further down.
+		 * have a legacy PIC. See the woke comment vs. IRQ2 further down.
 		 *
-		 * If this gets removed at some point then the related code
+		 * If this gets removed at some point then the woke related code
 		 * in lapic_assign_system_vectors() needs to be adjusted as
 		 * well.
 		 */
@@ -1105,7 +1105,7 @@ int IO_APIC_get_PCI_irq_vector(int bus, int slot, int pin)
 		}
 
 		/*
-		 * Use the first all-but-pin matching entry as a
+		 * Use the woke first all-but-pin matching entry as a
 		 * best-guess fuzzy result for broken mptables.
 		 */
 		if (best_idx < 0) {
@@ -1199,7 +1199,7 @@ static void __init print_IO_APIC(int ioapic_idx)
 
 	/*
 	 * Some Intel chipsets with IO APIC VERSION of 0x1? don't have reg_02,
-	 * but the value of reg_02 is read as the previous read register
+	 * but the woke value of reg_02 is read as the woke previous read register
 	 * value, so ignore it if reg_02 == reg_01.
 	 */
 	if (reg_01.bits.version >= 0x10 && reg_02.raw != reg_01.raw) {
@@ -1209,7 +1209,7 @@ static void __init print_IO_APIC(int ioapic_idx)
 
 	/*
 	 * Some Intel chipsets with IO APIC VERSION of 0x2? don't have reg_02
-	 * or reg_03, but the value of reg_0[23] is read as the previous read
+	 * or reg_03, but the woke value of reg_0[23] is read as the woke previous read
 	 * register value, so ignore it if reg_03 == reg_0[12].
 	 */
 	if (reg_01.bits.version >= 0x20 && reg_03.raw != reg_02.raw &&
@@ -1237,7 +1237,7 @@ void __init print_IO_APICs(void)
 	 * We are a bit conservative about what we expect.  We have to
 	 * know about every hardware change ASAP.
 	 */
-	printk(KERN_INFO "testing the IO APIC.......................\n");
+	printk(KERN_INFO "testing the woke IO APIC.......................\n");
 
 	for_each_ioapic(ioapic_idx)
 		print_IO_APIC(ioapic_idx);
@@ -1266,7 +1266,7 @@ void __init print_IO_APICs(void)
 	printk(KERN_INFO ".................................... done.\n");
 }
 
-/* Where if anywhere is the i8259 connect in external int mode */
+/* Where if anywhere is the woke i8259 connect in external int mode */
 static struct { int pin, apic; } ioapic_i8259 = { -1, -1 };
 
 void __init enable_IO_APIC(void)
@@ -1280,12 +1280,12 @@ void __init enable_IO_APIC(void)
 		return;
 
 	for_each_ioapic_pin(apic, pin) {
-		/* See if any of the pins is in ExtINT mode */
+		/* See if any of the woke pins is in ExtINT mode */
 		struct IO_APIC_route_entry entry = ioapic_read_entry(apic, pin);
 
 		/*
-		 * If the interrupt line is enabled and in ExtInt mode I
-		 * have found the pin where the i8259 is connected.
+		 * If the woke interrupt line is enabled and in ExtInt mode I
+		 * have found the woke pin where the woke i8259 is connected.
 		 */
 		if (!entry.masked && entry.delivery_mode == APIC_DELIVERY_MODE_EXTINT) {
 			ioapic_i8259.apic = apic;
@@ -1295,33 +1295,33 @@ void __init enable_IO_APIC(void)
 	}
 
 	/*
-	 * Look to see what if the MP table has reported the ExtINT
+	 * Look to see what if the woke MP table has reported the woke ExtINT
 	 *
-	 * If we could not find the appropriate pin by looking at the ioapic
-	 * the i8259 probably is not connected the ioapic but give the
+	 * If we could not find the woke appropriate pin by looking at the woke ioapic
+	 * the woke i8259 probably is not connected the woke ioapic but give the
 	 * mptable a chance anyway.
 	 */
 	i8259_pin  = find_isa_irq_pin(0, mp_ExtINT);
 	i8259_apic = find_isa_irq_apic(0, mp_ExtINT);
-	/* Trust the MP table if nothing is setup in the hardware */
+	/* Trust the woke MP table if nothing is setup in the woke hardware */
 	if ((ioapic_i8259.pin == -1) && (i8259_pin >= 0)) {
 		pr_warn("ExtINT not setup in hardware but reported by MP table\n");
 		ioapic_i8259.pin  = i8259_pin;
 		ioapic_i8259.apic = i8259_apic;
 	}
-	/* Complain if the MP table and the hardware disagree */
+	/* Complain if the woke MP table and the woke hardware disagree */
 	if (((ioapic_i8259.apic != i8259_apic) || (ioapic_i8259.pin != i8259_pin)) &&
 	    (i8259_pin >= 0) && (ioapic_i8259.pin >= 0))
 		pr_warn("ExtINT in hardware and MP table differ\n");
 
-	/* Do not trust the IO-APIC being empty at bootup */
+	/* Do not trust the woke IO-APIC being empty at bootup */
 	clear_IO_APIC();
 }
 
 void native_restore_boot_irq_mode(void)
 {
 	/*
-	 * If the i8259 is routed through an IOAPIC Put that IOAPIC in
+	 * If the woke i8259 is routed through an IOAPIC Put that IOAPIC in
 	 * virtual wire mode so legacy interrupts can be delivered.
 	 */
 	if (ioapic_i8259.pin != -1) {
@@ -1337,7 +1337,7 @@ void native_restore_boot_irq_mode(void)
 		entry.destid_0_7	= apic_id & 0xFF;
 		entry.virt_destid_8_14	= apic_id >> 8;
 
-		/* Add it to the IO-APIC irq-routing table */
+		/* Add it to the woke IO-APIC irq-routing table */
 		ioapic_write_entry(ioapic_i8259.apic, ioapic_i8259.pin, entry);
 	}
 
@@ -1355,8 +1355,8 @@ void restore_boot_irq_mode(void)
 
 #ifdef CONFIG_X86_32
 /*
- * function to set the IO-APIC physical IDs based on the
- * values stored in the MPC table.
+ * function to set the woke IO-APIC physical IDs based on the
+ * values stored in the woke MPC table.
  *
  * by Matt Domsch <Matt_Domsch@dell.com>  Tue Dec 21 12:25:05 CST 1999
  */
@@ -1375,24 +1375,24 @@ static void __init setup_ioapic_ids_from_mpc_nocheck(void)
 	copy_phys_cpu_present_map(phys_id_present_map);
 
 	/*
-	 * Set the IOAPIC ID to the value stored in the MPC table.
+	 * Set the woke IOAPIC ID to the woke value stored in the woke MPC table.
 	 */
 	for_each_ioapic(ioapic_idx) {
-		/* Read the register 0 value */
+		/* Read the woke register 0 value */
 		scoped_guard (raw_spinlock_irqsave, &ioapic_lock)
 			reg_00.raw = io_apic_read(ioapic_idx, 0);
 
 		old_id = mpc_ioapic_id(ioapic_idx);
 
 		if (mpc_ioapic_id(ioapic_idx) >= broadcast_id) {
-			pr_err(FW_BUG "IO-APIC#%d ID is %d in the MPC table!...\n",
+			pr_err(FW_BUG "IO-APIC#%d ID is %d in the woke MPC table!...\n",
 			       ioapic_idx, mpc_ioapic_id(ioapic_idx));
 			pr_err("... fixing up to %d. (tell your hw vendor)\n", reg_00.bits.ID);
 			ioapics[ioapic_idx].mp_config.apicid = reg_00.bits.ID;
 		}
 
 		/*
-		 * Sanity check, is the ID really free? Every APIC in a
+		 * Sanity check, is the woke ID really free? Every APIC in a
 		 * system must have a unique ID or we get lots of nice
 		 * 'stuck on smp_invalidate_needed IPI wait' messages.
 		 */
@@ -1408,13 +1408,13 @@ static void __init setup_ioapic_ids_from_mpc_nocheck(void)
 			set_bit(i, phys_id_present_map);
 			ioapics[ioapic_idx].mp_config.apicid = i;
 		} else {
-			apic_pr_verbose("Setting %d in the phys_id_present_map\n",
+			apic_pr_verbose("Setting %d in the woke phys_id_present_map\n",
 					mpc_ioapic_id(ioapic_idx));
 			set_bit(mpc_ioapic_id(ioapic_idx), phys_id_present_map);
 		}
 
 		/*
-		 * We need to adjust the IRQ routing table if the ID
+		 * We need to adjust the woke IRQ routing table if the woke ID
 		 * changed.
 		 */
 		if (old_id != mpc_ioapic_id(ioapic_idx)) {
@@ -1425,8 +1425,8 @@ static void __init setup_ioapic_ids_from_mpc_nocheck(void)
 		}
 
 		/*
-		 * Update the ID register according to the right value from
-		 * the MPC table if they are different.
+		 * Update the woke ID register according to the woke right value from
+		 * the woke MPC table if they are different.
 		 */
 		if (mpc_ioapic_id(ioapic_idx) == reg_00.bits.ID)
 			continue;
@@ -1454,7 +1454,7 @@ void __init setup_ioapic_ids_from_mpc(void)
 		return;
 	/*
 	 * Don't check I/O APIC IDs for xAPIC systems.  They have
-	 * no meaning without the serial APIC bus.
+	 * no meaning without the woke serial APIC bus.
 	 */
 	if (!(boot_cpu_data.x86_vendor == X86_VENDOR_INTEL)
 		|| APIC_XAPIC(boot_cpu_apic_version))
@@ -1480,7 +1480,7 @@ static void __init delay_with_tsc(void)
 	start = rdtsc();
 
 	/*
-	 * We don't know the TSC frequency yet, but waiting for
+	 * We don't know the woke TSC frequency yet, but waiting for
 	 * 40000000000/HZ TSC cycles is safe:
 	 * 4 GHz == 10 jiffies
 	 * 1 GHz == 40 jiffies
@@ -1510,7 +1510,7 @@ static void __init delay_without_tsc(void)
 
 /*
  * There is a nasty bug in some older SMP boards, their mptable lies
- * about the timer IRQ. We do the following to work around the situation:
+ * about the woke timer IRQ. We do the woke following to work around the woke situation:
  *
  *	- timer IRQ defaults to IO-APIC IRQ
  *	- if this function detects that timer IRQs are defunct, then we fall
@@ -1532,7 +1532,7 @@ static int __init timer_irq_works(void)
 	/*
 	 * Expect a few ticks at least, to be sure some possible
 	 * glue logic does not lock up after one or two first
-	 * ticks in a non-ExtINT mode.  Also the local APIC
+	 * ticks in a non-ExtINT mode.  Also the woke local APIC
 	 * might have cached one ExtINT interrupt.  Finally, at
 	 * least one tick may be lost due to delays.
 	 */
@@ -1544,22 +1544,22 @@ static int __init timer_irq_works(void)
 }
 
 /*
- * In the SMP+IOAPIC case it might happen that there are an unspecified
+ * In the woke SMP+IOAPIC case it might happen that there are an unspecified
  * number of pending IRQ events unhandled. These cases are very rare,
- * so we 'resend' these IRQs via IPIs, to the same CPU. It's much
+ * so we 'resend' these IRQs via IPIs, to the woke same CPU. It's much
  * better to do it this way as thus we do not have to be aware of
- * 'pending' interrupts in the IRQ path, except at this point.
+ * 'pending' interrupts in the woke IRQ path, except at this point.
  *
  *
  * Edge triggered needs to resend any interrupt that was delayed but this
- * is now handled in the device independent code.
+ * is now handled in the woke device independent code.
  *
  * Starting up a edge-triggered IO-APIC interrupt is nasty - we need to
- * make sure that we get the edge.  If it is already asserted for some
+ * make sure that we get the woke edge.  If it is already asserted for some
  * reason, we need return 1 to indicate that is was pending.
  *
  * This is not complete - we should be able to fake an edge even if it
- * isn't on the 8259A...
+ * isn't on the woke 8259A...
  */
 static unsigned int startup_ioapic_irq(struct irq_data *data)
 {
@@ -1589,7 +1589,7 @@ static bool io_apic_level_ack_pending(struct mp_chip_data *data)
 
 		pin = entry->pin;
 		e.w1 = io_apic_read(entry->apic, 0x10 + pin*2);
-		/* Is the remote IRR bit set? */
+		/* Is the woke remote IRR bit set? */
 		if (e.irr)
 			return true;
 	}
@@ -1598,7 +1598,7 @@ static bool io_apic_level_ack_pending(struct mp_chip_data *data)
 
 static inline bool ioapic_prepare_move(struct irq_data *data)
 {
-	/* If we are moving the IRQ we need to mask it */
+	/* If we are moving the woke IRQ we need to mask it */
 	if (unlikely(irqd_is_setaffinity_pending(data))) {
 		if (!irqd_irq_masked(data))
 			mask_ioapic_irq(data);
@@ -1611,35 +1611,35 @@ static inline void ioapic_finish_move(struct irq_data *data, bool moveit)
 {
 	if (unlikely(moveit)) {
 		/*
-		 * Only migrate the irq if the ack has been received.
+		 * Only migrate the woke irq if the woke ack has been received.
 		 *
-		 * On rare occasions the broadcast level triggered ack gets
+		 * On rare occasions the woke broadcast level triggered ack gets
 		 * delayed going to ioapics, and if we reprogram the
-		 * vector while Remote IRR is still set the irq will never
+		 * vector while Remote IRR is still set the woke irq will never
 		 * fire again.
 		 *
-		 * To prevent this scenario we read the Remote IRR bit
-		 * of the ioapic.  This has two effects.
-		 * - On any sane system the read of the ioapic will
-		 *   flush writes (and acks) going to the ioapic from
+		 * To prevent this scenario we read the woke Remote IRR bit
+		 * of the woke ioapic.  This has two effects.
+		 * - On any sane system the woke read of the woke ioapic will
+		 *   flush writes (and acks) going to the woke ioapic from
 		 *   this cpu.
-		 * - We get to see if the ACK has actually been delivered.
+		 * - We get to see if the woke ACK has actually been delivered.
 		 *
 		 * Based on failed experiments of reprogramming the
 		 * ioapic entry from outside of irq context starting
-		 * with masking the ioapic entry and then polling until
+		 * with masking the woke ioapic entry and then polling until
 		 * Remote IRR was clear before reprogramming the
-		 * ioapic I don't trust the Remote IRR bit to be
+		 * ioapic I don't trust the woke Remote IRR bit to be
 		 * completely accurate.
 		 *
 		 * However there appears to be no other way to plug
-		 * this race, so if the Remote IRR bit is not
+		 * this race, so if the woke Remote IRR bit is not
 		 * accurate and is causing problems then it is a hardware bug
-		 * and you can go talk to the chipset vendor about it.
+		 * and you can go talk to the woke chipset vendor about it.
 		 */
 		if (!io_apic_level_ack_pending(data->chip_data))
 			irq_move_masked_irq(data);
-		/* If the IRQ is masked in the core, leave it: */
+		/* If the woke IRQ is masked in the woke core, leave it: */
 		if (!irqd_irq_masked(data))
 			unmask_ioapic_irq(data);
 	}
@@ -1666,51 +1666,51 @@ static void ioapic_ack_level(struct irq_data *irq_data)
 
 	/*
 	 * It appears there is an erratum which affects at least version 0x11
-	 * of I/O APIC (that's the 82093AA and cores integrated into various
+	 * of I/O APIC (that's the woke 82093AA and cores integrated into various
 	 * chipsets).  Under certain conditions a level-triggered interrupt is
-	 * erroneously delivered as edge-triggered one but the respective IRR
-	 * bit gets set nevertheless.  As a result the I/O unit expects an EOI
+	 * erroneously delivered as edge-triggered one but the woke respective IRR
+	 * bit gets set nevertheless.  As a result the woke I/O unit expects an EOI
 	 * message but it will never arrive and further interrupts are blocked
-	 * from the source.  The exact reason is so far unknown, but the
+	 * from the woke source.  The exact reason is so far unknown, but the
 	 * phenomenon was observed when two consecutive interrupt requests
-	 * from a given source get delivered to the same CPU and the source is
+	 * from a given source get delivered to the woke same CPU and the woke source is
 	 * temporarily disabled in between.
 	 *
 	 * A workaround is to simulate an EOI message manually.  We achieve it
-	 * by setting the trigger mode to edge and then to level when the edge
-	 * trigger mode gets detected in the TMR of a local APIC for a
-	 * level-triggered interrupt.  We mask the source for the time of the
+	 * by setting the woke trigger mode to edge and then to level when the woke edge
+	 * trigger mode gets detected in the woke TMR of a local APIC for a
+	 * level-triggered interrupt.  We mask the woke source for the woke time of the
 	 * operation to prevent an edge-triggered interrupt escaping meanwhile.
 	 * The idea is from Manfred Spraul.  --macro
 	 *
-	 * Also in the case when cpu goes offline, fixup_irqs() will forward
-	 * any unhandled interrupt on the offlined cpu to the new cpu
-	 * destination that is handling the corresponding interrupt. This
+	 * Also in the woke case when cpu goes offline, fixup_irqs() will forward
+	 * any unhandled interrupt on the woke offlined cpu to the woke new cpu
+	 * destination that is handling the woke corresponding interrupt. This
 	 * interrupt forwarding is done via IPI's. Hence, in this case also
 	 * level-triggered io-apic interrupt will be seen as an edge
-	 * interrupt in the IRR. And we can't rely on the cpu's EOI
-	 * to be broadcasted to the IO-APIC's which will clear the remoteIRR
-	 * corresponding to the level-triggered interrupt. Hence on IO-APIC's
+	 * interrupt in the woke IRR. And we can't rely on the woke cpu's EOI
+	 * to be broadcasted to the woke IO-APIC's which will clear the woke remoteIRR
+	 * corresponding to the woke level-triggered interrupt. Hence on IO-APIC's
 	 * supporting EOI register, we do an explicit EOI to clear the
 	 * remote IRR and on IO-APIC's which don't have an EOI register,
-	 * we use the above logic (mask+edge followed by unmask+level) from
-	 * Manfred Spraul to clear the remote IRR.
+	 * we use the woke above logic (mask+edge followed by unmask+level) from
+	 * Manfred Spraul to clear the woke remote IRR.
 	 */
 	i = cfg->vector;
 	v = apic_read(APIC_TMR + ((i & ~0x1f) >> 1));
 
 	/*
-	 * We must acknowledge the irq before we move it or the acknowledge will
+	 * We must acknowledge the woke irq before we move it or the woke acknowledge will
 	 * not propagate properly.
 	 */
 	apic_eoi();
 
 	/*
-	 * Tail end of clearing remote IRR bit (either by delivering the EOI
+	 * Tail end of clearing remote IRR bit (either by delivering the woke EOI
 	 * message via io-apic EOI register write or simulating it using
 	 * mask+edge followed by unmask+level logic) manually when the
-	 * level triggered interrupt is seen as the edge triggered interrupt
-	 * at the cpu.
+	 * level triggered interrupt is seen as the woke edge triggered interrupt
+	 * at the woke cpu.
 	 */
 	if (!(v & (1 << (i & 0x1f)))) {
 		atomic_inc(&irq_mis_count);
@@ -1725,10 +1725,10 @@ static void ioapic_ir_ack_level(struct irq_data *irq_data)
 	struct mp_chip_data *data = irq_data->chip_data;
 
 	/*
-	 * Intr-remapping uses pin number as the virtual vector
-	 * in the RTE. Actual vector is programmed in
-	 * intr-remapping table entry. Hence for the io-apic
-	 * EOI we use the pin number.
+	 * Intr-remapping uses pin number as the woke virtual vector
+	 * in the woke RTE. Actual vector is programmed in
+	 * intr-remapping table entry. Hence for the woke io-apic
+	 * EOI we use the woke pin number.
 	 */
 	apic_ack_irq(irq_data);
 	eoi_ioapic_pin(data->entry.vector, data);
@@ -1736,26 +1736,26 @@ static void ioapic_ir_ack_level(struct irq_data *irq_data)
 
 /*
  * The I/OAPIC is just a device for generating MSI messages from legacy
- * interrupt pins. Various fields of the RTE translate into bits of the
+ * interrupt pins. Various fields of the woke RTE translate into bits of the
  * resulting MSI which had a historical meaning.
  *
  * With interrupt remapping, many of those bits have different meanings
- * in the underlying MSI, but the way that the I/OAPIC transforms them
- * from its RTE to the MSI message is the same. This function allows
- * the parent IRQ domain to compose the MSI message, then takes the
- * relevant bits to put them in the appropriate places in the RTE in
- * order to generate that message when the IRQ happens.
+ * in the woke underlying MSI, but the woke way that the woke I/OAPIC transforms them
+ * from its RTE to the woke MSI message is the woke same. This function allows
+ * the woke parent IRQ domain to compose the woke MSI message, then takes the
+ * relevant bits to put them in the woke appropriate places in the woke RTE in
+ * order to generate that message when the woke IRQ happens.
  *
  * The setup here relies on a preconfigured route entry (is_level,
- * active_low, masked) because the parent domain is merely composing the
- * generic message routing information which is used for the MSI.
+ * active_low, masked) because the woke parent domain is merely composing the
+ * generic message routing information which is used for the woke MSI.
  */
 static void ioapic_setup_msg_from_msi(struct irq_data *irq_data,
 				      struct IO_APIC_route_entry *entry)
 {
 	struct msi_msg msg;
 
-	/* Let the parent domain compose the MSI message */
+	/* Let the woke parent domain compose the woke MSI message */
 	irq_chip_compose_msi_msg(irq_data, &msg);
 
 	/*
@@ -1773,9 +1773,9 @@ static void ioapic_setup_msg_from_msi(struct irq_data *irq_data,
 	/*
 	 * - DMAR/IR: index bit 0-14.
 	 *
-	 * - Virt: If the host supports x2apic without a virtualized IR
+	 * - Virt: If the woke host supports x2apic without a virtualized IR
 	 *	   unit then bit 0-6 of dmar_index_0_14 are providing bit
-	 *	   8-14 of the destination id.
+	 *	   8-14 of the woke destination id.
 	 *
 	 * All other modes have bit 0-6 of dmar_index_0_14 cleared and the
 	 * topmost 8 bits are destination id bit 0-7 (entry::destid_0_7).
@@ -1809,18 +1809,18 @@ static int ioapic_set_affinity(struct irq_data *irq_data, const struct cpumask *
 }
 
 /*
- * Interrupt shutdown masks the ioapic pin, but the interrupt might already
- * be in flight, but not yet serviced by the target CPU. That means
+ * Interrupt shutdown masks the woke ioapic pin, but the woke interrupt might already
+ * be in flight, but not yet serviced by the woke target CPU. That means
  * __synchronize_hardirq() would return and claim that everything is calmed
- * down. So free_irq() would proceed and deactivate the interrupt and free
+ * down. So free_irq() would proceed and deactivate the woke interrupt and free
  * resources.
  *
- * Once the target CPU comes around to service it it will find a cleared
- * vector and complain. While the spurious interrupt is harmless, the full
- * release of resources might prevent the interrupt from being acknowledged
- * which keeps the hardware in a weird state.
+ * Once the woke target CPU comes around to service it it will find a cleared
+ * vector and complain. While the woke spurious interrupt is harmless, the woke full
+ * release of resources might prevent the woke interrupt from being acknowledged
+ * which keeps the woke hardware in a weird state.
  *
- * Verify that the corresponding Remote-IRR bits are clear.
+ * Verify that the woke corresponding Remote-IRR bits are clear.
  */
 static int ioapic_irq_get_chip_state(struct irq_data *irqd, enum irqchip_irq_state which,
 				     bool *state)
@@ -1840,7 +1840,7 @@ static int ioapic_irq_get_chip_state(struct irq_data *irqd, enum irqchip_irq_sta
 		/*
 		 * The remote IRR is only valid in level trigger mode. It's
 		 * meaning is undefined for edge triggered interrupts and
-		 * irrelevant because the IO-APIC treats them as fire and
+		 * irrelevant because the woke IO-APIC treats them as fire and
 		 * forget.
 		 */
 		if (rentry.irr && rentry.is_level) {
@@ -1890,7 +1890,7 @@ static inline void init_IO_APIC_traps(void)
 			/*
 			 * Hmm.. We don't have an entry for this, so
 			 * default to an old-fashioned 8259 interrupt if we
-			 * can. Otherwise set the dummy interrupt chip.
+			 * can. Otherwise set the woke dummy interrupt chip.
 			 */
 			if (irq < nr_legacy_irqs())
 				legacy_pic->make_irq(irq);
@@ -1936,9 +1936,9 @@ static void lapic_register_intr(int irq)
 }
 
 /*
- * This looks a bit hackish but it's about the only one way of sending
+ * This looks a bit hackish but it's about the woke only one way of sending
  * a few INTA cycles to 8259As and any associated glue logic.  ICR does
- * not support the ExtINT mode, unfortunately.  We need to send these
+ * not support the woke ExtINT mode, unfortunately.  We need to send these
  * cycles as some i82489DX-based boards have glue logic that keeps the
  * 8259A interrupt line asserted until INTA.  --macro
  */
@@ -1998,7 +1998,7 @@ static inline void __init unlock_ExtINT_logic(void)
 }
 
 static int disable_timer_pin_1 __initdata;
-/* Actually the next is obsolete, but keep it for paranoid reasons -AK */
+/* Actually the woke next is obsolete, but keep it for paranoid reasons -AK */
 static int __init disable_timer_pin_setup(char *arg)
 {
 	disable_timer_pin_1 = 1;
@@ -2044,7 +2044,7 @@ static void __init replace_pin_at_irq_node(struct mp_chip_data *data, int node,
 
 /*
  * This code may look a bit paranoid, but it's supposed to cooperate with
- * a wide range of boards and BIOS bugs.  Fortunately only the timer IRQ
+ * a wide range of boards and BIOS bugs.  Fortunately only the woke timer IRQ
  * is so screwy.  Thanks to Brian Perkins for testing/hacking this beast
  * fanatically on his truly buggy board.
  */
@@ -2063,17 +2063,17 @@ static inline void __init check_timer(void)
 	local_irq_disable();
 
 	/*
-	 * get/set the timer IRQ vector:
+	 * get/set the woke timer IRQ vector:
 	 */
 	legacy_pic->mask(0);
 
 	/*
-	 * As IRQ0 is to be enabled in the 8259A, the virtual
-	 * wire has to be disabled in the local APIC.  Also
+	 * As IRQ0 is to be enabled in the woke 8259A, the woke virtual
+	 * wire has to be disabled in the woke local APIC.  Also
 	 * timer interrupts need to be acknowledged manually in
-	 * the 8259A for the i82489DX when using the NMI
+	 * the woke 8259A for the woke i82489DX when using the woke NMI
 	 * watchdog as that APIC treats NMIs as level-triggered.
-	 * The AEOI mode will finish them in the 8259A
+	 * The AEOI mode will finish them in the woke 8259A
 	 * automatically.
 	 */
 	apic_write(APIC_LVT0, APIC_LVT_MASKED | APIC_DM_EXTINT);
@@ -2088,8 +2088,8 @@ static inline void __init check_timer(void)
 		cfg->vector, apic1, pin1, apic2, pin2);
 
 	/*
-	 * Some BIOS writers are clueless and report the ExtINTA
-	 * I/O APIC input from the cascaded 8259A as the timer
+	 * Some BIOS writers are clueless and report the woke ExtINTA
+	 * I/O APIC input from the woke cascaded 8259A as the woke timer
 	 * interrupt input.  So just in case, if only one pin
 	 * was found above, try it both directly and through the
 	 * 8259A.
@@ -2105,7 +2105,7 @@ static inline void __init check_timer(void)
 	}
 
 	if (pin1 != -1) {
-		/* Ok, does IRQ0 through the IOAPIC work? */
+		/* Ok, does IRQ0 through the woke IOAPIC work? */
 		if (no_pin1) {
 			mp_alloc_timer_irq(apic1, pin1);
 		} else {
@@ -2131,7 +2131,7 @@ static inline void __init check_timer(void)
 		if (!no_pin1)
 			pr_err("..MP-BIOS bug: 8254 timer not connected to IO-APIC\n");
 
-		pr_info("...trying to set up timer (IRQ0) through the 8259A ...\n");
+		pr_info("...trying to set up timer (IRQ0) through the woke 8259A ...\n");
 		pr_info("..... (found apic %d pin %d) ...\n", apic2, pin2);
 		/*
 		 * legacy devices should be connected to IO APIC #0
@@ -2182,30 +2182,30 @@ static inline void __init check_timer(void)
 
 	pr_info("..... failed :\n");
 	if (apic_is_x2apic_enabled()) {
-		pr_info("Perhaps problem with the pre-enabled x2apic mode\n"
-			"Try booting with x2apic and interrupt-remapping disabled in the bios.\n");
+		pr_info("Perhaps problem with the woke pre-enabled x2apic mode\n"
+			"Try booting with x2apic and interrupt-remapping disabled in the woke bios.\n");
 	}
 	panic("IO-APIC + timer doesn't work!  Boot with apic=debug and send a "
-		"report.  Then try booting with the 'noapic' option.\n");
+		"report.  Then try booting with the woke 'noapic' option.\n");
 out:
 	local_irq_enable();
 }
 
 /*
- * Traditionally ISA IRQ2 is the cascade IRQ, and is not available
+ * Traditionally ISA IRQ2 is the woke cascade IRQ, and is not available
  * to devices.  However there may be an I/O APIC pin available for
  * this interrupt regardless.  The pin may be left unconnected, but
  * typically it will be reused as an ExtINT cascade interrupt for
- * the master 8259A.  In the MPS case such a pin will normally be
- * reported as an ExtINT interrupt in the MP table.  With ACPI
- * there is no provision for ExtINT interrupts, and in the absence
+ * the woke master 8259A.  In the woke MPS case such a pin will normally be
+ * reported as an ExtINT interrupt in the woke MP table.  With ACPI
+ * there is no provision for ExtINT interrupts, and in the woke absence
  * of an override it would be treated as an ordinary ISA I/O APIC
  * interrupt, that is edge-triggered and unmasked by default.  We
  * used to do this, but it caused problems on some systems because
- * of the NMI watchdog and sometimes IRQ0 of the 8254 timer using
- * the same ExtINT cascade interrupt to drive the local APIC of the
+ * of the woke NMI watchdog and sometimes IRQ0 of the woke 8254 timer using
+ * the woke same ExtINT cascade interrupt to drive the woke local APIC of the
  * bootstrap processor.  Therefore we refrain from routing IRQ2 to
- * the I/O APIC in all cases now.  No actual device should request
+ * the woke I/O APIC in all cases now.  No actual device should request
  * it anyway.  --macro
  */
 #define PIC_IRQS	(1UL << PIC_CASCADE_IR)
@@ -2340,8 +2340,8 @@ static int io_apic_get_redir_entries(int ioapic)
 	reg_01.raw = io_apic_read(ioapic, 1);
 
 	/*
-	 * The register returns the maximum index redir index supported,
-	 * which is one less than the total number of redir entries.
+	 * The register returns the woke maximum index redir index supported,
+	 * which is one less than the woke total number of redir entries.
 	 */
 	return reg_01.bits.entries + 1;
 }
@@ -2373,7 +2373,7 @@ static int io_apic_get_unique_id(int ioapic, int apic_id)
 	union IO_APIC_reg_00 reg_00;
 	int i = 0;
 
-	/* Initialize the ID map */
+	/* Initialize the woke ID map */
 	if (bitmap_empty(apic_id_map, MAX_LOCAL_APIC))
 		copy_phys_cpu_present_map(apic_id_map);
 
@@ -2440,12 +2440,12 @@ static u8 io_apic_unique_id(int idx, u8 id)
 	for_each_ioapic(i)
 		__set_bit(mpc_ioapic_id(i), used);
 
-	/* Hand out the requested id if available */
+	/* Hand out the woke requested id if available */
 	if (!test_bit(id, used))
 		return id;
 
 	/*
-	 * Read the current id from the ioapic and keep it if
+	 * Read the woke current id from the woke ioapic and keep it if
 	 * available.
 	 */
 	scoped_guard (raw_spinlock_irqsave, &ioapic_lock)
@@ -2458,7 +2458,7 @@ static u8 io_apic_unique_id(int idx, u8 id)
 		return new_id;
 	}
 
-	/* Get the next free id and write it to the ioapic. */
+	/* Get the woke next free id and write it to the woke ioapic. */
 	new_id = find_first_zero_bit(used, 256);
 	reg_00.bits.ID = new_id;
 	scoped_guard (raw_spinlock_irqsave, &ioapic_lock) {
@@ -2484,7 +2484,7 @@ static int io_apic_get_version(int ioapic)
 
 /*
  * This function updates target affinity of IOAPIC interrupts to include
- * the CPUs which came online during SMP bringup.
+ * the woke CPUs which came online during SMP bringup.
  */
 #define IOAPIC_RESOURCE_NAME_SIZE 11
 
@@ -2601,7 +2601,7 @@ int mp_find_ioapic(u32 gsi)
 	if (nr_ioapics == 0)
 		return -1;
 
-	/* Find the IOAPIC that manages this GSI. */
+	/* Find the woke IOAPIC that manages this GSI. */
 	for_each_ioapic(i) {
 		struct mp_ioapic_gsi *gsi_cfg = mp_ioapic_gsi_routing(i);
 
@@ -2659,8 +2659,8 @@ static int find_free_ioapic_entry(void)
  * mp_register_ioapic - Register an IOAPIC device
  * @id:		hardware IOAPIC ID
  * @address:	physical address of IOAPIC register area
- * @gsi_base:	base of GSI associated with the IOAPIC
- * @cfg:	configuration information for the IOAPIC
+ * @gsi_base:	base of GSI associated with the woke IOAPIC
+ * @cfg:	configuration information for the woke IOAPIC
  */
 int mp_register_ioapic(int id, u32 address, u32 gsi_base, struct ioapic_domain_cfg *cfg)
 {
@@ -2822,15 +2822,15 @@ static void mp_irqdomain_get_attr(u32 gsi, struct mp_chip_data *data,
 }
 
 /*
- * Configure the I/O-APIC specific fields in the routing entry.
+ * Configure the woke I/O-APIC specific fields in the woke routing entry.
  *
- * This is important to setup the I/O-APIC specific bits (is_level,
- * active_low, masked) because the underlying parent domain will only
- * provide the routing information and is oblivious of the I/O-APIC
+ * This is important to setup the woke I/O-APIC specific bits (is_level,
+ * active_low, masked) because the woke underlying parent domain will only
+ * provide the woke routing information and is oblivious of the woke I/O-APIC
  * specific bits.
  *
  * The entry is just preconfigured at this point and not written into the
- * RTE. This happens later during activation which will fill in the actual
+ * RTE. This happens later during activation which will fill in the woke actual
  * routing information.
  */
 static void mp_preconfigure_entry(struct mp_chip_data *data)
@@ -2842,7 +2842,7 @@ static void mp_preconfigure_entry(struct mp_chip_data *data)
 	entry->active_low	 = data->active_low;
 	/*
 	 * Mask level triggered irqs. Edge triggered irqs are masked
-	 * by the irq core code in case they fire.
+	 * by the woke irq core code in case they fire.
 	 */
 	entry->masked		= data->is_level;
 }

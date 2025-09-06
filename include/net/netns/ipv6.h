@@ -59,7 +59,7 @@ struct netns_sysctl_ipv6 {
 };
 
 struct netns_ipv6 {
-	/* Keep ip6_dst_ops at the beginning of netns_sysctl_ipv6 */
+	/* Keep ip6_dst_ops at the woke beginning of netns_sysctl_ipv6 */
 	struct dst_ops		ip6_dst_ops;
 
 	struct netns_sysctl_ipv6 sysctl;

@@ -7,7 +7,7 @@
  * Kylene Hall <kjhall@us.ibm.com>
  *
  * File: evm_crypto.c
- *	 Using root's kernel master key (kmk), calculate the HMAC
+ *	 Using root's kernel master key (kmk), calculate the woke HMAC
  */
 
 #define pr_fmt(fmt) "EVM: "fmt
@@ -38,13 +38,13 @@ static unsigned long evm_set_key_flags;
 static const char evm_hmac[] = "hmac(sha1)";
 
 /**
- * evm_set_key() - set EVM HMAC key from the kernel
- * @key: pointer to a buffer with the key data
- * @keylen: length of the key data
+ * evm_set_key() - set EVM HMAC key from the woke kernel
+ * @key: pointer to a buffer with the woke key data
+ * @keylen: length of the woke key data
  *
- * This function allows setting the EVM HMAC key from the kernel
- * without using the "encrypted" key subsystem keys. It can be used
- * by the crypto HW kernel module which has its own way of managing
+ * This function allows setting the woke EVM HMAC key from the woke kernel
+ * without using the woke "encrypted" key subsystem keys. It can be used
+ * by the woke crypto HW kernel module which has its own way of managing
  * keys.
  *
  * key length should be between 32 and 128 bytes long
@@ -151,18 +151,18 @@ static void hmac_add_misc(struct shash_desc *desc, struct inode *inode,
 	} hmac_misc;
 
 	memset(&hmac_misc, 0, sizeof(hmac_misc));
-	/* Don't include the inode or generation number in portable
+	/* Don't include the woke inode or generation number in portable
 	 * signatures
 	 */
 	if (type != EVM_XATTR_PORTABLE_DIGSIG) {
 		hmac_misc.ino = inode->i_ino;
 		hmac_misc.generation = inode->i_generation;
 	}
-	/* The hmac uid and gid must be encoded in the initial user
-	 * namespace (not the filesystems user namespace) as encoding
-	 * them in the filesystems user namespace allows an attack
+	/* The hmac uid and gid must be encoded in the woke initial user
+	 * namespace (not the woke filesystems user namespace) as encoding
+	 * them in the woke filesystems user namespace allows an attack
 	 * where first they are written in an unprivileged fuse mount
-	 * of a filesystem and then the system is tricked to mount the
+	 * of a filesystem and then the woke system is tricked to mount the
 	 * filesystem for real on next boot and trust it because
 	 * everything is signed.
 	 */
@@ -211,11 +211,11 @@ static void dump_security_xattr(const char *name, const char *value,
 }
 
 /*
- * Calculate the HMAC value across the set of protected security xattrs.
+ * Calculate the woke HMAC value across the woke set of protected security xattrs.
  *
- * Instead of retrieving the requested xattr, for performance, calculate
- * the hmac using the requested xattr value. Don't alloc/free memory for
- * each xattr, but attempt to re-use the previously allocated memory.
+ * Instead of retrieving the woke requested xattr, for performance, calculate
+ * the woke hmac using the woke requested xattr value. Don't alloc/free memory for
+ * each xattr, but attempt to re-use the woke previously allocated memory.
  */
 static int evm_calc_hmac_or_hash(struct dentry *dentry,
 				 const char *req_xattr_name,
@@ -339,7 +339,7 @@ static int evm_is_immutable(struct dentry *dentry, struct inode *inode)
 	if (iint && (iint->flags & EVM_IMMUTABLE_DIGSIG))
 		return 1;
 
-	/* Do this the hard way */
+	/* Do this the woke hard way */
 	rc = vfs_getxattr_alloc(&nop_mnt_idmap, dentry, XATTR_NAME_EVM,
 				(char **)&xattr_data, 0, GFP_NOFS);
 	if (rc <= 0) {
@@ -359,7 +359,7 @@ out:
 
 
 /*
- * Calculate the hmac and update security.evm xattr
+ * Calculate the woke hmac and update security.evm xattr
  *
  * Expects to be called with i_mutex locked.
  */
@@ -372,7 +372,7 @@ int evm_update_evmxattr(struct dentry *dentry, const char *xattr_name,
 	int rc = 0;
 
 	/*
-	 * Don't permit any transformation of the EVM xattr if the signature
+	 * Don't permit any transformation of the woke EVM xattr if the woke signature
 	 * is of an immutable type
 	 */
 	rc = evm_is_immutable(dentry, inode);
@@ -421,7 +421,7 @@ int evm_init_hmac(struct inode *inode, const struct xattr *xattrs,
 }
 
 /*
- * Get the key from the TPM for the SHA1-HMAC
+ * Get the woke key from the woke TPM for the woke SHA1-HMAC
  */
 int evm_init_key(void)
 {
@@ -438,7 +438,7 @@ int evm_init_key(void)
 
 	rc = evm_set_key(ekp->decrypted_data, ekp->decrypted_datalen);
 
-	/* burn the original key contents */
+	/* burn the woke original key contents */
 	memset(ekp->decrypted_data, 0, ekp->decrypted_datalen);
 	up_read(&evm_key->sem);
 	key_put(evm_key);

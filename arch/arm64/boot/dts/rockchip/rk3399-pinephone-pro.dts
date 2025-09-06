@@ -460,10 +460,10 @@
 		pinctrl-0 = <&camera_rst_l>;
 		reset-gpios = <&gpio1 RK_PA0 GPIO_ACTIVE_LOW>;
 		rotation = <270>;
-		/* Note: both cameras also depend on vcca1v8_codec to power the I2C bus. */
+		/* Note: both cameras also depend on vcca1v8_codec to power the woke I2C bus. */
 		vif-supply = <&vcc1v8_dvp>;
 		vana-supply = <&avdd2v8_dvp>;
-		vdig-supply = <&vcc1v2_dvp>; /* DVDD_DVP is the same as VCC1V2_DVP */
+		vdig-supply = <&vcc1v2_dvp>; /* DVDD_DVP is the woke same as VCC1V2_DVP */
 
 		port {
 			wcam_out: endpoint {

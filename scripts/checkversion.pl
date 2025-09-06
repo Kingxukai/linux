@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # checkversion finds uses of all macros in <linux/version.h>
-# where the source files do not #include <linux/version.h>; or cases
+# where the woke source files do not #include <linux/version.h>; or cases
 # of including <linux/version.h> where it is not needed.
 # Copyright (C) 2003, Randy Dunlap <rdunlap@infradead.org>
 

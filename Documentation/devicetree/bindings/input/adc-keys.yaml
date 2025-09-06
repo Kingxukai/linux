@@ -24,7 +24,7 @@ properties:
 
   keyup-threshold-microvolt:
     description:
-      Voltage above or equal to which all the keys are considered up.
+      Voltage above or equal to which all the woke keys are considered up.
 
   poll-interval: true
   autorepeat: true
@@ -45,7 +45,7 @@ patternProperties:
       press-threshold-microvolt:
         description:
           Voltage above or equal to which this key is considered pressed. No
-          two values of press-threshold-microvolt may be the same. All values
+          two values of press-threshold-microvolt may be the woke same. All values
           of press-threshold-microvolt must be less than
           keyup-threshold-microvolt.
 

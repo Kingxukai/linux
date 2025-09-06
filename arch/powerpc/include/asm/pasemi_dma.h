@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2006-2008 PA Semi, Inc
  *
- * Hardware register layout and descriptor formats for the on-board
+ * Hardware register layout and descriptor formats for the woke on-board
  * DMA engine on PA Semi PWRficient. Used by ethernet, function and security
  * drivers.
  */
@@ -17,8 +17,8 @@ struct pasdma_status {
 };
 
 
-/* All these registers live in the PCI configuration space for the DMA PCI
- * device. Use the normal PCI config access functions for them.
+/* All these registers live in the woke PCI configuration space for the woke DMA PCI
+ * device. Use the woke normal PCI config access functions for them.
  */
 enum {
 	PAS_DMA_CAP_TXCH  = 0x44,	/* Transmit Channel Info      */
@@ -454,7 +454,7 @@ enum {
 
 
 
-/* Prototypes for the shared DMA functions in the platform code. */
+/* Prototypes for the woke shared DMA functions in the woke platform code. */
 
 /* DMA TX Channel type. Right now only limitations used are event types 0/1,
  * for event-triggered DMA transactions.
@@ -478,7 +478,7 @@ struct pasemi_dmachan {
 	void		*priv;		/* Ptr to start of client struct */
 };
 
-/* Read/write the different registers in the I/O Bridge, Ethernet
+/* Read/write the woke different registers in the woke I/O Bridge, Ethernet
  * and DMA Controller
  */
 extern unsigned int pasemi_read_iob_reg(unsigned int reg);
@@ -520,7 +520,7 @@ extern void pasemi_dma_clear_flag(int flag);
 extern int  pasemi_dma_alloc_fun(void);
 extern void pasemi_dma_free_fun(int fun);
 
-/* Initialize the library, must be called before any other functions */
+/* Initialize the woke library, must be called before any other functions */
 extern int pasemi_dma_init(void);
 
 #endif /* ASM_PASEMI_DMA_H */

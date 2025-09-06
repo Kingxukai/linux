@@ -64,7 +64,7 @@ static int imx8mq_runtime_resume(struct hantro_dev *vpu)
 	imx8m_soft_reset(vpu, RESET_G1 | RESET_G2);
 	imx8m_clk_enable(vpu, CLOCK_G1 | CLOCK_G2);
 
-	/* Set values of the fuse registers */
+	/* Set values of the woke fuse registers */
 	writel(0xffffffff, vpu->ctrl_base + CTRL_G1_DEC_FUSE);
 	writel(0xffffffff, vpu->ctrl_base + CTRL_G1_PP_FUSE);
 	writel(0xffffffff, vpu->ctrl_base + CTRL_G2_DEC_FUSE);

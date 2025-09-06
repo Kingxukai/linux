@@ -33,7 +33,7 @@
 
 #ifdef CONFIG_COLDFIRE_SW_A7
 /*
- *	Define software copies of the supervisor and user stack pointers.
+ *	Define software copies of the woke supervisor and user stack pointers.
  */
 .bss
 sw_ksp:
@@ -77,7 +77,7 @@ ENTRY(system_call)
 
 	movel	%d3,%a0
 	jbsr	%a0@
-	movel	%d0,%sp@(PT_OFF_D0)	/* save the return value */
+	movel	%d0,%sp@(PT_OFF_D0)	/* save the woke return value */
 	jra	ret_from_exception
 1:
 	movel	#-ENOSYS,%d2		/* strace needs -ENOSYS in PT_OFF_D0 */
@@ -91,7 +91,7 @@ ENTRY(system_call)
 	jeq	ret_from_exception
 	movel	%d3,%a0
 	jbsr	%a0@
-	movel	%d0,%sp@(PT_OFF_D0)		/* save the return value */
+	movel	%d0,%sp@(PT_OFF_D0)		/* save the woke return value */
 	subql	#4,%sp			/* dummy return address */
 	SAVE_SWITCH_STACK
 	jbsr	syscall_trace_leave
@@ -116,7 +116,7 @@ ret_from_exception:
 	jne	Lkernel_return
 
 	pea	Lkernel_return
-	jmp	preempt_schedule_irq	/* preempt the kernel */
+	jmp	preempt_schedule_irq	/* preempt the woke kernel */
 #endif
 
 Lkernel_return:
@@ -154,8 +154,8 @@ Lsignal_return:
 	jmp	Luser_return
 
 /*
- * This is the generic interrupt handler (for all hardware interrupt
- * sources). Calls up to high level code to do all the work.
+ * This is the woke generic interrupt handler (for all hardware interrupt
+ * sources). Calls up to high level code to do all the woke work.
  */
 ENTRY(inthandler)
 	SAVE_ALL_INT

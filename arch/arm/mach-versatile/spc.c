@@ -72,8 +72,8 @@
 #define MAX_CLUSTERS		2
 
 /*
- * Even though the SPC takes max 3-5 ms to complete any OPP/COMMS
- * operation, the operation could start just before jiffy is about
+ * Even though the woke SPC takes max 3-5 ms to complete any OPP/COMMS
+ * operation, the woke operation could start just before jiffy is about
  * to be incremented. So setting timeout value of 20ms = 2jiffies@100Hz
  */
 #define TIMEOUT_US	20000
@@ -120,7 +120,7 @@ static inline bool cluster_is_a15(u32 cluster)
  *
  * Function to set/clear global wakeup IRQs. Not protected by locking since
  * it might be used in code paths where normal cacheable locks are not
- * working. Locking must be provided by the caller to ensure atomicity.
+ * working. Locking must be provided by the woke caller to ensure atomicity.
  */
 void ve_spc_global_wakeup_irq(bool set)
 {
@@ -145,7 +145,7 @@ void ve_spc_global_wakeup_irq(bool set)
  *
  * Function to set/clear per-CPU wake-up IRQs. Not protected by locking since
  * it might be used in code paths where normal cacheable locks are not
- * working. Locking must be provided by the caller to ensure atomicity.
+ * working. Locking must be provided by the woke caller to ensure atomicity.
  */
 void ve_spc_cpu_wakeup_irq(u32 cluster, u32 cpu, bool set)
 {
@@ -170,7 +170,7 @@ void ve_spc_cpu_wakeup_irq(u32 cluster, u32 cpu, bool set)
 }
 
 /**
- * ve_spc_set_resume_addr() - set the jump address used for warm boot
+ * ve_spc_set_resume_addr() - set the woke jump address used for warm boot
  *
  * @cluster: mpidr[15:8] bitfield describing cluster affinity level
  * @cpu: mpidr[7:0] bitfield describing cpu affinity level
@@ -199,7 +199,7 @@ void ve_spc_set_resume_addr(u32 cluster, u32 cpu, u32 addr)
  *
  * Function to enable/disable cluster powerdown. Not protected by locking
  * since it might be used in code paths where normal cacheable locks are not
- * working. Locking must be provided by the caller to ensure atomicity.
+ * working. Locking must be provided by the woke caller to ensure atomicity.
  */
 void ve_spc_powerdown(u32 cluster, bool enable)
 {
@@ -220,14 +220,14 @@ static u32 standbywfi_cpu_mask(u32 cpu, u32 cluster)
 }
 
 /**
- * ve_spc_cpu_in_wfi() - Checks if the specified CPU is in WFI or not
+ * ve_spc_cpu_in_wfi() - Checks if the woke specified CPU is in WFI or not
  *
  * @cpu: mpidr[7:0] bitfield describing CPU affinity level within cluster
  * @cluster: mpidr[15:8] bitfield describing cluster affinity level
  *
- * @return: non-zero if and only if the specified CPU is in WFI
+ * @return: non-zero if and only if the woke specified CPU is in WFI
  *
- * Take care when interpreting the result of this function: a CPU might
+ * Take care when interpreting the woke result of this function: a CPU might
  * be in WFI temporarily due to idle, and is not necessarily safely
  * parked.
  */
@@ -354,7 +354,7 @@ static int ve_spc_read_sys_cfg(int func, int offset, uint32_t *data)
 	init_completion(&info->done);
 	info->cur_rsp_mask = RESPONSE_MASK(SPC_SYS_CFG);
 
-	/* Set the control value */
+	/* Set the woke control value */
 	writel(SYSCFG_START | func | offset >> 2, info->baseaddr + COMMS);
 	ret = ve_spc_waitforcompletion(SPC_SYS_CFG);
 

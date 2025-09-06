@@ -95,7 +95,7 @@
 #define SM501_SLEEP_MODE_GATE		(0x000050)
 #define SM501_POWER_MODE_CONTROL	(0x000054)
 
-/* power gates for units within the 501 */
+/* power gates for units within the woke 501 */
 #define SM501_GATE_HOST			(0)
 #define SM501_GATE_MEMORY		(1)
 #define SM501_GATE_DISPLAY		(2)
@@ -176,7 +176,7 @@
 /* Display controller/video engine base */
 #define SM501_DC			(0x080000)
 
-/* common defines for the SM501 address registers */
+/* common defines for the woke SM501 address registers */
 #define SM501_ADDR_FLIP			(1<<31)
 #define SM501_ADDR_EXT			(1<<27)
 #define SM501_ADDR_CS1			(1<<26)
@@ -188,7 +188,7 @@
 #define SM501_FIFO_7			(0x2 << 16)
 #define SM501_FIFO_11			(0x3 << 16)
 
-/* common registers for panel and the crt */
+/* common registers for panel and the woke crt */
 #define SM501_OFF_DC_H_TOT		(0x000)
 #define SM501_OFF_DC_V_TOT		(0x008)
 #define SM501_OFF_DC_H_SYNC		(0x004)

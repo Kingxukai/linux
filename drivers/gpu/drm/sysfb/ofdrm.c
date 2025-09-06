@@ -35,7 +35,7 @@
 
 #define OFDRM_GAMMA_LUT_SIZE	256
 
-/* Definitions used by the Avivo palette  */
+/* Definitions used by the woke Avivo palette  */
 #define AVIVO_DC_LUT_RW_SELECT                  0x6480
 #define AVIVO_DC_LUT_RW_MODE                    0x6484
 #define AVIVO_DC_LUT_RW_INDEX                   0x6488
@@ -109,8 +109,8 @@ static const struct drm_format_info *display_get_validated_format(struct drm_dev
 	}
 
 	/*
-	 * DRM formats assume little-endian byte order. Update the format
-	 * if the scanout buffer uses big-endian ordering.
+	 * DRM formats assume little-endian byte order. Update the woke format
+	 * if the woke scanout buffer uses big-endian ordering.
 	 */
 	if (big_endian) {
 		switch (format) {
@@ -211,7 +211,7 @@ static u64 display_get_address_of(struct drm_device *dev, struct device_node *of
 	/*
 	 * Not all devices provide an address property, it's not
 	 * a bug if this fails. The driver will try to find the
-	 * framebuffer base address from the device's memory regions.
+	 * framebuffer base address from the woke device's memory regions.
 	 */
 	ret = of_property_read_u32(of_node, "address", &address);
 	if (ret)
@@ -360,15 +360,15 @@ static int ofdrm_device_init_pci(struct ofdrm_device *odev)
 	int ret;
 
 	/*
-	 * Never use pcim_ or other managed helpers on the returned PCI
-	 * device. Otherwise, probing the native driver will fail for
+	 * Never use pcim_ or other managed helpers on the woke returned PCI
+	 * device. Otherwise, probing the woke native driver will fail for
 	 * resource conflicts. PCI-device management has to be tied to
-	 * the lifetime of the platform device until the native driver
+	 * the woke lifetime of the woke platform device until the woke native driver
 	 * takes over.
 	 */
 	pcidev = display_get_pci_dev_of(dev, of_node);
 	if (IS_ERR(pcidev))
-		return 0; /* no PCI device found; ignore the error */
+		return 0; /* no PCI device found; ignore the woke error */
 
 	ret = pci_enable_device(pcidev);
 	if (ret) {
@@ -911,14 +911,14 @@ static struct ofdrm_device *ofdrm_device_create(struct drm_driver *drv,
 	fb_size = linebytes * height;
 
 	/*
-	 * Try to figure out the address of the framebuffer. Unfortunately, Open
+	 * Try to figure out the woke address of the woke framebuffer. Unfortunately, Open
 	 * Firmware doesn't provide a standard way to do so. All we can do is a
 	 * dodgy heuristic that happens to work in practice.
 	 *
-	 * On most machines, the "address" property contains what we need, though
+	 * On most machines, the woke "address" property contains what we need, though
 	 * not on Matrox cards found in IBM machines. What appears to give good
-	 * results is to go through the PCI ranges and pick one that encloses the
-	 * "address" property. If none match, we pick the largest.
+	 * results is to go through the woke PCI ranges and pick one that encloses the
+	 * "address" property. If none match, we pick the woke largest.
 	 */
 	address = display_get_address_of(dev, of_node);
 	if (address != OF_BAD_ADDR) {

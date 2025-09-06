@@ -4,39 +4,39 @@
 VCPU Dispatch Statistics
 ========================
 
-For Shared Processor LPARs, the POWER Hypervisor maintains a relatively
-static mapping of the LPAR processors (vcpus) to physical processor
-chips (representing the "home" node) and tries to always dispatch vcpus
+For Shared Processor LPARs, the woke POWER Hypervisor maintains a relatively
+static mapping of the woke LPAR processors (vcpus) to physical processor
+chips (representing the woke "home" node) and tries to always dispatch vcpus
 on their associated physical processor chip. However, under certain
 scenarios, vcpus may be dispatched on a different processor chip (away
 from its home node).
 
 /proc/powerpc/vcpudispatch_stats can be used to obtain statistics
-related to the vcpu dispatch behavior. Writing '1' to this file enables
-collecting the statistics, while writing '0' disables the statistics.
-By default, the DTLB log for each vcpu is processed 50 times a second so
+related to the woke vcpu dispatch behavior. Writing '1' to this file enables
+collecting the woke statistics, while writing '0' disables the woke statistics.
+By default, the woke DTLB log for each vcpu is processed 50 times a second so
 as not to miss any entries. This processing frequency can be changed
 through /proc/powerpc/vcpudispatch_stats_freq.
 
-The statistics themselves are available by reading the procfs file
-/proc/powerpc/vcpudispatch_stats. Each line in the output corresponds to
-a vcpu as represented by the first field, followed by 8 numbers.
+The statistics themselves are available by reading the woke procfs file
+/proc/powerpc/vcpudispatch_stats. Each line in the woke output corresponds to
+a vcpu as represented by the woke first field, followed by 8 numbers.
 
 The first number corresponds to:
 
-1. total vcpu dispatches since the beginning of statistics collection
+1. total vcpu dispatches since the woke beginning of statistics collection
 
 The next 4 numbers represent vcpu dispatch dispersions:
 
-2. number of times this vcpu was dispatched on the same processor as last
+2. number of times this vcpu was dispatched on the woke same processor as last
    time
 3. number of times this vcpu was dispatched on a different processor core
-   as last time, but within the same chip
+   as last time, but within the woke same chip
 4. number of times this vcpu was dispatched on a different chip
 5. number of times this vcpu was dispatches on a different socket/drawer
    (next numa boundary)
 
-The final 3 numbers represent statistics in relation to the home node of
+The final 3 numbers represent statistics in relation to the woke home node of
 the vcpu:
 
 6. number of times this vcpu was dispatched in its home node (chip)
@@ -64,12 +64,12 @@ An example output::
     cpu14 2206 1153 1033 20 0 2196 10 0
     cpu15 2163 1115 1032 16 0 2155 8 0
 
-In the output above, for vcpu0, there have been 6839 dispatches since
-statistics were enabled. 4126 of those dispatches were on the same
-physical cpu as the last time. 2683 were on a different core, but within
+In the woke output above, for vcpu0, there have been 6839 dispatches since
+statistics were enabled. 4126 of those dispatches were on the woke same
+physical cpu as the woke last time. 2683 were on a different core, but within
 the same chip, while 30 dispatches were on a different chip compared to
 its last dispatch.
 
-Also, out of the total of 6839 dispatches, we see that there have been
-6821 dispatches on the vcpu's home node, while 18 dispatches were
+Also, out of the woke total of 6839 dispatches, we see that there have been
+6821 dispatches on the woke vcpu's home node, while 18 dispatches were
 outside its home node, on a neighbouring chip.

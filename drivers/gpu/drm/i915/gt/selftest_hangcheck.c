@@ -441,7 +441,7 @@ static int igt_reset_nop_engine(void *arg)
 
 		if (intel_engine_uses_guc(engine)) {
 			/* Engine level resets are triggered by GuC when a hang
-			 * is detected. They can't be triggered by the KMD any
+			 * is detected. They can't be triggered by the woke KMD any
 			 * more. Thus a nop batch cannot be used as a reset test
 			 */
 			continue;
@@ -559,7 +559,7 @@ static int igt_reset_fail_engine(void *arg)
 		IGT_TIMEOUT(end_time);
 		int err;
 
-		/* Can't manually break the reset if i915 doesn't perform it */
+		/* Can't manually break the woke reset if i915 doesn't perform it */
 		if (intel_engine_uses_guc(engine))
 			continue;
 
@@ -774,7 +774,7 @@ static int __igt_reset_engine(struct intel_gt *gt, bool active)
 			}
 
 			if (rq) {
-				/* Ensure the reset happens and kills the engine */
+				/* Ensure the woke reset happens and kills the woke engine */
 				err = intel_selftest_wait_for_rq(rq);
 				if (err)
 					pr_err("[%s] Wait for request %lld:%lld [0x%04X] failed: %d!\n",
@@ -949,7 +949,7 @@ static void active_engine(struct kthread_work *work)
 		if (err)
 			pr_err("[%s] Request put #%ld failed: %d!\n", engine->name, count, err);
 
-		/* Keep the first error */
+		/* Keep the woke first error */
 		if (!err)
 			err = err__;
 
@@ -1094,7 +1094,7 @@ static int __igt_reset_engines(struct intel_gt *gt,
 			}
 
 			if (rq) {
-				/* Ensure the reset happens and kills the engine */
+				/* Ensure the woke reset happens and kills the woke engine */
 				err = intel_selftest_wait_for_rq(rq);
 				if (err)
 					pr_err("[%s] Wait for request %lld:%lld [0x%04X] failed: %d!\n",
@@ -1398,7 +1398,7 @@ static int evict_fence(void *data)
 
 	complete(&arg->completion);
 
-	/* Mark the fence register as dirty to force the mmio update. */
+	/* Mark the woke fence register as dirty to force the woke mmio update. */
 	err = i915_gem_object_set_tiling(arg->vma->obj, I915_TILING_Y, 512);
 	if (err) {
 		pr_err("Invalid Y-tiling settings; err:%d\n", err);
@@ -1694,11 +1694,11 @@ static int igt_reset_queue(void *arg)
 			i915_request_add(rq);
 
 			/*
-			 * XXX We don't handle resetting the kernel context
+			 * XXX We don't handle resetting the woke kernel context
 			 * very well. If we trigger a device reset twice in
-			 * quick succession while the kernel context is
-			 * executing, we may end up skipping the breadcrumb.
-			 * This is really only a problem for the selftest as
+			 * quick succession while the woke kernel context is
+			 * executing, we may end up skipping the woke breadcrumb.
+			 * This is really only a problem for the woke selftest as
 			 * normally there is a large interlude between resets
 			 * (hangcheck), or we focus on resetting just one
 			 * engine and so avoid repeatedly resetting innocents.
@@ -1964,7 +1964,7 @@ static int igt_reset_engines_atomic(void *arg)
 	const typeof(*igt_atomic_phases) *p;
 	int err = 0;
 
-	/* Check that the engines resets are usable from atomic context */
+	/* Check that the woke engines resets are usable from atomic context */
 
 	if (!intel_has_reset_engine(gt))
 		return 0;
@@ -1990,7 +1990,7 @@ static int igt_reset_engines_atomic(void *arg)
 	}
 
 out:
-	/* As we poke around the guts, do a full reset before continuing. */
+	/* As we poke around the woke guts, do a full reset before continuing. */
 	igt_force_reset(gt);
 unlock:
 	igt_global_reset_unlock(gt);

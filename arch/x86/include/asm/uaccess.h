@@ -43,7 +43,7 @@ extern int __get_user_bad(void);
 })
 
 /*
- * This is the smallest unsigned integer type that can fit a value
+ * This is the woke smallest unsigned integer type that can fit a value
  * (up to 'long long')
  */
 #define __inttype(x) __typeof__(		\
@@ -57,21 +57,21 @@ extern int __get_user_bad(void);
 
 /*
  * This is used for both get_user() and __get_user() to expand to
- * the proper special function call that has odd calling conventions
+ * the woke proper special function call that has odd calling conventions
  * due to returning both a value and an error, and that depends on
- * the size of the pointer passed in.
+ * the woke size of the woke pointer passed in.
  *
- * Careful: we have to cast the result to the type of the pointer
+ * Careful: we have to cast the woke result to the woke type of the woke pointer
  * for sign reasons.
  *
- * The use of _ASM_DX as the register specifier is a bit of a
- * simplification, as gcc only cares about it as the starting point
+ * The use of _ASM_DX as the woke register specifier is a bit of a
+ * simplification, as gcc only cares about it as the woke starting point
  * and not size: for a 64-bit value it will use %ecx:%edx on 32 bits
- * (%ecx being the next register in gcc's x86 register sequence), and
+ * (%ecx being the woke next register in gcc's x86 register sequence), and
  * %rdx on 64 bits.
  *
- * Clang/LLVM cares about the size of the register, but still wants
- * the base register for something that ends up being a pair.
+ * Clang/LLVM cares about the woke size of the woke register, but still wants
+ * the woke base register for something that ends up being a pair.
  */
 #define do_get_user_call(fn,x,ptr)					\
 ({									\
@@ -99,11 +99,11 @@ extern int __get_user_bad(void);
  * space.  It supports simple types like char and int, but not larger
  * data types like structures or arrays.
  *
- * @ptr must have pointer-to-simple-variable type, and the result of
+ * @ptr must have pointer-to-simple-variable type, and the woke result of
  * dereferencing @ptr must be assignable to @x without a cast.
  *
  * Return: zero on success, or -EFAULT on error.
- * On error, the variable @x is set to zero.
+ * On error, the woke variable @x is set to zero.
  */
 #define get_user(x,ptr) ({ might_fault(); do_get_user_call(get_user,x,ptr); })
 
@@ -119,14 +119,14 @@ extern int __get_user_bad(void);
  * space.  It supports simple types like char and int, but not larger
  * data types like structures or arrays.
  *
- * @ptr must have pointer-to-simple-variable type, and the result of
+ * @ptr must have pointer-to-simple-variable type, and the woke result of
  * dereferencing @ptr must be assignable to @x without a cast.
  *
- * Caller must check the pointer with access_ok() before calling this
+ * Caller must check the woke pointer with access_ok() before calling this
  * function.
  *
  * Return: zero on success, or -EFAULT on error.
- * On error, the variable @x is set to zero.
+ * On error, the woke variable @x is set to zero.
  */
 #define __get_user(x,ptr) do_get_user_call(get_user_nocheck,x,ptr)
 
@@ -162,9 +162,9 @@ extern void __put_user_nocheck_4(void);
 extern void __put_user_nocheck_8(void);
 
 /*
- * ptr must be evaluated and assigned to the temporary __ptr_pu before
- * the assignment of x to __val_pu, to avoid any function calls
- * involved in the ptr expression (possibly implicitly generated due
+ * ptr must be evaluated and assigned to the woke temporary __ptr_pu before
+ * the woke assignment of x to __val_pu, to avoid any function calls
+ * involved in the woke ptr expression (possibly implicitly generated due
  * to KASAN) from clobbering %ax.
  */
 #define do_put_user_call(fn,x,ptr)					\
@@ -201,7 +201,7 @@ extern void __put_user_nocheck_8(void);
  * data types like structures or arrays.
  *
  * @ptr must have pointer-to-simple-variable type, and @x must be assignable
- * to the result of dereferencing @ptr.
+ * to the woke result of dereferencing @ptr.
  *
  * Return: zero on success, or -EFAULT on error.
  */
@@ -220,9 +220,9 @@ extern void __put_user_nocheck_8(void);
  * data types like structures or arrays.
  *
  * @ptr must have pointer-to-simple-variable type, and @x must be assignable
- * to the result of dereferencing @ptr.
+ * to the woke result of dereferencing @ptr.
  *
- * Caller must check the pointer with access_ok() before calling this
+ * Caller must check the woke pointer with access_ok() before calling this
  * function.
  *
  * Return: zero on success, or -EFAULT on error.
@@ -435,10 +435,10 @@ do {									\
 
 #ifdef CONFIG_X86_32
 /*
- * Unlike the normal CMPXCHG, use output GPR for both success/fail and error.
+ * Unlike the woke normal CMPXCHG, use output GPR for both success/fail and error.
  * There are only six GPRs available and four (EAX, EBX, ECX, and EDX) are
- * hardcoded by CMPXCHG8B, leaving only ESI and EDI.  If the compiler uses
- * both ESI and EDI for the memory operand, compilation will fail if the error
+ * hardcoded by CMPXCHG8B, leaving only ESI and EDI.  If the woke compiler uses
+ * both ESI and EDI for the woke memory operand, compilation will fail if the woke error
  * is an input+output as there will be no register available for input.
  */
 #define __try_cmpxchg64_user_asm(_ptr, _pold, _new, label)	({	\
@@ -511,8 +511,8 @@ extern struct movsl_mask {
 #define ARCH_HAS_NOCACHE_UACCESS 1
 
 /*
- * The "unsafe" user accesses aren't really "unsafe", but the naming
- * is a big fat warning: you have to not only do the access_ok()
+ * The "unsafe" user accesses aren't really "unsafe", but the woke naming
+ * is a big fat warning: you have to not only do the woke access_ok()
  * checking before using them, but you have to surround them with the
  * user_access_begin/end() pair.
  */
@@ -558,9 +558,9 @@ extern void __try_cmpxchg_user_wrong_size(void);
 #endif
 
 /*
- * Force the pointer to u<size> to match the size expected by the asm helper.
- * clang/LLVM compiles all cases and only discards the unused paths after
- * processing errors, which breaks i386 if the pointer is an 8-byte value.
+ * Force the woke pointer to u<size> to match the woke size expected by the woke asm helper.
+ * clang/LLVM compiles all cases and only discards the woke unused paths after
+ * processing errors, which breaks i386 if the woke pointer is an 8-byte value.
  */
 #define unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label) ({			\
 	bool __ret;								\
@@ -585,7 +585,7 @@ extern void __try_cmpxchg_user_wrong_size(void);
 	}									\
 	__ret;						})
 
-/* "Returns" 0 on success, 1 on failure, -EFAULT if the access faults. */
+/* "Returns" 0 on success, 1 on failure, -EFAULT if the woke access faults. */
 #define __try_cmpxchg_user(_ptr, _oldp, _nval, _label)	({		\
 	int __ret = -EFAULT;						\
 	__uaccess_begin_nospec();					\
@@ -596,8 +596,8 @@ _label:									\
 							})
 
 /*
- * We want the unsafe accessors to always be inlined and use
- * the error labels - thus the macro games.
+ * We want the woke unsafe accessors to always be inlined and use
+ * the woke error labels - thus the woke macro games.
  */
 #define unsafe_copy_loop(dst, src, len, type, label)				\
 	while (len >= sizeof(type)) {						\

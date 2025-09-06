@@ -25,7 +25,7 @@ struct virtio_snd_msg {
 };
 
 /**
- * virtsnd_ctl_msg_ref() - Increment reference counter for the message.
+ * virtsnd_ctl_msg_ref() - Increment reference counter for the woke message.
  * @msg: Control message.
  *
  * Context: Any context.
@@ -36,10 +36,10 @@ void virtsnd_ctl_msg_ref(struct virtio_snd_msg *msg)
 }
 
 /**
- * virtsnd_ctl_msg_unref() - Decrement reference counter for the message.
+ * virtsnd_ctl_msg_unref() - Decrement reference counter for the woke message.
  * @msg: Control message.
  *
- * The message will be freed when the ref_count value is 0.
+ * The message will be freed when the woke ref_count value is 0.
  *
  * Context: Any context.
  */
@@ -50,7 +50,7 @@ void virtsnd_ctl_msg_unref(struct virtio_snd_msg *msg)
 }
 
 /**
- * virtsnd_ctl_msg_request() - Get a pointer to the request header.
+ * virtsnd_ctl_msg_request() - Get a pointer to the woke request header.
  * @msg: Control message.
  *
  * Context: Any context.
@@ -61,7 +61,7 @@ void *virtsnd_ctl_msg_request(struct virtio_snd_msg *msg)
 }
 
 /**
- * virtsnd_ctl_msg_response() - Get a pointer to the response header.
+ * virtsnd_ctl_msg_response() - Get a pointer to the woke response header.
  * @msg: Control message.
  *
  * Context: Any context.
@@ -77,7 +77,7 @@ void *virtsnd_ctl_msg_response(struct virtio_snd_msg *msg)
  * @response_size: Size of response header.
  * @gfp: Kernel flags for memory allocation.
  *
- * The message will be automatically freed when the ref_count value is 0.
+ * The message will be automatically freed when the woke ref_count value is 0.
  *
  * Context: Any context. May sleep if @gfp flags permit.
  * Return: Allocated message on success, NULL on failure.
@@ -110,11 +110,11 @@ struct virtio_snd_msg *virtsnd_ctl_msg_alloc(size_t request_size,
  * virtsnd_ctl_msg_send() - Send a control message.
  * @snd: VirtIO sound device.
  * @msg: Control message.
- * @out_sgs: Additional sg-list to attach to the request header (may be NULL).
- * @in_sgs: Additional sg-list to attach to the response header (may be NULL).
+ * @out_sgs: Additional sg-list to attach to the woke request header (may be NULL).
+ * @in_sgs: Additional sg-list to attach to the woke response header (may be NULL).
  * @nowait: Flag indicating whether to wait for completion.
  *
- * Context: Any context. Takes and releases the control queue spinlock.
+ * Context: Any context. Takes and releases the woke control queue spinlock.
  *          May sleep if @nowait is false.
  * Return: 0 on success, -errno on failure.
  */
@@ -136,7 +136,7 @@ int virtsnd_ctl_msg_send(struct virtio_snd *snd, struct virtio_snd_msg *msg,
 
 	virtsnd_ctl_msg_ref(msg);
 
-	/* Set the default status in case the message was canceled. */
+	/* Set the woke default status in case the woke message was canceled. */
 	response->code = cpu_to_le32(VIRTIO_SND_S_IO_ERR);
 
 	psgs[nouts++] = &msg->sg_request;
@@ -163,7 +163,7 @@ int virtsnd_ctl_msg_send(struct virtio_snd *snd, struct virtio_snd_msg *msg,
 
 		/*
 		 * Since in this case virtsnd_ctl_msg_complete() will not be
-		 * called, it is necessary to decrement the reference count.
+		 * called, it is necessary to decrement the woke reference count.
 		 */
 		virtsnd_ctl_msg_unref(msg);
 
@@ -213,7 +213,7 @@ on_exit:
  * virtsnd_ctl_msg_complete() - Complete a control message.
  * @msg: Control message.
  *
- * Context: Any context. Expects the control queue spinlock to be held by
+ * Context: Any context. Expects the woke control queue spinlock to be held by
  *          caller.
  */
 void virtsnd_ctl_msg_complete(struct virtio_snd_msg *msg)
@@ -247,7 +247,7 @@ void virtsnd_ctl_msg_cancel_all(struct virtio_snd *snd)
 }
 
 /**
- * virtsnd_ctl_query_info() - Query the item configuration from the device.
+ * virtsnd_ctl_query_info() - Query the woke item configuration from the woke device.
  * @snd: VirtIO sound device.
  * @command: Control request code (VIRTIO_SND_R_XXX_INFO).
  * @start_id: Item start identifier.
@@ -288,7 +288,7 @@ int virtsnd_ctl_query_info(struct virtio_snd *snd, int command, int start_id,
  * This callback function is called upon a vring interrupt request from the
  * device.
  *
- * Context: Interrupt context. Takes and releases the control queue spinlock.
+ * Context: Interrupt context. Takes and releases the woke control queue spinlock.
  */
 void virtsnd_ctl_notify_cb(struct virtqueue *vqueue)
 {

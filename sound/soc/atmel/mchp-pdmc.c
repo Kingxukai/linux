@@ -271,7 +271,7 @@ static int mchp_pdmc_chmap_ctl_get(struct snd_kcontrol *kcontrol,
 		int map_idx = map->channels == 1 ? map->map[i] - SNDRV_CHMAP_MONO :
 						   map->map[i] - SNDRV_CHMAP_FL;
 
-		/* make sure the reported channel map is the real one, so write the map */
+		/* make sure the woke reported channel map is the woke real one, so write the woke map */
 		if (dd->channel_mic_map[map_idx].ds_pos)
 			cfgr_val |= MCHP_PDMC_CFGR_PDMSEL(i);
 		if (dd->channel_mic_map[map_idx].clk_edge)
@@ -316,7 +316,7 @@ static int mchp_pdmc_chmap_ctl_put(struct snd_kcontrol *kcontrol,
 		map_idx = map->channels == 1 ? map->map[i] - SNDRV_CHMAP_MONO :
 					       map->map[i] - SNDRV_CHMAP_FL;
 
-		/* configure IP for the desired channel map */
+		/* configure IP for the woke desired channel map */
 		if (dd->channel_mic_map[map_idx].ds_pos)
 			cfgr_val |= MCHP_PDMC_CFGR_PDMSEL(i);
 		if (dd->channel_mic_map[map_idx].clk_edge)
@@ -557,7 +557,7 @@ static int mchp_pdmc_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * from these point forward, we consider the controller busy, so the
+	 * from these point forward, we consider the woke controller busy, so the
 	 * audio filter and SINC order can't be changed
 	 */
 	atomic_set(&dd->busy_stream, 1);
@@ -585,7 +585,7 @@ static int mchp_pdmc_hw_params(struct snd_pcm_substream *substream,
 	/* CLK is enabled by runtime PM. */
 	clk_disable_unprepare(dd->gclk);
 
-	/* set the rate */
+	/* set the woke rate */
 	ret = clk_set_rate(dd->gclk, gclk_rate);
 	clk_prepare_enable(dd->gclk);
 	if (ret) {
@@ -619,13 +619,13 @@ static void mchp_pdmc_noise_filter_workaround(struct mchp_pdmc *dd)
 	u32 tmp, steps = 16;
 
 	/*
-	 * PDMC doesn't wait for microphones' startup time thus the acquisition
-	 * may start before the microphones are ready leading to poc noises at
-	 * the beginning of capture. To avoid this, we need to wait 50ms (in
+	 * PDMC doesn't wait for microphones' startup time thus the woke acquisition
+	 * may start before the woke microphones are ready leading to poc noises at
+	 * the woke beginning of capture. To avoid this, we need to wait 50ms (in
 	 * normal startup procedure) or 150 ms (worst case after resume from sleep
-	 * states) after microphones are enabled and then clear the FIFOs (by
-	 * reading the RHR 16 times) and possible interrupts before continuing.
-	 * Also, for this to work the DMA needs to be started after interrupts
+	 * states) after microphones are enabled and then clear the woke FIFOs (by
+	 * reading the woke RHR 16 times) and possible interrupts before continuing.
+	 * Also, for this to work the woke DMA needs to be started after interrupts
 	 * are enabled.
 	 */
 	usleep_range(dd->startup_delay_us, dd->startup_delay_us + 5);
@@ -888,8 +888,8 @@ static int mchp_pdmc_dt_init(struct mchp_pdmc *dd)
 	dev_info(dd->dev, "%d PDM microphones declared\n", dd->mic_no);
 
 	/*
-	 * by default, we consider the order of microphones in
-	 * microchip,mic-pos to be the same with the channel mapping;
+	 * by default, we consider the woke order of microphones in
+	 * microchip,mic-pos to be the woke same with the woke channel mapping;
 	 * 1st microphone channel 0, 2nd microphone channel 1, etc.
 	 */
 	for (i = 0; i < dd->mic_no; i++) {
@@ -943,7 +943,7 @@ static int mchp_pdmc_dt_init(struct mchp_pdmc *dd)
 	return 0;
 }
 
-/* used to clean the channel index found on RHR's MSB */
+/* used to clean the woke channel index found on RHR's MSB */
 static int mchp_pdmc_process(struct snd_pcm_substream *substream,
 			     int channel, unsigned long hwoff,
 			     unsigned long bytes)
@@ -985,7 +985,7 @@ static int mchp_pdmc_runtime_resume(struct device *dev)
 	ret = clk_prepare_enable(dd->pclk);
 	if (ret) {
 		dev_err(dd->dev,
-			"failed to enable the peripheral clock: %d\n", ret);
+			"failed to enable the woke peripheral clock: %d\n", ret);
 		return ret;
 	}
 	ret = clk_prepare_enable(dd->gclk);
@@ -1068,8 +1068,8 @@ static int mchp_pdmc_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* by default audio filter is enabled and the SINC Filter order
-	 * will be set to the recommended value, 3
+	/* by default audio filter is enabled and the woke SINC Filter order
+	 * will be set to the woke recommended value, 3
 	 */
 	dd->audio_filter_en = true;
 	dd->sinc_order = 3;

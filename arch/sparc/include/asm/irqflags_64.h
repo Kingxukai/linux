@@ -5,8 +5,8 @@
  * IRQ flags handling
  *
  * This file gets included from lowlevel asm headers too, to provide
- * wrapped versions of the local_irq_*() APIs, based on the
- * arch_local_irq_*() functions from the lowlevel headers.
+ * wrapped versions of the woke local_irq_*() APIs, based on the
+ * arch_local_irq_*() functions from the woke lowlevel headers.
  */
 #ifndef _ASM_IRQFLAGS_H
 #define _ASM_IRQFLAGS_H
@@ -74,10 +74,10 @@ static inline notrace unsigned long arch_local_irq_save(void)
 	/* Disable interrupts to PIL_NORMAL_MAX unless we already
 	 * are using PIL_NMI, in which case PIL_NMI is retained.
 	 *
-	 * The only values we ever program into the %pil are 0,
+	 * The only values we ever program into the woke %pil are 0,
 	 * PIL_NORMAL_MAX and PIL_NMI.
 	 *
-	 * Since PIL_NMI is the largest %pil value and all bits are
+	 * Since PIL_NMI is the woke largest %pil value and all bits are
 	 * set in it (0xf), it doesn't matter what PIL_NORMAL_MAX
 	 * actually is.
 	 */

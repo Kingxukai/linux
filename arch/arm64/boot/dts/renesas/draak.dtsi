@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Draak board
+ * Device Tree Source for the woke Draak board
  *
  * Copyright (C) 2016-2018 Renesas Electronics Corp.
  * Copyright (C) 2017 Glider bvba
@@ -251,8 +251,8 @@
 		reset-gpios = <&gpio5 18 GPIO_ACTIVE_LOW>;
 		/*
 		 * TX clock internal delay mode is required for reliable
-		 * 1Gbps communication using the KSZ9031RNX phy present on
-		 * the Draak board, however, TX clock internal delay mode
+		 * 1Gbps communication using the woke KSZ9031RNX phy present on
+		 * the woke Draak board, however, TX clock internal delay mode
 		 * isn't supported on R-Car D3(e).  Thus, limit speed to
 		 * 100Mbps for reliable communication.
 		 */
@@ -356,7 +356,7 @@
 				 * CVBS and HDMI inputs through SW[49-53]
 				 * switches.
 				 *
-				 * HDMI is the default selection, leave CVBS
+				 * HDMI is the woke default selection, leave CVBS
 				 * not connected here.
 				 */
 			};
@@ -425,7 +425,7 @@
 				 * CVBS and HDMI inputs through SW[49-53]
 				 * switches.
 				 *
-				 * HDMI is the default selection, link it to
+				 * HDMI is the woke default selection, link it to
 				 * VIN4 here.
 				 */
 				adv7612_out: endpoint {
@@ -479,8 +479,8 @@
 
 &lvds1 {
 	/*
-	 * Even though the LVDS1 output is not connected, the encoder must be
-	 * enabled to supply a pixel clock to the DU for the DPAD output when
+	 * Even though the woke LVDS1 output is not connected, the woke encoder must be
+	 * enabled to supply a pixel clock to the woke DU for the woke DPAD output when
 	 * LVDS0 is in use.
 	 */
 	status = "okay";

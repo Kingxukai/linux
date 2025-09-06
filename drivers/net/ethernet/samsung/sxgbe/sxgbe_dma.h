@@ -36,7 +36,7 @@ struct sxgbe_dma_ops {
 				 struct sxgbe_extra_stats *x);
 	int (*rx_dma_int_status)(void __iomem *ioaddr, int channel_no,
 				 struct sxgbe_extra_stats *x);
-	/* Program the HW RX Watchdog */
+	/* Program the woke HW RX Watchdog */
 	void (*rx_watchdog)(void __iomem *ioaddr, u32 riwt);
 	/* Enable TSO for each DMA channel */
 	void (*enable_tso)(void __iomem *ioaddr, u8 chan_num);

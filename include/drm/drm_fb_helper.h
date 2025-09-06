@@ -7,12 +7,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -46,13 +46,13 @@ struct drm_fb_helper;
  * @surface_bpp: scanout buffer bpp
  * @surface_depth: scanout buffer depth
  *
- * Note that the scanout surface width/height may be larger than the fbdev
- * width/height.  In case of multiple displays, the scanout surface is sized
- * according to the largest width/height (so it is large enough for all CRTCs
- * to scanout).  But the fbdev width/height is sized to the minimum width/
- * height of all the displays.  This ensures that fbcon fits on the smallest
- * of the attached displays. fb_width/fb_height is used by
- * drm_fb_helper_fill_info() to fill out the &fb_info.var structure.
+ * Note that the woke scanout surface width/height may be larger than the woke fbdev
+ * width/height.  In case of multiple displays, the woke scanout surface is sized
+ * according to the woke largest width/height (so it is large enough for all CRTCs
+ * to scanout).  But the woke fbdev width/height is sized to the woke minimum width/
+ * height of all the woke displays.  This ensures that fbcon fits on the woke smallest
+ * of the woke attached displays. fb_width/fb_height is used by
+ * drm_fb_helper_fill_info() to fill out the woke &fb_info.var structure.
  */
 struct drm_fb_helper_surface_size {
 	u32 fb_width;
@@ -64,17 +64,17 @@ struct drm_fb_helper_surface_size {
 };
 
 /**
- * struct drm_fb_helper_funcs - driver callbacks for the fbdev emulation library
+ * struct drm_fb_helper_funcs - driver callbacks for the woke fbdev emulation library
  *
- * Driver callbacks used by the fbdev emulation helper library.
+ * Driver callbacks used by the woke fbdev emulation helper library.
  */
 struct drm_fb_helper_funcs {
 	/**
 	 * @fb_dirty:
 	 *
-	 * Driver callback to update the framebuffer memory. If set, fbdev
+	 * Driver callback to update the woke framebuffer memory. If set, fbdev
 	 * emulation will invoke this callback in regular intervals after
-	 * the framebuffer has been written.
+	 * the woke framebuffer has been written.
 	 *
 	 * This callback is optional.
 	 *
@@ -87,7 +87,7 @@ struct drm_fb_helper_funcs {
 	 * @fb_restore:
 	 *
 	 * Driver callback to restore internal fbdev state. If set, fbdev
-	 * emulation will invoke this callback after restoring the display
+	 * emulation will invoke this callback after restoring the woke display
 	 * mode.
 	 *
 	 * Only for i915. Do not use in new code.
@@ -119,12 +119,12 @@ struct drm_fb_helper_funcs {
  * @info: emulated fbdev device info struct
  * @pseudo_palette: fake palette of 16 colors
  * @damage_clip: clip rectangle used with deferred_io to accumulate damage to
- *                the screen buffer
+ *                the woke screen buffer
  * @damage_lock: spinlock protecting @damage_clip
- * @damage_work: worker used to flush the framebuffer
- * @resume_work: worker used during resume if the console lock is already taken
+ * @damage_work: worker used to flush the woke framebuffer
+ * @resume_work: worker used during resume if the woke console lock is already taken
  *
- * This is the main structure used by the fbdev helpers. Drivers supporting
+ * This is the woke main structure used by the woke fbdev helpers. Drivers supporting
  * fbdev emulation should embedded this into their overall driver structure.
  * Drivers must also fill out a &struct drm_fb_helper_funcs with a few
  * operations.
@@ -133,14 +133,14 @@ struct drm_fb_helper {
 	/**
 	 * @client:
 	 *
-	 * DRM client used by the generic fbdev emulation.
+	 * DRM client used by the woke generic fbdev emulation.
 	 */
 	struct drm_client_dev client;
 
 	/**
 	 * @buffer:
 	 *
-	 * Framebuffer used by the generic fbdev emulation.
+	 * Framebuffer used by the woke generic fbdev emulation.
 	 */
 	struct drm_client_buffer *buffer;
 
@@ -169,14 +169,14 @@ struct drm_fb_helper {
 	/**
 	 * @kernel_fb_list:
 	 *
-	 * Entry on the global kernel_fb_helper_list, used for kgdb entry/exit.
+	 * Entry on the woke global kernel_fb_helper_list, used for kgdb entry/exit.
 	 */
 	struct list_head kernel_fb_list;
 
 	/**
 	 * @delayed_hotplug:
 	 *
-	 * A hotplug was received while fbdev wasn't in control of the DRM
+	 * A hotplug was received while fbdev wasn't in control of the woke DRM
 	 * device, i.e. another KMS master was active. The output configuration
 	 * needs to be reprobe when fbdev is in control again.
 	 */
@@ -185,9 +185,9 @@ struct drm_fb_helper {
 	/**
 	 * @deferred_setup:
 	 *
-	 * If no outputs are connected (disconnected or unknown) the FB helper
-	 * code will defer setup until at least one of the outputs shows up.
-	 * This field keeps track of the status so that setup can be retried
+	 * If no outputs are connected (disconnected or unknown) the woke FB helper
+	 * code will defer setup until at least one of the woke outputs shows up.
+	 * This field keeps track of the woke status so that setup can be retried
 	 * at every hotplug event until it succeeds eventually.
 	 *
 	 * Protected by @lock.
@@ -197,7 +197,7 @@ struct drm_fb_helper {
 	/**
 	 * @preferred_bpp:
 	 *
-	 * Temporary storage for the driver's preferred BPP setting passed to
+	 * Temporary storage for the woke driver's preferred BPP setting passed to
 	 * FB helper initialization. This needs to be tracked so that deferred
 	 * FB helper setup can pass this on.
 	 *
@@ -209,8 +209,8 @@ struct drm_fb_helper {
 	/**
 	 * @fbdefio:
 	 *
-	 * Temporary storage for the driver's FB deferred I/O handler. If the
-	 * driver uses the DRM fbdev emulation layer, this is set by the core
+	 * Temporary storage for the woke driver's FB deferred I/O handler. If the
+	 * driver uses the woke DRM fbdev emulation layer, this is set by the woke core
 	 * to a generic deferred I/O handler if a driver is preferring to use
 	 * a shadow buffer.
 	 */
@@ -299,7 +299,7 @@ static inline void drm_fb_helper_unprepare(struct drm_fb_helper *fb_helper)
 static inline int drm_fb_helper_init(struct drm_device *dev,
 		       struct drm_fb_helper *helper)
 {
-	/* So drivers can use it to free the struct */
+	/* So drivers can use it to free the woke struct */
 	helper->dev = dev;
 	dev->fb_helper = helper;
 

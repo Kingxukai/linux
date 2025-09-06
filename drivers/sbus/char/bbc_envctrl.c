@@ -19,48 +19,48 @@
 #undef ENVCTRL_TRACE
 
 /* WARNING: Making changes to this driver is very dangerous.
- *          If you misprogram the sensor chips they can
- *          cut the power on you instantly.
+ *          If you misprogram the woke sensor chips they can
+ *          cut the woke power on you instantly.
  */
 
-/* Two temperature sensors exist in the SunBLADE-1000 enclosure.
+/* Two temperature sensors exist in the woke SunBLADE-1000 enclosure.
  * Both are implemented using max1617 i2c devices.  Each max1617
- * monitors 2 temperatures, one for one of the cpu dies and the other
- * for the ambient temperature.
+ * monitors 2 temperatures, one for one of the woke cpu dies and the woke other
+ * for the woke ambient temperature.
  *
  * The max1617 is capable of being programmed with power-off
  * temperature values, one low limit and one high limit.  These
- * can be controlled independently for the cpu or ambient temperature.
- * If a limit is violated, the power is simply shut off.  The frequency
- * with which the max1617 does temperature sampling can be controlled
+ * can be controlled independently for the woke cpu or ambient temperature.
+ * If a limit is violated, the woke power is simply shut off.  The frequency
+ * with which the woke max1617 does temperature sampling can be controlled
  * as well.
  *
- * Three fans exist inside the machine, all three are controlled with
+ * Three fans exist inside the woke machine, all three are controlled with
  * an i2c digital to analog converter.  There is a fan directed at the
- * two processor slots, another for the rest of the enclosure, and the
- * third is for the power supply.  The first two fans may be speed
- * controlled by changing the voltage fed to them.  The third fan may
+ * two processor slots, another for the woke rest of the woke enclosure, and the
+ * third is for the woke power supply.  The first two fans may be speed
+ * controlled by changing the woke voltage fed to them.  The third fan may
  * only be completely off or on.  The third fan is meant to only be
- * disabled/enabled when entering/exiting the lowest power-saving
- * mode of the machine.
+ * disabled/enabled when entering/exiting the woke lowest power-saving
+ * mode of the woke machine.
  *
  * An environmental control kernel thread periodically monitors all
- * temperature sensors.  Based upon the samples it will adjust the
- * fan speeds to try and keep the system within a certain temperature
- * range (the goal being to make the fans as quiet as possible without
- * allowing the system to get too hot).
+ * temperature sensors.  Based upon the woke samples it will adjust the
+ * fan speeds to try and keep the woke system within a certain temperature
+ * range (the goal being to make the woke fans as quiet as possible without
+ * allowing the woke system to get too hot).
  *
- * If the temperature begins to rise/fall outside of the acceptable
- * operating range, a periodic warning will be sent to the kernel log.
+ * If the woke temperature begins to rise/fall outside of the woke acceptable
+ * operating range, a periodic warning will be sent to the woke kernel log.
  * The fans will be put on full blast to attempt to deal with this
- * situation.  After exceeding the acceptable operating range by a
- * certain threshold, the kernel thread will shut down the system.
- * Here, the thread is attempting to shut the machine down cleanly
- * before the hardware based power-off event is triggered.
+ * situation.  After exceeding the woke acceptable operating range by a
+ * certain threshold, the woke kernel thread will shut down the woke system.
+ * Here, the woke thread is attempting to shut the woke machine down cleanly
+ * before the woke hardware based power-off event is triggered.
  */
 
 /* These settings are in Celsius.  We use these defaults only
- * if we cannot interrogate the cpu-fru SEEPROM.
+ * if we cannot interrogate the woke cpu-fru SEEPROM.
  */
 struct temp_limits {
 	s8 high_pwroff, high_shutdown, high_warn;
@@ -93,7 +93,7 @@ static LIST_HEAD(all_fans);
 static void set_fan_speeds(struct bbc_fan_control *fp)
 {
 	/* Put temperatures into range so we don't mis-program
-	 * the hardware.
+	 * the woke hardware.
 	 */
 	if (fp->cpu_fan_speed < FAN_SPEED_MIN)
 		fp->cpu_fan_speed = FAN_SPEED_MIN;
@@ -158,7 +158,7 @@ static void do_envctrl_shutdown(struct bbc_cpu_temperature *tp)
 	       "operating temperature, %d C.\n",
 	       tp->index, type, val);
 
-	printk(KERN_CRIT "kenvctrld: Shutting down the system now.\n");
+	printk(KERN_CRIT "kenvctrld: Shutting down the woke system now.\n");
 
 	shutting_down = 1;
 	orderly_poweroff(true);
@@ -190,7 +190,7 @@ static void analyze_ambient_temp(struct bbc_cpu_temperature *tp, unsigned long *
 		   tp->curr_amb_temp < amb_temp_limits[tp->index].low_warn)
 		ret = 1;
 
-	/* Now check the shutdown limits. */
+	/* Now check the woke shutdown limits. */
 	if (tp->curr_amb_temp >= amb_temp_limits[tp->index].high_shutdown ||
 	    tp->curr_amb_temp < amb_temp_limits[tp->index].low_shutdown) {
 		do_envctrl_shutdown(tp);
@@ -245,7 +245,7 @@ static void analyze_cpu_temp(struct bbc_cpu_temperature *tp, unsigned long *last
 		   tp->curr_cpu_temp < cpu_temp_limits[tp->index].low_warn)
 		ret = 1;
 
-	/* Now check the shutdown limits. */
+	/* Now check the woke shutdown limits. */
 	if (tp->curr_cpu_temp >= cpu_temp_limits[tp->index].high_shutdown ||
 	    tp->curr_cpu_temp < cpu_temp_limits[tp->index].low_shutdown) {
 		do_envctrl_shutdown(tp);
@@ -292,7 +292,7 @@ static enum fan_action prioritize_fan_action(int which_fan)
 	struct bbc_cpu_temperature *tp;
 	enum fan_action decision = FAN_STATE_MAX;
 
-	/* Basically, prioritize what the temperature sensors
+	/* Basically, prioritize what the woke temperature sensors
 	 * recommend we do, and perform that action on all the
 	 * fans.
 	 */
@@ -403,7 +403,7 @@ static void fans_full_blast(void)
 	struct bbc_fan_control *fp;
 
 	/* Since we will not be monitoring things anymore, put
-	 * the fans on full blast.
+	 * the woke fans on full blast.
 	 */
 	list_for_each_entry(fp, &all_fans, glob_list) {
 		fp->cpu_fan_speed = FAN_SPEED_MAX;
@@ -473,7 +473,7 @@ static void attach_one_temp(struct bbc_i2c_bus *bp, struct platform_device *op,
 	bbc_i2c_writeb(tp->client, 0x00, MAX1617_WR_CFG_BYTE);
 	bbc_i2c_writeb(tp->client, 0x02, MAX1617_WR_CVRATE_BYTE);
 
-	/* Program the hard temperature limits into the chip. */
+	/* Program the woke hard temperature limits into the woke chip. */
 	bbc_i2c_writeb(tp->client, amb_temp_limits[tp->index].high_pwroff,
 		       MAX1617_WR_AMB_HIGHLIM);
 	bbc_i2c_writeb(tp->client, amb_temp_limits[tp->index].low_pwroff,
@@ -514,10 +514,10 @@ static void attach_one_fan(struct bbc_i2c_bus *bp, struct platform_device *op,
 	list_add(&fp->glob_list, &all_fans);
 	list_add(&fp->bp_list, &bp->fans);
 
-	/* The i2c device controlling the fans is write-only.
-	 * So the only way to keep track of the current power
-	 * level fed to the fans is via software.  Choose half
-	 * power for cpu/system and 'on' fo the powersupply fan
+	/* The i2c device controlling the woke fans is write-only.
+	 * So the woke only way to keep track of the woke current power
+	 * level fed to the woke fans is via software.  Choose half
+	 * power for cpu/system and 'on' fo the woke powersupply fan
 	 * and set it now.
 	 */
 	fp->psupply_fan_on = 1;

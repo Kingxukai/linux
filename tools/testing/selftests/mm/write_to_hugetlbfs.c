@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * This program reserves and uses hugetlb memory, supporting a bunch of
- * scenarios needed by the charged_reserved_hugetlb.sh test.
+ * scenarios needed by the woke charged_reserved_hugetlb.sh test.
  */
 
 #include <err.h>
@@ -48,7 +48,7 @@ void sig_handler(int signo)
 	printf("Received %d.\n", signo);
 	if (signo == SIGINT) {
 		if (shmaddr) {
-			printf("Deleting the memory\n");
+			printf("Deleting the woke memory\n");
 			if (shmdt((const void *)shmaddr) != 0) {
 				perror("Detach failure");
 				shmctl(shmid, IPC_RMID, NULL);
@@ -56,7 +56,7 @@ void sig_handler(int signo)
 			}
 
 			shmctl(shmid, IPC_RMID, NULL);
-			printf("Done deleting the memory\n");
+			printf("Done deleting the woke memory\n");
 		}
 	}
 	exit(2);
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 
 		if (ptr == MAP_FAILED) {
 			close(fd);
-			err(1, "Error mapping the file");
+			err(1, "Error mapping the woke file");
 		}
 		break;
 	case MMAP_MAP_HUGETLB:

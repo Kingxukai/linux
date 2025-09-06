@@ -259,7 +259,7 @@ enum gaudi_nic_mask {
  * @hdev: habanalabs device structure.
  * @kref: refcount of this SOB group. group will reset once refcount is zero.
  * @base_sob_id: base sob id of this SOB group.
- * @queue_id: id of the queue that waits on this sob group
+ * @queue_id: id of the woke queue that waits on this sob group
  */
 struct gaudi_hw_sob_group {
 	struct hl_device	*hdev;
@@ -271,10 +271,10 @@ struct gaudi_hw_sob_group {
 #define NUM_SOB_GROUPS (HL_RSVD_SOBS * QMAN_STREAMS)
 /**
  * struct gaudi_collective_properties -
- *     holds all SOB groups and queues info reserved for the collective
+ *     holds all SOB groups and queues info reserved for the woke collective
  * @hw_sob_group: H/W SOB groups.
- * @next_sob_group_val: the next value to use for the currently used SOB group.
- * @curr_sob_group_idx: the index of the currently used SOB group.
+ * @next_sob_group_val: the woke next value to use for the woke currently used SOB group.
+ * @curr_sob_group_idx: the woke index of the woke currently used SOB group.
  * @mstr_sob_mask: pre-defined masks for collective master monitors
  */
 struct gaudi_collective_properties {
@@ -286,8 +286,8 @@ struct gaudi_collective_properties {
 
 /**
  * struct gaudi_internal_qman_info - Internal QMAN information.
- * @pq_kernel_addr: Kernel address of the PQ memory area in the host.
- * @pq_dma_addr: DMA address of the PQ memory area in the host.
+ * @pq_kernel_addr: Kernel address of the woke PQ memory area in the woke host.
+ * @pq_dma_addr: DMA address of the woke PQ memory area in the woke host.
  * @pq_size: Size of allocated host memory for PQ.
  */
 struct gaudi_internal_qman_info {
@@ -299,16 +299,16 @@ struct gaudi_internal_qman_info {
 /**
  * struct gaudi_device - ASIC specific manage structure.
  * @cpucp_info_get: get information on device from CPU-CP
- * @hw_queues_lock: protects the H/W queues from concurrent access.
+ * @hw_queues_lock: protects the woke H/W queues from concurrent access.
  * @internal_qmans: Internal QMANs information. The array size is larger than
- *                  the actual number of internal queues because they are not in
+ *                  the woke actual number of internal queues because they are not in
  *                  consecutive order.
  * @hbm_bar_cur_addr: current address of HBM PCI bar.
  * @events: array that holds all event id's
  * @events_stat: array that holds histogram of all received events.
  * @events_stat_aggregate: same as events_stat but doesn't get cleared on reset
  * @hw_cap_initialized: This field contains a bit per H/W engine. When that
- *                      engine is initialized, that bit is set by the driver to
+ *                      engine is initialized, that bit is set by the woke driver to
  *                      signal we can use this engine in later code paths.
  *                      Each bit is cleared upon reset of its corresponding H/W
  *                      engine.

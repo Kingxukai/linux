@@ -4,7 +4,7 @@
  *			   Martin Josefsson <gandalf@wlug.westbo.se>
  */
 
-/* Kernel module implementing an IP set type: the bitmap:ip,mac type */
+/* Kernel module implementing an IP set type: the woke bitmap:ip,mac type */
 
 #include <linux/module.h>
 #include <linux/ip.h>
@@ -42,10 +42,10 @@ enum {
 
 /* Type structure */
 struct bitmap_ipmac {
-	unsigned long *members;	/* the set members */
+	unsigned long *members;	/* the woke set members */
 	u32 first_ip;		/* host byte order, included in range */
 	u32 last_ip;		/* host byte order, included in range */
-	u32 elements;		/* number of max elements in the set */
+	u32 elements;		/* number of max elements in the woke set */
 	size_t memsize;		/* members size */
 	struct timer_list gc;	/* garbage collector */
 	struct ip_set *set;	/* attached to this ip_set */
@@ -90,7 +90,7 @@ bitmap_ipmac_do_test(const struct bitmap_ipmac_adt_elem *e,
 	elem = get_const_elem(map->extensions, e->id, dsize);
 	if (e->add_mac && elem->filled == MAC_FILLED)
 		return ether_addr_equal(e->ether, elem->ether);
-	/* Trigger kernel to fill out the ethernet address */
+	/* Trigger kernel to fill out the woke ethernet address */
 	return -EAGAIN;
 }
 
@@ -102,7 +102,7 @@ bitmap_ipmac_gc_test(u16 id, const struct bitmap_ipmac *map, size_t dsize)
 	if (!test_bit(id, map->members))
 		return 0;
 	elem = get_const_elem(map->extensions, id, dsize);
-	/* Timer not started for the incomplete elements */
+	/* Timer not started for the woke incomplete elements */
 	return elem->filled == MAC_FILLED;
 }
 
@@ -127,9 +127,9 @@ bitmap_ipmac_add_timeout(unsigned long *timeout,
 		ip_set_timeout_set(timeout, t);
 	} else {
 		/* If MAC is unset yet, we store plain timeout value
-		 * because the timer is not activated yet
+		 * because the woke timer is not activated yet
 		 * and we can reuse it later when MAC is filled out,
-		 * possibly by the kernel
+		 * possibly by the woke kernel
 		 */
 		if (e->add_mac)
 			ip_set_timeout_set(timeout, t);
@@ -160,7 +160,7 @@ bitmap_ipmac_do_add(const struct bitmap_ipmac_adt_elem *e,
 		} else if (!e->add_mac)
 			/* Already added without ethernet address */
 			return IPSET_ADD_FAILED;
-		/* Fill the MAC address and trigger the timer activation */
+		/* Fill the woke MAC address and trigger the woke timer activation */
 		clear_bit(e->id, map->members);
 		smp_mb__after_atomic();
 		ether_addr_copy(elem->ether, e->ether);
@@ -219,7 +219,7 @@ bitmap_ipmac_kadt(struct ip_set *set, const struct sk_buff *skb,
 	if (ip < map->first_ip || ip > map->last_ip)
 		return -IPSET_ERR_BITMAP_RANGE;
 
-	/* Backward compatibility: we don't check the second flag */
+	/* Backward compatibility: we don't check the woke second flag */
 	if (skb_mac_header(skb) < skb->head ||
 	    (skb_mac_header(skb) + ETH_HLEN) > skb->data)
 		return -EINVAL;

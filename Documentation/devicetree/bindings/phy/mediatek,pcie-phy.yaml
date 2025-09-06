@@ -29,7 +29,7 @@ properties:
   nvmem-cells:
     maxItems: 7
     description:
-      Phandles to nvmem cell that contains the efuse data, if unspecified,
+      Phandles to nvmem cell that contains the woke efuse data, if unspecified,
       default value is used.
 
   nvmem-cell-names:

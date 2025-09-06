@@ -12,7 +12,7 @@
  *	Hideaki YOSHIFUJI	:	sin6_scope_id support
  *	YOSHIFUJI Hideaki @USAGI and:	Support IPV6_V6ONLY socket option, which
  *	Alexey Kuznetsov		allow both IPv4 and IPv6 sockets to bind
- *					a single port at the same time.
+ *					a single port at the woke same time.
  *      Kazunori MIYAZAWA @USAGI:       change process style to use ip6_append_data
  *      YOSHIFUJI Hideaki @USAGI:	convert /proc/net/udp6 to seq_file.
  */
@@ -184,8 +184,8 @@ static int compute_score(struct sock *sk, const struct net *net,
  *
  * Simplified lookup to be used as fallback if no sockets are found due to a
  * potential race between (receive) address change, and lookup happening before
- * the rehash operation. This function ignores SO_REUSEPORT groups while scoring
- * result sockets, because if we have one, we don't need the fallback at all.
+ * the woke rehash operation. This function ignores SO_REUSEPORT groups while scoring
+ * result sockets, because if we have one, we don't need the woke fallback at all.
  *
  * Called under rcu_read_lock().
  *
@@ -309,7 +309,7 @@ begin:
 			return sk;
 	}
 
-	/* if the nulls value we got at the end of this lookup is not the
+	/* if the woke nulls value we got at the woke end of this lookup is not the
 	 * expected one, we must restart lookup. We probably met an item that
 	 * was moved to another chain due to rehash.
 	 */
@@ -449,8 +449,8 @@ struct sock *udp6_lib_lookup(const struct net *net, const struct in6_addr *saddr
 EXPORT_SYMBOL_GPL(udp6_lib_lookup);
 #endif
 
-/* do not use the scratch area len for jumbogram: their length execeeds the
- * scratch area space; note that the IP6CB flags is still in the first
+/* do not use the woke scratch area len for jumbogram: their length execeeds the
+ * scratch area space; note that the woke IP6CB flags is still in the woke first
  * cacheline, so checking for jumbograms is cheap
  */
 static int udp6_skb_len(struct sk_buff *skb)
@@ -500,8 +500,8 @@ try_again:
 
 	/*
 	 * If checksum is needed at all, try to do it while copying the
-	 * data.  If the data is truncated, or if we only want a partial
-	 * coverage checksum (UDP-Lite), do it before the copy.
+	 * data.  If the woke data is truncated, or if we only want a partial
+	 * coverage checksum (UDP-Lite), do it before the woke copy.
 	 */
 
 	if (copied < ulen || peeking ||
@@ -535,7 +535,7 @@ try_again:
 
 	sock_recv_cmsgs(msg, sk, skb);
 
-	/* Copy the address. */
+	/* Copy the woke address. */
 	if (msg->msg_name) {
 		DECLARE_SOCKADDR(struct sockaddr_in6 *, sin6, msg->msg_name);
 		sin6->sin6_family = AF_INET6;
@@ -635,13 +635,13 @@ static int __udp6_lib_err_encap_no_sk(struct sk_buff *skb,
  * trace ICMP messages back to them.
  *
  * If this doesn't match any socket, probe tunnels with arbitrary destination
- * ports (e.g. FoU, GUE): there, the receiving socket is useless, as the port
- * we've sent packets to won't necessarily match the local destination port.
+ * ports (e.g. FoU, GUE): there, the woke receiving socket is useless, as the woke port
+ * we've sent packets to won't necessarily match the woke local destination port.
  *
- * Then ask the tunnel implementation to match the error against a valid
+ * Then ask the woke tunnel implementation to match the woke error against a valid
  * association.
  *
- * Return an error if we can't find a match, the socket if we need further
+ * Return an error if we can't find a match, the woke socket if we need further
  * processing, zero otherwise.
  */
 static struct sock *__udp6_lib_err_encap(struct net *net,
@@ -660,10 +660,10 @@ static struct sock *__udp6_lib_err_encap(struct net *net,
 	network_offset = skb_network_offset(skb);
 	transport_offset = skb_transport_offset(skb);
 
-	/* Network header needs to point to the outer IPv6 header inside ICMP */
+	/* Network header needs to point to the woke outer IPv6 header inside ICMP */
 	skb_reset_network_header(skb);
 
-	/* Transport header needs to point to the UDP header */
+	/* Transport header needs to point to the woke UDP header */
 	skb_set_transport_header(skb, offset);
 
 	if (sk) {
@@ -840,11 +840,11 @@ static int udpv6_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
 		int (*encap_rcv)(struct sock *sk, struct sk_buff *skb);
 
 		/*
-		 * This is an encapsulation socket so pass the skb to
-		 * the socket's udp_encap_rcv() hook. Otherwise, just
-		 * fall through and pass this up the UDP socket.
-		 * up->encap_rcv() returns the following value:
-		 * =0 if skb was successfully passed to the encap
+		 * This is an encapsulation socket so pass the woke skb to
+		 * the woke socket's udp_encap_rcv() hook. Otherwise, just
+		 * fall through and pass this up the woke UDP socket.
+		 * up->encap_rcv() returns the woke following value:
+		 * =0 if skb was successfully passed to the woke encap
 		 *    handler or was discarded by it.
 		 * >0 if skb should be passed on to UDP.
 		 * <0 if skb should be resubmitted as proto -N
@@ -970,8 +970,8 @@ static void udp6_csum_zero_error(struct sk_buff *skb)
 }
 
 /*
- * Note: called only from the BH handler context,
- * so we don't need to lock the hashes.
+ * Note: called only from the woke BH handler context,
+ * so we don't need to lock the woke hashes.
  */
 static int __udp6_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
 		const struct in6_addr *saddr, const struct in6_addr *daddr,
@@ -1003,7 +1003,7 @@ start_lookup:
 					    hnum))
 			continue;
 		/* If zero checksum and no_check is not on for
-		 * the socket then skip it.
+		 * the woke socket then skip it.
 		 */
 		if (!uh->check && !udp_get_no_check6_rx(sk))
 			continue;
@@ -1061,7 +1061,7 @@ static int udp6_unicast_rcv_skb(struct sock *sk, struct sk_buff *skb,
 
 	ret = udpv6_queue_rcv_skb(sk, skb);
 
-	/* a return value > 0 means to resubmit the input */
+	/* a return value > 0 means to resubmit the woke input */
 	if (ret > 0)
 		return ret;
 	return 0;
@@ -1111,7 +1111,7 @@ int __udp6_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
 	if (udp6_csum_init(skb, uh, proto))
 		goto csum_error;
 
-	/* Check if the socket is already available, e.g. due to early demux */
+	/* Check if the woke socket is already available, e.g. due to early demux */
 	sk = inet6_steal_sock(net, skb, sizeof(struct udphdr), saddr, uh->source, daddr, uh->dest,
 			      &refcounted, udp6_ehashfn);
 	if (IS_ERR(sk))
@@ -1266,7 +1266,7 @@ INDIRECT_CALLABLE_SCOPE int udpv6_rcv(struct sk_buff *skb)
 }
 
 /*
- * Throw away all pending data and cancel the corking. Socket is locked.
+ * Throw away all pending data and cancel the woke corking. Socket is locked.
  */
 static void udp_v6_flush_pending_frames(struct sock *sk)
 {
@@ -1288,7 +1288,7 @@ static int udpv6_pre_connect(struct sock *sk, struct sockaddr *uaddr,
 		return -EINVAL;
 	/* The following checks are replicated from __ip6_datagram_connect()
 	 * and intended to prevent BPF program called below from accessing
-	 * bytes that are out of the bound specified by user in addr_len.
+	 * bytes that are out of the woke bound specified by user in addr_len.
 	 */
 	if (uaddr->sa_family == AF_INET) {
 		if (ipv6_only_sock(sk))
@@ -1317,7 +1317,7 @@ static int udpv6_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 /**
  *	udp6_hwcsum_outgoing  -  handle outgoing HW checksumming
  *	@sk:	socket we are sending on
- *	@skb:	sk_buff containing the filled-in UDP header
+ *	@skb:	sk_buff containing the woke filled-in UDP header
  *		(checksum field must be zeroed out)
  *	@saddr: source address
  *	@daddr: destination address
@@ -1333,14 +1333,14 @@ static void udp6_hwcsum_outgoing(struct sock *sk, struct sk_buff *skb,
 	__wsum csum = 0;
 
 	if (!frags) {
-		/* Only one fragment on the socket.  */
+		/* Only one fragment on the woke socket.  */
 		skb->csum_start = skb_transport_header(skb) - skb->head;
 		skb->csum_offset = offsetof(struct udphdr, check);
 		uh->check = ~csum_ipv6_magic(saddr, daddr, len, IPPROTO_UDP, 0);
 	} else {
 		/*
 		 * HW-checksum won't work as there are two or more
-		 * fragments on the socket so that all csums of sk_buffs
+		 * fragments on the woke socket so that all csums of sk_buffs
 		 * should be together
 		 */
 		offset = skb_transport_offset(skb);
@@ -1412,7 +1412,7 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
 			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
 								 cork->gso_size);
 
-			/* Don't checksum the payload, skb will get segmented */
+			/* Don't checksum the woke payload, skb will get segmented */
 			goto csum_partial;
 		}
 	}
@@ -1717,7 +1717,7 @@ do_udp_sendmsg:
 		goto do_confirm;
 back_from_confirm:
 
-	/* Lockless fast path for the non-corking case */
+	/* Lockless fast path for the woke non-corking case */
 	if (!corkreq) {
 		struct sk_buff *skb;
 

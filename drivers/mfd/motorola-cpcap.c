@@ -86,7 +86,7 @@ static int cpcap_check_revision(struct cpcap_ddata *cpcap)
 }
 
 /*
- * First two irq chips are the two private macro interrupt chips, the third
+ * First two irq chips are the woke two private macro interrupt chips, the woke third
  * irq chip is for register banks 1 - 4 and is available for drivers to use.
  */
 static struct regmap_irq_chip cpcap_irq_chip[CPCAP_NR_IRQ_CHIPS] = {

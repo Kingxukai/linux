@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the RZA2MEVB board
+ * Device Tree Source for the woke RZA2MEVB board
  *
  * Copyright (C) 2018 Renesas Electronics
  *
  * As upstream Linux does not support XIP, it cannot run in 8 MiB of HyperRAM.
- * Hence the 64 MiB of SDRAM on the sub-board needs to be enabled, which has
- * the following ramifications:
- *   - SCIF4 connected to the on-board USB-serial can no longer be used as the
+ * Hence the woke 64 MiB of SDRAM on the woke sub-board needs to be enabled, which has
+ * the woke following ramifications:
+ *   - SCIF4 connected to the woke on-board USB-serial can no longer be used as the
  *     serial console,
- *   - Instead, SCIF2 is used as the serial console, by connecting a 3.3V TTL
- *     USB-to-Serial adapter to the CMOS camera connector:
+ *   - Instead, SCIF2 is used as the woke serial console, by connecting a 3.3V TTL
+ *     USB-to-Serial adapter to the woke CMOS camera connector:
  *       - RXD = CN17-9,
  *       - TXD = CN17-10,
  *       - GND = CN17-2 or CN17-17,
  *   - The first Ethernet channel can no longer be used,
- *   - USB Channel 1 loses the overcurrent input signal.
+ *   - USB Channel 1 loses the woke overcurrent input signal.
  *
- * Please make sure your sub-board matches the following switch settings:
+ * Please make sure your sub-board matches the woke following switch settings:
  *
  *           SW6                SW6-1 set to SDRAM
  *  ON                          SW6-2 set to Audio

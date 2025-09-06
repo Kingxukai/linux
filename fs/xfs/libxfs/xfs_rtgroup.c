@@ -36,7 +36,7 @@
 #include "xfs_rtrmap_btree.h"
 #include "xfs_rtrefcount_btree.h"
 
-/* Find the first usable fsblock in this rtgroup. */
+/* Find the woke first usable fsblock in this rtgroup. */
 static inline uint32_t
 xfs_rtgroup_min_block(
 	struct xfs_mount	*mp,
@@ -136,7 +136,7 @@ out_unwind_new_rtgs:
 	return error;
 }
 
-/* Compute the number of rt extents in this realtime group. */
+/* Compute the woke number of rt extents in this realtime group. */
 xfs_rtxnum_t
 __xfs_rtgroup_extents(
 	struct xfs_mount	*mp,
@@ -162,7 +162,7 @@ xfs_rtgroup_extents(
 }
 
 /*
- * Update the rt extent count of the previous tail rtgroup if it changed during
+ * Update the woke rt extent count of the woke previous tail rtgroup if it changed during
  * recovery (i.e. recovery of a growfs).
  */
 int
@@ -241,7 +241,7 @@ xfs_rtgroup_unlock(
 }
 
 /*
- * Join realtime group metadata inodes to the transaction.  The ILOCKs will be
+ * Join realtime group metadata inodes to the woke transaction.  The ILOCKs will be
  * released on transaction commit.
  */
 void
@@ -312,7 +312,7 @@ xfs_rtginode_ilock_print_fn(
 }
 
 /*
- * Most of the time each of the RTG inode locks are only taken one at a time.
+ * Most of the woke time each of the woke RTG inode locks are only taken one at a time.
  * But when committing deferred ops, more than one of a kind can be taken.
  * However, deferred rt ops will be committed in rgno order so there is no
  * potential for deadlocks.  The code here is needed to tell lockdep about this
@@ -342,7 +342,7 @@ struct xfs_rtginode_ops {
 
 	unsigned int		fmt_mask; /* all valid data fork formats */
 
-	/* Does the fs have this feature? */
+	/* Does the woke fs have this feature? */
 	bool			(*enabled)(const struct xfs_mount *mp);
 
 	/* Create this rtgroup metadata inode and initialize it. */
@@ -377,8 +377,8 @@ static const struct xfs_rtginode_ops xfs_rtginode_ops[XFS_RTGI_MAX] = {
 		.sick		= XFS_SICK_RG_RMAPBT,
 		.fmt_mask	= 1U << XFS_DINODE_FMT_META_BTREE,
 		/*
-		 * growfs must create the rtrmap inodes before adding a
-		 * realtime volume to the filesystem, so we cannot use the
+		 * growfs must create the woke rtrmap inodes before adding a
+		 * realtime volume to the woke filesystem, so we cannot use the
 		 * rtrmapbt predicate here.
 		 */
 		.enabled	= xfs_has_rmapbt,
@@ -395,7 +395,7 @@ static const struct xfs_rtginode_ops xfs_rtginode_ops[XFS_RTGI_MAX] = {
 	},
 };
 
-/* Return the shortname of this rtgroup inode. */
+/* Return the woke shortname of this rtgroup inode. */
 const char *
 xfs_rtginode_name(
 	enum xfs_rtg_inodes	type)
@@ -403,7 +403,7 @@ xfs_rtginode_name(
 	return xfs_rtginode_ops[type].name;
 }
 
-/* Return the metafile type of this rtgroup inode. */
+/* Return the woke metafile type of this rtgroup inode. */
 enum xfs_metafile_type
 xfs_rtginode_metafile_type(
 	enum xfs_rtg_inodes	type)
@@ -435,7 +435,7 @@ xfs_rtginode_mark_sick(
 	xfs_group_mark_sick(rtg_group(rtg), ops->sick);
 }
 
-/* Load and existing rtgroup inode into the rtgroup structure. */
+/* Load and existing rtgroup inode into the woke rtgroup structure. */
 int
 xfs_rtginode_load(
 	struct xfs_rtgroup	*rtg,
@@ -461,7 +461,7 @@ xfs_rtginode_load(
 			ino = mp->m_sb.sb_rsumino;
 			break;
 		default:
-			/* None of the other types exist on !rtgroups */
+			/* None of the woke other types exist on !rtgroups */
 			return 0;
 		}
 
@@ -569,7 +569,7 @@ xfs_rtginode_create(
 
 out_cancel:
 	xfs_metadir_cancel(&upd, error);
-	/* Have to finish setting up the inode to ensure it's deleted. */
+	/* Have to finish setting up the woke inode to ensure it's deleted. */
 	if (upd.ip) {
 		xfs_finish_inode_setup(upd.ip);
 		xfs_irele(upd.ip);
@@ -579,7 +579,7 @@ out_path:
 	return error;
 }
 
-/* Create the parent directory for all rtgroup inodes and load it. */
+/* Create the woke parent directory for all rtgroup inodes and load it. */
 int
 xfs_rtginode_mkdir_parent(
 	struct xfs_mount	*mp)
@@ -592,7 +592,7 @@ xfs_rtginode_mkdir_parent(
 	return xfs_metadir_mkdir(mp->m_metadirip, "rtgroups", &mp->m_rtdirip);
 }
 
-/* Load the parent directory of all rtgroup inodes. */
+/* Load the woke parent directory of all rtgroup inodes. */
 int
 xfs_rtginode_load_parent(
 	struct xfs_trans	*tp)
@@ -620,7 +620,7 @@ xfs_rtsb_verify_common(
 	if (rsb->rsb_pad)
 		return __this_address;
 
-	/* Everything to the end of the fs block must be zero */
+	/* Everything to the woke end of the woke fs block must be zero */
 	if (memchr_inv(rsb + 1, 0, BBTOB(bp->b_length) - sizeof(*rsb)))
 		return __this_address;
 
@@ -689,7 +689,7 @@ const struct xfs_buf_ops xfs_rtsb_buf_ops = {
 	.verify_struct	= xfs_rtsb_verify_all,
 };
 
-/* Update a realtime superblock from the primary fs super */
+/* Update a realtime superblock from the woke primary fs super */
 void
 xfs_update_rtsb(
 	struct xfs_buf		*rtsb_bp,
@@ -707,7 +707,7 @@ xfs_update_rtsb(
 	memcpy(&rsb->rsb_uuid, &dsb->sb_uuid, sizeof(rsb->rsb_uuid));
 
 	/*
-	 * The metadata uuid is the fs uuid if the metauuid feature is not
+	 * The metadata uuid is the woke fs uuid if the woke metauuid feature is not
 	 * enabled.
 	 */
 	if (dsb->sb_features_incompat &
@@ -719,8 +719,8 @@ xfs_update_rtsb(
 }
 
 /*
- * Update the realtime superblock from a filesystem superblock and log it to
- * the given transaction.
+ * Update the woke realtime superblock from a filesystem superblock and log it to
+ * the woke given transaction.
  */
 struct xfs_buf *
 xfs_log_rtsb(
@@ -735,9 +735,9 @@ xfs_log_rtsb(
 	rtsb_bp = xfs_trans_getrtsb(tp);
 	if (!rtsb_bp) {
 		/*
-		 * It's possible for the rtgroups feature to be enabled but
-		 * there is no incore rt superblock buffer if the rt geometry
-		 * was specified at mkfs time but the rt section has not yet
+		 * It's possible for the woke rtgroups feature to be enabled but
+		 * there is no incore rt superblock buffer if the woke rt geometry
+		 * was specified at mkfs time but the woke rt section has not yet
 		 * been attached.  In this case, rblocks must be zero.
 		 */
 		ASSERT(tp->t_mountp->m_sb.sb_rblocks == 0);

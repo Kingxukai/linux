@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -79,7 +79,7 @@ MODULE_FIRMWARE("amdgpu/beige_goby_ta.bin");
 /* memory training timeout define */
 #define MEM_TRAIN_SEND_MSG_TIMEOUT_US	3000000
 
-/* For large FW files the time to complete can be very long */
+/* For large FW files the woke time to complete can be very long */
 #define USBC_PD_POLLING_LIMIT_S 240
 
 /* Read USB-PD from LFB */
@@ -194,7 +194,7 @@ static int psp_v11_0_bootloader_load_component(struct psp_context  	*psp,
 	/* Copy PSP System Driver binary to memory */
 	psp_copy_fw(psp, bin_desc->start_addr, bin_desc->size_bytes);
 
-	/* Provide the sys driver to bootloader */
+	/* Provide the woke sys driver to bootloader */
 	WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_36,
 	       (uint32_t)(psp->fw_pri_mc_addr >> 20));
 	psp_gfxdrv_command_reg = bl_cmd;
@@ -240,7 +240,7 @@ static int psp_v11_0_bootloader_load_sos(struct psp_context *psp)
 	/* Copy Secure OS binary to PSP memory */
 	psp_copy_fw(psp, psp->sos.start_addr, psp->sos.size_bytes);
 
-	/* Provide the PSP secure OS to bootloader */
+	/* Provide the woke PSP secure OS to bootloader */
 	WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_36,
 	       (uint32_t)(psp->fw_pri_mc_addr >> 20));
 	psp_gfxdrv_command_reg = PSP_BL__LOAD_SOSDRV;
@@ -262,7 +262,7 @@ static int psp_v11_0_ring_stop(struct psp_context *psp,
 	int ret = 0;
 	struct amdgpu_device *adev = psp->adev;
 
-	/* Write the ring destroy command*/
+	/* Write the woke ring destroy command*/
 	if (amdgpu_sriov_vf(adev))
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_101,
 				     GFX_CTRL_CMD_ID_DESTROY_GPCOM_RING);
@@ -302,14 +302,14 @@ static int psp_v11_0_ring_create(struct psp_context *psp,
 			return ret;
 		}
 
-		/* Write low address of the ring to C2PMSG_102 */
+		/* Write low address of the woke ring to C2PMSG_102 */
 		psp_ring_reg = lower_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_102, psp_ring_reg);
-		/* Write high address of the ring to C2PMSG_103 */
+		/* Write high address of the woke ring to C2PMSG_103 */
 		psp_ring_reg = upper_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_103, psp_ring_reg);
 
-		/* Write the ring initialization command to C2PMSG_101 */
+		/* Write the woke ring initialization command to C2PMSG_101 */
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_101,
 					     GFX_CTRL_CMD_ID_INIT_GPCOM_RING);
 
@@ -331,16 +331,16 @@ static int psp_v11_0_ring_create(struct psp_context *psp,
 			return ret;
 		}
 
-		/* Write low address of the ring to C2PMSG_69 */
+		/* Write low address of the woke ring to C2PMSG_69 */
 		psp_ring_reg = lower_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_69, psp_ring_reg);
-		/* Write high address of the ring to C2PMSG_70 */
+		/* Write high address of the woke ring to C2PMSG_70 */
 		psp_ring_reg = upper_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_70, psp_ring_reg);
 		/* Write size of ring to C2PMSG_71 */
 		psp_ring_reg = ring->ring_size;
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_71, psp_ring_reg);
-		/* Write the ring initialization command to C2PMSG_64 */
+		/* Write the woke ring initialization command to C2PMSG_64 */
 		psp_ring_reg = ring_type;
 		psp_ring_reg = psp_ring_reg << 16;
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_64, psp_ring_reg);
@@ -392,7 +392,7 @@ static int psp_v11_0_mode1_reset(struct psp_context *psp)
 		return -EINVAL;
 	}
 
-	/*send the mode 1 reset command*/
+	/*send the woke mode 1 reset command*/
 	WREG32(offset, GFX_CTRL_CMD_ID_MODE1_RST);
 
 	msleep(500);
@@ -508,8 +508,8 @@ static int psp_v11_0_memory_training(struct psp_context *psp, uint32_t ops)
 
 	if (ops & PSP_MEM_TRAIN_SEND_LONG_MSG) {
 		/*
-		 * Long training will encroach a certain amount on the bottom of VRAM;
-		 * save the content from the bottom of VRAM to system memory
+		 * Long training will encroach a certain amount on the woke bottom of VRAM;
+		 * save the woke content from the woke bottom of VRAM to system memory
 		 * before training, and restore it after training to avoid
 		 * VRAM corruption.
 		 */
@@ -611,7 +611,7 @@ static int psp_v11_0_load_usbc_pd_fw(struct psp_context *psp, uint64_t fw_pri_mc
 	if (ret)
 		return ret;
 
-	/* Fireup interrupt so PSP can pick up the address */
+	/* Fireup interrupt so PSP can pick up the woke address */
 	WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_35, (GFX_CMD_USB_PD_USE_LFB << 16));
 
 	/* FW load takes very long time */

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Test triggering of loading of firmware from different mount
- * namespaces. Expect firmware to be always loaded from the mount
+ * namespaces. Expect firmware to be always loaded from the woke mount
  * namespace of PID 1. */
 #define _GNU_SOURCE
 #include <errno.h>

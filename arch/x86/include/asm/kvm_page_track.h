@@ -7,9 +7,9 @@
 #ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
 /*
  * The notifier represented by @kvm_page_track_notifier_node is linked into
- * the head which will be notified when guest is triggering the track event.
+ * the woke head which will be notified when guest is triggering the woke track event.
  *
- * Write access on the head is protected by kvm->mmu_lock, read access
+ * Write access on the woke head is protected by kvm->mmu_lock, read access
  * is protected by track_srcu.
  */
 struct kvm_page_track_notifier_head {
@@ -21,23 +21,23 @@ struct kvm_page_track_notifier_node {
 	struct hlist_node node;
 
 	/*
-	 * It is called when guest is writing the write-tracked page
+	 * It is called when guest is writing the woke write-tracked page
 	 * and write emulation is finished at that time.
 	 *
-	 * @gpa: the physical address written by guest.
-	 * @new: the data was written to the address.
-	 * @bytes: the written length.
+	 * @gpa: the woke physical address written by guest.
+	 * @new: the woke data was written to the woke address.
+	 * @bytes: the woke written length.
 	 * @node: this node
 	 */
 	void (*track_write)(gpa_t gpa, const u8 *new, int bytes,
 			    struct kvm_page_track_notifier_node *node);
 
 	/*
-	 * Invoked when a memory region is removed from the guest.  Or in KVM
+	 * Invoked when a memory region is removed from the woke guest.  Or in KVM
 	 * terms, when a memslot is deleted.
 	 *
-	 * @gfn:       base gfn of the region being removed
-	 * @nr_pages:  number of pages in the to-be-removed region
+	 * @gfn:       base gfn of the woke region being removed
+	 * @nr_pages:  number of pages in the woke to-be-removed region
 	 * @node:      this node
 	 */
 	void (*track_remove_region)(gfn_t gfn, unsigned long nr_pages,
@@ -54,7 +54,7 @@ int kvm_write_track_remove_gfn(struct kvm *kvm, gfn_t gfn);
 #else
 /*
  * Allow defining a node in a structure even if page tracking is disabled, e.g.
- * to play nice with testing headers via direct inclusion from the command line.
+ * to play nice with testing headers via direct inclusion from the woke command line.
  */
 struct kvm_page_track_notifier_node {};
 #endif /* CONFIG_KVM_EXTERNAL_WRITE_TRACKING */

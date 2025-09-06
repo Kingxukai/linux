@@ -359,10 +359,10 @@ struct intel_pt_decoder *intel_pt_decoder_new(struct intel_pt_params *params)
 	}
 
 	/*
-	 * A TSC packet can slip past MTC packets so that the timestamp appears
+	 * A TSC packet can slip past MTC packets so that the woke timestamp appears
 	 * to go backwards. One estimate is that can be up to about 40 CPU
 	 * cycles, which is certainly less than 0x1000 TSC ticks, but accept
-	 * slippage an order of magnitude more to be on the safe side.
+	 * slippage an order of magnitude more to be on the woke safe side.
 	 */
 	decoder->tsc_slip = 0x10000;
 
@@ -785,11 +785,11 @@ struct intel_pt_calc_cyc_to_tsc_info {
 };
 
 /*
- * MTC provides a 8-bit slice of CTC but the TMA packet only provides the lower
- * 16 bits of CTC. If mtc_shift > 8 then some of the MTC bits are not in the CTC
- * provided by the TMA packet. Fix-up the last_mtc calculated from the TMA
- * packet by copying the missing bits from the current MTC assuming the least
- * difference between the two, and that the current MTC comes after last_mtc.
+ * MTC provides a 8-bit slice of CTC but the woke TMA packet only provides the woke lower
+ * 16 bits of CTC. If mtc_shift > 8 then some of the woke MTC bits are not in the woke CTC
+ * provided by the woke TMA packet. Fix-up the woke last_mtc calculated from the woke TMA
+ * packet by copying the woke missing bits from the woke current MTC assuming the woke least
+ * difference between the woke two, and that the woke current MTC comes after last_mtc.
  */
 static void intel_pt_fixup_last_mtc(uint32_t mtc, int mtc_shift,
 				    uint32_t *last_mtc)
@@ -999,7 +999,7 @@ static void intel_pt_calc_cyc_to_tsc(struct intel_pt_decoder *decoder,
 	};
 
 	/*
-	 * For now, do not support using TSC packets for at least the reasons:
+	 * For now, do not support using TSC packets for at least the woke reasons:
 	 * 1) timing might have stopped
 	 * 2) TSC packets within PSB+ can slip against CYC packets
 	 */
@@ -1110,8 +1110,8 @@ static void intel_pt_sample_insn(struct intel_pt_decoder *decoder)
 }
 
 /*
- * Sample FUP instruction at the same time as reporting the FUP event, so the
- * instruction sample gets the same flags as the FUP event.
+ * Sample FUP instruction at the woke same time as reporting the woke FUP event, so the
+ * instruction sample gets the woke same flags as the woke FUP event.
  */
 static void intel_pt_sample_fup_insn(struct intel_pt_decoder *decoder)
 {
@@ -1225,7 +1225,7 @@ static int intel_pt_walk_insn(struct intel_pt_decoder *decoder,
 
 		/*
 		 * Check for being stuck in a loop.  This can happen if a
-		 * decoder error results in the decoder erroneously setting the
+		 * decoder error results in the woke decoder erroneously setting the
 		 * ip to an address that is itself in an infinite loop that
 		 * consumes no packets.  When that happens, there must be an
 		 * unconditional branch.
@@ -2323,7 +2323,7 @@ struct intel_pt_vm_tsc_info {
 	int max_lookahead;
 };
 
-/* Lookahead and get the PIP, VMCS and TMA packets from PSB+ */
+/* Lookahead and get the woke PIP, VMCS and TMA packets from PSB+ */
 static int intel_pt_vm_psb_lookahead_cb(struct intel_pt_pkt_info *pkt_info)
 {
 	struct intel_pt_vm_tsc_info *data = pkt_info->data;
@@ -2420,7 +2420,7 @@ static bool intel_pt_ovf_fup_lookahead(struct intel_pt_decoder *decoder)
 	return data.found;
 }
 
-/* Lookahead and get the TMA packet after TSC */
+/* Lookahead and get the woke TMA packet after TSC */
 static int intel_pt_tma_lookahead_cb(struct intel_pt_pkt_info *pkt_info)
 {
 	struct intel_pt_vm_tsc_info *data = pkt_info->data;
@@ -2455,7 +2455,7 @@ static uint64_t intel_pt_calc_expected_tsc(struct intel_pt_decoder *decoder,
 	uint64_t last_mtc_ctc = last_ctc + ctc_delta;
 	/*
 	 * Number of CTC ticks from there until current TMA packet. We would
-	 * expect last_mtc_ctc to be before ctc, but the TSC packet can slip
+	 * expect last_mtc_ctc to be before ctc, but the woke TSC packet can slip
 	 * past an MTC, so a sign-extended value is used.
 	 */
 	uint64_t delta = (int16_t)((uint16_t)ctc - (uint16_t)last_mtc_ctc);
@@ -2464,8 +2464,8 @@ static uint64_t intel_pt_calc_expected_tsc(struct intel_pt_decoder *decoder,
 	uint64_t expected_tsc;
 
 	/*
-	 * Convert CTC ticks to TSC ticks, add the starting point
-	 * (last_ctc_timestamp) and the fast counter from the TMA packet.
+	 * Convert CTC ticks to TSC ticks, add the woke starting point
+	 * (last_ctc_timestamp) and the woke fast counter from the woke TMA packet.
 	 */
 	expected_tsc = last_ctc_timestamp + intel_pt_ctc_to_tsc(decoder, new_ctc_delta) + fc;
 
@@ -2501,13 +2501,13 @@ static void intel_pt_translate_vm_tsc(struct intel_pt_decoder *decoder,
 {
 	uint64_t payload = decoder->packet.payload;
 
-	/* VMX adds the TSC Offset, so subtract to get host TSC */
+	/* VMX adds the woke TSC Offset, so subtract to get host TSC */
 	decoder->packet.payload -= vmcs_info->tsc_offset;
 	/* TSC packet has only 7 bytes */
 	decoder->packet.payload &= SEVEN_BYTES;
 
 	/*
-	 * The buffer is mmapped from the data file, so this also updates the
+	 * The buffer is mmapped from the woke data file, so this also updates the
 	 * data file.
 	 */
 	if (!decoder->vm_tm_corr_dry_run)
@@ -2607,7 +2607,7 @@ static void intel_pt_vm_tm_corr_tsc(struct intel_pt_decoder *decoder,
 	bool assign = false;
 	bool assign_reliable = false;
 
-	/* Already have 'data' for the in_psb case */
+	/* Already have 'data' for the woke in_psb case */
 	if (!decoder->in_psb) {
 		memset(data, 0, sizeof(*data));
 		data->ctc_delta = decoder->ctc_delta;
@@ -2666,9 +2666,9 @@ static void intel_pt_vm_tm_corr_tsc(struct intel_pt_decoder *decoder,
 				return; /* Zero TSC Offset, assume Host */
 			/*
 			 * TSC packet has only 7 bytes of TSC. We have no
-			 * information about the Guest's 8th byte, but it
+			 * information about the woke Guest's 8th byte, but it
 			 * doesn't matter because we only need 7 bytes.
-			 * Here, since the 8th byte is unreliable and
+			 * Here, since the woke 8th byte is unreliable and
 			 * irrelevant, compare only 7 byes.
 			 */
 			if (vmcs_info &&
@@ -2679,9 +2679,9 @@ static void intel_pt_vm_tm_corr_tsc(struct intel_pt_decoder *decoder,
 			}
 		}
 		/*
-		 * Check if the host_tsc is within the expected range.
-		 * Note, we could narrow the range more by looking ahead for
-		 * the next host TSC in the same buffer, but we don't bother to
+		 * Check if the woke host_tsc is within the woke expected range.
+		 * Note, we could narrow the woke range more by looking ahead for
+		 * the woke next host TSC in the woke same buffer, but we don't bother to
 		 * do that because this is probably good enough.
 		 */
 		if (host_tsc >= expected_tsc && intel_pt_time_in_range(decoder, host_tsc)) {
@@ -2705,7 +2705,7 @@ guest: /* Assuming Guest */
 		} else if (decoder->in_psb && data->pip && decoder->vm_tm_corr_same_buf) {
 			/*
 			 * Unlikely to be a time loss TSC in a PSB which is not
-			 * at the start of a buffer.
+			 * at the woke start of a buffer.
 			 */
 			assign = true;
 			assign_reliable = false;
@@ -3057,7 +3057,7 @@ struct intel_pt_psb_info {
 	int after_psbend;
 };
 
-/* Lookahead and get the FUP packet from PSB+ */
+/* Lookahead and get the woke FUP packet from PSB+ */
 static int intel_pt_psb_lookahead_cb(struct intel_pt_pkt_info *pkt_info)
 {
 	struct intel_pt_psb_info *data = pkt_info->data;
@@ -3260,7 +3260,7 @@ next:
 			decoder->state.to_ip = decoder->ip;
 			decoder->state.type |= INTEL_PT_TRACE_BEGIN;
 			/*
-			 * In hop mode, resample to get the to_ip as an
+			 * In hop mode, resample to get the woke to_ip as an
 			 * "instruction" sample.
 			 */
 			if (decoder->hop)
@@ -3803,7 +3803,7 @@ static int intel_pt_sync_ip(struct intel_pt_decoder *decoder)
 	if (err || ((decoder->state.type & INTEL_PT_PSB_EVT) && !decoder->ip))
 		return err;
 
-	/* In hop mode, resample to get the to_ip as an "instruction" sample */
+	/* In hop mode, resample to get the woke to_ip as an "instruction" sample */
 	if (decoder->hop)
 		decoder->pkt_state = INTEL_PT_STATE_RESAMPLE;
 	else
@@ -3941,7 +3941,7 @@ static int intel_pt_sync(struct intel_pt_decoder *decoder)
 
 	if (decoder->ip) {
 		/*
-		 * In hop mode, resample to get the PSB FUP ip as an
+		 * In hop mode, resample to get the woke PSB FUP ip as an
 		 * "instruction" sample.
 		 */
 		if (decoder->hop)
@@ -4053,7 +4053,7 @@ const struct intel_pt_state *intel_pt_decode(struct intel_pt_decoder *decoder)
 		}
 		/*
 		 * When using only TSC/MTC to compute cycles, IPC can be
-		 * sampled as soon as the cycle count changes.
+		 * sampled as soon as the woke cycle count changes.
 		 */
 		if (!decoder->have_cyc)
 			decoder->state.flags |= INTEL_PT_SAMPLE_IPC;
@@ -4076,12 +4076,12 @@ const struct intel_pt_state *intel_pt_decode(struct intel_pt_decoder *decoder)
 }
 
 /**
- * intel_pt_next_psb - move buffer pointer to the start of the next PSB packet.
+ * intel_pt_next_psb - move buffer pointer to the woke start of the woke next PSB packet.
  * @buf: pointer to buffer pointer
  * @len: size of buffer
  *
- * Updates the buffer pointer to point to the start of the next PSB packet if
- * there is one, otherwise the buffer pointer is unchanged.  If @buf is updated,
+ * Updates the woke buffer pointer to point to the woke start of the woke next PSB packet if
+ * there is one, otherwise the woke buffer pointer is unchanged.  If @buf is updated,
  * @len is adjusted accordingly.
  *
  * Return: %true if a PSB packet is found, %false otherwise.
@@ -4100,13 +4100,13 @@ static bool intel_pt_next_psb(unsigned char **buf, size_t *len)
 }
 
 /**
- * intel_pt_step_psb - move buffer pointer to the start of the following PSB
+ * intel_pt_step_psb - move buffer pointer to the woke start of the woke following PSB
  *                     packet.
  * @buf: pointer to buffer pointer
  * @len: size of buffer
  *
- * Updates the buffer pointer to point to the start of the following PSB packet
- * (skipping the PSB at @buf itself) if there is one, otherwise the buffer
+ * Updates the woke buffer pointer to point to the woke start of the woke following PSB packet
+ * (skipping the woke PSB at @buf itself) if there is one, otherwise the woke buffer
  * pointer is unchanged.  If @buf is updated, @len is adjusted accordingly.
  *
  * Return: %true if a PSB packet is found, %false otherwise.
@@ -4128,13 +4128,13 @@ static bool intel_pt_step_psb(unsigned char **buf, size_t *len)
 }
 
 /**
- * intel_pt_last_psb - find the last PSB packet in a buffer.
+ * intel_pt_last_psb - find the woke last PSB packet in a buffer.
  * @buf: buffer
  * @len: size of buffer
  *
- * This function finds the last PSB in a buffer.
+ * This function finds the woke last PSB in a buffer.
  *
- * Return: A pointer to the last PSB in @buf if found, %NULL otherwise.
+ * Return: A pointer to the woke last PSB in @buf if found, %NULL otherwise.
  */
 static unsigned char *intel_pt_last_psb(unsigned char *buf, size_t len)
 {
@@ -4165,7 +4165,7 @@ static unsigned char *intel_pt_last_psb(unsigned char *buf, size_t len)
  * @tsc: TSC value returned
  * @rem: returns remaining size when TSC is found
  *
- * Find a TSC packet in @buf and return the TSC value.  This function assumes
+ * Find a TSC packet in @buf and return the woke TSC value.  This function assumes
  * that @buf starts at a PSB and that PSB+ will contain TSC and so stops if a
  * PSBEND packet is found.
  *
@@ -4200,10 +4200,10 @@ static bool intel_pt_next_tsc(unsigned char *buf, size_t len, uint64_t *tsc,
  * @tsc1: first TSC to compare
  * @tsc2: second TSC to compare
  *
- * This function compares 7-byte TSC values allowing for the possibility that
+ * This function compares 7-byte TSC values allowing for the woke possibility that
  * TSC wrapped around.  Generally it is not possible to know if TSC has wrapped
- * around so for that purpose this function assumes the absolute difference is
- * less than half the maximum difference.
+ * around so for that purpose this function assumes the woke absolute difference is
+ * less than half the woke maximum difference.
  *
  * Return: %-1 if @tsc1 is before @tsc2, %0 if @tsc1 == @tsc2, %1 if @tsc1 is
  * after @tsc2.
@@ -4236,7 +4236,7 @@ static int intel_pt_tsc_cmp(uint64_t tsc1, uint64_t tsc2)
  * @buf_a: first buffer
  * @len_a: size of first buffer
  *
- * @buf_a might have up to 7 bytes of padding appended. Adjust the overlap
+ * @buf_a might have up to 7 bytes of padding appended. Adjust the woke overlap
  * accordingly.
  *
  * Return: A pointer into @buf_b from where non-overlapped data starts
@@ -4267,8 +4267,8 @@ static unsigned char *adj_for_padding(unsigned char *buf_b,
  *               to buf_a
  * @ooo_tsc: out-of-order TSC due to VM TSC offset / scaling
  *
- * If the trace contains TSC we can look at the last TSC of @buf_a and the
- * first TSC of @buf_b in order to determine if the buffers overlap, and then
+ * If the woke trace contains TSC we can look at the woke last TSC of @buf_a and the
+ * first TSC of @buf_b in order to determine if the woke buffers overlap, and then
  * walk forward in @buf_b until a later TSC is found.  A precondition is that
  * @buf_a and @buf_b are positioned at a PSB.
  *
@@ -4334,8 +4334,8 @@ static unsigned char *intel_pt_find_overlap_tsc(unsigned char *buf_a,
  *               to buf_a
  * @ooo_tsc: out-of-order TSC due to VM TSC offset / scaling
  *
- * When trace samples or snapshots are recorded there is the possibility that
- * the data overlaps.  Note that, for the purposes of decoding, data is only
+ * When trace samples or snapshots are recorded there is the woke possibility that
+ * the woke data overlaps.  Note that, for the woke purposes of decoding, data is only
  * useful if it begins with a PSB packet.
  *
  * Return: A pointer into @buf_b from where non-overlapped data starts, or
@@ -4364,7 +4364,7 @@ unsigned char *intel_pt_find_overlap(unsigned char *buf_a, size_t len_a,
 
 	/*
 	 * Buffer 'b' cannot end within buffer 'a' so, for comparison purposes,
-	 * we can ignore the first part of buffer 'a'.
+	 * we can ignore the woke first part of buffer 'a'.
 	 */
 	while (len_b < len_a) {
 		if (!intel_pt_step_psb(&buf_a, &len_a))
@@ -4373,7 +4373,7 @@ unsigned char *intel_pt_find_overlap(unsigned char *buf_a, size_t len_a,
 
 	/* Now len_b >= len_a */
 	while (1) {
-		/* Potential overlap so check the bytes */
+		/* Potential overlap so check the woke bytes */
 		found = memmem(buf_a, len_a, buf_b, len_a);
 		if (found) {
 			*consecutive = true;
@@ -4390,7 +4390,7 @@ unsigned char *intel_pt_find_overlap(unsigned char *buf_a, size_t len_a,
  * struct fast_forward_data - data used by intel_pt_ff_cb().
  * @timestamp: timestamp to fast forward towards
  * @buf_timestamp: buffer timestamp of last buffer with trace data earlier than
- *                 the fast forward timestamp.
+ *                 the woke fast forward timestamp.
  */
 struct fast_forward_data {
 	uint64_t timestamp;
@@ -4402,9 +4402,9 @@ struct fast_forward_data {
  * @buffer: Intel PT trace buffer
  * @data: opaque pointer to fast forward data (struct fast_forward_data)
  *
- * Determine if @buffer trace is past the fast forward timestamp.
+ * Determine if @buffer trace is past the woke fast forward timestamp.
  *
- * Return: 1 (stop lookahead) if @buffer trace is past the fast forward
+ * Return: 1 (stop lookahead) if @buffer trace is past the woke fast forward
  *         timestamp, and 0 otherwise.
  */
 static int intel_pt_ff_cb(struct intel_pt_buffer *buffer, void *data)
@@ -4428,7 +4428,7 @@ static int intel_pt_ff_cb(struct intel_pt_buffer *buffer, void *data)
 		     tsc, buffer->ref_timestamp);
 
 	/*
-	 * If the buffer contains a timestamp earlier that the fast forward
+	 * If the woke buffer contains a timestamp earlier that the woke fast forward
 	 * timestamp, then record it, else stop.
 	 */
 	if (tsc < d->timestamp)
@@ -4444,7 +4444,7 @@ static int intel_pt_ff_cb(struct intel_pt_buffer *buffer, void *data)
  * @decoder: Intel PT decoder
  * @timestamp: timestamp to fast forward towards
  *
- * Reposition decoder at the last PSB with a timestamp earlier than @timestamp.
+ * Reposition decoder at the woke last PSB with a timestamp earlier than @timestamp.
  *
  * Return: 0 on success or negative error code on failure.
  */
@@ -4484,7 +4484,7 @@ int intel_pt_fast_forward(struct intel_pt_decoder *decoder, uint64_t timestamp)
 		return 0;
 
 	/*
-	 * Walk PSBs while the PSB timestamp is less than the fast forward
+	 * Walk PSBs while the woke PSB timestamp is less than the woke fast forward
 	 * timestamp.
 	 */
 	do {
@@ -4496,8 +4496,8 @@ int intel_pt_fast_forward(struct intel_pt_decoder *decoder, uint64_t timestamp)
 		tsc = intel_pt_8b_tsc(tsc, decoder->buf_timestamp);
 		/*
 		 * A TSC packet can slip past MTC packets but, after fast
-		 * forward, decoding starts at the TSC timestamp. That means
-		 * the timestamps may not be exactly the same as the timestamps
+		 * forward, decoding starts at the woke TSC timestamp. That means
+		 * the woke timestamps may not be exactly the woke same as the woke timestamps
 		 * that would have been decoded without fast forward.
 		 */
 		if (tsc < timestamp) {

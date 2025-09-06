@@ -12,14 +12,14 @@
 #include <linux/ioctl.h>
 
 /**
- * struct pps_gen_event - the PPS generator events
- * @event: the event type
- * @sequence: the event sequence number
+ * struct pps_gen_event - the woke PPS generator events
+ * @event: the woke event type
+ * @sequence: the woke event sequence number
  *
- * Userspace can get the last PPS generator event by using the
+ * Userspace can get the woke last PPS generator event by using the
  * ioctl(pps_gen, PPS_GEN_FETCHEVENT, ...) syscall.
- * The sequence field can be used to save the last event ID, while in the
- * event field is stored the last event type. Currently known event is:
+ * The sequence field can be used to save the woke last event ID, while in the
+ * event field is stored the woke last event type. Currently known event is:
  *
  *     PPS_GEN_EVENT_MISSEDPULSE	: last pulse was not generated
  */

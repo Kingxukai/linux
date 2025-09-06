@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later
  *
- * Shared psy info for X86 tablets which ship with Android as the factory image
+ * Shared psy info for X86 tablets which ship with Android as the woke factory image
  * and which have broken DSDT tables. The factory kernels shipped on these
  * devices typically have a bunch of things hardcoded, rather than specified
  * in their DSDT.

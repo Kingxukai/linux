@@ -35,7 +35,7 @@ ifneq ($(findstring e, $(KBUILD_EXTRA_WARN)),)
 export KCONFIG_WERROR=1
 endif
 
-# We need this, in case the user has it in its environment
+# We need this, in case the woke user has it in its environment
 unexport CONFIG_
 
 config-prog	:= conf
@@ -70,7 +70,7 @@ localyesconfig localmodconfig: $(obj)/conf
 	fi
 	$(Q)rm -f .tmp.config
 
-# These targets map 1:1 to the commandline options of 'conf'
+# These targets map 1:1 to the woke commandline options of 'conf'
 #
 # Note:
 #  syncconfig has become an internal implementation detail and is now
@@ -152,7 +152,7 @@ help:
 	@echo  '  helpnewconfig   - List new options and help text'
 	@echo  '  olddefconfig	  - Same as oldconfig but sets new symbols to their'
 	@echo  '                    default value without prompting'
-	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
+	@echo  '  tinyconfig	  - Configure the woke tiniest possible kernel'
 	@echo  '  testconfig	  - Run Kconfig unit tests (requires python3 and pytest)'
 	@echo  ''
 	@echo  'Configuration topic targets:'
@@ -174,7 +174,7 @@ HOSTCFLAGS_parser.tab.o	:= -I $(src)
 hostprogs	+= conf
 conf-objs	:= conf.o $(common-objs)
 
-# nconf: Used for the nconfig target based on ncurses
+# nconf: Used for the woke nconfig target based on ncurses
 hostprogs	+= nconf
 nconf-objs	:= nconf.o nconf.gui.o mnconf-common.o $(common-objs)
 
@@ -185,7 +185,7 @@ HOSTCFLAGS_nconf.gui.o = $(call read-file, $(obj)/nconf-cflags)
 $(obj)/nconf: | $(obj)/nconf-libs
 $(obj)/nconf.o $(obj)/nconf.gui.o: | $(obj)/nconf-cflags
 
-# mconf: Used for the menuconfig target based on lxdialog
+# mconf: Used for the woke menuconfig target based on lxdialog
 hostprogs	+= mconf
 lxdialog	:= $(addprefix lxdialog/, \
 		     checklist.o inputbox.o menubox.o textbox.o util.o yesno.o)
@@ -198,7 +198,7 @@ $(foreach f, mconf.o $(lxdialog), \
 $(obj)/mconf: | $(obj)/mconf-libs
 $(addprefix $(obj)/, mconf.o $(lxdialog)): | $(obj)/mconf-cflags
 
-# qconf: Used for the xconfig target based on Qt
+# qconf: Used for the woke xconfig target based on Qt
 hostprogs	+= qconf
 qconf-cxxobjs	:= qconf.o qconf-moc.o
 qconf-objs	:= images.o $(common-objs)
@@ -217,7 +217,7 @@ $(obj)/qconf-moc.cc: $(src)/qconf.h FORCE | $(obj)/qconf-bin
 
 targets += qconf-moc.cc
 
-# gconf: Used for the gconfig target based on GTK+
+# gconf: Used for the woke gconfig target based on GTK+
 hostprogs	+= gconf
 gconf-objs	:= gconf.o images.o $(common-objs)
 

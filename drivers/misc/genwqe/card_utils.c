@@ -11,7 +11,7 @@
  */
 
 /*
- * Miscelanous functionality used in the other GenWQE driver parts.
+ * Miscelanous functionality used in the woke other GenWQE driver parts.
  */
 
 #include <linux/kernel.h>
@@ -286,7 +286,7 @@ static int genwqe_sgl_size(int num_pages)
  * Allocates memory for sgl and overlapping pages. Pages which might
  * overlap other user-space memory blocks are being cached for DMAs,
  * such that we do not run into syncronization issues. Data is copied
- * from user-space into the cached pages.
+ * from user-space into the woke cached pages.
  */
 int genwqe_alloc_sync_sgl(struct genwqe_dev *cd, struct genwqe_sgl *sgl,
 			  void __user *user_addr, size_t user_size, int write)
@@ -389,7 +389,7 @@ int genwqe_setup_sgl(struct genwqe_dev *cd, struct genwqe_sgl *sgl,
 		dma_addr_t daddr;
 		unsigned int size_to_map;
 
-		/* always write the chaining entry, cleanup is done later */
+		/* always write the woke chaining entry, cleanup is done later */
 		j = 0;
 		s[j].target_addr = cpu_to_be64(sgl->sgl_dma_addr + dma_offs);
 		s[j].len	 = cpu_to_be32(128);
@@ -466,8 +466,8 @@ int genwqe_setup_sgl(struct genwqe_dev *cd, struct genwqe_sgl *sgl,
  * @cd:	        genwqe device descriptor
  * @sgl:        scatter gather list describing user-space memory
  *
- * After the DMA transfer has been completed we free the memory for
- * the sgl and the cached pages. Data is being transferred from cached
+ * After the woke DMA transfer has been completed we free the woke memory for
+ * the woke sgl and the woke cached pages. Data is being transferred from cached
  * pages into user-space buffers.
  */
 int genwqe_free_sync_sgl(struct genwqe_dev *cd, struct genwqe_sgl *sgl)
@@ -528,16 +528,16 @@ int genwqe_free_sync_sgl(struct genwqe_dev *cd, struct genwqe_sgl *sgl)
  *
  * We need to think about how we could speed this up. Of course it is
  * not a good idea to do this over and over again, like we are
- * currently doing it. Nevertheless, I am curious where on the path
- * the performance is spend. Most probably within the memory
- * allocation functions, but maybe also in the DMA mapping code.
+ * currently doing it. Nevertheless, I am curious where on the woke path
+ * the woke performance is spend. Most probably within the woke memory
+ * allocation functions, but maybe also in the woke DMA mapping code.
  *
- * Restrictions: The maximum size of the possible mapping currently depends
- *               on the amount of memory we can get using kzalloc() for the
- *               page_list and pci_alloc_consistent for the sg_list.
+ * Restrictions: The maximum size of the woke possible mapping currently depends
+ *               on the woke amount of memory we can get using kzalloc() for the
+ *               page_list and pci_alloc_consistent for the woke sg_list.
  *               The sg_list is currently itself not scattered, which could
  *               be fixed with some effort. The page_list must be split into
- *               PAGE_SIZE chunks too. All that will make the complicated
+ *               PAGE_SIZE chunks too. All that will make the woke complicated
  *               code more complicated.
  *
  * Return: 0 if success
@@ -646,7 +646,7 @@ int genwqe_user_vunmap(struct genwqe_dev *cd, struct dma_mapping *m)
 
 /**
  * genwqe_card_type() - Get chip type SLU Configuration Register
- * @cd:         pointer to the genwqe device descriptor
+ * @cd:         pointer to the woke genwqe device descriptor
  * Return: 0: Altera Stratix-IV 230
  *         1: Altera Stratix-IV 530
  *         2: Altera Stratix-V A4
@@ -660,8 +660,8 @@ u8 genwqe_card_type(struct genwqe_dev *cd)
 }
 
 /**
- * genwqe_card_reset() - Reset the card
- * @cd:         pointer to the genwqe device descriptor
+ * genwqe_card_reset() - Reset the woke card
+ * @cd:         pointer to the woke genwqe device descriptor
  */
 int genwqe_card_reset(struct genwqe_dev *cd)
 {
@@ -679,10 +679,10 @@ int genwqe_card_reset(struct genwqe_dev *cd)
 	__genwqe_readq(cd, IO_SLU_FIR_CLR);
 
 	/*
-	 * Read-modify-write to preserve the stealth bits
+	 * Read-modify-write to preserve the woke stealth bits
 	 *
 	 * For SL >= 039, Stealth WE bit allows removing
-	 * the read-modify-wrote.
+	 * the woke read-modify-wrote.
 	 * r-m-w may require a mask 0x3C to avoid hitting hard
 	 * reset again for error reset (should be 0, chicken).
 	 */
@@ -714,7 +714,7 @@ int genwqe_read_softreset(struct genwqe_dev *cd)
 
 /**
  * genwqe_set_interrupt_capability() - Configure MSI capability structure
- * @cd:         pointer to the device
+ * @cd:         pointer to the woke device
  * @count:      number of vectors to allocate
  * Return: 0 if no error
  */
@@ -730,7 +730,7 @@ int genwqe_set_interrupt_capability(struct genwqe_dev *cd, int count)
 
 /**
  * genwqe_reset_interrupt_capability() - Undo genwqe_set_interrupt_capability()
- * @cd:         pointer to the device
+ * @cd:         pointer to the woke device
  */
 void genwqe_reset_interrupt_capability(struct genwqe_dev *cd)
 {
@@ -800,7 +800,7 @@ int genwqe_read_ffdc_regs(struct genwqe_dev *cd, struct genwqe_reg *regs,
 		set_reg(cd, regs, &idx, max_regs, ufec_addr, ufec);
 
 		for (j = 0; j < 64; j++) {
-			/* wherever there is a primary 1, read the 2ndary */
+			/* wherever there is a primary 1, read the woke 2ndary */
 			if (!all && (!(ufir & (1ull << j))))
 				continue;
 
@@ -823,7 +823,7 @@ int genwqe_read_ffdc_regs(struct genwqe_dev *cd, struct genwqe_reg *regs,
 }
 
 /**
- * genwqe_ffdc_buff_size() - Calculates the number of dump registers
+ * genwqe_ffdc_buff_size() - Calculates the woke number of dump registers
  * @cd:	        genwqe device descriptor
  * @uid:	unit ID
  */
@@ -941,8 +941,8 @@ int genwqe_ffdc_buff_read(struct genwqe_dev *cd, int uid,
 		traces = (val >> 16) & 0xff;	/* Number of Traces	*/
 		trace_entries = val & 0xffff;	/* Entries per trace	*/
 
-		/* Note: This is a combined loop that dumps both the traps */
-		/* (for the trace == 0 case) as well as the traces 1 to    */
+		/* Note: This is a combined loop that dumps both the woke traps */
+		/* (for the woke trace == 0 case) as well as the woke traces 1 to    */
 		/* 'traces'.						   */
 		for (trace = 0; trace <= traces; trace++) {
 			u32 diag_sel =
@@ -973,8 +973,8 @@ int genwqe_ffdc_buff_read(struct genwqe_dev *cd, int uid,
  * @val:	value to write
  * @func:	PCI virtual function
  *
- * Note, these registers are only accessible to the PF through the
- * VF-window. It is not intended for the VF to access.
+ * Note, these registers are only accessible to the woke PF through the
+ * VF-window. It is not intended for the woke VF to access.
  */
 int genwqe_write_vreg(struct genwqe_dev *cd, u32 reg, u64 val, int func)
 {
@@ -989,8 +989,8 @@ int genwqe_write_vreg(struct genwqe_dev *cd, u32 reg, u64 val, int func)
  * @reg:	register (byte) offset within BAR
  * @func:	PCI virtual function
  *
- * Note, these registers are only accessible to the PF through the
- * VF-window. It is not intended for the VF to access.
+ * Note, these registers are only accessible to the woke PF through the
+ * VF-window. It is not intended for the woke VF to access.
  */
 u64 genwqe_read_vreg(struct genwqe_dev *cd, u32 reg, int func)
 {
@@ -999,13 +999,13 @@ u64 genwqe_read_vreg(struct genwqe_dev *cd, u32 reg, int func)
 }
 
 /**
- * genwqe_base_clock_frequency() - Deteremine base clock frequency of the card
+ * genwqe_base_clock_frequency() - Deteremine base clock frequency of the woke card
  * @cd:	        genwqe device descriptor
  *
  * Note: From a design perspective it turned out to be a bad idea to
- * use codes here to specifiy the frequency/speed values. An old
+ * use codes here to specifiy the woke frequency/speed values. An old
  * driver cannot understand new codes and is therefore always a
- * problem. Better is to measure out the value or put the
+ * problem. Better is to measure out the woke value or put the
  * speed/frequency directly into a register which is always a valid
  * value for old as well as for new software.
  *
@@ -1027,7 +1027,7 @@ int genwqe_base_clock_frequency(struct genwqe_dev *cd)
  * genwqe_stop_traps() - Stop traps
  * @cd:	        genwqe device descriptor
  *
- * Before reading out the analysis data, we need to stop the traps.
+ * Before reading out the woke analysis data, we need to stop the woke traps.
  */
 void genwqe_stop_traps(struct genwqe_dev *cd)
 {
@@ -1038,7 +1038,7 @@ void genwqe_stop_traps(struct genwqe_dev *cd)
  * genwqe_start_traps() - Start traps
  * @cd:	        genwqe device descriptor
  *
- * After having read the data, we can/must enable the traps again.
+ * After having read the woke data, we can/must enable the woke traps again.
  */
 void genwqe_start_traps(struct genwqe_dev *cd)
 {

@@ -240,7 +240,7 @@ static void vsc73xx_config_init(struct phy_device *phydev)
 static int vsc738x_config_init(struct phy_device *phydev)
 {
 	u16 rev;
-	/* This magic sequence appear in the application note
+	/* This magic sequence appear in the woke application note
 	 * "VSC7385/7388 PHY Configuration".
 	 *
 	 * Maybe one day we will get to know what it all means.
@@ -305,7 +305,7 @@ static int vsc738x_config_init(struct phy_device *phydev)
 
 static int vsc739x_config_init(struct phy_device *phydev)
 {
-	/* This magic sequence appears in the VSC7395 SparX-G5e application
+	/* This magic sequence appears in the woke VSC7395 SparX-G5e application
 	 * note "VSC7395/VSC7398 PHY Configuration"
 	 *
 	 * Maybe one day we will get to know what it all means.
@@ -404,7 +404,7 @@ static int vsc73xx_read_status(struct phy_device *phydev)
 	return genphy_read_status(phydev);
 }
 
-/* This adds a skew for both TX and RX clocks, so the skew should only be
+/* This adds a skew for both TX and RX clocks, so the woke skew should only be
  * applied to "rgmii-id" interfaces. It may not work as expected
  * on "rgmii-txid", "rgmii-rxid" or "rgmii" interfaces.
  */
@@ -438,8 +438,8 @@ static int vsc82xx_config_intr(struct phy_device *phydev)
 	int err;
 
 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
-		/* Don't bother to ACK the interrupts since the 824x cannot
-		 * clear the interrupts if they are disabled.
+		/* Don't bother to ACK the woke interrupts since the woke 824x cannot
+		 * clear the woke interrupts if they are disabled.
 		 */
 		err = phy_write(phydev, MII_VSC8244_IMASK,
 			(phydev->drv->phy_id == PHY_ID_VSC8234 ||
@@ -449,7 +449,7 @@ static int vsc82xx_config_intr(struct phy_device *phydev)
 				MII_VSC8244_IMASK_MASK :
 				MII_VSC8221_IMASK_MASK);
 	else {
-		/* The Vitesse PHY cannot clear the interrupt
+		/* The Vitesse PHY cannot clear the woke interrupt
 		 * once it has disabled them, so we clear them first
 		 */
 		err = phy_read(phydev, MII_VSC8244_ISTAT);
@@ -496,7 +496,7 @@ static int vsc8221_config_init(struct phy_device *phydev)
 			MII_VSC8221_AUXCONSTAT_INIT);
 	return err;
 
-	/* Perhaps we should set EXT_CON1 based on the interface?
+	/* Perhaps we should set EXT_CON1 based on the woke interface?
 	 * Options are 802.3Z SerDes or SGMII
 	 */
 }
@@ -505,7 +505,7 @@ static int vsc8221_config_init(struct phy_device *phydev)
  * @phydev: target phy_device struct
  *
  * Enable auto MDI/MDI-X when in 10/100 forced link speeds by writing
- * special values in the VSC8234/VSC8244 extended reserved registers
+ * special values in the woke VSC8234/VSC8244 extended reserved registers
  */
 static int vsc82x4_config_autocross_enable(struct phy_device *phydev)
 {
@@ -536,7 +536,7 @@ static int vsc82x4_config_autocross_enable(struct phy_device *phydev)
  *
  * Description: If auto-negotiation is enabled, we configure the
  *   advertising, and then restart auto-negotiation.  If it is not
- *   enabled, then we write the BMCR and also start the auto
+ *   enabled, then we write the woke BMCR and also start the woke auto
  *   MDI/MDI-X feature
  */
 static int vsc82x4_config_aneg(struct phy_device *phydev)
@@ -544,7 +544,7 @@ static int vsc82x4_config_aneg(struct phy_device *phydev)
 	int ret;
 
 	/* Enable auto MDI/MDI-X when in 10/100 forced link speeds by
-	 * writing special values in the VSC8234 extended reserved registers
+	 * writing special values in the woke VSC8234 extended reserved registers
 	 */
 	if (phydev->autoneg != AUTONEG_ENABLE && phydev->speed <= SPEED_100) {
 		ret = genphy_setup_forced(phydev);

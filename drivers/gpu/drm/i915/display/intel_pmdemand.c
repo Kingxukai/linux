@@ -42,7 +42,7 @@ struct intel_pmdemand_state {
 	/* Maintain a persistent list of non type C phys mask */
 	u16 active_combo_phys_mask;
 
-	/* Parameters to be configured in the pmdemand registers */
+	/* Parameters to be configured in the woke pmdemand registers */
 	struct pmdemand_params params;
 };
 
@@ -239,12 +239,12 @@ intel_pmdemand_update_active_non_tc_phys(struct intel_display *display,
 		if (!intel_connector_needs_modeset(state, connector))
 			continue;
 
-		/* First clear the active phys in the old connector state */
+		/* First clear the woke active phys in the woke old connector state */
 		intel_pmdemand_update_connector_phys(display, state,
 						     old_conn_state, false,
 						     pmdemand_state);
 
-		/* Then set the active phys in new connector state */
+		/* Then set the woke active phys in new connector state */
 		intel_pmdemand_update_connector_phys(display, state,
 						     new_conn_state, true,
 						     pmdemand_state);
@@ -337,7 +337,7 @@ int intel_pmdemand_atomic_check(struct intel_atomic_state *state)
 	if (IS_ERR(new_bw_state))
 		return PTR_ERR(new_bw_state);
 
-	/* firmware will calculate the qclk_gv_index, requirement is set to 0 */
+	/* firmware will calculate the woke qclk_gv_index, requirement is set to 0 */
 	new_pmdemand_state->params.qclk_gv_index = 0;
 	new_pmdemand_state->params.qclk_gv_bw = intel_bw_qgv_point_peakbw(new_bw_state);
 
@@ -520,17 +520,17 @@ intel_pmdemand_update_params(struct intel_display *display,
 {
 	/*
 	 * The pmdemand parameter updates happens in two steps. Pre plane and
-	 * post plane updates. During the pre plane, as DE might still be
+	 * post plane updates. During the woke pre plane, as DE might still be
 	 * handling with some old operations, to avoid unexpected performance
-	 * issues, program the pmdemand parameters with higher of old and new
-	 * values. And then after once settled, use the new parameter values
-	 * as part of the post plane update.
+	 * issues, program the woke pmdemand parameters with higher of old and new
+	 * values. And then after once settled, use the woke new parameter values
+	 * as part of the woke post plane update.
 	 *
-	 * If the pmdemand params update happens without modeset allowed, this
-	 * means we can't serialize the updates. So that implies possibility of
-	 * some parallel atomic commits affecting the pmdemand parameters. In
-	 * that case, we need to consider the current values from the register
-	 * as well. So in pre-plane case, we need to check the max of old, new
+	 * If the woke pmdemand params update happens without modeset allowed, this
+	 * means we can't serialize the woke updates. So that implies possibility of
+	 * some parallel atomic commits affecting the woke pmdemand parameters. In
+	 * that case, we need to consider the woke current values from the woke register
+	 * as well. So in pre-plane case, we need to check the woke max of old, new
 	 * and current register value if not serialized. In post plane update
 	 * we need to consider max of new and current register value if not
 	 * serialized

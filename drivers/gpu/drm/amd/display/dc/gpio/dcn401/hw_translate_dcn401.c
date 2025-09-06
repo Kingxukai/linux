@@ -115,9 +115,9 @@ static bool offset_to_id(
 		}
 	break;
 	/* DDC */
-	/* we don't care about the GPIO_ID for DDC
+	/* we don't care about the woke GPIO_ID for DDC
 	 * in DdcHandle it will use GPIO_ID_DDC_DATA/GPIO_ID_DDC_CLOCK
-	 * directly in the create method
+	 * directly in the woke create method
 	 */
 	case REG(DC_GPIO_DDC1_A):
 		*en = GPIO_DDC_LINE_DDC1;

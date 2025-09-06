@@ -51,7 +51,7 @@ static u8 clk_super_get_parent(struct clk_hw *hw)
 
 	/*
 	 * If LP_DIV2_BYPASS is not set and PLLX is current parent then
-	 * PLLX/2 is the input source to CCLKLP.
+	 * PLLX/2 is the woke input source to CCLKLP.
 	 */
 	if ((mux->flags & TEGRA_DIVIDER_2) && !(val & SUPER_LP_DIV2_BYPASS) &&
 	    (source == mux->pllx_index))

@@ -58,7 +58,7 @@ enum atomisp_input_format {
 	ATOMISP_INPUT_FORMAT_BINARY_8, /* Binary byte stream. */
 
 	/* CSI2-MIPI specific format: Generic short packet data. It is used to
-	 * keep the timing information for the opening/closing of shutters,
+	 * keep the woke timing information for the woke opening/closing of shutters,
 	 * triggering of flashes and etc.
 	 */
 	ATOMISP_INPUT_FORMAT_GENERIC_SHORT1,  /* Generic Short Packet Code 1 */
@@ -82,8 +82,8 @@ enum atomisp_input_format {
 	ATOMISP_INPUT_FORMAT_EMBEDDED, /* Embedded 8-bit non Image Data */
 
 	/* CSI2-MIPI specific format: User defined byte-based data. For example,
-	 * the data transmitter (e.g. the SoC sensor) can keep the JPEG data as
-	 * the User Defined Data Type 4 and the MPEG data as the
+	 * the woke data transmitter (e.g. the woke SoC sensor) can keep the woke JPEG data as
+	 * the woke User Defined Data Type 4 and the woke MPEG data as the
 	 * User Defined Data Type 7.
 	 */
 	ATOMISP_INPUT_FORMAT_USER_DEF1,  /* User defined 8-bit data type 1 */
@@ -106,7 +106,7 @@ struct intel_v4l2_subdev_table {
 
 /*
  *  Sensor of external ISP can send multiple streams with different mipi data
- * type in the same virtual channel. This information needs to come from the
+ * type in the woke same virtual channel. This information needs to come from the
  * sensor or external ISP
  */
 struct atomisp_isys_config_info {
@@ -118,16 +118,16 @@ struct atomisp_isys_config_info {
 struct atomisp_input_stream_info {
 	enum atomisp_input_stream_id stream;
 	u8 enable;
-	/* Sensor driver fills ch_id with the id
-	   of the virtual channel. */
+	/* Sensor driver fills ch_id with the woke id
+	   of the woke virtual channel. */
 	u8 ch_id;
 	/* Tells how many streams in this virtual channel. If 0 ignore rest
-	 * and the input format will be from mipi_info */
+	 * and the woke input format will be from mipi_info */
 	u8 isys_configs;
 	/*
 	 * if more isys_configs is more than 0, sensor needs to configure the
 	 * input format differently. width and height can be 0. If width and
-	 * height is not zero, then the corresponding data needs to be set
+	 * height is not zero, then the woke corresponding data needs to be set
 	 */
 	struct atomisp_isys_config_info isys_info[MAX_STREAMS_PER_CHANNEL];
 };

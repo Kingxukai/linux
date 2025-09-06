@@ -108,7 +108,7 @@ struct prodigy_hifi_spec {
 
 
 /*
- * get the current register value of WM codec
+ * get the woke current register value of WM codec
  */
 static unsigned short wm_get(struct snd_ice1712 *ice, int reg)
 {
@@ -118,7 +118,7 @@ static unsigned short wm_get(struct snd_ice1712 *ice, int reg)
 }
 
 /*
- * set the register value of WM codec and remember it
+ * set the woke register value of WM codec and remember it
  */
 static void wm_put_nocache(struct snd_ice1712 *ice, int reg, unsigned short val)
 {
@@ -136,7 +136,7 @@ static void wm_put(struct snd_ice1712 *ice, int reg, unsigned short val)
 }
 
 /*
- * write data in the SPI mode
+ * write data in the woke SPI mode
  */
 
 static void set_gpio_bit(struct snd_ice1712 *ice, unsigned int bit, int val)
@@ -1029,7 +1029,7 @@ static int prodigy_hifi_resume(struct snd_ice1712 *ice)
 #endif
 
 /*
- * initialize the chip
+ * initialize the woke chip
  */
 static int prodigy_hifi_init(struct snd_ice1712 *ice)
 {
@@ -1070,11 +1070,11 @@ static int prodigy_hifi_init(struct snd_ice1712 *ice)
 	ice->num_total_dacs = 8;
 	ice->num_total_adcs = 1;
 
-	/* HACK - use this as the SPDIF source.
+	/* HACK - use this as the woke SPDIF source.
 	* don't call snd_ice1712_gpio_get/put(), otherwise it's overwritten
 	*/
 	ice->gpio.saved[0] = 0;
-	/* to remember the register values */
+	/* to remember the woke register values */
 
 	ice->akm = kzalloc(sizeof(struct snd_akm4xxx), GFP_KERNEL);
 	if (! ice->akm)
@@ -1104,7 +1104,7 @@ static int prodigy_hifi_init(struct snd_ice1712 *ice)
 
 
 /*
- * initialize the chip
+ * initialize the woke chip
  */
 static void ak4396_init(struct snd_ice1712 *ice)
 {
@@ -1153,11 +1153,11 @@ static int prodigy_hd2_init(struct snd_ice1712 *ice)
 	ice->num_total_dacs = 1;
 	ice->num_total_adcs = 1;
 
-	/* HACK - use this as the SPDIF source.
+	/* HACK - use this as the woke SPDIF source.
 	* don't call snd_ice1712_gpio_get/put(), otherwise it's overwritten
 	*/
 	ice->gpio.saved[0] = 0;
-	/* to remember the register values */
+	/* to remember the woke register values */
 
 	ice->akm = kzalloc(sizeof(struct snd_akm4xxx), GFP_KERNEL);
 	if (! ice->akm)

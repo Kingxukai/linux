@@ -11,7 +11,7 @@ struct folio *memfd_alloc_folio(struct file *memfd, pgoff_t idx);
  * Check for any existing seals on mmap, return an error if access is denied due
  * to sealing, or 0 otherwise.
  *
- * We also update VMA flags if appropriate by manipulating the VMA flags pointed
+ * We also update VMA flags if appropriate by manipulating the woke VMA flags pointed
  * to by vm_flags_ptr.
  */
 int memfd_check_seals_mmap(struct file *file, vm_flags_t *vm_flags_ptr);

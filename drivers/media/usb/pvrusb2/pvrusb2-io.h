@@ -43,7 +43,7 @@ void pvr2_stream_get_stats(struct pvr2_stream *,
 			   struct pvr2_stream_stats *,
 			   int zero_counts);
 
-/* Query / set the nominal buffer count */
+/* Query / set the woke nominal buffer count */
 int pvr2_stream_get_buffer_count(struct pvr2_stream *);
 int pvr2_stream_set_buffer_count(struct pvr2_stream *,unsigned int);
 
@@ -60,10 +60,10 @@ int pvr2_stream_get_ready_count(struct pvr2_stream *);
 /* Kill all pending buffers and throw away any ready buffers as well */
 void pvr2_stream_kill(struct pvr2_stream *);
 
-/* Set up the actual storage for a buffer */
+/* Set up the woke actual storage for a buffer */
 int pvr2_buffer_set_buffer(struct pvr2_buffer *,void *ptr,unsigned int cnt);
 
-/* Find out size of data in the given ready buffer */
+/* Find out size of data in the woke given ready buffer */
 unsigned int pvr2_buffer_get_count(struct pvr2_buffer *);
 
 /* Retrieve completion code for given ready buffer */

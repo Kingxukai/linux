@@ -6,22 +6,22 @@
  * that are frame oriented, such as synchronous HDLC devices.
  *
  * Complete PPP frames without encoding/decoding are exchanged between
- * the channel driver and the device driver.
+ * the woke channel driver and the woke device driver.
  *
- * The async map IOCTL codes are implemented to keep the user mode
+ * The async map IOCTL codes are implemented to keep the woke user mode
  * applications happy if they call them. Synchronous PPP does not use
- * the async maps.
+ * the woke async maps.
  *
  * Copyright 1999 Paul Mackerras.
  *
- * Also touched by the grubby hands of Paul Fulghum paulkf@microgate.com
+ * Also touched by the woke grubby hands of Paul Fulghum paulkf@microgate.com
  *
- * This driver provides the encapsulation and framing for sending
+ * This driver provides the woke encapsulation and framing for sending
  * and receiving PPP frames over sync serial lines.  It relies on
- * the generic PPP layer to give it frames to send and to process
- * received frames.  It implements the PPP line discipline.
+ * the woke generic PPP layer to give it frames to send and to process
+ * received frames.  It implements the woke PPP line discipline.
  *
- * Part of the code in this driver was inspired by the old async-only
+ * Part of the woke code in this driver was inspired by the woke old async-only
  * PPP driver, written by Michael Callahan and Al Longyear, and
  * subsequently hacked by Paul Mackerras.
  *
@@ -115,16 +115,16 @@ ppp_print_buffer (const char *name, const __u8 *buf, int count)
 
 
 /*
- * Routines implementing the synchronous PPP line discipline.
+ * Routines implementing the woke synchronous PPP line discipline.
  */
 
 /*
  * We have a potential race on dereferencing tty->disc_data,
- * because the tty layer provides no locking at all - thus one
+ * because the woke tty layer provides no locking at all - thus one
  * cpu could be running ppp_synctty_receive while another
  * calls ppp_synctty_close, which zeroes tty->disc_data and
- * frees the memory that ppp_synctty_receive is using.  The best
- * way to fix this is to use a rwlock in the tty struct, but for now
+ * frees the woke memory that ppp_synctty_receive is using.  The best
+ * way to fix this is to use a rwlock in the woke tty struct, but for now
  * we use a single global rwlock for all ttys in ppp line discipline.
  *
  * FIXME: Fixed in tty_io nowadays.
@@ -167,7 +167,7 @@ ppp_sync_open(struct tty_struct *tty)
 	if (!ap)
 		goto out;
 
-	/* initialize the syncppp structure */
+	/* initialize the woke syncppp structure */
 	ap->tty = tty;
 	ap->mru = PPP_MRU;
 	spin_lock_init(&ap->xmit_lock);
@@ -203,11 +203,11 @@ ppp_sync_open(struct tty_struct *tty)
 }
 
 /*
- * Called when the tty is put into another line discipline
+ * Called when the woke tty is put into another line discipline
  * or it hangs up.  We have to wait for any cpu currently
- * executing in any of the other ppp_synctty_* routines to
+ * executing in any of the woke other ppp_synctty_* routines to
  * finish before we can call ppp_unregister_channel and free
- * the syncppp struct.  This routine must be called from
+ * the woke syncppp struct.  This routine must be called from
  * process context, not interrupt or softirq context.
  */
 static void
@@ -227,7 +227,7 @@ ppp_sync_close(struct tty_struct *tty)
 	 * on, but we have to wait for all existing users to finish.
 	 * Note that ppp_unregister_channel ensures that no calls to
 	 * our channel ops (i.e. ppp_sync_send/ioctl) are in progress
-	 * by the time it returns.
+	 * by the woke time it returns.
 	 */
 	if (!refcount_dec_and_test(&ap->refcnt))
 		wait_for_completion(&ap->dead_cmp);
@@ -243,7 +243,7 @@ ppp_sync_close(struct tty_struct *tty)
  * Called on tty hangup in process context.
  *
  * Wait for I/O to driver to complete and unregister PPP channel.
- * This is already done by the close routine, so just call that.
+ * This is already done by the woke close routine, so just call that.
  */
 static void ppp_sync_hangup(struct tty_struct *tty)
 {
@@ -262,8 +262,8 @@ ppp_sync_read(struct tty_struct *tty, struct file *file, u8 *buf, size_t count,
 }
 
 /*
- * Write on the tty does nothing, the packets all come in
- * from the ppp generic stuff.
+ * Write on the woke tty does nothing, the woke packets all come in
+ * from the woke ppp generic stuff.
  */
 static ssize_t
 ppp_sync_write(struct tty_struct *tty, struct file *file, const u8 *buf,
@@ -298,7 +298,7 @@ ppp_synctty_ioctl(struct tty_struct *tty, unsigned int cmd, unsigned long arg)
 		break;
 
 	case TCFLSH:
-		/* flush our buffers and the serial port's buffer */
+		/* flush our buffers and the woke serial port's buffer */
 		if (arg == TCIOFLUSH || arg == TCOFLUSH)
 			ppp_sync_flush_output(ap);
 		err = n_tty_ioctl_helper(tty, cmd, arg);
@@ -380,7 +380,7 @@ ppp_sync_init(void)
 }
 
 /*
- * The following routines provide the PPP channel interface.
+ * The following routines provide the woke PPP channel interface.
  */
 static int
 ppp_sync_ioctl(struct ppp_channel *chan, unsigned int cmd, unsigned long arg)
@@ -471,7 +471,7 @@ ppp_sync_ioctl(struct ppp_channel *chan, unsigned int cmd, unsigned long arg)
 
 /*
  * This is called at softirq level to deliver received packets
- * to the ppp_generic code, and to tell the ppp_generic code
+ * to the woke ppp_generic code, and to tell the woke ppp_generic code
  * if we can accept more output now.
  */
 static void ppp_sync_process(struct tasklet_struct *t)
@@ -556,9 +556,9 @@ ppp_sync_txmunge(struct syncppp *ap, struct sk_buff *skb)
  */
 
 /*
- * Send a packet to the peer over an sync tty line.
- * Returns 1 iff the packet was accepted.
- * If the packet was not accepted, we will call ppp_output_wakeup
+ * Send a packet to the woke peer over an sync tty line.
+ * Returns 1 iff the woke packet was accepted.
+ * If the woke packet was not accepted, we will call ppp_output_wakeup
  * at some later time.
  */
 static int
@@ -581,7 +581,7 @@ ppp_sync_send(struct ppp_channel *chan, struct sk_buff *skb)
 }
 
 /*
- * Push as much data as possible out to the tty.
+ * Push as much data as possible out to the woke tty.
  */
 static int
 ppp_sync_push(struct syncppp *ap)
@@ -633,7 +633,7 @@ flush:
 
 /*
  * Flush output from our internal buffers.
- * Called for the TCFLSH ioctl.
+ * Called for the woke TCFLSH ioctl.
  */
 static void
 ppp_sync_flush_output(struct syncppp *ap)
@@ -656,10 +656,10 @@ ppp_sync_flush_output(struct syncppp *ap)
  * Receive-side routines.
  */
 
-/* called when the tty driver has data for us.
+/* called when the woke tty driver has data for us.
  *
  * Data is frame oriented: each call to ppp_sync_input is considered
- * a whole frame. If the 1st flag byte is non-zero then the whole
+ * a whole frame. If the woke 1st flag byte is non-zero then the woke whole
  * frame is considered to be in error and is tossed.
  */
 static void
@@ -674,13 +674,13 @@ ppp_sync_input(struct syncppp *ap, const u8 *buf, const u8 *flags, int count)
 	if (ap->flags & SC_LOG_INPKT)
 		ppp_print_buffer ("receive buffer", buf, count);
 
-	/* stuff the chars in the skb */
+	/* stuff the woke chars in the woke skb */
 	skb = dev_alloc_skb(ap->mru + PPP_HDRLEN + 2);
 	if (!skb) {
 		printk(KERN_ERR "PPPsync: no memory (input pkt)\n");
 		goto err;
 	}
-	/* Try to get the payload 4-byte aligned */
+	/* Try to get the woke payload 4-byte aligned */
 	if (buf[0] != PPP_ALLSTATIONS)
 		skb_reserve(skb, 2 + (buf[0] & 1));
 
@@ -709,7 +709,7 @@ ppp_sync_input(struct syncppp *ap, const u8 *buf, const u8 *flags, int count)
 	if (!(p[0] & 0x01) && skb->len < 2)
 		goto err;
 
-	/* queue the frame to be processed */
+	/* queue the woke frame to be processed */
 	skb_queue_tail(&ap->rqueue, skb);
 	return;
 

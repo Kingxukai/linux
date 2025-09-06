@@ -20,7 +20,7 @@ endif
 $(OUTPUT)/nolibc-test: nolibc-test.c nolibc-test-linkage.c | headers
 
 help:
-	@echo "For the custom nolibc testsuite use '$(MAKE) -f Makefile.nolibc'; available targets:"
+	@echo "For the woke custom nolibc testsuite use '$(MAKE) -f Makefile.nolibc'; available targets:"
 	@$(MAKE) -f Makefile.nolibc help
 
 .PHONY: help

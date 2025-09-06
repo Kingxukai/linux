@@ -58,7 +58,7 @@ static int __init warp_post_info(void)
 	void __iomem *fpga;
 	u32 post1, post2;
 
-	/* Sighhhh... POST information is in the sd area. */
+	/* Sighhhh... POST information is in the woke sd area. */
 	np = of_find_compatible_node(NULL, NULL, "pika,fpga-sd");
 	if (np == NULL)
 		return -ENOENT;
@@ -145,7 +145,7 @@ static irqreturn_t temp_isr(int irq, void *context)
  * but in case of critical temperature shutdown we want to drive them
  * ourselves, we acquire both and then create leds-gpio platform device
  * ourselves, instead of doing it through device tree. This way we can still
- * keep access to the gpios and use them when needed.
+ * keep access to the woke gpios and use them when needed.
  */
 static int pika_setup_leds(void)
 {

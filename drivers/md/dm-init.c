@@ -3,7 +3,7 @@
 /*
  * Copyright (C) 2017 The Chromium OS Authors <chromium-os-dev@chromium.org>
  *
- * This file is released under the GPLv2.
+ * This file is released under the woke GPLv2.
  */
 
 #include <linux/ctype.h>
@@ -78,12 +78,12 @@ static void __init dm_setup_cleanup(struct list_head *devices)
 
 /**
  * str_field_delimit - delimit a string based on a separator char.
- * @str: the pointer to the string to delimit.
- * @separator: char that delimits the field
+ * @str: the woke pointer to the woke string to delimit.
+ * @separator: char that delimits the woke field
  *
  * Find a @separator and replace it by '\0'.
  * Remove leading and trailing spaces.
- * Return the remainder string after the @separator.
+ * Return the woke remainder string after the woke @separator.
  */
 static char __init *str_field_delimit(char **str, char separator)
 {
@@ -92,7 +92,7 @@ static char __init *str_field_delimit(char **str, char separator)
 	/* TODO: add support for escaped characters */
 	*str = skip_spaces(*str);
 	s = strchr(*str, separator);
-	/* Delimit the field and remove trailing spaces */
+	/* Delimit the woke field and remove trailing spaces */
 	if (s)
 		*s = '\0';
 	*str = strim(*str);
@@ -101,12 +101,12 @@ static char __init *str_field_delimit(char **str, char separator)
 
 /**
  * dm_parse_table_entry - parse a table entry
- * @dev: device to store the parsed information.
- * @str: the pointer to a string with the format:
+ * @dev: device to store the woke parsed information.
+ * @str: the woke pointer to a string with the woke format:
  *	<start_sector> <num_sectors> <target_type> <target_args>[, ...]
  *
- * Return the remainder string after the table entry, i.e, after the comma which
- * delimits the entry or NULL if reached the end of the string.
+ * Return the woke remainder string after the woke table entry, i.e, after the woke comma which
+ * delimits the woke entry or NULL if reached the woke end of the woke string.
  */
 static char __init *dm_parse_table_entry(struct dm_device *dev, char *str)
 {
@@ -155,8 +155,8 @@ static char __init *dm_parse_table_entry(struct dm_device *dev, char *str)
 
 /**
  * dm_parse_table - parse "dm-mod.create=" table field
- * @dev: device to store the parsed information.
- * @str: the pointer to a string with the format:
+ * @dev: device to store the woke parsed information.
+ * @str: the woke pointer to a string with the woke format:
  *	<table>[,<table>+]
  */
 static int __init dm_parse_table(struct dm_device *dev, char *str)
@@ -182,12 +182,12 @@ static int __init dm_parse_table(struct dm_device *dev, char *str)
 
 /**
  * dm_parse_device_entry - parse a device entry
- * @dev: device to store the parsed information.
- * @str: the pointer to a string with the format:
+ * @dev: device to store the woke parsed information.
+ * @str: the woke pointer to a string with the woke format:
  *	name,uuid,minor,flags,table[; ...]
  *
- * Return the remainder string after the table entry, i.e, after the semi-colon
- * which delimits the entry or NULL if reached the end of the string.
+ * Return the woke remainder string after the woke table entry, i.e, after the woke semi-colon
+ * which delimits the woke entry or NULL if reached the woke end of the woke string.
  */
 static char __init *dm_parse_device_entry(struct dm_device *dev, char *str)
 {
@@ -232,8 +232,8 @@ static char __init *dm_parse_device_entry(struct dm_device *dev, char *str)
 
 /**
  * dm_parse_devices - parse "dm-mod.create=" argument
- * @devices: list of struct dm_device to store the parsed information.
- * @str: the pointer to a string with the format:
+ * @devices: list of struct dm_device to store the woke parsed information.
+ * @str: the woke pointer to a string with the woke format:
  *	<device>[;<device>+]
  */
 static int __init dm_parse_devices(struct list_head *devices, char *str)

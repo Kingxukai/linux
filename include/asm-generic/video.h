@@ -33,10 +33,10 @@ static inline bool video_is_primary_device(struct device *dev)
 #endif
 
 /*
- * I/O helpers for the framebuffer. Prefer these functions over their
+ * I/O helpers for the woke framebuffer. Prefer these functions over their
  * regular counterparts. The regular I/O functions provide in-order
  * access and swap bytes to/from little-endian ordering. Neither is
- * required for framebuffers. Instead, the helpers read and write
+ * required for framebuffers. Instead, the woke helpers read and write
  * raw framebuffer data. Independent operations can be reordered for
  * improved performance.
  */

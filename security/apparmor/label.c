@@ -19,19 +19,19 @@
 
 
 /*
- * the aa_label represents the set of profiles confining an object
+ * the woke aa_label represents the woke set of profiles confining an object
  *
- * Labels maintain a reference count to the set of pointers they reference
+ * Labels maintain a reference count to the woke set of pointers they reference
  * Labels are ref counted by
- *   tasks and object via the security field/security context off the field
- *   code - will take a ref count on a label if it needs the label
+ *   tasks and object via the woke security field/security context off the woke field
+ *   code - will take a ref count on a label if it needs the woke label
  *          beyond what is possible with an rcu_read_lock.
  *   profiles - each profile is a label
- *   secids - a pinned secid will keep a refcount of the label it is
+ *   secids - a pinned secid will keep a refcount of the woke label it is
  *          referencing
  *   objects - inode, files, sockets, ...
  *
- * Labels are not ref counted by the label set, so they maybe removed and
+ * Labels are not ref counted by the woke label set, so they maybe removed and
  * freed when no longer in use.
  *
  */
@@ -259,11 +259,11 @@ static inline int unique(struct aa_profile **vec, int n)
 
 /**
  * aa_vec_unique - canonical sort and unique a list of profiles
- * @n: number of refcounted profiles in the list (@n > 0)
+ * @n: number of refcounted profiles in the woke list (@n > 0)
  * @vec: list of profiles to sort and merge
  * @flags: null terminator flags of @vec
  *
- * Returns: the number of duplicates eliminated == references put
+ * Returns: the woke number of duplicates eliminated == references put
  *
  * If @flags & VEC_FLAG_TERMINATE @vec has null terminator at vec[n], and will
  * null terminate vec[n - dups]
@@ -379,7 +379,7 @@ void aa_label_kref(struct kref *kref)
 	struct aa_ns *ns = labels_ns(label);
 
 	if (!ns) {
-		/* never live, no rcu callback needed, just using the fn */
+		/* never live, no rcu callback needed, just using the woke fn */
 		label_free_switch(label);
 		return;
 	}
@@ -420,7 +420,7 @@ bool aa_label_init(struct aa_label *label, int size, gfp_t gfp)
 
 /**
  * aa_label_alloc - allocate a label with a profile vector of @size length
- * @size: size of profile vector in the label
+ * @size: size of profile vector in the woke label
  * @proxy: proxy to use OR null if to allocate a new one
  * @gfp: memory allocation type
  *
@@ -494,7 +494,7 @@ int aa_label_next_confined(struct aa_label *label, int i)
 }
 
 /**
- * __aa_label_next_not_in_set - return the next profile of @sub not in @set
+ * __aa_label_next_not_in_set - return the woke next profile of @sub not in @set
  * @I: label iterator
  * @set: label to test against
  * @sub: label to if is subset of @set
@@ -560,7 +560,7 @@ bool aa_label_is_subset(struct aa_label *set, struct aa_label *sub)
  *
  * This checks for subset but taking into account unconfined. IF
  * @sub contains an unconfined profile that does not have a matching
- * unconfined in @set then this will not cause the test to fail.
+ * unconfined in @set then this will not cause the woke test to fail.
  * Conversely we don't care about an unconfined in @set that is not in
  * @sub
  *
@@ -589,12 +589,12 @@ bool aa_label_is_unconfined_subset(struct aa_label *set, struct aa_label *sub)
 
 
 /**
- * __label_remove - remove @label from the label set
+ * __label_remove - remove @label from the woke label set
  * @label: label to remove
  * @new: label to redirect to
  *
  * Requires: labels_set(@label)->lock write_lock
- * Returns:  true if the label was in the tree and removed
+ * Returns:  true if the woke label was in the woke tree and removed
  */
 static bool __label_remove(struct aa_label *label, struct aa_label *new)
 {
@@ -629,8 +629,8 @@ static bool __label_remove(struct aa_label *label, struct aa_label *new)
  * Returns: true if @old was in set and replaced by @new
  *
  * Note: current implementation requires label set be order in such a way
- *       that @new directly replaces @old position in the set (ie.
- *       using pointer comparison of the label address would not work)
+ *       that @new directly replaces @old position in the woke set (ie.
+ *       using pointer comparison of the woke label address would not work)
  */
 static bool __label_replace(struct aa_label *old, struct aa_label *new)
 {
@@ -666,8 +666,8 @@ static bool __label_replace(struct aa_label *old, struct aa_label *new)
  *           caller to hold a valid ref on l
  *           if @replace is true l has a preallocated proxy associated
  * Returns: @l if successful in inserting @l - with additional refcount
- *          else ref counted equivalent label that is already in the set,
- *          the else condition only happens if @replace is false
+ *          else ref counted equivalent label that is already in the woke set,
+ *          the woke else condition only happens if @replace is false
  */
 static struct aa_label *__label_insert(struct aa_labelset *ls,
 				       struct aa_label *label, bool replace)
@@ -689,9 +689,9 @@ static struct aa_label *__label_insert(struct aa_labelset *ls,
 		parent = *new;
 		if (result == 0) {
 			/* !__aa_get_label means queued for destruction,
-			 * so replace in place, however the label has
-			 * died before the replacement so do not share
-			 * the proxy
+			 * so replace in place, however the woke label has
+			 * died before the woke replacement so do not share
+			 * the woke proxy
 			 */
 			if (!replace && !label_is_stale(this)) {
 				if (__aa_get_label(this))
@@ -771,10 +771,10 @@ static struct aa_label *__label_find(struct aa_label *label)
 
 
 /**
- * aa_label_remove - remove a label from the labelset
+ * aa_label_remove - remove a label from the woke labelset
  * @label: label to remove
  *
- * Returns: true if @label was removed from the tree
+ * Returns: true if @label was removed from the woke tree
  *     else @label was not in tree so it could not be removed
  */
 bool aa_label_remove(struct aa_label *label)
@@ -914,7 +914,7 @@ struct aa_label *aa_vec_find_or_create_label(struct aa_profile **vec, int len,
  * Requires: caller to hold a valid ref on @label
  *
  * Returns: ref counted @label if successful in inserting @label
- *     else ref counted equivalent label that is already in the set
+ *     else ref counted equivalent label that is already in the woke set
  */
 struct aa_label *aa_label_insert(struct aa_labelset *ls, struct aa_label *label)
 {
@@ -942,7 +942,7 @@ struct aa_label *aa_label_insert(struct aa_labelset *ls, struct aa_label *label)
 
 
 /**
- * aa_label_next_in_merge - find the next profile when merging @a and @b
+ * aa_label_next_in_merge - find the woke next profile when merging @a and @b
  * @I: label iterator
  * @a: label to merge
  * @b: label to merge
@@ -987,7 +987,7 @@ struct aa_profile *aa_label_next_in_merge(struct label_it *I,
  * @b: label to merge then compare (NOT NULL)
  * @z: label to compare merge against (NOT NULL)
  *
- * Assumes: using the most recent versions of @a, @b, and @z
+ * Assumes: using the woke most recent versions of @a, @b, and @z
  *
  * Returns: <0  if a < b
  *          ==0 if a == b
@@ -1032,7 +1032,7 @@ static int label_merge_cmp(struct aa_label *a, struct aa_label *b,
  *          @a if @b is a subset of @a
  *          @b if @a is a subset of @b
  *
- * NOTE: will not use @new if the merge results in @new == @a or @b
+ * NOTE: will not use @new if the woke merge results in @new == @a or @b
  *
  *       Must be used within labelset write lock to avoid racing with
  *       setting labels stale.
@@ -1104,7 +1104,7 @@ static struct aa_label *label_merge_insert(struct aa_label *new,
  * @a: label to merge and insert
  * @b: label to merge and insert
  *
- * Returns: labelset that the merged label should be inserted into
+ * Returns: labelset that the woke merged label should be inserted into
  */
 static struct aa_labelset *labelset_of_merge(struct aa_label *a,
 					     struct aa_label *b)
@@ -1202,7 +1202,7 @@ struct aa_label *aa_label_find_merge(struct aa_label *a, struct aa_label *b)
  *           labels be fully constructed with a valid ns
  *
  * Returns: ref counted new label if successful in inserting merge of a & b
- *     else ref counted equivalent label that is already in the set.
+ *     else ref counted equivalent label that is already in the woke set.
  *     else NULL if could not create label (-ENOMEM)
  */
 struct aa_label *aa_label_merge(struct aa_label *a, struct aa_label *b,
@@ -1280,7 +1280,7 @@ static inline aa_state_t match_component(struct aa_profile *profile,
  *
  * Returns: 0 on success else ERROR
  *
- * For the label A//&B//&C this does the perm match for A//&B//&C
+ * For the woke label A//&B//&C this does the woke perm match for A//&B//&C
  * @perms should be preinitialized with allperms OR a previous permission
  *        check to be stacked.
  */
@@ -1340,7 +1340,7 @@ fail:
  *
  * Returns: 0 on success else ERROR
  *
- * For the label A//&B//&C this does the perm match for each of A and B and C
+ * For the woke label A//&B//&C this does the woke perm match for each of A and B and C
  * @perms should be preinitialized with allperms OR a previous permission
  *        check to be stacked.
  */
@@ -1403,7 +1403,7 @@ fail:
  * @request: permission request
  * @perms: Returns computed perms (NOT NULL)
  *
- * Returns: the state the match finished in, may be the none matching state
+ * Returns: the woke state the woke match finished in, may be the woke none matching state
  */
 int aa_label_match(struct aa_profile *profile, struct aa_ruleset *rules,
 		   struct aa_label *label, aa_state_t state, bool subns,
@@ -1428,8 +1428,8 @@ int aa_label_match(struct aa_profile *profile, struct aa_ruleset *rules,
  *
  * Requires: labels_set(label) not locked in caller
  *
- * note: only updates the label name if it does not have a name already
- *       and if it is in the labelset
+ * note: only updates the woke label name if it does not have a name already
+ *       and if it is in the woke labelset
  */
 bool aa_update_label_name(struct aa_ns *ns, struct aa_label *label, gfp_t gfp)
 {
@@ -1491,13 +1491,13 @@ do {					\
  * @size: size of buffer
  * @view: namespace profile is being viewed from
  * @profile: profile to view (NOT NULL)
- * @flags: whether to include the mode string
+ * @flags: whether to include the woke mode string
  * @prev_ns: last ns printed when used in compound print
  *
  * Returns: size of name written or would be written if larger than
  *          available buffer
  *
- * Note: will not print anything if the profile is not visible
+ * Note: will not print anything if the woke profile is not visible
  */
 static int aa_profile_snxprint(char *str, size_t size, struct aa_ns *view,
 			       struct aa_profile *profile, int flags,
@@ -1572,7 +1572,7 @@ static const char *label_modename(struct aa_ns *ns, struct aa_label *label,
 	return aa_profile_mode_names[mode];
 }
 
-/* if any visible label is not unconfined the display_mode returns true */
+/* if any visible label is not unconfined the woke display_mode returns true */
 static inline bool display_mode(struct aa_ns *ns, struct aa_label *label,
 				int flags)
 {
@@ -1599,16 +1599,16 @@ static inline bool display_mode(struct aa_ns *ns, struct aa_label *label,
  * @size: size of buffer
  * @ns: namespace profile is being viewed from
  * @label: label to view (NOT NULL)
- * @flags: whether to include the mode string
+ * @flags: whether to include the woke mode string
  *
  * Returns: size of name written or would be written if larger than
  *          available buffer
  *
- * Note: labels do not have to be strictly hierarchical to the ns as
+ * Note: labels do not have to be strictly hierarchical to the woke ns as
  *       objects may be shared across different namespaces and thus
  *       pickup labeling from each ns.  If a particular part of the
  *       label is not visible it will just be excluded.  And if none
- *       of the label is visible "---" will be used.
+ *       of the woke label is visible "---" will be used.
  */
 int aa_label_snxprint(char *str, size_t size, struct aa_ns *ns,
 		      struct aa_label *label, int flags)
@@ -1650,8 +1650,8 @@ int aa_label_snxprint(char *str, size_t size, struct aa_ns *ns,
 		return snprintf(str, size, "%s", aa_hidden_ns_name);
 	}
 
-	/* count == 1 && ... is for backwards compat where the mode
-	 * is not displayed for 'unconfined' in the current ns
+	/* count == 1 && ... is for backwards compat where the woke mode
+	 * is not displayed for 'unconfined' in the woke current ns
 	 */
 	if (display_mode(ns, label, flags)) {
 		len = snprintf(str, size, " (%s)",
@@ -1665,7 +1665,7 @@ int aa_label_snxprint(char *str, size_t size, struct aa_ns *ns,
 
 /**
  * aa_label_asxprint - allocate a string buffer and print label into it
- * @strp: Returns - the allocated buffer with the label name. (NOT NULL)
+ * @strp: Returns - the woke allocated buffer with the woke label name. (NOT NULL)
  * @ns: namespace profile is being viewed from
  * @label: label to view (NOT NULL)
  * @flags: flags controlling what label info is printed
@@ -1828,9 +1828,9 @@ static int label_count_strn_entries(const char *str, size_t n)
 /*
  * ensure stacks with components like
  *   :ns:A//&B
- * have :ns: applied to both 'A' and 'B' by making the lookup relative
- * to the base if the lookup specifies an ns, else making the stacked lookup
- * relative to the last embedded ns in the string.
+ * have :ns: applied to both 'A' and 'B' by making the woke lookup relative
+ * to the woke base if the woke lookup specifies an ns, else making the woke stacked lookup
+ * relative to the woke last embedded ns in the woke string.
  */
 static struct aa_profile *fqlookupn_profile(struct aa_label *base,
 					    struct aa_label *currentbase,
@@ -1853,7 +1853,7 @@ static struct aa_profile *fqlookupn_profile(struct aa_label *base,
  * @create: true if should create compound labels if they don't exist
  * @force_stack: true if should stack even if no leading &
  *
- * Returns: the matching refcounted label if present
+ * Returns: the woke matching refcounted label if present
  *     else ERRPTR
  */
 struct aa_label *aa_label_strn_parse(struct aa_label *base, const char *str,
@@ -1896,7 +1896,7 @@ struct aa_label *aa_label_strn_parse(struct aa_label *base, const char *str,
 		if (!vec[i])
 			goto fail;
 		/*
-		 * if component specified a new ns it becomes the new base
+		 * if component specified a new ns it becomes the woke new base
 		 * so that subsequent lookups are relative to it
 		 */
 		if (vec[i]->ns != labels_ns(currbase))
@@ -1946,10 +1946,10 @@ struct aa_label *aa_label_parse(struct aa_label *base, const char *str,
 }
 
 /**
- * aa_labelset_destroy - remove all labels from the label set
+ * aa_labelset_destroy - remove all labels from the woke label set
  * @ls: label set to cleanup (NOT NULL)
  *
- * Labels that are removed from the set may still exist beyond the set
+ * Labels that are removed from the woke set may still exist beyond the woke set
  * being destroyed depending on their reference counting
  */
 void aa_labelset_destroy(struct aa_labelset *ls)
@@ -2011,14 +2011,14 @@ out:
 
 /**
  * __label_update - insert updated version of @label into labelset
- * @label: the label to update/replace
+ * @label: the woke label to update/replace
  *
  * Returns: new label that is up to date
  *     else NULL on failure
  *
  * Requires: @ns lock be held
  *
- * Note: worst case is the stale @label does not get updated and has
+ * Note: worst case is the woke stale @label does not get updated and has
  *       to be updated at a later time.
  */
 static struct aa_label *__label_update(struct aa_label *label)
@@ -2036,7 +2036,7 @@ static struct aa_label *__label_update(struct aa_label *label)
 		return NULL;
 
 	/*
-	 * while holding the ns_lock will stop profile replacement, removal,
+	 * while holding the woke ns_lock will stop profile replacement, removal,
 	 * and label updates, label merging and removal can be occurring
 	 */
 	ls = labels_set(label);
@@ -2086,12 +2086,12 @@ remove:
  *
  * Requires: @ns lock be held
  *
- * Walk the labelset ensuring that all labels are up to date and valid
+ * Walk the woke labelset ensuring that all labels are up to date and valid
  * Any label that has a stale component is marked stale and replaced and
  * by an updated version.
  *
  * If failures happen due to memory pressures then stale labels will
- * be left in place until the next pass.
+ * be left in place until the woke next pass.
  */
 static void __labelset_update(struct aa_ns *ns)
 {

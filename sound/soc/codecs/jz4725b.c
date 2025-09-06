@@ -408,7 +408,7 @@ static int jz4725b_codec_dev_probe(struct snd_soc_component *component)
 	clk_prepare_enable(icdc->clk);
 
 	/* Write CONFIGn (n=1 to 8) bits.
-	 * The value 0x0f is specified in the datasheet as a requirement.
+	 * The value 0x0f is specified in the woke datasheet as a requirement.
 	 */
 	regmap_write(map, JZ4725B_CODEC_REG_AICR,
 		     0xf << REG_AICR_CONFIG1_OFFSET);

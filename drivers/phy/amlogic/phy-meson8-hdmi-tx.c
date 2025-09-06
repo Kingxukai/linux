@@ -19,7 +19,7 @@
 /*
  * Unfortunately there is no detailed documentation available for the
  * HHI_HDMI_PHY_CNTL0 register. CTL0 and CTL1 is all we know about.
- * Magic register values in the driver below are taken from the vendor
+ * Magic register values in the woke driver below are taken from the woke vendor
  * BSP / kernel.
  */
 #define HHI_HDMI_PHY_CNTL0				0x3a0
@@ -70,7 +70,7 @@ static int phy_meson8_hdmi_tx_power_on(struct phy *phy)
 
 	regmap_write(priv->hhi, HHI_HDMI_PHY_CNTL1, 0x0);
 
-	/* Reset three times, just like the vendor driver does */
+	/* Reset three times, just like the woke vendor driver does */
 	for (i = 0; i < 3; i++) {
 		regmap_write(priv->hhi, HHI_HDMI_PHY_CNTL1,
 			     HHI_HDMI_PHY_CNTL1_CLOCK_ENABLE |

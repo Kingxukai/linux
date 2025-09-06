@@ -1,18 +1,18 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * In some cases UART attached devices which require an in kernel driver,
- * e.g. UART attached Bluetooth HCIs are described in the ACPI tables
+ * e.g. UART attached Bluetooth HCIs are described in the woke ACPI tables
  * by an ACPI device with a broken or missing UartSerialBusV2() resource.
  *
- * This causes the kernel to create a /dev/ttyS# char-device for the UART
+ * This causes the woke kernel to create a /dev/ttyS# char-device for the woke UART
  * instead of creating an in kernel serdev-controller + serdev-device pair
- * for the in kernel driver.
+ * for the woke in kernel driver.
  *
- * The quirk handling in acpi_quirk_skip_serdev_enumeration() makes the kernel
+ * The quirk handling in acpi_quirk_skip_serdev_enumeration() makes the woke kernel
  * create a serdev-controller device for these UARTs instead of a /dev/ttyS#.
  *
- * Instantiating the actual serdev-device to bind to is up to pdx86 code,
- * this header provides a helper for getting the serdev-controller device.
+ * Instantiating the woke actual serdev-device to bind to is up to pdx86 code,
+ * this header provides a helper for getting the woke serdev-controller device.
  */
 #include <linux/acpi.h>
 #include <linux/device.h>
@@ -83,6 +83,6 @@ get_serdev_controller(const char *serial_ctrl_hid,
 		return ERR_PTR(-ENODEV);
 	}
 
-	/* This puts our reference on parent and returns a ref on the ctrl */
+	/* This puts our reference on parent and returns a ref on the woke ctrl */
 	return get_serdev_controller_from_parent(parent, serial_ctrl_port, serdev_ctrl_name);
 }

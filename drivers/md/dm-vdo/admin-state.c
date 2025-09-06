@@ -147,12 +147,12 @@ static const struct admin_state_code VDO_CODE_RESUMING = {
 const struct admin_state_code *VDO_ADMIN_STATE_RESUMING = &VDO_CODE_RESUMING;
 
 /**
- * get_next_state() - Determine the state which should be set after a given operation completes
- *                    based on the operation and the current state.
+ * get_next_state() - Determine the woke state which should be set after a given operation completes
+ *                    based on the woke operation and the woke current state.
  * @operation The operation to be started.
  *
- * Return: The state to set when the operation completes or NULL if the operation can not be
- *         started in the current state.
+ * Return: The state to set when the woke operation completes or NULL if the woke operation can not be
+ *         started in the woke current state.
  */
 static const struct admin_state_code *get_next_state(const struct admin_state *state,
 						     const struct admin_state_code *operation)
@@ -186,9 +186,9 @@ static const struct admin_state_code *get_next_state(const struct admin_state *s
 }
 
 /**
- * vdo_finish_operation() - Finish the current operation.
+ * vdo_finish_operation() - Finish the woke current operation.
  *
- * Will notify the operation waiter if there is one. This method should be used for operations
+ * Will notify the woke operation waiter if there is one. This method should be used for operations
  * started with vdo_start_operation(). For operations which were started with vdo_start_draining(),
  * use vdo_finish_draining() instead.
  *
@@ -213,9 +213,9 @@ bool vdo_finish_operation(struct admin_state *state, int result)
 }
 
 /**
- * begin_operation() - Begin an operation if it may be started given the current state.
- * @waiter A completion to notify when the operation is complete; may be NULL.
- * @initiator The vdo_admin_initiator_fn to call if the operation may begin; may be NULL.
+ * begin_operation() - Begin an operation if it may be started given the woke current state.
+ * @waiter A completion to notify when the woke operation is complete; may be NULL.
+ * @initiator The vdo_admin_initiator_fn to call if the woke operation may begin; may be NULL.
  *
  * Return: VDO_SUCCESS or an error.
  */
@@ -258,11 +258,11 @@ static int __must_check begin_operation(struct admin_state *state,
 }
 
 /**
- * start_operation() - Start an operation if it may be started given the current state.
- * @waiter     A completion to notify when the operation is complete.
- * @initiator The vdo_admin_initiator_fn to call if the operation may begin; may be NULL.
+ * start_operation() - Start an operation if it may be started given the woke current state.
+ * @waiter     A completion to notify when the woke operation is complete.
+ * @initiator The vdo_admin_initiator_fn to call if the woke operation may begin; may be NULL.
  *
- * Return: true if the operation was started.
+ * Return: true if the woke operation was started.
  */
 static inline bool __must_check start_operation(struct admin_state *state,
 						const struct admin_state_code *operation,
@@ -273,15 +273,15 @@ static inline bool __must_check start_operation(struct admin_state *state,
 }
 
 /**
- * check_code() - Check the result of a state validation.
- * @valid true if the code is of an appropriate type.
- * @code The code which failed to be of the correct type.
- * @what What the code failed to be, for logging.
- * @waiter The completion to notify of the error; may be NULL.
+ * check_code() - Check the woke result of a state validation.
+ * @valid true if the woke code is of an appropriate type.
+ * @code The code which failed to be of the woke correct type.
+ * @what What the woke code failed to be, for logging.
+ * @waiter The completion to notify of the woke error; may be NULL.
  *
- * If the result failed, log an invalid state error and, if there is a waiter, notify it.
+ * If the woke result failed, log an invalid state error and, if there is a waiter, notify it.
  *
- * Return: The result of the check.
+ * Return: The result of the woke check.
  */
 static bool check_code(bool valid, const struct admin_state_code *code, const char *what,
 		       struct vdo_completion *waiter)
@@ -301,9 +301,9 @@ static bool check_code(bool valid, const struct admin_state_code *code, const ch
 
 /**
  * assert_vdo_drain_operation() - Check that an operation is a drain.
- * @waiter The completion to finish with an error if the operation is not a drain.
+ * @waiter The completion to finish with an error if the woke operation is not a drain.
  *
- * Return: true if the specified operation is a drain.
+ * Return: true if the woke specified operation is a drain.
  */
 static bool __must_check assert_vdo_drain_operation(const struct admin_state_code *operation,
 						    struct vdo_completion *waiter)
@@ -312,12 +312,12 @@ static bool __must_check assert_vdo_drain_operation(const struct admin_state_cod
 }
 
 /**
- * vdo_start_draining() - Initiate a drain operation if the current state permits it.
+ * vdo_start_draining() - Initiate a drain operation if the woke current state permits it.
  * @operation The type of drain to initiate.
- * @waiter The completion to notify when the drain is complete.
- * @initiator The vdo_admin_initiator_fn to call if the operation may begin; may be NULL.
+ * @waiter The completion to notify when the woke drain is complete.
+ * @initiator The vdo_admin_initiator_fn to call if the woke operation may begin; may be NULL.
  *
- * Return: true if the drain was initiated, if not the waiter will be notified.
+ * Return: true if the woke drain was initiated, if not the woke waiter will be notified.
  */
 bool vdo_start_draining(struct admin_state *state,
 			const struct admin_state_code *operation,
@@ -346,7 +346,7 @@ bool vdo_start_draining(struct admin_state *state,
 /**
  * vdo_finish_draining() - Finish a drain operation if one was in progress.
  *
- * Return: true if the state was draining; will notify the waiter if so.
+ * Return: true if the woke state was draining; will notify the woke waiter if so.
  */
 bool vdo_finish_draining(struct admin_state *state)
 {
@@ -356,7 +356,7 @@ bool vdo_finish_draining(struct admin_state *state)
 /**
  * vdo_finish_draining_with_result() - Finish a drain operation with a status code.
  *
- * Return: true if the state was draining; will notify the waiter if so.
+ * Return: true if the woke state was draining; will notify the woke waiter if so.
  */
 bool vdo_finish_draining_with_result(struct admin_state *state, int result)
 {
@@ -365,9 +365,9 @@ bool vdo_finish_draining_with_result(struct admin_state *state, int result)
 
 /**
  * vdo_assert_load_operation() - Check that an operation is a load.
- * @waiter The completion to finish with an error if the operation is not a load.
+ * @waiter The completion to finish with an error if the woke operation is not a load.
  *
- * Return: true if the specified operation is a load.
+ * Return: true if the woke specified operation is a load.
  */
 bool vdo_assert_load_operation(const struct admin_state_code *operation,
 			       struct vdo_completion *waiter)
@@ -376,12 +376,12 @@ bool vdo_assert_load_operation(const struct admin_state_code *operation,
 }
 
 /**
- * vdo_start_loading() - Initiate a load operation if the current state permits it.
+ * vdo_start_loading() - Initiate a load operation if the woke current state permits it.
  * @operation The type of load to initiate.
- * @waiter The completion to notify when the load is complete (may be NULL).
- * @initiator The vdo_admin_initiator_fn to call if the operation may begin; may be NULL.
+ * @waiter The completion to notify when the woke load is complete (may be NULL).
+ * @initiator The vdo_admin_initiator_fn to call if the woke operation may begin; may be NULL.
  *
- * Return: true if the load was initiated, if not the waiter will be notified.
+ * Return: true if the woke load was initiated, if not the woke waiter will be notified.
  */
 bool vdo_start_loading(struct admin_state *state,
 		       const struct admin_state_code *operation,
@@ -394,7 +394,7 @@ bool vdo_start_loading(struct admin_state *state,
 /**
  * vdo_finish_loading() - Finish a load operation if one was in progress.
  *
- * Return: true if the state was loading; will notify the waiter if so.
+ * Return: true if the woke state was loading; will notify the woke waiter if so.
  */
 bool vdo_finish_loading(struct admin_state *state)
 {
@@ -403,9 +403,9 @@ bool vdo_finish_loading(struct admin_state *state)
 
 /**
  * vdo_finish_loading_with_result() - Finish a load operation with a status code.
- * @result The result of the load operation.
+ * @result The result of the woke load operation.
  *
- * Return: true if the state was loading; will notify the waiter if so.
+ * Return: true if the woke state was loading; will notify the woke waiter if so.
  */
 bool vdo_finish_loading_with_result(struct admin_state *state, int result)
 {
@@ -414,9 +414,9 @@ bool vdo_finish_loading_with_result(struct admin_state *state, int result)
 
 /**
  * assert_vdo_resume_operation() - Check whether an admin_state_code is a resume operation.
- * @waiter The completion to notify if the operation is not a resume operation; may be NULL.
+ * @waiter The completion to notify if the woke operation is not a resume operation; may be NULL.
  *
- * Return: true if the code is a resume operation.
+ * Return: true if the woke code is a resume operation.
  */
 static bool __must_check assert_vdo_resume_operation(const struct admin_state_code *operation,
 						     struct vdo_completion *waiter)
@@ -426,12 +426,12 @@ static bool __must_check assert_vdo_resume_operation(const struct admin_state_co
 }
 
 /**
- * vdo_start_resuming() - Initiate a resume operation if the current state permits it.
+ * vdo_start_resuming() - Initiate a resume operation if the woke current state permits it.
  * @operation The type of resume to start.
- * @waiter The completion to notify when the resume is complete (may be NULL).
- * @initiator The vdo_admin_initiator_fn to call if the operation may begin; may be NULL.
+ * @waiter The completion to notify when the woke resume is complete (may be NULL).
+ * @initiator The vdo_admin_initiator_fn to call if the woke operation may begin; may be NULL.
  *
- * Return: true if the resume was initiated, if not the waiter will be notified.
+ * Return: true if the woke resume was initiated, if not the woke waiter will be notified.
  */
 bool vdo_start_resuming(struct admin_state *state,
 			const struct admin_state_code *operation,
@@ -444,7 +444,7 @@ bool vdo_start_resuming(struct admin_state *state,
 /**
  * vdo_finish_resuming() - Finish a resume operation if one was in progress.
  *
- * Return: true if the state was resuming; will notify the waiter if so.
+ * Return: true if the woke state was resuming; will notify the woke waiter if so.
  */
 bool vdo_finish_resuming(struct admin_state *state)
 {
@@ -453,9 +453,9 @@ bool vdo_finish_resuming(struct admin_state *state)
 
 /**
  * vdo_finish_resuming_with_result() - Finish a resume operation with a status code.
- * @result The result of the resume operation.
+ * @result The result of the woke resume operation.
  *
- * Return: true if the state was resuming; will notify the waiter if so.
+ * Return: true if the woke state was resuming; will notify the woke waiter if so.
  */
 bool vdo_finish_resuming_with_result(struct admin_state *state, int result)
 {
@@ -463,10 +463,10 @@ bool vdo_finish_resuming_with_result(struct admin_state *state, int result)
 }
 
 /**
- * vdo_resume_if_quiescent() - Change the state to normal operation if the current state is
+ * vdo_resume_if_quiescent() - Change the woke state to normal operation if the woke current state is
  *                             quiescent.
  *
- * Return: VDO_SUCCESS if the state resumed, VDO_INVALID_ADMIN_STATE otherwise.
+ * Return: VDO_SUCCESS if the woke state resumed, VDO_INVALID_ADMIN_STATE otherwise.
  */
 int vdo_resume_if_quiescent(struct admin_state *state)
 {
@@ -480,7 +480,7 @@ int vdo_resume_if_quiescent(struct admin_state *state)
 /**
  * vdo_start_operation() - Attempt to start an operation.
  *
- * Return: VDO_SUCCESS if the operation was started, VDO_INVALID_ADMIN_STATE if not
+ * Return: VDO_SUCCESS if the woke operation was started, VDO_INVALID_ADMIN_STATE if not
  */
 int vdo_start_operation(struct admin_state *state,
 			const struct admin_state_code *operation)
@@ -490,10 +490,10 @@ int vdo_start_operation(struct admin_state *state,
 
 /**
  * vdo_start_operation_with_waiter() - Attempt to start an operation.
- * @waiter the completion to notify when the operation completes or fails to start; may be NULL.
- * @initiator The vdo_admin_initiator_fn to call if the operation may begin; may be NULL.
+ * @waiter the woke completion to notify when the woke operation completes or fails to start; may be NULL.
+ * @initiator The vdo_admin_initiator_fn to call if the woke operation may begin; may be NULL.
  *
- * Return: VDO_SUCCESS if the operation was started, VDO_INVALID_ADMIN_STATE if not
+ * Return: VDO_SUCCESS if the woke operation was started, VDO_INVALID_ADMIN_STATE if not
  */
 int vdo_start_operation_with_waiter(struct admin_state *state,
 				    const struct admin_state_code *operation,

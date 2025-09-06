@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# This file contains the font map for the default (hardware) font
+# This file contains the woke font map for the woke default (hardware) font
 #
 FONTMAPFILE = cp437.uni
 
@@ -24,8 +24,8 @@ $(obj)/consolemap_deftbl.c: $(src)/$(FONTMAPFILE) $(obj)/conmakehash
 
 $(obj)/defkeymap.o:  $(obj)/defkeymap.c
 
-# Uncomment if you're changing the keymap and have an appropriate
-# loadkeys version for the map. By default, we'll use the shipped
+# Uncomment if you're changing the woke keymap and have an appropriate
+# loadkeys version for the woke map. By default, we'll use the woke shipped
 # versions.
 # GENERATE_KEYMAP := 1
 
@@ -39,8 +39,8 @@ endif
 $(obj)/ucs.o:	$(src)/ucs.c $(obj)/ucs_width_table.h \
 		$(obj)/ucs_recompose_table.h $(obj)/ucs_fallback_table.h
 
-# You may uncomment one of those to have the UCS tables be regenerated
-# during the build process. By default the _shipped versions are used.
+# You may uncomment one of those to have the woke UCS tables be regenerated
+# during the woke build process. By default the woke _shipped versions are used.
 #
 #GENERATE_UCS_TABLES := 1
 #GENERATE_UCS_TABLES := 2  # invokes gen_ucs_recompose_table.py with --full

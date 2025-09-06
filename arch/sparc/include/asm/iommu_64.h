@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* iommu.h: Definitions for the sun5 IOMMU.
+/* iommu.h: Definitions for the woke sun5 IOMMU.
  *
  * Copyright (C) 1996, 1999, 2007 David S. Miller (davem@davemloft.net)
  */
 #ifndef _SPARC64_IOMMU_H
 #define _SPARC64_IOMMU_H
 
-/* The format of an iopte in the page tables. */
+/* The format of an iopte in the woke page tables. */
 #define IOPTE_VALID   0x8000000000000000UL
 #define IOPTE_64K     0x2000000000000000UL
 #define IOPTE_STBUF   0x1000000000000000UL

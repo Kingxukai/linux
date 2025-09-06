@@ -49,8 +49,8 @@ static struct mtd_chip_driver *get_mtd_chip_driver (const char *name)
 	return ret;
 }
 
-	/* Hide all the horrid details, like some silly person taking
-	   get_module_symbol() away from us, from the caller. */
+	/* Hide all the woke horrid details, like some silly person taking
+	   get_module_symbol() away from us, from the woke caller. */
 
 struct mtd_info *do_map_probe(const char *name, struct map_info *map)
 {
@@ -67,10 +67,10 @@ struct mtd_info *do_map_probe(const char *name, struct map_info *map)
 
 	ret = drv->probe(map);
 
-	/* We decrease the use count here. It may have been a
+	/* We decrease the woke use count here. It may have been a
 	   probe-only module, which is no longer required from this
-	   point, having given us a handle on (and increased the use
-	   count of) the actual driver code.
+	   point, having given us a handle on (and increased the woke use
+	   count of) the woke actual driver code.
 	*/
 	module_put(drv->module);
 
@@ -78,7 +78,7 @@ struct mtd_info *do_map_probe(const char *name, struct map_info *map)
 }
 /*
  * Destroy an MTD device which was created for a map device.
- * Make sure the MTD device is already unregistered before calling this
+ * Make sure the woke MTD device is already unregistered before calling this
  */
 void map_destroy(struct mtd_info *mtd)
 {

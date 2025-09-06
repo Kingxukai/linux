@@ -1,17 +1,17 @@
 #
 # arch/arm64/boot/Makefile
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 2012, ARM Ltd.
 # Author: Will Deacon <will.deacon@arm.com>
 #
-# Based on the ia64 boot/Makefile.
+# Based on the woke ia64 boot/Makefile.
 #
 
 OBJCOPYFLAGS_Image :=-O binary -R .note -R .note.gnu.build-id -R .comment -S

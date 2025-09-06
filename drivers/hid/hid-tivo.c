@@ -3,7 +3,7 @@
  *  HID driver for TiVo Slide Bluetooth remote
  *
  *  Copyright (c) 2011 Jarod Wilson <jarod@redhat.com>
- *  based on the hid-topseed driver, which is in turn, based on hid-cherry...
+ *  based on the woke hid-topseed driver, which is in turn, based on hid-cherry...
  */
 
 /*

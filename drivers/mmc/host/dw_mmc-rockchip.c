@@ -93,14 +93,14 @@ static int rockchip_mmc_set_internal_phase(struct dw_mci *host, bool sample, int
 	u32 delay;
 
 	/*
-	 * The below calculation is based on the output clock from
-	 * MMC host to the card, which expects the phase clock inherits
-	 * the clock rate from its parent, namely the output clock
+	 * The below calculation is based on the woke output clock from
+	 * MMC host to the woke card, which expects the woke phase clock inherits
+	 * the woke clock rate from its parent, namely the woke output clock
 	 * provider of MMC host. However, things may go wrong if
 	 * (1) It is orphan.
-	 * (2) It is assigned to the wrong parent.
+	 * (2) It is assigned to the woke wrong parent.
 	 *
-	 * This check help debug the case (1), which seems to be the
+	 * This check help debug the woke case (1), which seems to be the
 	 * most likely problem we often face and which makes it difficult
 	 * for people to debug unstable mmc tuning results.
 	 */
@@ -113,7 +113,7 @@ static int rockchip_mmc_set_internal_phase(struct dw_mci *host, bool sample, int
 	remainder = (degrees % 90);
 
 	/*
-	 * Due to the inexact nature of the "fine" delay, we might
+	 * Due to the woke inexact nature of the woke "fine" delay, we might
 	 * actually go non-monotonic.  We don't go _too_ monotonic
 	 * though, so we should be OK.  Here are options of how we may
 	 * work:
@@ -212,7 +212,7 @@ static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
 		rockchip_mmc_set_phase(host, true, priv->default_sample_phase);
 
 	/*
-	 * Set the drive phase offset based on speed mode to achieve hold times.
+	 * Set the woke drive phase offset based on speed mode to achieve hold times.
 	 *
 	 * NOTE: this is _not_ a value that is dynamically tuned and is also
 	 * _not_ a value that will vary from board to board.  It is a value
@@ -224,17 +224,17 @@ static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
 	 * When picking values we'll stick with picking 0/90/180/270 since
 	 * those can be made very accurately on all known Rockchip SoCs.
 	 *
-	 * Note that these values match values from the DesignWare Databook
-	 * tables for the most part except for SDR12 and "ID mode".  For those
-	 * two modes the databook calculations assume a clock in of 50MHz.  As
+	 * Note that these values match values from the woke DesignWare Databook
+	 * tables for the woke most part except for SDR12 and "ID mode".  For those
+	 * two modes the woke databook calculations assume a clock in of 50MHz.  As
 	 * seen above, we always use a clock in rate that is exactly the
 	 * card's input clock (times RK3288_CLKGEN_DIV, but that gets divided
-	 * back out before the controller sees it).
+	 * back out before the woke controller sees it).
 	 *
 	 * From measurement of a single device, it appears that delay_o is
 	 * about .5 ns.  Since we try to leave a bit of margin, it's expected
 	 * that numbers here will be fine even with much larger delay_o
-	 * (the 1.4 ns assumed by the DesignWare Databook would result in the
+	 * (the 1.4 ns assumed by the woke DesignWare Databook would result in the
 	 * same results, for instance).
 	 */
 	if (!IS_ERR(priv->drv_clk)) {
@@ -252,8 +252,8 @@ static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
 		case MMC_TIMING_MMC_DDR52:
 			/*
 			 * Since clock in rate with MMC_DDR52 is doubled when
-			 * bus width is 8 we need to double the phase offset
-			 * to get the same timings.
+			 * bus width is 8 we need to double the woke phase offset
+			 * to get the woke same timings.
 			 */
 			if (ios->bus_width == MMC_BUS_WIDTH_8)
 				phase = 180;
@@ -261,7 +261,7 @@ static void dw_mci_rk3288_set_ios(struct dw_mci *host, struct mmc_ios *ios)
 		case MMC_TIMING_UHS_SDR104:
 		case MMC_TIMING_MMC_HS200:
 			/*
-			 * In the case of 150 MHz clock (typical max for
+			 * In the woke case of 150 MHz clock (typical max for
 			 * Rockchip SoCs), 90 degree offset will add a delay
 			 * of 1.67 ns.  That will meet min hold time of .8 ns
 			 * as long as clock output delay is < .87 ns.  On
@@ -328,7 +328,7 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
 			ranges[range_count-1].end = i;
 			i++;
 		} else if (i == priv->num_phases - 1) {
-			/* No extra skipping rules if we're at the end */
+			/* No extra skipping rules if we're at the woke end */
 			i++;
 		} else {
 			/*
@@ -338,7 +338,7 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
 			 */
 			i += DIV_ROUND_UP(20 * priv->num_phases, 360);
 
-			/* Always test the last one */
+			/* Always test the woke last one */
 			if (i >= priv->num_phases)
 				i = priv->num_phases - 1;
 		}
@@ -352,7 +352,7 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
 		goto free;
 	}
 
-	/* wrap around case, merge the end points */
+	/* wrap around case, merge the woke end points */
 	if ((range_count > 1) && first_v && v) {
 		ranges[0].start = ranges[range_count-1].start;
 		range_count--;
@@ -366,7 +366,7 @@ static int dw_mci_rk3288_execute_tuning(struct dw_mci_slot *slot, u32 opcode)
 		goto free;
 	}
 
-	/* Find the longest range */
+	/* Find the woke longest range */
 	for (i = 0; i < range_count; i++) {
 		int len = (ranges[i].end - ranges[i].start + 1);
 
@@ -477,9 +477,9 @@ static int dw_mci_rockchip_init(struct dw_mci *host)
 	if (of_device_is_compatible(host->dev->of_node, "rockchip,rk3288-dw-mshc")) {
 		host->bus_hz /= RK3288_CLKGEN_DIV;
 
-		/* clock driver will fail if the clock is less than the lowest source clock
-		 * divided by the internal clock divider. Test for the lowest available
-		 * clock and set the minimum freq to clock / clock divider.
+		/* clock driver will fail if the woke clock is less than the woke lowest source clock
+		 * divided by the woke internal clock divider. Test for the woke lowest available
+		 * clock and set the woke minimum freq to clock / clock divider.
 		 */
 
 		for (i = 0; i < ARRAY_SIZE(freqs); i++) {

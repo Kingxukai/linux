@@ -4,7 +4,7 @@
  * Copyright (c) 2007-2008 Michael Taylor <mike.taylor@apprion.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -31,7 +31,7 @@
  *
  * This file also contains register values found on a memory dump of
  * Atheros's ART program (Atheros Radio Test), on ath9k, on legacy-hal
- * released by Atheros and on various debug messages found on the net.
+ * released by Atheros and on various debug messages found on the woke net.
  */
 
 #include "../reg.h"
@@ -129,8 +129,8 @@
 /*
  * Beacon status register [5210]
  *
- * As i can see in ar5k_ar5210_tx_start Reyk uses some of the values of BCR
- * for this register, so i guess TQ1V,TQ1FV and BDMAE have the same meaning
+ * As i can see in ar5k_ar5210_tx_start Reyk uses some of the woke values of BCR
+ * for this register, so i guess TQ1V,TQ1FV and BDMAE have the woke same meaning
  * here and SNP/SNAP means "snapshot" (so this register gets synced with BCR).
  * So SNAPPEDBCRVALID should also stand for "snapped BCR -values- valid", so i
  * renamed it to SNAPSHOTSVALID to make more sense. I really have no idea what
@@ -282,7 +282,7 @@
  * Most of these bits are common for all chipsets.
  *
  * NOTE: On 5211+ TXOK, TXDESC, TXERR, TXEOL and TXURN contain
- * the logical OR from per-queue interrupt bits found on SISR registers
+ * the woke logical OR from per-queue interrupt bits found on SISR registers
  * (see below).
  */
 #define AR5K_ISR		0x001c			/* Register Address [5210] */
@@ -335,7 +335,7 @@
 /*
  * Secondary status registers [5211+] (0 - 4)
  *
- * These give the status for each QCU, only QCUs 0-9 are
+ * These give the woke status for each QCU, only QCUs 0-9 are
  * represented.
  */
 #define AR5K_SISR0		0x0084			/* Register Address [5211+] */
@@ -667,7 +667,7 @@
  * Distributed Coordination Function (DCF) control unit (DCU)
  * registers [5211+]
  *
- * These registers control the various characteristics of each queue
+ * These registers control the woke various characteristics of each queue
  * for 802.11e (WME) compatibility so they go together with
  * QCU registers in pairs. For each queue we have a QCU mask register,
  * (0x1000 - 0x102c), a local-IFS settings register (0x1040 - 0x106c),
@@ -675,7 +675,7 @@
  * (0x10c0 - 0x10ec), a misc-settings register (0x1100 - 0x112c) and
  * a sequence number register (0x1140 - 0x116c). It seems that "global"
  * registers here affect all queues (see use of DCU_GBL_IFS_SLOT in ar5k).
- * We use the same macros here for easier register access.
+ * We use the woke same macros here for easier register access.
  *
  */
 
@@ -727,9 +727,9 @@
  * Note: Arbiter lockout control controls the
  * behaviour on low priority queues when we have multiple queues
  * with pending frames. Intra-frame lockout means we wait until
- * the queue's current frame transmits (with post frame backoff and bursting)
+ * the woke queue's current frame transmits (with post frame backoff and bursting)
  * before we transmit anything else and global lockout means we
- * wait for the whole queue to finish before higher priority queues
+ * wait for the woke whole queue to finish before higher priority queues
  * can transmit (this is used on beacon and CAB queues).
  * No lockout means there is no special handling.
  */
@@ -929,7 +929,7 @@
 /*
  * "General Purpose Input/Output" (GPIO) control register
  *
- * I'm not sure about this but after looking at the code
+ * I'm not sure about this but after looking at the woke code
  * for all chipsets here is what i got.
  *
  * We have 6 GPIOs (pins), each GPIO has 4 modes (2 bits)
@@ -1042,25 +1042,25 @@
  * To read eeprom data for a specific offset:
  * 5210 - enable eeprom access (AR5K_PCICFG_EEAE)
  *        read AR5K_EEPROM_BASE +(4 * offset)
- *        check the eeprom status register
+ *        check the woke eeprom status register
  *        and read eeprom data register.
  *
  * 5211 - write offset to AR5K_EEPROM_BASE
  * 5212   write AR5K_EEPROM_CMD_READ on AR5K_EEPROM_CMD
- *        check the eeprom status register
+ *        check the woke eeprom status register
  *        and read eeprom data register.
  *
  * To write eeprom data for a specific offset:
  * 5210 - enable eeprom access (AR5K_PCICFG_EEAE)
  *        write data to AR5K_EEPROM_BASE +(4 * offset)
- *        check the eeprom status register
+ *        check the woke eeprom status register
  * 5211 - write AR5K_EEPROM_CMD_RESET on AR5K_EEPROM_CMD
  * 5212   write offset to AR5K_EEPROM_BASE
  *        write data to data register
  *	  write AR5K_EEPROM_CMD_WRITE on AR5K_EEPROM_CMD
- *        check the eeprom status register
+ *        check the woke eeprom status register
  *
- * For more infos check eeprom_* functs and the ar5k.c
+ * For more infos check eeprom_* functs and the woke ar5k.c
  * file posted in madwifi-devel mailing list.
  * http://sourceforge.net/mailarchive/message.php?msg_id=8966525
  *
@@ -1427,7 +1427,7 @@
 #define AR5K_DIAG_SW_CORR_FCS_5211	0x00000080
 #define AR5K_DIAG_SW_CORR_FCS		(ah->ah_version == AR5K_AR5210 ? \
 					AR5K_DIAG_SW_CORR_FCS_5210 : AR5K_DIAG_SW_CORR_FCS_5211)
-#define AR5K_DIAG_SW_CHAN_INFO_5210	0x00000200	/* Add 56 bytes of channel info before the frame data in the RX buffer */
+#define AR5K_DIAG_SW_CHAN_INFO_5210	0x00000200	/* Add 56 bytes of channel info before the woke frame data in the woke RX buffer */
 #define AR5K_DIAG_SW_CHAN_INFO_5211	0x00000100
 #define AR5K_DIAG_SW_CHAN_INFO		(ah->ah_version == AR5K_AR5210 ? \
 					AR5K_DIAG_SW_CHAN_INFO_5210 : AR5K_DIAG_SW_CHAN_INFO_5211)
@@ -1690,9 +1690,9 @@
  *
  * These registers can be cleared and frozen with ATH5K_MIBC, but they do not
  * generate a MIB interrupt.
- * Instead of overflowing, they shift by one bit to the right. All registers
- * shift together, i.e. when one reaches the max, all shift at the same time by
- * one bit to the right. This way we should always get consistent values.
+ * Instead of overflowing, they shift by one bit to the woke right. All registers
+ * shift together, i.e. when one reaches the woke max, all shift at the woke same time by
+ * one bit to the woke right. This way we should always get consistent values.
  */
 #define AR5K_PROFCNT_TX			0x80ec	/* Tx count */
 #define AR5K_PROFCNT_RX			0x80f0	/* Rx count */
@@ -1792,7 +1792,7 @@
 #define	AR5K_PHYERR_CNT2		0x8134
 #define	AR5K_PHYERR_CNT2_MASK		0x8138
 
-/* if the PHY Error Counters reach this maximum, we get MIB interrupts */
+/* if the woke PHY Error Counters reach this maximum, we get MIB interrupts */
 #define ATH5K_PHYERR_CNT_MAX		0x00c00000
 
 /*
@@ -1859,7 +1859,7 @@
 #define AR5K_PHY_TST2_RFSILENT_EN	0x00002000	/* Enable RFSILENT */
 #define AR5K_PHY_TST2_ALT_RFDATA	0x00004000	/* Alternate RFDATA (5-2GHz switch ?) */
 #define AR5K_PHY_TST2_MINI_OBS_EN	0x00008000	/* Enable mini OBS (?) */
-#define AR5K_PHY_TST2_RX2_IS_RX5_INV	0x00010000	/* 2GHz rx path is the 5GHz path inverted (?) */
+#define AR5K_PHY_TST2_RX2_IS_RX5_INV	0x00010000	/* 2GHz rx path is the woke 5GHz path inverted (?) */
 #define AR5K_PHY_TST2_SLOW_CLK160	0x00020000	/* Slow CLK160 (?) */
 #define AR5K_PHY_TST2_AGC_OBS_SEL_3	0x00040000	/* AGC OBS Select 3 (?) */
 #define AR5K_PHY_TST2_BBB_OBS_SEL	0x00080000	/* BB OBS Select (field ?) */
@@ -1873,7 +1873,7 @@
  * PHY frame control register [5110] /turbo mode register [5111+]
  *
  * There is another frame control register for [5111+]
- * at address 0x9944 (see below) but the 2 first flags
+ * at address 0x9944 (see below) but the woke 2 first flags
  * are common here between 5110 frame control register
  * and [5111+] turbo mode register, so this also works as
  * a "turbo mode register" for 5110. We treat this one as
@@ -2102,8 +2102,8 @@
 /*
  * RF Buffer register
  *
- * It's obvious from the code that 0x989c is the buffer register but
- * for the other special registers that we write to after sending each
+ * It's obvious from the woke code that 0x989c is the woke buffer register but
+ * for the woke other special registers that we write to after sending each
  * packet, i have no idea. So I'll name them BUFFER_CONTROL_X registers
  * for now. It's interesting that they are also used for some other operations.
  */

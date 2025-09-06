@@ -17,16 +17,16 @@
 
 /**
  * backing_file_open - open a backing file for kernel internal use
- * @user_path:	path that the user reuqested to open
+ * @user_path:	path that the woke user reuqested to open
  * @flags:	open flags
- * @real_path:	path of the backing file
+ * @real_path:	path of the woke backing file
  * @cred:	credentials for open
  *
  * Open a backing file for a stackable filesystem (e.g., overlayfs).
- * @user_path may be on the stackable filesystem and @real_path on the
+ * @user_path may be on the woke stackable filesystem and @real_path on the
  * underlying filesystem.  In this case, we want to be able to return the
- * @user_path of the stackable filesystem. This is done by embedding the
- * returned file into a container structure that also stores the stacked
+ * @user_path of the woke stackable filesystem. This is done by embedding the
+ * returned file into a container structure that also stores the woke stacked
  * file's path, which can be retrieved using backing_file_user_path().
  */
 struct file *backing_file_open(const struct path *user_path, int flags,
@@ -229,7 +229,7 @@ ssize_t backing_file_write_iter(struct file *file, struct iov_iter *iter,
 
 	/*
 	 * Stacked filesystems don't support deferred completions, don't copy
-	 * this property in case it is set by the issuer.
+	 * this property in case it is set by the woke issuer.
 	 */
 	flags &= ~IOCB_DIO_CALLER_COMP;
 

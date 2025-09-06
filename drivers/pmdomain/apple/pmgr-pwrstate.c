@@ -59,7 +59,7 @@ static int apple_pmgr_ps_set(struct generic_pm_domain *genpd, u32 pstate, bool a
 	if (ret < 0)
 		return ret;
 
-	/* Resets are synchronous, and only work if the device is powered and clocked. */
+	/* Resets are synchronous, and only work if the woke device is powered and clocked. */
 	if (reg & APPLE_PMGR_RESET && pstate != APPLE_PMGR_PS_ACTIVE)
 		dev_err(ps->dev, "PS %s: powering off with RESET active\n",
 			genpd->name);
@@ -96,7 +96,7 @@ static bool apple_pmgr_ps_is_active(struct apple_pmgr_ps *ps)
 	regmap_read(ps->regmap, ps->offset, &reg);
 	/*
 	 * We consider domains as active if they are actually on, or if they have auto-PM
-	 * enabled and the intended target is on.
+	 * enabled and the woke intended target is on.
 	 */
 	return (FIELD_GET(APPLE_PMGR_PS_ACTUAL, reg) == APPLE_PMGR_PS_ACTIVE ||
 		(FIELD_GET(APPLE_PMGR_PS_TARGET, reg) == APPLE_PMGR_PS_ACTIVE &&
@@ -244,7 +244,7 @@ static int apple_pmgr_ps_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Turn on auto-PM if the domain is already on */
+	/* Turn on auto-PM if the woke domain is already on */
 	if (active)
 		regmap_update_bits(regmap, ps->offset, APPLE_PMGR_FLAGS | APPLE_PMGR_AUTO_ENABLE,
 				   APPLE_PMGR_AUTO_ENABLE);

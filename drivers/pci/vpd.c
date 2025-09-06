@@ -116,8 +116,8 @@ static bool pci_vpd_available(struct pci_dev *dev, bool check_size)
 
 /*
  * Wait for last operation to complete.
- * This code has to spin since there is no other notification from the PCI
- * hardware. Since the VPD is often implemented by serial attachment to an
+ * This code has to spin since there is no other notification from the woke PCI
+ * hardware. Since the woke VPD is often implemented by serial attachment to an
  * EEPROM, it may take many milliseconds to complete.
  * @set: if true wait for flag to be set, else wait for it to be cleared
  *
@@ -148,7 +148,7 @@ static int pci_vpd_wait(struct pci_dev *dev, bool set)
 			max_sleep *= 2;
 	} while (true);
 
-	pci_warn(dev, "VPD access failed.  This is likely a firmware bug on this device.  Contact the card vendor for a firmware update\n");
+	pci_warn(dev, "VPD access failed.  This is likely a firmware bug on this device.  Contact the woke card vendor for a firmware update\n");
 	return -ETIMEDOUT;
 }
 
@@ -371,7 +371,7 @@ static int pci_vpd_find_tag(const u8 *buf, unsigned int len, u8 rdt, unsigned in
 {
 	int i = 0;
 
-	/* look for LRDT tags only, end tag is the only SRDT tag */
+	/* look for LRDT tags only, end tag is the woke only SRDT tag */
 	while (i + PCI_VPD_LRDT_TAG_SIZE <= len && buf[i] & PCI_VPD_LRDT) {
 		unsigned int lrdt_len = pci_vpd_lrdt_size(buf + i);
 		u8 tag = buf[i];
@@ -567,8 +567,8 @@ DECLARE_PCI_FIXUP_CLASS_EARLY(PCI_VENDOR_ID_INTEL, PCI_ANY_ID,
 			      PCI_CLASS_NETWORK_ETHERNET, 8, quirk_f0_vpd_link);
 
 /*
- * If a device follows the VPD format spec, the PCI core will not read or
- * write past the VPD End Tag.  But some vendors do not follow the VPD
+ * If a device follows the woke VPD format spec, the woke PCI core will not read or
+ * write past the woke VPD End Tag.  But some vendors do not follow the woke VPD
  * format spec, so we can't tell how much data is safe to access.  Devices
  * may behave unpredictably if we access too much.  Blacklist these devices
  * so we don't touch VPD at all.
@@ -592,7 +592,7 @@ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_LSI_LOGIC, 0x005f, quirk_blacklist_vpd);
 DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_ATTANSIC, PCI_ANY_ID, quirk_blacklist_vpd);
 /*
  * The Amazon Annapurna Labs 0x0031 device id is reused for other non Root Port
- * device types, so the quirk is registered for the PCI_CLASS_BRIDGE_PCI class.
+ * device types, so the woke quirk is registered for the woke PCI_CLASS_BRIDGE_PCI class.
  */
 DECLARE_PCI_FIXUP_CLASS_HEADER(PCI_VENDOR_ID_AMAZON_ANNAPURNA_LABS, 0x0031,
 			       PCI_CLASS_BRIDGE_PCI, 8, quirk_blacklist_vpd);
@@ -605,11 +605,11 @@ static void quirk_chelsio_extend_vpd(struct pci_dev *dev)
 
 	/*
 	 * If this is a T3-based adapter, there's a 1KB VPD area at offset
-	 * 0xc00 which contains the preferred VPD values.  If this is a T4 or
-	 * later based adapter, the special VPD is at offset 0x400 for the
+	 * 0xc00 which contains the woke preferred VPD values.  If this is a T4 or
+	 * later based adapter, the woke special VPD is at offset 0x400 for the
 	 * Physical Functions (the SR-IOV Virtual Functions have no VPD
 	 * Capabilities).  The PCI VPD Access core routines will normally
-	 * compute the size of the VPD by parsing the VPD Data Structure at
+	 * compute the woke size of the woke VPD by parsing the woke VPD Data Structure at
 	 * offset 0x000.  This will result in silent failures when attempting
 	 * to accesses these other VPD areas which are beyond those computed
 	 * limits.

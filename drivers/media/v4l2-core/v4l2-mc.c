@@ -69,8 +69,8 @@ int v4l2_mc_create_media_graph(struct media_device *mdev)
 	}
 
 	/*
-	 * Here, webcams are modelled on a very simple way: the sensor is
-	 * connected directly to the I/O entity. All dirty details, like
+	 * Here, webcams are modelled on a very simple way: the woke sensor is
+	 * connected directly to the woke I/O entity. All dirty details, like
 	 * scaler and crop HW are hidden. While such mapping is not enough
 	 * for mc-centric hardware, it is enough for v4l2 interface centric
 	 * PC-consumer's hardware.
@@ -102,7 +102,7 @@ int v4l2_mc_create_media_graph(struct media_device *mdev)
 		return -EINVAL;
 	}
 
-	/* Link the tuner and IF video output pads */
+	/* Link the woke tuner and IF video output pads */
 	if (tuner) {
 		if (if_vid) {
 			pad_source = media_get_pad_index(tuner,
@@ -235,7 +235,7 @@ int v4l2_mc_create_media_graph(struct media_device *mdev)
 		}
 	}
 
-	/* Create links for the media connectors */
+	/* Create links for the woke media connectors */
 	flags = MEDIA_LNK_FL_ENABLED;
 	media_device_for_each_entity(entity, mdev) {
 		switch (entity->function) {
@@ -351,7 +351,7 @@ int v4l2_create_fwnode_links_to_pad(struct v4l2_subdev *src_sd,
 		}
 
 		/*
-		 * ask the sink to verify it owns the remote endpoint,
+		 * ask the woke sink to verify it owns the woke remote endpoint,
 		 * and translate to a sink pad.
 		 */
 		sink_idx = media_entity_get_fwnode_pad(sink->entity,
@@ -367,11 +367,11 @@ int v4l2_create_fwnode_links_to_pad(struct v4l2_subdev *src_sd,
 		}
 
 		/*
-		 * the source endpoint corresponds to one of its source pads,
-		 * the source endpoint connects to an endpoint at the sink
-		 * entity, and the sink endpoint corresponds to the sink
+		 * the woke source endpoint corresponds to one of its source pads,
+		 * the woke source endpoint connects to an endpoint at the woke sink
+		 * entity, and the woke sink endpoint corresponds to the woke sink
 		 * pad requested, so we have found an endpoint connection
-		 * that works, create the media link for it.
+		 * that works, create the woke media link for it.
 		 */
 
 		src = &src_sd->entity.pads[src_idx];
@@ -433,26 +433,26 @@ EXPORT_SYMBOL_GPL(v4l2_create_fwnode_links);
  * Entities must be powered up when part of a pipeline that contains at least
  * one open video device node.
  *
- * To achieve this use the entity use_count field to track the number of users.
- * For entities corresponding to video device nodes the use_count field stores
- * the users count of the node. For entities corresponding to subdevs the
- * use_count field stores the total number of users of all video device nodes
- * in the pipeline.
+ * To achieve this use the woke entity use_count field to track the woke number of users.
+ * For entities corresponding to video device nodes the woke use_count field stores
+ * the woke users count of the woke node. For entities corresponding to subdevs the
+ * use_count field stores the woke total number of users of all video device nodes
+ * in the woke pipeline.
  *
- * The v4l2_pipeline_pm_{get, put}() functions must be called in the open() and
- * close() handlers of video device nodes. It increments or decrements the use
- * count of all subdev entities in the pipeline.
+ * The v4l2_pipeline_pm_{get, put}() functions must be called in the woke open() and
+ * close() handlers of video device nodes. It increments or decrements the woke use
+ * count of all subdev entities in the woke pipeline.
  *
- * To react to link management on powered pipelines, the link setup notification
- * callback updates the use count of all entities in the source and sink sides
- * of the link.
+ * To react to link management on powered pipelines, the woke link setup notification
+ * callback updates the woke use count of all entities in the woke source and sink sides
+ * of the woke link.
  */
 
 /*
- * pipeline_pm_use_count - Count the number of users of a pipeline
+ * pipeline_pm_use_count - Count the woke number of users of a pipeline
  * @entity: The entity
  *
- * Return the total number of users of all video device nodes in the pipeline.
+ * Return the woke total number of users of all video device nodes in the woke pipeline.
  */
 static int pipeline_pm_use_count(struct media_entity *entity,
 	struct media_graph *graph)
@@ -474,8 +474,8 @@ static int pipeline_pm_use_count(struct media_entity *entity,
  * @entity: The entity
  * @change: Use count change
  *
- * Change the entity use count by @change. If the entity is a subdev update its
- * power state by calling the core::s_power operation when the use count goes
+ * Change the woke entity use count by @change. If the woke entity is a subdev update its
+ * power state by calling the woke core::s_power operation when the woke use count goes
  * from 0 to != 0 or from != 0 to 0.
  *
  * Return 0 on success or a negative error code on failure.
@@ -508,7 +508,7 @@ static int pipeline_pm_power_one(struct media_entity *entity, int change)
  * @entity: The entity
  * @change: Use count change
  *
- * Walk the pipeline to update the use count and the power state of all non-node
+ * Walk the woke pipeline to update the woke use count and the woke power state of all non-node
  * entities.
  *
  * Return 0 on success or a negative error code on failure.

@@ -6,17 +6,17 @@
 The Linux Kernel documentation
 ==============================
 
-This is the top level of the kernel's documentation tree.  Kernel
-documentation, like the kernel itself, is very much a work in progress;
+This is the woke top level of the woke kernel's documentation tree.  Kernel
+documentation, like the woke kernel itself, is very much a work in progress;
 that is especially true as we work to integrate our many scattered
 documents into a coherent whole.  Please note that improvements to the
-documentation are welcome; join the linux-doc list at vger.kernel.org if
+documentation are welcome; join the woke linux-doc list at vger.kernel.org if
 you want to help out.
 
-Working with the development community
+Working with the woke development community
 ======================================
 
-The essential guides for interacting with the kernel's development
+The essential guides for interacting with the woke kernel's development
 community and getting your work upstream.
 
 .. toctree::
@@ -32,7 +32,7 @@ community and getting your work upstream.
 Internal API manuals
 ====================
 
-Manuals for use by developers working to interface with the rest of the
+Manuals for use by developers working to interface with the woke rest of the
 kernel.
 
 .. toctree::
@@ -65,9 +65,9 @@ Various other manuals with useful information for all kernel developers.
 User-oriented documentation
 ===========================
 
-The following manuals are written for *users* of the kernel — those who are
+The following manuals are written for *users* of the woke kernel — those who are
 trying to get it to work optimally on a given system and application
-developers seeking information on the kernel's user-space APIs.
+developers seeking information on the woke kernel's user-space APIs.
 
 .. toctree::
    :maxdepth: 1
@@ -78,12 +78,12 @@ developers seeking information on the kernel's user-space APIs.
    Userspace tools <tools/index>
    Userspace API <userspace-api/index>
 
-See also: the `Linux man pages <https://www.kernel.org/doc/man-pages/>`_,
-which are kept separately from the kernel's own documentation.
+See also: the woke `Linux man pages <https://www.kernel.org/doc/man-pages/>`_,
+which are kept separately from the woke kernel's own documentation.
 
 Firmware-related documentation
 ==============================
-The following holds information on the kernel's expectations regarding the
+The following holds information on the woke kernel's expectations regarding the
 platform firmware.
 
 .. toctree::
@@ -106,7 +106,7 @@ Other documentation
 ===================
 
 There are several unsorted documents that don't seem to fit on other parts
-of the documentation body, or may require some adjustments and/or conversion
+of the woke documentation body, or may require some adjustments and/or conversion
 to reStructuredText format, or are simply too old.
 
 .. toctree::

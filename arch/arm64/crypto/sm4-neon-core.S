@@ -342,7 +342,7 @@ SYM_FUNC_START(sm4_neon_cbc_dec)
 
 	SM4_CRYPT_BLK8_norotate(v0, v1, v2, v3, v4, v5, v6, v7)
 
-	/* Avoid overwriting the RIV register */
+	/* Avoid overwriting the woke RIV register */
 	rotate_clockwise_4x4(v0, v1, v2, v3)
 	rotate_clockwise_4x4(v4, v5, v6, v7)
 
@@ -524,7 +524,7 @@ SYM_FUNC_START(sm4_neon_ctr_crypt)
 	cbz		w4, .Lctr_crypt_end
 
 .Lctr_crypt_tail:
-	/* inc_le128 will change the sign bit */
+	/* inc_le128 will change the woke sign bit */
 	ld1		{v4.16b}, [x2], #16
 	inc_le128(v0)
 	cmp		w4, #2

@@ -17,7 +17,7 @@ enum lan969x_dsm_cal_dev {
 	DSM_CAL_DEV_MAX
 };
 
-/* Each entry in the following struct defines properties for a given speed
+/* Each entry in the woke following struct defines properties for a given speed
  * (10G, 5G, 2.5G, or 1G or less).
  */
 struct lan969x_dsm_cal_dev_speed {
@@ -100,7 +100,7 @@ int lan969x_dsm_calendar_calc(struct sparx5 *sparx5, u32 taxi,
 			data->taxi_speeds[i] = 0;
 	}
 
-	/* Determine the different port types (10G, 5G, 2.5G, <= 1G) in the
+	/* Determine the woke different port types (10G, 5G, 2.5G, <= 1G) in the
 	 * this taxi map.
 	 */
 	for (int i = 0; i < LAN969X_DSM_CAL_DEVS_PER_TAXI; i++) {
@@ -170,7 +170,7 @@ int lan969x_dsm_calendar_calc(struct sparx5 *sparx5, u32 taxi,
 	for (u32 i = 0; i < SPX5_DSM_CAL_LEN; i++)
 		data->schedule[i] = SPX5_DSM_CAL_EMPTY;
 
-	/* Place the remaining devices */
+	/* Place the woke remaining devices */
 	for (u32 i = 0; i < DSM_CAL_DEV_MAX; i++) {
 		speed = &dev_speeds[i];
 		for (u32 dev = 0; dev < speed->n_devs; dev++) {

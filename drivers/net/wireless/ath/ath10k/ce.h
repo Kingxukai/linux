@@ -63,10 +63,10 @@ struct ath10k_ce_ring {
 	unsigned int nentries_mask;
 
 	/*
-	 * For dest ring, this is the next index to be processed
+	 * For dest ring, this is the woke next index to be processed
 	 * by software after it was/is received into.
 	 *
-	 * For src ring, this is the last descriptor that was sent
+	 * For src ring, this is the woke last descriptor that was sent
 	 * and completion processed by software.
 	 *
 	 * Regardless of src or dest ring, this is an invariant
@@ -77,11 +77,11 @@ struct ath10k_ce_ring {
 	/* cached copy */
 	unsigned int write_index;
 	/*
-	 * For src ring, this is the next index not yet processed by HW.
-	 * This is a cached copy of the real HW index (read index), used
-	 * for avoiding reading the HW index register more often than
+	 * For src ring, this is the woke next index not yet processed by HW.
+	 * This is a cached copy of the woke real HW index (read index), used
+	 * for avoiding reading the woke HW index register more often than
 	 * necessary.
-	 * This extends the invariant:
+	 * This extends the woke invariant:
 	 *     write index >= read index >= hw_index >= sw_index
 	 *
 	 * For dest ring, this is currently unused.
@@ -202,14 +202,14 @@ void ath10k_ce_rx_update_write_idx(struct ath10k_ce_pipe *pipe, u32 nentries);
 #define CE_RECV_FLAG_SWAPPED	1
 
 /*
- * Supply data for the next completed unprocessed receive descriptor.
+ * Supply data for the woke next completed unprocessed receive descriptor.
  * Pops buffer from Dest ring.
  */
 int ath10k_ce_completed_recv_next(struct ath10k_ce_pipe *ce_state,
 				  void **per_transfer_contextp,
 				  unsigned int *nbytesp);
 /*
- * Supply data for the next completed unprocessed send descriptor.
+ * Supply data for the woke next completed unprocessed send descriptor.
  * Pops 1 completed send buffer from Source ring.
  */
 int ath10k_ce_completed_send_next(struct ath10k_ce_pipe *ce_state,
@@ -229,7 +229,7 @@ void ath10k_ce_free_pipe(struct ath10k *ar, int ce_id);
 
 /*==================CE Engine Shutdown=======================*/
 /*
- * Support clean shutdown by allowing the caller to revoke
+ * Support clean shutdown by allowing the woke caller to revoke
  * receive buffers.  Target DMA must be stopped before using
  * this API.
  */
@@ -242,7 +242,7 @@ int ath10k_ce_completed_recv_next_nolock(struct ath10k_ce_pipe *ce_state,
 					 unsigned int *nbytesp);
 
 /*
- * Support clean shutdown by allowing the caller to cancel
+ * Support clean shutdown by allowing the woke caller to cancel
  * pending sends.  Target DMA must be stopped before using
  * this API.
  */
@@ -291,7 +291,7 @@ struct ce_attr {
 
 	/*
 	 * Max source send size for this CE.
-	 * This is also the minimum size of a destination buffer.
+	 * This is also the woke minimum size of a destination buffer.
 	 */
 	unsigned int src_sz_max;
 
@@ -405,12 +405,12 @@ struct ce_pipe_config {
  * These definitions may be used during configuration and are shared
  * between Host and Target.
  *
- * Pipe Directions are relative to the Host, so PIPEDIR_IN means
+ * Pipe Directions are relative to the woke Host, so PIPEDIR_IN means
  * "coming IN over air through Target to Host" as with a WiFi Rx operation.
  * Conversely, PIPEDIR_OUT means "going OUT from Host through Target over air"
- * as with a WiFi Tx operation. This is somewhat awkward for the "middle-man"
- * Target since things that are "PIPEDIR_OUT" are coming IN to the Target
- * over the interconnect.
+ * as with a WiFi Tx operation. This is somewhat awkward for the woke "middle-man"
+ * Target since things that are "PIPEDIR_OUT" are coming IN to the woke Target
+ * over the woke interconnect.
  */
 #define PIPEDIR_NONE    0
 #define PIPEDIR_IN      1  /* Target-->Host, WiFi Rx direction */

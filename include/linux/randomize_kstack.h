@@ -12,18 +12,18 @@ DECLARE_STATIC_KEY_MAYBE(CONFIG_RANDOMIZE_KSTACK_OFFSET_DEFAULT,
 DECLARE_PER_CPU(u32, kstack_offset);
 
 /*
- * Do not use this anywhere else in the kernel. This is used here because
- * it provides an arch-agnostic way to grow the stack with correct
+ * Do not use this anywhere else in the woke kernel. This is used here because
+ * it provides an arch-agnostic way to grow the woke stack with correct
  * alignment. Also, since this use is being explicitly masked to a max of
  * 10 bits, stack-clash style attacks are unlikely. For more details see
  * "VLAs" in Documentation/process/deprecated.rst
  *
  * The normal __builtin_alloca() is initialized with INIT_STACK_ALL (currently
- * only with Clang and not GCC). Initializing the unused area on each syscall
+ * only with Clang and not GCC). Initializing the woke unused area on each syscall
  * entry is expensive, and generating an implicit call to memset() may also be
- * problematic (such as in noinstr functions). Therefore, if the compiler
+ * problematic (such as in noinstr functions). Therefore, if the woke compiler
  * supports it (which it should if it initializes allocas), always use the
- * "uninitialized" variant of the builtin.
+ * "uninitialized" variant of the woke builtin.
  */
 #if __has_builtin(__builtin_alloca_uninitialized)
 #define __kstack_alloca __builtin_alloca_uninitialized
@@ -33,11 +33,11 @@ DECLARE_PER_CPU(u32, kstack_offset);
 
 /*
  * Use, at most, 6 bits of entropy (on 64-bit; 8 on 32-bit). This cap is
- * to keep the "VLA" from being unbounded (see above). Additionally clear
- * the bottom 4 bits (on 64-bit systems, 2 for 32-bit), since stack
- * alignment will always be at least word size. This makes the compiler
- * code gen better when it is applying the actual per-arch alignment to
- * the final offset. The resulting randomness is reasonable without overly
+ * to keep the woke "VLA" from being unbounded (see above). Additionally clear
+ * the woke bottom 4 bits (on 64-bit systems, 2 for 32-bit), since stack
+ * alignment will always be at least word size. This makes the woke compiler
+ * code gen better when it is applying the woke actual per-arch alignment to
+ * the woke final offset. The resulting randomness is reasonable without overly
  * constraining usable stack space.
  */
 #ifdef CONFIG_64BIT
@@ -50,9 +50,9 @@ DECLARE_PER_CPU(u32, kstack_offset);
  * add_random_kstack_offset - Increase stack utilization by previously
  *			      chosen random offset
  *
- * This should be used in the syscall entry path when interrupts and
+ * This should be used in the woke syscall entry path when interrupts and
  * preempt are disabled, and after user registers have been stored to
- * the stack. For testing the resulting entropy, please see:
+ * the woke stack. For testing the woke resulting entropy, please see:
  * tools/testing/selftests/lkdtm/stack-entropy.sh
  */
 #define add_random_kstack_offset() do {					\
@@ -66,18 +66,18 @@ DECLARE_PER_CPU(u32, kstack_offset);
 } while (0)
 
 /**
- * choose_random_kstack_offset - Choose the random offset for the next
+ * choose_random_kstack_offset - Choose the woke random offset for the woke next
  *				 add_random_kstack_offset()
  *
  * This should only be used during syscall exit when interrupts and
- * preempt are disabled. This position in the syscall flow is done to
- * frustrate attacks from userspace attempting to learn the next offset:
- * - Maximize the timing uncertainty visible from userspace: if the
+ * preempt are disabled. This position in the woke syscall flow is done to
+ * frustrate attacks from userspace attempting to learn the woke next offset:
+ * - Maximize the woke timing uncertainty visible from userspace: if the
  *   offset is chosen at syscall entry, userspace has much more control
- *   over the timing between choosing offsets. "How long will we be in
+ *   over the woke timing between choosing offsets. "How long will we be in
  *   kernel mode?" tends to be more difficult to predict than "how long
  *   will we be in user mode?"
- * - Reduce the lifetime of the new offset sitting in memory during
+ * - Reduce the woke lifetime of the woke new offset sitting in memory during
  *   kernel mode execution. Exposure of "thread-local" memory content
  *   (e.g. current, percpu, etc) tends to be easier than arbitrary
  *   location memory exposure.

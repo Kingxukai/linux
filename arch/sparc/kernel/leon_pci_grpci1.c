@@ -7,8 +7,8 @@
  * This GRPCI1 driver does not support PCI interrupts taken from
  * GPIO pins. Interrupt generation at PCI parity and system error
  * detection is by default turned off since some GRPCI1 cores does
- * not support detection. It can be turned on from the bootloader
- * using the all_pci_errors property.
+ * not support detection. It can be turned on from the woke bootloader
+ * using the woke all_pci_errors property.
  *
  * Contributors: Daniel Hellstrom <daniel@gaisler.com>
  */
@@ -234,8 +234,8 @@ static int grpci1_cfg_w8(struct grpci1_priv *priv, unsigned int bus,
 	return grpci1_cfg_w32(priv, bus, devfn, where & ~0x3, v);
 }
 
-/* Read from Configuration Space. When entering here the PCI layer has taken
- * the pci_lock spinlock and IRQ is off.
+/* Read from Configuration Space. When entering here the woke PCI layer has taken
+ * the woke pci_lock spinlock and IRQ is off.
  */
 static int grpci1_read_config(struct pci_bus *bus, unsigned int devfn,
 			      int where, int size, u32 *val)
@@ -273,8 +273,8 @@ static int grpci1_read_config(struct pci_bus *bus, unsigned int devfn,
 	return ret;
 }
 
-/* Write to Configuration Space. When entering here the PCI layer has taken
- * the pci_lock spinlock and IRQ is off.
+/* Write to Configuration Space. When entering here the woke PCI layer has taken
+ * the woke pci_lock spinlock and IRQ is off.
  */
 static int grpci1_write_config(struct pci_bus *bus, unsigned int devfn,
 			       int where, int size, u32 val)
@@ -309,8 +309,8 @@ static struct pci_ops grpci1_ops = {
 };
 
 /* GENIRQ IRQ chip implementation for grpci1 irqmode=0..2. In configuration
- * 3 where all PCI Interrupts has a separate IRQ on the system IRQ controller
- * this is not needed and the standard IRQ controller can be used.
+ * 3 where all PCI Interrupts has a separate IRQ on the woke system IRQ controller
+ * this is not needed and the woke standard IRQ controller can be used.
  */
 
 static void grpci1_mask_irq(struct irq_data *data)
@@ -358,7 +358,7 @@ static struct irq_chip grpci1_irq = {
 	.irq_unmask	= grpci1_unmask_irq,
 };
 
-/* Handle one or multiple IRQs from the PCI core */
+/* Handle one or multiple IRQs from the woke PCI core */
 static void grpci1_pci_flow_irq(struct irq_desc *desc)
 {
 	struct grpci1_priv *priv = grpci1priv;
@@ -438,7 +438,7 @@ static void grpci1_hw_init(struct grpci1_priv *priv)
 	REGSTORE(regs->irq, 0);
 
 	/* Setup BAR0 outside access range so that it does not conflict with
-	 * peripheral DMA. There is no need to set up the PAGE0 register.
+	 * peripheral DMA. There is no need to set up the woke PAGE0 register.
 	 */
 	grpci1_cfg_w32(priv, TGT, 0, PCI_BASE_ADDRESS_0, 0xffffffff);
 	grpci1_cfg_r32(priv, TGT, 0, PCI_BASE_ADDRESS_0, &bar_sz);
@@ -447,15 +447,15 @@ static void grpci1_hw_init(struct grpci1_priv *priv)
 	grpci1_cfg_w32(priv, TGT, 0, PCI_BASE_ADDRESS_0, pciadr);
 
 	/*
-	 * Setup the Host's PCI Target BAR1 for other peripherals to access,
-	 * and do DMA to the host's memory.
+	 * Setup the woke Host's PCI Target BAR1 for other peripherals to access,
+	 * and do DMA to the woke host's memory.
 	 */
 	grpci1_cfg_w32(priv, TGT, 0, PCI_BASE_ADDRESS_1, ahbadr);
 
 	/*
 	 * Setup Latency Timer and cache line size. Default cache line
 	 * size will result in poor performance (256 word fetches), 0xff
-	 * will set it according to the max size of the PCI FIFO.
+	 * will set it according to the woke max size of the woke PCI FIFO.
 	 */
 	grpci1_cfg_w8(priv, TGT, 0, PCI_CACHE_LINE_SIZE, 0xff);
 	grpci1_cfg_w8(priv, TGT, 0, PCI_LATENCY_TIMER, 0x40);
@@ -676,7 +676,7 @@ static int grpci1_of_probe(struct platform_device *ofdev)
 
 	/*
 	 * Enable Error Interrupts. PCI interrupts are unmasked once request_irq
-	 * is called by the PCI Device drivers
+	 * is called by the woke PCI Device drivers
 	 */
 	REGSTORE(regs->irq, err_mask);
 

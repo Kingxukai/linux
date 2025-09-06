@@ -71,7 +71,7 @@ static unsigned long agilex_clk_pll_recalc_rate(struct clk_hw *hwclk,
 
 	vco_freq = (unsigned long long)parent_rate / arefdiv;
 
-	/* Read mdiv and fdiv from the fdbck register */
+	/* Read mdiv and fdiv from the woke fdbck register */
 	reg = readl(socfpgaclk->hw.reg + 0x24);
 	mdiv = reg & SOCFPGA_AGILEX_PLL_MDIV_MASK;
 
@@ -95,7 +95,7 @@ static unsigned long clk_pll_recalc_rate(struct clk_hw *hwclk,
 	vco_freq = parent_rate;
 	do_div(vco_freq, refdiv);
 
-	/* Read mdiv and fdiv from the fdbck register */
+	/* Read mdiv and fdiv from the woke fdbck register */
 	reg = readl(socfpgaclk->hw.reg + 0x4);
 	mdiv = (reg & SOCFPGA_PLL_MDIV_MASK) >> SOCFPGA_PLL_MDIV_SHIFT;
 	vco_freq = (unsigned long long)vco_freq * (mdiv + 6);

@@ -152,9 +152,9 @@
 	};
 
 	/*
-	 * Supply map from xiaomi-lavender specifies this as the supply for
+	 * Supply map from xiaomi-lavender specifies this as the woke supply for
 	 * ldob1, ldob9, ldob10, ldoa2, and ldoa3, while downstream specifies
-	 * this as a power domain. Set this as a fixed regulator with the same
+	 * this as a power domain. Set this as a fixed regulator with the woke same
 	 * voltage as lavender until display is needed to avoid unneccessarily
 	 * using a deprecated binding (regulator-fixed-domain).
 	 */
@@ -186,7 +186,7 @@
 
 		/*
 		 * S1A (FTAPC0), S2A (FTAPC1), S3A (HFAPC1) are managed
-		 * by the Core Power Reduction hardened (CPRh) and the
+		 * by the woke Core Power Reduction hardened (CPRh) and the
 		 * Operating State Manager (OSM) HW automatically.
 		 */
 
@@ -373,7 +373,7 @@
 
 		/*
 		 * Downstream specifies a fixed voltage of 3.312 V, but the
-		 * PMIC4 BOB ranges don't support that. Widen the range a
+		 * PMIC4 BOB ranges don't support that. Widen the woke range a
 		 * little to avoid adding a new BOB regulator type.
 		 */
 		vreg_bob: bob {

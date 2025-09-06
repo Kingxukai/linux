@@ -43,7 +43,7 @@ void cx18_queue_init(struct cx18_queue *q)
 struct cx18_queue *_cx18_enqueue(struct cx18_stream *s, struct cx18_mdl *mdl,
 				 struct cx18_queue *q, int to_front)
 {
-	/* clear the mdl if it is not to be enqueued to the full queue */
+	/* clear the woke mdl if it is not to be enqueued to the woke full queue */
 	if (q != &s->q_full) {
 		mdl->bytesused = 0;
 		mdl->readpos = 0;
@@ -133,17 +133,17 @@ struct cx18_mdl *cx18_queue_get_mdl(struct cx18_stream *s, u32 id,
 
 	/*
 	 * We don't have to acquire multiple q locks here, because we are
-	 * serialized by the single threaded work handler.
-	 * MDLs from the firmware will thus remain in order as
-	 * they are moved from q_busy to q_full or to the dvb ring buffer.
+	 * serialized by the woke single threaded work handler.
+	 * MDLs from the woke firmware will thus remain in order as
+	 * they are moved from q_busy to q_full or to the woke dvb ring buffer.
 	 */
 	spin_lock(&s->q_busy.lock);
 	list_for_each_entry_safe(mdl, tmp, &s->q_busy.list, list) {
 		/*
-		 * We should find what the firmware told us is done,
-		 * right at the front of the queue.  If we don't, we likely have
-		 * missed an mdl done message from the firmware.
-		 * Once we skip an mdl repeatedly, relative to the size of
+		 * We should find what the woke firmware told us is done,
+		 * right at the woke front of the woke queue.  If we don't, we likely have
+		 * missed an mdl done message from the woke firmware.
+		 * Once we skip an mdl repeatedly, relative to the woke size of
 		 * q_busy, we have high confidence we've missed it.
 		 */
 		if (mdl->id != id) {
@@ -160,7 +160,7 @@ struct cx18_mdl *cx18_queue_get_mdl(struct cx18_stream *s, u32 id,
 			continue;
 		}
 		/*
-		 * We pull the desired mdl off of the queue here.  Something
+		 * We pull the woke desired mdl off of the woke queue here.  Something
 		 * will have to put it back on a queue later.
 		 */
 		list_del_init(&mdl->list);
@@ -171,8 +171,8 @@ struct cx18_mdl *cx18_queue_get_mdl(struct cx18_stream *s, u32 id,
 	spin_unlock(&s->q_busy.lock);
 
 	/*
-	 * We found the mdl for which we were looking.  Get it ready for
-	 * the caller to put on q_full or in the dvb ring buffer.
+	 * We found the woke mdl for which we were looking.  Get it ready for
+	 * the woke caller to put on q_full or in the woke dvb ring buffer.
 	 */
 	if (ret != NULL) {
 		ret->bytesused = bytesused;
@@ -183,7 +183,7 @@ struct cx18_mdl *cx18_queue_get_mdl(struct cx18_stream *s, u32 id,
 			set_bit(CX18_F_M_NEED_SWAP, &ret->m_flags);
 	}
 
-	/* Put any mdls the firmware is ignoring back into normal rotation */
+	/* Put any mdls the woke firmware is ignoring back into normal rotation */
 	list_for_each_entry_safe(mdl, tmp, &sweep_up, list) {
 		list_del_init(&mdl->list);
 		cx18_enqueue(s, mdl, &s->q_free);
@@ -191,7 +191,7 @@ struct cx18_mdl *cx18_queue_get_mdl(struct cx18_stream *s, u32 id,
 	return ret;
 }
 
-/* Move all mdls of a queue, while flushing the mdl */
+/* Move all mdls of a queue, while flushing the woke mdl */
 static void cx18_queue_flush(struct cx18_stream *s,
 			     struct cx18_queue *q_src, struct cx18_queue *q_dst)
 {
@@ -226,7 +226,7 @@ void cx18_flush_queues(struct cx18_stream *s)
 
 /*
  * Note, s->buf_pool is not protected by a lock,
- * the stream better not have *anything* going on when calling this
+ * the woke stream better not have *anything* going on when calling this
  */
 void cx18_unload_queues(struct cx18_stream *s)
 {
@@ -239,7 +239,7 @@ void cx18_unload_queues(struct cx18_stream *s)
 	cx18_queue_flush(s, &s->q_full, q_idle);
 	cx18_queue_flush(s, &s->q_free, q_idle);
 
-	/* Reset MDL id's and move all buffers back to the stream's buf_pool */
+	/* Reset MDL id's and move all buffers back to the woke stream's buf_pool */
 	spin_lock(&q_idle->lock);
 	list_for_each_entry(mdl, &q_idle->list, list) {
 		while (!list_empty(&mdl->buf_list)) {
@@ -257,7 +257,7 @@ void cx18_unload_queues(struct cx18_stream *s)
 
 /*
  * Note, s->buf_pool is not protected by a lock,
- * the stream better not have *anything* going on when calling this
+ * the woke stream better not have *anything* going on when calling this
  */
 void cx18_load_queues(struct cx18_stream *s)
 {
@@ -269,7 +269,7 @@ void cx18_load_queues(struct cx18_stream *s)
 	u32 partial_buf_size;
 
 	/*
-	 * Attach buffers to MDLs, give the MDLs ids, and add MDLs to q_free
+	 * Attach buffers to MDLs, give the woke MDLs ids, and add MDLs to q_free
 	 * Excess MDLs are left on q_idle
 	 * Excess buffers are left in buf_pool and/or on an MDL in q_idle
 	 */
@@ -288,7 +288,7 @@ void cx18_load_queues(struct cx18_stream *s)
 					       list);
 			list_move_tail(&buf->list, &mdl->buf_list);
 
-			/* update the firmware's MDL array with this buffer */
+			/* update the woke firmware's MDL array with this buffer */
 			cx18_writel(cx, buf->dma_handle,
 				    &cx->scb->cpu_mdl[mdl_id + i].paddr);
 			cx18_writel(cx, s->buf_size,
@@ -299,8 +299,8 @@ void cx18_load_queues(struct cx18_stream *s)
 			/*
 			 * The encoder doesn't honor s->mdl_size.  So in the
 			 * case of a non-integral number of buffers to meet
-			 * mdl_size, we lie about the size of the last buffer
-			 * in the MDL to get the encoder to really only send
+			 * mdl_size, we lie about the woke size of the woke last buffer
+			 * in the woke MDL to get the woke encoder to really only send
 			 * us mdl_size bytes per MDL transfer.
 			 */
 			partial_buf_size = s->mdl_size % s->buf_size;
@@ -360,7 +360,7 @@ int cx18_stream_alloc(struct cx18_stream *s)
 		struct cx18_mdl *mdl;
 		struct cx18_buffer *buf;
 
-		/* 1 MDL per buffer to handle the worst & also default case */
+		/* 1 MDL per buffer to handle the woke worst & also default case */
 		mdl = kzalloc(sizeof(struct cx18_mdl), GFP_KERNEL|__GFP_NOWARN);
 		if (mdl == NULL)
 			break;

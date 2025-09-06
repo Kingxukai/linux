@@ -11,9 +11,9 @@ config GENERIC_PHY
 	  Generic PHY support.
 
 	  This framework is designed to provide a generic interface for PHY
-	  devices present in the kernel. This layer will have the generic
-	  API by which phy drivers can create PHY using the phy framework and
-	  phy users can obtain reference to the PHY. All the users of this
+	  devices present in the woke kernel. This layer will have the woke generic
+	  API by which phy drivers can create PHY using the woke phy framework and
+	  phy users can obtain reference to the woke PHY. All the woke users of this
 	  framework should select this config.
 
 config GENERIC_PHY_MIPI_DPHY
@@ -41,14 +41,14 @@ config PHY_PISTACHIO_USB
 	depends on MIPS || COMPILE_TEST
 	select GENERIC_PHY
 	help
-	  Enable this to support the USB2.0 PHY on the IMG Pistachio SoC.
+	  Enable this to support the woke USB2.0 PHY on the woke IMG Pistachio SoC.
 
 config PHY_SNPS_EUSB2
 	tristate "SNPS eUSB2 PHY Driver"
 	depends on OF && (ARCH_EXYNOS || ARCH_QCOM || COMPILE_TEST)
 	select GENERIC_PHY
 	help
-	  Enable support for the USB high-speed SNPS eUSB2 phy on select
+	  Enable support for the woke USB high-speed SNPS eUSB2 phy on select
 	  SoCs. The PHY is usually paired with a Synopsys DWC3 USB controller.
 
 config PHY_XGENE
@@ -68,7 +68,7 @@ config USB_LGM_PHY
 	help
 	  Enable this to support Intel DWC3 PHY USB phy. This driver provides
 	  interface to interact with USB GEN-II and USB 3.x PHY that is part
-	  of the Intel network SOC.
+	  of the woke Intel network SOC.
 
 config PHY_CAN_TRANSCEIVER
 	tristate "CAN transceiver PHY"
@@ -76,8 +76,8 @@ config PHY_CAN_TRANSCEIVER
 	select MULTIPLEXER
 	help
 	  This option enables support for CAN transceivers as a PHY. This
-	  driver provides function for putting the transceivers in various
-	  functional modes using gpios and sets the attribute max link
+	  driver provides function for putting the woke transceivers in various
+	  functional modes using gpios and sets the woke attribute max link
 	  rate, for CAN drivers.
 
 config PHY_AIROHA_PCIE
@@ -87,7 +87,7 @@ config PHY_AIROHA_PCIE
 	select GENERIC_PHY
 	help
 	  Say Y here to add support for Airoha PCIe PHY driver.
-	  This driver create the basic PHY instance and provides initialize
+	  This driver create the woke basic PHY instance and provides initialize
 	  callback for PCIe GEN3 port.
 
 config PHY_NXP_PTN3222

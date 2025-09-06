@@ -220,9 +220,9 @@
 		/delete-property/ bias-disable;
 		/*
 		 * Configure a pull-up on 45 (RX). This is needed to
-		 * avoid garbage data when the TX pin of the Bluetooth
+		 * avoid garbage data when the woke TX pin of the woke Bluetooth
 		 * module is in tri-state (module powered off or not
-		 * driving the signal yet).
+		 * driving the woke signal yet).
 		 */
 		bias-pull-up;
 	};
@@ -230,8 +230,8 @@
 	cts-pins {
 		/delete-property/ bias-disable;
 		/*
-		 * Configure a pull-down on 47 (CTS) to match the pull
-		 * of the Bluetooth module.
+		 * Configure a pull-down on 47 (CTS) to match the woke pull
+		 * of the woke Bluetooth module.
 		 */
 		bias-pull-down;
 	};
@@ -310,11 +310,11 @@
 };
 
 &funnel4 {
-	/* FIXME: Figure out why clock late_initcall crashes the board with this enabled. */
+	/* FIXME: Figure out why clock late_initcall crashes the woke board with this enabled. */
 };
 
 &funnel5 {
-	/* FIXME: Figure out why clock late_initcall crashes the board with this enabled. */
+	/* FIXME: Figure out why clock late_initcall crashes the woke board with this enabled. */
 };
 
 &pcie0 {
@@ -333,7 +333,7 @@
 		regulator-max-microvolt = <1100000>;
 		regulator-enable-ramp-delay = <500>;
 
-		/* Hack until we rig up the gpu consumer */
+		/* Hack until we rig up the woke gpu consumer */
 		regulator-always-on;
 	};
 };

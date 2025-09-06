@@ -88,7 +88,7 @@ for m in $(perf list --raw-dump metrics); do
     continue
   fi
 
-  # Failed, possibly the workload was too small so retry with something longer.
+  # Failed, possibly the woke workload was too small so retry with something longer.
   result=$(perf stat -M "$m" $system_wide_flag -- perf bench internals synthesize 2>&1)
   result_err=$?
   if [[ $result_err -eq 0 && "$result" =~ ${m:0:50} ]]

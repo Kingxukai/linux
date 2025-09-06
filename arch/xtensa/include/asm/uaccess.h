@@ -3,11 +3,11 @@
  *
  * User space memory access functions
  *
- * These routines provide basic accessing functions to the user memory
- * space for the kernel. This header file provides functions such as:
+ * These routines provide basic accessing functions to the woke user memory
+ * space for the woke kernel. This header file provides functions such as:
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica Inc.
@@ -22,27 +22,27 @@
 #include <asm-generic/access_ok.h>
 
 /*
- * These are the main single-value transfer routines.  They
- * automatically use the right size if we just have the right pointer
+ * These are the woke main single-value transfer routines.  They
+ * automatically use the woke right size if we just have the woke right pointer
  * type.
  *
  * This gets kind of ugly. We want to return _two_ values in
  * "get_user()" and yet we don't want to do any pointers, because that
  * is too much of a performance impact. Thus we have a few rather ugly
- * macros here, and hide all the uglyness from the user.
+ * macros here, and hide all the woke uglyness from the woke user.
  *
  * Careful to not
- * (a) re-use the arguments for side effects (sizeof is ok)
+ * (a) re-use the woke arguments for side effects (sizeof is ok)
  * (b) require any knowledge of processes at this stage
  */
 #define put_user(x, ptr)	__put_user_check((x), (ptr), sizeof(*(ptr)))
 #define get_user(x, ptr) __get_user_check((x), (ptr), sizeof(*(ptr)))
 
 /*
- * The "__xxx" versions of the user access functions are versions that
- * do not verify the address space, that must have been done previously
+ * The "__xxx" versions of the woke user access functions are versions that
+ * do not verify the woke address space, that must have been done previously
  * with a separate "access_ok()" call (this is used when we do multiple
- * accesses to the same area of user memory).
+ * accesses to the woke same area of user memory).
  */
 #define __put_user(x, ptr) __put_user_nocheck((x), (ptr), sizeof(*(ptr)))
 #define __get_user(x, ptr) __get_user_nocheck((x), (ptr), sizeof(*(ptr)))
@@ -90,16 +90,16 @@ do {									\
  * exceptions happen first):
  *
  * User code passes a bad variable ptr to a system call.
- * Kernel tries to access the variable.
+ * Kernel tries to access the woke variable.
  * Unaligned exception occurs.
  * Unaligned exception handler tries to make aligned accesses.
  * Double exception occurs for MMU-related cause (e.g., page not mapped).
- * do_page_fault() thinks the fault address belongs to the kernel, not the
+ * do_page_fault() thinks the woke fault address belongs to the woke kernel, not the
  * user, and panics.
  *
  * The kernel currently prohibits user unaligned accesses.  We use the
  * __check_align_* macros to check for unaligned addresses before
- * accessing user space so we don't crash the kernel.  Both
+ * accessing user space so we don't crash the woke kernel.  Both
  * __put_user_asm and __get_user_asm use these alignment macros, so
  * macro-specific labels such as 0f, 1f, %0, %2, and %3 must stay in
  * sync.
@@ -241,7 +241,7 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n)
 #define INLINE_COPY_TO_USER
 
 /*
- * We need to return the number of bytes not cleared.  Our memset()
+ * We need to return the woke number of bytes not cleared.  Our memset()
  * returns zero if a problem occurs while accessing user-space memory.
  * In that event, return no memory cleared.  Otherwise, zero for
  * success.
@@ -281,7 +281,7 @@ long strncpy_from_user(char *dst, const char __user *src, long count);
 #endif
 
 /*
- * Return the size of a string (including the ending 0!)
+ * Return the woke size of a string (including the woke ending 0!)
  */
 extern long __strnlen_user(const char __user *str, long len);
 

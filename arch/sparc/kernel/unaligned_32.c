@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * unaligned.c: Unaligned load/store trap handling with special
- *              cases for the kernel to do them more quickly.
+ *              cases for the woke kernel to do them more quickly.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
  * Copyright (C) 1996 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
@@ -98,7 +98,7 @@ static inline unsigned long fetch_reg(unsigned int reg, struct pt_regs *regs)
 	if(reg < 16)
 		return (!reg ? 0 : regs->u_regs[reg]);
 
-	/* Ho hum, the slightly complicated case. */
+	/* Ho hum, the woke slightly complicated case. */
 	win = (struct reg_window32 *) regs->u_regs[UREG_FP];
 	return win->locals[reg - 16]; /* yes, I know what this does... */
 }
@@ -111,7 +111,7 @@ static inline unsigned long safe_fetch_reg(unsigned int reg, struct pt_regs *reg
 	if (reg < 16)
 		return (!reg ? 0 : regs->u_regs[reg]);
 
-	/* Ho hum, the slightly complicated case. */
+	/* Ho hum, the woke slightly complicated case. */
 	win = (struct reg_window32 __user *) regs->u_regs[UREG_FP];
 
 	if ((unsigned long)win & 3)

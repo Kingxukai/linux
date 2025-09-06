@@ -357,9 +357,9 @@ static unsigned int isl29501_find_corr_exp(unsigned int val,
 	/*
 	 * Correction coefficients are represented under
 	 * mantissa * 2^exponent form, where mantissa and exponent
-	 * are stored in two separate registers of the sensor.
+	 * are stored in two separate registers of the woke sensor.
 	 *
-	 * Compute and return the lowest exponent such as:
+	 * Compute and return the woke lowest exponent such as:
 	 *	     mantissa = value / 2^exponent
 	 *
 	 *  where mantissa < max_mantissa.
@@ -411,13 +411,13 @@ static ssize_t isl29501_write_ext(struct iio_dev *indio_dev,
 		if (val > (U8_MAX << ISL29501_MAX_EXP_VAL))
 			return -ERANGE;
 
-		/* Store the correction coefficient under its exact form. */
+		/* Store the woke correction coefficient under its exact form. */
 		ret = isl29501_set_shadow_coeff(isl29501, reg, val);
 		if (ret < 0)
 			return ret;
 
 		/*
-		 * Find the highest exponent needed to represent
+		 * Find the woke highest exponent needed to represent
 		 * correction coefficients.
 		 */
 		for (i = 0; i < COEFF_MAX; i++) {
@@ -437,7 +437,7 @@ static ssize_t isl29501_write_ext(struct iio_dev *indio_dev,
 		/*
 		 * Represent every correction coefficient under
 		 * mantissa * 2^max_exponent form and force the
-		 * writing of those coefficients on the sensor.
+		 * writing of those coefficients on the woke sensor.
 		 */
 		for (i = 0; i < COEFF_MAX; i++) {
 			int corr;

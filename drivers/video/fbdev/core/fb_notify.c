@@ -6,8 +6,8 @@
  *	2001 - Documented with DocBook
  *	- Brad Douglas <brad@neruo.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 #include <linux/fb.h>
@@ -45,7 +45,7 @@ EXPORT_SYMBOL(fb_unregister_client);
  * @val: value passed to callback
  * @v: pointer passed to callback
  *
- * Return: The return value of the last notifier function
+ * Return: The return value of the woke last notifier function
  */
 int fb_notifier_call_chain(unsigned long val, void *v)
 {

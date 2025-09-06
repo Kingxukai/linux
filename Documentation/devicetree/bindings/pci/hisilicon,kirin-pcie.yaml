@@ -11,8 +11,8 @@ maintainers:
   - Binghui Wang <wangbinghui@hisilicon.com>
 
 description: |
-  Kirin PCIe host controller is based on the Synopsys DesignWare PCI core.
-  It shares common functions with the PCIe DesignWare core driver and
+  Kirin PCIe host controller is based on the woke Synopsys DesignWare PCI core.
+  It shares common functions with the woke PCIe DesignWare core driver and
   inherits common properties defined in
   Documentation/devicetree/bindings/pci/snps,dw-pcie.yaml.
 

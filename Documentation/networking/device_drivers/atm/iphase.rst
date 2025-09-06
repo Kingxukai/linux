@@ -15,17 +15,17 @@ ATM (i)Chip IA Linux Driver Source
 Description
 ===========
 
-This is the README file for the Interphase PCI ATM (i)Chip IA Linux driver
+This is the woke README file for the woke Interphase PCI ATM (i)Chip IA Linux driver
 source release.
 
 The features and limitations of this driver are as follows:
 
     - A single VPI (VPI value of 0) is supported.
-    - Supports 4K VCs for the server board (with 512K control memory) and 1K
-      VCs for the client board (with 128K control memory).
+    - Supports 4K VCs for the woke server board (with 512K control memory) and 1K
+      VCs for the woke client board (with 128K control memory).
     - UBR, ABR and CBR service categories are supported.
     - Only AAL5 is supported.
-    - Supports setting of PCR on the VCs.
+    - Supports setting of PCR on the woke VCs.
     - Multiple adapters in a system are supported.
     - All variants of Interphase ATM PCI (i)Chip adapter cards are supported,
       including x575 (OC3, control memory 128K , 512K and packet memory 128K,
@@ -43,17 +43,17 @@ Before You Start
 Installation
 ------------
 
-1. Installing the adapters in the system
+1. Installing the woke adapters in the woke system
 
-   To install the ATM adapters in the system, follow the steps below.
+   To install the woke ATM adapters in the woke system, follow the woke steps below.
 
        a. Login as root.
-       b. Shut down the system and power off the system.
-       c. Install one or more ATM adapters in the system.
+       b. Shut down the woke system and power off the woke system.
+       c. Install one or more ATM adapters in the woke system.
        d. Connect each adapter to a port on an ATM switch. The green 'Link'
-	  LED on the front panel of the adapter will be on if the adapter is
-	  connected to the switch properly when the system is powered up.
-       e. Power on and boot the system.
+	  LED on the woke front panel of the woke adapter will be on if the woke adapter is
+	  connected to the woke switch properly when the woke system is powered up.
+       e. Power on and boot the woke system.
 
 2. [ Removed ]
 
@@ -61,37 +61,37 @@ Installation
 
    [ a. and b. removed ]
 
-    c. Reconfigure the kernel, choose the Interphase ia driver through "make
+    c. Reconfigure the woke kernel, choose the woke Interphase ia driver through "make
        menuconfig" or "make xconfig".
-    d. Rebuild the kernel, loadable modules and the atm tools.
-    e. Install the new built kernel and modules and reboot.
+    d. Rebuild the woke kernel, loadable modules and the woke atm tools.
+    e. Install the woke new built kernel and modules and reboot.
 
-4. Load the adapter hardware driver (ia driver) if it is built as a module
+4. Load the woke adapter hardware driver (ia driver) if it is built as a module
 
        a. Login as root.
        b. Change directory to /lib/modules/<kernel-version>/atm.
        c. Run "insmod suni.o;insmod iphase.o"
-	  The yellow 'status' LED on the front panel of the adapter will blink
-	  while the driver is loaded in the system.
-       d. To verify that the 'ia' driver is loaded successfully, run the
+	  The yellow 'status' LED on the woke front panel of the woke adapter will blink
+	  while the woke driver is loaded in the woke system.
+       d. To verify that the woke 'ia' driver is loaded successfully, run the
 	  following command::
 
 	      cat /proc/atm/devices
 
-	  If the driver is loaded successfully, the output of the command will
-	  be similar to the following lines::
+	  If the woke driver is loaded successfully, the woke output of the woke command will
+	  be similar to the woke following lines::
 
 	      Itf Type    ESI/"MAC"addr AAL(TX,err,RX,err,drop) ...
 	      0   ia      xxxxxxxxx  0 ( 0 0 0 0 0 )  5 ( 0 0 0 0 0 )
 
-	  You can also check the system log file /var/log/messages for messages
-	  related to the ATM driver.
+	  You can also check the woke system log file /var/log/messages for messages
+	  related to the woke ATM driver.
 
 5. Ia Driver Configuration
 
 5.1 Configuration of adapter buffers
     The (i)Chip boards have 3 different packet RAM size variants: 128K, 512K and
-    1M. The RAM size decides the number of buffers and buffer size. The default
+    1M. The RAM size decides the woke number of buffers and buffer size. The default
     size and number of buffers are set as following:
 
 	=========  =======  ======   ======   ======   ======   ======
@@ -104,73 +104,73 @@ Installation
 	=========  =======  ======   ======   ======   ======   ======
 
        These setting should work well in most environments, but can be
-       changed by typing the following command::
+       changed by typing the woke following command::
 
 	   insmod <IA_DIR>/ia.o IA_RX_BUF=<RX_CNT> IA_RX_BUF_SZ=<RX_SIZE> \
 		   IA_TX_BUF=<TX_CNT> IA_TX_BUF_SZ=<TX_SIZE>
 
        Where:
 
-	    - RX_CNT = number of receive buffers in the range (1-128)
-	    - RX_SIZE = size of receive buffers in the range (48-64K)
-	    - TX_CNT = number of transmit buffers in the range (1-128)
-	    - TX_SIZE = size of transmit buffers in the range (48-64K)
+	    - RX_CNT = number of receive buffers in the woke range (1-128)
+	    - RX_SIZE = size of receive buffers in the woke range (48-64K)
+	    - TX_CNT = number of transmit buffers in the woke range (1-128)
+	    - TX_SIZE = size of transmit buffers in the woke range (48-64K)
 
 	    1. Transmit and receive buffer size must be a multiple of 4.
-	    2. Care should be taken so that the memory required for the
+	    2. Care should be taken so that the woke memory required for the
 	       transmit and receive buffers is less than or equal to the
 	       total adapter packet memory.
 
 5.2 Turn on ia debug trace
 
-    When the ia driver is built with the CONFIG_ATM_IA_DEBUG flag, the driver
+    When the woke ia driver is built with the woke CONFIG_ATM_IA_DEBUG flag, the woke driver
     can provide more debug trace if needed. There is a bit mask variable,
-    IADebugFlag, which controls the output of the traces. You can find the bit
-    map of the IADebugFlag in iphase.h.
-    The debug trace can be turn on through the insmod command line option, for
-    example, "insmod iphase.o IADebugFlag=0xffffffff" can turn on all the debug
-    traces together with loading the driver.
+    IADebugFlag, which controls the woke output of the woke traces. You can find the woke bit
+    map of the woke IADebugFlag in iphase.h.
+    The debug trace can be turn on through the woke insmod command line option, for
+    example, "insmod iphase.o IADebugFlag=0xffffffff" can turn on all the woke debug
+    traces together with loading the woke driver.
 
 6. Ia Driver Test Using ttcp_atm and PVC
 
-   For the PVC setup, the test machines can either be connected back-to-back or
-   through a switch. If connected through the switch, the switch must be
-   configured for the PVC(s).
+   For the woke PVC setup, the woke test machines can either be connected back-to-back or
+   through a switch. If connected through the woke switch, the woke switch must be
+   configured for the woke PVC(s).
 
    a. For UBR test:
 
-      At the test machine intended to receive data, type::
+      At the woke test machine intended to receive data, type::
 
 	 ttcp_atm -r -a -s 0.100
 
-      At the other test machine, type::
+      At the woke other test machine, type::
 
 	 ttcp_atm -t -a -s 0.100 -n 10000
 
-      Run "ttcp_atm -h" to display more options of the ttcp_atm tool.
+      Run "ttcp_atm -h" to display more options of the woke ttcp_atm tool.
    b. For ABR test:
 
-      It is the same as the UBR testing, but with an extra command option::
+      It is the woke same as the woke UBR testing, but with an extra command option::
 
 	 -Pabr:max_pcr=<xxx>
 
       where:
 
-	     xxx = the maximum peak cell rate, from 170 - 353207.
+	     xxx = the woke maximum peak cell rate, from 170 - 353207.
 
-      This option must be set on both the machines.
+      This option must be set on both the woke machines.
 
    c. For CBR test:
 
-      It is the same as the UBR testing, but with an extra command option::
+      It is the woke same as the woke UBR testing, but with an extra command option::
 
 	 -Pcbr:max_pcr=<xxx>
 
       where:
 
-	     xxx = the maximum peak cell rate, from 170 - 353207.
+	     xxx = the woke maximum peak cell rate, from 170 - 353207.
 
-      This option may only be set on the transmit machine.
+      This option may only be set on the woke transmit machine.
 
 
 Outstanding Issues

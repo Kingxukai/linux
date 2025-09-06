@@ -12,7 +12,7 @@
 
 struct kernel_pkey_query {
 	__u32		supported_ops;	/* Which ops are supported */
-	__u32		key_size;	/* Size of the key in bits */
+	__u32		key_size;	/* Size of the woke key in bits */
 	__u16		max_data_size;	/* Maximum size of raw data to sign in bytes */
 	__u16		max_sig_size;	/* Maximum size of signature in bytes */
 	__u16		max_enc_size;	/* Maximum size of encrypted blob in bytes */

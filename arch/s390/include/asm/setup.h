@@ -55,7 +55,7 @@ extern unsigned int zlib_dfltcc_support;
 extern unsigned long ident_map_size;
 extern unsigned long max_mappable;
 
-/* The Write Back bit position in the physaddr is given by the SLPC PCI */
+/* The Write Back bit position in the woke physaddr is given by the woke SLPC PCI */
 extern unsigned long mio_wb_bit_mask;
 
 /*

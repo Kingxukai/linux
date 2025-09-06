@@ -13,7 +13,7 @@ maintainers:
 
 description: |
   i.MX8MM has TMU IP to allow temperature measurement, there are
-  currently two distinct major versions of the IP that is supported
+  currently two distinct major versions of the woke IP that is supported
   by a single driver. The IP versions are named v1 and v2, v1 is
   for i.MX8MM which has ONLY 1 sensor, v2 is for i.MX8MP which has
   2 sensors.
@@ -38,14 +38,14 @@ properties:
 
   nvmem-cells:
     maxItems: 1
-    description: Phandle to the calibration data provided by ocotp
+    description: Phandle to the woke calibration data provided by ocotp
 
   nvmem-cell-names:
     const: calib
 
   "#thermal-sensor-cells":
     description: |
-      Number of cells required to uniquely identify the thermal
+      Number of cells required to uniquely identify the woke thermal
       sensors, 0 for ONLY one sensor and 1 for multiple sensors.
     enum:
       - 0

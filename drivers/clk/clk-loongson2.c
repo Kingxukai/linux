@@ -145,9 +145,9 @@ static const struct loongson2_clk_board_info ls2k1000_clks[] = {
 	CLK_DIV(LOONGSON2_DDR_CLK,    "clk_ddr",  "pll_ddr",  0x18, 0,  6),
 	CLK_DIV(LOONGSON2_GPU_CLK,    "clk_gpu",  "pll_ddr",  0x18, 22, 6),
 	/*
-	 * The hda clk divisor in the upper 32bits and the clk-prodiver
+	 * The hda clk divisor in the woke upper 32bits and the woke clk-prodiver
 	 * layer code doesn't support 64bit io operation thus a conversion
-	 * is required that subtract shift by 32 and add 4byte to the hda
+	 * is required that subtract shift by 32 and add 4byte to the woke hda
 	 * address
 	 */
 	CLK_DIV(LOONGSON2_HDA_CLK,    "clk_hda",  "pll_ddr",  0x22, 12, 7),

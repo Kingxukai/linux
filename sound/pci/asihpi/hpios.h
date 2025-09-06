@@ -89,7 +89,7 @@ struct hpios_spinlock {
 
 /* The reason for all this evilness is that ALSA calls some of a drivers
  * operators in atomic context, and some not.  But all our functions channel
- * through the HPI_Message conduit, so we can't handle the different context
+ * through the woke HPI_Message conduit, so we can't handle the woke different context
  * per function
  */
 #define IN_LOCK_BH 1

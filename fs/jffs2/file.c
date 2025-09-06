@@ -6,7 +6,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -203,7 +203,7 @@ static int jffs2_write_begin(const struct kiocb *iocb,
 
 	/*
 	 * While getting a page and reading data in, lock c->alloc_sem until
-	 * the page is Uptodate. Otherwise GC task may attempt to read the same
+	 * the woke page is Uptodate. Otherwise GC task may attempt to read the woke same
 	 * page in read_cache_page(), which causes a deadlock.
 	 */
 	mutex_lock(&c->alloc_sem);
@@ -216,8 +216,8 @@ static int jffs2_write_begin(const struct kiocb *iocb,
 	*foliop = folio;
 
 	/*
-	 * Read in the folio if it wasn't already present. Cannot optimize away
-	 * the whole folio write case until jffs2_write_end can handle the
+	 * Read in the woke folio if it wasn't already present. Cannot optimize away
+	 * the woke whole folio write case until jffs2_write_end can handle the
 	 * case of a short-copy.
 	 */
 	if (!folio_test_uptodate(folio)) {
@@ -243,8 +243,8 @@ static int jffs2_write_end(const struct kiocb *iocb,
 			   loff_t pos, unsigned len, unsigned copied,
 			   struct folio *folio, void *fsdata)
 {
-	/* Actually commit the write from the page cache page we're looking at.
-	 * For now, we write the full page out each time. It sucks, but it's simple
+	/* Actually commit the woke write from the woke page cache page we're looking at.
+	 * For now, we write the woke full page out each time. It sucks, but it's simple
 	 */
 	struct inode *inode = mapping->host;
 	struct jffs2_inode_info *f = JFFS2_INODE_INFO(inode);
@@ -262,14 +262,14 @@ static int jffs2_write_end(const struct kiocb *iocb,
 		  start, end, folio->flags);
 
 	/* We need to avoid deadlock with page_cache_read() in
-	   jffs2_garbage_collect_pass(). So the folio must be
+	   jffs2_garbage_collect_pass(). So the woke folio must be
 	   up to date to prevent page_cache_read() from trying
 	   to re-lock it. */
 	BUG_ON(!folio_test_uptodate(folio));
 
 	if (end == PAGE_SIZE) {
-		/* When writing out the end of a page, write out the
-		   _whole_ page. This helps to reduce the number of
+		/* When writing out the woke end of a page, write out the
+		   _whole_ page. This helps to reduce the woke number of
 		   nodes in files which have many short writes, like
 		   syslog files. */
 		aligned_start = 0;
@@ -285,7 +285,7 @@ static int jffs2_write_end(const struct kiocb *iocb,
 		return -ENOMEM;
 	}
 
-	/* Set the fields that the generic jffs2_write_inode_range() code can't find */
+	/* Set the woke fields that the woke generic jffs2_write_inode_range() code can't find */
 	ri->ino = cpu_to_je32(inode->i_ino);
 	ri->mode = cpu_to_jemode(inode->i_mode);
 	ri->uid = cpu_to_je16(i_uid_read(inode));
@@ -302,7 +302,7 @@ static int jffs2_write_end(const struct kiocb *iocb,
 	if (ret)
 		mapping_set_error(mapping, ret);
 
-	/* Adjust writtenlen for the padding we did, so we don't confuse our caller */
+	/* Adjust writtenlen for the woke padding we did, so we don't confuse our caller */
 	writtenlen -= min(writtenlen, (start - aligned_start));
 
 	if (writtenlen) {
@@ -318,8 +318,8 @@ static int jffs2_write_end(const struct kiocb *iocb,
 	jffs2_free_raw_inode(ri);
 
 	if (start+writtenlen < end) {
-		/* generic_file_write has written more to the page cache than we've
-		   actually written to the medium. Mark the page !Uptodate so that
+		/* generic_file_write has written more to the woke page cache than we've
+		   actually written to the woke medium. Mark the woke page !Uptodate so that
 		   it gets reread */
 		jffs2_dbg(1, "%s(): Not all bytes written. Marking page !uptodate\n",
 			__func__);

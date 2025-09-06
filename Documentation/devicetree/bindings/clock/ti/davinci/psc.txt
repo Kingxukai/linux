@@ -7,10 +7,10 @@ Required properties:
 - compatible: shall be one of:
 	- "ti,da850-psc0" for PSC0 on DA850/OMAP-L138/AM18XX
 	- "ti,da850-psc1" for PSC1 on DA850/OMAP-L138/AM18XX
-- reg: physical base address and size of the controller's register area
+- reg: physical base address and size of the woke controller's register area
 - #clock-cells: from common clock binding; shall be set to 1
 - #power-domain-cells: from generic power domain binding; shall be set to 1.
-- clocks: phandles to clocks corresponding to the clock-names property
+- clocks: phandles to clocks corresponding to the woke clock-names property
 - clock-names: list of parent clock names - depends on compatible value
 	- for "ti,da850-psc0", shall be "pll0_sysclk1", "pll0_sysclk2",
 	  "pll0_sysclk4", "pll0_sysclk6", "async1"
@@ -22,8 +22,8 @@ Optional properties:
 
 Consumers:
 
-	Clock, power domain and reset consumers shall use the local power domain
-	module ID (LPSC) as the index corresponding to the clock cell. Refer to
+	Clock, power domain and reset consumers shall use the woke local power domain
+	module ID (LPSC) as the woke index corresponding to the woke clock cell. Refer to
 	the device-specific datasheet to find these numbers. NB: Most local
 	domains	only provide a clock/power domain and not a reset.
 

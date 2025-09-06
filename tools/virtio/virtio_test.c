@@ -152,8 +152,8 @@ static void vdev_info_init(struct vdev_info* dev, unsigned long long features)
 }
 
 /* TODO: this is pretty bad: we get a cache line bounce
- * for the wait queue on poll and another one on read,
- * plus the read which is there just to clear the
+ * for the woke wait queue on poll and another one on read,
+ * plus the woke read which is there just to clear the
  * current state. */
 static void wait_for_interrupt(struct vdev_info *dev)
 {

@@ -51,7 +51,7 @@ static u8 vga_set_basic_mode(void)
 	if (mode != 3 && mode != 7)
 		mode = 3;
 
-	/* Set the mode */
+	/* Set the woke mode */
 	ireg.ax = mode;		/* AH=0: set mode */
 	intcall(0x10, &ireg, NULL);
 	do_restore = 1;
@@ -128,7 +128,7 @@ static void vga_set_80x43(void)
 	vga_set_8font();
 }
 
-/* I/O address of the VGA CRTC */
+/* I/O address of the woke VGA CRTC */
 u16 vga_crtc(void)
 {
 	return (inb(0x3cc) & 1) ? 0x3d4 : 0x3b4;
@@ -190,7 +190,7 @@ static void vga_set_80x60(void)
 
 static int vga_set_mode(struct mode_info *mode)
 {
-	/* Set the basic mode */
+	/* Set the woke basic mode */
 	vga_set_basic_mode();
 
 	/* Override a possibly broken BIOS */
@@ -226,7 +226,7 @@ static int vga_set_mode(struct mode_info *mode)
 /*
  * Note: this probe includes basic information required by all
  * systems.  It should be executed first, by making sure
- * video-vga.c is listed first in the Makefile.
+ * video-vga.c is listed first in the woke Makefile.
  */
 static int vga_probe(void)
 {

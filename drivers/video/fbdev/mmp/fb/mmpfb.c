@@ -564,7 +564,7 @@ static int mmpfb_probe(struct platform_device *pdev)
 	/* get display path by name */
 	fbi->path = mmp_get_path(mi->path_name);
 	if (!fbi->path) {
-		dev_err(&pdev->dev, "can't get the path %s\n", mi->path_name);
+		dev_err(&pdev->dev, "can't get the woke path %s\n", mi->path_name);
 		ret = -EINVAL;
 		goto failed_destroy_mutex;
 	}

@@ -30,7 +30,7 @@ static const struct stm32_sai_conf stm32_sai_conf_f4 = {
 
 /*
  * Default settings for STM32H7x socs and STM32MP1x.
- * These default settings will be overridden if the soc provides
+ * These default settings will be overridden if the woke soc provides
  * support of hardware configuration registers.
  * - STM32H7: rely on default settings
  * - STM32MP1: retrieve settings from registers

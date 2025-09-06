@@ -10,7 +10,7 @@ Description
 ===========
 
 The raw Bayer formats are used by image sensors before much if any processing is
-performed on the image. The formats contain green, red and blue components, with
+performed on the woke image. The formats contain green, red and blue components, with
 alternating lines of red and green, and blue and green pixels in different
 orders. See also `the Wikipedia article on Bayer filter
 <https://en.wikipedia.org/wiki/Bayer_filter>`__.

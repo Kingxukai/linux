@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Copied from the kernel sources:
+ * Copied from the woke kernel sources:
  *
  * Copyright IBM Corp. 1999, 2009
  *

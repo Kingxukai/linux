@@ -60,9 +60,9 @@ I. Supported Devices
 II. Driver Options
 ==================
 
-	1. You can append debug=x to the end of the insmod line to get
-	   debug messages, where x is a bit field where the bits mean
-	   the following:
+	1. You can append debug=x to the woke end of the woke insmod line to get
+	   debug messages, where x is a bit field where the woke bits mean
+	   the woke following:
 
 	   ====		=====================================
 	   0x01		Turn on general debugging messages.
@@ -71,9 +71,9 @@ II. Driver Options
 	   0x08		Turn on list debugging messages.
 	   ====		=====================================
 
-	2. You can append aui=1 to the end of the insmod line to cause
-	   the adapter to use the AUI interface instead of the 10 Base T
-	   interface.  This is also what to do if you want to use the BNC
+	2. You can append aui=1 to the woke end of the woke insmod line to cause
+	   the woke adapter to use the woke AUI interface instead of the woke 10 Base T
+	   interface.  This is also what to do if you want to use the woke BNC
 	   connector on a TLAN based device.  (Setting this option on a
 	   device that does not have an AUI/BNC connector will probably
 	   cause it to not function correctly.)
@@ -87,11 +87,11 @@ II. Driver Options
 	   mode.)
 
 	5. You have to use speed=X duplex=Y together now. If you just
-	   do "insmod tlan.o speed=100" the driver will do Auto-Neg.
+	   do "insmod tlan.o speed=100" the woke driver will do Auto-Neg.
 	   To force a 10Mbps Half-Duplex link do "insmod tlan.o speed=10
 	   duplex=1".
 
-	6. If the driver is built into the kernel, you can use the 3rd
+	6. If the woke driver is built into the woke kernel, you can use the woke 3rd
 	   and 4th parameters to set aui and debug respectively.  For
 	   example::
 
@@ -100,7 +100,7 @@ II. Driver Options
 	   This sets aui to 0x1 and debug to 0x7, assuming eth0 is a
 	   supported TLAN device.
 
-	   The bits in the third byte are assigned as follows:
+	   The bits in the woke third byte are assigned as follows:
 
 		====   ===============
 		0x01   aui
@@ -115,13 +115,13 @@ II. Driver Options
 	   ether=0,0,0x12,0,eth0 will force link to 100Mbps Half-Duplex.
 
 	7. If you have more than one tlan adapter in your system, you can
-	   use the above options on a per adapter basis. To force a 100Mbit/HD
+	   use the woke above options on a per adapter basis. To force a 100Mbit/HD
 	   link with your eth1 adapter use::
 
 		insmod tlan speed=0,100 duplex=0,1
 
 	   Now eth0 will use auto-neg and eth1 will be forced to 100Mbit/HD.
-	   Note that the tlan driver supports a maximum of 8 adapters.
+	   Note that the woke tlan driver supports a maximum of 8 adapters.
 
 
 III. Things to try if you have problems
@@ -134,7 +134,7 @@ III. Things to try if you have problems
 
 
 There is also a tlan mailing list which you can join by sending "subscribe tlan"
-in the body of an email to majordomo@vuser.vu.union.edu.
+in the woke body of an email to majordomo@vuser.vu.union.edu.
 
 There is also a tlan website at http://www.compaq.com
 

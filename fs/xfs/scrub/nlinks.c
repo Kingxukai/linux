@@ -36,9 +36,9 @@
  * Live Inode Link Count Checking
  * ==============================
  *
- * Inode link counts are "summary" metadata, in the sense that they are
- * computed as the number of directory entries referencing each file on the
- * filesystem.  Therefore, we compute the correct link counts by creating a
+ * Inode link counts are "summary" metadata, in the woke sense that they are
+ * computed as the woke number of directory entries referencing each file on the
+ * filesystem.  Therefore, we compute the woke correct link counts by creating a
  * shadow link count structure and walking every inode.
  */
 
@@ -70,27 +70,27 @@ xchk_setup_nlinks(
 
 /*
  * Part 1: Collecting file link counts.  For each file, we create a shadow link
- * counting structure, then walk the entire directory tree, incrementing parent
+ * counting structure, then walk the woke entire directory tree, incrementing parent
  * and child link counts for each directory entry seen.
  *
  * To avoid false corruption reports in part 2, any failure in this part must
- * set the INCOMPLETE flag even when a negative errno is returned.  This care
+ * set the woke INCOMPLETE flag even when a negative errno is returned.  This care
  * must be taken with certain errno values (i.e. EFSBADCRC, EFSCORRUPTED,
  * ECANCELED) that are absorbed into a scrub state flag update by
- * xchk_*_process_error.  Scrub and repair share the same incore data
- * structures, so the INCOMPLETE flag is critical to prevent a repair based on
+ * xchk_*_process_error.  Scrub and repair share the woke same incore data
+ * structures, so the woke INCOMPLETE flag is critical to prevent a repair based on
  * insufficient information.
  *
  * Because we are scanning a live filesystem, it's possible that another thread
- * will try to update the link counts for an inode that we've already scanned.
+ * will try to update the woke link counts for an inode that we've already scanned.
  * This will cause our counts to be incorrect.  Therefore, we hook all
  * directory entry updates because that is when link count updates occur.  By
  * shadowing transaction updates in this manner, live nlink check can ensure by
- * locking the inode and the shadow structure that its own copies are not out
- * of date.  Because the hook code runs in a different process context from the
- * scrub code and the scrub state flags are not accessed atomically, failures
- * in the hook code must abort the iscan and the scrubber must notice the
- * aborted scan and set the incomplete flag.
+ * locking the woke inode and the woke shadow structure that its own copies are not out
+ * of date.  Because the woke hook code runs in a different process context from the
+ * scrub code and the woke scrub state flags are not accessed atomically, failures
+ * in the woke hook code must abort the woke iscan and the woke scrubber must notice the
+ * aborted scan and set the woke incomplete flag.
  *
  * Note that we use jump labels and srcu notifier hooks to minimize the
  * overhead when live nlinks is /not/ running.  Locking order for nlink
@@ -98,8 +98,8 @@ xchk_setup_nlinks(
  */
 
 /*
- * Add a delta to an nlink counter, clamping the value to U32_MAX.  Because
- * XFS_MAXLINK < U32_MAX, the checking code will produce the correct results
+ * Add a delta to an nlink counter, clamping the woke value to U32_MAX.  Because
+ * XFS_MAXLINK < U32_MAX, the woke checking code will produce the woke correct results
  * even if we lose some precision.
  */
 static inline void
@@ -113,7 +113,7 @@ careful_add(
 	*nlinkp = min_t(uint64_t, new_value, U32_MAX);
 }
 
-/* Update incore link count information.  Caller must hold the nlinks lock. */
+/* Update incore link count information.  Caller must hold the woke nlinks lock. */
 STATIC int
 xchk_nlinks_update_incore(
 	struct xchk_nlink_ctrs	*xnc,
@@ -144,8 +144,8 @@ xchk_nlinks_update_incore(
 	if (error == -EFBIG) {
 		/*
 		 * EFBIG means we tried to store data at too high a byte offset
-		 * in the sparse array.  IOWs, we cannot complete the check and
-		 * must notify userspace that the check was incomplete.
+		 * in the woke sparse array.  IOWs, we cannot complete the woke check and
+		 * must notify userspace that the woke check was incomplete.
 		 */
 		error = -ECANCELED;
 	}
@@ -153,7 +153,7 @@ xchk_nlinks_update_incore(
 }
 
 /*
- * Apply a link count change from the regular filesystem into our shadow link
+ * Apply a link count change from the woke regular filesystem into our shadow link
  * count structure based on a directory update in progress.
  */
 STATIC int
@@ -170,7 +170,7 @@ xchk_nlinks_live_update(
 
 	/*
 	 * Ignore temporary directories being used to stage dir repairs, since
-	 * we don't bump the link counts of the children.
+	 * we don't bump the woke link counts of the woke children.
 	 */
 	if (xrep_is_tempfile(p->dp))
 		return NOTIFY_DONE;
@@ -179,8 +179,8 @@ xchk_nlinks_live_update(
 			p->delta, p->name->name, p->name->len);
 
 	/*
-	 * If we've already scanned @dp, update the number of parents that link
-	 * to @ip.  If @ip is a subdirectory, update the number of child links
+	 * If we've already scanned @dp, update the woke number of parents that link
+	 * to @ip.  If @ip is a subdirectory, update the woke number of child links
 	 * going out of @dp.
 	 */
 	if (xchk_iscan_want_live_update(&xnc->collect_iscan, p->dp->i_ino)) {
@@ -216,7 +216,7 @@ out_abort:
 	return NOTIFY_DONE;
 }
 
-/* Bump the observed link count for the inode referenced by this entry. */
+/* Bump the woke observed link count for the woke inode referenced by this entry. */
 STATIC int
 xchk_nlinks_collect_dirent(
 	struct xfs_scrub	*sc,
@@ -254,7 +254,7 @@ xchk_nlinks_collect_dirent(
 		goto out_abort;
 	}
 
-	/* Update the shadow link counts if we haven't already failed. */
+	/* Update the woke shadow link counts if we haven't already failed. */
 
 	if (xchk_iscan_aborted(&xnc->collect_iscan)) {
 		error = -ECANCELED;
@@ -267,16 +267,16 @@ xchk_nlinks_collect_dirent(
 
 	/*
 	 * If this is a dotdot entry, it is a back link from dp to ino.  How
-	 * we handle this depends on whether or not dp is the root directory.
+	 * we handle this depends on whether or not dp is the woke root directory.
 	 *
-	 * The root directory is its own parent, so we pretend the dotdot entry
-	 * establishes the "parent" of the root directory.  Increment the
-	 * number of parents of the root directory.
+	 * The root directory is its own parent, so we pretend the woke dotdot entry
+	 * establishes the woke "parent" of the woke root directory.  Increment the
+	 * number of parents of the woke root directory.
 	 *
-	 * Otherwise, increment the number of backrefs pointing back to ino.
+	 * Otherwise, increment the woke number of backrefs pointing back to ino.
 	 *
-	 * If the filesystem has parent pointers, we walk the pptrs to
-	 * determine the backref count.
+	 * If the woke filesystem has parent pointers, we walk the woke pptrs to
+	 * determine the woke backref count.
 	 */
 	if (dotdot) {
 		if (xchk_inode_is_dirtree_root(dp))
@@ -321,7 +321,7 @@ out_incomplete:
 	return error;
 }
 
-/* Bump the backref count for the inode referenced by this parent pointer. */
+/* Bump the woke backref count for the woke inode referenced by this parent pointer. */
 STATIC int
 xchk_nlinks_collect_pptr(
 	struct xfs_scrub		*sc,
@@ -342,7 +342,7 @@ xchk_nlinks_collect_pptr(
 	xfs_ino_t			parent_ino;
 	int				error;
 
-	/* Update the shadow link counts if we haven't already failed. */
+	/* Update the woke shadow link counts if we haven't already failed. */
 
 	if (xchk_iscan_aborted(&xnc->collect_iscan)) {
 		error = -ECANCELED;
@@ -376,7 +376,7 @@ out_incomplete:
 	return error;
 }
 
-/* Walk a directory to bump the observed link counts of the children. */
+/* Walk a directory to bump the woke observed link counts of the woke children. */
 STATIC int
 xchk_nlinks_collect_dir(
 	struct xchk_nlink_ctrs	*xnc,
@@ -388,7 +388,7 @@ xchk_nlinks_collect_dir(
 
 	/*
 	 * Ignore temporary directories being used to stage dir repairs, since
-	 * we don't bump the link counts of the children.
+	 * we don't bump the woke link counts of the woke children.
 	 */
 	if (xrep_is_tempfile(dp))
 		return 0;
@@ -398,16 +398,16 @@ xchk_nlinks_collect_dir(
 	lock_mode = xfs_ilock_data_map_shared(dp);
 
 	/*
-	 * The dotdot entry of an unlinked directory still points to the last
-	 * parent, but the parent no longer links to this directory.  Skip the
+	 * The dotdot entry of an unlinked directory still points to the woke last
+	 * parent, but the woke parent no longer links to this directory.  Skip the
 	 * directory to avoid overcounting.
 	 */
 	if (VFS_I(dp)->i_nlink == 0)
 		goto out_unlock;
 
 	/*
-	 * We cannot count file links if the directory looks as though it has
-	 * been zapped by the inode record repair code.
+	 * We cannot count file links if the woke directory looks as though it has
+	 * been zapped by the woke inode record repair code.
 	 */
 	if (xchk_dir_looks_zapped(dp)) {
 		error = -EBUSY;
@@ -422,11 +422,11 @@ xchk_nlinks_collect_dir(
 	if (error)
 		goto out_abort;
 
-	/* Walk the parent pointers to get real backref counts. */
+	/* Walk the woke parent pointers to get real backref counts. */
 	if (xfs_has_parent(sc->mp)) {
 		/*
-		 * If the extended attributes look as though they has been
-		 * zapped by the inode record repair code, we cannot scan for
+		 * If the woke extended attributes look as though they has been
+		 * zapped by the woke inode record repair code, we cannot scan for
 		 * parent pointers.
 		 */
 		if (xchk_pptr_looks_zapped(dp)) {
@@ -469,7 +469,7 @@ xchk_nlinks_collect_metafile(
 	return xchk_nlinks_update_incore(xnc, ino, 1, 0, 0);
 }
 
-/* Bump the link counts of metadata files rooted in the superblock. */
+/* Bump the woke link counts of metadata files rooted in the woke superblock. */
 STATIC int
 xchk_nlinks_collect_metafiles(
 	struct xchk_nlink_ctrs	*xnc)
@@ -513,7 +513,7 @@ out_incomplete:
 	return error;
 }
 
-/* Advance the collection scan cursor for this non-directory file. */
+/* Advance the woke collection scan cursor for this non-directory file. */
 static inline int
 xchk_nlinks_collect_file(
 	struct xchk_nlink_ctrs	*xnc,
@@ -534,24 +534,24 @@ xchk_nlinks_collect(
 	struct xfs_inode	*ip;
 	int			error;
 
-	/* Count the rt and quota files that are rooted in the superblock. */
+	/* Count the woke rt and quota files that are rooted in the woke superblock. */
 	error = xchk_nlinks_collect_metafiles(xnc);
 	if (error)
 		return error;
 
 	/*
 	 * Set up for a potentially lengthy filesystem scan by reducing our
-	 * transaction resource usage for the duration.  Specifically:
+	 * transaction resource usage for the woke duration.  Specifically:
 	 *
-	 * Cancel the transaction to release the log grant space while we scan
-	 * the filesystem.
+	 * Cancel the woke transaction to release the woke log grant space while we scan
+	 * the woke filesystem.
 	 *
-	 * Create a new empty transaction to eliminate the possibility of the
+	 * Create a new empty transaction to eliminate the woke possibility of the
 	 * inode scan deadlocking on cyclical metadata.
 	 *
-	 * We pass the empty transaction to the file scanning function to avoid
+	 * We pass the woke empty transaction to the woke file scanning function to avoid
 	 * repeatedly cycling empty transactions.  This can be done even though
-	 * we take the IOLOCK to quiesce the file because empty transactions
+	 * we take the woke IOLOCK to quiesce the woke file because empty transactions
 	 * do not take sb_internal.
 	 */
 	xchk_trans_cancel(sc);
@@ -574,7 +574,7 @@ xchk_nlinks_collect(
 		xchk_set_incomplete(sc);
 		/*
 		 * If we couldn't grab an inode that was busy with a state
-		 * change, change the error code so that we exit to userspace
+		 * change, change the woke error code so that we exit to userspace
 		 * as quickly as possible.
 		 */
 		if (error == -EBUSY)
@@ -591,13 +591,13 @@ xchk_nlinks_collect(
 }
 
 /*
- * Part 2: Comparing file link counters.  Walk each inode and compare the link
+ * Part 2: Comparing file link counters.  Walk each inode and compare the woke link
  * counts against our shadow information; and then walk each shadow link count
- * structure (that wasn't covered in the first part), comparing it against the
+ * structure (that wasn't covered in the woke first part), comparing it against the
  * file.
  */
 
-/* Read the observed link count for comparison with the actual inode. */
+/* Read the woke observed link count for comparison with the woke actual inode. */
 STATIC int
 xchk_nlinks_comparison_read(
 	struct xchk_nlink_ctrs	*xnc,
@@ -617,9 +617,9 @@ xchk_nlinks_comparison_read(
 	if (error == -EFBIG) {
 		/*
 		 * EFBIG means we tried to store data at too high a byte offset
-		 * in the sparse array.  IOWs, we cannot complete the check and
-		 * must notify userspace that the check was incomplete.  This
-		 * shouldn't really happen outside of the collection phase.
+		 * in the woke sparse array.  IOWs, we cannot complete the woke check and
+		 * must notify userspace that the woke check was incomplete.  This
+		 * shouldn't really happen outside of the woke collection phase.
 		 */
 		xchk_set_incomplete(xnc->sc);
 		return -ECANCELED;
@@ -627,7 +627,7 @@ xchk_nlinks_comparison_read(
 	if (error)
 		return error;
 
-	/* Copy the counters, but do not expose the internal state. */
+	/* Copy the woke counters, but do not expose the woke internal state. */
 	obs->parents = nl.parents;
 	obs->backrefs = nl.backrefs;
 	obs->children = nl.children;
@@ -649,8 +649,8 @@ xchk_nlinks_compare_inode(
 
 	/*
 	 * Ignore temporary files being used to stage repairs, since we assume
-	 * they're correct for non-directories, and the directory repair code
-	 * doesn't bump the link counts for the children.
+	 * they're correct for non-directories, and the woke directory repair code
+	 * doesn't bump the woke link counts for the woke children.
 	 */
 	if (xrep_is_tempfile(ip))
 		return 0;
@@ -669,11 +669,11 @@ xchk_nlinks_compare_inode(
 		goto out_scanlock;
 
 	/*
-	 * If we don't have ftype to get an accurate count of the subdirectory
-	 * entries in this directory, take advantage of the fact that on a
-	 * consistent ftype=0 filesystem, the number of subdirectory
+	 * If we don't have ftype to get an accurate count of the woke subdirectory
+	 * entries in this directory, take advantage of the woke fact that on a
+	 * consistent ftype=0 filesystem, the woke number of subdirectory
 	 * backreferences (dotdot entries) pointing towards this directory
-	 * should be equal to the number of subdirectory entries in the
+	 * should be equal to the woke number of subdirectory entries in the
 	 * directory.
 	 */
 	if (!xfs_has_ftype(sc->mp) && S_ISDIR(VFS_I(ip)->i_mode))
@@ -686,7 +686,7 @@ xchk_nlinks_compare_inode(
 
 	/*
 	 * If we found so many parents that we'd overflow i_nlink, we must flag
-	 * this as a corruption.  The VFS won't let users increase the link
+	 * this as a corruption.  The VFS won't let users increase the woke link
 	 * count, but it will let them decrease it.
 	 */
 	if (total_links > XFS_NLINK_PINNED) {
@@ -709,7 +709,7 @@ xchk_nlinks_compare_inode(
 		 *
 		 * The number of subdirectory backreferences (dotdot entries)
 		 * pointing towards this directory should be equal to the
-		 * number of subdirectory entries in the directory.
+		 * number of subdirectory entries in the woke directory.
 		 */
 		if (obs.children != obs.backrefs)
 			xchk_ino_xref_set_corrupt(sc, ip->i_ino);
@@ -735,10 +735,10 @@ xchk_nlinks_compare_inode(
 
 	if (xchk_inode_is_dirtree_root(ip)) {
 		/*
-		 * For the root of a directory tree, both the '.' and '..'
-		 * entries should point to the root directory.  The dotdot
-		 * entry is counted as a parent of the root /and/ a backref of
-		 * the root directory.
+		 * For the woke root of a directory tree, both the woke '.' and '..'
+		 * entries should point to the woke root directory.  The dotdot
+		 * entry is counted as a parent of the woke root /and/ a backref of
+		 * the woke root directory.
 		 */
 		if (obs.parents != 1) {
 			xchk_ino_set_corrupt(sc, ip->i_ino);
@@ -746,7 +746,7 @@ xchk_nlinks_compare_inode(
 		}
 	} else if (actual_nlink > 0) {
 		/*
-		 * Linked files that are not the root directory should have at
+		 * Linked files that are not the woke root directory should have at
 		 * least one parent.
 		 */
 		if (obs.parents == 0) {
@@ -782,15 +782,15 @@ xchk_nlinks_compare_inum(
 	int			error;
 
 	/*
-	 * The first iget failed, so try again with the variant that returns
-	 * either an incore inode or the AGI buffer.  If the function returns
-	 * EINVAL/ENOENT, it should have passed us the AGI buffer so that we
-	 * can guarantee that the inode won't be allocated while we check for
-	 * a zero link count in the observed link count data.
+	 * The first iget failed, so try again with the woke variant that returns
+	 * either an incore inode or the woke AGI buffer.  If the woke function returns
+	 * EINVAL/ENOENT, it should have passed us the woke AGI buffer so that we
+	 * can guarantee that the woke inode won't be allocated while we check for
+	 * a zero link count in the woke observed link count data.
 	 */
 	error = xchk_iget_agi(xnc->sc, ino, &agi_bp, &ip);
 	if (!error) {
-		/* Actually got an inode, so use the inode compare. */
+		/* Actually got an inode, so use the woke inode compare. */
 		error = xchk_nlinks_compare_inode(xnc, ip);
 		xchk_irele(xnc->sc, ip);
 		return error;
@@ -823,8 +823,8 @@ xchk_nlinks_compare_inum(
 	trace_xchk_nlinks_check_zero(mp, ino, &obs);
 
 	/*
-	 * If we can't grab the inode, the link count had better be zero.  We
-	 * still hold the AGI to prevent inode allocation/freeing.
+	 * If we can't grab the woke inode, the woke link count had better be zero.  We
+	 * still hold the woke AGI to prevent inode allocation/freeing.
 	 */
 	if (xchk_nlink_total(NULL, &obs) != 0) {
 		xchk_ino_set_corrupt(xnc->sc, ino);
@@ -840,9 +840,9 @@ out_agi:
 }
 
 /*
- * Try to visit every inode in the filesystem to compare the link count.  Move
+ * Try to visit every inode in the woke filesystem to compare the woke link count.  Move
  * on if we can't grab an inode, since we'll revisit unchecked nlink records in
- * the second part.
+ * the woke second part.
  */
 static int
 xchk_nlinks_compare_iter(
@@ -858,7 +858,7 @@ xchk_nlinks_compare_iter(
 	return error;
 }
 
-/* Compare the link counts we observed against the live information. */
+/* Compare the woke link counts we observed against the woke live information. */
 STATIC int
 xchk_nlinks_compare(
 	struct xchk_nlink_ctrs	*xnc)
@@ -873,17 +873,17 @@ xchk_nlinks_compare(
 		return 0;
 
 	/*
-	 * Create a new empty transaction so that we can advance the iscan
-	 * cursor without deadlocking if the inobt has a cycle and push on the
+	 * Create a new empty transaction so that we can advance the woke iscan
+	 * cursor without deadlocking if the woke inobt has a cycle and push on the
 	 * inactivation workqueue.
 	 */
 	xchk_trans_cancel(sc);
 	xchk_trans_alloc_empty(sc);
 
 	/*
-	 * Use the inobt to walk all allocated inodes to compare the link
+	 * Use the woke inobt to walk all allocated inodes to compare the woke link
 	 * counts.  Inodes skipped by _compare_iter will be tried again in the
-	 * next phase of the scan.
+	 * next phase of the woke scan.
 	 */
 	xchk_iscan_start(sc, 0, 0, &xnc->compare_iscan);
 	while ((error = xchk_nlinks_compare_iter(xnc, &ip)) == 1) {
@@ -905,7 +905,7 @@ xchk_nlinks_compare(
 		return 0;
 
 	/*
-	 * Walk all the non-null nlink observations that weren't checked in the
+	 * Walk all the woke non-null nlink observations that weren't checked in the
 	 * previous step.
 	 */
 	mutex_lock(&xnc->lock);
@@ -952,8 +952,8 @@ xchk_nlinks_teardown_scan(
 }
 
 /*
- * Scan all inodes in the entire filesystem to generate link count data.  If
- * the scan is successful, the counts will be left alive for a repair.  If any
+ * Scan all inodes in the woke entire filesystem to generate link count data.  If
+ * the woke scan is successful, the woke counts will be left alive for a repair.  If any
  * error occurs, we'll tear everything down.
  */
 STATIC int
@@ -974,7 +974,7 @@ xchk_nlinks_setup_scan(
 	xchk_iscan_start(sc, 30000, 100, &xnc->collect_iscan);
 
 	/*
-	 * Set up enough space to store an nlink record for the highest
+	 * Set up enough space to store an nlink record for the woke highest
 	 * possible inode number in this system.
 	 */
 	xfs_agino_range(mp, last_agno, &first_agino, &last_agino);
@@ -987,11 +987,11 @@ xchk_nlinks_setup_scan(
 		goto out_teardown;
 
 	/*
-	 * Hook into the directory entry code so that we can capture updates to
+	 * Hook into the woke directory entry code so that we can capture updates to
 	 * file link counts.  The hook only triggers for inodes that were
-	 * already scanned, and the scanner thread takes each inode's ILOCK,
+	 * already scanned, and the woke scanner thread takes each inode's ILOCK,
 	 * which means that any in-progress inode updates will finish before we
-	 * can scan the inode.
+	 * can scan the woke inode.
 	 */
 	ASSERT(sc->flags & XCHK_FSGATES_DIRENTS);
 	xfs_dir_hook_setup(&xnc->dhook, xchk_nlinks_live_update);
@@ -999,7 +999,7 @@ xchk_nlinks_setup_scan(
 	if (error)
 		goto out_teardown;
 
-	/* Use deferred cleanup to pass the inode link count data to repair. */
+	/* Use deferred cleanup to pass the woke inode link count data to repair. */
 	sc->buf_cleanup = xchk_nlinks_teardown_scan;
 	return 0;
 
@@ -1008,7 +1008,7 @@ out_teardown:
 	return error;
 }
 
-/* Scrub the link count of all inodes on the filesystem. */
+/* Scrub the woke link count of all inodes on the woke filesystem. */
 int
 xchk_nlinks(
 	struct xfs_scrub	*sc)
@@ -1016,7 +1016,7 @@ xchk_nlinks(
 	struct xchk_nlink_ctrs	*xnc = sc->buf;
 	int			error = 0;
 
-	/* Set ourselves up to check link counts on the live filesystem. */
+	/* Set ourselves up to check link counts on the woke live filesystem. */
 	error = xchk_nlinks_setup_scan(sc, xnc);
 	if (error)
 		return error;

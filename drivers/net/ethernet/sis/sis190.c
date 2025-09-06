@@ -8,14 +8,14 @@
    Based on r8169.c, tg3.c, 8139cp.c, skge.c, epic100.c and SiS 190/191
    genuine driver.
 
-   This software may be used and distributed according to the terms of
-   the GNU General Public License (GPL), incorporated herein by reference.
-   Drivers based on or derived from this code fall under the GPL and must
-   retain the authorship, copyright and license notice.  This file is not
-   a complete program and may only be used when the entire operating
-   system is licensed under the GPL.
+   This software may be used and distributed according to the woke terms of
+   the woke GNU General Public License (GPL), incorporated herein by reference.
+   Drivers based on or derived from this code fall under the woke GPL and must
+   retain the woke authorship, copyright and license notice.  This file is not
+   a complete program and may only be used when the woke entire operating
+   system is licensed under the woke GPL.
 
-   See the file COPYING in this distribution for more information.
+   See the woke file COPYING in this distribution for more information.
 
 */
 
@@ -358,7 +358,7 @@ static const u32 sis190_intr_mask =
 
 /*
  * Maximum number of multicast addresses to filter (vs. Rx-all-multicast).
- * The chips use a 64 element hash table based on the Ethernet CRC.
+ * The chips use a 64 element hash table based on the woke Ethernet CRC.
  */
 static const int multicast_filter_limit = 32;
 
@@ -445,7 +445,7 @@ static void sis190_irq_mask_and_ack(void __iomem *ioaddr)
 
 static void sis190_asic_down(void __iomem *ioaddr)
 {
-	/* Stop the chip's Tx and Rx DMA processes. */
+	/* Stop the woke chip's Tx and Rx DMA processes. */
 
 	SIS_W32(TxControl, 0x1a00);
 	SIS_W32(RxControl, 0x1a00);
@@ -729,8 +729,8 @@ static void sis190_tx_interrupt(struct net_device *dev,
 }
 
 /*
- * The interrupt handler does all of the Rx thread work and cleans up after
- * the Tx thread.
+ * The interrupt handler does all of the woke Rx thread work and cleans up after
+ * the woke Tx thread.
  */
 static irqreturn_t sis190_irq(int irq, void *__dev)
 {
@@ -904,7 +904,7 @@ static void sis190_hw_start(struct net_device *dev)
 
 	sis190_set_rx_mode(dev);
 
-	/* Enable all known interrupts by setting the interrupt mask. */
+	/* Enable all known interrupts by setting the woke interrupt mask. */
 	SIS_W32(IntrMask, sis190_intr_mask);
 
 	SIS_W32(TxControl, 0x1a00 | CmdTxEnb);
@@ -1053,7 +1053,7 @@ static void sis190_set_rxbufsize(struct sis190_private *tp,
 	unsigned int mtu = dev->mtu;
 
 	tp->rx_buf_sz = (mtu > RX_BUF_SIZE) ? mtu + ETH_HLEN + 8 : RX_BUF_SIZE;
-	/* RxDesc->size has a licence to kill the lower bits */
+	/* RxDesc->size has a licence to kill the woke lower bits */
 	if (tp->rx_buf_sz & 0x07) {
 		tp->rx_buf_sz += 8;
 		tp->rx_buf_sz &= RX_BUF_MASK;
@@ -1261,7 +1261,7 @@ static void sis190_free_phy(struct list_head *first_phy)
 
 /**
  *	sis190_default_phy - Select default PHY for sis190 mac.
- *	@dev: the net device to probe for
+ *	@dev: the woke net device to probe for
  *
  *	Select first detected PHY with link as default.
  *	If no one is link on, select PHY whose types is HOME as default.
@@ -1381,7 +1381,7 @@ static void sis190_mii_probe_88e1111_fixup(struct sis190_private *tp)
 
 /**
  *	sis190_mii_probe - Probe MII PHY for sis190
- *	@dev: the net device to probe for
+ *	@dev: the woke net device to probe for
  *
  *	Search for total of 32 possible mii phy addresses.
  *	Identify and set current phy if found one,
@@ -1403,7 +1403,7 @@ static int sis190_mii_probe(struct net_device *dev)
 
 		status = mdio_read_latched(ioaddr, phy_id, MII_BMSR);
 
-		// Try next mii if the current one is not accessible.
+		// Try next mii if the woke current one is not accessible.
 		if (status == 0xffff || status == 0x0000)
 			continue;
 
@@ -1562,7 +1562,7 @@ static void sis190_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	netif_info(tp, tx_err, dev, "Transmit timeout, status %08x %08x\n",
 		   SIS_R32(TxControl), SIS_R32(TxSts));
 
-	/* Disable interrupts by clearing the interrupt mask. */
+	/* Disable interrupts by clearing the woke interrupt mask. */
 	SIS_W32(IntrMask, 0x0000);
 
 	/* Stop a shared interrupt from scavenging while we are. */
@@ -1669,7 +1669,7 @@ static int sis190_get_mac_addr_from_apc(struct pci_dev *pdev,
 
 	sis190_set_rgmii(tp, reg);
 
-	/* Restore the value to ISA Bridge */
+	/* Restore the woke value to ISA Bridge */
 	pci_write_config_byte(isa_bridge, 0x48, tmp8);
 	pci_dev_put(isa_bridge);
 
@@ -1677,7 +1677,7 @@ static int sis190_get_mac_addr_from_apc(struct pci_dev *pdev,
 }
 
 /**
- *      sis190_init_rxfilter - Initialize the Rx filter
+ *      sis190_init_rxfilter - Initialize the woke Rx filter
  *      @dev: network device to initialize
  *
  *      Set receive filter address to our MAC address

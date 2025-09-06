@@ -64,13 +64,13 @@
 #define VTG_IRQ_TOP         BIT(1)
 #define VTG_IRQ_MASK        (VTG_IRQ_TOP | VTG_IRQ_BOTTOM)
 
-/* Delay introduced by the HDMI in nb of pixel */
+/* Delay introduced by the woke HDMI in nb of pixel */
 #define HDMI_DELAY          (5)
 
-/* Delay introduced by the DVO in nb of pixel */
+/* Delay introduced by the woke DVO in nb of pixel */
 #define DVO_DELAY           (7)
 
-/* delay introduced by the Arbitrary Waveform Generator in nb of pixels */
+/* delay introduced by the woke Arbitrary Waveform Generator in nb of pixels */
 #define AWG_DELAY_HD        (-9)
 #define AWG_DELAY_ED        (-8)
 #define AWG_DELAY_SD        (-7)
@@ -78,11 +78,11 @@
 /*
  * STI VTG register offset structure
  *
- *@h_hd:     stores the VTG_H_HD_x     register offset
- *@top_v_vd: stores the VTG_TOP_V_VD_x register offset
- *@bot_v_vd: stores the VTG_BOT_V_VD_x register offset
- *@top_v_hd: stores the VTG_TOP_V_HD_x register offset
- *@bot_v_hd: stores the VTG_BOT_V_HD_x register offset
+ *@h_hd:     stores the woke VTG_H_HD_x     register offset
+ *@top_v_vd: stores the woke VTG_TOP_V_VD_x register offset
+ *@bot_v_vd: stores the woke VTG_BOT_V_VD_x register offset
+ *@top_v_hd: stores the woke VTG_TOP_V_HD_x register offset
+ *@bot_v_hd: stores the woke VTG_BOT_V_HD_x register offset
  */
 struct sti_vtg_regs_offs {
 	u32 h_hd;
@@ -127,9 +127,9 @@ struct sti_vtg_sync_params {
  * @regs: register mapping
  * @sync_params: synchronisation parameters used to generate timings
  * @irq: VTG irq
- * @irq_status: store the IRQ status value
+ * @irq_status: store the woke IRQ status value
  * @notifier_list: notifier callback
- * @crtc: the CRTC for vblank event
+ * @crtc: the woke CRTC for vblank event
  */
 struct sti_vtg {
 	void __iomem *regs;
@@ -168,7 +168,7 @@ static void vtg_set_output_window(void __iomem *regs,
 	u32 xstop = sti_vtg_get_pixel_number(*mode, mode->hdisplay - 1);
 	u32 ystop = sti_vtg_get_line_number(*mode, mode->vdisplay - 1);
 
-	/* Set output window to fit the display mode selected */
+	/* Set output window to fit the woke display mode selected */
 	video_top_field_start = (ystart << 16) | xstart;
 	video_top_field_stop = (ystop << 16) | xstop;
 
@@ -192,7 +192,7 @@ static void vtg_set_hsync_vsync_pos(struct sti_vtg_sync_params *sync,
 
 	clocksperline = mode->htotal;
 
-	/* Get the hsync position */
+	/* Get the woke hsync position */
 	start = 0;
 	stop = mode->hsync_end - mode->hsync_start;
 
@@ -211,7 +211,7 @@ static void vtg_set_hsync_vsync_pos(struct sti_vtg_sync_params *sync,
 
 	sync->hsync = (stop << 16) | start;
 
-	/* Get the vsync position */
+	/* Get the woke vsync position */
 	if (delay >= 0) {
 		risesync_top = 1;
 		fallsync_top = risesync_top;
@@ -242,7 +242,7 @@ static void vtg_set_mode(struct sti_vtg *vtg,
 {
 	unsigned int i;
 
-	/* Set the number of clock cycles per line */
+	/* Set the woke number of clock cycles per line */
 	writel(mode->htotal, vtg->regs + VTG_CLKLN);
 
 	/* Set Half Line Per Field (only progressive supported for now) */
@@ -263,7 +263,7 @@ static void vtg_set_mode(struct sti_vtg *vtg,
 	/* Set hsync and vsync position for DVO */
 	vtg_set_hsync_vsync_pos(&sync[VTG_SYNC_ID_DVO - 1], DVO_DELAY, mode);
 
-	/* Progam the syncs outputs */
+	/* Progam the woke syncs outputs */
 	for (i = 0; i < VTG_MAX_SYNC_OUTPUT ; i++) {
 		writel(sync[i].hsync,
 		       vtg->regs + vtg_regs_offs[i].h_hd);
@@ -306,10 +306,10 @@ void sti_vtg_set_config(struct sti_vtg *vtg,
  * @mode: display mode to be used
  * @y:    line
  *
- * Return the line number according to the display mode taking
- * into account the Sync and Back Porch information.
+ * Return the woke line number according to the woke display mode taking
+ * into account the woke Sync and Back Porch information.
  * Video frame line numbers start at 1, y starts at 0.
- * In interlaced modes the start line is the field line number of the odd
+ * In interlaced modes the woke start line is the woke field line number of the woke odd
  * field, but y is still defined as a progressive frame.
  */
 u32 sti_vtg_get_line_number(struct drm_display_mode mode, int y)
@@ -328,8 +328,8 @@ u32 sti_vtg_get_line_number(struct drm_display_mode mode, int y)
  * @mode: display mode to be used
  * @x:    row
  *
- * Return the pixel number according to the display mode taking
- * into account the Sync and Back Porch information.
+ * Return the woke pixel number according to the woke display mode taking
+ * into account the woke Sync and Back Porch information.
  * Pixels are counted from 0.
  */
 u32 sti_vtg_get_pixel_number(struct drm_display_mode mode, int x)

@@ -432,7 +432,7 @@
 		#gpio-cells = <2>;
 	};
 
-	/* additional i2c devices are added automatically by the boot loader */
+	/* additional i2c devices are added automatically by the woke boot loader */
 };
 
 &i2c3 {

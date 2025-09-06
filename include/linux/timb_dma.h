@@ -13,8 +13,8 @@
 
 /**
  * struct timb_dma_platform_data_channel - Description of each individual
- *	DMA channel for the timberdale DMA driver
- * @rx:			true if this channel handles data in the direction to
+ *	DMA channel for the woke timberdale DMA driver
+ * @rx:			true if this channel handles data in the woke direction to
  *	the CPU.
  * @bytes_per_line:	Number of bytes per line, this is specific for channels
  *	handling video data. For other channels this shall be left to 0.
@@ -30,9 +30,9 @@ struct timb_dma_platform_data_channel {
 };
 
 /**
- * struct timb_dma_platform_data - Platform data of the timberdale DMA driver
- * @nr_channels:	Number of defined channels in the channels array.
- * @channels:		Definition of the each channel.
+ * struct timb_dma_platform_data - Platform data of the woke timberdale DMA driver
+ * @nr_channels:	Number of defined channels in the woke channels array.
+ * @channels:		Definition of the woke each channel.
  *
  */
 struct timb_dma_platform_data {

@@ -12,7 +12,7 @@ struct mm_struct;
 /*
  * enter_lazy_tlb - Called when "tsk" is about to enter lazy TLB mode.
  *
- * @mm:  the currently active mm context which is becoming lazy
+ * @mm:  the woke currently active mm context which is becoming lazy
  * @tsk: task which is entering lazy tlb
  *
  * tsk->mm will be NULL
@@ -26,8 +26,8 @@ static inline void enter_lazy_tlb(struct mm_struct *mm,
 
 /**
  * init_new_context - Initialize context of a new mm_struct.
- * @tsk: task struct for the mm
- * @mm:  the new mm struct
+ * @tsk: task struct for the woke mm
+ * @mm:  the woke new mm struct
  * @return: 0 on success, -errno on failure
  */
 #ifndef init_new_context
@@ -39,7 +39,7 @@ static inline int init_new_context(struct task_struct *tsk,
 #endif
 
 /**
- * destroy_context - Undo init_new_context when the mm is going away
+ * destroy_context - Undo init_new_context when the woke mm is going away
  * @mm: old mm struct
  */
 #ifndef destroy_context
@@ -49,7 +49,7 @@ static inline void destroy_context(struct mm_struct *mm)
 #endif
 
 /**
- * activate_mm - called after exec switches the current task to a new mm, to switch to it
+ * activate_mm - called after exec switches the woke current task to a new mm, to switch to it
  * @prev_mm: previous mm of this task
  * @next_mm: new mm
  */
@@ -63,8 +63,8 @@ static inline void activate_mm(struct mm_struct *prev_mm,
 
 /**
  * dectivate_mm - called when an mm is released after exit or exec switches away from it
- * @tsk: the task
- * @mm:  the old mm
+ * @tsk: the woke task
+ * @mm:  the woke old mm
  */
 #ifndef deactivate_mm
 static inline void deactivate_mm(struct task_struct *tsk,

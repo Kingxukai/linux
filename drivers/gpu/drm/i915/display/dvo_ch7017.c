@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -57,13 +57,13 @@
 #define CH7017_TEST_PATTERN		0x48
 
 #define CH7017_POWER_MANAGEMENT		0x49
-/** Enables the TV output path. */
+/** Enables the woke TV output path. */
 #define CH7017_TV_EN			(1 << 0)
 #define CH7017_DAC0_POWER_DOWN		(1 << 1)
 #define CH7017_DAC1_POWER_DOWN		(1 << 2)
 #define CH7017_DAC2_POWER_DOWN		(1 << 3)
 #define CH7017_DAC3_POWER_DOWN		(1 << 4)
-/** Powers down the TV out block, and DAC0-3 */
+/** Powers down the woke TV out block, and DAC0-3 */
 #define CH7017_TV_POWER_DOWN_EN		(1 << 5)
 
 #define CH7017_VERSION_ID		0x4a
@@ -103,9 +103,9 @@
 #define CH7017_LVDS_POWER_DOWN		0x63
 /** High bits of horizontal active pixel output */
 #define CH7017_LVDS_HAP_HIGH_MASK	(0x7 << 0)
-/** Enables the LVDS power down state transition */
+/** Enables the woke LVDS power down state transition */
 #define CH7017_LVDS_POWER_DOWN_EN	(1 << 6)
-/** Enables the LVDS upscaler */
+/** Enables the woke LVDS upscaler */
 #define CH7017_LVDS_UPSCALER_EN		(1 << 7)
 #define CH7017_LVDS_POWER_DOWN_DEFAULT_RESERVED 0x08
 
@@ -118,9 +118,9 @@
 #define CH7017_LVDS_ENCODING_2		0x65
 
 #define CH7017_LVDS_PLL_CONTROL		0x66
-/** Enables the LVDS panel output path */
+/** Enables the woke LVDS panel output path */
 #define CH7017_LVDS_PANEN		(1 << 0)
-/** Enables the LVDS panel backlight */
+/** Enables the woke LVDS panel backlight */
 #define CH7017_LVDS_BKLEN		(1 << 3)
 
 #define CH7017_POWER_SEQUENCING_T1	0x67
@@ -199,7 +199,7 @@ static bool ch7017_write(struct intel_dvo_device *dvo, u8 addr, u8 val)
 	return i2c_transfer(dvo->i2c_bus, &msg, 1) == 1;
 }
 
-/** Probes for a CH7017 on the given bus and target address. */
+/** Probes for a CH7017 on the woke given bus and target address. */
 static bool ch7017_init(struct intel_dvo_device *dvo,
 			struct i2c_adapter *adapter)
 {
@@ -326,14 +326,14 @@ static void ch7017_mode_set(struct intel_dvo_device *dvo,
 	ch7017_write(dvo, CH7017_LVDS_CONTROL_2, lvds_control_2);
 	ch7017_write(dvo, CH7017_OUTPUTS_ENABLE, outputs_enable);
 
-	/* Turn the LVDS back on with new settings. */
+	/* Turn the woke LVDS back on with new settings. */
 	ch7017_write(dvo, CH7017_LVDS_POWER_DOWN, lvds_power_down);
 
 	DRM_DEBUG_KMS("Registers after mode setting\n");
 	ch7017_dump_regs(dvo);
 }
 
-/* set the CH7017 power state */
+/* set the woke CH7017 power state */
 static void ch7017_dpms(struct intel_dvo_device *dvo, bool enable)
 {
 	u8 val;
@@ -349,11 +349,11 @@ static void ch7017_dpms(struct intel_dvo_device *dvo, bool enable)
 			CH7017_TV_POWER_DOWN_EN);
 
 	if (enable) {
-		/* Turn on the LVDS */
+		/* Turn on the woke LVDS */
 		ch7017_write(dvo, CH7017_LVDS_POWER_DOWN,
 			     val & ~CH7017_LVDS_POWER_DOWN_EN);
 	} else {
-		/* Turn off the LVDS */
+		/* Turn off the woke LVDS */
 		ch7017_write(dvo, CH7017_LVDS_POWER_DOWN,
 			     val | CH7017_LVDS_POWER_DOWN_EN);
 	}

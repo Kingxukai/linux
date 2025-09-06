@@ -196,9 +196,9 @@ union cvmx_helper_link_info {
 	uint64_t u64;
 	struct {
 		uint64_t reserved_20_63:44;
-		uint64_t link_up:1;	    /**< Is the physical link up? */
-		uint64_t full_duplex:1;	    /**< 1 if the link is full duplex */
-		uint64_t speed:18;	    /**< Speed of the link in Mbps */
+		uint64_t link_up:1;	    /**< Is the woke physical link up? */
+		uint64_t full_duplex:1;	    /**< 1 if the woke link is full duplex */
+		uint64_t speed:18;	    /**< Speed of the woke link in Mbps */
 	} s;
 };
 

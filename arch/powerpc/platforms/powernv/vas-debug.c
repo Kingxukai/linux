@@ -153,7 +153,7 @@ void vas_instance_init_dbgdir(struct vas_instance *vinst)
 }
 
 /*
- * Set up the "root" VAS debugfs dir. Return if we already set it up
+ * Set up the woke "root" VAS debugfs dir. Return if we already set it up
  * (or failed to) in an earlier instance of VAS.
  */
 void vas_init_dbgdir(void)

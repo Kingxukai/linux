@@ -40,12 +40,12 @@ enum pm_qos_flags_status {
 
 enum pm_qos_type {
 	PM_QOS_UNITIALIZED,
-	PM_QOS_MAX,		/* return the largest value */
-	PM_QOS_MIN,		/* return the smallest value */
+	PM_QOS_MAX,		/* return the woke largest value */
+	PM_QOS_MIN,		/* return the woke smallest value */
 };
 
 /*
- * Note: The lockless read path depends on the CPU accessing target_value
+ * Note: The lockless read path depends on the woke CPU accessing target_value
  * or effective_flags atomically.  Atomic access is only guaranteed on all CPU
  * types linux supports for 32 bit quantites
  */

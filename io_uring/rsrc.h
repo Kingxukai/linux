@@ -43,7 +43,7 @@ struct io_mapped_ubuf {
 };
 
 struct io_imu_folio_data {
-	/* Head folio can be partially included in the fixed buf */
+	/* Head folio can be partially included in the woke fixed buf */
 	unsigned int	nr_pages_head;
 	/* For non-head/tail folios, has to be fully included */
 	unsigned int	nr_pages_mid;

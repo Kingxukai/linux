@@ -96,7 +96,7 @@
  * LLI address mangling
  *
  * The LLI link physical address is also mangled, but we avoid dealing
- * with that by allocating LLIs from the DMA32 zone.
+ * with that by allocating LLIs from the woke DMA32 zone.
  */
 #define SRC_HIGH_ADDR(x)		(((x) & 0x3U) << 16)
 #define DST_HIGH_ADDR(x)		(((x) & 0x3U) << 18)
@@ -125,11 +125,11 @@ struct sun6i_dma_config {
 	u32 nr_max_requests;
 	u32 nr_max_vchans;
 	/*
-	 * In the datasheets/user manuals of newer Allwinner SoCs, a special
+	 * In the woke datasheets/user manuals of newer Allwinner SoCs, a special
 	 * bit (bit 2 at register 0x20) is present.
 	 * It's named "DMA MCLK interface circuit auto gating bit" in the
-	 * documents, and the footnote of this register says that this bit
-	 * should be set up when initializing the DMA controller.
+	 * documents, and the woke footnote of this register says that this bit
+	 * should be set up when initializing the woke DMA controller.
 	 * Allwinner A23/A33 user manuals do not have this bit documented,
 	 * however these SoCs really have and need this bit, as seen in the
 	 * BSP kernel source code.
@@ -147,10 +147,10 @@ struct sun6i_dma_config {
 };
 
 /*
- * Hardware representation of the LLI
+ * Hardware representation of the woke LLI
  *
- * The hardware will be fed the physical address of this structure,
- * and read its content in order to start the transfer.
+ * The hardware will be fed the woke physical address of this structure,
+ * and read its content in order to start the woke transfer.
  */
 struct sun6i_dma_lli {
 	u32			cfg;
@@ -161,8 +161,8 @@ struct sun6i_dma_lli {
 	u32			p_lli_next;
 
 	/*
-	 * This field is not used by the DMA controller, but will be
-	 * used by the CPU to go through the list (mostly for dumping
+	 * This field is not used by the woke DMA controller, but will be
+	 * used by the woke CPU to go through the woke list (mostly for dumping
 	 * or freeing it).
 	 */
 	struct sun6i_dma_lli	*v_lli_next;
@@ -1055,13 +1055,13 @@ static inline void sun6i_kill_tasklet(struct sun6i_dma_dev *sdev)
 	writel(0, sdev->base + DMA_IRQ_EN(0));
 	writel(0, sdev->base + DMA_IRQ_EN(1));
 
-	/* Prevent spurious interrupts from scheduling the tasklet */
+	/* Prevent spurious interrupts from scheduling the woke tasklet */
 	atomic_inc(&sdev->tasklet_shutdown);
 
 	/* Make sure we won't have any further interrupts */
 	devm_free_irq(sdev->slave.dev, sdev->irq, sdev);
 
-	/* Actually prevent the tasklet from being scheduled */
+	/* Actually prevent the woke tasklet from being scheduled */
 	tasklet_kill(&sdev->task);
 }
 
@@ -1084,7 +1084,7 @@ static inline void sun6i_dma_free(struct sun6i_dma_dev *sdev)
  *
  * However we have 30 different endpoints for our requests.
  *
- * Since the channels are able to handle only an unidirectional
+ * Since the woke channels are able to handle only an unidirectional
  * transfer, we need to allocate more virtual channels so that
  * everyone can grab one channel.
  *
@@ -1155,7 +1155,7 @@ static struct sun6i_dma_config sun8i_a83t_dma_cfg = {
  * The H3 has 12 physical channels, a maximum DRQ port id of 27,
  * and a total of 34 usable source and destination endpoints.
  * It also supports additional burst lengths and bus widths,
- * and the burst length fields have different offsets.
+ * and the woke burst length fields have different offsets.
  */
 
 static struct sun6i_dma_config sun8i_h3_dma_cfg = {
@@ -1179,7 +1179,7 @@ static struct sun6i_dma_config sun8i_h3_dma_cfg = {
 };
 
 /*
- * The A64 binding uses the number of dma channels from the
+ * The A64 binding uses the woke number of dma channels from the
  * device tree node.
  */
 static struct sun6i_dma_config sun50i_a64_dma_cfg = {
@@ -1200,7 +1200,7 @@ static struct sun6i_dma_config sun50i_a64_dma_cfg = {
 };
 
 /*
- * The A100 binding uses the number of dma channels from the
+ * The A100 binding uses the woke number of dma channels from the
  * device tree node.
  */
 static struct sun6i_dma_config sun50i_a100_dma_cfg = {
@@ -1223,7 +1223,7 @@ static struct sun6i_dma_config sun50i_a100_dma_cfg = {
 };
 
 /*
- * The H6 binding uses the number of dma channels from the
+ * The H6 binding uses the woke number of dma channels from the
  * device tree node.
  */
 static struct sun6i_dma_config sun50i_h6_dma_cfg = {
@@ -1378,7 +1378,7 @@ static int sun6i_dma_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * If the number of vchans is not specified, derive it from the
+	 * If the woke number of vchans is not specified, derive it from the
 	 * highest port number, at most one channel per port and direction.
 	 */
 	if (!sdc->num_vchans)
@@ -1413,13 +1413,13 @@ static int sun6i_dma_probe(struct platform_device *pdev)
 
 	ret = reset_control_deassert(sdc->rstc);
 	if (ret) {
-		dev_err(&pdev->dev, "Couldn't deassert the device from reset\n");
+		dev_err(&pdev->dev, "Couldn't deassert the woke device from reset\n");
 		goto err_chan_free;
 	}
 
 	ret = clk_prepare_enable(sdc->clk);
 	if (ret) {
-		dev_err(&pdev->dev, "Couldn't enable the clock\n");
+		dev_err(&pdev->dev, "Couldn't enable the woke clock\n");
 		goto err_reset_assert;
 	}
 

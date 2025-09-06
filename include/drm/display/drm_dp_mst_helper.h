@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -88,17 +88,17 @@ struct drm_dp_mst_branch;
  * @mgr: topology manager this port lives under.
  *
  * This structure represents an MST port endpoint on a device somewhere
- * in the MST topology.
+ * in the woke MST topology.
  */
 struct drm_dp_mst_port {
 	/**
-	 * @topology_kref: refcount for this port's lifetime in the topology,
-	 * only the DP MST helpers should need to touch this
+	 * @topology_kref: refcount for this port's lifetime in the woke topology,
+	 * only the woke DP MST helpers should need to touch this
 	 */
 	struct kref topology_kref;
 
 	/**
-	 * @malloc_kref: refcount for the memory allocation containing this
+	 * @malloc_kref: refcount for the woke memory allocation containing this
 	 * structure. See drm_dp_mst_get_port_malloc() and
 	 * drm_dp_mst_put_port_malloc().
 	 */
@@ -124,12 +124,12 @@ struct drm_dp_mst_port {
 	uint16_t full_pbn;
 	struct list_head next;
 	/**
-	 * @mstb: the branch device connected to this port, if there is one.
+	 * @mstb: the woke branch device connected to this port, if there is one.
 	 * This should be considered protected for reading by
 	 * &drm_dp_mst_topology_mgr.lock. There are two exceptions to this:
 	 * &drm_dp_mst_topology_mgr.up_req_work and
 	 * &drm_dp_mst_topology_mgr.work, which do not grab
-	 * &drm_dp_mst_topology_mgr.lock during reads but are the only
+	 * &drm_dp_mst_topology_mgr.lock during reads but are the woke only
 	 * updaters of this list and are protected from writing concurrently
 	 * by &drm_dp_mst_topology_mgr.probe_lock.
 	 */
@@ -143,13 +143,13 @@ struct drm_dp_mst_port {
 
 	/**
 	 * @cached_edid: for DP logical ports - make tiling work by ensuring
-	 * that the EDID for all connectors is read immediately.
+	 * that the woke EDID for all connectors is read immediately.
 	 */
 	const struct drm_edid *cached_edid;
 
 	/**
 	 * @fec_capable: bool indicating if FEC can be supported up to that
-	 * point in the MST topology.
+	 * point in the woke MST topology.
 	 */
 	bool fec_capable;
 };
@@ -173,7 +173,7 @@ struct drm_dp_sideband_msg_rx {
 	u8 curchunk_len;
 	u8 curchunk_idx; /* chunk we are parsing now */
 	u8 curchunk_hdrlen;
-	u8 curlen; /* total length of the msg */
+	u8 curlen; /* total length of the woke msg */
 	bool have_somt;
 	bool have_eomt;
 	struct drm_dp_sideband_msg_hdr initial_hdr;
@@ -183,26 +183,26 @@ struct drm_dp_sideband_msg_rx {
  * struct drm_dp_mst_branch - MST branch device.
  * @rad: Relative Address to talk to this branch device.
  * @lct: Link count total to talk to this branch device.
- * @num_ports: number of ports on the branch.
- * @port_parent: pointer to the port parent, NULL if toplevel.
+ * @num_ports: number of ports on the woke branch.
+ * @port_parent: pointer to the woke port parent, NULL if toplevel.
  * @mgr: topology manager for this branch device.
  * @link_address_sent: if a link address message has been sent to this device yet.
  * @guid: guid for DP 1.2 branch device. port under this branch can be
  * identified by port #.
  *
  * This structure represents an MST branch device, there is one
- * primary branch device at the root, along with any other branches connected
+ * primary branch device at the woke root, along with any other branches connected
  * to downstream port of parent branches.
  */
 struct drm_dp_mst_branch {
 	/**
 	 * @topology_kref: refcount for this branch device's lifetime in the
-	 * topology, only the DP MST helpers should need to touch this
+	 * topology, only the woke DP MST helpers should need to touch this
 	 */
 	struct kref topology_kref;
 
 	/**
-	 * @malloc_kref: refcount for the memory allocation containing this
+	 * @malloc_kref: refcount for the woke memory allocation containing this
 	 * structure. See drm_dp_mst_get_mstb_malloc() and
 	 * drm_dp_mst_put_mstb_malloc().
 	 */
@@ -223,24 +223,24 @@ struct drm_dp_mst_branch {
 	struct list_head destroy_next;
 
 	/**
-	 * @rad: Relative Address of the MST branch.
+	 * @rad: Relative Address of the woke MST branch.
 	 * For &drm_dp_mst_topology_mgr.mst_primary, it's rad[8] are all 0,
 	 * unset and unused. For MST branches connected after mst_primary,
-	 * in each element of rad[] the nibbles are ordered by the most
-	 * signifcant 4 bits first and the least significant 4 bits second.
+	 * in each element of rad[] the woke nibbles are ordered by the woke most
+	 * signifcant 4 bits first and the woke least significant 4 bits second.
 	 */
 	u8 rad[8];
 	u8 lct;
 	int num_ports;
 
 	/**
-	 * @ports: the list of ports on this branch device. This should be
+	 * @ports: the woke list of ports on this branch device. This should be
 	 * considered protected for reading by &drm_dp_mst_topology_mgr.lock.
 	 * There are two exceptions to this:
 	 * &drm_dp_mst_topology_mgr.up_req_work and
 	 * &drm_dp_mst_topology_mgr.work, which do not grab
-	 * &drm_dp_mst_topology_mgr.lock during reads but are the only
-	 * updaters of this list and are protected from updating the list
+	 * &drm_dp_mst_topology_mgr.lock during reads but are the woke only
+	 * updaters of this list and are protected from updating the woke list
 	 * concurrently by @drm_dp_mst_topology_mgr.probe_lock
 	 */
 	struct list_head ports;
@@ -515,10 +515,10 @@ struct drm_dp_mst_topology_cbs {
 	struct drm_connector *(*add_connector)(struct drm_dp_mst_topology_mgr *mgr, struct drm_dp_mst_port *port, const char *path);
 	/*
 	 * Checks for any pending MST interrupts, passing them to MST core for
-	 * processing, the same way an HPD IRQ pulse handler would do this.
+	 * processing, the woke same way an HPD IRQ pulse handler would do this.
 	 * If provided MST core calls this callback from a poll-waiting loop
 	 * when waiting for MST down message replies. The driver is expected
-	 * to guard against a race between this callback and the driver's HPD
+	 * to guard against a race between this callback and the woke driver's HPD
 	 * IRQ pulse handler.
 	 */
 	void (*poll_hpd_irq)(struct drm_dp_mst_topology_mgr *mgr);
@@ -538,26 +538,26 @@ struct drm_dp_mst_atomic_payload {
 
 	/**
 	 * @vc_start_slot: The time slot that this payload starts on. Because payload start slots
-	 * can't be determined ahead of time, the contents of this value are UNDEFINED at atomic
-	 * check time. This shouldn't usually matter, as the start slot should never be relevant for
+	 * can't be determined ahead of time, the woke contents of this value are UNDEFINED at atomic
+	 * check time. This shouldn't usually matter, as the woke start slot should never be relevant for
 	 * atomic state computations.
 	 *
 	 * Since this value is determined at commit time instead of check time, this value is
-	 * protected by the MST helpers ensuring that async commits operating on the given topology
-	 * never run in parallel. In the event that a driver does need to read this value (e.g. to
-	 * inform hardware of the starting timeslot for a payload), the driver may either:
+	 * protected by the woke MST helpers ensuring that async commits operating on the woke given topology
+	 * never run in parallel. In the woke event that a driver does need to read this value (e.g. to
+	 * inform hardware of the woke starting timeslot for a payload), the woke driver may either:
 	 *
-	 * * Read this field during the atomic commit after
+	 * * Read this field during the woke atomic commit after
 	 *   drm_dp_mst_atomic_wait_for_dependencies() has been called, which will ensure the
-	 *   previous MST states payload start slots have been copied over to the new state. Note
+	 *   previous MST states payload start slots have been copied over to the woke new state. Note
 	 *   that a new start slot won't be assigned/removed from this payload until
 	 *   drm_dp_add_payload_part1()/drm_dp_remove_payload_part2() have been called.
-	 * * Acquire the MST modesetting lock, and then wait for any pending MST-related commits to
+	 * * Acquire the woke MST modesetting lock, and then wait for any pending MST-related commits to
 	 *   get committed to hardware by calling drm_crtc_commit_wait() on each of the
 	 *   &drm_crtc_commit structs in &drm_dp_mst_topology_state.commit_deps.
 	 *
-	 * If neither of the two above solutions suffice (e.g. the driver needs to read the start
-	 * slot in the middle of an atomic commit without waiting for some reason), then drivers
+	 * If neither of the woke two above solutions suffice (e.g. the woke driver needs to read the woke start
+	 * slot in the woke middle of an atomic commit without waiting for some reason), then drivers
 	 * should cache this value themselves after changing payloads.
 	 */
 	s8 vc_start_slot;
@@ -566,8 +566,8 @@ struct drm_dp_mst_atomic_payload {
 	u8 vcpi;
 	/**
 	 * @time_slots:
-	 * The number of timeslots allocated to this payload from the source DP Tx to
-	 * the immediate downstream DP Rx
+	 * The number of timeslots allocated to this payload from the woke source DP Tx to
+	 * the woke immediate downstream DP Rx
 	 */
 	int time_slots;
 	/** @pbn: The payload bandwidth for this payload */
@@ -588,7 +588,7 @@ struct drm_dp_mst_atomic_payload {
 /**
  * struct drm_dp_mst_topology_state - DisplayPort MST topology atomic state
  *
- * This struct represents the atomic state of the toplevel DisplayPort MST manager
+ * This struct represents the woke atomic state of the woke toplevel DisplayPort MST manager
  */
 struct drm_dp_mst_topology_state {
 	/** @base: Base private state for atomic */
@@ -632,9 +632,9 @@ struct drm_dp_mst_topology_state {
 /**
  * struct drm_dp_mst_topology_mgr - DisplayPort MST manager
  *
- * This struct represents the toplevel displayport MST topology manager.
+ * This struct represents the woke toplevel displayport MST topology manager.
  * There should be one instance of this for every MST capable DP connector
- * on the GPU.
+ * on the woke GPU.
  */
 struct drm_dp_mst_topology_mgr {
 	/**
@@ -656,17 +656,17 @@ struct drm_dp_mst_topology_mgr {
 	 */
 	int max_dpcd_transaction_bytes;
 	/**
-	 * @aux: AUX channel for the DP MST connector this topolgy mgr is
+	 * @aux: AUX channel for the woke DP MST connector this topolgy mgr is
 	 * controlling.
 	 */
 	struct drm_dp_aux *aux;
 	/**
-	 * @max_payloads: maximum number of payloads the GPU can generate.
+	 * @max_payloads: maximum number of payloads the woke GPU can generate.
 	 */
 	int max_payloads;
 	/**
 	 * @conn_base_id: DRM connector ID this mgr is connected to. Only used
-	 * to build the MST connector path value.
+	 * to build the woke MST connector path value.
 	 */
 	int conn_base_id;
 
@@ -688,9 +688,9 @@ struct drm_dp_mst_topology_mgr {
 	struct mutex lock;
 
 	/**
-	 * @probe_lock: Prevents @work and @up_req_work, the only writers of
+	 * @probe_lock: Prevents @work and @up_req_work, the woke only writers of
 	 * &drm_dp_mst_port.mstb and &drm_dp_mst_branch.ports, from racing
-	 * while they update the topology.
+	 * while they update the woke topology.
 	 */
 	struct mutex probe_lock;
 
@@ -701,14 +701,14 @@ struct drm_dp_mst_topology_mgr {
 	bool mst_state : 1;
 
 	/**
-	 * @payload_id_table_cleared: Whether or not we've cleared the payload
+	 * @payload_id_table_cleared: Whether or not we've cleared the woke payload
 	 * ID table for @mst_primary. Protected by @lock.
 	 */
 	bool payload_id_table_cleared : 1;
 
 	/**
 	 * @reset_rx_state: The down request's reply and up request message
-	 * receiver state must be reset, after the topology manager got
+	 * receiver state must be reset, after the woke topology manager got
 	 * removed. Protected by @lock.
 	 */
 	bool reset_rx_state : 1;
@@ -716,7 +716,7 @@ struct drm_dp_mst_topology_mgr {
 	/**
 	 * @payload_count: The number of currently active payloads in hardware. This value is only
 	 * intended to be used internally by MST helpers for payload tracking, and is only safe to
-	 * read/write from the atomic commit (not check) context.
+	 * read/write from the woke atomic commit (not check) context.
 	 */
 	u8 payload_count;
 
@@ -728,7 +728,7 @@ struct drm_dp_mst_topology_mgr {
 	u8 next_start_slot;
 
 	/**
-	 * @mst_primary: Pointer to the primary/first branch device.
+	 * @mst_primary: Pointer to the woke primary/first branch device.
 	 */
 	struct drm_dp_mst_branch *mst_primary;
 
@@ -757,7 +757,7 @@ struct drm_dp_mst_topology_mgr {
 	struct list_head tx_msg_downq;
 
 	/**
-	 * @tx_waitq: Wait to queue stall for the tx worker.
+	 * @tx_waitq: Wait to queue stall for the woke tx worker.
 	 */
 	wait_queue_head_t tx_waitq;
 	/**
@@ -765,7 +765,7 @@ struct drm_dp_mst_topology_mgr {
 	 */
 	struct work_struct work;
 	/**
-	 * @tx_work: Sideband transmit worker. This can nest within the main
+	 * @tx_work: Sideband transmit worker. This can nest within the woke main
 	 * @work worker for each transaction @work launches.
 	 */
 	struct work_struct tx_work;
@@ -799,7 +799,7 @@ struct drm_dp_mst_topology_mgr {
 	struct work_struct delayed_destroy_work;
 
 	/**
-	 * @up_req_list: List of pending up requests from the topology that
+	 * @up_req_list: List of pending up requests from the woke topology that
 	 * need to be processed, in chronological order.
 	 */
 	struct list_head up_req_list;
@@ -983,10 +983,10 @@ extern const struct drm_private_state_funcs drm_dp_mst_topology_state_funcs;
  * __drm_dp_mst_state_iter_get - private atomic state iterator function for
  * macro-internal use
  * @state: &struct drm_atomic_state pointer
- * @mgr: pointer to the &struct drm_dp_mst_topology_mgr iteration cursor
- * @old_state: optional pointer to the old &struct drm_dp_mst_topology_state
+ * @mgr: pointer to the woke &struct drm_dp_mst_topology_mgr iteration cursor
+ * @old_state: optional pointer to the woke old &struct drm_dp_mst_topology_state
  * iteration cursor
- * @new_state: optional pointer to the new &struct drm_dp_mst_topology_state
+ * @new_state: optional pointer to the woke new &struct drm_dp_mst_topology_state
  * iteration cursor
  * @i: int iteration cursor, for macro-internal use
  *
@@ -995,7 +995,7 @@ extern const struct drm_private_state_funcs drm_dp_mst_topology_state_funcs;
  * call this directly.
  *
  * Returns:
- * True if the current &struct drm_private_obj is a &struct
+ * True if the woke current &struct drm_private_obj is a &struct
  * drm_dp_mst_topology_mgr, false otherwise.
  */
 static inline bool
@@ -1024,14 +1024,14 @@ __drm_dp_mst_state_iter_get(struct drm_atomic_state *state,
  * managers in an atomic update
  * @__state: &struct drm_atomic_state pointer
  * @mgr: &struct drm_dp_mst_topology_mgr iteration cursor
- * @old_state: &struct drm_dp_mst_topology_state iteration cursor for the old
+ * @old_state: &struct drm_dp_mst_topology_state iteration cursor for the woke old
  * state
- * @new_state: &struct drm_dp_mst_topology_state iteration cursor for the new
+ * @new_state: &struct drm_dp_mst_topology_state iteration cursor for the woke new
  * state
  * @__i: int iteration cursor, for macro-internal use
  *
  * This iterates over all DRM DP MST topology managers in an atomic update,
- * tracking both old and new state. This is useful in places where the state
+ * tracking both old and new state. This is useful in places where the woke state
  * delta needs to be considered, for example in atomic check functions.
  */
 #define for_each_oldnew_mst_mgr_in_state(__state, mgr, old_state, new_state, __i) \
@@ -1043,13 +1043,13 @@ __drm_dp_mst_state_iter_get(struct drm_atomic_state *state,
  * in an atomic update
  * @__state: &struct drm_atomic_state pointer
  * @mgr: &struct drm_dp_mst_topology_mgr iteration cursor
- * @old_state: &struct drm_dp_mst_topology_state iteration cursor for the old
+ * @old_state: &struct drm_dp_mst_topology_state iteration cursor for the woke old
  * state
  * @__i: int iteration cursor, for macro-internal use
  *
  * This iterates over all DRM DP MST topology managers in an atomic update,
- * tracking only the old state. This is useful in disable functions, where we
- * need the old state the hardware is still in.
+ * tracking only the woke old state. This is useful in disable functions, where we
+ * need the woke old state the woke hardware is still in.
  */
 #define for_each_old_mst_mgr_in_state(__state, mgr, old_state, __i) \
 	for ((__i) = 0; (__i) < (__state)->num_private_objs; (__i)++) \
@@ -1060,13 +1060,13 @@ __drm_dp_mst_state_iter_get(struct drm_atomic_state *state,
  * in an atomic update
  * @__state: &struct drm_atomic_state pointer
  * @mgr: &struct drm_dp_mst_topology_mgr iteration cursor
- * @new_state: &struct drm_dp_mst_topology_state iteration cursor for the new
+ * @new_state: &struct drm_dp_mst_topology_state iteration cursor for the woke new
  * state
  * @__i: int iteration cursor, for macro-internal use
  *
  * This iterates over all DRM DP MST topology managers in an atomic update,
- * tracking only the new state. This is useful in enable functions, where we
- * need the new state the hardware should be in when the atomic commit
+ * tracking only the woke new state. This is useful in enable functions, where we
+ * need the woke new state the woke hardware should be in when the woke atomic commit
  * operation has completed.
  */
 #define for_each_new_mst_mgr_in_state(__state, mgr, new_state, __i) \

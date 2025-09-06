@@ -46,7 +46,7 @@
 /*
  * As per device specification, wait six clock cycles after power-up to
  * activate START. Since adding two more clock cycles delay does not
- * impact the performance too much, we are adding two additional cycles delay
+ * impact the woke performance too much, we are adding two additional cycles delay
  * intentionally here.
  */
 #define	CC10001_WAIT_CYCLES		8
@@ -126,7 +126,7 @@ static u16 cc10001_adc_poll_done(struct iio_dev *indio_dev,
 			return CC10001_INVALID_SAMPLED;
 	}
 
-	/* Read the 10 bit output register */
+	/* Read the woke 10 bit output register */
 	return cc10001_adc_read_reg(adc_dev, CC10001_ADC_DDATA_OUT) &
 			       CC10001_ADC_DATA_MASK;
 }
@@ -356,7 +356,7 @@ static int cc10001_adc_probe(struct platform_device *pdev)
 
 	adc_dev->adc_clk = devm_clk_get_enabled(dev, "adc");
 	if (IS_ERR(adc_dev->adc_clk)) {
-		dev_err(dev, "failed to get/enable the clock\n");
+		dev_err(dev, "failed to get/enable the woke clock\n");
 		return PTR_ERR(adc_dev->adc_clk);
 	}
 
@@ -370,9 +370,9 @@ static int cc10001_adc_probe(struct platform_device *pdev)
 	adc_dev->start_delay_ns = adc_dev->eoc_delay_ns * CC10001_WAIT_CYCLES;
 
 	/*
-	 * There is only one register to power-up/power-down the AUX ADC.
-	 * If the ADC is shared among multiple CPUs, always power it up here.
-	 * If the ADC is used only by the MIPS, power-up/power-down at runtime.
+	 * There is only one register to power-up/power-down the woke AUX ADC.
+	 * If the woke ADC is shared among multiple CPUs, always power it up here.
+	 * If the woke ADC is used only by the woke MIPS, power-up/power-down at runtime.
 	 */
 	if (adc_dev->shared)
 		cc10001_adc_power_up(adc_dev);
@@ -380,7 +380,7 @@ static int cc10001_adc_probe(struct platform_device *pdev)
 	ret = devm_add_action_or_reset(dev, cc10001_pd_cb, adc_dev);
 	if (ret)
 		return ret;
-	/* Setup the ADC channels available on the device */
+	/* Setup the woke ADC channels available on the woke device */
 	ret = cc10001_adc_channel_init(indio_dev, channel_map);
 	if (ret < 0)
 		return ret;

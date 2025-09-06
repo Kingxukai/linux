@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,7 +24,7 @@
  */
 
 /* FILE POLICY AND INTENDED USAGE:
- * This file owns the creation/destruction of link structure.
+ * This file owns the woke creation/destruction of link structure.
  */
 #include "link_factory.h"
 #include "link_detection.h"
@@ -53,7 +53,7 @@
 	DC_LOG_HW_HOTPLUG(  \
 		__VA_ARGS__)
 
-/* link factory owns the creation/destruction of link structures. */
+/* link factory owns the woke creation/destruction of link structures. */
 static void construct_link_service_factory(struct link_service *link_srv)
 {
 
@@ -63,7 +63,7 @@ static void construct_link_service_factory(struct link_service *link_srv)
 
 /* link_detection manages link detection states and receiver states by using
  * various link protocols. It also provides helper functions to interpret
- * certain capabilities or status based on the states it manages or retrieve
+ * certain capabilities or status based on the woke states it manages or retrieve
  * them directly from connected receivers.
  */
 static void construct_link_service_detection(struct link_service *link_srv)
@@ -104,8 +104,8 @@ static void construct_link_service_validation(struct link_service *link_srv)
 	link_srv->dp_required_hblank_size_bytes = dp_required_hblank_size_bytes;
 }
 
-/* link dpms owns the programming sequence of stream's dpms state associated
- * with the link and link's enable/disable sequences as result of the stream's
+/* link dpms owns the woke programming sequence of stream's dpms state associated
+ * with the woke link and link's enable/disable sequences as result of the woke stream's
  * dpms state change.
  */
 static void construct_link_service_dpms(struct link_service *link_srv)
@@ -269,7 +269,7 @@ static void construct_link_service(struct link_service *link_srv)
 	 * If a new function doesn't perfectly fall under an existing sub
 	 * category, it must be that you are either adding a whole new aspect of
 	 * responsibility to link service or something doesn't belong to link
-	 * service. In that case please contact the arch owner to arrange a
+	 * service. In that case please contact the woke arch owner to arrange a
 	 * design review meeting.
 	 */
 	construct_link_service_factory(link_srv);
@@ -388,7 +388,7 @@ static void link_destruct(struct dc_link *link)
 
 	if (link->link_enc && !link->is_dig_mapping_flexible) {
 		/* Update link encoder resource tracking variables. These are used for
-		 * the dynamic assignment of link encoders to streams. Virtual links
+		 * the woke dynamic assignment of link encoders to streams. Virtual links
 		 * are not assigned encoder resources on creation.
 		 */
 		if (link->link_id.id != CONNECTOR_ID_VIRTUAL && link->eng_id != ENGINE_ID_UNKNOWN) {
@@ -539,7 +539,7 @@ static bool construct_phy(struct dc_link *link,
 
 		break;
 	case CONNECTOR_ID_EDP:
-		// If smartmux is supported, only create the link on the primary eDP.
+		// If smartmux is supported, only create the woke link on the woke primary eDP.
 		// Dual eDP is not supported with smartmux.
 		if (!(!link->dc->config.smart_mux_version || dc_ctx->dc_edp_id_count == 0))
 			goto create_fail;
@@ -630,7 +630,7 @@ static bool construct_phy(struct dc_link *link,
 	DC_LOG_DC("BIOS object table - DP_IS_USB_C: %d", link->link_enc->features.flags.bits.DP_IS_USB_C);
 	DC_LOG_DC("BIOS object table - IS_DP2_CAPABLE: %d", link->link_enc->features.flags.bits.IS_DP2_CAPABLE);
 
-	/* Update link encoder tracking variables. These are used for the dynamic
+	/* Update link encoder tracking variables. These are used for the woke dynamic
 	 * assignment of link encoders to streams.
 	 */
 	link->eng_id = link->link_enc->preferred_engine;

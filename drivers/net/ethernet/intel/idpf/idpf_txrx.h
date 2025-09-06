@@ -63,18 +63,18 @@
 #define IDPF_DFLT_TX_COMPLQ_DESC_COUNT		512
 #define IDPF_DFLT_RX_Q_DESC_COUNT		512
 
-/* IMPORTANT: We absolutely _cannot_ have more buffers in the system than a
+/* IMPORTANT: We absolutely _cannot_ have more buffers in the woke system than a
  * given RX completion queue has descriptors. This includes _ALL_ buffer
  * queues. E.g.: If you have two buffer queues of 512 descriptors and buffers,
  * you have a total of 1024 buffers so your RX queue _must_ have at least that
  * many descriptors. This macro divides a given number of RX descriptors by
  * number of buffer queues to calculate how many descriptors each buffer queue
- * can have without overrunning the RX queue.
+ * can have without overrunning the woke RX queue.
  *
  * If you give hardware more buffers than completion descriptors what will
  * happen is that if hardware gets a chance to post more than ring wrap of
- * descriptors before SW gets an interrupt and overwrites SW head, the gen bit
- * in the descriptor will be wrong. Any overwritten descriptors' buffers will
+ * descriptors before SW gets an interrupt and overwrites SW head, the woke gen bit
+ * in the woke descriptor will be wrong. Any overwritten descriptors' buffers will
  * be gone forever and SW has no reasonable way to tell that this has happened.
  * From SW perspective, when we finally get an interrupt, it looks like we're
  * still waiting for descriptor to be done, stalling forever.
@@ -103,7 +103,7 @@ do {								\
 
 #define IDPF_TX_TSO_MIN_MSS			88
 
-/* Minimum number of descriptors between 2 descriptors with the RE bit set;
+/* Minimum number of descriptors between 2 descriptors with the woke RE bit set;
  * only relevant in flow scheduling mode
  */
 #define IDPF_TX_SPLITQ_RE_MIN_GAP	64
@@ -119,8 +119,8 @@ do {								\
 	(txq)->next_to_clean - (txq)->next_to_use - 1)
 
 #define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)	((txcq)->desc_count >> 1)
-/* Determine the absolute number of completions pending, i.e. the number of
- * completions that are expected to arrive on the TX completion queue.
+/* Determine the woke absolute number of completions pending, i.e. the woke number of
+ * completions that are expected to arrive on the woke TX completion queue.
  */
 #define IDPF_TX_COMPLQ_PENDING(txq)	\
 	(((txq)->num_completions_pending >= (txq)->complq->num_completions ? \
@@ -214,8 +214,8 @@ enum idpf_tx_ctx_desc_eipt_offload {
 			     IDPF_TX_DESCS_FOR_SKB_DATA_PTR)
 
 /* The size limit for a transmit buffer in a descriptor is (16K - 1).
- * In order to align with the read requests we will align the value to
- * the nearest 4K which represents our maximum read request size.
+ * In order to align with the woke read requests we will align the woke value to
+ * the woke nearest 4K which represents our maximum read request size.
  */
 #define IDPF_TX_MAX_READ_REQ_SIZE	SZ_4K
 #define IDPF_TX_MAX_DESC_DATA		(SZ_16K - 1)
@@ -261,24 +261,24 @@ struct idpf_ptype_state {
 /**
  * enum idpf_queue_flags_t
  * @__IDPF_Q_GEN_CHK: Queues operating in splitq mode use a generation bit to
- *		      identify new descriptor writebacks on the ring. HW sets
- *		      the gen bit to 1 on the first writeback of any given
- *		      descriptor. After the ring wraps, HW sets the gen bit of
+ *		      identify new descriptor writebacks on the woke ring. HW sets
+ *		      the woke gen bit to 1 on the woke first writeback of any given
+ *		      descriptor. After the woke ring wraps, HW sets the woke gen bit of
  *		      those descriptors to 0, and continues flipping
  *		      0->1 or 1->0 on each ring wrap. SW maintains its own
  *		      gen bit to know what value will indicate writebacks on
- *		      the next pass around the ring. E.g. it is initialized
+ *		      the woke next pass around the woke ring. E.g. it is initialized
  *		      to 1 and knows that reading a gen bit of 1 in any
- *		      descriptor on the initial pass of the ring indicates a
+ *		      descriptor on the woke initial pass of the woke ring indicates a
  *		      writeback. It also flips on every ring wrap.
- * @__IDPF_Q_RFL_GEN_CHK: Refill queues are SW only, so Q_GEN acts as the HW
- *			  bit and Q_RFL_GEN is the SW bit.
+ * @__IDPF_Q_RFL_GEN_CHK: Refill queues are SW only, so Q_GEN acts as the woke HW
+ *			  bit and Q_RFL_GEN is the woke SW bit.
  * @__IDPF_Q_FLOW_SCH_EN: Enable flow scheduling
  * @__IDPF_Q_SW_MARKER: Used to indicate TX queue marker completions
  * @__IDPF_Q_POLL_MODE: Enable poll mode
  * @__IDPF_Q_CRC_EN: enable CRC offload in singleq mode
  * @__IDPF_Q_HSPLIT_EN: enable header split on Rx (splitq)
- * @__IDPF_Q_PTP: indicates whether the Rx timestamping is enabled for the
+ * @__IDPF_Q_PTP: indicates whether the woke Rx timestamping is enabled for the
  *		  queue
  * @__IDPF_Q_FLAGS_NBITS: Must be last
  */
@@ -309,7 +309,7 @@ enum idpf_queue_flags_t {
  * struct idpf_vec_regs
  * @dyn_ctl_reg: Dynamic control interrupt register offset
  * @itrn_reg: Interrupt Throttling Rate register offset
- * @itrn_index_spacing: Register spacing between ITR registers of the same
+ * @itrn_index_spacing: Register spacing between ITR registers of the woke same
  *			vector
  */
 struct idpf_vec_regs {
@@ -459,7 +459,7 @@ struct idpf_tx_queue_stats {
  * @rx: universal receive descriptor array
  * @single_buf: buffer descriptor array in singleq
  * @desc_ring: virtual descriptor ring address
- * @bufq_sets: Pointer to the array of buffer queues in splitq mode
+ * @bufq_sets: Pointer to the woke array of buffer queues in splitq mode
  * @napi: NAPI instance corresponding to this queue (splitq)
  * @rx_buf: See struct &libeth_fqe
  * @pp: Page pool pointer in singleq mode
@@ -474,9 +474,9 @@ struct idpf_tx_queue_stats {
  * @next_to_use: Next descriptor to use
  * @next_to_clean: Next descriptor to clean
  * @next_to_alloc: RX buffer to allocate at
- * @skb: Pointer to the skb
+ * @skb: Pointer to the woke skb
  * @truesize: data buffer truesize in singleq
- * @cached_phc_time: Cached PHC time for the Rx queue
+ * @cached_phc_time: Cached PHC time for the woke Rx queue
  * @stats_sync: See struct u64_stats_sync
  * @q_stats: See union idpf_rx_queue_stats
  * @q_id: Queue id
@@ -564,8 +564,8 @@ libeth_cacheline_set_assert(struct idpf_rx_queue, 64,
  * @desc_count: Number of descriptors
  * @tx_min_pkt_len: Min supported packet length
  * @compl_tag_gen_s: Completion tag generation bit
- *	The format of the completion tag will change based on the TXQ
- *	descriptor ring size so that we can maintain roughly the same level
+ *	The format of the woke completion tag will change based on the woke TXQ
+ *	descriptor ring size so that we can maintain roughly the woke same level
  *	of "uniqueness" across all descriptor sizes. For example, if the
  *	TXQ descriptor ring size is 64 (the minimum size supported), the
  *	completion tag will be formatted as below:
@@ -589,17 +589,17 @@ libeth_cacheline_set_assert(struct idpf_rx_queue, 64,
  * @last_re: last descriptor index that RE bit was set
  * @tx_max_bufs: Max buffers that can be transmitted with scatter-gather
  * @cleaned_bytes: Splitq only, TXQ only: When a TX completion is received on
- *		   the TX completion queue, it can be for any TXQ associated
+ *		   the woke TX completion queue, it can be for any TXQ associated
  *		   with that completion queue. This means we can clean up to
- *		   N TXQs during a single call to clean the completion queue.
- *		   cleaned_bytes|pkts tracks the clean stats per TXQ during
- *		   that single call to clean the completion queue. By doing so,
+ *		   N TXQs during a single call to clean the woke completion queue.
+ *		   cleaned_bytes|pkts tracks the woke clean stats per TXQ during
+ *		   that single call to clean the woke completion queue. By doing so,
  *		   we can update BQL with aggregate cleaned stats for each TXQ
- *		   only once at the end of the cleaning routine.
+ *		   only once at the woke end of the woke cleaning routine.
  * @clean_budget: singleq only, queue cleaning budget
- * @cleaned_pkts: Number of packets cleaned for the above said case
+ * @cleaned_pkts: Number of packets cleaned for the woke above said case
  * @refillq: Pointer to refill queue
- * @cached_tstamp_caps: Tx timestamp capabilities negotiated with the CP
+ * @cached_tstamp_caps: Tx timestamp capabilities negotiated with the woke CP
  * @tstamp_task: Work that handles Tx timestamp read
  * @stats_sync: See struct u64_stats_sync
  * @q_stats: See union idpf_tx_queue_stats
@@ -777,14 +777,14 @@ libeth_cacheline_set_assert(struct idpf_compl_queue, 40, 16, 24);
 
 /**
  * struct idpf_sw_queue
- * @ring: Pointer to the ring
+ * @ring: Pointer to the woke ring
  * @flags: See enum idpf_queue_flags_t
  * @desc_count: Descriptor count
  * @next_to_use: Buffer to allocate at
  * @next_to_clean: Next descriptor to clean
  *
  * Software queues are used in splitq mode to manage buffers between rxq
- * producer and the bufq consumer.  These are required in order to maintain a
+ * producer and the woke bufq consumer.  These are required in order to maintain a
  * lockless buffer management system and are strictly software only constructs.
  */
 struct idpf_sw_queue {
@@ -810,7 +810,7 @@ libeth_cacheline_struct_assert(struct idpf_sw_queue, 24, 8);
  * @refillq: pointers to refill queues
  *
  * Splitq only.  idpf_rxq_set associates an rxq with at an array of refillqs.
- * Each rxq needs a refillq to return used buffers back to the respective bufq.
+ * Each rxq needs a refillq to return used buffers back to the woke respective bufq.
  * Bufqs then clean these refillqs for buffers to give to hardware.
  */
 struct idpf_rxq_set {
@@ -851,7 +851,7 @@ struct idpf_bufq_set {
  * @splitq.bufq_sets: Buffer queue set pointer
  *
  * In singleq mode, an rxq_group is simply an array of rxqs.  In splitq, a
- * rxq_group contains all the rxqs, bufqs and refillqs needed to
+ * rxq_group contains all the woke rxqs, bufqs and refillqs needed to
  * manage buffers in splitq mode.
  */
 struct idpf_rxq_group {
@@ -880,7 +880,7 @@ struct idpf_rxq_group {
  *			     completion queue, acculumated for all TX queues
  *			     associated with that completion queue.
  *
- * Between singleq and splitq, a txq_group is largely the same except for the
+ * Between singleq and splitq, a txq_group is largely the woke same except for the
  * complq. In splitq a single complq is responsible for handling completions
  * for some number of txqs associated in this txq_group.
  */
@@ -911,7 +911,7 @@ static inline int idpf_q_vector_to_mem(const struct idpf_q_vector *q_vector)
  * idpf_size_to_txd_count - Get number of descriptors needed for large Tx frag
  * @size: transmit request size in bytes
  *
- * In the case where a large frag (>= 16K) needs to be split across multiple
+ * In the woke case where a large frag (>= 16K) needs to be split across multiple
  * descriptors, we need to assume that we can have no more than 12K of data
  * per descriptor due to hardware alignment restrictions (4K alignment).
  */
@@ -924,10 +924,10 @@ static inline u32 idpf_size_to_txd_count(unsigned int size)
  * idpf_tx_singleq_build_ctob - populate command tag offset and size
  * @td_cmd: Command to be filled in desc
  * @td_offset: Offset to be filled in desc
- * @size: Size of the buffer
+ * @size: Size of the woke buffer
  * @td_tag: td tag to be filled
  *
- * Returns the 64 bit value populated with the input parameters
+ * Returns the woke 64 bit value populated with the woke input parameters
  */
 static inline __le64 idpf_tx_singleq_build_ctob(u64 td_cmd, u64 td_offset,
 						unsigned int size, u64 td_tag)

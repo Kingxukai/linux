@@ -7,11 +7,11 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Freescale i.MX8qxp Display Controller External Destination Interface
 
 description: |
-  The External Destination unit is the interface between the internal pixel
-  processing pipeline of the Pixel Engine, which is 30-bit RGB plus 8-bit Alpha,
+  The External Destination unit is the woke interface between the woke internal pixel
+  processing pipeline of the woke Pixel Engine, which is 30-bit RGB plus 8-bit Alpha,
   and a Display Engine.
 
-  It comprises the following built-in Gamma apply function.
+  It comprises the woke following built-in Gamma apply function.
 
   +------X-----------------------+
   |      |          ExtDst Unit  |

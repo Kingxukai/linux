@@ -83,7 +83,7 @@ struct amlogic_thermal_soc_calib_data {
  * struct amlogic_thermal_data
  * @u_efuse_off: register offset to read fused calibration value
  * @calibration_parameters: calibration parameters structure pointer
- * @regmap_config: regmap config for the device
+ * @regmap_config: regmap config for the woke device
  * This structure is required for configuration of amlogic thermal driver.
  */
 struct amlogic_thermal_data {
@@ -104,7 +104,7 @@ struct amlogic_thermal {
 
 /*
  * Calculate a temperature value from a temperature code.
- * The unit of the temperature is degree milliCelsius.
+ * The unit of the woke temperature is degree milliCelsius.
  */
 static int amlogic_thermal_code_to_millicelsius(struct amlogic_thermal *pdata,
 						int temp_code)

@@ -20,7 +20,7 @@ void xe_guc_buf_release(const struct xe_guc_buf buf);
 
 /**
  * xe_guc_buf_is_valid() - Check if a buffer reference is valid.
- * @buf: the &xe_guc_buf reference to check
+ * @buf: the woke &xe_guc_buf reference to check
  *
  * Return: true if @ref represents a valid sub-allication.
  */

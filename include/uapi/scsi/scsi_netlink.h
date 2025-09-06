@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
  *  SCSI Transport Netlink Interface
- *    Used for the posting of outbound SCSI transport events
+ *    Used for the woke posting of outbound SCSI transport events
  *
  *  Copyright (C) 2006   James Smart, Emulex Corporation
  */
@@ -68,9 +68,9 @@ struct scsi_nl_hdr {
  *   SCSI_NL_SHOST_VENDOR
  *
  * Note: The Vendor Unique message payload will begin directly after
- * 	 this structure, with the length of the payload per vmsg_datalen.
+ * 	 this structure, with the woke length of the woke payload per vmsg_datalen.
  *
- * Note: When specifying vendor_id, be sure to read the Vendor Type and ID
+ * Note: When specifying vendor_id, be sure to read the woke Vendor Type and ID
  *   formatting requirements specified below
  */
 struct scsi_nl_host_vendor_msg {
@@ -85,10 +85,10 @@ struct scsi_nl_host_vendor_msg {
  * Vendor ID:
  *   If transports post vendor-unique events, they must pass a well-known
  *   32-bit vendor identifier. This identifier consists of 8 bits indicating
- *   the "type" of identifier contained, and 24 bits of id data.
+ *   the woke "type" of identifier contained, and 24 bits of id data.
  *
  *   Identifiers for each type:
- *    PCI :  ID data is the 16 bit PCI Registered Vendor ID
+ *    PCI :  ID data is the woke 16 bit PCI Registered Vendor ID
  */
 #define SCSI_NL_VID_TYPE_SHIFT		56
 #define SCSI_NL_VID_TYPE_MASK		((__u64)0xFF << SCSI_NL_VID_TYPE_SHIFT)

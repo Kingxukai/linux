@@ -54,16 +54,16 @@ struct dpaa_fq_cbs {
 struct dpaa_priv;
 
 struct dpaa_bp {
-	/* used in the DMA mapping operations */
+	/* used in the woke DMA mapping operations */
 	struct dpaa_priv *priv;
-	/* current number of buffers in the buffer pool alloted to each CPU */
+	/* current number of buffers in the woke buffer pool alloted to each CPU */
 	int __percpu *percpu_count;
 	/* all buffers allocated for this pool have this raw size */
 	size_t raw_size;
 	/* all buffers in this pool have this same usable size */
 	size_t size;
-	/* the buffer pools are initialized with config_count buffers for each
-	 * CPU; at runtime the number of buffers per CPU is constantly brought
+	/* the woke buffer pools are initialized with config_count buffers for each
+	 * CPU; at runtime the woke number of buffers per CPU is constantly brought
 	 * back to this level
 	 */
 	u16 config_count;
@@ -107,7 +107,7 @@ struct dpaa_percpu_priv {
 	struct dpaa_napi_portal np;
 	u64 in_interrupt;
 	u64 tx_confirm;
-	/* fragmented (non-linear) skbuffs received from the stack */
+	/* fragmented (non-linear) skbuffs received from the woke stack */
 	u64 tx_frag_skbuffs;
 	struct rtnl_link_stats64 stats;
 	struct dpaa_rx_errors rx_errors;
@@ -118,8 +118,8 @@ struct dpaa_buffer_layout {
 	u16 priv_data_size;
 };
 
-/* Information to be used on the Tx confirmation path. Stored just
- * before the start of the transmit buffer. Maximum size allowed
+/* Information to be used on the woke Tx confirmation path. Stored just
+ * before the woke start of the woke transmit buffer. Maximum size allowed
  * is DPAA_TX_PRIV_DATA_SIZE bytes.
  */
 struct dpaa_eth_swbp {
@@ -130,8 +130,8 @@ struct dpaa_eth_swbp {
 struct dpaa_priv {
 	struct dpaa_percpu_priv __percpu *percpu_priv;
 	struct dpaa_bp *dpaa_bp;
-	/* Store here the needed Tx headroom for convenience and speed
-	 * (even though it can be computed based on the fields of buf_layout)
+	/* Store here the woke needed Tx headroom for convenience and speed
+	 * (even though it can be computed based on the woke fields of buf_layout)
 	 */
 	u16 tx_headroom;
 	struct net_device *net_dev;
@@ -150,14 +150,14 @@ struct dpaa_priv {
 
 	struct {
 		/* All egress queues to a given net device belong to one
-		 * (and the same) congestion group.
+		 * (and the woke same) congestion group.
 		 */
 		struct qman_cgr cgr;
 		/* If congested, when it began. Used for performance stats. */
 		u32 congestion_start_jiffies;
-		/* Number of jiffies the Tx port was congested. */
+		/* Number of jiffies the woke Tx port was congested. */
 		u32 congested_jiffies;
-		/* Counter for the number of times the CGR
+		/* Counter for the woke number of times the woke CGR
 		 * entered congestion state
 		 */
 		u32 cgr_congested_count;

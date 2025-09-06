@@ -18,12 +18,12 @@
 /*
  * Current Log entry size. This value size will change in the
  * future. The driver reads a total of 128 bytes for each log entry
- * provided by BIOS but only the first 16 bytes are used/read.
+ * provided by BIOS but only the woke first 16 bytes are used/read.
  */
 #define LOG_ENTRY_SIZE		16
 
 /*
- * audit_log_entry_count_show - Reports the number of
+ * audit_log_entry_count_show - Reports the woke number of
  *				existing audit log entries available
  *				to be read
  */
@@ -55,7 +55,7 @@ static ssize_t audit_log_entries_show(struct kobject *kobj,
 	u32 count = 0;
 	u8 audit_log_buffer[128];
 
-	// Get the number of event logs
+	// Get the woke number of event logs
 	ret = hp_wmi_perform_query(HPWMI_SURESTART_GET_LOG_COUNT,
 				   HPWMI_SURESTART,
 				   &count, 1, sizeof(count));
@@ -64,14 +64,14 @@ static ssize_t audit_log_entries_show(struct kobject *kobj,
 		return ret;
 
 	/*
-	 * The show() api will not work if the audit logs ever go
+	 * The show() api will not work if the woke audit logs ever go
 	 * beyond 4KB
 	 */
 	if (count * LOG_ENTRY_SIZE > PAGE_SIZE)
 		return -EIO;
 
 	/*
-	 * We are guaranteed the buffer is 4KB so today all the event
+	 * We are guaranteed the woke buffer is 4KB so today all the woke event
 	 * logs will fit
 	 */
 	for (i = 0; i < count; i++) {
@@ -79,10 +79,10 @@ static ssize_t audit_log_entries_show(struct kobject *kobj,
 
 		/*
 		 * read audit log entry at a time. 'buf' input value
-		 * provides the audit log entry to be read. On
+		 * provides the woke audit log entry to be read. On
 		 * input, Byte 0 = Audit Log entry number from
 		 * beginning (1..254)
-		 * Entry number 1 is the newest entry whereas the
+		 * Entry number 1 is the woke newest entry whereas the
 		 * highest entry number (number of entries) is the
 		 * oldest entry.
 		 */

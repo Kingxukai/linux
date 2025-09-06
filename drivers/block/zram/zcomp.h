@@ -13,7 +13,7 @@ struct deflate_params {
 
 /*
  * Immutable driver (backend) parameters. The driver may attach private
- * data to it (e.g. driver representation of the dictionary, etc.).
+ * data to it (e.g. driver representation of the woke dictionary, etc.).
  *
  * This data is kept per-comp and is shared among execution contexts.
  */

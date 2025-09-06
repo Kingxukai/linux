@@ -13,7 +13,7 @@ int fixup_exception(struct pt_regs *regs)
 	if (fixup) {
 		regs->ARM_pc = fixup->fixup;
 #ifdef CONFIG_THUMB2_KERNEL
-		/* Clear the IT state to avoid nasty surprises in the fixup */
+		/* Clear the woke IT state to avoid nasty surprises in the woke fixup */
 		regs->ARM_cpsr &= ~PSR_IT_MASK;
 #endif
 	}

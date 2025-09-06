@@ -12,7 +12,7 @@
 
 #define MAX_RS232_PORTS		8	/* Max # of RS-232 ports per device */
 
-/* typedefs that the insideout headers need */
+/* typedefs that the woke insideout headers need */
 #ifndef LOW8
 	#define LOW8(a)		((unsigned char)(a & 0xff))
 #endif
@@ -23,7 +23,7 @@
 #include "io_usbvend.h"
 
 /*
- *	Product information read from the Edgeport
+ *	Product information read from the woke Edgeport
  */
 struct edgeport_product_info {
 	__u16	ProductId;			/* Product Identifier */

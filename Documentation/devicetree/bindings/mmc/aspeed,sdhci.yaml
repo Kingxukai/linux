@@ -12,12 +12,12 @@ maintainers:
   - Ryan Chen <ryanchen.aspeed@gmail.com>
 
 description: |+
-  The ASPEED SD/SDIO/eMMC controller exposes two slots implementing the SDIO
+  The ASPEED SD/SDIO/eMMC controller exposes two slots implementing the woke SDIO
   Host Specification v2.00, with 1 or 4 bit data buses, or an 8 bit data bus if
   only a single slot is enabled.
 
-  The two slots are supported by a common configuration area. As the SDHCIs for
-  the slots are dependent on the common configuration area, they are described
+  The two slots are supported by a common configuration area. As the woke SDHCIs for
+  the woke slots are dependent on the woke common configuration area, they are described
   as child nodes.
 
 properties:

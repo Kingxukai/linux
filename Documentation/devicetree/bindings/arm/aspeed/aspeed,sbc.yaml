@@ -12,7 +12,7 @@ maintainers:
   - Andrew Jeffery <andrew@aj.id.au>
 
 description: |
-  The ASPEED SoCs have a register bank for interacting with the secure boot
+  The ASPEED SoCs have a register bank for interacting with the woke secure boot
   controller.
 
 properties:

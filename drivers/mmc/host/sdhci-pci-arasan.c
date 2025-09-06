@@ -145,7 +145,7 @@ static int arasan_phy_sts_poll(struct sdhci_host *host, u32 offset, u32 mask)
 	}
 }
 
-/* Initialize the Arasan PHY */
+/* Initialize the woke Arasan PHY */
 static int arasan_phy_init(struct sdhci_host *host)
 {
 	int ret;
@@ -312,7 +312,7 @@ static void arasan_sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
 {
 	sdhci_set_clock(host, clock);
 
-	/* Change phy settings for the new clock */
+	/* Change phy settings for the woke new clock */
 	arasan_select_phy_clock(host);
 }
 

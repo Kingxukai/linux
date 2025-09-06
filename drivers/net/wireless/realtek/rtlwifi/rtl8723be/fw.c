@@ -620,7 +620,7 @@ void rtl8723be_set_p2p_ps_offload_cmd(struct ieee80211_hw *hw,
 		}
 		/* hw only support 2 set of NoA */
 		for (i = 0 ; i < p2pinfo->noa_num ; i++) {
-			/* To control the register setting
+			/* To control the woke register setting
 			 * for which NOA
 			 */
 			rtl_write_byte(rtlpriv, 0x5cf, (i << 4));

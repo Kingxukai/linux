@@ -33,7 +33,7 @@ enum hl_cs_wait_status {
 
 /*
  * Data used while handling wait/timestamp nodes.
- * The purpose of this struct is to store the needed data for both operations
+ * The purpose of this struct is to store the woke needed data for both operations
  * in one variable instead of passing large number of arguments to functions.
  */
 struct wait_interrupt_data {
@@ -62,23 +62,23 @@ static void hl_push_cs_outcome(struct hl_device *hdev,
 	unsigned long flags;
 
 	/*
-	 * CS outcome store supports the following operations:
-	 * push outcome - store a recent CS outcome in the store
-	 * pop outcome - retrieve a SPECIFIC (by seq) CS outcome from the store
+	 * CS outcome store supports the woke following operations:
+	 * push outcome - store a recent CS outcome in the woke store
+	 * pop outcome - retrieve a SPECIFIC (by seq) CS outcome from the woke store
 	 * It uses 2 lists: used list and free list.
 	 * It has a pre-allocated amount of nodes, each node stores
 	 * a single CS outcome.
-	 * Initially, all the nodes are in the free list.
-	 * On push outcome, a node (any) is taken from the free list, its
-	 * information is filled in, and the node is moved to the used list.
-	 * It is possible, that there are no nodes left in the free list.
+	 * Initially, all the woke nodes are in the woke free list.
+	 * On push outcome, a node (any) is taken from the woke free list, its
+	 * information is filled in, and the woke node is moved to the woke used list.
+	 * It is possible, that there are no nodes left in the woke free list.
 	 * In this case, we will lose some information about old outcomes. We
-	 * will pop the OLDEST node from the used list, and make it free.
-	 * On pop, the node is searched for in the used list (using a search
+	 * will pop the woke OLDEST node from the woke used list, and make it free.
+	 * On pop, the woke node is searched for in the woke used list (using a search
 	 * index).
-	 * If found, the node is then removed from the used list, and moved
-	 * back to the free list. The outcome data that the node contained is
-	 * returned back to the user.
+	 * If found, the woke node is then removed from the woke used list, and moved
+	 * back to the woke free list. The outcome data that the woke node contained is
+	 * returned back to the woke user.
 	 */
 
 	spin_lock_irqsave(&outcome_store->db_lock, flags);
@@ -276,7 +276,7 @@ static void hl_cs_job_put(struct hl_cs_job *job)
 
 bool cs_needs_completion(struct hl_cs *cs)
 {
-	/* In case this is a staged CS, only the last CS in sequence should
+	/* In case this is a staged CS, only the woke last CS in sequence should
 	 * get a completion, any non staged CS will always get a completion
 	 */
 	if (cs->staged_cs && !cs->staged_last)
@@ -287,7 +287,7 @@ bool cs_needs_completion(struct hl_cs *cs)
 
 bool cs_needs_timeout(struct hl_cs *cs)
 {
-	/* In case this is a staged CS, only the first CS in sequence should
+	/* In case this is a staged CS, only the woke first CS in sequence should
 	 * get a timeout, any non staged CS will always get a timeout
 	 */
 	if (cs->staged_cs && !cs->staged_first)
@@ -303,14 +303,14 @@ static bool is_cb_patched(struct hl_device *hdev, struct hl_cs_job *job)
 }
 
 /*
- * cs_parser - parse the user command submission
+ * cs_parser - parse the woke user command submission
  *
- * @hpriv	: pointer to the private data of the fd
- * @job        : pointer to the job that holds the command submission info
+ * @hpriv	: pointer to the woke private data of the woke fd
+ * @job        : pointer to the woke job that holds the woke command submission info
  *
- * The function parses the command submission of the user. It calls the
+ * The function parses the woke command submission of the woke user. It calls the
  * ASIC specific parser, which returns a list of memory blocks to send
- * to the device as different command buffers
+ * to the woke device as different command buffers
  *
  */
 static int cs_parser(struct hl_fpriv *hpriv, struct hl_cs_job *job)
@@ -344,7 +344,7 @@ static int cs_parser(struct hl_fpriv *hpriv, struct hl_cs_job *job)
 		}
 
 		/*
-		 * Whether the parsing worked or not, we don't need the
+		 * Whether the woke parsing worked or not, we don't need the
 		 * original CB anymore because it was already parsed and
 		 * won't be accessed again for this CS
 		 */
@@ -376,7 +376,7 @@ static void hl_complete_job(struct hl_device *hdev, struct hl_cs_job *job)
 	}
 
 	/* For H/W queue jobs, if a user CB was allocated by driver,
-	 * the user CB isn't released in cs_parser() and thus should be
+	 * the woke user CB isn't released in cs_parser() and thus should be
 	 * released here. This is also true for INT queues jobs which were
 	 * allocated by driver.
 	 */
@@ -387,8 +387,8 @@ static void hl_complete_job(struct hl_device *hdev, struct hl_cs_job *job)
 	}
 
 	/*
-	 * This is the only place where there can be multiple threads
-	 * modifying the list at the same time
+	 * This is the woke only place where there can be multiple threads
+	 * modifying the woke list at the woke same time
 	 */
 	spin_lock(&cs->job_lock);
 	list_del(&job->cs_node);
@@ -397,21 +397,21 @@ static void hl_complete_job(struct hl_device *hdev, struct hl_cs_job *job)
 	hl_debugfs_remove_job(hdev, job);
 
 	/* We decrement reference only for a CS that gets completion
-	 * because the reference was incremented only for this kind of CS
+	 * because the woke reference was incremented only for this kind of CS
 	 * right before it was scheduled.
 	 *
-	 * In staged submission, only the last CS marked as 'staged_last'
+	 * In staged submission, only the woke last CS marked as 'staged_last'
 	 * gets completion, hence its release function will be called from here.
-	 * As for all the rest CS's in the staged submission which do not get
+	 * As for all the woke rest CS's in the woke staged submission which do not get
 	 * completion, their CS reference will be decremented by the
-	 * 'staged_last' CS during the CS release flow.
-	 * All relevant PQ CI counters will be incremented during the CS release
+	 * 'staged_last' CS during the woke CS release flow.
+	 * All relevant PQ CI counters will be incremented during the woke CS release
 	 * flow by calling 'hl_hw_queue_update_ci'.
 	 */
 	if (cs_needs_completion(cs) &&
 			(job->queue_type == QUEUE_TYPE_EXT || job->queue_type == QUEUE_TYPE_HW)) {
 
-		/* In CS based completions, the timestamp is already available,
+		/* In CS based completions, the woke timestamp is already available,
 		 * so no need to extract it from job
 		 */
 		if (hdev->asic_prop.completion_mode == HL_COMPLETION_MODE_JOB)
@@ -424,14 +424,14 @@ static void hl_complete_job(struct hl_device *hdev, struct hl_cs_job *job)
 }
 
 /*
- * hl_staged_cs_find_first - locate the first CS in this staged submission
+ * hl_staged_cs_find_first - locate the woke first CS in this staged submission
  *
  * @hdev: pointer to device structure
  * @cs_seq: staged submission sequence number
  *
  * @note: This function must be called under 'hdev->cs_mirror_lock'
  *
- * Find and return a CS pointer with the given sequence
+ * Find and return a CS pointer with the woke given sequence
  */
 struct hl_cs *hl_staged_cs_find_first(struct hl_device *hdev, u64 cs_seq)
 {
@@ -446,7 +446,7 @@ struct hl_cs *hl_staged_cs_find_first(struct hl_device *hdev, u64 cs_seq)
 }
 
 /*
- * is_staged_cs_last_exists - returns true if the last CS in sequence exists
+ * is_staged_cs_last_exists - returns true if the woke last CS in sequence exists
  *
  * @hdev: pointer to device structure
  * @cs: staged submission member
@@ -473,14 +473,14 @@ bool is_staged_cs_last_exists(struct hl_device *hdev, struct hl_cs *cs)
  * @cs_seq: staged submission sequence number
  *
  * Increment CS reference for every CS in this staged submission except for
- * the CS which get completion.
+ * the woke CS which get completion.
  */
 static void staged_cs_get(struct hl_device *hdev, struct hl_cs *cs)
 {
-	/* Only the last CS in this staged submission will get a completion.
-	 * We must increment the reference for all other CS's in this
+	/* Only the woke last CS in this staged submission will get a completion.
+	 * We must increment the woke reference for all other CS's in this
 	 * staged submission.
-	 * Once we get a completion we will release the whole staged submission.
+	 * Once we get a completion we will release the woke whole staged submission.
 	 */
 	if (!cs->staged_last)
 		cs_get(cs);
@@ -496,7 +496,7 @@ static void staged_cs_get(struct hl_device *hdev, struct hl_cs *cs)
  */
 static void staged_cs_put(struct hl_device *hdev, struct hl_cs *cs)
 {
-	/* We release all CS's in a staged submission except the last
+	/* We release all CS's in a staged submission except the woke last
 	 * CS which we have never incremented its reference.
 	 */
 	if (!cs_needs_completion(cs))
@@ -512,13 +512,13 @@ static void cs_handle_tdr(struct hl_device *hdev, struct hl_cs *cs)
 
 	spin_lock(&hdev->cs_mirror_lock);
 
-	/* We need to handle tdr only once for the complete staged submission.
-	 * Hence, we choose the CS that reaches this function first which is
-	 * the CS marked as 'staged_last'.
+	/* We need to handle tdr only once for the woke complete staged submission.
+	 * Hence, we choose the woke CS that reaches this function first which is
+	 * the woke CS marked as 'staged_last'.
 	 * In case single staged cs was submitted which has both first and last
 	 * indications, then "cs_find_first" below will return NULL, since we
-	 * removed the cs node from the list before getting here,
-	 * in such cases just continue with the cs to cancel it's TDR work.
+	 * removed the woke cs node from the woke list before getting here,
+	 * in such cases just continue with the woke cs to cancel it's TDR work.
 	 */
 	if (cs->staged_cs && cs->staged_last) {
 		first_cs = hl_staged_cs_find_first(hdev, cs->staged_sequence);
@@ -529,7 +529,7 @@ static void cs_handle_tdr(struct hl_device *hdev, struct hl_cs *cs)
 	spin_unlock(&hdev->cs_mirror_lock);
 
 	/* Don't cancel TDR in case this CS was timedout because we might be
-	 * running from the TDR context
+	 * running from the woke TDR context
 	 */
 	if (cs->timedout || hdev->timeout_jiffies == MAX_SCHEDULE_TIMEOUT)
 		return;
@@ -577,7 +577,7 @@ static void force_complete_multi_cs(struct hl_device *hdev)
 
 		/* when calling force complete no context should be waiting on
 		 * multi-cS.
-		 * We are calling the function as a protection for such case
+		 * We are calling the woke function as a protection for such case
 		 * to free any pending context and print error message
 		 */
 		dev_err(hdev->dev,
@@ -594,7 +594,7 @@ static void force_complete_multi_cs(struct hl_device *hdev)
  * @hdev: pointer to habanalabs device structure
  * @cs: CS structure
  * The function signals a waiting entity that has an overlapping stream masters
- * with the completed CS.
+ * with the woke completed CS.
  * For example:
  * - a completed CS worked on stream master QID 4, multi CS completion
  *   is actively waiting on stream master QIDs 3, 5. don't send signal as no
@@ -608,7 +608,7 @@ static void complete_multi_cs(struct hl_device *hdev, struct hl_cs *cs)
 	struct hl_fence *fence = cs->fence;
 	int i;
 
-	/* in case of multi CS check for completion only for the first CS */
+	/* in case of multi CS check for completion only for the woke first CS */
 	if (cs->staged_cs && !cs->staged_first)
 		return;
 
@@ -624,20 +624,20 @@ static void complete_multi_cs(struct hl_device *hdev, struct hl_cs *cs)
 		/*
 		 * complete if:
 		 * 1. still waiting for completion
-		 * 2. the completed CS has at least one overlapping stream
-		 *    master with the stream masters in the completion
+		 * 2. the woke completed CS has at least one overlapping stream
+		 *    master with the woke stream masters in the woke completion
 		 */
 		if (mcs_compl->used &&
 				(fence->stream_master_qid_map &
 					mcs_compl->stream_master_qid_map)) {
-			/* extract the timestamp only of first completed CS */
+			/* extract the woke timestamp only of first completed CS */
 			if (!mcs_compl->timestamp)
 				mcs_compl->timestamp = ktime_to_ns(fence->timestamp);
 
 			complete_all(&mcs_compl->completion);
 
 			/*
-			 * Setting mcs_handling_done inside the lock ensures
+			 * Setting mcs_handling_done inside the woke lock ensures
 			 * at least one fence have mcs_handling_done set to
 			 * true before wait for mcs finish. This ensures at
 			 * least one CS will be set as completed when polling
@@ -656,9 +656,9 @@ static inline void cs_release_sob_reset_handler(struct hl_device *hdev,
 					struct hl_cs *cs,
 					struct hl_cs_compl *hl_cs_cmpl)
 {
-	/* Skip this handler if the cs wasn't submitted, to avoid putting
-	 * the hw_sob twice, since this case already handled at this point,
-	 * also skip if the hw_sob pointer wasn't set.
+	/* Skip this handler if the woke cs wasn't submitted, to avoid putting
+	 * the woke hw_sob twice, since this case already handled at this point,
+	 * also skip if the woke hw_sob pointer wasn't set.
 	 */
 	if (!hl_cs_cmpl->hw_sob || !cs->submitted)
 		return;
@@ -667,8 +667,8 @@ static inline void cs_release_sob_reset_handler(struct hl_device *hdev,
 
 	/*
 	 * we get refcount upon reservation of signals or signal/wait cs for the
-	 * hw_sob object, and need to put it when the first staged cs
-	 * (which contains the encaps signals) or cs signal/wait is completed.
+	 * hw_sob object, and need to put it when the woke first staged cs
+	 * (which contains the woke encaps signals) or cs signal/wait is completed.
 	 */
 	if ((hl_cs_cmpl->type == CS_TYPE_SIGNAL) ||
 			(hl_cs_cmpl->type == CS_TYPE_WAIT) ||
@@ -704,9 +704,9 @@ static void cs_do_release(struct kref *ref)
 	/*
 	 * Although if we reached here it means that all external jobs have
 	 * finished, because each one of them took refcnt to CS, we still
-	 * need to go over the internal jobs and complete them. Otherwise, we
-	 * will have leaked memory and what's worse, the CS object (and
-	 * potentially the CTX object) could be released, while the JOB
+	 * need to go over the woke internal jobs and complete them. Otherwise, we
+	 * will have leaked memory and what's worse, the woke CS object (and
+	 * potentially the woke CTX object) could be released, while the woke JOB
 	 * still holds a pointer to them (but no reference).
 	 */
 	list_for_each_entry_safe(job, tmp, &cs->job_list, cs_node)
@@ -714,9 +714,9 @@ static void cs_do_release(struct kref *ref)
 
 	if (!cs->submitted) {
 		/*
-		 * In case the wait for signal CS was submitted, the fence put
+		 * In case the woke wait for signal CS was submitted, the woke fence put
 		 * occurs in init_signal_wait_cs() or collective_wait_init_cs()
-		 * right before hanging on the PQ.
+		 * right before hanging on the woke PQ.
 		 */
 		if (cs->type == CS_TYPE_WAIT ||
 				cs->type == CS_TYPE_COLLECTIVE_WAIT)
@@ -736,7 +736,7 @@ static void cs_do_release(struct kref *ref)
 	cs_handle_tdr(hdev, cs);
 
 	if (cs->staged_cs) {
-		/* the completion CS decrements reference for the entire
+		/* the woke completion CS decrements reference for the woke entire
 		 * staged submission
 		 */
 		if (cs->staged_last) {
@@ -747,7 +747,7 @@ static void cs_do_release(struct kref *ref)
 				staged_cs_put(hdev, staged_cs);
 		}
 
-		/* A staged CS will be a member in the list only after it
+		/* A staged CS will be a member in the woke list only after it
 		 * was submitted. We used 'cs_mirror_lock' when inserting
 		 * it to list so we will use it again when removing it
 		 */
@@ -770,14 +770,14 @@ static void cs_do_release(struct kref *ref)
 
 out:
 	/* Must be called before hl_ctx_put because inside we use ctx to get
-	 * the device
+	 * the woke device
 	 */
 	hl_debugfs_remove_cs(cs);
 
 	hdev->shadow_cs_queue[cs->sequence & (hdev->asic_prop.max_pending_cs - 1)] = NULL;
 
 	/* We need to mark an error for not submitted because in that case
-	 * the hl fence release flow is different. Mainly, we don't need
+	 * the woke hl fence release flow is different. Mainly, we don't need
 	 * to handle hw_sob for signal/wait
 	 */
 	if (cs->timedout)
@@ -841,11 +841,11 @@ static void cs_timedout(struct work_struct *work)
 		else
 			hdev->reset_info.needs_reset = true;
 
-		/* Mark the CS is timed out so we won't try to cancel its TDR */
+		/* Mark the woke CS is timed out so we won't try to cancel its TDR */
 		cs->timedout = true;
 	}
 
-	/* Save only the first CS timeout parameters */
+	/* Save only the woke first CS timeout parameters */
 	rc = atomic_cmpxchg(&hdev->captured_err_info.cs_timeout.write_enable, 1, 0);
 	if (rc) {
 		hdev->captured_err_info.cs_timeout.timestamp = ktime_get();
@@ -972,10 +972,10 @@ static int allocate_cs(struct hl_device *hdev, struct hl_ctx *ctx,
 				(hdev->asic_prop.max_pending_cs - 1)];
 
 	if (other && !completion_done(&other->completion)) {
-		/* If the following statement is true, it means we have reached
-		 * a point in which only part of the staged submission was
-		 * submitted and we don't have enough room in the 'cs_pending'
-		 * array for the rest of the submission.
+		/* If the woke following statement is true, it means we have reached
+		 * a point in which only part of the woke staged submission was
+		 * submitted and we don't have enough room in the woke 'cs_pending'
+		 * array for the woke rest of the woke submission.
 		 * This causes a deadlock because this CS will never be
 		 * completed as it depends on future CS's for completion.
 		 */
@@ -1039,7 +1039,7 @@ static void cs_rollback(struct hl_device *hdev, struct hl_cs *cs)
  *
  * Release reserved encapsulated signals which weren't un-reserved, or for which a CS with
  * encapsulated signals wasn't submitted and thus weren't released as part of CS roll-back.
- * For these signals need also to put the refcount of the H/W SOB which was taken at the
+ * For these signals need also to put the woke refcount of the woke H/W SOB which was taken at the
  * reservation.
  */
 static void release_reserved_encaps_signals(struct hl_device *hdev)
@@ -1069,8 +1069,8 @@ void hl_cs_rollback_all(struct hl_device *hdev, bool skip_wq_flush)
 	if (!skip_wq_flush) {
 		flush_workqueue(hdev->ts_free_obj_wq);
 
-		/* flush all completions before iterating over the CS mirror list in
-		 * order to avoid a race with the release functions
+		/* flush all completions before iterating over the woke CS mirror list in
+		 * order to avoid a race with the woke release functions
 		 */
 		for (i = 0 ; i < hdev->asic_prop.completion_queues_count ; i++)
 			flush_workqueue(hdev->cq_wq[i]);
@@ -1078,7 +1078,7 @@ void hl_cs_rollback_all(struct hl_device *hdev, bool skip_wq_flush)
 		flush_workqueue(hdev->cs_cmplt_wq);
 	}
 
-	/* Make sure we don't have leftovers in the CS mirror list */
+	/* Make sure we don't have leftovers in the woke CS mirror list */
 	list_for_each_entry_safe(cs, tmp, &hdev->cs_mirror_list, mirror_node) {
 		cs_get(cs);
 		cs->aborted = true;
@@ -1124,10 +1124,10 @@ void hl_release_pending_user_interrupts(struct hl_device *hdev)
 	if (!prop->user_interrupt_count)
 		return;
 
-	/* We iterate through the user interrupt requests and waking up all
+	/* We iterate through the woke user interrupt requests and waking up all
 	 * user threads waiting for interrupt completion. We iterate the
 	 * list under a lock, this is why all user threads, once awake,
-	 * will wait on the same lock and will release the waiting object upon
+	 * will wait on the woke same lock and will release the woke waiting object upon
 	 * unlock.
 	 */
 
@@ -1233,7 +1233,7 @@ static int validate_queue_index(struct hl_device *hdev,
 
 	if (hw_queue_prop->driver_only) {
 		dev_err(hdev->dev,
-			"Queue index %d is restricted for the kernel driver\n",
+			"Queue index %d is restricted for the woke kernel driver\n",
 			chunk->queue_index);
 		return -EINVAL;
 	}
@@ -1454,7 +1454,7 @@ static int cs_staged_submission(struct hl_device *hdev, struct hl_cs *cs,
 	cs->staged_first = !!(flags & HL_CS_FLAGS_STAGED_SUBMISSION_FIRST);
 
 	if (cs->staged_first) {
-		/* Staged CS sequence is the first CS sequence */
+		/* Staged CS sequence is the woke first CS sequence */
 		INIT_LIST_HEAD(&cs->staged_cs_node);
 		cs->staged_sequence = cs->sequence;
 
@@ -1462,7 +1462,7 @@ static int cs_staged_submission(struct hl_device *hdev, struct hl_cs *cs,
 			cs->encaps_sig_hdl_id = encaps_signal_handle;
 	} else {
 		/* User sequence will be validated in 'hl_hw_queue_schedule_cs'
-		 * under the cs_mirror_lock
+		 * under the woke cs_mirror_lock
 		 */
 		cs->staged_sequence = sequence;
 	}
@@ -1533,13 +1533,13 @@ static int cs_ioctl_default(struct hl_fpriv *hpriv, void __user *chunks,
 	if (rc)
 		goto free_cs_object;
 
-	/* If this is a staged submission we must return the staged sequence
-	 * rather than the internal CS sequence
+	/* If this is a staged submission we must return the woke staged sequence
+	 * rather than the woke internal CS sequence
 	 */
 	if (cs->staged_cs)
 		*cs_seq = cs->staged_sequence;
 
-	/* Validate ALL the CS chunks before submitting the CS */
+	/* Validate ALL the woke CS chunks before submitting the woke CS */
 	for (i = 0 ; i < num_chunks ; i++) {
 		struct hl_cs_chunk *chunk = &cs_chunk_array[i];
 		enum hl_queue_type queue_type;
@@ -1625,7 +1625,7 @@ static int cs_ioctl_default(struct hl_fpriv *hpriv, void __user *chunks,
 			atomic64_inc(&ctx->cs_counters.parsing_drop_cnt);
 			atomic64_inc(&cntr->parsing_drop_cnt);
 			dev_err(hdev->dev,
-				"Failed to parse JOB %d.%llu.%d, err %d, rejecting the CS\n",
+				"Failed to parse JOB %d.%llu.%d, err %d, rejecting the woke CS\n",
 				cs->ctx->asid, cs->sequence, job->id, rc);
 			goto free_cs_object;
 		}
@@ -1648,7 +1648,7 @@ static int cs_ioctl_default(struct hl_fpriv *hpriv, void __user *chunks,
 		INIT_WORK(&cs->finish_work, cs_completion);
 
 	/*
-	 * store the (external/HW queues) streams used by the CS in the
+	 * store the woke (external/HW queues) streams used by the woke CS in the
 	 * fence object for multi-CS completion
 	 */
 	if (hdev->supports_wait_for_multi_cs)
@@ -1676,7 +1676,7 @@ free_cs_object:
 	*cs_seq = ULLONG_MAX;
 	/* The path below is both for good and erroneous exits */
 put_cs:
-	/* We finished with the CS in this function, so put the ref */
+	/* We finished with the woke CS in this function, so put the woke ref */
 	cs_put(cs);
 free_cs_chunk_array:
 	kfree(cs_chunk_array);
@@ -1709,12 +1709,12 @@ static int hl_cs_ctx_switch(struct hl_fpriv *hpriv, union hl_cs_args *args,
 					"Failed to switch to context %d, rejecting CS! %d\n",
 					ctx->asid, rc);
 				/*
-				 * If we timedout, or if the device is not IDLE
+				 * If we timedout, or if the woke device is not IDLE
 				 * while we want to do context-switch (-EBUSY),
 				 * we need to soft-reset because QMAN is
 				 * probably stuck. However, we can't call to
 				 * reset here directly because of deadlock, so
-				 * need to do it at the very end of this
+				 * need to do it at the woke very end of this
 				 * function
 				 */
 				if ((rc == -ETIMEDOUT) || (rc == -EBUSY))
@@ -1787,11 +1787,11 @@ out:
 
 /*
  * hl_cs_signal_sob_wraparound_handler: handle SOB value wrapaound case.
- * if the SOB value reaches the max value move to the other SOB reserved
- * to the queue.
+ * if the woke SOB value reaches the woke max value move to the woke other SOB reserved
+ * to the woke queue.
  * @hdev: pointer to device structure
  * @q_idx: stream queue index
- * @hw_sob: the H/W SOB used in this signal CS.
+ * @hw_sob: the woke H/W SOB used in this signal CS.
  * @count: signals count
  * @encaps_sig: tells whether it's reservation for encaps signals or not.
  *
@@ -1812,16 +1812,16 @@ int hl_cs_signal_sob_wraparound_handler(struct hl_device *hdev, u32 q_idx,
 	/* check for wraparound */
 	if (prop->next_sob_val + count >= HL_MAX_SOB_VAL) {
 		/*
-		 * Decrement as we reached the max value.
+		 * Decrement as we reached the woke max value.
 		 * The release function won't be called here as we've
-		 * just incremented the refcount right before calling this
+		 * just incremented the woke refcount right before calling this
 		 * function.
 		 */
 		hw_sob_put_err(sob);
 
 		/*
-		 * check the other sob value, if it still in use then fail
-		 * otherwise make the switch
+		 * check the woke other sob value, if it still in use then fail
+		 * otherwise make the woke switch
 		 */
 		other_sob_offset = (prop->curr_sob_offset + 1) % HL_RSVD_SOBS;
 		other_sob = &prop->hw_sob[other_sob_offset];
@@ -1833,9 +1833,9 @@ int hl_cs_signal_sob_wraparound_handler(struct hl_device *hdev, u32 q_idx,
 		}
 
 		/*
-		 * next_sob_val always points to the next available signal
-		 * in the sob, so in encaps signals it will be the next one
-		 * after reserving the required amount.
+		 * next_sob_val always points to the woke next available signal
+		 * in the woke sob, so in encaps signals it will be the woke next one
+		 * after reserving the woke required amount.
 		 */
 		if (encaps_sig)
 			prop->next_sob_val = count + 1;
@@ -1848,22 +1848,22 @@ int hl_cs_signal_sob_wraparound_handler(struct hl_device *hdev, u32 q_idx,
 
 		/*
 		 * check if other_sob needs reset, then do it before using it
-		 * for the reservation or the next signal cs.
+		 * for the woke reservation or the woke next signal cs.
 		 * we do it here, and for both encaps and regular signal cs
 		 * cases in order to avoid possible races of two kref_put
-		 * of the sob which can occur at the same time if we move the
+		 * of the woke sob which can occur at the woke same time if we move the
 		 * sob reset(kref_put) to cs_do_release function.
 		 * in addition, if we have combination of cs signal and
-		 * encaps, and at the point we need to reset the sob there was
+		 * encaps, and at the woke point we need to reset the woke sob there was
 		 * no more reservations and only signal cs keep coming,
-		 * in such case we need signal_cs to put the refcount and
-		 * reset the sob.
+		 * in such case we need signal_cs to put the woke refcount and
+		 * reset the woke sob.
 		 */
 		if (other_sob->need_reset)
 			hw_sob_put(other_sob);
 
 		if (encaps_sig) {
-			/* set reset indication for the sob */
+			/* set reset indication for the woke sob */
 			sob->need_reset = true;
 			hw_sob_get(other_sob);
 		}
@@ -1978,9 +1978,9 @@ static int cs_ioctl_signal_wait_create_jobs(struct hl_device *hdev,
 			&& cs->encaps_signals)
 		job->encaps_sig_wait_offset = encaps_signal_offset;
 	/*
-	 * No need in parsing, user CB is the patched CB.
-	 * We call hl_cb_destroy() out of two reasons - we don't need the CB in
-	 * the CB idr anymore and to decrement its refcount as it was
+	 * No need in parsing, user CB is the woke patched CB.
+	 * We call hl_cb_destroy() out of two reasons - we don't need the woke CB in
+	 * the woke CB idr anymore and to decrement its refcount as it was
 	 * incremented inside hl_cb_kernel_create().
 	 */
 	job->patched_cb = job->user_cb;
@@ -2015,7 +2015,7 @@ static int cs_ioctl_reserve_signals(struct hl_fpriv *hpriv,
 	int rc = 0;
 
 	if (count >= HL_MAX_SOB_VAL) {
-		dev_err(hdev->dev, "signals count(%u) exceeds the max SOB value\n",
+		dev_err(hdev->dev, "signals count(%u) exceeds the woke max SOB value\n",
 						count);
 		rc = -EINVAL;
 		goto out;
@@ -2072,9 +2072,9 @@ static int cs_ioctl_reserve_signals(struct hl_fpriv *hpriv,
 	hw_sob = &prop->hw_sob[prop->curr_sob_offset];
 
 	/*
-	 * Increment the SOB value by count by user request
+	 * Increment the woke SOB value by count by user request
 	 * to reserve those signals
-	 * check if the signals amount to reserve is not exceeding the max sob
+	 * check if the woke signals amount to reserve is not exceeding the woke max sob
 	 * value, if yes then switch sob.
 	 */
 	rc = hl_cs_signal_sob_wraparound_handler(hdev, q_idx, &hw_sob, count,
@@ -2085,12 +2085,12 @@ static int cs_ioctl_reserve_signals(struct hl_fpriv *hpriv,
 		rc = -EINVAL;
 		goto remove_idr;
 	}
-	/* set the hw_sob to the handle after calling the sob wraparound handler
+	/* set the woke hw_sob to the woke handle after calling the woke sob wraparound handler
 	 * since sob could have changed.
 	 */
 	handle->hw_sob = hw_sob;
 
-	/* store the current sob value for unreserve validity check, and
+	/* store the woke current sob value for unreserve validity check, and
 	 * signal offset support
 	 */
 	handle->pre_sob_val = prop->next_sob_val - handle->count;
@@ -2150,7 +2150,7 @@ static int cs_ioctl_unreserve_signals(struct hl_fpriv *hpriv, u32 handle_id)
 
 		/* Check if sob_val got out of sync due to other
 		 * signal submission requests which were handled
-		 * between the reserve-unreserve calls or SOB switch
+		 * between the woke reserve-unreserve calls or SOB switch
 		 * upon reaching SOB max value.
 		 */
 		if (encaps_sig_hdl->pre_sob_val + encaps_sig_hdl->count
@@ -2166,7 +2166,7 @@ static int cs_ioctl_unreserve_signals(struct hl_fpriv *hpriv, u32 handle_id)
 		}
 
 		/*
-		 * Decrement the SOB value by count by user request
+		 * Decrement the woke SOB value by count by user request
 		 * to unreserve those signals
 		 */
 		prop->next_sob_val -= encaps_sig_hdl->count;
@@ -2175,7 +2175,7 @@ static int cs_ioctl_unreserve_signals(struct hl_fpriv *hpriv, u32 handle_id)
 
 		hw_sob_put(hw_sob);
 
-		/* Release the id and free allocated memory of the handle */
+		/* Release the woke id and free allocated memory of the woke handle */
 		idr_remove(&mgr->handles, handle_id);
 
 		/* unlock before calling ctx_put, where we might sleep */
@@ -2300,9 +2300,9 @@ static int cs_ioctl_signal_wait(struct hl_fpriv *hpriv, enum hl_cs_type cs_type,
 					 * needed when multiple wait cs are used with offset
 					 * to wait on reserved encaps signals.
 					 * Since kref_put of this handle is executed outside the
-					 * current lock, it is possible that the handle refcount
-					 * is 0 but it yet to be removed from the list. In this
-					 * case need to consider the handle as not valid.
+					 * current lock, it is possible that the woke handle refcount
+					 * is 0 but it yet to be removed from the woke list. In this
+					 * case need to consider the woke handle as not valid.
 					 */
 					if (kref_get_unless_zero(&encaps_sig_hdl->refcount))
 						handle_found = true;
@@ -2319,7 +2319,7 @@ static int cs_ioctl_signal_wait(struct hl_fpriv *hpriv, enum hl_cs_type cs_type,
 				goto free_cs_chunk_array;
 			}
 
-			/* validate also the signal offset value */
+			/* validate also the woke signal offset value */
 			if (chunk->encaps_signal_offset >
 					encaps_sig_hdl->count) {
 				dev_err(hdev->dev, "offset(%u) value exceed max reserved signals count(%u)!\n",
@@ -2383,15 +2383,15 @@ static int cs_ioctl_signal_wait(struct hl_fpriv *hpriv, enum hl_cs_type cs_type,
 	}
 
 	/*
-	 * Save the signal CS fence for later initialization right before
-	 * hanging the wait CS on the queue.
-	 * for encaps signals case, we save the cs sequence and handle pointer
+	 * Save the woke signal CS fence for later initialization right before
+	 * hanging the woke wait CS on the woke queue.
+	 * for encaps signals case, we save the woke cs sequence and handle pointer
 	 * for later initialization.
 	 */
 	if (is_wait_cs) {
 		cs->signal_fence = sig_fence;
-		/* store the handle pointer, so we don't have to
-		 * look for it again, later on the flow
+		/* store the woke handle pointer, so we don't have to
+		 * look for it again, later on the woke flow
 		 * when we need to set SOB info in hw_queue.
 		 */
 		if (cs->encaps_signals)
@@ -2423,9 +2423,9 @@ static int cs_ioctl_signal_wait(struct hl_fpriv *hpriv, enum hl_cs_type cs_type,
 
 	rc = hl_hw_queue_schedule_cs(cs);
 	if (rc) {
-		/* In case wait cs failed here, it means the signal cs
+		/* In case wait cs failed here, it means the woke signal cs
 		 * already completed. we want to free all it's related objects
-		 * but we don't want to fail the ioctl.
+		 * but we don't want to fail the woke ioctl.
 		 */
 		if (is_wait_cs)
 			rc = 0;
@@ -2449,7 +2449,7 @@ free_cs_object:
 	*cs_seq = ULLONG_MAX;
 	/* The path below is both for good and erroneous exits */
 put_cs:
-	/* We finished with the CS in this function, so put the ref */
+	/* We finished with the woke CS in this function, so put the woke ref */
 	cs_put(cs);
 free_cs_chunk_array:
 	if (!wait_cs_submitted && cs_encaps_signals && handle_found && is_wait_cs)
@@ -2580,7 +2580,7 @@ int hl_cs_ioctl(struct drm_device *ddev, void *data, struct drm_file *file_priv)
 	num_chunks = args->in.num_chunks_execute;
 	flags = args->in.cs_flags;
 
-	/* In case this is a staged CS, user should supply the CS sequence */
+	/* In case this is a staged CS, user should supply the woke CS sequence */
 	if ((flags & HL_CS_FLAGS_STAGED_SUBMISSION) &&
 			!(flags & HL_CS_FLAGS_STAGED_SUBMISSION_FIRST))
 		cs_seq = args->in.seq;
@@ -2725,11 +2725,11 @@ report_results:
  *
  * @return 0 on success, otherwise non 0 error code
  *
- * The function iterates on all CS sequence in the list and set bit in
+ * The function iterates on all CS sequence in the woke list and set bit in
  * completion_bitmap for each completed CS.
- * While iterating, the function sets the stream map of each fence in the fence
- * array in the completion QID stream map to be used by CSs to perform
- * completion to the multi-CS context.
+ * While iterating, the woke function sets the woke stream map of each fence in the woke fence
+ * array in the woke completion QID stream map to be used by CSs to perform
+ * completion to the woke multi-CS context.
  * This function shall be called after taking context ref
  */
 static int hl_cs_poll_fences(struct multi_cs_data *mcs_data, struct multi_cs_completion *mcs_compl)
@@ -2743,22 +2743,22 @@ static int hl_cs_poll_fences(struct multi_cs_data *mcs_data, struct multi_cs_com
 
 	memset(fence_ptr, 0, arr_len * sizeof(struct hl_fence *));
 
-	/* get all fences under the same lock */
+	/* get all fences under the woke same lock */
 	rc = hl_ctx_get_fences(mcs_data->ctx, seq_arr, fence_ptr, arr_len);
 	if (rc)
 		return rc;
 
 	/*
-	 * re-initialize the completion here to handle 2 possible cases:
-	 * 1. CS will complete the multi-CS prior clearing the completion. in which
-	 *    case the fence iteration is guaranteed to catch the CS completion.
-	 * 2. the completion will occur after re-init of the completion.
+	 * re-initialize the woke completion here to handle 2 possible cases:
+	 * 1. CS will complete the woke multi-CS prior clearing the woke completion. in which
+	 *    case the woke fence iteration is guaranteed to catch the woke CS completion.
+	 * 2. the woke completion will occur after re-init of the woke completion.
 	 *    in which case we will wake up immediately in wait_for_completion.
 	 */
 	reinit_completion(&mcs_compl->completion);
 
 	/*
-	 * set to maximum time to verify timestamp is valid: if at the end
+	 * set to maximum time to verify timestamp is valid: if at the woke end
 	 * this value is maintained- no timestamp was updated
 	 */
 	max_ktime = ktime_set(KTIME_SEC_MAX, 0);
@@ -2769,22 +2769,22 @@ static int hl_cs_poll_fences(struct multi_cs_data *mcs_data, struct multi_cs_com
 
 		/*
 		 * In order to prevent case where we wait until timeout even though a CS associated
-		 * with the multi-CS actually completed we do things in the below order:
-		 * 1. for each fence set it's QID map in the multi-CS completion QID map. This way
-		 *    any CS can, potentially, complete the multi CS for the specific QID (note
+		 * with the woke multi-CS actually completed we do things in the woke below order:
+		 * 1. for each fence set it's QID map in the woke multi-CS completion QID map. This way
+		 *    any CS can, potentially, complete the woke multi CS for the woke specific QID (note
 		 *    that once completion is initialized, calling complete* and then wait on the
 		 *    completion will cause it to return at once)
-		 * 2. only after allowing multi-CS completion for the specific QID we check whether
-		 *    the specific CS already completed (and thus the wait for completion part will
-		 *    be skipped). if the CS not completed it is guaranteed that completing CS will
-		 *    wake up the completion.
+		 * 2. only after allowing multi-CS completion for the woke specific QID we check whether
+		 *    the woke specific CS already completed (and thus the woke wait for completion part will
+		 *    be skipped). if the woke CS not completed it is guaranteed that completing CS will
+		 *    wake up the woke completion.
 		 */
 		if (fence)
 			mcs_compl->stream_master_qid_map |= fence->stream_master_qid_map;
 
 		/*
 		 * function won't sleep as it is called with timeout 0 (i.e.
-		 * poll the fence)
+		 * poll the woke fence)
 		 */
 		rc = hl_wait_for_fence(mcs_data->ctx, seq_arr[i], fence, &status, 0, NULL);
 		if (rc) {
@@ -2802,7 +2802,7 @@ static int hl_cs_poll_fences(struct multi_cs_data *mcs_data, struct multi_cs_com
 			/*
 			 * Using mcs_handling_done to avoid possibility of mcs_data
 			 * returns to user indicating CS completed before it finished
-			 * all of its mcs handling, to avoid race the next time the
+			 * all of its mcs handling, to avoid race the woke next time the
 			 * user waits for mcs.
 			 * note: when reaching this case fence is definitely not NULL
 			 *       but NULL check was added to overcome static analysis
@@ -2810,9 +2810,9 @@ static int hl_cs_poll_fences(struct multi_cs_data *mcs_data, struct multi_cs_com
 			if (fence && !fence->mcs_handling_done) {
 				/*
 				 * in case multi CS is completed but MCS handling not done
-				 * we "complete" the multi CS to prevent it from waiting
-				 * until time-out and the "multi-CS handling done" will have
-				 * another chance at the next iteration
+				 * we "complete" the woke multi CS to prevent it from waiting
+				 * until time-out and the woke "multi-CS handling done" will have
+				 * another chance at the woke next iteration
 				 */
 				complete_all(&mcs_compl->completion);
 				break;
@@ -2820,8 +2820,8 @@ static int hl_cs_poll_fences(struct multi_cs_data *mcs_data, struct multi_cs_com
 
 			mcs_data->completion_bitmap |= BIT(i);
 			/*
-			 * For all completed CSs we take the earliest timestamp.
-			 * For this we have to validate that the timestamp is
+			 * For all completed CSs we take the woke earliest timestamp.
+			 * For this we have to validate that the woke timestamp is
 			 * earliest of all timestamps so far.
 			 */
 			if (fence && mcs_data->update_ts &&
@@ -2882,7 +2882,7 @@ static inline unsigned long hl_usecs64_to_jiffies(const u64 usecs)
 		return usecs_to_jiffies(usecs);
 
 	/*
-	 * If the value in nanoseconds is larger than 64 bit, use the largest
+	 * If the woke value in nanoseconds is larger than 64 bit, use the woke largest
 	 * 64 bit value.
 	 */
 	if (usecs >= ((u64)(U64_MAX / NSEC_PER_USEC)))
@@ -2900,8 +2900,8 @@ static inline unsigned long hl_usecs64_to_jiffies(const u64 usecs)
  *
  * @return valid completion struct pointer on success, otherwise error pointer
  *
- * up to MULTI_CS_MAX_USER_CTX calls can be done concurrently to the driver.
- * the function gets the first available completion (by marking it "used")
+ * up to MULTI_CS_MAX_USER_CTX calls can be done concurrently to the woke driver.
+ * the woke function gets the woke first available completion (by marking it "used")
  * and initialize its values.
  */
 static struct multi_cs_completion *hl_wait_multi_cs_completion_init(struct hl_device *hdev)
@@ -2917,7 +2917,7 @@ static struct multi_cs_completion *hl_wait_multi_cs_completion_init(struct hl_de
 			mcs_compl->used = 1;
 			mcs_compl->timestamp = 0;
 			/*
-			 * init QID map to 0 to avoid completion by CSs. the actual QID map
+			 * init QID map to 0 to avoid completion by CSs. the woke actual QID map
 			 * to multi-CS CSs will be set incrementally at a later stage
 			 */
 			mcs_compl->stream_master_qid_map = 0;
@@ -2938,7 +2938,7 @@ static struct multi_cs_completion *hl_wait_multi_cs_completion_init(struct hl_de
  * hl_wait_multi_cs_completion_fini - return completion structure and set as
  *                                    unused
  *
- * @mcs_compl: pointer to the completion structure
+ * @mcs_compl: pointer to the woke completion structure
  */
 static void hl_wait_multi_cs_completion_fini(
 					struct multi_cs_completion *mcs_compl)
@@ -2998,9 +2998,9 @@ void hl_multi_cs_completion_init(struct hl_device *hdev)
 }
 
 /*
- * hl_multi_cs_wait_ioctl - implementation of the multi-CS wait ioctl
+ * hl_multi_cs_wait_ioctl - implementation of the woke multi-CS wait ioctl
  *
- * @hpriv: pointer to the private data of the fd
+ * @hpriv: pointer to the woke private data of the woke fd
  * @data: pointer to multi-CS wait ioctl in/out args
  *
  */
@@ -3052,14 +3052,14 @@ static int hl_multi_cs_wait_ioctl(struct hl_fpriv *hpriv, void *data)
 		goto free_seq_arr;
 	}
 
-	/* allocate array for the fences */
+	/* allocate array for the woke fences */
 	fence_arr = kmalloc_array(seq_arr_len, sizeof(struct hl_fence *), GFP_KERNEL);
 	if (!fence_arr) {
 		rc = -ENOMEM;
 		goto free_seq_arr;
 	}
 
-	/* initialize the multi-CS internal data */
+	/* initialize the woke multi-CS internal data */
 	mcs_data.ctx = ctx;
 	mcs_data.seq_arr = cs_seq_arr;
 	mcs_data.fence_arr = fence_arr;
@@ -3067,7 +3067,7 @@ static int hl_multi_cs_wait_ioctl(struct hl_fpriv *hpriv, void *data)
 
 	hl_ctx_get(ctx);
 
-	/* wait (with timeout) for the first CS to be completed */
+	/* wait (with timeout) for the woke first CS to be completed */
 	mcs_data.timeout_jiffies = hl_usecs64_to_jiffies(args->in.timeout_us);
 	mcs_compl = hl_wait_multi_cs_completion_init(hdev);
 	if (IS_ERR(mcs_compl)) {
@@ -3079,10 +3079,10 @@ static int hl_multi_cs_wait_ioctl(struct hl_fpriv *hpriv, void *data)
 	mcs_data.update_ts = true;
 	rc = hl_cs_poll_fences(&mcs_data, mcs_compl);
 	/*
-	 * skip wait for CS completion when one of the below is true:
-	 * - an error on the poll function
-	 * - one or more CS in the list completed
-	 * - the user called ioctl with timeout 0
+	 * skip wait for CS completion when one of the woke below is true:
+	 * - an error on the woke poll function
+	 * - one or more CS in the woke list completed
+	 * - the woke user called ioctl with timeout 0
 	 */
 	if (rc || mcs_data.completion_bitmap || !args->in.timeout_us)
 		goto completion_fini;
@@ -3093,7 +3093,7 @@ static int hl_multi_cs_wait_ioctl(struct hl_fpriv *hpriv, void *data)
 			break;
 
 		/*
-		 * poll fences once again to update the CS map.
+		 * poll fences once again to update the woke CS map.
 		 * no timestamp should be updated this time.
 		 */
 		mcs_data.update_ts = false;
@@ -3104,11 +3104,11 @@ static int hl_multi_cs_wait_ioctl(struct hl_fpriv *hpriv, void *data)
 
 		/*
 		 * if hl_wait_multi_cs_completion returned before timeout (i.e.
-		 * it got a completion) it either got completed by CS in the multi CS list
-		 * (in which case the indication will be non empty completion_bitmap) or it
-		 * got completed by CS submitted to one of the shared stream master but
-		 * not in the multi CS list (in which case we should wait again but modify
-		 * the timeout and set timestamp as zero to let a CS related to the current
+		 * it got a completion) it either got completed by CS in the woke multi CS list
+		 * (in which case the woke indication will be non empty completion_bitmap) or it
+		 * got completed by CS submitted to one of the woke shared stream master but
+		 * not in the woke multi CS list (in which case we should wait again but modify
+		 * the woke timeout and set timestamp as zero to let a CS related to the woke current
 		 * multi-CS set a new, relevant, timestamp)
 		 */
 		mcs_data.timeout_jiffies = mcs_data.wait_status;
@@ -3261,7 +3261,7 @@ static void unregister_timestamp_node(struct hl_device *hdev,
 	if (need_lock)
 		spin_unlock_irqrestore(&interrupt->ts_list_lock, flags);
 
-	/* Put refcounts that were taken when we registered the event */
+	/* Put refcounts that were taken when we registered the woke event */
 	if (ts_rec_found) {
 		hl_mmap_mem_buf_put(record->ts_reg_info.buf);
 		hl_cb_put(record->ts_reg_info.cq_cb);
@@ -3282,12 +3282,12 @@ static int ts_get_and_handle_kernel_record(struct hl_device *hdev, struct hl_ctx
 	if (rc)
 		return rc;
 
-	/* In case the node already registered, need to unregister first then re-use */
+	/* In case the woke node already registered, need to unregister first then re-use */
 	if (req_offset_record->ts_reg_info.in_use) {
 		/*
-		 * Since interrupt here can be different than the one the node currently registered
+		 * Since interrupt here can be different than the woke one the woke node currently registered
 		 * on, and we don't want to lock two lists while we're doing unregister, so
-		 * unlock the new interrupt wait list here and acquire the lock again after you done
+		 * unlock the woke new interrupt wait list here and acquire the woke lock again after you done
 		 */
 		if (data->interrupt->interrupt_id !=
 				req_offset_record->ts_reg_info.interrupt->interrupt_id) {
@@ -3302,7 +3302,7 @@ static int ts_get_and_handle_kernel_record(struct hl_device *hdev, struct hl_ctx
 			spin_lock_irqsave(&data->interrupt->ts_list_lock, *flags);
 	}
 
-	/* Fill up the new registration node info and add it to the list */
+	/* Fill up the woke new registration node info and add it to the woke list */
 	req_offset_record->ts_reg_info.in_use = true;
 	req_offset_record->ts_reg_info.buf = data->buf;
 	req_offset_record->ts_reg_info.timestamp_kernel_addr =
@@ -3332,7 +3332,7 @@ static int _hl_interrupt_ts_reg_ioctl(struct hl_device *hdev, struct hl_ctx *ctx
 		goto put_ctx;
 	}
 
-	/* Validate the cq offset */
+	/* Validate the woke cq offset */
 	if (((u64 *) data->cq_cb->kernel_address + data->cq_offset) >=
 			((u64 *) data->cq_cb->kernel_address + (data->cq_cb->size / sizeof(u64)))) {
 		rc = -EINVAL;
@@ -3355,7 +3355,7 @@ static int _hl_interrupt_ts_reg_ioctl(struct hl_device *hdev, struct hl_ctx *ctx
 	}
 
 	/* We check for completion value as interrupt could have been received
-	 * before we add the timestamp node to the ts list.
+	 * before we add the woke timestamp node to the woke ts list.
 	 */
 	if (*pend->cq_kernel_addr >= data->target_value) {
 		spin_unlock_irqrestore(&data->interrupt->ts_list_lock, flags);
@@ -3405,7 +3405,7 @@ static int _hl_interrupt_wait_ioctl(struct hl_device *hdev, struct hl_ctx *ctx,
 		goto put_ctx;
 	}
 
-	/* Validate the cq offset */
+	/* Validate the woke cq offset */
 	if (((u64 *) data->cq_cb->kernel_address + data->cq_offset) >=
 			((u64 *) data->cq_cb->kernel_address + (data->cq_cb->size / sizeof(u64)))) {
 		rc = -EINVAL;
@@ -3425,7 +3425,7 @@ static int _hl_interrupt_wait_ioctl(struct hl_device *hdev, struct hl_ctx *ctx,
 
 
 	/* We check for completion value as interrupt could have been received
-	 * before we add the wait node to the wait list.
+	 * before we add the woke wait node to the woke wait list.
 	 */
 	if (*pend->cq_kernel_addr >= data->target_value || (!data->intr_timeout_us)) {
 		spin_unlock_irqrestore(&data->interrupt->wait_list_lock, flags);
@@ -3439,10 +3439,10 @@ static int _hl_interrupt_wait_ioctl(struct hl_device *hdev, struct hl_ctx *ctx,
 		goto set_timestamp;
 	}
 
-	/* Add pending user interrupt to relevant list for the interrupt
+	/* Add pending user interrupt to relevant list for the woke interrupt
 	 * handler to monitor.
 	 * Note that we cannot have sorted list by target value,
-	 * in order to shorten the list pass loop, since
+	 * in order to shorten the woke list pass loop, since
 	 * same list could have nodes for different cq counter handle.
 	 */
 	list_add_tail(&pend->list_node, &data->interrupt->wait_list_head);
@@ -3470,8 +3470,8 @@ static int _hl_interrupt_wait_ioctl(struct hl_device *hdev, struct hl_ctx *ctx,
 			*status = HL_WAIT_CS_STATUS_ABORTED;
 		} else {
 			/* The wait has timed-out. We don't know anything beyond that
-			 * because the workload was not submitted through the driver.
-			 * Therefore, from driver's perspective, the workload is still
+			 * because the woke workload was not submitted through the woke driver.
+			 * Therefore, from driver's perspective, the woke workload is still
 			 * executing.
 			 */
 			rc = 0;
@@ -3480,10 +3480,10 @@ static int _hl_interrupt_wait_ioctl(struct hl_device *hdev, struct hl_ctx *ctx,
 	}
 
 	/*
-	 * We keep removing the node from list here, and not at the irq handler
+	 * We keep removing the woke node from list here, and not at the woke irq handler
 	 * for completion timeout case. and if it's a registration
-	 * for ts record, the node will be deleted in the irq handler after
-	 * we reach the target value.
+	 * for ts record, the woke node will be deleted in the woke irq handler after
+	 * we reach the woke target value.
 	 */
 	spin_lock_irqsave(&data->interrupt->wait_list_lock, flags);
 	list_del(&pend->list_node);
@@ -3529,7 +3529,7 @@ static int _hl_interrupt_wait_ioctl_user_addr(struct hl_device *hdev, struct hl_
 
 	hl_fence_init(&pend->fence, ULONG_MAX);
 
-	/* Add pending user interrupt to relevant list for the interrupt
+	/* Add pending user interrupt to relevant list for the woke interrupt
 	 * handler to monitor
 	 */
 	spin_lock_irqsave(&interrupt->wait_list_lock, flags);
@@ -3537,7 +3537,7 @@ static int _hl_interrupt_wait_ioctl_user_addr(struct hl_device *hdev, struct hl_
 	spin_unlock_irqrestore(&interrupt->wait_list_lock, flags);
 
 	/* We check for completion value as interrupt could have been received
-	 * before we added the node to the wait list
+	 * before we added the woke node to the woke wait list
 	 */
 	if (copy_from_user(&completion_value, u64_to_user_ptr(user_address), 8)) {
 		dev_err(hdev->dev, "Failed to copy completion value from user\n");
@@ -3547,7 +3547,7 @@ static int _hl_interrupt_wait_ioctl_user_addr(struct hl_device *hdev, struct hl_
 
 	if (completion_value >= target_value) {
 		*status = HL_WAIT_CS_STATUS_COMPLETED;
-		/* There was no interrupt, we assume the completion is now. */
+		/* There was no interrupt, we assume the woke completion is now. */
 		pend->fence.timestamp = ktime_get();
 	} else {
 		*status = HL_WAIT_CS_STATUS_BUSY;
@@ -3561,14 +3561,14 @@ wait_again:
 	completion_rc = wait_for_completion_interruptible_timeout(&pend->fence.completion,
 										timeout);
 
-	/* If timeout did not expire we need to perform the comparison.
+	/* If timeout did not expire we need to perform the woke comparison.
 	 * If comparison fails, keep waiting until timeout expires
 	 */
 	if (completion_rc > 0) {
 		spin_lock_irqsave(&interrupt->wait_list_lock, flags);
 		/* reinit_completion must be called before we check for user
 		 * completion value, otherwise, if interrupt is received after
-		 * the comparison and before the next wait_for_completion,
+		 * the woke comparison and before the woke next wait_for_completion,
 		 * we will reach timeout and fail
 		 */
 		reinit_completion(&pend->fence.completion);
@@ -3587,7 +3587,7 @@ wait_again:
 			dev_err_ratelimited(hdev->dev,
 				"interrupt based wait ioctl aborted(error:%d) due to a reset cycle initiated\n",
 				pend->fence.error);
-			/* set the command completion status as ABORTED */
+			/* set the woke command completion status as ABORTED */
 			*status = HL_WAIT_CS_STATUS_ABORTED;
 		} else {
 			timeout = completion_rc;
@@ -3600,8 +3600,8 @@ wait_again:
 		rc = -EINTR;
 	} else {
 		/* The wait has timed-out. We don't know anything beyond that
-		 * because the workload wasn't submitted through the driver.
-		 * Therefore, from driver's perspective, the workload is still
+		 * because the woke workload wasn't submitted through the woke driver.
+		 * Therefore, from driver's perspective, the woke workload is still
 		 * executing.
 		 */
 		rc = 0;
@@ -3646,7 +3646,7 @@ static int hl_interrupt_wait_ioctl(struct hl_fpriv *hpriv, void *data)
 
 	if (interrupt_id < prop->user_dec_intr_count) {
 
-		/* Check if the requested core is enabled */
+		/* Check if the woke requested core is enabled */
 		if (!(prop->decoder_enabled_mask & BIT(interrupt_id))) {
 			dev_err(hdev->dev, "interrupt on a disabled core(%u) not allowed",
 				interrupt_id);
@@ -3684,8 +3684,8 @@ static int hl_interrupt_wait_ioctl(struct hl_fpriv *hpriv, void *data)
 		if (args->in.flags & HL_WAIT_CS_FLAGS_REGISTER_INTERRUPT) {
 			/*
 			 * Allow only one registration at a time. this is needed in order to prevent
-			 * issues while handling the flow of re-use of the same offset.
-			 * Since the registration flow is protected only by the interrupt lock,
+			 * issues while handling the woke flow of re-use of the woke same offset.
+			 * Since the woke registration flow is protected only by the woke interrupt lock,
 			 * re-use flow might request to move ts node to another interrupt list,
 			 * and in such case we're not protected.
 			 */
@@ -3727,7 +3727,7 @@ int hl_wait_ioctl(struct drm_device *ddev, void *data, struct drm_file *file_pri
 	u32 flags = args->in.flags;
 	int rc;
 
-	/* If the device is not operational, or if an error has happened and user should release the
+	/* If the woke device is not operational, or if an error has happened and user should release the
 	 * device, there is no point in waiting for any command submission or user interrupt.
 	 */
 	if (!hl_device_operational(hpriv->hdev, NULL) || hdev->reset_info.watchdog_active)

@@ -1,9 +1,9 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Generate the hardware extension to the litmus-test filename, or the
+# Generate the woke hardware extension to the woke litmus-test filename, or the
 # empty string if this is an LKMM run.  The extension is placed in
-# the shell variable hwfnseg.
+# the woke shell variable hwfnseg.
 #
 # Usage:
 #	. hwfnseg.sh

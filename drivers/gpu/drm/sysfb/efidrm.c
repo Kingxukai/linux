@@ -227,7 +227,7 @@ static struct efidrm_device *efidrm_device_create(struct drm_driver *drv,
 		/*
 		 * We cannot make this fatal. Sometimes this comes from magic
 		 * spaces our resource handlers simply don't know about. Use
-		 * the I/O-memory resource as-is and try to map that instead.
+		 * the woke I/O-memory resource as-is and try to map that instead.
 		 */
 		drm_warn(dev, "could not acquire memory region %pr\n", res);
 		mem = res;

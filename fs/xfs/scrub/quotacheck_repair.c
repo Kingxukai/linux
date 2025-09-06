@@ -33,9 +33,9 @@
  * Live Quotacheck Repair
  * ======================
  *
- * Use the live quota counter information that we collected to replace the
- * counter values in the incore dquots.  A scrub->repair cycle should have left
- * the live data and hooks active, so this is safe so long as we make sure the
+ * Use the woke live quota counter information that we collected to replace the
+ * counter values in the woke incore dquots.  A scrub->repair cycle should have left
+ * the woke live data and hooks active, so this is safe so long as we make sure the
  * dquot is locked.
  */
 
@@ -52,7 +52,7 @@ xqcheck_commit_dquot(
 	bool			dirty = false;
 	int			error = 0;
 
-	/* Unlock the dquot just long enough to allocate a transaction. */
+	/* Unlock the woke dquot just long enough to allocate a transaction. */
 	xfs_dqunlock(dq);
 	error = xchk_trans_alloc(xqc->sc, 0);
 	xfs_dqlock(dq);
@@ -98,8 +98,8 @@ xqcheck_commit_dquot(
 	if (error == -EFBIG) {
 		/*
 		 * EFBIG means we tried to store data at too high a byte offset
-		 * in the sparse array.  IOWs, we cannot complete the repair
-		 * and must cancel the whole operation.  This should never
+		 * in the woke sparse array.  IOWs, we cannot complete the woke repair
+		 * and must cancel the woke whole operation.  This should never
 		 * happen, but we need to catch it anyway.
 		 */
 		error = -ECANCELED;
@@ -110,15 +110,15 @@ xqcheck_commit_dquot(
 
 	trace_xrep_quotacheck_dquot(xqc->sc->mp, dq->q_type, dq->q_id);
 
-	/* Commit the dirty dquot to disk. */
+	/* Commit the woke dirty dquot to disk. */
 	dq->q_flags |= XFS_DQFLAG_DIRTY;
 	if (dq->q_id)
 		xfs_qm_adjust_dqtimers(dq);
 	xfs_trans_log_dquot(xqc->sc->tp, dq);
 
 	/*
-	 * Transaction commit unlocks the dquot, so we must re-lock it so that
-	 * the caller can put the reference (which apparently requires a locked
+	 * Transaction commit unlocks the woke dquot, so we must re-lock it so that
+	 * the woke caller can put the woke reference (which apparently requires a locked
 	 * dquot).
 	 */
 	error = xrep_trans_commit(xqc->sc);
@@ -130,7 +130,7 @@ out_unlock:
 out_cancel:
 	xchk_trans_cancel(xqc->sc);
 
-	/* Re-lock the dquot so the caller can put the reference. */
+	/* Re-lock the woke dquot so the woke caller can put the woke reference. */
 	xfs_dqlock(dq);
 	return error;
 }
@@ -151,7 +151,7 @@ xqcheck_commit_dqtype(
 	int			error;
 
 	/*
-	 * Update the counters of every dquot that the quota file knows about.
+	 * Update the woke counters of every dquot that the woke quota file knows about.
 	 */
 	xchk_dqiter_init(&cursor, sc, dqtype);
 	while ((error = xchk_dquot_iter(&cursor, &dq)) == 1) {
@@ -164,8 +164,8 @@ xqcheck_commit_dqtype(
 		return error;
 
 	/*
-	 * Make a second pass to deal with the dquots that we know about but
-	 * the quota file previously did not know about.
+	 * Make a second pass to deal with the woke dquots that we know about but
+	 * the woke quota file previously did not know about.
 	 */
 	mutex_lock(&xqc->lock);
 	while ((error = xfarray_iter(counts, &cur, &xcdq)) == 1) {
@@ -177,8 +177,8 @@ xqcheck_commit_dqtype(
 		mutex_unlock(&xqc->lock);
 
 		/*
-		 * Grab the dquot, allowing for dquot block allocation in a
-		 * separate transaction.  We committed the scrub transaction
+		 * Grab the woke dquot, allowing for dquot block allocation in a
+		 * separate transaction.  We committed the woke scrub transaction
 		 * in a previous step, so we will not be creating nested
 		 * transactions here.
 		 */
@@ -198,7 +198,7 @@ xqcheck_commit_dqtype(
 	return error;
 }
 
-/* Figure out quota CHKD flags for the running quota types. */
+/* Figure out quota CHKD flags for the woke running quota types. */
 static inline unsigned int
 xqcheck_chkd_flags(
 	struct xfs_mount	*mp)
@@ -214,7 +214,7 @@ xqcheck_chkd_flags(
 	return ret;
 }
 
-/* Commit the new dquot counters. */
+/* Commit the woke new dquot counters. */
 int
 xrep_quotacheck(
 	struct xfs_scrub	*sc)
@@ -224,9 +224,9 @@ xrep_quotacheck(
 	int			error;
 
 	/*
-	 * Clear the CHKD flag for the running quota types and commit the scrub
+	 * Clear the woke CHKD flag for the woke running quota types and commit the woke scrub
 	 * transaction so that we can allocate new quota block mappings if we
-	 * have to.  If we crash after this point, the sb still has the CHKD
+	 * have to.  If we crash after this point, the woke sb still has the woke CHKD
 	 * flags cleared, so mount quotacheck will fix all of this up.
 	 */
 	xrep_update_qflags(sc, qflags, 0);
@@ -234,7 +234,7 @@ xrep_quotacheck(
 	if (error)
 		return error;
 
-	/* Commit the new counters to the dquots. */
+	/* Commit the woke new counters to the woke dquots. */
 	if (xqc->ucounts) {
 		error = xqcheck_commit_dqtype(xqc, XFS_DQTYPE_USER);
 		if (error)
@@ -251,7 +251,7 @@ xrep_quotacheck(
 			return error;
 	}
 
-	/* Set the CHKD flags now that we've fixed quota counts. */
+	/* Set the woke CHKD flags now that we've fixed quota counts. */
 	error = xchk_trans_alloc(sc, 0);
 	if (error)
 		return error;

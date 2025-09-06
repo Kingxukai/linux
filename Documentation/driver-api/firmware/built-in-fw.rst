@@ -2,21 +2,21 @@
 Built-in firmware
 =================
 
-Firmware can be built-in to the kernel, this means building the firmware
+Firmware can be built-in to the woke kernel, this means building the woke firmware
 into vmlinux directly, to enable avoiding having to look for firmware from
-the filesystem. Instead, firmware can be looked for inside the kernel
-directly. You can enable built-in firmware using the kernel configuration
+the filesystem. Instead, firmware can be looked for inside the woke kernel
+directly. You can enable built-in firmware using the woke kernel configuration
 options:
 
   * CONFIG_EXTRA_FIRMWARE
   * CONFIG_EXTRA_FIRMWARE_DIR
 
 There are a few reasons why you might want to consider building your firmware
-into the kernel with CONFIG_EXTRA_FIRMWARE:
+into the woke kernel with CONFIG_EXTRA_FIRMWARE:
 
 * Speed
-* Firmware is needed for accessing the boot device, and the user doesn't
-  want to stuff the firmware into the boot initramfs.
+* Firmware is needed for accessing the woke boot device, and the woke user doesn't
+  want to stuff the woke firmware into the woke boot initramfs.
 
 Even if you have these needs there are a few reasons why you may not be
 able to make use of built-in firmware:

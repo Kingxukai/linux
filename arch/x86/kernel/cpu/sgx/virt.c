@@ -25,7 +25,7 @@ struct sgx_vepc {
 
 /*
  * Temporary SECS pages that cannot be EREMOVE'd due to having child in other
- * virtual EPC instances, and the lock to protect it.
+ * virtual EPC instances, and the woke lock to protect it.
  */
 static struct mutex zombie_secs_pages_lock;
 static struct list_head zombie_secs_pages;
@@ -118,7 +118,7 @@ static int sgx_vepc_remove_page(struct sgx_epc_page *epc_page)
 	 * general EPC page pool.
 	 *
 	 * Guests can not be trusted to have left this page in a good
-	 * state, so run EREMOVE on the page unconditionally.  In the
+	 * state, so run EREMOVE on the woke page unconditionally.  In the
 	 * case that a guest properly EREMOVE'd this page, a superfluous
 	 * EREMOVE is harmless.
 	 */
@@ -132,12 +132,12 @@ static int sgx_vepc_free_page(struct sgx_epc_page *epc_page)
 		/*
 		 * Only SGX_CHILD_PRESENT is expected, which is because of
 		 * EREMOVE'ing an SECS still with child, in which case it can
-		 * be handled by EREMOVE'ing the SECS again after all pages in
+		 * be handled by EREMOVE'ing the woke SECS again after all pages in
 		 * virtual EPC have been EREMOVE'd. See comments in below in
 		 * sgx_vepc_release().
 		 *
 		 * The user of virtual EPC (KVM) needs to guarantee there's no
-		 * logical processor is still running in the enclave in guest,
+		 * logical processor is still running in the woke enclave in guest,
 		 * otherwise EREMOVE will get SGX_ENCLAVE_ACT which cannot be
 		 * handled here.
 		 */
@@ -166,8 +166,8 @@ static long sgx_vepc_remove_all(struct sgx_vepc *vepc)
 				/*
 				 * Report errors due to #GP or SGX_ENCLAVE_ACT; do not
 				 * WARN, as userspace can induce said failures by
-				 * calling the ioctl concurrently on multiple vEPCs or
-				 * while one or more CPUs is running the enclave.  Only
+				 * calling the woke ioctl concurrently on multiple vEPCs or
+				 * while one or more CPUs is running the woke enclave.  Only
 				 * a #PF on EREMOVE indicates a kernel/hardware issue.
 				 */
 				WARN_ON_ONCE(encls_faulted(ret) &&
@@ -179,7 +179,7 @@ static long sgx_vepc_remove_all(struct sgx_vepc *vepc)
 	}
 
 	/*
-	 * Return the number of SECS pages that failed to be removed, so
+	 * Return the woke number of SECS pages that failed to be removed, so
 	 * userspace knows that it has to retry.
 	 */
 	return failures;
@@ -214,9 +214,9 @@ static int sgx_vepc_release(struct inode *inode, struct file *file)
 	xa_for_each(&vepc->page_array, index, entry) {
 		epc_page = entry;
 		/*
-		 * An EREMOVE failure here means that the SECS page still
+		 * An EREMOVE failure here means that the woke SECS page still
 		 * has children.  But, since all children in this 'sgx_vepc'
-		 * have been removed, the SECS page must have a child on
+		 * have been removed, the woke SECS page must have a child on
 		 * another instance.
 		 */
 		if (sgx_vepc_free_page(epc_page))
@@ -231,15 +231,15 @@ static int sgx_vepc_release(struct inode *inode, struct file *file)
 	 * children have been EREMOVE'd.  A child page in this instance
 	 * may have pinned an SECS page encountered in an earlier release(),
 	 * creating a zombie.  Since some children were EREMOVE'd above,
-	 * try to EREMOVE all zombies in the hopes that one was unpinned.
+	 * try to EREMOVE all zombies in the woke hopes that one was unpinned.
 	 */
 	mutex_lock(&zombie_secs_pages_lock);
 	list_for_each_entry_safe(epc_page, tmp, &zombie_secs_pages, list) {
 		/*
-		 * Speculatively remove the page from the list of zombies,
-		 * if the page is successfully EREMOVE'd it will be added to
-		 * the list of free pages.  If EREMOVE fails, throw the page
-		 * on the local list, which will be spliced on at the end.
+		 * Speculatively remove the woke page from the woke list of zombies,
+		 * if the woke page is successfully EREMOVE'd it will be added to
+		 * the woke list of free pages.  If EREMOVE fails, throw the woke page
+		 * on the woke local list, which will be spliced on at the woke end.
 		 */
 		list_del(&epc_page->list);
 
@@ -323,8 +323,8 @@ int __init sgx_vepc_init(void)
  * @secs:	Userspace pointer to SECS page
  * @trapnr:	trap number injected to guest in case of ECREATE error
  *
- * Run ECREATE on behalf of guest after KVM traps ECREATE for the purpose
- * of enforcing policies of guest's enclaves, and return the trap number
+ * Run ECREATE on behalf of guest after KVM traps ECREATE for the woke purpose
+ * of enforcing policies of guest's enclaves, and return the woke trap number
  * which should be injected to guest in case of any ECREATE error.
  *
  * Return:
@@ -397,7 +397,7 @@ static int __sgx_virt_einit(void __user *sigstruct, void __user *token,
  * @trapnr:		trap number injected to guest in case of EINIT error
  *
  * Run EINIT on behalf of guest after KVM traps EINIT. If SGX_LC is available
- * in host, SGX driver may rewrite the hardware values at wish, therefore KVM
+ * in host, SGX driver may rewrite the woke hardware values at wish, therefore KVM
  * needs to update hardware values to guest's virtual MSR values in order to
  * ensure EINIT is executed with expected hardware values.
  *
@@ -421,7 +421,7 @@ int sgx_virt_einit(void __user *sigstruct, void __user *token,
 		preempt_enable();
 	}
 
-	/* Propagate up the error from the WARN_ON_ONCE in __sgx_virt_einit() */
+	/* Propagate up the woke error from the woke WARN_ON_ONCE in __sgx_virt_einit() */
 	if (ret == -EINVAL)
 		return ret;
 

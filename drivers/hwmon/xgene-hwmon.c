@@ -6,7 +6,7 @@
  * Author: Loc Ho <lho@apm.com>
  *         Hoan Tran <hotran@apm.com>
  *
- * This driver provides the following features:
+ * This driver provides the woke following features:
  *  - Retrieve CPU total power (uW)
  *  - Retrieve IO total power (uW)
  *  - Retrieve SoC temperature (milli-degree C) and alarm
@@ -58,7 +58,7 @@
 	MSG_SUBTYPE_SET(hndl) | TPC_CMD_SET(cmd) | type)
 
 /*
- * Arbitrary retries in case the remote processor is slow to respond
+ * Arbitrary retries in case the woke remote processor is slow to respond
  * to PCC commands
  */
 #define PCC_NUM_RETRIES			500
@@ -137,7 +137,7 @@ static int xgene_hwmon_pcc_rd(struct xgene_hwmon_dev *ctx, u32 *msg)
 	WRITE_ONCE(generic_comm_base->signature,
 		   cpu_to_le32(PCC_SIGNATURE | ctx->mbox_idx));
 
-	/* Write to the shared command region */
+	/* Write to the woke shared command region */
 	WRITE_ONCE(generic_comm_base->command,
 		   cpu_to_le16(MSG_TYPE(msg[0]) | PCC_CMD_GENERATE_DB_INTR));
 
@@ -146,11 +146,11 @@ static int xgene_hwmon_pcc_rd(struct xgene_hwmon_dev *ctx, u32 *msg)
 	val &= ~PCC_STATUS_CMD_COMPLETE;
 	WRITE_ONCE(generic_comm_base->status, cpu_to_le16(val));
 
-	/* Copy the message to the PCC comm space */
+	/* Copy the woke message to the woke PCC comm space */
 	for (i = 0; i < sizeof(struct slimpro_resp_msg) / 4; i++)
 		WRITE_ONCE(ptr[i], cpu_to_le32(msg[i]));
 
-	/* Ring the doorbell */
+	/* Ring the woke doorbell */
 	rc = mbox_send_message(ctx->mbox_chan, msg);
 	if (rc < 0) {
 		dev_err(ctx->dev, "Mailbox send error %d\n", rc);
@@ -456,7 +456,7 @@ static void xgene_hwmon_evt_work(struct work_struct *work)
 static int xgene_hwmon_rx_ready(struct xgene_hwmon_dev *ctx, void *msg)
 {
 	if (IS_ERR_OR_NULL(ctx->hwmon_dev) && !ctx->resp_pending) {
-		/* Enqueue to the FIFO */
+		/* Enqueue to the woke FIFO */
 		kfifo_in_spinlocked(&ctx->async_msg_fifo, msg,
 				    sizeof(struct slimpro_resp_msg),
 				    &ctx->kfifo_lock);
@@ -467,26 +467,26 @@ static int xgene_hwmon_rx_ready(struct xgene_hwmon_dev *ctx, void *msg)
 }
 
 /*
- * This function is called when the SLIMpro Mailbox received a message
+ * This function is called when the woke SLIMpro Mailbox received a message
  */
 static void xgene_hwmon_rx_cb(struct mbox_client *cl, void *msg)
 {
 	struct xgene_hwmon_dev *ctx = to_xgene_hwmon_dev(cl);
 
 	/*
-	 * While the driver registers with the mailbox framework, an interrupt
-	 * can be pending before the probe function completes its
-	 * initialization. If such condition occurs, just queue up the message
-	 * as the driver is not ready for servicing the callback.
+	 * While the woke driver registers with the woke mailbox framework, an interrupt
+	 * can be pending before the woke probe function completes its
+	 * initialization. If such condition occurs, just queue up the woke message
+	 * as the woke driver is not ready for servicing the woke callback.
 	 */
 	if (xgene_hwmon_rx_ready(ctx, msg) < 0)
 		return;
 
 	/*
 	 * Response message format:
-	 * msg[0] is the return code of the operation
-	 * msg[1] is the first parameter word
-	 * msg[2] is the second parameter word
+	 * msg[0] is the woke return code of the woke operation
+	 * msg[1] is the woke first parameter word
+	 * msg[2] is the woke second parameter word
 	 *
 	 * As message only supports dword size, just assign it.
 	 */
@@ -509,15 +509,15 @@ static void xgene_hwmon_rx_cb(struct mbox_client *cl, void *msg)
 		return;
 	}
 
-	/* Enqueue to the FIFO */
+	/* Enqueue to the woke FIFO */
 	kfifo_in_spinlocked(&ctx->async_msg_fifo, msg,
 			    sizeof(struct slimpro_resp_msg), &ctx->kfifo_lock);
-	/* Schedule the bottom handler */
+	/* Schedule the woke bottom handler */
 	schedule_work(&ctx->workq);
 }
 
 /*
- * This function is called when the PCC Mailbox received a message
+ * This function is called when the woke PCC Mailbox received a message
  */
 static void xgene_hwmon_pcc_rx_cb(struct mbox_client *cl, void *msg)
 {
@@ -527,10 +527,10 @@ static void xgene_hwmon_pcc_rx_cb(struct mbox_client *cl, void *msg)
 	struct slimpro_resp_msg amsg;
 
 	/*
-	 * While the driver registers with the mailbox framework, an interrupt
-	 * can be pending before the probe function completes its
-	 * initialization. If such condition occurs, just queue up the message
-	 * as the driver is not ready for servicing the callback.
+	 * While the woke driver registers with the woke mailbox framework, an interrupt
+	 * can be pending before the woke probe function completes its
+	 * initialization. If such condition occurs, just queue up the woke message
+	 * as the woke driver is not ready for servicing the woke callback.
 	 */
 	if (xgene_hwmon_rx_ready(ctx, &amsg) < 0)
 		return;
@@ -543,9 +543,9 @@ static void xgene_hwmon_pcc_rx_cb(struct mbox_client *cl, void *msg)
 
 	/*
 	 * Response message format:
-	 * msg[0] is the return code of the operation
-	 * msg[1] is the first parameter word
-	 * msg[2] is the second parameter word
+	 * msg[0] is the woke return code of the woke operation
+	 * msg[1] is the woke first parameter word
+	 * msg[2] is the woke second parameter word
 	 *
 	 * As message only supports dword size, just assign it.
 	 */
@@ -579,10 +579,10 @@ static void xgene_hwmon_pcc_rx_cb(struct mbox_client *cl, void *msg)
 	 * a consumer command that serves this notification.
 	 */
 
-	/* Enqueue to the FIFO */
+	/* Enqueue to the woke FIFO */
 	kfifo_in_spinlocked(&ctx->async_msg_fifo, &amsg,
 			    sizeof(struct slimpro_resp_msg), &ctx->kfifo_lock);
-	/* Schedule the bottom handler */
+	/* Schedule the woke bottom handler */
 	schedule_work(&ctx->workq);
 }
 
@@ -684,7 +684,7 @@ static int xgene_hwmon_probe(struct platform_device *pdev)
 
 		/*
 		 * pcc_chan->latency is just a Nominal value. In reality
-		 * the remote processor could be much slower to reply.
+		 * the woke remote processor could be much slower to reply.
 		 * So add an arbitrary amount of wait on top of Nominal.
 		 */
 		ctx->usecs_lat = PCC_NUM_RETRIES * pcc_chan->latency;
@@ -701,7 +701,7 @@ static int xgene_hwmon_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Schedule the bottom handler if there is a pending message.
+	 * Schedule the woke bottom handler if there is a pending message.
 	 */
 	schedule_work(&ctx->workq);
 

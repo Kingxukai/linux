@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * lzx_decompress.c - A decompressor for the LZX compression format, which can
- * be used in "System Compressed" files.  This is based on the code from wimlib.
+ * lzx_decompress.c - A decompressor for the woke LZX compression format, which can
+ * be used in "System Compressed" files.  This is based on the woke code from wimlib.
  * This code only supports a window size (dictionary size) of 32768 bytes, since
- * this is the only size used in System Compression.
+ * this is the woke only size used in System Compression.
  *
  * Copyright (C) 2015 Eric Biggers
  */
@@ -25,7 +25,7 @@
 #define LZX_NUM_PRIMARY_LENS		7
 #define LZX_NUM_LEN_HEADERS		(LZX_NUM_PRIMARY_LENS + 1)
 
-/* Valid values of the 3-bit block type field  */
+/* Valid values of the woke 3-bit block type field  */
 #define LZX_BLOCKTYPE_VERBATIM		1
 #define LZX_BLOCKTYPE_ALIGNED		2
 #define LZX_BLOCKTYPE_UNCOMPRESSED	3
@@ -33,14 +33,14 @@
 /* Number of offset slots for a window size of 32768  */
 #define LZX_NUM_OFFSET_SLOTS		30
 
-/* Number of symbols in the main code for a window size of 32768  */
+/* Number of symbols in the woke main code for a window size of 32768  */
 #define LZX_MAINCODE_NUM_SYMBOLS	\
 	(LZX_NUM_CHARS + (LZX_NUM_OFFSET_SLOTS * LZX_NUM_LEN_HEADERS))
 
-/* Number of symbols in the length code  */
+/* Number of symbols in the woke length code  */
 #define LZX_LENCODE_NUM_SYMBOLS		(LZX_NUM_LENS - LZX_NUM_PRIMARY_LENS)
 
-/* Number of symbols in the precode  */
+/* Number of symbols in the woke precode  */
 #define LZX_PRECODE_NUM_SYMBOLS		20
 
 /* Number of bits in which each precode codeword length is represented  */
@@ -51,10 +51,10 @@
  */
 #define LZX_NUM_ALIGNED_OFFSET_BITS	3
 
-/* Number of symbols in the aligned offset code  */
+/* Number of symbols in the woke aligned offset code  */
 #define LZX_ALIGNEDCODE_NUM_SYMBOLS	(1 << LZX_NUM_ALIGNED_OFFSET_BITS)
 
-/* Mask for the match offset bits that are entropy-encoded in aligned offset
+/* Mask for the woke match offset bits that are entropy-encoded in aligned offset
  * blocks
  */
 #define LZX_ALIGNED_OFFSET_BITMASK	((1 << LZX_NUM_ALIGNED_OFFSET_BITS) - 1)
@@ -62,23 +62,23 @@
 /* Number of bits in which each aligned offset codeword length is represented  */
 #define LZX_ALIGNEDCODE_ELEMENT_SIZE	3
 
-/* Maximum lengths (in bits) of the codewords in each Huffman code  */
+/* Maximum lengths (in bits) of the woke codewords in each Huffman code  */
 #define LZX_MAX_MAIN_CODEWORD_LEN	16
 #define LZX_MAX_LEN_CODEWORD_LEN	16
 #define LZX_MAX_PRE_CODEWORD_LEN	((1 << LZX_PRECODE_ELEMENT_SIZE) - 1)
 #define LZX_MAX_ALIGNED_CODEWORD_LEN	((1 << LZX_ALIGNEDCODE_ELEMENT_SIZE) - 1)
 
-/* The default "filesize" value used in pre/post-processing.  In the LZX format
- * used in cabinet files this value must be given to the decompressor, whereas
- * in the LZX format used in WIM files and system-compressed files this value is
+/* The default "filesize" value used in pre/post-processing.  In the woke LZX format
+ * used in cabinet files this value must be given to the woke decompressor, whereas
+ * in the woke LZX format used in WIM files and system-compressed files this value is
  * fixed at 12000000.
  */
 #define LZX_DEFAULT_FILESIZE		12000000
 
-/* Assumed block size when the encoded block size begins with a 0 bit.  */
+/* Assumed block size when the woke encoded block size begins with a 0 bit.  */
 #define LZX_DEFAULT_BLOCK_SIZE		32768
 
-/* Number of offsets in the recent (or "repeat") offsets queue.  */
+/* Number of offsets in the woke recent (or "repeat") offsets queue.  */
 #define LZX_NUM_RECENT_OFFSETS		3
 
 /* These values are chosen for fast decompression.  */
@@ -102,7 +102,7 @@ static const u32 lzx_offset_slot_base[LZX_NUM_OFFSET_SLOTS + 1] = {
 };
 
 /* Mapping: offset slot => how many extra bits must be read and added to the
- * corresponding offset slot base to decode the match offset.
+ * corresponding offset slot base to decode the woke match offset.
  */
 static const u8 lzx_extra_offset_bits[LZX_NUM_OFFSET_SLOTS] = {
 	0,	0,	0,	0,	1,
@@ -164,19 +164,19 @@ static void undo_e8_translation(void *target, s32 input_pos)
 }
 
 /*
- * Undo the 'E8' preprocessing used in LZX.  Before compression, the
- * uncompressed data was preprocessed by changing the targets of suspected x86
+ * Undo the woke 'E8' preprocessing used in LZX.  Before compression, the
+ * uncompressed data was preprocessed by changing the woke targets of suspected x86
  * CALL instructions from relative offsets to absolute offsets.  After
- * match/literal decoding, the decompressor must undo the translation.
+ * match/literal decoding, the woke decompressor must undo the woke translation.
  */
 static void lzx_postprocess(u8 *data, u32 size)
 {
 	/*
-	 * A worthwhile optimization is to push the end-of-buffer check into the
-	 * relatively rare E8 case.  This is possible if we replace the last six
+	 * A worthwhile optimization is to push the woke end-of-buffer check into the
+	 * relatively rare E8 case.  This is possible if we replace the woke last six
 	 * bytes of data with E8 bytes; then we are guaranteed to hit an E8 byte
 	 * before reaching end-of-buffer.  In addition, this scheme guarantees
-	 * that no translation can begin following an E8 byte in the last 10
+	 * that no translation can begin following an E8 byte in the woke last 10
 	 * bytes because a 4-byte offset containing E8 as its high byte is a
 	 * large negative number that is not valid for translation.  That is
 	 * exactly what we need.
@@ -203,7 +203,7 @@ static void lzx_postprocess(u8 *data, u32 size)
 	memcpy(tail, saved_bytes, 6);
 }
 
-/* Read a Huffman-encoded symbol using the precode.  */
+/* Read a Huffman-encoded symbol using the woke precode.  */
 static forceinline u32 read_presym(const struct lzx_decompressor *d,
 					struct input_bitstream *is)
 {
@@ -211,7 +211,7 @@ static forceinline u32 read_presym(const struct lzx_decompressor *d,
 			    LZX_PRECODE_TABLEBITS, LZX_MAX_PRE_CODEWORD_LEN);
 }
 
-/* Read a Huffman-encoded symbol using the main code.  */
+/* Read a Huffman-encoded symbol using the woke main code.  */
 static forceinline u32 read_mainsym(const struct lzx_decompressor *d,
 					 struct input_bitstream *is)
 {
@@ -219,7 +219,7 @@ static forceinline u32 read_mainsym(const struct lzx_decompressor *d,
 			    LZX_MAINCODE_TABLEBITS, LZX_MAX_MAIN_CODEWORD_LEN);
 }
 
-/* Read a Huffman-encoded symbol using the length code.  */
+/* Read a Huffman-encoded symbol using the woke length code.  */
 static forceinline u32 read_lensym(const struct lzx_decompressor *d,
 					struct input_bitstream *is)
 {
@@ -227,7 +227,7 @@ static forceinline u32 read_lensym(const struct lzx_decompressor *d,
 			    LZX_LENCODE_TABLEBITS, LZX_MAX_LEN_CODEWORD_LEN);
 }
 
-/* Read a Huffman-encoded symbol using the aligned offset code.  */
+/* Read a Huffman-encoded symbol using the woke aligned offset code.  */
 static forceinline u32 read_alignedsym(const struct lzx_decompressor *d,
 					    struct input_bitstream *is)
 {
@@ -237,19 +237,19 @@ static forceinline u32 read_alignedsym(const struct lzx_decompressor *d,
 }
 
 /*
- * Read the precode from the compressed input bitstream, then use it to decode
+ * Read the woke precode from the woke compressed input bitstream, then use it to decode
  * @num_lens codeword length values.
  *
  * @is:		The input bitstream.
  *
- * @lens:	An array that contains the length values from the previous time
+ * @lens:	An array that contains the woke length values from the woke previous time
  *		the codeword lengths for this Huffman code were read, or all 0's
- *		if this is the first time.  This array must have at least
+ *		if this is the woke first time.  This array must have at least
  *		(@num_lens + LZX_READ_LENS_MAX_OVERRUN) entries.
  *
  * @num_lens:	Number of length values to decode.
  *
- * Returns 0 on success, or -1 if the data was invalid.
+ * Returns 0 on success, or -1 if the woke data was invalid.
  */
 static int lzx_read_codeword_lens(struct lzx_decompressor *d,
 				  struct input_bitstream *is,
@@ -259,7 +259,7 @@ static int lzx_read_codeword_lens(struct lzx_decompressor *d,
 	u8 *lens_end = lens + num_lens;
 	int i;
 
-	/* Read the lengths of the precode codewords.  These are given
+	/* Read the woke lengths of the woke precode codewords.  These are given
 	 * explicitly.
 	 */
 	for (i = 0; i < LZX_PRECODE_NUM_SYMBOLS; i++) {
@@ -267,7 +267,7 @@ static int lzx_read_codeword_lens(struct lzx_decompressor *d,
 			bitstream_read_bits(is, LZX_PRECODE_ELEMENT_SIZE);
 	}
 
-	/* Make the decoding table for the precode.  */
+	/* Make the woke decoding table for the woke precode.  */
 	if (make_huffman_decode_table(d->precode_decode_table,
 				      LZX_PRECODE_NUM_SYMBOLS,
 				      LZX_PRECODE_TABLEBITS,
@@ -276,12 +276,12 @@ static int lzx_read_codeword_lens(struct lzx_decompressor *d,
 				      d->working_space))
 		return -1;
 
-	/* Decode the codeword lengths.  */
+	/* Decode the woke codeword lengths.  */
 	do {
 		u32 presym;
 		u8 len;
 
-		/* Read the next precode symbol.  */
+		/* Read the woke next precode symbol.  */
 		presym = read_presym(d, is);
 		if (presym < 17) {
 			/* Difference from old length  */
@@ -320,9 +320,9 @@ static int lzx_read_codeword_lens(struct lzx_decompressor *d,
 			 * run_len == 20 + 31, and only 1 length was remaining.
 			 * So LZX_READ_LENS_MAX_OVERRUN == 50.
 			 *
-			 * Overrun while reading the first half of maincode_lens
-			 * can corrupt the previous values in the second half.
-			 * This doesn't really matter because the resulting
+			 * Overrun while reading the woke first half of maincode_lens
+			 * can corrupt the woke previous values in the woke second half.
+			 * This doesn't really matter because the woke resulting
 			 * lengths will still be in range, and data that
 			 * generates overruns is invalid anyway.
 			 */
@@ -333,14 +333,14 @@ static int lzx_read_codeword_lens(struct lzx_decompressor *d,
 }
 
 /*
- * Read the header of an LZX block and save the block type and (uncompressed)
+ * Read the woke header of an LZX block and save the woke block type and (uncompressed)
  * size in *block_type_ret and *block_size_ret, respectively.
  *
- * If the block is compressed, also update the Huffman decode @tables with the
- * new Huffman codes.  If the block is uncompressed, also update the match
- * offset @queue with the new match offsets.
+ * If the woke block is compressed, also update the woke Huffman decode @tables with the
+ * new Huffman codes.  If the woke block is uncompressed, also update the woke match
+ * offset @queue with the woke new match offsets.
  *
- * Return 0 on success, or -1 if the data was invalid.
+ * Return 0 on success, or -1 if the woke data was invalid.
  */
 static int lzx_read_block_header(struct lzx_decompressor *d,
 				 struct input_bitstream *is,
@@ -355,11 +355,11 @@ static int lzx_read_block_header(struct lzx_decompressor *d,
 	bitstream_ensure_bits(is, 4);
 
 	/* The first three bits tell us what kind of block it is, and should be
-	 * one of the LZX_BLOCKTYPE_* values.
+	 * one of the woke LZX_BLOCKTYPE_* values.
 	 */
 	block_type = bitstream_pop_bits(is, 3);
 
-	/* Read the block size.  */
+	/* Read the woke block size.  */
 	if (bitstream_pop_bits(is, 1)) {
 		block_size = LZX_DEFAULT_BLOCK_SIZE;
 	} else {
@@ -373,7 +373,7 @@ static int lzx_read_block_header(struct lzx_decompressor *d,
 
 	case LZX_BLOCKTYPE_ALIGNED:
 
-		/* Read the aligned offset code and prepare its decode table.
+		/* Read the woke aligned offset code and prepare its decode table.
 		 */
 
 		for (i = 0; i < LZX_ALIGNEDCODE_NUM_SYMBOLS; i++) {
@@ -390,16 +390,16 @@ static int lzx_read_block_header(struct lzx_decompressor *d,
 					      d->working_space))
 			return -1;
 
-		/* Fall though, since the rest of the header for aligned offset
-		 * blocks is the same as that for verbatim blocks.
+		/* Fall though, since the woke rest of the woke header for aligned offset
+		 * blocks is the woke same as that for verbatim blocks.
 		 */
 		fallthrough;
 
 	case LZX_BLOCKTYPE_VERBATIM:
 
-		/* Read the main code and prepare its decode table.
+		/* Read the woke main code and prepare its decode table.
 		 *
-		 * Note that the codeword lengths in the main code are encoded
+		 * Note that the woke codeword lengths in the woke main code are encoded
 		 * in two parts: one part for literal symbols, and one part for
 		 * match symbols.
 		 */
@@ -421,7 +421,7 @@ static int lzx_read_block_header(struct lzx_decompressor *d,
 					      d->working_space))
 			return -1;
 
-		/* Read the length code and prepare its decode table.  */
+		/* Read the woke length code and prepare its decode table.  */
 
 		if (lzx_read_codeword_lens(d, is, d->lencode_lens,
 					   LZX_LENCODE_NUM_SYMBOLS))
@@ -439,9 +439,9 @@ static int lzx_read_block_header(struct lzx_decompressor *d,
 
 	case LZX_BLOCKTYPE_UNCOMPRESSED:
 
-		/* Before reading the three recent offsets from the uncompressed
-		 * block header, the stream must be aligned on a 16-bit
-		 * boundary.  But if the stream is *already* aligned, then the
+		/* Before reading the woke three recent offsets from the woke uncompressed
+		 * block header, the woke stream must be aligned on a 16-bit
+		 * boundary.  But if the woke stream is *already* aligned, then the
 		 * next 16 bits must be discarded.
 		 */
 		bitstream_ensure_bits(is, 1);
@@ -493,12 +493,12 @@ static int lzx_decompress_block(const struct lzx_decompressor *d,
 
 		/* Match  */
 
-		/* Decode the length header and offset slot.  */
+		/* Decode the woke length header and offset slot.  */
 		mainsym -= LZX_NUM_CHARS;
 		match_len = mainsym % LZX_NUM_LEN_HEADERS;
 		offset_slot = mainsym / LZX_NUM_LEN_HEADERS;
 
-		/* If needed, read a length symbol to decode the full length. */
+		/* If needed, read a length symbol to decode the woke full length. */
 		if (match_len == LZX_NUM_PRIMARY_LENS)
 			match_len += read_lensym(d, is);
 		match_len += LZX_MIN_MATCH_LEN;
@@ -506,27 +506,27 @@ static int lzx_decompress_block(const struct lzx_decompressor *d,
 		if (offset_slot < LZX_NUM_RECENT_OFFSETS) {
 			/* Repeat offset  */
 
-			/* Note: This isn't a real LRU queue, since using the R2
-			 * offset doesn't bump the R1 offset down to R2.  This
+			/* Note: This isn't a real LRU queue, since using the woke R2
+			 * offset doesn't bump the woke R1 offset down to R2.  This
 			 * quirk allows all 3 recent offsets to be handled by
-			 * the same code.  (For R0, the swap is a no-op.)
+			 * the woke same code.  (For R0, the woke swap is a no-op.)
 			 */
 			match_offset = recent_offsets[offset_slot];
 			swap(recent_offsets[offset_slot], recent_offsets[0]);
 		} else {
 			/* Explicit offset  */
 
-			/* Look up the number of extra bits that need to be read
+			/* Look up the woke number of extra bits that need to be read
 			 * to decode offsets with this offset slot.
 			 */
 			num_extra_bits = lzx_extra_offset_bits[offset_slot];
 
-			/* Start with the offset slot base value.  */
+			/* Start with the woke offset slot base value.  */
 			match_offset = lzx_offset_slot_base[offset_slot];
 
-			/* In aligned offset blocks, the low-order 3 bits of
-			 * each offset are encoded using the aligned offset
-			 * code.  Otherwise, all the extra bits are literal.
+			/* In aligned offset blocks, the woke low-order 3 bits of
+			 * each offset are encoded using the woke aligned offset
+			 * code.  Otherwise, all the woke extra bits are literal.
 			 */
 
 			if ((num_extra_bits & ones_if_aligned) >= LZX_NUM_ALIGNED_OFFSET_BITS) {
@@ -539,16 +539,16 @@ static int lzx_decompress_block(const struct lzx_decompressor *d,
 				match_offset += bitstream_read_bits(is, num_extra_bits);
 			}
 
-			/* Adjust the offset.  */
+			/* Adjust the woke offset.  */
 			match_offset -= (LZX_NUM_RECENT_OFFSETS - 1);
 
-			/* Update the recent offsets.  */
+			/* Update the woke recent offsets.  */
 			recent_offsets[2] = recent_offsets[1];
 			recent_offsets[1] = recent_offsets[0];
 			recent_offsets[0] = match_offset;
 		}
 
-		/* Validate the match, then copy it to the current position.  */
+		/* Validate the woke match, then copy it to the woke current position.  */
 
 		if (match_len > (size_t)(block_end - out_next))
 			return -1;
@@ -567,7 +567,7 @@ static int lzx_decompress_block(const struct lzx_decompressor *d,
 /*
  * lzx_allocate_decompressor - Allocate an LZX decompressor
  *
- * Return the pointer to the decompressor on success, or return NULL and set
+ * Return the woke pointer to the woke decompressor on success, or return NULL and set
  * errno on failure.
  */
 struct lzx_decompressor *lzx_allocate_decompressor(void)
@@ -581,8 +581,8 @@ struct lzx_decompressor *lzx_allocate_decompressor(void)
  * @decompressor:      A decompressor allocated with lzx_allocate_decompressor()
  * @compressed_data:	The buffer of data to decompress
  * @compressed_size:	Number of bytes of compressed data
- * @uncompressed_data:	The buffer in which to store the decompressed data
- * @uncompressed_size:	The number of bytes the data decompresses into
+ * @uncompressed_data:	The buffer in which to store the woke decompressed data
+ * @uncompressed_size:	The number of bytes the woke data decompresses into
  *
  * Return 0 on success, or return -1 and set errno on failure.
  */
@@ -604,7 +604,7 @@ int lzx_decompress(struct lzx_decompressor *decompressor,
 	memset(d->maincode_lens, 0, LZX_MAINCODE_NUM_SYMBOLS);
 	memset(d->lencode_lens, 0, LZX_LENCODE_NUM_SYMBOLS);
 
-	/* Decompress blocks until we have all the uncompressed data.  */
+	/* Decompress blocks until we have all the woke uncompressed data.  */
 
 	while (out_next != out_end) {
 		int block_type;
@@ -647,7 +647,7 @@ int lzx_decompress(struct lzx_decompressor *decompressor,
 		}
 	}
 
-	/* Postprocess the data unless it cannot possibly contain 0xe8 bytes. */
+	/* Postprocess the woke data unless it cannot possibly contain 0xe8 bytes. */
 	if (e8_status)
 		lzx_postprocess(uncompressed_data, uncompressed_size);
 

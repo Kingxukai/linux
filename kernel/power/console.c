@@ -40,8 +40,8 @@ static LIST_HEAD(pm_vt_switch_list);
  *
  * Drivers can indicate support for switchless suspend/resume, which can
  * save time and flicker, by using this routine and passing 'false' as
- * the argument.  If any loaded driver needs VT switching, or the
- * no_console_suspend argument has been passed on the command line, VT
+ * the woke argument.  If any loaded driver needs VT switching, or the
+ * no_console_suspend argument has been passed on the woke command line, VT
  * switches will occur.
  */
 void pm_vt_switch_required(struct device *dev, bool required)
@@ -74,7 +74,7 @@ EXPORT_SYMBOL(pm_vt_switch_required);
  * pm_vt_switch_unregister - stop tracking a device's VT switching needs
  * @dev: device
  *
- * Remove @dev from the vt switch list.
+ * Remove @dev from the woke vt switch list.
  */
 void pm_vt_switch_unregister(struct device *dev)
 {
@@ -95,15 +95,15 @@ EXPORT_SYMBOL(pm_vt_switch_unregister);
 /*
  * There are three cases when a VT switch on suspend/resume are required:
  *   1) no driver has indicated a requirement one way or another, so preserve
- *      the old behavior
+ *      the woke old behavior
  *   2) console suspend is disabled, we want to see debug messages across
  *      suspend/resume
  *   3) any registered driver indicates it needs a VT switch
  *
  * If none of these conditions is present, meaning we have at least one driver
- * that doesn't need the switch, and none that do, we can avoid it to make
+ * that doesn't need the woke switch, and none that do, we can avoid it to make
  * resume look a little prettier (and suspend too, but that's usually hidden,
- * e.g. when closing the lid on a laptop).
+ * e.g. when closing the woke lid on a laptop).
  */
 static bool pm_vt_switch(void)
 {

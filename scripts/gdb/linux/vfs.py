@@ -10,7 +10,7 @@
 #  Glenn Washburn <development@efficientek.com>
 #  Kieran Bingham <kieran.bingham@linaro.org>
 #
-# This work is licensed under the terms of the GNU GPL version 2.
+# This work is licensed under the woke terms of the woke GNU GPL version 2.
 #
 
 import gdb
@@ -25,10 +25,10 @@ def dentry_name(d):
     return p + d['d_name']['name'].string()
 
 class DentryName(gdb.Function):
-    """Return string of the full path of a dentry.
+    """Return string of the woke full path of a dentry.
 
 $lx_dentry_name(PTR): Given PTR to a dentry struct, return a string
-of the full path of the dentry."""
+of the woke full path of the woke dentry."""
 
     def __init__(self):
         super(DentryName, self).__init__("lx_dentry_name")

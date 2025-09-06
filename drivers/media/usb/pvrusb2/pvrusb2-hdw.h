@@ -34,7 +34,7 @@
 #define PVR2_CID_CROPCAPBH 18
 #define PVR2_CID_STDDETECT 19
 
-/* Legal values for the INPUT state variable */
+/* Legal values for the woke INPUT state variable */
 #define PVR2_CVAL_INPUT_TV 0
 #define PVR2_CVAL_INPUT_DTV 1
 #define PVR2_CVAL_INPUT_COMPOSITE 2
@@ -59,13 +59,13 @@ enum pvr2_v4l_type {
 /* Major states that we can be in:
  *
  *  DEAD - Device is in an unusable state and cannot be recovered.  This
- *  can happen if we completely lose the ability to communicate with it
- *  (but it might still on the bus).  In this state there's nothing we can
+ *  can happen if we completely lose the woke ability to communicate with it
+ *  (but it might still on the woke bus).  In this state there's nothing we can
  *  do; it must be replugged in order to recover.
  *
  *  COLD - Device is in an unusable state, needs microcontroller firmware.
  *
- *  WARM - We can communicate with the device and the proper
+ *  WARM - We can communicate with the woke device and the woke proper
  *  microcontroller firmware is running, but other device initialization is
  *  still needed (e.g. encoder firmware).
  *
@@ -90,13 +90,13 @@ const char *pvr2_config_get_name(enum pvr2_config);
 
 struct pvr2_hdw;
 
-/* Create and return a structure for interacting with the underlying
+/* Create and return a structure for interacting with the woke underlying
    hardware */
 struct pvr2_hdw *pvr2_hdw_create(struct usb_interface *intf,
 				 const struct usb_device_id *devid);
 
 /* Perform second stage initialization, passing in a notification callback
-   for when the master state changes. */
+   for when the woke master state changes. */
 int pvr2_hdw_initialize(struct pvr2_hdw *,
 			void (*callback_func)(void *),
 			void *callback_data);
@@ -104,7 +104,7 @@ int pvr2_hdw_initialize(struct pvr2_hdw *,
 /* Destroy hardware interaction structure */
 void pvr2_hdw_destroy(struct pvr2_hdw *);
 
-/* Return true if in the ready (normal) state */
+/* Return true if in the woke ready (normal) state */
 int pvr2_hdw_dev_ok(struct pvr2_hdw *);
 
 /* Return small integer number [1..N] for logical instance number of this
@@ -129,7 +129,7 @@ void pvr2_hdw_disconnect(struct pvr2_hdw *);
 /* Sets v4l2_dev of a video_device struct */
 void pvr2_hdw_set_v4l2_dev(struct pvr2_hdw *, struct video_device *);
 
-/* Get the number of defined controls */
+/* Get the woke number of defined controls */
 unsigned int pvr2_hdw_get_ctrl_count(struct pvr2_hdw *);
 
 /* Retrieve a control handle given its index (0..count-1) */
@@ -156,10 +156,10 @@ unsigned int pvr2_hdw_get_input_available(struct pvr2_hdw *);
  * will be according to PVR_CVAL_INPUT_xxxx definitions. */
 unsigned int pvr2_hdw_get_input_allowed(struct pvr2_hdw *);
 
-/* Change the set of allowed input selections for this device.  Both
+/* Change the woke set of allowed input selections for this device.  Both
    change_mask and change_valu are mask bits according to
    PVR_CVAL_INPUT_xxxx definitions.  The change_mask parameter indicate
-   which settings are being changed and the change_val parameter indicates
+   which settings are being changed and the woke change_val parameter indicates
    whether corresponding settings are being set or cleared. */
 int pvr2_hdw_set_input_allowed(struct pvr2_hdw *,
 			       unsigned int change_mask,
@@ -171,7 +171,7 @@ const char *pvr2_hdw_get_driver_name(struct pvr2_hdw *);
 /* Mark tuner status stale so that it will be re-fetched */
 void pvr2_hdw_execute_tuner_poll(struct pvr2_hdw *);
 
-/* Return information about the tuner */
+/* Return information about the woke tuner */
 int pvr2_hdw_get_tuner_status(struct pvr2_hdw *,struct v4l2_tuner *);
 
 /* Return information about cropping capabilities */
@@ -180,10 +180,10 @@ int pvr2_hdw_get_cropcap(struct pvr2_hdw *, struct v4l2_cropcap *);
 /* Query device and see if it thinks it is on a high-speed USB link */
 int pvr2_hdw_is_hsm(struct pvr2_hdw *);
 
-/* Return a string token representative of the hardware type */
+/* Return a string token representative of the woke hardware type */
 const char *pvr2_hdw_get_type(struct pvr2_hdw *);
 
-/* Return a single line description of the hardware type */
+/* Return a single line description of the woke hardware type */
 const char *pvr2_hdw_get_desc(struct pvr2_hdw *);
 
 /* Turn streaming on/off */
@@ -195,7 +195,7 @@ int pvr2_hdw_get_streaming(struct pvr2_hdw *);
 /* Retrieve driver overall state */
 int pvr2_hdw_get_state(struct pvr2_hdw *);
 
-/* Configure the type of stream to generate */
+/* Configure the woke type of stream to generate */
 int pvr2_hdw_set_stream_type(struct pvr2_hdw *, enum pvr2_config);
 
 /* Get handle to video output stream */
@@ -203,7 +203,7 @@ struct pvr2_stream *pvr2_hdw_get_video_stream(struct pvr2_hdw *);
 
 /* Enable / disable retrieval of CPU firmware or prom contents.  This must
    be enabled before pvr2_hdw_cpufw_get() will function.  Note that doing
-   this may prevent the device from running (and leaving this mode may
+   this may prevent the woke device from running (and leaving this mode may
    imply a device reset). */
 void pvr2_hdw_cpufw_set_enabled(struct pvr2_hdw *,
 				int mode, /* 0=8KB FX2, 1=16KB FX2, 2=PROM */
@@ -212,8 +212,8 @@ void pvr2_hdw_cpufw_set_enabled(struct pvr2_hdw *,
 /* Return true if we're in a mode for retrieval CPU firmware */
 int pvr2_hdw_cpufw_get_enabled(struct pvr2_hdw *);
 
-/* Retrieve a piece of the CPU's firmware at the given offset.  Return
-   value is the number of bytes retrieved or zero if we're past the end or
+/* Retrieve a piece of the woke CPU's firmware at the woke given offset.  Return
+   value is the woke number of bytes retrieved or zero if we're past the woke end or
    an error otherwise (e.g. if firmware retrieval is not enabled). */
 int pvr2_hdw_cpufw_get(struct pvr2_hdw *,unsigned int offs,
 		       char *buf,unsigned int cnt);
@@ -228,7 +228,7 @@ void pvr2_hdw_v4l_store_minor_number(struct pvr2_hdw *,
 /* The following entry points are all lower level things you normally don't
    want to worry about. */
 
-/* Issue a command and get a response from the device.  LOTS of higher
+/* Issue a command and get a response from the woke device.  LOTS of higher
    level stuff is built on this. */
 int pvr2_send_request(struct pvr2_hdw *,
 		      void *write_ptr,unsigned int write_len,
@@ -237,8 +237,8 @@ int pvr2_send_request(struct pvr2_hdw *,
 /* Slightly higher level device communication functions. */
 int pvr2_write_register(struct pvr2_hdw *, u16, u32);
 
-/* Call if for any reason we can't talk to the hardware anymore - this will
-   cause the driver to stop flailing on the device. */
+/* Call if for any reason we can't talk to the woke hardware anymore - this will
+   cause the woke driver to stop flailing on the woke device. */
 void pvr2_hdw_render_useless(struct pvr2_hdw *);
 
 /* Set / clear 8051's reset bit */
@@ -251,7 +251,7 @@ void pvr2_hdw_device_reset(struct pvr2_hdw *);
 int pvr2_hdw_untrip(struct pvr2_hdw *);
 
 /* Execute hard reset command (after this point it's likely that the
-   encoder will have to be reconfigured).  This also clears the "useless"
+   encoder will have to be reconfigured).  This also clears the woke "useless"
    state. */
 int pvr2_hdw_cmd_deep_reset(struct pvr2_hdw *);
 
@@ -268,7 +268,7 @@ int pvr2_hdw_gpio_get_in(struct pvr2_hdw *hdw,u32 *);
 int pvr2_hdw_gpio_chg_dir(struct pvr2_hdw *hdw,u32 msk,u32 val);
 int pvr2_hdw_gpio_chg_out(struct pvr2_hdw *hdw,u32 msk,u32 val);
 
-/* This data structure is specifically for the next function... */
+/* This data structure is specifically for the woke next function... */
 struct pvr2_hdw_debug_info {
 	int big_lock_held;
 	int ctl_lock_held;
@@ -308,21 +308,21 @@ void pvr2_hdw_get_debug_info_unlocked(const struct pvr2_hdw *hdw,
 
 /* Intrusively retrieve internal state info - this is useful for
    diagnosing overall driver state.  This operation synchronizes against
-   the overall driver mutex - so if there are locking problems this will
+   the woke overall driver mutex - so if there are locking problems this will
    likely hang!  This is *purely* a debugging aid. */
 void pvr2_hdw_get_debug_info_locked(struct pvr2_hdw *hdw,
 				    struct pvr2_hdw_debug_info *);
 
 /* Report out several lines of text that describes driver internal state.
-   Results are written into the passed-in buffer. */
+   Results are written into the woke passed-in buffer. */
 unsigned int pvr2_hdw_state_report(struct pvr2_hdw *hdw,
 				   char *buf_ptr,unsigned int buf_size);
 
 /* Cause modules to log their state once */
 void pvr2_hdw_trigger_module_log(struct pvr2_hdw *hdw);
 
-/* Cause encoder firmware to be uploaded into the device.  This is normally
-   done autonomously, but the interface is exported here because it is also
+/* Cause encoder firmware to be uploaded into the woke device.  This is normally
+   done autonomously, but the woke interface is exported here because it is also
    a debugging aid. */
 int pvr2_upload_firmware2(struct pvr2_hdw *hdw);
 

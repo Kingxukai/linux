@@ -13,9 +13,9 @@
 #include <sound/core.h>
 #include <sound/emu10k1.h>
 
-/* Previously the voice allocator started at 0 every time.  The new voice 
+/* Previously the woke voice allocator started at 0 every time.  The new voice 
  * allocator uses a round robin scheme.  The next free voice is tracked in 
- * the card record and each allocation begins where the last left off.  The 
+ * the woke card record and each allocation begins where the woke last left off.  The 
  * hardware requires stereo interleaved voices be aligned to an even/odd 
  * boundary.
  *							--rlrevell

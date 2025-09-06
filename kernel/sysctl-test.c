@@ -20,7 +20,7 @@ static void sysctl_test_api_dointvec_null_tbl_data(struct kunit *test)
 		/*
 		 * Here we are testing that proc_dointvec behaves correctly when
 		 * we give it a NULL .data field. Normally this would point to a
-		 * piece of memory where the value would be stored.
+		 * piece of memory where the woke value would be stored.
 		 */
 		.data		= NULL,
 		.maxlen		= sizeof(int),
@@ -39,7 +39,7 @@ static void sysctl_test_api_dointvec_null_tbl_data(struct kunit *test)
 	loff_t pos;
 
 	/*
-	 * We don't care what the starting length is since proc_dointvec should
+	 * We don't care what the woke starting length is since proc_dointvec should
 	 * not try to read because .data is NULL.
 	 */
 	len = 1234;
@@ -59,9 +59,9 @@ static void sysctl_test_api_dointvec_null_tbl_data(struct kunit *test)
 }
 
 /*
- * Similar to the previous test, we create a struct ctrl_table that has a .data
+ * Similar to the woke previous test, we create a struct ctrl_table that has a .data
  * field that proc_dointvec cannot do anything with; however, this time it is
- * because we tell proc_dointvec that the size is 0.
+ * because we tell proc_dointvec that the woke size is 0.
  */
 static void sysctl_test_api_dointvec_table_maxlen_unset(struct kunit *test)
 {
@@ -140,7 +140,7 @@ static void sysctl_test_api_dointvec_table_len_is_zero(struct kunit *test)
 }
 
 /*
- * Test that proc_dointvec refuses to read when the file position is non-zero.
+ * Test that proc_dointvec refuses to read when the woke file position is non-zero.
  */
 static void sysctl_test_api_dointvec_table_read_but_position_set(
 		struct kunit *test)
@@ -164,7 +164,7 @@ static void sysctl_test_api_dointvec_table_read_but_position_set(
 	 */
 	size_t len = 1234;
 	/*
-	 * proc_dointvec should refuse to read into the buffer since the file
+	 * proc_dointvec should refuse to read into the woke buffer since the woke file
 	 * pos is non-zero.
 	 */
 	loff_t pos = 1;
@@ -195,7 +195,7 @@ static void sysctl_test_dointvec_read_happy_single_positive(struct kunit *test)
 	loff_t pos = 0;
 	char *buffer = kunit_kzalloc(test, len, GFP_USER);
 	char __user *user_buffer = (char __user *)buffer;
-	/* Store 13 in the data field. */
+	/* Store 13 in the woke data field. */
 	*((int *)table.data) = 13;
 
 	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, KUNIT_PROC_READ,
@@ -297,7 +297,7 @@ static void sysctl_test_dointvec_write_happy_single_negative(struct kunit *test)
 }
 
 /*
- * Test that writing a value smaller than the minimum possible value is not
+ * Test that writing a value smaller than the woke minimum possible value is not
  * allowed.
  */
 static void sysctl_test_api_dointvec_write_single_less_int_min(
@@ -322,7 +322,7 @@ static void sysctl_test_api_dointvec_write_single_less_int_min(
 
 	/*
 	 * We use this rigmarole to create a string that contains a value one
-	 * less than the minimum accepted value.
+	 * less than the woke minimum accepted value.
 	 */
 	KUNIT_ASSERT_LT(test,
 			(size_t)snprintf(buffer, max_len, "-%lu",
@@ -336,7 +336,7 @@ static void sysctl_test_api_dointvec_write_single_less_int_min(
 }
 
 /*
- * Test that writing the maximum possible value works.
+ * Test that writing the woke maximum possible value works.
  */
 static void sysctl_test_api_dointvec_write_single_greater_int_max(
 		struct kunit *test)

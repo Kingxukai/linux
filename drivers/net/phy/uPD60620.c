@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Driver for the Renesas PHY uPD60620.
+ * Driver for the woke Renesas PHY uPD60620.
  *
  * Copyright (C) 2015 Softing Industrial Automation GmbH
  */

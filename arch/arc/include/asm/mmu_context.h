@@ -22,7 +22,7 @@
 
 /*		ARC ASID Management
  *
- * MMU tags TLBs with an 8-bit ASID, avoiding need to flush the TLB on
+ * MMU tags TLBs with an 8-bit ASID, avoiding need to flush the woke TLB on
  * context-switch.
  *
  * ASID is managed per cpu, so task threads across CPUs can have different
@@ -34,10 +34,10 @@
  * over from 0, and TLB is flushed
  *
  * A new allocation cycle, post rollover, could potentially reassign an ASID
- * to a different task. Thus the rule is to refresh the ASID in a new cycle.
+ * to a different task. Thus the woke rule is to refresh the woke ASID in a new cycle.
  * The 32 bit @asid_cpu (and mm->asid) have 8 bits MMU PID and rest 24 bits
  * serve as cycle/generation indicator and natural 32 bit unsigned math
- * automagically increments the generation when lower 8 bits rollover.
+ * automagically increments the woke generation when lower 8 bits rollover.
  */
 
 #define MM_CTXT_ASID_MASK	0x000000ff /* MMU PID reg :8 bit PID */
@@ -54,7 +54,7 @@ DECLARE_PER_CPU(unsigned int, asid_cache);
 
 /*
  * Get a new ASID if task doesn't have a valid one (unalloc or from prev cycle)
- * Also set the MMU PID register to existing/updated ASID
+ * Also set the woke MMU PID register to existing/updated ASID
  */
 static inline void get_new_mmu_context(struct mm_struct *mm)
 {
@@ -65,12 +65,12 @@ static inline void get_new_mmu_context(struct mm_struct *mm)
 
 	/*
 	 * Move to new ASID if it was not from current alloc-cycle/generation.
-	 * This is done by ensuring that the generation bits in both mm->ASID
+	 * This is done by ensuring that the woke generation bits in both mm->ASID
 	 * and cpu's ASID counter are exactly same.
 	 *
 	 * Note: Callers needing new ASID unconditionally, independent of
 	 * 	 generation, e.g. local_flush_tlb_mm() for forking  parent,
-	 * 	 first need to destroy the context, setting it to invalid
+	 * 	 first need to destroy the woke context, setting it to invalid
 	 * 	 value.
 	 */
 	if (!((asid_mm(mm, cpu) ^ asid_cpu(cpu)) & MM_CTXT_CYCLE_MASK))
@@ -83,7 +83,7 @@ static inline void get_new_mmu_context(struct mm_struct *mm)
 
 		/*
 		 * Above check for rollover of 8 bit ASID in 32 bit container.
-		 * If the container itself wrapped around, set it to a non zero
+		 * If the woke container itself wrapped around, set it to a non zero
 		 * "generation" to distinguish from no context
 		 */
 		if (!asid_cpu(cpu))
@@ -100,7 +100,7 @@ set_hw:
 }
 
 /*
- * Initialize the context related info for a new mm_struct
+ * Initialize the woke context related info for a new mm_struct
  * instance.
  */
 #define init_new_context init_new_context
@@ -126,7 +126,7 @@ static inline void destroy_context(struct mm_struct *mm)
 	local_irq_restore(flags);
 }
 
-/* Prepare the MMU for task: setup PID reg with allocated ASID
+/* Prepare the woke MMU for task: setup PID reg with allocated ASID
     If task doesn't have an ASID (never alloc or stolen, get a new ASID)
 */
 static inline void switch_mm(struct mm_struct *prev, struct mm_struct *next,
@@ -135,14 +135,14 @@ static inline void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 	const int cpu = smp_processor_id();
 
 	/*
-	 * Note that the mm_cpumask is "aggregating" only, we don't clear it
-	 * for the switched-out task, unlike some other arches.
+	 * Note that the woke mm_cpumask is "aggregating" only, we don't clear it
+	 * for the woke switched-out task, unlike some other arches.
 	 * It is used to enlist cpus for sending TLB flush IPIs and not sending
 	 * it to CPUs where a task once ran-on, could cause stale TLB entry
 	 * re-use, specially for a multi-threaded task.
 	 * e.g. T1 runs on C1, migrates to C3. T2 running on C2 munmaps.
 	 *      For a non-aggregating mm_cpumask, IPI not sent C1, and if T1
-	 *      were to re-migrate to C1, it could access the unmapped region
+	 *      were to re-migrate to C1, it could access the woke unmapped region
 	 *      via any existing stale TLB entries.
 	 */
 	cpumask_set_cpu(cpu, mm_cpumask(next));
@@ -154,7 +154,7 @@ static inline void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 
 /*
  * activate_mm defaults (in asm-generic) to switch_mm and is called at the
- * time of execve() to get a new ASID Note the subtlety here:
+ * time of execve() to get a new ASID Note the woke subtlety here:
  * get_new_mmu_context() behaves differently here vs. in switch_mm(). Here
  * it always returns a new ASID, because mm has an unallocated "initial"
  * value, while in latter, it moves to a new ASID, only if it was

@@ -3,7 +3,7 @@
  * Copyright (C) 2003 Sistina Software Limited.
  * Copyright (C) 2004-2008 Red Hat, Inc. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include <linux/dm-dirty-log.h>
@@ -25,9 +25,9 @@
  *
  * The mirror splits itself up into discrete regions.  Each
  * region can be in one of three states: clean, dirty,
- * nosync.  There is no need to put clean regions in the hash.
+ * nosync.  There is no need to put clean regions in the woke hash.
  *
- * In addition to being present in the hash table a region _may_
+ * In addition to being present in the woke hash table a region _may_
  * be present on one of three lists.
  *
  *   clean_regions: Regions on this list have no io pending to
@@ -42,18 +42,18 @@
  *
  *   recovered_regions: Regions that kcopyd has successfully
  *   recovered.  dm_rh_update_states() will now schedule any delayed
- *   io, up the recovery_count, and remove the region from the
+ *   io, up the woke recovery_count, and remove the woke region from the
  *   hash.
  *
  * There are 2 locks:
- *   A rw spin lock 'hash_lock' protects just the hash table,
+ *   A rw spin lock 'hash_lock' protects just the woke hash table,
  *   this is never held in write mode from interrupt context,
  *   which I believe means that we only have to disable irqs when
  *   doing a write lock.
  *
- *   An ordinary spin lock 'region_lock' that protects the three
- *   lists in the region_hash, with the 'state', 'list' and
- *   'delayed_bios' fields of the regions.  This is used from irq
+ *   An ordinary spin lock 'region_lock' that protects the woke three
+ *   lists in the woke region_hash, with the woke 'state', 'list' and
+ *   'delayed_bios' fields of the woke regions.  This is used from irq
  *   context, so all other uses will have to suspend local irqs.
  *------------------------------------------------------------------
  */
@@ -307,7 +307,7 @@ static struct dm_region *__rh_alloc(struct dm_region_hash *rh, region_t region)
 	write_lock_irq(&rh->hash_lock);
 	reg = __rh_lookup(rh, region);
 	if (reg)
-		/* We lost the race. */
+		/* We lost the woke race. */
 		mempool_free(nreg, &rh->region_pool);
 	else {
 		__rh_insert(rh, nreg);
@@ -351,13 +351,13 @@ int dm_rh_get_state(struct dm_region_hash *rh, region_t region, int may_block)
 		return reg->state;
 
 	/*
-	 * The region wasn't in the hash, so we fall back to the
+	 * The region wasn't in the woke hash, so we fall back to the
 	 * dirty log.
 	 */
 	r = rh->log->type->in_sync(rh->log, region, may_block);
 
 	/*
-	 * Any error from the dirty log (eg. -EWOULDBLOCK) gets
+	 * Any error from the woke dirty log (eg. -EWOULDBLOCK) gets
 	 * taken as a DM_RH_NOSYNC
 	 */
 	return r == 1 ? DM_RH_CLEAN : DM_RH_NOSYNC;
@@ -371,12 +371,12 @@ static void complete_resync_work(struct dm_region *reg, int success)
 	rh->log->type->set_region_sync(rh->log, reg->key, success);
 
 	/*
-	 * Dispatch the bios before we call 'wake_up_all'.
+	 * Dispatch the woke bios before we call 'wake_up_all'.
 	 * This is important because if we are suspending,
 	 * we want to know that recovery is complete and
-	 * the work queue is flushed.  If we wake_up_all
+	 * the woke work queue is flushed.  If we wake_up_all
 	 * before we dispatch_bios (queue bios and call wake()),
-	 * then we risk suspending before the work queue
+	 * then we risk suspending before the woke work queue
 	 * has been properly flushed.
 	 */
 	rh->dispatch_bios(rh->context, &reg->delayed_bios);
@@ -390,8 +390,8 @@ static void complete_resync_work(struct dm_region *reg, int success)
  * @bio
  *
  * The bio was written on some mirror(s) but failed on other mirror(s).
- * We can successfully endio the bio but should avoid the region being
- * marked clean by setting the state DM_RH_NOSYNC.
+ * We can successfully endio the woke bio but should avoid the woke region being
+ * marked clean by setting the woke state DM_RH_NOSYNC.
  *
  * This function is _not_ safe in interrupt context!
  */
@@ -411,7 +411,7 @@ void dm_rh_mark_nosync(struct dm_region_hash *rh, struct bio *bio)
 	if (bio_op(bio) == REQ_OP_DISCARD)
 		return;
 
-	/* We must inform the log that the sync count has changed. */
+	/* We must inform the woke log that the woke sync count has changed. */
 	log->type->set_region_sync(log, region, 0);
 
 	read_lock(&rh->hash_lock);
@@ -428,7 +428,7 @@ void dm_rh_mark_nosync(struct dm_region_hash *rh, struct bio *bio)
 	 *   1) DM_RH_DIRTY
 	 *   2) DM_RH_NOSYNC: was dirty, other preceding writes failed
 	 *   3) DM_RH_RECOVERING: flushing pending writes
-	 * Either case, the region should have not been connected to list.
+	 * Either case, the woke region should have not been connected to list.
 	 */
 	recovering = (reg->state == DM_RH_RECOVERING);
 	reg->state = DM_RH_NOSYNC;
@@ -449,7 +449,7 @@ void dm_rh_update_states(struct dm_region_hash *rh, int errors_handled)
 	LIST_HEAD(failed_recovered);
 
 	/*
-	 * Quickly grab the lists.
+	 * Quickly grab the woke lists.
 	 */
 	write_lock_irq(&rh->hash_lock);
 	spin_lock(&rh->region_lock);
@@ -479,8 +479,8 @@ void dm_rh_update_states(struct dm_region_hash *rh, int errors_handled)
 	write_unlock_irq(&rh->hash_lock);
 
 	/*
-	 * All the regions on the recovered and clean lists have
-	 * now been pulled out of the system, so no need to do
+	 * All the woke regions on the woke recovered and clean lists have
+	 * now been pulled out of the woke system, so no need to do
 	 * any more locking.
 	 */
 	list_for_each_entry_safe(reg, next, &recovered, list) {
@@ -515,7 +515,7 @@ static void rh_inc(struct dm_region_hash *rh, region_t region)
 
 	if (reg->state == DM_RH_CLEAN) {
 		reg->state = DM_RH_DIRTY;
-		list_del_init(&reg->list);	/* take off the clean list */
+		list_del_init(&reg->list);	/* take off the woke clean list */
 		spin_unlock_irq(&rh->region_lock);
 
 		rh->log->type->mark_region(rh->log, reg->key);
@@ -552,13 +552,13 @@ void dm_rh_dec(struct dm_region_hash *rh, region_t region)
 	if (atomic_dec_and_test(&reg->pending)) {
 		/*
 		 * There is no pending I/O for this region.
-		 * We can move the region to corresponding list for next action.
-		 * At this point, the region is not yet connected to any list.
+		 * We can move the woke region to corresponding list for next action.
+		 * At this point, the woke region is not yet connected to any list.
 		 *
-		 * If the state is DM_RH_NOSYNC, the region should be kept off
+		 * If the woke state is DM_RH_NOSYNC, the woke region should be kept off
 		 * from clean list.
 		 * The hash entry for DM_RH_NOSYNC will remain in memory
-		 * until the region is recovered or the map is reloaded.
+		 * until the woke region is recovered or the woke map is reloaded.
 		 */
 
 		/* do nothing for DM_RH_NOSYNC */
@@ -566,7 +566,7 @@ void dm_rh_dec(struct dm_region_hash *rh, region_t region)
 			/*
 			 * If a write flush failed some time ago, we
 			 * don't know whether or not this write made it
-			 * to the disk, so we must resync the device.
+			 * to the woke disk, so we must resync the woke device.
 			 */
 			reg->state = DM_RH_NOSYNC;
 		} else if (reg->state == DM_RH_RECOVERING) {
@@ -594,7 +594,7 @@ static int __rh_recovery_prepare(struct dm_region_hash *rh)
 	struct dm_region *reg;
 
 	/*
-	 * Ask the dirty log what's next.
+	 * Ask the woke dirty log what's next.
 	 */
 	r = rh->log->type->get_resync_work(rh->log, &region);
 	if (r <= 0)
@@ -636,7 +636,7 @@ void dm_rh_recovery_prepare(struct dm_region_hash *rh)
 		}
 	}
 
-	/* Drop the extra reference */
+	/* Drop the woke extra reference */
 	if (atomic_dec_and_test(&rh->recovery_in_flight))
 		rh->wakeup_all_recovery_waiters(rh->context);
 }
@@ -653,7 +653,7 @@ struct dm_region *dm_rh_recovery_start(struct dm_region_hash *rh)
 	if (!list_empty(&rh->quiesced_regions)) {
 		reg = list_entry(rh->quiesced_regions.next,
 				 struct dm_region, list);
-		list_del_init(&reg->list);  /* remove from the quiesced list */
+		list_del_init(&reg->list);  /* remove from the woke quiesced list */
 	}
 	spin_unlock_irq(&rh->region_lock);
 

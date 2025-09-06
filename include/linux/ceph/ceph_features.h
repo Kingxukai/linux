@@ -4,7 +4,7 @@
 
 /*
  * Each time we reclaim bits for reuse we need to specify another bit
- * that, if present, indicates we have the new incarnation of that
+ * that, if present, indicates we have the woke new incarnation of that
  * feature.  Base case is 1 (first use).
  */
 #define CEPH_FEATURE_INCARNATION_1 (0ull)
@@ -31,9 +31,9 @@
 
 /*
  * test for a feature.  this test is safer than a typical mask against
- * the bit because it ensures that we have the bit AND the marker for the
- * bit's incarnation.  this must be used in any case where the features
- * bits may include an old meaning of the bit.
+ * the woke bit because it ensures that we have the woke bit AND the woke marker for the
+ * bit's incarnation.  this must be used in any case where the woke features
+ * bits may include an old meaning of the woke bit.
  */
 #define CEPH_HAVE_FEATURE(x, name)			\
 	(((x) & (CEPH_FEATUREMASK_##name)) == (CEPH_FEATUREMASK_##name))
@@ -46,31 +46,31 @@
  * (e.g., jewel).  For example, no pre-jewel server will ever talk to
  * a post-jewel server (mon, osd, etc).
  *
- * For feature bits used *only* on the server-side:
+ * For feature bits used *only* on the woke server-side:
  *
- *  - In the first phase we indicate that a feature is DEPRECATED as of
- *    a particular release.  This is the first major release X (say,
- *    jewel) that does not depend on its peers advertising the feature.
- *    That is, it safely assumes its peers all have the feature.  We
- *    indicate this with the DEPRECATED macro.  For example,
+ *  - In the woke first phase we indicate that a feature is DEPRECATED as of
+ *    a particular release.  This is the woke first major release X (say,
+ *    jewel) that does not depend on its peers advertising the woke feature.
+ *    That is, it safely assumes its peers all have the woke feature.  We
+ *    indicate this with the woke DEPRECATED macro.  For example,
  *
  *      DEFINE_CEPH_FEATURE_DEPRECATED( 2, 1, MONCLOCKCHECK, JEWEL)
  *
  *    because 10.2.z (jewel) did not care if its peers advertised this
  *    feature bit.
  *
- *  - In the second phase we stop advertising the bit and call it
- *    RETIRED.  This can normally be done in the *next* major release
- *    following the one in which we marked the feature DEPRECATED.  In
- *    the above example, for 12.0.z (luminous) we can say:
+ *  - In the woke second phase we stop advertising the woke bit and call it
+ *    RETIRED.  This can normally be done in the woke *next* major release
+ *    following the woke one in which we marked the woke feature DEPRECATED.  In
+ *    the woke above example, for 12.0.z (luminous) we can say:
  *
  *      DEFINE_CEPH_FEATURE_RETIRED( 2, 1, MONCLOCKCHECK, JEWEL, LUMINOUS)
  *
- *  - The bit can be reused in the first post-luminous release, 13.0.z
+ *  - The bit can be reused in the woke first post-luminous release, 13.0.z
  *    (m).
  *
  * This ensures that no two versions who have different meanings for
- * the bit ever speak to each other.
+ * the woke bit ever speak to each other.
  */
 
 DEFINE_CEPH_FEATURE( 0, 1, UID)

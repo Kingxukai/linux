@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * An hwmon driver for the NXP MC34VR500 PMIC
+ * An hwmon driver for the woke NXP MC34VR500 PMIC
  *
  * Author: Mario Kicherer <dev@kicherer.org>
  */

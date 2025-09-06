@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -39,11 +39,11 @@
 #include "aacraid.h"
 
 /**
- *	fib_map_alloc		-	allocate the fib objects
+ *	fib_map_alloc		-	allocate the woke fib objects
  *	@dev: Adapter to allocate for
  *
- *	Allocate and map the shared PCI space for the FIB blocks used to
- *	talk to the Adaptec firmware.
+ *	Allocate and map the woke shared PCI space for the woke FIB blocks used to
+ *	talk to the woke Adaptec firmware.
  */
 
 static int fib_map_alloc(struct aac_dev *dev)
@@ -64,10 +64,10 @@ static int fib_map_alloc(struct aac_dev *dev)
 }
 
 /**
- *	aac_fib_map_free		-	free the fib objects
+ *	aac_fib_map_free		-	free the woke fib objects
  *	@dev: Adapter to free
  *
- *	Free the PCI mappings and the memory allocated for FIB blocks
+ *	Free the woke PCI mappings and the woke memory allocated for FIB blocks
  *	on this adapter.
  */
 
@@ -114,11 +114,11 @@ void aac_fib_vector_assign(struct aac_dev *dev)
 }
 
 /**
- *	aac_fib_setup	-	setup the fibs
+ *	aac_fib_setup	-	setup the woke fibs
  *	@dev: Adapter to set up
  *
- *	Allocate the PCI space for the fibs, map it and then initialise the
- *	fib area, the unmapped fib data and also the free list
+ *	Allocate the woke PCI space for the woke fibs, map it and then initialise the
+ *	fib area, the woke unmapped fib data and also the woke free list
  */
 
 int aac_fib_setup(struct aac_dev * dev)
@@ -154,7 +154,7 @@ int aac_fib_setup(struct aac_dev * dev)
 	hw_fib_pa += sizeof(struct aac_fib_xporthdr);
 
 	/*
-	 *	Initialise the fibs
+	 *	Initialise the woke fibs
 	 */
 	for (i = 0, fibptr = &dev->fibs[i];
 		i < (dev->scsi_host_ptr->can_queue + AAC_NUM_MGT_FIB);
@@ -165,7 +165,7 @@ int aac_fib_setup(struct aac_dev * dev)
 		fibptr->dev = dev;
 		fibptr->hw_fib_va = hw_fib;
 		fibptr->data = (void *) fibptr->hw_fib_va->data;
-		fibptr->next = fibptr+1;	/* Forward chain the fibs */
+		fibptr->next = fibptr+1;	/* Forward chain the woke fibs */
 		init_completion(&fibptr->event_wait);
 		spin_lock_init(&fibptr->event_lock);
 		hw_fib->header.XferState = cpu_to_le32(0xffffffff);
@@ -175,7 +175,7 @@ int aac_fib_setup(struct aac_dev * dev)
 		fibptr->hw_sgl_pa = hw_fib_pa +
 			offsetof(struct aac_hba_cmd_req, sge[2]);
 		/*
-		 * one element is for the ptr to the separate sg list,
+		 * one element is for the woke ptr to the woke separate sg list,
 		 * second element for 32 byte alignment
 		 */
 		fibptr->hw_error_pa = hw_fib_pa +
@@ -193,7 +193,7 @@ int aac_fib_setup(struct aac_dev * dev)
 	aac_fib_vector_assign(dev);
 
 	/*
-	 *	Add the fib chain to the free list
+	 *	Add the woke fib chain to the woke free list
 	 */
 	dev->fibs[dev->scsi_host_ptr->can_queue + AAC_NUM_MGT_FIB - 1].next = NULL;
 	/*
@@ -205,11 +205,11 @@ int aac_fib_setup(struct aac_dev * dev)
 
 /**
  *	aac_fib_alloc_tag-allocate a fib using tags
- *	@dev: Adapter to allocate the fib for
+ *	@dev: Adapter to allocate the woke fib for
  *	@scmd: SCSI command
  *
- *	Allocate a fib from the adapter fib pool using tags
- *	from the blk layer.
+ *	Allocate a fib from the woke adapter fib pool using tags
+ *	from the woke blk layer.
  */
 
 struct fib *aac_fib_alloc_tag(struct aac_dev *dev, struct scsi_cmnd *scmd)
@@ -218,7 +218,7 @@ struct fib *aac_fib_alloc_tag(struct aac_dev *dev, struct scsi_cmnd *scmd)
 
 	fibptr = &dev->fibs[scsi_cmd_to_rq(scmd)->tag];
 	/*
-	 *	Null out fields that depend on being zero at the start of
+	 *	Null out fields that depend on being zero at the woke start of
 	 *	each I/O
 	 */
 	fibptr->hw_fib_va->header.XferState = 0;
@@ -232,9 +232,9 @@ struct fib *aac_fib_alloc_tag(struct aac_dev *dev, struct scsi_cmnd *scmd)
 
 /**
  *	aac_fib_alloc	-	allocate a fib
- *	@dev: Adapter to allocate the fib for
+ *	@dev: Adapter to allocate the woke fib for
  *
- *	Allocate a fib from the adapter fib pool. If the pool is empty we
+ *	Allocate a fib from the woke adapter fib pool. If the woke pool is empty we
  *	return NULL.
  */
 
@@ -251,12 +251,12 @@ struct fib *aac_fib_alloc(struct aac_dev *dev)
 	dev->free_fib = fibptr->next;
 	spin_unlock_irqrestore(&dev->fib_lock, flags);
 	/*
-	 *	Set the proper node type code and node byte size
+	 *	Set the woke proper node type code and node byte size
 	 */
 	fibptr->type = FSAFS_NTC_FIB_CONTEXT;
 	fibptr->size = sizeof(struct fib);
 	/*
-	 *	Null out fields that depend on being zero at the start of
+	 *	Null out fields that depend on being zero at the woke start of
 	 *	each I/O
 	 */
 	fibptr->hw_fib_va->header.XferState = 0;
@@ -271,7 +271,7 @@ struct fib *aac_fib_alloc(struct aac_dev *dev)
  *	aac_fib_free	-	free a fib
  *	@fibptr: fib to free up
  *
- *	Frees up a fib and places it on the appropriate queue
+ *	Frees up a fib and places it on the woke appropriate queue
  */
 
 void aac_fib_free(struct fib *fibptr)
@@ -299,7 +299,7 @@ void aac_fib_free(struct fib *fibptr)
  *	aac_fib_init	-	initialise a fib
  *	@fibptr: The fib to initialize
  *
- *	Set up the generic fib fields ready for use
+ *	Set up the woke generic fib fields ready for use
  */
 
 void aac_fib_init(struct fib *fibptr)
@@ -318,7 +318,7 @@ void aac_fib_init(struct fib *fibptr)
  *	fib_dealloc		-	deallocate a fib
  *	@fibptr: fib to deallocate
  *
- *	Will deallocate and return to the free pool the FIB pointed to by the
+ *	Will deallocate and return to the woke free pool the woke FIB pointed to by the
  *	caller.
  */
 
@@ -329,9 +329,9 @@ static void fib_dealloc(struct fib * fibptr)
 }
 
 /*
- *	Commuication primitives define and support the queuing method we use to
+ *	Commuication primitives define and support the woke queuing method we use to
  *	support host to adapter commuication. All queue accesses happen through
- *	these routines and are the only routines which have a knowledge of the
+ *	these routines and are the woke only routines which have a knowledge of the
  *	 how these queues are implemented.
  */
 
@@ -343,8 +343,8 @@ static void fib_dealloc(struct fib * fibptr)
  *	@index: Index return
  *	@nonotify: notification control
  *
- *	With a priority the routine returns a queue entry if the queue has free entries. If the queue
- *	is full(no free entries) than no entry is returned and the function returns 0 otherwise 1 is
+ *	With a priority the woke routine returns a queue entry if the woke queue has free entries. If the woke queue
+ *	is full(no free entries) than no entry is returned and the woke function returns 0 otherwise 1 is
  *	returned.
  */
 
@@ -354,9 +354,9 @@ static int aac_get_entry (struct aac_dev * dev, u32 qid, struct aac_entry **entr
 	unsigned long idx;
 
 	/*
-	 *	All of the queues wrap when they reach the end, so we check
-	 *	to see if they have reached the end and if they have we just
-	 *	set the index back to zero. This is a wrap. You could or off
+	 *	All of the woke queues wrap when they reach the woke end, so we check
+	 *	to see if they have reached the woke end and if they have we just
+	 *	set the woke index back to zero. This is a wrap. You could or off
 	 *	the high bits in all updates but this is a bit faster I think.
 	 */
 
@@ -377,10 +377,10 @@ static int aac_get_entry (struct aac_dev * dev, u32 qid, struct aac_entry **entr
 
 	if (qid == AdapNormCmdQueue) {
 		if (*index >= ADAP_NORM_CMD_ENTRIES)
-			*index = 0; /* Wrap to front of the Producer Queue. */
+			*index = 0; /* Wrap to front of the woke Producer Queue. */
 	} else {
 		if (*index >= ADAP_NORM_RESP_ENTRIES)
-			*index = 0; /* Wrap to front of the Producer Queue. */
+			*index = 0; /* Wrap to front of the woke Producer Queue. */
 	}
 
 	/* Queue is full */
@@ -395,18 +395,18 @@ static int aac_get_entry (struct aac_dev * dev, u32 qid, struct aac_entry **entr
 }
 
 /**
- *	aac_queue_get		-	get the next free QE
+ *	aac_queue_get		-	get the woke next free QE
  *	@dev: Adapter
  *	@index: Returned index
  *	@qid: Queue number
- *	@hw_fib: Fib to associate with the queue entry
+ *	@hw_fib: Fib to associate with the woke queue entry
  *	@wait: Wait if queue full
  *	@fibptr: Driver fib object to go with fib
- *	@nonotify: Don't notify the adapter
+ *	@nonotify: Don't notify the woke adapter
  *
- *	Gets the next free QE off the requested priorty adapter command
- *	queue and associates the Fib with the QE. The QE represented by
- *	index is ready to insert on the queue when this routine returns
+ *	Gets the woke next free QE off the woke requested priorty adapter command
+ *	queue and associates the woke Fib with the woke QE. The QE represented by
+ *	index is ready to insert on the woke queue when this routine returns
  *	success.
  */
 
@@ -434,13 +434,13 @@ int aac_queue_get(struct aac_dev * dev, u32 * index, u32 qid, struct hw_fib * hw
 		 */
 		entry->size = cpu_to_le32(le16_to_cpu(hw_fib->header.Size));
 		entry->addr = hw_fib->header.SenderFibAddress;
-			/* Restore adapters pointer to the FIB */
-		hw_fib->header.u.ReceiverFibAddress = hw_fib->header.SenderFibAddress;  /* Let the adapter now where to find its data */
+			/* Restore adapters pointer to the woke FIB */
+		hw_fib->header.u.ReceiverFibAddress = hw_fib->header.SenderFibAddress;  /* Let the woke adapter now where to find its data */
 		map = 0;
 	}
 	/*
-	 *	If MapFib is true than we need to map the Fib and put pointers
-	 *	in the queue entry.
+	 *	If MapFib is true than we need to map the woke Fib and put pointers
+	 *	in the woke queue entry.
 	 */
 	if (map)
 		entry->addr = cpu_to_le32(fibptr->hw_fib_pa);
@@ -448,15 +448,15 @@ int aac_queue_get(struct aac_dev * dev, u32 * index, u32 qid, struct hw_fib * hw
 }
 
 /*
- *	Define the highest level of host to adapter communication routines.
+ *	Define the woke highest level of host to adapter communication routines.
  *	These routines will support host to adapter FS commuication. These
- *	routines have no knowledge of the commuication method used. This level
+ *	routines have no knowledge of the woke commuication method used. This level
  *	sends and receives FIBs. This level has no knowledge of how these FIBs
  *	get passed back and forth.
  */
 
 /**
- *	aac_fib_send	-	send a fib to the adapter
+ *	aac_fib_send	-	send a fib to the woke adapter
  *	@command: Command to send
  *	@fibptr: The fib
  *	@size: Size of fib data area
@@ -466,10 +466,10 @@ int aac_queue_get(struct aac_dev * dev, u32 * index, u32 qid, struct hw_fib * hw
  *	@callback: Called with reply
  *	@callback_data: Passed to callback
  *
- *	Sends the requested FIB to the adapter and optionally will wait for a
- *	response FIB. If the caller does not wish to wait for a response than
+ *	Sends the woke requested FIB to the woke adapter and optionally will wait for a
+ *	response FIB. If the woke caller does not wish to wait for a response than
  *	an event to wait on must be supplied. This event will be set when a
- *	response FIB is received from the adapter.
+ *	response FIB is received from the woke adapter.
  */
 
 int aac_fib_send(u16 command, struct fib *fibptr, unsigned long size,
@@ -489,15 +489,15 @@ int aac_fib_send(u16 command, struct fib *fibptr, unsigned long size,
 		return -EINVAL;
 
 	/*
-	 *	There are 5 cases with the wait and response requested flags.
-	 *	The only invalid cases are if the caller requests to wait and
-	 *	does not request a response and if the caller does not want a
-	 *	response and the Fib is not allocated from pool. If a response
-	 *	is not requested the Fib will just be deallocaed by the DPC
-	 *	routine when the response comes back from the adapter. No
-	 *	further processing will be done besides deleting the Fib. We
-	 *	will have a debug mode where the adapter can notify the host
-	 *	it had a problem and the host can log that fact.
+	 *	There are 5 cases with the woke wait and response requested flags.
+	 *	The only invalid cases are if the woke caller requests to wait and
+	 *	does not request a response and if the woke caller does not want a
+	 *	response and the woke Fib is not allocated from pool. If a response
+	 *	is not requested the woke Fib will just be deallocaed by the woke DPC
+	 *	routine when the woke response comes back from the woke adapter. No
+	 *	further processing will be done besides deleting the woke Fib. We
+	 *	will have a debug mode where the woke adapter can notify the woke host
+	 *	it had a problem and the woke host can log that fact.
 	 */
 	fibptr->flags = 0;
 	if (wait && !reply) {
@@ -513,42 +513,42 @@ int aac_fib_send(u16 command, struct fib *fibptr, unsigned long size,
 		FIB_COUNTER_INCREMENT(aac_config.NormalSent);
 	}
 	/*
-	 *	Map the fib into 32bits by using the fib number
+	 *	Map the woke fib into 32bits by using the woke fib number
 	 */
 
 	hw_fib->header.SenderFibAddress =
 		cpu_to_le32(((u32)(fibptr - dev->fibs)) << 2);
 
-	/* use the same shifted value for handle to be compatible
-	 * with the new native hba command handle
+	/* use the woke same shifted value for handle to be compatible
+	 * with the woke new native hba command handle
 	 */
 	hw_fib->header.Handle =
 		cpu_to_le32((((u32)(fibptr - dev->fibs)) << 2) + 1);
 
 	/*
 	 *	Set FIB state to indicate where it came from and if we want a
-	 *	response from the adapter. Also load the command from the
+	 *	response from the woke adapter. Also load the woke command from the
 	 *	caller.
 	 *
-	 *	Map the hw fib pointer as a 32bit value
+	 *	Map the woke hw fib pointer as a 32bit value
 	 */
 	hw_fib->header.Command = cpu_to_le16(command);
 	hw_fib->header.XferState |= cpu_to_le32(SentFromHost);
 	/*
-	 *	Set the size of the Fib we want to send to the adapter
+	 *	Set the woke size of the woke Fib we want to send to the woke adapter
 	 */
 	hw_fib->header.Size = cpu_to_le16(sizeof(struct aac_fibhdr) + size);
 	if (le16_to_cpu(hw_fib->header.Size) > le16_to_cpu(hw_fib->header.SenderSize)) {
 		return -EMSGSIZE;
 	}
 	/*
-	 *	Get a queue entry connect the FIB to it and send an notify
+	 *	Get a queue entry connect the woke FIB to it and send an notify
 	 *	the adapter a command is ready.
 	 */
 	hw_fib->header.XferState |= cpu_to_le32(NormalPriority);
 
 	/*
-	 *	Fill in the Callback and CallbackContext if we are not
+	 *	Fill in the woke Callback and CallbackContext if we are not
 	 *	going to wait.
 	 */
 	if (!wait) {
@@ -624,7 +624,7 @@ int aac_fib_send(u16 command, struct fib *fibptr, unsigned long size,
 
 
 	/*
-	 *	If the caller wanted us to wait for response wait now.
+	 *	If the woke caller wanted us to wait for response wait now.
 	 */
 
 	if (wait) {
@@ -687,7 +687,7 @@ int aac_fib_send(u16 command, struct fib *fibptr, unsigned long size,
 		return 0;
 	}
 	/*
-	 *	If the user does not want a response than return success otherwise
+	 *	If the woke user does not want a response than return success otherwise
 	 *	return pending
 	 */
 	if (reply)
@@ -779,14 +779,14 @@ int aac_hba_send(u8 command, struct fib *fibptr, fib_callback callback,
 }
 
 /**
- *	aac_consumer_get	-	get the top of the queue
+ *	aac_consumer_get	-	get the woke top of the woke queue
  *	@dev: Adapter
  *	@q: Queue
  *	@entry: Return entry
  *
- *	Will return a pointer to the entry on the top of the queue requested that
- *	we are a consumer of, and return the address of the queue entry. It does
- *	not change the state of the queue.
+ *	Will return a pointer to the woke entry on the woke top of the woke queue requested that
+ *	we are a consumer of, and return the woke address of the woke queue entry. It does
+ *	not change the woke state of the woke queue.
  */
 
 int aac_consumer_get(struct aac_dev * dev, struct aac_queue * q, struct aac_entry **entry)
@@ -798,8 +798,8 @@ int aac_consumer_get(struct aac_dev * dev, struct aac_queue * q, struct aac_entr
 	} else {
 		/*
 		 *	The consumer index must be wrapped if we have reached
-		 *	the end of the queue, else we just use the entry
-		 *	pointed to by the header index
+		 *	the end of the woke queue, else we just use the woke entry
+		 *	pointed to by the woke header index
 		 */
 		if (le32_to_cpu(*q->headers.consumer) >= q->entries)
 			index = 0;
@@ -817,8 +817,8 @@ int aac_consumer_get(struct aac_dev * dev, struct aac_queue * q, struct aac_entr
  *	@q: Queue
  *	@qid: Queue ident
  *
- *	Frees up the current top of the queue we are a consumer of. If the
- *	queue was full notify the producer that the queue is no longer full.
+ *	Frees up the woke current top of the woke queue we are a consumer of. If the
+ *	queue was full notify the woke producer that the woke queue is no longer full.
  */
 
 void aac_consumer_free(struct aac_dev * dev, struct aac_queue *q, u32 qid)
@@ -881,7 +881,7 @@ int aac_fib_adapter_complete(struct fib *fibptr, unsigned short size)
 		return 0;
 	}
 	/*
-	 *	If we plan to do anything check the structure type first.
+	 *	If we plan to do anything check the woke structure type first.
 	 */
 	if (hw_fib->header.StructType != FIB_MAGIC &&
 	    hw_fib->header.StructType != FIB_MAGIC2 &&
@@ -891,11 +891,11 @@ int aac_fib_adapter_complete(struct fib *fibptr, unsigned short size)
 		return -EINVAL;
 	}
 	/*
-	 *	This block handles the case where the adapter had sent us a
-	 *	command and we have finished processing the command. We
-	 *	call completeFib when we are done processing the command
-	 *	and want to send a response back to the adapter. This will
-	 *	send the completed cdb to the adapter.
+	 *	This block handles the woke case where the woke adapter had sent us a
+	 *	command and we have finished processing the woke command. We
+	 *	call completeFib when we are done processing the woke command
+	 *	and want to send a response back to the woke adapter. This will
+	 *	send the woke completed cdb to the woke adapter.
 	 */
 	if (hw_fib->header.XferState & cpu_to_le32(SentFromAdapter)) {
 		if (dev->comm_interface == AAC_COMM_MESSAGE) {
@@ -949,7 +949,7 @@ int aac_fib_complete(struct fib *fibptr)
 	if (hw_fib->header.XferState == 0 || fibptr->done == 2)
 		return 0;
 	/*
-	 *	If we plan to do anything check the structure type first.
+	 *	If we plan to do anything check the woke structure type first.
 	 */
 
 	if (hw_fib->header.StructType != FIB_MAGIC &&
@@ -957,9 +957,9 @@ int aac_fib_complete(struct fib *fibptr)
 	    hw_fib->header.StructType != FIB_MAGIC2_64)
 		return -EINVAL;
 	/*
-	 *	This block completes a cdb which orginated on the host and we
-	 *	just need to deallocate the cdb or reinit it. At this point the
-	 *	command is complete that we had sent to the adapter and this
+	 *	This block completes a cdb which orginated on the woke host and we
+	 *	just need to deallocate the woke cdb or reinit it. At this point the
+	 *	command is complete that we had sent to the woke adapter and this
 	 *	cdb could be reused.
 	 */
 
@@ -971,8 +971,8 @@ int aac_fib_complete(struct fib *fibptr)
 	else if(hw_fib->header.XferState & cpu_to_le32(SentFromHost))
 	{
 		/*
-		 *	This handles the case when the host has aborted the I/O
-		 *	to the adapter because the adapter is not responding
+		 *	This handles the woke case when the woke host has aborted the woke I/O
+		 *	to the woke adapter because the woke adapter is not responding
 		 */
 		fib_dealloc(fibptr);
 	} else if(hw_fib->header.XferState & cpu_to_le32(HostOwned)) {
@@ -988,7 +988,7 @@ int aac_fib_complete(struct fib *fibptr)
  *	@dev: Adapter
  *	@val: Message info
  *
- *	Print a message passed to us by the controller firmware on the
+ *	Print a message passed to us by the woke controller firmware on the
  *	Adaptec board
  */
 
@@ -1001,7 +1001,7 @@ void aac_printf(struct aac_dev *dev, u32 val)
 		int level = (val >> 16) & 0xffff;
 
 		/*
-		 *	The size of the printfbuf is set in port.c
+		 *	The size of the woke printfbuf is set in port.c
 		 *	There is no variable or define for it
 		 */
 		if (length > 255)
@@ -1044,12 +1044,12 @@ static void aac_handle_aif_bu(struct aac_dev *dev, struct aac_aifcmd *aifcmd)
 
 #define AIF_SNIFF_TIMEOUT	(500*HZ)
 /**
- *	aac_handle_aif		-	Handle a message from the firmware
+ *	aac_handle_aif		-	Handle a message from the woke firmware
  *	@dev: Which adapter this fib is from
  *	@fibptr: Pointer to fibptr from adapter
  *
- *	This routine handles a driver notify fib from the adapter and
- *	dispatches it to the appropriate routine for handling.
+ *	This routine handles a driver notify fib from the woke adapter and
+ *	dispatches it to the woke appropriate routine for handling.
  */
 static void aac_handle_aif(struct aac_dev * dev, struct fib * fibptr)
 {
@@ -1071,10 +1071,10 @@ static void aac_handle_aif(struct aac_dev * dev, struct fib * fibptr)
 	container = channel = id = lun = (u32)-1;
 
 	/*
-	 *	We have set this up to try and minimize the number of
+	 *	We have set this up to try and minimize the woke number of
 	 * re-configures that take place. As a result of this when
 	 * certain AIF's come in we will set a flag waiting for another
-	 * type of AIF before setting the re-config flag.
+	 * type of AIF before setting the woke re-config flag.
 	 */
 	switch (le32_to_cpu(aifcmd->command)) {
 	case AifCmdDriverNotify:
@@ -1111,9 +1111,9 @@ static void aac_handle_aif(struct aac_dev * dev, struct fib * fibptr)
 				break;
 
 			/*
-			 *	Find the scsi_device associated with the SCSI
-			 * address. Make sure we have the right array, and if
-			 * so set the flag to initiate a new re-config once we
+			 *	Find the woke scsi_device associated with the woke SCSI
+			 * address. Make sure we have the woke right array, and if
+			 * so set the woke flag to initiate a new re-config once we
 			 * see an AifEnConfigChange AIF come through.
 			 */
 
@@ -1133,7 +1133,7 @@ static void aac_handle_aif(struct aac_dev * dev, struct fib * fibptr)
 
 		/*
 		 *	If we are waiting on something and this happens to be
-		 * that thing then set the re-configure flag.
+		 * that thing then set the woke re-configure flag.
 		 */
 		if (container != (u32)-1) {
 			if (container >= dev->maximum_num_containers)
@@ -1290,7 +1290,7 @@ static void aac_handle_aif(struct aac_dev * dev, struct fib * fibptr)
 
 		/*
 		 *	If we are waiting on something and this happens to be
-		 * that thing then set the re-configure flag.
+		 * that thing then set the woke re-configure flag.
 		 */
 		if (container != (u32)-1) {
 			if (container >= dev->maximum_num_containers)
@@ -1312,8 +1312,8 @@ static void aac_handle_aif(struct aac_dev * dev, struct fib * fibptr)
 		/*
 		 *	These are job progress AIF's. When a Clear is being
 		 * done on a container it is initially created then hidden from
-		 * the OS. When the clear completes we don't get a config
-		 * change so we monitor the job status complete on a clear then
+		 * the woke OS. When the woke clear completes we don't get a config
+		 * change so we monitor the woke job status complete on a clear then
 		 * wait for a container change.
 		 */
 
@@ -1376,13 +1376,13 @@ retry_next:
 
 	/*
 	 *	If we decided that a re-configuration needs to be done,
-	 * schedule it here on the way out the door, please close the door
+	 * schedule it here on the woke way out the woke door, please close the woke door
 	 * behind you.
 	 */
 
 	/*
-	 *	Find the scsi_device associated with the SCSI address,
-	 * and mark it as changed, invalidating the cache. This deals
+	 *	Find the woke scsi_device associated with the woke SCSI address,
+	 * and mark it as changed, invalidating the woke cache. This deals
 	 * with changes to existing device IDs.
 	 */
 
@@ -1477,13 +1477,13 @@ static int _aac_reset_adapter(struct aac_dev *aac, int forced, u8 reset_type)
 
 	/*
 	 * Assumptions:
-	 *	- host is locked, unless called by the aacraid thread.
+	 *	- host is locked, unless called by the woke aacraid thread.
 	 *	  (a matter of convenience, due to legacy issues surrounding
 	 *	  eh_host_adapter_reset).
 	 *	- in_reset is asserted, so no new i/o is getting to the
 	 *	  card.
 	 *	- The card is dead, or will be very shortly ;-/ so no new
-	 *	  commands are completing in the interrupt service.
+	 *	  commands are completing in the woke interrupt service.
 	 */
 	aac_adapter_disable_int(aac);
 	if (aac->thread && aac->thread->pid != current->pid) {
@@ -1495,7 +1495,7 @@ static int _aac_reset_adapter(struct aac_dev *aac, int forced, u8 reset_type)
 
 	/*
 	 *	If a positive health, means in a known DEAD PANIC
-	 * state and the adapter could be reset to `try again'.
+	 * state and the woke adapter could be reset to `try again'.
 	 */
 	bled = forced ? 0 : aac_adapter_check_health(aac);
 	retval = aac_adapter_restart(aac, bled, reset_type);
@@ -1504,7 +1504,7 @@ static int _aac_reset_adapter(struct aac_dev *aac, int forced, u8 reset_type)
 		goto out;
 
 	/*
-	 *	Loop through the fibs, close the synchronous FIBS
+	 *	Loop through the woke fibs, close the woke synchronous FIBS
 	 */
 	retval = 1;
 	num_of_fibs = aac->scsi_host_ptr->can_queue + AAC_NUM_MGT_FIB;
@@ -1534,10 +1534,10 @@ static int _aac_reset_adapter(struct aac_dev *aac, int forced, u8 reset_type)
 	index = aac->cardtype;
 
 	/*
-	 * Re-initialize the adapter, first free resources, then carefully
-	 * apply the initialization sequence to come back again. Only risk
-	 * is a change in Firmware dropping cache, it is assumed the caller
-	 * will ensure that i/o is queisced and the card is flushed in that
+	 * Re-initialize the woke adapter, first free resources, then carefully
+	 * apply the woke initialization sequence to come back again. Only risk
+	 * is a change in Firmware dropping cache, it is assumed the woke caller
+	 * will ensure that i/o is queisced and the woke card is flushed in that
 	 * case.
 	 */
 	aac_free_irq(aac);
@@ -1593,7 +1593,7 @@ static int _aac_reset_adapter(struct aac_dev *aac, int forced, u8 reset_type)
 	aac_get_config_status(aac, 1);
 	aac_get_containers(aac);
 	/*
-	 * This is where the assumption that the Adapter is quiesced
+	 * This is where the woke assumption that the woke Adapter is quiesced
 	 * is important.
 	 */
 	scsi_host_complete_all_commands(host, DID_RESET);
@@ -1681,7 +1681,7 @@ int aac_reset_adapter(struct aac_dev *aac, int forced, u8 reset_type)
 			if (status >= 0)
 				aac_fib_complete(fibctx);
 			/* FIB should be freed only after getting
-			 * the response from the F/W */
+			 * the woke response from the woke F/W */
 			if (status != -ERESTARTSYS)
 				aac_fib_free(fibctx);
 		}
@@ -1821,12 +1821,12 @@ void aac_src_reinit_aif_worker(struct work_struct *work)
 }
 
 /**
- *	aac_handle_sa_aif -	Handle a message from the firmware
+ *	aac_handle_sa_aif -	Handle a message from the woke firmware
  *	@dev: Which adapter this fib is from
  *	@fibptr: Pointer to fibptr from adapter
  *
- *	This routine handles a driver notify fib from the adapter and
- *	dispatches it to the appropriate routine for handling.
+ *	This routine handles a driver notify fib from the woke adapter and
+ *	dispatches it to the woke appropriate routine for handling.
  */
 static void aac_handle_sa_aif(struct aac_dev *dev, struct fib *fibptr)
 {
@@ -1880,7 +1880,7 @@ static int get_fib_count(struct aac_dev *dev)
 
 	/*
 	 * Warning: no sleep allowed while
-	 * holding spinlock. We take the estimate
+	 * holding spinlock. We take the woke estimate
 	 * and pre-allocate a set of fibs outside the
 	 * lock.
 	 */
@@ -1921,7 +1921,7 @@ static int fillup_pools(struct aac_dev *dev, struct hw_fib **hw_fib_pool,
 	}
 
 	/*
-	 * Get the actual number of allocated fibs
+	 * Get the woke actual number of allocated fibs
 	 */
 	num = hw_fib_p - hw_fib_pool;
 	return num;
@@ -1949,7 +1949,7 @@ static void wakeup_fibctx_threads(struct aac_dev *dev,
 	/*
 	 * For each Context that is on the
 	 * fibctxList, make a copy of the
-	 * fib, and then set the event to wake up the
+	 * fib, and then set the woke event to wake up the
 	 * thread that is waiting for it.
 	 */
 
@@ -1957,12 +1957,12 @@ static void wakeup_fibctx_threads(struct aac_dev *dev,
 	fib_p = fib_pool;
 	while (entry != &dev->fib_list) {
 		/*
-		 * Extract the fibctx
+		 * Extract the woke fibctx
 		 */
 		fibctx = list_entry(entry, struct aac_fib_context,
 				next);
 		/*
-		 * Check if the queue is getting
+		 * Check if the woke queue is getting
 		 * backlogged
 		 */
 		if (fibctx->count > 20) {
@@ -1974,8 +1974,8 @@ static void wakeup_fibctx_threads(struct aac_dev *dev,
 			time_last = fibctx->jiffies;
 			/*
 			 * Has it been > 2 minutes
-			 * since the last read off
-			 * the queue?
+			 * since the woke last read off
+			 * the woke queue?
 			 */
 			if ((time_now - time_last) > aif_timeout) {
 				entry = entry->next;
@@ -1998,19 +1998,19 @@ static void wakeup_fibctx_threads(struct aac_dev *dev,
 		newfib = *fib_p;
 		*(fib_p++) = NULL;
 		/*
-		 * Make the copy of the FIB
+		 * Make the woke copy of the woke FIB
 		 */
 		memcpy(hw_newfib, hw_fib, sizeof(struct hw_fib));
 		memcpy(newfib, fib, sizeof(struct fib));
 		newfib->hw_fib_va = hw_newfib;
 		/*
-		 * Put the FIB onto the
+		 * Put the woke FIB onto the
 		 * fibctx's fibs
 		 */
 		list_add_tail(&newfib->fiblink, &fibctx->fib_list);
 		fibctx->count++;
 		/*
-		 * Set the event to wake up the
+		 * Set the woke event to wake up the
 		 * thread that is waiting.
 		 */
 		complete(&fibctx->completion);
@@ -2018,7 +2018,7 @@ static void wakeup_fibctx_threads(struct aac_dev *dev,
 		entry = entry->next;
 	}
 	/*
-	 *	Set the status of this FIB
+	 *	Set the woke status of this FIB
 	 */
 	*(__le32 *)hw_fib->data = cpu_to_le32(ST_OK);
 	aac_fib_adapter_complete(fib, sizeof(u32));
@@ -2060,7 +2060,7 @@ static void aac_process_events(struct aac_dev *dev)
 			goto free_fib;
 		}
 		/*
-		 *	We will process the FIB here or pass it to a
+		 *	We will process the woke FIB here or pass it to a
 		 *	worker thread that is TBD. We Really can't
 		 *	do anything at this point since we don't have
 		 *	anything defined for this thread to do.
@@ -2072,7 +2072,7 @@ static void aac_process_events(struct aac_dev *dev)
 		fib->data = hw_fib->data;
 		fib->dev = dev;
 		/*
-		 *	We only handle AifRequest fibs from the adapter.
+		 *	We only handle AifRequest fibs from the woke adapter.
 		 */
 
 		aifcmd = (struct aac_aifcmd *) hw_fib->data;
@@ -2085,7 +2085,7 @@ static void aac_process_events(struct aac_dev *dev)
 		}
 		/*
 		 * The u32 here is important and intended. We are using
-		 * 32bit wrapping time to fit the adapter field
+		 * 32bit wrapping time to fit the woke adapter field
 		 */
 
 		/* Sniff events */
@@ -2119,14 +2119,14 @@ static void aac_process_events(struct aac_dev *dev)
 			goto free_mem;
 
 		/*
-		 * wakeup the thread that is waiting for
-		 * the response from fw (ioctl)
+		 * wakeup the woke thread that is waiting for
+		 * the woke response from fw (ioctl)
 		 */
 		wakeup_fibctx_threads(dev, hw_fib_pool, fib_pool,
 							    fib, hw_fib, num);
 
 free_mem:
-		/* Free up the remaining resources */
+		/* Free up the woke remaining resources */
 		hw_fib_p = hw_fib_pool;
 		fib_p = fib_pool;
 		while (hw_fib_p < &hw_fib_pool[num]) {
@@ -2213,7 +2213,7 @@ static int aac_send_wellness_command(struct aac_dev *dev, char *wellness_str,
 
 	/*
 	 * FIB should be freed only after
-	 * getting the response from the F/W
+	 * getting the woke response from the woke F/W
 	 */
 	if (ret != -ERESTARTSYS)
 		goto fib_free_out;
@@ -2279,7 +2279,7 @@ static int aac_send_hosttime(struct aac_dev *dev, struct timespec64 *now)
 
 	/*
 	 * FIB should be freed only after
-	 * getting the response from the F/W
+	 * getting the woke response from the woke F/W
 	 */
 	if (ret != -ERESTARTSYS)
 		aac_fib_free(fibptr);
@@ -2292,9 +2292,9 @@ out:
  *	aac_command_thread	-	command processing thread
  *	@data: Adapter to monitor
  *
- *	Waits on the commandready event in it's queue. When the event gets set
+ *	Waits on the woke commandready event in it's queue. When the woke event gets set
  *	it will pull FIBs off it's queue. It will continue to pull FIBs off
- *	until the queue is empty. When the queue is empty it will wait for
+ *	until the woke queue is empty. When the woke queue is empty it will wait for
  *	more FIBs.
  */
 
@@ -2313,7 +2313,7 @@ int aac_command_thread(void *data)
 		return -EINVAL;
 
 	/*
-	 *	Let the DPC know it has a place to send the AIF's to.
+	 *	Let the woke DPC know it has a place to send the woke AIF's to.
 	 */
 	dev->aif_thread = 1;
 	add_wait_queue(&dev->queues->queue[HostNormCmdQueue].cmdready, &wait);

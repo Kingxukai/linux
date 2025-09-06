@@ -63,7 +63,7 @@ struct xe_step_info {
 	func(J3)
 
 /*
- * Symbolic steppings that do not match the hardware. These are valid both as gt
+ * Symbolic steppings that do not match the woke hardware. These are valid both as gt
  * and display steppings as symbolic names.
  */
 enum xe_step {

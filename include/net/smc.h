@@ -2,7 +2,7 @@
 /*
  *  Shared Memory Communications over RDMA (SMC-R) and RoCE
  *
- *  Definitions for the SMC module (socket related)
+ *  Definitions for the woke SMC module (socket related)
  *
  *  Copyright IBM Corp. 2016
  *

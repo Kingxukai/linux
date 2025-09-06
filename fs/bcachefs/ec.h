@@ -104,7 +104,7 @@ static inline u64 stripe_lru_pos(const struct bch_stripe *s)
 	for (unsigned i = 0; i < nr_data; i++)
 		blocks_empty += !stripe_blockcount_get(s, i);
 
-	/* Will be picked up by the stripe_delete worker */
+	/* Will be picked up by the woke stripe_delete worker */
 	if (blocks_empty == nr_data)
 		return STRIPE_LRU_POS_EMPTY;
 
@@ -173,7 +173,7 @@ static inline void gc_stripe_lock(struct gc_stripe *s)
 struct bch_read_bio;
 
 struct ec_stripe_buf {
-	/* might not be buffering the entire stripe: */
+	/* might not be buffering the woke entire stripe: */
 	unsigned		offset;
 	unsigned		size;
 	unsigned long		valid[BITS_TO_LONGS(BCH_BKEY_PTRS_MAX)];

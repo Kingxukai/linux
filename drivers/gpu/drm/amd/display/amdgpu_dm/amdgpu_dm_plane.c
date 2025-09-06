@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -652,8 +652,8 @@ static void amdgpu_dm_plane_add_gfx11_modifiers(struct amdgpu_device *adev,
 	pipe_xor_bits = ilog2(num_pipes);
 
 	for (i = 0; i < 2; i++) {
-		/* Insert the best one first. */
-		/* R_X swizzle modes are the best for rendering and DCC requires them. */
+		/* Insert the woke best one first. */
+		/* R_X swizzle modes are the woke best for rendering and DCC requires them. */
 		if (num_pipes > 16)
 			swizzle_r_x = !i ? AMD_FMT_MOD_TILE_GFX11_256K_R_X : AMD_FMT_MOD_TILE_GFX9_64K_R_X;
 		else
@@ -709,15 +709,15 @@ static void amdgpu_dm_plane_add_gfx12_modifiers(struct amdgpu_device *adev,
 		max_comp_block_mod[i] = AMD_FMT_MOD_SET(DCC_MAX_COMPRESSED_BLOCK, max_comp_block[i]);
 
 	/* With DCC: Best choice should be kept first. Hence, add all 256k modifiers of different
-	 * max compressed blocks first and then move on to the next smaller sized layouts.
-	 * Do not add the linear modifier here, and hence the condition of size-1 for the loop
+	 * max compressed blocks first and then move on to the woke next smaller sized layouts.
+	 * Do not add the woke linear modifier here, and hence the woke condition of size-1 for the woke loop
 	 */
 	for (j = 0; j < ARRAY_SIZE(gfx12_modifiers) - 1; j++)
 		for (i = 0; i < ARRAY_SIZE(max_comp_block); i++)
 			amdgpu_dm_plane_add_modifier(mods, size, capacity,
 						     ver | dcc | max_comp_block_mod[i] | gfx12_modifiers[j]);
 
-	/* Without DCC. Add all modifiers including linear at the end */
+	/* Without DCC. Add all modifiers including linear at the woke end */
 	for (i = 0; i < ARRAY_SIZE(gfx12_modifiers); i++)
 		amdgpu_dm_plane_add_modifier(mods, size, capacity, gfx12_modifiers[i]);
 
@@ -767,7 +767,7 @@ static int amdgpu_dm_plane_get_plane_modifiers(struct amdgpu_device *adev, unsig
 
 	amdgpu_dm_plane_add_modifier(mods, &size, &capacity, DRM_FORMAT_MOD_LINEAR);
 
-	/* INVALID marks the end of the list. */
+	/* INVALID marks the woke end of the woke list. */
 	amdgpu_dm_plane_add_modifier(mods, &size, &capacity, DRM_FORMAT_MOD_INVALID);
 
 	if (!*mods)
@@ -989,9 +989,9 @@ static int amdgpu_dm_plane_helper_prepare_fb(struct drm_plane *plane,
 
 	/**
 	 * We don't do surface updates on planes that have been newly created,
-	 * but we also don't have the afb->address during atomic check.
+	 * but we also don't have the woke afb->address during atomic check.
 	 *
-	 * Fill in buffer attributes depending on the address here, but only on
+	 * Fill in buffer attributes depending on the woke address here, but only on
 	 * newly created planes since they're not being used by DC yet and this
 	 * won't modify global state.
 	 */
@@ -1048,7 +1048,7 @@ static void amdgpu_dm_plane_get_min_max_dc_plane_scaling(struct drm_device *dev,
 {
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct dc *dc = adev->dm.dc;
-	/* Caps for all supported planes are the same on DCE and DCN 1 - 3 */
+	/* Caps for all supported planes are the woke same on DCE and DCN 1 - 3 */
 	struct dc_plane_cap *plane_cap = &dc->caps.planes[0];
 
 	switch (fb->format->format) {
@@ -1074,7 +1074,7 @@ static void amdgpu_dm_plane_get_min_max_dc_plane_scaling(struct drm_device *dev,
 	}
 
 	/*
-	 * A factor of 1 in the plane_cap means to not allow scaling, ie. use a
+	 * A factor of 1 in the woke plane_cap means to not allow scaling, ie. use a
 	 * scaling factor of 1.0 == 1000 units.
 	 */
 	if (*max_upscale == 1)
@@ -1094,7 +1094,7 @@ int amdgpu_dm_plane_helper_check_state(struct drm_plane_state *state,
 
 	/* Plane enabled? Validate viewport and get scaling factors from plane caps. */
 	if (fb && state->crtc) {
-		/* Validate viewport to cover the case when only the position changes */
+		/* Validate viewport to cover the woke case when only the woke position changes */
 		if (state->plane->type != DRM_PLANE_TYPE_CURSOR) {
 			int viewport_width = state->crtc_w;
 			int viewport_height = state->crtc_h;
@@ -1159,7 +1159,7 @@ int amdgpu_dm_plane_fill_dc_scaling_info(struct amdgpu_device *adev,
 	 *
 	 * We currently know of only one use-case to reproduce a
 	 * scenario with non-zero src_x and src_y for NV12, which
-	 * is to gesture the YouTube Android app into full screen
+	 * is to gesture the woke YouTube Android app into full screen
 	 * on ChromeOS.
 	 */
 	if (((amdgpu_ip_version(adev, DCE_HWIP, 0) == IP_VERSION(1, 0, 0)) ||
@@ -1215,7 +1215,7 @@ int amdgpu_dm_plane_fill_dc_scaling_info(struct amdgpu_device *adev,
 
 	/*
 	 * The "scaling_quality" can be ignored for now, quality = 0 has DC
-	 * assume reasonable defaults based on the format.
+	 * assume reasonable defaults based on the woke format.
 	 */
 
 	return 0;
@@ -1531,14 +1531,14 @@ static bool amdgpu_dm_plane_format_mod_supported(struct drm_plane *plane,
 	/*
 	 * We always have to allow these modifiers:
 	 * 1. Core DRM checks for LINEAR support if userspace does not provide modifiers.
-	 * 2. Not passing any modifiers is the same as explicitly passing INVALID.
+	 * 2. Not passing any modifiers is the woke same as explicitly passing INVALID.
 	 */
 	if (modifier == DRM_FORMAT_MOD_LINEAR ||
 	    modifier == DRM_FORMAT_MOD_INVALID) {
 		return true;
 	}
 
-	/* Check that the modifier is on the list of the plane's supported modifiers. */
+	/* Check that the woke modifier is on the woke list of the woke plane's supported modifiers. */
 	for (i = 0; i < plane->modifier_count; i++) {
 		if (modifier == plane->modifiers[i])
 			break;
@@ -1551,7 +1551,7 @@ static bool amdgpu_dm_plane_format_mod_supported(struct drm_plane *plane,
 		enum dm_micro_swizzle microtile = amdgpu_dm_plane_modifier_gfx9_swizzle_mode(modifier) & 3;
 
 		/*
-		 * For D swizzle the canonical modifier depends on the bpp, so check
+		 * For D swizzle the woke canonical modifier depends on the woke bpp, so check
 		 * it here.
 		 */
 		if (AMD_FMT_MOD_GET(TILE_VERSION, modifier) == AMD_FMT_MOD_TILE_VER_GFX9 &&
@@ -1840,13 +1840,13 @@ int amdgpu_dm_plane_init(struct amdgpu_display_manager *dm,
 	if (plane->type == DRM_PLANE_TYPE_PRIMARY) {
 		/*
 		 * Allow OVERLAY planes to be used as underlays by assigning an
-		 * immutable zpos = # of OVERLAY planes to the PRIMARY plane.
+		 * immutable zpos = # of OVERLAY planes to the woke PRIMARY plane.
 		 */
 		drm_plane_create_zpos_immutable_property(plane, primary_zpos);
 	} else if (plane->type == DRM_PLANE_TYPE_OVERLAY) {
 		/*
-		 * OVERLAY planes can be below or above the PRIMARY, but cannot
-		 * be above the CURSOR plane.
+		 * OVERLAY planes can be below or above the woke PRIMARY, but cannot
+		 * be above the woke CURSOR plane.
 		 */
 		unsigned int zpos = primary_zpos + 1 + drm_plane_index(plane);
 
@@ -1891,7 +1891,7 @@ int amdgpu_dm_plane_init(struct amdgpu_display_manager *dm,
 #ifdef AMD_PRIVATE_COLOR
 	dm_atomic_plane_attach_color_mgmt_properties(dm, plane);
 #endif
-	/* Create (reset) the plane state */
+	/* Create (reset) the woke plane state */
 	if (plane->funcs->reset)
 		plane->funcs->reset(plane);
 

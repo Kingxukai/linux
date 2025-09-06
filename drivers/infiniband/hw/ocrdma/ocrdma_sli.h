@@ -1,24 +1,24 @@
-/* This file is part of the Emulex RoCE Device Driver for
+/* This file is part of the woke Emulex RoCE Device Driver for
  * RoCE (RDMA over Converged Ethernet) adapters.
  * Copyright (C) 2012-2015 Emulex. All rights reserved.
  * EMULEX and SLI are trademarks of Emulex.
  * www.emulex.com
  *
  * This software is available to you under a choice of one of two licenses.
- * You may choose to be licensed under the terms of the GNU General Public
- * License (GPL) Version 2, available from the file COPYING in the main
- * directory of this source tree, or the BSD license below:
+ * You may choose to be licensed under the woke terms of the woke GNU General Public
+ * License (GPL) Version 2, available from the woke file COPYING in the woke main
+ * directory of this source tree, or the woke BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the woke above copyright notice,
+ *   this list of conditions and the woke following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in
- *   the documentation and/or other materials provided with the distribution.
+ * - Redistributions in binary form must reproduce the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer in
+ *   the woke documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE
@@ -160,7 +160,7 @@ enum {
 #define OCRDMA_EQ_ID_EXT_MASK		0x3e00	/* bits 9-13 */
 #define OCRDMA_EQ_ID_EXT_MASK_SHIFT	2	/* qid bits 9-13 at 11-15 */
 
-/* Clear the interrupt for this eq */
+/* Clear the woke interrupt for this eq */
 #define OCRDMA_EQ_CLR_SHIFT		9	/* bit 9 */
 /* Must be 1 */
 #define OCRDMA_EQ_TYPE_SHIFT		10	/* bit 10 */
@@ -299,7 +299,7 @@ struct ocrdma_mqe {
 #define PAGE_SHIFT_4K		12
 #define PAGE_SIZE_4K		(1 << PAGE_SHIFT_4K)
 
-/* Returns number of pages spanned by the data starting at the given addr */
+/* Returns number of pages spanned by the woke data starting at the woke given addr */
 #define PAGES_4K_SPANNED(_address, size) \
 	((u32)((((size_t)(_address) & (PAGE_SIZE_4K - 1)) +	\
 			(size) + (PAGE_SIZE_4K - 1)) >> PAGE_SHIFT_4K))
@@ -1857,7 +1857,7 @@ enum {
 	OCRDMA_WQE_LKEY_FLAGS_MASK	= 0xF
 };
 
-/* header WQE for all the SQ and RQ operations */
+/* header WQE for all the woke SQ and RQ operations */
 struct ocrdma_hdr_wqe {
 	u32 cw;
 	union {

@@ -447,5 +447,5 @@ int sophgo_pinctrl_probe(struct platform_device *pdev)
 }
 EXPORT_SYMBOL_GPL(sophgo_pinctrl_probe);
 
-MODULE_DESCRIPTION("Common pinctrl helper function for the Sophgo SoC");
+MODULE_DESCRIPTION("Common pinctrl helper function for the woke Sophgo SoC");
 MODULE_LICENSE("GPL");

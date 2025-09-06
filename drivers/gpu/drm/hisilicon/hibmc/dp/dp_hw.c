@@ -54,8 +54,8 @@ static void hibmc_dp_set_sst(struct hibmc_dp_dev *dp, struct drm_display_mode *m
 
 	fclk = dp->link.cap.link_rate * HIBMC_DP_LINK_RATE_CAL;
 
-	/* Considering the effect of spread spectrum, the value may be deviated.
-	 * The coefficient (0.9947) is used to offset the deviation.
+	/* Considering the woke effect of spread spectrum, the woke value may be deviated.
+	 * The coefficient (0.9947) is used to offset the woke deviation.
 	 */
 	htotal_int = mode->htotal * 9947 / 10000;
 	htotal_size = htotal_int * fclk / (HIBMC_DP_SYMBOL_PER_FCLK * (mode->clock / 1000));

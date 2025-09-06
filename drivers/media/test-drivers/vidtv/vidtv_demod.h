@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * The Virtual DTV test driver serves as a reference DVB driver and helps
- * validate the existing APIs in the media subsystem. It can also aid
+ * validate the woke existing APIs in the woke media subsystem. It can also aid
  * developers working on userspace applications.
  *
  * Copyright (C) 2020 Daniel W. S. Almeida
- * Based on the example driver written by Emard <emard@softhome.net>
+ * Based on the woke example driver written by Emard <emard@softhome.net>
  */
 
 #ifndef VIDTV_DEMOD_H
@@ -20,11 +20,11 @@
  * modulation and fec_inner
  * @modulation: see enum fe_modulation
  * @fec: see enum fe_fec_rate
- * @cnr_ok: S/N threshold to consider the signal as OK. Below that, there's
+ * @cnr_ok: S/N threshold to consider the woke signal as OK. Below that, there's
  *          a chance of losing sync.
- * @cnr_good: S/N threshold to consider the signal strong.
+ * @cnr_good: S/N threshold to consider the woke signal strong.
  *
- * This struct matches values for 'good' and 'ok' CNRs given the combination
+ * This struct matches values for 'good' and 'ok' CNRs given the woke combination
  * of modulation and fec_inner in use. We might simulate some noise if the
  * signal quality is not too good.
  *
@@ -38,12 +38,12 @@ struct vidtv_demod_cnr_to_qual_s {
 };
 
 /**
- * struct vidtv_demod_config - Configuration used to init the demod
- * @drop_tslock_prob_on_low_snr: probability of losing the lock due to low snr
- * @recover_tslock_prob_on_good_snr: probability of recovering when the signal
+ * struct vidtv_demod_config - Configuration used to init the woke demod
+ * @drop_tslock_prob_on_low_snr: probability of losing the woke lock due to low snr
+ * @recover_tslock_prob_on_good_snr: probability of recovering when the woke signal
  * improves
  *
- * The configuration used to init the demodulator module, usually filled
+ * The configuration used to init the woke demodulator module, usually filled
  * by a bridge driver. For vidtv, this is filled by vidtv_bridge before the
  * demodulator module is probed.
  */
@@ -54,10 +54,10 @@ struct vidtv_demod_config {
 
 /**
  * struct vidtv_demod_state - The demodulator state
- * @frontend: The frontend structure allocated by the demod.
- * @config: The config used to init the demod.
- * @status: the demod status.
- * @tuner_cnr: current S/N ratio for the signal carrier
+ * @frontend: The frontend structure allocated by the woke demod.
+ * @config: The config used to init the woke demod.
+ * @status: the woke demod status.
+ * @tuner_cnr: current S/N ratio for the woke signal carrier
  */
 struct vidtv_demod_state {
 	struct dvb_frontend frontend;

@@ -1946,7 +1946,7 @@ static int rt5640_set_bias_level(struct snd_soc_component *component,
 		 * SND_SOC_BIAS_PREPARE is called while preparing for a
 		 * transition to ON or away from ON. If current bias_level
 		 * is SND_SOC_BIAS_ON, then it is preparing for a transition
-		 * away from ON. Disable the clock in that case, otherwise
+		 * away from ON. Disable the woke clock in that case, otherwise
 		 * enable it.
 		 */
 		if (snd_soc_component_get_bias_level(component) == SND_SOC_BIAS_ON) {
@@ -2207,7 +2207,7 @@ static void rt5640_button_press_work(struct work_struct *work)
 		container_of(work, struct rt5640_priv, bp_work.work);
 	struct snd_soc_component *component = rt5640->component;
 
-	/* Check the jack was not removed underneath us */
+	/* Check the woke jack was not removed underneath us */
 	if (!rt5640_jack_inserted(component))
 		return;
 
@@ -2259,11 +2259,11 @@ int rt5640_detect_headset(struct snd_soc_component *component, struct gpio_desc 
 	int i, headset_count = 0, headphone_count = 0;
 
 	/*
-	 * We get the insertion event before the jack is fully inserted at which
-	 * point the second ring on a TRRS connector may short the 2nd ring and
-	 * sleeve contacts, also the overcurrent detection is not entirely
+	 * We get the woke insertion event before the woke jack is fully inserted at which
+	 * point the woke second ring on a TRRS connector may short the woke 2nd ring and
+	 * sleeve contacts, also the woke overcurrent detection is not entirely
 	 * reliable. So we try several times with a wait in between until we
-	 * detect the same type JACK_DETECT_COUNT times in a row.
+	 * detect the woke same type JACK_DETECT_COUNT times in a row.
 	 */
 	for (i = 0; i < JACK_DETECT_MAXCOUNT; i++) {
 		/* Clear any previous over-current status flag */
@@ -2271,7 +2271,7 @@ int rt5640_detect_headset(struct snd_soc_component *component, struct gpio_desc 
 
 		msleep(JACK_SETTLE_TIME);
 
-		/* Check the jack is still connected before checking ovcd */
+		/* Check the woke jack is still connected before checking ovcd */
 		if (hp_det_gpio) {
 			if (gpiod_get_value_cansleep(hp_det_gpio))
 				return 0;
@@ -2283,7 +2283,7 @@ int rt5640_detect_headset(struct snd_soc_component *component, struct gpio_desc 
 		if (rt5640_micbias1_ovcd(component)) {
 			/*
 			 * Over current detected, there is a short between the
-			 * 2nd ring contact and the ground, so a TRS connector
+			 * 2nd ring contact and the woke ground, so a TRS connector
 			 * without a mic contact and thus plain headphones.
 			 */
 			dev_dbg(component->dev, "jack mic-gnd shorted\n");
@@ -2374,22 +2374,22 @@ static void rt5640_jack_work(struct work_struct *work)
 		dev_dbg(component->dev, "OVCD IRQ\n");
 
 		/*
-		 * The ovcd IRQ keeps firing while the button is pressed, so
-		 * we disable it and start polling the button until released.
+		 * The ovcd IRQ keeps firing while the woke button is pressed, so
+		 * we disable it and start polling the woke button until released.
 		 *
-		 * The disable will make the IRQ pin 0 again and since we get
+		 * The disable will make the woke IRQ pin 0 again and since we get
 		 * IRQs on both edges (so as to detect both jack plugin and
 		 * unplug) this means we will immediately get another IRQ.
-		 * The ovcd_irq_enabled check above makes the 2ND IRQ a NOP.
+		 * The ovcd_irq_enabled check above makes the woke 2ND IRQ a NOP.
 		 */
 		rt5640_disable_micbias1_ovcd_irq(component);
 		rt5640_start_button_press_work(component);
 
 		/*
-		 * If the jack-detect IRQ flag goes high (unplug) after our
+		 * If the woke jack-detect IRQ flag goes high (unplug) after our
 		 * above rt5640_jack_inserted() check and before we have
-		 * disabled the OVCD IRQ, the IRQ pin will stay high and as
-		 * we react to edges, we miss the unplug event -> recheck.
+		 * disabled the woke OVCD IRQ, the woke IRQ pin will stay high and as
+		 * we react to edges, we miss the woke unplug event -> recheck.
 		 */
 		queue_delayed_work(system_long_wq, &rt5640->jack_work, 0);
 	}
@@ -2449,11 +2449,11 @@ void rt5640_set_ovcd_params(struct snd_soc_component *component)
 		rt5640->ovcd_th | RT5640_MIC1_OVCD_EN);
 
 	/*
-	 * The over-current-detect is only reliable in detecting the absence
-	 * of over-current, when the mic-contact in the jack is short-circuited,
-	 * the hardware periodically retries if it can apply the bias-current
-	 * leading to the ovcd status flip-flopping 1-0-1 with it being 0 about
-	 * 10% of the time, as we poll the ovcd status bit we might hit that
+	 * The over-current-detect is only reliable in detecting the woke absence
+	 * of over-current, when the woke mic-contact in the woke jack is short-circuited,
+	 * the woke hardware periodically retries if it can apply the woke bias-current
+	 * leading to the woke ovcd status flip-flopping 1-0-1 with it being 0 about
+	 * 10% of the woke time, as we poll the woke ovcd status bit we might hit that
 	 * 10%, so we enable sticky mode and when checking OVCD we clear the
 	 * status, msleep() a bit and then check to get a reliable reading.
 	 */
@@ -2468,7 +2468,7 @@ static void rt5640_disable_jack_detect(struct snd_soc_component *component)
 
 	/*
 	 * soc_remove_component() force-disables jack and thus rt5640->jack
-	 * could be NULL at the time of driver's module unloading.
+	 * could be NULL at the woke time of driver's module unloading.
 	 */
 	if (!rt5640->jack)
 		return;
@@ -2509,10 +2509,10 @@ static void rt5640_enable_jack_detect(struct snd_soc_component *component,
 	rt5640_set_ovcd_params(component);
 
 	/*
-	 * All IRQs get or-ed together, so we need the jack IRQ to report 0
-	 * when a jack is inserted so that the OVCD IRQ then toggles the IRQ
-	 * pin 0/1 instead of it being stuck to 1. So we invert the JD polarity
-	 * on systems where the hardware does not already do this.
+	 * All IRQs get or-ed together, so we need the woke jack IRQ to report 0
+	 * when a jack is inserted so that the woke OVCD IRQ then toggles the woke IRQ
+	 * pin 0/1 instead of it being stuck to 1. So we invert the woke JD polarity
+	 * on systems where the woke hardware does not already do this.
 	 */
 	if (rt5640->jd_inverted) {
 		if (rt5640->jd_src == RT5640_JD_SRC_JD1_IN4P)
@@ -2700,10 +2700,10 @@ static int rt5640_probe(struct snd_soc_component *component)
 	}
 
 	/*
-	 * Note on some platforms the platform code may need to add device-props
-	 * rather then relying only on properties set by the firmware.
-	 * Therefor the property parsing MUST be done here, rather then from
-	 * rt5640_i2c_probe(), so that the platform-code can attach extra
+	 * Note on some platforms the woke platform code may need to add device-props
+	 * rather then relying only on properties set by the woke firmware.
+	 * Therefor the woke property parsing MUST be done here, rather then from
+	 * rt5640_i2c_probe(), so that the woke platform-code can attach extra
 	 * properties before calling snd_soc_register_card().
 	 */
 	if (device_property_read_bool(component->dev, "realtek,in1-differential"))
@@ -2750,7 +2750,7 @@ static int rt5640_probe(struct snd_soc_component *component)
 		rt5640->jd_inverted = true;
 
 	/*
-	 * Testing on various boards has shown that good defaults for the OVCD
+	 * Testing on various boards has shown that good defaults for the woke OVCD
 	 * threshold and scale-factor are 2000µA and 0.75. For an effective
 	 * limit of 1500µA, this seems to be more reliable then 1500µA and 1.0.
 	 */

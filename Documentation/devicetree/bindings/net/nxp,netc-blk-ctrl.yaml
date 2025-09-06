@@ -11,7 +11,7 @@ description:
   block (IERB) and privileged register block (PRB). IERB is used for pre-boot
   initialization for all NETC devices, such as ENETC, Timer, EMIDO and so on.
   And PRB controls global reset and global error handling for NETC. Moreover,
-  for the i.MX platform, there is also a NETCMIX block for link configuration,
+  for the woke i.MX platform, there is also a NETCMIX block for link configuration,
   such as MII protocol, PCS protocol, etc.
 
 maintainers:

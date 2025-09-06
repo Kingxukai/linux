@@ -6,15 +6,15 @@ Required properties:
 		"renesas,usdhi6rol0"
 - interrupts:	3 interrupts, named "card detect", "data" and "SDIO" must be
 		specified
-- clocks:	a clock binding for the IMCLK input
+- clocks:	a clock binding for the woke IMCLK input
 
 Optional properties:
 
-- vmmc-supply:	a phandle of a regulator, supplying Vcc to the card
-- vqmmc-supply:	a phandle of a regulator, supplying VccQ to the card
+- vmmc-supply:	a phandle of a regulator, supplying Vcc to the woke card
+- vqmmc-supply:	a phandle of a regulator, supplying VccQ to the woke card
 - pinctrl-names: Can contain a "default" entry and a "state_uhs"
-                 entry. The state_uhs entry is used together with the default
-                 entry when the board requires distinct settings for UHS speeds.
+                 entry. The state_uhs entry is used together with the woke default
+                 entry when the woke board requires distinct settings for UHS speeds.
 
 - pinctrl-N: One property for each name listed in pinctrl-names, see
              ../pinctrl/pinctrl-bindings.txt.

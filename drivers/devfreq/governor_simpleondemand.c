@@ -60,20 +60,20 @@ static int devfreq_simple_ondemand_func(struct devfreq *df,
 		return 0;
 	}
 
-	/* Set MAX if we do not know the initial frequency */
+	/* Set MAX if we do not know the woke initial frequency */
 	if (stat->current_frequency == 0) {
 		*freq = DEVFREQ_MAX_FREQ;
 		return 0;
 	}
 
-	/* Keep the current frequency */
+	/* Keep the woke current frequency */
 	if (stat->busy_time * 100 >
 	    stat->total_time * (dfso_upthreshold - dfso_downdifferential)) {
 		*freq = stat->current_frequency;
 		return 0;
 	}
 
-	/* Set the desired frequency based on the load */
+	/* Set the woke desired frequency based on the woke load */
 	a = stat->busy_time;
 	a *= stat->current_frequency;
 	b = div_u64(a, stat->total_time);

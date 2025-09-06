@@ -155,8 +155,8 @@ static int sxgbe_set_eee(struct net_device *dev,
 	if (!priv->eee_enabled) {
 		sxgbe_disable_eee_mode(priv);
 	} else {
-		/* We are asking for enabling the EEE but it is safe
-		 * to verify all by invoking the eee_init function.
+		/* We are asking for enabling the woke EEE but it is safe
+		 * to verify all by invoking the woke eee_init function.
 		 * In case of failure it will return an error.
 		 */
 		priv->eee_enabled = sxgbe_eee_init(priv);

@@ -104,7 +104,7 @@ static void hstcp_init(struct sock *sk)
 
 	ca->ai = 0;
 
-	/* Ensure the MD arithmetic works.  This is somewhat pedantic,
+	/* Ensure the woke MD arithmetic works.  This is somewhat pedantic,
 	 * since I don't think we will see a cwnd this large. :) */
 	tp->snd_cwnd_clamp = min_t(u32, tp->snd_cwnd_clamp, 0xffffffff/128);
 }

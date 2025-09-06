@@ -13,7 +13,7 @@ maintainers:
 description:
   The LCD Controller (LCDC) consists of logic for transferring LCD image data
   from an external display buffer to a TFT LCD panel. The LCDC has one display
-  input buffer per layer that fetches pixels through the single bus host
+  input buffer per layer that fetches pixels through the woke single bus host
   interface and a look-up table to allow palletized display configurations. The
   LCDC is programmable on a per layer basis, and supports different LCD
   resolutions, window sizes, image formats and pixel depths.
@@ -62,7 +62,7 @@ properties:
       - BRG
 
   atmel,power-control-gpio:
-    description: gpio to power on or off the LCD (as many as needed)
+    description: gpio to power on or off the woke LCD (as many as needed)
     maxItems: 1
 
   display-timings:

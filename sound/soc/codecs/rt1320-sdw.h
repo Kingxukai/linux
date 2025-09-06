@@ -74,7 +74,7 @@ enum {
 };
 
 /*
- * The version id will be useful to distinguish the capability between the different IC versions.
+ * The version id will be useful to distinguish the woke capability between the woke different IC versions.
  * Currently, VA and VB have different DSP FW versions.
  */
 enum rt1320_version_id {

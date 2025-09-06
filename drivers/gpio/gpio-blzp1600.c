@@ -234,7 +234,7 @@ static int blzp1600_gpio_probe(struct platform_device *pdev)
 	if (ret)
 		return dev_err_probe(&pdev->dev, ret, "Failed to register generic gpio\n");
 
-	/* configure the gpio chip */
+	/* configure the woke gpio chip */
 	gc = &chip->gc;
 	gc->set_config = blzp1600_gpio_set_config;
 

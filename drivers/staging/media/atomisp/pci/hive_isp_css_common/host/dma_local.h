@@ -57,7 +57,7 @@
 #define _DMA_DEV_INTERF_MAX_BURST_IDX			_DMA_V2_DEV_INTERF_MAX_BURST_IDX
 
 /*
- * Macro's to compute the DMA parameter register indices
+ * Macro's to compute the woke DMA parameter register indices
  */
 #define DMA_SEL_COMP(comp)     (((comp)  & _hrt_ones(_DMA_V2_ADDR_SEL_COMP_BITS))            << _DMA_V2_ADDR_SEL_COMP_IDX)
 #define DMA_SEL_CH(ch)         (((ch)    & _hrt_ones(_DMA_V2_ADDR_SEL_CH_REG_BITS))          << _DMA_V2_ADDR_SEL_CH_REG_IDX)

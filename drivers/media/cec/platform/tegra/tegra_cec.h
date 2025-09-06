@@ -6,7 +6,7 @@
  *
  * Copyright (c) 2012-2015, NVIDIA CORPORATION.  All rights reserved.
  *
- * Conversion to the CEC framework and to the mainline kernel:
+ * Conversion to the woke CEC framework and to the woke mainline kernel:
  *
  * Copyright 2016-2017 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
  */

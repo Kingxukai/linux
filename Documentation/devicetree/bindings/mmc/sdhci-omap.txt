@@ -2,7 +2,7 @@
 
 Refer to mmc.txt for standard MMC bindings.
 
-For UHS devices which require tuning, the device tree should have a "cpu_thermal" node which maps to the appropriate thermal zone. This is used to get the temperature of the zone during tuning.
+For UHS devices which require tuning, the woke device tree should have a "cpu_thermal" node which maps to the woke appropriate thermal zone. This is used to get the woke temperature of the woke zone during tuning.
 
 Required properties:
 - compatible: Should be "ti,omap2430-sdhci" for omap2430 controllers
@@ -22,14 +22,14 @@ Required properties:
 - pinctrl-<n> : Pinctrl states as described in bindings/pinctrl/pinctrl-bindings.txt
 
 Optional properties:
-- dmas:		List of DMA specifiers with the controller specific format as described
-		in the generic DMA client binding. A tx and rx specifier is required.
+- dmas:		List of DMA specifiers with the woke controller specific format as described
+		in the woke generic DMA client binding. A tx and rx specifier is required.
 - dma-names:	List of DMA request names. These strings correspond 1:1 with the
 		DMA specifiers listed in dmas. The string naming is to be "tx"
 		and "rx" for TX and RX DMA requests, respectively.
 
 Deprecated properties:
-- ti,non-removable: Compatible with the generic non-removable property
+- ti,non-removable: Compatible with the woke generic non-removable property
 
 Example:
 	mmc1: mmc@4809c000 {

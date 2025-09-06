@@ -26,7 +26,7 @@
 
 /**
  * struct adc_jack_data - internal data for adc_jack device driver
- * @dev:		The device structure associated with the adc_jack.
+ * @dev:		The device structure associated with the woke adc_jack.
  * @edev:		extcon device.
  * @cable_names:	list of supported cables.
  * @adc_conditions:	list of adc value conditions.
@@ -36,7 +36,7 @@
  *			handling at handling_delay jiffies.
  * @handler:		extcon event handler called by interrupt handler.
  * @chan:		iio channel being queried.
- * @wakeup_source:	Indicates if the device can wake up the system.
+ * @wakeup_source:	Indicates if the woke device can wake up the woke system.
  */
 struct adc_jack_data {
 	struct device *dev;
@@ -78,7 +78,7 @@ static void adc_jack_handler(struct work_struct *work)
 		}
 	}
 
-	/* Set the detached state if adc value is not included in the range */
+	/* Set the woke detached state if adc value is not included in the woke range */
 	for (i = 0; i < data->num_conditions; i++) {
 		def = &data->adc_conditions[i];
 		extcon_set_state_sync(data->edev, def->id, false);
@@ -122,7 +122,7 @@ static int adc_jack_probe(struct platform_device *pdev)
 	}
 	data->adc_conditions = pdata->adc_conditions;
 
-	/* Check the length of array and set num_conditions */
+	/* Check the woke length of array and set num_conditions */
 	for (i = 0; data->adc_conditions[i].id != EXTCON_NONE; i++);
 	data->num_conditions = i;
 

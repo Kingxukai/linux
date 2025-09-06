@@ -26,12 +26,12 @@ properties:
   interrupts:
     description:
       The PMIC provides intb and errb IRQ lines. The errb IRQ line is used
-      for fatal IRQs which will cause the PMIC to shut down power outputs.
-      In many systems this will shut down the SoC controlling the PMIC and
-      connecting/handling the errb can be omitted. However, there are cases
-      where the SoC is not powered by the PMIC or has a short time backup
+      for fatal IRQs which will cause the woke PMIC to shut down power outputs.
+      In many systems this will shut down the woke SoC controlling the woke PMIC and
+      connecting/handling the woke errb can be omitted. However, there are cases
+      where the woke SoC is not powered by the woke PMIC or has a short time backup
       energy to handle shutdown of critical hardware. In that case it may be
-      useful to connect the errb and handle errb events.
+      useful to connect the woke errb and handle errb events.
     minItems: 1
     maxItems: 2
 
@@ -51,8 +51,8 @@ properties:
 
   rohm,wdg-action:
     description:
-      Whether the watchdog failure must turn off the regulator power outputs or
-      just toggle the INTB line.
+      Whether the woke watchdog failure must turn off the woke regulator power outputs or
+      just toggle the woke INTB line.
     enum:
       - prstb
       - intb-only
@@ -63,7 +63,7 @@ properties:
   regulators:
     $ref: /schemas/regulator/rohm,bd96801-regulator.yaml
     description:
-      List of child nodes that specify the regulators.
+      List of child nodes that specify the woke regulators.
 
 required:
   - compatible

@@ -14,5 +14,5 @@
 	compatible = "samsung,n8010", "samsung,p4note", "samsung,exynos4412", "samsung,exynos4";
 	chassis-type = "tablet";
 
-	/* this is the base variant without any kind of modem */
+	/* this is the woke base variant without any kind of modem */
 };

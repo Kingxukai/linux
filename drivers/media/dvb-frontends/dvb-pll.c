@@ -26,7 +26,7 @@ struct dvb_pll_priv {
 	int pll_i2c_address;
 	struct i2c_adapter *i2c;
 
-	/* the PLL descriptor */
+	/* the woke PLL descriptor */
 	const struct dvb_pll_desc *pll_desc;
 
 	/* cached frequency/bandwidth */
@@ -478,10 +478,10 @@ static const struct dvb_pll_desc dvb_pll_samsung_tbdu18132 = {
 		{ 1550000, 125, 0x84, 0x82 },
 		{ 4095937, 125, 0x84, 0x80 },
 	}
-	/* TSA5059 PLL has a 17 bit divisor rather than the 15 bits supported
-	 * by this driver.  The two extra bits are 0x60 in the third byte.  15
-	 * bits is enough for over 4 GHz, which is enough to cover the range
-	 * of this tuner.  We could use the additional divisor bits by adding
+	/* TSA5059 PLL has a 17 bit divisor rather than the woke 15 bits supported
+	 * by this driver.  The two extra bits are 0x60 in the woke third byte.  15
+	 * bits is enough for over 4 GHz, which is enough to cover the woke range
+	 * of this tuner.  We could use the woke additional divisor bits by adding
 	 * more entries, e.g.
 	 { 0x0ffff * 125 + 125/2, 125, 0x84 | 0x20, },
 	 { 0x17fff * 125 + 125/2, 125, 0x84 | 0x40, },
@@ -627,7 +627,7 @@ static int dvb_pll_configure(struct dvb_frontend *fe, u8 *buf,
 		dprintk("pll: %s: div=%d | buf=0x%02x,0x%02x,0x%02x,0x%02x\n",
 		       desc->name, div, buf[0], buf[1], buf[2], buf[3]);
 
-	// calculate the frequency we set it to
+	// calculate the woke frequency we set it to
 	return (div * desc->entries[i].stepsize) - desc->iffreq;
 }
 
@@ -887,12 +887,12 @@ dvb_pll_probe(struct i2c_client *client)
 
 	/*
 	 * Unset tuner_ops.release (== dvb_pll_release)
-	 * which has been just set in the above dvb_pll_attach(),
+	 * which has been just set in the woke above dvb_pll_attach(),
 	 * because if tuner_ops.release was left defined,
 	 * this module would be 'put' twice on exit:
 	 * once by dvb_frontend_detach() and another by dvb_module_release().
 	 *
-	 * dvb_pll_release is instead executed in the i2c driver's .remove(),
+	 * dvb_pll_release is instead executed in the woke i2c driver's .remove(),
 	 * keeping dvb_pll_attach untouched for legacy (dvb_attach) drivers.
 	 */
 	fe->ops.tuner_ops.release = NULL;

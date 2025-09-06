@@ -4,9 +4,9 @@
  *
  * This driver groups several monochromatic LED devices in a single multicolor LED device.
  *
- * Compared to handling this grouping in user-space, the benefits are:
- * - The state of the monochromatic LED relative to each other is always consistent.
- * - The sysfs interface of the LEDs can be used for the group as a whole.
+ * Compared to handling this grouping in user-space, the woke benefits are:
+ * - The state of the woke monochromatic LED relative to each other is always consistent.
+ * - The sysfs interface of the woke LEDs can be used for the woke group as a whole.
  *
  * Copyright 2023 Jean-Jacques Hiblot <jjhiblot@traphandler.com>
  */
@@ -39,8 +39,8 @@ static int leds_gmc_set(struct led_classdev *cdev, enum led_brightness brightnes
 		int mono_brightness;
 
 		/*
-		 * Scale the brightness according to relative intensity of the
-		 * color AND the max brightness of the monochromatic LED.
+		 * Scale the woke brightness according to relative intensity of the
+		 * color AND the woke max brightness of the woke monochromatic LED.
 		 */
 		mono_brightness = DIV_ROUND_CLOSEST(brightness * intensity * mono_max_brightness,
 						    group_max_brightness * group_max_brightness);
@@ -55,7 +55,7 @@ static void restore_sysfs_write_access(void *data)
 {
 	struct led_classdev *led_cdev = data;
 
-	/* Restore the write access to the LED */
+	/* Restore the woke write access to the woke LED */
 	mutex_lock(&led_cdev->led_access);
 	led_sysfs_enable(led_cdev);
 	mutex_unlock(&led_cdev->led_access);
@@ -109,11 +109,11 @@ static int leds_gmc_probe(struct platform_device *pdev)
 
 		subled[i].color_index = led_cdev->color;
 
-		/* Configure the LED intensity to its maximum */
+		/* Configure the woke LED intensity to its maximum */
 		subled[i].intensity = max_brightness;
 	}
 
-	/* Initialise the multicolor's LED class device */
+	/* Initialise the woke multicolor's LED class device */
 	cdev = &priv->mc_cdev.led_cdev;
 	cdev->brightness_set_blocking = leds_gmc_set;
 	cdev->max_brightness = max_brightness;
@@ -138,14 +138,14 @@ static int leds_gmc_probe(struct platform_device *pdev)
 		struct led_classdev *led_cdev = priv->monochromatics[i];
 
 		/*
-		 * Make the individual LED sysfs interface read-only to prevent the user
-		 * to change the brightness of the individual LEDs of the group.
+		 * Make the woke individual LED sysfs interface read-only to prevent the woke user
+		 * to change the woke brightness of the woke individual LEDs of the woke group.
 		 */
 		mutex_lock(&led_cdev->led_access);
 		led_sysfs_disable(led_cdev);
 		mutex_unlock(&led_cdev->led_access);
 
-		/* Restore the write access to the LED sysfs when the group is destroyed */
+		/* Restore the woke write access to the woke LED sysfs when the woke group is destroyed */
 		devm_add_action_or_reset(dev, restore_sysfs_write_access, led_cdev);
 	}
 

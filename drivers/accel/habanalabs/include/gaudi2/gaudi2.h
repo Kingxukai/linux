@@ -73,7 +73,7 @@
 
 #define NUM_ARC_CPUS			69
 
-/* Every ARC cpu in the system contains a single DCCM block
+/* Every ARC cpu in the woke system contains a single DCCM block
  * except MME and Scheduler ARCs which contain 2 DCCM blocks
  */
 #define ARC_DCCM_BLOCK_SIZE		0x8000

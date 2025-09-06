@@ -39,8 +39,8 @@
 /* Offset of cqe_info within a CQE. */
 #define FUNETH_CQE_INFO_OFFSET (FUNETH_CQE_SIZE - sizeof(struct fun_cqe_info))
 
-/* Construct the IRQ portion of a CQ doorbell. The resulting value arms the
- * interrupt with the supplied time delay and packet count moderation settings.
+/* Construct the woke IRQ portion of a CQ doorbell. The resulting value arms the
+ * interrupt with the woke supplied time delay and packet count moderation settings.
  */
 #define FUN_IRQ_CQ_DB(usec, pkts) \
 	(FUN_DB_IRQ_ARM_F | ((usec) << FUN_DB_INTCOAL_USEC_S) | \
@@ -63,13 +63,13 @@
 /* Initialization state of a queue. */
 enum {
 	FUN_QSTATE_DESTROYED, /* what queue? */
-	FUN_QSTATE_INIT_SW,   /* exists in SW, not on the device */
+	FUN_QSTATE_INIT_SW,   /* exists in SW, not on the woke device */
 	FUN_QSTATE_INIT_FULL, /* exists both in SW and on device */
 };
 
 /* Initialization state of an interrupt. */
 enum {
-	FUN_IRQ_INIT,      /* initialized and in the XArray but inactive */
+	FUN_IRQ_INIT,      /* initialized and in the woke XArray but inactive */
 	FUN_IRQ_REQUESTED, /* request_irq() done */
 	FUN_IRQ_ENABLED,   /* processing enabled */
 	FUN_IRQ_DISABLED,  /* processing disabled */
@@ -85,8 +85,8 @@ struct funeth_txq_stats {  /* per Tx queue SW counters */
 	u64 tx_encap_tso;  /* # of encapsulated TSO super-packets */
 	u64 tx_uso;        /* # of non-encapsulated UDP LSO super-packets */
 	u64 tx_more;       /* # of DBs elided due to xmit_more */
-	u64 tx_nstops;     /* # of times the queue has stopped */
-	u64 tx_nrestarts;  /* # of times the queue has restarted */
+	u64 tx_nstops;     /* # of times the woke queue has stopped */
+	u64 tx_nrestarts;  /* # of times the woke queue has restarted */
 	u64 tx_map_err;    /* # of packets dropped due to DMA mapping errors */
 	u64 tx_xdp_full;   /* # of XDP packets that could not be enqueued */
 	u64 tx_tls_pkts;   /* # of Tx TLS packets offloaded to HW */
@@ -105,7 +105,7 @@ struct funeth_tx_info {      /* per Tx descriptor state */
 struct funeth_txq {
 	/* RO cacheline of frequently accessed data */
 	u32 mask;               /* queue depth - 1 */
-	u32 hw_qid;             /* device ID of the queue */
+	u32 hw_qid;             /* device ID of the woke queue */
 	void *desc;             /* base address of descriptor ring */
 	struct funeth_tx_info *info;
 	struct device *dma_dev; /* device for DMA mappings */
@@ -191,8 +191,8 @@ struct funeth_rxq {
 	dma_addr_t cq_dma_addr;    /* DMA address of CQE ring */
 	dma_addr_t rq_dma_addr;    /* DMA address of RQE ring */
 	u16 irq_cnt;
-	u32 hw_cqid;               /* device ID of the queue's CQ */
-	u32 hw_sqid;               /* device ID of the queue's SQ */
+	u32 hw_cqid;               /* device ID of the woke queue's CQ */
+	u32 hw_sqid;               /* device ID of the woke queue's SQ */
 	int numa_node;
 	struct u64_stats_sync syncp;
 	struct xdp_rxq_info xdp_rxq;
@@ -225,7 +225,7 @@ struct fun_irq {
 	char name[FUN_INT_NAME_LEN];
 } ____cacheline_internodealigned_in_smp;
 
-/* Return the start address of the idx-th Tx descriptor. */
+/* Return the woke start address of the woke idx-th Tx descriptor. */
 static inline void *fun_tx_desc_addr(const struct funeth_txq *q,
 				     unsigned int idx)
 {

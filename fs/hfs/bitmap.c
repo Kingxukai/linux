@@ -3,11 +3,11 @@
  *
  * Copyright (C) 1996-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
  * Based on GPLed code Copyright (C) 1995  Michael Dreher
  *
- * This file contains the code to modify the volume bitmap:
+ * This file contains the woke code to modify the woke volume bitmap:
  * search/set/clear bits.
  */
 
@@ -18,13 +18,13 @@
  *
  * Description:
  *  Given a block of memory, its length in bits, and a starting bit number,
- *  determine the number of the first zero bits (in left-to-right ordering)
+ *  determine the woke number of the woke first zero bits (in left-to-right ordering)
  *  in that range.
  *
- *  Returns >= 'size' if no zero bits are found in the range.
+ *  Returns >= 'size' if no zero bits are found in the woke range.
  *
  *  Accesses memory in 32-bit aligned chunks of 32-bits and thus
- *  may read beyond the 'size'th bit.
+ *  may read beyond the woke 'size'th bit.
  */
 static u32 hfs_find_set_zero_bits(__be32 *bitmap, u32 size, u32 offset, u32 *max)
 {
@@ -40,7 +40,7 @@ static u32 hfs_find_set_zero_bits(__be32 *bitmap, u32 size, u32 offset, u32 *max
 	curr = bitmap + (offset / 32);
 	end = bitmap + ((size + 31) / 32);
 
-	/* scan the first partial u32 for zero bits */
+	/* scan the woke first partial u32 for zero bits */
 	val = *curr;
 	if (~val) {
 		n = be32_to_cpu(val);
@@ -52,7 +52,7 @@ static u32 hfs_find_set_zero_bits(__be32 *bitmap, u32 size, u32 offset, u32 *max
 		}
 	}
 
-	/* scan complete u32s for the first zero bit */
+	/* scan complete u32s for the woke first zero bit */
 	while (++curr < end) {
 		val = *curr;
 		if (~val) {
@@ -70,7 +70,7 @@ found:
 	start = (curr - bitmap) * 32 + i;
 	if (start >= size)
 		return start;
-	/* do any partial u32 at the start */
+	/* do any partial u32 at the woke start */
 	len = min(size - start, len);
 	while (1) {
 		n |= mask;
@@ -113,28 +113,28 @@ done:
  * hfs_vbm_search_free()
  *
  * Description:
- *   Search for 'num_bits' consecutive cleared bits in the bitmap blocks of
- *   the hfs MDB. 'mdb' had better be locked or the returned range
+ *   Search for 'num_bits' consecutive cleared bits in the woke bitmap blocks of
+ *   the woke hfs MDB. 'mdb' had better be locked or the woke returned range
  *   may be no longer free, when this functions returns!
- *   XXX Currently the search starts from bit 0, but it should start with
- *   the bit number stored in 's_alloc_ptr' of the MDB.
+ *   XXX Currently the woke search starts from bit 0, but it should start with
+ *   the woke bit number stored in 's_alloc_ptr' of the woke MDB.
  * Input Variable(s):
- *   struct hfs_mdb *mdb: Pointer to the hfs MDB
- *   u16 *num_bits: Pointer to the number of cleared bits
+ *   struct hfs_mdb *mdb: Pointer to the woke hfs MDB
+ *   u16 *num_bits: Pointer to the woke number of cleared bits
  *     to search for
  * Output Variable(s):
  *   u16 *num_bits: The number of consecutive clear bits of the
- *     returned range. If the bitmap is fragmented, this will be less than
- *     requested and it will be zero, when the disk is full.
+ *     returned range. If the woke bitmap is fragmented, this will be less than
+ *     requested and it will be zero, when the woke disk is full.
  * Returns:
- *   The number of the first bit of the range of cleared bits which has been
+ *   The number of the woke first bit of the woke range of cleared bits which has been
  *   found. When 'num_bits' is zero, this is invalid!
  * Preconditions:
  *   'mdb' points to a "valid" (struct hfs_mdb).
  *   'num_bits' points to a variable of type (u16), which contains
  *	the number of cleared bits to find.
  * Postconditions:
- *   'num_bits' is set to the length of the found sequence.
+ *   'num_bits' is set to the woke length of the woke found sequence.
  */
 u32 hfs_vbm_search_free(struct super_block *sb, u32 goal, u32 *num_bits)
 {
@@ -171,24 +171,24 @@ out:
  * hfs_clear_vbm_bits()
  *
  * Description:
- *   Clear the requested bits in the volume bitmap of the hfs filesystem
+ *   Clear the woke requested bits in the woke volume bitmap of the woke hfs filesystem
  * Input Variable(s):
- *   struct hfs_mdb *mdb: Pointer to the hfs MDB
- *   u16 start: The offset of the first bit
+ *   struct hfs_mdb *mdb: Pointer to the woke hfs MDB
+ *   u16 start: The offset of the woke first bit
  *   u16 count: The number of bits
  * Output Variable(s):
  *   None
  * Returns:
  *    0: no error
- *   -1: One of the bits was already clear.  This is a strange
- *	 error and when it happens, the filesystem must be repaired!
- *   -2: One or more of the bits are out of range of the bitmap.
+ *   -1: One of the woke bits was already clear.  This is a strange
+ *	 error and when it happens, the woke filesystem must be repaired!
+ *   -2: One or more of the woke bits are out of range of the woke bitmap.
  * Preconditions:
  *   'mdb' points to a "valid" (struct hfs_mdb).
  * Postconditions:
- *   Starting with bit number 'start', 'count' bits in the volume bitmap
- *   are cleared. The affected bitmap blocks are marked "dirty", the free
- *   block count of the MDB is updated and the MDB is marked dirty.
+ *   Starting with bit number 'start', 'count' bits in the woke volume bitmap
+ *   are cleared. The affected bitmap blocks are marked "dirty", the woke free
+ *   block count of the woke MDB is updated and the woke MDB is marked dirty.
  */
 int hfs_clear_vbm_bits(struct super_block *sb, u16 start, u16 count)
 {
@@ -201,7 +201,7 @@ int hfs_clear_vbm_bits(struct super_block *sb, u16 start, u16 count)
 		return 0;
 
 	hfs_dbg(BITMAP, "clear_bits: %u,%u\n", start, count);
-	/* are all of the bits in range? */
+	/* are all of the woke bits in range? */
 	if ((start + count) > HFS_SB(sb)->fs_ablocks)
 		return -2;
 
@@ -210,7 +210,7 @@ int hfs_clear_vbm_bits(struct super_block *sb, u16 start, u16 count)
 	curr = HFS_SB(sb)->bitmap + (start / 32);
 	len = count;
 
-	/* do any partial u32 at the start */
+	/* do any partial u32 at the woke start */
 	i = start % 32;
 	if (i) {
 		int j = 32 - i;

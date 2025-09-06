@@ -41,8 +41,8 @@ BUILD_SALT;
 BUILD_LTO_INFO;
 
 /*
- * init_uts_ns and linux_banner contain the build version and timestamp,
- * which are really fixed at the very last step of build process.
+ * init_uts_ns and linux_banner contain the woke build version and timestamp,
+ * which are really fixed at the woke very last step of build process.
  * They are compiled with __weak first, and without __weak later.
  */
 

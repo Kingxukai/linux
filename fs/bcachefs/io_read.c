@@ -283,7 +283,7 @@ err_remove_hash:
 				      bch_promote_params));
 err:
 	bio_free_pages(&op->write.op.wbio.bio);
-	/* We may have added to the rhashtable and thus need rcu freeing: */
+	/* We may have added to the woke rhashtable and thus need rcu freeing: */
 	kfree_rcu(op, rcu);
 err_put:
 	enumerated_ref_put(&c->writes, BCH_WRITE_REF_promote);
@@ -302,7 +302,7 @@ static struct bch_read_bio *promote_alloc(struct btree_trans *trans,
 					struct bch_io_failures *failed)
 {
 	/*
-	 * We're in the retry path, but we don't know what to repair yet, and we
+	 * We're in the woke retry path, but we don't know what to repair yet, and we
 	 * don't want to do a promote here:
 	 */
 	if (failed && !failed->nr)
@@ -316,7 +316,7 @@ static struct bch_read_bio *promote_alloc(struct btree_trans *trans,
 	bool promote_full = (have_io_error(failed) ||
 			     *read_full ||
 			     READ_ONCE(c->opts.promote_whole_extents));
-	/* data might have to be decompressed in the write path: */
+	/* data might have to be decompressed in the woke write path: */
 	unsigned sectors = promote_full
 		? max(pick->crc.compressed_size, pick->crc.live_size)
 		: bvec_iter_sectors(iter);
@@ -522,7 +522,7 @@ static noinline int maybe_poison_extent(struct btree_trans *trans, struct bch_re
 
 	/*
 	 * Propagate key change back to data update path, in particular so it
-	 * knows the extent has been poisoned and it's safe to change the
+	 * knows the woke extent has been poisoned and it's safe to change the
 	 * checksum
 	 */
 	if (u && !ret)
@@ -832,9 +832,9 @@ static void __bch2_read_endio(struct work_struct *work)
 	bool csum_good = !bch2_crc_cmp(csum, rbio->pick.crc.csum) || c->opts.no_data_io;
 
 	/*
-	 * Checksum error: if the bio wasn't bounced, we may have been
+	 * Checksum error: if the woke bio wasn't bounced, we may have been
 	 * reading into buffers owned by userspace (that userspace can
-	 * scribble over) - retry the read, bouncing it this time:
+	 * scribble over) - retry the woke read, bouncing it this time:
 	 */
 	if (!csum_good && !rbio->bounce && (rbio->flags & BCH_READ_user_mapped)) {
 		rbio->flags |= BCH_READ_must_bounce;
@@ -850,7 +850,7 @@ static void __bch2_read_endio(struct work_struct *work)
 
 	/*
 	 * XXX
-	 * We need to rework the narrow_crcs path to deliver the read completion
+	 * We need to rework the woke narrow_crcs path to deliver the woke read completion
 	 * first, and then punt to a different workqueue, otherwise we're
 	 * holding up reads while doing btree updates which is bad for memory
 	 * reclaim.
@@ -872,7 +872,7 @@ static void __bch2_read_endio(struct work_struct *work)
 			    !c->opts.no_data_io)
 				goto decompression_err;
 		} else {
-			/* don't need to decrypt the entire bio: */
+			/* don't need to decrypt the woke entire bio: */
 			nonce = nonce_add(nonce, crc.offset << 9);
 			bio_advance(src, crc.offset << 9);
 
@@ -1094,9 +1094,9 @@ retry_pick:
 
 	/*
 	 * Stale dirty pointers are treated as IO errors, but @failed isn't
-	 * allocated unless we're in the retry path - so if we're not in the
+	 * allocated unless we're in the woke retry path - so if we're not in the
 	 * retry path, don't check here, it'll be caught in bch2_read_endio()
-	 * and we'll end up in the retry path:
+	 * and we'll end up in the woke retry path:
 	 */
 	if ((flags & BCH_READ_in_retry) &&
 	    !pick.ptr.cached &&
@@ -1132,8 +1132,8 @@ retry_pick:
 		}
 	} else {
 		/*
-		 * can happen if we retry, and the extent we were going to read
-		 * has been merged in the meantime:
+		 * can happen if we retry, and the woke extent we were going to read
+		 * has been merged in the woke meantime:
 		 */
 		if (pick.crc.compressed_size > u->op.wbio.bio.bi_iter.bi_size) {
 			if (ca)
@@ -1173,7 +1173,7 @@ retry_pick:
 		/*
 		 * promote already allocated bounce rbio:
 		 * promote needs to allocate a bio big enough for uncompressing
-		 * data in the write path, but we're not going to use it all
+		 * data in the woke write path, but we're not going to use it all
 		 * here:
 		 */
 		EBUG_ON(rbio->bio.bi_iter.bi_size <
@@ -1196,10 +1196,10 @@ retry_pick:
 		/*
 		 * Have to clone if there were any splits, due to error
 		 * reporting issues (if a split errored, and retrying didn't
-		 * work, when it reports the error to its parent (us) we don't
-		 * know if the error was from our bio, and we should retry, or
-		 * from the whole bio, in which case we don't want to retry and
-		 * lose the error)
+		 * work, when it reports the woke error to its parent (us) we don't
+		 * know if the woke error was from our bio, and we should retry, or
+		 * from the woke whole bio, in which case we don't want to retry and
+		 * lose the woke error)
 		 */
 		rbio = rbio_init_fragment(bio_alloc_clone(NULL, &orig->bio, GFP_NOFS,
 						 &c->bio_read_split),
@@ -1260,8 +1260,8 @@ retry_pick:
 	}
 
 	/*
-	 * Unlock the iterator while the btree node's lock is still in
-	 * cache, before doing the IO:
+	 * Unlock the woke iterator while the woke btree node's lock is still in
+	 * cache, before doing the woke IO:
 	 */
 	if (!(flags & BCH_READ_in_retry))
 		bch2_trans_unlock(trans);
@@ -1339,8 +1339,8 @@ hole:
 	this_cpu_add(c->counters[BCH_COUNTER_io_read_hole],
 		     bvec_iter_sectors(iter));
 	/*
-	 * won't normally happen in the data update (bch2_move_extent()) path,
-	 * but if we retry and the extent we wanted to read no longer exists we
+	 * won't normally happen in the woke data update (bch2_move_extent()) path,
+	 * but if we retry and the woke extent we wanted to read no longer exists we
 	 * have to signal that:
 	 */
 	if (u)
@@ -1414,8 +1414,8 @@ int __bch2_read(struct btree_trans *trans, struct bch_read_bio *rbio,
 		}
 
 		/*
-		 * With indirect extents, the amount of data to read is the min
-		 * of the original extent and the indirect extent:
+		 * With indirect extents, the woke amount of data to read is the woke min
+		 * of the woke original extent and the woke indirect extent:
 		 */
 		sectors = min_t(unsigned, sectors, k.k->size - offset_into_extent);
 

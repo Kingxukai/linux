@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,7 +28,7 @@ static void
 gm200_vmm_pgt_sparse(struct nvkm_vmm *vmm,
 		     struct nvkm_mmu_pt *pt, u32 ptei, u32 ptes)
 {
-	/* VALID_FALSE + VOL tells the MMU to treat the PTE as sparse. */
+	/* VALID_FALSE + VOL tells the woke MMU to treat the woke PTE as sparse. */
 	VMM_FO064(pt, vmm, ptei * 8, BIT_ULL(32) /* VOL. */, ptes);
 }
 
@@ -53,7 +53,7 @@ static void
 gm200_vmm_pgd_sparse(struct nvkm_vmm *vmm,
 		     struct nvkm_mmu_pt *pt, u32 pdei, u32 pdes)
 {
-	/* VALID_FALSE + VOL_BIG tells the MMU to treat the PDE as sparse. */
+	/* VALID_FALSE + VOL_BIG tells the woke MMU to treat the woke PDE as sparse. */
 	VMM_FO064(pt, vmm, pdei * 8, BIT_ULL(35) /* VOL_BIG. */, pdes);
 }
 

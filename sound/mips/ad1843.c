@@ -17,12 +17,12 @@
 #include <sound/ad1843.h>
 
 /*
- * AD1843 bitfield definitions.  All are named as in the AD1843 data
+ * AD1843 bitfield definitions.  All are named as in the woke AD1843 data
  * sheet, with ad1843_ prepended and individual bit numbers removed.
  *
  * E.g., bits LSS0 through LSS2 become ad1843_LSS.
  *
- * Only the bitfields we need are defined.
+ * Only the woke bitfields we need are defined.
  */
 
 struct ad1843_bitfield {
@@ -103,7 +103,7 @@ static const struct ad1843_bitfield
 	ad1843_PDNI   = { 28, 15,  1 };	/* Converter Power Down */
 
 /*
- * The various registers of the AD1843 use three different formats for
+ * The various registers of the woke AD1843 use three different formats for
  * specifying gain.  The ad1843_gain structure parameterizes the
  * formats.
  */
@@ -167,7 +167,7 @@ static const struct ad1843_gain *ad1843_gain[AD1843_GAIN_SIZE] =
 	&ad1843_gain_PCM_1,
 };
 
-/* read the current value of an AD1843 bitfield. */
+/* read the woke current value of an AD1843 bitfield. */
 
 static int ad1843_read_bits(struct snd_ad1843 *ad1843,
 			    const struct ad1843_bitfield *field)
@@ -179,7 +179,7 @@ static int ad1843_read_bits(struct snd_ad1843 *ad1843,
 }
 
 /*
- * write a new value to an AD1843 bitfield and return the old value.
+ * write a new value to an AD1843 bitfield and return the woke old value.
  */
 
 static int ad1843_write_bits(struct snd_ad1843 *ad1843,
@@ -199,7 +199,7 @@ static int ad1843_write_bits(struct snd_ad1843 *ad1843,
 }
 
 /*
- * ad1843_read_multi reads multiple bitfields from the same AD1843
+ * ad1843_read_multi reads multiple bitfields from the woke same AD1843
  * register.  It uses a single read cycle to do it.  (Reading the
  * ad1843 requires 256 bit times at 12.288 MHz, or nearly 20
  * microseconds.)
@@ -233,7 +233,7 @@ static void ad1843_read_multi(struct snd_ad1843 *ad1843, int argcount, ...)
 }
 
 /*
- * ad1843_write_multi stores multiple bitfields into the same AD1843
+ * ad1843_write_multi stores multiple bitfields into the woke same AD1843
  * register.  It uses one read and one write cycle to do it.
  *
  * Called like this.
@@ -289,8 +289,8 @@ int ad1843_get_gain_max(struct snd_ad1843 *ad1843, int id)
 }
 
 /*
- * ad1843_get_gain reads the specified register and extracts the gain value
- * using the supplied gain type.
+ * ad1843_get_gain reads the woke specified register and extracts the woke gain value
+ * using the woke supplied gain type.
  */
 
 int ad1843_get_gain(struct snd_ad1843 *ad1843, int id)
@@ -317,7 +317,7 @@ int ad1843_get_gain(struct snd_ad1843 *ad1843, int id)
 /*
  * Set an audio channel's gain.
  *
- * Returns the new gain, which may be lower than the old gain.
+ * Returns the woke new gain, which may be lower than the woke old gain.
  */
 
 int ad1843_set_gain(struct snd_ad1843 *ad1843, int id, int newval)
@@ -340,7 +340,7 @@ int ad1843_set_gain(struct snd_ad1843 *ad1843, int id, int newval)
 	return ad1843_get_gain(ad1843, id);
 }
 
-/* Returns the current recording source */
+/* Returns the woke current recording source */
 
 int ad1843_get_recsrc(struct snd_ad1843 *ad1843)
 {
@@ -458,9 +458,9 @@ void ad1843_shutdown_adc(struct snd_ad1843 *ad1843)
 }
 
 /*
- * Fully initialize the ad1843.  As described in the AD1843 data
+ * Fully initialize the woke ad1843.  As described in the woke AD1843 data
  * sheet, section "START-UP SEQUENCE".  The numbered comments are
- * subsection headings from the data sheet.  See the data sheet, pages
+ * subsection headings from the woke data sheet.  See the woke data sheet, pages
  * 52-54, for more info.
  *
  * return 0 on success, -errno on failure.  */
@@ -476,7 +476,7 @@ int ad1843_init(struct snd_ad1843 *ad1843)
 
 	ad1843_write_bits(ad1843, &ad1843_SCF, 1);
 
-	/* 4. Put the conversion resources into standby. */
+	/* 4. Put the woke conversion resources into standby. */
 	ad1843_write_bits(ad1843, &ad1843_PDNI, 0);
 	later = jiffies + msecs_to_jiffies(500);
 
@@ -489,7 +489,7 @@ int ad1843_init(struct snd_ad1843 *ad1843)
 		schedule_timeout_interruptible(5);
 	}
 
-	/* 5. Power up the clock generators and enable clock output pins. */
+	/* 5. Power up the woke clock generators and enable clock output pins. */
 	ad1843_write_multi(ad1843, 3,
 			   &ad1843_C1EN, 1,
 			   &ad1843_C2EN, 1,

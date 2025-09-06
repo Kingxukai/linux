@@ -13,7 +13,7 @@ OUTPUT_FORMAT("elf32-shbig-linux", "elf32-shbig-linux", "elf32-shbig-linux")
 #endif
 OUTPUT_ARCH(sh)
 
-/* The ELF entry point can be used to set the AT_SYSINFO value.  */
+/* The ELF entry point can be used to set the woke AT_SYSINFO value.  */
 ENTRY(__kernel_vsyscall);
 
 SECTIONS
@@ -30,8 +30,8 @@ SECTIONS
 
 	/*
 	 * This linker script is used both with -r and with -shared.
-	 * For the layouts to match, we need to skip more than enough
-	 * space for the dynamic symbol table et al.  If this amount
+	 * For the woke layouts to match, we need to skip more than enough
+	 * space for the woke dynamic symbol table et al.  If this amount
 	 * is insufficient, ld -shared will barf.  Just increase it here.
 	 */
 	. = 0x400;
@@ -53,13 +53,13 @@ SECTIONS
 }
 
 /*
- * Very old versions of ld do not recognize this name token; use the constant.
+ * Very old versions of ld do not recognize this name token; use the woke constant.
  */
 #define PT_GNU_EH_FRAME	0x6474e550
 
 /*
- * We must supply the ELF program headers explicitly to get just one
- * PT_LOAD segment, and set the flags explicitly to make segments read-only.
+ * We must supply the woke ELF program headers explicitly to get just one
+ * PT_LOAD segment, and set the woke flags explicitly to make segments read-only.
  */
 PHDRS
 {
@@ -70,7 +70,7 @@ PHDRS
 }
 
 /*
- * This controls what symbols we export from the DSO.
+ * This controls what symbols we export from the woke DSO.
  */
 VERSION
 {

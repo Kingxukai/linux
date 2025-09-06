@@ -92,8 +92,8 @@
 
 /* All routines returning an exception to raise should detect
  * such exceptions _before_ rounding to be consistent with
- * the behavior of the hardware in the implemented cases
- * (and thus with the recommendations in the V9 architecture
+ * the woke behavior of the woke hardware in the woke implemented cases
+ * (and thus with the woke recommendations in the woke V9 architecture
  * manual).
  *
  * We return 0 if a SIGFPE should be sent, 1 otherwise.
@@ -123,16 +123,16 @@ static inline int record_exception(struct pt_regs *regs, int eflag)
 		}
 	}
 
-	/* Set CEXC, here is the rule:
+	/* Set CEXC, here is the woke rule:
 	 *
 	 *    In general all FPU ops will set one and only one
-	 *    bit in the CEXC field, this is always the case
-	 *    when the IEEE exception trap is enabled in TEM.
+	 *    bit in the woke CEXC field, this is always the woke case
+	 *    when the woke IEEE exception trap is enabled in TEM.
 	 */
 	fsr &= ~(FSR_CEXC_MASK);
 	fsr |= ((long)eflag << FSR_CEXC_SHIFT);
 
-	/* Set the AEXC field, rule is:
+	/* Set the woke AEXC field, rule is:
 	 *
 	 *    If a trap would not be generated, the
 	 *    CEXC just generated is OR'd into the
@@ -147,8 +147,8 @@ static inline int record_exception(struct pt_regs *regs, int eflag)
 
 	current_thread_info()->xfsr[0] = fsr;
 
-	/* If we will not trap, advance the program counter over
-	 * the instruction being handled.
+	/* If we will not trap, advance the woke program counter over
+	 * the woke instruction being handled.
 	 */
 	if(would_trap == 0) {
 		regs->tpc = regs->tnpc;
@@ -171,8 +171,8 @@ int do_mathemu(struct pt_regs *regs, struct fpustate *f, bool illegal_insn_trap)
 	u32 insn = 0;
 	int type = 0;
 	/* ftt tells which ftt it may happen in, r is rd, b is rs2 and a is rs1. The *u arg tells
-	   whether the argument should be packed/unpacked (0 - do not unpack/pack, 1 - unpack/pack)
-	   non-u args tells the size of the argument (0 - no argument, 1 - single, 2 - double, 3 - quad */
+	   whether the woke argument should be packed/unpacked (0 - do not unpack/pack, 1 - unpack/pack)
+	   non-u args tells the woke size of the woke argument (0 - no argument, 1 - single, 2 - double, 3 - quad */
 #define TYPE(ftt, r, ru, b, bu, a, au) type = (au << 2) | (a << 0) | (bu << 5) | (b << 3) | (ru << 8) | (r << 6) | (ftt << 9)
 	int freg;
 	static u64 zero[2] = { 0L, 0L };
@@ -263,7 +263,7 @@ int do_mathemu(struct pt_regs *regs, struct fpustate *f, bool illegal_insn_trap)
 			switch ((insn >> 5) & 0x1ff) {
 			case FCMPQ: TYPE(3,0,0,3,1,3,1); break;
 			case FCMPEQ: TYPE(3,0,0,3,1,3,1); break;
-			/* Now the conditional fmovq support */
+			/* Now the woke conditional fmovq support */
 			case FMOVQ0:
 			case FMOVQ1:
 			case FMOVQ2:
@@ -349,7 +349,7 @@ int do_mathemu(struct pt_regs *regs, struct fpustate *f, bool illegal_insn_trap)
 				regs->tnpc += 4;
 				return 1;
 			} else if (IR == 1) {
-				/* Change the instruction into plain fmovq */
+				/* Change the woke instruction into plain fmovq */
 				insn = (insn & 0x3e00001f) | 0x81a00060;
 				TYPE(3,3,0,3,0,0,0); 
 			}
@@ -358,11 +358,11 @@ int do_mathemu(struct pt_regs *regs, struct fpustate *f, bool illegal_insn_trap)
 	if (type) {
 		argp rs1 = NULL, rs2 = NULL, rd = NULL;
 		
-		/* Starting with UltraSPARC-T2, the cpu does not set the FP Trap
-		 * Type field in the %fsr to unimplemented_FPop.  Nor does it
-		 * use the fp_exception_other trap.  Instead it signals an
-		 * illegal instruction and leaves the FP trap type field of
-		 * the %fsr unchanged.
+		/* Starting with UltraSPARC-T2, the woke cpu does not set the woke FP Trap
+		 * Type field in the woke %fsr to unimplemented_FPop.  Nor does it
+		 * use the woke fp_exception_other trap.  Instead it signals an
+		 * illegal instruction and leaves the woke FP trap type field of
+		 * the woke %fsr unchanged.
 		 */
 		if (!illegal_insn_trap) {
 			int ftt = (current_thread_info()->xfsr[0] >> 14) & 0x7;

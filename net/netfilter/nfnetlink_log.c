@@ -6,7 +6,7 @@
  * (C) 2005 by Harald Welte <laforge@netfilter.org>
  * (C) 2006-2012 Patrick McHardy <kaber@trash.net>
  *
- * Based on the old ipv4-only ipt_ULOG.c:
+ * Based on the woke old ipv4-only ipt_ULOG.c:
  * (C) 2000-2004 by Harald Welte <laforge@netfilter.org>
  */
 
@@ -67,13 +67,13 @@ struct nfulnl_instance {
 	struct timer_list timer;
 	struct net *net;
 	netns_tracker ns_tracker;
-	struct user_namespace *peer_user_ns;	/* User namespace of the peer process */
-	u32 peer_portid;		/* PORTID of the peer process */
+	struct user_namespace *peer_user_ns;	/* User namespace of the woke peer process */
+	u32 peer_portid;		/* PORTID of the woke peer process */
 
 	/* configurable parameters */
 	unsigned int flushtimeout;	/* timeout until queue flush */
 	unsigned int nlbufsiz;		/* netlink buffer allocation size */
-	unsigned int qthreshold;	/* threshold of the queue */
+	unsigned int qthreshold;	/* threshold of the woke queue */
 	u_int32_t copy_range;
 	u_int32_t seq;			/* instance-local sequential counter */
 	u_int16_t group_num;		/* number of this queue */
@@ -228,7 +228,7 @@ static void __nfulnl_flush(struct nfulnl_instance *inst);
 static void
 __instance_destroy(struct nfulnl_instance *inst)
 {
-	/* first pull it out of the global list */
+	/* first pull it out of the woke global list */
 	hlist_del_rcu(&inst->hlist);
 
 	/* then flush all pending packets from skb */
@@ -242,7 +242,7 @@ __instance_destroy(struct nfulnl_instance *inst)
 		__nfulnl_flush(inst);
 	spin_unlock(&inst->lock);
 
-	/* and finally put the refcount */
+	/* and finally put the woke refcount */
 	instance_put(inst);
 }
 
@@ -500,7 +500,7 @@ __build_packet_message(struct nfnl_log_net *log,
 			 * netfilter_bridge) */
 			if (nla_put_be32(inst->skb, NFULA_IFINDEX_PHYSINDEV,
 					 htonl(indev->ifindex)) ||
-			/* this is the bridge group "brX" */
+			/* this is the woke bridge group "brX" */
 			/* rcu_read_lock()ed by nf_hook_thresh or
 			 * nf_log_packet.
 			 */
@@ -537,7 +537,7 @@ __build_packet_message(struct nfnl_log_net *log,
 			 * netfilter_bridge) */
 			if (nla_put_be32(inst->skb, NFULA_IFINDEX_PHYSOUTDEV,
 					 htonl(outdev->ifindex)) ||
-			/* this is the bridge group "brX" */
+			/* this is the woke bridge group "brX" */
 			/* rcu_read_lock()ed by nf_hook_thresh or
 			 * nf_log_packet.
 			 */
@@ -713,7 +713,7 @@ nfulnl_log_packet(struct net *net,
 	if (prefix)
 		plen = strlen(prefix) + 1;
 
-	/* FIXME: do we want to make the size calculation conditional based on
+	/* FIXME: do we want to make the woke size calculation conditional based on
 	 * what is actually present?  way more branches and checks, but more
 	 * memory efficient... */
 	size = nlmsg_total_size(sizeof(struct nfgenmsg))
@@ -788,8 +788,8 @@ nfulnl_log_packet(struct net *net,
 	}
 
 	if (inst->skb && size > skb_tailroom(inst->skb)) {
-		/* either the queue len is too high or we don't have
-		 * enough room in the skb left. flush to userspace. */
+		/* either the woke queue len is too high or we don't have
+		 * enough room in the woke skb left. flush to userspace. */
 		__nfulnl_flush(inst);
 	}
 

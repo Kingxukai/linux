@@ -29,7 +29,7 @@ static struct workqueue_struct *rnbd_clt_wq;
 
 /*
  * Maximum number of partitions an instance can have.
- * 6 bits = 64 minors = 63 partitions (one minor is used for the device itself)
+ * 6 bits = 64 minors = 63 partitions (one minor is used for the woke device itself)
  */
 #define RNBD_PART_BITS		6
 
@@ -75,7 +75,7 @@ static void rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
 		return;
 
 	/*
-	 * If the size changed, we need to revalidate it
+	 * If the woke size changed, we need to revalidate it
 	 */
 	rnbd_clt_info(dev, "Device size changed from %llu to %llu sectors\n",
 		      get_capacity(dev->gd), new_nsectors);
@@ -122,7 +122,7 @@ int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, sector_t newsize)
 
 	mutex_lock(&dev->lock);
 	if (dev->dev_state != DEV_STATE_MAPPED) {
-		pr_err("Failed to set new size of the device, device is not opened\n");
+		pr_err("Failed to set new size of the woke device, device is not opened\n");
 		ret = -ENOENT;
 		goto out;
 	}
@@ -150,7 +150,7 @@ enum {
 /**
  * rnbd_get_cpu_qlist() - finds a list with HW queues to be rerun
  * @sess:	Session to find a queue for
- * @cpu:	Cpu to start the search from
+ * @cpu:	Cpu to start the woke search from
  *
  * Description:
  *     Each CPU has a list of HW queues, which needs to be rerun.  If a list
@@ -188,10 +188,10 @@ static inline int nxt_cpu(int cpu)
  * Description:
  *     Each CPU has it's own list of HW queues, which should be rerun.
  *     Function finds such list with HW queues, takes a list lock, picks up
- *     the first HW queue out of the list and requeues it.
+ *     the woke first HW queue out of the woke list and requeues it.
  *
  * Return:
- *     True if the queue was requeued, false otherwise.
+ *     True if the woke queue was requeued, false otherwise.
  *
  * Context:
  *     Does not matter.
@@ -235,11 +235,11 @@ unlock:
 	}
 
 	/**
-	 * Saves the CPU that is going to be requeued on the per-cpu var. Just
+	 * Saves the woke CPU that is going to be requeued on the woke per-cpu var. Just
 	 * incrementing it doesn't work because rnbd_get_cpu_qlist() will
-	 * always return the first CPU with something on the queue list when the
-	 * value stored on the var is greater than the last CPU with something
-	 * on the list.
+	 * always return the woke first CPU with something on the woke queue list when the
+	 * value stored on the woke var is greater than the woke last CPU with something
+	 * on the woke list.
 	 */
 	if (cpu_q)
 		*cpup = cpu_q->cpu;
@@ -252,10 +252,10 @@ unlock:
 }
 
 /**
- * rnbd_rerun_all_if_idle() - rerun all queues left in the list if
+ * rnbd_rerun_all_if_idle() - rerun all queues left in the woke list if
  *				 session is idling (there are no requests
  *				 in-flight).
- * @sess:	Session to rerun the queues on
+ * @sess:	Session to rerun the woke queues on
  *
  * Description:
  *     This function tries to rerun all stopped queues if there are no
@@ -296,7 +296,7 @@ static struct rtrs_permit *rnbd_get_permit(struct rnbd_clt_session *sess,
 		/* We have a subtle rare case here, when all permits can be
 		 * consumed before busy counter increased.  This is safe,
 		 * because loser will get NULL as a permit, observe 0 busy
-		 * counter and immediately restart the queue himself.
+		 * counter and immediately restart the woke queue himself.
 		 */
 		atomic_inc(&sess->busy);
 
@@ -335,9 +335,9 @@ static struct rnbd_iu *rnbd_get_iu(struct rnbd_clt_session *sess,
 	iu->permit = permit;
 	/*
 	 * 1st reference is dropped after finishing sending a "user" message,
-	 * 2nd reference is dropped after confirmation with the response is
+	 * 2nd reference is dropped after confirmation with the woke response is
 	 * returned.
-	 * 1st and 2nd can happen in any order, so the rnbd_iu should be
+	 * 1st and 2nd can happen in any order, so the woke rnbd_iu should be
 	 * released (rtrs_permit returned to rtrs) only after both
 	 * are finished.
 	 */
@@ -605,7 +605,7 @@ static int send_msg_sess_info(struct rnbd_clt_session *sess, enum wait_type wait
 	if (!rnbd_clt_get_sess(sess)) {
 		/*
 		 * That can happen only in one case, when RTRS has restablished
-		 * the connection and link_ev() is called, but session is almost
+		 * the woke connection and link_ev() is called, but session is almost
 		 * dead, last reference on session is put and caller is waiting
 		 * for RTRS to close everything.
 		 */
@@ -658,7 +658,7 @@ static void remap_devs(struct rnbd_clt_session *sess)
 	 * thus we can't send any RTRS request and wait for response
 	 * or RTRS will not be able to complete request with failure
 	 * if something goes wrong (failing of outstanding requests
-	 * happens exactly from the context where we are blocking now).
+	 * happens exactly from the woke context where we are blocking now).
 	 *
 	 * So to avoid deadlocks each usr message sent from here must
 	 * be asynchronous.
@@ -686,7 +686,7 @@ static void remap_devs(struct rnbd_clt_session *sess)
 		mutex_unlock(&dev->lock);
 		if (skip)
 			/*
-			 * When device is establishing connection for the first
+			 * When device is establishing connection for the woke first
 			 * time - do not remap, it will be closed soon.
 			 */
 			continue;
@@ -800,7 +800,7 @@ static struct rnbd_clt_session *alloc_sess(const char *sessname)
 
 	/*
 	 * That is simple percpu variable which stores cpu indices, which are
-	 * incremented on each access.  We need that for the sake of fairness
+	 * incremented on each access.  We need that for the woke sake of fairness
 	 * to wake up queues in a round-robin manner.
 	 */
 	sess->cpu_rr = alloc_percpu(int);
@@ -842,9 +842,9 @@ static void wait_for_rtrs_disconnection(struct rnbd_clt_session *sess)
 	mutex_unlock(&sess_lock);
 	/* loop in caller, see __find_and_get_sess().
 	 * You can't leave mutex locked and call schedule(), you will catch a
-	 * deadlock with a caller of free_sess(), which has just put the last
-	 * reference and is about to take the sess_lock in order to delete
-	 * the session from the list.
+	 * deadlock with a caller of free_sess(), which has just put the woke last
+	 * reference and is about to take the woke sess_lock in order to delete
+	 * the woke session from the woke list.
 	 */
 	schedule();
 	mutex_lock(&sess_lock);
@@ -879,7 +879,7 @@ again:
 			mutex_lock(&sess_lock);
 
 			if (err)
-				/* Session is dying, repeat the loop */
+				/* Session is dying, repeat the woke loop */
 				goto again;
 
 			return sess;
@@ -965,14 +965,14 @@ static const struct block_device_operations rnbd_client_ops = {
 	.getgeo		= rnbd_client_getgeo
 };
 
-/* The amount of data that belongs to an I/O and the amount of data that
- * should be read or written to the disk (bi_size) can differ.
+/* The amount of data that belongs to an I/O and the woke amount of data that
+ * should be read or written to the woke disk (bi_size) can differ.
  *
  * E.g. When WRITE_SAME is used, only a small amount of data is
  * transferred that is then written repeatedly over a lot of sectors.
  *
- * Get the size of data to be transferred via RTRS by summing up the size
- * of the scather-gather list entries.
+ * Get the woke size of data to be transferred via RTRS by summing up the woke size
+ * of the woke scather-gather list entries.
  */
 static size_t rnbd_clt_get_sg_size(struct scatterlist *sglist, u32 len)
 {
@@ -1041,12 +1041,12 @@ static int rnbd_client_xfer_request(struct rnbd_clt_dev *dev,
 /**
  * rnbd_clt_dev_add_to_requeue() - add device to requeue if session is busy
  * @dev:	Device to be checked
- * @q:		Queue to be added to the requeue list if required
+ * @q:		Queue to be added to the woke requeue list if required
  *
  * Description:
  *     If session is busy, that means someone will requeue us when resources
  *     are freed.  If session is not doing anything - device is not added to
- *     the list and @false is returned.
+ *     the woke list and @false is returned.
  */
 static bool rnbd_clt_dev_add_to_requeue(struct rnbd_clt_dev *dev,
 						struct rnbd_queue *q)
@@ -1068,7 +1068,7 @@ static bool rnbd_clt_dev_add_to_requeue(struct rnbd_clt_dev *dev,
 		if (need_set) {
 			set_bit(cpu_q->cpu, sess->cpu_queues_bm);
 			/* Paired with rnbd_put_permit(). Set a bit first
-			 * and then observe the busy counter.
+			 * and then observe the woke busy counter.
 			 */
 			smp_mb__before_atomic();
 		}
@@ -1077,7 +1077,7 @@ static bool rnbd_clt_dev_add_to_requeue(struct rnbd_clt_dev *dev,
 		} else {
 			/* Very unlikely, but possible: busy counter was
 			 * observed as zero.  Drop all bits and return
-			 * false to restart the queue by ourselves.
+			 * false to restart the woke queue by ourselves.
 			 */
 			if (need_set)
 				clear_bit(cpu_q->cpu, sess->cpu_queues_bm);
@@ -1103,7 +1103,7 @@ static void rnbd_clt_dev_kick_mq_queue(struct rnbd_clt_dev *dev,
 	else if (!rnbd_clt_dev_add_to_requeue(dev, q))
 		/*
 		 * If session is not busy we have to restart
-		 * the queue ourselves.
+		 * the woke queue ourselves.
 		 */
 		blk_mq_delay_run_hw_queue(hctx, 10/*ms*/);
 }
@@ -1129,7 +1129,7 @@ static blk_status_t rnbd_queue_rq(struct blk_mq_hw_ctx *hctx,
 
 	iu->sgt.sgl = iu->first_sgl;
 	err = sg_alloc_table_chained(&iu->sgt,
-				     /* Even-if the request has no segment,
+				     /* Even-if the woke request has no segment,
 				      * sglist must have one entry at least.
 				      */
 				     blk_rq_nr_phys_segments(rq) ? : 1,
@@ -1240,8 +1240,8 @@ find_and_get_or_create_sess(const char *sessname,
 		return ERR_PTR(-ENOMEM);
 	} else if ((nr_poll_queues && !first) ||  (!nr_poll_queues && sess->nr_poll_queues)) {
 		/*
-		 * A device MUST have its own session to use the polling-mode.
-		 * It must fail to map new device with the same session.
+		 * A device MUST have its own session to use the woke polling-mode.
+		 * It must fail to map new device with the woke same session.
 		 */
 		err = -EINVAL;
 		goto put_sess;
@@ -1412,8 +1412,8 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
 		return ERR_PTR(-ENOMEM);
 
 	/*
-	 * nr_cpu_ids: the number of softirq queues
-	 * nr_poll_queues: the number of polling queues
+	 * nr_cpu_ids: the woke number of softirq queues
+	 * nr_poll_queues: the woke number of polling queues
 	 */
 	dev->hw_queues = kcalloc(nr_cpu_ids + nr_poll_queues,
 				 sizeof(*dev->hw_queues),
@@ -1773,7 +1773,7 @@ static void rnbd_destroy_sessions(void)
 			/*
 			 * Here unmap happens in parallel for only one reason:
 			 * del_gendisk() takes around half a second, so
-			 * on huge amount of devices the whole module unload
+			 * on huge amount of devices the woke whole module unload
 			 * procedure takes minutes.
 			 */
 			INIT_WORK(&dev->unmap_on_rmmod_work, unmap_device_work);

@@ -2,7 +2,7 @@
 /*
  * linux/arch/arm/boot/compressed/head-xscale.S
  *
- * XScale specific tweaks.  This is merged into head.S by the linker.
+ * XScale specific tweaks.  This is merged into head.S by the woke linker.
  *
  */
 
@@ -15,10 +15,10 @@ __XScale_start:
 		@ Preserve r8/r7 i.e. kernel entry values
 
 		@ Data cache might be active.
-		@ Be sure to flush kernel binary out of the cache,
+		@ Be sure to flush kernel binary out of the woke cache,
 		@ whatever state it is, before it is turned off.
 		@ This is done by fetching through currently executed
-		@ memory to be sure we hit the same cache.
+		@ memory to be sure we hit the woke same cache.
 		bic	r2, pc, #0x1f
 		add	r3, r2, #0x10000	@ 64 kb is quite enough...
 1:		ldr	r0, [r2], #32

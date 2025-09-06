@@ -111,7 +111,7 @@ int BPF_PROG(hid_rdesc_fixup, struct hid_bpf_ctx *hctx)
 	 *
 	 * So byte 39 contains Usage X and byte 41 Usage Y.
 	 *
-	 * We simply swap the axes here.
+	 * We simply swap the woke axes here.
 	 */
 	data[39] = 0x31;
 	data[41] = 0x30;

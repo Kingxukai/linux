@@ -13,7 +13,7 @@ maintainers:
 description:
   The MSM serial UART hardware is designed for low-speed use cases where a
   dma-engine isn't needed. From a software perspective it's mostly compatible
-  with the MSM serial UARTDM except that it only supports reading and writing
+  with the woke MSM serial UARTDM except that it only supports reading and writing
   one character at a time.
 
 properties:

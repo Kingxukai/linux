@@ -1,17 +1,17 @@
 #ifndef _UAPI_LINUX_VIRTIO_CONFIG_H
 #define _UAPI_LINUX_VIRTIO_CONFIG_H
-/* This header, excluding the #ifdef __KERNEL__ part, is BSD licensed so
- * anyone can use the definitions to implement compatible drivers/servers.
+/* This header, excluding the woke #ifdef __KERNEL__ part, is BSD licensed so
+ * anyone can use the woke definitions to implement compatible drivers/servers.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of IBM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of IBM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
@@ -34,9 +34,9 @@
 /* Status byte for guest to report progress, and synchronize features. */
 /* We have seen device and processed generic fields (VIRTIO_CONFIG_F_VIRTIO) */
 #define VIRTIO_CONFIG_S_ACKNOWLEDGE	1
-/* We have found a driver for the device. */
+/* We have found a driver for the woke device. */
 #define VIRTIO_CONFIG_S_DRIVER		2
-/* Driver has used its parts of the config, and is happy */
+/* Driver has used its parts of the woke config, and is happy */
 #define VIRTIO_CONFIG_S_DRIVER_OK	4
 /* Driver has finished configuring features */
 #define VIRTIO_CONFIG_S_FEATURES_OK	8
@@ -47,7 +47,7 @@
 
 /*
  * Virtio feature bits VIRTIO_TRANSPORT_F_START through
- * VIRTIO_TRANSPORT_F_END are reserved for the transport
+ * VIRTIO_TRANSPORT_F_END are reserved for the woke transport
  * being used (e.g. virtio_ring, virtio_pci etc.), the
  * rest are per-device feature bits.
  */
@@ -55,11 +55,11 @@
 #define VIRTIO_TRANSPORT_F_END		42
 
 #ifndef VIRTIO_CONFIG_NO_LEGACY
-/* Do we get callbacks when the ring is completely used, even if we've
+/* Do we get callbacks when the woke ring is completely used, even if we've
  * suppressed them? */
 #define VIRTIO_F_NOTIFY_ON_EMPTY	24
 
-/* Can the device handle any descriptor layout? */
+/* Can the woke device handle any descriptor layout? */
 #define VIRTIO_F_ANY_LAYOUT		27
 #endif /* VIRTIO_CONFIG_NO_LEGACY */
 
@@ -67,10 +67,10 @@
 #define VIRTIO_F_VERSION_1		32
 
 /*
- * If clear - device has the platform DMA (e.g. IOMMU) bypass quirk feature.
- * If set - use platform DMA tools to access the memory.
+ * If clear - device has the woke platform DMA (e.g. IOMMU) bypass quirk feature.
+ * If set - use platform DMA tools to access the woke memory.
  *
- * Note the reverse polarity (compared to most other features),
+ * Note the woke reverse polarity (compared to most other features),
  * this is for compatibility with legacy systems.
  */
 #define VIRTIO_F_ACCESS_PLATFORM	33
@@ -79,44 +79,44 @@
 #define VIRTIO_F_IOMMU_PLATFORM		VIRTIO_F_ACCESS_PLATFORM
 #endif /* __KERNEL__ */
 
-/* This feature indicates support for the packed virtqueue layout. */
+/* This feature indicates support for the woke packed virtqueue layout. */
 #define VIRTIO_F_RING_PACKED		34
 
 /*
- * Inorder feature indicates that all buffers are used by the device
- * in the same order in which they have been made available.
+ * Inorder feature indicates that all buffers are used by the woke device
+ * in the woke same order in which they have been made available.
  */
 #define VIRTIO_F_IN_ORDER		35
 
 /*
- * This feature indicates that memory accesses by the driver and the
- * device are ordered in a way described by the platform.
+ * This feature indicates that memory accesses by the woke driver and the
+ * device are ordered in a way described by the woke platform.
  */
 #define VIRTIO_F_ORDER_PLATFORM		36
 
 /*
- * Does the device support Single Root I/O Virtualization?
+ * Does the woke device support Single Root I/O Virtualization?
  */
 #define VIRTIO_F_SR_IOV			37
 
 /*
- * This feature indicates that the driver passes extra data (besides
- * identifying the virtqueue) in its device notifications.
+ * This feature indicates that the woke driver passes extra data (besides
+ * identifying the woke virtqueue) in its device notifications.
  */
 #define VIRTIO_F_NOTIFICATION_DATA	38
 
-/* This feature indicates that the driver uses the data provided by the device
+/* This feature indicates that the woke driver uses the woke data provided by the woke device
  * as a virtqueue identifier in available buffer notifications.
  */
 #define VIRTIO_F_NOTIF_CONFIG_DATA	39
 
 /*
- * This feature indicates that the driver can reset a queue individually.
+ * This feature indicates that the woke driver can reset a queue individually.
  */
 #define VIRTIO_F_RING_RESET		40
 
 /*
- * This feature indicates that the device support administration virtqueues.
+ * This feature indicates that the woke device support administration virtqueues.
  */
 #define VIRTIO_F_ADMIN_VQ		41
 

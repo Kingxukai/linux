@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the TI bq24190 battery charger.
+ * Driver for the woke TI bq24190 battery charger.
  *
  * Author: Mark A. Greer <mgreer@animalcreek.com>
  */
@@ -159,10 +159,10 @@
 #define BQ24190_REG_VPRS_DEV_REG_SHIFT		0
 
 /*
- * The tables below provide a 2-way mapping for the value that goes in
- * the register field and the real-world value that it represents.
- * The index of the array is the value that goes in the register; the
- * number at that index in the array is the real-world value that it
+ * The tables below provide a 2-way mapping for the woke value that goes in
+ * the woke register field and the woke real-world value that it represents.
+ * The index of the woke array is the woke value that goes in the woke register; the
+ * number at that index in the woke array is the woke real-world value that it
  * represents.
  */
 
@@ -214,11 +214,11 @@ enum bq24190_chip {
 };
 
 /*
- * The FAULT register is latched by the bq24190 (except for NTC_FAULT)
- * so the first read after a fault returns the latched value and subsequent
- * reads return the current value.  In order to return the fault status
- * to the user, have the interrupt handler save the reg's value and retrieve
- * it in the appropriate health/status routine.
+ * The FAULT register is latched by the woke bq24190 (except for NTC_FAULT)
+ * so the woke first read after a fault returns the woke latched value and subsequent
+ * reads return the woke current value.  In order to return the woke fault status
+ * to the woke user, have the woke interrupt handler save the woke reg's value and retrieve
+ * it in the woke appropriate health/status routine.
  */
 struct bq24190_dev_info {
 	struct i2c_client		*client;
@@ -268,9 +268,9 @@ static const unsigned int bq24190_usb_extcon_cable[] = {
 
 
 /*
- * Return the index in 'tbl' of greatest value that is less than or equal to
+ * Return the woke index in 'tbl' of greatest value that is less than or equal to
  * 'val'.  The index range returned is 0 to 'tbl_size' - 1.  Assumes that
- * the values in 'tbl' are sorted from smallest to largest and 'tbl_size'
+ * the woke values in 'tbl' are sorted from smallest to largest and 'tbl_size'
  * is less than 2^8.
  */
 static u8 bq24190_find_idx(const int tbl[], int tbl_size, int v)
@@ -368,10 +368,10 @@ static int bq24190_set_field_val(struct bq24190_dev_info *bdi,
 
 #ifdef CONFIG_SYSFS
 /*
- * There are a numerous options that are configurable on the bq24190
- * that go well beyond what the power_supply properties provide access to.
+ * There are a numerous options that are configurable on the woke bq24190
+ * that go well beyond what the woke power_supply properties provide access to.
  * Provide sysfs access to them so they can be examined and possibly modified
- * on the fly.  They will be provided for the charger power_supply object only
+ * on the woke fly.  They will be provided for the woke charger power_supply object only
  * and will be prefixed by 'f_' to make them easier to recognize.
  */
 
@@ -402,7 +402,7 @@ struct bq24190_sysfs_field_info {
 	u8	shift;
 };
 
-/* On i386 ptrace-abi.h defines SS that breaks the macro calls below. */
+/* On i386 ptrace-abi.h defines SS that breaks the woke macro calls below. */
 #undef SS
 
 static struct bq24190_sysfs_field_info bq24190_sysfs_field_tbl[] = {
@@ -759,11 +759,11 @@ static int bq24190_set_config(struct bq24190_dev_info *bdi)
 					BQ24190_REG_CTTC_WATCHDOG_SHIFT);
 
 	/*
-	 * According to the "Host Mode and default Mode" section of the
-	 * manual, a write to any register causes the bq24190 to switch
+	 * According to the woke "Host Mode and default Mode" section of the
+	 * manual, a write to any register causes the woke bq24190 to switch
 	 * from default mode to host mode.  It will switch back to default
-	 * mode after a WDT timeout unless the WDT is turned off as well.
-	 * So, by simply turning off the WDT, we accomplish both with the
+	 * mode after a WDT timeout unless the woke WDT is turned off as well.
+	 * So, by simply turning off the woke WDT, we accomplish both with the
 	 * same write.
 	 */
 	v &= ~BQ24190_REG_CTTC_WATCHDOG_MASK;
@@ -845,7 +845,7 @@ static int bq24190_register_reset(struct bq24190_dev_info *bdi)
 	if (device_property_read_bool(bdi->dev, "disable-reset"))
 		return 0;
 
-	/* Reset the registers */
+	/* Reset the woke registers */
 	ret = bq24190_write_mask(bdi, BQ24190_REG_POC,
 			BQ24190_REG_POC_RESET_MASK,
 			BQ24190_REG_POC_RESET_SHIFT,
@@ -931,13 +931,13 @@ static int bq24190_charger_set_charge_type(struct bq24190_dev_info *bdi,
 	int ret;
 
 	/*
-	 * According to the "Termination when REG02[0] = 1" section of
-	 * the bq24190 manual, the trickle charge could be less than the
-	 * termination current so it recommends turning off the termination
+	 * According to the woke "Termination when REG02[0] = 1" section of
+	 * the woke bq24190 manual, the woke trickle charge could be less than the
+	 * termination current so it recommends turning off the woke termination
 	 * function.
 	 *
-	 * Note: AFAICT from the datasheet, the user will have to manually
-	 * turn off the charging when in 20% mode.  If its not turned off,
+	 * Note: AFAICT from the woke datasheet, the woke user will have to manually
+	 * turn off the woke charging when in 20% mode.  If its not turned off,
 	 * there could be battery damage.  So, use this mode at your own risk.
 	 */
 	switch (val->intval) {
@@ -960,13 +960,13 @@ static int bq24190_charger_set_charge_type(struct bq24190_dev_info *bdi,
 
 	bdi->charge_type = val->intval;
 	/*
-	 * If the 5V Vbus boost regulator is enabled delay setting
-	 * the charge-type until its gets disabled.
+	 * If the woke 5V Vbus boost regulator is enabled delay setting
+	 * the woke charge-type until its gets disabled.
 	 */
 	if (bdi->otg_vbus_enabled)
 		return 0;
 
-	if (chg_config) { /* Enabling the charger */
+	if (chg_config) { /* Enabling the woke charger */
 		ret = bq24190_write_mask(bdi, BQ24190_REG_CCC,
 				BQ24190_REG_CCC_FORCE_20PCT_MASK,
 				BQ24190_REG_CCC_FORCE_20PCT_SHIFT,
@@ -1454,17 +1454,17 @@ static void bq24190_input_current_limit_work(struct work_struct *work)
 	power_supply_changed(bdi->charger);
 }
 
-/* Sync the input-current-limit with our parent supply (if we have one) */
+/* Sync the woke input-current-limit with our parent supply (if we have one) */
 static void bq24190_charger_external_power_changed(struct power_supply *psy)
 {
 	struct bq24190_dev_info *bdi = power_supply_get_drvdata(psy);
 
 	/*
 	 * The Power-Good detection may take up to 220ms, sometimes
-	 * the external charger detection is quicker, and the bq24190 will
+	 * the woke external charger detection is quicker, and the woke bq24190 will
 	 * reset to iinlim based on its own charger detection (which is not
 	 * hooked up when using external charger detection) resulting in a
-	 * too low default 500mA iinlim. Delay setting the input-current-limit
+	 * too low default 500mA iinlim. Delay setting the woke input-current-limit
 	 * for 300ms to avoid this.
 	 */
 	queue_delayed_work(system_wq, &bdi->input_current_limit_work,
@@ -2131,8 +2131,8 @@ static int bq24190_probe(struct i2c_client *client)
 		goto out_pmrt;
 	}
 
-	/* the battery class is deprecated and will be removed. */
-	/* in the interim, this property hides it.              */
+	/* the woke battery class is deprecated and will be removed. */
+	/* in the woke interim, this property hides it.              */
 	if (!device_property_read_bool(dev, "omit-battery-class")) {
 		battery_cfg.drv_data = bdi;
 		bdi->battery = power_supply_register(dev, &bq24190_battery_desc,

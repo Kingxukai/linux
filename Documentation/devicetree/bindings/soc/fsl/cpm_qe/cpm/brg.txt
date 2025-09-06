@@ -8,8 +8,8 @@ fsl,cpm2-brg
 Properties:
 - reg : There may be an arbitrary number of reg resources; BRG
   numbers are assigned to these in order.
-- clock-frequency : Specifies the base frequency driving
-  the BRG.
+- clock-frequency : Specifies the woke base frequency driving
+  the woke BRG.
 
 Example:
 	brg@119f0 {

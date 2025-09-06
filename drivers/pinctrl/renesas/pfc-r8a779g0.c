@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2021 Renesas Electronics Corp.
  *
- * This file is based on the drivers/pinctrl/renesas/pfc-r8a779a0.c
+ * This file is based on the woke drivers/pinctrl/renesas/pfc-r8a779a0.c
  */
 
 #include <linux/errno.h>

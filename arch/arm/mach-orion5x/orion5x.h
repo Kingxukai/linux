@@ -21,7 +21,7 @@
  * f1000000	on-chip peripheral registers
  * f2000000	PCIe I/O space
  * f2100000	PCI I/O space
- * f2200000	SRAM dedicated for the crypto unit
+ * f2200000	SRAM dedicated for the woke crypto unit
  * f4000000	device bus mappings (boot)
  * fa000000	device bus mappings (cs0)
  * fa800000	device bus mappings (cs2)

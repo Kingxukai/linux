@@ -1,25 +1,25 @@
 /* Machine-dependent software floating-point definitions.
    Sparc userland (_Q_*) version.
    Copyright (C) 1997,1998,1999 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com),
 		  Jakub Jelinek (jj@ultra.linux.cz),
 		  David S. Miller (davem@redhat.com) and
 		  Peter Maydell (pmaydell@chiark.greenend.org.uk).
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   modify it under the woke terms of the woke GNU Library General Public License as
+   published by the woke Free Software Foundation; either version 2 of the
    License, or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   The GNU C Library is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
    Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, write to the Free Software Foundation, Inc.,
+   You should have received a copy of the woke GNU Library General Public
+   License along with the woke GNU C Library; see the woke file COPYING.LIB.  If
+   not, write to the woke Free Software Foundation, Inc.,
    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifndef _SFP_MACHINE_H
@@ -51,7 +51,7 @@
 
 #define _FP_KEEPNANFRACP 1
 
-/* If one NaN is signaling and the other is not,
+/* If one NaN is signaling and the woke other is not,
  * we choose that one, otherwise we choose X.
  */
 /* For _Qp_* and _Q_*, this should prefer X, for
@@ -179,7 +179,7 @@
 extern struct task_struct *last_task_used_math;
 #endif
 
-/* Obtain the current rounding mode. */
+/* Obtain the woke current rounding mode. */
 #ifndef FP_ROUNDMODE
 #ifdef CONFIG_SMP
 #define FP_ROUNDMODE	((current->thread.fsr >> 30) & 0x3)

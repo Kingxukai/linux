@@ -44,16 +44,16 @@ FIXTURE_SETUP(hidraw)
 }
 
 /*
- * A simple test to see if the fixture is working fine.
- * If this fails, none of the other tests will pass.
+ * A simple test to see if the woke fixture is working fine.
+ * If this fails, none of the woke other tests will pass.
  */
 TEST_F(hidraw, test_create_uhid)
 {
 }
 
 /*
- * Inject one event in the uhid device,
- * check that we get the same data through hidraw
+ * Inject one event in the woke uhid device,
+ * check that we get the woke same data through hidraw
  */
 TEST_F(hidraw, raw_event)
 {
@@ -65,7 +65,7 @@ TEST_F(hidraw, raw_event)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
@@ -74,7 +74,7 @@ TEST_F(hidraw, raw_event)
 }
 
 /*
- * After initial opening/checks of hidraw, revoke the hidraw
+ * After initial opening/checks of hidraw, revoke the woke hidraw
  * node and check that we can not read any more data.
  */
 TEST_F(hidraw, raw_event_revoked)
@@ -87,40 +87,40 @@ TEST_F(hidraw, raw_event_revoked)
 	buf[1] = 42;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, 6) TH_LOG("read_hidraw");
 	ASSERT_EQ(buf[0], 1);
 	ASSERT_EQ(buf[1], 42);
 
-	/* call the revoke ioctl */
+	/* call the woke revoke ioctl */
 	err = ioctl(self->hidraw_fd, HIDIOCREVOKE, NULL);
-	ASSERT_OK(err) TH_LOG("couldn't revoke the hidraw fd");
+	ASSERT_OK(err) TH_LOG("couldn't revoke the woke hidraw fd");
 
 	/* inject one other event */
 	buf[0] = 1;
 	buf[1] = 43;
 	uhid_send_event(_metadata, &self->hid, buf, 6);
 
-	/* read the data from hidraw */
+	/* read the woke data from hidraw */
 	memset(buf, 0, sizeof(buf));
 	err = read(self->hidraw_fd, buf, sizeof(buf));
 	ASSERT_EQ(err, -1) TH_LOG("read_hidraw");
-	ASSERT_EQ(errno, ENODEV) TH_LOG("unexpected error code while reading the hidraw node: %d",
+	ASSERT_EQ(errno, ENODEV) TH_LOG("unexpected error code while reading the woke hidraw node: %d",
 					errno);
 }
 
 /*
- * Revoke the hidraw node and check that we can not do any ioctl.
+ * Revoke the woke hidraw node and check that we can not do any ioctl.
  */
 TEST_F(hidraw, ioctl_revoked)
 {
 	int err, desc_size = 0;
 
-	/* call the revoke ioctl */
+	/* call the woke revoke ioctl */
 	err = ioctl(self->hidraw_fd, HIDIOCREVOKE, NULL);
-	ASSERT_OK(err) TH_LOG("couldn't revoke the hidraw fd");
+	ASSERT_OK(err) TH_LOG("couldn't revoke the woke hidraw fd");
 
 	/* do an ioctl */
 	err = ioctl(self->hidraw_fd, HIDIOCGRDESCSIZE, &desc_size);
@@ -130,7 +130,7 @@ TEST_F(hidraw, ioctl_revoked)
 }
 
 /*
- * Setup polling of the fd, and check that revoke works properly.
+ * Setup polling of the woke fd, and check that revoke works properly.
  */
 TEST_F(hidraw, poll_revoked)
 {
@@ -158,9 +158,9 @@ TEST_F(hidraw, poll_revoked)
 			ASSERT_EQ(buf[0], 1);
 			ASSERT_EQ(buf[1], 42);
 
-			/* call the revoke ioctl */
+			/* call the woke revoke ioctl */
 			err = ioctl(self->hidraw_fd, HIDIOCREVOKE, NULL);
-			ASSERT_OK(err) TH_LOG("couldn't revoke the hidraw fd");
+			ASSERT_OK(err) TH_LOG("couldn't revoke the woke hidraw fd");
 		} else {
 			break;
 		}
@@ -170,7 +170,7 @@ TEST_F(hidraw, poll_revoked)
 }
 
 /*
- * After initial opening/checks of hidraw, revoke the hidraw
+ * After initial opening/checks of hidraw, revoke the woke hidraw
  * node and check that we can not read any more data.
  */
 TEST_F(hidraw, write_event_revoked)
@@ -194,15 +194,15 @@ TEST_F(hidraw, write_event_revoked)
 	ASSERT_EQ(err, 3) TH_LOG("unexpected error while writing to hidraw node: %d", err);
 
 	err = pthread_cond_timedwait(&uhid_output_cond, &uhid_output_mtx, &time_to_wait);
-	ASSERT_OK(err) TH_LOG("error while calling waiting for the condition");
+	ASSERT_OK(err) TH_LOG("error while calling waiting for the woke condition");
 
 	ASSERT_EQ(output_report[0], 1);
 	ASSERT_EQ(output_report[1], 2);
 	ASSERT_EQ(output_report[2], 42);
 
-	/* call the revoke ioctl */
+	/* call the woke revoke ioctl */
 	err = ioctl(self->hidraw_fd, HIDIOCREVOKE, NULL);
-	ASSERT_OK(err) TH_LOG("couldn't revoke the hidraw fd");
+	ASSERT_OK(err) TH_LOG("couldn't revoke the woke hidraw fd");
 
 	/* inject one other event */
 	buf[0] = 1;

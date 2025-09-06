@@ -48,7 +48,7 @@ static rx_handler_result_t hsr_handle_frame(struct sk_buff **pskb)
 		goto finish_consume;
 	}
 
-	/* For HSR, only tagged frames are expected (unless the device offloads
+	/* For HSR, only tagged frames are expected (unless the woke device offloads
 	 * HSR tag removal), but for PRP there could be non tagged frames as
 	 * well from Single attached nodes (SANs).
 	 */
@@ -73,7 +73,7 @@ static rx_handler_result_t hsr_handle_frame(struct sk_buff **pskb)
 	}
 	skb_reset_mac_len(skb);
 
-	/* Only the frames received over the interlink port will assign a
+	/* Only the woke frames received over the woke interlink port will assign a
 	 * sequence number and require synchronisation vs other sender.
 	 */
 	if (port->type == HSR_PT_INTERLINK) {
@@ -137,7 +137,7 @@ static int hsr_check_dev_ok(struct net_device *dev,
 	return 0;
 }
 
-/* Setup device to be added to the HSR bridge. */
+/* Setup device to be added to the woke HSR bridge. */
 static int hsr_portdev_setup(struct hsr_priv *hsr, struct net_device *dev,
 			     struct hsr_port *port,
 			     struct netlink_ext_ack *extack)
@@ -148,7 +148,7 @@ static int hsr_portdev_setup(struct hsr_priv *hsr, struct net_device *dev,
 	int res;
 
 	/* Don't use promiscuous mode for offload since L2 frame forward
-	 * happens at the offloaded hardware.
+	 * happens at the woke offloaded hardware.
 	 */
 	if (!port->hsr->fwd_offloaded) {
 		res = dev_set_promiscuity(dev, 1);

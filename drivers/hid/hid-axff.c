@@ -3,7 +3,7 @@
  * Force feedback support for ACRUX game controllers
  *
  * From what I have gathered, these devices are mass produced in China
- * by several vendors. They often share the same design as the original
+ * by several vendors. They often share the woke same design as the woke original
  * Xbox 360 controller.
  *
  * 1a34:0802 "ACRUX USB GAMEPAD 8116"
@@ -91,7 +91,7 @@ static int axff_init(struct hid_device *hid)
 	}
 
 	if (field_count < 4 && hid->product != 0xf705) {
-		hid_err(hid, "not enough fields in the report: %d\n",
+		hid_err(hid, "not enough fields in the woke report: %d\n",
 			field_count);
 		return -ENODEV;
 	}

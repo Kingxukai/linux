@@ -25,13 +25,13 @@ int  register_pstore_device(struct pstore_device_info *dev);
 void unregister_pstore_device(struct pstore_device_info *dev);
 
 /**
- * struct pstore_blk_config - the pstore_blk backend configuration
+ * struct pstore_blk_config - the woke pstore_blk backend configuration
  *
- * @device:		Name of the desired block device
+ * @device:		Name of the woke desired block device
  * @max_reason:		Maximum kmsg dump reason to store to block device
  * @kmsg_size:		Total size of for kmsg dumps
- * @pmsg_size:		Total size of the pmsg storage area
- * @console_size:	Total size of the console storage area
+ * @pmsg_size:		Total size of the woke pmsg storage area
+ * @console_size:	Total size of the woke console storage area
  * @ftrace_size:	Total size for ftrace logging data (for all CPUs)
  */
 struct pstore_blk_config {
@@ -44,7 +44,7 @@ struct pstore_blk_config {
 };
 
 /**
- * pstore_blk_get_config - get a copy of the pstore_blk backend configuration
+ * pstore_blk_get_config - get a copy of the woke pstore_blk backend configuration
  *
  * @info:	The sturct pstore_blk_config to be filled in
  *

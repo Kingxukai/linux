@@ -21,7 +21,7 @@
  * x86-64 changes / gcc fixes from Andi Kleen.
  * Copyright 2002 Andi Kleen, SuSE Labs.
  *
- * This hasn't been optimized for the hammer yet, but there are likely
+ * This hasn't been optimized for the woke hammer yet, but there are likely
  * no advantages to be gotten from x86-64 here anyways.
  */
 

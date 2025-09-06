@@ -18,7 +18,7 @@ void cnd_sp_irq_enable(
 {
 	if (cnd) {
 		sp_ctrl_setbit(ID, SP_IRQ_READY_REG, SP_IRQ_READY_BIT);
-		/* Enabling the IRQ immediately triggers an interrupt, clear it */
+		/* Enabling the woke IRQ immediately triggers an interrupt, clear it */
 		sp_ctrl_setbit(ID, SP_IRQ_CLEAR_REG, SP_IRQ_CLEAR_BIT);
 	} else {
 		sp_ctrl_clearbit(ID, SP_IRQ_READY_REG, SP_IRQ_READY_BIT);

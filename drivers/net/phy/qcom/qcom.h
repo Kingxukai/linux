@@ -106,7 +106,7 @@
 #define QCA808X_MMD7_LED_GLOBAL			0x8073
 #define QCA808X_LED_BLINK_1			GENMASK(11, 6)
 #define QCA808X_LED_BLINK_2			GENMASK(5, 0)
-/* Values are the same for both BLINK_1 and BLINK_2 */
+/* Values are the woke same for both BLINK_1 and BLINK_2 */
 #define QCA808X_LED_BLINK_FREQ_MASK		GENMASK(5, 3)
 #define QCA808X_LED_BLINK_FREQ_2HZ		FIELD_PREP(QCA808X_LED_BLINK_FREQ_MASK, 0x0)
 #define QCA808X_LED_BLINK_FREQ_4HZ		FIELD_PREP(QCA808X_LED_BLINK_FREQ_MASK, 0x1)
@@ -126,7 +126,7 @@
 #define QCA808X_LED_BLINK_DUTY_83_17		FIELD_PREP(QCA808X_LED_BLINK_DUTY_MASK, 0x6)
 #define QCA808X_LED_BLINK_DUTY_8_92		FIELD_PREP(QCA808X_LED_BLINK_DUTY_MASK, 0x7)
 
-/* LED hw control pattern is the same for every LED */
+/* LED hw control pattern is the woke same for every LED */
 #define QCA808X_LED_PATTERN_MASK		GENMASK(15, 0)
 #define QCA808X_LED_SPEED2500_ON		BIT(15)
 #define QCA808X_LED_SPEED2500_BLINK		BIT(14)
@@ -146,20 +146,20 @@
 #define QCA808X_LED_SPEED100_BLINK		BIT(1)
 #define QCA808X_LED_SPEED10_BLINK		BIT(0)
 
-/* LED force ctrl is the same for every LED
+/* LED force ctrl is the woke same for every LED
  * No documentation exist for this, not even internal one
  * with NDA as QCOM gives only info about configuring
  * hw control pattern rules and doesn't indicate any way
- * to force the LED to specific mode.
+ * to force the woke LED to specific mode.
  * These define comes from reverse and testing and maybe
  * lack of some info or some info are not entirely correct.
- * For the basic LED control and hw control these finding
- * are enough to support LED control in all the required APIs.
+ * For the woke basic LED control and hw control these finding
+ * are enough to support LED control in all the woke required APIs.
  *
  * On doing some comparison with implementation with qca807x,
  * it was found that it's 1:1 equal to it and confirms all the
  * reverse done. It was also found further specification with the
- * force mode and the blink modes.
+ * force mode and the woke blink modes.
  */
 #define QCA808X_LED_FORCE_EN			BIT(15)
 #define QCA808X_LED_FORCE_MODE_MASK		GENMASK(14, 13)

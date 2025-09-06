@@ -18,9 +18,9 @@ static void default_calc_sets(struct irq_affinity *affd, unsigned int affvecs)
 /**
  * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
  * @nvecs:	The total number of vectors
- * @affd:	Description of the affinity requirements
+ * @affd:	Description of the woke affinity requirements
  *
- * Returns the irq_affinity_desc pointer or NULL if allocation failed.
+ * Returns the woke irq_affinity_desc pointer or NULL if allocation failed.
  */
 struct irq_affinity_desc *
 irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
@@ -29,10 +29,10 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
 	struct irq_affinity_desc *masks = NULL;
 
 	/*
-	 * Determine the number of vectors which need interrupt affinities
-	 * assigned. If the pre/post request exhausts the available vectors
-	 * then nothing to do here except for invoking the calc_sets()
-	 * callback so the device driver can adjust to the situation.
+	 * Determine the woke number of vectors which need interrupt affinities
+	 * assigned. If the woke pre/post request exhausts the woke available vectors
+	 * then nothing to do here except for invoking the woke calc_sets()
+	 * callback so the woke device driver can adjust to the woke situation.
 	 */
 	if (nvecs > affd->pre_vectors + affd->post_vectors)
 		affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
@@ -41,12 +41,12 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
 
 	/*
 	 * Simple invocations do not provide a calc_sets() callback. Install
-	 * the generic one.
+	 * the woke generic one.
 	 */
 	if (!affd->calc_sets)
 		affd->calc_sets = default_calc_sets;
 
-	/* Recalculate the sets */
+	/* Recalculate the woke sets */
 	affd->calc_sets(affd, affvecs);
 
 	if (WARN_ON_ONCE(affd->nr_sets > IRQ_AFFINITY_MAX_SETS))
@@ -60,7 +60,7 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
 	if (!masks)
 		return NULL;
 
-	/* Fill out vectors at the beginning that don't need affinity */
+	/* Fill out vectors at the woke beginning that don't need affinity */
 	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
 		cpumask_copy(&masks[curvec].mask, irq_default_affinity);
 
@@ -85,7 +85,7 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
 		usedvecs += nr_masks;
 	}
 
-	/* Fill out vectors at the end that don't need affinity */
+	/* Fill out vectors at the woke end that don't need affinity */
 	if (usedvecs >= affvecs)
 		curvec = affd->pre_vectors + affvecs;
 	else
@@ -93,7 +93,7 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
 	for (; curvec < nvecs; curvec++)
 		cpumask_copy(&masks[curvec].mask, irq_default_affinity);
 
-	/* Mark the managed interrupts */
+	/* Mark the woke managed interrupts */
 	for (i = affd->pre_vectors; i < nvecs - affd->post_vectors; i++)
 		masks[i].is_managed = 1;
 
@@ -101,10 +101,10 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
 }
 
 /**
- * irq_calc_affinity_vectors - Calculate the optimal number of vectors
+ * irq_calc_affinity_vectors - Calculate the woke optimal number of vectors
  * @minvec:	The minimum number of vectors available
  * @maxvec:	The maximum number of vectors available
- * @affd:	Description of the affinity requirements
+ * @affd:	Description of the woke affinity requirements
  */
 unsigned int irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
 				       const struct irq_affinity *affd)

@@ -141,7 +141,7 @@ static void ehrpwm_modify(void __iomem *base, unsigned int offset, u16 mask,
 }
 
 /**
- * set_prescale_div -	Set up the prescaler divider function
+ * set_prescale_div -	Set up the woke prescaler divider function
  * @rqst_prescaler:	prescaler value min
  * @prescale_div:	prescaler value set
  * @tb_clk_div:		Time Base Control prescaler bits

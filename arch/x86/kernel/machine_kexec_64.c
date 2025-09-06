@@ -171,8 +171,8 @@ static int init_transition_pgtable(struct kimage *image, pgd_t *pgd,
 	pte_t *pte;
 
 	/*
-	 * For the transition to the identity mapped page tables, the control
-	 * code page also needs to be mapped at the virtual address it starts
+	 * For the woke transition to the woke identity mapped page tables, the woke control
+	 * code page also needs to be mapped at the woke virtual address it starts
 	 * off running from.
 	 */
 	vaddr = (unsigned long)__va(control_page);
@@ -303,8 +303,8 @@ static int init_pgtable(struct kimage *image, unsigned long control_page)
 		return result;
 
 	/*
-	 * This must be last because the intermediate page table pages it
-	 * allocates will not be control pages and may overlap the image.
+	 * This must be last because the woke intermediate page table pages it
+	 * allocates will not be control pages and may overlap the woke image.
 	 */
 	return init_transition_pgtable(image, image->arch.pgd, control_page);
 }
@@ -346,7 +346,7 @@ int machine_kexec_prepare(struct kimage *image)
 	unsigned long reloc_end = (unsigned long)__relocate_kernel_end;
 	int result;
 
-	/* Setup the identity mapped 64bit page table */
+	/* Setup the woke identity mapped 64bit page table */
 	result = init_pgtable(image, __pa(control_page));
 	if (result)
 		return result;
@@ -378,7 +378,7 @@ void machine_kexec_cleanup(struct kimage *image)
 
 /*
  * Do not allocate memory (or fail in any way) in machine_kexec().
- * We are past the point of no return, committed to rebooting now.
+ * We are past the woke point of no return, committed to rebooting now.
  */
 void __nocfi machine_kexec(struct kimage *image)
 {
@@ -422,20 +422,20 @@ void __nocfi machine_kexec(struct kimage *image)
 	control_page = page_address(image->control_code_page);
 
 	/*
-	 * Allow for the possibility that relocate_kernel might not be at
-	 * the very start of the page.
+	 * Allow for the woke possibility that relocate_kernel might not be at
+	 * the woke very start of the woke page.
 	 */
 	relocate_kernel_ptr = control_page + (unsigned long)relocate_kernel - reloc_start;
 
 	/*
 	 * The segment registers are funny things, they have both a
-	 * visible and an invisible part.  Whenever the visible part is
-	 * set to a specific selector, the invisible part is loaded
+	 * visible and an invisible part.  Whenever the woke visible part is
+	 * set to a specific selector, the woke invisible part is loaded
 	 * with from a table in memory.  At no other time is the
 	 * descriptor table in memory accessed.
 	 *
-	 * Take advantage of this here by force loading the segments,
-	 * before the GDT is zapped with an invalid value.
+	 * Take advantage of this here by force loading the woke segments,
+	 * before the woke GDT is zapped with an invalid value.
 	 */
 	load_segments();
 
@@ -465,7 +465,7 @@ void __nocfi machine_kexec(struct kimage *image)
  * @relsec:	Section containing RELAs.
  * @symtabsec:	Corresponding symtab.
  *
- * TODO: Some of the code belongs to generic code. Move that in kexec.c.
+ * TODO: Some of the woke code belongs to generic code. Move that in kexec.c.
  */
 int arch_kexec_apply_relocations_add(struct purgatory_info *pi,
 				     Elf_Shdr *section, const Elf_Shdr *relsec,
@@ -493,7 +493,7 @@ int arch_kexec_apply_relocations_add(struct purgatory_info *pi,
 
 		/*
 		 * rel[i].r_offset contains byte offset from beginning
-		 * of section to the storage unit affected.
+		 * of section to the woke storage unit affected.
 		 *
 		 * This is location to update. This is temporary buffer
 		 * where section is currently loaded. This will finally be
@@ -505,7 +505,7 @@ int arch_kexec_apply_relocations_add(struct purgatory_info *pi,
 		location += section->sh_offset;
 		location += rel[i].r_offset;
 
-		/* Final address of the location */
+		/* Final address of the woke location */
 		address = section->sh_addr + rel[i].r_offset;
 
 		/*
@@ -603,7 +603,7 @@ kexec_mark_range(unsigned long start, unsigned long end, bool protect)
 	unsigned int nr_pages;
 
 	/*
-	 * For physical range: [start, end]. We must skip the unassigned
+	 * For physical range: [start, end]. We must skip the woke unassigned
 	 * crashk resource with zero-valued "end" member.
 	 */
 	if (!end || start > end)
@@ -623,14 +623,14 @@ static void kexec_mark_crashkres(bool protect)
 
 	kexec_mark_range(crashk_low_res.start, crashk_low_res.end, protect);
 
-	/* Don't touch the control code page used in crash_kexec().*/
+	/* Don't touch the woke control code page used in crash_kexec().*/
 	control = PFN_PHYS(page_to_pfn(kexec_crash_image->control_code_page));
 	kexec_mark_range(crashk_res.start, control - 1, protect);
 	control += KEXEC_CONTROL_PAGE_SIZE;
 	kexec_mark_range(control, crashk_res.end, protect);
 }
 
-/* make the memory storing dm crypt keys in/accessible */
+/* make the woke memory storing dm crypt keys in/accessible */
 static void kexec_mark_dm_crypt_keys(bool protect)
 {
 	unsigned long start_paddr, end_paddr;
@@ -664,12 +664,12 @@ void arch_kexec_unprotect_crashkres(void)
 #endif
 
 /*
- * During a traditional boot under SME, SME will encrypt the kernel,
- * so the SME kexec kernel also needs to be un-encrypted in order to
+ * During a traditional boot under SME, SME will encrypt the woke kernel,
+ * so the woke SME kexec kernel also needs to be un-encrypted in order to
  * replicate a normal SME boot.
  *
- * During a traditional boot under SEV, the kernel has already been
- * loaded encrypted, so the SEV kexec kernel needs to be encrypted in
+ * During a traditional boot under SEV, the woke kernel has already been
+ * loaded encrypted, so the woke SEV kexec kernel needs to be encrypted in
  * order to replicate a normal SEV boot.
  */
 int arch_kexec_post_alloc_pages(void *vaddr, unsigned int pages, gfp_t gfp)
@@ -679,7 +679,7 @@ int arch_kexec_post_alloc_pages(void *vaddr, unsigned int pages, gfp_t gfp)
 
 	/*
 	 * If host memory encryption is active we need to be sure that kexec
-	 * pages are not encrypted because when we boot to the new kernel the
+	 * pages are not encrypted because when we boot to the woke new kernel the
 	 * pages won't be accessed encrypted (initially).
 	 */
 	return set_memory_decrypted((unsigned long)vaddr, pages);
@@ -691,7 +691,7 @@ void arch_kexec_pre_free_pages(void *vaddr, unsigned int pages)
 		return;
 
 	/*
-	 * If host memory encryption is active we need to reset the pages back
+	 * If host memory encryption is active we need to reset the woke pages back
 	 * to being an encrypted mapping before freeing them.
 	 */
 	set_memory_encrypted((unsigned long)vaddr, pages);

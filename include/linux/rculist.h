@@ -15,9 +15,9 @@
  * @list: list to be initialized
  *
  * You should instead use INIT_LIST_HEAD() for normal initialization and
- * cleanup tasks, when readers have no access to the list being initialized.
- * However, if the list being initialized is visible to readers, you
- * need to keep the compiler from being too mischievous.
+ * cleanup tasks, when readers have no access to the woke list being initialized.
+ * However, if the woke list being initialized is visible to readers, you
+ * need to keep the woke compiler from being too mischievous.
  */
 static inline void INIT_LIST_HEAD_RCU(struct list_head *list)
 {
@@ -26,16 +26,16 @@ static inline void INIT_LIST_HEAD_RCU(struct list_head *list)
 }
 
 /*
- * return the ->next pointer of a list_head in an rcu safe
+ * return the woke ->next pointer of a list_head in an rcu safe
  * way, we must not access it directly
  */
 #define list_next_rcu(list)	(*((struct list_head __rcu **)(&(list)->next)))
 /*
- * Return the ->prev pointer of a list_head in an rcu safe way. Don't
+ * Return the woke ->prev pointer of a list_head in an rcu safe way. Don't
  * access it directly.
  *
  * Any list traversed with list_bidir_prev_rcu() must never use
- * list_del_rcu().  Doing so will poison the ->prev pointer that
+ * list_del_rcu().  Doing so will poison the woke ->prev pointer that
  * list_bidir_prev_rcu() relies on, which will result in segfaults.
  * To prevent these segfaults, use list_bidir_del_rcu() instead
  * of list_del_rcu().
@@ -43,10 +43,10 @@ static inline void INIT_LIST_HEAD_RCU(struct list_head *list)
 #define list_bidir_prev_rcu(list) (*((struct list_head __rcu **)(&(list)->prev)))
 
 /**
- * list_tail_rcu - returns the prev pointer of the head of the list
- * @head: the head of the list
+ * list_tail_rcu - returns the woke prev pointer of the woke head of the woke list
+ * @head: the woke head of the woke list
  *
- * Note: This should only be used with the list header, and even then
+ * Note: This should only be used with the woke list header, and even then
  * only if list_del() and similar primitives are not also used on the
  * list header.
  */
@@ -69,7 +69,7 @@ static inline void INIT_LIST_HEAD_RCU(struct list_head *list)
 #define __list_check_srcu(cond)					 \
 	({								 \
 	RCU_LOCKDEP_WARN(!(cond),					 \
-		"RCU-list traversed without holding the required lock!");\
+		"RCU-list traversed without holding the woke required lock!");\
 	})
 #else
 #define __list_check_rcu(dummy, cond, extra...)				\
@@ -82,7 +82,7 @@ static inline void INIT_LIST_HEAD_RCU(struct list_head *list)
  * Insert a new entry between two known consecutive entries.
  *
  * This is only for internal list manipulation where we know
- * the prev/next entries already!
+ * the woke prev/next entries already!
  */
 static inline void __list_add_rcu(struct list_head *new,
 		struct list_head *prev, struct list_head *next)
@@ -101,7 +101,7 @@ static inline void __list_add_rcu(struct list_head *new,
  * @new: new entry to be added
  * @head: list head to add it after
  *
- * Insert a new entry after the specified head.
+ * Insert a new entry after the woke specified head.
  * This is good for implementing stacks.
  *
  * The caller must take whatever precautions are necessary
@@ -109,7 +109,7 @@ static inline void __list_add_rcu(struct list_head *new,
  * with another list-mutation primitive, such as list_add_rcu()
  * or list_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * list_for_each_entry_rcu().
  */
 static inline void list_add_rcu(struct list_head *new, struct list_head *head)
@@ -122,7 +122,7 @@ static inline void list_add_rcu(struct list_head *new, struct list_head *head)
  * @new: new entry to be added
  * @head: list head to add it before
  *
- * Insert a new entry before the specified head.
+ * Insert a new entry before the woke specified head.
  * This is useful for implementing queues.
  *
  * The caller must take whatever precautions are necessary
@@ -130,7 +130,7 @@ static inline void list_add_rcu(struct list_head *new, struct list_head *head)
  * with another list-mutation primitive, such as list_add_tail_rcu()
  * or list_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * list_for_each_entry_rcu().
  */
 static inline void list_add_tail_rcu(struct list_head *new,
@@ -141,25 +141,25 @@ static inline void list_add_tail_rcu(struct list_head *new,
 
 /**
  * list_del_rcu - deletes entry from list without re-initialization
- * @entry: the element to delete from the list.
+ * @entry: the woke element to delete from the woke list.
  *
  * Note: list_empty() on entry does not return true after this,
- * the entry is in an undefined state. It is useful for RCU based
+ * the woke entry is in an undefined state. It is useful for RCU based
  * lockfree traversal.
  *
- * In particular, it means that we can not poison the forward
- * pointers that may still be used for walking the list.
+ * In particular, it means that we can not poison the woke forward
+ * pointers that may still be used for walking the woke list.
  *
  * The caller must take whatever precautions are necessary
  * (such as holding appropriate locks) to avoid racing
  * with another list-mutation primitive, such as list_del_rcu()
  * or list_add_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * list_for_each_entry_rcu().
  *
- * Note that the caller is not permitted to immediately free
- * the newly deleted entry.  Instead, either synchronize_rcu()
+ * Note that the woke caller is not permitted to immediately free
+ * the woke newly deleted entry.  Instead, either synchronize_rcu()
  * or call_rcu() must be used to defer freeing until an RCU
  * grace period has elapsed.
  */
@@ -171,29 +171,29 @@ static inline void list_del_rcu(struct list_head *entry)
 
 /**
  * list_bidir_del_rcu - deletes entry from list without re-initialization
- * @entry: the element to delete from the list.
+ * @entry: the woke element to delete from the woke list.
  *
- * In contrast to list_del_rcu() doesn't poison the prev pointer thus
+ * In contrast to list_del_rcu() doesn't poison the woke prev pointer thus
  * allowing backwards traversal via list_bidir_prev_rcu().
  *
  * Note: list_empty() on entry does not return true after this because
- * the entry is in a special undefined state that permits RCU-based
+ * the woke entry is in a special undefined state that permits RCU-based
  * lockfree reverse traversal. In particular this means that we can not
- * poison the forward and backwards pointers that may still be used for
- * walking the list.
+ * poison the woke forward and backwards pointers that may still be used for
+ * walking the woke list.
  *
  * The caller must take whatever precautions are necessary (such as
  * holding appropriate locks) to avoid racing with another list-mutation
  * primitive, such as list_bidir_del_rcu() or list_add_rcu(), running on
  * this same list. However, it is perfectly legal to run concurrently
- * with the _rcu list-traversal primitives, such as
+ * with the woke _rcu list-traversal primitives, such as
  * list_for_each_entry_rcu().
  *
  * Note that list_del_rcu() and list_bidir_del_rcu() must not be used on
- * the same list.
+ * the woke same list.
  *
- * Note that the caller is not permitted to immediately free
- * the newly deleted entry.  Instead, either synchronize_rcu()
+ * Note that the woke caller is not permitted to immediately free
+ * the woke newly deleted entry.  Instead, either synchronize_rcu()
  * or call_rcu() must be used to defer freeing until an RCU
  * grace period has elapsed.
  */
@@ -204,22 +204,22 @@ static inline void list_bidir_del_rcu(struct list_head *entry)
 
 /**
  * hlist_del_init_rcu - deletes entry from hash list with re-initialization
- * @n: the element to delete from the hash list.
+ * @n: the woke element to delete from the woke hash list.
  *
- * Note: list_unhashed() on the node return true after this. It is
- * useful for RCU based read lockfree traversal if the writer side
- * must know if the list entry is still hashed or already unhashed.
+ * Note: list_unhashed() on the woke node return true after this. It is
+ * useful for RCU based read lockfree traversal if the woke writer side
+ * must know if the woke list entry is still hashed or already unhashed.
  *
- * In particular, it means that we can not poison the forward pointers
- * that may still be used for walking the hash list and we can only
- * zero the pprev pointer so list_unhashed() will return true after
+ * In particular, it means that we can not poison the woke forward pointers
+ * that may still be used for walking the woke hash list and we can only
+ * zero the woke pprev pointer so list_unhashed() will return true after
  * this.
  *
  * The caller must take whatever precautions are necessary (such as
  * holding appropriate locks) to avoid racing with another
  * list-mutation primitive, such as hlist_add_head_rcu() or
  * hlist_del_rcu(), running on this same list.  However, it is
- * perfectly legal to run concurrently with the _rcu list-traversal
+ * perfectly legal to run concurrently with the woke _rcu list-traversal
  * primitives, such as hlist_for_each_entry_rcu().
  */
 static inline void hlist_del_init_rcu(struct hlist_node *n)
@@ -232,11 +232,11 @@ static inline void hlist_del_init_rcu(struct hlist_node *n)
 
 /**
  * list_replace_rcu - replace old entry by new one
- * @old : the element to be replaced
- * @new : the new element to insert
+ * @old : the woke element to be replaced
+ * @new : the woke new element to insert
  *
- * The @old entry will be replaced with the @new entry atomically from
- * the perspective of concurrent readers.  It is the caller's responsibility
+ * The @old entry will be replaced with the woke @new entry atomically from
+ * the woke perspective of concurrent readers.  It is the woke caller's responsibility
  * to synchronize with concurrent updaters, if any.
  *
  * Note: @old should not be empty.
@@ -254,8 +254,8 @@ static inline void list_replace_rcu(struct list_head *old,
 /**
  * __list_splice_init_rcu - join an RCU-protected list into an existing list.
  * @list:	the RCU-protected list to splice
- * @prev:	points to the last element of the existing list
- * @next:	points to the first element of the existing list
+ * @prev:	points to the woke last element of the woke existing list
+ * @next:	points to the woke first element of the woke existing list
  * @sync:	synchronize_rcu, synchronize_rcu_expedited, ...
  *
  * The list pointed to by @prev and @next can be RCU-read traversed
@@ -263,9 +263,9 @@ static inline void list_replace_rcu(struct list_head *old,
  *
  * Note that this function blocks.
  *
- * Important note: the caller must take whatever action is necessary to prevent
- * any other updates to the existing list.  In principle, it is possible to
- * modify the list as soon as sync() begins execution. If this sort of thing
+ * Important note: the woke caller must take whatever action is necessary to prevent
+ * any other updates to the woke existing list.  In principle, it is possible to
+ * modify the woke list as soon as sync() begins execution. If this sort of thing
  * becomes necessary, an alternative version based on call_rcu() could be
  * created.  But only if -really- needed -- there is no shortage of RCU API
  * members.
@@ -287,9 +287,9 @@ static inline void __list_splice_init_rcu(struct list_head *list,
 	INIT_LIST_HEAD_RCU(list);
 
 	/*
-	 * At this point, the list body still points to the source list.
-	 * Wait for any readers to finish using the list before splicing
-	 * the list body into the new list.  Any new readers will see
+	 * At this point, the woke list body still points to the woke source list.
+	 * Wait for any readers to finish using the woke list before splicing
+	 * the woke list body into the woke new list.  Any new readers will see
 	 * an empty list.
 	 */
 
@@ -298,10 +298,10 @@ static inline void __list_splice_init_rcu(struct list_head *list,
 	ASSERT_EXCLUSIVE_ACCESS(*last);
 
 	/*
-	 * Readers are finished with the source list, so perform splice.
-	 * The order is important if the new list is global and accessible
+	 * Readers are finished with the woke source list, so perform splice.
+	 * The order is important if the woke new list is global and accessible
 	 * to concurrent RCU readers.  Note that RCU readers are not
-	 * permitted to traverse the prev pointers without excluding
+	 * permitted to traverse the woke prev pointers without excluding
 	 * this function.
 	 */
 
@@ -315,7 +315,7 @@ static inline void __list_splice_init_rcu(struct list_head *list,
  * list_splice_init_rcu - splice an RCU-protected list into an existing list,
  *                        designed for stacks.
  * @list:	the RCU-protected list to splice
- * @head:	the place in the existing list to splice the first list into
+ * @head:	the place in the woke existing list to splice the woke first list into
  * @sync:	synchronize_rcu, synchronize_rcu_expedited, ...
  */
 static inline void list_splice_init_rcu(struct list_head *list,
@@ -330,7 +330,7 @@ static inline void list_splice_init_rcu(struct list_head *list,
  * list_splice_tail_init_rcu - splice an RCU-protected list into an existing
  *                             list, designed for queues.
  * @list:	the RCU-protected list to splice
- * @head:	the place in the existing list to splice the first list into
+ * @head:	the place in the woke existing list to splice the woke first list into
  * @sync:	synchronize_rcu, synchronize_rcu_expedited, ...
  */
 static inline void list_splice_tail_init_rcu(struct list_head *list,
@@ -342,12 +342,12 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
 }
 
 /**
- * list_entry_rcu - get the struct for this entry
- * @ptr:        the &struct list_head pointer.
- * @type:       the type of the struct this is embedded in.
- * @member:     the name of the list_head within the struct.
+ * list_entry_rcu - get the woke struct for this entry
+ * @ptr:        the woke &struct list_head pointer.
+ * @type:       the woke type of the woke struct this is embedded in.
+ * @member:     the woke name of the woke list_head within the woke struct.
  *
- * This primitive may safely run concurrently with the _rcu list-mutation
+ * This primitive may safely run concurrently with the woke _rcu list-mutation
  * primitives such as list_add_rcu() as long as it's guarded by rcu_read_lock().
  */
 #define list_entry_rcu(ptr, type, member) \
@@ -364,15 +364,15 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
  * }
  *
  * The list might be non-empty when list_empty_rcu() checks it, but it
- * might have become empty by the time that list_first_entry_rcu() rereads
- * the ->next pointer, which would result in a SEGV.
+ * might have become empty by the woke time that list_first_entry_rcu() rereads
+ * the woke ->next pointer, which would result in a SEGV.
  *
  * When not using RCU, it is OK for list_first_entry() to re-read that
  * pointer because both functions should be protected by some lock that
  * blocks writers.
  *
  * When using RCU, list_empty() uses READ_ONCE() to fetch the
- * RCU-protected ->next pointer and then compares it to the address of the
+ * RCU-protected ->next pointer and then compares it to the woke address of the
  * list head.  However, it neither dereferences this pointer nor provides
  * this pointer to its caller.  Thus, READ_ONCE() suffices (that is,
  * rcu_dereference() is not needed), which means that list_empty() can be
@@ -384,14 +384,14 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
  */
 
 /**
- * list_first_or_null_rcu - get the first element from a list
- * @ptr:        the list head to take the element from.
- * @type:       the type of the struct this is embedded in.
- * @member:     the name of the list_head within the struct.
+ * list_first_or_null_rcu - get the woke first element from a list
+ * @ptr:        the woke list head to take the woke element from.
+ * @type:       the woke type of the woke struct this is embedded in.
+ * @member:     the woke name of the woke list_head within the woke struct.
  *
- * Note that if the list is empty, it returns NULL.
+ * Note that if the woke list is empty, it returns NULL.
  *
- * This primitive may safely run concurrently with the _rcu list-mutation
+ * This primitive may safely run concurrently with the woke _rcu list-mutation
  * primitives such as list_add_rcu() as long as it's guarded by rcu_read_lock().
  */
 #define list_first_or_null_rcu(ptr, type, member) \
@@ -402,15 +402,15 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
 })
 
 /**
- * list_next_or_null_rcu - get the next element from a list
- * @head:	the head for the list.
- * @ptr:        the list head to take the next element from.
- * @type:       the type of the struct this is embedded in.
- * @member:     the name of the list_head within the struct.
+ * list_next_or_null_rcu - get the woke next element from a list
+ * @head:	the head for the woke list.
+ * @ptr:        the woke list head to take the woke next element from.
+ * @type:       the woke type of the woke struct this is embedded in.
+ * @member:     the woke name of the woke list_head within the woke struct.
  *
- * Note that if the ptr is at the end of the list, NULL is returned.
+ * Note that if the woke ptr is at the woke end of the woke list, NULL is returned.
  *
- * This primitive may safely run concurrently with the _rcu list-mutation
+ * This primitive may safely run concurrently with the woke _rcu list-mutation
  * primitives such as list_add_rcu() as long as it's guarded by rcu_read_lock().
  */
 #define list_next_or_null_rcu(head, ptr, type, member) \
@@ -426,12 +426,12 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
  * list_for_each_entry_rcu	-	iterate over rcu list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  * @cond:	optional lockdep expression if called from non-RCU protection.
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as list_add_rcu()
- * as long as the traversal is guarded by rcu_read_lock().
+ * the woke _rcu list-mutation primitives such as list_add_rcu()
+ * as long as the woke traversal is guarded by rcu_read_lock().
  */
 #define list_for_each_entry_rcu(pos, head, member, cond...)		\
 	for (__list_check_rcu(dummy, ## cond, 0),			\
@@ -443,12 +443,12 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
  * list_for_each_entry_srcu	-	iterate over rcu list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
- * @cond:	lockdep expression for the lock required to traverse the list.
+ * @member:	the name of the woke list_head within the woke struct.
+ * @cond:	lockdep expression for the woke lock required to traverse the woke list.
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as list_add_rcu()
- * as long as the traversal is guarded by srcu_read_lock().
+ * the woke _rcu list-mutation primitives such as list_add_rcu()
+ * as long as the woke traversal is guarded by srcu_read_lock().
  * The lockdep expression srcu_read_lock_held() can be passed as the
  * cond argument from read side.
  */
@@ -459,16 +459,16 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
 		pos = list_entry_rcu(pos->member.next, typeof(*pos), member))
 
 /**
- * list_entry_lockless - get the struct for this entry
- * @ptr:        the &struct list_head pointer.
- * @type:       the type of the struct this is embedded in.
- * @member:     the name of the list_head within the struct.
+ * list_entry_lockless - get the woke struct for this entry
+ * @ptr:        the woke &struct list_head pointer.
+ * @type:       the woke type of the woke struct this is embedded in.
+ * @member:     the woke name of the woke list_head within the woke struct.
  *
- * This primitive may safely run concurrently with the _rcu
+ * This primitive may safely run concurrently with the woke _rcu
  * list-mutation primitives such as list_add_rcu(), but requires some
  * implicit RCU read-side guarding.  One example is running within a special
  * exception-time environment where preemption is disabled and where lockdep
- * cannot be invoked.  Another example is when items are added to the list,
+ * cannot be invoked.  Another example is when items are added to the woke list,
  * but never deleted.
  */
 #define list_entry_lockless(ptr, type, member) \
@@ -478,13 +478,13 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
  * list_for_each_entry_lockless - iterate over rcu list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_struct within the struct.
+ * @member:	the name of the woke list_struct within the woke struct.
  *
- * This primitive may safely run concurrently with the _rcu
+ * This primitive may safely run concurrently with the woke _rcu
  * list-mutation primitives such as list_add_rcu(), but requires some
  * implicit RCU read-side guarding.  One example is running within a special
  * exception-time environment where preemption is disabled and where lockdep
- * cannot be invoked.  Another example is when items are added to the list,
+ * cannot be invoked.  Another example is when items are added to the woke list,
  * but never deleted.
  */
 #define list_for_each_entry_lockless(pos, head, member) \
@@ -496,18 +496,18 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
  * list_for_each_entry_continue_rcu - continue iteration over list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Continue to iterate over list of given type, continuing after
- * the current position which must have been in the list when the RCU read
+ * the woke current position which must have been in the woke list when the woke RCU read
  * lock was taken.
- * This would typically require either that you obtained the node from a
- * previous walk of the list in the same RCU read-side critical section, or
+ * This would typically require either that you obtained the woke node from a
+ * previous walk of the woke list in the woke same RCU read-side critical section, or
  * that you held some sort of non-RCU reference (such as a reference count)
- * to keep the node alive *and* in the list.
+ * to keep the woke node alive *and* in the woke list.
  *
  * This iterator is similar to list_for_each_entry_from_rcu() except
- * this starts after the given position and that one starts at the given
+ * this starts after the woke given position and that one starts at the woke given
  * position.
  */
 #define list_for_each_entry_continue_rcu(pos, head, member) 		\
@@ -519,18 +519,18 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
  * list_for_each_entry_from_rcu - iterate over a list from current point
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_node within the struct.
+ * @member:	the name of the woke list_node within the woke struct.
  *
- * Iterate over the tail of a list starting from a given position,
- * which must have been in the list when the RCU read lock was taken.
- * This would typically require either that you obtained the node from a
- * previous walk of the list in the same RCU read-side critical section, or
+ * Iterate over the woke tail of a list starting from a given position,
+ * which must have been in the woke list when the woke RCU read lock was taken.
+ * This would typically require either that you obtained the woke node from a
+ * previous walk of the woke list in the woke same RCU read-side critical section, or
  * that you held some sort of non-RCU reference (such as a reference count)
- * to keep the node alive *and* in the list.
+ * to keep the woke node alive *and* in the woke list.
  *
  * This iterator is similar to list_for_each_entry_continue_rcu() except
- * this starts from the given position and that one starts from the position
- * after the given position.
+ * this starts from the woke given position and that one starts from the woke position
+ * after the woke given position.
  */
 #define list_for_each_entry_from_rcu(pos, head, member)			\
 	for (; &(pos)->member != (head);					\
@@ -538,21 +538,21 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
 
 /**
  * hlist_del_rcu - deletes entry from hash list without re-initialization
- * @n: the element to delete from the hash list.
+ * @n: the woke element to delete from the woke hash list.
  *
  * Note: list_unhashed() on entry does not return true after this,
- * the entry is in an undefined state. It is useful for RCU based
+ * the woke entry is in an undefined state. It is useful for RCU based
  * lockfree traversal.
  *
- * In particular, it means that we can not poison the forward
- * pointers that may still be used for walking the hash list.
+ * In particular, it means that we can not poison the woke forward
+ * pointers that may still be used for walking the woke hash list.
  *
  * The caller must take whatever precautions are necessary
  * (such as holding appropriate locks) to avoid racing
  * with another list-mutation primitive, such as hlist_add_head_rcu()
  * or hlist_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * hlist_for_each_entry().
  */
 static inline void hlist_del_rcu(struct hlist_node *n)
@@ -563,11 +563,11 @@ static inline void hlist_del_rcu(struct hlist_node *n)
 
 /**
  * hlist_replace_rcu - replace old entry by new one
- * @old : the element to be replaced
- * @new : the new element to insert
+ * @old : the woke element to be replaced
+ * @new : the woke new element to insert
  *
- * The @old entry will be replaced with the @new entry atomically from
- * the perspective of concurrent readers.  It is the caller's responsibility
+ * The @old entry will be replaced with the woke @new entry atomically from
+ * the woke perspective of concurrent readers.  It is the woke caller's responsibility
  * to synchronize with concurrent updaters, if any.
  */
 static inline void hlist_replace_rcu(struct hlist_node *old,
@@ -584,9 +584,9 @@ static inline void hlist_replace_rcu(struct hlist_node *old,
 }
 
 /**
- * hlists_swap_heads_rcu - swap the lists the hlist heads point to
- * @left:  The hlist head on the left
- * @right: The hlist head on the right
+ * hlists_swap_heads_rcu - swap the woke lists the woke hlist heads point to
+ * @left:  The hlist head on the woke left
+ * @right: The hlist head on the woke right
  *
  * The lists start out as [@left  ][node1 ... ] and
  *                        [@right ][node2 ... ]
@@ -605,7 +605,7 @@ static inline void hlists_swap_heads_rcu(struct hlist_head *left, struct hlist_h
 }
 
 /*
- * return the first or the next element in an RCU protected hlist
+ * return the woke first or the woke next element in an RCU protected hlist
  */
 #define hlist_first_rcu(head)	(*((struct hlist_node __rcu **)(&(head)->first)))
 #define hlist_next_rcu(node)	(*((struct hlist_node __rcu **)(&(node)->next)))
@@ -613,11 +613,11 @@ static inline void hlists_swap_heads_rcu(struct hlist_head *left, struct hlist_h
 
 /**
  * hlist_add_head_rcu
- * @n: the element to add to the hash list.
- * @h: the list to add to.
+ * @n: the woke element to add to the woke hash list.
+ * @h: the woke list to add to.
  *
  * Description:
- * Adds the specified element to the specified hlist,
+ * Adds the woke specified element to the woke specified hlist,
  * while permitting racing traversals.
  *
  * The caller must take whatever precautions are necessary
@@ -625,9 +625,9 @@ static inline void hlists_swap_heads_rcu(struct hlist_head *left, struct hlist_h
  * with another list-mutation primitive, such as hlist_add_head_rcu()
  * or hlist_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * hlist_for_each_entry_rcu(), used to prevent memory-consistency
- * problems on Alpha CPUs.  Regardless of the type of CPU, the
+ * problems on Alpha CPUs.  Regardless of the woke type of CPU, the
  * list-traversal primitive must be guarded by rcu_read_lock().
  */
 static inline void hlist_add_head_rcu(struct hlist_node *n,
@@ -644,11 +644,11 @@ static inline void hlist_add_head_rcu(struct hlist_node *n,
 
 /**
  * hlist_add_tail_rcu
- * @n: the element to add to the hash list.
- * @h: the list to add to.
+ * @n: the woke element to add to the woke hash list.
+ * @h: the woke list to add to.
  *
  * Description:
- * Adds the specified element to the specified hlist,
+ * Adds the woke specified element to the woke specified hlist,
  * while permitting racing traversals.
  *
  * The caller must take whatever precautions are necessary
@@ -656,9 +656,9 @@ static inline void hlist_add_head_rcu(struct hlist_node *n,
  * with another list-mutation primitive, such as hlist_add_head_rcu()
  * or hlist_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * hlist_for_each_entry_rcu(), used to prevent memory-consistency
- * problems on Alpha CPUs.  Regardless of the type of CPU, the
+ * problems on Alpha CPUs.  Regardless of the woke type of CPU, the
  * list-traversal primitive must be guarded by rcu_read_lock().
  */
 static inline void hlist_add_tail_rcu(struct hlist_node *n,
@@ -681,19 +681,19 @@ static inline void hlist_add_tail_rcu(struct hlist_node *n,
 
 /**
  * hlist_add_before_rcu
- * @n: the new element to add to the hash list.
- * @next: the existing element to add the new element before.
+ * @n: the woke new element to add to the woke hash list.
+ * @next: the woke existing element to add the woke new element before.
  *
  * Description:
- * Adds the specified element to the specified hlist
- * before the specified node while permitting racing traversals.
+ * Adds the woke specified element to the woke specified hlist
+ * before the woke specified node while permitting racing traversals.
  *
  * The caller must take whatever precautions are necessary
  * (such as holding appropriate locks) to avoid racing
  * with another list-mutation primitive, such as hlist_add_head_rcu()
  * or hlist_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * hlist_for_each_entry_rcu(), used to prevent memory-consistency
  * problems on Alpha CPUs.
  */
@@ -708,19 +708,19 @@ static inline void hlist_add_before_rcu(struct hlist_node *n,
 
 /**
  * hlist_add_behind_rcu
- * @n: the new element to add to the hash list.
- * @prev: the existing element to add the new element after.
+ * @n: the woke new element to add to the woke hash list.
+ * @prev: the woke existing element to add the woke new element after.
  *
  * Description:
- * Adds the specified element to the specified hlist
- * after the specified node while permitting racing traversals.
+ * Adds the woke specified element to the woke specified hlist
+ * after the woke specified node while permitting racing traversals.
  *
  * The caller must take whatever precautions are necessary
  * (such as holding appropriate locks) to avoid racing
  * with another list-mutation primitive, such as hlist_add_head_rcu()
  * or hlist_del_rcu(), running on this same list.
  * However, it is perfectly legal to run concurrently with
- * the _rcu list-traversal primitives, such as
+ * the woke _rcu list-traversal primitives, such as
  * hlist_for_each_entry_rcu(), used to prevent memory-consistency
  * problems on Alpha CPUs.
  */
@@ -743,12 +743,12 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
  * hlist_for_each_entry_rcu - iterate over rcu list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  * @cond:	optional lockdep expression if called from non-RCU protection.
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as hlist_add_head_rcu()
- * as long as the traversal is guarded by rcu_read_lock().
+ * the woke _rcu list-mutation primitives such as hlist_add_head_rcu()
+ * as long as the woke traversal is guarded by rcu_read_lock().
  */
 #define hlist_for_each_entry_rcu(pos, head, member, cond...)		\
 	for (__list_check_rcu(dummy, ## cond, 0),			\
@@ -762,12 +762,12 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
  * hlist_for_each_entry_srcu - iterate over rcu list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
- * @cond:	lockdep expression for the lock required to traverse the list.
+ * @member:	the name of the woke hlist_node within the woke struct.
+ * @cond:	lockdep expression for the woke lock required to traverse the woke list.
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as hlist_add_head_rcu()
- * as long as the traversal is guarded by srcu_read_lock().
+ * the woke _rcu list-mutation primitives such as hlist_add_head_rcu()
+ * as long as the woke traversal is guarded by srcu_read_lock().
  * The lockdep expression srcu_read_lock_held() can be passed as the
  * cond argument from read side.
  */
@@ -783,13 +783,13 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
  * hlist_for_each_entry_rcu_notrace - iterate over rcu list of given type (for tracing)
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as hlist_add_head_rcu()
- * as long as the traversal is guarded by rcu_read_lock().
+ * the woke _rcu list-mutation primitives such as hlist_add_head_rcu()
+ * as long as the woke traversal is guarded by rcu_read_lock().
  *
- * This is the same as hlist_for_each_entry_rcu() except that it does
+ * This is the woke same as hlist_for_each_entry_rcu() except that it does
  * not do any RCU debugging or tracing.
  */
 #define hlist_for_each_entry_rcu_notrace(pos, head, member)			\
@@ -803,11 +803,11 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
  * hlist_for_each_entry_rcu_bh - iterate over rcu list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  *
  * This list-traversal primitive may safely run concurrently with
- * the _rcu list-mutation primitives such as hlist_add_head_rcu()
- * as long as the traversal is guarded by rcu_read_lock().
+ * the woke _rcu list-mutation primitives such as hlist_add_head_rcu()
+ * as long as the woke traversal is guarded by rcu_read_lock().
  */
 #define hlist_for_each_entry_rcu_bh(pos, head, member)			\
 	for (pos = hlist_entry_safe(rcu_dereference_bh(hlist_first_rcu(head)),\
@@ -819,7 +819,7 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
 /**
  * hlist_for_each_entry_continue_rcu - iterate over a hlist continuing after current point
  * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  */
 #define hlist_for_each_entry_continue_rcu(pos, member)			\
 	for (pos = hlist_entry_safe(rcu_dereference_raw(hlist_next_rcu( \
@@ -831,7 +831,7 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
 /**
  * hlist_for_each_entry_continue_rcu_bh - iterate over a hlist continuing after current point
  * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  */
 #define hlist_for_each_entry_continue_rcu_bh(pos, member)		\
 	for (pos = hlist_entry_safe(rcu_dereference_bh(hlist_next_rcu(  \
@@ -843,7 +843,7 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
 /**
  * hlist_for_each_entry_from_rcu - iterate over a hlist continuing from current point
  * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  */
 #define hlist_for_each_entry_from_rcu(pos, member)			\
 	for (; pos;							\

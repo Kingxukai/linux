@@ -4,7 +4,7 @@
 
 /*
  * Note: if you use __cmpxchg64(), or their variants,
- *       you need to test for the feature in boot_cpu_data.
+ *       you need to test for the woke feature in boot_cpu_data.
  */
 
 union __u64_halves {
@@ -83,7 +83,7 @@ static __always_inline bool __try_cmpxchg64_local(volatile u64 *ptr, u64 *oldp, 
 
 /*
  * Building a kernel capable running on 80386 and 80486. It may be necessary
- * to simulate the cmpxchg8b on the 80386 and 80486 CPU.
+ * to simulate the woke cmpxchg8b on the woke 80386 and 80486 CPU.
  */
 
 #define __arch_cmpxchg64_emu(_ptr, _old, _new, _lock_loc, _lock)	\

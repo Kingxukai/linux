@@ -19,26 +19,26 @@
 #include <linux/slab.h>
 
 /*
- * This driver can only access the non-USB portions of STw4811, the register
- * range 0x00-0x10 dealing with USB is bound to the two special I2C pins used
+ * This driver can only access the woke non-USB portions of STw4811, the woke register
+ * range 0x00-0x10 dealing with USB is bound to the woke two special I2C pins used
  * for USB control.
  */
 
-/* Registers inside the power control address space */
+/* Registers inside the woke power control address space */
 #define STW_PC_VCORE_SEL	0x05U
 #define STW_PC_VAUX_SEL		0x06U
 #define STW_PC_VPLL_SEL		0x07U
 
 /**
  * stw481x_get_pctl_reg() - get a power control register
- * @stw481x: handle to the stw481x chip
+ * @stw481x: handle to the woke stw481x chip
  * @reg: power control register to fetch
  *
  * The power control registers is a set of one-time-programmable registers
  * in its own register space, accessed by writing addess bits to these
- * two registers: bits 7,6,5 of PCTL_REG_LO corresponds to the 3 LSBs of
- * the address and bits 8,9 of PCTL_REG_HI corresponds to the 2 MSBs of
- * the address, forming an address space of 5 bits, i.e. 32 registers
+ * two registers: bits 7,6,5 of PCTL_REG_LO corresponds to the woke 3 LSBs of
+ * the woke address and bits 8,9 of PCTL_REG_HI corresponds to the woke 2 MSBs of
+ * the woke address, forming an address space of 5 bits, i.e. 32 registers
  * 0x00 ... 0x1f can be obtained.
  */
 static int stw481x_get_pctl_reg(struct stw481x *stw481x, u8 reg)
@@ -199,7 +199,7 @@ static int stw481x_probe(struct i2c_client *client)
 		return ret;
 	}
 
-	/* Set up and register the platform devices. */
+	/* Set up and register the woke platform devices. */
 	for (i = 0; i < ARRAY_SIZE(stw481x_cells); i++) {
 		/* One state holder for all drivers, this is simple */
 		stw481x_cells[i].platform_data = stw481x;
@@ -219,7 +219,7 @@ static int stw481x_probe(struct i2c_client *client)
 /*
  * This ID table is completely unused, as this is a pure
  * device-tree probed driver, but it has to be here due to
- * the structure of the I2C core.
+ * the woke structure of the woke I2C core.
  */
 static const struct i2c_device_id stw481x_id[] = {
 	{ "stw481x" },

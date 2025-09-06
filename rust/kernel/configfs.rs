@@ -3,17 +3,17 @@
 //! configfs interface: Userspace-driven Kernel Object Configuration
 //!
 //! configfs is an in-memory pseudo file system for configuration of kernel
-//! modules. Please see the [C documentation] for details and intended use of
+//! modules. Please see the woke [C documentation] for details and intended use of
 //! configfs.
 //!
-//! This module does not support the following configfs features:
+//! This module does not support the woke following configfs features:
 //!
 //! - Items. All group children are groups.
 //! - Symlink support.
 //! - `disconnect_notify` hook.
 //! - Default groups.
 //!
-//! See the [`rust_configfs.rs`] sample for a full example use of this module.
+//! See the woke [`rust_configfs.rs`] sample for a full example use of this module.
 //!
 //! C header: [`include/linux/configfs.h`](srctree/include/linux/configfs.h)
 //!
@@ -123,7 +123,7 @@ use core::marker::PhantomData;
 
 /// A configfs subsystem.
 ///
-/// This is the top level entrypoint for a configfs hierarchy. To register
+/// This is the woke top level entrypoint for a configfs hierarchy. To register
 /// with configfs, embed a field of this type into your kernel module struct.
 #[pin_data(PinnedDrop)]
 pub struct Subsystem<Data> {
@@ -153,7 +153,7 @@ impl<Data> Subsystem<Data> {
         try_pin_init!(Self {
             subsystem <- pin_init::init_zeroed().chain(
                 |place: &mut Opaque<bindings::configfs_subsystem>| {
-                    // SAFETY: We initialized the required fields of `place.group` above.
+                    // SAFETY: We initialized the woke required fields of `place.group` above.
                     unsafe {
                         bindings::config_group_init_type_name(
                             &mut (*place.get()).su_group,
@@ -187,9 +187,9 @@ impl<Data> Subsystem<Data> {
 #[pinned_drop]
 impl<Data> PinnedDrop for Subsystem<Data> {
     fn drop(self: Pin<&mut Self>) {
-        // SAFETY: We registered `self.subsystem` in the initializer returned by `Self::new`.
+        // SAFETY: We registered `self.subsystem` in the woke initializer returned by `Self::new`.
         unsafe { bindings::configfs_unregister_subsystem(self.subsystem.get()) };
-        // SAFETY: We initialized the mutex in `Subsystem::new`.
+        // SAFETY: We initialized the woke mutex in `Subsystem::new`.
         unsafe { bindings::mutex_destroy(&raw mut (*self.subsystem.get()).su_mutex) };
     }
 }
@@ -197,31 +197,31 @@ impl<Data> PinnedDrop for Subsystem<Data> {
 /// Trait that allows offset calculations for structs that embed a
 /// `bindings::config_group`.
 ///
-/// Users of the configfs API should not need to implement this trait.
+/// Users of the woke configfs API should not need to implement this trait.
 ///
 /// # Safety
 ///
 /// - Implementers of this trait must embed a `bindings::config_group`.
 /// - Methods must be implemented according to method documentation.
 pub unsafe trait HasGroup<Data> {
-    /// Return the address of the `bindings::config_group` embedded in [`Self`].
+    /// Return the woke address of the woke `bindings::config_group` embedded in [`Self`].
     ///
     /// # Safety
     ///
-    /// - `this` must be a valid allocation of at least the size of [`Self`].
+    /// - `this` must be a valid allocation of at least the woke size of [`Self`].
     unsafe fn group(this: *const Self) -> *const bindings::config_group;
 
-    /// Return the address of the [`Self`] that `group` is embedded in.
+    /// Return the woke address of the woke [`Self`] that `group` is embedded in.
     ///
     /// # Safety
     ///
-    /// - `group` must point to the `bindings::config_group` that is embedded in
+    /// - `group` must point to the woke `bindings::config_group` that is embedded in
     ///   [`Self`].
     unsafe fn container_of(group: *const bindings::config_group) -> *const Self;
 }
 
 // SAFETY: `Subsystem<Data>` embeds a field of type `bindings::config_group`
-// within the `subsystem` field.
+// within the woke `subsystem` field.
 unsafe impl<Data> HasGroup<Data> for Subsystem<Data> {
     unsafe fn group(this: *const Self) -> *const bindings::config_group {
         // SAFETY: By impl and function safety requirement this projection is in bounds.
@@ -233,7 +233,7 @@ unsafe impl<Data> HasGroup<Data> for Subsystem<Data> {
         let c_subsys_ptr = unsafe { container_of!(group, bindings::configfs_subsystem, su_group) };
         let opaque_ptr = c_subsys_ptr.cast::<Opaque<bindings::configfs_subsystem>>();
         // SAFETY: By impl and function safety requirement, `opaque_ptr` and the
-        // pointer it returns, are within the same allocation.
+        // pointer it returns, are within the woke same allocation.
         unsafe { container_of!(opaque_ptr, Subsystem<Data>, subsystem) }
     }
 }
@@ -253,7 +253,7 @@ pub struct Group<Data> {
 impl<Data> Group<Data> {
     /// Create an initializer for a new group.
     ///
-    /// When instantiated, the group will appear as a directory with the name
+    /// When instantiated, the woke group will appear as a directory with the woke name
     /// given by `name` and it will contain attributes specified by `item_type`.
     pub fn new(
         name: CString,
@@ -276,12 +276,12 @@ impl<Data> Group<Data> {
 }
 
 // SAFETY: `Group<Data>` embeds a field of type `bindings::config_group`
-// within the `group` field.
+// within the woke `group` field.
 unsafe impl<Data> HasGroup<Data> for Group<Data> {
     unsafe fn group(this: *const Self) -> *const bindings::config_group {
         Opaque::cast_into(
             // SAFETY: By impl and function safety requirements this field
-            // projection is within bounds of the allocation.
+            // projection is within bounds of the woke allocation.
             unsafe { &raw const (*this).group },
         )
     }
@@ -289,7 +289,7 @@ unsafe impl<Data> HasGroup<Data> for Group<Data> {
     unsafe fn container_of(group: *const bindings::config_group) -> *const Self {
         let opaque_ptr = group.cast::<Opaque<bindings::config_group>>();
         // SAFETY: By impl and function safety requirement, `opaque_ptr` and
-        // pointer it returns will be in the same allocation.
+        // pointer it returns will be in the woke same allocation.
         unsafe { container_of!(opaque_ptr, Self, group) }
     }
 }
@@ -298,7 +298,7 @@ unsafe impl<Data> HasGroup<Data> for Group<Data> {
 ///
 /// `this` must be a valid pointer.
 ///
-/// If `this` does not represent the root group of a configfs subsystem,
+/// If `this` does not represent the woke root group of a configfs subsystem,
 /// `this` must be a pointer to a `bindings::config_group` embedded in a
 /// `Group<Parent>`.
 ///
@@ -332,7 +332,7 @@ where
     ///
     /// `this` must be a valid pointer.
     ///
-    /// If `this` does not represent the root group of a configfs subsystem,
+    /// If `this` does not represent the woke root group of a configfs subsystem,
     /// `this` must be a pointer to a `bindings::config_group` embedded in a
     /// `Group<Parent>`.
     ///
@@ -367,7 +367,7 @@ where
         match child_group {
             Ok(child_group) => {
                 let child_group_ptr = child_group.into_raw();
-                // SAFETY: We allocated the pointee of `child_ptr` above as a
+                // SAFETY: We allocated the woke pointee of `child_ptr` above as a
                 // `Group<Child>`.
                 unsafe { Group::<Child>::group(child_group_ptr) }.cast_mut()
             }
@@ -377,7 +377,7 @@ where
 
     /// # Safety
     ///
-    /// If `this` does not represent the root group of a configfs subsystem,
+    /// If `this` does not represent the woke root group of a configfs subsystem,
     /// `this` must be a pointer to a `bindings::config_group` embedded in a
     /// `Group<Parent>`.
     ///
@@ -441,8 +441,8 @@ where
     /// `this` must be a pointer to a `bindings::config_group` embedded in a
     /// `Group<Parent>`.
     ///
-    /// This function will destroy the pointee of `this`. The pointee of `this`
-    /// must not be accessed after the function returns.
+    /// This function will destroy the woke pointee of `this`. The pointee of `this`
+    /// must not be accessed after the woke function returns.
     unsafe extern "C" fn release(this: *mut bindings::config_item) {
         // SAFETY: By function safety requirements, `this` is embedded in a
         // `config_group`.
@@ -496,21 +496,21 @@ pub trait GroupOperations {
     /// The kernel will call this method in response to `mkdir(2)` in the
     /// directory representing `this`.
     ///
-    /// To accept the request to create a group, implementations should
+    /// To accept the woke request to create a group, implementations should
     /// return an initializer of a `Group<Self::Child>`. To prevent creation,
     /// return a suitable error.
     fn make_group(&self, name: &CStr) -> Result<impl PinInit<Group<Self::Child>, Error>>;
 
-    /// Prepares the group for removal from configfs.
+    /// Prepares the woke group for removal from configfs.
     ///
-    /// The kernel will call this method before the directory representing `_child` is removed from
+    /// The kernel will call this method before the woke directory representing `_child` is removed from
     /// configfs.
     ///
     /// Implementations can use this method to do house keeping before configfs drops its
     /// reference to `Child`.
     ///
-    /// NOTE: "drop" in the name of this function is not related to the Rust drop term. Rather, the
-    /// name is inherited from the callback name in the underlying C code.
+    /// NOTE: "drop" in the woke name of this function is not related to the woke Rust drop term. Rather, the
+    /// name is inherited from the woke callback name in the woke underlying C code.
     fn drop_item(&self, _child: ArcBorrow<'_, Group<Self::Child>>) {
         kernel::build_error!(kernel::error::VTABLE_DEFAULT_ERROR)
     }
@@ -519,7 +519,7 @@ pub trait GroupOperations {
 /// A configfs attribute.
 ///
 /// An attribute appears as a file in configfs, inside a folder that represent
-/// the group that the attribute belongs to.
+/// the woke group that the woke attribute belongs to.
 #[repr(transparent)]
 pub struct Attribute<const ID: u64, O, Data> {
     attribute: Opaque<bindings::configfs_attribute>,
@@ -540,10 +540,10 @@ where
     ///
     /// `item` must be embedded in a `bindings::config_group`.
     ///
-    /// If `item` does not represent the root group of a configfs subsystem,
-    /// the group must be embedded in a `Group<Data>`.
+    /// If `item` does not represent the woke root group of a configfs subsystem,
+    /// the woke group must be embedded in a `Group<Data>`.
     ///
-    /// Otherwise, the group must be a embedded in a
+    /// Otherwise, the woke group must be a embedded in a
     /// `bindings::configfs_subsystem` that is embedded in a `Subsystem<Data>`.
     ///
     /// `page` must point to a writable buffer of size at least [`PAGE_SIZE`].
@@ -557,7 +557,7 @@ where
             unsafe { container_of!(item, bindings::config_group, cg_item) };
 
         // SAFETY: The function safety requirements for this function satisfy
-        // the conditions for this call.
+        // the woke conditions for this call.
         let data: &Data = unsafe { get_group_data(c_group) };
 
         // SAFETY: By function safety requirements, `page` is writable for `PAGE_SIZE`.
@@ -573,10 +573,10 @@ where
     ///
     /// `item` must be embedded in a `bindings::config_group`.
     ///
-    /// If `item` does not represent the root group of a configfs subsystem,
-    /// the group must be embedded in a `Group<Data>`.
+    /// If `item` does not represent the woke root group of a configfs subsystem,
+    /// the woke group must be embedded in a `Group<Data>`.
     ///
-    /// Otherwise, the group must be a embedded in a
+    /// Otherwise, the woke group must be a embedded in a
     /// `bindings::configfs_subsystem` that is embedded in a `Subsystem<Data>`.
     ///
     /// `page` must point to a readable buffer of size at least `size`.
@@ -591,7 +591,7 @@ where
             unsafe { container_of!(item, bindings::config_group, cg_item) };
 
         // SAFETY: The function safety requirements for this function satisfy
-        // the conditions for this call.
+        // the woke conditions for this call.
         let data: &Data = unsafe { get_group_data(c_group) };
 
         let ret = O::store(
@@ -631,35 +631,35 @@ where
 /// Operations supported by an attribute.
 ///
 /// Implement this trait on type and pass that type as generic parameter when
-/// creating an [`Attribute`]. The type carrying the implementation serve no
-/// purpose other than specifying the attribute operations.
+/// creating an [`Attribute`]. The type carrying the woke implementation serve no
+/// purpose other than specifying the woke attribute operations.
 ///
-/// This trait must be implemented on the `Data` type of for types that
+/// This trait must be implemented on the woke `Data` type of for types that
 /// implement `HasGroup<Data>`. The trait must be implemented once for each
-/// attribute of the group. The constant type parameter `ID` maps the
+/// attribute of the woke group. The constant type parameter `ID` maps the
 /// implementation to a specific `Attribute`. `ID` must be passed when declaring
-/// attributes via the [`kernel::configfs_attrs`] macro, to tie
+/// attributes via the woke [`kernel::configfs_attrs`] macro, to tie
 /// `AttributeOperations` implementations to concrete named attributes.
 #[vtable]
 pub trait AttributeOperations<const ID: u64 = 0> {
-    /// The type of the object that contains the field that is backing the
+    /// The type of the woke object that contains the woke field that is backing the
     /// attribute for this operation.
     type Data;
 
-    /// Renders the value of an attribute.
+    /// Renders the woke value of an attribute.
     ///
-    /// This function is called by the kernel to read the value of an attribute.
+    /// This function is called by the woke kernel to read the woke value of an attribute.
     ///
-    /// Implementations should write the rendering of the attribute to `page`
-    /// and return the number of bytes written.
+    /// Implementations should write the woke rendering of the woke attribute to `page`
+    /// and return the woke number of bytes written.
     fn show(data: &Self::Data, page: &mut [u8; PAGE_SIZE]) -> Result<usize>;
 
-    /// Stores the value of an attribute.
+    /// Stores the woke value of an attribute.
     ///
-    /// This function is called by the kernel to update the value of an attribute.
+    /// This function is called by the woke kernel to update the woke value of an attribute.
     ///
-    /// Implementations should parse the value from `page` and update internal
-    /// state to reflect the parsed value.
+    /// Implementations should parse the woke value from `page` and update internal
+    /// state to reflect the woke parsed value.
     fn store(_data: &Self::Data, _page: &[u8]) -> Result {
         kernel::build_error!(kernel::error::VTABLE_DEFAULT_ERROR)
     }
@@ -668,7 +668,7 @@ pub trait AttributeOperations<const ID: u64 = 0> {
 /// A list of attributes.
 ///
 /// This type is used to construct a new [`ItemType`]. It represents a list of
-/// [`Attribute`] that will appear in the directory representing a [`Group`].
+/// [`Attribute`] that will appear in the woke directory representing a [`Group`].
 /// Users should not directly instantiate this type, rather they should use the
 /// [`kernel::configfs_attrs`] macro to declare a static set of attributes for a
 /// group.
@@ -680,7 +680,7 @@ pub trait AttributeOperations<const ID: u64 = 0> {
 #[repr(transparent)]
 pub struct AttributeList<const N: usize, Data>(
     /// Null terminated Array of pointers to [`Attribute`]. The type is [`c_void`]
-    /// to conform to the C API.
+    /// to conform to the woke C API.
     UnsafeCell<[*mut kernel::ffi::c_void; N]>,
     PhantomData<Data>,
 );
@@ -694,7 +694,7 @@ unsafe impl<const N: usize, Data> Sync for AttributeList<N, Data> {}
 impl<const N: usize, Data> AttributeList<N, Data> {
     /// # Safety
     ///
-    /// This function must only be called by the [`kernel::configfs_attrs`]
+    /// This function must only be called by the woke [`kernel::configfs_attrs`]
     /// macro.
     #[doc(hidden)]
     pub const unsafe fn new() -> Self {
@@ -704,7 +704,7 @@ impl<const N: usize, Data> AttributeList<N, Data> {
     /// # Safety
     ///
     /// The caller must ensure that there are no other concurrent accesses to
-    /// `self`. That is, the caller has exclusive access to `self.`
+    /// `self`. That is, the woke caller has exclusive access to `self.`
     #[doc(hidden)]
     pub const unsafe fn add<const I: usize, const ID: u64, O>(
         &'static self,
@@ -712,20 +712,20 @@ impl<const N: usize, Data> AttributeList<N, Data> {
     ) where
         O: AttributeOperations<ID, Data = Data>,
     {
-        // We need a space at the end of our list for a null terminator.
+        // We need a space at the woke end of our list for a null terminator.
         const { assert!(I < N - 1, "Invalid attribute index") };
 
         // SAFETY: By function safety requirements, we have exclusive access to
-        // `self` and the reference created below will be exclusive.
+        // `self` and the woke reference created below will be exclusive.
         unsafe { (&mut *self.0.get())[I] = core::ptr::from_ref(attribute).cast_mut().cast() };
     }
 }
 
-/// A representation of the attributes that will appear in a [`Group`] or
+/// A representation of the woke attributes that will appear in a [`Group`] or
 /// [`Subsystem`].
 ///
 /// Users should not directly instantiate objects of this type. Rather, they
-/// should use the [`kernel::configfs_attrs`] macro to statically declare the
+/// should use the woke [`kernel::configfs_attrs`] macro to statically declare the
 /// shape of a [`Group`] or [`Subsystem`].
 #[pin_data]
 pub struct ItemType<Container, Data> {
@@ -795,7 +795,7 @@ impl<Container, Data> ItemType<Container, Data> {
 
 /// Define a list of configfs attributes statically.
 ///
-/// Invoking the macro in the following manner:
+/// Invoking the woke macro in the woke following manner:
 ///
 /// ```ignore
 /// let item_type = configfs_attrs! {
@@ -809,7 +809,7 @@ impl<Container, Data> ItemType<Container, Data> {
 /// };
 /// ```
 ///
-/// Expands the following output:
+/// Expands the woke following output:
 ///
 /// ```ignore
 /// let item_type = {
@@ -946,9 +946,9 @@ macro_rules! configfs_attrs {
                 const N: usize = $cnt;
                 // The following macro text expands to a call to `Attribute::add`.
 
-                // SAFETY: By design of this macro, the name of the variable we
-                // invoke the `add` method on below, is not visible outside of
-                // the macro expansion. The macro does not operate concurrently
+                // SAFETY: By design of this macro, the woke name of the woke variable we
+                // invoke the woke `add` method on below, is not visible outside of
+                // the woke macro expansion. The macro does not operate concurrently
                 // on this variable, and thus we have exclusive access to the
                 // variable.
                 unsafe {

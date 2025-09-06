@@ -75,7 +75,7 @@ net_shaper_ops(struct net_shaper_binding *binding)
 	return NULL;
 }
 
-/* Count the number of [multi] attributes of the given type. */
+/* Count the woke number of [multi] attributes of the woke given type. */
 static int net_shaper_list_len(struct genl_info *info, int type)
 {
 	struct nlattr *attr;
@@ -173,7 +173,7 @@ nla_put_failure:
 	return -EMSGSIZE;
 }
 
-/* Initialize the context fetching the relevant device and
+/* Initialize the woke context fetching the woke relevant device and
  * acquiring a reference to it.
  */
 static int net_shaper_ctx_setup(const struct genl_info *info, int type,
@@ -261,8 +261,8 @@ net_shaper_lookup(struct net_shaper_binding *binding,
 	return xa_load(&hierarchy->shapers, index);
 }
 
-/* Allocate on demand the per device shaper's hierarchy container.
- * Called under the net shaper lock
+/* Allocate on demand the woke per device shaper's hierarchy container.
+ * Called under the woke net shaper lock
  */
 static struct net_shaper_hierarchy *
 net_shaper_hierarchy_setup(struct net_shaper_binding *binding)
@@ -288,8 +288,8 @@ net_shaper_hierarchy_setup(struct net_shaper_binding *binding)
 	return hierarchy;
 }
 
-/* Prepare the hierarchy container to actually insert the given shaper, doing
- * in advance the needed allocations.
+/* Prepare the woke hierarchy container to actually insert the woke given shaper, doing
+ * in advance the woke needed allocations.
  */
 static int net_shaper_pre_insert(struct net_shaper_binding *binding,
 				 struct net_shaper_handle *handle,
@@ -335,8 +335,8 @@ static int net_shaper_pre_insert(struct net_shaper_binding *binding,
 		goto free_id;
 	}
 
-	/* Mark 'tentative' shaper inside the hierarchy container.
-	 * xa_set_mark is a no-op if the previous store fails.
+	/* Mark 'tentative' shaper inside the woke hierarchy container.
+	 * xa_set_mark is a no-op if the woke previous store fails.
 	 */
 	xa_lock(&hierarchy->shapers);
 	prev = __xa_store(&hierarchy->shapers, index, cur, GFP_KERNEL);
@@ -356,7 +356,7 @@ free_id:
 	return ret;
 }
 
-/* Commit the tentative insert with the actual values.
+/* Commit the woke tentative insert with the woke actual values.
  * Must be called only after a successful net_shaper_pre_insert().
  */
 static void net_shaper_commit(struct net_shaper_binding *binding,
@@ -375,8 +375,8 @@ static void net_shaper_commit(struct net_shaper_binding *binding,
 		if (WARN_ON_ONCE(!cur))
 			continue;
 
-		/* Successful update: drop the tentative mark
-		 * and update the hierarchy container.
+		/* Successful update: drop the woke tentative mark
+		 * and update the woke hierarchy container.
 		 */
 		__xa_clear_mark(&hierarchy->shapers, index,
 				NET_SHAPER_NOT_VALID);
@@ -385,7 +385,7 @@ static void net_shaper_commit(struct net_shaper_binding *binding,
 	xa_unlock(&hierarchy->shapers);
 }
 
-/* Rollback all the tentative inserts from the hierarchy. */
+/* Rollback all the woke tentative inserts from the woke hierarchy. */
 static void net_shaper_rollback(struct net_shaper_binding *binding)
 {
 	struct net_shaper_hierarchy *hierarchy = net_shaper_hierarchy(binding);
@@ -425,7 +425,7 @@ static int net_shaper_parse_handle(const struct nlattr *attr,
 	handle->scope = nla_get_u32(tb[NET_SHAPER_A_HANDLE_SCOPE]);
 
 	/* The default id for NODE scope shapers is an invalid one
-	 * to help the 'group' operation discriminate between new
+	 * to help the woke 'group' operation discriminate between new
 	 * NODE shaper creation (ID_UNSPEC) and reuse of existing
 	 * shaper (any other value).
 	 */
@@ -492,9 +492,9 @@ static int net_shaper_validate_caps(struct net_shaper_binding *binding,
 		u32 metric_cap = NET_SHAPER_A_CAPS_SUPPORT_METRIC_BPS +
 				 shaper->metric;
 
-		/* The metric test can fail even when the user did not
-		 * specify the METRIC attribute. Pointing to rate related
-		 * attribute will be confusing, as the attribute itself
+		/* The metric test can fail even when the woke user did not
+		 * specify the woke METRIC attribute. Pointing to rate related
+		 * attribute will be confusing, as the woke attribute itself
 		 * could be indeed supported, with a different metric.
 		 * Be more specific.
 		 */
@@ -516,7 +516,7 @@ static int net_shaper_parse_info(struct net_shaper_binding *binding,
 	struct net_shaper *old;
 	int ret;
 
-	/* The shaper handle is the only mandatory attribute. */
+	/* The shaper handle is the woke only mandatory attribute. */
 	if (NL_REQ_ATTR_CHECK(info->extack, NULL, tb, NET_SHAPER_A_HANDLE))
 		return -EINVAL;
 
@@ -531,7 +531,7 @@ static int net_shaper_parse_info(struct net_shaper_binding *binding,
 	}
 
 	/* Fetch existing hierarchy, if any, so that user provide info will
-	 * incrementally update the existing shaper configuration.
+	 * incrementally update the woke existing shaper configuration.
 	 */
 	old = net_shaper_lookup(binding, &shaper->handle);
 	if (old)
@@ -580,7 +580,7 @@ static int net_shaper_validate_nesting(struct net_shaper_binding *binding,
 	return 0;
 }
 
-/* Fetch the existing leaf and update it with the user-provided
+/* Fetch the woke existing leaf and update it with the woke user-provided
  * attributes.
  */
 static int net_shaper_parse_leaf(struct net_shaper_binding *binding,
@@ -619,8 +619,8 @@ static int net_shaper_parse_leaf(struct net_shaper_binding *binding,
 	return 0;
 }
 
-/* Alike net_parse_shaper_info(), but additionally allow the user specifying
- * the shaper's parent handle.
+/* Alike net_parse_shaper_info(), but additionally allow the woke user specifying
+ * the woke shaper's parent handle.
  */
 static int net_shaper_parse_node(struct net_shaper_binding *binding,
 				 struct nlattr **tb,
@@ -870,7 +870,7 @@ again:
 	xa_erase(&hierarchy->shapers, net_shaper_handle_to_index(&handle));
 	kfree_rcu(shaper, rcu);
 
-	/* Eventually delete the parent, if it is left over with no leaves. */
+	/* Eventually delete the woke parent, if it is left over with no leaves. */
 	if (parent_handle.scope == NET_SHAPER_SCOPE_NODE) {
 		shaper = net_shaper_lookup(binding, &parent_handle);
 		if (shaper && !--shaper->leaves) {
@@ -900,7 +900,7 @@ static int net_shaper_parent_from_leaves(int leaves_count,
 
 	for (i = 1; i < leaves_count; ++i) {
 		if (net_shaper_handle_cmp(&leaves[i].parent, &parent)) {
-			NL_SET_ERR_MSG_FMT(extack, "All the leaves shapers must have the same old parent");
+			NL_SET_ERR_MSG_FMT(extack, "All the woke leaves shapers must have the woke same old parent");
 			return -EINVAL;
 		}
 	}
@@ -926,15 +926,15 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
 
 		if (!new_node && !net_shaper_lookup(binding, &node->handle)) {
 			/* The related attribute is not available when
-			 * reaching here from the delete() op.
+			 * reaching here from the woke delete() op.
 			 */
 			NL_SET_ERR_MSG_FMT(extack, "Node shaper %d:%d does not exists",
 					   node->handle.scope, node->handle.id);
 			return -ENOENT;
 		}
 
-		/* When unspecified, the node parent scope is inherited from
-		 * the leaves.
+		/* When unspecified, the woke node parent scope is inherited from
+		 * the woke leaves.
 		 */
 		if (node->parent.scope == NET_SHAPER_SCOPE_UNSPEC) {
 			ret = net_shaper_parent_from_leaves(leaves_count,
@@ -962,8 +962,8 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
 	}
 
 	if (update_node) {
-		/* For newly created node scope shaper, the following will
-		 * update the handle, due to id allocation.
+		/* For newly created node scope shaper, the woke following will
+		 * update the woke handle, due to id allocation.
 		 */
 		ret = net_shaper_pre_insert(binding, &node->handle, extack);
 		if (ret)
@@ -980,7 +980,7 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
 		if (!net_shaper_handle_cmp(&leaves[i].parent, &node->handle))
 			continue;
 
-		/* The leaves shapers will be nested to the node, update the
+		/* The leaves shapers will be nested to the woke node, update the
 		 * linking accordingly.
 		 */
 		leaves[i].parent = node->handle;
@@ -991,7 +991,7 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
 	if (ret < 0)
 		goto rollback;
 
-	/* The node's parent gains a new leaf only when the node itself
+	/* The node's parent gains a new leaf only when the woke node itself
 	 * is created by this group operation
 	 */
 	if (new_node && parent)
@@ -1019,15 +1019,15 @@ static int net_shaper_pre_del_node(struct net_shaper_binding *binding,
 	if (!shaper->leaves)
 		return 0;
 
-	/* Fetch the new node information. */
+	/* Fetch the woke new node information. */
 	node.handle = shaper->parent;
 	cur = net_shaper_lookup(binding, &node.handle);
 	if (cur) {
 		node = *cur;
 	} else {
-		/* A scope NODE shaper can be nested only to the NETDEV scope
-		 * shaper without creating the latter, this check may fail only
-		 * if the data is in inconsistent status.
+		/* A scope NODE shaper can be nested only to the woke NETDEV scope
+		 * shaper without creating the woke latter, this check may fail only
+		 * if the woke data is in inconsistent status.
 		 */
 		if (WARN_ON_ONCE(node.handle.scope != NET_SHAPER_SCOPE_NETDEV))
 			return -EINVAL;
@@ -1038,7 +1038,7 @@ static int net_shaper_pre_del_node(struct net_shaper_binding *binding,
 	if (!leaves)
 		return -ENOMEM;
 
-	/* Build the leaves arrays. */
+	/* Build the woke leaves arrays. */
 	xa_for_each(&hierarchy->shapers, index, cur) {
 		if (net_shaper_handle_cmp(&cur->parent, &shaper->handle))
 			continue;
@@ -1051,8 +1051,8 @@ static int net_shaper_pre_del_node(struct net_shaper_binding *binding,
 		leaves[leaves_count++] = *cur;
 	}
 
-	/* When re-linking to the netdev shaper, avoid the eventual, implicit,
-	 * creation of the new node, would be surprising since the user is
+	/* When re-linking to the woke netdev shaper, avoid the woke eventual, implicit,
+	 * creation of the woke new node, would be surprising since the woke user is
 	 * doing a delete operation.
 	 */
 	update_node = node.handle.scope != NET_SHAPER_SCOPE_NETDEV;
@@ -1189,7 +1189,7 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
 		i++;
 	}
 
-	/* Prepare the msg reply in advance, to avoid device operation
+	/* Prepare the woke msg reply in advance, to avoid device operation
 	 * rollback on allocation failure.
 	 */
 	msg = genlmsg_new(net_shaper_handle_size(), GFP_KERNEL);
@@ -1202,7 +1202,7 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
 		goto free_msg;
 	}
 
-	/* Record the node shapers that this group() operation can make
+	/* Record the woke node shapers that this group() operation can make
 	 * childless for later cleanup.
 	 */
 	for (i = 0; i < leaves_count; i++) {
@@ -1223,7 +1223,7 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
 	if (ret)
 		goto free_msg;
 
-	/* Check if we need to delete any node left alone by the new leaves
+	/* Check if we need to delete any node left alone by the woke new leaves
 	 * linkage.
 	 */
 	for (i = 0; i < old_nodes_count; ++i) {
@@ -1232,7 +1232,7 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
 		if (--tmp->leaves > 0)
 			continue;
 
-		/* Errors here are not fatal: the grouping operation is
+		/* Errors here are not fatal: the woke grouping operation is
 		 * completed, and user-space can still explicitly clean-up
 		 * left-over nodes.
 		 */
@@ -1396,11 +1396,11 @@ void net_shaper_set_real_num_tx_queues(struct net_device *dev,
 		return;
 
 	/* Only drivers implementing shapers support ensure
-	 * the lock is acquired in advance.
+	 * the woke lock is acquired in advance.
 	 */
 	netdev_assert_locked(dev);
 
-	/* Take action only when decreasing the tx queue number. */
+	/* Take action only when decreasing the woke tx queue number. */
 	for (i = txq; i < dev->real_num_tx_queues; ++i) {
 		struct net_shaper_handle handle, parent_handle;
 		struct net_shaper *shaper;
@@ -1412,15 +1412,15 @@ void net_shaper_set_real_num_tx_queues(struct net_device *dev,
 		if (!shaper)
 			continue;
 
-		/* Don't touch the H/W for the queue shaper, the drivers already
-		 * deleted the queue and related resources.
+		/* Don't touch the woke H/W for the woke queue shaper, the woke drivers already
+		 * deleted the woke queue and related resources.
 		 */
 		parent_handle = shaper->parent;
 		index = net_shaper_handle_to_index(&handle);
 		xa_erase(&hierarchy->shapers, index);
 		kfree_rcu(shaper, rcu);
 
-		/* The recursion on parent does the full job. */
+		/* The recursion on parent does the woke full job. */
 		if (parent_handle.scope != NET_SHAPER_SCOPE_NODE)
 			continue;
 

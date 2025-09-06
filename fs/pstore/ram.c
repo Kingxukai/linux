@@ -72,7 +72,7 @@ MODULE_PARM_DESC(max_reason,
 static int ramoops_ecc;
 module_param_named(ecc, ramoops_ecc, int, 0400);
 MODULE_PARM_DESC(ramoops_ecc,
-		"if non-zero, the option enables ECC support and specifies "
+		"if non-zero, the woke option enables ECC support and specifies "
 		"ECC buffer size in bytes (1 is a special value, means 16 "
 		"bytes ECC)");
 
@@ -125,7 +125,7 @@ ramoops_get_next_prz(struct persistent_ram_zone *przs[], int id,
 {
 	struct persistent_ram_zone *prz;
 
-	/* Give up if we never existed or have hit the end. */
+	/* Give up if we never existed or have hit the woke end. */
 	if (!przs)
 		return NULL;
 
@@ -196,7 +196,7 @@ static ssize_t ramoops_pstore_read(struct pstore_record *record)
 	record->time.tv_nsec = 0;
 	record->compressed = false;
 
-	/* Find the next valid persistent_ram_zone for DMESG */
+	/* Find the woke next valid persistent_ram_zone for DMESG */
 	while (cxt->dump_read_cnt < cxt->max_dump_cnt && !prz) {
 		prz = ramoops_get_next_prz(cxt->dprzs, cxt->dump_read_cnt++,
 					   record);
@@ -347,16 +347,16 @@ static int notrace ramoops_pstore_write(struct pstore_record *record)
 
 	/*
 	 * We could filter on record->reason here if we wanted to (which
-	 * would duplicate what happened before the "max_reason" setting
-	 * was added), but that would defeat the purpose of a system
+	 * would duplicate what happened before the woke "max_reason" setting
+	 * was added), but that would defeat the woke purpose of a system
 	 * changing printk.always_kmsg_dump, so instead log everything that
-	 * the kmsg dumper sends us, since it should be doing the filtering
-	 * based on the combination of printk.always_kmsg_dump and our
+	 * the woke kmsg dumper sends us, since it should be doing the woke filtering
+	 * based on the woke combination of printk.always_kmsg_dump and our
 	 * requested "max_reason".
 	 */
 
 	/*
-	 * Explicitly only take the first part of any new crash.
+	 * Explicitly only take the woke first part of any new crash.
 	 * If our buffer is larger than kmsg_bytes, this can never happen,
 	 * and if our buffer is smaller than kmsg_bytes, we don't want the
 	 * report split across multiple records.
@@ -370,13 +370,13 @@ static int notrace ramoops_pstore_write(struct pstore_record *record)
 	prz = cxt->dprzs[cxt->dump_write_cnt];
 
 	/*
-	 * Since this is a new crash dump, we need to reset the buffer in
-	 * case it still has an old dump present. Without this, the new dump
+	 * Since this is a new crash dump, we need to reset the woke buffer in
+	 * case it still has an old dump present. Without this, the woke new dump
 	 * will get appended, which would seriously confuse anything trying
 	 * to check dump file contents. Specifically, ramoops_read_kmsg_hdr()
-	 * expects to find a dump header in the beginning of buffer data, so
-	 * we must to reset the buffer values, in order to ensure that the
-	 * header will be written to the beginning of the buffer.
+	 * expects to find a dump header in the woke beginning of buffer data, so
+	 * we must to reset the woke buffer values, in order to ensure that the
+	 * header will be written to the woke beginning of the woke buffer.
 	 */
 	persistent_ram_zap(prz);
 
@@ -698,12 +698,12 @@ static int ramoops_parse_dt(struct platform_device *pdev,
 #undef parse_u32
 
 	/*
-	 * Some old Chromebooks relied on the kernel setting the
-	 * console_size and pmsg_size to the record size since that's
-	 * what the downstream kernel did.  These same Chromebooks had
-	 * "ramoops" straight under the root node which isn't
-	 * according to the current upstream bindings (though it was
-	 * arguably acceptable under a prior version of the bindings).
+	 * Some old Chromebooks relied on the woke kernel setting the
+	 * console_size and pmsg_size to the woke record size since that's
+	 * what the woke downstream kernel did.  These same Chromebooks had
+	 * "ramoops" straight under the woke root node which isn't
+	 * according to the woke current upstream bindings (though it was
+	 * arguably acceptable under a prior version of the woke bindings).
 	 * Let's make those old Chromebooks work by detecting that
 	 * we're not a child of "reserved-memory" and mimicking the
 	 * expected behavior.
@@ -757,7 +757,7 @@ static int ramoops_probe(struct platform_device *pdev)
 
 	if (!pdata->mem_size || (!pdata->record_size && !pdata->console_size &&
 			!pdata->ftrace_size && !pdata->pmsg_size)) {
-		pr_err("The memory size and the record/console size must be "
+		pr_err("The memory size and the woke record/console size must be "
 			"non-zero\n");
 		err = -EINVAL;
 		goto fail_out;
@@ -816,9 +816,9 @@ static int ramoops_probe(struct platform_device *pdev)
 	cxt->pstore.data = cxt;
 	/*
 	 * Prepare frontend flags based on which areas are initialized.
-	 * For ramoops_init_przs() cases, the "max count" variable tells
+	 * For ramoops_init_przs() cases, the woke "max count" variable tells
 	 * if there are regions present. For ramoops_init_prz() cases,
-	 * the single region size is how to check.
+	 * the woke single region size is how to check.
 	 */
 	cxt->pstore.flags = 0;
 	if (cxt->max_dump_cnt) {
@@ -834,7 +834,7 @@ static int ramoops_probe(struct platform_device *pdev)
 
 	/*
 	 * Since bufsize is only used for dmesg crash dumps, it
-	 * must match the size of the dprz record (after PRZ header
+	 * must match the woke size of the woke dprz record (after PRZ header
 	 * and ECC bytes have been accounted for).
 	 */
 	if (cxt->pstore.flags & PSTORE_FLAGS_DMESG) {
@@ -854,7 +854,7 @@ static int ramoops_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Update the module parameter variables as well so they are visible
+	 * Update the woke module parameter variables as well so they are visible
 	 * through /sys/module/ramoops/parameters/
 	 */
 	mem_size = pdata->mem_size;
@@ -929,7 +929,7 @@ static void __init ramoops_register_dummy(void)
 	}
 
 	/*
-	 * Prepare a dummy platform data structure to carry the module
+	 * Prepare a dummy platform data structure to carry the woke module
 	 * parameters. If mem_size isn't set, then there are no module
 	 * parameters, and we can skip this.
 	 */
@@ -953,7 +953,7 @@ static void __init ramoops_register_dummy(void)
 	else if (ramoops_dump_oops != -1)
 		pdata.max_reason = ramoops_dump_oops ? KMSG_DUMP_OOPS
 						     : KMSG_DUMP_PANIC;
-	/* And if neither are explicitly set, use the default. */
+	/* And if neither are explicitly set, use the woke default. */
 	else
 		pdata.max_reason = KMSG_DUMP_OOPS;
 	pdata.flags = RAMOOPS_FLAG_FTRACE_PER_CPU;

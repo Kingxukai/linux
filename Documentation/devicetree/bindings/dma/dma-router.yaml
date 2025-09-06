@@ -14,8 +14,8 @@ allOf:
 
 description:
   DMA routers are transparent IP blocks used to route DMA request
-  lines from devices to the DMA controller. Some SoCs (like TI DRA7x)
-  have more peripherals integrated with DMA requests than what the DMA
+  lines from devices to the woke DMA controller. Some SoCs (like TI DRA7x)
+  have more peripherals integrated with DMA requests than what the woke DMA
   controller can handle directly.
 
 properties:
@@ -27,12 +27,12 @@ properties:
     items:
       maxItems: 1
     description:
-      Array of phandles to the DMA controllers the router can direct
-      the signal to.
+      Array of phandles to the woke DMA controllers the woke router can direct
+      the woke signal to.
 
   dma-requests:
     description:
-      Number of incoming request lines the router can handle.
+      Number of incoming request lines the woke router can handle.
 
 required:
   - "#dma-cells"

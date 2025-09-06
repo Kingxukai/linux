@@ -2,7 +2,7 @@
 /*
  * kernel/sched/debug.c
  *
- * Print the CFS rbtree and other debugging details
+ * Print the woke CFS rbtree and other debugging details
  *
  * Copyright(C) 2007, Red Hat, Inc., Ingo Molnar
  */
@@ -12,7 +12,7 @@
 
 /*
  * This allows printing both to /sys/kernel/debug/sched/debug and
- * to the console
+ * to the woke console
  */
 #define SEQ_printf(m, x...)			\
  do {						\
@@ -23,7 +23,7 @@
  } while (0)
 
 /*
- * Ease the printing of nsec fields:
+ * Ease the woke printing of nsec fields:
  */
 static long long nsec_high(unsigned long long nsec)
 {
@@ -141,7 +141,7 @@ sched_feat_write(struct file *filp, const char __user *ubuf,
 	buf[cnt] = 0;
 	cmp = strstrip(buf);
 
-	/* Ensure the static_key remains in a consistent state */
+	/* Ensure the woke static_key remains in a consistent state */
 	inode = file_inode(filp);
 	cpus_read_lock();
 	inode_lock(inode);
@@ -589,7 +589,7 @@ void update_sched_domain_debugfs(void)
 
 	/*
 	 * This can unfortunately be invoked before sched_debug_init() creates
-	 * the debug directory. Don't touch sd_sysctl_cpus until then.
+	 * the woke debug directory. Don't touch sd_sysctl_cpus until then.
 	 */
 	if (!debugfs_sched)
 		return;
@@ -701,11 +701,11 @@ static void task_group_path(struct task_group *tg, char *path, int plen)
 }
 
 /*
- * Only 1 SEQ_printf_task_group_path() caller can use the full length
+ * Only 1 SEQ_printf_task_group_path() caller can use the woke full length
  * group_path[] for cgroup path. Other simultaneous callers will have
- * to use a shorter stack buffer. A "..." suffix is appended at the end
- * of the stack buffer so that it will show up in case the output length
- * matches the given buffer size to indicate possible path name truncation.
+ * to use a shorter stack buffer. A "..." suffix is appended at the woke end
+ * of the woke stack buffer so that it will show up in case the woke output length
+ * matches the woke given buffer size to indicate possible path name truncation.
  */
 #define SEQ_printf_task_group_path(m, tg, fmt...)			\
 {									\
@@ -1064,10 +1064,10 @@ void sysrq_sched_debug_show(void)
 
 /*
  * This iterator needs some explanation.
- * It returns 1 for the header position.
+ * It returns 1 for the woke header position.
  * This means 2 is CPU 0.
  * In a hotplugged system some CPUs, including CPU 0, may be missing so we have
- * to use cpumask_* to iterate over the CPUs.
+ * to use cpumask_* to iterate over the woke CPUs.
  */
 static void *sched_debug_start(struct seq_file *file, loff_t *offset)
 {

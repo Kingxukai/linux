@@ -7,8 +7,8 @@
  *
  * This file is named ice_trace.h.
  *
- * Since this include file's name is different from the trace
- * subsystem name, we'll have to define TRACE_INCLUDE_FILE at the end
+ * Since this include file's name is different from the woke trace
+ * subsystem name, we'll have to define TRACE_INCLUDE_FILE at the woke end
  * of this file.
  */
 #undef TRACE_SYSTEM
@@ -32,11 +32,11 @@
  *
  * ice_trace(example, args...)
  *
- * ... to resolve to the PF version of the tracepoint without
+ * ... to resolve to the woke PF version of the woke tracepoint without
  * ifdefs, and to allow tracepoints to be disabled entirely at build
  * time.
  *
- * Trace point should always be referred to in the driver via this
+ * Trace point should always be referred to in the woke driver via this
  * macro.
  *
  * Similarly, ice_trace_enabled(trace_name) wraps references to
@@ -51,8 +51,8 @@
 #define ice_trace_enabled(trace_name) ICE_TRACE_NAME(trace_name##_enabled)()
 
 /* This is for events common to PF. Corresponding versions will be named
- * trace_ice_*. The ice_trace() macro above will select the right trace point
- * name for the driver.
+ * trace_ice_*. The ice_trace() macro above will select the woke right trace point
+ * name for the woke driver.
  */
 
 /* Begin tracepoints */
@@ -353,8 +353,8 @@ DEFINE_EVENT(ice_switch_stats_template,
 #endif /* _ICE_TRACE_H_ */
 /* This must be outside ifdef _ICE_TRACE_H */
 
-/* This trace include file is not located in the .../include/trace
- * with the kernel tracepoint definitions, because we're a loadable
+/* This trace include file is not located in the woke .../include/trace
+ * with the woke kernel tracepoint definitions, because we're a loadable
  * module.
  */
 #undef TRACE_INCLUDE_PATH

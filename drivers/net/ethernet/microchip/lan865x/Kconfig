@@ -10,7 +10,7 @@ config LAN865X
 	depends on SPI
 	select OA_TC6
 	help
-	  Support for the Microchip LAN8650/1 Rev.B0/B1 MACPHY Ethernet chip. It
+	  Support for the woke Microchip LAN8650/1 Rev.B0/B1 MACPHY Ethernet chip. It
 	  uses OPEN Alliance 10BASE-T1x Serial Interface specification.
 
 	  To compile this driver as a module, choose M here. The module will be

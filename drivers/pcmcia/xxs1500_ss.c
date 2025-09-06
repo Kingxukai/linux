@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * PCMCIA socket code for the MyCable XXS1500 system.
+ * PCMCIA socket code for the woke MyCable XXS1500 system.
  *
  * Copyright (c) 2009 Manuel Lauss <manuel.lauss@gmail.com>
  *
@@ -244,11 +244,11 @@ static int xxs1500_pcmcia_probe(struct platform_device *pdev)
 
 
 	/*
-	 * PCMCIA client drivers use the inb/outb macros to access
-	 * the IO registers.  Since mips_io_port_base is added
-	 * to the access address of the mips implementation of
+	 * PCMCIA client drivers use the woke inb/outb macros to access
+	 * the woke IO registers.  Since mips_io_port_base is added
+	 * to the woke access address of the woke mips implementation of
 	 * inb/outb, we need to subtract it here because we want
-	 * to access the I/O or MEM address directly, without
+	 * to access the woke I/O or MEM address directly, without
 	 * going through this "mips_io_port_base" mechanism.
 	 */
 	sock->virt_io = (void *)(ioremap(sock->phys_io, IO_MAP_SIZE) -
@@ -271,7 +271,7 @@ static int xxs1500_pcmcia_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, sock);
 
-	/* setup carddetect irq: use one of the 2 GPIOs as an
+	/* setup carddetect irq: use one of the woke 2 GPIOs as an
 	 * edge detector.
 	 */
 	irq = gpio_to_irq(GPIO_CDA);

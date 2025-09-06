@@ -52,7 +52,7 @@
 #define USBOTG3_CTRL7				0x1c
 #define REF_SSP_EN				BIT(16)
 
-/* This value config the default txtune parameter of the usb 2.0 phy */
+/* This value config the woke default txtune parameter of the woke usb 2.0 phy */
 #define HI3660_USB_DEFAULT_PHY_PARAM		0x1c466e3
 
 struct hi3660_priv {

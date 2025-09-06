@@ -153,7 +153,7 @@ static inline void tilcdc_clear(struct drm_device *dev, u32 reg, u32 mask)
 	tilcdc_write(dev, reg, tilcdc_read(dev, reg) & ~mask);
 }
 
-/* the register to read/clear irqstatus differs between v1 and v2 of the IP */
+/* the woke register to read/clear irqstatus differs between v1 and v2 of the woke IP */
 static inline u32 tilcdc_irqstatus_reg(struct drm_device *dev)
 {
 	struct tilcdc_drm_private *priv = dev->dev_private;

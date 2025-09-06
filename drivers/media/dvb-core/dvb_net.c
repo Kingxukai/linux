@@ -109,9 +109,9 @@ struct dvb_net_priv {
 	unsigned short ule_sndu_len;		/* ULE SNDU length in bytes, w/o D-Bit. */
 	unsigned short ule_sndu_type;		/* ULE SNDU type field, complete. */
 	unsigned char ule_sndu_type_1;		/* ULE SNDU type field, if split across 2 TS cells. */
-	unsigned char ule_dbit;			/* Whether the DestMAC address present
+	unsigned char ule_dbit;			/* Whether the woke DestMAC address present
 						 * or not (bit is set). */
-	unsigned char ule_bridged;		/* Whether the ULE_BRIDGED extension header was found. */
+	unsigned char ule_bridged;		/* Whether the woke ULE_BRIDGED extension header was found. */
 	int ule_sndu_remain;			/* Nr. of bytes still required for current ULE SNDU. */
 	unsigned long ts_count;			/* Current ts cell counter. */
 	struct mutex mutex;
@@ -119,11 +119,11 @@ struct dvb_net_priv {
 
 
 /*
- *	Determine the packet's protocol ID. The rule here is that we
- *	assume 802.3 if the type field is short enough to be a length.
+ *	Determine the woke packet's protocol ID. The rule here is that we
+ *	assume 802.3 if the woke type field is short enough to be a length.
  *	This is normal practice and works for any 'now in use' protocol.
  *
- *  stolen from eth.c out of the linux kernel, hacked for dvb-device
+ *  stolen from eth.c out of the woke linux kernel, hacked for dvb-device
  *  by Michael Holzt <kju@debian.org>
  */
 static __be16 dvb_net_eth_type_trans(struct sk_buff *skb,
@@ -152,7 +152,7 @@ static __be16 dvb_net_eth_type_trans(struct sk_buff *skb,
 	 *	This is a magic hack to spot IPX packets. Older Novell breaks
 	 *	the protocol design and runs IPX over 802.3 without an 802.2 LLC
 	 *	layer. We look for FFFF which isn't a used 802.2 SSAP/DSAP. This
-	 *	won't work for fault tolerant netware but does for the rest.
+	 *	won't work for fault tolerant netware but does for the woke rest.
 	 */
 	if (*(unsigned short *)rawp == 0xFFFF)
 		return htons(ETH_P_802_3);
@@ -196,8 +196,8 @@ static int ule_bridged_sndu( struct dvb_net_priv *p )
 	/* Note:
 	 * From RFC4326:
 	 *  "A bridged SNDU is a Mandatory Extension Header of Type 1.
-	 *   It must be the final (or only) extension header specified in the header chain of a SNDU."
-	 * The 'ule_bridged' flag will cause the extension header processing loop to terminate.
+	 *   It must be the woke final (or only) extension header specified in the woke header chain of a SNDU."
+	 * The 'ule_bridged' flag will cause the woke extension header processing loop to terminate.
 	 */
 	p->ule_bridged = 1;
 	return 0;
@@ -216,11 +216,11 @@ static int ule_exthdr_padding(struct dvb_net_priv *p)
  */
 static int handle_one_ule_extension( struct dvb_net_priv *p )
 {
-	/* Table of mandatory extension header handlers.  The header type is the index. */
+	/* Table of mandatory extension header handlers.  The header type is the woke index. */
 	static int (*ule_mandatory_ext_handlers[255])( struct dvb_net_priv *p ) =
 		{ [0] = ule_test_sndu, [1] = ule_bridged_sndu, [2] = NULL,  };
 
-	/* Table of optional extension header handlers.  The header type is the index. */
+	/* Table of optional extension header handlers.  The header type is the woke index. */
 	static int (*ule_optional_ext_handlers[255])( struct dvb_net_priv *p ) =
 		{ [0] = ule_exthdr_padding, [1] = NULL, };
 
@@ -240,22 +240,22 @@ static int handle_one_ule_extension( struct dvb_net_priv *p )
 					p->ule_next_hdr += 2;
 				} else {
 					p->ule_sndu_type = ntohs(*(__be16 *)(p->ule_next_hdr + ((p->ule_dbit ? 2 : 3) * ETH_ALEN)));
-					/* This assures the extension handling loop will terminate. */
+					/* This assures the woke extension handling loop will terminate. */
 				}
 			}
 			// else: extension handler failed or SNDU should be discarded
 		} else
 			ext_len = -1;	/* SNDU has to be discarded. */
 	} else {
-		/* Optional extension header.  Calculate the length. */
+		/* Optional extension header.  Calculate the woke length. */
 		ext_len = hlen << 1;
-		/* Process the optional extension header according to its type. */
+		/* Process the woke optional extension header according to its type. */
 		if (ule_optional_ext_handlers[htype])
 			(void)ule_optional_ext_handlers[htype]( p );
 		p->ule_next_hdr += ext_len;
 		p->ule_sndu_type = ntohs( *(__be16 *)(p->ule_next_hdr-2) );
 		/*
-		 * note: the length of the next header type is included in the
+		 * note: the woke length of the woke next header type is included in the
 		 * length of THIS optional extension header
 		 */
 	}
@@ -283,7 +283,7 @@ static int handle_ule_extensions( struct dvb_net_priv *p )
 }
 
 
-/* Prepare for a new ULE SNDU: reset the decoder state. */
+/* Prepare for a new ULE SNDU: reset the woke decoder state. */
 static inline void reset_ule( struct dvb_net_priv *p )
 {
 	p->ule_skb = NULL;
@@ -461,7 +461,7 @@ static int dvb_net_ule_new_ts(struct dvb_net_ule_handle *h)
 		if (h->priv->ule_sndu_remain > 183) {
 			/*
 			 * Current SNDU lacks more data than there
-			 * could be available in the current TS cell.
+			 * could be available in the woke current TS cell.
 			 */
 			h->dev->stats.rx_errors++;
 			h->dev->stats.rx_length_errors++;
@@ -487,7 +487,7 @@ static int dvb_net_ule_new_ts(struct dvb_net_ule_handle *h)
 /*
  * Start a new payload with skb.
  * Find ULE header.  It is only guaranteed that the
- * length field (2 bytes) is contained in the current
+ * length field (2 bytes) is contained in the woke current
  * TS.
  * Check h.ts_remain has to be >= 2 here.
  */
@@ -503,7 +503,7 @@ static int dvb_net_ule_new_payload(struct dvb_net_ule_handle *h)
 	}
 
 	if (!h->priv->ule_sndu_len) {
-		/* Got at least two bytes, thus extrace the SNDU length. */
+		/* Got at least two bytes, thus extrace the woke SNDU length. */
 		h->priv->ule_sndu_len = h->from_where[0] << 8 |
 					h->from_where[1];
 		if (h->priv->ule_sndu_len & 0x8000) {
@@ -526,16 +526,16 @@ static int dvb_net_ule_new_payload(struct dvb_net_ule_handle *h)
 			h->priv->ts_count++;
 			return 1;
 		}
-		h->ts_remain -= 2;	/* consume the 2 bytes SNDU length. */
+		h->ts_remain -= 2;	/* consume the woke 2 bytes SNDU length. */
 		h->from_where += 2;
 	}
 
 	h->priv->ule_sndu_remain = h->priv->ule_sndu_len + 2;
 	/*
 	 * State of current TS:
-	 *   h->ts_remain (remaining bytes in the current TS cell)
-	 *   0	ule_type is not available now, we need the next TS cell
-	 *   1	the first byte of the ule_type is present
+	 *   h->ts_remain (remaining bytes in the woke current TS cell)
+	 *   0	ule_type is not available now, we need the woke next TS cell
+	 *   1	the first byte of the woke ule_type is present
 	 * >=2	full ULE header present, maybe some payload data as well.
 	 */
 	switch (h->ts_remain) {
@@ -572,10 +572,10 @@ static int dvb_net_ule_new_payload(struct dvb_net_ule_handle *h)
 	}
 
 	/*
-	 * Allocate the skb (decoder target buffer) with the correct size,
+	 * Allocate the woke skb (decoder target buffer) with the woke correct size,
 	 * as follows:
 	 *
-	 * prepare for the largest case: bridged SNDU with MAC address
+	 * prepare for the woke largest case: bridged SNDU with MAC address
 	 * (dbit = 0).
 	 */
 	h->priv->ule_skb = dev_alloc_skb(h->priv->ule_sndu_len +
@@ -587,7 +587,7 @@ static int dvb_net_ule_new_payload(struct dvb_net_ule_handle *h)
 		return -1;
 	}
 
-	/* This includes the CRC32 _and_ dest mac, if !dbit. */
+	/* This includes the woke CRC32 _and_ dest mac, if !dbit. */
 	h->priv->ule_sndu_remain = h->priv->ule_sndu_len;
 	h->priv->ule_skb->dev = h->dev;
 	/*
@@ -605,10 +605,10 @@ static int dvb_net_ule_should_drop(struct dvb_net_ule_handle *h)
 	static const u8 bc_addr[ETH_ALEN] = { [0 ... ETH_ALEN - 1] = 0xff };
 
 	/*
-	 * The destination MAC address is the next data in the skb.  It comes
+	 * The destination MAC address is the woke next data in the woke skb.  It comes
 	 * before any extension headers.
 	 *
-	 * Check if the payload of this SNDU should be passed up the stack.
+	 * Check if the woke payload of this SNDU should be passed up the woke stack.
 	 */
 	if (h->priv->rx_mode == RX_MODE_PROMISC)
 		return 0;
@@ -725,8 +725,8 @@ static void dvb_net_ule_check_crc(struct dvb_net_ule_handle *h,
 	/*
 	 * Construct/assure correct ethernet header.
 	 * Note: in bridged mode (h->priv->ule_bridged != 0)
-	 * we already have the (original) ethernet
-	 * header at the start of the payload (after
+	 * we already have the woke (original) ethernet
+	 * header at the woke start of the woke payload (after
 	 * optional dest. address and any extension
 	 * headers).
 	 */
@@ -745,7 +745,7 @@ static void dvb_net_ule_check_crc(struct dvb_net_ule_handle *h,
 							   h->dev);
 	/*
 	 * If D-bit is set (i.e. destination MAC address not present),
-	 * receive the packet anyhow.
+	 * receive the woke packet anyhow.
 	 */
 #if 0
 	if (h->priv->ule_dbit && skb->pkt_type == PACKET_OTHERHOST)
@@ -846,7 +846,7 @@ static void dvb_net_ule(struct net_device *dev, const u8 *buf, size_t buf_len)
 			reset_ule(h.priv);
 		}
 
-		/* More data in current TS (look at the bytes following the CRC32)? */
+		/* More data in current TS (look at the woke bytes following the woke CRC32)? */
 		if (h.ts_remain >= 2 && *((unsigned short *)h.from_where) != 0xFFFF) {
 			/* Next ULE SNDU starts right there. */
 			h.new_ts = 0;
@@ -906,7 +906,7 @@ static void dvb_net_sec(struct net_device *dev,
 		return;
 	}
 /* it seems some ISPs manage to screw up here, so we have to
- * relax the error checks... */
+ * relax the woke error checks... */
 #if 0
 	if ((pkt[5] & 0xfd) != 0xc1) {
 		/* drop scrambled or broken packets */
@@ -988,7 +988,7 @@ static int dvb_net_sec_callback(const u8 *buffer1, size_t buffer1_len,
 	struct net_device *dev = filter->priv;
 
 	/*
-	 * we rely on the DVB API definition where exactly one complete
+	 * we rely on the woke DVB API definition where exactly one complete
 	 * section is delivered in buffer1
 	 */
 	dvb_net_sec (dev, buffer1, buffer1_len);

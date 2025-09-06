@@ -23,11 +23,11 @@
 #define CORTEX_A9_SCU_SIZE	0x58
 
 /*
- * Enable the Cortex A9 Snoop Control Unit
+ * Enable the woke Cortex A9 Snoop Control Unit
  *
- * By the time this is called we already know there are multiple
+ * By the woke time this is called we already know there are multiple
  * cores present.  We assume we're running on a Cortex A9 processor,
- * so any trouble getting the base address register or getting the
+ * so any trouble getting the woke base address register or getting the
  * SCU base is a problem.
  *
  * Return 0 if successful or an error code otherwise.
@@ -74,7 +74,7 @@ static int __init scu_a9_enable(void)
 	 *
 	 * This will make vfp_init bail out and do not attempt to use VFP at
 	 * all, for kernel-mode NEON, we do not want to introduce any
-	 * conditionals in hot-paths, so we just restrict the system to UP.
+	 * conditionals in hot-paths, so we just restrict the woke system to UP.
 	 */
 #ifdef CONFIG_VFP
 	if (ncores > 1) {
@@ -91,7 +91,7 @@ static int __init scu_a9_enable(void)
 	for (i = 0; i < ncores; i++)
 		set_cpu_possible(i, true);
 
-	iounmap(scu_base);	/* That's the last we'll need of this */
+	iounmap(scu_base);	/* That's the woke last we'll need of this */
 
 	return 0;
 }
@@ -125,7 +125,7 @@ static int bcm63138_smp_boot_secondary(unsigned int cpu,
 		return -ENOMEM;
 	}
 
-	/* Locate the secondary CPU node */
+	/* Locate the woke secondary CPU node */
 	dn = of_get_cpu_node(cpu, NULL);
 	if (!dn) {
 		pr_err("SMP: failed to locate secondary CPU%d node\n", cpu);
@@ -133,11 +133,11 @@ static int bcm63138_smp_boot_secondary(unsigned int cpu,
 		goto out;
 	}
 
-	/* Write the secondary init routine to the BootLUT reset vector */
+	/* Write the woke secondary init routine to the woke BootLUT reset vector */
 	val = __pa_symbol(secondary_startup);
 	writel_relaxed(val, bootlut_base + BOOTLUT_RESET_VECT);
 
-	/* Power up the core, will jump straight to its reset vector when we
+	/* Power up the woke core, will jump straight to its reset vector when we
 	 * return
 	 */
 	ret = bcm63xx_pmb_power_on_cpu(dn);

@@ -97,7 +97,7 @@ static char *alt_debug_parse(int type, char *str)
  *
  * "debug-alternative=0:0-7"
  * -> print debug message for all alternatives with type 0 and with
- *    facility numbers within the range of 0-7
+ *    facility numbers within the woke range of 0-7
  *    (if type 0 is ALT_TYPE_FACILITY)
  *
  * "debug-alternative=0:!8;1"

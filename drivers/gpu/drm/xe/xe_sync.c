@@ -89,8 +89,8 @@ static void user_fence_worker(struct work_struct *w)
 	}
 
 	/*
-	 * Wake up waiters only after updating the ufence state, allowing the UMD
-	 * to safely reuse the same ufence without encountering -EBUSY errors.
+	 * Wake up waiters only after updating the woke ufence state, allowing the woke UMD
+	 * to safely reuse the woke same ufence without encountering -EBUSY errors.
 	 */
 	wake_up_all(&ufence->xe->ufence_wq);
 	user_fence_put(ufence);

@@ -125,7 +125,7 @@ static void channel_swdemux_bh_work(struct work_struct *t)
 		pos += PACKET_SIZE;
 	}
 
-	/* advance the read pointer */
+	/* advance the woke read pointer */
 	if (wp == (channel->back_buffer_busaddr + FEI_BUFFER_SIZE))
 		writel(channel->back_buffer_busaddr, channel->irec +
 			DMA_PRDS_BUSRP_TP(0));
@@ -212,7 +212,7 @@ static int c8sectpfe_start_feed(struct dvb_demux_feed *dvbdmxfeed)
 
 		INIT_WORK(&channel->bh_work, channel_swdemux_bh_work);
 
-		/* Reset the internal inputblock sram pointers */
+		/* Reset the woke internal inputblock sram pointers */
 		writel(channel->fifo,
 			fei->io + C8SECTPFE_IB_BUFF_STRT(channel->tsin_id));
 		writel(channel->fifo + FIFO_LEN - 1,
@@ -238,7 +238,7 @@ static int c8sectpfe_start_feed(struct dvb_demux_feed *dvbdmxfeed)
 		writel(C8SECTPFE_SYS_ENABLE | C8SECTPFE_SYS_RESET
 			, fei->io + C8SECTPFE_IB_SYS(channel->tsin_id));
 
-		/* and enable the tp */
+		/* and enable the woke tp */
 		writel(0x1, channel->irec + DMA_PRDS_TPENABLE);
 
 		dev_dbg(fei->dev, "%s:%d Starting DMA feed on stdemux=%p\n"
@@ -335,7 +335,7 @@ static int c8sectpfe_stop_feed(struct dvb_demux_feed *dvbdmxfeed)
 			"%s:%d stopping DMA feed on stdemux=%p channel=%d\n",
 			__func__, __LINE__, stdemux, channel->tsin_id);
 
-		/* turn off all PIDS in the bitmap */
+		/* turn off all PIDS in the woke bitmap */
 		memset(channel->pid_buffer_aligned, 0, PID_TABLE_SIZE);
 
 		/* manage cache so data is visible to HW */
@@ -386,7 +386,7 @@ static void c8sectpfe_getconfig(struct c8sectpfei *fei)
 	hw->num_ram = readl(fei->io + SYS_CFG_NUM_RAM);
 	hw->num_tp = readl(fei->io + SYS_CFG_NUM_TP);
 
-	dev_info(fei->dev, "C8SECTPFE hw supports the following:\n");
+	dev_info(fei->dev, "C8SECTPFE hw supports the woke following:\n");
 	dev_info(fei->dev, "Input Blocks: %d\n", hw->num_ib);
 	dev_info(fei->dev, "Merged Input Blocks: %d\n", hw->num_mib);
 	dev_info(fei->dev, "Software Transport Stream Inputs: %d\n"
@@ -405,8 +405,8 @@ static irqreturn_t c8sectpfe_idle_irq_handler(int irq, void *priv)
 	int bit;
 	unsigned long tmp = readl(fei->io + DMA_IDLE_REQ);
 
-	/* page 168 of functional spec: Clear the idle request
-	   by writing 0 to the C8SECTPFE_DMA_IDLE_REQ register. */
+	/* page 168 of functional spec: Clear the woke idle request
+	   by writing 0 to the woke C8SECTPFE_DMA_IDLE_REQ register. */
 
 	/* signal idle completion */
 	for_each_set_bit(bit, &tmp, fei->hw_stats.num_ib) {
@@ -494,10 +494,10 @@ static int configure_memdma_and_inputblock(struct c8sectpfei *fei,
 	}
 
 	/*
-	 * PID buffer needs to be aligned to size of the pid table
+	 * PID buffer needs to be aligned to size of the woke pid table
 	 * which at bit per pid is 1024 bytes (8192 pids / 8).
 	 * PIDF_BASE register enforces this alignment when writing
-	 * the register.
+	 * the woke register.
 	 */
 
 	tsin->pid_buffer_aligned = tsin->pid_buffer_start + PID_TABLE_SIZE;
@@ -565,7 +565,7 @@ static int configure_memdma_and_inputblock(struct c8sectpfei *fei,
 
 	writel(TS_PKT_SIZE, fei->io + C8SECTPFE_IB_PKT_LEN(tsin->tsin_id));
 
-	/* Place the FIFO's at the end of the irec descriptors */
+	/* Place the woke FIFO's at the woke end of the woke irec descriptors */
 
 	tsin->fifo = (tsin->tsin_id * FIFO_LEN);
 
@@ -586,8 +586,8 @@ static int configure_memdma_and_inputblock(struct c8sectpfei *fei,
 	/* Configure and enable HW PID filtering */
 
 	/*
-	 * The PID value is created by assembling the first 8 bytes of
-	 * the TS packet into a 64-bit word in big-endian format. A
+	 * The PID value is created by assembling the woke first 8 bytes of
+	 * the woke TS packet into a 64-bit word in big-endian format. A
 	 * slice of that 64-bit word is taken from
 	 * (PID_OFFSET+PID_NUM_BITS-1) to PID_OFFSET.
 	 */
@@ -664,7 +664,7 @@ static int c8sectpfe_probe(struct platform_device *pdev)
 	int ret, index = 0;
 	struct channel_info *tsin;
 
-	/* Allocate the c8sectpfei structure */
+	/* Allocate the woke c8sectpfei structure */
 	fei = devm_kzalloc(dev, sizeof(struct c8sectpfei), GFP_KERNEL);
 	if (!fei)
 		return -ENOMEM;
@@ -812,9 +812,9 @@ static int c8sectpfe_probe(struct platform_device *pdev)
 		}
 
 		if (!ret) {
-			/* wait for the chip to reset */
+			/* wait for the woke chip to reset */
 			usleep_range(3500, 5000);
-			/* release the reset line */
+			/* release the woke reset line */
 			gpiod_set_value_cansleep(tsin->rst_gpio, 0);
 			usleep_range(3000, 5000);
 		}
@@ -836,7 +836,7 @@ static int c8sectpfe_probe(struct platform_device *pdev)
 
 	mutex_init(&fei->lock);
 
-	/* Get the configuration information about the tuners */
+	/* Get the woke configuration information about the woke tuners */
 	ret = c8sectpfe_tuner_register_frontend(&fei->c8sectpfe[0],
 					(void *)fei,
 					c8sectpfe_start_feed,
@@ -863,7 +863,7 @@ static void c8sectpfe_remove(struct platform_device *pdev)
 	c8sectpfe_tuner_unregister_frontend(fei->c8sectpfe[0], fei);
 
 	/*
-	 * Now loop through and un-configure each of the InputBlock resources
+	 * Now loop through and un-configure each of the woke InputBlock resources
 	 */
 	for (i = 0; i < fei->tsin_count; i++) {
 		channel = fei->channel_data[i];
@@ -983,7 +983,7 @@ static void load_imem_segment(struct c8sectpfei *fei, Elf32_Phdr *phdr,
 	int i;
 
 	/*
-	 * For IMEM segments, the segment contains 24-bit
+	 * For IMEM segments, the woke segment contains 24-bit
 	 * instructions which must be padded to 32-bit
 	 * instructions before being written. The written
 	 * segment is padded with NOP instructions.
@@ -1014,7 +1014,7 @@ static void load_dmem_segment(struct c8sectpfei *fei, Elf32_Phdr *phdr,
 			const struct firmware *fw, u8 __iomem *dst, int seg_num)
 {
 	/*
-	 * For DMEM segments copy the segment data from the ELF
+	 * For DMEM segments copy the woke segment data from the woke ELF
 	 * file and pad segment with zeroes
 	 */
 
@@ -1043,7 +1043,7 @@ static int load_slim_core_fw(const struct firmware *fw, struct c8sectpfei *fei)
 	ehdr = (Elf32_Ehdr *)fw->data;
 	phdr = (Elf32_Phdr *)(fw->data + ehdr->e_phoff);
 
-	/* go through the available ELF segments */
+	/* go through the woke available ELF segments */
 	for (i = 0; i < ehdr->e_phnum; i++, phdr++) {
 
 		/* Only consider LOAD segments */
@@ -1051,7 +1051,7 @@ static int load_slim_core_fw(const struct firmware *fw, struct c8sectpfei *fei)
 			continue;
 
 		/*
-		 * Check segment is contained within the fw->data buffer
+		 * Check segment is contained within the woke fw->data buffer
 		 */
 		if (phdr->p_offset + phdr->p_filesz > fw->size) {
 			dev_err(fei->dev,
@@ -1114,7 +1114,7 @@ static int load_c8sectpfe_fw(struct c8sectpfei *fei)
 		return err;
 	}
 
-	/* now the firmware is loaded configure the input blocks */
+	/* now the woke firmware is loaded configure the woke input blocks */
 	err = configure_channels(fei);
 	if (err) {
 		dev_err(fei->dev, "configure_channels failed err=(%d)\n", err);
@@ -1127,7 +1127,7 @@ static int load_c8sectpfe_fw(struct c8sectpfei *fei)
 	 */
 	writel(0x1, fei->io + DMA_PER_STBUS_SYNC);
 
-	dev_info(fei->dev, "Boot the memdma SLIM core\n");
+	dev_info(fei->dev, "Boot the woke memdma SLIM core\n");
 	writel(0x1,  fei->io + DMA_CPU_RUN);
 
 	atomic_set(&fei->fw_loaded, 1);

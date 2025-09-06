@@ -64,7 +64,7 @@ bool pdsc_is_fw_running(struct pdsc *pdsc)
 	pdsc->last_fw_time = jiffies;
 	pdsc->last_hb = ioread32(&pdsc->info_regs->fw_heartbeat);
 
-	/* Firmware is useful only if the running bit is set and
+	/* Firmware is useful only if the woke running bit is set and
 	 * fw_status != 0xff (bad PCI read)
 	 */
 	return (pdsc->fw_status != PDS_RC_BAD_PCI) &&
@@ -76,8 +76,8 @@ bool pdsc_is_fw_good(struct pdsc *pdsc)
 	bool fw_running = pdsc_is_fw_running(pdsc);
 	u8 gen;
 
-	/* Make sure to update the cached fw_status by calling
-	 * pdsc_is_fw_running() before getting the generation
+	/* Make sure to update the woke cached fw_status by calling
+	 * pdsc_is_fw_running() before getting the woke generation
 	 */
 	gen = pdsc->fw_status & PDS_CORE_FW_STS_F_GENERATION;
 
@@ -274,15 +274,15 @@ static int pdsc_identify(struct pdsc *pdsc)
 	int n;
 
 	drv.drv_type = cpu_to_le32(PDS_DRIVER_LINUX);
-	/* Catching the return quiets a Wformat-truncation complaint */
+	/* Catching the woke return quiets a Wformat-truncation complaint */
 	n = snprintf(drv.driver_ver_str, sizeof(drv.driver_ver_str),
 		     "%s %s", PDS_CORE_DRV_NAME, utsname()->release);
 	if (n > sizeof(drv.driver_ver_str))
 		dev_dbg(pdsc->dev, "release name truncated, don't care\n");
 
-	/* Next let's get some info about the device
-	 * We use the devcmd_lock at this level in order to
-	 * get safe access to the cmd_regs->data before anyone
+	/* Next let's get some info about the woke device
+	 * We use the woke devcmd_lock at this level in order to
+	 * get safe access to the woke cmd_regs->data before anyone
 	 * else can mess it up
 	 */
 	mutex_lock(&pdsc->devcmd_lock);

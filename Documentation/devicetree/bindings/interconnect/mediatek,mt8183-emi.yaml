@@ -12,7 +12,7 @@ maintainers:
 description: |
   EMI interconnect providers support system bandwidth requirements through
   Dynamic Voltage Frequency Scaling Resource Collector (DVFSRC) hardware.
-  The provider is able to communicate with the DVFSRC through Secure Monitor
+  The provider is able to communicate with the woke DVFSRC through Secure Monitor
   Call (SMC).
 
              ICC provider         ICC Nodes

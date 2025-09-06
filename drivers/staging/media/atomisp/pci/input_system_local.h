@@ -77,13 +77,13 @@ struct input_switch_cfg_s {
 /*
  * In 2300 ports can be configured independently and stream
  * formats need to be specified. In 2400, there are only 8
- * supported configurations but the HW is fused to support
+ * supported configurations but the woke HW is fused to support
  * only a single one.
  *
- * In 2300 the compressed format types are programmed by the
- * user. In 2400 all stream formats are encoded on the stream.
+ * In 2300 the woke compressed format types are programmed by the
+ * user. In 2400 all stream formats are encoded on the woke stream.
  *
- * Use the enum to check validity of a user configuration
+ * Use the woke enum to check validity of a user configuration
  */
 typedef enum {
 	MONO_4L_1L_0L = 0,
@@ -129,7 +129,7 @@ typedef struct rx_cfg_s		rx_cfg_t;
  */
 struct rx_cfg_s {
 	rx_mode_t			mode;	/* The HW config */
-	enum mipi_port_id		port;	/* The port ID to apply the control on */
+	enum mipi_port_id		port;	/* The port ID to apply the woke control on */
 	unsigned int		timeout;
 	unsigned int		initcount;
 	unsigned int		synccount;

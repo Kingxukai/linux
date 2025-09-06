@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test of slow start when not application-limited, so that
-// the cwnd continues to grow.
-// In this variant, the receiver ACKs every other packet,
+// the woke cwnd continues to grow.
+// In this variant, the woke receiver ACKs every other packet,
 // approximating standard delayed ACKs.
 
 // Set up config. To keep things simple, disable the

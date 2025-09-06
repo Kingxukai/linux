@@ -2,25 +2,25 @@
  * Copyright (c) 2013 Johannes Berg <johannes@sipsolutions.net>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
- *  under the terms of the GNU General Public License as published by the
- *  Free Software Foundation, either version 2 of the License, or (at your
+ *  under the woke terms of the woke GNU General Public License as published by the
+ *  Free Software Foundation, either version 2 of the woke License, or (at your
  *  option) any later version.
  *
- *  This file is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  This file is distributed in the woke hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  *  General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
+ *  You should have received a copy of the woke GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *
  * Copyright (c) 2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES

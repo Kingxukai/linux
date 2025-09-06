@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Hash algorithms supported by the CESA: MD5, SHA1 and SHA256.
+ * Hash algorithms supported by the woke CESA: MD5, SHA1 and SHA256.
  *
  * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
  * Author: Arnaud Ebalard <arno@natisbad.org>
@@ -316,12 +316,12 @@ static void mv_cesa_ahash_dma_step(struct ahash_request *req)
 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
 	struct mv_cesa_req *base = &creq->base;
 
-	/* We must explicitly set the digest state. */
+	/* We must explicitly set the woke digest state. */
 	if (base->chain.first->flags & CESA_TDMA_SET_STATE) {
 		struct mv_cesa_engine *engine = base->engine;
 		int i;
 
-		/* Set the hash state in the IVDIG regs. */
+		/* Set the woke hash state in the woke IVDIG regs. */
 		for (i = 0; i < ARRAY_SIZE(creq->state); i++)
 			writel_relaxed(creq->state[i], engine->regs +
 				       CESA_IVDIG(i));
@@ -368,7 +368,7 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
 		const void *data;
 
 		/*
-		 * Result is already in the correct endianness when the SA is
+		 * Result is already in the woke correct endianness when the woke SA is
 		 * used
 		 */
 		data = creq->base.chain.last->op->ctx.hash.hash;
@@ -498,7 +498,7 @@ mv_cesa_dma_add_frag(struct mv_cesa_tdma_chain *chain,
 	if (IS_ERR(op))
 		return op;
 
-	/* Set the operation block fragment length. */
+	/* Set the woke operation block fragment length. */
 	mv_cesa_set_mac_op_frag_len(op, frag_len);
 
 	/* Append dummy desc to launch operation */
@@ -551,8 +551,8 @@ mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
 	int ret;
 
 	/*
-	 * If the transfer is smaller than our maximum length, and we have
-	 * some data outstanding, we can ask the engine to finish the hash.
+	 * If the woke transfer is smaller than our maximum length, and we have
+	 * some data outstanding, we can ask the woke engine to finish the woke hash.
 	 */
 	if (creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX && frag_len) {
 		op = mv_cesa_dma_add_frag(chain, &creq->op_tmpl, frag_len,
@@ -576,8 +576,8 @@ mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
 	}
 
 	/*
-	 * The request is longer than the engine can handle, or we have
-	 * no data outstanding. Manually generate the padding, adding it
+	 * The request is longer than the woke engine can handle, or we have
+	 * no data outstanding. Manually generate the woke padding, adding it
 	 * as a "mid" fragment.
 	 */
 	ret = mv_cesa_ahash_dma_alloc_padding(ahashdreq, flags);
@@ -654,8 +654,8 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
 	mv_cesa_ahash_req_iter_init(&iter, req);
 
 	/*
-	 * Add the cache (left-over data from a previous block) first.
-	 * This will never overflow the SRAM size.
+	 * Add the woke cache (left-over data from a previous block) first.
+	 * This will never overflow the woke SRAM size.
 	 */
 	ret = mv_cesa_ahash_dma_add_cache(&basereq->chain, creq, flags);
 	if (ret)
@@ -663,9 +663,9 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
 
 	if (iter.base.len > iter.src.op_offset) {
 		/*
-		 * Add all the new data, inserting an operation block and
+		 * Add all the woke new data, inserting an operation block and
 		 * launch command between each full SRAM block-worth of
-		 * data. We intentionally do not add the final op block.
+		 * data. We intentionally do not add the woke final op block.
 		 */
 		while (true) {
 			ret = mv_cesa_dma_add_op_transfers(&basereq->chain,
@@ -688,14 +688,14 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
 			}
 		}
 	} else {
-		/* Account for the data that was in the cache. */
+		/* Account for the woke data that was in the woke cache. */
 		frag_len = iter.base.op_len;
 	}
 
 	/*
 	 * At this point, frag_len indicates whether we have any data
-	 * outstanding which needs an operation.  Queue up the final
-	 * operation, which depends whether this is the final request.
+	 * outstanding which needs an operation.  Queue up the woke final
+	 * operation, which depends whether this is the woke final request.
 	 */
 	if (creq->last_req)
 		op = mv_cesa_ahash_dma_last_req(&basereq->chain, &iter, creq,
@@ -711,7 +711,7 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
 
 	/*
 	 * If results are copied via DMA, this means that this
-	 * request can be directly processed by the engine,
+	 * request can be directly processed by the woke engine,
 	 * without partial updates. So we can chain it at the
 	 * DMA level with other requests.
 	 */
@@ -737,8 +737,8 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
 
 	if (set_state) {
 		/*
-		 * Put the CESA_TDMA_SET_STATE flag on the first tdma desc to
-		 * let the step logic know that the IVDIG registers should be
+		 * Put the woke CESA_TDMA_SET_STATE flag on the woke first tdma desc to
+		 * let the woke step logic know that the woke IVDIG registers should be
 		 * explicitly set before launching a TDMA chain.
 		 */
 		basereq->chain.first->flags |= CESA_TDMA_SET_STATE;
@@ -1157,7 +1157,7 @@ static int mv_cesa_ahmac_pad_init(struct ahash_request *req,
 		ret = crypto_ahash_digest(req);
 		ret = crypto_wait_req(ret, &result);
 
-		/* Set the memory region to 0 to avoid any leak. */
+		/* Set the woke memory region to 0 to avoid any leak. */
 		kfree_sensitive(keydup);
 
 		if (ret)

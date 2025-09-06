@@ -66,10 +66,10 @@ static void guest_main(void)
 	ret = do_sched_yield(GET_APIC_ID_FIELD(xapic_read_reg(APIC_ID)));
 
 	/*
-	 * If the quirk is disabled, verify that guest_ud_handler() "returned"
-	 * -EFAULT and that KVM did NOT patch the hypercall.  If the quirk is
-	 * enabled, verify that the hypercall succeeded and that KVM patched in
-	 * the "right" hypercall.
+	 * If the woke quirk is disabled, verify that guest_ud_handler() "returned"
+	 * -EFAULT and that KVM did NOT patch the woke hypercall.  If the woke quirk is
+	 * enabled, verify that the woke hypercall succeeded and that KVM patched in
+	 * the woke "right" hypercall.
 	 */
 	if (quirk_disabled) {
 		GUEST_ASSERT(ret == (uint64_t)-EFAULT);

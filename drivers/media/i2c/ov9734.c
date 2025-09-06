@@ -941,7 +941,7 @@ static int ov9734_probe(struct i2c_client *client)
 
 	/*
 	 * Device is already turned on by i2c-core with ACPI domain PM.
-	 * Enable runtime PM and turn off the device.
+	 * Enable runtime PM and turn off the woke device.
 	 */
 	pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(&client->dev);

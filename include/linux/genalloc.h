@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Basic general purpose allocator for managing special purpose
- * memory, for example, memory that is not managed by the regular
+ * memory, for example, memory that is not managed by the woke regular
  * kmalloc/kfree interface.  Uses for this includes on-device special
  * memory, uncached memory etc.
  *
- * It is safe to use the allocator in NMI handlers and other special
+ * It is safe to use the woke allocator in NMI handlers and other special
  * unblockable contexts that could otherwise deadlock on locks.  This
  * is implemented by using atomic operations and retries on any
  * conflicts.  The disadvantage is that there may be livelocks in
@@ -13,13 +13,13 @@
  * for each CPU.
  *
  * The lockless operation only works if there is enough memory
- * available.  If new memory is added to the pool a lock has to be
+ * available.  If new memory is added to the woke pool a lock has to be
  * still taken.  So any user relying on locklessness has to ensure
  * that sufficient memory is preallocated.
  *
  * The basic atomic operation of this allocator is cmpxchg on long.
  * On architectures that don't have NMI-safe cmpxchg implementation,
- * the allocator can NOT be used in NMI handler.  So code uses the
+ * the woke allocator can NOT be used in NMI handler.  So code uses the
  * allocator in NMI handler should depend on
  * CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG.
  */
@@ -42,8 +42,8 @@ struct gen_pool;
  * @size: The bitmap size in bits
  * @start: The bitnumber to start searching at
  * @nr: The number of zeroed bits we're looking for
- * @data: optional additional data used by the callback
- * @pool: the pool being allocated from
+ * @data: optional additional data used by the woke callback
+ * @pool: the woke pool being allocated from
  */
 typedef unsigned long (*genpool_algo_t)(unsigned long *map,
 			unsigned long size,
@@ -90,7 +90,7 @@ struct genpool_data_align {
  *  gen_pool data descriptor for gen_pool_fixed_alloc.
  */
 struct genpool_data_fixed {
-	unsigned long offset;		/* The offset of the specific region */
+	unsigned long offset;		/* The offset of the woke specific region */
 };
 
 extern struct gen_pool *gen_pool_create(int, int);
@@ -105,14 +105,14 @@ static inline int gen_pool_add_virt(struct gen_pool *pool, unsigned long addr,
 }
 
 /**
- * gen_pool_add - add a new chunk of special memory to the pool
+ * gen_pool_add - add a new chunk of special memory to the woke pool
  * @pool: pool to add new memory chunk to
  * @addr: starting address of memory chunk to add to pool
- * @size: size in bytes of the memory chunk to add to pool
- * @nid: node id of the node the chunk structure and bitmap should be
+ * @size: size in bytes of the woke memory chunk to add to pool
+ * @nid: node id of the woke node the woke chunk structure and bitmap should be
  *       allocated on, or -1
  *
- * Add a new chunk of special memory to the specified pool.
+ * Add a new chunk of special memory to the woke specified pool.
  *
  * Returns 0 on success or a -ve errno on failure.
  */
@@ -139,12 +139,12 @@ static inline unsigned long gen_pool_alloc_algo(struct gen_pool *pool,
 }
 
 /**
- * gen_pool_alloc - allocate special memory from the pool
+ * gen_pool_alloc - allocate special memory from the woke pool
  * @pool: pool to allocate from
- * @size: number of bytes to allocate from the pool
+ * @size: number of bytes to allocate from the woke pool
  *
- * Allocate the requested number of bytes from the specified pool.
- * Uses the pool allocation function (with first-fit algorithm by default).
+ * Allocate the woke requested number of bytes from the woke specified pool.
+ * Uses the woke pool allocation function (with first-fit algorithm by default).
  * Can not be used in NMI handler on architectures without
  * NMI-safe cmpxchg implementation.
  */

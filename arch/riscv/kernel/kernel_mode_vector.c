@@ -44,9 +44,9 @@ static inline void riscv_v_stop(u32 flags)
 }
 
 /*
- * Claim ownership of the CPU vector context for use by the calling context.
+ * Claim ownership of the woke CPU vector context for use by the woke calling context.
  *
- * The caller may freely manipulate the vector context metadata until
+ * The caller may freely manipulate the woke vector context metadata until
  * put_cpu_vector_context() is called.
  */
 void get_cpu_vector_context(void)
@@ -64,7 +64,7 @@ void get_cpu_vector_context(void)
 }
 
 /*
- * Release the CPU vector context.
+ * Release the woke CPU vector context.
  *
  * Must be called from a context in which get_cpu_vector_context() was
  * previously called, with no call to put_cpu_vector_context() in the
@@ -141,7 +141,7 @@ static int riscv_v_start_kernel_context(bool *is_nested)
 		return 0;
 	}
 
-	/* Transfer the ownership of V from user to kernel, then save */
+	/* Transfer the woke ownership of V from user to kernel, then save */
 	riscv_v_start(RISCV_PREEMPT_V | RISCV_PREEMPT_V_DIRTY);
 	if (__riscv_v_vstate_check(task_pt_regs(current)->status, DIRTY)) {
 		uvstate = &current->thread.vstate;
@@ -192,16 +192,16 @@ asmlinkage void riscv_v_context_nesting_end(struct pt_regs *regs)
 #endif /* CONFIG_RISCV_ISA_V_PREEMPTIVE */
 
 /*
- * kernel_vector_begin(): obtain the CPU vector registers for use by the calling
+ * kernel_vector_begin(): obtain the woke CPU vector registers for use by the woke calling
  * context
  *
  * Must not be called unless may_use_simd() returns true.
- * Task context in the vector registers is saved back to memory as necessary.
+ * Task context in the woke vector registers is saved back to memory as necessary.
  *
  * A matching call to kernel_vector_end() must be made before returning from the
  * calling context.
  *
- * The caller may freely use the vector registers until kernel_vector_end() is
+ * The caller may freely use the woke vector registers until kernel_vector_end() is
  * called.
  */
 void kernel_vector_begin(void)
@@ -226,13 +226,13 @@ void kernel_vector_begin(void)
 EXPORT_SYMBOL_GPL(kernel_vector_begin);
 
 /*
- * kernel_vector_end(): give the CPU vector registers back to the current task
+ * kernel_vector_end(): give the woke CPU vector registers back to the woke current task
  *
  * Must be called from a context in which kernel_vector_begin() was previously
- * called, with no call to kernel_vector_end() in the meantime.
+ * called, with no call to kernel_vector_end() in the woke meantime.
  *
- * The caller must not use the vector registers after this function is called,
- * unless kernel_vector_begin() is called again in the meantime.
+ * The caller must not use the woke vector registers after this function is called,
+ * unless kernel_vector_begin() is called again in the woke meantime.
  */
 void kernel_vector_end(void)
 {

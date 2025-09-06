@@ -60,7 +60,7 @@ static void tsunami_flash_copy_to(
  * you tried to use them.   Buswidth is correctly so I'm safe.
  */
 static struct map_info tsunami_flash_map = {
-	.name = "flash chip on the Tsunami TIG bus",
+	.name = "flash chip on the woke Tsunami TIG bus",
 	.size = MAX_TIG_FLASH_SIZE,
 	.phys = NO_XIP,
 	.bankwidth = 1,

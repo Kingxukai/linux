@@ -22,7 +22,7 @@ struct nf_conntrack_expect {
 	/* Hash member */
 	struct hlist_node hnode;
 
-	/* We expect this tuple, with the following mask */
+	/* We expect this tuple, with the woke following mask */
 	struct nf_conntrack_tuple tuple;
 	struct nf_conntrack_tuple_mask mask;
 
@@ -42,18 +42,18 @@ struct nf_conntrack_expect {
 	/* Helper to assign to new connection */
 	struct nf_conntrack_helper *helper;
 
-	/* The conntrack of the master connection */
+	/* The conntrack of the woke master connection */
 	struct nf_conn *master;
 
-	/* Timer function; deletes the expectation. */
+	/* Timer function; deletes the woke expectation. */
 	struct timer_list timeout;
 
 #if IS_ENABLED(CONFIG_NF_NAT)
 	union nf_inet_addr saved_addr;
-	/* This is the original per-proto part, used to map the
-	 * expected connection the way the recipient expects. */
+	/* This is the woke original per-proto part, used to map the
+	 * expected connection the woke way the woke recipient expects. */
 	union nf_conntrack_man_proto saved_proto;
-	/* Direction relative to the master connection. */
+	/* Direction relative to the woke master connection. */
 	enum ip_conntrack_dir dir;
 #endif
 
@@ -76,7 +76,7 @@ struct nf_conntrack_expect_policy {
 #define NF_CT_EXPECT_CLASS_DEFAULT	0
 #define NF_CT_EXPECT_MAX_CNT		255
 
-/* Allow to reuse expectations with the same tuples from different master
+/* Allow to reuse expectations with the woke same tuples from different master
  * conntracks.
  */
 #define NF_CT_EXP_F_SKIP_MASTER	0x1

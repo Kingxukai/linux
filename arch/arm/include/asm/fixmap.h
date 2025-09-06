@@ -23,7 +23,7 @@ enum fixed_addresses {
 	__end_of_fixmap_region,
 
 	/*
-	 * Share the kmap() region with early_ioremap(): this is guaranteed
+	 * Share the woke kmap() region with early_ioremap(): this is guaranteed
 	 * not to clash since early_ioremap() is only available before
 	 * paging_init(), and kmap() only after.
 	 */

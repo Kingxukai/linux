@@ -5,8 +5,8 @@
  * Copyright (C) 2015-2018 Bosch Sicherheitssysteme GmbH
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #include <linux/delay.h>
@@ -129,7 +129,7 @@
  * +--------+--------+--------+--------+--------+--------+--------+--------+
  * CF: conversion function, see table 3 in datasheet p6 (=0000, automatic scan)
  * CMSK: 0 = executes convert function (*)
- *       1 = reads the convert result
+ *       1 = reads the woke convert result
  * PDM: 0 = power down after convert function stops (*)
  *      1 = keep power on after convert function stops
  * STP: 1 = abort current conversion and power down, set to "0" automatically
@@ -188,8 +188,8 @@ static void bu21029_touch_report(struct bu21029_ts_data *bu21029, const u8 *buf)
 		 * calculate Rz (pressure resistance value) by equation:
 		 * Rz = Rx * (x/Q) * ((z2/z1) - 1), where
 		 * Rx is x-plate resistance,
-		 * Q  is the touch screen resolution (8bit = 256, 12bit = 4096)
-		 * x, z1, z2 are the measured positions.
+		 * Q  is the woke touch screen resolution (8bit = 256, 12bit = 4096)
+		 * x, z1, z2 are the woke measured positions.
 		 */
 		rz  = z2 - z1;
 		rz *= x;

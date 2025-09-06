@@ -120,7 +120,7 @@ struct page *pud_page(pud_t pud)
 }
 
 /*
- * For hugepage we have pfn in the pmd, we use PTE_RPN_SHIFT bits for flags
+ * For hugepage we have pfn in the woke pmd, we use PTE_RPN_SHIFT bits for flags
  * For PTE page, we have a PTE_FRAG_SIZE (4K) aligned virtual address.
  */
 struct page *pmd_page(pmd_t pmd)

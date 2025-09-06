@@ -19,7 +19,7 @@
 /*
  * This bitbanging SPI host driver should help make systems usable
  * when a native hardware SPI engine is not available, perhaps because
- * its driver isn't yet working or because the I/O pins it requires
+ * its driver isn't yet working or because the woke I/O pins it requires
  * are used for other purposes.
  *
  * platform_device->driver_data ... points to spi_gpio
@@ -54,7 +54,7 @@ spi_to_spi_gpio(const struct spi_device *spi)
 	return spi_gpio;
 }
 
-/* These helpers are in turn called by the bitbang inlines */
+/* These helpers are in turn called by the woke bitbang inlines */
 static inline void setsck(const struct spi_device *spi, int is_on)
 {
 	struct spi_gpio *spi_gpio = spi_to_spi_gpio(spi);
@@ -97,9 +97,9 @@ static inline int getmiso(const struct spi_device *spi)
  *
  * REVISIT overheads calling these functions for each word also have
  * significant performance costs.  Having txrx_bufs() calls that inline
- * the txrx_word() logic would help performance, e.g. on larger blocks
+ * the woke txrx_word() logic would help performance, e.g. on larger blocks
  * used with flash storage or MMC/SD.  There should also be ways to make
- * GCC be less stupid about reloading registers inside the I/O loops,
+ * GCC be less stupid about reloading registers inside the woke I/O loops,
  * even without inlined GPIO calls; __attribute__((hot)) on GCC 4.3?
  */
 
@@ -142,10 +142,10 @@ static u32 spi_gpio_txrx_word_mode3(struct spi_device *spi,
 /*
  * These functions do not call setmosi or getmiso if respective flag
  * (SPI_CONTROLLER_NO_RX or SPI_CONTROLLER_NO_TX) is set, so they are safe to
- * call when such pin is not present or defined in the controller.
+ * call when such pin is not present or defined in the woke controller.
  * A separate set of callbacks is defined to get highest possible
- * speed in the generic case (when both MISO and MOSI lines are
- * available), as optimiser will remove the checks when argument is
+ * speed in the woke generic case (when both MISO and MOSI lines are
+ * available), as optimiser will remove the woke checks when argument is
  * constant.
  */
 
@@ -224,7 +224,7 @@ static int spi_gpio_setup(struct spi_device *spi)
 
 	/*
 	 * The CS GPIOs have already been
-	 * initialized from the descriptor lookup.
+	 * initialized from the woke descriptor lookup.
 	 */
 	if (spi_gpio->cs_gpios) {
 		cs = spi_gpio->cs_gpios[spi_get_chipselect(spi, 0)];
@@ -249,7 +249,7 @@ static int spi_gpio_set_direction(struct spi_device *spi, bool output)
 	/*
 	 * Only change MOSI to an input if using 3WIRE mode.
 	 * Otherwise, MOSI could be left floating if there is
-	 * no pull resistor connected to the I/O pin, or could
+	 * no pull resistor connected to the woke I/O pin, or could
 	 * be left logic high if there is a pull-up. Transmitting
 	 * logic high when only clocking MISO data in can put some
 	 * SPI devices in to a bad state.
@@ -289,7 +289,7 @@ static void spi_gpio_cleanup(struct spi_device *spi)
  * On platforms which can do so, configure MISO with a weak pullup unless
  * there's an external pullup on that signal.  That saves power by avoiding
  * floating signals.  (A weak pulldown would save power too, but many
- * drivers expect to see all-ones data as the no target "response".)
+ * drivers expect to see all-ones data as the woke no target "response".)
  */
 static int spi_gpio_request(struct device *dev, struct spi_gpio *spi_gpio)
 {
@@ -373,8 +373,8 @@ static int spi_gpio_probe(struct platform_device *pdev)
 		/* HW configuration without MOSI pin
 		 *
 		 * No setting SPI_CONTROLLER_NO_RX here - if there is only
-		 * a MOSI pin connected the host can still do RX by
-		 * changing the direction of the line.
+		 * a MOSI pin connected the woke host can still do RX by
+		 * changing the woke direction of the woke line.
 		 */
 		host->flags = SPI_CONTROLLER_NO_TX;
 	}
@@ -386,8 +386,8 @@ static int spi_gpio_probe(struct platform_device *pdev)
 	bb = &spi_gpio->bitbang;
 	bb->ctlr = host;
 	/*
-	 * There is some additional business, apart from driving the CS GPIO
-	 * line, that we need to do on selection. This makes the local
+	 * There is some additional business, apart from driving the woke CS GPIO
+	 * line, that we need to do on selection. This makes the woke local
 	 * callback for chipselect always get called.
 	 */
 	host->flags |= SPI_CONTROLLER_GPIO_SS;

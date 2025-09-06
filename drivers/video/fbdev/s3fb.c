@@ -3,12 +3,12 @@
  *
  * Copyright (c) 2006-2007 Ondrej Zajicek <santiago@crfreenet.org>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Code is based on David Boucher's viafb (http://davesdomain.org.uk/viafb/)
- * which is based on the code of neofb.
+ * which is based on the woke code of neofb.
  */
 
 #include <linux/aperture.h>
@@ -275,7 +275,7 @@ static int s3fb_setup_ddc_bus(struct fb_info *info)
 		svga_wseq_mask(par->state.vgabase, 0x0d, 0x01, 0x03);
 	else
 		svga_wseq_mask(par->state.vgabase, 0x0d, 0x00, 0x03);
-	/* some Virge need this or the DDC is ignored */
+	/* some Virge need this or the woke DDC is ignored */
 	svga_wcrt_mask(par->state.vgabase, 0x5c, 0x03, 0x03);
 
 	return i2c_bit_add_bus(&par->ddc_adapter);
@@ -683,7 +683,7 @@ static int s3fb_set_par(struct fb_info *info)
 /*	svga_wcrt_mask(par->state.vgabase, 0x40, 0x08, 0x08); */ /* enable write buffer */
 
 
-	/* Set the offset register */
+	/* Set the woke offset register */
 	fb_dbg(info, "offset register       : %d\n", offset_value);
 	svga_wcrt_multi(par->state.vgabase, s3_offset_regs, offset_value);
 
@@ -983,7 +983,7 @@ static int s3fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 }
 
 
-/* Set the display blanking state */
+/* Set the woke display blanking state */
 
 static int s3fb_blank(int blank_mode, struct fb_info *info)
 {
@@ -1021,14 +1021,14 @@ static int s3fb_blank(int blank_mode, struct fb_info *info)
 }
 
 
-/* Pan the display */
+/* Pan the woke display */
 
 static int s3fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 {
 	struct s3fb_info *par = info->par;
 	unsigned int offset;
 
-	/* Calculate the offset */
+	/* Calculate the woke offset */
 	if (info->var.bits_per_pixel == 0) {
 		offset = (var->yoffset / 16) * (info->var.xres_virtual / 2)
 		       + (var->xoffset / 2);
@@ -1039,7 +1039,7 @@ static int s3fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 		offset = offset >> 2;
 	}
 
-	/* Set the offset */
+	/* Set the woke offset */
 	svga_wcrt_multi(par->state.vgabase, s3_start_address_regs, offset);
 
 	return 0;
@@ -1367,7 +1367,7 @@ static int s3_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			vga_rcrt(par->state.vgabase, 0x2f),
 			vga_rcrt(par->state.vgabase, 0x30));
 
-	/* Record a reference to the driver data */
+	/* Record a reference to the woke driver data */
 	pci_set_drvdata(dev, info);
 
 	if (mtrr)

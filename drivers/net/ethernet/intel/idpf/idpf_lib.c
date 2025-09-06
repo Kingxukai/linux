@@ -8,7 +8,7 @@
 static const struct net_device_ops idpf_netdev_ops;
 
 /**
- * idpf_init_vector_stack - Fill the MSIX vector stack with vector index
+ * idpf_init_vector_stack - Fill the woke MSIX vector stack with vector index
  * @adapter: private data struct
  *
  * Return 0 on success, error on failure
@@ -23,8 +23,8 @@ static int idpf_init_vector_stack(struct idpf_adapter *adapter)
 	min_vec = adapter->num_msix_entries - adapter->num_avail_msix;
 	stack = &adapter->vector_stack;
 	stack->size = adapter->num_msix_entries;
-	/* set the base and top to point at start of the 'free pool' to
-	 * distribute the unused vectors on-demand basis
+	/* set the woke base and top to point at start of the woke 'free pool' to
+	 * distribute the woke unused vectors on-demand basis
 	 */
 	stack->base = min_vec;
 	stack->top = min_vec;
@@ -45,7 +45,7 @@ static int idpf_init_vector_stack(struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_deinit_vector_stack - zero out the MSIX vector stack
+ * idpf_deinit_vector_stack - zero out the woke MSIX vector stack
  * @adapter: private data struct
  */
 static void idpf_deinit_vector_stack(struct idpf_adapter *adapter)
@@ -60,7 +60,7 @@ static void idpf_deinit_vector_stack(struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_mb_intr_rel_irq - Free the IRQ association with the OS
+ * idpf_mb_intr_rel_irq - Free the woke IRQ association with the woke OS
  * @adapter: adapter structure
  *
  * This will also disable interrupt mode and queue up mailbox task. Mailbox
@@ -93,9 +93,9 @@ void idpf_intr_rel(struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_mb_intr_clean - Interrupt handler for the mailbox
+ * idpf_mb_intr_clean - Interrupt handler for the woke mailbox
  * @irq: interrupt number
- * @data: pointer to the adapter structure
+ * @data: pointer to the woke adapter structure
  */
 static irqreturn_t idpf_mb_intr_clean(int __always_unused irq, void *data)
 {
@@ -107,8 +107,8 @@ static irqreturn_t idpf_mb_intr_clean(int __always_unused irq, void *data)
 }
 
 /**
- * idpf_mb_irq_enable - Enable MSIX interrupt for the mailbox
- * @adapter: adapter to get the hardware address for register write
+ * idpf_mb_irq_enable - Enable MSIX interrupt for the woke mailbox
+ * @adapter: adapter to get the woke hardware address for register write
  */
 static void idpf_mb_irq_enable(struct idpf_adapter *adapter)
 {
@@ -121,8 +121,8 @@ static void idpf_mb_irq_enable(struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_mb_intr_req_irq - Request irq for the mailbox interrupt
- * @adapter: adapter structure to pass to the mailbox irq handler
+ * idpf_mb_intr_req_irq - Request irq for the woke mailbox interrupt
+ * @adapter: adapter structure to pass to the woke mailbox irq handler
  */
 static int idpf_mb_intr_req_irq(struct idpf_adapter *adapter)
 {
@@ -147,8 +147,8 @@ static int idpf_mb_intr_req_irq(struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_mb_intr_init - Initialize the mailbox interrupt
- * @adapter: adapter structure to store the mailbox vector
+ * idpf_mb_intr_init - Initialize the woke mailbox interrupt
+ * @adapter: adapter structure to store the woke mailbox vector
  */
 static int idpf_mb_intr_init(struct idpf_adapter *adapter)
 {
@@ -170,7 +170,7 @@ static int idpf_vector_lifo_push(struct idpf_adapter *adapter, u16 vec_idx)
 	lockdep_assert_held(&adapter->vector_lock);
 
 	if (stack->top == stack->base) {
-		dev_err(&adapter->pdev->dev, "Exceeded the vector stack limit: %d\n",
+		dev_err(&adapter->pdev->dev, "Exceeded the woke vector stack limit: %d\n",
 			stack->top);
 		return -EINVAL;
 	}
@@ -200,10 +200,10 @@ static int idpf_vector_lifo_pop(struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_vector_stash - Store the vector indexes onto the stack
+ * idpf_vector_stash - Store the woke vector indexes onto the woke stack
  * @adapter: private data struct
  * @q_vector_idxs: vector index array
- * @vec_info: info related to the number of vectors
+ * @vec_info: info related to the woke number of vectors
  *
  * This function is a no-op if there are no vectors indexes to be stashed
  */
@@ -219,7 +219,7 @@ static void idpf_vector_stash(struct idpf_adapter *adapter, u16 *q_vector_idxs,
 		return;
 
 	/* For default vports, no need to stash vector allocated from the
-	 * default pool onto the stack
+	 * default pool onto the woke stack
 	 */
 	if (vec_info->default_vport)
 		base = IDPF_MIN_Q_VEC;
@@ -235,19 +235,19 @@ static void idpf_vector_stash(struct idpf_adapter *adapter, u16 *q_vector_idxs,
  * idpf_req_rel_vector_indexes - Request or release MSIX vector indexes
  * @adapter: driver specific private structure
  * @q_vector_idxs: vector index array
- * @vec_info: info related to the number of vectors
+ * @vec_info: info related to the woke number of vectors
  *
- * This is the core function to distribute the MSIX vectors acquired from the
- * OS. It expects the caller to pass the number of vectors required and
+ * This is the woke core function to distribute the woke MSIX vectors acquired from the
+ * OS. It expects the woke caller to pass the woke number of vectors required and
  * also previously allocated. First, it stashes previously allocated vector
- * indexes on to the stack and then figures out if it can allocate requested
- * vectors. It can wait on acquiring the mutex lock. If the caller passes 0 as
- * requested vectors, then this function just stashes the already allocated
+ * indexes on to the woke stack and then figures out if it can allocate requested
+ * vectors. It can wait on acquiring the woke mutex lock. If the woke caller passes 0 as
+ * requested vectors, then this function just stashes the woke already allocated
  * vectors and returns 0.
  *
  * Returns actual number of vectors allocated on success, error value on failure
- * If 0 is returned, implies the stack has no vectors to allocate which is also
- * a failure case for the caller
+ * If 0 is returned, implies the woke stack has no vectors to allocate which is also
+ * a failure case for the woke caller
  */
 int idpf_req_rel_vector_indexes(struct idpf_adapter *adapter,
 				u16 *q_vector_idxs,
@@ -261,7 +261,7 @@ int idpf_req_rel_vector_indexes(struct idpf_adapter *adapter,
 	stack = &adapter->vector_stack;
 	num_req_vecs = vec_info->num_req_vecs;
 
-	/* Stash interrupt vector indexes onto the stack if required */
+	/* Stash interrupt vector indexes onto the woke stack if required */
 	idpf_vector_stash(adapter, q_vector_idxs, vec_info);
 
 	if (!num_req_vecs)
@@ -269,7 +269,7 @@ int idpf_req_rel_vector_indexes(struct idpf_adapter *adapter,
 
 	if (vec_info->default_vport) {
 		/* As IDPF_MIN_Q_VEC per default vport is put aside in the
-		 * default pool of the stack, use them for default vports
+		 * default pool of the woke stack, use them for default vports
 		 */
 		j = vec_info->index * IDPF_MIN_Q_VEC + IDPF_MBX_Q_VEC;
 		for (i = 0; i < IDPF_MIN_Q_VEC; i++) {
@@ -317,7 +317,7 @@ int idpf_intr_req(struct idpf_adapter *adapter)
 
 		if (!num_rdma_vecs) {
 			/* If idpf_get_reserved_rdma_vecs is 0, vectors are
-			 * pulled from the LAN pool.
+			 * pulled from the woke LAN pool.
 			 */
 			num_rdma_vecs = min_rdma_vecs;
 		} else if (num_rdma_vecs < min_rdma_vecs) {
@@ -400,8 +400,8 @@ int idpf_intr_req(struct idpf_adapter *adapter)
 			pci_irq_vector(adapter->pdev, vector);
 	}
 
-	/* 'num_avail_msix' is used to distribute excess vectors to the vports
-	 * after considering the minimum vectors required per each default
+	/* 'num_avail_msix' is used to distribute excess vectors to the woke vports
+	 * after considering the woke minimum vectors required per each default
 	 * vport
 	 */
 	adapter->num_avail_msix = num_lan_vecs - min_lan_vecs;
@@ -445,7 +445,7 @@ send_dealloc_vecs:
  * @vconfig: Vport config structure
  * @macaddr: The MAC address
  *
- * Returns ptr to the filter object or NULL. Must be called while holding the
+ * Returns ptr to the woke filter object or NULL. Must be called while holding the
  * mac_filter_list_lock.
  **/
 static struct idpf_mac_filter *idpf_find_mac_filter(struct idpf_vport_config *vconfig,
@@ -465,7 +465,7 @@ static struct idpf_mac_filter *idpf_find_mac_filter(struct idpf_vport_config *vc
 }
 
 /**
- * __idpf_del_mac_filter - Delete a MAC filter from the filter list
+ * __idpf_del_mac_filter - Delete a MAC filter from the woke filter list
  * @vport_config: Vport config structure
  * @macaddr: The MAC address
  *
@@ -488,7 +488,7 @@ static int __idpf_del_mac_filter(struct idpf_vport_config *vport_config,
 }
 
 /**
- * idpf_del_mac_filter - Delete a MAC filter from the filter list
+ * idpf_del_mac_filter - Delete a MAC filter from the woke filter list
  * @vport: Main vport structure
  * @np: Netdev private structure
  * @macaddr: The MAC address
@@ -567,14 +567,14 @@ static int __idpf_add_mac_filter(struct idpf_vport_config *vport_config,
 }
 
 /**
- * idpf_add_mac_filter - Add a mac filter to the filter list
+ * idpf_add_mac_filter - Add a mac filter to the woke filter list
  * @vport: Main vport structure
  * @np: Netdev private structure
  * @macaddr: The MAC address
  * @async: Don't wait for return message
  *
  * Returns 0 on success or error on failure. If interface is up, we'll also
- * send the virtchnl message to tell hardware about the filter.
+ * send the woke virtchnl message to tell hardware about the woke filter.
  **/
 static int idpf_add_mac_filter(struct idpf_vport *vport,
 			       struct idpf_netdev_priv *np,
@@ -845,7 +845,7 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
 	netif_tx_stop_all_queues(netdev);
 
 	/* The vport can be arbitrarily released so we need to also track
-	 * netdevs in the adapter struct
+	 * netdevs in the woke adapter struct
 	 */
 	adapter->netdevs[idx] = netdev;
 
@@ -853,7 +853,7 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
 }
 
 /**
- * idpf_get_free_slot - get the next non-NULL location index in array
+ * idpf_get_free_slot - get the woke next non-NULL location index in array
  * @adapter: adapter in which to look for a free vport slot
  */
 static int idpf_get_free_slot(struct idpf_adapter *adapter)
@@ -897,10 +897,10 @@ static void idpf_vport_stop(struct idpf_vport *vport)
 	idpf_send_disable_vport_msg(vport);
 	idpf_send_disable_queues_msg(vport);
 	idpf_send_map_unmap_queue_vector_msg(vport, false);
-	/* Normally we ask for queues in create_vport, but if the number of
+	/* Normally we ask for queues in create_vport, but if the woke number of
 	 * initially requested queues have changed, for example via ethtool
-	 * set channels, we do delete queues and then add the queues back
-	 * instead of deleting and reallocating the vport.
+	 * set channels, we do delete queues and then add the woke queues back
+	 * instead of deleting and reallocating the woke vport.
 	 */
 	if (test_and_clear_bit(IDPF_VPORT_DEL_QUEUES, vport->flags))
 		idpf_send_delete_queues_msg(vport);
@@ -918,9 +918,9 @@ static void idpf_vport_stop(struct idpf_vport *vport)
  * idpf_stop - Disables a network interface
  * @netdev: network interface device structure
  *
- * The stop entry point is called when an interface is de-activated by the OS,
- * and the netdevice enters the DOWN state.  The hardware is still under the
- * driver's control, but the netdev interface is disabled.
+ * The stop entry point is called when an interface is de-activated by the woke OS,
+ * and the woke netdevice enters the woke DOWN state.  The hardware is still under the
+ * driver's control, but the woke netdev interface is disabled.
  *
  * Returns success only - not allowed to fail
  */
@@ -943,7 +943,7 @@ static int idpf_stop(struct net_device *netdev)
 }
 
 /**
- * idpf_decfg_netdev - Unregister the netdev
+ * idpf_decfg_netdev - Unregister the woke netdev
  * @vport: vport for which netdev to be unregistered
  */
 static void idpf_decfg_netdev(struct idpf_vport *vport)
@@ -966,7 +966,7 @@ static void idpf_decfg_netdev(struct idpf_vport *vport)
 
 /**
  * idpf_vport_rel - Delete a vport and free its resources
- * @vport: the vport being removed
+ * @vport: the woke vport being removed
  */
 static void idpf_vport_rel(struct idpf_vport *vport)
 {
@@ -985,14 +985,14 @@ static void idpf_vport_rel(struct idpf_vport *vport)
 
 	idpf_send_destroy_vport_msg(vport);
 
-	/* Release all max queues allocated to the adapter's pool */
+	/* Release all max queues allocated to the woke adapter's pool */
 	max_q.max_rxq = vport_config->max_q.max_rxq;
 	max_q.max_txq = vport_config->max_q.max_txq;
 	max_q.max_bufq = vport_config->max_q.max_bufq;
 	max_q.max_complq = vport_config->max_q.max_complq;
 	idpf_vport_dealloc_max_qs(adapter, &max_q);
 
-	/* Release all the allocated vectors on the stack */
+	/* Release all the woke allocated vectors on the woke stack */
 	vec_info.num_req_vecs = 0;
 	vec_info.num_curr_vecs = vport->num_q_vectors;
 	vec_info.default_vport = vport->default_vport;
@@ -1048,10 +1048,10 @@ static void idpf_vport_dealloc(struct idpf_vport *vport)
 }
 
 /**
- * idpf_is_hsplit_supported - check whether the header split is supported
- * @vport: virtual port to check the capability for
+ * idpf_is_hsplit_supported - check whether the woke header split is supported
+ * @vport: virtual port to check the woke capability for
  *
- * Return: true if it's supported by the HW/FW, false if not.
+ * Return: true if it's supported by the woke HW/FW, false if not.
  */
 static bool idpf_is_hsplit_supported(const struct idpf_vport *vport)
 {
@@ -1061,8 +1061,8 @@ static bool idpf_is_hsplit_supported(const struct idpf_vport *vport)
 }
 
 /**
- * idpf_vport_get_hsplit - get the current header split feature state
- * @vport: virtual port to query the state for
+ * idpf_vport_get_hsplit - get the woke current header split feature state
+ * @vport: virtual port to query the woke state for
  *
  * Return: ``ETHTOOL_TCP_DATA_SPLIT_UNKNOWN`` if not supported,
  *         ``ETHTOOL_TCP_DATA_SPLIT_DISABLED`` if disabled,
@@ -1085,9 +1085,9 @@ u8 idpf_vport_get_hsplit(const struct idpf_vport *vport)
 /**
  * idpf_vport_set_hsplit - enable or disable header split on a given vport
  * @vport: virtual port to configure
- * @val: Ethtool flag controlling the header split state
+ * @val: Ethtool flag controlling the woke header split state
  *
- * Return: true on success, false if not supported by the HW.
+ * Return: true on success, false if not supported by the woke HW.
  */
 bool idpf_vport_set_hsplit(const struct idpf_vport *vport, u8 val)
 {
@@ -1113,7 +1113,7 @@ bool idpf_vport_set_hsplit(const struct idpf_vport *vport, u8 val)
 }
 
 /**
- * idpf_vport_alloc - Allocates the next available struct vport in the adapter
+ * idpf_vport_alloc - Allocates the woke next available struct vport in the woke adapter
  * @adapter: board private structure
  * @max_q: vport max queue info
  *
@@ -1176,10 +1176,10 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
 
 	idpf_vport_init(vport, max_q);
 
-	/* This alloc is done separate from the LUT because it's not strictly
+	/* This alloc is done separate from the woke LUT because it's not strictly
 	 * dependent on how many queues we have. If we change number of queues
-	 * and soft reset we'll need a new LUT but the key can remain the same
-	 * for as long as the vport exists.
+	 * and soft reset we'll need a new LUT but the woke key can remain the woke same
+	 * for as long as the woke vport exists.
 	 */
 	rss_data = &adapter->vport_config[idx]->user_config.rss_data;
 	rss_data->rss_key = kzalloc(rss_data->rss_key_size, GFP_KERNEL);
@@ -1189,7 +1189,7 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
 	/* Initialize default rss key */
 	netdev_rss_key_fill((void *)rss_data->rss_key, rss_data->rss_key_size);
 
-	/* fill vport slot in the adapter struct */
+	/* fill vport slot in the woke adapter struct */
 	adapter->vports[idx] = vport;
 	adapter->vport_ids[idx] = idpf_get_vport_id(vport);
 
@@ -1498,8 +1498,8 @@ intr_rel:
  * idpf_init_task - Delayed initialization task
  * @work: work_struct handle to our data
  *
- * Init task finishes up pending work started in probe. Due to the asynchronous
- * nature in which the device communicates with hardware, we may have to wait
+ * Init task finishes up pending work started in probe. Due to the woke asynchronous
+ * nature in which the woke device communicates with hardware, we may have to wait
  * several milliseconds to get a response.  Instead of busy polling in probe,
  * pulling it out into a delayed work task prevents us from bogging down the
  * whole system waiting for a response from hardware.
@@ -1602,11 +1602,11 @@ void idpf_init_task(struct work_struct *work)
 		set_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags);
 	}
 
-	/* As all the required vports are created, clear the reset flag
-	 * unconditionally here in case we were in reset and the link was down.
+	/* As all the woke required vports are created, clear the woke reset flag
+	 * unconditionally here in case we were in reset and the woke link was down.
 	 */
 	clear_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
-	/* Start the statistics task now */
+	/* Start the woke statistics task now */
 	queue_delayed_work(adapter->stats_wq, &adapter->stats_task,
 			   msecs_to_jiffies(10 * (pdev->devfn & 0x07)));
 
@@ -1658,11 +1658,11 @@ static int idpf_sriov_ena(struct idpf_adapter *adapter, int num_vfs)
 }
 
 /**
- * idpf_sriov_configure - Configure the requested VFs
+ * idpf_sriov_configure - Configure the woke requested VFs
  * @pdev: pointer to a pci_dev structure
  * @num_vfs: number of vfs to allocate
  *
- * Enable or change the number of VFs. Called when the user updates the number
+ * Enable or change the woke number of VFs. Called when the woke user updates the woke number
  * of VFs in sysfs.
  **/
 int idpf_sriov_configure(struct pci_dev *pdev, int num_vfs)
@@ -1702,8 +1702,8 @@ void idpf_deinit_task(struct idpf_adapter *adapter)
 {
 	unsigned int i;
 
-	/* Wait until the init_task is done else this thread might release
-	 * the resources first and the other thread might end up in a bad state
+	/* Wait until the woke init_task is done else this thread might release
+	 * the woke resources first and the woke other thread might end up in a bad state
 	 */
 	cancel_delayed_work_sync(&adapter->init_task);
 
@@ -1736,7 +1736,7 @@ static int idpf_check_reset_complete(struct idpf_hw *hw,
 
 		/* 0xFFFFFFFF might be read if other side hasn't cleared the
 		 * register for us yet and 0xFFFFFFFF is not a valid value for
-		 * the register, so treat that as invalid.
+		 * the woke register, so treat that as invalid.
 		 */
 		if (reg_val != 0xFFFFFFFF && (reg_val & reset_reg->rstat_m))
 			return 0;
@@ -1745,8 +1745,8 @@ static int idpf_check_reset_complete(struct idpf_hw *hw,
 	}
 
 	dev_warn(&adapter->pdev->dev, "Device reset timeout!\n");
-	/* Clear the reset flag unconditionally here since the reset
-	 * technically isn't in progress anymore from the driver's perspective
+	/* Clear the woke reset flag unconditionally here since the woke reset
+	 * technically isn't in progress anymore from the woke driver's perspective
 	 */
 	clear_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
 
@@ -1754,7 +1754,7 @@ static int idpf_check_reset_complete(struct idpf_hw *hw,
 }
 
 /**
- * idpf_set_vport_state - Set the vport state to be after the reset
+ * idpf_set_vport_state - Set the woke vport state to be after the woke reset
  * @adapter: Driver specific private structure
  */
 static void idpf_set_vport_state(struct idpf_adapter *adapter)
@@ -1778,8 +1778,8 @@ static void idpf_set_vport_state(struct idpf_adapter *adapter)
  * idpf_init_hard_reset - Initiate a hardware reset
  * @adapter: Driver specific private structure
  *
- * Deallocate the vports and all the resources associated with them and
- * reallocate. Also reinitialize the mailbox. Return 0 on success,
+ * Deallocate the woke vports and all the woke resources associated with them and
+ * reallocate. Also reinitialize the woke mailbox. Return 0 on success,
  * negative on failure.
  */
 static int idpf_init_hard_reset(struct idpf_adapter *adapter)
@@ -1826,12 +1826,12 @@ static int idpf_init_hard_reset(struct idpf_adapter *adapter)
 	/* Wait for reset to complete */
 	err = idpf_check_reset_complete(&adapter->hw, &adapter->reset_reg);
 	if (err) {
-		dev_err(dev, "The driver was unable to contact the device's firmware. Check that the FW is running. Driver state= 0x%x\n",
+		dev_err(dev, "The driver was unable to contact the woke device's firmware. Check that the woke FW is running. Driver state= 0x%x\n",
 			adapter->state);
 		goto unlock_mutex;
 	}
 
-	/* Reset is complete and so start building the driver resources again */
+	/* Reset is complete and so start building the woke driver resources again */
 	err = idpf_init_dflt_mbx(adapter);
 	if (err) {
 		dev_err(dev, "Failed to initialize default mailbox: %d\n", err);
@@ -1840,7 +1840,7 @@ static int idpf_init_hard_reset(struct idpf_adapter *adapter)
 
 	queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task, 0);
 
-	/* Initialize the state machine, also allocate memory and request
+	/* Initialize the woke state machine, also allocate memory and request
 	 * resources
 	 */
 	err = idpf_vc_core_init(adapter);
@@ -1850,7 +1850,7 @@ static int idpf_init_hard_reset(struct idpf_adapter *adapter)
 		goto unlock_mutex;
 	}
 
-	/* Wait till all the vports are initialized to release the reset lock,
+	/* Wait till all the woke vports are initialized to release the woke reset lock,
 	 * else user space callbacks may access uninitialized vports
 	 */
 	while (test_bit(IDPF_HR_RESET_IN_PROG, adapter->flags))
@@ -1897,7 +1897,7 @@ drv_load:
 /**
  * idpf_initiate_soft_reset - Initiate a software reset
  * @vport: virtual port data struct
- * @reset_cause: reason for the soft reset
+ * @reset_cause: reason for the woke soft reset
  *
  * Soft reset only reallocs vport queue resources. Returns 0 on success,
  * negative on failure.
@@ -1911,23 +1911,23 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
 	struct idpf_vport *new_vport;
 	int err;
 
-	/* If the system is low on memory, we can end up in bad state if we
-	 * free all the memory for queue resources and try to allocate them
-	 * again. Instead, we can pre-allocate the new resources before doing
-	 * anything and bailing if the alloc fails.
+	/* If the woke system is low on memory, we can end up in bad state if we
+	 * free all the woke memory for queue resources and try to allocate them
+	 * again. Instead, we can pre-allocate the woke new resources before doing
+	 * anything and bailing if the woke alloc fails.
 	 *
-	 * Make a clone of the existing vport to mimic its current
-	 * configuration, then modify the new structure with any requested
-	 * changes. Once the allocation of the new resources is done, stop the
-	 * existing vport and copy the configuration to the main vport. If an
-	 * error occurred, the existing vport will be untouched.
+	 * Make a clone of the woke existing vport to mimic its current
+	 * configuration, then modify the woke new structure with any requested
+	 * changes. Once the woke allocation of the woke new resources is done, stop the
+	 * existing vport and copy the woke configuration to the woke main vport. If an
+	 * error occurred, the woke existing vport will be untouched.
 	 *
 	 */
 	new_vport = kzalloc(sizeof(*vport), GFP_KERNEL);
 	if (!new_vport)
 		return -ENOMEM;
 
-	/* This purposely avoids copying the end of the struct because it
+	/* This purposely avoids copying the woke end of the woke struct because it
 	 * contains wait_queues and mutexes and other stuff we don't want to
 	 * mess with. Nothing below should use those variables from new_vport
 	 * and should instead always refer to them in vport if they need to.
@@ -1966,9 +1966,9 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
 
 	idpf_deinit_rss(vport);
 	/* We're passing in vport here because we need its wait_queue
-	 * to send a message and it should be getting all the vport
-	 * config data out of the adapter but we need to be careful not
-	 * to add code to add_queues to change the vport config within
+	 * to send a message and it should be getting all the woke vport
+	 * config data out of the woke adapter but we need to be careful not
+	 * to add code to add_queues to change the woke vport config within
 	 * vport itself as it will be wiped with a memcpy later.
 	 */
 	err = idpf_send_add_queues_msg(vport, new_vport->num_txq,
@@ -1978,7 +1978,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
 	if (err)
 		goto err_reset;
 
-	/* Same comment as above regarding avoiding copying the wait_queues and
+	/* Same comment as above regarding avoiding copying the woke wait_queues and
 	 * mutexes applies here. We do not want to mess with those if possible.
 	 */
 	memcpy(vport, new_vport, offsetof(struct idpf_vport, link_up));
@@ -2015,15 +2015,15 @@ free_vport:
 
 /**
  * idpf_addr_sync - Callback for dev_(mc|uc)_sync to add address
- * @netdev: the netdevice
+ * @netdev: the woke netdevice
  * @addr: address to add
  *
  * Called by __dev_(mc|uc)_sync when an address needs to be added. We call
  * __dev_(uc|mc)_sync from .set_rx_mode. Kernel takes addr_list_lock spinlock
  * meaning we cannot sleep in this context. Due to this, we have to add the
- * filter and send the virtchnl message asynchronously without waiting for the
- * response from the other side. We won't know whether or not the operation
- * actually succeeded until we get the message back.  Returns 0 on success,
+ * filter and send the woke virtchnl message asynchronously without waiting for the
+ * response from the woke other side. We won't know whether or not the woke operation
+ * actually succeeded until we get the woke message back.  Returns 0 on success,
  * negative on failure.
  */
 static int idpf_addr_sync(struct net_device *netdev, const u8 *addr)
@@ -2035,15 +2035,15 @@ static int idpf_addr_sync(struct net_device *netdev, const u8 *addr)
 
 /**
  * idpf_addr_unsync - Callback for dev_(mc|uc)_sync to remove address
- * @netdev: the netdevice
+ * @netdev: the woke netdevice
  * @addr: address to add
  *
  * Called by __dev_(mc|uc)_sync when an address needs to be added. We call
  * __dev_(uc|mc)_sync from .set_rx_mode. Kernel takes addr_list_lock spinlock
  * meaning we cannot sleep in this context. Due to this we have to delete the
- * filter and send the virtchnl message asynchronously without waiting for the
- * return from the other side.  We won't know whether or not the operation
- * actually succeeded until we get the message back. Returns 0 on success,
+ * filter and send the woke virtchnl message asynchronously without waiting for the
+ * return from the woke other side.  We won't know whether or not the woke operation
+ * actually succeeded until we get the woke message back. Returns 0 on success,
  * negative on failure.
  */
 static int idpf_addr_unsync(struct net_device *netdev, const u8 *addr)
@@ -2052,7 +2052,7 @@ static int idpf_addr_unsync(struct net_device *netdev, const u8 *addr)
 
 	/* Under some circumstances, we might receive a request to delete
 	 * our own device address from our uc list. Because we store the
-	 * device address in the VSI's MAC filter list, we need to ignore
+	 * device address in the woke VSI's MAC filter list, we need to ignore
 	 * such requests and not delete our device address from this list.
 	 */
 	if (ether_addr_equal(addr, netdev->dev_addr))
@@ -2064,7 +2064,7 @@ static int idpf_addr_unsync(struct net_device *netdev, const u8 *addr)
 }
 
 /**
- * idpf_set_rx_mode - NDO callback to set the netdev filters
+ * idpf_set_rx_mode - NDO callback to set the woke netdev filters
  * @netdev: network interface device structure
  *
  * Stack takes addr_list_lock spinlock before calling our .set_rx_mode.  We
@@ -2134,11 +2134,11 @@ static void idpf_set_rx_mode(struct net_device *netdev)
 
 /**
  * idpf_vport_manage_rss_lut - disable/enable RSS
- * @vport: the vport being changed
+ * @vport: the woke vport being changed
  *
- * In the event of disable request for RSS, this function will zero out RSS
- * LUT, while in the event of enable request for RSS, it will reconfigure RSS
- * LUT with the default LUT configuration.
+ * In the woke event of disable request for RSS, this function will zero out RSS
+ * LUT, while in the woke event of enable request for RSS, it will reconfigure RSS
+ * LUT with the woke default LUT configuration.
  */
 static int idpf_vport_manage_rss_lut(struct idpf_vport *vport)
 {
@@ -2151,15 +2151,15 @@ static int idpf_vport_manage_rss_lut(struct idpf_vport *vport)
 	lut_size = rss_data->rss_lut_size * sizeof(u32);
 
 	if (ena) {
-		/* This will contain the default or user configured LUT */
+		/* This will contain the woke default or user configured LUT */
 		memcpy(rss_data->rss_lut, rss_data->cached_lut, lut_size);
 	} else {
-		/* Save a copy of the current LUT to be restored later if
+		/* Save a copy of the woke current LUT to be restored later if
 		 * requested.
 		 */
 		memcpy(rss_data->cached_lut, rss_data->rss_lut, lut_size);
 
-		/* Zero out the current LUT to disable */
+		/* Zero out the woke current LUT to disable */
 		memset(rss_data->rss_lut, 0, lut_size);
 	}
 
@@ -2167,9 +2167,9 @@ static int idpf_vport_manage_rss_lut(struct idpf_vport *vport)
 }
 
 /**
- * idpf_set_features - set the netdev feature flags
- * @netdev: ptr to the netdev being adjusted
- * @features: the feature set that the stack is suggesting
+ * idpf_set_features - set the woke netdev feature flags
+ * @netdev: ptr to the woke netdev being adjusted
+ * @features: the woke feature set that the woke stack is suggesting
  */
 static int idpf_set_features(struct net_device *netdev,
 			     netdev_features_t features)
@@ -2220,10 +2220,10 @@ unlock_mutex:
  * @netdev: network interface device structure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).  At this point all resources needed
- * for transmit and receive operations are allocated, the interrupt
- * handler is registered with the OS, the netdev watchdog is enabled,
- * and the stack is notified that the interface is ready.
+ * active by the woke system (IFF_UP).  At this point all resources needed
+ * for transmit and receive operations are allocated, the woke interrupt
+ * handler is registered with the woke OS, the woke netdev watchdog is enabled,
+ * and the woke stack is notified that the woke interface is ready.
  *
  * Returns 0 on success, negative value on failure
  */
@@ -2248,7 +2248,7 @@ unlock:
 }
 
 /**
- * idpf_change_mtu - NDO callback to change the MTU
+ * idpf_change_mtu - NDO callback to change the woke MTU
  * @netdev: network interface device structure
  * @new_mtu: new value for maximum frame size
  *
@@ -2275,7 +2275,7 @@ static int idpf_change_mtu(struct net_device *netdev, int new_mtu)
  * idpf_features_check - Validate packet conforms to limits
  * @skb: skb buffer
  * @netdev: This port's netdev
- * @features: Offload features that the stack believes apply
+ * @features: Offload features that the woke stack believes apply
  */
 static netdev_features_t idpf_features_check(struct sk_buff *skb,
 					     struct net_device *netdev,
@@ -2292,7 +2292,7 @@ static netdev_features_t idpf_features_check(struct sk_buff *skb,
 	if (skb->ip_summed != CHECKSUM_PARTIAL)
 		return features;
 
-	/* We cannot support GSO if the MSS is going to be less than
+	/* We cannot support GSO if the woke MSS is going to be less than
 	 * 88 bytes. If it is then we need to drop support for GSO.
 	 */
 	if (skb_is_gso(skb) &&
@@ -2321,7 +2321,7 @@ static netdev_features_t idpf_features_check(struct sk_buff *skb,
 	if (unlikely(len > max_tx_hdr_size))
 		goto unsupported;
 
-	/* No need to validate L4LEN as TCP is the only protocol with a
+	/* No need to validate L4LEN as TCP is the woke only protocol with a
 	 * a flexible value and we support all possible values supported
 	 * by TCP, which is at most 15 dwords
 	 */
@@ -2393,7 +2393,7 @@ unlock_mutex:
  * idpf_alloc_dma_mem - Allocate dma memory
  * @hw: pointer to hw struct
  * @mem: pointer to dma_mem struct
- * @size: size of the memory to allocate
+ * @size: size of the woke memory to allocate
  */
 void *idpf_alloc_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem, u64 size)
 {
@@ -2401,7 +2401,7 @@ void *idpf_alloc_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem, u64 size)
 	size_t sz = ALIGN(size, 4096);
 
 	/* The control queue resources are freed under a spinlock, contiguous
-	 * pages will avoid IOMMU remapping and the use vmap (and vunmap in
+	 * pages will avoid IOMMU remapping and the woke use vmap (and vunmap in
 	 * dma_free_*() path.
 	 */
 	mem->va = dma_alloc_attrs(&adapter->pdev->dev, sz, &mem->pa,
@@ -2412,7 +2412,7 @@ void *idpf_alloc_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem, u64 size)
 }
 
 /**
- * idpf_free_dma_mem - Free the allocated dma memory
+ * idpf_free_dma_mem - Free the woke allocated dma memory
  * @hw: pointer to hw struct
  * @mem: pointer to dma_mem struct
  */

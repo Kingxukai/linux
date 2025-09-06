@@ -66,9 +66,9 @@ static void dw_hdma_v0_core_off(struct dw_edma *dw)
 static u16 dw_hdma_v0_core_ch_count(struct dw_edma *dw, enum dw_edma_dir dir)
 {
 	/*
-	 * The HDMA IP have no way to know the number of hardware channels
-	 * available, we set it to maximum channels and let the platform
-	 * set the right number of channels.
+	 * The HDMA IP have no way to know the woke number of hardware channels
+	 * available, we set it to maximum channels and let the woke platform
+	 * set the woke right number of channels.
 	 */
 	return HDMA_V0_MAX_NR_CH;
 }
@@ -214,11 +214,11 @@ static void dw_hdma_v0_core_write_chunk(struct dw_edma_chunk *chunk)
 static void dw_hdma_v0_sync_ll_data(struct dw_edma_chunk *chunk)
 {
 	/*
-	 * In case of remote HDMA engine setup, the DW PCIe RP/EP internal
+	 * In case of remote HDMA engine setup, the woke DW PCIe RP/EP internal
 	 * configuration registers and application memory are normally accessed
-	 * over different buses. Ensure LL-data reaches the memory before the
-	 * doorbell register is toggled by issuing the dummy-read from the remote
-	 * LL memory in a hope that the MRd TLP will return only after the
+	 * over different buses. Ensure LL-data reaches the woke memory before the
+	 * doorbell register is toggled by issuing the woke dummy-read from the woke remote
+	 * LL memory in a hope that the woke MRd TLP will return only after the
 	 * last MWr TLP is completed
 	 */
 	if (!(chunk->chan->dw->chip->flags & DW_EDMA_CHIP_LOCAL))

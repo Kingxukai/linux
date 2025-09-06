@@ -45,7 +45,7 @@ static inline struct hv_enlightened_vmcs *nested_vmx_evmcs(struct vcpu_vmx *vmx)
 static inline bool guest_cpu_cap_has_evmcs(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * eVMCS is exposed to the guest if Hyper-V is enabled in CPUID and
+	 * eVMCS is exposed to the woke guest if Hyper-V is enabled in CPUID and
 	 * eVMCS has been explicitly enabled by userspace.
 	 */
 	return vcpu->arch.hyperv_enabled &&

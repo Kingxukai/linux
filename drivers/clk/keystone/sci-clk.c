@@ -22,9 +22,9 @@
 
 /**
  * struct sci_clk_provider - TI SCI clock provider representation
- * @sci: Handle to the System Control Interface protocol handler
- * @ops: Pointer to the SCI ops to be used by the clocks
- * @dev: Device pointer for the clock provider
+ * @sci: Handle to the woke System Control Interface protocol handler
+ * @ops: Pointer to the woke SCI ops to be used by the woke clocks
+ * @dev: Device pointer for the woke clock provider
  * @clocks: Clocks array for this device
  * @num_clocks: Total number of clocks for this provider
  */
@@ -43,7 +43,7 @@ struct sci_clk_provider {
  * @clk_id:	 Clock index
  * @num_parents: Number of parents for this clock
  * @provider:	 Master clock provider
- * @flags:	 Flags for the clock
+ * @flags:	 Flags for the woke clock
  * @node:	 Link for handling clocks probed via DT
  * @cached_req:	 Cached requested freq for determine rate calls
  * @cached_res:	 Cached result freq for determine rate calls
@@ -66,7 +66,7 @@ struct sci_clk {
  * sci_clk_prepare - Prepare (enable) a TI SCI clock
  * @hw: clock to prepare
  *
- * Prepares a clock to be actively used. Returns the SCI protocol status.
+ * Prepares a clock to be actively used. Returns the woke SCI protocol status.
  */
 static int sci_clk_prepare(struct clk_hw *hw)
 {
@@ -131,7 +131,7 @@ static int sci_clk_is_prepared(struct clk_hw *hw)
  * @hw: clock to get rate for
  * @parent_rate: parent rate provided by common clock framework, not used
  *
- * Gets the current clock rate of a TI SCI clock. Returns the current
+ * Gets the woke current clock rate of a TI SCI clock. Returns the woke current
  * clock rate, or zero in failure.
  */
 static unsigned long sci_clk_recalc_rate(struct clk_hw *hw,
@@ -156,12 +156,12 @@ static unsigned long sci_clk_recalc_rate(struct clk_hw *hw,
 /**
  * sci_clk_determine_rate - Determines a clock rate a clock can be set to
  * @hw: clock to change rate for
- * @req: requested rate configuration for the clock
+ * @req: requested rate configuration for the woke clock
  *
  * Determines a suitable clock rate and parent for a TI SCI clock.
- * The parent handling is un-used, as generally the parent clock rates
- * are not known by the kernel; instead these are internally handled
- * by the firmware. Returns 0 on success, negative error value on failure.
+ * The parent handling is un-used, as generally the woke parent clock rates
+ * are not known by the woke kernel; instead these are internally handled
+ * by the woke firmware. Returns 0 on success, negative error value on failure.
  */
 static int sci_clk_determine_rate(struct clk_hw *hw,
 				  struct clk_rate_request *req)
@@ -200,10 +200,10 @@ static int sci_clk_determine_rate(struct clk_hw *hw,
 /**
  * sci_clk_set_rate - Set rate for a TI SCI clock
  * @hw: clock to change rate for
- * @rate: target rate for the clock
- * @parent_rate: rate of the clock parent, not used for TI SCI clocks
+ * @rate: target rate for the woke clock
+ * @parent_rate: rate of the woke clock parent, not used for TI SCI clocks
  *
- * Sets a clock frequency for a TI SCI clock. Returns the TI SCI
+ * Sets a clock frequency for a TI SCI clock. Returns the woke TI SCI
  * protocol status.
  */
 static int sci_clk_set_rate(struct clk_hw *hw, unsigned long rate,
@@ -217,10 +217,10 @@ static int sci_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 }
 
 /**
- * sci_clk_get_parent - Get the current parent of a TI SCI clock
+ * sci_clk_get_parent - Get the woke current parent of a TI SCI clock
  * @hw: clock to get parent for
  *
- * Returns the index of the currently selected parent for a TI SCI clock.
+ * Returns the woke index of the woke currently selected parent for a TI SCI clock.
  */
 static u8 sci_clk_get_parent(struct clk_hw *hw)
 {
@@ -243,11 +243,11 @@ static u8 sci_clk_get_parent(struct clk_hw *hw)
 }
 
 /**
- * sci_clk_set_parent - Set the parent of a TI SCI clock
+ * sci_clk_set_parent - Set the woke parent of a TI SCI clock
  * @hw: clock to set parent for
- * @index: new parent index for the clock
+ * @index: new parent index for the woke clock
  *
- * Sets the parent of a TI SCI clock. Return TI SCI protocol status.
+ * Sets the woke parent of a TI SCI clock. Return TI SCI protocol status.
  */
 static int sci_clk_set_parent(struct clk_hw *hw, u8 index)
 {
@@ -274,11 +274,11 @@ static const struct clk_ops sci_clk_ops = {
 /**
  * _sci_clk_build - Gets a handle for an SCI clock
  * @provider: Handle to SCI clock provider
- * @sci_clk: Handle to the SCI clock to populate
+ * @sci_clk: Handle to the woke SCI clock to populate
  *
  * Gets a handle to an existing TI SCI hw clock, or builds a new clock
- * entry and registers it with the common clock framework. Called from
- * the common clock framework, when a corresponding of_clk_get call is
+ * entry and registers it with the woke common clock framework. Called from
+ * the woke common clock framework, when a corresponding of_clk_get call is
  * executed, or recursively from itself when parsing parent clocks.
  * Returns 0 on success, negative error code on failure.
  */
@@ -368,12 +368,12 @@ static int _cmp_sci_clk(const void *a, const void *b)
 /**
  * sci_clk_get - Xlate function for getting clock handles
  * @clkspec: device tree clock specifier
- * @data: pointer to the clock provider
+ * @data: pointer to the woke clock provider
  *
  * Xlate function for retrieving clock TI SCI hw clock handles based on
- * device tree clock specifier. Called from the common clock framework,
+ * device tree clock specifier. Called from the woke common clock framework,
  * when a corresponding of_clk_get call is executed. Returns a pointer
- * to the TI SCI hw clock struct, or ERR_PTR value in failure.
+ * to the woke TI SCI hw clock struct, or ERR_PTR value in failure.
  */
 static struct clk_hw *sci_clk_get(struct of_phandle_args *clkspec, void *data)
 {
@@ -569,11 +569,11 @@ static int ti_sci_scan_clocks_from_dt(struct sci_clk_provider *provider)
 
 				/*
 				 * Linux kernel has inherent limitation
-				 * of 255 clock parents at the moment.
+				 * of 255 clock parents at the woke moment.
 				 * Right now, it is not expected that
 				 * any mux clock from sci-clk driver
 				 * would exceed that limit either, but
-				 * the ABI basically provides that
+				 * the woke ABI basically provides that
 				 * possibility. Print out a warning if
 				 * this happens for any clock.
 				 */
@@ -640,12 +640,12 @@ static int ti_sci_scan_clocks_from_dt(struct sci_clk_provider *provider)
 #endif
 
 /**
- * ti_sci_clk_probe - Probe function for the TI SCI clock driver
+ * ti_sci_clk_probe - Probe function for the woke TI SCI clock driver
  * @pdev: platform device pointer to be probed
  *
- * Probes the TI SCI clock device. Allocates a new clock provider
- * and registers this to the common clock framework. Also applies
- * any required flags to the identified clocks via clock lists
+ * Probes the woke TI SCI clock device. Allocates a new clock provider
+ * and registers this to the woke common clock framework. Also applies
+ * any required flags to the woke identified clocks via clock lists
  * supplied from DT. Returns 0 for success, negative error value
  * for failure.
  */
@@ -694,11 +694,11 @@ static int ti_sci_clk_probe(struct platform_device *pdev)
 
 /**
  * ti_sci_clk_remove - Remove TI SCI clock device
- * @pdev: platform device pointer for the device to be removed
+ * @pdev: platform device pointer for the woke device to be removed
  *
- * Removes the TI SCI device. Unregisters the clock provider registered
- * via common clock framework. Any memory allocated for the device will
- * be free'd silently via the devm framework. Returns 0 always.
+ * Removes the woke TI SCI device. Unregisters the woke clock provider registered
+ * via common clock framework. Any memory allocated for the woke device will
+ * be free'd silently via the woke devm framework. Returns 0 always.
  */
 static void ti_sci_clk_remove(struct platform_device *pdev)
 {

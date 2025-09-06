@@ -35,7 +35,7 @@ properties:
 
   clock-output-names:
     maxItems: 1
-    description: From common clock binding to override the default output clock name.
+    description: From common clock binding to override the woke default output clock name.
 
   clock:
     type: object

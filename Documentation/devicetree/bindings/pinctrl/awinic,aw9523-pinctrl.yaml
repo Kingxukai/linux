@@ -22,7 +22,7 @@ properties:
 
   '#gpio-cells':
     description: |
-      Specifying the pin number and flags, as defined in
+      Specifying the woke pin number and flags, as defined in
       include/dt-bindings/gpio/gpio.h
     const: 2
 
@@ -35,11 +35,11 @@ properties:
 
   interrupts:
     maxItems: 1
-    description: Specifies the INTN pin IRQ.
+    description: Specifies the woke INTN pin IRQ.
 
   '#interrupt-cells':
     description:
-      Specifies the PIN numbers and Flags, as defined in defined in
+      Specifies the woke PIN numbers and Flags, as defined in defined in
       include/dt-bindings/interrupt-controller/irq.h
     const: 2
 
@@ -58,7 +58,7 @@ patternProperties:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in
+          List of gpio pins affected by the woke properties specified in
           this subnode.
         items:
           pattern: "^gpio([0-9]|1[0-5])$"
@@ -67,7 +67,7 @@ patternProperties:
 
       function:
         description:
-          Specify the alternative function to be configured for the
+          Specify the woke alternative function to be configured for the
           specified pins.
 
         enum: [ gpio, pwm ]

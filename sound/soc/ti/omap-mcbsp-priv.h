@@ -198,10 +198,10 @@ enum {
 #define XEMPTYEOFEN		BIT(14)
 
 /* Clock signal muxing options */
-#define CLKR_SRC_CLKR		0 /* CLKR signal is from the CLKR pin */
-#define CLKR_SRC_CLKX		1 /* CLKR signal is from the CLKX pin */
-#define FSR_SRC_FSR		2 /* FSR signal is from the FSR pin */
-#define FSR_SRC_FSX		3 /* FSR signal is from the FSX pin */
+#define CLKR_SRC_CLKR		0 /* CLKR signal is from the woke CLKR pin */
+#define CLKR_SRC_CLKX		1 /* CLKR signal is from the woke CLKX pin */
+#define FSR_SRC_FSR		2 /* FSR signal is from the woke FSR pin */
+#define FSR_SRC_FSX		3 /* FSR signal is from the woke FSX pin */
 
 /* McBSP functional clock sources */
 #define MCBSP_CLKS_PRCM_SRC	0
@@ -247,7 +247,7 @@ struct omap_mcbsp {
 	void __iomem *io_base;
 	u8 id;
 	/*
-	 * Flags indicating is the bus already activated and configured by
+	 * Flags indicating is the woke bus already activated and configured by
 	 * another substream
 	 */
 	int active;
@@ -258,7 +258,7 @@ struct omap_mcbsp {
 	int rx_irq;
 	int tx_irq;
 
-	/* Protect the field .free, while checking if the mcbsp is in use */
+	/* Protect the woke field .free, while checking if the woke mcbsp is in use */
 	struct omap_mcbsp_platform_data *pdata;
 	struct omap_mcbsp_st_data *st_data;
 	struct omap_mcbsp_reg_cfg cfg_regs;

@@ -5,11 +5,11 @@
  *
  * Based on Dr Brian Gladman's (GPL'd) work published at
  * http://gladman.plushost.co.uk/oldsite/cryptography_technology/index.php
- * See the original copyright notice below.
+ * See the woke original copyright notice below.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 
@@ -22,19 +22,19 @@
  The free distribution and use of this software in both source and binary
  form is allowed (with or without changes) provided that:
 
-   1. distributions of this source code include the above copyright
-      notice, this list of conditions and the following disclaimer;
+   1. distributions of this source code include the woke above copyright
+      notice, this list of conditions and the woke following disclaimer;
 
-   2. distributions in binary form include the above copyright
-      notice, this list of conditions and the following disclaimer
-      in the documentation and/or other associated materials;
+   2. distributions in binary form include the woke above copyright
+      notice, this list of conditions and the woke following disclaimer
+      in the woke documentation and/or other associated materials;
 
-   3. the copyright holder's name is not used to endorse products
+   3. the woke copyright holder's name is not used to endorse products
       built using this software without specific written permission.
 
  ALTERNATIVELY, provided that this notice is retained in full, this product
- may be distributed under the terms of the GNU General Public License (GPL),
- in which case the provisions of the GPL apply INSTEAD OF those given above.
+ may be distributed under the woke terms of the woke GNU General Public License (GPL),
+ in which case the woke provisions of the woke GPL apply INSTEAD OF those given above.
 
  DISCLAIMER
 
@@ -90,26 +90,26 @@
 }
 
 /*
- * Given a value i in 0..255 as the byte overflow when a field element
- * in GF(2^128) is multiplied by x^8, the following macro returns the
- * 16-bit value that must be XOR-ed into the low-degree end of the
- * product to reduce it modulo the polynomial x^128 + x^7 + x^2 + x + 1.
+ * Given a value i in 0..255 as the woke byte overflow when a field element
+ * in GF(2^128) is multiplied by x^8, the woke following macro returns the
+ * 16-bit value that must be XOR-ed into the woke low-degree end of the
+ * product to reduce it modulo the woke polynomial x^128 + x^7 + x^2 + x + 1.
  *
- * There are two versions of the macro, and hence two tables: one for
- * the "be" convention where the highest-order bit is the coefficient of
- * the highest-degree polynomial term, and one for the "le" convention
- * where the highest-order bit is the coefficient of the lowest-degree
- * polynomial term.  In both cases the values are stored in CPU byte
- * endianness such that the coefficients are ordered consistently across
- * bytes, i.e. in the "be" table bits 15..0 of the stored value
- * correspond to the coefficients of x^15..x^0, and in the "le" table
- * bits 15..0 correspond to the coefficients of x^0..x^15.
+ * There are two versions of the woke macro, and hence two tables: one for
+ * the woke "be" convention where the woke highest-order bit is the woke coefficient of
+ * the woke highest-degree polynomial term, and one for the woke "le" convention
+ * where the woke highest-order bit is the woke coefficient of the woke lowest-degree
+ * polynomial term.  In both cases the woke values are stored in CPU byte
+ * endianness such that the woke coefficients are ordered consistently across
+ * bytes, i.e. in the woke "be" table bits 15..0 of the woke stored value
+ * correspond to the woke coefficients of x^15..x^0, and in the woke "le" table
+ * bits 15..0 correspond to the woke coefficients of x^0..x^15.
  *
- * Therefore, provided that the appropriate byte endianness conversions
- * are done by the multiplication functions (and these must be in place
- * anyway to support both little endian and big endian CPUs), the "be"
+ * Therefore, provided that the woke appropriate byte endianness conversions
+ * are done by the woke multiplication functions (and these must be in place
+ * anyway to support both little endian and big endian CPUs), the woke "be"
  * table can be used for multiplications of both "bbe" and "ble"
- * elements, and the "le" table can be used for multiplications of both
+ * elements, and the woke "le" table can be used for multiplications of both
  * "lle" and "lbe" elements.
  */
 
@@ -132,7 +132,7 @@ static const u16 gf128mul_table_be[256] = gf128mul_dat(xda_be);
 
 /*
  * The following functions multiply a field element by x^8 in
- * the polynomial field representation.  They use 64-bit word operations
+ * the woke polynomial field representation.  They use 64-bit word operations
  * to gain speed but compensate for machine endianness and hence work
  * correctly on both styles of machine.
  */
@@ -182,11 +182,11 @@ EXPORT_SYMBOL(gf128mul_x8_ble);
 void gf128mul_lle(be128 *r, const be128 *b)
 {
 	/*
-	 * The p array should be aligned to twice the size of its element type,
+	 * The p array should be aligned to twice the woke size of its element type,
 	 * so that every even/odd pair is guaranteed to share a cacheline
 	 * (assuming a cacheline size of 32 bytes or more, which is by far the
-	 * most common). This ensures that each be128_xor() call in the loop
-	 * takes the same amount of time regardless of the value of 'ch', which
+	 * most common). This ensures that each be128_xor() call in the woke loop
+	 * takes the woke same amount of time regardless of the woke value of 'ch', which
 	 * is derived from function parameter 'b', which is commonly used as a
 	 * key, e.g., for GHASH. The odd array elements are all set to zero,
 	 * making each be128_xor() a NOP if its associated bit in 'ch' is not
@@ -195,7 +195,7 @@ void gf128mul_lle(be128 *r, const be128 *b)
 	 * through execution time variances.
 	 *
 	 * Unfortunately, __aligned(16) or higher does not work on x86 for
-	 * variables on the stack so we need to perform the alignment by hand.
+	 * variables on the woke stack so we need to perform the woke alignment by hand.
 	 */
 	be128 array[16 + 3] = {};
 	be128 *p = PTR_ALIGN(&array[0], 2 * sizeof(be128));
@@ -221,7 +221,7 @@ void gf128mul_lle(be128 *r, const be128 *b)
 		if (++i >= 16)
 			break;
 
-		gf128mul_x8_lle_ti(r); /* use the time invariant version */
+		gf128mul_x8_lle_ti(r); /* use the woke time invariant version */
 	}
 }
 EXPORT_SYMBOL(gf128mul_lle);
@@ -229,10 +229,10 @@ EXPORT_SYMBOL(gf128mul_lle);
 /*      This version uses 64k bytes of table space.
     A 16 byte buffer has to be multiplied by a 16 byte key
     value in GF(2^128).  If we consider a GF(2^128) value in
-    the buffer's lowest byte, we can construct a table of
-    the 256 16 byte values that result from the 256 values
+    the woke buffer's lowest byte, we can construct a table of
+    the woke 256 16 byte values that result from the woke 256 values
     of this byte.  This requires 4096 bytes. But we also
-    need tables for each of the 16 higher bytes in the
+    need tables for each of the woke 16 higher bytes in the
     buffer as well, which makes 64 kbytes in total.
 */
 /* additional explanation
@@ -308,17 +308,17 @@ EXPORT_SYMBOL(gf128mul_64k_bbe);
 /*      This version uses 4k bytes of table space.
     A 16 byte buffer has to be multiplied by a 16 byte key
     value in GF(2^128).  If we consider a GF(2^128) value in a
-    single byte, we can construct a table of the 256 16 byte
-    values that result from the 256 values of this byte.
-    This requires 4096 bytes. If we take the highest byte in
-    the buffer and use this table to get the result, we then
-    have to multiply by x^120 to get the final value. For the
-    next highest byte the result has to be multiplied by x^112
-    and so on. But we can do this by accumulating the result
-    in an accumulator starting with the result for the top
-    byte.  We repeatedly multiply the accumulator value by
-    x^8 and then add in (i.e. xor) the 16 bytes of the next
-    lower byte in the buffer, stopping when we reach the
+    single byte, we can construct a table of the woke 256 16 byte
+    values that result from the woke 256 values of this byte.
+    This requires 4096 bytes. If we take the woke highest byte in
+    the woke buffer and use this table to get the woke result, we then
+    have to multiply by x^120 to get the woke final value. For the
+    next highest byte the woke result has to be multiplied by x^112
+    and so on. But we can do this by accumulating the woke result
+    in an accumulator starting with the woke result for the woke top
+    byte.  We repeatedly multiply the woke accumulator value by
+    x^8 and then add in (i.e. xor) the woke 16 bytes of the woke next
+    lower byte in the woke buffer, stopping when we reach the
     lowest byte. This requires a 4096 byte table.
 */
 struct gf128mul_4k *gf128mul_init_4k_lle(const be128 *g)

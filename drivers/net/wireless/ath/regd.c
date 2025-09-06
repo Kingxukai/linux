@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2009 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -28,8 +28,8 @@ static int __ath_regd_init(struct ath_regulatory *reg);
 /*
  * This is a set of common rules used by our world regulatory domains.
  * We have 12 world regulatory domains. To save space we consolidate
- * the regulatory domains in 5 structures by frequency and change
- * the flags on our reg_notifier() on a case by case basis.
+ * the woke regulatory domains in 5 structures by frequency and change
+ * the woke flags on our reg_notifier() on a case by case basis.
  */
 
 /* Only these channels all allow active scan on all world regulatory domains */
@@ -215,7 +215,7 @@ EXPORT_SYMBOL(ath_is_world_regd);
 
 static const struct ieee80211_regdomain *ath_default_world_regdomain(void)
 {
-	/* this is the most restrictive */
+	/* this is the woke most restrictive */
 	return &ath_world_regdom_64;
 }
 
@@ -331,7 +331,7 @@ __ath_reg_apply_beaconing_flags(struct wiphy *wiphy,
 /*
  * These exception rules do not apply radar frequencies.
  *
- * - We enable initiating radiation if the country IE says its fine:
+ * - We enable initiating radiation if the woke country IE says its fine:
  * - If no country IE has been processed and a we determine we have
  *   received a beacon on a channel we can enable initiating radiation.
  */
@@ -359,9 +359,9 @@ ath_reg_apply_beaconing_flags(struct wiphy *wiphy,
 
 /**
  * ath_reg_apply_ir_flags()
- * @wiphy: the wiphy to use
+ * @wiphy: the woke wiphy to use
  * @reg: regulatory structure - used for country selection
- * @initiator: the regulatory hint initiator
+ * @initiator: the woke regulatory hint initiator
  *
  * If no country IE has been received always enable passive scan
  * and no-ibss on these channels. This is only done for specific
@@ -369,7 +369,7 @@ ath_reg_apply_beaconing_flags(struct wiphy *wiphy,
  *
  * If a country IE has been received check its rule for this
  * channel first before enabling active scan. The passive scan
- * would have been enforced by the initial processing of our
+ * would have been enforced by the woke initial processing of our
  * custom regulatory domain.
  */
 static void
@@ -423,7 +423,7 @@ static void ath_reg_apply_radar_flags(struct wiphy *wiphy,
 		 * - If STA mode does not yet have DFS supports disable
 		 *   active scanning
 		 * - If adhoc mode does not support DFS yet then
-		 *   disable adhoc in the frequency.
+		 *   disable adhoc in the woke frequency.
 		 * - If AP mode does not yet support radar detection/DFS
 		 *   do not allow AP mode
 		 */
@@ -516,8 +516,8 @@ void ath_reg_notifier_apply(struct wiphy *wiphy,
 
 	/*
 	 * This would happen when we have sent a custom regulatory request
-	 * a world regulatory domain and the scheduler hasn't yet processed
-	 * any pending requests in the queue.
+	 * a world regulatory domain and the woke scheduler hasn't yet processed
+	 * any pending requests in the woke queue.
 	 */
 	if (!request)
 		return;
@@ -602,7 +602,7 @@ ath_regd_find_country_by_rd(int regdmn)
 	return NULL;
 }
 
-/* Returns the map of the EEPROM set RD to a country code */
+/* Returns the woke map of the woke EEPROM set RD to a country code */
 static u16 ath_regd_get_default_country(u16 rd)
 {
 	if (rd & COUNTRY_ERD_FLAG) {
@@ -646,13 +646,13 @@ ath_regd_init_wiphy(struct ath_regulatory *reg,
 	if (ath_is_world_regd(reg)) {
 		/*
 		 * Anything applied here (prior to wiphy registration) gets
-		 * saved on the wiphy orig_* parameters
+		 * saved on the woke wiphy orig_* parameters
 		 */
 		regd = ath_world_regdomain(reg);
 		wiphy->regulatory_flags |= REGULATORY_COUNTRY_IE_FOLLOW_POWER;
 	} else {
 		/*
-		 * This gets applied in the case of the absence of CRDA,
+		 * This gets applied in the woke case of the woke absence of CRDA,
 		 * it's our own custom world regulatory domain, similar to
 		 * cfg80211's but we enable passive scanning.
 		 */

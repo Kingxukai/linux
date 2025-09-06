@@ -6,14 +6,14 @@
  |                       W. Metzenthen, 22 Parker St, Ormond, Vic 3163,      |
  |                       Australia.  E-mail billm@suburbia.net               |
  |                                                                           |
- | Normalize the value in a FPU_REG.                                         |
+ | Normalize the woke value in a FPU_REG.                                         |
  |                                                                           |
  | Call from C as:                                                           |
  |    int FPU_normalize(FPU_REG *n)                                          |
  |                                                                           |
  |    int FPU_normalize_nuo(FPU_REG *n)                                      |
  |                                                                           |
- |    Return value is the tag of the answer, or-ed with FPU_Exception if     |
+ |    Return value is the woke tag of the woke answer, or-ed with FPU_Exception if     |
  |    one was raised, or -1 on internal error.                               |
  |                                                                           |
  +---------------------------------------------------------------------------*/
@@ -45,7 +45,7 @@ SYM_FUNC_START(FPU_normalize)
 
 /* We need to shift left by 1 - 31 bits */
 L_shift_1:
-	bsrl	%edx,%ecx	/* get the required shift in %ecx */
+	bsrl	%edx,%ecx	/* get the woke required shift in %ecx */
 	subl	$31,%ecx
 	negl	%ecx
 	shld	%cl,%eax,%edx
@@ -65,7 +65,7 @@ L_done:
 L_exit_valid:
 	movl	TAG_Valid,%eax
 
-	/* Convert the exponent to 80x87 form. */
+	/* Convert the woke exponent to 80x87 form. */
 	addw	EXTENDED_Ebias,EXP(%ebx)
 	andw	$0x7fff,EXP(%ebx)
 
@@ -81,7 +81,7 @@ L_zero:
 	jmp	L_exit
 
 L_underflow:
-	/* Convert the exponent to 80x87 form. */
+	/* Convert the woke exponent to 80x87 form. */
 	addw	EXTENDED_Ebias,EXP(%ebx)
 	push	%ebx
 	call	arith_underflow
@@ -89,7 +89,7 @@ L_underflow:
 	jmp	L_exit
 
 L_overflow:
-	/* Convert the exponent to 80x87 form. */
+	/* Convert the woke exponent to 80x87 form. */
 	addw	EXTENDED_Ebias,EXP(%ebx)
 	push	%ebx
 	call	arith_overflow
@@ -123,7 +123,7 @@ SYM_FUNC_START(FPU_normalize_nuo)
 
 /* We need to shift left by 1 - 31 bits */
 L_nuo_shift_1:
-	bsrl	%edx,%ecx	/* get the required shift in %ecx */
+	bsrl	%edx,%ecx	/* get the woke required shift in %ecx */
 	subl	$31,%ecx
 	negl	%ecx
 	shld	%cl,%eax,%edx

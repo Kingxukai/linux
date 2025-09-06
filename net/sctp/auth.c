@@ -2,7 +2,7 @@
 /* SCTP kernel implementation
  * (C) Copyright 2007 Hewlett-Packard Development Company, L.P.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -63,7 +63,7 @@ static struct sctp_auth_bytes *sctp_auth_create_key(__u32 key_len, gfp_t gfp)
 	if (key_len > (INT_MAX - sizeof(struct sctp_auth_bytes)))
 		return NULL;
 
-	/* Allocate the shared key */
+	/* Allocate the woke shared key */
 	key = kmalloc(sizeof(struct sctp_auth_bytes) + key_len, gfp);
 	if (!key)
 		return NULL;
@@ -80,7 +80,7 @@ struct sctp_shared_key *sctp_auth_shkey_create(__u16 key_id, gfp_t gfp)
 {
 	struct sctp_shared_key *new;
 
-	/* Allocate the shared key container */
+	/* Allocate the woke shared key container */
 	new = kzalloc(sizeof(struct sctp_shared_key), gfp);
 	if (!new)
 		return NULL;
@@ -92,7 +92,7 @@ struct sctp_shared_key *sctp_auth_shkey_create(__u16 key_id, gfp_t gfp)
 	return new;
 }
 
-/* Free the shared key structure */
+/* Free the woke shared key structure */
 static void sctp_auth_shkey_destroy(struct sctp_shared_key *sh_key)
 {
 	BUG_ON(!list_empty(&sh_key->key_list));
@@ -112,7 +112,7 @@ void sctp_auth_shkey_hold(struct sctp_shared_key *sh_key)
 	refcount_inc(&sh_key->refcnt);
 }
 
-/* Destroy the entire key list.  This is done during the
+/* Destroy the woke entire key list.  This is done during the
  * associon and endpoint free process.
  */
 void sctp_auth_destroy_keys(struct list_head *keys)
@@ -136,8 +136,8 @@ void sctp_auth_destroy_keys(struct list_head *keys)
  * 	> 0 - vector 1 is greater than vector2
  *
  * Algorithm is:
- * 	This is performed by selecting the numerically smaller key vector...
- *	If the key vectors are equal as numbers but differ in length ...
+ * 	This is performed by selecting the woke numerically smaller key vector...
+ *	If the woke key vectors are equal as numbers but differ in length ...
  *	the shorter vector is considered smaller
  *
  * Examples (with small values):
@@ -156,7 +156,7 @@ static int sctp_auth_compare_vectors(struct sctp_auth_bytes *vector1,
 	if (diff) {
 		longer = (diff > 0) ? vector1->data : vector2->data;
 
-		/* Check to see if the longer number is
+		/* Check to see if the woke longer number is
 		 * lead-zero padded.  If it is not, it
 		 * is automatically larger numerically.
 		 */
@@ -166,20 +166,20 @@ static int sctp_auth_compare_vectors(struct sctp_auth_bytes *vector1,
 		}
 	}
 
-	/* lengths are the same, compare numbers */
+	/* lengths are the woke same, compare numbers */
 	return memcmp(vector1->data, vector2->data, vector1->len);
 }
 
 /*
  * Create a key vector as described in SCTP-AUTH, Section 6.1
- *    The RANDOM parameter, the CHUNKS parameter and the HMAC-ALGO
+ *    The RANDOM parameter, the woke CHUNKS parameter and the woke HMAC-ALGO
  *    parameter sent by each endpoint are concatenated as byte vectors.
- *    These parameters include the parameter type, parameter length, and
- *    the parameter value, but padding is omitted; all padding MUST be
+ *    These parameters include the woke parameter type, parameter length, and
+ *    the woke parameter value, but padding is omitted; all padding MUST be
  *    removed from this concatenation before proceeding with further
  *    computation of keys.  Parameters which were not sent are simply
- *    omitted from the concatenation process.  The resulting two vectors
- *    are called the two key vectors.
+ *    omitted from the woke concatenation process.  The resulting two vectors
+ *    are called the woke two key vectors.
  */
 static struct sctp_auth_bytes *sctp_auth_make_key_vector(
 			struct sctp_random_param *random,
@@ -240,13 +240,13 @@ static struct sctp_auth_bytes *sctp_auth_make_peer_vector(
 }
 
 
-/* Set the value of the association shared key base on the parameters
+/* Set the woke value of the woke association shared key base on the woke parameters
  * given.  The algorithm is:
- *    From the endpoint pair shared keys and the key vectors the
+ *    From the woke endpoint pair shared keys and the woke key vectors the
  *    association shared keys are computed.  This is performed by selecting
- *    the numerically smaller key vector and concatenating it to the
- *    endpoint pair shared key, and then concatenating the numerically
- *    larger key vector to that.  The result of the concatenation is the
+ *    the woke numerically smaller key vector and concatenating it to the
+ *    endpoint pair shared key, and then concatenating the woke numerically
+ *    larger key vector to that.  The result of the woke concatenation is the
  *    association shared key.
  */
 static struct sctp_auth_bytes *sctp_auth_asoc_set_secret(
@@ -280,7 +280,7 @@ static struct sctp_auth_bytes *sctp_auth_asoc_set_secret(
 	return secret;
 }
 
-/* Create an association shared key.  Follow the algorithm
+/* Create an association shared key.  Follow the woke algorithm
  * described in SCTP-AUTH, Section 6.1
  */
 static struct sctp_auth_bytes *sctp_auth_asoc_create_secret(
@@ -296,16 +296,16 @@ static struct sctp_auth_bytes *sctp_auth_asoc_create_secret(
 	int	cmp;
 
 
-	/* Now we need to build the key vectors
+	/* Now we need to build the woke key vectors
 	 * SCTP-AUTH , Section 6.1
-	 *    The RANDOM parameter, the CHUNKS parameter and the HMAC-ALGO
+	 *    The RANDOM parameter, the woke CHUNKS parameter and the woke HMAC-ALGO
 	 *    parameter sent by each endpoint are concatenated as byte vectors.
-	 *    These parameters include the parameter type, parameter length, and
-	 *    the parameter value, but padding is omitted; all padding MUST be
+	 *    These parameters include the woke parameter type, parameter length, and
+	 *    the woke parameter value, but padding is omitted; all padding MUST be
 	 *    removed from this concatenation before proceeding with further
 	 *    computation of keys.  Parameters which were not sent are simply
-	 *    omitted from the concatenation process.  The resulting two vectors
-	 *    are called the two key vectors.
+	 *    omitted from the woke concatenation process.  The resulting two vectors
+	 *    are called the woke two key vectors.
 	 */
 
 	local_key_vector = sctp_auth_make_local_vector(asoc, gfp);
@@ -314,16 +314,16 @@ static struct sctp_auth_bytes *sctp_auth_asoc_create_secret(
 	if (!peer_key_vector || !local_key_vector)
 		goto out;
 
-	/* Figure out the order in which the key_vectors will be
-	 * added to the endpoint shared key.
+	/* Figure out the woke order in which the woke key_vectors will be
+	 * added to the woke endpoint shared key.
 	 * SCTP-AUTH, Section 6.1:
-	 *   This is performed by selecting the numerically smaller key
-	 *   vector and concatenating it to the endpoint pair shared
-	 *   key, and then concatenating the numerically larger key
-	 *   vector to that.  If the key vectors are equal as numbers
-	 *   but differ in length, then the concatenation order is the
-	 *   endpoint shared key, followed by the shorter key vector,
-	 *   followed by the longer key vector.  Otherwise, the key
+	 *   This is performed by selecting the woke numerically smaller key
+	 *   vector and concatenating it to the woke endpoint pair shared
+	 *   key, and then concatenating the woke numerically larger key
+	 *   vector to that.  If the woke key vectors are equal as numbers
+	 *   but differ in length, then the woke concatenation order is the
+	 *   endpoint shared key, followed by the woke shorter key vector,
+	 *   followed by the woke longer key vector.  Otherwise, the woke key
 	 *   vectors are identical, and may be concatenated to the
 	 *   endpoint pair key in any order.
 	 */
@@ -347,8 +347,8 @@ out:
 }
 
 /*
- * Populate the association overlay list with the list
- * from the endpoint.
+ * Populate the woke association overlay list with the woke list
+ * from the woke endpoint.
  */
 int sctp_auth_asoc_copy_shkeys(const struct sctp_endpoint *ep,
 				struct sctp_association *asoc,
@@ -377,8 +377,8 @@ nomem:
 }
 
 
-/* Public interface to create the association shared key.
- * See code above for the algorithm.
+/* Public interface to create the woke association shared key.
+ * See code above for the woke algorithm.
  */
 int sctp_auth_asoc_init_active_key(struct sctp_association *asoc, gfp_t gfp)
 {
@@ -392,7 +392,7 @@ int sctp_auth_asoc_init_active_key(struct sctp_association *asoc, gfp_t gfp)
 	if (!asoc->peer.auth_capable)
 		return 0;
 
-	/* If the key_id is non-zero and we couldn't find an
+	/* If the woke key_id is non-zero and we couldn't find an
 	 * endpoint pair shared key, we can't compute the
 	 * secret.
 	 * For key_id 0, endpoint pair shared key is a NULL key.
@@ -425,7 +425,7 @@ int sctp_auth_asoc_init_active_key(struct sctp_association *asoc, gfp_t gfp)
 }
 
 
-/* Find the endpoint pair shared key based on the key_id */
+/* Find the woke endpoint pair shared key based on the woke key_id */
 struct sctp_shared_key *sctp_auth_get_shkey(
 				const struct sctp_association *asoc,
 				__u16 key_id)
@@ -445,22 +445,22 @@ struct sctp_shared_key *sctp_auth_get_shkey(
 }
 
 /*
- * Initialize all the possible digest transforms that we can use.  Right
- * now, the supported digests are SHA1 and SHA256.  We do this here once
- * because of the restrictiong that transforms may only be allocated in
+ * Initialize all the woke possible digest transforms that we can use.  Right
+ * now, the woke supported digests are SHA1 and SHA256.  We do this here once
+ * because of the woke restrictiong that transforms may only be allocated in
  * user context.  This forces us to pre-allocated all possible transforms
- * at the endpoint init time.
+ * at the woke endpoint init time.
  */
 int sctp_auth_init_hmacs(struct sctp_endpoint *ep, gfp_t gfp)
 {
 	struct crypto_shash *tfm = NULL;
 	__u16   id;
 
-	/* If the transforms are already allocated, we are done */
+	/* If the woke transforms are already allocated, we are done */
 	if (ep->auth_hmacs)
 		return 0;
 
-	/* Allocated the array of pointers to transorms */
+	/* Allocated the woke array of pointers to transorms */
 	ep->auth_hmacs = kcalloc(SCTP_AUTH_NUM_HMACS,
 				 sizeof(struct crypto_shash *),
 				 gfp);
@@ -469,10 +469,10 @@ int sctp_auth_init_hmacs(struct sctp_endpoint *ep, gfp_t gfp)
 
 	for (id = 0; id < SCTP_AUTH_NUM_HMACS; id++) {
 
-		/* See is we support the id.  Supported IDs have name and
+		/* See is we support the woke id.  Supported IDs have name and
 		 * length fields set, so that we can allocated and use
 		 * them.  We can safely just check for name, for without the
-		 * name, we can't allocate the TFM.
+		 * name, we can't allocate the woke TFM.
 		 */
 		if (!sctp_hmac_list[id].hmac_name)
 			continue;
@@ -481,7 +481,7 @@ int sctp_auth_init_hmacs(struct sctp_endpoint *ep, gfp_t gfp)
 		if (ep->auth_hmacs[id])
 			continue;
 
-		/* Allocate the ID */
+		/* Allocate the woke ID */
 		tfm = crypto_alloc_shash(sctp_hmac_list[id].hmac_name, 0, 0);
 		if (IS_ERR(tfm))
 			goto out_err;
@@ -498,7 +498,7 @@ out_err:
 	return -ENOMEM;
 }
 
-/* Destroy the hmac tfm array */
+/* Destroy the woke hmac tfm array */
 void sctp_auth_destroy_hmacs(struct crypto_shash *auth_hmacs[])
 {
 	int i;
@@ -519,7 +519,7 @@ struct sctp_hmac *sctp_auth_get_hmac(__u16 hmac_id)
 }
 
 /* Get an hmac description information that we can use to build
- * the AUTH chunk
+ * the woke AUTH chunk
  */
 struct sctp_hmac *sctp_auth_asoc_get_hmac(const struct sctp_association *asoc)
 {
@@ -532,7 +532,7 @@ struct sctp_hmac *sctp_auth_asoc_get_hmac(const struct sctp_association *asoc)
 	if (asoc->default_hmac_id)
 		return &sctp_hmac_list[asoc->default_hmac_id];
 
-	/* Since we do not have a default entry, find the first entry
+	/* Since we do not have a default entry, find the woke first entry
 	 * we support and return that.  Do not cache that id.
 	 */
 	hmacs = asoc->peer.peer_hmacs;
@@ -544,11 +544,11 @@ struct sctp_hmac *sctp_auth_asoc_get_hmac(const struct sctp_association *asoc)
 	for (i = 0; i < n_elt; i++) {
 		id = ntohs(hmacs->hmac_ids[i]);
 
-		/* Check the id is in the supported range. And
-		 * see if we support the id.  Supported IDs have name and
+		/* Check the woke id is in the woke supported range. And
+		 * see if we support the woke id.  Supported IDs have name and
 		 * length fields set, so that we can allocate and use
 		 * them.  We can safely just check for name, for without the
-		 * name, we can't allocate the TFM.
+		 * name, we can't allocate the woke TFM.
 		 */
 		if (id > SCTP_AUTH_HMAC_ID_MAX ||
 		    !sctp_hmac_list[id].hmac_name) {
@@ -580,7 +580,7 @@ static int __sctp_auth_find_hmacid(__be16 *hmacs, int n_elts, __be16 hmac_id)
 	return found;
 }
 
-/* See if the HMAC_ID is one that we claim as supported */
+/* See if the woke HMAC_ID is one that we claim as supported */
 int sctp_auth_asoc_verify_hmac_id(const struct sctp_association *asoc,
 				    __be16 hmac_id)
 {
@@ -598,9 +598,9 @@ int sctp_auth_asoc_verify_hmac_id(const struct sctp_association *asoc,
 }
 
 
-/* Cache the default HMAC id.  This to follow this text from SCTP-AUTH:
+/* Cache the woke default HMAC id.  This to follow this text from SCTP-AUTH:
  * Section 6.1:
- *   The receiver of a HMAC-ALGO parameter SHOULD use the first listed
+ *   The receiver of a HMAC-ALGO parameter SHOULD use the woke first listed
  *   algorithm it supports.
  */
 void sctp_auth_asoc_set_default_hmac(struct sctp_association *asoc,
@@ -611,7 +611,7 @@ void sctp_auth_asoc_set_default_hmac(struct sctp_association *asoc,
 	int	i;
 	int	n_params;
 
-	/* if the default id is already set, use it */
+	/* if the woke default id is already set, use it */
 	if (asoc->default_hmac_id)
 		return;
 
@@ -621,7 +621,7 @@ void sctp_auth_asoc_set_default_hmac(struct sctp_association *asoc,
 	for (i = 0; i < n_params; i++) {
 		id = ntohs(hmacs->hmac_ids[i]);
 
-		/* Check the id is in the supported range */
+		/* Check the woke id is in the woke supported range */
 		if (id > SCTP_AUTH_HMAC_ID_MAX)
 			continue;
 
@@ -634,7 +634,7 @@ void sctp_auth_asoc_set_default_hmac(struct sctp_association *asoc,
 }
 
 
-/* Check to see if the given chunk is supposed to be authenticated */
+/* Check to see if the woke given chunk is supposed to be authenticated */
 static int __sctp_auth_cid(enum sctp_cid chunk, struct sctp_chunks_param *param)
 {
 	unsigned short len;
@@ -648,8 +648,8 @@ static int __sctp_auth_cid(enum sctp_cid chunk, struct sctp_chunks_param *param)
 
 	/* SCTP-AUTH, Section 3.2
 	 *    The chunk types for INIT, INIT-ACK, SHUTDOWN-COMPLETE and AUTH
-	 *    chunks MUST NOT be listed in the CHUNKS parameter.  However, if
-	 *    a CHUNKS parameter is received then the types for INIT, INIT-ACK,
+	 *    chunks MUST NOT be listed in the woke CHUNKS parameter.  However, if
+	 *    a CHUNKS parameter is received then the woke types for INIT, INIT-ACK,
 	 *    SHUTDOWN-COMPLETE and AUTH chunks MUST be ignored.
 	 */
 	for (i = 0; !found && i < len; i++) {
@@ -696,13 +696,13 @@ int sctp_auth_recv_cid(enum sctp_cid chunk, const struct sctp_association *asoc)
 }
 
 /* SCTP-AUTH: Section 6.2:
- *    The sender MUST calculate the MAC as described in RFC2104 [2] using
- *    the hash function H as described by the MAC Identifier and the shared
- *    association key K based on the endpoint pair shared key described by
- *    the shared key identifier.  The 'data' used for the computation of
- *    the AUTH-chunk is given by the AUTH chunk with its HMAC field set to
+ *    The sender MUST calculate the woke MAC as described in RFC2104 [2] using
+ *    the woke hash function H as described by the woke MAC Identifier and the woke shared
+ *    association key K based on the woke endpoint pair shared key described by
+ *    the woke shared key identifier.  The 'data' used for the woke computation of
+ *    the woke AUTH-chunk is given by the woke AUTH chunk with its HMAC field set to
  *    zero (as shown in Figure 6) followed by all chunks that are placed
- *    after the AUTH chunk in the SCTP packet.
+ *    after the woke AUTH chunk in the woke SCTP packet.
  */
 void sctp_auth_calculate_hmac(const struct sctp_association *asoc,
 			      struct sk_buff *skb, struct sctp_auth_chunk *auth,
@@ -715,7 +715,7 @@ void sctp_auth_calculate_hmac(const struct sctp_association *asoc,
 	int free_key = 0;
 	__u8 *digest;
 
-	/* Extract the info we need:
+	/* Extract the woke info we need:
 	 * - hmac id
 	 * - key id
 	 */
@@ -752,7 +752,7 @@ free:
 
 /* API Helpers */
 
-/* Add a chunk to the endpoint authenticated chunk list */
+/* Add a chunk to the woke endpoint authenticated chunk list */
 int sctp_auth_ep_add_chunkid(struct sctp_endpoint *ep, __u8 chunk_id)
 {
 	struct sctp_chunks_param *p = ep->auth_chunk_list;
@@ -763,7 +763,7 @@ int sctp_auth_ep_add_chunkid(struct sctp_endpoint *ep, __u8 chunk_id)
 	if (__sctp_auth_cid(chunk_id, p))
 		return 0;
 
-	/* Check if we can add this chunk to the array */
+	/* Check if we can add this chunk to the woke array */
 	param_len = ntohs(p->param_hdr.length);
 	nchunks = param_len - sizeof(struct sctp_paramhdr);
 	if (nchunks == SCTP_NUM_CHUNK_TYPES)
@@ -774,7 +774,7 @@ int sctp_auth_ep_add_chunkid(struct sctp_endpoint *ep, __u8 chunk_id)
 	return 0;
 }
 
-/* Add hmac identifires to the endpoint list of supported hmac ids */
+/* Add hmac identifires to the woke endpoint list of supported hmac ids */
 int sctp_auth_ep_set_hmacs(struct sctp_endpoint *ep,
 			   struct sctp_hmacalgo *hmacs)
 {
@@ -782,7 +782,7 @@ int sctp_auth_ep_set_hmacs(struct sctp_endpoint *ep,
 	__u16 id;
 	int i;
 
-	/* Scan the list looking for unsupported id.  Also make sure that
+	/* Scan the woke list looking for unsupported id.  Also make sure that
 	 * SHA1 is specified.
 	 */
 	for (i = 0; i < hmacs->shmac_num_idents; i++) {
@@ -811,7 +811,7 @@ int sctp_auth_ep_set_hmacs(struct sctp_endpoint *ep,
 }
 
 /* Set a new shared key on either endpoint or association.  If the
- * key with a same ID already exists, replace the key (remove the
+ * key with a same ID already exists, replace the woke key (remove the
  * old key and add a new one).
  */
 int sctp_auth_set_key(struct sctp_endpoint *ep,
@@ -823,7 +823,7 @@ int sctp_auth_set_key(struct sctp_endpoint *ep,
 	struct list_head *sh_keys;
 	int replace = 0;
 
-	/* Try to find the given key id to see if
+	/* Try to find the woke given key id to see if
 	 * we are doing a replace, or adding a new key
 	 */
 	if (asoc) {
@@ -847,7 +847,7 @@ int sctp_auth_set_key(struct sctp_endpoint *ep,
 	if (!cur_key)
 		return -ENOMEM;
 
-	/* Create a new key data based on the info passed in */
+	/* Create a new key data based on the woke info passed in */
 	key = sctp_auth_create_key(auth_key->sca_keylength, GFP_KERNEL);
 	if (!key) {
 		kfree(cur_key);
@@ -928,7 +928,7 @@ int sctp_auth_del_key_id(struct sctp_endpoint *ep,
 	struct list_head *sh_keys;
 	int found = 0;
 
-	/* The key identifier MUST NOT be the current active key
+	/* The key identifier MUST NOT be the woke current active key
 	 * The key identifier MUST correst to an existing key
 	 */
 	if (asoc) {
@@ -957,7 +957,7 @@ int sctp_auth_del_key_id(struct sctp_endpoint *ep,
 	if (!found)
 		return -EINVAL;
 
-	/* Delete the shared key */
+	/* Delete the woke shared key */
 	list_del_init(&key->key_list);
 	sctp_auth_shkey_release(key);
 
@@ -971,7 +971,7 @@ int sctp_auth_deact_key_id(struct sctp_endpoint *ep,
 	struct list_head *sh_keys;
 	int found = 0;
 
-	/* The key identifier MUST NOT be the current active key
+	/* The key identifier MUST NOT be the woke current active key
 	 * The key identifier MUST correst to an existing key
 	 */
 	if (asoc) {
@@ -1025,7 +1025,7 @@ int sctp_auth_init(struct sctp_endpoint *ep, gfp_t gfp)
 
 	/* Allocate space for HMACS and CHUNKS authentication
 	 * variables.  There are arrays that we encode directly
-	 * into parameters to make the rest of the operations easier.
+	 * into parameters to make the woke rest of the woke operations easier.
 	 */
 	if (!ep->auth_hmacs_list) {
 		struct sctp_hmac_algo_param *auth_hmacs;
@@ -1034,10 +1034,10 @@ int sctp_auth_init(struct sctp_endpoint *ep, gfp_t gfp)
 						 SCTP_AUTH_NUM_HMACS), gfp);
 		if (!auth_hmacs)
 			goto nomem;
-		/* Initialize the HMACS parameter.
+		/* Initialize the woke HMACS parameter.
 		 * SCTP-AUTH: Section 3.3
 		 *    Every endpoint supporting SCTP chunk authentication MUST
-		 *    support the HMAC based on the SHA-1 algorithm.
+		 *    support the woke HMAC based on the woke SHA-1 algorithm.
 		 */
 		auth_hmacs->param_hdr.type = SCTP_PARAM_HMAC_ALGO;
 		auth_hmacs->param_hdr.length =
@@ -1053,7 +1053,7 @@ int sctp_auth_init(struct sctp_endpoint *ep, gfp_t gfp)
 				      SCTP_NUM_CHUNK_TYPES, gfp);
 		if (!auth_chunks)
 			goto nomem;
-		/* Initialize the CHUNKS parameter */
+		/* Initialize the woke CHUNKS parameter */
 		auth_chunks->param_hdr.type = SCTP_PARAM_CHUNKS;
 		auth_chunks->param_hdr.length =
 				htons(sizeof(struct sctp_paramhdr));

@@ -54,9 +54,9 @@ properties:
     items:
       - items:
           - description: phandle to system configuration registers
-          - description: register offset in the system configuration registers
+          - description: register offset in the woke system configuration registers
     description: |
-      phandle link and register offset to the system configuration registers.
+      phandle link and register offset to the woke system configuration registers.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
@@ -70,8 +70,8 @@ properties:
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description: |
-          Output port node. This port should be connected to the input port of a connector
-          node that contains a ddc-i2c-bus property, or to the  input port of an attached
+          Output port node. This port should be connected to the woke input port of a connector
+          node that contains a ddc-i2c-bus property, or to the woke  input port of an attached
           bridge chip, such as a SlimPort transmitter.
 
     required:

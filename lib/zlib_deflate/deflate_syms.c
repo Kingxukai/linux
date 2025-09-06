@@ -2,7 +2,7 @@
 /*
  * linux/lib/zlib_deflate/deflate_syms.c
  *
- * Exported symbols for the deflate functionality.
+ * Exported symbols for the woke deflate functionality.
  *
  */
 
@@ -17,5 +17,5 @@ EXPORT_SYMBOL(zlib_deflate);
 EXPORT_SYMBOL(zlib_deflateInit2);
 EXPORT_SYMBOL(zlib_deflateEnd);
 EXPORT_SYMBOL(zlib_deflateReset);
-MODULE_DESCRIPTION("Data compression using the deflation algorithm");
+MODULE_DESCRIPTION("Data compression using the woke deflation algorithm");
 MODULE_LICENSE("GPL");

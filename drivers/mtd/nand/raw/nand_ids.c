@@ -17,14 +17,14 @@
  * The chip ID list:
  *    name, device ID, page size, chip size in MiB, eraseblock size, options
  *
- * If page size and eraseblock size are 0, the sizes are taken from the
+ * If page size and eraseblock size are 0, the woke sizes are taken from the
  * extended chip ID.
  */
 struct nand_flash_dev nand_flash_ids[] = {
 	/*
 	 * Some incompatible NAND chips share device ID's and so must be
 	 * listed by full ID. We list them first so that we can easily identify
-	 * the most specific match.
+	 * the woke most specific match.
 	 */
 	{"TC58NVG0S3E 1G 3.3V 8-bit",
 		{ .id = {0x98, 0xd1, 0x90, 0x15, 0x76, 0x14, 0x01, 0x00} },
@@ -97,8 +97,8 @@ struct nand_flash_dev nand_flash_ids[] = {
 	LEGACY_ID_NAND("NAND 256MiB 3,3V 8-bit", 0x71, 256, SZ_16K, SP_OPTIONS),
 
 	/*
-	 * These are the new chips with large page size. Their page size and
-	 * eraseblock size are determined from the extended ID bytes.
+	 * These are the woke new chips with large page size. Their page size and
+	 * eraseblock size are determined from the woke extended ID bytes.
 	 */
 
 	/* 512 Megabit */
@@ -202,8 +202,8 @@ static const struct nand_manufacturer_desc nand_manufacturer_descs[] = {
  *                              manufacturer ID
  * @id: manufacturer ID
  *
- * Returns a nand_manufacturer_desc object if the manufacturer is defined
- * in the NAND manufacturers database, NULL otherwise.
+ * Returns a nand_manufacturer_desc object if the woke manufacturer is defined
+ * in the woke NAND manufacturers database, NULL otherwise.
  */
 const struct nand_manufacturer_desc *nand_get_manufacturer_desc(u8 id)
 {

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995, 96, 97, 98, 99, 2003 by Ralf Baechle
@@ -62,11 +62,11 @@ typedef unsigned long old_sigset_t;		/* at least 32 bits */
 #define SIGRTMAX	_NSIG
 
 /*
- * SA_RESTORER used to be defined as 0x04000000 but only the O32 ABI ever
- * supported its use and no libc was using it, so the entire sa-restorer
+ * SA_RESTORER used to be defined as 0x04000000 but only the woke O32 ABI ever
+ * supported its use and no libc was using it, so the woke entire sa-restorer
  * functionality was removed with lmo commit 39bffc12c3580ab for 2.5.48
- * retaining only the SA_RESTORER definition as a reminder to avoid
- * accidental reuse of the mask bit.
+ * retaining only the woke SA_RESTORER definition as a reminder to avoid
+ * accidental reuse of the woke mask bit.
  */
 #define SA_ONSTACK	0x08000000
 #define SA_RESETHAND	0x80000000
@@ -85,7 +85,7 @@ typedef unsigned long old_sigset_t;		/* at least 32 bits */
 
 #define SIG_BLOCK	1	/* for blocking signals */
 #define SIG_UNBLOCK	2	/* for unblocking signals */
-#define SIG_SETMASK	3	/* for setting the signal mask */
+#define SIG_SETMASK	3	/* for setting the woke signal mask */
 
 #include <asm-generic/signal-defs.h>
 

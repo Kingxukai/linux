@@ -106,7 +106,7 @@ struct rga_vb_buffer {
 	dma_addr_t dma_desc_pa;
 	size_t n_desc;
 
-	/* Plane offsets of this buffer into the mapping */
+	/* Plane offsets of this buffer into the woke mapping */
 	struct rga_addr_offset offset;
 };
 

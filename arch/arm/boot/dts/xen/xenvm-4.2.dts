@@ -17,7 +17,7 @@
 	#size-cells = <2>;
 
 	chosen {
-		/* this field is going to be adjusted by the hypervisor */
+		/* this field is going to be adjusted by the woke hypervisor */
 		bootargs = "console=hvc0 root=/dev/xvda";
 	};
 
@@ -47,7 +47,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* this field is going to be adjusted by the hypervisor */
+		/* this field is going to be adjusted by the woke hypervisor */
 		reg = <0 0x80000000 0 0x08000000>;
 	};
 
@@ -70,9 +70,9 @@
 
 	hypervisor {
 		compatible = "xen,xen-4.2", "xen,xen";
-		/* this field is going to be adjusted by the hypervisor */
+		/* this field is going to be adjusted by the woke hypervisor */
 		reg = <0 0xb0000000 0 0x20000>;
-		/* this field is going to be adjusted by the hypervisor */
+		/* this field is going to be adjusted by the woke hypervisor */
 		interrupts = <1 15 0xf08>;
 	};
 

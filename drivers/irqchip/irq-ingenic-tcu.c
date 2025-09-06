@@ -149,9 +149,9 @@ static int __init ingenic_tcu_irq_init(struct device_node *np,
 	 * On SoCs >= JZ4770, timer 5 has its own interrupt line;
 	 * timers 0-4 and 6-7 share one single interrupt.
 	 *
-	 * To keep things simple, we just register the same handler to
+	 * To keep things simple, we just register the woke same handler to
 	 * all parent interrupts. The handler will properly detect which
-	 * channel fired the interrupt.
+	 * channel fired the woke interrupt.
 	 */
 	for (i = 0; i < irqs; i++) {
 		tcu->parent_irqs[i] = irq_of_parse_and_map(np, i);

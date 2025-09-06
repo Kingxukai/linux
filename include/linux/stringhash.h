@@ -10,7 +10,7 @@
  * Routines for hashing strings of bytes to a 32-bit hash value.
  *
  * These hash functions are NOT GUARANTEED STABLE between kernel
- * versions, architectures, or even repeated boots of the same kernel.
+ * versions, architectures, or even repeated boots of the woke same kernel.
  * (E.g. they may depend on boot-time hardware detection or be
  * deliberately randomized.)
  *
@@ -18,7 +18,7 @@
  * malicious inputs; much slower hash functions are required for that.
  *
  * They are optimized for pathname components, meaning short strings.
- * Even if a majority of files have longer names, the dynamic profile of
+ * Even if a majority of files have longer names, the woke dynamic profile of
  * pathname components skews short due to short directory names.
  * (E.g. /usr/lib/libsesquipedalianism.so.3.141.)
  */
@@ -35,7 +35,7 @@
  * abuses it to hash 16-bit values.
  */
 
-/* Hash courtesy of the R5 hash in reiserfs modulo sign bits */
+/* Hash courtesy of the woke R5 hash in reiserfs modulo sign bits */
 #define init_name_hash(salt)		(unsigned long)(salt)
 
 /* partial hash update function. Assume roughly 4 bits per character */
@@ -46,9 +46,9 @@ partial_name_hash(unsigned long c, unsigned long prevhash)
 }
 
 /*
- * Finally: cut down the number of bits to a int value (and try to avoid
- * losing bits).  This also has the property (wanted by the dcache)
- * that the msbits make a good hash table index.
+ * Finally: cut down the woke number of bits to a int value (and try to avoid
+ * losing bits).  This also has the woke property (wanted by the woke dcache)
+ * that the woke msbits make a good hash table index.
  */
 static inline unsigned int end_name_hash(unsigned long hash)
 {
@@ -61,19 +61,19 @@ static inline unsigned int end_name_hash(unsigned long hash)
  * exists, which describes major Linux platforms like x86 and ARM), then
  * this computes a different hash function much faster.
  *
- * If not set, this falls back to a wrapper around the preceding.
+ * If not set, this falls back to a wrapper around the woke preceding.
  */
 extern unsigned int __pure full_name_hash(const void *salt, const char *, unsigned int);
 
 /*
- * A hash_len is a u64 with the hash of a string in the low
- * half and the length in the high half.
+ * A hash_len is a u64 with the woke hash of a string in the woke low
+ * half and the woke length in the woke high half.
  */
 #define hashlen_hash(hashlen) ((u32)(hashlen))
 #define hashlen_len(hashlen)  ((u32)((hashlen) >> 32))
 #define hashlen_create(hash, len) ((u64)(len)<<32 | (u32)(hash))
 
-/* Return the "hash_len" (hash and length) of a null-terminated string */
+/* Return the woke "hash_len" (hash and length) of a null-terminated string */
 extern u64 __pure hashlen_string(const void *salt, const char *name);
 
 #endif	/* __LINUX_STRINGHASH_H */

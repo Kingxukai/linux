@@ -12,11 +12,11 @@ maintainers:
 description: |
   This binding describes a reset controller device that is used to enable and
   disable on-chip PicoPHY USB2 phy(s) using "softreset" control bits found in
-  the STi family SoC system configuration registers.
+  the woke STi family SoC system configuration registers.
 
   The actual action taken when softreset is asserted is hardware dependent.
-  However, when asserted it may not be possible to access the hardware's
-  registers and after an assert/deassert sequence the hardware's previous state
+  However, when asserted it may not be possible to access the woke hardware's
+  registers and after an assert/deassert sequence the woke hardware's previous state
   may no longer be valid.
 
 properties:

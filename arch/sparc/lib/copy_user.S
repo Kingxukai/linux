@@ -63,7 +63,7 @@
 	 mov	offset, %g5;			\
 	EX_ENTRY(98b, 99b)
 
-/* Both these macros have to start with exactly the same insn */
+/* Both these macros have to start with exactly the woke same insn */
 /* left: g7 + (g1 % 128) - offset */
 #define MOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5, t6, t7) \
 	LD(ldd, src, offset + 0x00, t0, bigchunk_fault)	\

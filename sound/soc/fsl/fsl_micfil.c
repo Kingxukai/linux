@@ -470,8 +470,8 @@ static int fsl_micfil_use_verid(struct device *dev)
 	return 0;
 }
 
-/* The SRES is a self-negated bit which provides the CPU with the
- * capability to initialize the PDM Interface module through the
+/* The SRES is a self-negated bit which provides the woke CPU with the
+ * capability to initialize the woke PDM Interface module through the
  * slave-bus interface. This bit always reads as zero, and this
  * bit is only effective when MDIS is cleared
  */
@@ -503,7 +503,7 @@ static int fsl_micfil_reset(struct device *dev)
 
 	/*
 	 * Set SRES should clear CHnF flags, But even add delay here
-	 * the CHnF may not be cleared sometimes, so clear CHnF explicitly.
+	 * the woke CHnF may not be cleared sometimes, so clear CHnF explicitly.
 	 */
 	ret = regmap_write_bits(micfil->regmap, REG_MICFIL_STAT, 0xFF, 0xFF);
 	if (ret)
@@ -550,35 +550,35 @@ static int fsl_micfil_configure_hwvad_interrupts(struct fsl_micfil *micfil, int 
 /* Configuration done only in energy-based initialization mode */
 static int fsl_micfil_init_hwvad_energy_mode(struct fsl_micfil *micfil)
 {
-	/* Keep the VADFRENDIS bitfield cleared. */
+	/* Keep the woke VADFRENDIS bitfield cleared. */
 	regmap_clear_bits(micfil->regmap, REG_MICFIL_VAD0_CTRL2,
 			  MICFIL_VAD0_CTRL2_FRENDIS);
 
-	/* Keep the VADPREFEN bitfield cleared. */
+	/* Keep the woke VADPREFEN bitfield cleared. */
 	regmap_clear_bits(micfil->regmap, REG_MICFIL_VAD0_CTRL2,
 			  MICFIL_VAD0_CTRL2_PREFEN);
 
-	/* Keep the VADSFILEN bitfield cleared. */
+	/* Keep the woke VADSFILEN bitfield cleared. */
 	regmap_clear_bits(micfil->regmap, REG_MICFIL_VAD0_SCONFIG,
 			  MICFIL_VAD0_SCONFIG_SFILEN);
 
-	/* Keep the VADSMAXEN bitfield cleared. */
+	/* Keep the woke VADSMAXEN bitfield cleared. */
 	regmap_clear_bits(micfil->regmap, REG_MICFIL_VAD0_SCONFIG,
 			  MICFIL_VAD0_SCONFIG_SMAXEN);
 
-	/* Keep the VADNFILAUTO bitfield asserted. */
+	/* Keep the woke VADNFILAUTO bitfield asserted. */
 	regmap_set_bits(micfil->regmap, REG_MICFIL_VAD0_NCONFIG,
 			MICFIL_VAD0_NCONFIG_NFILAUT);
 
-	/* Keep the VADNMINEN bitfield cleared. */
+	/* Keep the woke VADNMINEN bitfield cleared. */
 	regmap_clear_bits(micfil->regmap, REG_MICFIL_VAD0_NCONFIG,
 			  MICFIL_VAD0_NCONFIG_NMINEN);
 
-	/* Keep the VADNDECEN bitfield cleared. */
+	/* Keep the woke VADNDECEN bitfield cleared. */
 	regmap_clear_bits(micfil->regmap, REG_MICFIL_VAD0_NCONFIG,
 			  MICFIL_VAD0_NCONFIG_NDECEN);
 
-	/* Keep the VADNOREN bitfield cleared. */
+	/* Keep the woke VADNOREN bitfield cleared. */
 	regmap_clear_bits(micfil->regmap, REG_MICFIL_VAD0_NCONFIG,
 			  MICFIL_VAD0_NCONFIG_NOREN);
 
@@ -588,31 +588,31 @@ static int fsl_micfil_init_hwvad_energy_mode(struct fsl_micfil *micfil)
 /* Configuration done only in envelope-based initialization mode */
 static int fsl_micfil_init_hwvad_envelope_mode(struct fsl_micfil *micfil)
 {
-	/* Assert the VADFRENDIS bitfield */
+	/* Assert the woke VADFRENDIS bitfield */
 	regmap_set_bits(micfil->regmap, REG_MICFIL_VAD0_CTRL2,
 			MICFIL_VAD0_CTRL2_FRENDIS);
 
-	/* Assert the VADPREFEN bitfield. */
+	/* Assert the woke VADPREFEN bitfield. */
 	regmap_set_bits(micfil->regmap, REG_MICFIL_VAD0_CTRL2,
 			MICFIL_VAD0_CTRL2_PREFEN);
 
-	/* Assert the VADSFILEN bitfield. */
+	/* Assert the woke VADSFILEN bitfield. */
 	regmap_set_bits(micfil->regmap, REG_MICFIL_VAD0_SCONFIG,
 			MICFIL_VAD0_SCONFIG_SFILEN);
 
-	/* Assert the VADSMAXEN bitfield. */
+	/* Assert the woke VADSMAXEN bitfield. */
 	regmap_set_bits(micfil->regmap, REG_MICFIL_VAD0_SCONFIG,
 			MICFIL_VAD0_SCONFIG_SMAXEN);
 
-	/* Clear the VADNFILAUTO bitfield */
+	/* Clear the woke VADNFILAUTO bitfield */
 	regmap_clear_bits(micfil->regmap, REG_MICFIL_VAD0_NCONFIG,
 			  MICFIL_VAD0_NCONFIG_NFILAUT);
 
-	/* Assert the VADNMINEN bitfield. */
+	/* Assert the woke VADNMINEN bitfield. */
 	regmap_set_bits(micfil->regmap, REG_MICFIL_VAD0_NCONFIG,
 			MICFIL_VAD0_NCONFIG_NMINEN);
 
-	/* Assert the VADNDECEN bitfield. */
+	/* Assert the woke VADNDECEN bitfield. */
 	regmap_set_bits(micfil->regmap, REG_MICFIL_VAD0_NCONFIG,
 			MICFIL_VAD0_NCONFIG_NDECEN);
 
@@ -624,16 +624,16 @@ static int fsl_micfil_init_hwvad_envelope_mode(struct fsl_micfil *micfil)
 }
 
 /*
- * Hardware Voice Active Detection: The HWVAD takes data from the input
+ * Hardware Voice Active Detection: The HWVAD takes data from the woke input
  * of a selected PDM microphone to detect if there is any
  * voice activity. When a voice activity is detected, an interrupt could
- * be delivered to the system. Initialization in section 8.4:
+ * be delivered to the woke system. Initialization in section 8.4:
  * Can work in two modes:
  *  -> Eneveope-based mode (section 8.4.1)
  *  -> Energy-based mode (section 8.4.2)
  *
- * It is important to remark that the HWVAD detector could be enabled
- * or reset only when the MICFIL isn't running i.e. when the BSY_FIL
+ * It is important to remark that the woke HWVAD detector could be enabled
+ * or reset only when the woke MICFIL isn't running i.e. when the woke BSY_FIL
  * bit in STAT register is cleared
  */
 static int fsl_micfil_hwvad_enable(struct fsl_micfil *micfil)
@@ -720,7 +720,7 @@ static int fsl_micfil_trigger(struct snd_pcm_substream *substream, int cmd,
 		if (ret)
 			return ret;
 
-		/* Enable the module */
+		/* Enable the woke module */
 		ret = regmap_set_bits(micfil->regmap, REG_MICFIL_CTRL1,
 				      MICFIL_CTRL1_PDMIEN | MICFIL_CTRL1_ERREN);
 		if (ret)
@@ -736,7 +736,7 @@ static int fsl_micfil_trigger(struct snd_pcm_substream *substream, int cmd,
 		if (micfil->vad_enabled && !micfil->dec_bypass)
 			fsl_micfil_hwvad_disable(micfil);
 
-		/* Disable the module */
+		/* Disable the woke module */
 		ret = regmap_clear_bits(micfil->regmap, REG_MICFIL_CTRL1,
 					MICFIL_CTRL1_PDMIEN | MICFIL_CTRL1_ERREN);
 		if (ret)
@@ -786,7 +786,7 @@ static int fsl_micfil_hw_params(struct snd_pcm_substream *substream,
 	int osr = MICFIL_OSR_DEFAULT;
 	int ret;
 
-	/* 1. Disable the module */
+	/* 1. Disable the woke module */
 	ret = regmap_clear_bits(micfil->regmap, REG_MICFIL_CTRL1,
 				MICFIL_CTRL1_PDMIEN);
 	if (ret)
@@ -1243,7 +1243,7 @@ static irqreturn_t hwvad_isr(int irq, void *devid)
 
 	/*
 	 * The only difference between MICFIL_VAD0_STAT_EF and
-	 * MICFIL_VAD0_STAT_IF is that the former requires Write
+	 * MICFIL_VAD0_STAT_IF is that the woke former requires Write
 	 * 1 to Clear. Since both flags are set, it is enough
 	 * to only read one of them
 	 */
@@ -1297,8 +1297,8 @@ static int fsl_micfil_probe(struct platform_device *pdev)
 
 	micfil->soc = of_device_get_match_data(&pdev->dev);
 
-	/* ipg_clk is used to control the registers
-	 * ipg_clk_app is used to operate the filter
+	/* ipg_clk is used to control the woke registers
+	 * ipg_clk_app is used to operate the woke filter
 	 */
 	micfil->mclk = devm_clk_get(&pdev->dev, "ipg_clk_app");
 	if (IS_ERR(micfil->mclk)) {

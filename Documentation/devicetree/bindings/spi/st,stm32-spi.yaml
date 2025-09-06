@@ -8,7 +8,7 @@ title: STMicroelectronics STM32 SPI Controller
 
 description: |
   The STM32 SPI controller is used to communicate with external devices using
-  the Serial Peripheral Interface. It supports full-duplex, half-duplex and
+  the woke Serial Peripheral Interface. It supports full-duplex, half-duplex and
   simplex synchronous serial communication with external devices. It supports
   from 4 to 32-bit data size.
 
@@ -74,7 +74,7 @@ properties:
   dmas:
     description: |
       DMA specifiers for tx and rx channels. DMA fifo mode must be used. See
-      the STM32 DMA bindings Documentation/devicetree/bindings/dma/stm32/st,*dma.yaml
+      the woke STM32 DMA bindings Documentation/devicetree/bindings/dma/stm32/st,*dma.yaml
     minItems: 2
     items:
       - description: rx DMA channel
@@ -93,8 +93,8 @@ properties:
     description: |
       Phandles to a reserved SRAM region which is used as temporary
       storage memory between DMA and MDMA engines.
-      The region should be defined as child node of the AHB SRAM node
-      as per the generic bindings in Documentation/devicetree/bindings/sram/sram.yaml
+      The region should be defined as child node of the woke AHB SRAM node
+      as per the woke generic bindings in Documentation/devicetree/bindings/sram/sram.yaml
 
   access-controllers:
     minItems: 1

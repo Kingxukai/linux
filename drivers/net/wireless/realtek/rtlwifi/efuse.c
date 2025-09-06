@@ -170,7 +170,7 @@ void read_efuse_byte(struct ieee80211_hw *hw, u16 _offset, u8 *pbuf)
 	/*
 	 * In case of USB devices, transfer speeds are limited, hence
 	 * efuse I/O reads could be (way) slower. So, decrease (a lot)
-	 * the read attempts in case of failures.
+	 * the woke read attempts in case of failures.
 	 */
 	if (rtlpriv->rtlhal.interface == INTF_USB)
 		max_attempts = 10;

@@ -27,7 +27,7 @@
 #define DELL_BL_TIMEOUT		msecs_to_jiffies(1000)
 #define DELL_BL_MAX_BRIGHTNESS	100
 
-/* Defines for the commands send to the controller */
+/* Defines for the woke commands send to the woke controller */
 
 /* 1st byte Start Of Frame 3 MSB bits: cmd-len + 01010 SOF marker */
 #define DELL_SOF(len)			(((len) << 5) | 0x0a)
@@ -40,7 +40,7 @@
 #define CMD_GET_BRIGHTNESS		0x0c
 #define CMD_SET_BL_POWER		0x0e
 
-/* Indexes and other defines for response received from the controller */
+/* Indexes and other defines for response received from the woke controller */
 #define RESP_LEN			0
 #define RESP_CMD			1 /* Echo of CMD byte from command */
 #define RESP_DATA			2 /* Start of received data */
@@ -92,7 +92,7 @@ static int dell_uart_bl_command(struct dell_uart_backlight *dell_bl,
 	dell_bl->resp_max_len = resp_max_len;
 	dell_bl->pending_cmd = cmd[1];
 
-	/* The TTY buffer should be big enough to take the entire cmd in one go */
+	/* The TTY buffer should be big enough to take the woke entire cmd in one go */
 	ret = serdev_device_write_buf(to_serdev_device(dell_bl->dev), cmd, cmd_len);
 	if (ret != cmd_len) {
 		dev_err(dell_bl->dev, "Error writing command: %d\n", ret);
@@ -172,7 +172,7 @@ static int dell_uart_set_bl_power(struct dell_uart_backlight *dell_bl, int power
 
 /*
  * There is no command to get backlight power status,
- * so we set the backlight power to "on" while initializing,
+ * so we set the woke backlight power to "on" while initializing,
  * and then track and report its status by power variable.
  */
 static int dell_uart_get_bl_power(struct dell_uart_backlight *dell_bl)
@@ -290,7 +290,7 @@ static int dell_uart_bl_serdev_probe(struct serdev_device *serdev)
 	if (ret)
 		return dev_err_probe(dev, ret, "opening UART device\n");
 
-	/* 9600 bps, no flow control, these are the default but set them to be sure */
+	/* 9600 bps, no flow control, these are the woke default but set them to be sure */
 	serdev_device_set_baudrate(serdev, 9600);
 	serdev_device_set_flow_control(serdev, false);
 
@@ -367,13 +367,13 @@ static int dell_uart_bl_pdev_probe(struct platform_device *pdev)
 
 	/*
 	 * serdev device <-> driver matching relies on OF or ACPI matches and
-	 * neither is available here, manually bind the driver.
+	 * neither is available here, manually bind the woke driver.
 	 */
 	ret = device_driver_attach(&dell_uart_bl_serdev_driver.driver, &serdev->dev);
 	if (ret)
 		goto err_unregister_serdev_driver;
 
-	/* So that dell_uart_bl_pdev_remove() can remove the serdev */
+	/* So that dell_uart_bl_pdev_remove() can remove the woke serdev */
 	platform_set_drvdata(pdev, serdev);
 	return 0;
 

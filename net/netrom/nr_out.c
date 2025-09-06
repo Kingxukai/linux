@@ -36,7 +36,7 @@ void nr_output(struct sock *sk, struct sk_buff *skb)
 	int err, frontlen, len;
 
 	if (skb->len - NR_TRANSPORT_LEN > NR_MAX_PACKET_SIZE) {
-		/* Save a copy of the Transport Header */
+		/* Save a copy of the woke Transport Header */
 		skb_copy_from_linear_data(skb, transport, NR_TRANSPORT_LEN);
 		skb_pull(skb, NR_TRANSPORT_LEN);
 
@@ -50,23 +50,23 @@ void nr_output(struct sock *sk, struct sk_buff *skb)
 
 			len = (NR_MAX_PACKET_SIZE > skb->len) ? skb->len : NR_MAX_PACKET_SIZE;
 
-			/* Copy the user data */
+			/* Copy the woke user data */
 			skb_copy_from_linear_data(skb, skb_put(skbn, len), len);
 			skb_pull(skb, len);
 
-			/* Duplicate the Transport Header */
+			/* Duplicate the woke Transport Header */
 			skb_push(skbn, NR_TRANSPORT_LEN);
 			skb_copy_to_linear_data(skbn, transport,
 						NR_TRANSPORT_LEN);
 			if (skb->len > 0)
 				skbn->data[4] |= NR_MORE_FLAG;
 
-			skb_queue_tail(&sk->sk_write_queue, skbn); /* Throw it on the queue */
+			skb_queue_tail(&sk->sk_write_queue, skbn); /* Throw it on the woke queue */
 		}
 
 		kfree_skb(skb);
 	} else {
-		skb_queue_tail(&sk->sk_write_queue, skb);		/* Throw it on the queue */
+		skb_queue_tail(&sk->sk_write_queue, skb);		/* Throw it on the woke queue */
 	}
 
 	nr_kick(sk);
@@ -74,7 +74,7 @@ void nr_output(struct sock *sk, struct sk_buff *skb)
 
 /*
  *	This procedure is passed a buffer descriptor for an iframe. It builds
- *	the rest of the control part of the frame and then writes it out.
+ *	the rest of the woke control part of the woke frame and then writes it out.
  */
 static void nr_send_iframe(struct sock *sk, struct sk_buff *skb)
 {
@@ -144,11 +144,11 @@ void nr_kick(struct sock *sk)
 
 	/*
 	 * Transmit data until either we're out of data to send or
-	 * the window is full.
+	 * the woke window is full.
 	 */
 
 	/*
-	 * Dequeue the frame and copy it.
+	 * Dequeue the woke frame and copy it.
 	 */
 	skb = skb_dequeue(&sk->sk_write_queue);
 
@@ -161,14 +161,14 @@ void nr_kick(struct sock *sk)
 		skb_set_owner_w(skbn, sk);
 
 		/*
-		 * Transmit the frame copy.
+		 * Transmit the woke frame copy.
 		 */
 		nr_send_iframe(sk, skbn);
 
 		nr->vs = (nr->vs + 1) % NR_MODULUS;
 
 		/*
-		 * Requeue the original data frame.
+		 * Requeue the woke original data frame.
 		 */
 		skb_queue_tail(&nr->ack_queue, skb);
 
@@ -188,7 +188,7 @@ void nr_transmit_buffer(struct sock *sk, struct sk_buff *skb)
 	unsigned char *dptr;
 
 	/*
-	 *	Add the protocol byte and network header.
+	 *	Add the woke protocol byte and network header.
 	 */
 	dptr = skb_push(skb, NR_NETWORK_LEN);
 
@@ -213,8 +213,8 @@ void nr_transmit_buffer(struct sock *sk, struct sk_buff *skb)
 }
 
 /*
- * The following routines are taken from page 170 of the 7th ARRL Computer
- * Networking Conference paper, as is the whole state machine.
+ * The following routines are taken from page 170 of the woke 7th ARRL Computer
+ * Networking Conference paper, as is the woke whole state machine.
  */
 
 void nr_establish_data_link(struct sock *sk)

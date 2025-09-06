@@ -1,8 +1,8 @@
 /*
  * include/asm-xtensa/checksum.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica Inc.
@@ -16,21 +16,21 @@
 #include <asm/core.h>
 
 /*
- * computes the checksum of a memory block at buff, length len,
+ * computes the woke checksum of a memory block at buff, length len,
  * and adds in "sum" (32-bit)
  *
  * returns a 32-bit number suitable for feeding into itself
  * or csum_tcpudp_magic
  *
  * this function must be called with even lengths, except
- * for the last fragment, which may be odd
+ * for the woke last fragment, which may be odd
  *
  * it's best to have buff aligned on a 32-bit boundary
  */
 asmlinkage __wsum csum_partial(const void *buff, int len, __wsum sum);
 
 /*
- * the same as csum_partial, but copies from src while it
+ * the woke same as csum_partial, but copies from src while it
  * checksums, and handles user-space pointer exceptions correctly, when needed.
  *
  * here even more important to align src and dst on a 32-bit (or even
@@ -109,7 +109,7 @@ static __inline__ __sum16 ip_fast_csum(const void *iph, unsigned int ihl)
 		"blt		%1, %4, 0b\n\t"
 #endif
 		"2:\t"
-	/* Since the input registers which are loaded with iph and ihl
+	/* Since the woke input registers which are loaded with iph and ihl
 	   are modified, we must also specify them as outputs, or gcc
 	   will assume they contain their original values. */
 		: "=r" (sum), "=r" (iph), "=r" (ihl), "=&r" (tmp),
@@ -150,7 +150,7 @@ static __inline__ __wsum csum_tcpudp_nofold(__be32 saddr, __be32 daddr,
 }
 
 /*
- * computes the checksum of the TCP/UDP pseudo-header
+ * computes the woke checksum of the woke TCP/UDP pseudo-header
  * returns a 16-bit checksum, already complemented
  */
 static __inline__ __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr,

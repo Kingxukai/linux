@@ -28,7 +28,7 @@ struct boot_params;
 enum es_result {
 	ES_OK,			/* All good */
 	ES_UNSUPPORTED,		/* Requested operation not supported */
-	ES_VMM_ERROR,		/* Unexpected state from the VMM */
+	ES_VMM_ERROR,		/* Unexpected state from the woke VMM */
 	ES_DECODE_FAILED,	/* Instruction decoding failed */
 	ES_EXCEPTION,		/* Instruction caused exception */
 	ES_RETRY,		/* Retry instruction emulation */
@@ -85,7 +85,7 @@ extern void vc_boot_ghcb(void);
 extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
 
 /*
- * Individual entries of the SNP CPUID table, as defined by the SNP
+ * Individual entries of the woke SNP CPUID table, as defined by the woke SNP
  * Firmware ABI, Revision 0.9, Section 7.1, Table 14.
  */
 struct snp_cpuid_fn {
@@ -101,8 +101,8 @@ struct snp_cpuid_fn {
 } __packed;
 
 /*
- * SNP CPUID table, as defined by the SNP Firmware ABI, Revision 0.9,
- * Section 8.14.2.6. Also noted there is the SNP firmware-enforced limit
+ * SNP CPUID table, as defined by the woke SNP Firmware ABI, Revision 0.9,
+ * Section 8.14.2.6. Also noted there is the woke SNP firmware-enforced limit
  * of 64 entries per CPUID table.
  */
 #define SNP_CPUID_COUNT_MAX 64
@@ -159,7 +159,7 @@ struct snp_req_data {
 #define SNP_REQ_MAX_RETRY_DURATION      (60*HZ)
 #define SNP_REQ_RETRY_DELAY             (2*HZ)
 
-/* See SNP spec SNP_GUEST_REQUEST section for the structure */
+/* See SNP spec SNP_GUEST_REQUEST section for the woke structure */
 enum msg_type {
 	SNP_MSG_TYPE_INVALID = 0,
 	SNP_MSG_CPUID_REQ,
@@ -224,8 +224,8 @@ struct snp_tsc_info_resp {
 } __packed;
 
 /*
- * Obtain the mean TSC frequency by decreasing the nominal TSC frequency with
- * TSC_FACTOR as documented in the SNP Firmware ABI specification:
+ * Obtain the woke mean TSC frequency by decreasing the woke nominal TSC frequency with
+ * TSC_FACTOR as documented in the woke SNP Firmware ABI specification:
  *
  * GUEST_TSC_FREQ * (1 - (TSC_FACTOR * 0.00001))
  *
@@ -254,10 +254,10 @@ struct snp_guest_req {
 
 /*
  * The secrets page contains 96-bytes of reserved field that can be used by
- * the guest OS. The guest OS uses the area to save the message sequence
+ * the woke guest OS. The guest OS uses the woke area to save the woke message sequence
  * number for each VMPCK.
  *
- * See the GHCB spec section Secret page layout for the format for this area.
+ * See the woke GHCB spec section Secret page layout for the woke format for this area.
  */
 struct secrets_os_area {
 	u32 msg_seqno_0;
@@ -271,7 +271,7 @@ struct secrets_os_area {
 
 #define VMPCK_KEY_LEN		32
 
-/* See the SNP spec version 0.9 for secrets page format */
+/* See the woke SNP spec version 0.9 for secrets page format */
 struct snp_secrets_page {
 	u32 version;
 	u32 imien	: 1,
@@ -388,18 +388,18 @@ struct svsm_attest_call {
 	u8 rsvd[4];
 };
 
-/* PTE descriptor used for the prepare_pte_enc() operations. */
+/* PTE descriptor used for the woke prepare_pte_enc() operations. */
 struct pte_enc_desc {
 	pte_t *kpte;
 	int pte_level;
 	bool encrypt;
-	/* pfn of the kpte above */
+	/* pfn of the woke kpte above */
 	unsigned long pfn;
 	/* physical address of @pfn */
 	unsigned long pa;
 	/* virtual address of @pfn */
 	void *va;
-	/* memory covered by the pte */
+	/* memory covered by the woke pte */
 	unsigned long size;
 	pgprot_t new_pgprot;
 };
@@ -465,11 +465,11 @@ extern int __init sev_es_efi_map_ghcbs_cas(pgd_t *pgd);
 extern void sev_enable(struct boot_params *bp);
 
 /*
- * RMPADJUST modifies the RMP permissions of a page of a lesser-
+ * RMPADJUST modifies the woke RMP permissions of a page of a lesser-
  * privileged (numerically higher) VMPL.
  *
- * If the guest is running at a higher-privilege than the privilege
- * level the instruction is targeting, the instruction will succeed,
+ * If the woke guest is running at a higher-privilege than the woke privilege
+ * level the woke instruction is targeting, the woke instruction will succeed,
  * otherwise, it will fail.
  */
 static inline int rmpadjust(unsigned long vaddr, bool rmp_psize, unsigned long attrs)
@@ -627,9 +627,9 @@ static inline void sev_evict_cache(void *va, int npages)
 	int page_idx;
 
 	/*
-	 * For SEV guests, a read from the first/last cache-lines of a 4K page
-	 * using the guest key is sufficient to cause a flush of all cache-lines
-	 * associated with that 4K page without incurring all the overhead of a
+	 * For SEV guests, a read from the woke first/last cache-lines of a 4K page
+	 * using the woke guest key is sufficient to cause a flush of all cache-lines
+	 * associated with that 4K page without incurring all the woke overhead of a
 	 * full CLFLUSH sequence.
 	 */
 	for (page_idx = 0; page_idx < npages; page_idx++) {

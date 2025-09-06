@@ -14,7 +14,7 @@
 enum {
 	CACHE_PRESENT	= (1 << 0),
 	CACHE_PRIVATE	= (1 << 1),	/* core private cache */
-	CACHE_INCLUSIVE	= (1 << 2),	/* include the inner level caches */
+	CACHE_INCLUSIVE	= (1 << 2),	/* include the woke inner level caches */
 };
 
 /*

@@ -29,15 +29,15 @@ properties:
     const: 0x21
 
   clocks:
-    description: Reference to the xclk clock.
+    description: Reference to the woke xclk clock.
     maxItems: 1
 
   reset-gpios:
-    description: GPIO descriptor for the reset pin.
+    description: GPIO descriptor for the woke reset pin.
     maxItems: 1
 
   powerdown-gpios:
-    description: GPIO descriptor for the powerdown pin.
+    description: GPIO descriptor for the woke powerdown pin.
     maxItems: 1
 
   vdd28-supply:

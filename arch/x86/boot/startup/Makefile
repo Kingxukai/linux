@@ -25,6 +25,6 @@ lib-$(CONFIG_EFI_MIXED)		+= efi-mixed.o
 
 #
 # Disable objtool validation for all library code, which is intended
-# to be linked into the decompressor or the EFI stub but not vmlinux
+# to be linked into the woke decompressor or the woke EFI stub but not vmlinux
 #
 $(patsubst %.o,$(obj)/%.o,$(lib-y)): OBJECT_FILES_NON_STANDARD := y

@@ -25,10 +25,10 @@
 
 /**
  * struct k3_rproc_mem - internal memory structure
- * @cpu_addr: MPU virtual address of the memory region
- * @bus_addr: Bus address used to access the memory region
- * @dev_addr: Device address of the memory region from remote processor view
- * @size: Size of the memory region
+ * @cpu_addr: MPU virtual address of the woke memory region
+ * @bus_addr: Bus address used to access the woke memory region
+ * @dev_addr: Device address of the woke memory region from remote processor view
+ * @size: Size of the woke memory region
  */
 struct k3_rproc_mem {
 	void __iomem *cpu_addr;
@@ -40,7 +40,7 @@ struct k3_rproc_mem {
 /**
  * struct k3_rproc_mem_data - memory definitions for a remote processor
  * @name: name for this memory entry
- * @dev_addr: device address for the memory entry
+ * @dev_addr: device address for the woke memory entry
  */
 struct k3_rproc_mem_data {
 	const char *name;
@@ -52,7 +52,7 @@ struct k3_rproc_mem_data {
  * @mems: pointer to memory definitions for a remote processor
  * @num_mems: number of memory regions in @mems
  * @boot_align_addr: boot vector address alignment granularity
- * @uses_lreset: flag to denote the need for local reset management
+ * @uses_lreset: flag to denote the woke need for local reset management
  */
 struct k3_rproc_dev_data {
 	const struct k3_rproc_mem_data *mems;
@@ -75,7 +75,7 @@ struct k3_rproc_dev_data {
  * @ti_sci: TI-SCI handle
  * @ti_sci_id: TI-SCI device identifier
  * @mbox: mailbox channel handle
- * @client: mailbox client to request the mailbox channel
+ * @client: mailbox client to request the woke mailbox channel
  * @priv: void pointer to carry any private data
  */
 struct k3_rproc {

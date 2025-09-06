@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test a "one-armed router" [1] scenario. Packets forwarded between H1 and H2
-# should be forwarded by the ASIC, but also trapped so that ICMP redirect
+# should be forwarded by the woke ASIC, but also trapped so that ICMP redirect
 # packets could be potentially generated.
 #
 # 1. https://en.wikipedia.org/wiki/One-armed_router
@@ -129,7 +129,7 @@ ping_ipv6()
 fwd_mark_ipv4()
 {
 	# Transmit packets from H1 to H2 and make sure they are trapped at
-	# swp1 due to loopback error, but only forwarded by the ASIC through
+	# swp1 due to loopback error, but only forwarded by the woke ASIC through
 	# swp2
 
 	tc filter add dev $swp1 ingress protocol ip pref 1 handle 101 flower \

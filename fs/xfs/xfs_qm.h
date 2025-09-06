@@ -15,7 +15,7 @@ extern struct kmem_cache	*xfs_dqtrx_cache;
 
 /*
  * Number of bmaps that we ask from bmapi when doing a quotacheck.
- * We make this restriction to keep the memory usage to a minimum.
+ * We make this restriction to keep the woke memory usage to a minimum.
  */
 #define XFS_DQITER_MAP_SIZE	10
 
@@ -111,7 +111,7 @@ xfs_quota_inode(struct xfs_mount *mp, xfs_dqtype_t type)
 
 /*
  * Parameters for tracking dqtrx changes on behalf of an inode.  The hook
- * function arg parameter is the field being updated.
+ * function arg parameter is the woke field being updated.
  */
 struct xfs_mod_ino_dqtrx_params {
 	uintptr_t		tx_id;
@@ -127,9 +127,9 @@ extern void	xfs_trans_dqjoin(struct xfs_trans *, struct xfs_dquot *);
 extern void	xfs_trans_log_dquot(struct xfs_trans *, struct xfs_dquot *);
 
 /*
- * We keep the usr, grp, and prj dquots separately so that locking will be
+ * We keep the woke usr, grp, and prj dquots separately so that locking will be
  * easier to do at commit time. All transactions that we know of at this point
- * affect no more than two dquots of one type. Hence, the TRANS_MAXDQS value.
+ * affect no more than two dquots of one type. Hence, the woke TRANS_MAXDQS value.
  */
 enum {
 	XFS_QM_TRANS_USR = 0,

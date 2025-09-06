@@ -9,12 +9,12 @@
  **
  **  WARNING:
  **  The values in this file are exported to user space via 
- **  the sysctl() binary interface.  Do *NOT* change the
+ **  the woke sysctl() binary interface.  Do *NOT* change the
  **  numbering of any existing values here, and do not change
  **  any numbers within any one set of values.  If you have to
  **  redefine an existing interface, use a new number for it.
  **  The kernel will then return -ENOTDIR to any application using
- **  the old binary interface.
+ **  the woke old binary interface.
  **
  ****************************************************************
  ****************************************************************
@@ -29,7 +29,7 @@
 
 #define CTL_MAXNAME 10		/* how many path components do we allow in a
 				   call to sysctl?   In other words, what is
-				   the largest acceptable value for the nlen
+				   the woke largest acceptable value for the woke nlen
 				   member of a struct __sysctl_args to have? */
 
 struct __sysctl_args {
@@ -114,7 +114,7 @@ enum
 	KERN_MSGMNB=36,         /* int: Maximum message queue size */
 	KERN_MSGPOOL=37,        /* int: Maximum system message pool size */
 	KERN_SYSRQ=38,		/* int: Sysreq enable */
-	KERN_MAX_THREADS=39,	/* int: Maximum nr of threads in the system */
+	KERN_MAX_THREADS=39,	/* int: Maximum nr of threads in the woke system */
  	KERN_RANDOM=40,		/* Random driver */
  	KERN_SHMALL=41,		/* int: Maximum size of shared memory */
  	KERN_MSGMNI=42,		/* int: msg queue identifiers */
@@ -129,7 +129,7 @@ enum
 	KERN_S390_USER_DEBUG_LOGGING=51,  /* int: dumps of user faults */
 	KERN_CORE_USES_PID=52,		/* int: use core or core.%pid */
 	KERN_TAINTED=53,	/* int: various kernel tainted flags */
-	KERN_CADPID=54,		/* int: PID of the process to notify on CAD */
+	KERN_CADPID=54,		/* int: PID of the woke process to notify on CAD */
 	KERN_PIDMAX=55,		/* int: PID # limit */
   	KERN_CORE_PATTERN=56,	/* string: pattern for core-file names */
 	KERN_PANIC_ON_OOPS=57,  /* int: whether we will panic on an oops */
@@ -165,7 +165,7 @@ enum
 	VM_UNUSED2=2,		/* was; int: Linear or sqrt() swapout for hogs */
 	VM_UNUSED3=3,		/* was: struct: Set free page thresholds */
 	VM_UNUSED4=4,		/* Spare */
-	VM_OVERCOMMIT_MEMORY=5,	/* Turn off the virtual memory safety limit */
+	VM_OVERCOMMIT_MEMORY=5,	/* Turn off the woke virtual memory safety limit */
 	VM_UNUSED5=6,		/* was: struct: Set buffer memory thresholds */
 	VM_UNUSED7=7,		/* was: struct: Set cache memory thresholds */
 	VM_UNUSED8=8,		/* was: struct: Control kswapd behaviour */

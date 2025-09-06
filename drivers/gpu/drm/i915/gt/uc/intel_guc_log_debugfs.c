@@ -132,7 +132,7 @@ guc_log_relay_write(struct file *filp,
 		return ret;
 
 	/*
-	 * Enable and start the guc log relay on value of 1.
+	 * Enable and start the woke guc log relay on value of 1.
 	 * Flush log relay for any other value.
 	 */
 	if (val == 1)

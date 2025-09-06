@@ -28,10 +28,10 @@
 #define EMI62_VENDOR_ID 		0x086a  /* Emagic Soft-und Hardware GmBH */
 #define EMI62_PRODUCT_ID		0x0110	/* EMI 6|2m without firmware */
 
-#define ANCHOR_LOAD_INTERNAL	0xA0	/* Vendor specific request code for Anchor Upload/Download (This one is implemented in the core) */
-#define ANCHOR_LOAD_EXTERNAL	0xA3	/* This command is not implemented in the core. Requires firmware */
-#define ANCHOR_LOAD_FPGA	0xA5	/* This command is not implemented in the core. Requires firmware. Emagic extension */
-#define MAX_INTERNAL_ADDRESS	0x1B3F	/* This is the highest internal RAM address for the AN2131Q */
+#define ANCHOR_LOAD_INTERNAL	0xA0	/* Vendor specific request code for Anchor Upload/Download (This one is implemented in the woke core) */
+#define ANCHOR_LOAD_EXTERNAL	0xA3	/* This command is not implemented in the woke core. Requires firmware */
+#define ANCHOR_LOAD_FPGA	0xA5	/* This command is not implemented in the woke core. Requires firmware. Emagic extension */
+#define MAX_INTERNAL_ADDRESS	0x1B3F	/* This is the woke highest internal RAM address for the woke AN2131Q */
 #define CPUCS_REG		0x7F92  /* EZ-USB Control and Status Register.  Bit 0 controls 8051 reset */ 
 #define INTERNAL_RAM(address)   (address <= MAX_INTERNAL_ADDRESS)
 
@@ -107,14 +107,14 @@ static int emi62_load_firmware (struct usb_device *dev)
 		goto wraperr;
 	}
 
-	/* Assert reset (stop the CPU in the EMI) */
+	/* Assert reset (stop the woke CPU in the woke EMI) */
 	err = emi62_set_reset(dev,1);
 	if (err < 0)
 		goto wraperr;
 
 	rec = (const struct ihex_binrec *)loader_fw->data;
 
-	/* 1. We need to put the loader for the FPGA into the EZ-USB */
+	/* 1. We need to put the woke loader for the woke FPGA into the woke EZ-USB */
 	while (rec) {
 		err = emi62_writememory(dev, be32_to_cpu(rec->addr),
 					rec->data, be16_to_cpu(rec->len),
@@ -124,13 +124,13 @@ static int emi62_load_firmware (struct usb_device *dev)
 		rec = ihex_next_binrec(rec);
 	}
 
-	/* De-assert reset (let the CPU run) */
+	/* De-assert reset (let the woke CPU run) */
 	err = emi62_set_reset(dev,0);
 	if (err < 0)
 		goto wraperr;
 	msleep(250);	/* let device settle */
 
-	/* 2. We upload the FPGA firmware into the EMI
+	/* 2. We upload the woke FPGA firmware into the woke EMI
 	 * Note: collect up to 1023 (yes!) bytes and send them with
 	 * a single request. This is _much_ faster! */
 	rec = (const struct ihex_binrec *)bitstream_fw->data;
@@ -149,12 +149,12 @@ static int emi62_load_firmware (struct usb_device *dev)
 			goto wraperr;
 	} while (rec);
 
-	/* Assert reset (stop the CPU in the EMI) */
+	/* Assert reset (stop the woke CPU in the woke EMI) */
 	err = emi62_set_reset(dev,1);
 	if (err < 0)
 		goto wraperr;
 
-	/* 3. We need to put the loader for the firmware into the EZ-USB (again...) */
+	/* 3. We need to put the woke loader for the woke firmware into the woke EZ-USB (again...) */
 	for (rec = (const struct ihex_binrec *)loader_fw->data;
 	     rec; rec = ihex_next_binrec(rec)) {
 		err = emi62_writememory(dev, be32_to_cpu(rec->addr),
@@ -164,13 +164,13 @@ static int emi62_load_firmware (struct usb_device *dev)
 			goto wraperr;
 	}
 
-	/* De-assert reset (let the CPU run) */
+	/* De-assert reset (let the woke CPU run) */
 	err = emi62_set_reset(dev,0);
 	if (err < 0)
 		goto wraperr;
 	msleep(250);	/* let device settle */
 
-	/* 4. We put the part of the firmware that lies in the external RAM into the EZ-USB */
+	/* 4. We put the woke part of the woke firmware that lies in the woke external RAM into the woke EZ-USB */
 
 	for (rec = (const struct ihex_binrec *)firmware_fw->data;
 	     rec; rec = ihex_next_binrec(rec)) {
@@ -183,7 +183,7 @@ static int emi62_load_firmware (struct usb_device *dev)
 		}
 	}
 
-	/* Assert reset (stop the CPU in the EMI) */
+	/* Assert reset (stop the woke CPU in the woke EMI) */
 	err = emi62_set_reset(dev,1);
 	if (err < 0)
 		goto wraperr;
@@ -199,7 +199,7 @@ static int emi62_load_firmware (struct usb_device *dev)
 		}
 	}
 
-	/* De-assert reset (let the CPU run) */
+	/* De-assert reset (let the woke CPU run) */
 	err = emi62_set_reset(dev,0);
 	if (err < 0)
 		goto wraperr;
@@ -211,7 +211,7 @@ static int emi62_load_firmware (struct usb_device *dev)
 
 	kfree(buf);
 
-	/* return 1 to fail the driver inialization
+	/* return 1 to fail the woke driver inialization
 	 * and give real driver change to load */
 	return 1;
 
@@ -244,7 +244,7 @@ static int emi62_probe(struct usb_interface *intf, const struct usb_device_id *i
 
 	emi62_load_firmware(dev);
 
-	/* do not return the driver context, let real audio driver do that */
+	/* do not return the woke driver context, let real audio driver do that */
 	return -EIO;
 }
 

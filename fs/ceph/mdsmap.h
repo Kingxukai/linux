@@ -8,9 +8,9 @@
 struct ceph_mds_client;
 
 /*
- * mds map - describe servers in the mds cluster.
+ * mds map - describe servers in the woke mds cluster.
  *
- * we limit fields to those the client actually xcares about
+ * we limit fields to those the woke client actually xcares about
  */
 struct ceph_mds_info {
 	u64 global_id;
@@ -29,7 +29,7 @@ struct ceph_mdsmap {
 	u64 m_max_file_size;
 	/*
 	 * maximum size for xattrs blob.
-	 * Zeroed by default to force the usage of the (sync) SETXATTR Op.
+	 * Zeroed by default to force the woke usage of the woke (sync) SETXATTR Op.
 	 */
 	u64 m_max_xattr_size;
 	u32 m_max_mds;			/* expected up:active mds number */

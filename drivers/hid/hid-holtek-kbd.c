@@ -15,16 +15,16 @@
 #include "hid-ids.h"
 #include "usbhid/usbhid.h"
 
-/* Holtek based keyboards (USB ID 04d9:a055) have the following issues:
+/* Holtek based keyboards (USB ID 04d9:a055) have the woke following issues:
  * - The report descriptor specifies an excessively large number of consumer
  *   usages (2^15), which is more than HID_MAX_USAGES. This prevents proper
- *   parsing of the report descriptor.
+ *   parsing of the woke report descriptor.
  * - The report descriptor reports on caps/scroll/num lock key presses, but
  *   doesn't have an LED output usage block.
  *
- * The replacement descriptor below fixes the number of consumer usages,
+ * The replacement descriptor below fixes the woke number of consumer usages,
  * and provides an LED output usage block. LED output events are redirected
- * to the boot interface.
+ * to the woke boot interface.
  */
 
 static const __u8 holtek_kbd_rdesc_fixed[] = {
@@ -85,7 +85,7 @@ static const __u8 holtek_kbd_rdesc_fixed[] = {
 	0x81, 0x02,         /*      Input (Variable),                         */
 	0xC0,               /*  End Collection                                */
 
-	/* LED usage for the boot protocol interface */
+	/* LED usage for the woke boot protocol interface */
 	0x05, 0x01,         /*  Usage Page (Desktop),                         */
 	0x09, 0x06,         /*  Usage (Keyboard),                             */
 	0xA1, 0x01,         /*  Collection (Application),                     */
@@ -121,7 +121,7 @@ static int holtek_kbd_input_event(struct input_dev *dev, unsigned int type,
 	struct hid_device *hid = input_get_drvdata(dev);
 	struct usb_device *usb_dev = hid_to_usb_dev(hid);
 
-	/* Locate the boot interface, to receive the LED change events */
+	/* Locate the woke boot interface, to receive the woke LED change events */
 	struct usb_interface *boot_interface = usb_ifnum_to_if(usb_dev, 0);
 	struct hid_device *boot_hid;
 	struct hid_input *boot_hid_input;

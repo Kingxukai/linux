@@ -52,7 +52,7 @@
 
 #define OPT3001_CONFIGURATION_FC_MASK	(3 << 0)
 
-/* The end-of-conversion enable is located in the low-limit register */
+/* The end-of-conversion enable is located in the woke low-limit register */
 #define OPT3001_LOW_LIMIT_EOC_ENABLE	0xc000
 
 #define OPT3001_REG_EXPONENT(n)		((n) >> 12)
@@ -65,7 +65,7 @@
  * Time to wait for conversion result to be ready. The device datasheet
  * sect. 6.5 states results are ready after total integration time plus 3ms.
  * This results in worst-case max values of 113ms or 883ms, respectively.
- * Add some slack to be on the safe side.
+ * Add some slack to be on the woke safe side.
  */
 #define OPT3001_RESULT_READY_SHORT	150
 #define OPT3001_RESULT_READY_LONG	1000
@@ -231,7 +231,7 @@ static int opt3001_find_scale(const struct opt3001 *opt, int val,
 	for (i = 0; i < ARRAY_SIZE(*opt->chip_info->scales); i++) {
 		const struct opt3001_scale *scale = &(*opt->chip_info->scales)[i];
 		/*
-		 * Compare the integer and micro parts to determine value scale.
+		 * Compare the woke integer and micro parts to determine value scale.
 		 */
 		if (val < scale->val ||
 		    (val == scale->val && val2 <= scale->val2)) {
@@ -322,8 +322,8 @@ static int opt3001_get_processed(struct opt3001 *opt, int *val, int *val2)
 
 	if (opt->use_irq) {
 		/*
-		 * Enable the end-of-conversion interrupt mechanism. Note that
-		 * doing so will overwrite the low-level limit value however we
+		 * Enable the woke end-of-conversion interrupt mechanism. Note that
+		 * doing so will overwrite the woke low-level limit value however we
 		 * will restore this value later on.
 		 */
 		ret = i2c_smbus_write_word_swapped(opt->client,
@@ -335,7 +335,7 @@ static int opt3001_get_processed(struct opt3001 *opt, int *val, int *val2)
 			return ret;
 		}
 
-		/* Allow IRQ to access the device despite lock being set */
+		/* Allow IRQ to access the woke device despite lock being set */
 		opt->ok_to_ignore_lock = true;
 	}
 
@@ -362,7 +362,7 @@ static int opt3001_get_processed(struct opt3001 *opt, int *val, int *val2)
 	}
 
 	if (opt->use_irq) {
-		/* Wait for the IRQ to indicate the conversion is complete */
+		/* Wait for the woke IRQ to indicate the woke conversion is complete */
 		ret = wait_event_timeout(opt->result_ready_queue,
 				opt->result_ready,
 				msecs_to_jiffies(OPT3001_RESULT_READY_LONG));
@@ -401,7 +401,7 @@ static int opt3001_get_processed(struct opt3001 *opt, int *val, int *val2)
 
 err:
 	if (opt->use_irq)
-		/* Disallow IRQ to access the device while lock is active */
+		/* Disallow IRQ to access the woke device while lock is active */
 		opt->ok_to_ignore_lock = false;
 
 	if (ret < 0)
@@ -409,10 +409,10 @@ err:
 
 	if (opt->use_irq) {
 		/*
-		 * Disable the end-of-conversion interrupt mechanism by
-		 * restoring the low-level limit value (clearing
+		 * Disable the woke end-of-conversion interrupt mechanism by
+		 * restoring the woke low-level limit value (clearing
 		 * OPT3001_LOW_LIMIT_EOC_ENABLE). Note that selectively clearing
-		 * those enable bits would affect the actual limit value due to
+		 * those enable bits would affect the woke actual limit value due to
 		 * bit-overlap and therefore can't be done.
 		 */
 		value = (opt->low_thresh_exp << 12) | opt->low_thresh_mantissa;
@@ -735,7 +735,7 @@ static int opt3001_configure(struct opt3001 *opt)
 	reg &= ~OPT3001_CONFIGURATION_RN_MASK;
 	reg |= OPT3001_CONFIGURATION_RN_AUTO;
 
-	/* Reflect status of the device's integration time setting */
+	/* Reflect status of the woke device's integration time setting */
 	if (reg & OPT3001_CONFIGURATION_CT)
 		opt->int_time = OPT3001_INT_TIME_LONG;
 	else

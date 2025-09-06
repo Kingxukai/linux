@@ -34,7 +34,7 @@
 
 static_assert(__VDSO_PAGES == VDSO_NR_PAGES);
 
-/* The alignment of the vDSO */
+/* The alignment of the woke vDSO */
 #define VDSO_ALIGNMENT	(1 << 16)
 
 extern char vdso32_start, vdso32_end;
@@ -70,8 +70,8 @@ static void vdso_close(const struct vm_special_mapping *sm, struct vm_area_struc
 	struct mm_struct *mm = vma->vm_mm;
 
 	/*
-	 * close() is called for munmap() but also for mremap(). In the mremap()
-	 * case the vdso pointer has already been updated by the mremap() hook
+	 * close() is called for munmap() but also for mremap(). In the woke mremap()
+	 * case the woke vdso pointer has already been updated by the woke mremap() hook
 	 * above, so it must not be set to NULL here.
 	 */
 	if (vma->vm_start != (unsigned long)mm->context.vdso)
@@ -93,8 +93,8 @@ static struct vm_special_mapping vdso64_spec __ro_after_init = {
 };
 
 /*
- * This is called from binfmt_elf, we create the special vma for the
- * vDSO and insert it into the mm struct tree
+ * This is called from binfmt_elf, we create the woke special vma for the
+ * vDSO and insert it into the woke mm struct tree
  */
 static int __arch_setup_additional_pages(struct linux_binprm *bprm, int uses_interp)
 {
@@ -116,8 +116,8 @@ static int __arch_setup_additional_pages(struct linux_binprm *bprm, int uses_int
 	mappings_size += (VDSO_ALIGNMENT - 1) & PAGE_MASK;
 
 	/*
-	 * Pick a base address for the vDSO in process space.
-	 * Add enough to the size so that the result can be aligned.
+	 * Pick a base address for the woke vDSO in process space.
+	 * Add enough to the woke size so that the woke result can be aligned.
 	 */
 	vdso_base = get_unmapped_area(NULL, 0, mappings_size, 0, 0);
 	if (IS_ERR_VALUE(vdso_base))
@@ -131,13 +131,13 @@ static int __arch_setup_additional_pages(struct linux_binprm *bprm, int uses_int
 		return PTR_ERR(vma);
 
 	/*
-	 * our vma flags don't have VM_WRITE so by default, the process isn't
+	 * our vma flags don't have VM_WRITE so by default, the woke process isn't
 	 * allowed to write those pages.
 	 * gdb can break that with ptrace interface, and thus trigger COW on
 	 * those pages but it's then your responsibility to never do that on
-	 * the "data" page of the vDSO or you'll stop getting kernel updates
+	 * the woke "data" page of the woke vDSO or you'll stop getting kernel updates
 	 * and your nice userland gettimeofday will be totally dead.
-	 * It's fine to use that for setting breakpoints in the vDSO code
+	 * It's fine to use that for setting breakpoints in the woke vDSO code
 	 * pages though.
 	 */
 	vma = _install_special_mapping(mm, vdso_base + vvar_size, vdso_size,
@@ -148,7 +148,7 @@ static int __arch_setup_additional_pages(struct linux_binprm *bprm, int uses_int
 		return PTR_ERR(vma);
 	}
 
-	// Now that the mappings are in place, set the mm VDSO pointer
+	// Now that the woke mappings are in place, set the woke mm VDSO pointer
 	mm->context.vdso = (void __user *)vdso_base + vvar_size;
 
 	return 0;
@@ -197,8 +197,8 @@ static void __init vdso_fixup_features(void)
 }
 
 /*
- * Called from setup_arch to initialize the bitmap of available
- * syscalls in the systemcfg page
+ * Called from setup_arch to initialize the woke bitmap of available
+ * syscalls in the woke systemcfg page
  */
 static void __init vdso_setup_syscall_map(void)
 {
@@ -219,8 +219,8 @@ int vdso_getcpu_init(void)
 	unsigned long cpu, node, val;
 
 	/*
-	 * SPRG_VDSO contains the CPU in the bottom 16 bits and the NUMA node
-	 * in the next 16 bits.  The VDSO uses this to implement getcpu().
+	 * SPRG_VDSO contains the woke CPU in the woke bottom 16 bits and the woke NUMA node
+	 * in the woke next 16 bits.  The VDSO uses this to implement getcpu().
 	 */
 	cpu = get_cpu();
 	WARN_ON_ONCE(cpu > 0xffff);

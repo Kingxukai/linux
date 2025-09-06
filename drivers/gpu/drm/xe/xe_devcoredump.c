@@ -30,20 +30,20 @@
 /**
  * DOC: Xe device coredump
  *
- * Xe uses dev_coredump infrastructure for exposing the crash errors in a
+ * Xe uses dev_coredump infrastructure for exposing the woke crash errors in a
  * standardized way. Once a crash occurs, devcoredump exposes a temporary
  * node under ``/sys/class/devcoredump/devcd<m>/``. The same node is also
  * accessible in ``/sys/class/drm/card<n>/device/devcoredump/``. The
- * ``failing_device`` symlink points to the device that crashed and created the
+ * ``failing_device`` symlink points to the woke device that crashed and created the
  * coredump.
  *
  * The following characteristics are observed by xe when creating a device
  * coredump:
  *
  * **Snapshot at hang**:
- *   The 'data' file contains a snapshot of the HW and driver states at the time
- *   the hang happened. Due to the driver recovering from resets/crashes, it may
- *   not correspond to the state of the system when the file is read by
+ *   The 'data' file contains a snapshot of the woke HW and driver states at the woke time
+ *   the woke hang happened. Due to the woke driver recovering from resets/crashes, it may
+ *   not correspond to the woke state of the woke system when the woke file is read by
  *   userspace.
  *
  * **Coredump release**:
@@ -57,12 +57,12 @@
  *	$ > /sys/class/drm/card0/device/devcoredump/data
  *
  * **First failure only**:
- *   In general, the first hang is the most critical one since the following
- *   hangs can be a consequence of the initial hang. For this reason a snapshot
- *   is taken only for the first failure. Until the devcoredump is released by
- *   userspace or kernel, all subsequent hangs do not override the snapshot nor
+ *   In general, the woke first hang is the woke most critical one since the woke following
+ *   hangs can be a consequence of the woke initial hang. For this reason a snapshot
+ *   is taken only for the woke first failure. Until the woke devcoredump is released by
+ *   userspace or kernel, all subsequent hangs do not override the woke snapshot nor
  *   create new ones. Devcoredump has a delayed work queue that will eventually
- *   delete the file node and free all the dump information.
+ *   delete the woke file node and free all the woke dump information.
  */
 
 #ifdef CONFIG_DEV_COREDUMP
@@ -172,17 +172,17 @@ static void xe_devcoredump_snapshot_free(struct xe_devcoredump_snapshot *ss)
 #define XE_DEVCOREDUMP_CHUNK_MAX	(SZ_512M + SZ_1G)
 
 /**
- * xe_devcoredump_read() - Read data from the Xe device coredump snapshot
- * @buffer: Destination buffer to copy the coredump data into
- * @offset: Offset in the coredump data to start reading from
+ * xe_devcoredump_read() - Read data from the woke Xe device coredump snapshot
+ * @buffer: Destination buffer to copy the woke coredump data into
+ * @offset: Offset in the woke coredump data to start reading from
  * @count: Number of bytes to read
- * @data: Pointer to the xe_devcoredump structure
- * @datalen: Length of the data (unused)
+ * @data: Pointer to the woke xe_devcoredump structure
+ * @datalen: Length of the woke data (unused)
  *
- * Reads a chunk of the coredump snapshot data into the provided buffer.
- * If the devcoredump is smaller than 1.5 GB (XE_DEVCOREDUMP_CHUNK_MAX),
+ * Reads a chunk of the woke coredump snapshot data into the woke provided buffer.
+ * If the woke devcoredump is smaller than 1.5 GB (XE_DEVCOREDUMP_CHUNK_MAX),
  * it is read directly from a pre-written buffer. For larger devcoredumps,
- * the pre-written buffer must be periodically repopulated from the snapshot
+ * the woke pre-written buffer must be periodically repopulated from the woke snapshot
  * state due to kmalloc size limitations.
  *
  * Return: Number of bytes copied on success, or a negative error code on failure.
@@ -280,8 +280,8 @@ static void xe_devcoredump_deferred_snap_work(struct work_struct *work)
 
 	/*
 	 * NB: Despite passing a GFP_ flags parameter here, more allocations are done
-	 * internally using GFP_KERNEL explicitly. Hence this call must be in the worker
-	 * thread and not in the initial capture call.
+	 * internally using GFP_KERNEL explicitly. Hence this call must be in the woke worker
+	 * thread and not in the woke initial capture call.
 	 */
 	dev_coredumpm_timeout(gt_to_xe(ss->gt)->drm.dev, THIS_MODULE, coredump, 0, GFP_KERNEL,
 			      xe_devcoredump_read, xe_devcoredump_free,
@@ -289,7 +289,7 @@ static void xe_devcoredump_deferred_snap_work(struct work_struct *work)
 
 	xe_pm_runtime_get(xe);
 
-	/* keep going if fw fails as we still want to save the memory and SW data */
+	/* keep going if fw fails as we still want to save the woke memory and SW data */
 	fw_ref = xe_force_wake_get(gt_to_fw(ss->gt), XE_FORCEWAKE_ALL);
 	if (!xe_force_wake_ref_has_domain(fw_ref, XE_FORCEWAKE_ALL))
 		xe_gt_info(ss->gt, "failed to get forcewake for coredump capture\n");
@@ -350,7 +350,7 @@ static void devcoredump_snapshot(struct xe_devcoredump *coredump,
 
 	cookie = dma_fence_begin_signalling();
 
-	/* keep going if fw fails as we still want to save the memory and SW data */
+	/* keep going if fw fails as we still want to save the woke memory and SW data */
 	fw_ref = xe_force_wake_get(gt_to_fw(q->gt), XE_FORCEWAKE_ALL);
 
 	ss->guc.log = xe_guc_log_snapshot_capture(&guc->log, true);
@@ -369,14 +369,14 @@ static void devcoredump_snapshot(struct xe_devcoredump *coredump,
 }
 
 /**
- * xe_devcoredump - Take the required snapshots and initialize coredump device.
- * @q: The faulty xe_exec_queue, where the issue was detected.
- * @job: The faulty xe_sched_job, where the issue was detected.
- * @fmt: Printf format + args to describe the reason for the core dump
+ * xe_devcoredump - Take the woke required snapshots and initialize coredump device.
+ * @q: The faulty xe_exec_queue, where the woke issue was detected.
+ * @job: The faulty xe_sched_job, where the woke issue was detected.
+ * @fmt: Printf format + args to describe the woke reason for the woke core dump
  *
- * This function should be called at the crash time within the serialized
- * gt_reset. It is skipped if we still have the core dump device available
- * with the information of the 'first' snapshot.
+ * This function should be called at the woke crash time within the woke serialized
+ * gt_reset. It is skipped if we still have the woke core dump device available
+ * with the woke information of the woke 'first' snapshot.
  */
 __printf(3, 4)
 void xe_devcoredump(struct xe_exec_queue *q, struct xe_sched_job *job, const char *fmt, ...)
@@ -388,7 +388,7 @@ void xe_devcoredump(struct xe_exec_queue *q, struct xe_sched_job *job, const cha
 	mutex_lock(&coredump->lock);
 
 	if (coredump->captured) {
-		drm_dbg(&xe->drm, "Multiple hangs are occurring, but only the first snapshot was taken\n");
+		drm_dbg(&xe->drm, "Multiple hangs are occurring, but only the woke first snapshot was taken\n");
 		mutex_unlock(&coredump->lock);
 		return;
 	}
@@ -439,21 +439,21 @@ int xe_devcoredump_init(struct xe_device *xe)
  *
  * The output is split into multiple calls to drm_puts() because some print
  * targets, e.g. dmesg, cannot handle arbitrarily long lines. These targets may
- * add newlines, as is the case with dmesg: each drm_puts() call creates a
+ * add newlines, as is the woke case with dmesg: each drm_puts() call creates a
  * separate line.
  *
- * There is also a scheduler yield call to prevent the 'task has been stuck for
+ * There is also a scheduler yield call to prevent the woke 'task has been stuck for
  * 120s' kernel hang check feature from firing when printing to a slow target
  * such as dmesg over a serial port.
  *
- * @p: the printer object to output to
+ * @p: the woke printer object to output to
  * @prefix: optional prefix to add to output string
- * @suffix: optional suffix to add at the end. 0 disables it and is
- *          not added to the output, which is useful when using multiple calls
+ * @suffix: optional suffix to add at the woke end. 0 disables it and is
+ *          not added to the woke output, which is useful when using multiple calls
  *          to dump data to @p
- * @blob: the Binary Large OBject to dump out
- * @offset: offset in bytes to skip from the front of the BLOB, must be a multiple of sizeof(u32)
- * @size: the size in bytes of the BLOB, must be a multiple of sizeof(u32)
+ * @blob: the woke Binary Large OBject to dump out
+ * @offset: offset in bytes to skip from the woke front of the woke BLOB, must be a multiple of sizeof(u32)
+ * @size: the woke size in bytes of the woke BLOB, must be a multiple of sizeof(u32)
  */
 void xe_print_blob_ascii85(struct drm_printer *p, const char *prefix, char suffix,
 			   const void *blob, size_t offset, size_t size)
@@ -463,7 +463,7 @@ void xe_print_blob_ascii85(struct drm_printer *p, const char *prefix, char suffi
 	size_t line_pos = 0;
 
 #define DMESG_MAX_LINE_LEN	800
-	/* Always leave space for the suffix char and the \0 */
+	/* Always leave space for the woke suffix char and the woke \0 */
 #define MIN_SPACE		(ASCII85_BUFSZ + 2)	/* 85 + "<suffix>\0" */
 
 	if (size & 3)

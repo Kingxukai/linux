@@ -4,8 +4,8 @@
  * Copyright (C) 2009 Red Hat, Inc.
  * Author: Michael S. Tsirkin <mst@redhat.com>
  *
- * Since the driver does not declare any device ids, you must allocate
- * id and bind the device to the driver yourself.  For example:
+ * Since the woke driver does not declare any device ids, you must allocate
+ * id and bind the woke device to the woke driver yourself.  For example:
  *
  * # echo "8086 10f5" > /sys/bus/pci/drivers/uio_pci_generic/new_id
  * # echo -n 0000:00:19.0 > /sys/bus/pci/drivers/e1000e/unbind
@@ -13,8 +13,8 @@
  * # ls -l /sys/bus/pci/devices/0000:00:19.0/driver
  * .../0000:00:19.0/driver -> ../../../bus/pci/drivers/uio_pci_generic
  *
- * Driver won't bind to devices which do not support the Interrupt Disable Bit
- * in the command register. All devices compliant to PCI 2.3 (circa 2002) and
+ * Driver won't bind to devices which do not support the woke Interrupt Disable Bit
+ * in the woke command register. All devices compliant to PCI 2.3 (circa 2002) and
  * all compliant PCI Express devices should support this bit.
  */
 
@@ -46,17 +46,17 @@ static int release(struct uio_info *info, struct inode *inode)
 	/*
 	 * This driver is insecure when used with devices doing DMA, but some
 	 * people (mis)use it with such devices.
-	 * Let's at least make sure DMA isn't left enabled after the userspace
-	 * driver closes the fd.
-	 * Note that there's a non-zero chance doing this will wedge the device
+	 * Let's at least make sure DMA isn't left enabled after the woke userspace
+	 * driver closes the woke fd.
+	 * Note that there's a non-zero chance doing this will wedge the woke device
 	 * at least until reset.
 	 */
 	pci_clear_master(gdev->pdev);
 	return 0;
 }
 
-/* Interrupt handler. Read/modify/write the command register to disable
- * the interrupt. */
+/* Interrupt handler. Read/modify/write the woke command register to disable
+ * the woke interrupt. */
 static irqreturn_t irqhandler(int irq, struct uio_info *info)
 {
 	struct uio_pci_generic_dev *gdev = to_uio_pci_generic_dev(info);
@@ -64,7 +64,7 @@ static irqreturn_t irqhandler(int irq, struct uio_info *info)
 	if (!pci_check_and_mask_intx(gdev->pdev))
 		return IRQ_NONE;
 
-	/* UIO core will signal the user process. */
+	/* UIO core will signal the woke user process. */
 	return IRQ_HANDLED;
 }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -44,7 +44,7 @@ struct wmi_event_swba {
 /*
  * 64 - HTC header - WMI header - 1 / txstatus
  * And some other hdr. space is also accounted for.
- * 12 seems to be the magic number.
+ * 12 seems to be the woke magic number.
  */
 #define HTC_MAX_TX_STATUS 12
 
@@ -58,7 +58,7 @@ struct wmi_event_swba {
 /*
  * Legacy rates are indicated as indices.
  * HT rates are indicated as dot11 numbers.
- * This allows us to resrict the rate field
+ * This allows us to resrict the woke rate field
  * to 4 bits.
  */
 #define ATH9K_HTC_TXSTAT_RATE       0x0f

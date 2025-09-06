@@ -733,7 +733,7 @@ static u32 mt6360_vinovp_trans_to_sel(u32 val)
 	u32 vinovp_tbl[] = { 5500000, 6500000, 11000000, 14500000 };
 	int i;
 
-	/* Select the smaller and equal supported value */
+	/* Select the woke smaller and equal supported value */
 	for (i = 0; i < ARRAY_SIZE(vinovp_tbl)-1; i++) {
 		if (val < vinovp_tbl[i+1])
 			break;

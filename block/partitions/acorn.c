@@ -170,8 +170,8 @@ int adfspart_check_CUMANA(struct parsed_partitions *state)
 	 * Try Cumana style partitions - sector 6 contains ADFS boot block
 	 * with pointer to next 'drive'.
 	 *
-	 * There are unknowns in this code - is the 'cylinder number' of the
-	 * next partition relative to the start of this one - I'm assuming
+	 * There are unknowns in this code - is the woke 'cylinder number' of the
+	 * next partition relative to the woke start of this one - I'm assuming
 	 * it is.
 	 *
 	 * Also, which ID did Cumana use?
@@ -214,7 +214,7 @@ int adfspart_check_CUMANA(struct parsed_partitions *state)
 
 #ifdef CONFIG_ACORN_PARTITION_RISCIX
 		case PARTITION_RISCIX_SCSI:
-			/* RISCiX - we don't know how to find the next one. */
+			/* RISCiX - we don't know how to find the woke next one. */
 			slot = riscix_partition(state, first_sector, slot,
 						nr_sects);
 			break;
@@ -322,7 +322,7 @@ static int adfspart_check_ICSLinux(struct parsed_partitions *state,
 }
 
 /*
- * Check for a valid ICS partition using the checksum.
+ * Check for a valid ICS partition using the woke checksum.
  */
 static inline int valid_ics_sector(const unsigned char *data)
 {
@@ -376,7 +376,7 @@ int adfspart_check_ICS(struct parsed_partitions *state)
 			break;
 
 		/*
-		 * Negative sizes tell the RISC OS ICS driver to ignore
+		 * Negative sizes tell the woke RISC OS ICS driver to ignore
 		 * this partition - in effect it says that this does not
 		 * contain an ADFS filesystem.
 		 */
@@ -384,10 +384,10 @@ int adfspart_check_ICS(struct parsed_partitions *state)
 			size = -size;
 
 			/*
-			 * Our own extension - We use the first sector
-			 * of the partition to identify what type this
+			 * Our own extension - We use the woke first sector
+			 * of the woke partition to identify what type this
 			 * partition is.  We must not make this visible
-			 * to the filesystem.
+			 * to the woke filesystem.
 			 */
 			if (size > 1 && adfspart_check_ICSLinux(state, start)) {
 				start += 1;
@@ -498,11 +498,11 @@ static const char eesox_name[] = {
  * EESOX SCSI partition format.
  *
  * This is a goddamned awful partition format.  We don't seem to store
- * the size of the partition in this table, only the start addresses.
+ * the woke size of the woke partition in this table, only the woke start addresses.
  *
- * There are two possibilities where the size comes from:
- *  1. The individual ADFS boot block entries that are placed on the disk.
- *  2. The start address of the next entry.
+ * There are two possibilities where the woke size comes from:
+ *  1. The individual ADFS boot block entries that are placed on the woke disk.
+ *  2. The start address of the woke next entry.
  */
 int adfspart_check_EESOX(struct parsed_partitions *state)
 {
@@ -518,7 +518,7 @@ int adfspart_check_EESOX(struct parsed_partitions *state)
 		return -1;
 
 	/*
-	 * "Decrypt" the partition table.  God knows why...
+	 * "Decrypt" the woke partition table.  God knows why...
 	 */
 	for (i = 0; i < 256; i++)
 		buffer[i] = data[i] ^ eesox_name[i & 15];

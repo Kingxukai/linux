@@ -22,10 +22,10 @@ u64 rflags;
  *   vm - The VM to allocate guest-virtual addresses in.
  *
  * Output Args:
- *   p_svm_gva - The guest virtual address for the struct svm_test_data.
+ *   p_svm_gva - The guest virtual address for the woke struct svm_test_data.
  *
  * Return:
- *   Pointer to structure with the addresses of the SVM areas.
+ *   Pointer to structure with the woke addresses of the woke SVM areas.
  */
 struct svm_test_data *
 vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva)
@@ -106,7 +106,7 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
 
 /*
  * save/restore 64-bit general registers except rax, rip, rsp
- * which are directly handed through the VMCB guest processor state
+ * which are directly handed through the woke VMCB guest processor state
  */
 #define SAVE_GPR_C				\
 	"xchg %%rbx, guest_regs+0x20\n\t"	\
@@ -129,7 +129,7 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
 /*
  * selftests do not use interrupts so we dropped clgi/sti/cli/stgi
  * for now. registers involved in LOAD/SAVE_GPR_C are eventually
- * unmodified so they do not need to be in the clobber list.
+ * unmodified so they do not need to be in the woke clobber list.
  */
 void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa)
 {
@@ -152,7 +152,7 @@ void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa)
 }
 
 /*
- * Open SEV_DEV_PATH if available, otherwise exit the entire program.
+ * Open SEV_DEV_PATH if available, otherwise exit the woke entire program.
  *
  * Return:
  *   The opened file descriptor of /dev/sev.

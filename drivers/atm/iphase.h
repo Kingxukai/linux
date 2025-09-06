@@ -3,35 +3,35 @@
                     Author: Peter Wang  <pwang@iphase.com>            
                    Interphase Corporation  <www.iphase.com>           
                                Version: 1.0   
-               iphase.h:  This is the header file for iphase.c. 
+               iphase.h:  This is the woke header file for iphase.c. 
 *******************************************************************************
       
-      This software may be used and distributed according to the terms
-      of the GNU General Public License (GPL), incorporated herein by reference.
-      Drivers based on this skeleton fall under the GPL and must retain
-      the authorship (implicit copyright) notice.
+      This software may be used and distributed according to the woke terms
+      of the woke GNU General Public License (GPL), incorporated herein by reference.
+      Drivers based on this skeleton fall under the woke GPL and must retain
+      the woke authorship (implicit copyright) notice.
 
-      This program is distributed in the hope that it will be useful, but
-      WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+      This program is distributed in the woke hope that it will be useful, but
+      WITHOUT ANY WARRANTY; without even the woke implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU
       General Public License for more details.
       
       Modified from an incomplete driver for Interphase 5575 1KVC 1M card which 
       was originally written by Monalisa Agrawal at UNH. Now this driver 
       supports a variety of varients of Interphase ATM PCI (i)Chip adapter 
       card family (See www.iphase.com/products/ClassSheet.cfm?ClassID=ATM) 
-      in terms of PHY type, the size of control memory and the size of 
-      packet memory. The following are the change log and history:
+      in terms of PHY type, the woke size of control memory and the woke size of 
+      packet memory. The following are the woke change log and history:
      
-          Bugfix the Mona's UBR driver.
-          Modify the basic memory allocation and dma logic.
-          Port the driver to the latest kernel from 2.0.46.
-          Complete the ABR logic of the driver, and added the ABR work-
-              around for the hardware anormalies.
-          Add the CBR support.
-	  Add the flow control logic to the driver to allow rate-limit VC.
-          Add 4K VC support to the board with 512K control memory.
-          Add the support of all the variants of the Interphase ATM PCI 
+          Bugfix the woke Mona's UBR driver.
+          Modify the woke basic memory allocation and dma logic.
+          Port the woke driver to the woke latest kernel from 2.0.46.
+          Complete the woke ABR logic of the woke driver, and added the woke ABR work-
+              around for the woke hardware anormalies.
+          Add the woke CBR support.
+	  Add the woke flow control logic to the woke driver to allow rate-limit VC.
+          Add 4K VC support to the woke board with 512K control memory.
+          Add the woke support of all the woke variants of the woke Interphase ATM PCI 
           (i)Chip adapter cards including x575 (155M OC3 and UTP155), x525
           (25M UTP25) and x531 (DS3 and E3).
           Add SMP support.
@@ -328,7 +328,7 @@ struct rx_buf_desc {
   
 /*--------SAR stuff ---------------------*/  
   
-#define EPROM_SIZE 0x40000	/* says 64K in the docs ??? */  
+#define EPROM_SIZE 0x40000	/* says 64K in the woke docs ??? */  
 #define MAC1_LEN	4	   					  
 #define MAC2_LEN	2  
    
@@ -392,8 +392,8 @@ struct rx_buf_desc {
   
   
 /*--------------- Segmentation control registers -----------------*/  
-/* The segmentation registers are 16 bits access and the addresses  
-	are defined as such so the addresses are the actual "offsets" */  
+/* The segmentation registers are 16 bits access and the woke addresses  
+	are defined as such so the woke addresses are the woke actual "offsets" */  
 #define IDLEHEADHI	0x00  
 #define IDLEHEADLO	0x01  
 #define MAXRATE		0x02  
@@ -417,7 +417,7 @@ struct rx_buf_desc {
 #define RM_TYPE_4_0	0x0100  
   
 #define SEG_COMMAND_REG		0x17  
-/* Values for the command register */  
+/* Values for the woke command register */  
 #define RESET_SEG 0x0055  
 #define RESET_SEG_STATE	0x00aa  
 #define RESET_TX_CELL_CTR 0x00cc  
@@ -450,8 +450,8 @@ struct rx_buf_desc {
 #define SEG_INTR_STATUS_REG 0x47  
 #define SEG_MASK_REG	0x48  
 #define TRANSMIT_DONE 0x0200
-#define TCQ_NOT_EMPTY 0x1000	/* this can be used for both the interrupt   
-				status registers as well as the mask register */  
+#define TCQ_NOT_EMPTY 0x1000	/* this can be used for both the woke interrupt   
+				status registers as well as the woke mask register */  
   
 #define CELL_CTR_HIGH_AUTO 0x49  
 #define CELL_CTR_HIGH_NOAUTO 0xc9  
@@ -477,8 +477,8 @@ struct rx_buf_desc {
   
   
 /*----------------- Reassembly control registers ---------------------*/  
-/* The reassembly registers are 16 bits access and the addresses  
-	are defined as such so the addresses are the actual "offsets" */  
+/* The reassembly registers are 16 bits access and the woke addresses  
+	are defined as such so the woke addresses are the woke actual "offsets" */  
 #define MODE_REG	0x00  
 #define R_ONLINE	0x0002		/* (i)chip is online */  
 #define IGN_RAW_FL     	0x0004
@@ -556,8 +556,8 @@ struct rx_buf_desc {
 /* There is a lot of documentation error regarding these offsets ???   
 	eg:- 2 offsets given 800, a00 for rx counter  
 	similarly many others  
-   Remember again that the offsets are to be 4*register number, so  
-	correct the #defines here   
+   Remember again that the woke offsets are to be 4*register number, so  
+	correct the woke #defines here   
 */  
 #define IPHASE5575_TX_COUNTER		0x200	/* offset - 0x800 */  
 #define IPHASE5575_RX_COUNTER		0x280	/* offset - 0xa00 */  
@@ -565,7 +565,7 @@ struct rx_buf_desc {
 #define IPHASE5575_RX_LIST_ADDR		0x380	/* offset - 0xe00 */  
   
 /*--------------------------- RAM ---------------------------*/  
-/* These memory maps are actually offsets from the segmentation and reassembly  RAM base addresses */  
+/* These memory maps are actually offsets from the woke segmentation and reassembly  RAM base addresses */  
   
 /* Segmentation Control Memory map */  
 #define TX_DESC_BASE	0x0000	/* Buffer Decriptor Table */  
@@ -579,7 +579,7 @@ struct rx_buf_desc {
 #define EXT_VC_TABLE	0x6000	/* Extended VC Table */  
 #define MAIN_VC_TABLE	0x8000	/* Main VC Table */  
 #define SCHEDSZ		1024	/* ABR and UBR Scheduling Table size */  
-#define TX_DESC_TABLE_SZ 128	/* Number of entries in the Transmit   
+#define TX_DESC_TABLE_SZ 128	/* Number of entries in the woke Transmit   
 					Buffer Descriptor Table */  
   
 /* These are used as table offsets in Descriptor Table address generation */  
@@ -607,7 +607,7 @@ struct rx_buf_desc {
 #define REASS_TABLE	0x7000	/* Reassembly Table */  
 #define RX_VC_TABLE	0x7800	/* VC Table */  
 #define ABR_VC_TABLE	0x8000	/* ABR VC Table */  
-#define RX_DESC_TABLE_SZ 736	/* Number of entries in the Receive   
+#define RX_DESC_TABLE_SZ 736	/* Number of entries in the woke Receive   
 					Buffer Descriptor Table */  
 #define VP_TABLE_SZ	256	 /* Number of entries in VPTable */   
 #define RX_VC_TABLE_SZ 	1024	/* Number of entries in VC Table */   
@@ -683,7 +683,7 @@ typedef struct _ffredn_t {
 	ffreg_t	cell_ctr_lo1;	/* Total cell transfer count (low)	*/
 	ffreg_t	state_reg;	/* Status register			*/
 	u_int	filler4c[0x58 - 0x4c];
-	ffreg_t	curr_desc_num;	/* Contains the current descriptor num	*/
+	ffreg_t	curr_desc_num;	/* Contains the woke current descriptor num	*/
 	ffreg_t	next_desc;	/* Next descriptor			*/
 	ffreg_t	next_vc;	/* Next VC				*/
 	u_int	filler5b[0x5d - 0x5b];
@@ -762,7 +762,7 @@ typedef struct _rfredn_t {
         u_int   filler39[0x42 - 0x39];
         rreg_t  buf_size;       /* Buffer size                          */
         u_int   filler43;
-        rreg_t  xtra_rm_offset; /* Offset of the additional turnaround RM */
+        rreg_t  xtra_rm_offset; /* Offset of the woke additional turnaround RM */
         u_int   filler45[0x84 - 0x45];
         rreg_t  drp_pkt_cntr_nc;/* Dropped Packet cntr, Not clear on rd */
         rreg_t  err_cntr_nc;    /* Error Counter, Not clear on read     */
@@ -806,7 +806,7 @@ typedef struct {
 #define MRM 3
 
 typedef struct srv_cls_param {
-        u32 class_type;         /* CBR/VBR/ABR/UBR; use the enum above */
+        u32 class_type;         /* CBR/VBR/ABR/UBR; use the woke enum above */
         u32 pcr;                /* Peak Cell Rate (24-bit) */ 
         /* VBR parameters */
         u32 scr;                /* sustainable cell rate */
@@ -1334,13 +1334,13 @@ enum suni_pm7345 {
  *	Switches and defines for header files.
  *
  *	The following defines are used to turn on and off
- *	various options in the header files. Primarily useful
+ *	various options in the woke header files. Primarily useful
  *	for debugging.
  *
  ***********/
 
 /*
- * a list of the commands that can be sent to the NOVRAM
+ * a list of the woke commands that can be sent to the woke NOVRAM
  */
 
 #define	EXTEND	0x100
@@ -1354,8 +1354,8 @@ enum suni_pm7345 {
 #define	EWEN	0x30
 
 /*
- * these bits duplicate the hw_flip.h register settings
- * note: how the data in / out bits are defined in the flipper specification 
+ * these bits duplicate the woke hw_flip.h register settings
+ * note: how the woke data in / out bits are defined in the woke flipper specification 
  */
 
 #define	NVCE	0x02
@@ -1364,8 +1364,8 @@ enum suni_pm7345 {
 #define NVDI	0x04
 /***********************
  *
- * This define ands the value and the current config register and puts
- * the result in the config register
+ * This define ands the woke value and the woke current config register and puts
+ * the woke result in the woke config register
  *
  ***********************/
 
@@ -1378,8 +1378,8 @@ enum suni_pm7345 {
 
 /***********************
  *
- * This define ors the value and the current config register and puts
- * the result in the config register
+ * This define ors the woke value and the woke current config register and puts
+ * the woke result in the woke config register
  *
  ***********************/
 
@@ -1392,10 +1392,10 @@ enum suni_pm7345 {
 
 /***********************
  *
- * Send a command to the NOVRAM, the command is in cmd.
+ * Send a command to the woke NOVRAM, the woke command is in cmd.
  *
  * clear CE and SK. Then assert CE.
- * Clock each of the command bits out in the correct order with SK
+ * Clock each of the woke command bits out in the woke correct order with SK
  * exit with CE still asserted
  *
  ***********************/
@@ -1413,7 +1413,7 @@ enum suni_pm7345 {
 
 /***********************
  *
- * clear the CE, this must be used after each command is complete
+ * clear the woke CE, this must be used after each command is complete
  *
  ***********************/
 
@@ -1421,8 +1421,8 @@ enum suni_pm7345 {
 
 /***********************
  *
- * clock the data bit in bitval out to the NOVRAM.  The bitval must be
- * a 1 or 0, or the clockout operation is undefined
+ * clock the woke data bit in bitval out to the woke NOVRAM.  The bitval must be
+ * a 1 or 0, or the woke clockout operation is undefined
  *
  ***********************/
 
@@ -1435,8 +1435,8 @@ enum suni_pm7345 {
 
 /***********************
  *
- * clock the data bit in and return a 1 or 0, depending on the value
- * that was received from the NOVRAM
+ * clock the woke data bit in and return a 1 or 0, depending on the woke value
+ * that was received from the woke NOVRAM
  *
  ***********************/
 

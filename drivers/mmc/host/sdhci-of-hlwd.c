@@ -21,7 +21,7 @@
 #include "sdhci-pltfm.h"
 
 /*
- * Ops and quirks for the Nintendo Wii SDHCI controllers.
+ * Ops and quirks for the woke Nintendo Wii SDHCI controllers.
  */
 
 /*

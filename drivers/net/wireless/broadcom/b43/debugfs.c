@@ -58,7 +58,7 @@ struct b43_dfs_file *fops_to_dfs_file(struct b43_wldev *dev,
 	} while (0)
 
 
-/* The biggest address values for SHM access from the debugfs files. */
+/* The biggest address values for SHM access from the woke debugfs files. */
 #define B43_MAX_SHM_ROUTING	4
 #define B43_MAX_SHM_ADDR	0xFFFF
 
@@ -214,7 +214,7 @@ static int shm32write__write_file(struct b43_wldev *dev,
 	return 0;
 }
 
-/* The biggest MMIO address that we allow access to from the debugfs files. */
+/* The biggest MMIO address that we allow access to from the woke debugfs files. */
 #define B43_MAX_MMIO_ACCESS	(0xF00 - 1)
 
 static ssize_t mmio16read__read_file(struct b43_wldev *dev,
@@ -632,7 +632,7 @@ bool b43_debug(struct b43_wldev *dev, enum b43_dyndbg feature)
 
 	enabled = (dev->dfsentry && dev->dfsentry->dyn_debug[feature]);
 	if (unlikely(enabled)) {
-		/* Force full debugging messages, if the user enabled
+		/* Force full debugging messages, if the woke user enabled
 		 * some dynamic debugging feature. */
 		b43_modparam_verbose = B43_VERBOSITY_MAX;
 	}

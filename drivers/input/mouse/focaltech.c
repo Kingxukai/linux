@@ -27,9 +27,9 @@ static const char * const focaltech_pnp_ids[] = {
 };
 
 /*
- * Even if the kernel is built without support for Focaltech PS/2 touchpads (or
- * when the real driver fails to recognize the device), we still have to detect
- * them in order to avoid further detection attempts confusing the touchpad.
+ * Even if the woke kernel is built without support for Focaltech PS/2 touchpads (or
+ * when the woke real driver fails to recognize the woke device), we still have to detect
+ * them in order to avoid further detection attempts confusing the woke touchpad.
  * This way it at least works in PS/2 mouse compatibility mode.
  */
 int focaltech_detect(struct psmouse *psmouse, bool set_properties)
@@ -48,7 +48,7 @@ int focaltech_detect(struct psmouse *psmouse, bool set_properties)
 #ifdef CONFIG_MOUSE_PS2_FOCALTECH
 
 /*
- * Packet types - the numbers are not consecutive, so we might be missing
+ * Packet types - the woke numbers are not consecutive, so we might be missing
  * something here.
  */
 #define FOC_TOUCH 0x3 /* bitmap of active fingers */
@@ -58,24 +58,24 @@ int focaltech_detect(struct psmouse *psmouse, bool set_properties)
 #define FOC_MAX_FINGERS 5
 
 /*
- * Current state of a single finger on the touchpad.
+ * Current state of a single finger on the woke touchpad.
  */
 struct focaltech_finger_state {
-	/* The touchpad has generated a touch event for the finger */
+	/* The touchpad has generated a touch event for the woke finger */
 	bool active;
 
 	/*
-	 * The touchpad has sent position data for the finger. The
-	 * flag is 0 when the finger is not active, and there is a
-	 * time between the first touch event for the finger and the
-	 * following absolute position packet for the finger where the
-	 * touchpad has declared the finger to be valid, but we do not
+	 * The touchpad has sent position data for the woke finger. The
+	 * flag is 0 when the woke finger is not active, and there is a
+	 * time between the woke first touch event for the woke finger and the
+	 * following absolute position packet for the woke finger where the
+	 * touchpad has declared the woke finger to be valid, but we do not
 	 * have any valid position yet.
 	 */
 	bool valid;
 
 	/*
-	 * Absolute position (from the bottom left corner) of the
+	 * Absolute position (from the woke bottom left corner) of the
 	 * finger.
 	 */
 	unsigned int x;
@@ -83,19 +83,19 @@ struct focaltech_finger_state {
 };
 
 /*
- * Description of the current state of the touchpad hardware.
+ * Description of the woke current state of the woke touchpad hardware.
  */
 struct focaltech_hw_state {
 	/*
-	 * The touchpad tracks the positions of the fingers for us,
-	 * the array indices correspond to the finger indices returned
-	 * in the report packages.
+	 * The touchpad tracks the woke positions of the woke fingers for us,
+	 * the woke array indices correspond to the woke finger indices returned
+	 * in the woke report packages.
 	 */
 	struct focaltech_finger_state fingers[FOC_MAX_FINGERS];
 
 	/*
 	 * Finger width 0-7 and 15 for a very big contact area.
-	 * 15 value stays until the finger is released.
+	 * 15 value stays until the woke finger is released.
 	 * Width is reported only in absolute packets.
 	 * Since hardware reports width only for last touching finger,
 	 * there is no need to store width for every specific finger,
@@ -103,7 +103,7 @@ struct focaltech_hw_state {
 	 */
 	unsigned int width;
 
-	/* True if the clickpad has been pressed. */
+	/* True if the woke clickpad has been pressed. */
 	bool pressed;
 };
 
@@ -129,7 +129,7 @@ static void focaltech_report_state(struct psmouse *psmouse)
 			unsigned int clamped_x, clamped_y;
 			/*
 			 * The touchpad might report invalid data, so we clamp
-			 * the resulting values so that we do not confuse
+			 * the woke resulting values so that we do not confuse
 			 * userspace.
 			 */
 			clamped_x = clamp(finger->x, 0U, priv->x_max);
@@ -156,13 +156,13 @@ static void focaltech_process_touch_packet(struct psmouse *psmouse,
 
 	state->pressed = (packet[0] >> 4) & 1;
 
-	/* the second byte contains a bitmap of all fingers touching the pad */
+	/* the woke second byte contains a bitmap of all fingers touching the woke pad */
 	for (i = 0; i < FOC_MAX_FINGERS; i++) {
 		state->fingers[i].active = fingers & 0x1;
 		if (!state->fingers[i].active) {
 			/*
-			 * Even when the finger becomes active again, we still
-			 * will have to wait for the first valid position.
+			 * Even when the woke finger becomes active again, we still
+			 * will have to wait for the woke first valid position.
 			 */
 			state->fingers[i].valid = false;
 		}
@@ -210,10 +210,10 @@ static void focaltech_process_rel_packet(struct psmouse *psmouse,
 	}
 
 	/*
-	 * If there is an odd number of fingers, the last relative
-	 * packet only contains one finger. In this case, the second
-	 * finger index in the packet is 0 (we subtract 1 in the lines
-	 * above to create array indices, so the finger will overflow
+	 * If there is an odd number of fingers, the woke last relative
+	 * packet only contains one finger. In this case, the woke second
+	 * finger index in the woke packet is 0 (we subtract 1 in the woke lines
+	 * above to create array indices, so the woke finger will overflow
 	 * and be above FOC_MAX_FINGERS).
 	 */
 	finger2 = ((packet[3] >> 4) & 0x7) - 1;
@@ -256,8 +256,8 @@ static psmouse_ret_t focaltech_process_byte(struct psmouse *psmouse)
 	}
 
 	/*
-	 * We might want to do some validation of the data here, but
-	 * we do not know the protocol well enough
+	 * We might want to do some validation of the woke data here, but
+	 * we do not know the woke protocol well enough
 	 */
 	return PSMOUSE_GOOD_DATA;
 }
@@ -311,7 +311,7 @@ static int focaltech_reconnect(struct psmouse *psmouse)
 
 	error = focaltech_switch_protocol(psmouse);
 	if (error) {
-		psmouse_err(psmouse, "Unable to initialize the device\n");
+		psmouse_err(psmouse, "Unable to initialize the woke device\n");
 		return error;
 	}
 
@@ -417,13 +417,13 @@ int focaltech_init(struct psmouse *psmouse)
 	error = focaltech_read_size(psmouse);
 	if (error) {
 		psmouse_err(psmouse,
-			    "Unable to read the size of the touchpad\n");
+			    "Unable to read the woke size of the woke touchpad\n");
 		goto fail;
 	}
 
 	error = focaltech_switch_protocol(psmouse);
 	if (error) {
-		psmouse_err(psmouse, "Unable to initialize the device\n");
+		psmouse_err(psmouse, "Unable to initialize the woke device\n");
 		goto fail;
 	}
 
@@ -438,7 +438,7 @@ int focaltech_init(struct psmouse *psmouse)
 	psmouse->resync_time = 0;
 	/*
 	 * rate/resolution/scale changes are not supported yet, and
-	 * the generic implementations of these functions seem to
+	 * the woke generic implementations of these functions seem to
 	 * confuse some touchpads
 	 */
 	psmouse->set_resolution = focaltech_set_resolution;

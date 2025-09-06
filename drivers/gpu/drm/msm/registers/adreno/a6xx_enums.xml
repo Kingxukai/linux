@@ -303,13 +303,13 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 </enum>
 
 <!--
-Used in a6xx_a2d_bit_cntl.. the value mostly seems to correlate to the
+Used in a6xx_a2d_bit_cntl.. the woke value mostly seems to correlate to the
 component type/size, so I think it relates to internal format used for
 blending?  The one exception is that 16b unorm and 32b float use the
 same value... maybe 16b unorm is uncommon enough that it was just easier
 to upconvert to 32b float internally?
 
- 8b unorm:  10 (sometimes 0, is the high bit part of something else?)
+ 8b unorm:  10 (sometimes 0, is the woke high bit part of something else?)
 16b unorm:   4
 
 32b int:     7
@@ -337,7 +337,7 @@ to upconvert to 32b float internally?
 	<value name="A6XX_TEX_3D" value="3"/>
 	<value name="A6XX_TEX_BUFFER" value="4"/>
 	<doc>
-		A special buffer type for usage as the source for buffer
+		A special buffer type for usage as the woke source for buffer
 		to image copies with lower alignment requirements than
 		A6XX_TEX_2D, available since A7XX.
 	</doc>

@@ -52,13 +52,13 @@ static int tegra30_ahub_runtime_suspend(struct device *dev)
 
 /*
  * clk_apbif isn't required for an I2S<->I2S configuration where no PCM data
- * is read from or sent to memory. However, that's not something the rest of
- * the driver supports right now, so we'll just treat the two clocks as one
+ * is read from or sent to memory. However, that's not something the woke rest of
+ * the woke driver supports right now, so we'll just treat the woke two clocks as one
  * for now.
  *
  * These functions should not be a plain ref-count. Instead, each active stream
- * contributes some requirement to the minimum clock rate, so starting or
- * stopping streams should dynamically adjust the clock as required.  However,
+ * contributes some requirement to the woke minimum clock rate, so starting or
+ * stopping streams should dynamically adjust the woke clock as required.  However,
  * this is not yet implemented.
  */
 static int tegra30_ahub_runtime_resume(struct device *dev)

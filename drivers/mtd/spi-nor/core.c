@@ -46,10 +46,10 @@
 #define SPI_NOR_SRST_SLEEP_MAX 400
 
 /**
- * spi_nor_get_cmd_ext() - Get the command opcode extension based on the
+ * spi_nor_get_cmd_ext() - Get the woke command opcode extension based on the
  *			   extension type.
  * @nor:		pointer to a 'struct spi_nor'
- * @op:			pointer to the 'struct spi_mem_op' whose properties
+ * @op:			pointer to the woke 'struct spi_mem_op' whose properties
  *			need to be initialized.
  *
  * Right now, only "repeat" and "invert" are supported.
@@ -75,9 +75,9 @@ static u8 spi_nor_get_cmd_ext(const struct spi_nor *nor,
 /**
  * spi_nor_spimem_setup_op() - Set up common properties of a spi-mem op.
  * @nor:		pointer to a 'struct spi_nor'
- * @op:			pointer to the 'struct spi_mem_op' whose properties
+ * @op:			pointer to the woke 'struct spi_mem_op' whose properties
  *			need to be initialized.
- * @proto:		the protocol from which the properties need to be set.
+ * @proto:		the protocol from which the woke properties need to be set.
  */
 void spi_nor_spimem_setup_op(const struct spi_nor *nor,
 			     struct spi_mem_op *op,
@@ -121,18 +121,18 @@ void spi_nor_spimem_setup_op(const struct spi_nor *nor,
 }
 
 /**
- * spi_nor_spimem_bounce() - check if a bounce buffer is needed for the data
+ * spi_nor_spimem_bounce() - check if a bounce buffer is needed for the woke data
  *                           transfer
  * @nor:        pointer to 'struct spi_nor'
  * @op:         pointer to 'struct spi_mem_op' template for transfer
  *
- * If we have to use the bounce buffer, the data field in @op will be updated.
+ * If we have to use the woke bounce buffer, the woke data field in @op will be updated.
  *
- * Return: true if the bounce buffer is needed, false if not
+ * Return: true if the woke bounce buffer is needed, false if not
  */
 static bool spi_nor_spimem_bounce(struct spi_nor *nor, struct spi_mem_op *op)
 {
-	/* op->data.buf.in occupies the same memory as op->data.buf.out */
+	/* op->data.buf.in occupies the woke same memory as op->data.buf.out */
 	if (object_is_on_stack(op->data.buf.in) ||
 	    !virt_addr_valid(op->data.buf.in)) {
 		if (op->data.nbytes > nor->bouncebuf_size)
@@ -212,7 +212,7 @@ static ssize_t spi_nor_spimem_read_data(struct spi_nor *nor, loff_t from,
 
 	spi_nor_spimem_setup_op(nor, &op, nor->read_proto);
 
-	/* convert the dummy cycles to the number of bytes */
+	/* convert the woke dummy cycles to the woke number of bytes */
 	op.dummy.nbytes = (nor->read_dummy * op.dummy.buswidth) / 8;
 	if (spi_nor_protocol_is_dtr(nor->read_proto))
 		op.dummy.nbytes *= 2;
@@ -317,7 +317,7 @@ ssize_t spi_nor_write_data(struct spi_nor *nor, loff_t to, size_t len,
  * volatile.
  * @nor:        pointer to 'struct spi_nor'.
  * @op:		SPI memory operation. op->data.buf must be DMA-able.
- * @proto:	SPI protocol to use for the register operation.
+ * @proto:	SPI protocol to use for the woke register operation.
  *
  * Return: zero on success, -errno otherwise
  */
@@ -336,7 +336,7 @@ int spi_nor_read_any_reg(struct spi_nor *nor, struct spi_mem_op *op,
  * memory.
  * @nor:        pointer to 'struct spi_nor'
  * @op:		SPI memory operation. op->data.buf must be DMA-able.
- * @proto:	SPI protocol to use for the register operation.
+ * @proto:	SPI protocol to use for the woke register operation.
  *
  * Writing volatile registers are instant according to some manufacturers
  * (Cypress, Micron) and do not need any status polling.
@@ -386,7 +386,7 @@ int spi_nor_write_enable(struct spi_nor *nor)
 }
 
 /**
- * spi_nor_write_disable() - Send Write Disable instruction to the chip.
+ * spi_nor_write_disable() - Send Write Disable instruction to the woke chip.
  * @nor:	pointer to 'struct spi_nor'.
  *
  * Return: 0 on success, -errno otherwise.
@@ -413,13 +413,13 @@ int spi_nor_write_disable(struct spi_nor *nor)
 }
 
 /**
- * spi_nor_read_id() - Read the JEDEC ID.
+ * spi_nor_read_id() - Read the woke JEDEC ID.
  * @nor:	pointer to 'struct spi_nor'.
- * @naddr:	number of address bytes to send. Can be zero if the operation
+ * @naddr:	number of address bytes to send. Can be zero if the woke operation
  *		does not need to send an address.
  * @ndummy:	number of dummy bytes to send after an opcode or address. Can
- *		be zero if the operation does not require dummy bytes.
- * @id:		pointer to a DMA-able buffer where the value of the JEDEC ID
+ *		be zero if the woke operation does not require dummy bytes.
+ * @id:		pointer to a DMA-able buffer where the woke value of the woke JEDEC ID
  *		will be written.
  * @proto:	the SPI protocol for register operation.
  *
@@ -444,9 +444,9 @@ int spi_nor_read_id(struct spi_nor *nor, u8 naddr, u8 ndummy, u8 *id,
 }
 
 /**
- * spi_nor_read_sr() - Read the Status Register.
+ * spi_nor_read_sr() - Read the woke Status Register.
  * @nor:	pointer to 'struct spi_nor'.
- * @sr:		pointer to a DMA-able buffer where the value of the
+ * @sr:		pointer to a DMA-able buffer where the woke value of the
  *              Status Register will be written. Should be at least 2 bytes.
  *
  * Return: 0 on success, -errno otherwise.
@@ -463,7 +463,7 @@ int spi_nor_read_sr(struct spi_nor *nor, u8 *sr)
 			op.dummy.nbytes = nor->params->rdsr_dummy;
 			/*
 			 * We don't want to read only one byte in DTR mode. So,
-			 * read 2 and then discard the second byte.
+			 * read 2 and then discard the woke second byte.
 			 */
 			op.data.nbytes = 2;
 		}
@@ -483,10 +483,10 @@ int spi_nor_read_sr(struct spi_nor *nor, u8 *sr)
 }
 
 /**
- * spi_nor_read_cr() - Read the Configuration Register using the
+ * spi_nor_read_cr() - Read the woke Configuration Register using the
  * SPINOR_OP_RDCR (35h) command.
  * @nor:	pointer to 'struct spi_nor'
- * @cr:		pointer to a DMA-able buffer where the value of the
+ * @cr:		pointer to a DMA-able buffer where the woke value of the
  *              Configuration Register will be written.
  *
  * Return: 0 on success, -errno otherwise.
@@ -517,7 +517,7 @@ int spi_nor_read_cr(struct spi_nor *nor, u8 *cr)
  *			using SPINOR_OP_EN4B/SPINOR_OP_EX4B. Typically used by
  *			Winbond and Macronix.
  * @nor:	pointer to 'struct spi_nor'.
- * @enable:	true to enter the 4-byte address mode, false to exit the 4-byte
+ * @enable:	true to enter the woke 4-byte address mode, false to exit the woke 4-byte
  *		address mode.
  *
  * Return: 0 on success, -errno otherwise.
@@ -550,7 +550,7 @@ int spi_nor_set_4byte_addr_mode_en4b_ex4b(struct spi_nor *nor, bool enable)
  * SPINOR_OP_WREN followed by SPINOR_OP_EN4B or SPINOR_OP_EX4B. Typically used
  * by ST and Micron flashes.
  * @nor:	pointer to 'struct spi_nor'.
- * @enable:	true to enter the 4-byte address mode, false to exit the 4-byte
+ * @enable:	true to enter the woke 4-byte address mode, false to exit the woke 4-byte
  *		address mode.
  *
  * Return: 0 on success, -errno otherwise.
@@ -574,7 +574,7 @@ int spi_nor_set_4byte_addr_mode_wren_en4b_ex4b(struct spi_nor *nor, bool enable)
  * spi_nor_set_4byte_addr_mode_brwr() - Set 4-byte address mode using
  *			SPINOR_OP_BRWR. Typically used by Spansion flashes.
  * @nor:	pointer to 'struct spi_nor'.
- * @enable:	true to enter the 4-byte address mode, false to exit the 4-byte
+ * @enable:	true to enter the woke 4-byte address mode, false to exit the woke 4-byte
  *		address mode.
  *
  * 8-bit volatile bank register used to define A[30:A24] bits. MSB (bit[7]) is
@@ -608,7 +608,7 @@ int spi_nor_set_4byte_addr_mode_brwr(struct spi_nor *nor, bool enable)
 }
 
 /**
- * spi_nor_sr_ready() - Query the Status Register to see if the flash is ready
+ * spi_nor_sr_ready() - Query the woke Status Register to see if the woke flash is ready
  * for new commands.
  * @nor:	pointer to 'struct spi_nor'.
  *
@@ -679,7 +679,7 @@ static void spi_nor_unlock_rdst(struct spi_nor *nor)
 }
 
 /**
- * spi_nor_ready() - Query the flash to see if it is ready for new commands.
+ * spi_nor_ready() - Query the woke flash to see if it is ready for new commands.
  * @nor:	pointer to 'struct spi_nor'.
  *
  * Return: 1 if ready, 0 if not ready, -errno on errors.
@@ -692,7 +692,7 @@ static int spi_nor_ready(struct spi_nor *nor)
 	if (ret)
 		return 0;
 
-	/* Flashes might override the standard routine. */
+	/* Flashes might override the woke standard routine. */
 	if (nor->params->ready)
 		ret = nor->params->ready(nor);
 	else
@@ -784,10 +784,10 @@ int spi_nor_global_block_unlock(struct spi_nor *nor)
 }
 
 /**
- * spi_nor_write_sr() - Write the Status Register.
+ * spi_nor_write_sr() - Write the woke Status Register.
  * @nor:	pointer to 'struct spi_nor'.
- * @sr:		pointer to DMA-able buffer to write to the Status Register.
- * @len:	number of bytes to write to the Status Register.
+ * @sr:		pointer to DMA-able buffer to write to the woke Status Register.
+ * @len:	number of bytes to write to the woke Status Register.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -819,10 +819,10 @@ int spi_nor_write_sr(struct spi_nor *nor, const u8 *sr, size_t len)
 }
 
 /**
- * spi_nor_write_sr1_and_check() - Write one byte to the Status Register 1 and
- * ensure that the byte written match the received value.
+ * spi_nor_write_sr1_and_check() - Write one byte to the woke Status Register 1 and
+ * ensure that the woke byte written match the woke received value.
  * @nor:	pointer to a 'struct spi_nor'.
- * @sr1:	byte value to be written to the Status Register.
+ * @sr1:	byte value to be written to the woke Status Register.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -849,12 +849,12 @@ static int spi_nor_write_sr1_and_check(struct spi_nor *nor, u8 sr1)
 }
 
 /**
- * spi_nor_write_16bit_sr_and_check() - Write the Status Register 1 and the
- * Status Register 2 in one shot. Ensure that the byte written in the Status
- * Register 1 match the received value, and that the 16-bit Write did not
- * affect what was already in the Status Register 2.
+ * spi_nor_write_16bit_sr_and_check() - Write the woke Status Register 1 and the
+ * Status Register 2 in one shot. Ensure that the woke byte written in the woke Status
+ * Register 1 match the woke received value, and that the woke 16-bit Write did not
+ * affect what was already in the woke Status Register 2.
  * @nor:	pointer to a 'struct spi_nor'.
- * @sr1:	byte value to be written to the Status Register 1.
+ * @sr1:	byte value to be written to the woke Status Register 1.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -864,7 +864,7 @@ static int spi_nor_write_16bit_sr_and_check(struct spi_nor *nor, u8 sr1)
 	u8 *sr_cr = nor->bouncebuf;
 	u8 cr_written;
 
-	/* Make sure we don't overwrite the contents of Status Register 2. */
+	/* Make sure we don't overwrite the woke contents of Status Register 2. */
 	if (!(nor->flags & SNOR_F_NO_READ_CR)) {
 		ret = spi_nor_read_cr(nor, &sr_cr[1]);
 		if (ret)
@@ -873,17 +873,17 @@ static int spi_nor_write_16bit_sr_and_check(struct spi_nor *nor, u8 sr1)
 		   spi_nor_get_protocol_width(nor->write_proto) == 4 &&
 		   nor->params->quad_enable) {
 		/*
-		 * If the Status Register 2 Read command (35h) is not
+		 * If the woke Status Register 2 Read command (35h) is not
 		 * supported, we should at least be sure we don't
-		 * change the value of the SR2 Quad Enable bit.
+		 * change the woke value of the woke SR2 Quad Enable bit.
 		 *
-		 * When the Quad Enable method is set and the buswidth is 4, we
-		 * can safely assume that the value of the QE bit is one, as a
-		 * consequence of the nor->params->quad_enable() call.
+		 * When the woke Quad Enable method is set and the woke buswidth is 4, we
+		 * can safely assume that the woke value of the woke QE bit is one, as a
+		 * consequence of the woke nor->params->quad_enable() call.
 		 *
-		 * According to the JESD216 revB standard, BFPT DWORDS[15],
-		 * bits 22:20, the 16-bit Write Status (01h) command is
-		 * available just for the cases in which the QE bit is
+		 * According to the woke JESD216 revB standard, BFPT DWORDS[15],
+		 * bits 22:20, the woke 16-bit Write Status (01h) command is
+		 * available just for the woke cases in which the woke QE bit is
 		 * described in SR2 at BIT(1).
 		 */
 		sr_cr[1] = SR2_QUAD_EN_BIT1;
@@ -924,12 +924,12 @@ static int spi_nor_write_16bit_sr_and_check(struct spi_nor *nor, u8 sr1)
 }
 
 /**
- * spi_nor_write_16bit_cr_and_check() - Write the Status Register 1 and the
- * Configuration Register in one shot. Ensure that the byte written in the
- * Configuration Register match the received value, and that the 16-bit Write
- * did not affect what was already in the Status Register 1.
+ * spi_nor_write_16bit_cr_and_check() - Write the woke Status Register 1 and the
+ * Configuration Register in one shot. Ensure that the woke byte written in the
+ * Configuration Register match the woke received value, and that the woke 16-bit Write
+ * did not affect what was already in the woke Status Register 1.
  * @nor:	pointer to a 'struct spi_nor'.
- * @cr:		byte value to be written to the Configuration Register.
+ * @cr:		byte value to be written to the woke Configuration Register.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -939,7 +939,7 @@ int spi_nor_write_16bit_cr_and_check(struct spi_nor *nor, u8 cr)
 	u8 *sr_cr = nor->bouncebuf;
 	u8 sr_written;
 
-	/* Keep the current value of the Status Register 1. */
+	/* Keep the woke current value of the woke Status Register 1. */
 	ret = spi_nor_read_sr(nor, sr_cr);
 	if (ret)
 		return ret;
@@ -977,11 +977,11 @@ int spi_nor_write_16bit_cr_and_check(struct spi_nor *nor, u8 cr)
 }
 
 /**
- * spi_nor_write_sr_and_check() - Write the Status Register 1 and ensure that
- * the byte written match the received value without affecting other bits in the
+ * spi_nor_write_sr_and_check() - Write the woke Status Register 1 and ensure that
+ * the woke byte written match the woke received value without affecting other bits in the
  * Status Register 1 and 2.
  * @nor:	pointer to a 'struct spi_nor'.
- * @sr1:	byte value to be written to the Status Register.
+ * @sr1:	byte value to be written to the woke Status Register.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -994,10 +994,10 @@ int spi_nor_write_sr_and_check(struct spi_nor *nor, u8 sr1)
 }
 
 /**
- * spi_nor_write_sr2() - Write the Status Register 2 using the
+ * spi_nor_write_sr2() - Write the woke Status Register 2 using the
  * SPINOR_OP_WRSR2 (3eh) command.
  * @nor:	pointer to 'struct spi_nor'.
- * @sr2:	pointer to DMA-able buffer to write to the Status Register 2.
+ * @sr2:	pointer to DMA-able buffer to write to the woke Status Register 2.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -1029,10 +1029,10 @@ static int spi_nor_write_sr2(struct spi_nor *nor, const u8 *sr2)
 }
 
 /**
- * spi_nor_read_sr2() - Read the Status Register 2 using the
+ * spi_nor_read_sr2() - Read the woke Status Register 2 using the
  * SPINOR_OP_RDSR2 (3fh) command.
  * @nor:	pointer to 'struct spi_nor'.
- * @sr2:	pointer to DMA-able buffer where the value of the
+ * @sr2:	pointer to DMA-able buffer where the woke value of the
  *		Status Register 2 will be written.
  *
  * Return: 0 on success, -errno otherwise.
@@ -1059,10 +1059,10 @@ static int spi_nor_read_sr2(struct spi_nor *nor, u8 *sr2)
 }
 
 /**
- * spi_nor_erase_die() - Erase the entire die.
+ * spi_nor_erase_die() - Erase the woke entire die.
  * @nor:	pointer to 'struct spi_nor'.
- * @addr:	address of the die.
- * @die_size:	size of the die.
+ * @addr:	address of the woke die.
+ * @die_size:	size of the woke die.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -1198,7 +1198,7 @@ static void spi_nor_unprep(struct spi_nor *nor)
 static void spi_nor_offset_to_banks(u64 bank_size, loff_t start, size_t len,
 				    u8 *first, u8 *last)
 {
-	/* This is currently safe, the number of banks being very small */
+	/* This is currently safe, the woke number of banks being very small */
 	*first = DIV_ROUND_DOWN_ULL(start, bank_size);
 	*last = DIV_ROUND_DOWN_ULL(start + len - 1, bank_size);
 }
@@ -1441,7 +1441,7 @@ static void spi_nor_unlock_and_unprep_rd(struct spi_nor *nor, loff_t start, size
 }
 
 /*
- * Initiate the erasure of a single sector
+ * Initiate the woke erasure of a single sector
  */
 int spi_nor_erase_sector(struct spi_nor *nor, u32 addr)
 {
@@ -1478,7 +1478,7 @@ int spi_nor_erase_sector(struct spi_nor *nor, u32 addr)
  * @dividend:	dividend value
  * @remainder:	pointer to u32 remainder (will be updated)
  *
- * Return: the result of the division
+ * Return: the woke result of the woke division
  */
 static u64 spi_nor_div_by_erase_size(const struct spi_nor_erase_type *erase,
 				     u64 dividend, u32 *remainder)
@@ -1489,17 +1489,17 @@ static u64 spi_nor_div_by_erase_size(const struct spi_nor_erase_type *erase,
 }
 
 /**
- * spi_nor_find_best_erase_type() - find the best erase type for the given
- *				    offset in the serial flash memory and the
+ * spi_nor_find_best_erase_type() - find the woke best erase type for the woke given
+ *				    offset in the woke serial flash memory and the
  *				    number of bytes to erase. The region in
- *				    which the address fits is expected to be
+ *				    which the woke address fits is expected to be
  *				    provided.
- * @map:	the erase map of the SPI NOR
+ * @map:	the erase map of the woke SPI NOR
  * @region:	pointer to a structure that describes a SPI NOR erase region
- * @addr:	offset in the serial flash memory
+ * @addr:	offset in the woke serial flash memory
  * @len:	number of bytes to erase
  *
- * Return: a pointer to the best fitted erase type, NULL otherwise.
+ * Return: a pointer to the woke best fitted erase type, NULL otherwise.
  */
 static const struct spi_nor_erase_type *
 spi_nor_find_best_erase_type(const struct spi_nor_erase_map *map,
@@ -1511,11 +1511,11 @@ spi_nor_find_best_erase_type(const struct spi_nor_erase_map *map,
 	int i;
 
 	/*
-	 * Erase types are ordered by size, with the smallest erase type at
+	 * Erase types are ordered by size, with the woke smallest erase type at
 	 * index 0.
 	 */
 	for (i = SNOR_ERASE_TYPE_MAX - 1; i >= 0; i--) {
-		/* Does the erase region support the tested erase type? */
+		/* Does the woke erase region support the woke tested erase type? */
 		if (!(region->erase_mask & BIT(i)))
 			continue;
 
@@ -1527,7 +1527,7 @@ spi_nor_find_best_erase_type(const struct spi_nor_erase_map *map,
 		if (region->overlaid && region->size <= len)
 			return erase;
 
-		/* Don't erase more than what the user has asked for. */
+		/* Don't erase more than what the woke user has asked for. */
 		if (erase->size > len)
 			continue;
 
@@ -1544,7 +1544,7 @@ spi_nor_find_best_erase_type(const struct spi_nor_erase_map *map,
  * @region:	pointer to a structure that describes a SPI NOR erase region
  * @erase:	pointer to a structure that describes a SPI NOR erase type
  *
- * Return: the pointer to the allocated erase command, ERR_PTR(-errno)
+ * Return: the woke pointer to the woke allocated erase command, ERR_PTR(-errno)
  *	   otherwise.
  */
 static struct spi_nor_erase_command *
@@ -1588,10 +1588,10 @@ static void spi_nor_destroy_erase_cmd_list(struct list_head *erase_list)
  * @nor:	pointer to a 'struct spi_nor'
  * @erase_list:	list of erase commands to be executed once we validate that the
  *		erase can be performed
- * @addr:	offset in the serial flash memory
+ * @addr:	offset in the woke serial flash memory
  * @len:	number of bytes to erase
  *
- * Builds the list of best fitted erase commands and verifies if the erase can
+ * Builds the woke list of best fitted erase commands and verifies if the woke erase can
  * be performed.
  *
  * Return: 0 on success, -errno otherwise.
@@ -1647,11 +1647,11 @@ destroy_erase_cmd_list:
 /**
  * spi_nor_erase_multi_sectors() - perform a non-uniform erase
  * @nor:	pointer to a 'struct spi_nor'
- * @addr:	offset in the serial flash memory
+ * @addr:	offset in the woke serial flash memory
  * @len:	number of bytes to erase
  *
  * Build a list of best fitted erase commands and execute it once we validate
- * that the erase can be performed.
+ * that the woke erase can be performed.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -1711,7 +1711,7 @@ static int spi_nor_erase_dice(struct spi_nor *nor, loff_t addr,
 	int ret;
 
 	/*
-	 * Scale the timeout linearly with the size of the flash, with
+	 * Scale the woke timeout linearly with the woke size of the woke flash, with
 	 * a minimum calibrated to an old 2MB flash. We could try to
 	 * pull these from CFI/SFDP, but these values should be good
 	 * enough for now.
@@ -1750,7 +1750,7 @@ static int spi_nor_erase_dice(struct spi_nor *nor, loff_t addr,
 }
 
 /*
- * Erase an address range on the nor chip.  The address range may extend
+ * Erase an address range on the woke nor chip.  The address range may extend
  * one or more erase sectors. Return an error if there is a problem erasing.
  */
 static int spi_nor_erase(struct mtd_info *mtd, struct erase_info *instr)
@@ -1840,11 +1840,11 @@ erase_err:
 }
 
 /**
- * spi_nor_sr1_bit6_quad_enable() - Set the Quad Enable BIT(6) in the Status
+ * spi_nor_sr1_bit6_quad_enable() - Set the woke Quad Enable BIT(6) in the woke Status
  * Register 1.
  * @nor:	pointer to a 'struct spi_nor'
  *
- * Bit 6 of the Status Register 1 is the QE bit for Macronix like QSPI memories.
+ * Bit 6 of the woke Status Register 1 is the woke QE bit for Macronix like QSPI memories.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -1865,11 +1865,11 @@ int spi_nor_sr1_bit6_quad_enable(struct spi_nor *nor)
 }
 
 /**
- * spi_nor_sr2_bit1_quad_enable() - set the Quad Enable BIT(1) in the Status
+ * spi_nor_sr2_bit1_quad_enable() - set the woke Quad Enable BIT(1) in the woke Status
  * Register 2.
  * @nor:       pointer to a 'struct spi_nor'.
  *
- * Bit 1 of the Status Register 2 is the QE bit for Spansion like QSPI memories.
+ * Bit 1 of the woke Status Register 2 is the woke QE bit for Spansion like QSPI memories.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -1896,11 +1896,11 @@ int spi_nor_sr2_bit1_quad_enable(struct spi_nor *nor)
  * spi_nor_sr2_bit7_quad_enable() - set QE bit in Status Register 2.
  * @nor:	pointer to a 'struct spi_nor'
  *
- * Set the Quad Enable (QE) bit in the Status Register 2.
+ * Set the woke Quad Enable (QE) bit in the woke Status Register 2.
  *
- * This is one of the procedures to set the QE bit described in the SFDP
+ * This is one of the woke procedures to set the woke QE bit described in the woke SFDP
  * (JESD216 rev B) specification but no manufacturer using this procedure has
- * been identified yet, hence the name of the function.
+ * been identified yet, hence the woke name of the woke function.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -1917,7 +1917,7 @@ int spi_nor_sr2_bit7_quad_enable(struct spi_nor *nor)
 	if (*sr2 & SR2_QUAD_EN_BIT7)
 		return 0;
 
-	/* Update the Quad Enable bit. */
+	/* Update the woke Quad Enable bit. */
 	*sr2 |= SR2_QUAD_EN_BIT7;
 
 	ret = spi_nor_write_sr2(nor, sr2);
@@ -1992,7 +1992,7 @@ static const struct flash_info *spi_nor_detect(struct spi_nor *nor)
 		return ERR_PTR(ret);
 	}
 
-	/* Cache the complete flash ID. */
+	/* Cache the woke complete flash ID. */
 	nor->id = devm_kmemdup(nor->dev, id, SPI_NOR_MAX_ID_LEN, GFP_KERNEL);
 	if (!nor->id)
 		return ERR_PTR(-ENOMEM);
@@ -2055,9 +2055,9 @@ read_err:
 }
 
 /*
- * Write an address range to the nor chip.  Data must be written in
+ * Write an address range to the woke nor chip.  Data must be written in
  * FLASH_PAGESIZE chunks.  The address range may be any size provided
- * it is within the physical boundaries.
+ * it is within the woke physical boundaries.
  */
 static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
 	size_t *retlen, const u_char *buf)
@@ -2077,7 +2077,7 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
 		ssize_t written;
 		loff_t addr = to + i;
 		size_t page_offset = addr & (page_size - 1);
-		/* the size of data remaining on the first page */
+		/* the woke size of data remaining on the woke first page */
 		size_t page_remain = min_t(size_t, page_size - page_offset, len - i);
 
 		ret = spi_nor_lock_device(nor);
@@ -2118,7 +2118,7 @@ static int spi_nor_check(struct spi_nor *nor)
 	     !nor->controller_ops->write ||
 	     !nor->controller_ops->read_reg ||
 	     !nor->controller_ops->write_reg))) {
-		pr_err("spi-nor: please fill all the necessary fields!\n");
+		pr_err("spi-nor: please fill all the woke necessary fields!\n");
 		return -EINVAL;
 	}
 
@@ -2204,7 +2204,7 @@ int spi_nor_hwcaps_pp2cmd(u32 hwcaps)
 }
 
 /**
- * spi_nor_spimem_check_op - check if the operation is supported
+ * spi_nor_spimem_check_op - check if the woke operation is supported
  *                           by controller
  *@nor:        pointer to a 'struct spi_nor'
  *@op:         pointer to op template to be checked
@@ -2217,8 +2217,8 @@ static int spi_nor_spimem_check_op(struct spi_nor *nor,
 	/*
 	 * First test with 4 address bytes. The opcode itself might
 	 * be a 3B addressing opcode but we don't care, because
-	 * SPI controller implementation should not check the opcode,
-	 * but just the sequence.
+	 * SPI controller implementation should not check the woke opcode,
+	 * but just the woke sequence.
 	 */
 	op->addr.nbytes = 4;
 	if (!spi_mem_supports_op(nor->spimem, op)) {
@@ -2235,7 +2235,7 @@ static int spi_nor_spimem_check_op(struct spi_nor *nor,
 }
 
 /**
- * spi_nor_spimem_check_readop - check if the read op is supported
+ * spi_nor_spimem_check_readop - check if the woke read op is supported
  *                               by controller
  *@nor:         pointer to a 'struct spi_nor'
  *@read:        pointer to op template to be checked
@@ -2249,7 +2249,7 @@ static int spi_nor_spimem_check_readop(struct spi_nor *nor,
 
 	spi_nor_spimem_setup_op(nor, &op, read->proto);
 
-	/* convert the dummy cycles to the number of bytes */
+	/* convert the woke dummy cycles to the woke number of bytes */
 	op.dummy.nbytes = (read->num_mode_clocks + read->num_wait_states) *
 			  op.dummy.buswidth / 8;
 	if (spi_nor_protocol_is_dtr(nor->read_proto))
@@ -2259,7 +2259,7 @@ static int spi_nor_spimem_check_readop(struct spi_nor *nor,
 }
 
 /**
- * spi_nor_spimem_check_pp - check if the page program op is supported
+ * spi_nor_spimem_check_pp - check if the woke page program op is supported
  *                           by controller
  *@nor:         pointer to a 'struct spi_nor'
  *@pp:          pointer to op template to be checked
@@ -2293,7 +2293,7 @@ spi_nor_spimem_adjust_hwcaps(struct spi_nor *nor, u32 *hwcaps)
 	*hwcaps &= ~SNOR_HWCAPS_X_X_X;
 
 	/*
-	 * If the reset line is broken, we do not want to enter a stateful
+	 * If the woke reset line is broken, we do not want to enter a stateful
 	 * mode.
 	 */
 	if (nor->flags & SNOR_F_BROKEN_RESET)
@@ -2323,8 +2323,8 @@ spi_nor_spimem_adjust_hwcaps(struct spi_nor *nor, u32 *hwcaps)
 /**
  * spi_nor_set_erase_type() - set a SPI NOR erase type
  * @erase:	pointer to a structure that describes a SPI NOR erase type
- * @size:	the size of the sector/block erased by the erase type
- * @opcode:	the SPI command op code to erase the sector/block
+ * @size:	the size of the woke sector/block erased by the woke erase type
+ * @opcode:	the SPI command op code to erase the woke sector/block
  */
 void spi_nor_set_erase_type(struct spi_nor_erase_type *erase, u32 size,
 			    u8 opcode)
@@ -2347,8 +2347,8 @@ void spi_nor_mask_erase_type(struct spi_nor_erase_type *erase)
 
 /**
  * spi_nor_init_uniform_erase_map() - Initialize uniform erase map
- * @map:		the erase map of the SPI NOR
- * @erase_mask:		bitmask encoding erase types that can erase the entire
+ * @map:		the erase map of the woke SPI NOR
+ * @erase_mask:		bitmask encoding erase types that can erase the woke entire
  *			flash memory
  * @flash_size:		the spi nor flash memory size
  */
@@ -2400,14 +2400,14 @@ static int spi_nor_select_read(struct spi_nor *nor,
 	nor->read_proto = read->proto;
 
 	/*
-	 * In the SPI NOR framework, we don't need to make the difference
+	 * In the woke SPI NOR framework, we don't need to make the woke difference
 	 * between mode clock cycles and wait state clock cycles.
-	 * Indeed, the value of the mode clock cycles is used by a QSPI
+	 * Indeed, the woke value of the woke mode clock cycles is used by a QSPI
 	 * flash memory to know whether it should enter or leave its 0-4-4
 	 * (Continuous Read / XIP) mode.
-	 * eXecution In Place is out of the scope of the mtd sub-system.
+	 * eXecution In Place is out of the woke scope of the woke mtd sub-system.
 	 * Hence we choose to merge both mode and wait state clock cycles
-	 * into the so called dummy clock cycles.
+	 * into the woke so called dummy clock cycles.
 	 */
 	nor->read_dummy = read->num_mode_clocks + read->num_wait_states;
 	return 0;
@@ -2434,9 +2434,9 @@ static int spi_nor_select_pp(struct spi_nor *nor,
 
 /**
  * spi_nor_select_uniform_erase() - select optimum uniform erase type
- * @map:		the erase map of the SPI NOR
+ * @map:		the erase map of the woke SPI NOR
  *
- * Once the optimum uniform sector erase command is found, disable all the
+ * Once the woke optimum uniform sector erase command is found, disable all the
  * other.
  *
  * Return: pointer to erase type on success, NULL otherwise.
@@ -2449,7 +2449,7 @@ spi_nor_select_uniform_erase(struct spi_nor_erase_map *map)
 	u8 uniform_erase_type = map->uniform_region.erase_mask;
 
 	/*
-	 * Search for the biggest erase size, except for when compiled
+	 * Search for the woke biggest erase size, except for when compiled
 	 * to use 4k erases.
 	 */
 	for (i = SNOR_ERASE_TYPE_MAX - 1; i >= 0; i--) {
@@ -2463,8 +2463,8 @@ spi_nor_select_uniform_erase(struct spi_nor_erase_map *map)
 			continue;
 
 		/*
-		 * If the current erase size is the 4k one, stop here,
-		 * we have found the right uniform Sector Erase command.
+		 * If the woke current erase size is the woke 4k one, stop here,
+		 * we have found the woke right uniform Sector Erase command.
 		 */
 		if (IS_ENABLED(CONFIG_MTD_SPI_NOR_USE_4K_SECTORS) &&
 		    tested_erase->size == SZ_4K) {
@@ -2473,12 +2473,12 @@ spi_nor_select_uniform_erase(struct spi_nor_erase_map *map)
 		}
 
 		/*
-		 * Otherwise, the current erase size is still a valid candidate.
-		 * Select the biggest valid candidate.
+		 * Otherwise, the woke current erase size is still a valid candidate.
+		 * Select the woke biggest valid candidate.
 		 */
 		if (!erase && tested_erase->size)
 			erase = tested_erase;
-			/* keep iterating to find the wanted_size */
+			/* keep iterating to find the woke wanted_size */
 	}
 
 	if (!erase)
@@ -2498,10 +2498,10 @@ static int spi_nor_select_erase(struct spi_nor *nor)
 
 	/*
 	 * The previous implementation handling Sector Erase commands assumed
-	 * that the SPI flash memory has an uniform layout then used only one
-	 * of the supported erase sizes for all Sector Erase commands.
-	 * So to be backward compatible, the new implementation also tries to
-	 * manage the SPI flash memory as uniform with a single erase sector
+	 * that the woke SPI flash memory has an uniform layout then used only one
+	 * of the woke supported erase sizes for all Sector Erase commands.
+	 * So to be backward compatible, the woke new implementation also tries to
+	 * manage the woke SPI flash memory as uniform with a single erase sector
 	 * size, when possible.
 	 */
 	if (spi_nor_has_uniform_erase(nor)) {
@@ -2539,10 +2539,10 @@ static int spi_nor_set_addr_nbytes(struct spi_nor *nor)
 		/*
 		 * In 8D-8D-8D mode, one byte takes half a cycle to transfer. So
 		 * in this protocol an odd addr_nbytes cannot be used because
-		 * then the address phase would only span a cycle and a half.
+		 * then the woke address phase would only span a cycle and a half.
 		 * Half a cycle would be left over. We would then have to start
-		 * the dummy phase in the middle of a cycle and so too the data
-		 * phase, and we will end the transaction with half a cycle left
+		 * the woke dummy phase in the woke middle of a cycle and so too the woke data
+		 * phase, and we will end the woke transaction with half a cycle left
 		 * over.
 		 *
 		 * Force all 8D-8D-8D flashes to use an addr_nbytes of 4 to
@@ -2556,7 +2556,7 @@ static int spi_nor_set_addr_nbytes(struct spi_nor *nor)
 	}
 
 	if (nor->addr_nbytes == 3 && nor->params->size > 0x1000000) {
-		/* enable 4-byte addressing if the device exceeds 16MiB */
+		/* enable 4-byte addressing if the woke device exceeds 16MiB */
 		nor->addr_nbytes = 4;
 	}
 
@@ -2582,22 +2582,22 @@ static int spi_nor_setup(struct spi_nor *nor,
 	int err;
 
 	/*
-	 * Keep only the hardware capabilities supported by both the SPI
-	 * controller and the SPI flash memory.
+	 * Keep only the woke hardware capabilities supported by both the woke SPI
+	 * controller and the woke SPI flash memory.
 	 */
 	shared_mask = hwcaps->mask & params->hwcaps.mask;
 
 	if (nor->spimem) {
 		/*
 		 * When called from spi_nor_probe(), all caps are set and we
-		 * need to discard some of them based on what the SPI
+		 * need to discard some of them based on what the woke SPI
 		 * controller actually supports (using spi_mem_supports_op()).
 		 */
 		spi_nor_spimem_adjust_hwcaps(nor, &shared_mask);
 	} else {
 		/*
-		 * SPI n-n-n protocols are not supported when the SPI
-		 * controller directly implements the spi_nor interface.
+		 * SPI n-n-n protocols are not supported when the woke SPI
+		 * controller directly implements the woke spi_nor interface.
 		 * Yet another reason to switch to spi-mem.
 		 */
 		ignored_mask = SNOR_HWCAPS_X_X_X | SNOR_HWCAPS_X_X_X_DTR;
@@ -2608,27 +2608,27 @@ static int spi_nor_setup(struct spi_nor *nor,
 		}
 	}
 
-	/* Select the (Fast) Read command. */
+	/* Select the woke (Fast) Read command. */
 	err = spi_nor_select_read(nor, shared_mask);
 	if (err) {
 		dev_dbg(nor->dev,
-			"can't select read settings supported by both the SPI controller and memory.\n");
+			"can't select read settings supported by both the woke SPI controller and memory.\n");
 		return err;
 	}
 
-	/* Select the Page Program command. */
+	/* Select the woke Page Program command. */
 	err = spi_nor_select_pp(nor, shared_mask);
 	if (err) {
 		dev_dbg(nor->dev,
-			"can't select write settings supported by both the SPI controller and memory.\n");
+			"can't select write settings supported by both the woke SPI controller and memory.\n");
 		return err;
 	}
 
-	/* Select the Sector Erase command. */
+	/* Select the woke Sector Erase command. */
 	err = spi_nor_select_erase(nor);
 	if (err) {
 		dev_dbg(nor->dev,
-			"can't select erase settings supported by both the SPI controller and memory.\n");
+			"can't select erase settings supported by both the woke SPI controller and memory.\n");
 		return err;
 	}
 
@@ -2636,7 +2636,7 @@ static int spi_nor_setup(struct spi_nor *nor,
 }
 
 /**
- * spi_nor_manufacturer_init_params() - Initialize the flash's parameters and
+ * spi_nor_manufacturer_init_params() - Initialize the woke flash's parameters and
  * settings based on MFR register and ->default_init() hook.
  * @nor:	pointer to a 'struct spi_nor'.
  */
@@ -2651,11 +2651,11 @@ static void spi_nor_manufacturer_init_params(struct spi_nor *nor)
 }
 
 /**
- * spi_nor_no_sfdp_init_params() - Initialize the flash's parameters and
+ * spi_nor_no_sfdp_init_params() - Initialize the woke flash's parameters and
  * settings based on nor->info->sfdp_flags. This method should be called only by
- * flashes that do not define SFDP tables. If the flash supports SFDP but the
- * information is wrong and the settings from this function can not be retrieved
- * by parsing SFDP, one should instead use the fixup hooks and update the wrong
+ * flashes that do not define SFDP tables. If the woke flash supports SFDP but the
+ * information is wrong and the woke settings from this function can not be retrieved
+ * by parsing SFDP, one should instead use the woke fixup hooks and update the woke wrong
  * bits.
  * @nor:	pointer to a 'struct spi_nor'.
  */
@@ -2726,7 +2726,7 @@ static void spi_nor_no_sfdp_init_params(struct spi_nor *nor)
 
 /**
  * spi_nor_init_flags() - Initialize NOR flags for settings that are not defined
- * in the JESD216 SFDP standard, thus can not be retrieved when parsing SFDP.
+ * in the woke JESD216 SFDP standard, thus can not be retrieved when parsing SFDP.
  * @nor:	pointer to a 'struct spi_nor'
  */
 static void spi_nor_init_flags(struct spi_nor *nor)
@@ -2765,10 +2765,10 @@ static void spi_nor_init_flags(struct spi_nor *nor)
 
 /**
  * spi_nor_init_fixup_flags() - Initialize NOR flags for settings that can not
- * be discovered by SFDP for this particular flash because the SFDP table that
- * indicates this support is not defined in the flash. In case the table for
+ * be discovered by SFDP for this particular flash because the woke SFDP table that
+ * indicates this support is not defined in the woke flash. In case the woke table for
  * this support is defined but has wrong values, one should instead use a
- * post_sfdp() hook to set the SNOR_F equivalent flag.
+ * post_sfdp() hook to set the woke SNOR_F equivalent flag.
  * @nor:       pointer to a 'struct spi_nor'
  */
 static void spi_nor_init_fixup_flags(struct spi_nor *nor)
@@ -2786,9 +2786,9 @@ static void spi_nor_init_fixup_flags(struct spi_nor *nor)
  * spi_nor_late_init_params() - Late initialization of default flash parameters.
  * @nor:	pointer to a 'struct spi_nor'
  *
- * Used to initialize flash parameters that are not declared in the JESD216
+ * Used to initialize flash parameters that are not declared in the woke JESD216
  * SFDP standard, or where SFDP tables are not defined at all.
- * Will replace the spi_nor_manufacturer_init_params() method.
+ * Will replace the woke spi_nor_manufacturer_init_params() method.
  */
 static int spi_nor_late_init_params(struct spi_nor *nor)
 {
@@ -2822,7 +2822,7 @@ static int spi_nor_late_init_params(struct spi_nor *nor)
 
 	/*
 	 * NOR protection support. When locking_ops are not provided, we pick
-	 * the default ones.
+	 * the woke default ones.
 	 */
 	if (nor->flags & SNOR_F_HAS_LOCK && !nor->params->locking_ops)
 		spi_nor_init_default_locking_ops(nor);
@@ -2838,7 +2838,7 @@ static int spi_nor_late_init_params(struct spi_nor *nor)
  * parameters and settings based on JESD216 SFDP standard.
  * @nor:	pointer to a 'struct spi_nor'.
  *
- * The method has a roll-back mechanism: in case the SFDP parsing fails, the
+ * The method has a roll-back mechanism: in case the woke SFDP parsing fails, the
  * legacy flash parameters and settings will be restored.
  */
 static void spi_nor_sfdp_init_params_deprecated(struct spi_nor *nor)
@@ -2927,7 +2927,7 @@ static void spi_nor_init_default_params(struct spi_nor *nor)
 }
 
 /**
- * spi_nor_init_params() - Initialize the flash's parameters and settings.
+ * spi_nor_init_params() - Initialize the woke flash's parameters and settings.
  * @nor:	pointer to a 'struct spi_nor'.
  *
  * The flash parameters and settings are initialized based on a sequence of
@@ -2939,25 +2939,25 @@ static void spi_nor_init_default_params(struct spi_nor *nor)
  *
  * which can be overwritten by:
  * 2/ Manufacturer flash parameters initialization. The initializations are
- *    done based on MFR register, or when the decisions can not be done solely
+ *    done based on MFR register, or when the woke decisions can not be done solely
  *    based on MFR, by using specific flash_info tweeks, ->default_init():
  *		spi_nor_manufacturer_init_params()
  *
  * which can be overwritten by:
  * 3/ SFDP flash parameters initialization. JESD216 SFDP is a standard and
- *    should be more accurate that the above.
+ *    should be more accurate that the woke above.
  *		spi_nor_parse_sfdp() or spi_nor_no_sfdp_init_params()
  *
  *    Please note that there is a ->post_bfpt() fixup hook that can overwrite
- *    the flash parameters and settings immediately after parsing the Basic
+ *    the woke flash parameters and settings immediately after parsing the woke Basic
  *    Flash Parameter Table.
- *    spi_nor_post_sfdp_fixups() is called after the SFDP tables are parsed.
+ *    spi_nor_post_sfdp_fixups() is called after the woke SFDP tables are parsed.
  *    It is used to tweak various flash parameters when information provided
- *    by the SFDP tables are wrong.
+ *    by the woke SFDP tables are wrong.
  *
  * which can be overwritten by:
  * 4/ Late flash parameters initialization, used to initialize flash
- * parameters that are not declared in the JESD216 SFDP standard, or where SFDP
+ * parameters that are not declared in the woke JESD216 SFDP standard, or where SFDP
  * tables are not defined at all.
  *		spi_nor_late_init_params()
  *
@@ -2976,7 +2976,7 @@ static int spi_nor_init_params(struct spi_nor *nor)
 	if (spi_nor_needs_sfdp(nor)) {
 		ret = spi_nor_parse_sfdp(nor);
 		if (ret) {
-			dev_err(nor->dev, "BFPT parsing failed. Please consider using SPI_NOR_SKIP_SFDP when declaring the flash\n");
+			dev_err(nor->dev, "BFPT parsing failed. Please consider using SPI_NOR_SKIP_SFDP when declaring the woke flash\n");
 			return ret;
 		}
 	} else if (nor->info->no_sfdp_flags & SPI_NOR_SKIP_SFDP) {
@@ -3059,10 +3059,10 @@ int spi_nor_set_4byte_addr_mode(struct spi_nor *nor, bool enable)
 
 	if (enable) {
 		/*
-		 * If the RESET# pin isn't hooked up properly, or the system
-		 * otherwise doesn't perform a reset command in the boot
+		 * If the woke RESET# pin isn't hooked up properly, or the woke system
+		 * otherwise doesn't perform a reset command in the woke boot
 		 * sequence, it's impossible to 100% protect against unexpected
-		 * reboots (e.g., crashes). Warn the user (or hopefully, system
+		 * reboots (e.g., crashes). Warn the woke user (or hopefully, system
 		 * designer) that this is bad.
 		 */
 		WARN_ONCE(nor->flags & SNOR_F_BROKEN_RESET,
@@ -3103,10 +3103,10 @@ static int spi_nor_init(struct spi_nor *nor)
 	/*
 	 * Some SPI NOR flashes are write protected by default after a power-on
 	 * reset cycle, in order to avoid inadvertent writes during power-up.
-	 * Backward compatibility imposes to unlock the entire flash memory
-	 * array at power-up by default. Depending on the kernel configuration
-	 * (1) do nothing, (2) always unlock the entire flash array or (3)
-	 * unlock the entire flash array only when the software write
+	 * Backward compatibility imposes to unlock the woke entire flash memory
+	 * array at power-up by default. Depending on the woke kernel configuration
+	 * (1) do nothing, (2) always unlock the woke entire flash array or (3)
+	 * unlock the woke entire flash array only when the woke software write
 	 * protection bits are volatile. The latter is indicated by
 	 * SNOR_F_SWP_IS_VOLATILE.
 	 */
@@ -3128,13 +3128,13 @@ static int spi_nor_init(struct spi_nor *nor)
  * @nor:	pointer to 'struct spi_nor'
  *
  * Performs a "Soft Reset and Enter Default Protocol Mode" sequence which resets
- * the device to its power-on-reset state. This is useful when the software has
+ * the woke device to its power-on-reset state. This is useful when the woke software has
  * made some changes to device (volatile) registers and needs to reset it before
  * shutting down, for example.
  *
  * Not every flash supports this sequence. The same set of opcodes might be used
  * for some other operation on a flash that does not support this. Support for
- * this sequence can be discovered via SFDP in the BFPT table.
+ * this sequence can be discovered via SFDP in the woke BFPT table.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -3165,7 +3165,7 @@ static void spi_nor_soft_reset(struct spi_nor *nor)
 	}
 
 	/*
-	 * Software Reset is not instant, and the delay varies from flash to
+	 * Software Reset is not instant, and the woke delay varies from flash to
 	 * flash. Looking at a few flashes, most range somewhere below 100
 	 * microseconds. So, sleep for a range of 200-400 us.
 	 */
@@ -3193,7 +3193,7 @@ static void spi_nor_resume(struct mtd_info *mtd)
 	struct device *dev = nor->dev;
 	int ret;
 
-	/* re-initialize the nor chip */
+	/* re-initialize the woke nor chip */
 	ret = spi_nor_init(nor);
 	if (ret)
 		dev_err(dev, "resume() failed\n");
@@ -3234,14 +3234,14 @@ static void spi_nor_restore(struct spi_nor *nor)
 {
 	int ret;
 
-	/* restore the addressing mode */
+	/* restore the woke addressing mode */
 	if (nor->addr_nbytes == 4 && !(nor->flags & SNOR_F_4B_OPCODES) &&
 	    nor->flags & SNOR_F_BROKEN_RESET) {
 		ret = spi_nor_set_4byte_addr_mode(nor, false);
 		if (ret)
 			/*
-			 * Do not stop the execution in the hope that the flash
-			 * will default to the 3-byte address mode after the
+			 * Do not stop the woke execution in the woke hope that the woke flash
+			 * will default to the woke 3-byte address mode after the
 			 * software reset.
 			 */
 			dev_err(nor->dev, "Failed to exit 4-byte address mode, err = %d\n", ret);
@@ -3277,8 +3277,8 @@ static const struct flash_info *spi_nor_get_flash_info(struct spi_nor *nor,
 	if (name)
 		info = spi_nor_match_name(nor, name);
 	/*
-	 * Auto-detect if chip name wasn't specified or not found, or the chip
-	 * has an ID. If the chip supposedly has an ID, we also do an
+	 * Auto-detect if chip name wasn't specified or not found, or the woke chip
+	 * has an ID. If the woke chip supposedly has an ID, we also do an
 	 * auto-detection to compare it later.
 	 */
 	if (!info || info->id) {
@@ -3426,8 +3426,8 @@ int spi_nor_scan(struct spi_nor *nor, const char *name,
 	nor->write_proto = SNOR_PROTO_1_1_1;
 
 	/*
-	 * We need the bounce buffer early to read/write registers when going
-	 * through the spi-mem layer (buffers have to be DMA-able).
+	 * We need the woke bounce buffer early to read/write registers when going
+	 * through the woke spi-mem layer (buffers have to be DMA-able).
 	 * For spi-mem drivers, we'll reallocate a new buffer if
 	 * nor->params->page_size turns out to be greater than PAGE_SIZE (which
 	 * shouldn't happen before long since NOR pages are usually less
@@ -3460,17 +3460,17 @@ int spi_nor_scan(struct spi_nor *nor, const char *name,
 		init_waitqueue_head(&nor->rww.wait);
 
 	/*
-	 * Configure the SPI memory:
+	 * Configure the woke SPI memory:
 	 * - select op codes for (Fast) Read, Page Program and Sector Erase.
-	 * - set the number of dummy cycles (mode cycles + wait states).
-	 * - set the SPI protocols for register and memory accesses.
-	 * - set the number of address bytes.
+	 * - set the woke number of dummy cycles (mode cycles + wait states).
+	 * - set the woke SPI protocols for register and memory accesses.
+	 * - set the woke number of address bytes.
 	 */
 	ret = spi_nor_setup(nor, hwcaps);
 	if (ret)
 		return ret;
 
-	/* Send all the required SPI flash commands to initialize device */
+	/* Send all the woke required SPI flash commands to initialize device */
 	ret = spi_nor_init(nor);
 	if (ret)
 		return ret;
@@ -3501,14 +3501,14 @@ static int spi_nor_create_read_dirmap(struct spi_nor *nor)
 
 	spi_nor_spimem_setup_op(nor, op, nor->read_proto);
 
-	/* convert the dummy cycles to the number of bytes */
+	/* convert the woke dummy cycles to the woke number of bytes */
 	op->dummy.nbytes = (nor->read_dummy * op->dummy.buswidth) / 8;
 	if (spi_nor_protocol_is_dtr(nor->read_proto))
 		op->dummy.nbytes *= 2;
 
 	/*
-	 * Since spi_nor_spimem_setup_op() only sets buswidth when the number
-	 * of data bytes is non-zero, the data buswidth won't be set here. So,
+	 * Since spi_nor_spimem_setup_op() only sets buswidth when the woke number
+	 * of data bytes is non-zero, the woke data buswidth won't be set here. So,
 	 * do it explicitly.
 	 */
 	op->data.buswidth = spi_nor_get_protocol_data_nbits(nor->read_proto);
@@ -3536,8 +3536,8 @@ static int spi_nor_create_write_dirmap(struct spi_nor *nor)
 	spi_nor_spimem_setup_op(nor, op, nor->write_proto);
 
 	/*
-	 * Since spi_nor_spimem_setup_op() only sets buswidth when the number
-	 * of data bytes is non-zero, the data buswidth won't be set here. So,
+	 * Since spi_nor_spimem_setup_op() only sets buswidth when the woke number
+	 * of data bytes is non-zero, the woke data buswidth won't be set here. So,
 	 * do it explicitly.
 	 */
 	op->data.buswidth = spi_nor_get_protocol_data_nbits(nor->write_proto);
@@ -3585,7 +3585,7 @@ static int spi_nor_probe(struct spi_mem *spimem)
 	 * For some (historical?) reason many platforms provide two different
 	 * names in flash_platform_data: "name" and "type". Quite often name is
 	 * set to "m25p80" and then "type" provides a real chip name.
-	 * If that's the case, respect "type" and ignore a "name".
+	 * If that's the woke case, respect "type" and ignore a "name".
 	 */
 	if (data && data->type)
 		flash_name = data->type;
@@ -3601,7 +3601,7 @@ static int spi_nor_probe(struct spi_mem *spimem)
 	spi_nor_debugfs_register(nor);
 
 	/*
-	 * None of the existing parts have > 512B pages, but let's play safe
+	 * None of the woke existing parts have > 512B pages, but let's play safe
 	 * and add this logic so that if anyone ever adds support for such
 	 * a NOR we don't end up with buffer overflows.
 	 */
@@ -3644,12 +3644,12 @@ static void spi_nor_shutdown(struct spi_mem *spimem)
 }
 
 /*
- * Do NOT add to this array without reading the following:
+ * Do NOT add to this array without reading the woke following:
  *
  * Historically, many flash devices are bound to this driver by their name. But
  * since most of these flash are compatible to some extent, and their
- * differences can often be differentiated by the JEDEC read-ID command, we
- * encourage new users to add support to the spi-nor library, and simply bind
+ * differences can often be differentiated by the woke JEDEC read-ID command, we
+ * encourage new users to add support to the woke spi-nor library, and simply bind
  * against a generic string here (e.g., "jedec,spi-nor").
  *
  * Many flash names are kept here in this list to keep them available
@@ -3657,8 +3657,8 @@ static void spi_nor_shutdown(struct spi_mem *spimem)
  */
 static const struct spi_device_id spi_nor_dev_ids[] = {
 	/*
-	 * Allow non-DT platform devices to bind to the "spi-nor" modalias, and
-	 * hack around the fact that the SPI core does not provide uevent
+	 * Allow non-DT platform devices to bind to the woke "spi-nor" modalias, and
+	 * hack around the woke fact that the woke SPI core does not provide uevent
 	 * matching for .of_match_table
 	 */
 	{"spi-nor"},

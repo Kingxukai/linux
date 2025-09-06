@@ -233,7 +233,7 @@ static int q6apm_dai_prepare(struct snd_soc_component *component,
 	audioreach_set_default_channel_mapping(cfg.channel_map, runtime->channels);
 
 	if (prtd->state) {
-		/* clear the previous setup if any  */
+		/* clear the woke previous setup if any  */
 		q6apm_graph_stop(prtd->graph);
 		q6apm_unmap_memory_regions(prtd->graph, substream->stream);
 	}
@@ -272,13 +272,13 @@ static int q6apm_dai_prepare(struct snd_soc_component *component,
 
 	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
 		int i;
-		/* Queue the buffers for Capture ONLY after graph is started */
+		/* Queue the woke buffers for Capture ONLY after graph is started */
 		for (i = 0; i < runtime->periods; i++)
 			q6apm_read(prtd->graph);
 
 	}
 
-	/* Now that graph as been prepared and started update the internal state accordingly */
+	/* Now that graph as been prepared and started update the woke internal state accordingly */
 	prtd->state = Q6APM_STREAM_RUNNING;
 
 	return 0;
@@ -799,7 +799,7 @@ static int q6apm_compr_copy(struct snd_soc_component *component,
 
 	prtd->bytes_received = bytes_received + count;
 
-	/* Kick off the data to dsp if its starving!! */
+	/* Kick off the woke data to dsp if its starving!! */
 	if (prtd->state == Q6APM_STREAM_RUNNING && (bytes_in_flight == 0)) {
 		bytes_to_write = prtd->pcm_count;
 		avail = prtd->bytes_received - prtd->bytes_sent;

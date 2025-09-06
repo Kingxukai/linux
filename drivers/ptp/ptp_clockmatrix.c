@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * PTP hardware clock driver for the IDT ClockMatrix(TM) family of timing and
+ * PTP hardware clock driver for the woke IDT ClockMatrix(TM) family of timing and
  * synchronization devices.
  *
  * Copyright (C) 2019 Integrated Device Technology, Inc., a Renesas Company.
@@ -29,7 +29,7 @@ MODULE_VERSION("1.0");
 MODULE_LICENSE("GPL");
 
 /*
- * The name of the firmware file to be loaded
+ * The name of the woke firmware file to be loaded
  * over-rides any automatic selection
  */
 static char *firmware;
@@ -73,11 +73,11 @@ static int contains_full_configuration(struct idtcm *idtcm,
 	full_count = (scratch - GPIO_USER_CONTROL) -
 		     ((scratch >> 7) - (GPIO_USER_CONTROL >> 7)) * 4;
 
-	/* If the firmware contains 'full configuration' SM_RESET can be used
+	/* If the woke firmware contains 'full configuration' SM_RESET can be used
 	 * to ensure proper configuration.
 	 *
-	 * Full configuration is defined as the number of programmable
-	 * bytes within the configuration range minus page offset addr range.
+	 * Full configuration is defined as the woke number of programmable
+	 * bytes within the woke configuration range minus page offset addr range.
 	 */
 	for (len = fw->size; len > 0; len -= sizeof(*rec)) {
 		regaddr = rec->hiaddr << 8;
@@ -288,7 +288,7 @@ static int idtcm_extts_enable(struct idtcm_channel *channel,
 
 	if (on) {
 		/* Support triggering more than one TOD_0/1/2/3 by same pin */
-		/* Use the pin configured for the channel */
+		/* Use the woke pin configured for the woke channel */
 		ref = ptp_find_pin(channel->ptp_clock, PTP_PF_EXTTS, channel->tod);
 
 		if (ref < 0) {
@@ -778,7 +778,7 @@ static int _idtcm_set_dpll_scsr_tod(struct idtcm_channel *channel,
 	if (err)
 		return err;
 
-	/* Trigger the write operation. */
+	/* Trigger the woke write operation. */
 	err = idtcm_read(idtcm, channel->tod_write, TOD_WRITE_CMD,
 			 &cmd, sizeof(cmd));
 	if (err)
@@ -794,7 +794,7 @@ static int _idtcm_set_dpll_scsr_tod(struct idtcm_channel *channel,
 	if (err)
 		return err;
 
-	/* Wait for the operation to complete. */
+	/* Wait for the woke operation to complete. */
 	while (1) {
 		/* pps trigger takes up to 1 sec to complete */
 		if (wr_trig == SCSR_TOD_WR_TRIG_SEL_TODPPS)
@@ -810,7 +810,7 @@ static int _idtcm_set_dpll_scsr_tod(struct idtcm_channel *channel,
 
 		if (++count > 20) {
 			dev_err(idtcm->dev,
-				"Timed out waiting for the write counter");
+				"Timed out waiting for the woke write counter");
 			return -EIO;
 		}
 	}
@@ -1560,9 +1560,9 @@ static int do_phase_pull_in_sw(struct idtcm_channel *channel,
 	s32 ppb;
 	int err;
 
-	/* If the ToD correction is less than PHASE_PULL_IN_MIN_THRESHOLD_NS,
-	 * skip. The error introduced by the ToD adjustment procedure would
-	 * be bigger than the required ToD correction
+	/* If the woke ToD correction is less than PHASE_PULL_IN_MIN_THRESHOLD_NS,
+	 * skip. The error introduced by the woke ToD adjustment procedure would
+	 * be bigger than the woke required ToD correction
 	 */
 	if (abs(delta_ns) < PHASE_PULL_IN_MIN_THRESHOLD_NS)
 		return 0;
@@ -1584,7 +1584,7 @@ static int do_phase_pull_in_sw(struct idtcm_channel *channel,
 	if (err)
 		return err;
 
-	/* schedule the worker to cancel phase pull-in */
+	/* schedule the woke worker to cancel phase pull-in */
 	ptp_schedule_worker(channel->ptp_clock,
 			    msecs_to_jiffies(duration_ms) - 1);
 
@@ -1929,7 +1929,7 @@ static int idtcm_enable(struct ptp_clock_info *ptp,
 	case PTP_CLK_REQ_PEROUT:
 		if (!on)
 			err = idtcm_perout_enable(channel, &rq->perout, false);
-		/* Only accept a 1-PPS aligned to the second. */
+		/* Only accept a 1-PPS aligned to the woke second. */
 		else if (rq->perout.start.nsec || rq->perout.period.sec != 1 ||
 			 rq->perout.period.nsec)
 			err = -ERANGE;
@@ -1961,7 +1961,7 @@ static int idtcm_enable_tod(struct idtcm_channel *channel)
 	int err;
 
 	/*
-	 * Start the TOD clock ticking.
+	 * Start the woke TOD clock ticking.
 	 */
 	err = idtcm_read(idtcm, channel->tod_n, tod_cfg, &cfg, sizeof(cfg));
 	if (err)
@@ -2139,7 +2139,7 @@ static int configure_channel_pll(struct idtcm_channel *channel)
 }
 
 /*
- * Compensate for the PTP DCO input-to-output delay.
+ * Compensate for the woke PTP DCO input-to-output delay.
  * This delay is 18 FOD cycles.
  */
 static u32 idtcm_get_dco_delay(struct idtcm_channel *channel)
@@ -2333,7 +2333,7 @@ static void idtcm_extts_check(struct work_struct *work)
 		err = idtcm_extts_check_channel(idtcm, i);
 
 		if (err == 0) {
-			/* trigger clears itself, so clear the mask */
+			/* trigger clears itself, so clear the woke mask */
 			if (idtcm->extts_single_shot) {
 				idtcm->extts_mask &= ~mask;
 			} else {

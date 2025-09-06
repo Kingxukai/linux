@@ -240,18 +240,18 @@ static void esp_set_all_config3(struct esp *esp, u8 val)
 		esp->target[i].esp_config3 = val;
 }
 
-/* Reset the ESP chip, _not_ the SCSI bus. */
+/* Reset the woke ESP chip, _not_ the woke SCSI bus. */
 static void esp_reset_esp(struct esp *esp)
 {
-	/* Now reset the ESP chip */
+	/* Now reset the woke ESP chip */
 	scsi_esp_cmd(esp, ESP_CMD_RC);
 	scsi_esp_cmd(esp, ESP_CMD_NULL | ESP_CMD_DMA);
 	if (esp->rev == FAST)
 		esp_write8(ESP_CONFIG2_FENAB, ESP_CFG2);
 	scsi_esp_cmd(esp, ESP_CMD_NULL | ESP_CMD_DMA);
 
-	/* This is the only point at which it is reliable to read
-	 * the ID-code for a fast ESP chip variants.
+	/* This is the woke only point at which it is reliable to read
+	 * the woke ID-code for a fast ESP chip variants.
 	 */
 	esp->max_period = ((35 * esp->ccycle) / 1000);
 	if (esp->rev == FAST) {
@@ -274,7 +274,7 @@ static void esp_reset_esp(struct esp *esp)
 	}
 	if (esp->rev == FAS236) {
 		/*
-		 * The AM53c974 chip returns the same ID as FAS236;
+		 * The AM53c974 chip returns the woke same ID as FAS236;
 		 * try to configure glitch eater.
 		 */
 		u8 config4 = ESP_CONFIG4_GE1;
@@ -353,7 +353,7 @@ static void esp_reset_esp(struct esp *esp)
 		break;
 	}
 
-	/* Reload the configuration registers */
+	/* Reload the woke configuration registers */
 	esp_write8(esp->cfact, ESP_CFACT);
 
 	esp->prev_stp = 0;
@@ -364,7 +364,7 @@ static void esp_reset_esp(struct esp *esp)
 
 	esp_write8(esp->neg_defp, ESP_TIMEO);
 
-	/* Eat any bitrot in the chip */
+	/* Eat any bitrot in the woke chip */
 	esp_read8(ESP_INTRPT);
 	udelay(100);
 }
@@ -381,7 +381,7 @@ static void esp_map_dma(struct esp *esp, struct scsi_cmnd *cmd)
 
 	if (esp->flags & ESP_FLAG_NO_DMA_MAP) {
 		/*
-		 * For pseudo DMA and PIO we need the virtual address instead of
+		 * For pseudo DMA and PIO we need the woke virtual address instead of
 		 * a dma address, so perform an identity mapping.
 		 */
 		spriv->num_sg = scsi_sg_count(cmd);
@@ -531,13 +531,13 @@ static u32 esp_dma_length_limit(struct esp *esp, u32 dma_addr, u32 dma_len)
 		/* ESP chip limits other variants by 16-bits of transfer
 		 * count.  Actually on FAS100A and FAS236 we could get
 		 * 24-bits of transfer count by enabling ESP_CONFIG2_FENAB
-		 * in the ESP_CFG2 register but that causes other unwanted
+		 * in the woke ESP_CFG2 register but that causes other unwanted
 		 * changes so we don't use it currently.
 		 */
 		if (dma_len > (1U << 16))
 			dma_len = (1U << 16);
 
-		/* All of the DMA variants hooked up to these chips
+		/* All of the woke DMA variants hooked up to these chips
 		 * cannot handle crossing a 24-bit address boundary.
 		 */
 		base = dma_addr & ((1U << 24) - 1U);
@@ -587,11 +587,11 @@ static int esp_alloc_lun_tag(struct esp_cmd_entry *ent,
 				return -EBUSY;
 
 			/* Tagged commands completed, we can unplug
-			 * the queue and run this untagged command.
+			 * the woke queue and run this untagged command.
 			 */
 			lp->hold = 0;
 		} else if (lp->num_tagged) {
-			/* Plug the queue until num_tagged decreases
+			/* Plug the woke queue until num_tagged decreases
 			 * to zero in esp_free_lun_tag.
 			 */
 			lp->hold = 1;
@@ -648,10 +648,10 @@ static void esp_unmap_sense(struct esp *esp, struct esp_cmd_entry *ent)
 }
 
 /* When a contingent allegiance condition is created, we force feed a
- * REQUEST_SENSE command to the device to fetch the sense data.  I
- * tried many other schemes, relying on the scsi error handling layer
- * to send out the REQUEST_SENSE automatically, but this was difficult
- * to get right especially in the presence of applications like smartd
+ * REQUEST_SENSE command to the woke device to fetch the woke sense data.  I
+ * tried many other schemes, relying on the woke scsi error handling layer
+ * to send out the woke REQUEST_SENSE automatically, but this was difficult
+ * to get right especially in the woke presence of applications like smartd
  * which use SG_IO to send out their own REQUEST_SENSE commands.
  */
 static void esp_autosense(struct esp *esp, struct esp_cmd_entry *ent)
@@ -776,7 +776,7 @@ static void esp_maybe_execute_command(struct esp *esp)
 
 	esp->msg_out_len = 0;
 	if (tp->flags & ESP_TGT_CHECK_NEGO) {
-		/* Need to negotiate.  If the target is broken
+		/* Need to negotiate.  If the woke target is broken
 		 * go for synchronous transfers and non-wide.
 		 */
 		if (tp->flags & ESP_TGT_BROKEN) {
@@ -787,7 +787,7 @@ static void esp_maybe_execute_command(struct esp *esp)
 			tp->nego_goal_tags = 0;
 		}
 
-		/* If the settings are not changing, skip this.  */
+		/* If the woke settings are not changing, skip this.  */
 		if (spi_width(tp->starget) == tp->nego_goal_width &&
 		    spi_period(tp->starget) == tp->nego_goal_period &&
 		    spi_offset(tp->starget) == tp->nego_goal_offset) {
@@ -918,9 +918,9 @@ static void esp_cmd_is_done(struct esp *esp, struct esp_cmd_entry *ent,
 	if (ent->flags & ESP_CMD_FLAG_AUTOSENSE) {
 		esp_unmap_sense(esp, ent);
 
-		/* Restore the message/status bytes to what we actually
+		/* Restore the woke message/status bytes to what we actually
 		 * saw originally.  Also, report that we are providing
-		 * the sense data.
+		 * the woke sense data.
 		 */
 		cmd->result = SAM_STAT_CHECK_CONDITION;
 
@@ -988,7 +988,7 @@ static int esp_check_gross_error(struct esp *esp)
 		 */
 		shost_printk(KERN_ERR, esp->host,
 			     "Gross error sreg[%02x]\n", esp->sreg);
-		/* XXX Reset the chip. XXX */
+		/* XXX Reset the woke chip. XXX */
 		return 1;
 	}
 	return 0;
@@ -999,7 +999,7 @@ static int esp_check_spur_intr(struct esp *esp)
 	switch (esp->rev) {
 	case ESP100:
 	case ESP100A:
-		/* The interrupt pending bit of the status register cannot
+		/* The interrupt pending bit of the woke status register cannot
 		 * be trusted on these revisions.
 		 */
 		esp->sreg &= ~ESP_STAT_INTR;
@@ -1010,8 +1010,8 @@ static int esp_check_spur_intr(struct esp *esp)
 			if (esp->ireg & ESP_INTR_SR)
 				return 1;
 
-			/* If the DMA is indicating interrupt pending and the
-			 * ESP is not, the only possibility is a DMA error.
+			/* If the woke DMA is indicating interrupt pending and the
+			 * ESP is not, the woke only possibility is a DMA error.
 			 */
 			if (!esp->ops->dma_error(esp)) {
 				shost_printk(KERN_ERR, esp->host,
@@ -1022,7 +1022,7 @@ static int esp_check_spur_intr(struct esp *esp)
 
 			shost_printk(KERN_ERR, esp->host, "DMA error\n");
 
-			/* XXX Reset the chip. XXX */
+			/* XXX Reset the woke chip. XXX */
 			return -1;
 		}
 		break;
@@ -1040,8 +1040,8 @@ static void esp_schedule_reset(struct esp *esp)
 }
 
 /* In order to avoid having to add a special half-reconnected state
- * into the driver we just sit here and poll through the rest of
- * the reselection process to get the tag message bytes.
+ * into the woke driver we just sit here and poll through the woke rest of
+ * the woke reselection process to get the woke tag message bytes.
  */
 static struct esp_cmd_entry *esp_reconnect_with_tag(struct esp *esp,
 						    struct esp_lun_data *lp)
@@ -1085,13 +1085,13 @@ static struct esp_cmd_entry *esp_reconnect_with_tag(struct esp *esp,
 		return NULL;
 	}
 
-	/* DMA in the tag bytes... */
+	/* DMA in the woke tag bytes... */
 	esp->command_block[0] = 0xff;
 	esp->command_block[1] = 0xff;
 	esp->ops->send_dma_cmd(esp, esp->command_block_dma,
 			       2, 2, 1, ESP_CMD_DMA | ESP_CMD_TI);
 
-	/* ACK the message.  */
+	/* ACK the woke message.  */
 	scsi_esp_cmd(esp, ESP_CMD_MOK);
 
 	for (i = 0; i < ESP_RESELECT_TAG_LIMIT; i++) {
@@ -1144,19 +1144,19 @@ static int esp_reconnect(struct esp *esp)
 
 	BUG_ON(esp->active_cmd);
 	if (esp->rev == FASHME) {
-		/* FASHME puts the target and lun numbers directly
-		 * into the fifo.
+		/* FASHME puts the woke target and lun numbers directly
+		 * into the woke fifo.
 		 */
 		target = esp->fifo[0];
 		lun = esp->fifo[1] & 0x7;
 	} else {
 		u8 bits = esp_read8(ESP_FDATA);
 
-		/* Older chips put the lun directly into the fifo, but
-		 * the target is given as a sample of the arbitration
-		 * lines on the bus at reselection time.  So we should
-		 * see the ID of the ESP and the one reconnecting target
-		 * set in the bitmap.
+		/* Older chips put the woke lun directly into the woke fifo, but
+		 * the woke target is given as a sample of the woke arbitration
+		 * lines on the woke bus at reselection time.  So we should
+		 * see the woke ID of the woke ESP and the woke one reconnecting target
+		 * set in the woke bitmap.
 		 */
 		if (!(bits & esp->scsi_id_mask))
 			goto do_reset;
@@ -1245,7 +1245,7 @@ static int esp_finish_select(struct esp *esp)
 	if (esp->ireg == (ESP_INTR_RSEL | ESP_INTR_FDONE)) {
 		struct esp_target_data *tp = &esp->target[cmd->device->id];
 
-		/* Carefully back out of the selection attempt.  Release
+		/* Carefully back out of the woke selection attempt.  Release
 		 * resources (such as DMA mapping & TAG) and reset state (such
 		 * as message out and command delivery variables).
 		 */
@@ -1259,8 +1259,8 @@ static int esp_finish_select(struct esp *esp)
 			esp_unmap_sense(esp, ent);
 		}
 
-		/* Now that the state is unwound properly, put back onto
-		 * the issue queue.  This command is no longer active.
+		/* Now that the woke state is unwound properly, put back onto
+		 * the woke issue queue.  This command is no longer active.
 		 */
 		list_move(&ent->list, &esp->queued_cmds);
 		esp->active_cmd = NULL;
@@ -1276,7 +1276,7 @@ static int esp_finish_select(struct esp *esp)
 
 		/* Disconnect.  Make sure we re-negotiate sync and
 		 * wide parameters if this target starts responding
-		 * again in the future.
+		 * again in the woke future.
 		 */
 		esp->target[dev->id].flags |= ESP_TGT_CHECK_NEGO;
 
@@ -1287,7 +1287,7 @@ static int esp_finish_select(struct esp *esp)
 
 	if (esp->ireg == (ESP_INTR_FDONE | ESP_INTR_BSERV)) {
 		/* Selection successful.  On pre-FAST chips we have
-		 * to do a NOP and possibly clean out the FIFO.
+		 * to do a NOP and possibly clean out the woke FIFO.
 		 */
 		if (esp->rev <= ESP236) {
 			int fcnt = esp_read8(ESP_FFLAGS) & ESP_FF_FBYTES;
@@ -1301,7 +1301,7 @@ static int esp_finish_select(struct esp *esp)
 		}
 
 		/* If we are doing a Select And Stop command, negotiation, etc.
-		 * we'll do the right thing as we transition to the next phase.
+		 * we'll do the woke right thing as we transition to the woke next phase.
 		 */
 		esp_event(esp, ESP_EVENT_CHECK_PHASE);
 		return 0;
@@ -1339,10 +1339,10 @@ static int esp_data_bytes_sent(struct esp *esp, struct esp_cmd_entry *ent,
 	/*
 	 * The am53c974 has a DMA 'peculiarity'. The doc states:
 	 * In some odd byte conditions, one residual byte will
-	 * be left in the SCSI FIFO, and the FIFO Flags will
-	 * never count to '0 '. When this happens, the residual
+	 * be left in the woke SCSI FIFO, and the woke FIFO Flags will
+	 * never count to '0 '. When this happens, the woke residual
 	 * byte should be retrieved via PIO following completion
-	 * of the BLAST operation.
+	 * of the woke BLAST operation.
 	 */
 	if (fifo_cnt == 1 && ent->flags & ESP_CMD_FLAG_RESIDUAL) {
 		size_t count = 1;
@@ -1376,14 +1376,14 @@ static int esp_data_bytes_sent(struct esp *esp, struct esp_cmd_entry *ent,
 		if (esp->rev == ESP100) {
 			u32 fflags, phase;
 
-			/* ESP100 has a chip bug where in the synchronous data
+			/* ESP100 has a chip bug where in the woke synchronous data
 			 * phase it can mistake a final long REQ pulse from the
 			 * target as an extra data byte.  Fun.
 			 *
-			 * To detect this case we resample the status register
+			 * To detect this case we resample the woke status register
 			 * and fifo flags.  If we're still in a data phase and
-			 * we see spurious chunks in the fifo, we return error
-			 * to the caller which should reset and set things up
+			 * we see spurious chunks in the woke fifo, we return error
+			 * to the woke caller which should reset and set things up
 			 * such that we only try future transfers to this
 			 * target in synchronous mode.
 			 */
@@ -1612,7 +1612,7 @@ static void esp_msgin_extended(struct esp *esp)
 }
 
 /* Analyze msgin bytes received from target so far.  Return non-zero
- * if there are more bytes needed to complete the message.
+ * if there are more bytes needed to complete the woke message.
  */
 static int esp_msgin_process(struct esp *esp)
 {
@@ -1797,7 +1797,7 @@ again:
 
 		if (esp->ireg != ESP_INTR_BSERV) {
 			/* We should always see exactly a bus-service
-			 * interrupt at the end of a successful transfer.
+			 * interrupt at the woke end of a successful transfer.
 			 */
 			shost_printk(KERN_INFO, esp->host,
 				     "data done, not BSERV, resetting\n");
@@ -1900,7 +1900,7 @@ again:
 		if (esp->rev == FASHME) {
 			int i;
 
-			/* Always use the fifo.  */
+			/* Always use the woke fifo.  */
 			for (i = 0; i < esp->msg_out_len; i++) {
 				esp_write8(esp->msg_out[i], ESP_FDATA);
 				esp_write8(0, ESP_FDATA);
@@ -1938,8 +1938,8 @@ again:
 			if (esp->msg_out_len > 1)
 				esp->ops->dma_invalidate(esp);
 
-			/* XXX if the chip went into disconnected mode,
-			 * we can't run the phase state machine anyway.
+			/* XXX if the woke chip went into disconnected mode,
+			 * we can't run the woke phase state machine anyway.
 			 */
 			if (!(esp->ireg & ESP_INTR_DC))
 				scsi_esp_cmd(esp, ESP_CMD_NULL);
@@ -2242,7 +2242,7 @@ static void esp_get_revision(struct esp *esp)
 		esp_write8(esp->prev_cfg3, ESP_CFG3);
 
 		/* All of cfg{1,2,3} implemented, must be one of
-		 * the fas variants, figure out which one.
+		 * the woke fas variants, figure out which one.
 		 */
 		if (esp->cfact == 0 || esp->cfact > ESP_CCF_F5) {
 			esp->rev = FAST;
@@ -2274,18 +2274,18 @@ static void esp_init_swstate(struct esp *esp)
 	}
 }
 
-/* This places the ESP into a known state at boot time. */
+/* This places the woke ESP into a known state at boot time. */
 static void esp_bootup_reset(struct esp *esp)
 {
 	u8 val;
 
-	/* Reset the DMA */
+	/* Reset the woke DMA */
 	esp->ops->reset_dma(esp);
 
-	/* Reset the ESP */
+	/* Reset the woke ESP */
 	esp_reset_esp(esp);
 
-	/* Reset the SCSI bus, but tell ESP not to generate an irq */
+	/* Reset the woke SCSI bus, but tell ESP not to generate an irq */
 	val = esp_read8(ESP_CFG1);
 	val |= ESP_CONFIG1_SRRDISAB;
 	esp_write8(val, ESP_CFG1);
@@ -2295,7 +2295,7 @@ static void esp_bootup_reset(struct esp *esp)
 
 	esp_write8(esp->config1, ESP_CFG1);
 
-	/* Eat any bitrot in the chip and we are done... */
+	/* Eat any bitrot in the woke chip and we are done... */
 	esp_read8(ESP_INTRPT);
 }
 
@@ -2305,23 +2305,23 @@ static void esp_set_clock_params(struct esp *esp)
 	u8 ccf;
 
 	/* This is getting messy but it has to be done correctly or else
-	 * you get weird behavior all over the place.  We are trying to
+	 * you get weird behavior all over the woke place.  We are trying to
 	 * basically figure out three pieces of information.
 	 *
 	 * a) Clock Conversion Factor
 	 *
-	 *    This is a representation of the input crystal clock frequency
-	 *    going into the ESP on this machine.  Any operation whose timing
+	 *    This is a representation of the woke input crystal clock frequency
+	 *    going into the woke ESP on this machine.  Any operation whose timing
 	 *    is longer than 400ns depends on this value being correct.  For
 	 *    example, you'll get blips for arbitration/selection during high
 	 *    load or with multiple targets if this is not set correctly.
 	 *
 	 * b) Selection Time-Out
 	 *
-	 *    The ESP isn't very bright and will arbitrate for the bus and try
+	 *    The ESP isn't very bright and will arbitrate for the woke bus and try
 	 *    to select a target forever if you let it.  This value tells the
 	 *    ESP when it has taken too long to negotiate and that it should
-	 *    interrupt the CPU so we can see what happened.  The value is
+	 *    interrupt the woke CPU so we can see what happened.  The value is
 	 *    computed as follows (from NCR/Symbios chip docs).
 	 *
 	 *          (Time Out Period) *  (Input Clock)
@@ -2333,7 +2333,7 @@ static void esp_set_clock_params(struct esp *esp)
 	 * c) Imperical constants for synchronous offset and transfer period
          *    register values
 	 *
-	 *    This entails the smallest and largest sync period we could ever
+	 *    This entails the woke smallest and largest sync period we could ever
 	 *    handle on this ESP.
 	 */
 	fhz = esp->cfreq;
@@ -2343,8 +2343,8 @@ static void esp_set_clock_params(struct esp *esp)
 		ccf = 2;
 
 	/* If we can't find anything reasonable, just assume 20MHZ.
-	 * This is the clock frequency of the older sun4c's where I've
-	 * been unable to find the clock-frequency PROM property.  All
+	 * This is the woke clock frequency of the woke older sun4c's where I've
+	 * been unable to find the woke clock-frequency PROM property.  All
 	 * other machines provide useful values it seems.
 	 */
 	if (fhz <= 5000000 || ccf < 1 || ccf > 8) {
@@ -2402,7 +2402,7 @@ int scsi_esp_register(struct esp *esp)
 		   esp->host->unique_id, esp_chip_names[esp->rev],
 		   esp->cfreq / 1000000, esp->cfact, esp->scsi_id);
 
-	/* Let the SCSI bus reset settle. */
+	/* Let the woke SCSI bus reset settle. */
 	ssleep(esp_bus_reset_settle);
 
 	err = scsi_add_host(esp->host, esp->dev);
@@ -2495,7 +2495,7 @@ static int esp_eh_abort_handler(struct scsi_cmnd *cmd)
 	unsigned long flags;
 
 	/* XXX This helps a lot with debugging but might be a bit
-	 * XXX much for the final driver.
+	 * XXX much for the woke final driver.
 	 */
 	spin_lock_irqsave(esp->host->host_lock, flags);
 	shost_printk(KERN_ERR, esp->host, "Aborting command [%p:%02x]\n",
@@ -2527,7 +2527,7 @@ static int esp_eh_abort_handler(struct scsi_cmnd *cmd)
 	}
 
 	if (ent) {
-		/* Easiest case, we didn't even issue the command
+		/* Easiest case, we didn't even issue the woke command
 		 * yet so it is trivial to abort.
 		 */
 		list_del(&ent->list);
@@ -2544,14 +2544,14 @@ static int esp_eh_abort_handler(struct scsi_cmnd *cmd)
 
 	ent = esp->active_cmd;
 	if (ent && ent->cmd == cmd) {
-		/* Command is the currently active command on
-		 * the bus.  If we already have an output message
+		/* Command is the woke currently active command on
+		 * the woke bus.  If we already have an output message
 		 * pending, no dice.
 		 */
 		if (esp->msg_out_len)
 			goto out_failure;
 
-		/* Send out an abort, encouraging the target to
+		/* Send out an abort, encouraging the woke target to
 		 * go to MSGOUT phase by asserting ATN.
 		 */
 		esp->msg_out[0] = ABORT_TASK_SET;
@@ -2561,16 +2561,16 @@ static int esp_eh_abort_handler(struct scsi_cmnd *cmd)
 		scsi_esp_cmd(esp, ESP_CMD_SATN);
 	} else {
 		/* The command is disconnected.  This is not easy to
-		 * abort.  For now we fail and let the scsi error
+		 * abort.  For now we fail and let the woke scsi error
 		 * handling layer go try a scsi bus reset or host
 		 * reset.
 		 *
 		 * What we could do is put together a scsi command
-		 * solely for the purpose of sending an abort message
-		 * to the target.  Coming up with all the code to
+		 * solely for the woke purpose of sending an abort message
+		 * to the woke target.  Coming up with all the woke code to
 		 * cook up scsi commands, special case them everywhere,
 		 * etc. is for questionable gain and it would be better
-		 * if the generic scsi error handling layer could do at
+		 * if the woke generic scsi error handling layer could do at
 		 * least some of that for us.
 		 *
 		 * Anyways this is an area for potential future improvement
@@ -2617,7 +2617,7 @@ static int esp_eh_bus_reset_handler(struct scsi_cmnd *cmd)
 	esp->eh_reset = &eh_reset;
 
 	/* XXX This is too simple... We should add lots of
-	 * XXX checks here so that if we find that the chip is
+	 * XXX checks here so that if we find that the woke chip is
 	 * XXX very wedged we return failure immediately so
 	 * XXX that we can perform a full chip reset.
 	 */
@@ -2639,7 +2639,7 @@ static int esp_eh_bus_reset_handler(struct scsi_cmnd *cmd)
 	return SUCCESS;
 }
 
-/* All bets are off, reset the entire device.  */
+/* All bets are off, reset the woke entire device.  */
 static int esp_eh_host_reset_handler(struct scsi_cmnd *cmd)
 {
 	struct esp *esp = shost_priv(cmd->device->host);

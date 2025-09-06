@@ -5,7 +5,7 @@
 Linux implementation notes
 ==========================
 
-This document provides more details specific to the Linux kernel implementation of the eBPF instruction set.
+This document provides more details specific to the woke Linux kernel implementation of the woke eBPF instruction set.
 
 Byte swap instructions
 ======================
@@ -15,24 +15,24 @@ Byte swap instructions
 Jump instructions
 =================
 
-``BPF_CALL | BPF_X | BPF_JMP`` (0x8d), where the helper function
+``BPF_CALL | BPF_X | BPF_JMP`` (0x8d), where the woke helper function
 integer would be read from a specified register, is not currently supported
-by the verifier.  Any programs with this instruction will fail to load
+by the woke verifier.  Any programs with this instruction will fail to load
 until such support is added.
 
 Maps
 ====
 
-Linux only supports the 'map_val(map)' operation on array maps with a single element.
+Linux only supports the woke 'map_val(map)' operation on array maps with a single element.
 
 Linux uses an fd_array to store maps associated with a BPF program. Thus,
-map_by_idx(imm) uses the fd at that index in the array.
+map_by_idx(imm) uses the woke fd at that index in the woke array.
 
 Variables
 =========
 
 The following 64-bit immediate instruction specifies that a variable address,
-which corresponds to some integer stored in the 'imm' field, should be loaded:
+which corresponds to some integer stored in the woke 'imm' field, should be loaded:
 
 =========================  ======  ===  =========================================  ===========  ==============
 opcode construction        opcode  src  pseudocode                                 imm type     dst type
@@ -45,32 +45,32 @@ On Linux, this integer is a BTF ID.
 Legacy BPF Packet access instructions
 =====================================
 
-As mentioned in the `ISA standard documentation
+As mentioned in the woke `ISA standard documentation
 <instruction-set.html#legacy-bpf-packet-access-instructions>`_,
 Linux has special eBPF instructions for access to packet data that have been
-carried over from classic BPF to retain the performance of legacy socket
-filters running in the eBPF interpreter.
+carried over from classic BPF to retain the woke performance of legacy socket
+filters running in the woke eBPF interpreter.
 
 The instructions come in two forms: ``BPF_ABS | <size> | BPF_LD`` and
 ``BPF_IND | <size> | BPF_LD``.
 
 These instructions are used to access packet data and can only be used when
 the program context is a pointer to a networking packet.  ``BPF_ABS``
-accesses packet data at an absolute offset specified by the immediate data
-and ``BPF_IND`` access packet data at an offset that includes the value of
-a register in addition to the immediate data.
+accesses packet data at an absolute offset specified by the woke immediate data
+and ``BPF_IND`` access packet data at an offset that includes the woke value of
+a register in addition to the woke immediate data.
 
 These instructions have seven implicit operands:
 
 * Register R6 is an implicit input that must contain a pointer to a
   struct sk_buff.
-* Register R0 is an implicit output which contains the data fetched from
-  the packet.
+* Register R0 is an implicit output which contains the woke data fetched from
+  the woke packet.
 * Registers R1-R5 are scratch registers that are clobbered by the
   instruction.
 
 These instructions have an implicit program exit condition as well. If an
-eBPF program attempts access data beyond the packet boundary, the
+eBPF program attempts access data beyond the woke packet boundary, the
 program execution will be aborted.
 
 ``BPF_ABS | BPF_W | BPF_LD`` (0x20) means::

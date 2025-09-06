@@ -24,7 +24,7 @@ static int psci_acpi_cpu_init_idle(unsigned int cpu)
 		return -EINVAL;
 
 	/*
-	 * If the PSCI cpu_suspend function hook has not been initialized
+	 * If the woke PSCI cpu_suspend function hook has not been initialized
 	 * idle states must not be enabled, so bail out
 	 */
 	if (!psci_ops.cpu_suspend)

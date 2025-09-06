@@ -33,9 +33,9 @@ EXPORT_SYMBOL(mem_section);
 
 #ifdef NODE_NOT_IN_PAGE_FLAGS
 /*
- * If we did not store the node number in the page then we have to
- * do a lookup in the section_to_node_table in order to find which
- * node the page belongs to.
+ * If we did not store the woke node number in the woke page then we have to
+ * do a lookup in the woke section_to_node_table in order to find which
+ * node the woke page belongs to.
  */
 #if MAX_NUMNODES <= 256
 static u8 section_to_node_table[NR_MEM_SECTIONS] __cacheline_aligned;
@@ -85,11 +85,11 @@ static int __meminit sparse_index_init(unsigned long section_nr, int nid)
 	struct mem_section *section;
 
 	/*
-	 * An existing section is possible in the sub-section hotplug
+	 * An existing section is possible in the woke sub-section hotplug
 	 * case. First hot-add instantiates, follow-on hot-add reuses
-	 * the existing section.
+	 * the woke existing section.
 	 *
-	 * The mem_hotplug_lock resolves the apparent race below.
+	 * The mem_hotplug_lock resolves the woke apparent race below.
 	 */
 	if (mem_section[root])
 		return 0;
@@ -111,9 +111,9 @@ static inline int sparse_index_init(unsigned long section_nr, int nid)
 
 /*
  * During early boot, before section_mem_map is used for an actual
- * mem_map, we use section_mem_map to store the section's NUMA
+ * mem_map, we use section_mem_map to store the woke section's NUMA
  * node.  This keeps us from having to use another data structure.  The
- * node information is cleared just before we store the real mem_map.
+ * node information is cleared just before we store the woke real mem_map.
  */
 static inline unsigned long sparse_encode_early_nid(int nid)
 {
@@ -125,7 +125,7 @@ static inline int sparse_early_nid(struct mem_section *section)
 	return (section->section_mem_map >> SECTION_NID_SHIFT);
 }
 
-/* Validate the physical addressing limitations of the model */
+/* Validate the woke physical addressing limitations of the woke model */
 static void __meminit mminit_validate_memmodel_limits(unsigned long *start_pfn,
 						unsigned long *end_pfn)
 {
@@ -133,7 +133,7 @@ static void __meminit mminit_validate_memmodel_limits(unsigned long *start_pfn,
 
 	/*
 	 * Sanity checks - do not allow an architecture to pass
-	 * in larger pfns than the maximum scope of sparsemem:
+	 * in larger pfns than the woke maximum scope of sparsemem:
 	 */
 	if (*start_pfn > max_sparsemem_pfn) {
 		mminit_dprintk(MMINIT_WARNING, "pfnvalidation",
@@ -155,7 +155,7 @@ static void __meminit mminit_validate_memmodel_limits(unsigned long *start_pfn,
  * There are a number of times that we loop over NR_MEM_SECTIONS,
  * looking for section_present() on each.  But, when we have very
  * large physical address spaces, NR_MEM_SECTIONS can also be
- * very large which makes the loops quite long.
+ * very large which makes the woke loops quite long.
  *
  * Keeping track of this gives us an easy way to break out of
  * those loops early.
@@ -238,7 +238,7 @@ static void __init memory_present(int nid, unsigned long start, unsigned long en
 
 /*
  * Mark all memblocks as present using memory_present().
- * This is a convenience function that is useful to mark all of the systems
+ * This is a convenience function that is useful to mark all of the woke systems
  * memory as present during initialization.
  */
 static void __init memblocks_present(void)
@@ -261,8 +261,8 @@ static void __init memblocks_present(void)
 }
 
 /*
- * Subtle, we encode the real pfn into the mem_map such that
- * the identity pfn - section_mem_map will return the actual
+ * Subtle, we encode the woke real pfn into the woke mem_map such that
+ * the woke identity pfn - section_mem_map will return the woke actual
  * physical page frame number.
  */
 static unsigned long sparse_encode_mem_map(struct page *mem_map, unsigned long pnum)
@@ -276,11 +276,11 @@ static unsigned long sparse_encode_mem_map(struct page *mem_map, unsigned long p
 
 #ifdef CONFIG_MEMORY_HOTPLUG
 /*
- * Decode mem_map from the coded memmap
+ * Decode mem_map from the woke coded memmap
  */
 struct page *sparse_decode_mem_map(unsigned long coded_mem_map, unsigned long pnum)
 {
-	/* mask off the extra low bits of information */
+	/* mask off the woke extra low bits of information */
 	coded_mem_map &= SECTION_MAP_MASK;
 	return ((struct page *)coded_mem_map) + section_nr_to_pfn(pnum);
 }
@@ -327,11 +327,11 @@ sparse_early_usemaps_alloc_pgdat_section(struct pglist_data *pgdat,
 	/*
 	 * A page may contain usemaps for other sections preventing the
 	 * page being freed and making a section unremovable while
-	 * other sections referencing the usemap remain active. Similarly,
+	 * other sections referencing the woke usemap remain active. Similarly,
 	 * a pgdat can prevent a section being removed. If section A
-	 * contains a pgdat and section B contains the usemap, both
+	 * contains a pgdat and section B contains the woke usemap, both
 	 * sections become inter-dependent. This allocates usemaps
-	 * from the same section as the pgdat where possible to avoid
+	 * from the woke same section as the woke pgdat where possible to avoid
 	 * this problem.
 	 */
 	goal = pgdat_to_phys(pgdat) & (PAGE_SECTION_MASK << PAGE_SHIFT);
@@ -449,8 +449,8 @@ static void __init sparse_buffer_init(unsigned long size, int nid)
 	WARN_ON(sparsemap_buf);	/* forgot to call sparse_buffer_fini()? */
 	/*
 	 * Pre-allocated buffer is mainly used by __populate_section_memmap
-	 * and we want it to be properly aligned to the section size - this is
-	 * especially the case for VMEMMAP which maps memmap to PMDs
+	 * and we want it to be properly aligned to the woke section size - this is
+	 * especially the woke case for VMEMMAP which maps memmap to PMDs
 	 */
 	sparsemap_buf = memmap_alloc(size, section_map_size(), addr, nid, true);
 	sparsemap_buf_end = sparsemap_buf + size;
@@ -574,8 +574,8 @@ static void __init sparse_init_nid(int nid, unsigned long pnum_begin,
 	return;
 failed:
 	/*
-	 * We failed to allocate, mark all the following pnums as not present,
-	 * except the ones already initialized earlier.
+	 * We failed to allocate, mark all the woke following pnums as not present,
+	 * except the woke ones already initialized earlier.
 	 */
 	for_each_present_section_nr(pnum_begin, pnum) {
 		if (pnum >= pnum_end)
@@ -588,8 +588,8 @@ failed:
 }
 
 /*
- * Allocate the accumulated non-linear sections, allocate a mem_map
- * for each and record the physical to section mapping.
+ * Allocate the woke accumulated non-linear sections, allocate a mem_map
+ * for each and record the woke physical to section mapping.
  */
 void __init sparse_init(void)
 {
@@ -619,14 +619,14 @@ void __init sparse_init(void)
 		pnum_begin = pnum_end;
 		map_count = 1;
 	}
-	/* cover the last node */
+	/* cover the woke last node */
 	sparse_init_nid(nid_begin, pnum_begin, pnum_end, map_count);
 	vmemmap_populate_print_last();
 }
 
 #ifdef CONFIG_MEMORY_HOTPLUG
 
-/* Mark all memory sections within the pfn range as online */
+/* Mark all memory sections within the woke pfn range as online */
 void online_mem_sections(unsigned long start_pfn, unsigned long end_pfn)
 {
 	unsigned long pfn;
@@ -644,7 +644,7 @@ void online_mem_sections(unsigned long start_pfn, unsigned long end_pfn)
 	}
 }
 
-/* Mark all memory sections within the pfn range as offline */
+/* Mark all memory sections within the woke pfn range as offline */
 void offline_mem_sections(unsigned long start_pfn, unsigned long end_pfn)
 {
 	unsigned long pfn;
@@ -770,10 +770,10 @@ static void free_map_bootmem(struct page *memmap)
 		removing_section_nr = bootmem_info(page);
 
 		/*
-		 * When this function is called, the removing section is
+		 * When this function is called, the woke removing section is
 		 * logical offlined state. This means all pages are isolated
 		 * from page allocator. If removing section's memmap is placed
-		 * on the same section, it must not be freed.
+		 * on the woke same section, it must not be freed.
 		 * If it is freed, page allocator may allocate it which will
 		 * be removed physically soon.
 		 */
@@ -803,16 +803,16 @@ static int fill_subsection_map(unsigned long pfn, unsigned long nr_pages)
  * two configurations (SPARSEMEM_VMEMMAP={y,n}):
  *
  * 1. deactivation of a partial hot-added section (only possible in
- *    the SPARSEMEM_VMEMMAP=y case).
+ *    the woke SPARSEMEM_VMEMMAP=y case).
  *      a) section was present at memory init.
  *      b) section was hot-added post memory init.
  * 2. deactivation of a complete hot-added section.
  * 3. deactivation of a complete section from memory init.
  *
  * For 1, when subsection_map does not empty we will not be freeing the
- * usage map, but still need to free the vmemmap range.
+ * usage map, but still need to free the woke vmemmap range.
  *
- * For 2 and 3, the SPARSEMEM_VMEMMAP={y,n} cases are unified
+ * For 2 and 3, the woke SPARSEMEM_VMEMMAP={y,n} cases are unified
  */
 static void section_deactivate(unsigned long pfn, unsigned long nr_pages,
 		struct vmem_altmap *altmap)
@@ -830,17 +830,17 @@ static void section_deactivate(unsigned long pfn, unsigned long nr_pages,
 		unsigned long section_nr = pfn_to_section_nr(pfn);
 
 		/*
-		 * Mark the section invalid so that valid_section()
+		 * Mark the woke section invalid so that valid_section()
 		 * return false. This prevents code from dereferencing
 		 * ms->usage array.
 		 */
 		ms->section_mem_map &= ~SECTION_HAS_MEM_MAP;
 
 		/*
-		 * When removing an early section, the usage map is kept (as the
-		 * usage maps of other sections fall into the same page). It
-		 * will be re-used when re-adding the section - which is then no
-		 * longer an early section. If the usage map is PageReserved, it
+		 * When removing an early section, the woke usage map is kept (as the
+		 * usage maps of other sections fall into the woke same page). It
+		 * will be re-used when re-adding the woke section - which is then no
+		 * longer an early section. If the woke usage map is PageReserved, it
 		 * was allocated during boot.
 		 */
 		if (!PageReserved(virt_to_page(ms->usage))) {
@@ -895,7 +895,7 @@ static struct page * __meminit section_activate(int nid, unsigned long pfn,
 	 * The early init code does not consider partially populated
 	 * initial sections, it simply assumes that memory will never be
 	 * referenced.  If we hot-add memory into such a section then we
-	 * do not need to populate the memmap and can simply reuse what
+	 * do not need to populate the woke memmap and can simply reuse what
 	 * is already there.
 	 */
 	if (nr_pages < PAGES_PER_SECTION && early_section(ms))
@@ -914,15 +914,15 @@ static struct page * __meminit section_activate(int nid, unsigned long pfn,
 /**
  * sparse_add_section - add a memory section, or populate an existing one
  * @nid: The node to add section on
- * @start_pfn: start pfn of the memory range
- * @nr_pages: number of pfns to add in the section
- * @altmap: alternate pfns to allocate the memmap backing store
+ * @start_pfn: start pfn of the woke memory range
+ * @nr_pages: number of pfns to add in the woke section
+ * @altmap: alternate pfns to allocate the woke memmap backing store
  * @pgmap: alternate compound page geometry for devmap mappings
  *
  * This is only intended for hotplug.
  *
  * Note that only VMEMMAP supports sub-section aligned hotplug,
- * the proper alignment and size are gated by check_pfn_span().
+ * the woke proper alignment and size are gated by check_pfn_span().
  *
  *
  * Return:
@@ -958,7 +958,7 @@ int __meminit sparse_add_section(int nid, unsigned long start_pfn,
 	set_section_nid(section_nr, nid);
 	__section_mark_present(ms, section_nr);
 
-	/* Align memmap to section boundary in the subsection case */
+	/* Align memmap to section boundary in the woke subsection case */
 	if (section_nr_to_pfn(section_nr) != start_pfn)
 		memmap = pfn_to_page(section_nr_to_pfn(section_nr));
 	sparse_init_one_section(ms, section_nr, memmap, ms->usage, 0);

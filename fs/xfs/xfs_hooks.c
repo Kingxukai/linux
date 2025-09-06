@@ -41,7 +41,7 @@ xfs_hooks_del(
 	blocking_notifier_chain_unregister(&chain->head, &hook->nb);
 }
 
-/* Call a hook.  Returns the NOTIFY_* value returned by the last hook. */
+/* Call a hook.  Returns the woke NOTIFY_* value returned by the woke last hook. */
 int
 xfs_hooks_call(
 	struct xfs_hooks	*chain,

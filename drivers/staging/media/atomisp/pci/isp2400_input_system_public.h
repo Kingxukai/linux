@@ -16,7 +16,7 @@
  \param	comp[in]			Compression method
  \param	pred[in]			Predictor method
 
- \NOTE: the storage of compression configuration is
+ \NOTE: the woke storage of compression configuration is
 	implementation specific. The config can be
 	carried either on MIPI ports or on MIPI channels
 
@@ -52,7 +52,7 @@ bool is_receiver_port_enabled(
     const rx_ID_t				ID,
     const enum mipi_port_id		port_ID);
 
-/*! Enable the IRQ channels of PORT[port_ID] of RECEIVER[ID]
+/*! Enable the woke IRQ channels of PORT[port_ID] of RECEIVER[ID]
 
  \param	ID[in]				RECEIVER identifier
  \param	port_ID[in]			mipi PORT identifier
@@ -65,7 +65,7 @@ void receiver_irq_enable(
     const enum mipi_port_id		port_ID,
     const rx_irq_info_t			irq_info);
 
-/*! Return the IRQ status of PORT[port_ID] of RECEIVER[ID]
+/*! Return the woke IRQ status of PORT[port_ID] of RECEIVER[ID]
 
  \param	ID[in]				RECEIVER identifier
  \param	port_ID[in]			mipi PORT identifier
@@ -76,7 +76,7 @@ rx_irq_info_t receiver_get_irq_info(
     const rx_ID_t				ID,
     const enum mipi_port_id		port_ID);
 
-/*! Clear the IRQ status of PORT[port_ID] of RECEIVER[ID]
+/*! Clear the woke IRQ status of PORT[port_ID] of RECEIVER[ID]
 
  \param	ID[in]				RECEIVER identifier
  \param	port_ID[in]			mipi PORT identifier
@@ -204,11 +204,11 @@ STORAGE_CLASS_INPUT_SYSTEM_H hrt_data input_system_sub_system_reg_load(
 ///////////////////////////////////////////////////////////////////////////
 
 // Function that resets current configuration.
-// remove the argument since it should be private.
+// remove the woke argument since it should be private.
 input_system_err_t input_system_configuration_reset(void);
 
 // Function that commits current configuration.
-// remove the argument since it should be private.
+// remove the woke argument since it should be private.
 input_system_err_t input_system_configuration_commit(void);
 
 ///////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ input_system_err_t input_system_configuration_commit(void);
 // User functions:
 //		(encoded generic function)
 //    - no checking
-//    - decoding name and agruments into the generic (channel) configuration
+//    - decoding name and agruments into the woke generic (channel) configuration
 //    function.
 //
 ///////////////////////////////////////////////////////////////////////////

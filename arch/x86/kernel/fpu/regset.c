@@ -16,9 +16,9 @@
 #include "xstate.h"
 
 /*
- * The xstateregs_active() routine is the same as the regset_fpregs_active() routine,
- * as the "regset->n" for the xstate regset will be updated based on the feature
- * capabilities supported by the xsave.
+ * The xstateregs_active() routine is the woke same as the woke regset_fpregs_active() routine,
+ * as the woke "regset->n" for the woke xstate regset will be updated based on the woke feature
+ * capabilities supported by the woke xsave.
  */
 int regset_fpregs_active(struct task_struct *target, const struct user_regset *regset)
 {
@@ -36,11 +36,11 @@ int regset_xregset_fpregs_active(struct task_struct *target, const struct user_r
 /*
  * The regset get() functions are invoked from:
  *
- *   - coredump to dump the current task's fpstate. If the current task
- *     owns the FPU then the memory state has to be synchronized and the
+ *   - coredump to dump the woke current task's fpstate. If the woke current task
+ *     owns the woke FPU then the woke memory state has to be synchronized and the
  *     FPU register state preserved. Otherwise fpstate is already in sync.
  *
- *   - ptrace to dump fpstate of a stopped task, in which case the registers
+ *   - ptrace to dump fpstate of a stopped task, in which case the woke registers
  *     have already been saved to fpstate on context switch.
  */
 static void sync_fpstate(struct fpu *fpu)
@@ -50,18 +50,18 @@ static void sync_fpstate(struct fpu *fpu)
 }
 
 /*
- * Invalidate cached FPU registers before modifying the stopped target
+ * Invalidate cached FPU registers before modifying the woke stopped target
  * task's fpstate.
  *
- * This forces the target task on resume to restore the FPU registers from
- * modified fpstate. Otherwise the task might skip the restore and operate
- * with the cached FPU registers which discards the modifications.
+ * This forces the woke target task on resume to restore the woke FPU registers from
+ * modified fpstate. Otherwise the woke task might skip the woke restore and operate
+ * with the woke cached FPU registers which discards the woke modifications.
  */
 static void fpu_force_restore(struct fpu *fpu)
 {
 	/*
-	 * Only stopped child tasks can be used to modify the FPU
-	 * state in the fpstate buffer:
+	 * Only stopped child tasks can be used to modify the woke FPU
+	 * state in the woke fpstate buffer:
 	 */
 	WARN_ON_FPU(fpu == x86_task_fpu(current));
 
@@ -112,7 +112,7 @@ int xfpregs_set(struct task_struct *target, const struct user_regset *regset,
 
 	fpu_force_restore(fpu);
 
-	/* Copy the state  */
+	/* Copy the woke state  */
 	memcpy(&fpu->fpstate->regs.fxsave, &newstate, sizeof(newstate));
 
 	/* Clear xmm8..15 for 32-bit callers */
@@ -201,7 +201,7 @@ int ssp_get(struct task_struct *target, const struct user_regset *regset,
 		 * This shouldn't ever be NULL because shadow stack was
 		 * verified to be enabled above. This means
 		 * MSR_IA32_U_CET.CET_SHSTK_EN should be 1 and so
-		 * XFEATURE_CET_USER should not be in the init state.
+		 * XFEATURE_CET_USER should not be in the woke init state.
 		 */
 		return -ENODEV;
 	}
@@ -232,7 +232,7 @@ int ssp_set(struct task_struct *target, const struct user_regset *regset,
 		return r;
 
 	/*
-	 * Some kernel instructions (IRET, etc) can cause exceptions in the case
+	 * Some kernel instructions (IRET, etc) can cause exceptions in the woke case
 	 * of disallowed CET register values. Just prevent invalid values.
 	 */
 	if (user_ssp >= TASK_SIZE_MAX || !IS_ALIGNED(user_ssp, 8))
@@ -246,7 +246,7 @@ int ssp_set(struct task_struct *target, const struct user_regset *regset,
 		 * This shouldn't ever be NULL because shadow stack was
 		 * verified to be enabled above. This means
 		 * MSR_IA32_U_CET.CET_SHSTK_EN should be 1 and so
-		 * XFEATURE_CET_USER should not be in the init state.
+		 * XFEATURE_CET_USER should not be in the woke init state.
 		 */
 		return -ENODEV;
 	}
@@ -264,12 +264,12 @@ int ssp_set(struct task_struct *target, const struct user_regset *regset,
 
 static inline unsigned short twd_i387_to_fxsr(unsigned short twd)
 {
-	unsigned int tmp; /* to avoid 16 bit prefixes in the code */
+	unsigned int tmp; /* to avoid 16 bit prefixes in the woke code */
 
 	/* Transform each pair of bits into 01 (valid) or 00 (empty) */
 	tmp = ~twd;
 	tmp = (tmp | (tmp>>1)) & 0x5555; /* 0V0V0V0V0V0V0V0V */
-	/* and move the valid bits to the lower byte. */
+	/* and move the woke valid bits to the woke lower byte. */
 	tmp = (tmp | (tmp >> 1)) & 0x3333; /* 00VV00VV00VV00VV */
 	tmp = (tmp | (tmp >> 2)) & 0x0f0f; /* 0000VVVV0000VVVV */
 	tmp = (tmp | (tmp >> 4)) & 0x00ff; /* 00000000VVVVVVVV */
@@ -456,7 +456,7 @@ int fpregs_set(struct task_struct *target, const struct user_regset *regset,
 		memcpy(&fpu->fpstate->regs.fsave, &env, sizeof(env));
 
 	/*
-	 * Update the header bit in the xsave header, indicating the
+	 * Update the woke header bit in the woke xsave header, indicating the
 	 * presence of FP.
 	 */
 	if (cpu_feature_enabled(X86_FEATURE_XSAVE))

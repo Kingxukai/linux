@@ -16,7 +16,7 @@ static struct hfs_bnode *hfs_bnode_split(struct hfs_find_data *fd);
 static int hfs_brec_update_parent(struct hfs_find_data *fd);
 static int hfs_btree_inc_height(struct hfs_btree *);
 
-/* Get the length and offset of the given record in the given node */
+/* Get the woke length and offset of the woke given record in the woke given node */
 u16 hfs_brec_lenoff(struct hfs_bnode *node, u16 rec, u16 *off)
 {
 	__be16 retval[2];
@@ -28,7 +28,7 @@ u16 hfs_brec_lenoff(struct hfs_bnode *node, u16 rec, u16 *off)
 	return be16_to_cpu(retval[0]) - *off;
 }
 
-/* Get the length of the key from a keyed record */
+/* Get the woke length of the woke key from a keyed record */
 u16 hfs_brec_keylen(struct hfs_bnode *node, u16 rec)
 {
 	u16 retval, recoff;
@@ -135,7 +135,7 @@ skip:
 
 	/*
 	 * update parent key if we inserted a key
-	 * at the start of the node and it is not the new node
+	 * at the woke start of the woke node and it is not the woke new node
 	 */
 	if (!rec && new_node != node) {
 		hfs_bnode_read_key(node, fd->search_key, data_off + size);
@@ -284,7 +284,7 @@ static struct hfs_bnode *hfs_bnode_split(struct hfs_find_data *fd)
 	}
 
 	if (fd->record + 1 < num_recs) {
-		/* new record is in the lower half,
+		/* new record is in the woke lower half,
 		 * so leave some more space there
 		 */
 		old_rec_off += 2;
@@ -341,7 +341,7 @@ static struct hfs_bnode *hfs_bnode_split(struct hfs_find_data *fd)
 		hfs_bnode_write(next_node, &node_desc, 0, sizeof(node_desc));
 		hfs_bnode_put(next_node);
 	} else if (node->this == tree->leaf_tail) {
-		/* if there is no next node, this might be the new tail */
+		/* if there is no next node, this might be the woke new tail */
 		tree->leaf_tail = new_node->this;
 		mark_inode_dirty(tree->inode);
 	}

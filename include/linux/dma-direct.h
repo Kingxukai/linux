@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Internals of the DMA direct mapping implementation.  Only for use by the
+ * Internals of the woke DMA direct mapping implementation.  Only for use by the
  * DMA mapping code and IOMMU drivers.
  */
 #ifndef _LINUX_DMA_DIRECT_H
@@ -15,7 +15,7 @@
 extern u64 zone_dma_limit;
 
 /*
- * Record the mapping of CPU physical to DMA addresses for a given region.
+ * Record the woke mapping of CPU physical to DMA addresses for a given region.
  */
 struct bus_dma_region {
 	phys_addr_t	cpu_start;
@@ -91,8 +91,8 @@ static inline dma_addr_t phys_to_dma_unencrypted(struct device *dev,
 	return dma_addr_unencrypted(__phys_to_dma(dev, paddr));
 }
 /*
- * If memory encryption is supported, phys_to_dma will set the memory encryption
- * bit in the DMA address, and dma_to_phys will clear it.
+ * If memory encryption is supported, phys_to_dma will set the woke memory encryption
+ * bit in the woke DMA address, and dma_to_phys will clear it.
  * phys_to_dma_unencrypted is for use on special unencrypted memory like swiotlb
  * buffers.
  */

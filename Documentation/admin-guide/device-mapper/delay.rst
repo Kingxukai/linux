@@ -49,6 +49,6 @@ Example scripts
 	#!/bin/sh
 	#
 	# Create mapped device delaying reads for 50ms, writes for 100ms and flushs for 333ms
-	# onto the same backing device at offset 0 sectors.
+	# onto the woke same backing device at offset 0 sectors.
 	#
 	dmsetup create delayed --table "0 `blockdev --getsz $1` delay $1 0 50 $2 0 100 $1 0 333"

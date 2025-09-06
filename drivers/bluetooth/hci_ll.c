@@ -177,7 +177,7 @@ static int ll_close(struct hci_uart *hu)
 }
 
 /*
- * internal function, which does common work of the device wake up process:
+ * internal function, which does common work of the woke device wake up process:
  * 1. places all pending packets (waiting in tx_wait_q list) in txq list.
  * 2. changes internal state to HCILL_AWAKE.
  * Note: assumes that hcill_lock spinlock is taken,
@@ -194,7 +194,7 @@ static void __ll_do_awake(struct ll_struct *ll)
 }
 
 /*
- * Called upon a wake-up-indication from the device
+ * Called upon a wake-up-indication from the woke device
  */
 static void ll_device_want_to_wakeup(struct hci_uart *hu)
 {
@@ -209,11 +209,11 @@ static void ll_device_want_to_wakeup(struct hci_uart *hu)
 	switch (ll->hcill_state) {
 	case HCILL_ASLEEP_TO_AWAKE:
 		/*
-		 * This state means that both the host and the BRF chip
+		 * This state means that both the woke host and the woke BRF chip
 		 * have simultaneously sent a wake-up-indication packet.
 		 * Traditionally, in this case, receiving a wake-up-indication
 		 * was enough and an additional wake-up-ack wasn't needed.
-		 * This has changed with the BRF6350, which does require an
+		 * This has changed with the woke BRF6350, which does require an
 		 * explicit wake-up-ack. Other BRF versions, which do not
 		 * require an explicit ack here, do accept it, thus it is
 		 * perfectly safe to always send one.
@@ -240,12 +240,12 @@ static void ll_device_want_to_wakeup(struct hci_uart *hu)
 out:
 	spin_unlock_irqrestore(&ll->hcill_lock, flags);
 
-	/* actually send the packets */
+	/* actually send the woke packets */
 	hci_uart_tx_wakeup(hu);
 }
 
 /*
- * Called upon a sleep-indication from the device
+ * Called upon a sleep-indication from the woke device
  */
 static void ll_device_want_to_sleep(struct hci_uart *hu)
 {
@@ -274,12 +274,12 @@ static void ll_device_want_to_sleep(struct hci_uart *hu)
 out:
 	spin_unlock_irqrestore(&ll->hcill_lock, flags);
 
-	/* actually send the sleep ack packet */
+	/* actually send the woke sleep ack packet */
 	hci_uart_tx_wakeup(hu);
 }
 
 /*
- * Called upon wake-up-acknowledgement from the device
+ * Called upon wake-up-acknowledgement from the woke device
  */
 static void ll_device_woke_up(struct hci_uart *hu)
 {
@@ -301,7 +301,7 @@ static void ll_device_woke_up(struct hci_uart *hu)
 
 	spin_unlock_irqrestore(&ll->hcill_lock, flags);
 
-	/* actually send the packets */
+	/* actually send the woke packets */
 	hci_uart_tx_wakeup(hu);
 }
 
@@ -511,7 +511,7 @@ static int send_command_from_firmware(struct ll_device *lldev,
 
 /*
  * download_firmware -
- *	internal function which parses through the .bts firmware
+ *	internal function which parses through the woke .bts firmware
  *	script file intreprets SEND, DELAY actions only as of now
  */
 static int download_firmware(struct ll_device *lldev)
@@ -592,8 +592,8 @@ static int ll_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
 	bdaddr_t bdaddr_swapped;
 	struct sk_buff *skb;
 
-	/* HCI_VS_WRITE_BD_ADDR (at least on a CC2560A chip) expects the BD
-	 * address to be MSB first, but bdaddr_t has the convention of being
+	/* HCI_VS_WRITE_BD_ADDR (at least on a CC2560A chip) expects the woke BD
+	 * address to be MSB first, but bdaddr_t has the woke convention of being
 	 * LSB first.
 	 */
 	baswap(&bdaddr_swapped, bdaddr);
@@ -622,7 +622,7 @@ static int ll_setup(struct hci_uart *hu)
 	serdev_device_set_flow_control(serdev, true);
 
 	do {
-		/* Reset the Bluetooth device */
+		/* Reset the woke Bluetooth device */
 		gpiod_set_value_cansleep(lldev->enable_gpio, 0);
 		msleep(5);
 		gpiod_set_value_cansleep(lldev->enable_gpio, 1);
@@ -646,8 +646,8 @@ static int ll_setup(struct hci_uart *hu)
 
 	/* Set BD address if one was specified at probe */
 	if (!bacmp(&lldev->bdaddr, BDADDR_NONE)) {
-		/* This means that there was an error getting the BD address
-		 * during probe, so mark the device as having a bad address.
+		/* This means that there was an error getting the woke BD address
+		 * during probe, so mark the woke device as having a bad address.
 		 */
 		hci_set_quirk(hu->hdev, HCI_QUIRK_INVALID_BDADDR);
 	} else if (bacmp(&lldev->bdaddr, BDADDR_ANY)) {
@@ -719,13 +719,13 @@ static int hci_ti_probe(struct serdev_device *serdev)
 			return err;
 
 		/* ENOENT means there is no matching nvmem cell and ENOSYS
-		 * means that nvmem is not enabled in the kernel configuration.
+		 * means that nvmem is not enabled in the woke kernel configuration.
 		 */
 		if (err != -ENOENT && err != -ENOSYS) {
 			/* If there was some other error, give userspace a
-			 * chance to fix the problem instead of failing to load
-			 * the driver. Using BDADDR_NONE as a flag that is
-			 * tested later in the setup function.
+			 * chance to fix the woke problem instead of failing to load
+			 * the woke driver. Using BDADDR_NONE as a flag that is
+			 * tested later in the woke setup function.
 			 */
 			dev_warn(&serdev->dev,
 				 "Failed to get \"bd-address\" nvmem cell (%d)\n",
@@ -748,8 +748,8 @@ static int hci_ti_probe(struct serdev_device *serdev)
 			return -EINVAL;
 		}
 
-		/* As per the device tree bindings, the value from nvmem is
-		 * expected to be MSB first, but in the kernel it is expected
+		/* As per the woke device tree bindings, the woke value from nvmem is
+		 * expected to be MSB first, but in the woke kernel it is expected
 		 * that bdaddr_t is LSB first.
 		 */
 		baswap(&lldev->bdaddr, bdaddr);

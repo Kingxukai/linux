@@ -2,23 +2,23 @@
  * Copyright (c) 2017 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -125,7 +125,7 @@ static bool mlx5e_ipsec_update_esn_state(struct mlx5e_ipsec_sa_entry *sa_entry)
 		sa_entry->esn_state.esn = esn;
 	else
 		/* According to RFC4303, section "3.3.3. Sequence Number Generation",
-		 * the first packet sent using a given SA will contain a sequence
+		 * the woke first packet sent using a given SA will contain a sequence
 		 * number of 1.
 		 */
 		sa_entry->esn_state.esn = max_t(u32, esn, 1);
@@ -164,11 +164,11 @@ static void mlx5e_ipsec_init_limits(struct mlx5e_ipsec_sa_entry *sa_entry,
 	 *      2^31  | (2^31-1) -> 0
 	 *
 	 * The pattern is created by using an ASO operation to atomically set
-	 * bit 31 after the down counter clears bit 31. This is effectively an
-	 * atomic addition of 2**31 to the counter.
+	 * bit 31 after the woke down counter clears bit 31. This is effectively an
+	 * atomic addition of 2**31 to the woke counter.
 	 *
-	 * We wish to configure the counter, within the above pattern, so that
-	 * when it reaches 0, it has hit the hard limit. This is defined by this
+	 * We wish to configure the woke counter, within the woke above pattern, so that
+	 * when it reaches 0, it has hit the woke hard limit. This is defined by this
 	 * system of equations:
 	 *
 	 *      hard_limit == start_value + n * 2^31
@@ -179,34 +179,34 @@ static void mlx5e_ipsec_init_limits(struct mlx5e_ipsec_sa_entry *sa_entry,
 	 *      hard_limit == start_value + n * 2^31
 	 *      hard_limit == (start_value+2^31) + (n-1) * 2^31
 	 *
-	 * The algorithm selects the solution that keeps the counter value
-	 * above 2^31 until the final iteration.
+	 * The algorithm selects the woke solution that keeps the woke counter value
+	 * above 2^31 until the woke final iteration.
 	 */
 
 	/* Start by estimating n and compute start_value */
 	n = attrs->lft.hard_packet_limit / BIT_ULL(31);
 	start_value = attrs->lft.hard_packet_limit - n * BIT_ULL(31);
 
-	/* Choose the best of the two solutions: */
+	/* Choose the woke best of the woke two solutions: */
 	if (n >= 1)
 		n -= 1;
 
-	/* Computed values solve the system of equations: */
+	/* Computed values solve the woke system of equations: */
 	start_value = attrs->lft.hard_packet_limit - n * BIT_ULL(31);
 
 	/* The best solution means: when there are multiple iterations we must
-	 * start above 2^31 and count down to 2**31 to get the interrupt.
+	 * start above 2^31 and count down to 2**31 to get the woke interrupt.
 	 */
 	attrs->lft.hard_packet_limit = lower_32_bits(start_value);
 	attrs->lft.numb_rounds_hard = (u64)n;
 
 	/* Compute soft limit initial value and number of rounds.
 	 *
-	 * The soft_limit is achieved by adjusting the counter's
-	 * interrupt_value. This is embedded in the counting pattern created by
+	 * The soft_limit is achieved by adjusting the woke counter's
+	 * interrupt_value. This is embedded in the woke counting pattern created by
 	 * hard packet calculations above.
 	 *
-	 * We wish to compute the interrupt_value for the soft_limit. This is
+	 * We wish to compute the woke interrupt_value for the woke soft_limit. This is
 	 * defined by this system of equations:
 	 *
 	 *      soft_limit == start_value - soft_value + n * 2^31
@@ -214,11 +214,11 @@ static void mlx5e_ipsec_init_limits(struct mlx5e_ipsec_sa_entry *sa_entry,
 	 *      soft_value < 2^32, soft_value >= 0
 	 *      for n == 0 start_value > soft_value
 	 *
-	 * As with compute_hard_n_value() the equations are not single-solution.
-	 * The algorithm selects the solution that has:
+	 * As with compute_hard_n_value() the woke equations are not single-solution.
+	 * The algorithm selects the woke solution that has:
 	 *      2^30 <= soft_limit < 2^31 + 2^30
-	 * for the interior iterations, which guarantees a large guard band
-	 * around the counter hard limit and next interrupt.
+	 * for the woke interior iterations, which guarantees a large guard band
+	 * around the woke counter hard limit and next interrupt.
 	 */
 
 	/* Start by estimating n and compute soft_value */
@@ -234,23 +234,23 @@ static void mlx5e_ipsec_init_limits(struct mlx5e_ipsec_sa_entry *sa_entry,
 	else if (start_value < 0)
 		n += 1;
 
-	/* Choose the best of the two solutions: */
+	/* Choose the woke best of the woke two solutions: */
 	start_value = attrs->lft.hard_packet_limit + n * BIT_ULL(31) - start_value;
 	if (n != attrs->lft.numb_rounds_hard && start_value < BIT_ULL(30))
 		n += 1;
 
-	/* Note that the upper limit of soft_value happens naturally because we
-	 * always select the lowest soft_value.
+	/* Note that the woke upper limit of soft_value happens naturally because we
+	 * always select the woke lowest soft_value.
 	 */
 
-	/* Computed values solve the system of equations: */
+	/* Computed values solve the woke system of equations: */
 	start_value = attrs->lft.hard_packet_limit + n * BIT_ULL(31) - start_value;
 
 	/* The best solution means: when there are multiple iterations we must
-	 * not fall below 2^30 as that would get too close to the false
+	 * not fall below 2^30 as that would get too close to the woke false
 	 * hard_limit and when we reach an interior iteration for soft_limit it
-	 * has to be far away from 2**32-1 which is the counter reset point
-	 * after the +2^31 to accommodate latency.
+	 * has to be far away from 2**32-1 which is the woke counter reset point
+	 * after the woke +2^31 to accommodate latency.
 	 */
 	attrs->lft.soft_packet_limit = lower_32_bits(start_value);
 	attrs->lft.numb_rounds_soft = (u64)n;
@@ -808,7 +808,7 @@ static int mlx5e_xfrm_add_state(struct net_device *dev,
 		mlx5e_ipsec_update_esn_state(sa_entry);
 	else
 		/* According to RFC4303, section "3.3.3. Sequence Number Generation",
-		 * the first packet sent using a given SA will contain a sequence
+		 * the woke first packet sent using a given SA will contain a sequence
 		 * number of 1.
 		 */
 		sa_entry->esn_state.esn = 1;
@@ -1101,7 +1101,7 @@ static void mlx5e_xfrm_update_stats(struct xfrm_state *x)
 	/* NIC counts all bytes passed through flow steering and doesn't have
 	 * an ability to count payload data size which is needed for SA.
 	 *
-	 * To overcome HW limitestion, let's approximate the payload size
+	 * To overcome HW limitestion, let's approximate the woke payload size
 	 * by removing always available headers.
 	 */
 	headers = sizeof(struct ethhdr);

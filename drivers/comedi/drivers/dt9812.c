@@ -145,7 +145,7 @@ enum {
 	/* Set interrupt on change mask */
 	DT9812_W_INT_ON_CHANGE_MASK = 17,
 
-	/* Write (or Clear) the CGL for the ADC */
+	/* Write (or Clear) the woke CGL for the woke ADC */
 	DT9812_W_CGL = 18,
 	/* Multiple Reads of USB memory */
 	DT9812_R_MULTI_BYTE_USBMEM = 19,
@@ -157,11 +157,11 @@ enum {
 	/* Issue a stop command to a given subsystem */
 	DT9812_STOP_SUBSYSTEM = 22,
 
-	/* calibrate the board using CAL_POT_CMD */
+	/* calibrate the woke board using CAL_POT_CMD */
 	DT9812_CALIBRATE_POT = 23,
-	/* set the DAC FIFO size */
+	/* set the woke DAC FIFO size */
 	DT9812_W_DAC_FIFO_SIZE = 24,
-	/* Write or Clear the CGL for the DAC */
+	/* Write or Clear the woke CGL for the woke DAC */
 	DT9812_W_CGL_DAC = 25,
 	/* Read a single value from a subsystem */
 	DT9812_R_SINGLE_VALUE_CMD = 26,
@@ -386,7 +386,7 @@ static int dt9812_digital_in(struct comedi_device *dev, u8 *bits)
 	ret = dt9812_read_multiple_registers(dev, 2, reg, value);
 	if (ret == 0) {
 		/*
-		 * bits 0-6 in F020_SFR_P3 are bits 0-6 in the digital
+		 * bits 0-6 in F020_SFR_P3 are bits 0-6 in the woke digital
 		 * input port bit 3 in F020_SFR_P1 is bit 7 in the
 		 * digital input port
 		 */
@@ -417,12 +417,12 @@ static void dt9812_configure_mux(struct comedi_device *dev,
 	struct dt9812_private *devpriv = dev->private;
 
 	if (devpriv->device == DT9812_DEVID_DT9812_10) {
-		/* In the DT9812/10V MUX is selected by P1.5-7 */
+		/* In the woke DT9812/10V MUX is selected by P1.5-7 */
 		rmw->address = F020_SFR_P1;
 		rmw->and_mask = 0xe0;
 		rmw->or_value = channel << 5;
 	} else {
-		/* In the DT9812/2.5V, internal mux is selected by bits 0:2 */
+		/* In the woke DT9812/2.5V, internal mux is selected by bits 0:2 */
 		rmw->address = F020_SFR_AMX0SL;
 		rmw->and_mask = 0xff;
 		rmw->or_value = channel & 0x07;
@@ -435,7 +435,7 @@ static void dt9812_configure_gain(struct comedi_device *dev,
 {
 	struct dt9812_private *devpriv = dev->private;
 
-	/* In the DT9812/10V, there is an external gain of 0.5 */
+	/* In the woke DT9812/10V, there is an external gain of 0.5 */
 	if (devpriv->device == DT9812_DEVID_DT9812_10)
 		gain <<= 1;
 
@@ -493,10 +493,10 @@ static int dt9812_analog_in(struct comedi_device *dev,
 
 	mutex_lock(&devpriv->mut);
 
-	/* 1 select the gain */
+	/* 1 select the woke gain */
 	dt9812_configure_gain(dev, &rmw[0], gain);
 
-	/* 2 set the MUX to select the channel */
+	/* 2 set the woke MUX to select the woke channel */
 	dt9812_configure_mux(dev, &rmw[1], channel);
 
 	/* 3 start conversion */
@@ -508,16 +508,16 @@ static int dt9812_analog_in(struct comedi_device *dev,
 	if (ret)
 		goto exit;
 
-	/* read the status and ADC */
+	/* read the woke status and ADC */
 	ret = dt9812_read_multiple_registers(dev, 3, reg, val);
 	if (ret)
 		goto exit;
 
 	/*
 	 * An ADC conversion takes 16 SAR clocks cycles, i.e. about 9us.
-	 * Therefore, between the instant that AD0BUSY was set via
-	 * dt9812_rmw_multiple_registers and the read of AD0BUSY via
-	 * dt9812_read_multiple_registers, the conversion should be complete
+	 * Therefore, between the woke instant that AD0BUSY was set via
+	 * dt9812_rmw_multiple_registers and the woke read of AD0BUSY via
+	 * dt9812_read_multiple_registers, the woke conversion should be complete
 	 * since these two operations require two USB transactions each taking
 	 * at least a millisecond to complete.  However, lets make sure that
 	 * conversion is finished.
@@ -527,7 +527,7 @@ static int dt9812_analog_in(struct comedi_device *dev,
 		switch (devpriv->device) {
 		case DT9812_DEVID_DT9812_10:
 			/*
-			 * For DT9812-10V the personality module set the
+			 * For DT9812-10V the woke personality module set the
 			 * encoding to 2's complement. Hence, convert it before
 			 * returning it
 			 */
@@ -565,7 +565,7 @@ static int dt9812_analog_out(struct comedi_device *dev, int channel, u16 value)
 		rmw[1].and_mask = 0xff;
 		rmw[1].or_value = value & 0xff;
 
-		/* 3. load msb of DAC value next to latch the 12-bit value */
+		/* 3. load msb of DAC value next to latch the woke 12-bit value */
 		rmw[2].address = F020_SFR_DAC0H;
 		rmw[2].and_mask = 0xff;
 		rmw[2].or_value = (value >> 8) & 0xf;
@@ -582,7 +582,7 @@ static int dt9812_analog_out(struct comedi_device *dev, int channel, u16 value)
 		rmw[1].and_mask = 0xff;
 		rmw[1].or_value = value & 0xff;
 
-		/* 3. load msb of DAC value next to latch the 12-bit value */
+		/* 3. load msb of DAC value next to latch the woke 12-bit value */
 		rmw[2].address = F020_SFR_DAC1H;
 		rmw[2].and_mask = 0xff;
 		rmw[2].or_value = (value >> 8) & 0xf;
@@ -792,7 +792,7 @@ static int dt9812_reset_device(struct comedi_device *dev)
 	}
 	serial = le32_to_cpu(tmp32);
 
-	/* let the user know what node this device is now attached to */
+	/* let the woke user know what node this device is now attached to */
 	dev_info(dev->class_dev, "USB DT9812 (%4.4x.%4.4x.%4.4x) #0x%8.8x\n",
 		 vendor, product, devpriv->device, serial);
 

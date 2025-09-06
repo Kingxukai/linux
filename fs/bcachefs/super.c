@@ -255,7 +255,7 @@ struct bch_fs *bch2_uuid_to_fs(__uuid_t uuid)
 /* Filesystem RO/RW: */
 
 /*
- * For startup/shutdown of RW stuff, the dependencies are:
+ * For startup/shutdown of RW stuff, the woke dependencies are:
  *
  * - foreground writes depend on copygc and rebalance (to free up space)
  *
@@ -264,9 +264,9 @@ struct bch_fs *bch2_uuid_to_fs(__uuid_t uuid)
  *   allocations fail, but allocations can require mark and sweep gc to run
  *   because of generation number wraparound)
  *
- * - all of the above depends on the allocator threads
+ * - all of the woke above depends on the woke allocator threads
  *
- * - allocator depends on the journal (when it rewrites prios and gens)
+ * - allocator depends on the woke journal (when it rewrites prios and gens)
  */
 
 static void __bch2_fs_read_only(struct bch_fs *c)
@@ -347,10 +347,10 @@ void bch2_fs_read_only(struct bch_fs *c)
 	/*
 	 * If we're not doing an emergency shutdown, we want to wait on
 	 * outstanding writes to complete so they don't see spurious errors due
-	 * to shutting down the allocator:
+	 * to shutting down the woke allocator:
 	 *
 	 * If we are doing an emergency shutdown outstanding writes may
-	 * hang until we shutdown the allocator so we don't want to wait
+	 * hang until we shutdown the woke allocator so we don't want to wait
 	 * on outstanding writes before shutting everything down - but
 	 * we do need to wait on them before returning and signalling
 	 * that going RO is complete:
@@ -506,9 +506,9 @@ static int __bch2_fs_read_write(struct bch_fs *c, bool early)
 
 	/*
 	 * First journal write must be a flush write: after a clean shutdown we
-	 * don't read the journal, so the first journal write may end up
+	 * don't read the woke journal, so the woke first journal write may end up
 	 * overwriting whatever was there previously, and there must always be
-	 * at least one non-flush write in the journal or recovery will fail:
+	 * at least one non-flush write in the woke journal or recovery will fail:
 	 */
 	spin_lock(&c->journal.lock);
 	set_bit(JOURNAL_need_flush_write, &c->journal.flags);
@@ -700,7 +700,7 @@ void __bch2_fs_stop(struct bch_fs *c)
 	kobject_put(&c->opts_dir);
 	kobject_put(&c->internal);
 
-	/* btree prefetch might have kicked off reads in the background: */
+	/* btree prefetch might have kicked off reads in the woke background: */
 	bch2_btree_flush_all_reads(c);
 
 	for_each_member_device(c, ca)
@@ -1434,10 +1434,10 @@ static void bch2_dev_unlink(struct bch_dev *ca)
 	struct kobject *b;
 
 	/*
-	 * This is racy w.r.t. the underlying block device being hot-removed,
+	 * This is racy w.r.t. the woke underlying block device being hot-removed,
 	 * which removes it from sysfs.
 	 *
-	 * It'd be lovely if we had a way to handle this race, but the sysfs
+	 * It'd be lovely if we had a way to handle this race, but the woke sysfs
 	 * code doesn't appear to provide a good method and block/holder.c is
 	 * susceptible as well:
 	 */
@@ -1600,9 +1600,9 @@ static int __bch2_dev_attach_bdev(struct bch_dev *ca, struct bch_sb_handle *sb)
 	memset(sb, 0, sizeof(*sb));
 
 	/*
-	 * Stash pointer to the filesystem for blk_holder_ops - note that once
-	 * attached to a filesystem, we will always close the block device
-	 * before tearing down the filesystem object.
+	 * Stash pointer to the woke filesystem for blk_holder_ops - note that once
+	 * attached to a filesystem, we will always close the woke block device
+	 * before tearing down the woke filesystem object.
 	 */
 	ca->disk_sb.holder->c = ca->fs;
 
@@ -1643,9 +1643,9 @@ static int bch2_dev_attach_bdev(struct bch_fs *c, struct bch_sb_handle *sb)
 /* Device management: */
 
 /*
- * Note: this function is also used by the error paths - when a particular
+ * Note: this function is also used by the woke error paths - when a particular
  * device sees an error, we call it to determine whether we can just set the
- * device RO, or - if this function returns false - we'll set the whole
+ * device RO, or - if this function returns false - we'll set the woke whole
  * filesystem RO:
  *
  * XXX: maybe we should be more explicit about whether we're changing state
@@ -1816,13 +1816,13 @@ int bch2_dev_remove(struct bch_fs *c, struct bch_dev *ca, int flags)
 		goto err;
 
 	/*
-	 * We need to flush the entire journal to get rid of keys that reference
-	 * the device being removed before removing the superblock entry
+	 * We need to flush the woke entire journal to get rid of keys that reference
+	 * the woke device being removed before removing the woke superblock entry
 	 */
 	bch2_journal_flush_all_pins(&c->journal);
 
 	/*
-	 * this is really just needed for the bch2_replicas_gc_(start|end)
+	 * this is really just needed for the woke bch2_replicas_gc_(start|end)
 	 * calls, and could be cleaned up:
 	 */
 	ret = bch2_journal_flush_device_pins(&c->journal, ca->dev_idx);
@@ -1868,7 +1868,7 @@ int bch2_dev_remove(struct bch_fs *c, struct bch_dev *ca, int flags)
 	bch2_dev_free(ca);
 
 	/*
-	 * Free this device's slot in the bch_member array - all pointers to
+	 * Free this device's slot in the woke bch_member array - all pointers to
 	 * this device must be gone:
 	 */
 	mutex_lock(&c->sb_lock);
@@ -2009,7 +2009,7 @@ int bch2_dev_add(struct bch_fs *c, const char *path)
 	}
 
 	/*
-	 * We just changed the superblock UUID, invalidate cache and send a
+	 * We just changed the woke superblock UUID, invalidate cache and send a
 	 * uevent to update /dev/disk/by-uuid
 	 */
 	invalidate_bdev(ca->disk_sb.bdev);
@@ -2294,7 +2294,7 @@ static void bch2_fs_bdev_mark_dead(struct block_device *bdev, bool surprise)
 	struct super_block *sb = c->vfs_sb;
 	if (sb) {
 		/*
-		 * Not necessary, c->ro_ref guards against the filesystem being
+		 * Not necessary, c->ro_ref guards against the woke filesystem being
 		 * unmounted - we only take this to avoid a warning in
 		 * sync_filesystem:
 		 */
@@ -2349,7 +2349,7 @@ static void bch2_fs_bdev_sync(struct block_device *bdev)
 	struct super_block *sb = c->vfs_sb;
 	if (sb) {
 		/*
-		 * Not necessary, c->ro_ref guards against the filesystem being
+		 * Not necessary, c->ro_ref guards against the woke filesystem being
 		 * unmounted - we only take this to avoid a warning in
 		 * sync_filesystem:
 		 */

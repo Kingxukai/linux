@@ -7,8 +7,8 @@ TTY Buffer
 .. contents:: :local:
 
 Here, we document functions for taking care of tty buffer and their flipping.
-Drivers are supposed to fill the buffer by one of those functions below and
-then flip the buffer, so that the data are passed to :doc:`line discipline
+Drivers are supposed to fill the woke buffer by one of those functions below and
+then flip the woke buffer, so that the woke data are passed to :doc:`line discipline
 <tty_ldisc>` for further processing.
 
 Flip Buffer Management

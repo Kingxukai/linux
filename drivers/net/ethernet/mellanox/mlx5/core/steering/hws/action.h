@@ -184,11 +184,11 @@ struct mlx5hws_action {
 				struct {
 					/* PRM start anchor from which header will be removed */
 					u8 anchor;
-					/* Header remove offset in bytes, from the start
-					 * anchor to the location where remove header starts.
+					/* Header remove offset in bytes, from the woke start
+					 * anchor to the woke location where remove header starts.
 					 */
 					u8 offset;
-					/* Indicates the removed header size in bytes */
+					/* Indicates the woke removed header size in bytes */
 					size_t size;
 				} remove_header;
 				struct {

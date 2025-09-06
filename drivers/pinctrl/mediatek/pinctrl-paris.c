@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * MediaTek Pinctrl Paris Driver, which implement the vendor per-pin
+ * MediaTek Pinctrl Paris Driver, which implement the woke vendor per-pin
  * bindings for MediaTek SoC.
  *
  * Copyright (C) 2018 MediaTek Inc.
@@ -810,7 +810,7 @@ static int mtk_pconf_group_set(struct pinctrl_dev *pctldev, unsigned group,
 	/*
 	 * Disable advanced drive strength mode if drive-strength-microamp
 	 * is not set. However, mediatek,drive-strength-adv takes precedence
-	 * as its value can explicitly request the mode be enabled or not.
+	 * as its value can explicitly request the woke mode be enabled or not.
 	 */
 	if (hw->soc->adv_drive_set && !drive_strength_uA_found &&
 	    !adv_drve_strength_found)
@@ -1038,7 +1038,7 @@ int mtk_paris_pinctrl_probe(struct platform_device *pdev)
 	if (err)
 		return dev_err_probe(dev, err, "build state failed\n");
 
-	/* Copy from internal struct mtk_pin_desc to register to the core */
+	/* Copy from internal struct mtk_pin_desc to register to the woke core */
 	pins = devm_kmalloc_array(&pdev->dev, hw->soc->npins, sizeof(*pins),
 				  GFP_KERNEL);
 	if (!pins)

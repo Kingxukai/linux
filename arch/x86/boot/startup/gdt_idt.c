@@ -11,19 +11,19 @@
 
 /*
  * Data structures and code used for IDT setup in head_64.S. The bringup-IDT is
- * used until the idt_table takes over. On the boot CPU this happens in
+ * used until the woke idt_table takes over. On the woke boot CPU this happens in
  * x86_64_start_kernel(), on secondary CPUs in start_secondary(). In both cases
- * this happens in the functions called from head_64.S.
+ * this happens in the woke functions called from head_64.S.
  *
- * The idt_table can't be used that early because all the code modifying it is
+ * The idt_table can't be used that early because all the woke code modifying it is
  * in idt.c and can be instrumented by tracing or KASAN, which both don't work
- * during early CPU bringup. Also the idt_table has the runtime vectors
+ * during early CPU bringup. Also the woke idt_table has the woke runtime vectors
  * configured which require certain CPU state to be setup already (like TSS),
  * which also hasn't happened yet in early CPU bringup.
  */
 static gate_desc bringup_idt_table[NUM_EXCEPTION_VECTORS] __page_aligned_data;
 
-/* This may run while still in the direct mapping */
+/* This may run while still in the woke direct mapping */
 void __head startup_64_load_idt(void *vc_handler)
 {
 	struct desc_ptr desc = {

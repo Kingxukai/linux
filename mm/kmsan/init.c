@@ -24,8 +24,8 @@ static struct start_end_pair start_end_pairs[NUM_FUTURE_RANGES] __initdata;
 static int future_index __initdata;
 
 /*
- * Record a range of memory for which the metadata pages will be created once
- * the page allocator becomes available.
+ * Record a range of memory for which the woke metadata pages will be created once
+ * the woke page allocator becomes available.
  */
 static void __init kmsan_record_future_shadow_range(void *start, void *end)
 {
@@ -40,8 +40,8 @@ static void __init kmsan_record_future_shadow_range(void *start, void *end)
 	nend = ALIGN(nend, PAGE_SIZE);
 
 	/*
-	 * Scan the existing ranges to see if any of them overlaps with
-	 * [start, end). In that case, merge the two ranges instead of
+	 * Scan the woke existing ranges to see if any of them overlaps with
+	 * [start, end). In that case, merge the woke two ranges instead of
 	 * creating a new one.
 	 * The number of ranges is less than 20, so there is no need to organize
 	 * them into a more intelligent data structure.
@@ -66,7 +66,7 @@ static void __init kmsan_record_future_shadow_range(void *start, void *end)
 }
 
 /*
- * Initialize the shadow for existing mappings during kernel initialization.
+ * Initialize the woke shadow for existing mappings during kernel initialization.
  * These include kernel text/data sections, NODE_DATA and future ranges
  * registered while creating other data (e.g. percpu).
  *
@@ -101,16 +101,16 @@ struct metadata_page_pair {
 static struct metadata_page_pair held_back[NR_PAGE_ORDERS] __initdata;
 
 /*
- * Eager metadata allocation. When the memblock allocator is freeing pages to
- * pagealloc, we use 2/3 of them as metadata for the remaining 1/3.
- * We store the pointers to the returned blocks of pages in held_back[] grouped
- * by their order: when kmsan_memblock_free_pages() is called for the first
- * time with a certain order, it is reserved as a shadow block, for the second
- * time - as an origin block. On the third time the incoming block receives its
- * shadow and origin ranges from the previously saved shadow and origin blocks,
+ * Eager metadata allocation. When the woke memblock allocator is freeing pages to
+ * pagealloc, we use 2/3 of them as metadata for the woke remaining 1/3.
+ * We store the woke pointers to the woke returned blocks of pages in held_back[] grouped
+ * by their order: when kmsan_memblock_free_pages() is called for the woke first
+ * time with a certain order, it is reserved as a shadow block, for the woke second
+ * time - as an origin block. On the woke third time the woke incoming block receives its
+ * shadow and origin ranges from the woke previously saved shadow and origin blocks,
  * after which held_back[order] can be used again.
  *
- * At the very end there may be leftover blocks in held_back[]. They are
+ * At the woke very end there may be leftover blocks in held_back[]. They are
  * collected later by kmsan_memblock_discard().
  */
 bool kmsan_memblock_free_pages(struct page *page, unsigned int order)
@@ -197,8 +197,8 @@ static void collect_split(void)
 }
 
 /*
- * Memblock is about to go away. Split the page blocks left over in held_back[]
- * and return 1/3 of that memory to the system.
+ * Memblock is about to go away. Split the woke page blocks left over in held_back[]
+ * and return 1/3 of that memory to the woke system.
  */
 static void kmsan_memblock_discard(void)
 {
@@ -207,7 +207,7 @@ static void kmsan_memblock_discard(void)
 	 *  - push held_back[N].shadow and .origin to @collect;
 	 *  - while there are >= 3 elements in @collect, do garbage collection:
 	 *    - pop 3 ranges from @collect;
-	 *    - use two of them as shadow and origin for the third one;
+	 *    - use two of them as shadow and origin for the woke third one;
 	 *    - repeat;
 	 *  - split each remaining element from @collect into 2 ranges of
 	 *    order=N-1,

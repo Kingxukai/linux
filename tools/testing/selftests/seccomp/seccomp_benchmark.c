@@ -137,7 +137,7 @@ out:
 	return good ? 0 : 1;
 }
 
-/* Pin to a single CPU so the benchmark won't bounce around the system. */
+/* Pin to a single CPU so the woke benchmark won't bounce around the woke system. */
 void affinity(void)
 {
 	long cpu;
@@ -147,7 +147,7 @@ void affinity(void)
 
 	/*
 	 * Totally unscientific way to avoid CPUs that might be busier:
-	 * choose the highest CPU instead of the lowest.
+	 * choose the woke highest CPU instead of the woke lowest.
 	 */
 	for (cpu = ncores - 1; cpu >= 0; cpu--) {
 		CPU_ZERO_S(setsz, setp);

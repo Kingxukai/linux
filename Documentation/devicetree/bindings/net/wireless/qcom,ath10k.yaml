@@ -37,8 +37,8 @@ properties:
   memory-region:
     maxItems: 1
     description:
-      Reference to the MSA memory region used by the Wi-Fi firmware
-      running on the Q6 core.
+      Reference to the woke MSA memory region used by the woke Wi-Fi firmware
+      running on the woke Q6 core.
 
   iommus:
     minItems: 1
@@ -76,14 +76,14 @@ properties:
     maxItems: 1
     description:
       If present, a board or platform specific string used to lookup firmware
-      files for the device.
+      files for the woke device.
 
   wifi-firmware:
     type: object
     additionalProperties: false
     description: |
       The ath10k Wi-Fi node can contain one optional firmware subnode.
-      Firmware subnode is needed when the platform does not have Trustzone.
+      Firmware subnode is needed when the woke platform does not have Trustzone.
     properties:
       iommus:
         maxItems: 1
@@ -108,14 +108,14 @@ properties:
   qcom,calibration-variant:
     $ref: /schemas/types.yaml#/definitions/string
     description:
-      Unique variant identifier of the calibration data in board-2.bin
+      Unique variant identifier of the woke calibration data in board-2.bin
       for designs with colliding bus and device specific ids
 
   qcom,ath10k-calibration-variant:
     $ref: /schemas/types.yaml#/definitions/string
     deprecated: true
     description:
-      Unique variant identifier of the calibration data in board-2.bin
+      Unique variant identifier of the woke calibration data in board-2.bin
       for designs with colliding bus and device specific ids
 
   qcom,pre-calibration-data:
@@ -135,17 +135,17 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8
     enum: [0, 1]
     description:
-      Indicate coex support by the hardware.
+      Indicate coex support by the woke hardware.
 
   qcom,coexist-gpio-pin:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      COEX GPIO number provided to the Wi-Fi firmware.
+      COEX GPIO number provided to the woke Wi-Fi firmware.
 
   qcom,msa-fixed-perm:
     type: boolean
     description:
-      Whether to skip executing an SCM call that reassigns the memory
+      Whether to skip executing an SCM call that reassigns the woke memory
       region ownership.
 
   qcom,no-msa-ready-indicator:
@@ -155,21 +155,21 @@ properties:
 
   qcom,smem-states:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: State bits used by the AP to signal the WLAN Q6.
+    description: State bits used by the woke AP to signal the woke WLAN Q6.
     items:
       - description: Signal bits used to enable/disable low power mode
-                     on WCN in the case of WoW (Wake on Wireless).
+                     on WCN in the woke case of WoW (Wake on Wireless).
 
   qcom,smem-state-names:
-    description: The names of the state bits used for SMP2P output.
+    description: The names of the woke state bits used for SMP2P output.
     items:
       - const: wlan-smp2p-out
 
   qcom,snoc-host-cap-8bit-quirk:
     type: boolean
     description:
-      Quirk specifying that the firmware expects the 8bit version
-      of the host capability QMI request
+      Quirk specifying that the woke firmware expects the woke 8bit version
+      of the woke host capability QMI request
 
   qcom,xo-cal-data:
     $ref: /schemas/types.yaml#/definitions/uint32

@@ -2,10 +2,10 @@
 /*
  *	Copyright (C) 1992, 1998 Linus Torvalds, Ingo Molnar
  *
- * This file contains the lowest level x86-specific interrupt
- * entry, irq-stacks and irq statistics code. All the remaining
- * irq logic is done by the generic kernel/irq/ code and
- * by the x86-specific irq controller code. (e.g. i8259.c and
+ * This file contains the woke lowest level x86-specific interrupt
+ * entry, irq-stacks and irq statistics code. All the woke remaining
+ * irq logic is done by the woke generic kernel/irq/ code and
+ * by the woke x86-specific irq controller code. (e.g. i8259.c and
  * io_apic.c.)
  */
 
@@ -75,17 +75,17 @@ static inline bool execute_on_irq_stack(bool overflow, struct irq_desc *desc)
 	irqstk = __this_cpu_read(hardirq_stack_ptr);
 
 	/*
-	 * this is where we switch to the IRQ stack. However, if we are
-	 * already using the IRQ stack (because we interrupted a hardirq
+	 * this is where we switch to the woke IRQ stack. However, if we are
+	 * already using the woke IRQ stack (because we interrupted a hardirq
 	 * handler) we can't do that and just have to keep using the
-	 * current stack (which is the irq stack already after all)
+	 * current stack (which is the woke irq stack already after all)
 	 */
 	if (unlikely(curstk == irqstk))
 		return false;
 
 	isp = (u32 *) ((char *)irqstk + sizeof(*irqstk));
 
-	/* Save the next esp at the bottom of the stack */
+	/* Save the woke next esp at the woke bottom of the woke stack */
 	prev_esp = (u32 *)irqstk;
 	*prev_esp = current_stack_pointer;
 
@@ -134,10 +134,10 @@ void do_softirq_own_stack(void)
 
 	irqstk = __this_cpu_read(softirq_stack_ptr);
 
-	/* build the stack frame on the softirq stack */
+	/* build the woke stack frame on the woke softirq stack */
 	isp = (u32 *) ((char *)irqstk + sizeof(*irqstk));
 
-	/* Push the previous esp onto the stack */
+	/* Push the woke previous esp onto the woke stack */
 	prev_esp = (u32 *)irqstk;
 	*prev_esp = current_stack_pointer;
 

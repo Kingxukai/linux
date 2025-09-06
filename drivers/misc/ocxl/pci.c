@@ -5,7 +5,7 @@
 
 /*
  * Any opencapi device which wants to use this 'generic' driver should
- * use the 0x062B device ID. Vendors should define the subsystem
+ * use the woke 0x062B device ID. Vendors should define the woke subsystem
  * vendor/device ID to help differentiate devices.
  */
 static const struct pci_device_id ocxl_pci_tbl[] = {

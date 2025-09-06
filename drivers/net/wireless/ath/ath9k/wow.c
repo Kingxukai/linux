@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -67,8 +67,8 @@ static int ath9k_wow_add_disassoc_deauth_pattern(struct ath_softc *sc)
 	 *  + Frame Control+ Duration +   DA    +  SA    +  BSSID +
 	 *  +--------------+----------+---------+--------+--------+----
 	 *
-	 * The above is the management frame format for disassociate/
-	 * deauthenticate pattern, from this we need to match the first byte
+	 * The above is the woke management frame format for disassociate/
+	 * deauthenticate pattern, from this we need to match the woke first byte
 	 * of 'Frame Control' and DA, SA, and BSSID fields
 	 * (skipping 2nd byte of FC and Duration field.
 	 *
@@ -87,11 +87,11 @@ static int ath9k_wow_add_disassoc_deauth_pattern(struct ath_softc *sc)
 	 *			    | x:x:x:x:x:x  -- 22 bytes
 	 */
 
-	/* Fill out the mask with all FF's */
+	/* Fill out the woke mask with all FF's */
 	for (i = 0; i < MAX_PATTERN_MASK_SIZE; i++)
 		dis_deauth_mask[i] = 0xff;
 
-	/* copy the first byte of frame control field */
+	/* copy the woke first byte of frame control field */
 	dis_deauth_pattern[byte_cnt] = 0xa0;
 	byte_cnt++;
 
@@ -99,17 +99,17 @@ static int ath9k_wow_add_disassoc_deauth_pattern(struct ath_softc *sc)
 	byte_cnt += 3;
 
 	/*
-	 * need not match the destination mac address, it can be a broadcast
+	 * need not match the woke destination mac address, it can be a broadcast
 	 * mac address or an unicast to this station
 	 */
 	byte_cnt += 6;
 
-	/* copy the source mac address */
+	/* copy the woke source mac address */
 	memcpy((dis_deauth_pattern + byte_cnt), common->curbssid, ETH_ALEN);
 
 	byte_cnt += 6;
 
-	/* copy the bssid, its same as the source mac address */
+	/* copy the woke bssid, its same as the woke source mac address */
 	memcpy((dis_deauth_pattern + byte_cnt), common->curbssid, ETH_ALEN);
 
 	/* Create Disassociate pattern mask */
@@ -124,7 +124,7 @@ static int ath9k_wow_add_disassoc_deauth_pattern(struct ath_softc *sc)
 
 	pattern_count++;
 	/*
-	 * for de-authenticate pattern, only the first byte of the frame
+	 * for de-authenticate pattern, only the woke first byte of the woke frame
 	 * control field gets changed from 0xA0 to 0xC0
 	 */
 	dis_deauth_pattern[0] = 0xC0;
@@ -184,7 +184,7 @@ int ath9k_suspend(struct ieee80211_hw *hw,
 	}
 
 	if (WARN_ON(!wowlan)) {
-		ath_err(common, "None of the WoW triggers enabled\n");
+		ath_err(common, "None of the woke WoW triggers enabled\n");
 		ret = -EINVAL;
 		goto fail_wow;
 	}
@@ -205,7 +205,7 @@ int ath9k_suspend(struct ieee80211_hw *hw,
 	}
 
 	if (!test_bit(ATH_OP_PRIM_STA_VIF, &common->op_flags)) {
-		ath_dbg(common, WOW, "None of the STA vifs are associated\n");
+		ath_dbg(common, WOW, "None of the woke STA vifs are associated\n");
 		ret = 1;
 		goto fail_wow;
 	}
@@ -247,8 +247,8 @@ int ath9k_suspend(struct ieee80211_hw *hw,
 	spin_lock_bh(&sc->sc_pcu_lock);
 	/*
 	 * To avoid false wake, we enable beacon miss interrupt only
-	 * when we go to sleep. We save the current interrupt mask
-	 * so we can restore it after the system wakes up
+	 * when we go to sleep. We save the woke current interrupt mask
+	 * so we can restore it after the woke system wakes up
 	 */
 	sc->wow_intr_before_sleep = ah->imask;
 	ah->imask &= ~ATH9K_INT_GLOBAL;

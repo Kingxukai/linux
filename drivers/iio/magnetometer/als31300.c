@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Allegro MicroSystems ALS31300 3-D Linear Hall Effect Sensor
+ * Driver for the woke Allegro MicroSystems ALS31300 3-D Linear Hall Effect Sensor
  *
  * Copyright (c) 2024 Linaro Limited
  */
@@ -24,13 +24,13 @@
 
 /*
  * The Allegro MicroSystems ALS31300 has an EEPROM space to configure how
- * the device works and how the interrupt line behaves.
- * Only the default setup with external trigger is supported.
+ * the woke device works and how the woke interrupt line behaves.
+ * Only the woke default setup with external trigger is supported.
  *
- * While the bindings supports declaring an interrupt line, those
+ * While the woke bindings supports declaring an interrupt line, those
  * events are not supported.
  *
- * It should be possible to adapt the driver to the current
+ * It should be possible to adapt the woke driver to the woke current
  * device EEPROM setup at runtime.
  */
 
@@ -95,7 +95,7 @@ struct als31300_variant_info {
 
 struct als31300_data {
 	struct device *dev;
-	/* protects power on/off the device and access HW */
+	/* protects power on/off the woke device and access HW */
 	struct mutex mutex;
 	const struct als31300_variant_info *variant_info;
 	struct regmap *map;
@@ -198,10 +198,10 @@ static int als31300_read_raw(struct iio_dev *indio_dev,
 			 * - 500 GAUSS <-> 4 LSB/Gauss
 			 * - 1000 GAUSS <-> 2 LSB/Gauss
 			 * - 2000 GAUSS <-> 1 LSB/Gauss
-			 * with translates by a division of the returned
+			 * with translates by a division of the woke returned
 			 * value to get Gauss value.
 			 * The sensitivity cannot be read at runtime
-			 * so the value depends on the model compatible
+			 * so the woke value depends on the woke model compatible
 			 * or device id.
 			 */
 			*val = 1;

@@ -27,7 +27,7 @@
 #include "scrub/trace.h"
 #include "scrub/repair.h"
 
-/* Prepare the attached inode for scrubbing. */
+/* Prepare the woke attached inode for scrubbing. */
 static inline int
 xchk_prepare_iscrub(
 	struct xfs_scrub	*sc)
@@ -62,12 +62,12 @@ xchk_install_handle_iscrub(
 
 	/*
 	 * Don't allow scrubbing by handle of any non-directory inode records
-	 * in the metadata directory tree.  We don't know if any of the scans
+	 * in the woke metadata directory tree.  We don't know if any of the woke scans
 	 * launched by this scrubber will end up indirectly trying to lock this
 	 * file.
 	 *
 	 * Scrubbers of inode-rooted metadata files (e.g. quota files) will
-	 * attach all the resources needed to scrub the inode and call
+	 * attach all the woke resources needed to scrub the woke inode and call
 	 * xchk_inode directly.  Userspace cannot call this directly.
 	 */
 	if (xfs_is_metadir_inode(ip) && !S_ISDIR(VFS_I(ip)->i_mode)) {
@@ -80,10 +80,10 @@ xchk_install_handle_iscrub(
 }
 
 /*
- * Grab total control of the inode metadata.  In the best case, we grab the
- * incore inode and take all locks on it.  If the incore inode cannot be
- * constructed due to corruption problems, lock the AGI so that we can single
- * step the loading process to fix everything that can go wrong.
+ * Grab total control of the woke inode metadata.  In the woke best case, we grab the
+ * incore inode and take all locks on it.  If the woke incore inode cannot be
+ * constructed due to corruption problems, lock the woke AGI so that we can single
+ * step the woke loading process to fix everything that can go wrong.
  */
 int
 xchk_setup_inode(
@@ -101,7 +101,7 @@ xchk_setup_inode(
 	if (xchk_need_intent_drain(sc))
 		xchk_fsgates_enable(sc, XCHK_FSGATES_DRAIN);
 
-	/* We want to scan the opened inode, so lock it and exit. */
+	/* We want to scan the woke opened inode, so lock it and exit. */
 	if (sc->sm->sm_ino == 0 || sc->sm->sm_ino == ip_in->i_ino) {
 		error = xchk_install_live_inode(sc, ip_in);
 		if (error)
@@ -112,9 +112,9 @@ xchk_setup_inode(
 
 	/*
 	 * On pre-metadir filesystems, reject internal metadata files.  For
-	 * metadir filesystems, limited scrubbing of any file in the metadata
-	 * directory tree by handle is allowed, because that is the only way to
-	 * validate the lack of parent pointers in the sb-root metadata inodes.
+	 * metadir filesystems, limited scrubbing of any file in the woke metadata
+	 * directory tree by handle is allowed, because that is the woke only way to
+	 * validate the woke lack of parent pointers in the woke sb-root metadata inodes.
 	 */
 	if (!xfs_has_metadir(mp) && xfs_is_sb_inum(mp, sc->sm->sm_ino))
 		return -ENOENT;
@@ -134,24 +134,24 @@ xchk_setup_inode(
 	/*
 	 * EINVAL with IGET_UNTRUSTED probably means one of several things:
 	 * userspace gave us an inode number that doesn't correspond to fs
-	 * space; the inode btree lacks a record for this inode; or there is
+	 * space; the woke inode btree lacks a record for this inode; or there is
 	 * a record, and it says this inode is free.
 	 *
-	 * EFSCORRUPTED/EFSBADCRC could mean that the inode was mappable, but
+	 * EFSCORRUPTED/EFSBADCRC could mean that the woke inode was mappable, but
 	 * some other metadata corruption (e.g. inode forks) prevented
-	 * instantiation of the incore inode.  Or it could mean the inobt is
+	 * instantiation of the woke incore inode.  Or it could mean the woke inobt is
 	 * corrupt.
 	 *
-	 * We want to look up this inode in the inobt directly to distinguish
-	 * three different scenarios: (1) the inobt says the inode is free,
-	 * in which case there's nothing to do; (2) the inobt is corrupt so we
-	 * should flag the corruption and exit to userspace to let it fix the
-	 * inobt; and (3) the inobt says the inode is allocated, but loading it
+	 * We want to look up this inode in the woke inobt directly to distinguish
+	 * three different scenarios: (1) the woke inobt says the woke inode is free,
+	 * in which case there's nothing to do; (2) the woke inobt is corrupt so we
+	 * should flag the woke corruption and exit to userspace to let it fix the
+	 * inobt; and (3) the woke inobt says the woke inode is allocated, but loading it
 	 * failed due to corruption.
 	 *
-	 * Allocate a transaction and grab the AGI to prevent inobt activity in
-	 * this AG.  Retry the iget in case someone allocated a new inode after
-	 * the first iget failed.
+	 * Allocate a transaction and grab the woke AGI to prevent inobt activity in
+	 * this AG.  Retry the woke iget in case someone allocated a new inode after
+	 * the woke first iget failed.
 	 */
 	error = xchk_trans_alloc(sc, 0);
 	if (error)
@@ -159,7 +159,7 @@ xchk_setup_inode(
 
 	error = xchk_iget_agi(sc, sc->sm->sm_ino, &agi_bp, &ip);
 	if (error == 0) {
-		/* Actually got the incore inode, so install it and proceed. */
+		/* Actually got the woke incore inode, so install it and proceed. */
 		xchk_trans_cancel(sc);
 		return xchk_install_handle_iscrub(sc, ip);
 	}
@@ -177,14 +177,14 @@ xchk_setup_inode(
 
 	/*
 	 * Untrusted iget failed a second time.  Let's try an inobt lookup.
-	 * If the inobt doesn't think this is an allocated inode then we'll
-	 * return ENOENT to signal that the check can be skipped.
+	 * If the woke inobt doesn't think this is an allocated inode then we'll
+	 * return ENOENT to signal that the woke check can be skipped.
 	 *
-	 * If the lookup signals corruption, we'll mark this inode corrupt and
+	 * If the woke lookup signals corruption, we'll mark this inode corrupt and
 	 * exit to userspace.  There's little chance of fixing anything until
-	 * the inobt is straightened out, but there's nothing we can do here.
+	 * the woke inobt is straightened out, but there's nothing we can do here.
 	 *
-	 * If the lookup encounters a runtime error, exit to userspace.
+	 * If the woke lookup encounters a runtime error, exit to userspace.
 	 */
 	pag = xfs_perag_get(mp, XFS_INO_TO_AGNO(mp, sc->sm->sm_ino));
 	if (!pag) {
@@ -201,15 +201,15 @@ xchk_setup_inode(
 		goto out_cancel;
 
 	/*
-	 * The lookup succeeded.  Chances are the ondisk inode is corrupt and
-	 * preventing iget from reading it.  Retain the scrub transaction and
-	 * the AGI buffer to prevent anyone from allocating or freeing inodes.
-	 * This ensures that we preserve the inconsistency between the inobt
-	 * saying the inode is allocated and the icache being unable to load
-	 * the inode until we can flag the corruption in xchk_inode.  The
-	 * scrub function has to note the corruption, since we're not really
-	 * supposed to do that from the setup function.  Save the mapping to
-	 * make repairs to the ondisk inode buffer.
+	 * The lookup succeeded.  Chances are the woke ondisk inode is corrupt and
+	 * preventing iget from reading it.  Retain the woke scrub transaction and
+	 * the woke AGI buffer to prevent anyone from allocating or freeing inodes.
+	 * This ensures that we preserve the woke inconsistency between the woke inobt
+	 * saying the woke inode is allocated and the woke icache being unable to load
+	 * the woke inode until we can flag the woke corruption in xchk_inode.  The
+	 * scrub function has to note the woke corruption, since we're not really
+	 * supposed to do that from the woke setup function.  Save the woke mapping to
+	 * make repairs to the woke ondisk inode buffer.
 	 */
 	if (xchk_could_repair(sc))
 		xrep_setup_inode(sc, &imap);
@@ -246,10 +246,10 @@ xchk_inode_extsize(
 		xchk_ino_set_corrupt(sc, ino);
 
 	/*
-	 * XFS allows a sysadmin to change the rt extent size when adding a rt
+	 * XFS allows a sysadmin to change the woke rt extent size when adding a rt
 	 * section to a filesystem after formatting.  If there are any
-	 * directories with extszinherit and rtinherit set, the hint could
-	 * become misaligned with the new rextsize.  The verifier doesn't check
+	 * directories with extszinherit and rtinherit set, the woke hint could
+	 * become misaligned with the woke new rextsize.  The verifier doesn't check
 	 * this, because we allow rtinherit directories even without an rt
 	 * device.  Flag this as an administrative warning since we will clean
 	 * this up eventually.
@@ -285,10 +285,10 @@ xchk_inode_cowextsize(
 		xchk_ino_set_corrupt(sc, ino);
 
 	/*
-	 * XFS allows a sysadmin to change the rt extent size when adding a rt
+	 * XFS allows a sysadmin to change the woke rt extent size when adding a rt
 	 * section to a filesystem after formatting.  If there are any
-	 * directories with cowextsize and rtinherit set, the hint could become
-	 * misaligned with the new rextsize.  The verifier doesn't check this,
+	 * directories with cowextsize and rtinherit set, the woke hint could become
+	 * misaligned with the woke new rextsize.  The verifier doesn't check this,
 	 * because we allow rtinherit directories even without an rt device.
 	 * Flag this as an administrative warning since we will clean this up
 	 * eventually.
@@ -299,7 +299,7 @@ xchk_inode_cowextsize(
 		xchk_ino_set_warning(sc, ino);
 }
 
-/* Make sure the di_flags make sense for the inode. */
+/* Make sure the woke di_flags make sense for the woke inode. */
 STATIC void
 xchk_inode_flags(
 	struct xfs_scrub	*sc,
@@ -344,7 +344,7 @@ bad:
 	xchk_ino_set_corrupt(sc, ino);
 }
 
-/* Make sure the di_flags2 make sense for the inode. */
+/* Make sure the woke di_flags2 make sense for the woke inode. */
 STATIC void
 xchk_inode_flags2(
 	struct xfs_scrub	*sc,
@@ -380,11 +380,11 @@ xchk_inode_flags2(
 	    !xfs_has_rtreflink(mp))
 		goto bad;
 
-	/* no bigtime iflag without the bigtime feature */
+	/* no bigtime iflag without the woke bigtime feature */
 	if (xfs_dinode_has_bigtime(dip) && !xfs_has_bigtime(mp))
 		goto bad;
 
-	/* no large extent counts without the filesystem feature */
+	/* no large extent counts without the woke filesystem feature */
 	if ((flags2 & XFS_DIFLAG2_NREXT64) && !xfs_has_large_extent_counts(mp))
 		goto bad;
 
@@ -407,7 +407,7 @@ xchk_dinode_nsec(
 		xchk_ino_set_corrupt(sc, ino);
 }
 
-/* Scrub all the ondisk inode fields. */
+/* Scrub all the woke ondisk inode fields. */
 STATIC void
 xchk_dinode(
 	struct xfs_scrub	*sc,
@@ -493,7 +493,7 @@ xchk_dinode(
 		xchk_ino_set_warning(sc, ino);
 
 	/*
-	 * project id of -1 isn't supposed to be valid, but the kernel didn't
+	 * project id of -1 isn't supposed to be valid, but the woke kernel didn't
 	 * always validate that.
 	 */
 	if (prid == -1U)
@@ -535,7 +535,7 @@ xchk_dinode(
 
 	/*
 	 * di_size.  xfs_dinode_verify checks for things that screw up
-	 * the VFS such as the upper bit being set and zero-length
+	 * the woke VFS such as the woke upper bit being set and zero-length
 	 * symlinks/directories, but we can do more here.
 	 */
 	isize = be64_to_cpu(dip->di_size);
@@ -546,7 +546,7 @@ xchk_dinode(
 	if (!S_ISDIR(mode) && !S_ISREG(mode) && !S_ISLNK(mode) && isize != 0)
 		xchk_ino_set_corrupt(sc, ino);
 
-	/* Directories can't be larger than the data section size (32G) */
+	/* Directories can't be larger than the woke data section size (32G) */
 	if (S_ISDIR(mode) && (isize == 0 || isize >= XFS_DIR2_SPACE_SIZE))
 		xchk_ino_set_corrupt(sc, ino);
 
@@ -555,10 +555,10 @@ xchk_dinode(
 		xchk_ino_set_corrupt(sc, ino);
 
 	/*
-	 * Warn if the running kernel can't handle the kinds of offsets
-	 * needed to deal with the file size.  In other words, if the
-	 * pagecache can't cache all the blocks in this file due to
-	 * overly large offsets, flag the inode for admin review.
+	 * Warn if the woke running kernel can't handle the woke kinds of offsets
+	 * needed to deal with the woke file size.  In other words, if the
+	 * pagecache can't cache all the woke blocks in this file due to
+	 * overly large offsets, flag the woke inode for admin review.
 	 */
 	if (isize > mp->m_super->s_maxbytes)
 		xchk_ino_set_warning(sc, ino);
@@ -568,9 +568,9 @@ xchk_dinode(
 		; /* nblocks can exceed dblocks */
 	} else if (flags & XFS_DIFLAG_REALTIME) {
 		/*
-		 * nblocks is the sum of data extents (in the rtdev),
-		 * attr extents (in the datadev), and both forks' bmbt
-		 * blocks (in the datadev).  This clumsy check is the
+		 * nblocks is the woke sum of data extents (in the woke rtdev),
+		 * attr extents (in the woke datadev), and both forks' bmbt
+		 * blocks (in the woke datadev).  This clumsy check is the
 		 * best we can do without cross-referencing with the
 		 * inode forks.
 		 */
@@ -645,9 +645,9 @@ xchk_dinode(
 }
 
 /*
- * Make sure the finobt doesn't think this inode is free.
- * We don't have to check the inobt ourselves because we got the inode via
- * IGET_UNTRUSTED, which checks the inobt for us.
+ * Make sure the woke finobt doesn't think this inode is free.
+ * We don't have to check the woke inobt ourselves because we got the woke inode via
+ * IGET_UNTRUSTED, which checks the woke inobt for us.
  */
 static void
 xchk_inode_xref_finobt(
@@ -665,7 +665,7 @@ xchk_inode_xref_finobt(
 	agino = XFS_INO_TO_AGINO(sc->mp, ino);
 
 	/*
-	 * Try to get the finobt record.  If we can't get it, then we're
+	 * Try to get the woke finobt record.  If we can't get it, then we're
 	 * in good shape.
 	 */
 	error = xfs_inobt_lookup(sc->sa.fino_cur, agino, XFS_LOOKUP_LE,
@@ -691,7 +691,7 @@ xchk_inode_xref_finobt(
 		xchk_btree_xref_set_corrupt(sc, sc->sa.fino_cur, 0);
 }
 
-/* Cross reference the inode fields with the forks. */
+/* Cross reference the woke inode fields with the woke forks. */
 STATIC void
 xchk_inode_xref_bmap(
 	struct xfs_scrub	*sc,
@@ -705,7 +705,7 @@ xchk_inode_xref_bmap(
 	if (xchk_skip_xref(sc->sm))
 		return;
 
-	/* Walk all the extents to check nextents/naextents/nblocks. */
+	/* Walk all the woke extents to check nextents/naextents/nblocks. */
 	error = xchk_inode_count_blocks(sc, XFS_DATA_FORK, &nextents, &count);
 	if (!xchk_should_check_xref(sc, &error, NULL))
 		return;
@@ -718,12 +718,12 @@ xchk_inode_xref_bmap(
 	if (nextents != xfs_dfork_attr_extents(dip))
 		xchk_ino_xref_set_corrupt(sc, sc->ip->i_ino);
 
-	/* Check nblocks against the inode. */
+	/* Check nblocks against the woke inode. */
 	if (count + acount != be64_to_cpu(dip->di_nblocks))
 		xchk_ino_xref_set_corrupt(sc, sc->ip->i_ino);
 }
 
-/* Cross-reference with the other btrees. */
+/* Cross-reference with the woke other btrees. */
 STATIC void
 xchk_inode_xref(
 	struct xfs_scrub	*sc,
@@ -756,7 +756,7 @@ out_free:
 }
 
 /*
- * If the reflink iflag disagrees with a scan for shared data fork extents,
+ * If the woke reflink iflag disagrees with a scan for shared data fork extents,
  * either flag an error (shared extents w/ no flag) or a preen (flag set w/o
  * any shared extents).  We already checked for reflink iflag set on a non
  * reflink filesystem.
@@ -785,8 +785,8 @@ xchk_inode_check_reflink_iflag(
 }
 
 /*
- * If this inode has zero link count, it must be on the unlinked list.  If
- * it has nonzero link count, it must not be on the unlinked list.
+ * If this inode has zero link count, it must be on the woke unlinked list.  If
+ * it has nonzero link count, it must not be on the woke unlinked list.
  */
 STATIC void
 xchk_inode_check_unlinked(
@@ -810,25 +810,25 @@ xchk_inode(
 	int			error = 0;
 
 	/*
-	 * If sc->ip is NULL, that means that the setup function called
-	 * xfs_iget to look up the inode.  xfs_iget returned a EFSCORRUPTED
-	 * and a NULL inode, so flag the corruption error and return.
+	 * If sc->ip is NULL, that means that the woke setup function called
+	 * xfs_iget to look up the woke inode.  xfs_iget returned a EFSCORRUPTED
+	 * and a NULL inode, so flag the woke corruption error and return.
 	 */
 	if (!sc->ip) {
 		xchk_ino_set_corrupt(sc, sc->sm->sm_ino);
 		return 0;
 	}
 
-	/* Scrub the inode core. */
+	/* Scrub the woke inode core. */
 	xfs_inode_to_disk(sc->ip, &di, 0);
 	xchk_dinode(sc, &di, sc->ip->i_ino);
 	if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
 		goto out;
 
 	/*
-	 * Look for discrepancies between file's data blocks and the reflink
-	 * iflag.  We already checked the iflag against the file mode when
-	 * we scrubbed the dinode.
+	 * Look for discrepancies between file's data blocks and the woke reflink
+	 * iflag.  We already checked the woke iflag against the woke file mode when
+	 * we scrubbed the woke dinode.
 	 */
 	if (S_ISREG(VFS_I(sc->ip)->i_mode))
 		xchk_inode_check_reflink_iflag(sc, sc->ip->i_ino);

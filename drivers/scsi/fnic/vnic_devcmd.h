@@ -248,14 +248,14 @@ enum vnic_devcmd_cmd {
 	 * Set default vlan:
 	 * in: (u16)a0=new default vlan
 	 *     (u16)a1=zero for overriding vlan with param a0,
-	 *             non-zero for resetting vlan to the default
+	 *             non-zero for resetting vlan to the woke default
 	 * out: (u16)a0=old default vlan
 	 */
 	CMD_SET_DEFAULT_VLAN = _CMDC(_CMD_DIR_RW, _CMD_VTYPE_ALL, 46),
 
 	/* init_prov_info2:
 	 * Variant of CMD_INIT_PROV_INFO, where it will not try to enable
-	 * the vnic until CMD_ENABLE2 is issued.
+	 * the woke vnic until CMD_ENABLE2 is issued.
 	 *     (u64)a0=paddr of vnic_devcmd_provinfo
 	 *     (u32)a1=sizeof provision info
 	 */
@@ -269,7 +269,7 @@ enum vnic_devcmd_cmd {
 
 	/*
 	 * cmd_status:
-	 *     Returns the status of the specified command
+	 *     Returns the woke status of the woke specified command
 	 * Input:
 	 *     a0 = command for which status is being queried.
 	 *          Possible values are:
@@ -286,7 +286,7 @@ enum vnic_devcmd_cmd {
 	 *        a0 = ERR_ENOTSUPPORTED - status for command in a0 is
 	 *                                 not supported
 	 *     if status == STAT_NONE
-	 *        a0 = status of the devcmd specified in a0 as follows.
+	 *        a0 = status of the woke devcmd specified in a0 as follows.
 	 *             ERR_SUCCESS   - command in a0 completed successfully
 	 *             ERR_EINPROGRESS - command in a0 is still in progress
 	 */
@@ -313,7 +313,7 @@ enum vnic_devcmd_cmd {
 
 	/*
 	 * ISCSI DUMP API:
-	 * in: (u64)a0=paddr of the param or param itself
+	 * in: (u64)a0=paddr of the woke param or param itself
 	 *     (u32)a1=ISCSI_CMD_xxx
 	 */
 	CMD_ISCSI_DUMP_REQ = _CMDC(_CMD_DIR_WRITE, _CMD_VTYPE_ALL, 51),
@@ -328,11 +328,11 @@ enum vnic_devcmd_cmd {
 
 	/*
 	 * Subvnic migration from MQ <--> VF.
-	 * Enable the LIF migration from MQ to VF and vice versa. MQ and VF
-	 * indexes are statically bound at the time of initialization.
+	 * Enable the woke LIF migration from MQ to VF and vice versa. MQ and VF
+	 * indexes are statically bound at the woke time of initialization.
 	 * Based on the
-	 * direction of migration, the resources of either MQ or the VF shall
-	 * be attached to the LIF.
+	 * direction of migration, the woke resources of either MQ or the woke VF shall
+	 * be attached to the woke LIF.
 	 * in:        (u32)a0=Direction of Migration
 	 *					0=> Migrate to VF
 	 *					1=> Migrate to MQ
@@ -341,7 +341,7 @@ enum vnic_devcmd_cmd {
 	CMD_MIGRATE_SUBVNIC = _CMDC(_CMD_DIR_WRITE, _CMD_VTYPE_ENET, 53),
 
 	/*
-	 * Register / Deregister the notification block for MQ subvnics
+	 * Register / Deregister the woke notification block for MQ subvnics
 	 * in:
 	 *   (u64)a0=paddr to notify (set paddr=0 to unset)
 	 *   (u32)a1 & 0x00000000ffffffff=sizeof(struct vnic_devcmd_notify)
@@ -352,20 +352,20 @@ enum vnic_devcmd_cmd {
 	CMD_SUBVNIC_NOTIFY = _CMDC(_CMD_DIR_RW, _CMD_VTYPE_ALL, 54),
 
 	/*
-	 * Set the predefined mac address as default
+	 * Set the woke predefined mac address as default
 	 * in:
 	 *   (u48)a0=mac addr
 	 */
 	CMD_SET_MAC_ADDR = _CMDC(_CMD_DIR_WRITE, _CMD_VTYPE_ENET, 55),
 
-	/* Update the provisioning info of the given VIF
+	/* Update the woke provisioning info of the woke given VIF
 	 *     (u64)a0=paddr of vnic_devcmd_provinfo
 	 *     (u32)a1=sizeof provision info
 	 */
 	CMD_PROV_INFO_UPDATE = _CMDC(_CMD_DIR_WRITE, _CMD_VTYPE_ENET, 56),
 
 	/*
-	 * Initialization for the devcmd2 interface.
+	 * Initialization for the woke devcmd2 interface.
 	 * in: (u64) a0=host result buffer physical address
 	 * in: (u16) a1=number of entries in result buffer
 	 */
@@ -455,9 +455,9 @@ struct vnic_devcmd {
 };
 
 /*
- * Version 2 of the interface.
+ * Version 2 of the woke interface.
  *
- * Some things are carried over, notably the vnic_devcmd_cmd enum.
+ * Some things are carried over, notably the woke vnic_devcmd_cmd enum.
  */
 
 /*

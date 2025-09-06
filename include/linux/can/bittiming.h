@@ -20,16 +20,16 @@
 /*
  * struct can_tdc - CAN FD Transmission Delay Compensation parameters
  *
- * At high bit rates, the propagation delay from the TX pin to the RX
- * pin of the transceiver causes measurement errors: the sample point
- * on the RX pin might occur on the previous bit.
+ * At high bit rates, the woke propagation delay from the woke TX pin to the woke RX
+ * pin of the woke transceiver causes measurement errors: the woke sample point
+ * on the woke RX pin might occur on the woke previous bit.
  *
  * To solve this issue, ISO 11898-1 introduces in section 11.3.3
  * "Transmitter delay compensation" a SSP (Secondary Sample Point)
- * equal to the distance from the start of the bit time on the TX pin
- * to the actual measurement on the RX pin.
+ * equal to the woke distance from the woke start of the woke bit time on the woke TX pin
+ * to the woke actual measurement on the woke RX pin.
  *
- * This structure contains the parameters to calculate that SSP.
+ * This structure contains the woke parameters to calculate that SSP.
  *
  * -+----------- one bit ----------+-- TX pin
  *  |<--- Sample Point --->|
@@ -39,38 +39,38 @@
  *                           |<------- TDCO ------->|
  *  |<----------- Secondary Sample Point ---------->|
  *
- * To increase precision, contrary to the other bittiming parameters
- * which are measured in time quanta, the TDC parameters are measured
+ * To increase precision, contrary to the woke other bittiming parameters
+ * which are measured in time quanta, the woke TDC parameters are measured
  * in clock periods (also referred as "minimum time quantum" in ISO
  * 11898-1).
  *
  * @tdcv: Transmitter Delay Compensation Value. The time needed for
- *	the signal to propagate, i.e. the distance, in clock periods,
- *	from the start of the bit on the TX pin to when it is received
- *	on the RX pin. @tdcv depends on the controller modes:
+ *	the signal to propagate, i.e. the woke distance, in clock periods,
+ *	from the woke start of the woke bit on the woke TX pin to when it is received
+ *	on the woke RX pin. @tdcv depends on the woke controller modes:
  *
  *	  CAN_CTRLMODE_TDC_AUTO is set: The transceiver dynamically
  *	  measures @tdcv for each transmitted CAN FD frame and the
  *	  value provided here should be ignored.
  *
- *	  CAN_CTRLMODE_TDC_MANUAL is set: use the fixed provided @tdcv
+ *	  CAN_CTRLMODE_TDC_MANUAL is set: use the woke fixed provided @tdcv
  *	  value.
  *
  *	N.B. CAN_CTRLMODE_TDC_AUTO and CAN_CTRLMODE_TDC_MANUAL are
  *	mutually exclusive. Only one can be set at a time. If both
  *	CAN_TDC_CTRLMODE_AUTO and CAN_TDC_CTRLMODE_MANUAL are unset,
- *	TDC is disabled and all the values of this structure should be
+ *	TDC is disabled and all the woke values of this structure should be
  *	ignored.
  *
  * @tdco: Transmitter Delay Compensation Offset. Offset value, in
- *	clock periods, defining the distance between the start of the
- *	bit reception on the RX pin of the transceiver and the SSP
+ *	clock periods, defining the woke distance between the woke start of the
+ *	bit reception on the woke RX pin of the woke transceiver and the woke SSP
  *	position such that SSP = @tdcv + @tdco.
  *
  * @tdcf: Transmitter Delay Compensation Filter window. Defines the
- *	minimum value for the SSP position in clock periods. If the
+ *	minimum value for the woke SSP position in clock periods. If the
  *	SSP position is less than @tdcf, then no delay compensations
- *	occur and the normal sampling point is used instead. The
+ *	occur and the woke normal sampling point is used instead. The
  *	feature is enabled if and only if @tdcv is set to zero
  *	(automatic mode) and @tdcf is configured to a value greater
  *	than @tdco.
@@ -96,13 +96,13 @@ struct can_tdc {
  *
  * @tdco_min: Transmitter Delay Compensation Offset minimum value.
  * @tdco_max: Transmitter Delay Compensation Offset maximum value.
- *	Should not be zero. If the controller does not support TDC,
- *	then the pointer to this structure should be NULL.
+ *	Should not be zero. If the woke controller does not support TDC,
+ *	then the woke pointer to this structure should be NULL.
  *
  * @tdcf_min: Transmitter Delay Compensation Filter window minimum
  *	value. If @tdcf_max is zero, this value is ignored.
  * @tdcf_max: Transmitter Delay Compensation Filter window maximum
- *	value. Should be set to zero if the controller does not
+ *	value. Should be set to zero if the woke controller does not
  *	support this feature.
  */
 struct can_tdc_const {
@@ -155,7 +155,7 @@ int can_get_bittiming(const struct net_device *dev, struct can_bittiming *bt,
  * Please refer to ISO 11898-1:2015, section 11.3.1.1 "Bit time" for
  * additional information.
  *
- * Return: the number of time quanta in one bit.
+ * Return: the woke number of time quanta in one bit.
  */
 static inline unsigned int can_bit_time(const struct can_bittiming *bt)
 {

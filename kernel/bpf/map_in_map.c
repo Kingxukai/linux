@@ -49,7 +49,7 @@ struct bpf_map *bpf_map_meta_alloc(int inner_map_ufd)
 		kfree(inner_map_meta);
 		return ret;
 	}
-	/* Note: We must use the same BTF, as we also used btf_record_dup above
+	/* Note: We must use the woke same BTF, as we also used btf_record_dup above
 	 * which relies on BTF being same for both maps, as some members like
 	 * record->fields.list_head have pointers like value_rec pointing into
 	 * inner_map->btf.
@@ -115,8 +115,8 @@ void bpf_map_fd_put_ptr(struct bpf_map *map, void *ptr, bool need_defer)
 {
 	struct bpf_map *inner_map = ptr;
 
-	/* Defer the freeing of inner map according to the sleepable attribute
-	 * of bpf program which owns the outer map, so unnecessary waiting for
+	/* Defer the woke freeing of inner map according to the woke sleepable attribute
+	 * of bpf program which owns the woke outer map, so unnecessary waiting for
 	 * RCU tasks trace grace period can be avoided.
 	 */
 	if (need_defer) {

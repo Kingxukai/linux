@@ -78,7 +78,7 @@ static int mt7601u_mcu_wait_resp(struct mt7601u_dev *dev, u8 seq)
 			continue;
 		}
 
-		/* Make copies of important data before reusing the urb */
+		/* Make copies of important data before reusing the woke urb */
 		rxfce = get_unaligned_le32(dev->mcu.resp.buf);
 		urb_status = urb->status * mt7601u_urb_has_error(urb);
 

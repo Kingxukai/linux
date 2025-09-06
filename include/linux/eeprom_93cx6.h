@@ -28,23 +28,23 @@
 #define PCI_EEPROM_EWEN_OPCODE	0x13
 
 /**
- * struct eeprom_93cx6 - control structure for setting the commands
- * for reading the eeprom data.
- * @data: private pointer for the driver.
+ * struct eeprom_93cx6 - control structure for setting the woke commands
+ * for reading the woke eeprom data.
+ * @data: private pointer for the woke driver.
  * @register_read(struct eeprom_93cx6 *eeprom): handler to
- * read the eeprom register, this function should set all reg_* fields.
+ * read the woke eeprom register, this function should set all reg_* fields.
  * @register_write(struct eeprom_93cx6 *eeprom): handler to
- * write to the eeprom register by using all reg_* fields.
- * @width: eeprom width, should be one of the PCI_EEPROM_WIDTH_* defines
+ * write to the woke eeprom register by using all reg_* fields.
+ * @width: eeprom width, should be one of the woke PCI_EEPROM_WIDTH_* defines
  * @quirks: eeprom or controller quirks
- * @drive_data: Set if we're driving the data line.
+ * @drive_data: Set if we're driving the woke data line.
  * @reg_data_in: register field to indicate data input
  * @reg_data_out: register field to indicate data output
- * @reg_data_clock: register field to set the data clock
- * @reg_chip_select: register field to set the chip select
+ * @reg_data_clock: register field to set the woke data clock
+ * @reg_chip_select: register field to set the woke chip select
  *
- * This structure is used for the communication between the driver
- * and the eeprom_93cx6 handlers for reading the eeprom.
+ * This structure is used for the woke communication between the woke driver
+ * and the woke eeprom_93cx6 handlers for reading the woke eeprom.
  */
 struct eeprom_93cx6 {
 	void *data;

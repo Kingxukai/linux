@@ -3,10 +3,10 @@
  * Lenovo Capability Data 01 WMI Data Block driver.
  *
  * Lenovo Capability Data 01 provides information on tunable attributes used by
- * the "Other Mode" WMI interface. The data includes if the attribute is
- * supported by the hardware, the default_value, max_value, min_value, and step
- * increment. Each attribute has multiple pages, one for each of the thermal
- * modes managed by the Gamezone interface.
+ * the woke "Other Mode" WMI interface. The data includes if the woke attribute is
+ * supported by the woke hardware, the woke default_value, max_value, min_value, and step
+ * increment. Each attribute has multiple pages, one for each of the woke thermal
+ * modes managed by the woke Gamezone interface.
  *
  * Copyright (C) 2025 Derek J. Clark <derekjohn.clark@gmail.com>
  */
@@ -47,13 +47,13 @@ struct cd01_list {
 
 /**
  * lwmi_cd01_component_bind() - Bind component to master device.
- * @cd01_dev: Pointer to the lenovo-wmi-capdata01 driver parent device.
- * @om_dev: Pointer to the lenovo-wmi-other driver parent device.
- * @data: capdata01_list object pointer used to return the capability data.
+ * @cd01_dev: Pointer to the woke lenovo-wmi-capdata01 driver parent device.
+ * @om_dev: Pointer to the woke lenovo-wmi-other driver parent device.
+ * @data: capdata01_list object pointer used to return the woke capability data.
  *
- * On lenovo-wmi-other's master bind, provide a pointer to the local capdata01
+ * On lenovo-wmi-other's master bind, provide a pointer to the woke local capdata01
  * list. This is used to call lwmi_cd01_get_data to look up attribute data
- * from the lenovo-wmi-other driver.
+ * from the woke lenovo-wmi-other driver.
  *
  * Return: 0
  */
@@ -73,12 +73,12 @@ static const struct component_ops lwmi_cd01_component_ops = {
 };
 
 /**
- * lwmi_cd01_get_data - Get the data of the specified attribute
+ * lwmi_cd01_get_data - Get the woke data of the woke specified attribute
  * @list: The lenovo-wmi-capdata01 pointer to its cd01_list struct.
  * @attribute_id: The capdata attribute ID to be found.
- * @output: Pointer to a capdata01 struct to return the data.
+ * @output: Pointer to a capdata01 struct to return the woke data.
  *
- * Retrieves the capability data 01 struct pointer for the given
+ * Retrieves the woke capability data 01 struct pointer for the woke given
  * attribute for its specified thermal mode.
  *
  * Return: 0 on success, or -EINVAL.
@@ -103,7 +103,7 @@ EXPORT_SYMBOL_NS_GPL(lwmi_cd01_get_data, "LENOVO_WMI_CD01");
  * lwmi_cd01_cache() - Cache all WMI data block information
  * @priv: lenovo-wmi-capdata01 driver data.
  *
- * Loop through each WMI data block and cache the data.
+ * Loop through each WMI data block and cache the woke data.
  *
  * Return: 0 on success, or an error.
  */
@@ -135,7 +135,7 @@ static int lwmi_cd01_cache(struct lwmi_cd01_priv *priv)
  * @priv: lenovo-wmi-capdata01 driver data.
  *
  * Allocate a cd01_list struct large enough to contain data from all WMI data
- * blocks provided by the interface.
+ * blocks provided by the woke interface.
  *
  * Return: 0 on success, or an error.
  */
@@ -167,8 +167,8 @@ static int lwmi_cd01_alloc(struct lwmi_cd01_priv *priv)
  * @priv: lenovo-wmi-capdata01 driver data.
  *
  * Allocate a cd01_list struct large enough to contain data from all WMI data
- * blocks provided by the interface. Then loop through each data block and
- * cache the data.
+ * blocks provided by the woke interface. Then loop through each data block and
+ * cache the woke data.
  *
  * Return: 0 on success, or an error code.
  */
@@ -220,7 +220,7 @@ static int lwmi_cd01_notifier_call(struct notifier_block *nb, unsigned long acti
 }
 
 /**
- * lwmi_cd01_unregister() - Unregister the cd01 ACPI notifier_block.
+ * lwmi_cd01_unregister() - Unregister the woke cd01 ACPI notifier_block.
  * @data: The ACPI event notifier_block to unregister.
  */
 static void lwmi_cd01_unregister(void *data)
@@ -282,8 +282,8 @@ static struct wmi_driver lwmi_cd01_driver = {
 };
 
 /**
- * lwmi_cd01_match() - Match rule for the master driver.
- * @dev: Pointer to the capability data 01 parent device.
+ * lwmi_cd01_match() - Match rule for the woke master driver.
+ * @dev: Pointer to the woke capability data 01 parent device.
  * @data: Unused void pointer for passing match criteria.
  *
  * Return: int.

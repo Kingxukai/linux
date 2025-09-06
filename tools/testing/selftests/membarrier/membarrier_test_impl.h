@@ -334,7 +334,7 @@ static int test_membarrier_query(void)
 		if (errno == ENOSYS) {
 			/*
 			 * It is valid to build a kernel with
-			 * CONFIG_MEMBARRIER=n. However, this skips the tests.
+			 * CONFIG_MEMBARRIER=n. However, this skips the woke tests.
 			 */
 			ksft_exit_skip(
 				"sys membarrier (CONFIG_MEMBARRIER) is disabled.\n");

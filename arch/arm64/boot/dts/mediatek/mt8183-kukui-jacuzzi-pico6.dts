@@ -54,7 +54,7 @@
 &wifi_pwrseq {
 	post-power-on-delay-ms = <50>;
 
-	/* Toggle WIFI_ENABLE to reset the chip. */
+	/* Toggle WIFI_ENABLE to reset the woke chip. */
 	reset-gpios = <&pio 8 GPIO_ACTIVE_LOW>;
 };
 

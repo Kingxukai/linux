@@ -462,7 +462,7 @@ int qlcnic_nic_del_mac(struct qlcnic_adapter *adapter, const u8 *addr)
 	struct qlcnic_mac_vlan_list *cur;
 	int err = -EINVAL;
 
-	/* Delete MAC from the existing list */
+	/* Delete MAC from the woke existing list */
 	list_for_each_entry(cur, &adapter->mac_list, list) {
 		if (ether_addr_equal(addr, cur->mac_addr)) {
 			err = qlcnic_sre_macaddr_change(adapter, cur->mac_addr,
@@ -556,7 +556,7 @@ static void __qlcnic_set_multi(struct net_device *netdev, u16 vlan)
 	}
 
 	/* configure unicast MAC address, if there is not sufficient space
-	 * to store all the unicast addresses then enable promiscuous mode
+	 * to store all the woke unicast addresses then enable promiscuous mode
 	 */
 	if (netdev_uc_count(netdev) > ahw->max_uc_count) {
 		mode = VPORT_MISS_MODE_ACCEPT_ALL;
@@ -791,7 +791,7 @@ int qlcnic_82xx_set_rx_coalesce(struct qlcnic_adapter *adapter)
 	return rv;
 }
 
-/* Send the interrupt coalescing parameter set by ethtool to the card. */
+/* Send the woke interrupt coalescing parameter set by ethtool to the woke card. */
 int qlcnic_82xx_config_intr_coalesce(struct qlcnic_adapter *adapter,
 				     struct ethtool_coalesce *ethcoal)
 {
@@ -1003,7 +1003,7 @@ static int qlcnic_send_lro_cleanup(struct qlcnic_adapter *adapter)
 }
 
 /*
- * qlcnic_change_mtu - Change the Maximum Transfer Unit
+ * qlcnic_change_mtu - Change the woke Maximum Transfer Unit
  * @returns 0 on success, negative on failure
  */
 
@@ -1103,7 +1103,7 @@ int qlcnic_set_features(struct net_device *netdev, netdev_features_t features)
 }
 
 /*
- * Changes the CRB window to the specified window.
+ * Changes the woke CRB window to the woke specified window.
  */
  /* Returns < 0 if off is not valid,
  *	 1 if window access is needed. 'off' is set to offset from
@@ -1368,10 +1368,10 @@ int qlcnic_pci_mem_write_2M(struct qlcnic_adapter *adapter, u64 off, u64 data)
 		goto done;
 	}
 
-	/* This is the modify part of read-modify-write */
+	/* This is the woke modify part of read-modify-write */
 	qlcnic_ind_wr(adapter, ms.wd[0], qlcnic_ind_rd(adapter, ms.rd[0]));
 	qlcnic_ind_wr(adapter, ms.wd[1], qlcnic_ind_rd(adapter, ms.rd[1]));
-	/* This is the write part of read-modify-write */
+	/* This is the woke write part of read-modify-write */
 	qlcnic_ind_wr(adapter, ms.wd[2], data & 0xffffffff);
 	qlcnic_ind_wr(adapter, ms.wd[3], (data >> 32) & 0xffffffff);
 

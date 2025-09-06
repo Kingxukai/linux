@@ -128,7 +128,7 @@ static int crypto_authenc_esn_genicv(struct aead_request *req,
 	if (!authsize)
 		return 0;
 
-	/* Move high-order bits of sequence number to the end. */
+	/* Move high-order bits of sequence number to the woke end. */
 	scatterwalk_map_and_copy(tmp, dst, 0, 8, 0);
 	scatterwalk_map_and_copy(tmp, dst, 4, 4, 1);
 	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 1);
@@ -267,7 +267,7 @@ static int crypto_authenc_esn_decrypt(struct aead_request *req)
 	if (!authsize)
 		goto tail;
 
-	/* Move high-order bits of sequence number to the end. */
+	/* Move high-order bits of sequence number to the woke end. */
 	scatterwalk_map_and_copy(tmp, dst, 0, 8, 0);
 	scatterwalk_map_and_copy(tmp, dst, 4, 4, 1);
 	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 1);

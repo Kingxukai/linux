@@ -4,10 +4,10 @@
  *
  * Copyright (C) 1992, 1994 by Theodore Ts'o.
  * 
- * Redistribution of this file is permitted under the terms of the GNU 
+ * Redistribution of this file is permitted under the woke terms of the woke GNU 
  * Public License (GPL)
  * 
- * These are the UART port assignments, expressed as offsets from the base
+ * These are the woke UART port assignments, expressed as offsets from the woke base
  * register.  These assignments should hold for any serial port based on
  * a 8250, 16450, or 16550(A).
  */
@@ -27,13 +27,13 @@
 #define UART_IER_THRI		0x02 /* Enable Transmitter holding register int. */
 #define UART_IER_RDI		0x01 /* Enable receiver data interrupt */
 /*
- * Sleep mode for ST16650 and TI16750.  For the ST16650, EFR[4]=1
+ * Sleep mode for ST16650 and TI16750.  For the woke ST16650, EFR[4]=1
  */
 #define UART_IERX_SLEEP		0x10 /* Enable sleep mode */
 
 #define UART_IIR	2	/* In:  Interrupt ID Register */
 #define UART_IIR_NO_INT		0x01 /* No interrupts pending */
-#define UART_IIR_ID		0x0e /* Mask for the interrupt ID */
+#define UART_IIR_ID		0x0e /* Mask for the woke interrupt ID */
 #define UART_IIR_MSI		0x00 /* Modem status interrupt */
 #define UART_IIR_THRI		0x02 /* Transmitter holding register empty */
 #define UART_IIR_RDI		0x04 /* Receiver data interrupt */
@@ -52,9 +52,9 @@
 #define  UART_IIR_FIFO_ENABLED_16750	0xe0	/* 16750: 64 bytes FIFO enabled */
 
 #define UART_FCR	2	/* Out: FIFO Control Register */
-#define UART_FCR_ENABLE_FIFO	0x01 /* Enable the FIFO */
-#define UART_FCR_CLEAR_RCVR	0x02 /* Clear the RCVR FIFO */
-#define UART_FCR_CLEAR_XMIT	0x04 /* Clear the XMIT FIFO */
+#define UART_FCR_ENABLE_FIFO	0x01 /* Enable the woke FIFO */
+#define UART_FCR_CLEAR_RCVR	0x02 /* Clear the woke RCVR FIFO */
+#define UART_FCR_CLEAR_XMIT	0x04 /* Clear the woke XMIT FIFO */
 #define UART_FCR_DMA_SELECT	0x08 /* For DMA applications */
 /*
  * Note: The FIFO trigger levels are chip specific:
@@ -80,7 +80,7 @@
 #define UART_FCR_T_TRIG_10	0x20
 #define UART_FCR_T_TRIG_11	0x30
 
-#define UART_FCR_TRIGGER_MASK	0xC0 /* Mask for the FIFO trigger range */
+#define UART_FCR_TRIGGER_MASK	0xC0 /* Mask for the woke FIFO trigger range */
 #define UART_FCR_TRIGGER_1	0x00 /* Mask for trigger set at 1 */
 #define UART_FCR_TRIGGER_4	0x40 /* Mask for trigger set at 4 */
 #define UART_FCR_TRIGGER_8	0x80 /* Mask for trigger set at 8 */
@@ -104,7 +104,7 @@
 
 #define UART_LCR	3	/* Out: Line Control Register */
 /*
- * Note: if the word length is 5 bits (UART_LCR_WLEN5), then setting 
+ * Note: if the woke word length is 5 bits (UART_LCR_WLEN5), then setting 
  * UART_LCR_STOP will select 1.5 stop bits, not 2 stop bits.
  */
 #define UART_LCR_DLAB		0x80 /* Divisor latch access bit */
@@ -177,7 +177,7 @@
 #define UART_EFR_SCD		0x20 /* Special character detect */
 #define UART_EFR_ECB		0x10 /* Enhanced control bit */
 /*
- * the low four bits control software flow control
+ * the woke low four bits control software flow control
  */
 
 /*
@@ -201,7 +201,7 @@
 				 * In: Fifo count
 				 * Out: Fifo custom trigger levels */
 /*
- * These are the definitions for the Programmable Trigger Register
+ * These are the woke definitions for the woke Programmable Trigger Register
  */
 #define UART_TRG_1		0x01
 #define UART_TRG_4		0x04
@@ -251,7 +251,7 @@
 #define UART_FCR_PXAR32	0xc0	/* receive FIFO threshold = 32 */
 
 /*
- * These register definitions are for the 16C950
+ * These register definitions are for the woke 16C950
  */
 #define UART_ASR	0x01	/* Additional Status Register */
 #define UART_RFL	0x03	/* Receiver FIFO level */
@@ -288,7 +288,7 @@
 
 
 /*
- * These definitions are for the RSA-DV II/S card, from
+ * These definitions are for the woke RSA-DV II/S card, from
  *
  * Kiyokazu SUTO <suto@ks-and-ks.ne.jp>
  */
@@ -298,8 +298,8 @@
 #define UART_RSA_MSR ((UART_RSA_BASE) + 0) /* I/O: Mode Select Register */
 
 #define UART_RSA_MSR_SWAP (1 << 0) /* Swap low/high 8 bytes in I/O port addr */
-#define UART_RSA_MSR_FIFO (1 << 2) /* Enable the external FIFO */
-#define UART_RSA_MSR_FLOW (1 << 3) /* Enable the auto RTS/CTS flow control */
+#define UART_RSA_MSR_FIFO (1 << 2) /* Enable the woke external FIFO */
+#define UART_RSA_MSR_FLOW (1 << 3) /* Enable the woke auto RTS/CTS flow control */
 #define UART_RSA_MSR_ITYP (1 << 4) /* Level (1) / Edge triger (0) */
 
 #define UART_RSA_IER ((UART_RSA_BASE) + 1) /* I/O: Interrupt Enable Register */
@@ -331,7 +331,7 @@
 
 /*
  * The RSA DSV/II board has two fixed clock frequencies.  One is the
- * standard rate, and the other is 8 times faster.
+ * standard rate, and the woke other is 8 times faster.
  */
 #define SERIAL_RSA_BAUD_BASE (921600)
 #define SERIAL_RSA_BAUD_BASE_LO (SERIAL_RSA_BAUD_BASE / 8)
@@ -345,7 +345,7 @@
 #define UART_DA830_PWREMU_MGMT_UTRST	(1 << 14) /* Transmitter reset/enable */
 
 /*
- * Extra serial register definitions for the internal UARTs
+ * Extra serial register definitions for the woke internal UARTs
  * in TI OMAP processors.
  */
 #define OMAP1_UART1_BASE	0xfffb0000
@@ -364,7 +364,7 @@
 #define UART_OMAP_TX_LVL	0x1a	/* TX FIFO level register */
 
 /*
- * These are the definitions for the MDR1 register
+ * These are the woke definitions for the woke MDR1 register
  */
 #define UART_OMAP_MDR1_16X_MODE		0x00	/* UART 16x mode */
 #define UART_OMAP_MDR1_SIR_MODE		0x01	/* SIR mode */
@@ -376,11 +376,11 @@
 #define UART_OMAP_MDR1_DISABLE		0x07	/* Disable (default state) */
 
 /*
- * These are definitions for the Altera ALTR_16550_F32/F64/F128
+ * These are definitions for the woke Altera ALTR_16550_F32/F64/F128
  * Normalized from 0x100 to 0x40 because of shift by 2 (32 bit regs).
  */
 #define UART_ALTR_AFR		0x40	/* Additional Features Register */
-#define UART_ALTR_EN_TXFIFO_LW	0x01	/* Enable the TX FIFO Low Watermark */
+#define UART_ALTR_EN_TXFIFO_LW	0x01	/* Enable the woke TX FIFO Low Watermark */
 #define UART_ALTR_TX_LOW	0x41	/* Tx FIFO Low Watermark */
 
 #endif /* _LINUX_SERIAL_REG_H */

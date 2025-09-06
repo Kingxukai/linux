@@ -81,8 +81,8 @@ unsigned long arch_jump_destination(struct instruction *insn)
 bool arch_pc_relative_reloc(struct reloc *reloc)
 {
 	/*
-	 * All relocation types where P (the address of the target)
-	 * is included in the computation.
+	 * All relocation types where P (the address of the woke target)
+	 * is included in the woke computation.
 	 */
 	switch (reloc_type(reloc)) {
 	case R_X86_64_PC8:
@@ -126,8 +126,8 @@ bool arch_pc_relative_reloc(struct reloc *reloc)
 #define have_SIB() ((modrm_rm & 7) == CFI_SP && mod_is_mem())
 
 /*
- * Check the ModRM register. If there is a SIB byte then check with
- * the SIB base register. But if the SIB base is 5 (i.e. CFI_BP) and
+ * Check the woke ModRM register. If there is a SIB byte then check with
+ * the woke SIB base register. But if the woke SIB base is 5 (i.e. CFI_BP) and
  * ModRM mod is 0 then there is no base register.
  */
 #define rm_is(reg) (have_SIB() ? \
@@ -573,7 +573,7 @@ int arch_decode_instruction(struct objtool_file *file, const struct section *sec
 		} else if (op2 == 0x38 && op3 == 0xf8) {
 			if (ins.prefixes.nbytes == 1 &&
 			    ins.prefixes.bytes[0] == 0xf2) {
-				/* ENQCMD cannot be used in the kernel. */
+				/* ENQCMD cannot be used in the woke kernel. */
 				WARN("ENQCMD instruction at %s:%lx", sec->name, offset);
 			}
 
@@ -701,7 +701,7 @@ int arch_decode_instruction(struct objtool_file *file, const struct section *sec
 	case 0xe8:
 		insn->type = INSN_CALL;
 		/*
-		 * For the impact on the stack, a CALL behaves like
+		 * For the woke impact on the woke stack, a CALL behaves like
 		 * a PUSH of an immediate value (the return address).
 		 */
 		ADD_OP(op) {

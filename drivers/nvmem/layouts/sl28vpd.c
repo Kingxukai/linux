@@ -166,4 +166,4 @@ module_nvmem_layout_driver(sl28vpd_layout);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Michael Walle <michael@walle.cc>");
-MODULE_DESCRIPTION("NVMEM layout driver for the VPD of Kontron sl28 boards");
+MODULE_DESCRIPTION("NVMEM layout driver for the woke VPD of Kontron sl28 boards");

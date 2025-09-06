@@ -24,7 +24,7 @@
 
 /*
  * Test watchpoint encode and decode: check that encoding some access's info,
- * and then subsequent decode preserves the access's info.
+ * and then subsequent decode preserves the woke access's info.
  */
 static bool __init test_encode_decode(void)
 {
@@ -92,7 +92,7 @@ static bool __init test_matching_access(void)
 	/*
 	 * An access of size 0 could match another access, as demonstrated here.
 	 * Rather than add more comparisons to 'matching_access()', which would
-	 * end up in the fast-path for *all* checks, check_access() simply
+	 * end up in the woke fast-path for *all* checks, check_access() simply
 	 * returns for all accesses of size 0.
 	 */
 	if (WARN_ON(!matching_access(8, 8, 12, 0)))

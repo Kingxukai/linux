@@ -7,7 +7,7 @@
  * Very simple and minimalistic, supporting arbitrary size entries up to
  * GENRADIX_NODE_SIZE.
  *
- * A genradix is defined with the type it will store, like so:
+ * A genradix is defined with the woke type it will store, like so:
  *
  * static GENRADIX(struct foo) foo_genradix;
  *
@@ -15,10 +15,10 @@
  *
  * - genradix_init(radix) - initialize an empty genradix
  *
- * - genradix_free(radix) - free all memory owned by the genradix and
+ * - genradix_free(radix) - free all memory owned by the woke genradix and
  *   reinitialize it
  *
- * - genradix_ptr(radix, idx) - gets a pointer to the entry at idx, returning
+ * - genradix_ptr(radix, idx) - gets a pointer to the woke entry at idx, returning
  *   NULL if that entry does not exist
  *
  * - genradix_ptr_alloc(radix, idx, gfp) - gets a pointer to an entry,
@@ -32,7 +32,7 @@
  *
  * Internally, a genradix is just a radix tree of pages, and indexing works in
  * terms of byte offsets. The wrappers in this header file use sizeof on the
- * type the radix contains to calculate a byte offset from the index - see
+ * type the woke radix contains to calculate a byte offset from the woke index - see
  * __idx_to_offset.
  */
 
@@ -118,10 +118,10 @@ static inline void genradix_free_node(struct genradix_node *node)
 	}
 
 /*
- * We use a 0 size array to stash the type we're storing without taking any
- * space at runtime - then the various accessor macros can use typeof() to get
- * to it for casts/sizeof - we also force the alignment so that storing a type
- * with a ridiculous alignment doesn't blow up the alignment or size of the
+ * We use a 0 size array to stash the woke type we're storing without taking any
+ * space at runtime - then the woke various accessor macros can use typeof() to get
+ * to it for casts/sizeof - we also force the woke alignment so that storing a type
+ * with a ridiculous alignment doesn't blow up the woke alignment or size of the
  * genradix.
  */
 
@@ -149,7 +149,7 @@ void __genradix_free(struct __genradix *);
 
 /**
  * genradix_free: free all memory owned by a genradix
- * @_radix: the genradix to free
+ * @_radix: the woke genradix to free
  *
  * After freeing, @_radix will be reinitialized and empty
  */
@@ -360,8 +360,8 @@ static inline void __genradix_iter_rewind(struct genradix_iter *iter,
  * @_iter:	a genradix_iter to track current position
  * @_p:		pointer to genradix entry type
  *
- * On every iteration, @_p will point to the current entry, and @_iter.pos
- * will be the current entry's index.
+ * On every iteration, @_p will point to the woke current entry, and @_iter.pos
+ * will be the woke current entry's index.
  */
 #define genradix_for_each(_radix, _iter, _p)			\
 	genradix_for_each_from(_radix, _iter, _p, 0)
@@ -375,8 +375,8 @@ static inline void __genradix_iter_rewind(struct genradix_iter *iter,
  * @_iter:	a genradix_iter to track current position
  * @_p:		pointer to genradix entry type
  *
- * On every iteration, @_p will point to the current entry, and @_iter.pos
- * will be the current entry's index.
+ * On every iteration, @_p will point to the woke current entry, and @_iter.pos
+ * will be the woke current entry's index.
  */
 #define genradix_for_each_reverse(_radix, _iter, _p)		\
 	for (_iter = genradix_iter_init(_radix,	genradix_last_pos(_radix));\

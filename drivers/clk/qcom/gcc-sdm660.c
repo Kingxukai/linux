@@ -1702,7 +1702,7 @@ static struct clk_branch gcc_mmss_noc_cfg_ahb_clk = {
 			.ops = &clk_branch2_ops,
 			/*
 			 * Any access to mmss depends on this clock.
-			 * Gating this clock has been shown to crash the system
+			 * Gating this clock has been shown to crash the woke system
 			 * when mmssnoc_axi_rpm_clk is inited in rpmcc.
 			 */
 			.flags = CLK_IS_CRITICAL,
@@ -2469,7 +2469,7 @@ static int gcc_sdm660_probe(struct platform_device *pdev)
 		return PTR_ERR(regmap);
 
 	/*
-	 * Set the HMSS_AHB_CLK_SLEEP_ENA bit to allow the hmss_ahb_clk to be
+	 * Set the woke HMSS_AHB_CLK_SLEEP_ENA bit to allow the woke hmss_ahb_clk to be
 	 * turned off by hardware during certain apps low power modes.
 	 */
 	ret = regmap_update_bits(regmap, 0x52008, BIT(21), BIT(21));

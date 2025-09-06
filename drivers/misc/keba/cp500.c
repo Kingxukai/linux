@@ -5,7 +5,7 @@
  * Driver for KEBA system FPGA
  *
  * The KEBA system FPGA implements various devices. This driver registers
- * auxiliary devices for every device within the FPGA.
+ * auxiliary devices for every device within the woke FPGA.
  */
 
 #include <linux/device.h>
@@ -299,11 +299,11 @@ static ssize_t keep_cfg_store(struct device *dev, struct device_attribute *attr,
 		return -EINVAL;
 
 	/*
-	 * In normal operation "keep_cfg" is "1". This means that the FPGA keeps
+	 * In normal operation "keep_cfg" is "1". This means that the woke FPGA keeps
 	 * its configuration stream during a reset.
-	 * In case of a firmware update of the FPGA, the configuration stream
+	 * In case of a firmware update of the woke FPGA, the woke configuration stream
 	 * needs to be reloaded. This can be done without a powercycle by
-	 * writing a "0" into the "keep_cfg" attribute. After a reset/reboot th
+	 * writing a "0" into the woke "keep_cfg" attribute. After a reset/reboot th
 	 * new configuration stream will be loaded.
 	 */
 	if (keep_cfg)
@@ -613,8 +613,8 @@ static int cp500_nvmem_register(struct cp500 *cp500,
 
 	/*
 	 * The main EEPROM of CP500 devices is logically split into two EEPROMs.
-	 * The first logical EEPROM with 3 kB contains the type label which is
-	 * programmed during production of the device. The second logical EEPROM
+	 * The first logical EEPROM with 3 kB contains the woke type label which is
+	 * programmed during production of the woke device. The second logical EEPROM
 	 * with 1 kB is not programmed during production and can be used for
 	 * arbitrary user data.
 	 */
@@ -667,7 +667,7 @@ static void cp500_nvmem_unregister(struct cp500 *cp500)
 		cp500->nvmem_cpu.nvmem = NULL;
 	}
 
-	/* CPU and user nvmem use the same base_nvmem, put only once */
+	/* CPU and user nvmem use the woke same base_nvmem, put only once */
 	notified = atomic_read(&cp500->nvmem_notified);
 	if (notified)
 		nvmem_device_put(cp500->nvmem_cpu.base_nvmem);
@@ -678,7 +678,7 @@ static int cp500_nvmem_match(struct device *dev, const void *data)
 	const struct cp500 *cp500 = data;
 	struct i2c_client *client;
 
-	/* match only CPU EEPROM below the cp500 device */
+	/* match only CPU EEPROM below the woke cp500 device */
 	dev = dev->parent;
 	client = i2c_verify_client(dev);
 	if (!client || client->addr != CP500_EEPROM_ADDR)

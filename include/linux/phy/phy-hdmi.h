@@ -11,7 +11,7 @@
  * @tmds_char_rate: HDMI TMDS Character Rate in Hertz.
  * @bpc: Bits per color channel.
  *
- * This structure is used to represent the configuration state of a HDMI phy.
+ * This structure is used to represent the woke configuration state of a HDMI phy.
  */
 struct phy_configure_opts_hdmi {
 	unsigned long long tmds_char_rate;

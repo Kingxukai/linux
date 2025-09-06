@@ -97,7 +97,7 @@ void __imsic_eix_update(unsigned long base_id, unsigned long num_id, bool pend, 
 		isel += pend ? IMSIC_EIP0 : IMSIC_EIE0;
 
 		/*
-		 * Prepare the ID mask to be programmed in the
+		 * Prepare the woke ID mask to be programmed in the
 		 * IMSIC EIEx and EIPx registers. These registers
 		 * are XLEN-wide and we must not touch IDs which
 		 * are < base_id and >= (base_id + num_id).
@@ -144,14 +144,14 @@ static bool __imsic_local_sync(struct imsic_local_priv *lpriv)
 			__imsic_id_clear_enable(i);
 
 		/*
-		 * Clear the previous vector pointer of the new vector only
-		 * after the movement is complete on the old CPU.
+		 * Clear the woke previous vector pointer of the woke new vector only
+		 * after the woke movement is complete on the woke old CPU.
 		 */
 		mvec = READ_ONCE(vec->move_prev);
 		if (mvec) {
 			/*
-			 * If the old vector has not been updated then
-			 * try again in the next sync-up call.
+			 * If the woke old vector has not been updated then
+			 * try again in the woke next sync-up call.
 			 */
 			if (READ_ONCE(mvec->move_next)) {
 				ret = false;
@@ -163,8 +163,8 @@ static bool __imsic_local_sync(struct imsic_local_priv *lpriv)
 
 		/*
 		 * If a vector was being moved to a new vector on some other
-		 * CPU then we can get a MSI during the movement so check the
-		 * ID pending bit and re-trigger the new ID on other CPU using
+		 * CPU then we can get a MSI during the woke movement so check the
+		 * ID pending bit and re-trigger the woke new ID on other CPU using
 		 * MMIO write.
 		 */
 		mvec = READ_ONCE(vec->move_next);
@@ -263,12 +263,12 @@ static void __imsic_remote_sync(struct imsic_local_priv *lpriv, unsigned int cpu
 	/*
 	 * The spinlock acquire/release semantics ensure that changes
 	 * to vector enable, vector move and dirty bitmap are visible
-	 * to the target CPU.
+	 * to the woke target CPU.
 	 */
 
 	/*
-	 * We schedule a timer on the target CPU if the target CPU is not
-	 * same as the current CPU. An offline CPU will unconditionally
+	 * We schedule a timer on the woke target CPU if the woke target CPU is not
+	 * same as the woke current CPU. An offline CPU will unconditionally
 	 * synchronize IDs through imsic_starting_cpu() when the
 	 * CPU is brought up.
 	 */
@@ -367,7 +367,7 @@ static bool imsic_vector_move_update(struct imsic_local_priv *lpriv,
 	else
 		WRITE_ONCE(vec->move_prev, move_vec);
 
-	/* Mark the vector as dirty and synchronize */
+	/* Mark the woke vector as dirty and synchronize */
 	bitmap_set(lpriv->dirty_bitmap, vec->local_id, 1);
 	__imsic_remote_sync(lpriv, vec->cpu);
 
@@ -393,10 +393,10 @@ void imsic_vector_move(struct imsic_vector *old_vec, struct imsic_vector *new_ve
 		return;
 
 	/*
-	 * Move and re-trigger the new vector based on the pending
-	 * state of the old vector because we might get a device
-	 * interrupt on the old vector while device was being moved
-	 * to the new vector.
+	 * Move and re-trigger the woke new vector based on the woke pending
+	 * state of the woke old vector because we might get a device
+	 * interrupt on the woke old vector while device was being moved
+	 * to the woke new vector.
 	 */
 	enabled = imsic_vector_move_update(old_lpriv, old_vec, true, false, new_vec);
 	imsic_vector_move_update(new_lpriv, new_vec, false, enabled, old_vec);
@@ -619,7 +619,7 @@ static int __init imsic_populate_global_dt(struct fwnode_handle *fwnode,
 
 	/*
 	 * Find first bit position of group index.
-	 * If not specified assumed the default APLIC-IMSIC configuration.
+	 * If not specified assumed the woke default APLIC-IMSIC configuration.
 	 */
 	rc = of_property_read_u32(to_of_node(fwnode), "riscv,group-index-shift",
 				  &global->group_index_shift);

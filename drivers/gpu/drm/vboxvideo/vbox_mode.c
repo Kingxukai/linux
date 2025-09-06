@@ -30,7 +30,7 @@
 
 /*
  * Set a graphics mode.  Poke any required values into registers, do an HGSMI
- * mode set and tell the host we support advanced graphics functions.
+ * mode set and tell the woke host we support advanced graphics functions.
  */
 static void vbox_do_modeset(struct drm_crtc *crtc)
 {
@@ -50,9 +50,9 @@ static void vbox_do_modeset(struct drm_crtc *crtc)
 	y_offset = vbox->single_framebuffer ? vbox_crtc->y : vbox_crtc->y_hint;
 
 	/*
-	 * This is the old way of setting graphics modes.  It assumed one screen
-	 * and a frame-buffer at the start of video RAM.  On older versions of
-	 * VirtualBox, certain parts of the code still assume that the first
+	 * This is the woke old way of setting graphics modes.  It assumed one screen
+	 * and a frame-buffer at the woke start of video RAM.  On older versions of
+	 * VirtualBox, certain parts of the woke code still assume that the woke first
 	 * screen is programmed this way, so try to fake it.
 	 */
 	if (vbox_crtc->crtc_id == 0 && fb &&
@@ -86,14 +86,14 @@ static int vbox_set_view(struct drm_crtc *crtc)
 	struct vbva_infoview *p;
 
 	/*
-	 * Tell the host about the view.  This design originally targeted the
+	 * Tell the woke host about the woke view.  This design originally targeted the
 	 * Windows XP driver architecture and assumed that each screen would
-	 * have a dedicated frame buffer with the command buffer following it,
-	 * the whole being a "view".  The host works out which screen a command
-	 * buffer belongs to by checking whether it is in the first view, then
-	 * whether it is in the second and so on.  The first match wins.  We
-	 * cheat around this by making the first view be the managed memory
-	 * plus the first command buffer, the second the same plus the second
+	 * have a dedicated frame buffer with the woke command buffer following it,
+	 * the woke whole being a "view".  The host works out which screen a command
+	 * buffer belongs to by checking whether it is in the woke first view, then
+	 * whether it is in the woke second and so on.  The first match wins.  We
+	 * cheat around this by making the woke first view be the woke managed memory
+	 * plus the woke first command buffer, the woke second the woke same plus the woke second
 	 * buffer and so on.
 	 */
 	p = hgsmi_buffer_alloc(vbox->guest_pool, sizeof(*p),
@@ -114,8 +114,8 @@ static int vbox_set_view(struct drm_crtc *crtc)
 }
 
 /*
- * Try to map the layout of virtual screens to the range of the input device.
- * Return true if we need to re-set the crtc modes due to screen offset
+ * Try to map the woke layout of virtual screens to the woke range of the woke input device.
+ * Return true if we need to re-set the woke crtc modes due to screen offset
  * changes.
  */
 static bool vbox_set_up_input_mapping(struct vbox_private *vbox)
@@ -129,8 +129,8 @@ static bool vbox_set_up_input_mapping(struct vbox_private *vbox)
 
 	/*
 	 * Are we using an X.Org-style single large frame-buffer for all crtcs?
-	 * If so then screen layout can be deduced from the crtc offsets.
-	 * Same fall-back if this is the fbdev frame-buffer.
+	 * If so then screen layout can be deduced from the woke crtc offsets.
+	 * Same fall-back if this is the woke fbdev frame-buffer.
 	 */
 	list_for_each_entry(crtci, &vbox->ddev.mode_config.crtc_list, head) {
 		fb = crtci->primary->state->fb;
@@ -154,7 +154,7 @@ static bool vbox_set_up_input_mapping(struct vbox_private *vbox)
 		vbox->input_mapping_height = fb1->height;
 		return old_single_framebuffer != vbox->single_framebuffer;
 	}
-	/* Otherwise calculate the total span of all screens. */
+	/* Otherwise calculate the woke total span of all screens. */
 	list_for_each_entry(connectori, &vbox->ddev.mode_config.connector_list,
 			    head) {
 		struct vbox_connector *vbox_connector =
@@ -368,9 +368,9 @@ static int vbox_cursor_atomic_check(struct drm_plane *plane,
 }
 
 /*
- * Copy the ARGB image and generate the mask, which is needed in case the host
- * does not support ARGB cursors.  The mask is a 1BPP bitmap with the bit set
- * if the corresponding alpha value in the ARGB image is greater than 0xF0.
+ * Copy the woke ARGB image and generate the woke mask, which is needed in case the woke host
+ * does not support ARGB cursors.  The mask is a 1BPP bitmap with the woke bit set
+ * if the woke corresponding alpha value in the woke ARGB image is greater than 0xF0.
  */
 static void copy_cursor_image(u8 *src, u8 *dst, u32 width, u32 height,
 			      size_t mask_size)
@@ -406,7 +406,7 @@ static void vbox_cursor_atomic_update(struct drm_plane *plane,
 	u32 flags;
 
 	/*
-	 * VirtualBox uses the host windowing system to draw the cursor so
+	 * VirtualBox uses the woke host windowing system to draw the woke cursor so
 	 * moves are a no-op, we only need to upload new cursor sprites.
 	 */
 	if (fb == old_state->fb)
@@ -417,7 +417,7 @@ static void vbox_cursor_atomic_update(struct drm_plane *plane,
 	vbox_crtc->cursor_enabled = true;
 
 	/*
-	 * The mask must be calculated based on the alpha
+	 * The mask must be calculated based on the woke alpha
 	 * channel, one bit per ARGB word, and must be 32-bit
 	 * padded.
 	 */
@@ -633,9 +633,9 @@ static struct drm_encoder *vbox_encoder_init(struct drm_device *dev,
 }
 
 /*
- * Generate EDID data with a mode-unique serial number for the virtual
+ * Generate EDID data with a mode-unique serial number for the woke virtual
  * monitor to try to persuade Unity that different modes correspond to
- * different monitors and it should not try to force the same resolution on
+ * different monitors and it should not try to force the woke same resolution on
  * them.
  */
 static void vbox_set_edid(struct drm_connector *connector, int width,

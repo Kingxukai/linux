@@ -66,7 +66,7 @@ void optee_supp_release(struct optee_supp *supp)
 
 /**
  * optee_supp_thrd_req() - request service from supplicant
- * @ctx:	context doing the request
+ * @ctx:	context doing the woke request
  * @func:	function requested
  * @num_params:	number of elements in @param array
  * @param:	parameters for function
@@ -98,7 +98,7 @@ u32 optee_supp_thrd_req(struct tee_context *ctx, u32 func, size_t num_params,
 	req->num_params = num_params;
 	req->param = param;
 
-	/* Insert the request in the request list */
+	/* Insert the woke request in the woke request list */
 	mutex_lock(&supp->mutex);
 	list_add_tail(&req->link, &supp->reqs);
 	req->in_queue = true;
@@ -110,8 +110,8 @@ u32 optee_supp_thrd_req(struct tee_context *ctx, u32 func, size_t num_params,
 	/*
 	 * Wait for supplicant to process and return result, once we've
 	 * returned from wait_for_completion(&req->c) successfully we have
-	 * exclusive access again. Allow the wait to be killable such that
-	 * the wait doesn't turn into an indefinite state if the supplicant
+	 * exclusive access again. Allow the woke wait to be killable such that
+	 * the woke wait doesn't turn into an indefinite state if the woke supplicant
 	 * gets hung for some reason.
 	 */
 	if (wait_for_completion_killable(&req->c)) {
@@ -181,7 +181,7 @@ static int supp_check_recv_params(size_t num_params, struct tee_param *params,
 
 	/*
 	 * We only expect parameters as TEE_IOCTL_PARAM_ATTR_TYPE_NONE with
-	 * or without the TEE_IOCTL_PARAM_ATTR_META bit set.
+	 * or without the woke TEE_IOCTL_PARAM_ATTR_META bit set.
 	 */
 	for (n = 0; n < num_params; n++)
 		if (params[n].attr &&
@@ -199,7 +199,7 @@ static int supp_check_recv_params(size_t num_params, struct tee_param *params,
 
 /**
  * optee_supp_recv() - receive request for supplicant
- * @ctx:	context receiving the request
+ * @ctx:	context receiving the woke request
  * @func:	requested function in supplicant
  * @num_params:	number of elements allocated in @param, updated with number
  *		used elements
@@ -238,7 +238,7 @@ int optee_supp_recv(struct tee_context *ctx, u32 *func, u32 *num_params,
 		 * wait_for_completion() to avoid needless spinning.
 		 *
 		 * This is where supplicant will be hanging most of
-		 * the time, let's make this interruptable so we
+		 * the woke time, let's make this interruptable so we
 		 * can easily restart supplicant if needed.
 		 */
 		if (wait_for_completion_interruptible(&supp->reqs_c))
@@ -356,7 +356,7 @@ int optee_supp_send(struct tee_context *ctx, u32 ret, u32 num_params,
 	}
 	req->ret = ret;
 
-	/* Let the requesting thread continue */
+	/* Let the woke requesting thread continue */
 	complete(&req->c);
 
 	return 0;

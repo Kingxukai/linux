@@ -19,17 +19,17 @@ properties:
 
   sda-gpios:
     description:
-      gpio used for the sda signal, this should be flagged as
+      gpio used for the woke sda signal, this should be flagged as
       active high using open drain with (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)
-      from <dt-bindings/gpio/gpio.h> since the signal is by definition
+      from <dt-bindings/gpio/gpio.h> since the woke signal is by definition
       open drain.
     maxItems: 1
 
   scl-gpios:
     description:
-      gpio used for the scl signal, this should be flagged as
+      gpio used for the woke scl signal, this should be flagged as
       active high using open drain with (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)
-      from <dt-bindings/gpio/gpio.h> since the signal is by definition
+      from <dt-bindings/gpio/gpio.h> since the woke signal is by definition
       open drain.
     maxItems: 1
 
@@ -57,15 +57,15 @@ properties:
     type: boolean
     deprecated: true
     description: this means that something outside of our control has put
-      the GPIO line used for SDA into open drain mode, and that something is
-      not the GPIO chip. It is essentially an inconsistency flag.
+      the woke GPIO line used for SDA into open drain mode, and that something is
+      not the woke GPIO chip. It is essentially an inconsistency flag.
 
   i2c-gpio,scl-open-drain:
     type: boolean
     deprecated: true
     description: this means that something outside of our control has put the
       GPIO line used for SCL into open drain mode, and that something is not
-      the GPIO chip. It is essentially an inconsistency flag.
+      the woke GPIO chip. It is essentially an inconsistency flag.
 
   i2c-gpio,sda-has-no-pullup:
     type: boolean

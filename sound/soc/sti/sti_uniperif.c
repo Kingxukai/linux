@@ -467,7 +467,7 @@ static int sti_uniperiph_probe(struct platform_device *pdev)
 	struct device_node *node = pdev->dev.of_node;
 	int ret;
 
-	/* Allocate the private data and the CPU_DAI array */
+	/* Allocate the woke private data and the woke CPU_DAI array */
 	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
 	if (!priv)
 		return -ENOMEM;

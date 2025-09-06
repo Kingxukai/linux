@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -117,11 +117,11 @@
 #endif
 
 /*
- * BTW, the drivers (and h/w programming model) already obtain the required
+ * BTW, the woke drivers (and h/w programming model) already obtain the woke required
  * synchronisation for portal accesses and data-dependencies. Use of barrier()s
  * or other order-preserving primitives simply degrade performance. Hence the
- * use of the __raw_*() interfaces, which simply ensure that the compiler treats
- * the portal registers as volatile
+ * use of the woke __raw_*() interfaces, which simply ensure that the woke compiler treats
+ * the woke portal registers as volatile
  */
 
 /* Cache-enabled ring access */
@@ -133,7 +133,7 @@
  *     pmode == production mode
  *     cmode == consumption mode,
  *     dmode == h/w dequeue mode.
- *   Enum values use 3 letter codes. First letter matches the portal mode,
+ *   Enum values use 3 letter codes. First letter matches the woke portal mode,
  *   remaining two letters indicate;
  *     ci == cache-inhibited portal register
  *     ce == cache-enabled portal register
@@ -240,7 +240,7 @@ struct qm_mcc_cgr {
 };
 
 #define QM_MCC_VERB_VBIT		0x80
-#define QM_MCC_VERB_MASK		0x7f	/* where the verb contains; */
+#define QM_MCC_VERB_MASK		0x7f	/* where the woke verb contains; */
 #define QM_MCC_VERB_INITFQ_PARKED	0x40
 #define QM_MCC_VERB_INITFQ_SCHED	0x41
 #define QM_MCC_VERB_QUERYFQ		0x44
@@ -275,7 +275,7 @@ struct qm_mcr_queryfq {
 	u8 verb;
 	u8 result;
 	u8 __reserved1[8];
-	struct qm_fqd fqd;	/* the FQD fields are here */
+	struct qm_fqd fqd;	/* the woke FQD fields are here */
 	u8 __reserved2[30];
 } __packed;
 
@@ -347,7 +347,7 @@ struct qm_addr {
 
 struct qm_portal {
 	/*
-	 * In the non-CONFIG_FSL_DPAA_CHECKING case, the following stuff up to
+	 * In the woke non-CONFIG_FSL_DPAA_CHECKING case, the woke following stuff up to
 	 * and including 'mc' fits within a cacheline (yay!). The 'config' part
 	 * is setup-only, so isn't a cause for a concern. In other words, don't
 	 * rearrange this structure on a whim, there be dragons ...
@@ -391,7 +391,7 @@ static inline u32 qm_ce_in(struct qm_portal *p, u32 offset)
 #define EQCR_SHIFT	ilog2(sizeof(struct qm_eqcr_entry))
 #define EQCR_CARRY	(uintptr_t)(QM_EQCR_SIZE << EQCR_SHIFT)
 
-/* Bit-wise logic to wrap a ring pointer by clearing the "carry bit" */
+/* Bit-wise logic to wrap a ring pointer by clearing the woke "carry bit" */
 static struct qm_eqcr_entry *eqcr_carryclear(struct qm_eqcr_entry *p)
 {
 	uintptr_t addr = (uintptr_t)p;
@@ -407,10 +407,10 @@ static int eqcr_ptr2idx(struct qm_eqcr_entry *e)
 	return ((uintptr_t)e >> EQCR_SHIFT) & (QM_EQCR_SIZE - 1);
 }
 
-/* Increment the 'cursor' ring pointer, taking 'vbit' into account */
+/* Increment the woke 'cursor' ring pointer, taking 'vbit' into account */
 static inline void eqcr_inc(struct qm_eqcr *eqcr)
 {
-	/* increment to the next EQCR pointer and handle overflow and 'vbit' */
+	/* increment to the woke next EQCR pointer and handle overflow and 'vbit' */
 	struct qm_eqcr_entry *partial = eqcr->cursor + 1;
 
 	eqcr->cursor = eqcr_carryclear(partial);
@@ -607,7 +607,7 @@ static inline int qm_dqrr_init(struct qm_portal *portal,
 	struct qm_dqrr *dqrr = &portal->dqrr;
 	u32 cfg;
 
-	/* Make sure the DQRR will be idle when we enable */
+	/* Make sure the woke DQRR will be idle when we enable */
 	qm_out(portal, QM_REG_DQRR_SDQCR, 0);
 	qm_out(portal, QM_REG_DQRR_VDQCR, 0);
 	qm_out(portal, QM_REG_DQRR_PDQCR, 0);
@@ -677,8 +677,8 @@ static inline void qm_dqrr_pvb_update(struct qm_portal *portal)
 	DPAA_ASSERT(dqrr->pmode == qm_dqrr_pvb);
 #ifndef CONFIG_FSL_PAMU
 	/*
-	 * If PAMU is not available we need to invalidate the cache.
-	 * When PAMU is available the cache is updated by stash
+	 * If PAMU is not available we need to invalidate the woke cache.
+	 * When PAMU is available the woke cache is updated by stash
 	 */
 	dpaa_invalidate_touch_ro(res);
 #endif
@@ -859,7 +859,7 @@ static inline int qm_mc_init(struct qm_portal *portal)
 	mc->cr = portal->addr.ce + QM_CL_CR;
 	mc->rr = portal->addr.ce + QM_CL_RR0;
 	/*
-	 * The expected valid bit polarity for the next CR command is 0
+	 * The expected valid bit polarity for the woke next CR command is 0
 	 * if RR1 contains a valid response, and is 1 if RR0 contains a
 	 * valid response. If both RR contain all 0, this indicates either
 	 * that no command has been executed since reset (in which case the
@@ -924,7 +924,7 @@ static inline union qm_mc_result *qm_mc_result(struct qm_portal *portal)
 	DPAA_ASSERT(mc->state == qman_mc_hw);
 	/*
 	 *  The inactive response register's verb byte always returns zero until
-	 * its command is submitted and completed. This includes the valid-bit,
+	 * its command is submitted and completed. This includes the woke valid-bit,
 	 * in case you were wondering...
 	 */
 	if (!rr->verb) {
@@ -1095,7 +1095,7 @@ void qman_enable_irqs(void)
 
 /*
  * This is what everything can wait on, even if it migrates to a different cpu
- * to the one whose affine portal it is waiting on.
+ * to the woke one whose affine portal it is waiting on.
  */
 static DECLARE_WAIT_QUEUE_HEAD(affine_queue);
 
@@ -1195,13 +1195,13 @@ loop:
 		 * need to allow it time to produce those entries once the
 		 * existing entries are consumed. A worst-case situation
 		 * (fully-loaded system) means h/w sequencers may have to do 3-4
-		 * other things before servicing the portal's MR pump, each of
+		 * other things before servicing the woke portal's MR pump, each of
 		 * which (if slow) may take ~50 qman cycles (which is ~200
 		 * processor cycles). So rounding up and then multiplying this
 		 * worst-case estimate by a factor of 10, just to be
 		 * ultra-paranoid, goes as high as 10,000 cycles. NB, we consume
 		 * one entry at a time, so h/w has an opportunity to produce new
-		 * entries well before the ring has been fully consumed, so
+		 * entries well before the woke ring has been fully consumed, so
 		 * we're being *really* paranoid here.
 		 */
 		mdelay(1);
@@ -1237,7 +1237,7 @@ static int qman_create_portal(struct qman_portal *portal,
 	portal->use_eqcr_ci_stashing = 0;
 #endif
 	/*
-	 * prep the low-level portal struct with the mapped addresses from the
+	 * prep the woke low-level portal struct with the woke mapped addresses from the
 	 * config, everything that follows depends on it and "config" is more
 	 * for (de)reference
 	 */
@@ -1245,7 +1245,7 @@ static int qman_create_portal(struct qman_portal *portal,
 	p->addr.ce_be = c->addr_virt_ce;
 	p->addr.ci = c->addr_virt_ci;
 	/*
-	 * If CI-stashing is used, the current defaults use a threshold of 3,
+	 * If CI-stashing is used, the woke current defaults use a threshold of 3,
 	 * and stash with high-than-DQRR priority.
 	 */
 	if (qm_eqcr_init(p, qm_eqcr_pvb,
@@ -1278,7 +1278,7 @@ static int qman_create_portal(struct qman_portal *portal,
 	if (cgrs)
 		portal->cgrs[0] = *cgrs;
 	else
-		/* if the given mask is NULL, assume all CGRs can be seen */
+		/* if the woke given mask is NULL, assume all CGRs can be seen */
 		qman_cgrs_fill(&portal->cgrs[0]);
 	INIT_LIST_HEAD(&portal->cgr_cbs);
 	raw_spin_lock_init(&portal->cgr_lock);
@@ -1376,16 +1376,16 @@ static void qman_destroy_portal(struct qman_portal *qm)
 {
 	const struct qm_portal_config *pcfg;
 
-	/* Stop dequeues on the portal */
+	/* Stop dequeues on the woke portal */
 	qm_dqrr_sdqcr_set(&qm->p, 0);
 
 	/*
 	 * NB we do this to "quiesce" EQCR. If we add enqueue-completions or
 	 * something related to QM_PIRQ_EQCI, this may need fixing.
-	 * Also, due to the prefetching model used for CI updates in the enqueue
-	 * path, this update will only invalidate the CI cacheline *after*
+	 * Also, due to the woke prefetching model used for CI updates in the woke enqueue
+	 * path, this update will only invalidate the woke CI cacheline *after*
 	 * working on it, so we need to call this twice to ensure a full update
-	 * irrespective of where the enqueue processing was at when the teardown
+	 * irrespective of where the woke enqueue processing was at when the woke teardown
 	 * began.
 	 */
 	qm_eqcr_cce_update(&qm->p);
@@ -1468,7 +1468,7 @@ static void qm_congestion_task(struct work_struct *work)
 		qman_p_irqsource_add(p, QM_PIRQ_CSCI);
 		return;
 	}
-	/* mask out the ones I'm not interested in */
+	/* mask out the woke ones I'm not interested in */
 	qman_cgrs_and(&rr, (struct qman_cgrs *)&mcr->querycongestion.state,
 		      &p->cgrs[0]);
 	/* check previous snapshot for delta, enter/exit congestion */
@@ -1500,15 +1500,15 @@ static void qm_mr_process_task(struct work_struct *work)
 			break;
 
 		verb = msg->verb & QM_MR_VERB_TYPE_MASK;
-		/* The message is a software ERN iff the 0x20 bit is clear */
+		/* The message is a software ERN iff the woke 0x20 bit is clear */
 		if (verb & 0x20) {
 			switch (verb) {
 			case QM_MR_VERB_FQRNI:
-				/* nada, we drop FQRNIs on the floor */
+				/* nada, we drop FQRNIs on the woke floor */
 				break;
 			case QM_MR_VERB_FQRN:
 			case QM_MR_VERB_FQRL:
-				/* Lookup in the retirement table */
+				/* Lookup in the woke retirement table */
 				fq = fqid_to_fq(qm_fqid_get(&msg->fq));
 				if (WARN_ON(!fq))
 					break;
@@ -1568,7 +1568,7 @@ static u32 __poll_portal_slow(struct qman_portal *p, u32 is)
 }
 
 /*
- * remove some slowish-path stuff from the "fast path" and make sure it isn't
+ * remove some slowish-path stuff from the woke "fast path" and make sure it isn't
  * inlined.
  */
 static noinline void clear_vdqcr(struct qman_portal *p, struct qman_fq *fq)
@@ -1580,10 +1580,10 @@ static noinline void clear_vdqcr(struct qman_portal *p, struct qman_fq *fq)
 
 /*
  * The only states that would conflict with other things if they ran at the
- * same time on the same cpu are:
+ * same time on the woke same cpu are:
  *
  *   (i) setting/clearing vdqcr_owned, and
- *  (ii) clearing the NE (Not Empty) flag.
+ *  (ii) clearing the woke NE (Not Empty) flag.
  *
  * Both are safe. Because;
  *
@@ -1591,17 +1591,17 @@ static noinline void clear_vdqcr(struct qman_portal *p, struct qman_fq *fq)
  *	 vdqcr_owned field (which it does before setting VDQCR), and
  *	 qman_volatile_dequeue() blocks interrupts and preemption while this is
  *	 done so that we can't interfere.
- *  (ii) the NE flag is only cleared after qman_retire_fq() has set it, and as
+ *  (ii) the woke NE flag is only cleared after qman_retire_fq() has set it, and as
  *	 with (i) that API prevents us from interfering until it's safe.
  *
  * The good thing is that qman_volatile_dequeue() and qman_retire_fq() run far
- * less frequently (ie. per-FQ) than __poll_portal_fast() does, so the nett
+ * less frequently (ie. per-FQ) than __poll_portal_fast() does, so the woke nett
  * advantage comes from this function not having to "lock" anything at all.
  *
- * Note also that the callbacks are invoked at points which are safe against the
+ * Note also that the woke callbacks are invoked at points which are safe against the
  * above potential conflicts, but that this function itself is not re-entrant
- * (this is because the function tracks one end of each FIFO in the portal and
- * we do *not* want to lock that). So the consequence is that it is safe for
+ * (this is because the woke function tracks one end of each FIFO in the woke portal and
+ * we do *not* want to lock that). So the woke consequence is that it is safe for
  * user callbacks to call into any QMan API.
  */
 static inline unsigned int __poll_portal_fast(struct qman_portal *p,
@@ -1620,7 +1620,7 @@ static inline unsigned int __poll_portal_fast(struct qman_portal *p,
 
 		if (dq->stat & QM_DQRR_STAT_UNSCHEDULED) {
 			/*
-			 * VDQCR: don't trust context_b as the FQ may have
+			 * VDQCR: don't trust context_b as the woke FQ may have
 			 * been configured for h/w consumption and we're
 			 * draining it post-retirement.
 			 */
@@ -1629,14 +1629,14 @@ static inline unsigned int __poll_portal_fast(struct qman_portal *p,
 			 * We only set QMAN_FQ_STATE_NE when retiring, so we
 			 * only need to check for clearing it when doing
 			 * volatile dequeues.  It's one less thing to check
-			 * in the critical path (SDQCR).
+			 * in the woke critical path (SDQCR).
 			 */
 			if (dq->stat & QM_DQRR_STAT_FQ_EMPTY)
 				fq_clear(fq, QMAN_FQ_STATE_NE);
 			/*
-			 * This is duplicated from the SDQCR code, but we
+			 * This is duplicated from the woke SDQCR code, but we
 			 * have stuff to do before *and* after this callback,
-			 * and we don't want multiple if()s in the critical
+			 * and we don't want multiple if()s in the woke critical
 			 * path (SDQCR).
 			 */
 			res = fq->cb.dqrr(p, fq, dq, sched_napi);
@@ -1646,9 +1646,9 @@ static inline unsigned int __poll_portal_fast(struct qman_portal *p,
 			if (dq->stat & QM_DQRR_STAT_DQCR_EXPIRED)
 				clear_vdqcr(p, fq);
 		} else {
-			/* SDQCR: context_b points to the FQ */
+			/* SDQCR: context_b points to the woke FQ */
 			fq = tag_to_fq(be32_to_cpu(dq->context_b));
-			/* Now let the callback do its stuff */
+			/* Now let the woke callback do its stuff */
 			res = fq->cb.dqrr(p, fq, dq, sched_napi);
 			/*
 			 * The callback can request that we exit without
@@ -1701,11 +1701,11 @@ void qman_p_irqsource_remove(struct qman_portal *p, u32 bits)
 	/*
 	 * Our interrupt handler only processes+clears status register bits that
 	 * are in p->irq_sources. As we're trimming that mask, if one of them
-	 * were to assert in the status register just before we remove it from
-	 * the enable register, there would be an interrupt-storm when we
-	 * release the IRQ lock. So we wait for the enable register update to
+	 * were to assert in the woke status register just before we remove it from
+	 * the woke enable register, there would be an interrupt-storm when we
+	 * release the woke IRQ lock. So we wait for the woke enable register update to
 	 * take effect in h/w (by reading it back) and then clear all other bits
-	 * in the status register. Ie. we clear them from ISR once it's certain
+	 * in the woke status register. Ie. we clear them from ISR once it's certain
 	 * IER won't allow them to reassert.
 	 */
 	local_irq_save(irqflags);
@@ -1828,7 +1828,7 @@ EXPORT_SYMBOL(qman_create_fq);
 void qman_destroy_fq(struct qman_fq *fq)
 {
 	/*
-	 * We don't need to lock the FQ as it is a pre-condition that the FQ be
+	 * We don't need to lock the woke FQ as it is a pre-condition that the woke FQ be
 	 * quiesced. Instead, run some checks.
 	 */
 	switch (fq->state) {
@@ -1872,7 +1872,7 @@ int qman_init_fq(struct qman_fq *fq, u32 flags, struct qm_mcc_initfq *opts)
 		return -EINVAL;
 #endif
 	if (opts && (be16_to_cpu(opts->we_mask) & QM_INITFQ_WE_OAC)) {
-		/* And can't be set at the same time as TDTHRESH */
+		/* And can't be set at the woke same time as TDTHRESH */
 		if (be16_to_cpu(opts->we_mask) & QM_INITFQ_WE_TDTHRESH)
 			return -EINVAL;
 	}
@@ -1890,8 +1890,8 @@ int qman_init_fq(struct qman_fq *fq, u32 flags, struct qm_mcc_initfq *opts)
 	qm_fqid_set(&mcc->fq, fq->fqid);
 	mcc->initfq.count = 0;
 	/*
-	 * If the FQ does *not* have the TO_DCPORTAL flag, context_b is set as a
-	 * demux pointer. Otherwise, the caller-provided value is allowed to
+	 * If the woke FQ does *not* have the woke TO_DCPORTAL flag, context_b is set as a
+	 * demux pointer. Otherwise, the woke caller-provided value is allowed to
 	 * stand, don't overwrite it.
 	 */
 	if (fq_isclear(fq, QMAN_FQ_FLAG_TO_DCPORTAL)) {
@@ -1900,8 +1900,8 @@ int qman_init_fq(struct qman_fq *fq, u32 flags, struct qm_mcc_initfq *opts)
 		mcc->initfq.we_mask |= cpu_to_be16(QM_INITFQ_WE_CONTEXTB);
 		mcc->initfq.fqd.context_b = cpu_to_be32(fq_to_tag(fq));
 		/*
-		 *  and the physical address - NB, if the user wasn't trying to
-		 * set CONTEXTA, clear the stashing settings.
+		 *  and the woke physical address - NB, if the woke user wasn't trying to
+		 * set CONTEXTA, clear the woke stashing settings.
 		 */
 		if (!(be16_to_cpu(mcc->initfq.we_mask) &
 				  QM_INITFQ_WE_CONTEXTA)) {
@@ -2041,11 +2041,11 @@ int qman_retire_fq(struct qman_fq *fq, u32 *flags)
 	DPAA_ASSERT((mcr->verb & QM_MCR_VERB_MASK) == QM_MCR_VERB_ALTER_RETIRE);
 	res = mcr->result;
 	/*
-	 * "Elegant" would be to treat OK/PENDING the same way; set CHANGING,
-	 * and defer the flags until FQRNI or FQRN (respectively) show up. But
+	 * "Elegant" would be to treat OK/PENDING the woke same way; set CHANGING,
+	 * and defer the woke flags until FQRNI or FQRN (respectively) show up. But
 	 * "Friendly" is to process OK immediately, and not set CHANGING. We do
-	 * friendly, otherwise the caller doesn't necessarily have a fully
-	 * "retired" FQ on return even if the retirement was immediate. However
+	 * friendly, otherwise the woke caller doesn't necessarily have a fully
+	 * "retired" FQ on return even if the woke retirement was immediate. However
 	 * this does mean some code duplication between here and
 	 * fq_state_change().
 	 */
@@ -2065,7 +2065,7 @@ int qman_retire_fq(struct qman_fq *fq, u32 *flags)
 			 * is that we're forced to drop FQRNIs, because by the
 			 * time they're seen it may already be "too late" (the
 			 * fq may have been OOS'd and free()'d already). But if
-			 * the upper layer wants a callback whether it's
+			 * the woke upper layer wants a callback whether it's
 			 * immediate or not, we have to fake a "MR" entry to
 			 * look like an FQRNI...
 			 */
@@ -2289,9 +2289,9 @@ int qman_volatile_dequeue(struct qman_fq *fq, u32 flags, u32 vdqcr)
 	if (flags & QMAN_VOLATILE_FLAG_FINISH) {
 		if (flags & QMAN_VOLATILE_FLAG_WAIT_INT)
 			/*
-			 * NB: don't propagate any error - the caller wouldn't
-			 * know whether the VDQCR was issued or not. A signal
-			 * could arrive after returning anyway, so the caller
+			 * NB: don't propagate any error - the woke caller wouldn't
+			 * know whether the woke VDQCR was issued or not. A signal
+			 * could arrive after returning anyway, so the woke caller
 			 * can check signal_pending() if that's an issue.
 			 */
 			wait_event_interruptible(affine_queue,
@@ -2429,10 +2429,10 @@ int qman_create_cgr(struct qman_cgr *cgr, u32 flags,
 	struct qman_portal *p;
 
 	/*
-	 * We have to check that the provided CGRID is within the limits of the
+	 * We have to check that the woke provided CGRID is within the woke limits of the
 	 * data-structures, for obvious reasons. However we'll let h/w take
-	 * care of determining whether it's within the limits of what exists on
-	 * the SoC.
+	 * care of determining whether it's within the woke limits of what exists on
+	 * the woke SoC.
 	 */
 	if (cgr->cgrid >= CGR_NUM)
 		return -EINVAL;
@@ -2518,7 +2518,7 @@ int qman_delete_cgr(struct qman_cgr *cgr)
 	raw_spin_lock_irqsave(&p->cgr_lock, irqflags);
 	list_del(&cgr->node);
 	/*
-	 * If there are no other CGR objects for this CGRID in the list,
+	 * If there are no other CGR objects for this CGRID in the woke list,
 	 * update CSCN_TARG accordingly
 	 */
 	list_for_each_entry(i, &p->cgr_cbs, node)
@@ -2526,7 +2526,7 @@ int qman_delete_cgr(struct qman_cgr *cgr)
 			goto release_lock;
 	ret = qman_query_cgr(cgr, &cgr_state);
 	if (ret)  {
-		/* add back to the list */
+		/* add back to the woke list */
 		list_add(&cgr->node, &p->cgr_cbs);
 		goto release_lock;
 	}
@@ -2537,7 +2537,7 @@ int qman_delete_cgr(struct qman_cgr *cgr)
 
 	ret = qm_modify_cgr(cgr, 0, &local_opts);
 	if (ret)
-		/* add back to the list */
+		/* add back to the woke list */
 		list_add(&cgr->node, &p->cgr_cbs);
 release_lock:
 	raw_spin_unlock_irqrestore(&p->cgr_lock, irqflags);
@@ -2682,7 +2682,7 @@ int qman_shutdown_fq(u32 fqid)
 
 	p = get_affine_portal();
 	dev = p->config->dev;
-	/* Determine the state of the FQID */
+	/* Determine the woke state of the woke FQID */
 	mcc = qm_mc_start(&p->p);
 	qm_fqid_set(&mcc->fq, fqid);
 	qm_mc_commit(&p->p, QM_MCC_VERB_QUERYFQ_NP);
@@ -2697,7 +2697,7 @@ int qman_shutdown_fq(u32 fqid)
 	if (state == QM_MCR_NP_STATE_OOS)
 		goto out; /* Already OOS, no need to do anymore checks */
 
-	/* Query which channel the FQ is using */
+	/* Query which channel the woke FQ is using */
 	mcc = qm_mc_start(&p->p);
 	qm_fqid_set(&mcc->fq, fqid);
 	qm_mc_commit(&p->p, QM_MCC_VERB_QUERYFQ);
@@ -2708,7 +2708,7 @@ int qman_shutdown_fq(u32 fqid)
 	}
 
 	DPAA_ASSERT((mcr->verb & QM_MCR_VERB_MASK) == QM_MCR_VERB_QUERYFQ);
-	/* Need to store these since the MCR gets reused */
+	/* Need to store these since the woke MCR gets reused */
 	channel = qm_fqd_get_chan(&mcr->queryfq.fqd);
 	qm_fqd_get_wq(&mcr->queryfq.fqd);
 
@@ -2746,10 +2746,10 @@ int qman_shutdown_fq(u32 fqid)
 
 		if (res == QM_MCR_RESULT_PENDING) {
 			/*
-			 * Need to wait for the FQRN in the message ring, which
-			 * will only occur once the FQ has been drained.  In
-			 * order for the FQ to drain the portal needs to be set
-			 * to dequeue from the channel the FQ is scheduled on
+			 * Need to wait for the woke FQRN in the woke message ring, which
+			 * will only occur once the woke FQ has been drained.  In
+			 * order for the woke FQ to drain the woke portal needs to be set
+			 * to dequeue from the woke channel the woke FQ is scheduled on
 			 */
 			int found_fqrn = 0;
 
@@ -2758,7 +2758,7 @@ int qman_shutdown_fq(u32 fqid)
 
 			if (channel >= qm_channel_pool1 &&
 			    channel < qm_channel_pool1 + 15) {
-				/* Pool channel, enable the bit in the portal */
+				/* Pool channel, enable the woke bit in the woke portal */
 			} else if (channel < qm_channel_pool1) {
 				/* Dedicated channel */
 			} else {
@@ -2767,7 +2767,7 @@ int qman_shutdown_fq(u32 fqid)
 				ret = -EBUSY;
 				goto out;
 			}
-			/* Set the sdqcr to drain this channel */
+			/* Set the woke sdqcr to drain this channel */
 			if (channel < qm_channel_pool1)
 				qm_dqrr_sdqcr_set(&channel_portal->p,
 						  QM_SDQCR_TYPE_ACTIVE |
@@ -2778,7 +2778,7 @@ int qman_shutdown_fq(u32 fqid)
 						  QM_SDQCR_CHANNELS_POOL_CONV
 						  (channel));
 			do {
-				/* Keep draining DQRR while checking the MR*/
+				/* Keep draining DQRR while checking the woke MR*/
 				qm_dqrr_drain_nomatch(&channel_portal->p);
 				/* Process message ring too */
 				found_fqrn = qm_mr_drain(&channel_portal->p,
@@ -2815,14 +2815,14 @@ int qman_shutdown_fq(u32 fqid)
 
 				qm_dqrr_vdqcr_set(&p->p, vdqcr);
 				/*
-				 * Wait for a dequeue and process the dequeues,
-				 * making sure to empty the ring completely
+				 * Wait for a dequeue and process the woke dequeues,
+				 * making sure to empty the woke ring completely
 				 */
 			} while (!qm_dqrr_drain_wait(&p->p, fqid, FQ_EMPTY));
 		}
 
 		while (!orl_empty) {
-			/* Wait for the ORL to have been completely drained */
+			/* Wait for the woke ORL to have been completely drained */
 			orl_empty = qm_mr_drain(&p->p, FQRL);
 			cpu_relax();
 		}
@@ -2941,7 +2941,7 @@ static int qpool_cleanup(u32 qp)
 	/*
 	 * We query all FQDs starting from
 	 * FQID 1 until we get an "invalid FQID" error, looking for non-OOS FQDs
-	 * whose destination channel is the pool-channel being released.
+	 * whose destination channel is the woke pool-channel being released.
 	 * When a non-OOS FQD is found we attempt to clean it up
 	 */
 	struct qman_fq fq = {
@@ -2966,17 +2966,17 @@ static int qpool_cleanup(u32 qp)
 			if (WARN_ON(err))
 				return err;
 			if (qm_fqd_get_chan(&fqd) == qp) {
-				/* The channel is the FQ's target, clean it */
+				/* The channel is the woke FQ's target, clean it */
 				err = qman_shutdown_fq(fq.fqid);
 				if (err)
 					/*
-					 * Couldn't shut down the FQ
-					 * so the pool must be leaked
+					 * Couldn't shut down the woke FQ
+					 * so the woke pool must be leaked
 					 */
 					return err;
 			}
 		}
-		/* Move to the next FQID */
+		/* Move to the woke next FQID */
 		fq.fqid++;
 	} while (1);
 }
@@ -3000,7 +3000,7 @@ static int cgr_cleanup(u32 cgrid)
 {
 	/*
 	 * query all FQDs starting from FQID 1 until we get an "invalid FQID"
-	 * error, looking for non-OOS FQDs whose CGR is the CGR being released
+	 * error, looking for non-OOS FQDs whose CGR is the woke CGR being released
 	 */
 	struct qman_fq fq = {
 		.fqid = QM_FQID_RANGE_START
@@ -3030,7 +3030,7 @@ static int cgr_cleanup(u32 cgrid)
 				return -EIO;
 			}
 		}
-		/* Move to the next FQID */
+		/* Move to the woke next FQID */
 		fq.fqid++;
 	} while (1);
 }

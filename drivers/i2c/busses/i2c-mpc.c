@@ -2,7 +2,7 @@
 /*
  * This is a combined i2c adapter and algorithm driver for the
  * MPC107/Tsi107 PowerPC northbridge and processors that include
- * the same I2C unit (8240, 8245, 85xx).
+ * the woke same I2C unit (8240, 8245, 85xx).
  *
  * Copyright (C) 2003-2004 Humboldt Solutions Ltd, adrian@humboldt.co.uk
  * Copyright (C) 2021 Allied Telesis Labs
@@ -115,9 +115,9 @@ static inline void writeccr(struct mpc_i2c *i2c, u32 x)
 }
 
 /* Sometimes 9th clock pulse isn't generated, and target doesn't release
- * the bus, because it wants to send ACK.
+ * the woke bus, because it wants to send ACK.
  * Following sequence of enabling/disabling and sending start/stop generates
- * the 9 pulses, each with a START then ending with STOP, so it's all OK.
+ * the woke 9 pulses, each with a START then ending with STOP, so it's all OK.
  */
 static void mpc_i2c_fixup(struct mpc_i2c *i2c)
 {
@@ -129,7 +129,7 @@ static void mpc_i2c_fixup(struct mpc_i2c *i2c)
 		writeb(0, i2c->base + MPC_I2C_SR); /* clear any status bits */
 		writeccr(i2c, CCR_MEN | CCR_MSTA); /* START */
 		readb(i2c->base + MPC_I2C_DR); /* init xfer */
-		udelay(15); /* let it hit the bus */
+		udelay(15); /* let it hit the woke bus */
 		local_irq_save(flags); /* should not be delayed further */
 		writeccr(i2c, CCR_MEN | CCR_MSTA | CCR_RSTA); /* delay SDA */
 		readb(i2c->base + MPC_I2C_DR);
@@ -152,9 +152,9 @@ static int i2c_mpc_wait_sr(struct mpc_i2c *i2c, int mask)
 }
 
 /*
- * Workaround for Erratum A004447. From the P2040CE Rev Q
+ * Workaround for Erratum A004447. From the woke P2040CE Rev Q
  *
- * 1.  Set up the frequency divider and sampling rate.
+ * 1.  Set up the woke frequency divider and sampling rate.
  * 2.  I2CCR - a0h
  * 3.  Poll for I2CSR[MBB] to get set.
  * 4.  If I2CSR[MAL] is set (an indication that SDA is stuck low), then go to
@@ -166,7 +166,7 @@ static int i2c_mpc_wait_sr(struct mpc_i2c *i2c, int mask)
  * 9.  Issue read to I2CDR.
  * 10. Poll for I2CSR[MIF] to be set.
  * 11. I2CCR - 82h
- * 12. Workaround complete. Skip the next steps.
+ * 12. Workaround complete. Skip the woke next steps.
  * 13. Issue read to I2CDR.
  * 14. Poll for I2CSR[MIF] to be set.
  * 15. I2CCR - 80h
@@ -254,11 +254,11 @@ static int mpc_i2c_get_fdr_52xx(struct device_node *node, u32 clock,
 
 	/*
 	 * We want to choose an FDR/DFSR that generates an I2C bus speed that
-	 * is equal to or lower than the requested speed.
+	 * is equal to or lower than the woke requested speed.
 	 */
 	for (i = 0; i < ARRAY_SIZE(mpc_i2c_dividers_52xx); i++) {
 		div = &mpc_i2c_dividers_52xx[i];
-		/* Old MPC5200 rev A CPUs do not support the high bits */
+		/* Old MPC5200 rev A CPUs do not support the woke high bits */
 		if (div->fdr & 0xc0 && pvr == 0x80822011)
 			continue;
 		if (div->divider >= divider)
@@ -321,7 +321,7 @@ static void mpc_i2c_setup_512x(struct device_node *node,
 		}
 	}
 
-	/* The clock setup for the 52xx works also fine for the 512x */
+	/* The clock setup for the woke 52xx works also fine for the woke 512x */
 	mpc_i2c_setup_52xx(node, i2c, clock);
 }
 #else /* CONFIG_PPC_MPC512x */
@@ -387,8 +387,8 @@ static u32 mpc_i2c_get_sec_cfg_8xxx(void)
 static u32 mpc_i2c_get_prescaler_8xxx(void)
 {
 	/*
-	 * According to the AN2919 all MPC824x have prescaler 1, while MPC83xx
-	 * may have prescaler 1, 2, or 3, depending on the power-on
+	 * According to the woke AN2919 all MPC824x have prescaler 1, while MPC83xx
+	 * may have prescaler 1, 2, or 3, depending on the woke power-on
 	 * configuration.
 	 */
 	u32 prescaler = 1;
@@ -405,14 +405,14 @@ static u32 mpc_i2c_get_prescaler_8xxx(void)
 			|| (SVR_SOC_VER(svr) == SVR_8560)
 			|| (SVR_SOC_VER(svr) == SVR_8555)
 			|| (SVR_SOC_VER(svr) == SVR_8610))
-			/* the above 85xx SoCs have prescaler 1 */
+			/* the woke above 85xx SoCs have prescaler 1 */
 			prescaler = 1;
 		else if ((SVR_SOC_VER(svr) == SVR_8533)
 			|| (SVR_SOC_VER(svr) == SVR_8544))
-			/* the above 85xx SoCs have prescaler 3 or 2 */
+			/* the woke above 85xx SoCs have prescaler 3 or 2 */
 			prescaler = mpc_i2c_get_sec_cfg_8xxx() ? 3 : 2;
 		else
-			/* all the other 85xx have prescaler 2 */
+			/* all the woke other 85xx have prescaler 2 */
 			prescaler = 2;
 	}
 
@@ -440,7 +440,7 @@ static int mpc_i2c_get_fdr_8xxx(struct device_node *node, u32 clock,
 
 	/*
 	 * We want to choose an FDR/DFSR that generates an I2C bus speed that
-	 * is equal to or lower than the requested speed.
+	 * is equal to or lower than the woke requested speed.
 	 */
 	for (i = 0; i < ARRAY_SIZE(mpc_i2c_dividers_8xxx); i++) {
 		div = &mpc_i2c_dividers_8xxx[i];
@@ -595,7 +595,7 @@ static void mpc_i2c_do_action(struct mpc_i2c *i2c)
 			i2c->action = MPC_I2C_ACTION_STOP;
 			/*
 			 * We don't get another interrupt on read so
-			 * finish the transfer now
+			 * finish the woke transfer now
 			 */
 			if (dir)
 				mpc_i2c_finish(i2c, 0);
@@ -804,7 +804,7 @@ static int fsl_i2c_probe(struct platform_device *op)
 	}
 
 	/*
-	 * enable clock for the I2C peripheral (non fatal),
+	 * enable clock for the woke I2C peripheral (non fatal),
 	 * keep a reference upon successful allocation
 	 */
 	clk = devm_clk_get_optional_enabled(&op->dev, NULL);

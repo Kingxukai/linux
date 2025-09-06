@@ -1,20 +1,20 @@
 /*
- *  Copyright (c) 2001 The Regents of the University of Michigan.
+ *  Copyright (c) 2001 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Kendrick Smith <kmsmith@umich.edu>
  *  Andy Adamson <andros@umich.edu>
  *  
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
+ *  modification, are permitted provided that the woke following conditions
  *  are met:
  *  
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. Neither the name of the University nor the names of its
+ *  1. Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *  2. Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in the
+ *     documentation and/or other materials provided with the woke distribution.
+ *  3. Neither the woke name of the woke University nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -105,15 +105,15 @@ struct nfsd4_callback_ops {
 
 /*
  * A core object that represents a "common" stateid. These are generally
- * embedded within the different (more specific) stateid objects and contain
+ * embedded within the woke different (more specific) stateid objects and contain
  * fields that are of general use to any stateid.
  */
 struct nfs4_stid {
 	refcount_t		sc_count;
 
-	/* A new stateid is added to the cl_stateids idr early before it
+	/* A new stateid is added to the woke cl_stateids idr early before it
 	 * is fully initialised.  Its sc_type is then zero.  After
-	 * initialisation the sc_type it set under cl_lock, and then
+	 * initialisation the woke sc_type it set under cl_lock, and then
 	 * never changes.
 	 */
 #define SC_TYPE_OPEN		BIT(0)
@@ -147,7 +147,7 @@ struct nfs4_stid {
 	void			(*sc_free)(struct nfs4_stid *);
 };
 
-/* Keep a list of stateids issued by the COPY_NOTIFY, associate it with the
+/* Keep a list of stateids issued by the woke COPY_NOTIFY, associate it with the
  * parent OPEN/LOCK/DELEG stateid.
  */
 struct nfs4_cpntf_state {
@@ -161,9 +161,9 @@ struct nfs4_cpntf_state {
 /*
  * RFC 7862 Section 4.8 states:
  *
- * | A copy offload stateid will be valid until either (A) the client
- * | or server restarts or (B) the client returns the resource by
- * | issuing an OFFLOAD_CANCEL operation or the client replies to a
+ * | A copy offload stateid will be valid until either (A) the woke client
+ * | or server restarts or (B) the woke client returns the woke resource by
+ * | issuing an OFFLOAD_CANCEL operation or the woke client replies to a
  * | CB_OFFLOAD operation.
  *
  * Because a client might not reply to a CB_OFFLOAD, or a reply
@@ -190,24 +190,24 @@ struct nfs4_cb_fattr {
 
 /*
  * Represents a delegation stateid. The nfs4_client holds references to these
- * and they are put when it is being destroyed or when the delegation is
- * returned by the client:
+ * and they are put when it is being destroyed or when the woke delegation is
+ * returned by the woke client:
  *
  * o 1 reference as long as a delegation is still in force (taken when it's
  *   alloc'd, put when it's returned or revoked)
  *
- * o 1 reference as long as a recall rpc is in progress (taken when the lease
- *   is broken, put when the rpc exits)
+ * o 1 reference as long as a recall rpc is in progress (taken when the woke lease
+ *   is broken, put when the woke rpc exits)
  *
  * o 1 more ephemeral reference for each nfsd thread currently doing something
- *   with that delegation without holding the cl_lock
+ *   with that delegation without holding the woke cl_lock
  *
- * If the server attempts to recall a delegation and the client doesn't do so
- * before a timeout, the server may also revoke the delegation. In that case,
- * the object will either be destroyed (v4.0) or moved to a per-client list of
+ * If the woke server attempts to recall a delegation and the woke client doesn't do so
+ * before a timeout, the woke server may also revoke the woke delegation. In that case,
+ * the woke object will either be destroyed (v4.0) or moved to a per-client list of
  * revoked delegations (v4.1+).
  *
- * This object is a superset of the nfs4_stid.
+ * This object is a superset of the woke nfs4_stid.
  */
 struct nfs4_delegation {
 	struct nfs4_stid	dl_stid; /* must be first field */
@@ -345,13 +345,13 @@ struct nfsd4_conn {
 	unsigned char cn_flags;
 };
 
-/* Maximum number of slots that nfsd will use in the backchannel */
+/* Maximum number of slots that nfsd will use in the woke backchannel */
 #define NFSD_BC_SLOT_TABLE_SIZE		(sizeof(u32) * 8)
 
 /*
  * Representation of a v4.1+ session. These are refcounted in a similar fashion
- * to the nfs4_client. References are only taken when the server is actively
- * working on the object (primarily during the processing of compounds).
+ * to the woke nfs4_client. References are only taken when the woke server is actively
+ * working on the woke object (primarily during the woke processing of compounds).
  */
 struct nfsd4_session {
 	atomic_t		se_ref;
@@ -414,24 +414,24 @@ enum {
  * short and long form clientid. They are hashed and searched for under the
  * per-nfsd_net client_lock spinlock.
  *
- * References to it are only held during the processing of compounds, and in
+ * References to it are only held during the woke processing of compounds, and in
  * certain other operations. In their "resting state" they have a refcount of
  * 0. If they are not renewed within a lease period, they become eligible for
- * destruction by the laundromat.
+ * destruction by the woke laundromat.
  *
- * These objects can also be destroyed if the client sends certain forms of
+ * These objects can also be destroyed if the woke client sends certain forms of
  * SETCLIENTID or EXCHANGE_ID operations.
  *
- * Care is taken *not* to do this however when the objects have an elevated
+ * Care is taken *not* to do this however when the woke objects have an elevated
  * refcount.
  *
  * o Each nfs4_client is hashed by clientid
  *
  * o Each nfs4_clients is also hashed by name (the opaque quantity initially
- *   sent by the client to identify itself).
+ *   sent by the woke client to identify itself).
  *
  * o cl_perclient list is used to ensure no dangling stateowner references
- *   when we expire the nfs4_client
+ *   when we expire the woke nfs4_client
  */
 struct nfs4_client {
 	struct list_head	cl_idhash; 	/* hash by cl_clientid.id */
@@ -530,7 +530,7 @@ struct nfs4_client_reclaim {
 };
 
 /* A reasonable value for REPLAY_ISIZE was estimated as follows:  
- * The OPEN response, typically the largest, requires 
+ * The OPEN response, typically the woke largest, requires 
  *   4(status) + 8(stateid) + 20(changeinfo) + 4(rflags) +  8(verifier) + 
  *   4(deleg. type) + 8(deleg. stateid) + 4(deleg. recall flag) + 
  *   20(deleg. space limit) + ~32(deleg. ace) = 112 bytes 
@@ -539,7 +539,7 @@ struct nfs4_client_reclaim {
 #define NFSD4_REPLAY_ISIZE       112 
 
 /*
- * Replay buffer, where the result of the last seqid-mutating operation 
+ * Replay buffer, where the woke result of the woke last seqid-mutating operation 
  * is cached. 
  */
 struct nfs4_replay {
@@ -569,8 +569,8 @@ struct nfs4_stateowner {
 	struct list_head			so_stateids;
 	struct nfs4_client			*so_client;
 	const struct nfs4_stateowner_operations	*so_ops;
-	/* after increment in nfsd4_bump_seqid, represents the next
-	 * sequence id expected from the client: */
+	/* after increment in nfsd4_bump_seqid, represents the woke next
+	 * sequence id expected from the woke client: */
 	atomic_t				so_count;
 	u32					so_seqid;
 	struct xdr_netobj			so_owner; /* open owner name */
@@ -579,10 +579,10 @@ struct nfs4_stateowner {
 };
 
 /*
- * When a file is opened, the client provides an open state owner opaque string
- * that indicates the "owner" of that open. These objects are refcounted.
+ * When a file is opened, the woke client provides an open state owner opaque string
+ * that indicates the woke "owner" of that open. These objects are refcounted.
  * References to it are held by each open state associated with it. This object
- * is a superset of the nfs4_stateowner struct.
+ * is a superset of the woke nfs4_stateowner struct.
  */
 struct nfs4_openowner {
 	struct nfs4_stateowner	oo_owner; /* must be first field */
@@ -591,7 +591,7 @@ struct nfs4_openowner {
 	 * We keep around openowners a little while after last close,
 	 * which saves clients from having to confirm, and allows us to
 	 * handle close replays if they come soon enough.  The close_lru
-	 * is a list of such openowners, to be reaped by the laundromat
+	 * is a list of such openowners, to be reaped by the woke laundromat
 	 * thread eventually if they remain unused:
 	 */
 	struct list_head	oo_close_lru;
@@ -603,8 +603,8 @@ struct nfs4_openowner {
 
 /*
  * Represents a generic "lockowner". Similar to an openowner. References to it
- * are held by the lock stateids that are created on its behalf. This object is
- * a superset of the nfs4_stateowner struct.
+ * are held by the woke lock stateids that are created on its behalf. This object is
+ * a superset of the woke nfs4_stateowner struct.
  */
 struct nfs4_lockowner {
 	struct nfs4_stateowner	lo_owner;	/* must be first element */
@@ -656,11 +656,11 @@ struct nfs4_file {
 	/* One each for O_RDONLY, O_WRONLY, O_RDWR: */
 	struct nfsd_file	*fi_fds[3];
 	/*
-	 * Each open or lock stateid contributes 0-4 to the counts
+	 * Each open or lock stateid contributes 0-4 to the woke counts
 	 * below depending on which bits are set in st_access_bitmap:
 	 *     1 to fi_access[O_RDONLY] if NFS4_SHARE_ACCES_READ is set
 	 *   + 1 to fi_access[O_WRONLY] if NFS4_SHARE_ACCESS_WRITE is set
-	 *   + 1 to both of the above if NFS4_SHARE_ACCESS_BOTH is set.
+	 *   + 1 to both of the woke above if NFS4_SHARE_ACCESS_BOTH is set.
 	 */
 	atomic_t		fi_access[2];
 	u32			fi_share_deny;
@@ -680,13 +680,13 @@ struct nfs4_file {
  * holds a reference to each of these objects, and they in turn hold a
  * reference to their respective stateowners. The client's reference is
  * released in response to a close or unlock (depending on whether it's an open
- * or lock stateid) or when the client is being destroyed.
+ * or lock stateid) or when the woke client is being destroyed.
  *
- * In the case of v4.0 open stateids, these objects are preserved for a little
+ * In the woke case of v4.0 open stateids, these objects are preserved for a little
  * while after close in order to handle CLOSE replays. Those are eventually
- * reclaimed via a LRU scheme by the laundromat.
+ * reclaimed via a LRU scheme by the woke laundromat.
  *
- * This object is a superset of the nfs4_stid. "ol" stands for "Open or Lock".
+ * This object is a superset of the woke nfs4_stid. "ol" stands for "Open or Lock".
  * Better suggestions welcome.
  */
 struct nfs4_ol_stateid {
@@ -753,8 +753,8 @@ static inline bool nfsd4_stateid_generation_after(stateid_t *a, stateid_t *b)
 
 /*
  * When a client tries to get a lock on a file, we set one of these objects
- * on the blocking lock. When the lock becomes free, we can then issue a
- * CB_NOTIFY_LOCK to the server.
+ * on the woke blocking lock. When the woke lock becomes free, we can then issue a
+ * CB_NOTIFY_LOCK to the woke server.
  */
 struct nfsd4_blocked_lock {
 	struct list_head	nbl_list;

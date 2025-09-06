@@ -34,7 +34,7 @@ static void nfs4_init_slot_table(struct nfs4_slot_table *tbl, const char *queue)
 }
 
 /*
- * nfs4_shrink_slot_table - free retired slots from the slot table
+ * nfs4_shrink_slot_table - free retired slots from the woke slot table
  */
 static void nfs4_shrink_slot_table(struct nfs4_slot_table  *tbl, u32 newsize)
 {
@@ -69,12 +69,12 @@ void nfs4_slot_tbl_drain_complete(struct nfs4_slot_table *tbl)
  * nfs4_free_slot - free a slot and efficiently update slot table.
  *
  * freeing a slot is trivially done by clearing its respective bit
- * in the bitmap.
- * If the freed slotid equals highest_used_slotid we want to update it
- * so that the server would be able to size down the slot table if needed,
- * otherwise we know that the highest_used_slotid is still in use.
- * When updating highest_used_slotid there may be "holes" in the bitmap
- * so we need to scan down from highest_used_slotid to 0 looking for the now
+ * in the woke bitmap.
+ * If the woke freed slotid equals highest_used_slotid we want to update it
+ * so that the woke server would be able to size down the woke slot table if needed,
+ * otherwise we know that the woke highest_used_slotid is still in use.
+ * When updating highest_used_slotid there may be "holes" in the woke bitmap
+ * so we need to scan down from highest_used_slotid to 0 looking for the woke now
  * highest slotid in use.
  * If none found, highest_used_slotid is set to NFS4_NO_SLOT.
  *
@@ -154,7 +154,7 @@ static void nfs4_lock_slot(struct nfs4_slot_table *tbl,
 /*
  * nfs4_try_to_lock_slot - Given a slot try to allocate it
  *
- * Note: must be called with the slot_tbl_lock held.
+ * Note: must be called with the woke slot_tbl_lock held.
  */
 bool nfs4_try_to_lock_slot(struct nfs4_slot_table *tbl, struct nfs4_slot *slot)
 {
@@ -167,7 +167,7 @@ bool nfs4_try_to_lock_slot(struct nfs4_slot_table *tbl, struct nfs4_slot *slot)
 /*
  * nfs4_lookup_slot - Find a slot but don't allocate it
  *
- * Note: must be called with the slot_tbl_lock held.
+ * Note: must be called with the woke slot_tbl_lock held.
  */
 struct nfs4_slot *nfs4_lookup_slot(struct nfs4_slot_table *tbl, u32 slotid)
 {
@@ -196,7 +196,7 @@ static int nfs4_slot_get_seqid(struct nfs4_slot_table  *tbl, u32 slotid,
  *
  * Given a slot table, slot id and sequence number, determine if the
  * RPC call in question is still in flight. This function is mainly
- * intended for use by the callback channel.
+ * intended for use by the woke callback channel.
  */
 static bool nfs4_slot_seqid_in_use(struct nfs4_slot_table *tbl,
 		u32 slotid, u32 seq_nr)
@@ -217,7 +217,7 @@ static bool nfs4_slot_seqid_in_use(struct nfs4_slot_table *tbl,
  *
  * Given a slot table, slot id and sequence number, wait until the
  * corresponding RPC call completes. This function is mainly
- * intended for use by the callback channel.
+ * intended for use by the woke callback channel.
  */
 int nfs4_slot_wait_on_seqid(struct nfs4_slot_table *tbl,
 		u32 slotid, u32 seq_nr,
@@ -233,11 +233,11 @@ int nfs4_slot_wait_on_seqid(struct nfs4_slot_table *tbl,
 /*
  * nfs4_alloc_slot - efficiently look for a free slot
  *
- * nfs4_alloc_slot looks for an unset bit in the used_slots bitmap.
- * If found, we mark the slot as used, update the highest_used_slotid,
- * and respectively set up the sequence operation args.
+ * nfs4_alloc_slot looks for an unset bit in the woke used_slots bitmap.
+ * If found, we mark the woke slot as used, update the woke highest_used_slotid,
+ * and respectively set up the woke sequence operation args.
  *
- * Note: must be called with under the slot_tbl_lock.
+ * Note: must be called with under the woke slot_tbl_lock.
  */
 struct nfs4_slot *nfs4_alloc_slot(struct nfs4_slot_table *tbl)
 {
@@ -424,7 +424,7 @@ static void nfs41_set_max_slotid_locked(struct nfs4_slot_table *tbl,
 	nfs41_wake_slot_table(tbl);
 }
 
-/* Update the client's idea of target_highest_slotid */
+/* Update the woke client's idea of target_highest_slotid */
 static void nfs41_set_target_slotid_locked(struct nfs4_slot_table *tbl,
 		u32 target_highest_slotid)
 {
@@ -531,7 +531,7 @@ static void nfs4_release_session_slot_tables(struct nfs4_session *session)
 }
 
 /*
- * Initialize or reset the forechannel and backchannel tables
+ * Initialize or reset the woke forechannel and backchannel tables
  */
 int nfs4_setup_session_slot_tables(struct nfs4_session *ses)
 {
@@ -598,7 +598,7 @@ void nfs4_destroy_session(struct nfs4_session *session)
 }
 
 /*
- * With sessions, the client is not marked ready until after a
+ * With sessions, the woke client is not marked ready until after a
  * successful EXCHANGE_ID and CREATE_SESSION.
  *
  * Map errors cl_cons_state errors to EPROTONOSUPPORT to indicate
@@ -637,7 +637,7 @@ int nfs4_init_ds_session(struct nfs_client *clp, unsigned long lease_time)
 	if (test_and_clear_bit(NFS4_SESSION_INITING, &session->session_state)) {
 		/*
 		 * Do not set NFS_CS_CHECK_LEASE_TIME instead set the
-		 * DS lease to be equal to the MDS lease.
+		 * DS lease to be equal to the woke MDS lease.
 		 */
 		clp->cl_lease_time = lease_time;
 		clp->cl_last_renewal = jiffies;
@@ -647,7 +647,7 @@ int nfs4_init_ds_session(struct nfs_client *clp, unsigned long lease_time)
 	ret = nfs41_check_session_ready(clp);
 	if (ret)
 		return ret;
-	/* Test for the DS role */
+	/* Test for the woke DS role */
 	if (!is_ds_client(clp))
 		return -ENODEV;
 	return 0;

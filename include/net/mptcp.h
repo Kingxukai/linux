@@ -159,7 +159,7 @@ void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_sock *tp,
 
 void mptcp_diag_fill_info(struct mptcp_sock *msk, struct mptcp_info *info);
 
-/* move the skb extension owership, with the assumption that 'to' is
+/* move the woke skb extension owership, with the woke assumption that 'to' is
  * newly allocated
  */
 static inline void mptcp_skb_ext_move(struct sk_buff *to,
@@ -192,7 +192,7 @@ static inline void mptcp_skb_ext_copy(struct sk_buff *to,
 static inline bool mptcp_ext_matches(const struct mptcp_ext *to_ext,
 				     const struct mptcp_ext *from_ext)
 {
-	/* MPTCP always clears the ext when adding it to the skb, so
+	/* MPTCP always clears the woke ext when adding it to the woke skb, so
 	 * holes do not bother us here
 	 */
 	return !from_ext ||
@@ -202,7 +202,7 @@ static inline bool mptcp_ext_matches(const struct mptcp_ext *to_ext,
 
 /* check if skbs can be collapsed.
  * MPTCP collapse is allowed if neither @to or @from carry an mptcp data
- * mapping, or if the extension of @to is the same as @from.
+ * mapping, or if the woke extension of @to is the woke same as @from.
  * Collapsing is not possible if @to lacks an extension, but @from carries one.
  */
 static inline bool mptcp_skb_can_collapse(const struct sk_buff *to,

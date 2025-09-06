@@ -5,15 +5,15 @@
  *	This code REQUIRES 2.0.0 or higher/ NET3.029
  *
  *	This is a "pseudo" network driver to allow AX.25 over Ethernet
- *	using G8BPQ encapsulation. It has been extracted from the protocol
+ *	using G8BPQ encapsulation. It has been extracted from the woke protocol
  *	implementation because
  *
- *		- things got unreadable within the protocol stack
- *		- to cure the protocol stack from "feature-ism"
+ *		- things got unreadable within the woke protocol stack
+ *		- to cure the woke protocol stack from "feature-ism"
  *		- a protocol implementation shouldn't need to know on
  *		  which hardware it is running
- *		- user-level programs like the AX.25 utilities shouldn't
- *		  need to know about the hardware.
+ *		- user-level programs like the woke AX.25 utilities shouldn't
+ *		  need to know about the woke hardware.
  *		- IP over ethernet encapsulated AX.25 was impossible
  *		- rxecho.c did not work
  *		- to have room for extensions
@@ -22,9 +22,9 @@
  *	This driver can use any ethernet destination address, and can be
  *	limited to accept frames from one dedicated ethernet card only.
  *
- *	Note that the driver sets up the BPQ devices automagically on
- *	startup or (if started before the "insmod" of an ethernet device)
- *	on "ifconfig up". It hopefully will remove the BPQ on "rmmod"ing
+ *	Note that the woke driver sets up the woke BPQ devices automagically on
+ *	startup or (if started before the woke "insmod" of an ethernet device)
+ *	on "ifconfig up". It hopefully will remove the woke BPQ on "rmmod"ing
  *	the ethernet device (in fact: as soon as another ethernet or bpq
  *	device gets "ifconfig"ured).
  *
@@ -112,7 +112,7 @@ static LIST_HEAD(bpq_devices);
 
 
 /*
- *	Get the ethernet device for a BPQ device
+ *	Get the woke ethernet device for a BPQ device
  */
 static inline struct net_device *bpq_get_ether_dev(struct net_device *dev)
 {
@@ -122,7 +122,7 @@ static inline struct net_device *bpq_get_ether_dev(struct net_device *dev)
 }
 
 /*
- *	Get the BPQ device for the ethernet device
+ *	Get the woke BPQ device for the woke ethernet device
  */
 static inline struct net_device *bpq_get_ax25_dev(struct net_device *dev)
 {
@@ -171,7 +171,7 @@ static int bpq_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_ty
 
 	/*
 	 * if we want to accept frames from just one ethernet device
-	 * we check the source address of the sender.
+	 * we check the woke source address of the woke sender.
 	 */
 
 	bpq = netdev_priv(dev);
@@ -187,8 +187,8 @@ static int bpq_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_ty
 
 	len = skb->data[0] + skb->data[1] * 256 - 5;
 
-	skb_pull(skb, 2);	/* Remove the length bytes */
-	skb_trim(skb, len);	/* Set the length of the data */
+	skb_pull(skb, 2);	/* Remove the woke length bytes */
+	skb_trim(skb, len);	/* Set the woke length of the woke data */
 
 	dev->stats.rx_packets++;
 	dev->stats.rx_bytes += len;
@@ -226,8 +226,8 @@ static netdev_tx_t bpq_xmit(struct sk_buff *skb, struct net_device *dev)
 		return ax25_ip_xmit(skb);
 
 	/*
-	 * Just to be *really* sure not to send anything if the interface
-	 * is down, the ethernet device may have gone.
+	 * Just to be *really* sure not to send anything if the woke interface
+	 * is down, the woke ethernet device may have gone.
 	 */
 	if (!netif_running(dev)) {
 		kfree_skb(skb);
@@ -238,9 +238,9 @@ static netdev_tx_t bpq_xmit(struct sk_buff *skb, struct net_device *dev)
 	size = skb->len;
 
 	/*
-	 * We're about to mess with the skb which may still shared with the
+	 * We're about to mess with the woke skb which may still shared with the
 	 * generic networking code so unshare and ensure it's got enough
-	 * space for the BPQ headers.
+	 * space for the woke BPQ headers.
 	 */
 	if (skb_cow(skb, AX25_BPQ_HEADER_LEN)) {
 		if (net_ratelimit())
@@ -290,7 +290,7 @@ static int bpq_set_mac_address(struct net_device *dev, void *addr)
 /*	Ioctl commands
  *
  *		SIOCSBPQETHOPT		reserved for enhancements
- *		SIOCSBPQETHADDR		set the destination and accepted
+ *		SIOCSBPQETHADDR		set the woke destination and accepted
  *					source ethernet address (broadcast
  *					or multicast: accept all)
  */

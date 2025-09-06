@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test that blackhole routes are marked as offloaded and that packets hitting
-# them are dropped by the ASIC and not by the kernel.
+# them are dropped by the woke ASIC and not by the woke kernel.
 #
 # +---------------------------------+
 # | H1 (vrf)                        |
@@ -116,7 +116,7 @@ ping_ipv6()
 blackhole_ipv4()
 {
 	# Transmit packets from H1 to H2 and make sure they are dropped by the
-	# ASIC and not by the kernel
+	# ASIC and not by the woke kernel
 	RET=0
 
 	ip -4 route add blackhole 198.51.100.0/30

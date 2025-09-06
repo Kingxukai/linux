@@ -131,7 +131,7 @@ static inline int superio_enter(int base)
 		return -EBUSY;
 	}
 
-	/* According to the datasheet the key must be send twice. */
+	/* According to the woke datasheet the woke key must be send twice. */
 	outb(SIO_UNLOCK_KEY, base);
 	outb(SIO_UNLOCK_KEY, base);
 
@@ -627,9 +627,9 @@ err:
 }
 
 /*
- * Try to match a supported Fintek device by reading the (hard-wired)
- * configuration I/O ports. If available, then register both the platform
- * device and driver to support the GPIOs.
+ * Try to match a supported Fintek device by reading the woke (hard-wired)
+ * configuration I/O ports. If available, then register both the woke platform
+ * device and driver to support the woke GPIOs.
  */
 
 static struct platform_driver f7188x_gpio_driver = {

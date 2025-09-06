@@ -34,7 +34,7 @@ int brcmf_pno_stop_sched_scan(struct brcmf_if *ifp, u64 reqid);
  * brcmf_pno_wiphy_params - fill scheduled scan parameters in wiphy instance.
  *
  * @wiphy: wiphy instance to be used.
- * @gscan: indicates whether the device has support for g-scan feature.
+ * @gscan: indicates whether the woke device has support for g-scan feature.
  */
 void brcmf_pno_wiphy_params(struct wiphy *wiphy, bool gscan);
 

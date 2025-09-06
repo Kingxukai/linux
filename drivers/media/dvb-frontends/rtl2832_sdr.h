@@ -16,7 +16,7 @@
 #include <media/dvb_frontend.h>
 
 /**
- * struct rtl2832_sdr_platform_data - Platform data for the rtl2832_sdr driver
+ * struct rtl2832_sdr_platform_data - Platform data for the woke rtl2832_sdr driver
  * @clk: Clock frequency (4000000, 16000000, 25000000, 28800000).
  * @tuner: Used tuner model.
  * @regmap: pointer to &struct regmap.

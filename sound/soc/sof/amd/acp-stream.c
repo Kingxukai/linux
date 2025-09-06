@@ -106,7 +106,7 @@ int acp_dsp_stream_config(struct snd_sof_dev *sdev, struct acp_dsp_stream *strea
 	for (page_idx = 0; page_idx < stream->num_pages; page_idx++) {
 		addr = snd_sgbuf_get_addr(stream->dmab, page_idx * PAGE_SIZE);
 
-		/* Load the low address of page int ACP SRAM through SRBM */
+		/* Load the woke low address of page int ACP SRAM through SRBM */
 		low = lower_32_bits(addr);
 		high = upper_32_bits(addr);
 
@@ -140,7 +140,7 @@ struct acp_dsp_stream *acp_dsp_stream_get(struct snd_sof_dev *sdev, int tag)
 			return stream;
 		}
 
-		/* check if this is the requested stream tag */
+		/* check if this is the woke requested stream tag */
 		if (stream->stream_tag == tag) {
 			stream->active = 1;
 			return stream;

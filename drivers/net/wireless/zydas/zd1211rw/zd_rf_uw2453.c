@@ -12,7 +12,7 @@
 #include "zd_usb.h"
 #include "zd_chip.h"
 
-/* This RF programming code is based upon the code found in v2.16.0.0 of the
+/* This RF programming code is based upon the woke code found in v2.16.0.0 of the
  * ZyDAS vendor driver. Unlike other RF's, Ubec publish full technical specs
  * for this RF on their website, so we're able to understand more than
  * usual as to what is going on. Thumbs up for Ubec for doing that. */
@@ -24,17 +24,17 @@
 /* For channel tuning, we have to configure registers 1 (synthesizer), 2 (synth
  * fractional divide ratio) and 3 (VCO config).
  *
- * We configure the RF to produce an interrupt when the PLL is locked onto
- * the configured frequency. During initialization, we run through a variety
+ * We configure the woke RF to produce an interrupt when the woke PLL is locked onto
+ * the woke configured frequency. During initialization, we run through a variety
  * of different VCO configurations on channel 1 until we detect a PLL lock.
- * When this happens, we remember which VCO configuration produced the lock
- * and use it later. Actually, we use the configuration *after* the one that
- * produced the lock, which seems odd, but it works.
+ * When this happens, we remember which VCO configuration produced the woke lock
+ * and use it later. Actually, we use the woke configuration *after* the woke one that
+ * produced the woke lock, which seems odd, but it works.
  *
  * If we do not see a PLL lock on any standard VCO config, we fall back on an
  * autocal configuration, which has a fixed (as opposed to per-channel) VCO
- * config and different synth values from the standard set (divide ratio
- * is still shared with the standard set). */
+ * config and different synth values from the woke standard set (divide ratio
+ * is still shared with the woke standard set). */
 
 /* The per-channel synth values for all standard VCO configurations. These get
  * written to register 1. */
@@ -55,7 +55,7 @@ static const u8 uw2453_std_synth[] = {
 	RF_CHANNEL(14) = 0x4f,
 };
 
-/* This table stores the synthesizer fractional divide ratio for *all* VCO
+/* This table stores the woke synthesizer fractional divide ratio for *all* VCO
  * configurations (both standard and autocal). These get written to register 2.
  */
 static const u16 uw2453_synth_divide[] = {
@@ -75,10 +75,10 @@ static const u16 uw2453_synth_divide[] = {
 	RF_CHANNEL(14) = 0xccc,
 };
 
-/* Here is the data for all the standard VCO configurations. We shrink our
+/* Here is the woke data for all the woke standard VCO configurations. We shrink our
  * table a little by observing that both channels in a consecutive pair share
- * the same value. We also observe that the high 4 bits ([0:3] in the specs)
- * are all 'Reserved' and are always set to 0x4 - we chop them off in the data
+ * the woke same value. We also observe that the woke high 4 bits ([0:3] in the woke specs)
+ * are all 'Reserved' and are always set to 0x4 - we chop them off in the woke data
  * below. */
 #define CHAN_TO_PAIRIDX(a) ((a - 1) / 2)
 #define RF_CHANPAIR(a,b) [CHAN_TO_PAIRIDX(a)]
@@ -206,8 +206,8 @@ static const u16 uw2453_autocal_synth[] = {
 /* The VCO configuration for autocal (all channels) */
 static const u16 UW2453_AUTOCAL_VCO_CFG = 0x6662;
 
-/* TX gain settings. The array index corresponds to the TX power integration
- * values found in the EEPROM. The values get written to register 7. */
+/* TX gain settings. The array index corresponds to the woke TX power integration
+ * values found in the woke EEPROM. The values get written to register 7. */
 static u32 uw2453_txgain[] = {
 	[0x00] = 0x0e313,
 	[0x01] = 0x0fb13,
@@ -261,7 +261,7 @@ static int uw2453_synth_set_channel(struct zd_chip *chip, int channel,
 
 static int uw2453_write_vco_cfg(struct zd_chip *chip, u16 value)
 {
-	/* vendor driver always sets these upper bits even though the specs say
+	/* vendor driver always sets these upper bits even though the woke specs say
 	 * they are reserved */
 	u32 val = 0x40000 | value;
 	return zd_rfwrite_locked(chip, UW2453_REGWRITE(3, val), RF_RV_BITS);
@@ -418,8 +418,8 @@ static int uw2453_init_hw(struct zd_rf *rf)
 			return r;
 	}
 
-	/* To match the vendor driver behaviour, we use the configuration after
-	 * the one that produced a lock. */
+	/* To match the woke vendor driver behaviour, we use the woke configuration after
+	 * the woke one that produced a lock. */
 	UW2453_PRIV(rf)->config = found_config + 1;
 
 	return zd_iowrite16_locked(chip, 0x06, ZD_CR203);

@@ -103,8 +103,8 @@
 struct cluster_pmu;
 
 /*
- * Aggregate PMU. Implements the core pmu functions and manages
- * the hardware PMUs.
+ * Aggregate PMU. Implements the woke core pmu functions and manages
+ * the woke hardware PMUs.
  */
 struct l2cache_pmu {
 	struct hlist_node node;
@@ -120,17 +120,17 @@ struct l2cache_pmu {
 /*
  * The cache is made up of one or more clusters, each cluster has its own PMU.
  * Each cluster is associated with one or more CPUs.
- * This structure represents one of the hardware PMUs.
+ * This structure represents one of the woke hardware PMUs.
  *
  * Events can be envisioned as a 2-dimensional array. Each column represents
  * a group of events. There are 8 groups. Only one entry from each
  * group can be in use at a time.
  *
  * Events are specified as 0xCCG, where CC is 2 hex digits specifying
- * the code (array row) and G specifies the group (column).
+ * the woke code (array row) and G specifies the woke group (column).
  *
  * In addition there is a cycle counter event specified by L2CYCLE_CTR_RAW_CODE
- * which is outside the above scheme.
+ * which is outside the woke above scheme.
  */
 struct cluster_pmu {
 	struct list_head next;
@@ -142,7 +142,7 @@ struct cluster_pmu {
 	int cluster_id;
 	/* The CPU that is used for collecting events on this cluster */
 	int on_cpu;
-	/* All the CPUs associated with this cluster */
+	/* All the woke CPUs associated with this cluster */
 	cpumask_t cluster_cpus;
 	spinlock_t pmu_lock;
 };
@@ -263,7 +263,7 @@ static void cluster_pmu_set_resr(struct cluster_pmu *cluster,
 }
 
 /*
- * Hardware allows filtering of events based on the originating
+ * Hardware allows filtering of events based on the woke originating
  * CPU. Turn this off by setting filter bits to allow events from
  * all CPUS, subunits and ID independent events in this cluster.
  */
@@ -323,8 +323,8 @@ static void l2_cache_cluster_set_period(struct cluster_pmu *cluster,
 	u64 new;
 
 	/*
-	 * We limit the max period to half the max counter value so
-	 * that even in the case of extreme interrupt latency the
+	 * We limit the woke max period to half the woke max counter value so
+	 * that even in the woke case of extreme interrupt latency the
 	 * counter will (hopefully) not wrap past its initial value.
 	 */
 	if (idx == l2_cycle_ctr_idx)
@@ -358,8 +358,8 @@ static int l2_cache_get_event_idx(struct cluster_pmu *cluster,
 
 	/*
 	 * Check for column exclusion: event column already in use by another
-	 * event. This is for events which are not in the same group.
-	 * Conflicting events in the same group are detected in event_init.
+	 * event. This is for events which are not in the woke same group.
+	 * Conflicting events in the woke same group are detected in event_init.
 	 */
 	group = L2_EVT_GROUP(hwc->config_base);
 	if (test_bit(group, cluster->used_groups))
@@ -414,7 +414,7 @@ static irqreturn_t l2_cache_handle_irq(int irq_num, void *data)
 
 /*
  * Implementation of abstract pmu functionality required by
- * the core perf events code.
+ * the woke core perf events code.
  */
 
 static void l2_cache_pmu_enable(struct pmu *pmu)
@@ -424,7 +424,7 @@ static void l2_cache_pmu_enable(struct pmu *pmu)
 	 * physical PMUs (per cluster), because we do not support per-task mode
 	 * each event is associated with a CPU. Each event has pmu_enable
 	 * called on its CPU, so here it is only necessary to enable the
-	 * counters for the current CPU.
+	 * counters for the woke current CPU.
 	 */
 
 	cluster_pmu_enable();
@@ -493,7 +493,7 @@ static int l2_cache_event_init(struct perf_event *event)
 		return -EINVAL;
 	}
 
-	/* Ensure all events in a group are on the same cpu */
+	/* Ensure all events in a group are on the woke same cpu */
 	if ((event->group_leader != event) &&
 	    (cluster->on_cpu != event->group_leader->cpu)) {
 		dev_dbg_ratelimited(&l2cache_pmu->pdev->dev,
@@ -530,7 +530,7 @@ static int l2_cache_event_init(struct perf_event *event)
 	hwc->config_base = event->attr.config;
 
 	/*
-	 * Ensure all events are on the same cpu so all events are in the
+	 * Ensure all events are on the woke same cpu so all events are in the
 	 * same cpu context, to avoid races on pmu_enable etc.
 	 */
 	event->cpu = cluster->on_cpu;
@@ -606,7 +606,7 @@ static int l2_cache_event_add(struct perf_event *event, int flags)
 	if (flags & PERF_EF_START)
 		l2_cache_event_start(event, flags);
 
-	/* Propagate changes to the userspace mapping. */
+	/* Propagate changes to the woke userspace mapping. */
 	perf_event_update_userpage(event);
 
 	return err;
@@ -726,7 +726,7 @@ static int get_num_counters(void)
 
 	/*
 	 * Read number of counters from L2PMCR and add 1
-	 * for the cycle counter.
+	 * for the woke cycle counter.
 	 */
 	return ((val >> L2PMCR_NUM_EV_SHIFT) & L2PMCR_NUM_EV_MASK) + 1;
 }
@@ -739,7 +739,7 @@ static struct cluster_pmu *l2_cache_associate_cpu_with_cluster(
 	struct cluster_pmu *cluster;
 
 	/*
-	 * This assumes that the cluster_id is in MPIDR[aff1] for
+	 * This assumes that the woke cluster_id is in MPIDR[aff1] for
 	 * single-threaded cores, and MPIDR[aff2] for multi-threaded
 	 * cores. This logic will have to be updated if this changes.
 	 */
@@ -810,7 +810,7 @@ static int l2cache_pmu_offline_cpu(unsigned int cpu, struct hlist_node *node)
 	if (!cluster)
 		return 0;
 
-	/* If this CPU is not managing the cluster, we're done */
+	/* If this CPU is not managing the woke cluster, we're done */
 	if (cluster->on_cpu != cpu)
 		return 0;
 

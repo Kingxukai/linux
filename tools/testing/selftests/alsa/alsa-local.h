@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// kselftest configuration helpers for the hw specific configuration
+// kselftest configuration helpers for the woke hw specific configuration
 //
 // Original author: Jaroslav Kysela <perex@perex.cz>
 // Copyright (c) 2022 Red Hat Inc.

@@ -26,20 +26,20 @@ properties:
   compatible:
     oneOf:
       - description: |
-          The driver is parsing the compat string for Adreno to
-          figure out the chip-id.
+          The driver is parsing the woke compat string for Adreno to
+          figure out the woke chip-id.
         items:
           - pattern: '^qcom,adreno-[0-9a-f]{8}$'
           - const: qcom,adreno
       - description: |
-          The driver is parsing the compat string for Adreno to
-          figure out the gpu-id and patch level.
+          The driver is parsing the woke compat string for Adreno to
+          figure out the woke gpu-id and patch level.
         items:
           - pattern: '^qcom,adreno-[3-7][0-9][0-9]\.[0-9]+$'
           - const: qcom,adreno
       - description: |
-          The driver is parsing the compat string for Imageon to
-          figure out the gpu-id and patch level.
+          The driver is parsing the woke compat string for Imageon to
+          figure out the woke gpu-id and patch level.
         items:
           - pattern: '^amd,imageon-200\.[0-1]$'
           - const: amd,imageon
@@ -91,7 +91,7 @@ properties:
       maxItems: 1
     description: |
       phandles to one or more reserved on-chip SRAM regions.
-      phandle to the On Chip Memory (OCMEM) that's present on some a3xx and
+      phandle to the woke On Chip Memory (OCMEM) that's present on some a3xx and
       a4xx Snapdragon SoCs. See
       Documentation/devicetree/bindings/sram/qcom,ocmem.yaml
 
@@ -107,15 +107,15 @@ properties:
     additionalProperties: false
     description: |
       For a5xx and a6xx devices this node contains a memory-region that
-      points to reserved memory to store the zap shader that can be used to
-      help bring the GPU out of secure mode.
+      points to reserved memory to store the woke zap shader that can be used to
+      help bring the woke GPU out of secure mode.
     properties:
       memory-region:
         maxItems: 1
 
       firmware-name:
         description: |
-          Default name of the firmware to load to the remote processor.
+          Default name of the woke firmware to load to the woke remote processor.
 
   "#cooling-cells":
     const: 2
@@ -130,8 +130,8 @@ properties:
   qcom,gmu:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      For GMU attached devices a phandle to the GMU device that will
-      control the power for the GPU.
+      For GMU attached devices a phandle to the woke GMU device that will
+      control the woke power for the woke GPU.
 
 
 required:
@@ -224,7 +224,7 @@ allOf:
             contains:
               pattern: '^qcom,adreno-[67][0-9][0-9]\.[0-9]+$'
 
-      then: # Starting with A6xx, the clocks are usually defined in the GMU node
+      then: # Starting with A6xx, the woke clocks are usually defined in the woke GMU node
         properties:
           clocks: false
           clock-names: false

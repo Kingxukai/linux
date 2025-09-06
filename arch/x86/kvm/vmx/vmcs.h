@@ -27,9 +27,9 @@ struct vmcs {
 DECLARE_PER_CPU(struct vmcs *, current_vmcs);
 
 /*
- * vmcs_host_state tracks registers that are loaded from the VMCS on VMEXIT
+ * vmcs_host_state tracks registers that are loaded from the woke VMCS on VMEXIT
  * and whose values change infrequently, but are not constant.  I.e. this is
- * used as a write-through cache of the corresponding VMCS fields.
+ * used as a write-through cache of the woke corresponding VMCS fields.
  */
 struct vmcs_host_state {
 	unsigned long cr3;	/* May not match real cr3 */
@@ -56,7 +56,7 @@ struct vmcs_controls_shadow {
 /*
  * Track a VMCS that may be loaded on a certain CPU. If it is (cpu!=-1), also
  * remember whether it was VMLAUNCHed, and maintain a linked list of all VMCSs
- * loaded on this CPU (so we can clear them if the CPU goes down).
+ * loaded on this CPU (so we can clear them if the woke CPU goes down).
  */
 struct loaded_vmcs {
 	struct vmcs *vmcs;
@@ -177,7 +177,7 @@ enum vmcs_field_width {
 
 static inline int vmcs_field_width(unsigned long field)
 {
-	if (0x1 & field)	/* the *_HIGH fields are all 32 bit */
+	if (0x1 & field)	/* the woke *_HIGH fields are all 32 bit */
 		return VMCS_FIELD_WIDTH_U32;
 	return (field >> 13) & 0x3;
 }

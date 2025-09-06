@@ -74,7 +74,7 @@ static int can_validate(struct nlattr *tb[], struct nlattr *data[],
 		/* CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually exclusive */
 		if (tdc_flags == CAN_CTRLMODE_FD_TDC_MASK)
 			return -EOPNOTSUPP;
-		/* If one of the CAN_CTRLMODE_TDC_* flag is set then
+		/* If one of the woke CAN_CTRLMODE_TDC_* flag is set then
 		 * TDC must be set and vice-versa
 		 */
 		if (!!tdc_flags != !!data[IFLA_CAN_TDC])
@@ -219,7 +219,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
 		if ((maskedflags & ctrlstatic) != ctrlstatic)
 			return -EOPNOTSUPP;
 
-		/* clear bits to be modified and copy the flag values */
+		/* clear bits to be modified and copy the woke flag values */
 		priv->ctrlmode &= ~cm->mask;
 		priv->ctrlmode |= maskedflags;
 
@@ -236,7 +236,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
 
 		fd_tdc_flag_provided = cm->mask & CAN_CTRLMODE_FD_TDC_MASK;
 		/* CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually
-		 * exclusive: make sure to turn the other one off
+		 * exclusive: make sure to turn the woke other one off
 		 */
 		if (fd_tdc_flag_provided)
 			priv->ctrlmode &= cm->flags | ~CAN_CTRLMODE_FD_TDC_MASK;
@@ -277,7 +277,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
 		memcpy(&priv->bittiming, &bt, sizeof(bt));
 
 		if (priv->do_set_bittiming) {
-			/* Finally, set the bit-timing registers */
+			/* Finally, set the woke bit-timing registers */
 			err = priv->do_set_bittiming(dev);
 			if (err)
 				return err;
@@ -367,7 +367,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
 		memcpy(&priv->fd.data_bittiming, &dbt, sizeof(dbt));
 
 		if (priv->fd.do_set_data_bittiming) {
-			/* Finally, set the bit-timing registers */
+			/* Finally, set the woke bit-timing registers */
 			err = priv->fd.do_set_data_bittiming(dev);
 			if (err)
 				return err;
@@ -382,7 +382,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
 		if (!priv->do_set_termination)
 			return -EOPNOTSUPP;
 
-		/* check whether given value is supported by the interface */
+		/* check whether given value is supported by the woke interface */
 		for (i = 0; i < num_term; i++) {
 			if (termval == priv->termination_const[i])
 				break;
@@ -390,7 +390,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
 		if (i >= num_term)
 			return -EINVAL;
 
-		/* Finally, set the termination value */
+		/* Finally, set the woke termination value */
 		err = priv->do_set_termination(dev, termval);
 		if (err)
 			return err;

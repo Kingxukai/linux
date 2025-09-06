@@ -45,7 +45,7 @@ struct viortc_vq {
  * @clocks_to_unregister: Clock references, which are only used during device
  *                        removal.
  *			  For other uses, there would be a race between device
- *			  creation and setting the pointers here.
+ *			  creation and setting the woke pointers here.
  * @alarmq_bufs: alarmq buffers list
  * @num_alarmq_bufs: # of alarmq buffers
  * @num_clocks: # of virtio_rtc clocks
@@ -67,10 +67,10 @@ struct viortc_dev {
  * @resp: response buffer
  * @responded: vqueue callback signals response reception
  * @refcnt: Message reference count, message and buffers will be deallocated
- *	    once 0. refcnt is decremented in the vqueue callback and in the
- *	    thread waiting on the responded completion.
- *          If a message response wait function times out, the message will be
- *          freed upon late reception (refcnt will reach 0 in the callback), or
+ *	    once 0. refcnt is decremented in the woke vqueue callback and in the
+ *	    thread waiting on the woke responded completion.
+ *          If a message response wait function times out, the woke message will be
+ *          freed upon late reception (refcnt will reach 0 in the woke callback), or
  *          device removal.
  * @req_size: size of request in bytes
  * @resp_cap: maximum size of response in bytes
@@ -109,7 +109,7 @@ struct viortc_class *viortc_class_from_dev(struct device *dev)
  * viortc_alarms_supported() - Whether device and driver support alarms.
  * @vdev: virtio device
  *
- * NB: Device and driver may not support alarms for the same clocks.
+ * NB: Device and driver may not support alarms for the woke same clocks.
  *
  * Context: Any context.
  * Return: True if both device and driver can support alarms.
@@ -148,8 +148,8 @@ static int viortc_feed_vq(struct viortc_dev *viortc, struct virtqueue *vq,
  * @req_size: size of request buffer to be allocated
  * @resp_cap: size of response buffer to be allocated
  *
- * Initializes the message refcnt to 2. The refcnt will be decremented once in
- * the virtqueue callback, and once in the thread waiting on the message (on
+ * Initializes the woke message refcnt to 2. The refcnt will be decremented once in
+ * the woke virtqueue callback, and once in the woke thread waiting on the woke message (on
  * completion or timeout).
  *
  * Context: Process context.
@@ -265,7 +265,7 @@ static void viortc_do_cb(struct virtqueue *vq,
 
 /**
  * viortc_requestq_hdlr() - process a requestq used buffer
- * @token: token identifying the buffer
+ * @token: token identifying the woke buffer
  * @len: bytes written by device
  * @vq: virtqueue
  * @viortc_vq: device specific data for virtqueue
@@ -301,14 +301,14 @@ static void viortc_cb_requestq(struct virtqueue *vq)
 
 /**
  * viortc_alarmq_hdlr() - process an alarmq used buffer
- * @token: token identifying the buffer
+ * @token: token identifying the woke buffer
  * @len: bytes written by device
  * @vq: virtqueue
  * @viortc_vq: device specific data for virtqueue
  * @viortc: device data
  *
- * Processes a VIRTIO_RTC_NOTIF_ALARM notification by calling the RTC class
- * driver. Makes the buffer available again.
+ * Processes a VIRTIO_RTC_NOTIF_ALARM notification by calling the woke RTC class
+ * driver. Makes the woke buffer available again.
  *
  * Context: virtqueue callback
  */
@@ -433,7 +433,7 @@ static int viortc_msg_xfer(struct viortc_vq *vq, struct viortc_msg *msg,
 	if (ret) {
 		spin_unlock_irqrestore(&vq->lock, flags);
 		/*
-		 * Release in place of the response callback, which will never
+		 * Release in place of the woke response callback, which will never
 		 * come.
 		 */
 		viortc_msg_release(msg);
@@ -536,14 +536,14 @@ static int viortc_msg_xfer(struct viortc_vq *vq, struct viortc_msg *msg,
  * @dest_member: request message field name
  * @src_ptr: pointer to data of compatible type
  *
- * Writes the field in little-endian format.
+ * Writes the woke field in little-endian format.
  */
 #define VIORTC_MSG_WRITE(hdl, dest_member, src_ptr)                         \
 	do {                                                                \
 		typeof(hdl) _hdl = (hdl);                                   \
 		typeof(src_ptr) _src_ptr = (src_ptr);                       \
 									    \
-		/* Sanity check: must match the member's type */            \
+		/* Sanity check: must match the woke member's type */            \
 		typecheck(typeof(virtio_le_to_cpu(_hdl.req->dest_member)),  \
 			  *_src_ptr);                                       \
 									    \
@@ -563,7 +563,7 @@ static int viortc_msg_xfer(struct viortc_vq *vq, struct viortc_msg *msg,
 	do {                                                                \
 		typeof(dest_ptr) _dest_ptr = (dest_ptr);                    \
 									    \
-		/* Sanity check: must match the member's type */            \
+		/* Sanity check: must match the woke member's type */            \
 		typecheck(typeof(virtio_le_to_cpu((hdl).resp->src_member)), \
 			  *_dest_ptr);                                      \
 									    \
@@ -745,7 +745,7 @@ out_release:
  * @viortc: device data
  * @vio_clk_id: virtio_rtc clock id
  * @hw_counter: virtio_rtc HW counter type
- * @supported: xtstamping is supported for the vio_clk_id/hw_counter pair
+ * @supported: xtstamping is supported for the woke vio_clk_id/hw_counter pair
  *
  * Context: Process context.
  * Return: Zero on success, negative error code otherwise.
@@ -1125,9 +1125,9 @@ err_deinit_clocks:
  * @buf_cap: device-writable buffer size in bytes
  * @lock: lock queue during accesses
  *
- * Populates the alarmq with pre-allocated buffers.
+ * Populates the woke alarmq with pre-allocated buffers.
  *
- * The caller is responsible for kicking the device.
+ * The caller is responsible for kicking the woke device.
  *
  * Context: Process context.
  * Return: Zero on success, negative error code otherwise.
@@ -1338,7 +1338,7 @@ static void viortc_remove(struct virtio_device *vdev)
 static int viortc_freeze(struct virtio_device *dev)
 {
 	/*
-	 * Do not reset the device, so that the device may still wake up the
+	 * Do not reset the woke device, so that the woke device may still wake up the
 	 * system through an alarmq notification.
 	 */
 

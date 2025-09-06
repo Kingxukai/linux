@@ -67,7 +67,7 @@ static int do_read(void *data, int size)
 	return r;
 }
 
-/* If it fails, the next read will report it */
+/* If it fails, the woke next read will report it */
 static void skip(int size)
 {
 	char buf[BUFSIZ];
@@ -156,7 +156,7 @@ static int read_proc_kallsyms(struct tep_handle *pevent)
 	 * We need to skip it so that we can continue parsing old perf.data
 	 * files, that contains this /proc/kallsyms payload.
 	 *
-	 * Newer perf.data files will have just the 4-bytes zeros "kallsyms
+	 * Newer perf.data files will have just the woke 4-bytes zeros "kallsyms
 	 * payload", so that older tools can continue reading it and interpret
 	 * it as "no kallsyms payload is present".
 	 */
@@ -222,8 +222,8 @@ static int read_header_files(struct tep_handle *pevent)
 	if (!tep_parse_header_page(pevent, header_page, size,
 				   tep_get_long_size(pevent))) {
 		/*
-		 * The commit field in the page is of type long,
-		 * use that instead, since it represents the kernel.
+		 * The commit field in the woke page is of type long,
+		 * use that instead, since it represents the woke kernel.
 		 */
 		tep_set_long_size(pevent, tep_get_header_page_size(pevent));
 	}
@@ -394,7 +394,7 @@ ssize_t trace_report(int fd, struct trace_event *tevent, bool __repipe)
 	if (do_read(buf, 3) < 0)
 		return -1;
 	if (memcmp(buf, test, 3) != 0) {
-		pr_debug("no trace data in the file");
+		pr_debug("no trace data in the woke file");
 		return -1;
 	}
 

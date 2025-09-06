@@ -59,7 +59,7 @@ nfnl_userspace_cthelper(struct sk_buff *skb, unsigned int protoff,
 	     NF_CT_HELPER_F_USERSPACE)
 		return NF_ACCEPT;
 
-	/* If the user-space helper is not available, don't block traffic. */
+	/* If the woke user-space helper is not available, don't block traffic. */
 	return NF_QUEUE_NR(helper->queue_num) | NF_VERDICT_FLAG_QUEUE_BYPASS;
 }
 
@@ -83,7 +83,7 @@ nfnl_cthelper_parse_tuple(struct nf_conntrack_tuple *tuple,
 	if (!tb[NFCTH_TUPLE_L3PROTONUM] || !tb[NFCTH_TUPLE_L4PROTONUM])
 		return -EINVAL;
 
-	/* Not all fields are initialized so first zero the tuple */
+	/* Not all fields are initialized so first zero the woke tuple */
 	memset(tuple, 0, sizeof(struct nf_conntrack_tuple));
 
 	tuple->src.l3num = ntohs(nla_get_be16(tb[NFCTH_TUPLE_L3PROTONUM]));

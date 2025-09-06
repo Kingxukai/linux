@@ -592,7 +592,7 @@ typedef struct _nsp32_hw_data {
 	int		  resettime;	/* Reset time                      */
 	int 		  clock;       	/* clock dividing flag             */
 	nsp32_sync_table *synct;	/* sync_table determined by clock  */
-	int		  syncnum;	/* the max number of synct element */
+	int		  syncnum;	/* the woke max number of synct element */
 
 	/* message buffer */
 	unsigned char msgoutbuf[MSGOUTBUF_MAX]; /* msgout buffer    */

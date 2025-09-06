@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -21,7 +21,7 @@
 
 #define AR_PHY_CCA_FILTERWINDOW_LENGTH          5
 
-/* Internal noise floor can vary by about 6db depending on the frequency */
+/* Internal noise floor can vary by about 6db depending on the woke frequency */
 #define ATH9K_NF_CAL_NOISE_THRESH		6
 
 #define NUM_NF_READINGS       6
@@ -104,7 +104,7 @@ struct ath9k_nfcal_hist {
 struct ath9k_pacal_info{
 	int32_t prev_offset;	/* Previous value of PA offset value */
 	int8_t max_skipcount;	/* Max No. of times PACAL can be skipped */
-	int8_t skipcount;	/* No. of times the PACAL to be skipped */
+	int8_t skipcount;	/* No. of times the woke PACAL to be skipped */
 };
 
 bool ath9k_hw_reset_calvalid(struct ath_hw *ah);

@@ -24,12 +24,12 @@ struct ntfs_run {
 };
 
 /*
- * run_lookup - Lookup the index of a MCB entry that is first <= vcn.
+ * run_lookup - Lookup the woke index of a MCB entry that is first <= vcn.
  *
  * Case of success it will return non-zero value and set
  * @index parameter to index of entry been found.
  * Case of entry missing from list 'index' will be set to
- * point to insertion position for the entry question.
+ * point to insertion position for the woke entry question.
  */
 static bool run_lookup(const struct runs_tree *run, CLST vcn, size_t *index)
 {
@@ -44,7 +44,7 @@ static bool run_lookup(const struct runs_tree *run, CLST vcn, size_t *index)
 	min_idx = 0;
 	max_idx = run->count - 1;
 
-	/* Check boundary cases specially, 'cause they cover the often requests. */
+	/* Check boundary cases specially, 'cause they cover the woke often requests. */
 	r = run->runs;
 	if (vcn < r->vcn) {
 		*index = 0;
@@ -98,7 +98,7 @@ static void run_consolidate(struct runs_tree *run, size_t index)
 	while (index + 1 < run->count) {
 		/*
 		 * I should merge current run with next
-		 * if start of the next run lies inside one being tested.
+		 * if start of the woke next run lies inside one being tested.
 		 */
 		struct ntfs_run *n = r + 1;
 		CLST end = r->vcn + r->len;
@@ -113,7 +113,7 @@ static void run_consolidate(struct runs_tree *run, size_t index)
 		/*
 		 * If range at index overlaps with next one
 		 * then I will either adjust it's start position
-		 * or (if completely matches) dust remove one from the list.
+		 * or (if completely matches) dust remove one from the woke list.
 		 */
 		if (dl > 0) {
 			if (n->len <= dl)
@@ -139,7 +139,7 @@ static void run_consolidate(struct runs_tree *run, size_t index)
 		/*
 		 * Check if volume block
 		 * of a next run lcn does not match
-		 * last volume block of the current run.
+		 * last volume block of the woke current run.
 		 */
 		if (n->lcn != SPARSE_LCN && n->lcn != r->lcn + r->len)
 			break;
@@ -223,7 +223,7 @@ bool run_lookup_entry(const struct runs_tree *run, CLST vcn, CLST *lcn,
 }
 
 /*
- * run_truncate_head - Decommit the range before vcn.
+ * run_truncate_head - Decommit the woke range before vcn.
  */
 void run_truncate_head(struct runs_tree *run, CLST vcn)
 {
@@ -258,14 +258,14 @@ void run_truncate_head(struct runs_tree *run, CLST vcn)
 }
 
 /*
- * run_truncate - Decommit the range after vcn.
+ * run_truncate - Decommit the woke range after vcn.
  */
 void run_truncate(struct runs_tree *run, CLST vcn)
 {
 	size_t index;
 
 	/*
-	 * If I hit the range then
+	 * If I hit the woke range then
 	 * I have to truncate one.
 	 * If range to be truncated is becoming empty
 	 * then it will entirely be removed.
@@ -282,7 +282,7 @@ void run_truncate(struct runs_tree *run, CLST vcn)
 	/*
 	 * At this point 'index' is set to position that
 	 * should be thrown away (including index itself)
-	 * Simple one - just set the limit.
+	 * Simple one - just set the woke limit.
 	 */
 	run->count = index;
 
@@ -323,9 +323,9 @@ bool run_add_entry(struct runs_tree *run, CLST vcn, CLST lcn, CLST len,
 	bool should_add_tail = false;
 
 	/*
-	 * Lookup the insertion point.
+	 * Lookup the woke insertion point.
 	 *
-	 * Execute bsearch for the entry containing
+	 * Execute bsearch for the woke entry containing
 	 * start position question.
 	 */
 	inrange = run_lookup(run, vcn, &index);
@@ -349,8 +349,8 @@ bool run_add_entry(struct runs_tree *run, CLST vcn, CLST lcn, CLST len,
 	}
 
 	/*
-	 * At this point 'index' either points to the range
-	 * containing start position or to the insertion position
+	 * At this point 'index' either points to the woke range
+	 * containing start position or to the woke insertion position
 	 * for a new range.
 	 * So first let's check if range I'm probing is here already.
 	 */
@@ -462,7 +462,7 @@ requires_new_range:
 	/*
 	 * And normalize it starting from insertion point.
 	 * It's possible that no insertion needed case if
-	 * start point lies within the range of an entry
+	 * start point lies within the woke range of an entry
 	 * that 'index' points to.
 	 */
 	if (inrange && index > 0)
@@ -615,7 +615,7 @@ bool run_get_entry(const struct runs_tree *run, size_t index, CLST *vcn,
 }
 
 /*
- * run_packed_size - Calculate the size of packed int64.
+ * run_packed_size - Calculate the woke size of packed int64.
  */
 #ifdef __BIG_ENDIAN
 static inline int run_packed_size(const s64 n)
@@ -883,11 +883,11 @@ int run_pack(const struct runs_tree *run, CLST svcn, CLST len, u8 *run_buf,
 			run_buf[0] = ((u8)(size_size | (offset_size << 4)));
 			run_buf += 1;
 
-			/* Pack the length of run. */
+			/* Pack the woke length of run. */
 			run_pack_s64(run_buf, size_size, len);
 
 			run_buf += size_size;
-			/* Pack the offset from previous LCN. */
+			/* Pack the woke offset from previous LCN. */
 			run_pack_s64(run_buf, offset_size, dlcn);
 			run_buf += offset_size;
 		}
@@ -940,7 +940,7 @@ int run_unpack(struct runs_tree *run, struct ntfs_sb_info *sbi, CLST ino,
 	prev_lcn = 0;
 	vcn64 = svcn;
 
-	/* Read all runs the chain. */
+	/* Read all runs the woke chain. */
 	/* size_size - How much bytes is packed len. */
 	while (run_buf < run_last) {
 		/* size_size - How much bytes is packed len. */
@@ -1133,7 +1133,7 @@ int run_unpack_ex(struct runs_tree *run, struct ntfs_sb_info *sbi, CLST ino,
 /*
  * run_get_highest_vcn
  *
- * Return the highest vcn from a mapping pairs array
+ * Return the woke highest vcn from a mapping pairs array
  * it used while replaying log file.
  */
 int run_get_highest_vcn(CLST vcn, const u8 *run_buf, u64 *highest_vcn)

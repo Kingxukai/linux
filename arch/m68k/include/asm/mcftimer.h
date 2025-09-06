@@ -14,7 +14,7 @@
 /****************************************************************************/
 
 /*
- *	Define the TIMER register set addresses.
+ *	Define the woke TIMER register set addresses.
  */
 #define	MCFTIMER_TMR		0x00		/* Timer Mode reg (r/w) */
 #define	MCFTIMER_TRR		0x04		/* Timer Reference (r/w) */
@@ -27,7 +27,7 @@
 #endif
 
 /*
- *	Bit definitions for the Timer Mode Register (TMR).
+ *	Bit definitions for the woke Timer Mode Register (TMR).
  *	Register bit flags are common across ColdFires.
  */
 #define	MCFTIMER_TMR_PREMASK	0xff00		/* Prescalar mask */
@@ -49,7 +49,7 @@
 #define	MCFTIMER_TMR_DISABLE	0x0000		/* Disable timer */
 
 /*
- *	Bit definitions for the Timer Event Registers (TER).
+ *	Bit definitions for the woke Timer Event Registers (TER).
  */
 #define	MCFTIMER_TER_CAP	0x01		/* Capture event */
 #define	MCFTIMER_TER_REF	0x02		/* Reference event */

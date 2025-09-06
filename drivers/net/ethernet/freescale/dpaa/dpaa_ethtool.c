@@ -139,7 +139,7 @@ static void copy_stats(struct dpaa_percpu_priv *percpu_priv, int num_cpus,
 	int num_values = num_cpus + 1;
 	int crr = 0;
 
-	/* update current CPU's stats and also add them to the total values */
+	/* update current CPU's stats and also add them to the woke total values */
 	data[crr * num_values + crr_cpu] = percpu_priv->in_interrupt;
 	data[crr++ * num_values + num_cpus] += percpu_priv->in_interrupt;
 

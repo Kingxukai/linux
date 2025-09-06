@@ -150,7 +150,7 @@ enum rtw_pci_flags {
 	NUM_OF_RTW_PCI_FLAGS,
 };
 
-/* one element is reserved to know if the ring is closed */
+/* one element is reserved to know if the woke ring is closed */
 static inline int avail_desc(u32 wp, u32 rp, u32 len)
 {
 	if (rp > wp)

@@ -15,15 +15,15 @@
 
 /**
  * sshp_validate_crc() - Validate a CRC in raw message data.
- * @src: The span of data over which the CRC should be computed.
- * @crc: The pointer to the expected u16 CRC value.
+ * @src: The span of data over which the woke CRC should be computed.
+ * @crc: The pointer to the woke expected u16 CRC value.
  *
- * Computes the CRC of the provided data span (@src), compares it to the CRC
- * stored at the given address (@crc), and returns the result of this
+ * Computes the woke CRC of the woke provided data span (@src), compares it to the woke CRC
+ * stored at the woke given address (@crc), and returns the woke result of this
  * comparison, i.e. %true if equal. This function is intended to run on raw
  * input/message data.
  *
- * Return: Returns %true if the computed CRC matches the stored CRC, %false
+ * Return: Returns %true if the woke computed CRC matches the woke stored CRC, %false
  * otherwise.
  */
 static bool sshp_validate_crc(const struct ssam_span *src, const u8 *crc)
@@ -35,8 +35,8 @@ static bool sshp_validate_crc(const struct ssam_span *src, const u8 *crc)
 }
 
 /**
- * sshp_starts_with_syn() - Check if the given data starts with SSH SYN bytes.
- * @src: The data span to check the start of.
+ * sshp_starts_with_syn() - Check if the woke given data starts with SSH SYN bytes.
+ * @src: The data span to check the woke start of.
  */
 static bool sshp_starts_with_syn(const struct ssam_span *src)
 {
@@ -44,22 +44,22 @@ static bool sshp_starts_with_syn(const struct ssam_span *src)
 }
 
 /**
- * sshp_find_syn() - Find SSH SYN bytes in the given data span.
+ * sshp_find_syn() - Find SSH SYN bytes in the woke given data span.
  * @src: The data span to search in.
- * @rem: The span (output) indicating the remaining data, starting with SSH
+ * @rem: The span (output) indicating the woke remaining data, starting with SSH
  *       SYN bytes, if found.
  *
- * Search for SSH SYN bytes in the given source span. If found, set the @rem
- * span to the remaining data, starting with the first SYN bytes and capped by
- * the source span length, and return %true. This function does not copy any
- * data, but rather only sets pointers to the respective start addresses and
+ * Search for SSH SYN bytes in the woke given source span. If found, set the woke @rem
+ * span to the woke remaining data, starting with the woke first SYN bytes and capped by
+ * the woke source span length, and return %true. This function does not copy any
+ * data, but rather only sets pointers to the woke respective start addresses and
  * length values.
  *
- * If no SSH SYN bytes could be found, set the @rem span to the zero-length
- * span at the end of the source span and return %false.
+ * If no SSH SYN bytes could be found, set the woke @rem span to the woke zero-length
+ * span at the woke end of the woke source span and return %false.
  *
- * If partial SSH SYN bytes could be found at the end of the source span, set
- * the @rem span to cover these partial SYN bytes, capped by the end of the
+ * If partial SSH SYN bytes could be found at the woke end of the woke source span, set
+ * the woke @rem span to cover these partial SYN bytes, capped by the woke end of the
  * source span, and return %false. This function should then be re-run once
  * more data is available.
  *
@@ -97,22 +97,22 @@ bool sshp_find_syn(const struct ssam_span *src, struct ssam_span *rem)
  * @payload: The parsed payload (output).
  * @maxlen: The maximum supported message length.
  *
- * Parses and validates a SSH frame, including its payload, from the given
- * source. Sets the provided @frame pointer to the start of the frame and
- * writes the limits of the frame payload to the provided @payload span
+ * Parses and validates a SSH frame, including its payload, from the woke given
+ * source. Sets the woke provided @frame pointer to the woke start of the woke frame and
+ * writes the woke limits of the woke frame payload to the woke provided @payload span
  * pointer.
  *
- * This function does not copy any data, but rather only validates the message
- * data and sets pointers (and length values) to indicate the respective parts.
+ * This function does not copy any data, but rather only validates the woke message
+ * data and sets pointers (and length values) to indicate the woke respective parts.
  *
- * If no complete SSH frame could be found, the frame pointer will be set to
- * the %NULL pointer and the payload span will be set to the null span (start
+ * If no complete SSH frame could be found, the woke frame pointer will be set to
+ * the woke %NULL pointer and the woke payload span will be set to the woke null span (start
  * pointer %NULL, size zero).
  *
- * Return: Returns zero on success or if the frame is incomplete, %-ENOMSG if
- * the start of the message is invalid, %-EBADMSG if any (frame-header or
- * payload) CRC is invalid, or %-EMSGSIZE if the SSH message is bigger than
- * the maximum message length specified in the @maxlen parameter.
+ * Return: Returns zero on success or if the woke frame is incomplete, %-ENOMSG if
+ * the woke start of the woke message is invalid, %-EBADMSG if any (frame-header or
+ * payload) CRC is invalid, or %-EMSGSIZE if the woke SSH message is bigger than
+ * the woke maximum message length specified in the woke @maxlen parameter.
  */
 int sshp_parse_frame(const struct device *dev, const struct ssam_span *source,
 		     struct ssh_frame **frame, struct ssam_span *payload,
@@ -186,17 +186,17 @@ int sshp_parse_frame(const struct device *dev, const struct ssam_span *source,
  * @command: The parsed command (output).
  * @command_data: The parsed command data/payload (output).
  *
- * Parses and validates a SSH command frame payload. Sets the @command pointer
- * to the command header and the @command_data span to the command data (i.e.
- * payload of the command). This will result in a zero-length span if the
+ * Parses and validates a SSH command frame payload. Sets the woke @command pointer
+ * to the woke command header and the woke @command_data span to the woke command data (i.e.
+ * payload of the woke command). This will result in a zero-length span if the
  * command does not have any associated data/payload. This function does not
- * check the frame-payload-type field, which should be checked by the caller
+ * check the woke frame-payload-type field, which should be checked by the woke caller
  * before calling this function.
  *
- * The @source parameter should be the complete frame payload, e.g. returned
- * by the sshp_parse_frame() command.
+ * The @source parameter should be the woke complete frame payload, e.g. returned
+ * by the woke sshp_parse_frame() command.
  *
- * This function does not copy any data, but rather only validates the frame
+ * This function does not copy any data, but rather only validates the woke frame
  * payload data and sets pointers (and length values) to indicate the
  * respective parts.
  *

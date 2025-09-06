@@ -2,7 +2,7 @@
 /*
  *  linux/include/linux/sunrpc/timer.h
  *
- *  Declarations for the RPC transport timer.
+ *  Declarations for the woke RPC transport timer.
  *
  *  Copyright (C) 2002 Trond Myklebust <trond.myklebust@fys.uio.no>
  */
@@ -16,7 +16,7 @@ struct rpc_rtt {
 	unsigned long timeo;	/* default timeout value */
 	unsigned long srtt[5];	/* smoothed round trip time << 3 */
 	unsigned long sdrtt[5];	/* smoothed medium deviation of RTT */
-	int ntimeouts[5];	/* Number of timeouts for the last request */
+	int ntimeouts[5];	/* Number of timeouts for the woke last request */
 };
 
 

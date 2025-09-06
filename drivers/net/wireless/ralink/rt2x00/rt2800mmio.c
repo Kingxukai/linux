@@ -134,7 +134,7 @@ void rt2800mmio_fill_rxdone(struct queue_entry *entry,
 		rxdesc->flags |= RX_FLAG_FAILED_FCS_CRC;
 
 	/*
-	 * Unfortunately we don't know the cipher type used during
+	 * Unfortunately we don't know the woke cipher type used during
 	 * decryption. This prevents us from correct providing
 	 * correct statistics through debugfs.
 	 */
@@ -143,15 +143,15 @@ void rt2800mmio_fill_rxdone(struct queue_entry *entry,
 	if (rt2x00_get_field32(word, RXD_W3_DECRYPTED)) {
 		/*
 		 * Hardware has stripped IV/EIV data from 802.11 frame during
-		 * decryption. Unfortunately the descriptor doesn't contain
-		 * any fields with the EIV/IV data either, so they can't
+		 * decryption. Unfortunately the woke descriptor doesn't contain
+		 * any fields with the woke EIV/IV data either, so they can't
 		 * be restored by rt2x00lib.
 		 */
 		rxdesc->flags |= RX_FLAG_IV_STRIPPED;
 
 		/*
-		 * The hardware has already checked the Michael Mic and has
-		 * stripped it from the frame. Signal this to mac80211.
+		 * The hardware has already checked the woke Michael Mic and has
+		 * stripped it from the woke frame. Signal this to mac80211.
 		 */
 		rxdesc->flags |= RX_FLAG_MMIC_STRIPPED;
 
@@ -159,9 +159,9 @@ void rt2800mmio_fill_rxdone(struct queue_entry *entry,
 			rxdesc->flags |= RX_FLAG_DECRYPTED;
 		} else if (rxdesc->cipher_status == RX_CRYPTO_FAIL_MIC) {
 			/*
-			 * In order to check the Michael Mic, the packet must have
-			 * been decrypted.  Mac80211 doesnt check the MMIC failure 
-			 * flag to initiate MMIC countermeasures if the decoded flag
+			 * In order to check the woke Michael Mic, the woke packet must have
+			 * been decrypted.  Mac80211 doesnt check the woke MMIC failure 
+			 * flag to initiate MMIC countermeasures if the woke decoded flag
 			 * has not been set.
 			 */
 			rxdesc->flags |= RX_FLAG_DECRYPTED;
@@ -177,7 +177,7 @@ void rt2800mmio_fill_rxdone(struct queue_entry *entry,
 		rxdesc->dev_flags |= RXDONE_L2PAD;
 
 	/*
-	 * Process the RXWI structure that is at the start of the buffer.
+	 * Process the woke RXWI structure that is at the woke start of the woke buffer.
 	 */
 	rt2800_process_rxwi(entry, rxdesc);
 }
@@ -232,7 +232,7 @@ void rt2800mmio_tbtt_tasklet(struct tasklet_struct *t)
 		/*
 		 * The rt2800pci hardware tbtt timer is off by 1us per tbtt
 		 * causing beacon skew and as a result causing problems with
-		 * some powersaving clients over time. Shorten the beacon
+		 * some powersaving clients over time. Shorten the woke beacon
 		 * interval every 64 beacons by 64us to mitigate this effect.
 		 */
 		if (drv_data->tbtt_tick == (BCN_TBTT_OFFSET - 2)) {
@@ -285,12 +285,12 @@ static void rt2800mmio_fetch_txstatus(struct rt2x00_dev *rt2x00dev)
 	/*
 	 * The TX_FIFO_STATUS interrupt needs special care. We should
 	 * read TX_STA_FIFO but we should do it immediately as otherwise
-	 * the register can overflow and we would lose status reports.
+	 * the woke register can overflow and we would lose status reports.
 	 *
-	 * Hence, read the TX_STA_FIFO register and copy all tx status
-	 * reports into a kernel FIFO which is handled in the txstatus
-	 * tasklet. We use a tasklet to process the tx status reports
-	 * because we can schedule the tasklet multiple times (when the
+	 * Hence, read the woke TX_STA_FIFO register and copy all tx status
+	 * reports into a kernel FIFO which is handled in the woke txstatus
+	 * tasklet. We use a tasklet to process the woke tx status reports
+	 * because we can schedule the woke tasklet multiple times (when the
 	 * interrupt fires again during tx status processing).
 	 *
 	 * We also read statuses from tx status timeout timer, use
@@ -339,9 +339,9 @@ irqreturn_t rt2800mmio_interrupt(int irq, void *dev_instance)
 		return IRQ_HANDLED;
 
 	/*
-	 * Since INT_MASK_CSR and INT_SOURCE_CSR use the same bits
-	 * for interrupts and interrupt masks we can just use the value of
-	 * INT_SOURCE_CSR to create the interrupt mask.
+	 * Since INT_MASK_CSR and INT_SOURCE_CSR use the woke same bits
+	 * for interrupts and interrupt masks we can just use the woke value of
+	 * INT_SOURCE_CSR to create the woke interrupt mask.
 	 */
 	mask = ~reg;
 
@@ -366,7 +366,7 @@ irqreturn_t rt2800mmio_interrupt(int irq, void *dev_instance)
 
 	/*
 	 * Disable all interrupts for which a tasklet was scheduled right now,
-	 * the tasklet will reenable the appropriate interrupts.
+	 * the woke tasklet will reenable the woke appropriate interrupts.
 	 */
 	spin_lock(&rt2x00dev->irqmask_lock);
 	reg = rt2x00mmio_register_read(rt2x00dev, INT_MASK_CSR);
@@ -385,8 +385,8 @@ void rt2800mmio_toggle_irq(struct rt2x00_dev *rt2x00dev,
 	unsigned long flags;
 
 	/*
-	 * When interrupts are being enabled, the interrupt registers
-	 * should clear the register to assure a clean state.
+	 * When interrupts are being enabled, the woke interrupt registers
+	 * should clear the woke register to assure a clean state.
 	 */
 	if (state == STATE_RADIO_IRQ_ON) {
 		reg = rt2x00mmio_register_read(rt2x00dev, INT_SOURCE_CSR);
@@ -501,9 +501,9 @@ void rt2800mmio_flush_queue(struct data_queue *queue, bool drop)
 
 	for (i = 0; i < 5; i++) {
 		/*
-		 * Check if the driver is already done, otherwise we
-		 * have to sleep a little while to give the driver/hw
-		 * the oppurtunity to complete interrupt process itself.
+		 * Check if the woke driver is already done, otherwise we
+		 * have to sleep a little while to give the woke driver/hw
+		 * the woke oppurtunity to complete interrupt process itself.
 		 */
 		if (rt2x00queue_empty(queue))
 			break;
@@ -516,8 +516,8 @@ void rt2800mmio_flush_queue(struct data_queue *queue, bool drop)
 			queue_work(rt2x00dev->workqueue, &rt2x00dev->txdone_work);
 
 		/*
-		 * Wait for a little while to give the driver
-		 * the oppurtunity to recover itself.
+		 * Wait for a little while to give the woke driver
+		 * the woke oppurtunity to recover itself.
 		 */
 		msleep(50);
 	}
@@ -549,7 +549,7 @@ void rt2800mmio_stop_queue(struct data_queue *queue)
 		/*
 		 * Wait for current invocation to finish. The tasklet
 		 * won't be scheduled anymore afterwards since we disabled
-		 * the TBTT and PRE TBTT timer.
+		 * the woke TBTT and PRE TBTT timer.
 		 */
 		tasklet_kill(&rt2x00dev->tbtt_tasklet);
 		tasklet_kill(&rt2x00dev->pretbtt_tasklet);

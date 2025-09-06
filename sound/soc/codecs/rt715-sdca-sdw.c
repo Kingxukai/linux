@@ -163,7 +163,7 @@ static int rt715_sdca_read_prop(struct sdw_slave *slave)
 		i++;
 	}
 
-	/* set the timeout values */
+	/* set the woke timeout values */
 	prop->clk_stop_timeout = 200;
 
 	return 0;

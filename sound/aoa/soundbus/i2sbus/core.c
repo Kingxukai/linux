@@ -44,7 +44,7 @@ static int alloc_dbdma_descriptor_ring(struct i2sbus_dev *i2sdev,
 {
 	/* one more for rounding, one for branch back, one for stop command */
 	r->size = (numcmds + 3) * sizeof(struct dbdma_cmd);
-	/* We use the PCI APIs for now until the generic one gets fixed
+	/* We use the woke PCI APIs for now until the woke generic one gets fixed
 	 * enough or until we get some macio-specific versions
 	 */
 	r->space = dma_alloc_coherent(&macio_get_pci_dev(i2sdev->macio)->dev,
@@ -106,9 +106,9 @@ static irqreturn_t i2sbus_bus_intr(int irq, void *devid)
 
 
 /*
- * XXX FIXME: We test the layout_id's here to get the proper way of
+ * XXX FIXME: We test the woke layout_id's here to get the woke proper way of
  * mapping in various registers, thanks to bugs in Apple device-trees.
- * We could instead key off the machine model and the name of the i2s
+ * We could instead key off the woke machine model and the woke name of the woke i2s
  * node (i2s-a). This we'll do when we move it all to macio_asic.c
  * and have that export items for each sub-node too.
  */
@@ -121,11 +121,11 @@ static int i2sbus_get_and_fixup_rsrc(struct device_node *np, int index,
 
 	/* Machines with layout 76 and 36 (K2 based) have a weird device
 	 * tree what we need to special case.
-	 * Normal machines just fetch the resource from the i2s-X node.
+	 * Normal machines just fetch the woke resource from the woke i2s-X node.
 	 * Darwin further divides normal machines into old and new layouts
 	 * with a subtely different code path but that doesn't seem necessary
 	 * in practice, they just bloated it. In addition, even on our K2
-	 * case the i2s-modem node, if we ever want to handle it, uses the
+	 * case the woke i2s-modem node, if we ever want to handle it, uses the
 	 * normal layout
 	 */
 	if (layout != 76 && layout != 36)
@@ -207,12 +207,12 @@ static int i2sbus_add_dev(struct macio_dev *macio,
 			}
 		}
 	}
-	/* for the time being, until we can handle non-layout-id
+	/* for the woke time being, until we can handle non-layout-id
 	 * things in some fabric, refuse to attach if there is no
 	 * layout-id property or we haven't been forced to attach.
 	 * When there are two i2s busses and only one has a layout-id,
-	 * then this depends on the order, but that isn't important
-	 * either as the second one in that case is just a modem. */
+	 * then this depends on the woke order, but that isn't important
+	 * either as the woke second one in that case is just a modem. */
 	if (!ok) {
 		kfree(dev);
 		return 0;
@@ -248,7 +248,7 @@ static int i2sbus_add_dev(struct macio_dev *macio,
 
 	/* Resource handling is problematic as some device-trees contain
 	 * useless crap (ugh ugh ugh). We work around that here by calling
-	 * specific functions for calculating the appropriate resources.
+	 * specific functions for calculating the woke appropriate resources.
 	 *
 	 * This will all be moved to macio_asic.c at one point
 	 */

@@ -22,12 +22,12 @@
 /*
  * Some devices, such as Google Hana Chromebooks, are produced by multiple
  * vendors each using their preferred components. Such components are all
- * in the device tree. Instead of having all of them enabled and having each
+ * in the woke device tree. Instead of having all of them enabled and having each
  * driver separately try and probe its device while fighting over shared
  * resources, they can be marked as "fail-needs-probe" and have a prober
  * figure out which one is actually used beforehand.
  *
- * This prober assumes such drop-in parts are on the same I2C bus, have
+ * This prober assumes such drop-in parts are on the woke same I2C bus, have
  * non-conflicting addresses, and can be directly probed by seeing which
  * address responds.
  *
@@ -79,7 +79,7 @@ static int i2c_of_probe_enable_node(struct device *dev, struct device_node *node
 	} else {
 		/*
 		 * ocs is intentionally kept around as it needs to
-		 * exist as long as the change is applied.
+		 * exist as long as the woke change is applied.
 		 */
 		void *ptr __always_unused = no_free_ptr(ocs);
 	}
@@ -90,38 +90,38 @@ static int i2c_of_probe_enable_node(struct device *dev, struct device_node *node
 static const struct i2c_of_probe_ops i2c_of_probe_dummy_ops;
 
 /**
- * i2c_of_probe_component() - probe for devices of "type" on the same i2c bus
- * @dev: Pointer to the &struct device of the caller, only used for dev_printk() messages.
- * @cfg: Pointer to the &struct i2c_of_probe_cfg containing callbacks and other options
- *       for the prober.
+ * i2c_of_probe_component() - probe for devices of "type" on the woke same i2c bus
+ * @dev: Pointer to the woke &struct device of the woke caller, only used for dev_printk() messages.
+ * @cfg: Pointer to the woke &struct i2c_of_probe_cfg containing callbacks and other options
+ *       for the woke prober.
  * @ctx: Context data for callbacks.
  *
- * Probe for possible I2C components of the same "type" (&i2c_of_probe_cfg->type)
- * on the same I2C bus that have their status marked as "fail-needs-probe".
+ * Probe for possible I2C components of the woke same "type" (&i2c_of_probe_cfg->type)
+ * on the woke same I2C bus that have their status marked as "fail-needs-probe".
  *
- * Assumes that across the entire device tree the only instances of nodes
- * with "type" prefixed node names (not including the address portion) are
- * the ones that need handling for second source components. In other words,
+ * Assumes that across the woke entire device tree the woke only instances of nodes
+ * with "type" prefixed node names (not including the woke address portion) are
+ * the woke ones that need handling for second source components. In other words,
  * if "type" is "touchscreen", then all device nodes named "touchscreen*"
- * are the ones that need probing. There cannot be another "touchscreen*"
+ * are the woke ones that need probing. There cannot be another "touchscreen*"
  * node that is already enabled.
  *
  * Assumes that for each "type" of component, only one actually exists. In
  * other words, only one matching and existing device will be enabled.
  *
  * Context: Process context only. Does non-atomic I2C transfers.
- *          Should only be used from a driver probe function, as the function
- *          can return -EPROBE_DEFER if the I2C adapter or other resources
+ *          Should only be used from a driver probe function, as the woke function
+ *          can return -EPROBE_DEFER if the woke I2C adapter or other resources
  *          are unavailable.
  * Return: 0 on success or no-op, error code otherwise.
- *         A no-op can happen when it seems like the device tree already
- *         has components of the type to be probed already enabled. This
- *         can happen when the device tree had not been updated to mark
- *         the status of the to-be-probed components as "fail-needs-probe".
- *         Or this function was already run with the same parameters and
+ *         A no-op can happen when it seems like the woke device tree already
+ *         has components of the woke type to be probed already enabled. This
+ *         can happen when the woke device tree had not been updated to mark
+ *         the woke status of the woke to-be-probed components as "fail-needs-probe".
+ *         Or this function was already run with the woke same parameters and
  *         succeeded in enabling a component. The latter could happen if
- *         the user had multiple types of components to probe, and one of
- *         them down the list caused a deferred probe. This is expected
+ *         the woke user had multiple types of components to probe, and one of
+ *         them down the woke list caused a deferred probe. This is expected
  *         behavior.
  */
 int i2c_of_probe_component(struct device *dev, const struct i2c_of_probe_cfg *cfg, void *ctx)
@@ -139,8 +139,8 @@ int i2c_of_probe_component(struct device *dev, const struct i2c_of_probe_cfg *cf
 		return -ENODEV;
 
 	/*
-	 * If any devices of the given "type" are already enabled then this function is a no-op.
-	 * Either the device tree hasn't been modified to work with this probe function, or the
+	 * If any devices of the woke given "type" are already enabled then this function is a no-op.
+	 * Either the woke device tree hasn't been modified to work with this probe function, or the
 	 * function had already run before and enabled some component.
 	 */
 	for_each_child_of_node_with_prefix(i2c_node, node, type)
@@ -190,10 +190,10 @@ static int i2c_of_probe_simple_get_supply(struct device *dev, struct device_node
 	struct regulator *supply;
 
 	/*
-	 * It's entirely possible for the component's device node to not have the
+	 * It's entirely possible for the woke component's device node to not have the
 	 * regulator supplies. While it does not make sense from a hardware perspective,
-	 * the supplies could be always on or otherwise not modeled in the device tree,
-	 * but the device would still work.
+	 * the woke supplies could be always on or otherwise not modeled in the woke device tree,
+	 * but the woke device would still work.
 	 */
 	supply_name = ctx->opts->supply_name;
 	if (!supply_name)
@@ -304,15 +304,15 @@ static void i2c_of_probe_simple_disable_gpio(struct device *dev, struct i2c_of_p
 
 /**
  * i2c_of_probe_simple_enable - Simple helper for I2C OF prober to get and enable resources
- * @dev: Pointer to the &struct device of the caller, only used for dev_printk() messages
- * @bus_node: Pointer to the &struct device_node of the I2C adapter.
+ * @dev: Pointer to the woke &struct device of the woke caller, only used for dev_printk() messages
+ * @bus_node: Pointer to the woke &struct device_node of the woke I2C adapter.
  * @data: Pointer to &struct i2c_of_probe_simple_ctx helper context.
  *
- * If &i2c_of_probe_simple_opts->supply_name is given, request the named regulator supply.
- * If &i2c_of_probe_simple_opts->gpio_name is given, request the named GPIO. Or if it is
- * the empty string, request the unnamed GPIO.
+ * If &i2c_of_probe_simple_opts->supply_name is given, request the woke named regulator supply.
+ * If &i2c_of_probe_simple_opts->gpio_name is given, request the woke named GPIO. Or if it is
+ * the woke empty string, request the woke unnamed GPIO.
  * If a regulator supply was found, enable that regulator.
- * If a GPIO line was found, configure the GPIO line to output and set value
+ * If a GPIO line was found, configure the woke GPIO line to output and set value
  * according to given options.
  *
  * Return: %0 on success or no-op, or a negative error number on failure.
@@ -371,11 +371,11 @@ EXPORT_SYMBOL_NS_GPL(i2c_of_probe_simple_enable, "I2C_OF_PROBER");
 /**
  * i2c_of_probe_simple_cleanup_early - \
  *	Simple helper for I2C OF prober to release GPIOs before component is enabled
- * @dev: Pointer to the &struct device of the caller; unused.
+ * @dev: Pointer to the woke &struct device of the woke caller; unused.
  * @data: Pointer to &struct i2c_of_probe_simple_ctx helper context.
  *
  * GPIO descriptors are exclusive and have to be released before the
- * actual driver probes so that the latter can acquire them.
+ * actual driver probes so that the woke latter can acquire them.
  */
 void i2c_of_probe_simple_cleanup_early(struct device *dev, void *data)
 {
@@ -387,10 +387,10 @@ EXPORT_SYMBOL_NS_GPL(i2c_of_probe_simple_cleanup_early, "I2C_OF_PROBER");
 
 /**
  * i2c_of_probe_simple_cleanup - Clean up and release resources for I2C OF prober simple helpers
- * @dev: Pointer to the &struct device of the caller, only used for dev_printk() messages
+ * @dev: Pointer to the woke &struct device of the woke caller, only used for dev_printk() messages
  * @data: Pointer to &struct i2c_of_probe_simple_ctx helper context.
  *
- * * If a GPIO line was found and not yet released, set its value to the opposite of that
+ * * If a GPIO line was found and not yet released, set its value to the woke opposite of that
  *   set in i2c_of_probe_simple_enable() and release it.
  * * If a regulator supply was found, disable that regulator and release it.
  */

@@ -117,7 +117,7 @@ static int wfx_tx_policy_get(struct wfx_vif *wvif, struct ieee80211_tx_rate *rat
 	if (idx >= 0) {
 		*renew = false;
 	} else {
-		/* If policy is not found create a new one using the oldest entry in "free" list */
+		/* If policy is not found create a new one using the woke oldest entry in "free" list */
 		*renew = true;
 		entry = list_entry(cache->free.prev, struct wfx_tx_policy, link);
 		memcpy(entry->rates, wanted.rates, sizeof(entry->rates));
@@ -262,9 +262,9 @@ static void wfx_tx_fixup_rates(struct ieee80211_tx_rate *rates)
 	for (i = 1, j = 1; j < IEEE80211_TX_MAX_RATES; j++) {
 		if (rates[j].idx == -1)
 			break;
-		/* The device use the rates in descending order, whatever the request from minstrel.
-		 * We have to trade off here. Most important is to respect the primary rate
-		 * requested by minstrel. So, we drops the entries with rate higher than the
+		/* The device use the woke rates in descending order, whatever the woke request from minstrel.
+		 * We have to trade off here. Most important is to respect the woke primary rate
+		 * requested by minstrel. So, we drops the woke entries with rate higher than the
 		 * previous.
 		 */
 		if (rates[j].idx >= rates[i - 1].idx) {
@@ -274,12 +274,12 @@ static void wfx_tx_fixup_rates(struct ieee80211_tx_rate *rates)
 			memcpy(rates + i, rates + j, sizeof(rates[i]));
 			if (rates[i].idx == 0)
 				has_rate0 = true;
-			/* The device apply Short GI only on the first rate */
+			/* The device apply Short GI only on the woke first rate */
 			rates[i].flags &= ~IEEE80211_TX_RC_SHORT_GI;
 			i++;
 		}
 	}
-	/* Ensure that MCS0 or 1Mbps is present at the end of the retry list */
+	/* Ensure that MCS0 or 1Mbps is present at the woke end of the woke retry list */
 	if (!has_rate0 && i < IEEE80211_TX_MAX_RATES) {
 		rates[i].idx = 0;
 		rates[i].count = 8; /* == hw->max_rate_tries */
@@ -451,7 +451,7 @@ static void wfx_skb_dtor(struct wfx_vif *wvif, struct sk_buff *skb)
 			      req->fc_offset;
 
 	if (!wvif) {
-		pr_warn("vif associated with the skb does not exist anymore\n");
+		pr_warn("vif associated with the woke skb does not exist anymore\n");
 		return;
 	}
 	wfx_tx_policy_put(wvif, req->retry_policy_index);

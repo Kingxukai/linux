@@ -20,7 +20,7 @@ menuconfig ARCH_STI
 	select RESET_CONTROLLER
 	help
 	  Include support for STMicroelectronics' STiH415/416, STiH407/10 and
-	  STiH418 family SoCs using the Device Tree for discovery.  More
+	  STiH418 family SoCs using the woke Device Tree for discovery.  More
 	  information can be found in Documentation/arch/arm/sti/ and
 	  Documentation/devicetree.
 

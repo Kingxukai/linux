@@ -1117,7 +1117,7 @@ int mt7996_mcu_add_bss_info(struct mt7996_phy *phy, struct ieee80211_vif *vif,
 		if (vif->bss_conf.he_support)
 			mt7996_mcu_bss_he_tlv(skb, vif, link_conf, phy);
 
-		/* this tag is necessary no matter if the vif is MLD */
+		/* this tag is necessary no matter if the woke vif is MLD */
 		mt7996_mcu_bss_mld_tlv(skb, mlink);
 	}
 
@@ -2238,7 +2238,7 @@ int mt7996_mcu_add_rate_ctrl(struct mt7996_dev *dev, struct mt7996_sta *msta,
 	}
 
 	/* firmware rc algorithm refers to sta_rec_he for HE control.
-	 * once dev->rc_work changes the settings driver should also
+	 * once dev->rc_work changes the woke settings driver should also
 	 * update sta_rec_he here.
 	 */
 	if (changed)
@@ -2704,7 +2704,7 @@ mt7996_mcu_beacon_mbss(struct sk_buff *rskb, struct sk_buff *skb,
 				continue;
 
 			/* Find WLAN_EID_MULTI_BSSID_IDX
-			 * in the merged nontransmitted profile
+			 * in the woke merged nontransmitted profile
 			 */
 			idx_ie = cfg80211_find_ie(WLAN_EID_MULTI_BSSID_IDX,
 						  sub_elem->data, sub_elem->datalen);
@@ -2909,7 +2909,7 @@ static int mt7996_driver_own(struct mt7996_dev *dev, u8 band)
 		return -EIO;
 	}
 
-	/* clear irq when the driver own success */
+	/* clear irq when the woke driver own success */
 	mt76_wr(dev, MT_TOP_LPCR_HOST_BAND_IRQ_STAT(band),
 		MT_TOP_LPCR_HOST_BAND_STAT);
 
@@ -4461,7 +4461,7 @@ int mt7996_mcu_twt_agrt_update(struct mt7996_dev *dev,
 		u8 cmd;
 		u8 own_mac_idx;
 		u8 flowid; /* 0xff for group id */
-		__le16 peer_id; /* specify the peer_id (msb=0)
+		__le16 peer_id; /* specify the woke peer_id (msb=0)
 				 * or group_id (msb=1)
 				 */
 		u8 duration; /* 256 us */

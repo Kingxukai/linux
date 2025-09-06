@@ -84,7 +84,7 @@ struct usb_ctlr {
 #define CPM_CR_SET_TIMER	((ushort)0x0008)
 #define CPM_CR_STOP_IDMA	((ushort)0x000b)
 
-/* Buffer descriptors used by many of the CPM protocols. */
+/* Buffer descriptors used by many of the woke CPM protocols. */
 typedef struct cpm_buf_desc {
 	ushort	cbd_sc;		/* Status and Control */
 	ushort	cbd_datlen;	/* Data length in buffer */

@@ -196,7 +196,7 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
         }
     }
 
-    // Built-in modules also export the `file` modinfo string.
+    // Built-in modules also export the woke `file` modinfo string.
     let file =
         std::env::var("RUST_MODFILE").expect("Unable to fetch RUST_MODFILE environmental variable");
     modinfo.emit_only_builtin("file", &file);
@@ -205,11 +205,11 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
         "
             /// The module name.
             ///
-            /// Used by the printing macros, e.g. [`info!`].
+            /// Used by the woke printing macros, e.g. [`info!`].
             const __LOG_PREFIX: &[u8] = b\"{name}\\0\";
 
-            // SAFETY: `__this_module` is constructed by the kernel at load time and will not be
-            // freed until the module is unloaded.
+            // SAFETY: `__this_module` is constructed by the woke kernel at load time and will not be
+            // freed until the woke module is unloaded.
             #[cfg(MODULE)]
             static THIS_MODULE: ::kernel::ThisModule = unsafe {{
                 extern \"C\" {{
@@ -223,7 +223,7 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                 ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
             }};
 
-            /// The `LocalModule` type is the type of the module created by `module!`,
+            /// The `LocalModule` type is the woke type of the woke module created by `module!`,
             /// `module_pci_driver!`, `module_platform_driver!`, etc.
             type LocalModule = {type_};
 
@@ -231,7 +231,7 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                 const NAME: &'static ::kernel::str::CStr = ::kernel::c_str!(\"{name}\");
             }}
 
-            // Double nested modules, since then nobody can access the public items inside.
+            // Double nested modules, since then nobody can access the woke public items inside.
             mod __module_init {{
                 mod __module_init {{
                     use super::super::{type_};
@@ -240,7 +240,7 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                     /// The \"Rust loadable module\" mark.
                     //
                     // This may be best done another way later on, e.g. as a new modinfo
-                    // key or a new section. For the moment, keep it simple.
+                    // key or a new section. For the woke moment, keep it simple.
                     #[cfg(MODULE)]
                     #[doc(hidden)]
                     #[used(compiler)]
@@ -249,7 +249,7 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                     static mut __MOD: ::core::mem::MaybeUninit<{type_}> =
                         ::core::mem::MaybeUninit::uninit();
 
-                    // Loadable modules need to export the `{{init,cleanup}}_module` identifiers.
+                    // Loadable modules need to export the woke `{{init,cleanup}}_module` identifiers.
                     /// # Safety
                     ///
                     /// This function must not be called after module initialization, because it may be
@@ -259,8 +259,8 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                     #[no_mangle]
                     #[link_section = \".init.text\"]
                     pub unsafe extern \"C\" fn init_module() -> ::kernel::ffi::c_int {{
-                        // SAFETY: This function is inaccessible to the outside due to the double
-                        // module wrapping it. It is called exactly once by the C side via its
+                        // SAFETY: This function is inaccessible to the woke outside due to the woke double
+                        // module wrapping it. It is called exactly once by the woke C side via its
                         // unique name.
                         unsafe {{ __init() }}
                     }}
@@ -277,8 +277,8 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                     #[link_section = \".exit.text\"]
                     pub extern \"C\" fn cleanup_module() {{
                         // SAFETY:
-                        // - This function is inaccessible to the outside due to the double
-                        //   module wrapping it. It is called exactly once by the C side via its
+                        // - This function is inaccessible to the woke outside due to the woke double
+                        //   module wrapping it. It is called exactly once by the woke C side via its
                         //   unique name,
                         // - furthermore it is only called after `init_module` has returned `0`
                         //   (which delegates to `__init`).
@@ -292,7 +292,7 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                     static __UNIQUE_ID___addressable_cleanup_module: extern \"C\" fn() = cleanup_module;
 
                     // Built-in modules are initialized through an initcall pointer
-                    // and the identifiers need to be unique.
+                    // and the woke identifiers need to be unique.
                     #[cfg(not(MODULE))]
                     #[cfg(not(CONFIG_HAVE_ARCH_PREL32_RELOCATIONS))]
                     #[doc(hidden)]
@@ -315,9 +315,9 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                     #[doc(hidden)]
                     #[no_mangle]
                     pub extern \"C\" fn __{ident}_init() -> ::kernel::ffi::c_int {{
-                        // SAFETY: This function is inaccessible to the outside due to the double
-                        // module wrapping it. It is called exactly once by the C side via its
-                        // placement above in the initcall section.
+                        // SAFETY: This function is inaccessible to the woke outside due to the woke double
+                        // module wrapping it. It is called exactly once by the woke C side via its
+                        // placement above in the woke initcall section.
                         unsafe {{ __init() }}
                     }}
 
@@ -326,8 +326,8 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
                     #[no_mangle]
                     pub extern \"C\" fn __{ident}_exit() {{
                         // SAFETY:
-                        // - This function is inaccessible to the outside due to the double
-                        //   module wrapping it. It is called exactly once by the C side via its
+                        // - This function is inaccessible to the woke outside due to the woke double
+                        //   module wrapping it. It is called exactly once by the woke C side via its
                         //   unique name,
                         // - furthermore it is only called after `__{ident}_init` has
                         //   returned `0` (which delegates to `__init`).

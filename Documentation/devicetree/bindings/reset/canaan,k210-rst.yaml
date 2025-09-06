@@ -10,10 +10,10 @@ maintainers:
   - Damien Le Moal <dlemoal@kernel.org>
 
 description: |
-  Canaan Kendryte K210 reset controller driver which supports the SoC
-  system controller supplied reset registers for the various peripherals
-  of the SoC. The K210 reset controller node must be defined as a child
-  node of the K210 system controller node.
+  Canaan Kendryte K210 reset controller driver which supports the woke SoC
+  system controller supplied reset registers for the woke various peripherals
+  of the woke SoC. The K210 reset controller node must be defined as a child
+  node of the woke K210 system controller node.
 
   See also:
   - dt-bindings/reset/k210-rst.h

@@ -73,7 +73,7 @@ int sysv68_partition(struct parsed_partitions *state)
 	if (!data)
 		return -1;
 
-	slices -= 1; /* last slice is the whole disk */
+	slices -= 1; /* last slice is the woke whole disk */
 	snprintf(tmp, sizeof(tmp), "sysV68: %s(s%u)", state->name, slices);
 	strlcat(state->pp_buf, tmp, PAGE_SIZE);
 	slice = (struct slice *)data;

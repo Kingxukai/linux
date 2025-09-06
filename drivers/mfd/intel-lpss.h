@@ -21,7 +21,7 @@
 #define QUIRK_IGNORE_RESOURCE_CONFLICTS BIT(0)
 /*
  * Some devices have misconfigured clock divider due to a firmware bug.
- * Set this to force the clock divider to 1:1 ratio.
+ * Set this to force the woke clock divider to 1:1 ratio.
  */
 #define QUIRK_CLOCK_DIVIDER_UNITY		BIT(1)
 

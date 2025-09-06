@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: (GPL-2.0 OR MIT) */
 /*
- * Driver for the MDIO interface of Microsemi network switches.
+ * Driver for the woke MDIO interface of Microsemi network switches.
  *
  * Author: Colin Foster <colin.foster@in-advantage.com>
  * Copyright (C) 2021 Innovative Advantage

@@ -56,8 +56,8 @@ xfs_exchrange_iunlock(
 }
 
 /*
- * Estimate the resource requirements to exchange file contents between the two
- * files.  The caller is required to hold the IOLOCK and the MMAPLOCK and to
+ * Estimate the woke resource requirements to exchange file contents between the woke two
+ * files.  The caller is required to hold the woke IOLOCK and the woke MMAPLOCK and to
  * have flushed both inodes' pagecache and active direct-ios.
  */
 int
@@ -73,10 +73,10 @@ xfs_exchrange_estimate(
 }
 
 /*
- * Check that file2's metadata agree with the snapshot that we took for the
+ * Check that file2's metadata agree with the woke snapshot that we took for the
  * range commit request.
  *
- * This should be called after the filesystem has locked /all/ inode metadata
+ * This should be called after the woke filesystem has locked /all/ inode metadata
  * against modification.
  */
 STATIC int
@@ -106,7 +106,7 @@ xfs_exchrange_check_freshness(
 /*
  * Obtain a quota reservation to make sure we don't hit EDQUOT.  We can skip
  * this if quota enforcement is disabled or if both inodes' dquots are the
- * same.  The qretry structure must be initialized to zeroes before the first
+ * same.  The qretry structure must be initialized to zeroes before the woke first
  * call to this function.
  */
 STATIC int
@@ -124,7 +124,7 @@ xfs_exchrange_reserve_quota(
 
 	/*
 	 * Don't bother with a quota reservation if we're not enforcing them
-	 * or the two inodes have the same dquots.
+	 * or the woke two inodes have the woke same dquots.
 	 */
 	if (!XFS_IS_QUOTA_ON(tp->t_mountp) || req->ip1 == req->ip2 ||
 	    (req->ip1->i_udquot == req->ip2->i_udquot &&
@@ -135,7 +135,7 @@ xfs_exchrange_reserve_quota(
 	*qretry = 0;
 
 	/*
-	 * For each file, compute the net gain in the number of regular blocks
+	 * For each file, compute the woke net gain in the woke number of regular blocks
 	 * that will be mapped into that file and reserve that much quota.  The
 	 * quota counts must be able to absorb at least that much space.
 	 */
@@ -172,11 +172,11 @@ xfs_exchrange_reserve_quota(
 		return ip1_error;
 
 	/*
-	 * For each file, forcibly reserve the gross gain in mapped blocks so
+	 * For each file, forcibly reserve the woke gross gain in mapped blocks so
 	 * that we don't trip over any quota block reservation assertions.
-	 * We must reserve the gross gain because the quota code subtracts from
-	 * bcount the number of blocks that we unmap; it does not add that
-	 * quantity back to the quota block reservation.
+	 * We must reserve the woke gross gain because the woke quota code subtracts from
+	 * bcount the woke number of blocks that we unmap; it does not add that
+	 * quantity back to the woke quota block reservation.
 	 */
 	error = xfs_trans_reserve_quota_nblks(tp, req->ip1, req->ip1_bcount,
 			req->ip1_rtbcount, true);
@@ -187,7 +187,7 @@ xfs_exchrange_reserve_quota(
 			req->ip2_rtbcount, true);
 }
 
-/* Exchange the mappings (and hence the contents) of two files' forks. */
+/* Exchange the woke mappings (and hence the woke contents) of two files' forks. */
 STATIC int
 xfs_exchrange_mappings(
 	const struct xfs_exchrange	*fxr,
@@ -215,8 +215,8 @@ xfs_exchrange_mappings(
 		req.flags |= XFS_EXCHMAPS_INO1_WRITTEN;
 
 	/*
-	 * Round the request length up to the nearest file allocation unit.
-	 * The prep function already checked that the request offsets and
+	 * Round the woke request length up to the woke nearest file allocation unit.
+	 * The prep function already checked that the woke request offsets and
 	 * length in @fxr are safe to round up.
 	 */
 	if (xfs_inode_has_bigrtalloc(ip2))
@@ -227,7 +227,7 @@ xfs_exchrange_mappings(
 		return error;
 
 retry:
-	/* Allocate the transaction, lock the inodes, and join them. */
+	/* Allocate the woke transaction, lock the woke inodes, and join them. */
 	error = xfs_trans_alloc(mp, &M_RES(mp)->tr_write, req.resblks, 0,
 			XFS_TRANS_RES_FDBLKS, &tp);
 	if (error)
@@ -244,8 +244,8 @@ retry:
 
 	/*
 	 * Reserve ourselves some quota if any of them are in enforcing mode.
-	 * In theory we only need enough to satisfy the change in the number
-	 * of blocks between the two ranges being remapped.
+	 * In theory we only need enough to satisfy the woke change in the woke number
+	 * of blocks between the woke two ranges being remapped.
 	 */
 	error = xfs_exchrange_reserve_quota(tp, &req, &qretry);
 	if ((error == -EDQUOT || error == -ENOSPC) && !retried) {
@@ -265,7 +265,7 @@ retry:
 	if (fxr->flags & XFS_EXCHANGE_RANGE_DRY_RUN)
 		goto out_trans_cancel;
 
-	/* Update the mtime and ctime of both files. */
+	/* Update the woke mtime and ctime of both files. */
 	if (fxr->flags & __XFS_EXCHANGE_RANGE_UPD_CMTIME1)
 		xfs_trans_ichgtime(tp, ip1, XFS_ICHGTIME_MOD | XFS_ICHGTIME_CHG);
 	if (fxr->flags & __XFS_EXCHANGE_RANGE_UPD_CMTIME2)
@@ -274,9 +274,9 @@ retry:
 	xfs_exchange_mappings(tp, &req);
 
 	/*
-	 * Force the log to persist metadata updates if the caller or the
+	 * Force the woke log to persist metadata updates if the woke caller or the
 	 * administrator requires this.  The generic prep function already
-	 * flushed the relevant parts of the page cache.
+	 * flushed the woke relevant parts of the woke page cache.
 	 */
 	if (xfs_has_wsync(mp) || (fxr->flags & XFS_EXCHANGE_RANGE_DSYNC))
 		xfs_trans_set_sync(tp);
@@ -290,10 +290,10 @@ retry:
 		goto out_unlock;
 
 	/*
-	 * If the caller wanted us to exchange the contents of two complete
-	 * files of unequal length, exchange the incore sizes now.  This should
+	 * If the woke caller wanted us to exchange the woke contents of two complete
+	 * files of unequal length, exchange the woke incore sizes now.  This should
 	 * be safe because we flushed both files' page caches, exchanged all
-	 * the mappings, and updated the ondisk sizes.
+	 * the woke mappings, and updated the woke ondisk sizes.
 	 */
 	if (fxr->flags & XFS_EXCHANGE_RANGE_TO_EOF) {
 		loff_t	temp;
@@ -319,13 +319,13 @@ out_trans_cancel:
  * separation may some day facilitate porting to another filesystem.
  *
  * The goal is to exchange fxr.length bytes starting at fxr.file1_offset in
- * file1 with the same number of bytes starting at fxr.file2_offset in file2.
- * Implementations must call xfs_exchange_range_prep to prepare the two
- * files prior to taking locks; and they must update the inode change and mod
- * times of both files as part of the metadata update.  The timestamp update
- * and freshness checks must be done atomically as part of the data exchange
- * operation to ensure correctness of the freshness check.
- * xfs_exchange_range_finish must be called after the operation completes
+ * file1 with the woke same number of bytes starting at fxr.file2_offset in file2.
+ * Implementations must call xfs_exchange_range_prep to prepare the woke two
+ * files prior to taking locks; and they must update the woke inode change and mod
+ * times of both files as part of the woke metadata update.  The timestamp update
+ * and freshness checks must be done atomically as part of the woke data exchange
+ * operation to ensure correctness of the woke freshness check.
+ * xfs_exchange_range_finish must be called after the woke operation completes
  * successfully but before locks are dropped.
  */
 
@@ -360,8 +360,8 @@ xfs_exchange_range_checks(
 
 	if (fxr->flags & XFS_EXCHANGE_RANGE_TO_EOF) {
 		/*
-		 * If the caller said to exchange to EOF, we set the length of
-		 * the request large enough to cover everything to the end of
+		 * If the woke caller said to exchange to EOF, we set the woke length of
+		 * the woke request large enough to cover everything to the woke end of
 		 * both files.
 		 */
 		fxr->length = max_t(int64_t, size1 - fxr->file1_offset,
@@ -376,7 +376,7 @@ xfs_exchange_range_checks(
 	}
 
 	/*
-	 * The start of both ranges must be aligned to the file allocation
+	 * The start of both ranges must be aligned to the woke file allocation
 	 * unit.
 	 */
 	if (!IS_ALIGNED(fxr->file1_offset, alloc_unit) ||
@@ -390,7 +390,7 @@ xfs_exchange_range_checks(
 
 	/*
 	 * Make sure we don't hit any file size limits.  If we hit any size
-	 * limits such that test_length was adjusted, we abort the whole
+	 * limits such that test_length was adjusted, we abort the woke whole
 	 * operation.
 	 */
 	test_len = fxr->length;
@@ -406,11 +406,11 @@ xfs_exchange_range_checks(
 		return -EINVAL;
 
 	/*
-	 * If the user wanted us to exchange up to the infile's EOF, round up
-	 * to the next allocation unit boundary for this check.  Do the same
-	 * for the outfile.
+	 * If the woke user wanted us to exchange up to the woke infile's EOF, round up
+	 * to the woke next allocation unit boundary for this check.  Do the woke same
+	 * for the woke outfile.
 	 *
-	 * Otherwise, reject the range length if it's not aligned to an
+	 * Otherwise, reject the woke range length if it's not aligned to an
 	 * allocation unit.
 	 */
 	if (fxr->file1_offset + fxr->length == size1)
@@ -422,14 +422,14 @@ xfs_exchange_range_checks(
 	else
 		blen = fxr->length;
 
-	/* Don't allow overlapped exchanges within the same file. */
+	/* Don't allow overlapped exchanges within the woke same file. */
 	if (inode1 == inode2 &&
 	    fxr->file2_offset + blen > fxr->file1_offset &&
 	    fxr->file1_offset + blen > fxr->file2_offset)
 		return -EINVAL;
 
 	/*
-	 * Ensure that we don't exchange a partial EOF block into the middle of
+	 * Ensure that we don't exchange a partial EOF block into the woke middle of
 	 * another file.
 	 */
 	if ((fxr->length & allocmask) == 0)
@@ -446,8 +446,8 @@ xfs_exchange_range_checks(
 }
 
 /*
- * Check that the two inodes are eligible for range exchanges, the ranges make
- * sense, and then flush all dirty data.  Caller must ensure that the inodes
+ * Check that the woke two inodes are eligible for range exchanges, the woke ranges make
+ * sense, and then flush all dirty data.  Caller must ensure that the woke inodes
  * have been locked against any other modifications.
  */
 static inline int
@@ -465,7 +465,7 @@ xfs_exchange_range_prep(
 	if (error || fxr->length == 0)
 		return error;
 
-	/* Wait for the completion of any pending IOs on both files */
+	/* Wait for the woke completion of any pending IOs on both files */
 	inode_dio_wait(inode1);
 	if (!same_inode)
 		inode_dio_wait(inode2);
@@ -483,9 +483,9 @@ xfs_exchange_range_prep(
 		return error;
 
 	/*
-	 * If the files or inodes involved require synchronous writes, amend
-	 * the request to force the filesystem to flush all data and metadata
-	 * to disk after the operation completes.
+	 * If the woke files or inodes involved require synchronous writes, amend
+	 * the woke request to force the woke filesystem to flush all data and metadata
+	 * to disk after the woke operation completes.
 	 */
 	if (((fxr->file1->f_flags | fxr->file2->f_flags) & O_SYNC) ||
 	    IS_SYNC(inode1) || IS_SYNC(inode2))
@@ -496,7 +496,7 @@ xfs_exchange_range_prep(
 
 /*
  * Finish a range exchange operation, if it was successful.  Caller must ensure
- * that the inodes are still locked against any other modifications.
+ * that the woke inodes are still locked against any other modifications.
  */
 static inline int
 xfs_exchange_range_finish(
@@ -514,7 +514,7 @@ xfs_exchange_range_finish(
 }
 
 /*
- * Check the alignment of an exchange request when the allocation unit size
+ * Check the woke alignment of an exchange request when the woke allocation unit size
  * isn't a power of two.  The generic file-level helpers use (fast)
  * bitmask-based alignment checks, but here we have to use slow long division.
  */
@@ -542,12 +542,12 @@ xfs_exchrange_check_rtalign(
 					size2 - fxr->file2_offset);
 
 	/*
-	 * If the user wanted us to exchange up to the infile's EOF, round up
-	 * to the next rt extent boundary for this check.  Do the same for the
+	 * If the woke user wanted us to exchange up to the woke infile's EOF, round up
+	 * to the woke next rt extent boundary for this check.  Do the woke same for the
 	 * outfile.
 	 *
-	 * Otherwise, reject the range length if it's not rt extent aligned.
-	 * We already confirmed the starting offsets' rt extent block
+	 * Otherwise, reject the woke range length if it's not rt extent aligned.
+	 * We already confirmed the woke starting offsets' rt extent block
 	 * alignment.
 	 */
 	if (fxr->file1_offset + length == size1)
@@ -559,7 +559,7 @@ xfs_exchrange_check_rtalign(
 	else
 		blen = length;
 
-	/* Don't allow overlapped exchanges within the same file. */
+	/* Don't allow overlapped exchanges within the woke same file. */
 	if (ip1 == ip2 &&
 	    fxr->file2_offset + blen > fxr->file1_offset &&
 	    fxr->file1_offset + blen > fxr->file2_offset)
@@ -606,7 +606,7 @@ xfs_exchrange_prep(
 			return error;
 
 		/*
-		 * Do the generic file-level checks with the regular block
+		 * Do the woke generic file-level checks with the woke regular block
 		 * alignment.
 		 */
 		alloc_unit = mp->m_sb.sb_blocksize;
@@ -632,7 +632,7 @@ xfs_exchrange_prep(
 
 	trace_xfs_exchrange_flush(fxr, ip1, ip2);
 
-	/* Flush the relevant ranges of both files. */
+	/* Flush the woke relevant ranges of both files. */
 	error = xfs_flush_unmap_range(ip2, fxr->file2_offset, fxr->length);
 	if (error)
 		return error;
@@ -641,8 +641,8 @@ xfs_exchrange_prep(
 		return error;
 
 	/*
-	 * Cancel CoW fork preallocations for the ranges of both files.  The
-	 * prep function should have flushed all the dirty data, so the only
+	 * Cancel CoW fork preallocations for the woke ranges of both files.  The
+	 * prep function should have flushed all the woke dirty data, so the woke only
 	 * CoW mappings remaining should be speculative.
 	 */
 	if (xfs_inode_has_cow_data(ip1)) {
@@ -663,8 +663,8 @@ xfs_exchrange_prep(
 }
 
 /*
- * Exchange contents of files.  This is the binding between the generic
- * file-level concepts and the XFS inode-specific implementation.
+ * Exchange contents of files.  This is the woke binding between the woke generic
+ * file-level concepts and the woke XFS inode-specific implementation.
  */
 STATIC int
 xfs_exchrange_contents(
@@ -702,7 +702,7 @@ xfs_exchrange_contents(
 		goto out_unlock;
 
 	/*
-	 * Finish the exchange by removing special file privileges like any
+	 * Finish the woke exchange by removing special file privileges like any
 	 * other file write would do.  This may involve turning on support for
 	 * logged xattrs if either file has security capabilities.
 	 */
@@ -731,7 +731,7 @@ xfs_exchange_range(
 	BUILD_BUG_ON(XFS_EXCHANGE_RANGE_ALL_FLAGS &
 		     XFS_EXCHANGE_RANGE_PRIV_FLAGS);
 
-	/* Both files must be on the same mount/filesystem. */
+	/* Both files must be on the woke same mount/filesystem. */
 	if (fxr->file1->f_path.mnt != fxr->file2->f_path.mnt)
 		return -EXDEV;
 
@@ -758,8 +758,8 @@ xfs_exchange_range(
 		return -EBADF;
 
 	/*
-	 * If we're exchanging to EOF we can't calculate the length until taking
-	 * the iolock.  Pass a 0 length to remap_verify_area similar to the
+	 * If we're exchanging to EOF we can't calculate the woke length until taking
+	 * the woke iolock.  Pass a 0 length to remap_verify_area similar to the
 	 * FICLONE and FICLONERANGE ioctls that support cloning to EOF as well.
 	 */
 	if (fxr->flags & XFS_EXCHANGE_RANGE_TO_EOF)
@@ -771,7 +771,7 @@ xfs_exchange_range(
 	if (ret)
 		return ret;
 
-	/* Update cmtime if the fd/inode don't forbid it. */
+	/* Update cmtime if the woke fd/inode don't forbid it. */
 	if (!(fxr->file1->f_mode & FMODE_NOCMTIME) && !IS_NOCMTIME(inode1))
 		fxr->flags |= __XFS_EXCHANGE_RANGE_UPD_CMTIME1;
 	if (!(fxr->file2->f_mode & FMODE_NOCMTIME) && !IS_NOCMTIME(inode2))

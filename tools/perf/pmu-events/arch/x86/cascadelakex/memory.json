@@ -87,17 +87,17 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of machine clears due to memory order conflicts.",
+        "BriefDescription": "Counts the woke number of machine clears due to memory order conflicts.",
         "Counter": "0,1,2,3",
         "Errata": "SKL089",
         "EventCode": "0xC3",
         "EventName": "MACHINE_CLEARS.MEMORY_ORDERING",
-        "PublicDescription": "Counts the number of memory ordering Machine Clears detected. Memory Ordering Machine Clears can result from one of the following:a. memory disambiguation,b. external snoop, orc. cross SMT-HW-thread snoop (stores) hitting load buffer.",
+        "PublicDescription": "Counts the woke number of memory ordering Machine Clears detected. Memory Ordering Machine Clears can result from one of the woke following:a. memory disambiguation,b. external snoop, orc. cross SMT-HW-thread snoop (stores) hitting load buffer.",
         "SampleAfterValue": "100003",
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 128 cycles.",
+        "BriefDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 128 cycles.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "EventCode": "0xcd",
@@ -105,12 +105,12 @@
         "MSRIndex": "0x3F6",
         "MSRValue": "0x80",
         "PEBS": "2",
-        "PublicDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 128 cycles.  Reported latency may be longer than just the memory latency.",
+        "PublicDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 128 cycles.  Reported latency may be longer than just the woke memory latency.",
         "SampleAfterValue": "1009",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 16 cycles.",
+        "BriefDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 16 cycles.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "EventCode": "0xcd",
@@ -118,12 +118,12 @@
         "MSRIndex": "0x3F6",
         "MSRValue": "0x10",
         "PEBS": "2",
-        "PublicDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 16 cycles.  Reported latency may be longer than just the memory latency.",
+        "PublicDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 16 cycles.  Reported latency may be longer than just the woke memory latency.",
         "SampleAfterValue": "20011",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 256 cycles.",
+        "BriefDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 256 cycles.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "EventCode": "0xcd",
@@ -131,12 +131,12 @@
         "MSRIndex": "0x3F6",
         "MSRValue": "0x100",
         "PEBS": "2",
-        "PublicDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 256 cycles.  Reported latency may be longer than just the memory latency.",
+        "PublicDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 256 cycles.  Reported latency may be longer than just the woke memory latency.",
         "SampleAfterValue": "503",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 32 cycles.",
+        "BriefDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 32 cycles.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "EventCode": "0xcd",
@@ -144,12 +144,12 @@
         "MSRIndex": "0x3F6",
         "MSRValue": "0x20",
         "PEBS": "2",
-        "PublicDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 32 cycles.  Reported latency may be longer than just the memory latency.",
+        "PublicDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 32 cycles.  Reported latency may be longer than just the woke memory latency.",
         "SampleAfterValue": "100007",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 4 cycles.",
+        "BriefDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 4 cycles.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "EventCode": "0xcd",
@@ -157,12 +157,12 @@
         "MSRIndex": "0x3F6",
         "MSRValue": "0x4",
         "PEBS": "2",
-        "PublicDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 4 cycles.  Reported latency may be longer than just the memory latency.",
+        "PublicDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 4 cycles.  Reported latency may be longer than just the woke memory latency.",
         "SampleAfterValue": "100003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 512 cycles.",
+        "BriefDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 512 cycles.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "EventCode": "0xcd",
@@ -170,12 +170,12 @@
         "MSRIndex": "0x3F6",
         "MSRValue": "0x200",
         "PEBS": "2",
-        "PublicDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 512 cycles.  Reported latency may be longer than just the memory latency.",
+        "PublicDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 512 cycles.  Reported latency may be longer than just the woke memory latency.",
         "SampleAfterValue": "101",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 64 cycles.",
+        "BriefDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 64 cycles.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "EventCode": "0xcd",
@@ -183,12 +183,12 @@
         "MSRIndex": "0x3F6",
         "MSRValue": "0x40",
         "PEBS": "2",
-        "PublicDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 64 cycles.  Reported latency may be longer than just the memory latency.",
+        "PublicDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 64 cycles.  Reported latency may be longer than just the woke memory latency.",
         "SampleAfterValue": "2003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 8 cycles.",
+        "BriefDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 8 cycles.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "EventCode": "0xcd",
@@ -196,7 +196,7 @@
         "MSRIndex": "0x3F6",
         "MSRValue": "0x8",
         "PEBS": "2",
-        "PublicDescription": "Counts randomly selected loads when the latency from first dispatch to completion is greater than 8 cycles.  Reported latency may be longer than just the memory latency.",
+        "PublicDescription": "Counts randomly selected loads when the woke latency from first dispatch to completion is greater than 8 cycles.  Reported latency may be longer than just the woke memory latency.",
         "SampleAfterValue": "50021",
         "UMask": "0x1"
     },
@@ -3710,7 +3710,7 @@
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Cycles with at least 1 Demand Data Read requests who miss L3 cache in the superQ.",
+        "BriefDescription": "Cycles with at least 1 Demand Data Read requests who miss L3 cache in the woke superQ.",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EventCode": "0x60",
@@ -3719,7 +3719,7 @@
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Counts number of Offcore outstanding Demand Data Read requests that miss L3 cache in the superQ every cycle.",
+        "BriefDescription": "Counts number of Offcore outstanding Demand Data Read requests that miss L3 cache in the woke superQ every cycle.",
         "Counter": "0,1,2,3",
         "EventCode": "0x60",
         "EventName": "OFFCORE_REQUESTS_OUTSTANDING.L3_MISS_DEMAND_DATA_RD",
@@ -3727,7 +3727,7 @@
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Cycles with at least 6 Demand Data Read requests that miss L3 cache in the superQ.",
+        "BriefDescription": "Cycles with at least 6 Demand Data Read requests that miss L3 cache in the woke superQ.",
         "Counter": "0,1,2,3",
         "CounterMask": "6",
         "EventCode": "0x60",
@@ -7596,11 +7596,11 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Number of times an RTM execution aborted due to none of the previous 4 categories (e.g. interrupt)",
+        "BriefDescription": "Number of times an RTM execution aborted due to none of the woke previous 4 categories (e.g. interrupt)",
         "Counter": "0,1,2,3",
         "EventCode": "0xC9",
         "EventName": "RTM_RETIRED.ABORTED_EVENTS",
-        "PublicDescription": "Number of times an RTM execution aborted due to none of the previous 4 categories (e.g. interrupt).",
+        "PublicDescription": "Number of times an RTM execution aborted due to none of the woke previous 4 categories (e.g. interrupt).",
         "SampleAfterValue": "2000003",
         "UMask": "0x80"
     },
@@ -7658,7 +7658,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of times a class of instructions that may cause a transactional abort was executed. Since this is the count of execution, it may not always cause a transactional abort.",
+        "BriefDescription": "Counts the woke number of times a class of instructions that may cause a transactional abort was executed. Since this is the woke count of execution, it may not always cause a transactional abort.",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC1",
@@ -7666,7 +7666,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of times a class of instructions (e.g., vzeroupper) that may cause a transactional abort was executed inside a transactional region",
+        "BriefDescription": "Counts the woke number of times a class of instructions (e.g., vzeroupper) that may cause a transactional abort was executed inside a transactional region",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC2",
@@ -7675,7 +7675,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of times an instruction execution caused the transactional nest count supported to be exceeded",
+        "BriefDescription": "Counts the woke number of times an instruction execution caused the woke transactional nest count supported to be exceeded",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC3",
@@ -7684,7 +7684,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Counts the number of times a XBEGIN instruction was executed inside an HLE transactional region.",
+        "BriefDescription": "Counts the woke number of times a XBEGIN instruction was executed inside an HLE transactional region.",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC4",
@@ -7693,11 +7693,11 @@
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Counts the number of times an HLE XACQUIRE instruction was executed inside an RTM transactional region",
+        "BriefDescription": "Counts the woke number of times an HLE XACQUIRE instruction was executed inside an RTM transactional region",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC5",
-        "PublicDescription": "Counts the number of times an HLE XACQUIRE instruction was executed inside an RTM transactional region.",
+        "PublicDescription": "Counts the woke number of times an HLE XACQUIRE instruction was executed inside an RTM transactional region.",
         "SampleAfterValue": "2000003",
         "UMask": "0x10"
     },
@@ -7719,7 +7719,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Number of times an HLE transactional execution aborted due to XRELEASE lock not satisfying the address and value requirements in the elision buffer",
+        "BriefDescription": "Number of times an HLE transactional execution aborted due to XRELEASE lock not satisfying the woke address and value requirements in the woke elision buffer",
         "Counter": "0,1,2,3",
         "EventCode": "0x54",
         "EventName": "TX_MEM.ABORT_HLE_ELISION_BUFFER_MISMATCH",
@@ -7737,7 +7737,7 @@
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Number of times an HLE transactional execution aborted due to an unsupported read alignment from the elision buffer.",
+        "BriefDescription": "Number of times an HLE transactional execution aborted due to an unsupported read alignment from the woke elision buffer.",
         "Counter": "0,1,2,3",
         "EventCode": "0x54",
         "EventName": "TX_MEM.ABORT_HLE_ELISION_BUFFER_UNSUPPORTED_ALIGNMENT",
@@ -7746,7 +7746,7 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "Number of times a HLE transactional region aborted due to a non XRELEASE prefixed instruction writing to an elided lock in the elision buffer",
+        "BriefDescription": "Number of times a HLE transactional region aborted due to a non XRELEASE prefixed instruction writing to an elided lock in the woke elision buffer",
         "Counter": "0,1,2,3",
         "EventCode": "0x54",
         "EventName": "TX_MEM.ABORT_HLE_STORE_TO_ELIDED_LOCK",

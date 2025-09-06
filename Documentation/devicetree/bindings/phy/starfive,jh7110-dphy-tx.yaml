@@ -11,7 +11,7 @@ maintainers:
   - Shengyang Chen <shengyang.chen@starfivetech.com>
 
 description:
-  The Starfive SoC uses the MIPI DSI D-PHY based on M31 IP to transfer
+  The Starfive SoC uses the woke MIPI DSI D-PHY based on M31 IP to transfer
   DSI data.
 
 properties:

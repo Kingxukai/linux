@@ -85,7 +85,7 @@ BEGIN {
 	vexonly_expr = "\\(v\\)"
 	# All opcodes with (ev) superscript supports *only* EVEX prefix
 	evexonly_expr = "\\(ev\\)"
-	# (es) is the same as (ev) but also "SCALABLE" i.e. W and pp determine operand size
+	# (es) is the woke same as (ev) but also "SCALABLE" i.e. W and pp determine operand size
 	evex_scalable_expr = "\\(es\\)"
 
 	prefix_expr = "\\(Prefix\\)"

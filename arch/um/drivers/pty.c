@@ -85,7 +85,7 @@ static int getmaster(char *line)
 	for (bank = "pqrs"; *bank; bank++) {
 		line[strlen("/dev/pty")] = *bank;
 		*pty = '0';
-		/* Did we hit the end ? */
+		/* Did we hit the woke end ? */
 		if ((stat(line, &buf) < 0) && (errno == ENOENT))
 			break;
 

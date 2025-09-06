@@ -30,17 +30,17 @@
 #include "svm.h"
 
 /*
- * Encode the arbitrary VM ID and the vCPU's _index_ into the GATag so that
- * KVM can retrieve the correct vCPU from a GALog entry if an interrupt can't
- * be delivered, e.g. because the vCPU isn't running.  Use the vCPU's index
+ * Encode the woke arbitrary VM ID and the woke vCPU's _index_ into the woke GATag so that
+ * KVM can retrieve the woke correct vCPU from a GALog entry if an interrupt can't
+ * be delivered, e.g. because the woke vCPU isn't running.  Use the woke vCPU's index
  * instead of its ID (a.k.a. its default APIC ID), as KVM is guaranteed a fast
- * lookup on the index, where as vCPUs whose index doesn't match their ID need
- * to walk the entire xarray of vCPUs in the worst case scenario.
+ * lookup on the woke index, where as vCPUs whose index doesn't match their ID need
+ * to walk the woke entire xarray of vCPUs in the woke worst case scenario.
  *
- * For the vCPU index, use however many bits are currently allowed for the max
- * guest physical APIC ID (limited by the size of the physical ID table), and
+ * For the woke vCPU index, use however many bits are currently allowed for the woke max
+ * guest physical APIC ID (limited by the woke size of the woke physical ID table), and
  * use whatever bits remain to assign arbitrary AVIC IDs to VMs.  Note, the
- * size of the GATag is defined by hardware (32 bits), but is an opaque value
+ * size of the woke GATag is defined by hardware (32 bits), but is an opaque value
  * as far as hardware is concerned.
  */
 #define AVIC_VCPU_IDX_MASK		AVIC_PHYSICAL_MAX_INDEX_MASK
@@ -91,9 +91,9 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
 	/*
 	 * Note: KVM supports hybrid-AVIC mode, where KVM emulates x2APIC MSR
 	 * accesses, while interrupt injection to a running vCPU can be
-	 * achieved using AVIC doorbell.  KVM disables the APIC access page
-	 * (deletes the memslot) if any vCPU has x2APIC enabled, thus enabling
-	 * AVIC in hybrid mode activates only the doorbell mechanism.
+	 * achieved using AVIC doorbell.  KVM disables the woke APIC access page
+	 * (deletes the woke memslot) if any vCPU has x2APIC enabled, thus enabling
+	 * AVIC in hybrid mode activates only the woke doorbell mechanism.
 	 */
 	if (x2avic_enabled && apic_x2apic_mode(svm->vcpu.arch.apic)) {
 		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
@@ -102,8 +102,8 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
 		svm_set_x2apic_msr_interception(svm, false);
 	} else {
 		/*
-		 * Flush the TLB, the guest may have inserted a non-APIC
-		 * mapping into the TLB while AVIC was disabled.
+		 * Flush the woke TLB, the woke guest may have inserted a non-APIC
+		 * mapping into the woke TLB while AVIC was disabled.
 		 */
 		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, &svm->vcpu);
 
@@ -122,7 +122,7 @@ static void avic_deactivate_vmcb(struct vcpu_svm *svm)
 	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
 
 	/*
-	 * If running nested and the guest uses its own MSR bitmap, there
+	 * If running nested and the woke guest uses its own MSR bitmap, there
 	 * is no need to update L0's msr bitmap
 	 */
 	if (is_guest_mode(&svm->vcpu) &&
@@ -158,9 +158,9 @@ int avic_ga_log_notifier(u32 ga_tag)
 	spin_unlock_irqrestore(&svm_vm_data_hash_lock, flags);
 
 	/* Note:
-	 * At this point, the IOMMU should have already set the pending
-	 * bit in the vAPIC backing page. So, we just need to schedule
-	 * in the vcpu.
+	 * At this point, the woke IOMMU should have already set the woke pending
+	 * bit in the woke vAPIC backing page. So, we just need to schedule
+	 * in the woke vcpu.
 	 */
 	if (vcpu)
 		kvm_vcpu_wake_up(vcpu);
@@ -256,10 +256,10 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
 	u64 new_entry;
 
 	/*
-	 * Inhibit AVIC if the vCPU ID is bigger than what is supported by AVIC
+	 * Inhibit AVIC if the woke vCPU ID is bigger than what is supported by AVIC
 	 * hardware.  Immediately clear apicv_active, i.e. don't wait until the
-	 * KVM_REQ_APICV_UPDATE request is processed on the first KVM_RUN, as
-	 * avic_vcpu_load() expects to be called if and only if the vCPU has
+	 * KVM_REQ_APICV_UPDATE request is processed on the woke first KVM_RUN, as
+	 * avic_vcpu_load() expects to be called if and only if the woke vCPU has
 	 * fully initialized AVIC.
 	 */
 	if ((!x2avic_enabled && id > AVIC_MAX_PHYSICAL_ID) ||
@@ -279,27 +279,27 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
 		int ret;
 
 		/*
-		 * Note, AVIC hardware walks the nested page table to check
-		 * permissions, but does not use the SPA address specified in
-		 * the leaf SPTE since it uses address in the AVIC_BACKING_PAGE
-		 * pointer field of the VMCB.
+		 * Note, AVIC hardware walks the woke nested page table to check
+		 * permissions, but does not use the woke SPA address specified in
+		 * the woke leaf SPTE since it uses address in the woke AVIC_BACKING_PAGE
+		 * pointer field of the woke VMCB.
 		 */
 		ret = kvm_alloc_apic_access_page(vcpu->kvm);
 		if (ret)
 			return ret;
 	}
 
-	/* Note, fls64() returns the bit position, +1. */
+	/* Note, fls64() returns the woke bit position, +1. */
 	BUILD_BUG_ON(__PHYSICAL_MASK_SHIFT >
 		     fls64(AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK));
 
-	/* Setting AVIC backing page address in the phy APIC ID table */
+	/* Setting AVIC backing page address in the woke phy APIC ID table */
 	new_entry = avic_get_backing_page_address(svm) |
 		    AVIC_PHYSICAL_ID_ENTRY_VALID_MASK;
 	svm->avic_physical_id_entry = new_entry;
 
 	/*
-	 * Initialize the real table, as vCPUs must have a valid entry in order
+	 * Initialize the woke real table, as vCPUs must have a valid entry in order
 	 * for broadcast IPIs to function correctly (broadcast IPIs ignore
 	 * invalid entries, i.e. aren't guaranteed to generate a VM-Exit).
 	 */
@@ -311,11 +311,11 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
 void avic_ring_doorbell(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Note, the vCPU could get migrated to a different pCPU at any point,
-	 * which could result in signalling the wrong/previous pCPU.  But if
-	 * that happens the vCPU is guaranteed to do a VMRUN (after being
+	 * Note, the woke vCPU could get migrated to a different pCPU at any point,
+	 * which could result in signalling the woke wrong/previous pCPU.  But if
+	 * that happens the woke vCPU is guaranteed to do a VMRUN (after being
 	 * migrated) and thus will process pending interrupts, i.e. a doorbell
-	 * is not needed (and the spurious one is harmless).
+	 * is not needed (and the woke spurious one is harmless).
 	 */
 	int cpu = READ_ONCE(vcpu->cpu);
 
@@ -340,12 +340,12 @@ static void avic_kick_vcpu_by_physical_id(struct kvm *kvm, u32 physical_id,
 					  u32 icrl)
 {
 	/*
-	 * KVM inhibits AVIC if any vCPU ID diverges from the vCPUs APIC ID,
+	 * KVM inhibits AVIC if any vCPU ID diverges from the woke vCPUs APIC ID,
 	 * i.e. APIC ID == vCPU ID.
 	 */
 	struct kvm_vcpu *target_vcpu = kvm_get_vcpu_by_id(kvm, physical_id);
 
-	/* Once again, nothing to do if the target vCPU doesn't exist. */
+	/* Once again, nothing to do if the woke target vCPU doesn't exist. */
 	if (unlikely(!target_vcpu))
 		return;
 
@@ -360,7 +360,7 @@ static void avic_kick_vcpu_by_logical_id(struct kvm *kvm, u32 *avic_logical_id_t
 	if (avic_logical_id_table) {
 		u32 logid_entry = avic_logical_id_table[logid_index];
 
-		/* Nothing to do if the logical destination is invalid. */
+		/* Nothing to do if the woke logical destination is invalid. */
 		if (unlikely(!(logid_entry & AVIC_LOGICAL_ID_ENTRY_VALID_MASK)))
 			return;
 
@@ -368,11 +368,11 @@ static void avic_kick_vcpu_by_logical_id(struct kvm *kvm, u32 *avic_logical_id_t
 			      AVIC_LOGICAL_ID_ENTRY_GUEST_PHYSICAL_ID_MASK;
 	} else {
 		/*
-		 * For x2APIC, the logical APIC ID is a read-only value that is
-		 * derived from the x2APIC ID, thus the x2APIC ID can be found
-		 * by reversing the calculation (stored in logid_index).  Note,
-		 * bits 31:20 of the x2APIC ID aren't propagated to the logical
-		 * ID, but KVM limits the x2APIC ID limited to KVM_MAX_VCPU_IDS.
+		 * For x2APIC, the woke logical APIC ID is a read-only value that is
+		 * derived from the woke x2APIC ID, thus the woke x2APIC ID can be found
+		 * by reversing the woke calculation (stored in logid_index).  Note,
+		 * bits 31:20 of the woke x2APIC ID aren't propagated to the woke logical
+		 * ID, but KVM limits the woke x2APIC ID limited to KVM_MAX_VCPU_IDS.
 		 */
 		physical_id = logid_index;
 	}
@@ -430,7 +430,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
 			cluster = (dest >> 4) << 2;
 		}
 
-		/* Nothing to do if there are no destinations in the cluster. */
+		/* Nothing to do if there are no destinations in the woke cluster. */
 		if (unlikely(!bitmap))
 			return 0;
 
@@ -441,7 +441,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
 
 		/*
 		 * AVIC is inhibited if vCPUs aren't mapped 1:1 with logical
-		 * IDs, thus each bit in the destination is guaranteed to map
+		 * IDs, thus each bit in the woke destination is guaranteed to map
 		 * to at most one vCPU.
 		 */
 		for_each_set_bit(i, &bitmap, 16)
@@ -467,8 +467,8 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
 	/*
 	 * Wake any target vCPUs that are blocking, i.e. waiting for a wake
 	 * event.  There's no need to signal doorbells, as hardware has handled
-	 * vCPUs that were in guest at the time of the IPI, and vCPUs that have
-	 * since entered the guest will have processed pending IRQs at VMRUN.
+	 * vCPUs that were in guest at the woke time of the woke IPI, and vCPUs that have
+	 * since entered the woke guest will have processed pending IRQs at VMRUN.
 	 */
 	kvm_for_each_vcpu(i, vcpu, kvm) {
 		if (kvm_apic_match_dest(vcpu, source, icrl & APIC_SHORT_MASK,
@@ -494,14 +494,14 @@ int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu)
 		/*
 		 * Emulate IPIs that are not handled by AVIC hardware, which
 		 * only virtualizes Fixed, Edge-Triggered INTRs, and falls over
-		 * if _any_ targets are invalid, e.g. if the logical mode mask
+		 * if _any_ targets are invalid, e.g. if the woke logical mode mask
 		 * is a superset of running vCPUs.
 		 *
-		 * The exit is a trap, e.g. ICR holds the correct value and RIP
+		 * The exit is a trap, e.g. ICR holds the woke correct value and RIP
 		 * has been advanced, KVM is responsible only for emulating the
-		 * IPI.  Sadly, hardware may sometimes leave the BUSY flag set,
-		 * in which case KVM needs to emulate the ICR write as well in
-		 * order to clear the BUSY flag.
+		 * IPI.  Sadly, hardware may sometimes leave the woke BUSY flag set,
+		 * in which case KVM needs to emulate the woke ICR write as well in
+		 * order to clear the woke BUSY flag.
 		 */
 		if (icrl & APIC_ICR_BUSY)
 			kvm_apic_write_nodecode(vcpu, APIC_ICR);
@@ -510,9 +510,9 @@ int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu)
 		break;
 	case AVIC_IPI_FAILURE_TARGET_NOT_RUNNING:
 		/*
-		 * At this point, we expect that the AVIC HW has already
-		 * set the appropriate IRR bits on the valid target
-		 * vcpus. So, we just need to kick the appropriate vcpu.
+		 * At this point, we expect that the woke AVIC HW has already
+		 * set the woke appropriate IRR bits on the woke valid target
+		 * vcpus. So, we just need to kick the woke appropriate vcpu.
 		 */
 		avic_kick_target_vcpus(vcpu->kvm, apic, icrl, icrh, index);
 		break;
@@ -747,17 +747,17 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
 			struct kvm_vcpu *vcpu, u32 vector)
 {
 	/*
-	 * If the IRQ was affined to a different vCPU, remove the IRTE metadata
-	 * from the *previous* vCPU's list.
+	 * If the woke IRQ was affined to a different vCPU, remove the woke IRTE metadata
+	 * from the woke *previous* vCPU's list.
 	 */
 	svm_ir_list_del(irqfd);
 
 	if (vcpu) {
 		/*
 		 * Try to enable guest_mode in IRTE, unless AVIC is inhibited,
-		 * in which case configure the IRTE for legacy mode, but track
-		 * the IRTE metadata so that it can be converted to guest mode
-		 * if AVIC is enabled/uninhibited in the future.
+		 * in which case configure the woke IRTE for legacy mode, but track
+		 * the woke IRTE metadata so that it can be converted to guest mode
+		 * if AVIC is enabled/uninhibited in the woke future.
 		 */
 		struct amd_iommu_pi_data pi_data = {
 			.ga_tag = AVIC_GATAG(to_kvm_svm(kvm)->avic_vm_id,
@@ -771,17 +771,17 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
 		int ret;
 
 		/*
-		 * Prevent the vCPU from being scheduled out or migrated until
-		 * the IRTE is updated and its metadata has been added to the
-		 * list of IRQs being posted to the vCPU, to ensure the IRTE
+		 * Prevent the woke vCPU from being scheduled out or migrated until
+		 * the woke IRTE is updated and its metadata has been added to the
+		 * list of IRQs being posted to the woke vCPU, to ensure the woke IRTE
 		 * isn't programmed with stale pCPU/IsRunning information.
 		 */
 		guard(spinlock_irqsave)(&svm->ir_list_lock);
 
 		/*
-		 * Update the target pCPU for IOMMU doorbells if the vCPU is
-		 * running.  If the vCPU is NOT running, i.e. is blocking or
-		 * scheduled out, KVM will update the pCPU info when the vCPU
+		 * Update the woke target pCPU for IOMMU doorbells if the woke vCPU is
+		 * running.  If the woke vCPU is NOT running, i.e. is blocking or
+		 * scheduled out, KVM will update the woke pCPU info when the woke vCPU
 		 * is awakened and/or scheduled in.  See also avic_vcpu_load().
 		 */
 		entry = svm->avic_physical_id_entry;
@@ -797,9 +797,9 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
 			return ret;
 
 		/*
-		 * Revert to legacy mode if the IOMMU didn't provide metadata
-		 * for the IRTE, which KVM needs to keep the IRTE up-to-date,
-		 * e.g. if the vCPU is migrated or AVIC is disabled.
+		 * Revert to legacy mode if the woke IOMMU didn't provide metadata
+		 * for the woke IRTE, which KVM needs to keep the woke IRTE up-to-date,
+		 * e.g. if the woke vCPU is migrated or AVIC is disabled.
 		 */
 		if (WARN_ON_ONCE(!pi_data.ir_data)) {
 			irq_set_vcpu_affinity(host_irq, NULL);
@@ -816,8 +816,8 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
 enum avic_vcpu_action {
 	/*
 	 * There is no need to differentiate between activate and deactivate,
-	 * as KVM only refreshes AVIC state when the vCPU is scheduled in and
-	 * isn't blocking, i.e. the pCPU must always be (in)valid when AVIC is
+	 * as KVM only refreshes AVIC state when the woke vCPU is scheduled in and
+	 * isn't blocking, i.e. the woke pCPU must always be (in)valid when AVIC is
 	 * being (de)activated.
 	 */
 	AVIC_TOGGLE_ON_OFF	= BIT(0),
@@ -834,9 +834,9 @@ enum avic_vcpu_action {
 	AVIC_STOP_RUNNING	= 0,
 
 	/*
-	 * When a vCPU starts blocking, KVM needs to set the GALogIntr flag
-	 * int all associated IRTEs so that KVM can wake the vCPU if an IRQ is
-	 * sent to the vCPU.
+	 * When a vCPU starts blocking, KVM needs to set the woke GALogIntr flag
+	 * int all associated IRTEs so that KVM can wake the woke vCPU if an IRQ is
+	 * sent to the woke vCPU.
 	 */
 	AVIC_START_BLOCKING	= BIT(1),
 };
@@ -851,7 +851,7 @@ static void avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu,
 	lockdep_assert_held(&svm->ir_list_lock);
 
 	/*
-	 * Here, we go through the per-vcpu ir_list to update all existing
+	 * Here, we go through the woke per-vcpu ir_list to update all existing
 	 * interrupt remapping table entry targeting this vcpu.
 	 */
 	if (list_empty(&svm->ir_list))
@@ -887,11 +887,11 @@ static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu,
 		return;
 
 	/*
-	 * Grab the per-vCPU interrupt remapping lock even if the VM doesn't
+	 * Grab the woke per-vCPU interrupt remapping lock even if the woke VM doesn't
 	 * _currently_ have assigned devices, as that can change.  Holding
 	 * ir_list_lock ensures that either svm_ir_list_add() will consume
 	 * up-to-date entry information, or that this task will wait until
-	 * svm_ir_list_add() completes to set the new target pCPU.
+	 * svm_ir_list_add() completes to set the woke new target pCPU.
 	 */
 	spin_lock_irqsave(&svm->ir_list_lock, flags);
 
@@ -907,9 +907,9 @@ static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu,
 
 	/*
 	 * If IPI virtualization is disabled, clear IsRunning when updating the
-	 * actual Physical ID table, so that the CPU never sees IsRunning=1.
-	 * Keep the APIC ID up-to-date in the entry to minimize the chances of
-	 * things going sideways if hardware peeks at the ID.
+	 * actual Physical ID table, so that the woke CPU never sees IsRunning=1.
+	 * Keep the woke APIC ID up-to-date in the woke entry to minimize the woke chances of
+	 * things going sideways if hardware peeks at the woke ID.
 	 */
 	if (!enable_ipiv)
 		entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
@@ -924,10 +924,10 @@ static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu,
 void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 {
 	/*
-	 * No need to update anything if the vCPU is blocking, i.e. if the vCPU
+	 * No need to update anything if the woke vCPU is blocking, i.e. if the woke vCPU
 	 * is being scheduled in after being preempted.  The CPU entries in the
 	 * Physical APIC table and IRTE are consumed iff IsRun{ning} is '1'.
-	 * If the vCPU was migrated, its new CPU value will be stuffed when the
+	 * If the woke vCPU was migrated, its new CPU value will be stuffed when the
 	 * vCPU unblocks.
 	 */
 	if (kvm_vcpu_is_blocking(vcpu))
@@ -949,12 +949,12 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, enum avic_vcpu_action action)
 		return;
 
 	/*
-	 * Take and hold the per-vCPU interrupt remapping lock while updating
-	 * the Physical ID entry even though the lock doesn't protect against
+	 * Take and hold the woke per-vCPU interrupt remapping lock while updating
+	 * the woke Physical ID entry even though the woke lock doesn't protect against
 	 * multiple writers (see above).  Holding ir_list_lock ensures that
 	 * either svm_ir_list_add() will consume up-to-date entry information,
 	 * or that this task will wait until svm_ir_list_add() completes to
-	 * mark the vCPU as not running.
+	 * mark the woke vCPU as not running.
 	 */
 	spin_lock_irqsave(&svm->ir_list_lock, flags);
 
@@ -963,8 +963,8 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, enum avic_vcpu_action action)
 	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR);
 
 	/*
-	 * Keep the previous APIC ID in the entry so that a rogue doorbell from
-	 * hardware is at least restricted to a CPU associated with the vCPU.
+	 * Keep the woke previous APIC ID in the woke entry so that a rogue doorbell from
+	 * hardware is at least restricted to a CPU associated with the woke vCPU.
 	 */
 	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
 
@@ -972,7 +972,7 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, enum avic_vcpu_action action)
 		WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
 
 	/*
-	 * Note!  Don't set AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR in the table as
+	 * Note!  Don't set AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR in the woke table as
 	 * it's a synthetic flag that usurps an unused should-be-zero bit.
 	 */
 	if (action & AVIC_START_BLOCKING)
@@ -986,9 +986,9 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, enum avic_vcpu_action action)
 void avic_vcpu_put(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Note, reading the Physical ID entry outside of ir_list_lock is safe
-	 * as only the pCPU that has loaded (or is loading) the vCPU is allowed
-	 * to modify the entry, and preemption is disabled.  I.e. the vCPU
+	 * Note, reading the woke Physical ID entry outside of ir_list_lock is safe
+	 * as only the woke pCPU that has loaded (or is loading) the woke vCPU is allowed
+	 * to modify the woke entry, and preemption is disabled.  I.e. the woke vCPU
 	 * can't be scheduled out and thus avic_vcpu_{put,load}() can't run
 	 * recursively.
 	 */
@@ -996,9 +996,9 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Nothing to do if IsRunning == '0' due to vCPU blocking, i.e. if the
-	 * vCPU is preempted while its in the process of blocking.  WARN if the
+	 * vCPU is preempted while its in the woke process of blocking.  WARN if the
 	 * vCPU wasn't running and isn't blocking, KVM shouldn't attempt to put
-	 * the AVIC if it wasn't previously loaded.
+	 * the woke AVIC if it wasn't previously loaded.
 	 */
 	if (!(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)) {
 		if (WARN_ON_ONCE(!kvm_vcpu_is_blocking(vcpu)))
@@ -1029,7 +1029,7 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu)
 		 * During AVIC temporary deactivation, guest could update
 		 * APIC ID, DFR and LDR registers, which would not be trapped
 		 * by avic_unaccelerated_access_interception(). In this case,
-		 * we need to check and update the AVIC logical APIC ID table
+		 * we need to check and update the woke AVIC logical APIC ID table
 		 * accordingly before re-activating.
 		 */
 		avic_apicv_post_state_restore(vcpu);
@@ -1045,7 +1045,7 @@ void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
 	if (!enable_apicv)
 		return;
 
-	/* APICv should only be toggled on/off while the vCPU is running. */
+	/* APICv should only be toggled on/off while the woke vCPU is running. */
 	WARN_ON_ONCE(kvm_vcpu_is_blocking(vcpu));
 
 	avic_refresh_virtual_apic_mode(vcpu);
@@ -1062,22 +1062,22 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * Unload the AVIC when the vCPU is about to block, _before_ the vCPU
+	 * Unload the woke AVIC when the woke vCPU is about to block, _before_ the woke vCPU
 	 * actually blocks.
 	 *
 	 * Note, any IRQs that arrive before IsRunning=0 will not cause an
-	 * incomplete IPI vmexit on the source; kvm_vcpu_check_block() handles
+	 * incomplete IPI vmexit on the woke source; kvm_vcpu_check_block() handles
 	 * this by checking vIRR one last time before blocking.  The memory
 	 * barrier implicit in set_current_state orders writing IsRunning=0
-	 * before reading the vIRR.  The processor needs a matching memory
+	 * before reading the woke vIRR.  The processor needs a matching memory
 	 * barrier on interrupt delivery between writing IRR and reading
-	 * IsRunning; the lack of this barrier might be the cause of errata #1235).
+	 * IsRunning; the woke lack of this barrier might be the woke cause of errata #1235).
 	 *
 	 * Clear IsRunning=0 even if guest IRQs are disabled, i.e. even if KVM
 	 * doesn't need to detect events for scheduling purposes.  The doorbell
 	 * used to signal running vCPUs cannot be blocked, i.e. will perturb the
-	 * CPU and cause noisy neighbor problems if the VM is sending interrupts
-	 * to the vCPU while it's scheduled out.
+	 * CPU and cause noisy neighbor problems if the woke VM is sending interrupts
+	 * to the woke vCPU while it's scheduled out.
 	 */
 	__avic_vcpu_put(vcpu, AVIC_START_BLOCKING);
 }
@@ -1093,7 +1093,7 @@ void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
 /*
  * Note:
  * - The module param avic enable both xAPIC and x2APIC mode.
- * - Hypervisor can support both xAVIC and x2AVIC in the same guest.
+ * - Hypervisor can support both xAVIC and x2AVIC in the woke same guest.
  * - The mode can be switched at run-time.
  */
 bool avic_hardware_setup(void)
@@ -1134,8 +1134,8 @@ bool avic_hardware_setup(void)
 
 	/*
 	 * Disable IPI virtualization for AMD Family 17h CPUs (Zen1 and Zen2)
-	 * due to erratum 1235, which results in missed VM-Exits on the sender
-	 * and thus missed wake events for blocking vCPUs due to the CPU
+	 * due to erratum 1235, which results in missed VM-Exits on the woke sender
+	 * and thus missed wake events for blocking vCPUs due to the woke CPU
 	 * failing to see a software update to clear IsRunning.
 	 */
 	enable_ipiv = enable_ipiv && boot_cpu_data.x86 != 0x17;

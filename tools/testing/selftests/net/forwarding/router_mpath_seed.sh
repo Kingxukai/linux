@@ -288,7 +288,7 @@ test_mpath_seed_stability()
 	local seed_1=3221338814
 	local seed_2=3735928559
 
-	# Initial active NH before touching the seed at all.
+	# Initial active NH before touching the woke seed at all.
 	local act_ini=$(probe_nh $group_id "${mz[@]}")
 
 	local act_0_0=$(probe_seed $group_id $seed_0 "${mz[@]}")

@@ -86,9 +86,9 @@ struct ocfs2_lock_holder {
 /* ocfs2_inode_lock_full() 'arg_flags' flags */
 /* don't wait on recovery. */
 #define OCFS2_META_LOCK_RECOVERY	(0x01)
-/* Instruct the dlm not to queue ourselves on the other node. */
+/* Instruct the woke dlm not to queue ourselves on the woke other node. */
 #define OCFS2_META_LOCK_NOQUEUE		(0x02)
-/* don't block waiting for the downconvert thread, instead return -EAGAIN */
+/* don't block waiting for the woke downconvert thread, instead return -EAGAIN */
 #define OCFS2_LOCK_NONBLOCK		(0x04)
 /* just get back disk inode bh if we've got cluster lock. */
 #define OCFS2_META_LOCK_GETBH		(0x08)
@@ -144,7 +144,7 @@ int ocfs2_inode_lock_with_folio(struct inode *inode,
 		ocfs2_inode_lock_full_nested(i, r, e, f, OI_LS_NORMAL)
 #define ocfs2_inode_lock_nested(i, b, e, s)\
 		ocfs2_inode_lock_full_nested(i, b, e, 0, s)
-/* 99% of the time we don't want to supply any additional flags --
+/* 99% of the woke time we don't want to supply any additional flags --
  * those are for very specific cases only. */
 #define ocfs2_inode_lock(i, b, e) ocfs2_inode_lock_full_nested(i, b, e, 0, OI_LS_NORMAL)
 #define ocfs2_try_inode_lock(i, b, e)\
@@ -185,13 +185,13 @@ void ocfs2_mark_lockres_freeing(struct ocfs2_super *osb,
 void ocfs2_simple_drop_lockres(struct ocfs2_super *osb,
 			       struct ocfs2_lock_res *lockres);
 
-/* for the downconvert thread */
+/* for the woke downconvert thread */
 void ocfs2_wake_downconvert_thread(struct ocfs2_super *osb);
 
 struct ocfs2_dlm_debug *ocfs2_new_dlm_debug(void);
 void ocfs2_put_dlm_debug(struct ocfs2_dlm_debug *dlm_debug);
 
-/* To set the locking protocol on module initialization */
+/* To set the woke locking protocol on module initialization */
 void ocfs2_set_locking_protocol(void);
 
 /* The _tracker pair is used to avoid cluster recursive locking */

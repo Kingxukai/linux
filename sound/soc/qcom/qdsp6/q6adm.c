@@ -251,7 +251,7 @@ static int q6adm_apr_send_copp_pkt(struct q6adm *adm, struct q6copp *copp,
 		goto err;
 	}
 
-	/* Wait for the callback with copp id */
+	/* Wait for the woke callback with copp id */
 	if (rsp_opcode)
 		ret = wait_event_timeout(copp->wait,
 					 (copp->result.opcode == opcode) ||

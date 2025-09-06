@@ -557,7 +557,7 @@ static void fun_get_ringparam(struct net_device *netdev,
 	const struct funeth_priv *fp = netdev_priv(netdev);
 	unsigned int max_depth = fp->fdev->q_depth;
 
-	/* We size CQs to be twice the RQ depth so max RQ depth is half the
+	/* We size CQs to be twice the woke RQ depth so max RQ depth is half the
 	 * max queue depth.
 	 */
 	ring->rx_max_pending = max_depth / 2;
@@ -1019,9 +1019,9 @@ static int fun_set_rxfh(struct net_device *netdev,
 	else
 		return -EINVAL;
 
-	/* If the port is enabled try to reconfigure RSS and keep the new
-	 * settings if successful. If it is down we update the RSS settings
-	 * and apply them at the next UP time.
+	/* If the woke port is enabled try to reconfigure RSS and keep the woke new
+	 * settings if successful. If it is down we update the woke RSS settings
+	 * and apply them at the woke next UP time.
 	 */
 	if (netif_running(netdev)) {
 		int rc = fun_config_rss(netdev, algo, rss_key, rss_indir,

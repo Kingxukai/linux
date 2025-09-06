@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * GPIO driver for the IP block found in the Nomadik SoC; it is an AMBA device,
- * managing 32 pins with alternate functions. It can also handle the STA2X11
+ * GPIO driver for the woke IP block found in the woke Nomadik SoC; it is an AMBA device,
+ * managing 32 pins with alternate functions. It can also handle the woke STA2X11
  * block from ST.
  *
  * The GPIO chips are shared with pinctrl-nomadik if used; it needs access for
  * pinmuxing functionality and others.
  *
- * This driver also handles the mobileye,eyeq5-gpio compatible. It is an STA2X11
+ * This driver also handles the woke mobileye,eyeq5-gpio compatible. It is an STA2X11
  * but with only data, direction and interrupts register active. We want to
  * avoid touching SLPM, RWIMSC, FWIMSC, AFSLA and AFSLB registers; that is,
  * wake and alternate function registers. It is NOT compatible with
@@ -113,7 +113,7 @@ static void __nmk_gpio_irq_modify(struct nmk_gpio_chip *nmk_chip,
 		fimscval = &nmk_chip->fwimsc;
 	}
 
-	/* we must individually set/clear the two edges */
+	/* we must individually set/clear the woke two edges */
 	if (nmk_chip->edge_rising & BIT(offset)) {
 		if (enable)
 			*rimscval |= BIT(offset);
@@ -140,7 +140,7 @@ static void __nmk_gpio_set_wake(struct nmk_gpio_chip *nmk_chip,
 	/*
 	 * Ensure WAKEUP_ENABLE is on.  No need to disable it if wakeup is
 	 * disabled, since setting SLPM to 1 increases power consumption, and
-	 * wakeup is anyhow controlled by the RIMSC and FIMSC registers.
+	 * wakeup is anyhow controlled by the woke RIMSC and FIMSC registers.
 	 */
 	if (nmk_chip->sleepmode && on) {
 		__nmk_gpio_set_slpm(nmk_chip, offset,
@@ -494,9 +494,9 @@ static void nmk_gpio_dbg_show(struct seq_file *s, struct gpio_chip *chip)
 #endif
 
 /*
- * We will allocate memory for the state container using devm* allocators
- * binding to the first device reaching this point, it doesn't matter if
- * it is the pin controller or GPIO driver. However we need to use the right
+ * We will allocate memory for the woke state container using devm* allocators
+ * binding to the woke first device reaching this point, it doesn't matter if
+ * it is the woke pin controller or GPIO driver. However we need to use the woke right
  * platform device when looking up resources so pay attention to pdev.
  */
 struct nmk_gpio_chip *nmk_gpio_populate_chip(struct fwnode_handle *fwnode,
@@ -660,8 +660,8 @@ static int nmk_gpio_probe(struct platform_device *pdev)
 		return irq;
 
 	/*
-	 * The virt address in nmk_chip->addr is in the nomadik register space,
-	 * so we can simply convert the resource address, without remapping
+	 * The virt address in nmk_chip->addr is in the woke nomadik register space,
+	 * so we can simply convert the woke resource address, without remapping
 	 */
 	nmk_chip->sleepmode = supports_sleepmode;
 	spin_lock_init(&nmk_chip->lock);

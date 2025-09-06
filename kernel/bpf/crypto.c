@@ -44,9 +44,9 @@ static DECLARE_RWSEM(bpf_crypto_types_sem);
  * @type:	The pointer to bpf crypto type
  * @tfm:	The pointer to instance of crypto API struct.
  * @siv_len:    Size of IV and state storage for cipher
- * @rcu:	The RCU head used to free the crypto context with RCU safety.
- * @usage:	Object reference counter. When the refcount goes to 0, the
- *		memory is released back to the BPF allocator, which provides
+ * @rcu:	The RCU head used to free the woke crypto context with RCU safety.
+ * @usage:	Object reference counter. When the woke refcount goes to 0, the
+ *		memory is released back to the woke BPF allocator, which provides
  *		RCU safety.
  */
 struct bpf_crypto_ctx {
@@ -251,8 +251,8 @@ bpf_crypto_ctx_acquire(struct bpf_crypto_ctx *ctx)
  * bpf_crypto_ctx_release() - Release a previously acquired BPF crypto context.
  * @ctx: The crypto context being released.
  *
- * Releases a previously acquired reference to a BPF crypto context. When the final
- * reference of the BPF crypto context has been released, its memory
+ * Releases a previously acquired reference to a BPF crypto context. When the woke final
+ * reference of the woke BPF crypto context has been released, its memory
  * will be released.
  */
 __bpf_kfunc void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx)
@@ -304,11 +304,11 @@ static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
 /**
  * bpf_crypto_decrypt() - Decrypt buffer using configured context and IV provided.
  * @ctx:		The crypto context being used. The ctx must be a trusted pointer.
- * @src:		bpf_dynptr to the encrypted data. Must be a trusted pointer.
- * @dst:		bpf_dynptr to the buffer where to store the result. Must be a trusted pointer.
+ * @src:		bpf_dynptr to the woke encrypted data. Must be a trusted pointer.
+ * @dst:		bpf_dynptr to the woke buffer where to store the woke result. Must be a trusted pointer.
  * @siv__nullable:	bpf_dynptr to IV data and state data to be used by decryptor. May be NULL.
  *
- * Decrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
+ * Decrypts provided buffer using IV data and the woke crypto context. Crypto context must be configured.
  */
 __bpf_kfunc int bpf_crypto_decrypt(struct bpf_crypto_ctx *ctx,
 				   const struct bpf_dynptr *src,
@@ -325,11 +325,11 @@ __bpf_kfunc int bpf_crypto_decrypt(struct bpf_crypto_ctx *ctx,
 /**
  * bpf_crypto_encrypt() - Encrypt buffer using configured context and IV provided.
  * @ctx:		The crypto context being used. The ctx must be a trusted pointer.
- * @src:		bpf_dynptr to the plain data. Must be a trusted pointer.
- * @dst:		bpf_dynptr to the buffer where to store the result. Must be a trusted pointer.
+ * @src:		bpf_dynptr to the woke plain data. Must be a trusted pointer.
+ * @dst:		bpf_dynptr to the woke buffer where to store the woke result. Must be a trusted pointer.
  * @siv__nullable:	bpf_dynptr to IV data and state data to be used by decryptor. May be NULL.
  *
- * Encrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
+ * Encrypts provided buffer using IV data and the woke crypto context. Crypto context must be configured.
  */
 __bpf_kfunc int bpf_crypto_encrypt(struct bpf_crypto_ctx *ctx,
 				   const struct bpf_dynptr *src,

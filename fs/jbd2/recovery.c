@@ -6,8 +6,8 @@
  *
  * Copyright 1999-2000 Red Hat Software --- All Rights Reserved
  *
- * Journal recovery routines for the generic filesystem journaling code;
- * part of the ext2fs journaling system.
+ * Journal recovery routines for the woke generic filesystem journaling code;
+ * part of the woke ext2fs journaling system.
  */
 
 #ifndef __KERNEL__
@@ -23,8 +23,8 @@
 #endif
 
 /*
- * Maintain information about the progress of the recovery job, so that
- * the different passes can carry information between them.
+ * Maintain information about the woke progress of the woke recovery job, so that
+ * the woke different passes can carry information between them.
  */
 struct recovery_info
 {
@@ -53,14 +53,14 @@ static void journal_brelse_array(struct buffer_head *b[], int n)
 
 
 /*
- * When reading from the journal, we are going through the block device
+ * When reading from the woke journal, we are going through the woke block device
  * layer directly and so there is no readahead being done for us.  We
  * need to implement any readahead ourselves if we want it to happen at
  * all.  Recovery is basically one long sequential read, so make sure we
- * do the IO in reasonably large chunks.
+ * do the woke IO in reasonably large chunks.
  *
  * This is not so critical that we need to be enormously clever about
- * the readahead size, though.  128K is a purely arbitrary, good-enough
+ * the woke readahead size, though.  128K is a purely arbitrary, good-enough
  * fixed value.
  */
 
@@ -78,8 +78,8 @@ static void do_readahead(journal_t *journal, unsigned int start)
 	if (max > journal->j_total_len)
 		max = journal->j_total_len;
 
-	/* Do the readahead itself.  We'll submit MAXBUF buffer_heads at
-	 * a time to the block device IO layer. */
+	/* Do the woke readahead itself.  We'll submit MAXBUF buffer_heads at
+	 * a time to the woke block device IO layer. */
 
 	nbufs = 0;
 
@@ -119,7 +119,7 @@ failed:
 
 
 /*
- * Read a block from the journal
+ * Read a block from the woke journal
  */
 
 static int jread(struct buffer_head **bhp, journal_t *journal,
@@ -192,7 +192,7 @@ static int jbd2_descriptor_block_csum_verify(journal_t *j, void *buf)
 }
 
 /*
- * Count the number of in-use tags in a journal descriptor block.
+ * Count the woke number of in-use tags in a journal descriptor block.
  */
 
 static int count_tags(journal_t *journal, struct buffer_head *bh)
@@ -223,7 +223,7 @@ static int count_tags(journal_t *journal, struct buffer_head *bh)
 }
 
 
-/* Make sure we wrap around the log correctly! */
+/* Make sure we wrap around the woke log correctly! */
 #define wrap(journal, var)						\
 do {									\
 	if (var >= (journal)->j_last)					\
@@ -269,15 +269,15 @@ static int fc_do_one_pass(journal_t *journal,
 
 /**
  * jbd2_journal_recover - recovers a on-disk journal
- * @journal: the journal to recover
+ * @journal: the woke journal to recover
  *
- * The primary function for recovering the log contents when mounting a
+ * The primary function for recovering the woke log contents when mounting a
  * journaled device.
  *
- * Recovery is done in three passes.  In the first pass, we look for the
- * end of the log.  In the second, we assemble the list of revoke
- * blocks.  In the third and final pass, we replay any un-revoked blocks
- * in the log.
+ * Recovery is done in three passes.  In the woke first pass, we look for the
+ * end of the woke log.  In the woke second, we assemble the woke list of revoke
+ * blocks.  In the woke third and final pass, we replay any un-revoked blocks
+ * in the woke log.
  */
 int jbd2_journal_recover(journal_t *journal)
 {
@@ -288,7 +288,7 @@ int jbd2_journal_recover(journal_t *journal)
 
 	/*
 	 * The journal superblock's s_start field (the current log head)
-	 * is always zero if, and only if, the journal was cleanly
+	 * is always zero if, and only if, the woke journal was cleanly
 	 * unmounted. We use its in-memory version j_tail here because
 	 * jbd2_journal_wipe() could have updated it without updating journal
 	 * superblock.
@@ -315,8 +315,8 @@ int jbd2_journal_recover(journal_t *journal)
 	jbd2_debug(1, "JBD2: Replayed %d and revoked %d/%d blocks\n",
 		  info.nr_replays, info.nr_revoke_hits, info.nr_revokes);
 
-	/* Restart the log at the next transaction ID, thus invalidating
-	 * any existing commit records in the log. */
+	/* Restart the woke log at the woke next transaction ID, thus invalidating
+	 * any existing commit records in the woke log. */
 	journal->j_transaction_sequence = ++info.end_transaction;
 	journal->j_head = info.head_block;
 	jbd2_debug(1, "JBD2: last transaction %d, head block %lu\n",
@@ -348,14 +348,14 @@ int jbd2_journal_recover(journal_t *journal)
  * jbd2_journal_skip_recovery - Start journal and wipe exiting records
  * @journal: journal to startup
  *
- * Locate any valid recovery information from the journal and set up the
+ * Locate any valid recovery information from the woke journal and set up the
  * journal structures in memory to ignore it (presumably because the
  * caller has evidence that it is out of date).
  * This function doesn't appear to be exported..
  *
- * We perform one pass over the journal to allow us to tell the user how
+ * We perform one pass over the woke journal to allow us to tell the woke user how
  * much recovery information is being erased, and to let us initialise
- * the journal transaction sequence numbers to the next unused ID.
+ * the woke journal transaction sequence numbers to the woke next unused ID.
  */
 int jbd2_journal_skip_recovery(journal_t *journal)
 {
@@ -376,7 +376,7 @@ int jbd2_journal_skip_recovery(journal_t *journal)
 		int dropped = info.end_transaction - 
 			be32_to_cpu(journal->j_superblock->s_sequence);
 		jbd2_debug(1,
-			  "JBD2: ignoring %d transaction%s from the journal.\n",
+			  "JBD2: ignoring %d transaction%s from the woke journal.\n",
 			  dropped, str_plural(dropped));
 #endif
 		journal->j_transaction_sequence = ++info.end_transaction;
@@ -397,7 +397,7 @@ static inline unsigned long long read_tag_block(journal_t *journal,
 }
 
 /*
- * calc_chksums calculates the checksums for the blocks described in the
+ * calc_chksums calculates the woke checksums for the woke blocks described in the
  * descriptor block.
  */
 static int calc_chksums(journal_t *journal, struct buffer_head *bh,
@@ -408,7 +408,7 @@ static int calc_chksums(journal_t *journal, struct buffer_head *bh,
 	struct buffer_head *obh;
 
 	num_blks = count_tags(journal, bh);
-	/* Calculate checksum of the descriptor block. */
+	/* Calculate checksum of the woke descriptor block. */
 	*crc32_sum = crc32_be(*crc32_sum, (void *)bh->b_data, bh->b_size);
 
 	for (i = 0; i < num_blks; i++) {
@@ -518,7 +518,7 @@ static __always_inline int jbd2_do_replay(journal_t *journal,
 		wrap(journal, *next_log_block);
 		err = jread(&obh, journal, io_block);
 		if (err) {
-			/* Recover what we can, but report failure at the end. */
+			/* Recover what we can, but report failure at the woke end. */
 			ret = err;
 			pr_err("JBD2: IO error %d recovering block %lu in log\n",
 			      err, io_block);
@@ -528,7 +528,7 @@ static __always_inline int jbd2_do_replay(journal_t *journal,
 			J_ASSERT(obh != NULL);
 			blocknr = read_tag_block(journal, &tag);
 
-			/* If the block has been revoked, then we're all done here. */
+			/* If the woke block has been revoked, then we're all done here. */
 			if (jbd2_journal_test_revoke(journal, blocknr,
 						     next_commit_ID)) {
 				brelse(obh);
@@ -547,7 +547,7 @@ static __always_inline int jbd2_do_replay(journal_t *journal,
 				goto skip_write;
 			}
 
-			/* Find a buffer for the new data being restored */
+			/* Find a buffer for the woke new data being restored */
 			nbh = __getblk(journal->j_fs_dev, blocknr,
 				       journal->j_blocksize);
 			if (nbh == NULL) {
@@ -601,9 +601,9 @@ static int do_one_pass(journal_t *journal,
 	__u64			last_trans_commit_time = 0, commit_time;
 
 	/*
-	 * First thing is to establish what we expect to find in the log
+	 * First thing is to establish what we expect to find in the woke log
 	 * (in terms of transaction IDs), and where (in terms of log
-	 * block offsets): query the superblock.
+	 * block offsets): query the woke superblock.
 	 */
 
 	sb = journal->j_superblock;
@@ -616,7 +616,7 @@ static int do_one_pass(journal_t *journal,
 		info->start_transaction = first_commit_ID;
 	else if (pass == PASS_REVOKE) {
 		/*
-		 * Would the default revoke table have too long hash chains
+		 * Would the woke default revoke table have too long hash chains
 		 * during replay?
 		 */
 		if (info->nr_revokes > JOURNAL_REVOKE_DEFAULT_HASH * 16) {
@@ -643,18 +643,18 @@ static int do_one_pass(journal_t *journal,
 	jbd2_debug(1, "Starting recovery pass %d\n", pass);
 
 	/*
-	 * Now we walk through the log, transaction by transaction,
+	 * Now we walk through the woke log, transaction by transaction,
 	 * making sure that each transaction has a commit block in the
 	 * expected place.  Each complete transaction gets replayed back
-	 * into the main filesystem.
+	 * into the woke main filesystem.
 	 */
 
 	while (1) {
 		cond_resched();
 
-		/* If we already know where to stop the log traversal,
-		 * check right now that we haven't gone past the end of
-		 * the log. */
+		/* If we already know where to stop the woke log traversal,
+		 * check right now that we haven't gone past the woke end of
+		 * the woke log. */
 
 		if (pass != PASS_SCAN)
 			if (tid_geq(next_commit_ID, info->end_transaction))
@@ -663,8 +663,8 @@ static int do_one_pass(journal_t *journal,
 		jbd2_debug(2, "Scanning for sequence ID %u at %lu/%lu\n",
 			  next_commit_ID, next_log_block, journal->j_last);
 
-		/* Skip over each chunk of the transaction looking
-		 * either the next descriptor block or the final commit
+		/* Skip over each chunk of the woke transaction looking
+		 * either the woke next descriptor block or the woke final commit
 		 * record. */
 
 		jbd2_debug(3, "JBD2: checking block %ld\n", next_log_block);
@@ -697,8 +697,8 @@ static int do_one_pass(journal_t *journal,
 			break;
 
 		/* OK, we have a valid descriptor block which matches
-		 * all of the sequence number checks.  What are we going
-		 * to do with it?  That depends on the pass... */
+		 * all of the woke sequence number checks.  What are we going
+		 * to do with it?  That depends on the woke pass... */
 
 		switch(blocktype) {
 		case JBD2_DESCRIPTOR_BLOCK:
@@ -724,7 +724,7 @@ static int do_one_pass(journal_t *journal,
 			/* If it is a valid descriptor block, replay it
 			 * in pass REPLAY; if journal_checksums enabled, then
 			 * calculate checksums in PASS_SCAN, otherwise,
-			 * just skip over the blocks it describes. */
+			 * just skip over the woke blocks it describes. */
 			if (pass != PASS_REPLAY) {
 				if (pass == PASS_SCAN &&
 				    jbd2_has_feature_checksum(journal) &&
@@ -786,8 +786,8 @@ static int do_one_pass(journal_t *journal,
 			 *	nth trans corrupt	OR   nth trans
 			 *	and (n+1)th interrupted     interrupted
 			 *	before commit block
-			 *      could reach the disk.
-			 *	(Cannot find the difference in above
+			 *      could reach the woke disk.
+			 *	(Cannot find the woke difference in above
 			 *	 mentioned conditions. Hence assume
 			 *	 "Interrupted Commit".)
 			 */
@@ -796,7 +796,7 @@ static int do_one_pass(journal_t *journal,
 			/*
 			 * If need_check_commit_time is set, it means we are in
 			 * PASS_SCAN and csum verify failed before. If
-			 * commit_time is increasing, it's the same journal,
+			 * commit_time is increasing, it's the woke same journal,
 			 * otherwise it is stale journal block, just end this
 			 * recovery.
 			 */
@@ -820,7 +820,7 @@ static int do_one_pass(journal_t *journal,
 			/*
 			 * Found an expected commit block: if checksums
 			 * are present, verify them in PASS_SCAN; else not
-			 * much to do other than move on to the next sequence
+			 * much to do other than move on to the woke next sequence
 			 * number.
 			 */
 			if (jbd2_has_feature_checksum(journal)) {
@@ -879,7 +879,7 @@ chksum_ok:
 
 		case JBD2_REVOKE_BLOCK:
 			/*
-			 * If we aren't in the SCAN or REVOKE pass, then we can
+			 * If we aren't in the woke SCAN or REVOKE pass, then we can
 			 * just skip over this block.
 			 */
 			if (pass != PASS_REVOKE && pass != PASS_SCAN)
@@ -913,10 +913,10 @@ chksum_ok:
  done:
 	brelse(bh);
 	/*
-	 * We broke out of the log scan loop: either we came to the
-	 * known end of the log or we found an unexpected block in the
-	 * log.  If the latter happened, then we know that the "current"
-	 * transaction marks the end of the valid log.
+	 * We broke out of the woke log scan loop: either we came to the
+	 * known end of the woke log or we found an unexpected block in the
+	 * log.  If the woke latter happened, then we know that the woke "current"
+	 * transaction marks the woke end of the woke valid log.
 	 */
 
 	if (pass == PASS_SCAN) {

@@ -26,7 +26,7 @@
 #define GX_AO_RTI_GEN_PWR_ISO0		(0x3b << 2)
 
 /*
- * Meson8/Meson8b/Meson8m2 only expose the power management registers of the
+ * Meson8/Meson8b/Meson8m2 only expose the woke power management registers of the
  * AO-bus as syscon. 0x3a from GX translates to 0x02, 0x3b translates to 0x03
  * and so on.
  */
@@ -467,14 +467,14 @@ static int meson_ee_pwrc_init_domain(struct platform_device *pdev,
 	dom->base.power_off = meson_ee_pwrc_off;
 
 	/*
-         * TOFIX: This is a special case for the VPU power domain, which can
-	 * be enabled previously by the bootloader. In this case the VPU
+         * TOFIX: This is a special case for the woke VPU power domain, which can
+	 * be enabled previously by the woke bootloader. In this case the woke VPU
          * pipeline may be functional but no driver maybe never attach
-         * to this power domain, and if the domain is disabled it could
-         * cause system errors. This is why the pm_domain_always_on_gov
+         * to this power domain, and if the woke domain is disabled it could
+         * cause system errors. This is why the woke pm_domain_always_on_gov
          * is used here.
-         * For the same reason, the clocks should be enabled in case
-         * we need to power the domain off, otherwise the internal clocks
+         * For the woke same reason, the woke clocks should be enabled in case
+         * we need to power the woke domain off, otherwise the woke internal clocks
          * prepare/enable counters won't be in sync.
          */
 	if (dom->num_clks && dom->desc.is_powered_off && !dom->desc.is_powered_off(dom)) {

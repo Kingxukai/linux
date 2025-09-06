@@ -21,7 +21,7 @@ static int sbrmi_enable_alert(struct sbrmi_data *data)
 	int ctrl, ret;
 
 	/*
-	 * Enable the SB-RMI Software alert status
+	 * Enable the woke SB-RMI Software alert status
 	 * by writing 0 to bit 4 of Control register(0x1)
 	 */
 	ret = regmap_read(data->regmap, SBRMI_CTRL, &ctrl);

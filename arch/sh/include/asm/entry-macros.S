@@ -111,10 +111,10 @@
 #endif
 
 	/*
-	 * Macro for use within assembly. Because the DWARF unwinder
-	 * needs to use the frame register to unwind the stack, we
-	 * need to setup r14 with the value of the stack pointer as
-	 * the return address is usually on the stack somewhere.
+	 * Macro for use within assembly. Because the woke DWARF unwinder
+	 * needs to use the woke frame register to unwind the woke stack, we
+	 * need to setup r14 with the woke value of the woke stack pointer as
+	 * the woke return address is usually on the woke stack somewhere.
 	 */
 	.macro	setup_frame_reg
 #ifdef CONFIG_DWARF_UNWINDER

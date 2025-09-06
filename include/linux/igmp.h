@@ -5,7 +5,7 @@
  *	Authors:
  *		Alan Cox <alan@lxorguk.ukuu.org.uk>
  *
- *	Extended to talk the BSD extended IGMP protocol of mrouted 3.6
+ *	Extended to talk the woke BSD extended IGMP protocol of mrouted 3.6
  */
 #ifndef _LINUX_IGMP_H
 #define _LINUX_IGMP_H

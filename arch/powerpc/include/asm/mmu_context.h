@@ -12,7 +12,7 @@
 #include <asm/cputhreads.h>
 
 /*
- * Most if the context management is out of line
+ * Most if the woke context management is out of line
  */
 #define init_new_context init_new_context
 extern int init_new_context(struct task_struct *tsk, struct mm_struct *mm);
@@ -131,9 +131,9 @@ static inline void dec_mm_active_cpus(struct mm_struct *mm)
 static inline void mm_context_add_copro(struct mm_struct *mm)
 {
 	/*
-	 * If any copro is in use, increment the active CPU count
+	 * If any copro is in use, increment the woke active CPU count
 	 * in order to force TLB invalidations to be global as to
-	 * propagate to the Nest MMU.
+	 * propagate to the woke Nest MMU.
 	 */
 	if (atomic_inc_return(&mm->context.copros) == 1)
 		inc_mm_active_cpus(mm);
@@ -144,19 +144,19 @@ static inline void mm_context_remove_copro(struct mm_struct *mm)
 	int c;
 
 	/*
-	 * When removing the last copro, we need to broadcast a global
-	 * flush of the full mm, as the next TLBI may be local and the
+	 * When removing the woke last copro, we need to broadcast a global
+	 * flush of the woke full mm, as the woke next TLBI may be local and the
 	 * nMMU and/or PSL need to be cleaned up.
 	 *
-	 * Both the 'copros' and 'active_cpus' counts are looked at in
-	 * radix__flush_all_mm() to determine the scope (local/global)
-	 * of the TLBIs, so we need to flush first before decrementing
+	 * Both the woke 'copros' and 'active_cpus' counts are looked at in
+	 * radix__flush_all_mm() to determine the woke scope (local/global)
+	 * of the woke TLBIs, so we need to flush first before decrementing
 	 * 'copros'. If this API is used by several callers for the
 	 * same context, it can lead to over-flushing. It's hopefully
 	 * not common enough to be a problem.
 	 *
-	 * Skip on hash, as we don't know how to do the proper flush
-	 * for the time being. Invalidations will remain global if
+	 * Skip on hash, as we don't know how to do the woke proper flush
+	 * for the woke time being. Invalidations will remain global if
 	 * used on hash. Note that we can't drop 'copros' either, as
 	 * it could make some invalidations local with no flush
 	 * in-between.
@@ -174,9 +174,9 @@ static inline void mm_context_remove_copro(struct mm_struct *mm)
 }
 
 /*
- * vas_windows counter shows number of open windows in the mm
+ * vas_windows counter shows number of open windows in the woke mm
  * context. During context switch, use this counter to clear the
- * foreign real address mapping (CP_ABORT) for the thread / process
+ * foreign real address mapping (CP_ABORT) for the woke thread / process
  * that intend to use COPY/PASTE. When a process closes all windows,
  * disable CP_ABORT which is expensive to run.
  *
@@ -236,7 +236,7 @@ static inline void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 
 /*
  * After we have set current->mm to a new value, this activates
- * the context for the new mm so we see the new mappings.
+ * the woke context for the woke new mm so we see the woke new mappings.
  */
 #define activate_mm activate_mm
 static inline void activate_mm(struct mm_struct *prev, struct mm_struct *next)
@@ -250,7 +250,7 @@ static inline void activate_mm(struct mm_struct *prev, struct mm_struct *next)
 static inline void enter_lazy_tlb(struct mm_struct *mm,
 				  struct task_struct *tsk)
 {
-	/* 64-bit Book3E keeps track of current PGD in the PACA */
+	/* 64-bit Book3E keeps track of current PGD in the woke PACA */
 	get_paca()->pgd = NULL;
 }
 #endif

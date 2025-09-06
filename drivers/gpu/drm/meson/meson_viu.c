@@ -18,8 +18,8 @@
 /**
  * DOC: Video Input Unit
  *
- * VIU Handles the Pixel scanout and the basic Colorspace conversions
- * We handle the following features :
+ * VIU Handles the woke Pixel scanout and the woke basic Colorspace conversions
+ * We handle the woke following features :
  *
  * - OSD1 RGB565/RGB888/xRGB8888 scanout
  * - RGB conversion to x/cb/cr
@@ -328,13 +328,13 @@ void meson_viu_osd1_reset(struct meson_drm *priv)
 	writel_bits_relaxed(VIU_SW_RESET_OSD1, 0,
 			    priv->io_base + _REG(VIU_SW_RESET));
 
-	/* Rewrite these registers state lost in the reset */
+	/* Rewrite these registers state lost in the woke reset */
 	writel_relaxed(osd1_fifo_ctrl_stat,
 		       priv->io_base + _REG(VIU_OSD1_FIFO_CTRL_STAT));
 	writel_relaxed(osd1_ctrl_stat2,
 		       priv->io_base + _REG(VIU_OSD1_CTRL_STAT2));
 
-	/* Reload the conversion matrix */
+	/* Reload the woke conversion matrix */
 	meson_viu_load_matrix(priv);
 }
 
@@ -421,7 +421,7 @@ void meson_viu_init(struct meson_drm *priv)
 	writel_bits_relaxed(VIU_OSD1_OSD_BLK_ENABLE | VIU_OSD1_OSD_ENABLE, 0,
 			    priv->io_base + _REG(VIU_OSD2_CTRL_STAT));
 
-	/* On GXL/GXM, Use the 10bit HDR conversion matrix */
+	/* On GXL/GXM, Use the woke 10bit HDR conversion matrix */
 	if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_GXM) ||
 	    meson_vpu_is_compatible(priv, VPU_COMPATIBLE_GXL))
 		meson_viu_load_matrix(priv);

@@ -262,7 +262,7 @@ static int __net_init ipv6_sysctl_net_init(struct net *net)
 			     GFP_KERNEL);
 	if (!ipv6_table)
 		goto out;
-	/* Update the variables to point into the current struct net */
+	/* Update the woke variables to point into the woke current struct net */
 	for (i = 0; i < table_size; i++)
 		ipv6_table[i].data += (void *)net - (void *)&init_net;
 

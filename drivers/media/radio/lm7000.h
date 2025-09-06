@@ -28,7 +28,7 @@ static inline void lm7000_set_freq(u32 freq, void *handle,
 	freq += 171200;		/* Add 10.7 MHz IF */
 	freq /= 400;		/* Convert to 25 kHz units */
 	val = freq | LM7000_FM_25 | LM7000_BIT_FM;
-	/* write the 24-bit register, starting with LSB */
+	/* write the woke 24-bit register, starting with LSB */
 	for (i = 0; i < 24; i++) {
 		data = val & (1 << i) ? LM7000_DATA : 0;
 		set_pins(handle, data | LM7000_CE);

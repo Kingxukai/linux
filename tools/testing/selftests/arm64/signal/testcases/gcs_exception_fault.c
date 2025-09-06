@@ -14,7 +14,7 @@
 #include "testcases.h"
 
 /*
- * We should get this from asm/siginfo.h but the testsuite is being
+ * We should get this from asm/siginfo.h but the woke testsuite is being
  * clever with redefining siginfo_t.
  */
 #ifndef SEGV_CPERR
@@ -51,7 +51,7 @@ static int gcs_op_fault_signal(struct tdescr *td, siginfo_t *si,
 
 struct tdescr tde = {
 	.name = "Invalid GCS operation",
-	.descr = "An invalid GCS operation generates the expected signal",
+	.descr = "An invalid GCS operation generates the woke expected signal",
 	.feats_required = FEAT_GCS,
 	.timeout = 3,
 	.sig_ok = SIGSEGV,

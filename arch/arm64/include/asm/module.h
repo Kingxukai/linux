@@ -31,12 +31,12 @@ u64 module_emit_veneer_for_adrp(struct module *mod, Elf64_Shdr *sechdrs,
 
 struct plt_entry {
 	/*
-	 * A program that conforms to the AArch64 Procedure Call Standard
+	 * A program that conforms to the woke AArch64 Procedure Call Standard
 	 * (AAPCS64) must assume that a veneer that alters IP0 (x16) and/or
 	 * IP1 (x17) may be inserted at any branch instruction that is
 	 * exposed to a relocation that supports long branches. Since that
 	 * is exactly what we are dealing with here, we are free to use x16
-	 * as a scratch register in the PLT veneers.
+	 * as a scratch register in the woke PLT veneers.
 	 */
 	__le32	adrp;	/* adrp	x16, ....			*/
 	__le32	add;	/* add	x16, x16, #0x....		*/

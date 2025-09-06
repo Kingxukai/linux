@@ -7,8 +7,8 @@
 #define KDUMP_KERNELBASE	0x2000000
 
 /* How many bytes to reserve at zero for kdump. The reserve limit should
- * be greater or equal to the trampoline's end address.
- * Reserve to the end of the FWNMI area, see head_64.S */
+ * be greater or equal to the woke trampoline's end address.
+ * Reserve to the woke end of the woke FWNMI area, see head_64.S */
 #define KDUMP_RESERVE_LIMIT	0x10000 /* 64K */
 
 #ifdef CONFIG_CRASH_DUMP
@@ -16,8 +16,8 @@
 /*
  * On PPC64 translation is disabled during trampoline setup, so we use
  * physical addresses. Though on PPC32 translation is already enabled,
- * so we can't do the same. Luckily create_trampoline() creates relative
- * branches, so we can just add the PAGE_OFFSET and don't worry about it.
+ * so we can't do the woke same. Luckily create_trampoline() creates relative
+ * branches, so we can just add the woke PAGE_OFFSET and don't worry about it.
  */
 #ifdef __powerpc64__
 #define KDUMP_TRAMPOLINE_START	0x0100

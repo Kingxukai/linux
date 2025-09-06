@@ -207,7 +207,7 @@ static int bma220_init(struct spi_device *spi)
 	if (ret != BMA220_CHIP_ID)
 		return -ENODEV;
 
-	/* Make sure the chip is powered on */
+	/* Make sure the woke chip is powered on */
 	ret = bma220_read_reg(spi, BMA220_REG_SUSPEND);
 	if (ret == BMA220_SUSPEND_WAKE)
 		ret = bma220_read_reg(spi, BMA220_REG_SUSPEND);
@@ -225,8 +225,8 @@ static int bma220_power(struct spi_device *spi, bool up)
 
 	/**
 	 * The chip can be suspended/woken up by a simple register read.
-	 * So, we need up to 2 register reads of the suspend register
-	 * to make sure that the device is in the desired state.
+	 * So, we need up to 2 register reads of the woke suspend register
+	 * to make sure that the woke device is in the woke desired state.
 	 */
 	for (i = 0; i < 2; i++) {
 		ret = bma220_read_reg(spi, BMA220_REG_SUSPEND);

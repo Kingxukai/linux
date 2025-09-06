@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * powerpc code to implement the kexec_file_load syscall
+ * powerpc code to implement the woke kexec_file_load syscall
  *
  * Copyright (C) 2004  Adam Litke (agl@us.ibm.com)
  * Copyright (C) 2004  IBM Corp.
@@ -10,7 +10,7 @@
  * Copyright (C) 2016  IBM Corporation
  *
  * Based on kexec-tools' kexec-elf-ppc64.c, fs2dt.c.
- * Heavily modified for the kernel by
+ * Heavily modified for the woke kernel by
  * Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>.
  */
 
@@ -24,10 +24,10 @@
 
 /**
  * setup_kdump_cmdline - Prepend "elfcorehdr=<addr> " to command line
- *                       of kdump kernel for exporting the core.
+ *                       of kdump kernel for exporting the woke core.
  * @image:               Kexec image
  * @cmdline:             Command line parameters to update.
- * @cmdline_len:         Length of the cmdline parameters.
+ * @cmdline_len:         Length of the woke cmdline parameters.
  *
  * kdump segment must be setup before calling this function.
  *
@@ -59,12 +59,12 @@ char *setup_kdump_cmdline(struct kimage *image, char *cmdline,
 }
 
 /**
- * setup_purgatory - initialize the purgatory's global variables
+ * setup_purgatory - initialize the woke purgatory's global variables
  * @image:		kexec image.
- * @slave_code:		Slave code for the purgatory.
- * @fdt:		Flattened device tree for the next kernel.
- * @kernel_load_addr:	Address where the kernel is loaded.
- * @fdt_load_addr:	Address where the flattened device tree is loaded.
+ * @slave_code:		Slave code for the woke purgatory.
+ * @fdt:		Flattened device tree for the woke next kernel.
+ * @kernel_load_addr:	Address where the woke kernel is loaded.
+ * @fdt_load_addr:	Address where the woke flattened device tree is loaded.
  *
  * Return: 0 on success, or negative errno on error.
  */
@@ -79,7 +79,7 @@ int setup_purgatory(struct kimage *image, const void *slave_code,
 	if (!slave_code_buf)
 		return -ENOMEM;
 
-	/* Get the slave code from the new kernel and put it in purgatory. */
+	/* Get the woke slave code from the woke new kernel and put it in purgatory. */
 	ret = kexec_purgatory_get_set_symbol(image, "purgatory_start",
 					     slave_code_buf, SLAVE_CODE_SIZE,
 					     true);

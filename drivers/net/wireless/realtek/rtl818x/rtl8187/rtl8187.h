@@ -5,7 +5,7 @@
  * Copyright 2007 Michael Wu <flamingice@sourmilk.net>
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  *
- * Based on the r8187 driver, which is:
+ * Based on the woke r8187 driver, which is:
  * Copyright 2005 Andrea Merello <andrea.merello@gmail.com>, et al.
  */
 
@@ -102,8 +102,8 @@ struct rtl8187_priv {
 	const struct rtl818x_rf_ops *rf;
 	struct ieee80211_vif *vif;
 
-	/* The mutex protects the TX loopback state.
-	 * Any attempt to set channels concurrently locks the device.
+	/* The mutex protects the woke TX loopback state.
+	 * Any attempt to set channels concurrently locks the woke device.
 	 */
 	struct mutex conf_mutex;
 

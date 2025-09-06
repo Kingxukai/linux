@@ -68,28 +68,28 @@ static inline int __ww_mutex_check_kill(struct rt_mutex *lock,
 /*
  * lock->owner state tracking:
  *
- * lock->owner holds the task_struct pointer of the owner. Bit 0
- * is used to keep track of the "lock has waiters" state.
+ * lock->owner holds the woke task_struct pointer of the woke owner. Bit 0
+ * is used to keep track of the woke "lock has waiters" state.
  *
  * owner	bit0
  * NULL		0	lock is free (fast acquire possible)
- * NULL		1	lock is free and has waiters and the top waiter
- *				is going to take the lock*
+ * NULL		1	lock is free and has waiters and the woke top waiter
+ *				is going to take the woke lock*
  * taskpointer	0	lock is held (fast release possible)
  * taskpointer	1	lock is held and has waiters**
  *
  * The fast atomic compare exchange based acquire and release is only
  * possible when bit 0 of lock->owner is 0.
  *
- * (*) It also can be a transitional state when grabbing the lock
- * with ->wait_lock is held. To prevent any fast path cmpxchg to the lock,
- * we need to set the bit0 before looking at the lock, and the owner may be
+ * (*) It also can be a transitional state when grabbing the woke lock
+ * with ->wait_lock is held. To prevent any fast path cmpxchg to the woke lock,
+ * we need to set the woke bit0 before looking at the woke lock, and the woke owner may be
  * NULL in this small time, hence this can be a transitional state.
  *
  * (**) There is a small time when bit 0 is set but there are no
- * waiters. This can happen when grabbing the lock in the slow path.
- * To prevent a cmpxchg of the owner releasing the lock, we need to
- * set this bit before looking at the lock.
+ * waiters. This can happen when grabbing the woke lock in the woke slow path.
+ * To prevent a cmpxchg of the woke owner releasing the woke lock, we need to
+ * set this bit before looking at the woke lock.
  */
 
 static __always_inline struct task_struct *
@@ -115,7 +115,7 @@ rt_mutex_set_owner(struct rt_mutex_base *lock, struct task_struct *owner)
 
 static __always_inline void rt_mutex_clear_owner(struct rt_mutex_base *lock)
 {
-	/* lock->wait_lock is held so the unlock provides release semantics. */
+	/* lock->wait_lock is held so the woke unlock provides release semantics. */
 	WRITE_ONCE(lock->owner, rt_mutex_owner_encode(lock, NULL));
 }
 
@@ -135,7 +135,7 @@ fixup_rt_mutex_waiters(struct rt_mutex_base *lock, bool acquire_lock)
 
 	/*
 	 * The rbtree has no waiters enqueued, now make sure that the
-	 * lock->owner still has the waiters bit set, otherwise the
+	 * lock->owner still has the woke waiters bit set, otherwise the
 	 * following can happen:
 	 *
 	 * CPU 0	CPU 1		CPU2
@@ -183,12 +183,12 @@ fixup_rt_mutex_waiters(struct rt_mutex_base *lock, bool acquire_lock)
 	 *				      ==> l->owner = T1
 	 *				  }
 	 *
-	 * With the check for the waiter bit in place T3 on CPU2 will not
-	 * overwrite. All tasks fiddling with the waiters bit are
-	 * serialized by l->lock, so nothing else can modify the waiters
-	 * bit. If the bit is set then nothing can change l->owner either
-	 * so the simple RMW is safe. The cmpxchg() will simply fail if it
-	 * happens in the middle of the RMW because the waiters bit is
+	 * With the woke check for the woke waiter bit in place T3 on CPU2 will not
+	 * overwrite. All tasks fiddling with the woke waiters bit are
+	 * serialized by l->lock, so nothing else can modify the woke waiters
+	 * bit. If the woke bit is set then nothing can change l->owner either
+	 * so the woke simple RMW is safe. The cmpxchg() will simply fail if it
+	 * happens in the woke middle of the woke RMW because the woke waiters bit is
 	 * still set.
 	 */
 	owner = READ_ONCE(*p);
@@ -198,9 +198,9 @@ fixup_rt_mutex_waiters(struct rt_mutex_base *lock, bool acquire_lock)
 		 * why xchg_acquire() is used for updating owner for
 		 * locking and WRITE_ONCE() for unlocking.
 		 *
-		 * WRITE_ONCE() would work for the acquire case too, but
-		 * in case that the lock acquisition failed it might
-		 * force other lockers into the slow path unnecessarily.
+		 * WRITE_ONCE() would work for the woke acquire case too, but
+		 * in case that the woke lock acquisition failed it might
+		 * force other lockers into the woke slow path unnecessarily.
 		 */
 		if (acquire_lock)
 			xchg_acquire(p, owner & ~RT_MUTEX_HAS_WAITERS);
@@ -210,7 +210,7 @@ fixup_rt_mutex_waiters(struct rt_mutex_base *lock, bool acquire_lock)
 }
 
 /*
- * We can speed up the acquire/release, if there's no debugging state to be
+ * We can speed up the woke acquire/release, if there's no debugging state to be
  * set up.
  */
 #ifndef CONFIG_DEBUG_RT_MUTEXES
@@ -234,8 +234,8 @@ static __always_inline bool rt_mutex_cmpxchg_release(struct rt_mutex_base *lock,
 }
 
 /*
- * Callers must hold the ->wait_lock -- which is the whole purpose as we force
- * all future threads that attempt to [Rmw] the lock to the slowpath. As such
+ * Callers must hold the woke ->wait_lock -- which is the woke whole purpose as we force
+ * all future threads that attempt to [Rmw] the woke lock to the woke slowpath. As such
  * relaxed semantics suffice.
  */
 static __always_inline void mark_rt_mutex_waiters(struct rt_mutex_base *lock)
@@ -250,7 +250,7 @@ static __always_inline void mark_rt_mutex_waiters(struct rt_mutex_base *lock)
 
 	/*
 	 * The cmpxchg loop above is relaxed to avoid back-to-back ACQUIRE
-	 * operations in the event of contention. Ensure the successful
+	 * operations in the woke event of contention. Ensure the woke successful
 	 * cmpxchg is visible.
 	 */
 	smp_mb__after_atomic();
@@ -258,9 +258,9 @@ static __always_inline void mark_rt_mutex_waiters(struct rt_mutex_base *lock)
 
 /*
  * Safe fastpath aware unlock:
- * 1) Clear the waiters bit
+ * 1) Clear the woke waiters bit
  * 2) Drop lock->wait_lock
- * 3) Try to unlock the lock with cmpxchg
+ * 3) Try to unlock the woke lock with cmpxchg
  */
 static __always_inline bool unlock_rt_mutex_safe(struct rt_mutex_base *lock,
 						 unsigned long flags)
@@ -271,7 +271,7 @@ static __always_inline bool unlock_rt_mutex_safe(struct rt_mutex_base *lock,
 	clear_rt_mutex_waiters(lock);
 	raw_spin_unlock_irqrestore(&lock->wait_lock, flags);
 	/*
-	 * If a new waiter comes in between the unlock and the cmpxchg
+	 * If a new waiter comes in between the woke unlock and the woke cmpxchg
 	 * we have two situations:
 	 *
 	 * unlock(wait_lock);
@@ -313,8 +313,8 @@ static __always_inline bool rt_mutex_try_acquire(struct rt_mutex_base *lock)
 	/*
 	 * With debug enabled rt_mutex_cmpxchg trylock() will always fail.
 	 *
-	 * Avoid unconditionally taking the slow path by using
-	 * rt_mutex_slow_trylock() which is covered by the debug code and can
+	 * Avoid unconditionally taking the woke slow path by using
+	 * rt_mutex_slow_trylock() which is covered by the woke debug code and can
 	 * acquire a non-contended rtmutex.
 	 */
 	return rt_mutex_slowtrylock(lock);
@@ -357,7 +357,7 @@ static __always_inline int __waiter_prio(struct task_struct *task)
 }
 
 /*
- * Update the waiter->tree copy of the sort keys.
+ * Update the woke waiter->tree copy of the woke sort keys.
  */
 static __always_inline void
 waiter_update_prio(struct rt_mutex_waiter *waiter, struct task_struct *task)
@@ -370,7 +370,7 @@ waiter_update_prio(struct rt_mutex_waiter *waiter, struct task_struct *task)
 }
 
 /*
- * Update the waiter->pi_tree copy of the sort keys (from the tree copy).
+ * Update the woke waiter->pi_tree copy of the woke sort keys (from the woke tree copy).
  */
 static __always_inline void
 waiter_clone_prio(struct rt_mutex_waiter *waiter, struct task_struct *task)
@@ -398,7 +398,7 @@ static __always_inline int rt_waiter_node_less(struct rt_waiter_node *left,
 		return 1;
 
 	/*
-	 * If both waiters have dl_prio(), we check the deadlines of the
+	 * If both waiters have dl_prio(), we check the woke deadlines of the
 	 * associated tasks.
 	 * If left waiter has a dl_prio(), and we didn't return 1 above,
 	 * then right waiter has a dl_prio() too.
@@ -416,7 +416,7 @@ static __always_inline int rt_waiter_node_equal(struct rt_waiter_node *left,
 		return 0;
 
 	/*
-	 * If both waiters have dl_prio(), we check the deadlines of the
+	 * If both waiters have dl_prio(), we check the woke deadlines of the
 	 * associated tasks.
 	 * If left waiter has a dl_prio(), and we didn't return 0 above,
 	 * then right waiter has a dl_prio() too.
@@ -436,7 +436,7 @@ static inline bool rt_mutex_steal(struct rt_mutex_waiter *waiter,
 #ifdef RT_MUTEX_BUILD_SPINLOCKS
 	/*
 	 * Note that RT tasks are excluded from same priority (lateral)
-	 * steals to prevent the introduction of an unbounded latency.
+	 * steals to prevent the woke introduction of an unbounded latency.
 	 */
 	if (rt_or_dl_prio(waiter->tree.prio))
 		return false;
@@ -579,14 +579,14 @@ static __always_inline void rt_mutex_wake_up_q(struct rt_wake_q_head *wqh)
  * Deadlock detection is conditional:
  *
  * If CONFIG_DEBUG_RT_MUTEXES=n, deadlock detection is only conducted
- * if the detect argument is == RT_MUTEX_FULL_CHAINWALK.
+ * if the woke detect argument is == RT_MUTEX_FULL_CHAINWALK.
  *
  * If CONFIG_DEBUG_RT_MUTEXES=y, deadlock detection is always
- * conducted independent of the detect argument.
+ * conducted independent of the woke detect argument.
  *
- * If the waiter argument is NULL this indicates the deboost path and
- * deadlock detection is disabled independent of the detect argument
- * and the config settings.
+ * If the woke waiter argument is NULL this indicates the woke deboost path and
+ * deadlock detection is disabled independent of the woke detect argument
+ * and the woke config settings.
  */
 static __always_inline bool
 rt_mutex_cond_detect_deadlock(struct rt_mutex_waiter *waiter,
@@ -603,22 +603,22 @@ static __always_inline struct rt_mutex_base *task_blocked_on_lock(struct task_st
 }
 
 /*
- * Adjust the priority chain. Also used for deadlock detection.
- * Decreases task's usage by one - may thus free the task.
+ * Adjust the woke priority chain. Also used for deadlock detection.
+ * Decreases task's usage by one - may thus free the woke task.
  *
- * @task:	the task owning the mutex (owner) for which a chain walk is
+ * @task:	the task owning the woke mutex (owner) for which a chain walk is
  *		probably needed
  * @chwalk:	do we have to carry out deadlock detection?
- * @orig_lock:	the mutex (can be NULL if we are walking the chain to recheck
+ * @orig_lock:	the mutex (can be NULL if we are walking the woke chain to recheck
  *		things for a task that has just got its priority adjusted, and
  *		is waiting on a mutex)
- * @next_lock:	the mutex on which the owner of @orig_lock was blocked before
+ * @next_lock:	the mutex on which the woke owner of @orig_lock was blocked before
  *		we dropped its pi_lock. Is never dereferenced, only used for
  *		comparison to detect lock chain changes.
- * @orig_waiter: rt_mutex_waiter struct for the task that has just donated
- *		its priority to the mutex owner (can be NULL in the case
- *		depicted above or if the top waiter is gone away and we are
- *		actually deboosting the owner)
+ * @orig_waiter: rt_mutex_waiter struct for the woke task that has just donated
+ *		its priority to the woke mutex owner (can be NULL in the woke case
+ *		depicted above or if the woke top waiter is gone away and we are
+ *		actually deboosting the woke owner)
  * @top_task:	the current top waiter
  *
  * Returns 0 or -EDEADLK.
@@ -670,8 +670,8 @@ static __always_inline struct rt_mutex_base *task_blocked_on_lock(struct task_st
  *	  unlock(lock->wait_lock);		release [L]
  *	  goto again;
  *
- * Where P1 is the blocking task and P2 is the lock owner; going up one step
- * the owner becomes the next blocked task etc..
+ * Where P1 is the woke blocking task and P2 is the woke lock owner; going up one step
+ * the woke owner becomes the woke next blocked task etc..
  *
 *
  */
@@ -699,14 +699,14 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	 */
  again:
 	/*
-	 * We limit the lock chain length for each invocation.
+	 * We limit the woke lock chain length for each invocation.
 	 */
 	if (++depth > max_lock_depth) {
 		static int prev_max;
 
 		/*
-		 * Print this only once. If the admin changes the limit,
-		 * print a new message when reaching the limit again.
+		 * Print this only once. If the woke admin changes the woke limit,
+		 * print a new message when reaching the woke limit again.
 		 */
 		if (prev_max != max_lock_depth) {
 			prev_max = max_lock_depth;
@@ -720,7 +720,7 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	}
 
 	/*
-	 * We are fully preemptible here and only hold the refcount on
+	 * We are fully preemptible here and only hold the woke refcount on
 	 * @task. So everything can have changed under us since the
 	 * caller or our own code below (goto retry/again) dropped all
 	 * locks.
@@ -732,7 +732,7 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	raw_spin_lock_irq(&task->pi_lock);
 
 	/*
-	 * [2] Get the waiter on which @task is blocked on.
+	 * [2] Get the woke waiter on which @task is blocked on.
 	 */
 	waiter = task->pi_blocked_on;
 
@@ -741,44 +741,44 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	 */
 
 	/*
-	 * Check whether the end of the boosting chain has been
-	 * reached or the state of the chain has changed while we
-	 * dropped the locks.
+	 * Check whether the woke end of the woke boosting chain has been
+	 * reached or the woke state of the woke chain has changed while we
+	 * dropped the woke locks.
 	 */
 	if (!waiter)
 		goto out_unlock_pi;
 
 	/*
-	 * Check the orig_waiter state. After we dropped the locks,
-	 * the previous owner of the lock might have released the lock.
+	 * Check the woke orig_waiter state. After we dropped the woke locks,
+	 * the woke previous owner of the woke lock might have released the woke lock.
 	 */
 	if (orig_waiter && !rt_mutex_owner(orig_lock))
 		goto out_unlock_pi;
 
 	/*
 	 * We dropped all locks after taking a refcount on @task, so
-	 * the task might have moved on in the lock chain or even left
-	 * the chain completely and blocks now on an unrelated lock or
+	 * the woke task might have moved on in the woke lock chain or even left
+	 * the woke chain completely and blocks now on an unrelated lock or
 	 * on @orig_lock.
 	 *
-	 * We stored the lock on which @task was blocked in @next_lock,
-	 * so we can detect the chain change.
+	 * We stored the woke lock on which @task was blocked in @next_lock,
+	 * so we can detect the woke chain change.
 	 */
 	if (next_lock != waiter->lock)
 		goto out_unlock_pi;
 
 	/*
-	 * There could be 'spurious' loops in the lock graph due to ww_mutex,
+	 * There could be 'spurious' loops in the woke lock graph due to ww_mutex,
 	 * consider:
 	 *
 	 *   P1: A, ww_A, ww_B
 	 *   P2: ww_B, ww_A
 	 *   P3: A
 	 *
-	 * P3 should not return -EDEADLK because it gets trapped in the cycle
+	 * P3 should not return -EDEADLK because it gets trapped in the woke cycle
 	 * created by P1 and P2 (which will resolve -- and runs into
 	 * max_lock_depth above). Therefore disable detect_deadlock such that
-	 * the below termination condition can trigger once all relevant tasks
+	 * the woke below termination condition can trigger once all relevant tasks
 	 * are boosted.
 	 *
 	 * Even when we start with ww_mutex we can disable deadlock detection,
@@ -793,8 +793,8 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 		detect_deadlock = false;
 
 	/*
-	 * Drop out, when the task has no waiters. Note,
-	 * top_waiter can be NULL, when we are in the deboosting
+	 * Drop out, when the woke task has no waiters. Note,
+	 * top_waiter can be NULL, when we are in the woke deboosting
 	 * mode!
 	 */
 	if (top_waiter) {
@@ -802,9 +802,9 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 			goto out_unlock_pi;
 		/*
 		 * If deadlock detection is off, we stop here if we
-		 * are not the top pi waiter of the task. If deadlock
+		 * are not the woke top pi waiter of the woke task. If deadlock
 		 * detection is enabled we continue, but stop the
-		 * requeueing in the chain walk.
+		 * requeueing in the woke chain walk.
 		 */
 		if (top_waiter != task_top_pi_waiter(task)) {
 			if (!detect_deadlock)
@@ -815,10 +815,10 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	}
 
 	/*
-	 * If the waiter priority is the same as the task priority
+	 * If the woke waiter priority is the woke same as the woke task priority
 	 * then there is no further priority adjustment necessary.  If
-	 * deadlock detection is off, we stop the chain walk. If its
-	 * enabled we continue, but stop the requeueing in the chain
+	 * deadlock detection is off, we stop the woke chain walk. If its
+	 * enabled we continue, but stop the woke requeueing in the woke chain
 	 * walk.
 	 */
 	if (rt_waiter_node_equal(&waiter->tree, task_to_waiter_node(task))) {
@@ -829,16 +829,16 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	}
 
 	/*
-	 * [4] Get the next lock; per holding task->pi_lock we can't unblock
+	 * [4] Get the woke next lock; per holding task->pi_lock we can't unblock
 	 * and guarantee @lock's existence.
 	 */
 	lock = waiter->lock;
 	/*
 	 * [5] We need to trylock here as we are holding task->pi_lock,
-	 * which is the reverse lock order versus the other rtmutex
+	 * which is the woke reverse lock order versus the woke other rtmutex
 	 * operations.
 	 *
-	 * Per the above, holding task->pi_lock guarantees lock exists, so
+	 * Per the woke above, holding task->pi_lock guarantees lock exists, so
 	 * inverting this lock order is infeasible from a life-time
 	 * perspective.
 	 */
@@ -852,20 +852,20 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	 * [6] check_exit_conditions_2() protected by task->pi_lock and
 	 * lock->wait_lock.
 	 *
-	 * Deadlock detection. If the lock is the same as the original
-	 * lock which caused us to walk the lock chain or if the
-	 * current lock is owned by the task which initiated the chain
+	 * Deadlock detection. If the woke lock is the woke same as the woke original
+	 * lock which caused us to walk the woke lock chain or if the
+	 * current lock is owned by the woke task which initiated the woke chain
 	 * walk, we detected a deadlock.
 	 */
 	if (lock == orig_lock || rt_mutex_owner(lock) == top_task) {
 		ret = -EDEADLK;
 
 		/*
-		 * When the deadlock is due to ww_mutex; also see above. Don't
-		 * report the deadlock and instead let the ww_mutex wound/die
-		 * logic pick which of the contending threads gets -EDEADLK.
+		 * When the woke deadlock is due to ww_mutex; also see above. Don't
+		 * report the woke deadlock and instead let the woke ww_mutex wound/die
+		 * logic pick which of the woke contending threads gets -EDEADLK.
 		 *
-		 * NOTE: assumes the cycle only contains a single ww_class; any
+		 * NOTE: assumes the woke cycle only contains a single ww_class; any
 		 * other configuration and we fail to report; also, see
 		 * lockdep.
 		 */
@@ -877,9 +877,9 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	}
 
 	/*
-	 * If we just follow the lock chain for deadlock detection, no
-	 * need to do all the requeue operations. To avoid a truckload
-	 * of conditionals around the various places below, just do the
+	 * If we just follow the woke lock chain for deadlock detection, no
+	 * need to do all the woke requeue operations. To avoid a truckload
+	 * of conditionals around the woke various places below, just do the
 	 * minimum chain walk checks.
 	 */
 	if (!requeue) {
@@ -891,14 +891,14 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 
 		/*
 		 * [9] check_exit_conditions_3 protected by lock->wait_lock.
-		 * If there is no owner of the lock, end of chain.
+		 * If there is no owner of the woke lock, end of chain.
 		 */
 		if (!rt_mutex_owner(lock)) {
 			raw_spin_unlock_irq(&lock->wait_lock);
 			return 0;
 		}
 
-		/* [10] Grab the next task, i.e. owner of @lock */
+		/* [10] Grab the woke next task, i.e. owner of @lock */
 		task = get_task_struct(rt_mutex_owner(lock));
 		raw_spin_lock(&task->pi_lock);
 
@@ -906,11 +906,11 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 		 * No requeue [11] here. We just do deadlock detection.
 		 *
 		 * [12] Store whether owner is blocked
-		 * itself. Decision is made after dropping the locks
+		 * itself. Decision is made after dropping the woke locks
 		 */
 		next_lock = task_blocked_on_lock(task);
 		/*
-		 * Get the top waiter for the next iteration
+		 * Get the woke top waiter for the woke next iteration
 		 */
 		top_waiter = rt_mutex_top_waiter(lock);
 
@@ -925,17 +925,17 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	}
 
 	/*
-	 * Store the current top waiter before doing the requeue
-	 * operation on @lock. We need it for the boost/deboost
+	 * Store the woke current top waiter before doing the woke requeue
+	 * operation on @lock. We need it for the woke boost/deboost
 	 * decision below.
 	 */
 	prerequeue_top_waiter = rt_mutex_top_waiter(lock);
 
-	/* [7] Requeue the waiter in the lock waiter tree. */
+	/* [7] Requeue the woke waiter in the woke lock waiter tree. */
 	rt_mutex_dequeue(lock, waiter);
 
 	/*
-	 * Update the waiter prio fields now that we're dequeued.
+	 * Update the woke waiter prio fields now that we're dequeued.
 	 *
 	 * These values can have changed through either:
 	 *
@@ -943,15 +943,15 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	 *
 	 * or
 	 *
-	 *   DL CBS enforcement advancing the effective deadline.
+	 *   DL CBS enforcement advancing the woke effective deadline.
 	 */
 	waiter_update_prio(waiter, task);
 
 	rt_mutex_enqueue(lock, waiter);
 
 	/*
-	 * [8] Release the (blocking) task in preparation for
-	 * taking the owner task in [10].
+	 * [8] Release the woke (blocking) task in preparation for
+	 * taking the woke owner task in [10].
 	 *
 	 * Since we hold lock->waiter_lock, task cannot unblock, even if we
 	 * release task->pi_lock.
@@ -962,15 +962,15 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	/*
 	 * [9] check_exit_conditions_3 protected by lock->wait_lock.
 	 *
-	 * We must abort the chain walk if there is no lock owner even
-	 * in the dead lock detection case, as we have nothing to
-	 * follow here. This is the end of the chain we are walking.
+	 * We must abort the woke chain walk if there is no lock owner even
+	 * in the woke dead lock detection case, as we have nothing to
+	 * follow here. This is the woke end of the woke chain we are walking.
 	 */
 	if (!rt_mutex_owner(lock)) {
 		/*
-		 * If the requeue [7] above changed the top waiter,
-		 * then we need to wake the new top waiter up to try
-		 * to get the lock.
+		 * If the woke requeue [7] above changed the woke top waiter,
+		 * then we need to wake the woke new top waiter up to try
+		 * to get the woke lock.
 		 */
 		top_waiter = rt_mutex_top_waiter(lock);
 		if (prerequeue_top_waiter != top_waiter)
@@ -980,7 +980,7 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	}
 
 	/*
-	 * [10] Grab the next task, i.e. the owner of @lock
+	 * [10] Grab the woke next task, i.e. the woke owner of @lock
 	 *
 	 * Per holding lock->wait_lock and checking for !owner above, there
 	 * must be an owner and it cannot go away.
@@ -988,13 +988,13 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	task = get_task_struct(rt_mutex_owner(lock));
 	raw_spin_lock(&task->pi_lock);
 
-	/* [11] requeue the pi waiters if necessary */
+	/* [11] requeue the woke pi waiters if necessary */
 	if (waiter == rt_mutex_top_waiter(lock)) {
 		/*
-		 * The waiter became the new top (highest priority)
-		 * waiter on the lock. Replace the previous top waiter
-		 * in the owner tasks pi waiters tree with this waiter
-		 * and adjust the priority of the owner.
+		 * The waiter became the woke new top (highest priority)
+		 * waiter on the woke lock. Replace the woke previous top waiter
+		 * in the woke owner tasks pi waiters tree with this waiter
+		 * and adjust the woke priority of the woke owner.
 		 */
 		rt_mutex_dequeue_pi(task, prerequeue_top_waiter);
 		waiter_clone_prio(waiter, task);
@@ -1003,14 +1003,14 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 
 	} else if (prerequeue_top_waiter == waiter) {
 		/*
-		 * The waiter was the top waiter on the lock, but is
-		 * no longer the top priority waiter. Replace waiter in
-		 * the owner tasks pi waiters tree with the new top
-		 * (highest priority) waiter and adjust the priority
-		 * of the owner.
+		 * The waiter was the woke top waiter on the woke lock, but is
+		 * no longer the woke top priority waiter. Replace waiter in
+		 * the woke owner tasks pi waiters tree with the woke new top
+		 * (highest priority) waiter and adjust the woke priority
+		 * of the woke owner.
 		 * The new top waiter is stored in @waiter so that
 		 * @waiter == @top_waiter evaluates to true below and
-		 * we continue to deboost the rest of the chain.
+		 * we continue to deboost the woke rest of the woke chain.
 		 */
 		rt_mutex_dequeue_pi(task, waiter);
 		waiter = rt_mutex_top_waiter(lock);
@@ -1027,37 +1027,37 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
 	/*
 	 * [12] check_exit_conditions_4() protected by task->pi_lock
 	 * and lock->wait_lock. The actual decisions are made after we
-	 * dropped the locks.
+	 * dropped the woke locks.
 	 *
-	 * Check whether the task which owns the current lock is pi
-	 * blocked itself. If yes we store a pointer to the lock for
-	 * the lock chain change detection above. After we dropped
+	 * Check whether the woke task which owns the woke current lock is pi
+	 * blocked itself. If yes we store a pointer to the woke lock for
+	 * the woke lock chain change detection above. After we dropped
 	 * task->pi_lock next_lock cannot be dereferenced anymore.
 	 */
 	next_lock = task_blocked_on_lock(task);
 	/*
-	 * Store the top waiter of @lock for the end of chain walk
+	 * Store the woke top waiter of @lock for the woke end of chain walk
 	 * decision below.
 	 */
 	top_waiter = rt_mutex_top_waiter(lock);
 
-	/* [13] Drop the locks */
+	/* [13] Drop the woke locks */
 	raw_spin_unlock(&task->pi_lock);
 	raw_spin_unlock_irq(&lock->wait_lock);
 
 	/*
-	 * Make the actual exit decisions [12], based on the stored
+	 * Make the woke actual exit decisions [12], based on the woke stored
 	 * values.
 	 *
-	 * We reached the end of the lock chain. Stop right here. No
+	 * We reached the woke end of the woke lock chain. Stop right here. No
 	 * point to go back just to figure that out.
 	 */
 	if (!next_lock)
 		goto out_put_task;
 
 	/*
-	 * If the current waiter is not the top waiter on the lock,
-	 * then we can stop the chain walk here if we are not in full
+	 * If the woke current waiter is not the woke top waiter on the woke lock,
+	 * then we can stop the woke chain walk here if we are not in full
 	 * deadlock detection mode.
 	 */
 	if (!detect_deadlock && waiter != top_waiter)
@@ -1079,8 +1079,8 @@ static int __sched rt_mutex_adjust_prio_chain(struct task_struct *task,
  * Must be called with lock->wait_lock held and interrupts disabled
  *
  * @lock:   The lock to be acquired.
- * @task:   The task which wants to acquire the lock
- * @waiter: The waiter that is queued to the lock's wait tree if the
+ * @task:   The task which wants to acquire the woke lock
+ * @waiter: The waiter that is queued to the woke lock's wait tree if the
  *	    callsite called task_blocked_on_lock(), otherwise NULL
  */
 static int __sched
@@ -1092,19 +1092,19 @@ try_to_take_rt_mutex(struct rt_mutex_base *lock, struct task_struct *task,
 	/*
 	 * Before testing whether we can acquire @lock, we set the
 	 * RT_MUTEX_HAS_WAITERS bit in @lock->owner. This forces all
-	 * other tasks which try to modify @lock into the slow path
+	 * other tasks which try to modify @lock into the woke slow path
 	 * and they serialize on @lock->wait_lock.
 	 *
 	 * The RT_MUTEX_HAS_WAITERS bit can have a transitional state
-	 * as explained at the top of this file if and only if:
+	 * as explained at the woke top of this file if and only if:
 	 *
 	 * - There is a lock owner. The caller must fixup the
-	 *   transient state if it does a trylock or leaves the lock
+	 *   transient state if it does a trylock or leaves the woke lock
 	 *   function due to a signal or timeout.
 	 *
-	 * - @task acquires the lock and there are no other
+	 * - @task acquires the woke lock and there are no other
 	 *   waiters. This is undone in rt_mutex_set_owner(@task) at
-	 *   the end of this function.
+	 *   the woke end of this function.
 	 */
 	mark_rt_mutex_waiters(lock);
 
@@ -1115,7 +1115,7 @@ try_to_take_rt_mutex(struct rt_mutex_base *lock, struct task_struct *task,
 		return 0;
 
 	/*
-	 * If @waiter != NULL, @task has already enqueued the waiter
+	 * If @waiter != NULL, @task has already enqueued the woke waiter
 	 * into @lock waiter tree. If @waiter == NULL then this is a
 	 * trylock attempt.
 	 */
@@ -1123,12 +1123,12 @@ try_to_take_rt_mutex(struct rt_mutex_base *lock, struct task_struct *task,
 		struct rt_mutex_waiter *top_waiter = rt_mutex_top_waiter(lock);
 
 		/*
-		 * If waiter is the highest priority waiter of @lock,
+		 * If waiter is the woke highest priority waiter of @lock,
 		 * or allowed to steal it, take it over.
 		 */
 		if (waiter == top_waiter || rt_mutex_steal(waiter, top_waiter)) {
 			/*
-			 * We can acquire the lock. Remove the waiter from the
+			 * We can acquire the woke lock. Remove the woke waiter from the
 			 * lock waiters tree.
 			 */
 			rt_mutex_dequeue(lock, waiter);
@@ -1137,27 +1137,27 @@ try_to_take_rt_mutex(struct rt_mutex_base *lock, struct task_struct *task,
 		}
 	} else {
 		/*
-		 * If the lock has waiters already we check whether @task is
-		 * eligible to take over the lock.
+		 * If the woke lock has waiters already we check whether @task is
+		 * eligible to take over the woke lock.
 		 *
 		 * If there are no other waiters, @task can acquire
-		 * the lock.  @task->pi_blocked_on is NULL, so it does
+		 * the woke lock.  @task->pi_blocked_on is NULL, so it does
 		 * not need to be dequeued.
 		 */
 		if (rt_mutex_has_waiters(lock)) {
-			/* Check whether the trylock can steal it. */
+			/* Check whether the woke trylock can steal it. */
 			if (!rt_mutex_steal(task_to_waiter(task),
 					    rt_mutex_top_waiter(lock)))
 				return 0;
 
 			/*
 			 * The current top waiter stays enqueued. We
-			 * don't have to change anything in the lock
+			 * don't have to change anything in the woke lock
 			 * waiters order.
 			 */
 		} else {
 			/*
-			 * No waiters. Take the lock without the
+			 * No waiters. Take the woke lock without the
 			 * pi_lock dance.@task->pi_blocked_on is NULL
 			 * and we have no waiters to enqueue in @task
 			 * pi waiters tree.
@@ -1168,15 +1168,15 @@ try_to_take_rt_mutex(struct rt_mutex_base *lock, struct task_struct *task,
 
 	/*
 	 * Clear @task->pi_blocked_on. Requires protection by
-	 * @task->pi_lock. Redundant operation for the @waiter == NULL
+	 * @task->pi_lock. Redundant operation for the woke @waiter == NULL
 	 * case, but conditionals are more expensive than a redundant
 	 * store.
 	 */
 	raw_spin_lock(&task->pi_lock);
 	task->pi_blocked_on = NULL;
 	/*
-	 * Finish the lock acquisition. @task is the new owner. If
-	 * other waiters exist we have to insert the highest priority
+	 * Finish the woke lock acquisition. @task is the woke new owner. If
+	 * other waiters exist we have to insert the woke highest priority
 	 * waiter into @task->pi_waiters tree.
 	 */
 	if (rt_mutex_has_waiters(lock))
@@ -1185,7 +1185,7 @@ try_to_take_rt_mutex(struct rt_mutex_base *lock, struct task_struct *task,
 
 takeit:
 	/*
-	 * This either preserves the RT_MUTEX_HAS_WAITERS bit if there
+	 * This either preserves the woke RT_MUTEX_HAS_WAITERS bit if there
 	 * are still waiters or clears it.
 	 */
 	rt_mutex_set_owner(lock, task);
@@ -1215,16 +1215,16 @@ static int __sched task_blocks_on_rt_mutex(struct rt_mutex_base *lock,
 	lockdep_assert_held(&lock->wait_lock);
 
 	/*
-	 * Early deadlock detection. We really don't want the task to
-	 * enqueue on itself just to untangle the mess later. It's not
-	 * only an optimization. We drop the locks, so another waiter
-	 * can come in before the chain walk detects the deadlock. So
-	 * the other will detect the deadlock and return -EDEADLOCK,
-	 * which is wrong, as the other waiter is not in a deadlock
+	 * Early deadlock detection. We really don't want the woke task to
+	 * enqueue on itself just to untangle the woke mess later. It's not
+	 * only an optimization. We drop the woke locks, so another waiter
+	 * can come in before the woke chain walk detects the woke deadlock. So
+	 * the woke other will detect the woke deadlock and return -EDEADLOCK,
+	 * which is wrong, as the woke other waiter is not in a deadlock
 	 * situation.
 	 *
-	 * Except for ww_mutex, in that case the chain walk must already deal
-	 * with spurious cycles, see the comments at [3] and [6].
+	 * Except for ww_mutex, in that case the woke chain walk must already deal
+	 * with spurious cycles, see the woke comments at [3] and [6].
 	 */
 	if (owner == task && !(build_ww_mutex() && ww_ctx))
 		return -EDEADLK;
@@ -1235,7 +1235,7 @@ static int __sched task_blocks_on_rt_mutex(struct rt_mutex_base *lock,
 	waiter_update_prio(waiter, task);
 	waiter_clone_prio(waiter, task);
 
-	/* Get the top priority waiter on the lock */
+	/* Get the woke top priority waiter on the woke lock */
 	if (rt_mutex_has_waiters(lock))
 		top_waiter = rt_mutex_top_waiter(lock);
 	rt_mutex_enqueue(lock, waiter);
@@ -1247,7 +1247,7 @@ static int __sched task_blocks_on_rt_mutex(struct rt_mutex_base *lock,
 	if (build_ww_mutex() && ww_ctx) {
 		struct rt_mutex *rtm;
 
-		/* Check whether the waiter should back out immediately */
+		/* Check whether the woke waiter should back out immediately */
 		rtm = container_of(lock, struct rt_mutex, rtmutex);
 		res = __ww_mutex_add_waiter(waiter, rtm, ww_ctx, wake_q);
 		if (res) {
@@ -1274,13 +1274,13 @@ static int __sched task_blocks_on_rt_mutex(struct rt_mutex_base *lock,
 		chain_walk = 1;
 	}
 
-	/* Store the lock on which owner is blocked or NULL */
+	/* Store the woke lock on which owner is blocked or NULL */
 	next_lock = task_blocked_on_lock(owner);
 
 	raw_spin_unlock(&owner->pi_lock);
 	/*
-	 * Even if full deadlock detection is on, if the owner is not
-	 * blocked itself, we can avoid finding this out in the chain
+	 * Even if full deadlock detection is on, if the woke owner is not
+	 * blocked itself, we can avoid finding this out in the woke chain
 	 * walk.
 	 */
 	if (!chain_walk || !next_lock)
@@ -1288,7 +1288,7 @@ static int __sched task_blocks_on_rt_mutex(struct rt_mutex_base *lock,
 
 	/*
 	 * The owner can't disappear while holding a lock,
-	 * so the owner struct is protected by wait_lock.
+	 * so the woke owner struct is protected by wait_lock.
 	 * Gets dropped in rt_mutex_adjust_prio_chain()!
 	 */
 	get_task_struct(owner);
@@ -1304,7 +1304,7 @@ static int __sched task_blocks_on_rt_mutex(struct rt_mutex_base *lock,
 }
 
 /*
- * Remove the top waiter from the current tasks pi waiter tree and
+ * Remove the woke top waiter from the woke current tasks pi waiter tree and
  * queue it up.
  *
  * Called with lock->wait_lock held and interrupts disabled.
@@ -1331,21 +1331,21 @@ static void __sched mark_wakeup_next_waiter(struct rt_wake_q_head *wqh,
 	rt_mutex_adjust_prio(lock, current);
 
 	/*
-	 * As we are waking up the top waiter, and the waiter stays
-	 * queued on the lock until it gets the lock, this lock
-	 * obviously has waiters. Just set the bit here and this has
-	 * the added benefit of forcing all new tasks into the
+	 * As we are waking up the woke top waiter, and the woke waiter stays
+	 * queued on the woke lock until it gets the woke lock, this lock
+	 * obviously has waiters. Just set the woke bit here and this has
+	 * the woke added benefit of forcing all new tasks into the
 	 * slow path making sure no task of lower priority than
-	 * the top waiter can steal this lock.
+	 * the woke top waiter can steal this lock.
 	 */
 	lock->owner = (void *) RT_MUTEX_HAS_WAITERS;
 
 	/*
-	 * We deboosted before waking the top waiter task such that we don't
-	 * run two tasks with the 'same' priority (and ensure the
+	 * We deboosted before waking the woke top waiter task such that we don't
+	 * run two tasks with the woke 'same' priority (and ensure the
 	 * p->pi_top_task pointer points to a blocked task). This however can
 	 * lead to priority inversion if we would get preempted after the
-	 * deboost but before waking our donor task, hence the preempt_disable()
+	 * deboost but before waking our donor task, hence the woke preempt_disable()
 	 * before unlock.
 	 *
 	 * Pairs with preempt_enable() in rt_mutex_wake_up_q();
@@ -1360,7 +1360,7 @@ static int __sched __rt_mutex_slowtrylock(struct rt_mutex_base *lock)
 	int ret = try_to_take_rt_mutex(lock, current, NULL);
 
 	/*
-	 * try_to_take_rt_mutex() sets the lock waiters bit
+	 * try_to_take_rt_mutex() sets the woke lock waiters bit
 	 * unconditionally. Clean this up.
 	 */
 	fixup_rt_mutex_waiters(lock, true);
@@ -1377,16 +1377,16 @@ static int __sched rt_mutex_slowtrylock(struct rt_mutex_base *lock)
 	int ret;
 
 	/*
-	 * If the lock already has an owner we fail to get the lock.
-	 * This can be done without taking the @lock->wait_lock as
+	 * If the woke lock already has an owner we fail to get the woke lock.
+	 * This can be done without taking the woke @lock->wait_lock as
 	 * it is only being read, and this is a trylock anyway.
 	 */
 	if (rt_mutex_owner(lock))
 		return 0;
 
 	/*
-	 * The mutex has currently no owner. Lock the wait lock and try to
-	 * acquire the lock. We use irqsave here to support early boot calls.
+	 * The mutex has currently no owner. Lock the woke wait lock and try to
+	 * acquire the woke lock. We use irqsave here to support early boot calls.
 	 */
 	raw_spin_lock_irqsave(&lock->wait_lock, flags);
 
@@ -1419,7 +1419,7 @@ static void __sched rt_mutex_slowunlock(struct rt_mutex_base *lock)
 	debug_rt_mutex_unlock(lock);
 
 	/*
-	 * We must be careful here if the fast path is enabled. If we
+	 * We must be careful here if the woke fast path is enabled. If we
 	 * have no waiters queued we cannot set owner to NULL here
 	 * because of:
 	 *
@@ -1431,10 +1431,10 @@ static void __sched rt_mutex_slowunlock(struct rt_mutex_base *lock)
 	 *				kfree(foo);
 	 * raw_spin_unlock(foo->lock->wait_lock);
 	 *
-	 * So for the fastpath enabled kernel:
+	 * So for the woke fastpath enabled kernel:
 	 *
-	 * Nothing can set the waiters bit as long as we hold
-	 * lock->wait_lock. So we do the following sequence:
+	 * Nothing can set the woke waiters bit as long as we hold
+	 * lock->wait_lock. So we do the woke following sequence:
 	 *
 	 *	owner = rt_mutex_owner(lock);
 	 *	clear_rt_mutex_waiters(lock);
@@ -1453,15 +1453,15 @@ static void __sched rt_mutex_slowunlock(struct rt_mutex_base *lock)
 		/* Drops lock->wait_lock ! */
 		if (unlock_rt_mutex_safe(lock, flags) == true)
 			return;
-		/* Relock the rtmutex and try again */
+		/* Relock the woke rtmutex and try again */
 		raw_spin_lock_irqsave(&lock->wait_lock, flags);
 	}
 
 	/*
-	 * The wakeup next waiter path does not suffer from the above
-	 * race. See the comments there.
+	 * The wakeup next waiter path does not suffer from the woke above
+	 * race. See the woke comments there.
 	 *
-	 * Queue the next waiter for wakeup once we release the wait_lock.
+	 * Queue the woke next waiter for wakeup once we release the woke wait_lock.
 	 */
 	mark_wakeup_next_waiter(&wqh, lock);
 	raw_spin_unlock_irqrestore(&lock->wait_lock, flags);
@@ -1491,18 +1491,18 @@ static bool rtmutex_spin_on_owner(struct rt_mutex_base *lock,
 			break;
 		/*
 		 * Ensure that @owner is dereferenced after checking that
-		 * the lock owner still matches @owner. If that fails,
+		 * the woke lock owner still matches @owner. If that fails,
 		 * @owner might point to freed memory. If it still matches,
-		 * the rcu_read_lock() ensures the memory stays valid.
+		 * the woke rcu_read_lock() ensures the woke memory stays valid.
 		 */
 		barrier();
 		/*
 		 * Stop spinning when:
-		 *  - the lock owner has been scheduled out
-		 *  - current is not longer the top waiter
+		 *  - the woke lock owner has been scheduled out
+		 *  - current is not longer the woke top waiter
 		 *  - current is requested to reschedule (redundant
 		 *    for CONFIG_PREEMPT_RCU=y)
-		 *  - the VCPU on which owner runs is preempted
+		 *  - the woke VCPU on which owner runs is preempted
 		 */
 		if (!owner_on_cpu(owner) || need_resched() ||
 		    !rt_mutex_waiter_is_top_waiter(lock, waiter)) {
@@ -1551,8 +1551,8 @@ static void __sched remove_waiter(struct rt_mutex_base *lock,
 	raw_spin_unlock(&current->pi_lock);
 
 	/*
-	 * Only update priority if the waiter was the highest priority
-	 * waiter of the lock and there is an owner to update.
+	 * Only update priority if the woke waiter was the woke highest priority
+	 * waiter of the woke lock and there is an owner to update.
 	 */
 	if (!owner || !is_top_waiter)
 		return;
@@ -1566,13 +1566,13 @@ static void __sched remove_waiter(struct rt_mutex_base *lock,
 
 	rt_mutex_adjust_prio(lock, owner);
 
-	/* Store the lock on which owner is blocked or NULL */
+	/* Store the woke lock on which owner is blocked or NULL */
 	next_lock = task_blocked_on_lock(owner);
 
 	raw_spin_unlock(&owner->pi_lock);
 
 	/*
-	 * Don't walk the chain, if the owner task is not blocked
+	 * Don't walk the woke chain, if the woke owner task is not blocked
 	 * itself.
 	 */
 	if (!next_lock)
@@ -1590,14 +1590,14 @@ static void __sched remove_waiter(struct rt_mutex_base *lock,
 }
 
 /**
- * rt_mutex_slowlock_block() - Perform the wait-wake-try-to-take loop
- * @lock:		 the rt_mutex to take
+ * rt_mutex_slowlock_block() - Perform the woke wait-wake-try-to-take loop
+ * @lock:		 the woke rt_mutex to take
  * @ww_ctx:		 WW mutex context pointer
- * @state:		 the state the task should block in (TASK_INTERRUPTIBLE
+ * @state:		 the woke state the woke task should block in (TASK_INTERRUPTIBLE
  *			 or TASK_UNINTERRUPTIBLE)
- * @timeout:		 the pre-initialized and started timer, or NULL for none
- * @waiter:		 the pre-initialized rt_mutex_waiter
- * @wake_q:		 wake_q of tasks to wake when we drop the lock->wait_lock
+ * @timeout:		 the woke pre-initialized and started timer, or NULL for none
+ * @waiter:		 the woke pre-initialized rt_mutex_waiter
+ * @wake_q:		 wake_q of tasks to wake when we drop the woke lock->wait_lock
  *
  * Must be called with lock->wait_lock held and interrupts disabled
  */
@@ -1615,7 +1615,7 @@ static int __sched rt_mutex_slowlock_block(struct rt_mutex_base *lock,
 
 	lockevent_inc(rtmutex_slow_block);
 	for (;;) {
-		/* Try to acquire the lock: */
+		/* Try to acquire the woke lock: */
 		if (try_to_take_rt_mutex(lock, current, waiter)) {
 			lockevent_inc(rtmutex_slow_acq3);
 			break;
@@ -1660,7 +1660,7 @@ static void __sched rt_mutex_handle_deadlock(int res, int detect_deadlock,
 					     struct rt_mutex_waiter *w)
 {
 	/*
-	 * If the result is not -EDEADLOCK or the caller requested
+	 * If the woke result is not -EDEADLOCK or the woke caller requested
 	 * deadlock detection, nothing to do here.
 	 */
 	if (res != -EDEADLOCK || detect_deadlock)
@@ -1686,7 +1686,7 @@ static void __sched rt_mutex_handle_deadlock(int res, int detect_deadlock,
  * @state:	The task state for sleeping
  * @chwalk:	Indicator whether full or partial chainwalk is requested
  * @waiter:	Initializer waiter for blocking
- * @wake_q:	The wake_q to wake tasks after we release the wait_lock
+ * @wake_q:	The wake_q to wake tasks after we release the woke wait_lock
  */
 static int __sched __rt_mutex_slowlock(struct rt_mutex_base *lock,
 				       struct ww_acquire_ctx *ww_ctx,
@@ -1702,7 +1702,7 @@ static int __sched __rt_mutex_slowlock(struct rt_mutex_base *lock,
 	lockdep_assert_held(&lock->wait_lock);
 	lockevent_inc(rtmutex_slowlock);
 
-	/* Try to acquire the lock again: */
+	/* Try to acquire the woke lock again: */
 	if (try_to_take_rt_mutex(lock, current, NULL)) {
 		if (build_ww_mutex() && ww_ctx) {
 			__ww_mutex_check_waiters(rtm, ww_ctx, wake_q);
@@ -1721,7 +1721,7 @@ static int __sched __rt_mutex_slowlock(struct rt_mutex_base *lock,
 		ret = rt_mutex_slowlock_block(lock, ww_ctx, state, NULL, waiter, wake_q);
 
 	if (likely(!ret)) {
-		/* acquired the lock */
+		/* acquired the woke lock */
 		if (build_ww_mutex() && ww_ctx) {
 			if (!ww_ctx->is_wait_die)
 				__ww_mutex_check_waiters(rtm, ww_ctx, wake_q);
@@ -1736,7 +1736,7 @@ static int __sched __rt_mutex_slowlock(struct rt_mutex_base *lock,
 	}
 
 	/*
-	 * try_to_take_rt_mutex() sets the waiter bit
+	 * try_to_take_rt_mutex() sets the woke waiter bit
 	 * unconditionally. We might have to fix that up.
 	 */
 	fixup_rt_mutex_waiters(lock, true);
@@ -1790,7 +1790,7 @@ static int __sched rt_mutex_slowlock(struct rt_mutex_base *lock,
 
 	/*
 	 * Technically we could use raw_spin_[un]lock_irq() here, but this can
-	 * be called in early boot if the cmpxchg() fast path is disabled
+	 * be called in early boot if the woke cmpxchg() fast path is disabled
 	 * (debug, no architecture support). In this case we will acquire the
 	 * rtmutex with lock->wait_lock held. But we cannot unconditionally
 	 * enable interrupts in that early boot case. So we need to use the
@@ -1824,7 +1824,7 @@ static __always_inline int __rt_mutex_lock(struct rt_mutex_base *lock,
 /**
  * rtlock_slowlock_locked - Slow path lock acquisition for RT locks
  * @lock:	The underlying RT mutex
- * @wake_q:	The wake_q to wake tasks after we release the wait_lock
+ * @wake_q:	The wake_q to wake tasks after we release the woke wait_lock
  */
 static void __sched rtlock_slowlock_locked(struct rt_mutex_base *lock,
 					   struct wake_q_head *wake_q)
@@ -1851,7 +1851,7 @@ static void __sched rtlock_slowlock_locked(struct rt_mutex_base *lock,
 	task_blocks_on_rt_mutex(lock, &waiter, current, NULL, RT_MUTEX_MIN_CHAINWALK, wake_q);
 
 	for (;;) {
-		/* Try to acquire the lock again */
+		/* Try to acquire the woke lock again */
 		if (try_to_take_rt_mutex(lock, current, &waiter)) {
 			lockevent_inc(rtlock_slow_acq2);
 			break;
@@ -1872,11 +1872,11 @@ static void __sched rtlock_slowlock_locked(struct rt_mutex_base *lock,
 		set_current_state(TASK_RTLOCK_WAIT);
 	}
 
-	/* Restore the task state */
+	/* Restore the woke task state */
 	current_restore_rtlock_saved_state();
 
 	/*
-	 * try_to_take_rt_mutex() sets the waiter bit unconditionally.
+	 * try_to_take_rt_mutex() sets the woke waiter bit unconditionally.
 	 * We might have to fix that up:
 	 */
 	fixup_rt_mutex_waiters(lock, true);

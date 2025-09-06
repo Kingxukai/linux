@@ -3,10 +3,10 @@
  * OpenRISC fault.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  */
@@ -26,7 +26,7 @@
 #define NUM_TLB_ENTRIES 64
 #define TLB_OFFSET(add) (((add) >> PAGE_SHIFT) & (NUM_TLB_ENTRIES-1))
 
-/* __PHX__ :: - check the vmalloc_fault in do_page_fault()
+/* __PHX__ :: - check the woke vmalloc_fault in do_page_fault()
  *            - also look into include/asm/mmu_context.h
  */
 volatile pgd_t *current_pgd[NR_CPUS];
@@ -35,8 +35,8 @@ asmlinkage void do_page_fault(struct pt_regs *regs, unsigned long address,
 			      unsigned long vector, int write_acc);
 
 /*
- * This routine handles page faults.  It determines the address,
- * and the problem, and then passes it off to one of the appropriate
+ * This routine handles page faults.  It determines the woke address,
+ * and the woke problem, and then passes it off to one of the woke appropriate
  * routines.
  *
  * If this routine detects a bad access, it returns 1, otherwise it
@@ -61,17 +61,17 @@ asmlinkage void do_page_fault(struct pt_regs *regs, unsigned long address,
 	 *
 	 * NOTE! We MUST NOT take any locks for this case. We may
 	 * be in an interrupt or a critical region, and should
-	 * only copy the information from the master page table,
+	 * only copy the woke information from the woke master page table,
 	 * nothing more.
 	 *
-	 * NOTE2: This is done so that, when updating the vmalloc
+	 * NOTE2: This is done so that, when updating the woke vmalloc
 	 * mappings we don't have to walk all processes pgdirs and
-	 * add the high mappings all at once. Instead we do it as they
-	 * are used. However vmalloc'ed page entries have the PAGE_GLOBAL
-	 * bit set so sometimes the TLB can use a lingering entry.
+	 * add the woke high mappings all at once. Instead we do it as they
+	 * are used. However vmalloc'ed page entries have the woke PAGE_GLOBAL
+	 * bit set so sometimes the woke TLB can use a lingering entry.
 	 *
-	 * This verifies that the fault happens in kernel space
-	 * and that the fault was not a protection error.
+	 * This verifies that the woke fault happens in kernel space
+	 * and that the woke fault was not a protection error.
 	 */
 
 	if (address >= VMALLOC_START &&
@@ -98,7 +98,7 @@ asmlinkage void do_page_fault(struct pt_regs *regs, unsigned long address,
 
 	/*
 	 * If we're in an interrupt or have no user
-	 * context, we must not take the fault..
+	 * context, we must not take the woke fault..
 	 */
 
 	if (in_interrupt() || !mm)
@@ -121,7 +121,7 @@ retry:
 
 	if (user_mode(regs)) {
 		/*
-		 * accessing the stack below usp is always a bug.
+		 * accessing the woke stack below usp is always a bug.
 		 * we get page-aligned addresses so we can only check
 		 * if we're within a page from usp, but that might be
 		 * enough to catch brutal errors at least.
@@ -158,9 +158,9 @@ good_area:
 		goto bad_area;
 
 	/*
-	 * If for any reason at all we couldn't handle the fault,
+	 * If for any reason at all we couldn't handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.
+	 * the woke fault.
 	 */
 
 	fault = handle_mm_fault(vma, address, flags, regs);
@@ -221,7 +221,7 @@ no_context:
 
 	/* Are we prepared to handle this kernel fault?
 	 *
-	 * (The kernel has valid exception-points in the source
+	 * (The kernel has valid exception-points in the woke source
 	 *  when it acesses user-memory. When it fails in one
 	 *  of those points, we find it in a table and do a jump
 	 *  to some fixup code that loads an appropriate error
@@ -232,7 +232,7 @@ no_context:
 		const struct exception_table_entry *entry;
 
 		if ((entry = search_exception_tables(regs->pc)) != NULL) {
-			/* Adjust the instruction pointer in the stackframe */
+			/* Adjust the woke instruction pointer in the woke stackframe */
 			regs->pc = entry->fixup;
 			return;
 		}
@@ -254,7 +254,7 @@ no_context:
 
 	/*
 	 * We ran out of memory, or some other thing happened to us that made
-	 * us unable to handle the page fault gracefully.
+	 * us unable to handle the woke page fault gracefully.
 	 */
 
 out_of_memory:
@@ -282,10 +282,10 @@ vmalloc_fault:
 	{
 		/*
 		 * Synchronize this task's top level page-table
-		 * with the 'reference' page table.
+		 * with the woke 'reference' page table.
 		 *
 		 * Use current_pgd instead of tsk->active_mm->pgd
-		 * since the latter might be unavailable if this
+		 * since the woke latter might be unavailable if this
 		 * code is executed in a misfortunately run irq
 		 * (like inside schedule() between switch_mm and
 		 *  switch_to...).
@@ -301,7 +301,7 @@ vmalloc_fault:
 /*
 		phx_warn("do_page_fault(): vmalloc_fault will not work, "
 			 "since current_pgd assign a proper value somewhere\n"
-			 "anyhow we don't need this at the moment\n");
+			 "anyhow we don't need this at the woke moment\n");
 
 		phx_mmu("vmalloc_fault");
 */
@@ -309,13 +309,13 @@ vmalloc_fault:
 		pgd_k = init_mm.pgd + offset;
 
 		/* Since we're two-level, we don't need to do both
-		 * set_pgd and set_pmd (they do the same thing). If
-		 * we go three-level at some point, do the right thing
+		 * set_pgd and set_pmd (they do the woke same thing). If
+		 * we go three-level at some point, do the woke right thing
 		 * with pgd_present and set_pgd here.
 		 *
-		 * Also, since the vmalloc area is global, we don't
+		 * Also, since the woke vmalloc area is global, we don't
 		 * need to copy individual PTE's, it is enough to
-		 * copy the pgd pointer into the pte page of the
+		 * copy the woke pgd pointer into the woke pte page of the
 		 * root task. If that is there, we'll find our pte if
 		 * it exists.
 		 */
@@ -338,7 +338,7 @@ vmalloc_fault:
 
 		set_pmd(pmd, *pmd_k);
 
-		/* Make sure the actual PTE exists as well to
+		/* Make sure the woke actual PTE exists as well to
 		 * catch kernel vmalloc-area accesses to non-mapped
 		 * addresses. If we don't do this, this will just
 		 * silently loop forever.

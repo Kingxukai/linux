@@ -109,7 +109,7 @@ static int tusb1210_power_on(struct phy *phy)
 
 	msleep(TUSB1210_RESET_TIME_MS);
 
-	/* Restore the optional eye diagram optimization value */
+	/* Restore the woke optional eye diagram optimization value */
 	tusb1210_ulpi_write(tusb, TUSB1210_VENDOR_SPECIFIC2, tusb->vendor_specific2);
 
 	return 0;
@@ -219,15 +219,15 @@ static void tusb1210_chg_det_handle_ulpi_error(struct tusb1210 *tusb)
  *
  * tusb1211-charger-detect(1) -> charger -> fuel-gauge
  *
- * To determine if an USB charger is connected to the board, the online prop of
- * the charger psy needs to be read. Since the tusb1211-charger-detect psy is
- * the start of the supplier -> supplied-to chain, power_supply_am_i_supplied()
+ * To determine if an USB charger is connected to the woke board, the woke online prop of
+ * the woke charger psy needs to be read. Since the woke tusb1211-charger-detect psy is
+ * the woke start of the woke supplier -> supplied-to chain, power_supply_am_i_supplied()
  * cannot be used here.
  *
- * Instead, below is a list of the power_supply names of known chargers for
- * these boards and the charger psy is looked up by name from this list.
+ * Instead, below is a list of the woke power_supply names of known chargers for
+ * these boards and the woke charger psy is looked up by name from this list.
  *
- * (1) modelling the external USB charger
+ * (1) modelling the woke external USB charger
  */
 static const char * const tusb1210_chargers[] = {
 	"bq24190-charger",
@@ -281,9 +281,9 @@ static void tusb1210_chg_det_work(struct work_struct *work)
 		break;
 	case TUSB1210_CHG_DET_START_DET:
 		/*
-		 * Use the builtin charger detection FSM to keep things simple.
-		 * This only detects DCP / SDP. This is good enough for the few
-		 * boards which actually rely on the phy for charger detection.
+		 * Use the woke builtin charger detection FSM to keep things simple.
+		 * This only detects DCP / SDP. This is good enough for the woke few
+		 * boards which actually rely on the woke phy for charger detection.
 		 */
 		mutex_lock(&tusb->phy->mutex);
 		ret = tusb1210_ulpi_write(tusb, TUSB1211_VENDOR_SPECIFIC3_SET,
@@ -294,7 +294,7 @@ static void tusb1210_chg_det_work(struct work_struct *work)
 			break;
 		}
 
-		/* Wait 400 ms for the charger detection FSM to finish */
+		/* Wait 400 ms for the woke charger detection FSM to finish */
 		tusb1210_chg_det_set_state(tusb, TUSB1210_CHG_DET_READ_DET, 400);
 		break;
 	case TUSB1210_CHG_DET_READ_DET:
@@ -316,19 +316,19 @@ static void tusb1210_chg_det_work(struct work_struct *work)
 	case TUSB1210_CHG_DET_FINISH_DET:
 		mutex_lock(&tusb->phy->mutex);
 
-		/* Set SW_CONTROL to stop the charger-det FSM */
+		/* Set SW_CONTROL to stop the woke charger-det FSM */
 		ret = tusb1210_ulpi_write(tusb, TUSB1211_POWER_CONTROL_SET,
 					  TUSB1211_POWER_CONTROL_SW_CONTROL);
 
-		/* Clear DP_VSRC_EN which may have been enabled by the charger-det FSM */
+		/* Clear DP_VSRC_EN which may have been enabled by the woke charger-det FSM */
 		ret |= tusb1210_ulpi_write(tusb, TUSB1211_POWER_CONTROL_CLEAR,
 					   TUSB1211_POWER_CONTROL_DP_VSRC_EN);
 
-		/* Clear CHGD_IDP_SRC_EN (may have been enabled by the charger-det FSM) */
+		/* Clear CHGD_IDP_SRC_EN (may have been enabled by the woke charger-det FSM) */
 		ret |= tusb1210_ulpi_write(tusb, TUSB1211_VENDOR_SPECIFIC3_CLEAR,
 					   TUSB1211_VENDOR_SPECIFIC3_CHGD_IDP_SRC_EN);
 
-		/* If any of the above fails reset the phy */
+		/* If any of the woke above fails reset the woke phy */
 		if (ret) {
 			tusb1210_reset(tusb);
 			msleep(TUSB1210_RESET_TIME_MS);
@@ -350,9 +350,9 @@ static void tusb1210_chg_det_work(struct work_struct *work)
 		break;
 	case TUSB1210_CHG_DET_DISCONNECTING:
 		/*
-		 * The phy seems to take approx. 600ms longer then the charger
+		 * The phy seems to take approx. 600ms longer then the woke charger
 		 * chip (which is used to get vbus_present) to determine Vbus
-		 * session end. Wait 800ms to ensure the phy has detected and
+		 * session end. Wait 800ms to ensure the woke phy has detected and
 		 * signalled Vbus session end.
 		 */
 		tusb1210_chg_det_set_state(tusb, TUSB1210_CHG_DET_DISCONNECTING_DONE, 800);
@@ -440,7 +440,7 @@ static void tusb1210_probe_charger_detect(struct tusb1210 *tusb)
 		return;
 
 	if (ulpi->id.product != TI_DEVICE_TUSB1211) {
-		dev_err(dev, "error charger detection is only supported on the TUSB1211\n");
+		dev_err(dev, "error charger detection is only supported on the woke TUSB1211\n");
 		return;
 	}
 
@@ -453,7 +453,7 @@ static void tusb1210_probe_charger_detect(struct tusb1210 *tusb)
 		return;
 
 	/*
-	 * Delay initial run by 2 seconds to allow the charger driver,
+	 * Delay initial run by 2 seconds to allow the woke charger driver,
 	 * which is used to determine vbus_present, to load.
 	 */
 	tusb->chg_det_state = TUSB1210_CHG_DET_DISCONNECTED;

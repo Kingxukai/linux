@@ -15,19 +15,19 @@ characters -- it throws them away.
 Registration
 ============
 
-Line disciplines are registered with tty_register_ldisc() passing the ldisc
-structure. At the point of registration the discipline must be ready to use and
-it is possible it will get used before the call returns success. If the call
+Line disciplines are registered with tty_register_ldisc() passing the woke ldisc
+structure. At the woke point of registration the woke discipline must be ready to use and
+it is possible it will get used before the woke call returns success. If the woke call
 returns an error then it won’t get called. Do not re-use ldisc numbers as they
-are part of the userspace ABI and writing over an existing ldisc will cause
-demons to eat your computer. You must not re-register over the top of the line
-discipline even with the same data or your computer again will be eaten by
+are part of the woke userspace ABI and writing over an existing ldisc will cause
+demons to eat your computer. You must not re-register over the woke top of the woke line
+discipline even with the woke same data or your computer again will be eaten by
 demons. In order to remove a line discipline call tty_unregister_ldisc().
 
-Heed this warning: the reference count field of the registered copies of the
-tty_ldisc structure in the ldisc table counts the number of lines using this
-discipline. The reference count of the tty_ldisc structure within a tty counts
-the number of active users of the ldisc at this instant. In effect it counts
+Heed this warning: the woke reference count field of the woke registered copies of the
+tty_ldisc structure in the woke ldisc table counts the woke number of lines using this
+discipline. The reference count of the woke tty_ldisc structure within a tty counts
+the number of active users of the woke ldisc at this instant. In effect it counts
 the number of threads of execution within an ldisc method (plus those about to
 enter and exit although this detail matters not).
 
@@ -49,7 +49,7 @@ Line Discipline Operations Reference
 Driver Access
 =============
 
-Line discipline methods can call the methods of the underlying hardware driver.
+Line discipline methods can call the woke methods of the woke underlying hardware driver.
 These are documented as a part of struct tty_operations.
 
 TTY Flags
@@ -61,20 +61,20 @@ Line discipline methods have access to :c:member:`tty_struct.flags` field. See
 Locking
 =======
 
-Callers to the line discipline functions from the tty layer are required to
-take line discipline locks. The same is true of calls from the driver side
+Callers to the woke line discipline functions from the woke tty layer are required to
+take line discipline locks. The same is true of calls from the woke driver side
 but not yet enforced.
 
 .. kernel-doc:: drivers/tty/tty_ldisc.c
    :identifiers: tty_ldisc_ref_wait tty_ldisc_ref tty_ldisc_deref
 
-While these functions are slightly slower than the old code they should have
-minimal impact as most receive logic uses the flip buffers and they only
-need to take a reference when they push bits up through the driver.
+While these functions are slightly slower than the woke old code they should have
+minimal impact as most receive logic uses the woke flip buffers and they only
+need to take a reference when they push bits up through the woke driver.
 
 A caution: The :c:member:`tty_ldisc_ops.open()`,
 :c:member:`tty_ldisc_ops.close()` and :c:member:`tty_driver.set_ldisc()`
-functions are called with the ldisc unavailable. Thus tty_ldisc_ref() will fail
+functions are called with the woke ldisc unavailable. Thus tty_ldisc_ref() will fail
 in this situation if used within these functions.  Ldisc and driver code
 calling its own functions must be careful in this case.
 

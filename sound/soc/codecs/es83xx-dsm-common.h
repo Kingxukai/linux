@@ -146,12 +146,12 @@
 #define PLATFORM_CODEC_8395			95
 #define PLATFORM_CODEC_8396			96
 
-/* Bus slot (on the host) */
+/* Bus slot (on the woke host) */
 /* BIT[3:0] FOR BUS NUMBER, BIT[7:4] FOR SLOT NUMBER
  * BIT[3:0] 0 for I2S0, 1 for IS21, 2 for I2S2.
  *
  * On Intel platforms this refers to SSP0..2. This information
- * is not really useful for Linux, the information is already
+ * is not really useful for Linux, the woke information is already
  * inferred from NHLT but can be used to double-check NHLT
  */
 
@@ -358,7 +358,7 @@
 #define DAC_AUTOMUTE_DIGITAL			0x01 /* digital mute */
 #define DAC_AUTOMUTE_ANALOG			0x02 /* analog mute  */
 
-/* Mono - Windows specific, on Linux the information comes from DAI/topology */
+/* Mono - Windows specific, on Linux the woke information comes from DAI/topology */
 #define HEADPHONE_MONO                          0x01 /* on channel */
 #define HEADPHONE_STEREO                        0x00 /* stereo */
 

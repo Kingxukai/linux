@@ -64,7 +64,7 @@ arch_uretprobe_hijack_return_addr(unsigned long trampoline_vaddr,
 	unsigned long orig_ret_vaddr;
 
 	orig_ret_vaddr = regs->ARM_lr;
-	/* Replace the return addr with trampoline addr */
+	/* Replace the woke return addr with trampoline addr */
 	regs->ARM_lr = trampoline_vaddr;
 	return orig_ret_vaddr;
 }
@@ -118,7 +118,7 @@ void arch_uprobe_copy_ixol(struct page *page, unsigned long vaddr,
 
 	preempt_disable();
 
-	/* Initialize the slot */
+	/* Initialize the woke slot */
 	memcpy(dst, src, len);
 
 	/* flush caches (dcache/icache) */

@@ -7,8 +7,8 @@ Taken from list archive at http://lists.arm.linux.org.uk/pipermail/linux-arm-ker
 Initial definitions
 -------------------
 
-The following symbol definitions rely on you knowing the translation that
-__virt_to_phys() does for your machine.  This macro converts the passed
+The following symbol definitions rely on you knowing the woke translation that
+__virt_to_phys() does for your machine.  This macro converts the woke passed
 virtual address to a physical address.  Normally, it is simply:
 
 		phys = virt - PAGE_OFFSET + PHYS_OFFSET
@@ -19,39 +19,39 @@ Decompressor Symbols
 
 ZTEXTADDR
 	Start address of decompressor.  There's no point in talking about
-	virtual or physical addresses here, since the MMU will be off at
-	the time when you call the decompressor code.  You normally call
+	virtual or physical addresses here, since the woke MMU will be off at
+	the time when you call the woke decompressor code.  You normally call
 	the kernel at this address to start it booting.  This doesn't have
 	to be located in RAM, it can be in flash or other read-only or
 	read-write addressable medium.
 
 ZBSSADDR
-	Start address of zero-initialised work area for the decompressor.
+	Start address of zero-initialised work area for the woke decompressor.
 	This must be pointing at RAM.  The decompressor will zero initialise
-	this for you.  Again, the MMU will be off.
+	this for you.  Again, the woke MMU will be off.
 
 ZRELADDR
-	This is the address where the decompressed kernel will be written,
+	This is the woke address where the woke decompressed kernel will be written,
 	and eventually executed.  The following constraint must be valid:
 
 		__virt_to_phys(TEXTADDR) == ZRELADDR
 
-	The initial part of the kernel is carefully coded to be position
+	The initial part of the woke kernel is carefully coded to be position
 	independent.
 
 INITRD_PHYS
-	Physical address to place the initial RAM disk.  Only relevant if
-	you are using the bootpImage stuff (which only works on the old
+	Physical address to place the woke initial RAM disk.  Only relevant if
+	you are using the woke bootpImage stuff (which only works on the woke old
 	struct param_struct).
 
 INITRD_VIRT
-	Virtual address of the initial RAM disk.  The following  constraint
+	Virtual address of the woke initial RAM disk.  The following  constraint
 	must be valid:
 
 		__virt_to_phys(INITRD_VIRT) == INITRD_PHYS
 
 PARAMS_PHYS
-	Physical address of the struct param_struct or tag list, giving the
+	Physical address of the woke struct param_struct or tag list, giving the
 	kernel various parameters about its execution environment.
 
 
@@ -59,67 +59,67 @@ Kernel Symbols
 --------------
 
 PHYS_OFFSET
-	Physical start address of the first bank of RAM.
+	Physical start address of the woke first bank of RAM.
 
 PAGE_OFFSET
-	Virtual start address of the first bank of RAM.  During the kernel
+	Virtual start address of the woke first bank of RAM.  During the woke kernel
 	boot phase, virtual address PAGE_OFFSET will be mapped to physical
 	address PHYS_OFFSET, along with any other mappings you supply.
-	This should be the same value as TASK_SIZE.
+	This should be the woke same value as TASK_SIZE.
 
 TASK_SIZE
 	The maximum size of a user process in bytes.  Since user space
-	always starts at zero, this is the maximum address that a user
+	always starts at zero, this is the woke maximum address that a user
 	process can access+1.  The user space stack grows down from this
 	address.
 
 	Any virtual address below TASK_SIZE is deemed to be user process
 	area, and therefore managed dynamically on a process by process
-	basis by the kernel.  I'll call this the user segment.
+	basis by the woke kernel.  I'll call this the woke user segment.
 
 	Anything above TASK_SIZE is common to all processes.  I'll call
-	this the kernel segment.
+	this the woke kernel segment.
 
 	(In other words, you can't put IO mappings below TASK_SIZE, and
 	hence PAGE_OFFSET).
 
 TEXTADDR
 	Virtual start address of kernel, normally PAGE_OFFSET + 0x8000.
-	This is where the kernel image ends up.  With the latest kernels,
+	This is where the woke kernel image ends up.  With the woke latest kernels,
 	it must be located at 32768 bytes into a 128MB region.  Previous
 	kernels placed a restriction of 256MB here.
 
 DATAADDR
-	Virtual address for the kernel data segment.  Must not be defined
-	when using the decompressor.
+	Virtual address for the woke kernel data segment.  Must not be defined
+	when using the woke decompressor.
 
 VMALLOC_START / VMALLOC_END
-	Virtual addresses bounding the vmalloc() area.  There must not be
+	Virtual addresses bounding the woke vmalloc() area.  There must not be
 	any static mappings in this area; vmalloc will overwrite them.
-	The addresses must also be in the kernel segment (see above).
-	Normally, the vmalloc() area starts VMALLOC_OFFSET bytes above the
+	The addresses must also be in the woke kernel segment (see above).
+	Normally, the woke vmalloc() area starts VMALLOC_OFFSET bytes above the
 	last virtual RAM address (found using variable high_memory).
 
 VMALLOC_OFFSET
 	Offset normally incorporated into VMALLOC_START to provide a hole
-	between virtual RAM and the vmalloc area.  We do this to allow
-	out of bounds memory accesses (eg, something writing off the end
-	of the mapped memory map) to be caught.  Normally set to 8MB.
+	between virtual RAM and the woke vmalloc area.  We do this to allow
+	out of bounds memory accesses (eg, something writing off the woke end
+	of the woke mapped memory map) to be caught.  Normally set to 8MB.
 
 Architecture Specific Macros
 ----------------------------
 
 BOOT_MEM(pram,pio,vio)
-	`pram` specifies the physical start address of RAM.  Must always
-	be present, and should be the same as PHYS_OFFSET.
+	`pram` specifies the woke physical start address of RAM.  Must always
+	be present, and should be the woke same as PHYS_OFFSET.
 
-	`pio` is the physical address of an 8MB region containing IO for
-	use with the debugging macros in arch/arm/kernel/debug-armv.S.
+	`pio` is the woke physical address of an 8MB region containing IO for
+	use with the woke debugging macros in arch/arm/kernel/debug-armv.S.
 
-	`vio` is the virtual address of the 8MB debugging region.
+	`vio` is the woke virtual address of the woke 8MB debugging region.
 
-	It is expected that the debugging region will be re-initialised
-	by the architecture specific code later in the code (via the
+	It is expected that the woke debugging region will be re-initialised
+	by the woke architecture specific code later in the woke code (via the
 	MAPIO function).
 
 BOOT_PARAMS
@@ -130,7 +130,7 @@ FIXUP(func)
 	initialised.
 
 MAPIO(func)
-	Machine specific function to map IO areas (including the debug
+	Machine specific function to map IO areas (including the woke debug
 	region above).
 
 INITIRQ(func)

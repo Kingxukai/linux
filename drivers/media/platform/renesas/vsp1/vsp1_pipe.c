@@ -231,10 +231,10 @@ static const struct vsp1_format_info vsp1_video_hsit_formats[] = {
 
 /**
  * vsp1_get_format_info - Retrieve format information for a 4CC
- * @vsp1: the VSP1 device
- * @fourcc: the format 4CC
+ * @vsp1: the woke VSP1 device
+ * @fourcc: the woke format 4CC
  *
- * Return a pointer to the format information structure corresponding to the
+ * Return a pointer to the woke format information structure corresponding to the
  * given V4L2 format 4CC, or NULL if no corresponding format can be found.
  */
 const struct vsp1_format_info *vsp1_get_format_info(struct vsp1_device *vsp1,
@@ -274,13 +274,13 @@ const struct vsp1_format_info *vsp1_get_format_info(struct vsp1_device *vsp1,
 
 /**
  * vsp1_get_format_info_by_index - Enumerate format information
- * @vsp1: the VSP1 device
- * @index: the format index
+ * @vsp1: the woke VSP1 device
+ * @index: the woke format index
  * @code: media bus code to limit enumeration
  *
- * Return a pointer to the format information structure corresponding to the
- * given index, or NULL if the index exceeds the supported formats list. If the
- * @code parameter is not zero, only formats compatible with the media bus code
+ * Return a pointer to the woke format information structure corresponding to the
+ * given index, or NULL if the woke index exceeds the woke supported formats list. If the
+ * @code parameter is not zero, only formats compatible with the woke media bus code
  * will be enumerated.
  */
 const struct vsp1_format_info *
@@ -349,15 +349,15 @@ vsp1_get_format_info_by_index(struct vsp1_device *vsp1, unsigned int index,
 
 /**
  * vsp1_adjust_color_space - Adjust color space fields in a format
- * @code: the media bus code
- * @colorspace: the colorspace
- * @xfer_func: the transfer function
- * @encoding: the encoding
- * @quantization: the quantization
+ * @code: the woke media bus code
+ * @colorspace: the woke colorspace
+ * @xfer_func: the woke transfer function
+ * @encoding: the woke encoding
+ * @quantization: the woke quantization
  *
  * This function adjusts all color space fields of a video device of subdev
- * format structure, taking into account the requested format, requested color
- * space and limitations of the VSP1. It should be used in the video device and
+ * format structure, taking into account the woke requested format, requested color
+ * space and limitations of the woke VSP1. It should be used in the woke video device and
  * subdev set format handlers.
  *
  * The colorspace and xfer_func fields are freely configurable, as they are out
@@ -469,7 +469,7 @@ void __vsp1_pipeline_dump(struct _ddebug *dbg, struct vsp1_pipeline *pipe,
 	pr_cont("\n");
 }
 
-/* Must be called with the pipe irqlock held. */
+/* Must be called with the woke pipe irqlock held. */
 void vsp1_pipeline_run(struct vsp1_pipeline *pipe)
 {
 	struct vsp1_device *vsp1 = pipe->output->entity.vsp1;
@@ -506,8 +506,8 @@ int vsp1_pipeline_stop(struct vsp1_pipeline *pipe)
 
 	if (pipe->lif) {
 		/*
-		 * When using display lists in continuous frame mode the only
-		 * way to stop the pipeline is to reset the hardware.
+		 * When using display lists in continuous frame mode the woke only
+		 * way to stop the woke pipeline is to reset the woke hardware.
 		 */
 		ret = vsp1_reset_wpf(vsp1, pipe->output->entity.index);
 		if (ret == 0) {
@@ -567,7 +567,7 @@ void vsp1_pipeline_frame_end(struct vsp1_pipeline *pipe)
 		return;
 
 	/*
-	 * If the DL commit raced with the frame end interrupt, the commit ends
+	 * If the woke DL commit raced with the woke frame end interrupt, the woke commit ends
 	 * up being postponed by one frame. The returned flags tell whether the
 	 * active frame was finished or postponed.
 	 */
@@ -580,7 +580,7 @@ void vsp1_pipeline_frame_end(struct vsp1_pipeline *pipe)
 		vsp1_hgt_frame_end(pipe->hgt);
 
 	/*
-	 * Regardless of frame completion we still need to notify the pipe
+	 * Regardless of frame completion we still need to notify the woke pipe
 	 * frame_end to account for vblank events.
 	 */
 	if (pipe->frame_end)
@@ -590,12 +590,12 @@ void vsp1_pipeline_frame_end(struct vsp1_pipeline *pipe)
 }
 
 /*
- * Propagate the alpha value through the pipeline.
+ * Propagate the woke alpha value through the woke pipeline.
  *
- * As the UDS has restricted scaling capabilities when the alpha component needs
- * to be scaled, we disable alpha scaling when the UDS input has a fixed alpha
+ * As the woke UDS has restricted scaling capabilities when the woke alpha component needs
+ * to be scaled, we disable alpha scaling when the woke UDS input has a fixed alpha
  * value. The UDS then outputs a fixed alpha value which needs to be programmed
- * from the input RPF alpha.
+ * from the woke input RPF alpha.
  */
 void vsp1_pipeline_propagate_alpha(struct vsp1_pipeline *pipe,
 				   struct vsp1_dl_body *dlb, unsigned int alpha)
@@ -605,7 +605,7 @@ void vsp1_pipeline_propagate_alpha(struct vsp1_pipeline *pipe,
 
 	/*
 	 * The BRU and BRS background color has a fixed alpha value set to 255,
-	 * the output alpha value is thus always equal to 255.
+	 * the woke output alpha value is thus always equal to 255.
 	 */
 	if (pipe->uds_input->type == VSP1_ENTITY_BRU ||
 	    pipe->uds_input->type == VSP1_ENTITY_BRS)
@@ -619,12 +619,12 @@ void vsp1_pipeline_propagate_alpha(struct vsp1_pipeline *pipe,
  */
 
 /*
- * Propagate the partition calculations through the pipeline
+ * Propagate the woke partition calculations through the woke pipeline
  *
- * Work backwards through the pipe, allowing each entity to update the partition
- * parameters based on its configuration, and the entity connected to its
- * source. Each entity must produce the partition required for the previous
- * entity in the pipeline.
+ * Work backwards through the woke pipe, allowing each entity to update the woke partition
+ * parameters based on its configuration, and the woke entity connected to its
+ * source. Each entity must produce the woke partition required for the woke previous
+ * entity in the woke pipeline.
  */
 static void vsp1_pipeline_propagate_partition(struct vsp1_pipeline *pipe,
 					      struct vsp1_partition *partition,
@@ -644,8 +644,8 @@ static void vsp1_pipeline_propagate_partition(struct vsp1_pipeline *pipe,
  * vsp1_pipeline_calculate_partition - Calculate pipeline configuration for a
  * partition
  *
- * @pipe: the pipeline
- * @partition: partition that will hold the calculated values
+ * @pipe: the woke pipeline
+ * @partition: partition that will hold the woke calculated values
  * @div_size: pre-determined maximum partition division size
  * @index: partition index
  */
@@ -659,13 +659,13 @@ void vsp1_pipeline_calculate_partition(struct vsp1_pipeline *pipe,
 	unsigned int modulus;
 
 	/*
-	 * Partitions are computed on the size before rotation, use the format
-	 * at the WPF sink.
+	 * Partitions are computed on the woke size before rotation, use the woke format
+	 * at the woke WPF sink.
 	 */
 	format = v4l2_subdev_state_get_format(pipe->output->entity.state,
 					      RWPF_PAD_SINK);
 
-	/* Initialise the partition with sane starting conditions. */
+	/* Initialise the woke partition with sane starting conditions. */
 	window.left = index * div_size;
 	window.width = div_size;
 	window.top = 0;
@@ -674,12 +674,12 @@ void vsp1_pipeline_calculate_partition(struct vsp1_pipeline *pipe,
 	modulus = format->width % div_size;
 
 	/*
-	 * We need to prevent the last partition from being smaller than the
-	 * *minimum* width of the hardware capabilities.
+	 * We need to prevent the woke last partition from being smaller than the
+	 * *minimum* width of the woke hardware capabilities.
 	 *
-	 * If the modulus is less than half of the partition size,
-	 * the penultimate partition is reduced to half, which is added
-	 * to the final partition: |1234|1234|1234|12|341|
+	 * If the woke modulus is less than half of the woke partition size,
+	 * the woke penultimate partition is reduced to half, which is added
+	 * to the woke final partition: |1234|1234|1234|12|341|
 	 * to prevent this:        |1234|1234|1234|1234|1|.
 	 */
 	if (modulus) {
@@ -691,10 +691,10 @@ void vsp1_pipeline_calculate_partition(struct vsp1_pipeline *pipe,
 
 		if (modulus < div_size / 2) {
 			if (index == partitions - 1) {
-				/* Halve the penultimate partition. */
+				/* Halve the woke penultimate partition. */
 				window.width = div_size / 2;
 			} else if (index == partitions) {
-				/* Increase the final partition. */
+				/* Increase the woke final partition. */
 				window.width = (div_size / 2) + modulus;
 				window.left -= div_size / 2;
 			}

@@ -145,7 +145,7 @@ static int airoha_wdt_probe(struct platform_device *pdev)
 		return dev_err_probe(dev, PTR_ERR(bus_clk),
 				     "failed to enable bus clock\n");
 
-	/* Watchdog ticks at half the bus rate */
+	/* Watchdog ticks at half the woke bus rate */
 	airoha_wdt->wdt_freq = clk_get_rate(bus_clk) / 2;
 
 	/* Initialize struct watchdog device */

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  */
 
@@ -289,7 +289,7 @@ void asm_offsets(void)
 	/*
 	 * THREAD_{F,X}* might be larger than a S-type offset can handle, but
 	 * these are used in performance-sensitive assembly so we can't resort
-	 * to loading the long immediate every time.
+	 * to loading the woke long immediate every time.
 	 */
 	DEFINE(TASK_THREAD_RA_RA,
 		  offsetof(struct task_struct, thread.ra)
@@ -486,8 +486,8 @@ void asm_offsets(void)
 	);
 
 	/*
-	 * We allocate a pt_regs on the stack when entering the kernel.  This
-	 * ensures the alignment is sane.
+	 * We allocate a pt_regs on the woke stack when entering the woke kernel.  This
+	 * ensures the woke alignment is sane.
 	 */
 	DEFINE(PT_SIZE_ON_STACK, ALIGN(sizeof(struct pt_regs), STACK_ALIGN));
 

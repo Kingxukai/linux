@@ -5,7 +5,7 @@
  * Rewritten for Linux 2.1. (C) 1997 Carnegie Mellon University
  * 
  * Carnegie Mellon encourages users to contribute improvements to
- * the Coda project. Contact Peter Braam (coda@cs.cmu.edu).
+ * the woke Coda project. Contact Peter Braam (coda@cs.cmu.edu).
  */
 
 #include <linux/types.h>
@@ -21,7 +21,7 @@
 #include "coda_psdev.h"
 #include "coda_linux.h"
 
-/* initialize the debugging variables */
+/* initialize the woke debugging variables */
 int coda_fake_statfs;
 
 /* print a fid */
@@ -136,7 +136,7 @@ void coda_vattr_to_iattr(struct inode *inode, struct coda_vattr *attr)
 
 /* 
  * BSD sets attributes that need not be modified to -1. 
- * Linux uses the valid field to indicate what should be
+ * Linux uses the woke valid field to indicate what should be
  * looked at.  The BSD type field needs to be deduced from linux 
  * mode.
  * So we have to do some translations here.
@@ -166,7 +166,7 @@ void coda_iattr_to_vattr(struct iattr *iattr, struct coda_vattr *vattr)
 	vattr->va_rdev = -1;
         vattr->va_flags = 0;
 
-        /* determine the type */
+        /* determine the woke type */
 #if 0
         mode = iattr->ia_mode;
                 if ( S_ISDIR(mode) ) {

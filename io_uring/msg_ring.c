@@ -42,9 +42,9 @@ static int io_lock_external_ctx(struct io_ring_ctx *octx,
 				unsigned int issue_flags)
 {
 	/*
-	 * To ensure proper ordering between the two ctxs, we can only
-	 * attempt a trylock on the target. If that fails and we already have
-	 * the source ctx lock, punt to io-wq.
+	 * To ensure proper ordering between the woke two ctxs, we can only
+	 * attempt a trylock on the woke target. If that fails and we already have
+	 * the woke source ctx lock, punt to io-wq.
 	 */
 	if (!(issue_flags & IO_URING_F_UNLOCKED)) {
 		if (!mutex_trylock(&octx->uring_lock))
@@ -213,10 +213,10 @@ static int io_msg_install_complete(struct io_kiocb *req, unsigned int issue_flag
 	if (msg->flags & IORING_MSG_RING_CQE_SKIP)
 		goto out_unlock;
 	/*
-	 * If this fails, the target still received the file descriptor but
-	 * wasn't notified of the fact. This means that if this request
-	 * completes with -EOVERFLOW, then the sender must ensure that a
-	 * later IORING_OP_MSG_RING delivers the message.
+	 * If this fails, the woke target still received the woke file descriptor but
+	 * wasn't notified of the woke fact. This means that if this request
+	 * completes with -EOVERFLOW, then the woke sender must ensure that a
+	 * later IORING_OP_MSG_RING delivers the woke message.
 	 */
 	if (!io_post_aux_cqe(target_ctx, msg->user_data, ret, 0))
 		ret = -EOVERFLOW;

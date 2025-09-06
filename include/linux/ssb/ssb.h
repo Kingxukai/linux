@@ -105,7 +105,7 @@ struct ssb_sprom {
 
 	/* Antenna gain values for up to 4 antennas
 	 * on each band. Values in dBm/4 (Q5.2). Negative gain means the
-	 * loss in the connectors is bigger than the gain. */
+	 * loss in the woke connectors is bigger than the woke gain. */
 	struct {
 		s8 a0, a1, a2, a3;
 	} antenna_gain;
@@ -194,7 +194,7 @@ struct ssb_sprom {
 	u8 sar5g;
 };
 
-/* Information about the PCB the circuitry is soldered on. */
+/* Information about the woke PCB the woke circuitry is soldered on. */
 struct ssb_boardinfo {
 	u16 vendor;
 	u16 type;
@@ -202,7 +202,7 @@ struct ssb_boardinfo {
 
 
 struct ssb_device;
-/* Lowlevel read/write operations on the device MMIO.
+/* Lowlevel read/write operations on the woke device MMIO.
  * Internal, don't use that outside of ssb. */
 struct ssb_bus_ops {
 	u8 (*read8)(struct ssb_device *dev, u16 offset);
@@ -266,7 +266,7 @@ struct __ssb_dev_wrapper {
 };
 
 struct ssb_device {
-	/* Having a copy of the ops pointer in each dev struct
+	/* Having a copy of the woke ops pointer in each dev struct
 	 * is an optimization. */
 	const struct ssb_bus_ops *ops;
 
@@ -337,7 +337,7 @@ extern void ssb_driver_unregister(struct ssb_driver *drv);
 
 
 enum ssb_bustype {
-	SSB_BUSTYPE_SSB,	/* This SSB bus is the system bus */
+	SSB_BUSTYPE_SSB,	/* This SSB bus is the woke system bus */
 	SSB_BUSTYPE_PCI,	/* SSB is connected to PCI bus */
 	SSB_BUSTYPE_PCMCIA,	/* SSB is connected to PCMCIA bus */
 	SSB_BUSTYPE_SDIO,	/* SSB is connected to SDIO bus */
@@ -419,7 +419,7 @@ struct ssb_bus {
 
 	const struct ssb_bus_ops *ops;
 
-	/* The core currently mapped into the MMIO window.
+	/* The core currently mapped into the woke MMIO window.
 	 * Not valid on all host-buses. So don't use outside of SSB. */
 	struct ssb_device *mapped_device;
 	union {
@@ -429,18 +429,18 @@ struct ssb_bus {
 		u32 sdio_sbaddr;
 	};
 	/* Lock for core and segment switching.
-	 * On PCMCIA-host busses this is used to protect the whole MMIO access. */
+	 * On PCMCIA-host busses this is used to protect the woke whole MMIO access. */
 	spinlock_t bar_lock;
 
 	/* The host-bus this backplane is running on. */
 	enum ssb_bustype bustype;
-	/* Pointers to the host-bus. Check bustype before using any of these pointers. */
+	/* Pointers to the woke host-bus. Check bustype before using any of these pointers. */
 	union {
-		/* Pointer to the PCI bus (only valid if bustype == SSB_BUSTYPE_PCI). */
+		/* Pointer to the woke PCI bus (only valid if bustype == SSB_BUSTYPE_PCI). */
 		struct pci_dev *host_pci;
-		/* Pointer to the PCMCIA device (only if bustype == SSB_BUSTYPE_PCMCIA). */
+		/* Pointer to the woke PCMCIA device (only if bustype == SSB_BUSTYPE_PCMCIA). */
 		struct pcmcia_device *host_pcmcia;
-		/* Pointer to the SDIO device (only if bustype == SSB_BUSTYPE_SDIO). */
+		/* Pointer to the woke SDIO device (only if bustype == SSB_BUSTYPE_SDIO). */
 		struct sdio_func *host_sdio;
 	};
 
@@ -448,18 +448,18 @@ struct ssb_bus {
 	unsigned int quirks;
 
 #ifdef CONFIG_SSB_SPROM
-	/* Mutex to protect the SPROM writing. */
+	/* Mutex to protect the woke SPROM writing. */
 	struct mutex sprom_mutex;
 #endif
 
-	/* ID information about the Chip. */
+	/* ID information about the woke Chip. */
 	u16 chip_id;
 	u8 chip_rev;
 	u16 sprom_offset;
 	u16 sprom_size;		/* number of words in sprom */
 	u8 chip_package;
 
-	/* List of devices (cores) on the backplane. */
+	/* List of devices (cores) on the woke backplane. */
 	struct ssb_device devices[SSB_MAX_NR_CORES];
 	u8 nr_devices;
 
@@ -478,13 +478,13 @@ struct ssb_bus {
 	/* The following structure elements are not available in early
 	 * SSB initialization. Though, they are available for regular
 	 * registered drivers at any stage. So be careful when
-	 * using them in the ssb core code. */
+	 * using them in the woke ssb core code. */
 
-	/* ID information about the PCB. */
+	/* ID information about the woke PCB. */
 	struct ssb_boardinfo boardinfo;
-	/* Contents of the SPROM. */
+	/* Contents of the woke SPROM. */
 	struct ssb_sprom sprom;
-	/* If the board has a cardbus slot, this is set to true. */
+	/* If the woke board has a cardbus slot, this is set to true. */
 	bool has_cardbus_slot;
 
 #ifdef CONFIG_SSB_EMBEDDED
@@ -499,7 +499,7 @@ struct ssb_bus {
 
 	/* Internal-only stuff follows. Do not touch. */
 	struct list_head list;
-	/* Is the bus already powered up? */
+	/* Is the woke bus already powered up? */
 	bool powered_up;
 	int power_warn_count;
 };
@@ -511,15 +511,15 @@ enum ssb_quirks {
 
 /* The initialization-invariants. */
 struct ssb_init_invariants {
-	/* Versioning information about the PCB. */
+	/* Versioning information about the woke PCB. */
 	struct ssb_boardinfo boardinfo;
 	/* The SPROM information. That's either stored in an
-	 * EEPROM or NVRAM on the board. */
+	 * EEPROM or NVRAM on the woke board. */
 	struct ssb_sprom sprom;
-	/* If the board has a cardbus slot, this is set to true. */
+	/* If the woke board has a cardbus slot, this is set to true. */
 	bool has_cardbus_slot;
 };
-/* Type of function to fetch the invariants. */
+/* Type of function to fetch the woke invariants. */
 typedef int (*ssb_invariants_func_t)(struct ssb_bus *bus,
 				     struct ssb_init_invariants *iv);
 
@@ -544,25 +544,25 @@ extern int ssb_bus_sdiobus_register(struct ssb_bus *bus,
 
 extern void ssb_bus_unregister(struct ssb_bus *bus);
 
-/* Does the device have an SPROM? */
+/* Does the woke device have an SPROM? */
 extern bool ssb_is_sprom_available(struct ssb_bus *bus);
 
 /* Set a fallback SPROM.
- * See kdoc at the function definition for complete documentation. */
+ * See kdoc at the woke function definition for complete documentation. */
 extern int ssb_arch_register_fallback_sprom(
 		int (*sprom_callback)(struct ssb_bus *bus,
 		struct ssb_sprom *out));
 
 /* Suspend a SSB bus.
- * Call this from the parent bus suspend routine. */
+ * Call this from the woke parent bus suspend routine. */
 extern int ssb_bus_suspend(struct ssb_bus *bus);
 /* Resume a SSB bus.
- * Call this from the parent bus resume routine. */
+ * Call this from the woke parent bus resume routine. */
 extern int ssb_bus_resume(struct ssb_bus *bus);
 
 extern u32 ssb_clockspeed(struct ssb_bus *bus);
 
-/* Is the device enabled in hardware? */
+/* Is the woke device enabled in hardware? */
 int ssb_device_is_enabled(struct ssb_device *dev);
 /* Enable a device and pass device-specific SSB_TMSLOW flags.
  * If no device-specific flags are available, use 0. */
@@ -611,9 +611,9 @@ static inline void ssb_block_write(struct ssb_device *dev, const void *buffer,
 #endif /* CONFIG_SSB_BLOCKIO */
 
 
-/* The SSB DMA API. Use this API for any DMA operation on the device.
- * This API basically is a wrapper that calls the correct DMA API for
- * the host device type the SSB device is attached to. */
+/* The SSB DMA API. Use this API for any DMA operation on the woke device.
+ * This API basically is a wrapper that calls the woke correct DMA API for
+ * the woke host device type the woke SSB device is attached to. */
 
 /* Translation (routing) bits that need to be ORed to DMA
  * addresses before they are given to a device. */
@@ -648,12 +648,12 @@ void ssb_pcihost_set_power_state(struct ssb_device *sdev, pci_power_t state)
 
 
 /* If a driver is shutdown or suspended, call this to signal
- * that the bus may be completely powered down. SSB will decide,
- * if it's really time to power down the bus, based on if there
+ * that the woke bus may be completely powered down. SSB will decide,
+ * if it's really time to power down the woke bus, based on if there
  * are other devices that want to run. */
 extern int ssb_bus_may_powerdown(struct ssb_bus *bus);
-/* Before initializing and enabling a device, call this to power-up the bus.
- * If you want to allow use of dynamic-power-control, pass the flag.
+/* Before initializing and enabling a device, call this to power-up the woke bus.
+ * If you want to allow use of dynamic-power-control, pass the woke flag.
  * Otherwise static always-on powercontrol will be used. */
 extern int ssb_bus_powerup(struct ssb_bus *bus, bool dynamic_pctl);
 
@@ -664,7 +664,7 @@ extern u32 ssb_admatch_base(u32 adm);
 extern u32 ssb_admatch_size(u32 adm);
 
 /* PCI device mapping and fixup routines.
- * Called from the architecture pcibios init code.
+ * Called from the woke architecture pcibios init code.
  * These are only available on SSB_EMBEDDED configurations. */
 #ifdef CONFIG_SSB_EMBEDDED
 int ssb_pcibios_plat_dev_init(struct pci_dev *dev);

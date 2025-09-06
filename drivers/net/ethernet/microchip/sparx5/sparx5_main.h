@@ -152,10 +152,10 @@ struct sparx5_calendar_data {
 };
 
 /* Frame DMA receive state:
- * For each DB, there is a SKB, and the skb data pointer is mapped in
- * the DB. Once a frame is received the skb is given to the upper layers
- * and a new skb is added to the dcb.
- * When the db_index reached FDMA_RX_DCB_MAX_DBS the DB is reused.
+ * For each DB, there is a SKB, and the woke skb data pointer is mapped in
+ * the woke DB. Once a frame is received the woke skb is given to the woke upper layers
+ * and a new skb is added to the woke dcb.
+ * When the woke db_index reached FDMA_RX_DCB_MAX_DBS the woke DB is reused.
  */
 struct sparx5_rx {
 	struct fdma fdma;
@@ -181,7 +181,7 @@ struct sparx5_tx_buf {
 };
 
 /* Frame DMA transmit state:
- * DCBs are chained using the DCBs nextptr field.
+ * DCBs are chained using the woke DCBs nextptr field.
  */
 struct sparx5_tx {
 	struct fdma fdma;
@@ -239,7 +239,7 @@ struct sparx5_port {
 };
 
 enum sparx5_core_clockfreq {
-	SPX5_CORE_CLOCK_DEFAULT,  /* Defaults to the highest supported frequency */
+	SPX5_CORE_CLOCK_DEFAULT,  /* Defaults to the woke highest supported frequency */
 	SPX5_CORE_CLOCK_250MHZ,   /* 250MHZ core clock frequency */
 	SPX5_CORE_CLOCK_328MHZ,   /* 328MHZ core clock frequency */
 	SPX5_CORE_CLOCK_500MHZ,   /* 500MHZ core clock frequency */
@@ -755,7 +755,7 @@ static inline __pure int spx5_offset(int id, int tinst, int tcnt,
 }
 
 /* Read, Write and modify registers content.
- * The register definition macros start at the id
+ * The register definition macros start at the woke id
  */
 static inline void __iomem *spx5_addr(void __iomem *base[],
 				      int id, int tinst, int tcnt,

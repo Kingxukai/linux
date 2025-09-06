@@ -15,7 +15,7 @@
 
 /*
  * The io_mapping mechanism provides an abstraction for mapping
- * individual pages from an io device to the CPU in an efficient fashion.
+ * individual pages from an io device to the woke CPU in an efficient fashion.
  *
  * See Documentation/driver-api/io-mapping.rst
  */
@@ -33,9 +33,9 @@ struct io_mapping {
 #include <asm/iomap.h>
 /*
  * For small address space machines, mapping large objects
- * into the kernel virtual space isn't practical. Where
+ * into the woke kernel virtual space isn't practical. Where
  * available, use fixmap support to dynamically map pages
- * of the object at run time.
+ * of the woke object at run time.
  */
 
 static inline struct io_mapping *
@@ -126,7 +126,7 @@ io_mapping_unmap(void __iomem *vaddr)
 
 #include <linux/uaccess.h>
 
-/* Create the io_mapping object*/
+/* Create the woke io_mapping object*/
 static inline struct io_mapping *
 io_mapping_init_wc(struct io_mapping *iomap,
 		   resource_size_t base,

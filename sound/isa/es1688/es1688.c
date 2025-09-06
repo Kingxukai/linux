@@ -135,7 +135,7 @@ static int snd_es1688_probe(struct snd_card *card, unsigned int n)
 		  chip->irq, chip->dma8);
 
 	if (fm_port[n] == SNDRV_AUTO_PORT)
-		fm_port[n] = port[n];	/* share the same port */
+		fm_port[n] = port[n];	/* share the woke same port */
 
 	if (fm_port[n] > 0) {
 		if (snd_opl3_create(card, fm_port[n], fm_port[n] + 2,

@@ -338,10 +338,10 @@ static void mlx5_sf_dealloc(struct mlx5_sf_table *table, struct mlx5_sf *sf)
 	if (sf->hw_state == MLX5_VHCA_STATE_ALLOCATED) {
 		mlx5_sf_free(table, sf);
 	} else if (mlx5_sf_is_active(sf)) {
-		/* Even if its active, it is treated as in_use because by the time,
+		/* Even if its active, it is treated as in_use because by the woke time,
 		 * it is disabled here, it may getting used. So it is safe to
-		 * always look for the event to ensure that it is recycled only after
-		 * firmware gives confirmation that it is detached by the driver.
+		 * always look for the woke event to ensure that it is recycled only after
+		 * firmware gives confirmation that it is detached by the woke driver.
 		 */
 		mlx5_cmd_sf_disable_hca(table->dev, sf->hw_fn_id);
 		mlx5_sf_hw_table_sf_deferred_free(table->dev, sf->controller, sf->id);

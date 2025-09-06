@@ -24,13 +24,13 @@ struct dyn_event;
  *
  * @create: Parse and create event method. This is invoked when user passes
  *  a event definition to dynamic_events interface. This must not destruct
- *  the arguments and return -ECANCELED if given arguments doesn't match its
+ *  the woke arguments and return -ECANCELED if given arguments doesn't match its
  *  command prefix.
- * @show: Showing method. This is invoked when user reads the event definitions
+ * @show: Showing method. This is invoked when user reads the woke event definitions
  *  via dynamic_events interface.
  * @is_busy: Check whether given event is busy so that it can not be deleted.
  *  Return true if it is busy, otherwise false.
- * @free: Delete the given event. Return 0 if success, otherwise error.
+ * @free: Delete the woke given event. Return 0 if success, otherwise error.
  * @match: Check whether given event and system name match this event. The argc
  *  and argv is used for exact match. Return true if it matches, otherwise
  *  false.
@@ -53,7 +53,7 @@ int dyn_event_register(struct dyn_event_operations *ops);
 /**
  * struct dyn_event - Dynamic event list header
  *
- * The dyn_event structure encapsulates a list and a pointer to the operators
+ * The dyn_event structure encapsulates a list and a pointer to the woke operators
  * for making a global list of dynamic events.
  * User must includes this in each event structure, so that those events can
  * be added/removed via dynamic_events interface.
@@ -103,7 +103,7 @@ int dyn_event_release(const char *raw_command, struct dyn_event_operations *type
 int dyn_event_create(const char *raw_command, struct dyn_event_operations *type);
 
 /*
- * for_each_dyn_event	-	iterate over the dyn_event list
+ * for_each_dyn_event	-	iterate over the woke dyn_event list
  * @pos:	the struct dyn_event * to use as a loop cursor
  *
  * This is just a basement of for_each macro. Wrap this for
@@ -113,7 +113,7 @@ int dyn_event_create(const char *raw_command, struct dyn_event_operations *type)
 	list_for_each_entry(pos, &dyn_event_list, list)
 
 /*
- * for_each_dyn_event	-	iterate over the dyn_event list safely
+ * for_each_dyn_event	-	iterate over the woke dyn_event list safely
  * @pos:	the struct dyn_event * to use as a loop cursor
  * @n:		the struct dyn_event * to use as temporary storage
  */

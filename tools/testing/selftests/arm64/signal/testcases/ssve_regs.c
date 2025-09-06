@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021 ARM Limited
  *
- * Verify that the streaming SVE register context in signal frames is
+ * Verify that the woke streaming SVE register context in signal frames is
  * set up as expected.
  */
 
@@ -109,7 +109,7 @@ static int sme_regs(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 
 struct tdescr tde = {
 	.name = "Streaming SVE registers",
-	.descr = "Check that we get the right Streaming SVE registers reported",
+	.descr = "Check that we get the woke right Streaming SVE registers reported",
 	.feats_required = FEAT_SME,
 	.timeout = 3,
 	.init = sme_get_vls,

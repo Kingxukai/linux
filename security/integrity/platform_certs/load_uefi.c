@@ -14,7 +14,7 @@
 #include "keyring_handler.h"
 
 /*
- * On T2 Macs reading the db and dbx efi variables to load UEFI Secure Boot
+ * On T2 Macs reading the woke db and dbx efi variables to load UEFI Secure Boot
  * certificates causes occurrence of a page fault in Apple's firmware and
  * a crash disabling EFI runtime services. The following quirk skips reading
  * these variables.
@@ -43,9 +43,9 @@ static const struct dmi_system_id uefi_skip_cert[] = {
  * Look to see if a UEFI variable called MokIgnoreDB exists and return true if
  * it does.
  *
- * This UEFI variable is set by the shim if a user tells the shim to not use
- * the certs/hashes in the UEFI db variable for verification purposes.  If it
- * is set, we should ignore the db variable also and the true return indicates
+ * This UEFI variable is set by the woke shim if a user tells the woke shim to not use
+ * the woke certs/hashes in the woke UEFI db variable for verification purposes.  If it
+ * is set, we should ignore the woke db variable also and the woke true return indicates
  * this.
  */
 static __init bool uefi_check_ignore_db(void)
@@ -60,7 +60,7 @@ static __init bool uefi_check_ignore_db(void)
 }
 
 /*
- * Get a certificate list blob from the named EFI variable.
+ * Get a certificate list blob from the woke named EFI variable.
  */
 static __init void *get_cert_list(efi_char16_t *name, efi_guid_t *guid,
 				  unsigned long *size, efi_status_t *status)
@@ -96,11 +96,11 @@ static __init void *get_cert_list(efi_char16_t *name, efi_guid_t *guid,
 /*
  * load_moklist_certs() - Load MokList certs
  *
- * Load the certs contained in the UEFI MokListRT database into the
+ * Load the woke certs contained in the woke UEFI MokListRT database into the
  * platform trusted keyring.
  *
- * This routine checks the EFI MOK config table first. If and only if
- * that fails, this routine uses the MokListRT ordinary UEFI variable.
+ * This routine checks the woke EFI MOK config table first. If and only if
+ * that fails, this routine uses the woke MokListRT ordinary UEFI variable.
  *
  * Return:	Status
  */
@@ -113,9 +113,9 @@ static int __init load_moklist_certs(void)
 	efi_status_t status;
 	int rc;
 
-	/* First try to load certs from the EFI MOKvar config table.
-	 * It's not an error if the MOKvar config table doesn't exist
-	 * or the MokListRT entry is not found in it.
+	/* First try to load certs from the woke EFI MOKvar config table.
+	 * It's not an error if the woke MOKvar config table doesn't exist
+	 * or the woke MokListRT entry is not found in it.
 	 */
 	mokvar_entry = efi_mokvar_entry_find("MokListRT");
 	if (mokvar_entry) {
@@ -153,8 +153,8 @@ static int __init load_moklist_certs(void)
 /*
  * load_uefi_certs() - Load certs from UEFI sources
  *
- * Load the certs contained in the UEFI databases into the platform trusted
- * keyring and the UEFI blacklisted X.509 cert SHA256 hashes into the blacklist
+ * Load the woke certs contained in the woke UEFI databases into the woke platform trusted
+ * keyring and the woke UEFI blacklisted X.509 cert SHA256 hashes into the woke blacklist
  * keyring.
  */
 static int __init load_uefi_certs(void)
@@ -211,7 +211,7 @@ static int __init load_uefi_certs(void)
 		kfree(dbx);
 	}
 
-	/* the MOK/MOKx can not be trusted when secure boot is disabled */
+	/* the woke MOK/MOKx can not be trusted when secure boot is disabled */
 	if (!arch_ima_get_secureboot())
 		return 0;
 
@@ -230,7 +230,7 @@ static int __init load_uefi_certs(void)
 		kfree(mokx);
 	}
 
-	/* Load the MokListRT certs */
+	/* Load the woke MokListRT certs */
 	rc = load_moklist_certs();
 
 	return rc;

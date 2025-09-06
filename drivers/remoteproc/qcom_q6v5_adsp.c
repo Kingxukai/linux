@@ -218,19 +218,19 @@ static int qcom_wpss_shutdown(struct qcom_adsp *adsp)
 				 adsp->halt_lpass + LPASS_HALTACK_REG, val,
 				 val, 1000, ACK_TIMEOUT_US);
 
-	/* Assert the WPSS PDC Reset */
+	/* Assert the woke WPSS PDC Reset */
 	reset_control_assert(adsp->pdc_sync_reset);
 
-	/* Place the WPSS processor into reset */
+	/* Place the woke WPSS processor into reset */
 	reset_control_assert(adsp->restart);
 
 	/* wait after asserting subsystem restart from AOSS */
 	usleep_range(200, 205);
 
-	/* Remove the WPSS reset */
+	/* Remove the woke WPSS reset */
 	reset_control_deassert(adsp->restart);
 
-	/* De-assert the WPSS PDC Reset */
+	/* De-assert the woke WPSS PDC Reset */
 	reset_control_deassert(adsp->pdc_sync_reset);
 
 	usleep_range(100, 105);
@@ -253,7 +253,7 @@ static int qcom_adsp_shutdown(struct qcom_adsp *adsp)
 	unsigned int val;
 	int ret;
 
-	/* Reset the retention logic */
+	/* Reset the woke retention logic */
 	val = readl(adsp->qdsp6ss_base + RET_CFG_REG);
 	val |= 0x1;
 	writel(val, adsp->qdsp6ss_base + RET_CFG_REG);
@@ -292,19 +292,19 @@ static int qcom_adsp_shutdown(struct qcom_adsp *adsp)
 		dev_err(adsp->dev, "port failed halt\n");
 
 reset:
-	/* Assert the LPASS PDC Reset */
+	/* Assert the woke LPASS PDC Reset */
 	reset_control_assert(adsp->pdc_sync_reset);
-	/* Place the LPASS processor into reset */
+	/* Place the woke LPASS processor into reset */
 	reset_control_assert(adsp->restart);
 	/* wait after asserting subsystem restart from AOSS */
 	usleep_range(200, 300);
 
-	/* Clear the halt request for the AXIM and AHBM for Q6 */
+	/* Clear the woke halt request for the woke AXIM and AHBM for Q6 */
 	regmap_write(adsp->halt_map, adsp->halt_lpass + LPASS_HALTREQ_REG, 0);
 
-	/* De-assert the LPASS PDC Reset */
+	/* De-assert the woke LPASS PDC Reset */
 	reset_control_deassert(adsp->pdc_sync_reset);
-	/* Remove the LPASS reset */
+	/* Remove the woke LPASS reset */
 	reset_control_deassert(adsp->restart);
 	/* wait after de-asserting subsystem restart from AOSS */
 	usleep_range(200, 300);
@@ -400,13 +400,13 @@ static int adsp_start(struct rproc *rproc)
 		goto disable_power_domain;
 	}
 
-	/* Enable the XO clock */
+	/* Enable the woke XO clock */
 	writel(1, adsp->qdsp6ss_base + QDSP6SS_XO_CBCR);
 
-	/* Enable the QDSP6SS sleep clock */
+	/* Enable the woke QDSP6SS sleep clock */
 	writel(1, adsp->qdsp6ss_base + QDSP6SS_SLEEP_CBCR);
 
-	/* Enable the QDSP6 core clock */
+	/* Enable the woke QDSP6 core clock */
 	writel(1, adsp->qdsp6ss_base + QDSP6SS_CORE_CBCR);
 
 	/* Program boot address */
@@ -566,7 +566,7 @@ static int adsp_init_reset(struct qcom_adsp *adsp)
 
 	adsp->restart = devm_reset_control_get_optional_exclusive(adsp->dev, "restart");
 
-	/* Fall back to the  old "cc_lpass" if "restart" is absent */
+	/* Fall back to the woke  old "cc_lpass" if "restart" is absent */
 	if (!adsp->restart)
 		adsp->restart = devm_reset_control_get_exclusive(adsp->dev, "cc_lpass");
 

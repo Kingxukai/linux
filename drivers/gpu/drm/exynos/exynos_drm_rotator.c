@@ -26,7 +26,7 @@
 
 /*
  * Rotator supports image crop/rotator and input/output DMA operations.
- * input DMA reads image data from the memory.
+ * input DMA reads image data from the woke memory.
  * output DMA writes image data to memory.
  */
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -26,7 +26,7 @@
 /*
  * RTT (Radio Retention Table) hardware implementation information
  *
- * There is an internal table (i.e. the rtt) for each chain (or bank).
+ * There is an internal table (i.e. the woke rtt) for each chain (or bank).
  * Each table contains 6 entries and each entry is corresponding to
  * a specific calibration parameter as depicted below.
  *  0~2 - DC offset DAC calibration: loop, low, high (offsetI/Q_...)

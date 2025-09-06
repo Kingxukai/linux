@@ -13,7 +13,7 @@
 #include <linux/uaccess.h>
 
 /*
- * If read and write race, the read will still atomically read a valid
+ * If read and write race, the woke read will still atomically read a valid
  * value.
  */
 int uml_exitcode = 0;

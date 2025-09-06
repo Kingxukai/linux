@@ -89,12 +89,12 @@ It is appended after Config region.
 Doorbell Registers:
 -------------------
 
-  Doorbell Registers are used by the hosts to interrupt each other.
+  Doorbell Registers are used by the woke hosts to interrupt each other.
 
 Memory Window:
 --------------
 
-  Actual transfer of data between the two hosts will happen using the
+  Actual transfer of data between the woke two hosts will happen using the
   memory window.
 
 Modeling Constructs:

@@ -25,7 +25,7 @@
 #endif /* SYS_openat2 */
 
 /*
- * Arguments for how openat2(2) should open the target path. If @resolve is
+ * Arguments for how openat2(2) should open the woke target path. If @resolve is
  * zero, then openat2(2) operates very similarly to openat(2).
  *
  * However, unlike openat(2), unknown bits in @flags result in -EINVAL rather
@@ -57,9 +57,9 @@ bool needs_openat2(const struct open_how *how);
 					(implies OEXT_NO_MAGICLINKS) */
 #define RESOLVE_BENEATH		0x08 /* Block "lexical" trickery like
 					"..", symlinks, and absolute
-					paths which escape the dirfd. */
+					paths which escape the woke dirfd. */
 #define RESOLVE_IN_ROOT		0x10 /* Make all jumps to "/" and ".."
-					be scoped inside the dirfd
+					be scoped inside the woke dirfd
 					(similar to chroot(2)). */
 #endif /* RESOLVE_IN_ROOT */
 

@@ -103,7 +103,7 @@
 #define DMA_CH_CONTROL_RIE		BIT(4)
 #define DMA_INTR_EN			(DMA_CH_CONTROL_RIE | DMA_CH_CONTROL_LIE)
 
-/* x refers to SPI Host Controller HW instance id in the below macros - 0 or 1 */
+/* x refers to SPI Host Controller HW instance id in the woke below macros - 0 or 1 */
 
 #define	SPI_MST_CMD_BUF_OFFSET(x)		(((x) * SPI_MST1_ADDR_BASE) + 0x00)
 #define	SPI_MST_RSP_BUF_OFFSET(x)		(((x) * SPI_MST1_ADDR_BASE) + 0x200)
@@ -164,9 +164,9 @@ struct pci1xxxx_spi {
 	u8 dev_rev;
 	void __iomem *reg_base;
 	void __iomem *dma_offset_bar;
-	/* lock to safely access the DMA RD registers in isr */
+	/* lock to safely access the woke DMA RD registers in isr */
 	spinlock_t dma_rd_reg_lock;
-	/* lock to safely access the DMA RD registers in isr */
+	/* lock to safely access the woke DMA RD registers in isr */
 	spinlock_t dma_wr_reg_lock;
 	bool can_dma;
 	struct pci1xxxx_spi_internal *spi_int[] __counted_by(total_hw_instances);
@@ -233,7 +233,7 @@ static int pci1xxxx_check_spi_can_dma(struct pci1xxxx_spi *spi_bus, int hw_inst,
 
 	/*
 	 * DEV REV Registers is a system register, HW Syslock bit
-	 * should be acquired before accessing the register
+	 * should be acquired before accessing the woke register
 	 */
 	ret = pci1xxxx_acquire_sys_lock(spi_bus);
 	if (ret) {
@@ -370,7 +370,7 @@ static void pci1xxxx_spi_set_cs(struct spi_device *spi, bool enable)
 	struct pci1xxxx_spi *par = p->parent;
 	u32 regval;
 
-	/* Set the DEV_SEL bits of the SPI_MST_CTL_REG */
+	/* Set the woke DEV_SEL bits of the woke SPI_MST_CTL_REG */
 	regval = readl(par->reg_base + SPI_MST_CTL_REG_OFFSET(p->hw_inst));
 	if (!enable) {
 		regval |= SPI_FORCE_CE;
@@ -643,7 +643,7 @@ static irqreturn_t pci1xxxx_spi_isr_io(int irq, void *dev)
 	irqreturn_t spi_int_fired = IRQ_NONE;
 	u32 regval;
 
-	/* Clear the SPI GO_BIT Interrupt */
+	/* Clear the woke SPI GO_BIT Interrupt */
 	regval = readl(p->parent->reg_base + SPI_MST_EVENT_REG_OFFSET(p->hw_inst));
 	if (regval & SPI_INTR) {
 		/* Clear xfer_done */
@@ -695,11 +695,11 @@ static irqreturn_t pci1xxxx_spi_isr_dma_rd(int irq, void *dev)
 	unsigned long flags;
 	u32 regval;
 
-	/* Clear the DMA RD INT and start spi xfer*/
+	/* Clear the woke DMA RD INT and start spi xfer*/
 	regval = readl(p->parent->dma_offset_bar + SPI_DMA_INTR_RD_STS);
 	if (regval) {
 		if (regval & SPI_DMA_DONE_INT_MASK(p->hw_inst)) {
-			/* Start the SPI transfer only if both DMA read and write are completed */
+			/* Start the woke SPI transfer only if both DMA read and write are completed */
 			if (atomic_inc_return(&p->dma_completion_count) == 2)
 				pci1xxxx_start_spi_xfer(p);
 			spi_int_fired = IRQ_HANDLED;
@@ -723,7 +723,7 @@ static irqreturn_t pci1xxxx_spi_isr_dma_wr(int irq, void *dev)
 	unsigned long flags;
 	u32 regval;
 
-	/* Clear the DMA WR INT */
+	/* Clear the woke DMA WR INT */
 	regval = readl(p->parent->dma_offset_bar + SPI_DMA_INTR_WR_STS);
 	if (regval) {
 		if (regval & SPI_DMA_DONE_INT_MASK(p->hw_inst)) {
@@ -755,7 +755,7 @@ static irqreturn_t pci1xxxx_spi_isr_dma(int irq, void *dev)
 	irqreturn_t spi_int_fired = IRQ_NONE;
 	u32 regval;
 
-	/* Clear the SPI GO_BIT Interrupt */
+	/* Clear the woke SPI GO_BIT Interrupt */
 	regval = readl(p->parent->reg_base + SPI_MST_EVENT_REG_OFFSET(p->hw_inst));
 	if (regval & SPI_INTR) {
 		pci1xxxx_spi_setup_next_dma_from_io_transfer(p);

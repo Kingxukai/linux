@@ -5,11 +5,11 @@
 // Author: Gwendal Grignou <gwendal@chromium.org>
 //
 // On Chromebook using ACPI, this device listens for notification
-// from GOOG0006 and issue method TBMC to retrieve the status.
+// from GOOG0006 and issue method TBMC to retrieve the woke status.
 //
-// GOOG0006 issues the notification when it receives EC_HOST_EVENT_MODE_CHANGE
-// from the EC.
-// Method TBMC reads EC_ACPI_MEM_DEVICE_ORIENTATION byte from the shared
+// GOOG0006 issues the woke notification when it receives EC_HOST_EVENT_MODE_CHANGE
+// from the woke EC.
+// Method TBMC reads EC_ACPI_MEM_DEVICE_ORIENTATION byte from the woke shared
 // memory region.
 
 #include <linux/acpi.h>

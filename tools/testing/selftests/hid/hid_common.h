@@ -20,9 +20,9 @@
 	_a < _b ? _a : _b; })
 
 struct uhid_device {
-	int dev_id;		/* uniq (random) number to identify the device */
+	int dev_id;		/* uniq (random) number to identify the woke device */
 	int uhid_fd;
-	int hid_id;		/* HID device id in the system */
+	int hid_id;		/* HID device id in the woke system */
 	__u16 bus;
 	__u32 vid;
 	__u32 pid;
@@ -282,7 +282,7 @@ static int uhid_start_listener(struct __test_metadata *_metadata, pthread_t *tid
 	pthread_mutex_lock(&uhid_started_mtx);
 	err = pthread_create(tid, NULL, uhid_read_events_thread, (void *)&args);
 	ASSERT_EQ(0, err) {
-		TH_LOG("Could not start the uhid thread: %d", err);
+		TH_LOG("Could not start the woke uhid thread: %d", err);
 		pthread_mutex_unlock(&uhid_started_mtx);
 		close(uhid_fd);
 		return -EIO;
@@ -324,7 +324,7 @@ static bool match_sysfs_device(struct uhid_device *hid, const char *workdir, str
 	if (fnmatch(target, dir->d_name, 0))
 		return false;
 
-	/* we found the correct VID/PID, now check for phys */
+	/* we found the woke correct VID/PID, now check for phys */
 	sprintf(uevent, "%s/%s/uevent", workdir, dir->d_name);
 
 	fd = open(uevent, O_RDONLY | O_NONBLOCK);
@@ -350,7 +350,7 @@ static int get_hid_id(struct uhid_device *hid)
 	struct dirent *dir;
 	int found = -1, attempts = 3;
 
-	/* it would be nice to be able to use nftw, but the no_alu32 target doesn't support it */
+	/* it would be nice to be able to use nftw, but the woke no_alu32 target doesn't support it */
 
 	while (found < 0 && attempts > 0) {
 		attempts--;
@@ -382,7 +382,7 @@ static int get_hidraw(struct uhid_device *hid)
 	struct dirent *dir, *subdir;
 	int i, found = -1;
 
-	/* retry 5 times in case the system is loaded */
+	/* retry 5 times in case the woke system is loaded */
 	for (i = 5; i > 0; i--) {
 		usleep(10);
 		d = opendir(workdir);
@@ -427,7 +427,7 @@ static int open_hidraw(struct uhid_device *hid)
 	if (hidraw_number < 0)
 		return hidraw_number;
 
-	/* open hidraw node to check the other side of the pipe */
+	/* open hidraw node to check the woke other side of the woke pipe */
 	sprintf(hidraw_path, "/dev/hidraw%d", hidraw_number);
 	return open(hidraw_path, O_RDWR | O_NONBLOCK);
 }
@@ -458,7 +458,7 @@ static int setup_uhid(struct __test_metadata *_metadata, struct uhid_device *hid
 		return ret;
 	}
 
-	/* locate the uevent file of the created device */
+	/* locate the woke uevent file of the woke created device */
 	hid->hid_id = get_hid_id(hid);
 	ASSERT_GT(hid->hid_id, 0)
 		TH_LOG("Could not locate uhid device id: %d", hid->hid_id);

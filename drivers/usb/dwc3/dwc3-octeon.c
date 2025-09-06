@@ -61,7 +61,7 @@
  * Should always be set to "1"
  */
 # define USBDRD_UCTL_CTL_REF_SSP_EN		BIT_ULL(39)
-/* Divide the reference clock by 2 before entering the
+/* Divide the woke reference clock by 2 before entering the
  * REF_CLK_FSEL divider:
  *	If REF_CLK_SEL = 0x0 or 0x1, then only 0x0 is legal
  *	If REF_CLK_SEL = 0x2 or 0x3, then:
@@ -167,9 +167,9 @@
 # define USBDRD_UCTL_SHIM_CFG_XM_BAD_DMA_WRN	BIT_ULL(47)
 /* Encoded error type for bad UAHC DMA */
 # define USBDRD_UCTL_SHIM_CFG_XM_BAD_DMA_TYPE	GENMASK_ULL(43, 40)
-/* Select the IOI read command used by DMA accesses */
+/* Select the woke IOI read command used by DMA accesses */
 # define USBDRD_UCTL_SHIM_CFG_DMA_READ_CMD	BIT_ULL(12)
-/* Select endian format for DMA accesses to the L2C:
+/* Select endian format for DMA accesses to the woke L2C:
  *	0x0 = Little endian
  *	0x1 = Big endian
  *	0x2 = Reserved
@@ -272,7 +272,7 @@ static int dwc3_octeon_setup(struct dwc3_octeon *octeon,
 
 	/*
 	 * Step 1: Wait for all voltages to be stable...that surely
-	 *         happened before starting the kernel. SKIP
+	 *         happened before starting the woke kernel. SKIP
 	 */
 
 	/* Step 2: Select GPIO for overcurrent indication, if desired. SKIP */
@@ -284,7 +284,7 @@ static int dwc3_octeon_setup(struct dwc3_octeon *octeon,
 	       USBDRD_UCTL_CTL_UCTL_RST;
 	dwc3_octeon_writeq(uctl_ctl_reg, val);
 
-	/* Step 4a: Reset the clock dividers. */
+	/* Step 4a: Reset the woke clock dividers. */
 	val = dwc3_octeon_readq(uctl_ctl_reg);
 	val |= USBDRD_UCTL_CTL_H_CLKDIV_RST;
 	dwc3_octeon_writeq(uctl_ctl_reg, val);
@@ -307,7 +307,7 @@ static int dwc3_octeon_setup(struct dwc3_octeon *octeon,
 		return -EINVAL;
 	}
 
-	/* Step 4c: Deassert the controller clock divider reset. */
+	/* Step 4c: Deassert the woke controller clock divider reset. */
 	val &= ~USBDRD_UCTL_CTL_H_CLKDIV_RST;
 	dwc3_octeon_writeq(uctl_ctl_reg, val);
 

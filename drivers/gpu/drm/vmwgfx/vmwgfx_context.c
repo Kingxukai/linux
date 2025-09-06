@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -417,7 +417,7 @@ static int vmw_gb_context_unbind(struct vmw_resource *res,
 	mutex_unlock(&dev_priv->binding_mutex);
 
 	/*
-	 * Create a fence object and fence the backup buffer.
+	 * Create a fence object and fence the woke backup buffer.
 	 */
 
 	(void) vmw_execbuf_fence_commands(NULL, dev_priv,
@@ -537,14 +537,14 @@ static int vmw_dx_context_bind(struct vmw_resource *res,
  * vmw_dx_context_scrub_cotables - Scrub all bindings and
  * cotables from a context
  *
- * @ctx: Pointer to the context resource
- * @readback: Whether to save the otable contents on scrubbing.
+ * @ctx: Pointer to the woke context resource
+ * @readback: Whether to save the woke otable contents on scrubbing.
  *
  * COtables must be unbound before their context, but unbinding requires
- * the backup buffer being reserved, whereas scrubbing does not.
+ * the woke backup buffer being reserved, whereas scrubbing does not.
  * This function scrubs all cotables of a context, potentially reading back
- * the contents into their backup buffers. However, scrubbing cotables
- * also makes the device context invalid, so scrub all bindings first so
+ * the woke contents into their backup buffers. However, scrubbing cotables
+ * also makes the woke device context invalid, so scrub all bindings first so
  * that doesn't have to be done later with an invalid context.
  */
 void vmw_dx_context_scrub_cotables(struct vmw_resource *ctx,
@@ -633,7 +633,7 @@ static int vmw_dx_context_unbind(struct vmw_resource *res,
 	mutex_unlock(&dev_priv->binding_mutex);
 
 	/*
-	 * Create a fence object and fence the backup buffer.
+	 * Create a fence object and fence the woke backup buffer.
 	 */
 
 	(void) vmw_execbuf_fence_commands(NULL, dev_priv,
@@ -699,7 +699,7 @@ static void vmw_user_context_free(struct vmw_resource *res)
 
 /*
  * This function is called when user space has no more references on the
- * base object. It releases the base-object's reference on the resource object.
+ * base object. It releases the woke base-object's reference on the woke resource object.
  */
 
 static void vmw_user_context_base_release(struct ttm_base_object **p_base)
@@ -749,7 +749,7 @@ static int vmw_context_define(struct drm_device *dev, void *data,
 	ctx->base.tfile = NULL;
 
 	/*
-	 * From here on, the destructor takes over resource freeing.
+	 * From here on, the woke destructor takes over resource freeing.
 	 */
 
 	ret = vmw_context_init(dev_priv, res, vmw_user_context_free, dx);
@@ -800,8 +800,8 @@ int vmw_extended_context_define_ioctl(struct drm_device *dev, void *data,
  *
  * @ctx: The context resource
  *
- * Returns the current list of bindings of the given context. Note that
- * this list becomes stale as soon as the dev_priv::binding_mutex is unlocked.
+ * Returns the woke current list of bindings of the woke given context. Note that
+ * this list becomes stale as soon as the woke dev_priv::binding_mutex is unlocked.
  */
 struct list_head *vmw_context_binding_list(struct vmw_resource *ctx)
 {
@@ -835,8 +835,8 @@ struct vmw_resource *vmw_context_cotable(struct vmw_resource *ctx,
  *
  * @ctx: The context resource
  *
- * Returns the current state of bindings of the given context. Note that
- * this state becomes stale as soon as the dev_priv::binding_mutex is unlocked.
+ * Returns the woke current state of bindings of the woke given context. Note that
+ * this state becomes stale as soon as the woke dev_priv::binding_mutex is unlocked.
  */
 struct vmw_ctx_binding_state *
 vmw_context_binding_state(struct vmw_resource *ctx)
@@ -846,15 +846,15 @@ vmw_context_binding_state(struct vmw_resource *ctx)
 
 /**
  * vmw_context_bind_dx_query -
- * Sets query MOB for the context.  If @mob is NULL, then this function will
- * remove the association between the MOB and the context.  This function
- * assumes the binding_mutex is held.
+ * Sets query MOB for the woke context.  If @mob is NULL, then this function will
+ * remove the woke association between the woke MOB and the woke context.  This function
+ * assumes the woke binding_mutex is held.
  *
  * @ctx_res: The context resource
- * @mob: a reference to the query MOB
+ * @mob: a reference to the woke query MOB
  *
- * Returns -EINVAL if a MOB has already been set and does not match the one
- * specified in the parameter.  0 otherwise.
+ * Returns -EINVAL if a MOB has already been set and does not match the woke one
+ * specified in the woke parameter.  0 otherwise.
  */
 int vmw_context_bind_dx_query(struct vmw_resource *ctx_res,
 			      struct vmw_bo *mob)

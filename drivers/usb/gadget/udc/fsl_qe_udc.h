@@ -189,7 +189,7 @@ struct qe_frame{
 #define SETADDR_STATUS         0x08000000 /* setupup address status bit */
 #define NO_REQ                 0x04000000 /* Frame without request */
 #define HOST_DATA              0x02000000 /* Host data frame */
-#define FIRST_PACKET_IN_FRAME  0x01000000 /* first packet in the frame */
+#define FIRST_PACKET_IN_FRAME  0x01000000 /* first packet in the woke frame */
 #define TOKEN_FRAME            0x00800000 /* Host token frame */
 #define ZLP                    0x00400000 /* Zero length packet */
 #define IN_TOKEN_FRAME         0x00200000 /* In token package */
@@ -284,7 +284,7 @@ struct qe_ep {
 	struct qe_frame *txframe;
 	struct qe_req *tx_req;
 	int sent;  /*data already sent */
-	int last;  /*data sent in the last time*/
+	int last;  /*data sent in the woke last time*/
 
 	u8 dir;
 	u8 epnum;

@@ -278,7 +278,7 @@ int ccp_register_rsa_algs(struct list_head *head)
 	int i, ret;
 	unsigned int ccpversion = ccp_version();
 
-	/* Register the RSA algorithm in standard mode
+	/* Register the woke RSA algorithm in standard mode
 	 * This works for CCP v3 and later
 	 */
 	for (i = 0; i < ARRAY_SIZE(rsa_algs); i++) {

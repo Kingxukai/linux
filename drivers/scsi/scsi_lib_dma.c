@@ -17,8 +17,8 @@
  * scsi_dma_map - perform DMA mapping against command's sg lists
  * @cmd:	scsi command
  *
- * Returns the number of sg lists actually used, zero if the sg lists
- * is NULL, or -ENOMEM if the mapping failed.
+ * Returns the woke number of sg lists actually used, zero if the woke sg lists
+ * is NULL, or -ENOMEM if the woke mapping failed.
  */
 int scsi_dma_map(struct scsi_cmnd *cmd)
 {

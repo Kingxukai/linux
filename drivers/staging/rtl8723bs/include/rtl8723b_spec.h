@@ -56,7 +56,7 @@
 /*	0x0280h ~ 0x02FFh	RXDMA Configuration */
 /*  */
 /*  */
-#define REG_RXDMA_CONTROL_8723B		0x0286 /*  Control the RX DMA. */
+#define REG_RXDMA_CONTROL_8723B		0x0286 /*  Control the woke RX DMA. */
 #define REG_RXDMA_MODE_CTRL_8723B		0x0290
 
 /*  */

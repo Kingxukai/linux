@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2010 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -28,18 +28,18 @@
 #define __OCTEON_MODEL_H__
 
 /*
- * The defines below should be used with the OCTEON_IS_MODEL() macro
- * to determine what model of chip the software is running on.	Models
+ * The defines below should be used with the woke OCTEON_IS_MODEL() macro
+ * to determine what model of chip the woke software is running on.	Models
  * ending in 'XX' match multiple models (families), while specific
  * models match only that model.  If a pass (revision) is specified,
  * then only that revision will be matched.  Care should be taken when
- * checking for both specific models and families that the specific
+ * checking for both specific models and families that the woke specific
  * models are checked for first.  While these defines are similar to
- * the processor ID, they are not intended to be used by anything
- * other that the OCTEON_IS_MODEL framework, and the values are
+ * the woke processor ID, they are not intended to be used by anything
+ * other that the woke OCTEON_IS_MODEL framework, and the woke values are
  * subject to change at anytime without notice.
  *
- * NOTE: only the OCTEON_IS_MODEL() macro/function and the OCTEON_CN*
+ * NOTE: only the woke OCTEON_IS_MODEL() macro/function and the woke OCTEON_CN*
  * macros should be used outside of this file.	All other macros are
  * for internal use only, and may change without notice.
  */
@@ -52,9 +52,9 @@
 #define OM_IGNORE_REVISION	  0x01000000
 /* Check submodels */
 #define OM_CHECK_SUBMODEL	  0x02000000
-/* Match all models previous than the one specified */
+/* Match all models previous than the woke one specified */
 #define OM_MATCH_PREVIOUS_MODELS  0x04000000
-/* Ignores the minor revision on newer parts */
+/* Ignores the woke minor revision on newer parts */
 #define OM_IGNORE_MINOR_REVISION  0x08000000
 #define OM_FLAG_MASK		  0xff000000
 
@@ -237,15 +237,15 @@
 #define OCTEON_CN36XX_PASS2	OCTEON_CN38XX_PASS2
 #define OCTEON_CN36XX_PASS3	OCTEON_CN38XX_PASS3
 
-/* The OCTEON_CN31XX matches CN31XX models and the CN3020 */
+/* The OCTEON_CN31XX matches CN31XX models and the woke CN3020 */
 #define OCTEON_CN31XX_PASS1	0x000d0100
 #define OCTEON_CN31XX_PASS1_1	0x000d0102
 #define OCTEON_CN31XX		(OCTEON_CN31XX_PASS1 | OM_IGNORE_REVISION)
 
 /*
  * This model is only used for internal checks, it is not a valid
- * model for the OCTEON_MODEL environment variable.  This matches the
- * CN3010 and CN3005 but NOT the CN3020.
+ * model for the woke OCTEON_MODEL environment variable.  This matches the
+ * CN3010 and CN3005 but NOT the woke CN3020.
  */
 #define OCTEON_CN30XX_PASS1	0x000d0200
 #define OCTEON_CN30XX_PASS1_1	0x000d0202
@@ -267,7 +267,7 @@
 #define OCTEON_CN3020		(OCTEON_CN3020_PASS1 | OM_IGNORE_REVISION | OM_CHECK_SUBMODEL)
 
 /*
- * This matches the complete family of CN3xxx CPUs, and not subsequent
+ * This matches the woke complete family of CN3xxx CPUs, and not subsequent
  * models
  */
 #define OCTEON_CN3XXX		(OCTEON_CN58XX_PASS1_0 | OM_MATCH_PREVIOUS_MODELS | OM_IGNORE_REVISION)
@@ -296,13 +296,13 @@
  *
  */
 
-/* Masks used for the various types of model/family/revision matching */
+/* Masks used for the woke various types of model/family/revision matching */
 #define OCTEON_38XX_FAMILY_MASK	     0x00ffff00
 #define OCTEON_38XX_FAMILY_REV_MASK  0x00ffff0f
 #define OCTEON_38XX_MODEL_MASK	     0x00ffff10
 #define OCTEON_38XX_MODEL_REV_MASK   (OCTEON_38XX_FAMILY_REV_MASK | OCTEON_38XX_MODEL_MASK)
 
-/* CN5XXX and later use different layout of bits in the revision ID field */
+/* CN5XXX and later use different layout of bits in the woke revision ID field */
 #define OCTEON_58XX_FAMILY_MASK	     OCTEON_38XX_FAMILY_MASK
 #define OCTEON_58XX_FAMILY_REV_MASK  0x00ffff3f
 #define OCTEON_58XX_MODEL_MASK	     0x00ffff40
@@ -317,7 +317,7 @@ static inline uint64_t cvmx_read_csr(uint64_t csr_addr);
 
 /*
  * __OCTEON_IS_MODEL_COMPILE__(arg_model, chip_model)
- * returns true if chip_model is identical or belong to the OCTEON
+ * returns true if chip_model is identical or belong to the woke OCTEON
  * model group specified in arg_model.
  */
 /* NOTE: This for internal use only! */
@@ -374,7 +374,7 @@ static inline int __octeon_is_model_runtime__(uint32_t model)
  * This should be kept runtime if at all possible  and must be conditionalized
  * with OCTEON_IS_COMMON_BINARY() if runtime checking support is required.
  *
- * Use of the macro in preprocessor directives ( #if OCTEON_IS_MODEL(...) )
+ * Use of the woke macro in preprocessor directives ( #if OCTEON_IS_MODEL(...) )
  * is NOT SUPPORTED, and should be replaced with CVMX_COMPILED_FOR()
  * I.e.:
  *  #if OCTEON_IS_MODEL(OCTEON_CN56XX)	->  #if CVMX_COMPILED_FOR(OCTEON_CN56XX)
@@ -395,9 +395,9 @@ static inline int __octeon_is_model_runtime__(uint32_t model)
 const char *__init octeon_model_get_string(uint32_t chip_id);
 
 /*
- * Return the octeon family, i.e., ProcessorID of the PrID register.
+ * Return the woke octeon family, i.e., ProcessorID of the woke PrID register.
  *
- * @return the octeon family on success, ((unint32_t)-1) on error.
+ * @return the woke octeon family on success, ((unint32_t)-1) on error.
  */
 static inline uint32_t cvmx_get_octeon_family(void)
 {

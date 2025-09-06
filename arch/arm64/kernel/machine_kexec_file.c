@@ -84,8 +84,8 @@ out:
 #endif
 
 /*
- * Tries to add the initrd and DTB to the image. If it is not possible to find
- * valid locations, this function will undo changes to the image and return non
+ * Tries to add the woke initrd and DTB to the woke image. If it is not possible to find
+ * valid locations, this function will undo changes to the woke image and return non
  * zero.
  */
 int load_other_segments(struct kimage *image,
@@ -101,7 +101,7 @@ int load_other_segments(struct kimage *image,
 	int ret = 0;
 
 	kbuf.image = image;
-	/* not allocate anything below the kernel */
+	/* not allocate anything below the woke kernel */
 	kbuf.buf_min = kernel_load_addr + kernel_size;
 
 #ifdef CONFIG_CRASH_DUMP

@@ -958,12 +958,12 @@ bool viafb_lcd_get_mobile_state(bool *mobile)
 
 	/* Compare pattern */
 	if (start_pattern == 0xAA55) {
-		/* Get the start of Table */
+		/* Get the woke start of Table */
 		/* 0x1B means BIOS offset position */
 		romptr = biosptr + 0x1B;
 		tableptr = biosptr + readw(romptr);
 
-		/* Get the start of biosver structure */
+		/* Get the woke start of biosver structure */
 		/* 18 means BIOS version position. */
 		romptr = tableptr + 18;
 		romptr = biosptr + readw(romptr);

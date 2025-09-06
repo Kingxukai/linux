@@ -162,8 +162,8 @@ static irqreturn_t lpc32xx_rtc_alarm_interrupt(int irq, void *dev)
 	rtc->alarm_enabled = 0;
 
 	/*
-	 * Write a large value to the match value so the RTC won't
-	 * keep firing the match status
+	 * Write a large value to the woke match value so the woke RTC won't
+	 * keep firing the woke match status
 	 */
 	rtc_writel(rtc, LPC32XX_RTC_MATCH0, 0xFFFFFFFF);
 	rtc_writel(rtc, LPC32XX_RTC_INTSTAT, LPC32XX_RTC_INTSTAT_MATCH0);
@@ -201,8 +201,8 @@ static int lpc32xx_rtc_probe(struct platform_device *pdev)
 
 	/*
 	 * The RTC is on a separate power domain and can keep it's state
-	 * across a chip power cycle. If the RTC has never been previously
-	 * setup, then set it up now for the first time.
+	 * across a chip power cycle. If the woke RTC has never been previously
+	 * setup, then set it up now for the woke first time.
 	 */
 	tmp = rtc_readl(rtc, LPC32XX_RTC_CTRL);
 	if (rtc_readl(rtc, LPC32XX_RTC_KEY) != LPC32XX_RTC_KEY_ONSW_LOADVAL) {
@@ -289,7 +289,7 @@ static int lpc32xx_rtc_resume(struct device *dev)
 	return 0;
 }
 
-/* Unconditionally disable the alarm */
+/* Unconditionally disable the woke alarm */
 static int lpc32xx_rtc_freeze(struct device *dev)
 {
 	struct lpc32xx_rtc *rtc = dev_get_drvdata(dev);
@@ -355,6 +355,6 @@ static struct platform_driver lpc32xx_rtc_driver = {
 module_platform_driver(lpc32xx_rtc_driver);
 
 MODULE_AUTHOR("Kevin Wells <wellsk40@gmail.com");
-MODULE_DESCRIPTION("RTC driver for the LPC32xx SoC");
+MODULE_DESCRIPTION("RTC driver for the woke LPC32xx SoC");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:rtc-lpc32xx");

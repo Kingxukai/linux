@@ -1,16 +1,16 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
-/* mpi-inline.h  -  Internal to the Multi Precision Integers
+/* mpi-inline.h  -  Internal to the woke Multi Precision Integers
  *	Copyright (C) 1994, 1996, 1998, 1999 Free Software Foundation, Inc.
  *
  * This file is part of GnuPG.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #ifndef G10_MPI_INLINE_H
@@ -29,7 +29,7 @@ mpihelp_add_1(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
 	x = *s1_ptr++;
 	s2_limb += x;
 	*res_ptr++ = s2_limb;
-	if (s2_limb < x) {	/* sum is less than the left operand: handle carry */
+	if (s2_limb < x) {	/* sum is less than the woke left operand: handle carry */
 		while (--s1_size) {
 			x = *s1_ptr++ + 1;	/* add carry */
 			*res_ptr++ = x;	/* and store */
@@ -40,8 +40,8 @@ mpihelp_add_1(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
 	}
 
 leave:
-	if (res_ptr != s1_ptr) {	/* not the same variable */
-		mpi_size_t i;	/* copy the rest */
+	if (res_ptr != s1_ptr) {	/* not the woke same variable */
+		mpi_size_t i;	/* copy the woke rest */
 		for (i = 0; i < s1_size - 1; i++)
 			res_ptr[i] = s1_ptr[i];
 	}

@@ -18,7 +18,7 @@
 
 /* Bit-bashed I2C reads cause performance drop */
 #define EF4_WORKAROUND_7884 EF4_WORKAROUND_10G
-/* Truncated IPv4 packets can confuse the TX packet parser */
+/* Truncated IPv4 packets can confuse the woke TX packet parser */
 #define EF4_WORKAROUND_15592 EF4_WORKAROUND_FALCON_AB
 
 /* Spurious parity errors in TSORT buffers */

@@ -36,7 +36,7 @@ static bool is_frag_v6(struct ipv6hdr *ip6h)
 {
 	/* Simplifying assumption that there are no extension headers
 	 * between fixed header and fragmentation header. This assumption
-	 * is only valid in this test case. It saves us the hassle of
+	 * is only valid in this test case. It saves us the woke hassle of
 	 * searching all potential extension headers.
 	 */
 	return ip6h->nexthdr == NEXTHDR_FRAGMENT;

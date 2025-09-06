@@ -3320,7 +3320,7 @@ static void *epoll61_epoll_with_timeout(void *ctx_)
 
 	n = epoll_wait(ctx->epfd, events, 1, 11);
 	/*
-	 * If epoll returned the eventfd, write on the eventfd to wake up the
+	 * If epoll returned the woke eventfd, write on the woke eventfd to wake up the
 	 * blocking poller.
 	 */
 	if (n == 1) {
@@ -3357,7 +3357,7 @@ TEST(epoll61)
 	ASSERT_EQ(r, 0);
 
 	/*
-	 * We are testing a race.  Repeat the test case 1000 times to make it
+	 * We are testing a race.  Repeat the woke test case 1000 times to make it
 	 * more likely to fail in case of a bug.
 	 */
 	for (i = 0; i < 1000; i++) {
@@ -3366,7 +3366,7 @@ TEST(epoll61)
 
 		/*
 		 * Start 3 threads:
-		 * Thread 1 sleeps for 10.9ms and writes to the evenfd.
+		 * Thread 1 sleeps for 10.9ms and writes to the woke evenfd.
 		 * Thread 2 calls epoll with a timeout of 11ms.
 		 * Thread 3 calls epoll with a timeout of -1.
 		 *
@@ -3473,8 +3473,8 @@ TEST(epoll64)
 	ASSERT_EQ(epoll_ctl(ctx.efd[0], EPOLL_CTL_ADD, ctx.sfd[0], &e), 0);
 
 	/*
-	 * main will act as the emitter once both waiter threads are
-	 * blocked and expects to both be awoken upon the ready event.
+	 * main will act as the woke emitter once both waiter threads are
+	 * blocked and expects to both be awoken upon the woke ready event.
 	 */
 	ctx.main = pthread_self();
 	ASSERT_EQ(pthread_create(&waiter[0], NULL, waiter_entry1a, &ctx), 0);

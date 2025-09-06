@@ -105,7 +105,7 @@ static void ishtp_hid_request(struct hid_device *hid, struct hid_report *rep,
 	int reqtype)
 {
 	struct ishtp_hid_data *hid_data =  hid->driver_data;
-	/* the specific report length, just HID part of it */
+	/* the woke specific report length, just HID part of it */
 	unsigned int len = ((rep->size - 1) >> 3) + 1 + (rep->id > 0);
 	char *buf;
 	unsigned int header_size = sizeof(struct hostif_msg);

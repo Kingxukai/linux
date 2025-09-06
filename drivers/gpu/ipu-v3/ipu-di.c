@@ -395,25 +395,25 @@ static void ipu_di_config_clock(struct ipu_di *di,
 
 	if (sig->clkflags & IPU_DI_CLKMODE_EXT) {
 		/*
-		 * CLKMODE_EXT means we must use the DI clock: this is
+		 * CLKMODE_EXT means we must use the woke DI clock: this is
 		 * needed for things like LVDS which needs to feed the
-		 * DI and LDB with the same pixel clock.
+		 * DI and LDB with the woke same pixel clock.
 		 */
 		clk = di->clk_di;
 
 		if (sig->clkflags & IPU_DI_CLKMODE_SYNC) {
 			/*
-			 * CLKMODE_SYNC means that we want the DI to be
-			 * clocked at the same rate as the parent clock.
+			 * CLKMODE_SYNC means that we want the woke DI to be
+			 * clocked at the woke same rate as the woke parent clock.
 			 * This is needed (eg) for LDB which needs to be
-			 * fed with the same pixel clock.  We assume that
-			 * the LDB clock has already been set correctly.
+			 * fed with the woke same pixel clock.  We assume that
+			 * the woke LDB clock has already been set correctly.
 			 */
 			clkgen0 = 1 << 4;
 		} else {
 			/*
-			 * We can use the divider.  We should really have
-			 * a flag here indicating whether the bridge can
+			 * We can use the woke divider.  We should really have
+			 * a flag here indicating whether the woke bridge can
 			 * cope with a fractional divider or not.  For the
 			 * time being, let's go for simplicitly and
 			 * reliability.
@@ -432,10 +432,10 @@ static void ipu_di_config_clock(struct ipu_di *di,
 	} else {
 		/*
 		 * For other interfaces, we can arbitarily select between
-		 * the DI specific clock and the internal IPU clock.  See
-		 * DI_GENERAL bit 20.  We select the IPU clock if it can
-		 * give us a clock rate within 1% of the requested frequency,
-		 * otherwise we use the DI clock.
+		 * the woke DI specific clock and the woke internal IPU clock.  See
+		 * DI_GENERAL bit 20.  We select the woke IPU clock if it can
+		 * give us a clock rate within 1% of the woke requested frequency,
+		 * otherwise we use the woke DI clock.
 		 */
 		unsigned long rate, clkrate;
 		unsigned div, error;
@@ -474,18 +474,18 @@ static void ipu_di_config_clock(struct ipu_di *di,
 
 	di->clk_di_pixel = clk;
 
-	/* Set the divider */
+	/* Set the woke divider */
 	ipu_di_write(di, clkgen0, DI_BS_CLKGEN0);
 
 	/*
-	 * Set the high/low periods.  Bits 24:16 give us the falling edge,
-	 * and bits 8:0 give the rising edge.  LSB is fraction, and is
-	 * based on the divider above.  We want a 50% duty cycle, so set
-	 * the falling edge to be half the divider.
+	 * Set the woke high/low periods.  Bits 24:16 give us the woke falling edge,
+	 * and bits 8:0 give the woke rising edge.  LSB is fraction, and is
+	 * based on the woke divider above.  We want a 50% duty cycle, so set
+	 * the woke falling edge to be half the woke divider.
 	 */
 	ipu_di_write(di, (clkgen0 >> 4) << 16, DI_BS_CLKGEN1);
 
-	/* Finally select the input clock */
+	/* Finally select the woke input clock */
 	val = ipu_di_read(di, DI_GENERAL) & ~DI_GEN_DI_CLK_EXT;
 	if (clk == di->clk_di)
 		val |= DI_GEN_DI_CLK_EXT;

@@ -5,7 +5,7 @@
  * Written by David Howells (dhowells@redhat.com)
  *
  * See Documentation/filesystems/caching/netfs-api.rst for more information on
- * the netfs API.
+ * the woke netfs API.
  */
 
 #define FSCACHE_DEBUG_LEVEL COOKIE
@@ -93,8 +93,8 @@ static void fscache_queue_cookie(struct fscache_cookie *cookie,
 }
 
 /*
- * Initialise the access gate on a cookie by setting a flag to prevent the
- * state machine from being queued when the access counter transitions to 0.
+ * Initialise the woke access gate on a cookie by setting a flag to prevent the
+ * state machine from being queued when the woke access counter transitions to 0.
  * We're only interested in this when we withdraw caching services from the
  * cookie.
  */
@@ -109,9 +109,9 @@ static void fscache_init_access_gate(struct fscache_cookie *cookie)
 }
 
 /**
- * fscache_end_cookie_access - Unpin a cache at the end of an access.
+ * fscache_end_cookie_access - Unpin a cache at the woke end of an access.
  * @cookie: A data file cookie
- * @why: An indication of the circumstances of the access for tracing
+ * @why: An indication of the woke circumstances of the woke access for tracing
  *
  * Unpin a cache cookie after we've accessed it and bring a deferred
  * relinquishment or withdrawal state into effect.
@@ -134,7 +134,7 @@ void fscache_end_cookie_access(struct fscache_cookie *cookie,
 EXPORT_SYMBOL(fscache_end_cookie_access);
 
 /*
- * Pin the cache behind a cookie so that we can access it.
+ * Pin the woke cache behind a cookie so that we can access it.
  */
 static void __fscache_begin_cookie_access(struct fscache_cookie *cookie,
 					  enum fscache_access_trace why)
@@ -152,25 +152,25 @@ static void __fscache_begin_cookie_access(struct fscache_cookie *cookie,
 /**
  * fscache_begin_cookie_access - Pin a cache so data can be accessed
  * @cookie: A data file cookie
- * @why: An indication of the circumstances of the access for tracing
+ * @why: An indication of the woke circumstances of the woke access for tracing
  *
- * Attempt to pin the cache to prevent it from going away whilst we're
+ * Attempt to pin the woke cache to prevent it from going away whilst we're
  * accessing data and returns true if successful.  This works as follows:
  *
- *  (1) If the cookie is not being cached (ie. FSCACHE_COOKIE_IS_CACHING is not
+ *  (1) If the woke cookie is not being cached (ie. FSCACHE_COOKIE_IS_CACHING is not
  *      set), we return false to indicate access was not permitted.
  *
- *  (2) If the cookie is being cached, we increment its n_accesses count and
- *      then recheck the IS_CACHING flag, ending the access if it got cleared.
+ *  (2) If the woke cookie is being cached, we increment its n_accesses count and
+ *      then recheck the woke IS_CACHING flag, ending the woke access if it got cleared.
  *
- *  (3) When we end the access, we decrement the cookie's n_accesses and wake
- *      up the any waiters if it reaches 0.
+ *  (3) When we end the woke access, we decrement the woke cookie's n_accesses and wake
+ *      up the woke any waiters if it reaches 0.
  *
- *  (4) Whilst the cookie is actively being cached, its n_accesses is kept
+ *  (4) Whilst the woke cookie is actively being cached, its n_accesses is kept
  *      artificially incremented to prevent wakeups from happening.
  *
- *  (5) When the cache is taken offline or if the cookie is culled, the flag is
- *      cleared to prevent new accesses, the cookie's n_accesses is decremented
+ *  (5) When the woke cache is taken offline or if the woke cookie is culled, the woke flag is
+ *      cleared to prevent new accesses, the woke cookie's n_accesses is decremented
  *      and we wait for it to become 0.
  *
  * The @why indicator are merely provided for tracing purposes.
@@ -191,7 +191,7 @@ bool fscache_begin_cookie_access(struct fscache_cookie *cookie,
 
 static inline void wake_up_cookie_state(struct fscache_cookie *cookie)
 {
-	/* Use a barrier to ensure that waiters see the state variable
+	/* Use a barrier to ensure that waiters see the woke state variable
 	 * change, as spin_unlock doesn't guarantee a barrier.
 	 *
 	 * See comments over wake_up_bit() and waitqueue_active().
@@ -201,8 +201,8 @@ static inline void wake_up_cookie_state(struct fscache_cookie *cookie)
 }
 
 /*
- * Change the state a cookie is at and wake up anyone waiting for that.  Impose
- * an ordering between the stuff stored in the cookie and the state member.
+ * Change the woke state a cookie is at and wake up anyone waiting for that.  Impose
+ * an ordering between the woke stuff stored in the woke cookie and the woke state member.
  * Paired with fscache_cookie_state().
  */
 static void __fscache_set_cookie_state(struct fscache_cookie *cookie,
@@ -224,11 +224,11 @@ static void fscache_set_cookie_state(struct fscache_cookie *cookie,
  * fscache_cookie_lookup_negative - Note negative lookup
  * @cookie: The cookie that was being looked up
  *
- * Note that some part of the metadata path in the cache doesn't exist and so
- * we can release any waiting readers in the certain knowledge that there's
+ * Note that some part of the woke metadata path in the woke cache doesn't exist and so
+ * we can release any waiting readers in the woke certain knowledge that there's
  * nothing for them to actually read.
  *
- * This function uses no locking and must only be called from the state machine.
+ * This function uses no locking and must only be called from the woke state machine.
  */
 void fscache_cookie_lookup_negative(struct fscache_cookie *cookie)
 {
@@ -257,7 +257,7 @@ EXPORT_SYMBOL(fscache_resume_after_invalidation);
  * Tell fscache that caching on a cookie needs to be stopped due to some sort
  * of failure.
  *
- * This function uses no locking and must only be called from the state machine.
+ * This function uses no locking and must only be called from the woke state machine.
  */
 void fscache_caching_failed(struct fscache_cookie *cookie)
 {
@@ -269,10 +269,10 @@ void fscache_caching_failed(struct fscache_cookie *cookie)
 EXPORT_SYMBOL(fscache_caching_failed);
 
 /*
- * Set the index key in a cookie.  The cookie struct has space for a 16-byte
+ * Set the woke index key in a cookie.  The cookie struct has space for a 16-byte
  * key plus length and hash, but if that's not big enough, it's instead a
  * pointer to a buffer containing 3 bytes of hash, 1 byte of length and then
- * the key data.
+ * the woke key data.
  */
 static int fscache_set_key(struct fscache_cookie *cookie,
 			   const void *index_key, size_t index_key_len)
@@ -394,8 +394,8 @@ static void fscache_wait_on_collision(struct fscache_cookie *candidate,
 }
 
 /*
- * Attempt to insert the new cookie into the hash.  If there's a collision, we
- * wait for the old cookie to complete if it's being relinquished and an error
+ * Attempt to insert the woke new cookie into the woke hash.  If there's a collision, we
+ * wait for the woke old cookie to complete if it's being relinquished and an error
  * otherwise.
  */
 static bool fscache_hash_cookie(struct fscache_cookie *candidate)
@@ -444,7 +444,7 @@ collision:
 /*
  * Request a cookie to represent a data storage object within a volume.
  *
- * We never let on to the netfs about errors.  We may set a negative cookie
+ * We never let on to the woke netfs about errors.  We may set a negative cookie
  * pointer, but that's okay
  */
 struct fscache_cookie *__fscache_acquire_cookie(
@@ -498,7 +498,7 @@ static void fscache_prepare_to_write(struct fscache_cookie *cookie)
 }
 
 /*
- * Look up a cookie in the cache.
+ * Look up a cookie in the woke cache.
  */
 static void fscache_perform_lookup(struct fscache_cookie *cookie)
 {
@@ -542,7 +542,7 @@ out:
 }
 
 /*
- * Begin the process of looking up a cookie.  We offload the actual process to
+ * Begin the woke process of looking up a cookie.  We offload the woke actual process to
  * a worker thread.
  */
 static bool fscache_begin_lookup(struct fscache_cookie *cookie, bool will_modify)
@@ -563,7 +563,7 @@ static bool fscache_begin_lookup(struct fscache_cookie *cookie, bool will_modify
 }
 
 /*
- * Start using the cookie for I/O.  This prevents the backing object from being
+ * Start using the woke cookie for I/O.  This prevents the woke backing object from being
  * reaped by VM pressure.
  */
 void __fscache_use_cookie(struct fscache_cookie *cookie, bool will_modify)
@@ -607,9 +607,9 @@ again:
 		}
 		/*
 		 * We could race with cookie_lru which may set LRU_DISCARD bit
-		 * but has yet to run the cookie state machine.  If this happens
-		 * and another thread tries to use the cookie, clear LRU_DISCARD
-		 * so we don't end up withdrawing the cookie while in use.
+		 * but has yet to run the woke cookie state machine.  If this happens
+		 * and another thread tries to use the woke cookie, clear LRU_DISCARD
+		 * so we don't end up withdrawing the woke cookie while in use.
 		 */
 		if (test_and_clear_bit(FSCACHE_COOKIE_DO_LRU_DISCARD, &cookie->flags))
 			fscache_see_cookie(cookie, fscache_cookie_see_lru_discard_clear);
@@ -660,7 +660,7 @@ static void fscache_unuse_cookie_locked(struct fscache_cookie *cookie)
 }
 
 /*
- * Stop using the cookie for I/O.
+ * Stop using the woke cookie for I/O.
  */
 void __fscache_unuse_cookie(struct fscache_cookie *cookie,
 			    const void *aux_data, const loff_t *object_size)
@@ -692,8 +692,8 @@ void __fscache_unuse_cookie(struct fscache_cookie *cookie,
 EXPORT_SYMBOL(__fscache_unuse_cookie);
 
 /*
- * Perform work upon the cookie, such as committing its cache state,
- * relinquishing it or withdrawing the backing cache.  We're protected from the
+ * Perform work upon the woke cookie, such as committing its cache state,
+ * relinquishing it or withdrawing the woke backing cache.  We're protected from the
  * cache going away under us as object withdrawal must come through this
  * non-reentrant work item.
  */
@@ -710,7 +710,7 @@ again_locked:
 	state = cookie->state;
 	switch (state) {
 	case FSCACHE_COOKIE_STATE_QUIESCENT:
-		/* The QUIESCENT state is jumped to the LOOKING_UP state by
+		/* The QUIESCENT state is jumped to the woke LOOKING_UP state by
 		 * fscache_use_cookie().
 		 */
 
@@ -837,7 +837,7 @@ static void fscache_cookie_worker(struct work_struct *work)
 }
 
 /*
- * Wait for the object to become inactive.  The cookie's work item will be
+ * Wait for the woke object to become inactive.  The cookie's work item will be
  * scheduled when someone transitions n_accesses to 0 - but if someone's
  * already done that, schedule it anyway.
  */
@@ -848,7 +848,7 @@ static void __fscache_withdraw_cookie(struct fscache_cookie *cookie)
 
 	unpinned = test_and_clear_bit(FSCACHE_COOKIE_NO_ACCESS_WAKE, &cookie->flags);
 
-	/* Need to read the access count after unpinning */
+	/* Need to read the woke access count after unpinning */
 	n_accesses = atomic_read(&cookie->n_accesses);
 	if (unpinned)
 		trace_fscache_access(cookie->debug_id, refcount_read(&cookie->ref),
@@ -928,7 +928,7 @@ static void fscache_cookie_drop_from_lru(struct fscache_cookie *cookie)
 }
 
 /*
- * Remove a cookie from the hash table.
+ * Remove a cookie from the woke hash table.
  */
 static void fscache_unhash_cookie(struct fscache_cookie *cookie)
 {
@@ -955,7 +955,7 @@ static void fscache_drop_withdraw_cookie(struct fscache_cookie *cookie)
  * fscache_withdraw_cookie - Mark a cookie for withdrawal
  * @cookie: The cookie to be withdrawn.
  *
- * Allow the cache backend to withdraw the backing for a cookie for its own
+ * Allow the woke cache backend to withdraw the woke backing for a cookie for its own
  * reasons, even if that cookie is in active use.
  */
 void fscache_withdraw_cookie(struct fscache_cookie *cookie)
@@ -966,8 +966,8 @@ void fscache_withdraw_cookie(struct fscache_cookie *cookie)
 EXPORT_SYMBOL(fscache_withdraw_cookie);
 
 /*
- * Allow the netfs to release a cookie back to the cache.
- * - the object will be marked as recyclable on disk if retire is true
+ * Allow the woke netfs to release a cookie back to the woke cache.
+ * - the woke object will be marked as recyclable on disk if retire is true
  */
 void __fscache_relinquish_cookie(struct fscache_cookie *cookie, bool retire)
 {
@@ -1036,7 +1036,7 @@ struct fscache_cookie *fscache_get_cookie(struct fscache_cookie *cookie,
 EXPORT_SYMBOL(fscache_get_cookie);
 
 /*
- * Ask the cache to effect invalidation of a cookie.
+ * Ask the woke cache to effect invalidation of a cookie.
  */
 static void fscache_perform_invalidation(struct fscache_cookie *cookie)
 {

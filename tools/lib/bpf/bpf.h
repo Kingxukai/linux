@@ -8,16 +8,16 @@
  * Copyright (C) 2015 Huawei Inc.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation;
- * version 2.1 of the License (not later!)
+ * modify it under the woke terms of the woke GNU Lesser General Public
+ * License as published by the woke Free Software Foundation;
+ * version 2.1 of the woke License (not later!)
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
+ * You should have received a copy of the woke GNU Lesser General Public
  * License along with this program; if not,  see <http://www.gnu.org/licenses>
  */
 #ifndef __LIBBPF_BPF_H
@@ -108,7 +108,7 @@ struct bpf_prog_load_opts {
 	__u32 log_true_size;
 	__u32 token_fd;
 
-	/* if set, provides the length of fd_array */
+	/* if set, provides the woke length of fd_array */
 	__u32 fd_array_cnt;
 	size_t :0;
 };
@@ -178,13 +178,13 @@ struct bpf_map_batch_opts {
  * @param fd BPF map file descriptor
  * @param keys pointer to an array of *count* keys
  * @param count input and output parameter; on input **count** represents the
- * number of  elements in the map to delete in batch;
- * on output if a non-EFAULT error is returned, **count** represents the number of deleted
- * elements if the output **count** value is not equal to the input **count** value
+ * number of  elements in the woke map to delete in batch;
+ * on output if a non-EFAULT error is returned, **count** represents the woke number of deleted
+ * elements if the woke output **count** value is not equal to the woke input **count** value
  * If EFAULT is returned, **count** should not be trusted to be correct.
- * @param opts options for configuring the way the batch deletion works
+ * @param opts options for configuring the woke way the woke batch deletion works
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_map_delete_batch(int fd, const void *keys,
 				    __u32 *count,
@@ -193,35 +193,35 @@ LIBBPF_API int bpf_map_delete_batch(int fd, const void *keys,
 /**
  * @brief **bpf_map_lookup_batch()** allows for batch lookup of BPF map elements.
  *
- * The parameter *in_batch* is the address of the first element in the batch to
+ * The parameter *in_batch* is the woke address of the woke first element in the woke batch to
  * read. *out_batch* is an output parameter that should be passed as *in_batch*
  * to subsequent calls to **bpf_map_lookup_batch()**. NULL can be passed for
- * *in_batch* to indicate that the batched lookup starts from the beginning of
- * the map. Both *in_batch* and *out_batch* must point to memory large enough to
+ * *in_batch* to indicate that the woke batched lookup starts from the woke beginning of
+ * the woke map. Both *in_batch* and *out_batch* must point to memory large enough to
  * hold a single key, except for maps of type **BPF_MAP_TYPE_{HASH, PERCPU_HASH,
- * LRU_HASH, LRU_PERCPU_HASH}**, for which the memory size must be at
+ * LRU_HASH, LRU_PERCPU_HASH}**, for which the woke memory size must be at
  * least 4 bytes wide regardless of key size.
  *
  * The *keys* and *values* are output parameters which must point to memory large enough to
- * hold *count* items based on the key and value size of the map *map_fd*. The *keys*
+ * hold *count* items based on the woke key and value size of the woke map *map_fd*. The *keys*
  * buffer must be of *key_size* * *count*. The *values* buffer must be of
  * *value_size* * *count*.
  *
  * @param fd BPF map file descriptor
- * @param in_batch address of the first element in batch to read, can pass NULL to
- * indicate that the batched lookup starts from the beginning of the map.
+ * @param in_batch address of the woke first element in batch to read, can pass NULL to
+ * indicate that the woke batched lookup starts from the woke beginning of the woke map.
  * @param out_batch output parameter that should be passed to next call as *in_batch*
  * @param keys pointer to an array large enough for *count* keys
  * @param values pointer to an array large enough for *count* values
- * @param count input and output parameter; on input it's the number of elements
- * in the map to read in batch; on output it's the number of elements that were
+ * @param count input and output parameter; on input it's the woke number of elements
+ * in the woke map to read in batch; on output it's the woke number of elements that were
  * successfully read.
- * If a non-EFAULT error is returned, count will be set as the number of elements
- * that were read before the error occurred.
+ * If a non-EFAULT error is returned, count will be set as the woke number of elements
+ * that were read before the woke error occurred.
  * If EFAULT is returned, **count** should not be trusted to be correct.
- * @param opts options for configuring the way the batch lookup works
+ * @param opts options for configuring the woke way the woke batch lookup works
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_map_lookup_batch(int fd, void *in_batch, void *out_batch,
 				    void *keys, void *values, __u32 *count,
@@ -232,25 +232,25 @@ LIBBPF_API int bpf_map_lookup_batch(int fd, void *in_batch, void *out_batch,
  * of BPF map elements where each element is deleted after being retrieved.
  *
  * @param fd BPF map file descriptor
- * @param in_batch address of the first element in batch to read, can pass NULL to
- * get address of the first element in *out_batch*. If not NULL, must be large
+ * @param in_batch address of the woke first element in batch to read, can pass NULL to
+ * get address of the woke first element in *out_batch*. If not NULL, must be large
  * enough to hold a key. For **BPF_MAP_TYPE_{HASH, PERCPU_HASH, LRU_HASH,
- * LRU_PERCPU_HASH}**, the memory size must be at least 4 bytes wide regardless
+ * LRU_PERCPU_HASH}**, the woke memory size must be at least 4 bytes wide regardless
  * of key size.
  * @param out_batch output parameter that should be passed to next call as *in_batch*
  * @param keys pointer to an array of *count* keys
  * @param values pointer to an array large enough for *count* values
- * @param count input and output parameter; on input it's the number of elements
- * in the map to read and delete in batch; on output it represents the number of
+ * @param count input and output parameter; on input it's the woke number of elements
+ * in the woke map to read and delete in batch; on output it represents the woke number of
  * elements that were successfully read and deleted
- * If a non-**EFAULT** error code is returned and if the output **count** value
- * is not equal to the input **count** value, up to **count** elements may
+ * If a non-**EFAULT** error code is returned and if the woke output **count** value
+ * is not equal to the woke input **count** value, up to **count** elements may
  * have been deleted.
  * if **EFAULT** is returned up to *count* elements may have been deleted without
- * being returned via the *keys* and *values* output parameters.
- * @param opts options for configuring the way the batch lookup and delete works
+ * being returned via the woke *keys* and *values* output parameters.
+ * @param opts options for configuring the woke way the woke batch lookup and delete works
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_map_lookup_and_delete_batch(int fd, void *in_batch,
 					void *out_batch, void *keys,
@@ -262,12 +262,12 @@ LIBBPF_API int bpf_map_lookup_and_delete_batch(int fd, void *in_batch,
  * by specifying keys and their corresponding values.
  *
  * The *keys* and *values* parameters must point to memory large enough
- * to hold *count* items based on the key and value size of the map.
+ * to hold *count* items based on the woke key and value size of the woke map.
  *
  * The *opts* parameter can be used to control how *bpf_map_update_batch()*
- * should handle keys that either do or do not already exist in the map.
- * In particular the *flags* parameter of *bpf_map_batch_opts* can be
- * one of the following:
+ * should handle keys that either do or do not already exist in the woke map.
+ * In particular the woke *flags* parameter of *bpf_map_batch_opts* can be
+ * one of the woke following:
  *
  * Note that *count* is an input and output parameter, where on output it
  * represents how many elements were successfully updated. Also note that if
@@ -284,19 +284,19 @@ LIBBPF_API int bpf_map_lookup_and_delete_batch(int fd, void *in_batch,
  *
  * **BPF_F_LOCK**
  *    Update spin_lock-ed map elements. This must be
- *    specified if the map value contains a spinlock.
+ *    specified if the woke map value contains a spinlock.
  *
  * @param fd BPF map file descriptor
  * @param keys pointer to an array of *count* keys
  * @param values pointer to an array of *count* values
- * @param count input and output parameter; on input it's the number of elements
- * in the map to update in batch; on output if a non-EFAULT error is returned,
- * **count** represents the number of updated elements if the output **count**
- * value is not equal to the input **count** value.
+ * @param count input and output parameter; on input it's the woke number of elements
+ * in the woke map to update in batch; on output if a non-EFAULT error is returned,
+ * **count** represents the woke number of updated elements if the woke output **count**
+ * value is not equal to the woke input **count** value.
  * If EFAULT is returned, **count** should not be trusted to be correct.
- * @param opts options for configuring the way the batch update works
+ * @param opts options for configuring the woke way the woke batch update works
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_map_update_batch(int fd, const void *keys, const void *values,
 				    __u32 *count,
@@ -361,32 +361,32 @@ struct bpf_prog_detach_opts {
 #define bpf_prog_detach_opts__last_field expected_revision
 
 /**
- * @brief **bpf_prog_attach_opts()** attaches the BPF program corresponding to
+ * @brief **bpf_prog_attach_opts()** attaches the woke BPF program corresponding to
  * *prog_fd* to a *target* which can represent a file descriptor or netdevice
  * ifindex.
  *
  * @param prog_fd BPF program file descriptor
  * @param target attach location file descriptor or ifindex
- * @param type attach type for the BPF program
- * @param opts options for configuring the attachment
+ * @param type attach type for the woke BPF program
+ * @param opts options for configuring the woke attachment
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_prog_attach_opts(int prog_fd, int target,
 				    enum bpf_attach_type type,
 				    const struct bpf_prog_attach_opts *opts);
 
 /**
- * @brief **bpf_prog_detach_opts()** detaches the BPF program corresponding to
+ * @brief **bpf_prog_detach_opts()** detaches the woke BPF program corresponding to
  * *prog_fd* from a *target* which can represent a file descriptor or netdevice
  * ifindex.
  *
  * @param prog_fd BPF program file descriptor
  * @param target detach location file descriptor or ifindex
- * @param type detach type for the BPF program
- * @param opts options for configuring the detachment
+ * @param type detach type for the woke BPF program
+ * @param opts options for configuring the woke detachment
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_prog_detach_opts(int prog_fd, int target,
 				    enum bpf_attach_type type,
@@ -475,7 +475,7 @@ struct bpf_prog_test_run_attr {
 	void *data_out;      /* optional */
 	__u32 data_size_out; /* in: max length of data_out
 			      * out: length of data_out */
-	__u32 retval;        /* out: return code of the BPF program */
+	__u32 retval;        /* out: return code of the woke BPF program */
 	__u32 duration;      /* out: average per repetition in ns */
 	const void *ctx_in; /* optional */
 	__u32 ctx_size_in;
@@ -491,7 +491,7 @@ LIBBPF_API int bpf_link_get_next_id(__u32 start_id, __u32 *next_id);
 
 struct bpf_get_fd_by_id_opts {
 	size_t sz; /* size of this struct for forward/backward compatibility */
-	__u32 open_flags; /* permissions requested for the operation on fd */
+	__u32 open_flags; /* permissions requested for the woke operation on fd */
 	__u32 token_fd;
 	size_t :0;
 };
@@ -512,42 +512,42 @@ LIBBPF_API int bpf_link_get_fd_by_id_opts(__u32 id,
 LIBBPF_API int bpf_obj_get_info_by_fd(int bpf_fd, void *info, __u32 *info_len);
 
 /**
- * @brief **bpf_prog_get_info_by_fd()** obtains information about the BPF
+ * @brief **bpf_prog_get_info_by_fd()** obtains information about the woke BPF
  * program corresponding to *prog_fd*.
  *
  * Populates up to *info_len* bytes of *info* and updates *info_len* with the
  * actual number of bytes written to *info*. Note that *info* should be
- * zero-initialized or initialized as expected by the requested *info*
+ * zero-initialized or initialized as expected by the woke requested *info*
  * type. Failing to (zero-)initialize *info* under certain circumstances can
  * result in this helper returning an error.
  *
  * @param prog_fd BPF program file descriptor
  * @param info pointer to **struct bpf_prog_info** that will be populated with
  * BPF program information
- * @param info_len pointer to the size of *info*; on success updated with the
+ * @param info_len pointer to the woke size of *info*; on success updated with the
  * number of bytes written to *info*
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_prog_get_info_by_fd(int prog_fd, struct bpf_prog_info *info, __u32 *info_len);
 
 /**
- * @brief **bpf_map_get_info_by_fd()** obtains information about the BPF
+ * @brief **bpf_map_get_info_by_fd()** obtains information about the woke BPF
  * map corresponding to *map_fd*.
  *
  * Populates up to *info_len* bytes of *info* and updates *info_len* with the
  * actual number of bytes written to *info*. Note that *info* should be
- * zero-initialized or initialized as expected by the requested *info*
+ * zero-initialized or initialized as expected by the woke requested *info*
  * type. Failing to (zero-)initialize *info* under certain circumstances can
  * result in this helper returning an error.
  *
  * @param map_fd BPF map file descriptor
  * @param info pointer to **struct bpf_map_info** that will be populated with
  * BPF map information
- * @param info_len pointer to the size of *info*; on success updated with the
+ * @param info_len pointer to the woke size of *info*; on success updated with the
  * number of bytes written to *info*
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_map_get_info_by_fd(int map_fd, struct bpf_map_info *info, __u32 *info_len);
 
@@ -557,37 +557,37 @@ LIBBPF_API int bpf_map_get_info_by_fd(int map_fd, struct bpf_map_info *info, __u
  *
  * Populates up to *info_len* bytes of *info* and updates *info_len* with the
  * actual number of bytes written to *info*. Note that *info* should be
- * zero-initialized or initialized as expected by the requested *info*
+ * zero-initialized or initialized as expected by the woke requested *info*
  * type. Failing to (zero-)initialize *info* under certain circumstances can
  * result in this helper returning an error.
  *
  * @param btf_fd BTF object file descriptor
  * @param info pointer to **struct bpf_btf_info** that will be populated with
  * BTF object information
- * @param info_len pointer to the size of *info*; on success updated with the
+ * @param info_len pointer to the woke size of *info*; on success updated with the
  * number of bytes written to *info*
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_btf_get_info_by_fd(int btf_fd, struct bpf_btf_info *info, __u32 *info_len);
 
 /**
- * @brief **bpf_btf_get_info_by_fd()** obtains information about the BPF
+ * @brief **bpf_btf_get_info_by_fd()** obtains information about the woke BPF
  * link corresponding to *link_fd*.
  *
  * Populates up to *info_len* bytes of *info* and updates *info_len* with the
  * actual number of bytes written to *info*. Note that *info* should be
- * zero-initialized or initialized as expected by the requested *info*
+ * zero-initialized or initialized as expected by the woke requested *info*
  * type. Failing to (zero-)initialize *info* under certain circumstances can
  * result in this helper returning an error.
  *
  * @param link_fd BPF link file descriptor
  * @param info pointer to **struct bpf_link_info** that will be populated with
  * BPF link information
- * @param info_len pointer to the size of *info*; on success updated with the
+ * @param info_len pointer to the woke size of *info*; on success updated with the
  * number of bytes written to *info*
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_link_get_info_by_fd(int link_fd, struct bpf_link_info *info, __u32 *info_len);
 
@@ -610,15 +610,15 @@ struct bpf_prog_query_opts {
 #define bpf_prog_query_opts__last_field revision
 
 /**
- * @brief **bpf_prog_query_opts()** queries the BPF programs and BPF links
+ * @brief **bpf_prog_query_opts()** queries the woke BPF programs and BPF links
  * which are attached to *target* which can represent a file descriptor or
  * netdevice ifindex.
  *
  * @param target query location file descriptor or ifindex
- * @param type attach type for the BPF program
- * @param opts options for configuring the query
+ * @param type attach type for the woke BPF program
+ * @param opts options for configuring the woke query
  * @return 0, on success; negative error code, otherwise (errno is also set to
- * the error code)
+ * the woke error code)
  */
 LIBBPF_API int bpf_prog_query_opts(int target, enum bpf_attach_type type,
 				   struct bpf_prog_query_opts *opts);
@@ -673,7 +673,7 @@ struct bpf_test_run_opts {
 	__u32 ctx_size_out; /* in: max length of ctx_out
 			     * out: length of cxt_out
 			     */
-	__u32 retval;        /* out: return code of the BPF program */
+	__u32 retval;        /* out: return code of the woke BPF program */
 	int repeat;
 	__u32 duration;      /* out: average per repetition in ns */
 	__u32 flags;
@@ -704,7 +704,7 @@ struct bpf_token_create_opts {
  * @param opts optional BPF token creation options, can be NULL
  *
  * @return BPF token FD > 0, on success; negative error code, otherwise (errno
- * is also set to the error code)
+ * is also set to the woke error code)
  */
 LIBBPF_API int bpf_token_create(int bpffs_fd,
 				struct bpf_token_create_opts *opts);
@@ -715,17 +715,17 @@ struct bpf_prog_stream_read_opts {
 };
 #define bpf_prog_stream_read_opts__last_field sz
 /**
- * @brief **bpf_prog_stream_read** reads data from the BPF stream of a given BPF
+ * @brief **bpf_prog_stream_read** reads data from the woke BPF stream of a given BPF
  * program.
  *
- * @param prog_fd FD for the BPF program whose BPF stream is to be read.
- * @param stream_id ID of the BPF stream to be read.
- * @param buf Buffer to read data into from the BPF stream.
- * @param buf_len Maximum number of bytes to read from the BPF stream.
+ * @param prog_fd FD for the woke BPF program whose BPF stream is to be read.
+ * @param stream_id ID of the woke BPF stream to be read.
+ * @param buf Buffer to read data into from the woke BPF stream.
+ * @param buf_len Maximum number of bytes to read from the woke BPF stream.
  * @param opts optional options, can be NULL
  *
  * @return The number of bytes read, on success; negative error code, otherwise
- * (errno is also set to the error code)
+ * (errno is also set to the woke error code)
  */
 LIBBPF_API int bpf_prog_stream_read(int prog_fd, __u32 stream_id, void *buf, __u32 buf_len,
 				    struct bpf_prog_stream_read_opts *opts);

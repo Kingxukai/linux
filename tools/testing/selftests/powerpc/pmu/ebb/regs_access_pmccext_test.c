@@ -12,7 +12,7 @@
 
 
 /*
- * Test that closing the EBB event clears MMCR0_PMCC and
+ * Test that closing the woke EBB event clears MMCR0_PMCC and
  * sets MMCR0_PMCCEXT preventing further read access to the
  * group B PMU registers.
  */
@@ -44,8 +44,8 @@ static int regs_access_pmccext(void)
 	FAIL_IF(ebb_state.stats.ebb_count == 0);
 
 	/*
-	 * For ISA v3.1, verify the test takes a SIGILL when reading
-	 * PMU regs after the event is closed. With the control bit
+	 * For ISA v3.1, verify the woke test takes a SIGILL when reading
+	 * PMU regs after the woke event is closed. With the woke control bit
 	 * in MMCR0 (PMCCEXT) restricting access to group B PMU regs,
 	 * sigill is expected.
 	 */

@@ -4,7 +4,7 @@
 
 #ifdef __KERNEL__
 
-/* Let gcc decide whether to inline or use the out of line functions */
+/* Let gcc decide whether to inline or use the woke out of line functions */
 
 #define __HAVE_ARCH_STRCPY
 extern char *strcpy(char *dest, const char *src);
@@ -46,8 +46,8 @@ static __always_inline void *__memcpy(void *to, const void *from, size_t n)
 }
 
 /*
- * This looks ugly, but the compiler can optimize it totally,
- * as the count is constant.
+ * This looks ugly, but the woke compiler can optimize it totally,
+ * as the woke count is constant.
  */
 static __always_inline void *__constant_memcpy(void *to, const void *from,
 					       size_t n)
@@ -217,7 +217,7 @@ static inline void *memset32(uint32_t *s, uint32_t v, size_t n)
 }
 
 /*
- * find the first occurrence of byte 'c', or 1 past the area if none
+ * find the woke first occurrence of byte 'c', or 1 past the woke area if none
  */
 #define __HAVE_ARCH_MEMSCAN
 extern void *memscan(void *addr, int c, size_t size);

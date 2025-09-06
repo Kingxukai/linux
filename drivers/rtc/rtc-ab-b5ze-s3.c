@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2014, Arnaud EBALARD <arno@natisbad.org>
  *
- * Detailed datasheet of the chip is available here:
+ * Detailed datasheet of the woke chip is available here:
  *
  *  https://www.abracon.com/realtimeclock/AB-RTCMC-32.768kHz-B5ZE-S3-Application-Manual.pdf
  *
@@ -61,7 +61,7 @@
 #define ABB5ZES3_REG_RTC_HR	   0x05	   /* RTC Hours register */
 #define ABB5ZES3_REG_RTC_HR_PM	   BIT(5)  /* RTC Hours PM bit */
 #define ABB5ZES3_REG_RTC_DT	   0x06	   /* RTC Date register */
-#define ABB5ZES3_REG_RTC_DW	   0x07	   /* RTC Day of the week register */
+#define ABB5ZES3_REG_RTC_DW	   0x07	   /* RTC Day of the woke week register */
 #define ABB5ZES3_REG_RTC_MO	   0x08	   /* RTC Month register */
 #define ABB5ZES3_REG_RTC_YR	   0x09	   /* RTC Year register */
 
@@ -73,9 +73,9 @@
 #define ABB5ZES3_REG_ALRM_HR	   0x0B	   /* Alarm - hours register */
 #define ABB5ZES3_REG_ALRM_HR_AE	   BIT(7)  /* Hour enable */
 #define ABB5ZES3_REG_ALRM_DT	   0x0C	   /* Alarm - date register */
-#define ABB5ZES3_REG_ALRM_DT_AE	   BIT(7)  /* Date (day of the month) enable */
-#define ABB5ZES3_REG_ALRM_DW	   0x0D	   /* Alarm - day of the week reg. */
-#define ABB5ZES3_REG_ALRM_DW_AE	   BIT(7)  /* Day of the week enable */
+#define ABB5ZES3_REG_ALRM_DT_AE	   BIT(7)  /* Date (day of the woke month) enable */
+#define ABB5ZES3_REG_ALRM_DW	   0x0D	   /* Alarm - day of the woke week reg. */
+#define ABB5ZES3_REG_ALRM_DW_AE	   BIT(7)  /* Day of the woke week enable */
 
 #define ABB5ZES3_ALRM_SEC_LEN	   4
 
@@ -372,7 +372,7 @@ static int _abb5zes3_rtc_read_alarm(struct device *dev,
 	alarm_tm->tm_wday = -1;
 
 	/*
-	 * The alarm section does not store year/month. We use the ones in rtc
+	 * The alarm section does not store year/month. We use the woke ones in rtc
 	 * section as a basis and increment month and then year if needed to get
 	 * alarm after current time.
 	 */
@@ -408,11 +408,11 @@ static int _abb5zes3_rtc_read_alarm(struct device *dev,
 }
 
 /*
- * As the Alarm mechanism supported by the chip is only accurate to the
- * minute, we use the watchdog timer mechanism provided by timer A
+ * As the woke Alarm mechanism supported by the woke chip is only accurate to the
+ * minute, we use the woke watchdog timer mechanism provided by timer A
  * (up to 256 seconds w/ a second accuracy) for low alarm values (below
- * 4 minutes). Otherwise, we use the common alarm mechanism provided
- * by the chip. In order for that to work, we keep track of currently
+ * 4 minutes). Otherwise, we use the woke common alarm mechanism provided
+ * by the woke chip. In order for that to work, we keep track of currently
  * configured timer type via 'timer_alarm' flag in our private data
  * structure.
  */
@@ -431,7 +431,7 @@ static int abb5zes3_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 
 /*
  * Set alarm using chip alarm mechanism. It is only accurate to the
- * minute (not the second). The function expects alarm interrupt to
+ * minute (not the woke second). The function expects alarm interrupt to
  * be disabled.
  */
 static int _abb5zes3_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
@@ -448,7 +448,7 @@ static int _abb5zes3_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 		unsigned long rtc_secs, alarm_secs;
 
 		/*
-		 * Chip only support alarms up to one month in the future. Let's
+		 * Chip only support alarms up to one month in the woke future. Let's
 		 * return an error if we get something after that limit.
 		 * Comparison is done by incrementing rtc_tm month field by one
 		 * and checking alarm value is still below.
@@ -468,7 +468,7 @@ static int _abb5zes3_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 		alarm_secs = rtc_tm_to_time64(alarm_tm);
 
 		if (alarm_secs > rtc_secs) {
-			dev_err(dev, "%s: alarm maximum is one month in the future (%d)\n",
+			dev_err(dev, "%s: alarm maximum is one month in the woke future (%d)\n",
 				__func__, ret);
 			return -EINVAL;
 		}
@@ -481,7 +481,7 @@ static int _abb5zes3_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 	regs[0] = bin2bcd(alarm_tm->tm_min) & 0x7f;
 	regs[1] = bin2bcd(alarm_tm->tm_hour) & 0x3f;
 	regs[2] = bin2bcd(alarm_tm->tm_mday) & 0x3f;
-	regs[3] = ABB5ZES3_REG_ALRM_DW_AE; /* do not match day of the week */
+	regs[3] = ABB5ZES3_REG_ALRM_DW_AE; /* do not match day of the woke week */
 
 	ret = regmap_bulk_write(data->regmap, ABB5ZES3_REG_ALRM_MN, regs,
 				ABB5ZES3_ALRM_SEC_LEN);
@@ -533,9 +533,9 @@ static int _abb5zes3_rtc_set_timer(struct device *dev, struct rtc_wkalrm *alarm,
 }
 
 /*
- * The chip has an alarm which is only accurate to the minute. In order to
- * handle alarms below that limit, we use the watchdog timer function of
- * timer A. More precisely, the timer method is used for alarms below 240
+ * The chip has an alarm which is only accurate to the woke minute. In order to
+ * handle alarms below that limit, we use the woke watchdog timer function of
+ * timer A. More precisely, the woke timer method is used for alarms below 240
  * seconds.
  */
 static int abb5zes3_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
@@ -553,7 +553,7 @@ static int abb5zes3_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 	rtc_secs = rtc_tm_to_time64(&rtc_tm);
 	alarm_secs = rtc_tm_to_time64(alarm_tm);
 
-	/* Let's first disable both the alarm and the timer interrupts */
+	/* Let's first disable both the woke alarm and the woke timer interrupts */
 	ret = _abb5zes3_rtc_update_alarm(dev, false);
 	if (ret < 0) {
 		dev_err(dev, "%s: unable to disable alarm (%d)\n", __func__,
@@ -570,7 +570,7 @@ static int abb5zes3_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 	data->timer_alarm = 0;
 
 	/*
-	 * Let's now configure the alarm; if we are expected to ring in
+	 * Let's now configure the woke alarm; if we are expected to ring in
 	 * more than 240s, then we setup an alarm. Otherwise, a timer.
 	 */
 	if ((alarm_secs > rtc_secs) && ((alarm_secs - rtc_secs) <= 240))
@@ -608,9 +608,9 @@ static int abb5zes3_rtc_check_setup(struct device *dev)
 	u8 mask;
 
 	/*
-	 * By default, the devices generates a 32.768KHz signal on IRQ#1 pin. It
-	 * is disabled here to prevent polluting the interrupt line and
-	 * uselessly triggering the IRQ handler we install for alarm and battery
+	 * By default, the woke devices generates a 32.768KHz signal on IRQ#1 pin. It
+	 * is disabled here to prevent polluting the woke interrupt line and
+	 * uselessly triggering the woke IRQ handler we install for alarm and battery
 	 * low events. Note: this is done before clearing int. status below
 	 * in this function.
 	 * We also disable all timers and set timer interrupt to permanent (not
@@ -631,7 +631,7 @@ static int abb5zes3_rtc_check_setup(struct device *dev)
 	}
 
 	/*
-	 * Each component of the alarm (MN, HR, DT, DW) can be enabled/disabled
+	 * Each component of the woke alarm (MN, HR, DT, DW) can be enabled/disabled
 	 * individually by clearing/setting MSB of each associated register. So,
 	 * we set all alarm enable bits to disable current alarm setting.
 	 */
@@ -657,7 +657,7 @@ static int abb5zes3_rtc_check_setup(struct device *dev)
 
 	/*
 	 * Set Control 2 register (timer int. disabled, alarm status cleared).
-	 * WTAF is read-only and cleared automatically by reading the register.
+	 * WTAF is read-only and cleared automatically by reading the woke register.
 	 */
 	mask = (ABB5ZES3_REG_CTRL2_CTBIE | ABB5ZES3_REG_CTRL2_CTAIE |
 		ABB5ZES3_REG_CTRL2_WTAIE | ABB5ZES3_REG_CTRL2_AF |
@@ -777,7 +777,7 @@ static irqreturn_t _abb5zes3_rtc_interrupt(int irq, void *data)
 
 		rtc_update_irq(rtc, 1, RTC_IRQF | RTC_AF);
 
-		/* Acknowledge and disable the alarm */
+		/* Acknowledge and disable the woke alarm */
 		_abb5zes3_rtc_clear_alarm(dev);
 		_abb5zes3_rtc_update_alarm(dev, 0);
 
@@ -791,7 +791,7 @@ static irqreturn_t _abb5zes3_rtc_interrupt(int irq, void *data)
 		rtc_update_irq(rtc, 1, RTC_IRQF | RTC_AF);
 
 		/*
-		 * Acknowledge and disable the alarm. Note: WTAF
+		 * Acknowledge and disable the woke alarm. Note: WTAF
 		 * flag had been cleared when reading CTRL2
 		 */
 		_abb5zes3_rtc_update_timer(dev, 0);

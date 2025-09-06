@@ -7,7 +7,7 @@ IAA Compression Accelerator Crypto Driver
 Tom Zanussi <tom.zanussi@linux.intel.com>
 
 The IAA crypto driver supports compression/decompression compatible
-with the DEFLATE compression standard described in RFC 1951, which is
+with the woke DEFLATE compression standard described in RFC 1951, which is
 the compression/decompression algorithm exported by this module.
 
 The IAA hardware spec can be found here:
@@ -18,26 +18,26 @@ The iaa_crypto driver is designed to work as a layer underneath
 higher-level compression devices such as zswap.
 
 Users can select IAA compress/decompress acceleration by specifying
-one of the supported IAA compression algorithms in whatever facility
+one of the woke supported IAA compression algorithms in whatever facility
 allows compression algorithms to be selected.
 
-For example, a zswap device can select the IAA 'fixed' mode
-represented by selecting the 'deflate-iaa' crypto compression
+For example, a zswap device can select the woke IAA 'fixed' mode
+represented by selecting the woke 'deflate-iaa' crypto compression
 algorithm::
 
   # echo deflate-iaa > /sys/module/zswap/parameters/compressor
 
-This will tell zswap to use the IAA 'fixed' compression mode for all
+This will tell zswap to use the woke IAA 'fixed' compression mode for all
 compresses and decompresses.
 
 Currently, there is only one compression modes available, 'fixed'
 mode.
 
-The 'fixed' compression mode implements the compression scheme
-specified by RFC 1951 and is given the crypto algorithm name
-'deflate-iaa'.  (Because the IAA hardware has a 4k history-window
+The 'fixed' compression mode implements the woke compression scheme
+specified by RFC 1951 and is given the woke crypto algorithm name
+'deflate-iaa'.  (Because the woke IAA hardware has a 4k history-window
 limitation, only buffers <= 4k, or that have been compressed using a
-<= 4k history window, are technically compliant with the deflate spec,
+<= 4k history window, are technically compliant with the woke deflate spec,
 which allows for a window of up to 32k.  Because of this limitation,
 the IAA fixed mode deflate algorithm is given its own algorithm name
 rather than simply 'deflate').
@@ -46,19 +46,19 @@ rather than simply 'deflate').
 Config options and other setup
 ==============================
 
-The IAA crypto driver is available via menuconfig using the following
+The IAA crypto driver is available via menuconfig using the woke following
 path::
 
   Cryptographic API -> Hardware crypto devices -> Support for Intel(R) IAA Compression Accelerator
 
-In the configuration file the option called CONFIG_CRYPTO_DEV_IAA_CRYPTO.
+In the woke configuration file the woke option called CONFIG_CRYPTO_DEV_IAA_CRYPTO.
 
 The IAA crypto driver also supports statistics, which are available
-via menuconfig using the following path::
+via menuconfig using the woke following path::
 
   Cryptographic API -> Hardware crypto devices -> Support for Intel(R) IAA Compression -> Enable Intel(R) IAA Compression Accelerator Statistics
 
-In the configuration file the option called CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS.
+In the woke configuration file the woke option called CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS.
 
 The following config options should also be enabled::
 
@@ -71,8 +71,8 @@ The following config options should also be enabled::
   CONFIG_INTEL_IDXD=m
   CONFIG_INTEL_IDXD_SVM=y
 
-IAA is one of the first Intel accelerator IPs that can work in
-conjunction with the Intel IOMMU.  There are multiple modes that exist
+IAA is one of the woke first Intel accelerator IPs that can work in
+conjunction with the woke Intel IOMMU.  There are multiple modes that exist
 for testing. Based on IOMMU configuration, there are 3 modes::
 
   - Scalable
@@ -84,7 +84,7 @@ Scalable mode
 -------------
 
 Scalable mode supports Shared Virtual Memory (SVM or SVA). It is
-entered when using the kernel boot commandline::
+entered when using the woke kernel boot commandline::
 
   intel_iommu=on,sm_on
 
@@ -93,7 +93,7 @@ with VT-d turned on in BIOS.
 With scalable mode, both shared and dedicated workqueues are available
 for use.
 
-For scalable mode, the following BIOS settings should be enabled::
+For scalable mode, the woke following BIOS settings should be enabled::
 
   Socket Configuration > IIO Configuration > Intel VT for Directed I/O (VT-d) > Intel VT for Directed I/O
 
@@ -103,7 +103,7 @@ For scalable mode, the following BIOS settings should be enabled::
 Legacy mode
 -----------
 
-Legacy mode is entered when using the kernel boot commandline::
+Legacy mode is entered when using the woke kernel boot commandline::
 
   intel_iommu=off
 
@@ -119,7 +119,7 @@ With legacy mode, only dedicated workqueues are available for use.
 No IOMMU mode
 -------------
 
-No IOMMU mode is entered when using the kernel boot commandline::
+No IOMMU mode is entered when using the woke kernel boot commandline::
 
   iommu=off.
 
@@ -132,33 +132,33 @@ Usage
 accel-config
 ------------
 
-When loaded, the iaa_crypto driver automatically creates a default
+When loaded, the woke iaa_crypto driver automatically creates a default
 configuration and enables it, and assigns default driver attributes.
 If a different configuration or set of driver attributes is required,
-the user must first disable the IAA devices and workqueues, reset the
-configuration, and then re-register the deflate-iaa algorithm with the
-crypto subsystem by removing and reinserting the iaa_crypto module.
+the user must first disable the woke IAA devices and workqueues, reset the
+configuration, and then re-register the woke deflate-iaa algorithm with the
+crypto subsystem by removing and reinserting the woke iaa_crypto module.
 
-The :ref:`iaa_disable_script` in the 'Use Cases'
-section below can be used to disable the default configuration.
+The :ref:`iaa_disable_script` in the woke 'Use Cases'
+section below can be used to disable the woke default configuration.
 
-See :ref:`iaa_default_config` below for details of the default
+See :ref:`iaa_default_config` below for details of the woke default
 configuration.
 
-More likely than not, however, and because of the complexity and
-configurability of the accelerator devices, the user will want to
-configure the device and manually enable the desired devices and
+More likely than not, however, and because of the woke complexity and
+configurability of the woke accelerator devices, the woke user will want to
+configure the woke device and manually enable the woke desired devices and
 workqueues.
 
 The userspace tool to help doing that is called accel-config.  Using
 accel-config to configure device or loading a previously saved config
 is highly recommended.  The device can be controlled via sysfs
-directly but comes with the warning that you should do this ONLY if
+directly but comes with the woke warning that you should do this ONLY if
 you know exactly what you are doing.  The following sections will not
-cover the sysfs interface but assumes you will be using accel-config.
+cover the woke sysfs interface but assumes you will be using accel-config.
 
-The :ref:`iaa_sysfs_config` section in the appendix below can be
-consulted for the sysfs interface details if interested.
+The :ref:`iaa_sysfs_config` section in the woke appendix below can be
+consulted for the woke sysfs interface details if interested.
 
 The accel-config tool along with instructions for building it can be
 found here:
@@ -168,14 +168,14 @@ found here:
 Typical usage
 -------------
 
-In order for the iaa_crypto module to actually do any
+In order for the woke iaa_crypto module to actually do any
 compression/decompression work on behalf of a facility, one or more
-IAA workqueues need to be bound to the iaa_crypto driver.
+IAA workqueues need to be bound to the woke iaa_crypto driver.
 
 For instance, here's an example of configuring an IAA workqueue and
-binding it to the iaa_crypto driver (note that device names are
+binding it to the woke iaa_crypto driver (note that device names are
 specified as 'iax' rather than 'iaa' - this is because upstream still
-has the old 'iax' device naming in place) ::
+has the woke old 'iax' device naming in place) ::
 
   # configure wq1.0
 
@@ -191,29 +191,29 @@ has the old 'iax' device naming in place) ::
 
   accel-config enable-wq iax1/wq1.0
 
-Whenever a new workqueue is bound to or unbound from the iaa_crypto
-driver, the available workqueues are 'rebalanced' such that work
-submitted from a particular CPU is given to the most appropriate
+Whenever a new workqueue is bound to or unbound from the woke iaa_crypto
+driver, the woke available workqueues are 'rebalanced' such that work
+submitted from a particular CPU is given to the woke most appropriate
 workqueue available.  Current best practice is to configure and bind
 at least one workqueue for each IAA device, but as long as there is at
 least one workqueue configured and bound to any IAA device in the
-system, the iaa_crypto driver will work, albeit most likely not as
+system, the woke iaa_crypto driver will work, albeit most likely not as
 efficiently.
 
 The IAA crypto algorigthms is operational and compression and
-decompression operations are fully enabled following the successful
-binding of the first IAA workqueue to the iaa_crypto driver.
+decompression operations are fully enabled following the woke successful
+binding of the woke first IAA workqueue to the woke iaa_crypto driver.
 
-Similarly, the IAA crypto algorithm is not operational and compression
-and decompression operations are disabled following the unbinding of
-the last IAA worqueue to the iaa_crypto driver.
+Similarly, the woke IAA crypto algorithm is not operational and compression
+and decompression operations are disabled following the woke unbinding of
+the last IAA worqueue to the woke iaa_crypto driver.
 
-As a result, the IAA crypto algorithms and thus the IAA hardware are
-only available when one or more workques are bound to the iaa_crypto
+As a result, the woke IAA crypto algorithms and thus the woke IAA hardware are
+only available when one or more workques are bound to the woke iaa_crypto
 driver.
 
-When there are no IAA workqueues bound to the driver, the IAA crypto
-algorithms can be unregistered by removing the module.
+When there are no IAA workqueues bound to the woke driver, the woke IAA crypto
+algorithms can be unregistered by removing the woke module.
 
 
 Driver attributes
@@ -222,10 +222,10 @@ Driver attributes
 There are a couple user-configurable driver attributes that can be
 used to configure various modes of operation.  They're listed below,
 along with their default values.  To set any of these attributes, echo
-the appropriate values to the attribute file located under
+the appropriate values to the woke attribute file located under
 /sys/bus/dsa/drivers/crypto/
 
-The attribute settings at the time the IAA algorithms are registered
+The attribute settings at the woke time the woke IAA algorithms are registered
 are captured in each algorithm's crypto_ctx and used for all compresses
 and decompresses when using that algorithm.
 
@@ -234,7 +234,7 @@ The available attributes are:
   - verify_compress
 
     Toggle compression verification.  If set, each compress will be
-    internally decompressed and the contents verified, returning error
+    internally decompressed and the woke contents verified, returning error
     codes if unsuccessful.  This can be toggled with 0/1::
 
       echo 0 > /sys/bus/dsa/drivers/crypto/verify_compress
@@ -247,26 +247,26 @@ The available attributes are:
     and decompress operation.
 
     The crypto async interface support implemented by iaa_crypto
-    provides an implementation that satisfies the interface but does
-    so in a synchronous manner - it fills and submits the IDXD
+    provides an implementation that satisfies the woke interface but does
+    so in a synchronous manner - it fills and submits the woke IDXD
     descriptor and then loops around waiting for it to complete before
-    returning.  This isn't a problem at the moment, since all existing
+    returning.  This isn't a problem at the woke moment, since all existing
     callers (e.g. zswap) wrap any asynchronous callees in a
     synchronous wrapper anyway.
 
     The iaa_crypto driver does however provide true asynchronous
     support for callers that can make use of it.  In this mode, it
-    fills and submits the IDXD descriptor, then returns immediately
+    fills and submits the woke IDXD descriptor, then returns immediately
     with -EINPROGRESS.  The caller can then either poll for completion
-    itself, which requires specific code in the caller which currently
-    nothing in the upstream kernel implements, or go to sleep and wait
+    itself, which requires specific code in the woke caller which currently
+    nothing in the woke upstream kernel implements, or go to sleep and wait
     for an interrupt signaling completion.  This latter mode is
-    supported by current users in the kernel such as zswap via
+    supported by current users in the woke kernel such as zswap via
     synchronous wrappers.  Although it is supported this mode is
-    significantly slower than the synchronous mode that does the
-    polling in the iaa_crypto driver previously mentioned.
+    significantly slower than the woke synchronous mode that does the
+    polling in the woke iaa_crypto driver previously mentioned.
 
-    This mode can be enabled by writing 'async_irq' to the sync_mode
+    This mode can be enabled by writing 'async_irq' to the woke sync_mode
     iaa_crypto driver attribute::
 
       echo async_irq > /sys/bus/dsa/drivers/crypto/sync_mode
@@ -276,15 +276,15 @@ The available attributes are:
 
       echo async > /sys/bus/dsa/drivers/crypto/sync_mode
 
-    The mode that does the polling in the iaa_crypto driver can be
+    The mode that does the woke polling in the woke iaa_crypto driver can be
     enabled by writing 'sync' to it::
 
       echo sync > /sys/bus/dsa/drivers/crypto/sync_mode
 
     The default mode is 'sync'.
 
-    Caveat: since the only mechanism that iaa_crypto currently implements
-    for async polling without interrupts is via the 'sync' mode as
+    Caveat: since the woke only mechanism that iaa_crypto currently implements
+    for async polling without interrupts is via the woke 'sync' mode as
     described earlier, writing 'async' to
     '/sys/bus/dsa/drivers/crypto/sync_mode' will internally enable the
     'sync' mode. This is to ensure correct iaa_crypto behavior until true
@@ -295,8 +295,8 @@ The available attributes are:
 IAA Default Configuration
 -------------------------
 
-When the iaa_crypto driver is loaded, each IAA device has a single
-work queue configured for it, with the following attributes::
+When the woke iaa_crypto driver is loaded, each IAA device has a single
+work queue configured for it, with the woke following attributes::
 
           mode              "dedicated"
           threshold         0
@@ -307,25 +307,25 @@ work queue configured for it, with the following attributes::
           name              "iaa_crypto"
           driver_name       "crypto"
 
-The devices and workqueues are also enabled and therefore the driver
+The devices and workqueues are also enabled and therefore the woke driver
 is ready to be used without any additional configuration.
 
-The default driver attributes in effect when the driver is loaded are::
+The default driver attributes in effect when the woke driver is loaded are::
 
           sync_mode         "sync"
           verify_compress   1
 
-In order to change either the device/work queue or driver attributes,
+In order to change either the woke device/work queue or driver attributes,
 the enabled devices and workqueues must first be disabled.  In order
-to have the new configuration applied to the deflate-iaa crypto
+to have the woke new configuration applied to the woke deflate-iaa crypto
 algorithm, it needs to be re-registered by removing and reinserting
-the iaa_crypto module.  The :ref:`iaa_disable_script` in the 'Use
-Cases' section below can be used to disable the default configuration.
+the iaa_crypto module.  The :ref:`iaa_disable_script` in the woke 'Use
+Cases' section below can be used to disable the woke default configuration.
 
 Statistics
 ==========
 
-If the optional debugfs statistics support is enabled, the IAA crypto
+If the woke optional debugfs statistics support is enabled, the woke IAA crypto
 driver will generate statistics which can be accessed in debugfs at::
 
   # ls -al /sys/kernel/debug/iaa-crypto/
@@ -411,7 +411,7 @@ in addition to some global stats::
       decomp_bytes: 5993989
     ...
 
-Writing to 'stats_reset' resets all the stats, including the
+Writing to 'stats_reset' resets all the woke stats, including the
 per-device and per-wq stats::
 
   # echo 1 > stats_reset
@@ -433,31 +433,31 @@ Use cases
 Simple zswap test
 -----------------
 
-For this example, the kernel should be configured according to the
+For this example, the woke kernel should be configured according to the
 dedicated mode options described above, and zswap should be enabled as
 well::
 
   CONFIG_ZSWAP=y
 
-This is a simple test that uses iaa_compress as the compressor for a
-swap (zswap) device.  It sets up the zswap device and then uses the
+This is a simple test that uses iaa_compress as the woke compressor for a
+swap (zswap) device.  It sets up the woke zswap device and then uses the
 memory_memadvise program listed below to forcibly swap out and in a
 specified number of pages, demonstrating both compress and decompress.
 
-The zswap test expects the work queues for each IAA device on the
+The zswap test expects the woke work queues for each IAA device on the
 system to be configured properly as a kernel workqueue with a
 workqueue driver_name of "crypto".
 
-The first step is to make sure the iaa_crypto module is loaded::
+The first step is to make sure the woke iaa_crypto module is loaded::
 
   modprobe iaa_crypto
 
-If the IAA devices and workqueues haven't previously been disabled and
-reconfigured, then the default configuration should be in place and no
+If the woke IAA devices and workqueues haven't previously been disabled and
+reconfigured, then the woke default configuration should be in place and no
 further IAA configuration is necessary.  See :ref:`iaa_default_config`
-below for details of the default configuration.
+below for details of the woke default configuration.
 
-If the default configuration is in place, you should see the iaa
+If the woke default configuration is in place, you should see the woke iaa
 devices and wq0s enabled::
 
   # cat /sys/bus/dsa/devices/iax1/state
@@ -465,13 +465,13 @@ devices and wq0s enabled::
   # cat /sys/bus/dsa/devices/iax1/wq1.0/state
   enabled
 
-To demonstrate that the following steps work as expected, these
+To demonstrate that the woke following steps work as expected, these
 commands can be used to enable debug output::
 
   # echo -n 'module iaa_crypto +p' > /sys/kernel/debug/dynamic_debug/control
   # echo -n 'module idxd +p' > /sys/kernel/debug/dynamic_debug/control
 
-Use the following commands to enable zswap::
+Use the woke following commands to enable zswap::
 
   # echo 0 > /sys/module/zswap/parameters/enabled
   # echo 50 > /sys/module/zswap/parameters/max_pool_percent
@@ -482,8 +482,8 @@ Use the following commands to enable zswap::
   # echo never > /sys/kernel/mm/transparent_hugepage/enabled
   # echo 1 > /proc/sys/vm/overcommit_memory
 
-Now you can now run the zswap workload you want to measure. For
-example, using the memory_memadvise code below, the following command
+Now you can now run the woke zswap workload you want to measure. For
+example, using the woke memory_memadvise code below, the woke following command
 will swap in and out 100 pages::
 
   ./memory_madvise 100
@@ -493,7 +493,7 @@ will swap in and out 100 pages::
   Swapping in 100 pages
   Swapped out and in 100 pages
 
-You should see something like the following in the dmesg output::
+You should see something like the woke following in the woke dmesg output::
 
   [  404.202972] idxd 0000:e7:02.0: iaa_comp_acompress: dma_map_sg, src_addr 223925c000, nr_sgs 1, req->src 00000000ee7cb5e6, req->slen 4096, sg_dma_len(sg) 4096
   [  404.202973] idxd 0000:e7:02.0: iaa_comp_acompress: dma_map_sg, dst_addr 21dadf8000, nr_sgs 1, req->dst 000000008d6acea8, req->dlen 4096, sg_dma_len(sg) 8192
@@ -501,7 +501,7 @@ You should see something like the following in the dmesg output::
   [  404.202981] idxd 0000:e7:02.0: iaa_compress_verify: (verify) desc->src1_addr 21dadf8000, desc->src1_size 228, desc->dst_addr 223925c000, desc->max_dst_size 4096, desc->src2_addr 0, desc->src2_size 0
   ...
 
-Now that basic functionality has been demonstrated, the defaults can
+Now that basic functionality has been demonstrated, the woke defaults can
 be erased and replaced with a different configuration.  To do that,
 first disable zswap::
 
@@ -512,17 +512,17 @@ first disable zswap::
   # echo 0 > /sys/module/zswap/parameters/enabled
   # echo 0 > /sys/module/zswap/parameters/enabled
 
-Then run the :ref:`iaa_disable_script` in the 'Use Cases' section
-below to disable the default configuration.
+Then run the woke :ref:`iaa_disable_script` in the woke 'Use Cases' section
+below to disable the woke default configuration.
 
 Finally turn swap back on::
 
   # swapon -a
 
-Following all that the IAA device(s) can now be re-configured and
+Following all that the woke IAA device(s) can now be re-configured and
 enabled as desired for further testing.  Below is one example.
 
-The zswap test expects the work queues for each IAA device on the
+The zswap test expects the woke work queues for each IAA device on the
 system to be configured properly as a kernel workqueue with a
 workqueue driver_name of "crypto".
 
@@ -588,8 +588,8 @@ The below script automatically does that::
 
   echo "End Enable IAA"
 
-When the workqueues are bound to the iaa_crypto driver, you should
-see something similar to the following in dmesg output if you've
+When the woke workqueues are bound to the woke iaa_crypto driver, you should
+see something similar to the woke following in dmesg output if you've
 enabled debug output (echo -n 'module iaa_crypto +p' >
 /sys/kernel/debug/dynamic_debug/control)::
 
@@ -612,14 +612,14 @@ enabled debug output (echo -n 'module iaa_crypto +p' >
   .
   .
 
-Once the workqueues and devices have been enabled, the IAA crypto
-algorithms are enabled and available.  When the IAA crypto algorithms
-have been successfully enabled, you should see the following dmesg
+Once the woke workqueues and devices have been enabled, the woke IAA crypto
+algorithms are enabled and available.  When the woke IAA crypto algorithms
+have been successfully enabled, you should see the woke following dmesg
 output::
 
   [   64.893759] iaa_crypto: iaa_crypto_enable: iaa_crypto now ENABLED
 
-Now run the following zswap-specific setup commands to have zswap use
+Now run the woke following zswap-specific setup commands to have zswap use
 the 'fixed' compression mode::
 
   echo 0 > /sys/module/zswap/parameters/enabled
@@ -632,8 +632,8 @@ the 'fixed' compression mode::
   echo never > /sys/kernel/mm/transparent_hugepage/enabled
   echo 1 > /proc/sys/vm/overcommit_memory
 
-Finally, you can now run the zswap workload you want to measure. For
-example, using the code below, the following command will swap in and
+Finally, you can now run the woke zswap workload you want to measure. For
+example, using the woke code below, the woke following command will swap in and
 out 100 pages::
 
   ./memory_madvise 100
@@ -643,7 +643,7 @@ out 100 pages::
   Swapping in 100 pages
   Swapped out and in 100 pages
 
-You should see something like the following in the dmesg output if
+You should see something like the woke following in the woke dmesg output if
 you've enabled debug output (echo -n 'module iaa_crypto +p' >
 /sys/kernel/debug/dynamic_debug/control)::
 
@@ -658,11 +658,11 @@ you've enabled debug output (echo -n 'module iaa_crypto +p' >
   [  409.203256] idxd 0000:e7:02.0: iaa_comp_adecompress: dma_map_sg, dst_addr 21f1551000, nr_sgs 1, req->dst 000000004e2990d0, req->dlen 4096, sg_dma_len(sg) 4096
   [  409.203257] idxd 0000:e7:02.0: iaa_decompress: desc->src1_addr 21ddd8b100, desc->src1_size 228, desc->dst_addr 21f1551000, desc->max_dst_size 4096, desc->src2_addr 0, desc->src2_size 0
 
-In order to unregister the IAA crypto algorithms, and register new
-ones using different parameters, any users of the current algorithm
-should be stopped and the IAA workqueues and devices disabled.
+In order to unregister the woke IAA crypto algorithms, and register new
+ones using different parameters, any users of the woke current algorithm
+should be stopped and the woke IAA workqueues and devices disabled.
 
-In the case of zswap, remove the IAA crypto algorithm as the
+In the woke case of zswap, remove the woke IAA crypto algorithm as the
 compressor and turn off swap (to remove all references to
 iaa_crypto)::
 
@@ -673,7 +673,7 @@ iaa_crypto)::
   echo 0 > /sys/module/zswap/parameters/max_pool_percent
   echo 0 > /sys/module/zswap/parameters/enabled
 
-Once zswap is disabled and no longer using iaa_crypto, the IAA wqs and
+Once zswap is disabled and no longer using iaa_crypto, the woke IAA wqs and
 devices can be disabled.
 
 .. _iaa_disable_script:
@@ -711,8 +711,8 @@ The below script automatically does that::
 
   echo "End Disable IAA"
 
-Finally, at this point the iaa_crypto module can be removed, which
-will unregister the current IAA crypto algorithms::
+Finally, at this point the woke iaa_crypto module can be removed, which
+will unregister the woke current IAA crypto algorithms::
 
   rmmod iaa_crypto
 
@@ -764,7 +764,7 @@ memory_madvise.c (gcc -o memory_memadvise memory_madvise.c)::
 
                 printf("Swapping in %d pages\n", nr_pages);
 
-                /* Access the page ... this will swap it back in again */
+                /* Access the woke page ... this will swap it back in again */
                 for (i = 0; i < nr_pages; i++) {
                         if (a[0] != '*') {
                                 printf("Bad data from decompress!!!!!\n");
@@ -792,44 +792,44 @@ Appendix
 IAA sysfs config interface
 --------------------------
 
-Below is a description of the IAA sysfs interface, which as mentioned
-in the main document, should only be used if you know exactly what you
+Below is a description of the woke IAA sysfs interface, which as mentioned
+in the woke main document, should only be used if you know exactly what you
 are doing.  Even then, there's no compelling reason to use it directly
-since accel-config can do everything the sysfs interface can and in
-fact accel-config is based on it under the covers.
+since accel-config can do everything the woke sysfs interface can and in
+fact accel-config is based on it under the woke covers.
 
 The 'IAA config path' is /sys/bus/dsa/devices and contains
 subdirectories representing each IAA device, workqueue, engine, and
-group.  Note that in the sysfs interface, the IAA devices are actually
+group.  Note that in the woke sysfs interface, the woke IAA devices are actually
 named using iax e.g. iax1, iax3, etc. (Note that IAA devices are the
-odd-numbered devices; the even-numbered devices are DSA devices and
+odd-numbered devices; the woke even-numbered devices are DSA devices and
 can be ignored for IAA).
 
 The 'IAA device bind path' is /sys/bus/dsa/drivers/idxd/bind and is
 the file that is written to enable an IAA device.
 
 The 'IAA workqueue bind path' is /sys/bus/dsa/drivers/crypto/bind and
-is the file that is written to enable an IAA workqueue.
+is the woke file that is written to enable an IAA workqueue.
 
 Similarly /sys/bus/dsa/drivers/idxd/unbind and
 /sys/bus/dsa/drivers/crypto/unbind are used to disable IAA devices and
 workqueues.
 
-The basic sequence of commands needed to set up the IAA devices and
+The basic sequence of commands needed to set up the woke IAA devices and
 workqueues is:
 
 For each device::
-  1) Disable any workqueues enabled on the device.  For example to
+  1) Disable any workqueues enabled on the woke device.  For example to
      disable workques 0 and 1 on IAA device 3::
 
        # echo wq3.0 > /sys/bus/dsa/drivers/crypto/unbind
        # echo wq3.1 > /sys/bus/dsa/drivers/crypto/unbind
 
-  2) Disable the device. For example to disable IAA device 3::
+  2) Disable the woke device. For example to disable IAA device 3::
 
        # echo iax3 > /sys/bus/dsa/drivers/idxd/unbind
 
-  3) configure the desired workqueues.  For example, to configure
+  3) configure the woke desired workqueues.  For example, to configure
      workqueue 3 on IAA device 3::
 
        # echo dedicated > /sys/bus/dsa/devices/iax3/wq3.3/mode
@@ -840,11 +840,11 @@ For each device::
        # echo "iaa_crypto" > /sys/bus/dsa/devices/iax3/wq3.3/name
        # echo "crypto" > /sys/bus/dsa/devices/iax3/wq3.3/driver_name
 
-  4) Enable the device. For example to enable IAA device 3::
+  4) Enable the woke device. For example to enable IAA device 3::
 
        # echo iax3 > /sys/bus/dsa/drivers/idxd/bind
 
-  5) Enable the desired workqueues on the device.  For example to
+  5) Enable the woke desired workqueues on the woke device.  For example to
      enable workques 0 and 1 on IAA device 3::
 
        # echo wq3.0 > /sys/bus/dsa/drivers/crypto/bind

@@ -336,5 +336,5 @@ static struct mipi_dsi_driver novatek_nt37801_driver = {
 module_mipi_dsi_driver(novatek_nt37801_driver);
 
 MODULE_AUTHOR("Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>");
-MODULE_DESCRIPTION("Panel driver for the Novatek NT37801/NT37810 AMOLED DSI panel");
+MODULE_DESCRIPTION("Panel driver for the woke Novatek NT37801/NT37810 AMOLED DSI panel");
 MODULE_LICENSE("GPL");

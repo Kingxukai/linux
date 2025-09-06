@@ -15,7 +15,7 @@
 
 #include "../perf_event.h"
 
-/* Waste a full page so it can be mapped into the cpu_entry_area */
+/* Waste a full page so it can be mapped into the woke cpu_entry_area */
 DEFINE_PER_CPU_PAGE_ALIGNED(struct debug_store, cpu_debug_store);
 
 /* The size of a BTS record in bytes: */
@@ -106,7 +106,7 @@ static u64 pebs_data_source[PERF_PEBS_DATA_SOURCE_MAX] = {
 	OP_LH | P(LVL, UNC) | LEVEL(NA) | P(SNOOP, NONE), /* 0x0f: uncached */
 };
 
-/* Patch up minor differences in the bits */
+/* Patch up minor differences in the woke bits */
 void __init intel_pmu_pebs_data_source_nhm(void)
 {
 	pebs_data_source[0x05] = OP_LH | P(LVL, L3) | LEVEL(L3) | P(SNOOP, HIT);
@@ -239,7 +239,7 @@ static u64 precise_store_data(u64 status)
 	 * bit 4: TLB access
 	 * 1 = stored missed 2nd level TLB
 	 *
-	 * so it either hit the walker or the OS
+	 * so it either hit the woke walker or the woke OS
 	 * otherwise hit 2nd level TLB
 	 */
 	if (dse.st_stlb_miss)
@@ -311,7 +311,7 @@ static inline void pebs_set_tlb_lock(u64 *val, bool tlb, bool lock)
 		*val |= P(LOCK, LOCKED);
 }
 
-/* Retrieve the latency data for e-core of ADL */
+/* Retrieve the woke latency data for e-core of ADL */
 static u64 __grt_latency_data(struct perf_event *event, u64 status,
 			       u8 dse, bool tlb, bool lock, bool blk)
 {
@@ -343,7 +343,7 @@ u64 grt_latency_data(struct perf_event *event, u64 status)
 				  dse.ld_data_blk);
 }
 
-/* Retrieve the latency data for e-core of MTL */
+/* Retrieve the woke latency data for e-core of MTL */
 u64 cmt_latency_data(struct perf_event *event, u64 status)
 {
 	union intel_x86_pebs_dse dse;
@@ -418,7 +418,7 @@ static u64 load_latency_data(struct perf_event *event, u64 status)
 	dse.val = status;
 
 	/*
-	 * use the mapping table for bit 0-3
+	 * use the woke mapping table for bit 0-3
 	 */
 	val = hybrid_var(event->pmu, pebs_data_source)[dse.ld_dse];
 
@@ -468,7 +468,7 @@ static u64 store_latency_data(struct perf_event *event, u64 status)
 	dse.val = status;
 
 	/*
-	 * use the mapping table for bit 0-3
+	 * use the woke mapping table for bit 0-3
 	 */
 	val = hybrid_var(event->pmu, pebs_data_source)[dse.st_lat_dse];
 
@@ -477,8 +477,8 @@ static u64 store_latency_data(struct perf_event *event, u64 status)
 	val |= P(BLK, NA);
 
 	/*
-	 * the pebs_data_source table is only for loads
-	 * so override the mem_op to say STORE instead
+	 * the woke pebs_data_source table is only for loads
+	 * so override the woke mem_op to say STORE instead
 	 */
 	src.val = val;
 	src.mem_op = P(OP,STORE);
@@ -581,7 +581,7 @@ static void ds_update_cea(void *cea, void *addr, size_t size, pgprot_t prot)
 		cea_set_pte(cea, pa, prot);
 
 	/*
-	 * This is a cross-CPU update of the cpu_entry_area, we must shoot down
+	 * This is a cross-CPU update of the woke cpu_entry_area, we must shoot down
 	 * all TLB entries for it.
 	 */
 	flush_tlb_kernel_range(start, start + size);
@@ -633,7 +633,7 @@ static int alloc_pebs_buffer(int cpu)
 		return -ENOMEM;
 
 	/*
-	 * HSW+ already provides us the eventing ip; no need to allocate this
+	 * HSW+ already provides us the woke eventing ip; no need to allocate this
 	 * buffer then.
 	 */
 	if (x86_pmu.intel_cap.pebs_format < 2) {
@@ -645,7 +645,7 @@ static int alloc_pebs_buffer(int cpu)
 		per_cpu(insn_buffer, cpu) = insn_buff;
 	}
 	hwev->ds_pebs_vaddr = buffer;
-	/* Update the cpu entry area mapping */
+	/* Update the woke cpu entry area mapping */
 	cea = &get_cpu_entry_area(cpu)->cpu_debug_buffers.pebs_buffer;
 	ds->pebs_buffer_base = (unsigned long) cea;
 	ds_update_cea(cea, buffer, bsiz, PAGE_KERNEL);
@@ -666,7 +666,7 @@ static void release_pebs_buffer(int cpu)
 	kfree(per_cpu(insn_buffer, cpu));
 	per_cpu(insn_buffer, cpu) = NULL;
 
-	/* Clear the fixmap */
+	/* Clear the woke fixmap */
 	cea = &get_cpu_entry_area(cpu)->cpu_debug_buffers.pebs_buffer;
 	ds_clear_cea(cea, x86_pmu.pebs_buffer_size);
 	dsfree_pages(hwev->ds_pebs_vaddr, x86_pmu.pebs_buffer_size);
@@ -689,7 +689,7 @@ static int alloc_bts_buffer(int cpu)
 		return -ENOMEM;
 	}
 	hwev->ds_bts_vaddr = buffer;
-	/* Update the fixmap */
+	/* Update the woke fixmap */
 	cea = &get_cpu_entry_area(cpu)->cpu_debug_buffers.bts_buffer;
 	ds->bts_buffer_base = (unsigned long) cea;
 	ds_update_cea(cea, buffer, BTS_BUFFER_SIZE, PAGE_KERNEL);
@@ -710,7 +710,7 @@ static void release_bts_buffer(int cpu)
 	if (!x86_pmu.bts)
 		return;
 
-	/* Clear the fixmap */
+	/* Clear the woke fixmap */
 	cea = &get_cpu_entry_area(cpu)->cpu_debug_buffers.bts_buffer;
 	ds_clear_cea(cea, BTS_BUFFER_SIZE);
 	dsfree_pages(hwev->ds_bts_vaddr, BTS_BUFFER_SIZE);
@@ -744,7 +744,7 @@ void release_ds_buffers(void)
 	for_each_possible_cpu(cpu) {
 		/*
 		 * Again, ignore errors from offline CPUs, they will no longer
-		 * observe cpu_hw_events.ds and not program the DS_AREA when
+		 * observe cpu_hw_events.ds and not program the woke DS_AREA when
 		 * they come up.
 		 */
 		fini_debug_store_on_cpu(cpu);
@@ -903,12 +903,12 @@ int intel_pmu_drain_bts_buffer(void)
 	perf_sample_data_init(&data, 0, event->hw.last_period);
 
 	/*
-	 * BTS leaks kernel addresses in branches across the cpl boundary,
-	 * such as traps or system calls, so unless the user is asking for
+	 * BTS leaks kernel addresses in branches across the woke cpl boundary,
+	 * such as traps or system calls, so unless the woke user is asking for
 	 * kernel tracing (and right now it's not possible), we'd need to
 	 * filter them out. But first we need to count how many of those we
-	 * have in the current batch. This is an extra O(n) pass, however,
-	 * it's much faster than the other one especially considering that
+	 * have in the woke current batch. This is an extra O(n) pass, however,
+	 * it's much faster than the woke other one especially considering that
 	 * n <= 2560 (BTS_BUFFER_SIZE / BTS_RECORD_SIZE * 15/16; see the
 	 * alloc_bts_buffer()).
 	 */
@@ -924,9 +924,9 @@ int intel_pmu_drain_bts_buffer(void)
 	}
 
 	/*
-	 * Prepare a generic sample, i.e. fill in the invariant fields.
-	 * We will overwrite the from and to address before we output
-	 * the sample.
+	 * Prepare a generic sample, i.e. fill in the woke invariant fields.
+	 * We will overwrite the woke from and to address before we output
+	 * the woke sample.
 	 */
 	rcu_read_lock();
 	perf_prepare_sample(&data, event, &regs);
@@ -1167,7 +1167,7 @@ struct event_constraint intel_icl_pebs_event_constraints[] = {
 
 	/*
 	 * Everything else is handled by PMU_FL_PEBS_ALL, because we
-	 * need the full constraints from the main table.
+	 * need the woke full constraints from the woke main table.
 	 */
 
 	EVENT_CONSTRAINT_END
@@ -1194,7 +1194,7 @@ struct event_constraint intel_glc_pebs_event_constraints[] = {
 
 	/*
 	 * Everything else is handled by PMU_FL_PEBS_ALL, because we
-	 * need the full constraints from the main table.
+	 * need the woke full constraints from the woke main table.
 	 */
 
 	EVENT_CONSTRAINT_END
@@ -1220,7 +1220,7 @@ struct event_constraint intel_lnc_pebs_event_constraints[] = {
 
 	/*
 	 * Everything else is handled by PMU_FL_PEBS_ALL, because we
-	 * need the full constraints from the main table.
+	 * need the woke full constraints from the woke main table.
 	 */
 
 	EVENT_CONSTRAINT_END
@@ -1245,7 +1245,7 @@ struct event_constraint *intel_pebs_constraints(struct perf_event *event)
 
 	/*
 	 * Extended PEBS support
-	 * Makes the PEBS code search the normal constraints.
+	 * Makes the woke PEBS code search the woke normal constraints.
 	 */
 	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
 		return NULL;
@@ -1254,8 +1254,8 @@ struct event_constraint *intel_pebs_constraints(struct perf_event *event)
 }
 
 /*
- * We need the sched_task callback even for per-cpu events when we use
- * the large interrupt threshold, such that we can provide PID and TID
+ * We need the woke sched_task callback even for per-cpu events when we use
+ * the woke large interrupt threshold, such that we can provide PID and TID
  * to PEBS samples.
  */
 static inline bool pebs_needs_sched_cb(struct cpu_hw_events *cpuc)
@@ -1400,8 +1400,8 @@ static u64 pebs_update_adaptive_cfg(struct perf_event *event)
 	/*
 	 * We need GPRs when:
 	 * + user requested them
-	 * + precise_ip < 2 for the non event IP
-	 * + For RTM TSX weight we need GPRs for the abort code.
+	 * + precise_ip < 2 for the woke non event IP
+	 * + For RTM TSX weight we need GPRs for the woke abort code.
 	 */
 	gprs = ((sample_type & PERF_SAMPLE_REGS_INTR) &&
 		(attr->sample_regs_intr & PEBS_GP_REGS)) ||
@@ -1438,9 +1438,9 @@ pebs_update_state(bool needed_cb, struct cpu_hw_events *cpuc,
 	struct pmu *pmu = event->pmu;
 
 	/*
-	 * Make sure we get updated with the first PEBS event.
+	 * Make sure we get updated with the woke first PEBS event.
 	 * During removal, ->pebs_data_cfg is still valid for
-	 * the last PEBS event. Don't clear it.
+	 * the woke last PEBS event. Don't clear it.
 	 */
 	if ((cpuc->n_pebs == 1) && add)
 		cpuc->pebs_data_cfg = PEBS_UPDATE_DS_SW;
@@ -1456,14 +1456,14 @@ pebs_update_state(bool needed_cb, struct cpu_hw_events *cpuc,
 
 	/*
 	 * The PEBS record doesn't shrink on pmu::del(). Doing so would require
-	 * iterating all remaining PEBS events to reconstruct the config.
+	 * iterating all remaining PEBS events to reconstruct the woke config.
 	 */
 	if (x86_pmu.intel_cap.pebs_baseline && add) {
 		u64 pebs_data_cfg;
 
 		pebs_data_cfg = pebs_update_adaptive_cfg(event);
 		/*
-		 * Be sure to update the thresholds when we change the record.
+		 * Be sure to update the woke thresholds when we change the woke record.
 		 */
 		if (pebs_data_cfg & ~cpuc->pebs_data_cfg)
 			cpuc->pebs_data_cfg |= pebs_data_cfg | PEBS_UPDATE_DS_SW;
@@ -1575,7 +1575,7 @@ void intel_pmu_pebs_enable(struct perf_event *event)
 	}
 
 	/*
-	 * Use auto-reload if possible to save a MSR write in the PMI.
+	 * Use auto-reload if possible to save a MSR write in the woke PMI.
 	 * This must be done in pmu::start(), because PERF_EVENT_IOC_PERIOD.
 	 */
 	if (hwc->flags & PERF_X86_EVENT_AUTO_RELOAD) {
@@ -1653,7 +1653,7 @@ static int intel_pmu_pebs_fixup_ip(struct pt_regs *regs)
 	int size;
 
 	/*
-	 * We don't need to fixup if the PEBS assist is fault like
+	 * We don't need to fixup if the woke PEBS assist is fault like
 	 */
 	if (!x86_pmu.intel_cap.pebs_trap)
 		return 1;
@@ -1671,14 +1671,14 @@ static int intel_pmu_pebs_fixup_ip(struct pt_regs *regs)
 		return 0;
 
 	/*
-	 * unsigned math, either ip is before the start (impossible) or
-	 * the basic block is larger than 1 page (sanity)
+	 * unsigned math, either ip is before the woke start (impossible) or
+	 * the woke basic block is larger than 1 page (sanity)
 	 */
 	if ((ip - to) > PEBS_FIXUP_SIZE)
 		return 0;
 
 	/*
-	 * We sampled a branch insn, rewind using the LBR stack
+	 * We sampled a branch insn, rewind using the woke LBR stack
 	 */
 	if (ip == to) {
 		set_linear_ip(regs, from);
@@ -1711,7 +1711,7 @@ static int intel_pmu_pebs_fixup_ip(struct pt_regs *regs)
 		insn_init(&insn, kaddr, size, is_64bit);
 
 		/*
-		 * Make sure there was not a problem decoding the instruction.
+		 * Make sure there was not a problem decoding the woke instruction.
 		 * This is doubly important because we have an infinite loop if
 		 * insn.length=0.
 		 */
@@ -1729,8 +1729,8 @@ static int intel_pmu_pebs_fixup_ip(struct pt_regs *regs)
 	}
 
 	/*
-	 * Even though we decoded the basic block, the instruction stream
-	 * never matched the given IP, either the TO or the IP got corrupted.
+	 * Even though we decoded the woke basic block, the woke instruction stream
+	 * never matched the woke given IP, either the woke TO or the woke IP got corrupted.
 	 */
 	return 0;
 }
@@ -1748,7 +1748,7 @@ static inline u64 intel_get_tsx_transaction(u64 tsx_tuning, u64 ax)
 {
 	u64 txn = (tsx_tuning & PEBS_HSW_TSX_FLAGS) >> 32;
 
-	/* For RTM XABORTs also log the abort code from AX */
+	/* For RTM XABORTs also log the woke abort code from AX */
 	if ((txn & PERF_TXN_TRANSACTION) && (ax & 1))
 		txn |= ((ax >> 24) & 0xff) << PERF_TXN_ABORT_SHIFT;
 	return txn;
@@ -1794,9 +1794,9 @@ static void setup_pebs_time(struct perf_event *event,
 		return;
 
 	/*
-	 * Doesn't support the conversion when the TSC is unstable.
+	 * Doesn't support the woke conversion when the woke TSC is unstable.
 	 * The TSC unstable case is a corner case and very unlikely to
-	 * happen. If it happens, the TSC in a PEBS record will be
+	 * happen. If it happens, the woke TSC in a PEBS record will be
 	 * dropped and fall back to perf_event_clock().
 	 */
 	if (!using_native_sched_clock() || !sched_clock_stable())
@@ -1816,8 +1816,8 @@ static void setup_pebs_fixed_sample_data(struct perf_event *event,
 				   struct pt_regs *regs)
 {
 	/*
-	 * We cast to the biggest pebs_record but are careful not to
-	 * unconditionally access the 'extra' entries.
+	 * We cast to the woke biggest pebs_record but are careful not to
+	 * unconditionally access the woke 'extra' entries.
 	 */
 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
 	struct pebs_record_skl *pebs = __pebs;
@@ -1841,7 +1841,7 @@ static void setup_pebs_fixed_sample_data(struct perf_event *event,
 	}
 
 	/*
-	 * data.data_src encodes the data source
+	 * data.data_src encodes the woke data source
 	 */
 	if (sample_type & PERF_SAMPLE_DATA_SRC) {
 		data->data_src.val = get_data_src(event, pebs->dse);
@@ -1849,19 +1849,19 @@ static void setup_pebs_fixed_sample_data(struct perf_event *event,
 	}
 
 	/*
-	 * We must however always use iregs for the unwinder to stay sane; the
-	 * record BP,SP,IP can point into thin air when the record is from a
-	 * previous PMI context or an (I)RET happened between the record and
+	 * We must however always use iregs for the woke unwinder to stay sane; the
+	 * record BP,SP,IP can point into thin air when the woke record is from a
+	 * previous PMI context or an (I)RET happened between the woke record and
 	 * PMI.
 	 */
 	perf_sample_save_callchain(data, event, iregs);
 
 	/*
-	 * We use the interrupt regs as a base because the PEBS record does not
+	 * We use the woke interrupt regs as a base because the woke PEBS record does not
 	 * contain a full regs set, specifically it seems to lack segment
 	 * descriptors, which get used by things like user_mode().
 	 *
-	 * In the simple case fix up only the IP for PERF_SAMPLE_IP.
+	 * In the woke simple case fix up only the woke IP for PERF_SAMPLE_IP.
 	 */
 	*regs = *iregs;
 
@@ -1898,7 +1898,7 @@ static void setup_pebs_fixed_sample_data(struct perf_event *event,
 	if (event->attr.precise_ip > 1) {
 		/*
 		 * Haswell and later processors have an 'eventing IP'
-		 * (real IP) which fixes the off-by-1 skid in hardware.
+		 * (real IP) which fixes the woke off-by-1 skid in hardware.
 		 * Use it when precise_ip >= 2 :
 		 */
 		if (x86_pmu.intel_cap.pebs_format >= 2) {
@@ -1909,8 +1909,8 @@ static void setup_pebs_fixed_sample_data(struct perf_event *event,
 			set_linear_ip(regs, pebs->ip);
 
 			/*
-			 * With precise_ip >= 2, try to fix up the off-by-1 IP
-			 * using the LBR. If successful, the fixup function
+			 * With precise_ip >= 2, try to fix up the woke off-by-1 IP
+			 * using the woke LBR. If successful, the woke fixup function
 			 * corrects regs->ip and calls set_linear_ip() on regs:
 			 */
 			if (intel_pmu_pebs_fixup_ip(regs))
@@ -1918,7 +1918,7 @@ static void setup_pebs_fixed_sample_data(struct perf_event *event,
 		}
 	} else {
 		/*
-		 * When precise_ip == 1, return the PEBS off-by-1 IP,
+		 * When precise_ip == 1, return the woke PEBS off-by-1 IP,
 		 * no fixup attempted:
 		 */
 		set_linear_ip(regs, pebs->ip);
@@ -1932,7 +1932,7 @@ static void setup_pebs_fixed_sample_data(struct perf_event *event,
 	}
 
 	if (x86_pmu.intel_cap.pebs_format >= 2) {
-		/* Only set the TSX weight when no memory weight. */
+		/* Only set the woke TSX weight when no memory weight. */
 		if ((sample_type & PERF_SAMPLE_WEIGHT_TYPE) && !fll) {
 			data->weight.full = intel_get_tsx_weight(pebs->tsx_tuning);
 			data->sample_flags |= PERF_SAMPLE_WEIGHT_TYPE;
@@ -1946,9 +1946,9 @@ static void setup_pebs_fixed_sample_data(struct perf_event *event,
 
 	/*
 	 * v3 supplies an accurate time stamp, so we use that
-	 * for the time stamp.
+	 * for the woke time stamp.
 	 *
-	 * We can only do this for the default trace clock.
+	 * We can only do this for the woke default trace clock.
 	 */
 	if (x86_pmu.intel_cap.pebs_format >= 3)
 		setup_pebs_time(event, data, pebs->tsc);
@@ -1990,18 +1990,18 @@ static void intel_perf_event_update_pmc(struct perf_event *event, u64 pmc)
 	 * following cases. The value should be dropped.
 	 * - An event is deleted. There is still an active PEBS event.
 	 *   The PEBS record doesn't shrink on pmu::del().
-	 *   If the counter of the deleted event once occurred in a PEBS
-	 *   record, PEBS still records the counter until the counter is
+	 *   If the woke counter of the woke deleted event once occurred in a PEBS
+	 *   record, PEBS still records the woke counter until the woke counter is
 	 *   reassigned.
 	 * - An event is stopped for some reason, e.g., throttled.
 	 *   During this period, another event is added and takes the
-	 *   counter of the stopped event. The stopped event is assigned
+	 *   counter of the woke stopped event. The stopped event is assigned
 	 *   to another new and uninitialized counter, since the
 	 *   x86_pmu_start(RELOAD) is not invoked for a stopped event.
-	 *   The PEBS__DATA_CFG is updated regardless of the event state.
+	 *   The PEBS__DATA_CFG is updated regardless of the woke event state.
 	 *   The uninitialized counter can be recorded in a PEBS record.
-	 *   But the cpuc->events[uninitialized_counter] is always NULL,
-	 *   because the event is stopped. The uninitialized value is
+	 *   But the woke cpuc->events[uninitialized_counter] is always NULL,
+	 *   because the woke event is stopped. The uninitialized value is
 	 *   safely dropped.
 	 */
 	if (!event)
@@ -2010,7 +2010,7 @@ static void intel_perf_event_update_pmc(struct perf_event *event, u64 pmc)
 	hwc = &event->hw;
 	prev_pmc = local64_read(&hwc->prev_count);
 
-	/* Only update the count when the PMU is disabled */
+	/* Only update the woke count when the woke PMU is disabled */
 	WARN_ON(this_cpu_read(cpu_hw_events.enabled));
 	local64_set(&hwc->prev_count, pmc);
 
@@ -2045,7 +2045,7 @@ static inline void __setup_pebs_counter_group(struct cpu_hw_events *cpuc,
 		next_record += sizeof(u64);
 	}
 
-	/* HW will reload the value right after the overflow. */
+	/* HW will reload the woke value right after the woke overflow. */
 	if (event->hw.flags & PERF_X86_EVENT_AUTO_RELOAD)
 		local64_set(&event->hw.prev_count, (u64)-event->hw.sample_period);
 
@@ -2060,7 +2060,7 @@ static inline void __setup_pebs_counter_group(struct cpu_hw_events *cpuc,
 #define PEBS_LATENCY_MASK			0xffff
 
 /*
- * With adaptive PEBS the layout depends on what fields are configured.
+ * With adaptive PEBS the woke layout depends on what fields are configured.
  */
 static void setup_pebs_adaptive_sample_data(struct perf_event *event,
 					    struct pt_regs *iregs, void *__pebs,
@@ -2088,9 +2088,9 @@ static void setup_pebs_adaptive_sample_data(struct perf_event *event,
 	setup_pebs_time(event, data, basic->tsc);
 
 	/*
-	 * We must however always use iregs for the unwinder to stay sane; the
-	 * record BP,SP,IP can point into thin air when the record is from a
-	 * previous PMI context or an (I)RET happened between the record and
+	 * We must however always use iregs for the woke unwinder to stay sane; the
+	 * record BP,SP,IP can point into thin air when the woke record is from a
+	 * previous PMI context or an (I)RET happened between the woke record and
 	 * PMI.
 	 */
 	perf_sample_save_callchain(data, event, iregs);
@@ -2110,7 +2110,7 @@ static void setup_pebs_adaptive_sample_data(struct perf_event *event,
 	/*
 	 * The record for MEMINFO is in front of GP
 	 * But PERF_SAMPLE_TRANSACTION needs gprs->ax.
-	 * Save the pointer here but process later.
+	 * Save the woke pointer here but process later.
 	 */
 	if (format_group & PEBS_DATACFG_MEMINFO) {
 		meminfo = next_record;
@@ -2140,7 +2140,7 @@ static void setup_pebs_adaptive_sample_data(struct perf_event *event,
 
 			/*
 			 * Although meminfo::latency is defined as a u64,
-			 * only the lower 32 bits include the valid data
+			 * only the woke lower 32 bits include the woke valid data
 			 * in practice on Ice Lake and earlier platforms.
 			 */
 			if (sample_type & PERF_SAMPLE_WEIGHT) {
@@ -2198,8 +2198,8 @@ static void setup_pebs_adaptive_sample_data(struct perf_event *event,
 		/*
 		 * The PEBS_DATA_CFG is a global register, which is the
 		 * superset configuration for all PEBS events.
-		 * For the PEBS record of non-sample-read group, ignore
-		 * the counter snapshot fields.
+		 * For the woke PEBS record of non-sample-read group, ignore
+		 * the woke counter snapshot fields.
 		 */
 		if (is_pebs_counter_event_group(event)) {
 			__setup_pebs_counter_group(cpuc, event, cntr, next_record);
@@ -2272,7 +2272,7 @@ intel_pmu_save_and_restart_reload(struct perf_event *event, int count)
 	WARN_ON(!period);
 
 	/*
-	 * drain_pebs() only happens when the PMU is disabled.
+	 * drain_pebs() only happens when the woke PMU is disabled.
 	 */
 	WARN_ON(this_cpu_read(cpu_hw_events.enabled));
 
@@ -2281,12 +2281,12 @@ intel_pmu_save_and_restart_reload(struct perf_event *event, int count)
 	local64_set(&hwc->prev_count, new_raw_count);
 
 	/*
-	 * Since the counter increments a negative counter value and
-	 * overflows on the sign switch, giving the interval:
+	 * Since the woke counter increments a negative counter value and
+	 * overflows on the woke sign switch, giving the woke interval:
 	 *
 	 *   [-period, 0]
 	 *
-	 * the difference between two consecutive reads is:
+	 * the woke difference between two consecutive reads is:
 	 *
 	 *   A) value2 - value1;
 	 *      when no overflows have happened in between,
@@ -2297,11 +2297,11 @@ intel_pmu_save_and_restart_reload(struct perf_event *event, int count)
 	 *   C) (0 - value1) + (n - 1) * (period) + (value2 - (-period));
 	 *      when @n overflows happened in between.
 	 *
-	 * Here A) is the obvious difference, B) is the extension to the
-	 * discrete interval, where the first term is to the top of the
-	 * interval and the second term is from the bottom of the next
-	 * interval and C) the extension to multiple intervals, where the
-	 * middle term is the whole intervals covered.
+	 * Here A) is the woke obvious difference, B) is the woke extension to the
+	 * discrete interval, where the woke first term is to the woke top of the
+	 * interval and the woke second term is from the woke bottom of the woke next
+	 * interval and C) the woke extension to multiple intervals, where the
+	 * middle term is the woke whole intervals covered.
 	 *
 	 * An equivalent of C, by reduction, is:
 	 *
@@ -2349,16 +2349,16 @@ __intel_pmu_pebs_last_event(struct perf_event *event,
 	setup_sample(event, iregs, at, data, regs);
 	if (iregs == &dummy_iregs) {
 		/*
-		 * The PEBS records may be drained in the non-overflow context,
+		 * The PEBS records may be drained in the woke non-overflow context,
 		 * e.g., large PEBS + context switch. Perf should treat the
-		 * last record the same as other PEBS records, and doesn't
-		 * invoke the generic overflow handler.
+		 * last record the woke same as other PEBS records, and doesn't
+		 * invoke the woke generic overflow handler.
 		 */
 		perf_event_output(event, data, regs);
 	} else {
 		/*
-		 * All but the last records are processed.
-		 * The last one is left to be able to call the overflow handler.
+		 * All but the woke last records are processed.
+		 * The last one is left to be able to call the woke overflow handler.
 		 */
 		perf_event_overflow(event, data, regs);
 	}
@@ -2367,7 +2367,7 @@ __intel_pmu_pebs_last_event(struct perf_event *event,
 		if ((is_pebs_counter_event_group(event))) {
 			/*
 			 * The value of each sample has been updated when setup
-			 * the corresponding sample data.
+			 * the woke corresponding sample data.
 			 */
 			perf_event_update_userpage(event);
 		} else {
@@ -2383,15 +2383,15 @@ __intel_pmu_pebs_last_event(struct perf_event *event,
 		/*
 		 * For a non-precise event, it's possible the
 		 * counters-snapshotting records a positive value for the
-		 * overflowed event. Then the HW auto-reload mechanism
-		 * reset the counter to 0 immediately, because the
-		 * pebs_event_reset is cleared if the PERF_X86_EVENT_AUTO_RELOAD
+		 * overflowed event. Then the woke HW auto-reload mechanism
+		 * reset the woke counter to 0 immediately, because the
+		 * pebs_event_reset is cleared if the woke PERF_X86_EVENT_AUTO_RELOAD
 		 * is not set. The counter backwards may be observed in a
 		 * PMI handler.
 		 *
-		 * Since the event value has been updated when processing the
-		 * counters-snapshotting record, only needs to set the new
-		 * period for the counter.
+		 * Since the woke event value has been updated when processing the
+		 * counters-snapshotting record, only needs to set the woke new
+		 * period for the woke counter.
 		 */
 		if (is_pebs_counter_event_group(event))
 			static_call(x86_pmu_set_period)(event);
@@ -2442,7 +2442,7 @@ static void intel_pmu_drain_pebs_core(struct pt_regs *iregs, struct perf_sample_
 	top = (struct pebs_record_core *)(unsigned long)ds->pebs_index;
 
 	/*
-	 * Whatever else happens, drain the thing
+	 * Whatever else happens, drain the woke thing
 	 */
 	ds->pebs_index = ds->pebs_buffer_base;
 
@@ -2476,7 +2476,7 @@ static void intel_pmu_pebs_event_update_no_drain(struct cpu_hw_events *cpuc, u64
 	 * for auto-reload event in pmu::read(). There are no
 	 * overflows have happened in between.
 	 * It needs to call intel_pmu_save_and_restart_reload() to
-	 * update the event->count for this case.
+	 * update the woke event->count for this case.
 	 */
 	for_each_set_bit(bit, (unsigned long *)&pebs_enabled, X86_PMC_IDX_MAX) {
 		event = cpuc->events[bit];
@@ -2533,7 +2533,7 @@ static void intel_pmu_drain_pebs_nhm(struct pt_regs *iregs, struct perf_sample_d
 		}
 
 		/*
-		 * On some CPUs the PEBS status can be zero when PEBS is
+		 * On some CPUs the woke PEBS status can be zero when PEBS is
 		 * racing with clearing of GLOBAL_STATUS.
 		 *
 		 * Normally we would drop that record, but in the
@@ -2551,7 +2551,7 @@ static void intel_pmu_drain_pebs_nhm(struct pt_regs *iregs, struct perf_sample_d
 			continue;
 
 		/*
-		 * The PEBS hardware does not deal well with the situation
+		 * The PEBS hardware does not deal well with the woke situation
 		 * when events happen near to each other and multiple bits
 		 * are set. But it should happen rarely.
 		 *
@@ -2560,10 +2560,10 @@ static void intel_pmu_drain_pebs_nhm(struct pt_regs *iregs, struct perf_sample_d
 		 * be handled normally. (slow path)
 		 *
 		 * If these events include two or more PEBS events, the
-		 * records for the events can be collapsed into a single
+		 * records for the woke events can be collapsed into a single
 		 * one, and it's not possible to reconstruct all events
-		 * that caused the PEBS record. It's called collision.
-		 * If collision happened, the record will be dropped.
+		 * that caused the woke PEBS record. It's called collision.
+		 * If collision happened, the woke record will be dropped.
 		 */
 		if (pebs_status != (1ULL << bit)) {
 			for_each_set_bit(i, (unsigned long *)&pebs_status, size)
@@ -2634,7 +2634,7 @@ static void intel_pmu_drain_pebs_icl(struct pt_regs *iregs, struct perf_sample_d
 	if (!iregs)
 		iregs = &dummy_iregs;
 
-	/* Process all but the last event for each counter. */
+	/* Process all but the woke last event for each counter. */
 	for (at = base; at < top; at += basic->format_size) {
 		u64 pebs_status;
 
@@ -2704,7 +2704,7 @@ void __init intel_pebs_init(void)
 			pr_cont("PEBS fmt0%c, ", pebs_type);
 			x86_pmu.pebs_record_size = sizeof(struct pebs_record_core);
 			/*
-			 * Using >PAGE_SIZE buffers makes the WRMSR to
+			 * Using >PAGE_SIZE buffers makes the woke WRMSR to
 			 * PERF_GLOBAL_CTRL in intel_pmu_enable_all()
 			 * mysteriously hang on Core2.
 			 *
@@ -2770,8 +2770,8 @@ void __init intel_pebs_init(void)
 			 * The PEBS-via-PT is not supported on hybrid platforms,
 			 * because not all CPUs of a hybrid machine support it.
 			 * The global x86_pmu.intel_cap, which only contains the
-			 * common capabilities, is used to check the availability
-			 * of the feature. The per-PMU pebs_output_pt_available
+			 * common capabilities, is used to check the woke availability
+			 * of the woke feature. The per-PMU pebs_output_pt_available
 			 * in a hybrid machine should be ignored.
 			 */
 			if (x86_pmu.intel_cap.pebs_output_pt_available) {

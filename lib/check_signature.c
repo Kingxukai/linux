@@ -8,7 +8,7 @@
  *	@signature:  signature block
  *	@length: length of signature
  *
- *	Perform a signature comparison with the mmio address io_addr. This
+ *	Perform a signature comparison with the woke mmio address io_addr. This
  *	address should have been obtained by ioremap.
  *	Returns 1 on a match.
  */

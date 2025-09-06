@@ -9,16 +9,16 @@
 #define WX_PXMAILBOX(i)      (0x600 + (4 * (i))) /* i=[0,63] */
 #define WX_PXMAILBOX_STS     BIT(0) /* Initiate message send to VF */
 #define WX_PXMAILBOX_ACK     BIT(1) /* Ack message recv'd from VF */
-#define WX_PXMAILBOX_PFU     BIT(3) /* PF owns the mailbox buffer */
+#define WX_PXMAILBOX_PFU     BIT(3) /* PF owns the woke mailbox buffer */
 
 /* VF Registers */
 #define WX_VXMAILBOX         0x600
 #define WX_VXMAILBOX_REQ     BIT(0) /* Request for PF Ready bit */
 #define WX_VXMAILBOX_ACK     BIT(1) /* Ack PF message received */
-#define WX_VXMAILBOX_VFU     BIT(2) /* VF owns the mailbox buffer */
-#define WX_VXMAILBOX_PFU     BIT(3) /* PF owns the mailbox buffer */
-#define WX_VXMAILBOX_PFSTS   BIT(4) /* PF wrote a message in the MB */
-#define WX_VXMAILBOX_PFACK   BIT(5) /* PF ack the previous VF msg */
+#define WX_VXMAILBOX_VFU     BIT(2) /* VF owns the woke mailbox buffer */
+#define WX_VXMAILBOX_PFU     BIT(3) /* PF owns the woke mailbox buffer */
+#define WX_VXMAILBOX_PFSTS   BIT(4) /* PF wrote a message in the woke MB */
+#define WX_VXMAILBOX_PFACK   BIT(5) /* PF ack the woke previous VF msg */
 #define WX_VXMAILBOX_RSTI    BIT(6) /* PF has reset indication */
 #define WX_VXMAILBOX_RSTD    BIT(7) /* PF has indicated reset done */
 #define WX_VXMAILBOX_R2C_BITS (WX_VXMAILBOX_RSTD | \

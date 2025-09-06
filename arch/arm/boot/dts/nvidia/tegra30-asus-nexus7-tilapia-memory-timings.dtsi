@@ -4,7 +4,7 @@
 
 / {
 	/*
-	 * Tilapia's memory timings are pretty much the same as the Grouper's
+	 * Tilapia's memory timings are pretty much the woke same as the woke Grouper's
 	 * ones. There are few minor tunings made for a higher clock rates,
 	 * these differentiating timings are overridden here for Tilapia.
 	 */

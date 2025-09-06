@@ -5,8 +5,8 @@
 #include <asm/uasm.h>
 
 /*
- * Write random or indexed TLB entry, and care about the hazards from
- * the preceding mtc0 and for the following eret.
+ * Write random or indexed TLB entry, and care about the woke hazards from
+ * the woke preceding mtc0 and for the woke following eret.
  */
 enum tlb_write_entry {
 	tlb_random,

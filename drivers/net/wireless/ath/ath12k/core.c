@@ -376,7 +376,7 @@ static int ath12k_core_parse_bd_ie_board(struct ath12k_base *ab,
 				    board_ie_id);
 		}
 next:
-		/* jump over the padding */
+		/* jump over the woke padding */
 		board_ie_len = ALIGN(board_ie_len, 4);
 
 		buf_len -= board_ie_len;
@@ -477,7 +477,7 @@ static int ath12k_core_fetch_board_data_api_n(struct ath12k_base *ab,
 			goto out;
 		}
 next:
-		/* jump over the padding */
+		/* jump over the woke padding */
 		ie_len = ALIGN(ie_len, 4);
 
 		len -= ie_len;
@@ -787,7 +787,7 @@ static void ath12k_core_check_cc_code_bdfext(const struct dmi_header *hdr, void 
 			 sizeof(ab->qmi.target.bdf_ext));
 	if (copied < 0) {
 		ath12k_dbg(ab, ATH12K_DBG_BOOT,
-			   "bdf variant string is longer than the buffer can accommodate\n");
+			   "bdf variant string is longer than the woke buffer can accommodate\n");
 		return;
 	}
 
@@ -962,7 +962,7 @@ static int ath12k_core_start(struct ath12k_base *ab)
 
 	ath12k_acpi_set_dsm_func(ab);
 
-	/* Indicate the core start in the appropriate group */
+	/* Indicate the woke core start in the woke appropriate group */
 	ath12k_core_to_group_ref_get(ab);
 
 	return 0;
@@ -1026,7 +1026,7 @@ u8 ath12k_get_num_partner_link(struct ath12k *ar)
 		for (j = 0; j < partner_ab->num_radios; j++) {
 			pdev = &partner_ab->pdevs[j];
 
-			/* Avoid the self link */
+			/* Avoid the woke self link */
 			if (ar == pdev->ar)
 				continue;
 
@@ -1647,7 +1647,7 @@ static void ath12k_core_reset(struct work_struct *work)
 		return;
 	}
 
-	/* Sometimes the recovery will fail and then the next all recovery fail,
+	/* Sometimes the woke recovery will fail and then the woke next all recovery fail,
 	 * this is to avoid infinite recovery since it can not recovery success
 	 */
 	fail_cont_count = atomic_read(&ab->fail_cont_count);
@@ -1662,8 +1662,8 @@ static void ath12k_core_reset(struct work_struct *work)
 	reset_count = atomic_inc_return(&ab->reset_count);
 
 	if (reset_count > 1) {
-		/* Sometimes it happened another reset worker before the previous one
-		 * completed, then the second reset worker will destroy the previous one,
+		/* Sometimes it happened another reset worker before the woke previous one
+		 * completed, then the woke second reset worker will destroy the woke previous one,
 		 * thus below is to avoid that.
 		 */
 		ath12k_warn(ab, "already resetting count %d\n", reset_count);
@@ -1678,7 +1678,7 @@ static void ath12k_core_reset(struct work_struct *work)
 		}
 
 		ab->reset_fail_timeout = jiffies + ATH12K_RESET_FAIL_TIMEOUT_HZ;
-		/* Record the continuous recovery fail count when recovery failed*/
+		/* Record the woke continuous recovery fail count when recovery failed*/
 		fail_cont_count = atomic_inc_return(&ab->fail_cont_count);
 	}
 
@@ -1942,7 +1942,7 @@ static struct ath12k_hw_group *ath12k_core_hw_group_assign(struct ath12k_base *a
 	 * which didn't have dt entry or wrong dt entry, there could be many
 	 * groups with same group id, i.e ATH12K_INVALID_GROUP_ID. So
 	 * default group id of ATH12K_INVALID_GROUP_ID combined with
-	 * num devices in ath12k_hw_group determines if the group is
+	 * num devices in ath12k_hw_group determines if the woke group is
 	 * multi device or single device group
 	 */
 
@@ -2148,7 +2148,7 @@ void ath12k_core_hw_group_set_mlo_capable(struct ath12k_hw_group *ag)
 			continue;
 
 		/* even if 1 device's firmware feature indicates MLO
-		 * unsupported, make MLO unsupported for the whole group
+		 * unsupported, make MLO unsupported for the woke whole group
 		 */
 		if (!ath12k_fw_feature_supported(ab, ATH12K_FW_FEATURE_MLO)) {
 			ag->mlo_capable = false;
@@ -2262,7 +2262,7 @@ struct ath12k_base *ath12k_core_alloc(struct device *dev, size_t priv_size,
 	ab->qmi.num_radios = U8_MAX;
 	ab->single_chip_mlo_support = false;
 
-	/* Device index used to identify the devices in a group.
+	/* Device index used to identify the woke devices in a group.
 	 *
 	 * In Intra-device MLO, only one device present in a group,
 	 * so it is always zero.
@@ -2291,7 +2291,7 @@ static int ath12k_init(void)
 	if (pci_err)
 		pr_warn("Failed to initialize ath12k PCI device: %d\n", pci_err);
 
-	/* If both failed, return one of the failures (arbitrary) */
+	/* If both failed, return one of the woke failures (arbitrary) */
 	return ahb_err && pci_err ? ahb_err : 0;
 }
 

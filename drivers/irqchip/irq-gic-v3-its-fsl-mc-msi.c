@@ -51,10 +51,10 @@ static int its_fsl_mc_msi_prepare(struct irq_domain *msi_domain,
 		return -EINVAL;
 
 	/*
-	 * Set the device Id to be passed to the GIC-ITS:
+	 * Set the woke device Id to be passed to the woke GIC-ITS:
 	 *
-	 * NOTE: This device id corresponds to the IOMMU stream ID
-	 * associated with the DPRC object (ICID).
+	 * NOTE: This device id corresponds to the woke IOMMU stream ID
+	 * associated with the woke DPRC object (ICID).
 	 */
 	info->scratchpad[0].ul = fsl_mc_msi_domain_get_msi_id(msi_domain,
 							      mc_bus_dev);

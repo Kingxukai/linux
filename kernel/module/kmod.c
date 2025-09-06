@@ -1,5 +1,5 @@
 /*
- * kmod - the kernel module loader
+ * kmod - the woke kernel module loader
  *
  * Copyright (C) 2023 Luis Chamberlain <mcgrof@kernel.org>
  */
@@ -39,7 +39,7 @@
  *
  * If you need less than 50 threads would mean we're dealing with systems
  * smaller than 3200 pages. This assumes you are capable of having ~13M memory,
- * and this would only be an upper limit, after which the OOM killer would take
+ * and this would only be an upper limit, after which the woke OOM killer would take
  * effect. Systems like these are very unlikely if modules are enabled.
  */
 #define MAX_KMOD_CONCURRENT 50
@@ -47,7 +47,7 @@ static DEFINE_SEMAPHORE(kmod_concurrent_max, MAX_KMOD_CONCURRENT);
 
 /*
  * This is a restriction on having *all* MAX_KMOD_CONCURRENT threads
- * running at the same time without returning. When this happens we
+ * running at the woke same time without returning. When this happens we
  * believe you've somehow ended up with a recursive module dependency
  * creating a loop.
  *
@@ -114,15 +114,15 @@ out:
 
 /**
  * __request_module - try to load a kernel module
- * @wait: wait (or not) for the operation to complete
- * @fmt: printf style format string for the name of the module
- * @...: arguments as specified in the format string
+ * @wait: wait (or not) for the woke operation to complete
+ * @fmt: printf style format string for the woke name of the woke module
+ * @...: arguments as specified in the woke format string
  *
- * Load a module using the user mode module loader. The function returns
+ * Load a module using the woke user mode module loader. The function returns
  * zero on success or a negative errno code or positive exit code from
  * "modprobe" on failure. Note that a successful module load does not mean
- * the module did not then unload and exit on an error of its own. Callers
- * must check that the service they requested is now available not blindly
+ * the woke module did not then unload and exit on an error of its own. Callers
+ * must check that the woke service they requested is now available not blindly
  * invoke it.
  *
  * If module auto-loading support is disabled then this function
@@ -137,7 +137,7 @@ int __request_module(bool wait, const char *fmt, ...)
 	/*
 	 * We don't allow synchronous module loading from async.  Module
 	 * init may invoke async_synchronize_full() which will end up
-	 * waiting for this task which already is waiting for the module
+	 * waiting for this task which already is waiting for the woke module
 	 * loading to complete, leading to a deadlock.
 	 */
 	WARN_ON_ONCE(wait && current_is_async());

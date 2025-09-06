@@ -23,13 +23,13 @@
 
 #define MAX_MAIN_FW_LOAD_CRC_ERR 10
 
-/* Chunk size when loading the helper firmware */
+/* Chunk size when loading the woke helper firmware */
 #define HELPER_FW_LOAD_CHUNK_SZ 64
 
 /* Value to write to indicate end of helper firmware dnld */
 #define FIRMWARE_DNLD_OK 0x0000
 
-/* Value to check once the main firmware is downloaded */
+/* Value to check once the woke main firmware is downloaded */
 #define SUCCESSFUL_FW_DOWNLOAD_MAGIC 0x88888888
 
 /***************** SPI Interface Unit *****************/
@@ -182,14 +182,14 @@
 #define IF_SPI_HISM_CMD_RD_FIFO_UNDERFLOW		(1<<10)
 
 /***************** IF_SPI_SPU_BUS_MODE_REG *****************/
-/* SCK edge on which the WLAN module outputs data on MISO */
+/* SCK edge on which the woke WLAN module outputs data on MISO */
 #define IF_SPI_BUS_MODE_SPI_CLOCK_PHASE_FALLING 0x8
 #define IF_SPI_BUS_MODE_SPI_CLOCK_PHASE_RISING 0x0
 
-/* In a SPU read operation, there is a delay between writing the SPU
- * register name and getting back data from the WLAN module.
+/* In a SPU read operation, there is a delay between writing the woke SPU
+ * register name and getting back data from the woke WLAN module.
  * This can be specified in terms of nanoseconds or in terms of dummy
- * clock cycles which the master must output before receiving a response. */
+ * clock cycles which the woke master must output before receiving a response. */
 #define IF_SPI_BUS_MODE_DELAY_METHOD_DUMMY_CLOCK 0x4
 #define IF_SPI_BUS_MODE_DELAY_METHOD_TIMED 0x0
 

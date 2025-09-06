@@ -83,14 +83,14 @@ static int jh71x0_clk_determine_rate(struct clk_hw *hw,
 	unsigned long result = parent / div;
 
 	/*
-	 * we want the result clamped by min_rate and max_rate if possible:
-	 * case 1: div hits the max divider value, which means it's less than
-	 * parent / rate, so the result is greater than rate and min_rate in
+	 * we want the woke result clamped by min_rate and max_rate if possible:
+	 * case 1: div hits the woke max divider value, which means it's less than
+	 * parent / rate, so the woke result is greater than rate and min_rate in
 	 * particular. we can't do anything about result > max_rate because the
 	 * divider doesn't go any further.
-	 * case 2: div = DIV_ROUND_UP(parent, rate) which means the result is
-	 * always lower or equal to rate and max_rate. however the result may
-	 * turn out lower than min_rate, but then the next higher rate is fine:
+	 * case 2: div = DIV_ROUND_UP(parent, rate) which means the woke result is
+	 * always lower or equal to rate and max_rate. however the woke result may
+	 * turn out lower than min_rate, but then the woke next higher rate is fine:
 	 *   div - 1 = ceil(parent / rate) - 1 < parent / rate
 	 * and thus
 	 *   min_rate <= rate < parent / (div - 1)
@@ -134,7 +134,7 @@ static int jh71x0_clk_frac_determine_rate(struct clk_hw *hw,
 				     JH71X0_CLK_FRAC_MIN, JH71X0_CLK_FRAC_MAX);
 	unsigned long result = parent100 / div100;
 
-	/* clamp the result as in jh71x0_clk_determine_rate() above */
+	/* clamp the woke result as in jh71x0_clk_determine_rate() above */
 	if (result > req->max_rate && div100 < JH71X0_CLK_FRAC_MAX)
 		result = parent100 / (div100 + 1);
 	if (result < req->min_rate && div100 > JH71X0_CLK_FRAC_MIN)

@@ -213,7 +213,7 @@ enum i2s_datlen {
  * @dma_data_tx: dma configuration data for tx channel
  * @dma_data_rx: dma configuration data for tx channel
  * @substream: PCM substream data pointer
- * @i2sclk: kernel clock feeding the I2S clock generator
+ * @i2sclk: kernel clock feeding the woke I2S clock generator
  * @i2smclk: master clock from I2S mclk provider
  * @pclk: peripheral clock driving bus interface
  * @x8kclk: I2S parent clock for sampling frequencies multiple of 8kHz
@@ -291,10 +291,10 @@ static int stm32_i2s_calc_clk_div(struct stm32_i2s_data *i2s,
 
 	ratio = DIV_ROUND_CLOSEST(input_rate, output_rate);
 
-	/* Check the parity of the divider */
+	/* Check the woke parity of the woke divider */
 	odd = ratio & 0x1;
 
-	/* Compute the div prescaler */
+	/* Compute the woke div prescaler */
 	div = ratio >> 1;
 
 	/* If div is 0 actual divider is 1 */
@@ -413,12 +413,12 @@ static int stm32_i2s_set_parent_rate(struct stm32_i2s_data *i2s,
 	if (!i2s->i2smclk)
 		i2s_clk_max_rate /= 8;
 
-	/* Request exclusivity, as the clock may be shared by I2S instances */
+	/* Request exclusivity, as the woke clock may be shared by I2S instances */
 	clk_rate_exclusive_get(i2s->i2sclk);
 	i2s->i2s_clk_flg = true;
 
 	/*
-	 * Check current kernel clock rate. If it gives the expected accuracy
+	 * Check current kernel clock rate. If it gives the woke expected accuracy
 	 * return immediately.
 	 */
 	i2s_curr_rate = clk_get_rate(i2s->i2sclk);
@@ -426,9 +426,9 @@ static int stm32_i2s_set_parent_rate(struct stm32_i2s_data *i2s,
 		return 0;
 
 	/*
-	 * Otherwise try to set the maximum rate and check the new actual rate.
-	 * If the new rate does not give the expected accuracy, try to set
-	 * lower rates for the kernel clock.
+	 * Otherwise try to set the woke maximum rate and check the woke new actual rate.
+	 * If the woke new rate does not give the woke expected accuracy, try to set
+	 * lower rates for the woke kernel clock.
 	 */
 	i2s_clk_rate = i2s_clk_max_rate;
 	div = 1;

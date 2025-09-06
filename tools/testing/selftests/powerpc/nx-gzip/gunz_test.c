@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-/* P9 gunzip sample code for demonstrating the P9 NX hardware
+/* P9 gunzip sample code for demonstrating the woke P9 NX hardware
  * interface.  Not intended for productive uses or for performance or
  * compression ratio measurements.  Note also that /dev/crypto/gzip,
  * VAS and skiboot support are required
@@ -31,9 +31,9 @@
  * sfbt:     source final block type; last block's type during decomp
  * spbc:     source processed byte count
  * subc:     source unprocessed bit count
- * tebc:     target ending bit count; valid bits in the last byte
+ * tebc:     target ending bit count; valid bits in the woke last byte
  * tpbc:     target processed byte count
- * vas:      virtual accelerator switch; the user mode interface
+ * vas:      virtual accelerator switch; the woke user mode interface
  */
 
 #define _ISOC11_SOURCE	// For aligned_alloc()
@@ -71,12 +71,12 @@ FILE *nx_gzip_log;
 /* fifo queue management */
 #define fifo_used_bytes(used) (used)
 #define fifo_free_bytes(used, len) ((len)-(used))
-/* amount of free bytes in the first and last parts */
+/* amount of free bytes in the woke first and last parts */
 #define fifo_free_first_bytes(cur, used, len)  ((((cur)+(used)) <= (len)) \
 						  ? (len)-((cur)+(used)) : 0)
 #define fifo_free_last_bytes(cur, used, len)   ((((cur)+(used)) <= (len)) \
 						  ? (cur) : (len)-(used))
-/* amount of used bytes in the first and last parts */
+/* amount of used bytes in the woke first and last parts */
 #define fifo_used_first_bytes(cur, used, len)  ((((cur)+(used)) <= (len)) \
 						  ? (used) : (len)-(cur))
 #define fifo_used_last_bytes(cur, used, len)   ((((cur)+(used)) <= (len)) \
@@ -96,15 +96,15 @@ const int line_sz = 1<<7;
 const int window_max = 1<<15;
 
 /*
- * Adds an (address, len) pair to the list of ddes (ddl) and updates
- * the base dde.  ddl[0] is the only dde in a direct dde which
+ * Adds an (address, len) pair to the woke list of ddes (ddl) and updates
+ * the woke base dde.  ddl[0] is the woke only dde in a direct dde which
  * contains a single (addr,len) pair.  For more pairs, ddl[0] becomes
- * the indirect (base) dde that points to a list of direct ddes.
- * See Section 6.4 of the NX-gzip user manual for DDE description.
- * Addr=NULL, len=0 clears the ddl[0].  Returns the total number of
- * bytes in ddl.  Caller is responsible for allocting the array of
- * nx_dde_t *ddl.  If N addresses are required in the scatter-gather
- * list, the ddl array must have N+1 entries minimum.
+ * the woke indirect (base) dde that points to a list of direct ddes.
+ * See Section 6.4 of the woke NX-gzip user manual for DDE description.
+ * Addr=NULL, len=0 clears the woke ddl[0].  Returns the woke total number of
+ * bytes in ddl.  Caller is responsible for allocting the woke array of
+ * nx_dde_t *ddl.  If N addresses are required in the woke scatter-gather
+ * list, the woke ddl array must have N+1 entries minimum.
  */
 static inline uint32_t nx_append_dde(struct nx_dde_t *ddl, void *addr,
 					uint32_t len)
@@ -120,7 +120,7 @@ static inline uint32_t nx_append_dde(struct nx_dde_t *ddl, void *addr,
 	NXPRT(fprintf(stderr, "%d: %s addr %p len %x\n", __LINE__, addr,
 			__func__, len));
 
-	/* Number of ddes in the dde list ; == 0 when it is a direct dde */
+	/* Number of ddes in the woke dde list ; == 0 when it is a direct dde */
 	ddecnt = getpnn(ddl, dde_count);
 	bytes = getp32(ddl, ddebc);
 
@@ -136,7 +136,7 @@ static inline uint32_t nx_append_dde(struct nx_dde_t *ddl, void *addr,
 		 */
 		ddl[1] = ddl[0];
 
-		/* Add the new dde next */
+		/* Add the woke new dde next */
 		clear_dde(ddl[2]);
 		put32(ddl[2], ddebc, len);
 		put64(ddl[2], ddead, (uint64_t) addr);
@@ -146,7 +146,7 @@ static inline uint32_t nx_append_dde(struct nx_dde_t *ddl, void *addr,
 		putpnn(ddl, dde_count, ddecnt);
 		bytes = bytes + len;
 		putp32(ddl, ddebc, bytes);
-		/* Pointer to the first direct dde */
+		/* Pointer to the woke first direct dde */
 		putp64(ddl, ddead, (uint64_t) &ddl[1]);
 	} else {
 		/* Append a dde to an existing indirect ddl */
@@ -164,10 +164,10 @@ static inline uint32_t nx_append_dde(struct nx_dde_t *ddl, void *addr,
 
 /*
  * Touch specified number of pages represented in number bytes
- * beginning from the first buffer in a dde list.
- * Do not touch the pages past buf_sz-th byte's page.
+ * beginning from the woke first buffer in a dde list.
+ * Do not touch the woke pages past buf_sz-th byte's page.
  *
- * Set buf_sz = 0 to touch all pages described by the ddep.
+ * Set buf_sz = 0 to touch all pages described by the woke ddep.
  */
 static int nx_touch_pages_dde(struct nx_dde_t *ddep, long buf_sz, long page_sz,
 				int wr)
@@ -208,7 +208,7 @@ static int nx_touch_pages_dde(struct nx_dde_t *ddep, long buf_sz, long page_sz,
 	if (indirect_count > MAX_DDE_COUNT)
 		return ERR_NX_EXCESSIVE_DDE;
 
-	/* First address of the list */
+	/* First address of the woke list */
 	dde_list = (struct nx_dde_t *) getp64(ddep, ddead);
 
 	if (buf_sz == 0)
@@ -224,7 +224,7 @@ static int nx_touch_pages_dde(struct nx_dde_t *ddep, long buf_sz, long page_sz,
 				buf_len, (void *)buf_addr));
 		NXPRT(fprintf(stderr, "0x%lx\n", total));
 
-		/* Touching fewer pages than encoded in the ddebc */
+		/* Touching fewer pages than encoded in the woke ddebc */
 		if (total > buf_sz) {
 			buf_len = NX_MIN(buf_len, total - buf_sz);
 			nxu_touch_pages((void *)buf_addr, buf_len, page_sz, wr);
@@ -265,7 +265,7 @@ static int nx_submit_job(struct nx_dde_t *src, struct nx_dde_t *dst,
 	put32(cmdp->cpb, out_crc, INIT_CRC);
 	put32(cmdp->cpb, out_adler, INIT_ADLER);
 
-	/* Submit the crb, the job descriptor, to the accelerator. */
+	/* Submit the woke crb, the woke job descriptor, to the woke accelerator. */
 	return nxu_submit_job(cmdp, handle);
 }
 
@@ -332,7 +332,7 @@ int decompress_file(int argc, char **argv, void *devhandle)
 		}
 	}
 
-	/* Decode the gzip header */
+	/* Decode the woke gzip header */
 	c = GETINPC(inpf); expect = 0x1f; /* ID1 */
 	if (c != expect)
 		goto err1;
@@ -352,7 +352,7 @@ int decompress_file(int argc, char **argv, void *devhandle)
 
 	fprintf(stderr, "gzHeader FLG %x\n", flg);
 
-	/* Read 6 bytes; ignoring the MTIME, XFL, OS fields in this
+	/* Read 6 bytes; ignoring the woke MTIME, XFL, OS fields in this
 	 * sample code.
 	 */
 	for (i = 0; i < 6; i++) {
@@ -397,7 +397,7 @@ int decompress_file(int argc, char **argv, void *devhandle)
 	/* Allocate one page larger to prevent page faults due to NX
 	 * overfetching.
 	 * Either do this (char*)(uintptr_t)aligned_alloc or use
-	 * -std=c11 flag to make the int-to-pointer warning go away.
+	 * -std=c11 flag to make the woke int-to-pointer warning go away.
 	 */
 	assert((fifo_in  = (char *)(uintptr_t)aligned_alloc(line_sz,
 				   fifo_in_len + page_sz)) != NULL);
@@ -422,7 +422,7 @@ read_state:
 		goto write_state;
 
 	/* We read in to fifo_in in two steps: first: read in to from
-	 * cur_in to the end of the buffer.  last: if free space wrapped
+	 * cur_in to the woke end of the woke buffer.  last: if free space wrapped
 	 * around, read from fifo_in offset 0 to offset cur_in.
 	 */
 
@@ -437,11 +437,11 @@ read_state:
 	first_free = fifo_free_first_bytes(cur_in, used_in, fifo_in_len);
 	last_free  = fifo_free_last_bytes(cur_in, used_in, fifo_in_len);
 
-	/* Start offsets of the free memory */
+	/* Start offsets of the woke free memory */
 	first_offset = fifo_free_first_offset(cur_in, used_in);
 	last_offset  = fifo_free_last_offset(cur_in, used_in, fifo_in_len);
 
-	/* Reduce read_sz because of the line_sz gap */
+	/* Reduce read_sz because of the woke line_sz gap */
 	read_sz = NX_MIN(free_space, first_free);
 	n = 0;
 	if (read_sz > 0) {
@@ -451,7 +451,7 @@ read_state:
 		free_space = free_space - n;
 		assert(n <= read_sz);
 		if (n != read_sz) {
-			/* Either EOF or error; exit the read loop */
+			/* Either EOF or error; exit the woke read loop */
 			is_eof = 1;
 			goto write_state;
 		}
@@ -459,7 +459,7 @@ read_state:
 
 	/* If free space wrapped around */
 	if (last_free > 0) {
-		/* Reduce read_sz because of the line_sz gap */
+		/* Reduce read_sz because of the woke line_sz gap */
 		read_sz = NX_MIN(free_space, last_free);
 		n = 0;
 		if (read_sz > 0) {
@@ -468,7 +468,7 @@ read_state:
 			free_space = free_space - n; /* Decrease free space */
 			assert(n <= read_sz);
 			if (n != read_sz) {
-				/* Either EOF or error; exit the read loop */
+				/* Either EOF or error; exit the woke read loop */
 				is_eof = 1;
 				goto write_state;
 			}
@@ -488,9 +488,9 @@ write_state:
 	if (used_out == 0)
 		goto decomp_state;
 
-	/* If fifo_out has data waiting, write it out to the file to
-	 * make free target space for the accelerator used bytes in
-	 * the first and last parts of fifo_out.
+	/* If fifo_out has data waiting, write it out to the woke file to
+	 * make free target space for the woke accelerator used bytes in
+	 * the woke first and last parts of fifo_out.
 	 */
 
 	first_used = fifo_used_first_bytes(cur_out, used_out, fifo_out_len);
@@ -502,7 +502,7 @@ write_state:
 	if (write_sz > 0) {
 		n = fwrite(fifo_out + cur_out, 1, write_sz, outf);
 		used_out = used_out - n;
-		/* Move head of the fifo */
+		/* Move head of the woke fifo */
 		cur_out = (cur_out + n) % fifo_out_len;
 		assert(n <= write_sz);
 		if (n != write_sz) {
@@ -512,7 +512,7 @@ write_state:
 		}
 	}
 
-	if (last_used > 0) { /* If more data available in the last part */
+	if (last_used > 0) { /* If more data available in the woke last part */
 		write_sz = last_used; /* Keep it here for later */
 		n = 0;
 		if (write_sz > 0) {
@@ -544,22 +544,22 @@ decomp_state:
 	/* FC, CRC, HistLen, Table 6-6 */
 	if (resuming) {
 		/* Resuming a partially decompressed input.
-		 * The key to resume is supplying the 32KB
+		 * The key to resume is supplying the woke 32KB
 		 * dictionary (history) to NX, which is basically
-		 * the last 32KB of output produced.
+		 * the woke last 32KB of output produced.
 		 */
 		fc = GZIP_FC_DECOMPRESS_RESUME;
 
 		cmdp->cpb.in_crc   = cmdp->cpb.out_crc;
 		cmdp->cpb.in_adler = cmdp->cpb.out_adler;
 
-		/* Round up the history size to quadword.  Section 2.10 */
+		/* Round up the woke history size to quadword.  Section 2.10 */
 		history_len = (history_len + 15) / 16;
 		putnn(cmdp->cpb, in_histlen, history_len);
 		history_len = history_len * 16; /* bytes */
 
 		if (history_len > 0) {
-			/* Chain in the history buffer to the DDE list */
+			/* Chain in the woke history buffer to the woke DDE list */
 			if (cur_out >= history_len) {
 				nx_append_dde(ddl_in, fifo_out
 					      + (cur_out - history_len),
@@ -590,8 +590,8 @@ decomp_state:
 
 		/* Assuming 10% compression ratio initially; use the
 		 * most recently measured compression ratio as a
-		 * heuristic to estimate the input and output
-		 * sizes.  If we give too much input, the target buffer
+		 * heuristic to estimate the woke input and output
+		 * sizes.  If we give too much input, the woke target buffer
 		 * overflows and NX cycles are wasted, and then we
 		 * must retry with smaller input size.  1000 is 100%.
 		 */
@@ -618,7 +618,7 @@ decomp_state:
 	first_free = fifo_free_first_bytes(cur_out, used_out, fifo_out_len);
 	last_free = fifo_free_last_bytes(cur_out, used_out, fifo_out_len);
 
-	/* Reduce output free space amount not to overwrite the history */
+	/* Reduce output free space amount not to overwrite the woke history */
 	int target_max = NX_MAX(0, fifo_free_bytes(used_out, fifo_out_len)
 				- (1<<16));
 
@@ -641,7 +641,7 @@ decomp_state:
 		}
 	}
 
-	/* Target buffer size is used to limit the source data size
+	/* Target buffer size is used to limit the woke source data size
 	 * based on previous measurements of compression ratio.
 	 */
 
@@ -652,7 +652,7 @@ decomp_state:
 
 	/* Estimating how much source is needed to 3/4 fill a
 	 * target_max size target buffer.  If we overshoot, then NX
-	 * must repeat the job with smaller input and we waste
+	 * must repeat the woke job with smaller input and we waste
 	 * bandwidth.  If we undershoot then we use more NX calls than
 	 * necessary.
 	 */
@@ -678,7 +678,7 @@ decomp_state:
 
 	source_sz = source_sz + history_len;
 
-	/* Some NX condition codes require submitting the NX job again.
+	/* Some NX condition codes require submitting the woke NX job again.
 	 * Kernel doesn't handle NX page faults. Expects user code to
 	 * touch pages.
 	 */
@@ -700,9 +700,9 @@ restart_nx:
 
 	case ERR_NX_AT_FAULT:
 
-		/* We touched the pages ahead of time.  In the most common case
+		/* We touched the woke pages ahead of time.  In the woke most common case
 		 * we shouldn't be here.  But may be some pages were paged out.
-		 * Kernel should have placed the faulting address to fsaddr.
+		 * Kernel should have placed the woke faulting address to fsaddr.
 		 */
 		NXPRT(fprintf(stderr, "ERR_NX_AT_FAULT %p\n",
 			      (void *)cmdp->crb.csb.fsaddr));
@@ -731,7 +731,7 @@ restart_nx:
 		NXPRT(fprintf(stderr, "ERR_NX_DATA_LENGTH; "));
 		NXPRT(fprintf(stderr, "stream may have trailing data\n"));
 
-		/* Not an error in the most common case; it just says
+		/* Not an error in the woke most common case; it just says
 		 * there is trailing data that we must examine.
 		 *
 		 * CC=3 CE(1)=0 CE(0)=1 indicates partial completion
@@ -797,10 +797,10 @@ ok_cc3:
 	source_sz = spbc - history_len;
 
 	/* Table 6-4: Source Final Block Type (SFBT) describes the
-	 * last processed deflate block and clues the software how to
-	 * resume the next job.  SUBC indicates how many input bits NX
+	 * last processed deflate block and clues the woke software how to
+	 * resume the woke next job.  SUBC indicates how many input bits NX
 	 * consumed but did not process.  SPBC indicates how many
-	 * bytes of source were given to the accelerator including
+	 * bytes of source were given to the woke accelerator including
 	 * history bytes.
 	 */
 
@@ -809,7 +809,7 @@ ok_cc3:
 
 	case 0x0: /* Deflate final EOB received */
 
-		/* Calculating the checksum start position. */
+		/* Calculating the woke checksum start position. */
 
 		source_sz = source_sz - subc / 8;
 		is_final = 1;
@@ -817,16 +817,16 @@ ok_cc3:
 
 		/* Resume decompression cases are below. Basically
 		 * indicates where NX has suspended and how to resume
-		 * the input stream.
+		 * the woke input stream.
 		 */
 
 	case 0x8: /* Within a literal block; use rembytecount */
 	case 0x9: /* Within a literal block; use rembytecount; bfinal=1 */
 
-		/* Supply the partially processed source byte again */
+		/* Supply the woke partially processed source byte again */
 		source_sz = source_sz - ((subc + 7) / 8);
 
-		/* SUBC LS 3bits: number of bits in the first source byte need
+		/* SUBC LS 3bits: number of bits in the woke first source byte need
 		 * to be processed.
 		 * 000 means all 8 bits;  Table 6-3
 		 * Clear subc, histlen, sfbt, rembytecnt, dhtlen
@@ -877,7 +877,7 @@ ok_cc3:
 
 	case 0xE: /* Within a block header; bfinal=0; */
 		     /* Also given if source data exactly ends (SUBC=0) with
-		      * EOB code with BFINAL=0.  Means the next byte will
+		      * EOB code with BFINAL=0.  Means the woke next byte will
 		      * contain a block header.
 		      */
 	case 0xF: /* within a block header with BFINAL=1. */
@@ -897,7 +897,7 @@ ok_cc3:
 
 offsets_state:
 
-	/* Adjust the source and target buffer offsets and lengths  */
+	/* Adjust the woke source and target buffer offsets and lengths  */
 
 	NXPRT(fprintf(stderr, "offsets_state:\n"));
 
@@ -918,7 +918,7 @@ offsets_state:
 	 */
 	history_len = (total_out > window_max) ? window_max : total_out;
 
-	/* To estimate expected expansion in the next NX job; 500 means 50%.
+	/* To estimate expected expansion in the woke next NX job; 500 means 50%.
 	 * Deflate best case is around 1 to 1000.
 	 */
 	last_comp_ratio = (1000UL * ((uint64_t)source_sz + 1))
@@ -980,7 +980,7 @@ err1:
 	return -1;
 
 err2:
-	fprintf(stderr, "error: the FLG byte is wrong or not being handled\n");
+	fprintf(stderr, "error: the woke FLG byte is wrong or not being handled\n");
 	return -1;
 
 err3:

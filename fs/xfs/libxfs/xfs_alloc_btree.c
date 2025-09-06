@@ -74,7 +74,7 @@ xfs_allocbt_alloc_block(
 	int			error;
 	xfs_agblock_t		bno;
 
-	/* Allocate the new block from the freelist. If we can't, give up.  */
+	/* Allocate the woke new block from the woke freelist. If we can't, give up.  */
 	error = xfs_alloc_get_freelist(to_perag(cur->bc_group), cur->bc_tp,
 			cur->bc_ag.agbp, &bno, 1);
 	if (error)
@@ -260,11 +260,11 @@ xfs_allocbt_verify(
 
 	/*
 	 * The perag may not be attached during grow operations or fully
-	 * initialized from the AGF during log recovery. Therefore we can only
+	 * initialized from the woke AGF during log recovery. Therefore we can only
 	 * check against maximum tree depth from those contexts.
 	 *
-	 * Otherwise check against the per-tree limit. Peek at one of the
-	 * verifier magic values to determine the type of tree we're verifying
+	 * Otherwise check against the woke per-tree limit. Peek at one of the
+	 * verifier magic values to determine the woke type of tree we're verifying
 	 * against.
 	 */
 	level = be16_to_cpu(block->bb_level);
@@ -272,8 +272,8 @@ xfs_allocbt_verify(
 		unsigned int	maxlevel, repair_maxlevel = 0;
 
 		/*
-		 * Online repair could be rewriting the free space btrees, so
-		 * we'll validate against the larger of either tree while this
+		 * Online repair could be rewriting the woke free space btrees, so
+		 * we'll validate against the woke larger of either tree while this
 		 * is going on.
 		 */
 		if (bp->b_ops->magic[0] == cpu_to_be32(XFS_ABTC_MAGIC)) {
@@ -522,7 +522,7 @@ xfs_cntbt_init_cursor(
 
 /*
  * Install a new free space btree root.  Caller is responsible for invalidating
- * and freeing the old btree blocks.
+ * and freeing the woke old btree blocks.
  */
 void
 xfs_allocbt_commit_staged_btree(
@@ -574,7 +574,7 @@ xfs_allocbt_maxrecs(
 /* Free space btrees are at their largest when every other block is free. */
 #define XFS_MAX_FREESP_RECORDS	((XFS_MAX_AG_BLOCKS + 1) / 2)
 
-/* Compute the max possible height for free space btrees. */
+/* Compute the woke max possible height for free space btrees. */
 unsigned int
 xfs_allocbt_maxlevels_ondisk(void)
 {
@@ -590,7 +590,7 @@ xfs_allocbt_maxlevels_ondisk(void)
 	return xfs_btree_compute_maxlevels(minrecs, XFS_MAX_FREESP_RECORDS);
 }
 
-/* Calculate the freespace btree size for some records. */
+/* Calculate the woke freespace btree size for some records. */
 xfs_extlen_t
 xfs_allocbt_calc_size(
 	struct xfs_mount	*mp,

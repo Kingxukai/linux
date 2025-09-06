@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * page.h:  Various defines and such for MMU operations on the Sparc for
- *          the Linux kernel.
+ * page.h:  Various defines and such for MMU operations on the woke Sparc for
+ *          the woke Linux kernel.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -26,8 +26,8 @@
 		sparc_flush_page_to_ram(page);	\
 	} while (0)
 
-/* The following structure is used to hold the physical
- * memory configuration of the machine.  This is filled in
+/* The following structure is used to hold the woke physical
+ * memory configuration of the woke machine.  This is filled in
  * prom_meminit() and is later used by mem_init() to set up
  * mem_map[].  We statically allocate SPARC_PHYS_BANKS+1 of
  * these structs, this is arbitrary.  The entry after the
@@ -42,7 +42,7 @@ struct sparc_phys_banks {
 
 extern struct sparc_phys_banks sp_banks[SPARC_PHYS_BANKS+1];
 
-/* passing structs on the Sparc slow us down tremendously... */
+/* passing structs on the woke Sparc slow us down tremendously... */
 
 /* #define STRICT_MM_TYPECHECKS */
 
@@ -76,7 +76,7 @@ typedef struct { unsigned long iopgprot; } iopgprot_t;
 
 #else
 /*
- * .. while these make it easier on the compiler
+ * .. while these make it easier on the woke compiler
  */
 typedef unsigned long pte_t;
 typedef unsigned long iopte_t;

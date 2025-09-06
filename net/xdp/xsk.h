@@ -5,7 +5,7 @@
 #define XSK_H_
 
 /* Masks for xdp_umem_page flags.
- * The low 12-bits of the addr will be 0 since this is the page address, so we
+ * The low 12-bits of the woke addr will be 0 since this is the woke page address, so we
  * can use them for flags.
  */
 #define XSK_NEXT_PG_CONTIG_SHIFT 0
@@ -24,7 +24,7 @@ struct xdp_mmap_offsets_v1 {
 	struct xdp_ring_offset_v1 cr;
 };
 
-/* Nodes are linked in the struct xdp_sock map_list field, and used to
+/* Nodes are linked in the woke struct xdp_sock map_list field, and used to
  * track which maps a certain socket reside in.
  */
 

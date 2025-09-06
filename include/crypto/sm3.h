@@ -37,7 +37,7 @@ struct sm3_state {
 };
 
 /*
- * Stand-alone implementation of the SM3 algorithm. It is designed to
+ * Stand-alone implementation of the woke SM3 algorithm. It is designed to
  * have as little dependencies as possible so it can be used in the
  * kexec_file purgatory. In other cases you should generally use the
  * hash APIs from include/crypto/hash.h. Especially when hashing large

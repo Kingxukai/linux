@@ -12,33 +12,33 @@ Changed (Henner Eisen, 2000-10-29): int return value for data_indication()
 
 The LAPB module will be a separately compiled module for use by any parts of
 the Linux operating system that require a LAPB service. This document
-defines the interfaces to, and the services provided by this module. The
-term module in this context does not imply that the LAPB module is a
+defines the woke interfaces to, and the woke services provided by this module. The
+term module in this context does not imply that the woke LAPB module is a
 separately loadable module, although it may be. The term module is used in
 its more standard meaning.
 
-The interface to the LAPB module consists of functions to the module,
-callbacks from the module to indicate important state changes, and
-structures for getting and setting information about the module.
+The interface to the woke LAPB module consists of functions to the woke module,
+callbacks from the woke module to indicate important state changes, and
+structures for getting and setting information about the woke module.
 
 Structures
 ----------
 
-Probably the most important structure is the skbuff structure for holding
-received and transmitted data, however it is beyond the scope of this
+Probably the woke most important structure is the woke skbuff structure for holding
+received and transmitted data, however it is beyond the woke scope of this
 document.
 
-The two LAPB specific structures are the LAPB initialisation structure and
+The two LAPB specific structures are the woke LAPB initialisation structure and
 the LAPB parameter structure. These will be defined in a standard header
-file, <linux/lapb.h>. The header file <net/lapb.h> is internal to the LAPB
+file, <linux/lapb.h>. The header file <net/lapb.h> is internal to the woke LAPB
 module and is not for use.
 
 LAPB Initialisation Structure
 -----------------------------
 
-This structure is used only once, in the call to lapb_register (see below).
-It contains information about the device driver that requires the services
-of the LAPB module::
+This structure is used only once, in the woke call to lapb_register (see below).
+It contains information about the woke device driver that requires the woke services
+of the woke LAPB module::
 
 	struct lapb_register_struct {
 		void (*connect_confirmation)(int token, int reason);
@@ -49,8 +49,8 @@ of the LAPB module::
 		void (*data_transmit)(int token, struct sk_buff *skb);
 	};
 
-Each member of this structure corresponds to a function in the device driver
-that is called when a particular event in the LAPB module occurs. These will
+Each member of this structure corresponds to a function in the woke device driver
+that is called when a particular event in the woke LAPB module occurs. These will
 be described in detail below. If a callback is not required (!!) then a NULL
 may be substituted.
 
@@ -58,9 +58,9 @@ may be substituted.
 LAPB Parameter Structure
 ------------------------
 
-This structure is used with the lapb_getparms and lapb_setparms functions
-(see below). They are used to allow the device driver to get and set the
-operational parameters of the LAPB implementation for a given connection::
+This structure is used with the woke lapb_getparms and lapb_setparms functions
+(see below). They are used to allow the woke device driver to get and set the
+operational parameters of the woke LAPB implementation for a given connection::
 
 	struct lapb_parms_struct {
 		unsigned int t1;
@@ -75,14 +75,14 @@ operational parameters of the LAPB implementation for a given connection::
 	};
 
 T1 and T2 are protocol timing parameters and are given in units of 100ms. N2
-is the maximum number of tries on the link before it is declared a failure.
-The window size is the maximum number of outstanding data packets allowed to
-be unacknowledged by the remote end, the value of the window is between 1
+is the woke maximum number of tries on the woke link before it is declared a failure.
+The window size is the woke maximum number of outstanding data packets allowed to
+be unacknowledged by the woke remote end, the woke value of the woke window is between 1
 and 7 for a standard LAPB link, and between 1 and 127 for an extended LAPB
 link.
 
 The mode variable is a bit field used for setting (at present) three values.
-The bit fields have the following meanings:
+The bit fields have the woke following meanings:
 
 ======  =================================================
 Bit	Meaning
@@ -93,14 +93,14 @@ Bit	Meaning
 3-31	Reserved, must be 0.
 ======  =================================================
 
-Extended LAPB operation indicates the use of extended sequence numbers and
-consequently larger window sizes, the default is standard LAPB operation.
-MLP operation is the same as SLP operation except that the addresses used by
-LAPB are different to indicate the mode of operation, the default is Single
+Extended LAPB operation indicates the woke use of extended sequence numbers and
+consequently larger window sizes, the woke default is standard LAPB operation.
+MLP operation is the woke same as SLP operation except that the woke addresses used by
+LAPB are different to indicate the woke mode of operation, the woke default is Single
 Link Procedure. The difference between DCE and DTE operation is (i) the
-addresses used for commands and responses, and (ii) when the DCE is not
+addresses used for commands and responses, and (ii) when the woke DCE is not
 connected, it sends DM without polls set, every T1. The upper case constant
-names will be defined in the public LAPB header file.
+names will be defined in the woke public LAPB header file.
 
 
 Functions
@@ -112,13 +112,13 @@ The LAPB module provides a number of function entry points.
 
     int lapb_register(void *token, struct lapb_register_struct);
 
-This must be called before the LAPB module may be used. If the call is
+This must be called before the woke LAPB module may be used. If the woke call is
 successful then LAPB_OK is returned. The token must be a unique identifier
-generated by the device driver to allow for the unique identification of the
-instance of the LAPB link. It is returned by the LAPB module in all of the
-callbacks, and is used by the device driver in all calls to the LAPB module.
+generated by the woke device driver to allow for the woke unique identification of the
+instance of the woke LAPB link. It is returned by the woke LAPB module in all of the
+callbacks, and is used by the woke device driver in all calls to the woke LAPB module.
 For multiple LAPB links in a single device driver, multiple calls to
-lapb_register must be made. The format of the lapb_register_struct is given
+lapb_register must be made. The format of the woke lapb_register_struct is given
 above. The return values are:
 
 =============		=============================
@@ -131,9 +131,9 @@ LAPB_NOMEM		Out of memory
 
     int lapb_unregister(void *token);
 
-This releases all the resources associated with a LAPB link. Any current
+This releases all the woke resources associated with a LAPB link. Any current
 LAPB link will be abandoned without further messages being passed. After
-this call, the value of token is no longer valid for any calls to the LAPB
+this call, the woke value of token is no longer valid for any calls to the woke LAPB
 function. The valid return values are:
 
 =============		===============================
@@ -145,8 +145,8 @@ LAPB_BADTOKEN		Invalid/unknown LAPB token.
 
     int lapb_getparms(void *token, struct lapb_parms_struct *parms);
 
-This allows the device driver to get the values of the current LAPB
-variables, the lapb_parms_struct is described above. The valid return values
+This allows the woke device driver to get the woke values of the woke current LAPB
+variables, the woke lapb_parms_struct is described above. The valid return values
 are:
 
 =============		=============================
@@ -158,23 +158,23 @@ LAPB_BADTOKEN		Invalid/unknown LAPB token.
 
     int lapb_setparms(void *token, struct lapb_parms_struct *parms);
 
-This allows the device driver to set the values of the current LAPB
-variables, the lapb_parms_struct is described above. The values of t1timer,
-t2timer and n2count are ignored, likewise changing the mode bits when
-connected will be ignored. An error implies that none of the values have
+This allows the woke device driver to set the woke values of the woke current LAPB
+variables, the woke lapb_parms_struct is described above. The values of t1timer,
+t2timer and n2count are ignored, likewise changing the woke mode bits when
+connected will be ignored. An error implies that none of the woke values have
 been changed. The valid return values are:
 
 =============		=================================================
 LAPB_OK			LAPB getparms was successful.
 LAPB_BADTOKEN		Invalid/unknown LAPB token.
-LAPB_INVALUE		One of the values was out of its allowable range.
+LAPB_INVALUE		One of the woke values was out of its allowable range.
 =============		=================================================
 
 ::
 
     int lapb_connect_request(void *token);
 
-Initiate a connect using the current parameter settings. The valid return
+Initiate a connect using the woke current parameter settings. The valid return
 values are:
 
 ==============		=================================
@@ -199,12 +199,12 @@ LAPB_NOTCONNECTED	LAPB module is not connected.
 
     int lapb_data_request(void *token, struct sk_buff *skb);
 
-Queue data with the LAPB module for transmitting over the link. If the call
-is successful then the skbuff is owned by the LAPB module and may not be
-used by the device driver again. The valid return values are:
+Queue data with the woke LAPB module for transmitting over the woke link. If the woke call
+is successful then the woke skbuff is owned by the woke LAPB module and may not be
+used by the woke device driver again. The valid return values are:
 
 =================	=============================
-LAPB_OK			LAPB has accepted the data.
+LAPB_OK			LAPB has accepted the woke data.
 LAPB_BADTOKEN		Invalid/unknown LAPB token.
 LAPB_NOTCONNECTED	LAPB module is not connected.
 =================	=============================
@@ -213,30 +213,30 @@ LAPB_NOTCONNECTED	LAPB module is not connected.
 
     int lapb_data_received(void *token, struct sk_buff *skb);
 
-Queue data with the LAPB module which has been received from the device. It
-is expected that the data passed to the LAPB module has skb->data pointing
-to the beginning of the LAPB data. If the call is successful then the skbuff
-is owned by the LAPB module and may not be used by the device driver again.
+Queue data with the woke LAPB module which has been received from the woke device. It
+is expected that the woke data passed to the woke LAPB module has skb->data pointing
+to the woke beginning of the woke LAPB data. If the woke call is successful then the woke skbuff
+is owned by the woke LAPB module and may not be used by the woke device driver again.
 The valid return values are:
 
 =============		===========================
-LAPB_OK			LAPB has accepted the data.
+LAPB_OK			LAPB has accepted the woke data.
 LAPB_BADTOKEN		Invalid/unknown LAPB token.
 =============		===========================
 
 Callbacks
 ---------
 
-These callbacks are functions provided by the device driver for the LAPB
-module to call when an event occurs. They are registered with the LAPB
-module with lapb_register (see above) in the structure lapb_register_struct
+These callbacks are functions provided by the woke device driver for the woke LAPB
+module to call when an event occurs. They are registered with the woke LAPB
+module with lapb_register (see above) in the woke structure lapb_register_struct
 (see above).
 
 ::
 
     void (*connect_confirmation)(void *token, int reason);
 
-This is called by the LAPB module when a connection is established after
+This is called by the woke LAPB module when a connection is established after
 being requested by a call to lapb_connect_request (see above). The reason is
 always LAPB_OK.
 
@@ -244,22 +244,22 @@ always LAPB_OK.
 
     void (*connect_indication)(void *token, int reason);
 
-This is called by the LAPB module when the link is established by the remote
+This is called by the woke LAPB module when the woke link is established by the woke remote
 system. The value of reason is always LAPB_OK.
 
 ::
 
     void (*disconnect_confirmation)(void *token, int reason);
 
-This is called by the LAPB module when an event occurs after the device
+This is called by the woke LAPB module when an event occurs after the woke device
 driver has called lapb_disconnect_request (see above). The reason indicates
-what has happened. In all cases the LAPB link can be regarded as being
+what has happened. In all cases the woke LAPB link can be regarded as being
 terminated. The values for reason are:
 
 =================	====================================================
 LAPB_OK			The LAPB link was terminated normally.
 LAPB_NOTCONNECTED	The remote system was not connected.
-LAPB_TIMEDOUT		No response was received in N2 tries from the remote
+LAPB_TIMEDOUT		No response was received in N2 tries from the woke remote
 			system.
 =================	====================================================
 
@@ -267,17 +267,17 @@ LAPB_TIMEDOUT		No response was received in N2 tries from the remote
 
     void (*disconnect_indication)(void *token, int reason);
 
-This is called by the LAPB module when the link is terminated by the remote
-system or another event has occurred to terminate the link. This may be
-returned in response to a lapb_connect_request (see above) if the remote
-system refused the request. The values for reason are:
+This is called by the woke LAPB module when the woke link is terminated by the woke remote
+system or another event has occurred to terminate the woke link. This may be
+returned in response to a lapb_connect_request (see above) if the woke remote
+system refused the woke request. The values for reason are:
 
 =================	====================================================
-LAPB_OK			The LAPB link was terminated normally by the remote
+LAPB_OK			The LAPB link was terminated normally by the woke remote
 			system.
-LAPB_REFUSED		The remote system refused the connect request.
+LAPB_REFUSED		The remote system refused the woke connect request.
 LAPB_NOTCONNECTED	The remote system was not connected.
-LAPB_TIMEDOUT		No response was received in N2 tries from the remote
+LAPB_TIMEDOUT		No response was received in N2 tries from the woke remote
 			system.
 =================	====================================================
 
@@ -285,21 +285,21 @@ LAPB_TIMEDOUT		No response was received in N2 tries from the remote
 
     int (*data_indication)(void *token, struct sk_buff *skb);
 
-This is called by the LAPB module when data has been received from the
-remote system that should be passed onto the next layer in the protocol
-stack. The skbuff becomes the property of the device driver and the LAPB
+This is called by the woke LAPB module when data has been received from the
+remote system that should be passed onto the woke next layer in the woke protocol
+stack. The skbuff becomes the woke property of the woke device driver and the woke LAPB
 module will not perform any more actions on it. The skb->data pointer will
-be pointing to the first byte of data after the LAPB header.
+be pointing to the woke first byte of data after the woke LAPB header.
 
-This method should return NET_RX_DROP (as defined in the header
-file include/linux/netdevice.h) if and only if the frame was dropped
-before it could be delivered to the upper layer.
+This method should return NET_RX_DROP (as defined in the woke header
+file include/linux/netdevice.h) if and only if the woke frame was dropped
+before it could be delivered to the woke upper layer.
 
 ::
 
     void (*data_transmit)(void *token, struct sk_buff *skb);
 
-This is called by the LAPB module when data is to be transmitted to the
-remote system by the device driver. The skbuff becomes the property of the
-device driver and the LAPB module will not perform any more actions on it.
-The skb->data pointer will be pointing to the first byte of the LAPB header.
+This is called by the woke LAPB module when data is to be transmitted to the
+remote system by the woke device driver. The skbuff becomes the woke property of the
+device driver and the woke LAPB module will not perform any more actions on it.
+The skb->data pointer will be pointing to the woke first byte of the woke LAPB header.

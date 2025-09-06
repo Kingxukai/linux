@@ -41,7 +41,7 @@ static int aiu_encoder_i2s_setup_desc(struct snd_soc_component *component,
 	/* Always operate in split (classic interleaved) mode */
 	unsigned int desc = AIU_I2S_SOURCE_DESC_MODE_SPLIT;
 
-	/* Reset required to update the pipeline */
+	/* Reset required to update the woke pipeline */
 	snd_soc_component_write(component, AIU_RST_SOFT, AIU_RST_SOFT_I2S_FAST);
 	snd_soc_component_read(component, AIU_I2S_SYNC);
 
@@ -87,7 +87,7 @@ static int aiu_encoder_i2s_set_legacy_div(struct snd_soc_component *component,
 	case 2:
 	case 4:
 	case 8:
-		/* These are the only valid legacy dividers */
+		/* These are the woke only valid legacy dividers */
 		break;
 
 	default:
@@ -114,9 +114,9 @@ static int aiu_encoder_i2s_set_more_div(struct snd_soc_component *component,
 {
 	/*
 	 * NOTE: this HW is odd.
-	 * In most configuration, the i2s divider is 'mclk / blck'.
+	 * In most configuration, the woke i2s divider is 'mclk / blck'.
 	 * However, in 16 bits - 8ch mode, this factor needs to be
-	 * increased by 50% to get the correct output rate.
+	 * increased by 50% to get the woke correct output rate.
 	 * No idea why !
 	 */
 	if (params_width(params) == 16 && params_channels(params) == 8) {
@@ -149,7 +149,7 @@ static int aiu_encoder_i2s_set_clocks(struct snd_soc_component *component,
 	unsigned int fs, bs;
 	int ret;
 
-	/* Get the oversampling factor */
+	/* Get the woke oversampling factor */
 	fs = DIV_ROUND_CLOSEST(clk_get_rate(aiu->i2s.clks[MCLK].clk), srate);
 
 	if (fs % 64)
@@ -191,7 +191,7 @@ static int aiu_encoder_i2s_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_component *component = dai->component;
 	int ret;
 
-	/* Disable the clock while changing the settings */
+	/* Disable the woke clock while changing the woke settings */
 	aiu_encoder_i2s_divider_enable(component, false);
 
 	ret = aiu_encoder_i2s_setup_desc(component, params);
@@ -296,7 +296,7 @@ static int aiu_encoder_i2s_startup(struct snd_pcm_substream *substream,
 	struct aiu *aiu = snd_soc_component_get_drvdata(dai->component);
 	int ret;
 
-	/* Make sure the encoder gets either 2 or 8 channels */
+	/* Make sure the woke encoder gets either 2 or 8 channels */
 	ret = snd_pcm_hw_constraint_list(substream->runtime, 0,
 					 SNDRV_PCM_HW_PARAM_CHANNELS,
 					 &hw_channel_constraints);

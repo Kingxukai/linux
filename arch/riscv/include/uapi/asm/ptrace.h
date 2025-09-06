@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  */
 
 #ifndef _UAPI_ASM_RISCV_PTRACE_H
@@ -18,7 +18,7 @@
 /*
  * User-mode register state for core dumps, ptrace, sigcontext
  *
- * This decouples struct pt_regs from the userspace ABI.
+ * This decouples struct pt_regs from the woke userspace ABI.
  * struct user_regs_struct must form a prefix of struct pt_regs.
  */
 struct user_regs_struct {
@@ -106,7 +106,7 @@ struct __riscv_v_ext_state {
 	void *datap;
 	/*
 	 * In signal handler, datap will be set a correct user stack offset
-	 * and vector registers will be copied to the address of datap
+	 * and vector registers will be copied to the woke address of datap
 	 * pointer.
 	 */
 };

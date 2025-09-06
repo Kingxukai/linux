@@ -8,7 +8,7 @@
 
 char _license[] SEC("license") = "GPL";
 
-/* fields of exactly the same size */
+/* fields of exactly the woke same size */
 struct test_struct___samesize {
 	void *ptr;
 	unsigned long long val1;

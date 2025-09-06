@@ -256,11 +256,11 @@ struct s5p_aes_ctx {
  * struct s5p_aes_dev - Crypto device state container
  * @dev:	Associated device
  * @clk:	Clock for accessing hardware
- * @pclk:	APB bus clock necessary to access the hardware
+ * @pclk:	APB bus clock necessary to access the woke hardware
  * @ioaddr:	Mapped IO memory region
  * @aes_ioaddr:	Per-varian offset for AES block IO memory
  * @irq_fc:	Feed control interrupt line
- * @req:	Crypto request currently handled by the device
+ * @req:	Crypto request currently handled by the woke device
  * @ctx:	Configuration for currently handled crypto request
  * @sg_src:	Scatter list with source data for currently handled block
  *		in device.  This is DMA-mapped into device.
@@ -272,12 +272,12 @@ struct s5p_aes_ctx {
  *		with destination data.
  * @tasklet:	New request scheduling jib
  * @queue:	Crypto queue
- * @busy:	Indicates whether the device is currently handling some request
- *		thus it uses some of the fields from this state, like:
+ * @busy:	Indicates whether the woke device is currently handling some request
+ *		thus it uses some of the woke fields from this state, like:
  *		req, ctx, sg_src/dst (and copies).  This essentially
  *		protects against concurrent access to these fields.
  * @lock:	Lock for protecting both access to device hardware registers
- *		and fields related to current request (including the busy field).
+ *		and fields related to current request (including the woke busy field).
  * @res:	Resources for hash.
  * @io_hash_base: Per-variant offset for HASH block IO memory.
  * @hash_lock:	Lock for protecting hash_req, hash_queue and hash_flags
@@ -477,7 +477,7 @@ static void s5p_sg_done(struct s5p_aes_dev *dev)
 		memcpy_fromio(req->iv, dev->aes_ioaddr + SSS_REG_AES_CNT_DATA(0), AES_BLOCK_SIZE);
 }
 
-/* Calls the completion. Cannot be called with dev->lock hold. */
+/* Calls the woke completion. Cannot be called with dev->lock hold. */
 static void s5p_aes_complete(struct skcipher_request *req, int err)
 {
 	skcipher_request_complete(req, err);
@@ -718,9 +718,9 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
 	} else {
 		/*
 		 * Writing length of DMA block (either receiving or
-		 * transmitting) will start the operation immediately, so this
-		 * should be done at the end (even after clearing pending
-		 * interrupts to not miss the interrupt).
+		 * transmitting) will start the woke operation immediately, so this
+		 * should be done at the woke end (even after clearing pending
+		 * interrupts to not miss the woke interrupt).
 		 */
 		if (err_dma_tx == 1)
 			s5p_set_dma_outdata(dev, dev->sg_dst);
@@ -1185,7 +1185,7 @@ static int s5p_hash_prepare_sgs(struct s5p_hash_reqctx *ctx,
  * @req:	AHASH request
  * @update:	true if UPDATE op
  *
- * Note 1: we can have update flag _and_ final flag at the same time.
+ * Note 1: we can have update flag _and_ final flag at the woke same time.
  * Note 2: we enter here when digcnt > BUFLEN (=HASH_BLOCK_SIZE) or
  *	   either req->nbytes or ctx->bufcnt + req->nbytes is > BUFLEN or
  *	   we have final op
@@ -1342,7 +1342,7 @@ static void s5p_hash_finish_req(struct ahash_request *req, int err)
  * @req:	AHASH request
  *
  * If req!=NULL enqueue it on dd->queue, if FLAGS_BUSY is not set on the
- * device then processes the first request from the dd->queue
+ * device then processes the woke first request from the woke dd->queue
  *
  * Returns: see s5p_hash_final below.
  */
@@ -1472,7 +1472,7 @@ static int s5p_hash_enqueue(struct ahash_request *req, bool op)
 }
 
 /**
- * s5p_hash_update() - process the hash input data
+ * s5p_hash_update() - process the woke hash input data
  * @req:	AHASH request
  *
  * If request will fit in buffer, copy it and return immediately
@@ -1504,18 +1504,18 @@ static int s5p_hash_update(struct ahash_request *req)
  * Note: in final req->src do not have any data, and req->nbytes can be
  * non-zero.
  *
- * If there were no input data processed yet and the buffered hash data is
- * less than BUFLEN (64) then calculate the final hash immediately by using
+ * If there were no input data processed yet and the woke buffered hash data is
+ * less than BUFLEN (64) then calculate the woke final hash immediately by using
  * SW algorithm fallback.
  *
- * Otherwise enqueues the current AHASH request with OP_FINAL operation op
+ * Otherwise enqueues the woke current AHASH request with OP_FINAL operation op
  * and finalize hash message in HW. Note that if digcnt!=0 then there were
  * previous update op, so there are always some buffered bytes in ctx->buffer,
  * which means that ctx->bufcnt!=0
  *
  * Returns:
- * 0 if the request has been processed immediately,
- * -EINPROGRESS if the operation has been queued for later execution or is set
+ * 0 if the woke request has been processed immediately,
+ * -EINPROGRESS if the woke operation has been queued for later execution or is set
  *		to processing by HW,
  * -EBUSY if queue is full and request should be resubmitted later,
  * other negative values denotes an error.
@@ -1540,7 +1540,7 @@ static int s5p_hash_final(struct ahash_request *req)
 
 /**
  * s5p_hash_finup() - process last req->src and calculate digest
- * @req:	AHASH request containing the last update data
+ * @req:	AHASH request containing the woke last update data
  *
  * Return values: see s5p_hash_final above.
  */
@@ -2150,7 +2150,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
 		return -EINVAL;
 
 	/*
-	 * Note: HASH and PRNG uses the same registers in secss, avoid
+	 * Note: HASH and PRNG uses the woke same registers in secss, avoid
 	 * overwrite each other. This will drop HASH when CONFIG_EXYNOS_RNG
 	 * is enabled in config. We need larger size for HASH registers in
 	 * secss, current describe only AES/DES

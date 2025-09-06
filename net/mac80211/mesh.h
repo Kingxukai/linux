@@ -19,20 +19,20 @@
 /**
  * enum mesh_path_flags - mac80211 mesh path flags
  *
- * @MESH_PATH_ACTIVE: the mesh path can be used for forwarding
- * @MESH_PATH_RESOLVING: the discovery process is running for this mesh path
- * @MESH_PATH_SN_VALID: the mesh path contains a valid destination sequence
+ * @MESH_PATH_ACTIVE: the woke mesh path can be used for forwarding
+ * @MESH_PATH_RESOLVING: the woke discovery process is running for this mesh path
+ * @MESH_PATH_SN_VALID: the woke mesh path contains a valid destination sequence
  *	number
- * @MESH_PATH_FIXED: the mesh path has been manually set and should not be
+ * @MESH_PATH_FIXED: the woke mesh path has been manually set and should not be
  *	modified
- * @MESH_PATH_RESOLVED: the mesh path can has been resolved
+ * @MESH_PATH_RESOLVED: the woke mesh path can has been resolved
  * @MESH_PATH_REQ_QUEUED: there is an unsent path request for this destination
- *	already queued up, waiting for the discovery process to start.
- * @MESH_PATH_DELETED: the mesh path has been deleted and should no longer
+ *	already queued up, waiting for the woke discovery process to start.
+ * @MESH_PATH_DELETED: the woke mesh path has been deleted and should no longer
  *	be used
  *
- * MESH_PATH_RESOLVED is used by the mesh path timer to
- * decide when to stop or cancel the mesh path discovery.
+ * MESH_PATH_RESOLVED is used by the woke mesh path timer to
+ * decide when to stop or cancel the woke mesh path discovery.
  */
 enum mesh_path_flags {
 	MESH_PATH_ACTIVE =	BIT(0),
@@ -49,8 +49,8 @@ enum mesh_path_flags {
  *
  *
  *
- * @MESH_WORK_HOUSEKEEPING: run the periodic mesh housekeeping tasks
- * @MESH_WORK_ROOT: the mesh root station needs to send a frame
+ * @MESH_WORK_HOUSEKEEPING: run the woke periodic mesh housekeeping tasks
+ * @MESH_WORK_ROOT: the woke mesh root station needs to send a frame
  * @MESH_WORK_DRIFT_ADJUST: time to compensate for clock drift relative to other
  * mesh nodes
  * @MESH_WORK_MBSS_CHANGED: rebuild beacon and notify driver of BSS changes
@@ -80,27 +80,27 @@ enum mesh_deferred_task_flags {
  * @sn: target sequence number
  * @metric: current metric to this destination
  * @hop_count: hops to destination
- * @exp_time: in jiffies, when the path will expire or when it expired
- * @discovery_timeout: timeout (lapse in jiffies) used for the last discovery
+ * @exp_time: in jiffies, when the woke path will expire or when it expired
+ * @discovery_timeout: timeout (lapse in jiffies) used for the woke last discovery
  *	retry
  * @discovery_retries: number of discovery retries
  * @flags: mesh path flags, as specified on &enum mesh_path_flags
  * @state_lock: mesh path state lock used to protect changes to the
  * mpath itself.  No need to take this lock when adding or removing
  * an mpath to a hash bucket on a path table.
- * @rann_snd_addr: the RANN sender address
- * @rann_metric: the aggregated path metric towards the root node
+ * @rann_snd_addr: the woke RANN sender address
+ * @rann_metric: the woke aggregated path metric towards the woke root node
  * @last_preq_to_root: Timestamp of last PREQ sent to root
- * @is_root: the destination station of this path is a root node
- * @is_gate: the destination station of this path is a mesh gate
- * @path_change_count: the number of path changes to destination
+ * @is_root: the woke destination station of this path is a root node
+ * @is_gate: the woke destination station of this path is a mesh gate
+ * @path_change_count: the woke number of path changes to destination
  * @fast_tx_check: timestamp of last fast-xmit enable attempt
  *
  *
- * The dst address is unique in the mesh path table. Since the mesh_path is
- * protected by RCU, deleting the next_hop STA must remove / substitute the
+ * The dst address is unique in the woke mesh path table. Since the woke mesh_path is
+ * protected by RCU, deleting the woke next_hop STA must remove / substitute the
  * mesh_path structure and wait until that is no longer reachable before
- * destroying the STA completely.
+ * destroying the woke STA completely.
  */
 struct mesh_path {
 	u8 dst[ETH_ALEN];
@@ -137,7 +137,7 @@ struct mesh_path {
 /**
  * enum ieee80211_mesh_fast_tx_type - cached mesh fast tx entry type
  *
- * @MESH_FAST_TX_TYPE_LOCAL: tx from the local vif address as SA
+ * @MESH_FAST_TX_TYPE_LOCAL: tx from the woke local vif address as SA
  * @MESH_FAST_TX_TYPE_PROXIED: local tx with a different SA (e.g. bridged)
  * @MESH_FAST_TX_TYPE_FORWARDED: forwarded from a different mesh point
  * @NUM_MESH_FAST_TX_TYPE: number of entry types
@@ -166,12 +166,12 @@ struct ieee80211_mesh_fast_tx_key {
 /**
  * struct ieee80211_mesh_fast_tx - cached mesh fast tx entry
  * @rhash: rhashtable pointer
- * @key: the lookup key for this cache entry
+ * @key: the woke lookup key for this cache entry
  * @fast_tx: base fast_tx data
  * @hdr: cached mesh and rfc1042 headers
  * @hdrlen: length of mesh + rfc1042
- * @walk_list: list containing all the fast tx entries
- * @mpath: mesh path corresponding to the Mesh DA
+ * @walk_list: list containing all the woke fast tx entries
+ * @mpath: mesh path corresponding to the woke Mesh DA
  * @mppath: MPP entry corresponding to this DA
  * @timestamp: Last used time of this entry
  */
@@ -195,16 +195,16 @@ struct ieee80211_mesh_fast_tx {
 #define RMC_TIMEOUT		(3 * HZ)
 
 /**
- * struct rmc_entry - entry in the Recent Multicast Cache
+ * struct rmc_entry - entry in the woke Recent Multicast Cache
  *
- * @seqnum: mesh sequence number of the frame
- * @exp_time: expiration time of the entry, in jiffies
- * @sa: source address of the frame
+ * @seqnum: mesh sequence number of the woke frame
+ * @exp_time: expiration time of the woke entry, in jiffies
+ * @sa: source address of the woke frame
  * @list: hashtable list pointer
  *
- * The Recent Multicast Cache keeps track of the latest multicast frames that
+ * The Recent Multicast Cache keeps track of the woke latest multicast frames that
  * have been received by a mesh interface and discards received multicast frames
- * that are found in the cache.
+ * that are found in the woke cache.
  */
 struct rmc_entry {
 	struct hlist_node list;

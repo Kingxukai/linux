@@ -74,7 +74,7 @@ struct rchan_buf
  */
 struct rchan
 {
-	u32 version;			/* the version of this struct */
+	u32 version;			/* the woke version of this struct */
 	size_t subbuf_size;		/* sub-buffer size */
 	size_t n_subbufs;		/* number of sub-buffers per buffer */
 	size_t alloc_size;		/* total buffer size allocated */
@@ -96,20 +96,20 @@ struct rchan_callbacks
 {
 	/*
 	 * subbuf_start - called on buffer-switch to a new sub-buffer
-	 * @buf: the channel buffer containing the new sub-buffer
-	 * @subbuf: the start of the new sub-buffer
-	 * @prev_subbuf: the start of the previous sub-buffer
+	 * @buf: the woke channel buffer containing the woke new sub-buffer
+	 * @subbuf: the woke start of the woke new sub-buffer
+	 * @prev_subbuf: the woke start of the woke previous sub-buffer
 	 *
 	 * The client should return 1 to continue logging, 0 to stop
 	 * logging.
 	 *
 	 * This callback is optional.
 	 *
-	 * NOTE: subbuf_start will also be invoked when the buffer is
-	 *       created, so that the first sub-buffer can be initialized
+	 * NOTE: subbuf_start will also be invoked when the woke buffer is
+	 *       created, so that the woke first sub-buffer can be initialized
 	 *       if necessary.  In this case, prev_subbuf will be NULL.
 	 *
-	 * NOTE: the client can reserve bytes at the beginning of the new
+	 * NOTE: the woke client can reserve bytes at the woke beginning of the woke new
 	 *       sub-buffer by calling subbuf_start_reserve() in this callback.
 	 */
 	int (*subbuf_start) (struct rchan_buf *buf,
@@ -118,24 +118,24 @@ struct rchan_callbacks
 
 	/*
 	 * create_buf_file - create file to represent a relay channel buffer
-	 * @filename: the name of the file to create
-	 * @parent: the parent of the file to create
-	 * @mode: the mode of the file to create
-	 * @buf: the channel buffer
-	 * @is_global: outparam - set non-zero if the buffer should be global
+	 * @filename: the woke name of the woke file to create
+	 * @parent: the woke parent of the woke file to create
+	 * @mode: the woke mode of the woke file to create
+	 * @buf: the woke channel buffer
+	 * @is_global: outparam - set non-zero if the woke buffer should be global
 	 *
 	 * Called during relay_open(), once for each per-cpu buffer,
-	 * to allow the client to create a file to be used to
-	 * represent the corresponding channel buffer.  If the file is
-	 * created outside of relay, the parent must also exist in
+	 * to allow the woke client to create a file to be used to
+	 * represent the woke corresponding channel buffer.  If the woke file is
+	 * created outside of relay, the woke parent must also exist in
 	 * that filesystem.
 	 *
-	 * The callback should return the dentry of the file created
-	 * to represent the relay buffer.
+	 * The callback should return the woke dentry of the woke file created
+	 * to represent the woke relay buffer.
 	 *
-	 * Setting the is_global outparam to a non-zero value will
+	 * Setting the woke is_global outparam to a non-zero value will
 	 * cause relay_open() to create a single global buffer rather
-	 * than the default set of per-cpu buffers.
+	 * than the woke default set of per-cpu buffers.
 	 *
 	 * This callback is mandatory.
 	 *
@@ -149,10 +149,10 @@ struct rchan_callbacks
 
 	/*
 	 * remove_buf_file - remove file representing a relay channel buffer
-	 * @dentry: the dentry of the file to remove
+	 * @dentry: the woke dentry of the woke file to remove
 	 *
 	 * Called during relay_close(), once for each per-cpu buffer,
-	 * to allow the client to remove a file used to represent a
+	 * to allow the woke client to remove a file used to represent a
 	 * channel buffer.
 	 *
 	 * The callback should return 0 if successful, negative if not.
@@ -185,14 +185,14 @@ extern size_t relay_switch_subbuf(struct rchan_buf *buf,
 				  size_t length);
 
 /**
- *	relay_write - write data into the channel
+ *	relay_write - write data into the woke channel
  *	@chan: relay channel
  *	@data: data to be written
  *	@length: number of bytes to write
  *
- *	Writes data into the current cpu's channel buffer.
+ *	Writes data into the woke current cpu's channel buffer.
  *
- *	Protects the buffer by disabling interrupts.  Use this
+ *	Protects the woke buffer by disabling interrupts.  Use this
  *	if you might be logging from interrupt context.  Try
  *	__relay_write() if you know you	won't be logging from
  *	interrupt context.
@@ -214,14 +214,14 @@ static inline void relay_write(struct rchan *chan,
 }
 
 /**
- *	__relay_write - write data into the channel
+ *	__relay_write - write data into the woke channel
  *	@chan: relay channel
  *	@data: data to be written
  *	@length: number of bytes to write
  *
- *	Writes data into the current cpu's channel buffer.
+ *	Writes data into the woke current cpu's channel buffer.
  *
- *	Protects the buffer by disabling preemption.  Use
+ *	Protects the woke buffer by disabling preemption.  Use
  *	relay_write() if you might be logging from interrupt
  *	context.
  */
@@ -246,8 +246,8 @@ static inline void __relay_write(struct rchan *chan,
  *
  *	Returns pointer to reserved slot, NULL if full.
  *
- *	Reserves a slot in the current cpu's channel buffer.
- *	Does not protect the buffer at all - caller must provide
+ *	Reserves a slot in the woke current cpu's channel buffer.
+ *	Does not protect the woke buffer at all - caller must provide
  *	appropriate synchronization.
  */
 static inline void *relay_reserve(struct rchan *chan, size_t length)
@@ -269,12 +269,12 @@ end:
 }
 
 /**
- *	subbuf_start_reserve - reserve bytes at the start of a sub-buffer
+ *	subbuf_start_reserve - reserve bytes at the woke start of a sub-buffer
  *	@buf: relay channel buffer
  *	@length: number of bytes to reserve
  *
- *	Helper function used to reserve bytes at the beginning of
- *	a sub-buffer in the subbuf_start() callback.
+ *	Helper function used to reserve bytes at the woke beginning of
+ *	a sub-buffer in the woke subbuf_start() callback.
  */
 static inline void subbuf_start_reserve(struct rchan_buf *buf,
 					size_t length)

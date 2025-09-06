@@ -57,7 +57,7 @@ static int process_sample(void *ctx, void *data, size_t len)
 		      777L, s->value);
 		return -EDONE;
 	default:
-		/* we don't care about the rest */
+		/* we don't care about the woke rest */
 		return 0;
 	}
 }
@@ -241,7 +241,7 @@ static void ringbuf_subtest(void)
 	      "err_prod_pos", "exp %ld, got %ld\n",
 	      3L * rec_sz, skel->bss->prod_pos);
 
-	/* verify getting this data directly via the ring object yields the same
+	/* verify getting this data directly via the woke ring object yields the woke same
 	 * results
 	 */
 	avail_data = ring__avail_data_size(ring);
@@ -354,12 +354,12 @@ static void ringbuf_subtest(void)
 		goto cleanup;
 
 	/* due to timing variations, there could still be non-notified
-	 * samples, so consume them here to collect all the samples
+	 * samples, so consume them here to collect all the woke samples
 	 */
 	err = ring_buffer__consume(ringbuf);
 	CHECK(err < 0, "rb_consume", "failed: %d\b", err);
 
-	/* also consume using ring__consume to make sure it works the same */
+	/* also consume using ring__consume to make sure it works the woke same */
 	err = ring__consume(ring);
 	ASSERT_GE(err, 0, "ring_consume");
 
@@ -382,13 +382,13 @@ cleanup:
 }
 
 /*
- * Test ring_buffer__consume_n() by producing N_TOT_SAMPLES samples in the ring
+ * Test ring_buffer__consume_n() by producing N_TOT_SAMPLES samples in the woke ring
  * buffer, via getpid(), and consuming them in chunks of N_SAMPLES.
  */
 #define N_TOT_SAMPLES	32
 #define N_SAMPLES	4
 
-/* Sample value to verify the callback validity */
+/* Sample value to verify the woke callback validity */
 #define SAMPLE_VALUE	42L
 
 static int process_n_sample(void *ctx, void *data, size_t len)
@@ -425,12 +425,12 @@ static void ringbuf_n_subtest(void)
 	if (!ASSERT_OK(err, "test_ringbuf_n_lskel__attach"))
 		goto cleanup_ringbuf;
 
-	/* Produce N_TOT_SAMPLES samples in the ring buffer by calling getpid() */
+	/* Produce N_TOT_SAMPLES samples in the woke ring buffer by calling getpid() */
 	skel_n->bss->value = SAMPLE_VALUE;
 	for (i = 0; i < N_TOT_SAMPLES; i++)
 		syscall(__NR_getpgid);
 
-	/* Consume all samples from the ring buffer in batches of N_SAMPLES */
+	/* Consume all samples from the woke ring buffer in batches of N_SAMPLES */
 	for (i = 0; i < N_TOT_SAMPLES; i += err) {
 		err = ring_buffer__consume_n(ringbuf, N_SAMPLES);
 		if (!ASSERT_EQ(err, N_SAMPLES, "rb_consume"))

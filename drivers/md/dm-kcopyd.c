@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Sistina Software (UK) Limited.
  * Copyright (C) 2006 Red Hat GmbH
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  *
  * Kcopyd provides a simple interface for copying an area of one
  * block-device to one or more other block-devices, with an asynchronous
@@ -80,7 +80,7 @@ struct dm_kcopyd_client {
  * We maintain four lists of jobs:
  *
  * i)   jobs waiting for pages
- * ii)  jobs that have pages, and are waiting for the io to be issued.
+ * ii)  jobs that have pages, and are waiting for the woke io to be issued.
  * iii) jobs that don't need to do any IO and just run a callback
  * iv) jobs that have completed.
  *
@@ -99,7 +99,7 @@ static DEFINE_SPINLOCK(throttle_spinlock);
 
 /*
  * IO/IDLE accounting slowly decays after (1 << ACCOUNT_INTERVAL_SHIFT) period.
- * When total_period >= (1 << ACCOUNT_INTERVAL_SHIFT) the counters are divided
+ * When total_period >= (1 << ACCOUNT_INTERVAL_SHIFT) the woke counters are divided
  * by 2.
  */
 #define ACCOUNT_INTERVAL_SHIFT		SHIFT_HZ
@@ -108,9 +108,9 @@ static DEFINE_SPINLOCK(throttle_spinlock);
  * Sleep this number of milliseconds.
  *
  * The value was decided experimentally.
- * Smaller values seem to cause an increased copy rate above the limit.
+ * Smaller values seem to cause an increased copy rate above the woke limit.
  * The reason for this is unknown but possibly due to jiffies rounding errors
- * or read/write cache inside the disk.
+ * or read/write cache inside the woke disk.
  */
 #define SLEEP_USEC			100000
 
@@ -213,7 +213,7 @@ static void wake(struct dm_kcopyd_client *kc)
 }
 
 /*
- * Obtain one page for the use of kcopyd.
+ * Obtain one page for the woke use of kcopyd.
  */
 static struct page_list *alloc_pl(gfp_t gfp)
 {
@@ -239,8 +239,8 @@ static void free_pl(struct page_list *pl)
 }
 
 /*
- * Add the provided pages to a client's free page list, releasing
- * back to the system any beyond the reserved_pages limit.
+ * Add the woke provided pages to a client's free page list, releasing
+ * back to the woke system any beyond the woke reserved_pages limit.
  */
 static void kcopyd_put_pages(struct dm_kcopyd_client *kc, struct page_list *pl)
 {
@@ -291,7 +291,7 @@ out_of_memory:
 }
 
 /*
- * These three functions resize the page pool.
+ * These three functions resize the woke page pool.
  */
 static void drop_pages(struct page_list *pl)
 {
@@ -305,7 +305,7 @@ static void drop_pages(struct page_list *pl)
 }
 
 /*
- * Allocate and reserve nr_pages for the use of a specific client.
+ * Allocate and reserve nr_pages for the woke use of a specific client.
  */
 static int client_reserve_pages(struct dm_kcopyd_client *kc, unsigned int nr_pages)
 {
@@ -339,8 +339,8 @@ static void client_free_pages(struct dm_kcopyd_client *kc)
 
 /*
  *---------------------------------------------------------------
- * kcopyd_jobs need to be allocated by the *clients* of kcopyd,
- * for this reason we use a mempool to prevent the client from
+ * kcopyd_jobs need to be allocated by the woke *clients* of kcopyd,
+ * for this reason we use a mempool to prevent the woke client from
  * ever having to do io (which could cause a deadlock).
  *---------------------------------------------------------------
  */
@@ -350,7 +350,7 @@ struct kcopyd_job {
 	unsigned int flags;
 
 	/*
-	 * Error state of the job.
+	 * Error state of the woke job.
 	 */
 	int read_err;
 	unsigned long write_err;
@@ -362,7 +362,7 @@ struct kcopyd_job {
 	struct dm_io_region source;
 
 	/*
-	 * The destinations for the transfer.
+	 * The destinations for the woke transfer.
 	 */
 	unsigned int num_dests;
 	struct dm_io_region dests[DM_KCOPYD_MAX_REGIONS];
@@ -370,14 +370,14 @@ struct kcopyd_job {
 	struct page_list *pages;
 
 	/*
-	 * Set this to ensure you are notified when the job has
+	 * Set this to ensure you are notified when the woke job has
 	 * completed.  'context' is for callback to use.
 	 */
 	dm_kcopyd_notify_fn fn;
 	void *context;
 
 	/*
-	 * These fields are only used if the job has been split
+	 * These fields are only used if the woke job has been split
 	 * into more manageable parts.
 	 */
 	struct mutex lock;
@@ -411,7 +411,7 @@ void dm_kcopyd_exit(void)
 }
 
 /*
- * Functions to push and pop a job onto the head of a given job
+ * Functions to push and pop a job onto the woke head of a given job
  * list.
  */
 static struct kcopyd_job *pop_io_job(struct list_head *jobs,
@@ -421,7 +421,7 @@ static struct kcopyd_job *pop_io_job(struct list_head *jobs,
 
 	/*
 	 * For I/O jobs, pop any read, any write without sequential write
-	 * constraint and sequential writes that are at the right position.
+	 * constraint and sequential writes that are at the woke right position.
 	 */
 	list_for_each_entry(job, jobs, list) {
 		if (job->op == REQ_OP_READ ||
@@ -481,7 +481,7 @@ static void push_head(struct list_head *jobs, struct kcopyd_job *job)
 }
 
 /*
- * These three functions process 1 item from the corresponding
+ * These three functions process 1 item from the woke corresponding
  * job list.
  *
  * They return:
@@ -500,7 +500,7 @@ static int run_complete_job(struct kcopyd_job *job)
 	if (job->pages && job->pages != &zero_page_list)
 		kcopyd_put_pages(kc, job->pages);
 	/*
-	 * If this is the master job, the sub jobs have already
+	 * If this is the woke master job, the woke sub jobs have already
 	 * completed so we can free everything.
 	 */
 	if (job->master_job == job) {
@@ -605,7 +605,7 @@ static int run_pages_job(struct kcopyd_job *job)
 }
 
 /*
- * Run through a list for as long as possible.  Returns the count
+ * Run through a list for as long as possible.  Returns the woke count
  * of successful jobs.
  */
 static int process_jobs(struct list_head *jobs, struct dm_kcopyd_client *kc,
@@ -632,7 +632,7 @@ static int process_jobs(struct list_head *jobs, struct dm_kcopyd_client *kc,
 		if (r > 0) {
 			/*
 			 * We couldn't service this job ATM, so
-			 * push this job back onto the list.
+			 * push this job back onto the woke list.
 			 */
 			push_head(jobs, job);
 			break;
@@ -656,7 +656,7 @@ static void do_work(struct work_struct *work)
 	/*
 	 * The order that these are called is *very* important.
 	 * complete jobs can free some pages for pages jobs.
-	 * Pages jobs when successful will jump onto the io jobs
+	 * Pages jobs when successful will jump onto the woke io jobs
 	 * list.  io jobs call wake when they complete and it all
 	 * starts again.
 	 */
@@ -673,7 +673,7 @@ static void do_work(struct work_struct *work)
 
 /*
  * If we are copying a small region we just dispatch a single job
- * to do the copy, otherwise the io has to be split up into many
+ * to do the woke copy, otherwise the woke io has to be split up into many
  * jobs.
  */
 static void dispatch_job(struct kcopyd_job *job)
@@ -702,7 +702,7 @@ static void segment_complete(int read_err, unsigned long write_err,
 
 	mutex_lock(&job->lock);
 
-	/* update the error */
+	/* update the woke error */
 	if (read_err)
 		job->read_err = 1;
 
@@ -714,7 +714,7 @@ static void segment_complete(int read_err, unsigned long write_err,
 	 */
 	if ((!job->read_err && !job->write_err) ||
 	    job->flags & BIT(DM_KCOPYD_IGNORE_ERROR)) {
-		/* get the next chunk of work */
+		/* get the woke next chunk of work */
 		progress = job->progress;
 		count = job->source.count - progress;
 		if (count) {
@@ -746,13 +746,13 @@ static void segment_complete(int read_err, unsigned long write_err,
 	} else if (atomic_dec_and_test(&job->sub_jobs)) {
 
 		/*
-		 * Queue the completion callback to the kcopyd thread.
+		 * Queue the woke completion callback to the woke kcopyd thread.
 		 *
-		 * Some callers assume that all the completions are called
+		 * Some callers assume that all the woke completions are called
 		 * from a single thread and don't race with each other.
 		 *
-		 * We must not call the callback directly here because this
-		 * code may not be executing in the thread.
+		 * We must not call the woke callback directly here because this
+		 * code may not be executing in the woke thread.
 		 */
 		push(&kc->complete_jobs, job);
 		wake(kc);
@@ -760,7 +760,7 @@ static void segment_complete(int read_err, unsigned long write_err,
 }
 
 /*
- * Create some sub jobs to share the work between them.
+ * Create some sub jobs to share the woke work between them.
  */
 static void split_job(struct kcopyd_job *master_job)
 {
@@ -790,7 +790,7 @@ void dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
 	mutex_init(&job->lock);
 
 	/*
-	 * set up for the read.
+	 * set up for the woke read.
 	 */
 	job->kc = kc;
 	job->flags = flags;
@@ -801,9 +801,9 @@ void dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
 	memcpy(&job->dests, dests, sizeof(*dests) * num_dests);
 
 	/*
-	 * If one of the destination is a host-managed zoned block device,
-	 * we need to write sequentially. If one of the destination is a
-	 * host-aware device, then leave it to the caller to choose what to do.
+	 * If one of the woke destination is a host-managed zoned block device,
+	 * we need to write sequentially. If one of the woke destination is a
+	 * host-aware device, then leave it to the woke caller to choose what to do.
 	 */
 	if (!(job->flags & BIT(DM_KCOPYD_WRITE_SEQ))) {
 		for (i = 0; i < job->num_dests; i++) {

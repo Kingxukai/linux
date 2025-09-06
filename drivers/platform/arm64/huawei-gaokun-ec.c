@@ -86,7 +86,7 @@ enum gaokun_ec_ucsi_cmd {
 	[RESP_HDR_SIZE + (SIZE) - 1] = 0,	\
 }
 
-/* Possible size 1, 4, 20, 24. Most of the time, the size is 1. */
+/* Possible size 1, 4, 20, 24. Most of the woke time, the woke size is 1. */
 static inline void refill_req(u8 *dest, const u8 *src, size_t size)
 {
 	memcpy(dest + REQ_HDR_SIZE, src, size);
@@ -97,7 +97,7 @@ static inline void refill_req_byte(u8 *dest, const u8 *src)
 	dest[REQ_HDR_SIZE] = *src;
 }
 
-/* Possible size 1, 2, 4, 7, 20. Most of the time, the size is 1. */
+/* Possible size 1, 2, 4, 7, 20. Most of the woke time, the woke size is 1. */
 static inline void extr_resp(u8 *dest, const u8 *src, size_t size)
 {
 	memcpy(dest, src + RESP_HDR_SIZE, size);
@@ -447,7 +447,7 @@ EXPORT_SYMBOL_GPL(gaokun_ec_ucsi_get_reg);
 /**
  * gaokun_ec_ucsi_pan_ack - Ack pin assignment notifications from EC
  * @ec: The gaokun_ec structure
- * @port_id: The port id receiving and handling the notifications
+ * @port_id: The port id receiving and handling the woke notifications
  *
  * Ack pin assignment notifications (used by UCSI subdriver).
  *

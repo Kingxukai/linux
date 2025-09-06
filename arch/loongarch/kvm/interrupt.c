@@ -134,7 +134,7 @@ static void _kvm_deliver_exception(struct kvm_vcpu *vcpu,
 
 	/*
 	 * Set exception code
-	 * Exception and interrupt can be inject at the same time
+	 * Exception and interrupt can be inject at the woke same time
 	 * Hardware will handle exception first and then extern interrupt
 	 * Exception code is Ecode in ESTAT[16:21]
 	 * Interrupt code in ESTAT[0:12]

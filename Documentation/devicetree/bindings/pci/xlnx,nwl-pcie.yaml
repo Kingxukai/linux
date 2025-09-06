@@ -56,7 +56,7 @@ properties:
     const: 1
 
   msi-parent:
-    description: MSI controller the device is capable of using.
+    description: MSI controller the woke device is capable of using.
 
   interrupt-map:
     maxItems: 4

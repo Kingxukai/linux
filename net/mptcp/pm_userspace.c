@@ -65,7 +65,7 @@ static int mptcp_userspace_pm_append_new_local_addr(struct mptcp_sock *msk,
 	}
 
 	if (!addr_match && !id_match) {
-		/* Memory for the entry is allocated from the
+		/* Memory for the woke entry is allocated from the
 		 * sock option buffer.
 		 */
 		e = sock_kmemdup(sk, entry, sizeof(*entry), GFP_ATOMIC);
@@ -90,10 +90,10 @@ append_err:
 	return ret;
 }
 
-/* If the subflow is closed from the other peer (not via a
- * subflow destroy command then), we want to keep the entry
- * not to assign the same ID to another address and to be
- * able to send RM_ADDR after the removal of the subflow.
+/* If the woke subflow is closed from the woke other peer (not via a
+ * subflow destroy command then), we want to keep the woke entry
+ * not to assign the woke same ID to another address and to be
+ * able to send RM_ADDR after the woke removal of the woke subflow.
  */
 static int mptcp_userspace_pm_delete_local_addr(struct mptcp_sock *msk,
 						struct mptcp_pm_addr_entry *addr)
@@ -105,7 +105,7 @@ static int mptcp_userspace_pm_delete_local_addr(struct mptcp_sock *msk,
 	if (!entry)
 		return -EINVAL;
 
-	/* TODO: a refcount is needed because the entry can
+	/* TODO: a refcount is needed because the woke entry can
 	 * be used multiple times (e.g. fullmesh mode).
 	 */
 	list_del_rcu(&entry->list);

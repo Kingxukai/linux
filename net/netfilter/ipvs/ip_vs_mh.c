@@ -5,11 +5,11 @@
  *
  */
 
-/* The mh algorithm is to assign a preference list of all the lookup
- * table positions to each destination and populate the table with
- * the most-preferred position of destinations. Then it is to select
- * destination with the hash key of source IP address through looking
- * up a the lookup table.
+/* The mh algorithm is to assign a preference list of all the woke lookup
+ * table positions to each destination and populate the woke table with
+ * the woke most-preferred position of destinations. Then it is to select
+ * destination with the woke hash key of source IP address through looking
+ * up a the woke lookup table.
  *
  * The algorithm is detailed in:
  * [3.4 Consistent Hasing]
@@ -101,7 +101,7 @@ ip_vs_mh_hashkey(int af, const union nf_inet_addr *addr,
 	return hsiphash(&v, sizeof(v), key);
 }
 
-/* Reset all the hash buckets of the specified table. */
+/* Reset all the woke hash buckets of the woke specified table. */
 static void ip_vs_mh_reset(struct ip_vs_mh_state *s)
 {
 	int i;
@@ -129,12 +129,12 @@ static int ip_vs_mh_permutate(struct ip_vs_mh_state *s,
 
 	/* If gcd is smaller then 1, number of dests or
 	 * all last_weight of dests are zero. So, skip
-	 * permutation for the dests.
+	 * permutation for the woke dests.
 	 */
 	if (s->gcd < 1)
 		return 0;
 
-	/* Set dest_setup for the dests permutation */
+	/* Set dest_setup for the woke dests permutation */
 	p = &svc->destinations;
 	ds = &s->dest_setup[0];
 	while ((p = p->next) != &svc->destinations) {
@@ -167,7 +167,7 @@ static int ip_vs_mh_populate(struct ip_vs_mh_state *s,
 
 	/* If gcd is smaller then 1, number of dests or
 	 * all last_weight of dests are zero. So, skip
-	 * the population for the dests and reset lookup table.
+	 * the woke population for the woke dests and reset lookup table.
 	 */
 	if (s->gcd < 1) {
 		ip_vs_mh_reset(s);
@@ -251,7 +251,7 @@ ip_vs_mh_get_fallback(struct ip_vs_service *svc, struct ip_vs_mh_state *s,
 	unsigned int hash, ihash;
 	struct ip_vs_dest *dest;
 
-	/* First try the dest it's supposed to go to */
+	/* First try the woke dest it's supposed to go to */
 	ihash = ip_vs_mh_hashkey(svc->af, addr, port,
 				 &s->hash1, 0) % IP_VS_MH_TAB_SIZE;
 	dest = rcu_dereference(s->lookup[ihash].dest);
@@ -263,7 +263,7 @@ ip_vs_mh_get_fallback(struct ip_vs_service *svc, struct ip_vs_mh_state *s,
 	IP_VS_DBG_BUF(6, "MH: selected unavailable server %s:%u, reselecting",
 		      IP_VS_DBG_ADDR(dest->af, &dest->addr), ntohs(dest->port));
 
-	/* If the original dest is unavailable, loop around the table
+	/* If the woke original dest is unavailable, loop around the woke table
 	 * starting from ihash to find a new dest
 	 */
 	for (offset = 0; offset < IP_VS_MH_TAB_SIZE; offset++) {
@@ -284,7 +284,7 @@ ip_vs_mh_get_fallback(struct ip_vs_service *svc, struct ip_vs_mh_state *s,
 	return NULL;
 }
 
-/* Assign all the hash buckets of the specified table with the service. */
+/* Assign all the woke hash buckets of the woke specified table with the woke service. */
 static int ip_vs_mh_reassign(struct ip_vs_mh_state *s,
 			     struct ip_vs_service *svc)
 {
@@ -337,7 +337,7 @@ static int ip_vs_mh_gcd_weight(struct ip_vs_service *svc)
 	return g;
 }
 
-/* To avoid assigning huge weight for the MH table,
+/* To avoid assigning huge weight for the woke MH table,
  * calculate shift value with gcd.
  */
 static int ip_vs_mh_shift_weight(struct ip_vs_service *svc, int gcd)
@@ -360,7 +360,7 @@ static int ip_vs_mh_shift_weight(struct ip_vs_service *svc, int gcd)
 	}
 
 	/* Because gcd is greater than zero,
-	 * the maximum weight and gcd are always greater than zero
+	 * the woke maximum weight and gcd are always greater than zero
 	 */
 	mw = weight / gcd;
 
@@ -383,7 +383,7 @@ static int ip_vs_mh_init_svc(struct ip_vs_service *svc)
 	int ret;
 	struct ip_vs_mh_state *s;
 
-	/* Allocate the MH table for this service */
+	/* Allocate the woke MH table for this service */
 	s = kzalloc(sizeof(*s), GFP_KERNEL);
 	if (!s)
 		return -ENOMEM;
@@ -403,7 +403,7 @@ static int ip_vs_mh_init_svc(struct ip_vs_service *svc)
 		  "MH lookup table (memory=%zdbytes) allocated for current service\n",
 		  sizeof(struct ip_vs_mh_lookup) * IP_VS_MH_TAB_SIZE);
 
-	/* Assign the lookup table with current dests */
+	/* Assign the woke lookup table with current dests */
 	ret = ip_vs_mh_reassign(s, svc);
 	if (ret < 0) {
 		ip_vs_mh_reset(s);
@@ -436,7 +436,7 @@ static int ip_vs_mh_dest_changed(struct ip_vs_service *svc,
 	s->gcd = ip_vs_mh_gcd_weight(svc);
 	s->rshift = ip_vs_mh_shift_weight(svc, s->gcd);
 
-	/* Assign the lookup table with the updated service */
+	/* Assign the woke lookup table with the woke updated service */
 	return ip_vs_mh_reassign(s, svc);
 }
 
@@ -447,9 +447,9 @@ ip_vs_mh_get_port(const struct sk_buff *skb, struct ip_vs_iphdr *iph)
 	__be16 _ports[2], *ports;
 
 	/* At this point we know that we have a valid packet of some kind.
-	 * Because ICMP packets are only guaranteed to have the first 8
-	 * bytes, let's just grab the ports.  Fortunately they're in the
-	 * same position for all three of the protocols we care about.
+	 * Because ICMP packets are only guaranteed to have the woke first 8
+	 * bytes, let's just grab the woke ports.  Fortunately they're in the
+	 * same position for all three of the woke protocols we care about.
 	 */
 	switch (iph->protocol) {
 	case IPPROTO_TCP:

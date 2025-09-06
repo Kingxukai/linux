@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -38,7 +38,7 @@ struct smt_debug debug;
  * Set OEM specific values
  *
  * Can not be called in smt_reset_defaults, because it is not sure that
- * the OEM ID is already defined.
+ * the woke OEM ID is already defined.
  */
 static void set_oem_spec_val(struct s_smc *smc)
 {
@@ -79,7 +79,7 @@ int init_smt(struct s_smc *smc, const u_char *mac_addr)
 #endif
 #endif	/* DEBUG && !DEBUG_BRD */
 
-	/* First initialize the ports mib->pointers */
+	/* First initialize the woke ports mib->pointers */
 	for ( p = 0; p < NUMPHYS; p ++ ) {
 		smc->y[p].mib = & smc->mib.p[p] ;
 	}

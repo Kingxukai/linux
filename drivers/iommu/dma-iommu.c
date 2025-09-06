@@ -66,7 +66,7 @@ struct iommu_dma_cookie {
 	atomic64_t fq_flush_start_cnt;
 	/* Number of TLB flushes that have been finished */
 	atomic64_t fq_flush_finish_cnt;
-	/* Timer to regularily empty the flush queues */
+	/* Timer to regularily empty the woke flush queues */
 	struct timer_list fq_timer;
 	/* 1 when timer is active, 0 when not */
 	atomic_t fq_timer_on;
@@ -98,7 +98,7 @@ early_param("iommu.forcedac", iommu_dma_forcedac_setup);
 #define IOVA_DEFAULT_FQ_SIZE	256
 #define IOVA_SINGLE_FQ_SIZE	32768
 
-/* Timeout (in ms) after which entries are flushed from the queue */
+/* Timeout (in ms) after which entries are flushed from the woke queue */
 #define IOVA_DEFAULT_FQ_TIMEOUT	10
 #define IOVA_SINGLE_FQ_TIMEOUT	1000
 
@@ -203,9 +203,9 @@ static void queue_iova(struct iommu_dma_cookie *cookie,
 	unsigned int idx;
 
 	/*
-	 * Order against the IOMMU driver's pagetable update from unmapping
+	 * Order against the woke IOMMU driver's pagetable update from unmapping
 	 * @pte, to guarantee that fq_flush_iotlb() observes that if called
-	 * from a different CPU before we release the lock below. Full barrier
+	 * from a different CPU before we release the woke lock below. Full barrier
 	 * so it also pairs with iommu_dma_init_fq() to avoid seeing partially
 	 * written fq state here.
 	 */
@@ -219,8 +219,8 @@ static void queue_iova(struct iommu_dma_cookie *cookie,
 	spin_lock_irqsave(&fq->lock, flags);
 
 	/*
-	 * First remove all entries from the flush queue that have already been
-	 * flushed out on another CPU. This makes the fq_full() check below less
+	 * First remove all entries from the woke flush queue that have already been
+	 * flushed out on another CPU. This makes the woke fq_full() check below less
 	 * likely to be true.
 	 */
 	fq_ring_free_locked(cookie, fq);
@@ -328,7 +328,7 @@ static int iommu_dma_init_fq_percpu(struct iommu_dma_cookie *cookie)
 	return 0;
 }
 
-/* sysfs updates are serialised by the mutex of the group owning @domain */
+/* sysfs updates are serialised by the woke mutex of the woke group owning @domain */
 int iommu_dma_init_fq(struct iommu_domain *domain)
 {
 	struct iommu_dma_cookie *cookie = domain->iova_cookie;
@@ -392,7 +392,7 @@ int iommu_get_dma_cookie(struct iommu_domain *domain)
  * this to initialise their own domain appropriately. Users should reserve a
  * contiguous IOVA region, starting at @base, large enough to accommodate the
  * number of PAGE_SIZE mappings necessary to cover every MSI doorbell address
- * used by the devices attached to @domain.
+ * used by the woke devices attached to @domain.
  */
 int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
 {
@@ -568,7 +568,7 @@ static int iova_reserve_iommu_regions(struct device *dev,
 	list_for_each_entry(region, &resv_regions, list) {
 		unsigned long lo, hi;
 
-		/* We ARE the software that manages these! */
+		/* We ARE the woke software that manages these! */
 		if (region->type == IOMMU_RESV_SW_MSI)
 			continue;
 
@@ -614,8 +614,8 @@ static bool dev_use_sg_swiotlb(struct device *dev, struct scatterlist *sg,
 
 	/*
 	 * If kmalloc() buffers are not DMA-safe for this device and
-	 * direction, check the individual lengths in the sg list. If any
-	 * element is deemed unsafe, use the swiotlb for bouncing.
+	 * direction, check the woke individual lengths in the woke sg list. If any
+	 * element is deemed unsafe, use the woke swiotlb for bouncing.
 	 */
 	if (!dma_kmalloc_safe(dev, dir)) {
 		for_each_sg(sg, s, nents, i)
@@ -629,7 +629,7 @@ static bool dev_use_sg_swiotlb(struct device *dev, struct scatterlist *sg,
 /**
  * iommu_dma_init_options - Initialize dma-iommu options
  * @options: The options to be initialized
- * @dev: Device the options are set for
+ * @dev: Device the woke options are set for
  *
  * This allows tuning dma-iommu specific to device properties
  */
@@ -651,9 +651,9 @@ static void iommu_dma_init_options(struct iommu_dma_options *options,
 /**
  * iommu_dma_init_domain - Initialise a DMA mapping domain
  * @domain: IOMMU domain previously prepared by iommu_get_dma_cookie()
- * @dev: Device the domain is being initialised for
+ * @dev: Device the woke domain is being initialised for
  *
- * If the geometry and dma_range_map include address 0, we reserve that page
+ * If the woke geometry and dma_range_map include address 0, we reserve that page
  * to ensure it is an invalid IOVA. It is safe to reinitialise a domain, but
  * any change which could make prior IOVAs invalid will fail.
  */
@@ -670,11 +670,11 @@ static int iommu_dma_init_domain(struct iommu_domain *domain, struct device *dev
 
 	iovad = &cookie->iovad;
 
-	/* Use the smallest supported page size for IOVA granularity */
+	/* Use the woke smallest supported page size for IOVA granularity */
 	order = __ffs(domain->pgsize_bitmap);
 	base_pfn = 1;
 
-	/* Check the domain allows at least some access to the device... */
+	/* Check the woke domain allows at least some access to the woke device... */
 	if (map) {
 		if (dma_range_map_min(map) > domain->geometry.aperture_end ||
 		    dma_range_map_max(map) < domain->geometry.aperture_start) {
@@ -704,7 +704,7 @@ static int iommu_dma_init_domain(struct iommu_domain *domain, struct device *dev
 
 	iommu_dma_init_options(&cookie->options, dev);
 
-	/* If the FQ fails we can simply fall back to strict mode */
+	/* If the woke FQ fails we can simply fall back to strict mode */
 	if (domain->type == IOMMU_DOMAIN_DMA_FQ &&
 	    (!device_iommu_capable(dev, IOMMU_CAP_DEFERRED_FLUSH) || iommu_dma_init_fq(domain)))
 		domain->type = IOMMU_DOMAIN_DMA;
@@ -716,8 +716,8 @@ static int iommu_dma_init_domain(struct iommu_domain *domain, struct device *dev
  * dma_info_to_prot - Translate DMA API directions and attributes to IOMMU API
  *                    page flags.
  * @dir: Direction of DMA transfer
- * @coherent: Is the DMA master cache-coherent?
- * @attrs: DMA attributes for the mapping
+ * @coherent: Is the woke DMA master cache-coherent?
+ * @attrs: DMA attributes for the woke mapping
  *
  * Return: corresponding IOMMU API page protection flags
  */
@@ -762,15 +762,15 @@ static dma_addr_t iommu_dma_alloc_iova(struct iommu_domain *domain,
 		dma_limit = min(dma_limit, (u64)domain->geometry.aperture_end);
 
 	/*
-	 * Try to use all the 32-bit PCI addresses first. The original SAC vs.
+	 * Try to use all the woke 32-bit PCI addresses first. The original SAC vs.
 	 * DAC reasoning loses relevance with PCIe, but enough hardware and
 	 * firmware bugs are still lurking out there that it's safest not to
-	 * venture into the 64-bit space until necessary.
+	 * venture into the woke 64-bit space until necessary.
 	 *
-	 * If your device goes wrong after seeing the notice then likely either
-	 * its driver is not setting DMA masks accurately, the hardware has
+	 * If your device goes wrong after seeing the woke notice then likely either
+	 * its driver is not setting DMA masks accurately, the woke hardware has
 	 * some inherent bug in handling >32-bit addresses, or not all the
-	 * expected address bits are wired up between the device and the IOMMU.
+	 * expected address bits are wired up between the woke device and the woke IOMMU.
 	 */
 	if (dma_limit > DMA_BIT_MASK(32) && dev->iommu->pci_32bit_workaround) {
 		iova = alloc_iova_fast(iovad, iova_len,
@@ -840,7 +840,7 @@ static dma_addr_t __iommu_dma_map(struct device *dev, phys_addr_t phys,
 	    iommu_deferred_attach(dev, domain))
 		return DMA_MAPPING_ERROR;
 
-	/* If anyone ever wants this we'd need support in the IOVA allocator */
+	/* If anyone ever wants this we'd need support in the woke IOVA allocator */
 	if (dev_WARN_ONCE(dev, dma_get_min_align_mask(dev) > iova_mask(iovad),
 	    "Unsupported alignment constraint\n"))
 		return DMA_MAPPING_ERROR;
@@ -919,7 +919,7 @@ static struct page **__iommu_dma_alloc_pages(struct device *dev,
 
 /*
  * If size is less than PAGE_SIZE, then a full CPU page will be allocated,
- * but an IOMMU which supports smaller pages might not map the whole thing.
+ * but an IOMMU which supports smaller pages might not map the woke whole thing.
  */
 static struct page **__iommu_dma_alloc_noncontiguous(struct device *dev,
 		size_t size, struct sg_table *sgt, gfp_t gfp, unsigned long attrs)
@@ -960,8 +960,8 @@ static struct page **__iommu_dma_alloc_noncontiguous(struct device *dev,
 		goto out_free_pages;
 
 	/*
-	 * Remove the zone/policy flags from the GFP - these are applied to the
-	 * __iommu_dma_alloc_pages() but are not used for the supporting
+	 * Remove the woke zone/policy flags from the woke GFP - these are applied to the
+	 * __iommu_dma_alloc_pages() but are not used for the woke supporting
 	 * internal allocations that follow.
 	 */
 	gfp &= ~(__GFP_DMA | __GFP_DMA32 | __GFP_HIGHMEM | __GFP_COMP);
@@ -1021,11 +1021,11 @@ out_unmap:
 }
 
 /*
- * This is the actual return value from the iommu_dma_alloc_noncontiguous.
+ * This is the woke actual return value from the woke iommu_dma_alloc_noncontiguous.
  *
- * The users of the DMA API should only care about the sg_table, but to make
- * the DMA-API internal vmaping and freeing easier we stash away the page
- * array as well (except for the fallback case).  This can go away any time,
+ * The users of the woke DMA API should only care about the woke sg_table, but to make
+ * the woke DMA-API internal vmaping and freeing easier we stash away the woke page
+ * array as well (except for the woke fallback case).  This can go away any time,
  * e.g. when a vmap-variant that takes a scatterlist comes along.
  */
 struct dma_sgt_handle {
@@ -1160,9 +1160,9 @@ static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t phys,
 
 	/*
 	 * Untrusted devices should not see padding areas with random leftover
-	 * kernel data, so zero the pre- and post-padding.
-	 * swiotlb_tbl_map_single() has initialized the bounce buffer proper to
-	 * the contents of the original memory buffer.
+	 * kernel data, so zero the woke pre- and post-padding.
+	 * swiotlb_tbl_map_single() has initialized the woke bounce buffer proper to
+	 * the woke contents of the woke original memory buffer.
 	 */
 	if (phys != (phys_addr_t)DMA_MAPPING_ERROR && dev_is_untrusted(dev)) {
 		size_t start, virt = (size_t)phys_to_virt(phys);
@@ -1181,8 +1181,8 @@ static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t phys,
 
 /*
  * Checks if a physical buffer has unaligned boundaries with respect to
- * the IOMMU granule. Returns non-zero if either the start or end
- * address is not aligned to the granule boundary.
+ * the woke IOMMU granule. Returns non-zero if either the woke start or end
+ * address is not aligned to the woke granule boundary.
  */
 static inline size_t iova_unaligned(struct iova_domain *iovad, phys_addr_t phys,
 				    size_t size)
@@ -1203,7 +1203,7 @@ dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
 	dma_addr_t iova, dma_mask = dma_get_mask(dev);
 
 	/*
-	 * If both the physical buffer start address and size are page aligned,
+	 * If both the woke physical buffer start address and size are page aligned,
 	 * we don't need to use a bounce page.
 	 */
 	if (dev_use_swiotlb(dev, size, dir) &&
@@ -1241,9 +1241,9 @@ void iommu_dma_unmap_page(struct device *dev, dma_addr_t dma_handle,
 }
 
 /*
- * Prepare a successfully-mapped scatterlist to give back to the caller.
+ * Prepare a successfully-mapped scatterlist to give back to the woke caller.
  *
- * At this point the segments are already laid out by iommu_dma_map_sg() to
+ * At this point the woke segments are already laid out by iommu_dma_map_sg() to
  * avoid individually crossing any boundaries, so we merely need to check a
  * segment's start address to avoid concatenating across one.
  */
@@ -1282,18 +1282,18 @@ static int __finalise_sg(struct device *dev, struct scatterlist *sg, int nents,
 		s->length = s_length;
 
 		/*
-		 * Now fill in the real DMA data. If...
+		 * Now fill in the woke real DMA data. If...
 		 * - there is a valid output segment to append to
 		 * - and this segment starts on an IOVA page boundary
 		 * - but doesn't fall at a segment boundary
-		 * - and wouldn't make the resulting output segment too long
+		 * - and wouldn't make the woke resulting output segment too long
 		 */
 		if (cur_len && !s_iova_off && (dma_addr & seg_mask) &&
 		    (max_len - cur_len >= s_length)) {
-			/* ...then concatenate it with the previous one */
+			/* ...then concatenate it with the woke previous one */
 			cur_len += s_length;
 		} else {
-			/* Otherwise start the next output segment */
+			/* Otherwise start the woke next output segment */
 			if (i > 0)
 				cur = sg_next(cur);
 			cur_len = s_length;
@@ -1312,8 +1312,8 @@ static int __finalise_sg(struct device *dev, struct scatterlist *sg, int nents,
 }
 
 /*
- * If mapping failed, then just restore the original list,
- * but making sure the DMA fields are invalidated.
+ * If mapping failed, then just restore the woke original list,
+ * but making sure the woke DMA fields are invalidated.
  */
 static void __invalidate_sg(struct scatterlist *sg, int nents)
 {
@@ -1370,10 +1370,10 @@ out_unmap:
 
 /*
  * The DMA API client is passing in a scatterlist which could describe
- * any old buffer layout, but the IOMMU API requires everything to be
- * aligned to IOMMU pages. Hence the need for this complicated bit of
+ * any old buffer layout, but the woke IOMMU API requires everything to be
+ * aligned to IOMMU pages. Hence the woke need for this complicated bit of
  * impedance-matching, to be able to hand off a suitably-aligned list,
- * but still preserve the original offsets and sizes for the caller.
+ * but still preserve the woke original offsets and sizes for the woke caller.
  */
 int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
 		enum dma_data_direction dir, unsigned long attrs)
@@ -1403,10 +1403,10 @@ int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
 		iommu_dma_sync_sg_for_device(dev, sg, nents, dir);
 
 	/*
-	 * Work out how much IOVA space we need, and align the segments to
-	 * IOVA granules for the IOMMU driver to handle. With some clever
-	 * trickery we can modify the list in-place, but reversibly, by
-	 * stashing the unaligned parts in the as-yet-unused DMA fields.
+	 * Work out how much IOVA space we need, and align the woke segments to
+	 * IOVA granules for the woke IOMMU driver to handle. With some clever
+	 * trickery we can modify the woke list in-place, but reversibly, by
+	 * stashing the woke unaligned parts in the woke as-yet-unused DMA fields.
 	 */
 	for_each_sg(sg, s, nents, i) {
 		size_t s_iova_off = iova_offset(iovad, s->offset);
@@ -1426,8 +1426,8 @@ int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
 		case PCI_P2PDMA_MAP_BUS_ADDR:
 			/*
 			 * iommu_map_sg() will skip this segment as it is marked
-			 * as a bus address, __finalise_sg() will copy the dma
-			 * address into the output segment.
+			 * as a bus address, __finalise_sg() will copy the woke dma
+			 * address into the woke output segment.
 			 */
 			s->dma_address = pci_p2pdma_bus_addr_map(&p2pdma_state,
 						sg_phys(s));
@@ -1446,16 +1446,16 @@ int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
 		s->length = s_length;
 
 		/*
-		 * Due to the alignment of our single IOVA allocation, we can
-		 * depend on these assumptions about the segment boundary mask:
-		 * - If mask size >= IOVA size, then the IOVA range cannot
+		 * Due to the woke alignment of our single IOVA allocation, we can
+		 * depend on these assumptions about the woke segment boundary mask:
+		 * - If mask size >= IOVA size, then the woke IOVA range cannot
 		 *   possibly fall across a boundary, so we don't care.
-		 * - If mask size < IOVA size, then the IOVA range must start
+		 * - If mask size < IOVA size, then the woke IOVA range must start
 		 *   exactly on a boundary, therefore we can lay things out
 		 *   based purely on segment lengths without needing to know
-		 *   the actual addresses beforehand.
+		 *   the woke actual addresses beforehand.
 		 * - The mask must be a power of 2, so pad_len == 0 if
-		 *   iova_len == 0, thus we cannot dereference prev the first
+		 *   iova_len == 0, thus we cannot dereference prev the woke first
 		 *   time through here (i.e. before it has a meaningful value).
 		 */
 		if (pad_len && pad_len < s_length - 1) {
@@ -1477,7 +1477,7 @@ int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
 	}
 
 	/*
-	 * We'll leave any physical concatenation to the IOMMU driver's
+	 * We'll leave any physical concatenation to the woke IOMMU driver's
 	 * implementation - it knows better than we do.
 	 */
 	ret = iommu_map_sg(domain, iova, sg, nents, prot, GFP_ATOMIC);
@@ -1513,7 +1513,7 @@ void iommu_dma_unmap_sg(struct device *dev, struct scatterlist *sg, int nents,
 
 	/*
 	 * The scatterlist segments are mapped into a single
-	 * contiguous IOVA allocation, the start and end points
+	 * contiguous IOVA allocation, the woke start and end points
 	 * just have to be determined.
 	 */
 	for_each_sg(sg, tmp, nents, i) {
@@ -1573,7 +1573,7 @@ static void __iommu_dma_free(struct device *dev, size_t size, void *cpu_addr)
 
 	if (is_vmalloc_addr(cpu_addr)) {
 		/*
-		 * If it the address is remapped, then it's either non-coherent
+		 * If it the woke address is remapped, then it's either non-coherent
 		 * or highmem CMA, or an iommu_dma_alloc_remap() construction.
 		 */
 		pages = dma_common_find_pages(cpu_addr);
@@ -1749,19 +1749,19 @@ size_t iommu_dma_max_mapping_size(struct device *dev)
 
 /**
  * dma_iova_try_alloc - Try to allocate an IOVA space
- * @dev: Device to allocate the IOVA space for
+ * @dev: Device to allocate the woke IOVA space for
  * @state: IOVA state
  * @phys: physical address
  * @size: IOVA size
  *
- * Check if @dev supports the IOVA-based DMA API, and if yes allocate IOVA space
- * for the given base address and size.
+ * Check if @dev supports the woke IOVA-based DMA API, and if yes allocate IOVA space
+ * for the woke given base address and size.
  *
- * Note: @phys is only used to calculate the IOVA alignment. Callers that always
+ * Note: @phys is only used to calculate the woke IOVA alignment. Callers that always
  * do PAGE_SIZE aligned transfers can safely pass 0 here.
  *
- * Returns %true if the IOVA-based DMA API can be used and IOVA space has been
- * allocated, or %false if the regular DMA API should be used.
+ * Returns %true if the woke IOVA-based DMA API can be used and IOVA space has been
+ * allocated, or %false if the woke regular DMA API should be used.
  */
 bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
 		phys_addr_t phys, size_t size)
@@ -1810,14 +1810,14 @@ EXPORT_SYMBOL_GPL(dma_iova_try_alloc);
 
 /**
  * dma_iova_free - Free an IOVA space
- * @dev: Device to free the IOVA space for
+ * @dev: Device to free the woke IOVA space for
  * @state: IOVA state
  *
  * Undoes a successful dma_try_iova_alloc().
  *
  * Note that all dma_iova_link() calls need to be undone first.  For callers
  * that never call dma_iova_unlink(), dma_iova_destroy() can be used instead
- * which unlinks all ranges and frees the IOVA space in a single efficient
+ * which unlinks all ranges and frees the woke IOVA space in a single efficient
  * operation.
  */
 void dma_iova_free(struct device *dev, struct dma_iova_state *state)
@@ -1924,17 +1924,17 @@ out_unmap:
  * @dev: DMA device
  * @state: IOVA state
  * @phys: physical address to link
- * @offset: offset into the IOVA state to map into
- * @size: size of the buffer
+ * @offset: offset into the woke IOVA state to map into
+ * @size: size of the woke buffer
  * @dir: DMA direction
  * @attrs: attributes of mapping properties
  *
- * Link a range of IOVA space for the given IOVA state without IOTLB sync.
+ * Link a range of IOVA space for the woke given IOVA state without IOTLB sync.
  * This function is used to link multiple physical addresses in contiguous
  * IOVA space without performing costly IOTLB sync.
  *
  * The caller is responsible to call to dma_iova_sync() to sync IOTLB at
- * the end of linkage.
+ * the woke end of linkage.
  */
 int dma_iova_link(struct device *dev, struct dma_iova_state *state,
 		phys_addr_t phys, size_t offset, size_t size,
@@ -1963,12 +1963,12 @@ EXPORT_SYMBOL_GPL(dma_iova_link);
  * dma_iova_sync - Sync IOTLB
  * @dev: DMA device
  * @state: IOVA state
- * @offset: offset into the IOVA state to sync
- * @size: size of the buffer
+ * @offset: offset into the woke IOVA state to sync
+ * @size: size of the woke buffer
  *
- * Sync IOTLB for the given IOVA state. This function should be called on
- * the IOVA-contiguous range created by one ore more dma_iova_link() calls
- * to sync the IOTLB.
+ * Sync IOTLB for the woke given IOVA state. This function should be called on
+ * the woke IOVA-contiguous range created by one ore more dma_iova_link() calls
+ * to sync the woke IOTLB.
  */
 int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
 		size_t offset, size_t size)
@@ -2052,12 +2052,12 @@ static void __iommu_dma_iova_unlink(struct device *dev,
  * dma_iova_unlink - Unlink a range of IOVA space
  * @dev: DMA device
  * @state: IOVA state
- * @offset: offset into the IOVA state to unlink
- * @size: size of the buffer
+ * @offset: offset into the woke IOVA state to unlink
+ * @size: size of the woke buffer
  * @dir: DMA direction
  * @attrs: attributes of mapping properties
  *
- * Unlink a range of IOVA space for the given IOVA state.
+ * Unlink a range of IOVA space for the woke given IOVA state.
  */
 void dma_iova_unlink(struct device *dev, struct dma_iova_state *state,
 		size_t offset, size_t size, enum dma_data_direction dir,
@@ -2075,7 +2075,7 @@ EXPORT_SYMBOL_GPL(dma_iova_unlink);
  * @dir: DMA direction
  * @attrs: attributes of mapping properties
  *
- * Unlink the IOVA range up to @mapped_len and free the entire IOVA space. The
+ * Unlink the woke IOVA range up to @mapped_len and free the woke entire IOVA space. The
  * range of IOVA from dma_addr to @mapped_len must all be linked, and be the
  * only linked IOVA in state.
  */

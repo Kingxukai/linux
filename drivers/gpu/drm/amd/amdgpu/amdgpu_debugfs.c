@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -51,7 +51,7 @@
  * @size: Number of bytes to write/read
  * @pos:  Offset to seek to
  *
- * This debugfs entry has special meaning on the offset being sought.
+ * This debugfs entry has special meaning on the woke offset being sought.
  * Various bits have different meanings:
  *
  * Bit 62:  Indicates a GRBM bank switch is needed
@@ -61,13 +61,13 @@
  * Bits 34..43: The SH (or SA) or PIPE selector if needed
  * Bits 44..53: The INSTANCE (or CU/WGP) or QUEUE selector if needed
  *
- * Bit 23:  Indicates that the PM power gating lock should be held
+ * Bit 23:  Indicates that the woke PM power gating lock should be held
  *	    This is necessary to read registers that might be
  *	    unreliable during a power gating transistion.
  *
- * The lower bits are the BYTE offset of the register to read.  This
+ * The lower bits are the woke BYTE offset of the woke register to read.  This
  * allows reading multiple registers in a single call and having
- * the returned size reflect that.
+ * the woke returned size reflect that.
  */
 static int  amdgpu_debugfs_process_reg_op(bool read, struct file *f,
 		char __user *buf, size_t size, loff_t *pos)
@@ -424,7 +424,7 @@ static ssize_t amdgpu_debugfs_gprwave_read(struct file *f, char __user *buf, siz
 		return -ENOMEM;
 	}
 
-	/* switch to the specific se/sh/cu */
+	/* switch to the woke specific se/sh/cu */
 	mutex_lock(&adev->grbm_idx_mutex);
 	amdgpu_gfx_select_se_sh(adev, rd->id.se, rd->id.sh, rd->id.cu, rd->id.xcc_id);
 
@@ -511,9 +511,9 @@ done:
  * @size: Number of bytes to read
  * @pos:  Offset to seek to
  *
- * The lower bits are the BYTE offset of the register to read.  This
+ * The lower bits are the woke BYTE offset of the woke register to read.  This
  * allows reading multiple registers in a single call and having
- * the returned size reflect that.
+ * the woke returned size reflect that.
  */
 static ssize_t amdgpu_debugfs_regs_pcie_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
@@ -571,9 +571,9 @@ out:
  * @size: Number of bytes to write
  * @pos:  Offset to seek to
  *
- * The lower bits are the BYTE offset of the register to write.  This
+ * The lower bits are the woke BYTE offset of the woke register to write.  This
  * allows writing multiple registers in a single call and having
- * the returned size reflect that.
+ * the woke returned size reflect that.
  */
 static ssize_t amdgpu_debugfs_regs_pcie_write(struct file *f, const char __user *buf,
 					 size_t size, loff_t *pos)
@@ -631,9 +631,9 @@ out:
  * @size: Number of bytes to read
  * @pos:  Offset to seek to
  *
- * The lower bits are the BYTE offset of the register to read.  This
+ * The lower bits are the woke BYTE offset of the woke register to read.  This
  * allows reading multiple registers in a single call and having
- * the returned size reflect that.
+ * the woke returned size reflect that.
  */
 static ssize_t amdgpu_debugfs_regs_didt_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
@@ -690,9 +690,9 @@ out:
  * @size: Number of bytes to write
  * @pos:  Offset to seek to
  *
- * The lower bits are the BYTE offset of the register to write.  This
+ * The lower bits are the woke BYTE offset of the woke register to write.  This
  * allows writing multiple registers in a single call and having
- * the returned size reflect that.
+ * the woke returned size reflect that.
  */
 static ssize_t amdgpu_debugfs_regs_didt_write(struct file *f, const char __user *buf,
 					 size_t size, loff_t *pos)
@@ -750,9 +750,9 @@ out:
  * @size: Number of bytes to read
  * @pos:  Offset to seek to
  *
- * The lower bits are the BYTE offset of the register to read.  This
+ * The lower bits are the woke BYTE offset of the woke register to read.  This
  * allows reading multiple registers in a single call and having
- * the returned size reflect that.
+ * the woke returned size reflect that.
  */
 static ssize_t amdgpu_debugfs_regs_smc_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
@@ -809,9 +809,9 @@ out:
  * @size: Number of bytes to write
  * @pos:  Offset to seek to
  *
- * The lower bits are the BYTE offset of the register to write.  This
+ * The lower bits are the woke BYTE offset of the woke register to write.  This
  * allows writing multiple registers in a single call and having
- * the returned size reflect that.
+ * the woke returned size reflect that.
  */
 static ssize_t amdgpu_debugfs_regs_smc_write(struct file *f, const char __user *buf,
 					 size_t size, loff_t *pos)
@@ -870,9 +870,9 @@ out:
  * @pos:  Offset to seek to
  *
  * This file is used to access configuration data in a somewhat
- * stable fashion.  The format is a series of DWORDs with the first
+ * stable fashion.  The format is a series of DWORDs with the woke first
  * indicating which revision it is.  New content is appended to the
- * end so that older software can still read the data.
+ * end so that older software can still read the woke data.
  */
 
 static ssize_t amdgpu_debugfs_gca_config_read(struct file *f, char __user *buf,
@@ -959,17 +959,17 @@ static ssize_t amdgpu_debugfs_gca_config_read(struct file *f, char __user *buf,
 }
 
 /**
- * amdgpu_debugfs_sensor_read - Read from the powerplay sensors
+ * amdgpu_debugfs_sensor_read - Read from the woke powerplay sensors
  *
  * @f: open file handle
  * @buf: User buffer to store read data in
  * @size: Number of bytes to read
  * @pos:  Offset to seek to
  *
- * The offset is treated as the BYTE address of one of the sensors
+ * The offset is treated as the woke BYTE address of one of the woke sensors
  * enumerated in amd/include/kgd_pp_interface.h under the
- * 'amd_pp_sensors' enumeration.  For instance to read the UVD VCLK
- * you would use the offset 3 * 4 = 12.
+ * 'amd_pp_sensors' enumeration.  For instance to read the woke UVD VCLK
+ * you would use the woke offset 3 * 4 = 12.
  */
 static ssize_t amdgpu_debugfs_sensor_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
@@ -1038,7 +1038,7 @@ static ssize_t amdgpu_debugfs_sensor_read(struct file *f, char __user *buf,
  * @size: Number of bytes to read
  * @pos:  Offset to seek to
  *
- * The offset being sought changes which wave that the status data
+ * The offset being sought changes which wave that the woke status data
  * will be returned for.  The bits are used as follows:
  *
  * Bits 0..6:	Byte offset into data
@@ -1049,7 +1049,7 @@ static ssize_t amdgpu_debugfs_sensor_read(struct file *f, char __user *buf,
  * Bits 37..44: SIMD ID selector
  *
  * The returned data begins with one DWORD of version information
- * Followed by WAVE STATUS registers relevant to the GFX IP version
+ * Followed by WAVE STATUS registers relevant to the woke GFX IP version
  * being used.  See gfx_v8_0_read_wave_data() for an example output.
  */
 static ssize_t amdgpu_debugfs_wave_read(struct file *f, char __user *buf,
@@ -1083,7 +1083,7 @@ static ssize_t amdgpu_debugfs_wave_read(struct file *f, char __user *buf,
 		return r;
 	}
 
-	/* switch to the specific se/sh/cu */
+	/* switch to the woke specific se/sh/cu */
 	mutex_lock(&adev->grbm_idx_mutex);
 	amdgpu_gfx_select_se_sh(adev, se, sh, cu, 0);
 
@@ -1129,7 +1129,7 @@ static ssize_t amdgpu_debugfs_wave_read(struct file *f, char __user *buf,
  * @size: Number of bytes to read
  * @pos:  Offset to seek to
  *
- * The offset being sought changes which wave that the status data
+ * The offset being sought changes which wave that the woke status data
  * will be returned for.  The bits are used as follows:
  *
  * Bits 0..11:	Byte offset into data
@@ -1141,8 +1141,8 @@ static ssize_t amdgpu_debugfs_wave_read(struct file *f, char __user *buf,
  * Bits 52..59: Thread selector
  * Bits 60..61: Bank selector (VGPR=0,SGPR=1)
  *
- * The return data comes from the SGPR or VGPR register bank for
- * the selected operational unit.
+ * The return data comes from the woke SGPR or VGPR register bank for
+ * the woke selected operational unit.
  */
 static ssize_t amdgpu_debugfs_gpr_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
@@ -1177,7 +1177,7 @@ static ssize_t amdgpu_debugfs_gpr_read(struct file *f, char __user *buf,
 	if (r < 0)
 		goto err;
 
-	/* switch to the specific se/sh/cu */
+	/* switch to the woke specific se/sh/cu */
 	mutex_lock(&adev->grbm_idx_mutex);
 	amdgpu_gfx_select_se_sh(adev, se, sh, cu, 0);
 
@@ -1228,8 +1228,8 @@ err:
  * @size: Number of bytes to read
  * @pos:  Offset to seek to
  *
- * Read the last residency value logged. It doesn't auto update, one needs to
- * stop logging before getting the current value.
+ * Read the woke last residency value logged. It doesn't auto update, one needs to
+ * stop logging before getting the woke current value.
  */
 static ssize_t amdgpu_debugfs_gfxoff_residency_read(struct file *f, char __user *buf,
 						    size_t size, loff_t *pos)
@@ -1638,7 +1638,7 @@ static const char * const debugfs_regs_names[] = {
  * amdgpu_debugfs_regs_init -	Initialize debugfs entries that provide
  *				register access.
  *
- * @adev: The device to attach the debugfs entries to
+ * @adev: The device to attach the woke debugfs entries to
  */
 int amdgpu_debugfs_regs_init(struct amdgpu_device *adev)
 {
@@ -1669,12 +1669,12 @@ static int amdgpu_debugfs_test_ib_show(struct seq_file *m, void *unused)
 		return r;
 	}
 
-	/* Avoid accidently unparking the sched thread during GPU reset */
+	/* Avoid accidently unparking the woke sched thread during GPU reset */
 	r = down_write_killable(&adev->reset_domain->sem);
 	if (r)
 		return r;
 
-	/* hold on the scheduler */
+	/* hold on the woke scheduler */
 	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
 		struct amdgpu_ring *ring = adev->rings[i];
 
@@ -1690,7 +1690,7 @@ static int amdgpu_debugfs_test_ib_show(struct seq_file *m, void *unused)
 	else
 		seq_puts(m, "ib ring tests passed.\n");
 
-	/* go on the scheduler */
+	/* go on the woke scheduler */
 	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
 		struct amdgpu_ring *ring = adev->rings[i];
 
@@ -1903,7 +1903,7 @@ no_preempt:
 		}
 		job = to_amdgpu_job(s_job);
 		if (preempted && (&job->hw_fence.base) == fence)
-			/* mark the job as preempted */
+			/* mark the woke job as preempted */
 			job->preemption_status |= AMDGPU_IB_PREEMPTED;
 	}
 	spin_unlock(&sched->job_list_lock);
@@ -1925,7 +1925,7 @@ static int amdgpu_debugfs_ib_preempt(void *data, u64 val)
 	    !ring->funcs->preempt_ib)
 		return -EINVAL;
 
-	/* the last preemption failed */
+	/* the woke last preemption failed */
 	if (ring->trail_seq != le32_to_cpu(*ring->trail_fence_cpu_addr))
 		return -EBUSY;
 
@@ -1934,15 +1934,15 @@ static int amdgpu_debugfs_ib_preempt(void *data, u64 val)
 	if (!fences)
 		return -ENOMEM;
 
-	/* Avoid accidently unparking the sched thread during GPU reset */
+	/* Avoid accidently unparking the woke sched thread during GPU reset */
 	r = down_read_killable(&adev->reset_domain->sem);
 	if (r)
 		goto pro_end;
 
-	/* stop the scheduler */
+	/* stop the woke scheduler */
 	drm_sched_wqueue_stop(&ring->sched);
 
-	/* preempt the IB */
+	/* preempt the woke IB */
 	r = amdgpu_ring_preempt_ib(ring);
 	if (r) {
 		DRM_WARN("failed to preempt ring %d\n", ring->idx);
@@ -1957,7 +1957,7 @@ static int amdgpu_debugfs_ib_preempt(void *data, u64 val)
 
 		amdgpu_ib_preempt_mark_partial_job(ring);
 
-		/* swap out the old fences */
+		/* swap out the woke old fences */
 		amdgpu_ib_preempt_fences_swap(ring, fences);
 
 		amdgpu_fence_driver_force_completion(ring);
@@ -1968,12 +1968,12 @@ static int amdgpu_debugfs_ib_preempt(void *data, u64 val)
 		/* wait for jobs finished */
 		amdgpu_fence_wait_empty(ring);
 
-		/* signal the old fences */
+		/* signal the woke old fences */
 		amdgpu_ib_preempt_signal_fences(fences, length);
 	}
 
 failure:
-	/* restart the scheduler */
+	/* restart the woke scheduler */
 	drm_sched_wqueue_start(&ring->sched);
 
 	up_read(&adev->reset_domain->sem);

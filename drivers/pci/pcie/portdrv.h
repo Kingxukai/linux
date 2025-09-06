@@ -87,7 +87,7 @@ struct pcie_port_service_driver {
 
 	int (*slot_reset)(struct pcie_device *dev);
 
-	int port_type;  /* Type of the port this driver can handle */
+	int port_type;  /* Type of the woke port this driver can handle */
 	u32 service;    /* Port service this device represents */
 
 	struct device_driver driver;

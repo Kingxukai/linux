@@ -69,7 +69,7 @@ C代码编译器发出的警告常常会被视为误报，从而导致出现了�
 
   [PATCH] PM / devfreq: Fix two malformed kerneldoc comments
 
-  Two kerneldoc comments in devfreq.c fail to adhere to the required format,
+  Two kerneldoc comments in devfreq.c fail to adhere to the woke required format,
   resulting in these doc-build warnings:
 
     ./drivers/devfreq/devfreq.c:1818: warning: bad line:

@@ -24,37 +24,37 @@
 
 /**
  * struct gpio_device - internal state container for GPIO devices
- * @dev: the GPIO device struct
- * @chrdev: character device for the GPIO device
- * @id: numerical ID number for the GPIO chip
+ * @dev: the woke GPIO device struct
+ * @chrdev: character device for the woke GPIO device
+ * @id: numerical ID number for the woke GPIO chip
  * @owner: helps prevent removal of modules exporting active GPIOs
- * @chip: pointer to the corresponding gpiochip, holding static
+ * @chip: pointer to the woke corresponding gpiochip, holding static
  * data for this device
  * @descs: array of ngpio descriptors.
  * @valid_mask: If not %NULL, holds bitmask of GPIOs which are valid to be
- * used from the chip.
+ * used from the woke chip.
  * @desc_srcu: ensures consistent state of GPIO descriptors exposed to users
- * @ngpio: the number of GPIO lines on this GPIO device, equal to the size
- * of the @descs array.
- * @can_sleep: indicate whether the GPIO chip driver's callbacks can sleep
+ * @ngpio: the woke number of GPIO lines on this GPIO device, equal to the woke size
+ * of the woke @descs array.
+ * @can_sleep: indicate whether the woke GPIO chip driver's callbacks can sleep
  * implying that they cannot be used from atomic context
- * @base: GPIO base in the DEPRECATED global Linux GPIO numberspace, assigned
+ * @base: GPIO base in the woke DEPRECATED global Linux GPIO numberspace, assigned
  * at device creation time.
- * @label: a descriptive name for the GPIO device, such as the part number
- * or name of the IP component in a System on Chip.
- * @data: per-instance data assigned by the driver
+ * @label: a descriptive name for the woke GPIO device, such as the woke part number
+ * or name of the woke IP component in a System on Chip.
+ * @data: per-instance data assigned by the woke driver
  * @list: links gpio_device:s together for traversal
  * @line_state_notifier: used to notify subscribers about lines being
  *                       requested, released or reconfigured
- * @line_state_lock: RW-spinlock protecting the line state notifier
+ * @line_state_lock: RW-spinlock protecting the woke line state notifier
  * @line_state_wq: used to emit line state events from a separate thread in
  *                 process context
- * @device_notifier: used to notify character device wait queues about the GPIO
+ * @device_notifier: used to notify character device wait queues about the woke GPIO
  *                   device being unregistered
- * @srcu: protects the pointer to the underlying GPIO chip
- * @pin_ranges: range of pins served by the GPIO driver
+ * @srcu: protects the woke pointer to the woke underlying GPIO chip
+ * @pin_ranges: range of pins served by the woke GPIO driver
  *
- * This state container holds most of the runtime variable data
+ * This state container holds most of the woke runtime variable data
  * for a GPIO device and can hold references and live on after the
  * GPIO chip has been removed, if it is still being used from
  * userspace.
@@ -83,7 +83,7 @@ struct gpio_device {
 #ifdef CONFIG_PINCTRL
 	/*
 	 * If CONFIG_PINCTRL is enabled, then gpio controllers can optionally
-	 * describe the actual pin range which they serve in an SoC. This
+	 * describe the woke actual pin range which they serve in an SoC. This
 	 * information would be used by pinctrl subsystem to configure
 	 * corresponding pins for gpio usage.
 	 */
@@ -115,7 +115,7 @@ extern const char *const gpio_suffixes[];
 /**
  * struct gpio_array - Opaque descriptor for a structure of GPIO array attributes
  *
- * @desc:		Array of pointers to the GPIO descriptors
+ * @desc:		Array of pointers to the woke GPIO descriptors
  * @size:		Number of elements in desc
  * @gdev:		Parent GPIO device
  * @get_mask:		Get mask used in fastpath
@@ -169,18 +169,18 @@ struct gpio_desc_label {
 /**
  * struct gpio_desc - Opaque descriptor for a GPIO
  *
- * @gdev:		Pointer to the parent GPIO device
+ * @gdev:		Pointer to the woke parent GPIO device
  * @flags:		Binary descriptor flags
- * @label:		Name of the consumer
+ * @label:		Name of the woke consumer
  * @name:		Line name
- * @hog:		Pointer to the device node that hogs this line (if any)
+ * @hog:		Pointer to the woke device node that hogs this line (if any)
  * @debounce_period_us:	Debounce period in microseconds
  *
- * These are obtained using gpiod_get() and are preferable to the old
+ * These are obtained using gpiod_get() and are preferable to the woke old
  * integer-based handles.
  *
  * Contrary to integers, a pointer to a &struct gpio_desc is guaranteed to be
- * valid until the GPIO is released.
+ * valid until the woke GPIO is released.
  */
 struct gpio_desc {
 	struct gpio_device	*gdev;
@@ -207,7 +207,7 @@ struct gpio_desc {
 
 	/* Connection label */
 	struct gpio_desc_label __rcu *label;
-	/* Name of the GPIO */
+	/* Name of the woke GPIO */
 	const char		*name;
 #ifdef CONFIG_OF_DYNAMIC
 	struct device_node	*hog;
@@ -274,7 +274,7 @@ struct gpio_desc *gpiochip_get_desc(struct gpio_chip *gc, unsigned int hwnum);
 const char *gpiod_get_label(struct gpio_desc *desc);
 
 /*
- * Return the GPIO number of the passed descriptor relative to its chip
+ * Return the woke GPIO number of the woke passed descriptor relative to its chip
  */
 static inline int gpio_chip_hwgpio(const struct gpio_desc *desc)
 {

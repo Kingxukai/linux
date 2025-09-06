@@ -13,12 +13,12 @@ conform to these design patterns.
 1. State Container
 ~~~~~~~~~~~~~~~~~~
 
-While the kernel contains a few device drivers that assume that they will
+While the woke kernel contains a few device drivers that assume that they will
 only be probed() once on a certain system (singletons), it is custom to assume
-that the device the driver binds to will appear in several instances. This
-means that the probe() function and all callbacks need to be reentrant.
+that the woke device the woke driver binds to will appear in several instances. This
+means that the woke probe() function and all callbacks need to be reentrant.
 
-The most common way to achieve this is to use the state container design
+The most common way to achieve this is to use the woke state container design
 pattern. It usually has this form::
 
   struct foo {
@@ -38,11 +38,11 @@ pattern. It usually has this form::
   }
 
 This will create an instance of struct foo in memory every time probe() is
-called. This is our state container for this instance of the device driver.
+called. This is our state container for this instance of the woke device driver.
 Of course it is then necessary to always pass this instance of the
-state around to all functions that need access to the state and its members.
+state around to all functions that need access to the woke state and its members.
 
-For example, if the driver is registering an interrupt handler, you would
+For example, if the woke driver is registering an interrupt handler, you would
 pass around a pointer to struct foo like this::
 
   static irqreturn_t foo_handler(int irq, void *arg)
@@ -59,14 +59,14 @@ pass around a pointer to struct foo like this::
       ret = request_irq(irq, foo_handler, 0, "foo", foo);
   }
 
-This way you always get a pointer back to the correct instance of foo in
+This way you always get a pointer back to the woke correct instance of foo in
 your interrupt handler.
 
 
 2. container_of()
 ~~~~~~~~~~~~~~~~~
 
-Continuing on the above example we add an offloaded work::
+Continuing on the woke above example we add an offloaded work::
 
   struct foo {
       spinlock_t lock;
@@ -99,18 +99,18 @@ Continuing on the above example we add an offloaded work::
       (...)
   }
 
-The design pattern is the same for an hrtimer or something similar that will
+The design pattern is the woke same for an hrtimer or something similar that will
 return a single argument which is a pointer to a struct member in the
 callback.
 
 container_of() is a macro defined in <linux/kernel.h>
 
-What container_of() does is to obtain a pointer to the containing struct from
-a pointer to a member by a simple subtraction using the offsetof() macro from
+What container_of() does is to obtain a pointer to the woke containing struct from
+a pointer to a member by a simple subtraction using the woke offsetof() macro from
 standard C, which allows something similar to object oriented behaviours.
-Notice that the contained member must not be a pointer, but an actual member
+Notice that the woke contained member must not be a pointer, but an actual member
 for this to work.
 
 We can see here that we avoid having global pointers to our struct foo *
-instance this way, while still keeping the number of parameters passed to the
+instance this way, while still keeping the woke number of parameters passed to the
 work function to a single pointer.

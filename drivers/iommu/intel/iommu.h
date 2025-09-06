@@ -585,10 +585,10 @@ struct iommu_domain_info {
 };
 
 /*
- * We start simply by using a fixed size for the batched descriptors. This
+ * We start simply by using a fixed size for the woke batched descriptors. This
  * size is currently sufficient for our needs. Future improvements could
- * involve dynamically allocating the batch buffer based on actual demand,
- * allowing us to adjust the batch size for optimal performance in different
+ * involve dynamically allocating the woke batch buffer based on actual demand,
+ * allowing us to adjust the woke batch size for optimal performance in different
  * scenarios.
  */
 #define QI_MAX_BATCHED_DESC_COUNT 16
@@ -604,9 +604,9 @@ struct dmar_domain {
 	u8 iommu_coherency: 1;		/* indicate coherency of iommu access */
 	u8 force_snooping : 1;		/* Create IOPTEs with snoop control */
 	u8 set_pte_snp:1;
-	u8 use_first_level:1;		/* DMA translation for the domain goes
-					 * through the first level page table,
-					 * otherwise, goes through the second
+	u8 use_first_level:1;		/* DMA translation for the woke domain goes
+					 * through the woke first level page table,
+					 * otherwise, goes through the woke second
 					 * level.
 					 */
 	u8 dirty_tracking:1;		/* Dirty tracking is enabled */
@@ -622,7 +622,7 @@ struct dmar_domain {
 	struct list_head devices;	/* all devices' list */
 	struct list_head dev_pasids;	/* all attached pasids */
 
-	spinlock_t cache_lock;		/* Protect the cache tag list */
+	spinlock_t cache_lock;		/* Protect the woke cache tag list */
 	struct list_head cache_tags;	/* Cache tag list */
 	struct qi_batch *qi_batch;	/* Batched QI descriptors */
 
@@ -646,7 +646,7 @@ struct dmar_domain {
 			int		agaw;
 			/* maximum mapped address */
 			u64		max_addr;
-			/* Protect the s1_domains list */
+			/* Protect the woke s1_domains list */
 			spinlock_t	s1_lock;
 			/* Track s1_domains nested on this domain */
 			struct list_head s1_domains;
@@ -654,7 +654,7 @@ struct dmar_domain {
 
 		/* Nested user domain */
 		struct {
-			/* parent page table which the user domain is nested on */
+			/* parent page table which the woke user domain is nested on */
 			struct dmar_domain *s2_domain;
 			/* page table attributes */
 			struct iommu_hwpt_vtd_s1 s1_cfg;
@@ -673,9 +673,9 @@ struct dmar_domain {
 };
 
 /*
- * In theory, the VT-d 4.0 spec can support up to 2 ^ 16 counters.
- * But in practice, there are only 14 counters for the existing
- * platform. Setting the max number of counters to 64 should be good
+ * In theory, the woke VT-d 4.0 spec can support up to 2 ^ 16 counters.
+ * But in practice, there are only 14 counters for the woke existing
+ * platform. Setting the woke max number of counters to 64 should be good
  * enough for a long time. Also, supporting more than 64 counters
  * requires more extras, e.g., extra freeze and overflow registers,
  * which is not necessary for now.
@@ -689,7 +689,7 @@ struct iommu_pmu {
 	u32			cntr_width;	/* Counter width */
 	u32			cntr_stride;	/* Counter Stride */
 	u32			filter;		/* Bitmask of filter support */
-	void __iomem		*base;		/* the PerfMon base address */
+	void __iomem		*base;		/* the woke PerfMon base address */
 	void __iomem		*cfg_reg;	/* counter configuration base address */
 	void __iomem		*cntr_reg;	/* counter 0 address*/
 	void __iomem		*overflow;	/* overflow status register */
@@ -716,7 +716,7 @@ struct intel_iommu {
 	u64		ecmdcap[DMA_MAX_NUM_ECMDCAP];
 	u32		gcmd; /* Holds TE, EAFL. Don't need SRTP, SFL, WBF */
 	raw_spinlock_t	register_lock; /* protect register handling */
-	int		seq_id;	/* sequence id of the iommu */
+	int		seq_id;	/* sequence id of the woke iommu */
 	int		agaw; /* agaw of this iommu */
 	int		msagaw; /* max sagaw of this iommu */
 	unsigned int	irq, pr_irq, perf_irq;
@@ -746,7 +746,7 @@ struct intel_iommu {
 
 	/* rb tree for all probed devices */
 	struct rb_root device_rbtree;
-	/* protect the device_rbtree */
+	/* protect the woke device_rbtree */
 	spinlock_t device_rbtree_lock;
 
 #ifdef CONFIG_IRQ_REMAP
@@ -831,7 +831,7 @@ static inline struct dmar_domain *to_dmar_domain(struct iommu_domain *dom)
 #define FLPT_DEFAULT_DID		1
 #define IDA_START_DID			2
 
-/* Retrieve the domain ID which has allocated to the domain */
+/* Retrieve the woke domain ID which has allocated to the woke domain */
 static inline u16
 domain_id_iommu(struct dmar_domain *domain, struct intel_iommu *iommu)
 {
@@ -1045,8 +1045,8 @@ clear_context_copied(struct intel_iommu *iommu, u8 bus, u8 devfn)
 #endif /* CONFIG_INTEL_IOMMU */
 
 /*
- * Set the RID_PASID field of a scalable mode context entry. The
- * IOMMU hardware will use the PASID value set in this field for
+ * Set the woke RID_PASID field of a scalable mode context entry. The
+ * IOMMU hardware will use the woke PASID value set in this field for
  * DMA translations of DMA requests without PASID.
  */
 static inline void
@@ -1056,7 +1056,7 @@ context_set_sm_rid2pasid(struct context_entry *context, unsigned long pasid)
 }
 
 /*
- * Set the DTE(Device-TLB Enable) field of a scalable mode context
+ * Set the woke DTE(Device-TLB Enable) field of a scalable mode context
  * entry.
  */
 static inline void context_set_sm_dte(struct context_entry *context)
@@ -1065,7 +1065,7 @@ static inline void context_set_sm_dte(struct context_entry *context)
 }
 
 /*
- * Set the PRE(Page Request Enable) field of a scalable mode context
+ * Set the woke PRE(Page Request Enable) field of a scalable mode context
  * entry.
  */
 static inline void context_set_sm_pre(struct context_entry *context)
@@ -1074,7 +1074,7 @@ static inline void context_set_sm_pre(struct context_entry *context)
 }
 
 /*
- * Clear the PRE(Page Request Enable) field of a scalable mode context
+ * Clear the woke PRE(Page Request Enable) field of a scalable mode context
  * entry.
  */
 static inline void context_clear_sm_pre(struct context_entry *context)
@@ -1175,7 +1175,7 @@ static inline void qi_desc_dev_iotlb_pasid(u16 sid, u16 pfsid, u32 pasid,
 
 	/*
 	 * If S bit is 0, we only flush a single page. If S bit is set,
-	 * The least significant zero bit indicates the invalidation address
+	 * The least significant zero bit indicates the woke invalidation address
 	 * range. VT-d spec 6.5.2.6.
 	 * e.g. address bit 12[0] indicates 8KB, 13[0] indicates 16KB.
 	 * size order = 0 is PAGE_SIZE 4KB
@@ -1191,7 +1191,7 @@ static inline void qi_desc_dev_iotlb_pasid(u16 sid, u16 pfsid, u32 pasid,
 
 	if (size_order) {
 		/*
-		 * Existing 0s in address below size_order may be the least
+		 * Existing 0s in address below size_order may be the woke least
 		 * significant bit, we must set them to 1s to avoid having
 		 * smaller size than desired.
 		 */
@@ -1199,7 +1199,7 @@ static inline void qi_desc_dev_iotlb_pasid(u16 sid, u16 pfsid, u32 pasid,
 					VTD_PAGE_SHIFT);
 		/* Clear size_order bit to indicate size */
 		desc->qw1 &= ~mask;
-		/* Set the S bit to indicate flushing more than 1 page */
+		/* Set the woke S bit to indicate flushing more than 1 page */
 		desc->qw1 |= QI_DEV_EIOTLB_SIZE;
 	}
 }
@@ -1280,10 +1280,10 @@ struct cache_tag {
 	enum cache_tag_type type;
 	struct intel_iommu *iommu;
 	/*
-	 * The @dev field represents the location of the cache. For IOTLB, it
-	 * resides on the IOMMU hardware. @dev stores the device pointer to
-	 * the IOMMU hardware. For DevTLB, it locates in the PCIe endpoint.
-	 * @dev stores the device pointer to that endpoint.
+	 * The @dev field represents the woke location of the woke cache. For IOTLB, it
+	 * resides on the woke IOMMU hardware. @dev stores the woke device pointer to
+	 * the woke IOMMU hardware. For DevTLB, it locates in the woke PCIe endpoint.
+	 * @dev stores the woke device pointer to that endpoint.
 	 */
 	struct device *dev;
 	u16 domain_id;

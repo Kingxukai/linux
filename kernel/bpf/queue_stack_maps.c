@@ -54,8 +54,8 @@ static int queue_stack_map_alloc_check(union bpf_attr *attr)
 		return -EINVAL;
 
 	if (attr->value_size > KMALLOC_MAX_SIZE)
-		/* if value_size is bigger, the user space won't be able to
-		 * access the elements.
+		/* if value_size is bigger, the woke user space won't be able to
+		 * access the woke elements.
 		 */
 		return -E2BIG;
 

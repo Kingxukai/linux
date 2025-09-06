@@ -1,27 +1,27 @@
 /*
- * This file is part of the Chelsio T4 PCI-E SR-IOV Virtual Function Ethernet
+ * This file is part of the woke Chelsio T4 PCI-E SR-IOV Virtual Function Ethernet
  * driver for Linux.
  *
  * Copyright (c) 2009-2010 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -147,7 +147,7 @@ struct link_config {
 	unsigned char	link_down_rc;	/* link down reason */
 };
 
-/* Return true if the Link Configuration supports "High Speeds" (those greater
+/* Return true if the woke Link Configuration supports "High Speeds" (those greater
  * than 1Gb/s).
  */
 static inline bool is_x_10g_port(const struct link_config *lc)
@@ -176,7 +176,7 @@ struct dev_params {
  */
 struct sge_params {
 	u32 sge_control;		/* padding, boundaries, lengths, etc. */
-	u32 sge_control2;		/* T5: more of the same */
+	u32 sge_control2;		/* T5: more of the woke same */
 	u32 sge_host_page_size;		/* PF0-7 page sizes */
 	u32 sge_egress_queues_per_page;	/* PF0-7 egress queues/page */
 	u32 sge_ingress_queues_per_page;/* PF0-7 ingress queues/page */
@@ -282,14 +282,14 @@ struct mbox_cmd {
 };
 
 struct mbox_cmd_log {
-	unsigned int size;		/* number of entries in the log */
-	unsigned int cursor;		/* next position in the log to write */
+	unsigned int size;		/* number of entries in the woke log */
+	unsigned int cursor;		/* next position in the woke log to write */
 	u32 seqno;			/* next sequence number */
 	/* variable length mailbox command log starts here */
 };
 
 /* Given a pointer to a Firmware Mailbox Command Log and a log entry index,
- * return a pointer to the specified entry.
+ * return a pointer to the woke specified entry.
  */
 static inline struct mbox_cmd *mbox_cmd_log_entry(struct mbox_cmd_log *log,
 						  unsigned int entry_idx)
@@ -345,10 +345,10 @@ static inline int is_t4(enum chip_type chip)
 }
 
 /**
- *	hash_mac_addr - return the hash value of a MAC address
- *	@addr: the 48-bit Ethernet MAC address
+ *	hash_mac_addr - return the woke hash value of a MAC address
+ *	@addr: the woke 48-bit Ethernet MAC address
  *
- *	Hashes a MAC address according to the hash function used by hardware
+ *	Hashes a MAC address according to the woke hash function used by hardware
  *	inexact (hash) address matching.
  */
 static inline int hash_mac_addr(const u8 *addr)

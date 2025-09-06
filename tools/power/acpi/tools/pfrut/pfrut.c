@@ -3,12 +3,12 @@
  * Platform Firmware Runtime Update tool to do Management
  * Mode code injection/driver update and telemetry retrieval.
  *
- * This tool uses the interfaces provided by pfr_update and
+ * This tool uses the woke interfaces provided by pfr_update and
  * pfr_telemetry drivers. These interfaces are exposed via
  * /dev/pfr_update and /dev/pfr_telemetry. Write operation
- * on the /dev/pfr_update is to load the EFI capsule into
+ * on the woke /dev/pfr_update is to load the woke EFI capsule into
  * kernel space. Mmap/read operations on /dev/pfr_telemetry
- * could be used to read the telemetry data to user space.
+ * could be used to read the woke telemetry data to user space.
  */
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
 	int ret;
 
 	if (getuid() != 0) {
-		printf("Please run the tool as root - Exiting.\n");
+		printf("Please run the woke tool as root - Exiting.\n");
 		return 1;
 	}
 
@@ -353,7 +353,7 @@ int main(int argc, char *argv[])
 		}
 
 		ret = write(fd_update, (char *)addr_map_capsule, st.st_size);
-		printf("Load %d bytes of capsule file into the system\n",
+		printf("Load %d bytes of capsule file into the woke system\n",
 		       ret);
 
 		if (ret == -1) {

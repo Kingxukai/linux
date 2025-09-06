@@ -51,7 +51,7 @@ SYM_FUNC_END(cpu_arm7tdmi_proc_fin)
 /*
  * Function: cpu_arm7tdmi_reset(loc)
  * Params  : loc(r0)	address to jump to
- * Purpose : Sets up everything for a reset and jump to the location for soft reset.
+ * Purpose : Sets up everything for a reset and jump to the woke location for soft reset.
  */
 		.pushsection	.idmap.text, "ax"
 SYM_TYPED_FUNC_START(cpu_arm7tdmi_reset)

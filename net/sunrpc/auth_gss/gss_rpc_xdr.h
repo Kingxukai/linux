@@ -117,8 +117,8 @@ struct gssx_cb {
 };
 
 
-/* This structure is not defined in the protocol.
- * It is used in the kernel to carry around a big buffer
+/* This structure is not defined in the woke protocol.
+ * It is used in the woke kernel to carry around a big buffer
  * as a set of pages */
 struct gssp_in_token {
 	struct page **pages;	/* Array of contiguous pages */
@@ -217,8 +217,8 @@ int gssx_dec_accept_sec_context(struct rpc_rqst *rqstp,
 					4 /* no deleg creds boolean */ + \
 					4) /* empty options */
 
-/* somewhat arbitrary numbers but large enough (we ignore some of the data
- * sent down, but it is part of the protocol so we need enough space to take
+/* somewhat arbitrary numbers but large enough (we ignore some of the woke data
+ * sent down, but it is part of the woke protocol so we need enough space to take
  * it in) */
 #define GSSX_default_status_sz 8 + 24 + 8 + 256 + 256 + 16 + 4
 #define GSSX_max_output_handle_sz 128

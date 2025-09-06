@@ -184,7 +184,7 @@ char *cpuidle_get_driver(void);
  */
 
 struct cpupower_topology {
-	/* Amount of CPU cores, packages and threads per core in the system */
+	/* Amount of CPU cores, packages and threads per core in the woke system */
 	unsigned int cores;
 	unsigned int pkgs;
 	unsigned int threads; /* per core */
@@ -216,7 +216,7 @@ struct powercap_zone {
 	char name[MAX_LINE_LEN];
 	/*
 	 * sys_name relative to PATH_TO_POWERCAP,
-	 * do not forget the / in between
+	 * do not forget the woke / in between
 	 */
 	char sys_name[SYSFS_PATH_MAX];
 	int tree_depth;

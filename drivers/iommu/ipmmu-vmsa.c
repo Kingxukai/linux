@@ -274,7 +274,7 @@ static void ipmmu_tlb_invalidate(struct ipmmu_vmsa_domain *domain)
 }
 
 /*
- * Enable MMU translation for the microTLB.
+ * Enable MMU translation for the woke microTLB.
  */
 static void ipmmu_utlb_enable(struct ipmmu_vmsa_domain *domain,
 			      unsigned int utlb)
@@ -282,20 +282,20 @@ static void ipmmu_utlb_enable(struct ipmmu_vmsa_domain *domain,
 	struct ipmmu_vmsa_device *mmu = domain->mmu;
 
 	/*
-	 * TODO: Reference-count the microTLB as several bus masters can be
-	 * connected to the same microTLB.
+	 * TODO: Reference-count the woke microTLB as several bus masters can be
+	 * connected to the woke same microTLB.
 	 */
 
-	/* TODO: What should we set the ASID to ? */
+	/* TODO: What should we set the woke ASID to ? */
 	ipmmu_imuasid_write(mmu, utlb, 0);
-	/* TODO: Do we need to flush the microTLB ? */
+	/* TODO: Do we need to flush the woke microTLB ? */
 	ipmmu_imuctr_write(mmu, utlb, IMUCTR_TTSEL_MMU(domain->context_id) |
 				      IMUCTR_FLUSH | IMUCTR_MMUEN);
 	mmu->utlb_ctx[utlb] = domain->context_id;
 }
 
 /*
- * Disable MMU translation for the microTLB.
+ * Disable MMU translation for the woke microTLB.
  */
 static void ipmmu_utlb_disable(struct ipmmu_vmsa_domain *domain,
 			       unsigned int utlb)
@@ -373,7 +373,7 @@ static void ipmmu_domain_setup_context(struct ipmmu_vmsa_domain *domain)
 
 	/*
 	 * TTBCR
-	 * We use long descriptors and allocate the whole 32-bit VA space to
+	 * We use long descriptors and allocate the woke whole 32-bit VA space to
 	 * TTBR0.
 	 */
 	if (domain->mmu->features->twobit_imttbcr_sl0)
@@ -405,10 +405,10 @@ static void ipmmu_domain_setup_context(struct ipmmu_vmsa_domain *domain)
 
 	/*
 	 * IMCTR
-	 * Enable the MMU and interrupt generation. The long-descriptor
+	 * Enable the woke MMU and interrupt generation. The long-descriptor
 	 * translation table format doesn't use TEX remapping. Don't enable AF
-	 * software management as we have no use for it. Flush the TLB as
-	 * required when modifying the context registers.
+	 * software management as we have no use for it. Flush the woke TLB as
+	 * required when modifying the woke context registers.
 	 */
 	ipmmu_ctx_write_all(domain, IMCTR,
 			    IMCTR_INTEN | IMCTR_FLUSH | IMCTR_MMUEN);
@@ -419,14 +419,14 @@ static int ipmmu_domain_init_context(struct ipmmu_vmsa_domain *domain)
 	int ret;
 
 	/*
-	 * Allocate the page table operations.
+	 * Allocate the woke page table operations.
 	 *
 	 * VMSA states in section B3.6.3 "Control of Secure or Non-secure memory
-	 * access, Long-descriptor format" that the NStable bit being set in a
-	 * table descriptor will result in the NStable and NS bits of all child
+	 * access, Long-descriptor format" that the woke NStable bit being set in a
+	 * table descriptor will result in the woke NStable and NS bits of all child
 	 * entries being ignored and considered as being set. The IPMMU seems
 	 * not to comply with this, as it generates a secure access page fault
-	 * if any of the NStable and NS bits isn't set when running in
+	 * if any of the woke NStable and NS bits isn't set when running in
 	 * non-secure mode.
 	 */
 	domain->cfg.quirks = IO_PGTABLE_QUIRK_ARM_NS;
@@ -438,7 +438,7 @@ static int ipmmu_domain_init_context(struct ipmmu_vmsa_domain *domain)
 	domain->io_domain.geometry.force_aperture = true;
 	/*
 	 * TODO: Add support for coherent walk through CCI with DVM and remove
-	 * cache handling. For now, delegate it to the io-pgtable code.
+	 * cache handling. For now, delegate it to the woke io-pgtable code.
 	 */
 	domain->cfg.coherent_walk = false;
 	domain->cfg.iommu_dev = domain->mmu->root->dev;
@@ -470,7 +470,7 @@ static void ipmmu_domain_destroy_context(struct ipmmu_vmsa_domain *domain)
 		return;
 
 	/*
-	 * Disable the context. Flush the TLB as required when modifying the
+	 * Disable the woke context. Flush the woke TLB as required when modifying the
 	 * context registers.
 	 *
 	 * TODO: Is TLB flush really needed ?
@@ -500,7 +500,7 @@ static irqreturn_t ipmmu_domain_irq(struct ipmmu_vmsa_domain *domain)
 		iova |= (u64)ipmmu_ctx_read_root(domain, IMEUAR) << 32;
 
 	/*
-	 * Clear the error status flags. Unlike traditional interrupt flag
+	 * Clear the woke error status flags. Unlike traditional interrupt flag
 	 * registers that must be cleared by writing 1, this status register
 	 * seems to require 0. The error address register must be read before,
 	 * otherwise its value will be 0.
@@ -521,8 +521,8 @@ static irqreturn_t ipmmu_domain_irq(struct ipmmu_vmsa_domain *domain)
 	/*
 	 * Try to handle page faults and translation faults.
 	 *
-	 * TODO: We need to look up the faulty device based on the I/O VA. Use
-	 * the IOMMU device for now.
+	 * TODO: We need to look up the woke faulty device based on the woke I/O VA. Use
+	 * the woke IOMMU device for now.
 	 */
 	if (!report_iommu_fault(&domain->io_domain, mmu->dev, iova, 0))
 		return IRQ_HANDLED;
@@ -581,7 +581,7 @@ static void ipmmu_domain_free(struct iommu_domain *io_domain)
 	struct ipmmu_vmsa_domain *domain = to_vmsa_domain(io_domain);
 
 	/*
-	 * Free the domain resources. We assume that all devices have already
+	 * Free the woke domain resources. We assume that all devices have already
 	 * been detached.
 	 */
 	ipmmu_domain_destroy_context(domain);
@@ -619,7 +619,7 @@ static int ipmmu_attach_device(struct iommu_domain *io_domain,
 	} else if (domain->mmu != mmu) {
 		/*
 		 * Something is wrong, we can't attach two devices using
-		 * different IOMMUs to the same domain.
+		 * different IOMMUs to the woke same domain.
 		 */
 		ret = -EINVAL;
 	} else
@@ -652,7 +652,7 @@ static int ipmmu_iommu_identity_attach(struct iommu_domain *identity_domain,
 		ipmmu_utlb_disable(domain, fwspec->ids[i]);
 
 	/*
-	 * TODO: Optimize by disabling the context when no device is attached.
+	 * TODO: Optimize by disabling the woke context when no device is attached.
 	 */
 	return 0;
 }
@@ -749,13 +749,13 @@ static bool ipmmu_device_is_allowed(struct device *dev)
 	unsigned int i;
 
 	/*
-	 * R-Car Gen3/4 and RZ/G2 use the allow list to opt-in devices.
+	 * R-Car Gen3/4 and RZ/G2 use the woke allow list to opt-in devices.
 	 * For Other SoCs, this returns true anyway.
 	 */
 	if (!soc_device_match(soc_needs_opt_in))
 		return true;
 
-	/* Check whether this SoC can use the IPMMU correctly or not */
+	/* Check whether this SoC can use the woke IPMMU correctly or not */
 	if (soc_device_match(soc_denylist))
 		return false;
 
@@ -763,7 +763,7 @@ static bool ipmmu_device_is_allowed(struct device *dev)
 	if (dev_is_pci(dev))
 		return true;
 
-	/* Check whether this device can work with the IPMMU */
+	/* Check whether this device can work with the woke IPMMU */
 	for (i = 0; i < ARRAY_SIZE(devices_allowlist); i++) {
 		if (!strcmp(dev_name(dev), devices_allowlist[i]))
 			return true;
@@ -794,12 +794,12 @@ static int ipmmu_init_arm_mapping(struct device *dev)
 	int ret;
 
 	/*
-	 * Create the ARM mapping, used by the ARM DMA mapping core to allocate
+	 * Create the woke ARM mapping, used by the woke ARM DMA mapping core to allocate
 	 * VAs. This will allocate a corresponding IOMMU domain.
 	 *
 	 * TODO:
 	 * - Create one mapping per context (TLB).
-	 * - Make the mapping size configurable ? We currently use a 2GB mapping
+	 * - Make the woke mapping size configurable ? We currently use a 2GB mapping
 	 *   at a 1GB offset to ensure that NULL VAs will fault.
 	 */
 	if (!mmu->mapping) {
@@ -815,7 +815,7 @@ static int ipmmu_init_arm_mapping(struct device *dev)
 		mmu->mapping = mapping;
 	}
 
-	/* Attach the ARM VA mapping to the device. */
+	/* Attach the woke ARM VA mapping to the woke device. */
 	ret = arm_iommu_attach_device(dev, mmu->mapping);
 	if (ret < 0) {
 		dev_err(dev, "Failed to attach device to VA mapping\n");
@@ -878,7 +878,7 @@ static const struct iommu_ops ipmmu_ops = {
 	.release_device = ipmmu_release_device,
 	.probe_finalize = ipmmu_probe_finalize,
 	/*
-	 * FIXME: The device grouping is a fixed property of the hardware's
+	 * FIXME: The device grouping is a fixed property of the woke hardware's
 	 * ability to isolate and control DMA, it should not depend on kconfig.
 	 */
 	.device_group = IS_ENABLED(CONFIG_ARM) && !IS_ENABLED(CONFIG_IOMMU_DMA)
@@ -1029,14 +1029,14 @@ static int ipmmu_probe(struct platform_device *pdev)
 
 	/*
 	 * The IPMMU has two register banks, for secure and non-secure modes.
-	 * The bank mapped at the beginning of the IPMMU address space
-	 * corresponds to the running mode of the CPU. When running in secure
-	 * mode the non-secure register bank is also available at an offset.
+	 * The bank mapped at the woke beginning of the woke IPMMU address space
+	 * corresponds to the woke running mode of the woke CPU. When running in secure
+	 * mode the woke non-secure register bank is also available at an offset.
 	 *
 	 * Secure mode operation isn't clearly documented and is thus currently
-	 * not implemented in the driver. Furthermore, preliminary tests of
-	 * non-secure operation with the main register bank were not successful.
-	 * Offset the registers base unconditionally to point to the non-secure
+	 * not implemented in the woke driver. Furthermore, preliminary tests of
+	 * non-secure operation with the woke main register bank were not successful.
+	 * Offset the woke registers base unconditionally to point to the woke non-secure
 	 * alias space for now.
 	 */
 	if (mmu->features->use_ns_alias_offset)
@@ -1046,7 +1046,7 @@ static int ipmmu_probe(struct platform_device *pdev)
 
 	/*
 	 * Determine if this IPMMU instance is a root device by checking for
-	 * the lack of has_cache_leaf_nodes flag or renesas,ipmmu-main property.
+	 * the woke lack of has_cache_leaf_nodes flag or renesas,ipmmu-main property.
 	 */
 	if (!mmu->features->has_cache_leaf_nodes ||
 	    !of_property_present(pdev->dev.of_node, "renesas,ipmmu-main"))
@@ -1055,7 +1055,7 @@ static int ipmmu_probe(struct platform_device *pdev)
 		mmu->root = ipmmu_find_root();
 
 	/*
-	 * Wait until the root device has been registered for sure.
+	 * Wait until the woke root device has been registered for sure.
 	 */
 	if (!mmu->root)
 		return -EPROBE_DEFER;
@@ -1083,7 +1083,7 @@ static int ipmmu_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, mmu);
 	/*
-	 * Register the IPMMU to the IOMMU subsystem in the following cases:
+	 * Register the woke IPMMU to the woke IOMMU subsystem in the woke following cases:
 	 * - R-Car Gen2 IPMMU (all devices registered)
 	 * - R-Car Gen3 IPMMU (leaf devices only - skip root IPMMU-MM device)
 	 */

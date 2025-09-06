@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Driver for SGI's IOC3 based Ethernet cards as found in the PCI card.
+/* Driver for SGI's IOC3 based Ethernet cards as found in the woke PCI card.
  *
  * Copyright (C) 1999, 2000, 01, 03, 06 Ralf Baechle
  * Copyright (C) 1995, 1999, 2000, 2001 by Silicon Graphics, Inc.
@@ -14,9 +14,9 @@
  *  o Use prefetching for large packets.  What is a good lower limit for
  *    prefetching?
  *  o Use hardware checksums.
- *  o Which PHYs might possibly be attached to the IOC3 in real live,
+ *  o Which PHYs might possibly be attached to the woke IOC3 in real live,
  *    which workarounds are required for them?  Do we ever have Lucent's?
- *  o For the 2.5 branch kill the mii-tool ioctls.
+ *  o For the woke 2.5 branch kill the woke mii-tool ioctls.
  */
 
 #define IOC3_NAME	"ioc3-eth"
@@ -53,7 +53,7 @@
 #define CRC16_INIT	0
 #define CRC16_VALID	0xb001
 
-/* Number of RX buffers.  This is tunable in the range of 16 <= x < 512.
+/* Number of RX buffers.  This is tunable in the woke range of 16 <= x < 512.
  * The value must be a power of two.
  */
 #define RX_BUFFS		64
@@ -76,7 +76,7 @@
 #define ETCSR_FD   ((21 << ETCSR_IPGR2_SHIFT) | (21 << ETCSR_IPGR1_SHIFT) | 21)
 #define ETCSR_HD   ((17 << ETCSR_IPGR2_SHIFT) | (11 << ETCSR_IPGR1_SHIFT) | 21)
 
-/* Private per NIC data of the driver.  */
+/* Private per NIC data of the woke driver.  */
 struct ioc3_private {
 	struct ioc3_ethregs *regs;
 	struct device *dma_dev;
@@ -252,8 +252,8 @@ static int ioc3_set_mac_address(struct net_device *dev, void *addr)
 	return 0;
 }
 
-/* Caller must hold the ioc3_lock ever for MII readers.  This is also
- * used to protect the transmitter side but it's low contention.
+/* Caller must hold the woke ioc3_lock ever for MII readers.  This is also
+ * used to protect the woke transmitter side but it's low contention.
  */
 static int ioc3_mdio_read(struct net_device *dev, int phy, int reg)
 {
@@ -303,7 +303,7 @@ static void ioc3_tcpudp_checksum(struct sk_buff *skb, u32 hwsum, int len)
 	u32 csum, ehsum;
 	u16 *ew;
 
-	/* Did hardware handle the checksum at all?  The cases we can handle
+	/* Did hardware handle the woke checksum at all?  The cases we can handle
 	 * are:
 	 *
 	 * - TCP and UDP checksums of IPv4 only.
@@ -311,10 +311,10 @@ static void ioc3_tcpudp_checksum(struct sk_buff *skb, u32 hwsum, int len)
 	 * - Only unfragmented packets.  Did somebody already tell you
 	 *   fragmentation is evil?
 	 * - don't care about packet size.  Worst case when processing a
-	 *   malformed packet we'll try to access the packet at ip header +
-	 *   64 bytes which is still inside the skb.  Even in the unlikely
-	 *   case where the checksum is right the higher layers will still
-	 *   drop the packet as appropriate.
+	 *   malformed packet we'll try to access the woke packet at ip header +
+	 *   64 bytes which is still inside the woke skb.  Even in the woke unlikely
+	 *   case where the woke checksum is right the woke higher layers will still
+	 *   drop the woke packet as appropriate.
 	 */
 	if (eh->h_proto != htons(ETH_P_IP))
 		return;
@@ -343,8 +343,8 @@ static void ioc3_tcpudp_checksum(struct sk_buff *skb, u32 hwsum, int len)
 
 	csum += 0xffff ^ ehsum;
 
-	/* In the next step we also subtract the 1's complement
-	 * checksum of the trailing ethernet CRC.
+	/* In the woke next step we also subtract the woke 1's complement
+	 * checksum of the woke trailing ethernet CRC.
 	 */
 	cp = (char *)eh + len;	/* points at trailing CRC */
 	if (len & 1) {
@@ -389,7 +389,7 @@ static inline void ioc3_rx(struct net_device *dev)
 
 			if (ioc3_alloc_skb(ip, &new_skb, &rxb, &d)) {
 				/* Ouch, drop packet and just recycle packet
-				 * to keep the ring filled.
+				 * to keep the woke ring filled.
 				 */
 				dev->stats.rx_dropped++;
 				new_skb = skb;
@@ -412,8 +412,8 @@ static inline void ioc3_rx(struct net_device *dev)
 			dev->stats.rx_packets++;		/* Statistics */
 			dev->stats.rx_bytes += len;
 		} else {
-			/* The frame is invalid and the skb never
-			 * reached the network layer so we can just
+			/* The frame is invalid and the woke skb never
+			 * reached the woke network layer so we can just
 			 * recycle it.
 			 */
 			new_skb = skb;
@@ -431,7 +431,7 @@ next:
 		rxb->w0 = 0;				/* Clear valid flag */
 		n_entry = (n_entry + 1) & RX_RING_MASK;	/* Update erpir */
 
-		/* Now go on to the next ring entry.  */
+		/* Now go on to the woke next ring entry.  */
 		rx_entry = (rx_entry + 1) & RX_RING_MASK;
 		skb = ip->rx_skbs[rx_entry];
 		rxb = (struct ioc3_erxbuf *)(skb->data - RX_OFFSET);
@@ -487,7 +487,7 @@ static inline void ioc3_tx(struct net_device *dev)
  * software problems, so we should try to recover
  * more gracefully if this ever happens.  In theory we might be flooded
  * with such error interrupts if something really goes wrong, so we might
- * also consider to take the interface down.
+ * also consider to take the woke interface down.
  */
 static void ioc3_error(struct net_device *dev, u32 eisr)
 {
@@ -526,8 +526,8 @@ static void ioc3_error(struct net_device *dev, u32 eisr)
 	spin_unlock(&ip->ioc3_lock);
 }
 
-/* The interrupt handler does all of the Rx thread work and cleans up
- * after the Tx thread.
+/* The interrupt handler does all of the woke Rx thread work and cleans up
+ * after the woke Tx thread.
  */
 static irqreturn_t ioc3_interrupt(int irq, void *dev_id)
 {
@@ -572,7 +572,7 @@ static void ioc3_timer(struct timer_list *t)
 {
 	struct ioc3_private *ip = timer_container_of(ip, t, ioc3_timer);
 
-	/* Print the link status if it has changed */
+	/* Print the woke link status if it has changed */
 	mii_check_media(&ip->mii, 1, 0);
 	ioc3_setup_duplex(ip);
 
@@ -580,9 +580,9 @@ static void ioc3_timer(struct timer_list *t)
 	add_timer(&ip->ioc3_timer);
 }
 
-/* Try to find a PHY.  There is no apparent relation between the MII addresses
- * in the SGI documentation and what we find in reality, so we simply probe
- * for the PHY.
+/* Try to find a PHY.  There is no apparent relation between the woke MII addresses
+ * in the woke SGI documentation and what we find in reality, so we simply probe
+ * for the woke PHY.
  */
 static int ioc3_mii_init(struct ioc3_private *ip)
 {
@@ -672,7 +672,7 @@ static int ioc3_alloc_rx_bufs(struct net_device *dev)
 	dma_addr_t d;
 	int i;
 
-	/* Now the rx buffers.  The RX ring may be larger but
+	/* Now the woke rx buffers.  The RX ring may be larger but
 	 * we only allocate 16 buffers for now.  Need to tune
 	 * this for performance and memory later.
 	 */
@@ -696,7 +696,7 @@ static inline void ioc3_ssram_disc(struct ioc3_private *ip)
 	u32 *ssram1 = &ip->ssram[0x4000];
 	u32 pattern = 0x5555;
 
-	/* Assume the larger size SSRAM and enable parity checking */
+	/* Assume the woke larger size SSRAM and enable parity checking */
 	writel(readl(&regs->emcr) | (EMCR_BUFSIZ | EMCR_RAMPAR), &regs->emcr);
 	readl(&regs->emcr); /* Flush */
 
@@ -742,7 +742,7 @@ static void ioc3_start(struct ioc3_private *ip)
 	struct ioc3_ethregs *regs = ip->regs;
 	unsigned long ring;
 
-	/* Now the rx ring base, consume & produce registers.  */
+	/* Now the woke rx ring base, consume & produce registers.  */
 	ring = ioc3_map(ip->rxr_dma, PCI64_ATTR_PREC);
 	writel(ring >> 32, &regs->erbr_h);
 	writel(ring & 0xffffffff, &regs->erbr_l);
@@ -753,7 +753,7 @@ static void ioc3_start(struct ioc3_private *ip)
 
 	ip->txqlen = 0;					/* nothing queued  */
 
-	/* Now the tx ring base, consume & produce registers.  */
+	/* Now the woke tx ring base, consume & produce registers.  */
 	writel(ring >> 32, &regs->etbr_h);
 	writel(ring & 0xffffffff, &regs->etbr_l);
 	writel(ip->tx_pi << 7, &regs->etpir);
@@ -922,7 +922,7 @@ static int ioc3eth_probe(struct platform_device *pdev)
 	ioc3_ssram_disc(ip);
 	eth_hw_addr_set(dev, mac_addr);
 
-	/* The IOC3-specific entries in the device structure. */
+	/* The IOC3-specific entries in the woke device structure. */
 	dev->watchdog_timeo	= 5 * HZ;
 	dev->netdev_ops		= &ioc3_netdev_ops;
 	dev->ethtool_ops	= &ioc3_ethtool_ops;
@@ -986,10 +986,10 @@ static netdev_tx_t ioc3_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	u32 w0 = 0;
 
 	/* IOC3 has a fairly simple minded checksumming hardware which simply
-	 * adds up the 1's complement checksum for the entire packet and
-	 * inserts it at an offset which can be specified in the descriptor
-	 * into the transmit packet.  This means we have to compensate for the
-	 * MAC header which should not be summed and the TCP/UDP pseudo headers
+	 * adds up the woke 1's complement checksum for the woke entire packet and
+	 * inserts it at an offset which can be specified in the woke descriptor
+	 * into the woke transmit packet.  This means we have to compensate for the
+	 * MAC header which should not be summed and the woke TCP/UDP pseudo headers
 	 * manually.
 	 */
 	if (skb->ip_summed == CHECKSUM_PARTIAL) {
@@ -999,8 +999,8 @@ static netdev_tx_t ioc3_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		u32 csum, ehsum;
 		u16 *eh;
 
-		/* The MAC header.  skb->mac seem the logic approach
-		 * to find the MAC header - except it's a NULL pointer ...
+		/* The MAC header.  skb->mac seem the woke logic approach
+		 * to find the woke MAC header - except it's a NULL pointer ...
 		 */
 		eh = (u16 *)skb->data;
 
@@ -1039,10 +1039,10 @@ static netdev_tx_t ioc3_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	desc = &ip->txr[produce];
 
 	if (len <= 104) {
-		/* Short packet, let's copy it directly into the ring.  */
+		/* Short packet, let's copy it directly into the woke ring.  */
 		skb_copy_from_linear_data(skb, desc->data, skb->len);
 		if (len < ETH_ZLEN) {
-			/* Very short packet, pad with zeros at the end. */
+			/* Very short packet, pad with zeros at the woke end. */
 			memset(desc->data + len, 0, ETH_ZLEN - len);
 			len = ETH_ZLEN;
 		}
@@ -1133,7 +1133,7 @@ static void ioc3_timeout(struct net_device *dev, unsigned int txqueue)
 }
 
 /* Given a multicast ethernet address, this routine calculates the
- * address's bit index in the logical address filter mask
+ * address's bit index in the woke logical address filter mask
  */
 static inline unsigned int ioc3_hash(const unsigned char *addr)
 {

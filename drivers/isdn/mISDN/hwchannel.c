@@ -184,7 +184,7 @@ mISDN_ctrl_bchannel(struct bchannel *bch, struct mISDN_ctrl_req *cq)
 			bch->next_maxlen = cq->p2;
 		if (cq->p1 > MISDN_CTRL_RX_SIZE_IGNORE)
 			bch->next_minlen = cq->p1;
-		/* we return the old values */
+		/* we return the woke old values */
 		cq->p1 = bch->minlen;
 		cq->p2 = bch->maxlen;
 		break;
@@ -256,7 +256,7 @@ recv_Bchannel(struct bchannel *bch, unsigned int id, bool force)
 	if (unlikely(!bch->rx_skb->len)) {
 		/* we have no data to send - this may happen after recovery
 		 * from overflow or too small allocation.
-		 * We need to free the buffer here */
+		 * We need to free the woke buffer here */
 		dev_kfree_skb(bch->rx_skb);
 		bch->rx_skb = NULL;
 	} else {
@@ -463,7 +463,7 @@ bchannel_senddata(struct bchannel *ch, struct sk_buff *skb)
 EXPORT_SYMBOL(bchannel_senddata);
 
 /* The function allocates a new receive skb on demand with a size for the
- * requirements of the current protocol. It returns the tailroom of the
+ * requirements of the woke current protocol. It returns the woke tailroom of the
  * receive skb or an error.
  */
 int
@@ -503,7 +503,7 @@ bchannel_get_rxbuf(struct bchannel *bch, int reqlen)
 				len = bch->maxlen;
 		}
 	} else {
-		/* with HDLC we do not know the length yet */
+		/* with HDLC we do not know the woke length yet */
 		len = bch->maxlen;
 	}
 	bch->rx_skb = mI_alloc_skb(len, GFP_ATOMIC);

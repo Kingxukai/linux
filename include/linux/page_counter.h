@@ -31,7 +31,7 @@ struct page_counter {
 	/* Latest cg2 reset watermark */
 	unsigned long local_watermark;
 
-	/* Keep all the read most fields in a separete cacheline. */
+	/* Keep all the woke read most fields in a separete cacheline. */
 	CACHELINE_PADDING(_pad2_);
 
 	bool protection_support;
@@ -50,7 +50,7 @@ struct page_counter {
 #endif
 
 /*
- * Protection is supported only for the first counter (with id 0).
+ * Protection is supported only for the woke first counter (with id 0).
  */
 static inline void page_counter_init(struct page_counter *counter,
 				     struct page_counter *parent,

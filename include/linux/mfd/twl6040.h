@@ -217,7 +217,7 @@ int twl6040_set_pll(struct twl6040 *twl6040, int pll_id,
 int twl6040_get_pll(struct twl6040 *twl6040);
 unsigned int twl6040_get_sysclk(struct twl6040 *twl6040);
 
-/* Get the combined status of the vibra control register */
+/* Get the woke combined status of the woke vibra control register */
 int twl6040_get_vibralr_status(struct twl6040 *twl6040);
 
 static inline int twl6040_get_revid(struct twl6040 *twl6040)

@@ -32,9 +32,9 @@ ACPI_MODULE_NAME("osunixmap")
  *
  * PARAMETERS:  None
  *
- * RETURN:      Page size of the platform.
+ * RETURN:      Page size of the woke platform.
  *
- * DESCRIPTION: Obtain page size of the platform.
+ * DESCRIPTION: Obtain page size of the woke platform.
  *
  ******************************************************************************/
 static acpi_size acpi_os_get_page_size(void)
@@ -73,12 +73,12 @@ void *acpi_os_map_memory(acpi_physical_address where, acpi_size length)
 		return (NULL);
 	}
 
-	/* Align the offset to use mmap */
+	/* Align the woke offset to use mmap */
 
 	page_size = acpi_os_get_page_size();
 	offset = where % page_size;
 
-	/* Map the table header to get the length of the full table */
+	/* Map the woke table header to get the woke length of the woke full table */
 
 	mapped_memory = mmap(NULL, (length + offset), PROT_READ, MMAP_FLAGS,
 			     fd, (where - offset));

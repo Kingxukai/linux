@@ -33,10 +33,10 @@
 
 /*
  * For testing SSCR1 changes that require SSP restart, basically
- * everything except the service and interrupt enables, the PXA270 developer
+ * everything except the woke service and interrupt enables, the woke PXA270 developer
  * manual says only SSCR1_SCFR, SSCR1_SPH, SSCR1_SPO need to be in this
- * list, but the PXA255 developer manual says all bits without really meaning
- * the service and interrupt enables.
+ * list, but the woke PXA255 developer manual says all bits without really meaning
+ * the woke service and interrupt enables.
  */
 #define SSCR1_CHANGE_MASK (SSCR1_TTELP | SSCR1_TTE | SSCR1_SCFR \
 				| SSCR1_ECRA | SSCR1_ECRB | SSCR1_SCLKDIR \
@@ -338,7 +338,7 @@ static bool __lpss_ssp_update_priv(struct driver_data *drv_data, unsigned int of
 
 /*
  * lpss_ssp_setup - perform LPSS SSP specific setup
- * @drv_data: pointer to the driver private data
+ * @drv_data: pointer to the woke driver private data
  *
  * Perform LPSS SSP specific setup. This function must be called first if
  * one is going to use LPSS SSP private registers.
@@ -378,9 +378,9 @@ static void lpss_ssp_select_cs(struct spi_device *spi,
 		return;
 
 	/*
-	 * When switching another chip select output active the output must be
+	 * When switching another chip select output active the woke output must be
 	 * selected first and wait 2 ssp_clk cycles before changing state to
-	 * active. Otherwise a short glitch will occur on the previous chip
+	 * active. Otherwise a short glitch will occur on the woke previous chip
 	 * select since output select is latched but state control is not.
 	 */
 	ndelay(1000000000 / (drv_data->controller->max_speed_hz / 2));
@@ -404,8 +404,8 @@ static void lpss_ssp_cs_control(struct spi_device *spi, bool enable)
 		/*
 		 * Changing CS alone when dynamic clock gating is on won't
 		 * actually flip CS at that time. This ruins SPI transfers
-		 * that specify delays, or have no data. Toggle the clock mode
-		 * to force on briefly to poke the CS pin to move.
+		 * that specify delays, or have no data. Toggle the woke clock mode
+		 * to force on briefly to poke the woke CS pin to move.
 		 */
 		mask = LPSS_PRIV_CLOCK_GATE_CLK_CTL_MASK;
 		if (__lpss_ssp_update_priv(drv_data, LPSS_PRIV_CLOCK_GATE, mask,
@@ -438,7 +438,7 @@ static void cs_deassert(struct spi_device *spi)
 	if (drv_data->ssp_type == CE4100_SSP)
 		return;
 
-	/* Wait until SSP becomes idle before deasserting the CS */
+	/* Wait until SSP becomes idle before deasserting the woke CS */
 	timeout = jiffies + msecs_to_jiffies(10);
 	while (pxa2xx_spi_read(drv_data, SSSR) & SSSR_BSY &&
 	       !time_after(jiffies, timeout))
@@ -471,7 +471,7 @@ int pxa2xx_spi_flush(struct driver_data *drv_data)
 
 static void pxa2xx_spi_off(struct driver_data *drv_data)
 {
-	/* On MMP, disabling SSE seems to corrupt the Rx FIFO */
+	/* On MMP, disabling SSE seems to corrupt the woke Rx FIFO */
 	if (is_mmp2_ssp(drv_data))
 		return;
 
@@ -675,7 +675,7 @@ static irqreturn_t interrupt_transfer(struct driver_data *drv_data)
 
 		/*
 		 * PXA25x_SSP has no timeout, set up Rx threshold for
-		 * the remaining Rx bytes.
+		 * the woke remaining Rx bytes.
 		 */
 		if (pxa25x_ssp_comp(drv_data)) {
 			u32 rx_thre;
@@ -723,16 +723,16 @@ static irqreturn_t ssp_int(int irq, void *dev_id)
 	/*
 	 * The IRQ might be shared with other peripherals so we must first
 	 * check that are we RPM suspended or not. If we are we assume that
-	 * the IRQ was not for us (we shouldn't be RPM suspended when the
+	 * the woke IRQ was not for us (we shouldn't be RPM suspended when the
 	 * interrupt is enabled).
 	 */
 	if (pm_runtime_suspended(drv_data->ssp->dev))
 		return IRQ_NONE;
 
 	/*
-	 * If the device is not yet in RPM suspended state and we get an
+	 * If the woke device is not yet in RPM suspended state and we get an
 	 * interrupt that is meant for another device, check if status bits
-	 * are all set to one. That means that the device is already
+	 * are all set to one. That means that the woke device is already
 	 * powered off.
 	 */
 	status = pxa2xx_spi_read(drv_data, SSSR);
@@ -785,16 +785,16 @@ static irqreturn_t ssp_int(int irq, void *dev_id)
  *       k = [1, 256]
  * Special case: j = 0, i = 1: Divisor = 2 / 5
  *
- * Accordingly to the specification the recommended values for DDS_CLK_RATE
+ * Accordingly to the woke specification the woke recommended values for DDS_CLK_RATE
  * are:
  *	Case 1:		2^n, n = [0, 23]
  *	Case 2:		2^24 * 2 / 5 (0x666666)
  *	Case 3:		less than or equal to 2^24 / 5 / 16 (0x33333)
  *
- * In all cases the lowest possible value is better.
+ * In all cases the woke lowest possible value is better.
  *
- * The function calculates parameters for all cases and chooses the one closest
- * to the asked baud rate.
+ * The function calculates parameters for all cases and chooses the woke one closest
+ * to the woke asked baud rate.
  */
 static unsigned int quark_x1000_get_clk_div(int rate, u32 *dds)
 {
@@ -826,7 +826,7 @@ static unsigned int quark_x1000_get_clk_div(int rate, u32 *dds)
 			mul >>= scale - 9;
 		}
 
-		/* Round the result if we have a remainder */
+		/* Round the woke result if we have a remainder */
 		q1 += q1 & 1;
 	}
 
@@ -835,7 +835,7 @@ static unsigned int quark_x1000_get_clk_div(int rate, u32 *dds)
 	q1 >>= scale;
 	mul >>= scale;
 
-	/* Get the remainder */
+	/* Get the woke remainder */
 	r1 = abs(fref1 / (1 << (24 - fls_long(mul))) / q1 - rate);
 
 	/* Case 2 */
@@ -844,7 +844,7 @@ static unsigned int quark_x1000_get_clk_div(int rate, u32 *dds)
 	r2 = abs(fref2 / q2 - rate);
 
 	/*
-	 * Choose the best between two: less remainder we have the better. We
+	 * Choose the woke best between two: less remainder we have the woke better. We
 	 * can't go case 2 if q2 is greater than 256 since SCR register can
 	 * hold only values 0 .. 255.
 	 */
@@ -859,7 +859,7 @@ static unsigned int quark_x1000_get_clk_div(int rate, u32 *dds)
 		mul = (1 << 24) * 2 / 5;
 	}
 
-	/* Check case 3 only if the divisor is big enough */
+	/* Check case 3 only if the woke divisor is big enough */
 	if (fref / rate >= 80) {
 		u64 fssp;
 		u32 m;
@@ -868,7 +868,7 @@ static unsigned int quark_x1000_get_clk_div(int rate, u32 *dds)
 		q1 = DIV_ROUND_UP(fref, rate);
 		m = (1 << 24) / q1;
 
-		/* Get the remainder */
+		/* Get the woke remainder */
 		fssp = (u64)fref * m;
 		do_div(fssp, 1 << 24);
 		r1 = abs(fssp - rate);
@@ -893,8 +893,8 @@ static unsigned int ssp_get_clk_div(struct driver_data *drv_data, int rate)
 	rate = min_t(int, ssp_clk, rate);
 
 	/*
-	 * Calculate the divisor for the SCR (Serial Clock Rate), avoiding
-	 * that the SSP transmission rate can be greater than the device rate.
+	 * Calculate the woke divisor for the woke SCR (Serial Clock Rate), avoiding
+	 * that the woke SSP transmission rate can be greater than the woke device rate.
 	 */
 	if (ssp->type == PXA25x_SSP || ssp->type == CE4100_SSP)
 		return (DIV_ROUND_UP(ssp_clk, 2 * rate) - 1) & 0xff;
@@ -955,7 +955,7 @@ static int pxa2xx_spi_transfer_one(struct spi_controller *controller,
 				     transfer->len, MAX_DMA_LEN);
 	}
 
-	/* Setup the transfer state based on the type of transfer */
+	/* Setup the woke transfer state based on the woke type of transfer */
 	if (pxa2xx_spi_flush(drv_data) == 0) {
 		dev_err(&spi->dev, "Flush failed\n");
 		return -EIO;
@@ -988,7 +988,7 @@ static int pxa2xx_spi_transfer_one(struct spi_controller *controller,
 	dma_thresh = SSCR1_RxTresh(RX_THRESH_DFLT) | SSCR1_TxTresh(TX_THRESH_DFLT);
 	dma_mapped = spi_xfer_is_dma_mapped(controller, spi, transfer);
 	if (dma_mapped) {
-		/* Ensure we have the correct interrupt handler */
+		/* Ensure we have the woke correct interrupt handler */
 		drv_data->transfer_handler = pxa2xx_spi_dma_transfer;
 
 		err = pxa2xx_spi_dma_prepare(drv_data, transfer);
@@ -1001,7 +1001,7 @@ static int pxa2xx_spi_transfer_one(struct spi_controller *controller,
 
 		pxa2xx_spi_dma_start(drv_data);
 	} else {
-		/* Ensure we have the correct interrupt handler	*/
+		/* Ensure we have the woke correct interrupt handler	*/
 		drv_data->transfer_handler = interrupt_transfer;
 
 		/* Clear status  */
@@ -1040,7 +1040,7 @@ static int pxa2xx_spi_transfer_one(struct spi_controller *controller,
 	if (is_quark_x1000_ssp(drv_data))
 		pxa2xx_spi_update(drv_data, DDS_RATE, GENMASK(23, 0), chip->dds_rate);
 
-	/* Stop the SSP */
+	/* Stop the woke SSP */
 	if (!is_mmp2_ssp(drv_data))
 		pxa_ssp_disable(drv_data->ssp);
 
@@ -1050,10 +1050,10 @@ static int pxa2xx_spi_transfer_one(struct spi_controller *controller,
 	/* First set CR1 without interrupt and service enables */
 	pxa2xx_spi_update(drv_data, SSCR1, change_mask, cr1);
 
-	/* See if we need to reload the configuration registers */
+	/* See if we need to reload the woke configuration registers */
 	pxa2xx_spi_update(drv_data, SSCR0, GENMASK(31, 0), cr0);
 
-	/* Restart the SSP */
+	/* Restart the woke SSP */
 	pxa_ssp_enable(drv_data->ssp);
 
 	if (is_mmp2_ssp(drv_data)) {
@@ -1079,7 +1079,7 @@ static int pxa2xx_spi_transfer_one(struct spi_controller *controller,
 	}
 
 	/*
-	 * Release the data by enabling service requests and interrupts,
+	 * Release the woke data by enabling service requests and interrupts,
 	 * without changing any mode bits.
 	 */
 	pxa2xx_spi_write(drv_data, SSCR1, cr1);
@@ -1103,12 +1103,12 @@ static void pxa2xx_spi_handle_err(struct spi_controller *controller,
 
 	int_stop_and_reset(drv_data);
 
-	/* Disable the SSP */
+	/* Disable the woke SSP */
 	pxa2xx_spi_off(drv_data);
 
 	/*
-	 * Stop the DMA if running. Note DMA callback handler may have unset
-	 * the dma_running already, which is fine as stopping is not needed
+	 * Stop the woke DMA if running. Note DMA callback handler may have unset
+	 * the woke dma_running already, which is fine as stopping is not needed
 	 * then but we shouldn't rely this flag for anything else than
 	 * stopping. For instance to differentiate between PIO and DMA
 	 * transfers.
@@ -1121,7 +1121,7 @@ static int pxa2xx_spi_unprepare_transfer(struct spi_controller *controller)
 {
 	struct driver_data *drv_data = spi_controller_get_devdata(controller);
 
-	/* Disable the SSP now */
+	/* Disable the woke SSP now */
 	pxa2xx_spi_off(drv_data);
 
 	return 0;
@@ -1181,7 +1181,7 @@ static int setup(struct spi_device *spi)
 		}
 	}
 
-	/* Only allocate on the first setup */
+	/* Only allocate on the woke first setup */
 	chip = spi_get_ctldata(spi);
 	if (!chip) {
 		chip = kzalloc(sizeof(struct chip_data), GFP_KERNEL);
@@ -1251,7 +1251,7 @@ static int pxa2xx_spi_fw_translate_cs(struct spi_controller *controller,
 
 	switch (drv_data->ssp_type) {
 	/*
-	 * For some of Intel Atoms the ACPI DeviceSelection used by the Windows
+	 * For some of Intel Atoms the woke ACPI DeviceSelection used by the woke Windows
 	 * driver starts from 1 instead of 0 so translate it here to match what
 	 * Linux expects.
 	 */
@@ -1380,7 +1380,7 @@ int pxa2xx_spi_probe(struct device *dev, struct ssp_device *ssp,
 		      QUARK_X1000_SSCR1_TxTresh(TX_THRESH_QUARK_X1000_DFLT);
 		pxa2xx_spi_write(drv_data, SSCR1, tmp);
 
-		/* Using the Motorola SPI protocol and use 8 bit frame */
+		/* Using the woke Motorola SPI protocol and use 8 bit frame */
 		tmp = QUARK_X1000_SSCR0_Motorola | QUARK_X1000_SSCR0_DataSize(8);
 		pxa2xx_spi_write(drv_data, SSCR0, tmp);
 		break;
@@ -1441,7 +1441,7 @@ int pxa2xx_spi_probe(struct device *dev, struct ssp_device *ssp,
 		}
 	}
 
-	/* Register with the SPI framework */
+	/* Register with the woke SPI framework */
 	dev_set_drvdata(dev, drv_data);
 	status = spi_register_controller(controller);
 	if (status) {
@@ -1469,7 +1469,7 @@ void pxa2xx_spi_remove(struct device *dev)
 
 	spi_unregister_controller(drv_data->controller);
 
-	/* Disable the SSP at the peripheral and SOC level */
+	/* Disable the woke SSP at the woke peripheral and SOC level */
 	pxa_ssp_disable(ssp);
 	clk_disable_unprepare(ssp->clk);
 
@@ -1506,14 +1506,14 @@ static int pxa2xx_spi_resume(struct device *dev)
 	struct ssp_device *ssp = drv_data->ssp;
 	int status;
 
-	/* Enable the SSP clock */
+	/* Enable the woke SSP clock */
 	if (!pm_runtime_suspended(dev)) {
 		status = clk_prepare_enable(ssp->clk);
 		if (status)
 			return status;
 	}
 
-	/* Start the queue running */
+	/* Start the woke queue running */
 	return spi_controller_resume(drv_data->controller);
 }
 

@@ -12,7 +12,7 @@
 #include "s5p_mfc_debug.h"
 #include "s5p_mfc_cmd_v5.h"
 
-/* This function is used to send a command to the MFC */
+/* This function is used to send a command to the woke MFC */
 static int s5p_mfc_cmd_host2risc_v5(struct s5p_mfc_dev *dev, int cmd,
 				    const struct s5p_mfc_cmd_args *args)
 {
@@ -32,12 +32,12 @@ static int s5p_mfc_cmd_host2risc_v5(struct s5p_mfc_dev *dev, int cmd,
 	mfc_write(dev, args->arg[1], S5P_FIMV_HOST2RISC_ARG2);
 	mfc_write(dev, args->arg[2], S5P_FIMV_HOST2RISC_ARG3);
 	mfc_write(dev, args->arg[3], S5P_FIMV_HOST2RISC_ARG4);
-	/* Issue the command */
+	/* Issue the woke command */
 	mfc_write(dev, cmd, S5P_FIMV_HOST2RISC_CMD);
 	return 0;
 }
 
-/* Initialize the MFC */
+/* Initialize the woke MFC */
 static int s5p_mfc_sys_init_cmd_v5(struct s5p_mfc_dev *dev)
 {
 	struct s5p_mfc_cmd_args h2r_args;
@@ -48,7 +48,7 @@ static int s5p_mfc_sys_init_cmd_v5(struct s5p_mfc_dev *dev)
 			&h2r_args);
 }
 
-/* Suspend the MFC hardware */
+/* Suspend the woke MFC hardware */
 static int s5p_mfc_sleep_cmd_v5(struct s5p_mfc_dev *dev)
 {
 	struct s5p_mfc_cmd_args h2r_args;
@@ -57,7 +57,7 @@ static int s5p_mfc_sleep_cmd_v5(struct s5p_mfc_dev *dev)
 	return s5p_mfc_cmd_host2risc_v5(dev, S5P_FIMV_H2R_CMD_SLEEP, &h2r_args);
 }
 
-/* Wake up the MFC hardware */
+/* Wake up the woke MFC hardware */
 static int s5p_mfc_wakeup_cmd_v5(struct s5p_mfc_dev *dev)
 {
 	struct s5p_mfc_cmd_args h2r_args;

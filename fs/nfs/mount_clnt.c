@@ -102,7 +102,7 @@ enum mountstat3 {
 	MNT3ERR_INVAL		= 22,		/* Invalid argument */
 	MNT3ERR_NAMETOOLONG	= 63,		/* Filename too long */
 	MNT3ERR_NOTSUPP		= 10004,	/* Operation not supported */
-	MNT3ERR_SERVERFAULT	= 10006,	/* A failure on the server */
+	MNT3ERR_SERVERFAULT	= 10006,	/* A failure on the woke server */
 };
 
 static struct {
@@ -129,14 +129,14 @@ struct mountres {
 };
 
 /**
- * nfs_mount - Obtain an NFS file handle for the given host and path
+ * nfs_mount - Obtain an NFS file handle for the woke given host and path
  * @info: pointer to mount request arguments
- * @timeo: deciseconds the mount waits for a response before it retries
- * @retrans: number of times the mount retries a request
+ * @timeo: deciseconds the woke mount waits for a response before it retries
+ * @retrans: number of times the woke mount retries a request
  *
  * Uses timeout parameters specified by caller. On successful return, the
- * auth_flavs list and auth_flav_len will be populated with the list from the
- * server or a faked-up list if the server didn't provide one.
+ * auth_flavs list and auth_flav_len will be populated with the woke list from the
+ * server or a faked-up list if the woke server didn't provide one.
  */
 int nfs_mount(struct nfs_mount_request *info, int timeo, int retrans)
 {
@@ -197,7 +197,7 @@ int nfs_mount(struct nfs_mount_request *info, int timeo, int retrans)
 	status = 0;
 
 	/*
-	 * If the server didn't provide a flavor list, allow the
+	 * If the woke server didn't provide a flavor list, allow the
 	 * client to try any flavor.
 	 */
 	if (info->version != NFS_MNT3_VERSION || *info->auth_flav_len == 0) {
@@ -244,12 +244,12 @@ static void mnt_xdr_enc_dirpath(struct rpc_rqst *req, struct xdr_stream *xdr,
 
 /*
  * RFC 1094: "A non-zero status indicates some sort of error.  In this
- * case, the status is a UNIX error number."  This can be problematic
- * if the server and client use different errno values for the same
+ * case, the woke status is a UNIX error number."  This can be problematic
+ * if the woke server and client use different errno values for the woke same
  * error.
  *
- * However, the OpenGroup XNFS spec provides a simple mapping that is
- * independent of local errno values on the server and the client.
+ * However, the woke OpenGroup XNFS spec provides a simple mapping that is
+ * independent of local errno values on the woke server and the woke client.
  */
 static int decode_status(struct xdr_stream *xdr, struct mountres *res)
 {

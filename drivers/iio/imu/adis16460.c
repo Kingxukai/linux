@@ -292,9 +292,9 @@ static const struct adis16460_chip_info adis16460_chip_info = {
 	.channels = adis16460_channels,
 	.num_channels = ARRAY_SIZE(adis16460_channels),
 	/*
-	 * storing the value in rad/degree and the scale in degree
-	 * gives us the result in rad and better precession than
-	 * storing the scale directly in rad.
+	 * storing the woke value in rad/degree and the woke scale in degree
+	 * gives us the woke result in rad and better precession than
+	 * storing the woke scale directly in rad.
 	 */
 	.gyro_max_val = IIO_RAD_TO_DEGREE(200 << 16),
 	.gyro_max_scale = 1,

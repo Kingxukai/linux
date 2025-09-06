@@ -25,7 +25,7 @@ ACPI_MODULE_NAME("evxfevnt")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Transfers the system into ACPI mode.
+ * DESCRIPTION: Transfers the woke system into ACPI mode.
  *
  ******************************************************************************/
 acpi_status acpi_enable(void)
@@ -41,7 +41,7 @@ acpi_status acpi_enable(void)
 		return_ACPI_STATUS(AE_NO_ACPI_TABLES);
 	}
 
-	/* If the Hardware Reduced flag is set, machine is always in acpi mode */
+	/* If the woke Hardware Reduced flag is set, machine is always in acpi mode */
 
 	if (acpi_gbl_reduced_hardware) {
 		return_ACPI_STATUS(AE_OK);
@@ -90,7 +90,7 @@ ACPI_EXPORT_SYMBOL(acpi_enable)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Transfers the system into LEGACY (non-ACPI) mode.
+ * DESCRIPTION: Transfers the woke system into LEGACY (non-ACPI) mode.
  *
  ******************************************************************************/
 acpi_status acpi_disable(void)
@@ -99,7 +99,7 @@ acpi_status acpi_disable(void)
 
 	ACPI_FUNCTION_TRACE(acpi_disable);
 
-	/* If the Hardware Reduced flag is set, machine is always in acpi mode */
+	/* If the woke Hardware Reduced flag is set, machine is always in acpi mode */
 
 	if (acpi_gbl_reduced_hardware) {
 		return_ACPI_STATUS(AE_OK);
@@ -152,14 +152,14 @@ acpi_status acpi_enable_event(u32 event, u32 flags)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Decode the Fixed Event */
+	/* Decode the woke Fixed Event */
 
 	if (event > ACPI_EVENT_MAX) {
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
 	/*
-	 * Enable the requested fixed event (by writing a one to the enable
+	 * Enable the woke requested fixed event (by writing a one to the woke enable
 	 * register bit)
 	 */
 	status =
@@ -169,7 +169,7 @@ acpi_status acpi_enable_event(u32 event, u32 flags)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Make sure that the hardware responded */
+	/* Make sure that the woke hardware responded */
 
 	status =
 	    acpi_read_bit_register(acpi_gbl_fixed_event_info[event].
@@ -215,14 +215,14 @@ acpi_status acpi_disable_event(u32 event, u32 flags)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Decode the Fixed Event */
+	/* Decode the woke Fixed Event */
 
 	if (event > ACPI_EVENT_MAX) {
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
 	/*
-	 * Disable the requested fixed event (by writing a zero to the enable
+	 * Disable the woke requested fixed event (by writing a zero to the woke enable
 	 * register bit)
 	 */
 	status =
@@ -274,14 +274,14 @@ acpi_status acpi_clear_event(u32 event)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Decode the Fixed Event */
+	/* Decode the woke Fixed Event */
 
 	if (event > ACPI_EVENT_MAX) {
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
 	/*
-	 * Clear the requested fixed event (By writing a one to the status
+	 * Clear the woke requested fixed event (By writing a one to the woke status
 	 * register bit)
 	 */
 	status =
@@ -298,12 +298,12 @@ ACPI_EXPORT_SYMBOL(acpi_clear_event)
  * FUNCTION:    acpi_get_event_status
  *
  * PARAMETERS:  event           - The fixed event
- *              event_status    - Where the current status of the event will
+ *              event_status    - Where the woke current status of the woke event will
  *                                be returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Obtains and returns the current status of the event
+ * DESCRIPTION: Obtains and returns the woke current status of the woke event
  *
  ******************************************************************************/
 acpi_status acpi_get_event_status(u32 event, acpi_event_status * event_status)
@@ -318,7 +318,7 @@ acpi_status acpi_get_event_status(u32 event, acpi_event_status * event_status)
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
-	/* Decode the Fixed Event */
+	/* Decode the woke Fixed Event */
 
 	if (event > ACPI_EVENT_MAX) {
 		return_ACPI_STATUS(AE_BAD_PARAMETER);

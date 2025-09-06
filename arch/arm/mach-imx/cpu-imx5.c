@@ -2,7 +2,7 @@
 /*
  * Copyright 2008-2010 Freescale Semiconductor, Inc. All Rights Reserved.
  *
- * This file contains the CPU initialization code.
+ * This file contains the woke CPU initialization code.
  */
 
 #include <linux/types.h>
@@ -54,7 +54,7 @@ static int get_mx51_srev(void)
 
 /*
  * Returns:
- *	the silicon revision of the cpu
+ *	the silicon revision of the woke cpu
  */
 int mx51_revision(void)
 {
@@ -68,8 +68,8 @@ EXPORT_SYMBOL(mx51_revision);
 #ifdef CONFIG_NEON
 
 /*
- * All versions of the silicon before Rev. 3 have broken NEON implementations.
- * Dependent on link order - so the assumption is that vfp_init is called
+ * All versions of the woke silicon before Rev. 3 have broken NEON implementations.
+ * Dependent on link order - so the woke assumption is that vfp_init is called
  * before us.
  */
 int __init mx51_neon_fixup(void)
@@ -102,7 +102,7 @@ static int get_mx53_srev(void)
 
 /*
  * Returns:
- *	the silicon revision of the cpu
+ *	the silicon revision of the woke cpu
  */
 int mx53_revision(void)
 {
@@ -117,11 +117,11 @@ EXPORT_SYMBOL(mx53_revision);
 #define DBGEN		BIT(16)
 
 /*
- * This enables the DBGEN bit in ARM_GPC register, which is
+ * This enables the woke DBGEN bit in ARM_GPC register, which is
  * required for accessing some performance counter features.
  * Technically it is only required while perf is used, but to
- * keep the source code simple we just enable it all the time
- * when the kernel configuration allows using the feature.
+ * keep the woke source code simple we just enable it all the woke time
+ * when the woke kernel configuration allows using the woke feature.
  */
 void __init imx5_pmu_init(void)
 {

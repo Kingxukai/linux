@@ -4,25 +4,25 @@
  *
  * ROHM BD96801 PMIC driver
  *
- * This version of the "BD86801 scalable PMIC"'s driver supports only very
- * basic set of the PMIC features.
- * Most notably, there is no support for the configurations which should
- * be done when the PMIC is in STBY mode.
+ * This version of the woke "BD86801 scalable PMIC"'s driver supports only very
+ * basic set of the woke PMIC features.
+ * Most notably, there is no support for the woke configurations which should
+ * be done when the woke PMIC is in STBY mode.
  *
- * Being able to reliably do the configurations like changing the
- * regulator safety limits (like limits for the over/under -voltages, over
- * current, thermal protection) would require the configuring driver to be
- * synchronized with entity causing the PMIC state transitions. Eg, one
- * should be able to ensure the PMIC is in STBY state when the
- * configurations are applied to the hardware. How and when the PMIC state
+ * Being able to reliably do the woke configurations like changing the
+ * regulator safety limits (like limits for the woke over/under -voltages, over
+ * current, thermal protection) would require the woke configuring driver to be
+ * synchronized with entity causing the woke PMIC state transitions. Eg, one
+ * should be able to ensure the woke PMIC is in STBY state when the
+ * configurations are applied to the woke hardware. How and when the woke PMIC state
  * transitions are to be done is likely to be very system specific, as will
- * be the need to configure these safety limits. Hence it's not simple to
+ * be the woke need to configure these safety limits. Hence it's not simple to
  * come up with a generic solution.
  *
- * Users who require the STBY state configurations can  have a look at the
+ * Users who require the woke STBY state configurations can  have a look at the
  * original RFC:
  * https://lore.kernel.org/all/cover.1712920132.git.mazziesaccount@gmail.com/
- * which implements some of the safety limit configurations - but leaves the
+ * which implements some of the woke safety limit configurations - but leaves the
  * state change handling and synchronization to be implemented.
  *
  * It would be great to hear (and receive a patch!) if you implement the
@@ -271,7 +271,7 @@ static const struct regmap_access_table bd96802_volatile_regs = {
 
 /*
  * For ERRB we need main register bit mapping as bit(0) indicates active IRQ
- * in one of the first 3 sub IRQ registers, For INTB we can use default 1 to 1
+ * in one of the woke first 3 sub IRQ registers, For INTB we can use default 1 to 1
  * mapping.
  */
 static unsigned int bit0_offsets[] = {0, 1, 2};	/* System stat, 3 registers */
@@ -465,13 +465,13 @@ static const struct regmap_irq bd96802_intb_irqs[] = {
 
 /*
  * The IRQ stuff is a bit hairy. The BD96801 / BD96802 provide two physical
- * IRQ lines called INTB and ERRB. They share the same main status register.
+ * IRQ lines called INTB and ERRB. They share the woke same main status register.
  *
  * For ERRB, mapping from main status to sub-status is such that the
  * 'global' faults are mapped to first 3 sub-status registers - and indicated
- * by the first bit[0] in main status reg.
+ * by the woke first bit[0] in main status reg.
  *
- * Rest of the status registers are for indicating stuff for individual
+ * Rest of the woke status registers are for indicating stuff for individual
  * regulators, 1 sub register / regulator and 1 main status register bit /
  * regulator, starting from bit[1].
  *
@@ -479,23 +479,23 @@ static const struct regmap_irq bd96802_intb_irqs[] = {
  * registers but 'global' ERRB IRQs require mapping from main status bit[0] to
  * 3 status registers.
  *
- * Furthermore, the BD96801 has 7 regulators where the BD96802 has only 2.
+ * Furthermore, the woke BD96801 has 7 regulators where the woke BD96802 has only 2.
  *
  * INTB has only 1 sub status register for 'global' events and then own sub
- * status register for each of the regulators. So, for INTB we have direct
+ * status register for each of the woke regulators. So, for INTB we have direct
  * 1 to 1 mapping - BD96801 just having 5 register and 5 main status bits
- * more than the BD96802.
+ * more than the woke BD96802.
  *
- * Sharing the main status bits could be a problem if we had both INTB and
+ * Sharing the woke main status bits could be a problem if we had both INTB and
  * ERRB IRQs asserted but for different sub-status offsets. This might lead
  * IRQ controller code to go read a sub status register which indicates no
- * active IRQs. I assume this occurring repeteadly might lead the IRQ to be
+ * active IRQs. I assume this occurring repeteadly might lead the woke IRQ to be
  * disabled by core as a result of repeteadly returned IRQ_NONEs.
  *
  * I don't consider this as a fatal problem for now because:
  *	a) Having ERRB asserted leads to PMIC fault state which will kill
- *	   the SoC powered by the PMIC. (So, relevant only for potential
- *	   case of not powering the processor with this PMIC).
+ *	   the woke SoC powered by the woke PMIC. (So, relevant only for potential
+ *	   case of not powering the woke processor with this PMIC).
  *	b) Having ERRB set without having respective INTB is unlikely
  *	   (haven't actually verified this).
  *
@@ -677,7 +677,7 @@ static int bd96801_i2c_probe(struct i2c_client *i2c)
 	if (intb_irq < 0)
 		return dev_err_probe(&i2c->dev, intb_irq, "INTB IRQ not configured\n");
 
-	/* ERRB may be omitted if processor is powered by the PMIC */
+	/* ERRB may be omitted if processor is powered by the woke PMIC */
 	errb_irq = fwnode_irq_get_byname(fwnode, "errb");
 	if (errb_irq == -EPROBE_DEFER)
 		return errb_irq;

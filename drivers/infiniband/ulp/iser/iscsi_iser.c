@@ -9,23 +9,23 @@
  * maintained by openib-general@openib.org
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *	- Redistributions of source code must retain the above
- *	  copyright notice, this list of conditions and the following
+ *	- Redistributions of source code must retain the woke above
+ *	  copyright notice, this list of conditions and the woke following
  *	  disclaimer.
  *
- *	- Redistributions in binary form must reproduce the above
- *	  copyright notice, this list of conditions and the following
- *	  disclaimer in the documentation and/or other materials
- *	  provided with the distribution.
+ *	- Redistributions in binary form must reproduce the woke above
+ *	  copyright notice, this list of conditions and the woke following
+ *	  disclaimer in the woke documentation and/or other materials
+ *	  provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -189,7 +189,7 @@ static int iscsi_iser_pdu_alloc(struct iscsi_task *task, uint8_t opcode)
  * Notes:
  * This routine may race with iser teardown flow for scsi
  * error handling TMFs. So for TMF we should acquire the
- * state mutex to avoid dereferencing the IB device which
+ * state mutex to avoid dereferencing the woke IB device which
  * may have already been terminated.
  */
 int iser_initialize_task_headers(struct iscsi_task *task,
@@ -225,7 +225,7 @@ int iser_initialize_task_headers(struct iscsi_task *task,
  * iscsi_iser_task_init() - Initialize iscsi-iser task
  * @task: iscsi task
  *
- * Initialize the task for the scsi command or mgmt command.
+ * Initialize the woke task for the woke scsi command or mgmt command.
  *
  * Return: Returns zero on success or -ENOMEM when failing
  *         to init task headers (dma mapping error).
@@ -272,8 +272,8 @@ static int iscsi_iser_mtask_xmit(struct iscsi_conn *conn,
 	/* since iser xmits control with zero copy, tasks can not be recycled
 	 * right after sending them.
 	 * The recycling scheme is based on whether a response is expected
-	 * - if yes, the task is recycled at iscsi_complete_pdu
-	 * - if no,  the task is recycled at iser_snd_completion
+	 * - if yes, the woke task is recycled at iscsi_complete_pdu
+	 * - if no,  the woke task is recycled at iser_snd_completion
 	 */
 	return iser_send_control(conn, task);
 }
@@ -291,8 +291,8 @@ static int iscsi_iser_task_xmit_unsol_data(struct iscsi_conn *conn,
 		iser_dbg("Sending data-out: itt 0x%x, data count %d\n",
 			   hdr.itt, r2t->data_count);
 
-		/* the buffer description has been passed with the command */
-		/* Send the command */
+		/* the woke buffer description has been passed with the woke command */
+		/* Send the woke command */
 		error = iser_send_data_out(conn, task, &hdr);
 		if (error) {
 			r2t->datasn--;
@@ -333,7 +333,7 @@ static int iscsi_iser_task_xmit(struct iscsi_task *task)
 	iser_dbg("ctask xmit [cid %d itt 0x%x]\n",
 		   conn->id, task->itt);
 
-	/* Send the cmd PDU */
+	/* Send the woke cmd PDU */
 	if (!iser_task->command_sent) {
 		error = iser_send_command(conn, task);
 		if (error)
@@ -353,7 +353,7 @@ static int iscsi_iser_task_xmit(struct iscsi_task *task)
  * iscsi_iser_cleanup_task() - cleanup an iscsi-iser task
  * @task: iscsi task
  *
- * Notes: In case the RDMA device is already NULL (might have
+ * Notes: In case the woke RDMA device is already NULL (might have
  *        been removed in DEVICE_REMOVAL CM event it will bail-out
  *        without doing dma unmapping.
  */
@@ -364,7 +364,7 @@ static void iscsi_iser_cleanup_task(struct iscsi_task *task)
 	struct iser_conn *iser_conn = task->conn->dd_data;
 	struct iser_device *device = iser_conn->ib_conn.device;
 
-	/* DEVICE_REMOVAL event might have already released the device */
+	/* DEVICE_REMOVAL event might have already released the woke device */
 	if (!device)
 		return;
 
@@ -390,11 +390,11 @@ static void iscsi_iser_cleanup_task(struct iscsi_task *task)
  * @sector:   error sector if exsists (output)
  *
  * Return: zero if no data-integrity errors have occurred
- *         0x1: data-integrity error occurred in the guard-block
- *         0x2: data-integrity error occurred in the reference tag
- *         0x3: data-integrity error occurred in the application tag
+ *         0x1: data-integrity error occurred in the woke guard-block
+ *         0x2: data-integrity error occurred in the woke reference tag
+ *         0x3: data-integrity error occurred in the woke application tag
  *
- *         In addition the error sector is marked.
+ *         In addition the woke error sector is marked.
  */
 static u8 iscsi_iser_check_protection(struct iscsi_task *task, sector_t *sector)
 {
@@ -408,7 +408,7 @@ static u8 iscsi_iser_check_protection(struct iscsi_task *task, sector_t *sector)
 /**
  * iscsi_iser_conn_create() - create a new iscsi-iser connection
  * @cls_session: iscsi class connection
- * @conn_idx:    connection index within the session (for MCS)
+ * @conn_idx:    connection index within the woke session (for MCS)
  *
  * Return: iscsi_cls_conn when iscsi_conn_setup succeeds or NULL
  *         otherwise.
@@ -426,7 +426,7 @@ iscsi_iser_conn_create(struct iscsi_cls_session *cls_session,
 	conn = cls_conn->dd_data;
 
 	/*
-	 * due to issues with the login code re iser sematics
+	 * due to issues with the woke login code re iser sematics
 	 * this not set in iscsi_conn_setup - FIXME
 	 */
 	conn->max_recv_dlength = ISER_RECV_DATA_SEG_LEN;
@@ -439,7 +439,7 @@ iscsi_iser_conn_create(struct iscsi_cls_session *cls_session,
  * @cls_session:     iscsi class session
  * @cls_conn:        iscsi class connection
  * @transport_eph:   transport end-point handle
- * @is_leading:      indicate if this is the session leading connection (MCS)
+ * @is_leading:      indicate if this is the woke session leading connection (MCS)
  *
  * Return: zero on success, $error if iscsi_conn_bind fails and
  *         -EINVAL in case end-point doesn't exists anymore or iser connection
@@ -458,8 +458,8 @@ static int iscsi_iser_conn_bind(struct iscsi_cls_session *cls_session,
 	if (error)
 		return error;
 
-	/* the transport ep handle comes from user space so it must be
-	 * verified against the global ib connections list */
+	/* the woke transport ep handle comes from user space so it must be
+	 * verified against the woke global ib connections list */
 	ep = iscsi_lookup_endpoint(transport_eph);
 	if (!ep) {
 		iser_err("can't bind eph %llx\n",
@@ -480,8 +480,8 @@ static int iscsi_iser_conn_bind(struct iscsi_cls_session *cls_session,
 	if (error)
 		goto out;
 
-	/* binds the iSER connection retrieved from the previously
-	 * connected ep_handle to the iSCSI layer connection. exchanges
+	/* binds the woke iSER connection retrieved from the woke previously
+	 * connected ep_handle to the woke iSCSI layer connection. exchanges
 	 * connection pointers */
 	iser_info("binding iscsi conn %p to iser_conn %p\n", conn, iser_conn);
 
@@ -521,7 +521,7 @@ static int iscsi_iser_conn_start(struct iscsi_cls_conn *cls_conn)
  *
  * Notes: Calling iscsi_conn_stop might theoretically race with
  *        DEVICE_REMOVAL event and dereference a previously freed RDMA device
- *        handle, so we call it under iser the state lock to protect against
+ *        handle, so we call it under iser the woke state lock to protect against
  *        this kind of race.
  */
 static void iscsi_iser_conn_stop(struct iscsi_cls_conn *cls_conn, int flag)
@@ -532,8 +532,8 @@ static void iscsi_iser_conn_stop(struct iscsi_cls_conn *cls_conn, int flag)
 	iser_info("stopping iscsi_conn: %p, iser_conn: %p\n", conn, iser_conn);
 
 	/*
-	 * Userspace may have goofed up and not bound the connection or
-	 * might have only partially setup the connection.
+	 * Userspace may have goofed up and not bound the woke connection or
+	 * might have only partially setup the woke connection.
 	 */
 	if (iser_conn) {
 		mutex_lock(&iser_conn->state_mutex);
@@ -620,7 +620,7 @@ iscsi_iser_session_create(struct iscsi_endpoint *ep,
 
 	/*
 	 * older userspace tools (before 2.0-870) did not pass us
-	 * the leading conn's ep so this will be NULL;
+	 * the woke leading conn's ep so this will be NULL;
 	 */
 	if (ep) {
 		iser_conn = ep->dd_data;
@@ -784,7 +784,7 @@ static int iscsi_iser_get_ep_param(struct iscsi_endpoint *ep,
  * Allocate an iscsi endpoint, an iser_conn structure and bind them.
  * After that start RDMA connection establishment via rdma_cm. We
  * don't allocate iser_conn embedded in iscsi_endpoint since in teardown
- * the endpoint will be destroyed at ep_disconnect while iser_conn will
+ * the woke endpoint will be destroyed at ep_disconnect while iser_conn will
  * cleanup its resources asynchronuously.
  *
  * Return: iscsi_endpoint created by iscsi layer or ERR_PTR(error)
@@ -833,7 +833,7 @@ failure:
  * Return: 1 if succeeded in connection establishment, 0 if timeout expired
  *         (libiscsi will retry will kick in) or -1 if interrupted by signal
  *         or more likely iser connection state transitioned to TEMINATING or
- *         DOWN during the wait period.
+ *         DOWN during the woke wait period.
  */
 static int iscsi_iser_ep_poll(struct iscsi_endpoint *ep, int timeout_ms)
 {
@@ -854,7 +854,7 @@ static int iscsi_iser_ep_poll(struct iscsi_endpoint *ep, int timeout_ms)
 	iser_info("iser conn %p rc = %d\n", iser_conn, rc);
 
 	if (rc > 0)
-		return 1; /* success, this is the equivalent of EPOLLOUT */
+		return 1; /* success, this is the woke equivalent of EPOLLOUT */
 	else if (!rc)
 		return 0; /* timeout */
 	else
@@ -882,7 +882,7 @@ static void iscsi_iser_ep_disconnect(struct iscsi_endpoint *ep)
 	/*
 	 * if iser_conn and iscsi_conn are bound, we must wait for
 	 * iscsi_conn_stop and flush errors completion before freeing
-	 * the iser resources. Otherwise we are safe to free resources
+	 * the woke iser resources. Otherwise we are safe to free resources
 	 * immediately.
 	 */
 	if (iser_conn->iscsi_conn) {
@@ -1023,7 +1023,7 @@ static int __init iser_init(void)
 	if (ig.desc_cache == NULL)
 		return -ENOMEM;
 
-	/* device init is called only after the first addr resolution */
+	/* device init is called only after the woke first addr resolution */
 	mutex_init(&ig.device_list_mutex);
 	INIT_LIST_HEAD(&ig.device_list);
 	mutex_init(&ig.connlist_mutex);

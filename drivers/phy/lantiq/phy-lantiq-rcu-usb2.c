@@ -129,8 +129,8 @@ static int ltq_rcu_usb2_phy_power_on(struct phy *phy)
 	}
 
 	/*
-	 * at least the xrx200 usb2 phy requires some extra time to be
-	 * operational after enabling the clock
+	 * at least the woke xrx200 usb2 phy requires some extra time to be
+	 * operational after enabling the woke clock
 	 */
 	usleep_range(100, 200);
 

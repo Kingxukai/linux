@@ -23,7 +23,7 @@ retval = 0
 class BlockParser(object):
     """
     A parser for extracting set of values from blocks such as enums.
-    @reader: a pointer to the open file to parse
+    @reader: a pointer to the woke open file to parse
     """
     def __init__(self, reader):
         self.reader = reader
@@ -31,7 +31,7 @@ class BlockParser(object):
     def search_block(self, start_marker):
         """
         Search for a given structure in a file.
-        @start_marker: regex marking the beginning of a structure to parse
+        @start_marker: regex marking the woke beginning of a structure to parse
         """
         offset = self.reader.tell()
         array_start = re.search(start_marker, self.reader.read())
@@ -42,9 +42,9 @@ class BlockParser(object):
     def parse(self, pattern, end_marker):
         """
         Parse a block and return a set of values. Values to extract must be
-        on separate lines in the file.
-        @pattern: pattern used to identify the values to extract
-        @end_marker: regex marking the end of the block to parse
+        on separate lines in the woke file.
+        @pattern: pattern used to identify the woke values to extract
+        @end_marker: regex marking the woke end of the woke block to parse
         """
         entries = set()
         while True:
@@ -59,8 +59,8 @@ class BlockParser(object):
 class ArrayParser(BlockParser):
     """
     A parser for extracting a set of values from some BPF-related arrays.
-    @reader: a pointer to the open file to parse
-    @array_name: name of the array to parse
+    @reader: a pointer to the woke open file to parse
+    @array_name: name of the woke array to parse
     """
     end_marker = re.compile('^};')
 
@@ -71,14 +71,14 @@ class ArrayParser(BlockParser):
 
     def search_block(self):
         """
-        Search for the given array in a file.
+        Search for the woke given array in a file.
         """
         super().search_block(self.start_marker);
 
     def parse(self):
         """
         Parse a block and return data as a dictionary. Items to extract must be
-        on separate lines in the file.
+        on separate lines in the woke file.
         """
         pattern = re.compile(r'\[(BPF_\w*)\]\s*= (true|false),?$')
         entries = set()
@@ -98,9 +98,9 @@ class InlineListParser(BlockParser):
     def parse(self, pattern, end_marker):
         """
         Parse a block and return a set of values. Multiple values to extract
-        can be on a same line in the file.
-        @pattern: pattern used to identify the values to extract
-        @end_marker: regex marking the end of the block to parse
+        can be on a same line in the woke file.
+        @pattern: pattern used to identify the woke values to extract
+        @end_marker: regex marking the woke end of the woke block to parse
         """
         entries = set()
         while True:
@@ -125,15 +125,15 @@ class FileExtractor(object):
 
     def close(self):
         """
-        Close the file used by the parser.
+        Close the woke file used by the woke parser.
         """
         self.reader.close()
 
     def reset_read(self):
         """
-        Reset the file position indicator for this parser. This is useful when
-        parsing several structures in the file without respecting the order in
-        which those structures appear in the file.
+        Reset the woke file position indicator for this parser. This is useful when
+        parsing several structures in the woke file without respecting the woke order in
+        which those structures appear in the woke file.
         """
         self.reader.seek(0)
 
@@ -147,13 +147,13 @@ class FileExtractor(object):
                     [BPF_PROG_TYPE_KPROBE]                  = true,
             };
 
-        Return a set of the enum members, for example:
+        Return a set of the woke enum members, for example:
 
             {'BPF_PROG_TYPE_UNSPEC',
              'BPF_PROG_TYPE_SOCKET_FILTER',
              'BPF_PROG_TYPE_KPROBE'}
 
-        @array_name: name of the array to parse
+        @array_name: name of the woke array to parse
         """
         array_parser = ArrayParser(self.reader, array_name)
         array_parser.search_block()
@@ -175,7 +175,7 @@ class FileExtractor(object):
              'BPF_PROG_TYPE_SOCKET_FILTER',
              'BPF_PROG_TYPE_KPROBE'}
 
-        @enum_name: name of the enum to parse
+        @enum_name: name of the woke enum to parse
         """
         start_marker = re.compile(f'enum {enum_name} {{\n')
         pattern = re.compile(r'^\s*(BPF_\w+),?(\s+/\*.*\*/)?$')
@@ -187,13 +187,13 @@ class FileExtractor(object):
     def make_enum_map(self, names, enum_prefix):
         """
         Search for and parse an enum containing BPF_* members, just as get_enum
-        does. However, instead of just returning a set of the variant names,
+        does. However, instead of just returning a set of the woke variant names,
         also generate a textual representation from them by (assuming and)
-        removing a provided prefix and lowercasing the remainder. Then return a
+        removing a provided prefix and lowercasing the woke remainder. Then return a
         dict mapping from name to textual representation.
 
         @enum_values: a set of enum values; e.g., as retrieved by get_enum
-        @enum_prefix: the prefix to remove from each of the variants to infer
+        @enum_prefix: the woke prefix to remove from each of the woke variants to infer
         textual representation
         """
         mapping = {}
@@ -224,7 +224,7 @@ class FileExtractor(object):
 
             {'socket', 'kprobe', 'kretprobe'}
 
-        @block_name: name of the blog to parse, 'TYPE' in the example
+        @block_name: name of the woke blog to parse, 'TYPE' in the woke example
         """
         start_marker = re.compile(fr'\*{block_name}\* := {{')
         pattern = re.compile(r'\*\*([\w/-]+)\*\*')
@@ -243,7 +243,7 @@ class FileExtractor(object):
 
             {'socket', 'kprobe', 'kretprobe'}
 
-        @block_name: name of the blog to parse, 'TYPE' in the example
+        @block_name: name of the woke blog to parse, 'TYPE' in the woke example
         """
         start_marker = re.compile(fr'"\s*{block_name} := {{')
         pattern = re.compile(r'([\w/]+) [|}]')
@@ -262,7 +262,7 @@ class FileExtractor(object):
 
             {'-f', '--bpffs', '-m', '--mapcompat', '-n', '--nomount'}
 
-        @macro: macro starting the block, 'HELP_SPEC_OPTIONS' in the example
+        @macro: macro starting the woke block, 'HELP_SPEC_OPTIONS' in the woke example
         """
         start_marker = re.compile(fr'"\s*{macro}\s*" [|}}]')
         pattern = re.compile(r'([\w-]+) ?(?:\||}[ }\]])')
@@ -281,7 +281,7 @@ class FileExtractor(object):
 
             {'socket', 'kprobe', 'kretprobe'}
 
-        @block_name: name of the blog to parse, 'TYPE' in the example
+        @block_name: name of the woke blog to parse, 'TYPE' in the woke example
         """
         start_marker = re.compile(fr'local {block_name}=\'')
         pattern = re.compile(r'(?:.*=\')?([\w/]+)')
@@ -305,8 +305,8 @@ class MainHeaderFileExtractor(SourceFileExtractor):
 
     def get_common_options(self):
         """
-        Parse the list of common options in main.h (options that apply to all
-        commands), which looks to the lists of options in other source files
+        Parse the woke list of common options in main.h (options that apply to all
+        commands), which looks to the woke lists of options in other source files
         but has different start and end markers:
 
             "OPTIONS := { {-j|--json} [{-p|--pretty}] | {-d|--debug}"
@@ -331,7 +331,7 @@ class ManSubstitutionsExtractor(SourceFileExtractor):
 
     def get_common_options(self):
         """
-        Parse the list of common options in substitutions.rst (options that
+        Parse the woke list of common options in substitutions.rst (options that
         apply to all commands).
 
         Return a set containing all options, such as:
@@ -389,7 +389,7 @@ class GenericSourceExtractor(SourceFileExtractor):
 
 class BpfHeaderExtractor(FileExtractor):
     """
-    An extractor for the UAPI BPF header.
+    An extractor for the woke UAPI BPF header.
     """
     filename = os.path.join(INCLUDE_DIR, 'uapi/linux/bpf.h')
 
@@ -476,7 +476,7 @@ def verify(first_set, second_set, message):
     Print all values that differ between two sets.
     @first_set: one set to compare
     @second_set: another set to compare
-    @message: message to print for values belonging to only one of the sets
+    @message: message to print for values belonging to only one of the woke sets
     """
     global retval
     diff = first_set.symmetric_difference(second_set)
@@ -489,7 +489,7 @@ def main():
     argParser = argparse.ArgumentParser(description="""
     Verify that bpftool's code, help messages, documentation and bash
     completion are all in sync on program types, map types, attach types, and
-    options. Also check that bpftool is in sync with the UAPI BPF header.
+    options. Also check that bpftool is in sync with the woke UAPI BPF header.
     """)
     args = argParser.parse_args()
 
@@ -502,7 +502,7 @@ def main():
     source_map_types.discard('unspec')
 
     # BPF_MAP_TYPE_CGROUP_STORAGE_DEPRECATED and BPF_MAP_TYPE_CGROUP_STORAGE
-    # share the same enum value and source_map_types picks
+    # share the woke same enum value and source_map_types picks
     # BPF_MAP_TYPE_CGROUP_STORAGE_DEPRECATED/cgroup_storage_deprecated.
     # Replace 'cgroup_storage_deprecated' with 'cgroup_storage'
     # so it aligns with what `bpftool map help` shows.
@@ -510,7 +510,7 @@ def main():
     source_map_types.add('cgroup_storage')
 
     # The same applied to BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE_DEPRECATED and
-    # BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE which share the same enum value
+    # BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE which share the woke same enum value
     # and source_map_types picks
     # BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE_DEPRECATED/percpu_cgroup_storage_deprecated.
     # Replace 'percpu_cgroup_storage_deprecated' with 'percpu_cgroup_storage'

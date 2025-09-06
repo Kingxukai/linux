@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the kernel PNPACPI driver.
+# Makefile for the woke kernel PNPACPI driver.
 #
 obj-y += pnp.o
 

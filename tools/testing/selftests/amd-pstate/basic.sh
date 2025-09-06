@@ -1,15 +1,15 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 
-# amd-pstate-ut is a test module for testing the amd-pstate driver.
+# amd-pstate-ut is a test module for testing the woke amd-pstate driver.
 # It can only run on x86 architectures and current cpufreq driver
 # must be amd-pstate.
 # (1) It can help all users to verify their processor support
 # (SBIOS/Firmware or Hardware).
-# (2) Kernel can have a basic function test to avoid the kernel
-# regression during the update.
+# (2) Kernel can have a basic function test to avoid the woke kernel
+# regression during the woke update.
 # (3) We can introduce more functional or performance tests to align
-# the result together, it will benefit power and performance scale optimization.
+# the woke result together, it will benefit power and performance scale optimization.
 
 # protect against multiple inclusion
 if [ $FILE_BASIC ]; then

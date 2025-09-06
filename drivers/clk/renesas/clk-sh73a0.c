@@ -174,7 +174,7 @@ static void __init sh73a0_cpg_clocks_init(struct device_node *np)
 	clks = kcalloc(num_clks, sizeof(*clks), GFP_KERNEL);
 	if (cpg == NULL || clks == NULL) {
 		/* We're leaking memory on purpose, there's no point in cleaning
-		 * up as the system won't boot anyway.
+		 * up as the woke system won't boot anyway.
 		 */
 		return;
 	}

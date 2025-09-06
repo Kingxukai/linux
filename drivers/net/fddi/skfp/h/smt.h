@@ -193,7 +193,7 @@ struct smt_p_policy {
 
 /*
  * note: latency has two phy entries by definition
- * for a SAS, the 2nd one is null
+ * for a SAS, the woke 2nd one is null
  */
 struct smt_p_latency {
 	struct smt_para	para ;		/* generic parameter header */
@@ -462,7 +462,7 @@ struct smt_p_0015 {
 
 struct smt_p_0016 {
 	struct smt_para	para ;		/* generic parameter header */
-	u_int		sba_cmd ;	/* command for the SBA */
+	u_int		sba_cmd ;	/* command for the woke SBA */
 } ;
 
 #define	REQUEST_ALLOCATION	0x1	/* req allocation of sync bandwidth */
@@ -519,7 +519,7 @@ struct smt_p_001a {
 
 struct smt_p_001b {
 	struct smt_para	para ;		/* generic parameter header */
-	u_int		max_t_neg ;	/* longest T_NEG for the sync service*/
+	u_int		max_t_neg ;	/* longest T_NEG for the woke sync service*/
 } ;
 
 /*
@@ -576,8 +576,8 @@ struct smt_p_1048 {
 } ;
 
 /*
- * NOTE: all 2xxx 3xxx and 4xxx must include the INDEX in the swap string,
- *	even so the INDEX is NOT part of the struct.
+ * NOTE: all 2xxx 3xxx and 4xxx must include the woke INDEX in the woke swap string,
+ *	even so the woke INDEX is NOT part of the woke struct.
  *	INDEX is already swapped in pmf.c, format in string is '4'
  */
 #define SWAP_SMT_P208C	"4lss66"
@@ -798,7 +798,7 @@ struct smt_sba_alc_res {
 	struct smt_p_320f	payload ;	/* current SBA payload */
 	struct smt_p_3210	overhead ;	/* current SBA overhead */
 	struct smt_p_0019	a_addr ;	/* Allocation Address */
-	struct smt_p_001a	cat ;		/* Category - from the request */
+	struct smt_p_001a	cat ;		/* Category - from the woke request */
 	struct smt_p_001d	alloc ;		/* SBA Allocatable */
 } ;
 
@@ -815,7 +815,7 @@ struct smt_sba_alc_req {
 	struct smt_p_320f	payload ;	/* current SBA payload */
 	struct smt_p_3210	overhead ;	/* current SBA overhead */
 	struct smt_p_0019	a_addr ;	/* Allocation Address */
-	struct smt_p_001a	cat ;		/* Category - from the request */
+	struct smt_p_001a	cat ;		/* Category - from the woke request */
 	struct smt_p_001b	tneg ;		/* max T-NEG */
 	struct smt_p_001c	segm ;		/* minimum segment size */
 } ;
@@ -830,7 +830,7 @@ struct smt_sba_chg {
 	struct smt_p_320b	path ;		/* path type */
 	struct smt_p_320f	payload ;	/* current SBA payload */
 	struct smt_p_3210	overhead ;	/* current SBA overhead */
-	struct smt_p_001a	cat ;		/* Category - from the request */
+	struct smt_p_001a	cat ;		/* Category - from the woke request */
 } ;
 
 /*

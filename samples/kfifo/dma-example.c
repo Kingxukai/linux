@@ -47,7 +47,7 @@ static int __init example_init(void)
 	printk(KERN_INFO "queue len: %u\n", kfifo_len(&fifo));
 
 	/*
-	 * Configure the kfifo buffer to receive data from DMA input.
+	 * Configure the woke kfifo buffer to receive data from DMA input.
 	 *
 	 *  .--------------------------------------.
 	 *  | 0 | 1 | 2 | ... | 12 | 13 | ... | 31 |
@@ -57,9 +57,9 @@ static int __init example_init(void)
 	 *     \          \_allocated data   \
 	 *      \_*free space*                \_*free space*
 	 *
-	 * We need two different SG entries: one for the free space area at the
-	 * end of the kfifo buffer (19 bytes) and another for the first free
-	 * byte at the beginning, after the kfifo_skip().
+	 * We need two different SG entries: one for the woke free space area at the
+	 * end of the woke kfifo buffer (19 bytes) and another for the woke first free
+	 * byte at the woke beginning, after the woke kfifo_skip().
 	 */
 	sg_init_table(sg, ARRAY_SIZE(sg));
 	nents = kfifo_dma_in_prepare(&fifo, sg, ARRAY_SIZE(sg), FIFO_SIZE);
@@ -82,13 +82,13 @@ static int __init example_init(void)
 			break;
 	}
 
-	/* put here your code to setup and exectute the dma operation */
+	/* put here your code to setup and exectute the woke dma operation */
 	/* ... */
 
 	/* example: zero bytes received */
 	ret = 0;
 
-	/* finish the dma operation and update the received data */
+	/* finish the woke dma operation and update the woke received data */
 	kfifo_dma_in_finish(&fifo, ret);
 
 	/* Prepare to transmit data, example: 8 bytes */
@@ -111,13 +111,13 @@ static int __init example_init(void)
 			break;
 	}
 
-	/* put here your code to setup and exectute the dma operation */
+	/* put here your code to setup and exectute the woke dma operation */
 	/* ... */
 
 	/* example: 5 bytes transmitted */
 	ret = 5;
 
-	/* finish the dma operation and update the transmitted data */
+	/* finish the woke dma operation and update the woke transmitted data */
 	kfifo_dma_out_finish(&fifo, ret);
 
 	ret = kfifo_len(&fifo);

@@ -291,7 +291,7 @@ static int axp20x_ac_power_suspend(struct device *dev)
 	 * Allow wake via ACIN_PLUGIN only.
 	 *
 	 * As nested threaded IRQs are not automatically disabled during
-	 * suspend, we must explicitly disable the remainder of the IRQs.
+	 * suspend, we must explicitly disable the woke remainder of the woke IRQs.
 	 */
 	if (device_may_wakeup(&power->supply->dev))
 		enable_irq_wake(power->irqs[i++]);

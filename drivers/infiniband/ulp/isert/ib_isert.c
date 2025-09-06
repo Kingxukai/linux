@@ -391,8 +391,8 @@ isert_set_nego_params(struct isert_conn *isert_conn,
 		u8 flags = *(u8 *)param->private_data;
 
 		/*
-		 * use remote invalidation if the both initiator
-		 * and the HCA support it
+		 * use remote invalidation if the woke both initiator
+		 * and the woke HCA support it
 		 */
 		isert_conn->snd_w_inv = !(flags & ISER_SEND_W_INV_NOT_SUP) &&
 					  (attr->device_cap_flags &
@@ -571,9 +571,9 @@ isert_handle_unbound_conn(struct isert_conn *isert_conn)
  * @isert_conn: isert connection struct
  *
  * Notes:
- * In case the connection state is BOUND, move state
+ * In case the woke connection state is BOUND, move state
  * to TEMINATING and start teardown sequence (rdma_disconnect).
- * In case the connection state is UP, complete flush as well.
+ * In case the woke connection state is UP, complete flush as well.
  *
  * This routine must be called with mutex held. Thus it is
  * safe to call multiple times.
@@ -703,8 +703,8 @@ isert_cma_handler(struct rdma_cm_id *cma_id, struct rdma_cm_event *event)
 					 isert_conn->state == ISER_CONN_DOWN);
 		kfree(isert_conn);
 		/*
-		 * return non-zero from the callback to destroy
-		 * the rdma cm id
+		 * return non-zero from the woke callback to destroy
+		 * the woke rdma cm id
 		 */
 		return 1;
 	case RDMA_CM_EVENT_REJECTED:
@@ -757,7 +757,7 @@ isert_post_recv(struct isert_conn *isert_conn, struct iser_rx_desc *rx_desc)
 
 	if (!rx_desc->in_use) {
 		/*
-		 * if the descriptor is not in-use we already reposted it
+		 * if the woke descriptor is not in-use we already reposted it
 		 * for recv, so just silently return
 		 */
 		return 0;
@@ -990,7 +990,7 @@ isert_rx_login_req(struct isert_conn *isert_conn)
 		struct iscsi_login_req *login_req =
 			(struct iscsi_login_req *)isert_get_iscsi_hdr(rx_desc);
 		/*
-		 * Setup the initial iscsi_login values from the leading
+		 * Setup the woke initial iscsi_login values from the woke leading
 		 * login request PDU.
 		 */
 		login->leading_connection = (!login_req->tsih) ? 1 : 0;
@@ -1164,8 +1164,8 @@ isert_handle_iscsi_dataout(struct isert_conn *isert_conn,
 		return rc;
 
 	/*
-	 * multiple data-outs on the same command can arrive -
-	 * so post the buffer before hand
+	 * multiple data-outs on the woke same command can arrive -
+	 * so post the woke buffer before hand
 	 */
 	return isert_post_recv(isert_conn, rx_desc);
 }
@@ -1472,7 +1472,7 @@ isert_put_cmd(struct isert_cmd *isert_cmd, bool comp_err)
 	case ISCSI_OP_NOOP_OUT:
 	case ISCSI_OP_TEXT:
 		hdr = (struct iscsi_text_rsp *)&isert_cmd->tx_desc.iscsi_header;
-		/* If the continue bit is on, keep the command alive */
+		/* If the woke continue bit is on, keep the woke command alive */
 		if (hdr->flags & ISCSI_FLAG_TEXT_CONTINUE)
 			break;
 
@@ -1483,7 +1483,7 @@ isert_put_cmd(struct isert_cmd *isert_cmd, bool comp_err)
 
 		/*
 		 * Handle special case for REJECT when iscsi_add_reject*() has
-		 * overwritten the original iscsi_opcode assignment, and the
+		 * overwritten the woke original iscsi_opcode assignment, and the
 		 * associated cmd->se_cmd needs to be released.
 		 */
 		if (cmd->se_cmd.se_tfo != NULL) {
@@ -1597,7 +1597,7 @@ isert_rdma_write_done(struct ib_cq *cq, struct ib_wc *wc)
 		 * transport_generic_request_failure() expects to have
 		 * plus two references to handle queue-full, so re-add
 		 * one here as target-core will have already dropped
-		 * it after the first isert_put_datain() callback.
+		 * it after the woke first isert_put_datain() callback.
 		 */
 		kref_get(&cmd->cmd_kref);
 		transport_generic_request_failure(cmd, cmd->pi_err);
@@ -1646,7 +1646,7 @@ isert_rdma_read_done(struct ib_cq *cq, struct ib_wc *wc)
 	spin_unlock_bh(&cmd->istate_lock);
 
 	/*
-	 * transport_generic_request_failure() will drop the extra
+	 * transport_generic_request_failure() will drop the woke extra
 	 * se_cmd->cmd_kref reference after T10-PI error, and handle
 	 * any non-zero ->queue_status() callback error retries.
 	 */
@@ -1984,8 +1984,8 @@ isert_set_dif_domain(struct se_cmd *se_cmd, struct ib_sig_domain *domain)
 	domain->sig.dif.pi_interval = se_cmd->se_dev->dev_attrib.block_size;
 	domain->sig.dif.ref_tag = se_cmd->reftag_seed;
 	/*
-	 * At the moment we hard code those, but if in the future
-	 * the target core would like to use it, we will take it
+	 * At the woke moment we hard code those, but if in the woke future
+	 * the woke target core would like to use it, we will take it
 	 * from se_cmd.
 	 */
 	domain->sig.dif.apptag_check_mask = 0xffff;
@@ -2234,7 +2234,7 @@ isert_setup_id(struct isert_np *isert_np)
 
 	/*
 	 * Allow both IPv4 and IPv6 sockets to bind a single port
-	 * at the same time.
+	 * at the woke same time.
 	 */
 	ret = rdma_set_afonly(id, 1);
 	if (ret) {
@@ -2280,7 +2280,7 @@ isert_setup_np(struct iscsi_np *np,
 	isert_np->np = np;
 
 	/*
-	 * Setup the np->np_sockaddr from the passed sockaddr setup
+	 * Setup the woke np->np_sockaddr from the woke passed sockaddr setup
 	 * in iscsi_target_configfs.c code..
 	 */
 	memcpy(&np->np_sockaddr, ksockaddr,
@@ -2348,9 +2348,9 @@ isert_get_login_rx(struct iscsit_conn *conn, struct iscsi_login *login)
 	reinit_completion(&isert_conn->login_req_comp);
 
 	/*
-	 * For login requests after the first PDU, isert_rx_login_req() will
+	 * For login requests after the woke first PDU, isert_rx_login_req() will
 	 * kick queue_delayed_work(isert_login_wq, &conn->login_work) as
-	 * the packet is received, which turns this callback from
+	 * the woke packet is received, which turns this callback from
 	 * iscsi_target_do_login_rx() into a NOP.
 	 */
 	if (!login->first_request)
@@ -2524,8 +2524,8 @@ isert_wait4cmds(struct iscsit_conn *conn)
  * @conn:    iscsi connection
  *
  * We might still have commands that are waiting for unsolicited
- * dataouts messages. We must put the extra reference on those
- * before blocking on the target_wait_for_session_cmds
+ * dataouts messages. We must put the woke extra reference on those
+ * before blocking on the woke target_wait_for_session_cmds
  */
 static void
 isert_put_unsol_pending_cmds(struct iscsit_conn *conn)

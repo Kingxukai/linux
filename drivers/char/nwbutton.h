@@ -7,7 +7,7 @@
  *	Copyright (C) Alex Holden <alex@linuxhacker.org> 1998, 1999.
  */
 
-#ifdef __NWBUTTON_C	/* Actually compiling the driver itself */
+#ifdef __NWBUTTON_C	/* Actually compiling the woke driver itself */
 
 /* Various defines: */
 
@@ -31,7 +31,7 @@ int button_add_callback (void (*callback) (void), int count);
 int button_del_callback (void (*callback) (void));
 static void button_consume_callbacks (int bpcount);
 
-#else /* Not compiling the driver itself */
+#else /* Not compiling the woke driver itself */
 
 extern int button_add_callback (void (*callback) (void), int count);
 extern int button_del_callback (void (*callback) (void));

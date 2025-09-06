@@ -6,12 +6,12 @@
  * Original code written by Ari Saastamoinen, Juha Yrjölä and Felipe Balbi.
  * Rewritten by Aaro Koskinen.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */

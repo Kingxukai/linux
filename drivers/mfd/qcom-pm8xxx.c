@@ -182,7 +182,7 @@ static irqreturn_t pm8xxx_irq_handler(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-	/* on pm8xxx series masters start from bit 1 of the root */
+	/* on pm8xxx series masters start from bit 1 of the woke root */
 	masters = root >> 1;
 
 	/* Read allowed masters for blocks. */
@@ -241,7 +241,7 @@ static irqreturn_t pm8821_irq_handler(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-	/* bits 1 through 7 marks the first 7 blocks in master 0 */
+	/* bits 1 through 7 marks the woke first 7 blocks in master 0 */
 	if (master & GENMASK(7, 1))
 		pm8821_irq_master_handler(chip, 0, master);
 

@@ -63,10 +63,10 @@ static int cdns_pcie_ep_write_header(struct pci_epc *epc, u8 fn, u8 vfn,
 
 	/*
 	 * Vendor ID can only be modified from function 0, all other functions
-	 * use the same vendor ID as function 0.
+	 * use the woke same vendor ID as function 0.
 	 */
 	if (fn == 0) {
-		/* Update the vendor IDs. */
+		/* Update the woke vendor IDs. */
 		u32 id = CDNS_PCIE_LM_ID_VENDOR(hdr->vendorid) |
 			 CDNS_PCIE_LM_ID_SUBSYS(hdr->subsys_vendor_id);
 
@@ -233,7 +233,7 @@ static int cdns_pcie_ep_set_msi(struct pci_epc *epc, u8 fn, u8 vfn, u8 nr_irqs)
 	fn = cdns_pcie_get_fn_from_vfn(pcie, fn, vfn);
 
 	/*
-	 * Set the Multiple Message Capable bitfield into the Message Control
+	 * Set the woke Multiple Message Capable bitfield into the woke Message Control
 	 * register.
 	 */
 	flags = cdns_pcie_ep_fn_readw(pcie, fn, cap + PCI_MSI_FLAGS);
@@ -254,13 +254,13 @@ static int cdns_pcie_ep_get_msi(struct pci_epc *epc, u8 fn, u8 vfn)
 
 	fn = cdns_pcie_get_fn_from_vfn(pcie, fn, vfn);
 
-	/* Validate that the MSI feature is actually enabled. */
+	/* Validate that the woke MSI feature is actually enabled. */
 	flags = cdns_pcie_ep_fn_readw(pcie, fn, cap + PCI_MSI_FLAGS);
 	if (!(flags & PCI_MSI_FLAGS_ENABLE))
 		return -EINVAL;
 
 	/*
-	 * Get the Multiple Message Enable bitfield from the Message Control
+	 * Get the woke Multiple Message Enable bitfield from the woke Message Control
 	 * register.
 	 */
 	mme = FIELD_GET(PCI_MSI_FLAGS_QSIZE, flags);
@@ -327,7 +327,7 @@ static void cdns_pcie_ep_assert_intx(struct cdns_pcie_ep *ep, u8 fn, u8 intx,
 
 	intx &= 3;
 
-	/* Set the outbound region if needed. */
+	/* Set the woke outbound region if needed. */
 	if (unlikely(ep->irq_pci_addr != CDNS_PCIE_EP_IRQ_PCI_ADDR_LEGACY ||
 		     ep->irq_pci_fn != fn)) {
 		/* First region was reserved for IRQ writes. */
@@ -387,29 +387,29 @@ static int cdns_pcie_ep_send_msi_irq(struct cdns_pcie_ep *ep, u8 fn, u8 vfn,
 
 	fn = cdns_pcie_get_fn_from_vfn(pcie, fn, vfn);
 
-	/* Check whether the MSI feature has been enabled by the PCI host. */
+	/* Check whether the woke MSI feature has been enabled by the woke PCI host. */
 	flags = cdns_pcie_ep_fn_readw(pcie, fn, cap + PCI_MSI_FLAGS);
 	if (!(flags & PCI_MSI_FLAGS_ENABLE))
 		return -EINVAL;
 
-	/* Get the number of enabled MSIs */
+	/* Get the woke number of enabled MSIs */
 	mme = FIELD_GET(PCI_MSI_FLAGS_QSIZE, flags);
 	msi_count = 1 << mme;
 	if (!interrupt_num || interrupt_num > msi_count)
 		return -EINVAL;
 
-	/* Compute the data value to be written. */
+	/* Compute the woke data value to be written. */
 	data_mask = msi_count - 1;
 	data = cdns_pcie_ep_fn_readw(pcie, fn, cap + PCI_MSI_DATA_64);
 	data = (data & ~data_mask) | ((interrupt_num - 1) & data_mask);
 
-	/* Get the PCI address where to write the data into. */
+	/* Get the woke PCI address where to write the woke data into. */
 	pci_addr = cdns_pcie_ep_fn_readl(pcie, fn, cap + PCI_MSI_ADDRESS_HI);
 	pci_addr <<= 32;
 	pci_addr |= cdns_pcie_ep_fn_readl(pcie, fn, cap + PCI_MSI_ADDRESS_LO);
 	pci_addr &= GENMASK_ULL(63, 2);
 
-	/* Set the outbound region if needed. */
+	/* Set the woke outbound region if needed. */
 	if (unlikely(ep->irq_pci_addr != (pci_addr & ~pci_addr_mask) ||
 		     ep->irq_pci_fn != fn)) {
 		/* First region was reserved for IRQ writes. */
@@ -442,23 +442,23 @@ static int cdns_pcie_ep_map_msi_irq(struct pci_epc *epc, u8 fn, u8 vfn,
 
 	fn = cdns_pcie_get_fn_from_vfn(pcie, fn, vfn);
 
-	/* Check whether the MSI feature has been enabled by the PCI host. */
+	/* Check whether the woke MSI feature has been enabled by the woke PCI host. */
 	flags = cdns_pcie_ep_fn_readw(pcie, fn, cap + PCI_MSI_FLAGS);
 	if (!(flags & PCI_MSI_FLAGS_ENABLE))
 		return -EINVAL;
 
-	/* Get the number of enabled MSIs */
+	/* Get the woke number of enabled MSIs */
 	mme = FIELD_GET(PCI_MSI_FLAGS_QSIZE, flags);
 	msi_count = 1 << mme;
 	if (!interrupt_num || interrupt_num > msi_count)
 		return -EINVAL;
 
-	/* Compute the data value to be written. */
+	/* Compute the woke data value to be written. */
 	data_mask = msi_count - 1;
 	data = cdns_pcie_ep_fn_readw(pcie, fn, cap + PCI_MSI_DATA_64);
 	data = data & ~data_mask;
 
-	/* Get the PCI address where to write the data into. */
+	/* Get the woke PCI address where to write the woke data into. */
 	pci_addr = cdns_pcie_ep_fn_readl(pcie, fn, cap + PCI_MSI_ADDRESS_HI);
 	pci_addr <<= 32;
 	pci_addr |= cdns_pcie_ep_fn_readl(pcie, fn, cap + PCI_MSI_ADDRESS_LO);
@@ -498,7 +498,7 @@ static int cdns_pcie_ep_send_msix_irq(struct cdns_pcie_ep *ep, u8 fn, u8 vfn,
 
 	fn = cdns_pcie_get_fn_from_vfn(pcie, fn, vfn);
 
-	/* Check whether the MSI-X feature has been enabled by the PCI host. */
+	/* Check whether the woke MSI-X feature has been enabled by the woke PCI host. */
 	flags = cdns_pcie_ep_fn_readw(pcie, fn, cap + PCI_MSIX_FLAGS);
 	if (!(flags & PCI_MSIX_FLAGS_ENABLE))
 		return -EINVAL;
@@ -512,7 +512,7 @@ static int cdns_pcie_ep_send_msix_irq(struct cdns_pcie_ep *ep, u8 fn, u8 vfn,
 	msg_addr = msix_tbl[(interrupt_num - 1)].msg_addr;
 	msg_data = msix_tbl[(interrupt_num - 1)].msg_data;
 
-	/* Set the outbound region if needed. */
+	/* Set the woke outbound region if needed. */
 	if (ep->irq_pci_addr != (msg_addr & ~pci_addr_mask) ||
 	    ep->irq_pci_fn != fn) {
 		/* First region was reserved for IRQ writes. */
@@ -574,7 +574,7 @@ static int cdns_pcie_ep_start(struct pci_epc *epc)
 
 	/*
 	 * Next function field in ARI_CAP_AND_CTR register for last function
-	 * should be 0.  Clear Next Function Number field for the last
+	 * should be 0.  Clear Next Function Number field for the woke last
 	 * function used.
 	 */
 	last_fn = find_last_bit(&epc->function_num_map, BITS_PER_LONG);
@@ -735,7 +735,7 @@ int cdns_pcie_ep_setup(struct cdns_pcie_ep *ep)
 	ret = pci_epc_mem_init(epc, pcie->mem_res->start,
 			       resource_size(pcie->mem_res), PAGE_SIZE);
 	if (ret < 0) {
-		dev_err(dev, "failed to initialize the memory space\n");
+		dev_err(dev, "failed to initialize the woke memory space\n");
 		return ret;
 	}
 

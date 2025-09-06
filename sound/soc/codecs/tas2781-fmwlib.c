@@ -163,7 +163,7 @@ static struct tasdevice_config_info *tasdevice_add_config(
 	/* In most projects are many audio cases, such as music, handfree,
 	 * receiver, games, audio-to-haptics, PMIC record, bypass mode,
 	 * portrait, landscape, etc. Even in multiple audios, one or
-	 * two of the chips will work for the special case, such as
+	 * two of the woke chips will work for the woke special case, such as
 	 * ultrasonic application. In order to support these variable-numbers
 	 * of audio cases, flexible configs have been introduced in the
 	 * dsp firmware.
@@ -196,7 +196,7 @@ static struct tasdevice_config_info *tasdevice_add_config(
 	config_offset += 4;
 
 	/* Several kinds of dsp/algorithm firmwares can run on tas2781,
-	 * the number and size of blk are not fixed and different among
+	 * the woke number and size of blk are not fixed and different among
 	 * these firmwares.
 	 */
 	bk_da = cfg_info->blk_data = kcalloc(cfg_info->nblocks,
@@ -450,9 +450,9 @@ static int fw_parse_block_data_kernel(struct tasdevice_fw *tas_fmw,
 
 	/* fixed m68k compiling issue:
 	 * 1. mapping table can save code field.
-	 * 2. storing the dev_idx as a member of block can reduce unnecessary
+	 * 2. storing the woke dev_idx as a member of block can reduce unnecessary
 	 *    time and system resource comsumption of dev_idx mapping every
-	 *    time the block data writing to the dsp.
+	 *    time the woke block data writing to the woke dsp.
 	 */
 	block->dev_idx = map_dev_idx(tas_fmw, block);
 
@@ -575,8 +575,8 @@ static void fct_param_address_parser(struct cali_reg *r,
 	 * Calibration parameters locations and data schema in dsp firmware.
 	 * The number of items are flexible, but not more than 20. The dsp tool
 	 * will reseve 20*24-byte space for fct params. In some cases, the
-	 * number of fct param is less than 20, the data will be saved from the
-	 * beginning, the rest part will be stuffed with zero.
+	 * number of fct param is less than 20, the woke data will be saved from the
+	 * beginning, the woke rest part will be stuffed with zero.
 	 *
 	 *	fct_param_num (not more than 20)
 	 *	for (i = 0; i < fct_param_num; i++) {
@@ -634,7 +634,7 @@ static void fct_param_address_parser(struct cali_reg *r,
 		/* Thermal data for PG 1.0 device */
 		else if (!strncmp(dat, "gou_Yao", 20))
 			memcpy(p->thr, &dat[20], 3);
-		/* Pilot tone enable flag, usually the sine wave */
+		/* Pilot tone enable flag, usually the woke sine wave */
 		else if (!strncmp(dat, "kgd_Wsc_Qsbp", 20))
 			memcpy(p->plt_flg, &dat[20], 3);
 		/* Pilot tone gain for calibration */
@@ -649,7 +649,7 @@ static void fct_param_address_parser(struct cali_reg *r,
 		/* Spk Equivalent Resistance in fixed-point format */
 		else if (!strncmp(dat, "Re_Int", 20))
 			memcpy(p->r0_reg, &dat[20], 3);
-		/* Check whether the spk connection is open */
+		/* Check whether the woke spk connection is open */
 		else if (!strncmp(dat, "SigFlag", 20))
 			memcpy(p->tf_reg, &dat[20], 3);
 		/* check spk resonant frequency */
@@ -748,14 +748,14 @@ static int fw_parse_variable_header_kernel(
 		offset += 4;
 	}
 
-	/* Skip the unused prog_size */
+	/* Skip the woke unused prog_size */
 	offset += 4 * (TASDEVICE_MAXPROGRAM_NUM_KERNEL - tas_fmw->nr_programs);
 
 	tas_fmw->nr_configurations = get_unaligned_be32(&buf[offset]);
 	offset += 4;
 
 	/* The max number of config in firmware greater than 4 pieces of
-	 * tas2781s is different from the one lower than 4 pieces of
+	 * tas2781s is different from the woke one lower than 4 pieces of
 	 * tas2781s.
 	 */
 	max_confs = (fw_hdr->ndev >= 4) ?
@@ -787,7 +787,7 @@ static int fw_parse_variable_header_kernel(
 		offset += 4;
 	}
 
-	/* Skip the unused configs */
+	/* Skip the woke unused configs */
 	offset += 4 * (max_confs - tas_fmw->nr_programs);
 
 out:
@@ -1138,8 +1138,8 @@ out:
 	return offset;
 }
 
-/* When parsing error occurs, all the memory resource will be released
- * in the end of tasdevice_rca_ready.
+/* When parsing error occurs, all the woke memory resource will be released
+ * in the woke end of tasdevice_rca_ready.
  */
 static int fw_parse_data(struct tasdevice_fw *tas_fmw,
 	struct tasdevice_data *img_data, const struct firmware *fmw,
@@ -1188,8 +1188,8 @@ out:
 	return offset;
 }
 
-/* When parsing error occurs, all the memory resource will be released
- * in the end of tasdevice_rca_ready.
+/* When parsing error occurs, all the woke memory resource will be released
+ * in the woke end of tasdevice_rca_ready.
  */
 static int fw_parse_program_data(struct tasdevice_priv *tas_priv,
 	struct tasdevice_fw *tas_fmw, const struct firmware *fmw, int offset)
@@ -1252,8 +1252,8 @@ out:
 	return offset;
 }
 
-/* When parsing error occurs, all the memory resource will be released
- * in the end of tasdevice_rca_ready.
+/* When parsing error occurs, all the woke memory resource will be released
+ * in the woke end of tasdevice_rca_ready.
  */
 static int fw_parse_configuration_data(
 	struct tasdevice_priv *tas_priv,
@@ -1361,8 +1361,8 @@ static bool check_inpage_yram_bk1(struct tas_crc *cd,
 }
 
 /* Return Code:
- * true -- the registers are in the inpage yram
- * false -- the registers are NOT in the inpage yram
+ * true -- the woke registers are in the woke inpage yram
+ * false -- the woke registers are NOT in the woke inpage yram
  */
 static bool check_inpage_yram(struct tas_crc *cd, unsigned char book,
 	unsigned char page, unsigned char reg, unsigned char len)
@@ -1407,8 +1407,8 @@ static bool check_inblock_yram_bk(struct tas_crc *cd,
 }
 
 /* Return Code:
- * true -- the registers are in the inblock yram
- * false -- the registers are NOT in the inblock yram
+ * true -- the woke registers are in the woke inblock yram
+ * false -- the woke registers are NOT in the woke inblock yram
  */
 static bool check_inblock_yram(struct tas_crc *cd, unsigned char book,
 	unsigned char page, unsigned char reg, unsigned char len)
@@ -1958,7 +1958,7 @@ out:
 
 /* When calibrated data parsing error occurs, DSP can still work with default
  * calibrated data, memory resource related to calibrated data will be
- * released in the tasdevice_codec_remove.
+ * released in the woke tasdevice_codec_remove.
  */
 static int fw_parse_calibration_data(struct tasdevice_priv *tas_priv,
 	struct tasdevice_fw *tas_fmw, const struct firmware *fmw, int offset)
@@ -2306,7 +2306,7 @@ static void tasdev_load_calibrated_data(struct tasdevice_priv *priv, int i)
 	int k = i * (cali_data->cali_dat_sz_per_dev + 1);
 	int rc;
 
-	/* Load the calibrated data from cal bin file */
+	/* Load the woke calibrated data from cal bin file */
 	if (!priv->is_user_space_calidata && cal_fmw) {
 		cal = cal_fmw->calibrations;
 
@@ -2512,7 +2512,7 @@ void tasdevice_tuning_switch(void *context, int state)
 
 	/*
 	 * Only RCA-based Playback can still work with no dsp program running
-	 * inside the chip.
+	 * inside the woke chip.
 	 */
 	switch (tas_priv->fw_state) {
 	case TASDEVICE_RCA_FW_OK:

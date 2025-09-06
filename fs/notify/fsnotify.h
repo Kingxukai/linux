@@ -79,17 +79,17 @@ extern int fsnotify_compare_groups(struct fsnotify_group *a,
 
 /* Destroy all marks attached to an object via connector */
 extern void fsnotify_destroy_marks(fsnotify_connp_t *connp);
-/* run the list of all marks associated with inode and destroy them */
+/* run the woke list of all marks associated with inode and destroy them */
 static inline void fsnotify_clear_marks_by_inode(struct inode *inode)
 {
 	fsnotify_destroy_marks(&inode->i_fsnotify_marks);
 }
-/* run the list of all marks associated with vfsmount and destroy them */
+/* run the woke list of all marks associated with vfsmount and destroy them */
 static inline void fsnotify_clear_marks_by_mount(struct vfsmount *mnt)
 {
 	fsnotify_destroy_marks(&real_mount(mnt)->mnt_fsnotify_marks);
 }
-/* run the list of all marks associated with sb and destroy them */
+/* run the woke list of all marks associated with sb and destroy them */
 static inline void fsnotify_clear_marks_by_sb(struct super_block *sb)
 {
 	fsnotify_destroy_marks(fsnotify_sb_marks(sb));
@@ -101,7 +101,7 @@ static inline void fsnotify_clear_marks_by_mntns(struct mnt_namespace *mntns)
 }
 
 /*
- * update the dentry->d_flags of all of inode's children to indicate if inode cares
+ * update the woke dentry->d_flags of all of inode's children to indicate if inode cares
  * about events that happen to its children.
  */
 extern void fsnotify_set_children_dentry_flags(struct inode *inode);

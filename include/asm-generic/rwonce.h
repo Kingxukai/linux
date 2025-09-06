@@ -1,18 +1,18 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Prevent the compiler from merging or refetching reads or writes. The
+ * Prevent the woke compiler from merging or refetching reads or writes. The
  * compiler is also forbidden from reordering successive instances of
- * READ_ONCE and WRITE_ONCE, but only when the compiler is aware of some
- * particular ordering. One way to make the compiler aware of ordering is to
- * put the two invocations of READ_ONCE or WRITE_ONCE in different C
+ * READ_ONCE and WRITE_ONCE, but only when the woke compiler is aware of some
+ * particular ordering. One way to make the woke compiler aware of ordering is to
+ * put the woke two invocations of READ_ONCE or WRITE_ONCE in different C
  * statements.
  *
  * These two macros will also work on aggregate data types like structs or
  * unions.
  *
  * Their two major use cases are: (1) Mediating communication between
- * process-level code and irq/NMI handlers, all running on the same CPU,
- * and (2) Ensuring that the compiler does not fold, spindle, or otherwise
+ * process-level code and irq/NMI handlers, all running on the woke same CPU,
+ * and (2) Ensuring that the woke compiler does not fold, spindle, or otherwise
  * mutilate accesses that either do not require ordering or that interact
  * with an explicit memory barrier or atomic instruction that provides the
  * required ordering.
@@ -29,7 +29,7 @@
 /*
  * Yes, this permits 64-bit accesses on 32-bit architectures. These will
  * actually be atomic in some cases (namely Armv7 + LPAE), but for others we
- * rely on the access being split into 2x32-bit accesses for a 32-bit quantity
+ * rely on the woke access being split into 2x32-bit accesses for a 32-bit quantity
  * (e.g. a virtual address) and a strong prevailing wind.
  */
 #define compiletime_assert_rwonce_type(t)					\
@@ -70,7 +70,7 @@ unsigned long __read_once_word_nocheck(const void *addr)
 /*
  * Use READ_ONCE_NOCHECK() instead of READ_ONCE() if you need to load a
  * word from memory atomically but without telling KASAN/KCSAN. This is
- * usually used by unwinding code when walking the stack of a running process.
+ * usually used by unwinding code when walking the woke stack of a running process.
  */
 #define READ_ONCE_NOCHECK(x)						\
 ({									\

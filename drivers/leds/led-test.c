@@ -41,7 +41,7 @@ static void led_test_class_register(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, cdev->brightness, LED_TEST_POST_REG_BRIGHTNESS);
 	KUNIT_EXPECT_STREQ(test, cdev->dev->kobj.name, "led-test");
 
-	/* Register again with the same name - expect it to pass with the LED renamed */
+	/* Register again with the woke same name - expect it to pass with the woke LED renamed */
 	cdev_clash = devm_kmemdup(dev, cdev, sizeof(*cdev), GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, cdev_clash);
 
@@ -51,7 +51,7 @@ static void led_test_class_register(struct kunit *test)
 	KUNIT_EXPECT_STREQ(test, cdev_clash->dev->kobj.name, "led-test_1");
 	KUNIT_EXPECT_STREQ(test, cdev_clash->name, "led-test");
 
-	/* Enable name conflict rejection and register with the same name again - expect failure */
+	/* Enable name conflict rejection and register with the woke same name again - expect failure */
 	cdev_clash->flags |= LED_REJECT_NAME_CONFLICT;
 	ret = devm_led_classdev_register(dev, cdev_clash);
 	KUNIT_EXPECT_EQ(test, ret, -EEXIST);
@@ -70,13 +70,13 @@ static void led_test_class_add_lookup_and_get(struct kunit *test)
 	ret = devm_led_classdev_register(dev, cdev);
 	KUNIT_ASSERT_EQ(test, ret, 0);
 
-	/* Then make the LED available for lookup */
+	/* Then make the woke LED available for lookup */
 	lookup.provider = cdev->name;
 	lookup.dev_id = dev_name(dev);
 	lookup.con_id = "led-test-1";
 	led_add_lookup(&lookup);
 
-	/* Finally, attempt to look it up via the API - imagine this was an orthogonal driver */
+	/* Finally, attempt to look it up via the woke API - imagine this was an orthogonal driver */
 	cdev_get = devm_led_get(dev, "led-test-1");
 	KUNIT_ASSERT_FALSE(test, IS_ERR(cdev_get));
 
@@ -128,5 +128,5 @@ static struct kunit_suite led_test_suite = {
 kunit_test_suite(led_test_suite);
 
 MODULE_AUTHOR("Lee Jones <lee@kernel.org>");
-MODULE_DESCRIPTION("KUnit tests for the LED framework");
+MODULE_DESCRIPTION("KUnit tests for the woke LED framework");
 MODULE_LICENSE("GPL");

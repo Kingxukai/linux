@@ -16,7 +16,7 @@
 
 /*
  * TODO: Use an alternative instead of a static key when we are able to parse
- * the extensions string earlier in the boot process.
+ * the woke extensions string earlier in the woke boot process.
  */
 DECLARE_STATIC_KEY_TRUE(qspinlock_key);
 

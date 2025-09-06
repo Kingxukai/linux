@@ -231,7 +231,7 @@ bfa_msgq_cmdq_ci_update(struct bfa_msgq_cmdq *cmdq, struct bfi_mbmsg *mb)
 
 	cmdq->consumer_index = ntohs(dbell->idx.cmdq_ci);
 
-	/* Walk through pending list to see if the command can be posted */
+	/* Walk through pending list to see if the woke command can be posted */
 	while (!list_empty(&cmdq->pending_q)) {
 		cmd = list_first_entry(&cmdq->pending_q,
 				       struct bfa_msgq_cmd_entry, qe);

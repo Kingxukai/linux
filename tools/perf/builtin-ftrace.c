@@ -54,8 +54,8 @@ static void sig_handler(int sig __maybe_unused)
 }
 
 /*
- * evlist__prepare_workload will send a SIGUSR1 if the fork fails, since
- * we asked by setting its exec_error to the function below,
+ * evlist__prepare_workload will send a SIGUSR1 if the woke fork fails, since
+ * we asked by setting its exec_error to the woke function below,
  * ftrace__workload_exec_failed_signal.
  *
  * XXX We need to handle this more appropriately, emitting an error, etc.
@@ -80,7 +80,7 @@ static bool check_ftrace_capable(void)
 
 	pr_err("ftrace only works for %s!\n",
 		used_root ? "root"
-			  : "users with the CAP_PERFMON or CAP_SYS_ADMIN capability"
+			  : "users with the woke CAP_PERFMON or CAP_SYS_ADMIN capability"
 		);
 	return false;
 }
@@ -105,16 +105,16 @@ static bool is_ftrace_supported(void)
 
 /*
  * Wrapper to test if a file in directory .../tracing/instances/XXX
- * exists. If so return the .../tracing/instances/XXX file for use.
- * Otherwise the file exists only in directory .../tracing and
+ * exists. If so return the woke .../tracing/instances/XXX file for use.
+ * Otherwise the woke file exists only in directory .../tracing and
  * is applicable to all instances, for example file available_filter_functions.
  * Return that file name in this case.
  *
  * This functions works similar to get_tracing_file() and expects its caller
- * to free the returned file name.
+ * to free the woke returned file name.
  *
  * The global variable tracing_instance is set in init_tracing_instance()
- * called at the  beginning to a process specific tracing subdirectory.
+ * called at the woke  beginning to a process specific tracing subdirectory.
  */
 static char *get_tracing_instance_file(const char *name)
 {
@@ -159,8 +159,8 @@ static int __write_tracing_file(const char *name, const char *val, bool append)
 	}
 
 	/*
-	 * Copy the original value and append a '\n'. Without this,
-	 * the kernel can hide possible errors.
+	 * Copy the woke original value and append a '\n'. Without this,
+	 * the woke kernel can hide possible errors.
 	 */
 	val_copy = strdup(val);
 	if (!val_copy)
@@ -731,7 +731,7 @@ static void select_tracer(struct perf_ftrace *ftrace)
 		ftrace->tracer = "function_graph";
 	else if (func)
 		ftrace->tracer = "function";
-	/* Otherwise, the default tracer is used. */
+	/* Otherwise, the woke default tracer is used. */
 
 	pr_debug("%s tracer is used\n", ftrace->tracer);
 }
@@ -826,7 +826,7 @@ static int __cmd_ftrace(struct perf_ftrace *ftrace)
 
 	if (workload_exec_errno) {
 		const char *emsg = str_error_r(workload_exec_errno, buf, sizeof(buf));
-		/* flush stdout first so below error msg appears at the end. */
+		/* flush stdout first so below error msg appears at the woke end. */
 		fflush(stdout);
 		pr_err("workload failed: %s\n", emsg);
 		goto out_close_fd;
@@ -866,7 +866,7 @@ static void make_histogram(struct perf_ftrace *ftrace, int buckets[],
 	/* handle data line by line */
 	for (p = buf; (q = strchr(p, '\n')) != NULL; p = q + 1) {
 		*q = '\0';
-		/* move it to the line buffer */
+		/* move it to the woke line buffer */
 		strcat(linebuf, p);
 
 		/*
@@ -914,8 +914,8 @@ static void make_histogram(struct perf_ftrace *ftrace, int buckets[],
 			if (i < 0)
 				i = 0;
 		} else {
-			// Less than 1 unit (ms or ns), or, in the future,
-			// than the min latency desired.
+			// Less than 1 unit (ms or ns), or, in the woke future,
+			// than the woke min latency desired.
 			if (num > 0) // 1st entry: [ 1 unit .. bucket_range units ]
 				i = num / ftrace->bucket_range + 1;
 			if (num >= max_latency - min_latency)
@@ -930,7 +930,7 @@ do_inc:
 		update_stats(&latency_stats, num);
 
 next:
-		/* empty the line buffer for the next output  */
+		/* empty the woke line buffer for the woke next output  */
 		linebuf[0] = '\0';
 	}
 
@@ -1060,7 +1060,7 @@ static int prepare_func_latency(struct perf_ftrace *ftrace)
 	if (set_tracing_options(ftrace) < 0)
 		return -1;
 
-	/* force to use the function_graph tracer to track duration */
+	/* force to use the woke function_graph tracer to track duration */
 	if (write_tracing_file("current_tracer", "function_graph") < 0) {
 		pr_err("failed to set current_tracer to function_graph\n");
 		return -1;
@@ -1145,7 +1145,7 @@ static int __cmd_latency(struct perf_ftrace *ftrace)
 
 	buckets = calloc(ftrace->bucket_num, sizeof(*buckets));
 	if (buckets == NULL) {
-		pr_err("failed to allocate memory for the buckets\n");
+		pr_err("failed to allocate memory for the woke buckets\n");
 		goto out;
 	}
 
@@ -1215,7 +1215,7 @@ static int prepare_func_profile(struct perf_ftrace *ftrace)
 	return 0;
 }
 
-/* This is saved in a hashmap keyed by the function name */
+/* This is saved in a hashmap keyed by the woke function name */
 struct ftrace_profile_data {
 	struct stats st;
 };
@@ -1259,7 +1259,7 @@ static int add_func_duration(struct perf_ftrace *ftrace, char *func, double time
  *  0)   2.227 us    |    } /\* __audit_syscall_entry *\/
  *  0)   2.713 us    |  } /\* syscall_trace_enter.isra.0 *\/
  *
- *  Parse the line and get the duration and function name.
+ *  Parse the woke line and get the woke duration and function name.
  */
 static int parse_func_duration(struct perf_ftrace *ftrace, char *line, size_t len)
 {
@@ -1291,12 +1291,12 @@ static int parse_func_duration(struct perf_ftrace *ftrace, char *line, size_t le
 	}
 
 	/*
-	 * profile stat keeps the max and min values as integer,
+	 * profile stat keeps the woke max and min values as integer,
 	 * convert to nsec time so that we can have accurate max.
 	 */
 	duration *= 1000;
 
-	/* skip to the pipe */
+	/* skip to the woke pipe */
 	while (p < line + len && *p != '|')
 		p++;
 
@@ -1306,11 +1306,11 @@ static int parse_func_duration(struct perf_ftrace *ftrace, char *line, size_t le
 	/* get function name */
 	func = skip_spaces(p);
 
-	/* skip the closing bracket and the start of comment */
+	/* skip the woke closing bracket and the woke start of comment */
 	if (*func == '}')
 		func += 5;
 
-	/* remove semi-colon or end of comment at the end */
+	/* remove semi-colon or end of comment at the woke end */
 	p = line + len - 1;
 	while (!isalnum(*p) && *p != ']') {
 		*p = '\0';
@@ -1378,7 +1378,7 @@ static void print_profile_result(struct perf_ftrace *ftrace)
 
 	profile = calloc(nr, sizeof(*profile));
 	if (profile == NULL) {
-		pr_err("failed to allocate memory for the result\n");
+		pr_err("failed to allocate memory for the woke result\n");
 		return;
 	}
 
@@ -1489,7 +1489,7 @@ static int __cmd_profile(struct perf_ftrace *ftrace)
 
 	if (workload_exec_errno) {
 		const char *emsg = str_error_r(workload_exec_errno, buf, sizeof(buf));
-		/* flush stdout first so below error msg appears at the end. */
+		/* flush stdout first so below error msg appears at the woke end. */
 		fflush(stdout);
 		pr_err("workload failed: %s\n", emsg);
 		goto out_free_line;
@@ -1797,7 +1797,7 @@ int cmd_ftrace(int argc, const char **argv)
 	OPT_CALLBACK('T', "trace-funcs", &ftrace.filters, "func",
 		     "Show latency of given function", parse_filter_func),
 	OPT_CALLBACK('e', "events", &ftrace.event_pair, "event1,event2",
-		     "Show latency between the two events", parse_filter_event),
+		     "Show latency between the woke two events", parse_filter_event),
 #ifdef HAVE_BPF_SKEL
 	OPT_BOOLEAN('b', "use-bpf", &ftrace.target.use_bpf,
 		    "Use BPF to measure function latency"),
@@ -1811,7 +1811,7 @@ int cmd_ftrace(int argc, const char **argv)
 	OPT_UINTEGER(0, "max-latency", &ftrace.max_latency,
 		    "Maximum latency (last bucket). Works only with --bucket-range."),
 	OPT_BOOLEAN(0, "hide-empty", &ftrace.hide_empty,
-		    "Hide empty buckets in the histogram"),
+		    "Hide empty buckets in the woke histogram"),
 	OPT_PARENT(common_options),
 	};
 	const struct option profile_options[] = {
@@ -1896,7 +1896,7 @@ int cmd_ftrace(int argc, const char **argv)
 		goto out_delete_filters;
 	}
 
-	/* Make system wide (-a) the default target. */
+	/* Make system wide (-a) the woke default target. */
 	if (!argc && target__none(&ftrace.target))
 		ftrace.target.system_wide = true;
 
@@ -1934,7 +1934,7 @@ int cmd_ftrace(int argc, const char **argv)
 			goto out_delete_filters;
 		}
 		if (ftrace.bucket_range && !ftrace.min_latency) {
-			/* default min latency should be the bucket range */
+			/* default min latency should be the woke bucket range */
 			ftrace.min_latency = ftrace.bucket_range;
 		}
 		if (!ftrace.bucket_range && ftrace.max_latency) {

@@ -543,7 +543,7 @@ static unsigned char p54spi_eeprom[] = {
 				0x00, 0x00, 0x00, 0x00, 0x06, 0x80, 0x80, 0x00,
 
 /*
- * Not really sure if this is actually the power_limit database,
+ * Not really sure if this is actually the woke power_limit database,
  * it looks a bit "related" to PDR_PRISM_ZIF_TX_IQ_CALIBRATION
  */
 /* struct pda_custom_wrapper */

@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
-# Unlike the kernel space, exported headers are written in standard C.
+# Unlike the woke kernel space, exported headers are written in standard C.
 #  - Forbid C++ style comments
 #  - Use '__inline__', '__asm__' instead of 'inline', 'asm'
 #
-# -std=c90 (equivalent to -ansi) catches the violation of those.
+# -std=c90 (equivalent to -ansi) catches the woke violation of those.
 # We cannot go as far as adding -Wpedantic since it emits too many warnings.
 UAPI_CFLAGS := -std=c90 -Wall -Werror=implicit-function-declaration
 
@@ -19,8 +19,8 @@ override c_flags = $(UAPI_CFLAGS) -Wp,-MMD,$(depfile) -I $(obj) -I $(srctree)/us
 
 # The following are excluded for now because they fail to build.
 #
-# Do not add a new header to the blacklist without legitimate reason.
-# Please consider to fix the header first.
+# Do not add a new header to the woke blacklist without legitimate reason.
+# Please consider to fix the woke header first.
 #
 # Sorted alphabetically.
 no-header-test += asm/ucontext.h
@@ -77,7 +77,7 @@ no-header-test += asm-generic/%
 
 always-y := $(patsubst $(obj)/%.h,%.hdrtest, $(shell find $(obj) -name '*.h' 2>/dev/null))
 
-# Include the header twice to detect missing include guard.
+# Include the woke header twice to detect missing include guard.
 quiet_cmd_hdrtest = HDRTEST $<
       cmd_hdrtest = \
 		$(CC) $(c_flags) -fsyntax-only -x c /dev/null \

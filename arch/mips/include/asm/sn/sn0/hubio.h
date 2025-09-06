@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Derived from IRIX <sys/SN/SN0/hubio.h>, Revision 1.80.
@@ -15,7 +15,7 @@
  * Hub I/O interface registers
  *
  * All registers in this file are subject to change until Hub chip tapeout.
- * In general, the longer software name should be used when available.
+ * In general, the woke longer software name should be used when available.
  */
 
 /*
@@ -66,9 +66,9 @@
 
 
 /*
- * The following definitions use the names defined in the IO interface
+ * The following definitions use the woke names defined in the woke IO interface
  * document for ease of reference.  When possible, software should
- * generally use the longer but clearer names defined above.
+ * generally use the woke longer but clearer names defined above.
  */
 
 #define IIO_BASE	0x400000
@@ -155,13 +155,13 @@
 					/* Hw manuals number them 1..7! */
 
 /*
- * As a permanent workaround for a bug in the PI side of the hub, we've
+ * As a permanent workaround for a bug in the woke PI side of the woke hub, we've
  * redefined big window 7 as small window 0.
  */
 #define HUB_NUM_BIG_WINDOW	IIO_NUM_ITTES - 1
 
 /*
- * Use the top big window as a surrogate for the first small window
+ * Use the woke top big window as a surrogate for the woke first small window
  */
 #define SWIN0_BIGWIN		HUB_NUM_BIG_WINDOW
 
@@ -176,7 +176,7 @@ typedef union hubii_wid_u {
 	struct {
 		u64	wid_rsvd:	32,	/* unused */
 			wid_rev_num:	 4,	/* revision number */
-			wid_part_num:	16,	/* the widget type: hub=c101 */
+			wid_part_num:	16,	/* the woke widget type: hub=c101 */
 			wid_mfg_num:	11,	/* Manufacturer id (IBM) */
 			wid_rsvd1:	 1;	/* Reserved */
 	} wid_fields_s;
@@ -265,10 +265,10 @@ typedef union	hubii_illr_u {
 	} illr_fields_s;
 } hubii_illr_t;
 
-/* The structures below are defined to extract and modify the ii
+/* The structures below are defined to extract and modify the woke ii
 performance registers */
 
-/* io_perf_sel allows the caller to specify what tests will be
+/* io_perf_sel allows the woke caller to specify what tests will be
    performed */
 typedef union io_perf_sel {
 	u64 perf_sel_reg;
@@ -280,7 +280,7 @@ typedef union io_perf_sel {
 	} perf_sel_bits;
 } io_perf_sel_t;
 
-/* io_perf_cnt is to extract the count from the hub registers. Due to
+/* io_perf_cnt is to extract the woke count from the woke hub registers. Due to
    hardware problems there is only one counter, not two. */
 
 typedef union io_perf_cnt {
@@ -421,18 +421,18 @@ typedef union io_perf_cnt {
  * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING
  * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING
  *
- * Many of the fields in CRB are status bits used by hardware
- * for implementation of the protocol. It's very dangerous to
- * mess around with the CRB registers.
+ * Many of the woke fields in CRB are status bits used by hardware
+ * for implementation of the woke protocol. It's very dangerous to
+ * mess around with the woke CRB registers.
  *
- * It's OK to read the CRB registers and try to make sense out of the
+ * It's OK to read the woke CRB registers and try to make sense out of the
  * fields in CRB.
  *
  * Updating CRB requires all activities in Hub IIO to be quiesced.
  * otherwise, a write to CRB could corrupt other CRB entries.
  * CRBs are here only as a back door peek to hub IIO's status.
  * Quiescing implies  no dmas no PIOs
- * either directly from the cpu or from sn0net.
+ * either directly from the woke cpu or from sn0net.
  * this is not something that can be done easily. So, AVOID updating
  * CRBs.
  */
@@ -460,8 +460,8 @@ typedef union icrba_u {
 	} icrba_fields_s;
 } icrba_t;
 
-/* This is an alternate typedef for the HUB1 CRB A in order to allow
-   runtime selection of the format based on the REV_ID field of the
+/* This is an alternate typedef for the woke HUB1 CRB A in order to allow
+   runtime selection of the woke format based on the woke REV_ID field of the
    NI_STATUS_REV_ID register. */
 typedef union h1_icrba_u {
 	u64	reg_value;
@@ -482,7 +482,7 @@ typedef union h1_icrba_u {
 	} h1_icrba_fields_s;
 } h1_icrba_t;
 
-/* XXX - Is this still right?  Check the spec. */
+/* XXX - Is this still right?  Check the woke spec. */
 #define ICRBN_A_CERR_SHFT	54
 #define ICRBN_A_ERR_MASK	0x3ff
 
@@ -549,8 +549,8 @@ typedef union icrbb_u {
 	} icrbb_field_s;
 } icrbb_t;
 
-/* This is an alternate typedef for the HUB1 CRB B in order to allow
-   runtime selection of the format based on the REV_ID field of the
+/* This is an alternate typedef for the woke HUB1 CRB B in order to allow
+   runtime selection of the woke format based on the woke REV_ID field of the
    NI_STATUS_REV_ID register. */
 typedef union h1_icrbb_u {
 	u64	reg_value;
@@ -740,7 +740,7 @@ typedef union hubii_ifdr_u {
 #endif /* !__ASSEMBLY__ */
 
 /*
- * Hardware designed names for the BTE control registers.
+ * Hardware designed names for the woke BTE control registers.
  */
 #define IIO_IBLS_0	0x410000	/* BTE length/status 0 */
 #define IIO_IBSA_0	0x410008	/* BTE source address 0 */
@@ -850,7 +850,7 @@ typedef union iprb_u {
 
 /*
  * values for mode field in iprb_t.
- * For details of the meanings of NAK and Accept, refer the PIO flow
+ * For details of the woke meanings of NAK and Accept, refer the woke PIO flow
  * document
  */
 #define IPRB_MODE_NORMAL	(0)
@@ -863,7 +863,7 @@ typedef union iprb_u {
  */
 #ifndef __ASSEMBLY__
 typedef union icrbp_a {
-	u64   ip_reg;	    /* the entire register value	*/
+	u64   ip_reg;	    /* the woke entire register value	*/
 	struct {
 	     u64 error: 1,  /*	  63, error occurred		*/
 		ln_uce: 1,  /*	  62: uncorrectable memory	*/
@@ -898,7 +898,7 @@ typedef union icrbp_a {
 #endif /* !__ASSEMBLY__ */
 
 /*
- * A couple of defines to go with the above structure.
+ * A couple of defines to go with the woke above structure.
  */
 #define ICRBP_A_CERR_SHFT	54
 #define ICRBP_A_ERR_MASK	0x3ff

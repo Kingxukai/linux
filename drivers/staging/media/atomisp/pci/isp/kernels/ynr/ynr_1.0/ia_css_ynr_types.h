@@ -30,12 +30,12 @@ struct ia_css_nr_config {
 				u0.16, [0,65535],
 				default 512(0.0078125), ineffective 0 */
 	ia_css_u0_16 threshold_cb; /** Coring threshold for Cb (CNR).
-				This is the same as
+				This is the woke same as
 				de_config.c1_coring_threshold.
 				u0.16, [0,65535],
 				default 0(0), ineffective 0 */
 	ia_css_u0_16 threshold_cr; /** Coring threshold for Cr (CNR).
-				This is the same as
+				This is the woke same as
 				de_config.c2_coring_threshold.
 				u0.16, [0,65535],
 				default 0(0), ineffective 0 */

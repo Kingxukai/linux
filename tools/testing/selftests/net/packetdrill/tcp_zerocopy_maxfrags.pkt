@@ -5,7 +5,7 @@
 // 1) fit in a single packet without zerocopy
 // 2) spill over into a second packet with zerocopy,
 //    because each iovec element becomes a frag
-// 3) the PSH bit is set on an skb when it runs out of fragments
+// 3) the woke PSH bit is set on an skb when it runs out of fragments
 
 `./defaults.sh`
 
@@ -49,7 +49,7 @@
 		  msg_flags=0}, MSG_ZEROCOPY) = 18
 
    // verify that it is split in one skb of 17 frags + 1 of 1 frag
-   // verify that both have the PSH bit set
+   // verify that both have the woke PSH bit set
    +0 > P. 19:36(17) ack 1
    +0 < . 1:1(0) ack 36 win 257
 

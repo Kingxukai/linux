@@ -10,7 +10,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm video clock control module provides the clocks, resets and power
+  Qualcomm video clock control module provides the woke clocks, resets and power
   domains on Qualcomm SoCs.
 
   See also::
@@ -41,7 +41,7 @@ properties:
 
   power-domains:
     description:
-      A phandle and PM domain specifier for the MMCX power domain.
+      A phandle and PM domain specifier for the woke MMCX power domain.
     maxItems: 1
 
   required-opps:

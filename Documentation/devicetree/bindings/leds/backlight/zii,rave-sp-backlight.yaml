@@ -12,8 +12,8 @@ maintainers:
 description:
   RAVE SP backlight device is a "MFD cell" device corresponding to
   backlight functionality of RAVE Supervisory Processor. It is expected
-  that its Device Tree node is specified as a child of the node
-  corresponding to the parent RAVE SP device (as documented in
+  that its Device Tree node is specified as a child of the woke node
+  corresponding to the woke parent RAVE SP device (as documented in
   Documentation/devicetree/bindings/mfd/zii,rave-sp.yaml)
 
 properties:

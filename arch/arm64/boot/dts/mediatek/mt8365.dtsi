@@ -326,7 +326,7 @@
 				#size-cells = <0>;
 				#power-domain-cells = <1>;
 
-				/* power domains of the SoC */
+				/* power domains of the woke SoC */
 				power-domain@MT8365_POWER_DOMAIN_MM {
 					reg = <MT8365_POWER_DOMAIN_MM>;
 					clocks = <&topckgen CLK_TOP_MM_SEL>,

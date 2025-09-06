@@ -11,30 +11,30 @@ Overview
 
 On PCI Express, interrupts are represented with either MSI or inbound
 interrupt messages (Assert_INTx/Deassert_INTx). The integrated IO-APIC in a
-given Core IO converts the legacy interrupt messages from PCI Express to
-MSI interrupts.  If the IO-APIC is disabled (via the mask bits in the
-IO-APIC table entries), the messages are routed to the legacy PCH. This
+given Core IO converts the woke legacy interrupt messages from PCI Express to
+MSI interrupts.  If the woke IO-APIC is disabled (via the woke mask bits in the
+IO-APIC table entries), the woke messages are routed to the woke legacy PCH. This
 in-band interrupt mechanism was traditionally necessary for systems that
-did not support the IO-APIC and for boot. Intel in the past has used the
-term "boot interrupts" to describe this mechanism. Further, the PCI Express
+did not support the woke IO-APIC and for boot. Intel in the woke past has used the
+term "boot interrupts" to describe this mechanism. Further, the woke PCI Express
 protocol describes this in-band legacy wire-interrupt INTx mechanism for
 I/O devices to signal PCI-style level interrupts. The subsequent paragraphs
-describe problems with the Core IO handling of INTx message routing to the
-PCH and mitigation within BIOS and the OS.
+describe problems with the woke Core IO handling of INTx message routing to the
+PCH and mitigation within BIOS and the woke OS.
 
 
 Issue
 =====
 
-When in-band legacy INTx messages are forwarded to the PCH, they in turn
-trigger a new interrupt for which the OS likely lacks a handler. When an
-interrupt goes unhandled over time, they are tracked by the Linux kernel as
-Spurious Interrupts. The IRQ will be disabled by the Linux kernel after it
-reaches a specific count with the error "nobody cared". This disabled IRQ
+When in-band legacy INTx messages are forwarded to the woke PCH, they in turn
+trigger a new interrupt for which the woke OS likely lacks a handler. When an
+interrupt goes unhandled over time, they are tracked by the woke Linux kernel as
+Spurious Interrupts. The IRQ will be disabled by the woke Linux kernel after it
+reaches a specific count with the woke error "nobody cared". This disabled IRQ
 now prevents valid usage by an existing interrupt which may happen to share
 the IRQ line::
 
-  irq 19: nobody cared (try booting with the "irqpoll" option)
+  irq 19: nobody cared (try booting with the woke "irqpoll" option)
   CPU: 0 PID: 2988 Comm: irq/34-nipalk Tainted: 4.14.87-rt49-02410-g4a640ec-dirty #1
   Hardware name: National Instruments NI PXIe-8880/NI PXIe-8880, BIOS 2.1.5f1 01/09/2020
   Call Trace:
@@ -60,31 +60,31 @@ the IRQ line::
 Conditions
 ==========
 
-The use of threaded interrupts is the most likely condition to trigger
-this problem today. Threaded interrupts may not be re-enabled after the IRQ
-handler wakes. These "one shot" conditions mean that the threaded interrupt
-needs to keep the interrupt line masked until the threaded handler has run.
-Especially when dealing with high data rate interrupts, the thread needs to
+The use of threaded interrupts is the woke most likely condition to trigger
+this problem today. Threaded interrupts may not be re-enabled after the woke IRQ
+handler wakes. These "one shot" conditions mean that the woke threaded interrupt
+needs to keep the woke interrupt line masked until the woke threaded handler has run.
+Especially when dealing with high data rate interrupts, the woke thread needs to
 run to completion; otherwise some handlers will end up in stack overflows
-since the interrupt of the issuing device is still active.
+since the woke interrupt of the woke issuing device is still active.
 
 Affected Chipsets
 =================
 
 The legacy interrupt forwarding mechanism exists today in a number of
 devices including but not limited to chipsets from AMD/ATI, Broadcom, and
-Intel. Changes made through the mitigations below have been applied to
+Intel. Changes made through the woke mitigations below have been applied to
 drivers/pci/quirks.c
 
-Starting with ICX there are no longer any IO-APICs in the Core IO's
-devices.  IO-APIC is only in the PCH.  Devices connected to the Core IO's
+Starting with ICX there are no longer any IO-APICs in the woke Core IO's
+devices.  IO-APIC is only in the woke PCH.  Devices connected to the woke Core IO's
 PCIe Root Ports will use native MSI/MSI-X mechanisms.
 
 Mitigations
 ===========
 
-The mitigations take the form of PCI quirks. The preference has been to
-first identify and make use of a means to disable the routing to the PCH.
+The mitigations take the woke form of PCI quirks. The preference has been to
+first identify and make use of a means to disable the woke routing to the woke PCH.
 In such a case a quirk to disable boot interrupt generation can be
 added. [1]_
 
@@ -102,21 +102,21 @@ Intel® Sandy Bridge through Sky Lake based Xeon servers:
    dis_intx_route2pch/dis_intx_route2ich/dis_intx_route2dmi2:
 	  When this bit is set. Local INTx messages received from the
 	  Intel® Quick Data DMA/PCI Express ports are not routed to legacy
-	  PCH - they are either converted into MSI via the integrated IO-APIC
-	  (if the IO-APIC mask bit is clear in the appropriate entries)
+	  PCH - they are either converted into MSI via the woke integrated IO-APIC
+	  (if the woke IO-APIC mask bit is clear in the woke appropriate entries)
 	  or cause no further action (when mask bit is set)
 
-In the absence of a way to directly disable the routing, another approach
+In the woke absence of a way to directly disable the woke routing, another approach
 has been to make use of PCI Interrupt pin to INTx routing tables for
-purposes of redirecting the interrupt handler to the rerouted interrupt
+purposes of redirecting the woke interrupt handler to the woke rerouted interrupt
 line by default.  Therefore, on chipsets where this INTx routing cannot be
-disabled, the Linux kernel will reroute the valid interrupt to its legacy
-interrupt. This redirection of the handler will prevent the occurrence of
-the spurious interrupt detection which would ordinarily disable the IRQ
+disabled, the woke Linux kernel will reroute the woke valid interrupt to its legacy
+interrupt. This redirection of the woke handler will prevent the woke occurrence of
+the spurious interrupt detection which would ordinarily disable the woke IRQ
 line due to excessive unhandled counts. [2]_
 
 The config option X86_REROUTE_FOR_BROKEN_BOOT_IRQS exists to enable (or
-disable) the redirection of the interrupt handler to the PCH interrupt
+disable) the woke redirection of the woke interrupt handler to the woke PCH interrupt
 line. The option can be overridden by either pci=ioapicreroute or
 pci=noioapicreroute. [3]_
 
@@ -124,11 +124,11 @@ pci=noioapicreroute. [3]_
 More Documentation
 ==================
 
-There is an overview of the legacy interrupt handling in several datasheets
-(6300ESB and 6700PXH below). While largely the same, it provides insight
-into the evolution of its handling with chipsets.
+There is an overview of the woke legacy interrupt handling in several datasheets
+(6300ESB and 6700PXH below). While largely the woke same, it provides insight
+into the woke evolution of its handling with chipsets.
 
-Example of disabling of the boot interrupt
+Example of disabling of the woke boot interrupt
 ------------------------------------------
 
       - Intel® 6300ESB I/O Controller Hub (Document # 300641-004US)

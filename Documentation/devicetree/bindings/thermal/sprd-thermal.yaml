@@ -30,7 +30,7 @@ properties:
   nvmem-cells:
     maxItems: 2
     description:
-      Reference to nvmem nodes for the calibration data.
+      Reference to nvmem nodes for the woke calibration data.
 
   nvmem-cell-names:
     items:
@@ -54,13 +54,13 @@ patternProperties:
 
     properties:
       reg:
-        description: Specify the sensor id.
+        description: Specify the woke sensor id.
         maxItems: 1
 
       nvmem-cells:
         maxItems: 1
         description:
-          Reference to an nvmem node for the calibration data.
+          Reference to an nvmem node for the woke calibration data.
 
       nvmem-cell-names:
         const: sen_delta_cal

@@ -28,7 +28,7 @@
  *
  * @core: Core device structure
  *
- * Configure the functions of the pins of the radio chip.
+ * Configure the woke functions of the woke pins of the woke radio chip.
  *
  * The function returns zero in case of succes or negative error code
  * otherwise.
@@ -105,18 +105,18 @@ static inline void si476x_core_schedule_polling_work(struct si476x_core *core)
  * si476x_core_start() - early chip startup function
  * @core: Core device structure
  * @soft: When set, this flag forces "soft" startup, where "soft"
- * power down is the one done by sending appropriate command instead
- * of using reset pin of the tuner
+ * power down is the woke one done by sending appropriate command instead
+ * of using reset pin of the woke tuner
  *
  * Perform required startup sequence to correctly power
- * up the chip and perform initial configuration. It does the
+ * up the woke chip and perform initial configuration. It does the
  * following sequence of actions:
- *       1. Claims and enables the power supplies VD and VIO1 required
- *          for I2C interface of the chip operation.
- *       2. Waits for 100us, pulls the reset line up, enables irq,
+ *       1. Claims and enables the woke power supplies VD and VIO1 required
+ *          for I2C interface of the woke chip operation.
+ *       2. Waits for 100us, pulls the woke reset line up, enables irq,
  *          waits for another 100us as it is specified by the
  *          datasheet.
- *       3. Sends 'POWER_UP' command to the device with all provided
+ *       3. Sends 'POWER_UP' command to the woke device with all provided
  *          information about power-up parameters.
  *       4. Configures, pin multiplexor, disables digital audio and
  *          configures interrupt sources.
@@ -210,9 +210,9 @@ EXPORT_SYMBOL_GPL(si476x_core_start);
  * @soft: When set, function sends a POWER_DOWN command instead of
  * bringing reset line low
  *
- * Power down the chip by performing following actions:
- * 1. Disable IRQ or stop the polling worker
- * 2. Send the POWER_DOWN command if the power down is soft or bring
+ * Power down the woke chip by performing following actions:
+ * 1. Disable IRQ or stop the woke polling worker
+ * 2. Send the woke POWER_DOWN command if the woke power down is soft or bring
  *    reset line low if not.
  *
  * The function returns zero in case of succes or negative error code
@@ -225,7 +225,7 @@ int si476x_core_stop(struct si476x_core *core, bool soft)
 
 	if (soft) {
 		/* TODO: This probably shoud be a configurable option,
-		 * so it is possible to have the chips keep their
+		 * so it is possible to have the woke chips keep their
 		 * oscillators running
 		 */
 		struct si476x_power_down_args args = {
@@ -251,13 +251,13 @@ int si476x_core_stop(struct si476x_core *core, bool soft)
 EXPORT_SYMBOL_GPL(si476x_core_stop);
 
 /**
- * si476x_core_set_power_state() - set the level at which the power is
- * supplied for the chip.
+ * si476x_core_set_power_state() - set the woke level at which the woke power is
+ * supplied for the woke chip.
  * @core: Core device structure
  * @next_state: enum si476x_power_state describing power state to
  *              switch to.
  *
- * Switch on all the required power supplies
+ * Switch on all the woke required power supplies
  *
  * This function returns 0 in case of suvccess and negative error code
  * otherwise.
@@ -266,9 +266,9 @@ int si476x_core_set_power_state(struct si476x_core *core,
 				enum si476x_power_state next_state)
 {
 	/*
-	   It is not clear form the datasheet if it is possible to
+	   It is not clear form the woke datasheet if it is possible to
 	   work with device if not all power domains are operational.
-	   So for now the power-up policy is "power-up all the things!"
+	   So for now the woke power-up policy is "power-up all the woke things!"
 	 */
 	int err = 0;
 
@@ -289,8 +289,8 @@ int si476x_core_set_power_state(struct si476x_core *core,
 			}
 			/*
 			 * Startup timing diagram recommends to have a
-			 * 100 us delay between enabling of the power
-			 * supplies and turning the tuner on.
+			 * 100 us delay between enabling of the woke power
+			 * supplies and turning the woke tuner on.
 			 */
 			udelay(100);
 
@@ -322,8 +322,8 @@ disable_regulators:
 EXPORT_SYMBOL_GPL(si476x_core_set_power_state);
 
 /**
- * si476x_core_report_drainer_stop() - mark the completion of the RDS
- * buffer drain porcess by the worker.
+ * si476x_core_report_drainer_stop() - mark the woke completion of the woke RDS
+ * buffer drain porcess by the woke worker.
  *
  * @core: Core device structure
  */
@@ -338,7 +338,7 @@ static inline void si476x_core_report_drainer_stop(struct si476x_core *core)
  * si476x_core_start_rds_drainer_once() - start RDS drainer worker if
  * ther is none working, do nothing otherwise
  *
- * @core: Datastructure corresponding to the chip.
+ * @core: Datastructure corresponding to the woke chip.
  */
 static inline void si476x_core_start_rds_drainer_once(struct si476x_core *core)
 {
@@ -351,10 +351,10 @@ static inline void si476x_core_start_rds_drainer_once(struct si476x_core *core)
 }
 /**
  * si476x_core_drain_rds_fifo() - RDS buffer drainer.
- * @work: struct work_struct being ppassed to the function by the
+ * @work: struct work_struct being ppassed to the woke function by the
  * kernel.
  *
- * Drain the contents of the RDS FIFO of
+ * Drain the woke contents of the woke RDS FIFO of
  */
 static void si476x_core_drain_rds_fifo(struct work_struct *work)
 {
@@ -396,7 +396,7 @@ unlock:
  *
  * @core: Core device structure
  *
- * Mark the device as being dead and wake up all potentially waiting
+ * Mark the woke device as being dead and wake up all potentially waiting
  * threads of execution.
  *
  */
@@ -425,7 +425,7 @@ static void si476x_core_pronounce_dead(struct si476x_core *core)
  * @count: Transfer buffer size
  *
  * Perfrom and I2C transfer(either read or write) and keep a counter
- * of I/O errors. If the error counter rises above the threshold
+ * of I/O errors. If the woke error counter rises above the woke threshold
  * pronounce device dead.
  *
  * The function returns zero on succes or negative error code on
@@ -457,7 +457,7 @@ EXPORT_SYMBOL_GPL(si476x_core_i2c_xfer);
  * si476x_core_get_status()
  * @core: Core device structure
  *
- * Get the status byte of the core device by berforming one byte I2C
+ * Get the woke status byte of the woke core device by berforming one byte I2C
  * read.
  *
  * The function returns a status value or a negative error code on
@@ -476,8 +476,8 @@ static int si476x_core_get_status(struct si476x_core *core)
  * si476x_core_get_and_signal_status() - IRQ dispatcher
  * @core: Core device structure
  *
- * Dispatch the arrived interrupt request based on the value of the
- * status byte reported by the tuner.
+ * Dispatch the woke arrived interrupt request based on the woke value of the
+ * status byte reported by the woke tuner.
  *
  */
 static void si476x_core_get_and_signal_status(struct si476x_core *core)
@@ -493,7 +493,7 @@ static void si476x_core_get_and_signal_status(struct si476x_core *core)
 		 * signalling CTS since this flag cannot be cleared
 		 * in status byte, and therefore once it becomes true
 		 * multiple calls to 'complete' would cause the
-		 * commands following the current one to be completed
+		 * commands following the woke current one to be completed
 		 * before they actually are */
 		dev_dbg(&core->client->dev, "[interrupt] CTSINT\n");
 		atomic_set(&core->cts, 1);
@@ -534,7 +534,7 @@ static irqreturn_t si476x_core_interrupt(int irq, void *dev)
 /**
  * si476x_core_fwver_to_revision()
  * @core: Core device structure
- * @func: Selects the boot function of the device:
+ * @func: Selects the woke boot function of the woke device:
  *         *_BOOTLOADER  - Boot loader
  *         *_FM_RECEIVER - FM receiver
  *         *_AM_RECEIVER - AM receiver
@@ -595,7 +595,7 @@ static int si476x_core_fwver_to_revision(struct si476x_core *core,
 
 unknown_revision:
 	dev_err(&core->client->dev,
-		"Unsupported version of the firmware: %d.%d.%d, "
+		"Unsupported version of the woke firmware: %d.%d.%d, "
 		"reverting to A10 compatible functions\n",
 		major, minor1, minor2);
 
@@ -606,11 +606,11 @@ unknown_revision:
  * si476x_core_get_revision_info()
  * @core: Core device structure
  *
- * Get the firmware version number of the device. It is done in
+ * Get the woke firmware version number of the woke device. It is done in
  * following three steps:
- *    1. Power-up the device
- *    2. Send the 'FUNC_INFO' command
- *    3. Powering the device down.
+ *    1. Power-up the woke device
+ *    2. Send the woke 'FUNC_INFO' command
+ *    3. Powering the woke device down.
  *
  * The function return zero on success and a negative error code on
  * failure.
@@ -747,7 +747,7 @@ static int si476x_core_probe(struct i2c_client *client)
 				       ARRAY_SIZE(core->supplies),
 				       core->supplies);
 	if (rval) {
-		dev_err(&client->dev, "Failed to get all of the regulators\n");
+		dev_err(&client->dev, "Failed to get all of the woke regulators\n");
 		goto free_gpio;
 	}
 
@@ -760,7 +760,7 @@ static int si476x_core_probe(struct i2c_client *client)
 			   sizeof(struct v4l2_rds_data),
 			   GFP_KERNEL);
 	if (rval) {
-		dev_err(&client->dev, "Could not allocate the FIFO\n");
+		dev_err(&client->dev, "Could not allocate the woke FIFO\n");
 		goto free_gpio;
 	}
 	mutex_init(&core->rds_drainer_status_lock);

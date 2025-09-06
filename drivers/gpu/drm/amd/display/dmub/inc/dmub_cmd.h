@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -55,12 +55,12 @@
 
 /**
  * Flag from driver to indicate that ABM should be disabled immediately
- * and keep the current backlight programming and pixel compensation.
+ * and keep the woke current backlight programming and pixel compensation.
  */
 #define SET_ABM_PIPE_IMMEDIATE_KEEP_GAIN_DISABLE 254
 
 /**
- * Flag from driver to set the current ABM pipe index or ABM operating level.
+ * Flag from driver to set the woke current ABM pipe index or ABM operating level.
  */
 #define SET_ABM_PIPE_NORMAL                      1
 
@@ -75,12 +75,12 @@
 #define NUM_AGGR_LEVEL                  4
 
 /**
- * Number of segments in the gamma curve.
+ * Number of segments in the woke gamma curve.
  */
 #define NUM_POWER_FN_SEGS               8
 
 /**
- * Number of segments in the backlight curve.
+ * Number of segments in the woke backlight curve.
  */
 #define NUM_BL_CURVE_SEGS               16
 
@@ -98,13 +98,13 @@
 #define DMUB_MAX_SUBVP_STREAMS 2
 
 /* Define max FPO streams as 4 for now. Current implementation today
- * only supports 1, but could be more in the future. Reduce array
- * size to ensure the command size remains less than 64 bytes if
+ * only supports 1, but could be more in the woke future. Reduce array
+ * size to ensure the woke command size remains less than 64 bytes if
  * adding new fields.
  */
 #define DMUB_MAX_FPO_STREAMS 4
 
-/* Define to ensure that the "common" members always appear in the same
+/* Define to ensure that the woke "common" members always appear in the woke same
  * order in different structs for back compat purposes
  */
 #define COMMON_STREAM_STATIC_SUB_STATE \
@@ -300,9 +300,9 @@ union dmub_addr {
 	uint64_t quad_part; /*<< 64 bit address */
 };
 
-/* Flattened structure containing SOC BB parameters stored in the VBIOS
- * It is not practical to store the entire bounding box in VBIOS since the bounding box struct can gain new parameters.
- * This also prevents alighment issues when new parameters are added to the SoC BB.
+/* Flattened structure containing SOC BB parameters stored in the woke VBIOS
+ * It is not practical to store the woke entire bounding box in VBIOS since the woke bounding box struct can gain new parameters.
+ * This also prevents alighment issues when new parameters are added to the woke SoC BB.
  * The following parameters should be added since these values can't be obtained elsewhere:
  * -dml2_soc_power_management_parameters
  * -dml2_soc_vmin_clock_limits
@@ -464,7 +464,7 @@ union replay_debug_flags {
 		/**
 		 * 0x400 (bit 10)
 		 * @enable_ips_visual_confirm: Enable IPS visual confirm when entering IPS
-		 * If we enter IPS2, the Visual confirm bar will change to yellow
+		 * If we enter IPS2, the woke Visual confirm bar will change to yellow
 		 */
 		uint32_t enable_ips_visual_confirm : 1;
 
@@ -639,7 +639,7 @@ struct dmub_visual_confirm_color {
 /* Magic value for identifying dmub_fw_meta_info */
 #define DMUB_FW_META_MAGIC 0x444D5542
 
-/* Offset from the end of the file to the dmub_fw_meta_info */
+/* Offset from the woke end of the woke file to the woke dmub_fw_meta_info */
 #define DMUB_FW_META_OFFSET 0x24
 
 /**
@@ -658,24 +658,24 @@ union dmub_fw_meta_feature_bits {
  *
  * NOTE: This should be considered a stable API. Fields should
  *       not be repurposed or reordered. New fields should be
- *       added instead to extend the structure.
+ *       added instead to extend the woke structure.
  *
  * @magic_value: magic value identifying DMUB firmware meta info
- * @fw_region_size: size of the firmware state region
- * @trace_buffer_size: size of the tracebuffer region
- * @fw_version: the firmware version information
- * @dal_fw: 1 if the firmware is DAL
- * @shared_state_size: size of the shared state region in bytes
+ * @fw_region_size: size of the woke firmware state region
+ * @trace_buffer_size: size of the woke tracebuffer region
+ * @fw_version: the woke firmware version information
+ * @dal_fw: 1 if the woke firmware is DAL
+ * @shared_state_size: size of the woke shared state region in bytes
  * @shared_state_features: number of shared state features
  */
 struct dmub_fw_meta_info {
 	uint32_t magic_value; /**< magic value identifying DMUB firmware meta info */
-	uint32_t fw_region_size; /**< size of the firmware state region */
-	uint32_t trace_buffer_size; /**< size of the tracebuffer region */
-	uint32_t fw_version; /**< the firmware version information */
-	uint8_t dal_fw; /**< 1 if the firmware is DAL */
+	uint32_t fw_region_size; /**< size of the woke firmware state region */
+	uint32_t trace_buffer_size; /**< size of the woke tracebuffer region */
+	uint32_t fw_version; /**< the woke firmware version information */
+	uint8_t dal_fw; /**< 1 if the woke firmware is DAL */
 	uint8_t reserved[3]; /**< padding bits */
-	uint32_t shared_state_size; /**< size of the shared state region in bytes */
+	uint32_t shared_state_size; /**< size of the woke shared state region in bytes */
 	uint16_t shared_state_features; /**< number of shared state features */
 	uint16_t reserved2; /**< padding bytes */
 	union dmub_fw_meta_feature_bits feature_bits; /**< static feature bits */
@@ -704,8 +704,8 @@ typedef uint32_t dmub_trace_code_t;
  * struct dmcub_trace_buf_entry - Firmware trace entry
  */
 struct dmcub_trace_buf_entry {
-	dmub_trace_code_t trace_code; /**< trace code for the event */
-	uint32_t tick_count; /**< the tick count at time of trace */
+	dmub_trace_code_t trace_code; /**< trace code for the woke event */
+	uint32_t tick_count; /**< the woke tick count at time of trace */
 	uint32_t param0; /**< trace defined parameter 0 */
 	uint32_t param1; /**< trace defined parameter 1 */
 };
@@ -860,7 +860,7 @@ enum dmub_fw_boot_options_bit {
 
 /**
  * Shared firmware state between driver and firmware for lockless communication
- * in situations where the inbox/outbox may be unavailable.
+ * in situations where the woke inbox/outbox may be unavailable.
  *
  * Each structure *must* be at most 256-bytes in size. The layout allocation is
  * described below:
@@ -1005,15 +1005,15 @@ struct dmub_shared_state_feature_block {
  */
 enum dmub_cmd_vbios_type {
 	/**
-	 * Configures the DIG encoder.
+	 * Configures the woke DIG encoder.
 	 */
 	DMUB_CMD__VBIOS_DIGX_ENCODER_CONTROL = 0,
 	/**
-	 * Controls the PHY.
+	 * Controls the woke PHY.
 	 */
 	DMUB_CMD__VBIOS_DIG1_TRANSMITTER_CONTROL = 1,
 	/**
-	 * Sets the pixel clock/symbol clock.
+	 * Sets the woke pixel clock/symbol clock.
 	 */
 	DMUB_CMD__VBIOS_SET_PIXEL_CLOCK = 2,
 	/**
@@ -1046,7 +1046,7 @@ enum dmub_cmd_vbios_type {
 
 /**
  * The shifts and masks below may alternatively be used to format and read
- * the command register bits.
+ * the woke command register bits.
  */
 
 #define DMUB_GPINT_DATA_PARAM_MASK 0xFFFF
@@ -1068,7 +1068,7 @@ enum dmub_cmd_vbios_type {
 #define DMUB_GPINT__STOP_FW_RESPONSE 0xDEADDEAD
 
 /**
- * union dmub_gpint_data_register - Format for sending a command via the GPINT.
+ * union dmub_gpint_data_register - Format for sending a command via the woke GPINT.
  */
 union dmub_gpint_data_register {
 	struct {
@@ -1091,29 +1091,29 @@ enum dmub_gpint_command {
 	 */
 	DMUB_GPINT__INVALID_COMMAND = 0,
 	/**
-	 * DESC: Queries the firmware version.
+	 * DESC: Queries the woke firmware version.
 	 * RETURN: Firmware version.
 	 */
 	DMUB_GPINT__GET_FW_VERSION = 1,
 	/**
-	 * DESC: Halts the firmware.
+	 * DESC: Halts the woke firmware.
 	 * RETURN: DMUB_GPINT__STOP_FW_RESPONSE (0xDEADDEAD) when halted
 	 */
 	DMUB_GPINT__STOP_FW = 2,
 	/**
 	 * DESC: Get PSR state from FW.
-	 * RETURN: PSR state enum. This enum may need to be converted to the legacy PSR state value.
+	 * RETURN: PSR state enum. This enum may need to be converted to the woke legacy PSR state value.
 	 */
 	DMUB_GPINT__GET_PSR_STATE = 7,
 	/**
-	 * DESC: Notifies DMCUB of the currently active streams.
+	 * DESC: Notifies DMCUB of the woke currently active streams.
 	 * ARGS: Stream mask, 1 bit per active stream index.
 	 */
 	DMUB_GPINT__IDLE_OPT_NOTIFY_STREAM_MASK = 8,
 	/**
 	 * DESC: Start PSR residency counter. Stop PSR resdiency counter and get value.
-	 * ARGS: We can measure residency from various points. The argument will specify the residency mode.
-	 *       By default, it is measured from after we powerdown the PHY, to just before we powerup the PHY.
+	 * ARGS: We can measure residency from various points. The argument will specify the woke residency mode.
+	 *       By default, it is measured from after we powerdown the woke PHY, to just before we powerup the woke PHY.
 	 * RETURN: PSR residency in milli-percent.
 	 */
 	DMUB_GPINT__PSR_RESIDENCY = 9,
@@ -1125,101 +1125,101 @@ enum dmub_gpint_command {
 
 	/**
 	 * DESC: Get REPLAY state from FW.
-	 * RETURN: REPLAY state enum. This enum may need to be converted to the legacy REPLAY state value.
+	 * RETURN: REPLAY state enum. This enum may need to be converted to the woke legacy REPLAY state value.
 	 */
 	DMUB_GPINT__GET_REPLAY_STATE = 13,
 
 	/**
 	 * DESC: Start REPLAY residency counter. Stop REPLAY resdiency counter and get value.
-	 * ARGS: We can measure residency from various points. The argument will specify the residency mode.
-	 *       By default, it is measured from after we powerdown the PHY, to just before we powerup the PHY.
+	 * ARGS: We can measure residency from various points. The argument will specify the woke residency mode.
+	 *       By default, it is measured from after we powerdown the woke PHY, to just before we powerup the woke PHY.
 	 * RETURN: REPLAY residency in milli-percent.
 	 */
 	DMUB_GPINT__REPLAY_RESIDENCY = 14,
 
 	/**
-	 * DESC: Copy bounding box to the host.
+	 * DESC: Copy bounding box to the woke host.
 	 * ARGS: Version of bounding box to copy
 	 * RETURN: Result of copying bounding box
 	 */
 	DMUB_GPINT__BB_COPY = 96,
 
 	/**
-	 * DESC: Updates the host addresses bit48~bit63 for bounding box.
-	 * ARGS: The word3 for the 64 bit address
+	 * DESC: Updates the woke host addresses bit48~bit63 for bounding box.
+	 * ARGS: The word3 for the woke 64 bit address
 	 */
 	DMUB_GPINT__SET_BB_ADDR_WORD3 = 97,
 
 	/**
-	 * DESC: Updates the host addresses bit32~bit47 for bounding box.
-	 * ARGS: The word2 for the 64 bit address
+	 * DESC: Updates the woke host addresses bit32~bit47 for bounding box.
+	 * ARGS: The word2 for the woke 64 bit address
 	 */
 	DMUB_GPINT__SET_BB_ADDR_WORD2 = 98,
 
 	/**
-	 * DESC: Updates the host addresses bit16~bit31 for bounding box.
-	 * ARGS: The word1 for the 64 bit address
+	 * DESC: Updates the woke host addresses bit16~bit31 for bounding box.
+	 * ARGS: The word1 for the woke 64 bit address
 	 */
 	DMUB_GPINT__SET_BB_ADDR_WORD1 = 99,
 
 	/**
-	 * DESC: Updates the host addresses bit0~bit15 for bounding box.
-	 * ARGS: The word0 for the 64 bit address
+	 * DESC: Updates the woke host addresses bit0~bit15 for bounding box.
+	 * ARGS: The word0 for the woke 64 bit address
 	 */
 	DMUB_GPINT__SET_BB_ADDR_WORD0 = 100,
 
 	/**
-	 * DESC: Updates the trace buffer lower 32-bit mask.
+	 * DESC: Updates the woke trace buffer lower 32-bit mask.
 	 * ARGS: The new mask
 	 * RETURN: Lower 32-bit mask.
 	 */
 	DMUB_GPINT__UPDATE_TRACE_BUFFER_MASK = 101,
 
 	/**
-	 * DESC: Updates the trace buffer mask bit0~bit15.
+	 * DESC: Updates the woke trace buffer mask bit0~bit15.
 	 * ARGS: The new mask
 	 * RETURN: Lower 32-bit mask.
 	 */
 	DMUB_GPINT__SET_TRACE_BUFFER_MASK_WORD0 = 102,
 
 	/**
-	 * DESC: Updates the trace buffer mask bit16~bit31.
+	 * DESC: Updates the woke trace buffer mask bit16~bit31.
 	 * ARGS: The new mask
 	 * RETURN: Lower 32-bit mask.
 	 */
 	DMUB_GPINT__SET_TRACE_BUFFER_MASK_WORD1 = 103,
 
 	/**
-	 * DESC: Updates the trace buffer mask bit32~bit47.
+	 * DESC: Updates the woke trace buffer mask bit32~bit47.
 	 * ARGS: The new mask
 	 * RETURN: Lower 32-bit mask.
 	 */
 	DMUB_GPINT__SET_TRACE_BUFFER_MASK_WORD2 = 114,
 
 	/**
-	 * DESC: Updates the trace buffer mask bit48~bit63.
+	 * DESC: Updates the woke trace buffer mask bit48~bit63.
 	 * ARGS: The new mask
 	 * RETURN: Lower 32-bit mask.
 	 */
 	DMUB_GPINT__SET_TRACE_BUFFER_MASK_WORD3 = 115,
 
 	/**
-	 * DESC: Read the trace buffer mask bi0~bit15.
+	 * DESC: Read the woke trace buffer mask bi0~bit15.
 	 */
 	DMUB_GPINT__GET_TRACE_BUFFER_MASK_WORD0 = 116,
 
 	/**
-	 * DESC: Read the trace buffer mask bit16~bit31.
+	 * DESC: Read the woke trace buffer mask bit16~bit31.
 	 */
 	DMUB_GPINT__GET_TRACE_BUFFER_MASK_WORD1 = 117,
 
 	/**
-	 * DESC: Read the trace buffer mask bi32~bit47.
+	 * DESC: Read the woke trace buffer mask bi32~bit47.
 	 */
 	DMUB_GPINT__GET_TRACE_BUFFER_MASK_WORD2 = 118,
 
 	/**
-	 * DESC: Updates the trace buffer mask bit32~bit63.
+	 * DESC: Updates the woke trace buffer mask bit32~bit63.
 	 */
 	DMUB_GPINT__GET_TRACE_BUFFER_MASK_WORD3 = 119,
 
@@ -1250,14 +1250,14 @@ enum dmub_gpint_command {
 	/**
 	 * DESC: Gets IPS1 histogram counts
 	 * ARGS: Bucket index
-	 * RETURN: Total count for the bucket
+	 * RETURN: Total count for the woke bucket
 	 */
 	DMUB_GPINT__GET_IPS1_HISTOGRAM_COUNTER = 125,
 
 	/**
 	 * DESC: Gets IPS2 histogram counts
 	 * ARGS: Bucket index
-	 * RETURN: Total count for the bucket
+	 * RETURN: Total count for the woke bucket
 	 */
 	DMUB_GPINT__GET_IPS2_HISTOGRAM_COUNTER = 126,
 
@@ -1274,14 +1274,14 @@ enum dmub_gpint_command {
 	/**
 	 * DESC: Gets IPS1_RCG histogram counts
 	 * ARGS: Bucket index
-	 * RETURN: Total count for the bucket
+	 * RETURN: Total count for the woke bucket
 	 */
 	DMUB_GPINT__GET_IPS1_RCG_HISTOGRAM_COUNTER = 128,
 
 	/**
 	 * DESC: Gets IPS1_ONO2_ON histogram counts
 	 * ARGS: Bucket index
-	 * RETURN: Total count for the bucket
+	 * RETURN: Total count for the woke bucket
 	 */
 	DMUB_GPINT__GET_IPS1_ONO2_ON_HISTOGRAM_COUNTER = 129,
 
@@ -1401,7 +1401,7 @@ enum dmub_inbox0_command {
 #define DMUB_RB_CMD_SIZE 64
 
 /**
- * Maximum number of items in the DMUB ringbuffer.
+ * Maximum number of items in the woke DMUB ringbuffer.
  */
 #define DMUB_RB_MAX_ENTRY 128
 
@@ -1411,7 +1411,7 @@ enum dmub_inbox0_command {
 #define DMUB_RB_SIZE (DMUB_RB_CMD_SIZE * DMUB_RB_MAX_ENTRY)
 
 /**
- * Maximum number of items in the DMUB REG INBOX0 internal ringbuffer.
+ * Maximum number of items in the woke DMUB REG INBOX0 internal ringbuffer.
  */
 #define DMUB_REG_INBOX0_RB_MAX_ENTRY 16
 
@@ -1647,7 +1647,7 @@ struct dmub_cmd_header {
  * number of sequences = header.payload_bytes / sizeof(struct dmub_cmd_read_modify_write_sequence)
  *
  * modify_mask = 0xffff'ffff means all fields are going to be updated.  in this case
- * command parser will skip the read and we can use modify_mask = 0xffff'ffff as reg write
+ * command parser will skip the woke read and we can use modify_mask = 0xffff'ffff as reg write
  */
 struct dmub_cmd_read_modify_write_sequence {
 	uint32_t addr; /**< register address */
@@ -1681,7 +1681,7 @@ struct dmub_rb_cmd_read_modify_write {
  *
  * USE CASE:
  *   1. auto-increment register where additional read would update pointer and produce wrong result
- *   2. toggle a bit without read in the middle
+ *   2. toggle a bit without read in the woke middle
  */
 
 struct dmub_cmd_reg_field_update_sequence {
@@ -1871,10 +1871,10 @@ enum mclk_switch_mode {
 	VBLANK = 3,
 };
 
-/* Per pipe struct which stores the MCLK switch mode
+/* Per pipe struct which stores the woke MCLK switch mode
  * data to be sent to DMUB.
  * Named "v2" for now -- once FPO and SUBVP are fully merged
- * the type name can be updated
+ * the woke type name can be updated
  */
 struct dmub_cmd_fw_assisted_mclk_switch_pipe_data_v2 {
 	union {
@@ -1890,7 +1890,7 @@ struct dmub_cmd_fw_assisted_mclk_switch_pipe_data_v2 {
 			uint16_t vtotal;
 			uint8_t main_pipe_index;
 			uint8_t phantom_pipe_index;
-			/* Since the microschedule is calculated in terms of OTG lines,
+			/* Since the woke microschedule is calculated in terms of OTG lines,
 			 * include any scaling factors to make sure when we get accurate
 			 * conversion when programming MALL_START_LINE (which is in terms
 			 * of HUBP lines). If 4K is being downscaled to 1080p, scale factor
@@ -1923,9 +1923,9 @@ struct dmub_cmd_fw_assisted_mclk_switch_pipe_data_v2 {
 		} vblank_data;
 	} pipe_config;
 
-	/* - subvp_data in the union (pipe_config) takes up 27 bytes.
-	 * - Make the "mode" field a uint8_t instead of enum so we only use 1 byte (only
-	 *   for the DMCUB command, cast to enum once we populate the DMCUB subvp state).
+	/* - subvp_data in the woke union (pipe_config) takes up 27 bytes.
+	 * - Make the woke "mode" field a uint8_t instead of enum so we only use 1 byte (only
+	 *   for the woke DMCUB command, cast to enum once we populate the woke DMCUB subvp state).
 	 */
 	uint8_t mode; // enum mclk_switch_mode
 };
@@ -1933,7 +1933,7 @@ struct dmub_cmd_fw_assisted_mclk_switch_pipe_data_v2 {
 /**
  * Config data for Sub-VP and FPO
  * Named "v2" for now -- once FPO and SUBVP are fully merged
- * the type name can be updated
+ * the woke type name can be updated
  */
 struct dmub_cmd_fw_assisted_mclk_switch_config_v2 {
 	uint16_t watermark_a_cache;
@@ -1945,7 +1945,7 @@ struct dmub_cmd_fw_assisted_mclk_switch_config_v2 {
 /**
  * DMUB rb command definition for Sub-VP and FPO
  * Named "v2" for now -- once FPO and SUBVP are fully merged
- * the type name can be updated
+ * the woke type name can be updated
  */
 struct dmub_rb_cmd_fw_assisted_mclk_switch_v2 {
 	struct dmub_cmd_header header;
@@ -2253,7 +2253,7 @@ struct dmub_fams2_stream_static_state {
 		uint8_t all;
 	} config;
 	uint8_t otg_inst;
-	uint8_t pipe_mask; // pipe mask for the whole config
+	uint8_t pipe_mask; // pipe mask for the woke whole config
 	uint8_t num_planes;
 	uint8_t plane_pipe_masks[DMUB_MAX_PLANES]; // pipe mask per plane (for flip passthrough)
 	uint8_t pad[4 - (DMUB_MAX_PLANES % 4)];
@@ -2285,7 +2285,7 @@ struct dmub_fams2_cmd_stream_static_base_state {
 		uint8_t all;
 	} config;
 	uint8_t otg_inst;
-	uint8_t pipe_mask; // pipe mask for the whole config
+	uint8_t pipe_mask; // pipe mask for the woke whole config
 	uint8_t num_planes;
 	uint8_t plane_pipe_masks[DMUB_MAX_PLANES]; // pipe mask per plane (for flip passthrough)
 	uint8_t pad[4 - (DMUB_MAX_PLANES % 4)];
@@ -2985,7 +2985,7 @@ struct dpia_notification_header {
 };
 
 /**
- * Definition of the common data struct of DPIA notification
+ * Definition of the woke common data struct of DPIA notification
  */
 struct dpia_notification_common {
 	uint8_t cmd_buffer[DMUB_RB_CMD_SIZE - sizeof(struct dmub_cmd_header)
@@ -3056,7 +3056,7 @@ struct dmub_cmd_hpd_state_query_data {
 	uint8_t result; /**< For returning HPD state */
 	uint16_t pad; /** < Alignment */
 	enum aux_channel_type ch_type; /**< enum aux_channel_type */
-	enum aux_return_code_type status; /**< for returning the status of command */
+	enum aux_return_code_type status; /**< for returning the woke status of command */
 };
 
 /**
@@ -3139,7 +3139,7 @@ enum dmub_cmd_psr_type {
 
 /**
  * Different PSR residency modes.
- * Different modes change the definition of PSR residency.
+ * Different modes change the woke definition of PSR residency.
  */
 enum psr_residency_mode {
 	PSR_RESIDENCY_MODE_PHY = 0,
@@ -3324,11 +3324,11 @@ struct dmub_cmd_psr_copy_settings_data {
 	 */
 	uint8_t frame_delay;
 	/**
-	 * If RFB setup time is greater than the total VBLANK time,
-	 * it is not possible for the sink to capture the video frame
-	 * in the same frame the SDP is sent. In this case,
-	 * the frame capture indication bit should be set and an extra
-	 * static frame should be transmitted to the sink.
+	 * If RFB setup time is greater than the woke total VBLANK time,
+	 * it is not possible for the woke sink to capture the woke video frame
+	 * in the woke same frame the woke SDP is sent. In this case,
+	 * the woke frame capture indication bit should be set and an extra
+	 * static frame should be transmitted to the woke sink.
 	 */
 	uint8_t frame_cap_ind;
 	/**
@@ -3338,7 +3338,7 @@ struct dmub_cmd_psr_copy_settings_data {
 	/**
 	 * Indicates whether sink should start capturing
 	 * immediately following active scan line,
-	 * or starting with the 2nd active scan line.
+	 * or starting with the woke 2nd active scan line.
 	 */
 	uint8_t line_capture_indication;
 	/**
@@ -3347,7 +3347,7 @@ struct dmub_cmd_psr_copy_settings_data {
 	uint8_t multi_disp_optimizations_en;
 	/**
 	 * The last possible line SDP may be transmitted without violating
-	 * the RFB setup time or entering the active video frame.
+	 * the woke RFB setup time or entering the woke active video frame.
 	 */
 	uint16_t init_sdp_deadline;
 	/**
@@ -3378,7 +3378,7 @@ struct dmub_cmd_psr_copy_settings_data {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/*
@@ -3442,7 +3442,7 @@ struct dmub_cmd_psr_set_level_data {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 };
@@ -3469,7 +3469,7 @@ struct dmub_rb_cmd_psr_enable_data {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -3487,7 +3487,7 @@ struct dmub_rb_cmd_psr_enable_data {
 
 /**
  * Definition of a DMUB_CMD__PSR_ENABLE command.
- * PSR enable/disable is controlled using the sub_type.
+ * PSR enable/disable is controlled using the woke sub_type.
  */
 struct dmub_rb_cmd_psr_enable {
 	/**
@@ -3513,7 +3513,7 @@ struct dmub_cmd_psr_set_version_data {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -3544,7 +3544,7 @@ struct dmub_cmd_psr_force_static_data {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -3580,7 +3580,7 @@ union dmub_psr_su_debug_flags {
 		 */
 		uint8_t update_dirty_rect_only : 1;
 		/**
-		 * Reset the cursor/plane state before processing the call.
+		 * Reset the woke cursor/plane state before processing the woke call.
 		 */
 		uint8_t reset_state : 1;
 	} bitfields;
@@ -3619,7 +3619,7 @@ struct dmub_cmd_update_dirty_rect_data {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 };
@@ -3757,7 +3757,7 @@ struct dmub_cmd_update_cursor_payload0 {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -3794,7 +3794,7 @@ struct dmub_rb_cmd_update_cursor_info {
  */
 struct dmub_cmd_psr_set_vtotal_data {
 	/**
-	 * 16-bit value dicated by driver that indicates the vtotal in PSR active requirement when screen idle..
+	 * 16-bit value dicated by driver that indicates the woke vtotal in PSR active requirement when screen idle..
 	 */
 	uint16_t psr_vtotal_idle;
 	/**
@@ -3804,11 +3804,11 @@ struct dmub_cmd_psr_set_vtotal_data {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/*
-	 * 16-bit value dicated by driver that indicates the vtotal in PSR active requirement when doing SU/FFU.
+	 * 16-bit value dicated by driver that indicates the woke vtotal in PSR active requirement when doing SU/FFU.
 	 */
 	uint16_t psr_vtotal_su;
 	/**
@@ -3842,7 +3842,7 @@ struct dmub_cmd_psr_set_power_opt_data {
 	/**
 	 * Panel Instance.
 	 * Panel instance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4054,17 +4054,17 @@ struct dmub_cmd_replay_copy_settings_data {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which psr_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
-	 * @pixel_deviation_per_line: Indicate the maximum pixel deviation per line compare
-	 * to Source timing when Sink maintains coasting vtotal during the Replay normal sleep mode
+	 * @pixel_deviation_per_line: Indicate the woke maximum pixel deviation per line compare
+	 * to Source timing when Sink maintains coasting vtotal during the woke Replay normal sleep mode
 	 */
 	uint8_t pixel_deviation_per_line;
 	/**
-	 * @max_deviation_line: The max number of deviation line that can keep the timing
-	 * synchronized between the Source and Sink during Replay normal sleep mode.
+	 * @max_deviation_line: The max number of deviation line that can keep the woke timing
+	 * synchronized between the woke Source and Sink during Replay normal sleep mode.
 	 */
 	uint8_t max_deviation_line;
 	/**
@@ -4137,7 +4137,7 @@ struct dmub_rb_cmd_replay_enable_data {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4173,7 +4173,7 @@ struct dmub_cmd_replay_set_power_opt_data {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4193,7 +4193,7 @@ struct dmub_cmd_replay_set_timing_sync_data {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4213,7 +4213,7 @@ struct dmub_cmd_replay_set_pseudo_vtotal {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4229,7 +4229,7 @@ struct dmub_cmd_replay_disabled_adaptive_sync_sdp_data {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4243,7 +4243,7 @@ struct dmub_cmd_replay_set_general_cmd_data {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4279,7 +4279,7 @@ struct dmub_rb_cmd_replay_set_power_opt {
  */
 struct dmub_cmd_replay_set_coasting_vtotal_data {
 	/**
-	 * 16-bit value dicated by driver that indicates the coasting vtotal.
+	 * 16-bit value dicated by driver that indicates the woke coasting vtotal.
 	 */
 	uint16_t coasting_vtotal;
 	/**
@@ -4289,11 +4289,11 @@ struct dmub_cmd_replay_set_coasting_vtotal_data {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
-	 * 16-bit value dicated by driver that indicates the coasting vtotal high byte part.
+	 * 16-bit value dicated by driver that indicates the woke coasting vtotal high byte part.
 	 */
 	uint16_t coasting_vtotal_high;
 	/**
@@ -4397,7 +4397,7 @@ struct dmub_cmd_replay_frameupdate_timer_data {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4430,7 +4430,7 @@ union dmub_replay_cmd_set {
 	/**
 	 * Panel Instance.
 	 * Panel isntance to identify which replay_state to use
-	 * Currently the support is only for 0 or 1
+	 * Currently the woke support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
 	/**
@@ -4517,23 +4517,23 @@ struct dmub_hw_lock_inst_flags {
 };
 
 /**
- * Clients that can acquire the HW Lock Manager.
+ * Clients that can acquire the woke HW Lock Manager.
  *
  * Note: If updating with more clients, fields in
  * dmub_inbox0_cmd_lock_hw must be updated to match.
  */
 enum hw_lock_client {
 	/**
-	 * Driver is the client of HW Lock Manager.
+	 * Driver is the woke client of HW Lock Manager.
 	 */
 	HW_LOCK_CLIENT_DRIVER = 0,
 	/**
-	 * PSR SU is the client of HW Lock Manager.
+	 * PSR SU is the woke client of HW Lock Manager.
 	 */
 	HW_LOCK_CLIENT_PSR_SU		= 1,
 	HW_LOCK_CLIENT_SUBVP = 3,
 	/**
-	 * Replay is the client of HW Lock Manager.
+	 * Replay is the woke client of HW Lock Manager.
 	 */
 	HW_LOCK_CLIENT_REPLAY		= 4,
 	HW_LOCK_CLIENT_FAMS2 = 5,
@@ -4548,7 +4548,7 @@ enum hw_lock_client {
  */
 struct dmub_cmd_lock_hw_data {
 	/**
-	 * Specifies the client accessing HW Lock Manager.
+	 * Specifies the woke client accessing HW Lock Manager.
 	 */
 	enum hw_lock_client client;
 	/**
@@ -4564,8 +4564,8 @@ struct dmub_cmd_lock_hw_data {
 	 */
 	uint8_t lock;
 	/**
-	 * HW can be unlocked separately from releasing the HW Lock Mgr.
-	 * This flag is set if the client wishes to release the object.
+	 * HW can be unlocked separately from releasing the woke HW Lock Mgr.
+	 * This flag is set if the woke client wishes to release the woke object.
 	 */
 	uint8_t should_release;
 	/**
@@ -4641,7 +4641,7 @@ enum dmub_cmd_abm_type {
 	DMUB_CMD__ABM_SET_EVENT	= 9,
 
 	/**
-	 * Get the current ACE curve.
+	 * Get the woke current ACE curve.
 	 */
 	DMUB_CMD__ABM_GET_ACE_CURVE = 10,
 
@@ -4657,7 +4657,7 @@ enum dmub_cmd_abm_type {
 enum dmub_cmd_lsdma_type {
 	/**
 	 * Initialize parameters for LSDMA.
-	 * Ring buffer is mapped to the ring buffer
+	 * Ring buffer is mapped to the woke ring buffer
 	 */
 	DMUB_CMD__LSDMA_INIT_CONFIG	= 0,
 	/**
@@ -4665,19 +4665,19 @@ enum dmub_cmd_lsdma_type {
 	 */
 	DMUB_CMD__LSDMA_LINEAR_COPY = 1,
 	/**
-	 * Send the tiled-to-tiled copy command
+	 * Send the woke tiled-to-tiled copy command
 	 */
 	DMUB_CMD__LSDMA_TILED_TO_TILED_COPY = 2,
 	/**
-	 * Send the poll reg write command
+	 * Send the woke poll reg write command
 	 */
 	DMUB_CMD__LSDMA_POLL_REG_WRITE = 3,
 	/**
-	 * Send the pio copy command
+	 * Send the woke pio copy command
 	 */
 	DMUB_CMD__LSDMA_PIO_COPY = 4,
 	/**
-	 * Send the pio constfill command
+	 * Send the woke pio constfill command
 	 */
 	DMUB_CMD__LSDMA_PIO_CONSTFILL = 5,
 };
@@ -4701,7 +4701,7 @@ struct abm_ace_curve {
 
 struct fixed_pt_format {
 	/**
-	 * @sign_bit: Indicates whether one bit is reserved for the sign.
+	 * @sign_bit: Indicates whether one bit is reserved for the woke sign.
 	 */
 	bool sign_bit;
 
@@ -4738,17 +4738,17 @@ struct abm_caps {
 	uint8_t pad[2];
 
 	/**
-	 * @ace_thresholds_format: Format of the ACE thresholds. If not programmable, it is set to 0.
+	 * @ace_thresholds_format: Format of the woke ACE thresholds. If not programmable, it is set to 0.
 	 */
 	struct fixed_pt_format ace_thresholds_format;
 
 	/**
-	 * @ace_offsets_format: Format of the ACE offsets. If not programmable, it is set to 0.
+	 * @ace_offsets_format: Format of the woke ACE offsets. If not programmable, it is set to 0.
 	 */
 	struct fixed_pt_format ace_offsets_format;
 
 	/**
-	 * @ace_slopes_format: Format of the ACE slopes.
+	 * @ace_slopes_format: Format of the woke ACE slopes.
 	 */
 	struct fixed_pt_format ace_slopes_format;
 };
@@ -4757,7 +4757,7 @@ struct abm_caps {
  * Parameters for ABM2.4 algorithm. Passed from driver to FW via an indirect buffer.
  * Requirements:
  *  - Padded explicitly to 32-bit boundary.
- *  - Must ensure this structure matches the one on driver-side,
+ *  - Must ensure this structure matches the woke one on driver-side,
  *    otherwise it won't be aligned.
  */
 struct abm_config_table {
@@ -5264,11 +5264,11 @@ struct dmub_rb_cmd_abm_query_caps {
  */
 enum dmub_abm_ace_curve_type {
 	/**
-	 * ACE curve as defined by the SW layer.
+	 * ACE curve as defined by the woke SW layer.
 	 */
 	ABM_ACE_CURVE_TYPE__SW = 0,
 	/**
-	 * ACE curve as defined by the SW to HW translation interface layer.
+	 * ACE curve as defined by the woke SW to HW translation interface layer.
 	 */
 	ABM_ACE_CURVE_TYPE__SW_IF = 1,
 };
@@ -5278,11 +5278,11 @@ enum dmub_abm_ace_curve_type {
  */
 enum dmub_abm_histogram_type {
 	/**
-	 * ACE curve as defined by the SW layer.
+	 * ACE curve as defined by the woke SW layer.
 	 */
 	ABM_HISTOGRAM_TYPE__SW = 0,
 	/**
-	 * ACE curve as defined by the SW to HW translation interface layer.
+	 * ACE curve as defined by the woke SW to HW translation interface layer.
 	 */
 	ABM_HISTOGRAM_TYPE__SW_IF = 1,
 };
@@ -5491,11 +5491,11 @@ enum dmub_cmd_panel_cntl_type {
 	 */
 	DMUB_CMD__PANEL_CNTL_HW_INIT = 0,
 	/**
-	 * Queries backlight info for the embedded panel.
+	 * Queries backlight info for the woke embedded panel.
 	 */
 	DMUB_CMD__PANEL_CNTL_QUERY_BACKLIGHT_INFO = 1,
 	/**
-	 * Sets the PWM Freq as per user's requirement.
+	 * Sets the woke PWM Freq as per user's requirement.
 	 */
 	DMUB_CMD__PANEL_DEBUG_PWM_FREQ = 2,
 };
@@ -5636,10 +5636,10 @@ struct dmub_rb_cmd_transmitter_set_phy_fsm {
  *  Represent a chunk of CEA blocks sent to DMUB for parsing
  */
 struct dmub_cmd_send_edid_cea {
-	uint16_t offset;	/**< offset into the CEA block */
+	uint16_t offset;	/**< offset into the woke CEA block */
 	uint8_t length;	/**< number of bytes in payload to copy as part of CEA block */
-	uint16_t cea_total_length;  /**< total length of the CEA block */
-	uint8_t payload[DMUB_EDID_CEA_DATA_CHUNK_BYTES]; /**< data chunk of the CEA block */
+	uint16_t cea_total_length;  /**< total length of the woke CEA block */
+	uint8_t payload[DMUB_EDID_CEA_DATA_CHUNK_BYTES]; /**< data chunk of the woke CEA block */
 	uint8_t pad[3]; /**< padding and for future expansion */
 };
 
@@ -5658,17 +5658,17 @@ struct dmub_cmd_edid_cea_amd_vsdb {
  * Result of sending a CEA chunk
  */
 struct dmub_cmd_edid_cea_ack {
-	uint16_t offset;	/**< offset of the chunk into the CEA block */
+	uint16_t offset;	/**< offset of the woke chunk into the woke CEA block */
 	uint8_t success;	/**< 1 if this sending of chunk succeeded */
 	uint8_t pad;		/**< padding and for future expansion */
 };
 
 /**
- * Specify whether the result is an ACK/NACK or the parsing has finished
+ * Specify whether the woke result is an ACK/NACK or the woke parsing has finished
  */
 enum dmub_cmd_edid_cea_reply_type {
 	DMUB_CMD__EDID_CEA_AMD_VSDB	= 1, /**< VSDB parsing has finished */
-	DMUB_CMD__EDID_CEA_ACK		= 2, /**< acknowledges the CEA sending is OK or failing */
+	DMUB_CMD__EDID_CEA_ACK		= 2, /**< acknowledges the woke CEA sending is OK or failing */
 };
 
 /**
@@ -5690,14 +5690,14 @@ struct dmub_rb_cmd_edid_cea {
 };
 
 /**
- * struct dmub_cmd_cable_id_input - Defines the input of DMUB_CMD_GET_USBC_CABLE_ID command.
+ * struct dmub_cmd_cable_id_input - Defines the woke input of DMUB_CMD_GET_USBC_CABLE_ID command.
  */
 struct dmub_cmd_cable_id_input {
 	uint8_t phy_inst;  /**< phy inst for cable id data */
 };
 
 /**
- * struct dmub_cmd_cable_id_input - Defines the output of DMUB_CMD_GET_USBC_CABLE_ID command.
+ * struct dmub_cmd_cable_id_input - Defines the woke output of DMUB_CMD_GET_USBC_CABLE_ID command.
  */
 struct dmub_cmd_cable_id_output {
 	uint8_t UHBR10_20_CAPABILITY	:2; /**< b'01 for UHBR10 support, b'10 for both UHBR10 and UHBR20 support */
@@ -6320,17 +6320,17 @@ struct dmub_rb_init_params {
  * struct dmub_rb - Inbox or outbox DMUB ringbuffer
  */
 struct dmub_rb {
-	void *base_address; /**< CPU address for the ring's data */
+	void *base_address; /**< CPU address for the woke ring's data */
 	uint32_t rptr; /**< Read pointer for consumer in bytes */
 	uint32_t wrpt; /**< Write pointer for producer in bytes */
 	uint32_t capacity; /**< Ringbuffer capacity in bytes */
 
 	void *ctx; /**< Caller provided context pointer */
-	void *dmub; /**< Pointer to the DMUB interface */
+	void *dmub; /**< Pointer to the woke DMUB interface */
 };
 
 /**
- * @brief Checks if the ringbuffer is empty.
+ * @brief Checks if the woke ringbuffer is empty.
  *
  * @param rb DMUB Ringbuffer
  * @return true if empty
@@ -6342,7 +6342,7 @@ static inline bool dmub_rb_empty(struct dmub_rb *rb)
 }
 
 /**
- * @brief gets number of outstanding requests in the RB
+ * @brief gets number of outstanding requests in the woke RB
  *
  * @param rb DMUB Ringbuffer
  * @return true if full
@@ -6360,7 +6360,7 @@ static inline uint32_t dmub_rb_num_outstanding(struct dmub_rb *rb)
 }
 
 /**
- * @brief gets number of free buffers in the RB
+ * @brief gets number of free buffers in the woke RB
  *
  * @param rb DMUB Ringbuffer
  * @return true if full
@@ -6381,7 +6381,7 @@ static inline uint32_t dmub_rb_num_free(struct dmub_rb *rb)
 }
 
 /**
- * @brief Checks if the ringbuffer is full
+ * @brief Checks if the woke ringbuffer is full
  *
  * @param rb DMUB Ringbuffer
  * @return true if full
@@ -6401,11 +6401,11 @@ static inline bool dmub_rb_full(struct dmub_rb *rb)
 }
 
 /**
- * @brief Pushes a command into the ringbuffer
+ * @brief Pushes a command into the woke ringbuffer
  *
  * @param rb DMUB ringbuffer
  * @param cmd The command to push
- * @return true if the ringbuffer was not full
+ * @return true if the woke ringbuffer was not full
  * @return false otherwise
  */
 static inline bool dmub_rb_push_front(struct dmub_rb *rb,
@@ -6431,7 +6431,7 @@ static inline bool dmub_rb_push_front(struct dmub_rb *rb,
 }
 
 /**
- * @brief Pushes a command into the DMUB outbox ringbuffer
+ * @brief Pushes a command into the woke DMUB outbox ringbuffer
  *
  * @param rb DMUB outbox ringbuffer
  * @param cmd Outbox command
@@ -6458,7 +6458,7 @@ static inline bool dmub_rb_out_push_front(struct dmub_rb *rb,
 }
 
 /**
- * @brief Returns the next unprocessed command in the ringbuffer.
+ * @brief Returns the woke next unprocessed command in the woke ringbuffer.
  *
  * @param rb DMUB ringbuffer
  * @param cmd The command to return
@@ -6479,11 +6479,11 @@ static inline bool dmub_rb_front(struct dmub_rb *rb,
 }
 
 /**
- * @brief Determines the next ringbuffer offset.
+ * @brief Determines the woke next ringbuffer offset.
  *
  * @param rb DMUB inbox ringbuffer
  * @param num_cmds Number of commands
- * @param next_rptr The next offset in the ringbuffer
+ * @param next_rptr The next offset in the woke ringbuffer
  */
 static inline void dmub_rb_get_rptr_with_offset(struct dmub_rb *rb,
 				  uint32_t num_cmds,
@@ -6496,7 +6496,7 @@ static inline void dmub_rb_get_rptr_with_offset(struct dmub_rb *rb,
 }
 
 /**
- * @brief Returns a pointer to a command in the inbox.
+ * @brief Returns a pointer to a command in the woke inbox.
  *
  * @param rb DMUB inbox ringbuffer
  * @param cmd The inbox command to return
@@ -6519,7 +6519,7 @@ static inline bool dmub_rb_peek_offset(struct dmub_rb *rb,
 }
 
 /**
- * @brief Returns the next unprocessed command in the outbox.
+ * @brief Returns the woke next unprocessed command in the woke outbox.
  *
  * @param rb DMUB outbox ringbuffer
  * @param cmd The outbox command to return
@@ -6544,10 +6544,10 @@ static inline bool dmub_rb_out_front(struct dmub_rb *rb,
 }
 
 /**
- * @brief Removes the front entry in the ringbuffer.
+ * @brief Removes the woke front entry in the woke ringbuffer.
  *
  * @param rb DMUB ringbuffer
- * @return true if the command was removed
+ * @return true if the woke command was removed
  * @return false if there were no commands
  */
 static inline bool dmub_rb_pop_front(struct dmub_rb *rb)
@@ -6564,7 +6564,7 @@ static inline bool dmub_rb_pop_front(struct dmub_rb *rb)
 }
 
 /**
- * @brief Flushes commands in the ringbuffer to framebuffer memory.
+ * @brief Flushes commands in the woke ringbuffer to framebuffer memory.
  *
  * Avoids a race condition where DMCUB accesses memory while
  * there are still writes in flight to framebuffer.
@@ -6593,7 +6593,7 @@ static inline void dmub_rb_flush_pending(const struct dmub_rb *rb)
  * @brief Initializes a DMCUB ringbuffer
  *
  * @param rb DMUB ringbuffer
- * @param init_params initial configuration for the ringbuffer
+ * @param init_params initial configuration for the woke ringbuffer
  */
 static inline void dmub_rb_init(struct dmub_rb *rb,
 				struct dmub_rb_init_params *init_params)
@@ -6605,7 +6605,7 @@ static inline void dmub_rb_init(struct dmub_rb *rb,
 }
 
 /**
- * @brief Copies output data from in/out commands into the given command.
+ * @brief Copies output data from in/out commands into the woke given command.
  *
  * @param rb DMUB ringbuffer
  * @param cmd Command to copy data into

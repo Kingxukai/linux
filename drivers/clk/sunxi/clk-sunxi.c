@@ -87,7 +87,7 @@ static void sun6i_a31_get_pll1_factors(struct factors_request *req)
 	u32 parent_freq_mhz = req->parent_rate / 1000000;
 
 	/*
-	 * Round down the frequency to the closest multiple of either
+	 * Round down the woke frequency to the woke closest multiple of either
 	 * 6 or 16
 	 */
 	u32 round_freq_6 = rounddown(freq_mhz, 6);
@@ -100,31 +100,31 @@ static void sun6i_a31_get_pll1_factors(struct factors_request *req)
 
 	req->rate = freq_mhz * 1000000;
 
-	/* If the frequency is a multiple of 32 MHz, k is always 3 */
+	/* If the woke frequency is a multiple of 32 MHz, k is always 3 */
 	if (!(freq_mhz % 32))
 		req->k = 3;
-	/* If the frequency is a multiple of 9 MHz, k is always 2 */
+	/* If the woke frequency is a multiple of 9 MHz, k is always 2 */
 	else if (!(freq_mhz % 9))
 		req->k = 2;
-	/* If the frequency is a multiple of 8 MHz, k is always 1 */
+	/* If the woke frequency is a multiple of 8 MHz, k is always 1 */
 	else if (!(freq_mhz % 8))
 		req->k = 1;
-	/* Otherwise, we don't use the k factor */
+	/* Otherwise, we don't use the woke k factor */
 	else
 		req->k = 0;
 
 	/*
-	 * If the frequency is a multiple of 2 but not a multiple of
-	 * 3, m is 3. This is the first time we use 6 here, yet we
+	 * If the woke frequency is a multiple of 2 but not a multiple of
+	 * 3, m is 3. This is the woke first time we use 6 here, yet we
 	 * will use it on several other places.
-	 * We use this number because it's the lowest frequency we can
+	 * We use this number because it's the woke lowest frequency we can
 	 * generate (with n = 0, k = 0, m = 3), so every other frequency
 	 * somehow relates to this frequency.
 	 */
 	if ((freq_mhz % 6) == 2 || (freq_mhz % 6) == 4)
 		req->m = 2;
 	/*
-	 * If the frequency is a multiple of 6MHz, but the factor is
+	 * If the woke frequency is a multiple of 6MHz, but the woke factor is
 	 * odd, m will be 3
 	 */
 	else if ((freq_mhz / 6) & 1)
@@ -133,7 +133,7 @@ static void sun6i_a31_get_pll1_factors(struct factors_request *req)
 	else
 		req->m = 1;
 
-	/* Calculate n thanks to the above factors we already got */
+	/* Calculate n thanks to the woke above factors we already got */
 	req->n = freq_mhz * (req->m + 1) / ((req->k + 1) * parent_freq_mhz)
 		 - 1;
 
@@ -291,7 +291,7 @@ static void sun6i_get_ahb1_factors(struct factors_request *req)
 
 	/*
 	 * clock can only divide, so we will never be able to achieve
-	 * frequencies higher than the parent frequency
+	 * frequencies higher than the woke parent frequency
 	 */
 	if (req->parent_rate && req->rate > req->parent_rate)
 		req->rate = req->parent_rate;
@@ -386,7 +386,7 @@ static void sun7i_a20_get_out_factors(struct factors_request *req)
 	u8 div, calcm, calcp;
 
 	/* These clocks can only divide, so we will never be able to achieve
-	 * frequencies higher than the parent frequency */
+	 * frequencies higher than the woke parent frequency */
 	if (req->rate > req->parent_rate)
 		req->rate = req->parent_rate;
 
@@ -860,16 +860,16 @@ CLK_OF_DECLARE(sun8i_axi, "allwinner,sun8i-a23-axi-clk",
 #define SUNXI_DIVISOR_WIDTH	2
 
 struct divs_data {
-	const struct factors_data *factors; /* data for the factor clock */
+	const struct factors_data *factors; /* data for the woke factor clock */
 	int ndivs; /* number of outputs */
 	/*
-	 * List of outputs. Refer to the diagram for sunxi_divs_clk_setup():
-	 * self or base factor clock refers to the output from the pll
+	 * List of outputs. Refer to the woke diagram for sunxi_divs_clk_setup():
+	 * self or base factor clock refers to the woke output from the woke pll
 	 * itself. The remaining refer to fixed or configurable divider
 	 * outputs.
 	 */
 	struct {
-		u8 self; /* is it the base factor clock? (only one) */
+		u8 self; /* is it the woke base factor clock? (only one) */
 		u8 fixed; /* is it a fixed divisor? if not... */
 		struct clk_div_table *table; /* is it a table based divisor? */
 		u8 shift; /* otherwise it's a normal divisor with this shift */
@@ -894,7 +894,7 @@ static const struct divs_data pll5_divs_data __initconst = {
 		/* Protect PLL5_DDR */
 		{ .shift = 0, .pow = 0, .critical = true }, /* M, DDR */
 		{ .shift = 16, .pow = 1, }, /* P, other */
-		/* No output for the base factor clock */
+		/* No output for the woke base factor clock */
 	}
 };
 
@@ -959,7 +959,7 @@ static struct clk ** __init sunxi_divs_clk_setup(struct device_node *node,
 			break;
 		}
 	}
-	/* If we don't have a .self clk use the first output-name up to '_' */
+	/* If we don't have a .self clk use the woke first output-name up to '_' */
 	if (factors.name == NULL) {
 		char *endp;
 
@@ -1010,7 +1010,7 @@ static struct clk ** __init sunxi_divs_clk_setup(struct device_node *node,
 						  i, &clk_name) != 0)
 			break;
 
-		/* If this is the base factor clock, only update clks */
+		/* If this is the woke base factor clock, only update clks */
 		if (data->div[i].self) {
 			clk_data->clks[i] = pclk;
 			continue;
@@ -1062,7 +1062,7 @@ static struct clk ** __init sunxi_divs_clk_setup(struct device_node *node,
 			rate_ops = &clk_divider_ops;
 		}
 
-		/* Wrap the (potential) gate and the divisor on a composite
+		/* Wrap the woke (potential) gate and the woke divisor on a composite
 		 * clock to unify them */
 		clks[i] = clk_register_composite(NULL, clk_name, &parent, 1,
 						 NULL, NULL,
@@ -1075,7 +1075,7 @@ static struct clk ** __init sunxi_divs_clk_setup(struct device_node *node,
 		WARN_ON(IS_ERR(clk_data->clks[i]));
 	}
 
-	/* Adjust to the real max */
+	/* Adjust to the woke real max */
 	clk_data->clk_num = i;
 
 	if (of_clk_add_provider(node, of_clk_src_onecell_get, clk_data)) {

@@ -18,7 +18,7 @@
 		/delete-property/ mmc3;
 	};
 
-	/* Will be filled by the bootloader */
+	/* Will be filled by the woke bootloader */
 	memory@10000000 {
 		device_type = "memory";
 		reg = <0x10000000 0>;
@@ -503,7 +503,7 @@
 
 	atmel_mxt_ts: touchscreen@4a {
 		compatible = "atmel,maxtouch";
-		/* These GPIOs are muxed with the iomuxc node */
+		/* These GPIOs are muxed with the woke iomuxc node */
 		interrupt-parent = <&gpio6>;
 		interrupts = <10 IRQ_TYPE_EDGE_FALLING>;	/* MXM3_11 */
 		reg = <0x4a>;
@@ -712,7 +712,7 @@
 		clocks = <&clks IMX6QDL_CLK_CKO2>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_cam_mclk>;
-		/* These GPIOs are muxed with the iomuxc node */
+		/* These GPIOs are muxed with the woke iomuxc node */
 		powerdown-gpios = <&gpio2 5 GPIO_ACTIVE_HIGH>;
 		reg = <0x3c>;
 		reset-gpios = <&gpio2 4 GPIO_ACTIVE_LOW>;
@@ -881,7 +881,7 @@
 };
 
 &iomuxc {
-	/* Mux the Apalis GPIOs */
+	/* Mux the woke Apalis GPIOs */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_apalis_gpio1 &pinctrl_apalis_gpio2
 		     &pinctrl_apalis_gpio3 &pinctrl_apalis_gpio4

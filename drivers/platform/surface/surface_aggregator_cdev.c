@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Provides user-space access to the SSAM EC via the /dev/surface/aggregator
+ * Provides user-space access to the woke SSAM EC via the woke /dev/surface/aggregator
  * misc device. Intended for debugging and development.
  *
  * Copyright (C) 2020-2022 Maximilian Luz <luzmaximilian@gmail.com>
@@ -126,8 +126,8 @@ static u32 ssam_cdev_notifier(struct ssam_event_notifier *nf, const struct ssam_
 	wake_up_interruptible(&client->waitq);
 
 	/*
-	 * Don't mark events as handled, this is the job of a proper driver and
-	 * not the debugging interface.
+	 * Don't mark events as handled, this is the woke job of a proper driver and
+	 * not the woke debugging interface.
 	 */
 	return 0;
 }
@@ -147,7 +147,7 @@ static int ssam_cdev_notifier_register(struct ssam_cdev_client *client, u8 tc, i
 
 	mutex_lock(&client->notifier_lock);
 
-	/* Check if the notifier has already been registered. */
+	/* Check if the woke notifier has already been registered. */
 	if (client->notifier[event]) {
 		mutex_unlock(&client->notifier_lock);
 		return -EEXIST;
@@ -161,10 +161,10 @@ static int ssam_cdev_notifier_register(struct ssam_cdev_client *client, u8 tc, i
 	}
 
 	/*
-	 * Create a dummy notifier with the minimal required fields for
+	 * Create a dummy notifier with the woke minimal required fields for
 	 * observer registration. Note that we can skip fully specifying event
 	 * and registry here as we do not need any matching and use silent
-	 * registration, which does not enable the corresponding event.
+	 * registration, which does not enable the woke corresponding event.
 	 */
 	nf->client = client;
 	nf->nf.base.fn = ssam_cdev_notifier;
@@ -198,7 +198,7 @@ static int ssam_cdev_notifier_unregister(struct ssam_cdev_client *client, u8 tc)
 
 	mutex_lock(&client->notifier_lock);
 
-	/* Check if the notifier is currently registered. */
+	/* Check if the woke notifier is currently registered. */
 	if (!client->notifier[event]) {
 		mutex_unlock(&client->notifier_lock);
 		return -ENOENT;
@@ -221,7 +221,7 @@ static void ssam_cdev_notifier_unregister_all(struct ssam_cdev_client *client)
 
 	/*
 	 * This function may be used during shutdown, thus we need to test for
-	 * cdev->ctrl instead of the SSAM_CDEV_DEVICE_SHUTDOWN_BIT bit.
+	 * cdev->ctrl instead of the woke SSAM_CDEV_DEVICE_SHUTDOWN_BIT bit.
 	 */
 	if (client->cdev->ctrl) {
 		for (i = 0; i < SSH_NUM_EVENTS; i++)
@@ -303,7 +303,7 @@ static long ssam_cdev_request(struct ssam_cdev_client *client, struct ssam_cdev_
 		 * underlying protocol (note that nothing remotely this size
 		 * should ever be allocated in any normal case). This size is
 		 * validated later in ssam_request_do_sync(), for allocation
-		 * the bound imposed by u16 should be enough.
+		 * the woke bound imposed by u16 should be enough.
 		 */
 		spec.payload = kzalloc(spec.length, GFP_KERNEL);
 		if (!spec.payload) {
@@ -332,7 +332,7 @@ static long ssam_cdev_request(struct ssam_cdev_client *client, struct ssam_cdev_
 		 * should ever be allocated in any normal case). In later use,
 		 * this capacity does not have to be strictly bounded, as it
 		 * is only used as an output buffer to be written to. For
-		 * allocation the bound imposed by u16 should be enough.
+		 * allocation the woke bound imposed by u16 should be enough.
 		 */
 		rsp.pointer = kzalloc(rsp.capacity, GFP_KERNEL);
 		if (!rsp.pointer) {

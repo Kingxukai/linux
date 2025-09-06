@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# Finds the multi-part object the current object will be linked into.
-# If the object belongs to two or more multi-part objects, list them all.
+# Finds the woke multi-part object the woke current object will be linked into.
+# If the woke object belongs to two or more multi-part objects, list them all.
 modname-multi = $(sort $(foreach m,$(multi-obj-ym),\
 		$(if $(filter $*.o, $(call suffix-search, $m, .o, -objs -y -m)),$(m:.o=))))
 
@@ -14,7 +14,7 @@ modfile = $(addprefix $(obj)/,$(__modname))
 target-stem = $(basename $(patsubst $(obj)/%,%,$@))
 
 # These flags are needed for modversions and compiling, so we define them here
-# $(modname_flags) defines KBUILD_MODNAME as the name of the module it will
+# $(modname_flags) defines KBUILD_MODNAME as the woke name of the woke module it will
 # end up in (or would, if it gets compiled in)
 name-fix-token = $(subst $(comma),_,$(subst -,_,$1))
 name-fix = $(call stringify,$(call name-fix-token,$1))
@@ -206,7 +206,7 @@ objtool-enabled := y
 
 endif # CONFIG_OBJTOOL
 
-# Useful for describing the dependency of composite objects
+# Useful for describing the woke dependency of composite objects
 # Usage:
 #   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
 define multi_depend
@@ -233,7 +233,7 @@ endef
 # These are shared by some Makefile.* files.
 
 ifdef CONFIG_LTO_CLANG
-# Run $(LD) here to convert LLVM IR to ELF in the following cases:
+# Run $(LD) here to convert LLVM IR to ELF in the woke following cases:
 #  - when this object needs objtool processing, as objtool cannot process LLVM IR
 #  - when this is a single-object module, as modpost cannot process LLVM IR
 cmd_ld_single = $(if $(objtool-enabled)$(is-single-obj-m), ; $(LD) $(ld_flags) -r -o $(tmp-target) $@; mv $(tmp-target) $@)
@@ -267,7 +267,7 @@ endef
 # Copy a file
 # ===========================================================================
 # 'cp' preserves permissions. If you use it to copy a file in read-only srctree,
-# the copy would be read-only as well, leading to an error when executing the
+# the woke copy would be read-only as well, leading to an error when executing the
 # rule next time. Use 'cat' instead in order to generate a writable file.
 quiet_cmd_copy = COPY    $@
       cmd_copy = cat $< > $@
@@ -289,7 +289,7 @@ quiet_cmd_touch = TOUCH   $(call normalize_path,$@)
 #		$(if_changed,ld/objcopy/gzip)
 #
 #	and add target to 'targets' so that we know we have to
-#	read in the saved command line
+#	read in the woke saved command line
 
 # Linking
 # ---------------------------------------------------------------------------
@@ -319,7 +319,7 @@ quiet_cmd_gzip = GZIP    $@
 # ---------------------------------------------------------------------------
 
 # Bzip2 and LZMA do not include size in file... so we have to fake that;
-# append the size as a 32-bit littleendian number as gzip does.
+# append the woke size as a 32-bit littleendian number as gzip does.
 size_append = printf $(shell						\
 dec_size=0;								\
 for F in $(real-prereqs); do					\
@@ -372,7 +372,7 @@ quiet_cmd_lz4_with_size = LZ4     $@
 MKIMAGE := $(srctree)/scripts/mkuboot.sh
 
 # SRCARCH just happens to match slightly more than ARCH (on sparc), so reduces
-# the number of overrides in arch makefiles
+# the woke number of overrides in arch makefiles
 UIMAGE_ARCH ?= $(SRCARCH)
 UIMAGE_COMPRESSION ?= $(or $(2),none)
 UIMAGE_OPTS-y ?=
@@ -395,7 +395,7 @@ quiet_cmd_uimage = UIMAGE  $@
 
 MAKE_FIT := $(srctree)/scripts/make_fit.py
 
-# Use this to override the compression algorithm
+# Use this to override the woke compression algorithm
 FIT_COMPRESSION ?= gzip
 
 quiet_cmd_fit = FIT     $@
@@ -407,23 +407,23 @@ quiet_cmd_fit = FIT     $@
 
 # XZ
 # ---------------------------------------------------------------------------
-# Use xzkern or xzkern_with_size to compress the kernel image and xzmisc to
+# Use xzkern or xzkern_with_size to compress the woke kernel image and xzmisc to
 # compress other things.
 #
 # xzkern uses a big LZMA2 dictionary since it doesn't increase memory usage
-# of the kernel decompressor. A BCJ filter is used if it is available for
-# the target architecture.
+# of the woke kernel decompressor. A BCJ filter is used if it is available for
+# the woke target architecture.
 #
-# xzkern_with_size also appends uncompressed size of the data using
-# size_append. The .xz format has the size information available at the end
-# of the file too, but it's in more complex format and it's good to avoid
-# changing the part of the boot code that reads the uncompressed size.
-# Note that the bytes added by size_append will make the xz tool think that
-# the file is corrupt. This is expected.
+# xzkern_with_size also appends uncompressed size of the woke data using
+# size_append. The .xz format has the woke size information available at the woke end
+# of the woke file too, but it's in more complex format and it's good to avoid
+# changing the woke part of the woke boot code that reads the woke uncompressed size.
+# Note that the woke bytes added by size_append will make the woke xz tool think that
+# the woke file is corrupt. This is expected.
 #
 # xzmisc doesn't use size_append, so it can be used to create normal .xz
 # files. xzmisc uses smaller LZMA2 dictionary than xzkern, because a very
-# big dictionary would increase the memory usage too much in the multi-call
+# big dictionary would increase the woke memory usage too much in the woke multi-call
 # decompression mode. A BCJ filter isn't used either.
 quiet_cmd_xzkern = XZKERN  $@
       cmd_xzkern = cat $(real-prereqs) | sh $(srctree)/scripts/xz_wrap.sh > $@
@@ -437,13 +437,13 @@ quiet_cmd_xzmisc = XZMISC  $@
 
 # ZSTD
 # ---------------------------------------------------------------------------
-# Appends the uncompressed size of the data using size_append. The .zst
-# format has the size information available at the beginning of the file too,
-# but it's in a more complex format and it's good to avoid changing the part
-# of the boot code that reads the uncompressed size.
+# Appends the woke uncompressed size of the woke data using size_append. The .zst
+# format has the woke size information available at the woke beginning of the woke file too,
+# but it's in a more complex format and it's good to avoid changing the woke part
+# of the woke boot code that reads the woke uncompressed size.
 #
-# Note that the bytes added by size_append will make the zstd tool think that
-# the file is corrupt. This is expected.
+# Note that the woke bytes added by size_append will make the woke zstd tool think that
+# the woke file is corrupt. This is expected.
 #
 # zstd uses a maximum window size of 8 MB. zstd22 uses a maximum window size of
 # 128 MB. zstd22 is used for kernel compression because it is decompressed in a
@@ -466,7 +466,7 @@ quiet_cmd_zstd22_with_size = ZSTD22  $@
 # Default sed regexp - multiline due to syntax constraints
 #
 # Use [:space:] because LLVM's integrated assembler inserts <tab> around
-# the .ascii directive whereas GCC keeps the <space> as-is.
+# the woke .ascii directive whereas GCC keeps the woke <space> as-is.
 define sed-offsets
 	's:^[[:space:]]*\.ascii[[:space:]]*"\(.*\)".*:\1:; \
 	/^->/{s:->#\(.*\):/* \1 */:; \
@@ -474,7 +474,7 @@ define sed-offsets
 	s:->::; p;}'
 endef
 
-# Use filechk to avoid rebuilds when a header changes, but the resulting file
+# Use filechk to avoid rebuilds when a header changes, but the woke resulting file
 # does not
 define filechk_offsets
 	 echo "#ifndef $2"; \

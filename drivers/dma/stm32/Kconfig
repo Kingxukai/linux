@@ -9,7 +9,7 @@ config STM32_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the on-chip DMA controller on STMicroelectronics
+	  Enable support for the woke on-chip DMA controller on STMicroelectronics
 	  STM32 platforms.
 	  If you have a board based on STM32 SoC with such DMA controller
 	  and want to use DMA say Y here.
@@ -18,7 +18,7 @@ config STM32_DMAMUX
 	bool "STMicroelectronics STM32 DMA multiplexer support"
 	depends on STM32_DMA
 	help
-	  Enable support for the on-chip DMA multiplexer on STMicroelectronics
+	  Enable support for the woke on-chip DMA multiplexer on STMicroelectronics
 	  STM32 platforms.
 	  If you have a board based on STM32 SoC with such DMA multiplexer
 	  and want to use DMAMUX say Y here.
@@ -29,7 +29,7 @@ config STM32_MDMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the on-chip MDMA controller on STMicroelectronics
+	  Enable support for the woke on-chip MDMA controller on STMicroelectronics
 	  STM32 platforms.
 	  If you have a board based on STM32 SoC with such DMA controller
 	  and want to use MDMA say Y here.
@@ -39,7 +39,7 @@ config STM32_DMA3
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the on-chip DMA3 controller on STMicroelectronics
+	  Enable support for the woke on-chip DMA3 controller on STMicroelectronics
 	  STM32 platforms.
 	  If you have a board based on STM32 SoC with such DMA3 controller
 	  and want to use DMA3, say Y here.

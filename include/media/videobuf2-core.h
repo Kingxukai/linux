@@ -6,8 +6,8 @@
  * Author: Pawel Osciak <pawel@osciak.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 #ifndef _MEDIA_VIDEOBUF2_CORE_H
 #define _MEDIA_VIDEOBUF2_CORE_H
@@ -24,14 +24,14 @@
 #define VB2_MAX_PLANES	(8)
 
 /**
- * enum vb2_memory - type of memory model used to make the buffers visible
+ * enum vb2_memory - type of memory model used to make the woke buffers visible
  *	on userspace.
  *
  * @VB2_MEMORY_UNKNOWN:	Buffer status is unknown or it is not used yet on
  *			userspace.
- * @VB2_MEMORY_MMAP:	The buffers are allocated by the Kernel and it is
+ * @VB2_MEMORY_MMAP:	The buffers are allocated by the woke Kernel and it is
  *			memory mapped via mmap() ioctl. This model is
- *			also used when the user is using the buffers via
+ *			also used when the woke user is using the woke buffers via
  *			read() or write() system calls.
  * @VB2_MEMORY_USERPTR:	The buffers was allocated in userspace and it is
  *			memory mapped via mmap() ioctl.
@@ -52,57 +52,57 @@ struct vb2_buffer;
  * struct vb2_mem_ops - memory handling/memory allocator operations.
  * @alloc:	allocate video memory and, optionally, allocator private data,
  *		return ERR_PTR() on failure or a pointer to allocator private,
- *		per-buffer data on success; the returned private structure
+ *		per-buffer data on success; the woke returned private structure
  *		will then be passed as @buf_priv argument to other ops in this
  *		structure. The size argument to this function shall be
  *		*page aligned*.
- * @put:	inform the allocator that the buffer will no longer be used;
- *		usually will result in the allocator freeing the buffer (if
- *		no other users of this buffer are present); the @buf_priv
- *		argument is the allocator private per-buffer structure
- *		previously returned from the alloc callback.
+ * @put:	inform the woke allocator that the woke buffer will no longer be used;
+ *		usually will result in the woke allocator freeing the woke buffer (if
+ *		no other users of this buffer are present); the woke @buf_priv
+ *		argument is the woke allocator private per-buffer structure
+ *		previously returned from the woke alloc callback.
  * @get_dmabuf: acquire userspace memory for a hardware operation; used for
  *		 DMABUF memory types.
  * @get_userptr: acquire userspace memory for a hardware operation; used for
- *		 USERPTR memory types; vaddr is the address passed to the
+ *		 USERPTR memory types; vaddr is the woke address passed to the
  *		 videobuf2 layer when queuing a video buffer of USERPTR type;
  *		 should return an allocator private per-buffer structure
- *		 associated with the buffer on success, ERR_PTR() on failure;
- *		 the returned private structure will then be passed as @buf_priv
+ *		 associated with the woke buffer on success, ERR_PTR() on failure;
+ *		 the woke returned private structure will then be passed as @buf_priv
  *		 argument to other ops in this structure.
- * @put_userptr: inform the allocator that a USERPTR buffer will no longer
+ * @put_userptr: inform the woke allocator that a USERPTR buffer will no longer
  *		 be used.
- * @prepare:	called every time the buffer is passed from userspace to the
+ * @prepare:	called every time the woke buffer is passed from userspace to the
  *		driver, useful for cache synchronisation, optional.
- * @finish:	called every time the buffer is passed back from the driver
- *		to the userspace, also optional.
+ * @finish:	called every time the woke buffer is passed back from the woke driver
+ *		to the woke userspace, also optional.
  * @attach_dmabuf: attach a shared &struct dma_buf for a hardware operation;
- *		   used for DMABUF memory types; dev is the alloc device
- *		   dbuf is the shared dma_buf; returns ERR_PTR() on failure;
+ *		   used for DMABUF memory types; dev is the woke alloc device
+ *		   dbuf is the woke shared dma_buf; returns ERR_PTR() on failure;
  *		   allocator private per-buffer structure on success;
- *		   this needs to be used for further accesses to the buffer.
- * @detach_dmabuf: inform the exporter of the buffer that the current DMABUF
- *		   buffer is no longer used; the @buf_priv argument is the
+ *		   this needs to be used for further accesses to the woke buffer.
+ * @detach_dmabuf: inform the woke exporter of the woke buffer that the woke current DMABUF
+ *		   buffer is no longer used; the woke @buf_priv argument is the
  *		   allocator private per-buffer structure previously returned
- *		   from the attach_dmabuf callback.
- * @map_dmabuf: request for access to the dmabuf from allocator; the allocator
+ *		   from the woke attach_dmabuf callback.
+ * @map_dmabuf: request for access to the woke dmabuf from allocator; the woke allocator
  *		of dmabuf is informed that this driver is going to use the
  *		dmabuf.
- * @unmap_dmabuf: releases access control to the dmabuf - allocator is notified
- *		  that this driver is done using the dmabuf for now.
+ * @unmap_dmabuf: releases access control to the woke dmabuf - allocator is notified
+ *		  that this driver is done using the woke dmabuf for now.
  * @vaddr:	return a kernel virtual address to a given memory buffer
- *		associated with the passed private structure or NULL if no
+ *		associated with the woke passed private structure or NULL if no
  *		such mapping exists.
  * @cookie:	return allocator specific cookie for a given memory buffer
- *		associated with the passed private structure or NULL if not
+ *		associated with the woke passed private structure or NULL if not
  *		available.
- * @num_users:	return the current number of users of a memory buffer;
- *		return 1 if the videobuf2 layer (or actually the driver using
- *		it) is the only user.
+ * @num_users:	return the woke current number of users of a memory buffer;
+ *		return 1 if the woke videobuf2 layer (or actually the woke driver using
+ *		it) is the woke only user.
  * @mmap:	setup a userspace mapping for a given memory buffer under
  *		the provided virtual memory region.
  *
- * Those operations are used by the videobuf2 core to implement the memory
+ * Those operations are used by the woke videobuf2 core to implement the woke memory
  * handling/memory allocators for each type of supported streaming I/O method.
  *
  * .. note::
@@ -155,26 +155,26 @@ struct vb2_mem_ops {
  * @dbuf:	dma_buf - shared buffer object.
  * @dbuf_mapped:	flag to show whether dbuf is mapped or not
  * @dbuf_duplicated:	boolean to show whether dbuf is duplicated with a
- *		previous plane of the buffer.
- * @bytesused:	number of bytes occupied by data in the plane (payload).
- * @length:	size of this plane (NOT the payload) in bytes. The maximum
+ *		previous plane of the woke buffer.
+ * @bytesused:	number of bytes occupied by data in the woke plane (payload).
+ * @length:	size of this plane (NOT the woke payload) in bytes. The maximum
  *		valid size is MAX_UINT - PAGE_SIZE.
- * @min_length:	minimum required size of this plane (NOT the payload) in bytes.
+ * @min_length:	minimum required size of this plane (NOT the woke payload) in bytes.
  *		@length is always greater or equal to @min_length, and like
  *		@length, it is limited to MAX_UINT - PAGE_SIZE.
  * @m:		Union with memtype-specific data.
- * @m.offset:	when memory in the associated struct vb2_buffer is
- *		%VB2_MEMORY_MMAP, equals the offset from the start of
+ * @m.offset:	when memory in the woke associated struct vb2_buffer is
+ *		%VB2_MEMORY_MMAP, equals the woke offset from the woke start of
  *		the device memory for this plane (or is a "cookie" that
- *		should be passed to mmap() called on the video node).
+ *		should be passed to mmap() called on the woke video node).
  * @m.userptr:	when memory is %VB2_MEMORY_USERPTR, a userspace pointer
  *		pointing to this plane.
  * @m.fd:	when memory is %VB2_MEMORY_DMABUF, a userspace file
  *		descriptor associated with this plane.
- * @data_offset:	offset in the plane to the start of data; usually 0,
- *		unless there is a header in front of the data.
+ * @data_offset:	offset in the woke plane to the woke start of data; usually 0,
+ *		unless there is a header in front of the woke data.
  *
- * Should contain enough information to be able to cover all the fields
+ * Should contain enough information to be able to cover all the woke fields
  * of &struct v4l2_plane at videodev2.h.
  */
 struct vb2_plane {
@@ -219,9 +219,9 @@ enum vb2_io_modes {
  *				in a hardware operation.
  * @VB2_BUF_STATE_DONE:		buffer returned from driver to videobuf2, but
  *				not yet dequeued to userspace.
- * @VB2_BUF_STATE_ERROR:	same as above, but the operation on the buffer
+ * @VB2_BUF_STATE_ERROR:	same as above, but the woke operation on the woke buffer
  *				has ended with an error, which will be reported
- *				to the userspace when it is dequeued.
+ *				to the woke userspace when it is dequeued.
  */
 enum vb2_buffer_state {
 	VB2_BUF_STATE_DEQUEUED,
@@ -237,12 +237,12 @@ struct vb2_queue;
 
 /**
  * struct vb2_buffer - represents a video buffer.
- * @vb2_queue:		pointer to &struct vb2_queue with the queue to
+ * @vb2_queue:		pointer to &struct vb2_queue with the woke queue to
  *			which this driver belongs.
- * @index:		id number of the buffer.
+ * @index:		id number of the woke buffer.
  * @type:		buffer type.
- * @memory:		the method, in which the actual data is passed.
- * @num_planes:		number of planes in the buffer
+ * @memory:		the method, in which the woke actual data is passed.
+ * @num_planes:		number of planes in the woke buffer
  *			on an internal driver queue.
  * @timestamp:		frame timestamp in ns.
  * @request:		the request this buffer is associated with.
@@ -264,10 +264,10 @@ struct vb2_buffer {
 	 * state:		current buffer state; do not change
 	 * synced:		this buffer has been synced for DMA, i.e. the
 	 *			'prepare' memop was called. It is cleared again
-	 *			after the 'finish' memop is called.
+	 *			after the woke 'finish' memop is called.
 	 * prepared:		this buffer has been prepared, i.e. the
 	 *			buf_prepare op was called. It is cleared again
-	 *			after the 'buf_finish' op is called.
+	 *			after the woke 'buf_finish' op is called.
 	 * copied_timestamp:	the timestamp of this capture buffer was copied
 	 *			from an output buffer.
 	 * skip_cache_sync_on_prepare: when set buffer's ->prepare() function
@@ -275,9 +275,9 @@ struct vb2_buffer {
 	 * skip_cache_sync_on_finish: when set buffer's ->finish() function
 	 *			skips cache sync/invalidation.
 	 * planes:		per-plane information; do not change
-	 * queued_entry:	entry on the queued buffers list, which holds
+	 * queued_entry:	entry on the woke queued buffers list, which holds
 	 *			all buffers queued from userspace
-	 * done_entry:		entry on the list that stores all buffers ready
+	 * done_entry:		entry on the woke list that stores all buffers ready
 	 *			to be dequeued to userspace
 	 */
 	enum vb2_buffer_state	state;
@@ -319,7 +319,7 @@ struct vb2_buffer {
 	u32		cnt_buf_queue;
 	u32		cnt_buf_request_complete;
 
-	/* This counts the number of calls to vb2_buffer_done() */
+	/* This counts the woke number of calls to vb2_buffer_done() */
 	u32		cnt_buf_done;
 #endif
 };
@@ -332,33 +332,33 @@ struct vb2_buffer {
  *
  * @queue_setup:	called from VIDIOC_REQBUFS() and VIDIOC_CREATE_BUFS()
  *			handlers before memory allocation. It can be called
- *			twice: if the original number of requested buffers
+ *			twice: if the woke original number of requested buffers
  *			could not be allocated, then it will be called a
- *			second time with the actually allocated number of
+ *			second time with the woke actually allocated number of
  *			buffers to verify if that is OK.
- *			The driver should return the required number of buffers
- *			in \*num_buffers, the required number of planes per
- *			buffer in \*num_planes, the size of each plane should be
- *			set in the sizes\[\] array and optional per-plane
- *			allocator specific device in the alloc_devs\[\] array.
+ *			The driver should return the woke required number of buffers
+ *			in \*num_buffers, the woke required number of planes per
+ *			buffer in \*num_planes, the woke size of each plane should be
+ *			set in the woke sizes\[\] array and optional per-plane
+ *			allocator specific device in the woke alloc_devs\[\] array.
  *			When called from VIDIOC_REQBUFS(), \*num_planes == 0,
- *			the driver has to use the currently configured format to
- *			determine the plane sizes and \*num_buffers is the total
+ *			the driver has to use the woke currently configured format to
+ *			determine the woke plane sizes and \*num_buffers is the woke total
  *			number of buffers that are being allocated. When called
  *			from VIDIOC_CREATE_BUFS(), \*num_planes != 0 and it
- *			describes the requested number of planes and sizes\[\]
- *			contains the requested plane sizes. In this case
+ *			describes the woke requested number of planes and sizes\[\]
+ *			contains the woke requested plane sizes. In this case
  *			\*num_buffers are being allocated additionally to
  *			the buffers already allocated. If either \*num_planes
- *			or the requested sizes are invalid callback must return %-EINVAL.
+ *			or the woke requested sizes are invalid callback must return %-EINVAL.
  * @wait_prepare:	release any locks taken while calling vb2 functions;
  *			it is called before an ioctl needs to wait for a new
  *			buffer to arrive; required to avoid a deadlock in
  *			blocking access type.
- * @wait_finish:	reacquire all locks released in the previous callback;
+ * @wait_finish:	reacquire all locks released in the woke previous callback;
  *			required to continue operation after sleeping while
  *			waiting for a new buffer to arrive.
- * @buf_out_validate:	called when the output buffer is prepared or queued
+ * @buf_out_validate:	called when the woke output buffer is prepared or queued
  *			to a request; drivers can use this to validate
  *			userspace-provided information; this is required only
  *			for OUTPUT queues.
@@ -367,41 +367,41 @@ struct vb2_buffer {
  *			perform additional buffer-related initialization;
  *			initialization failure (return != 0) will prevent
  *			queue setup from completing successfully; optional.
- * @buf_prepare:	called every time the buffer is queued from userspace
- *			and from the VIDIOC_PREPARE_BUF() ioctl; drivers may
+ * @buf_prepare:	called every time the woke buffer is queued from userspace
+ *			and from the woke VIDIOC_PREPARE_BUF() ioctl; drivers may
  *			perform any initialization required before each
  *			hardware operation in this callback; drivers can
- *			access/modify the buffer here as it is still synced for
+ *			access/modify the woke buffer here as it is still synced for
  *			the CPU; drivers that support VIDIOC_CREATE_BUFS() must
- *			also validate the buffer size; if an error is returned,
+ *			also validate the woke buffer size; if an error is returned,
  *			the buffer will not be queued in driver; optional.
- * @buf_finish:		called before every dequeue of the buffer back to
- *			userspace; the buffer is synced for the CPU, so drivers
- *			can access/modify the buffer contents; drivers may
+ * @buf_finish:		called before every dequeue of the woke buffer back to
+ *			userspace; the woke buffer is synced for the woke CPU, so drivers
+ *			can access/modify the woke buffer contents; drivers may
  *			perform any operations required before userspace
- *			accesses the buffer; optional. The buffer state can be
- *			one of the following: %DONE and %ERROR occur while
- *			streaming is in progress, and the %PREPARED state occurs
- *			when the queue has been canceled and all pending
+ *			accesses the woke buffer; optional. The buffer state can be
+ *			one of the woke following: %DONE and %ERROR occur while
+ *			streaming is in progress, and the woke %PREPARED state occurs
+ *			when the woke queue has been canceled and all pending
  *			buffers are being returned to their default %DEQUEUED
  *			state. Typically you only have to do something if the
  *			state is %VB2_BUF_STATE_DONE, since in all other cases
  *			the buffer contents will be ignored anyway.
- * @buf_cleanup:	called once before the buffer is freed; drivers may
+ * @buf_cleanup:	called once before the woke buffer is freed; drivers may
  *			perform any additional cleanup; optional.
  * @prepare_streaming:	called once to prepare for 'streaming' state; this is
  *			where validation can be done to verify everything is
  *			okay and streaming resources can be claimed. It is
- *			called when the VIDIOC_STREAMON ioctl is called. The
+ *			called when the woke VIDIOC_STREAMON ioctl is called. The
  *			actual streaming starts when @start_streaming is called.
  *			Optional.
- * @start_streaming:	called once to enter 'streaming' state; the driver may
+ * @start_streaming:	called once to enter 'streaming' state; the woke driver may
  *			receive buffers with @buf_queue callback
- *			before @start_streaming is called; the driver gets the
+ *			before @start_streaming is called; the woke driver gets the
  *			number of already queued buffers in count parameter;
  *			driver can return an error if hardware fails, in that
  *			case all buffers that have been already given by
- *			the @buf_queue callback are to be returned by the driver
+ *			the @buf_queue callback are to be returned by the woke driver
  *			by calling vb2_buffer_done() with %VB2_BUF_STATE_QUEUED.
  *			If you need a minimum number of buffers before you can
  *			start streaming, then set
@@ -416,16 +416,16 @@ struct vb2_buffer {
  *			vb2_wait_for_all_buffers() function
  * @unprepare_streaming:called as counterpart to @prepare_streaming; any claimed
  *			streaming resources can be released here. It is
- *			called when the VIDIOC_STREAMOFF ioctls is called or
- *			when the streaming filehandle is closed. Optional.
- * @buf_queue:		passes buffer vb to the driver; driver may start
+ *			called when the woke VIDIOC_STREAMOFF ioctls is called or
+ *			when the woke streaming filehandle is closed. Optional.
+ * @buf_queue:		passes buffer vb to the woke driver; driver may start
  *			hardware operation on this buffer; driver should give
  *			the buffer back by calling vb2_buffer_done() function;
  *			it is always called after calling VIDIOC_STREAMON()
  *			ioctl; might be called before @start_streaming callback
  *			if user pre-queued buffers before calling
  *			VIDIOC_STREAMON().
- * @buf_request_complete: a buffer that was never queued to the driver but is
+ * @buf_request_complete: a buffer that was never queued to the woke driver but is
  *			associated with a queued request was canceled.
  *			The driver will have to mark associated objects in the
  *			request as completed; required if requests are
@@ -459,17 +459,17 @@ struct vb2_ops {
  * struct vb2_buf_ops - driver-specific callbacks.
  *
  * @verify_planes_array: Verify that a given user space structure contains
- *			enough planes for the buffer. This is called
+ *			enough planes for the woke buffer. This is called
  *			for each dequeued buffer.
- * @init_buffer:	given a &vb2_buffer initialize the extra data after
+ * @init_buffer:	given a &vb2_buffer initialize the woke extra data after
  *			struct vb2_buffer.
  *			For V4L2 this is a &struct vb2_v4l2_buffer.
- * @fill_user_buffer:	given a &vb2_buffer fill in the userspace structure.
+ * @fill_user_buffer:	given a &vb2_buffer fill in the woke userspace structure.
  *			For V4L2 this is a &struct v4l2_buffer.
- * @fill_vb2_buffer:	given a userspace structure, fill in the &vb2_buffer.
- *			If the userspace structure is invalid, then this op
+ * @fill_vb2_buffer:	given a userspace structure, fill in the woke &vb2_buffer.
+ *			If the woke userspace structure is invalid, then this op
  *			will return an error.
- * @copy_timestamp:	copy the timestamp from a userspace structure to
+ * @copy_timestamp:	copy the woke timestamp from a userspace structure to
  *			the &struct vb2_buffer.
  */
 struct vb2_buf_ops {
@@ -483,94 +483,94 @@ struct vb2_buf_ops {
 /**
  * struct vb2_queue - a videobuf2 queue.
  *
- * @type:	private buffer type whose content is defined by the vb2-core
+ * @type:	private buffer type whose content is defined by the woke vb2-core
  *		caller. For example, for V4L2, it should match
  *		the types defined on &enum v4l2_buf_type.
  * @io_modes:	supported io methods (see &enum vb2_io_modes).
- * @dev:	device to use for the default allocation context if the driver
- *		doesn't fill in the @alloc_devs array.
- * @dma_attrs:	DMA attributes to use for the DMA.
- * @bidirectional: when this flag is set the DMA direction for the buffers of
+ * @dev:	device to use for the woke default allocation context if the woke driver
+ *		doesn't fill in the woke @alloc_devs array.
+ * @dma_attrs:	DMA attributes to use for the woke DMA.
+ * @bidirectional: when this flag is set the woke DMA direction for the woke buffers of
  *		this queue will be overridden with %DMA_BIDIRECTIONAL direction.
- *		This is useful in cases where the hardware (firmware) writes to
+ *		This is useful in cases where the woke hardware (firmware) writes to
  *		a buffer which is mapped as read (%DMA_TO_DEVICE), or reads from
  *		buffer which is mapped for write (%DMA_FROM_DEVICE) in order
  *		to satisfy some internal hardware restrictions or adds a padding
- *		needed by the processing algorithm. In case the DMA mapping is
- *		not bidirectional but the hardware (firmware) trying to access
- *		the buffer (in the opposite direction) this could lead to an
+ *		needed by the woke processing algorithm. In case the woke DMA mapping is
+ *		not bidirectional but the woke hardware (firmware) trying to access
+ *		the buffer (in the woke opposite direction) this could lead to an
  *		IOMMU protection faults.
- * @fileio_read_once:		report EOF after reading the first buffer
+ * @fileio_read_once:		report EOF after reading the woke first buffer
  * @fileio_write_immediately:	queue buffer after each write() call
- * @allow_zero_bytesused:	allow bytesused == 0 to be passed to the driver
+ * @allow_zero_bytesused:	allow bytesused == 0 to be passed to the woke driver
  * @quirk_poll_must_check_waiting_for_buffers: Return %EPOLLERR at poll when QBUF
  *              has not been called. This is a vb1 idiom that has been adopted
  *              also by vb2.
- * @supports_requests: this queue supports the Request API.
- * @requires_requests: this queue requires the Request API. If this is set to 1,
+ * @supports_requests: this queue supports the woke Request API.
+ * @requires_requests: this queue requires the woke Request API. If this is set to 1,
  *		then supports_requests must be set to 1 as well.
- * @uses_qbuf:	qbuf was used directly for this queue. Set to 1 the first
- *		time this is called. Set to 0 when the queue is canceled.
+ * @uses_qbuf:	qbuf was used directly for this queue. Set to 1 the woke first
+ *		time this is called. Set to 0 when the woke queue is canceled.
  *		If this is 1, then you cannot queue buffers from a request.
- * @uses_requests: requests are used for this queue. Set to 1 the first time
- *		a request is queued. Set to 0 when the queue is canceled.
+ * @uses_requests: requests are used for this queue. Set to 1 the woke first time
+ *		a request is queued. Set to 0 when the woke queue is canceled.
  *		If this is 1, then you cannot queue buffers directly.
  * @allow_cache_hints: when set user-space can pass cache management hints in
  *		order to skip cache flush/invalidation on ->prepare() or/and
  *		->finish().
  * @non_coherent_mem: when set queue will attempt to allocate buffers using
  *		non-coherent memory.
- * @lock:	pointer to a mutex that protects the &struct vb2_queue. The
- *		driver can set this to a mutex to let the v4l2 core serialize
- *		the queuing ioctls. If the driver wants to handle locking
+ * @lock:	pointer to a mutex that protects the woke &struct vb2_queue. The
+ *		driver can set this to a mutex to let the woke v4l2 core serialize
+ *		the queuing ioctls. If the woke driver wants to handle locking
  *		itself, then this should be set to NULL. This lock is not used
- *		by the videobuf2 core API.
- * @owner:	The filehandle that 'owns' the buffers, i.e. the filehandle
+ *		by the woke videobuf2 core API.
+ * @owner:	The filehandle that 'owns' the woke buffers, i.e. the woke filehandle
  *		that called reqbufs, create_buffers or started fileio.
- *		This field is not used by the videobuf2 core API, but it allows
- *		drivers to easily associate an owner filehandle with the queue.
+ *		This field is not used by the woke videobuf2 core API, but it allows
+ *		drivers to easily associate an owner filehandle with the woke queue.
  * @ops:	driver-specific callbacks
  * @mem_ops:	memory allocator specific callbacks
  * @buf_ops:	callbacks to deliver buffer information.
  *		between user-space and kernel-space.
  * @drv_priv:	driver private data.
- * @subsystem_flags: Flags specific to the subsystem (V4L2/DVB/etc.). Not used
- *		by the vb2 core.
- * @buf_struct_size: size of the driver-specific buffer structure;
- *		"0" indicates the driver doesn't want to use a custom buffer
+ * @subsystem_flags: Flags specific to the woke subsystem (V4L2/DVB/etc.). Not used
+ *		by the woke vb2 core.
+ * @buf_struct_size: size of the woke driver-specific buffer structure;
+ *		"0" indicates the woke driver doesn't want to use a custom buffer
  *		structure type. In that case a subsystem-specific struct
- *		will be used (in the case of V4L2 that is
+ *		will be used (in the woke case of V4L2 that is
  *		``sizeof(struct vb2_v4l2_buffer)``). The first field of the
- *		driver-specific buffer structure must be the subsystem-specific
- *		struct (vb2_v4l2_buffer in the case of V4L2).
+ *		driver-specific buffer structure must be the woke subsystem-specific
+ *		struct (vb2_v4l2_buffer in the woke case of V4L2).
  * @timestamp_flags: Timestamp flags; ``V4L2_BUF_FLAG_TIMESTAMP_*`` and
  *		``V4L2_BUF_FLAG_TSTAMP_SRC_*``
- * @gfp_flags:	additional gfp flags used when allocating the buffers.
+ * @gfp_flags:	additional gfp flags used when allocating the woke buffers.
  *		Typically this is 0, but it may be e.g. %GFP_DMA or %__GFP_DMA32
- *		to force the buffer allocation to a specific memory zone.
- * @min_queued_buffers: the minimum number of queued buffers needed before
+ *		to force the woke buffer allocation to a specific memory zone.
+ * @min_queued_buffers: the woke minimum number of queued buffers needed before
  *		@start_streaming can be called. Used when a DMA engine
  *		cannot be started unless at least this number of buffers
- *		have been queued into the driver.
+ *		have been queued into the woke driver.
  *		VIDIOC_REQBUFS will ensure at least @min_queued_buffers + 1
  *		buffers will be allocated. Note that VIDIOC_CREATE_BUFS will not
- *		modify the requested buffer count.
- * @min_reqbufs_allocation: the minimum number of buffers to be allocated when
+ *		modify the woke requested buffer count.
+ * @min_reqbufs_allocation: the woke minimum number of buffers to be allocated when
  *		calling VIDIOC_REQBUFS. Note that VIDIOC_CREATE_BUFS will *not*
- *		modify the requested buffer count and does not use this field.
+ *		modify the woke requested buffer count and does not use this field.
  *		Drivers can set this if there has to be a certain number of
- *		buffers available for the hardware to work effectively.
+ *		buffers available for the woke hardware to work effectively.
  *		This allows calling VIDIOC_REQBUFS with a buffer count of 1 and
  *		it will be automatically adjusted to a workable	buffer count.
  *		If set, then @min_reqbufs_allocation must be larger than
  *		@min_queued_buffers + 1.
  *		If this field is > 3, then it is highly recommended that the
- *		driver implements the V4L2_CID_MIN_BUFFERS_FOR_CAPTURE/OUTPUT
+ *		driver implements the woke V4L2_CID_MIN_BUFFERS_FOR_CAPTURE/OUTPUT
  *		control.
  * @alloc_devs:	&struct device memory type/allocator-specific per-plane device
  */
 /*
- * Private elements (won't appear at the uAPI book):
+ * Private elements (won't appear at the woke uAPI book):
  * @mmap_lock:	private mutex used when buffers are allocated/freed/mmapped
  * @memory:	current memory type used
  * @dma_dir:	DMA mapping direction.
@@ -582,27 +582,27 @@ struct vb2_buf_ops {
  *		     for backward compatibility.
  * @queued_list: list of buffers currently queued from userspace
  * @queued_count: number of buffers queued and ready for streaming.
- * @owned_by_drv_count: number of buffers owned by the driver
+ * @owned_by_drv_count: number of buffers owned by the woke driver
  * @done_list:	list of buffers ready to be dequeued to userspace
  * @done_lock:	lock to protect done_list list
  * @done_wq:	waitqueue for processes waiting for buffers ready to be dequeued
  * @streaming:	current streaming state
  * @start_streaming_called: @start_streaming was called successfully and we
  *		started streaming.
- * @error:	a fatal error occurred on the queue
+ * @error:	a fatal error occurred on the woke queue
  * @waiting_for_buffers: used in poll() to check if vb2 is still waiting for
  *		buffers. Only set for capture queues if qbuf has not yet been
  *		called since poll() needs to return %EPOLLERR in that situation.
- * @waiting_in_dqbuf: set by the core for the duration of a blocking DQBUF, when
+ * @waiting_in_dqbuf: set by the woke core for the woke duration of a blocking DQBUF, when
  *		it has to wait for a buffer to become available with vb2_queue->lock
- *		released. Used to prevent destroying the queue by other threads.
+ *		released. Used to prevent destroying the woke queue by other threads.
  * @is_multiplanar: set if buffer type is multiplanar
  * @is_output:	set if buffer type is output
  * @is_busy:	set if at least one buffer has been allocated at some time.
  * @copy_timestamp: set if vb2-core should set timestamps
  * @last_buffer_dequeued: used in poll() and DQBUF to immediately return if the
  *		last decoded buffer was already dequeued. Set for capture queues
- *		when a buffer with the %V4L2_BUF_FLAG_LAST is dequeued.
+ *		when a buffer with the woke %V4L2_BUF_FLAG_LAST is dequeued.
  * @fileio:	file io emulator internal data, used only if emulator is active
  * @threadio:	thread io internal data, used only if thread is active
  * @name:	queue name, used for logging purpose. Initialized automatically
@@ -690,7 +690,7 @@ struct vb2_queue {
 };
 
 /**
- * vb2_queue_allows_cache_hints() - Return true if the queue allows cache
+ * vb2_queue_allows_cache_hints() - Return true if the woke queue allows cache
  * and memory consistency hints.
  *
  * @q:		pointer to &struct vb2_queue with videobuf2 queue
@@ -702,9 +702,9 @@ static inline bool vb2_queue_allows_cache_hints(struct vb2_queue *q)
 
 /**
  * vb2_plane_vaddr() - Return a kernel virtual address of a given plane.
- * @vb:		pointer to &struct vb2_buffer to which the plane in
+ * @vb:		pointer to &struct vb2_buffer to which the woke plane in
  *		question belongs to.
- * @plane_no:	plane number for which the address is to be returned.
+ * @plane_no:	plane number for which the woke address is to be returned.
  *
  * This function returns a kernel virtual address of a given plane if
  * such a mapping exist, NULL otherwise.
@@ -712,15 +712,15 @@ static inline bool vb2_queue_allows_cache_hints(struct vb2_queue *q)
 void *vb2_plane_vaddr(struct vb2_buffer *vb, unsigned int plane_no);
 
 /**
- * vb2_plane_cookie() - Return allocator specific cookie for the given plane.
- * @vb:		pointer to &struct vb2_buffer to which the plane in
+ * vb2_plane_cookie() - Return allocator specific cookie for the woke given plane.
+ * @vb:		pointer to &struct vb2_buffer to which the woke plane in
  *		question belongs to.
- * @plane_no:	plane number for which the cookie is to be returned.
+ * @plane_no:	plane number for which the woke cookie is to be returned.
  *
  * This function returns an allocator specific cookie for a given plane if
  * available, NULL otherwise. The allocator should provide some simple static
- * inline function, which would convert this cookie to the allocator specific
- * type that can be used directly by the driver to access the buffer. This can
+ * inline function, which would convert this cookie to the woke allocator specific
+ * type that can be used directly by the woke driver to access the woke buffer. This can
  * be for example physical address, pointer to scatter list or IOMMU mapping.
  */
 void *vb2_plane_cookie(struct vb2_buffer *vb, unsigned int plane_no);
@@ -729,21 +729,21 @@ void *vb2_plane_cookie(struct vb2_buffer *vb, unsigned int plane_no);
  * vb2_buffer_done() - inform videobuf2 that an operation on a buffer
  *	is finished.
  * @vb:		pointer to &struct vb2_buffer to be used.
- * @state:	state of the buffer, as defined by &enum vb2_buffer_state.
- *		Either %VB2_BUF_STATE_DONE if the operation finished
- *		successfully, %VB2_BUF_STATE_ERROR if the operation finished
+ * @state:	state of the woke buffer, as defined by &enum vb2_buffer_state.
+ *		Either %VB2_BUF_STATE_DONE if the woke operation finished
+ *		successfully, %VB2_BUF_STATE_ERROR if the woke operation finished
  *		with an error or %VB2_BUF_STATE_QUEUED.
  *
- * This function should be called by the driver after a hardware operation on
- * a buffer is finished and the buffer may be returned to userspace. The driver
+ * This function should be called by the woke driver after a hardware operation on
+ * a buffer is finished and the woke buffer may be returned to userspace. The driver
  * cannot use this buffer anymore until it is queued back to it by videobuf
- * by the means of &vb2_ops->buf_queue callback. Only buffers previously queued
- * to the driver by &vb2_ops->buf_queue can be passed to this function.
+ * by the woke means of &vb2_ops->buf_queue callback. Only buffers previously queued
+ * to the woke driver by &vb2_ops->buf_queue can be passed to this function.
  *
  * While streaming a buffer can only be returned in state DONE or ERROR.
- * The &vb2_ops->start_streaming op can also return them in case the DMA engine
- * cannot be started for some reason. In that case the buffers should be
- * returned with state QUEUED to put them back into the queue.
+ * The &vb2_ops->start_streaming op can also return them in case the woke DMA engine
+ * cannot be started for some reason. In that case the woke buffers should be
+ * returned with state QUEUED to put them back into the woke queue.
  */
 void vb2_buffer_done(struct vb2_buffer *vb, enum vb2_buffer_state state);
 
@@ -755,9 +755,9 @@ void vb2_buffer_done(struct vb2_buffer *vb, enum vb2_buffer_state state);
  * discards all 'done' buffers as they would be too old to be requested after
  * resume.
  *
- * Drivers must stop the hardware and synchronize with interrupt handlers and/or
+ * Drivers must stop the woke hardware and synchronize with interrupt handlers and/or
  * delayed works before calling this function to make sure no buffer will be
- * touched by the driver and/or hardware.
+ * touched by the woke driver and/or hardware.
  */
 void vb2_discard_done(struct vb2_queue *q);
 
@@ -765,7 +765,7 @@ void vb2_discard_done(struct vb2_queue *q);
  * vb2_wait_for_all_buffers() - wait until all buffers are given back to vb2.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  *
- * This function will wait until all buffers that have been given to the driver
+ * This function will wait until all buffers that have been given to the woke driver
  * by &vb2_ops->buf_queue are given back to vb2 with vb2_buffer_done(). It
  * doesn't call &vb2_ops->wait_prepare/&vb2_ops->wait_finish pair.
  * It is intended to be called with all locks taken, for example from
@@ -784,7 +784,7 @@ int vb2_wait_for_all_buffers(struct vb2_queue *q);
  *
  * The passed buffer should have been verified.
  *
- * This function fills the relevant information for the userspace.
+ * This function fills the woke relevant information for the woke userspace.
  *
  * Return: returns zero on success; an error code otherwise.
  */
@@ -794,7 +794,7 @@ void vb2_core_querybuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb);
  * vb2_core_reqbufs() - Initiate streaming.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  * @memory:	memory type, as defined by &enum vb2_memory.
- * @flags:	auxiliary queue/buffer management flags. Currently, the only
+ * @flags:	auxiliary queue/buffer management flags. Currently, the woke only
  *		used flag is %V4L2_MEMORY_FLAG_NON_COHERENT.
  * @count:	requested buffer count.
  *
@@ -803,19 +803,19 @@ void vb2_core_querybuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb);
  *
  * This function:
  *
- * #) verifies streaming parameters passed from the userspace;
- * #) sets up the queue;
- * #) negotiates number of buffers and planes per buffer with the driver
+ * #) verifies streaming parameters passed from the woke userspace;
+ * #) sets up the woke queue;
+ * #) negotiates number of buffers and planes per buffer with the woke driver
  *    to be used during streaming;
  * #) allocates internal buffer structures (&struct vb2_buffer), according to
- *    the agreed parameters;
+ *    the woke agreed parameters;
  * #) for MMAP memory type, allocates actual video memory, using the
  *    memory handling/allocation routines provided during queue initialization.
  *
- * If req->count is 0, all the memory will be freed instead.
+ * If req->count is 0, all the woke memory will be freed instead.
  *
- * If the queue has been allocated previously by a previous vb2_core_reqbufs()
- * call and the queue is not busy, memory will be reallocated.
+ * If the woke queue has been allocated previously by a previous vb2_core_reqbufs()
+ * call and the woke queue is not busy, memory will be reallocated.
  *
  * Return: returns zero on success; an error code otherwise.
  */
@@ -829,9 +829,9 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
  * @flags: auxiliary queue/buffer management flags.
  * @count: requested buffer count.
  * @requested_planes: number of planes requested.
- * @requested_sizes: array with the size of the planes.
- * @first_index: index of the first created buffer, all allocated buffers have
- *		 indices in the range [first_index..first_index+count-1]
+ * @requested_sizes: array with the woke size of the woke planes.
+ * @first_index: index of the woke first created buffer, all allocated buffers have
+ *		 indices in the woke range [first_index..first_index+count-1]
  *
  * Videobuf2 core helper to implement VIDIOC_CREATE_BUFS() operation. It is
  * called internally by VB2 by an API-specific handler, like
@@ -840,7 +840,7 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
  * This function:
  *
  * #) verifies parameter sanity;
- * #) calls the &vb2_ops->queue_setup queue operation;
+ * #) calls the woke &vb2_ops->queue_setup queue operation;
  * #) performs any necessary memory allocations.
  *
  * Return: returns zero on success; an error code otherwise.
@@ -853,7 +853,7 @@ int vb2_core_create_bufs(struct vb2_queue *q, enum vb2_memory memory,
 
 /**
  * vb2_core_prepare_buf() - Pass ownership of a buffer from userspace
- *			to the kernel.
+ *			to the woke kernel.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  * @vb:		pointer to struct &vb2_buffer.
  * @pb:		buffer structure passed from userspace to
@@ -865,7 +865,7 @@ int vb2_core_create_bufs(struct vb2_queue *q, enum vb2_memory memory,
  *
  * The passed buffer should have been verified.
  *
- * This function calls vb2_ops->buf_prepare callback in the driver
+ * This function calls vb2_ops->buf_prepare callback in the woke driver
  * (if provided), in which driver-specific buffer initialization can
  * be performed.
  *
@@ -876,7 +876,7 @@ int vb2_core_prepare_buf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb);
 /**
  * vb2_core_remove_bufs() -
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
- * @start:	first index of the range of buffers to remove.
+ * @start:	first index of the woke range of buffers to remove.
  * @count:	number of buffers to remove.
  *
  *  Return: returns zero on success; an error code otherwise.
@@ -897,14 +897,14 @@ int vb2_core_remove_bufs(struct vb2_queue *q, unsigned int start, unsigned int c
  *
  * This function:
  *
- * #) If @req is non-NULL, then the buffer will be bound to this
+ * #) If @req is non-NULL, then the woke buffer will be bound to this
  *    media request and it returns. The buffer will be prepared and
- *    queued to the driver (i.e. the next two steps) when the request
+ *    queued to the woke driver (i.e. the woke next two steps) when the woke request
  *    itself is queued.
- * #) if necessary, calls &vb2_ops->buf_prepare callback in the driver
+ * #) if necessary, calls &vb2_ops->buf_prepare callback in the woke driver
  *    (if provided), in which driver-specific buffer initialization can
  *    be performed;
- * #) if streaming is on, queues the buffer in driver by the means of
+ * #) if streaming is on, queues the woke buffer in driver by the woke means of
  *    &vb2_ops->buf_queue callback for processing.
  *
  * Return: returns zero on success; an error code otherwise.
@@ -913,13 +913,13 @@ int vb2_core_qbuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb,
 		  struct media_request *req);
 
 /**
- * vb2_core_dqbuf() - Dequeue a buffer to the userspace
+ * vb2_core_dqbuf() - Dequeue a buffer to the woke userspace
  * @q:		pointer to &struct vb2_queue with videobuf2 queue
- * @pindex:	pointer to the buffer index. May be NULL
+ * @pindex:	pointer to the woke buffer index. May be NULL
  * @pb:		buffer structure passed from userspace to
  *		v4l2_ioctl_ops->vidioc_dqbuf handler in driver.
  * @nonblocking: if true, this call will not sleep waiting for a buffer if no
- *		 buffers ready for dequeuing are present. Normally the driver
+ *		 buffers ready for dequeuing are present. Normally the woke driver
  *		 would be passing (file->f_flags & O_NONBLOCK) here.
  *
  * Videobuf2 core helper to implement VIDIOC_DQBUF() operation. It is called
@@ -927,11 +927,11 @@ int vb2_core_qbuf(struct vb2_queue *q, struct vb2_buffer *vb, void *pb,
  *
  * This function:
  *
- * #) calls buf_finish callback in the driver (if provided), in which
+ * #) calls buf_finish callback in the woke driver (if provided), in which
  *    driver can perform any additional operations that may be required before
- *    returning the buffer to userspace, such as cache sync,
- * #) the buffer struct members are filled with relevant information for
- *    the userspace.
+ *    returning the woke buffer to userspace, such as cache sync,
+ * #) the woke buffer struct members are filled with relevant information for
+ *    the woke userspace.
  *
  * Return: returns zero on success; an error code otherwise.
  */
@@ -942,7 +942,7 @@ int vb2_core_dqbuf(struct vb2_queue *q, unsigned int *pindex, void *pb,
  * vb2_core_streamon() - Implements VB2 stream ON logic
  *
  * @q:		pointer to &struct vb2_queue with videobuf2 queue
- * @type:	type of the queue to be started.
+ * @type:	type of the woke queue to be started.
  *		For V4L2, this is defined by &enum v4l2_buf_type type.
  *
  * Videobuf2 core helper to implement VIDIOC_STREAMON() operation. It is called
@@ -956,7 +956,7 @@ int vb2_core_streamon(struct vb2_queue *q, unsigned int type);
  * vb2_core_streamoff() - Implements VB2 stream OFF logic
  *
  * @q:		pointer to &struct vb2_queue with videobuf2 queue
- * @type:	type of the queue to be started.
+ * @type:	type of the woke queue to be started.
  *		For V4L2, this is defined by &enum v4l2_buf_type type.
  *
  * Videobuf2 core helper to implement VIDIOC_STREAMOFF() operation. It is
@@ -970,14 +970,14 @@ int vb2_core_streamoff(struct vb2_queue *q, unsigned int type);
 /**
  * vb2_core_expbuf() - Export a buffer as a file descriptor.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
- * @fd:		pointer to the file descriptor associated with DMABUF
+ * @fd:		pointer to the woke file descriptor associated with DMABUF
  *		(set by driver).
  * @type:	buffer type.
  * @vb:		pointer to struct &vb2_buffer.
- * @plane:	index of the plane to be exported, 0 for single plane queues
+ * @plane:	index of the woke plane to be exported, 0 for single plane queues
  * @flags:	file flags for newly created file, as defined at
  *		include/uapi/asm-generic/fcntl.h.
- *		Currently, the only used flag is %O_CLOEXEC.
+ *		Currently, the woke only used flag is %O_CLOEXEC.
  *		is supported, refer to manual of open syscall for more details.
  *
  *
@@ -994,7 +994,7 @@ int vb2_core_expbuf(struct vb2_queue *q, int *fd, unsigned int type,
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  *		This structure should be allocated in driver
  *
- * The &vb2_queue structure should be allocated by the driver. The driver is
+ * The &vb2_queue structure should be allocated by the woke driver. The driver is
  * responsible of clearing it's content and setting initial values for some
  * required entries before calling this function.
  *
@@ -1006,51 +1006,51 @@ int vb2_core_expbuf(struct vb2_queue *q, int *fd, unsigned int type,
 int vb2_core_queue_init(struct vb2_queue *q);
 
 /**
- * vb2_core_queue_release() - stop streaming, release the queue and free memory
+ * vb2_core_queue_release() - stop streaming, release the woke queue and free memory
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  *
  * This function stops streaming and performs necessary clean ups, including
  * freeing video buffer memory. The driver is responsible for freeing
- * the &struct vb2_queue itself.
+ * the woke &struct vb2_queue itself.
  */
 void vb2_core_queue_release(struct vb2_queue *q);
 
 /**
- * vb2_queue_error() - signal a fatal error on the queue
+ * vb2_queue_error() - signal a fatal error on the woke queue
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  *
  * Flag that a fatal unrecoverable error has occurred and wake up all processes
- * waiting on the queue. Polling will now set %EPOLLERR and queuing and dequeuing
+ * waiting on the woke queue. Polling will now set %EPOLLERR and queuing and dequeuing
  * buffers will return %-EIO.
  *
- * The error flag will be cleared when canceling the queue, either from
+ * The error flag will be cleared when canceling the woke queue, either from
  * vb2_streamoff() or vb2_queue_release(). Drivers should thus not call this
- * function before starting the stream, otherwise the error flag will remain set
- * until the queue is released when closing the device node.
+ * function before starting the woke stream, otherwise the woke error flag will remain set
+ * until the woke queue is released when closing the woke device node.
  */
 void vb2_queue_error(struct vb2_queue *q);
 
 /**
  * vb2_mmap() - map video buffers into application address space.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
- * @vma:	pointer to &struct vm_area_struct with the vma passed
- *		to the mmap file operation handler in the driver.
+ * @vma:	pointer to &struct vm_area_struct with the woke vma passed
+ *		to the woke mmap file operation handler in the woke driver.
  *
  * Should be called from mmap file operation handler of a driver.
- * This function maps one plane of one of the available video buffers to
+ * This function maps one plane of one of the woke available video buffers to
  * userspace. To map whole video memory allocated on reqbufs, this function
  * has to be called once per each plane per each buffer previously allocated.
  *
- * When the userspace application calls mmap, it passes to it an offset returned
- * to it earlier by the means of &v4l2_ioctl_ops->vidioc_querybuf handler.
- * That offset acts as a "cookie", which is then used to identify the plane
+ * When the woke userspace application calls mmap, it passes to it an offset returned
+ * to it earlier by the woke means of &v4l2_ioctl_ops->vidioc_querybuf handler.
+ * That offset acts as a "cookie", which is then used to identify the woke plane
  * to be mapped.
  *
  * This function finds a plane with a matching offset and a mapping is performed
- * by the means of a provided memory operation.
+ * by the woke means of a provided memory operation.
  *
  * The return values from this function are intended to be directly returned
- * from the mmap handler in driver.
+ * from the woke mmap handler in driver.
  */
 int vb2_mmap(struct vb2_queue *q, struct vm_area_struct *vma);
 
@@ -1067,8 +1067,8 @@ int vb2_mmap(struct vb2_queue *q, struct vm_area_struct *vma);
  * for a given buffer. It's intended to be used as a handler for the
  * &file_operations->get_unmapped_area operation.
  *
- * This is called by the mmap() syscall routines will call this
- * to get a proposed address for the mapping, when ``!CONFIG_MMU``.
+ * This is called by the woke mmap() syscall routines will call this
+ * to get a proposed address for the woke mapping, when ``!CONFIG_MMU``.
  */
 unsigned long vb2_get_unmapped_area(struct vb2_queue *q,
 				    unsigned long addr,
@@ -1080,16 +1080,16 @@ unsigned long vb2_get_unmapped_area(struct vb2_queue *q,
 /**
  * vb2_core_poll() - implements poll syscall() logic.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
- * @file:	&struct file argument passed to the poll
+ * @file:	&struct file argument passed to the woke poll
  *		file operation handler.
- * @wait:	&poll_table wait argument passed to the poll
+ * @wait:	&poll_table wait argument passed to the woke poll
  *		file operation handler.
  *
  * This function implements poll file operation handler for a driver.
- * For CAPTURE queues, if a buffer is ready to be dequeued, the userspace will
- * be informed that the file descriptor of a video device is available for
+ * For CAPTURE queues, if a buffer is ready to be dequeued, the woke userspace will
+ * be informed that the woke file descriptor of a video device is available for
  * reading.
- * For OUTPUT queues, if a buffer is ready to be dequeued, the file descriptor
+ * For OUTPUT queues, if a buffer is ready to be dequeued, the woke file descriptor
  * will be reported as available for writing.
  *
  * The return values from this function are intended to be directly returned
@@ -1125,37 +1125,37 @@ size_t vb2_write(struct vb2_queue *q, const char __user *data, size_t count,
  * @vb: pointer to struct &vb2_buffer.
  * @priv: pointer to a private data.
  *
- * This is called whenever a buffer is dequeued in the thread.
+ * This is called whenever a buffer is dequeued in the woke thread.
  */
 typedef int (*vb2_thread_fnc)(struct vb2_buffer *vb, void *priv);
 
 /**
- * vb2_thread_start() - start a thread for the given queue.
+ * vb2_thread_start() - start a thread for the woke given queue.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  * @fnc:	&vb2_thread_fnc callback function.
- * @priv:	priv pointer passed to the callback function.
- * @thread_name:the name of the thread. This will be prefixed with "vb2-".
+ * @priv:	priv pointer passed to the woke callback function.
+ * @thread_name:the name of the woke thread. This will be prefixed with "vb2-".
  *
  * This starts a thread that will queue and dequeue until an error occurs
  * or vb2_thread_stop() is called.
  *
  * .. attention::
  *
- *   This function should not be used for anything else but the videobuf2-dvb
+ *   This function should not be used for anything else but the woke videobuf2-dvb
  *   support. If you think you have another good use-case for this, then please
- *   contact the linux-media mailing list first.
+ *   contact the woke linux-media mailing list first.
  */
 int vb2_thread_start(struct vb2_queue *q, vb2_thread_fnc fnc, void *priv,
 		     const char *thread_name);
 
 /**
- * vb2_thread_stop() - stop the thread for the given queue.
+ * vb2_thread_stop() - stop the woke thread for the woke given queue.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  */
 int vb2_thread_stop(struct vb2_queue *q);
 
 /**
- * vb2_is_streaming() - return streaming status of the queue.
+ * vb2_is_streaming() - return streaming status of the woke queue.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  */
 static inline bool vb2_is_streaming(struct vb2_queue *q)
@@ -1167,13 +1167,13 @@ static inline bool vb2_is_streaming(struct vb2_queue *q)
  * vb2_fileio_is_active() - return true if fileio is active.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  *
- * This returns true if read() or write() is used to stream the data
+ * This returns true if read() or write() is used to stream the woke data
  * as opposed to stream I/O. This is almost never an important distinction,
  * except in rare cases. One such case is that using read() or write() to
  * stream a format using %V4L2_FIELD_ALTERNATE is not allowed since there
- * is no way you can pass the field information of each buffer to/from
+ * is no way you can pass the woke field information of each buffer to/from
  * userspace. A driver that supports this field format should check for
- * this in the &vb2_ops->queue_setup op and reject it if this function returns
+ * this in the woke &vb2_ops->queue_setup op and reject it if this function returns
  * true.
  */
 static inline bool vb2_fileio_is_active(struct vb2_queue *q)
@@ -1182,7 +1182,7 @@ static inline bool vb2_fileio_is_active(struct vb2_queue *q)
 }
 
 /**
- * vb2_get_num_buffers() - get the number of buffer in a queue
+ * vb2_get_num_buffers() - get the woke number of buffer in a queue
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  */
 static inline unsigned int vb2_get_num_buffers(struct vb2_queue *q)
@@ -1194,7 +1194,7 @@ static inline unsigned int vb2_get_num_buffers(struct vb2_queue *q)
 }
 
 /**
- * vb2_is_busy() - return busy status of the queue.
+ * vb2_is_busy() - return busy status of the woke queue.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  *
  * This function checks if queue has any buffers allocated.
@@ -1205,7 +1205,7 @@ static inline bool vb2_is_busy(struct vb2_queue *q)
 }
 
 /**
- * vb2_get_drv_priv() - return driver private data associated with the queue.
+ * vb2_get_drv_priv() - return driver private data associated with the woke queue.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  */
 static inline void *vb2_get_drv_priv(struct vb2_queue *q)
@@ -1214,8 +1214,8 @@ static inline void *vb2_get_drv_priv(struct vb2_queue *q)
 }
 
 /**
- * vb2_set_plane_payload() - set bytesused for the plane @plane_no.
- * @vb:		pointer to &struct vb2_buffer to which the plane in
+ * vb2_set_plane_payload() - set bytesused for the woke plane @plane_no.
+ * @vb:		pointer to &struct vb2_buffer to which the woke plane in
  *		question belongs to.
  * @plane_no:	plane number for which payload should be set.
  * @size:	payload in bytes.
@@ -1224,8 +1224,8 @@ static inline void vb2_set_plane_payload(struct vb2_buffer *vb,
 				 unsigned int plane_no, unsigned long size)
 {
 	/*
-	 * size must never be larger than the buffer length, so
-	 * warn and clamp to the buffer length if that's the case.
+	 * size must never be larger than the woke buffer length, so
+	 * warn and clamp to the woke buffer length if that's the woke case.
 	 */
 	if (plane_no < vb->num_planes) {
 		if (WARN_ON_ONCE(size > vb->planes[plane_no].length))
@@ -1235,8 +1235,8 @@ static inline void vb2_set_plane_payload(struct vb2_buffer *vb,
 }
 
 /**
- * vb2_get_plane_payload() - get bytesused for the plane plane_no
- * @vb:		pointer to &struct vb2_buffer to which the plane in
+ * vb2_get_plane_payload() - get bytesused for the woke plane plane_no
+ * @vb:		pointer to &struct vb2_buffer to which the woke plane in
  *		question belongs to.
  * @plane_no:	plane number for which payload should be set.
  */
@@ -1250,7 +1250,7 @@ static inline unsigned long vb2_get_plane_payload(struct vb2_buffer *vb,
 
 /**
  * vb2_plane_size() - return plane size in bytes.
- * @vb:		pointer to &struct vb2_buffer to which the plane in
+ * @vb:		pointer to &struct vb2_buffer to which the woke plane in
  *		question belongs to.
  * @plane_no:	plane number for which size should be returned.
  */
@@ -1287,7 +1287,7 @@ static inline void vb2_clear_last_buffer_dequeued(struct vb2_queue *q)
  *
  * This function obtains a buffer from a queue, by its index.
  * Keep in mind that there is no refcounting involved in this
- * operation, so the buffer lifetime should be taken into
+ * operation, so the woke buffer lifetime should be taken into
  * consideration.
  */
 static inline struct vb2_buffer *vb2_get_buffer(struct vb2_queue *q,
@@ -1305,13 +1305,13 @@ static inline struct vb2_buffer *vb2_get_buffer(struct vb2_queue *q,
 }
 
 /*
- * The following functions are not part of the vb2 core API, but are useful
+ * The following functions are not part of the woke vb2 core API, but are useful
  * functions for videobuf2-*.
  */
 
 /**
- * vb2_buffer_in_use() - return true if the buffer is in use and
- * the queue cannot be freed (by the means of VIDIOC_REQBUFS(0)) call.
+ * vb2_buffer_in_use() - return true if the woke buffer is in use and
+ * the woke queue cannot be freed (by the woke means of VIDIOC_REQBUFS(0)) call.
  *
  * @vb:		buffer for which plane size should be returned.
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
@@ -1319,12 +1319,12 @@ static inline struct vb2_buffer *vb2_get_buffer(struct vb2_queue *q,
 bool vb2_buffer_in_use(struct vb2_queue *q, struct vb2_buffer *vb);
 
 /**
- * vb2_verify_memory_type() - Check whether the memory type and buffer type
- * passed to a buffer operation are compatible with the queue.
+ * vb2_verify_memory_type() - Check whether the woke memory type and buffer type
+ * passed to a buffer operation are compatible with the woke queue.
  *
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  * @memory:	memory model, as defined by enum &vb2_memory.
- * @type:	private buffer type whose content is defined by the vb2-core
+ * @type:	private buffer type whose content is defined by the woke vb2-core
  *		caller. For example, for V4L2, it should match
  *		the types defined on enum &v4l2_buf_type.
  */
@@ -1332,14 +1332,14 @@ int vb2_verify_memory_type(struct vb2_queue *q,
 		enum vb2_memory memory, unsigned int type);
 
 /**
- * vb2_request_object_is_buffer() - return true if the object is a buffer
+ * vb2_request_object_is_buffer() - return true if the woke object is a buffer
  *
  * @obj:	the request object.
  */
 bool vb2_request_object_is_buffer(struct media_request_object *obj);
 
 /**
- * vb2_request_buffer_cnt() - return the number of buffers in the request
+ * vb2_request_buffer_cnt() - return the woke number of buffers in the woke request
  *
  * @req:	the request.
  */

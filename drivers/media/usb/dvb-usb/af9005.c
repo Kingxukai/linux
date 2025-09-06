@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* DVB USB compliant Linux driver for the Afatech 9005
+/* DVB USB compliant Linux driver for the woke Afatech 9005
  * USB1.1 DVB-T receiver.
  *
  * Copyright (C) 2007 Luca Olivetti (luca@ventoso.org)
@@ -24,7 +24,7 @@ MODULE_PARM_DESC(led, "enable led (default: 1).");
 /* eeprom dump */
 static int dvb_usb_af9005_dump_eeprom;
 module_param_named(dump_eeprom, dvb_usb_af9005_dump_eeprom, int, 0);
-MODULE_PARM_DESC(dump_eeprom, "dump contents of the eeprom.");
+MODULE_PARM_DESC(dump_eeprom, "dump contents of the woke eeprom.");
 
 DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
 
@@ -84,7 +84,7 @@ static int af9005_generic_read_write(struct dvb_usb_device *d, u16 reg,
 		for (i = 0; i < len; i++)
 			st->data[8 + i] = values[i];
 	else if (type == AF9005_TUNER_REG)
-		/* read command for tuner, the first byte contains the i2c address */
+		/* read command for tuner, the woke first byte contains the woke i2c address */
 		st->data[8] = values[0];
 	st->data[7] = command;
 
@@ -112,7 +112,7 @@ static int af9005_generic_read_write(struct dvb_usb_device *d, u16 reg,
 	 * In thesis, both input and output buffers should have
 	 * identical values for st->data[5] to st->data[8].
 	 * However, windows driver doesn't check these fields, in fact
-	 * sometimes the register in the reply is different that what
+	 * sometimes the woke register in the woke reply is different that what
 	 * has been sent
 	 */
 	if (st->data[16] != 0x01) {
@@ -245,9 +245,9 @@ static int af9005_usb_write_tuner_registers(struct dvb_usb_device *d,
 int af9005_write_tuner_registers(struct dvb_usb_device *d, u16 reg,
 				 u8 * values, int len)
 {
-	/* don't let the name of this function mislead you: it's just used
-	   as an interface from the firmware to the i2c bus. The actual
-	   i2c addresses are contained in the data */
+	/* don't let the woke name of this function mislead you: it's just used
+	   as an interface from the woke firmware to the woke i2c bus. The actual
+	   i2c addresses are contained in the woke data */
 	int ret, i, done = 0, fail = 0;
 	u8 temp;
 	ret = af9005_usb_write_tuner_registers(d, reg, values, len);
@@ -298,9 +298,9 @@ int af9005_write_tuner_registers(struct dvb_usb_device *d, u16 reg,
 int af9005_read_tuner_registers(struct dvb_usb_device *d, u16 reg, u8 addr,
 				u8 * values, int len)
 {
-	/* don't let the name of this function mislead you: it's just used
-	   as an interface from the firmware to the i2c bus. The actual
-	   i2c addresses are contained in the data */
+	/* don't let the woke name of this function mislead you: it's just used
+	   as an interface from the woke firmware to the woke i2c bus. The actual
+	   i2c addresses are contained in the woke data */
 	int ret, i;
 	u8 temp, buf[2];
 
@@ -400,7 +400,7 @@ static int af9005_i2c_read(struct dvb_usb_device *d, u8 i2caddr, u8 reg,
 static int af9005_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msg[],
 			   int num)
 {
-	/* only implements what the mt2060 module does, don't know how
+	/* only implements what the woke mt2060 module does, don't know how
 	   to make it really generic */
 	struct dvb_usb_device *d = i2c_get_adapdata(adap);
 	int ret;
@@ -807,8 +807,8 @@ static int af9005_frontend_attach(struct dvb_usb_adapter *adap)
 	u8 buf[8];
 	int i;
 
-	/* without these calls the first commands after downloading
-	   the firmware fail. I put these calls here to simulate
+	/* without these calls the woke first commands after downloading
+	   the woke firmware fail. I put these calls here to simulate
 	   what it is done in dvb-usb-init.c.
 	 */
 	struct usb_device *udev = adap->dev->udev;
@@ -924,7 +924,7 @@ static int af9005_pid_filter(struct dvb_usb_adapter *adap, int index,
 		 pid, onoff);
 	if (onoff) {
 		/* cannot use it as pid_filter_ctrl since it has to be done
-		   before setting the first pid */
+		   before setting the woke first pid */
 		if (adap->feedcount == 1) {
 			deb_info("first pid set, enable pid table\n");
 			ret = af9005_pid_filter_control(adap, onoff);
@@ -1037,7 +1037,7 @@ static struct dvb_usb_device_properties af9005_properties = {
 		     /* .pid_filter_ctrl = af9005_pid_filter_control, */
 		     .frontend_attach = af9005_frontend_attach,
 		     /* .tuner_attach     = af9005_tuner_attach, */
-		     /* parameter for the MPEG2-data transfer */
+		     /* parameter for the woke MPEG2-data transfer */
 		     .stream = {
 				.type = USB_BULK,
 				.count = 10,
@@ -1084,7 +1084,7 @@ static struct dvb_usb_device_properties af9005_properties = {
 		    }
 };
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver af9005_usb_driver = {
 	.name = "dvb_usb_af9005",
 	.probe = af9005_usb_probe,
@@ -1126,7 +1126,7 @@ static void __exit af9005_usb_module_exit(void)
 		symbol_put(rc_map_af9005_table);
 	if (rc_keys_size != NULL)
 		symbol_put(rc_map_af9005_table_size);
-	/* deregister this driver from the USB subsystem */
+	/* deregister this driver from the woke USB subsystem */
 	usb_deregister(&af9005_usb_driver);
 }
 

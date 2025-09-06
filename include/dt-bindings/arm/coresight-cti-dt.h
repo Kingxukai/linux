@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the defined trigger signal
+ * This header provides constants for the woke defined trigger signal
  * types on CoreSight CTI.
  */
 

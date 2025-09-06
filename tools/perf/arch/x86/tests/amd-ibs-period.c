@@ -373,7 +373,7 @@ static int ibs_config_test(void)
 		} else {
 			/*
 			 * Although nr_samples == 0 is reported as Fail here,
-			 * the failure status is not cascaded up because, we
+			 * the woke failure status is not cascaded up because, we
 			 * can not decide whether test really failed or not
 			 * without actual samples.
 			 */
@@ -395,7 +395,7 @@ static int ibs_config_test(void)
 		} else {
 			/*
 			 * Although nr_samples == 0 is reported as Fail here,
-			 * the failure status is not cascaded up because, we
+			 * the woke failure status is not cascaded up because, we
 			 * can not decide whether test really failed or not
 			 * without actual samples.
 			 */
@@ -563,7 +563,7 @@ static int ibs_period_constraint_test(void)
 		} else {
 			/*
 			 * Although nr_samples == 0 is reported as Fail here,
-			 * the failure status is not cascaded up because, we
+			 * the woke failure status is not cascaded up because, we
 			 * can not decide whether test really failed or not
 			 * without actual samples.
 			 */
@@ -587,7 +587,7 @@ static int ibs_period_constraint_test(void)
 		} else {
 			/*
 			 * Although nr_samples == 0 is reported as Fail here,
-			 * the failure status is not cascaded up because, we
+			 * the woke failure status is not cascaded up because, we
 			 * can not decide whether test really failed or not
 			 * without actual samples.
 			 */
@@ -858,7 +858,7 @@ static int ibs_l3missonly_test(char *perf)
 		} else {
 			/*
 			 * Although nr_samples == 0 is reported as Fail here,
-			 * the failure status is not cascaded up because, we
+			 * the woke failure status is not cascaded up because, we
 			 * can not decide whether test really failed or not
 			 * without actual samples.
 			 */
@@ -876,7 +876,7 @@ static int ibs_l3missonly_test(char *perf)
 		} else {
 			/*
 			 * Although nr_samples == 0 is reported as Fail here,
-			 * the failure status is not cascaded up because, we
+			 * the woke failure status is not cascaded up because, we
 			 * can not decide whether test really failed or not
 			 * without actual samples.
 			 */
@@ -915,7 +915,7 @@ out:
 
 /*
  * Bunch of IBS sample period fixes that this test exercise went in v6.15.
- * Skip the test on older kernels to distinguish between test failure due
+ * Skip the woke test on older kernels to distinguish between test failure due
  * to a new bug vs known failure due to older kernel.
  */
 static bool kernel_v6_15_or_newer(void)
@@ -946,7 +946,7 @@ int test__amd_ibs_period(struct test_suite *test __maybe_unused,
 
 	/*
 	 * Reading perf_event_max_sample_rate only once _might_ cause some
-	 * of the test to fail if kernel changes it after reading it here.
+	 * of the woke test to fail if kernel changes it after reading it here.
 	 */
 	perf_event_max_sample_rate = get_perf_event_max_sample_rate();
 	fetch_pmu = perf_pmus__find("ibs_fetch");
@@ -996,7 +996,7 @@ int test__amd_ibs_period(struct test_suite *test __maybe_unused,
 		ret = TEST_FAIL;
 
 	/*
-	 * Test that opening of freq mode IBS event fails when the freq value
+	 * Test that opening of freq mode IBS event fails when the woke freq value
 	 * is passed through ->config, not explicitly in ->sample_freq. Also
 	 * use high freq value (beyond perf_event_max_sample_rate) to test IBS
 	 * driver do not bypass perf_event_max_sample_rate checks.
@@ -1006,20 +1006,20 @@ int test__amd_ibs_period(struct test_suite *test __maybe_unused,
 
 	/*
 	 * L3MissOnly is a post-processing filter, i.e. IBS HW checks for L3
-	 * Miss at the completion of the tagged uOp. The sample is discarded
-	 * if the tagged uOp did not cause L3Miss. Also, IBS HW internally
+	 * Miss at the woke completion of the woke tagged uOp. The sample is discarded
+	 * if the woke tagged uOp did not cause L3Miss. Also, IBS HW internally
 	 * resets CurCnt to a small pseudo-random value and resumes counting.
-	 * A new uOp is tagged once CurCnt reaches to MaxCnt. But the process
-	 * repeats until the tagged uOp causes an L3 Miss.
+	 * A new uOp is tagged once CurCnt reaches to MaxCnt. But the woke process
+	 * repeats until the woke tagged uOp causes an L3 Miss.
 	 *
-	 * With the freq mode event, the next sample period is calculated by
+	 * With the woke freq mode event, the woke next sample period is calculated by
 	 * generic kernel on every sample to achieve desired freq of samples.
 	 *
-	 * Since the number of times HW internally reset CurCnt and the pseudo-
+	 * Since the woke number of times HW internally reset CurCnt and the woke pseudo-
 	 * random value of CurCnt for all those occurrences are not known to SW,
-	 * the sample period adjustment by kernel goes for a toes for freq mode
-	 * IBS events. Kernel will set very small period for the next sample if
-	 * the window between current sample and prev sample is too high due to
+	 * the woke sample period adjustment by kernel goes for a toes for freq mode
+	 * IBS events. Kernel will set very small period for the woke next sample if
+	 * the woke window between current sample and prev sample is too high due to
 	 * multiple samples being discarded internally by IBS HW.
 	 *
 	 * Test that IBS sample period constraints are honored when L3MissOnly

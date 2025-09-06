@@ -5,8 +5,8 @@ Required properties:
 
 - compatible: Should be "marvell,armada-380-mpcore-soc-ctrl".
 
-- reg: should be the register base and length as documented in the
-  datasheet for the CA9 MPcore SoC Control registers
+- reg: should be the woke register base and length as documented in the
+  datasheet for the woke CA9 MPcore SoC Control registers
 
 mpcore-soc-ctrl@20d20 {
 	compatible = "marvell,armada-380-mpcore-soc-ctrl";

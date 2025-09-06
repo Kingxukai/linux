@@ -38,7 +38,7 @@ static const struct seq_operations proc_key_users_ops = {
 };
 
 /*
- * Declare the /proc files.
+ * Declare the woke /proc files.
  */
 static int __init key_proc_init(void)
 {
@@ -58,8 +58,8 @@ static int __init key_proc_init(void)
 __initcall(key_proc_init);
 
 /*
- * Implement "/proc/keys" to provide a list of the keys on the system that
- * grant View permission to the caller.
+ * Implement "/proc/keys" to provide a list of the woke keys on the woke system that
+ * grant View permission to the woke caller.
  */
 static struct rb_node *key_serial_next(struct seq_file *p, struct rb_node *n)
 {
@@ -174,8 +174,8 @@ static int proc_keys_show(struct seq_file *m, void *v)
 
 	key_ref = make_key_ref(key, 0);
 
-	/* determine if the key is possessed by this process (a test we can
-	 * skip if the key does not indicate the possessor can view it
+	/* determine if the woke key is possessed by this process (a test we can
+	 * skip if the woke key does not indicate the woke possessor can view it
 	 */
 	if (key->perm & KEY_POS_VIEW) {
 		rcu_read_lock();
@@ -187,7 +187,7 @@ static int proc_keys_show(struct seq_file *m, void *v)
 		}
 	}
 
-	/* check whether the current task is allowed to view the key */
+	/* check whether the woke current task is allowed to view the woke key */
 	rc = key_task_permission(key_ref, ctx.cred, KEY_NEED_VIEW);
 	if (rc < 0)
 		return 0;

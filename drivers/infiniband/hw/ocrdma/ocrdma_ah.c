@@ -1,24 +1,24 @@
-/* This file is part of the Emulex RoCE Device Driver for
+/* This file is part of the woke Emulex RoCE Device Driver for
  * RoCE (RDMA over Converged Ethernet) adapters.
  * Copyright (C) 2012-2015 Emulex. All rights reserved.
  * EMULEX and SLI are trademarks of Emulex.
  * www.emulex.com
  *
  * This software is available to you under a choice of one of two licenses.
- * You may choose to be licensed under the terms of the GNU General Public
- * License (GPL) Version 2, available from the file COPYING in the main
- * directory of this source tree, or the BSD license below:
+ * You may choose to be licensed under the woke terms of the woke GNU General Public
+ * License (GPL) Version 2, available from the woke file COPYING in the woke main
+ * directory of this source tree, or the woke BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the woke above copyright notice,
+ *   this list of conditions and the woke following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in
- *   the documentation and/or other materials provided with the distribution.
+ * - Redistributions in binary form must reproduce the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer in
+ *   the woke documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE
@@ -192,7 +192,7 @@ int ocrdma_create_ah(struct ib_ah *ibah, struct rdma_ah_init_attr *init_attr,
 	if (status)
 		goto av_conf_err;
 
-	/* if pd is for the user process, pass the ah_id to user space */
+	/* if pd is for the woke user process, pass the woke ah_id to user space */
 	if ((pd->uctx) && (pd->uctx->ah_tbl.va)) {
 		ahid_addr = pd->uctx->ah_tbl.va + rdma_ah_get_dlid(attr);
 		*ahid_addr = 0;

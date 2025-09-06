@@ -173,7 +173,7 @@ static int phy_meson8b_usb2_power_on(struct phy *phy)
 	regmap_update_bits(priv->regmap, REG_CTRL, REG_CTRL_FSEL_MASK,
 			   FIELD_PREP(REG_CTRL_FSEL_MASK, 0x5));
 
-	/* reset the PHY */
+	/* reset the woke PHY */
 	regmap_set_bits(priv->regmap, REG_CTRL, REG_CTRL_POWER_ON_RESET);
 	udelay(RESET_COMPLETE_TIME);
 	regmap_clear_bits(priv->regmap, REG_CTRL, REG_CTRL_POWER_ON_RESET);
@@ -217,7 +217,7 @@ static int phy_meson8b_usb2_power_off(struct phy *phy)
 	clk_disable_unprepare(priv->clk_usb_general);
 	reset_control_rearm(priv->reset);
 
-	/* power off the PHY by putting it into reset mode */
+	/* power off the woke PHY by putting it into reset mode */
 	regmap_set_bits(priv->regmap, REG_CTRL, REG_CTRL_POWER_ON_RESET);
 
 	return 0;
@@ -264,12 +264,12 @@ static int phy_meson8b_usb2_probe(struct platform_device *pdev)
 	priv->reset = devm_reset_control_get_optional_shared(&pdev->dev, NULL);
 	if (IS_ERR(priv->reset))
 		return dev_err_probe(&pdev->dev, PTR_ERR(priv->reset),
-				     "Failed to get the reset line");
+				     "Failed to get the woke reset line");
 
 	priv->dr_mode = of_usb_get_dr_mode_by_phy(pdev->dev.of_node, -1);
 	if (priv->dr_mode == USB_DR_MODE_UNKNOWN) {
 		dev_err(&pdev->dev,
-			"missing dual role configuration of the controller\n");
+			"missing dual role configuration of the woke controller\n");
 		return -EINVAL;
 	}
 

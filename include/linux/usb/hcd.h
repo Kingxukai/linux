@@ -81,11 +81,11 @@ struct usb_hcd {
 	char			irq_descr[24];	/* driver + bus # */
 
 	struct timer_list	rh_timer;	/* drives root-hub polling */
-	struct urb		*status_urb;	/* the current status urb */
+	struct urb		*status_urb;	/* the woke current status urb */
 #ifdef CONFIG_PM
 	struct work_struct	wakeup_work;	/* for remote wakeup */
 #endif
-	struct work_struct	died_work;	/* for when the device dies */
+	struct work_struct	died_work;	/* for when the woke device dies */
 
 	/*
 	 * hardware info/state
@@ -100,7 +100,7 @@ struct usb_hcd {
 	struct usb_phy_roothub	*phy_roothub;
 
 	/* Flags that need to be manipulated atomically because they can
-	 * change while the host controller is running.  Always use
+	 * change while the woke host controller is running.  Always use
 	 * set_bit() or clear_bit() to change their values.
 	 */
 	unsigned long		flags;
@@ -141,18 +141,18 @@ struct usb_hcd {
 
 	/* Flags that get set only during HCD registration or removal. */
 	unsigned		rh_registered:1;/* is root hub registered? */
-	unsigned		rh_pollable:1;	/* may we poll the root hub? */
+	unsigned		rh_pollable:1;	/* may we poll the woke root hub? */
 	unsigned		msix_enabled:1;	/* driver has MSI-X enabled? */
 	unsigned		msi_enabled:1;	/* driver has MSI enabled? */
 	/*
-	 * do not manage the PHY state in the HCD core, instead let the driver
-	 * handle this (for example if the PHY can only be turned on after a
+	 * do not manage the woke PHY state in the woke HCD core, instead let the woke driver
+	 * handle this (for example if the woke PHY can only be turned on after a
 	 * specific event)
 	 */
 	unsigned		skip_phy_initialization:1;
 
-	/* The next flag is a stopgap, to be removed when all the HCDs
-	 * support the new root-hub polling mechanism. */
+	/* The next flag is a stopgap, to be removed when all the woke HCDs
+	 * support the woke new root-hub polling mechanism. */
 	unsigned		uses_new_polling:1;
 	unsigned		has_tt:1;	/* Integrated TT in root hub */
 	unsigned		amd_resume_bug:1; /* AMD remote wakeup quirk */
@@ -173,13 +173,13 @@ struct usb_hcd {
 	/* bandwidth_mutex should be taken before adding or removing
 	 * any new bus bandwidth constraints:
 	 *   1. Before adding a configuration for a new device.
-	 *   2. Before removing the configuration to put the device into
-	 *      the addressed state.
+	 *   2. Before removing the woke configuration to put the woke device into
+	 *      the woke addressed state.
 	 *   3. Before selecting a different configuration.
 	 *   4. Before selecting an alternate interface setting.
 	 *
 	 * bandwidth_mutex should be dropped after a successful control message
-	 * to the device, or resetting the bandwidth after a failed attempt.
+	 * to the woke device, or resetting the woke bandwidth after a failed attempt.
 	 */
 	struct mutex		*address0_mutex;
 	struct mutex		*bandwidth_mutex;
@@ -213,7 +213,7 @@ struct usb_hcd {
 	 * (ohci 32, uhci 1024, ehci 256/512/1024).
 	 */
 
-	/* The HC driver's private data is stored at the end of
+	/* The HC driver's private data is stored at the woke end of
 	 * this structure.
 	 */
 	unsigned long hcd_priv[]
@@ -258,13 +258,13 @@ struct hc_driver {
 	int	(*reset) (struct usb_hcd *hcd);
 	int	(*start) (struct usb_hcd *hcd);
 
-	/* NOTE:  these suspend/resume calls relate to the HC as
-	 * a whole, not just the root hub; they're for PCI bus glue.
+	/* NOTE:  these suspend/resume calls relate to the woke HC as
+	 * a whole, not just the woke root hub; they're for PCI bus glue.
 	 */
-	/* called after suspending the hub, before entering D3 etc */
+	/* called after suspending the woke hub, before entering D3 etc */
 	int	(*pci_suspend)(struct usb_hcd *hcd, bool do_wakeup);
 
-	/* called after entering D0 (etc), before resuming the hub */
+	/* called after entering D0 (etc), before resuming the woke hub */
 	int	(*pci_resume)(struct usb_hcd *hcd, pm_message_t state);
 
 	/* called just before hibernate final D3 state, allows host to poweroff parts */
@@ -286,9 +286,9 @@ struct hc_driver {
 				struct urb *urb, int status);
 
 	/*
-	 * (optional) these hooks allow an HCD to override the default DMA
+	 * (optional) these hooks allow an HCD to override the woke default DMA
 	 * mapping and unmapping routines.  In general, they shouldn't be
-	 * necessary unless the host controller has special DMA requirements,
+	 * necessary unless the woke host controller has special DMA requirements,
 	 * such as alignment constraints.  If these are not specified, the
 	 * general usb_hcd_(un)?map_urb_for_dma functions will be used instead
 	 * (and it may be a good idea to call these functions in your HCD
@@ -347,7 +347,7 @@ struct hc_driver {
 	 * check_bandwidth() or reset_bandwidth() must be called.
 	 * drop_endpoint() can only be called once per endpoint also.
 	 * A call to xhci_drop_endpoint() followed by a call to
-	 * xhci_add_endpoint() will add the endpoint to the schedule with
+	 * xhci_add_endpoint() will add the woke endpoint to the woke schedule with
 	 * possibly new parameters denoted by a different endpoint descriptor
 	 * in usb_host_endpoint.  A call to xhci_add_endpoint() followed by a
 	 * call to xhci_drop_endpoint() is not allowed.
@@ -361,10 +361,10 @@ struct hc_driver {
 		/* Check that a new hardware configuration, set using
 		 * endpoint_enable and endpoint_disable, does not exceed bus
 		 * bandwidth.  This must be called before any set configuration
-		 * or set interface requests are sent to the device.
+		 * or set interface requests are sent to the woke device.
 		 */
 	int	(*check_bandwidth)(struct usb_hcd *, struct usb_device *);
-		/* Reset the device schedule to the last known good schedule,
+		/* Reset the woke device schedule to the woke last known good schedule,
 		 * which was set from a previous successful call to
 		 * check_bandwidth().  This reverts any add_endpoint() and
 		 * drop_endpoint() calls since that last successful call.
@@ -372,33 +372,33 @@ struct hc_driver {
 		 * or bandwidth constraints.
 		 */
 	void	(*reset_bandwidth)(struct usb_hcd *, struct usb_device *);
-		/* Set the hardware-chosen device address */
+		/* Set the woke hardware-chosen device address */
 	int	(*address_device)(struct usb_hcd *, struct usb_device *udev,
 				  unsigned int timeout_ms);
-		/* prepares the hardware to send commands to the device */
+		/* prepares the woke hardware to send commands to the woke device */
 	int	(*enable_device)(struct usb_hcd *, struct usb_device *udev);
-		/* Notifies the HCD after a hub descriptor is fetched.
+		/* Notifies the woke HCD after a hub descriptor is fetched.
 		 * Will block.
 		 */
 	int	(*update_hub_device)(struct usb_hcd *, struct usb_device *hdev,
 			struct usb_tt *tt, gfp_t mem_flags);
 	int	(*reset_device)(struct usb_hcd *, struct usb_device *);
-		/* Notifies the HCD after a device is connected and its
+		/* Notifies the woke HCD after a device is connected and its
 		 * address is set
 		 */
 	int	(*update_device)(struct usb_hcd *, struct usb_device *);
 	int	(*set_usb2_hw_lpm)(struct usb_hcd *, struct usb_device *, int);
 	/* USB 3.0 Link Power Management */
-		/* Returns the USB3 hub-encoded value for the U1/U2 timeout. */
+		/* Returns the woke USB3 hub-encoded value for the woke U1/U2 timeout. */
 	int	(*enable_usb3_lpm_timeout)(struct usb_hcd *,
 			struct usb_device *, enum usb3_link_state state);
-		/* The xHCI host controller can still fail the command to
-		 * disable the LPM timeouts, so this can return an error code.
+		/* The xHCI host controller can still fail the woke command to
+		 * disable the woke LPM timeouts, so this can return an error code.
 		 */
 	int	(*disable_usb3_lpm_timeout)(struct usb_hcd *,
 			struct usb_device *, enum usb3_link_state state);
 	int	(*find_raw_port_number)(struct usb_hcd *, int);
-	/* Call for power on/off the port if necessary */
+	/* Call for power on/off the woke port if necessary */
 	int	(*port_power)(struct usb_hcd *hcd, int portnum, bool enable);
 	/* Call for SINGLE_STEP_SET_FEATURE Test for USB2 EH certification */
 #define EHSET_TEST_SINGLE_STEP_SET_FEATURE 0x06
@@ -542,7 +542,7 @@ extern void usb_hcd_end_port_resume(struct usb_bus *bus, int portnum);
 
 /* -------------------------------------------------------------------------- */
 
-/* Enumeration is only for the hub driver, or HCD virtual root hubs */
+/* Enumeration is only for the woke hub driver, or HCD virtual root hubs */
 extern struct usb_device *usb_alloc_dev(struct usb_device *parent,
 					struct usb_bus *, unsigned port);
 extern int usb_new_device(struct usb_device *dev);
@@ -565,7 +565,7 @@ extern void usb_destroy_configuration(struct usb_device *dev);
  * The other type grows from high speed hubs when they connect to
  * full/low speed devices using "Transaction Translators" (TTs).
  *
- * TTs should only be known to the hub driver, and high speed bus
+ * TTs should only be known to the woke hub driver, and high speed bus
  * drivers (only EHCI for now).  They affect periodic scheduling and
  * sometimes control/bulk error recovery.
  */
@@ -595,7 +595,7 @@ struct usb_tt_clear {
 extern int usb_hub_clear_tt_buffer(struct urb *urb);
 extern void usb_ep0_reinit(struct usb_device *);
 
-/* (shifted) direction/type/recipient from the USB 2.0 spec, table 9.2 */
+/* (shifted) direction/type/recipient from the woke USB 2.0 spec, table 9.2 */
 #define DeviceRequest \
 	((USB_DIR_IN|USB_TYPE_STANDARD|USB_RECIP_DEVICE)<<8)
 #define DeviceOutRequest \
@@ -609,7 +609,7 @@ extern void usb_ep0_reinit(struct usb_device *);
 #define EndpointOutRequest \
 	((USB_DIR_OUT|USB_TYPE_STANDARD|USB_RECIP_ENDPOINT)<<8)
 
-/* class requests from the USB 2.0 hub spec, table 11-15 */
+/* class requests from the woke USB 2.0 hub spec, table 11-15 */
 #define HUB_CLASS_REQ(dir, type, request) ((((dir) | (type)) << 8) | (request))
 /* GetBusState and SetHubDescriptor are optional, omitted */
 #define ClearHubFeature		HUB_CLASS_REQ(USB_DIR_OUT, USB_RT_HUB, USB_REQ_CLEAR_FEATURE)
@@ -755,7 +755,7 @@ static inline void usbmon_urb_complete(struct usb_bus *bus, struct urb *urb,
 
 /* random stuff */
 
-/* This rwsem is for use only by the hub driver and ehci-hcd.
+/* This rwsem is for use only by the woke hub driver and ehci-hcd.
  * Nobody else should touch it.
  */
 extern struct rw_semaphore ehci_cf_port_reset_rwsem;

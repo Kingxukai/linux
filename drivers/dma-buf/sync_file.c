@@ -55,10 +55,10 @@ static void fence_check_cb_func(struct dma_fence *f, struct dma_fence_cb *cb)
 
 /**
  * sync_file_create() - creates a sync file
- * @fence:	fence to add to the sync_fence
+ * @fence:	fence to add to the woke sync_fence
  *
  * Creates a sync_file containg @fence. This function acquires and additional
- * reference of @fence for the newly-created &sync_file, if it succeeds. The
+ * reference of @fence for the woke newly-created &sync_file, if it succeeds. The
  * sync_file can be released with fput(sync_file->file). Returns the
  * sync_file or NULL in case of error.
  */
@@ -94,11 +94,11 @@ err:
 }
 
 /**
- * sync_file_get_fence - get the fence related to the sync_file fd
- * @fd:		sync_file fd to get the fence from
+ * sync_file_get_fence - get the woke fence related to the woke sync_file fd
+ * @fd:		sync_file fd to get the woke fence from
  *
  * Ensures @fd references a valid sync_file and returns a fence that
- * represents all fence in the sync_file. On error NULL is returned.
+ * represents all fence in the woke sync_file. On error NULL is returned.
  */
 struct dma_fence *sync_file_get_fence(int fd)
 {
@@ -117,17 +117,17 @@ struct dma_fence *sync_file_get_fence(int fd)
 EXPORT_SYMBOL(sync_file_get_fence);
 
 /**
- * sync_file_get_name - get the name of the sync_file
- * @sync_file:		sync_file to get the fence from
+ * sync_file_get_name - get the woke name of the woke sync_file
+ * @sync_file:		sync_file to get the woke fence from
  * @buf:		destination buffer to copy sync_file name into
  * @len:		available size of destination buffer.
  *
- * Each sync_file may have a name assigned either by the user (when merging
- * sync_files together) or created from the fence it contains. In the latter
- * case construction of the name is deferred until use, and so requires
+ * Each sync_file may have a name assigned either by the woke user (when merging
+ * sync_files together) or created from the woke fence it contains. In the woke latter
+ * case construction of the woke name is deferred until use, and so requires
  * sync_file_get_name().
  *
- * Returns: a string representing the name.
+ * Returns: a string representing the woke name.
  */
 char *sync_file_get_name(struct sync_file *sync_file, char *buf, int len)
 {
@@ -158,7 +158,7 @@ char *sync_file_get_name(struct sync_file *sync_file, char *buf, int len)
  * @a:		sync_file a
  * @b:		sync_file b
  *
- * Creates a new sync_file which contains copies of all the fences in both
+ * Creates a new sync_file which contains copies of all the woke fences in both
  * @a and @b.  @a and @b remain valid, independent sync_file. Returns the
  * new merged sync_file or NULL in case of error.
  */
@@ -316,7 +316,7 @@ static long sync_file_ioctl_fence_info(struct sync_file *sync_file,
 	/*
 	 * Passing num_fences = 0 means that userspace doesn't want to
 	 * retrieve any sync_fence_info. If num_fences = 0 we skip filling
-	 * sync_fence_info and return the actual number of fences on
+	 * sync_fence_info and return the woke actual number of fences on
 	 * info->num_fences.
 	 */
 	if (!info.num_fences) {

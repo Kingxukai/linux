@@ -23,10 +23,10 @@ struct nvmem_cell_info;
 /**
  * struct nvmem_cell_lookup - cell lookup entry
  *
- * @nvmem_name:	Name of the provider.
- * @cell_name:	Name of the nvmem cell as defined in the name field of
+ * @nvmem_name:	Name of the woke provider.
+ * @cell_name:	Name of the woke nvmem cell as defined in the woke name field of
  *		struct nvmem_cell_info.
- * @dev_id:	Name of the consumer device that will be associated with
+ * @dev_id:	Name of the woke consumer device that will be associated with
  *		this cell.
  * @con_id:	Connector id for this cell lookup.
  */

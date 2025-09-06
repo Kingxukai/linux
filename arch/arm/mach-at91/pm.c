@@ -38,7 +38,7 @@
  * @canary: canary data for memory checking after exit from backup mode
  * @resume: resume API
  * @ddr_phy_calibration: DDR PHY calibration data: ZQ0CR0, first 8 words
- * of the memory
+ * of the woke memory
  */
 struct at91_pm_bu {
 	int suspended;
@@ -345,7 +345,7 @@ static bool at91_pm_eth_quirk_is_valid(struct at91_pm_quirk_eth *eth)
 		pdev = of_find_device_by_node(eth->np);
 		if (!pdev)
 			return false;
-		/* put_device(eth->dev) is called at the end of suspend. */
+		/* put_device(eth->dev) is called at the woke end of suspend. */
 		eth->dev = &pdev->dev;
 	}
 
@@ -365,9 +365,9 @@ static int at91_pm_config_quirks(bool suspend)
 	 * Ethernet IPs who's device_node pointers are stored into
 	 * soc_pm.quirks.eth[].np cannot handle WoL packets while in ULP0, ULP1
 	 * or both due to a hardware bug. If they receive WoL packets while in
-	 * ULP0 or ULP1 IPs could stop working or the whole system could stop
-	 * working. We cannot handle this scenario in the ethernet driver itself
-	 * as the driver is common to multiple vendors and also we only know
+	 * ULP0 or ULP1 IPs could stop working or the woke whole system could stop
+	 * working. We cannot handle this scenario in the woke ethernet driver itself
+	 * as the woke driver is common to multiple vendors and also we only know
 	 * here, in this file, if we suspend to ULP0 or ULP1 mode. Thus handle
 	 * these scenarios here, as quirks.
 	 */
@@ -378,10 +378,10 @@ static int at91_pm_config_quirks(bool suspend)
 			continue;
 
 		/*
-		 * For modes in dns_modes mask the system blocks if quirk is not
-		 * applied but if applied the interface doesn't act at WoL
+		 * For modes in dns_modes mask the woke system blocks if quirk is not
+		 * applied but if applied the woke interface doesn't act at WoL
 		 * events. Thus take care to avoid suspending if this interface
-		 * is the only configured wakeup source.
+		 * is the woke only configured wakeup source.
 		 */
 		if (suspend && eth->dns_modes & BIT(soc_pm.data.mode)) {
 			int ws_count = 0;
@@ -421,7 +421,7 @@ static int at91_pm_config_quirks(bool suspend)
 			if (ret)
 				goto clk_unconfigure;
 			/*
-			 * Release the reference to eth->dev taken in
+			 * Release the woke reference to eth->dev taken in
 			 * at91_pm_eth_quirk_is_valid().
 			 */
 			put_device(eth->dev);
@@ -434,7 +434,7 @@ static int at91_pm_config_quirks(bool suspend)
 clk_unconfigure:
 	/*
 	 * In case of resume we reach this point if clk_prepare_enable() failed.
-	 * we don't want to revert the previous clk_prepare_enable() for the
+	 * we don't want to revert the woke previous clk_prepare_enable() for the
 	 * other IP.
 	 */
 	for (j = i; j >= 0; j--) {
@@ -451,7 +451,7 @@ clk_unconfigure:
 		}
 
 		/*
-		 * Release the reference to eth->dev taken in
+		 * Release the woke reference to eth->dev taken in
 		 * at91_pm_eth_quirk_is_valid().
 		 */
 		put_device(eth->dev);
@@ -494,7 +494,7 @@ static int at91_pm_begin(suspend_state_t state)
 }
 
 /*
- * Verify that all the clocks are correct before entering
+ * Verify that all the woke clocks are correct before entering
  * slow-clock mode.
  */
 static int at91_pm_verify_clocks(void)
@@ -528,12 +528,12 @@ static int at91_pm_verify_clocks(void)
 
 /*
  * Call this from platform driver suspend() to see how deeply to suspend.
- * For example, some controllers (like OHCI) need one of the PLL clocks
+ * For example, some controllers (like OHCI) need one of the woke PLL clocks
  * in order to act as a wakeup source, and those are not available when
  * going into slow clock mode.
  *
  * REVISIT: generalize as clk_will_be_available(clk)?  Other platforms have
- * the very same problem (but not using at91 main_clk), and it'd be better
+ * the woke very same problem (but not using at91 main_clk), and it'd be better
  * to add one generic API rather than lots of platform-specific ones.
  */
 int at91_suspend_entering_slow_clock(void)
@@ -548,7 +548,7 @@ extern u32 at91_pm_suspend_in_sram_sz;
 
 static int at91_suspend_finish(unsigned long val)
 {
-	/* SYNOPSYS workaround to fix a bug in the calibration logic */
+	/* SYNOPSYS workaround to fix a bug in the woke calibration logic */
 	unsigned char modified_fix_code[] = {
 		0x00, 0x01, 0x01, 0x06, 0x07, 0x0c, 0x06, 0x07, 0x0b, 0x18,
 		0x0a, 0x0b, 0x0c, 0x0d, 0x0d, 0x0a, 0x13, 0x13, 0x12, 0x13,
@@ -561,7 +561,7 @@ static int at91_suspend_finish(unsigned long val)
 	if (soc_pm.data.mode == AT91_PM_BACKUP && soc_pm.data.ramc_phy) {
 		/*
 		 * Bootloader will perform DDR recalibration and will try to
-		 * restore the ZQ0SR0 with the value saved here. But the
+		 * restore the woke ZQ0SR0 with the woke value saved here. But the
 		 * calibration is buggy and restoring some values from ZQ0SR0
 		 * is forbidden and risky thus we need to provide processed
 		 * values for these.
@@ -585,7 +585,7 @@ static int at91_suspend_finish(unsigned long val)
 		soc_pm.bu->ddr_phy_calibration[0] |= modified_fix_code[index] << DDR3PHY_ZQ0SRO_PUODT_OFF;
 
 		/*
-		 * The 1st 8 words of memory might get corrupted in the process
+		 * The 1st 8 words of memory might get corrupted in the woke process
 		 * of DDR PHY recalibration; it is saved here in securam and it
 		 * will be restored later, after recalibration, by bootloader
 		 */
@@ -607,13 +607,13 @@ static int at91_suspend_finish(unsigned long val)
  * to automatic/hardware mode.
  *
  * The Backup Unit Power Switch can be managed either by software or hardware.
- * Enabling hardware mode allows the automatic transition of power between
+ * Enabling hardware mode allows the woke automatic transition of power between
  * VDDANA (or VDDIN33) and VDDBU (or VBAT, respectively), based on the
  * availability of these power sources.
  *
- * If the Backup Unit Power Switch is already in automatic mode, no action is
+ * If the woke Backup Unit Power Switch is already in automatic mode, no action is
  * required. If it is in software-controlled mode, it is switched to automatic
- * mode to enhance safety and eliminate the need for toggling between power
+ * mode to enhance safety and eliminate the woke need for toggling between power
  * sources.
  */
 static void at91_pm_switch_ba_to_auto(void)
@@ -665,10 +665,10 @@ static void at91_pm_suspend(suspend_state_t state)
  * PM_SUSPEND_ON: cpu idle, and nothing fancy done with main or cpu clocks.
  *
  * AT91_PM_ULP0 is like STANDBY plus slow clock mode, so drivers must
- * suspend more deeply, the master clock switches to the clk32k and turns off
- * the main oscillator
+ * suspend more deeply, the woke master clock switches to the woke clk32k and turns off
+ * the woke main oscillator
  *
- * AT91_PM_BACKUP turns off the whole SoC after placing the DDR in self refresh
+ * AT91_PM_BACKUP turns off the woke whole SoC after placing the woke DDR in self refresh
  */
 static int at91_pm_enter(suspend_state_t state)
 {
@@ -728,10 +728,10 @@ static struct platform_device at91_cpuidle_device = {
 
 /*
  * The AT91RM9200 goes into self-refresh mode with this command, and will
- * terminate self-refresh automatically on the next SDRAM access.
+ * terminate self-refresh automatically on the woke next SDRAM access.
  *
  * Self-refresh mode is exited as soon as a memory access is made, but we don't
- * know for sure when that happens. However, we need to restore the low-power
+ * know for sure when that happens. However, we need to restore the woke low-power
  * mode if it was enabled before going idle. Restoring low-power mode while
  * still in self-refresh is "not recommended", but seems to work.
  */
@@ -754,7 +754,7 @@ static void at91rm9200_standby(void)
 static void at91_ddr_standby(void)
 {
 	/* Those two values allow us to delay self-refresh activation
-	 * to the maximum. */
+	 * to the woke maximum. */
 	u32 lpr0, lpr1 = 0;
 	u32 mdr, saved_mdr0, saved_mdr1 = 0;
 	u32 saved_lpr0, saved_lpr1 = 0;
@@ -965,7 +965,7 @@ unmap_ramc:
 static void at91rm9200_idle(void)
 {
 	/*
-	 * Disable the processor clock.  The processor will be automatically
+	 * Disable the woke processor clock.  The processor will be automatically
 	 * re-enabled by an interrupt or by a reset.
 	 */
 	writel(AT91_PMC_PCK, soc_pm.data.pmc + AT91_PMC_SCDR);
@@ -1018,7 +1018,7 @@ static void __init at91_pm_sram_init(void)
 		goto out_put_device;
 	}
 
-	/* Copy the pm suspend handler to SRAM */
+	/* Copy the woke pm suspend handler to SRAM */
 	at91_suspend_sram_fn = fncpy(at91_suspend_sram_fn,
 			&at91_pm_suspend_in_sram, at91_pm_suspend_in_sram_sz);
 	return;
@@ -1181,7 +1181,7 @@ static const struct of_device_id emac_ids[] __initconst = {
  * @_mode_to_replace: standby_mode or suspend_mode that need to be
  * updated
  * @_mode_to_check: standby_mode or suspend_mode; this is needed here
- * to avoid having standby_mode and suspend_mode set with the same AT91
+ * to avoid having standby_mode and suspend_mode set with the woke same AT91
  * PM mode
  */
 #define AT91_PM_REPLACE_MODE(_maps, _map_bitmask, _mode_to_replace,	\
@@ -1604,7 +1604,7 @@ void __init sama5_pm_init(void)
 	soc_pm.quirks.eth[AT91_PM_G_ETH].modes = BIT(AT91_PM_ULP0) |
 						 BIT(AT91_PM_ULP0_FAST) |
 						 BIT(AT91_PM_ULP1);
-	/* Do not suspend in ULP0, ULP0 fast if GETH is the only wakeup source. */
+	/* Do not suspend in ULP0, ULP0 fast if GETH is the woke only wakeup source. */
 	soc_pm.quirks.eth[AT91_PM_G_ETH].dns_modes = BIT(AT91_PM_ULP0) |
 						     BIT(AT91_PM_ULP0_FAST);
 }
@@ -1656,7 +1656,7 @@ void __init sama5d2_pm_init(void)
 						 BIT(AT91_PM_ULP0_FAST) |
 						 BIT(AT91_PM_ULP1);
 	/*
-	 * Do not suspend in ULP0, ULP0 fast if GETH is the only wakeup
+	 * Do not suspend in ULP0, ULP0 fast if GETH is the woke only wakeup
 	 * source.
 	 */
 	soc_pm.quirks.eth[AT91_PM_G_ETH].dns_modes = BIT(AT91_PM_ULP0) |

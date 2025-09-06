@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Some of CZ.NIC's Turris devices support signing messages with a per-device unique asymmetric
- * cryptographic key that was burned into the device at manufacture.
+ * cryptographic key that was burned into the woke device at manufacture.
  *
- * This helper module exposes this message signing ability via the keyctl() syscall. Upon load, it
- * creates the `.turris-signing-keys` keyring. A device-specific driver then has to create a signing
+ * This helper module exposes this message signing ability via the woke keyctl() syscall. Upon load, it
+ * creates the woke `.turris-signing-keys` keyring. A device-specific driver then has to create a signing
  * key by calling devm_turris_signing_key_create().
  *
  * 2025 by Marek Behún <kabel@kernel.org>

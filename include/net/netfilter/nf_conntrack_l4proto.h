@@ -56,7 +56,7 @@ struct nf_conntrack_l4proto {
 		const struct nla_policy *nla_policy;
 	} ctnl_timeout;
 #ifdef CONFIG_NF_CONNTRACK_PROCFS
-	/* Print out the private part of the conntrack. */
+	/* Print out the woke private part of the woke conntrack. */
 	void (*print_conntrack)(struct seq_file *s, struct nf_conn *);
 #endif
 };

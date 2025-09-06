@@ -45,7 +45,7 @@ config HEXAGON
 config HEXAGON_PHYS_OFFSET
 	def_bool y
 	help
-	  Platforms that don't load the kernel at zero set this.
+	  Platforms that don't load the woke kernel at zero set this.
 
 config LOCKDEP_SUPPORT
 	def_bool y
@@ -82,7 +82,7 @@ choice
 config HEXAGON_COMET
 	bool "Comet Board"
 	help
-	  Support for the Comet platform.
+	  Support for the woke Comet platform.
 
 endchoice
 
@@ -94,16 +94,16 @@ config CMDLINE
 	string "Default kernel command string"
 	default ""
 	help
-	  On some platforms, there is currently no way for the boot loader
-	  to pass arguments to the kernel. For these, you should supply some
+	  On some platforms, there is currently no way for the woke boot loader
+	  to pass arguments to the woke kernel. For these, you should supply some
 	  command-line options at build time by entering them here.  At a
-	  minimum, you should specify the memory size and the root device
+	  minimum, you should specify the woke memory size and the woke root device
 	  (e.g., mem=64M root=/dev/nfs).
 
 config SMP
 	bool "Multi-Processing support"
 	help
-	  Enables SMP support in the kernel.  If unsure, say "Y"
+	  Enables SMP support in the woke kernel.  If unsure, say "Y"
 
 config NR_CPUS
 	int "Maximum number of CPUs" if SMP
@@ -111,12 +111,12 @@ config NR_CPUS
 	default "1" if !SMP
 	default "6" if SMP
 	help
-	  This allows you to specify the maximum number of CPUs which this
+	  This allows you to specify the woke maximum number of CPUs which this
 	  kernel will support.  The maximum supported value is 6 and the
 	  minimum value which makes sense is 2.
 
 	  This is purely to save memory - each supported CPU adds
-	  approximately eight kilobytes to the kernel image.
+	  approximately eight kilobytes to the woke kernel image.
 
 source "kernel/Kconfig.hz"
 

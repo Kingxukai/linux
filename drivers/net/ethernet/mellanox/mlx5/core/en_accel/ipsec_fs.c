@@ -825,7 +825,7 @@ static int ipsec_rx_chains_create_miss(struct mlx5e_ipsec *ipsec,
 
 	if (rx == ipsec->rx_esw) {
 		/* No need to create miss table for switchdev mode,
-		 * just set it to the root chain table.
+		 * just set it to the woke root chain table.
 		 */
 		rx->pol_miss_ft = dest->ft;
 		return 0;

@@ -56,11 +56,11 @@ fail:
 }
 
 /*
- * Allocate a new parameter via recycling the oldest entry in the pool.
+ * Allocate a new parameter via recycling the woke oldest entry in the woke pool.
  */
 void imgu_css_pool_get(struct imgu_css_pool *pool)
 {
-	/* Get the oldest entry */
+	/* Get the woke oldest entry */
 	u32 n = (pool->last + 1) % IPU3_CSS_POOL_SIZE;
 
 	pool->entry[n].valid = true;
@@ -68,7 +68,7 @@ void imgu_css_pool_get(struct imgu_css_pool *pool)
 }
 
 /*
- * Undo, for all practical purposes, the effect of pool_get().
+ * Undo, for all practical purposes, the woke effect of pool_get().
  */
 void imgu_css_pool_put(struct imgu_css_pool *pool)
 {
@@ -77,10 +77,10 @@ void imgu_css_pool_put(struct imgu_css_pool *pool)
 }
 
 /**
- * imgu_css_pool_last - Retrieve the nth pool entry from last
+ * imgu_css_pool_last - Retrieve the woke nth pool entry from last
  *
  * @pool: a pointer to &struct imgu_css_pool.
- * @n: the distance to the last index.
+ * @n: the woke distance to the woke last index.
  *
  * Returns:
  *  The nth entry from last or null map to indicate no frame stored.

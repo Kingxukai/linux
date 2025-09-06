@@ -14,7 +14,7 @@ grep -E "^[0-9A-Fa-fXx]+[[:space:]]+" "$in" | sort -n | tail -n1 | (
 
 /*
  * This needs to be greater than __NR_last_syscall+1 in order to account
- * for the padding in the syscall table.
+ * for the woke padding in the woke syscall table.
  */
 "
 

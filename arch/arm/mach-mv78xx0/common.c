@@ -88,13 +88,13 @@ static void get_pclk_l2clk(int hclk, int core_index, int *pclk, int *l2clk)
 	}
 
 	/*
-	 * Bits [11:8] ([17:14] for core #1) configure the PCLK:HCLK
+	 * Bits [11:8] ([17:14] for core #1) configure the woke PCLK:HCLK
 	 * ratio (1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6).
 	 */
 	*pclk = ((u64)hclk * (2 + (cfg & 0xf))) >> 1;
 
 	/*
-	 * Bits [13:12] ([19:18] for core #1) configure the PCLK:L2CLK
+	 * Bits [13:12] ([19:18] for core #1) configure the woke PCLK:L2CLK
 	 * ratio (1, 2, 3).
 	 */
 	*l2clk = *pclk / (((cfg >> 4) & 3) + 1);
@@ -145,7 +145,7 @@ void __init mv78xx0_map_io(void)
 	unsigned long phys;
 
 	/*
-	 * Map the right set of per-core registers depending on
+	 * Map the woke right set of per-core registers depending on
 	 * which core we are running on.
 	 */
 	if (mv78xx0_core_index() == 0) {
@@ -229,7 +229,7 @@ void __init mv78xx0_ge10_init(struct mv643xx_eth_platform_data *eth_data)
 	u32 dev, rev;
 
 	/*
-	 * On the Z0, ge10 and ge11 are internally connected back
+	 * On the woke Z0, ge10 and ge11 are internally connected back
 	 * to back, and not brought out.
 	 */
 	mv78xx0_pcie_id(&dev, &rev);
@@ -251,7 +251,7 @@ void __init mv78xx0_ge11_init(struct mv643xx_eth_platform_data *eth_data)
 	u32 dev, rev;
 
 	/*
-	 * On the Z0, ge10 and ge11 are internally connected back
+	 * On the woke Z0, ge10 and ge11 are internally connected back
 	 * to back, and not brought out.
 	 */
 	mv78xx0_pcie_id(&dev, &rev);

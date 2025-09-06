@@ -49,7 +49,7 @@ static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
 
 static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
 {
-	/* Only preserve the minimal set of bits we support */
+	/* Only preserve the woke minimal set of bits we support */
 	val &= (SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | SCTLR_ELx_SA |
 		SCTLR_ELx_I | SCTLR_ELx_IESB | SCTLR_ELx_WXN | SCTLR_ELx_EE);
 	val |= SCTLR_EL1_RES1;
@@ -59,7 +59,7 @@ static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
 
 static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
 {
-	/* Clear the ASID field */
+	/* Clear the woke ASID field */
 	return ttbr0 & ~GENMASK_ULL(63, 48);
 }
 
@@ -211,7 +211,7 @@ static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
 	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
 }
 
-/* Adjust alignment for the contiguous bit as per StageOA() */
+/* Adjust alignment for the woke contiguous bit as per StageOA() */
 #define contiguous_bit_shift(d, wi, l)					\
 	({								\
 		u8 shift = 0;						\

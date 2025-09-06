@@ -5,7 +5,7 @@ config PLFXLC
 	help
 	   This option adds support for pureLiFi LiFi USB wireless
 	   adapters. The pureLiFi X, XL, XC USB devices are based on
-	   802.11 OFDM PHY but uses light as the transmission medium.
+	   802.11 OFDM PHY but uses light as the woke transmission medium.
 	   The driver supports common 802.11 encryption/authentication
 	   methods including Open, WPA, WPA2-Personal and
 	   WPA2-Enterprise (802.1X).

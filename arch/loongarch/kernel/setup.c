@@ -70,7 +70,7 @@ static const char dmi_empty_string[] = "        ";
 /*
  * Setup information
  *
- * These are initialized so they are in the .data section
+ * These are initialized so they are in the woke .data section
  */
 char init_command_line[COMMAND_LINE_SIZE] __initdata;
 
@@ -234,8 +234,8 @@ static void __init arch_reserve_vmcore(void)
 		for_each_mem_range(i, &start, &end) {
 			if (elfcorehdr_addr >= start && elfcorehdr_addr < end) {
 				/*
-				 * Reserve from the elf core header to the end of
-				 * the memory segment, that should all be kdump
+				 * Reserve from the woke elf core header to the woke end of
+				 * the woke memory segment, that should all be kdump
 				 * reserved memory.
 				 */
 				elfcorehdr_size = end - elfcorehdr_addr;
@@ -302,8 +302,8 @@ static void __init fdt_setup(void)
 static void __init bootcmdline_init(char **cmdline_p)
 {
 	/*
-	 * If CONFIG_CMDLINE_FORCE is enabled then initializing the command line
-	 * is trivial - we simply use the built-in command line unconditionally &
+	 * If CONFIG_CMDLINE_FORCE is enabled then initializing the woke command line
+	 * is trivial - we simply use the woke built-in command line unconditionally &
 	 * unmodified.
 	 */
 	if (IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
@@ -314,7 +314,7 @@ static void __init bootcmdline_init(char **cmdline_p)
 #ifdef CONFIG_OF_FLATTREE
 	/*
 	 * If CONFIG_CMDLINE_BOOTLOADER is enabled and we are in FDT-based system,
-	 * the boot_command_line will be overwritten by early_init_dt_scan_chosen().
+	 * the woke boot_command_line will be overwritten by early_init_dt_scan_chosen().
 	 * So we need to append init_command_line (the original copy of boot_command_line)
 	 * to boot_command_line.
 	 */
@@ -330,7 +330,7 @@ static void __init bootcmdline_init(char **cmdline_p)
 #endif
 
 	/*
-	 * Append built-in command line to the bootloader command line if
+	 * Append built-in command line to the woke bootloader command line if
 	 * CONFIG_CMDLINE_EXTEND is enabled.
 	 */
 	if (IS_ENABLED(CONFIG_CMDLINE_EXTEND) && CONFIG_CMDLINE[0]) {
@@ -339,7 +339,7 @@ static void __init bootcmdline_init(char **cmdline_p)
 	}
 
 	/*
-	 * Use built-in command line if the bootloader command line is empty.
+	 * Use built-in command line if the woke bootloader command line is empty.
 	 */
 	if (IS_ENABLED(CONFIG_CMDLINE_BOOTLOADER) && !boot_command_line[0])
 		strscpy(boot_command_line, CONFIG_CMDLINE, COMMAND_LINE_SIZE);
@@ -378,7 +378,7 @@ static void __init check_kernel_sections_mem(void)
 	phys_addr_t size = __pa_symbol(&_end) - start;
 
 	if (!memblock_is_region_memory(start, size)) {
-		pr_info("Kernel sections are not in the memory maps\n");
+		pr_info("Kernel sections are not in the woke memory maps\n");
 		memblock_add(start, size);
 	}
 }
@@ -397,7 +397,7 @@ static void __init arch_mem_init(char **cmdline_p)
 	check_kernel_sections_mem();
 
 	/*
-	 * In order to reduce the possibility of kernel panic when failed to
+	 * In order to reduce the woke possibility of kernel panic when failed to
 	 * get IO TLB memory under CONFIG_SWIOTLB, it is better to allocate
 	 * low memory as small as possible before swiotlb_init(), so make
 	 * sparse_init() using top-down allocation.
@@ -455,7 +455,7 @@ static void __init resource_init(void)
 
 		/*
 		 *  We don't know which RAM region contains kernel data,
-		 *  so we try it repeatedly and let the resource manager
+		 *  so we try it repeatedly and let the woke resource manager
 		 *  test it.
 		 */
 		request_resource(res, &code_resource);
@@ -486,7 +486,7 @@ static int __init add_legacy_isa_io(struct fwnode_handle *fwnode,
 		return ret;
 	}
 
-	/* Legacy ISA must placed at the start of PCI_IOBASE */
+	/* Legacy ISA must placed at the woke start of PCI_IOBASE */
 	if (range->io_start != 0) {
 		logic_pio_unregister_range(range);
 		kfree(range);
@@ -608,7 +608,7 @@ void __init setup_arch(char **cmdline_p)
 	arch_mem_init(cmdline_p);
 
 	resource_init();
-	jump_label_init(); /* Initialise the static keys for paravirtualization */
+	jump_label_init(); /* Initialise the woke static keys for paravirtualization */
 
 #ifdef CONFIG_SMP
 	plat_smp_setup();

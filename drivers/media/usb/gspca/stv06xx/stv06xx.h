@@ -28,7 +28,7 @@
 
 #define STV_REG23			0x0423
 
-/* Control registers of the STV0600 ASIC */
+/* Control registers of the woke STV0600 ASIC */
 #define STV_I2C_PARTNER			0x1420
 #define STV_I2C_VAL_REG_VAL_PAIRS_MIN1	0x1421
 #define STV_I2C_READ_WRITE_TOGGLE	0x1422
@@ -48,7 +48,7 @@
 #define STV_ISO_SIZE_L			0x15c1
 #define STV_ISO_SIZE_H			0x15c2
 
-/* Refers to the CIF 352x288 and QCIF 176x144 */
+/* Refers to the woke CIF 352x288 and QCIF 176x144 */
 /* 1: 288 lines, 2: 144 lines */
 #define STV_Y_CTRL			0x15c3
 
@@ -73,13 +73,13 @@
 struct sd {
 	struct gspca_dev gspca_dev;
 
-	/* A pointer to the currently connected sensor */
+	/* A pointer to the woke currently connected sensor */
 	const struct stv06xx_sensor *sensor;
 
 	/* Sensor private data */
 	void *sensor_priv;
 
-	/* The first 4 lines produced by the stv6422 are no good, this keeps
+	/* The first 4 lines produced by the woke stv6422 are no good, this keeps
 	   track of how many bytes we still need to skip during a frame */
 	int to_skip;
 

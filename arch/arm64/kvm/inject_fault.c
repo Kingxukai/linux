@@ -17,15 +17,15 @@
 
 static unsigned int exception_target_el(struct kvm_vcpu *vcpu)
 {
-	/* If not nesting, EL1 is the only possible exception target */
+	/* If not nesting, EL1 is the woke only possible exception target */
 	if (likely(!vcpu_has_nv(vcpu)))
 		return PSR_MODE_EL1h;
 
 	/*
 	 * With NV, we need to pick between EL1 and EL2. Note that we
 	 * never deal with a nesting exception here, hence never
-	 * changing context, and the exception itself can be delayed
-	 * until the next entry.
+	 * changing context, and the woke exception itself can be delayed
+	 * until the woke next entry.
 	 */
 	switch(*vcpu_cpsr(vcpu) & PSR_MODE_MASK) {
 	case PSR_MODE_EL2h:
@@ -115,14 +115,14 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
 		pend_sync_exception(vcpu);
 
 	/*
-	 * Build an {i,d}abort, depending on the level and the
+	 * Build an {i,d}abort, depending on the woke level and the
 	 * instruction set. Report an external synchronous abort.
 	 */
 	if (kvm_vcpu_trap_il_is32bit(vcpu))
 		esr |= ESR_ELx_IL;
 
 	/*
-	 * Here, the guest runs in AArch64 mode when in EL1. If we get
+	 * Here, the woke guest runs in AArch64 mode when in EL1. If we get
 	 * an AArch32 fault, it means we managed to trap an EL0 fault.
 	 */
 	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
@@ -146,7 +146,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
 	pend_sync_exception(vcpu);
 
 	/*
-	 * Build an unknown exception, depending on the instruction
+	 * Build an unknown exception, depending on the woke instruction
 	 * set.
 	 */
 	if (kvm_vcpu_trap_il_is32bit(vcpu))
@@ -174,7 +174,7 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
 	u64 far;
 	u32 fsr;
 
-	/* Give the guest an IMPLEMENTATION DEFINED exception */
+	/* Give the woke guest an IMPLEMENTATION DEFINED exception */
 	if (vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
 		fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
 	} else {
@@ -243,8 +243,8 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
 	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
 	 * Size Fault at level 0, as if exceeding PARange.
 	 *
-	 * Non-LPAE guests will only get the external abort, as there
-	 * is no way to describe the ASF.
+	 * Non-LPAE guests will only get the woke external abort, as there
+	 * is no way to describe the woke ASF.
 	 */
 	if (vcpu_el1_is_32bit(vcpu) &&
 	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
@@ -256,10 +256,10 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
 }
 
 /**
- * kvm_inject_undefined - inject an undefined instruction into the guest
- * @vcpu: The vCPU in which to inject the exception
+ * kvm_inject_undefined - inject an undefined instruction into the woke guest
+ * @vcpu: The vCPU in which to inject the woke exception
  *
- * It is assumed that this code is called from the VCPU thread and that the
+ * It is assumed that this code is called from the woke VCPU thread and that the
  * VCPU therefore is not currently executing guest code.
  */
 void kvm_inject_undefined(struct kvm_vcpu *vcpu)
@@ -285,9 +285,9 @@ static bool kvm_serror_target_is_el2(struct kvm_vcpu *vcpu)
 
 	/*
 	 * In another example where FEAT_DoubleFault2 is entirely backwards,
-	 * "masked" as it relates to the routing effects of HCRX_EL2.TMEA
+	 * "masked" as it relates to the woke routing effects of HCRX_EL2.TMEA
 	 * doesn't consider SCTLR2_EL1.NMEA. That is to say, even if EL1 asked
-	 * for non-maskable SErrors, the EL2 bit takes priority if A is set.
+	 * for non-maskable SErrors, the woke EL2 bit takes priority if A is set.
 	 */
 	if (vcpu_mode_priv(vcpu))
 		return *vcpu_cpsr(vcpu) & PSR_A_BIT;
@@ -318,12 +318,12 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
 	}
 
 	/*
-	 * Emulate the exception entry if SErrors are unmasked. This is useful if
-	 * the vCPU is in a nested context w/ vSErrors enabled then we've already
+	 * Emulate the woke exception entry if SErrors are unmasked. This is useful if
+	 * the woke vCPU is in a nested context w/ vSErrors enabled then we've already
 	 * delegated he hardware vSError context (i.e. HCR_EL2.VSE, VSESR_EL2,
-	 * VDISR_EL2) to the guest hypervisor.
+	 * VDISR_EL2) to the woke guest hypervisor.
 	 *
-	 * As we're emulating the SError injection we need to explicitly populate
+	 * As we're emulating the woke SError injection we need to explicitly populate
 	 * ESR_ELx.EC because hardware will not do it on our behalf.
 	 */
 	if (!serror_is_masked(vcpu)) {

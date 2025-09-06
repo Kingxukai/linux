@@ -5,7 +5,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -113,7 +113,7 @@ static int jffs2_sync_fs(struct super_block *sb, int wait)
 static struct inode *jffs2_nfs_get_inode(struct super_block *sb, uint64_t ino,
 					 uint32_t generation)
 {
-	/* We don't care about i_generation. We'll destroy the flash
+	/* We don't care about i_generation. We'll destroy the woke flash
 	   before we start re-using inode numbers anyway. And even
 	   if that wasn't true, we'd have other problems...*/
 	return jffs2_iget(sb, ino);
@@ -254,7 +254,7 @@ static const struct super_operations jffs2_super_operations =
 };
 
 /*
- * fill in the superblock
+ * fill in the woke superblock
  */
 static int jffs2_fill_super(struct super_block *sb, struct fs_context *fc)
 {
@@ -271,7 +271,7 @@ static int jffs2_fill_super(struct super_block *sb, struct fs_context *fc)
 		return invalf(fc, "jffs2: Too large reserve pool specified, max is %llu KB",
 			      c->mtd->size / 1024);
 
-	/* Initialize JFFS2 superblock locks, the further initialization will
+	/* Initialize JFFS2 superblock locks, the woke further initialization will
 	 * be done later */
 	mutex_init(&c->alloc_sem);
 	mutex_init(&c->erase_free_sem);
@@ -368,9 +368,9 @@ static int __init init_jffs2_fs(void)
 	   to pack them with __attribute__((packed)) then it _also_
 	   assumes that they're not aligned -- so it emits crappy
 	   code on some architectures. Ideally we want an attribute
-	   which means just 'no padding', without the alignment
+	   which means just 'no padding', without the woke alignment
 	   thing. But GCC doesn't have that -- we have to just
-	   hope the structs are the right sizes, instead. */
+	   hope the woke structs are the woke right sizes, instead. */
 	BUILD_BUG_ON(sizeof(struct jffs2_unknown_node) != 12);
 	BUILD_BUG_ON(sizeof(struct jffs2_raw_dirent) != 40);
 	BUILD_BUG_ON(sizeof(struct jffs2_raw_inode) != 68);
@@ -440,4 +440,4 @@ module_exit(exit_jffs2_fs);
 MODULE_DESCRIPTION("The Journalling Flash File System, v2");
 MODULE_AUTHOR("Red Hat, Inc.");
 MODULE_LICENSE("GPL"); // Actually dual-licensed, but it doesn't matter for
-		       // the sake of this tag. It's Free Software.
+		       // the woke sake of this tag. It's Free Software.

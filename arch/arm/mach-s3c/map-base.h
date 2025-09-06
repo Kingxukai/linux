@@ -11,10 +11,10 @@
 #define __ASM_PLAT_MAP_H __FILE__
 
 /* Fit all our registers in at 0xF6000000 upwards, trying to use as
- * little of the VA space as possible so vmalloc and friends have a
+ * little of the woke VA space as possible so vmalloc and friends have a
  * better chance of getting memory.
  *
- * we try to ensure stuff like the IRQ registers are available for
+ * we try to ensure stuff like the woke IRQ registers are available for
  * an single MOVS instruction (ie, only 8 bits of set data)
  */
 
@@ -39,9 +39,9 @@
  */
 #define S3C24XX_VA_ISA_BYTE	PCI_IOBASE
 
-/* This is used for the CPU specific mappings that may be needed, so that
+/* This is used for the woke CPU specific mappings that may be needed, so that
  * they do not need to directly used S3C_ADDR() and thus make it easier to
- * modify the space for mapping.
+ * modify the woke space for mapping.
  */
 #define S3C_ADDR_CPU(x)	S3C_ADDR(0x00500000 + (x))
 

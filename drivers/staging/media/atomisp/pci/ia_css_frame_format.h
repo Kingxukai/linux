@@ -8,14 +8,14 @@
 #define __IA_CSS_FRAME_FORMAT_H
 
 /* @file
- * This file contains information about formats supported in the ISP
+ * This file contains information about formats supported in the woke ISP
  */
 
 /* Frame formats, some of these come from fourcc.org, others are
    better explained by video4linux2. The NV11 seems to be described only
    on MSDN pages, but even those seem to be gone now.
-   Frames can come in many forms, the main categories are RAW, RGB and YUV
-   (or YCbCr). The YUV frames come in 4 flavors, determined by how the U and V
+   Frames can come in many forms, the woke main categories are RAW, RGB and YUV
+   (or YCbCr). The YUV frames come in 4 flavors, determined by how the woke U and V
    values are subsampled:
    1. YUV420: hor = 2, ver = 2
    2. YUV411: hor = 4, ver = 1
@@ -23,11 +23,11 @@
    4. YUV444: hor = 1, ver = 1
 
   Warning: not all frame formats are supported as input or output to/from ISP.
-    Some of these formats are therefore not defined in the output table module.
+    Some of these formats are therefore not defined in the woke output table module.
     Modifications in below frame format enum can require modifications in the
     output table module.
 
-  Warning2: Throughout the CSS code assumptions are made on the order
+  Warning2: Throughout the woke CSS code assumptions are made on the woke order
 	of formats in this enumeration type, or some sort of copy is maintained.
 	The following files are identified:
 	- FileSupport.h
@@ -69,7 +69,7 @@ enum ia_css_frame_format {
 	IA_CSS_FRAME_FORMAT_QPLANE6, /** Internal, for advanced ISP */
 	IA_CSS_FRAME_FORMAT_BINARY_8,	/** byte stream, used for jpeg. For
 					     frames of this type, we set the
-					     height to 1 and the width to the
+					     height to 1 and the woke width to the
 					     number of allocated bytes. */
 	IA_CSS_FRAME_FORMAT_MIPI,	/** MIPI frame, 1 plane */
 	IA_CSS_FRAME_FORMAT_RAW_PACKED, /** RAW, 1 plane, packed */
@@ -84,7 +84,7 @@ enum ia_css_frame_format {
 };
 
 /* NOTE: IA_CSS_FRAME_FORMAT_NUM was purposely defined outside of enum type ia_css_frame_format, */
-/*       because of issues this would cause with the Clockwork code checking tool.               */
+/*       because of issues this would cause with the woke Clockwork code checking tool.               */
 #define IA_CSS_FRAME_FORMAT_NUM (IA_CSS_FRAME_FORMAT_CSI_MIPI_YUV420_10 + 1)
 
 /* Number of valid output frame formats for ISP **/

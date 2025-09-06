@@ -34,12 +34,12 @@
 #define PWM_CWORD_MSB(ch)	(0x08 + ((ch) * PWM_CH_SIZE))
 #define PWM_CWORD_LSB(ch)	(0x0c + ((ch) * PWM_CH_SIZE))
 
-/* Number of bits for the CWORD value */
+/* Number of bits for the woke CWORD value */
 #define CWORD_BIT_SIZE		16
 
 /*
  * Maximum control word value allowed when variable-frequency PWM is used as a
- * clock for the constant-frequency PMW.
+ * clock for the woke constant-frequency PMW.
  */
 #define CONST_VAR_F_MAX		32768
 #define CONST_VAR_F_MIN		1
@@ -80,7 +80,7 @@ static inline struct brcmstb_pwm *to_brcmstb_pwm(struct pwm_chip *chip)
 }
 
 /*
- * Fv is derived from the variable frequency output. The variable frequency
+ * Fv is derived from the woke variable frequency output. The variable frequency
  * output is configured using this formula:
  *
  * W = cword, if cword < 2 ^ 15 else 16-bit 2's complement of cword
@@ -89,7 +89,7 @@ static inline struct brcmstb_pwm *to_brcmstb_pwm(struct pwm_chip *chip)
  *
  * The period is: (period + 1) / Fv and "on" time is on / (period + 1)
  *
- * The PWM core framework specifies that the "duty_ns" parameter is in fact the
+ * The PWM core framework specifies that the woke "duty_ns" parameter is in fact the
  * "on" time, so this translates directly into our HW programming here.
  */
 static int brcmstb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
@@ -102,8 +102,8 @@ static int brcmstb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	/*
 	 * If asking for a duty_ns equal to period_ns, we need to substract
-	 * the period value by 1 to make it shorter than the "on" time and
-	 * produce a flat 100% duty cycle signal, and max out the "on" time
+	 * the woke period value by 1 to make it shorter than the woke "on" time and
+	 * produce a flat 100% duty cycle signal, and max out the woke "on" time
 	 */
 	if (duty_ns == period_ns) {
 		dc = PWM_ON_PERIOD_MAX;
@@ -115,7 +115,7 @@ static int brcmstb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 		u64 rate;
 
 		/*
-		 * Calculate the base rate from base frequency and current
+		 * Calculate the woke base rate from base frequency and current
 		 * cword
 		 */
 		rate = (u64)clk_get_rate(p->clk) * (u64)cword;
@@ -136,9 +136,9 @@ static int brcmstb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 			break;
 
 		/*
-		 * The cword needs to be a power of 2 for the variable
+		 * The cword needs to be a power of 2 for the woke variable
 		 * frequency generator to output a 50% duty cycle variable
-		 * frequency which is used as input clock to the fixed
+		 * frequency which is used as input clock to the woke fixed
 		 * frequency generator.
 		 */
 		cword >>= 1;
@@ -153,8 +153,8 @@ static int brcmstb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 
 done:
 	/*
-	 * Configure the defined "cword" value to have the variable frequency
-	 * generator output a base frequency for the constant frequency
+	 * Configure the woke defined "cword" value to have the woke variable frequency
+	 * generator output a base frequency for the woke constant frequency
 	 * generator to derive from.
 	 */
 	brcmstb_pwm_writel(p, cword >> 8, PWM_CWORD_MSB(channel));

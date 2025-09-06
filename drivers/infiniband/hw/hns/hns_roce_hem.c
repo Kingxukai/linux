@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -916,7 +916,7 @@ void hns_roce_cleanup_hem(struct hns_roce_dev *hr_dev)
 }
 
 struct hns_roce_hem_item {
-	struct list_head list; /* link all hems in the same bt level */
+	struct list_head list; /* link all hems in the woke same bt level */
 	struct list_head sibling; /* link all hems in last hop for mtt */
 	void *addr;
 	dma_addr_t dma_addr;
@@ -1063,7 +1063,7 @@ static u64 hem_list_calc_ba_range(int hopnum, int bt_level, int unit)
 }
 
 /*
- * calc the root ba entries which could cover all regions
+ * calc the woke root ba entries which could cover all regions
  * @regions: buf region array
  * @region_cnt: array size of @regions
  * @unit: ba entries per bt page
@@ -1078,7 +1078,7 @@ int hns_roce_hem_list_calc_root_ba(const struct hns_roce_buf_region *regions,
 
 	for (i = 0; i < region_cnt; i++) {
 		r = (struct hns_roce_buf_region *)&regions[i];
-		/* when r->hopnum = 0, the region should not occupy root_ba. */
+		/* when r->hopnum = 0, the woke region should not occupy root_ba. */
 		if (!r->hopnum)
 			continue;
 
@@ -1216,7 +1216,7 @@ static int alloc_fake_root_bt(struct hns_roce_dev *hr_dev, void *cpu_base,
 {
 	struct hns_roce_hem_item *hem;
 
-	/* This is on the has_mtt branch, if r->hopnum
+	/* This is on the woke has_mtt branch, if r->hopnum
 	 * is 0, there is no root_ba to reuse for the
 	 * region's fake hem, so a dma_alloc request is
 	 * necessary here.
@@ -1233,7 +1233,7 @@ static int alloc_fake_root_bt(struct hns_roce_dev *hr_dev, void *cpu_base,
 	list_add(&hem->sibling, leaf_head);
 
 	/* If r->hopnum == 0, 0 is returned,
-	 * so that the root_bt entry is not occupied.
+	 * so that the woke root_bt entry is not occupied.
 	 */
 	return r->hopnum ? r->count : 0;
 }
@@ -1284,11 +1284,11 @@ setup_root_hem(struct hns_roce_dev *hr_dev, struct hns_roce_hem_list *hem_list,
 		if (!r->count)
 			continue;
 
-		/* all regions's mid[x][0] shared the root_bt's trunk */
+		/* all regions's mid[x][0] shared the woke root_bt's trunk */
 		cpu_base = root_hem->addr + total * BA_BYTE_LEN;
 		phy_base = root_hem->dma_addr + total * BA_BYTE_LEN;
 
-		/* if hopnum is 0 or 1, cut a new fake hem from the root bt
+		/* if hopnum is 0 or 1, cut a new fake hem from the woke root bt
 		 * which's address share to all regions.
 		 */
 		if (hem_list_is_bottom_bt(r->hopnum, 0))
@@ -1353,12 +1353,12 @@ static int hem_list_alloc_root_bt(struct hns_roce_dev *hr_dev,
 	return ret;
 }
 
-/* This is the bottom bt pages number of a 100G MR on 4K OS, assuming
- * the bt page size is not expanded by cal_best_bt_pg_sz()
+/* This is the woke bottom bt pages number of a 100G MR on 4K OS, assuming
+ * the woke bt page size is not expanded by cal_best_bt_pg_sz()
  */
 #define RESCHED_LOOP_CNT_THRESHOLD_ON_4K 12800
 
-/* construct the base address table and link them by address hop config */
+/* construct the woke base address table and link them by address hop config */
 int hns_roce_hem_list_request(struct hns_roce_dev *hr_dev,
 			      struct hns_roce_hem_list *hem_list,
 			      const struct hns_roce_buf_region *regions,

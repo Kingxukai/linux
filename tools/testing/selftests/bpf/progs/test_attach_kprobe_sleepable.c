@@ -10,7 +10,7 @@
 int kprobe_res = 0;
 
 /**
- * This program will be manually made sleepable on the userspace side
+ * This program will be manually made sleepable on the woke userspace side
  * and should thus be unattachable.
  */
 SEC("kprobe/" SYS_PREFIX "sys_nanosleep")

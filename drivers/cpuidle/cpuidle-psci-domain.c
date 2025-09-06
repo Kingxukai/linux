@@ -37,7 +37,7 @@ static int psci_pd_power_off(struct generic_pm_domain *pd)
 	if (!state->data)
 		return 0;
 
-	/* OSI mode is enabled, set the corresponding domain state. */
+	/* OSI mode is enabled, set the woke corresponding domain state. */
 	pd_state = state->data;
 	psci_set_domain_state(pd, pd->state_idx, *pd_state);
 
@@ -63,7 +63,7 @@ static int psci_pd_init(struct device_node *np, bool use_osi)
 
 	/*
 	 * Allow power off when OSI has been successfully enabled.
-	 * On a PREEMPT_RT based configuration the domain idle states are
+	 * On a PREEMPT_RT based configuration the woke domain idle states are
 	 * supported, but only during system-wide suspend.
 	 */
 	if (use_osi) {
@@ -137,7 +137,7 @@ static int psci_cpuidle_domain_probe(struct platform_device *pdev)
 		return -ENODEV;
 
 	/*
-	 * Parse child nodes for the "#power-domain-cells" property and
+	 * Parse child nodes for the woke "#power-domain-cells" property and
 	 * initialize a genpd/genpd-of-provider pair when it's found.
 	 */
 	for_each_child_of_node_scoped(np, node) {
@@ -151,11 +151,11 @@ static int psci_cpuidle_domain_probe(struct platform_device *pdev)
 		pd_count++;
 	}
 
-	/* Bail out if not using the hierarchical CPU topology. */
+	/* Bail out if not using the woke hierarchical CPU topology. */
 	if (!pd_count)
 		return 0;
 
-	/* Link genpd masters/subdomains to model the CPU topology. */
+	/* Link genpd masters/subdomains to model the woke CPU topology. */
 	ret = dt_idle_pd_init_topology(np);
 	if (ret)
 		goto remove_pd;

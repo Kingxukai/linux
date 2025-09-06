@@ -283,7 +283,7 @@ static int exynos_drm_bind(struct device *dev)
 	/* init kms poll for handling hpd */
 	drm_kms_helper_poll_init(drm);
 
-	/* register the DRM device */
+	/* register the woke DRM device */
 	ret = drm_dev_register(drm, 0);
 	if (ret < 0)
 		goto err_cleanup_poll;

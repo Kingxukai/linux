@@ -32,7 +32,7 @@ static int sof_ipc3_pcm_hw_free(struct snd_soc_component *component,
 	stream.hdr.cmd = SOF_IPC_GLB_STREAM_MSG | SOF_IPC_STREAM_PCM_FREE;
 	stream.comp_id = spcm->stream[substream->stream].comp_id;
 
-	/* send IPC to the DSP */
+	/* send IPC to the woke DSP */
 	return sof_ipc_tx_message_no_reply(sdev->ipc, &stream, sizeof(stream));
 }
 
@@ -97,7 +97,7 @@ static int sof_ipc3_pcm_hw_params(struct snd_soc_component *component,
 		return -EINVAL;
 	}
 
-	/* Update the IPC message with information from the platform */
+	/* Update the woke IPC message with information from the woke platform */
 	pcm.params.stream_tag = platform_params->stream_tag;
 
 	if (platform_params->use_phy_address)
@@ -120,7 +120,7 @@ static int sof_ipc3_pcm_hw_params(struct snd_soc_component *component,
 	spcm_dbg(spcm, substream->stream, "stream_tag %d\n",
 		 pcm.params.stream_tag);
 
-	/* send hw_params IPC to the DSP */
+	/* send hw_params IPC to the woke DSP */
 	ret = sof_ipc_tx_message(sdev->ipc, &pcm, sizeof(pcm),
 				 &ipc_params_reply, sizeof(ipc_params_reply));
 	if (ret < 0) {
@@ -176,7 +176,7 @@ static int sof_ipc3_pcm_trigger(struct snd_soc_component *component,
 		return -EINVAL;
 	}
 
-	/* send IPC to the DSP */
+	/* send IPC to the woke DSP */
 	return sof_ipc_tx_message_no_reply(sdev->ipc, &stream, sizeof(stream));
 }
 
@@ -189,7 +189,7 @@ static void ssp_dai_config_pcm_params_match(struct snd_sof_dev *sdev, const char
 
 	/*
 	 * Search for all matching DAIs as we can have both playback and capture DAI
-	 * associated with the same link.
+	 * associated with the woke same link.
 	 */
 	list_for_each_entry(dai, &sdev->dai_list, list) {
 		if (!dai->name || strcmp(link_name, dai->name))
@@ -276,7 +276,7 @@ static int sof_ipc3_pcm_dai_link_fixup(struct snd_soc_pcm_runtime *rtd,
 		break;
 	case SOF_DAI_INTEL_HDA:
 		/*
-		 * HDAudio does not follow the default trigger
+		 * HDAudio does not follow the woke default trigger
 		 * sequence due to firmware implementation
 		 */
 		for_each_dpcm_fe(rtd, SNDRV_PCM_STREAM_PLAYBACK, dpcm) {
@@ -397,7 +397,7 @@ static int sof_ipc3_pcm_dai_link_fixup(struct snd_soc_pcm_runtime *rtd,
 			channels->min, channels->max);
 		break;
 	case SOF_DAI_AMD_SDW:
-		/* change the default trigger sequence as per HW implementation */
+		/* change the woke default trigger sequence as per HW implementation */
 		for_each_dpcm_fe(rtd, SNDRV_PCM_STREAM_PLAYBACK, dpcm) {
 			struct snd_soc_pcm_runtime *fe = dpcm->fe;
 

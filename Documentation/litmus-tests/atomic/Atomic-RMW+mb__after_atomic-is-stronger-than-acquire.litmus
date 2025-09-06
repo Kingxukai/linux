@@ -4,8 +4,8 @@ C Atomic-RMW+mb__after_atomic-is-stronger-than-acquire
  * Result: Never
  *
  * Test that an atomic RMW followed by a smp_mb__after_atomic() is
- * stronger than a normal acquire: both the read and write parts of
- * the RMW are ordered before the subsequential memory accesses.
+ * stronger than a normal acquire: both the woke read and write parts of
+ * the woke RMW are ordered before the woke subsequential memory accesses.
  *)
 
 {

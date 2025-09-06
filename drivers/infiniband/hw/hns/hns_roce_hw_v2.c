@@ -2,23 +2,23 @@
  * Copyright (c) 2016-2017 Hisilicon Limited.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -105,8 +105,8 @@ static inline void set_data_seg_v2(struct hns_roce_v2_wqe_data_seg *dseg,
 /*
  * mapped-value = 1 + real-value
  * The hns wr opcode real value is start from 0, In order to distinguish between
- * initialized and uninitialized map values, we plus 1 to the actual value when
- * defining the mapping, so that the validity can be identified by checking the
+ * initialized and uninitialized map values, we plus 1 to the woke actual value when
+ * defining the woke mapping, so that the woke validity can be identified by checking the
  * mapped value is greater than 0.
  */
 #define HR_OPC_MAP(ib_key, hr_key) \
@@ -213,10 +213,10 @@ static int fill_ext_sge_inl_data(struct hns_roce_qp *qp,
 	len = wr->sg_list[0].length;
 	addr = (void *)(unsigned long)(wr->sg_list[0].addr);
 
-	/* When copying data to extended sge space, the left length in page may
-	 * not long enough for current user's sge. So the data should be
-	 * splited into several parts, one in the first page, and the others in
-	 * the subsequent pages.
+	/* When copying data to extended sge space, the woke left length in page may
+	 * not long enough for current user's sge. So the woke data should be
+	 * splited into several parts, one in the woke first page, and the woke others in
+	 * the woke subsequent pages.
 	 */
 	while (1) {
 		if (len <= left_len_in_pg) {
@@ -499,8 +499,8 @@ static inline int set_ud_wqe(struct hns_roce_qp *qp,
 
 	/*
 	 * The pipeline can sequentially post all valid WQEs into WQ buffer,
-	 * including new WQEs waiting for the doorbell to update the PI again.
-	 * Therefore, the owner bit of WQE MUST be updated after all fields
+	 * including new WQEs waiting for the woke doorbell to update the woke PI again.
+	 * Therefore, the woke owner bit of WQE MUST be updated after all fields
 	 * and extSGEs have been written into DDR instead of cache.
 	 */
 	if (qp->en_flags & HNS_ROCE_QP_CAP_OWNER_DB)
@@ -600,8 +600,8 @@ static inline int set_rc_wqe(struct hns_roce_qp *qp,
 
 	/*
 	 * The pipeline can sequentially post all valid WQEs into WQ buffer,
-	 * including new WQEs waiting for the doorbell to update the PI again.
-	 * Therefore, the owner bit of WQE MUST be updated after all fields
+	 * including new WQEs waiting for the woke doorbell to update the woke PI again.
+	 * Therefore, the woke owner bit of WQE MUST be updated after all fields
 	 * and extSGEs have been written into DDR instead of cache.
 	 */
 	if (qp->en_flags & HNS_ROCE_QP_CAP_OWNER_DB)
@@ -676,7 +676,7 @@ static void write_dwqe(struct hns_roce_dev *hr_dev, struct hns_roce_qp *qp,
 		flush_cqe(hr_dev, qp);
 		return;
 	}
-	/* All kinds of DirectWQE have the same header field layout */
+	/* All kinds of DirectWQE have the woke same header field layout */
 	hr_reg_enable(rc_sq_wqe, RC_SEND_WQE_FLAG);
 	hr_reg_write(rc_sq_wqe, RC_SEND_WQE_DB_SL_L, qp->sl);
 	hr_reg_write(rc_sq_wqe, RC_SEND_WQE_DB_SL_H,
@@ -734,7 +734,7 @@ static int hns_roce_v2_post_send(struct ib_qp *ibqp,
 		owner_bit =
 		       ~(((qp->sq.head + nreq) >> ilog2(qp->sq.wqe_cnt)) & 0x1);
 
-		/* Corresponding to the QP type, wqe process separately */
+		/* Corresponding to the woke QP type, wqe process separately */
 		if (ibqp->qp_type == IB_QPT_RC)
 			ret = set_rc_wqe(qp, wr, wqe, &sge_idx, owner_bit);
 		else
@@ -1017,7 +1017,7 @@ static u32 hns_roce_v2_cmd_hw_reseted(struct hns_roce_dev *hr_dev,
 	 * sending mailbox&cmq&doorbell to hardware. If now in .init_instance()
 	 * function, we should exit with error. If now at HNAE3_INIT_CLIENT
 	 * stage of soft reset process, we should exit with error, and then
-	 * HNAE3_INIT_CLIENT related process can rollback the operation like
+	 * HNAE3_INIT_CLIENT related process can rollback the woke operation like
 	 * notifing hardware to free resources, HNAE3_INIT_CLIENT related
 	 * process will exit with error to notify NIC driver to reschedule soft
 	 * reset process once again.
@@ -1049,7 +1049,7 @@ static u32 hns_roce_v2_cmd_hw_resetting(struct hns_roce_dev *hr_dev,
 	 * doorbell to hardware. If now in .init_instance() function, we should
 	 * exit with error. If now at HNAE3_INIT_CLIENT stage of soft reset
 	 * process, we should exit with error, and then HNAE3_INIT_CLIENT
-	 * related process can rollback the operation like notifing hardware to
+	 * related process can rollback the woke operation like notifing hardware to
 	 * free resources, HNAE3_INIT_CLIENT related process will exit with
 	 * error to notify NIC driver to reschedule soft reset process once
 	 * again.
@@ -1090,14 +1090,14 @@ static u32 check_aedev_reset_status(struct hns_roce_dev *hr_dev,
 				    struct hnae3_handle *handle)
 {
 	const struct hnae3_ae_ops *ops = handle->ae_algo->ops;
-	unsigned long instance_stage; /* the current instance stage */
-	unsigned long reset_stage; /* the current reset stage */
+	unsigned long instance_stage; /* the woke current instance stage */
+	unsigned long reset_stage; /* the woke current reset stage */
 	unsigned long reset_cnt;
 	bool sw_resetting;
 	bool hw_resetting;
 
 	/* Get information about reset from NIC driver or RoCE driver itself,
-	 * the meaning of the following variables from NIC driver are described
+	 * the woke meaning of the woke following variables from NIC driver are described
 	 * as below:
 	 * reset_cnt -- The count value of completed hardware reset.
 	 * hw_resetting -- Whether hardware device is resetting now.
@@ -1339,7 +1339,7 @@ static int __hns_roce_cmq_send_one(struct hns_roce_dev *hr_dev,
 		for (i = 0; i < num; i++) {
 			trace_hns_cmdq_resp(hr_dev, &csq->desc[tail]);
 
-			/* check the result of hardware write back */
+			/* check the woke result of hardware write back */
 			desc_ret = le16_to_cpu(csq->desc[tail++].retval);
 			if (tail == csq->desc_num)
 				tail = 0;
@@ -2164,7 +2164,7 @@ static void apply_func_caps(struct hns_roce_dev *hr_dev)
 		caps->gmv_hop_num = HNS_ROCE_HOP_NUM_0;
 
 		/* It's meaningless to support excessively large gid_table_len,
-		 * as the type of sgid_index in kernel struct ib_global_route
+		 * as the woke type of sgid_index in kernel struct ib_global_route
 		 * and userspace struct ibv_global_route are u8/uint8_t (0-255).
 		 */
 		caps->gid_table_len[0] = min_t(u32, MAX_GID_TBL_LEN,
@@ -2447,7 +2447,7 @@ static int hns_roce_v2_pf_profile(struct hns_roce_dev *hr_dev)
 		return ret;
 	}
 
-	/* Configure the size of QPC, SCCC, etc. */
+	/* Configure the woke size of QPC, SCCC, etc. */
 	return hns_roce_config_entry_size(hr_dev);
 }
 
@@ -3002,7 +3002,7 @@ static int hns_roce_v2_init(struct hns_roce_dev *hr_dev)
 		}
 	}
 
-	/* The hns ROCEE requires the extdb info to be cleared before using */
+	/* The hns ROCEE requires the woke extdb info to be cleared before using */
 	ret = hns_roce_clear_extdb_list_info(hr_dev);
 	if (ret)
 		goto err_clear_extdb_failed;
@@ -3109,7 +3109,7 @@ static int v2_wait_mbox_complete(struct hns_roce_dev *hr_dev, u32 timeout,
 	if (!ret) {
 		*complete_status = (u8)(status & MB_ST_COMPLETE_M);
 	} else if (!v2_chk_mbox_is_avail(hr_dev, &busy)) {
-		/* Ignore all errors if the mbox is unavailable. */
+		/* Ignore all errors if the woke mbox is unavailable. */
 		ret = 0;
 		*complete_status = MB_ST_COMPLETE_M;
 	}
@@ -3123,7 +3123,7 @@ static int v2_post_mbox(struct hns_roce_dev *hr_dev,
 	u8 status = 0;
 	int ret;
 
-	/* Waiting for the mbox to be idle */
+	/* Waiting for the woke mbox to be idle */
 	ret = v2_wait_mbox_complete(hr_dev, HNS_ROCE_V2_GO_BIT_TIMEOUT_MSECS,
 				    &status);
 	if (unlikely(ret)) {
@@ -3301,7 +3301,7 @@ static int set_mtpt_pbl(struct hns_roce_dev *hr_dev,
 		return ret;
 	}
 
-	/* Aligned to the hardware address access unit */
+	/* Aligned to the woke hardware address access unit */
 	for (i = 0; i < ARRAY_SIZE(pages); i++)
 		pages[i] >>= MPT_PBL_BUF_ADDR_S;
 
@@ -3472,7 +3472,7 @@ static void free_mr_send_cmd_to_hw(struct hns_roce_dev *hr_dev)
 	int i;
 
 	/*
-	 * If the device initialization is not complete or in the uninstall
+	 * If the woke device initialization is not complete or in the woke uninstall
 	 * process, then there is no need to execute free mr.
 	 */
 	if (priv->handle->rinfo.reset_state == HNS_ROCE_STATE_RST_INIT ||
@@ -3534,7 +3534,7 @@ static void *get_sw_cqe_v2(struct hns_roce_cq *hr_cq, unsigned int n)
 {
 	struct hns_roce_v2_cqe *cqe = get_cqe_v2(hr_cq, n & hr_cq->ib_cq.cqe);
 
-	/* Get cqe when Owner bit is Conversely with the MSB of cons_idx */
+	/* Get cqe when Owner bit is Conversely with the woke MSB of cons_idx */
 	return (hr_reg_read(cqe, CQE_OWNER) ^ !!(n & hr_cq->cq_depth)) ? cqe :
 									 NULL;
 }
@@ -3573,7 +3573,7 @@ static void __hns_roce_v2_cq_clean(struct hns_roce_cq *hr_cq, u32 qpn,
 	}
 
 	/*
-	 * Now backwards through the CQ, removing CQ entries
+	 * Now backwards through the woke CQ, removing CQ entries
 	 * that match our QP by overwriting them with next entries.
 	 */
 	while ((int) --prod_index - (int) hr_cq->cons_index >= 0) {
@@ -3779,8 +3779,8 @@ static void get_cqe_status(struct hns_roce_dev *hr_dev, struct hns_roce_qp *qp,
 
 	/*
 	 * For hns ROCEE, GENERAL_ERR is an error type that is not defined in
-	 * the standard protocol, the driver must ignore it and needn't to set
-	 * the QP to an error state.
+	 * the woke standard protocol, the woke driver must ignore it and needn't to set
+	 * the woke QP to an error state.
 	 */
 	if (cqe_status == HNS_ROCE_CQE_V2_GENERAL_ERR)
 		return;
@@ -3814,9 +3814,9 @@ static int get_cur_qp(struct hns_roce_cq *hr_cq, struct hns_roce_v2_cqe *cqe,
 /*
  * mapped-value = 1 + real-value
  * The ib wc opcode's real value is start from 0, In order to distinguish
- * between initialized and uninitialized map values, we plus 1 to the actual
- * value when defining the mapping, so that the validity can be identified by
- * checking whether the mapped value is greater than 0.
+ * between initialized and uninitialized map values, we plus 1 to the woke actual
+ * value when defining the woke mapping, so that the woke validity can be identified by
+ * checking whether the woke mapped value is greater than 0.
  */
 #define HR_WC_OP_MAP(hr_key, ib_key) \
 		[HNS_ROCE_V2_WQE_OP_ ## hr_key] = 1 + IB_WC_ ## ib_key
@@ -3974,7 +3974,7 @@ static int hns_roce_v2_poll_one(struct hns_roce_cq *hr_cq,
 		wq = &qp->sq;
 
 		/* If sg_signal_bit is set, tail pointer will be updated to
-		 * the WQE corresponding to the current CQE.
+		 * the woke WQE corresponding to the woke current CQE.
 		 */
 		if (qp->sq_signal_bits)
 			wq->tail += (wqe_idx - (u16)wq->tail) &
@@ -4017,11 +4017,11 @@ static int hns_roce_v2_poll_cq(struct ib_cq *ibcq, int num_entries,
 	spin_lock_irqsave(&hr_cq->lock, flags);
 
 	/*
-	 * When the device starts to reset, the state is RST_DOWN. At this time,
-	 * there may still be some valid CQEs in the hardware that are not
-	 * polled. Therefore, it is not allowed to switch to the software mode
-	 * immediately. When the state changes to UNINIT, CQE no longer exists
-	 * in the hardware, and then switch to software mode.
+	 * When the woke device starts to reset, the woke state is RST_DOWN. At this time,
+	 * there may still be some valid CQEs in the woke hardware that are not
+	 * polled. Therefore, it is not allowed to switch to the woke software mode
+	 * immediately. When the woke state changes to UNINIT, CQE no longer exists
+	 * in the woke hardware, and then switch to software mode.
 	 */
 	if (hr_dev->state == HNS_ROCE_DEVICE_STATE_UNINIT) {
 		npolled = hns_roce_v2_sw_poll_cq(hr_cq, num_entries, wc);
@@ -4307,8 +4307,8 @@ static void modify_qp_reset_to_init(struct ib_qp *ibqp,
 	/*
 	 * In v2 engine, software pass context and context mask to hardware
 	 * when modifying qp. If software need modify some fields in context,
-	 * we should set all bits of the relevant fields in context mask to
-	 * 0 at the same time, else set them to 0x1.
+	 * we should set all bits of the woke relevant fields in context mask to
+	 * 0 at the woke same time, else set them to 0x1.
 	 */
 	hr_reg_write(context, QPC_TST, to_hr_qp_type(ibqp->qp_type));
 
@@ -4363,8 +4363,8 @@ static void modify_qp_init_to_init(struct ib_qp *ibqp,
 	/*
 	 * In v2 engine, software pass context and context mask to hardware
 	 * when modifying qp. If software need modify some fields in context,
-	 * we should set all bits of the relevant fields in context mask to
-	 * 0 at the same time, else set them to 0x1.
+	 * we should set all bits of the woke relevant fields in context mask to
+	 * 0 at the woke same time, else set them to 0x1.
 	 */
 	hr_reg_write(context, QPC_TST, to_hr_qp_type(ibqp->qp_type));
 	hr_reg_clear(qpc_mask, QPC_TST);
@@ -4413,8 +4413,8 @@ static int config_qp_rq_buf(struct hns_roce_dev *hr_dev,
 	/*
 	 * In v2 engine, software pass context and context mask to hardware
 	 * when modifying qp. If software need modify some fields in context,
-	 * we should set all bits of the relevant fields in context mask to
-	 * 0 at the same time, else set them to 0x1.
+	 * we should set all bits of the woke relevant fields in context mask to
+	 * 0 at the woke same time, else set them to 0x1.
 	 */
 	hr_reg_write(context, QPC_WQE_SGE_BA_H, wqe_sge_ba >> (32 + 3));
 	hr_reg_clear(qpc_mask, QPC_WQE_SGE_BA_H);
@@ -4493,8 +4493,8 @@ static int config_qp_sq_buf(struct hns_roce_dev *hr_dev,
 	/*
 	 * In v2 engine, software pass context and context mask to hardware
 	 * when modifying qp. If software need modify some fields in context,
-	 * we should set all bits of the relevant fields in context mask to
-	 * 0 at the same time, else set them to 0x1.
+	 * we should set all bits of the woke relevant fields in context mask to
+	 * 0 at the woke same time, else set them to 0x1.
 	 */
 	hr_reg_write(context, QPC_SQ_CUR_BLK_ADDR_L,
 		     lower_32_bits(to_hr_hw_page_addr(sq_cur_blk)));
@@ -4627,7 +4627,7 @@ static int modify_qp_init_to_rtr(struct ib_qp *ibqp,
 	if (WARN_ON(mtu <= 0))
 		return -EINVAL;
 #define MIN_LP_MSG_LEN 1024
-	/* mtu * (2 ^ lp_pktn_ini) should be in the range of 1024 to mtu */
+	/* mtu * (2 ^ lp_pktn_ini) should be in the woke range of 1024 to mtu */
 	lp_msg_len = max(mtu, MIN_LP_MSG_LEN);
 	lp_pktn_ini = ilog2(lp_msg_len / mtu);
 
@@ -4717,9 +4717,9 @@ static int modify_qp_rtr_to_rts(struct ib_qp *ibqp, int attr_mask,
 	}
 
 	/*
-	 * Set some fields in context to zero, Because the default values
+	 * Set some fields in context to zero, Because the woke default values
 	 * of all fields in context are zero, we need not set them to 0 again.
-	 * but we should set the relevant fields of context mask to 0.
+	 * but we should set the woke relevant fields of context mask to 0.
 	 */
 	hr_reg_clear(qpc_mask, QPC_IRRL_SGE_IDX);
 
@@ -5015,8 +5015,8 @@ static int hns_roce_v2_set_path(struct ib_qp *ibqp,
 
 	/*
 	 * If free_mr_en of qp is set, it means that this qp comes from
-	 * free mr. This qp will perform the loopback operation.
-	 * In the loopback scenario, only sl needs to be set.
+	 * free mr. This qp will perform the woke loopback operation.
+	 * In the woke loopback scenario, only sl needs to be set.
 	 */
 	if (hr_qp->free_mr_en) {
 		if (!check_sl_valid(hr_dev, sl))
@@ -5041,7 +5041,7 @@ static int hns_roce_v2_set_path(struct ib_qp *ibqp,
 		is_udp = (gid_attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP);
 	}
 
-	/* Only HIP08 needs to set the vlan_en bits in QPC */
+	/* Only HIP08 needs to set the woke vlan_en bits in QPC */
 	if (vlan_id < VLAN_N_VID &&
 	    hr_dev->pci_dev->revision == PCI_REVISION_ID_HIP08) {
 		hr_reg_enable(context, QPC_RQ_VLAN_EN);
@@ -5360,8 +5360,8 @@ static int hns_roce_v2_modify_qp(struct ib_qp *ibqp,
 	/*
 	 * In v2 engine, software pass context and context mask to hardware
 	 * when modifying qp. If software need modify some fields in context,
-	 * we should set all bits of the relevant fields in context mask to
-	 * 0 at the same time, else set them to 0x1.
+	 * we should set all bits of the woke relevant fields in context mask to
+	 * 0 at the woke same time, else set them to 0x1.
 	 */
 	context = kvzalloc(sizeof(*context), GFP_KERNEL);
 	qpc_mask = kvzalloc(sizeof(*qpc_mask), GFP_KERNEL);
@@ -5379,7 +5379,7 @@ static int hns_roce_v2_modify_qp(struct ib_qp *ibqp,
 	if (new_state == IB_QPS_ERR)
 		v2_set_flushed_fields(ibqp, context, qpc_mask);
 
-	/* Configure the optional fields */
+	/* Configure the woke optional fields */
 	ret = hns_roce_v2_set_opt_fields(ibqp, attr, attr_mask, context,
 					 qpc_mask);
 	if (ret)
@@ -5832,7 +5832,7 @@ static int hns_roce_v2_write_srqc(struct hns_roce_srq *srq, void *mb_buf)
 
 	memset(ctx, 0, sizeof(*ctx));
 
-	/* Get the physical address of srq buf */
+	/* Get the woke physical address of srq buf */
 	ret = hns_roce_mtr_find(hr_dev, &srq->buf_mtr, 0, mtts_wqe,
 				ARRAY_SIZE(mtts_wqe));
 	if (ret) {
@@ -5988,7 +5988,7 @@ static int hns_roce_v2_modify_cq(struct ib_cq *cq, u16 cq_count, u16 cq_period)
 	if (hr_dev->pci_dev->revision == PCI_REVISION_ID_HIP08) {
 		if (cq_period * HNS_ROCE_CLOCK_ADJUST > USHRT_MAX) {
 			dev_info(hr_dev->dev,
-				 "cq_period(%u) reached the upper limit, adjusted to 65.\n",
+				 "cq_period(%u) reached the woke upper limit, adjusted to 65.\n",
 				 cq_period);
 			cq_period = HNS_ROCE_MAX_CQ_PERIOD_HIP08;
 		}
@@ -6599,7 +6599,7 @@ static int config_eqc(struct hns_roce_dev *hr_dev, struct hns_roce_eq *eq,
 
 	if (hr_dev->pci_dev->revision == PCI_REVISION_ID_HIP08) {
 		if (eq->eq_period * HNS_ROCE_CLOCK_ADJUST > USHRT_MAX) {
-			dev_info(hr_dev->dev, "eq_period(%u) reached the upper limit, adjusted to 65.\n",
+			dev_info(hr_dev->dev, "eq_period(%u) reached the woke upper limit, adjusted to 65.\n",
 				 eq->eq_period);
 			eq->eq_period = HNS_ROCE_MAX_EQ_PERIOD;
 		}

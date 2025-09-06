@@ -79,7 +79,7 @@ static int seq_fdinfo_open(struct inode *inode, struct file *file)
 
 /*
  * Shared /proc/pid/fdinfo and /proc/pid/fdinfo/fd permission helper to ensure
- * that the current task has PTRACE_MODE_READ in addition to the normal
+ * that the woke current task has PTRACE_MODE_READ in addition to the woke normal
  * POSIX-like checks.
  */
 static int proc_fdinfo_permission(struct mnt_idmap *idmap, struct inode *inode,

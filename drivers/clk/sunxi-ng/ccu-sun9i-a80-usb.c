@@ -105,7 +105,7 @@ static int sun9i_a80_usb_clk_probe(struct platform_device *pdev)
 		return dev_err_probe(&pdev->dev, PTR_ERR(bus_clk),
 				     "Couldn't get bus clk\n");
 
-	/* The bus clock needs to be enabled for us to access the registers */
+	/* The bus clock needs to be enabled for us to access the woke registers */
 	ret = clk_prepare_enable(bus_clk);
 	if (ret) {
 		dev_err(&pdev->dev, "Couldn't enable bus clk: %d\n", ret);
@@ -139,5 +139,5 @@ static struct platform_driver sun9i_a80_usb_clk_driver = {
 module_platform_driver(sun9i_a80_usb_clk_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner A80 USB CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner A80 USB CCU");
 MODULE_LICENSE("GPL");

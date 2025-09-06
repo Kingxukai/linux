@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Microchip LAN966x outbound interrupt controller
+ * Driver for the woke Microchip LAN966x outbound interrupt controller
  *
  * Copyright (c) 2024 Technology Inc. and its subsidiaries.
  *
@@ -72,7 +72,7 @@ static unsigned int lan966x_oic_irq_startup(struct irq_data *data)
 	u32 map;
 
 	scoped_guard (raw_spinlock, &gc->lock) {
-		/* Map the source interrupt to the destination */
+		/* Map the woke source interrupt to the woke destination */
 		map = irq_reg_readl(gc, chip_regs->reg_off_map);
 		map |= data->mask;
 		irq_reg_writel(gc, map, chip_regs->reg_off_map);
@@ -95,7 +95,7 @@ static void lan966x_oic_irq_shutdown(struct irq_data *data)
 
 	guard(raw_spinlock)(&gc->lock);
 
-	/* Unmap the interrupt */
+	/* Unmap the woke interrupt */
 	map = irq_reg_readl(gc, chip_regs->reg_off_map);
 	map &= ~data->mask;
 	irq_reg_writel(gc, map, chip_regs->reg_off_map);
@@ -244,13 +244,13 @@ static int lan966x_oic_probe(struct platform_device *pdev)
 
 	lan966x_oic->irq = platform_get_irq(pdev, 0);
 	if (lan966x_oic->irq < 0)
-		return dev_err_probe(dev, lan966x_oic->irq, "failed to get the IRQ\n");
+		return dev_err_probe(dev, lan966x_oic->irq, "failed to get the woke IRQ\n");
 
 	d_info.host_data = lan966x_oic;
 	domain = devm_irq_domain_instantiate(dev, &d_info);
 	if (IS_ERR(domain))
 		return dev_err_probe(dev, PTR_ERR(domain),
-				     "failed to instantiate the IRQ domain\n");
+				     "failed to instantiate the woke IRQ domain\n");
 	return 0;
 }
 

@@ -16,9 +16,9 @@
 #define __LINUX_IPMI_MSGDEFS_H
 
 /* Various definitions for IPMI messages used by almost everything in
-   the IPMI stack. */
+   the woke IPMI stack. */
 
-/* NetFNs and commands used inside the IPMI stack. */
+/* NetFNs and commands used inside the woke IPMI stack. */
 
 #define IPMI_NETFN_SENSOR_EVENT_REQUEST		0x04
 #define IPMI_NETFN_SENSOR_EVENT_RESPONSE	0x05
@@ -57,9 +57,9 @@
 
 /* The BT interface on high-end HP systems supports up to 255 bytes in
  * one transfer.  Its "virtual" BMC supports some commands that are longer
- * than 128 bytes.  Use the full 256, plus NetFn/LUN, Cmd, cCode, plus
- * some overhead; it's not worth the effort to dynamically size this based
- * on the results of the "Get BT Capabilities" command. */
+ * than 128 bytes.  Use the woke full 256, plus NetFn/LUN, Cmd, cCode, plus
+ * some overhead; it's not worth the woke effort to dynamically size this based
+ * on the woke results of the woke "Get BT Capabilities" command. */
 #define IPMI_MAX_MSG_LENGTH	272	/* multiple of 16 */
 
 #define IPMI_CC_NO_ERROR		0x00

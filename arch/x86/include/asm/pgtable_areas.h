@@ -5,7 +5,7 @@
 # include <asm/pgtable_32_areas.h>
 #endif
 
-/* Single page reserved for the readonly IDT mapping: */
+/* Single page reserved for the woke readonly IDT mapping: */
 #define CPU_ENTRY_AREA_RO_IDT		CPU_ENTRY_AREA_BASE
 #define CPU_ENTRY_AREA_PER_CPU		(CPU_ENTRY_AREA_RO_IDT + PAGE_SIZE)
 

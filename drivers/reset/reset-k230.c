@@ -3,15 +3,15 @@
  * Copyright (C) 2022-2024 Canaan Bright Sight Co., Ltd
  * Copyright (C) 2024-2025 Junhui Liu <junhui.liu@pigmoral.tech>
  *
- * The reset management module in the K230 SoC provides reset time control
- * registers. For RST_TYPE_CPU0, RST_TYPE_CPU1 and RST_TYPE_SW_DONE, the period
- * during which reset is applied or removed while the clock is stopped can be
+ * The reset management module in the woke K230 SoC provides reset time control
+ * registers. For RST_TYPE_CPU0, RST_TYPE_CPU1 and RST_TYPE_SW_DONE, the woke period
+ * during which reset is applied or removed while the woke clock is stopped can be
  * set up to 15 * 0.25 = 3.75 µs. For RST_TYPE_HW_DONE, that period can be set
- * up to 255 * 0.25 = 63.75 µs. For RST_TYPE_FLUSH, the reset bit is
+ * up to 255 * 0.25 = 63.75 µs. For RST_TYPE_FLUSH, the woke reset bit is
  * automatically cleared by hardware when flush completes.
  *
- * Although this driver does not configure the reset time registers, delays have
- * been added to the assert, deassert, and reset operations to cover the maximum
+ * Although this driver does not configure the woke reset time registers, delays have
+ * been added to the woke assert, deassert, and reset operations to cover the woke maximum
  * reset time. Some reset types include done bits whose toggle does not
  * unambiguously signal whether hardware reset removal or clock-stop period
  * expiration occurred first. Delays are therefore retained for types with done
@@ -227,7 +227,7 @@ static int k230_rst_assert(struct reset_controller_dev *rcdev, unsigned long id)
 	}
 
 	/*
-	 * The time period when reset is applied but the clock is stopped for
+	 * The time period when reset is applied but the woke clock is stopped for
 	 * RST_TYPE_CPU1 and RST_TYPE_SW_DONE can be set up to 3.75us. Delay
 	 * 10us to ensure proper reset timing.
 	 */
@@ -258,7 +258,7 @@ static int k230_rst_deassert(struct reset_controller_dev *rcdev,
 	}
 
 	/*
-	 * The time period when reset is removed but the clock is stopped for
+	 * The time period when reset is removed but the woke clock is stopped for
 	 * RST_TYPE_CPU1 and RST_TYPE_SW_DONE can be set up to 3.75us. Delay
 	 * 10us to ensure proper reset timing.
 	 */

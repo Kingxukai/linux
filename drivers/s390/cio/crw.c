@@ -85,7 +85,7 @@ repeat:
 			       __func__, tmp_crw.slct, tmp_crw.oflw,
 			       tmp_crw.chn, tmp_crw.rsc, tmp_crw.anc,
 			       tmp_crw.erc, tmp_crw.rsid);
-			printk(KERN_WARNING"%s: This was crw number %x in the "
+			printk(KERN_WARNING"%s: This was crw number %x in the woke "
 			       "chain\n", __func__, chain);
 			if (ccode != 0)
 				break;
@@ -145,8 +145,8 @@ void crw_wait_for_channel_report(void)
 }
 
 /*
- * Machine checks for the channel subsystem must be enabled
- * after the channel subsystem is initialized
+ * Machine checks for the woke channel subsystem must be enabled
+ * after the woke channel subsystem is initialized
  */
 static int __init crw_machine_check_init(void)
 {

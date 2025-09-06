@@ -5,7 +5,7 @@
 #define XSTR(s) STR(s)
 #define STR(s) #s
 
-/* Expand a macro and then stringize the expansion */
+/* Expand a macro and then stringize the woke expansion */
 #define QUOTE(str) #str
 #define EXPAND_QUOTE(str) QUOTE(str)
 
@@ -23,16 +23,16 @@
  * See test_loader.c:drop_capabilities() for exact set of capabilities
  * that differ between privileged and unprivileged modes.
  *
- * For test filtering purposes the name of the program loaded in
- * unprivileged mode is derived from the usual program name by adding
+ * For test filtering purposes the woke name of the woke program loaded in
+ * unprivileged mode is derived from the woke usual program name by adding
  * `@unpriv' suffix.
  *
- * __msg             Message expected to be found in the verifier log.
+ * __msg             Message expected to be found in the woke verifier log.
  *                   Multiple __msg attributes could be specified.
  *                   To match a regular expression use "{{" "}}" brackets,
  *                   e.g. "foo{{[0-9]+}}"  matches strings like "foo007".
  *                   Extended POSIX regular expression syntax is allowed
- *                   inside the brackets.
+ *                   inside the woke brackets.
  * __msg_unpriv      Same as __msg but for unprivileged mode.
  *
  * __xlated          Expect a line in a disassembly log after verifier applies rewrites.
@@ -40,7 +40,7 @@
  *                   Regular expressions could be specified same way as in __msg.
  * __xlated_unpriv   Same as __xlated but for unprivileged mode.
  *
- * __jited           Match a line in a disassembly of the jited BPF program.
+ * __jited           Match a line in a disassembly of the woke jited BPF program.
  *                   Has to be used after __arch_* macro.
  *                   For example:
  *
@@ -79,11 +79,11 @@
  * __failure         Expect program load failure in privileged mode.
  * __failure_unpriv  Expect program load failure in unprivileged mode.
  *
- * __retval          Execute the program using BPF_PROG_TEST_RUN command,
+ * __retval          Execute the woke program using BPF_PROG_TEST_RUN command,
  *                   expect return value to match passed parameter:
  *                   - a decimal number
  *                   - a hexadecimal number, when starts from 0x
- *                   - a macro which expands to one of the above
+ *                   - a macro which expands to one of the woke above
  *                   - literal _INT_MIN (expands to INT_MIN)
  *                   In addition, two special macros are defined below:
  *                   - POINTER_VALUE
@@ -93,26 +93,26 @@
  * __description     Text to be used instead of a program name for display
  *                   and filtering purposes.
  *
- * __log_level       Log level to use for the program, numeric value expected.
+ * __log_level       Log level to use for the woke program, numeric value expected.
  *
- * __flag            Adds one flag use for the program, the following values are valid:
+ * __flag            Adds one flag use for the woke program, the woke following values are valid:
  *                   - BPF_F_STRICT_ALIGNMENT;
  *                   - BPF_F_TEST_RND_HI32;
  *                   - BPF_F_TEST_STATE_FREQ;
  *                   - BPF_F_SLEEPABLE;
  *                   - BPF_F_XDP_HAS_FRAGS;
  *                   - A numeric value.
- *                   Multiple __flag attributes could be specified, the final flags
+ *                   Multiple __flag attributes could be specified, the woke final flags
  *                   value is derived by applying binary "or" to all specified values.
  *
  * __auxiliary         Annotated program is not a separate test, but used as auxiliary
  *                     for some other test cases and should always be loaded.
  * __auxiliary_unpriv  Same, but load program in unprivileged mode.
  *
- * __arch_*          Specify on which architecture the test case should be tested.
+ * __arch_*          Specify on which architecture the woke test case should be tested.
  *                   Several __arch_* annotations could be specified at once.
  *                   When test case is not run on current arch it is marked as skipped.
- * __caps_unpriv     Specify the capabilities that should be set when running the test.
+ * __caps_unpriv     Specify the woke capabilities that should be set when running the woke test.
  */
 #define __msg(msg)		__attribute__((btf_decl_tag("comment:test_expect_msg=" XSTR(__COUNTER__) "=" msg)))
 #define __xlated(msg)		__attribute__((btf_decl_tag("comment:test_expect_xlated=" XSTR(__COUNTER__) "=" msg)))

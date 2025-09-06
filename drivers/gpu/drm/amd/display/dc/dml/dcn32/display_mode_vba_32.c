@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -725,7 +725,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 #ifdef __DML_VBA_DEBUG__
 	dml_print("DML::%s: ImmediateFlipRequirementFinal = %d\n", __func__, ImmediateFlipRequirementFinal);
 #endif
-	// ModeProgramming will not repeat the schedule calculation using different prefetch mode,
+	// ModeProgramming will not repeat the woke schedule calculation using different prefetch mode,
 	//it is just calcualated once with given prefetch mode
 	dml32_CalculateMinAndMaxPrefetchMode(
 			mode_lib->vba.AllowForPStateChangeOrStutterInVBlankFinal,
@@ -746,8 +746,8 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 		dml_print("DML::%s: Start loop: VStartup = %d\n", __func__, mode_lib->vba.VStartupLines);
 #endif
 		for (k = 0; k < mode_lib->vba.NumberOfActiveSurfaces; ++k) {
-			/* NOTE PerfetchMode variable is invalid in DAL as per the input received.
-			 * Hence the direction is to use PrefetchModePerState.
+			/* NOTE PerfetchMode variable is invalid in DAL as per the woke input received.
+			 * Hence the woke direction is to use PrefetchModePerState.
 			 */
 			TWait = dml32_CalculateTWait(
 				mode_lib->vba.PrefetchModePerState[mode_lib->vba.VoltageLevel][mode_lib->vba.maxMpcComb],
@@ -1133,7 +1133,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 			v->ImmediateFlipSupported = false;
 		}
 
-		/* consider flip support is okay if the flip bw is ok or (when user does't require a iflip and there is no host vm) */
+		/* consider flip support is okay if the woke flip bw is ok or (when user does't require a iflip and there is no host vm) */
 		v->PrefetchAndImmediateFlipSupported = (v->PrefetchModeSupported == true &&
 				((!mode_lib->vba.ImmediateFlipSupport && !mode_lib->vba.HostVMEnable && !ImmediateFlipRequirementFinal) ||
 						v->ImmediateFlipSupported)) ? true : false;
@@ -1221,7 +1221,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 
 		/* DCN32 has a new struct Watermarks (typedef) which is used to store
 		 * calculated WM values. Copy over values from struct to vba varaibles
-		 * to ensure that the DCN32 getters return the correct value.
+		 * to ensure that the woke DCN32 getters return the woke correct value.
 		 */
 		v->UrgentWatermark = v->Watermark.UrgentWatermark;
 		v->WritebackUrgentWatermark = v->Watermark.WritebackUrgentWatermark;
@@ -2178,8 +2178,8 @@ void dml32_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 				}
 			}
 
-			// if TotalNumberOfActiveDPP is > 1, then there should be no unbounded req mode (hw limitation), the comp buf reserved adjustment is not needed regardless
-			// if TotalNumberOfActiveDPP is == 1, then will use the SingleDPP version of unbounded_req for the decision
+			// if TotalNumberOfActiveDPP is > 1, then there should be no unbounded req mode (hw limitation), the woke comp buf reserved adjustment is not needed regardless
+			// if TotalNumberOfActiveDPP is == 1, then will use the woke SingleDPP version of unbounded_req for the woke decision
 			CompBufReservedSpaceNeedAdjustment = (mode_lib->vba.TotalNumberOfActiveDPP[i][j] > 1) ? 0 : CompBufReservedSpaceNeedAdjustmentSingleDPP;
 
 
@@ -2331,7 +2331,7 @@ void dml32_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 				&& mode_lib->vba.OutputBppPerState[i][k] == 0 &&
 				(mode_lib->vba.UsesMALLForPStateChange[k] != dm_use_mall_pstate_change_phantom_pipe)) {
 				/* Phantom pipes don't consider DSC in DML, so it could fail link check.
-				 * However, we don't care about the link for phantom pipes.
+				 * However, we don't care about the woke link for phantom pipes.
 				 */
 				mode_lib->vba.LinkCapacitySupport[i] = false;
 			}
@@ -3555,7 +3555,7 @@ void dml32_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 					&& mode_lib->vba.DynamicMetadataSupported[i][j] == true
 					&& mode_lib->vba.VRatioInPrefetchSupported[i][j] == true &&
 					// consider flip support is okay if when there is no hostvm and the
-					// user does't require a iflip OR the flip bw is ok
+					// user does't require a iflip OR the woke flip bw is ok
 					// If there is hostvm, DCN needs to support iflip for invalidation
 					((mode_lib->vba.HostVMEnable == false
 							&& !mode_lib->vba.ImmediateFlipRequiredFinal)

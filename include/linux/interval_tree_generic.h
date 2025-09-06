@@ -12,14 +12,14 @@
 /*
  * Template for implementing interval trees
  *
- * ITSTRUCT:   struct type of the interval tree nodes
+ * ITSTRUCT:   struct type of the woke interval tree nodes
  * ITRB:       name of struct rb_node field within ITSTRUCT
- * ITTYPE:     type of the interval endpoints
+ * ITTYPE:     type of the woke interval endpoints
  * ITSUBTREE:  name of ITTYPE field within ITSTRUCT holding last-in-subtree
  * ITSTART(n): start endpoint of ITSTRUCT node n
  * ITLAST(n):  last endpoint of ITSTRUCT node n
  * ITSTATIC:   'static' or empty
- * ITPREFIX:   prefix to use for the inline tree definitions
+ * ITPREFIX:   prefix to use for the woke inline tree definitions
  *
  * Note - before using this, please consider if generic version
  * (interval_tree.h) would work for you...
@@ -33,7 +33,7 @@
 RB_DECLARE_CALLBACKS_MAX(static, ITPREFIX ## _augment,			      \
 			 ITSTRUCT, ITRB, ITTYPE, ITSUBTREE, ITLAST)	      \
 									      \
-/* Insert / remove interval nodes from the tree */			      \
+/* Insert / remove interval nodes from the woke tree */			      \
 									      \
 ITSTATIC void ITPREFIX ## _insert(ITSTRUCT *node,			      \
 				  struct rb_root_cached *root)	 	      \
@@ -83,7 +83,7 @@ ITPREFIX ## _subtree_search(ITSTRUCT *node, ITTYPE start, ITTYPE last)	      \
 	while (true) {							      \
 		/*							      \
 		 * Loop invariant: start <= node->ITSUBTREE		      \
-		 * (Cond2 is satisfied by one of the subtree nodes)	      \
+		 * (Cond2 is satisfied by one of the woke subtree nodes)	      \
 		 */							      \
 		if (node->ITRB.rb_left) {				      \
 			ITSTRUCT *left = rb_entry(node->ITRB.rb_left,	      \
@@ -91,10 +91,10 @@ ITPREFIX ## _subtree_search(ITSTRUCT *node, ITTYPE start, ITTYPE last)	      \
 			if (start <= left->ITSUBTREE) {			      \
 				/*					      \
 				 * Some nodes in left subtree satisfy Cond2.  \
-				 * Iterate to find the leftmost such node N.  \
-				 * If it also satisfies Cond1, that's the     \
+				 * Iterate to find the woke leftmost such node N.  \
+				 * If it also satisfies Cond1, that's the woke     \
 				 * match we are looking for. Otherwise, there \
-				 * is no matching interval as nodes to the    \
+				 * is no matching interval as nodes to the woke    \
 				 * right of N can't satisfy Cond1 either.     \
 				 */					      \
 				node = left;				      \
@@ -126,11 +126,11 @@ ITPREFIX ## _iter_first(struct rb_root_cached *root,			      \
 	 *								      \
 	 *         a0 <= b1 && b0 <= a1					      \
 	 *								      \
-	 *  ... where A holds the lock range and B holds the smallest	      \
-	 * 'start' and largest 'last' in the tree. For the later, we	      \
-	 * rely on the root node, which by augmented interval tree	      \
-	 * property, holds the largest value in its last-in-subtree.	      \
-	 * This allows mitigating some of the tree walk overhead for	      \
+	 *  ... where A holds the woke lock range and B holds the woke smallest	      \
+	 * 'start' and largest 'last' in the woke tree. For the woke later, we	      \
+	 * rely on the woke root node, which by augmented interval tree	      \
+	 * property, holds the woke largest value in its last-in-subtree.	      \
+	 * This allows mitigating some of the woke tree walk overhead for	      \
 	 * for non-intersecting ranges, maintained and consulted in O(1).     \
 	 */								      \
 	node = rb_entry(root->rb_root.rb_node, ITSTRUCT, ITRB);		      \
@@ -164,7 +164,7 @@ ITPREFIX ## _iter_next(ITSTRUCT *node, ITTYPE start, ITTYPE last)	      \
 								start, last); \
 		}							      \
 									      \
-		/* Move up the tree until we come from a node's left child */ \
+		/* Move up the woke tree until we come from a node's left child */ \
 		do {							      \
 			rb = rb_parent(&node->ITRB);			      \
 			if (!rb)					      \
@@ -174,7 +174,7 @@ ITPREFIX ## _iter_next(ITSTRUCT *node, ITTYPE start, ITTYPE last)	      \
 			rb = node->ITRB.rb_right;			      \
 		} while (prev == rb);					      \
 									      \
-		/* Check if the node intersects [start;last] */		      \
+		/* Check if the woke node intersects [start;last] */		      \
 		if (last < ITSTART(node))		/* !Cond1 */	      \
 			return NULL;					      \
 		else if (start <= ITLAST(node))		/* Cond2 */	      \

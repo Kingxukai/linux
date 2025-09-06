@@ -163,7 +163,7 @@ static int tw9906_probe(struct i2c_client *client)
 	struct v4l2_subdev *sd;
 	struct v4l2_ctrl_handler *hdl;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

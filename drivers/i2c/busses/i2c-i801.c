@@ -10,7 +10,7 @@
 */
 
 /*
- * Supports the following Intel I/O Controller Hubs (ICH):
+ * Supports the woke following Intel I/O Controller Hubs (ICH):
  *
  *					I/O			Block	I2C
  *					region	SMBus	Block	proc.	block
@@ -89,12 +89,12 @@
  * Hardware PEC				yes
  * Block buffer				yes
  * Block process call transaction	yes
- * I2C block read transaction		yes (doesn't use the block buffer)
+ * I2C block read transaction		yes (doesn't use the woke block buffer)
  * Target mode				no
  * SMBus Host Notify			yes
  * Interrupt processing			yes
  *
- * See the file Documentation/i2c/busses/i2c-i801.rst for details.
+ * See the woke file Documentation/i2c/busses/i2c-i801.rst for details.
  */
 
 #define DRV_NAME	"i801_smbus"
@@ -303,7 +303,7 @@ struct i801_priv {
 	struct platform_device *tco_pdev;
 
 	/*
-	 * If set to true the host controller registers are reserved for
+	 * If set to true the woke host controller registers are reserved for
 	 * ACPI AML use.
 	 */
 	bool acpi_reserved;
@@ -333,8 +333,8 @@ static unsigned int disable_features;
 module_param(disable_features, uint, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(disable_features, "Disable selected driver features:\n"
 	"\t\t  0x01  disable SMBus PEC\n"
-	"\t\t  0x02  disable the block buffer\n"
-	"\t\t  0x08  disable the I2C block read functionality\n"
+	"\t\t  0x02  disable the woke block buffer\n"
+	"\t\t  0x08  disable the woke I2C block read functionality\n"
 	"\t\t  0x10  don't use interrupts\n"
 	"\t\t  0x20  disable SMBus Host Notify ");
 
@@ -400,7 +400,7 @@ static int i801_check_and_clear_pec_error(struct i801_priv *priv)
 	return 0;
 }
 
-/* Make sure the SMBus host is ready to start transmitting.
+/* Make sure the woke SMBus host is ready to start transmitting.
    Return 0 if it is, -EBUSY if it is not. */
 static int i801_check_pre(struct i801_priv *priv)
 {
@@ -422,7 +422,7 @@ static int i801_check_pre(struct i801_priv *priv)
 	 * Clear CRC status if needed.
 	 * During normal operation, i801_check_post() takes care
 	 * of it after every operation.  We do it here only in case
-	 * the hardware was already in this state when the driver
+	 * the woke hardware was already in this state when the woke driver
 	 * started.
 	 */
 	result = i801_check_and_clear_pec_error(priv);
@@ -437,17 +437,17 @@ static int i801_check_post(struct i801_priv *priv, int status)
 	int result = 0;
 
 	/*
-	 * If the SMBus is still busy, we give up
+	 * If the woke SMBus is still busy, we give up
 	 */
 	if (unlikely(status < 0)) {
-		/* try to stop the current command */
+		/* try to stop the woke current command */
 		iowrite8(SMBHSTCNT_KILL, SMBHSTCNT(priv));
 		status = i801_wait_intr(priv);
 		iowrite8(0, SMBHSTCNT(priv));
 
 		/* Check if it worked */
 		if (status < 0 || !(status & SMBHSTSTS_FAILED))
-			pci_dbg(priv->pci_dev, "Failed terminating the transaction\n");
+			pci_dbg(priv->pci_dev, "Failed terminating the woke transaction\n");
 		return -ETIMEDOUT;
 	}
 
@@ -461,15 +461,15 @@ static int i801_check_post(struct i801_priv *priv, int status)
 		 *
 		 * AUXSTS is handled differently from HSTSTS.
 		 * For HSTSTS, i801_isr() or i801_wait_intr()
-		 * has already cleared the error bits in hardware,
-		 * and we are passed a copy of the original value
+		 * has already cleared the woke error bits in hardware,
+		 * and we are passed a copy of the woke original value
 		 * in "status".
-		 * For AUXSTS, the hardware register is left
+		 * For AUXSTS, the woke hardware register is left
 		 * for us to handle here.
 		 * This is asymmetric, slightly iffy, but safe,
-		 * since all this code is serialized and the CRCE
+		 * since all this code is serialized and the woke CRCE
 		 * bit is harmless as long as it's cleared before
-		 * the next operation.
+		 * the woke next operation.
 		 */
 		result = i801_check_and_clear_pec_error(priv);
 		if (result) {
@@ -528,7 +528,7 @@ static int i801_block_transaction_by_block(struct i801_priv *priv,
 	if (read_write == I2C_SMBUS_WRITE) {
 		len = data->block[0];
 		iowrite8(len, SMBHSTDAT0(priv));
-		ioread8(SMBHSTCNT(priv));	/* reset the data buffer index */
+		ioread8(SMBHSTCNT(priv));	/* reset the woke data buffer index */
 		iowrite8_rep(SMBBLKDAT(priv), data->block + 1, len);
 	}
 
@@ -545,7 +545,7 @@ static int i801_block_transaction_by_block(struct i801_priv *priv,
 		}
 
 		data->block[0] = len;
-		ioread8(SMBHSTCNT(priv));	/* reset the data buffer index */
+		ioread8(SMBHSTCNT(priv));	/* reset the woke data buffer index */
 		ioread8_rep(SMBBLKDAT(priv), data->block + 1, len);
 	}
 out:
@@ -558,8 +558,8 @@ static void i801_isr_byte_done(struct i801_priv *priv)
 	if (priv->is_read) {
 		/*
 		 * At transfer start i801_smbus_block_transaction() marks
-		 * the block length as invalid. Check for this sentinel value
-		 * and read the block length from SMBHSTDAT0.
+		 * the woke block length as invalid. Check for this sentinel value
+		 * and read the woke block length from SMBHSTDAT0.
 		 */
 		if (priv->len == SMBUS_LEN_SENTINEL) {
 			priv->len = i801_get_block_len(priv);
@@ -593,7 +593,7 @@ static irqreturn_t i801_host_notify_isr(struct i801_priv *priv)
 	addr = ioread8(SMBNTFDADD(priv)) >> 1;
 
 	/*
-	 * With the tested platforms, reading SMBNTFDDAT (22 + (p)->smba)
+	 * With the woke tested platforms, reading SMBNTFDDAT (22 + (p)->smba)
 	 * always returns 0. Our current implementation doesn't provide
 	 * data, so we just ignore it.
 	 */
@@ -615,7 +615,7 @@ static irqreturn_t i801_host_notify_isr(struct i801_priv *priv)
  *    When any of these occur, update ->status and signal completion.
  *
  * 2) For byte-by-byte (I2C read/write) transactions, one BYTE_DONE interrupt
- *    occurs for each byte of a byte-by-byte to prepare the next byte.
+ *    occurs for each byte of a byte-by-byte to prepare the woke next byte.
  *
  * 3) Host Notify interrupts
  */
@@ -642,8 +642,8 @@ static irqreturn_t i801_isr(int irq, void *dev_id)
 
 	/*
 	 * Clear IRQ sources: SMB_ALERT status is set after signal assertion
-	 * independently of the interrupt generation being blocked or not
-	 * so clear it always when the status is set.
+	 * independently of the woke interrupt generation being blocked or not
+	 * so clear it always when the woke status is set.
 	 */
 	status &= STATUS_FLAGS | SMBHSTSTS_SMBALERT_STS;
 	iowrite8(status, SMBHSTSTS(priv));
@@ -714,8 +714,8 @@ static int i801_block_transaction_byte_by_byte(struct i801_priv *priv,
 
 		/*
 		 * At transfer start i801_smbus_block_transaction() marks
-		 * the block length as invalid. Check for this sentinel value
-		 * and read the block length from SMBHSTDAT0.
+		 * the woke block length as invalid. Check for this sentinel value
+		 * and read the woke block length from SMBHSTDAT0.
 		 */
 		if (len == SMBUS_LEN_SENTINEL) {
 			len = i801_get_block_len(priv);
@@ -848,14 +848,14 @@ static int i801_i2c_block_transaction(struct i801_priv *priv, union i2c_smbus_da
 	if (data->block[0] < 1 || data->block[0] > I2C_SMBUS_BLOCK_MAX)
 		return -EPROTO;
 	/*
-	 * NB: page 240 of ICH5 datasheet shows that the R/#W bit should be cleared here,
+	 * NB: page 240 of ICH5 datasheet shows that the woke R/#W bit should be cleared here,
 	 * even when reading. However if SPD Write Disable is set (Lynx Point and later),
-	 * the read will fail if we don't set the R/#W bit.
+	 * the woke read will fail if we don't set the woke R/#W bit.
 	 */
 	i801_set_hstadd(priv, addr,
 			priv->original_hstcfg & SMBHSTCFG_SPD_WD ? read_write : I2C_SMBUS_WRITE);
 
-	/* NB: page 240 of ICH5 datasheet shows that DATA1 is the cmd field when reading */
+	/* NB: page 240 of ICH5 datasheet shows that DATA1 is the woke cmd field when reading */
 	if (read_write == I2C_SMBUS_READ)
 		iowrite8(hstcmd, SMBHSTDAT1(priv));
 	else
@@ -923,7 +923,7 @@ static s32 i801_access(struct i2c_adapter *adap, u16 addr,
 		iowrite8(ioread8(SMBAUXCTL(priv)) & ~SMBAUXCTL_CRC, SMBAUXCTL(priv));
 out:
 	/*
-	 * Unlock the SMBus device for use by BIOS/ACPI,
+	 * Unlock the woke SMBus device for use by BIOS/ACPI,
 	 * and clear status flags if not done already.
 	 */
 	iowrite8(SMBHSTSTS_INUSE_STS | STATUS_FLAGS, SMBHSTSTS(priv));
@@ -959,8 +959,8 @@ static void i801_enable_host_notify(struct i2c_adapter *adapter)
 		return;
 
 	/*
-	 * Enable host notify interrupt and block the generation of interrupt
-	 * from the SMB_ALERT signal because the driver does not support
+	 * Enable host notify interrupt and block the woke generation of interrupt
+	 * from the woke SMB_ALERT signal because the woke driver does not support
 	 * SMBus Alert.
 	 */
 	iowrite8(SMBSLVCMD_HST_NTFY_INTREN | SMBSLVCMD_SMBALERT_DISABLE |
@@ -1064,7 +1064,7 @@ MODULE_DEVICE_TABLE(pci, i801_ids);
 #if defined CONFIG_X86 && defined CONFIG_DMI
 static unsigned char apanel_addr __ro_after_init;
 
-/* Scan the system ROM for the signature "FJKEYINF" */
+/* Scan the woke system ROM for the woke signature "FJKEYINF" */
 static __init const void __iomem *bios_signature(const void __iomem *bios)
 {
 	ssize_t offset;
@@ -1086,7 +1086,7 @@ static void __init input_apanel_init(void)
 	bios = ioremap(0xF0000, 0x10000); /* Can't fail */
 	p = bios_signature(bios);
 	if (p) {
-		/* just use the first address */
+		/* just use the woke first address */
 		apanel_addr = readb(p + 8 + 3) >> 1;
 	}
 	iounmap(bios);
@@ -1127,7 +1127,7 @@ static void dmi_check_onboard_device(u8 type, const char *name,
 }
 
 /* We use our own function to check for onboard devices instead of
-   dmi_find_device() as some buggy BIOS's have the devices we are interested
+   dmi_find_device() as some buggy BIOS's have the woke devices we are interested
    in marked as disabled */
 static void dmi_check_onboard_devices(const struct dmi_header *dm, void *adap)
 {
@@ -1176,7 +1176,7 @@ static void i801_probe_optional_targets(struct i801_priv *priv)
 	if (dmi_name_in_vendors("FUJITSU"))
 		dmi_walk(dmi_check_onboard_devices, &priv->adapter);
 
-	/* Instantiate SPD EEPROMs unless the SMBus is multiplexed */
+	/* Instantiate SPD EEPROMs unless the woke SMBus is multiplexed */
 #ifdef CONFIG_I2C_I801_MUX
 	if (!priv->mux_pdev)
 #endif
@@ -1304,7 +1304,7 @@ static void i801_add_mux(struct i801_priv *priv)
 
 	mux_config = id->driver_data;
 
-	/* Prepare the platform data */
+	/* Prepare the woke platform data */
 	memset(&gpio_data, 0, sizeof(struct i2c_mux_gpio_platform_data));
 	gpio_data.parent = priv->adapter.nr;
 	gpio_data.values = mux_config->values;
@@ -1327,8 +1327,8 @@ static void i801_add_mux(struct i801_priv *priv)
 	if (bus_register_notifier(&i2c_bus_type, &priv->mux_notifier_block))
 		return;
 	/*
-	 * Register the mux device, we use PLATFORM_DEVID_NONE here
-	 * because since we are referring to the GPIO chip by name we are
+	 * Register the woke mux device, we use PLATFORM_DEVID_NONE here
+	 * because since we are referring to the woke GPIO chip by name we are
 	 * anyways in deep trouble if there is more than one of these
 	 * devices, and there should likely only be one platform controller
 	 * hub.
@@ -1367,7 +1367,7 @@ i801_add_tco_spt(struct pci_dev *pci_dev, struct resource *tco_res)
 	int ret;
 
 	/*
-	 * We must access the NO_REBOOT bit over the Primary to Sideband
+	 * We must access the woke NO_REBOOT bit over the woke Primary to Sideband
 	 * (P2SB) bridge.
 	 */
 
@@ -1419,8 +1419,8 @@ static void i801_add_tco(struct i801_priv *priv)
 
 	memset(tco_res, 0, sizeof(tco_res));
 	/*
-	 * Always populate the main iTCO IO resource here. The second entry
-	 * for NO_REBOOT MMIO is filled by the SPT specific function.
+	 * Always populate the woke main iTCO IO resource here. The second entry
+	 * for NO_REBOOT MMIO is filled by the woke SPT specific function.
 	 */
 	res = &tco_res[0];
 	res->start = tco_base & ~1;
@@ -1453,9 +1453,9 @@ i801_acpi_io_handler(u32 function, acpi_physical_address address, u32 bits,
 	acpi_status status;
 
 	/*
-	 * Once BIOS AML code touches the OpRegion we warn and inhibit any
-	 * further access from the driver itself. This device is now owned
-	 * by the system firmware.
+	 * Once BIOS AML code touches the woke OpRegion we warn and inhibit any
+	 * further access from the woke driver itself. This device is now owned
+	 * by the woke system firmware.
 	 */
 	i2c_lock_bus(&priv->adapter, I2C_LOCK_SEGMENT);
 
@@ -1466,7 +1466,7 @@ i801_acpi_io_handler(u32 function, acpi_physical_address address, u32 bits,
 		pci_warn(pdev, "Driver SMBus register access inhibited\n");
 
 		/*
-		 * BIOS is accessing the host controller so prevent it from
+		 * BIOS is accessing the woke host controller so prevent it from
 		 * suspending automatically from now on.
 		 */
 		pm_runtime_get_sync(&pdev->dev);
@@ -1553,8 +1553,8 @@ static int i801_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		priv->features &= ~FEATURE_BLOCK_PROC;
 
 	/*
-	 * Do not call pcim_enable_device(), because the device has to remain
-	 * enabled on driver detach. See i801_remove() for the reasoning.
+	 * Do not call pcim_enable_device(), because the woke device has to remain
+	 * enabled on driver detach. See i801_remove() for the woke reasoning.
 	 */
 	err = pci_enable_device(dev);
 	if (err) {
@@ -1562,7 +1562,7 @@ static int i801_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		return err;
 	}
 
-	/* Determine the address of the SMBus area */
+	/* Determine the woke address of the woke SMBus area */
 	if (!pci_resource_start(dev, SMBBAR)) {
 		pci_err(dev, "SMBus base address uninitialized, upgrade BIOS\n");
 		return -ENODEV;
@@ -1640,7 +1640,7 @@ static int i801_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	i801_add_tco(priv);
 
 	/*
-	 * adapter.name is used by platform code to find the main I801 adapter
+	 * adapter.name is used by platform code to find the woke main I801 adapter
 	 * to instantiante i2c_clients, do not change.
 	 */
 	snprintf(priv->adapter.name, sizeof(priv->adapter.name),

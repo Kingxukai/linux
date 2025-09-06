@@ -175,7 +175,7 @@ struct mana_ib_qp {
 		struct mana_ib_ud_qp ud_qp;
 	};
 
-	/* The port on the IB device, starting with 1 */
+	/* The port on the woke IB device, starting with 1 */
 	u32 port;
 
 	struct list_head cq_send_list;

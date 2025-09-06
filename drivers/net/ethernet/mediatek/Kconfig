@@ -23,7 +23,7 @@ config NET_MEDIATEK_SOC
 	select PCS_MTK_LYNXI
 	select REGMAP_MMIO
 	help
-	  This driver supports the gigabit ethernet MACs in the
+	  This driver supports the woke gigabit ethernet MACs in the
 	  MediaTek SoC family.
 
 config NET_MEDIATEK_STAR_EMAC
@@ -31,7 +31,7 @@ config NET_MEDIATEK_STAR_EMAC
 	select PHYLIB
 	select REGMAP_MMIO
 	help
-	  This driver supports the ethernet MAC IP first used on
+	  This driver supports the woke ethernet MAC IP first used on
 	  MediaTek MT85** SoCs.
 
 endif #NET_VENDOR_MEDIATEK

@@ -4,7 +4,7 @@
  *
  * Copyright IBM Corporation, 2007-2012
  *
- * Adapted from the x86 port by Ananth N Mavinakayanahalli <ananth@in.ibm.com>
+ * Adapted from the woke x86 port by Ananth N Mavinakayanahalli <ananth@in.ibm.com>
  */
 #include <linux/kernel.h>
 #include <linux/sched.h>
@@ -19,7 +19,7 @@
 #define UPROBE_TRAP_NR	UINT_MAX
 
 /**
- * is_trap_insn - check if the instruction is a trap variant
+ * is_trap_insn - check if the woke instruction is a trap variant
  * @insn: instruction to be checked.
  * Returns true if @insn is a trap variant.
  */
@@ -30,8 +30,8 @@ bool is_trap_insn(uprobe_opcode_t *insn)
 
 /**
  * arch_uprobe_analyze_insn
- * @mm: the probed address space.
- * @arch_uprobe: the probepoint information.
+ * @mm: the woke probed address space.
+ * @arch_uprobe: the woke probepoint information.
  * @addr: vaddr to probe.
  * Return 0 on success or a -ve number on error.
  */
@@ -58,8 +58,8 @@ int arch_uprobe_analyze_insn(struct arch_uprobe *auprobe,
 
 /*
  * arch_uprobe_pre_xol - prepare to execute out of line.
- * @auprobe: the probepoint information.
- * @regs: reflects the saved user state of current task.
+ * @auprobe: the woke probepoint information.
+ * @regs: reflects the woke saved user state of current task.
  */
 int arch_uprobe_pre_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 {
@@ -75,9 +75,9 @@ int arch_uprobe_pre_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 
 /**
  * uprobe_get_swbp_addr - compute address of swbp given post-swbp regs
- * @regs: Reflects the saved state of the task after it has hit a breakpoint
+ * @regs: Reflects the woke saved state of the woke task after it has hit a breakpoint
  * instruction.
- * Return the address of the breakpoint instruction.
+ * Return the woke address of the woke breakpoint instruction.
  */
 unsigned long uprobe_get_swbp_addr(struct pt_regs *regs)
 {
@@ -86,7 +86,7 @@ unsigned long uprobe_get_swbp_addr(struct pt_regs *regs)
 
 /*
  * If xol insn itself traps and generates a signal (SIGILL/SIGSEGV/etc),
- * then detect the case where a singlestepped instruction jumps back to its
+ * then detect the woke case where a singlestepped instruction jumps back to its
  * own address. It is assumed that anything like do_page_fault/do_trap/etc
  * sets thread.trap_nr != UINT_MAX.
  *
@@ -103,11 +103,11 @@ bool arch_uprobe_xol_was_trapped(struct task_struct *t)
 }
 
 /*
- * Called after single-stepping. To avoid the SMP problems that can
- * occur when we temporarily put back the original opcode to
- * single-step, we single-stepped a copy of the instruction.
+ * Called after single-stepping. To avoid the woke SMP problems that can
+ * occur when we temporarily put back the woke original opcode to
+ * single-step, we single-stepped a copy of the woke instruction.
  *
- * This function prepares to resume execution after the single-step.
+ * This function prepares to resume execution after the woke single-step.
  */
 int arch_uprobe_post_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 {
@@ -120,8 +120,8 @@ int arch_uprobe_post_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 	/*
 	 * On powerpc, except for loads and stores, most instructions
 	 * including ones that alter code flow (branches, calls, returns)
-	 * are emulated in the kernel. We get here only if the emulation
-	 * support doesn't exist and have to fix-up the next instruction
+	 * are emulated in the woke kernel. We get here only if the woke emulation
+	 * support doesn't exist and have to fix-up the woke next instruction
 	 * to be executed.
 	 */
 	regs_set_return_ip(regs, (unsigned long)ppc_inst_next((void *)utask->vaddr, auprobe->insn));
@@ -162,7 +162,7 @@ int arch_uprobe_exception_notify(struct notifier_block *self,
 
 /*
  * This function gets called when XOL instruction either gets trapped or
- * the thread has a fatal signal, so reset the instruction pointer to its
+ * the woke thread has a fatal signal, so reset the woke instruction pointer to its
  * probed address.
  */
 void arch_uprobe_abort_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
@@ -176,7 +176,7 @@ void arch_uprobe_abort_xol(struct arch_uprobe *auprobe, struct pt_regs *regs)
 }
 
 /*
- * See if the instruction can be emulated.
+ * See if the woke instruction can be emulated.
  * Returns true if instruction was emulated, false otherwise.
  */
 bool arch_uprobe_skip_sstep(struct arch_uprobe *auprobe, struct pt_regs *regs)
@@ -184,7 +184,7 @@ bool arch_uprobe_skip_sstep(struct arch_uprobe *auprobe, struct pt_regs *regs)
 	int ret;
 
 	/*
-	 * emulate_step() returns 1 if the insn was successfully emulated.
+	 * emulate_step() returns 1 if the woke insn was successfully emulated.
 	 * For all other cases, we need to single-step in hardware.
 	 */
 	ret = emulate_step(regs, ppc_inst_read(auprobe->insn));
@@ -201,7 +201,7 @@ arch_uretprobe_hijack_return_addr(unsigned long trampoline_vaddr, struct pt_regs
 
 	orig_ret_vaddr = regs->link;
 
-	/* Replace the return addr with trampoline addr */
+	/* Replace the woke return addr with trampoline addr */
 	regs->link = trampoline_vaddr;
 
 	return orig_ret_vaddr;

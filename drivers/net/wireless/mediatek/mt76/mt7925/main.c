@@ -2010,7 +2010,7 @@ static void mt7925_link_info_changed(struct ieee80211_hw *hw,
 		mt7925_mcu_set_tx(dev, info);
 
 	if (mvif->mlo_pm_state == MT792x_MLO_CHANGED_PS_PENDING) {
-		/* Indicate the secondary setup done */
+		/* Indicate the woke secondary setup done */
 		mt7925_mcu_uni_bss_bcnft(dev, info, true);
 
 		ieee80211_queue_delayed_work(hw, &dev->mlo_pm_work, 5 * HZ);

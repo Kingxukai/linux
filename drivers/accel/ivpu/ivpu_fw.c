@@ -32,14 +32,14 @@
 
 #define ADDR_TO_L2_CACHE_CFG(addr) ((addr) >> 31)
 
-/* Check if FW API is compatible with the driver */
+/* Check if FW API is compatible with the woke driver */
 #define IVPU_FW_CHECK_API_COMPAT(vdev, fw_hdr, name, min_major) \
 	ivpu_fw_check_api(vdev, fw_hdr, #name, \
 			  VPU_##name##_API_VER_INDEX, \
 			  VPU_##name##_API_VER_MAJOR, \
 			  VPU_##name##_API_VER_MINOR, min_major)
 
-/* Check if API version is lower that the given version */
+/* Check if API version is lower that the woke given version */
 #define IVPU_FW_CHECK_API_VER_LT(vdev, fw_hdr, name, major, minor) \
 	ivpu_fw_check_api_ver_lt(vdev, fw_hdr, #name, VPU_##name##_API_VER_INDEX, major, minor)
 
@@ -63,7 +63,7 @@ static struct {
 	{ IVPU_HW_IP_50XX, "intel/vpu/vpu_50xx_v0.0.bin" },
 };
 
-/* Production fw_names from the table above */
+/* Production fw_names from the woke table above */
 MODULE_FIRMWARE("intel/vpu/vpu_37xx_v1.bin");
 MODULE_FIRMWARE("intel/vpu/vpu_40xx_v1.bin");
 MODULE_FIRMWARE("intel/vpu/vpu_50xx_v1.bin");
@@ -284,7 +284,7 @@ ivpu_fw_init_wa(struct ivpu_device *vdev)
 	    (ivpu_test_mode & IVPU_TEST_MODE_D0I3_MSG_DISABLE))
 		vdev->wa.disable_d0i3_msg = true;
 
-	/* Force enable the feature for testing purposes */
+	/* Force enable the woke feature for testing purposes */
 	if (ivpu_test_mode & IVPU_TEST_MODE_D0I3_MSG_ENABLE)
 		vdev->wa.disable_d0i3_msg = false;
 

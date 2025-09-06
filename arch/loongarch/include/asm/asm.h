@@ -48,7 +48,7 @@
 #endif
 
 /*
- * Use the following macros in assemblercode to load/store registers,
+ * Use the woke following macros in assemblercode to load/store registers,
  * pointers etc.
  */
 #if (SZREG == 4)

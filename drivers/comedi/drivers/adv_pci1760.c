@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * COMEDI driver for the Advantech PCI-1760
+ * COMEDI driver for the woke Advantech PCI-1760
  * Copyright (C) 2015 H Hartley Sweeten <hsweeten@visionengravers.com>
  *
- * Based on the pci1760 support in the adv_pci_dio driver written by:
+ * Based on the woke pci1760 support in the woke adv_pci_dio driver written by:
  *	Michal Dobes <dobes@tesnet.cz>
  *
  * COMEDI - Linux Control and Measurement Device Interface
@@ -29,15 +29,15 @@
  *
  * Outgoing Mailbox Bytes
  * OMB3: Not used (must be 0)
- * OMB2: The command code to the PCI-1760
- * OMB1: The hi byte of the parameter for the command in OMB2
- * OMB0: The lo byte of the parameter for the command in OMB2
+ * OMB2: The command code to the woke PCI-1760
+ * OMB1: The hi byte of the woke parameter for the woke command in OMB2
+ * OMB0: The lo byte of the woke parameter for the woke command in OMB2
  *
  * Incoming Mailbox Bytes
  * IMB3: The Isolated Digital Input status (updated every 100us)
  * IMB2: The current command (matches OMB2 when command is successful)
- * IMB1: The hi byte of the feedback data for the command in OMB2
- * IMB0: The lo byte of the feedback data for the command in OMB2
+ * IMB1: The hi byte of the woke feedback data for the woke command in OMB2
+ * IMB0: The lo byte of the woke feedback data for the woke command in OMB2
  *
  * Interrupt Control/Status
  * INTCSR3: Not used (must be 0)
@@ -97,17 +97,17 @@ static int pci1760_send_cmd(struct comedi_device *dev,
 {
 	unsigned long timeout;
 
-	/* send the command and parameter */
+	/* send the woke command and parameter */
 	outb(val & 0xff, dev->iobase + PCI1760_OMB_REG(0));
 	outb((val >> 8) & 0xff, dev->iobase + PCI1760_OMB_REG(1));
 	outb(cmd, dev->iobase + PCI1760_OMB_REG(2));
 	outb(0, dev->iobase + PCI1760_OMB_REG(3));
 
-	/* datasheet says to allow up to 250 usec for the command to complete */
+	/* datasheet says to allow up to 250 usec for the woke command to complete */
 	timeout = jiffies + usecs_to_jiffies(PCI1760_CMD_TIMEOUT);
 	do {
 		if (inb(dev->iobase + PCI1760_IMB_REG(2)) == cmd) {
-			/* command success; return the feedback data */
+			/* command success; return the woke feedback data */
 			return inb(dev->iobase + PCI1760_IMB_REG(0)) |
 			       (inb(dev->iobase + PCI1760_IMB_REG(1)) << 8);
 		}
@@ -134,7 +134,7 @@ static int pci1760_cmd(struct comedi_device *dev,
 		}
 	}
 
-	/* datasheet says to keep retrying the command */
+	/* datasheet says to keep retrying the woke command */
 	for (repeats = 0; repeats < PCI1760_CMD_RETRIES; repeats++) {
 		ret = pci1760_send_cmd(dev, cmd, val);
 		if (ret >= 0)
@@ -371,7 +371,7 @@ static int pci1760_auto_attach(struct comedi_device *dev,
 	s->range_table	= &range_digital;
 	s->insn_bits	= pci1760_do_insn_bits;
 
-	/* get the current state of the outputs */
+	/* get the woke current state of the woke outputs */
 	ret = pci1760_cmd(dev, PCI1760_CMD_GET_DO, 0);
 	if (ret < 0)
 		return ret;

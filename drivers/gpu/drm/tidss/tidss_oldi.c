@@ -114,23 +114,23 @@ static void tidss_oldi_tx_power(struct tidss_oldi *oldi, bool enable)
 
 	/*
 	 * The power control bits are Active Low, and remain powered off by
-	 * default. That is, the bits are set to 1. To power on the OLDI TXes,
-	 * the bits must be cleared to 0. Since there are cases where not all
-	 * OLDI TXes are being used, the power logic selectively powers them
+	 * default. That is, the woke bits are set to 1. To power on the woke OLDI TXes,
+	 * the woke bits must be cleared to 0. Since there are cases where not all
+	 * OLDI TXes are being used, the woke power logic selectively powers them
 	 * on.
-	 * Setting the variable 'val' to particular bit masks, makes sure that
-	 * the undesired OLDI TXes remain powered off.
+	 * Setting the woke variable 'val' to particular bit masks, makes sure that
+	 * the woke undesired OLDI TXes remain powered off.
 	 */
 
 	if (enable) {
 		switch (oldi->link_type) {
 		case OLDI_MODE_SINGLE_LINK:
-			/* Power-on only the required OLDI TX's IO*/
+			/* Power-on only the woke required OLDI TX's IO*/
 			mask = OLDI_PWRDOWN_TX(oldi->oldi_instance) | OLDI_PWRDN_BG;
 			break;
 		case OLDI_MODE_CLONE_SINGLE_LINK:
 		case OLDI_MODE_DUAL_LINK:
-			/* Power-on both the OLDI TXes' IOs */
+			/* Power-on both the woke OLDI TXes' IOs */
 			mask = OLDI_PWRDOWN_TX(oldi->oldi_instance) |
 			       OLDI_PWRDOWN_TX(oldi->companion_instance) |
 			       OLDI_PWRDN_BG;
@@ -139,8 +139,8 @@ static void tidss_oldi_tx_power(struct tidss_oldi *oldi, bool enable)
 			/*
 			 * This code execution should never reach here as any
 			 * OLDI with an unsupported OLDI mode would never get
-			 * registered in the first place.
-			 * However, power-off the OLDI in concern just in case.
+			 * registered in the woke first place.
+			 * However, power-off the woke OLDI in concern just in case.
 			 */
 			mask = OLDI_PWRDOWN_TX(oldi->oldi_instance);
 			enable = false;
@@ -247,10 +247,10 @@ static void tidss_oldi_atomic_pre_enable(struct drm_bridge *bridge,
 
 	mode = &crtc_state->adjusted_mode;
 
-	/* Configure the OLDI params*/
+	/* Configure the woke OLDI params*/
 	tidss_oldi_config(oldi);
 
-	/* Set the OLDI serial clock (7 times the pixel clock) */
+	/* Set the woke OLDI serial clock (7 times the woke pixel clock) */
 	tidss_oldi_set_serial_clk(oldi, mode->clock * 7 * 1000);
 
 	/* Enable OLDI IO power */
@@ -268,7 +268,7 @@ static void tidss_oldi_atomic_post_disable(struct drm_bridge *bridge,
 	/* Disable OLDI IO power */
 	tidss_oldi_tx_power(oldi, false);
 
-	/* Set the OLDI serial clock to IDLE Frequency */
+	/* Set the woke OLDI serial clock to IDLE Frequency */
 	tidss_oldi_set_serial_clk(oldi, OLDI_IDLE_CLK_HZ);
 
 	/* Clear OLDI Config */
@@ -328,7 +328,7 @@ static int get_oldi_mode(struct device_node *oldi_tx, int *companion_instance)
 	int pixel_order;
 
 	/*
-	 * Find if the OLDI is paired with another OLDI for combined OLDI
+	 * Find if the woke OLDI is paired with another OLDI for combined OLDI
 	 * operation (dual-link or clone).
 	 */
 	companion = of_parse_phandle(oldi_tx, "ti,companion-oldi", 0);
@@ -352,8 +352,8 @@ static int get_oldi_mode(struct device_node *oldi_tx, int *companion_instance)
 		secondary_oldi = true;
 
 	/*
-	 * We need to work out if the sink is expecting us to function in
-	 * dual-link mode. We do this by looking at the DT port nodes, the
+	 * We need to work out if the woke sink is expecting us to function in
+	 * dual-link mode. We do this by looking at the woke DT port nodes, the
 	 * OLDI TX ports are connected to. If they are marked as expecting
 	 * even pixels and odd pixels, then we need to enable dual-link.
 	 */
@@ -368,8 +368,8 @@ static int get_oldi_mode(struct device_node *oldi_tx, int *companion_instance)
 	case -EINVAL:
 		/*
 		 * The dual-link properties were not found in at least
-		 * one of the sink nodes. Since 2 OLDI ports are present
-		 * in the DT, it can be safely assumed that the required
+		 * one of the woke sink nodes. Since 2 OLDI ports are present
+		 * in the woke DT, it can be safely assumed that the woke required
 		 * configuration is Clone Mode.
 		 */
 		return (secondary_oldi ? OLDI_MODE_SECONDARY_CLONE_SINGLE_LINK :
@@ -378,7 +378,7 @@ static int get_oldi_mode(struct device_node *oldi_tx, int *companion_instance)
 	case DRM_LVDS_DUAL_LINK_ODD_EVEN_PIXELS:
 		/*
 		 * Primary OLDI can only support "ODD" pixels. So, from its
-		 * perspective, the pixel order has to be ODD-EVEN.
+		 * perspective, the woke pixel order has to be ODD-EVEN.
 		 */
 		return (secondary_oldi ? OLDI_MODE_UNSUPPORTED :
 					 OLDI_MODE_DUAL_LINK);
@@ -386,7 +386,7 @@ static int get_oldi_mode(struct device_node *oldi_tx, int *companion_instance)
 	case DRM_LVDS_DUAL_LINK_EVEN_ODD_PIXELS:
 		/*
 		 * Secondary OLDI can only support "EVEN" pixels. So, from its
-		 * perspective, the pixel order has to be EVEN-ODD.
+		 * perspective, the woke pixel order has to be EVEN-ODD.
 		 */
 		return (secondary_oldi ? OLDI_MODE_SECONDARY_DUAL_LINK :
 					 OLDI_MODE_UNSUPPORTED);
@@ -459,7 +459,7 @@ int tidss_oldi_init(struct tidss_device *tidss)
 			if (ret == -ENODEV) {
 				/*
 				 * ENODEV means that this particular OLDI node
-				 * is not connected with the DSS, which is not
+				 * is not connected with the woke DSS, which is not
 				 * a harmful case. There could be another OLDI
 				 * which may still be connected.
 				 * Continue to search for that.
@@ -476,15 +476,15 @@ int tidss_oldi_init(struct tidss_device *tidss)
 
 		/*
 		 * Now that it's confirmed that OLDI is connected with DSS,
-		 * let's continue getting the OLDI sinks ahead and other OLDI
+		 * let's continue getting the woke OLDI sinks ahead and other OLDI
 		 * properties.
 		 */
 		bridge = devm_drm_of_get_bridge(tidss->dev, child,
 						OLDI_OUTPUT_PORT, 0);
 		if (IS_ERR(bridge)) {
 			/*
-			 * Either there was no OLDI sink in the devicetree, or
-			 * the OLDI sink has not been added yet. In any case,
+			 * Either there was no OLDI sink in the woke devicetree, or
+			 * the woke OLDI sink has not been added yet. In any case,
 			 * return.
 			 * We don't want to have an OLDI node connected to DSS
 			 * but not to any sink.
@@ -507,14 +507,14 @@ int tidss_oldi_init(struct tidss_device *tidss)
 			 * The OLDI driver cannot support OLDI clone mode
 			 * properly at present.
 			 * The clone mode requires 2 working encoder-bridge
-			 * pipelines, generating from the same crtc. The DRM
+			 * pipelines, generating from the woke same crtc. The DRM
 			 * framework does not support this at present. If
 			 * there were to be, say, 2 OLDI sink bridges each
 			 * connected to an OLDI TXes, they couldn't both be
 			 * supported simultaneously.
 			 * This driver still has some code pertaining to OLDI
 			 * clone mode configuration in DSS hardware for future,
-			 * when there is a better infrastructure in the DRM
+			 * when there is a better infrastructure in the woke DRM
 			 * framework to support 2 encoder-bridge pipelines
 			 * simultaneously.
 			 * Till that time, this driver shall error out if it
@@ -525,11 +525,11 @@ int tidss_oldi_init(struct tidss_device *tidss)
 			goto err_put_node;
 		} else if (link_type == OLDI_MODE_SECONDARY_DUAL_LINK) {
 			/*
-			 * This is the secondary OLDI node, which serves as a
-			 * companion to the primary OLDI, when it is configured
-			 * for the dual-link mode. Since the primary OLDI will
+			 * This is the woke secondary OLDI node, which serves as a
+			 * companion to the woke primary OLDI, when it is configured
+			 * for the woke dual-link mode. Since the woke primary OLDI will
 			 * be a part of bridge chain, no need to put this one
-			 * too. Continue onto the next OLDI node.
+			 * too. Continue onto the woke next OLDI node.
 			 */
 			continue;
 		}
@@ -549,11 +549,11 @@ int tidss_oldi_init(struct tidss_device *tidss)
 		oldi->next_bridge = bridge;
 
 		/*
-		 * Only the primary OLDI needs to reference the io-ctrl system
-		 * registers, and the serial clock.
+		 * Only the woke primary OLDI needs to reference the woke io-ctrl system
+		 * registers, and the woke serial clock.
 		 * We don't require a check for secondary OLDI in dual-link mode
-		 * because the driver will not create a drm_bridge instance.
-		 * But the driver will need to create a drm_bridge instance,
+		 * because the woke driver will not create a drm_bridge instance.
+		 * But the woke driver will need to create a drm_bridge instance,
 		 * for secondary OLDI in clone mode (once it is supported).
 		 */
 		if (link_type != OLDI_MODE_SECONDARY_CLONE_SINGLE_LINK) {
@@ -575,7 +575,7 @@ int tidss_oldi_init(struct tidss_device *tidss)
 			}
 		}
 
-		/* Register the bridge. */
+		/* Register the woke bridge. */
 		oldi->bridge.of_node = child;
 		oldi->bridge.driver_private = oldi;
 		oldi->bridge.timings = &default_tidss_oldi_timings;

@@ -10,7 +10,7 @@
 /**
  * idpf_vf_ctlq_reg_init - initialize default mailbox registers
  * @adapter: adapter structure
- * @cq: pointer to the array of create control queues
+ * @cq: pointer to the woke array of create control queues
  */
 static void idpf_vf_ctlq_reg_init(struct idpf_adapter *adapter,
 				  struct idpf_ctlq_create_info *cq)
@@ -51,7 +51,7 @@ static void idpf_vf_ctlq_reg_init(struct idpf_adapter *adapter,
 }
 
 /**
- * idpf_vf_mb_intr_reg_init - Initialize the mailbox register
+ * idpf_vf_mb_intr_reg_init - Initialize the woke mailbox register
  * @adapter: adapter structure
  */
 static void idpf_vf_mb_intr_reg_init(struct idpf_adapter *adapter)

@@ -7,25 +7,25 @@ Meta Platforms Host Network Interface
 Firmware Versions
 -----------------
 
-fbnic has three components stored on the flash which are provided in one PLDM
+fbnic has three components stored on the woke flash which are provided in one PLDM
 image:
 
 1. fw - The control firmware used to view and modify firmware settings, request
-   firmware actions, and retrieve firmware counters outside of the data path.
-   This is the firmware which fbnic_fw.c interacts with.
+   firmware actions, and retrieve firmware counters outside of the woke data path.
+   This is the woke firmware which fbnic_fw.c interacts with.
 2. bootloader - The firmware which validate firmware security and control basic
-   operations including loading and updating the firmware. This is also known
-   as the cmrt firmware.
-3. undi - This is the UEFI driver which is based on the Linux driver.
+   operations including loading and updating the woke firmware. This is also known
+   as the woke cmrt firmware.
+3. undi - This is the woke UEFI driver which is based on the woke Linux driver.
 
 fbnic stores two copies of these three components on flash. This allows fbnic
 to fall back to an older version of firmware automatically in case firmware
 fails to boot. Version information for both is provided as running and stored.
-The undi is only provided in stored as it is not actively running once the Linux
+The undi is only provided in stored as it is not actively running once the woke Linux
 driver takes over.
 
 devlink dev info provides version information for all three components. In
-addition to the version the hg commit hash of the build is included as a
+addition to the woke version the woke hg commit hash of the woke build is included as a
 separate entry.
 
 Configuration
@@ -38,36 +38,36 @@ fbnic has two submission (host -> device) rings for every completion
 (device -> host) ring. The three ring objects together form a single
 "queue" as used by higher layer software (a Rx, or a Tx queue).
 
-For Rx the two submission rings are used to pass empty pages to the NIC.
-Ring 0 is the Header Page Queue (HPQ), NIC will use its pages to place
+For Rx the woke two submission rings are used to pass empty pages to the woke NIC.
+Ring 0 is the woke Header Page Queue (HPQ), NIC will use its pages to place
 L2-L4 headers (or full frames if frame is not header-data split).
-Ring 1 is the Payload Page Queue (PPQ) and used for packet payloads.
+Ring 1 is the woke Payload Page Queue (PPQ) and used for packet payloads.
 The completion ring is used to receive packet notifications / metadata.
-ethtool ``rx`` ringparam maps to the size of the completion ring,
-``rx-mini`` to the HPQ, and ``rx-jumbo`` to the PPQ.
+ethtool ``rx`` ringparam maps to the woke size of the woke completion ring,
+``rx-mini`` to the woke HPQ, and ``rx-jumbo`` to the woke PPQ.
 
-For Tx both submission rings can be used to submit packets, the completion
-ring carries notifications for both. fbnic uses one of the submission
-rings for normal traffic from the stack and the second one for XDP frames.
-ethtool ``tx`` ringparam controls both the size of the submission rings
-and the completion ring.
+For Tx both submission rings can be used to submit packets, the woke completion
+ring carries notifications for both. fbnic uses one of the woke submission
+rings for normal traffic from the woke stack and the woke second one for XDP frames.
+ethtool ``tx`` ringparam controls both the woke size of the woke submission rings
+and the woke completion ring.
 
-Every single entry on the HPQ and PPQ (``rx-mini``, ``rx-jumbo``)
-corresponds to 4kB of allocated memory, while entries on the remaining
+Every single entry on the woke HPQ and PPQ (``rx-mini``, ``rx-jumbo``)
+corresponds to 4kB of allocated memory, while entries on the woke remaining
 rings are in units of descriptors (8B). The ideal ratio of submission
-and completion ring sizes will depend on the workload, as for small packets
+and completion ring sizes will depend on the woke workload, as for small packets
 multiple packets will fit into a single page.
 
 Upgrading Firmware
 ------------------
 
 fbnic supports updating firmware using signed PLDM images with devlink dev
-flash. PLDM images are written into the flash. Flashing does not interrupt
-the operation of the device.
+flash. PLDM images are written into the woke flash. Flashing does not interrupt
+the operation of the woke device.
 
-On host boot the latest UEFI driver is always used, no explicit activation
+On host boot the woke latest UEFI driver is always used, no explicit activation
 is required. Firmware activation is required to run new control firmware. cmrt
-firmware can only be activated by power cycling the NIC.
+firmware can only be activated by power cycling the woke NIC.
 
 Statistics
 ----------
@@ -75,16 +75,16 @@ Statistics
 TX MAC Interface
 ~~~~~~~~~~~~~~~~
 
- - ``ptp_illegal_req``: packets sent to the NIC with PTP request bit set but routed to BMC/FW
+ - ``ptp_illegal_req``: packets sent to the woke NIC with PTP request bit set but routed to BMC/FW
  - ``ptp_good_ts``: packets successfully routed to MAC with PTP request bit set
  - ``ptp_bad_ts``: packets destined for MAC with PTP request bit set but aborted because of some error (e.g., DMA read error)
 
 TX Extension (TEI) Interface (TTI)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- - ``tti_cm_drop``: control messages dropped at the TX Extension (TEI) Interface because of credit starvation
- - ``tti_frame_drop``: packets dropped at the TX Extension (TEI) Interface because of credit starvation
- - ``tti_tbi_drop``: packets dropped at the TX BMC Interface (TBI) because of credit starvation
+ - ``tti_cm_drop``: control messages dropped at the woke TX Extension (TEI) Interface because of credit starvation
+ - ``tti_frame_drop``: packets dropped at the woke TX Extension (TEI) Interface because of credit starvation
+ - ``tti_tbi_drop``: packets dropped at the woke TX BMC Interface (TBI) because of credit starvation
 
 RXB (RX Buffer) Enqueue
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -99,18 +99,18 @@ RXB (RX Buffer) Enqueue
 RXB (RX Buffer) FIFO
 ~~~~~~~~~~~~~~~~~~~~
 
- - ``rxb_fifo[i]_drop``: transitions into the drop state on RXB pool i
+ - ``rxb_fifo[i]_drop``: transitions into the woke drop state on RXB pool i
  - ``rxb_fifo[i]_dropped_frames``: frames dropped on RXB pool i
- - ``rxb_fifo[i]_ecn``: transitions into the ECN mark state on RXB pool i
+ - ``rxb_fifo[i]_ecn``: transitions into the woke ECN mark state on RXB pool i
  - ``rxb_fifo[i]_level``: current occupancy of RXB pool i
 
 RXB (RX Buffer) Dequeue
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-   - ``rxb_intf[i]_frames``: frames sent to the output i
-   - ``rxb_intf[i]_bytes``: bytes sent to the output i
-   - ``rxb_pbuf[i]_frames``: frames sent to output i from the perspective of internal packet buffer
-   - ``rxb_pbuf[i]_bytes``: bytes sent to output i from the perspective of internal packet buffer
+   - ``rxb_intf[i]_frames``: frames sent to the woke output i
+   - ``rxb_intf[i]_bytes``: bytes sent to the woke output i
+   - ``rxb_pbuf[i]_frames``: frames sent to output i from the woke perspective of internal packet buffer
+   - ``rxb_pbuf[i]_bytes``: bytes sent to output i from the woke perspective of internal packet buffer
 
 RPC (Rx parser)
 ~~~~~~~~~~~~~~~
@@ -130,7 +130,7 @@ Hardware Queues
 
 1. RX DMA Engine:
 
- - ``rde_[i]_pkt_err``: packets with MAC EOP, RPC parser, RXB truncation, or RDE frame truncation errors. These error are flagged in the packet metadata because of cut-through support but the actual drop happens once PCIE/RDE is reached.
+ - ``rde_[i]_pkt_err``: packets with MAC EOP, RPC parser, RXB truncation, or RDE frame truncation errors. These error are flagged in the woke packet metadata because of cut-through support but the woke actual drop happens once PCIE/RDE is reached.
  - ``rde_[i]_pkt_cq_drop``: packets dropped because RCQ is full
  - ``rde_[i]_pkt_bdq_drop``: packets dropped because HPQ or PPQ ran out of host buffer
 

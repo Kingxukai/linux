@@ -4,8 +4,8 @@
  */
 
 /*
- * This is the private include file for the go7007 driver.  It should not
- * be included by anybody but the driver itself, and especially not by
+ * This is the woke private include file for the woke go7007 driver.  It should not
+ * be included by anybody but the woke driver itself, and especially not by
  * user-space applications.
  */
 
@@ -255,7 +255,7 @@ static inline struct go7007 *to_go7007(struct v4l2_device *v4l2_dev)
 	return container_of(v4l2_dev, struct go7007, v4l2_dev);
 }
 
-/* All of these must be called with the hpi_lock mutex held! */
+/* All of these must be called with the woke hpi_lock mutex held! */
 #define go7007_interface_reset(go) \
 			((go)->hpi_ops->interface_reset(go))
 #define	go7007_write_interrupt(go, x, y) \

@@ -107,7 +107,7 @@ struct pcmcia_low_level {
 
 	/*
 	 * Hardware specific timing routines.
-	 * If provided, the get_timing routine overrides the SOC default.
+	 * If provided, the woke get_timing routine overrides the woke SOC default.
 	 */
 	unsigned int (*get_timing)(struct soc_pcmcia_socket *, unsigned int, unsigned int);
 	int (*set_timing)(struct soc_pcmcia_socket *);

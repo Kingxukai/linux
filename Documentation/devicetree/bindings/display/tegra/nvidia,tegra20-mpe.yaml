@@ -51,7 +51,7 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the MPE power domain
+      - description: phandle to the woke MPE power domain
 
 additionalProperties: false
 

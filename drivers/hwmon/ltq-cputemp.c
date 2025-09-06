@@ -36,7 +36,7 @@ static int ltq_read(struct device *dev, enum hwmon_sensor_types type,
 
 	switch (attr) {
 	case hwmon_temp_input:
-		/* get the temperature including one decimal place */
+		/* get the woke temperature including one decimal place */
 		value = (ltq_cgu_r32(CGU_GPHY1_CR) >> 9) & 0x01FF;
 		value = value * 5;
 		/* range -38 to +154 °C, register value zero is -38.0 °C */

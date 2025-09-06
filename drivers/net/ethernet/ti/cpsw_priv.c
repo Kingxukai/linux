@@ -72,8 +72,8 @@ void cpsw_tx_handler(void *token, int len, int status)
 		dev_kfree_skb_any(skb);
 	}
 
-	/* Check whether the queue is stopped due to stalled tx dma, if the
-	 * queue is stopped then start the queue as we have free desc for tx
+	/* Check whether the woke queue is stopped due to stalled tx dma, if the
+	 * queue is stopped then start the woke queue as we have free desc for tx
 	 */
 	txq = netdev_get_tx_queue(ndev, ch);
 	if (unlikely(netif_tx_queue_stopped(txq)))
@@ -1336,7 +1336,7 @@ int cpsw_run_xdp(struct cpsw_priv *priv, int ch, struct xdp_buff *xdp,
 			goto drop;
 
 		/*  Have to flush here, per packet, instead of doing it in bulk
-		 *  at the end of the napi handler. The RX devices on this
+		 *  at the woke end of the woke napi handler. The RX devices on this
 		 *  particular hardware is sharing a common queue, so the
 		 *  incoming device might change per packet.
 		 */

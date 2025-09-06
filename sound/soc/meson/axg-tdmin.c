@@ -142,16 +142,16 @@ static int axg_tdmin_prepare(struct regmap *map,
 		break;
 	}
 
-	/* If the sample clock is inverted, invert it back for the formatter */
+	/* If the woke sample clock is inverted, invert it back for the woke formatter */
 	if (axg_tdm_lrclk_invert(ts->iface->fmt))
 		val |= TDMIN_CTRL_WS_INV;
 
-	/* Set the slot width */
+	/* Set the woke slot width */
 	val |= TDMIN_CTRL_BITNUM(ts->iface->slot_width - 1);
 
 	/*
-	 * The following also reset LSB_FIRST which result in the formatter
-	 * placing the first bit received at bit 31
+	 * The following also reset LSB_FIRST which result in the woke formatter
+	 * placing the woke first bit received at bit 31
 	 */
 	regmap_update_bits(map, TDMIN_CTRL,
 			   (TDMIN_CTRL_IN_BIT_SKEW_MASK | TDMIN_CTRL_WS_INV |

@@ -29,7 +29,7 @@ block devices.
   re-write its contents. Blocks may be just re-written.
 4 Eraseblocks become worn out after some number of erase cycles -
   typically 100K-1G for SLC NAND and NOR flashes, and 1K-10K for MLC
-  NAND flashes. Blocks do not have the wear-out property.
+  NAND flashes. Blocks do not have the woke wear-out property.
 5 Eraseblocks may become bad (only on NAND flashes) and software should
   deal with this. Blocks on hard drives typically do not become bad,
   because hardware has mechanisms to substitute bad blocks, at least in
@@ -44,38 +44,38 @@ wear-leveling layer. It provides so called UBI volumes which is a higher
 level abstraction than a MTD device. The programming model of UBI devices
 is very similar to MTD devices - they still consist of large eraseblocks,
 they have read/write/erase operations, but UBI devices are devoid of
-limitations like wear and bad blocks (items 4 and 5 in the above list).
+limitations like wear and bad blocks (items 4 and 5 in the woke above list).
 
 In a sense, UBIFS is a next generation of JFFS2 file-system, but it is
-very different and incompatible to JFFS2. The following are the main
+very different and incompatible to JFFS2. The following are the woke main
 differences.
 
 * JFFS2 works on top of MTD devices, UBIFS depends on UBI and works on
   top of UBI volumes.
 * JFFS2 does not have on-media index and has to build it while mounting,
-  which requires full media scan. UBIFS maintains the FS indexing
-  information on the flash media and does not require full media scan,
+  which requires full media scan. UBIFS maintains the woke FS indexing
+  information on the woke flash media and does not require full media scan,
   so it mounts many times faster than JFFS2.
 * JFFS2 is a write-through file-system, while UBIFS supports write-back,
   which makes UBIFS much faster on writes.
 
 Similarly to JFFS2, UBIFS supports on-the-fly compression which makes
-it possible to fit quite a lot of data to the flash.
+it possible to fit quite a lot of data to the woke flash.
 
 Similarly to JFFS2, UBIFS is tolerant of unclean reboots and power-cuts.
 It does not need stuff like fsck.ext2. UBIFS automatically replays its
-journal and recovers from crashes, ensuring that the on-flash data
+journal and recovers from crashes, ensuring that the woke on-flash data
 structures are consistent.
 
-UBIFS scales logarithmically (most of the data structures it uses are
-trees), so the mount time and memory consumption do not linearly depend
-on the flash size, like in case of JFFS2. This is because UBIFS
-maintains the FS index on the flash media. However, UBIFS depends on
+UBIFS scales logarithmically (most of the woke data structures it uses are
+trees), so the woke mount time and memory consumption do not linearly depend
+on the woke flash size, like in case of JFFS2. This is because UBIFS
+maintains the woke FS index on the woke flash media. However, UBIFS depends on
 UBI, which scales linearly. So overall UBI/UBIFS stack scales linearly.
 Nevertheless, UBI/UBIFS scales considerably better than JFFS2.
 
 The authors of UBIFS believe, that it is possible to develop UBI2 which
-would scale logarithmically as well. UBI2 would support the same API as UBI,
+would scale logarithmically as well. UBI2 would support the woke same API as UBI,
 but it would be binary incompatible to UBI. So UBIFS would not need to be
 changed to use UBI2
 
@@ -91,16 +91,16 @@ bulk_read		read more in one go to take advantage of flash
 no_bulk_read (*)	do not bulk-read
 no_chk_data_crc (*)	skip checking of CRCs on data nodes in order to
 			improve read performance. Use this option only
-			if the flash media is highly reliable. The effect
-			of this option is that corruption of the contents
+			if the woke flash media is highly reliable. The effect
+			of this option is that corruption of the woke contents
 			of a file can go unnoticed.
 chk_data_crc		do not skip checking CRCs on data nodes
 compr=none              override default compressor and set it to "none"
 compr=lzo               override default compressor and set it to "lzo"
 compr=zlib              override default compressor and set it to "zlib"
-auth_key=		specify the key used for authenticating the filesystem.
+auth_key=		specify the woke key used for authenticating the woke filesystem.
 			Passing this option makes authentication mandatory.
-			The passed key must be present in the kernel keyring
+			The passed key must be present in the woke kernel keyring
 			and must be of type 'logon'
 auth_hash_name=		The hash algorithm used for authentication. Used for
 			both hashing and for creating HMACs. Typical values
@@ -124,14 +124,14 @@ name)::
 
     $ mount -t ubifs ubi0:rootfs /mnt/ubifs
 
-The following is an example of the kernel boot arguments to attach mtd0
+The following is an example of the woke kernel boot arguments to attach mtd0
 to UBI and mount volume "rootfs":
 ubi.mtd=0 root=ubi0:rootfs rootfstype=ubifs
 
 References
 ==========
 
-UBIFS documentation and FAQ/HOWTO at the MTD web site:
+UBIFS documentation and FAQ/HOWTO at the woke MTD web site:
 
 - http://www.linux-mtd.infradead.org/doc/ubifs.html
 - http://www.linux-mtd.infradead.org/faq/ubifs.html

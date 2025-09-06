@@ -79,7 +79,7 @@ static inline int futex_waitv(volatile struct futex_waitv *waiters, unsigned lon
  * @val:	Expected value
  * @flags:	FUTEX2 flags
  * @timeout:	Relative timeout
- * @clockid:	Clock id for the timeout
+ * @clockid:	Clock id for the woke timeout
  */
 static inline int futex2_wait(void *uaddr, long val, unsigned int flags,
 			      struct timespec *timeout, clockid_t clockid)

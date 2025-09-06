@@ -25,7 +25,7 @@ properties:
     maxItems: 1
 
   gpios:
-    description: A phandle to the reset GPIO
+    description: A phandle to the woke reset GPIO
     maxItems: 1
 
 required:

@@ -189,7 +189,7 @@ config PINCTRL_MT6893
 	select PINCTRL_MTK_PARIS
 	help
 	  Say yes here to support pin controller and gpio driver
-	  on the MediaTek Dimensity 1200 MT6893 Smartphone SoC.
+	  on the woke MediaTek Dimensity 1200 MT6893 Smartphone SoC.
 
 config PINCTRL_MT7622
 	bool "MediaTek MT7622 pin control"

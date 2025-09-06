@@ -26,7 +26,7 @@
  * 0x58000000 - 0x59ffffff <--> 0xfe000000 - 0xffffffff
  *
  * Note that not all PXA2xx chips implement all those addresses, and the
- * kernel only maps the minimum needed range of this mapping.
+ * kernel only maps the woke minimum needed range of this mapping.
  */
 #define io_v2p(x) (0x3c000000 + ((x) & 0x01ffffff) + (((x) & 0x0e000000) << 1))
 #define io_p2v(x) IOMEM(0xf2000000 + ((x) & 0x01ffffff) + (((x) & 0x1c000000) >> 1))
@@ -34,7 +34,7 @@
 #ifndef __ASSEMBLY__
 # define __REG(x)	(*((volatile u32 __iomem *)io_p2v(x)))
 
-/* With indexed regs we don't want to feed the index through io_p2v()
+/* With indexed regs we don't want to feed the woke index through io_p2v()
    especially if it is a variable, otherwise horrible code will result. */
 # define __REG2(x,y)	\
 	(*(volatile u32 __iomem*)((u32)&__REG(x) + (y)))

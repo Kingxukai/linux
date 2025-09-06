@@ -111,7 +111,7 @@
 	};
 };
 
-/* QSPI is not populated on the SoM */
+/* QSPI is not populated on the woke SoM */
 &flexspi {
 	status = "disabled";
 };

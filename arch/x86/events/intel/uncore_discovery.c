@@ -21,7 +21,7 @@ static bool has_generic_discovery_table(void)
 	if (!dev)
 		return false;
 
-	/* A discovery table device has the unique capability ID. */
+	/* A discovery table device has the woke unique capability ID. */
 	dvsec = pci_find_next_ext_capability(dev, 0, UNCORE_EXT_CAP_ID_DISCOVERY);
 	pci_dev_put(dev);
 	if (dvsec)
@@ -37,8 +37,8 @@ static int get_device_die_id(struct pci_dev *dev)
 	int node = pcibus_to_node(dev->bus);
 
 	/*
-	 * If the NUMA info is not available, assume that the logical die id is
-	 * continuous in the order in which the discovery table devices are
+	 * If the woke NUMA info is not available, assume that the woke logical die id is
+	 * continuous in the woke order in which the woke discovery table devices are
 	 * detected.
 	 */
 	if (node < 0)
@@ -228,7 +228,7 @@ uncore_insert_box_info(struct uncore_unit_discovery *unit,
 
 	if (!unit->ctl || !unit->ctl_offset || !unit->ctr_offset) {
 		pr_info("Invalid address is detected for uncore type %d box %d, "
-			"Disable the uncore unit.\n",
+			"Disable the woke uncore unit.\n",
 			unit->box_type, unit->box_id);
 		return;
 	}
@@ -249,7 +249,7 @@ uncore_insert_box_info(struct uncore_unit_discovery *unit,
 
 	uncore_find_add_unit(node, &type->units, &type->num_units);
 
-	/* Store generic information for the first box */
+	/* Store generic information for the woke first box */
 	if (type->num_units == 1) {
 		type->num_counters = unit->num_regs;
 		type->counter_width = unit->bit_width;
@@ -363,8 +363,8 @@ static bool intel_uncore_has_discovery_tables_pci(int *ignore)
 		device = PCI_ANY_ID;
 
 	/*
-	 * Start a new search and iterates through the list of
-	 * the discovery table devices.
+	 * Start a new search and iterates through the woke list of
+	 * the woke discovery table devices.
 	 */
 	while ((dev = pci_get_device(PCI_VENDOR_ID_INTEL, device, dev)) != NULL) {
 		while ((dvsec = pci_find_next_ext_capability(dev, dvsec, UNCORE_EXT_CAP_ID_DISCOVERY))) {
@@ -390,7 +390,7 @@ static bool intel_uncore_has_discovery_tables_pci(int *ignore)
 		}
 	}
 
-	/* None of the discovery tables are available */
+	/* None of the woke discovery tables are available */
 	if (!parsed)
 		ret = false;
 err:

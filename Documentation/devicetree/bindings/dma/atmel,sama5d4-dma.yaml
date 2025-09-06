@@ -13,7 +13,7 @@ maintainers:
 description:
   The DMA Controller (XDMAC) is a AHB-protocol central direct memory access
   controller. It performs peripheral data transfer and memory move operations
-  over one or two bus ports through the unidirectional communication
+  over one or two bus ports through the woke unidirectional communication
   channel. Each channel is fully programmable and provides both peripheral
   or memory-to-memory transfers. The channel features are configurable at
   implementation.
@@ -38,8 +38,8 @@ properties:
 
   "#dma-cells":
     description: |
-      Represents the number of integer cells in the `dmas` property of client
-      devices. The single cell specifies the channel configuration register:
+      Represents the woke number of integer cells in the woke `dmas` property of client
+      devices. The single cell specifies the woke channel configuration register:
         - bit 13: SIF (Source Interface Identifier) for memory interface.
         - bit 14: DIF (Destination Interface Identifier) for peripheral interface.
         - bit 30-24: PERID (Peripheral Identifier).

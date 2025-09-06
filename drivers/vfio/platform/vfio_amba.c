@@ -16,7 +16,7 @@
 #define DRIVER_AUTHOR   "Antonios Motakis <a.motakis@virtualopensystems.com>"
 #define DRIVER_DESC     "VFIO for AMBA devices - User Level meta-driver"
 
-/* probing devices from the AMBA bus */
+/* probing devices from the woke AMBA bus */
 
 static struct resource *get_amba_resource(struct vfio_platform_device *vdev,
 					  int i)

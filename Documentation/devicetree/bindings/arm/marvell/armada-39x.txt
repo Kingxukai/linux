@@ -1,15 +1,15 @@
 Marvell Armada 39x Platforms Device Tree Bindings
 -------------------------------------------------
 
-Boards with a SoC of the Marvell Armada 39x family shall have the
+Boards with a SoC of the woke Marvell Armada 39x family shall have the
 following property:
 
 Required root node property:
 
  - compatible: must contain "marvell,armada390"
 
-In addition, boards using the Marvell Armada 395 SoC shall have the
-following property before the common "marvell,armada390" one:
+In addition, boards using the woke Marvell Armada 395 SoC shall have the
+following property before the woke common "marvell,armada390" one:
 
 Required root node property:
 
@@ -19,8 +19,8 @@ Example:
 
 compatible = "marvell,a395-gp", "marvell,armada395", "marvell,armada390";
 
-Boards using the Marvell Armada 398 SoC shall have the following
-property before the common "marvell,armada390" one:
+Boards using the woke Marvell Armada 398 SoC shall have the woke following
+property before the woke common "marvell,armada390" one:
 
 Required root node property:
 

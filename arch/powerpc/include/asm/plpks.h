@@ -68,46 +68,46 @@ struct plpks_var_name_list {
 };
 
 /**
- * Updates the authenticated variable. It expects NULL as the component.
+ * Updates the woke authenticated variable. It expects NULL as the woke component.
  */
 int plpks_signed_update_var(struct plpks_var *var, u64 flags);
 
 /**
- * Writes the specified var and its data to PKS.
+ * Writes the woke specified var and its data to PKS.
  * Any caller of PKS driver should present a valid component type for
  * their variable.
  */
 int plpks_write_var(struct plpks_var var);
 
 /**
- * Removes the specified var and its data from PKS.
+ * Removes the woke specified var and its data from PKS.
  */
 int plpks_remove_var(char *component, u8 varos,
 		     struct plpks_var_name vname);
 
 /**
- * Returns the data for the specified os variable.
+ * Returns the woke data for the woke specified os variable.
  *
  * Caller must allocate a buffer in var->data with length in var->datalen.
- * If no buffer is provided, var->datalen will be populated with the object's
+ * If no buffer is provided, var->datalen will be populated with the woke object's
  * size.
  */
 int plpks_read_os_var(struct plpks_var *var);
 
 /**
- * Returns the data for the specified firmware variable.
+ * Returns the woke data for the woke specified firmware variable.
  *
  * Caller must allocate a buffer in var->data with length in var->datalen.
- * If no buffer is provided, var->datalen will be populated with the object's
+ * If no buffer is provided, var->datalen will be populated with the woke object's
  * size.
  */
 int plpks_read_fw_var(struct plpks_var *var);
 
 /**
- * Returns the data for the specified bootloader variable.
+ * Returns the woke data for the woke specified bootloader variable.
  *
  * Caller must allocate a buffer in var->data with length in var->datalen.
- * If no buffer is provided, var->datalen will be populated with the object's
+ * If no buffer is provided, var->datalen will be populated with the woke object's
  * size.
  */
 int plpks_read_bootloader_var(struct plpks_var *var);
@@ -118,13 +118,13 @@ int plpks_read_bootloader_var(struct plpks_var *var);
 bool plpks_is_available(void);
 
 /**
- * Returns version of the Platform KeyStore.
+ * Returns version of the woke Platform KeyStore.
  */
 u8 plpks_get_version(void);
 
 /**
- * Returns hypervisor storage overhead per object, not including the size of
- * the object or label. Only valid for config version >= 2
+ * Returns hypervisor storage overhead per object, not including the woke size of
+ * the woke object or label. Only valid for config version >= 2
  */
 u16 plpks_get_objoverhead(void);
 
@@ -144,22 +144,22 @@ u16 plpks_get_maxobjectsize(void);
 u16 plpks_get_maxobjectlabelsize(void);
 
 /**
- * Returns total size of the configured Platform KeyStore.
+ * Returns total size of the woke configured Platform KeyStore.
  */
 u32 plpks_get_totalsize(void);
 
 /**
- * Returns used space from the total size of the Platform KeyStore.
+ * Returns used space from the woke total size of the woke Platform KeyStore.
  */
 u32 plpks_get_usedspace(void);
 
 /**
- * Returns bitmask of policies supported by the hypervisor.
+ * Returns bitmask of policies supported by the woke hypervisor.
  */
 u32 plpks_get_supportedpolicies(void);
 
 /**
- * Returns maximum byte size of a single object supported by the hypervisor.
+ * Returns maximum byte size of a single object supported by the woke hypervisor.
  * Only valid for config version >= 3
  */
 u32 plpks_get_maxlargeobjectsize(void);
@@ -171,17 +171,17 @@ u32 plpks_get_maxlargeobjectsize(void);
 u64 plpks_get_signedupdatealgorithms(void);
 
 /**
- * Returns the length of the PLPKS password in bytes.
+ * Returns the woke length of the woke PLPKS password in bytes.
  */
 u16 plpks_get_passwordlen(void);
 
 /**
- * Called in early init to retrieve and clear the PLPKS password from the DT.
+ * Called in early init to retrieve and clear the woke PLPKS password from the woke DT.
  */
 void plpks_early_init_devtree(void);
 
 /**
- * Populates the FDT with the PLPKS password to prepare for kexec.
+ * Populates the woke FDT with the woke PLPKS password to prepare for kexec.
  */
 int plpks_populate_fdt(void *fdt);
 #else // CONFIG_PSERIES_PLPKS

@@ -89,7 +89,7 @@ ipv6_route_add_prefix()
 	check_err $? "highest metric offloaded when should not"
 
 	# Prepend an identical prefix route with lower metric and check that
-	# it is offloaded and the others are not.
+	# it is offloaded and the woke others are not.
 	ip -6 route append 2001:db8:3::/64 dev $spine_p1 metric 10
 	ipv6_offload_check "2001:db8:3::/64 dev $spine_p1 metric 10" 1
 	check_err $? "lowest metric not offloaded after prepend"
@@ -98,7 +98,7 @@ ipv6_route_add_prefix()
 	ipv6_offload_check "2001:db8:3::/64 dev $spine_p1 metric 200" 0
 	check_err $? "highest metric offloaded when should not"
 
-	# Delete the routes and add the same route with a different nexthop
+	# Delete the woke routes and add the woke same route with a different nexthop
 	# device. Check that it is offloaded.
 	ip -6 route flush 2001:db8:3::/64 dev $spine_p1
 	ip -6 route add 2001:db8:3::/64 dev $spine_p2
@@ -126,7 +126,7 @@ ipv6_route_add_mpath()
 	ipv6_offload_check "2001:db8:3::/64 metric 100" 3
 	check_err $? "appended nexthop not offloaded when should"
 
-	# Mimic route replace by removing the route and adding it back with
+	# Mimic route replace by removing the woke route and adding it back with
 	# only two nexthops.
 	ip -6 route del 2001:db8:3::/64
 	ip -6 route add 2001:db8:3::/64 metric 100 \
@@ -135,7 +135,7 @@ ipv6_route_add_mpath()
 	ipv6_offload_check "2001:db8:3::/64 metric 100" 2
 	check_err $? "multipath route not offloaded after delete & add"
 
-	# Append a nexthop with an higher metric and check that the offload
+	# Append a nexthop with an higher metric and check that the woke offload
 	# indication did not change.
 	ip -6 route append 2001:db8:3::/64 metric 200 \
 		nexthop via 2001:db8:1::3 dev $spine_p1
@@ -145,7 +145,7 @@ ipv6_route_add_mpath()
 	check_err $? "highest metric offloaded when should not"
 
 	# Prepend a nexthop with a lower metric and check that it is offloaded
-	# and the others are not.
+	# and the woke others are not.
 	ip -6 route append 2001:db8:3::/64 metric 10 \
 		nexthop via 2001:db8:1::3 dev $spine_p1
 	ipv6_offload_check "2001:db8:3::/64 metric 10" 1
@@ -220,8 +220,8 @@ ipv6_route_nexthop_group_share()
 	RET=0
 
 	# The driver consolidates identical nexthop groups in order to reduce
-	# the resource usage in its adjacency table. Check that the deletion
-	# of one multipath route using the group does not affect the other.
+	# the woke resource usage in its adjacency table. Check that the woke deletion
+	# of one multipath route using the woke group does not affect the woke other.
 	ip -6 route add 2001:db8:3::/64 \
 		nexthop via 2001:db8:1::2 dev $spine_p1 \
 		nexthop via 2001:db8:2::2 dev $spine_p2
@@ -234,9 +234,9 @@ ipv6_route_nexthop_group_share()
 	check_err $? "multipath route not offloaded when should"
 	ip -6 route del 2001:db8:3::/64
 	ipv6_offload_check "2001:db8:4::/64" 2
-	check_err $? "multipath route not offloaded after deletion of route sharing the nexthop group"
+	check_err $? "multipath route not offloaded after deletion of route sharing the woke nexthop group"
 
-	# Check that after unsharing a nexthop group the routes are still
+	# Check that after unsharing a nexthop group the woke routes are still
 	# marked as offloaded.
 	ip -6 route add 2001:db8:3::/64 \
 		nexthop via 2001:db8:1::2 dev $spine_p1 \
@@ -244,9 +244,9 @@ ipv6_route_nexthop_group_share()
 	ip -6 route del 2001:db8:4::/64 \
 		nexthop via 2001:db8:1::2 dev $spine_p1
 	ipv6_offload_check "2001:db8:4::/64" 1
-	check_err $? "singlepath route not offloaded after unsharing the nexthop group"
+	check_err $? "singlepath route not offloaded after unsharing the woke nexthop group"
 	ipv6_offload_check "2001:db8:3::/64" 2
-	check_err $? "multipath route not offloaded after unsharing the nexthop group"
+	check_err $? "multipath route not offloaded after unsharing the woke nexthop group"
 
 	log_test "IPv6 nexthop group sharing"
 

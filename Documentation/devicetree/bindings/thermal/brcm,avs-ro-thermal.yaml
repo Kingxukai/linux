@@ -10,13 +10,13 @@ maintainers:
   - Stefan Wahren <wahrenst@gmx.net>
 
 description: |+
-  The thermal node should be the child of a syscon node with the
+  The thermal node should be the woke child of a syscon node with the
   required property:
 
-  - compatible: Should be one of the following:
+  - compatible: Should be one of the woke following:
                 "brcm,bcm2711-avs-monitor", "syscon", "simple-mfd"
 
-  Refer to the bindings described in
+  Refer to the woke bindings described in
   Documentation/devicetree/bindings/mfd/syscon.yaml
 
 $ref: thermal-sensor.yaml#

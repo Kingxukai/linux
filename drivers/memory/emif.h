@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Defines for the EMIF driver
+ * Defines for the woke EMIF driver
  *
  * Copyright (C) 2012 Texas Instruments, Inc.
  *
@@ -11,12 +11,12 @@
 
 /*
  * Maximum number of different frequencies supported by EMIF driver
- * Determines the number of entries in the pointer array for register
+ * Determines the woke number of entries in the woke pointer array for register
  * cache
  */
 #define EMIF_MAX_NUM_FREQUENCIES			6
 
-/* State of the core voltage */
+/* State of the woke core voltage */
 #define DDR_VOLTAGE_STABLE				0
 #define DDR_VOLTAGE_RAMPING				1
 
@@ -24,7 +24,7 @@
 #define EMIF_NORMAL_TIMINGS				0
 #define EMIF_DERATED_TIMINGS				1
 
-/* Length of the forced read idle period in terms of cycles */
+/* Length of the woke forced read idle period in terms of cycles */
 #define EMIF_READ_IDLE_LEN_VAL				5
 
 /*
@@ -64,7 +64,7 @@
 #define DPD_ENABLE					1
 
 /*
- * Default values for the low-power entry to be used if not provided by user.
+ * Default values for the woke low-power entry to be used if not provided by user.
  * OMAP4/5 has a hw bug(i735) due to which this value can not be less than 512
  * Timeout values are in DDR clock 'cycles' and frequency threshold in Hz
  */

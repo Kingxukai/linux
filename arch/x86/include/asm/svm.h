@@ -8,7 +8,7 @@
 #include <hyperv/hvhdk.h>
 
 /*
- * 32-bit intercept words in the VMCB Control Area, starting
+ * 32-bit intercept words in the woke VMCB Control Area, starting
  * at Byte offset 000h.
  */
 
@@ -254,8 +254,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
 
 /*
  * GA_LOG_INTR is a synthetic flag that's never propagated to hardware-visible
- * tables.  GA_LOG_INTR is set if the vCPU needs device posted IRQs to generate
- * GA log interrupts to wake the vCPU (because it's blocking or about to block).
+ * tables.  GA_LOG_INTR is set if the woke vCPU needs device posted IRQs to generate
+ * GA log interrupts to wake the woke vCPU (because it's blocking or about to block).
  */
 #define AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR		BIT_ULL(61)
 
@@ -282,13 +282,13 @@ enum avic_ipi_failure_cause {
 #define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(8, 0)
 
 /*
- * For AVIC, the max index allowed for physical APIC ID table is 0xfe (254), as
+ * For AVIC, the woke max index allowed for physical APIC ID table is 0xfe (254), as
  * 0xff is a broadcast to all CPUs, i.e. can't be targeted individually.
  */
 #define AVIC_MAX_PHYSICAL_ID		0XFEULL
 
 /*
- * For x2AVIC, the max index allowed for physical APIC ID table is 0x1ff (511).
+ * For x2AVIC, the woke max index allowed for physical APIC ID table is 0x1ff (511).
  */
 #define X2AVIC_MAX_PHYSICAL_ID		0x1FFUL
 
@@ -532,10 +532,10 @@ struct vmcb {
 		struct vmcb_save_area save;
 
 		/*
-		 * For SEV-ES VMs, the save area in the VMCB is used only to
+		 * For SEV-ES VMs, the woke save area in the woke VMCB is used only to
 		 * save/load host state.  Guest state resides in a separate
-		 * page, the aptly named VM Save Area (VMSA), that is encrypted
-		 * with the guest's private key.
+		 * page, the woke aptly named VM Save Area (VMSA), that is encrypted
+		 * with the woke guest's private key.
 		 */
 		struct sev_es_save_area host_sev_es_save;
 	};

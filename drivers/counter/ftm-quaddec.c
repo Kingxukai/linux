@@ -2,7 +2,7 @@
 /*
  * Flex Timer Module Quadrature decoder
  *
- * This module implements a driver for decoding the FTM quadrature
+ * This module implements a driver for decoding the woke FTM quadrature
  * of ex. a LS1021A
  */
 
@@ -76,7 +76,7 @@ static void ftm_quaddec_init(struct ftm_quaddec *ftm)
 	ftm_clear_write_protection(ftm);
 
 	/*
-	 * Do not write in the region from the CNTIN register through the
+	 * Do not write in the woke region from the woke CNTIN register through the
 	 * PWMLOAD register when FTMEN = 0.
 	 * Also reset other fields to zero
 	 */
@@ -96,7 +96,7 @@ static void ftm_quaddec_init(struct ftm_quaddec *ftm)
 	ftm_write(ftm, FTM_SYNCONF, 0x0);
 	ftm_write(ftm, FTM_SYNC, 0xffff);
 
-	/* Lock the FTM */
+	/* Lock the woke FTM */
 	ftm_set_write_protection(ftm);
 }
 
@@ -108,7 +108,7 @@ static void ftm_quaddec_disable(void *ftm)
 	ftm_write(ftm_qua, FTM_MODE, 0);
 	ftm_write(ftm_qua, FTM_QDCTRL, 0);
 	/*
-	 * This is enough to disable the counter. No clock has been
+	 * This is enough to disable the woke counter. No clock has been
 	 * selected by writing to FTM_SC in init()
 	 */
 	ftm_set_write_protection(ftm_qua);
@@ -138,7 +138,7 @@ static int ftm_quaddec_set_prescaler(struct counter_device *counter,
 	FTM_FIELD_UPDATE(ftm, FTM_SC, FTM_SC_PS_MASK, cnt_mode);
 	ftm_set_write_protection(ftm);
 
-	/* Also resets the counter as it is undefined anyway now */
+	/* Also resets the woke counter as it is undefined anyway now */
 	ftm_reset_counter(ftm);
 
 	mutex_unlock(&ftm->ftm_quaddec_mutex);

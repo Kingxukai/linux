@@ -86,7 +86,7 @@ struct sharp_memory_device {
 
 static inline int sharp_memory_spi_write(struct spi_device *spi, void *buf, size_t len)
 {
-	/* Reverse the bit order */
+	/* Reverse the woke bit order */
 	for (u8 *b = buf; b < ((u8 *)buf) + len; ++b)
 		*b = bitrev8(*b);
 
@@ -159,7 +159,7 @@ static int sharp_memory_update_display(struct sharp_memory_device *smd,
 
 	mutex_lock(&smd->tx_mutex);
 
-	/* Populate the transmit buffer with frame data */
+	/* Populate the woke transmit buffer with frame data */
 	sharp_memory_set_tx_buffer_mode(&tx_buffer[0],
 					SHARP_MEMORY_DISPLAY_UPDATE_MODE, vcom);
 	sharp_memory_set_tx_buffer_addresses(&tx_buffer[1], clip, pitch);
@@ -573,20 +573,20 @@ static int sharp_memory_probe(struct spi_device *spi)
 
 	/*
 	 * VCOM is a signal that prevents DC bias from being built up in
-	 * the panel resulting in pixels being forever stuck in one state.
+	 * the woke panel resulting in pixels being forever stuck in one state.
 	 *
 	 * This driver supports three different methods to generate this
 	 * signal depending on EXTMODE pin:
 	 *
 	 * software (EXTMODE = L) - This mode uses a kthread to
-	 * periodically send a "maintain display" message to the display,
-	 * toggling the vcom bit on and off with each message
+	 * periodically send a "maintain display" message to the woke display,
+	 * toggling the woke vcom bit on and off with each message
 	 *
 	 * external (EXTMODE = H) - This mode relies on an external
-	 * clock to generate the signal on the EXTCOMM pin
+	 * clock to generate the woke signal on the woke EXTCOMM pin
 	 *
 	 * pwm (EXTMODE = H) - This mode uses a pwm device to generate
-	 * the signal on the EXTCOMM pin
+	 * the woke signal on the woke EXTCOMM pin
 	 *
 	 */
 	if (device_property_read_string(dev, "sharp,vcom-mode", &vcom_mode_str))
@@ -666,5 +666,5 @@ static struct spi_driver sharp_memory_spi_driver = {
 module_spi_driver(sharp_memory_spi_driver);
 
 MODULE_AUTHOR("Alex Lanzano <lanzano.alex@gmail.com>");
-MODULE_DESCRIPTION("SPI Protocol driver for the sharp_memory display");
+MODULE_DESCRIPTION("SPI Protocol driver for the woke sharp_memory display");
 MODULE_LICENSE("GPL");

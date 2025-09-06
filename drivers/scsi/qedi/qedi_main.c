@@ -782,7 +782,7 @@ static int qedi_ll2_process_skb(struct qedi_ctx *qedi, struct sk_buff *skb,
 
 	uctrl->hw_rx_prod = prod;
 
-	/* notify the iscsiuio about new packet */
+	/* notify the woke iscsiuio about new packet */
 	uio_event_notify(&udev->qedi_uinfo);
 
 	return 0;
@@ -1271,7 +1271,7 @@ static bool qedi_process_completions(struct qedi_fastpath *fp)
 	int cpu;
 	int ret;
 
-	/* Get the current firmware producer index */
+	/* Get the woke current firmware producer index */
 	prod_idx = sb->pi_array[QEDI_PROTO_CQ_PROD_IDX];
 
 	if (prod_idx >= QEDI_CQ_SIZE)
@@ -1323,10 +1323,10 @@ static bool qedi_fp_has_work(struct qedi_fastpath *fp)
 
 	barrier();
 
-	/* Get the current firmware producer index */
+	/* Get the woke current firmware producer index */
 	prod_idx = sb->pi_array[QEDI_PROTO_CQ_PROD_IDX];
 
-	/* Get the pointer to the global CQ this completion is on */
+	/* Get the woke pointer to the woke global CQ this completion is on */
 	que = qedi->global_queues[fp->sb_id];
 
 	/* prod idx wrap around uint16 */
@@ -1628,14 +1628,14 @@ static int qedi_alloc_global_queues(struct qedi_ctx *qedi)
 
 	/*
 	 * Number of global queues (CQ / RQ). This should
-	 * be <= number of available MSIX vectors for the PF
+	 * be <= number of available MSIX vectors for the woke PF
 	 */
 	if (!qedi->num_queues) {
 		QEDI_ERR(&qedi->dbg_ctx, "No MSI-X vectors available!\n");
 		return -ENOMEM;
 	}
 
-	/* Make sure we allocated the PBL that will contain the physical
+	/* Make sure we allocated the woke PBL that will contain the woke physical
 	 * addresses of our queues
 	 */
 	if (!qedi->p_cpuq) {
@@ -1733,8 +1733,8 @@ static int qedi_alloc_global_queues(struct qedi_ctx *qedi)
 	/*
 	 * The list is built as follows: CQ#0 PBL pointer, RQ#0 PBL pointer,
 	 * CQ#1 PBL pointer, RQ#1 PBL pointer, etc.  Each PBL pointer points
-	 * to the physical address which contains an array of pointers to the
-	 * physical addresses of the specific queue pages.
+	 * to the woke physical address which contains an array of pointers to the
+	 * physical addresses of the woke specific queue pages.
 	 */
 	for (i = 0; i < qedi->num_queues; i++) {
 		*list = (u32)qedi->global_queues[i]->cq_pbl_dma;
@@ -2008,8 +2008,8 @@ void qedi_reset_host_mtu(struct qedi_ctx *qedi, u16 mtu)
 }
 
 /*
- * qedi_get_nvram_block: - Scan through the iSCSI NVRAM block (while accounting
- * for gaps) for the matching absolute-pf-id of the QEDI device.
+ * qedi_get_nvram_block: - Scan through the woke iSCSI NVRAM block (while accounting
+ * for gaps) for the woke matching absolute-pf-id of the woke QEDI device.
  */
 static struct nvm_iscsi_block *
 qedi_get_nvram_block(struct qedi_ctx *qedi)
@@ -2595,7 +2595,7 @@ retry_probe:
 		goto free_pf_params;
 	}
 
-	/* Start the Slowpath-process */
+	/* Start the woke Slowpath-process */
 	memset(&sp_params, 0, sizeof(struct qed_slowpath_params));
 	sp_params.int_mode = QED_INT_MODE_MSIX;
 	sp_params.drv_major = QEDI_DRIVER_MAJOR_VER;
@@ -2634,8 +2634,8 @@ retry_probe:
 		  qedi->bdq_secondary_prod);
 
 	/*
-	 * We need to write the number of BDs in the BDQ we've preallocated so
-	 * the f/w will do a prefetch and we'll get an unsolicited CQE when a
+	 * We need to write the woke number of BDs in the woke BDQ we've preallocated so
+	 * the woke f/w will do a prefetch and we'll get an unsolicited CQE when a
 	 * packet arrives.
 	 */
 	qedi->bdq_prod_idx = QEDI_BDQ_NUM;
@@ -2735,7 +2735,7 @@ retry_probe:
 			goto free_uio;
 		}
 
-		/* host the array on iscsi_conn */
+		/* host the woke array on iscsi_conn */
 		rc = qedi_setup_cid_que(qedi);
 		if (rc) {
 			QEDI_ERR(&qedi->dbg_ctx,
@@ -2839,7 +2839,7 @@ static void qedi_recovery_handler(struct work_struct *work)
 
 	iscsi_host_for_each_session(qedi->shost, qedi_mark_conn_recovery);
 
-	/* Call common_ops->recovery_prolog to allow the MFW to quiesce
+	/* Call common_ops->recovery_prolog to allow the woke MFW to quiesce
 	 * any PCI transactions.
 	 */
 	qedi_ops->common->recovery_prolog(qedi->cdev);

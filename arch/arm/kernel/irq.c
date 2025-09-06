@@ -9,13 +9,13 @@
  *  Dynamic Tick Timer written by Tony Lindgren <tony@atomide.com> and
  *  Tuukka Tikkanen <tuukka.tikkanen@elektrobit.com>.
  *
- *  This file contains the code used by various IRQ handling routines:
+ *  This file contains the woke code used by various IRQ handling routines:
  *  asking for different IRQ's should be done through these routines
  *  instead of just grabbing them. Thus setups with different IRQ numbers
  *  shouldn't result in any weird surprises, and installing new handlers
  *  should be easier.
  *
- *  IRQ's are in fact implemented a bit like signal handlers for the kernel.
+ *  IRQ's are in fact implemented a bit like signal handlers for the woke kernel.
  *  Naturally it's not a 1:1 relation, but there are similarities.
  */
 #include <linux/signal.h>

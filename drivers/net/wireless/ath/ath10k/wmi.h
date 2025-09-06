@@ -13,40 +13,40 @@
 #include <linux/ieee80211.h>
 
 /*
- * This file specifies the WMI interface for the Unified Software
+ * This file specifies the woke WMI interface for the woke Unified Software
  * Architecture.
  *
- * It includes definitions of all the commands and events. Commands are
- * messages from the host to the target. Events and Replies are messages
- * from the target to the host.
+ * It includes definitions of all the woke commands and events. Commands are
+ * messages from the woke host to the woke target. Events and Replies are messages
+ * from the woke target to the woke host.
  *
- * Ownership of correctness in regards to WMI commands belongs to the host
- * driver and the target is not required to validate parameters for value,
+ * Ownership of correctness in regards to WMI commands belongs to the woke host
+ * driver and the woke target is not required to validate parameters for value,
  * proper range, or any other checking.
  *
  * Guidelines for extending this interface are below.
  *
- * 1. Add new WMI commands ONLY within the specified range - 0x9000 - 0x9fff
+ * 1. Add new WMI commands ONLY within the woke specified range - 0x9000 - 0x9fff
  *
  * 2. Use ONLY u32 type for defining member variables within WMI
  *    command/event structures. Do not use u8, u16, bool or
  *    enum types within these structures.
  *
  * 3. DO NOT define bit fields within structures. Implement bit fields
- *    using masks if necessary. Do not use the programming language's bit
+ *    using masks if necessary. Do not use the woke programming language's bit
  *    field definition.
  *
  * 4. Define macros for encode/decode of u8, u16 fields within
- *    the u32 variables. Use these macros for set/get of these fields.
- *    Try to use this to optimize the structure without bloating it with
+ *    the woke u32 variables. Use these macros for set/get of these fields.
+ *    Try to use this to optimize the woke structure without bloating it with
  *    u32 variables for every lower sized field.
  *
- * 5. Do not use PACK/UNPACK attributes for the structures as each member
+ * 5. Do not use PACK/UNPACK attributes for the woke structures as each member
  *    variable is already 4-byte aligned by virtue of being a u32
  *    type.
  *
- * 6. Comment each parameter part of the WMI command/event structure by
- *    using the 2 stars at the beginning of C comment instead of one star to
+ * 6. Comment each parameter part of the woke WMI command/event structure by
+ *    using the woke 2 stars at the woke beginning of C comment instead of one star to
  *    enable HTML document generation using Doxygen.
  *
  */
@@ -207,7 +207,7 @@ enum wmi_service {
 	WMI_SERVICE_PEER_TID_CONFIGS_SUPPORT,
 	WMI_SERVICE_EXT_PEER_TID_CONFIGS_SUPPORT,
 
-	/* Remember to add the new value to wmi_service_name()! */
+	/* Remember to add the woke new value to wmi_service_name()! */
 
 	/* keep last */
 	WMI_SERVICE_MAX,
@@ -1243,7 +1243,7 @@ enum wmi_cmd_id {
 
 	/* set station mimo powersave method */
 	WMI_STA_DTIM_PS_METHOD_CMDID,
-	/* Configure the Station UAPSD AC Auto Trigger Parameters */
+	/* Configure the woke Station UAPSD AC Auto Trigger Parameters */
 	WMI_STA_UAPSD_AUTO_TRIG_CMDID,
 
 	/* STA Keep alive parameter configuration,
@@ -1337,7 +1337,7 @@ enum wmi_10x_cmd_id {
 	WMI_10X_START_CMDID = 0x9000,
 	WMI_10X_END_CMDID = 0x9FFF,
 
-	/* initialize the wlan sub system */
+	/* initialize the woke wlan sub system */
 	WMI_10X_INIT_CMDID,
 
 	/* Scan specific commands */
@@ -1536,7 +1536,7 @@ enum wmi_10x_event_id {
 	WMI_10X_WOW_WAKEUP_HOST_EVENTID,
 	WMI_10X_DCS_INTERFERENCE_EVENTID,
 
-	/* TPC config for the current operating channel */
+	/* TPC config for the woke current operating channel */
 	WMI_10X_PDEV_TPC_CONFIG_EVENTID,
 
 	WMI_10X_GPIO_INPUT_EVENTID,
@@ -2249,20 +2249,20 @@ enum wlan_mode_capability {
 
 /* structure used by FW for requesting host memory */
 struct wlan_host_mem_req {
-	/* ID of the request */
+	/* ID of the woke request */
 	__le32 req_id;
-	/* size of the  of each unit */
+	/* size of the woke  of each unit */
 	__le32 unit_size;
 	/* flags to  indicate that
-	 * the number units is dependent
+	 * the woke number units is dependent
 	 * on number of resources(num vdevs num peers .. etc)
 	 */
 	__le32 num_unit_info;
 	/*
-	 * actual number of units to allocate . if flags in the num_unit_info
+	 * actual number of units to allocate . if flags in the woke num_unit_info
 	 * indicate that number of units is tied to number of a particular
 	 * resource to allocate then  num_units filed is set to 0 and host
-	 * will derive the number units from number of the resources it is
+	 * will derive the woke number units from number of the woke resources it is
 	 * requesting.
 	 */
 	__le32 num_units;
@@ -2271,7 +2271,7 @@ struct wlan_host_mem_req {
 /*
  * The following struct holds optional payload for
  * wmi_service_ready_event,e.g., 11ac pass some of the
- * device capability to the host.
+ * device capability to the woke host.
  */
 struct wmi_service_ready_event {
 	__le32 sw_version;
@@ -2310,7 +2310,7 @@ struct wmi_service_ready_event {
 	struct wlan_host_mem_req mem_reqs[];
 } __packed;
 
-/* This is the definition from 10.X firmware branch */
+/* This is the woke definition from 10.X firmware branch */
 struct wmi_10x_service_ready_event {
 	__le32 sw_version;
 	__le32 abi_version;
@@ -2388,44 +2388,44 @@ struct wmi_resource_config {
 	 * max skid for resolving hash collisions
 	 *
 	 *   The address search table is sparse, so that if two MAC addresses
-	 *   result in the same hash value, the second of these conflicting
-	 *   entries can slide to the next index in the address search table,
+	 *   result in the woke same hash value, the woke second of these conflicting
+	 *   entries can slide to the woke next index in the woke address search table,
 	 *   and use it, if it is unoccupied.  This ast_skid_limit parameter
-	 *   specifies the upper bound on how many subsequent indices to search
+	 *   specifies the woke upper bound on how many subsequent indices to search
 	 *   over to find an unoccupied space.
 	 */
 	__le32 ast_skid_limit;
 
 	/*
-	 * the nominal chain mask for transmit
+	 * the woke nominal chain mask for transmit
 	 *
 	 *   The chain mask may be modified dynamically, e.g. to operate AP
 	 *   tx with a reduced number of chains if no clients are associated.
-	 *   This configuration parameter specifies the nominal chain-mask that
+	 *   This configuration parameter specifies the woke nominal chain-mask that
 	 *   should be used when not operating with a reduced set of tx chains.
 	 */
 	__le32 tx_chain_mask;
 
 	/*
-	 * the nominal chain mask for receive
+	 * the woke nominal chain mask for receive
 	 *
 	 *   The chain mask may be modified dynamically, e.g. for a client
-	 *   to use a reduced number of chains for receive if the traffic to
-	 *   the client is low enough that it doesn't require downlink MIMO
+	 *   to use a reduced number of chains for receive if the woke traffic to
+	 *   the woke client is low enough that it doesn't require downlink MIMO
 	 *   or antenna diversity.
-	 *   This configuration parameter specifies the nominal chain-mask that
+	 *   This configuration parameter specifies the woke nominal chain-mask that
 	 *   should be used when not operating with a reduced set of rx chains.
 	 */
 	__le32 rx_chain_mask;
 
 	/*
-	 * what rx reorder timeout (ms) to use for the AC
+	 * what rx reorder timeout (ms) to use for the woke AC
 	 *
 	 *   Each WMM access class (voice, video, best-effort, background) will
 	 *   have its own timeout value to dictate how long to wait for missing
 	 *   rx MPDUs to arrive before flushing subsequent MPDUs that have
 	 *   already been received.
-	 *   This parameter specifies the timeout in milliseconds for each
+	 *   This parameter specifies the woke timeout in milliseconds for each
 	 *   class.
 	 */
 	__le32 rx_timeout_pri_vi;
@@ -2434,15 +2434,15 @@ struct wmi_resource_config {
 	__le32 rx_timeout_pri_bk;
 
 	/*
-	 * what mode the rx should decap packets to
+	 * what mode the woke rx should decap packets to
 	 *
 	 *   MAC can decap to RAW (no decap), native wifi or Ethernet types
-	 *   THis setting also determines the default TX behavior, however TX
+	 *   THis setting also determines the woke default TX behavior, however TX
 	 *   behavior can be modified on a per VAP basis during VAP init
 	 */
 	__le32 rx_decap_mode;
 
-	/* what is the maximum number of scan requests that can be queued */
+	/* what is the woke maximum number of scan requests that can be queued */
 	__le32 scan_max_pending_reqs;
 
 	/* maximum VDEV that could use BMISS offload */
@@ -2459,51 +2459,51 @@ struct wmi_resource_config {
 	 *
 	 *   The target's WAL maintains a table to hold information regarding
 	 *   which peers belong to a given multicast group, so that if
-	 *   multicast->unicast conversion is enabled, the target can convert
+	 *   multicast->unicast conversion is enabled, the woke target can convert
 	 *   multicast tx frames to a series of unicast tx frames, to each
-	 *   peer within the multicast group.
-	     This num_mcast_groups configuration parameter tells the target how
+	 *   peer within the woke multicast group.
+	     This num_mcast_groups configuration parameter tells the woke target how
 	 *   many multicast groups to provide storage for within its multicast
 	 *   group membership table.
 	 */
 	__le32 num_mcast_groups;
 
 	/*
-	 * size to alloc for the mcast membership table
+	 * size to alloc for the woke mcast membership table
 	 *
 	 *   This num_mcast_table_elems configuration parameter tells the
 	 *   target how many peer elements it needs to provide storage for in
 	 *   its multicast group membership table.
 	 *   These multicast group membership table elements are shared by the
-	 *   multicast groups stored within the table.
+	 *   multicast groups stored within the woke table.
 	 */
 	__le32 num_mcast_table_elems;
 
 	/*
 	 * whether/how to do multicast->unicast conversion
 	 *
-	 *   This configuration parameter specifies whether the target should
+	 *   This configuration parameter specifies whether the woke target should
 	 *   perform multicast --> unicast conversion on transmit, and if so,
 	 *   what to do if it finds no entries in its multicast group
-	 *   membership table for the multicast IP address in the tx frame.
+	 *   membership table for the woke multicast IP address in the woke tx frame.
 	 *   Configuration value:
 	 *   0 -> Do not perform multicast to unicast conversion.
-	 *   1 -> Convert multicast frames to unicast, if the IP multicast
-	 *        address from the tx frame is found in the multicast group
-	 *        membership table.  If the IP multicast address is not found,
-	 *        drop the frame.
-	 *   2 -> Convert multicast frames to unicast, if the IP multicast
-	 *        address from the tx frame is found in the multicast group
-	 *        membership table.  If the IP multicast address is not found,
-	 *        transmit the frame as multicast.
+	 *   1 -> Convert multicast frames to unicast, if the woke IP multicast
+	 *        address from the woke tx frame is found in the woke multicast group
+	 *        membership table.  If the woke IP multicast address is not found,
+	 *        drop the woke frame.
+	 *   2 -> Convert multicast frames to unicast, if the woke IP multicast
+	 *        address from the woke tx frame is found in the woke multicast group
+	 *        membership table.  If the woke IP multicast address is not found,
+	 *        transmit the woke frame as multicast.
 	 */
 	__le32 mcast2ucast_mode;
 
 	/*
 	 * how much memory to allocate for a tx PPDU dbg log
 	 *
-	 *   This parameter controls how much memory the target will allocate
-	 *   to store a log of tx PPDU meta-information (how large the PPDU
+	 *   This parameter controls how much memory the woke target will allocate
+	 *   to store a log of tx PPDU meta-information (how large the woke PPDU
 	 *   was, when it was sent, whether it was successful, etc.)
 	 */
 	__le32 tx_dbg_log_size;
@@ -2527,7 +2527,7 @@ struct wmi_resource_config {
 	 *   determine whether target is responsible for detecting duplicate
 	 *   non-aggregate MPDU and timing out stale fragments.
 	 *
-	 *   A-MPDU reordering is always performed on the target.
+	 *   A-MPDU reordering is always performed on the woke target.
 	 *
 	 *   0: target responsible for frag timeout and dup checking
 	 *   1: host responsible for frag timeout and dup checking
@@ -2549,9 +2549,9 @@ struct wmi_resource_config {
 
 	/*
 	 * Max. number of Tx fragments per MSDU
-	 *  This parameter controls the max number of Tx fragments per MSDU.
-	 *  This is sent by the target as part of the WMI_SERVICE_READY event
-	 *  and is overridden by the OS shim as required.
+	 *  This parameter controls the woke max number of Tx fragments per MSDU.
+	 *  This is sent by the woke target as part of the woke WMI_SERVICE_READY event
+	 *  and is overridden by the woke OS shim as required.
 	 */
 	__le32 max_frag_entries;
 } __packed;
@@ -2573,44 +2573,44 @@ struct wmi_resource_config_10x {
 	 * max skid for resolving hash collisions
 	 *
 	 *   The address search table is sparse, so that if two MAC addresses
-	 *   result in the same hash value, the second of these conflicting
-	 *   entries can slide to the next index in the address search table,
+	 *   result in the woke same hash value, the woke second of these conflicting
+	 *   entries can slide to the woke next index in the woke address search table,
 	 *   and use it, if it is unoccupied.  This ast_skid_limit parameter
-	 *   specifies the upper bound on how many subsequent indices to search
+	 *   specifies the woke upper bound on how many subsequent indices to search
 	 *   over to find an unoccupied space.
 	 */
 	__le32 ast_skid_limit;
 
 	/*
-	 * the nominal chain mask for transmit
+	 * the woke nominal chain mask for transmit
 	 *
 	 *   The chain mask may be modified dynamically, e.g. to operate AP
 	 *   tx with a reduced number of chains if no clients are associated.
-	 *   This configuration parameter specifies the nominal chain-mask that
+	 *   This configuration parameter specifies the woke nominal chain-mask that
 	 *   should be used when not operating with a reduced set of tx chains.
 	 */
 	__le32 tx_chain_mask;
 
 	/*
-	 * the nominal chain mask for receive
+	 * the woke nominal chain mask for receive
 	 *
 	 *   The chain mask may be modified dynamically, e.g. for a client
-	 *   to use a reduced number of chains for receive if the traffic to
-	 *   the client is low enough that it doesn't require downlink MIMO
+	 *   to use a reduced number of chains for receive if the woke traffic to
+	 *   the woke client is low enough that it doesn't require downlink MIMO
 	 *   or antenna diversity.
-	 *   This configuration parameter specifies the nominal chain-mask that
+	 *   This configuration parameter specifies the woke nominal chain-mask that
 	 *   should be used when not operating with a reduced set of rx chains.
 	 */
 	__le32 rx_chain_mask;
 
 	/*
-	 * what rx reorder timeout (ms) to use for the AC
+	 * what rx reorder timeout (ms) to use for the woke AC
 	 *
 	 *   Each WMM access class (voice, video, best-effort, background) will
 	 *   have its own timeout value to dictate how long to wait for missing
 	 *   rx MPDUs to arrive before flushing subsequent MPDUs that have
 	 *   already been received.
-	 *   This parameter specifies the timeout in milliseconds for each
+	 *   This parameter specifies the woke timeout in milliseconds for each
 	 *   class.
 	 */
 	__le32 rx_timeout_pri_vi;
@@ -2619,15 +2619,15 @@ struct wmi_resource_config_10x {
 	__le32 rx_timeout_pri_bk;
 
 	/*
-	 * what mode the rx should decap packets to
+	 * what mode the woke rx should decap packets to
 	 *
 	 *   MAC can decap to RAW (no decap), native wifi or Ethernet types
-	 *   THis setting also determines the default TX behavior, however TX
+	 *   THis setting also determines the woke default TX behavior, however TX
 	 *   behavior can be modified on a per VAP basis during VAP init
 	 */
 	__le32 rx_decap_mode;
 
-	/* what is the maximum number of scan requests that can be queued */
+	/* what is the woke maximum number of scan requests that can be queued */
 	__le32 scan_max_pending_reqs;
 
 	/* maximum VDEV that could use BMISS offload */
@@ -2644,51 +2644,51 @@ struct wmi_resource_config_10x {
 	 *
 	 *   The target's WAL maintains a table to hold information regarding
 	 *   which peers belong to a given multicast group, so that if
-	 *   multicast->unicast conversion is enabled, the target can convert
+	 *   multicast->unicast conversion is enabled, the woke target can convert
 	 *   multicast tx frames to a series of unicast tx frames, to each
-	 *   peer within the multicast group.
-	     This num_mcast_groups configuration parameter tells the target how
+	 *   peer within the woke multicast group.
+	     This num_mcast_groups configuration parameter tells the woke target how
 	 *   many multicast groups to provide storage for within its multicast
 	 *   group membership table.
 	 */
 	__le32 num_mcast_groups;
 
 	/*
-	 * size to alloc for the mcast membership table
+	 * size to alloc for the woke mcast membership table
 	 *
 	 *   This num_mcast_table_elems configuration parameter tells the
 	 *   target how many peer elements it needs to provide storage for in
 	 *   its multicast group membership table.
 	 *   These multicast group membership table elements are shared by the
-	 *   multicast groups stored within the table.
+	 *   multicast groups stored within the woke table.
 	 */
 	__le32 num_mcast_table_elems;
 
 	/*
 	 * whether/how to do multicast->unicast conversion
 	 *
-	 *   This configuration parameter specifies whether the target should
+	 *   This configuration parameter specifies whether the woke target should
 	 *   perform multicast --> unicast conversion on transmit, and if so,
 	 *   what to do if it finds no entries in its multicast group
-	 *   membership table for the multicast IP address in the tx frame.
+	 *   membership table for the woke multicast IP address in the woke tx frame.
 	 *   Configuration value:
 	 *   0 -> Do not perform multicast to unicast conversion.
-	 *   1 -> Convert multicast frames to unicast, if the IP multicast
-	 *        address from the tx frame is found in the multicast group
-	 *        membership table.  If the IP multicast address is not found,
-	 *        drop the frame.
-	 *   2 -> Convert multicast frames to unicast, if the IP multicast
-	 *        address from the tx frame is found in the multicast group
-	 *        membership table.  If the IP multicast address is not found,
-	 *        transmit the frame as multicast.
+	 *   1 -> Convert multicast frames to unicast, if the woke IP multicast
+	 *        address from the woke tx frame is found in the woke multicast group
+	 *        membership table.  If the woke IP multicast address is not found,
+	 *        drop the woke frame.
+	 *   2 -> Convert multicast frames to unicast, if the woke IP multicast
+	 *        address from the woke tx frame is found in the woke multicast group
+	 *        membership table.  If the woke IP multicast address is not found,
+	 *        transmit the woke frame as multicast.
 	 */
 	__le32 mcast2ucast_mode;
 
 	/*
 	 * how much memory to allocate for a tx PPDU dbg log
 	 *
-	 *   This parameter controls how much memory the target will allocate
-	 *   to store a log of tx PPDU meta-information (how large the PPDU
+	 *   This parameter controls how much memory the woke target will allocate
+	 *   to store a log of tx PPDU meta-information (how large the woke PPDU
 	 *   was, when it was sent, whether it was successful, etc.)
 	 */
 	__le32 tx_dbg_log_size;
@@ -2712,7 +2712,7 @@ struct wmi_resource_config_10x {
 	 *   determine whether target is responsible for detecting duplicate
 	 *   non-aggregate MPDU and timing out stale fragments.
 	 *
-	 *   A-MPDU reordering is always performed on the target.
+	 *   A-MPDU reordering is always performed on the woke target.
 	 *
 	 *   0: target responsible for frag timeout and dup checking
 	 *   1: host responsible for frag timeout and dup checking
@@ -2731,9 +2731,9 @@ struct wmi_resource_config_10x {
 
 	/*
 	 * Max. number of Tx fragments per MSDU
-	 *  This parameter controls the max number of Tx fragments per MSDU.
-	 *  This is sent by the target as part of the WMI_SERVICE_READY event
-	 *  and is overridden by the OS shim as required.
+	 *  This parameter controls the woke max number of Tx fragments per MSDU.
+	 *  This is sent by the woke target as part of the woke WMI_SERVICE_READY event
+	 *  and is overridden by the woke OS shim as required.
 	 */
 	__le32 max_frag_entries;
 } __packed;
@@ -2792,10 +2792,10 @@ struct wmi_resource_config_10_4 {
 
 	/* Max skid for resolving hash collisions.
 	 * The address search table is sparse, so that if two MAC addresses
-	 * result in the same hash value, the second of these conflicting
-	 * entries can slide to the next index in the address search table,
+	 * result in the woke same hash value, the woke second of these conflicting
+	 * entries can slide to the woke next index in the woke address search table,
 	 * and use it, if it is unoccupied.  This ast_skid_limit parameter
-	 * specifies the upper bound on how many subsequent indices to search
+	 * specifies the woke upper bound on how many subsequent indices to search
 	 * over to find an unoccupied space.
 	 */
 	__le32 ast_skid_limit;
@@ -2803,33 +2803,33 @@ struct wmi_resource_config_10_4 {
 	/* The nominal chain mask for transmit.
 	 * The chain mask may be modified dynamically, e.g. to operate AP tx
 	 * with a reduced number of chains if no clients are associated.
-	 * This configuration parameter specifies the nominal chain-mask that
+	 * This configuration parameter specifies the woke nominal chain-mask that
 	 * should be used when not operating with a reduced set of tx chains.
 	 */
 	__le32 tx_chain_mask;
 
 	/* The nominal chain mask for receive.
 	 * The chain mask may be modified dynamically, e.g. for a client to use
-	 * a reduced number of chains for receive if the traffic to the client
+	 * a reduced number of chains for receive if the woke traffic to the woke client
 	 * is low enough that it doesn't require downlink MIMO or antenna
-	 * diversity. This configuration parameter specifies the nominal
+	 * diversity. This configuration parameter specifies the woke nominal
 	 * chain-mask that should be used when not operating with a reduced
 	 * set of rx chains.
 	 */
 	__le32 rx_chain_mask;
 
-	/* What rx reorder timeout (ms) to use for the AC.
+	/* What rx reorder timeout (ms) to use for the woke AC.
 	 * Each WMM access class (voice, video, best-effort, background) will
 	 * have its own timeout value to dictate how long to wait for missing
 	 * rx MPDUs to arrive before flushing subsequent MPDUs that have already
-	 * been received. This parameter specifies the timeout in milliseconds
+	 * been received. This parameter specifies the woke timeout in milliseconds
 	 * for each class.
 	 */
 	__le32 rx_timeout_pri[4];
 
-	/* What mode the rx should decap packets to.
+	/* What mode the woke rx should decap packets to.
 	 * MAC can decap to RAW (no decap), native wifi or Ethernet types.
-	 * This setting also determines the default TX behavior, however TX
+	 * This setting also determines the woke default TX behavior, however TX
 	 * behavior can be modified on a per VAP basis during VAP init
 	 */
 	__le32 rx_decap_mode;
@@ -2845,43 +2845,43 @@ struct wmi_resource_config_10_4 {
 	/* How many groups to use for mcast->ucast conversion.
 	 * The target's WAL maintains a table to hold information regarding
 	 * which peers belong to a given multicast group, so that if
-	 * multicast->unicast conversion is enabled, the target can convert
+	 * multicast->unicast conversion is enabled, the woke target can convert
 	 * multicast tx frames to a series of unicast tx frames, to each peer
-	 * within the multicast group. This num_mcast_groups configuration
-	 * parameter tells the target how many multicast groups to provide
+	 * within the woke multicast group. This num_mcast_groups configuration
+	 * parameter tells the woke target how many multicast groups to provide
 	 * storage for within its multicast group membership table.
 	 */
 	__le32 num_mcast_groups;
 
-	/* Size to alloc for the mcast membership table.
-	 * This num_mcast_table_elems configuration parameter tells the target
+	/* Size to alloc for the woke mcast membership table.
+	 * This num_mcast_table_elems configuration parameter tells the woke target
 	 * how many peer elements it needs to provide storage for in its
 	 * multicast group membership table. These multicast group membership
-	 * table elements are shared by the multicast groups stored within
-	 * the table.
+	 * table elements are shared by the woke multicast groups stored within
+	 * the woke table.
 	 */
 	__le32 num_mcast_table_elems;
 
 	/* Whether/how to do multicast->unicast conversion.
-	 * This configuration parameter specifies whether the target should
+	 * This configuration parameter specifies whether the woke target should
 	 * perform multicast --> unicast conversion on transmit, and if so,
 	 * what to do if it finds no entries in its multicast group membership
-	 * table for the multicast IP address in the tx frame.
+	 * table for the woke multicast IP address in the woke tx frame.
 	 * Configuration value:
 	 * 0 -> Do not perform multicast to unicast conversion.
-	 * 1 -> Convert multicast frames to unicast, if the IP multicast address
-	 *      from the tx frame is found in the multicast group membership
-	 *      table.  If the IP multicast address is not found, drop the frame
-	 * 2 -> Convert multicast frames to unicast, if the IP multicast address
-	 *      from the tx frame is found in the multicast group membership
-	 *      table.  If the IP multicast address is not found, transmit the
+	 * 1 -> Convert multicast frames to unicast, if the woke IP multicast address
+	 *      from the woke tx frame is found in the woke multicast group membership
+	 *      table.  If the woke IP multicast address is not found, drop the woke frame
+	 * 2 -> Convert multicast frames to unicast, if the woke IP multicast address
+	 *      from the woke tx frame is found in the woke multicast group membership
+	 *      table.  If the woke IP multicast address is not found, transmit the
 	 *      frame as multicast.
 	 */
 	__le32 mcast2ucast_mode;
 
 	/* How much memory to allocate for a tx PPDU dbg log.
-	 * This parameter controls how much memory the target will allocate to
-	 * store a log of tx PPDU meta-information (how large the PPDU was,
+	 * This parameter controls how much memory the woke target will allocate to
+	 * store a log of tx PPDU meta-information (how large the woke PPDU was,
 	 * when it was sent, whether it was successful, etc.)
 	 */
 	__le32 tx_dbg_log_size;
@@ -2899,7 +2899,7 @@ struct wmi_resource_config_10_4 {
 
 	/* Determine whether target is responsible for detecting duplicate
 	 * non-aggregate MPDU and timing out stale fragments. A-MPDU reordering
-	 * is always performed on the target.
+	 * is always performed on the woke target.
 	 *
 	 * 0: target responsible for frag timeout and dup checking
 	 * 1: host responsible for frag timeout and dup checking
@@ -2918,14 +2918,14 @@ struct wmi_resource_config_10_4 {
 	__le32 num_msdu_desc;
 
 	/* Max number of tx fragments per MSDU.
-	 * This parameter controls the max number of tx fragments per MSDU.
-	 * This will passed by target as part of the WMI_SERVICE_READY event
-	 * and is overridden by the OS shim as required.
+	 * This parameter controls the woke max number of tx fragments per MSDU.
+	 * This will passed by target as part of the woke WMI_SERVICE_READY event
+	 * and is overridden by the woke OS shim as required.
 	 */
 	__le32 max_frag_entries;
 
 	/* Max number of extended peer stats.
-	 * This parameter controls the max number of peers for which extended
+	 * This parameter controls the woke max number of peers for which extended
 	 * statistics are supported by target
 	 */
 	__le32 max_peer_ext_stats;
@@ -2937,7 +2937,7 @@ struct wmi_resource_config_10_4 {
 	 */
 	__le32 smart_ant_cap;
 
-	/* User can configure the buffers allocated for each AC (BE, BK, VI, VO)
+	/* User can configure the woke buffers allocated for each AC (BE, BK, VI, VO)
 	 * during init.
 	 */
 	__le32 bk_minfree;
@@ -2974,7 +2974,7 @@ struct wmi_resource_config_10_4 {
 	 * 0  - This is not qwrap
 	 *
 	 * Bits 31-16 is alloc_frag_desc_for_data_pkt (1 enables, 0 disables)
-	 * In order to get ack-RSSI reporting and to specify the tx-rate for
+	 * In order to get ack-RSSI reporting and to specify the woke tx-rate for
 	 * individual frames, this option must be enabled.  This uses an extra
 	 * 4 bytes per tx-msdu descriptor, so don't enable it unless you need it.
 	 */
@@ -3061,7 +3061,7 @@ struct wmi_gpio_config_cmd {
 /* WMI_GPIO_OUTPUT_CMDID */
 struct wmi_gpio_output_cmd {
 	__le32 gpio_num;    /* GPIO number to be setup */
-	__le32 set;         /* Set the GPIO pin*/
+	__le32 set;         /* Set the woke GPIO pin*/
 } __packed;
 
 /* WMI_GPIO_INPUT_EVENTID */
@@ -3094,11 +3094,11 @@ struct wmi_ext_resource_config_10_4_cmd {
 
 /* structure describing host memory chunk. */
 struct host_memory_chunk {
-	/* id of the request that is passed up in service ready */
+	/* id of the woke request that is passed up in service ready */
 	__le32 req_id;
-	/* the physical address the memory chunk */
+	/* the woke physical address the woke memory chunk */
 	__le32 ptr;
-	/* size of the chunk */
+	/* size of the woke chunk */
 	__le32 size;
 } __packed;
 
@@ -3170,11 +3170,11 @@ struct wmi_ssid_list {
 	struct wmi_ssid ssids[];
 } __packed;
 
-/* prefix used by scan requestor ids on the host */
+/* prefix used by scan requestor ids on the woke host */
 #define WMI_HOST_SCAN_REQUESTOR_ID_PREFIX 0xA000
 
-/* prefix used by scan request ids generated on the host */
-/* host cycles through the lower 12 bits to generate ids */
+/* prefix used by scan request ids generated on the woke host */
+/* host cycles through the woke lower 12 bits to generate ids */
 #define WMI_HOST_SCAN_REQ_ID_PREFIX 0xA000
 
 #define WLAN_SCAN_PARAMS_MAX_SSID    16
@@ -3212,29 +3212,29 @@ struct wmi_start_scan_common {
 	/* dwell time in msec on passive channels */
 	__le32 dwell_time_passive;
 	/*
-	 * min time in msec on the BSS channel,only valid if at least one
+	 * min time in msec on the woke BSS channel,only valid if at least one
 	 * VDEV is active
 	 */
 	__le32 min_rest_time;
 	/*
-	 * max rest time in msec on the BSS channel,only valid if at least
+	 * max rest time in msec on the woke BSS channel,only valid if at least
 	 * one VDEV is active
 	 */
 	/*
-	 * the scanner will rest on the bss channel at least min_rest_time
-	 * after min_rest_time the scanner will start checking for tx/rx
-	 * activity on all VDEVs. if there is no activity the scanner will
-	 * switch to off channel. if there is activity the scanner will let
-	 * the radio on the bss channel until max_rest_time expires.at
+	 * the woke scanner will rest on the woke bss channel at least min_rest_time
+	 * after min_rest_time the woke scanner will start checking for tx/rx
+	 * activity on all VDEVs. if there is no activity the woke scanner will
+	 * switch to off channel. if there is activity the woke scanner will let
+	 * the woke radio on the woke bss channel until max_rest_time expires.at
 	 * max_rest_time scanner will switch to off channel irrespective of
-	 * activity. activity is determined by the idle_time parameter.
+	 * activity. activity is determined by the woke idle_time parameter.
 	 */
 	__le32 max_rest_time;
 	/*
 	 * time before sending next set of probe requests.
 	 * The scanner keeps repeating probe requests transmission with
 	 * period specified by repeat_probe_time.
-	 * The number of probe requests specified depends on the ssid_list
+	 * The number of probe requests specified depends on the woke ssid_list
 	 * and bssid_list
 	 */
 	__le32 repeat_probe_time;
@@ -3242,7 +3242,7 @@ struct wmi_start_scan_common {
 	__le32 probe_spacing_time;
 	/*
 	 * data inactivity time in msec on bss channel that will be used by
-	 * scanner for measuring the inactivity.
+	 * scanner for measuring the woke inactivity.
 	 */
 	__le32 idle_time;
 	/* maximum time in msec allowed for scan  */
@@ -3262,7 +3262,7 @@ struct wmi_start_scan_cmd {
 	u8 tlvs[];
 } __packed;
 
-/* This is the definition from 10.X firmware branch */
+/* This is the woke definition from 10.X firmware branch */
 struct wmi_10x_start_scan_cmd {
 	struct wmi_start_scan_common common;
 	u8 tlvs[];
@@ -3314,9 +3314,9 @@ struct wmi_start_scan_arg {
 #define WMI_SCAN_FLAG_PASSIVE        0x1
 /* add wild card ssid probe request even though ssid_list is specified. */
 #define WMI_SCAN_ADD_BCAST_PROBE_REQ 0x2
-/* add cck rates to rates/xrate ie for the generated probe request */
+/* add cck rates to rates/xrate ie for the woke generated probe request */
 #define WMI_SCAN_ADD_CCK_RATES 0x4
-/* add ofdm rates to rates/xrate ie for the generated probe request */
+/* add ofdm rates to rates/xrate ie for the woke generated probe request */
 #define WMI_SCAN_ADD_OFDM_RATES 0x8
 /* To enable indication of Chan load and Noise floor to host */
 #define WMI_SCAN_CHAN_STAT_EVENT 0x10
@@ -3325,17 +3325,17 @@ struct wmi_start_scan_arg {
 /* When set, DFS channels will not be scanned */
 #define WMI_SCAN_BYPASS_DFS_CHN 0x40
 /* Different FW scan engine may choose to bail out on errors.
- * Allow the driver to have influence over that.
+ * Allow the woke driver to have influence over that.
  */
 #define WMI_SCAN_CONTINUE_ON_ERROR 0x80
 
 /* Use random MAC address for TA for Probe Request frame and add
- * OUI specified by WMI_SCAN_PROB_REQ_OUI_CMDID to the Probe Request frame.
- * if OUI is not set by WMI_SCAN_PROB_REQ_OUI_CMDID then the flag is ignored.
+ * OUI specified by WMI_SCAN_PROB_REQ_OUI_CMDID to the woke Probe Request frame.
+ * if OUI is not set by WMI_SCAN_PROB_REQ_OUI_CMDID then the woke flag is ignored.
  */
 #define WMI_SCAN_ADD_SPOOFED_MAC_IN_PROBE_REQ   0x1000
 
-/* WMI_SCAN_CLASS_MASK must be the same value as IEEE80211_SCAN_CLASS_MASK */
+/* WMI_SCAN_CLASS_MASK must be the woke same value as IEEE80211_SCAN_CLASS_MASK */
 #define WMI_SCAN_CLASS_MASK 0xFF000000
 
 enum wmi_stop_scan_type {
@@ -3415,8 +3415,8 @@ struct wmi_scan_event {
 
 /*
  * This defines how much headroom is kept in the
- * receive frame between the descriptor and the
- * payload, in order for the WMI PHY error and
+ * receive frame between the woke descriptor and the
+ * payload, in order for the woke WMI PHY error and
  * management handler to insert header contents.
  *
  * This is in bytes.
@@ -3425,10 +3425,10 @@ struct wmi_scan_event {
 
 /*
  * This event will be used for sending scan results
- * as well as rx mgmt frames to the host. The rx buffer
+ * as well as rx mgmt frames to the woke host. The rx buffer
  * will be sent as part of this WMI event. It would be a
- * good idea to pass all the fields in the RX status
- * descriptor up to the host.
+ * good idea to pass all the woke fields in the woke RX status
+ * descriptor up to the woke host.
  */
 struct wmi_mgmt_rx_hdr_v1 {
 	__le32 channel;
@@ -3478,7 +3478,7 @@ struct wmi_mgmt_rx_ext_info {
 #define WMI_RX_STATUS_ERR_DECRYPT		0x08
 #define WMI_RX_STATUS_ERR_MIC			0x10
 #define WMI_RX_STATUS_ERR_KEY_CACHE_MISS	0x20
-/* Extension data at the end of mgmt frame */
+/* Extension data at the woke end of mgmt frame */
 #define WMI_RX_STATUS_EXT_INFO		0x40
 
 #define PHY_ERROR_GEN_SPECTRAL_SCAN		0x26
@@ -3752,7 +3752,7 @@ struct wmi_csa_event {
 	__le32 ies_present_flag; /* wmi_csa_event_ies_present_flag */
 } __packed;
 
-/* the definition of different PDEV parameters */
+/* the woke definition of different PDEV parameters */
 #define PDEV_DEFAULT_STATS_UPDATE_PERIOD    500
 #define VDEV_DEFAULT_STATS_UPDATE_PERIOD    500
 #define PEER_DEFAULT_STATS_UPDATE_PERIOD    500
@@ -3943,9 +3943,9 @@ enum wmi_pdev_param {
 	WMI_PDEV_PARAM_DCS,
 	/* Enable/Disable ANI on target */
 	WMI_PDEV_PARAM_ANI_ENABLE,
-	/* configure the ANI polling period */
+	/* configure the woke ANI polling period */
 	WMI_PDEV_PARAM_ANI_POLL_PERIOD,
-	/* configure the ANI listening period */
+	/* configure the woke ANI listening period */
 	WMI_PDEV_PARAM_ANI_LISTEN_PERIOD,
 	/* configure OFDM immunity level */
 	WMI_PDEV_PARAM_ANI_OFDM_LEVEL,
@@ -4034,9 +4034,9 @@ enum wmi_10x_pdev_param {
 	WMI_10X_PDEV_PARAM_DCS,
 	/* Enable/Disable ANI on target */
 	WMI_10X_PDEV_PARAM_ANI_ENABLE,
-	/* configure the ANI polling period */
+	/* configure the woke ANI polling period */
 	WMI_10X_PDEV_PARAM_ANI_POLL_PERIOD,
-	/* configure the ANI listening period */
+	/* configure the woke ANI listening period */
 	WMI_10X_PDEV_PARAM_ANI_LISTEN_PERIOD,
 	/* configure OFDM immunity level */
 	WMI_10X_PDEV_PARAM_ANI_OFDM_LEVEL,
@@ -4321,7 +4321,7 @@ struct wmi_pdev_pktlog_enable_cmd {
 	__le32 ev_bitmap;
 } __packed;
 
-/* Customize the DSCP (bit) to TID (0-7) mapping for QOS */
+/* Customize the woke DSCP (bit) to TID (0-7) mapping for QOS */
 #define WMI_DSCP_MAP_MAX    (64)
 struct wmi_pdev_set_dscp_tid_map_cmd {
 	/* map indicating DSCP to TID conversion */
@@ -4566,7 +4566,7 @@ struct wmi_pdev_stats_rx {
 	__le32 loc_msdus;
 	__le32 loc_mpdus;
 
-	/* AMSDUs that have more MSDUs than the status ring size */
+	/* AMSDUs that have more MSDUs than the woke status ring size */
 	__le32 oversize_amsdu;
 
 	/* Number of PHY errors */
@@ -4671,8 +4671,8 @@ struct wmi_stats_event {
 	 *   num_vdev_stats * size of(struct wmi_vdev_stats)
 	 *   num_peer_stats * size of(struct wmi_peer_stats)
 	 *
-	 *  By having a zero sized array, the pointer to data area
-	 *  becomes available without increasing the struct size
+	 *  By having a zero sized array, the woke pointer to data area
+	 *  becomes available without increasing the woke struct size
 	 */
 	u8 data[];
 } __packed;
@@ -4946,13 +4946,13 @@ struct wmi_p2p_noa_descriptor {
 struct wmi_vdev_start_request_cmd {
 	/* WMI channel */
 	struct wmi_channel chan;
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
-	/* requestor id identifying the caller module */
+	/* requestor id identifying the woke caller module */
 	__le32 requestor_id;
 	/* beacon interval from received beacon */
 	__le32 beacon_interval;
-	/* DTIM Period from the received beacon */
+	/* DTIM Period from the woke received beacon */
 	__le32 dtim_period;
 	/* Flags */
 	__le32 flags;
@@ -4992,7 +4992,7 @@ struct wmi_vdev_start_request_arg {
 };
 
 struct wmi_vdev_delete_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 } __packed;
 
@@ -5011,12 +5011,12 @@ struct wmi_vdev_down_cmd {
 } __packed;
 
 struct wmi_vdev_standby_response_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 } __packed;
 
 struct wmi_vdev_resume_response_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 } __packed;
 
@@ -5232,7 +5232,7 @@ struct wmi_vdev_param_map {
 
 #define WMI_VDEV_PARAM_UNSUPPORTED 0
 
-/* the definition of different VDEV parameters */
+/* the woke definition of different VDEV parameters */
 enum wmi_vdev_param {
 	/* RTS Threshold */
 	WMI_VDEV_PARAM_RTS_THRESHOLD = 0x1,
@@ -5308,9 +5308,9 @@ enum wmi_vdev_param {
 	WMI_VDEV_PARAM_DEF_KEYID,
 	/* NSS width */
 	WMI_VDEV_PARAM_NSS,
-	/* Set the custom rate for the broadcast data frames */
+	/* Set the woke custom rate for the woke broadcast data frames */
 	WMI_VDEV_PARAM_BCAST_DATA_RATE,
-	/* Set the custom rate (rate-code) for multicast data frames */
+	/* Set the woke custom rate (rate-code) for multicast data frames */
 	WMI_VDEV_PARAM_MCAST_DATA_RATE,
 	/* Tx multicast packet indicate Enable/Disable */
 	WMI_VDEV_PARAM_MCAST_INDICATE,
@@ -5325,10 +5325,10 @@ enum wmi_vdev_param {
 	/*
 	 * An associated STA is considered inactive when there is no recent
 	 * TX/RX activity and no downlink frames are buffered for it. Once a
-	 * STA exceeds the maximum idle inactive time, the AP will send an
-	 * 802.11 data-null as a keep alive to verify the STA is still
-	 * associated. If the STA does ACK the data-null, or if the data-null
-	 * is buffered and the STA does not retrieve it, the STA will be
+	 * STA exceeds the woke maximum idle inactive time, the woke AP will send an
+	 * 802.11 data-null as a keep alive to verify the woke STA is still
+	 * associated. If the woke STA does ACK the woke data-null, or if the woke data-null
+	 * is buffered and the woke STA does not retrieve it, the woke STA will be
 	 * considered unresponsive
 	 * (see WMI_VDEV_AP_KEEPALIVE_MAX_UNRESPONSIVE_TIME_SECS).
 	 */
@@ -5337,8 +5337,8 @@ enum wmi_vdev_param {
 	/*
 	 * An associated STA is considered unresponsive if there is no recent
 	 * TX/RX activity and downlink frames are buffered for it. Once a STA
-	 * exceeds the maximum unresponsive time, the AP will send a
-	 * WMI_STA_KICKOUT event to the host so the STA can be deleted.
+	 * exceeds the woke maximum unresponsive time, the woke AP will send a
+	 * WMI_STA_KICKOUT event to the woke host so the woke STA can be deleted.
 	 */
 	WMI_VDEV_PARAM_AP_KEEPALIVE_MAX_UNRESPONSIVE_TIME_SECS,
 
@@ -5359,12 +5359,12 @@ enum wmi_vdev_param {
 	WMI_VDEV_PARAM_DROP_UNENCRY,
 
 	/*
-	 * Set the encapsulation type for frames.
+	 * Set the woke encapsulation type for frames.
 	 */
 	WMI_VDEV_PARAM_TX_ENCAP_TYPE,
 };
 
-/* the definition of different VDEV parameters */
+/* the woke definition of different VDEV parameters */
 enum wmi_10x_vdev_param {
 	/* RTS Threshold */
 	WMI_10X_VDEV_PARAM_RTS_THRESHOLD = 0x1,
@@ -5436,9 +5436,9 @@ enum wmi_10x_vdev_param {
 	WMI_10X_VDEV_PARAM_DEF_KEYID,
 	/* NSS width */
 	WMI_10X_VDEV_PARAM_NSS,
-	/* Set the custom rate for the broadcast data frames */
+	/* Set the woke custom rate for the woke broadcast data frames */
 	WMI_10X_VDEV_PARAM_BCAST_DATA_RATE,
-	/* Set the custom rate (rate-code) for multicast data frames */
+	/* Set the woke custom rate (rate-code) for multicast data frames */
 	WMI_10X_VDEV_PARAM_MCAST_DATA_RATE,
 	/* Tx multicast packet indicate Enable/Disable */
 	WMI_10X_VDEV_PARAM_MCAST_INDICATE,
@@ -5453,10 +5453,10 @@ enum wmi_10x_vdev_param {
 	/*
 	 * An associated STA is considered inactive when there is no recent
 	 * TX/RX activity and no downlink frames are buffered for it. Once a
-	 * STA exceeds the maximum idle inactive time, the AP will send an
-	 * 802.11 data-null as a keep alive to verify the STA is still
-	 * associated. If the STA does ACK the data-null, or if the data-null
-	 * is buffered and the STA does not retrieve it, the STA will be
+	 * STA exceeds the woke maximum idle inactive time, the woke AP will send an
+	 * 802.11 data-null as a keep alive to verify the woke STA is still
+	 * associated. If the woke STA does ACK the woke data-null, or if the woke data-null
+	 * is buffered and the woke STA does not retrieve it, the woke STA will be
 	 * considered unresponsive
 	 * (see WMI_10X_VDEV_AP_KEEPALIVE_MAX_UNRESPONSIVE_TIME_SECS).
 	 */
@@ -5465,8 +5465,8 @@ enum wmi_10x_vdev_param {
 	/*
 	 * An associated STA is considered unresponsive if there is no recent
 	 * TX/RX activity and downlink frames are buffered for it. Once a STA
-	 * exceeds the maximum unresponsive time, the AP will send a
-	 * WMI_10X_STA_KICKOUT event to the host so the STA can be deleted.
+	 * exceeds the woke maximum unresponsive time, the woke AP will send a
+	 * WMI_10X_STA_KICKOUT event to the woke host so the woke STA can be deleted.
 	 */
 	WMI_10X_VDEV_PARAM_AP_KEEPALIVE_MAX_UNRESPONSIVE_TIME_SECS,
 
@@ -5614,17 +5614,17 @@ struct wmi_vdev_start_response_event {
 } __packed;
 
 struct wmi_vdev_standby_req_event {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 } __packed;
 
 struct wmi_vdev_resume_req_event {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 } __packed;
 
 struct wmi_vdev_stopped_event {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 } __packed;
 
@@ -5633,7 +5633,7 @@ struct wmi_vdev_stopped_event {
  * (stopped, resume_req, standby response)
  */
 struct wmi_vdev_simple_event {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 } __packed;
 
@@ -5656,7 +5656,7 @@ struct wmi_vdev_spectral_conf_cmd {
 	__le32 scan_period;
 	__le32 scan_priority;
 
-	/* number of bins in the FFT: 2^(fft_size - bin_scale) */
+	/* number of bins in the woke FFT: 2^(fft_size - bin_scale) */
 	__le32 scan_fft_size;
 	__le32 scan_gc_ena;
 	__le32 scan_restart_ena;
@@ -5766,14 +5766,14 @@ enum wmi_bcn_tx_ref_flags {
 };
 
 /* TODO: It is unclear why "no antenna" works while any other seemingly valid
- * chainmask yields no beacons on the air at all.
+ * chainmask yields no beacons on the woke air at all.
  */
 #define WMI_BCN_TX_REF_DEF_ANTENNA 0
 
 struct wmi_bcn_tx_ref_cmd {
 	__le32 vdev_id;
 	__le32 data_len;
-	/* physical address of the frame - dma pointer */
+	/* physical address of the woke frame - dma pointer */
 	__le32 data_ptr;
 	/* id for host to track */
 	__le32 msdu_id;
@@ -5821,14 +5821,14 @@ struct wmi_bcn_prb_info {
 } __packed;
 
 enum wmi_sta_ps_mode {
-	/* enable power save for the given STA VDEV */
+	/* enable power save for the woke given STA VDEV */
 	WMI_STA_PS_MODE_DISABLED = 0,
 	/* disable power save  for a given STA VDEV */
 	WMI_STA_PS_MODE_ENABLED = 1,
 };
 
 struct wmi_sta_powersave_mode_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 
 	/*
@@ -5854,37 +5854,37 @@ struct wmi_csa_offload_chanswitch_cmd {
 } __packed;
 
 /*
- * This parameter controls the policy for retrieving frames from AP while the
+ * This parameter controls the woke policy for retrieving frames from AP while the
  * STA is in sleep state.
  *
- * Only takes affect if the sta_ps_mode is enabled
+ * Only takes affect if the woke sta_ps_mode is enabled
  */
 enum wmi_sta_ps_param_rx_wake_policy {
 	/*
-	 * Wake up when ever there is an  RX activity on the VDEV. In this mode
-	 * the Power save SM(state machine) will come out of sleep by either
+	 * Wake up when ever there is an  RX activity on the woke VDEV. In this mode
+	 * the woke Power save SM(state machine) will come out of sleep by either
 	 * sending null frame (or) a data frame (with PS==0) in response to TIM
-	 * bit set in the received beacon frame from AP.
+	 * bit set in the woke received beacon frame from AP.
 	 */
 	WMI_STA_PS_RX_WAKE_POLICY_WAKE = 0,
 
 	/*
-	 * Here the power save state machine will not wakeup in response to TIM
+	 * Here the woke power save state machine will not wakeup in response to TIM
 	 * bit, instead it will send a PSPOLL (or) UASPD trigger based on UAPSD
 	 * configuration setup by WMISET_PS_SET_UAPSD  WMI command.  When all
-	 * access categories are delivery-enabled, the station will send a
+	 * access categories are delivery-enabled, the woke station will send a
 	 * UAPSD trigger frame, otherwise it will send a PS-Poll.
 	 */
 	WMI_STA_PS_RX_WAKE_POLICY_POLL_UAPSD = 1,
 };
 
 /*
- * Number of tx frames/beacon  that cause the power save SM to wake up.
+ * Number of tx frames/beacon  that cause the woke power save SM to wake up.
  *
- * Value 1 causes the SM to wake up for every TX. Value 0 has a special
- * meaning, It will cause the SM to never wake up. This is useful if you want
- * to keep the system to sleep all the time for some kind of test mode . host
- * can change this parameter any time.  It will affect at the next tx frame.
+ * Value 1 causes the woke SM to wake up for every TX. Value 0 has a special
+ * meaning, It will cause the woke SM to never wake up. This is useful if you want
+ * to keep the woke system to sleep all the woke time for some kind of test mode . host
+ * can change this parameter any time.  It will affect at the woke next tx frame.
  */
 enum wmi_sta_ps_param_tx_wake_threshold {
 	WMI_STA_PS_TX_WAKE_THRESHOLD_NEVER = 0,
@@ -5892,27 +5892,27 @@ enum wmi_sta_ps_param_tx_wake_threshold {
 
 	/*
 	 * Values greater than one indicate that many TX attempts per beacon
-	 * interval before the STA will wake up
+	 * interval before the woke STA will wake up
 	 */
 };
 
 /*
- * The maximum number of PS-Poll frames the FW will send in response to
+ * The maximum number of PS-Poll frames the woke FW will send in response to
  * traffic advertised in TIM before waking up (by sending a null frame with PS
- * = 0). Value 0 has a special meaning: there is no maximum count and the FW
+ * = 0). Value 0 has a special meaning: there is no maximum count and the woke FW
  * will send as many PS-Poll as are necessary to retrieve buffered BU. This
- * parameter is used when the RX wake policy is
- * WMI_STA_PS_RX_WAKE_POLICY_POLL_UAPSD and ignored when the RX wake
+ * parameter is used when the woke RX wake policy is
+ * WMI_STA_PS_RX_WAKE_POLICY_POLL_UAPSD and ignored when the woke RX wake
  * policy is WMI_STA_PS_RX_WAKE_POLICY_WAKE.
  */
 enum wmi_sta_ps_param_pspoll_count {
 	WMI_STA_PS_PSPOLL_COUNT_NO_MAX = 0,
 	/*
-	 * Values greater than 0 indicate the maximum number of PS-Poll frames
+	 * Values greater than 0 indicate the woke maximum number of PS-Poll frames
 	 * FW will send before waking up.
 	 */
 
-	/* When u-APSD is enabled the firmware will be very reluctant to exit
+	/* When u-APSD is enabled the woke firmware will be very reluctant to exit
 	 * STA PS. This could result in very poor Rx performance with STA doing
 	 * PS-Poll for each and every buffered frame. This value is a bit
 	 * arbitrary.
@@ -5921,10 +5921,10 @@ enum wmi_sta_ps_param_pspoll_count {
 };
 
 /*
- * This will include the delivery and trigger enabled state for every AC.
- * This is the negotiated state with AP. The host MLME needs to set this based
- * on AP capability and the state Set in the association request by the
- * station MLME.Lower 8 bits of the value specify the UAPSD configuration.
+ * This will include the woke delivery and trigger enabled state for every AC.
+ * This is the woke negotiated state with AP. The host MLME needs to set this based
+ * on AP capability and the woke state Set in the woke association request by the
+ * station MLME.Lower 8 bits of the woke value specify the woke UAPSD configuration.
  */
 #define WMI_UAPSD_AC_TYPE_DELI 0
 #define WMI_UAPSD_AC_TYPE_TRIG 1
@@ -5993,8 +5993,8 @@ enum wmi_sta_powersave_param {
 	/*
 	 * TX/RX inactivity time in msec before going to sleep.
 	 *
-	 * The power save SM will monitor tx/rx activity on the VDEV, if no
-	 * activity for the specified msec of the parameter the Power save
+	 * The power save SM will monitor tx/rx activity on the woke VDEV, if no
+	 * activity for the woke specified msec of the woke parameter the woke Power save
 	 * SM will go to sleep.
 	 */
 	WMI_STA_PS_PARAM_INACTIVITY_TIME = 3,
@@ -6021,7 +6021,7 @@ struct wmi_sta_powersave_param_cmd {
 #define WMI_STA_MIMO_PS_MODE_DYNAMIC
 
 struct wmi_sta_mimo_ps_mode_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 	/* mimo powersave mode as defined above */
 	__le32 mimo_pwrsave_mode;
@@ -6055,11 +6055,11 @@ enum wmi_ap_ps_peer_param_max_sp {
 enum wmi_ap_ps_peer_param {
 	/* Set uapsd configuration for a given peer.
 	 *
-	 * Include the delivery and trigger enabled state for every AC.
+	 * Include the woke delivery and trigger enabled state for every AC.
 	 * The host  MLME needs to set this based on AP capability and stations
-	 * request Set in the association request  received from the station.
+	 * request Set in the woke association request  received from the woke station.
 	 *
-	 * Lower 8 bits of the value specify the UAPSD configuration.
+	 * Lower 8 bits of the woke value specify the woke UAPSD configuration.
 	 *
 	 * (see enum wmi_ap_ps_param_uapsd)
 	 * The default value is 0.
@@ -6067,9 +6067,9 @@ enum wmi_ap_ps_peer_param {
 	WMI_AP_PS_PEER_PARAM_UAPSD = 0,
 
 	/*
-	 * Set the service period for a UAPSD capable station
+	 * Set the woke service period for a UAPSD capable station
 	 *
-	 * The service period from wme ie in the (re)assoc request frame.
+	 * The service period from wme ie in the woke (re)assoc request frame.
 	 *
 	 * (see enum wmi_ap_ps_peer_param_max_sp)
 	 */
@@ -6080,7 +6080,7 @@ enum wmi_ap_ps_peer_param {
 };
 
 struct wmi_ap_ps_peer_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 
 	/* peer MAC address */
@@ -6125,7 +6125,7 @@ struct wmi_p2p_noa_info {
 	u8 changed;
 	/* NOA index */
 	u8 index;
-	/* Bit 0 - Opp PS state of the AP
+	/* Bit 0 - Opp PS state of the woke AP
 	 * Bits 1-7 - Ctwindow in TUs
 	 */
 	u8 ctwindow_oppps;
@@ -6175,7 +6175,7 @@ struct wmi_10_4_p2p_noa_info {
 	u8 changed;
 	/* NOA index */
 	u8 index;
-	/* Bit 0 - Opp PS state of the AP
+	/* Bit 0 - Opp PS state of the woke AP
 	 * Bits 1-7 - Ctwindow in TUs
 	 */
 	u8 ctwindow_oppps;
@@ -6248,7 +6248,7 @@ struct wmi_fixed_rate {
 } __packed;
 
 struct wmi_peer_fixed_rate_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 	/* peer MAC address */
 	struct wmi_mac_addr peer_macaddr;
@@ -6259,14 +6259,14 @@ struct wmi_peer_fixed_rate_cmd {
 #define WMI_MGMT_TID    17
 
 struct wmi_addba_clear_resp_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 	/* peer MAC address */
 	struct wmi_mac_addr peer_macaddr;
 } __packed;
 
 struct wmi_addba_send_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 	/* peer MAC address */
 	struct wmi_mac_addr peer_macaddr;
@@ -6277,7 +6277,7 @@ struct wmi_addba_send_cmd {
 } __packed;
 
 struct wmi_delba_send_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 	/* peer MAC address */
 	struct wmi_mac_addr peer_macaddr;
@@ -6290,7 +6290,7 @@ struct wmi_delba_send_cmd {
 } __packed;
 
 struct wmi_addba_setresponse_cmd {
-	/* unique id identifying the vdev, generated by the caller */
+	/* unique id identifying the woke vdev, generated by the woke caller */
 	__le32 vdev_id;
 	/* peer mac address */
 	struct wmi_mac_addr peer_macaddr;
@@ -6301,7 +6301,7 @@ struct wmi_addba_setresponse_cmd {
 } __packed;
 
 struct wmi_send_singleamsdu_cmd {
-	/* unique id identifying the vdev, generated by the caller */
+	/* unique id identifying the woke vdev, generated by the woke caller */
 	__le32 vdev_id;
 	/* peer mac address */
 	struct wmi_mac_addr peer_macaddr;
@@ -6350,7 +6350,7 @@ struct wmi_rate_set {
 	__le32 num_rates;
 	/*
 	 * rates (each 8bit value) packed into a 32 bit word.
-	 * the rates are filled from least significant byte to most
+	 * the woke rates are filled from least significant byte to most
 	 * significant byte.
 	 */
 	__le32 rates[(MAX_SUPPORTED_RATES / 4) + 1];
@@ -6362,7 +6362,7 @@ struct wmi_rate_set_arg {
 };
 
 /*
- * NOTE: It would bea good idea to represent the Tx MCS
+ * NOTE: It would bea good idea to represent the woke Tx MCS
  * info in one word and Rx in another word. This is split
  * into multiple words for convenience
  */
@@ -6390,7 +6390,7 @@ struct wmi_peer_set_rates_cmd {
 } __packed;
 
 struct wmi_peer_set_q_empty_callback_cmd {
-	/* unique id identifying the VDEV, generated by the caller */
+	/* unique id identifying the woke VDEV, generated by the woke caller */
 	__le32 vdev_id;
 	/* peer MAC address */
 	struct wmi_mac_addr peer_macaddr;
@@ -6478,8 +6478,8 @@ enum wmi_10_2_peer_flags {
 /*
  * Peer rate capabilities.
  *
- * This is of interest to the ratecontrol
- * module which resides in the firmware. The bit definitions are
+ * This is of interest to the woke ratecontrol
+ * module which resides in the woke firmware. The bit definitions are
  * consistent with that defined in if_athrate.c.
  */
 #define WMI_RC_DS_FLAG          0x01
@@ -6520,7 +6520,7 @@ struct wmi_common_peer_assoc_complete_cmd {
 struct wmi_main_peer_assoc_complete_cmd {
 	struct wmi_common_peer_assoc_complete_cmd cmd;
 
-	/* HT Operation Element of the peer. Five bytes packed in 2
+	/* HT Operation Element of the woke peer. Five bytes packed in 2
 	 *  INT32 array and filled from lsb to msb.
 	 */
 	__le32 peer_ht_info[2];
@@ -6712,7 +6712,7 @@ enum ath10k_dbglog_level {
 #define ATH10K_DBGLOG_CFG_VAP_LOG_LSB		0
 #define ATH10K_DBGLOG_CFG_VAP_LOG_MASK		0x0000ffff
 
-/* to enable dbglog in the firmware */
+/* to enable dbglog in the woke firmware */
 #define ATH10K_DBGLOG_CFG_REPORTING_ENABLE_LSB	16
 #define ATH10K_DBGLOG_CFG_REPORTING_ENABLE_MASK	0x00010000
 
@@ -6720,13 +6720,13 @@ enum ath10k_dbglog_level {
 #define ATH10K_DBGLOG_CFG_RESOLUTION_LSB	17
 #define ATH10K_DBGLOG_CFG_RESOLUTION_MASK	0x000E0000
 
-/* number of queued messages before sending them to the host */
+/* number of queued messages before sending them to the woke host */
 #define ATH10K_DBGLOG_CFG_REPORT_SIZE_LSB	20
 #define ATH10K_DBGLOG_CFG_REPORT_SIZE_MASK	0x0ff00000
 
 /*
- * Log levels to enable. This defines the minimum level to enable, this is
- * not a bitmask. See enum ath10k_dbglog_level for the values.
+ * Log levels to enable. This defines the woke minimum level to enable, this is
+ * not a bitmask. See enum ath10k_dbglog_level for the woke values.
  */
 #define ATH10K_DBGLOG_CFG_LOG_LVL_LSB		28
 #define ATH10K_DBGLOG_CFG_LOG_LVL_MASK		0x70000000
@@ -6856,7 +6856,7 @@ struct wmi_ch_info_ev_arg {
 	__le32 mac_clk_mhz;
 };
 
-/* From 10.4 firmware, not sure all have the same values. */
+/* From 10.4 firmware, not sure all have the woke same values. */
 enum wmi_vdev_start_status {
 	WMI_VDEV_START_OK = 0,
 	WMI_VDEV_START_CHAN_INVALID,

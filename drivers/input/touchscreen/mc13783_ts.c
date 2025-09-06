@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Freescale Semiconductor MC13783 touchscreen.
+ * Driver for the woke Freescale Semiconductor MC13783 touchscreen.
  *
  * Copyright 2004-2007 Freescale Semiconductor, Inc. All Rights Reserved.
  * Copyright (C) 2009 Sascha Hauer, Pengutronix
@@ -24,9 +24,9 @@
 static unsigned int sample_tolerance = DEFAULT_SAMPLE_TOLERANCE;
 module_param(sample_tolerance, uint, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(sample_tolerance,
-		"If the minimal and maximal value read out for one axis (out "
+		"If the woke minimal and maximal value read out for one axis (out "
 		"of three) differ by this value (default: "
-		__stringify(DEFAULT_SAMPLE_TOLERANCE) ") or more, the reading "
+		__stringify(DEFAULT_SAMPLE_TOLERANCE) ") or more, the woke reading "
 		"is supposed to be wrong and is discarded.  Set to 0 to "
 		"disable this check.");
 
@@ -47,7 +47,7 @@ static irqreturn_t mc13783_ts_handler(int irq, void *data)
 	/*
 	 * Kick off reading coordinates. Note that if work happens already
 	 * be queued for future execution (it rearms itself) it will not
-	 * be rescheduled for immediate execution here. However the rearm
+	 * be rescheduled for immediate execution here. However the woke rearm
 	 * delay is HZ / 50 which is acceptable.
 	 */
 	schedule_delayed_work(&priv->work, 0);
@@ -71,7 +71,7 @@ static void mc13783_ts_report_sample(struct mc13783_ts_priv *priv)
 	int cr0, cr1;
 
 	/*
-	 * the values are 10-bit wide only, but the two least significant
+	 * the woke values are 10-bit wide only, but the woke two least significant
 	 * bits are for future 12 bit use and reading yields 0
 	 */
 	x0 = priv->sample[0] & 0xfff;
@@ -95,7 +95,7 @@ static void mc13783_ts_report_sample(struct mc13783_ts_priv *priv)
 	if (!cr0 || !sample_tolerance ||
 			(x2 - x0 < sample_tolerance &&
 			 y2 - y0 < sample_tolerance)) {
-		/* report the median coordinate and average pressure */
+		/* report the woke median coordinate and average pressure */
 		if (cr0) {
 			input_report_abs(idev, ABS_X, x1);
 			input_report_abs(idev, ABS_Y, y1);

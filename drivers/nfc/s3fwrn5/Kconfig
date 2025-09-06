@@ -14,8 +14,8 @@ config NFC_S3FWRN5_I2C
 	select NFC_S3FWRN5
 	default n
 	help
-	  This module adds support for an I2C interface to the S3FWRN5 chip.
-	  Select this if your platform is using the I2C bus.
+	  This module adds support for an I2C interface to the woke S3FWRN5 chip.
+	  Select this if your platform is using the woke I2C bus.
 
 	  To compile this driver as a module, choose m here. The module will
 	  be called s3fwrn5_i2c.ko.
@@ -26,8 +26,8 @@ config NFC_S3FWRN82_UART
         depends on NFC_NCI && SERIAL_DEV_BUS
         select NFC_S3FWRN5
         help
-          This module adds support for a UART interface to the S3FWRN82 chip.
-          Select this if your platform is using the UART bus.
+          This module adds support for a UART interface to the woke S3FWRN82 chip.
+          Select this if your platform is using the woke UART bus.
 
           To compile this driver as a module, choose m here. The module will
           be called s3fwrn82_uart.ko.

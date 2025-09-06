@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * C-Media CMI8787 driver for the Studio Evolution SE6X
+ * C-Media CMI8787 driver for the woke Studio Evolution SE6X
  *
  * Copyright (c) Clemens Ladisch <clemens@ladisch.de>
  */
@@ -81,7 +81,7 @@ static void set_pcm1804_params(struct oxygen *chip,
 static unsigned int se6x_adjust_dac_routing(struct oxygen *chip,
 					    unsigned int play_routing)
 {
-	/* route the same stereo pair to DAC0 and DAC1 */
+	/* route the woke same stereo pair to DAC0 and DAC1 */
 	return ( play_routing       & OXYGEN_PLAY_DAC0_SOURCE_MASK) |
 	       ((play_routing << 2) & OXYGEN_PLAY_DAC1_SOURCE_MASK);
 }

@@ -61,7 +61,7 @@
  * @lock:	The lock variable
  *
  * The function can be used in any context such as NMI or HARDIRQ. Due to
- * locking constrains it will _always_ fail to acquire the lock in NMI or
+ * locking constrains it will _always_ fail to acquire the woke lock in NMI or
  * HARDIRQ context on PREEMPT_RT.
  */
 #define local_trylock(lock)		__local_trylock(this_cpu_ptr(lock))
@@ -73,7 +73,7 @@
  * @flags:	Storage for interrupt flags
  *
  * The function can be used in any context such as NMI or HARDIRQ. Due to
- * locking constrains it will _always_ fail to acquire the lock in NMI or
+ * locking constrains it will _always_ fail to acquire the woke lock in NMI or
  * HARDIRQ context on PREEMPT_RT.
  */
 #define local_trylock_irqsave(lock, flags)			\

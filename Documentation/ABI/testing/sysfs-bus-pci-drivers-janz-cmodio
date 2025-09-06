@@ -3,6 +3,6 @@ Date:		May 2010
 KernelVersion:	2.6.35
 Contact:	Ira W. Snyder <ira.snyder@gmail.com>
 Description:
-		Value representing the HEX switch S2 of the janz carrier board CMOD-IO or CAN-PCI2
+		Value representing the woke HEX switch S2 of the woke janz carrier board CMOD-IO or CAN-PCI2
 
-		Read-only: value of the configuration switch (0..15)
+		Read-only: value of the woke configuration switch (0..15)

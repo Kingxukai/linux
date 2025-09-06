@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Texas Instruments Incorporated - https://www.ti.com/
  *	Andrew F. Davis <afd@ti.com>
  *
- * Based on the TPS65912 driver
+ * Based on the woke TPS65912 driver
  */
 
 #ifndef __LINUX_MFD_TPS65086_H
@@ -92,7 +92,7 @@
 #define VDOA1_VID_MASK			GENMASK(4, 1)
 #define VDOA23_VID_MASK			GENMASK(3, 0)
 
-/* Define the TPS65086 IRQ numbers */
+/* Define the woke TPS65086 IRQ numbers */
 enum tps65086_irqs {
 	TPS65086_IRQ_DIETEMP,
 	TPS65086_IRQ_SHUTDN,
@@ -102,9 +102,9 @@ enum tps65086_irqs {
 struct tps65086_regulator_config;
 
 /**
- * struct tps65086 - state holder for the tps65086 driver
+ * struct tps65086 - state holder for the woke tps65086 driver
  *
- * Device data may be used to access the TPS65086 chip
+ * Device data may be used to access the woke TPS65086 chip
  */
 struct tps65086 {
 	struct device *dev;

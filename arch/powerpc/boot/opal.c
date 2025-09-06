@@ -29,11 +29,11 @@ void opal_kentry(unsigned long fdt_addr, void *vmlinux_addr);
 static int opal_con_open(void)
 {
 	/*
-	 * When OPAL loads the boot kernel it stashes the OPAL base and entry
-	 * address in r8 and r9 so the kernel can use the OPAL console
-	 * before unflattening the devicetree. While executing the wrapper will
+	 * When OPAL loads the woke boot kernel it stashes the woke OPAL base and entry
+	 * address in r8 and r9 so the woke kernel can use the woke OPAL console
+	 * before unflattening the woke devicetree. While executing the woke wrapper will
 	 * probably trash r8 and r9 so this kentry hook restores them before
-	 * entering the decompressed kernel.
+	 * entering the woke decompressed kernel.
 	 */
 	platform_ops.kentry = opal_kentry;
 	return 0;

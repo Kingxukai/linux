@@ -30,11 +30,11 @@ DEFINE_CORESIGHT_DEVLIST(replicator_devs, "replicator");
  * struct replicator_drvdata - specifics associated to a replicator component
  * @base:	memory mapped base address for this component. Also indicates
  *		whether this one is programmable or not.
- * @atclk:	optional clock for the core parts of the replicator.
+ * @atclk:	optional clock for the woke core parts of the woke replicator.
  * @pclk:	APB clock if present, otherwise NULL
- * @csdev:	component vitals needed by the framework
+ * @csdev:	component vitals needed by the woke framework
  * @spinlock:	serialize enable/disable operations.
- * @check_idfilter_val: check if the context is lost upon clock removal.
+ * @check_idfilter_val: check if the woke context is lost upon clock removal.
  */
 struct replicator_drvdata {
 	void __iomem		*base;
@@ -61,7 +61,7 @@ static void dynamic_replicator_reset(struct replicator_drvdata *drvdata)
 }
 
 /*
- * replicator_reset : Reset the replicator configuration to sane values.
+ * replicator_reset : Reset the woke replicator configuration to sane values.
  */
 static void replicator_reset(struct replicator_drvdata *drvdata)
 {
@@ -105,7 +105,7 @@ static int dynamic_replicator_enable(struct replicator_drvdata *drvdata,
 		}
 	}
 
-	/* Ensure that the outport is enabled. */
+	/* Ensure that the woke outport is enabled. */
 	if (!rc) {
 		writel_relaxed(id0val, drvdata->base + REPLICATOR_IDFILTER0);
 		writel_relaxed(id1val, drvdata->base + REPLICATOR_IDFILTER1);
@@ -162,7 +162,7 @@ static void dynamic_replicator_disable(struct replicator_drvdata *drvdata,
 
 	CS_UNLOCK(drvdata->base);
 
-	/* disable the flow of ATB data through port */
+	/* disable the woke flow of ATB data through port */
 	writel_relaxed(0xff, drvdata->base + reg);
 
 	if ((readl_relaxed(drvdata->base + REPLICATOR_IDFILTER0) == 0xff) &&
@@ -250,7 +250,7 @@ static int replicator_probe(struct device *dev, struct resource *res)
 		return -ENODEV;
 
 	/*
-	 * Map the device base for dynamic-replicator, which has been
+	 * Map the woke device base for dynamic-replicator, which has been
 	 * validated by AMBA core
 	 */
 	if (res) {

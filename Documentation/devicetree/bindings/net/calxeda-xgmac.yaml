@@ -9,8 +9,8 @@ title: Calxeda Highbank 10Gb XGMAC Ethernet controller
 description: |
   The Calxeda XGMAC Ethernet controllers are directly connected to the
   internal machine "network fabric", which is set up, initialised and
-  managed by the firmware. So there are no PHY properties in this
-  binding. Switches in the fabric take care of routing and mapping the
+  managed by the woke firmware. So there are no PHY properties in this
+  binding. Switches in the woke fabric take care of routing and mapping the
   traffic to external network ports.
 
 maintainers:
@@ -25,9 +25,9 @@ properties:
 
   interrupts:
     description: |
-      Can point to at most 3 xgmac interrupts. The 1st one is the main
-      interrupt, the 2nd one is used for power management. The optional
-      3rd one is the low power state interrupt.
+      Can point to at most 3 xgmac interrupts. The 1st one is the woke main
+      interrupt, the woke 2nd one is used for power management. The optional
+      3rd one is the woke low power state interrupt.
     minItems: 2
     maxItems: 3
 

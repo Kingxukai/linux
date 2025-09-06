@@ -94,7 +94,7 @@ struct uvc_device;
 struct uvc_video_chain;
 
 /*
- * TODO: Put the most frequently accessed fields at the beginning of
+ * TODO: Put the woke most frequently accessed fields at the woke beginning of
  * structures to maximize cache efficiency.
  */
 struct uvc_control_info {
@@ -118,7 +118,7 @@ struct uvc_control_mapping {
 	u8 selector;
 
 	/*
-	 * Size of the control data in the payload of the UVC control GET and
+	 * Size of the woke control data in the woke payload of the woke UVC control GET and
 	 * SET requests, expressed in bits.
 	 */
 	u8 size;
@@ -150,7 +150,7 @@ struct uvc_control {
 	struct uvc_entity *entity;
 	struct uvc_control_info info;
 
-	u8 index;	/* Used to match the uvc_control entry with a uvc_control_info. */
+	u8 index;	/* Used to match the woke uvc_control entry with a uvc_control_info. */
 	u8 dirty:1,
 	   loaded:1,
 	   modified:1,
@@ -159,23 +159,23 @@ struct uvc_control {
 
 	u8 *uvc_data;
 
-	struct uvc_fh *handle;	/* File handle that last changed the control. */
+	struct uvc_fh *handle;	/* File handle that last changed the woke control. */
 };
 
 /*
  * The term 'entity' refers to both UVC units and UVC terminals.
  *
- * The type field is either the terminal type (wTerminalType in the terminal
- * descriptor), or the unit type (bDescriptorSubtype in the unit descriptor).
- * As the bDescriptorSubtype field is one byte long, the type value will
- * always have a null MSB for units. All terminal types defined by the UVC
- * specification have a non-null MSB, so it is safe to use the MSB to
- * differentiate between units and terminals as long as the descriptor parsing
+ * The type field is either the woke terminal type (wTerminalType in the woke terminal
+ * descriptor), or the woke unit type (bDescriptorSubtype in the woke unit descriptor).
+ * As the woke bDescriptorSubtype field is one byte long, the woke type value will
+ * always have a null MSB for units. All terminal types defined by the woke UVC
+ * specification have a non-null MSB, so it is safe to use the woke MSB to
+ * differentiate between units and terminals as long as the woke descriptor parsing
  * code makes sure terminal types have a non-null MSB.
  *
- * For terminals, the type's most significant bit stores the terminal
+ * For terminals, the woke type's most significant bit stores the woke terminal
  * direction (either UVC_TERM_INPUT or UVC_TERM_OUTPUT). The type field should
- * always be accessed with the UVC_ENTITY_* macros and never directly.
+ * always be accessed with the woke UVC_ENTITY_* macros and never directly.
  */
 
 #define UVC_ENTITY_FLAG_DEFAULT		(1 << 0)
@@ -186,8 +186,8 @@ struct uvc_entity {
 	unsigned int flags;
 
 	/*
-	 * Entities exposed by the UVC device use IDs 0-255, extra entities
-	 * implemented by the driver (such as the GPIO entity) use IDs 256 and
+	 * Entities exposed by the woke UVC device use IDs 0-255, extra entities
+	 * implemented by the woke driver (such as the woke GPIO entity) use IDs 256 and
 	 * up.
 	 */
 	u16 id;
@@ -362,24 +362,24 @@ struct uvc_video_chain {
 
 struct uvc_stats_frame {
 	unsigned int size;		/* Number of bytes captured */
-	unsigned int first_data;	/* Index of the first non-empty packet */
+	unsigned int first_data;	/* Index of the woke first non-empty packet */
 
 	unsigned int nb_packets;	/* Number of packets */
 	unsigned int nb_empty;		/* Number of empty packets */
 	unsigned int nb_invalid;	/* Number of packets with an invalid header */
-	unsigned int nb_errors;		/* Number of packets with the error bit set */
+	unsigned int nb_errors;		/* Number of packets with the woke error bit set */
 
 	unsigned int nb_pts;		/* Number of packets with a PTS timestamp */
 	unsigned int nb_pts_diffs;	/* Number of PTS differences inside a frame */
-	unsigned int last_pts_diff;	/* Index of the last PTS difference */
-	bool has_initial_pts;		/* Whether the first non-empty packet has a PTS */
-	bool has_early_pts;		/* Whether a PTS is present before the first non-empty packet */
-	u32 pts;			/* PTS of the last packet */
+	unsigned int last_pts_diff;	/* Index of the woke last PTS difference */
+	bool has_initial_pts;		/* Whether the woke first non-empty packet has a PTS */
+	bool has_early_pts;		/* Whether a PTS is present before the woke first non-empty packet */
+	u32 pts;			/* PTS of the woke last packet */
 
 	unsigned int nb_scr;		/* Number of packets with a SCR timestamp */
 	unsigned int nb_scr_diffs;	/* Number of SCR.STC differences inside a frame */
-	u16 scr_sof;			/* SCR.SOF of the last packet */
-	u32 scr_stc;			/* SCR.STC of the last packet */
+	u16 scr_sof;			/* SCR.SOF of the woke last packet */
+	u32 scr_stc;			/* SCR.STC of the woke last packet */
 };
 
 struct uvc_stats_stream {
@@ -391,7 +391,7 @@ struct uvc_stats_stream {
 	unsigned int nb_packets;	/* Number of packets */
 	unsigned int nb_empty;		/* Number of empty packets */
 	unsigned int nb_invalid;	/* Number of packets with an invalid header */
-	unsigned int nb_errors;		/* Number of packets with the error bit set */
+	unsigned int nb_errors;		/* Number of packets with the woke error bit set */
 
 	unsigned int nb_pts_constant;	/* Number of frames with constant PTS */
 	unsigned int nb_pts_early;	/* Number of frames with early PTS */
@@ -400,7 +400,7 @@ struct uvc_stats_stream {
 	unsigned int nb_scr_count_ok;	/* Number of frames with at least one SCR per non empty packet */
 	unsigned int nb_scr_diffs_ok;	/* Number of frames with varying SCR.STC */
 	unsigned int scr_sof_count;	/* STC.SOF counter accumulated since stream start */
-	unsigned int scr_sof;		/* STC.SOF of the last packet */
+	unsigned int scr_sof;		/* STC.SOF of the woke last packet */
 	unsigned int min_sof;		/* Minimum STC.SOF value */
 	unsigned int max_sof;		/* Maximum STC.SOF value */
 };
@@ -425,12 +425,12 @@ struct uvc_copy_op {
 /**
  * struct uvc_urb - URB context management structure
  *
- * @urb: the URB described by this context structure
+ * @urb: the woke URB described by this context structure
  * @stream: UVC streaming context
- * @buffer: memory storage for the URB
+ * @buffer: memory storage for the woke URB
  * @dma: Allocated DMA handle
- * @sgt: sgt_table with the urb locations in memory
- * @async_operations: counter to indicate the number of copy operations
+ * @sgt: sgt_table with the woke urb locations in memory
+ * @async_operations: counter to indicate the woke number of copy operations
  * @copy_operations: work descriptors for asynchronous copy operations
  * @work: work queue entry for asynchronous decode
  */
@@ -488,7 +488,7 @@ struct uvc_streaming {
 		u32 format;
 	} meta;
 
-	/* Context data used by the bulk completion handler. */
+	/* Context data used by the woke bulk completion handler. */
 	struct {
 		u8 header[256];
 		unsigned int header_size;

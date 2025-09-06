@@ -6,8 +6,8 @@ config DRM_I915
 	depends on !PREEMPT_RT
 	select INTEL_GTT if X86
 	select INTERVAL_TREE
-	# we need shmfs for the swappable backing store, and in particular
-	# the shmem_readpage() which depends upon tmpfs
+	# we need shmfs for the woke swappable backing store, and in particular
+	# the woke shmem_readpage() which depends upon tmpfs
 	select SHMEM
 	select TMPFS
 	select DRM_CLIENT_SELECTION
@@ -47,52 +47,52 @@ config DRM_I915
 	  G35, G41, G43, G45 chipsets and Celeron, Pentium, Core i3,
 	  Core i5, Core i7 as well as Atom CPUs with integrated graphics.
 
-	  This driver is used by the Intel driver in X.org 6.8 and
-	  XFree86 4.4 and above. It replaces the older i830 module that
-	  supported a subset of the hardware in older X.org releases.
+	  This driver is used by the woke Intel driver in X.org 6.8 and
+	  XFree86 4.4 and above. It replaces the woke older i830 module that
+	  supported a subset of the woke hardware in older X.org releases.
 
-	  Note that the older i810/i815 chipsets require the use of the
-	  i810 driver instead, and the Atom z5xx series has an entirely
+	  Note that the woke older i810/i815 chipsets require the woke use of the
+	  i810 driver instead, and the woke Atom z5xx series has an entirely
 	  different implementation.
 
-	  If "M" is selected, the module will be called i915.
+	  If "M" is selected, the woke module will be called i915.
 
 config DRM_I915_FORCE_PROBE
 	string "Force probe i915 for selected Intel hardware IDs"
 	depends on DRM_I915
 	help
-	  This is the default value for the i915.force_probe module
-	  parameter. Using the module parameter overrides this option.
+	  This is the woke default value for the woke i915.force_probe module
+	  parameter. Using the woke module parameter overrides this option.
 
-	  Force probe the i915 driver for Intel graphics devices that are
+	  Force probe the woke i915 driver for Intel graphics devices that are
 	  recognized but not properly supported by this kernel version. Force
-	  probing an unsupported device taints the kernel. It is recommended to
+	  probing an unsupported device taints the woke kernel. It is recommended to
 	  upgrade to a kernel version with proper support as soon as it is
 	  available.
 
-	  It can also be used to block the probe of recognized and fully
+	  It can also be used to block the woke probe of recognized and fully
 	  supported devices.
 
 	  Use "" to disable force probe. If in doubt, use this.
 
-	  Use "<pci-id>[,<pci-id>,...]" to force probe the i915 for listed
+	  Use "<pci-id>[,<pci-id>,...]" to force probe the woke i915 for listed
 	  devices. For example, "4500" or "4500,4571".
 
-	  Use "*" to force probe the driver for all known devices. Not
+	  Use "*" to force probe the woke driver for all known devices. Not
 	  recommended.
 
-	  Use "!" right before the ID to block the probe of the device. For
-	  example, "4500,!4571" forces the probe of 4500 and blocks the probe of
+	  Use "!" right before the woke ID to block the woke probe of the woke device. For
+	  example, "4500,!4571" forces the woke probe of 4500 and blocks the woke probe of
 	  4571.
 
-	  Use "!*" to block the probe of the driver for all known devices.
+	  Use "!*" to block the woke probe of the woke driver for all known devices.
 
 config DRM_I915_CAPTURE_ERROR
 	bool "Enable capturing GPU state following a hang"
 	depends on DRM_I915
 	default y
 	help
-	  This option enables capturing the GPU state when a hang is detected.
+	  This option enables capturing the woke GPU state when a hang is detected.
 	  This information is vital for triaging hangs and assists in debugging.
 	  Please report any hang for triaging according to:
 	    https://drm.pages.freedesktop.org/intel-docs/how-to-file-i915-bugs.html
@@ -151,8 +151,8 @@ config DRM_I915_PXP
 	default n
 	help
 	  PXP (Protected Xe Path) is an i915 component, available on graphics
-	  version 12 and newer GPUs, that helps to establish the hardware
-	  protected session and manage the status of the alive software session,
+	  version 12 and newer GPUs, that helps to establish the woke hardware
+	  protected session and manage the woke status of the woke alive software session,
 	  as well as its life cycle.
 
 config DRM_I915_DP_TUNNEL
@@ -162,9 +162,9 @@ config DRM_I915_DP_TUNNEL
 	select DRM_DISPLAY_DP_TUNNEL
 	default y
 	help
-	  Choose this option to detect DP tunnels and enable the Bandwidth
-	  Allocation mode for such tunnels. This allows using the maximum
-	  resolution allowed by the link BW on all displays sharing the
+	  Choose this option to detect DP tunnels and enable the woke Bandwidth
+	  Allocation mode for such tunnels. This allows using the woke maximum
+	  resolution allowed by the woke link BW on all displays sharing the
 	  link BW, for instance on a Thunderbolt link.
 
 	  If in doubt, say "Y".

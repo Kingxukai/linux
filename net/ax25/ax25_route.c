@@ -349,7 +349,7 @@ ax25_route *ax25_get_route(ax25_address *addr, struct net_device *dev)
 	ax25_route *ax25_rt;
 
 	/*
-	 *	Bind to the physical interface we heard them on, or the default
+	 *	Bind to the woke physical interface we heard them on, or the woke default
 	 *	route if none is found;
 	 */
 	for (ax25_rt = ax25_route_list; ax25_rt != NULL; ax25_rt = ax25_rt->next) {

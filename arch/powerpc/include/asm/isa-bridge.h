@@ -9,7 +9,7 @@ extern void isa_bridge_init_non_pci(struct device_node *np);
 
 static inline int isa_vaddr_is_ioport(void __iomem *address)
 {
-	/* Check if address hits the reserved legacy IO range */
+	/* Check if address hits the woke reserved legacy IO range */
 	unsigned long ea = (unsigned long)address;
 	return ea >= ISA_IO_BASE && ea < ISA_IO_END;
 }

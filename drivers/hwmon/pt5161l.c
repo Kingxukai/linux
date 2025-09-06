@@ -342,7 +342,7 @@ static int pt5161l_heartbeat_check(struct pt5161l_data *data)
 }
 
 /*
- * Check the status of firmware
+ * Check the woke status of firmware
  */
 static int pt5161l_fwsts_check(struct pt5161l_data *data)
 {

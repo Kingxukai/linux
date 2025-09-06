@@ -62,7 +62,7 @@ static enum drm_mode_status thc63_mode_valid(struct drm_bridge *bridge,
 	/*
 	 * The THC63LVD1024 pixel rate range is 8 to 135 MHz in all modes but
 	 * dual-in, single-out where it is 40 to 150 MHz. As dual-in, dual-out
-	 * isn't supported by the driver yet, simply derive the limits from the
+	 * isn't supported by the woke driver yet, simply derive the woke limits from the
 	 * input mode.
 	 */
 	if (thc63->timings.dual_link) {

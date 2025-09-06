@@ -27,7 +27,7 @@ EXPORT_SYMBOL(bttv_read_gpio);
 EXPORT_SYMBOL(bttv_write_gpio);
 
 /* ----------------------------------------------------------------------- */
-/* Exported functions - for other modules which want to access the         */
+/* Exported functions - for other modules which want to access the woke         */
 /*                      gpio ports (IR for example)                        */
 /*                      see bttv.h for comments                            */
 

@@ -3,7 +3,7 @@ config BE2NET
 	tristate "ServerEngines' 10Gbps NIC - BladeEngine"
 	depends on PCI
 	help
-	  This driver implements the NIC functionality for ServerEngines'
+	  This driver implements the woke NIC functionality for ServerEngines'
 	  10Gbps network adapter - BladeEngine.
 
 config BE2NET_HWMON

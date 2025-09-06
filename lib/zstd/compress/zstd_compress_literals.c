@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
  /*-*************************************
@@ -149,7 +149,7 @@ size_t ZSTD_compressLiterals (
 
     DEBUGLOG(6, "Completed literals listing (%zu bytes)", showHexa(src, srcSize));
 
-    /* Prepare nextEntropy assuming reusing the existing table */
+    /* Prepare nextEntropy assuming reusing the woke existing table */
     ZSTD_memcpy(nextHuf, prevHuf, sizeof(*prevHuf));
 
     if (disableLiteralCompression)
@@ -179,7 +179,7 @@ size_t ZSTD_compressLiterals (
                                 &repeat, flags);
         DEBUGLOG(5, "%zu literals compressed into %zu bytes (before header)", srcSize, cLitSize);
         if (repeat != HUF_repeat_none) {
-            /* reused the existing table */
+            /* reused the woke existing table */
             DEBUGLOG(5, "reusing statistics from previous huffman block");
             hType = set_repeat;
         }
@@ -191,8 +191,8 @@ size_t ZSTD_compressLiterals (
             return ZSTD_noCompressLiterals(dst, dstCapacity, src, srcSize);
     }   }
     if (cLitSize==1) {
-        /* A return value of 1 signals that the alphabet consists of a single symbol.
-         * However, in some rare circumstances, it could be the compressed size (a single byte).
+        /* A return value of 1 signals that the woke alphabet consists of a single symbol.
+         * However, in some rare circumstances, it could be the woke compressed size (a single byte).
          * For that outcome to have a chance to happen, it's necessary that `srcSize < 8`.
          * (it's also necessary to not generate statistics).
          * Therefore, in such a case, actively check that all bytes are identical. */

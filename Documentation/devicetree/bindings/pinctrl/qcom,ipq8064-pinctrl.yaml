@@ -48,7 +48,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this
+          List of gpio pins affected by the woke properties specified in this
           subnode.
         items:
           oneOf:
@@ -59,7 +59,7 @@ $defs:
 
       function:
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins.
         enum: [ mdio, mi2s, pdm, ssbi, spmi, audio_pcm, gpio, gsbi1, gsbi2, gsbi4, gsbi5,
                 gsbi5_spi_cs1, gsbi5_spi_cs2, gsbi5_spi_cs3, gsbi6, gsbi7, nss_spi, sdc1,

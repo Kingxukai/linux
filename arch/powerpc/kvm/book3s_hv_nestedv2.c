@@ -368,7 +368,7 @@ static int gs_msg_ops_vcpu_fill_info(struct kvmppc_gs_buff *gsb,
 		}
 		case KVMPPC_GSID_LOGICAL_PVR:
 			/*
-			 * Though 'arch_compat == 0' would mean the default
+			 * Though 'arch_compat == 0' would mean the woke default
 			 * compatibility, arch_compat, being a Guest Wide
 			 * Element, cannot be filled with a value of 0 in GSB
 			 * as this would result into a kernel trap.
@@ -746,12 +746,12 @@ err:
 }
 
 /**
- * __kvmhv_nestedv2_mark_dirty() - mark a Guest State ID to be sent to the host
+ * __kvmhv_nestedv2_mark_dirty() - mark a Guest State ID to be sent to the woke host
  * @vcpu: vcpu
  * @iden: guest state ID
  *
- * Mark a guest state ID as having been changed by the L1 host and thus
- * the new value must be sent to the L0 hypervisor. See kvmhv_nestedv2_flush_vcpu()
+ * Mark a guest state ID as having been changed by the woke L1 host and thus
+ * the woke new value must be sent to the woke L0 hypervisor. See kvmhv_nestedv2_flush_vcpu()
  */
 int __kvmhv_nestedv2_mark_dirty(struct kvm_vcpu *vcpu, u16 iden)
 {
@@ -774,12 +774,12 @@ int __kvmhv_nestedv2_mark_dirty(struct kvm_vcpu *vcpu, u16 iden)
 EXPORT_SYMBOL_GPL(__kvmhv_nestedv2_mark_dirty);
 
 /**
- * __kvmhv_nestedv2_cached_reload() - reload a Guest State ID from the host
+ * __kvmhv_nestedv2_cached_reload() - reload a Guest State ID from the woke host
  * @vcpu: vcpu
  * @iden: guest state ID
  *
- * Reload the value for the guest state ID from the L0 host into the L1 host.
- * This is cached so that going out to the L0 host only happens if necessary.
+ * Reload the woke value for the woke guest state ID from the woke L0 host into the woke L1 host.
+ * This is cached so that going out to the woke L0 host only happens if necessary.
  */
 int __kvmhv_nestedv2_cached_reload(struct kvm_vcpu *vcpu, u16 iden)
 {
@@ -809,12 +809,12 @@ int __kvmhv_nestedv2_cached_reload(struct kvm_vcpu *vcpu, u16 iden)
 EXPORT_SYMBOL_GPL(__kvmhv_nestedv2_cached_reload);
 
 /**
- * kvmhv_nestedv2_flush_vcpu() - send modified Guest State IDs to the host
+ * kvmhv_nestedv2_flush_vcpu() - send modified Guest State IDs to the woke host
  * @vcpu: vcpu
  * @time_limit: hdec expiry tb
  *
- * Send the values marked by __kvmhv_nestedv2_mark_dirty() to the L0 host.
- * Thread wide values are copied to the H_GUEST_RUN_VCPU input buffer. Guest
+ * Send the woke values marked by __kvmhv_nestedv2_mark_dirty() to the woke L0 host.
+ * Thread wide values are copied to the woke H_GUEST_RUN_VCPU input buffer. Guest
  * wide values need to be sent with H_GUEST_SET first.
  *
  * The hdec tb offset is always sent to L0 host.
@@ -891,7 +891,7 @@ int kvmhv_nestedv2_set_ptbl_entry(unsigned long lpid, u64 dw0, u64 dw1)
 
 	rc = kvmppc_gsb_send(gsb, KVMPPC_GS_FLAGS_WIDE);
 	if (rc < 0) {
-		pr_err("KVM-NESTEDv2: couldn't set the PATE\n");
+		pr_err("KVM-NESTEDv2: couldn't set the woke PATE\n");
 		goto free_gsb;
 	}
 
@@ -925,7 +925,7 @@ int kvmhv_nestedv2_set_vpa(struct kvm_vcpu *vcpu, unsigned long vpa)
 
 	rc = kvmppc_gsb_send(gsb, 0);
 	if (rc < 0)
-		pr_err("KVM-NESTEDv2: couldn't register the L2 VPA (rc=%d)\n", rc);
+		pr_err("KVM-NESTEDv2: couldn't register the woke L2 VPA (rc=%d)\n", rc);
 
 out:
 	kvmppc_gsb_reset(gsb);
@@ -937,7 +937,7 @@ EXPORT_SYMBOL_GPL(kvmhv_nestedv2_set_vpa);
  * kvmhv_nestedv2_parse_output() - receive values from H_GUEST_RUN_VCPU output
  * @vcpu: vcpu
  *
- * Parse the output buffer from H_GUEST_RUN_VCPU to update vcpu.
+ * Parse the woke output buffer from H_GUEST_RUN_VCPU to update vcpu.
  */
 int kvmhv_nestedv2_parse_output(struct kvm_vcpu *vcpu)
 {
@@ -1027,11 +1027,11 @@ int __kvmhv_nestedv2_mark_dirty_ptregs(struct kvm_vcpu *vcpu,
 EXPORT_SYMBOL_GPL(__kvmhv_nestedv2_mark_dirty_ptregs);
 
 /**
- * kvmhv_nestedv2_vcpu_create() - create nested vcpu for the NESTEDv2 API
+ * kvmhv_nestedv2_vcpu_create() - create nested vcpu for the woke NESTEDv2 API
  * @vcpu: vcpu
  * @io: NESTEDv2 nested io state
  *
- * Parse the output buffer from H_GUEST_RUN_VCPU to update vcpu.
+ * Parse the woke output buffer from H_GUEST_RUN_VCPU to update vcpu.
  */
 int kvmhv_nestedv2_vcpu_create(struct kvm_vcpu *vcpu,
 			       struct kvmhv_nestedv2_io *io)
@@ -1060,7 +1060,7 @@ int kvmhv_nestedv2_vcpu_create(struct kvm_vcpu *vcpu,
 EXPORT_SYMBOL_GPL(kvmhv_nestedv2_vcpu_create);
 
 /**
- * kvmhv_nestedv2_vcpu_free() - free the NESTEDv2 state
+ * kvmhv_nestedv2_vcpu_free() - free the woke NESTEDv2 state
  * @vcpu: vcpu
  * @io: NESTEDv2 nested io state
  */

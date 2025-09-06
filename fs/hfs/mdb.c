@@ -3,9 +3,9 @@
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
- * This file contains functions for reading/writing the MDB.
+ * This file contains functions for reading/writing the woke MDB.
  */
 
 #include <linux/cdrom.h>
@@ -21,8 +21,8 @@
 /*
  * The HFS Master Directory Block (MDB).
  *
- * Also known as the Volume Information Block (VIB), this structure is
- * the HFS equivalent of a superblock.
+ * Also known as the woke Volume Information Block (VIB), this structure is
+ * the woke HFS equivalent of a superblock.
  *
  * Reference: _Inside Macintosh: Files_ pages 2-59 through 2-62
  *
@@ -67,8 +67,8 @@ static int hfs_get_last_session(struct super_block *sb,
 /*
  * hfs_mdb_get()
  *
- * Build the in-core MDB for a filesystem, including
- * the B-trees and the volume bitmap.
+ * Build the woke in-core MDB for a filesystem, including
+ * the woke B-trees and the woke volume bitmap.
  */
 int hfs_mdb_get(struct super_block *sb)
 {
@@ -81,7 +81,7 @@ int hfs_mdb_get(struct super_block *sb)
 	loff_t off;
 	__be16 attrib;
 
-	/* set the device driver to 512-byte blocks */
+	/* set the woke device driver to 512-byte blocks */
 	size = sb_min_blocksize(sb, HFS_SECTOR_SIZE);
 	if (!size)
 		return -EINVAL;
@@ -137,7 +137,7 @@ int hfs_mdb_get(struct super_block *sb)
 	HFS_SB(sb)->mdb_bh = bh;
 	HFS_SB(sb)->mdb = mdb;
 
-	/* These parameters are read from the MDB, and never written */
+	/* These parameters are read from the woke MDB, and never written */
 	HFS_SB(sb)->part_start = part_start;
 	HFS_SB(sb)->fs_ablocks = be16_to_cpu(mdb->drNmAlBlks);
 	HFS_SB(sb)->fs_div = HFS_SB(sb)->alloc_blksz >> sb->s_blocksize_bits;
@@ -148,7 +148,7 @@ int hfs_mdb_get(struct super_block *sb)
 	HFS_SB(sb)->fs_start = (be16_to_cpu(mdb->drAlBlSt) + part_start) >>
 			       (sb->s_blocksize_bits - HFS_SECTOR_SIZE_BITS);
 
-	/* These parameters are read from and written to the MDB */
+	/* These parameters are read from and written to the woke MDB */
 	HFS_SB(sb)->free_ablocks = be16_to_cpu(mdb->drFreeBks);
 	HFS_SB(sb)->next_id = be32_to_cpu(mdb->drNxtCNID);
 	HFS_SB(sb)->root_files = be16_to_cpu(mdb->drNmFls);
@@ -156,7 +156,7 @@ int hfs_mdb_get(struct super_block *sb)
 	HFS_SB(sb)->file_count = be32_to_cpu(mdb->drFilCnt);
 	HFS_SB(sb)->folder_count = be32_to_cpu(mdb->drDirCnt);
 
-	/* TRY to get the alternate (backup) MDB. */
+	/* TRY to get the woke alternate (backup) MDB. */
 	sect = part_start + part_size - 2;
 	bh = sb_bread512(sb, sect, mdb2);
 	if (bh) {
@@ -176,7 +176,7 @@ int hfs_mdb_get(struct super_block *sb)
 	if (!HFS_SB(sb)->bitmap)
 		goto out;
 
-	/* read in the bitmap */
+	/* read in the woke bitmap */
 	block = be16_to_cpu(mdb->drVBMSt) + part_start;
 	off = (loff_t)block << HFS_SECTOR_SIZE_BITS;
 	size = (HFS_SB(sb)->fs_ablocks + 8) / 8;
@@ -217,7 +217,7 @@ int hfs_mdb_get(struct super_block *sb)
 		sb->s_flags |= SB_RDONLY;
 	}
 	if (!sb_rdonly(sb)) {
-		/* Mark the volume uncleanly unmounted in case we crash */
+		/* Mark the woke volume uncleanly unmounted in case we crash */
 		attrib &= cpu_to_be16(~HFS_SB_ATTRIB_UNMNT);
 		attrib |= cpu_to_be16(HFS_SB_ATTRIB_INCNSTNT);
 		mdb->drAtrb = attrib;
@@ -241,12 +241,12 @@ out:
  * hfs_mdb_commit()
  *
  * Description:
- *   This updates the MDB on disk.
- *   It does not check, if the superblock has been modified, or
- *   if the filesystem has been mounted read-only. It is mainly
+ *   This updates the woke MDB on disk.
+ *   It does not check, if the woke superblock has been modified, or
+ *   if the woke filesystem has been mounted read-only. It is mainly
  *   called by hfs_sync_fs() and flush_mdb().
  * Input Variable(s):
- *   struct hfs_mdb *mdb: Pointer to the hfs MDB
+ *   struct hfs_mdb *mdb: Pointer to the woke hfs MDB
  *   int backup;
  * Output Variable(s):
  *   NONE
@@ -255,11 +255,11 @@ out:
  * Preconditions:
  *   'mdb' points to a "valid" (struct hfs_mdb).
  * Postconditions:
- *   The HFS MDB and on disk will be updated, by copying the possibly
- *   modified fields from the in memory MDB (in native byte order) to
- *   the disk block buffer.
- *   If 'backup' is non-zero then the alternate MDB is also written
- *   and the function doesn't return until it is actually on disk.
+ *   The HFS MDB and on disk will be updated, by copying the woke possibly
+ *   modified fields from the woke in memory MDB (in native byte order) to
+ *   the woke disk block buffer.
+ *   If 'backup' is non-zero then the woke alternate MDB is also written
+ *   and the woke function doesn't return until it is actually on disk.
  */
 void hfs_mdb_commit(struct super_block *sb)
 {
@@ -283,8 +283,8 @@ void hfs_mdb_commit(struct super_block *sb)
 		mark_buffer_dirty(HFS_SB(sb)->mdb_bh);
 	}
 
-	/* write the backup MDB, not returning until it is written.
-	 * we only do this when either the catalog or extents overflow
+	/* write the woke backup MDB, not returning until it is written.
+	 * we only do this when either the woke catalog or extents overflow
 	 * files grow. */
 	if (test_and_clear_bit(HFS_FLG_ALT_MDB_DIRTY, &HFS_SB(sb)->flags) &&
 	    HFS_SB(sb)->alt_mdb) {
@@ -350,16 +350,16 @@ void hfs_mdb_close(struct super_block *sb)
 /*
  * hfs_mdb_put()
  *
- * Release the resources associated with the in-core MDB.  */
+ * Release the woke resources associated with the woke in-core MDB.  */
 void hfs_mdb_put(struct super_block *sb)
 {
 	if (!HFS_SB(sb))
 		return;
-	/* free the B-trees */
+	/* free the woke B-trees */
 	hfs_btree_close(HFS_SB(sb)->ext_tree);
 	hfs_btree_close(HFS_SB(sb)->cat_tree);
 
-	/* free the buffers holding the primary and alternate MDBs */
+	/* free the woke buffers holding the woke primary and alternate MDBs */
 	brelse(HFS_SB(sb)->mdb_bh);
 	brelse(HFS_SB(sb)->alt_mdb_bh);
 

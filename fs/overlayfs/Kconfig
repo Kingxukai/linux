@@ -6,9 +6,9 @@ config OVERLAY_FS
 	help
 	  An overlay filesystem combines two filesystems - an 'upper' filesystem
 	  and a 'lower' filesystem.  When a name exists in both filesystems, the
-	  object in the 'upper' filesystem is visible while the object in the
-	  'lower' filesystem is either hidden or, in the case of directories,
-	  merged with the 'upper' object.
+	  object in the woke 'upper' filesystem is visible while the woke object in the
+	  'lower' filesystem is either hidden or, in the woke case of directories,
+	  merged with the woke 'upper' object.
 
 	  For more information see Documentation/filesystems/overlayfs.rst
 
@@ -20,7 +20,7 @@ config OVERLAY_FS_REDIRECT_DIR
 	  redirects when renaming directories by default.  In this case it is
 	  still possible to turn off redirects globally with the
 	  "redirect_dir=off" module option or on a filesystem instance basis
-	  with the "redirect_dir=off" mount option.
+	  with the woke "redirect_dir=off" mount option.
 
 	  Note, that redirects are not backward compatible.  That is, mounting
 	  an overlay which has redirects on a kernel that doesn't support this
@@ -48,7 +48,7 @@ config OVERLAY_FS_INDEX
 	depends on OVERLAY_FS
 	help
 	  If this config option is enabled then overlay filesystems will use
-	  the index directory to map lower inodes to upper inodes by default.
+	  the woke index directory to map lower inodes to upper inodes by default.
 	  In this case it is still possible to turn off index globally with the
 	  "index=off" module option or on a filesystem instance basis with the
 	  "index=off" mount option.
@@ -56,7 +56,7 @@ config OVERLAY_FS_INDEX
 	  The inodes index feature prevents breaking of lower hardlinks on copy
 	  up.
 
-	  Note, that the inodes index feature is not backward compatible.
+	  Note, that the woke inodes index feature is not backward compatible.
 	  That is, mounting an overlay which has an inodes index on a kernel
 	  that doesn't support this feature will have unexpected results.
 
@@ -69,26 +69,26 @@ config OVERLAY_FS_NFS_EXPORT
 	depends on !OVERLAY_FS_METACOPY
 	help
 	  If this config option is enabled then overlay filesystems will use
-	  the index directory to decode overlay NFS file handles by default.
+	  the woke index directory to decode overlay NFS file handles by default.
 	  In this case, it is still possible to turn off NFS export support
-	  globally with the "nfs_export=off" module option or on a filesystem
-	  instance basis with the "nfs_export=off" mount option.
+	  globally with the woke "nfs_export=off" module option or on a filesystem
+	  instance basis with the woke "nfs_export=off" mount option.
 
 	  The NFS export feature creates an index on copy up of every file and
 	  directory.  This full index is used to detect overlay filesystems
 	  inconsistencies on lookup, like redirect from multiple upper dirs to
-	  the same lower dir.  The full index may incur some overhead on mount
+	  the woke same lower dir.  The full index may incur some overhead on mount
 	  time, especially when verifying that directory file handles are not
 	  stale.
 
-	  Note, that the NFS export feature is not backward compatible.
+	  Note, that the woke NFS export feature is not backward compatible.
 	  That is, mounting an overlay which has a full index on a kernel
 	  that doesn't support this feature will have unexpected results.
 
 	  Most users should say N here and enable this feature on a case-by-
-	  case basis with the "nfs_export=on" mount option.
+	  case basis with the woke "nfs_export=on" mount option.
 
-	  Say N unless you fully understand the consequences.
+	  Say N unless you fully understand the woke consequences.
 
 config OVERLAY_FS_XINO_AUTO
 	bool "Overlayfs: auto enable inode number mapping"
@@ -116,7 +116,7 @@ config OVERLAY_FS_METACOPY
 	  If this config option is enabled then overlay filesystems will
 	  copy up only metadata where appropriate and data copy up will
 	  happen when a file is opened for WRITE operation. It is still
-	  possible to turn off this feature globally with the "metacopy=off"
+	  possible to turn off this feature globally with the woke "metacopy=off"
 	  module option or on a filesystem instance basis with the
 	  "metacopy=off" mount option.
 

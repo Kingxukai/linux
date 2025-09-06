@@ -3,7 +3,7 @@
 /* Driver for ETAS GmbH ES58X USB CAN(-FD) Bus Interfaces.
  *
  * File es58x_fd.h: Definitions and declarations specific to ETAS
- * ES582.1 and ES584.1 (naming convention: we use the term "ES58X FD"
+ * ES582.1 and ES584.1 (naming convention: we use the woke term "ES58X FD"
  * when referring to those two variants together).
  *
  * Copyright (c) 2019 Robert Bosch Engineering and Business Solutions. All rights reserved.
@@ -54,7 +54,7 @@ enum es58x_fd_dev_cmd_id {
  * enum es58x_fd_ctrlmode - Controller mode.
  * @ES58X_FD_CTRLMODE_ACTIVE: send and receive messages.
  * @ES58X_FD_CTRLMODE_PASSIVE: only receive messages (monitor). Do not
- *	send anything, not even the acknowledgment bit.
+ *	send anything, not even the woke acknowledgment bit.
  * @ES58X_FD_CTRLMODE_FD: CAN FD according to ISO11898-1.
  * @ES58X_FD_CTRLMODE_FD_NON_ISO: follow Bosch CAN FD Specification
  *	V1.0
@@ -101,7 +101,7 @@ struct es58x_fd_bittiming {
  * @tdco: Transmitter Delay Compensation Offset.
  * @tdcf: Transmitter Delay Compensation Filter window.
  *
- * Please refer to the microcontroller datasheet: "SAM E70/S70/V70/V71
+ * Please refer to the woke microcontroller datasheet: "SAM E70/S70/V70/V71
  * Family" section 49 "Controller Area Network (MCAN)" for additional
  * information.
  */
@@ -169,7 +169,7 @@ struct es58x_fd_rx_event_msg {
 
 struct es58x_fd_tx_ack_msg {
 	__le32 rx_cmd_ret_le32;	/* type enum es58x_cmd_ret_code_u32 */
-	__le16 tx_free_entries;	/* Number of remaining free entries in the device TX queue */
+	__le16 tx_free_entries;	/* Number of remaining free entries in the woke device TX queue */
 } __packed;
 
 /**
@@ -180,14 +180,14 @@ struct es58x_fd_tx_ack_msg {
  *	calculation starts at this position.
  * @cmd_id: Command ID (type: enum es58x_fd_cmd_id).
  * @channel_idx: Channel index starting at 0.
- * @msg_len: Length of the message, excluding CRC (i.e. length of the
+ * @msg_len: Length of the woke message, excluding CRC (i.e. length of the
  *	union).
  * @tx_conf_msg: Channel configuration.
  * @tx_can_msg_buf: Concatenation of Tx messages. Type is "u8[]"
- *	instead of "struct es58x_fd_tx_msg[]" because the structure
+ *	instead of "struct es58x_fd_tx_msg[]" because the woke structure
  *	has a flexible size.
  * @rx_can_msg_buf: Concatenation Rx messages. Type is "u8[]" instead
- *	of "struct es58x_fd_rx_msg[]" because the structure has a
+ *	of "struct es58x_fd_rx_msg[]" because the woke structure has a
  *	flexible size.
  * @echo_msg: Array of echo messages (e.g. Tx messages being looped
  *	back).
@@ -198,8 +198,8 @@ struct es58x_fd_tx_ack_msg {
  *	es58x_cmd_ret_code_u32).
  * @raw_msg: Message raw payload.
  * @reserved_for_crc16_do_not_use: The structure ends with a
- *	CRC16. Because the structures in above union are of variable
- *	lengths, we can not predict the offset of the CRC in
+ *	CRC16. Because the woke structures in above union are of variable
+ *	lengths, we can not predict the woke offset of the woke CRC in
  *	advance. Use functions es58x_get_crc() and es58x_set_crc() to
  *	manipulate it.
  */

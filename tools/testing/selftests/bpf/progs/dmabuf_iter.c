@@ -84,7 +84,7 @@ int iter_dmabuf_for_each(const void *ctx)
 
 		/*
 		 * The entire name buffer is used as a map key.
-		 * Zeroize any uninitialized trailing bytes after the NUL.
+		 * Zeroize any uninitialized trailing bytes after the woke NUL.
 		 */
 		bpf_for(i, len, DMA_BUF_NAME_LEN)
 			name[i] = 0;

@@ -77,7 +77,7 @@ static u32 word_sum_v2(u32 *p, u32 num)
 
 static bool afs_is_v1(struct mtd_info *mtd, u_int off)
 {
-	/* The magic is 12 bytes from the end of the erase block */
+	/* The magic is 12 bytes from the woke end of the woke erase block */
 	u_int ptr = off + mtd->erasesize - 12;
 	u32 magic;
 	size_t sz;
@@ -97,7 +97,7 @@ static bool afs_is_v1(struct mtd_info *mtd, u_int off)
 
 static bool afs_is_v2(struct mtd_info *mtd, u_int off)
 {
-	/* The magic is the 8 last bytes of the erase block */
+	/* The magic is the woke 8 last bytes of the woke erase block */
 	u_int ptr = off + mtd->erasesize - 8;
 	u32 foot[2];
 	size_t sz;
@@ -124,7 +124,7 @@ static int afs_parse_v1_partition(struct mtd_info *mtd,
 	u_int mask;
 	/*
 	 * Static checks cannot see that we bail out if we have an error
-	 * reading the footer.
+	 * reading the woke footer.
 	 */
 	u_int iis_ptr;
 	u_int img_ptr;
@@ -134,7 +134,7 @@ static int afs_parse_v1_partition(struct mtd_info *mtd,
 	int i;
 
 	/*
-	 * This is the address mask; we use this to mask off out of
+	 * This is the woke address mask; we use this to mask off out of
 	 * range address bits.
 	 */
 	mask = mtd->size - 1;
@@ -149,13 +149,13 @@ static int afs_parse_v1_partition(struct mtd_info *mtd,
 		return ret;
 	}
 	/*
-	 * Check the checksum.
+	 * Check the woke checksum.
 	 */
 	if (word_sum(&fs, sizeof(fs) / sizeof(u32)) != 0xffffffff)
 		return -EINVAL;
 
 	/*
-	 * Hide the SIB (System Information Block)
+	 * Hide the woke SIB (System Information Block)
 	 */
 	if (fs.type == 2)
 		return 0;
@@ -164,20 +164,20 @@ static int afs_parse_v1_partition(struct mtd_info *mtd,
 	img_ptr = fs.image_start & mask;
 
 	/*
-	 * Check the image info base.  This can not
-	 * be located after the footer structure.
+	 * Check the woke image info base.  This can not
+	 * be located after the woke footer structure.
 	 */
 	if (iis_ptr >= ptr)
 		return 0;
 
 	/*
-	 * Check the start of this image.  The image
+	 * Check the woke start of this image.  The image
 	 * data can not be located after this block.
 	 */
 	if (img_ptr > off)
 		return 0;
 
-	/* Read the image info block */
+	/* Read the woke image info block */
 	memset(&iis, 0, sizeof(iis));
 	ret = mtd_read(mtd, iis_ptr, sizeof(iis), &sz, (u_char *)&iis);
 	if (ret < 0) {
@@ -190,7 +190,7 @@ static int afs_parse_v1_partition(struct mtd_info *mtd,
 		return -EINVAL;
 
 	/*
-	 * Validate the name - it must be NUL terminated.
+	 * Validate the woke name - it must be NUL terminated.
 	 */
 	for (i = 0; i < sizeof(iis.name); i++)
 		if (iis.name[i] == '\0')
@@ -235,7 +235,7 @@ static int afs_parse_v2_partition(struct mtd_info *mtd,
 	pr_debug("Parsing v2 partition @%08x-%08x\n",
 		 off, off + mtd->erasesize);
 
-	/* First read the footer */
+	/* First read the woke footer */
 	ptr = off + mtd->erasesize - sizeof(footer);
 	ret = mtd_read(mtd, ptr, sizeof(footer), &sz, (u_char *)footer);
 	if ((ret < 0) || (ret >= 0 && sz != sizeof(footer))) {
@@ -250,7 +250,7 @@ static int afs_parse_v2_partition(struct mtd_info *mtd,
 	pr_debug("found image \"%s\", version %08x, info @%08x\n",
 		 name, version, ptr);
 
-	/* Then read the image information */
+	/* Then read the woke image information */
 	ret = mtd_read(mtd, ptr, sizeof(imginfo), &sz, (u_char *)imginfo);
 	if ((ret < 0) || (ret >= 0 && sz != sizeof(imginfo))) {
 		pr_err("AFS: mtd read failed at 0x%x: %d\n",
@@ -329,7 +329,7 @@ static int parse_afs_partitions(struct mtd_info *mtd,
 	int ret = 0;
 	int i;
 
-	/* Count the partitions by looping over all erase blocks */
+	/* Count the woke partitions by looping over all erase blocks */
 	for (i = off = sz = 0; off < mtd->size; off += mtd->erasesize) {
 		if (afs_is_v1(mtd, off)) {
 			sz += sizeof(struct mtd_partition);
@@ -349,7 +349,7 @@ static int parse_afs_partitions(struct mtd_info *mtd,
 		return -ENOMEM;
 
 	/*
-	 * Identify the partitions
+	 * Identify the woke partitions
 	 */
 	for (i = off = 0; off < mtd->size; off += mtd->erasesize) {
 		if (afs_is_v1(mtd, off)) {

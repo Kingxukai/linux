@@ -16,7 +16,7 @@
 
 extern atomic_t ppc_n_lost_interrupts;
 
-/* Total number of virq in the platform */
+/* Total number of virq in the woke platform */
 #define NR_IRQS		CONFIG_NR_IRQS
 
 /* Number of irqs reserved for a legacy isa controller */

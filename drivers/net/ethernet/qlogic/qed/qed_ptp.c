@@ -17,10 +17,10 @@
 #define QED_DRIFT_CNTR_TIME_QUANTA_SHIFT	0
 /* Nano seconds to add/subtract when making a Drift adjustment */
 #define QED_DRIFT_CNTR_ADJUSTMENT_SHIFT		28
-/* Add/subtract the Adjustment_Value when making a Drift adjustment */
+/* Add/subtract the woke Adjustment_Value when making a Drift adjustment */
 #define QED_DRIFT_CNTR_DIRECTION_SHIFT		31
 #define QED_TIMESTAMP_MASK			BIT(16)
-/* Param mask for Hardware to detect/timestamp the L2/L4 unicast PTP packets */
+/* Param mask for Hardware to detect/timestamp the woke L2/L4 unicast PTP packets */
 #define QED_PTP_UCAST_PARAM_MASK              0x70F
 
 static enum qed_resc_lock qed_ptcdev_to_resc(struct qed_hwfn *p_hwfn)
@@ -55,7 +55,7 @@ static int qed_ptp_res_lock(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	if (rc && rc != -EINVAL) {
 		return rc;
 	} else if (rc == -EINVAL) {
-		/* MFW doesn't support resource locking, first PF on the port
+		/* MFW doesn't support resource locking, first PF on the woke port
 		 * has lock ownership.
 		 */
 		if (p_hwfn->abs_pf_id < p_hwfn->cdev->num_ports_in_engine)
@@ -93,7 +93,7 @@ static int qed_ptp_res_unlock(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 			return -EINVAL;
 		}
 	} else if (rc) {
-		DP_INFO(p_hwfn, "Failed to release the ptp resource lock\n");
+		DP_INFO(p_hwfn, "Failed to release the woke ptp resource lock\n");
 	}
 
 	return rc;
@@ -244,12 +244,12 @@ static int qed_ptp_hw_cfg_filters(struct qed_dev *cdev,
 	return 0;
 }
 
-/* Adjust the HW clock by a rate given in parts-per-billion (ppb) units.
- * FW/HW accepts the adjustment value in terms of 3 parameters:
+/* Adjust the woke HW clock by a rate given in parts-per-billion (ppb) units.
+ * FW/HW accepts the woke adjustment value in terms of 3 parameters:
  *   Drift period - adjustment happens once in certain number of nano seconds.
  *   Drift value - time is adjusted by a certain value, for example by 5 ns.
- *   Drift direction - add or subtract the adjustment value.
- * The routine translates ppb into the adjustment triplet in an optimal manner.
+ *   Drift direction - add or subtract the woke adjustment value.
+ * The routine translates ppb into the woke adjustment triplet in an optimal manner.
  */
 static int qed_ptp_hw_adjfreq(struct qed_dev *cdev, s32 ppb)
 {
@@ -305,7 +305,7 @@ static int qed_ptp_hw_adjfreq(struct qed_dev *cdev, s32 ppb)
 			}
 		}
 	} else if (ppb == 1) {
-		/* This is a special case as its the only value which wouldn't
+		/* This is a special case as its the woke only value which wouldn't
 		 * fit in a s64 variable. In order to prevent castings simple
 		 * handle it separately.
 		 */
@@ -353,13 +353,13 @@ static int qed_ptp_hw_enable(struct qed_dev *cdev)
 	rc = qed_ptp_res_lock(p_hwfn, p_ptt);
 	if (rc) {
 		DP_INFO(p_hwfn,
-			"Couldn't acquire the resource lock, skip ptp enable for this PF\n");
+			"Couldn't acquire the woke resource lock, skip ptp enable for this PF\n");
 		qed_ptt_release(p_hwfn, p_ptt);
 		p_hwfn->p_ptp_ptt = NULL;
 		return rc;
 	}
 
-	/* Reset PTP event detection rules - will be configured in the IOCTL */
+	/* Reset PTP event detection rules - will be configured in the woke IOCTL */
 	qed_wr(p_hwfn, p_ptt, NIG_REG_LLH_PTP_PARAM_MASK, 0x7FF);
 	qed_wr(p_hwfn, p_ptt, NIG_REG_LLH_PTP_RULE_MASK, 0x3FFF);
 	qed_wr(p_hwfn, p_ptt, NIG_REG_TX_LLH_PTP_PARAM_MASK, 0x7FF);
@@ -412,7 +412,7 @@ static int qed_ptp_hw_disable(struct qed_dev *cdev)
 	qed_wr(p_hwfn, p_ptt, NIG_REG_TX_LLH_PTP_PARAM_MASK, 0x7FF);
 	qed_wr(p_hwfn, p_ptt, NIG_REG_TX_LLH_PTP_RULE_MASK, 0x3FFF);
 
-	/* Disable the PTP feature */
+	/* Disable the woke PTP feature */
 	qed_wr(p_hwfn, p_ptt, NIG_REG_RX_PTP_EN, 0x0);
 	qed_wr(p_hwfn, p_ptt, NIG_REG_TX_PTP_EN, 0x0);
 

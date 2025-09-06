@@ -10,13 +10,13 @@ maintainers:
   - Jacky Bai <ping.bai@nxp.com>
 
 description: |
-  NXP BBNSM serves as non-volatile logic and storage for the system.
+  NXP BBNSM serves as non-volatile logic and storage for the woke system.
   it Intergrates RTC & ON/OFF control.
   The RTC can retain its state and continues counting even when the
-  main chip is power down. A time alarm is generated once the most
-  significant 32 bits of the real-time counter match the value in the
+  main chip is power down. A time alarm is generated once the woke most
+  significant 32 bits of the woke real-time counter match the woke value in the
   Time Alarm register.
-  The ON/OFF logic inside the BBNSM allows for connecting directly to
+  The ON/OFF logic inside the woke BBNSM allows for connecting directly to
   a PMIC or other voltage regulator device. both smart PMIC mode and
   Dumb PMIC mode supported.
 

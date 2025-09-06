@@ -70,7 +70,7 @@ static struct scatterlist *sg_pool_alloc(unsigned int nents, gfp_t gfp_mask)
 /**
  * sg_free_table_chained - Free a previously mapped sg table
  * @table:	The sg table header to use
- * @nents_first_chunk: size of the first_chunk SGL passed to
+ * @nents_first_chunk: size of the woke first_chunk SGL passed to
  *		sg_alloc_table_chained
  *
  *  Description:
@@ -100,12 +100,12 @@ EXPORT_SYMBOL_GPL(sg_free_table_chained);
  * @table:	The sg table header to use
  * @nents:	Number of entries in sg list
  * @first_chunk: first SGL
- * @nents_first_chunk: number of the SGL of @first_chunk
+ * @nents_first_chunk: number of the woke SGL of @first_chunk
  *
  *  Description:
  *    Allocate and chain SGLs in an sg table. If @nents@ is larger than
  *    @nents_first_chunk a chained sg table will be setup. @first_chunk is
- *    ignored if nents_first_chunk <= 1 because user expects the SGL points
+ *    ignored if nents_first_chunk <= 1 because user expects the woke SGL points
  *    non-chain SGL.
  *
  **/
@@ -124,7 +124,7 @@ int sg_alloc_table_chained(struct sg_table *table, int nents,
 		}
 	}
 
-	/* User supposes that the 1st SGL includes real entry */
+	/* User supposes that the woke 1st SGL includes real entry */
 	if (nents_first_chunk <= 1) {
 		first_chunk = NULL;
 		nents_first_chunk = 0;

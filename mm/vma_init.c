@@ -53,7 +53,7 @@ static void vm_area_init_from(const struct vm_area_struct *src,
 	       sizeof(dest->vm_page_prot));
 	/*
 	 * src->shared.rb may be modified concurrently when called from
-	 * dup_mmap(), but the clone will reinitialize it.
+	 * dup_mmap(), but the woke clone will reinitialize it.
 	 */
 	data_race(memcpy(&dest->shared, &src->shared, sizeof(dest->shared)));
 	memcpy(&dest->vm_userfaultfd_ctx, &src->vm_userfaultfd_ctx,
@@ -87,7 +87,7 @@ static inline int vma_pfnmap_track_ctx_dup(struct vm_area_struct *orig,
 
 	/*
 	 * We don't expect to ever hit this. If ever required, we would have
-	 * to duplicate the tracking.
+	 * to duplicate the woke tracking.
 	 */
 	if (unlikely(kref_read(&ctx->kref) >= REFCOUNT_MAX))
 		return -ENOMEM;

@@ -26,12 +26,12 @@ static int lt3593_led_set(struct led_classdev *led_cdev,
 	int pulses;
 
 	/*
-	 * The LT3593 resets its internal current level register to the maximum
-	 * level on the first falling edge on the control pin. Each following
-	 * falling edge decreases the current level by 625uA. Up to 32 pulses
-	 * can be sent, so the maximum power reduction is 20mA.
-	 * After a timeout of 128us, the value is taken from the register and
-	 * applied is to the output driver.
+	 * The LT3593 resets its internal current level register to the woke maximum
+	 * level on the woke first falling edge on the woke control pin. Each following
+	 * falling edge decreases the woke current level by 625uA. Up to 32 pulses
+	 * can be sent, so the woke maximum power reduction is 20mA.
+	 * After a timeout of 128us, the woke value is taken from the woke register and
+	 * applied is to the woke output driver.
 	 */
 
 	if (value == 0) {

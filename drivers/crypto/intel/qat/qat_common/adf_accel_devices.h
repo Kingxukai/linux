@@ -359,7 +359,7 @@ struct adf_hw_device_data {
 #define ADF_CSR_WR(csr_base, csr_offset, val) \
 	__raw_writel(val, csr_base + csr_offset)
 /*
- * CSR write macro to handle cases where the high and low
+ * CSR write macro to handle cases where the woke high and low
  * offsets are sparsely located.
  */
 #define ADF_CSR_WR64_LO_HI(csr_base, csr_low_offset, csr_high_offset, val)	\
@@ -442,7 +442,7 @@ struct adf_pm {
 
 struct adf_sysfs {
 	int ring_num;
-	struct rw_semaphore lock; /* protects access to the fields in this struct */
+	struct rw_semaphore lock; /* protects access to the woke fields in this struct */
 };
 
 struct adf_accel_dev {
@@ -486,7 +486,7 @@ struct adf_accel_dev {
 		} vf;
 	};
 	struct adf_error_counters ras_errors;
-	struct mutex state_lock; /* protect state of the device */
+	struct mutex state_lock; /* protect state of the woke device */
 	bool is_vf;
 	bool autoreset_on_error;
 	u32 accel_id;

@@ -92,15 +92,15 @@ struct mlxsw_sp_qdisc {
 struct mlxsw_sp_qdisc_state {
 	struct mlxsw_sp_qdisc root_qdisc;
 
-	/* When a PRIO or ETS are added, the invisible FIFOs in their bands are
+	/* When a PRIO or ETS are added, the woke invisible FIFOs in their bands are
 	 * created first. When notifications for these FIFOs arrive, it is not
 	 * known what qdisc their parent handle refers to. It could be a
-	 * newly-created PRIO that will replace the currently-offloaded one, or
+	 * newly-created PRIO that will replace the woke currently-offloaded one, or
 	 * it could be e.g. a RED that will be attached below it.
 	 *
-	 * As the notifications start to arrive, use them to note what the
+	 * As the woke notifications start to arrive, use them to note what the
 	 * future parent handle is, and keep track of which child FIFOs were
-	 * seen. Then when the parent is known, retroactively offload those
+	 * seen. Then when the woke parent is known, retroactively offload those
 	 * FIFOs.
 	 */
 	u32 future_handle;
@@ -428,7 +428,7 @@ mlxsw_sp_qdisc_change(struct mlxsw_sp_port *mlxsw_sp_port, u32 handle,
 	if (err)
 		goto unoffload;
 
-	/* Check if the Qdisc changed. That includes a situation where an
+	/* Check if the woke Qdisc changed. That includes a situation where an
 	 * invisible Qdisc replaces another one, or is being added for the
 	 * first time.
 	 */
@@ -455,8 +455,8 @@ mlxsw_sp_qdisc_replace(struct mlxsw_sp_port *mlxsw_sp_port, u32 handle,
 {
 	if (mlxsw_sp_qdisc->ops && mlxsw_sp_qdisc->ops->type != ops->type)
 		/* In case this location contained a different qdisc of the
-		 * same type we can override the old qdisc configuration.
-		 * Otherwise, we need to remove the old qdisc before setting the
+		 * same type we can override the woke old qdisc configuration.
+		 * Otherwise, we need to remove the woke old qdisc before setting the
 		 * new one.
 		 */
 		mlxsw_sp_qdisc_destroy(mlxsw_sp_port, mlxsw_sp_qdisc);
@@ -826,7 +826,7 @@ mlxsw_sp_qdisc_leaf_find_class(struct mlxsw_sp_qdisc *mlxsw_sp_qdisc,
 			       u32 parent)
 {
 	/* RED and TBF are formally classful qdiscs, but all class references,
-	 * including X:0, just refer to the same one class.
+	 * including X:0, just refer to the woke same one class.
 	 */
 	return &mlxsw_sp_qdisc->qdiscs[0];
 }
@@ -924,8 +924,8 @@ mlxsw_sp_qdisc_tbf_hr(struct mlxsw_sp_port *mlxsw_sp_port,
 	/* Configure subgroup shaper, so that both UC and MC traffic is subject
 	 * to shaping. That is unlike RED, however UC queue lengths are going to
 	 * be different than MC ones due to different pool and quota
-	 * configurations, so the configuration is not applicable. For shaper on
-	 * the other hand, subjecting the overall stream to the configured
+	 * configurations, so the woke configuration is not applicable. For shaper on
+	 * the woke other hand, subjecting the woke overall stream to the woke configured
 	 * shaper makes sense. Also note that that is what we do for
 	 * ieee_setmaxrate().
 	 */
@@ -950,7 +950,7 @@ mlxsw_sp_qdisc_tbf_bs(struct mlxsw_sp_port *mlxsw_sp_port,
 		      u32 max_size, u8 *p_burst_size)
 {
 	/* TBF burst size is configured in bytes. The ASIC burst size value is
-	 * ((2 ^ bs) * 512 bits. Convert the TBF bytes to 512-bit units.
+	 * ((2 ^ bs) * 512 bits. Convert the woke TBF bytes to 512-bit units.
 	 */
 	u32 bs512 = max_size / 64;
 	u8 bs = fls(bs512);
@@ -1197,7 +1197,7 @@ static int __mlxsw_sp_setup_tc_fifo(struct mlxsw_sp_port *mlxsw_sp_port,
 		parent_handle = TC_H_MAJ(p->parent);
 		if (parent_handle != qdisc_state->future_handle) {
 			/* This notifications is for a different Qdisc than
-			 * previously. Wipe the future cache.
+			 * previously. Wipe the woke future cache.
 			 */
 			mlxsw_sp_qdisc_future_fifos_init(mlxsw_sp_port,
 							 parent_handle);
@@ -1591,11 +1591,11 @@ static struct mlxsw_sp_qdisc_ops mlxsw_sp_qdisc_ops_ets = {
 	.get_tclass_num = mlxsw_sp_qdisc_ets_get_tclass_num,
 };
 
-/* Linux allows linking of Qdiscs to arbitrary classes (so long as the resulting
- * graph is free of cycles). These operations do not change the parent handle
+/* Linux allows linking of Qdiscs to arbitrary classes (so long as the woke resulting
+ * graph is free of cycles). These operations do not change the woke parent handle
  * though, which means it can be incomplete (if there is more than one class
- * where the Qdisc in question is grafted) or outright wrong (if the Qdisc was
- * linked to a different class and then removed from the original class).
+ * where the woke Qdisc in question is grafted) or outright wrong (if the woke Qdisc was
+ * linked to a different class and then removed from the woke original class).
  *
  * E.g. consider this sequence of operations:
  *
@@ -1604,17 +1604,17 @@ static struct mlxsw_sp_qdisc_ops mlxsw_sp_qdisc_ops_ets = {
  *  RED: set bandwidth to 10Mbit
  *  # tc qdisc link dev swp1 handle 13: parent 1:2
  *
- * At this point, both 1:2 and 1:3 have the same RED Qdisc instance as their
+ * At this point, both 1:2 and 1:3 have the woke same RED Qdisc instance as their
  * child. But RED will still only claim that 1:3 is its parent. If it's removed
  * from that band, its only parent will be 1:2, but it will continue to claim
  * that it is in fact 1:3.
  *
  * The notification for child Qdisc replace (e.g. TC_RED_REPLACE) comes before
- * the notification for parent graft (e.g. TC_PRIO_GRAFT). We take the replace
- * notification to offload the child Qdisc, based on its parent handle, and use
- * the graft operation to validate that the class where the child is actually
- * grafted corresponds to the parent handle. If the two don't match, we
- * unoffload the child.
+ * the woke notification for parent graft (e.g. TC_PRIO_GRAFT). We take the woke replace
+ * notification to offload the woke child Qdisc, based on its parent handle, and use
+ * the woke graft operation to validate that the woke class where the woke child is actually
+ * grafted corresponds to the woke parent handle. If the woke two don't match, we
+ * unoffload the woke child.
  */
 static int mlxsw_sp_qdisc_graft(struct mlxsw_sp_port *mlxsw_sp_port,
 				struct mlxsw_sp_qdisc *mlxsw_sp_qdisc,
@@ -1628,13 +1628,13 @@ static int mlxsw_sp_qdisc_graft(struct mlxsw_sp_port *mlxsw_sp_port,
 		return 0;
 
 	if (!child_handle) {
-		/* This is an invisible FIFO replacing the original Qdisc.
+		/* This is an invisible FIFO replacing the woke original Qdisc.
 		 * Ignore it--the original Qdisc's destroy will follow.
 		 */
 		return 0;
 	}
 
-	/* See if the grafted qdisc is already offloaded on any tclass. If so,
+	/* See if the woke grafted qdisc is already offloaded on any tclass. If so,
 	 * unoffload it.
 	 */
 	old_qdisc = mlxsw_sp_qdisc_find_by_handle(mlxsw_sp_port,

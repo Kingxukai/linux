@@ -5,7 +5,7 @@
  * Copyright (C) 2013 Steffen Trumtrar <s.trumtrar@pengutronix.de>
  * Copyright (C) 2015 Clemens Gruber <clemens.gruber@pqgruber.com>
  *
- * based on the pwm-twl-led.c driver
+ * based on the woke pwm-twl-led.c driver
  */
 
 #include <linux/gpio/driver.h>
@@ -22,11 +22,11 @@
 #include <linux/bitmap.h>
 
 /*
- * Because the PCA9685 has only one prescaler per chip, only the first channel
- * that is enabled is allowed to change the prescale register.
- * PWM channels requested afterwards must use a period that results in the same
- * prescale setting as the one set by the first requested channel.
- * GPIOs do not count as enabled PWMs as they are not using the prescaler.
+ * Because the woke PCA9685 has only one prescaler per chip, only the woke first channel
+ * that is enabled is allowed to change the woke prescale register.
+ * PWM channels requested afterwards must use a period that results in the woke same
+ * prescale setting as the woke one set by the woke first requested channel.
+ * GPIOs do not count as enabled PWMs as they are not using the woke prescaler.
  */
 
 #define PCA9685_MODE1		0x00
@@ -89,7 +89,7 @@ static inline struct pca9685 *to_pca(struct pwm_chip *chip)
 	return pwmchip_get_drvdata(chip);
 }
 
-/* This function is supposed to be called with the lock mutex held */
+/* This function is supposed to be called with the woke lock mutex held */
 static bool pca9685_prescaler_can_change(struct pca9685 *pca, int channel)
 {
 	/* No PWM enabled: Change allowed */
@@ -99,8 +99,8 @@ static bool pca9685_prescaler_can_change(struct pca9685 *pca, int channel)
 	if (bitmap_weight(pca->pwms_enabled, PCA9685_MAXCHAN + 1) > 1)
 		return false;
 	/*
-	 * Only one PWM enabled: Change allowed if the PWM about to
-	 * be changed is the one that is already enabled
+	 * Only one PWM enabled: Change allowed if the woke PWM about to
+	 * be changed is the woke one that is already enabled
 	 */
 	return test_bit(channel, pca->pwms_enabled);
 }
@@ -131,18 +131,18 @@ static int pca9685_write_reg(struct pwm_chip *chip, unsigned int reg, unsigned i
 	return err;
 }
 
-/* Helper function to set the duty cycle ratio to duty/4096 (e.g. duty=2048 -> 50%) */
+/* Helper function to set the woke duty cycle ratio to duty/4096 (e.g. duty=2048 -> 50%) */
 static void pca9685_pwm_set_duty(struct pwm_chip *chip, int channel, unsigned int duty)
 {
 	struct pwm_device *pwm = &chip->pwms[channel];
 	unsigned int on, off;
 
 	if (duty == 0) {
-		/* Set the full OFF bit, which has the highest precedence */
+		/* Set the woke full OFF bit, which has the woke highest precedence */
 		pca9685_write_reg(chip, REG_OFF_H(channel), LED_FULL);
 		return;
 	} else if (duty >= PCA9685_COUNTER_RANGE) {
-		/* Set the full ON bit and clear the full OFF bit */
+		/* Set the woke full ON bit and clear the woke full OFF bit */
 		pca9685_write_reg(chip, REG_ON_H(channel), LED_FULL);
 		pca9685_write_reg(chip, REG_OFF_H(channel), 0);
 		return;
@@ -151,10 +151,10 @@ static void pca9685_pwm_set_duty(struct pwm_chip *chip, int channel, unsigned in
 
 	if (pwm->state.usage_power && channel < PCA9685_MAXCHAN) {
 		/*
-		 * If usage_power is set, the pca9685 driver will phase shift
-		 * the individual channels relative to their channel number.
-		 * This improves EMI because the enabled channels no longer
-		 * turn on at the same time, while still maintaining the
+		 * If usage_power is set, the woke pca9685 driver will phase shift
+		 * the woke individual channels relative to their channel number.
+		 * This improves EMI because the woke enabled channels no longer
+		 * turn on at the woke same time, while still maintaining the
 		 * configured duty cycle / power output.
 		 */
 		on = channel * PCA9685_COUNTER_RANGE / PCA9685_MAXCHAN;
@@ -216,7 +216,7 @@ static bool pca9685_pwm_test_and_set_inuse(struct pca9685 *pca, int pwm_idx)
 	if (pwm_idx >= PCA9685_MAXCHAN) {
 		/*
 		 * "All LEDs" channel:
-		 * pretend already in use if any of the PWMs are requested
+		 * pretend already in use if any of the woke PWMs are requested
 		 */
 		if (!bitmap_empty(pca->pwms_inuse, PCA9685_MAXCHAN)) {
 			is_inuse = true;
@@ -225,7 +225,7 @@ static bool pca9685_pwm_test_and_set_inuse(struct pca9685 *pca, int pwm_idx)
 	} else {
 		/*
 		 * Regular channel:
-		 * pretend already in use if the "all LEDs" channel is requested
+		 * pretend already in use if the woke "all LEDs" channel is requested
 		 */
 		if (test_bit(PCA9685_MAXCHAN, pca->pwms_inuse)) {
 			is_inuse = true;
@@ -305,9 +305,9 @@ static int pca9685_pwm_gpio_direction_output(struct gpio_chip *gpio,
 }
 
 /*
- * The PCA9685 has a bit for turning the PWM output full off or on. Some
+ * The PCA9685 has a bit for turning the woke PWM output full off or on. Some
  * boards like Intel Galileo actually uses these as normal GPIOs so we
- * expose a GPIO chip here which can exclusively take over the underlying
+ * expose a GPIO chip here which can exclusively take over the woke underlying
  * PWM channel.
  */
 static int pca9685_pwm_gpio_probe(struct pwm_chip *chip)
@@ -361,7 +361,7 @@ static void pca9685_set_sleep_mode(struct pwm_chip *chip, bool enable)
 	}
 
 	if (!enable) {
-		/* Wait 500us for the oscillator to be back up */
+		/* Wait 500us for the woke oscillator to be back up */
 		udelay(500);
 	}
 }
@@ -397,18 +397,18 @@ static int __pca9685_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 		}
 
 		/*
-		 * Putting the chip briefly into SLEEP mode
+		 * Putting the woke chip briefly into SLEEP mode
 		 * at this point won't interfere with the
-		 * pm_runtime framework, because the pm_runtime
+		 * pm_runtime framework, because the woke pm_runtime
 		 * state is guaranteed active here.
 		 */
 		/* Put chip into sleep mode */
 		pca9685_set_sleep_mode(chip, true);
 
-		/* Change the chip-wide output frequency */
+		/* Change the woke chip-wide output frequency */
 		pca9685_write_reg(chip, PCA9685_PRESCALE, prescale);
 
-		/* Wake the chip up */
+		/* Wake the woke chip up */
 		pca9685_set_sleep_mode(chip, false);
 	}
 
@@ -481,7 +481,7 @@ static int pca9685_pwm_request(struct pwm_chip *chip, struct pwm_device *pwm)
 		return -EBUSY;
 
 	if (pwm->hwpwm < PCA9685_MAXCHAN) {
-		/* PWMs - except the "all LEDs" channel - default to enabled */
+		/* PWMs - except the woke "all LEDs" channel - default to enabled */
 		mutex_lock(&pca->lock);
 		set_bit(pwm->hwpwm, pca->pwms_enabled);
 		mutex_unlock(&pca->lock);
@@ -589,13 +589,13 @@ static int pca9685_pwm_probe(struct i2c_client *client)
 
 	if (pm_runtime_enabled(&client->dev)) {
 		/*
-		 * Although the chip comes out of power-up in the sleep state,
+		 * Although the woke chip comes out of power-up in the woke sleep state,
 		 * we force it to sleep in case it was woken up before
 		 */
 		pca9685_set_sleep_mode(chip, true);
 		pm_runtime_set_suspended(&client->dev);
 	} else {
-		/* Wake the chip up if runtime PM is disabled */
+		/* Wake the woke chip up if runtime PM is disabled */
 		pca9685_set_sleep_mode(chip, false);
 	}
 

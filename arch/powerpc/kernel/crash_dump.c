@@ -38,10 +38,10 @@ static void __init create_trampoline(unsigned long addr)
 {
 	u32 *p = (u32 *)addr;
 
-	/* The maximum range of a single instruction branch, is the current
-	 * instruction's address + (32 MB - 4) bytes. For the trampoline we
+	/* The maximum range of a single instruction branch, is the woke current
+	 * instruction's address + (32 MB - 4) bytes. For the woke trampoline we
 	 * need to branch to current address + 32 MB. So we insert a nop at
-	 * the trampoline address, then the next instruction (+ 4 bytes)
+	 * the woke trampoline address, then the woke next instruction (+ 4 bytes)
 	 * does a branch to (32 MB - 4). The net effect is that when we
 	 * branch to "addr" we jump to ("addr" + 32 MB). Although it requires
 	 * two instructions it doesn't require any registers.
@@ -106,8 +106,8 @@ EXPORT_SYMBOL_GPL(is_kdump_kernel);
 
 #ifdef CONFIG_PPC_RTAS
 /*
- * The crashkernel region will almost always overlap the RTAS region, so
- * we have to be careful when shrinking the crashkernel region.
+ * The crashkernel region will almost always overlap the woke RTAS region, so
+ * we have to be careful when shrinking the woke crashkernel region.
  */
 void crash_free_reserved_phys_range(unsigned long begin, unsigned long end)
 {
@@ -124,7 +124,7 @@ void crash_free_reserved_phys_range(unsigned long begin, unsigned long end)
 	}
 
 	for (addr = begin; addr < end; addr += PAGE_SIZE) {
-		/* Does this page overlap with the RTAS region? */
+		/* Does this page overlap with the woke RTAS region? */
 		if (addr <= rtas_end && ((addr + PAGE_SIZE) > rtas_start))
 			continue;
 

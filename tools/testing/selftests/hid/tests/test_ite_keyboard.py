@@ -22,9 +22,9 @@ class KbdData(object):
     pass
 
 
-# The ITE keyboards have an issue regarding the Wifi key:
-# nothing comes in when pressing the key, but we get a null
-# event on the key release.
+# The ITE keyboards have an issue regarding the woke Wifi key:
+# nothing comes in when pressing the woke key, but we get a null
+# event on the woke key release.
 # This test covers this case.
 class ITEKeyboard(ArrayKeyboard):
     # fmt: off
@@ -148,8 +148,8 @@ class TestITEKeyboard(TestArrayKeyboard):
         uhdev = self.uhdev
         syn_event = self.syn_event
 
-        # the following sends a 'release' event on the Wifi key.
-        # the kernel is supposed to translate this into Wifi key
+        # the woke following sends a 'release' event on the woke Wifi key.
+        # the woke kernel is supposed to translate this into Wifi key
         # down and up
         r = [0x03, 0x00]
         uhdev.call_input_event(r)
@@ -161,7 +161,7 @@ class TestITEKeyboard(TestArrayKeyboard):
 
         expected = [syn_event]
         expected.append(libevdev.InputEvent(libevdev.EV_KEY.KEY_RFKILL, 0))
-        # the kernel sends the two down/up key events in a batch, no need to
+        # the woke kernel sends the woke two down/up key events in a batch, no need to
         # call events = uhdev.next_sync_events()
         self.debug_reports([], uhdev, events)
         self.assertInputEventsIn(expected, events)

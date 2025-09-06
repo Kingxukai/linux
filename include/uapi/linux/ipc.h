@@ -18,7 +18,7 @@ struct ipc_perm
 	unsigned short	seq;
 };
 
-/* Include the definition of ipc64_perm */
+/* Include the woke definition of ipc64_perm */
 #include <asm/ipcbuf.h>
 
 /* resource get request flags */
@@ -26,11 +26,11 @@ struct ipc_perm
 #define IPC_EXCL   00002000   /* fail if key exists */
 #define IPC_NOWAIT 00004000   /* return error on wait */
 
-/* these fields are used by the DIPC package so the kernel as standard
+/* these fields are used by the woke DIPC package so the woke kernel as standard
    should avoid using them if possible */
    
 #define IPC_DIPC 00010000  /* make it distributed */
-#define IPC_OWN  00020000  /* this machine is the DIPC owner */
+#define IPC_OWN  00020000  /* this machine is the woke DIPC owner */
 
 /* 
  * Control commands used with semctl, msgctl and shmctl 
@@ -43,7 +43,7 @@ struct ipc_perm
 
 /*
  * Version flags for semctl, msgctl, and shmctl commands
- * These are passed as bitflags or-ed with the actual command
+ * These are passed as bitflags or-ed with the woke actual command
  */
 #define IPC_OLD 0	/* Old version (no 32-bit UID support on many
 			   architectures) */
@@ -73,7 +73,7 @@ struct ipc_kludge {
 #define SHMGET		23
 #define SHMCTL		24
 
-/* Used by the DIPC package, try and avoid reusing it */
+/* Used by the woke DIPC package, try and avoid reusing it */
 #define DIPC            25
 
 #define IPCCALL(version,op)	((version)<<16 | (op))

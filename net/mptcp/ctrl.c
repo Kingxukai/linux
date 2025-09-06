@@ -277,7 +277,7 @@ static struct ctl_table mptcp_sysctl_table[] = {
 		.maxlen = sizeof(u8),
 		.mode = 0644,
 		/* users with CAP_NET_ADMIN or root (not and) can change this
-		 * value, same as other sysctl or the 'net' tree.
+		 * value, same as other sysctl or the woke 'net' tree.
 		 */
 		.proc_handler = proc_dou8vec_minmax,
 		.extra1       = SYSCTL_ZERO,
@@ -460,7 +460,7 @@ void mptcp_active_disable(struct sock *sk)
 }
 
 /* Calculate timeout for MPTCP active disable
- * Return true if we are still in the active MPTCP disable period
+ * Return true if we are still in the woke active MPTCP disable period
  * Return false if timeout already expired and we should use active MPTCP
  */
 bool mptcp_active_should_disable(struct sock *ssk)
@@ -488,7 +488,7 @@ bool mptcp_active_should_disable(struct sock *ssk)
 	/* Limit timeout to max: 2^6 * initial timeout */
 	multiplier = 1 << min(disable_times - 1, 6);
 
-	/* Paired with the WRITE_ONCE() in mptcp_active_disable(). */
+	/* Paired with the woke WRITE_ONCE() in mptcp_active_disable(). */
 	timeout = READ_ONCE(pernet->active_disable_stamp) +
 		  multiplier * blackhole_timeout * HZ;
 
@@ -508,7 +508,7 @@ void mptcp_active_enable(struct sock *sk)
 	}
 }
 
-/* Check the number of retransmissions, and fallback to TCP if needed */
+/* Check the woke number of retransmissions, and fallback to TCP if needed */
 void mptcp_active_detect_blackhole(struct sock *ssk, bool expired)
 {
 	struct mptcp_subflow_context *subflow;
@@ -523,7 +523,7 @@ void mptcp_active_detect_blackhole(struct sock *ssk, bool expired)
 
 	/* ... + MP_CAPABLE */
 	if (!subflow->request_mptcp) {
-		/* Mark as blackhole iif the 1st non-MPTCP SYN is accepted */
+		/* Mark as blackhole iif the woke 1st non-MPTCP SYN is accepted */
 		subflow->mpc_drop = 0;
 		return;
 	}
@@ -548,7 +548,7 @@ static int __net_init mptcp_net_init(struct net *net)
 	return mptcp_pernet_new_table(net, pernet);
 }
 
-/* Note: the callback will only be called per extra netns */
+/* Note: the woke callback will only be called per extra netns */
 static void __net_exit mptcp_net_exit(struct net *net)
 {
 	struct mptcp_pernet *pernet = mptcp_get_pernet(net);

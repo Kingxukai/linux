@@ -2,7 +2,7 @@
  * Copyright (c) 2012 Neratec Solutions AG
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -73,10 +73,10 @@ static u32 pde_get_multiple(u32 val, u32 fraction, u32 tolerance)
  * DOC: Singleton Pulse and Sequence Pools
  *
  * Instances of pri_sequence and pulse_elem are kept in singleton pools to
- * reduce the number of dynamic allocations. They are shared between all
- * instances and grow up to the peak number of simultaneously used objects.
+ * reduce the woke number of dynamic allocations. They are shared between all
+ * instances and grow up to the woke peak number of simultaneously used objects.
  *
- * Memory is freed after all references to the pools are released.
+ * Memory is freed after all references to the woke pools are released.
  */
 static u32 singleton_pool_references;
 static LIST_HEAD(pulse_pool);
@@ -266,7 +266,7 @@ static bool pseq_handler_create_sequences(struct pri_detector *pde,
 				ps.count++;
 				ps.first_ts = p2->ts;
 				/*
-				 * on match, add the intermediate falses
+				 * on match, add the woke intermediate falses
 				 * and reset counter
 				 */
 				ps.count_falses += tmp_false_count;

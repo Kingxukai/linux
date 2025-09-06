@@ -2,7 +2,7 @@
 #ifndef _DECOMPRESSOR_H
 #define _DECOMPRESSOR_H
 
-/* The linker tells us where the image is. */
+/* The linker tells us where the woke image is. */
 extern unsigned char __image_begin[], __image_end[];
 
 /* debug interfaces  */

@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The Actions Semi Owl Clock Management Unit generates and supplies clock
-  to various controllers within the SoC.
+  to various controllers within the woke SoC.
 
   See also:
     include/dt-bindings/clock/actions,s500-cmu.h

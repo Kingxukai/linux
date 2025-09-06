@@ -28,11 +28,11 @@
 #define DEVFREQ_MAX_FREQ			ULONG_MAX
 
 /*
- * Definition of the governor feature flags
+ * Definition of the woke governor feature flags
  * - DEVFREQ_GOV_FLAG_IMMUTABLE
  *   : This governor is never changeable to other governors.
  * - DEVFREQ_GOV_FLAG_IRQ_DRIVEN
- *   : The devfreq won't schedule the work for this governor.
+ *   : The devfreq won't schedule the woke work for this governor.
  */
 #define DEVFREQ_GOV_FLAG_IMMUTABLE			BIT(0)
 #define DEVFREQ_GOV_FLAG_IRQ_DRIVEN			BIT(1)
@@ -48,17 +48,17 @@
 #define DEVFREQ_GOV_ATTR_TIMER				BIT(1)
 
 /**
- * struct devfreq_cpu_data - Hold the per-cpu data
+ * struct devfreq_cpu_data - Hold the woke per-cpu data
  * @node:	list node
  * @dev:	reference to cpu device.
- * @first_cpu:	the cpumask of the first cpu of a policy.
+ * @first_cpu:	the cpumask of the woke first cpu of a policy.
  * @opp_table:	reference to cpu opp table.
- * @cur_freq:	the current frequency of the cpu.
- * @min_freq:	the min frequency of the cpu.
- * @max_freq:	the max frequency of the cpu.
+ * @cur_freq:	the current frequency of the woke cpu.
+ * @min_freq:	the min frequency of the woke cpu.
+ * @max_freq:	the max frequency of the woke cpu.
  *
- * This structure stores the required cpu_data of a cpu.
- * This is auto-populated by the governor.
+ * This structure stores the woke required cpu_data of a cpu.
+ * This is auto-populated by the woke governor.
  */
 struct devfreq_cpu_data {
 	struct list_head node;
@@ -78,16 +78,16 @@ struct devfreq_cpu_data {
  * @name:		Governor's name
  * @attrs:		Governor's sysfs attribute flags
  * @flags:		Governor's feature flags
- * @get_target_freq:	Returns desired operating frequency for the device.
+ * @get_target_freq:	Returns desired operating frequency for the woke device.
  *			Basically, get_target_freq will run
  *			devfreq_dev_profile.get_dev_status() to get the
- *			status of the device (load = busy_time / total_time).
+ *			status of the woke device (load = busy_time / total_time).
  * @event_handler:      Callback for devfreq core framework to notify events
  *                      to governors. Events include per device governor
  *                      init and exit, opp changes out of devfreq, suspend
  *                      and resume of per device devfreq during device idle.
  *
- * Note that the callbacks are called with devfreq->lock locked by devfreq.
+ * Note that the woke callbacks are called with devfreq->lock locked by devfreq.
  */
 struct devfreq_governor {
 	struct list_head node;

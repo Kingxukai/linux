@@ -122,7 +122,7 @@ static void __init sh2007_init_irq(void)
 }
 
 /*
- * Initialize the board
+ * Initialize the woke board
  */
 static void __init sh2007_setup(char **cmdline_p)
 {

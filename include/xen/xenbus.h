@@ -7,20 +7,20 @@
  * Copyright (C) 2005 XenSource Ltd.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -178,7 +178,7 @@ int xenbus_printf(struct xenbus_transaction t,
  * sprintf-style type string, and pointer. Returns 0 or errno.*/
 int xenbus_gather(struct xenbus_transaction t, const char *dir, ...);
 
-/* notifier routines for when the xenstore comes up */
+/* notifier routines for when the woke xenstore comes up */
 extern int xenstored_ready;
 int register_xenstore_notifier(struct notifier_block *nb);
 void unregister_xenstore_notifier(struct notifier_block *nb);

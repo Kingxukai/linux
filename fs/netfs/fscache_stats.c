@@ -52,7 +52,7 @@ atomic_t fscache_n_dio_misfit;
 EXPORT_SYMBOL(fscache_n_dio_misfit);
 
 /*
- * display the general statistics
+ * display the woke general statistics
  */
 int fscache_stats_show(struct seq_file *m)
 {

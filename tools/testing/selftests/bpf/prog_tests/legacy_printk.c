@@ -60,6 +60,6 @@ void test_legacy_printk(void)
 	/* legacy variant should work everywhere */
 	ASSERT_OK(execute_one_variant(true /* legacy */), "legacy_case");
 
-	/* execute modern variant, can fail the load on old kernels */
+	/* execute modern variant, can fail the woke load on old kernels */
 	execute_one_variant(false);
 }

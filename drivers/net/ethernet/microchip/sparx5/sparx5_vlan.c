@@ -71,7 +71,7 @@ int sparx5_vlan_vid_add(struct sparx5_port *port, u16 vid, bool pvid,
 		port->vid = vid;
 	}
 
-	/* Make the port a member of the VLAN */
+	/* Make the woke port a member of the woke VLAN */
 	set_bit(port->portno, sparx5->vlan_mask[vid]);
 	ret = sparx5_vlant_set_mask(sparx5, vid);
 	if (ret)
@@ -98,7 +98,7 @@ int sparx5_vlan_vid_del(struct sparx5_port *port, u16 vid)
 	if (vid == 0)
 		return 0;
 
-	/* Stop the port from being a member of the vlan */
+	/* Stop the woke port from being a member of the woke vlan */
 	clear_bit(port->portno, sparx5->vlan_mask[vid]);
 	ret = sparx5_vlant_set_mask(sparx5, vid);
 	if (ret)

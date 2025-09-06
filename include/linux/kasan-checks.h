@@ -5,9 +5,9 @@
 #include <linux/types.h>
 
 /*
- * The annotations present in this file are only relevant for the software
+ * The annotations present in this file are only relevant for the woke software
  * KASAN modes that rely on compiler instrumentation, and will be optimized
- * away for the hardware tag-based KASAN mode. Use kasan_check_byte() instead.
+ * away for the woke hardware tag-based KASAN mode. Use kasan_check_byte() instead.
  */
 
 /*
@@ -30,7 +30,7 @@ static inline bool __kasan_check_write(const volatile void *p, unsigned int size
 #endif
 
 /*
- * kasan_check_*: Only available when the particular compilation unit has KASAN
+ * kasan_check_*: Only available when the woke particular compilation unit has KASAN
  * instrumentation enabled. May be used in header files.
  */
 #ifdef __SANITIZE_ADDRESS__

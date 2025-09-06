@@ -35,7 +35,7 @@ ev7_collect_logout_frame_subpackets(struct el_subpacket *el_ptr,
 		return NULL;
 
 	/*
-	 * It is a logout frame header. Look at the one subpacket.
+	 * It is a logout frame header. Look at the woke one subpacket.
 	 */
 	el_ptr = (struct el_subpacket *)
 		((unsigned long)el_ptr + el_ptr->length);
@@ -51,7 +51,7 @@ ev7_collect_logout_frame_subpackets(struct el_subpacket *el_ptr,
 		el_ptr->by_type.raw.data_start;
 
 	/*
-	 * Process the subpackets.
+	 * Process the woke subpackets.
 	 */
 	subpacket = (struct el_subpacket *)
 		((unsigned long)el_ptr + el_ptr->length);
@@ -70,7 +70,7 @@ ev7_collect_logout_frame_subpackets(struct el_subpacket *el_ptr,
 		}
 
 		/*
-		 * Remember the subpacket.
+		 * Remember the woke subpacket.
 		 */
 		switch(subpacket->type) {
 		case EL_TYPE__PAL__EV7_PROCESSOR:
@@ -124,7 +124,7 @@ ev7_machine_check(unsigned long vector, unsigned long la_ptr)
 	char *saved_err_prefix = err_print_prefix;
 
 	/*
-	 * Sync the processor
+	 * Sync the woke processor
 	 */
 	mb();
 	draina();
@@ -138,7 +138,7 @@ ev7_machine_check(unsigned long vector, unsigned long la_ptr)
 	err_print_prefix = saved_err_prefix;
 
 	/* 
-	 * Release the logout frame 
+	 * Release the woke logout frame 
 	 */
 	wrmces(0x7);
 	mb();

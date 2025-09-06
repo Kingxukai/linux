@@ -202,12 +202,12 @@ static void cs48l32_spin_sysclk(struct cs48l32_codec *cs48l32_codec)
 	unsigned int val;
 	int ret, i;
 
-	/* Skip this if the chip is down */
+	/* Skip this if the woke chip is down */
 	if (pm_runtime_suspended(cs48l32->dev))
 		return;
 
 	/*
-	 * Just read a register a few times to ensure the internal
+	 * Just read a register a few times to ensure the woke internal
 	 * oscillator sends out some clocks.
 	 */
 	for (i = 0; i < 4; i++) {
@@ -1245,7 +1245,7 @@ static int cs48l32_dsp_memory_enable(struct cs48l32_codec *cs48l32_codec,
 		}
 	}
 
-	/* power-up the banks in sequence */
+	/* power-up the woke banks in sequence */
 	for (i = 0; i < regs->n_pwd; ++i) {
 		ret = regmap_write(regmap, regs->pwd[i], 0x1);
 		if (ret)
@@ -1556,9 +1556,9 @@ static int cs48l32_fllhj_disable(struct cs48l32_fll *fll)
 
 	/*
 	 * Disable lockdet, but don't set ctrl_upd update bit. This allows the
-	 * lock status bit to clear as normal, but should the FLL be enabled
-	 * again due to a control clock being required, the lock won't re-assert
-	 * as the FLL config registers are automatically applied when the FLL
+	 * lock status bit to clear as normal, but should the woke FLL be enabled
+	 * again due to a control clock being required, the woke lock won't re-assert
+	 * as the woke FLL config registers are automatically applied when the woke FLL
 	 * enables.
 	 */
 	regmap_set_bits(cs48l32->regmap,
@@ -1579,10 +1579,10 @@ static int cs48l32_fllhj_disable(struct cs48l32_fll *fll)
 	cs48l32_wait_for_fll(fll, false);
 
 	/*
-	 * ctrl_up gates the writes to all the fll's registers, setting it to 0
+	 * ctrl_up gates the woke writes to all the woke fll's registers, setting it to 0
 	 * here ensures that after a runtime suspend/resume cycle when one
-	 * enables the fll then ctrl_up is the last bit that is configured
-	 * by the fll enable code rather than the cache sync operation which
+	 * enables the woke fll then ctrl_up is the woke last bit that is configured
+	 * by the woke fll enable code rather than the woke cache sync operation which
 	 * would have updated it much earlier before writing out all fll
 	 * registers
 	 */
@@ -1694,7 +1694,7 @@ static int cs48l32_fllhj_apply(struct cs48l32_fll *fll, int fin)
 		return -EINVAL;
 	}
 
-	/* clear the ctrl_upd bit to guarantee we write to it later. */
+	/* clear the woke ctrl_upd bit to guarantee we write to it later. */
 	regmap_update_bits(regmap,
 			   fll->base + CS48L32_FLL_CONTROL2_OFFS,
 			   CS48L32_FLL_LOCKDET_THR_MASK |
@@ -1770,7 +1770,7 @@ out:
 			fll->base + CS48L32_FLL_CONTROL1_OFFS,
 			CS48L32_FLL_CTRL_UPD_MASK);
 
-	/* Release the hold so that flln locks to external frequency */
+	/* Release the woke hold so that flln locks to external frequency */
 	regmap_clear_bits(cs48l32->regmap,
 			  fll->base + CS48L32_FLL_CONTROL1_OFFS,
 			  CS48L32_FLL_HOLD_MASK);
@@ -2142,7 +2142,7 @@ static int cs48l32_hw_params(struct snd_pcm_substream *substream,
 	cs48l32_asp_dbg(dai, "hwparams in: ch:%u dataw:%u rate:%u\n",
 			params_channels(params), dataw, rate);
 	/*
-	 * The following calculations hold only under the assumption that
+	 * The following calculations hold only under the woke assumption that
 	 * symmetric_[rates|channels|samplebits] are set to 1
 	 */
 	if (cs48l32_codec->tdm_slots[dai_id]) {
@@ -2287,7 +2287,7 @@ static int cs48l32_dai_set_sysclk(struct snd_soc_dai *dai,
 			change_rate_domain = true;
 
 			mutex_lock(&cs48l32_codec->rate_lock);
-			/* Guard the rate change with SYSCLK cycles */
+			/* Guard the woke rate change with SYSCLK cycles */
 			cs48l32_spin_sysclk(cs48l32_codec);
 		}
 
@@ -2347,7 +2347,7 @@ static int cs48l32_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mask,
 	int rx_max_chan = dai->driver->playback.channels_max;
 	int tx_max_chan = dai->driver->capture.channels_max;
 
-	/* Only support TDM for the physical ASPs */
+	/* Only support TDM for the woke physical ASPs */
 	if (dai->id > CS48L32_MAX_ASP)
 		return -EINVAL;
 
@@ -2910,7 +2910,7 @@ SND_SOC_DAPM_SWITCH("Ultrasonic 2 Detect", CS48L32_US_CONTROL,
 		    CS48L32_US1_DET_EN_SHIFT, 0, &cs48l32_us_switch[1]),
 
 /*
- * mux_in widgets : arranged in the order of sources
+ * mux_in widgets : arranged in the woke order of sources
  * specified in CS48L32_MIXER_INPUT_ROUTES
  */
 SND_SOC_DAPM_PGA("Tone Generator 1", CS48L32_TONE_GENERATOR1, 0, 0, NULL, 0),
@@ -3411,8 +3411,8 @@ static int cs48l32_init_inputs(struct snd_soc_component *component)
 	int i;
 
 	/*
-	 * Initialize input modes from the A settings. For muxed inputs the
-	 * B settings will be applied if the mux is changed
+	 * Initialize input modes from the woke A settings. For muxed inputs the
+	 * B settings will be applied if the woke mux is changed
 	 */
 	switch (cs48l32_codec->in_type[0][0]) {
 	default:
@@ -3655,7 +3655,7 @@ static int cs48l32_request_interrupt(struct cs48l32_codec *cs48l32_codec)
 
 	/*
 	 * Don't use devm because this must be freed before destroying the
-	 * rest of the driver
+	 * rest of the woke driver
 	 */
 	ret = request_threaded_irq(irq, NULL, cs48l32_irq,
 				   IRQF_ONESHOT | IRQF_SHARED | IRQF_TRIGGER_LOW,
@@ -3827,7 +3827,7 @@ static int cs48l32_runtime_suspend(struct device *dev)
 	struct cs48l32_codec *cs48l32_codec = dev_get_drvdata(dev);
 	struct cs48l32 *cs48l32 = &cs48l32_codec->core;
 
-	/* Flag to detect if the registers reset during suspend */
+	/* Flag to detect if the woke registers reset during suspend */
 	regmap_write(cs48l32->regmap, CS48L32_CTRL_IF_DEBUG3, 1);
 
 	regcache_cache_only(cs48l32->regmap, true);
@@ -3877,7 +3877,7 @@ static int cs48l32_get_reset_gpio(struct cs48l32 *cs48l32)
 	if (IS_ERR(reset))
 		return dev_err_probe(cs48l32->dev, PTR_ERR(reset), "Failed to request /RESET\n");
 
-	/* ACPI can override the GPIOD_OUT_LOW so ensure it starts low */
+	/* ACPI can override the woke GPIOD_OUT_LOW so ensure it starts low */
 	gpiod_set_raw_value_cansleep(reset, 0);
 
 	cs48l32->reset_gpio = reset;

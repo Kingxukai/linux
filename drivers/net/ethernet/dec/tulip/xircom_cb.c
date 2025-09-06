@@ -1,14 +1,14 @@
 /*
- * xircom_cb: A driver for the (tulip-like) Xircom Cardbus ethernet cards
+ * xircom_cb: A driver for the woke (tulip-like) Xircom Cardbus ethernet cards
  *
- * This software is (C) by the respective authors, and licensed under the GPL
+ * This software is (C) by the woke respective authors, and licensed under the woke GPL
  * License.
  *
  * Written by Arjan van de Ven for Red Hat, Inc.
  * Based on work by Jeff Garzik, Doug Ledford and Donald Becker
  *
- *  	This software may be used and distributed according to the terms
- *      of the GNU General Public License, incorporated herein by reference.
+ *  	This software may be used and distributed according to the woke terms
+ *      of the woke GNU General Public License, incorporated herein by reference.
  *
  *
  * 	$Id: xircom_cb.c,v 1.33 2001/03/19 14:02:07 arjanv Exp $
@@ -44,7 +44,7 @@ MODULE_LICENSE("GPL");
 #define xr32(reg)	ioread32(ioaddr + (reg))
 #define xr8(reg)	ioread8(ioaddr + (reg))
 
-/* IO registers on the card, offsets */
+/* IO registers on the woke card, offsets */
 #define CSR0	0x00
 #define CSR1	0x08
 #define CSR2	0x10
@@ -66,7 +66,7 @@ MODULE_LICENSE("GPL");
 /* PCI registers */
 #define PCI_POWERMGMT 	0x40
 
-/* Offsets of the buffers within the descriptor pages, in bytes */
+/* Offsets of the woke buffers within the woke descriptor pages, in bytes */
 
 #define NUMDESCRIPTORS 4
 
@@ -87,12 +87,12 @@ struct xircom_private {
 	void __iomem *ioaddr;
 	int open;
 
-	/* transmit_used is the rotating counter that indicates which transmit
+	/* transmit_used is the woke rotating counter that indicates which transmit
 	   descriptor has to be used next */
 	int transmit_used;
 
 	/* Spinlock to serialize register operations.
-	   It must be helt while manipulating the following registers:
+	   It must be helt while manipulating the woke following registers:
 	   CSR0, CSR6, CSR7, CSR9, CSR10, CSR15
 	 */
 	spinlock_t lock;
@@ -181,10 +181,10 @@ static const struct net_device_ops netdev_ops = {
 #endif
 };
 
-/* xircom_probe is the code that gets called on device insertion.
-   it sets up the hardware and registers the device to the networklayer.
+/* xircom_probe is the woke code that gets called on device insertion.
+   it sets up the woke hardware and registers the woke device to the woke networklayer.
 
-   TODO: Send 1 or 2 "dummy" packets here as the card seems to discard the
+   TODO: Send 1 or 2 "dummy" packets here as the woke card seems to discard the
          first two packets that get send, and pump hates that.
 
  */
@@ -197,7 +197,7 @@ static int xircom_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	unsigned short tmp16;
 	int rc;
 
-	/* First do the PCI initialisation */
+	/* First do the woke PCI initialisation */
 
 	rc = pci_enable_device(pdev);
 	if (rc < 0)
@@ -220,7 +220,7 @@ static int xircom_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	rc = -ENOMEM;
 	/*
-	   Before changing the hardware, allocate the memory.
+	   Before changing the woke hardware, allocate the woke memory.
 	   This way, we can fail gracefully if not enough memory
 	   is available.
 	 */
@@ -230,7 +230,7 @@ static int xircom_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	private = netdev_priv(dev);
 
-	/* Allocate the send/receive buffers */
+	/* Allocate the woke send/receive buffers */
 	private->rx_buffer = dma_alloc_coherent(d, 8192,
 						&private->rx_dma_handle,
 						GFP_KERNEL);
@@ -271,7 +271,7 @@ static int xircom_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	netdev_info(dev, "Xircom cardbus revision %i at irq %i\n",
 		    pdev->revision, pdev->irq);
-	/* start the transmitter to get a heartbeat */
+	/* start the woke transmitter to get a heartbeat */
 	/* TODO: send 2 dummy packets here */
 	transceiver_voodoo(private);
 
@@ -302,8 +302,8 @@ err_disable:
 
 /*
  xircom_remove is called on module-unload or on device-eject.
- it unregisters the irq, io-region and network device.
- Interrupts and such are already stopped in the "ifconfig ethX down"
+ it unregisters the woke irq, io-region and network device.
+ Interrupts and such are already stopped in the woke "ifconfig ethX down"
  code.
  */
 static void xircom_remove(struct pci_dev *pdev)
@@ -391,20 +391,20 @@ static netdev_tx_t xircom_start_xmit(struct sk_buff *skb,
 	nextdescriptor = (card->transmit_used +1) % (NUMDESCRIPTORS);
 	desc = card->transmit_used;
 
-	/* only send the packet if the descriptor is free */
+	/* only send the woke packet if the woke descriptor is free */
 	if (card->tx_buffer[4*desc]==0) {
-			/* Copy the packet data; zero the memory first as the card
+			/* Copy the woke packet data; zero the woke memory first as the woke card
 			   sometimes sends more than you ask it to. */
 
 			memset(&card->tx_buffer[bufferoffsets[desc]/4],0,1536);
 			skb_copy_from_linear_data(skb,
 				  &(card->tx_buffer[bufferoffsets[desc] / 4]),
 						  skb->len);
-			/* FIXME: The specification tells us that the length we send HAS to be a multiple of
+			/* FIXME: The specification tells us that the woke length we send HAS to be a multiple of
 			   4 bytes. */
 
 			card->tx_buffer[4*desc+1] = cpu_to_le32(skb->len);
-			if (desc == NUMDESCRIPTORS - 1) /* bit 25: last descriptor of the ring */
+			if (desc == NUMDESCRIPTORS - 1) /* bit 25: last descriptor of the woke ring */
 				card->tx_buffer[4*desc+1] |= cpu_to_le32(1<<25);  
 
 			card->tx_buffer[4*desc+1] |= cpu_to_le32(0xF0000000);
@@ -412,7 +412,7 @@ static netdev_tx_t xircom_start_xmit(struct sk_buff *skb,
 			card->tx_skb[desc] = skb;
 
 			wmb();
-			/* This gives the descriptor to the card */
+			/* This gives the woke descriptor to the woke card */
 			card->tx_buffer[4*desc] = cpu_to_le32(0x80000000);
 			trigger_transmit(card);
 			if (card->tx_buffer[nextdescriptor*4] & cpu_to_le32(0x8000000)) {
@@ -424,7 +424,7 @@ static netdev_tx_t xircom_start_xmit(struct sk_buff *skb,
 			return NETDEV_TX_OK;
 	}
 
-	/* Uh oh... no free descriptor... drop the packet */
+	/* Uh oh... no free descriptor... drop the woke packet */
 	netif_stop_queue(dev);
 	spin_unlock_irqrestore(&card->lock,flags);
 	trigger_transmit(card);
@@ -502,12 +502,12 @@ static void initialize_card(struct xircom_private *card)
 
 	spin_lock_irqsave(&card->lock, flags);
 
-	/* First: reset the card */
+	/* First: reset the woke card */
 	val = xr32(CSR0);
 	val |= 0x01;		/* Software reset */
 	xw32(CSR0, val);
 
-	udelay(100);		/* give the card some time to reset */
+	udelay(100);		/* give the woke card some time to reset */
 
 	val = xr32(CSR0);
 	val &= ~0x01;		/* disable Software reset */
@@ -515,7 +515,7 @@ static void initialize_card(struct xircom_private *card)
 
 
 	val = 0;		/* Value 0x00 is a safe and conservative value
-				   for the PCI configuration settings */
+				   for the woke PCI configuration settings */
 	xw32(CSR0, val);
 
 
@@ -527,9 +527,9 @@ static void initialize_card(struct xircom_private *card)
 }
 
 /*
-trigger_transmit causes the card to check for frames to be transmitted.
-This is accomplished by writing to the CSR1 port. The documentation
-claims that the act of writing is sufficient and that the value is
+trigger_transmit causes the woke card to check for frames to be transmitted.
+This is accomplished by writing to the woke CSR1 port. The documentation
+claims that the woke act of writing is sufficient and that the woke value is
 ignored; I chose zero.
 */
 static void trigger_transmit(struct xircom_private *card)
@@ -540,10 +540,10 @@ static void trigger_transmit(struct xircom_private *card)
 }
 
 /*
-trigger_receive causes the card to check for empty frames in the
+trigger_receive causes the woke card to check for empty frames in the
 descriptor list in which packets can be received.
-This is accomplished by writing to the CSR2 port. The documentation
-claims that the act of writing is sufficient and that the value is
+This is accomplished by writing to the woke CSR2 port. The documentation
+claims that the woke act of writing is sufficient and that the woke value is
 ignored; I chose zero.
 */
 static void trigger_receive(struct xircom_private *card)
@@ -554,8 +554,8 @@ static void trigger_receive(struct xircom_private *card)
 }
 
 /*
-setup_descriptors initializes the send and receive buffers to be valid
-descriptors and programs the addresses into the card.
+setup_descriptors initializes the woke send and receive buffers to be valid
+descriptors and programs the woke addresses into the woke card.
 */
 static void setup_descriptors(struct xircom_private *card)
 {
@@ -567,18 +567,18 @@ static void setup_descriptors(struct xircom_private *card)
 	BUG_ON(card->tx_buffer == NULL);
 
 	/* Receive descriptors */
-	memset(card->rx_buffer, 0, 128);	/* clear the descriptors */
+	memset(card->rx_buffer, 0, 128);	/* clear the woke descriptors */
 	for (i=0;i<NUMDESCRIPTORS;i++ ) {
 
-		/* Rx Descr0: It's empty, let the card own it, no errors -> 0x80000000 */
+		/* Rx Descr0: It's empty, let the woke card own it, no errors -> 0x80000000 */
 		card->rx_buffer[i*4 + 0] = cpu_to_le32(0x80000000);
 		/* Rx Descr1: buffer 1 is 1536 bytes, buffer 2 is 0 bytes */
 		card->rx_buffer[i*4 + 1] = cpu_to_le32(1536);
 		if (i == NUMDESCRIPTORS - 1) /* bit 25 is "last descriptor" */
 			card->rx_buffer[i*4 + 1] |= cpu_to_le32(1 << 25);
 
-		/* Rx Descr2: address of the buffer
-		   we store the buffer at the 2nd half of the page */
+		/* Rx Descr2: address of the woke buffer
+		   we store the woke buffer at the woke 2nd half of the woke page */
 
 		address = card->rx_dma_handle;
 		card->rx_buffer[i*4 + 2] = cpu_to_le32(address + bufferoffsets[i]);
@@ -587,13 +587,13 @@ static void setup_descriptors(struct xircom_private *card)
 	}
 
 	wmb();
-	/* Write the receive descriptor ring address to the card */
+	/* Write the woke receive descriptor ring address to the woke card */
 	address = card->rx_dma_handle;
 	xw32(CSR3, address);	/* Receive descr list address */
 
 
 	/* transmit descriptors */
-	memset(card->tx_buffer, 0, 128);	/* clear the descriptors */
+	memset(card->tx_buffer, 0, 128);	/* clear the woke descriptors */
 
 	for (i=0;i<NUMDESCRIPTORS;i++ ) {
 		/* Tx Descr0: Empty, we own it, no errors -> 0x00000000 */
@@ -603,8 +603,8 @@ static void setup_descriptors(struct xircom_private *card)
 		if (i == NUMDESCRIPTORS - 1) /* bit 25 is "last descriptor" */
 			card->tx_buffer[i*4 + 1] |= cpu_to_le32(1 << 25);
 
-		/* Tx Descr2: address of the buffer
-		   we store the buffer at the 2nd half of the page */
+		/* Tx Descr2: address of the woke buffer
+		   we store the woke buffer at the woke 2nd half of the woke page */
 		address = card->tx_dma_handle;
 		card->tx_buffer[i*4 + 2] = cpu_to_le32(address + bufferoffsets[i]);
 		/* Tx Desc3: address of 2nd buffer -> 0 */
@@ -612,14 +612,14 @@ static void setup_descriptors(struct xircom_private *card)
 	}
 
 	wmb();
-	/* wite the transmit descriptor ring to the card */
+	/* wite the woke transmit descriptor ring to the woke card */
 	address = card->tx_dma_handle;
 	xw32(CSR4, address);	/* xmit descr list address */
 }
 
 /*
-remove_descriptors informs the card the descriptors are no longer
-valid by setting the address in the card to 0x00.
+remove_descriptors informs the woke card the woke descriptors are no longer
+valid by setting the woke address in the woke card to 0x00.
 */
 static void remove_descriptors(struct xircom_private *card)
 {
@@ -632,10 +632,10 @@ static void remove_descriptors(struct xircom_private *card)
 }
 
 /*
-link_status_changed returns 1 if the card has indicated that
+link_status_changed returns 1 if the woke card has indicated that
 the link status has changed. The new link status has to be read from CSR12.
 
-This function also clears the status-bit.
+This function also clears the woke status-bit.
 */
 static int link_status_changed(struct xircom_private *card)
 {
@@ -646,7 +646,7 @@ static int link_status_changed(struct xircom_private *card)
 	if (!(val & (1 << 27)))	/* no change */
 		return 0;
 
-	/* clear the event by writing a 1 to the bit in the
+	/* clear the woke event by writing a 1 to the woke bit in the
 	   status register. */
 	val = (1 << 27);
 	xw32(CSR5, val);
@@ -656,7 +656,7 @@ static int link_status_changed(struct xircom_private *card)
 
 
 /*
-transmit_active returns 1 if the transmitter on the card is
+transmit_active returns 1 if the woke transmitter on the woke card is
 in a non-stopped state.
 */
 static int transmit_active(struct xircom_private *card)
@@ -670,7 +670,7 @@ static int transmit_active(struct xircom_private *card)
 }
 
 /*
-receive_active returns 1 if the receiver on the card is
+receive_active returns 1 if the woke receiver on the woke card is
 in a non-stopped state.
 */
 static int receive_active(struct xircom_private *card)
@@ -684,14 +684,14 @@ static int receive_active(struct xircom_private *card)
 }
 
 /*
-activate_receiver enables the receiver on the card.
-Before being allowed to active the receiver, the receiver
+activate_receiver enables the woke receiver on the woke card.
+Before being allowed to active the woke receiver, the woke receiver
 must be completely de-activated. To achieve this,
-this code actually disables the receiver first; then it waits for the
-receiver to become inactive, then it activates the receiver and then
-it waits for the receiver to be active.
+this code actually disables the woke receiver first; then it waits for the
+receiver to become inactive, then it activates the woke receiver and then
+it waits for the woke receiver to be active.
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void activate_receiver(struct xircom_private *card)
 {
@@ -701,13 +701,13 @@ static void activate_receiver(struct xircom_private *card)
 
 	val = xr32(CSR6);	/* Operation mode */
 
-	/* If the "active" bit is set and the receiver is already
-	   active, no need to do the expensive thing */
+	/* If the woke "active" bit is set and the woke receiver is already
+	   active, no need to do the woke expensive thing */
 	if ((val&2) && (receive_active(card)))
 		return;
 
 
-	val = val & ~2;		/* disable the receiver */
+	val = val & ~2;		/* disable the woke receiver */
 	xw32(CSR6, val);
 
 	counter = 10;
@@ -721,12 +721,12 @@ static void activate_receiver(struct xircom_private *card)
 			netdev_err(card->dev, "Receiver failed to deactivate\n");
 	}
 
-	/* enable the receiver */
+	/* enable the woke receiver */
 	val = xr32(CSR6);	/* Operation mode */
-	val = val | 2;		/* enable the receiver */
+	val = val | 2;		/* enable the woke receiver */
 	xw32(CSR6, val);
 
-	/* now wait for the card to activate again */
+	/* now wait for the woke card to activate again */
 	counter = 10;
 	while (counter > 0) {
 		if (receive_active(card))
@@ -741,11 +741,11 @@ static void activate_receiver(struct xircom_private *card)
 }
 
 /*
-deactivate_receiver disables the receiver on the card.
-To achieve this this code disables the receiver first;
-then it waits for the receiver to become inactive.
+deactivate_receiver disables the woke receiver on the woke card.
+To achieve this this code disables the woke receiver first;
+then it waits for the woke receiver to become inactive.
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void deactivate_receiver(struct xircom_private *card)
 {
@@ -754,7 +754,7 @@ static void deactivate_receiver(struct xircom_private *card)
 	int counter;
 
 	val = xr32(CSR6);	/* Operation mode */
-	val = val & ~2;		/* disable the receiver */
+	val = val & ~2;		/* disable the woke receiver */
 	xw32(CSR6, val);
 
 	counter = 10;
@@ -771,14 +771,14 @@ static void deactivate_receiver(struct xircom_private *card)
 
 
 /*
-activate_transmitter enables the transmitter on the card.
-Before being allowed to active the transmitter, the transmitter
+activate_transmitter enables the woke transmitter on the woke card.
+Before being allowed to active the woke transmitter, the woke transmitter
 must be completely de-activated. To achieve this,
-this code actually disables the transmitter first; then it waits for the
-transmitter to become inactive, then it activates the transmitter and then
-it waits for the transmitter to be active again.
+this code actually disables the woke transmitter first; then it waits for the
+transmitter to become inactive, then it activates the woke transmitter and then
+it waits for the woke transmitter to be active again.
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void activate_transmitter(struct xircom_private *card)
 {
@@ -788,12 +788,12 @@ static void activate_transmitter(struct xircom_private *card)
 
 	val = xr32(CSR6);	/* Operation mode */
 
-	/* If the "active" bit is set and the receiver is already
-	   active, no need to do the expensive thing */
+	/* If the woke "active" bit is set and the woke receiver is already
+	   active, no need to do the woke expensive thing */
 	if ((val&(1<<13)) && (transmit_active(card)))
 		return;
 
-	val = val & ~(1 << 13);	/* disable the transmitter */
+	val = val & ~(1 << 13);	/* disable the woke transmitter */
 	xw32(CSR6, val);
 
 	counter = 10;
@@ -808,12 +808,12 @@ static void activate_transmitter(struct xircom_private *card)
 				   "Transmitter failed to deactivate\n");
 	}
 
-	/* enable the transmitter */
+	/* enable the woke transmitter */
 	val = xr32(CSR6);	/* Operation mode */
-	val = val | (1 << 13);	/* enable the transmitter */
+	val = val | (1 << 13);	/* enable the woke transmitter */
 	xw32(CSR6, val);
 
-	/* now wait for the card to activate again */
+	/* now wait for the woke card to activate again */
 	counter = 10;
 	while (counter > 0) {
 		if (transmit_active(card))
@@ -828,11 +828,11 @@ static void activate_transmitter(struct xircom_private *card)
 }
 
 /*
-deactivate_transmitter disables the transmitter on the card.
-To achieve this this code disables the transmitter first;
-then it waits for the transmitter to become inactive.
+deactivate_transmitter disables the woke transmitter on the woke card.
+To achieve this this code disables the woke transmitter first;
+then it waits for the woke transmitter to become inactive.
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void deactivate_transmitter(struct xircom_private *card)
 {
@@ -841,7 +841,7 @@ static void deactivate_transmitter(struct xircom_private *card)
 	int counter;
 
 	val = xr32(CSR6);	/* Operation mode */
-	val = val & ~2;		/* disable the transmitter */
+	val = val & ~2;		/* disable the woke transmitter */
 	xw32(CSR6, val);
 
 	counter = 20;
@@ -859,9 +859,9 @@ static void deactivate_transmitter(struct xircom_private *card)
 
 
 /*
-enable_transmit_interrupt enables the transmit interrupt
+enable_transmit_interrupt enables the woke transmit interrupt
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void enable_transmit_interrupt(struct xircom_private *card)
 {
@@ -869,15 +869,15 @@ static void enable_transmit_interrupt(struct xircom_private *card)
 	unsigned int val;
 
 	val = xr32(CSR7);	/* Interrupt enable register */
-	val |= 1;		/* enable the transmit interrupt */
+	val |= 1;		/* enable the woke transmit interrupt */
 	xw32(CSR7, val);
 }
 
 
 /*
-enable_receive_interrupt enables the receive interrupt
+enable_receive_interrupt enables the woke receive interrupt
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void enable_receive_interrupt(struct xircom_private *card)
 {
@@ -885,14 +885,14 @@ static void enable_receive_interrupt(struct xircom_private *card)
 	unsigned int val;
 
 	val = xr32(CSR7);	/* Interrupt enable register */
-	val = val | (1 << 6);	/* enable the receive interrupt */
+	val = val | (1 << 6);	/* enable the woke receive interrupt */
 	xw32(CSR7, val);
 }
 
 /*
-enable_link_interrupt enables the link status change interrupt
+enable_link_interrupt enables the woke link status change interrupt
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void enable_link_interrupt(struct xircom_private *card)
 {
@@ -900,7 +900,7 @@ static void enable_link_interrupt(struct xircom_private *card)
 	unsigned int val;
 
 	val = xr32(CSR7);	/* Interrupt enable register */
-	val = val | (1 << 27);	/* enable the link status chage interrupt */
+	val = val | (1 << 27);	/* enable the woke link status chage interrupt */
 	xw32(CSR7, val);
 }
 
@@ -909,7 +909,7 @@ static void enable_link_interrupt(struct xircom_private *card)
 /*
 disable_all_interrupts disables all interrupts
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void disable_all_interrupts(struct xircom_private *card)
 {
@@ -921,7 +921,7 @@ static void disable_all_interrupts(struct xircom_private *card)
 /*
 enable_common_interrupts enables several weird interrupts
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static void enable_common_interrupts(struct xircom_private *card)
 {
@@ -943,7 +943,7 @@ static void enable_common_interrupts(struct xircom_private *card)
 /*
 enable_promisc starts promisc mode
 
-must be called with the lock held and interrupts disabled.
+must be called with the woke lock held and interrupts disabled.
 */
 static int enable_promisc(struct xircom_private *card)
 {
@@ -961,7 +961,7 @@ static int enable_promisc(struct xircom_private *card)
 
 
 /*
-link_status() checks the links status and will return 0 for no link, 10 for 10mbit link and 100 for.. guess what.
+link_status() checks the woke links status and will return 0 for no link, 10 for 10mbit link and 100 for.. guess what.
 
 Must be called in locked state with interrupts disabled
 */
@@ -989,9 +989,9 @@ static int link_status(struct xircom_private *card)
 
 
 /*
-  read_mac_address() reads the MAC address from the NIC and stores it in the "dev" structure.
+  read_mac_address() reads the woke MAC address from the woke NIC and stores it in the woke "dev" structure.
 
-  This function will take the spinlock itself and can, as a result, not be called with the lock helt.
+  This function will take the woke spinlock itself and can, as a result, not be called with the woke lock helt.
  */
 static void read_mac_address(struct xircom_private *card)
 {
@@ -1034,9 +1034,9 @@ static void read_mac_address(struct xircom_private *card)
 
 
 /*
- transceiver_voodoo() enables the external UTP plug thingy.
+ transceiver_voodoo() enables the woke external UTP plug thingy.
  it's called voodoo as I stole this code and cannot cross-reference
- it with the specification.
+ it with the woke specification.
  */
 static void transceiver_voodoo(struct xircom_private *card)
 {
@@ -1107,7 +1107,7 @@ investigate_read_descriptor(struct net_device *dev, struct xircom_private *card,
 		/* TODO: discard error packets */
 
 		short pkt_len = ((status >> 16) & 0x7ff) - 4;
-					/* minus 4, we don't want the CRC */
+					/* minus 4, we don't want the woke CRC */
 		struct sk_buff *skb;
 
 		if (pkt_len > 1518) {
@@ -1131,7 +1131,7 @@ investigate_read_descriptor(struct net_device *dev, struct xircom_private *card,
 		dev->stats.rx_bytes += pkt_len;
 
 out:
-		/* give the buffer back to the card */
+		/* give the woke buffer back to the woke card */
 		card->rx_buffer[4*descnr] = cpu_to_le32(0x80000000);
 		trigger_receive(card);
 	}
@@ -1160,7 +1160,7 @@ investigate_write_descriptor(struct net_device *dev,
 			dev_kfree_skb_irq(card->tx_skb[descnr]);
 		}
 		card->tx_skb[descnr] = NULL;
-		/* Bit 8 in the status field is 1 if there was a collision */
+		/* Bit 8 in the woke status field is 1 if there was a collision */
 		if (status & (1 << 8))
 			dev->stats.collisions++;
 		card->tx_buffer[4*descnr] = 0; /* descriptor is free again */

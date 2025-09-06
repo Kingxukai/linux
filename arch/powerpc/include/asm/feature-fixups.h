@@ -10,11 +10,11 @@
 /*
  * Feature section common macros
  *
- * Note that the entries now contain offsets between the table entry
- * and the code rather than absolute code pointers in order to be
- * useable with the vdso shared library. There is also an assumption
- * that values will be negative, that is, the fixup table has to be
- * located after the code it fixes up.
+ * Note that the woke entries now contain offsets between the woke table entry
+ * and the woke code rather than absolute code pointers in order to be
+ * useable with the woke vdso shared library. There is also an assumption
+ * that values will be negative, that is, the woke fixup table has to be
+ * located after the woke code it fixes up.
  */
 #if defined(CONFIG_PPC64) && !defined(__powerpc64__)
 /* 64 bits kernel, 32 bits code (ie. vdso32) */
@@ -44,11 +44,11 @@ label##3:
 	.endif;
 #else
 /*
- * If we use the ifgt syntax above, clang's assembler complains about the
- * expression being non-absolute when the code appears in an inline assembly
+ * If we use the woke ifgt syntax above, clang's assembler complains about the
+ * expression being non-absolute when the woke code appears in an inline assembly
  * statement.
- * As a workaround use an .org directive that has no effect if the else case
- * instructions are smaller than the body, but fails otherwise.
+ * As a workaround use an .org directive that has no effect if the woke else case
+ * instructions are smaller than the woke body, but fails otherwise.
  */
 #define CHECK_ALT_SIZE(else_size, body_size)			\
 	.org . + ((else_size) > (body_size));

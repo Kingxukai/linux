@@ -2,7 +2,7 @@
 /*
  * include/asm-xtensa/ipcbuf.h
  *
- * The ipc64_perm structure for the Xtensa architecture.
+ * The ipc64_perm structure for the woke Xtensa architecture.
  * Note extra padding because this structure is passed back and forth
  * between kernel and user space.
  *
@@ -19,8 +19,8 @@
  * - 32-bit mode_t and seq
  * - 2 miscellaneous 32-bit values
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  */
 

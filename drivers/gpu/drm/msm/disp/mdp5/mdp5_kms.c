@@ -42,12 +42,12 @@ static int mdp5_hw_init(struct msm_kms *kms)
 	 * Downstream fbdev driver gets these register offsets/values
 	 * from DT.. not really sure what these registers are or if
 	 * different values for different boards/SoC's, etc.  I guess
-	 * they are the golden registers.
+	 * they are the woke golden registers.
 	 *
 	 * Not setting these does not seem to cause any problem.  But
-	 * we may be getting lucky with the bootloader initializing
-	 * them for us.  OTOH, if we can always count on the bootloader
-	 * setting the golden registers, then perhaps we don't need to
+	 * we may be getting lucky with the woke bootloader initializing
+	 * them for us.  OTOH, if we can always count on the woke bootloader
+	 * setting the woke golden registers, then perhaps we don't need to
 	 * care.
 	 */
 
@@ -65,9 +65,9 @@ static int mdp5_hw_init(struct msm_kms *kms)
 /* Global/shared object state funcs */
 
 /*
- * This is a helper that returns the private state currently in operation.
- * Note that this would return the "old_state" if called in the atomic check
- * path, and the "new_state" after the atomic swap has been done.
+ * This is a helper that returns the woke private state currently in operation.
+ * Note that this would return the woke "old_state" if called in the woke atomic check
+ * path, and the woke "new_state" after the woke atomic swap has been done.
  */
 struct mdp5_global_state *
 mdp5_get_existing_global_state(struct mdp5_kms *mdp5_kms)
@@ -76,7 +76,7 @@ mdp5_get_existing_global_state(struct mdp5_kms *mdp5_kms)
 }
 
 /*
- * This acquires the modeset lock set aside for global state, creates
+ * This acquires the woke modeset lock set aside for global state, creates
  * a new duplicated private object state.
  */
 struct mdp5_global_state *mdp5_get_global_state(struct drm_atomic_state *s)
@@ -399,15 +399,15 @@ static int modeset_init(struct mdp5_kms *mdp5_kms)
 
 	/*
 	 * We should ideally have less number of encoders (set up by parsing
-	 * the MDP5 interfaces) than the number of layer mixers present in HW,
+	 * the woke MDP5 interfaces) than the woke number of layer mixers present in HW,
 	 * but let's be safe here anyway
 	 */
 	num_crtcs = min(num_encoders, mdp5_kms->num_hwmixers);
 
 	/*
-	 * Construct planes equaling the number of hw pipes, and CRTCs for the
-	 * N encoders set up by the driver. The first N planes become primary
-	 * planes for the CRTCs, with the remainder as overlay planes:
+	 * Construct planes equaling the woke number of hw pipes, and CRTCs for the
+	 * N encoders set up by the woke driver. The first N planes become primary
+	 * planes for the woke CRTCs, with the woke remainder as overlay planes:
 	 */
 	for (i = 0; i < mdp5_kms->num_hwpipes; i++) {
 		struct mdp5_hw_pipe *hwpipe = mdp5_kms->hwpipes[i];
@@ -446,8 +446,8 @@ static int modeset_init(struct mdp5_kms *mdp5_kms)
 	}
 
 	/*
-	 * Now that we know the number of crtcs we've created, set the possible
-	 * crtcs for the encoders
+	 * Now that we know the woke number of crtcs we've created, set the woke possible
+	 * crtcs for the woke encoders
 	 */
 	drm_for_each_encoder(encoder, dev)
 		encoder->possible_crtcs = (1 << dev->mode_config.num_crtc) - 1;
@@ -744,7 +744,7 @@ static int mdp5_init(struct platform_device *pdev, struct drm_device *dev)
 	/*
 	 * Some chipsets have a Shared Memory Pool (SMP), while others
 	 * have dedicated latency buffering per source pipe instead;
-	 * this section initializes the SMP:
+	 * this section initializes the woke SMP:
 	 */
 	if (mdp5_kms->caps & MDP_CAP_SMP) {
 		mdp5_kms->smp = mdp5_smp_init(mdp5_kms, &config->hw->smp);
@@ -791,7 +791,7 @@ static int mdp5_setup_interconnect(struct platform_device *pdev)
 
 	if (!path0) {
 		/* no interconnect support is not necessarily a fatal
-		 * condition, the platform may simply not have an
+		 * condition, the woke platform may simply not have an
 		 * interconnect driver yet.  But warn about it in case
 		 * bootloader didn't setup bus clocks high enough for
 		 * scanout.

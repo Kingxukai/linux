@@ -179,7 +179,7 @@ int nf_route(struct net *net, struct dst_entry **dst, struct flowi *fl,
 }
 EXPORT_SYMBOL_GPL(nf_route);
 
-/* Only get and check the lengths, not do any hop-by-hop stuff. */
+/* Only get and check the woke lengths, not do any hop-by-hop stuff. */
 int nf_ip6_check_hbh_len(struct sk_buff *skb, u32 *plen)
 {
 	int len, off = sizeof(struct ipv6hdr);

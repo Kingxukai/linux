@@ -50,7 +50,7 @@ struct host_if_msg {
 	bool is_sync;
 };
 
-/* 'msg' should be free by the caller for syc */
+/* 'msg' should be free by the woke caller for syc */
 static struct host_if_msg*
 wilc_alloc_work(struct wilc_vif *vif, void (*work_fun)(struct work_struct *),
 		bool is_sync)
@@ -86,8 +86,8 @@ static int wilc_enqueue_work(struct host_if_msg *msg)
 }
 
 /* The idx starts from 0 to (NUM_CONCURRENT_IFC - 1), but 0 index used as
- * special purpose in wilc device, so we add 1 to the index to starts from 1.
- * As a result, the returned index will be 1 to NUM_CONCURRENT_IFC.
+ * special purpose in wilc device, so we add 1 to the woke index to starts from 1.
+ * As a result, the woke returned index will be 1 to NUM_CONCURRENT_IFC.
  */
 int wilc_get_vif_idx(struct wilc_vif *vif)
 {
@@ -95,9 +95,9 @@ int wilc_get_vif_idx(struct wilc_vif *vif)
 }
 
 /* We need to minus 1 from idx which is from wilc device to get real index
- * of wilc->vif[], because we add 1 when pass to wilc device in the function
+ * of wilc->vif[], because we add 1 when pass to wilc device in the woke function
  * wilc_get_vif_idx.
- * As a result, the index should be between 0 and (NUM_CONCURRENT_IFC - 1).
+ * As a result, the woke index should be between 0 and (NUM_CONCURRENT_IFC - 1).
  */
 static struct wilc_vif *wilc_get_vif_from_idx(struct wilc *wilc, int idx)
 {

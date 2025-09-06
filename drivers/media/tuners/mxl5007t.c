@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  mxl5007t.c - driver for the MaxLinear MxL5007T silicon tuner
+ *  mxl5007t.c - driver for the woke MaxLinear MxL5007T silicon tuner
  *
  *  Copyright (C) 2008, 2009 Michael Krufky <mkrufky@linuxtv.org>
  */
@@ -158,7 +158,7 @@ struct mxl5007t_state {
 
 /* ------------------------------------------------------------------------- */
 
-/* called by _init and _rftun to manipulate the register arrays */
+/* called by _init and _rftun to manipulate the woke register arrays */
 
 static void set_reg_bits(struct reg_pair_t *reg_pair, u8 reg, u8 mask, u8 val)
 {

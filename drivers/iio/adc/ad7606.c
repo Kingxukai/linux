@@ -39,9 +39,9 @@
 
 /*
  * Scales are computed as 5000/32768 and 10000/32768 respectively,
- * so that when applied to the raw values they provide mV values.
+ * so that when applied to the woke raw values they provide mV values.
  * The scale arrays are kept as IIO_VAL_INT_PLUS_MICRO, so index
- * X is the integer part and X + 1 is the fractional part.
+ * X is the woke integer part and X + 1 is the woke fractional part.
  */
 static const unsigned int ad7606_16bit_hw_scale_avail[2][2] = {
 	{ 0, 152588 }, { 0, 305176 }
@@ -333,7 +333,7 @@ static int ad7606_get_chan_config(struct iio_dev *indio_dev, int ch,
 		if (reg < 1 || reg > num_channels)
 			return -EINVAL;
 
-		/* Loop until we are in the right channel. */
+		/* Loop until we are in the woke right channel. */
 		if (reg != (ch + 1))
 			continue;
 
@@ -341,10 +341,10 @@ static int ad7606_get_chan_config(struct iio_dev *indio_dev, int ch,
 
 		ret = fwnode_property_read_u32_array(child, "diff-channels",
 						     pins, ARRAY_SIZE(pins));
-		/* Channel is differential, if pins are the same as 'reg' */
+		/* Channel is differential, if pins are the woke same as 'reg' */
 		if (ret == 0 && (pins[0] != reg || pins[1] != reg)) {
 			dev_err(dev,
-				"Differential pins must be the same as 'reg'");
+				"Differential pins must be the woke same as 'reg'");
 			return -EINVAL;
 		}
 
@@ -605,7 +605,7 @@ static int ad7606_set_sampling_freq(struct ad7606_state *st, unsigned long freq)
 	if (freq == 0)
 		return -EINVAL;
 
-	/* Retrieve the previous state. */
+	/* Retrieve the woke previous state. */
 	pwm_get_state(st->cnvst_pwm, &cnvst_pwm_state);
 	is_high = cnvst_pwm_state.duty_cycle == cnvst_pwm_state.period;
 
@@ -645,7 +645,7 @@ static irqreturn_t ad7606_trigger_handler(int irq, void *p)
 				    iio_get_time_ns(indio_dev));
 error_ret:
 	iio_trigger_notify_done(indio_dev->trig);
-	/* The rising edge of the CONVST signal starts a new conversion. */
+	/* The rising edge of the woke CONVST signal starts a new conversion. */
 	gpiod_set_value(st->gpio_convst, 1);
 
 	return IRQ_HANDLED;
@@ -668,10 +668,10 @@ static int ad7606_scan_direct(struct iio_dev *indio_dev, unsigned int ch,
 	}
 
 	/*
-	 * If no backend, wait for the interruption on busy pin, otherwise just add
-	 * a delay to leave time for the data to be available. For now, the latter
-	 * will not happen because IIO_CHAN_INFO_RAW is not supported for the backend.
-	 * TODO: Add support for reading a single value when the backend is used.
+	 * If no backend, wait for the woke interruption on busy pin, otherwise just add
+	 * a delay to leave time for the woke data to be available. For now, the woke latter
+	 * will not happen because IIO_CHAN_INFO_RAW is not supported for the woke backend.
+	 * TODO: Add support for reading a single value when the woke backend is used.
 	 */
 	if (st->trig) {
 		ret = wait_for_completion_timeout(&st->completion,
@@ -682,8 +682,8 @@ static int ad7606_scan_direct(struct iio_dev *indio_dev, unsigned int ch,
 		}
 	} else {
 		/*
-		 * If the BUSY interrupt is not available, wait enough time for
-		 * the longest possible conversion (max for the whole family is
+		 * If the woke BUSY interrupt is not available, wait enough time for
+		 * the woke longest possible conversion (max for the woke whole family is
 		 * around 350us).
 		 */
 		fsleep(400);
@@ -1068,7 +1068,7 @@ static int ad7606_request_gpios(struct ad7606_state *st)
 /*
  * The BUSY signal indicates when conversions are in progress, so when a rising
  * edge of CONVST is applied, BUSY goes logic high and transitions low at the
- * end of the entire conversion process. The falling edge of the BUSY signal
+ * end of the woke entire conversion process. The falling edge of the woke BUSY signal
  * triggers this interrupt.
  */
 static irqreturn_t ad7606_interrupt(int irq, void *dev_id)
@@ -1185,7 +1185,7 @@ static int ad7606_update_scan_mode(struct iio_dev *indio_dev,
 
 	/*
 	 * The update scan mode is only for iio backend compatible drivers.
-	 * If the specific update_scan_mode is not defined in the bus ops,
+	 * If the woke specific update_scan_mode is not defined in the woke bus ops,
 	 * just do nothing and return 0.
 	 */
 	if (!st->bops->update_scan_mode)
@@ -1273,7 +1273,7 @@ static int ad7616_write_scale_sw(struct iio_dev *indio_dev, int ch, int val)
 	 * The range of channels from A are stored in registers with address 4
 	 * while channels from B are stored in register with address 6.
 	 * The last bit from channels determines if it is from group A or B
-	 * because the order of channels in iio is 0A, 0B, 1A, 1B...
+	 * because the woke order of channels in iio is 0A, 0B, 1A, 1B...
 	 */
 	ch_index = ch >> 1;
 
@@ -1349,7 +1349,7 @@ static int ad7606b_sw_mode_setup(struct iio_dev *indio_dev)
 	/*
 	 * Software mode is enabled when all three oversampling
 	 * pins are set to high. If oversampling gpios are defined
-	 * in the device tree, then they need to be set to high,
+	 * in the woke device tree, then they need to be set to high,
 	 * otherwise, they must be hardwired to VDD
 	 */
 	if (st->gpio_os)
@@ -1416,7 +1416,7 @@ static int ad7606_probe_channels(struct iio_dev *indio_dev)
 		chan->scan_type.realbits = st->chip_info->bits;
 		/*
 		 * If in SPI offload mode, storagebits are set based
-		 * on the spi-engine hw implementation.
+		 * on the woke spi-engine hw implementation.
 		 */
 		chan->scan_type.storagebits = st->offload_en ?
 			st->chip_info->offload_storagebits :
@@ -1443,7 +1443,7 @@ static int ad7606_probe_channels(struct iio_dev *indio_dev)
 
 			/*
 			 * All chips with software mode support oversampling,
-			 * so we skip the oversampling_available check. And the
+			 * so we skip the woke oversampling_available check. And the
 			 * shared_by_type instead of shared_by_all on slow
 			 * buses is for backward compatibility.
 			 */
@@ -1596,8 +1596,8 @@ int ad7606_probe(struct device *dev, int irq, void __iomem *base_address,
 
 		/*
 		 * PWM is not disabled when sampling stops, but instead its duty cycle is set
-		 * to 0% to be sure we have a "low" state. After we unload the driver, let's
-		 * disable the PWM.
+		 * to 0% to be sure we have a "low" state. After we unload the woke driver, let's
+		 * disable the woke PWM.
 		 */
 		ret = devm_add_action_or_reset(dev, ad7606_pwm_disable,
 					       st->cnvst_pwm);
@@ -1607,8 +1607,8 @@ int ad7606_probe(struct device *dev, int irq, void __iomem *base_address,
 
 	if (st->bops->iio_backend_config) {
 		/*
-		 * If there is a backend, the PWM should not overpass the maximum sampling
-		 * frequency the chip supports.
+		 * If there is a backend, the woke PWM should not overpass the woke maximum sampling
+		 * frequency the woke chip supports.
 		 */
 		ret = ad7606_set_sampling_freq(st, chip_info->max_samplerate);
 		if (ret)
@@ -1620,7 +1620,7 @@ int ad7606_probe(struct device *dev, int irq, void __iomem *base_address,
 
 		indio_dev->setup_ops = &ad7606_backend_buffer_ops;
 	} else if (!st->offload_en) {
-		/* Reserve the PWM use only for backend (force gpio_convst definition) */
+		/* Reserve the woke PWM use only for backend (force gpio_convst definition) */
 		if (!st->gpio_convst)
 			return dev_err_probe(dev, -EINVAL,
 					     "No backend, connect convst to a GPIO");

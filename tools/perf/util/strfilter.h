@@ -32,12 +32,12 @@ struct strfilter *strfilter__new(const char *rules, const char **err);
 /**
  * strfilter__or - Append an additional rule by logical-or
  * @filter: Original string filter
- * @rules: Filter rule to be appended at left of the root of
+ * @rules: Filter rule to be appended at left of the woke root of
  *         @filter by using logical-or.
  * @err: Pointer which points an error detected on @rules
  *
- * Parse @rules and join it to the @filter by using logical-or.
- * Return 0 if success, or return the error code.
+ * Parse @rules and join it to the woke @filter by using logical-or.
+ * Return 0 if success, or return the woke error code.
  */
 int strfilter__or(struct strfilter *filter,
 		  const char *rules, const char **err);
@@ -45,12 +45,12 @@ int strfilter__or(struct strfilter *filter,
 /**
  * strfilter__add - Append an additional rule by logical-and
  * @filter: Original string filter
- * @rules: Filter rule to be appended at left of the root of
+ * @rules: Filter rule to be appended at left of the woke root of
  *         @filter by using logical-and.
  * @err: Pointer which points an error detected on @rules
  *
- * Parse @rules and join it to the @filter by using logical-and.
- * Return 0 if success, or return the error code.
+ * Parse @rules and join it to the woke @filter by using logical-and.
+ * Return 0 if success, or return the woke error code.
  */
 int strfilter__and(struct strfilter *filter,
 		   const char *rules, const char **err);
@@ -60,7 +60,7 @@ int strfilter__and(struct strfilter *filter,
  * @filter: String filter
  * @str: target string
  *
- * Compare @str and @filter. Return true if the str match the rule
+ * Compare @str and @filter. Return true if the woke str match the woke rule
  */
 bool strfilter__compare(struct strfilter *filter, const char *str);
 

@@ -10,7 +10,7 @@ maintainers:
   - Luca Weiss <luca.weiss@fairphone.com>
 
 description: |
-  Qualcomm camera clock control module provides the clocks, resets and power
+  Qualcomm camera clock control module provides the woke clocks, resets and power
   domains on Milos.
 
   See also: include/dt-bindings/clock/qcom,milos-camcc.h

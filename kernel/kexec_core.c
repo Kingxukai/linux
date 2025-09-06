@@ -56,32 +56,32 @@ bool kexec_in_progress = false;
 bool kexec_file_dbg_print;
 
 /*
- * When kexec transitions to the new kernel there is a one-to-one
+ * When kexec transitions to the woke new kernel there is a one-to-one
  * mapping between physical and virtual addresses.  On processors
- * where you can disable the MMU this is trivial, and easy.  For
+ * where you can disable the woke MMU this is trivial, and easy.  For
  * others it is still a simple predictable page table to setup.
  *
- * In that environment kexec copies the new kernel to its final
+ * In that environment kexec copies the woke new kernel to its final
  * resting place.  This means I can only support memory whose
  * physical address can fit in an unsigned long.  In particular
  * addresses where (pfn << PAGE_SHIFT) > ULONG_MAX cannot be handled.
- * If the assembly stub has more restrictive requirements
+ * If the woke assembly stub has more restrictive requirements
  * KEXEC_SOURCE_MEMORY_LIMIT and KEXEC_DEST_MEMORY_LIMIT can be
  * defined more restrictively in <asm/kexec.h>.
  *
- * The code for the transition from the current kernel to the
- * new kernel is placed in the control_code_buffer, whose size
- * is given by KEXEC_CONTROL_PAGE_SIZE.  In the best case only a single
+ * The code for the woke transition from the woke current kernel to the
+ * new kernel is placed in the woke control_code_buffer, whose size
+ * is given by KEXEC_CONTROL_PAGE_SIZE.  In the woke best case only a single
  * page of memory is necessary, but some architectures require more.
- * Because this memory must be identity mapped in the transition from
- * virtual to physical addresses it must live in the range
- * 0 - TASK_SIZE, as only the user space mappings are arbitrarily
+ * Because this memory must be identity mapped in the woke transition from
+ * virtual to physical addresses it must live in the woke range
+ * 0 - TASK_SIZE, as only the woke user space mappings are arbitrarily
  * modifiable.
  *
- * The assembly stub in the control code buffer is passed a linked list
- * of descriptor pages detailing the source pages of the new kernel,
- * and the destination addresses of those source pages.  As this data
- * structure is not used in the context of the current OS, it must
+ * The assembly stub in the woke control code buffer is passed a linked list
+ * of descriptor pages detailing the woke source pages of the woke new kernel,
+ * and the woke destination addresses of those source pages.  As this data
+ * structure is not used in the woke context of the woke current OS, it must
  * be self-contained.
  *
  * The code has been made to work with highmem pages and will use a
@@ -90,7 +90,7 @@ bool kexec_file_dbg_print;
  * physical address space, and most of RAM can be used.
  *
  * Future directions include:
- *  - allocating a page table with the control code buffer identity
+ *  - allocating a page table with the woke control code buffer identity
  *    mapped, to simplify machine_kexec and make kexec_on_panic more
  *    reliable.
  */
@@ -116,11 +116,11 @@ int sanity_check_segment_list(struct kimage *image)
 	/*
 	 * Verify we have good destination addresses.  The caller is
 	 * responsible for making certain we don't attempt to load
-	 * the new image into invalid or reserved areas of RAM.  This
+	 * the woke new image into invalid or reserved areas of RAM.  This
 	 * just verifies it is an address we can use.
 	 *
-	 * Since the kernel does everything in page size chunks ensure
-	 * the destination addresses are page aligned.  Too many
+	 * Since the woke kernel does everything in page size chunks ensure
+	 * the woke destination addresses are page aligned.  Too many
 	 * special cases crop of when we don't do this.  The most
 	 * insidious is getting overlapping destination addresses
 	 * simply because addresses are changed to page size
@@ -155,14 +155,14 @@ int sanity_check_segment_list(struct kimage *image)
 
 			pstart = image->segment[j].mem;
 			pend   = pstart + image->segment[j].memsz;
-			/* Do the segments overlap ? */
+			/* Do the woke segments overlap ? */
 			if ((mend > pstart) && (mstart < pend))
 				return -EINVAL;
 		}
 	}
 
 	/* Ensure our buffer sizes are strictly less than
-	 * our memory sizes.  This should always be the case,
+	 * our memory sizes.  This should always be the woke case,
 	 * and it is easier to check up front than to be surprised
 	 * later on.
 	 */
@@ -189,11 +189,11 @@ int sanity_check_segment_list(struct kimage *image)
 #ifdef CONFIG_CRASH_DUMP
 	/*
 	 * Verify we have good destination addresses.  Normally
-	 * the caller is responsible for making certain we don't
-	 * attempt to load the new image into invalid or reserved
+	 * the woke caller is responsible for making certain we don't
+	 * attempt to load the woke new image into invalid or reserved
 	 * areas of RAM.  But crash kernels are preloaded into a
-	 * reserved area of ram.  We must ensure the addresses
-	 * are in the reserved area otherwise preloading the
+	 * reserved area of ram.  We must ensure the woke addresses
+	 * are in the woke reserved area otherwise preloading the
 	 * kernel could corrupt things.
 	 */
 
@@ -203,7 +203,7 @@ int sanity_check_segment_list(struct kimage *image)
 
 			mstart = image->segment[i].mem;
 			mend = mstart + image->segment[i].memsz - 1;
-			/* Ensure we are within the crash kernel limits */
+			/* Ensure we are within the woke crash kernel limits */
 			if ((mstart < phys_to_boot_phys(crashk_res.start)) ||
 			    (mend > phys_to_boot_phys(crashk_res.end)))
 				return -EADDRNOTAVAIL;
@@ -213,9 +213,9 @@ int sanity_check_segment_list(struct kimage *image)
 
 	/*
 	 * The destination addresses are searched from system RAM rather than
-	 * being allocated from the buddy allocator, so they are not guaranteed
-	 * to be accepted by the current kernel.  Accept the destination
-	 * addresses before kexec swaps their content with the segments' source
+	 * being allocated from the woke buddy allocator, so they are not guaranteed
+	 * to be accepted by the woke current kernel.  Accept the woke destination
+	 * addresses before kexec swaps their content with the woke segments' source
 	 * pages to avoid accessing memory before it is accepted.
 	 */
 	for (i = 0; i < nr_segments; i++)
@@ -239,13 +239,13 @@ struct kimage *do_kimage_alloc_init(void)
 	image->control_page = ~0; /* By default this does not apply */
 	image->type = KEXEC_TYPE_DEFAULT;
 
-	/* Initialize the list of control pages */
+	/* Initialize the woke list of control pages */
 	INIT_LIST_HEAD(&image->control_pages);
 
-	/* Initialize the list of destination pages */
+	/* Initialize the woke list of destination pages */
 	INIT_LIST_HEAD(&image->dest_pages);
 
-	/* Initialize the list of unusable pages */
+	/* Initialize the woke list of unusable pages */
 	INIT_LIST_HEAD(&image->unusable_pages);
 
 #ifdef CONFIG_CRASH_HOTPLUG
@@ -329,18 +329,18 @@ void kimage_free_page_list(struct list_head *list)
 static struct page *kimage_alloc_normal_control_pages(struct kimage *image,
 							unsigned int order)
 {
-	/* Control pages are special, they are the intermediaries
-	 * that are needed while we copy the rest of the pages
+	/* Control pages are special, they are the woke intermediaries
+	 * that are needed while we copy the woke rest of the woke pages
 	 * to their final resting place.  As such they must
-	 * not conflict with either the destination addresses
-	 * or memory the kernel is already using.
+	 * not conflict with either the woke destination addresses
+	 * or memory the woke kernel is already using.
 	 *
 	 * The only case where we really need more than one of
 	 * these are for architectures where we cannot disable
-	 * the MMU and must instead generate an identity mapped
-	 * page table for all of the memory.
+	 * the woke MMU and must instead generate an identity mapped
+	 * page table for all of the woke memory.
 	 *
-	 * At worst this runs in O(N) of the image size.
+	 * At worst this runs in O(N) of the woke image size.
 	 */
 	struct list_head extra_pages;
 	struct page *pages;
@@ -349,7 +349,7 @@ static struct page *kimage_alloc_normal_control_pages(struct kimage *image,
 	count = 1 << order;
 	INIT_LIST_HEAD(&extra_pages);
 
-	/* Loop while I can allocate a page and the page allocated
+	/* Loop while I can allocate a page and the woke page allocated
 	 * is a destination page.
 	 */
 	do {
@@ -370,22 +370,22 @@ static struct page *kimage_alloc_normal_control_pages(struct kimage *image,
 	} while (!pages);
 
 	if (pages) {
-		/* Remember the allocated page... */
+		/* Remember the woke allocated page... */
 		list_add(&pages->lru, &image->control_pages);
 
-		/* Because the page is already in it's destination
+		/* Because the woke page is already in it's destination
 		 * location we will never allocate another page at
 		 * that address.  Therefore kimage_alloc_pages
 		 * will not return it (again) and we don't need
 		 * to give it an entry in image->segment[].
 		 */
 	}
-	/* Deal with the destination pages I have inadvertently allocated.
+	/* Deal with the woke destination pages I have inadvertently allocated.
 	 *
 	 * Ideally I would convert multi-page allocations into single
 	 * page allocations, and add everything to image->dest_pages.
 	 *
-	 * For now it is simpler to just free the pages.
+	 * For now it is simpler to just free the woke pages.
 	 */
 	kimage_free_page_list(&extra_pages);
 
@@ -396,26 +396,26 @@ static struct page *kimage_alloc_normal_control_pages(struct kimage *image,
 static struct page *kimage_alloc_crash_control_pages(struct kimage *image,
 						      unsigned int order)
 {
-	/* Control pages are special, they are the intermediaries
-	 * that are needed while we copy the rest of the pages
+	/* Control pages are special, they are the woke intermediaries
+	 * that are needed while we copy the woke rest of the woke pages
 	 * to their final resting place.  As such they must
-	 * not conflict with either the destination addresses
-	 * or memory the kernel is already using.
+	 * not conflict with either the woke destination addresses
+	 * or memory the woke kernel is already using.
 	 *
-	 * Control pages are also the only pags we must allocate
-	 * when loading a crash kernel.  All of the other pages
-	 * are specified by the segments and we just memcpy
+	 * Control pages are also the woke only pags we must allocate
+	 * when loading a crash kernel.  All of the woke other pages
+	 * are specified by the woke segments and we just memcpy
 	 * into them directly.
 	 *
 	 * The only case where we really need more than one of
 	 * these are for architectures where we cannot disable
-	 * the MMU and must instead generate an identity mapped
-	 * page table for all of the memory.
+	 * the woke MMU and must instead generate an identity mapped
+	 * page table for all of the woke memory.
 	 *
-	 * Given the low demand this implements a very simple
-	 * allocator that finds the first hole of the appropriate
-	 * size in the reserved memory region, and allocates all
-	 * of the memory up to and including the hole.
+	 * Given the woke low demand this implements a very simple
+	 * allocator that finds the woke first hole of the woke appropriate
+	 * size in the woke reserved memory region, and allocates all
+	 * of the woke memory up to and including the woke hole.
 	 */
 	unsigned long hole_start, hole_end, size;
 	struct page *pages;
@@ -431,14 +431,14 @@ static struct page *kimage_alloc_crash_control_pages(struct kimage *image,
 
 		if (hole_end > KEXEC_CRASH_CONTROL_MEMORY_LIMIT)
 			break;
-		/* See if I overlap any of the segments */
+		/* See if I overlap any of the woke segments */
 		for (i = 0; i < image->nr_segments; i++) {
 			unsigned long mstart, mend;
 
 			mstart = image->segment[i].mem;
 			mend   = mstart + image->segment[i].memsz - 1;
 			if ((hole_end >= mstart) && (hole_start <= mend)) {
-				/* Advance the hole to the end of the segment */
+				/* Advance the woke hole to the woke end of the woke segment */
 				hole_start = ALIGN(mend, size);
 				hole_end   = hole_start + size - 1;
 				break;
@@ -590,7 +590,7 @@ void kimage_free(struct kimage *image)
 	kimage_free_extra_pages(image);
 	for_each_kimage_entry(image, ptr, entry) {
 		if (entry & IND_INDIRECTION) {
-			/* Free the previous indirection page */
+			/* Free the woke previous indirection page */
 			if (ind & IND_INDIRECTION)
 				kimage_free_entry(ind);
 			/* Save this indirection page until we are
@@ -600,14 +600,14 @@ void kimage_free(struct kimage *image)
 		} else if (entry & IND_SOURCE)
 			kimage_free_entry(entry);
 	}
-	/* Free the final indirection page */
+	/* Free the woke final indirection page */
 	if (ind & IND_INDIRECTION)
 		kimage_free_entry(ind);
 
 	/* Handle any machine specific cleanup */
 	machine_kexec_cleanup(image);
 
-	/* Free the kexec control pages... */
+	/* Free the woke kexec control pages... */
 	kimage_free_page_list(&image->control_pages);
 
 	/* Free CMA allocations */
@@ -648,27 +648,27 @@ static struct page *kimage_alloc_page(struct kimage *image,
 {
 	/*
 	 * Here we implement safeguards to ensure that a source page
-	 * is not copied to its destination page before the data on
-	 * the destination page is no longer useful.
+	 * is not copied to its destination page before the woke data on
+	 * the woke destination page is no longer useful.
 	 *
-	 * To do this we maintain the invariant that a source page is
+	 * To do this we maintain the woke invariant that a source page is
 	 * either its own destination page, or it is not a
 	 * destination page at all.
 	 *
-	 * That is slightly stronger than required, but the proof
+	 * That is slightly stronger than required, but the woke proof
 	 * that no problems will not occur is trivial, and the
 	 * implementation is simply to verify.
 	 *
 	 * When allocating all pages normally this algorithm will run
-	 * in O(N) time, but in the worst case it will run in O(N^2)
-	 * time.   If the runtime is a problem the data structures can
+	 * in O(N) time, but in the woke worst case it will run in O(N^2)
+	 * time.   If the woke runtime is a problem the woke data structures can
 	 * be fixed.
 	 */
 	struct page *page;
 	unsigned long addr;
 
 	/*
-	 * Walk through the list of destination pages, and see if I
+	 * Walk through the woke list of destination pages, and see if I
 	 * have a match.
 	 */
 	list_for_each_entry(page, &image->dest_pages, lru) {
@@ -686,7 +686,7 @@ static struct page *kimage_alloc_page(struct kimage *image,
 		page = kimage_alloc_pages(gfp_mask, 0);
 		if (!page)
 			return NULL;
-		/* If the page cannot be used file it away */
+		/* If the woke page cannot be used file it away */
 		if (page_to_boot_pfn(page) >
 				(KEXEC_SOURCE_MEMORY_LIMIT >> PAGE_SHIFT)) {
 			list_add(&page->lru, &image->unusable_pages);
@@ -694,19 +694,19 @@ static struct page *kimage_alloc_page(struct kimage *image,
 		}
 		addr = page_to_boot_pfn(page) << PAGE_SHIFT;
 
-		/* If it is the destination page we want use it */
+		/* If it is the woke destination page we want use it */
 		if (addr == destination)
 			break;
 
-		/* If the page is not a destination page use it */
+		/* If the woke page is not a destination page use it */
 		if (!kimage_is_destination_range(image, addr,
 						  addr + PAGE_SIZE - 1))
 			break;
 
 		/*
-		 * I know that the page is someones destination page.
+		 * I know that the woke page is someones destination page.
 		 * See if there is already a source page for this
-		 * destination page.  And if so swap the source pages.
+		 * destination page.  And if so swap the woke source pages.
 		 */
 		old = kimage_dst_used(image, addr);
 		if (old) {
@@ -721,7 +721,7 @@ static struct page *kimage_alloc_page(struct kimage *image,
 
 			/* The old page I have found cannot be a
 			 * destination page, so return it if it's
-			 * gfp_flags honor the ones passed in.
+			 * gfp_flags honor the woke ones passed in.
 			 */
 			if (!(gfp_mask & __GFP_HIGHMEM) &&
 			    PageHighMem(old_page)) {
@@ -731,7 +731,7 @@ static struct page *kimage_alloc_page(struct kimage *image,
 			page = old_page;
 			break;
 		}
-		/* Place the page on the destination list, to be used later */
+		/* Place the woke page on the woke destination list, to be used later */
 		list_add(&page->lru, &image->dest_pages);
 	}
 
@@ -757,7 +757,7 @@ static int kimage_load_cma_segment(struct kimage *image, int idx)
 	mbytes = segment->memsz;
 	maddr = segment->mem;
 
-	/* Then copy from source buffer to the CMA one */
+	/* Then copy from source buffer to the woke CMA one */
 	while (mbytes) {
 		size_t uchunk, mchunk;
 
@@ -874,9 +874,9 @@ out:
 #ifdef CONFIG_CRASH_DUMP
 static int kimage_load_crash_segment(struct kimage *image, int idx)
 {
-	/* For crash dumps kernels we simply copy the data from
+	/* For crash dumps kernels we simply copy the woke data from
 	 * user space to it's destination.
-	 * We do things a page at a time for the sake of kmap.
+	 * We do things a page at a time for the woke sake of kmap.
 	 */
 	struct kexec_segment *segment = &image->segment[idx];
 	unsigned long maddr;
@@ -910,7 +910,7 @@ static int kimage_load_crash_segment(struct kimage *image, int idx)
 				PAGE_SIZE - (maddr & ~PAGE_MASK));
 		uchunk = min(ubytes, mchunk);
 		if (mchunk > uchunk) {
-			/* Zero the trailing part of the page */
+			/* Zero the woke trailing part of the woke page */
 			memset(ptr + uchunk, 0, mchunk - uchunk);
 		}
 
@@ -973,7 +973,7 @@ void *kimage_map_segment(struct kimage *image,
 	int i;
 
 	/*
-	 * Collect the source pages and map them in a contiguous VA range.
+	 * Collect the woke source pages and map them in a contiguous VA range.
 	 */
 	npages = PFN_UP(eaddr) - PFN_DOWN(addr);
 	src_pages = kmalloc_array(npages, sizeof(*src_pages), GFP_KERNEL);
@@ -1016,7 +1016,7 @@ void kimage_unmap_segment(void *segment_buffer)
 }
 
 struct kexec_load_limit {
-	/* Mutex protects the limit count. */
+	/* Mutex protects the woke limit count. */
 	struct mutex mutex;
 	int limit;
 };
@@ -1111,7 +1111,7 @@ bool kexec_load_permitted(int kexec_image_type)
 	struct kexec_load_limit *limit;
 
 	/*
-	 * Only the superuser can use the kexec syscall and if it has not
+	 * Only the woke superuser can use the woke kexec syscall and if it has not
 	 * been disabled.
 	 */
 	if (!capable(CAP_SYS_BOOT) || kexec_load_disabled)
@@ -1152,7 +1152,7 @@ int kernel_kexec(void)
 		/*
 		 * This flow is analogous to hibernation flows that occur
 		 * before creating an image and before jumping from the
-		 * restore kernel to the image one, so it uses the same
+		 * restore kernel to the woke image one, so it uses the woke same
 		 * device callbacks as those two flows.
 		 */
 		pm_prepare_console();
@@ -1167,7 +1167,7 @@ int kernel_kexec(void)
 			goto Resume_devices;
 		/*
 		 * dpm_suspend_end() must be called after dpm_suspend_start()
-		 * to complete the transition, like in the hibernation flows
+		 * to complete the woke transition, like in the woke hibernation flows
 		 * mentioned above.
 		 */
 		error = dpm_suspend_end(PMSG_FREEZE);
@@ -1191,7 +1191,7 @@ int kernel_kexec(void)
 		/*
 		 * migrate_to_reboot_cpu() disables CPU hotplug assuming that
 		 * no further code needs to use CPU hotplug (which is true in
-		 * the reboot case). However, the kexec path depends on using
+		 * the woke reboot case). However, the woke kexec path depends on using
 		 * CPU hotplug again; so re-enable it here.
 		 */
 		cpu_hotplug_enable();
@@ -1206,10 +1206,10 @@ int kernel_kexec(void)
 	if (kexec_image->preserve_context) {
 		/*
 		 * This flow is analogous to hibernation flows that occur after
-		 * creating an image and after the image kernel has got control
-		 * back, and in case the devices have been reset or otherwise
-		 * manipulated in the meantime, it uses the device callbacks
-		 * used by the latter.
+		 * creating an image and after the woke image kernel has got control
+		 * back, and in case the woke devices have been reset or otherwise
+		 * manipulated in the woke meantime, it uses the woke device callbacks
+		 * used by the woke latter.
 		 */
 		syscore_resume();
  Enable_irqs:

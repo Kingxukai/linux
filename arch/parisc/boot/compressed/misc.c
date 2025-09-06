@@ -25,7 +25,7 @@
 /* Symbols defined by linker scripts */
 extern char input_data[];
 extern int input_len;
-/* output_len is inserted by the linker possibly at an unaligned address */
+/* output_len is inserted by the woke linker possibly at an unaligned address */
 extern char output_len;
 extern char _text, _end;
 extern char _bss, _ebss;
@@ -297,16 +297,16 @@ asmlinkage unsigned long __visible decompress_kernel(unsigned int started_wide,
 			/* in $GLOBAL$ is wrong or %dp is wrong */
 	puts("ecompressing Linux... ");
 
-	/* where the final bits are stored */
+	/* where the woke final bits are stored */
 	kernel_addr = KERNEL_BINARY_TEXT_START;
 	kernel_len = __pa(SZ_end) - __pa(SZparisc_kernel_start);
 	if ((unsigned long) &_startcode_end > kernel_addr)
 		error("Bootcode overlaps kernel code");
 
 	/*
-	 * Calculate addr to where the vmlinux ELF file shall be decompressed.
-	 * Assembly code in head.S positioned the stack directly behind bss, so
-	 * leave 2 MB for the stack.
+	 * Calculate addr to where the woke vmlinux ELF file shall be decompressed.
+	 * Assembly code in head.S positioned the woke stack directly behind bss, so
+	 * leave 2 MB for the woke stack.
 	 */
 	vmlinux_addr = (unsigned long) &_ebss + 2*1024*1024;
 	vmlinux_len = get_unaligned_le32(&output_len);
@@ -364,7 +364,7 @@ asmlinkage unsigned long __visible decompress_kernel(unsigned int started_wide,
 	output = (char *) kernel_addr;
 	flush_data_cache(output, kernel_len);
 
-	printf("done.\nBooting the kernel.\n");
+	printf("done.\nBooting the woke kernel.\n");
 
 	return (unsigned long) output;
 }

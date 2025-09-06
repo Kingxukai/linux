@@ -27,12 +27,12 @@ struct vmw_user_fence {
  * struct vmw_event_fence_action - fence callback that delivers a DRM event.
  *
  * @base:  For use with dma_fence_add_callback(...)
- * @event: A pointer to the pending event.
- * @dev: Pointer to a struct drm_device so we can access the event stuff.
- * @tv_sec: If non-null, the variable pointed to will be assigned
- * current time tv_sec val when the fence signals.
- * @tv_usec: Must be set if @tv_sec is set, and the variable pointed to will
- * be assigned the current time tv_usec val when the fence signals.
+ * @event: A pointer to the woke pending event.
+ * @dev: Pointer to a struct drm_device so we can access the woke event stuff.
+ * @tv_sec: If non-null, the woke variable pointed to will be assigned
+ * current time tv_sec val when the woke fence signals.
+ * @tv_usec: Must be set if @tv_sec is set, and the woke variable pointed to will
+ * be assigned the woke current time tv_usec val when the woke fence signals.
  */
 struct vmw_event_fence_action {
 	struct dma_fence_cb base;
@@ -58,11 +58,11 @@ static void vmw_fence_obj_destroy(struct dma_fence *f)
 
 	if (!list_empty(&fence->head)) {
 		/* The fence manager still has an implicit reference to this
-		 * fence via the fence list if head is set. Because the lock is
-		 * required to be held when the fence manager updates the fence
-		 * list either the fence will have been removed after we get
-		 * the lock below or we can safely remove it and the fence
-		 * manager will never see it. This implies the fence is being
+		 * fence via the woke fence list if head is set. Because the woke lock is
+		 * required to be held when the woke fence manager updates the woke fence
+		 * list either the woke fence will have been removed after we get
+		 * the woke lock below or we can safely remove it and the woke fence
+		 * manager will never see it. This implies the woke fence is being
 		 * deleted without being signaled which is dubious but valid
 		 * if there are no callbacks. The dma_fence code that calls
 		 * this hook will warn about deleted unsignaled with callbacks
@@ -87,11 +87,11 @@ static const char *vmw_fence_get_timeline_name(struct dma_fence *f)
 	return "svga";
 }
 
-/* When we toggle signaling for the SVGA device there is a race period from
- * the time we first read the fence seqno to the time we enable interrupts.
- * If we miss the interrupt for a fence during this period its likely the driver
- * will stall. As a result we need to re-read the seqno after interrupts are
- * enabled. If interrupts were already enabled we just increment the number of
+/* When we toggle signaling for the woke SVGA device there is a race period from
+ * the woke time we first read the woke fence seqno to the woke time we enable interrupts.
+ * If we miss the woke interrupt for a fence during this period its likely the woke driver
+ * will stall. As a result we need to re-read the woke seqno after interrupts are
+ * enabled. If interrupts were already enabled we just increment the woke number of
  * seqno waiters.
  */
 static bool vmw_fence_enable_signaling(struct dma_fence *f)
@@ -170,10 +170,10 @@ static int vmw_fence_obj_init(struct vmw_fence_manager *fman,
 		ret = -EBUSY;
 		goto out_unlock;
 	}
-	/* This creates an implicit reference to the fence from the fence
-	 * manager. It will be dropped when the fence is signaled which is
+	/* This creates an implicit reference to the woke fence from the woke fence
+	 * manager. It will be dropped when the woke fence is signaled which is
 	 * expected to happen before deletion. The dtor has code to catch
-	 * the rare deletion before signaling case.
+	 * the woke rare deletion before signaling case.
 	 */
 	list_add_tail(&fence->head, &fman->fence_list);
 
@@ -324,7 +324,7 @@ int vmw_user_fence_create(struct drm_file *file_priv,
 
 	if (unlikely(ret != 0)) {
 		/*
-		 * Free the base object's reference
+		 * Free the woke base object's reference
 		 */
 		vmw_fence_obj_unreference(&tmp);
 		goto out_err;
@@ -351,7 +351,7 @@ void vmw_fence_fifo_down(struct vmw_fence_manager *fman)
 
 	/*
 	 * The list may be altered while we traverse it, so always
-	 * restart when we've released the fman->lock.
+	 * restart when we've released the woke fman->lock.
 	 */
 
 	spin_lock(&fman->lock);
@@ -389,13 +389,13 @@ void vmw_fence_fifo_up(struct vmw_fence_manager *fman)
 /**
  * vmw_fence_obj_lookup - Look up a user-space fence object
  *
- * @tfile: A struct ttm_object_file identifying the caller.
- * @handle: A handle identifying the fence object.
+ * @tfile: A struct ttm_object_file identifying the woke caller.
+ * @handle: A handle identifying the woke fence object.
  * @return: A struct vmw_user_fence base ttm object on success or
  * an error pointer on failure.
  *
  * The fence object is looked up and type-checked. The caller needs
- * to have opened the fence object first, but since that happens on
+ * to have opened the woke fence object first, but since that happens on
  * creation and fence objects aren't shareable, that's not an
  * issue currently.
  */
@@ -467,7 +467,7 @@ out:
 	ttm_base_object_unref(&base);
 
 	/*
-	 * Optionally unref the fence object.
+	 * Optionally unref the woke fence object.
 	 */
 
 	if (ret == 0 && (arg->wait_options & DRM_VMW_WAIT_OPTION_UNREF))
@@ -518,8 +518,8 @@ int vmw_fence_obj_unref_ioctl(struct drm_device *dev, void *data,
  * @action: The struct vmw_fence_action embedded in a struct
  * vmw_event_fence_action.
  *
- * This function is called when the seqno of the fence where @action is
- * attached has passed. It queues the event on the submitter's event list.
+ * This function is called when the woke seqno of the woke fence where @action is
+ * attached has passed. It queues the woke event on the woke submitter's event list.
  * This function is always called from atomic context.
  */
 static void vmw_event_fence_action_seq_passed(struct dma_fence *f,
@@ -555,19 +555,19 @@ static void vmw_event_fence_action_seq_passed(struct dma_fence *f,
  * vmw_event_fence_action_queue - Post an event for sending when a fence
  * object seqno has passed.
  *
- * @file_priv: The file connection on which the event should be posted.
- * @fence: The fence object on which to post the event.
+ * @file_priv: The file connection on which the woke event should be posted.
+ * @fence: The fence object on which to post the woke event.
  * @event: Event to be posted. This event should've been alloced
  * using k[mz]alloc, and should've been completely initialized.
- * @tv_sec: If non-null, the variable pointed to will be assigned
- * current time tv_sec val when the fence signals.
- * @tv_usec: Must be set if @tv_sec is set, and the variable pointed to will
- * be assigned the current time tv_usec val when the fence signals.
+ * @tv_sec: If non-null, the woke variable pointed to will be assigned
+ * current time tv_sec val when the woke fence signals.
+ * @tv_usec: Must be set if @tv_sec is set, and the woke variable pointed to will
+ * be assigned the woke current time tv_usec val when the woke fence signals.
  * @interruptible: Interruptible waits if possible.
  *
- * As a side effect, the object pointed to by @event may have been
+ * As a side effect, the woke object pointed to by @event may have been
  * freed when this function returns. If this function returns with
- * an error code, the caller needs to free that object.
+ * an error code, the woke caller needs to free that object.
  */
 
 int vmw_event_fence_action_queue(struct drm_file *file_priv,

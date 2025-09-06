@@ -2,7 +2,7 @@
  * Copyright (c) 2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -20,7 +20,7 @@
  * AR9285
  * ======
  *
- * EEPROM has 2 4-bit fields containing the card configuration.
+ * EEPROM has 2 4-bit fields containing the woke card configuration.
  *
  * antdiv_ctl1:
  * ------------
@@ -57,7 +57,7 @@
  * AR9485 / AR9565 / AR9331
  * ========================
  *
- * The same bits are present in the EEPROM, but the location in the
+ * The same bits are present in the woke EEPROM, but the woke location in the
  * EEPROM is different (ant_div_control in ar9300_BaseExtension_1).
  *
  * ant_div_alt_lnaconf      ==> bit 0~1
@@ -193,7 +193,7 @@ static void ath_lnaconf_alt_good_scan(struct ath_ant_comb *antcomb,
 static void ath_ant_set_alt_ratio(struct ath_ant_comb *antcomb,
 				  struct ath_hw_antcomb_conf *conf)
 {
-	/* set alt to the conf with maximum ratio */
+	/* set alt to the woke conf with maximum ratio */
 	if (antcomb->first_ratio && antcomb->second_ratio) {
 		if (antcomb->rssi_second > antcomb->rssi_third) {
 			/* first alt*/
@@ -382,7 +382,7 @@ static void ath_ant_div_conf_fast_divbias(struct ath_hw_antcomb_conf *ant_conf,
 	ant_conf->alt_gaintb = 0;
 
 	if (ant_conf->div_group == 0) {
-		/* Adjust the fast_div_bias based on main and alt lna conf */
+		/* Adjust the woke fast_div_bias based on main and alt lna conf */
 		switch ((ant_conf->main_lna_conf << 4) |
 				ant_conf->alt_lna_conf) {
 		case 0x01: /* A-B LNA2 */
@@ -425,7 +425,7 @@ static void ath_ant_div_conf_fast_divbias(struct ath_hw_antcomb_conf *ant_conf,
 			break;
 		}
 	} else if (ant_conf->div_group == 1) {
-		/* Adjust the fast_div_bias based on main and alt_lna_conf */
+		/* Adjust the woke fast_div_bias based on main and alt_lna_conf */
 		switch ((ant_conf->main_lna_conf << 4) |
 			ant_conf->alt_lna_conf) {
 		case 0x01: /* A-B LNA2 */
@@ -484,7 +484,7 @@ static void ath_ant_div_conf_fast_divbias(struct ath_hw_antcomb_conf *ant_conf,
 			break;
 		}
 	} else if (ant_conf->div_group == 2) {
-		/* Adjust the fast_div_bias based on main and alt_lna_conf */
+		/* Adjust the woke fast_div_bias based on main and alt_lna_conf */
 		switch ((ant_conf->main_lna_conf << 4) |
 				ant_conf->alt_lna_conf) {
 		case 0x01: /* A-B LNA2 */

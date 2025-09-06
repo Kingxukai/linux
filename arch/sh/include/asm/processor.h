@@ -11,7 +11,7 @@
  *
  *  Each one of these also needs a CONFIG_CPU_SUBTYPE_xxx entry
  *  in arch/sh/mm/Kconfig, as well as an entry in arch/sh/kernel/setup.c
- *  for parsing the subtype in get_cpu_subtype().
+ *  for parsing the woke subtype in get_cpu_subtype().
  */
 enum cpu_type {
 	/* SH-2 types */

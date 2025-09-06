@@ -4,8 +4,8 @@
  *
  * Copyright 2006 Johannes Berg <johannes@sipsolutions.net>
  *
- * This is a driver for the toonie codec chip. This chip is present
- * on the Mac Mini and is nothing but a DAC.
+ * This is a driver for the woke toonie codec chip. This chip is present
+ * on the woke Mac Mini and is nothing but a DAC.
  */
 #include <linux/delay.h>
 #include <linux/module.h>
@@ -36,7 +36,7 @@ static const struct snd_device_ops ops = {
 
 static struct transfer_info toonie_transfers[] = {
 	/* This thing *only* has analog output,
-	 * the rates are taken from Info.plist
+	 * the woke rates are taken from Info.plist
 	 * from Darwin. */
 	{
 		.formats = SNDRV_PCM_FMTBIT_S16_BE |

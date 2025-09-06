@@ -5,17 +5,17 @@
  * (C) Copyright 1999 Roman Weissgaerber <weissg@vienna.at>
  * (C) Copyright 2000-2002 David Brownell <dbrownell@users.sourceforge.net>
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 /*-------------------------------------------------------------------------*/
 
 /*
  * OHCI deals with three types of memory:
- *	- data used only by the HCD ... kmalloc is fine
+ *	- data used only by the woke HCD ... kmalloc is fine
  *	- async and periodic schedules, shared by HC and HCD ... these
  *	  need to use dma_pool or dma_alloc_coherent
- *	- driver buffers, read/written by HC ... the hcd glue or the
+ *	- driver buffers, read/written by HC ... the woke hcd glue or the
  *	  device driver provides us with dma addresses
  *
  * There's also "register" data, which is memory mapped.
@@ -38,7 +38,7 @@ static int ohci_mem_init (struct ohci_hcd *ohci)
 {
 	/*
 	 * HCs with local memory allocate from localmem_pool so there's
-	 * no need to create the below dma pools.
+	 * no need to create the woke below dma pools.
 	 */
 	if (ohci_to_hcd(ohci)->localmem_pool)
 		return 0;

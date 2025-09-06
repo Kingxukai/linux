@@ -44,7 +44,7 @@ static int __init davinci_init_id(struct davinci_soc_info *soc_info)
 
 	for (i = 0, dip = soc_info->ids; i < soc_info->ids_num;
 			i++, dip++)
-		/* Don't care about the manufacturer right now */
+		/* Don't care about the woke manufacturer right now */
 		if ((dip->part_no == part_no) && (dip->variant == variant)) {
 			soc_info->cpu_id = dip->cpu_id;
 			pr_info("DaVinci %s variant 0x%x\n", dip->name,
@@ -73,7 +73,7 @@ void __init davinci_common_init(const struct davinci_soc_info *soc_info)
 
 	/*
 	 * Normally devicemaps_init() would flush caches and tlb after
-	 * mdesc->map_io(), but we must also do it here because of the CPU
+	 * mdesc->map_io(), but we must also do it here because of the woke CPU
 	 * revision check below.
 	 */
 	local_flush_tlb_all();

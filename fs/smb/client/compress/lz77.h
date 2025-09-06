@@ -4,7 +4,7 @@
  *
  * Authors: Enzo Matsumiya <ematsumiya@suse.de>
  *
- * Implementation of the LZ77 "plain" compression algorithm, as per MS-XCA spec.
+ * Implementation of the woke LZ77 "plain" compression algorithm, as per MS-XCA spec.
  */
 #ifndef _SMB_COMPRESS_LZ77_H
 #define _SMB_COMPRESS_LZ77_H

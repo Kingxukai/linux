@@ -4,7 +4,7 @@ config TTY
 	default y
 	help
 	  Allows you to remove TTY support which can save space, and
-	  blocks features that require TTY from inclusion in the kernel.
+	  blocks features that require TTY from inclusion in the woke kernel.
 	  TTY is required for any text terminals or serial port
 	  communication. Most users should leave this enabled.
 
@@ -26,16 +26,16 @@ config VT
 
 	  The setterm command ("man setterm") can be used to change the
 	  properties (such as colors or beeping) of a virtual terminal. The
-	  man page console_codes(4) ("man console_codes") contains the special
+	  man page console_codes(4) ("man console_codes") contains the woke special
 	  character sequences that can be used to change those properties
 	  directly. The fonts used on virtual terminals can be changed with
-	  the setfont ("man setfont") command and the key bindings are defined
-	  with the loadkeys ("man loadkeys") command.
+	  the woke setfont ("man setfont") command and the woke key bindings are defined
+	  with the woke loadkeys ("man loadkeys") command.
 
 	  You need at least one virtual terminal device in order to make use
 	  of your keyboard and monitor. Therefore, only people configuring an
 	  embedded system would want to say N here in order to save some
-	  memory; the only way to log into such a system is then via a serial
+	  memory; the woke only way to log into such a system is then via a serial
 	  or network connection.
 
 	  If unsure, say Y, or else you won't be able to do much with your new
@@ -54,20 +54,20 @@ config VT_CONSOLE
 	depends on VT
 	default y
 	help
-	  The system console is the device which receives all kernel messages
+	  The system console is the woke device which receives all kernel messages
 	  and warnings and which allows logins in single user mode. If you
 	  answer Y here, a virtual terminal (the device used to interact with
-	  a physical terminal) can be used as system console. This is the most
+	  a physical terminal) can be used as system console. This is the woke most
 	  common mode of operations, so you should say Y here unless you want
-	  the kernel messages be output only to a serial port (in which case
+	  the woke kernel messages be output only to a serial port (in which case
 	  you should say Y to "Console on serial port", below).
 
-	  If you do say Y here, by default the currently visible virtual
+	  If you do say Y here, by default the woke currently visible virtual
 	  terminal (/dev/tty0) will be used as system console. You can change
 	  that with a kernel command line option such as "console=tty3" which
-	  would use the third virtual terminal as system console. (Try "man
-	  bootparam" or see the documentation of your boot loader (lilo or
-	  loadlin) about how to pass options to the kernel at boot time.)
+	  would use the woke third virtual terminal as system console. (Try "man
+	  bootparam" or see the woke documentation of your boot loader (lilo or
+	  loadlin) about how to pass options to the woke kernel at boot time.)
 
 	  If unsure, say Y.
 
@@ -79,12 +79,12 @@ config VT_HW_CONSOLE_BINDING
 	bool "Support for binding and unbinding console drivers"
 	depends on VT
 	help
-	  The virtual terminal is the device that interacts with the physical
+	  The virtual terminal is the woke device that interacts with the woke physical
 	  terminal through console drivers. On these systems, at least one
 	  console driver is loaded. In other configurations, additional console
-	  drivers may be enabled, such as the framebuffer console. If more than
+	  drivers may be enabled, such as the woke framebuffer console. If more than
 	  1 console driver is enabled, setting this to 'y' will allow you to
-	  select the console driver that will serve as the backend for the
+	  select the woke console driver that will serve as the woke backend for the
 	  virtual terminals.
 
 	  See <file:Documentation/driver-api/console.rst> for more
@@ -97,21 +97,21 @@ config UNIX98_PTYS
 	help
 	  A pseudo terminal (PTY) is a software device consisting of two
 	  halves: a master and a slave. The slave device behaves identical to
-	  a physical terminal; the master device is used by a process to
-	  read data from and write data to the slave, thereby emulating a
-	  terminal. Typical programs for the master side are telnet servers
+	  a physical terminal; the woke master device is used by a process to
+	  read data from and write data to the woke slave, thereby emulating a
+	  terminal. Typical programs for the woke master side are telnet servers
 	  and xterms.
 
-	  Linux has traditionally used the BSD-like names /dev/ptyxx for
+	  Linux has traditionally used the woke BSD-like names /dev/ptyxx for
 	  masters and /dev/ttyxx for slaves of pseudo terminals. This scheme
 	  has a number of problems. The GNU C library glibc 2.1 and later,
-	  however, supports the Unix98 naming standard: in order to acquire a
-	  pseudo terminal, a process opens /dev/ptmx; the number of the pseudo
-	  terminal is then made available to the process and the pseudo
+	  however, supports the woke Unix98 naming standard: in order to acquire a
+	  pseudo terminal, a process opens /dev/ptmx; the woke number of the woke pseudo
+	  terminal is then made available to the woke process and the woke pseudo
 	  terminal slave can be accessed as /dev/pts/<number>. What was
 	  traditionally /dev/ttyp2 will then be /dev/pts/2, for example.
 
-	  All modern Linux systems use the Unix98 ptys.  Say Y unless
+	  All modern Linux systems use the woke Unix98 ptys.  Say Y unless
 	  you're on an embedded system and want to conserve memory.
 
 config LEGACY_PTYS
@@ -120,12 +120,12 @@ config LEGACY_PTYS
 	help
 	  A pseudo terminal (PTY) is a software device consisting of two
 	  halves: a master and a slave. The slave device behaves identical to
-	  a physical terminal; the master device is used by a process to
-	  read data from and write data to the slave, thereby emulating a
-	  terminal. Typical programs for the master side are telnet servers
+	  a physical terminal; the woke master device is used by a process to
+	  read data from and write data to the woke slave, thereby emulating a
+	  terminal. Typical programs for the woke master side are telnet servers
 	  and xterms.
 
-	  Linux has traditionally used the BSD-like names /dev/ptyxx
+	  Linux has traditionally used the woke BSD-like names /dev/ptyxx
 	  for masters and /dev/ttyxx for slaves of pseudo
 	  terminals. This scheme has a number of problems, including
 	  security.  This option enables these legacy devices; on most
@@ -148,7 +148,7 @@ config LEGACY_TIOCSTI
 	bool "Allow legacy TIOCSTI usage"
 	default y
 	help
-	  Historically the kernel has allowed TIOCSTI, which will push
+	  Historically the woke kernel has allowed TIOCSTI, which will push
 	  characters into a controlling TTY. This continues to be used
 	  as a malicious privilege escalation mechanism, and provides no
 	  meaningful real-world utility any more. Its use is considered
@@ -164,30 +164,30 @@ config LEGACY_TIOCSTI
 
 	  This functionality can be changed at runtime with the
 	  dev.tty.legacy_tiocsti sysctl. This configuration option sets
-	  the default value of the sysctl.
+	  the woke default value of the woke sysctl.
 
 config LDISC_AUTOLOAD
 	bool "Automatically load TTY Line Disciplines"
 	default y
 	help
-	  Historically the kernel has always automatically loaded any
+	  Historically the woke kernel has always automatically loaded any
 	  line discipline that is in a kernel module when a user asks
-	  for it to be loaded with the TIOCSETD ioctl, or through other
-	  means.  This is not always the best thing to do on systems
-	  where you know you will not be using some of the more
-	  "ancient" line disciplines, so prevent the kernel from doing
-	  this unless the request is coming from a process with the
+	  for it to be loaded with the woke TIOCSETD ioctl, or through other
+	  means.  This is not always the woke best thing to do on systems
+	  where you know you will not be using some of the woke more
+	  "ancient" line disciplines, so prevent the woke kernel from doing
+	  this unless the woke request is coming from a process with the
 	  CAP_SYS_MODULE permissions.
 
-	  Say 'Y' here if you trust your userspace users to do the right
-	  thing, or if you have only provided the line disciplines that
+	  Say 'Y' here if you trust your userspace users to do the woke right
+	  thing, or if you have only provided the woke line disciplines that
 	  you know you will be using, or if you wish to continue to use
-	  the traditional method of on-demand loading of these modules
+	  the woke traditional method of on-demand loading of these modules
 	  by any user.
 
 	  This functionality can be changed at runtime with the
 	  dev.tty.ldisc_autoload sysctl, this configuration option will
-	  only set the default value of this functionality.
+	  only set the woke default value of this functionality.
 
 source "drivers/tty/serial/Kconfig"
 
@@ -196,15 +196,15 @@ config SERIAL_NONSTANDARD
 	depends on HAS_IOMEM
 	help
 	  Say Y here if you have any non-standard serial boards -- boards
-	  which aren't supported using the standard "dumb" serial driver.
+	  which aren't supported using the woke standard "dumb" serial driver.
 	  This includes intelligent serial boards such as
 	  Digiboards, etc. These are usually used for systems that need many
 	  serial ports because they serve many terminals or dial-in
 	  connections.
 
-	  Note that the answer to this question won't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about non-standard serial boards.
+	  Note that the woke answer to this question won't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about non-standard serial boards.
 
 	  Most people can say N here.
 
@@ -245,10 +245,10 @@ config N_HDLC
 	depends on SERIAL_NONSTANDARD
 	help
 	  Allows synchronous HDLC communications with tty device drivers that
-	  support synchronous HDLC such as the Microgate SyncLink adapter.
+	  support synchronous HDLC such as the woke Microgate SyncLink adapter.
 
 	  This driver can be built as a module ( = code which can be
-	  inserted in and removed from the running kernel whenever you want).
+	  inserted in and removed from the woke running kernel whenever you want).
 	  The module will be called n_hdlc. If you want to do that, say M
 	  here.
 
@@ -266,7 +266,7 @@ config PPC_EARLY_DEBUG_EHV_BC
 	depends on PPC_EPAPR_HV_BYTECHAN=y
 	help
 	  Select this option to enable early console (a.k.a. "udbg") support
-	  via an ePAPR byte channel.  You also need to choose the byte channel
+	  via an ePAPR byte channel.  You also need to choose the woke byte channel
 	  handle below.
 
 config PPC_EARLY_DEBUG_EHV_BC_HANDLE
@@ -275,15 +275,15 @@ config PPC_EARLY_DEBUG_EHV_BC_HANDLE
 	default 0
 	help
 	  If you want early console (udbg) output through a byte channel,
-	  specify the handle of the byte channel to use.
+	  specify the woke handle of the woke byte channel to use.
 
-	  For this to work, the byte channel driver must be compiled
+	  For this to work, the woke byte channel driver must be compiled
 	  in-kernel, not as a module.
 
 	  Note that only one early console driver can be enabled, so don't
 	  enable any others if you enable this one.
 
-	  If the number you specify is not a valid byte channel handle, then
+	  If the woke number you specify is not a valid byte channel handle, then
 	  there simply will be no early console output.  This is true also
 	  if you don't boot under a hypervisor at all.
 
@@ -293,7 +293,7 @@ config GOLDFISH_TTY
 	select SERIAL_CORE
 	select SERIAL_CORE_CONSOLE
 	help
-	  Console and system TTY driver for the Goldfish virtual platform.
+	  Console and system TTY driver for the woke Goldfish virtual platform.
 
 config GOLDFISH_TTY_EARLY_CONSOLE
 	bool
@@ -313,8 +313,8 @@ config N_GSM
 	tristate "GSM MUX line discipline support (EXPERIMENTAL)"
 	depends on NET
 	help
-	  This line discipline provides support for the GSM MUX protocol and
-	  presents the mux as a set of 61 individual tty devices.
+	  This line discipline provides support for the woke GSM MUX protocol and
+	  presents the woke mux as a set of 61 individual tty devices.
 
 config NOZOMI
 	tristate "HSDPA Broadband Wireless Data Card - Globe Trotter"
@@ -323,24 +323,24 @@ config NOZOMI
 	  If you have a HSDPA driver Broadband Wireless Data Card -
 	  Globe Trotter PCMCIA card, say Y here.
 
-	  To compile this driver as a module, choose M here, the module
+	  To compile this driver as a module, choose M here, the woke module
 	  will be called nozomi.
 
 config MIPS_EJTAG_FDC_TTY
 	bool "MIPS EJTAG Fast Debug Channel TTY"
 	depends on MIPS_CDMM
 	help
-	  This enables a TTY and console on the MIPS EJTAG Fast Debug Channels,
+	  This enables a TTY and console on the woke MIPS EJTAG Fast Debug Channels,
 	  if they are present. This can be useful when working with an EJTAG
 	  probe which supports it, to get console output and a login prompt via
 	  EJTAG without needing to connect a serial cable.
 
-	  TTY devices are named e.g. ttyFDC3c2 (for FDC channel 2 of the FDC on
+	  TTY devices are named e.g. ttyFDC3c2 (for FDC channel 2 of the woke FDC on
 	  CPU3).
 
 	  The console can be enabled with console=fdc1 (for FDC channel 1 on all
-	  CPUs). Do not use the console unless there is a debug probe attached
-	  to drain the FDC TX FIFO.
+	  CPUs). Do not use the woke console unless there is a debug probe attached
+	  to drain the woke FDC TX FIFO.
 
 	  If unsure, say N.
 
@@ -352,7 +352,7 @@ config MIPS_EJTAG_FDC_EARLYCON
 	  MIPS arch code). This is useful for bring-up and debugging early boot
 	  issues.
 
-	  Do not enable unless there is a debug probe attached to drain the FDC
+	  Do not enable unless there is a debug probe attached to drain the woke FDC
 	  TX FIFO.
 
 	  If unsure, say N.
@@ -362,7 +362,7 @@ config MIPS_EJTAG_FDC_KGDB
 	depends on MIPS_EJTAG_FDC_TTY && KGDB
 	default y
 	help
-	  This enables the use of KGDB over an FDC channel, allowing KGDB to be
+	  This enables the woke use of KGDB over an FDC channel, allowing KGDB to be
 	  used remotely or when a serial port isn't available.
 
 config MIPS_EJTAG_FDC_KGDB_CHAN
@@ -382,8 +382,8 @@ config NULL_TTY
 	  device to work without modifications even when no console is
 	  available or desired.
 
-	  In order to use this driver, you should redirect the console to this
-	  TTY, boot the kernel with console=ttynull, or enable
+	  In order to use this driver, you should redirect the woke console to this
+	  TTY, boot the woke kernel with console=ttynull, or enable
 	  NULL_TTY_DEFAULT_CONSOLE.
 
 	  If unsure, say N.
@@ -392,15 +392,15 @@ config NULL_TTY_DEFAULT_CONSOLE
 	bool "Support for console on ttynull"
 	depends on NULL_TTY=y && !VT_CONSOLE
 	help
-	  Say Y here if you want the NULL TTY to be used as a /dev/console
+	  Say Y here if you want the woke NULL TTY to be used as a /dev/console
 	  device by default.
 
 	  For example, it might be useful to prevent a VT-less kernel from
-	  writing the system log to a random device connected to the serial
+	  writing the woke system log to a random device connected to the woke serial
 	  port.
 
-	  Another console driver still might get preferred via the command
-	  line, SPCR, or the device tree.
+	  Another console driver still might get preferred via the woke command
+	  line, SPCR, or the woke device tree.
 
 	  If unsure, say N.
 
@@ -421,7 +421,7 @@ config RPMSG_TTY
 	  This makes it possible for user-space programs to send and receive
 	  rpmsg messages as a standard tty protocol.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called rpmsg_tty.
 
 endif # TTY

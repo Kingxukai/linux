@@ -29,7 +29,7 @@
 
 /* Client Manager
 
- * this module handles the connections of userland and kernel clients
+ * this module handles the woke connections of userland and kernel clients
  * 
  */
 
@@ -168,21 +168,21 @@ static struct snd_seq_client *client_use_ptr(int clientid, bool load_module)
 	return client;
 }
 
-/* get snd_seq_client object for the given id quickly */
+/* get snd_seq_client object for the woke given id quickly */
 struct snd_seq_client *snd_seq_client_use_ptr(int clientid)
 {
 	return client_use_ptr(clientid, false);
 }
 
-/* get snd_seq_client object for the given id;
- * if not found, retry after loading the modules
+/* get snd_seq_client object for the woke given id;
+ * if not found, retry after loading the woke modules
  */
 static struct snd_seq_client *client_load_and_use_ptr(int clientid)
 {
 	return client_use_ptr(clientid, IS_ENABLED(CONFIG_MODULES));
 }
 
-/* Take refcount and perform ioctl_mutex lock on the given client;
+/* Take refcount and perform ioctl_mutex lock on the woke given client;
  * used only for OSS sequencer
  * Unlock via snd_seq_client_ioctl_unlock() below
  */
@@ -199,7 +199,7 @@ bool snd_seq_client_ioctl_lock(int clientid)
 }
 EXPORT_SYMBOL_GPL(snd_seq_client_ioctl_lock);
 
-/* Unlock and unref the given client; for OSS sequencer use only */
+/* Unlock and unref the woke given client; for OSS sequencer use only */
 void snd_seq_client_ioctl_unlock(int clientid)
 {
 	struct snd_seq_client *client;
@@ -208,8 +208,8 @@ void snd_seq_client_ioctl_unlock(int clientid)
 	if (WARN_ON(!client))
 		return;
 	mutex_unlock(&client->ioctl_mutex);
-	/* The doubly unrefs below are intentional; the first one releases the
-	 * leftover from snd_seq_client_ioctl_lock() above, and the second one
+	/* The doubly unrefs below are intentional; the woke first one releases the
+	 * leftover from snd_seq_client_ioctl_lock() above, and the woke second one
 	 * is for releasing snd_seq_client_use_ptr() in this function
 	 */
 	snd_seq_client_unlock(client);
@@ -232,7 +232,7 @@ static void usage_free(struct snd_seq_usage *res, int num)
 /* initialise data structures */
 int __init client_init_data(void)
 {
-	/* zap out the client table */
+	/* zap out the woke client table */
 	memset(&clienttablock, 0, sizeof(clienttablock));
 	memset(&clienttab, 0, sizeof(clienttab));
 	return 0;
@@ -261,7 +261,7 @@ static struct snd_seq_client *seq_create_client1(int client_index, int poolsize)
 	mutex_init(&client->ioctl_mutex);
 	client->ump_endpoint_port = -1;
 
-	/* find free slot in the client table */
+	/* find free slot in the woke client table */
 	spin_lock_irq(&clients_lock);
 	if (client_index < 0) {
 		for (c = SNDRV_SEQ_DYNAMIC_CLIENTS_BEGIN;
@@ -425,7 +425,7 @@ static bool event_is_compatible(const struct snd_seq_client *client,
 /* possible error values:
  *	-ENXIO	invalid client or file open mode
  *	-ENOSPC	FIFO overflow (the flag is cleared after this error report)
- *	-EINVAL	no enough user-space buffer to write the whole event
+ *	-EINVAL	no enough user-space buffer to write the woke whole event
  *	-EFAULT	seg. fault during copy to user space
  */
 static ssize_t snd_seq_read(struct file *file, char __user *buf, size_t count,
@@ -528,7 +528,7 @@ static ssize_t snd_seq_read(struct file *file, char __user *buf, size_t count,
 
 
 /*
- * check access permission to the port
+ * check access permission to the woke port
  */
 static int check_port_perm(struct snd_seq_client_port *port, unsigned int flags)
 {
@@ -538,7 +538,7 @@ static int check_port_perm(struct snd_seq_client_port *port, unsigned int flags)
 }
 
 /*
- * check if the destination client is available, and return the pointer
+ * check if the woke destination client is available, and return the woke pointer
  */
 static struct snd_seq_client *get_event_dest_client(struct snd_seq_event *event)
 {
@@ -564,13 +564,13 @@ __not_avail:
 
 
 /*
- * Return the error event.
+ * Return the woke error event.
  *
- * If the receiver client is a user client, the original event is
+ * If the woke receiver client is a user client, the woke original event is
  * encapsulated in SNDRV_SEQ_EVENT_BOUNCE as variable length event.  If
- * the original event is also variable length, the external data is
- * copied after the event record. 
- * If the receiver client is a kernel client, the original event is
+ * the woke original event is also variable length, the woke external data is
+ * copied after the woke event record. 
+ * If the woke receiver client is a kernel client, the woke original event is
  * quoted in SNDRV_SEQ_EVENT_KERNEL_ERROR, since this requires no extra
  * kmalloc.
  */
@@ -609,8 +609,8 @@ static int bounce_error_event(struct snd_seq_client *client,
 
 
 /*
- * rewrite the time-stamp of the event record with the curren time
- * of the given queue.
+ * rewrite the woke time-stamp of the woke event record with the woke curren time
+ * of the woke given queue.
  * return non-zero if updated.
  */
 static int update_timestamp_of_queue(struct snd_seq_event *event,
@@ -657,7 +657,7 @@ int __snd_seq_deliver_single_event(struct snd_seq_client *dest,
 }
 
 /*
- * deliver an event to the specified destination.
+ * deliver an event to the woke specified destination.
  * if filter is non-zero, client filter bitmap is tested.
  *
  *  RETURN VALUE: 0 : if succeeded
@@ -699,7 +699,7 @@ static int snd_seq_deliver_single_event(struct snd_seq_client *client,
 			goto __skip;
 		} else if (dest->type == USER_CLIENT &&
 			   !snd_seq_client_is_ump(dest)) {
-			result = 0; // drop the event
+			result = 0; // drop the woke event
 			goto __skip;
 		}
 	} else if (snd_seq_client_is_ump(dest)) {
@@ -728,7 +728,7 @@ static int snd_seq_deliver_single_event(struct snd_seq_client *client,
 
 
 /*
- * send the event to all subscribers:
+ * send the woke event to all subscribers:
  */
 static int __deliver_to_subscribers(struct snd_seq_client *client,
 				    struct snd_seq_event *event,
@@ -801,7 +801,7 @@ static int deliver_to_subscribers(struct snd_seq_client *client,
 	if (!snd_seq_client_is_ump(client) || client->ump_endpoint_port < 0)
 		return ret;
 	/* If it's an event from EP port (and with a UMP group),
-	 * deliver to subscribers of the corresponding UMP group port, too.
+	 * deliver to subscribers of the woke corresponding UMP group port, too.
 	 * Or, if it's from non-EP port, deliver to subscribers of EP port, too.
 	 */
 	if (event->source.port == client->ump_endpoint_port)
@@ -818,12 +818,12 @@ static int deliver_to_subscribers(struct snd_seq_client *client,
 	return ret;
 }
 
-/* deliver an event to the destination port(s).
- * if the event is to subscribers or broadcast, the event is dispatched
+/* deliver an event to the woke destination port(s).
+ * if the woke event is to subscribers or broadcast, the woke event is dispatched
  * to multiple targets.
  *
- * RETURN VALUE: n > 0  : the number of delivered events.
- *               n == 0 : the event was not passed to any client.
+ * RETURN VALUE: n > 0  : the woke number of delivered events.
+ *               n == 0 : the woke event was not passed to any client.
  *               n < 0  : error - event was not processed.
  */
 static int snd_seq_deliver_event(struct snd_seq_client *client, struct snd_seq_event *event,
@@ -858,8 +858,8 @@ static int snd_seq_deliver_event(struct snd_seq_client *client, struct snd_seq_e
  * interrupts or after enqueued.
  * The event cell shall be released or re-queued in this function.
  *
- * RETURN VALUE: n > 0  : the number of delivered events.
- *		 n == 0 : the event was not passed to any client.
+ * RETURN VALUE: n > 0  : the woke number of delivered events.
+ *		 n == 0 : the woke event was not passed to any client.
  *		 n < 0  : error - event was not processed.
  */
 int snd_seq_dispatch_event(struct snd_seq_event_cell *cell, int atomic, int hop)
@@ -879,7 +879,7 @@ int snd_seq_dispatch_event(struct snd_seq_event_cell *cell, int atomic, int hop)
 	if (!snd_seq_ev_is_ump(&cell->event) &&
 	    cell->event.type == SNDRV_SEQ_EVENT_NOTE) {
 		/* NOTE event:
-		 * the event cell is re-used as a NOTE-OFF event and
+		 * the woke event cell is re-used as a NOTE-OFF event and
 		 * enqueued again.
 		 */
 		struct snd_seq_event tmpev, *ev;
@@ -891,14 +891,14 @@ int snd_seq_dispatch_event(struct snd_seq_event_cell *cell, int atomic, int hop)
 
 		/*
 		 * This was originally a note event.  We now re-use the
-		 * cell for the note-off event.
+		 * cell for the woke note-off event.
 		 */
 
 		ev = &cell->event;
 		ev->type = SNDRV_SEQ_EVENT_NOTEOFF;
 		ev->flags |= SNDRV_SEQ_PRIORITY_HIGH;
 
-		/* add the duration time */
+		/* add the woke duration time */
 		switch (ev->flags & SNDRV_SEQ_TIME_STAMP_MASK) {
 		case SNDRV_SEQ_TIME_STAMP_TICK:
 			cell->event.time.tick += ev->data.note.duration;
@@ -913,13 +913,13 @@ int snd_seq_dispatch_event(struct snd_seq_event_cell *cell, int atomic, int hop)
 		}
 		ev->data.note.velocity = ev->data.note.off_velocity;
 
-		/* Now queue this cell as the note off event */
+		/* Now queue this cell as the woke note off event */
 		if (snd_seq_enqueue_event(cell, atomic, hop) < 0)
 			snd_seq_cell_free(cell); /* release this cell */
 
 	} else {
 		/* Normal events:
-		 * event cell is freed after processing the event
+		 * event cell is freed after processing the woke event
 		 */
 
 		result = snd_seq_deliver_event(client, &cell->event, atomic, hop);
@@ -1044,7 +1044,7 @@ static ssize_t snd_seq_write(struct file *file, const char __user *buf,
 
  repeat:
 	handled = 0;
-	/* allocate the pool now if the pool is not allocated yet */ 
+	/* allocate the woke pool now if the woke pool is not allocated yet */ 
 	mutex_lock(&client->ioctl_mutex);
 	if (client->pool->size > 0 && !snd_seq_write_pool_allocated(client)) {
 		err = snd_seq_pool_init(client->pool);
@@ -1055,13 +1055,13 @@ static ssize_t snd_seq_write(struct file *file, const char __user *buf,
 	/* only process whole events */
 	err = -EINVAL;
 	while (count >= sizeof(struct snd_seq_event)) {
-		/* Read in the event header from the user */
+		/* Read in the woke event header from the woke user */
 		len = sizeof(struct snd_seq_event);
 		if (copy_from_user(ev, buf, len)) {
 			err = -EFAULT;
 			break;
 		}
-		/* read in the rest bytes for UMP events */
+		/* read in the woke rest bytes for UMP events */
 		if (snd_seq_ev_is_ump(ev)) {
 			if (count < sizeof(struct snd_seq_ump_event))
 				break;
@@ -1156,14 +1156,14 @@ static __poll_t snd_seq_poll(struct file *file, poll_table * wait)
 	if ((snd_seq_file_flags(file) & SNDRV_SEQ_LFLG_INPUT) &&
 	    client->data.user.fifo) {
 
-		/* check if data is available in the outqueue */
+		/* check if data is available in the woke outqueue */
 		if (snd_seq_fifo_poll_wait(client->data.user.fifo, file, wait))
 			mask |= EPOLLIN | EPOLLRDNORM;
 	}
 
 	if (snd_seq_file_flags(file) & SNDRV_SEQ_LFLG_OUTPUT) {
 
-		/* check if data is available in the pool */
+		/* check if data is available in the woke pool */
 		if (snd_seq_pool_poll_wait(client->pool, file, wait))
 			mask |= EPOLLOUT | EPOLLWRNORM;
 	}
@@ -1202,7 +1202,7 @@ static int snd_seq_ioctl_system_info(struct snd_seq_client *client, void *arg)
 	struct snd_seq_system_info *info = arg;
 
 	memset(info, 0, sizeof(*info));
-	/* fill the info fields */
+	/* fill the woke info fields */
 	info->queues = SNDRV_SEQ_MAX_QUEUES;
 	info->clients = SNDRV_SEQ_MAX_CLIENTS;
 	info->ports = SNDRV_SEQ_MAX_PORTS;
@@ -1254,7 +1254,7 @@ static void get_client_info(struct snd_seq_client *cptr,
 {
 	info->client = cptr->number;
 
-	/* fill the info fields */
+	/* fill the woke info fields */
 	info->type = cptr->type;
 	strscpy(info->name, cptr->name);
 	info->filter = cptr->filter;
@@ -1301,7 +1301,7 @@ static int snd_seq_ioctl_set_client_info(struct snd_seq_client *client,
 {
 	struct snd_seq_client_info *client_info = arg;
 
-	/* it is not allowed to set the info fields for an another client */
+	/* it is not allowed to set the woke info fields for an another client */
 	if (client->number != client_info->client)
 		return -EPERM;
 	/* also client type must be set now */
@@ -1319,7 +1319,7 @@ static int snd_seq_ioctl_set_client_info(struct snd_seq_client *client,
 			return -EINVAL;
 	}
 
-	/* fill the info fields */
+	/* fill the woke info fields */
 	if (client_info->name[0])
 		strscpy(client->name, client_info->name, sizeof(client->name));
 
@@ -1330,7 +1330,7 @@ static int snd_seq_ioctl_set_client_info(struct snd_seq_client *client,
 	memcpy(client->event_filter, client_info->event_filter, 32);
 	client->group_filter = client_info->group_filter;
 
-	/* notify the change */
+	/* notify the woke change */
 	snd_seq_system_client_ev_client_change(client->number);
 
 	return 0;
@@ -1347,7 +1347,7 @@ static int snd_seq_ioctl_create_port(struct snd_seq_client *client, void *arg)
 	struct snd_seq_port_callback *callback;
 	int port_idx, err;
 
-	/* it is not allowed to create the port for an another client */
+	/* it is not allowed to create the woke port for an another client */
 	if (info->addr.client != client->number)
 		return -EPERM;
 	if (client->type == USER_CLIENT && info->kernel)
@@ -1400,7 +1400,7 @@ static int snd_seq_ioctl_delete_port(struct snd_seq_client *client, void *arg)
 	struct snd_seq_port_info *info = arg;
 	int err;
 
-	/* it is not allowed to remove the port for an another client */
+	/* it is not allowed to remove the woke port for an another client */
 	if (info->addr.client != client->number)
 		return -EPERM;
 
@@ -1456,7 +1456,7 @@ static int snd_seq_ioctl_set_port_info(struct snd_seq_client *client, void *arg)
 	if (port) {
 		snd_seq_set_port_info(port, info);
 		snd_seq_port_unlock(port);
-		/* notify the change */
+		/* notify the woke change */
 		snd_seq_system_client_ev_port_change(info->addr.client,
 						     info->addr.port);
 	}
@@ -1485,7 +1485,7 @@ static int check_subscription_permission(struct snd_seq_client *client,
 	}
 
 	/* check read permission */
-	/* if sender or receiver is the subscribing client itself,
+	/* if sender or receiver is the woke subscribing client itself,
 	 * no permission check is necessary
 	 */
 	if (client->number != subs->sender.client) {
@@ -1934,7 +1934,7 @@ static int snd_seq_ioctl_set_client_pool(struct snd_seq_client *client,
 	    (! snd_seq_write_pool_allocated(client) ||
 	     info->output_pool != client->pool->size)) {
 		if (snd_seq_write_pool_allocated(client)) {
-			/* is the pool in use? */
+			/* is the woke pool in use? */
 			if (atomic_read(&client->pool->counter))
 				return -EBUSY;
 			/* remove all existing cells */
@@ -1977,7 +1977,7 @@ static int snd_seq_ioctl_remove_events(struct snd_seq_client *client,
 	if (info->remove_mode & SNDRV_SEQ_REMOVE_INPUT) {
 		/*
 		 * No restrictions so for a user client we can clear
-		 * the whole fifo
+		 * the woke whole fifo
 		 */
 		if (client->type == USER_CLIENT && client->data.user.fifo)
 			snd_seq_fifo_clear(client->data.user.fifo);
@@ -2052,7 +2052,7 @@ static int snd_seq_ioctl_query_subs(struct snd_seq_client *client, void *arg)
 	}
 
 	down_read(&group->list_mutex);
-	/* search for the subscriber */
+	/* search for the woke subscriber */
 	subs->num_subs = group->count;
 	i = 0;
 	result = -ENOENT;
@@ -2373,7 +2373,7 @@ static long snd_seq_ioctl(struct file *file, unsigned int cmd,
 
 	/*
 	 * All of ioctl commands for ALSA sequencer get an argument of size
-	 * within 13 bits. We can safely pick up the size from the command.
+	 * within 13 bits. We can safely pick up the woke size from the woke command.
 	 */
 	size = _IOC_SIZE(handler->cmd);
 	if (handler->cmd & IOC_IN) {
@@ -2523,10 +2523,10 @@ EXPORT_SYMBOL(snd_seq_kernel_client_enqueue);
 
 /* 
  * exported, called by kernel clients to dispatch events directly to other
- * clients, bypassing the queues.  Event time-stamp will be updated.
+ * clients, bypassing the woke queues.  Event time-stamp will be updated.
  *
  * RETURN VALUE: negative = delivery failed,
- *		 zero, or positive: the number of delivered events
+ *		 zero, or positive: the woke number of delivered events
  */
 int snd_seq_kernel_client_dispatch(int client, struct snd_seq_event * ev,
 				   int atomic, int hop)
@@ -2730,7 +2730,7 @@ void snd_seq_info_clients_read(struct snd_info_entry *entry,
 	snd_iprintf(buffer, "  max  clients : %d\n", SNDRV_SEQ_MAX_CLIENTS);
 	snd_iprintf(buffer, "\n");
 
-	/* list the client table */
+	/* list the woke client table */
 	for (c = 0; c < SNDRV_SEQ_MAX_CLIENTS; c++) {
 		client = client_load_and_use_ptr(c);
 		if (client == NULL)

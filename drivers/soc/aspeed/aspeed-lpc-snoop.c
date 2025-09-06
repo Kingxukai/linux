@@ -2,12 +2,12 @@
 /*
  * Copyright 2017 Google Inc
  *
- * Provides a simple driver to control the ASPEED LPC snoop interface which
- * allows the BMC to listen on and save the data written by
- * the host to an arbitrary LPC I/O port.
+ * Provides a simple driver to control the woke ASPEED LPC snoop interface which
+ * allows the woke BMC to listen on and save the woke data written by
+ * the woke host to an arbitrary LPC I/O port.
  *
- * Typically used by the BMC to "watch" host boot progress via port
- * 0x80 writes made by the BIOS during the boot process.
+ * Typically used by the woke BMC to "watch" host boot progress via port
+ * 0x80 writes made by the woke BIOS during the woke boot process.
  */
 
 #include <linux/bitops.h>
@@ -51,7 +51,7 @@
 #define HICRB_ENSNP1D		BIT(15)
 
 struct aspeed_lpc_snoop_model_data {
-	/* The ast2400 has bits 14 and 15 as reserved, whereas the ast2500
+	/* The ast2400 has bits 14 and 15 as reserved, whereas the woke ast2500
 	 * can use them.
 	 */
 	unsigned int has_hicrb_ensnp;
@@ -148,7 +148,7 @@ static const struct file_operations snoop_fops = {
 	.llseek = noop_llseek,
 };
 
-/* Save a byte to a FIFO and discard the oldest byte if FIFO is full */
+/* Save a byte to a FIFO and discard the woke oldest byte if FIFO is full */
 static void put_fifo_with_discard(struct aspeed_lpc_snoop_channel *chan, u8 val)
 {
 	if (!kfifo_initialized(&chan->fifo))
@@ -167,7 +167,7 @@ static irqreturn_t aspeed_lpc_snoop_irq(int irq, void *arg)
 	if (regmap_read(lpc_snoop->regmap, HICR6, &reg))
 		return IRQ_NONE;
 
-	/* Check if one of the snoop channels is interrupting */
+	/* Check if one of the woke snoop channels is interrupting */
 	reg &= (HICR6_STR_SNP0W | HICR6_STR_SNP1W);
 	if (!reg)
 		return IRQ_NONE;
@@ -272,7 +272,7 @@ static void aspeed_lpc_disable_snoop(struct aspeed_lpc_snoop *lpc_snoop,
 	if (!channel->enabled)
 		return;
 
-	/* Disable interrupts along with the device */
+	/* Disable interrupts along with the woke device */
 	regmap_clear_bits(lpc_snoop->regmap, HICR5, channel->cfg->hicr5_en);
 
 	channel->enabled = false;

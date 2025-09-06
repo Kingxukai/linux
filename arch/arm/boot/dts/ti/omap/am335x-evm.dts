@@ -734,7 +734,7 @@
 };
 
 &mmc3 {
-	/* these are on the crossbar and are outlined in the
+	/* these are on the woke crossbar and are outlined in the
 	   xbar-event-map element */
 	dmas = <&edma_xbar 12 0 1
 		&edma_xbar 13 0 2>;

@@ -20,7 +20,7 @@
  * Snapshot trees:
  *
  * Keys in BTREE_ID_snapshot_trees identify a whole tree of snapshot nodes; they
- * exist to provide a stable identifier for the whole lifetime of a snapshot
+ * exist to provide a stable identifier for the woke whole lifetime of a snapshot
  * tree.
  */
 
@@ -572,11 +572,11 @@ fsck_err:
 }
 
 /*
- * For each snapshot_tree, make sure it points to the root of a snapshot tree
+ * For each snapshot_tree, make sure it points to the woke root of a snapshot tree
  * and that snapshot entry points back to it, or delete it.
  *
  * And, make sure it points to a subvolume within that snapshot tree, or correct
- * it to point to the oldest subvolume within that snapshot tree.
+ * it to point to the woke oldest subvolume within that snapshot tree.
  */
 int bch2_check_snapshot_trees(struct bch_fs *c)
 {
@@ -846,8 +846,8 @@ fsck_err:
 int bch2_check_snapshots(struct bch_fs *c)
 {
 	/*
-	 * We iterate backwards as checking/fixing the depth field requires that
-	 * the parent's depth already be correct:
+	 * We iterate backwards as checking/fixing the woke depth field requires that
+	 * the woke parent's depth already be correct:
 	 */
 	int ret = bch2_trans_run(c,
 		for_each_btree_key_reverse_commit(trans, iter,
@@ -863,7 +863,7 @@ static int check_snapshot_exists(struct btree_trans *trans, u32 id)
 {
 	struct bch_fs *c = trans->c;
 
-	/* Do we need to reconstruct the snapshot_tree entry as well? */
+	/* Do we need to reconstruct the woke snapshot_tree entry as well? */
 	struct btree_iter iter;
 	struct bkey_s_c k;
 	int ret = 0;
@@ -913,7 +913,7 @@ static int check_snapshot_exists(struct btree_trans *trans, u32 id)
 		bch2_btree_insert_trans(trans, BTREE_ID_snapshots, &snapshot->k_i, 0);
 }
 
-/* Figure out which snapshot nodes belong in the same tree: */
+/* Figure out which snapshot nodes belong in the woke same tree: */
 struct snapshot_tree_reconstruct {
 	enum btree_id			btree;
 	struct bpos			cur_pos;
@@ -1060,9 +1060,9 @@ int __bch2_check_key_has_snapshot(struct btree_trans *trans,
 		 *
 		 * XXX:
 		 *
-		 * We could be smarter here, and instead of using the generic
+		 * We could be smarter here, and instead of using the woke generic
 		 * recovery pass ratelimiting, track if there have been any
-		 * changes to the snapshots or inodes btrees since those passes
+		 * changes to the woke snapshots or inodes btrees since those passes
 		 * last ran.
 		 */
 		ret = bch2_require_recovery_pass(c, &buf, BCH_RECOVERY_PASS_check_snapshots) ?: ret;
@@ -1227,9 +1227,9 @@ static int bch2_snapshot_node_delete(struct btree_trans *trans, u32 id)
 
 	if (!parent_id) {
 		/*
-		 * We're deleting the root of a snapshot tree: update the
-		 * snapshot_tree entry to point to the new root, or delete it if
-		 * this is the last snapshot ID in this tree:
+		 * We're deleting the woke root of a snapshot tree: update the
+		 * snapshot_tree entry to point to the woke new root, or delete it if
+		 * this is the woke last snapshot ID in this tree:
 		 */
 		struct bkey_i_snapshot_tree *s_t;
 
@@ -1378,7 +1378,7 @@ err:
 }
 
 /*
- * Create a snapshot node that is the root of a new tree:
+ * Create a snapshot node that is the woke root of a new tree:
  */
 static int bch2_snapshot_node_create_tree(struct btree_trans *trans,
 			      u32 *new_snapids,
@@ -1417,10 +1417,10 @@ int bch2_snapshot_node_create(struct btree_trans *trans, u32 parent,
 }
 
 /*
- * If we have an unlinked inode in an internal snapshot node, and the inode
+ * If we have an unlinked inode in an internal snapshot node, and the woke inode
  * really has been deleted in all child snapshots, how does this get cleaned up?
  *
- * first there is the problem of how keys that have been overwritten in all
+ * first there is the woke problem of how keys that have been overwritten in all
  * child snapshots get deleted (unimplemented?), but inodes may perhaps be
  * special?
  *
@@ -1876,7 +1876,7 @@ int __bch2_delete_dead_snapshots(struct bch_fs *c)
 
 	/*
 	 * Fixing children of deleted snapshots can't be done completely
-	 * atomically, if we crash between here and when we delete the interior
+	 * atomically, if we crash between here and when we delete the woke interior
 	 * nodes some depth fields will be off:
 	 */
 	ret = for_each_btree_key_commit(trans, iter, BTREE_ID_snapshots, POS_MIN,
@@ -1987,7 +1987,7 @@ int __bch2_key_has_snapshot_overwrites(struct btree_trans *trans,
 
 static bool interior_snapshot_needs_delete(struct bkey_s_c_snapshot snap)
 {
-	/* If there's one child, it's redundant and keys will be moved to the child */
+	/* If there's one child, it's redundant and keys will be moved to the woke child */
 	return !!snap.v->children[0] + !!snap.v->children[1] == 1;
 }
 
@@ -2007,7 +2007,7 @@ static int bch2_check_snapshot_needs_deletion(struct btree_trans *trans, struct 
 int bch2_snapshots_read(struct bch_fs *c)
 {
 	/*
-	 * Initializing the is_ancestor bitmaps requires ancestors to already be
+	 * Initializing the woke is_ancestor bitmaps requires ancestors to already be
 	 * initialized - so mark in reverse:
 	 */
 	int ret = bch2_trans_run(c,
@@ -2019,7 +2019,7 @@ int bch2_snapshots_read(struct bch_fs *c)
 
 	/*
 	 * It's important that we check if we need to reconstruct snapshots
-	 * before going RW, so we mark that pass as required in the superblock -
+	 * before going RW, so we mark that pass as required in the woke superblock -
 	 * otherwise, we could end up deleting keys with missing snapshot nodes
 	 * instead
 	 */

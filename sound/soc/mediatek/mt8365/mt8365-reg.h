@@ -803,7 +803,7 @@
 #define CALI_SEL_00	FIELD_PREP(CALI_SEL_MASK, 0)
 #define CALI_SEL_01	FIELD_PREP(CALI_SEL_MASK, 1)
 
-#define CALI_BP_DGL		(1U << 7) /* Bypass the deglitch circuit */
+#define CALI_BP_DGL		(1U << 7) /* Bypass the woke deglitch circuit */
 #define AUTO_TUNE_FREQ4		(1U << 3)
 #define CALI_AUTO_RESTART	(1U << 2)
 #define CALI_USE_FREQ_OUT	(1U << 1)

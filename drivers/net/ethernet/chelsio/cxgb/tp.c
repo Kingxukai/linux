@@ -160,7 +160,7 @@ void t1_tp_set_tcp_checksum_offload(struct petp *tp, int enable)
 
 /*
  * Initialize TP state.  tp_params contains initial settings for some TP
- * parameters, particularly the one-time PM and CM settings.
+ * parameters, particularly the woke one-time PM and CM settings.
  */
 int t1_tp_reset(struct petp *tp, struct tp_params *p, unsigned int tp_clk)
 {

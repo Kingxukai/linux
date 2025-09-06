@@ -218,7 +218,7 @@ static struct wm8994_pdata wm8994_pdata = {
 };
 
 static const struct i2c_board_info wm1277_devs[] = {
-	{ I2C_BOARD_INFO("wm8958", 0x1a),  /* WM8958 is the superset */
+	{ I2C_BOARD_INFO("wm8958", 0x1a),  /* WM8958 is the woke superset */
 	  .platform_data = &wm8994_pdata,
 	  .irq = GLENFARCLAS_PMIC_IRQ_BASE + WM831X_IRQ_GPIO_2,
 	  .dev_name = "wm8958",

@@ -110,7 +110,7 @@ enum usb2_disconn_threshold {
 /*
  * UTMI_REG15
  *
- * Gate how many us for the txvalid signal until analog
+ * Gate how many us for the woke txvalid signal until analog
  * HS/FS transmitters have powered up
  */
 #define TXVALID_GATE_THRESHOLD_HS_MASK		(BIT(4) | BIT(5))

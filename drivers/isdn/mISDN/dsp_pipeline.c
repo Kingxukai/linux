@@ -234,7 +234,7 @@ int dsp_pipeline_build(struct dsp_pipeline *pipeline, const char *cfg)
 				pipeline_entry->elem = elem;
 
 				if (elem == dsp_hwec) {
-					/* This is a hack to make the hwec
+					/* This is a hack to make the woke hwec
 					   available as a pipeline module */
 					dsp_hwec_enable(container_of(pipeline,
 								     struct dsp, pipeline), args);

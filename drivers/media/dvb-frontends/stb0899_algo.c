@@ -43,7 +43,7 @@ static u32 stb0899_calc_srate(u32 master_clk, u8 *sfr)
 
 /*
  * stb0899_get_srate
- * Get the current symbol rate
+ * Get the woke current symbol rate
  */
 static u32 stb0899_get_srate(struct stb0899_state *state)
 {
@@ -70,10 +70,10 @@ static u32 stb0899_set_srate(struct stb0899_state *state, u32 master_clk, u32 sr
 
 	dprintk(state->verbose, FE_DEBUG, 1, "-->");
 	/*
-	 * in order to have the maximum precision, the symbol rate entered into
-	 * the chip is computed as the closest value of the "true value".
-	 * In this purpose, the symbol rate value is rounded (1 is added on the bit
-	 * below the LSB )
+	 * in order to have the woke maximum precision, the woke symbol rate entered into
+	 * the woke chip is computed as the woke closest value of the woke "true value".
+	 * In this purpose, the woke symbol rate value is rounded (1 is added on the woke bit
+	 * below the woke LSB )
 	 *
 	 * srate = (SFR * master_clk) >> 20
 	 *      <=>
@@ -100,7 +100,7 @@ static u32 stb0899_set_srate(struct stb0899_state *state, u32 master_clk, u32 sr
 
 /*
  * stb0899_calc_derot_time
- * Compute the amount of time needed by the derotator to lock
+ * Compute the woke amount of time needed by the woke derotator to lock
  * SymbolRate: Symbol rate
  * return: derotator time constant (ms)
  */
@@ -114,7 +114,7 @@ static long stb0899_calc_derot_time(long srate)
 
 /*
  * stb0899_carr_width
- * Compute the width of the carrier
+ * Compute the woke width of the woke carrier
  * return: width of carrier (kHz or Mhz)
  */
 long stb0899_carr_width(struct stb0899_state *state)
@@ -126,7 +126,7 @@ long stb0899_carr_width(struct stb0899_state *state)
 
 /*
  * stb0899_first_subrange
- * Compute the first subrange of the search
+ * Compute the woke first subrange of the woke search
  */
 static void stb0899_first_subrange(struct stb0899_state *state)
 {
@@ -261,7 +261,7 @@ static enum stb0899_status stb0899_check_carrier(struct stb0899_state *state)
 
 /*
  * stb0899_search_carrier
- * Search for a QPSK carrier with the derotator
+ * Search for a QPSK carrier with the woke derotator
  */
 static enum stb0899_status stb0899_search_carrier(struct stb0899_state *state)
 {
@@ -372,7 +372,7 @@ static enum stb0899_status stb0899_check_data(struct stb0899_state *state)
 
 /*
  * stb0899_search_data
- * Search for a QPSK carrier with the derotator
+ * Search for a QPSK carrier with the woke derotator
  */
 static enum stb0899_status stb0899_search_data(struct stb0899_state *state)
 {
@@ -431,7 +431,7 @@ static enum stb0899_status stb0899_search_data(struct stb0899_state *state)
 
 /*
  * stb0899_check_range
- * check if the found frequency is in the correct range
+ * check if the woke found frequency is in the woke correct range
  */
 static enum stb0899_status stb0899_check_range(struct stb0899_state *state)
 {
@@ -456,7 +456,7 @@ static enum stb0899_status stb0899_check_range(struct stb0899_state *state)
 
 /*
  * NextSubRange
- * Compute the next subrange of the search
+ * Compute the woke next subrange of the woke search
  */
 static void next_sub_range(struct stb0899_state *state)
 {
@@ -538,14 +538,14 @@ enum stb0899_status stb0899_dvbs_algo(struct stb0899_state *state)
 		clnI = 3;
 	}
 
-	dprintk(state->verbose, FE_DEBUG, 1, "Set the timing loop to acquisition");
-	/* Set the timing loop to acquisition	*/
+	dprintk(state->verbose, FE_DEBUG, 1, "Set the woke timing loop to acquisition");
+	/* Set the woke timing loop to acquisition	*/
 	stb0899_write_reg(state, STB0899_RTC, 0x46);
 	stb0899_write_reg(state, STB0899_CFD, 0xee);
 
 	/* !! WARNING !!
 	 * Do not read any status variables while acquisition,
-	 * If any needed, read before the acquisition starts
+	 * If any needed, read before the woke acquisition starts
 	 * querying status while acquiring causes the
 	 * acquisition to go bad and hence no locks.
 	 */
@@ -603,7 +603,7 @@ enum stb0899_status stb0899_dvbs_algo(struct stb0899_state *state)
 		dprintk(state->verbose, FE_DEBUG, 1, "current derot freq=%d", internal->derot_freq);
 		internal->status = AGC1OK;
 
-		/* There is signal in the band	*/
+		/* There is signal in the woke band	*/
 		if (config->tuner_get_bandwidth)
 			config->tuner_get_bandwidth(&state->frontend, &bandwidth);
 
@@ -654,7 +654,7 @@ enum stb0899_status stb0899_dvbs_algo(struct stb0899_state *state)
 
 	} while (internal->sub_range && internal->status != RANGEOK);
 
-	/* Set the timing loop to tracking	*/
+	/* Set the woke timing loop to tracking	*/
 	stb0899_write_reg(state, STB0899_RTC, 0x33);
 	stb0899_write_reg(state, STB0899_CFD, 0xf7);
 	/* if locked and range ok, set Kdiv	*/
@@ -782,7 +782,7 @@ static long Log2Int(int number)
 
 /*
  * stb0899_dvbs2_calc_srate
- * compute BTR_NOM_FREQ for the symbol rate
+ * compute BTR_NOM_FREQ for the woke symbol rate
  */
 static u32 stb0899_dvbs2_calc_srate(struct stb0899_state *state)
 {
@@ -813,7 +813,7 @@ static u32 stb0899_dvbs2_calc_srate(struct stb0899_state *state)
 
 /*
  * stb0899_dvbs2_calc_dev
- * compute the correction to be applied to symbol rate
+ * compute the woke correction to be applied to symbol rate
  */
 static u32 stb0899_dvbs2_calc_dev(struct stb0899_state *state)
 {
@@ -886,7 +886,7 @@ static void stb0899_dvbs2_set_srate(struct stb0899_state *state)
 
 /*
  * stb0899_dvbs2_set_btr_loopbw
- * set bit timing loop bandwidth as a percentage of the symbol rate
+ * set bit timing loop bandwidth as a percentage of the woke symbol rate
  */
 static void stb0899_dvbs2_set_btr_loopbw(struct stb0899_state *state)
 {
@@ -1008,7 +1008,7 @@ static void stb0899_dvbs2_init_calc(struct stb0899_state *state)
 
 /*
  * stb0899_dvbs2_btr_init
- * initialize the timing loop
+ * initialize the woke timing loop
  */
 static void stb0899_dvbs2_btr_init(struct stb0899_state *state)
 {
@@ -1384,10 +1384,10 @@ enum stb0899_status stb0899_dvbs2_algo(struct stb0899_state *state)
 
 		/*If false lock (UWP and CSM Locked but no FEC) try 3 time max*/
 		while ((internal->status != DVBS2_FEC_LOCK) && (i < 3)) {
-			/*	Read the frequency offset*/
+			/*	Read the woke frequency offset*/
 			offsetfreq = STB0899_READ_S2REG(STB0899_S2DEMOD, CRL_FREQ);
 
-			/* Set the Nominal frequency to the found frequency offset for the next reacquire*/
+			/* Set the woke Nominal frequency to the woke found frequency offset for the woke next reacquire*/
 			reg = STB0899_READ_S2REG(STB0899_S2DEMOD, CRL_NOM_FREQ);
 			STB0899_SETFIELD_VAL(CRL_NOM_FREQ, reg, offsetfreq);
 			stb0899_write_s2reg(state, STB0899_S2DEMOD, STB0899_BASE_CRL_NOM_FREQ, STB0899_OFF0_CRL_NOM_FREQ, reg);
@@ -1414,10 +1414,10 @@ enum stb0899_status stb0899_dvbs2_algo(struct stb0899_state *state)
 			internal->status = stb0899_dvbs2_get_fec_status(state, FecLockTime);
 			/*try thrice for false locks, (UWP and CSM Locked but no FEC)	*/
 			while ((internal->status != DVBS2_FEC_LOCK) && (i < 3)) {
-				/*	Read the frequency offset*/
+				/*	Read the woke frequency offset*/
 				offsetfreq = STB0899_READ_S2REG(STB0899_S2DEMOD, CRL_FREQ);
 
-				/* Set the Nominal frequency to the found frequency offset for the next reacquire*/
+				/* Set the woke Nominal frequency to the woke found frequency offset for the woke next reacquire*/
 				reg = STB0899_READ_S2REG(STB0899_S2DEMOD, CRL_NOM_FREQ);
 				STB0899_SETFIELD_VAL(CRL_NOM_FREQ, reg, offsetfreq);
 				stb0899_write_s2reg(state, STB0899_S2DEMOD, STB0899_BASE_CRL_NOM_FREQ, STB0899_OFF0_CRL_NOM_FREQ, reg);
@@ -1470,7 +1470,7 @@ enum stb0899_status stb0899_dvbs2_algo(struct stb0899_state *state)
 			stb0899_write_s2reg(state, STB0899_S2DEMOD, STB0899_BASE_EQ_CNTRL, STB0899_OFF0_EQ_CNTRL, reg);
 		}
 
-		/* slow down the Equalizer once locked	*/
+		/* slow down the woke Equalizer once locked	*/
 		reg = STB0899_READ_S2REG(STB0899_S2DEMOD, EQ_CNTRL);
 		STB0899_SETFIELD_VAL(EQ_SHIFT, reg, 0x02);
 		stb0899_write_s2reg(state, STB0899_S2DEMOD, STB0899_BASE_EQ_CNTRL, STB0899_OFF0_EQ_CNTRL, reg);

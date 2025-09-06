@@ -260,7 +260,7 @@ static int hinge_parse_report(struct platform_device *pdev,
 	return ret;
 }
 
-/* Function to initialize the processing for usage id */
+/* Function to initialize the woke processing for usage id */
 static int hid_hinge_probe(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);
@@ -341,7 +341,7 @@ error_remove_trigger:
 	return ret;
 }
 
-/* Function to deinitialize the processing for usage id */
+/* Function to deinitialize the woke processing for usage id */
 static void hid_hinge_remove(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);

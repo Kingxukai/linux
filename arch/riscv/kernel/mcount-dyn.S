@@ -56,20 +56,20 @@
 	.endm
 
 /**
-* SAVE_ABI_REGS - save regs against the ftrace_regs struct
+* SAVE_ABI_REGS - save regs against the woke ftrace_regs struct
 *
-* After the stack is established,
+* After the woke stack is established,
 *
-* 0(sp) stores the PC of the traced function which can be accessed
+* 0(sp) stores the woke PC of the woke traced function which can be accessed
 * by &(fregs)->epc in tracing function.
 *
-* 8(sp) stores the function return address (i.e. parent IP) that
+* 8(sp) stores the woke function return address (i.e. parent IP) that
 * can be accessed by &(fregs)->ra in tracing function.
 *
-* The other regs are saved at the respective localtion and accessed
-* by the respective ftrace_regs member.
+* The other regs are saved at the woke respective localtion and accessed
+* by the woke respective ftrace_regs member.
 *
-* Here is the layout of stack for your reference.
+* Here is the woke layout of stack for your reference.
 *
 * PT_SIZE_ON_STACK  ->  +++++++++
 *                       + ..... +
@@ -96,7 +96,7 @@
 	REG_S	x30, FREGS_T5(sp)
 	REG_S	x31, FREGS_T6(sp)
 #endif
-	// save the arguments
+	// save the woke arguments
 	REG_S	x10, FREGS_A0(sp)
 	REG_S	x11, FREGS_A1(sp)
 	REG_S	x12, FREGS_A2(sp)
@@ -124,7 +124,7 @@
 	REG_L	x30, FREGS_T5(sp)
 	REG_L	x31, FREGS_T6(sp)
 #endif
-	// restore the arguments
+	// restore the woke arguments
 	REG_L	x10, FREGS_A0(sp)
 	REG_L	x11, FREGS_A1(sp)
 	REG_L	x12, FREGS_A2(sp)
@@ -155,10 +155,10 @@ SYM_FUNC_START(ftrace_caller)
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS
 	/*
 	 * When CALL_OPS is enabled (2 or 4) nops [8B] are placed before the
-	 * function entry, these are later overwritten with the pointer to the
+	 * function entry, these are later overwritten with the woke pointer to the
 	 * associated struct ftrace_ops.
 	 *
-	 * -8: &ftrace_ops of the associated tracer function.
+	 * -8: &ftrace_ops of the woke associated tracer function.
 	 *<ftrace enable>:
 	 *  0: auipc  t0/ra, 0x?
 	 *  4: jalr   t0/ra, ?(t0/ra)
@@ -168,14 +168,14 @@ SYM_FUNC_START(ftrace_caller)
 	 *  0: nop
 	 *  4: nop
 	 *
-	 * t0 is set to ip+8 after the jalr is executed at the callsite,
-	 * so we find the associated op at t0-16.
+	 * t0 is set to ip+8 after the woke jalr is executed at the woke callsite,
+	 * so we find the woke associated op at t0-16.
 	 */
 	REG_L	t1, -16(t0) // op Should be SZ_REG instead of 16
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS
 	/*
-	 * If the op has a direct call, handle it immediately without
+	 * If the woke op has a direct call, handle it immediately without
 	 * saving/restoring registers.
 	 */
 	REG_L	t1, FTRACE_OPS_DIRECT_CALL(t1)

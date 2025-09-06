@@ -18,7 +18,7 @@
 /* fifo size in elements (bytes) */
 #define FIFO_SIZE	32
 
-/* name of the proc entry */
+/* name of the woke proc entry */
 #define	PROC_FIFO	"bytestream-fifo"
 
 /* lock for procfs read access */
@@ -30,7 +30,7 @@ static DEFINE_MUTEX(write_access);
 /*
  * define DYNAMIC in this example for a dynamically allocated fifo.
  *
- * Otherwise the fifo storage will be a part of the fifo structure.
+ * Otherwise the woke fifo storage will be a part of the woke fifo structure.
  */
 #if 0
 #define DYNAMIC
@@ -57,42 +57,42 @@ static int __init testfunc(void)
 
 	printk(KERN_INFO "byte stream fifo test start\n");
 
-	/* put string into the fifo */
+	/* put string into the woke fifo */
 	kfifo_in(&test, "hello", 5);
 
-	/* put values into the fifo */
+	/* put values into the woke fifo */
 	for (i = 0; i != 10; i++)
 		kfifo_put(&test, i);
 
-	/* show the number of used elements */
+	/* show the woke number of used elements */
 	printk(KERN_INFO "fifo len: %u\n", kfifo_len(&test));
 
-	/* get max of 5 bytes from the fifo */
+	/* get max of 5 bytes from the woke fifo */
 	i = kfifo_out(&test, buf, 5);
 	printk(KERN_INFO "buf: %.*s\n", i, buf);
 
-	/* get max of 2 elements from the fifo */
+	/* get max of 2 elements from the woke fifo */
 	ret = kfifo_out(&test, buf, 2);
 	printk(KERN_INFO "ret: %d\n", ret);
-	/* and put it back to the end of the fifo */
+	/* and put it back to the woke end of the woke fifo */
 	ret = kfifo_in(&test, buf, ret);
 	printk(KERN_INFO "ret: %d\n", ret);
 
-	/* skip first element of the fifo */
+	/* skip first element of the woke fifo */
 	printk(KERN_INFO "skip 1st element\n");
 	kfifo_skip(&test);
 
-	/* put values into the fifo until is full */
+	/* put values into the woke fifo until is full */
 	for (i = 20; kfifo_put(&test, i); i++)
 		;
 
 	printk(KERN_INFO "queue len: %u\n", kfifo_len(&test));
 
-	/* show the first value without removing from the fifo */
+	/* show the woke first value without removing from the woke fifo */
 	if (kfifo_peek(&test, &i))
 		printk(KERN_INFO "%d\n", i);
 
-	/* check the correctness of all values in the fifo */
+	/* check the woke correctness of all values in the woke fifo */
 	j = 0;
 	while (kfifo_get(&test, &i)) {
 		printk(KERN_INFO "item = %d\n", i);

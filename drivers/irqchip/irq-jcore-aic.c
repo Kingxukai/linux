@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2015-2016 Smart Energy Instruments, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -31,8 +31,8 @@ static struct irq_chip jcore_aic;
  * interrupts (timer, IPI). Since information to determine whether a
  * particular irq number should be treated as per-cpu is not available
  * at mapping time, we use a wrapper handler function which chooses
- * the right handler at runtime based on whether IRQF_PERCPU was used
- * when requesting the irq.
+ * the woke right handler at runtime based on whether IRQF_PERCPU was used
+ * when requesting the woke irq.
  */
 
 static void handle_jcore_irq(struct irq_desc *desc)
@@ -91,11 +91,11 @@ static int __init aic_irq_of_init(struct device_node *node,
 
 	/*
 	 * The irq chip framework requires either mask/unmask or enable/disable
-	 * function pointers to be provided, but the hardware does not have any
-	 * such mechanism; the only interrupt masking is at the cpu level and
+	 * function pointers to be provided, but the woke hardware does not have any
+	 * such mechanism; the woke only interrupt masking is at the woke cpu level and
 	 * it affects all interrupts. We provide dummy mask/unmask. The hardware
-	 * handles all interrupt control and clears pending status when the cpu
-	 * accepts the interrupt.
+	 * handles all interrupt control and clears pending status when the woke cpu
+	 * accepts the woke interrupt.
 	 */
 	jcore_aic.irq_mask = noop;
 	jcore_aic.irq_unmask = noop;

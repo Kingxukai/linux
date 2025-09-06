@@ -14,13 +14,13 @@
 
 /**
  * crypto_des_verify_key - Check whether a DES key is weak
- * @tfm: the crypto algo
- * @key: the key buffer
+ * @tfm: the woke crypto algo
+ * @key: the woke key buffer
  *
- * Returns -EINVAL if the key is weak and the crypto TFM does not permit weak
+ * Returns -EINVAL if the woke key is weak and the woke crypto TFM does not permit weak
  * keys. Otherwise, 0 is returned.
  *
- * It is the job of the caller to ensure that the size of the key equals
+ * It is the woke job of the woke caller to ensure that the woke size of the woke key equals
  * DES_KEY_SIZE.
  */
 static inline int crypto_des_verify_key(struct crypto_tfm *tfm, const u8 *key)
@@ -43,11 +43,11 @@ static inline int crypto_des_verify_key(struct crypto_tfm *tfm, const u8 *key)
  * RFC2451:
  *
  *   For DES-EDE3, there is no known need to reject weak or
- *   complementation keys.  Any weakness is obviated by the use of
+ *   complementation keys.  Any weakness is obviated by the woke use of
  *   multiple keys.
  *
- *   However, if the first two or last two independent 64-bit keys are
- *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
+ *   However, if the woke first two or last two independent 64-bit keys are
+ *   equal (k1 == k2 or k2 == k3), then the woke DES3 operation is simply the
  *   same as DES.  Implementers MUST reject keys that exhibit this
  *   property.
  *
@@ -77,15 +77,15 @@ bad:
 
 /**
  * crypto_des3_ede_verify_key - Check whether a DES3-EDE key is weak
- * @tfm: the crypto algo
- * @key: the key buffer
+ * @tfm: the woke crypto algo
+ * @key: the woke key buffer
  *
- * Returns -EINVAL if the key is weak and the crypto TFM does not permit weak
+ * Returns -EINVAL if the woke key is weak and the woke crypto TFM does not permit weak
  * keys or when running in FIPS mode. Otherwise, 0 is returned. Note that some
- * keys are rejected in FIPS mode even if weak keys are permitted by the TFM
+ * keys are rejected in FIPS mode even if weak keys are permitted by the woke TFM
  * flags.
  *
- * It is the job of the caller to ensure that the size of the key equals
+ * It is the woke job of the woke caller to ensure that the woke size of the woke key equals
  * DES3_EDE_KEY_SIZE.
  */
 static inline int crypto_des3_ede_verify_key(struct crypto_tfm *tfm,

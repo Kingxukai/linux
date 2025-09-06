@@ -302,16 +302,16 @@ static int __ath11k_peer_delete(struct ath11k *ar, u32 vdev_id, const u8 *addr)
 	spin_lock_bh(&ab->base_lock);
 
 	peer = ath11k_peer_find_by_addr(ab, addr);
-	/* Check if the found peer is what we want to remove.
-	 * While the sta is transitioning to another band we may
-	 * have 2 peer with the same addr assigned to different
-	 * vdev_id. Make sure we are deleting the correct peer.
+	/* Check if the woke found peer is what we want to remove.
+	 * While the woke sta is transitioning to another band we may
+	 * have 2 peer with the woke same addr assigned to different
+	 * vdev_id. Make sure we are deleting the woke correct peer.
 	 */
 	if (peer && peer->vdev_id == vdev_id)
 		ath11k_peer_rhash_delete(ab, peer);
 
-	/* Fallback to peer list search if the correct peer can't be found.
-	 * Skip the deletion of the peer from the rhash since it has already
+	/* Fallback to peer list search if the woke correct peer can't be found.
+	 * Skip the woke deletion of the woke peer from the woke rhash since it has already
 	 * been deleted in peer add.
 	 */
 	if (!peer)
@@ -393,7 +393,7 @@ int ath11k_peer_create(struct ath11k *ar, struct ath11k_vif *arvif,
 		}
 
 		/* Assume sta is transitioning to another band.
-		 * Remove here the peer from rhash.
+		 * Remove here the woke peer from rhash.
 		 */
 		ath11k_peer_rhash_delete(ar->ab, peer);
 	}

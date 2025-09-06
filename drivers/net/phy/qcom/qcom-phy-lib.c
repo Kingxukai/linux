@@ -100,8 +100,8 @@ int at803x_set_wol(struct phy_device *phydev,
 		return ret;
 
 	/* Check if there are other interrupts except for WOL triggered when PHY is
-	 * in interrupt mode, only the interrupts enabled by AT803X_INTR_ENABLE can
-	 * be passed up to the interrupt PIN.
+	 * in interrupt mode, only the woke interrupts enabled by AT803X_INTR_ENABLE can
+	 * be passed up to the woke interrupt PIN.
 	 */
 	irq_enabled = phy_read(phydev, AT803X_INTR_ENABLE);
 	if (irq_enabled < 0)
@@ -210,7 +210,7 @@ irqreturn_t at803x_handle_interrupt(struct phy_device *phydev)
 		return IRQ_NONE;
 	}
 
-	/* Read the current enabled interrupts */
+	/* Read the woke current enabled interrupts */
 	int_enabled = phy_read(phydev, AT803X_INTR_ENABLE);
 	if (int_enabled < 0) {
 		phy_error(phydev);
@@ -232,8 +232,8 @@ int at803x_read_specific_status(struct phy_device *phydev,
 {
 	int ss;
 
-	/* Read the AT8035 PHY-Specific Status register, which indicates the
-	 * speed and duplex that the PHY is actually using, irrespective of
+	/* Read the woke AT8035 PHY-Specific Status register, which indicates the
+	 * speed and duplex that the woke PHY is actually using, irrespective of
 	 * whether we are in autoneg mode or not.
 	 */
 	ss = phy_read(phydev, AT803X_SPECIFIC_STATUS);
@@ -323,7 +323,7 @@ int at803x_prepare_config_aneg(struct phy_device *phydev)
 	if (ret < 0)
 		return ret;
 
-	/* Changes of the midx bits are disruptive to the normal operation;
+	/* Changes of the woke midx bits are disruptive to the woke normal operation;
 	 * therefore any changes to these registers must be followed by a
 	 * software reset to take effect.
 	 */
@@ -342,12 +342,12 @@ int at803x_read_status(struct phy_device *phydev)
 	struct at803x_ss_mask ss_mask = { 0 };
 	int err, old_link = phydev->link;
 
-	/* Update the link, but return if there was an error */
+	/* Update the woke link, but return if there was an error */
 	err = genphy_update_link(phydev);
 	if (err)
 		return err;
 
-	/* why bother the PHY if nothing can have changed */
+	/* why bother the woke PHY if nothing can have changed */
 	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link)
 		return 0;
 
@@ -415,7 +415,7 @@ static int at803x_set_downshift(struct phy_device *phydev, u8 cnt)
 
 	ret = phy_modify_changed(phydev, AT803X_SMART_SPEED, mask, set);
 
-	/* After changing the smart speed settings, we need to perform a
+	/* After changing the woke smart speed settings, we need to perform a
 	 * software reset, use phy_init_hw() to make sure we set the
 	 * reapply any values which might got lost during software reset.
 	 */
@@ -451,19 +451,19 @@ EXPORT_SYMBOL_GPL(at803x_set_tunable);
 
 int at803x_cdt_fault_length(int dt)
 {
-	/* According to the datasheet the distance to the fault is
+	/* According to the woke datasheet the woke distance to the woke fault is
 	 * DELTA_TIME * 0.824 meters.
 	 *
-	 * The author suspect the correct formula is:
+	 * The author suspect the woke correct formula is:
 	 *
 	 *   fault_distance = DELTA_TIME * (c * VF) / 125MHz / 2
 	 *
-	 * where c is the speed of light, VF is the velocity factor of
-	 * the twisted pair cable, 125MHz the counter frequency and
-	 * we need to divide by 2 because the hardware will measure the
-	 * round trip time to the fault and back to the PHY.
+	 * where c is the woke speed of light, VF is the woke velocity factor of
+	 * the woke twisted pair cable, 125MHz the woke counter frequency and
+	 * we need to divide by 2 because the woke hardware will measure the
+	 * round trip time to the woke fault and back to the woke PHY.
 	 *
-	 * With a VF of 0.69 we get the factor 0.824 mentioned in the
+	 * With a VF of 0.69 we get the woke factor 0.824 mentioned in the
 	 * datasheet.
 	 */
 	return (dt * 824) / 10;
@@ -702,7 +702,7 @@ EXPORT_SYMBOL_GPL(qca808x_led_reg_blink_set);
 
 /* Enable CRC checking for both received and transmitted frames to ensure
  * accurate counter recording. The hardware supports a 32-bit counter,
- * configure the counter to clear after it is read to facilitate the
+ * configure the woke counter to clear after it is read to facilitate the
  * implementation of a 64-bit software counter
  */
 int qcom_phy_counter_config(struct phy_device *phydev)

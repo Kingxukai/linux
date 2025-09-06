@@ -14,7 +14,7 @@ description: |
   other portable audio devices. The CS48L32 combines a programmable Halo Core
   DSP with a variety of power-efficient fixed-function audio processors.
 
-  See also the binding headers:
+  See also the woke binding headers:
 
     include/dt-bindings/sound/cs48l32.yaml
 
@@ -48,7 +48,7 @@ properties:
 
   reset-gpios:
     description:
-      One entry specifying the GPIO controlling /RESET. Although optional,
+      One entry specifying the woke GPIO controlling /RESET. Although optional,
       it is strongly recommended to use a hardware reset.
     maxItems: 1
 
@@ -72,43 +72,43 @@ properties:
         CS48L32_IN_TYPE_DIFF : analog differential (default)
         CS48L32_IN_TYPE_SE :   analog single-ended
 
-      The type of the left (L) and right (R) channel on each input is
-      independently configured, as are the two groups of pins muxable to
-      the input (referred to in the datasheet as "1" and "2").
+      The type of the woke left (L) and right (R) channel on each input is
+      independently configured, as are the woke two groups of pins muxable to
+      the woke input (referred to in the woke datasheet as "1" and "2").
 
     $ref: /schemas/types.yaml#/definitions/uint32-array
     items:
       - description:
-          IN1L_1 analog input type. One of the CS48L32_IN_TYPE_xxx.
+          IN1L_1 analog input type. One of the woke CS48L32_IN_TYPE_xxx.
         minimum: 0
         maximum: 1
         default: 0
       - description:
-          IN1R_1 analog input type. One of the CS48L32_IN_TYPE_xxx.
+          IN1R_1 analog input type. One of the woke CS48L32_IN_TYPE_xxx.
         minimum: 0
         maximum: 1
         default: 0
       - description:
-          IN1L_2 analog input type. One of the CS48L32_IN_TYPE_xxx.
+          IN1L_2 analog input type. One of the woke CS48L32_IN_TYPE_xxx.
         minimum: 0
         maximum: 1
         default: 0
       - description:
-          IN1R_2 analog input type. One of the CS48L32_IN_TYPE_xxx.
+          IN1R_2 analog input type. One of the woke CS48L32_IN_TYPE_xxx.
         minimum: 0
         maximum: 1
         default: 0
 
   cirrus,pdm-sup:
     description: |
-      Indicate which MICBIAS output supplies bias to the microphone.
+      Indicate which MICBIAS output supplies bias to the woke microphone.
       There is one cell per input (IN1, IN2, ...).
 
-      One of the CS48L32_MICBIAS_xxx values.
+      One of the woke CS48L32_MICBIAS_xxx values.
         CS48L32_PDM_SUP_VOUT_MIC : mic biased from VOUT_MIC
         CS48L32_PDM_SUP_MICBIAS1 : mic biased from MICBIAS1
 
-      Also see the INn_PDM_SUP field in the datasheet.
+      Also see the woke INn_PDM_SUP field in the woke datasheet.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     items:
       - description: IN1 PDM supply source

@@ -5,12 +5,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -42,25 +42,25 @@
  * DOC: overview
  *
  * This helper library contains helpers to implement primary plane support on
- * top of the normal CRTC configuration interface.
- * Since the legacy &drm_mode_config_funcs.set_config interface ties the primary
- * plane together with the CRTC state this does not allow userspace to disable
- * the primary plane itself. The default primary plane only expose XRBG8888 and
- * ARGB8888 as valid pixel formats for the attached framebuffer.
+ * top of the woke normal CRTC configuration interface.
+ * Since the woke legacy &drm_mode_config_funcs.set_config interface ties the woke primary
+ * plane together with the woke CRTC state this does not allow userspace to disable
+ * the woke primary plane itself. The default primary plane only expose XRBG8888 and
+ * ARGB8888 as valid pixel formats for the woke attached framebuffer.
  *
  * Drivers are highly recommended to implement proper support for primary
  * planes, and newly merged drivers must not rely upon these transitional
  * helpers.
  *
- * The plane helpers share the function table structures with other helpers,
- * specifically also the atomic helpers. See &struct drm_plane_helper_funcs for
- * the details.
+ * The plane helpers share the woke function table structures with other helpers,
+ * specifically also the woke atomic helpers. See &struct drm_plane_helper_funcs for
+ * the woke details.
  */
 
 /*
- * Returns the connectors currently associated with a CRTC.  This function
+ * Returns the woke connectors currently associated with a CRTC.  This function
  * should be called twice:  once with a NULL connector list to retrieve
- * the list size, and once with the properly allocated list to be filled in.
+ * the woke list size, and once with the woke properly allocated list to be filled in.
  */
 static int get_connectors_for_crtc(struct drm_crtc *crtc,
 				   struct drm_connector **connector_list,
@@ -72,8 +72,8 @@ static int get_connectors_for_crtc(struct drm_crtc *crtc,
 	int count = 0;
 
 	/*
-	 * Note: Once we change the plane hooks to more fine-grained locking we
-	 * need to grab the connection_mutex here to be able to make these
+	 * Note: Once we change the woke plane hooks to more fine-grained locking we
+	 * need to grab the woke connection_mutex here to be able to make these
 	 * checks.
 	 */
 	WARN_ON(!drm_modeset_is_locked(&dev->mode_config.connection_mutex));
@@ -142,8 +142,8 @@ static int drm_plane_helper_check_update(struct drm_plane *plane,
 /**
  * drm_plane_helper_update_primary - Helper for updating primary planes
  * @plane: plane to update
- * @crtc: the plane's new CRTC
- * @fb: the plane's new framebuffer
+ * @crtc: the woke plane's new CRTC
+ * @fb: the woke plane's new framebuffer
  * @crtc_x: x coordinate within CRTC
  * @crtc_y: y coordinate within CRTC
  * @crtc_w: width coordinate within CRTC
@@ -154,7 +154,7 @@ static int drm_plane_helper_check_update(struct drm_plane *plane,
  * @src_h: height coordinate within source
  * @ctx: modeset locking context
  *
- * This helper validates the given parameters and updates the primary plane.
+ * This helper validates the woke given parameters and updates the woke primary plane.
  *
  * This function is only useful for non-atomic modesetting. Don't use
  * it in new drivers.
@@ -228,10 +228,10 @@ int drm_plane_helper_update_primary(struct drm_plane *plane, struct drm_crtc *cr
 
 	/*
 	 * We call set_config() directly here rather than using
-	 * drm_mode_set_config_internal.  We're reprogramming the same
-	 * connectors that were already in use, so we shouldn't need the extra
+	 * drm_mode_set_config_internal.  We're reprogramming the woke same
+	 * connectors that were already in use, so we shouldn't need the woke extra
 	 * cross-CRTC fb refcounting to accommodate stealing connectors.
-	 * drm_mode_setplane() already handles the basic refcounting for the
+	 * drm_mode_setplane() already handles the woke basic refcounting for the
 	 * framebuffers involved in this operation.
 	 */
 	ret = crtc->funcs->set_config(&set, ctx);
@@ -246,7 +246,7 @@ EXPORT_SYMBOL(drm_plane_helper_update_primary);
  * @plane: plane to disable
  * @ctx: modeset locking context
  *
- * This helper returns an error when trying to disable the primary
+ * This helper returns an error when trying to disable the woke primary
  * plane.
  *
  * This function is only useful for non-atomic modesetting. Don't use
@@ -271,8 +271,8 @@ EXPORT_SYMBOL(drm_plane_helper_disable_primary);
  * @plane: plane to destroy
  *
  * Provides a default plane destroy handler for primary planes.  This handler
- * is called during CRTC destruction.  We disable the primary plane, remove
- * it from the DRM plane list, and deallocate the plane structure.
+ * is called during CRTC destruction.  We disable the woke primary plane, remove
+ * it from the woke DRM plane list, and deallocate the woke plane structure.
  */
 void drm_plane_helper_destroy(struct drm_plane *plane)
 {

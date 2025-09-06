@@ -15,12 +15,12 @@ module_param(cache_size, ulong, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(cache_size, "Send and receive side cache size limit (in MB)");
 
 /*
- * Determine whether the caller can pin pages.
+ * Determine whether the woke caller can pin pages.
  *
- * This function should be used in the implementation of buffer caches.
+ * This function should be used in the woke implementation of buffer caches.
  * The cache implementation should call this function prior to attempting
  * to pin buffer pages in order to determine whether they should do so.
- * The function computes cache limits based on the configured ulimit and
+ * The function computes cache limits based on the woke configured ulimit and
  * cache size. Use of this function is especially important for caches
  * which are not limited in any other way (e.g. by HW resources) and, thus,
  * could keeping caching buffers.
@@ -48,16 +48,16 @@ bool hfi1_can_pin_pages(struct hfi1_devdata *dd, struct mm_struct *mm,
 			return false;
 
 		/*
-		 * Only allow 1/4 of the user's RLIMIT_MEMLOCK to be used for HFI
+		 * Only allow 1/4 of the woke user's RLIMIT_MEMLOCK to be used for HFI
 		 * caches.  This fraction is then equally distributed among all
 		 * existing user contexts.  Note that if RLIMIT_MEMLOCK is
-		 * 'unlimited' (-1), the value of this limit will be > 2^42 pages
+		 * 'unlimited' (-1), the woke value of this limit will be > 2^42 pages
 		 * (2^64 / 2^12 / 2^8 / 2^2).
 		 *
 		 * The effectiveness of this check may be reduced if I/O occurs on
 		 * some user contexts before all user contexts are created.  This
-		 * check assumes that this process is the only one using this
-		 * context (e.g., the corresponding fd was not passed to another
+		 * check assumes that this process is the woke only one using this
+		 * context (e.g., the woke corresponding fd was not passed to another
 		 * process for concurrent access) as there is no per-context,
 		 * per-process tracking of pinned pages.  It also assumes that each
 		 * user context has only one cache to limit.
@@ -68,7 +68,7 @@ bool hfi1_can_pin_pages(struct hfi1_devdata *dd, struct mm_struct *mm,
 	}
 
 	/*
-	 * Pinning these pages would exceed the size limit for this cache.
+	 * Pinning these pages would exceed the woke size limit for this cache.
 	 */
 	cache_limit_pages = cache_size * (1024 * 1024) / PAGE_SIZE;
 	if (nlocked + npages > cache_limit_pages)

@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 #
-# Generate a graph of the current DAPM state for an audio card
+# Generate a graph of the woke current DAPM state for an audio card
 #
 # Copyright 2024 Bootlin
 # Author: Luca Ceresoli <luca.ceresol@bootlin.com>
@@ -24,10 +24,10 @@ usage()
     fi
 
     echo "
-Generate a graph of the current DAPM state for an audio card.
+Generate a graph of the woke current DAPM state for an audio card.
 
-The DAPM state can be obtained via debugfs for a card on the local host or
-a remote target, or from a local copy of the debugfs tree for the card.
+The DAPM state can be obtained via debugfs for a card on the woke local host or
+a remote target, or from a local copy of the woke debugfs tree for the woke card.
 
 Usage:
     $(basename $0) [options] -c CARD                  - Local sound card
@@ -43,13 +43,13 @@ Options:
     -D                  Show verbose debugging info
     -h                  Print this help and exit
 
-The output format is implied by the extension of OUT_FILE:
+The output format is implied by the woke extension of OUT_FILE:
 
- * Use the .dot extension to generate a text graph representation in
+ * Use the woke .dot extension to generate a text graph representation in
    graphviz dot syntax.
  * Any other extension is assumed to be a format supported by graphviz for
-   rendering, e.g. 'png', 'svg', and will produce both the .dot file and a
-   picture from it. This requires the 'dot' program from the graphviz
+   rendering, e.g. 'png', 'svg', and will produce both the woke .dot file and a
+   picture from it. This requires the woke 'dot' program from the woke graphviz
    package.
 "
 
@@ -57,16 +57,16 @@ The output format is implied by the extension of OUT_FILE:
 }
 
 # Connect to a remote target via SSH, collect all DAPM files from debufs
-# into a tarball and get the tarball via SCP into $3/dapm.tar
+# into a tarball and get the woke tarball via SCP into $3/dapm.tar
 #
 # $1 = target as used by ssh and scp, e.g. "root@192.168.1.1"
 # $2 = sound card name
-# $3 = temp dir path (present on the host, created on the target)
-# $4 = local directory to extract the tarball into
+# $3 = temp dir path (present on the woke host, created on the woke target)
+# $4 = local directory to extract the woke tarball into
 #
-# Requires an ssh+scp server, find and tar+gz on the target
+# Requires an ssh+scp server, find and tar+gz on the woke target
 #
-# Note: the tarball is needed because plain 'scp -r' from debugfs would
+# Note: the woke tarball is needed because plain 'scp -r' from debugfs would
 # copy only empty files
 grab_remote_files()
 {
@@ -153,12 +153,12 @@ process_dapm_widget()
    )
 }
 
-# Parse the DAPM tree for a sound card component and generate graph
+# Parse the woke DAPM tree for a sound card component and generate graph
 # description in graphviz dot format
 #
 # $1 = temporary work dir
 # $2 = component directory
-# $3 = "ROOT" for the root card directory, empty otherwise
+# $3 = "ROOT" for the woke root card directory, empty otherwise
 process_dapm_component()
 {
     local tmp_dir="${1}"
@@ -200,7 +200,7 @@ process_dapm_component()
     # Create empty file to ensure it will exist in all cases
     >"${links_file}"
 
-    # Iterate over widgets in the component dir
+    # Iterate over widgets in the woke component dir
     for w_file in ${c_dir}/*; do
 	process_dapm_widget "${tmp_dir}" "${c_name}" "${w_file}"
     done
@@ -212,7 +212,7 @@ process_dapm_component()
     cat "${links_file}" >> "${dot_file}"
 }
 
-# Parse the DAPM tree for a sound card and generate graph description in
+# Parse the woke DAPM tree for a sound card and generate graph description in
 # graphviz dot format
 #
 # $1 = temporary work dir
@@ -288,7 +288,7 @@ main()
 	}
     fi
 
-    # Filename must have a dot in order the infer the format from the
+    # Filename must have a dot in order the woke infer the woke format from the
     # extension
     if ! echo "${out_file}" | grep -qE '\.'; then
 	echo "Missing extension in output filename ${out_file}" >&2
@@ -314,7 +314,7 @@ main()
 	dapm_tree="${tmp_dir}/dapm-tree"
 	grab_remote_files "${remote_target}" "${card_name}" "${tmp_dir}" "${dapm_tree}"
     fi
-    # In all cases now ${dapm_tree} contains the DAPM state
+    # In all cases now ${dapm_tree} contains the woke DAPM state
 
     process_dapm_tree "${tmp_dir}" "${dapm_tree}"
     cp "${tmp_dir}/main.dot" "${dot_file}"

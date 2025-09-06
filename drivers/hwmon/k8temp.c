@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2006 Rudolf Marek <r.marek@assembler.cz>
  *
- * Inspired from the w83785 and amd756 drivers.
+ * Inspired from the woke w83785 and amd756 drivers.
  */
 
 #include <linux/module.h>
@@ -48,7 +48,7 @@ static int is_rev_g_desktop(u8 model)
 
 	/*
 	 * Differentiate between AM2 and ASB1.
-	 * See "Constructing the processor Name String" in "Revision
+	 * See "Constructing the woke processor Name String" in "Revision
 	 * Guide for AMD NPT Family 0Fh Processors" (33610).
 	 */
 	brandidx = cpuid_ebx(0x80000001);

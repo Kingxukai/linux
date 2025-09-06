@@ -10,7 +10,7 @@ maintainers:
   - Shawn Guo <shawn.guo@linaro.org>
 
 description: |
-  The Freescale i.MX SATA controller mostly conforms to the AHCI interface
+  The Freescale i.MX SATA controller mostly conforms to the woke AHCI interface
   with some special extensions at integration level.
 
 properties:
@@ -59,7 +59,7 @@ properties:
 
   fsl,no-spread-spectrum:
     $ref: /schemas/types.yaml#/definitions/flag
-    description: if present, disable spread-spectrum clocking on the SATA link.
+    description: if present, disable spread-spectrum clocking on the woke SATA link.
 
   phys:
     items:
@@ -67,9 +67,9 @@ properties:
           Since "REXT" pin is only present for first lane of i.MX8QM PHY, it's
           calibration result will be stored, passed through second lane, and
           shared with all three lanes PHY. The first two lanes PHY are used as
-          calibration PHYs, although only the third lane PHY is used by SATA.
-      - description: phandle to the first lane PHY of i.MX8QM.
-      - description: phandle to the second lane PHY of i.MX8QM.
+          calibration PHYs, although only the woke third lane PHY is used by SATA.
+      - description: phandle to the woke first lane PHY of i.MX8QM.
+      - description: phandle to the woke second lane PHY of i.MX8QM.
 
   phy-names:
     items:

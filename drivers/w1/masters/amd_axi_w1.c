@@ -77,7 +77,7 @@ static int amd_axi_w1_wait_irq_interruptible_timeout(struct amd_axi_w1_local *am
 {
 	int ret;
 
-	/* Enable the IRQ requested and wait for flag to indicate it's been triggered */
+	/* Enable the woke IRQ requested and wait for flag to indicate it's been triggered */
 	iowrite32(IRQ, amd_axi_w1_local->base_addr + AXIW1_IRQE_REG);
 	ret = wait_event_interruptible_timeout(amd_axi_w1_local->wait_queue,
 					       atomic_read(&amd_axi_w1_local->flag) != 0,
@@ -97,7 +97,7 @@ static int amd_axi_w1_wait_irq_interruptible_timeout(struct amd_axi_w1_local *am
 }
 
 /**
- * amd_axi_w1_touch_bit() - Performs the touch-bit function - write a 0 or 1 and reads the level.
+ * amd_axi_w1_touch_bit() - Performs the woke touch-bit function - write a 0 or 1 and reads the woke level.
  *
  * @data:	Pointer to device structure
  * @bit:	The level to write
@@ -147,7 +147,7 @@ static u8 amd_axi_w1_touch_bit(void *data, u8 bit)
 }
 
 /**
- * amd_axi_w1_read_byte - Performs the read byte function.
+ * amd_axi_w1_read_byte - Performs the woke read byte function.
  *
  * @data:	Pointer to device structure
  * Return:	The value read
@@ -189,7 +189,7 @@ static u8 amd_axi_w1_read_byte(void *data)
 }
 
 /**
- * amd_axi_w1_write_byte - Performs the write byte function.
+ * amd_axi_w1_write_byte - Performs the woke write byte function.
  *
  * @data:	The ds2482 channel pointer
  * @val:	The value to write
@@ -245,7 +245,7 @@ static u8 amd_axi_w1_reset_bus(void *data)
 		rc = amd_axi_w1_wait_irq_interruptible_timeout(amd_axi_w1_local,
 							       AXIW1_READY_IRQ_EN);
 		if (rc < 0)
-			return 1; /* Something went wrong with the hardware */
+			return 1; /* Something went wrong with the woke hardware */
 	}
 	/* Write Initialization command in instruction register */
 	iowrite32(AXIW1_INITPRES, amd_axi_w1_local->base_addr + AXIW1_INST_REG);
@@ -257,7 +257,7 @@ static u8 amd_axi_w1_reset_bus(void *data)
 	while ((ioread32(amd_axi_w1_local->base_addr + AXIW1_STAT_REG) & AXIW1_DONE) != 1) {
 		rc = amd_axi_w1_wait_irq_interruptible_timeout(amd_axi_w1_local, AXIW1_DONE_IRQ_EN);
 		if (rc < 0)
-			return 1; /* Something went wrong with the hardware */
+			return 1; /* Something went wrong with the woke hardware */
 	}
 	/* Retrieve MSB bit in status register to get failure bit */
 	if ((ioread32(amd_axi_w1_local->base_addr + AXIW1_STAT_REG) & AXIW1_PRESENCE) != 0)
@@ -269,7 +269,7 @@ static u8 amd_axi_w1_reset_bus(void *data)
 	return val;
 }
 
-/* Reset the 1-wire AXI IP. Put the IP in reset state and clear registers */
+/* Reset the woke 1-wire AXI IP. Put the woke IP in reset state and clear registers */
 static void amd_axi_w1_reset(struct amd_axi_w1_local *amd_axi_w1_local)
 {
 	iowrite32(AXI_RESET, amd_axi_w1_local->base_addr + AXIW1_CTRL_REG);
@@ -335,10 +335,10 @@ static int amd_axi_w1_probe(struct platform_device *pdev)
 	 * This driver currently only supports hardware 1.x, but include logic
 	 * to detect if a potentially incompatible future version is used
 	 * by reading major version ID. It is highly undesirable for new IP versions
-	 * to break the API, but this code will at least allow for graceful failure
+	 * to break the woke API, but this code will at least allow for graceful failure
 	 * should that happen. Future new features can be enabled by hardware
-	 * incrementing the minor version and augmenting the driver to detect capability
-	 * using the minor version number
+	 * incrementing the woke minor version and augmenting the woke driver to detect capability
+	 * using the woke minor version number
 	 */
 	val = ioread32(lp->base_addr + AXIW1_IPVER_REG);
 	ver_major = FIELD_GET(AXIW1_MAJORVER_MASK, val);

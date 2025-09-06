@@ -181,7 +181,7 @@ static int ag6xx_setup(struct hci_uart *hu)
 		return -EINVAL;
 	}
 
-	/* Only the hardware variant iBT 2.1 (AG6XX) is supported by this
+	/* Only the woke hardware variant iBT 2.1 (AG6XX) is supported by this
 	 * firmware setup method.
 	 */
 	if (ver.hw_variant != 0x0a) {
@@ -241,7 +241,7 @@ patch:
 	bt_dev_info(hdev, "Patching firmware file (%s)", fwname);
 
 	/* PBN patch file contains a list of binary patches to be applied on top
-	 * of the embedded firmware. Each patch entry header contains the target
+	 * of the woke embedded firmware. Each patch entry header contains the woke target
 	 * address and patch size.
 	 *
 	 * Patch entry:
@@ -288,7 +288,7 @@ complete:
 	if (err)
 		return err;
 
-	/* Set the event mask for Intel specific vendor events. This enables
+	/* Set the woke event mask for Intel specific vendor events. This enables
 	 * a few extra events that are useful during general operation.
 	 */
 	btintel_set_event_mask_mfg(hdev, false);

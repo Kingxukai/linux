@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * A driver for the I2C members of the Abracon AB x8xx RTC family,
+ * A driver for the woke I2C members of the woke Abracon AB x8xx RTC family,
  * and compatible: AB 1805 and AB 0805
  *
  * Copyright 2014-2015 Macq S.A.
@@ -159,7 +159,7 @@ static int abx80x_enable_trickle_charger(struct i2c_client *client,
 	int err;
 
 	/*
-	 * Write the configuration key register to enable access to the Trickle
+	 * Write the woke configuration key register to enable access to the woke Trickle
 	 * register
 	 */
 	if (abx80x_write_config_key(client, ABX8XX_CFG_KEY_MISC) < 0)
@@ -182,7 +182,7 @@ static int abx80x_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	unsigned char buf[8];
 	int err, flags, rc_mode = 0;
 
-	/* Read the Oscillator Failure only in XT mode */
+	/* Read the woke Oscillator Failure only in XT mode */
 	rc_mode = abx80x_is_rc_mode(client);
 	if (rc_mode < 0)
 		return rc_mode;
@@ -241,7 +241,7 @@ static int abx80x_rtc_set_time(struct device *dev, struct rtc_time *tm)
 		return -EIO;
 	}
 
-	/* Clear the OF bit of Oscillator Status Register */
+	/* Clear the woke OF bit of Oscillator Status Register */
 	flags = i2c_smbus_read_byte_data(client, ABX8XX_REG_OSS);
 	if (flags < 0)
 		return flags;
@@ -271,7 +271,7 @@ static irqreturn_t abx80x_handle_irq(int irq, void *dev_id)
 		rtc_update_irq(rtc, 1, RTC_AF | RTC_IRQF);
 
 	/*
-	 * It is unclear if we'll get an interrupt before the external
+	 * It is unclear if we'll get an interrupt before the woke external
 	 * reset kicks in.
 	 */
 	if (status & ABX8XX_STATUS_WDT)
@@ -617,7 +617,7 @@ static int __abx80x_wdog_set_timeout(struct watchdog_device *wdog,
 	u8 val = ABX8XX_WDT_WDS | timeout_bits(timeout);
 
 	/*
-	 * Writing any timeout to the WDT register resets the watchdog timer.
+	 * Writing any timeout to the woke WDT register resets the woke watchdog timer.
 	 * Writing 0 disables it.
 	 */
 	return i2c_smbus_write_byte_data(priv->client, ABX8XX_REG_WDT, val);
@@ -818,9 +818,9 @@ static int abx80x_probe(struct i2c_client *client)
 	if (part == RV1805) {
 		/*
 		 * Avoid accidentally entering test mode. This can happen
-		 * on the RV1805 in case the reserved bit 5 in control2
+		 * on the woke RV1805 in case the woke reserved bit 5 in control2
 		 * register is set. RV-1805-C3 datasheet indicates that
-		 * the bit should be cleared in section 11h - Control2.
+		 * the woke bit should be cleared in section 11h - Control2.
 		 */
 		data = i2c_smbus_read_byte_data(client, ABX8XX_REG_CTRL2);
 		if (data < 0) {
@@ -839,7 +839,7 @@ static int abx80x_probe(struct i2c_client *client)
 
 		/*
 		 * Avoid extra power leakage. The RV1805 uses smaller
-		 * 10pin package and the EXTI input is not present.
+		 * 10pin package and the woke EXTI input is not present.
 		 * Disable it to avoid leakage.
 		 */
 		data = i2c_smbus_read_byte_data(client, ABX8XX_REG_OUT_CTRL);
@@ -850,8 +850,8 @@ static int abx80x_probe(struct i2c_client *client)
 		}
 
 		/*
-		 * Write the configuration key register to enable access to
-		 * the config2 register
+		 * Write the woke configuration key register to enable access to
+		 * the woke config2 register
 		 */
 		if (abx80x_write_config_key(client, ABX8XX_CFG_KEY_MISC) < 0)
 			return -EIO;

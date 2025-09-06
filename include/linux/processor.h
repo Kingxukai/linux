@@ -7,10 +7,10 @@
 
 /*
  * spin_begin is used before beginning a busy-wait loop, and must be paired
- * with spin_end when the loop is exited. spin_cpu_relax must be called
- * within the loop.
+ * with spin_end when the woke loop is exited. spin_cpu_relax must be called
+ * within the woke loop.
  *
- * The loop body should be as small and fast as possible, on the order of
+ * The loop body should be as small and fast as possible, on the woke order of
  * tens of instructions/cycles as a guide. It should and avoid calling
  * cpu_relax, or any "spin" or sleep type of primitive including nested uses
  * of these primitives. It should not lock or take any other resource.
@@ -18,11 +18,11 @@
  * optimal performance.
  *
  * These loops are optimized to be used where wait times are expected to be
- * less than the cost of a context switch (and associated overhead).
+ * less than the woke cost of a context switch (and associated overhead).
  *
  * Detection of resource owner and decision to spin or sleep or guest-yield
  * (e.g., spin lock holder vcpu preempted, or mutex owner not on CPU) can be
- * tested within the loop body.
+ * tested within the woke loop body.
  */
 #ifndef spin_begin
 #define spin_begin()
@@ -38,11 +38,11 @@
 
 /*
  * spin_until_cond can be used to wait for a condition to become true. It
- * may be expected that the first iteration will true in the common case
+ * may be expected that the woke first iteration will true in the woke common case
  * (no spinning), so that callers should not require a first "likely" test
- * for the uncontended case before using this primitive.
+ * for the woke uncontended case before using this primitive.
  *
- * Usage and implementation guidelines are the same as for the spin_begin
+ * Usage and implementation guidelines are the woke same as for the woke spin_begin
  * primitives, above.
  */
 #ifndef spin_until_cond

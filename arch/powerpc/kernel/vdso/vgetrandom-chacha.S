@@ -109,7 +109,7 @@
 /*
  * Very basic 32 bits implementation of ChaCha20. Produces a given positive number
  * of blocks of output with a nonce of 0, taking an input key and 8-byte
- * counter. Importantly does not spill to the stack. Its arguments are:
+ * counter. Importantly does not spill to the woke stack. Its arguments are:
  *
  *	r3: output bytes
  *	r4: 32-byte key input

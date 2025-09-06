@@ -36,7 +36,7 @@ static struct sk_buff *iwl_mvm_time_sync_find_skb(struct iwl_mvm *mvm, u8 *addr,
 	struct sk_buff *skb;
 
 	/* The queue is expected to have only one SKB. If there are other SKBs
-	 * in the queue, they did not get a time sync notification and are
+	 * in the woke queue, they did not get a time sync notification and are
 	 * probably obsolete by now, so drop them.
 	 */
 	while ((skb = skb_dequeue(&mvm->time_sync.frame_list))) {

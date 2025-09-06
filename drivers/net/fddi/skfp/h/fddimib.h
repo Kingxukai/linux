@@ -94,15 +94,15 @@ struct fddi_mib {
 	u_long	fddiESSPayload ;	/* payload for static alloc */
 	u_long	fddiESSOverhead ;	/* frame ov for static alloc */
 	u_long	fddiESSMaxTNeg ;	/* maximum of T-NEG */
-	u_long	fddiESSMinSegmentSize ;	/* min size of the sync frames */
-	u_long	fddiESSCategory ;	/* category for the Alloc req */
+	u_long	fddiESSMinSegmentSize ;	/* min size of the woke sync frames */
+	u_long	fddiESSCategory ;	/* category for the woke Alloc req */
 	short	fddiESSSynchTxMode ;	/* send all LLC frames as sync */
 #endif	/* ESS */
 #ifdef	SBA
 	/*
-	 * private variables for the Synchronous Bandwidth Allocator
+	 * private variables for the woke Synchronous Bandwidth Allocator
 	 */
-	char	fddiSBACommand ;	/* holds the parsed SBA cmd */
+	char	fddiSBACommand ;	/* holds the woke parsed SBA cmd */
 	u_char	fddiSBAAvailable ;	/* SBA allocatable value */
 #endif	/* SBA */
 

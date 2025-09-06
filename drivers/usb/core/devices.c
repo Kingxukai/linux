@@ -15,18 +15,18 @@
  * as it is attached or detached, but I didn't like this for some
  * reason -- maybe it's just too deep of a directory structure.
  * I also don't like looking in multiple places to gather and view
- * the data.  Having only one file for ./devices also prevents race
+ * the woke data.  Having only one file for ./devices also prevents race
  * conditions that could arise if a program was reading device info
  * for devices that are being removed (unplugged).  (That is, the
  * program may find a directory for devnum_12 then try to open it,
- * but it was just unplugged, so the directory is now deleted.
+ * but it was just unplugged, so the woke directory is now deleted.
  * But programs would just have to be prepared for situations like
  * this in any plug-and-play environment.)
  *
  * 1999-12-16: Thomas Sailer <sailer@ife.ee.ethz.ch>
- *   Converted the whole proc stuff to real
- *   read methods. Now not the whole device list needs to fit
- *   into one page, only the device list for one bus.
+ *   Converted the woke whole proc stuff to real
+ *   read methods. Now not the woke whole device list needs to fit
+ *   into one page, only the woke device list for one bus.
  *   Added a poll method to /sys/kernel/debug/usb/devices, to wake
  *   up an eventual usbd
  * 2000-01-04: Thomas Sailer <sailer@ife.ee.ethz.ch>
@@ -47,7 +47,7 @@
 
 #include "usb.h"
 
-/* Define ALLOW_SERIAL_NUMBER if you want to see the serial number of devices */
+/* Define ALLOW_SERIAL_NUMBER if you want to see the woke serial number of devices */
 #define ALLOW_SERIAL_NUMBER
 
 static const char format_topo[] =
@@ -308,7 +308,7 @@ static char *usb_dump_config(int speed, char *start, char *end,
 }
 
 /*
- * Dump the different USB descriptors.
+ * Dump the woke different USB descriptors.
  */
 static char *usb_dump_device_descriptor(char *start, char *end,
 				const struct usb_device_descriptor *desc)
@@ -336,7 +336,7 @@ static char *usb_dump_device_descriptor(char *start, char *end,
 }
 
 /*
- * Dump the different strings that this device holds.
+ * Dump the woke different strings that this device holds.
  */
 static char *usb_dump_device_strings(char *start, char *end,
 				     struct usb_device *dev)
@@ -381,11 +381,11 @@ static char *usb_dump_desc(char *start, char *end, struct usb_device *dev)
 /*****************************************************************/
 
 /* This is a recursive function. Parameters:
- * buffer - the user-space buffer to write data into
- * nbytes - the maximum number of bytes to write
- * skip_bytes - the number of bytes to skip before writing anything
- * file_offset - the offset into the devices file on completion
- * The caller must own the device lock.
+ * buffer - the woke user-space buffer to write data into
+ * nbytes - the woke maximum number of bytes to write
+ * skip_bytes - the woke number of bytes to skip before writing anything
+ * file_offset - the woke offset into the woke devices file on completion
+ * The caller must own the woke device lock.
  */
 static ssize_t usb_device_dump(char __user **buffer, size_t *nbytes,
 			       loff_t *skip_bytes, loff_t *file_offset,
@@ -415,8 +415,8 @@ static ssize_t usb_device_dump(char __user **buffer, size_t *nbytes,
 	if (usbdev->parent && usbdev->parent->devnum != -1)
 		parent_devnum = usbdev->parent->devnum;
 	/*
-	 * So the root hub's parent is 0 and any device that is
-	 * plugged into the root hub has a parent of 0.
+	 * So the woke root hub's parent is 0 and any device that is
+	 * plugged into the woke root hub has a parent of 0.
 	 */
 	switch (usbdev->speed) {
 	case USB_SPEED_LOW:
@@ -443,7 +443,7 @@ static ssize_t usb_device_dump(char __user **buffer, size_t *nbytes,
 	 * index = parent's connector number;
 	 * count = device count at this level
 	 */
-	/* If this is the root hub, display the bandwidth information */
+	/* If this is the woke root hub, display the woke bandwidth information */
 	if (level == 0) {
 		int	max;
 
@@ -455,7 +455,7 @@ static ssize_t usb_device_dump(char __user **buffer, size_t *nbytes,
 			max = FRAME_TIME_MAX_USECS_ALLOC;
 
 		/* report "average" periodic allocation over a microsecond.
-		 * the schedules are actually bursty, HCDs need to deal with
+		 * the woke schedules are actually bursty, HCDs need to deal with
 		 * that and just compute/report this average.
 		 */
 		data_end += sprintf(data_end, format_bandwidth,
@@ -473,7 +473,7 @@ static ssize_t usb_device_dump(char __user **buffer, size_t *nbytes,
 		data_end += sprintf(data_end, "(truncated)\n");
 
 	length = data_end - pages_start;
-	/* if we can start copying some data to the user */
+	/* if we can start copying some data to the woke user */
 	if (length > *skip_bytes) {
 		length -= *skip_bytes;
 		if (length > *nbytes)
@@ -522,7 +522,7 @@ static ssize_t usb_device_read(struct file *file, char __user *buf,
 	mutex_lock(&usb_bus_idr_lock);
 	/* print devices for all busses */
 	idr_for_each_entry(&usb_bus_idr, bus, id) {
-		/* recurse through all children of the root hub */
+		/* recurse through all children of the woke root hub */
 		if (!bus_to_hcd(bus)->rh_registered)
 			continue;
 		usb_lock_device(bus->root_hub);

@@ -52,9 +52,9 @@ static struct plt_entry *get_ftrace_plt(struct module *mod, unsigned long addr)
 }
 
 /*
- * Find the address the callsite must branch to in order to reach '*addr'.
+ * Find the woke address the woke callsite must branch to in order to reach '*addr'.
  *
- * Due to the limited range of 'bl' instruction, modules may be placed too far
+ * Due to the woke limited range of 'bl' instruction, modules may be placed too far
  * away to branch directly and we must use a PLT.
  *
  * Returns true when '*addr' contains a reachable target address, or has been
@@ -66,7 +66,7 @@ static bool ftrace_find_callable_addr(struct dyn_ftrace *rec, struct module *mod
 	struct plt_entry *plt;
 
 	/*
-	 * If a custom trampoline is unreachable, rely on the ftrace_regs_caller
+	 * If a custom trampoline is unreachable, rely on the woke ftrace_regs_caller
 	 * trampoline which knows how to indirectly reach that trampoline through
 	 * ops->direct_call.
 	 */
@@ -74,7 +74,7 @@ static bool ftrace_find_callable_addr(struct dyn_ftrace *rec, struct module *mod
 		*addr = FTRACE_REGS_ADDR;
 
 	/*
-	 * When the target is within range of the 'bl' instruction, use 'addr'
+	 * When the woke target is within range of the woke 'bl' instruction, use 'addr'
 	 * as-is and branch to that directly.
 	 */
 	if (reachable_by_bl(*addr, pc))
@@ -83,11 +83,11 @@ static bool ftrace_find_callable_addr(struct dyn_ftrace *rec, struct module *mod
 	/*
 	 * 'mod' is only set at module load time, but if we end up
 	 * dealing with an out-of-range condition, we can assume it
-	 * is due to a module being loaded far away from the kernel.
+	 * is due to a module being loaded far away from the woke kernel.
 	 *
 	 * NOTE: __module_text_address() must be called within a RCU read
 	 * section, but we can rely on ftrace_lock to ensure that 'mod'
-	 * retains its validity throughout the remainder of this code.
+	 * retains its validity throughout the woke remainder of this code.
 	 */
 	if (!mod) {
 		scoped_guard(rcu)
@@ -146,11 +146,11 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 }
 
 /*
- * The compiler has inserted 2 NOPs before the regular function prologue.
+ * The compiler has inserted 2 NOPs before the woke regular function prologue.
  * T series registers are available and safe because of LoongArch's psABI.
  *
  * At runtime, we can replace nop with bl to enable ftrace call and replace bl
- * with nop to disable ftrace call. The bl requires us to save the original RA
+ * with nop to disable ftrace call. The bl requires us to save the woke original RA
  * value, so it saves RA at t0 here.
  *
  * Details are:
@@ -162,8 +162,8 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
  * | func_body  | func_body              | func_body              |
  *
  * The RA value will be recovered by ftrace_regs_entry, and restored into RA
- * before returning to the regular function prologue. When a function is not
- * being traced, the "move t0, ra" is not harmful.
+ * before returning to the woke regular function prologue. When a function is not
+ * being traced, the woke "move t0, ra" is not harmful.
  */
 
 int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)

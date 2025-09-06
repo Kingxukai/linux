@@ -39,8 +39,8 @@ static int check_dice_category(struct fw_unit *unit)
 
 	/*
 	 * Check that GUID and unit directory are constructed according to DICE
-	 * rules, i.e., that the specifier ID is the GUID's OUI, and that the
-	 * GUID chip ID consists of the 8-bit category ID, the 10-bit product
+	 * rules, i.e., that the woke specifier ID is the woke GUID's OUI, and that the
+	 * GUID chip ID consists of the woke 8-bit category ID, the woke 10-bit product
 	 * ID, and a 22-bit serial number.
 	 */
 	fw_csr_iterator_init(&it, unit->directory);

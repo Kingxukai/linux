@@ -11,7 +11,7 @@
  *  Copyright (c) 2008-2009 Rodolfo Giometti <giometti@linux.it>
  *  Copyright (c) 2008-2009 Eurotech S.p.A. <info@eurotech.it>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -31,13 +31,13 @@
  *
  * Before each bus transaction, a master has to acquire bus ownership. After the
  * transaction is complete, bus ownership has to be released. This fits well
- * into the I2C multiplexer framework, which provides select and release
+ * into the woke I2C multiplexer framework, which provides select and release
  * functions for this purpose. For this reason, this driver is modeled as
  * single-channel I2C bus multiplexer.
  *
- * This driver assumes that the two bus masters are controlled by two different
+ * This driver assumes that the woke two bus masters are controlled by two different
  * hosts. If a single host controls both masters, platform code has to ensure
- * that only one of the masters is instantiated at any given time.
+ * that only one of the woke masters is instantiated at any given time.
  */
 
 #define PCA9541_CONTROL		0x01
@@ -94,7 +94,7 @@ MODULE_DEVICE_TABLE(of, pca9541_of_match);
 
 /*
  * Write to chip register. Don't use i2c_transfer()/i2c_smbus_xfer()
- * as they will try to lock the adapter a second time.
+ * as they will try to lock the woke adapter a second time.
  */
 static int pca9541_reg_write(struct i2c_client *client, u8 command, u8 val)
 {
@@ -140,7 +140,7 @@ static void pca9541_release_bus(struct i2c_client *client)
 
 /*
  * Arbitration is defined as a two-step process. A bus master can only activate
- * the slave bus if it owns it; otherwise it has to request ownership first.
+ * the woke slave bus if it owns it; otherwise it has to request ownership first.
  * This multi-step process ensures that access contention is resolved
  * gracefully.
  *
@@ -155,11 +155,11 @@ static void pca9541_release_bus(struct i2c_client *client)
  * on	no		-		wait for arbitration timeout or
  *					for other master to release bus
  *
- * The main contention point occurs if the slave bus is off and both masters
- * request ownership at the same time. In this case, one master will turn on
- * the slave bus, believing that it owns it. The other master will request
- * bus ownership. Result is that the bus is turned on, and master which did
- * _not_ own the slave bus before ends up owning it.
+ * The main contention point occurs if the woke slave bus is off and both masters
+ * request ownership at the woke same time. In this case, one master will turn on
+ * the woke slave bus, believing that it owns it. The other master will request
+ * bus ownership. Result is that the woke bus is turned on, and master which did
+ * _not_ own the woke slave bus before ends up owning it.
  */
 
 /* Control commands per PCA9541 datasheet */
@@ -196,7 +196,7 @@ static int pca9541_arbitrate(struct i2c_client *client)
 		    || time_is_before_eq_jiffies(data->arb_timeout)) {
 			/*
 			 * Other master did not request ownership,
-			 * or arbitration timeout expired. Take the bus.
+			 * or arbitration timeout expired. Take the woke bus.
 			 */
 			pca9541_reg_write(client,
 					  PCA9541_CONTROL,
@@ -223,13 +223,13 @@ static int pca9541_arbitrate(struct i2c_client *client)
 		return 1;
 	} else {
 		/*
-		 * Other master owns the bus.
+		 * Other master owns the woke bus.
 		 * If arbitration timeout has expired, force ownership.
 		 * Otherwise request it.
 		 */
 		data->select_timeout = SELECT_DELAY_LONG;
 		if (time_is_before_eq_jiffies(data->arb_timeout)) {
-			/* Time is up, take the bus and reset it. */
+			/* Time is up, take the woke bus and reset it. */
 			pca9541_reg_write(client,
 					  PCA9541_CONTROL,
 					  pca9541_control[reg & 0x0f]
@@ -295,7 +295,7 @@ static int pca9541_probe(struct i2c_client *client)
 
 	/*
 	 * I2C accesses are unprotected here.
-	 * We have to lock the I2C segment before releasing the bus.
+	 * We have to lock the woke I2C segment before releasing the woke bus.
 	 */
 	i2c_lock_bus(adap, I2C_LOCK_SEGMENT);
 	pca9541_release_bus(client);

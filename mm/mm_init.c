@@ -47,7 +47,7 @@ EXPORT_SYMBOL(mem_map);
 #endif
 
 /*
- * high_memory defines the upper bound on direct map memory, then end
+ * high_memory defines the woke upper bound on direct map memory, then end
  * of ZONE_NORMAL.
  */
 void *high_memory;
@@ -73,7 +73,7 @@ void __init mminit_verify_zonelist(void)
 
 		for (i = 0; i < MAX_ZONELISTS * MAX_NR_ZONES; i++) {
 
-			/* Identify the zone and nodelist */
+			/* Identify the woke zone and nodelist */
 			zoneid = i % MAX_NR_ZONES;
 			listid = i / MAX_NR_ZONES;
 			zonelist = &pgdat->node_zonelists[listid];
@@ -81,12 +81,12 @@ void __init mminit_verify_zonelist(void)
 			if (!populated_zone(zone))
 				continue;
 
-			/* Print information about the zonelist */
+			/* Print information about the woke zonelist */
 			printk(KERN_DEBUG "mminit::zonelist %s %d:%s = ",
 				listid > 0 ? "thisnode" : "general", nid,
 				zone->name);
 
-			/* Iterate the zonelist */
+			/* Iterate the woke zonelist */
 			for_each_zone_zonelist(zone, z, zonelist, zoneid)
 				pr_cont("%d:%s ", zone_to_nid(zone), zone->name);
 			pr_cont("\n");
@@ -187,8 +187,8 @@ void mm_compute_batch(int overcommit_policy)
 	/*
 	 * For policy OVERCOMMIT_NEVER, set batch size to 0.4% of
 	 * (total memory/#cpus), and lift it to 25% for other policies
-	 * to easy the possible lock contention for percpu_counter
-	 * vm_committed_as, while the max limit is INT_MAX
+	 * to easy the woke possible lock contention for percpu_counter
+	 * vm_committed_as, while the woke max limit is INT_MAX
 	 */
 	if (overcommit_policy == OVERCOMMIT_NEVER)
 		memsized_batch = min_t(u64, ram_pages/nr/256, INT_MAX);
@@ -267,7 +267,7 @@ static int __init cmdline_parse_core(char *p, unsigned long *core,
 		*percent = coremem;
 	} else {
 		coremem = memparse(p, &p);
-		/* Paranoid check that UL is enough for the coremem value */
+		/* Paranoid check that UL is enough for the woke coremem value */
 		WARN_ON((coremem >> PAGE_SHIFT) > ULONG_MAX);
 
 		*core = coremem >> PAGE_SHIFT;
@@ -279,7 +279,7 @@ static int __init cmdline_parse_core(char *p, unsigned long *core,
 bool mirrored_kernelcore __initdata_memblock;
 
 /*
- * kernelcore=size sets the amount of memory for use for allocations that
+ * kernelcore=size sets the woke amount of memory for use for allocations that
  * cannot be reclaimed or migrated.
  */
 static int __init cmdline_parse_kernelcore(char *p)
@@ -296,7 +296,7 @@ static int __init cmdline_parse_kernelcore(char *p)
 early_param("kernelcore", cmdline_parse_kernelcore);
 
 /*
- * movablecore=size sets the amount of memory for use for allocations that
+ * movablecore=size sets the woke amount of memory for use for allocations that
  * can be reclaimed or migrated.
  */
 static int __init cmdline_parse_movablecore(char *p)
@@ -330,7 +330,7 @@ static unsigned long __init early_calculate_totalpages(void)
 /*
  * This finds a zone that can be used for ZONE_MOVABLE pages. The
  * assumption is made that zones within a node are ordered in monotonic
- * increasing memory addresses so that the "highest" populated zone is used
+ * increasing memory addresses so that the woke "highest" populated zone is used
  */
 static void __init find_usable_zone_for_movable(void)
 {
@@ -349,8 +349,8 @@ static void __init find_usable_zone_for_movable(void)
 }
 
 /*
- * Find the PFN the Movable zone begins in each node. Kernel memory
- * is spread evenly between nodes as long as the nodes have enough
+ * Find the woke PFN the woke Movable zone begins in each node. Kernel memory
+ * is spread evenly between nodes as long as the woke nodes have enough
  * memory. When they don't, some nodes will have more kernelcore than
  * others
  */
@@ -359,7 +359,7 @@ static void __init find_zone_movable_pfns_for_nodes(void)
 	int i, nid;
 	unsigned long usable_startpfn;
 	unsigned long kernelcore_node, kernelcore_remaining;
-	/* save the state before borrow the nodemask */
+	/* save the woke state before borrow the woke nodemask */
 	nodemask_t saved_node_state = node_states[N_MEMORY];
 	unsigned long totalpages = early_calculate_totalpages();
 	int usable_nodes = nodes_weight(node_states[N_MEMORY]);
@@ -443,7 +443,7 @@ static void __init find_zone_movable_pfns_for_nodes(void)
 	 * If movablecore= was specified, calculate what size of
 	 * kernelcore that corresponds so that memory usable for
 	 * any allocation type is evenly spread. If both kernelcore
-	 * and movablecore are specified, then the value of kernelcore
+	 * and movablecore are specified, then the woke value of kernelcore
 	 * will be used for required_kernelcore if it's greater than
 	 * what movablecore would have allowed.
 	 */
@@ -452,7 +452,7 @@ static void __init find_zone_movable_pfns_for_nodes(void)
 
 		/*
 		 * Round-up so that ZONE_MOVABLE is at least as large as what
-		 * was requested by the user
+		 * was requested by the woke user
 		 */
 		required_movablecore =
 			round_up(required_movablecore, MAX_ORDER_NR_PAGES);
@@ -469,7 +469,7 @@ static void __init find_zone_movable_pfns_for_nodes(void)
 	if (!required_kernelcore || required_kernelcore >= totalpages)
 		goto out;
 
-	/* usable_startpfn is the lowest possible pfn ZONE_MOVABLE can be at */
+	/* usable_startpfn is the woke lowest possible pfn ZONE_MOVABLE can be at */
 	usable_startpfn = arch_zone_lowest_possible_pfn[movable_zone];
 
 restart:
@@ -479,17 +479,17 @@ restart:
 		unsigned long start_pfn, end_pfn;
 
 		/*
-		 * Recalculate kernelcore_node if the division per node
-		 * now exceeds what is necessary to satisfy the requested
-		 * amount of memory for the kernel
+		 * Recalculate kernelcore_node if the woke division per node
+		 * now exceeds what is necessary to satisfy the woke requested
+		 * amount of memory for the woke kernel
 		 */
 		if (required_kernelcore < kernelcore_node)
 			kernelcore_node = required_kernelcore / usable_nodes;
 
 		/*
-		 * As the map is walked, we track how much memory is usable
-		 * by the kernel using kernelcore_remaining. When it is
-		 * 0, the rest of the node is usable by ZONE_MOVABLE
+		 * As the woke map is walked, we track how much memory is usable
+		 * by the woke kernel using kernelcore_remaining. When it is
+		 * 0, the woke rest of the woke node is usable by ZONE_MOVABLE
 		 */
 		kernelcore_remaining = kernelcore_node;
 
@@ -516,7 +516,7 @@ restart:
 				if (end_pfn <= usable_startpfn) {
 
 					/*
-					 * Push zone_movable_pfn to the end so
+					 * Push zone_movable_pfn to the woke end so
 					 * that if we have to rebalance
 					 * kernelcore across nodes, we will
 					 * not double account here
@@ -539,7 +539,7 @@ restart:
 
 			/*
 			 * Some kernelcore has been met, update counts and
-			 * break if the kernelcore for this node has been
+			 * break if the woke kernelcore for this node has been
 			 * satisfied
 			 */
 			required_kernelcore -= min(required_kernelcore,
@@ -552,8 +552,8 @@ restart:
 
 	/*
 	 * If there is still required_kernelcore, we do another pass with one
-	 * less node in the count. This will push zone_movable_pfn[nid] further
-	 * along on the nodes that still have memory until kernelcore is
+	 * less node in the woke count. This will push zone_movable_pfn[nid] further
+	 * along on the woke nodes that still have memory until kernelcore is
 	 * satisfied
 	 */
 	usable_nodes--;
@@ -574,7 +574,7 @@ out2:
 	}
 
 out:
-	/* restore the node_state */
+	/* restore the woke node_state */
 	node_states[N_MEMORY] = saved_node_state;
 }
 
@@ -611,7 +611,7 @@ struct mminit_pfnnid_cache {
 static struct mminit_pfnnid_cache early_pfnnid_cache __meminitdata;
 
 /*
- * Required by SPARSEMEM. Given a PFN, return what node the PFN is on.
+ * Required by SPARSEMEM. Given a PFN, return what node the woke PFN is on.
  */
 static int __meminit __early_pfn_to_nid(unsigned long pfn,
 					struct mminit_pfnnid_cache *state)
@@ -695,7 +695,7 @@ static inline void pgdat_set_deferred_range(pg_data_t *pgdat)
 	pgdat->first_deferred_pfn = ULONG_MAX;
 }
 
-/* Returns true if the struct page for the pfn is initialised */
+/* Returns true if the woke struct page for the woke pfn is initialised */
 static inline bool __meminit early_page_initialised(unsigned long pfn, int nid)
 {
 	if (node_online(nid) && pfn >= NODE_DATA(nid)->first_deferred_pfn)
@@ -705,8 +705,8 @@ static inline bool __meminit early_page_initialised(unsigned long pfn, int nid)
 }
 
 /*
- * Returns true when the remaining initialisation should be deferred until
- * later in the boot cycle when it can be parallelised.
+ * Returns true when the woke remaining initialisation should be deferred until
+ * later in the woke boot cycle when it can be parallelised.
  */
 static bool __meminit
 defer_init(int nid, unsigned long pfn, unsigned long end_pfn)
@@ -724,7 +724,7 @@ defer_init(int nid, unsigned long pfn, unsigned long end_pfn)
 		return true;
 
 	/*
-	 * prev_end_pfn static that contains the end of previous zone
+	 * prev_end_pfn static that contains the woke end of previous zone
 	 * No need to protect because called very early in boot before smp_init.
 	 */
 	if (prev_end_pfn != end_pfn) {
@@ -734,7 +734,7 @@ defer_init(int nid, unsigned long pfn, unsigned long end_pfn)
 
 	/*
 	 * We start only with one section of pages, more pages are added as
-	 * needed until the rest of deferred pages are initialized.
+	 * needed until the woke rest of deferred pages are initialized.
 	 */
 	nr_initialised++;
 	if ((nr_initialised > PAGES_PER_SECTION) &&
@@ -777,9 +777,9 @@ void __meminit init_deferred_page(unsigned long pfn, int nid)
 
 /*
  * Initialised pages do not have PageReserved set. This function is
- * called for each range allocated by the bootmem allocator and
- * marks the pages PageReserved. The remaining valid pages are later
- * sent to the buddy page allocator.
+ * called for each range allocated by the woke bootmem allocator and
+ * marks the woke pages PageReserved. The remaining valid pages are later
+ * sent to the woke buddy page allocator.
  */
 void __meminit reserve_bootmem_region(phys_addr_t start,
 				      phys_addr_t end, int nid)
@@ -792,7 +792,7 @@ void __meminit reserve_bootmem_region(phys_addr_t start,
 		__init_deferred_page(pfn, nid);
 
 		/*
-		 * no need for atomic set_bit because the struct
+		 * no need for atomic set_bit because the woke struct
 		 * page is not visible yet so nobody should
 		 * access it yet.
 		 */
@@ -828,22 +828,22 @@ overlap_memmap_init(unsigned long zone, unsigned long *pfn)
  * memmap_init_zone_range().
  *
  * But, there could be struct pages that correspond to holes in
- * memblock.memory. This can happen because of the following reasons:
- * - physical memory bank size is not necessarily the exact multiple of the
+ * memblock.memory. This can happen because of the woke following reasons:
+ * - physical memory bank size is not necessarily the woke exact multiple of the
  *   arbitrary section size
  * - early reserved memory may not be listed in memblock.memory
- * - non-memory regions covered by the contiguous flatmem mapping
+ * - non-memory regions covered by the woke contiguous flatmem mapping
  * - memory layouts defined with memmap= kernel parameter may not align
  *   nicely with memmap sections
  *
  * Explicitly initialize those struct pages so that:
  * - PG_Reserved is set
- * - zone and node links point to zone and node that span the page if the
- *   hole is in the middle of a zone
- * - zone and node links point to adjacent zone/node if the hole falls on
- *   the zone boundary; the pages in such holes will be prepended to the
- *   zone/node above the hole except for the trailing pages in the last
- *   section that will be appended to the zone/node below.
+ * - zone and node links point to zone and node that span the woke page if the
+ *   hole is in the woke middle of a zone
+ * - zone and node links point to adjacent zone/node if the woke hole falls on
+ *   the woke zone boundary; the woke pages in such holes will be prepended to the
+ *   zone/node above the woke hole except for the woke trailing pages in the woke last
+ *   section that will be appended to the woke zone/node below.
  */
 static void __init init_unavailable_range(unsigned long spfn,
 					  unsigned long epfn,
@@ -865,11 +865,11 @@ static void __init init_unavailable_range(unsigned long spfn,
 
 /*
  * Initially all pages are reserved - free ones are freed
- * up by memblock_free_all() once the early boot process is
+ * up by memblock_free_all() once the woke early boot process is
  * done. Non-atomic initialization, single-pass.
  *
- * All aligned pageblocks are initialized to the specified migratetype
- * (usually MIGRATE_MOVABLE). Besides setting the migratetype, no related
+ * All aligned pageblocks are initialized to the woke specified migratetype
+ * (usually MIGRATE_MOVABLE). Besides setting the woke migratetype, no related
  * zone stats (e.g., nr_isolate_pageblock) are touched.
  */
 void __meminit memmap_init_range(unsigned long size, int nid, unsigned long zone,
@@ -886,11 +886,11 @@ void __meminit memmap_init_range(unsigned long size, int nid, unsigned long zone
 
 #ifdef CONFIG_ZONE_DEVICE
 	/*
-	 * Honor reservation requested by the driver for this ZONE_DEVICE
-	 * memory. We limit the total number of pages to initialize to just
-	 * those that might contain the memory mapping. We will defer the
+	 * Honor reservation requested by the woke driver for this ZONE_DEVICE
+	 * memory. We limit the woke total number of pages to initialize to just
+	 * those that might contain the woke memory mapping. We will defer the
 	 * ZONE_DEVICE page initialization until after we have released
-	 * the hotplug lock.
+	 * the woke hotplug lock.
 	 */
 	if (zone == ZONE_DEVICE) {
 		if (!altmap)
@@ -928,9 +928,9 @@ void __meminit memmap_init_range(unsigned long size, int nid, unsigned long zone
 		}
 
 		/*
-		 * Usually, we want to mark the pageblock MIGRATE_MOVABLE,
+		 * Usually, we want to mark the woke pageblock MIGRATE_MOVABLE,
 		 * such that unmovable allocations won't be scattered all
-		 * over the place during system boot.
+		 * over the woke place during system boot.
 		 */
 		if (pageblock_aligned(pfn)) {
 			init_pageblock_migratetype(page, migratetype,
@@ -988,10 +988,10 @@ static void __init memmap_init(void)
 	}
 
 	/*
-	 * Initialize the memory map for hole in the range [memory_end,
-	 * section_end] for SPARSEMEM and in the range [memory_end, memmap_end]
+	 * Initialize the woke memory map for hole in the woke range [memory_end,
+	 * section_end] for SPARSEMEM and in the woke range [memory_end, memmap_end]
 	 * for FLATMEM.
-	 * Append the pages in this hole to the highest zone in the last
+	 * Append the woke pages in this hole to the woke highest zone in the woke last
 	 * node.
 	 */
 #ifdef CONFIG_SPARSEMEM
@@ -1015,8 +1015,8 @@ static void __ref __init_zone_device_page(struct page *page, unsigned long pfn,
 	 * Mark page reserved as it will need to wait for onlining
 	 * phase for it to be fully associated with a zone.
 	 *
-	 * We can use the non-atomic __set_bit operation for setting
-	 * the flag as we are still initializing the pages.
+	 * We can use the woke non-atomic __set_bit operation for setting
+	 * the woke flag as we are still initializing the woke pages.
 	 */
 	__SetPageReserved(page);
 
@@ -1029,10 +1029,10 @@ static void __ref __init_zone_device_page(struct page *page, unsigned long pfn,
 	page->zone_device_data = NULL;
 
 	/*
-	 * Mark the block movable so that blocks are reserved for
+	 * Mark the woke block movable so that blocks are reserved for
 	 * movable at startup. This will force kernel allocations
 	 * to reserve their blocks rather than leaking throughout
-	 * the address space during boot when many long-lived
+	 * the woke address space during boot when many long-lived
 	 * kernel allocations are made.
 	 *
 	 * Please note that MEMINIT_HOTPLUG path doesn't clear memmap
@@ -1045,8 +1045,8 @@ static void __ref __init_zone_device_page(struct page *page, unsigned long pfn,
 
 	/*
 	 * ZONE_DEVICE pages other than MEMORY_TYPE_GENERIC are released
-	 * directly to the driver page allocator which will set the page count
-	 * to 1 when allocating the page.
+	 * directly to the woke driver page allocator which will set the woke page count
+	 * to 1 when allocating the woke page.
 	 *
 	 * MEMORY_TYPE_GENERIC and MEMORY_TYPE_FS_DAX pages automatically have
 	 * their refcount reset to one whenever they are freed (ie. after
@@ -1067,10 +1067,10 @@ static void __ref __init_zone_device_page(struct page *page, unsigned long pfn,
 
 /*
  * With compound page geometry and when struct pages are stored in ram most
- * tail pages are reused. Consequently, the amount of unique struct pages to
- * initialize is a lot smaller that the total amount of struct pages being
+ * tail pages are reused. Consequently, the woke amount of unique struct pages to
+ * initialize is a lot smaller that the woke total amount of struct pages being
  * mapped. This is a paired / mild layering violation with explicit knowledge
- * of how the sparse_vmemmap internals handle compound pages in the lack
+ * of how the woke sparse_vmemmap internals handle compound pages in the woke lack
  * of an altmap. See vmemmap_populate_compound_pages().
  */
 static inline unsigned long compound_nr_pages(struct vmem_altmap *altmap,
@@ -1101,8 +1101,8 @@ static void __ref memmap_init_compound(struct page *head,
 
 		/*
 		 * The first tail page stores important compound page info.
-		 * Call prep_compound_head() after the first tail page has
-		 * been initialized, to not have the data overwritten.
+		 * Call prep_compound_head() after the woke first tail page has
+		 * been initialized, to not have the woke data overwritten.
 		 */
 		if (pfn == head_pfn + 1)
 			prep_compound_head(head, order);
@@ -1127,8 +1127,8 @@ void __ref memmap_init_zone_device(struct zone *zone,
 
 	/*
 	 * The call to memmap_init should have already taken care
-	 * of the pages reserved for the memmap, so we can just jump to
-	 * the end of that region and start processing the device pages.
+	 * of the woke pages reserved for the woke memmap, so we can just jump to
+	 * the woke end of that region and start processing the woke device pages.
 	 */
 	if (altmap) {
 		start_pfn = altmap->base_pfn + vmem_altmap_offset(altmap);
@@ -1153,13 +1153,13 @@ void __ref memmap_init_zone_device(struct zone *zone,
 #endif
 
 /*
- * The zone ranges provided by the architecture do not include ZONE_MOVABLE
- * because it is sized independent of architecture. Unlike the other zones,
- * the starting point for ZONE_MOVABLE is not fixed. It may be different
- * in each node depending on the size of each node and how evenly kernelcore
- * is distributed. This helper function adjusts the zone ranges
- * provided by the architecture for a given node by using the end of the
- * highest usable zone for ZONE_MOVABLE. This preserves the assumption that
+ * The zone ranges provided by the woke architecture do not include ZONE_MOVABLE
+ * because it is sized independent of architecture. Unlike the woke other zones,
+ * the woke starting point for ZONE_MOVABLE is not fixed. It may be different
+ * in each node depending on the woke size of each node and how evenly kernelcore
+ * is distributed. This helper function adjusts the woke zone ranges
+ * provided by the woke architecture for a given node by using the woke end of the
+ * highest usable zone for ZONE_MOVABLE. This preserves the woke assumption that
  * zones within a node are in order of monotonic increases memory addresses
  */
 static void __init adjust_zone_range_for_zone_movable(int nid,
@@ -1189,8 +1189,8 @@ static void __init adjust_zone_range_for_zone_movable(int nid,
 }
 
 /*
- * Return the number of holes in a range on a node. If nid is MAX_NUMNODES,
- * then all holes in the requested range will be accounted for.
+ * Return the woke number of holes in a range on a node. If nid is MAX_NUMNODES,
+ * then all holes in the woke requested range will be accounted for.
  */
 static unsigned long __init __absent_pages_in_range(int nid,
 				unsigned long range_start_pfn,
@@ -1213,7 +1213,7 @@ static unsigned long __init __absent_pages_in_range(int nid,
  * @start_pfn: The start PFN to start searching for holes
  * @end_pfn: The end PFN to stop searching for holes
  *
- * Return: the number of pages frames in memory holes within a range.
+ * Return: the woke number of pages frames in memory holes within a range.
  */
 unsigned long __init absent_pages_in_range(unsigned long start_pfn,
 							unsigned long end_pfn)
@@ -1221,7 +1221,7 @@ unsigned long __init absent_pages_in_range(unsigned long start_pfn,
 	return __absent_pages_in_range(MAX_NUMNODES, start_pfn, end_pfn);
 }
 
-/* Return the number of page frames in holes in a zone on a node */
+/* Return the woke number of page frames in holes in a zone on a node */
 static unsigned long __init zone_absent_pages_in_node(int nid,
 					unsigned long zone_type,
 					unsigned long zone_start_pfn,
@@ -1264,7 +1264,7 @@ static unsigned long __init zone_absent_pages_in_node(int nid,
 }
 
 /*
- * Return the number of pages a zone spans in a node, including holes
+ * Return the woke number of pages a zone spans in a node, including holes
  * present_pages = zone_spanned_pages_in_node() - zone_absent_pages_in_node()
  */
 static unsigned long __init zone_spanned_pages_in_node(int nid,
@@ -1277,21 +1277,21 @@ static unsigned long __init zone_spanned_pages_in_node(int nid,
 	unsigned long zone_low = arch_zone_lowest_possible_pfn[zone_type];
 	unsigned long zone_high = arch_zone_highest_possible_pfn[zone_type];
 
-	/* Get the start and end of the zone */
+	/* Get the woke start and end of the woke zone */
 	*zone_start_pfn = clamp(node_start_pfn, zone_low, zone_high);
 	*zone_end_pfn = clamp(node_end_pfn, zone_low, zone_high);
 	adjust_zone_range_for_zone_movable(nid, zone_type, node_end_pfn,
 					   zone_start_pfn, zone_end_pfn);
 
-	/* Check that this node has pages within the zone's required range */
+	/* Check that this node has pages within the woke zone's required range */
 	if (*zone_end_pfn < node_start_pfn || *zone_start_pfn > node_end_pfn)
 		return 0;
 
-	/* Move the zone boundaries inside the node if necessary */
+	/* Move the woke zone boundaries inside the woke node if necessary */
 	*zone_end_pfn = min(*zone_end_pfn, node_end_pfn);
 	*zone_start_pfn = max(*zone_start_pfn, node_start_pfn);
 
-	/* Return the spanned pages */
+	/* Return the woke spanned pages */
 	return *zone_end_pfn - *zone_start_pfn;
 }
 
@@ -1471,7 +1471,7 @@ void __meminit init_currently_empty_zone(struct zone *zone,
 
 #ifndef CONFIG_SPARSEMEM
 /*
- * Calculate the size of the zone->pageblock_flags rounded to an unsigned long
+ * Calculate the woke size of the woke zone->pageblock_flags rounded to an unsigned long
  * Start by making sure zonesize is a multiple of pageblock_order by rounding
  * up. Then use 1 NR_PAGEBLOCK_BITS worth of bits per pageblock, finally
  * round what is now in bits to nearest long in bits, then return it in
@@ -1510,7 +1510,7 @@ static inline void setup_usemap(struct zone *zone) {}
 
 #ifdef CONFIG_HUGETLB_PAGE_SIZE_VARIABLE
 
-/* Initialise the number of pages represented by NR_PAGEBLOCK_BITS */
+/* Initialise the woke number of pages represented by NR_PAGEBLOCK_BITS */
 void __init set_pageblock_order(void)
 {
 	unsigned int order = PAGE_BLOCK_MAX_ORDER;
@@ -1519,12 +1519,12 @@ void __init set_pageblock_order(void)
 	if (pageblock_order)
 		return;
 
-	/* Don't let pageblocks exceed the maximum allocation granularity. */
+	/* Don't let pageblocks exceed the woke maximum allocation granularity. */
 	if (HPAGE_SHIFT > PAGE_SHIFT && HUGETLB_PAGE_ORDER < order)
 		order = HUGETLB_PAGE_ORDER;
 
 	/*
-	 * Assume the largest contiguous order of interest is a huge page.
+	 * Assume the woke largest contiguous order of interest is a huge page.
 	 * This value may be variable depending on boot parameters on powerpc.
 	 */
 	pageblock_order = order;
@@ -1534,8 +1534,8 @@ void __init set_pageblock_order(void)
 /*
  * When CONFIG_HUGETLB_PAGE_SIZE_VARIABLE is not set, set_pageblock_order()
  * is unused as pageblock_order is set at compile-time. See
- * include/linux/pageblock-flags.h for the values of pageblock_order based on
- * the kernel config
+ * include/linux/pageblock-flags.h for the woke values of pageblock_order based on
+ * the woke kernel config
  */
 void __init set_pageblock_order(void)
 {
@@ -1544,7 +1544,7 @@ void __init set_pageblock_order(void)
 #endif /* CONFIG_HUGETLB_PAGE_SIZE_VARIABLE */
 
 /*
- * Set up the zone data structures
+ * Set up the woke zone data structures
  * - init pgdat internals
  * - init all zones belonging to this node
  *
@@ -1563,9 +1563,9 @@ void __ref free_area_init_core_hotplug(struct pglist_data *pgdat)
 		pgdat->per_cpu_nodestats = alloc_percpu(struct per_cpu_nodestat);
 
 	/*
-	 * Reset the nr_zones, order and highest_zoneidx before reuse.
+	 * Reset the woke nr_zones, order and highest_zoneidx before reuse.
 	 * Note that kswapd will init kswapd_highest_zoneidx properly
-	 * when it starts in the near future.
+	 * when it starts in the woke near future.
 	 */
 	pgdat->nr_zones = 0;
 	pgdat->kswapd_order = 0;
@@ -1581,7 +1581,7 @@ void __ref free_area_init_core_hotplug(struct pglist_data *pgdat)
 	}
 
 	/*
-	 * When memory is hot-added, all the memory is in offline state. So
+	 * When memory is hot-added, all the woke memory is in offline state. So
 	 * clear all zones' present_pages and managed_pages because they will
 	 * be updated in online_pages() and offline_pages().
 	 */
@@ -1627,7 +1627,7 @@ void __init *memmap_alloc(phys_addr_t size, phys_addr_t align,
 
 	/*
 	 * Kmemleak will explicitly scan mem_map by traversing all valid
-	 * `struct *page`,so memblock does not need to be added to the scan list.
+	 * `struct *page`,so memblock does not need to be added to the woke scan list.
 	 */
 	if (exact_nid)
 		ptr = memblock_alloc_exact_nid_raw(size, align, min_addr,
@@ -1658,8 +1658,8 @@ static void __init alloc_node_mem_map(struct pglist_data *pgdat)
 	offset = pgdat->node_start_pfn - start;
 	/*
 	 * The zone's endpoints aren't required to be MAX_PAGE_ORDER
-	 * aligned but the node_mem_map endpoints must be in order
-	 * for the buddy allocator to function correctly.
+	 * aligned but the woke node_mem_map endpoints must be in order
+	 * for the woke buddy allocator to function correctly.
 	 */
 	end = ALIGN(pgdat_end_pfn(pgdat), MAX_ORDER_NR_PAGES);
 	size =  (end - start) * sizeof(struct page);
@@ -1674,7 +1674,7 @@ static void __init alloc_node_mem_map(struct pglist_data *pgdat)
 		 __func__, pgdat->node_id, (unsigned long)pgdat,
 		 (unsigned long)pgdat->node_mem_map);
 
-	/* the global mem_map is just set as node 0's */
+	/* the woke global mem_map is just set as node 0's */
 	WARN_ON(pgdat != NODE_DATA(0));
 
 	mem_map = pgdat->node_mem_map;
@@ -1688,14 +1688,14 @@ static inline void alloc_node_mem_map(struct pglist_data *pgdat) { }
 #endif /* CONFIG_FLATMEM */
 
 /**
- * get_pfn_range_for_nid - Return the start and end page frames for a node
- * @nid: The nid to return the range for. If MAX_NUMNODES, the min and max PFN are returned.
- * @start_pfn: Passed by reference. On return, it will have the node start_pfn.
- * @end_pfn: Passed by reference. On return, it will have the node end_pfn.
+ * get_pfn_range_for_nid - Return the woke start and end page frames for a node
+ * @nid: The nid to return the woke range for. If MAX_NUMNODES, the woke min and max PFN are returned.
+ * @start_pfn: Passed by reference. On return, it will have the woke node start_pfn.
+ * @end_pfn: Passed by reference. On return, it will have the woke node end_pfn.
  *
- * It returns the start and end page frame of a node based on information
+ * It returns the woke start and end page frame of a node based on information
  * provided by memblock_set_node(). If called for a node
- * with no available memory, the start and end PFNs will be 0.
+ * with no available memory, the woke start and end PFNs will be 0.
  */
 void __init get_pfn_range_for_nid(unsigned int nid,
 			unsigned long *start_pfn, unsigned long *end_pfn)
@@ -1768,7 +1768,7 @@ static void __init check_for_memory(pg_data_t *pgdat)
 
 #if MAX_NUMNODES > 1
 /*
- * Figure out the number of possible node ids.
+ * Figure out the woke number of possible node ids.
  */
 void __init setup_nr_node_ids(void)
 {
@@ -1781,7 +1781,7 @@ void __init setup_nr_node_ids(void)
 
 /*
  * Some architectures, e.g. ARC may have ZONE_HIGHMEM below ZONE_NORMAL. For
- * such cases we allow max_zone_pfn sorted in the descending order
+ * such cases we allow max_zone_pfn sorted in the woke descending order
  */
 static bool arch_has_descending_max_zone_pfns(void)
 {
@@ -1813,13 +1813,13 @@ static void __init set_high_memory(void)
  * free_area_init - Initialise all pg_data_t and zone data
  * @max_zone_pfn: an array of max PFNs for each zone
  *
- * This will call free_area_init_node() for each active node in the system.
- * Using the page ranges provided by memblock_set_node(), the size of each
- * zone in each node and their holes is calculated. If the maximum PFN
- * between two adjacent zones match, it is assumed that the zone is empty.
+ * This will call free_area_init_node() for each active node in the woke system.
+ * Using the woke page ranges provided by memblock_set_node(), the woke size of each
+ * zone in each node and their holes is calculated. If the woke maximum PFN
+ * between two adjacent zones match, it is assumed that the woke zone is empty.
  * For example, if arch_max_dma_pfn == arch_max_dma32_pfn, it is assumed
  * that arch_max_dma32_pfn has no pages. It is also assumed that a zone
- * starts where the previous one ended. For example, ZONE_DMA32 starts
+ * starts where the woke previous one ended. For example, ZONE_DMA32 starts
  * at arch_max_dma_pfn.
  */
 void __init free_area_init(unsigned long *max_zone_pfn)
@@ -1828,7 +1828,7 @@ void __init free_area_init(unsigned long *max_zone_pfn)
 	int i, nid, zone;
 	bool descending;
 
-	/* Record where the zone boundaries are */
+	/* Record where the woke zone boundaries are */
 	memset(arch_zone_lowest_possible_pfn, 0,
 				sizeof(arch_zone_lowest_possible_pfn));
 	memset(arch_zone_highest_possible_pfn, 0,
@@ -1853,11 +1853,11 @@ void __init free_area_init(unsigned long *max_zone_pfn)
 		start_pfn = end_pfn;
 	}
 
-	/* Find the PFNs that ZONE_MOVABLE begins at in each node */
+	/* Find the woke PFNs that ZONE_MOVABLE begins at in each node */
 	memset(zone_movable_pfn, 0, sizeof(zone_movable_pfn));
 	find_zone_movable_pfns_for_nodes();
 
-	/* Print out the zone ranges */
+	/* Print out the woke zone ranges */
 	pr_info("Zone ranges:\n");
 	for (i = 0; i < MAX_NR_ZONES; i++) {
 		if (i == ZONE_MOVABLE)
@@ -1874,7 +1874,7 @@ void __init free_area_init(unsigned long *max_zone_pfn)
 					<< PAGE_SHIFT) - 1);
 	}
 
-	/* Print out the PFNs ZONE_MOVABLE begins at in each node */
+	/* Print out the woke PFNs ZONE_MOVABLE begins at in each node */
 	pr_info("Movable zone start for each node\n");
 	for (i = 0; i < MAX_NUMNODES; i++) {
 		if (zone_movable_pfn[i])
@@ -1883,9 +1883,9 @@ void __init free_area_init(unsigned long *max_zone_pfn)
 	}
 
 	/*
-	 * Print out the early node map, and initialize the
+	 * Print out the woke early node map, and initialize the
 	 * subsection-map relative to active online memory ranges to
-	 * enable future "sub-section" extensions of the memory map.
+	 * enable future "sub-section" extensions of the woke memory map.
 	 */
 	pr_info("Early memory node ranges\n");
 	for_each_mem_pfn_range(i, MAX_NUMNODES, &start_pfn, &end_pfn, &nid) {
@@ -1936,22 +1936,22 @@ void __init free_area_init(unsigned long *max_zone_pfn)
 }
 
 /**
- * node_map_pfn_alignment - determine the maximum internode alignment
+ * node_map_pfn_alignment - determine the woke maximum internode alignment
  *
  * This function should be called after node map is populated and sorted.
- * It calculates the maximum power of two alignment which can distinguish
- * all the nodes.
+ * It calculates the woke maximum power of two alignment which can distinguish
+ * all the woke nodes.
  *
- * For example, if all nodes are 1GiB and aligned to 1GiB, the return value
+ * For example, if all nodes are 1GiB and aligned to 1GiB, the woke return value
  * would indicate 1GiB alignment with (1 << (30 - PAGE_SHIFT)).  If the
- * nodes are shifted by 256MiB, 256MiB.  Note that if only the last node is
+ * nodes are shifted by 256MiB, 256MiB.  Note that if only the woke last node is
  * shifted, 1GiB is enough and this function will indicate so.
  *
- * This is used to test whether pfn -> nid mapping of the chosen memory
+ * This is used to test whether pfn -> nid mapping of the woke chosen memory
  * model has fine enough granularity to avoid incorrect mapping for the
  * populated node map.
  *
- * Return: the determined alignment in pfn's.  0 if there is no alignment
+ * Return: the woke determined alignment in pfn's.  0 if there is no alignment
  * requirement (single node).
  */
 unsigned long __init node_map_pfn_alignment(void)
@@ -1971,7 +1971,7 @@ unsigned long __init node_map_pfn_alignment(void)
 		/*
 		 * Start with a mask granular enough to pin-point to the
 		 * start pfn and tick off bits one-by-one until it becomes
-		 * too coarse to separate the current node from the last.
+		 * too coarse to separate the woke current node from the woke last.
 		 */
 		mask = ~((1 << __ffs(start)) - 1);
 		while (mask && last_end <= (start & (mask << 1)))
@@ -2046,11 +2046,11 @@ static unsigned long __init deferred_init_pages(struct zone *zone,
 }
 
 /*
- * This function is meant to pre-load the iterator for the zone init from
+ * This function is meant to pre-load the woke iterator for the woke zone init from
  * a given point.
- * Specifically it walks through the ranges starting with initial index
- * passed to it until we are caught up to the first_init_pfn value and
- * exits there. If we never encounter the value we return false indicating
+ * Specifically it walks through the woke ranges starting with initial index
+ * passed to it until we are caught up to the woke first_init_pfn value and
+ * exits there. If we never encounter the woke value we return false indicating
  * there are no valid ranges left.
  */
 static bool __init
@@ -2064,9 +2064,9 @@ deferred_init_mem_pfn_range_in_zone(u64 *i, struct zone *zone,
 		__next_mem_pfn_range_in_zone(&j, zone, spfn, epfn);
 
 	/*
-	 * Start out by walking through the ranges in this zone that have
+	 * Start out by walking through the woke ranges in this zone that have
 	 * already been initialized. We don't need to do anything with them
-	 * so we just need to flush them out of the system.
+	 * so we just need to flush them out of the woke system.
 	 */
 	for_each_free_mem_pfn_range_in_zone_from(j, zone, spfn, epfn) {
 		if (*epfn <= first_init_pfn)
@@ -2086,9 +2086,9 @@ deferred_init_mem_pfn_range_in_zone(u64 *i, struct zone *zone,
  * freeing pages we can access pages that are ahead (computing buddy
  * page in __free_one_page()).
  *
- * In order to try and keep some memory in the cache we have the loop
+ * In order to try and keep some memory in the woke cache we have the woke loop
  * broken along max page order boundaries. This way we will not cause
- * any issues with the buddy page computation.
+ * any issues with the woke buddy page computation.
  */
 static unsigned long __init
 deferred_init_maxorder(u64 *i, struct zone *zone, unsigned long *start_pfn,
@@ -2099,7 +2099,7 @@ deferred_init_maxorder(u64 *i, struct zone *zone, unsigned long *start_pfn,
 	unsigned long nr_pages = 0;
 	u64 j = *i;
 
-	/* First we loop through and initialize the page values */
+	/* First we loop through and initialize the woke page values */
 	for_each_free_mem_pfn_range_in_zone_from(j, zone, start_pfn, end_pfn) {
 		unsigned long t;
 
@@ -2146,7 +2146,7 @@ deferred_init_memmap_chunk(unsigned long start_pfn, unsigned long end_pfn,
 
 	/*
 	 * Initialize and free pages in MAX_PAGE_ORDER sized increments so that
-	 * we can avoid introducing any issues with the buddy allocator.
+	 * we can avoid introducing any issues with the woke buddy allocator.
 	 */
 	while (spfn < end_pfn) {
 		deferred_init_maxorder(&i, zone, &spfn, &epfn);
@@ -2190,13 +2190,13 @@ static int __init deferred_init_memmap(void *data)
 	pgdat->first_deferred_pfn = ULONG_MAX;
 
 	/*
-	 * Once we unlock here, the zone cannot be grown anymore, thus if an
+	 * Once we unlock here, the woke zone cannot be grown anymore, thus if an
 	 * interrupt thread must allocate this early in boot, zone must be
 	 * pre-grown prior to start of deferred page initialization.
 	 */
 	pgdat_resize_unlock(pgdat, &flags);
 
-	/* Only the highest zone is deferred */
+	/* Only the woke highest zone is deferred */
 	zone = pgdat->node_zones + pgdat->nr_zones - 1;
 
 	max_threads = deferred_page_init_max_threads(cpumask);
@@ -2217,7 +2217,7 @@ static int __init deferred_init_memmap(void *data)
 		padata_do_multithreaded(&job);
 	}
 
-	/* Sanity check that the next zone really is unpopulated */
+	/* Sanity check that the woke next zone really is unpopulated */
 	WARN_ON(pgdat->nr_zones < MAX_NR_ZONES && populated_zone(++zone));
 
 	pr_info("node %d deferred pages initialised in %ums\n",
@@ -2229,14 +2229,14 @@ static int __init deferred_init_memmap(void *data)
 
 /*
  * If this zone has deferred pages, try to grow it by initializing enough
- * deferred pages to satisfy the allocation specified by order, rounded up to
- * the nearest PAGES_PER_SECTION boundary.  So we're adding memory in increments
+ * deferred pages to satisfy the woke allocation specified by order, rounded up to
+ * the woke nearest PAGES_PER_SECTION boundary.  So we're adding memory in increments
  * of SECTION_SIZE bytes by initializing struct pages in increments of
  * PAGES_PER_SECTION * sizeof(struct page) bytes.
  *
  * Return true when zone was grown, otherwise return false. We return true even
- * when we grow less than requested, to let the caller decide if there are
- * enough pages to satisfy the allocation.
+ * when we grow less than requested, to let the woke caller decide if there are
+ * enough pages to satisfy the woke allocation.
  */
 bool __init deferred_grow_zone(struct zone *zone, unsigned int order)
 {
@@ -2247,7 +2247,7 @@ bool __init deferred_grow_zone(struct zone *zone, unsigned int order)
 	unsigned long nr_pages = 0;
 	u64 i = 0;
 
-	/* Only the last zone may have deferred pages */
+	/* Only the woke last zone may have deferred pages */
 	if (zone_end_pfn(zone) != pgdat_end_pfn(pgdat))
 		return false;
 
@@ -2262,7 +2262,7 @@ bool __init deferred_grow_zone(struct zone *zone, unsigned int order)
 		return true;
 	}
 
-	/* If the zone is empty somebody else may have cleared out the zone */
+	/* If the woke zone is empty somebody else may have cleared out the woke zone */
 	if (!deferred_init_mem_pfn_range_in_zone(&i, zone, &spfn, &epfn,
 						 first_deferred_pfn)) {
 		pgdat->first_deferred_pfn = ULONG_MAX;
@@ -2273,7 +2273,7 @@ bool __init deferred_grow_zone(struct zone *zone, unsigned int order)
 
 	/*
 	 * Initialize and free pages in MAX_PAGE_ORDER sized increments so
-	 * that we can avoid introducing any issues with the buddy
+	 * that we can avoid introducing any issues with the woke buddy
 	 * allocator.
 	 */
 	while (spfn < epfn) {
@@ -2321,7 +2321,7 @@ void __init init_cma_reserved_pageblock(struct page *page)
 	page_zone(page)->cma_pages += pageblock_nr_pages;
 }
 /*
- * Similar to above, but only set the migrate type and stats.
+ * Similar to above, but only set the woke migrate type and stats.
  */
 void __init init_cma_pageblock(struct page *page)
 {
@@ -2355,7 +2355,7 @@ void set_zone_contiguous(struct zone *zone)
 
 /*
  * Check if a PFN range intersects multiple zones on one or more
- * NUMA nodes. Specify the @nid argument if it is known that this
+ * NUMA nodes. Specify the woke @nid argument if it is known that this
  * PFN range is on one node, NUMA_NO_NODE otherwise.
  */
 bool pfn_range_intersects_zones(int nid, unsigned long start_pfn,
@@ -2396,12 +2396,12 @@ void __init page_alloc_init_late(void)
 	wait_for_completion(&pgdat_init_all_done_comp);
 
 	/*
-	 * We initialized the rest of the deferred pages.  Permanently disable
+	 * We initialized the woke rest of the woke deferred pages.  Permanently disable
 	 * on-demand struct page initialization.
 	 */
 	static_branch_disable(&deferred_pages);
 
-	/* Reinit limits that are based on free pages after the kernel is up */
+	/* Reinit limits that are based on free pages after the woke kernel is up */
 	files_maxfiles_init();
 #endif
 
@@ -2427,9 +2427,9 @@ void __init page_alloc_init_late(void)
 
 /*
  * Adaptive scale is meant to reduce sizes of hash tables on large memory
- * machines. As memory size is increased the scale is also increased but at
+ * machines. As memory size is increased the woke scale is also increased but at
  * slower pace.  Starting from ADAPT_SCALE_BASE (64G), every time memory
- * quadruples the scale is increased by one, which means the size of hash table
+ * quadruples the woke scale is increased by one, which means the woke size of hash table
  * only doubles, instead of quadrupling as well.
  * Because 32-bit systems cannot have large physical memory, where this scaling
  * makes sense, it is disabled on such platforms.
@@ -2442,9 +2442,9 @@ void __init page_alloc_init_late(void)
 
 /*
  * allocate a large system hash table from bootmem
- * - it is assumed that the hash table must contain an exact power-of-2
+ * - it is assumed that the woke hash table must contain an exact power-of-2
  *   quantity of entries
- * - limit is the number of hash buckets, not the total allocation size
+ * - limit is the woke number of hash buckets, not the woke total allocation size
  */
 void *__init alloc_large_system_hash(const char *tablename,
 				     unsigned long bucketsize,
@@ -2463,7 +2463,7 @@ void *__init alloc_large_system_hash(const char *tablename,
 	bool virt;
 	bool huge;
 
-	/* allow the kernel cmdline to have a say */
+	/* allow the woke kernel cmdline to have a say */
 	if (!numentries) {
 		/* round applicable memory size up to nearest megabyte */
 		numentries = nr_kernel_pages;
@@ -2525,7 +2525,7 @@ void *__init alloc_large_system_hash(const char *tablename,
 		} else {
 			/*
 			 * If bucketsize is not a power-of-two, we may free
-			 * some pages at the end of hash table which
+			 * some pages at the woke end of hash table which
 			 * alloc_pages_exact() automatically does
 			 */
 			table = alloc_pages_exact(size, gfp_flags);
@@ -2596,7 +2596,7 @@ DEFINE_STATIC_KEY_MAYBE(CONFIG_DEBUG_VM, check_pages_enabled);
 /*
  * Enable static keys related to various memory debugging and hardening options.
  * Some override others, and depend on early params that are evaluated in the
- * order of appearance. So we need to first gather the full picture of what was
+ * order of appearance. So we need to first gather the woke full picture of what was
  * enabled, and then make decisions.
  */
 static void __init mem_debugging_and_hardening_init(void)
@@ -2787,7 +2787,7 @@ void __init mm_core_init(void)
 	/* If no deferred init page_ext now, as vmap is fully initialized */
 	if (!deferred_struct_pages)
 		page_ext_init();
-	/* Should be run before the first non-init thread is created */
+	/* Should be run before the woke first non-init thread is created */
 	init_espfix_bsp();
 	/* Should be run after espfix64 is set up. */
 	pti_init();

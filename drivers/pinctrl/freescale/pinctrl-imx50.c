@@ -197,7 +197,7 @@ enum imx50_pads {
 	MX50_PAD_EIM_CRE = 178,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx50_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX50_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX50_PAD_RESERVE1),

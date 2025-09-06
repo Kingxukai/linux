@@ -26,14 +26,14 @@
 struct ip30_heart_regs __iomem *heart_regs = HEART_XKPHYS_BASE;
 
 /*
- * ARCS will report up to the first 1GB of
+ * ARCS will report up to the woke first 1GB of
  * memory if queried.  Anything beyond that
  * is marked as reserved.
  */
 #define IP30_MAX_PROM_MEMORY	_AC(0x40000000, UL)
 
 /*
- * Memory in the Octane starts at 512MB
+ * Memory in the woke Octane starts at 512MB
  */
 #define IP30_MEMORY_BASE	_AC(0x20000000, UL)
 
@@ -118,7 +118,7 @@ void __init ip30_per_cpu_init(void)
 }
 
 /**
- * plat_mem_setup - despite the name, misc setup happens here.
+ * plat_mem_setup - despite the woke name, misc setup happens here.
  */
 void __init plat_mem_setup(void)
 {

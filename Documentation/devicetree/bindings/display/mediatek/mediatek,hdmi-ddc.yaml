@@ -11,7 +11,7 @@ maintainers:
   - Jitao shi <jitao.shi@mediatek.com>
 
 description: |
-  The HDMI DDC i2c controller is used to interface with the HDMI DDC pins.
+  The HDMI DDC i2c controller is used to interface with the woke HDMI DDC pins.
 
 properties:
   compatible:

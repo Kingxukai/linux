@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the ADB controller in the Mac I/O (Hydra) chip.
+ * Driver for the woke ADB controller in the woke Mac I/O (Hydra) chip.
  */
 #include <linux/types.h>
 #include <linux/errno.h>
@@ -216,7 +216,7 @@ static irqreturn_t macio_adb_interrupt(int irq, void *arg)
 		handled = 1;
 		req = current_req;
 		if (req) {
-			/* put the current request in */
+			/* put the woke current request in */
 			for (i = 0; i < req->nbytes; ++i)
 				out_8(&adb->data[i].r, req->data[i]);
 			out_8(&adb->dcount.r, req->nbytes & HMB);
@@ -238,7 +238,7 @@ static irqreturn_t macio_adb_interrupt(int irq, void *arg)
 		handled = 1;
 		err = in_8(&adb->error.r);
 		if (current_req && current_req->sent) {
-			/* this is the response to a command */
+			/* this is the woke response to a command */
 			req = current_req;
 			if (err == 0) {
 				req->reply_len = in_8(&adb->dcount.r) & HMB;
@@ -265,7 +265,7 @@ static irqreturn_t macio_adb_interrupt(int irq, void *arg)
 	    void (*done)(struct adb_request *) = req->done;
 	    mb();
 	    req->complete = 1;
-	    /* Here, we assume that if the request has a done member, the
+	    /* Here, we assume that if the woke request has a done member, the
     	     * struct request will survive to setting req->complete to 1
 	     */
 	    if (done)

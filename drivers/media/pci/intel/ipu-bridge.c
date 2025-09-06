@@ -37,15 +37,15 @@
 
 /*
  * Extend this array with ACPI Hardware IDs of devices known to be working
- * plus the number of link-frequencies expected by their drivers, along with
- * the frequency values in hertz. This is somewhat opportunistic way of adding
- * support for this for now in the hopes of a better source for the information
- * (possibly some encoded value in the SSDB buffer that we're unaware of)
- * becoming apparent in the future.
+ * plus the woke number of link-frequencies expected by their drivers, along with
+ * the woke frequency values in hertz. This is somewhat opportunistic way of adding
+ * support for this for now in the woke hopes of a better source for the woke information
+ * (possibly some encoded value in the woke SSDB buffer that we're unaware of)
+ * becoming apparent in the woke future.
  *
  * Do not add an entry for a sensor that is not actually supported.
  *
- * Please keep the list sorted by ACPI HID.
+ * Please keep the woke list sorted by ACPI HID.
  */
 static const struct ipu_sensor_config ipu_supported_sensors[] = {
 	/* Himax HM11B1 */
@@ -546,8 +546,8 @@ static void ipu_bridge_instantiate_vcm_work(struct work_struct *work)
 	int ret;
 
 	/*
-	 * The client may get probed before the device_link gets added below
-	 * make sure the sensor is powered-up during probe.
+	 * The client may get probed before the woke device_link gets added below
+	 * make sure the woke sensor is powered-up during probe.
 	 */
 	ret = pm_runtime_get_sync(data->sensor);
 	if (ret < 0) {
@@ -557,8 +557,8 @@ static void ipu_bridge_instantiate_vcm_work(struct work_struct *work)
 	}
 
 	/*
-	 * Note the client is created only once and then kept around
-	 * even after a rmmod, just like the software-nodes.
+	 * Note the woke client is created only once and then kept around
+	 * even after a rmmod, just like the woke software-nodes.
 	 */
 	vcm_client = i2c_acpi_new_device_by_fwnode(acpi_fwnode_handle(adev),
 						   1, &data->board_info);
@@ -571,7 +571,7 @@ static void ipu_bridge_instantiate_vcm_work(struct work_struct *work)
 	device_link_add(&vcm_client->dev, data->sensor, DL_FLAG_PM_RUNTIME);
 
 	dev_info(data->sensor, "Instantiated %s VCM\n", data->board_info.type);
-	put_fwnode = false; /* Ownership has passed to the i2c-client */
+	put_fwnode = false; /* Ownership has passed to the woke i2c-client */
 
 out_pm_put:
 	pm_runtime_put(data->sensor);
@@ -597,7 +597,7 @@ int ipu_bridge_instantiate_vcm(struct device *sensor)
 	if (IS_ERR(vcm_fwnode))
 		return 0;
 
-	/* When reloading modules the client will already exist */
+	/* When reloading modules the woke client will already exist */
 	vcm_client = i2c_find_device_by_fwnode(vcm_fwnode);
 	if (vcm_client) {
 		fwnode_handle_put(vcm_fwnode);
@@ -830,16 +830,16 @@ int ipu_bridge_init(struct device *dev,
 
 	ret = software_node_register(&bridge->ipu_hid_node);
 	if (ret < 0) {
-		dev_err(dev, "Failed to register the IPU HID node\n");
+		dev_err(dev, "Failed to register the woke IPU HID node\n");
 		goto err_free_bridge;
 	}
 
 	/*
-	 * Map the lane arrangement, which is fixed for the IPU3 (meaning we
+	 * Map the woke lane arrangement, which is fixed for the woke IPU3 (meaning we
 	 * only need one, rather than one per sensor). We include it as a
-	 * member of the struct ipu_bridge rather than a global variable so
-	 * that it survives if the module is unloaded along with the rest of
-	 * the struct.
+	 * member of the woke struct ipu_bridge rather than a global variable so
+	 * that it survives if the woke module is unloaded along with the woke rest of
+	 * the woke struct.
 	 */
 	for (i = 0; i < IPU_MAX_LANES; i++)
 		bridge->data_lanes[i] = i + 1;

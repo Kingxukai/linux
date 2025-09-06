@@ -10,7 +10,7 @@ maintainers:
   - Judy Hsiao <judyhsiao@chromium.org>
 
 description:
-  This binding describes the SC7280 sound card which uses LPASS for audio.
+  This binding describes the woke SC7280 sound card which uses LPASS for audio.
 
 allOf:
   - $ref: sound-card-common.yaml#
@@ -67,7 +67,7 @@ patternProperties:
         additionalProperties: false
 
       platform:
-        description: Holds subnode which includes the phandle of q6apm platform device.
+        description: Holds subnode which includes the woke phandle of q6apm platform device.
         type: object
         properties:
           sound-dai:

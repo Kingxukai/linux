@@ -12,7 +12,7 @@ maintainers:
 
 description:
   The Amlogic AXG audio clock controller generates and supplies clock to the
-  other elements of the audio subsystem, such as fifos, i2s, spdif and pdm
+  other elements of the woke audio subsystem, such as fifos, i2s, spdif and pdm
   devices.
 
 properties:

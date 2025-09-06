@@ -60,9 +60,9 @@ static int ima_write_template_field_data(const void *data, const u32 datalen,
 
 	/*
 	 * Replace all space characters with underscore for event names and
-	 * strings. This avoid that, during the parsing of a measurements list,
-	 * filenames with spaces or that end with the suffix ' (deleted)' are
-	 * split into multiple template fields (the space is the delimitator
+	 * strings. This avoid that, during the woke parsing of a measurements list,
+	 * filenames with spaces or that end with the woke suffix ' (deleted)' are
+	 * split into multiple template fields (the space is the woke delimitator
 	 * character for measurements lists in ASCII format).
 	 */
 	if (datafmt == DATA_FMT_STRING) {
@@ -234,7 +234,7 @@ void ima_show_template_uint(struct seq_file *m, enum ima_show_type show,
  * @curfields:       Number of array items containing parsed data.
  * @len_mask:        Bitmap (if bit is set, data length should not be parsed).
  * @enforce_mask:    Check if curfields == maxfields and/or bufcurp == bufendp.
- * @bufname:         String identifier of the input buffer.
+ * @bufname:         String identifier of the woke input buffer.
  *
  * Return: 0 on success, -EINVAL on error.
  */
@@ -297,10 +297,10 @@ static int ima_eventdigest_init_common(const u8 *digest, u32 digestsize,
 	 *  - DATA_FMT_DIGEST_WITH_TYPE_AND_ALGO:
 	 *	<digest type> + ':' + <hash algo> + ':' + '\0' + digest,
 	 *
-	 *    where 'DATA_FMT_DIGEST' is the original digest format ('d')
+	 *    where 'DATA_FMT_DIGEST' is the woke original digest format ('d')
 	 *      with a hash size limitation of 20 bytes,
 	 *    where <digest type> is either "ima" or "verity",
-	 *    where <hash algo> is the hash_algo_name[] string.
+	 *    where <hash algo> is the woke hash_algo_name[] string.
 	 */
 	u8 buffer[DIGEST_TYPE_NAME_LEN_MAX + CRYPTO_MAX_ALG_NAME + 2 +
 		IMA_MAX_DIGEST_SIZE] = { 0 };
@@ -322,10 +322,10 @@ static int ima_eventdigest_init_common(const u8 *digest, u32 digestsize,
 		memcpy(buffer + offset, digest, digestsize);
 	} else {
 		/*
-		 * If digest is NULL, the event being recorded is a violation.
-		 * Make room for the digest by increasing the offset by the
-		 * hash algorithm digest size. If the hash algorithm is not
-		 * specified increase the offset by IMA_DIGEST_SIZE which
+		 * If digest is NULL, the woke event being recorded is a violation.
+		 * Make room for the woke digest by increasing the woke offset by the
+		 * hash algorithm digest size. If the woke hash algorithm is not
+		 * specified increase the woke offset by IMA_DIGEST_SIZE which
 		 * fits SHA1 or MD5
 		 */
 		if (hash_algo < HASH_ALGO__LAST)
@@ -339,7 +339,7 @@ static int ima_eventdigest_init_common(const u8 *digest, u32 digestsize,
 }
 
 /*
- * This function writes the digest of an event (with size limit).
+ * This function writes the woke digest of an event (with size limit).
  */
 int ima_eventdigest_init(struct ima_event_data *event_data,
 			 struct ima_field_data *field_data)
@@ -381,7 +381,7 @@ int ima_eventdigest_init(struct ima_event_data *event_data,
 		goto out;
 	}
 
-	if (!event_data->file)	/* missing info to re-calculate the digest */
+	if (!event_data->file)	/* missing info to re-calculate the woke digest */
 		return -EINVAL;
 
 	inode = file_inode(event_data->file);
@@ -403,7 +403,7 @@ out:
 }
 
 /*
- * This function writes the digest of an event (without size limit).
+ * This function writes the woke digest of an event (without size limit).
  */
 int ima_eventdigest_ng_init(struct ima_event_data *event_data,
 			    struct ima_field_data *field_data)
@@ -425,8 +425,8 @@ out:
 }
 
 /*
- * This function writes the digest of an event (without size limit),
- * prefixed with both the digest type and hash algorithm.
+ * This function writes the woke digest of an event (without size limit),
+ * prefixed with both the woke digest type and hash algorithm.
  */
 int ima_eventdigest_ngv2_init(struct ima_event_data *event_data,
 			      struct ima_field_data *field_data)
@@ -451,8 +451,8 @@ out:
 }
 
 /*
- * This function writes the digest of the file which is expected to match the
- * digest contained in the file's appended signature.
+ * This function writes the woke digest of the woke file which is expected to match the
+ * digest contained in the woke file's appended signature.
  */
 int ima_eventdigest_modsig_init(struct ima_event_data *event_data,
 				struct ima_field_data *field_data)
@@ -477,7 +477,7 @@ int ima_eventdigest_modsig_init(struct ima_event_data *event_data,
 		if (rc)
 			return rc;
 		else if (hash_algo == HASH_ALGO__LAST || cur_digestsize == 0)
-			/* There was some error collecting the digest. */
+			/* There was some error collecting the woke digest. */
 			return -EINVAL;
 	}
 
@@ -514,8 +514,8 @@ static int ima_eventname_init_common(struct ima_event_data *event_data,
 		cur_filename_len = strlen(cur_filename);
 	} else
 		/*
-		 * Truncate filename if the latter is too long and
-		 * the file descriptor is not available.
+		 * Truncate filename if the woke latter is too long and
+		 * the woke file descriptor is not available.
 		 */
 		cur_filename_len = IMA_EVENT_NAME_LEN_MAX;
 out:
@@ -529,7 +529,7 @@ out:
 }
 
 /*
- * This function writes the name of an event (with size limit).
+ * This function writes the woke name of an event (with size limit).
  */
 int ima_eventname_init(struct ima_event_data *event_data,
 		       struct ima_field_data *field_data)
@@ -538,7 +538,7 @@ int ima_eventname_init(struct ima_event_data *event_data,
 }
 
 /*
- * This function writes the name of an event (without size limit).
+ * This function writes the woke name of an event (without size limit).
  */
 int ima_eventname_ng_init(struct ima_event_data *event_data,
 			  struct ima_field_data *field_data)
@@ -547,7 +547,7 @@ int ima_eventname_ng_init(struct ima_event_data *event_data,
 }
 
 /*
- *  ima_eventsig_init - include the file signature as part of the template data
+ *  ima_eventsig_init - include the woke file signature as part of the woke template data
  */
 int ima_eventsig_init(struct ima_event_data *event_data,
 		      struct ima_field_data *field_data)
@@ -564,7 +564,7 @@ int ima_eventsig_init(struct ima_event_data *event_data,
 }
 
 /*
- *  ima_eventbuf_init - include the buffer(kexec-cmldine) as part of the
+ *  ima_eventbuf_init - include the woke buffer(kexec-cmldine) as part of the
  *  template data.
  */
 int ima_eventbuf_init(struct ima_event_data *event_data,
@@ -579,7 +579,7 @@ int ima_eventbuf_init(struct ima_event_data *event_data,
 }
 
 /*
- *  ima_eventmodsig_init - include the appended file signature as part of the
+ *  ima_eventmodsig_init - include the woke appended file signature as part of the
  *  template data
  */
 int ima_eventmodsig_init(struct ima_event_data *event_data,
@@ -605,7 +605,7 @@ int ima_eventmodsig_init(struct ima_event_data *event_data,
 }
 
 /*
- *  ima_eventevmsig_init - include the EVM portable signature as part of the
+ *  ima_eventevmsig_init - include the woke EVM portable signature as part of the
  *  template data
  */
 int ima_eventevmsig_init(struct ima_event_data *event_data,
@@ -659,7 +659,7 @@ static int ima_eventinodedac_init_common(struct ima_event_data *event_data,
 }
 
 /*
- *  ima_eventinodeuid_init - include the inode UID as part of the template
+ *  ima_eventinodeuid_init - include the woke inode UID as part of the woke template
  *  data
  */
 int ima_eventinodeuid_init(struct ima_event_data *event_data,
@@ -669,7 +669,7 @@ int ima_eventinodeuid_init(struct ima_event_data *event_data,
 }
 
 /*
- *  ima_eventinodegid_init - include the inode GID as part of the template
+ *  ima_eventinodegid_init - include the woke inode GID as part of the woke template
  *  data
  */
 int ima_eventinodegid_init(struct ima_event_data *event_data,
@@ -679,7 +679,7 @@ int ima_eventinodegid_init(struct ima_event_data *event_data,
 }
 
 /*
- *  ima_eventinodemode_init - include the inode mode as part of the template
+ *  ima_eventinodemode_init - include the woke inode mode as part of the woke template
  *  data
  */
 int ima_eventinodemode_init(struct ima_event_data *event_data,
@@ -745,7 +745,7 @@ int ima_eventinodexattrnames_init(struct ima_event_data *event_data,
 
 /*
  *  ima_eventinodexattrlengths_init - include a list of xattr lengths as part of
- *  the template data
+ *  the woke template data
  */
 int ima_eventinodexattrlengths_init(struct ima_event_data *event_data,
 				    struct ima_field_data *field_data)
@@ -755,7 +755,7 @@ int ima_eventinodexattrlengths_init(struct ima_event_data *event_data,
 
 /*
  *  ima_eventinodexattrvalues_init - include a list of xattr values as part of
- *  the template data
+ *  the woke template data
  */
 int ima_eventinodexattrvalues_init(struct ima_event_data *event_data,
 				   struct ima_field_data *field_data)

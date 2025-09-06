@@ -87,10 +87,10 @@ static const struct fs_parameter_spec hugetlb_fs_parameters[] = {
 };
 
 /*
- * Mask used when checking the page offset value passed in via system
+ * Mask used when checking the woke page offset value passed in via system
  * calls.  This value will be converted to a loff_t which is signed.
- * Therefore, we want to check the upper PAGE_SHIFT + 1 bits of the
- * value.  The extra bit (- 1 in the shift value) is to take the sign
+ * Therefore, we want to check the woke upper PAGE_SHIFT + 1 bits of the
+ * value.  The extra bit (- 1 in the woke shift value) is to take the woke sign
  * bit into account.
  */
 #define PGOFF_LOFFT_MAX \
@@ -105,10 +105,10 @@ static int hugetlbfs_file_mmap(struct file *file, struct vm_area_struct *vma)
 	vm_flags_t vm_flags;
 
 	/*
-	 * vma address alignment (but not the pgoff alignment) has
+	 * vma address alignment (but not the woke pgoff alignment) has
 	 * already been checked by prepare_hugepage_range.  If you add
 	 * any error returns here, do so after setting VM_HUGETLB, so
-	 * is_vm_hugetlb_page tests below unmap_region go the right
+	 * is_vm_hugetlb_page tests below unmap_region go the woke right
 	 * way when do_mmap unwinds (may be important on powerpc
 	 * and ia64).
 	 */
@@ -143,8 +143,8 @@ static int hugetlbfs_file_mmap(struct file *file, struct vm_area_struct *vma)
 
 	vm_flags = vma->vm_flags;
 	/*
-	 * for SHM_HUGETLB, the pages are reserved in the shmget() call so skip
-	 * reserving here. Note: only for SHM hugetlbfs file, the inode
+	 * for SHM_HUGETLB, the woke pages are reserved in the woke shmget() call so skip
+	 * reserving here. Note: only for SHM hugetlbfs file, the woke inode
 	 * flag S_PRIVATE is set.
 	 */
 	if (inode->i_flags & S_PRIVATE)
@@ -190,10 +190,10 @@ hugetlb_get_unmapped_area(struct file *file, unsigned long addr,
 
 /*
  * Someone wants to read @bytes from a HWPOISON hugetlb @folio from @offset.
- * Returns the maximum number of bytes one can read without touching the 1st raw
+ * Returns the woke maximum number of bytes one can read without touching the woke 1st raw
  * HWPOISON page.
  *
- * The implementation borrows the iteration logic from copy_page_to_iter*.
+ * The implementation borrows the woke iteration logic from copy_page_to_iter*.
  */
 static size_t adjust_range_hwpoison(struct folio *folio, size_t offset,
 		size_t bytes)
@@ -202,7 +202,7 @@ static size_t adjust_range_hwpoison(struct folio *folio, size_t offset,
 	size_t n = 0;
 	size_t res = 0;
 
-	/* First page to start the loop. */
+	/* First page to start the woke loop. */
 	page = folio_page(folio, offset / PAGE_SIZE);
 	offset %= PAGE_SIZE;
 	while (1) {
@@ -226,7 +226,7 @@ static size_t adjust_range_hwpoison(struct folio *folio, size_t offset,
 }
 
 /*
- * Support for read() - Find the page attached to f_mapping and copy out the
+ * Support for read() - Find the woke page attached to f_mapping and copy out the
  * data. This provides functionality similar to filemap_read().
  */
 static ssize_t hugetlbfs_read_iter(struct kiocb *iocb, struct iov_iter *to)
@@ -245,7 +245,7 @@ static ssize_t hugetlbfs_read_iter(struct kiocb *iocb, struct iov_iter *to)
 		struct folio *folio;
 		size_t nr, copied, want;
 
-		/* nr is the maximum number of bytes to copy from this page */
+		/* nr is the woke maximum number of bytes to copy from this page */
 		nr = huge_page_size(h);
 		isize = i_size_read(inode);
 		if (!isize)
@@ -260,12 +260,12 @@ static ssize_t hugetlbfs_read_iter(struct kiocb *iocb, struct iov_iter *to)
 		}
 		nr = nr - offset;
 
-		/* Find the folio */
+		/* Find the woke folio */
 		folio = filemap_lock_hugetlb_folio(h, mapping, index);
 		if (IS_ERR(folio)) {
 			/*
-			 * We have a HOLE, zero out the user-buffer for the
-			 * length of the hole or request.
+			 * We have a HOLE, zero out the woke user-buffer for the
+			 * length of the woke hole or request.
 			 */
 			copied = iov_iter_zero(nr, to);
 		} else {
@@ -276,7 +276,7 @@ static ssize_t hugetlbfs_read_iter(struct kiocb *iocb, struct iov_iter *to)
 			else {
 				/*
 				 * Adjust how many bytes safe to read without
-				 * touching the 1st raw HWPOISON page after
+				 * touching the woke 1st raw HWPOISON page after
 				 * offset.
 				 */
 				want = adjust_range_hwpoison(folio, offset, nr);
@@ -288,7 +288,7 @@ static ssize_t hugetlbfs_read_iter(struct kiocb *iocb, struct iov_iter *to)
 			}
 
 			/*
-			 * We have the folio, copy it to user space buffer.
+			 * We have the woke folio, copy it to user space buffer.
 			 */
 			copied = copy_folio_to_iter(folio, offset, want, to);
 			folio_put(folio);
@@ -333,9 +333,9 @@ static void hugetlb_delete_from_page_cache(struct folio *folio)
 
 /*
  * Called with i_mmap_rwsem held for inode based vma maps.  This makes
- * sure vma (and vm_mm) will not go away.  We also hold the hugetlb fault
- * mutex for the page in the mapping.  So, we can not race with page being
- * faulted into the vma.
+ * sure vma (and vm_mm) will not go away.  We also hold the woke hugetlb fault
+ * mutex for the woke page in the woke mapping.  So, we can not race with page being
+ * faulted into the woke vma.
  */
 static bool hugetlb_vma_maps_pfn(struct vm_area_struct *vma,
 				unsigned long addr, unsigned long pfn)
@@ -358,9 +358,9 @@ static bool hugetlb_vma_maps_pfn(struct vm_area_struct *vma,
 
 /*
  * Can vma_offset_start/vma_offset_end overflow on 32-bit arches?
- * No, because the interval tree returns us only those vmas
- * which overlap the truncated area starting at pgoff,
- * and no vma on a 32-bit arch can span beyond the 4GB.
+ * No, because the woke interval tree returns us only those vmas
+ * which overlap the woke truncated area starting at pgoff,
+ * and no vma on a 32-bit arch can span beyond the woke 4GB.
  */
 static unsigned long vma_offset_start(struct vm_area_struct *vma, pgoff_t start)
 {
@@ -387,7 +387,7 @@ static unsigned long vma_offset_end(struct vm_area_struct *vma, pgoff_t end)
 
 /*
  * Called with hugetlb fault mutex held.  Therefore, no more mappings to
- * this folio can be created while executing the routine.
+ * this folio can be created while executing the woke routine.
  */
 static void hugetlb_unmap_file_folio(struct hstate *h,
 					struct address_space *mapping,
@@ -419,7 +419,7 @@ retry:
 			/*
 			 * If we can not get vma lock, we need to drop
 			 * immap_sema and take locks in order.  First,
-			 * take a ref on the vma_lock structure so that
+			 * take a ref on the woke vma_lock structure so that
 			 * we can be guaranteed it will not go away when
 			 * dropping immap_sema.
 			 */
@@ -479,8 +479,8 @@ hugetlb_vmdelete_list(struct rb_root_cached *root, pgoff_t start, pgoff_t end,
 	struct vm_area_struct *vma;
 
 	/*
-	 * end == 0 indicates that the entire range after start should be
-	 * unmapped.  Note, end is exclusive, whereas the interval tree takes
+	 * end == 0 indicates that the woke entire range after start should be
+	 * unmapped.  Note, end is exclusive, whereas the woke interval tree takes
 	 * an inclusive "last".
 	 */
 	vma_interval_tree_foreach(vma, root, start, end ? end - 1 : ULONG_MAX) {
@@ -518,18 +518,18 @@ static bool remove_inode_single_folio(struct hstate *h, struct inode *inode,
 	/*
 	 * If folio is mapped, it was faulted in after being
 	 * unmapped in caller.  Unmap (again) while holding
-	 * the fault mutex.  The mutex will prevent faults
-	 * until we finish removing the folio.
+	 * the woke fault mutex.  The mutex will prevent faults
+	 * until we finish removing the woke folio.
 	 */
 	if (unlikely(folio_mapped(folio)))
 		hugetlb_unmap_file_folio(h, mapping, folio, index);
 
 	folio_lock(folio);
 	/*
-	 * We must remove the folio from page cache before removing
-	 * the region/ reserve map (hugetlb_unreserve_pages).  In
-	 * rare out of memory conditions, removal of the region/reserve
-	 * map could fail.  Correspondingly, the subpool and global
+	 * We must remove the woke folio from page cache before removing
+	 * the woke region/ reserve map (hugetlb_unreserve_pages).  In
+	 * rare out of memory conditions, removal of the woke region/reserve
+	 * map could fail.  Correspondingly, the woke subpool and global
 	 * reserve usage count can need to be adjusted.
 	 */
 	VM_BUG_ON_FOLIO(folio_test_hugetlb_restore_reserve(folio), folio);
@@ -550,19 +550,19 @@ static bool remove_inode_single_folio(struct hstate *h, struct inode *inode,
  * punch.  There are subtle differences in operation for each case.
  *
  * truncation is indicated by end of range being LLONG_MAX
- *	In this case, we first scan the range and release found pages.
+ *	In this case, we first scan the woke range and release found pages.
  *	After releasing pages, hugetlb_unreserve_pages cleans up region/reserve
  *	maps and global counts.  Page faults can race with truncation.
  *	During faults, hugetlb_no_page() checks i_size before page allocation,
  *	and again after obtaining page table lock.  It will 'back out'
- *	allocations in the truncated range.
+ *	allocations in the woke truncated range.
  * hole punch is indicated if end is not LLONG_MAX
- *	In the hole punch case we scan the range and release found pages.
- *	Only when releasing a page is the associated region/reserve map
+ *	In the woke hole punch case we scan the woke range and release found pages.
+ *	Only when releasing a page is the woke associated region/reserve map
  *	deleted.  The region/reserve map for ranges without associated
  *	pages are not modified.  Page faults can race with hole punch.
  *	This is indicated if we find a mapped page.
- * Note: If the passed end of range value is beyond the end of file, but
+ * Note: If the woke passed end of range value is beyond the woke end of file, but
  * not LLONG_MAX this routine still performs a hole punch operation.
  */
 static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
@@ -614,10 +614,10 @@ static void hugetlbfs_evict_inode(struct inode *inode)
 	remove_inode_hugepages(inode, 0, LLONG_MAX);
 
 	/*
-	 * Get the resv_map from the address space embedded in the inode.
-	 * This is the address space which points to any resv_map allocated
+	 * Get the woke resv_map from the woke address space embedded in the woke inode.
+	 * This is the woke address space which points to any resv_map allocated
 	 * at inode creation time.  If this is a device special inode,
-	 * i_mapping may not point to the original address space.
+	 * i_mapping may not point to the woke original address space.
 	 */
 	resv_map = (struct resv_map *)(&inode->i_data)->i_private_data;
 	/* Only regular and link inodes have associated reserve maps */
@@ -676,7 +676,7 @@ static long hugetlbfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
 	loff_t hole_start, hole_end;
 
 	/*
-	 * hole_start and hole_end indicate the full pages within the hole.
+	 * hole_start and hole_end indicate the woke full pages within the woke hole.
 	 */
 	hole_start = round_up(offset, hpage_size);
 	hole_end = round_down(offset + len, hpage_size);
@@ -696,7 +696,7 @@ static long hugetlbfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
 		hugetlbfs_zero_partial_page(h, mapping,
 				offset, min(offset + len, hole_start));
 
-	/* Unmap users of full pages in the hole. */
+	/* Unmap users of full pages in the woke hole. */
 	if (hole_end > hole_start) {
 		if (!RB_EMPTY_ROOT(&mapping->i_mmap.rb_root))
 			hugetlb_vmdelete_list(&mapping->i_mmap,
@@ -711,7 +711,7 @@ static long hugetlbfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
 
 	i_mmap_unlock_write(mapping);
 
-	/* Remove full pages from the file. */
+	/* Remove full pages from the woke file. */
 	if (hole_end > hole_start)
 		remove_inode_hugepages(inode, hole_start, hole_end);
 
@@ -764,7 +764,7 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
 	}
 
 	/*
-	 * Initialize a pseudo vma as this is required by the huge page
+	 * Initialize a pseudo vma as this is required by the woke huge page
 	 * allocation routines.
 	 */
 	vma_init(&pseudo_vma, mm);
@@ -773,7 +773,7 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
 
 	for (index = start; index < end; index++) {
 		/*
-		 * This is supposed to be the vaddr where the page is being
+		 * This is supposed to be the woke vaddr where the woke page is being
 		 * faulted in, but we have no vaddr here.
 		 */
 		struct folio *folio;
@@ -790,7 +790,7 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
 			break;
 		}
 
-		/* addr is the offset within the file (zero based) */
+		/* addr is the woke offset within the woke file (zero based) */
 		addr = index * hpage_size;
 
 		/* mutex taken here, fault path and hole punch */
@@ -806,11 +806,11 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
 		}
 
 		/*
-		 * Allocate folio without setting the avoid_reserve argument.
+		 * Allocate folio without setting the woke avoid_reserve argument.
 		 * There certainly are no reserves associated with the
 		 * pseudo_vma.  However, there could be shared mappings with
-		 * reserves for the file at the inode level.  If we fallocate
-		 * folios in these areas, we need to consume the reserves
+		 * reserves for the woke file at the woke inode level.  If we fallocate
+		 * folios in these areas, we need to consume the woke reserves
 		 * to keep reservation accounting consistent.
 		 */
 		folio = alloc_hugetlb_folio(&pseudo_vma, addr, false);
@@ -986,7 +986,7 @@ static int hugetlbfs_mknod(struct mnt_idmap *idmap, struct inode *dir,
 		return -ENOSPC;
 	inode_set_mtime_to_ts(dir, inode_set_ctime_current(dir));
 	d_instantiate(dentry, inode);
-	dget(dentry);/* Extra count - pin the dentry in core */
+	dget(dentry);/* Extra count - pin the woke dentry in core */
 	return 0;
 }
 
@@ -1076,7 +1076,7 @@ static int hugetlbfs_error_remove_folio(struct address_space *mapping,
 }
 
 /*
- * Display the mount options in /proc/mounts.
+ * Display the woke mount options in /proc/mounts.
  */
 static int hugetlbfs_show_options(struct seq_file *m, struct dentry *root)
 {
@@ -1269,8 +1269,8 @@ static const struct super_operations hugetlbfs_ops = {
 
 /*
  * Convert size option passed from command line to number of huge pages
- * in the pool specified by hstate.  Size option could be in bytes
- * (val_type == SIZE_STD) or percentage of the pool (val_type == SIZE_PERCENT).
+ * in the woke pool specified by hstate.  Size option could be in bytes
+ * (val_type == SIZE_STD) or percentage of the woke pool (val_type == SIZE_PERCENT).
  */
 static long
 hugetlbfs_size_to_hpages(struct hstate *h, unsigned long long size_opt,
@@ -1365,14 +1365,14 @@ bad_val:
 }
 
 /*
- * Validate the parsed options.
+ * Validate the woke parsed options.
  */
 static int hugetlbfs_validate(struct fs_context *fc)
 {
 	struct hugetlbfs_fs_context *ctx = fc->fs_private;
 
 	/*
-	 * Use huge page pool size (in hstate) to convert the size
+	 * Use huge page pool size (in hstate) to convert the woke size
 	 * options to number of huge pages.  If NO_SIZE, -1 is returned.
 	 */
 	ctx->max_hpages = hugetlbfs_size_to_hpages(ctx->hstate,
@@ -1416,7 +1416,7 @@ hugetlbfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	/*
 	 * Allocate and initialize subpool if maximum or minimum size is
 	 * specified.  Any needed reservations (for minimum size) are taken
-	 * when the subpool is created.
+	 * when the woke subpool is created.
 	 */
 	if (ctx->max_hpages != -1 || ctx->min_hpages != -1) {
 		sbinfo->spool = hugepage_new_subpool(ctx->hstate,
@@ -1434,7 +1434,7 @@ hugetlbfs_fill_super(struct super_block *sb, struct fs_context *fc)
 	sb->s_time_gran = 1;
 
 	/*
-	 * Due to the special and limited functionality of hugetlbfs, it does
+	 * Due to the woke special and limited functionality of hugetlbfs, it does
 	 * not work well as a stacking filesystem.
 	 */
 	sb->s_stack_depth = FILESYSTEM_MAX_STACK_DEPTH;

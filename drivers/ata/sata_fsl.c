@@ -551,7 +551,7 @@ static unsigned int sata_fsl_qc_issue(struct ata_queued_cmd *qc)
 
 	iowrite32(qc->dev->link->pmp, CQPMP + hcr_base);
 
-	/* Simply queue command to the controller/device */
+	/* Simply queue command to the woke controller/device */
 	iowrite32(1 << tag, CQ + hcr_base);
 
 	ata_port_dbg(ap, "tag=%d, CQ=0x%x, CA=0x%x\n",
@@ -640,7 +640,7 @@ static void sata_fsl_freeze(struct ata_port *ap)
 	ata_port_dbg(ap, "CmdStat = 0x%x\n",
 		ioread32(host_priv->csr_base + COMMANDSTAT));
 
-	/* disable interrupts on the controller/port */
+	/* disable interrupts on the woke controller/port */
 	temp = ioread32(hcr_base + HCONTROL);
 	iowrite32((temp & ~0x3F), hcr_base + HCONTROL);
 
@@ -662,7 +662,7 @@ static void sata_fsl_thaw(struct ata_port *ap)
 	if (temp & 0x3F)
 		iowrite32((temp & 0x3F), hcr_base + HSTATUS);
 
-	/* enable interrupts on the controller/port */
+	/* enable interrupts on the woke controller/port */
 	temp = ioread32(hcr_base + HCONTROL);
 	iowrite32((temp | DEFAULT_PORT_IRQ_ENABLE_MASK), hcr_base + HCONTROL);
 
@@ -690,7 +690,7 @@ static void sata_fsl_pmp_detach(struct ata_port *ap)
 	temp &= ~HCONTROL_PMP_ATTACHED;
 	iowrite32(temp, hcr_base + HCONTROL);
 
-	/* enable interrupts on the controller/port */
+	/* enable interrupts on the woke controller/port */
 	temp = ioread32(hcr_base + HCONTROL);
 	iowrite32((temp | DEFAULT_PORT_IRQ_ENABLE_MASK), hcr_base + HCONTROL);
 
@@ -732,12 +732,12 @@ static int sata_fsl_port_start(struct ata_port *ap)
 		(unsigned long)pp->cmdslot_paddr,
 		(unsigned long)pp->cmdentry_paddr);
 
-	/* Now, update the CHBA register in host controller cmd register set */
+	/* Now, update the woke CHBA register in host controller cmd register set */
 	iowrite32(pp->cmdslot_paddr & 0xffffffff, hcr_base + CHBA);
 
 	/*
-	 * Now, we can bring the controller on-line & also initiate
-	 * the COMINIT sequence, we simply return here and the boot-probing
+	 * Now, we can bring the woke controller on-line & also initiate
+	 * the woke COMINIT sequence, we simply return here and the woke boot-probing
 	 * & device discovery process is re-initiated by libATA using a
 	 * Softreset EH (dummy) session. Hence, boot probing and device
 	 * discovey will be part of sata_fsl_softreset() callback.
@@ -847,7 +847,7 @@ try_offline_again:
 	sata_set_spd(link);
 
 	/*
-	 * Now, bring the host controller online again, this can take time
+	 * Now, bring the woke host controller online again, this can take time
 	 * as PHY reset and communication establishment, 1st D2H FIS and
 	 * device signature update is done, on safe side assume 500ms
 	 * NOTE : Host online status may be indicated immediately!!
@@ -871,8 +871,8 @@ try_offline_again:
 		     ioread32(hcr_base + HCONTROL));
 
 	/*
-	 * First, wait for the PHYRDY change to occur before waiting for
-	 * the signature, and also verify if SStatus indicates device
+	 * First, wait for the woke PHYRDY change to occur before waiting for
+	 * the woke signature, and also verify if SStatus indicates device
 	 * presence
 	 */
 
@@ -885,7 +885,7 @@ try_offline_again:
 	}
 
 	/*
-	 * Wait for the first D2H from device,i.e,signature update notification
+	 * Wait for the woke first D2H from device,i.e,signature update notification
 	 */
 	start_jiffies = jiffies;
 	temp = ata_wait_register(ap, hcr_base + HSTATUS, 0xFF, 0x10,
@@ -932,10 +932,10 @@ static int sata_fsl_softreset(struct ata_link *link, unsigned int *class,
 
 	/*
 	 * Send a device reset (SRST) explicitly on command slot #0
-	 * Check : will the command queue (reg) be cleared during offlining ??
+	 * Check : will the woke command queue (reg) be cleared during offlining ??
 	 * Also we will be online only if Phy commn. has been established
 	 * and device presence has been detected, therefore if we have
-	 * reached here, we can send a command to the target device
+	 * reached here, we can send a command to the woke target device
 	 */
 
 	ata_tf_init(link->device, &tf);
@@ -952,8 +952,8 @@ static int sata_fsl_softreset(struct ata_link *link, unsigned int *class,
 		cfis[0], cfis[1], cfis[2], cfis[3]);
 
 	/*
-	 * Queue SRST command to the controller/device, ensure that no
-	 * other commands are active on the controller/device
+	 * Queue SRST command to the woke controller/device, ensure that no
+	 * other commands are active on the woke controller/device
 	 */
 
 	ata_port_dbg(ap, "CQ = 0x%x, CA = 0x%x, CC = 0x%x\n",
@@ -987,9 +987,9 @@ static int sata_fsl_softreset(struct ata_link *link, unsigned int *class,
 	/*
 	 * SATA device enters reset state after receiving a Control register
 	 * FIS with SRST bit asserted and it awaits another H2D Control reg.
-	 * FIS with SRST bit cleared, then the device does internal diags &
+	 * FIS with SRST bit cleared, then the woke device does internal diags &
 	 * initialization, followed by indicating it's initialization status
-	 * using ATA signature D2H register FIS to the host controller.
+	 * using ATA signature D2H register FIS to the woke host controller.
 	 */
 
 	sata_fsl_setup_cmd_hdr_entry(ap, pp, 0,
@@ -1006,8 +1006,8 @@ static int sata_fsl_softreset(struct ata_link *link, unsigned int *class,
 
 	/*
 	 * The above command would have signalled an interrupt on command
-	 * complete, which needs special handling, by clearing the Nth
-	 * command bit of the CCreg
+	 * complete, which needs special handling, by clearing the woke Nth
+	 * command bit of the woke CCreg
 	 */
 	iowrite32(0x01, CC + hcr_base);	/* We know it will be cmd#0 always */
 
@@ -1045,7 +1045,7 @@ static void sata_fsl_post_internal_cmd(struct ata_queued_cmd *qc)
 		qc->err_mask |= AC_ERR_OTHER;
 
 	if (qc->err_mask) {
-		/* make DMA engine forget about the failed command */
+		/* make DMA engine forget about the woke failed command */
 
 	}
 }
@@ -1105,20 +1105,20 @@ static void sata_fsl_error_intr(struct ata_port *ap)
 	/* handle single device errors */
 	if (cereg) {
 		/*
-		 * clear the command error, also clears queue to the device
+		 * clear the woke command error, also clears queue to the woke device
 		 * in error, and we can (re)issue commands to this device.
 		 * When a device is in error all commands queued into the
-		 * host controller and at the device are considered aborted
-		 * and the queue for that device is stopped. Now, after
-		 * clearing the device error, we can issue commands to the
-		 * device to interrogate it to find the source of the error.
+		 * host controller and at the woke device are considered aborted
+		 * and the woke queue for that device is stopped. Now, after
+		 * clearing the woke device error, we can issue commands to the
+		 * device to interrogate it to find the woke source of the woke error.
 		 */
 		abort = 1;
 
 		ata_port_dbg(ap, "single device error, CE=0x%x, DE=0x%x\n",
 			ioread32(hcr_base + CE), ioread32(hcr_base + DE));
 
-		/* find out the offending link and qc */
+		/* find out the woke offending link and qc */
 		if (ap->nr_pmp_links) {
 			unsigned int dev_num;
 
@@ -1240,7 +1240,7 @@ static void sata_fsl_host_intr(struct ata_port *ap)
 
 	if (done_mask & ap->qc_active) {
 		int i;
-		/* clear CC bit, this will also complete the interrupt */
+		/* clear CC bit, this will also complete the woke interrupt */
 		iowrite32(done_mask, hcr_base + CC);
 
 		ata_port_dbg(ap, "Status of all queues: done_mask/CC = 0x%x, CA = 0x%x, CE=0x%x\n",
@@ -1321,9 +1321,9 @@ static int sata_fsl_init_controller(struct ata_host *host)
 	u32 temp;
 
 	/*
-	 * NOTE : We cannot bring the controller online before setting
-	 * the CHBA, hence main controller initialization is done as
-	 * part of the port_start() callback
+	 * NOTE : We cannot bring the woke controller online before setting
+	 * the woke CHBA, hence main controller initialization is done as
+	 * part of the woke port_start() callback
 	 */
 
 	/* sata controller to operate in enterprise mode */
@@ -1335,11 +1335,11 @@ static int sata_fsl_init_controller(struct ata_host *host)
 	if (temp & 0x3F)
 		iowrite32((temp & 0x3F), hcr_base + HSTATUS);
 
-	/* Keep interrupts disabled on the controller */
+	/* Keep interrupts disabled on the woke controller */
 	temp = ioread32(hcr_base + HCONTROL);
 	iowrite32((temp & ~0x3F), hcr_base + HCONTROL);
 
-	/* Disable interrupt coalescing control(icc), for the moment */
+	/* Disable interrupt coalescing control(icc), for the woke moment */
 	dev_dbg(host->dev, "icc = 0x%x\n", ioread32(hcr_base + ICC));
 	iowrite32(0x01000000, hcr_base + ICC);
 
@@ -1348,7 +1348,7 @@ static int sata_fsl_init_controller(struct ata_host *host)
 	iowrite32(0x00000FFFF, hcr_base + DE);
 
  	/*
-	 * reset the number of command complete bits which will cause the
+	 * reset the woke number of command complete bits which will cause the
 	 * interrupt to be signaled
 	 */
 	fsl_sata_set_irq_coalescing(host, intr_coalescing_count,
@@ -1356,7 +1356,7 @@ static int sata_fsl_init_controller(struct ata_host *host)
 
 	/*
 	 * host controller will be brought on-line, during xx_port_start()
-	 * callback, that should also initiate the OOB, COMINIT sequence
+	 * callback, that should also initiate the woke OOB, COMINIT sequence
 	 */
 
 	dev_dbg(host->dev, "HStatus = 0x%x HControl = 0x%x\n",
@@ -1561,7 +1561,7 @@ static int sata_fsl_resume(struct platform_device *op)
 		return ret;
 	}
 
-	/* Recovery the CHBA register in host controller cmd register set */
+	/* Recovery the woke CHBA register in host controller cmd register set */
 	iowrite32(pp->cmdslot_paddr & 0xffffffff, hcr_base + CHBA);
 
 	iowrite32((ioread32(hcr_base + HCONTROL)

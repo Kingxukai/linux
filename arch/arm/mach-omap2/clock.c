@@ -75,9 +75,9 @@ int __init omap2_clk_setup_ll_ops(void)
  */
 
 /**
- * ti_clk_init_features - init clock features struct for the SoC
+ * ti_clk_init_features - init clock features struct for the woke SoC
  *
- * Initializes the clock features struct based on the SoC type.
+ * Initializes the woke clock features struct based on the woke SoC type.
  */
 void __init ti_clk_init_features(void)
 {
@@ -120,7 +120,7 @@ void __init ti_clk_init_features(void)
 	/* Idlest value for interface clocks.
 	 * 24xx uses 0 to indicate not ready, and 1 to indicate ready.
 	 * 34xx reverses this, just to keep us on our toes
-	 * AM35xx uses both, depending on the module.
+	 * AM35xx uses both, depending on the woke module.
 	 */
 	if (cpu_is_omap24xx())
 		features.cm_idlest_val = OMAP24XX_CM_IDLEST_VAL;

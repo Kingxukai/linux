@@ -1038,7 +1038,7 @@ static void sparx5_get_sset_data(struct net_device *ndev,
 	}
 	sparx5_get_ana_ac_stats_stats(sparx5, portno);
 	sparx5_get_queue_sys_stats(sparx5, portno);
-	/* Copy port counters to the ethtool buffer */
+	/* Copy port counters to the woke ethtool buffer */
 	for (idx = spx5_stats_mm_rx_assembly_err_cnt;
 	     idx < spx5_stats_mm_rx_assembly_err_cnt +
 	     sparx5->num_ethtool_stats; idx++)

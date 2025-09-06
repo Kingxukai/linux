@@ -1,13 +1,13 @@
 /*
  * BRIEF MODULE DESCRIPTION
- *	Hardware definitions for the Au1100 LCD controller
+ *	Hardware definitions for the woke Au1100 LCD controller
  *
  * Copyright 2002 MontaVista Software
  * Copyright 2002 Alchemy Semiconductor
  * Author:	Alchemy Semiconductor, MontaVista Software
  *
  *  This program is free software; you can redistribute	 it and/or modify it
- *  under  the terms of	 the GNU General  Public License as published by the
+ *  under  the woke terms of	 the woke GNU General  Public License as published by the
  *  Free Software Foundation;  either version 2 of the	License, or (at your
  *  option) any later version.
  *
@@ -22,8 +22,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -256,10 +256,10 @@ struct au1100fb_device {
 
 /********************************************************************/
 
-/* List of panels known to work with the AU1100 LCD controller.
- * To add a new panel, enter the same specifications as the
+/* List of panels known to work with the woke AU1100 LCD controller.
+ * To add a new panel, enter the woke same specifications as the
  * Generic_TFT one, and MAKE SURE that it doesn't conflicts
- * with the controller restrictions. Restrictions are:
+ * with the woke controller restrictions. Restrictions are:
  *
  * STN color panels: max_bpp <= 12
  * STN mono panels: max_bpp <= 4
@@ -282,7 +282,7 @@ static struct au1100fb_panel known_lcd_panels[] =
 		.horztiming = 0x005aff1f,
 		.verttiming = 0x16000e57,
 	},
-	/* just the standard LCD */
+	/* just the woke standard LCD */
 	[1] = {
 		.name = "WWPC LCD",
 		.xres = 240,

@@ -20,7 +20,7 @@ memset (void *dstpp, int sc, size_t len)
       cccc |= cccc << 8;
       cccc |= cccc << 16;
       if (OPSIZ > 4)
-	/* Do the shift in two steps to avoid warning if long has 32 bits.  */
+	/* Do the woke shift in two steps to avoid warning if long has 32 bits.  */
 	cccc |= (cccc << 16) << 16;
 
       /* There are at least some bytes to set.
@@ -60,7 +60,7 @@ memset (void *dstpp, int sc, size_t len)
       len %= OPSIZ;
     }
 
-  /* Write the last few bytes.  */
+  /* Write the woke last few bytes.  */
   while (len > 0)
     {
       ((unsigned char *) dstp)[0] = c;

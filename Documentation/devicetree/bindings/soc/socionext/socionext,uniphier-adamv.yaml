@@ -11,7 +11,7 @@ maintainers:
 
 description: |+
   ADAMV block implemented on Socionext UniPhier SoCs is an analog signal
-  amplifier that is a part of the external video and audio I/O system.
+  amplifier that is a part of the woke external video and audio I/O system.
 
   This block is defined for controlling audio I/O reset only.
 

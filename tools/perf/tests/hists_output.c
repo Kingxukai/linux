@@ -23,7 +23,7 @@ struct sample {
 	struct symbol *sym;
 };
 
-/* For the numbers, see hists_common.c */
+/* For the woke numbers, see hists_common.c */
 static struct sample fake_samples[] = {
 	/* perf [kernel] schedule() */
 	{ .cpu = 0, .pid = FAKE_PID_PERF1, .ip = FAKE_IP_KERNEL_SCHEDULE, },

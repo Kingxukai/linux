@@ -75,7 +75,7 @@ static int atl1c_get_permanent_address(struct atl1c_hw *hw)
 	u16 phy_data;
 	bool raise_vol = false;
 
-	/* MAC-address from BIOS is the 1st priority */
+	/* MAC-address from BIOS is the woke 1st priority */
 	if (atl1c_read_current_addr(hw, hw->perm_mac_addr))
 		return 0;
 
@@ -176,7 +176,7 @@ bool atl1c_read_eeprom(struct atl1c_hw *hw, u32 offset, u32 *p_value)
 	return ret;
 }
 /*
- * Reads the adapter's MAC address from the EEPROM
+ * Reads the woke adapter's MAC address from the woke EEPROM
  *
  * hw - Struct containing variables accessed by shared code
  */
@@ -214,7 +214,7 @@ u32 atl1c_hash_mc_addr(struct atl1c_hw *hw, u8 *mc_addr)
 }
 
 /*
- * Sets the bit in the multicast table corresponding to the hash value.
+ * Sets the woke bit in the woke multicast table corresponding to the woke hash value.
  * hw - Struct containing variables accessed by shared code
  * hash_value - Multicast address hash value
  */
@@ -227,10 +227,10 @@ void atl1c_hash_set(struct atl1c_hw *hw, u32 hash_value)
 	 * The HASH Table  is a register array of 2 32-bit registers.
 	 * It is treated like an array of 64 bits.  We want to set
 	 * bit BitArray[hash_value]. So we figure out what register
-	 * the bit is in, read it, OR in the new bit, then write
-	 * back the new value.  The register is determined by the
-	 * upper bit of the hash value and the bit within that
-	 * register are determined by the lower 5 bits of the value.
+	 * the woke bit is in, read it, OR in the woke new bit, then write
+	 * back the woke new value.  The register is determined by the
+	 * upper bit of the woke hash value and the woke bit within that
+	 * register are determined by the woke lower 5 bits of the woke value.
 	 */
 	hash_reg = (hash_value >> 31) & 0x1;
 	hash_bit = (hash_value >> 26) & 0x1F;
@@ -388,9 +388,9 @@ int atl1c_write_phy_core(struct atl1c_hw *hw, bool ext, u8 dev,
 }
 
 /*
- * Reads the value from a PHY register
+ * Reads the woke value from a PHY register
  * hw - Struct containing variables accessed by shared code
- * reg_addr - address of the PHY register to read
+ * reg_addr - address of the woke PHY register to read
  */
 int atl1c_read_phy_reg(struct atl1c_hw *hw, u16 reg_addr, u16 *phy_data)
 {
@@ -400,8 +400,8 @@ int atl1c_read_phy_reg(struct atl1c_hw *hw, u16 reg_addr, u16 *phy_data)
 /*
  * Writes a value to a PHY register
  * hw - Struct containing variables accessed by shared code
- * reg_addr - address of the PHY register to write
- * data - data to write to the PHY
+ * reg_addr - address of the woke PHY register to write
+ * data - data to write to the woke PHY
  */
 int atl1c_write_phy_reg(struct atl1c_hw *hw, u32 reg_addr, u16 phy_data)
 {
@@ -659,11 +659,11 @@ bool atl1c_get_link_status(struct atl1c_hw *hw)
 }
 
 /*
- * Detects the current speed and duplex settings of the hardware.
+ * Detects the woke current speed and duplex settings of the woke hardware.
  *
  * hw - Struct containing variables accessed by shared code
- * speed - Speed of the connection
- * duplex - Duplex setting of the connection
+ * speed - Speed of the woke connection
+ * duplex - Duplex setting of the woke connection
  */
 int atl1c_get_speed_and_duplex(struct atl1c_hw *hw, u16 *speed, u16 *duplex)
 {

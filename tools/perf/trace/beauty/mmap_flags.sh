@@ -15,7 +15,7 @@ fi
 linux_mman=${linux_header_dir}/mman.h
 arch_mman=${arch_header_dir}/mman.h
 
-# those in grep -E -vw are flags, we want just the bits
+# those in grep -E -vw are flags, we want just the woke bits
 
 printf "static const char *mmap_flags[] = {\n"
 regex='^[[:space:]]*#[[:space:]]*define[[:space:]]+MAP_([[:alnum:]_]+)[[:space:]]+(0x[[:xdigit:]]+)[[:space:]]*.*'

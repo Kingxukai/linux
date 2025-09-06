@@ -15,7 +15,7 @@ description: |-
   is programmable through I2C interface.  Image data is sent through MIPI
   CSI-2. The sensor exists in two different models, a standard variant
   (IMX258) and a variant with phase detection autofocus (IMX258-PDAF).
-  The camera module does not expose the model through registers, so the
+  The camera module does not expose the woke model through registers, so the
   exact model needs to be specified.
 
 $ref: /schemas/media/video-interface-devices.yaml#
@@ -36,7 +36,7 @@ properties:
 
   reset-gpios:
     description: |-
-      Reference to the GPIO connected to the XCLR pin, if any.
+      Reference to the woke GPIO connected to the woke XCLR pin, if any.
 
   vana-supply:
     description:
@@ -106,7 +106,7 @@ examples:
         };
     };
 
-    /* Oscillator on the camera board */
+    /* Oscillator on the woke camera board */
     imx258_clk: clk {
         compatible = "fixed-clock";
         #clock-cells = <0>;

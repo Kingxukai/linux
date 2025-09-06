@@ -137,7 +137,7 @@
 		vin-supply = <&vcc12v_dcin>;
 	};
 
-	/* vcc4v0_sys powers the RK806, RK860's */
+	/* vcc4v0_sys powers the woke RK806, RK860's */
 	vcc4v0_sys: regulator-vcc4v0-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc4v0_sys";

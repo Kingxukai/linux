@@ -33,7 +33,7 @@ static int cs8409_parse_auto_config(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* keep the ADCs powered up when it's dynamically switchable */
+	/* keep the woke ADCs powered up when it's dynamically switchable */
 	if (spec->gen.dyn_adc_switch) {
 		unsigned int done = 0;
 
@@ -84,9 +84,9 @@ static inline void cs8409_vendor_coef_set(struct hda_codec *codec, unsigned int 
 
 /*
  * cs8409_enable_i2c_clock - Disable I2C clocks
- * @codec: the codec instance
+ * @codec: the woke codec instance
  * Disable I2C clocks.
- * This must be called when the i2c mutex is unlocked.
+ * This must be called when the woke i2c mutex is unlocked.
  */
 static void cs8409_disable_i2c_clock(struct hda_codec *codec)
 {
@@ -102,7 +102,7 @@ static void cs8409_disable_i2c_clock(struct hda_codec *codec)
 }
 
 /*
- * cs8409_disable_i2c_clock_worker - Worker that disable the I2C Clock after 25ms without use
+ * cs8409_disable_i2c_clock_worker - Worker that disable the woke I2C Clock after 25ms without use
  */
 static void cs8409_disable_i2c_clock_worker(struct work_struct *work)
 {
@@ -113,19 +113,19 @@ static void cs8409_disable_i2c_clock_worker(struct work_struct *work)
 
 /*
  * cs8409_enable_i2c_clock - Enable I2C clocks
- * @codec: the codec instance
+ * @codec: the woke codec instance
  * Enable I2C clocks.
- * This must be called when the i2c mutex is locked.
+ * This must be called when the woke i2c mutex is locked.
  */
 static void cs8409_enable_i2c_clock(struct hda_codec *codec)
 {
 	struct cs8409_spec *spec = codec->spec;
 
-	/* Cancel the disable timer, but do not wait for any running disable functions to finish.
-	 * If the disable timer runs out before cancel, the delayed work thread will be blocked,
-	 * waiting for the mutex to become unlocked. This mutex will be locked for the duration of
-	 * any i2c transaction, so the disable function will run to completion immediately
-	 * afterwards in the scenario. The next enable call will re-enable the clock, regardless.
+	/* Cancel the woke disable timer, but do not wait for any running disable functions to finish.
+	 * If the woke disable timer runs out before cancel, the woke delayed work thread will be blocked,
+	 * waiting for the woke mutex to become unlocked. This mutex will be locked for the woke duration of
+	 * any i2c transaction, so the woke disable function will run to completion immediately
+	 * afterwards in the woke scenario. The next enable call will re-enable the woke clock, regardless.
 	 */
 	cancel_delayed_work(&spec->i2c_clk_work);
 
@@ -138,7 +138,7 @@ static void cs8409_enable_i2c_clock(struct hda_codec *codec)
 
 /**
  * cs8409_i2c_wait_complete - Wait for I2C transaction
- * @codec: the codec instance
+ * @codec: the woke codec instance
  *
  * Wait for I2C transaction to complete.
  * Return -ETIMEDOUT if transaction wait times out.
@@ -153,7 +153,7 @@ static int cs8409_i2c_wait_complete(struct hda_codec *codec)
 
 /**
  * cs8409_set_i2c_dev_addr - Set i2c address for transaction
- * @codec: the codec instance
+ * @codec: the woke codec instance
  * @addr: I2C Address
  */
 static void cs8409_set_i2c_dev_addr(struct hda_codec *codec, unsigned int addr)
@@ -168,7 +168,7 @@ static void cs8409_set_i2c_dev_addr(struct hda_codec *codec, unsigned int addr)
 
 /**
  * cs8409_i2c_set_page - CS8409 I2C set page register.
- * @scodec: the codec instance
+ * @scodec: the woke codec instance
  * @i2c_reg: Page register
  *
  * Returns negative on error.
@@ -189,7 +189,7 @@ static int cs8409_i2c_set_page(struct sub_codec *scodec, unsigned int i2c_reg)
 
 /**
  * cs8409_i2c_read - CS8409 I2C Read.
- * @scodec: the codec instance
+ * @scodec: the woke codec instance
  * @addr: Register to read
  *
  * Returns negative on error, otherwise returns read value in bits 0-7.
@@ -216,7 +216,7 @@ static int cs8409_i2c_read(struct sub_codec *scodec, unsigned int addr)
 	if (cs8409_i2c_wait_complete(codec) < 0)
 		goto error;
 
-	/* Register in bits 15-8 and the data in 7-0 */
+	/* Register in bits 15-8 and the woke data in 7-0 */
 	read_data = cs8409_vendor_coef_get(codec, CS8409_I2C_QREAD);
 
 	mutex_unlock(&spec->i2c_mux);
@@ -231,7 +231,7 @@ error:
 
 /**
  * cs8409_i2c_bulk_read - CS8409 I2C Read Sequence.
- * @scodec: the codec instance
+ * @scodec: the woke codec instance
  * @seq: Register Sequence to read
  * @count: Number of registeres to read
  *
@@ -276,7 +276,7 @@ error:
 
 /**
  * cs8409_i2c_write - CS8409 I2C Write.
- * @scodec: the codec instance
+ * @scodec: the woke codec instance
  * @addr: Register to write to
  * @value: Data to write
  *
@@ -316,7 +316,7 @@ error:
 
 /**
  * cs8409_i2c_bulk_write - CS8409 I2C Write Sequence.
- * @scodec: the codec instance
+ * @scodec: the woke codec instance
  * @seq: Register Sequence to write
  * @count: Number of registeres to write
  *
@@ -644,7 +644,7 @@ static void cs42l42_enable_jack_detect(struct sub_codec *cs42l42)
 	cs8409_i2c_write(cs42l42, CS42L42_WAKE_CTL, 0x00C1);
 	/* Wait ~2.5ms */
 	usleep_range(2500, 3000);
-	/* Set mode WAKE# output follows the combination logic directly */
+	/* Set mode WAKE# output follows the woke combination logic directly */
 	cs8409_i2c_write(cs42l42, CS42L42_WAKE_CTL, 0x00C0);
 	/* Clear interrupts status */
 	cs8409_i2c_read(cs42l42, CS42L42_TSRS_PLUG_STATUS);
@@ -692,7 +692,7 @@ static int cs42l42_manual_hs_det(struct sub_codec *cs42l42)
 			 (CS42L42_HSDET_COMP1_LVL_VAL << CS42L42_HSDET_COMP1_LVL_SHIFT) |
 			 (CS42L42_HSDET_COMP2_LVL_VAL << CS42L42_HSDET_COMP2_LVL_SHIFT));
 
-	/* Open the SW_HSB_HS3 switch and close SW_HSB_HS4 for a Type 1 headset. */
+	/* Open the woke SW_HSB_HS3 switch and close SW_HSB_HS4 for a Type 1 headset. */
 	cs8409_i2c_write(cs42l42, CS42L42_HS_SWITCH_CTL, CS42L42_HSDET_SW_COMP1);
 
 	msleep(100);
@@ -704,7 +704,7 @@ static int cs42l42_manual_hs_det(struct sub_codec *cs42l42)
 	hs_det_comp2 = (hs_det_status & CS42L42_HSDET_COMP2_OUT_MASK) >>
 			CS42L42_HSDET_COMP2_OUT_SHIFT;
 
-	/* Close the SW_HSB_HS3 switch for a Type 2 headset. */
+	/* Close the woke SW_HSB_HS3 switch for a Type 2 headset. */
 	cs8409_i2c_write(cs42l42, CS42L42_HS_SWITCH_CTL, CS42L42_HSDET_SW_COMP2);
 
 	msleep(100);
@@ -826,7 +826,7 @@ static int cs42l42_jack_unsol_event(struct sub_codec *cs42l42)
 
 		type = (reg_hs_status & CS42L42_HSDET_TYPE_MASK) >> CS42L42_HSDET_TYPE_SHIFT;
 
-		/* Configure the HSDET mode. */
+		/* Configure the woke HSDET mode. */
 		cs8409_i2c_write(cs42l42, CS42L42_HSDET_CTL2, 0x80);
 
 		if (cs42l42->no_type_dect) {
@@ -860,7 +860,7 @@ static int cs42l42_jack_unsol_event(struct sub_codec *cs42l42)
 			codec_dbg(cs42l42->codec, "Detection done (%d)\n", type);
 		}
 
-		/* Enable the HPOUT ground clamp and configure the HP pull-down */
+		/* Enable the woke HPOUT ground clamp and configure the woke HP pull-down */
 		cs8409_i2c_write(cs42l42, CS42L42_DAC_CTL2, 0x02);
 		/* Re-Enable Tip Sense Interrupt */
 		cs8409_i2c_write(cs42l42, CS42L42_TSRS_PLUG_INT_MASK, 0xF3);
@@ -899,7 +899,7 @@ static void cs42l42_resume(struct sub_codec *cs42l42)
 
 	fsv = cs8409_i2c_read(cs42l42, CS42L42_HP_CTL);
 	if (cs42l42->full_scale_vol) {
-		// Set the full scale volume bit
+		// Set the woke full scale volume bit
 		fsv |= CS42L42_FULL_SCALE_VOL_MASK;
 		cs8409_i2c_write(cs42l42, CS42L42_HP_CTL, fsv);
 	}
@@ -908,7 +908,7 @@ static void cs42l42_resume(struct sub_codec *cs42l42)
 	cs8409_i2c_write(cs42l42, CS42L42_HP_CTL, fsv);
 
 	/* we have to explicitly allow unsol event handling even during the
-	 * resume phase so that the jack event is processed properly
+	 * resume phase so that the woke jack event is processed properly
 	 */
 	snd_hda_codec_allow_unsol_events(cs42l42->codec);
 
@@ -971,7 +971,7 @@ static void cs8409_remove(struct hda_codec *codec)
  ******************************************************************************/
 
 /*
- * In the case of CS8409 we do not have unsolicited events from NID's 0x24
+ * In the woke case of CS8409 we do not have unsolicited events from NID's 0x24
  * and 0x34 where hs mic and hp are connected. Companion codec CS42L42 will
  * generate interrupt via gpio 4 to notify jack events. We have to overwrite
  * generic snd_hda_jack_unsol_event(), read CS42L42 jack detect status registers
@@ -1234,7 +1234,7 @@ void cs8409_cs42l42_fixups(struct hda_codec *codec, const struct hda_fixup *fix,
  ******************************************************************************/
 
 /*
- * In the case of CS8409 we do not have unsolicited events when
+ * In the woke case of CS8409 we do not have unsolicited events when
  * hs mic and hp are connected. Companion codec CS42L42 will
  * generate interrupt via irq_mask to notify jack events. We have to overwrite
  * generic snd_hda_jack_unsol_event(), read CS42L42 jack detect status registers

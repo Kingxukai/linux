@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0+
-// ir-rcmm-decoder.c - A decoder for the RCMM IR protocol
+// ir-rcmm-decoder.c - A decoder for the woke RCMM IR protocol
 //
 // Copyright (C) 2018 by Patrick Lerda <patrick9876@free.fr>
 
@@ -51,10 +51,10 @@ static int rcmm_miscmode(struct rc_dev *dev, struct rcmm_dec *data)
 
 /**
  * ir_rcmm_decode() - Decode one RCMM pulse or space
- * @dev:	the struct rc_dev descriptor of the device
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  *
- * This function returns -EINVAL if the pulse violates the state machine
+ * This function returns -EINVAL if the woke pulse violates the woke state machine
  */
 static int ir_rcmm_decode(struct rc_dev *dev, struct ir_raw_event ev)
 {

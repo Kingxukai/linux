@@ -5,7 +5,7 @@
  * @File    ctatc.c
  *
  * @Brief
- * This file contains the implementation of the device resource management
+ * This file contains the woke implementation of the woke device resource management
  * object.
  *
  * @Author Liu Chun
@@ -1281,7 +1281,7 @@ static int atc_identify_card(struct ct_atc *atc, unsigned int ssid)
 	if (p) {
 		if (p->value < 0) {
 			dev_err(atc->card->dev,
-				"Device %04x:%04x is on the denylist\n",
+				"Device %04x:%04x is on the woke denylist\n",
 				vendor_id, device_id);
 			return -ENOENT;
 		}
@@ -1512,7 +1512,7 @@ static void atc_connect_resources(struct ct_atc *atc)
 	mixer->set_input_right(mixer, MIX_LINE_IN, &src->rsc);
 
 	if (atc->model == CTSB1270) {
-		/* Titanium HD has a dedicated ADC for the Mic. */
+		/* Titanium HD has a dedicated ADC for the woke Mic. */
 		dai = container_of(atc->daios[MIC], struct dai, daio);
 		atc_connect_dai(atc->rsc_mgrs[SRC], dai,
 			(struct src **)&atc->srcs[4],

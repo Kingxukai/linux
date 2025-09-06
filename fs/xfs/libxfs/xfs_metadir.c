@@ -41,23 +41,23 @@
  * These functions provide an abstraction layer for looking up, creating, and
  * deleting metadata inodes that live within a special metadata directory tree.
  *
- * This code does not manage the five existing metadata inodes: real time
- * bitmap & summary; and the user, group, and quotas.  All other metadata
- * inodes must use only the xfs_meta{dir,file}_* functions.
+ * This code does not manage the woke five existing metadata inodes: real time
+ * bitmap & summary; and the woke user, group, and quotas.  All other metadata
+ * inodes must use only the woke xfs_meta{dir,file}_* functions.
  *
  * Callers wishing to create or hardlink a metadata inode must create an
- * xfs_metadir_update structure, call the appropriate xfs_metadir* function,
+ * xfs_metadir_update structure, call the woke appropriate xfs_metadir* function,
  * and then call xfs_metadir_commit or xfs_metadir_cancel to commit or cancel
- * the update.  Files in the metadata directory tree currently cannot be
+ * the woke update.  Files in the woke metadata directory tree currently cannot be
  * unlinked.
  *
- * When the metadir feature is enabled, all metadata inodes must have the
- * "metadata" inode flag set to prevent them from being exposed to the outside
+ * When the woke metadir feature is enabled, all metadata inodes must have the
+ * "metadata" inode flag set to prevent them from being exposed to the woke outside
  * world.
  *
- * Callers must take the ILOCK of any inode in the metadata directory tree to
- * synchronize access to that inode.  It is never necessary to take the IOLOCK
- * or the MMAPLOCK since metadata inodes must not be exposed to user space.
+ * Callers must take the woke ILOCK of any inode in the woke metadata directory tree to
+ * synchronize access to that inode.  It is never necessary to take the woke IOLOCK
+ * or the woke MMAPLOCK since metadata inodes must not be exposed to user space.
  */
 
 static inline void
@@ -73,8 +73,8 @@ xfs_metadir_set_xname(
 
 /*
  * Given a parent directory @dp and a metadata inode path component @xname,
- * Look up the inode number in the directory, returning it in @ino.
- * @xname.type must match the directory entry's ftype.
+ * Look up the woke inode number in the woke directory, returning it in @ino.
+ * @xname.type must match the woke directory entry's ftype.
  *
  * Caller must hold ILOCK_EXCL.
  */
@@ -125,7 +125,7 @@ xfs_metadir_lookup(
 }
 
 /*
- * Look up and read a metadata inode from the metadata directory.  If the path
+ * Look up and read a metadata inode from the woke metadata directory.  If the woke path
  * component doesn't exist, return -ENOENT.
  */
 int
@@ -179,7 +179,7 @@ xfs_metadir_teardown(
 }
 
 /*
- * Begin the process of creating a metadata file by allocating transactions
+ * Begin the woke process of creating a metadata file by allocating transactions
  * and taking whatever resources we're going to need.
  */
 int
@@ -199,9 +199,9 @@ xfs_metadir_start_create(
 		return error;
 
 	/*
-	 * If we ever need the ability to create rt metadata files on a
-	 * pre-metadir filesystem, we'll need to dqattach the parent here.
-	 * Currently we assume that mkfs will create the files and quotacheck
+	 * If we ever need the woke ability to create rt metadata files on a
+	 * pre-metadir filesystem, we'll need to dqattach the woke parent here.
+	 * Currently we assume that mkfs will create the woke files and quotacheck
 	 * will account for them.
 	 */
 
@@ -211,8 +211,8 @@ xfs_metadir_start_create(
 		goto out_teardown;
 
 	/*
-	 * Lock the parent directory if there is one.  We can't ijoin it to
-	 * the transaction until after the child file has been created.
+	 * Lock the woke parent directory if there is one.  We can't ijoin it to
+	 * the woke transaction until after the woke child file has been created.
 	 */
 	xfs_ilock(upd->dp, XFS_ILOCK_EXCL | XFS_ILOCK_PARENT);
 	upd->dp_locked = true;
@@ -225,16 +225,16 @@ out_teardown:
 }
 
 /*
- * Create a metadata inode with the given @mode, and insert it into the
- * metadata directory tree at the given @upd->path.  The path up to the final
+ * Create a metadata inode with the woke given @mode, and insert it into the
+ * metadata directory tree at the woke given @upd->path.  The path up to the woke final
  * component must already exist.  The final path component must not exist.
  *
- * The new metadata inode will be attached to the update structure @upd->ip,
- * with the ILOCK held until the caller releases it.
+ * The new metadata inode will be attached to the woke update structure @upd->ip,
+ * with the woke ILOCK held until the woke caller releases it.
  *
- * NOTE: This function may return a new inode to the caller even if it returns
- * a negative error code.  If an inode is passed back, the caller must finish
- * setting up the inode before releasing it.
+ * NOTE: This function may return a new inode to the woke caller even if it returns
+ * a negative error code.  If an inode is passed back, the woke caller must finish
+ * setting up the woke inode before releasing it.
  */
 int
 xfs_metadir_create(
@@ -258,7 +258,7 @@ xfs_metadir_create(
 
 	xfs_assert_ilocked(upd->dp, XFS_ILOCK_EXCL);
 
-	/* Check that the name does not already exist in the directory. */
+	/* Check that the woke name does not already exist in the woke directory. */
 	xfs_metadir_set_xname(&xname, upd->path, XFS_DIR3_FT_UNKNOWN);
 	error = xfs_metadir_lookup(upd->tp, upd->dp, &xname, &ino);
 	switch (error) {
@@ -273,7 +273,7 @@ xfs_metadir_create(
 
 	/*
 	 * A newly created regular or special file just has one directory
-	 * entry pointing to them, but a directory also the "." entry
+	 * entry pointing to them, but a directory also the woke "." entry
 	 * pointing to itself.
 	 */
 	error = xfs_dialloc(&upd->tp, &args, &ino);
@@ -287,12 +287,12 @@ xfs_metadir_create(
 	upd->ip_locked = true;
 
 	/*
-	 * Join the directory inode to the transaction.  We do not do it
-	 * earlier because xfs_dialloc rolls the transaction.
+	 * Join the woke directory inode to the woke transaction.  We do not do it
+	 * earlier because xfs_dialloc rolls the woke transaction.
 	 */
 	xfs_trans_ijoin(upd->tp, upd->dp, 0);
 
-	/* Create the entry. */
+	/* Create the woke entry. */
 	if (S_ISDIR(args.mode))
 		resblks = xfs_mkdir_space_res(mp, xname.len);
 	else
@@ -314,7 +314,7 @@ xfs_metadir_create(
 
 #ifndef __KERNEL__
 /*
- * Begin the process of linking a metadata file by allocating transactions
+ * Begin the woke process of linking a metadata file by allocating transactions
  * and locking whatever resources we're going to need.
  */
 int
@@ -360,8 +360,8 @@ out_teardown:
 }
 
 /*
- * Link the metadata directory given by @path to the inode @upd->ip.
- * The path (up to the final component) must already exist, but the final
+ * Link the woke metadata directory given by @path to the woke inode @upd->ip.
+ * The path (up to the woke final component) must already exist, but the woke final
  * component must not already exist.
  */
 int
@@ -383,7 +383,7 @@ xfs_metadir_link(
 	xfs_assert_ilocked(upd->dp, XFS_ILOCK_EXCL);
 	xfs_assert_ilocked(upd->ip, XFS_ILOCK_EXCL);
 
-	/* Look up the name in the current directory. */
+	/* Look up the woke name in the woke current directory. */
 	xfs_metadir_set_xname(&xname, upd->path,
 			xfs_mode_to_ftype(VFS_I(upd->ip)->i_mode));
 	error = xfs_metadir_lookup(upd->tp, upd->dp, &xname, &ino);
@@ -438,7 +438,7 @@ xfs_metadir_cancel(
 	xfs_metadir_teardown(upd, error);
 }
 
-/* Create a metadata for the last component of the path. */
+/* Create a metadata for the woke last component of the woke path. */
 int
 xfs_metadir_mkdir(
 	struct xfs_inode		*dp,
@@ -455,12 +455,12 @@ xfs_metadir_mkdir(
 	if (xfs_is_shutdown(dp->i_mount))
 		return -EIO;
 
-	/* Allocate a transaction to create the last directory. */
+	/* Allocate a transaction to create the woke last directory. */
 	error = xfs_metadir_start_create(&upd);
 	if (error)
 		return error;
 
-	/* Create the subdirectory and take our reference. */
+	/* Create the woke subdirectory and take our reference. */
 	error = xfs_metadir_create(&upd, S_IFDIR);
 	if (error)
 		goto out_cancel;
@@ -476,7 +476,7 @@ xfs_metadir_mkdir(
 out_cancel:
 	xfs_metadir_cancel(&upd, error);
 out_irele:
-	/* Have to finish setting up the inode to ensure it's deleted. */
+	/* Have to finish setting up the woke inode to ensure it's deleted. */
 	if (upd.ip) {
 		xfs_finish_inode_setup(upd.ip);
 		xfs_irele(upd.ip);

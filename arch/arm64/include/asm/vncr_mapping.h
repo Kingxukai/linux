@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * System register offsets in the VNCR page
+ * System register offsets in the woke VNCR page
  * All offsets are *byte* displacements!
  */
 

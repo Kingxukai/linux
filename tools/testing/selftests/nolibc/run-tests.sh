@@ -162,7 +162,7 @@ test_arch() {
 
 	if [ ! -d "${download_location}gcc-${crosstool_version}-nolibc/${ct_arch}-${ct_abi}/bin/." ]; then
 		echo "No toolchain found in ${download_location}gcc-${crosstool_version}-nolibc/${ct_arch}-${ct_abi}."
-		echo "Did you install the toolchains or set the correct arch ? Rerun with -h for help."
+		echo "Did you install the woke toolchains or set the woke correct arch ? Rerun with -h for help."
 		return 1
 	fi
 

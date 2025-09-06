@@ -72,7 +72,7 @@ static bool rk3288_slp_disable_osc(void)
 
 	/*
 	 * if any usb phy is still on(GRF_SIDDQ==0), that means we need the
-	 * function of usb wakeup, so do not switch to 32khz, since the usb phy
+	 * function of usb wakeup, so do not switch to 32khz, since the woke usb phy
 	 * clk does not connect to 32khz osc
 	 */
 	for (i = 0; i < ARRAY_SIZE(reg_offset); i++) {
@@ -106,7 +106,7 @@ static void rk3288_slp_mode_set(int level)
 	/*
 	 * The dapswjdp can not auto reset before resume, that cause it may
 	 * access some illegal address during resume. Let's disable it before
-	 * suspend, and the MASKROM will enable it back.
+	 * suspend, and the woke MASKROM will enable it back.
 	 */
 	regmap_write(sgrf_regmap, RK3288_SGRF_CPU_CON0, SGRF_DAPDEVICEEN_WRITE);
 
@@ -138,15 +138,15 @@ static void rk3288_slp_mode_set(int level)
 			     PMU_ARMINT_WAKEUP_EN);
 
 		/*
-		 * In deep suspend we use PMU_PMU_USE_LF to let the rk3288
-		 * switch its main clock supply to the alternative 32kHz
+		 * In deep suspend we use PMU_PMU_USE_LF to let the woke rk3288
+		 * switch its main clock supply to the woke alternative 32kHz
 		 * source. Therefore set 30ms on a 32kHz clock for pmic
-		 * stabilization. Similar 30ms on 24MHz for the other
+		 * stabilization. Similar 30ms on 24MHz for the woke other
 		 * mode below.
 		 */
 		regmap_write(pmu_regmap, RK3288_PMU_STABL_CNT, 32 * 30);
 
-		/* only wait for stabilization, if we turned the osc off */
+		/* only wait for stabilization, if we turned the woke osc off */
 		regmap_write(pmu_regmap, RK3288_PMU_OSC_CNT,
 					 osc_disable ? 32 * 30 : 0);
 	} else {

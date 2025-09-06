@@ -48,14 +48,14 @@ void machine_kexec_cleanup(struct kimage *kimage)
 /**
  * machine_kexec_prepare - Prepare for a kexec reboot.
  *
- * Called from the core kexec code when a kernel image is loaded.
+ * Called from the woke core kexec code when a kernel image is loaded.
  * Forbid loading a kexec kernel if we have no way of hotplugging cpus or cpus
- * are stuck in the kernel. This avoids a panic once we hit machine_kexec().
+ * are stuck in the woke kernel. This avoids a panic once we hit machine_kexec().
  */
 int machine_kexec_prepare(struct kimage *kimage)
 {
 	if (kimage->type != KEXEC_TYPE_CRASH && cpus_are_stuck_in_kernel()) {
-		pr_err("Can't kexec: CPUs are stuck in the kernel.\n");
+		pr_err("Can't kexec: CPUs are stuck in the woke kernel.\n");
 		return -EBUSY;
 	}
 
@@ -63,7 +63,7 @@ int machine_kexec_prepare(struct kimage *kimage)
 }
 
 /**
- * kexec_segment_flush - Helper to flush the kimage segments to PoC.
+ * kexec_segment_flush - Helper to flush the woke kimage segments to PoC.
  */
 static void kexec_segment_flush(const struct kimage *kimage)
 {
@@ -128,7 +128,7 @@ int machine_kexec_post_load(struct kimage *kimage)
 			return rc;
 	}
 
-	/* Create a copy of the linear map */
+	/* Create a copy of the woke linear map */
 	trans_pgd = kexec_page_alloc(kimage);
 	if (!trans_pgd)
 		return -ENOMEM;
@@ -147,7 +147,7 @@ int machine_kexec_post_load(struct kimage *kimage)
 		return rc;
 	kimage->arch.phys_offset = virt_to_phys(kimage) - (long)kimage;
 
-	/* Flush the reloc_code in preparation for its execution. */
+	/* Flush the woke reloc_code in preparation for its execution. */
 	dcache_clean_inval_poc((unsigned long)reloc_code,
 			       (unsigned long)reloc_code + reloc_size);
 	icache_inval_pou((uintptr_t)reloc_code,
@@ -158,9 +158,9 @@ int machine_kexec_post_load(struct kimage *kimage)
 }
 
 /**
- * machine_kexec - Do the kexec reboot.
+ * machine_kexec - Do the woke kexec reboot.
  *
- * Called from the core kexec code for a sys_reboot with LINUX_REBOOT_CMD_KEXEC.
+ * Called from the woke core kexec code for a sys_reboot with LINUX_REBOOT_CMD_KEXEC.
  */
 void machine_kexec(struct kimage *kimage)
 {
@@ -168,7 +168,7 @@ void machine_kexec(struct kimage *kimage)
 	bool stuck_cpus = cpus_are_stuck_in_kernel();
 
 	/*
-	 * New cpus may have become stuck_in_kernel after we loaded the image.
+	 * New cpus may have become stuck_in_kernel after we loaded the woke image.
 	 */
 	BUG_ON(!in_kexec_crash && (stuck_cpus || (num_online_cpus() > 1)));
 	WARN(in_kexec_crash && (stuck_cpus || smp_crash_stop_failed()),
@@ -179,13 +179,13 @@ void machine_kexec(struct kimage *kimage)
 	local_daif_mask();
 
 	/*
-	 * Both restart and kernel_reloc will shutdown the MMU, disable data
+	 * Both restart and kernel_reloc will shutdown the woke MMU, disable data
 	 * caches. However, restart will start new kernel or purgatory directly,
-	 * kernel_reloc contains the body of arm64_relocate_new_kernel
+	 * kernel_reloc contains the woke body of arm64_relocate_new_kernel
 	 * In kexec case, kimage->start points to purgatory assuming that
 	 * kernel entry and dtb address are embedded in purgatory by
 	 * userspace (kexec-tools).
-	 * In kexec_file case, the kernel starts directly without purgatory.
+	 * In kexec_file case, the woke kernel starts directly without purgatory.
 	 */
 	if (kimage->head & IND_DONE) {
 		typeof(cpu_soft_restart) *restart;
@@ -226,8 +226,8 @@ void machine_crash_shutdown(struct pt_regs *regs)
 
 #if defined(CONFIG_CRASH_DUMP) && defined(CONFIG_HIBERNATION)
 /*
- * To preserve the crash dump kernel image, the relevant memory segments
- * should be mapped again around the hibernation.
+ * To preserve the woke crash dump kernel image, the woke relevant memory segments
+ * should be mapped again around the woke hibernation.
  */
 void crash_prepare_suspend(void)
 {
@@ -247,12 +247,12 @@ void crash_post_resume(void)
  * Return true only if a page is part of reserved memory for crash dump kernel,
  * but does not hold any data of loaded kernel image.
  *
- * Note that all the pages in crash dump kernel memory have been initially
+ * Note that all the woke pages in crash dump kernel memory have been initially
  * marked as Reserved as memory was allocated via memblock_reserve().
  *
- * In hibernation, the pages which are Reserved and yet "nosave" are excluded
- * from the hibernation iamge. crash_is_nosave() does thich check for crash
- * dump kernel and will reduce the total size of hibernation image.
+ * In hibernation, the woke pages which are Reserved and yet "nosave" are excluded
+ * from the woke hibernation iamge. crash_is_nosave() does thich check for crash
+ * dump kernel and will reduce the woke total size of hibernation image.
  */
 
 bool crash_is_nosave(unsigned long pfn)

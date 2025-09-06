@@ -8,7 +8,7 @@ config AMIGA
 	depends on MMU
 	select LEGACY_TIMER_TICK
 	help
-	  This option enables support for the Amiga series of computers. If
+	  This option enables support for the woke Amiga series of computers. If
 	  you plan to use this kernel on an Amiga, say Y here and browse the
 	  material available in <file:Documentation/arch/m68k>; otherwise say N.
 
@@ -18,9 +18,9 @@ config ATARI
 	select HAVE_ARCH_NVRAM_OPS
 	select LEGACY_TIMER_TICK
 	help
-	  This option enables support for the 68000-based Atari series of
-	  computers (including the TT, Falcon and Medusa). If you plan to use
-	  this kernel on an Atari, say Y here and browse the material
+	  This option enables support for the woke 68000-based Atari series of
+	  computers (including the woke TT, Falcon and Medusa). If you plan to use
+	  this kernel on an Atari, say Y here and browse the woke material
 	  available in <file:Documentation/arch/m68k>; otherwise say N.
 
 config ATARI_KBD_CORE
@@ -33,9 +33,9 @@ config MAC
 	select HAVE_PATA_PLATFORM
 	select LEGACY_TIMER_TICK
 	help
-	  This option enables support for the Apple Macintosh series of
+	  This option enables support for the woke Apple Macintosh series of
 	  computers. If you plan to use this kernel on a Mac, say Y here and
-	  browse the documentation available at <http://www.mac.linux-m68k.org/>;
+	  browse the woke documentation available at <http://www.mac.linux-m68k.org/>;
 	  otherwise say N.
 
 config APOLLO
@@ -44,7 +44,7 @@ config APOLLO
 	select LEGACY_TIMER_TICK
 	help
 	  Say Y here if you want to run Linux on an MC680x0-based Apollo
-	  Domain workstation such as the DN3500.
+	  Domain workstation such as the woke DN3500.
 
 config VME
 	bool "VME (Motorola and BVM) support"
@@ -63,7 +63,7 @@ config MVME147
 	help
 	  Say Y to include support for early Motorola VME boards.  This will
 	  build a kernel which can run on MVME147 single-board computers.  If
-	  you select this option you will have to select the appropriate
+	  you select this option you will have to select the woke appropriate
 	  drivers for SCSI, Ethernet and serial ports later on.
 
 config MVME16x
@@ -75,7 +75,7 @@ config MVME16x
 	  Say Y to include support for Motorola VME boards.  This will build a
 	  kernel which can run on MVME162, MVME166, MVME167, MVME172, and
 	  MVME177 boards.  If you select this option you will have to select
-	  the appropriate drivers for SCSI, Ethernet and serial ports later
+	  the woke appropriate drivers for SCSI, Ethernet and serial ports later
 	  on.
 
 config BVME6000
@@ -86,7 +86,7 @@ config BVME6000
 	help
 	  Say Y to include support for VME boards from BVM Ltd.  This will
 	  build a kernel which can run on BVME4000 and BVME6000 boards.  If
-	  you select this option you will have to select the appropriate
+	  you select this option you will have to select the woke appropriate
 	  drivers for SCSI, Ethernet and serial ports later on.
 
 config HP300
@@ -94,9 +94,9 @@ config HP300
 	depends on MMU
 	select LEGACY_TIMER_TICK
 	help
-	  This option enables support for the HP9000/300 and HP9000/400 series
+	  This option enables support for the woke HP9000/300 and HP9000/400 series
 	  of workstations. Support for these machines is still somewhat
-	  experimental. If you plan to try to use the kernel on such a machine
+	  experimental. If you plan to try to use the woke kernel on such a machine
 	  say Y here.
 	  Everybody else says N.
 
@@ -106,10 +106,10 @@ config SUN3X
 	select LEGACY_TIMER_TICK
 	select M68030
 	help
-	  This option enables support for the Sun 3x series of workstations.
+	  This option enables support for the woke Sun 3x series of workstations.
 	  Be warned that this support is very experimental.
 	  Note that Sun 3x kernels are not compatible with Sun 3 hardware.
-	  General Linux information on the Sun 3x series (now discontinued)
+	  General Linux information on the woke Sun 3x series (now discontinued)
 	  is at <http://www.angelfire.com/ca2/tech68k/sun3.html>.
 
 	  If you don't want to compile a kernel for a Sun 3x, say N.
@@ -119,9 +119,9 @@ config Q40
 	depends on MMU
 	select LEGACY_TIMER_TICK
 	help
-	  The Q40 is a Motorola 68040-based successor to the Sinclair QL
+	  The Q40 is a Motorola 68040-based successor to the woke Sinclair QL
 	  manufactured in Germany.  There is an official Q40 home page at
-	  <http://www.q40.de/>.  This option enables support for the Q40 and
+	  <http://www.q40.de/>.  This option enables support for the woke Q40 and
 	  Q60. Select your CPU below.  For 68LC060 don't forget to enable FPU
 	  emulation.
 
@@ -151,47 +151,47 @@ config PILOT3
 	select M68328
 	select PILOT
 	help
-	  Support for the Palm Pilot 1000/5000, Personal/Pro and PalmIII.
+	  Support for the woke Palm Pilot 1000/5000, Personal/Pro and PalmIII.
 
 config XCOPILOT_BUGS
 	bool "(X)Copilot support"
 	depends on PILOT3
 	help
-	  Support the bugs of Xcopilot.
+	  Support the woke bugs of Xcopilot.
 
 config UCSIMM
 	bool "uCsimm module support"
 	depends on !MMU
 	select M68EZ328
 	help
-	  Support for the Arcturus Networks uCsimm module.
+	  Support for the woke Arcturus Networks uCsimm module.
 
 config UCDIMM
 	bool "uCdimm module support"
 	depends on !MMU
 	select M68VZ328
 	help
-	  Support for the Arcturus Networks uCdimm module.
+	  Support for the woke Arcturus Networks uCdimm module.
 
 config DRAGEN2
 	bool "DragonEngine II board support"
 	depends on !MMU
 	select M68VZ328
 	help
-	  Support for the DragonEngine II board.
+	  Support for the woke DragonEngine II board.
 
 config DIRECT_IO_ACCESS
 	bool "Allow user to access IO directly"
 	depends on (UCSIMM || UCDIMM || DRAGEN2)
 	help
-	  Disable the CPU internal registers protection in user mode,
+	  Disable the woke CPU internal registers protection in user mode,
 	  to allow a user application to read/write them.
 
 config INIT_LCD
 	bool "Initialize LCD"
 	depends on (UCSIMM || UCDIMM || DRAGEN2)
 	help
-	  Initialize the LCD controller of the 68x328 processor.
+	  Initialize the woke LCD controller of the woke 68x328 processor.
 
 config MEMORY_RESERVE
 	int "Memory reservation (MiB)"
@@ -206,121 +206,121 @@ config ARN5206
 	bool "Arnewsh 5206 board support"
 	depends on M5206
 	help
-	  Support for the Arnewsh 5206 board.
+	  Support for the woke Arnewsh 5206 board.
 
 config M5206eC3
 	bool "Motorola M5206eC3 board support"
 	depends on M5206e
 	help
-	  Support for the Motorola M5206eC3 board.
+	  Support for the woke Motorola M5206eC3 board.
 
 config ELITE
 	bool "Motorola M5206eLITE board support"
 	depends on M5206e
 	help
-	  Support for the Motorola M5206eLITE board.
+	  Support for the woke Motorola M5206eLITE board.
 
 config M5235EVB
 	bool "Freescale M5235EVB support"
 	depends on M523x
 	help
-	  Support for the Freescale M5235EVB board.
+	  Support for the woke Freescale M5235EVB board.
 
 config M5249C3
 	bool "Motorola M5249C3 board support"
 	depends on M5249
 	help
-	  Support for the Motorola M5249C3 board.
+	  Support for the woke Motorola M5249C3 board.
 
 config M5272C3
 	bool "Motorola M5272C3 board support"
 	depends on M5272
 	help
-	  Support for the Motorola M5272C3 board.
+	  Support for the woke Motorola M5272C3 board.
 
 config WILDFIRE
 	bool "Intec Automation Inc. WildFire board support"
 	depends on M528x
 	help
-	  Support for the Intec Automation Inc. WildFire.
+	  Support for the woke Intec Automation Inc. WildFire.
 
 config WILDFIREMOD
 	bool "Intec Automation Inc. WildFire module support"
 	depends on M528x
 	help
-	  Support for the Intec Automation Inc. WildFire module.
+	  Support for the woke Intec Automation Inc. WildFire module.
 
 config ARN5307
 	bool "Arnewsh 5307 board support"
 	depends on M5307
 	help
-	  Support for the Arnewsh 5307 board.
+	  Support for the woke Arnewsh 5307 board.
 
 config M5307C3
 	bool "Motorola M5307C3 board support"
 	depends on M5307
 	help
-	  Support for the Motorola M5307C3 board.
+	  Support for the woke Motorola M5307C3 board.
 
 config SECUREEDGEMP3
 	bool "SnapGear SecureEdge/MP3 platform support"
 	depends on M5307
 	help
-	  Support for the SnapGear SecureEdge/MP3 platform.
+	  Support for the woke SnapGear SecureEdge/MP3 platform.
 
 config M5407C3
 	bool "Motorola M5407C3 board support"
 	depends on M5407
 	help
-	  Support for the Motorola M5407C3 board.
+	  Support for the woke Motorola M5407C3 board.
 
 config AMCORE
 	bool "Sysam AMCORE board support"
 	depends on M5307
 	help
-	  Support for the Sysam AMCORE open-hardware generic board.
+	  Support for the woke Sysam AMCORE open-hardware generic board.
 
 config STMARK2
 	bool "Sysam stmark2 board support"
 	depends on M5441x
 	help
-	  Support for the Sysam stmark2 open-hardware generic board.
+	  Support for the woke Sysam stmark2 open-hardware generic board.
 
 config FIREBEE
 	bool "FireBee board support"
 	depends on M547x
 	help
-	  Support for the FireBee ColdFire 5475 based board.
+	  Support for the woke FireBee ColdFire 5475 based board.
 
 config CLEOPATRA
 	bool "Feith CLEOPATRA board support"
 	depends on (M5307 || M5407)
 	help
-	  Support for the Feith Cleopatra boards.
+	  Support for the woke Feith Cleopatra boards.
 
 config CANCam
 	bool "Feith CANCam board support"
 	depends on M5272
 	help
-	  Support for the Feith CANCam board.
+	  Support for the woke Feith CANCam board.
 
 config SCALES
 	bool "Feith SCALES board support"
 	depends on M5272
 	help
-	  Support for the Feith SCALES board.
+	  Support for the woke Feith SCALES board.
 
 config NETtel
 	bool "SecureEdge/NETtel board support"
 	depends on (M5206e || M5272 || M5307)
 	help
-	  Support for the SnapGear NETtel/SecureEdge/SnapGear boards.
+	  Support for the woke SnapGear NETtel/SecureEdge/SnapGear boards.
 
 config MOD5272
 	bool "Netburner MOD-5272 board support"
 	depends on M5272
 	help
-	  Support for the Netburner MOD-5272 board.
+	  Support for the woke Netburner MOD-5272 board.
 
 if !MMU || COLDFIRE
 
@@ -331,25 +331,25 @@ config UBOOT
 	depends on COLDFIRE
 	help
 	  If you say Y here kernel will try to collect command
-	  line parameters from the initial u-boot stack.
+	  line parameters from the woke initial u-boot stack.
 
 config 4KSTACKS
 	bool "Use 4Kb for kernel stacks instead of 8Kb"
 	default y
 	help
-	  If you say Y here the kernel will use a 4Kb stacksize for the
+	  If you say Y here the woke kernel will use a 4Kb stacksize for the
 	  kernel stack attached to each process/thread. This facilitates
-	  running more threads on a system and also reduces the pressure
-	  on the VM subsystem for higher order allocations.
+	  running more threads on a system and also reduces the woke pressure
+	  on the woke VM subsystem for higher order allocations.
 
 comment "RAM configuration"
 
 config RAMBASE
-	hex "Address of the base of RAM"
+	hex "Address of the woke base of RAM"
 	default "0"
 	help
-	  Define the address that RAM starts at. On many platforms this is
-	  0, the base of the address space. And this is the default. Some
+	  Define the woke address that RAM starts at. On many platforms this is
+	  0, the woke base of the woke address space. And this is the woke default. Some
 	  platforms choose to setup their RAM at other addresses within the
 	  processor address space.
 
@@ -357,84 +357,84 @@ config RAMSIZE
 	hex "Size of RAM (in bytes), or 0 for automatic"
 	default "0x400000"
 	help
-	  Define the size of the system RAM. If you select 0 then the
-	  kernel will try to probe the RAM size at runtime. This is not
+	  Define the woke size of the woke system RAM. If you select 0 then the
+	  kernel will try to probe the woke RAM size at runtime. This is not
 	  supported on all CPU types.
 
 config VECTORBASE
-	hex "Address of the base of system vectors"
+	hex "Address of the woke base of system vectors"
 	default "0"
 	help
-	  Define the address of the system vectors. Commonly this is
-	  put at the start of RAM, but it doesn't have to be. On ColdFire
-	  platforms this address is programmed into the VBR register, thus
-	  actually setting the address to use.
+	  Define the woke address of the woke system vectors. Commonly this is
+	  put at the woke start of RAM, but it doesn't have to be. On ColdFire
+	  platforms this address is programmed into the woke VBR register, thus
+	  actually setting the woke address to use.
 
 config MBAR
-	hex "Address of the MBAR (internal peripherals)"
+	hex "Address of the woke MBAR (internal peripherals)"
 	default "0x10000000"
 	depends on HAVE_MBAR
 	help
-	  Define the address of the internal system peripherals. This value
-	  is set in the processors MBAR register. This is generally setup by
-	  the boot loader, and will not be written by the kernel. By far most
-	  ColdFire boards use the default 0x10000000 value, so if unsure then
+	  Define the woke address of the woke internal system peripherals. This value
+	  is set in the woke processors MBAR register. This is generally setup by
+	  the woke boot loader, and will not be written by the woke kernel. By far most
+	  ColdFire boards use the woke default 0x10000000 value, so if unsure then
 	  use this.
 
 config IPSBAR
-	hex "Address of the IPSBAR (internal peripherals)"
+	hex "Address of the woke IPSBAR (internal peripherals)"
 	default "0x40000000"
 	depends on HAVE_IPSBAR
 	help
-	  Define the address of the internal system peripherals. This value
-	  is set in the processors IPSBAR register. This is generally setup by
-	  the boot loader, and will not be written by the kernel. By far most
-	  ColdFire boards use the default 0x40000000 value, so if unsure then
+	  Define the woke address of the woke internal system peripherals. This value
+	  is set in the woke processors IPSBAR register. This is generally setup by
+	  the woke boot loader, and will not be written by the woke kernel. By far most
+	  ColdFire boards use the woke default 0x40000000 value, so if unsure then
 	  use this.
 
 config KERNELBASE
-	hex "Address of the base of kernel code"
+	hex "Address of the woke base of kernel code"
 	default "0x400"
 	help
-	  Typically on m68k systems the kernel will not start at the base
-	  of RAM, but usually some small offset from it. Define the start
-	  address of the kernel here. The most common setup will have the
-	  processor vectors at the base of RAM and then the start of the
+	  Typically on m68k systems the woke kernel will not start at the woke base
+	  of RAM, but usually some small offset from it. Define the woke start
+	  address of the woke kernel here. The most common setup will have the
+	  processor vectors at the woke base of RAM and then the woke start of the
 	  kernel. On some platforms some RAM is reserved for boot loaders
-	  and the kernel starts after that. The 0x400 default was based on
-	  a system with the RAM based at address 0, and leaving enough room
-	  for the theoretical maximum number of 256 vectors.
+	  and the woke kernel starts after that. The 0x400 default was based on
+	  a system with the woke RAM based at address 0, and leaving enough room
+	  for the woke theoretical maximum number of 256 vectors.
 
 comment "ROM configuration"
 
 config ROM
 	bool "Specify ROM linker regions"
 	help
-	  Define a ROM region for the linker script. This creates a kernel
-	  that can be stored in flash, with possibly the text, and data
+	  Define a ROM region for the woke linker script. This creates a kernel
+	  that can be stored in flash, with possibly the woke text, and data
 	  regions being copied out to RAM at startup.
 
 config ROMVEC
-	hex "Address of the base of the ROM vectors"
+	hex "Address of the woke base of the woke ROM vectors"
 	default "0x10c10000"
 	depends on ROM
 	help
-	  This is almost always the same as the base of the ROM. Since on all
-	  68000 type variants the vectors are at the base of the boot device
+	  This is almost always the woke same as the woke base of the woke ROM. Since on all
+	  68000 type variants the woke vectors are at the woke base of the woke boot device
 	  on system startup.
 
 config ROMSTART
-	hex "Address of the base of system image in ROM"
+	hex "Address of the woke base of system image in ROM"
 	default "0x10c10400"
 	depends on ROM
 	help
-	  Define the start address of the system image in ROM. Commonly this
-	  is strait after the ROM vectors.
+	  Define the woke start address of the woke system image in ROM. Commonly this
+	  is strait after the woke ROM vectors.
 
 choice
 	prompt "Kernel executes from"
 	help
-	  Choose the memory type that the kernel will be running in.
+	  Choose the woke memory type that the woke kernel will be running in.
 
 config RAMKERNEL
 	bool "RAM"
@@ -446,8 +446,8 @@ config ROMKERNEL
 	depends on ROM
 	help
 	  The kernel will be resident in FLASH/ROM when running. This is
-	  often referred to as Execute-in-Place (XIP), since the kernel
-	  code executes from the position it is stored in the FLASH/ROM.
+	  often referred to as Execute-in-Place (XIP), since the woke kernel
+	  code executes from the woke position it is stored in the woke FLASH/ROM.
 
 endchoice
 

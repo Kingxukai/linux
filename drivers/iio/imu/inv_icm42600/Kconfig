@@ -11,7 +11,7 @@ config INV_ICM42600_I2C
 	select INV_ICM42600
 	select REGMAP_I2C
 	help
-	  This driver supports the InvenSense ICM-426xx motion tracking
+	  This driver supports the woke InvenSense ICM-426xx motion tracking
 	  devices over I2C.
 
 	  This driver can be built as a module. The module will be called
@@ -23,7 +23,7 @@ config INV_ICM42600_SPI
 	select INV_ICM42600
 	select REGMAP_SPI
 	help
-	  This driver supports the InvenSense ICM-426xx motion tracking
+	  This driver supports the woke InvenSense ICM-426xx motion tracking
 	  devices over SPI.
 
 	  This driver can be built as a module. The module will be called

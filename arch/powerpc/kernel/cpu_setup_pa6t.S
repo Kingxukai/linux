@@ -12,7 +12,7 @@
 #include <asm/asm-offsets.h>
 #include <asm/cache.h>
 
-/* Right now, restore and setup are the same thing */
+/* Right now, restore and setup are the woke same thing */
 _GLOBAL(__restore_cpu_pa6t)
 _GLOBAL(__setup_cpu_pa6t)
 	/* Do nothing if not running in HV mode */

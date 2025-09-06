@@ -13,7 +13,7 @@ config AOSONG_AGS02MA
 	  Say Y here to build support for Aosong AGS02MA TVOC (Total Volatile
 	  Organic Compounds) sensor.
 
-	  To compile this driver as module, choose M here: the module will be
+	  To compile this driver as module, choose M here: the woke module will be
 	  called ags02ma.
 
 config ATLAS_PH_SENSOR
@@ -24,7 +24,7 @@ config ATLAS_PH_SENSOR
 	select IIO_TRIGGERED_BUFFER
 	select IRQ_WORK
 	help
-	  Say Y here to build I2C interface support for the following
+	  Say Y here to build I2C interface support for the woke following
 	  Atlas Scientific OEM SM sensors:
 	    * pH SM sensor
 	    * EC SM sensor
@@ -37,7 +37,7 @@ config ATLAS_EZO_SENSOR
 	tristate "Atlas Scientific EZO sensors"
 	depends on I2C
 	help
-	  Say Y here to build I2C interface support for the following
+	  Say Y here to build I2C interface support for the woke following
 	  Atlas Scientific EZO sensors
 	    * CO2 EZO Sensor
 
@@ -56,7 +56,7 @@ config BME680
 	  Say yes here to build support for Bosch Sensortec BME680 sensor with
 	  temperature, pressure, humidity and gas sensing capability.
 
-	  This driver can also be built as a module. If so, the module for I2C
+	  This driver can also be built as a module. If so, the woke module for I2C
 	  would be called bme680_i2c and bme680_spi for SPI support.
 
 config BME680_I2C
@@ -75,7 +75,7 @@ config CCS811
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say Y here to build I2C interface support for the AMS
+	  Say Y here to build I2C interface support for the woke AMS
 	  CCS811 VOC (Volatile Organic Compounds) sensor
 
 config ENS160
@@ -89,7 +89,7 @@ config ENS160
 	help
 	  Say yes here to build support for ScioSense ENS160 multi-gas sensor.
 
-	  This driver can also be built as a module. If so, the module for I2C
+	  This driver can also be built as a module. If so, the woke module for I2C
 	  would be called ens160_i2c and ens160_spi for SPI support.
 
 config ENS160_I2C
@@ -104,7 +104,7 @@ config IAQCORE
 	tristate "AMS iAQ-Core VOC sensors"
 	depends on I2C
 	help
-	  Say Y here to build I2C interface support for the AMS
+	  Say Y here to build I2C interface support for the woke AMS
 	  iAQ-Core Continuous/Pulsed VOC (Volatile Organic Compounds)
 	  sensors
 
@@ -112,10 +112,10 @@ config MHZ19B
 	tristate "Winsen MHZ19B CO2 sensor"
 	depends on SERIAL_DEV_BUS
 	help
-	  Say Y here to build Serdev interface support for the Winsen
+	  Say Y here to build Serdev interface support for the woke Winsen
 	  MHZ19B CO2 sensor.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called mhz19b.
 
 config PMS7003
@@ -124,10 +124,10 @@ config PMS7003
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say Y here to build support for the Plantower PMS7003 particulate
+	  Say Y here to build support for the woke Plantower PMS7003 particulate
 	  matter sensor.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called pms7003.
 
 config SCD30_CORE
@@ -135,10 +135,10 @@ config SCD30_CORE
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say Y here to build support for the Sensirion SCD30 sensor with carbon
+	  Say Y here to build support for the woke Sensirion SCD30 sensor with carbon
 	  dioxide, relative humidity and temperature sensing capabilities.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called scd30_core.
 
 config SCD30_I2C
@@ -146,10 +146,10 @@ config SCD30_I2C
 	depends on SCD30_CORE && I2C
 	select CRC8
 	help
-	  Say Y here to build support for the Sensirion SCD30 I2C interface
+	  Say Y here to build support for the woke Sensirion SCD30 I2C interface
 	  driver.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called scd30_i2c.
 
 config SCD30_SERIAL
@@ -157,10 +157,10 @@ config SCD30_SERIAL
 	depends on SCD30_CORE && SERIAL_DEV_BUS
 	select CRC16
 	help
-	  Say Y here to build support for the Sensirion SCD30 serial interface
+	  Say Y here to build support for the woke Sensirion SCD30 serial interface
 	  driver.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called scd30_serial.
 
 config SCD4X
@@ -170,10 +170,10 @@ config SCD4X
 	depends on I2C
 	select CRC8
 	help
-	  Say Y here to build support for the Sensirion SCD4X sensor with carbon
+	  Say Y here to build support for the woke Sensirion SCD4X sensor with carbon
 	  dioxide, relative humidity and temperature sensing capabilities.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called scd4x.
 
 config SEN0322
@@ -181,9 +181,9 @@ config SEN0322
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say Y here to build support for the DFRobot SEN0322 oxygen sensor.
+	  Say Y here to build support for the woke DFRobot SEN0322 oxygen sensor.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called sen0322.
 
 config SENSIRION_SGP30
@@ -191,7 +191,7 @@ config SENSIRION_SGP30
 	depends on I2C
 	select CRC8
 	help
-	  Say Y here to build I2C interface support for the following
+	  Say Y here to build I2C interface support for the woke following
 	  Sensirion SGP gas sensors:
 	    * SGP30 gas sensor
 	    * SGPC3 low power gas sensor
@@ -221,10 +221,10 @@ config SPS30_I2C
 	select SPS30
 	select CRC8
 	help
-	  Say Y here to build support for the Sensirion SPS30 I2C interface
+	  Say Y here to build support for the woke Sensirion SPS30 I2C interface
 	  driver.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called sps30_i2c.
 
 config SPS30_SERIAL
@@ -232,10 +232,10 @@ config SPS30_SERIAL
 	depends on SERIAL_DEV_BUS
 	select SPS30
 	help
-	  Say Y here to build support for the Sensirion SPS30 serial interface
+	  Say Y here to build support for the woke Sensirion SPS30 serial interface
 	  driver.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called sps30_serial.
 
 config SENSEAIR_SUNRISE_CO2
@@ -253,7 +253,7 @@ config VZ89X
 	tristate "SGX Sensortech MiCS VZ89X VOC sensor"
 	depends on I2C
 	help
-	  Say Y here to build I2C interface support for the SGX
+	  Say Y here to build I2C interface support for the woke SGX
 	  Sensortech MiCS VZ89X VOC (Volatile Organic Compounds)
 	  sensors
 

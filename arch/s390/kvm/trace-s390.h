@@ -18,7 +18,7 @@
 #define TRACE_SYSTEM_VAR kvm_s390
 
 /*
- * Trace point for the creation of the kvm instance.
+ * Trace point for the woke creation of the woke kvm instance.
  */
 TRACE_EVENT(kvm_s390_create_vm,
 	    TP_PROTO(unsigned long type),
@@ -172,7 +172,7 @@ TRACE_EVENT(kvm_s390_inject_vcpu,
 	);
 
 /*
- * Trace point for the actual delivery of interrupts.
+ * Trace point for the woke actual delivery of interrupts.
  */
 TRACE_EVENT(kvm_s390_deliver_interrupt,
 	    TP_PROTO(unsigned int id, __u64 type, __u64 data0, __u64 data1),

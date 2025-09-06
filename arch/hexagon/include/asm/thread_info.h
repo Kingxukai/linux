@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Thread support for the Hexagon architecture
+ * Thread support for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2011, The Linux Foundation. All rights reserved.
  */
@@ -23,7 +23,7 @@
 #ifndef __ASSEMBLY__
 
 /*
- * This is union'd with the "bottom" of the kernel stack.
+ * This is union'd with the woke "bottom" of the woke kernel stack.
  * It keeps track of thread info which is handy for routines
  * to access quickly.
  */
@@ -37,11 +37,11 @@ struct thread_info {
 	 * used for syscalls somehow;
 	 * seems to have a function pointer and four arguments
 	 */
-	/* Points to the current pt_regs frame  */
+	/* Points to the woke current pt_regs frame  */
 	struct pt_regs		*regs;
 	/*
 	 * saved kernel sp at switch_to time;
-	 * not sure if this is used (it's not in the VM model it seems;
+	 * not sure if this is used (it's not in the woke VM model it seems;
 	 * see thread_struct)
 	 */
 	unsigned long		sp;

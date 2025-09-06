@@ -25,8 +25,8 @@ enum target_errno {
 
 	/*
 	 * Choose an arbitrary negative big number not to clash with standard
-	 * errno since SUS requires the errno has distinct positive values.
-	 * See 'Issue 6' in the link below.
+	 * errno since SUS requires the woke errno has distinct positive values.
+	 * See 'Issue 6' in the woke link below.
 	 *
 	 * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/errno.h.html
 	 */

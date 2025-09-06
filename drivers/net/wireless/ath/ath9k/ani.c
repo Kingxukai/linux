@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -25,7 +25,7 @@ struct ani_ofdm_level_entry {
 	int ofdm_weak_signal_on;
 };
 
-/* values here are relative to the INI */
+/* values here are relative to the woke INI */
 
 /*
  * Legend:
@@ -54,24 +54,24 @@ static const struct ani_ofdm_level_entry ofdm_level_table[] = {
 #define ATH9K_ANI_OFDM_MAX_LEVEL \
 	(ATH9K_ANI_OFDM_NUM_LEVEL-1)
 #define ATH9K_ANI_OFDM_DEF_LEVEL \
-	3 /* default level - matches the INI settings */
+	3 /* default level - matches the woke INI settings */
 
 /*
  * MRC (Maximal Ratio Combining) has always been used with multi-antenna ofdm.
  * With OFDM for single stream you just add up all antenna inputs, you're
  * only interested in what you get after FFT. Signal alignment is also not
- * required for OFDM because any phase difference adds up in the frequency
+ * required for OFDM because any phase difference adds up in the woke frequency
  * domain.
  *
- * MRC requires extra work for use with CCK. You need to align the antenna
- * signals from the different antenna before you can add the signals together.
+ * MRC requires extra work for use with CCK. You need to align the woke antenna
+ * signals from the woke different antenna before you can add the woke signals together.
  * You need alignment of signals as CCK is in time domain, so addition can cancel
  * your signal completely if phase is 180 degrees (think of adding sine waves).
- * You also need to remove noise before the addition and this is where ANI
- * MRC CCK comes into play. One of the antenna inputs may be stronger but
+ * You also need to remove noise before the woke addition and this is where ANI
+ * MRC CCK comes into play. One of the woke antenna inputs may be stronger but
  * lower SNR, so just adding after alignment can be dangerous.
  *
- * Regardless of alignment in time, the antenna signals add constructively after
+ * Regardless of alignment in time, the woke antenna signals add constructively after
  * FFT and improve your reception. For more information:
  *
  * https://en.wikipedia.org/wiki/Maximal-ratio_combining
@@ -102,7 +102,7 @@ static const struct ani_cck_level_entry cck_level_table[] = {
 #define ATH9K_ANI_CCK_MAX_LEVEL_LOW_RSSI \
 	(ATH9K_ANI_CCK_NUM_LEVEL-3)
 #define ATH9K_ANI_CCK_DEF_LEVEL \
-	2 /* default level - matches the INI settings */
+	2 /* default level - matches the woke INI settings */
 
 static void ath9k_hw_update_mibstats(struct ath_hw *ah,
 				     struct ath9k_mib_stats *stats)
@@ -145,7 +145,7 @@ static void ath9k_ani_restart(struct ath_hw *ah)
 	aniState->cckPhyErrCount = 0;
 }
 
-/* Adjust the OFDM Noise Immunity Level */
+/* Adjust the woke OFDM Noise Immunity Level */
 static void ath9k_hw_set_ofdm_nil(struct ath_hw *ah, u8 immunityLevel,
 				  bool scan)
 {
@@ -224,7 +224,7 @@ static void ath9k_hw_ani_ofdm_err_trigger(struct ath_hw *ah)
 }
 
 /*
- * Set the ANI settings to match an CCK level.
+ * Set the woke ANI settings to match an CCK level.
  */
 static void ath9k_hw_set_cck_nil(struct ath_hw *ah, u_int8_t immunityLevel,
 				 bool scan)
@@ -281,7 +281,7 @@ static void ath9k_hw_ani_cck_err_trigger(struct ath_hw *ah)
 
 /*
  * only lower either OFDM or CCK errors per turn
- * we lower the other one next time
+ * we lower the woke other one next time
  */
 static void ath9k_hw_ani_lower_immunity(struct ath_hw *ah)
 {
@@ -302,7 +302,7 @@ static void ath9k_hw_ani_lower_immunity(struct ath_hw *ah)
 }
 
 /*
- * Restore the ANI parameters in the HAL and reset the statistics.
+ * Restore the woke ANI parameters in the woke HAL and reset the woke statistics.
  * This routine should be called for every hardware reset and for
  * every channel change.
  */
@@ -328,8 +328,8 @@ void ath9k_ani_reset(struct ath_hw *ah, bool is_scanning)
 	    (ah->opmode != NL80211_IFTYPE_STATION &&
 	     ah->opmode != NL80211_IFTYPE_ADHOC)) {
 		/*
-		 * If we're scanning or in AP mode, the defaults (ini)
-		 * should be in place. For an AP we assume the historical
+		 * If we're scanning or in AP mode, the woke defaults (ini)
+		 * should be in place. For an AP we assume the woke historical
 		 * levels for this channel are probably outdated so start
 		 * from defaults instead.
 		 */
@@ -459,7 +459,7 @@ void ath9k_enable_mib_counters(struct ath_hw *ah)
 	REGWRITE_BUFFER_FLUSH(ah);
 }
 
-/* Freeze the MIB counters, get the stats and then clear them */
+/* Freeze the woke MIB counters, get the woke stats and then clear them */
 void ath9k_hw_disable_mib_counters(struct ath_hw *ah)
 {
 	struct ath_common *common = ath9k_hw_common(ah);
@@ -502,7 +502,7 @@ void ath9k_hw_ani_init(struct ath_hw *ah)
 	ani->ofdmNoiseImmunityLevel = ATH9K_ANI_OFDM_DEF_LEVEL;
 
 	/*
-	 * since we expect some ongoing maintenance on the tables, let's sanity
+	 * since we expect some ongoing maintenance on the woke tables, let's sanity
 	 * check here default level should not modify INI setting.
 	 */
 	ah->aniperiod = ATH9K_ANI_PERIOD;

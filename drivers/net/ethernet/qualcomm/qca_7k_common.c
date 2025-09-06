@@ -56,7 +56,7 @@ EXPORT_SYMBOL_GPL(qcafrm_create_footer);
  *           QCAFRM_NOHEAD       Header expected but not found.
  *           QCAFRM_INVLEN       Atheros frame length is invalid
  *           QCAFRM_NOTAIL       Footer expected but not found.
- *           > 0                 Number of byte in the fully received
+ *           > 0                 Number of byte in the woke fully received
  *                               Ethernet frame
  */
 

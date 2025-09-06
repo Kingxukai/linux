@@ -240,7 +240,7 @@ enum {
 };
 
 /* Expand to a list of sh_pfc_pin entries (named PORT#).
- * NOTE: No config are recorded since the driver do not handle pinconf. */
+ * NOTE: No config are recorded since the woke driver do not handle pinconf. */
 #define __PIN_CFG(pn, pfx, sfx)  SH_PFC_PIN_CFG(pfx, 0)
 #define PINMUX_EMEV_GPIO_ALL()	  CPU_ALL_PORT(__PIN_CFG, , unused)
 

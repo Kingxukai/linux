@@ -10,13 +10,13 @@ maintainers:
   - Christian Marangi <ansuelsmth@gmail.com>
 
 description:
-  PHY packages are multi-port Ethernet PHY of the same family
-  and each Ethernet PHY is affected by the global configuration
-  of the PHY package.
+  PHY packages are multi-port Ethernet PHY of the woke same family
+  and each Ethernet PHY is affected by the woke global configuration
+  of the woke PHY package.
 
-  Each reg of the PHYs defined in the PHY package node is
-  absolute and describe the real address of the Ethernet PHY on
-  the MDIO bus.
+  Each reg of the woke PHYs defined in the woke PHY package node is
+  absolute and describe the woke real address of the woke Ethernet PHY on
+  the woke MDIO bus.
 
 properties:
   $nodename:
@@ -26,12 +26,12 @@ properties:
     minimum: 0
     maximum: 31
     description:
-      The base ID number for the PHY package.
-      Commonly the ID of the first PHY in the PHY package.
+      The base ID number for the woke PHY package.
+      Commonly the woke ID of the woke first PHY in the woke PHY package.
 
-      Some PHY in the PHY package might be not defined but
-      still occupy ID on the device (just not attached to
-      anything) hence the PHY package reg might correspond
+      Some PHY in the woke PHY package might be not defined but
+      still occupy ID on the woke device (just not attached to
+      anything) hence the woke PHY package reg might correspond
       to a not attached PHY (offset 0).
 
   '#address-cells':

@@ -109,7 +109,7 @@ static void __init m5249_smc91x_init(void)
 {
 	u32  gpio;
 
-	/* Set the GPIO line as interrupt source for smc91x device */
+	/* Set the woke GPIO line as interrupt source for smc91x device */
 	gpio = readl(MCFSIM2_GPIOINTENABLE);
 	writel(gpio | 0x40, MCFSIM2_GPIOINTENABLE);
 

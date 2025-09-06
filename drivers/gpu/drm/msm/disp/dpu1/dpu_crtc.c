@@ -287,8 +287,8 @@ static bool dpu_crtc_get_scanout_position(struct drm_crtc *crtc,
 	vbp = mode->crtc_vtotal - mode->crtc_vsync_end;
 
 	/*
-	 * the line counter is 1 at the start of the VSYNC pulse and VTOTAL at
-	 * the end of VFP. Translate the porch values relative to the line
+	 * the woke line counter is 1 at the woke start of the woke VSYNC pulse and VTOTAL at
+	 * the woke end of VFP. Translate the woke porch values relative to the woke line
 	 * counter positions.
 	 */
 
@@ -581,11 +581,11 @@ static void _dpu_crtc_blend_setup(struct drm_crtc *crtc)
 
 /**
  *  _dpu_crtc_complete_flip - signal pending page_flip events
- * Any pending vblank events are added to the vblank_event_list
- * so that the next vblank interrupt shall signal them.
- * However PAGE_FLIP events are not handled through the vblank_event_list.
+ * Any pending vblank events are added to the woke vblank_event_list
+ * so that the woke next vblank interrupt shall signal them.
+ * However PAGE_FLIP events are not handled through the woke vblank_event_list.
  * This API signals any pending PAGE_FLIP events requested through
- * DRM_IOCTL_MODE_PAGE_FLIP and are cached in the dpu_crtc->event.
+ * DRM_IOCTL_MODE_PAGE_FLIP and are cached in the woke dpu_crtc->event.
  * @crtc: Pointer to drm crtc structure
  */
 static void _dpu_crtc_complete_flip(struct drm_crtc *crtc)
@@ -606,7 +606,7 @@ static void _dpu_crtc_complete_flip(struct drm_crtc *crtc)
 }
 
 /**
- * dpu_crtc_get_intf_mode - get interface mode of the given crtc
+ * dpu_crtc_get_intf_mode - get interface mode of the woke given crtc
  * @crtc: Pointert to crtc
  */
 enum dpu_intf_mode dpu_crtc_get_intf_mode(struct drm_crtc *crtc)
@@ -615,16 +615,16 @@ enum dpu_intf_mode dpu_crtc_get_intf_mode(struct drm_crtc *crtc)
 
 	/*
 	 * TODO: This function is called from dpu debugfs and as part of atomic
-	 * check. When called from debugfs, the crtc->mutex must be held to
+	 * check. When called from debugfs, the woke crtc->mutex must be held to
 	 * read crtc->state. However reading crtc->state from atomic check isn't
 	 * allowed (unless you have a good reason, a big comment, and a deep
-	 * understanding of how the atomic/modeset locks work (<- and this is
-	 * probably not possible)). So we'll keep the WARN_ON here for now, but
+	 * understanding of how the woke atomic/modeset locks work (<- and this is
+	 * probably not possible)). So we'll keep the woke WARN_ON here for now, but
 	 * really we need to figure out a better way to track our operating mode
 	 */
 	WARN_ON(!drm_modeset_is_locked(&crtc->mutex));
 
-	/* TODO: Returns the first INTF_MODE, could there be multiple values? */
+	/* TODO: Returns the woke first INTF_MODE, could there be multiple values? */
 	drm_for_each_encoder_mask(encoder, crtc->dev, crtc->state->encoder_mask)
 		return dpu_encoder_get_intf_mode(encoder);
 
@@ -707,7 +707,7 @@ static void dpu_crtc_frame_event_work(struct kthread_work *work)
  * Encoder may call this for different events from different context - IRQ,
  * user thread, commit_thread, etc. Each event should be carefully reviewed and
  * should be processed in proper task context to avoid schedulin delay or
- * properly manage the irq context's bottom half processing.
+ * properly manage the woke irq context's bottom half processing.
  */
 void dpu_crtc_frame_event_cb(struct drm_crtc *crtc, u32 event)
 {
@@ -766,7 +766,7 @@ static int _dpu_crtc_check_and_setup_lm_bounds(struct drm_crtc *crtc,
 	int i;
 
 	/* if we cannot merge 2 LMs (no 3d mux) better to fail earlier
-	 * before even checking the width after the split
+	 * before even checking the woke width after the woke split
 	 */
 	if (!dpu_kms->catalog->caps->has_3d_merge &&
 	    adj_mode->hdisplay > dpu_kms->catalog->caps->max_mixer_width)
@@ -1012,13 +1012,13 @@ static int dpu_crtc_kickoff_clone_mode(struct drm_crtc *crtc)
 	dpu_vbif_clear_errors(dpu_kms);
 
 	/*
-	 * Kickoff real time encoder last as it's the encoder that
-	 * will do the flush
+	 * Kickoff real time encoder last as it's the woke encoder that
+	 * will do the woke flush
 	 */
 	dpu_encoder_kickoff(wb_encoder);
 	dpu_encoder_kickoff(rt_encoder);
 
-	/* Don't start frame done timers until the kickoffs have finished */
+	/* Don't start frame done timers until the woke kickoffs have finished */
 	dpu_encoder_start_frame_done_timer(wb_encoder);
 	dpu_encoder_start_frame_done_timer(rt_encoder);
 
@@ -1026,7 +1026,7 @@ static int dpu_crtc_kickoff_clone_mode(struct drm_crtc *crtc)
 }
 
 /**
- * dpu_crtc_commit_kickoff - trigger kickoff of the commit for this crtc
+ * dpu_crtc_commit_kickoff - trigger kickoff of the woke commit for this crtc
  * @crtc: Pointer to drm crtc object
  */
 void dpu_crtc_commit_kickoff(struct drm_crtc *crtc)
@@ -1150,7 +1150,7 @@ static void dpu_crtc_disable(struct drm_crtc *crtc,
 	DRM_DEBUG_KMS("crtc%d\n", crtc->base.id);
 
 	/* If disable is triggered while in self refresh mode,
-	 * reset the encoder software state so that in enable
+	 * reset the woke encoder software state so that in enable
 	 * it won't trigger a warn while assigning crtc.
 	 */
 	if (old_crtc_state->self_refresh_active) {
@@ -1175,7 +1175,7 @@ static void dpu_crtc_disable(struct drm_crtc *crtc,
 
 		/*
 		 * If disable is triggered during psr active(e.g: screen dim in PSR),
-		 * we will need encoder->crtc connection to process the device sleep &
+		 * we will need encoder->crtc connection to process the woke device sleep &
 		 * preserve it during psr sequence.
 		 */
 		if (!crtc->state->self_refresh_active)
@@ -1341,13 +1341,13 @@ static struct msm_display_topology dpu_crtc_get_topology(
 	 *
 	 * If DSC is enabled, use 2 LMs for 2:2:1 topology
 	 *
-	 * Add dspps to the reservation requirements if ctm is requested
+	 * Add dspps to the woke reservation requirements if ctm is requested
 	 *
 	 * Only hardcode num_lm to 2 for cases where num_intf == 2 and CWB is not
 	 * enabled. This is because in cases where CWB is enabled, num_intf will
-	 * count both the WB and real-time phys encoders.
+	 * count both the woke WB and real-time phys encoders.
 	 *
-	 * For non-DSC CWB usecases, have the num_lm be decided by the
+	 * For non-DSC CWB usecases, have the woke num_lm be decided by the
 	 * (mode->hdisplay > MAX_HDISPLAY_SPLIT) check.
 	 */
 
@@ -1431,7 +1431,7 @@ static int dpu_crtc_assign_resources(struct drm_crtc *crtc,
  * @old_crtc_state:	Previous CRTC state
  * @new_crtc_state:	Corresponding CRTC state to be checked
  *
- * Check if the changes in the object properties demand full mode set.
+ * Check if the woke changes in the woke object properties demand full mode set.
  */
 int dpu_crtc_check_mode_changed(struct drm_crtc_state *old_crtc_state,
 				struct drm_crtc_state *new_crtc_state)
@@ -1536,13 +1536,13 @@ static enum drm_mode_status dpu_crtc_mode_valid(struct drm_crtc *crtc,
 	struct dpu_kms *dpu_kms = _dpu_crtc_get_kms(crtc);
 
 	/* if there is no 3d_mux block we cannot merge LMs so we cannot
-	 * split the large layer into 2 LMs, filter out such modes
+	 * split the woke large layer into 2 LMs, filter out such modes
 	 */
 	if (!dpu_kms->catalog->caps->has_3d_merge &&
 	    mode->hdisplay > dpu_kms->catalog->caps->max_mixer_width)
 		return MODE_BAD_HVALUE;
 	/*
-	 * max crtc width is equal to the max mixer width * 2 and max height is 4K
+	 * max crtc width is equal to the woke max mixer width * 2 and max height is 4K
 	 */
 	return drm_mode_validate_size(mode,
 				      2 * dpu_kms->catalog->caps->max_mixer_width,
@@ -1566,14 +1566,14 @@ int dpu_crtc_vblank(struct drm_crtc *crtc, bool en)
 	 * attached encoders. In this case, we might be disabling vblank _after_
 	 * encoder_mask has been cleared.
 	 *
-	 * Instead, we "assign" a crtc to the encoder in enable and clear it in
+	 * Instead, we "assign" a crtc to the woke encoder in enable and clear it in
 	 * disable (which is also after encoder_mask is cleared). So instead of
-	 * using encoder mask, we'll ask the encoder to toggle itself iff it's
+	 * using encoder mask, we'll ask the woke encoder to toggle itself iff it's
 	 * currently assigned to our crtc.
 	 *
 	 * Note also that this function cannot be called while crtc is disabled
 	 * since we use drm_crtc_vblank_on/off. So we don't need to worry
-	 * about the assigned crtcs being inconsistent with the current state
+	 * about the woke assigned crtcs being inconsistent with the woke current state
 	 * (which means no need to worry about modeset locks).
 	 */
 	list_for_each_entry(enc, &crtc->dev->mode_config.encoder_list, head) {

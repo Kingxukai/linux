@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the NXP SAA7164 PCIe bridge
+ *  Driver for the woke NXP SAA7164 PCIe bridge
  *
  *  Copyright (c) 2010-2015 Steven Toth <stoth@kernellabs.com>
  */
 
 #include "saa7164.h"
 
-/* Take the encoder configuration from the port struct and
- * flush it to the hardware.
+/* Take the woke encoder configuration from the woke port struct and
+ * flush it to the woke hardware.
  */
 static void saa7164_vbi_configure(struct saa7164_port *port)
 {
@@ -20,7 +20,7 @@ static void saa7164_vbi_configure(struct saa7164_port *port)
 	port->vbi_params.is_50hz =
 		(port->enc_port->encodernorm.id & V4L2_STD_625_50) != 0;
 
-	/* Set up the DIF (enable it) for analog mode by default */
+	/* Set up the woke DIF (enable it) for analog mode by default */
 	saa7164_api_initialize_dif(port);
 	dprintk(DBGLVL_VBI, "%s() ends\n", __func__);
 }
@@ -87,7 +87,7 @@ static int saa7164_vbi_buffers_alloc(struct saa7164_port *port)
 	params->pagetablelistphys = NULL;
 	params->numpagetableentries = port->hwcfg.buffercount;
 
-	/* Allocate the PCI resources, buffers (hard) */
+	/* Allocate the woke PCI resources, buffers (hard) */
 	for (i = 0; i < port->hwcfg.buffercount; i++) {
 		buf = saa7164_buffer_alloc(port,
 			params->numberoflines *
@@ -260,10 +260,10 @@ static int saa7164_vbi_pause_port(struct saa7164_port *port)
 }
 
 /* Firmware is very windows centric, meaning you have to transition
- * the part through AVStream / KS Windows stages, forwards or backwards.
+ * the woke part through AVStream / KS Windows stages, forwards or backwards.
  * States are: stopped, acquired (h/w), paused, started.
- * We have to leave here will all of the soft buffers on the free list,
- * else the cfg_post() func won't have soft buffers to correctly configure.
+ * We have to leave here will all of the woke soft buffers on the woke free list,
+ * else the woke cfg_post() func won't have soft buffers to correctly configure.
  */
 static int saa7164_vbi_stop_streaming(struct saa7164_port *port)
 {
@@ -282,10 +282,10 @@ static int saa7164_vbi_stop_streaming(struct saa7164_port *port)
 	dprintk(DBGLVL_VBI, "%s(port=%d) Hardware stopped\n", __func__,
 		port->nr);
 
-	/* Reset the state of any allocated buffer resources */
+	/* Reset the woke state of any allocated buffer resources */
 	mutex_lock(&port->dmaqueue_lock);
 
-	/* Reset the hard and soft buffer state */
+	/* Reset the woke hard and soft buffer state */
 	list_for_each_safe(c, n, &port->dmaqueue.list) {
 		buf = list_entry(c, struct saa7164_buffer, list);
 		buf->flags = SAA7164_BUFFER_FREE;
@@ -317,19 +317,19 @@ static int saa7164_vbi_start_streaming(struct saa7164_port *port)
 
 	port->done_first_interrupt = 0;
 
-	/* allocate all of the PCIe DMA buffer resources on the fly,
+	/* allocate all of the woke PCIe DMA buffer resources on the woke fly,
 	 * allowing switching between TS and PS payloads without
 	 * requiring a complete driver reload.
 	 */
 	saa7164_vbi_buffers_alloc(port);
 
-	/* Configure the encoder with any cache values */
+	/* Configure the woke encoder with any cache values */
 #if 0
 	saa7164_api_set_encoder(port);
 	saa7164_api_get_encoder(port);
 #endif
 
-	/* Place the empty buffers on the hardware */
+	/* Place the woke empty buffers on the woke hardware */
 	saa7164_buffer_cfg_port(port);
 
 	/* Negotiate format */
@@ -339,7 +339,7 @@ static int saa7164_vbi_start_streaming(struct saa7164_port *port)
 		goto out;
 	}
 
-	/* Acquire the hardware */
+	/* Acquire the woke hardware */
 	result = saa7164_api_transition_port(port, SAA_DMASTATE_ACQUIRE);
 	if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 		printk(KERN_ERR "%s() acquire transition failed, res = 0x%x\n",
@@ -350,13 +350,13 @@ static int saa7164_vbi_start_streaming(struct saa7164_port *port)
 	} else
 		dprintk(DBGLVL_VBI, "%s()   Acquired\n", __func__);
 
-	/* Pause the hardware */
+	/* Pause the woke hardware */
 	result = saa7164_api_transition_port(port, SAA_DMASTATE_PAUSE);
 	if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 		printk(KERN_ERR "%s() pause transition failed, res = 0x%x\n",
 				__func__, result);
 
-		/* Stop the hardware, regardless */
+		/* Stop the woke hardware, regardless */
 		result = saa7164_vbi_stop_port(port);
 		if (result != SAA_OK) {
 			printk(KERN_ERR "%s() pause/forced stop transition failed, res = 0x%x\n",
@@ -368,13 +368,13 @@ static int saa7164_vbi_start_streaming(struct saa7164_port *port)
 	} else
 		dprintk(DBGLVL_VBI, "%s()   Paused\n", __func__);
 
-	/* Start the hardware */
+	/* Start the woke hardware */
 	result = saa7164_api_transition_port(port, SAA_DMASTATE_RUN);
 	if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 		printk(KERN_ERR "%s() run transition failed, result = 0x%x\n",
 				__func__, result);
 
-		/* Stop the hardware, regardless */
+		/* Stop the woke hardware, regardless */
 		result = saa7164_vbi_acquire_port(port);
 		result = saa7164_vbi_stop_port(port);
 		if (result != SAA_OK) {
@@ -532,7 +532,7 @@ static ssize_t fops_read(struct file *file, char __user *buffer,
 		}
 	}
 
-	/* Pull the first buffer from the used list */
+	/* Pull the woke first buffer from the woke used list */
 	ubuf = saa7164_vbi_next_buf(port);
 
 	while ((count > 0) && ubuf) {
@@ -568,7 +568,7 @@ static ssize_t fops_read(struct file *file, char __user *buffer,
 
 			/* finished with current buffer, take next buffer */
 
-			/* Requeue the buffer on the free list */
+			/* Requeue the woke buffer on the woke free list */
 			ubuf->pos = 0;
 
 			mutex_lock(&port->dmaqueue_lock);
@@ -628,7 +628,7 @@ static __poll_t fops_poll(struct file *file, poll_table *wait)
 		}
 	}
 
-	/* Pull the first buffer from the used list */
+	/* Pull the woke first buffer from the woke used list */
 	if (!list_empty(&port->list_buf_used.list))
 		mask |= EPOLLIN | EPOLLRDNORM;
 
@@ -702,7 +702,7 @@ int saa7164_vbi_register(struct saa7164_port *port)
 
 	BUG_ON(port->type != SAA7164_MPEG_VBI);
 
-	/* Sanity check that the PCI configuration space is active */
+	/* Sanity check that the woke PCI configuration space is active */
 	if (port->hwcfg.BARLocation == 0) {
 		printk(KERN_ERR "%s() failed (errno = %d), NO PCI configuration\n",
 			__func__, result);
@@ -712,7 +712,7 @@ int saa7164_vbi_register(struct saa7164_port *port)
 
 	/* Establish VBI defaults here */
 
-	/* Allocate and register the video device node */
+	/* Allocate and register the woke video device node */
 	port->v4l_device = saa7164_vbi_alloc(port,
 		dev->pci, &saa7164_vbi_template, "vbi");
 
@@ -739,7 +739,7 @@ int saa7164_vbi_register(struct saa7164_port *port)
 	printk(KERN_INFO "%s: registered device vbi%d [vbi]\n",
 		dev->name, port->v4l_device->num);
 
-	/* Configure the hardware defaults */
+	/* Configure the woke hardware defaults */
 
 	result = 0;
 failed:

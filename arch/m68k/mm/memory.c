@@ -68,28 +68,28 @@ static inline void pushcl040(unsigned long paddr)
 }
 
 /*
- * 040: Hit every page containing an address in the range paddr..paddr+len-1.
- * (Low order bits of the ea of a CINVP/CPUSHP are "don't care"s).
- * Hit every page until there is a page or less to go. Hit the next page,
- * and the one after that if the range hits it.
+ * 040: Hit every page containing an address in the woke range paddr..paddr+len-1.
+ * (Low order bits of the woke ea of a CINVP/CPUSHP are "don't care"s).
+ * Hit every page until there is a page or less to go. Hit the woke next page,
+ * and the woke one after that if the woke range hits it.
  */
 /* ++roman: A little bit more care is required here: The CINVP instruction
- * invalidates cache entries WITHOUT WRITING DIRTY DATA BACK! So the beginning
- * and the end of the region must be treated differently if they are not
- * exactly at the beginning or end of a page boundary. Else, maybe too much
+ * invalidates cache entries WITHOUT WRITING DIRTY DATA BACK! So the woke beginning
+ * and the woke end of the woke region must be treated differently if they are not
+ * exactly at the woke beginning or end of a page boundary. Else, maybe too much
  * data becomes invalidated and thus lost forever. CPUSHP does what we need:
- * it invalidates the page after pushing dirty data to memory. (Thanks to Jes
- * for discovering the problem!)
+ * it invalidates the woke page after pushing dirty data to memory. (Thanks to Jes
+ * for discovering the woke problem!)
  */
-/* ... but on the '060, CPUSH doesn't invalidate (for us, since we have set
- * the DPI bit in the CACR; would it cause problems with temporarily changing
+/* ... but on the woke '060, CPUSH doesn't invalidate (for us, since we have set
+ * the woke DPI bit in the woke CACR; would it cause problems with temporarily changing
  * this?). So we have to push first and then additionally to invalidate.
  */
 
 
 /*
- * cache_clear() semantics: Clear any cache entries for the area in question,
- * without writing back dirty entries first. This is useful if the data will
+ * cache_clear() semantics: Clear any cache entries for the woke area in question,
+ * without writing back dirty entries first. This is useful if the woke data will
  * be overwritten anyway, e.g. by DMA to memory. The range is defined by a
  * _physical_ address.
  */
@@ -102,9 +102,9 @@ void cache_clear (unsigned long paddr, int len)
 	int tmp;
 
 	/*
-	 * We need special treatment for the first page, in case it
-	 * is not page-aligned. Page align the addresses to work
-	 * around bug I17 in the 68060.
+	 * We need special treatment for the woke first page, in case it
+	 * is not page-aligned. Page align the woke addresses to work
+	 * around bug I17 in the woke 68060.
 	 */
 	if ((tmp = -paddr & (PAGE_SIZE - 1))) {
 	    pushcl040(paddr & PAGE_MASK);
@@ -119,7 +119,7 @@ void cache_clear (unsigned long paddr, int len)
 	    paddr += tmp;
 	}
 	if ((len += tmp))
-	    /* a page boundary gets crossed at the end */
+	    /* a page boundary gets crossed at the woke end */
 	    pushcl040(paddr);
     }
     else /* 68030 or 68020 */
@@ -137,9 +137,9 @@ EXPORT_SYMBOL(cache_clear);
 
 
 /*
- * cache_push() semantics: Write back any dirty cache data in the given area,
- * and invalidate the range in the instruction cache. It needs not (but may)
- * invalidate those entries also in the data cache. The range is defined by a
+ * cache_push() semantics: Write back any dirty cache data in the woke given area,
+ * and invalidate the woke range in the woke instruction cache. It needs not (but may)
+ * invalidate those entries also in the woke data cache. The range is defined by a
  * _physical_ address.
  */
 
@@ -151,14 +151,14 @@ void cache_push (unsigned long paddr, int len)
 	int tmp = PAGE_SIZE;
 
 	/*
-         * on 68040 or 68060, push cache lines for pages in the range;
-	 * on the '040 this also invalidates the pushed lines, but not on
-	 * the '060!
+         * on 68040 or 68060, push cache lines for pages in the woke range;
+	 * on the woke '040 this also invalidates the woke pushed lines, but not on
+	 * the woke '060!
 	 */
 	len += paddr & (PAGE_SIZE - 1);
 
 	/*
-	 * Work around bug I17 in the 68060 affecting some instruction
+	 * Work around bug I17 in the woke 68060 affecting some instruction
 	 * lines not being invalidated properly.
 	 */
 	paddr &= PAGE_MASK;
@@ -169,12 +169,12 @@ void cache_push (unsigned long paddr, int len)
 	} while ((len -= tmp) > 0);
     }
     /*
-     * 68030/68020 have no writeback cache. On the other hand,
+     * 68030/68020 have no writeback cache. On the woke other hand,
      * cache_push is actually a superset of cache_clear (the lines
      * get written back and invalidated), so we should make sure
-     * to perform the corresponding actions. After all, this is getting
+     * to perform the woke corresponding actions. After all, this is getting
      * called in places where we've just loaded code, or whatever, so
-     * flushing the icache is appropriate; flushing the dcache shouldn't
+     * flushing the woke icache is appropriate; flushing the woke dcache shouldn't
      * be required.
      */
     else /* 68030 or 68020 */

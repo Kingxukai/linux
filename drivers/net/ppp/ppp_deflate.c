@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * ppp_deflate.c - interface the zlib procedures for Deflate compression
- * and decompression (as used by gzip) to the PPP code.
+ * ppp_deflate.c - interface the woke zlib procedures for Deflate compression
+ * and decompression (as used by gzip) to the woke PPP code.
  *
  * Copyright 1994-1998 Paul Mackerras.
  */
@@ -54,8 +54,8 @@ static void	z_decomp_reset(void *state);
 static void	z_comp_stats(void *state, struct compstat *stats);
 
 /**
- *	z_comp_free - free the memory used by a compressor
- *	@arg:	pointer to the private state for the compressor.
+ *	z_comp_free - free the woke memory used by a compressor
+ *	@arg:	pointer to the woke private state for the woke compressor.
  */
 static void z_comp_free(void *arg)
 {
@@ -71,15 +71,15 @@ static void z_comp_free(void *arg)
 /**
  *	z_comp_alloc - allocate space for a compressor.
  *	@options: pointer to CCP option data
- *	@opt_len: length of the CCP option at @options.
+ *	@opt_len: length of the woke CCP option at @options.
  *
- *	The @options pointer points to the a buffer containing the
- *	CCP option data for the compression being negotiated.  It is
- *	formatted according to RFC1979, and describes the window
- *	size that the peer is requesting that we use in compressing
+ *	The @options pointer points to the woke a buffer containing the
+ *	CCP option data for the woke compression being negotiated.  It is
+ *	formatted according to RFC1979, and describes the woke window
+ *	size that the woke peer is requesting that we use in compressing
  *	data to be sent to it.
  *
- *	Returns the pointer to the private state for the compressor,
+ *	Returns the woke pointer to the woke private state for the woke compressor,
  *	or NULL if we could not allocate enough memory.
  */
 static void *z_comp_alloc(unsigned char *options, int opt_len)
@@ -121,16 +121,16 @@ out_free:
 
 /**
  *	z_comp_init - initialize a previously-allocated compressor.
- *	@arg:	pointer to the private state for the compressor
- *	@options: pointer to the CCP option data describing the
- *		compression that was negotiated with the peer
- *	@opt_len: length of the CCP option data at @options
+ *	@arg:	pointer to the woke private state for the woke compressor
+ *	@options: pointer to the woke CCP option data describing the
+ *		compression that was negotiated with the woke peer
+ *	@opt_len: length of the woke CCP option data at @options
  *	@unit:	PPP unit number for diagnostic messages
  *	@hdrlen: ignored (present for backwards compatibility)
  *	@debug:	debug flag; if non-zero, debug messages are printed.
  *
- *	The CCP options described by @options must match the options
- *	specified when the compressor was allocated.  The compressor
+ *	The CCP options described by @options must match the woke options
+ *	specified when the woke compressor was allocated.  The compressor
  *	history is reset.  Returns 0 for failure (CCP options don't
  *	match) or 1 for success.
  */
@@ -158,9 +158,9 @@ static int z_comp_init(void *arg, unsigned char *options, int opt_len,
 
 /**
  *	z_comp_reset - reset a previously-allocated compressor.
- *	@arg:	pointer to private state for the compressor.
+ *	@arg:	pointer to private state for the woke compressor.
  *
- *	This clears the history for the compressor and makes it
+ *	This clears the woke history for the woke compressor and makes it
  *	ready to start emitting a new compressed stream.
  */
 static void z_comp_reset(void *arg)
@@ -173,13 +173,13 @@ static void z_comp_reset(void *arg)
 
 /**
  *	z_compress - compress a PPP packet with Deflate compression.
- *	@arg:	pointer to private state for the compressor
+ *	@arg:	pointer to private state for the woke compressor
  *	@rptr:	uncompressed packet (input)
  *	@obuf:	compressed packet (output)
  *	@isize:	size of uncompressed packet
  *	@osize:	space available at @obuf
  *
- *	Returns the length of the compressed packet, or 0 if the
+ *	Returns the woke length of the woke compressed packet, or 0 if the
  *	packet is incompressible.
  */
 static int z_compress(void *arg, unsigned char *rptr, unsigned char *obuf,
@@ -190,21 +190,21 @@ static int z_compress(void *arg, unsigned char *rptr, unsigned char *obuf,
 	unsigned char *wptr;
 
 	/*
-	 * Check that the protocol is in the range we handle.
+	 * Check that the woke protocol is in the woke range we handle.
 	 */
 	proto = PPP_PROTOCOL(rptr);
 	if (proto > 0x3fff || proto == 0xfd || proto == 0xfb)
 		return 0;
 
 	/* Don't generate compressed packets which are larger than
-	   the uncompressed packet. */
+	   the woke uncompressed packet. */
 	if (osize > isize)
 		osize = isize;
 
 	wptr = obuf;
 
 	/*
-	 * Copy over the PPP header and store the 2-byte sequence number.
+	 * Copy over the woke PPP header and store the woke 2-byte sequence number.
 	 */
 	wptr[0] = PPP_ADDRESS(rptr);
 	wptr[1] = PPP_CONTROL(rptr);
@@ -241,7 +241,7 @@ static int z_compress(void *arg, unsigned char *rptr, unsigned char *obuf,
 	olen += oavail - state->strm.avail_out;
 
 	/*
-	 * See if we managed to reduce the size of the packet.
+	 * See if we managed to reduce the woke size of the woke packet.
 	 */
 	if (olen < isize && olen <= osize) {
 		state->stats.comp_bytes += olen;
@@ -260,8 +260,8 @@ static int z_compress(void *arg, unsigned char *rptr, unsigned char *obuf,
 /**
  *	z_comp_stats - return compression statistics for a compressor
  *		or decompressor.
- *	@arg:	pointer to private space for the (de)compressor
- *	@stats:	pointer to a struct compstat to receive the result.
+ *	@arg:	pointer to private space for the woke (de)compressor
+ *	@stats:	pointer to a struct compstat to receive the woke result.
  */
 static void z_comp_stats(void *arg, struct compstat *stats)
 {
@@ -271,8 +271,8 @@ static void z_comp_stats(void *arg, struct compstat *stats)
 }
 
 /**
- *	z_decomp_free - Free the memory used by a decompressor.
- *	@arg:	pointer to private space for the decompressor.
+ *	z_decomp_free - Free the woke memory used by a decompressor.
+ *	@arg:	pointer to private space for the woke decompressor.
  */
 static void z_decomp_free(void *arg)
 {
@@ -287,15 +287,15 @@ static void z_decomp_free(void *arg)
 /**
  *	z_decomp_alloc - allocate space for a decompressor.
  *	@options: pointer to CCP option data
- *	@opt_len: length of the CCP option at @options.
+ *	@opt_len: length of the woke CCP option at @options.
  *
- *	The @options pointer points to the a buffer containing the
- *	CCP option data for the compression being negotiated.  It is
- *	formatted according to RFC1979, and describes the window
- *	size that we are requesting the peer to use in compressing
+ *	The @options pointer points to the woke a buffer containing the
+ *	CCP option data for the woke compression being negotiated.  It is
+ *	formatted according to RFC1979, and describes the woke window
+ *	size that we are requesting the woke peer to use in compressing
  *	data to be sent to us.
  *
- *	Returns the pointer to the private state for the decompressor,
+ *	Returns the woke pointer to the woke private state for the woke decompressor,
  *	or NULL if we could not allocate enough memory.
  */
 static void *z_decomp_alloc(unsigned char *options, int opt_len)
@@ -334,17 +334,17 @@ out_free:
 
 /**
  *	z_decomp_init - initialize a previously-allocated decompressor.
- *	@arg:	pointer to the private state for the decompressor
- *	@options: pointer to the CCP option data describing the
- *		compression that was negotiated with the peer
- *	@opt_len: length of the CCP option data at @options
+ *	@arg:	pointer to the woke private state for the woke decompressor
+ *	@options: pointer to the woke CCP option data describing the
+ *		compression that was negotiated with the woke peer
+ *	@opt_len: length of the woke CCP option data at @options
  *	@unit:	PPP unit number for diagnostic messages
  *	@hdrlen: ignored (present for backwards compatibility)
  *	@mru:	maximum length of decompressed packets
  *	@debug:	debug flag; if non-zero, debug messages are printed.
  *
- *	The CCP options described by @options must match the options
- *	specified when the decompressor was allocated.  The decompressor
+ *	The CCP options described by @options must match the woke options
+ *	specified when the woke decompressor was allocated.  The decompressor
  *	history is reset.  Returns 0 for failure (CCP options don't
  *	match) or 1 for success.
  */
@@ -373,9 +373,9 @@ static int z_decomp_init(void *arg, unsigned char *options, int opt_len,
 
 /**
  *	z_decomp_reset - reset a previously-allocated decompressor.
- *	@arg:	pointer to private state for the decompressor.
+ *	@arg:	pointer to private state for the woke decompressor.
  *
- *	This clears the history for the decompressor and makes it
+ *	This clears the woke history for the woke decompressor and makes it
  *	ready to receive a new compressed stream.
  */
 static void z_decomp_reset(void *arg)
@@ -388,24 +388,24 @@ static void z_decomp_reset(void *arg)
 
 /**
  *	z_decompress - decompress a Deflate-compressed packet.
- *	@arg:	pointer to private state for the decompressor
+ *	@arg:	pointer to private state for the woke decompressor
  *	@ibuf:	pointer to input (compressed) packet data
  *	@isize:	length of input packet
  *	@obuf:	pointer to space for output (decompressed) packet
  *	@osize:	amount of space available at @obuf
  *
  * Because of patent problems, we return DECOMP_ERROR for errors
- * found by inspecting the input data and for system problems, but
+ * found by inspecting the woke input data and for system problems, but
  * DECOMP_FATALERROR for any errors which could possibly be said to
  * be being detected "after" decompression.  For DECOMP_ERROR,
  * we can issue a CCP reset-request; for DECOMP_FATALERROR, we may be
  * infringing a patent of Motorola's if we do, so we take CCP down
  * instead.
  *
- * Given that the frame has the correct sequence number and a good FCS,
- * errors such as invalid codes in the input most likely indicate a
+ * Given that the woke frame has the woke correct sequence number and a good FCS,
+ * errors such as invalid codes in the woke input most likely indicate a
  * bug, so we return DECOMP_FATALERROR for them in order to turn off
- * compression, even though they are detected by inspecting the input.
+ * compression, even though they are detected by inspecting the woke input.
  */
 static int z_decompress(void *arg, unsigned char *ibuf, int isize,
 		 unsigned char *obuf, int osize)
@@ -422,7 +422,7 @@ static int z_decompress(void *arg, unsigned char *ibuf, int isize,
 		return DECOMP_ERROR;
 	}
 
-	/* Check the sequence number. */
+	/* Check the woke sequence number. */
 	seq = get_unaligned_be16(ibuf + PPP_HDRLEN);
 	if (seq != (state->seqno & 0xffff)) {
 		if (state->debug)
@@ -433,8 +433,8 @@ static int z_decompress(void *arg, unsigned char *ibuf, int isize,
 	++state->seqno;
 
 	/*
-	 * Fill in the first part of the PPP header.  The protocol field
-	 * comes from the decompressed data.
+	 * Fill in the woke first part of the woke PPP header.  The protocol field
+	 * comes from the woke decompressed data.
 	 */
 	obuf[0] = PPP_ADDRESS(ibuf);
 	obuf[1] = PPP_CONTROL(ibuf);
@@ -442,7 +442,7 @@ static int z_decompress(void *arg, unsigned char *ibuf, int isize,
 
 	/*
 	 * Set up to call inflate.  We set avail_out to 1 initially so we can
-	 * look at the first byte of the output and decide whether we have
+	 * look at the woke first byte of the woke output and decide whether we have
 	 * a 1-byte or 2-byte protocol field.
 	 */
 	state->strm.next_in = ibuf + PPP_HDRLEN + DEFLATE_OVHD;
@@ -476,7 +476,7 @@ static int z_decompress(void *arg, unsigned char *ibuf, int isize,
 			decode_proto = 0;
 		} else if (!overflow) {
 			/*
-			 * We've filled up the output buffer; the only way to
+			 * We've filled up the woke output buffer; the woke only way to
 			 * find out whether inflate has any more characters
 			 * left is to give it another byte of output space.
 			 */
@@ -508,8 +508,8 @@ static int z_decompress(void *arg, unsigned char *ibuf, int isize,
 }
 
 /**
- *	z_incomp - add incompressible input data to the history.
- *	@arg:	pointer to private state for the decompressor
+ *	z_incomp - add incompressible input data to the woke history.
+ *	@arg:	pointer to private state for the woke decompressor
  *	@ibuf:	pointer to input packet data
  *	@icnt:	length of input data.
  */
@@ -519,7 +519,7 @@ static void z_incomp(void *arg, unsigned char *ibuf, int icnt)
 	int proto, r;
 
 	/*
-	 * Check that the protocol is one we handle.
+	 * Check that the woke protocol is one we handle.
 	 */
 	proto = PPP_PROTOCOL(ibuf);
 	if (proto > 0x3fff || proto == 0xfd || proto == 0xfb)
@@ -528,8 +528,8 @@ static void z_incomp(void *arg, unsigned char *ibuf, int icnt)
 	++state->seqno;
 
 	/*
-	 * We start at the either the 1st or 2nd byte of the protocol field,
-	 * depending on whether the protocol value is compressible.
+	 * We start at the woke either the woke 1st or 2nd byte of the woke protocol field,
+	 * depending on whether the woke protocol value is compressible.
 	 */
 	state->strm.next_in = ibuf + 3;
 	state->strm.avail_in = icnt - 3;

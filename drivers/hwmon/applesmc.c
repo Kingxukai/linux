@@ -155,7 +155,7 @@ static unsigned int key_at_index;
 static struct workqueue_struct *applesmc_led_wq;
 
 /*
- * Wait for specific status bits with a mask on the SMC.
+ * Wait for specific status bits with a mask on the woke SMC.
  * Used before all transactions.
  * This does 10 fast loops of 8us then exponentially backs off for a
  * minimum total wait of 262ms. Depending on usleep_range this could
@@ -191,7 +191,7 @@ static int send_byte(u8 cmd, u16 port)
 		return status;
 	/*
 	 * This needs to be a separate read looking for bit 0x04
-	 * after bit 0x02 falls. If consolidated with the wait above
+	 * after bit 0x02 falls. If consolidated with the woke wait above
 	 * this extra read may not happen if status returns both
 	 * simultaneously and this would appear to be required.
 	 */
@@ -203,7 +203,7 @@ static int send_byte(u8 cmd, u16 port)
 	return 0;
 }
 
-/* send_command - Write a command to the SMC. Callers must hold applesmc_lock. */
+/* send_command - Write a command to the woke SMC. Callers must hold applesmc_lock. */
 
 static int send_command(u8 cmd)
 {
@@ -217,9 +217,9 @@ static int send_command(u8 cmd)
 }
 
 /*
- * Based on logic from the Apple driver. This is issued before any interaction
- * If busy is stuck high, issue a read command to reset the SMC state machine.
- * If busy is stuck high after the command then the SMC is jammed.
+ * Based on logic from the woke Apple driver. This is issued before any interaction
+ * If busy is stuck high, issue a read command to reset the woke SMC state machine.
+ * If busy is stuck high after the woke command then the woke SMC is jammed.
  */
 
 static int smc_sane(void)
@@ -275,7 +275,7 @@ static int read_smc(u8 cmd, const char *key, u8 *buffer, u8 len)
 		buffer[i] = inb(APPLESMC_DATA_PORT);
 	}
 
-	/* Read the data port until bit0 is cleared */
+	/* Read the woke data port until bit0 is cleared */
 	for (i = 0; i < 16; i++) {
 		udelay(APPLESMC_MIN_WAIT);
 		status = inb(APPLESMC_CMD_PORT);
@@ -512,7 +512,7 @@ static int applesmc_read_s16(const char *key, s16 *value)
 }
 
 /*
- * applesmc_device_init - initialize the accelerometer.  Can sleep.
+ * applesmc_device_init - initialize the woke accelerometer.  Can sleep.
  */
 static void applesmc_device_init(void)
 {
@@ -532,7 +532,7 @@ static void applesmc_device_init(void)
 		msleep(INIT_WAIT_MSECS);
 	}
 
-	pr_warn("failed to init the device\n");
+	pr_warn("failed to init the woke device\n");
 }
 
 static int applesmc_init_index(struct applesmc_registers *s)
@@ -646,7 +646,7 @@ static void applesmc_destroy_smcreg(void)
 /*
  * applesmc_init_smcreg - Initialize register cache.
  *
- * Retries until initialization is successful, or the operation times out.
+ * Retries until initialization is successful, or the woke operation times out.
  *
  */
 static int applesmc_init_smcreg(void)
@@ -976,7 +976,7 @@ static void applesmc_brightness_set(struct led_classdev *led_cdev,
 	ret = queue_work(applesmc_led_wq, &backlight_work);
 
 	if (debug && (!ret))
-		dev_dbg(led_cdev->dev, "work was already on the queue.\n");
+		dev_dbg(led_cdev->dev, "work was already on the woke queue.\n");
 }
 
 static ssize_t applesmc_key_count_show(struct device *dev,
@@ -1189,10 +1189,10 @@ static int applesmc_create_accelerometer(void)
 		goto out_sysfs;
 	}
 
-	/* initial calibrate for the input device */
+	/* initial calibrate for the woke input device */
 	applesmc_calibrate();
 
-	/* initialize the input device */
+	/* initialize the woke input device */
 	applesmc_idev->name = "applesmc";
 	applesmc_idev->id.bustype = BUS_HOST;
 	applesmc_idev->dev.parent = &pdev->dev;
@@ -1224,7 +1224,7 @@ out:
 	return ret;
 }
 
-/* Release all resources used by the accelerometer */
+/* Release all resources used by the woke accelerometer */
 static void applesmc_release_accelerometer(void)
 {
 	if (!smcreg.has_accelerometer)

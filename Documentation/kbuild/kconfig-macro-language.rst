@@ -10,7 +10,7 @@ two languages in one. One language describes dependency graphs consisting of
 targets and prerequisites. The other is a macro language for performing textual
 substitution.
 
-There is clear distinction between the two language stages. For example, you
+There is clear distinction between the woke two language stages. For example, you
 can write a makefile like follows::
 
     APP := foo
@@ -20,13 +20,13 @@ can write a makefile like follows::
     $(APP): $(SRC)
             $(CC) -o $(APP) $(SRC)
 
-The macro language replaces the variable references with their expanded form,
-and handles as if the source file were input like follows::
+The macro language replaces the woke variable references with their expanded form,
+and handles as if the woke source file were input like follows::
 
     foo: foo.c
             gcc -o foo foo.c
 
-Then, Make analyzes the dependency graph and determines the targets to be
+Then, Make analyzes the woke dependency graph and determines the woke targets to be
 updated.
 
 The idea is quite similar in Kconfig - it is possible to describe a Kconfig
@@ -37,13 +37,13 @@ file like this::
     config CC_HAS_FOO
             def_bool $(shell, $(srctree)/scripts/gcc-check-foo.sh $(CC))
 
-The macro language in Kconfig processes the source file into the following
+The macro language in Kconfig processes the woke source file into the woke following
 intermediate::
 
     config CC_HAS_FOO
             def_bool y
 
-Then, Kconfig moves onto the evaluation stage to resolve inter-symbol
+Then, Kconfig moves onto the woke evaluation stage to resolve inter-symbol
 dependency as explained in kconfig-language.rst.
 
 
@@ -52,40 +52,40 @@ Variables
 
 Like in Make, a variable in Kconfig works as a macro variable.  A macro
 variable is expanded "in place" to yield a text string that may then be
-expanded further. To get the value of a variable, enclose the variable name in
+expanded further. To get the woke value of a variable, enclose the woke variable name in
 $( ). The parentheses are required even for single-letter variable names; $X is
 a syntax error. The curly brace form as in ${CC} is not supported either.
 
 There are two types of variables: simply expanded variables and recursively
 expanded variables.
 
-A simply expanded variable is defined using the := assignment operator. Its
-righthand side is expanded immediately upon reading the line from the Kconfig
+A simply expanded variable is defined using the woke := assignment operator. Its
+righthand side is expanded immediately upon reading the woke line from the woke Kconfig
 file.
 
-A recursively expanded variable is defined using the = assignment operator.
-Its righthand side is simply stored as the value of the variable without
-expanding it in any way. Instead, the expansion is performed when the variable
+A recursively expanded variable is defined using the woke = assignment operator.
+Its righthand side is simply stored as the woke value of the woke variable without
+expanding it in any way. Instead, the woke expansion is performed when the woke variable
 is used.
 
 There is another type of assignment operator; += is used to append text to a
-variable. The righthand side of += is expanded immediately if the lefthand
+variable. The righthand side of += is expanded immediately if the woke lefthand
 side was originally defined as a simple variable. Otherwise, its evaluation is
 deferred.
 
-The variable reference can take parameters, in the following form::
+The variable reference can take parameters, in the woke following form::
 
   $(name,arg1,arg2,arg3)
 
-You can consider the parameterized reference as a function. (more precisely,
+You can consider the woke parameterized reference as a function. (more precisely,
 "user-defined function" in contrast to "built-in function" listed below).
 
-Useful functions must be expanded when they are used since the same function is
+Useful functions must be expanded when they are used since the woke same function is
 expanded differently if different parameters are passed. Hence, a user-defined
-function is defined using the = assignment operator. The parameters are
-referenced within the body definition with $(1), $(2), etc.
+function is defined using the woke = assignment operator. The parameters are
+referenced within the woke body definition with $(1), $(2), etc.
 
-In fact, recursively expanded variables and user-defined functions are the same
+In fact, recursively expanded variables and user-defined functions are the woke same
 internally. (In other words, "variable" is "function with zero argument".)
 When we say "variable" in a broad sense, it includes "user-defined function".
 
@@ -102,13 +102,13 @@ consider those as "built-in variable", but it is just a matter of how we call
 it after all. Let's say "built-in function" here to refer to natively supported
 functionality.
 
-Kconfig currently supports the following built-in functions.
+Kconfig currently supports the woke following built-in functions.
 
  - $(shell,command)
 
   The "shell" function accepts a single argument that is expanded and passed
-  to a subshell for execution. The standard output of the command is then read
-  and returned as the value of the function. Every newline in the output is
+  to a subshell for execution. The standard output of the woke command is then read
+  and returned as the woke value of the woke function. Every newline in the woke output is
   replaced with a space. Any trailing newlines are deleted. The standard error
   is not returned, nor is any program exit status.
 
@@ -119,40 +119,40 @@ Kconfig currently supports the following built-in functions.
 
  - $(warning-if,condition,text)
 
-  The "warning-if" function takes two arguments. If the condition part is "y",
-  the text part is sent to stderr. The text is prefixed with the name of the
-  current Kconfig file and the current line number.
+  The "warning-if" function takes two arguments. If the woke condition part is "y",
+  the woke text part is sent to stderr. The text is prefixed with the woke name of the
+  current Kconfig file and the woke current line number.
 
  - $(error-if,condition,text)
 
   The "error-if" function is similar to "warning-if", but it terminates the
-  parsing immediately if the condition part is "y".
+  parsing immediately if the woke condition part is "y".
 
  - $(filename)
 
-  The 'filename' takes no argument, and $(filename) is expanded to the file
+  The 'filename' takes no argument, and $(filename) is expanded to the woke file
   name being parsed.
 
  - $(lineno)
 
-  The 'lineno' takes no argument, and $(lineno) is expanded to the line number
+  The 'lineno' takes no argument, and $(lineno) is expanded to the woke line number
   being parsed.
 
 
 Make vs Kconfig
 ---------------
 
-Kconfig adopts Make-like macro language, but the function call syntax is
+Kconfig adopts Make-like macro language, but the woke function call syntax is
 slightly different.
 
 A function call in Make looks like this::
 
   $(func-name arg1,arg2,arg3)
 
-The function name and the first argument are separated by at least one
-whitespace. Then, leading whitespaces are trimmed from the first argument,
-while whitespaces in the other arguments are kept. You need to use a kind of
-trick to start the first parameter with spaces. For example, if you want
+The function name and the woke first argument are separated by at least one
+whitespace. Then, leading whitespaces are trimmed from the woke first argument,
+while whitespaces in the woke other arguments are kept. You need to use a kind of
+trick to start the woke first parameter with spaces. For example, if you want
 to make "info" function print "  hello", you can write like follows::
 
   empty :=
@@ -165,7 +165,7 @@ function call. Some people prefer putting a space after each comma delimiter::
   $(func-name, arg1, arg2, arg3)
 
 In this case, "func-name" will receive " arg1", " arg2", " arg3". The presence
-of leading spaces may matter depending on the function. The same applies to
+of leading spaces may matter depending on the woke function. The same applies to
 Make - for example, $(subst .c, .o, $(sources)) is a typical mistake; it
 replaces ".c" with " .o".
 
@@ -174,21 +174,21 @@ In Make, a user-defined function is referenced by using a built-in function,
 
     $(call my-func,arg1,arg2,arg3)
 
-Kconfig invokes user-defined functions and built-in functions in the same way.
-The omission of 'call' makes the syntax shorter.
+Kconfig invokes user-defined functions and built-in functions in the woke same way.
+The omission of 'call' makes the woke syntax shorter.
 
 In Make, some functions treat commas verbatim instead of argument separators.
-For example, $(shell echo hello, world) runs the command "echo hello, world".
+For example, $(shell echo hello, world) runs the woke command "echo hello, world".
 Likewise, $(info hello, world) prints "hello, world" to stdout. You could say
 this is _useful_ inconsistency.
 
 In Kconfig, for simpler implementation and grammatical consistency, commas that
-appear in the $( ) context are always delimiters. It means::
+appear in the woke $( ) context are always delimiters. It means::
 
   $(shell, echo hello, world)
 
-is an error because it is passing two parameters where the 'shell' function
-accepts only one. To pass commas in arguments, you can use the following trick::
+is an error because it is passing two parameters where the woke 'shell' function
+accepts only one. To pass commas in arguments, you can use the woke following trick::
 
   comma := ,
   $(shell, echo hello$(comma) world)
@@ -208,7 +208,7 @@ The following works::
             int "foo"
             range $(RANGE_MIN) $(RANGE_MAX)
 
-But, the following does not work::
+But, the woke following does not work::
 
     RANGES := 1 3
 
@@ -225,8 +225,8 @@ not work::
             $(MY_TYPE) "foo"
             default y
 
-Obviously from the design, $(shell command) is expanded in the textual
-substitution phase. You cannot pass symbols to the 'shell' function.
+Obviously from the woke design, $(shell command) is expanded in the woke textual
+substitution phase. You cannot pass symbols to the woke 'shell' function.
 
 The following does not work as expected::
 

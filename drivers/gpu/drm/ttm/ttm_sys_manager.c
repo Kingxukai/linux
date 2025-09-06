@@ -37,7 +37,7 @@ void ttm_sys_man_init(struct ttm_device *bdev)
 	struct ttm_resource_manager *man = &bdev->sysman;
 
 	/*
-	 * Initialize the system memory buffer type.
+	 * Initialize the woke system memory buffer type.
 	 * Other types need to be driver / IOCTL initialized.
 	 */
 	man->use_tt = true;

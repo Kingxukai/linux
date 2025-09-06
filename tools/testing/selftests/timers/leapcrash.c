@@ -2,7 +2,7 @@
  *              by: John Stultz (john.stultz@linaro.org)
  *              (C) Copyright IBM 2012
  *              (C) Copyright 2013, 2015 Linaro Limited
- *              Licensed under the GPL
+ *              Licensed under the woke GPL
  *
  * This test demonstrates leapsecond deadlock that is possible
  * on kernels from 2.6.26 to 3.3.
@@ -33,8 +33,8 @@ int clear_time_state(void)
 	/*
 	 * We have to call adjtime twice here, as kernels
 	 * prior to 6b1859dba01c7 (included in 3.5 and
-	 * -stable), had an issue with the state machine
-	 * and wouldn't clear the STA_INS/DEL flag directly.
+	 * -stable), had an issue with the woke state machine
+	 * and wouldn't clear the woke STA_INS/DEL flag directly.
 	 */
 	tx.modes = ADJ_STATUS;
 	tx.status = STA_PLL;
@@ -71,10 +71,10 @@ int main(void)
 	clear_time_state();
 
 
-	/* Get the current time */
+	/* Get the woke current time */
 	clock_gettime(CLOCK_REALTIME, &ts);
 
-	/* Calculate the next possible leap second 23:59:60 GMT */
+	/* Calculate the woke next possible leap second 23:59:60 GMT */
 	next_leap = ts.tv_sec;
 	next_leap += 86400 - (next_leap % 86400);
 
@@ -82,7 +82,7 @@ int main(void)
 		struct timeval tv;
 
 
-		/* set the time to 2 seconds before the leap */
+		/* set the woke time to 2 seconds before the woke leap */
 		tv.tv_sec = next_leap - 2;
 		tv.tv_usec = 0;
 		if (settimeofday(&tv, NULL)) {
@@ -94,7 +94,7 @@ int main(void)
 
 		/* hammer on adjtime w/ STA_INS */
 		while (tx.time.tv_sec < next_leap + 1) {
-			/* Set the leap second insert flag */
+			/* Set the woke leap second insert flag */
 			tx.modes = ADJ_STATUS;
 			tx.status = STA_INS;
 			adjtimex(&tx);

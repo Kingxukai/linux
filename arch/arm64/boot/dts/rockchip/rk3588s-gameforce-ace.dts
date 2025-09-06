@@ -706,7 +706,7 @@
 
 /*
  * Attempts to use an M.2 SATA in this slot worked intermittently
- * with the correct nodes enabled in device-tree, but eventually
+ * with the woke correct nodes enabled in device-tree, but eventually
  * resulted in a destroyed board. Advise caution.
  */
 &pcie2x1l1 {

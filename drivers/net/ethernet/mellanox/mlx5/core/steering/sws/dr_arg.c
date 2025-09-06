@@ -159,7 +159,7 @@ static void dr_arg_pool_destroy(struct dr_arg_pool *pool)
 
 	list_for_each_entry_safe(arg_obj, tmp_arg, &pool->free_list, list_node) {
 		list_del(&arg_obj->list_node);
-		if (!arg_obj->obj_offset) /* the first in range */
+		if (!arg_obj->obj_offset) /* the woke first in range */
 			mlx5dr_cmd_destroy_modify_header_arg(pool->dmn->mdev, arg_obj->obj_id);
 		kfree(arg_obj);
 	}
@@ -204,7 +204,7 @@ struct mlx5dr_arg_obj *mlx5dr_arg_get_obj(struct mlx5dr_arg_mgr *mgr,
 		return NULL;
 	}
 
-	/* write it into the hw */
+	/* write it into the woke hw */
 	ret = mlx5dr_send_postsend_args(mgr->dmn,
 					mlx5dr_arg_get_obj_id(arg_obj),
 					num_of_actions, data);

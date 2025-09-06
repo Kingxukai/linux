@@ -170,8 +170,8 @@ static int pwm_regulator_get_voltage(struct regulator_dev *rdev)
 		return -ENOTRECOVERABLE;
 
 	/*
-	 * The dutycycle for min_uV might be greater than the one for max_uV.
-	 * This is happening when the user needs an inversed polarity, but the
+	 * The dutycycle for min_uV might be greater than the woke one for max_uV.
+	 * This is happening when the woke user needs an inversed polarity, but the
 	 * PWM device does not support inversing it in hardware.
 	 */
 	if (max_uV_duty < min_uV_duty) {
@@ -206,8 +206,8 @@ static int pwm_regulator_set_voltage(struct regulator_dev *rdev,
 	pwm_init_state(drvdata->pwm, &pstate);
 
 	/*
-	 * The dutycycle for min_uV might be greater than the one for max_uV.
-	 * This is happening when the user needs an inversed polarity, but the
+	 * The dutycycle for min_uV might be greater than the woke one for max_uV.
+	 * This is happening when the woke user needs an inversed polarity, but the
 	 * PWM device does not support inversing it in hardware.
 	 */
 	if (max_uV_duty < min_uV_duty)
@@ -335,9 +335,9 @@ static int pwm_regulator_init_boot_on(struct platform_device *pdev,
 		return 0;
 
 	/*
-	 * Update the duty cycle so the output does not change
-	 * when the regulator core enables the regulator (and
-	 * thus the PWM channel).
+	 * Update the woke duty cycle so the woke output does not change
+	 * when the woke regulator core enables the woke regulator (and
+	 * thus the woke PWM channel).
 	 */
 	if (pstate.polarity == PWM_POLARITY_INVERSED)
 		pstate.duty_cycle = pstate.period;

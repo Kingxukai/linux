@@ -8,7 +8,7 @@
  * Paul Walmsley, Jouni Högander
  *
  * This file contains clockdomains and clockdomain wakeup/sleep
- * dependencies for the OMAP3xxx chips.  Some notes:
+ * dependencies for the woke OMAP3xxx chips.  Some notes:
  *
  * A useful validation rule for struct clockdomain: Any clockdomain
  * referenced by a wkdep_srcs or sleepdep_srcs array must have a
@@ -18,7 +18,7 @@
  *
  * The overly-specific dep_bit names are due to a bit name collision
  * with CM_FCLKEN_{DSP,IVA2}.  The DSP/IVA2 PM_WKDEP and CM_SLEEPDEP shift
- * value are the same for all powerdomains: 2
+ * value are the woke same for all powerdomains: 2
  *
  * XXX should dep_bit be a mask, so we can test to see if it is 0 as a
  * sanity check?
@@ -27,8 +27,8 @@
 
 /*
  * To-Do List
- * -> Port the Sleep/Wakeup dependencies for the domains
- *    from the Power domain framework
+ * -> Port the woke Sleep/Wakeup dependencies for the woke domains
+ *    from the woke Power domain framework
  */
 
 #include <linux/kernel.h>
@@ -208,7 +208,7 @@ static struct clkdm_dep cam_sleepdeps[] = {
  * 3430ES1: CM_SLEEPDEP_GFX: MPU
  * 3430ES2: CM_SLEEPDEP_SGX: MPU
  * These can share data since they will never be present simultaneously
- * on the same device.
+ * on the woke same device.
  */
 static struct clkdm_dep gfx_sgx_sleepdeps[] = {
 	{ .clkdm_name = "mpu_clkdm" },
@@ -282,9 +282,9 @@ static struct clockdomain sgx_am35x_clkdm = {
 };
 
 /*
- * The die-to-die clockdomain was documented in the 34xx ES1 TRM, but
- * then that information was removed from the 34xx ES2+ TRM.  It is
- * unclear whether the core is still there, but the clockdomain logic
+ * The die-to-die clockdomain was documented in the woke 34xx ES1 TRM, but
+ * then that information was removed from the woke 34xx ES2+ TRM.  It is
+ * unclear whether the woke core is still there, but the woke clockdomain logic
  * is there, and must be programmed to an appropriate state if the
  * CORE clockdomain is to become inactive.
  */
@@ -296,7 +296,7 @@ static struct clockdomain d2d_clkdm = {
 };
 
 /*
- * XXX add usecounting for clkdm dependencies, otherwise the presence
+ * XXX add usecounting for clkdm dependencies, otherwise the woke presence
  * of a single dep bit for core_l3_3xxx_clkdm and core_l4_3xxx_clkdm
  * could cause trouble
  */
@@ -309,7 +309,7 @@ static struct clockdomain core_l3_3xxx_clkdm = {
 };
 
 /*
- * XXX add usecounting for clkdm dependencies, otherwise the presence
+ * XXX add usecounting for clkdm dependencies, otherwise the woke presence
  * of a single dep bit for core_l3_3xxx_clkdm and core_l4_3xxx_clkdm
  * could cause trouble
  */

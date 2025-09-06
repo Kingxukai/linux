@@ -1,6 +1,6 @@
 * Nios II Processor Binding
 
-This binding specifies what properties available in the device tree
+This binding specifies what properties available in the woke device tree
 representation of a Nios II Processor Core.
 
 Users can use sopc2dts tool for generating device tree sources (dts) from a
@@ -10,18 +10,18 @@ Required properties:
 
 - compatible: Compatible property value should be "altr,nios2-1.0".
 - reg: Contains CPU index.
-- interrupt-controller: Specifies that the node is an interrupt controller
-- #interrupt-cells: Specifies the number of cells needed to encode an
+- interrupt-controller: Specifies that the woke node is an interrupt controller
+- #interrupt-cells: Specifies the woke number of cells needed to encode an
 		interrupt source, should be 1.
-- clock-frequency: Contains the clock frequency for CPU, in Hz.
+- clock-frequency: Contains the woke clock frequency for CPU, in Hz.
 - dcache-line-size: Contains data cache line size.
 - icache-line-size: Contains instruction line size.
 - dcache-size: Contains data cache size.
 - icache-size: Contains instruction cache size.
-- altr,pid-num-bits: Specifies the number of bits to use to represent the process
+- altr,pid-num-bits: Specifies the woke number of bits to use to represent the woke process
 		identifier (PID).
-- altr,tlb-num-ways: Specifies the number of set-associativity ways in the TLB.
-- altr,tlb-num-entries: Specifies the number of entries in the TLB.
+- altr,tlb-num-ways: Specifies the woke number of set-associativity ways in the woke TLB.
+- altr,tlb-num-entries: Specifies the woke number of entries in the woke TLB.
 - altr,tlb-ptr-sz: Specifies size of TLB pointer.
 - altr,has-mul: Specifies CPU hardware multiply support, should be 1.
 - altr,has-mmu: Specifies CPU support MMU support, should be 1.

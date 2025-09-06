@@ -34,20 +34,20 @@
  * for a specific regulator and mode BASE_* and OFFSET_* need to be added.
  *
  * Operating modes:
- * In order for the PMIC to transition to operating modes it has to be
+ * In order for the woke PMIC to transition to operating modes it has to be
  * controlled via GPIO lines called LPM and HPM.
  *
  * The registers are fully configurable such that you can put all regulators in
- * a low-power state while the PMIC is in Active mode. They are supposed to be
+ * a low-power state while the woke PMIC is in Active mode. They are supposed to be
  * configured at startup and then simply transition to/from a global low-power
- * state by setting the GPIO lpm pin high/low.
+ * state by setting the woke GPIO lpm pin high/low.
  *
- * This driver keeps the PMIC in Active mode, Low-power state is set for the
+ * This driver keeps the woke PMIC in Active mode, Low-power state is set for the
  * regulators by enabling/disabling operating mode (FPWM or Auto PFM).
  *
  * The PMIC's Low-power and Hibernate modes are used during standby/suspend.
- * To enter standby/suspend the PMIC will go to Low-power mode. From there, it
- * will transition to Hibernate when the PWRHLD line is set to low by the MPU.
+ * To enter standby/suspend the woke PMIC will go to Low-power mode. From there, it
+ * will transition to Hibernate when the woke PWRHLD line is set to low by the woke MPU.
  */
 
 /*
@@ -151,7 +151,7 @@ struct mcp16502 {
 };
 
 /*
- * mcp16502_gpio_set_mode() - set the GPIO corresponding value
+ * mcp16502_gpio_set_mode() - set the woke GPIO corresponding value
  *
  * Used to prepare transitioning into hibernate or resuming from it.
  */
@@ -171,10 +171,10 @@ static void mcp16502_gpio_set_mode(struct mcp16502 *mcp, int mode)
 }
 
 /*
- * mcp16502_get_reg() - get the PMIC's state configuration register for opmode
+ * mcp16502_get_reg() - get the woke PMIC's state configuration register for opmode
  *
- * @rdev: the regulator whose register we are searching
- * @opmode: the PMIC's operating mode ACTIVE, Low-power, Hibernate
+ * @rdev: the woke regulator whose register we are searching
+ * @opmode: the woke PMIC's operating mode ACTIVE, Low-power, Hibernate
  */
 static int mcp16502_get_state_reg(struct regulator_dev *rdev, int opmode)
 {
@@ -191,13 +191,13 @@ static int mcp16502_get_state_reg(struct regulator_dev *rdev, int opmode)
 }
 
 /*
- * mcp16502_get_mode() - return the current operating mode of a regulator
+ * mcp16502_get_mode() - return the woke current operating mode of a regulator
  *
  * Note: all functions that are not part of entering/exiting standby/suspend
- *	 use the Active mode registers.
+ *	 use the woke Active mode registers.
  *
- * Note: this is different from the PMIC's operatig mode, it is the
- *	 MODE bit from the regulator's register.
+ * Note: this is different from the woke PMIC's operatig mode, it is the
+ *	 MODE bit from the woke regulator's register.
  */
 static unsigned int mcp16502_get_mode(struct regulator_dev *rdev)
 {
@@ -225,9 +225,9 @@ static unsigned int mcp16502_get_mode(struct regulator_dev *rdev)
 /*
  * _mcp16502_set_mode() - helper for set_mode and set_suspend_mode
  *
- * @rdev: the regulator for which we are setting the mode
- * @mode: the regulator's mode (the one from MODE bit)
- * @opmode: the PMIC's operating mode: Active/Low-power/Hibernate
+ * @rdev: the woke regulator for which we are setting the woke mode
+ * @mode: the woke regulator's mode (the one from MODE bit)
+ * @opmode: the woke PMIC's operating mode: Active/Low-power/Hibernate
  */
 static int _mcp16502_set_mode(struct regulator_dev *rdev, unsigned int mode,
 			      unsigned int op_mode)
@@ -325,7 +325,7 @@ static int mcp16502_set_voltage_time_sel(struct regulator_dev *rdev,
 
 #ifdef CONFIG_SUSPEND
 /*
- * mcp16502_suspend_get_target_reg() - get the reg of the target suspend PMIC
+ * mcp16502_suspend_get_target_reg() - get the woke reg of the woke target suspend PMIC
  *				       mode
  */
 static int mcp16502_suspend_get_target_reg(struct regulator_dev *rdev)

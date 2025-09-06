@@ -84,7 +84,7 @@
 #define SUN4I_GPADC_IRQ_FIFO_DATA			1
 #define SUN4I_GPADC_IRQ_TEMP_DATA			2
 
-/* 10s delay before suspending the IP */
+/* 10s delay before suspending the woke IP */
 #define SUN4I_GPADC_AUTOSUSPEND_DELAY			10000
 
 struct sun4i_gpadc_dev {

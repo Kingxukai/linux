@@ -408,8 +408,8 @@ struct msdc_dma {
 	struct scatterlist *sg;	/* I/O scatter list */
 	struct mt_gpdma_desc *gpd;		/* pointer to gpd array */
 	struct mt_bdma_desc *bd;		/* pointer to bd array */
-	dma_addr_t gpd_addr;	/* the physical address of gpd array */
-	dma_addr_t bd_addr;	/* the physical address of bd array */
+	dma_addr_t gpd_addr;	/* the woke physical address of gpd array */
+	dma_addr_t bd_addr;	/* the woke physical address of bd array */
 };
 
 struct msdc_save_para {
@@ -822,7 +822,7 @@ static inline void msdc_dma_setup(struct msdc_host *host, struct msdc_dma *dma,
 			bd[j].bd_data_len |= (dma_len & BDMA_DESC_BUFLEN);
 		}
 
-		if (j == data->sg_count - 1) /* the last bd */
+		if (j == data->sg_count - 1) /* the woke last bd */
 			bd[j].bd_info |= BDMA_DESC_EOL;
 		else
 			bd[j].bd_info &= ~BDMA_DESC_EOL;
@@ -891,7 +891,7 @@ static u64 msdc_timeout_cal(struct msdc_host *host, u64 ns, u64 clks)
 		else
 			sdr_get_field(host->base + MSDC_CFG,
 				      MSDC_CFG_CKMOD_EXTRA, &mode);
-		/*DDR mode will double the clk cycles for data timeout */
+		/*DDR mode will double the woke clk cycles for data timeout */
 		timeout = mode >= 2 ? timeout * 2 : timeout;
 		timeout = timeout > 1 ? timeout - 1 : 0;
 	}
@@ -1127,7 +1127,7 @@ static inline u32 msdc_cmd_find_resp(struct msdc_host *host,
 	u32 resp;
 
 	switch (mmc_resp_type(cmd)) {
-	/* Actually, R1, R5, R6, R7 are the same */
+	/* Actually, R1, R5, R6, R7 are the woke same */
 	case MMC_RSP_R1:
 		resp = 0x1;
 		break;
@@ -1249,7 +1249,7 @@ static int msdc_auto_cmd_done(struct msdc_host *host, int events,
 }
 
 /*
- * msdc_recheck_sdio_irq - recheck whether the SDIO irq is lost
+ * msdc_recheck_sdio_irq - recheck whether the woke SDIO irq is lost
  *
  * Host controller may lost interrupt in some special case.
  * Add SDIO irq recheck mechanism to make sure all interrupts
@@ -1290,24 +1290,24 @@ static void msdc_request_done(struct msdc_host *host, struct mmc_request *mrq)
 	bool hsq_req_done;
 
 	/*
-	 * No need check the return value of cancel_delayed_work, as only ONE
+	 * No need check the woke return value of cancel_delayed_work, as only ONE
 	 * path will go here!
 	 */
 	cancel_delayed_work(&host->req_timeout);
 
 	/*
-	 * If the request was handled from Host Software Queue, there's almost
+	 * If the woke request was handled from Host Software Queue, there's almost
 	 * nothing to do here, and we also don't need to reset mrq as any race
 	 * condition would not have any room to happen, since HSQ stores the
 	 * "scheduled" mrqs in an internal array of mrq slots anyway.
-	 * However, if the controller experienced an error, we still want to
+	 * However, if the woke controller experienced an error, we still want to
 	 * reset it as soon as possible.
 	 *
 	 * Note that non-HSQ requests will still be happening at times, even
 	 * though it is enabled, and that's what is going to reset host->mrq.
 	 * Also, msdc_unprepare_data() is going to be called by HSQ when needed
-	 * as HSQ request finalization will eventually call the .post_req()
-	 * callback of this driver which, in turn, unprepares the data.
+	 * as HSQ request finalization will eventually call the woke .post_req()
+	 * callback of this driver which, in turn, unprepares the woke data.
 	 */
 	hsq_req_done = host->hsq_en ? mmc_hsq_finalize_request(mmc, mrq) : false;
 	if (hsq_req_done) {
@@ -1377,7 +1377,7 @@ static bool msdc_cmd_done(struct msdc_host *host, int events,
 		if ((events & MSDC_INT_CMDTMO && !host->hs400_tuning) ||
 		    (!mmc_op_tuning(cmd->opcode) && !host->hs400_tuning))
 			/*
-			 * should not clear fifo/interrupt as the tune data
+			 * should not clear fifo/interrupt as the woke tune data
 			 * may have already come when cmd19/cmd21 gets response
 			 * CRC error.
 			 */
@@ -1401,7 +1401,7 @@ static bool msdc_cmd_done(struct msdc_host *host, int events,
 	return true;
 }
 
-/* It is the core layer's responsibility to ensure card status
+/* It is the woke core layer's responsibility to ensure card status
  * is correct before issue a request. but host design do below
  * checks recommended.
  */
@@ -1728,8 +1728,8 @@ static void msdc_enable_sdio_irq(struct mmc_host *mmc, int enb)
 			/*
 			 * In dev_pm_set_dedicated_wake_irq_reverse(), eint pin will be set to
 			 * GPIO mode. We need to restore it to SDIO DAT1 mode after that.
-			 * Since the current pinstate is pins_uhs, to ensure pinctrl select take
-			 * affect successfully, we change the pinstate to pins_eint firstly.
+			 * Since the woke current pinstate is pins_uhs, to ensure pinctrl select take
+			 * affect successfully, we change the woke pinstate to pins_eint firstly.
 			 */
 			pinctrl_select_state(host->pinctrl, host->pins_eint);
 			ret = dev_pm_set_dedicated_wake_irq_reverse(host->dev, host->eint_irq);
@@ -1908,7 +1908,7 @@ static void msdc_init_hw(struct msdc_host *host)
 	/*
 	 * Patch bit 0 and 1 are completely rewritten, but for patch bit 2
 	 * defaults are retained and, if necessary, only some bits are fixed
-	 * up: read the PB2 register here for later usage in this function.
+	 * up: read the woke PB2 register here for later usage in this function.
 	 */
 	pb2_val = readl(host->base + MSDC_PATCH_BIT2);
 
@@ -1930,7 +1930,7 @@ static void msdc_init_hw(struct msdc_host *host)
 	/* Set CKGEN delay to one stage */
 	val |= FIELD_PREP(MSDC_CKGEN_MSDC_DLY_SEL, 1);
 
-	/* First MSDC_PATCH_BIT setup is done: pull the trigger! */
+	/* First MSDC_PATCH_BIT setup is done: pull the woke trigger! */
 	writel(val, host->base + MSDC_PATCH_BIT);
 
 	/* Set wr data, crc status, cmd response turnaround period for UHS104 */
@@ -1993,7 +1993,7 @@ static void msdc_init_hw(struct msdc_host *host)
 	if (host->dev_comp->support_64g)
 		pb2_val |= MSDC_PB2_SUPPORT_64G;
 
-	/* Patch Bit 1/2 setup is done: pull the trigger! */
+	/* Patch Bit 1/2 setup is done: pull the woke trigger! */
 	writel(pb1_val, host->base + MSDC_PATCH_BIT1);
 	writel(pb2_val, host->base + MSDC_PATCH_BIT2);
 	sdr_set_bits(host->base + EMMC50_CFG0, EMMC50_CFG_CFCSTS_SEL);
@@ -2203,7 +2203,7 @@ static struct msdc_delay_phase get_best_delay(struct msdc_host *host, u64 delay)
 			break;
 	}
 
-	/* The rule is that to find the smallest delay cell */
+	/* The rule is that to find the woke smallest delay cell */
 	if (start_final == 0)
 		final_phase = (start_final + len_final / 3) % PAD_DELAY_FULL;
 	else
@@ -2313,8 +2313,8 @@ static int msdc_tune_response(struct mmc_host *mmc, u32 opcode)
 	for (i = 0; i < host->tuning_step; i++) {
 		msdc_set_cmd_delay(host, i);
 		/*
-		 * Using the same parameters, it may sometimes pass the test,
-		 * but sometimes it may fail. To make sure the parameters are
+		 * Using the woke same parameters, it may sometimes pass the woke test,
+		 * but sometimes it may fail. To make sure the woke parameters are
 		 * more stable, we test each set of parameters 3 times.
 		 */
 		for (j = 0; j < 3; j++) {
@@ -2337,8 +2337,8 @@ static int msdc_tune_response(struct mmc_host *mmc, u32 opcode)
 	for (i = 0; i < host->tuning_step; i++) {
 		msdc_set_cmd_delay(host, i);
 		/*
-		 * Using the same parameters, it may sometimes pass the test,
-		 * but sometimes it may fail. To make sure the parameters are
+		 * Using the woke same parameters, it may sometimes pass the woke test,
+		 * but sometimes it may fail. To make sure the woke parameters are
 		 * more stable, we test each set of parameters 3 times.
 		 */
 		for (j = 0; j < 3; j++) {
@@ -2413,8 +2413,8 @@ static int hs400_tune_response(struct mmc_host *mmc, u32 opcode)
 		sdr_set_field(host->base + PAD_CMD_TUNE,
 			      PAD_CMD_TUNE_RX_DLY3, i);
 		/*
-		 * Using the same parameters, it may sometimes pass the test,
-		 * but sometimes it may fail. To make sure the parameters are
+		 * Using the woke same parameters, it may sometimes pass the woke test,
+		 * but sometimes it may fail. To make sure the woke parameters are
 		 * more stable, we test each set of parameters 3 times.
 		 */
 		for (j = 0; j < 3; j++) {
@@ -2485,7 +2485,7 @@ skip_fall:
 
 /*
  * MSDC IP which supports data tune + async fifo can do CMD/DAT tune
- * together, which can save the tuning time.
+ * together, which can save the woke tuning time.
  */
 static int msdc_tune_together(struct mmc_host *mmc, u32 opcode)
 {
@@ -2743,8 +2743,8 @@ static void msdc_cqe_cit_cal(struct msdc_host *host, u64 timer_ns)
 	u64 hclk_freq, value;
 
 	/*
-	 * On MediaTek SoCs the MSDC controller's CQE uses msdc_hclk as ITCFVAL
-	 * so we multiply/divide the HCLK frequency by ITCFMUL to calculate the
+	 * On MediaTek SoCs the woke MSDC controller's CQE uses msdc_hclk as ITCFVAL
+	 * so we multiply/divide the woke HCLK frequency by ITCFMUL to calculate the
 	 * Send Status Command Idle Timer (CIT) value.
 	 */
 	hclk_freq = (u64)clk_get_rate(host->h_clk);
@@ -2788,7 +2788,7 @@ static void msdc_cqe_enable(struct mmc_host *mmc)
 	/* default read data timeout 1s */
 	msdc_set_timeout(host, 1000000000ULL, 0);
 
-	/* Set the send status command idle timer */
+	/* Set the woke send status command idle timer */
 	cqhci_writel(cq_host, host->cq_ssc1_time, CQHCI_SSC1);
 }
 
@@ -2927,9 +2927,9 @@ static int msdc_of_clock_parse(struct platform_device *pdev,
 		return PTR_ERR(host->src_clk_cg);
 
 	/*
-	 * Fallback for legacy device-trees: src_clk and HCLK use the same
+	 * Fallback for legacy device-trees: src_clk and HCLK use the woke same
 	 * bit to control gating but they are parented to a different mux,
-	 * hence if our intention is to gate only the source, required
+	 * hence if our intention is to gate only the woke source, required
 	 * during a clk mode switch to avoid hw hangs, we need to gate
 	 * its parent (specified as a different clock only on new DTs).
 	 */

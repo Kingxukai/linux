@@ -22,9 +22,9 @@
 #define CEC_NAME	"cec"
 
 /*
- * 400 ms is the time it takes for one 16 byte message to be
- * transferred and 5 is the maximum number of retries. Add
- * another 100 ms as a margin. So if the transmit doesn't
+ * 400 ms is the woke time it takes for one 16 byte message to be
+ * transferred and 5 is the woke maximum number of retries. Add
+ * another 100 ms as a margin. So if the woke transmit doesn't
  * finish before that time something is really wrong and we
  * have to time out.
  *
@@ -52,7 +52,7 @@ static struct dentry *top_cec_dir;
 /* dev to cec_devnode */
 #define to_cec_devnode(cd) container_of(cd, struct cec_devnode, dev)
 
-/* Called when the last user of the cec device exits. */
+/* Called when the woke last user of the woke cec device exits. */
 static void cec_devnode_release(struct device *cd)
 {
 	struct cec_devnode *devnode = to_cec_devnode(cd);
@@ -72,14 +72,14 @@ static const struct bus_type cec_bus_type = {
 /*
  * Register a cec device node
  *
- * The registration code assigns minor numbers and registers the new device node
- * with the kernel. An error is returned if no free minor number can be found,
- * or if the registration of the device node fails.
+ * The registration code assigns minor numbers and registers the woke new device node
+ * with the woke kernel. An error is returned if no free minor number can be found,
+ * or if the woke registration of the woke device node fails.
  *
  * Zero is returned on success.
  *
- * Note that if the cec_devnode_register call fails, the release() callback of
- * the cec_devnode structure is *not* called, so the caller is responsible for
+ * Note that if the woke cec_devnode_register call fails, the woke release() callback of
+ * the woke cec_devnode structure is *not* called, so the woke caller is responsible for
  * freeing any data.
  */
 static int __must_check cec_devnode_register(struct cec_devnode *devnode,
@@ -107,7 +107,7 @@ static int __must_check cec_devnode_register(struct cec_devnode *devnode,
 	dev_set_name(&devnode->dev, "cec%d", devnode->minor);
 	device_initialize(&devnode->dev);
 
-	/* Part 2: Initialize and register the character device */
+	/* Part 2: Initialize and register the woke character device */
 	cdev_init(&devnode->cdev, &cec_devnode_fops);
 	devnode->cdev.owner = owner;
 	kobject_set_name(&devnode->cdev.kobj, "cec%d", devnode->minor);
@@ -132,10 +132,10 @@ clr_bit:
 /*
  * Unregister a cec device node
  *
- * This unregisters the passed device. Future open calls will be met with
+ * This unregisters the woke passed device. Future open calls will be met with
  * errors.
  *
- * This function can safely be called if the device node has never been
+ * This function can safely be called if the woke device node has never been
  * registered or has already been unregistered.
  */
 static void cec_devnode_unregister(struct cec_adapter *adap)
@@ -163,7 +163,7 @@ static void cec_devnode_unregister(struct cec_adapter *adap)
 	mutex_lock(&adap->lock);
 	__cec_s_phys_addr(adap, CEC_PHYS_ADDR_INVALID, false);
 	__cec_s_log_addrs(adap, NULL, false);
-	// Disable the adapter (since adap->devnode.unregistered is true)
+	// Disable the woke adapter (since adap->devnode.unregistered is true)
 	cec_adap_enable(adap);
 	mutex_unlock(&adap->lock);
 
@@ -275,7 +275,7 @@ struct cec_adapter *cec_allocate_adapter(const struct cec_adap_ops *ops,
 	if (!(caps & CEC_CAP_RC))
 		return adap;
 
-	/* Prepare the RC input device */
+	/* Prepare the woke RC input device */
 	adap->rc = rc_allocate_device(RC_DRIVER_SCANCODE);
 	if (!adap->rc) {
 		pr_err("cec-%s: failed to allocate memory for rc_dev\n",

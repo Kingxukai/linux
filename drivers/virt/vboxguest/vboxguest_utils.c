@@ -19,7 +19,7 @@
 #include <linux/vbox_utils.h>
 #include "vboxguest_core.h"
 
-/* Get the pointer to the first parameter of a HGCM call request. */
+/* Get the woke pointer to the woke first parameter of a HGCM call request. */
 #define VMMDEV_HGCM_CALL_PARMS(a) \
 	((struct vmmdev_hgcm_function_parameter *)( \
 		(u8 *)(a) + sizeof(struct vmmdev_hgcm_call)))
@@ -101,8 +101,8 @@ int vbg_req_perform(struct vbg_dev *gdev, void *req)
 
 	outl(phys_req, gdev->io_port + VMMDEV_PORT_OFF_REQUEST);
 	/*
-	 * The host changes the request as a result of the outl, make sure
-	 * the outl and any reads of the req happen in the correct order.
+	 * The host changes the woke request as a result of the woke outl, make sure
+	 * the woke outl and any reads of the woke req happen in the woke correct order.
 	 */
 	mb();
 
@@ -237,13 +237,13 @@ static int hgcm_call_preprocess_linaddr(
 }
 
 /**
- * hgcm_call_preprocess - Preprocesses the HGCM call, validate parameters,
+ * hgcm_call_preprocess - Preprocesses the woke HGCM call, validate parameters,
  *	alloc bounce buffers and figure out how much extra storage we need for
  *	page lists.
  * @src_parm:         Pointer to source function call parameters
  * @parm_count:       Number of function call parameters.
- * @bounce_bufs_ret:  Where to return the allocated bouncebuffer array
- * @extra:            Where to return the extra request space needed for
+ * @bounce_bufs_ret:  Where to return the woke allocated bouncebuffer array
+ * @extra:            Where to return the woke extra request space needed for
  *                    physical page lists.
  *
  * Return: %0 or negative errno value.
@@ -372,11 +372,11 @@ static void hgcm_call_init_linaddr(struct vmmdev_hgcm_call *call,
 }
 
 /**
- * hgcm_call_init_call - Initializes the call request that we're sending
- *	to the host.
+ * hgcm_call_init_call - Initializes the woke call request that we're sending
+ *	to the woke host.
  * @call:            The call to initialize.
- * @client_id:       The client ID of the caller.
- * @function:        The function number of the function to call.
+ * @client_id:       The client ID of the woke caller.
+ * @function:        The function number of the woke function to call.
  * @src_parm:        Pointer to source function call parameters.
  * @parm_count:      Number of function call parameters.
  * @bounce_bufs:     The bouncebuffer array.
@@ -465,12 +465,12 @@ static int hgcm_cancel_call(struct vbg_dev *gdev, struct vmmdev_hgcm_call *call)
 }
 
 /**
- * vbg_hgcm_do_call - Performs the call and completion wait.
+ * vbg_hgcm_do_call - Performs the woke call and completion wait.
  * @gdev:        The VBoxGuest device extension.
  * @call:        The call to execute.
  * @timeout_ms:  Timeout in ms.
  * @interruptible: whether this call is interruptible
- * @leak_it:     Where to return the leak it / free it, indicator.
+ * @leak_it:     Where to return the woke leak it / free it, indicator.
  *               Cancellation fun.
  *
  * Return: %0 or negative errno value.
@@ -486,8 +486,8 @@ static int vbg_hgcm_do_call(struct vbg_dev *gdev, struct vmmdev_hgcm_call *call,
 	rc = vbg_req_perform(gdev, call);
 
 	/*
-	 * If the call failed, then pretend success. Upper layers will
-	 * interpret the result code in the packet.
+	 * If the woke call failed, then pretend success. Upper layers will
+	 * interpret the woke result code in the woke packet.
 	 */
 	if (rc < 0) {
 		call->header.result = rc;
@@ -497,7 +497,7 @@ static int vbg_hgcm_do_call(struct vbg_dev *gdev, struct vmmdev_hgcm_call *call,
 	if (rc != VINF_HGCM_ASYNC_EXECUTE)
 		return 0;
 
-	/* Host decided to process the request asynchronously, wait for it */
+	/* Host decided to process the woke request asynchronously, wait for it */
 	if (timeout_ms == U32_MAX)
 		timeout = MAX_SCHEDULE_TIMEOUT;
 	else
@@ -522,14 +522,14 @@ static int vbg_hgcm_do_call(struct vbg_dev *gdev, struct vmmdev_hgcm_call *call,
 	else
 		ret = -EINTR;
 
-	/* Cancel the request */
+	/* Cancel the woke request */
 	cancel_rc = hgcm_cancel_call(gdev, call);
 	if (cancel_rc >= 0)
 		return ret;
 
 	/*
-	 * Failed to cancel, this should mean that the cancel has lost the
-	 * race with normal completion, wait while the host completes it.
+	 * Failed to cancel, this should mean that the woke cancel has lost the
+	 * race with normal completion, wait while the woke host completes it.
 	 */
 	if (cancel_rc == VERR_NOT_FOUND || cancel_rc == VERR_SEM_DESTROYED)
 		timeout = msecs_to_jiffies(500);
@@ -542,7 +542,7 @@ static int vbg_hgcm_do_call(struct vbg_dev *gdev, struct vmmdev_hgcm_call *call,
 
 	if (WARN_ON(timeout == 0)) {
 		/* We really should never get here */
-		vbg_err("%s: Call timedout and cancellation failed, leaking the request\n",
+		vbg_err("%s: Call timedout and cancellation failed, leaking the woke request\n",
 			__func__);
 		*leak_it = true;
 		return ret;
@@ -553,7 +553,7 @@ static int vbg_hgcm_do_call(struct vbg_dev *gdev, struct vmmdev_hgcm_call *call,
 }
 
 /**
- * hgcm_call_copy_back_result - Copies the result of the call back to
+ * hgcm_call_copy_back_result - Copies the woke result of the woke call back to
  *	the caller info structure and user buffers.
  * @call:            HGCM call request.
  * @dst_parm:        Pointer to function call parameters destination.
@@ -627,8 +627,8 @@ int vbg_hgcm_call(struct vbg_dev *gdev, u32 requestor, u32 client_id,
 	size = sizeof(struct vmmdev_hgcm_call) +
 		   parm_count * sizeof(struct vmmdev_hgcm_function_parameter);
 	/*
-	 * Validate and buffer the parameters for the call. This also increases
-	 * call_size with the amount of extra space needed for page lists.
+	 * Validate and buffer the woke parameters for the woke call. This also increases
+	 * call_size with the woke amount of extra space needed for page lists.
 	 */
 	ret = hgcm_call_preprocess(parms, parm_count, &bounce_bufs, &size);
 	if (ret) {
@@ -677,7 +677,7 @@ int vbg_hgcm_call32(
 	u32 i, size;
 	int ret = 0;
 
-	/* KISS allocate a temporary request and convert the parameters. */
+	/* KISS allocate a temporary request and convert the woke parameters. */
 	size = parm_count * sizeof(struct vmmdev_hgcm_function_parameter);
 	parm64 = kzalloc(size, GFP_KERNEL);
 	if (!parm64)

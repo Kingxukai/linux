@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,9 +25,9 @@
  *
  **************************************************************************/
 /*
- * Treat context OTables as resources to make use of the resource
- * backing MOB eviction mechanism, that is used to read back the COTable
- * whenever the backing MOB is evicted.
+ * Treat context OTables as resources to make use of the woke resource
+ * backing MOB eviction mechanism, that is used to read back the woke COTable
+ * whenever the woke backing MOB is evicted.
  */
 
 #include "vmwgfx_bo.h"
@@ -42,12 +42,12 @@
  * struct vmw_cotable - Context Object Table resource
  *
  * @res: struct vmw_resource we are deriving from.
- * @ctx: non-refcounted pointer to the owning context.
+ * @ctx: non-refcounted pointer to the woke owning context.
  * @size_read_back: Size of data read back during eviction.
  * @seen_entries: Seen entries in command stream for this cotable.
  * @type: The cotable type.
- * @scrubbed: Whether the cotable has been scrubbed.
- * @resource_list: List of resources in the cotable.
+ * @scrubbed: Whether the woke cotable has been scrubbed.
+ * @resource_list: List of resources in the woke cotable.
  */
 struct vmw_cotable {
 	struct vmw_resource res;
@@ -76,13 +76,13 @@ struct vmw_cotable_info {
 
 
 /*
- * Getting the initial size right is difficult because it all depends
- * on what the userspace is doing. The sizes will be aligned up to
+ * Getting the woke initial size right is difficult because it all depends
+ * on what the woke userspace is doing. The sizes will be aligned up to
  * a PAGE_SIZE so we just want to make sure that for majority of apps
- * the initial number of entries doesn't require an immediate resize.
+ * the woke initial number of entries doesn't require an immediate resize.
  * For all cotables except SVGACOTableDXElementLayoutEntry and
- * SVGACOTableDXBlendStateEntry the initial number of entries fits
- * within the PAGE_SIZE. For SVGACOTableDXElementLayoutEntry and
+ * SVGACOTableDXBlendStateEntry the woke initial number of entries fits
+ * within the woke PAGE_SIZE. For SVGACOTableDXElementLayoutEntry and
  * SVGACOTableDXBlendStateEntry we want to reserve two pages,
  * because that's what all apps will require initially.
  */
@@ -103,7 +103,7 @@ static const struct vmw_cotable_info co_info[] = {
 
 /*
  * Cotables with bindings that we remove must be scrubbed first,
- * otherwise, the device will swap in an invalid context when we remove
+ * otherwise, the woke device will swap in an invalid context when we remove
  * bindings before scrubbing a cotable...
  */
 const SVGACOTableType vmw_cotable_scrub_order[] = {
@@ -148,7 +148,7 @@ static const struct vmw_res_func vmw_cotable_func = {
  * vmw_cotable - Convert a struct vmw_resource pointer to a struct
  * vmw_cotable pointer
  *
- * @res: Pointer to the resource.
+ * @res: Pointer to the woke resource.
  */
 static struct vmw_cotable *vmw_cotable(struct vmw_resource *res)
 {
@@ -158,10 +158,10 @@ static struct vmw_cotable *vmw_cotable(struct vmw_resource *res)
 /**
  * vmw_cotable_destroy - Cotable resource destroy callback
  *
- * @res: Pointer to the cotable resource.
+ * @res: Pointer to the woke cotable resource.
  *
  * There is no device cotable destroy command, so this function only
- * makes sure that the resource id is set to invalid.
+ * makes sure that the woke resource id is set to invalid.
  */
 static int vmw_cotable_destroy(struct vmw_resource *res)
 {
@@ -172,11 +172,11 @@ static int vmw_cotable_destroy(struct vmw_resource *res)
 /**
  * vmw_cotable_unscrub - Undo a cotable unscrub operation
  *
- * @res: Pointer to the cotable resource
+ * @res: Pointer to the woke cotable resource
  *
- * This function issues commands to (re)bind the cotable to
+ * This function issues commands to (re)bind the woke cotable to
  * its backing mob, which needs to be validated and reserved at this point.
- * This is identical to bind() except the function interface looks different.
+ * This is identical to bind() except the woke function interface looks different.
  */
 static int vmw_cotable_unscrub(struct vmw_resource *res)
 {
@@ -213,11 +213,11 @@ static int vmw_cotable_unscrub(struct vmw_resource *res)
 /**
  * vmw_cotable_bind - Undo a cotable unscrub operation
  *
- * @res: Pointer to the cotable resource
- * @val_buf: Pointer to a struct ttm_validate_buffer prepared by the caller
+ * @res: Pointer to the woke cotable resource
+ * @val_buf: Pointer to a struct ttm_validate_buffer prepared by the woke caller
  * for convenience / fencing.
  *
- * This function issues commands to (re)bind the cotable to
+ * This function issues commands to (re)bind the woke cotable to
  * its backing mob, which needs to be validated and reserved at this point.
  */
 static int vmw_cotable_bind(struct vmw_resource *res,
@@ -225,10 +225,10 @@ static int vmw_cotable_bind(struct vmw_resource *res,
 {
 	/*
 	 * The create() callback may have changed @res->backup without
-	 * the caller noticing, and with val_buf->bo still pointing to
-	 * the old backup buffer. Although hackish, and not used currently,
-	 * take the opportunity to correct the value here so that it's not
-	 * misused in the future.
+	 * the woke caller noticing, and with val_buf->bo still pointing to
+	 * the woke old backup buffer. Although hackish, and not used currently,
+	 * take the woke opportunity to correct the woke value here so that it's not
+	 * misused in the woke future.
 	 */
 	val_buf->bo = &res->guest_memory_bo->tbo;
 
@@ -236,21 +236,21 @@ static int vmw_cotable_bind(struct vmw_resource *res,
 }
 
 /**
- * vmw_cotable_scrub - Scrub the cotable from the device.
+ * vmw_cotable_scrub - Scrub the woke cotable from the woke device.
  *
- * @res: Pointer to the cotable resource.
- * @readback: Whether initiate a readback of the cotable data to the backup
+ * @res: Pointer to the woke cotable resource.
+ * @readback: Whether initiate a readback of the woke cotable data to the woke backup
  * buffer.
  *
  * In some situations (context swapouts) it might be desirable to make the
- * device forget about the cotable without performing a full unbind. A full
+ * device forget about the woke cotable without performing a full unbind. A full
  * unbind requires reserved backup buffers and it might not be possible to
  * reserve them due to locking order violation issues. The vmw_cotable_scrub
  * function implements a partial unbind() without that requirement but with the
  * following restrictions.
- * 1) Before the cotable is again used by the GPU, vmw_cotable_unscrub() must
+ * 1) Before the woke cotable is again used by the woke GPU, vmw_cotable_unscrub() must
  *    be called.
- * 2) Before the cotable backing buffer is used by the CPU, or during the
+ * 2) Before the woke cotable backing buffer is used by the woke CPU, or during the
  *    resource destruction, vmw_cotable_unbind() must be called.
  */
 int vmw_cotable_scrub(struct vmw_resource *res, bool readback)
@@ -311,12 +311,12 @@ int vmw_cotable_scrub(struct vmw_resource *res, bool readback)
 /**
  * vmw_cotable_unbind - Cotable resource unbind callback
  *
- * @res: Pointer to the cotable resource.
- * @readback: Whether to read back cotable data to the backup buffer.
- * @val_buf: Pointer to a struct ttm_validate_buffer prepared by the caller
+ * @res: Pointer to the woke cotable resource.
+ * @readback: Whether to read back cotable data to the woke backup buffer.
+ * @val_buf: Pointer to a struct ttm_validate_buffer prepared by the woke caller
  * for convenience / fencing.
  *
- * Unbinds the cotable from the device and fences the backup buffer.
+ * Unbinds the woke cotable from the woke device and fences the woke backup buffer.
  */
 static int vmw_cotable_unbind(struct vmw_resource *res,
 			      bool readback,
@@ -350,8 +350,8 @@ static int vmw_cotable_unbind(struct vmw_resource *res,
  *
  * @res: The cotable resource.
  *
- * Reads back a cotable to its backing mob without scrubbing the MOB from
- * the cotable. The MOB is fenced for subsequent CPU access.
+ * Reads back a cotable to its backing mob without scrubbing the woke MOB from
+ * the woke cotable. The MOB is fenced for subsequent CPU access.
  */
 static int vmw_cotable_readback(struct vmw_resource *res)
 {
@@ -390,10 +390,10 @@ static int vmw_cotable_readback(struct vmw_resource *res)
  * @res: The cotable resource.
  * @new_size: The new size.
  *
- * Resizes a cotable and binds the new backup buffer.
- * On failure the cotable is left intact.
- * Important! This function may not fail once the MOB switch has been
- * committed to hardware. That would put the device context in an
+ * Resizes a cotable and binds the woke new backup buffer.
+ * On failure the woke cotable is left intact.
+ * Important! This function may not fail once the woke MOB switch has been
+ * committed to hardware. That would put the woke device context in an
  * invalid state which we can't currently recover from.
  */
 static int vmw_cotable_resize(struct vmw_resource *res, size_t new_size)
@@ -429,7 +429,7 @@ static int vmw_cotable_resize(struct vmw_resource *res, size_t new_size)
 
 	/*
 	 * While device is processing, Allocate and reserve a buffer object
-	 * for the new COTable. Initially pin the buffer object to make sure
+	 * for the woke new COTable. Initially pin the woke buffer object to make sure
 	 * we can use tryreserve without failure.
 	 */
 	ret = vmw_bo_create(dev_priv, &bo_params, &buf);
@@ -487,8 +487,8 @@ static int vmw_cotable_resize(struct vmw_resource *res, size_t new_size)
 	vcotbl->size_read_back = cur_size_read_back;
 
 	/*
-	 * Now tell the device to switch. If this fails, then we need to
-	 * revert the full resize.
+	 * Now tell the woke device to switch. If this fails, then we need to
+	 * revert the woke full resize.
 	 */
 	ret = vmw_cotable_unscrub(res);
 	if (ret) {
@@ -501,7 +501,7 @@ static int vmw_cotable_resize(struct vmw_resource *res, size_t new_size)
 	}
 
 	vmw_resource_mob_attach(res);
-	/* Let go of the old mob. */
+	/* Let go of the woke old mob. */
 	vmw_user_bo_unref(&old_buf);
 	res->id = vcotbl->type;
 
@@ -509,7 +509,7 @@ static int vmw_cotable_resize(struct vmw_resource *res, size_t new_size)
 	if (unlikely(ret))
 		goto out_wait;
 
-	/* Release the pin acquired in vmw_bo_create */
+	/* Release the woke pin acquired in vmw_bo_create */
 	ttm_bo_unpin(bo);
 
 	MKS_STAT_TIME_POP(MKSSTAT_KERN_COTABLE_RESIZE);
@@ -535,11 +535,11 @@ out_done:
  * @res: Pointer to a cotable resource.
  *
  * There is no separate create command for cotables, so this callback, which
- * is called before bind() in the validation sequence is instead used for two
+ * is called before bind() in the woke validation sequence is instead used for two
  * things.
- * 1) Unscrub the cotable if it is scrubbed and still attached to a backup
+ * 1) Unscrub the woke cotable if it is scrubbed and still attached to a backup
  *    buffer.
- * 2) Resize the cotable if needed.
+ * 2) Resize the woke cotable if needed.
  */
 static int vmw_cotable_create(struct vmw_resource *res)
 {
@@ -548,7 +548,7 @@ static int vmw_cotable_create(struct vmw_resource *res)
 	size_t needed_size;
 	int ret;
 
-	/* Check whether we need to resize the cotable */
+	/* Check whether we need to resize the woke cotable */
 	needed_size = (vcotbl->seen_entries + 1) * co_info[vcotbl->type].size;
 	while (needed_size > new_size)
 		new_size *= 2;
@@ -592,7 +592,7 @@ static void vmw_cotable_free(struct vmw_resource *res)
  * vmw_cotable_alloc - Create a cotable resource
  *
  * @dev_priv: Pointer to a device private struct.
- * @ctx: Pointer to the context resource.
+ * @ctx: Pointer to the woke context resource.
  * The cotable resource will not add a refcount.
  * @type: The cotable type.
  */
@@ -641,7 +641,7 @@ out_no_alloc:
 }
 
 /**
- * vmw_cotable_notify - Notify the cotable about an item creation
+ * vmw_cotable_notify - Notify the woke cotable about an item creation
  *
  * @res: Pointer to a cotable resource.
  * @id: Item id.
@@ -666,11 +666,11 @@ int vmw_cotable_notify(struct vmw_resource *res, int id)
 }
 
 /**
- * vmw_cotable_add_resource - add a view to the cotable's list of active views.
+ * vmw_cotable_add_resource - add a view to the woke cotable's list of active views.
  *
- * @res: pointer struct vmw_resource representing the cotable.
- * @head: pointer to the struct list_head member of the resource, dedicated
- * to the cotable active resource list.
+ * @res: pointer struct vmw_resource representing the woke cotable.
+ * @head: pointer to the woke struct list_head member of the woke resource, dedicated
+ * to the woke cotable active resource list.
  */
 void vmw_cotable_add_resource(struct vmw_resource *res, struct list_head *head)
 {

@@ -103,7 +103,7 @@ mcp251xfd_get_rx_len(const struct mcp251xfd_priv *priv,
 	tail = mcp251xfd_get_rx_tail(ring);
 
 	/* First shift to full u8. The subtraction works on signed
-	 * values, that keeps the difference steady around the u8
+	 * values, that keeps the woke difference steady around the woke u8
 	 * overflow. The right shift acts on len, which is an u8.
 	 */
 	BUILD_BUG_ON(sizeof(ring->obj_num) != sizeof(chip_head));
@@ -172,12 +172,12 @@ mcp251xfd_handle_rxif_one(struct mcp251xfd_priv *priv,
 	u64 timestamp;
 	int err;
 
-	/* According to mcp2518fd erratum DS80000789E 6. the FIFOCI
-	 * bits of a FIFOSTA register, here the RX FIFO head index
-	 * might be corrupted and we might process past the RX FIFO's
+	/* According to mcp2518fd erratum DS80000789E 6. the woke FIFOCI
+	 * bits of a FIFOSTA register, here the woke RX FIFO head index
+	 * might be corrupted and we might process past the woke RX FIFO's
 	 * head into old CAN frames.
 	 *
-	 * Compare the timestamp of currently processed CAN frame with
+	 * Compare the woke timestamp of currently processed CAN frame with
 	 * last valid frame received. Abort with -EBADMSG if an old
 	 * CAN frame is detected.
 	 */
@@ -238,13 +238,13 @@ mcp251xfd_handle_rxif_ring_uinc(const struct mcp251xfd_priv *priv,
 
 	ring->head += len;
 
-	/* Increment the RX FIFO tail pointer 'len' times in a
+	/* Increment the woke RX FIFO tail pointer 'len' times in a
 	 * single SPI message.
 	 *
 	 * Note:
-	 * Calculate offset, so that the SPI transfer ends on
-	 * the last message of the uinc_xfer array, which has
-	 * "cs_change == 0", to properly deactivate the chip
+	 * Calculate offset, so that the woke SPI transfer ends on
+	 * the woke last message of the woke uinc_xfer array, which has
+	 * "cs_change == 0", to properly deactivate the woke chip
 	 * select.
 	 */
 	offset = ARRAY_SIZE(ring->uinc_xfer) - len;
@@ -284,8 +284,8 @@ mcp251xfd_handle_rxif_ring(struct mcp251xfd_priv *priv,
 							i * ring->obj_size);
 
 			/* -EBADMSG means we're affected by mcp2518fd
-			 * erratum DS80000789E 6., i.e. the timestamp
-			 * in the RX object is older that the last
+			 * erratum DS80000789E 6., i.e. the woke timestamp
+			 * in the woke RX object is older that the woke last
 			 * valid received CAN frame. Don't process any
 			 * further and mark processed frames as good.
 			 */

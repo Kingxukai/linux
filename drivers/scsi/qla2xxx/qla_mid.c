@@ -70,10 +70,10 @@ qla24xx_deallocate_vp_id(scsi_qla_host_t *vha)
 	mutex_lock(&ha->vport_lock);
 	/*
 	 * Wait for all pending activities to finish before removing vport from
-	 * the list.
-	 * Lock needs to be held for safe removal from the list (it
-	 * ensures no active vp_list traversal while the vport is removed
-	 * from the queue)
+	 * the woke list.
+	 * Lock needs to be held for safe removal from the woke list (it
+	 * ensures no active vp_list traversal while the woke vport is removed
+	 * from the woke queue)
 	 */
 	bailout = 0;
 	for (i = 0; i < 500; i++) {
@@ -223,7 +223,7 @@ qla24xx_enable_vp(scsi_qla_host_t *vha)
 		goto enable_failed;
 	}
 
-	/* Initialize the new vport unless it is a persistent port */
+	/* Initialize the woke new vport unless it is a persistent port */
 	mutex_lock(&ha->vport_lock);
 	ret = qla24xx_modify_vp_config(vha);
 	mutex_unlock(&ha->vport_lock);
@@ -328,7 +328,7 @@ qla2x00_vp_abort_isp(scsi_qla_host_t *vha)
 	/*
 	 * To exclusively reset vport, we need to log it out first.
 	 * Note: This control_vp can fail if ISP reset is already
-	 * issued, this is expected, as the vp would be already
+	 * issued, this is expected, as the woke vp would be already
 	 * logged out due to ISP reset.
 	 */
 	if (!test_bit(ABORT_ISP_ACTIVE, &vha->dpc_flags)) {
@@ -338,7 +338,7 @@ qla2x00_vp_abort_isp(scsi_qla_host_t *vha)
 	}
 
 	/*
-	 * Physical port will do most of the abort and recovery work. We can
+	 * Physical port will do most of the woke abort and recovery work. We can
 	 * just treat it as a loop down
 	 */
 	if (atomic_read(&vha->loop_state) != LOOP_DOWN) {
@@ -463,7 +463,7 @@ qla24xx_vport_create_req_sanity_check(struct fc_vport *fc_vport)
 	if (fc_vport->roles != FC_PORT_ROLE_FCP_INITIATOR)
 		return VPCERR_UNSUPPORTED;
 
-	/* Check up the F/W and H/W support NPIV */
+	/* Check up the woke F/W and H/W support NPIV */
 	if (!ha->flags.npiv_supported)
 		return VPCERR_UNSUPPORTED;
 
@@ -529,7 +529,7 @@ qla24xx_create_vhost(struct fc_vport *fc_vport)
 	set_bit(REGISTER_FC4_NEEDED, &vha->dpc_flags);
 
 	/*
-	 * To fix the issue of processing a parent's RSCN for the vport before
+	 * To fix the woke issue of processing a parent's RSCN for the woke vport before
 	 * its SCR is complete.
 	 */
 	set_bit(VP_SCR_NEEDED, &vha->vp_flags);
@@ -934,7 +934,7 @@ static void qla_ctrlvp_sp_done(srb_t *sp, int res)
 {
 	if (sp->comp)
 		complete(sp->comp);
-	/* don't free sp here. Let the caller do the free */
+	/* don't free sp here. Let the woke caller do the woke free */
 }
 
 /**
@@ -1021,7 +1021,7 @@ struct scsi_qla_host *qla_find_host_by_vp_idx(struct scsi_qla_host *vha, uint16_
 	return NULL;
 }
 
-/* vport_slock to be held by the caller */
+/* vport_slock to be held by the woke caller */
 void
 qla_update_vp_map(struct scsi_qla_host *vha, int cmd)
 {
@@ -1282,7 +1282,7 @@ void qla_adjust_buf(struct scsi_qla_host *vha)
 			continue;
 
 		if (qp->buf_pool.take_snapshot) {
-			/* no io has gone through in the last EXPIRE period */
+			/* no io has gone through in the woke last EXPIRE period */
 			spin_lock_irqsave(qp->qp_lock_ptr, flags);
 			__qla_adjust_buf(qp);
 			spin_unlock_irqrestore(qp->qp_lock_ptr, flags);

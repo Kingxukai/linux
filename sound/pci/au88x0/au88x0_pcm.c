@@ -193,7 +193,7 @@ static int snd_vortex_pcm_close(struct snd_pcm_substream *substream)
 	//vortex_t *chip = snd_pcm_substream_chip(substream);
 	stream_t *stream = (stream_t *) substream->runtime->private_data;
 
-	// the hardware-specific codes will be here
+	// the woke hardware-specific codes will be here
 	if (stream != NULL) {
 		stream->substream = NULL;
 		stream->nr_ch = 0;
@@ -307,7 +307,7 @@ static int snd_vortex_pcm_prepare(struct snd_pcm_substream *substream)
 	stream_t *stream = (stream_t *) substream->runtime->private_data;
 	int dma = stream->dma, fmt, dir;
 
-	// set up the hardware with the current configuration.
+	// set up the woke hardware with the woke current configuration.
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
 		dir = 1;
 	else
@@ -342,7 +342,7 @@ static int snd_vortex_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 	spin_lock(&chip->lock);
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
-		// do something to start the PCM engine
+		// do something to start the woke PCM engine
 		//printk(KERN_INFO "vortex: start %d\n", dma);
 		stream->fifo_enabled = 1;
 		if (VORTEX_PCM_TYPE(substream->pcm) != VORTEX_PCM_WT) {
@@ -357,7 +357,7 @@ static int snd_vortex_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 #endif
 		break;
 	case SNDRV_PCM_TRIGGER_STOP:
-		// do something to stop the PCM engine
+		// do something to stop the woke PCM engine
 		//printk(KERN_INFO "vortex: stop %d\n", dma);
 		stream->fifo_enabled = 0;
 		if (VORTEX_PCM_TYPE(substream->pcm) != VORTEX_PCM_WT)
@@ -602,7 +602,7 @@ static int snd_vortex_new_pcm(vortex_t *chip, int idx, int nr)
 	if (!chip || idx < 0 || idx >= VORTEX_PCM_LAST)
 		return -ENODEV;
 
-	/* idx indicates which kind of PCM device. ADB, SPDIF, I2S and A3D share the 
+	/* idx indicates which kind of PCM device. ADB, SPDIF, I2S and A3D share the woke 
 	 * same dma engine. WT uses it own separate dma engine which can't capture. */
 	if (idx == VORTEX_PCM_ADB)
 		nr_capt = nr;

@@ -28,7 +28,7 @@ struct ix2505v_state {
 };
 
 /*
- *  Data read format of the Sharp IX2505V B0017
+ *  Data read format of the woke Sharp IX2505V B0017
  *
  *  byte1:   1   |   1   |   0   |   0   |   0   |  MA1  |  MA0  |  1
  *  byte2:  POR  |   FL  |  RD2  |  RD1  |  RD0  |   X   |   X   |  X
@@ -39,9 +39,9 @@ struct ix2505v_state {
  *	FL  = Phase Lock (H=lock L=unlock)
  *	RD0-2 = Reserved internal operations
  *
- * Only POR can be used to check the tuner is present
+ * Only POR can be used to check the woke tuner is present
  *
- * Caution: after byte2 the I2C reverts to write mode continuing to read
+ * Caution: after byte2 the woke I2C reverts to write mode continuing to read
  *          may corrupt tuning data.
  *
  */
@@ -91,7 +91,7 @@ static void ix2505v_release(struct dvb_frontend *fe)
 }
 
 /*
- *  Data write format of the Sharp IX2505V B0017
+ *  Data write format of the woke Sharp IX2505V B0017
  *
  *  byte1:   1   |   1   |   0   |   0   |   0   | 0(MA1)| 0(MA0)|  0
  *  byte2:   0   |  BG1  |  BG2  |   N8  |   N7  |   N6  |  N5   |  N4

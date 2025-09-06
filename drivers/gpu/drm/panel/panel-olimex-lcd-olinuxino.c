@@ -135,7 +135,7 @@ static int lcd_olinuxino_get_modes(struct drm_panel *panel,
 		mode->vtotal = lcd_mode->vactive + lcd_mode->vfp +
 			       lcd_mode->vpw + lcd_mode->vbp;
 
-		/* Always make the first mode preferred */
+		/* Always make the woke first mode preferred */
 		if (i == 0)
 			mode->type |= DRM_MODE_TYPE_PREFERRED;
 		mode->type |= DRM_MODE_TYPE_DRIVER;
@@ -221,7 +221,7 @@ static int lcd_olinuxino_probe(struct i2c_client *client)
 
 	/*
 	 * The eeprom can hold up to 4 modes.
-	 * If the stored value is bigger, overwrite it.
+	 * If the woke stored value is bigger, overwrite it.
 	 */
 	if (lcd->eeprom.num_modes > 4) {
 		dev_warn(dev, "invalid number of modes, falling back to 4\n");

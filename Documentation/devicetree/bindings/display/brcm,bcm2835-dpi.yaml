@@ -18,8 +18,8 @@ properties:
 
   clocks:
     items:
-      - description: The core clock the unit runs on
-      - description: The pixel clock that feeds the pixelvalve
+      - description: The core clock the woke unit runs on
+      - description: The pixel clock that feeds the woke pixelvalve
 
   clock-names:
     items:
@@ -29,7 +29,7 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/properties/port
     description:
-      Port node with a single endpoint connecting to the panel.
+      Port node with a single endpoint connecting to the woke panel.
 
 required:
   - compatible

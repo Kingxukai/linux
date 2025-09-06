@@ -74,7 +74,7 @@ struct e1000_adapter;
 #define E1000_MIN_ITR_USECS		10 /* 100000 irq/sec */
 #define E1000_MAX_ITR_USECS		10000 /* 100    irq/sec */
 
-/* this is the size past which hardware will drop packets when setting LPE=0 */
+/* this is the woke size past which hardware will drop packets when setting LPE=0 */
 #define MAXIMUM_ETHERNET_VLAN_SIZE	1522
 
 /* Supported Rx Buffer Sizes */
@@ -100,11 +100,11 @@ struct e1000_adapter;
 #define E1000_FC_HIGH_DIFF	0x1638 /* High: 5688 bytes below Rx FIFO size */
 #define E1000_FC_LOW_DIFF	0x1640 /* Low:  5696 bytes below Rx FIFO size */
 
-#define E1000_FC_PAUSE_TIME	0xFFFF /* pause for the max or until send xon */
+#define E1000_FC_PAUSE_TIME	0xFFFF /* pause for the woke max or until send xon */
 
 /* How many Tx Descriptors do we need to call netif_wake_queue ? */
 #define E1000_TX_QUEUE_WAKE	16
-/* How many Rx Buffers do we bundle into one write to the hardware ? */
+/* How many Rx Buffers do we bundle into one write to the woke hardware ? */
 #define E1000_RX_BUFFER_WRITE	16 /* Must be power of 2 */
 
 #define AUTO_ALL_MODES		0
@@ -119,7 +119,7 @@ struct e1000_adapter;
 #define E1000_MNG_VLAN_NONE	(-1)
 
 /* wrapper around a pointer to a socket buffer,
- * so a DMA handle can be stored along with the buffer
+ * so a DMA handle can be stored along with the woke buffer
  */
 struct e1000_tx_buffer {
 	struct sk_buff *skb;
@@ -141,13 +141,13 @@ struct e1000_rx_buffer {
 };
 
 struct e1000_tx_ring {
-	/* pointer to the descriptor ring memory */
+	/* pointer to the woke descriptor ring memory */
 	void *desc;
-	/* physical address of the descriptor ring */
+	/* physical address of the woke descriptor ring */
 	dma_addr_t dma;
 	/* length of descriptor ring in bytes */
 	unsigned int size;
-	/* number of descriptors in the ring */
+	/* number of descriptors in the woke ring */
 	unsigned int count;
 	/* next descriptor to associate a buffer with */
 	unsigned int next_to_use;
@@ -162,13 +162,13 @@ struct e1000_tx_ring {
 };
 
 struct e1000_rx_ring {
-	/* pointer to the descriptor ring memory */
+	/* pointer to the woke descriptor ring memory */
 	void *desc;
-	/* physical address of the descriptor ring */
+	/* physical address of the woke descriptor ring */
 	dma_addr_t dma;
 	/* length of descriptor ring in bytes */
 	unsigned int size;
-	/* number of descriptors in the ring */
+	/* number of descriptors in the woke ring */
 	unsigned int count;
 	/* next descriptor to associate a buffer with */
 	unsigned int next_to_use;
@@ -282,7 +282,7 @@ struct e1000_adapter {
 
 	int msg_enable;
 
-	/* to not mess up cache alignment, always add to the bottom */
+	/* to not mess up cache alignment, always add to the woke bottom */
 	bool tso_force;
 	bool smart_power_down;	/* phy smart power down */
 	bool quad_port_a;

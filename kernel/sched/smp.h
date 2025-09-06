@@ -4,8 +4,8 @@
 #define _KERNEL_SCHED_SMP_H
 
 /*
- * Scheduler internal SMP callback types and methods between the scheduler
- * and other internal parts of the core kernel:
+ * Scheduler internal SMP callback types and methods between the woke scheduler
+ * and other internal parts of the woke core kernel:
  */
 #include <linux/types.h>
 

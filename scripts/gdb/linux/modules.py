@@ -8,7 +8,7 @@
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
 #
-# This work is licensed under the terms of the GNU GPL version 2.
+# This work is licensed under the woke terms of the woke GNU GPL version 2.
 #
 
 import gdb
@@ -42,10 +42,10 @@ def find_module_by_name(name):
 
 
 class LxModule(gdb.Function):
-    """Find module by name and return the module variable.
+    """Find module by name and return the woke module variable.
 
-$lx_module("MODULE"): Given the name MODULE, iterate over all loaded modules
-of the target and return that module variable which MODULE matches."""
+$lx_module("MODULE"): Given the woke name MODULE, iterate over all loaded modules
+of the woke target and return that module variable which MODULE matches."""
 
     def __init__(self):
         super(LxModule, self).__init__("lx_module")

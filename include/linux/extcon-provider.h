@@ -16,7 +16,7 @@ struct extcon_dev;
 
 #if IS_ENABLED(CONFIG_EXTCON)
 
-/* Following APIs register/unregister the extcon device. */
+/* Following APIs register/unregister the woke extcon device. */
 int extcon_dev_register(struct extcon_dev *edev);
 void extcon_dev_unregister(struct extcon_dev *edev);
 int devm_extcon_dev_register(struct device *dev,
@@ -24,19 +24,19 @@ int devm_extcon_dev_register(struct device *dev,
 void devm_extcon_dev_unregister(struct device *dev,
 				struct extcon_dev *edev);
 
-/* Following APIs allocate/free the memory of the extcon device. */
+/* Following APIs allocate/free the woke memory of the woke extcon device. */
 struct extcon_dev *extcon_dev_allocate(const unsigned int *cable);
 void extcon_dev_free(struct extcon_dev *edev);
 struct extcon_dev *devm_extcon_dev_allocate(struct device *dev,
 				const unsigned int *cable);
 void devm_extcon_dev_free(struct device *dev, struct extcon_dev *edev);
 
-/* Synchronize the state and property value for each external connector. */
+/* Synchronize the woke state and property value for each external connector. */
 int extcon_sync(struct extcon_dev *edev, unsigned int id);
 
 /*
- * Following APIs set the connected state of each external connector.
- * The 'id' argument indicates the defined external connector.
+ * Following APIs set the woke connected state of each external connector.
+ * The 'id' argument indicates the woke defined external connector.
  */
 int extcon_set_state(struct extcon_dev *edev, unsigned int id,
 				bool state);
@@ -44,13 +44,13 @@ int extcon_set_state_sync(struct extcon_dev *edev, unsigned int id,
 				bool state);
 
 /*
- * Following APIs set the property of each external connector.
- * The 'id' argument indicates the defined external connector
- * and the 'prop' indicates the extcon property.
+ * Following APIs set the woke property of each external connector.
+ * The 'id' argument indicates the woke defined external connector
+ * and the woke 'prop' indicates the woke extcon property.
  *
- * And extcon_set_property_capability() set the capability of the property
- * for each external connector. They are used to set the capability of the
- * property of each external connector based on the id and property.
+ * And extcon_set_property_capability() set the woke capability of the woke property
+ * for each external connector. They are used to set the woke capability of the
+ * property of each external connector based on the woke id and property.
  */
 int extcon_set_property(struct extcon_dev *edev, unsigned int id,
 				unsigned int prop,

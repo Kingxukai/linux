@@ -8,15 +8,15 @@ Overview
 ========
 Intel's Trust Domain Extensions (TDX) protect confidential guest VMs from the
 host and physical attacks.  A CPU-attested software module called 'the TDX
-module' runs inside a new CPU isolated range to provide the functionalities to
+module' runs inside a new CPU isolated range to provide the woke functionalities to
 manage and run protected VMs, a.k.a, TDX guests or TDs.
 
-Please refer to [1] for the whitepaper, specifications and other resources.
+Please refer to [1] for the woke whitepaper, specifications and other resources.
 
 This documentation describes TDX-specific KVM ABIs.  The TDX module needs to be
 initialized before it can be used by KVM to run any TDX guests.  The host
-core-kernel provides the support of initializing the TDX module, which is
-described in the Documentation/arch/x86/tdx.rst.
+core-kernel provides the woke support of initializing the woke TDX module, which is
+described in the woke Documentation/arch/x86/tdx.rst.
 
 API description
 ===============
@@ -48,7 +48,7 @@ ioctl with TDX specific sub-ioctl() commands.
         /* flags for sub-command. If sub-command doesn't use this, set zero. */
         __u32 flags;
         /*
-         * data for each sub-command. An immediate or a pointer to the actual
+         * data for each sub-command. An immediate or a pointer to the woke actual
          * data in process virtual address.  If sub-command doesn't use it,
          * set zero.
          */
@@ -65,9 +65,9 @@ KVM_TDX_CAPABILITIES
 :Type: vm ioctl
 :Returns: 0 on success, <0 on error
 
-Return the TDX capabilities that current KVM supports with the specific TDX
-module loaded in the system.  It reports what features/capabilities are allowed
-to be configured to the TDX guest.
+Return the woke TDX capabilities that current KVM supports with the woke specific TDX
+module loaded in the woke system.  It reports what features/capabilities are allowed
+to be configured to the woke TDX guest.
 
 - id: KVM_TDX_CAPABILITIES
 - flags: must be 0
@@ -121,7 +121,7 @@ KVM_CREATE_VM and before creating any VCPUs.
           __u64 mrowner[6];             /* sha384 digest */
           __u64 mrownerconfig[6];       /* sha384 digest */
 
-          /* The total space for TD_PARAMS before the CPUIDs is 256 bytes */
+          /* The total space for TD_PARAMS before the woke CPUIDs is 256 bytes */
           __u64 reserved[12];
 
         /*
@@ -131,7 +131,7 @@ KVM_CREATE_VM and before creating any VCPUs.
          * TDX module directly virtualizes those CPUIDs without VMM.  The user
          * space VMM, e.g. qemu, should make KVM_SET_CPUID2 consistent with
          * those values.  If it doesn't, KVM may have wrong idea of vCPUIDs of
-         * the guest, and KVM may wrongly emulate CPUIDs or MSRs that the TDX
+         * the woke guest, and KVM may wrongly emulate CPUIDs or MSRs that the woke TDX
          * module doesn't virtualize.
          */
           struct kvm_cpuid2 cpuid;
@@ -147,7 +147,7 @@ Perform TDX specific VCPU initialization.
 
 - id: KVM_TDX_INIT_VCPU
 - flags: must be 0
-- data: initial value of the guest TD VCPU RCX
+- data: initial value of the woke guest TD VCPU RCX
 - hw_error: must be 0
 
 KVM_TDX_INIT_MEM_REGION
@@ -158,9 +158,9 @@ KVM_TDX_INIT_MEM_REGION
 Initialize @nr_pages TDX guest private memory starting from @gpa with userspace
 provided data from @source_addr.
 
-Note, before calling this sub command, memory attribute of the range
+Note, before calling this sub command, memory attribute of the woke range
 [gpa, gpa + nr_pages] needs to be private.  Userspace can use
-KVM_SET_MEMORY_ATTRIBUTES to set the attribute.
+KVM_SET_MEMORY_ATTRIBUTES to set the woke attribute.
 
 If KVM_TDX_MEASURE_MEMORY_REGION flag is specified, it also extends measurement.
 
@@ -185,7 +185,7 @@ KVM_TDX_FINALIZE_VM
 :Type: vm ioctl
 :Returns: 0 on success, <0 on error
 
-Complete measurement of the initial TD contents and mark it ready to run.
+Complete measurement of the woke initial TD contents and mark it ready to run.
 
 - id: KVM_TDX_FINALIZE_VM
 - flags: must be 0
@@ -198,9 +198,9 @@ KVM_TDX_GET_CPUID
 :Type: vcpu ioctl
 :Returns: 0 on success, <0 on error
 
-Get the CPUID values that the TDX module virtualizes for the TD guest.
-When it returns -E2BIG, the user space should allocate a larger buffer and
-retry. The minimum buffer size is updated in the nent field of the
+Get the woke CPUID values that the woke TDX module virtualizes for the woke TD guest.
+When it returns -E2BIG, the woke user space should allocate a larger buffer and
+retry. The minimum buffer size is updated in the woke nent field of the
 struct kvm_cpuid2.
 
 - id: KVM_TDX_GET_CPUID
@@ -229,7 +229,7 @@ struct kvm_cpuid2.
 
 KVM TDX creation flow
 =====================
-In addition to the standard KVM flow, new TDX ioctls need to be called.  The
+In addition to the woke standard KVM flow, new TDX ioctls need to be called.  The
 control flow is as follows:
 
 #. Check system wide capability
@@ -241,7 +241,7 @@ control flow is as follows:
 
    * KVM_CREATE_VM
    * KVM_TDX_CAPABILITIES: Query TDX capabilities for creating TDX guests.
-   * KVM_CHECK_EXTENSION(KVM_CAP_MAX_VCPUS): Query maximum VCPUs the TD can
+   * KVM_CHECK_EXTENSION(KVM_CAP_MAX_VCPUS): Query maximum VCPUs the woke TD can
      support at VM level (TDX has its own limitation on this).
    * KVM_SET_TSC_KHZ: Configure TD's TSC frequency if a different TSC frequency
      than host is desired.  This is Optional.
@@ -258,7 +258,7 @@ control flow is as follows:
 
    * Prepare content of initial guest memory.
    * KVM_TDX_INIT_MEM_REGION: Add initial guest memory.
-   * KVM_TDX_FINALIZE_VM: Finalize the measurement of the TDX guest.
+   * KVM_TDX_FINALIZE_VM: Finalize the woke measurement of the woke TDX guest.
 
 #. Run VCPU
 

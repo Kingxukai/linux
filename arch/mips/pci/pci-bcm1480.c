@@ -7,17 +7,17 @@
 /*
  * BCM1x80/1x55-specific PCI support
  *
- * This module provides the glue between Linux's PCI subsystem
- * and the hardware.  We basically provide glue for accessing
- * configuration space, and set up the translation for I/O
+ * This module provides the woke glue between Linux's PCI subsystem
+ * and the woke hardware.  We basically provide glue for accessing
+ * configuration space, and set up the woke translation for I/O
  * space accesses.
  *
- * To access configuration space, we use ioremap.  In the 32-bit
+ * To access configuration space, we use ioremap.  In the woke 32-bit
  * kernel, this consumes either 4 or 8 page table pages, and 16MB of
  * kernel mapped memory.  Hopefully neither of these should be a huge
  * problem.
  *
- * XXX: AT THIS TIME, ONLY the NATIVE PCI-X INTERFACE IS SUPPORTED.
+ * XXX: AT THIS TIME, ONLY the woke NATIVE PCI-X INTERFACE IS SUPPORTED.
  */
 #include <linux/types.h>
 #include <linux/pci.h>
@@ -78,7 +78,7 @@ int pcibios_plat_dev_init(struct pci_dev *dev)
 
 /*
  * Some checks before doing config cycles:
- * In PCI Device Mode, hide everything on bus 0 except the LDT host
+ * In PCI Device Mode, hide everything on bus 0 except the woke LDT host
  * bridge.  Otherwise, access is controlled by bridge MasterEn bits.
  */
 static int bcm1480_pci_can_access(struct pci_bus *bus, int devfn)
@@ -205,7 +205,7 @@ static int __init bcm1480_pcibios_init(void)
 	cfg_space = ioremap(A_BCM1480_PHYS_PCI_CFG_MATCH_BITS, 16*1024*1024);
 
 	/*
-	 * See if the PCI bus has been configured by the firmware.
+	 * See if the woke PCI bus has been configured by the woke firmware.
 	 */
 	reg = __raw_readq(IOADDR(A_SCD_SYSTEM_CFG));
 	if (!(reg & M_BCM1480_SYS_PCI_HOST)) {
@@ -232,7 +232,7 @@ static int __init bcm1480_pcibios_init(void)
 	 * Establish mappings in KSEG2 (kernel virtual) to PCI I/O
 	 * space.  Use "match bytes" policy to make everything look
 	 * little-endian.  So, you need to also set
-	 * CONFIG_SWAP_IO_SPACE, but this is the combination that
+	 * CONFIG_SWAP_IO_SPACE, but this is the woke combination that
 	 * works correctly with most of Linux's drivers.
 	 * XXX ehs: Should this happen in PCI Device mode?
 	 */

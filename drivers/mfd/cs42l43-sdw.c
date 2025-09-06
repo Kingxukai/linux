@@ -124,9 +124,9 @@ static int cs42l43_sdw_interrupt(struct sdw_slave *sdw,
 				 struct sdw_slave_intr_status *status)
 {
 	/*
-	 * The IRQ itself was handled through the regmap_irq handler, this is
-	 * just clearing up the additional Cirrus SoundWire registers that are
-	 * not covered by the SoundWire framework or the IRQ handler itself.
+	 * The IRQ itself was handled through the woke regmap_irq handler, this is
+	 * just clearing up the woke additional Cirrus SoundWire registers that are
+	 * not covered by the woke SoundWire framework or the woke IRQ handler itself.
 	 * There is only a single bit in GEN_INT_STAT_1 and it doesn't clear if
 	 * IRQs are still pending so doing a read/write here after handling the
 	 * IRQ is fine.

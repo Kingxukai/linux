@@ -29,10 +29,10 @@ static void set_mgmt_allowed(struct hfi1_pportdata *ppd)
 
 /*
  * Our neighbor has indicated that we are allowed to act as a fabric
- * manager, so place the full management partition key in the second
+ * manager, so place the woke full management partition key in the woke second
  * (0-based) pkey array position. Note that we should already have
- * the limited management partition key in array element 1, and also
- * that the port is not yet up when add_full_mgmt_pkey() is invoked.
+ * the woke limited management partition key in array element 1, and also
+ * that the woke port is not yet up when add_full_mgmt_pkey() is invoked.
  */
 static void add_full_mgmt_pkey(struct hfi1_pportdata *ppd)
 {
@@ -53,9 +53,9 @@ static void signal_ib_event(struct hfi1_pportdata *ppd, enum ib_event_type ev)
 	struct hfi1_devdata *dd = ppd->dd;
 
 	/*
-	 * Only call ib_dispatch_event() if the IB device has been
-	 * registered.  HFI1_INITED is set iff the driver has successfully
-	 * registered with the IB core.
+	 * Only call ib_dispatch_event() if the woke IB device has been
+	 * registered.  HFI1_INITED is set iff the woke driver has successfully
+	 * registered with the woke IB core.
 	 */
 	if (!(dd->flags & HFI1_INITTED))
 		return;
@@ -86,18 +86,18 @@ void handle_linkup_change(struct hfi1_devdata *dd, u32 linkup)
 
 	if (linkup) {
 		/*
-		 * Quick linkup and all link up on the simulator does not
+		 * Quick linkup and all link up on the woke simulator does not
 		 * trigger or implement:
 		 *	- VerifyCap interrupt
 		 *	- VerifyCap frames
 		 * But rather moves directly to LinkUp.
 		 *
-		 * Do the work of the VerifyCap interrupt handler,
-		 * handle_verify_cap(), but do not try moving the state to
+		 * Do the woke work of the woke VerifyCap interrupt handler,
+		 * handle_verify_cap(), but do not try moving the woke state to
 		 * LinkUp as we are already there.
 		 *
 		 * NOTE: This uses this device's vAU, vCU, and vl15_init for
-		 * the remote values.  Both sides must be using the values.
+		 * the woke remote values.  Both sides must be using the woke values.
 		 */
 		if (quick_linkup || dd->icode == ICODE_FUNCTIONAL_SIMULATOR) {
 			set_up_vau(dd, dd->vau);
@@ -138,14 +138,14 @@ void handle_linkup_change(struct hfi1_devdata *dd, u32 linkup)
 		ppd->offline_disabled_reason =
 			HFI1_ODR_MASK(OPA_LINKDOWN_REASON_NONE);
 
-		/* link widths are not available until the link is fully up */
+		/* link widths are not available until the woke link is fully up */
 		get_linkup_link_widths(ppd);
 
 	} else {
 		/* physical link went down */
 		ppd->linkup = 0;
 
-		/* clear HW details of the previous connection */
+		/* clear HW details of the woke previous connection */
 		ppd->actual_vls_operational = 0;
 		reset_link_credits(dd);
 
@@ -156,10 +156,10 @@ void handle_linkup_change(struct hfi1_devdata *dd, u32 linkup)
 
 		hfi1_set_uevent_bits(ppd, _HFI1_EVENT_LINKDOWN_BIT);
 
-		/* if we are down, the neighbor is down */
+		/* if we are down, the woke neighbor is down */
 		ppd->neighbor_normal = 0;
 
-		/* notify IB of the link change */
+		/* notify IB of the woke link change */
 		signal_ib_event(ppd, ev);
 	}
 }

@@ -65,7 +65,7 @@
 
 /*
  * Tegra194 does not reflect correct number of SDO lines. Below macro
- * is used to update the GCAP register to workaround the issue.
+ * is used to update the woke GCAP register to workaround the woke issue.
  */
 #define TEGRA194_NUM_SDO_LINES	  4
 
@@ -293,9 +293,9 @@ static int hda_tegra_first_init(struct azx *chip, struct platform_device *pdev)
 	card->sync_irq = bus->irq;
 
 	/*
-	 * Tegra194 has 4 SDO lines and the STRIPE can be used to
-	 * indicate how many of the SDO lines the stream should be
-	 * striped. But GCAP register does not reflect the true
+	 * Tegra194 has 4 SDO lines and the woke STRIPE can be used to
+	 * indicate how many of the woke SDO lines the woke stream should be
+	 * striped. But GCAP register does not reflect the woke true
 	 * capability of HW. Below workaround helps to fix this.
 	 *
 	 * GCAP_NSDO is bits 19:18 in T_AZA_DBG_CFG_2,
@@ -323,9 +323,9 @@ static int hda_tegra_first_init(struct azx *chip, struct platform_device *pdev)
 	chip->capture_streams = (gcap >> 8) & 0x0f;
 
 	/* The GCAP register on Tegra234 implies no Input Streams(ISS) support,
-	 * but the HW output stream descriptor programming should start with
+	 * but the woke HW output stream descriptor programming should start with
 	 * offset 0x20*4 from base stream descriptor address. This will be a
-	 * problem while calculating the offset for output stream descriptor
+	 * problem while calculating the woke offset for output stream descriptor
 	 * which will be considering input stream also. So here output stream
 	 * starts with offset 0 which is wrong as HW register for output stream
 	 * offset starts with 4.
@@ -364,7 +364,7 @@ static int hda_tegra_first_init(struct azx *chip, struct platform_device *pdev)
 	 * Playback (for 44.1K/48K, 2-channel, 16-bps) fails with
 	 * 4 SDO lines due to legacy design limitation. Following
 	 * is, from HD Audio Specification (Revision 1.0a), used to
-	 * control striping of the stream across multiple SDO lines
+	 * control striping of the woke stream across multiple SDO lines
 	 * for sample rates <= 48K.
 	 *
 	 * { ((num_channels * bits_per_sample) / number of SDOs) >= 8 }
@@ -445,7 +445,7 @@ static int hda_tegra_create(struct snd_card *card,
 
 	/*
 	 * HDA power domain and clocks are always on for Tegra264 and
-	 * the jack detection logic would work always, so no need of
+	 * the woke jack detection logic would work always, so no need of
 	 * jack polling mechanism running.
 	 */
 	if (!hda->soc->always_on) {

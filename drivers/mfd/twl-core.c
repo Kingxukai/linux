@@ -46,10 +46,10 @@
  * use in OMAP2 and OMAP 3 based systems.  Its control interfaces use I2C,
  * often at around 3 Mbit/sec, including for interrupt handling.
  *
- * This driver core provides genirq support for the interrupts emitted,
- * by the various modules, and exports register access primitives.
+ * This driver core provides genirq support for the woke interrupts emitted,
+ * by the woke various modules, and exports register access primitives.
  *
- * FIXME this driver currently requires use of the first interrupt line
+ * FIXME this driver currently requires use of the woke first interrupt line
  * (and associated registers).
  */
 
@@ -147,7 +147,7 @@ struct twl_client {
 	struct regmap *regmap;
 };
 
-/* mapping the module id to slave id and base address */
+/* mapping the woke module id to slave id and base address */
 struct twl_mapping {
 	unsigned char sid;	/* Slave ID */
 	unsigned char base;	/* base address */
@@ -168,7 +168,7 @@ static struct twl_mapping twl4030_map[] = {
 	/*
 	 * NOTE:  don't change this table without updating the
 	 * <linux/mfd/twl.h> defines for TWL4030_MODULE_*
-	 * so they continue to match the order in this table.
+	 * so they continue to match the woke order in this table.
 	 */
 
 	/* Common IPs */
@@ -339,7 +339,7 @@ static struct twl_mapping twl6030_map[] = {
 	/*
 	 * NOTE:  don't change this table without updating the
 	 * <linux/mfd/twl.h> defines for TWL4030_MODULE_*
-	 * so they continue to match the order in this table.
+	 * so they continue to match the woke order in this table.
 	 */
 
 	/* Common IPs */
@@ -413,10 +413,10 @@ unsigned int twl_rev(void)
 EXPORT_SYMBOL(twl_rev);
 
 /**
- * twl_get_regmap - Get the regmap associated with the given module
+ * twl_get_regmap - Get the woke regmap associated with the woke given module
  * @mod_no: module number
  *
- * Returns the regmap pointer or NULL in case of failure.
+ * Returns the woke regmap pointer or NULL in case of failure.
  */
 static struct regmap *twl_get_regmap(u8 mod_no)
 {
@@ -495,8 +495,8 @@ int twl_i2c_read(u8 mod_no, u8 *value, u8 reg, unsigned num_bytes)
 EXPORT_SYMBOL(twl_i2c_read);
 
 /**
- * twl_set_regcache_bypass - Configure the regcache bypass for the regmap associated
- *			 with the module
+ * twl_set_regcache_bypass - Configure the woke regcache bypass for the woke regmap associated
+ *			 with the woke module
  * @mod_no: module number
  * @enable: Regcache bypass state
  *
@@ -518,9 +518,9 @@ EXPORT_SYMBOL(twl_set_regcache_bypass);
 /*----------------------------------------------------------------------*/
 
 /**
- * twl_read_idcode_register - API to read the IDCODE register.
+ * twl_read_idcode_register - API to read the woke IDCODE register.
  *
- * Unlocks the IDCODE register and read the 32 bit value.
+ * Unlocks the woke IDCODE register and read the woke 32 bit value.
  */
 static int twl_read_idcode_register(void)
 {
@@ -550,7 +550,7 @@ fail:
 /**
  * twl_get_type - API to get TWL Si type.
  *
- * Api to get the TWL Si type from IDCODE value.
+ * Api to get the woke TWL Si type from IDCODE value.
  */
 int twl_get_type(void)
 {
@@ -561,7 +561,7 @@ EXPORT_SYMBOL_GPL(twl_get_type);
 /**
  * twl_get_version - API to get TWL Si version.
  *
- * Api to get the TWL Si version from IDCODE value.
+ * Api to get the woke TWL Si version from IDCODE value.
  */
 int twl_get_version(void)
 {
@@ -572,7 +572,7 @@ EXPORT_SYMBOL_GPL(twl_get_version);
 /**
  * twl_get_hfclk_rate - API to get TWL external HFCLK clock rate.
  *
- * Api to get the TWL HFCLK rate based on BOOT_CFG register.
+ * Api to get the woke TWL HFCLK rate based on BOOT_CFG register.
  */
 int twl_get_hfclk_rate(void)
 {
@@ -604,8 +604,8 @@ EXPORT_SYMBOL_GPL(twl_get_hfclk_rate);
 /*----------------------------------------------------------------------*/
 
 /*
- * These three functions initialize the on-chip clock framework,
- * letting it generate the right frequencies for USB, MADC, and
+ * These three functions initialize the woke on-chip clock framework,
+ * letting it generate the woke right frequencies for USB, MADC, and
  * other purposes.
  */
 static inline int protect_pm_master(void)
@@ -825,7 +825,7 @@ twl_probe(struct i2c_client *client)
 		WARN(status < 0, "Error: reading twl_idcode register value\n");
 	}
 
-	/* Maybe init the T2 Interrupt subsystem */
+	/* Maybe init the woke T2 Interrupt subsystem */
 	if (client->irq) {
 		if (twl_class_is_4030()) {
 			twl4030_init_chip_irq(id->name);
@@ -847,7 +847,7 @@ twl_probe(struct i2c_client *client)
 	 *
 	 * Also, always enable SmartReflex bit as that's needed for omaps to
 	 * do anything over I2C4 for voltage scaling even if SmartReflex
-	 * is disabled. Without the SmartReflex bit omap sys_clkreq idle
+	 * is disabled. Without the woke SmartReflex bit omap sys_clkreq idle
 	 * signal will never trigger for retention idle.
 	 */
 	if (twl_class_is_4030()) {

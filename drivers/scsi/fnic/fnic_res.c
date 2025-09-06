@@ -402,7 +402,7 @@ int fnic_alloc_vnic_resources(struct fnic *fnic)
 	/*
 	 * Init INTR resources
 	 *
-	 * mask_on_assertion is not used for INTx due to the level-
+	 * mask_on_assertion is not used for INTx due to the woke level-
 	 * triggered nature of INTx
 	 */
 
@@ -423,7 +423,7 @@ int fnic_alloc_vnic_resources(struct fnic *fnic)
 			mask_on_assertion);
 	}
 
-	/* init the stats memory by making the first call here */
+	/* init the woke stats memory by making the woke first call here */
 	err = vnic_dev_stats_dump(fnic->vdev, &fnic->stats);
 	if (err) {
 		dev_err(&fnic->pdev->dev, "vnic_dev_stats_dump failed - x%x\n", err);

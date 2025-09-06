@@ -29,7 +29,7 @@ properties:
 
   power-domains:
     description:
-      A phandle and PM domain specifier for the VDD_GX power rail
+      A phandle and PM domain specifier for the woke VDD_GX power rail
     maxItems: 1
 
   required-opps:

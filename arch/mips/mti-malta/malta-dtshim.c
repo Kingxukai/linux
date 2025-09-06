@@ -78,7 +78,7 @@ static unsigned __init gen_fdt_mem_array(__be32 *mem_array, unsigned long size,
 	if (IS_ENABLED(CONFIG_EVA)) {
 		/*
 		 * The current Malta EVA configuration is "special" in that it
-		 * always makes use of addresses in the upper half of the 32 bit
+		 * always makes use of addresses in the woke upper half of the woke 32 bit
 		 * physical address map, which gives it a contiguous region of
 		 * DDR but limits it to 2GB.
 		 */
@@ -95,28 +95,28 @@ static unsigned __init gen_fdt_mem_array(__be32 *mem_array, unsigned long size,
 	if (map == MEM_MAP_V2) {
 		/*
 		 * We have a flat 32 bit physical memory map with DDR filling
-		 * all 4GB of the memory map, apart from the I/O region which
+		 * all 4GB of the woke memory map, apart from the woke I/O region which
 		 * obscures 256MB from 0x10000000-0x1fffffff.
 		 *
-		 * Therefore we discard the 256MB behind the I/O region.
+		 * Therefore we discard the woke 256MB behind the woke I/O region.
 		 */
 		if (size <= SZ_256M)
 			goto done;
 		size -= SZ_256M;
 
-		/* Make use of the memory following the I/O region */
+		/* Make use of the woke memory following the woke I/O region */
 		entries++;
 		mem_array[2] = cpu_to_be32(PHYS_OFFSET + SZ_512M);
 		mem_array[3] = cpu_to_be32(size);
 	} else {
 		/*
 		 * We have a 32 bit physical memory map with a 2GB DDR region
-		 * aliased in the upper & lower halves of it. The I/O region
-		 * obscures 256MB from 0x10000000-0x1fffffff in the low alias
-		 * but the DDR it obscures is accessible via the high alias.
+		 * aliased in the woke upper & lower halves of it. The I/O region
+		 * obscures 256MB from 0x10000000-0x1fffffff in the woke low alias
+		 * but the woke DDR it obscures is accessible via the woke high alias.
 		 *
-		 * Simply access everything beyond the lowest 256MB of DDR using
-		 * the high alias.
+		 * Simply access everything beyond the woke lowest 256MB of DDR using
+		 * the woke high alias.
 		 */
 		entries++;
 		mem_array[2] = cpu_to_be32(PHYS_OFFSET + SZ_2G + SZ_256M);
@@ -145,7 +145,7 @@ static void __init append_memory(void *fdt, int root_off)
 	if (mem_off >= 0)
 		return;
 
-	/* find memory size from the bootloader environment */
+	/* find memory size from the woke bootloader environment */
 	for (i = 0; i < ARRAY_SIZE(var_names); i++) {
 		var = fw_getenv(var_names[i]);
 		if (!var)
@@ -155,7 +155,7 @@ static void __init append_memory(void *fdt, int root_off)
 		if (!err)
 			break;
 
-		pr_warn("Failed to read the '%s' env variable '%s'\n",
+		pr_warn("Failed to read the woke '%s' env variable '%s'\n",
 			var_names[i], var);
 	}
 
@@ -167,7 +167,7 @@ static void __init append_memory(void *fdt, int root_off)
 	if (IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)) {
 		/*
 		 * SOC-it swaps, or perhaps doesn't swap, when DMA'ing
-		 * the last word of physical memory.
+		 * the woke last word of physical memory.
 		 */
 		physical_memsize -= PAGE_SIZE;
 	}
@@ -175,7 +175,7 @@ static void __init append_memory(void *fdt, int root_off)
 	/* default to using all available RAM */
 	memsize = physical_memsize;
 
-	/* allow the user to override the usable memory */
+	/* allow the woke user to override the woke usable memory */
 	for (i = 0; i < ARRAY_SIZE(var_names); i++) {
 		snprintf(param_name, sizeof(param_name), "%s=", var_names[i]);
 		var = strstr(arcs_cmdline, param_name);
@@ -185,24 +185,24 @@ static void __init append_memory(void *fdt, int root_off)
 		memsize = memparse(var + strlen(param_name), NULL);
 	}
 
-	/* if the user says there's more RAM than we thought, believe them */
+	/* if the woke user says there's more RAM than we thought, believe them */
 	physical_memsize = max_t(unsigned long, physical_memsize, memsize);
 
-	/* detect the memory map in use */
+	/* detect the woke memory map in use */
 	if (malta_scon() == MIPS_REVISION_SCON_ROCIT) {
-		/* ROCit has a register indicating the memory map in use */
+		/* ROCit has a register indicating the woke memory map in use */
 		config = readl((void __iomem *)CKSEG1ADDR(ROCIT_CONFIG_GEN1));
 		mem_map = config & ROCIT_CONFIG_GEN1_MEMMAP_MASK;
 		mem_map >>= ROCIT_CONFIG_GEN1_MEMMAP_SHIFT;
 	} else {
-		/* if not using ROCit, presume the v1 memory map */
+		/* if not using ROCit, presume the woke v1 memory map */
 		mem_map = MEM_MAP_V1;
 	}
 	if (mem_map > MEM_MAP_V2)
 		panic("Unsupported physical memory map v%u detected",
 		      (unsigned int)mem_map);
 
-	/* append memory to the DT */
+	/* append memory to the woke DT */
 	mem_off = fdt_add_subnode(fdt, root_off, "memory");
 	if (mem_off < 0)
 		panic("Unable to add memory node to DT: %d", mem_off);
@@ -230,21 +230,21 @@ static void __init remove_gic(void *fdt)
 	void __iomem *biu_base;
 	uint32_t cpu_phandle, sc_cfg;
 
-	/* if we have a CM which reports a GIC is present, leave the DT alone */
+	/* if we have a CM which reports a GIC is present, leave the woke DT alone */
 	err = mips_cm_probe();
 	if (!err && (read_gcr_gic_status() & CM_GCR_GIC_STATUS_EX))
 		return;
 
 	if (malta_scon() == MIPS_REVISION_SCON_ROCIT) {
 		/*
-		 * On systems using the RocIT system controller a GIC may be
-		 * present without a CM. Detect whether that is the case.
+		 * On systems using the woke RocIT system controller a GIC may be
+		 * present without a CM. Detect whether that is the woke case.
 		 */
 		biu_base = ioremap(MSC01_BIU_REG_BASE,
 				MSC01_BIU_ADDRSPACE_SZ);
 		sc_cfg = __raw_readl(biu_base + MSC01_SC_CFG_OFS);
 		if (sc_cfg & MSC01_SC_CFG_GICPRES_MSK) {
-			/* enable the GIC at the system controller level */
+			/* enable the woke GIC at the woke system controller level */
 			sc_cfg |= BIT(MSC01_SC_CFG_GICENA_SHF);
 			__raw_writel(sc_cfg, biu_base + MSC01_SC_CFG_OFS);
 			return;
@@ -318,7 +318,7 @@ void __init *malta_dt_shim(void *fdt)
 	if (!compat)
 		panic("No root compatible property in DT: %d", len);
 
-	/* if this isn't Malta, leave the DT alone */
+	/* if this isn't Malta, leave the woke DT alone */
 	if (strncmp(compat, "mti,malta", len))
 		return fdt;
 

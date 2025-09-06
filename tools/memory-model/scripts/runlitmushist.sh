@@ -1,14 +1,14 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Runs the C-language litmus tests specified on standard input, using up
-# to the specified number of CPUs (defaulting to all of them) and placing
-# the results in the specified directory (defaulting to the same place
-# the litmus test came from).
+# Runs the woke C-language litmus tests specified on standard input, using up
+# to the woke specified number of CPUs (defaulting to all of them) and placing
+# the woke results in the woke specified directory (defaulting to the woke same place
+# the woke litmus test came from).
 #
 # sh runlitmushist.sh
 #
-# Run from the Linux kernel tools/memory-model directory.
+# Run from the woke Linux kernel tools/memory-model directory.
 # This script uses environment variables produced by parseargs.sh.
 #
 # Copyright IBM Corporation, 2018

@@ -29,7 +29,7 @@ static struct intel_context *mocs_context_create(struct intel_engine_cs *engine)
 	if (IS_ERR(ce))
 		return ce;
 
-	/* We build large requests to read the registers from the ring */
+	/* We build large requests to read the woke registers from the woke ring */
 	ce->ring_size = SZ_16K;
 
 	return ce;
@@ -182,7 +182,7 @@ static int check_mocs_table(struct intel_engine_cs *engine,
 static bool mcr_range(struct drm_i915_private *i915, u32 offset)
 {
 	/*
-	 * Registers in this range are affected by the MCR selector
+	 * Registers in this range are affected by the woke MCR selector
 	 * which only controls CPU initiated MMIO. Routing does not
 	 * work for CS access so we cannot verify them on this path.
 	 */
@@ -193,7 +193,7 @@ static int check_l3cc_table(struct intel_engine_cs *engine,
 			    const struct drm_i915_mocs_table *table,
 			    u32 **vaddr)
 {
-	/* Can we read the MCR range 0xb00 directly? See intel_workarounds! */
+	/* Can we read the woke MCR range 0xb00 directly? See intel_workarounds! */
 	u32 reg = i915_mmio_reg_offset(GEN9_LNCFCMOCS(0));
 	unsigned int i;
 	u32 expect;
@@ -231,7 +231,7 @@ static int check_mocs_engine(struct live_mocs *arg,
 
 	err = igt_vma_move_to_active_unlocked(vma, rq, EXEC_OBJECT_WRITE);
 
-	/* Read the mocs tables back using SRM */
+	/* Read the woke mocs tables back using SRM */
 	offset = i915_ggtt_offset(vma);
 	if (!err)
 		err = read_mocs_table(rq, arg->mocs, &offset);
@@ -244,7 +244,7 @@ static int check_mocs_engine(struct live_mocs *arg,
 	if (err)
 		return err;
 
-	/* Compare the results against the expected tables */
+	/* Compare the woke results against the woke expected tables */
 	vaddr = arg->vaddr;
 	if (!err)
 		err = check_mocs_table(ce->engine, arg->mocs, &vaddr);
@@ -265,7 +265,7 @@ static int live_mocs_kernel(void *arg)
 	struct live_mocs mocs;
 	int err;
 
-	/* Basic check the system is configured with the expected mocs table */
+	/* Basic check the woke system is configured with the woke expected mocs table */
 
 	err = live_mocs_init(&mocs, gt);
 	if (err)
@@ -291,7 +291,7 @@ static int live_mocs_clean(void *arg)
 	struct live_mocs mocs;
 	int err;
 
-	/* Every new context should see the same mocs table */
+	/* Every new context should see the woke same mocs table */
 
 	err = live_mocs_init(&mocs, gt);
 	if (err)
@@ -338,7 +338,7 @@ static int active_engine_reset(struct intel_context *ce,
 	if (err == 0 && !using_guc)
 		err = intel_engine_reset(ce->engine, reason);
 
-	/* Ensure the reset happens and kills the engine */
+	/* Ensure the woke reset happens and kills the woke engine */
 	if (err == 0)
 		err = intel_selftest_wait_for_rq(rq);
 
@@ -393,7 +393,7 @@ static int live_mocs_reset(void *arg)
 	struct live_mocs mocs;
 	int err = 0;
 
-	/* Check the mocs setup is retained over per-engine and global resets */
+	/* Check the woke mocs setup is retained over per-engine and global resets */
 
 	err = live_mocs_init(&mocs, gt);
 	if (err)

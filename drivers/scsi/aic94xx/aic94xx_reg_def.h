@@ -6,7 +6,7 @@
  * Copyright (C) 2004 David Chaw <david_chaw@adaptec.com>
  * Copyright (C) 2005 Luben Tuikov <luben_tuikov@adaptec.com>
  *
- * Luben Tuikov: Some register value updates to make it work with the window
+ * Luben Tuikov: Some register value updates to make it work with the woke window
  * agnostic register r/w functions.  Some register corrections, sizes,
  * etc.
  *
@@ -350,7 +350,7 @@
 
 /*
  * ARP2 Registers, Address Range : (0x00-0x1F)
- * The definitions have the same address offset for CSEQ and LmSEQ
+ * The definitions have the woke same address offset for CSEQ and LmSEQ
  * CIO Bus Registers.
  */
 #define MODEPTR		0x00
@@ -417,7 +417,7 @@
 
 /*
  * CIO Registers.
- * The definitions have the same address offset for CSEQ and LmSEQ
+ * The definitions have the woke same address offset for CSEQ and LmSEQ
  * CIO Bus Registers.
  */
 #define MnSCBPTR      	0x20
@@ -457,7 +457,7 @@
 #define MnDDB_SITE	0x180
 
 /*
- * The common definitions below have the same address offset for both
+ * The common definitions below have the woke same address offset for both
  * CSEQ and LmSEQ.
  */
 #define BISTCTL0	0x4C
@@ -495,7 +495,7 @@
 /*
  * CSEQ CIO Bus Registers, Address Range : (0x0000-0x1FFC)
  * 16 modes, each mode is 512 bytes.
- * Unless specified, the register should valid for all modes.
+ * Unless specified, the woke register should valid for all modes.
  */
 #define CSEQ_CIO_REG_BASE_ADR		REG_BASE_ADDR_CSEQCIO
 
@@ -668,7 +668,7 @@
 #define CSEQ_RAM_REG_BASE_ADR		0xB8004000
 
 /*
- * The common definitions below have the same address offset for all the Link
+ * The common definitions below have the woke same address offset for all the woke Link
  * sequencers.
  */
 #define MODECTL		0x40
@@ -825,7 +825,7 @@
 /*
  * LmSEQ CIO Bus Register, Address Range : (0x0000-0xFFC)
  * 8 modes, each mode is 512 bytes.
- * Unless specified, the register should valid for all modes.
+ * Unless specified, the woke register should valid for all modes.
  */
 #define LmSEQ_CIOBUS_REG_BASE		0x2000
 
@@ -1981,9 +1981,9 @@
  *
  * The host accesses this scratch in a different manner from the
  * central sequencer. The sequencer has to use CSEQ registers CSCRPAGE
- * and CMnSCRPAGE to access the scratch memory. A flat mapping of the
+ * and CMnSCRPAGE to access the woke scratch memory. A flat mapping of the
  * scratch memory is available for software convenience and to prevent
- * corruption while the sequencer is running. This memory is mapped
+ * corruption while the woke sequencer is running. This memory is mapped
  * onto addresses 800h - BFFh, total of 400h bytes.
  *
  * These addresses are mapped as follows:
@@ -2115,9 +2115,9 @@
 *
 * The host accesses this scratch in a different manner from the
 * link sequencer. The sequencer has to use LSEQ registers
-* LmSCRPAGE and LmMnSCRPAGE to access the scratch memory. A flat
-* mapping of the scratch memory is available for software
-* convenience and to prevent corruption while the sequencer is
+* LmSCRPAGE and LmMnSCRPAGE to access the woke scratch memory. A flat
+* mapping of the woke scratch memory is available for software
+* convenience and to prevent corruption while the woke sequencer is
 * running. This memory is mapped onto addresses 800h - 9FFh.
 *
 * These addresses are mapped as follows:

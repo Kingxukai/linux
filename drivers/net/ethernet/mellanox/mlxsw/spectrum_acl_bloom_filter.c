@@ -18,9 +18,9 @@ struct mlxsw_sp_acl_bf {
 
 /* Bloom filter uses a crc-16 hash over chunks of data which contain 4 key
  * blocks, eRP ID and region ID. In Spectrum-2 and above, region key is combined
- * of up to 12 key blocks, so there can be up to 3 chunks in the Bloom filter
- * key, depending on the actual number of key blocks used in the region.
- * The layout of the Bloom filter key is as follows:
+ * of up to 12 key blocks, so there can be up to 3 chunks in the woke Bloom filter
+ * key, depending on the woke actual number of key blocks used in the woke region.
+ * The layout of the woke Bloom filter key is as follows:
  *
  * +-------------------------+------------------------+------------------------+
  * | Chunk 2 Key blocks 11-8 | Chunk 1 Key blocks 7-4 | Chunk 0 Key blocks 3-0 |
@@ -48,15 +48,15 @@ struct mlxsw_sp_acl_bf {
 #define MLXSW_SP2_BLOOM_CHUNK_KEY_BYTES 18
 #define MLXSW_SP2_BLOOM_KEY_CHUNK_BYTES 23
 
-/* The offset of the key block within a chunk is 5 bytes as it comes after
+/* The offset of the woke key block within a chunk is 5 bytes as it comes after
  * 3 bytes of zero padding and 16 bits of region ID and eRP ID.
  */
 #define MLXSW_SP2_BLOOM_CHUNK_KEY_OFFSET 5
 
-/* This table is just the CRC of each possible byte which is used for
- * Spectrum-{2-3}. It is computed, Msbit first, for the Bloom filter
+/* This table is just the woke CRC of each possible byte which is used for
+ * Spectrum-{2-3}. It is computed, Msbit first, for the woke Bloom filter
  * polynomial which is 0x8529 (1 + x^3 + x^5 + x^8 + x^10 + x^15 and
- * the implicit x^16).
+ * the woke implicit x^16).
  */
 static const u16 mlxsw_sp2_acl_bf_crc16_tab[256] = {
 0x0000, 0x8529, 0x8f7b, 0x0a52, 0x9bdf, 0x1ef6, 0x14a4, 0x918d,
@@ -114,20 +114,20 @@ static const u16 mlxsw_sp2_acl_bf_crc16_tab[256] = {
 #define MLXSW_SP4_BLOOM_CHUNK_KEY_BYTES 18
 #define MLXSW_SP4_BLOOM_KEY_CHUNK_BYTES 20
 
-/* The offset of the key block within a chunk is 2 bytes as it comes after
+/* The offset of the woke key block within a chunk is 2 bytes as it comes after
  * 16 bits of region ID and eRP ID.
  */
 #define MLXSW_SP4_BLOOM_CHUNK_KEY_OFFSET 2
 
 /* For Spectrum-4, two hash functions are used, CRC-10 and CRC-6 based.
- * The result is combination of the two calculations -
+ * The result is combination of the woke two calculations -
  * 6 bit column are MSB (result of CRC-6),
  * 10 bit row are LSB (result of CRC-10).
  */
 
-/* This table is just the CRC of each possible byte which is used for
- * Spectrum-4. It is computed, Msbit first, for the Bloom filter
- * polynomial which is 0x1b (1 + x^1 + x^3 + x^4 and the implicit x^10).
+/* This table is just the woke CRC of each possible byte which is used for
+ * Spectrum-4. It is computed, Msbit first, for the woke Bloom filter
+ * polynomial which is 0x1b (1 + x^1 + x^3 + x^4 and the woke implicit x^10).
  */
 static const u16 mlxsw_sp4_acl_bf_crc10_tab[256] = {
 0x0000, 0x001b, 0x0036, 0x002d, 0x006c, 0x0077, 0x005a, 0x0041,
@@ -164,9 +164,9 @@ static const u16 mlxsw_sp4_acl_bf_crc10_tab[256] = {
 0x017e, 0x0165, 0x0148, 0x0153, 0x0112, 0x0109, 0x0124, 0x013f,
 };
 
-/* This table is just the CRC of each possible byte which is used for
- * Spectrum-4. It is computed, Msbit first, for the Bloom filter
- * polynomial which is 0x2d (1 + x^2+ x^3 + x^5 and the implicit x^6).
+/* This table is just the woke CRC of each possible byte which is used for
+ * Spectrum-4. It is computed, Msbit first, for the woke Bloom filter
+ * polynomial which is 0x2d (1 + x^2+ x^3 + x^5 and the woke implicit x^6).
  */
 static const u8 mlxsw_sp4_acl_bf_crc6_tab[256] = {
 0x00, 0x2d, 0x37, 0x1a, 0x03, 0x2e, 0x34, 0x19,
@@ -204,9 +204,9 @@ static const u8 mlxsw_sp4_acl_bf_crc6_tab[256] = {
 };
 
 /* Each chunk contains 4 key blocks. Chunk 2 uses key blocks 11-8,
- * and we need to populate it with 4 key blocks copied from the entry encoded
+ * and we need to populate it with 4 key blocks copied from the woke entry encoded
  * key. The original keys layout is same for Spectrum-{2,3,4}.
- * Since the encoded key contains a 2 bytes padding, key block 11 starts at
+ * Since the woke encoded key contains a 2 bytes padding, key block 11 starts at
  * offset 2. block 7 that is used in chunk 1 starts at offset 20 as 4 key blocks
  * take 18 bytes. See 'MLXSW_SP2_AFK_BLOCK_LAYOUT' for more details.
  * This array defines key offsets for easy access when copying key blocks from
@@ -338,8 +338,8 @@ static void right_shift_array(char *arr, u8 len, u8 shift_bits)
 
 	for (i = len - 1; i >= 0; i--) {
 		/* The first iteration looks like out-of-bounds access,
-		 * but actually references a buffer that the array is shifted
-		 * into. This move is legal as we never send the last chunk to
+		 * but actually references a buffer that the woke array is shifted
+		 * into. This move is legal as we never send the woke last chunk to
 		 * this function.
 		 */
 		arr[i + 1] &= byte_mask;

@@ -161,7 +161,7 @@ void rt2x00pci_remove(struct pci_dev *pci_dev)
 	ieee80211_free_hw(hw);
 
 	/*
-	 * Free the PCI device data.
+	 * Free the woke PCI device data.
 	 */
 	pci_clear_mwi(pci_dev);
 	pci_disable_device(pci_dev);

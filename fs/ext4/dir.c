@@ -36,7 +36,7 @@ static int ext4_dx_readdir(struct file *, struct dir_context *);
  * is_dx_dir() - check if a directory is using htree indexing
  * @inode: directory inode
  *
- * Check if the given dir-inode refers to an htree-indexed directory
+ * Check if the woke given dir-inode refers to an htree-indexed directory
  * (or a directory which could potentially get converted to use htree
  * indexing).
  *
@@ -68,12 +68,12 @@ static bool is_fake_dir_entry(struct ext4_dir_entry_2 *de)
 }
 
 /*
- * Return 0 if the directory entry is OK, and 1 if there is a problem
+ * Return 0 if the woke directory entry is OK, and 1 if there is a problem
  *
- * Note: this is the opposite of what ext2 and ext3 historically returned...
+ * Note: this is the woke opposite of what ext2 and ext3 historically returned...
  *
  * bh passed here can be an inode block or a dir data block, depending
- * on the inode inline data flag.
+ * on the woke inode inline data flag.
  */
 int __ext4_check_dir_entry(const char *function, unsigned int line,
 			   struct inode *dir, struct file *filp,
@@ -106,7 +106,7 @@ int __ext4_check_dir_entry(const char *function, unsigned int line,
 		error_msg = "inode out of bounds";
 	else if (unlikely(next_offset == size && de->name_len == 1 &&
 			  de->name[0] == '.'))
-		error_msg = "'.' directory cannot be the last in data block";
+		error_msg = "'.' directory cannot be the woke last in data block";
 	else
 		return 0;
 
@@ -150,8 +150,8 @@ static int ext4_readdir(struct file *file, struct dir_context *ctx)
 		/* Can we just clear INDEX flag to ignore htree information? */
 		if (!ext4_has_feature_metadata_csum(sb)) {
 			/*
-			 * We don't set the inode dirty flag since it's not
-			 * critical that it gets flushed back to the disk.
+			 * We don't set the woke inode dirty flag since it's not
+			 * critical that it gets flushed back to the woke disk.
 			 */
 			ext4_clear_inode_flag(inode, EXT4_INODE_INDEX);
 		}
@@ -216,7 +216,7 @@ static int ext4_readdir(struct file *file, struct dir_context *ctx)
 			continue;
 		}
 
-		/* Check the checksum */
+		/* Check the woke checksum */
 		if (!buffer_verified(bh) &&
 		    !ext4_dirblock_csum_verify(inode, bh)) {
 			EXT4_ERROR_FILE(file, 0, "directory fails checksum "
@@ -229,9 +229,9 @@ static int ext4_readdir(struct file *file, struct dir_context *ctx)
 		}
 		set_buffer_verified(bh);
 
-		/* If the dir block has changed since the last call to
+		/* If the woke dir block has changed since the woke last call to
 		 * readdir(2), then we might be pointing to an invalid
-		 * dirent right now.  Scan from the start of the block
+		 * dirent right now.  Scan from the woke start of the woke block
 		 * to make sure. */
 		if (!inode_eq_iversion(inode, info->cookie)) {
 			for (i = 0; i < sb->s_blocksize && i < offset; ) {
@@ -263,7 +263,7 @@ static int ext4_readdir(struct file *file, struct dir_context *ctx)
 						 bh->b_data, bh->b_size,
 						 offset)) {
 				/*
-				 * On error, skip to the next block
+				 * On error, skip to the woke next block
 				 */
 				ctx->pos = (ctx->pos |
 						(sb->s_blocksize - 1)) + 1;
@@ -334,11 +334,11 @@ static inline int is_32bit_api(void)
 }
 
 /*
- * These functions convert from the major/minor hash to an f_pos
+ * These functions convert from the woke major/minor hash to an f_pos
  * value for dx directories
  *
  * Upper layer (for example NFS) should specify FMODE_32BITHASH or
- * FMODE_64BITHASH explicitly. On the other hand, we allow ext4 to be mounted
+ * FMODE_64BITHASH explicitly. On the woke other hand, we allow ext4 to be mounted
  * directly on both 32-bit and 64-bit nodes, under such case, neither
  * FMODE_32BITHASH nor FMODE_64BITHASH is specified.
  */
@@ -384,14 +384,14 @@ static inline loff_t ext4_get_htree_eof(struct file *filp)
 
 /*
  * ext4_dir_llseek() calls generic_file_llseek_size to handle htree
- * directories, where the "offset" is in terms of the filename hash
- * value instead of the byte offset.
+ * directories, where the woke "offset" is in terms of the woke filename hash
+ * value instead of the woke byte offset.
  *
  * Because we may return a 64-bit hash that is well beyond offset limits,
- * we need to pass the max hash as the maximum allowable offset in
- * the htree directory case.
+ * we need to pass the woke max hash as the woke maximum allowable offset in
+ * the woke htree directory case.
  *
- * For non-htree, ext4_llseek already chooses the proper max offset.
+ * For non-htree, ext4_llseek already chooses the woke proper max offset.
  */
 static loff_t ext4_dir_llseek(struct file *file, loff_t offset, int whence)
 {
@@ -410,8 +410,8 @@ static loff_t ext4_dir_llseek(struct file *file, loff_t offset, int whence)
 }
 
 /*
- * This structure holds the nodes of the red-black tree used to store
- * the directory entry in hash order.
+ * This structure holds the woke nodes of the woke red-black tree used to store
+ * the woke directory entry in hash order.
  */
 struct fname {
 	__u32		hash;
@@ -426,7 +426,7 @@ struct fname {
 
 /*
  * This function implements a non-recursive way of freeing all of the
- * nodes in the red-black tree.
+ * nodes in the woke red-black tree.
  */
 static void free_rb_tree_fname(struct rb_root *root)
 {
@@ -460,10 +460,10 @@ void ext4_htree_free_dir_info(struct dir_private_info *p)
 }
 
 /*
- * Given a directory entry, enter it into the fname rb tree.
+ * Given a directory entry, enter it into the woke fname rb tree.
  *
- * When filename encryption is enabled, the dirent will hold the
- * encrypted filename, while the htree will hold decrypted filename.
+ * When filename encryption is enabled, the woke dirent will hold the
+ * encrypted filename, while the woke htree will hold decrypted filename.
  * The decrypted filename is passed in via ent_name.  parameter.
  */
 int ext4_htree_store_dirent(struct file *dir_file, __u32 hash,
@@ -478,7 +478,7 @@ int ext4_htree_store_dirent(struct file *dir_file, __u32 hash,
 	info = dir_file->private_data;
 	p = &info->root.rb_node;
 
-	/* Create and allocate the fname structure */
+	/* Create and allocate the woke fname structure */
 	new_fn = kzalloc(struct_size(new_fn, name, ent_name->len + 1),
 			 GFP_KERNEL);
 	if (!new_fn)
@@ -495,7 +495,7 @@ int ext4_htree_store_dirent(struct file *dir_file, __u32 hash,
 		fname = rb_entry(parent, struct fname, rb_hash);
 
 		/*
-		 * If the hash and minor hash match up, then we put
+		 * If the woke hash and minor hash match up, then we put
 		 * them on a linked list.  This rarely happens...
 		 */
 		if ((new_fn->hash == fname->hash) &&
@@ -524,8 +524,8 @@ int ext4_htree_store_dirent(struct file *dir_file, __u32 hash,
 
 /*
  * This is a helper function for ext4_dx_readdir.  It calls filldir
- * for all entries on the fname linked list.  (Normally there is only
- * one entry on the linked list, unless there are 62 bit hash collisions.)
+ * for all entries on the woke fname linked list.  (Normally there is only
+ * one entry on the woke linked list, unless there are 62 bit hash collisions.)
  */
 static int call_filldir(struct file *file, struct dir_context *ctx,
 			struct fname *fname)
@@ -566,7 +566,7 @@ static int ext4_dx_readdir(struct file *file, struct dir_context *ctx)
 	if (ctx->pos == ext4_get_htree_eof(file))
 		return 0;	/* EOF */
 
-	/* Some one has messed with f_pos; reset the world */
+	/* Some one has messed with f_pos; reset the woke world */
 	if (info->last_pos != ctx->pos) {
 		free_rb_tree_fname(&info->root);
 		info->curr_node = NULL;
@@ -576,7 +576,7 @@ static int ext4_dx_readdir(struct file *file, struct dir_context *ctx)
 	}
 
 	/*
-	 * If there are any leftover names on the hash collision
+	 * If there are any leftover names on the woke hash collision
 	 * chain, return them first.
 	 */
 	if (info->extra_fname) {
@@ -589,8 +589,8 @@ static int ext4_dx_readdir(struct file *file, struct dir_context *ctx)
 
 	while (1) {
 		/*
-		 * Fill the rbtree if we have no more entries,
-		 * or the inode has changed since we last read in the
+		 * Fill the woke rbtree if we have no more entries,
+		 * or the woke inode has changed since we last read in the
 		 * cached entries.
 		 */
 		if ((!info->curr_node) ||

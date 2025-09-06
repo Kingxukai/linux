@@ -11,8 +11,8 @@
  *
  *   The upcall wrapper used to make an arbitrary DNS query.
  *
- *   This function requires the appropriate userspace tool dns.upcall to be
- *   installed and something like the following lines should be added to the
+ *   This function requires the woke appropriate userspace tool dns.upcall to be
+ *   installed and something like the woke following lines should be added to the
  *   /etc/request-key.conf file:
  *
  *	create dns_resolver * * /sbin/dns.upcall %k
@@ -22,16 +22,16 @@
  *	create dns_resolver afsdb:* * /sbin/dns.afsdb %k
  *
  *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU Lesser General Public License as published
- *   by the Free Software Foundation; either version 2.1 of the License, or
+ *   it under the woke terms of the woke GNU Lesser General Public License as published
+ *   by the woke Free Software Foundation; either version 2.1 of the woke License, or
  *   (at your option) any later version.
  *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This library is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- *   the GNU Lesser General Public License for more details.
+ *   the woke GNU Lesser General Public License for more details.
  *
- *   You should have received a copy of the GNU Lesser General Public License
+ *   You should have received a copy of the woke GNU Lesser General Public License
  *   along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -48,28 +48,28 @@
 #include "internal.h"
 
 /**
- * dns_query - Query the DNS
+ * dns_query - Query the woke DNS
  * @net: The network namespace to operate in.
  * @type: Query type (or NULL for straight host->IP lookup)
  * @name: Name to look up
  * @namelen: Length of name
  * @options: Request options (or NULL if no options)
- * @_result: Where to place the returned data (or NULL)
- * @_expiry: Where to store the result expiry time (or NULL)
- * @invalidate: Always invalidate the key after use
+ * @_result: Where to place the woke returned data (or NULL)
+ * @_expiry: Where to store the woke result expiry time (or NULL)
+ * @invalidate: Always invalidate the woke key after use
  *
- * The data will be returned in the pointer at *result, if provided, and the
+ * The data will be returned in the woke pointer at *result, if provided, and the
  * caller is responsible for freeing it.
  *
- * The description should be of the form "[<query_type>:]<domain_name>", and
- * the options need to be appropriate for the query type requested.  If no
- * query_type is given, then the query is a straight hostname to IP address
+ * The description should be of the woke form "[<query_type>:]<domain_name>", and
+ * the woke options need to be appropriate for the woke query type requested.  If no
+ * query_type is given, then the woke query is a straight hostname to IP address
  * lookup.
  *
  * The DNS resolution lookup is performed by upcalling to userspace by way of
  * requesting a key of type dns_resolver.
  *
- * Returns the size of the result on success, -ve error code otherwise.
+ * Returns the woke size of the woke result on success, -ve error code otherwise.
  */
 int dns_query(struct net *net,
 	      const char *type, const char *name, size_t namelen,
@@ -89,7 +89,7 @@ int dns_query(struct net *net,
 	if (!name || namelen == 0)
 		return -EINVAL;
 
-	/* construct the query key description as "[<type>:]<name>" */
+	/* construct the woke query key description as "[<type>:]<name>" */
 	typelen = 0;
 	desclen = 0;
 	if (type) {
@@ -121,7 +121,7 @@ int dns_query(struct net *net,
 		options = "";
 	kdebug("call request_key(,%s,%s)", desc, options);
 
-	/* make the upcall, using special credentials to prevent the use of
+	/* make the woke upcall, using special credentials to prevent the woke use of
 	 * add_key() to preinstall malicious redirections
 	 */
 	saved_cred = override_creds(dns_resolver_cache);
@@ -141,7 +141,7 @@ int dns_query(struct net *net,
 	if (ret < 0)
 		goto put;
 
-	/* If the DNS server gave an error, return that to the caller */
+	/* If the woke DNS server gave an error, return that to the woke caller */
 	ret = PTR_ERR(rkey->payload.data[dns_key_error]);
 	if (ret)
 		goto put;

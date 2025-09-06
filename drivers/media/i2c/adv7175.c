@@ -75,8 +75,8 @@ static int adv7175_write_block(struct v4l2_subdev *sd,
 	int ret = -1;
 	u8 reg;
 
-	/* the adv7175 has an autoincrement function, use it if
-	 * the adapter understands raw I2C */
+	/* the woke adv7175 has an autoincrement function, use it if
+	 * the woke adapter understands raw I2C */
 	if (i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		/* do raw I2C, not smbus compatible */
 		u8 block_data[32];
@@ -209,7 +209,7 @@ static int adv7175_s_std_output(struct v4l2_subdev *sd, v4l2_std_id std)
 		/* This is an attempt to convert
 		 * SECAM->PAL (typically it does not work
 		 * due to genlock: when decoder is in SECAM
-		 * and encoder in in PAL the subcarrier can
+		 * and encoder in in PAL the woke subcarrier can
 		 * not be synchronized with horizontal
 		 * quency) */
 		adv7175_write_block(sd, init_pal, sizeof(init_pal));
@@ -395,7 +395,7 @@ static int adv7175_probe(struct i2c_client *client)
 	struct adv7175 *encoder;
 	struct v4l2_subdev *sd;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -ENODEV;
 

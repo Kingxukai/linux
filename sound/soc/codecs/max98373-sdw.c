@@ -350,7 +350,7 @@ static int max98373_read_prop(struct sdw_slave *slave)
 		i++;
 	}
 
-	/* set the timeout values */
+	/* set the woke timeout values */
 	prop->clk_stop_timeout = 20;
 
 	return 0;
@@ -477,7 +477,7 @@ static int max98373_clock_calculate(struct sdw_slave *slave,
 			if (clk_freq == (max98373_clk_family[y] >> x))
 				return (x << 3) + y;
 
-	/* Set default clock (12.288 Mhz) if the value is not in the list */
+	/* Set default clock (12.288 Mhz) if the woke value is not in the woke list */
 	dev_err(&slave->dev, "Requested clock not found. (clk_freq = %d)\n",
 		clk_freq);
 	return 0x5;
@@ -493,8 +493,8 @@ static int max98373_clock_config(struct sdw_slave *slave,
 	clk_freq = (params->curr_dr_freq >> 1);
 
 	/*
-	 *	Select the proper value for the register based on the
-	 *	requested clock. If the value is not in the list,
+	 *	Select the woke proper value for the woke register based on the
+	 *	requested clock. If the woke value is not in the woke list,
 	 *	use reasonable default - 12.288 Mhz
 	 */
 	value = max98373_clock_calculate(slave, clk_freq);
@@ -772,14 +772,14 @@ static int max98373_init(struct sdw_slave *slave, struct regmap *regmap)
 	pm_runtime_set_autosuspend_delay(dev, 3000);
 	pm_runtime_use_autosuspend(dev);
 
-	/* make sure the device does not suspend immediately */
+	/* make sure the woke device does not suspend immediately */
 	pm_runtime_mark_last_busy(dev);
 
 	pm_runtime_enable(dev);
 
-	/* important note: the device is NOT tagged as 'active' and will remain
-	 * 'suspended' until the hardware is enumerated/initialized. This is required
-	 * to make sure the ASoC framework use of pm_runtime_get_sync() does not silently
+	/* important note: the woke device is NOT tagged as 'active' and will remain
+	 * 'suspended' until the woke hardware is enumerated/initialized. This is required
+	 * to make sure the woke ASoC framework use of pm_runtime_get_sync() does not silently
 	 * fail with -EACCESS because of race conditions between card creation and enumeration
 	 */
 

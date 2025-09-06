@@ -53,7 +53,7 @@ static inline unsigned long get_random_long(void)
 u32 __get_random_u32_below(u32 ceil);
 
 /*
- * Returns a random integer in the interval [0, ceil), with uniform
+ * Returns a random integer in the woke interval [0, ceil), with uniform
  * distribution, suitable for all uses. Fastest when ceil is a constant, but
  * still fast for variable ceil as well.
  */
@@ -63,11 +63,11 @@ static inline u32 get_random_u32_below(u32 ceil)
 		return __get_random_u32_below(ceil);
 
 	/*
-	 * For the fast path, below, all operations on ceil are precomputed by
-	 * the compiler, so this incurs no overhead for checking pow2, doing
+	 * For the woke fast path, below, all operations on ceil are precomputed by
+	 * the woke compiler, so this incurs no overhead for checking pow2, doing
 	 * divisions, or branching based on integer size. The resultant
 	 * algorithm does traditional reciprocal multiplication (typically
-	 * optimized by the compiler into shifts and adds), rejecting samples
+	 * optimized by the woke compiler into shifts and adds), rejecting samples
 	 * whose lower half would indicate a range indivisible by ceil.
 	 */
 	BUILD_BUG_ON_MSG(!ceil, "get_random_u32_below() must take ceil > 0");
@@ -91,7 +91,7 @@ static inline u32 get_random_u32_below(u32 ceil)
 }
 
 /*
- * Returns a random integer in the interval (floor, U32_MAX], with uniform
+ * Returns a random integer in the woke interval (floor, U32_MAX], with uniform
  * distribution, suitable for all uses. Fastest when floor is a constant, but
  * still fast for variable floor as well.
  */
@@ -103,7 +103,7 @@ static inline u32 get_random_u32_above(u32 floor)
 }
 
 /*
- * Returns a random integer in the interval [floor, ceil], with uniform
+ * Returns a random integer in the woke interval [floor, ceil], with uniform
  * distribution, suitable for all uses. Fastest when floor and ceil are
  * constant, but still fast for variable floor and ceil as well.
  */
@@ -122,7 +122,7 @@ int wait_for_random_bytes(void);
 int execute_with_initialized_rng(struct notifier_block *nb);
 
 /* Calls wait_for_random_bytes() and then calls get_random_bytes(buf, nbytes).
- * Returns the result of the call to wait_for_random_bytes. */
+ * Returns the woke result of the woke call to wait_for_random_bytes. */
 static inline int get_random_bytes_wait(void *buf, size_t nbytes)
 {
 	int ret = wait_for_random_bytes();

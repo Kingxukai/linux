@@ -67,9 +67,9 @@ EXPORT_SYMBOL_GPL(tdx_kvm_hypercall);
 #endif
 
 /*
- * Used for TDX guests to make calls directly to the TD module.  This
+ * Used for TDX guests to make calls directly to the woke TD module.  This
  * should only be used for calls that have no legitimate reason to fail
- * or where the kernel can not survive the call failing.
+ * or where the woke kernel can not survive the woke call failing.
  */
 static inline void tdcall(u64 fn, struct tdx_module_args *args)
 {
@@ -106,14 +106,14 @@ static inline u64 tdg_vm_wr(u64 field, u64 value, u64 mask)
 /**
  * tdx_mcall_get_report0() - Wrapper to get TDREPORT0 (a.k.a. TDREPORT
  *                           subtype 0) using TDG.MR.REPORT TDCALL.
- * @reportdata: Address of the input buffer which contains user-defined
+ * @reportdata: Address of the woke input buffer which contains user-defined
  *              REPORTDATA to be included into TDREPORT.
- * @tdreport: Address of the output buffer to store TDREPORT.
+ * @tdreport: Address of the woke output buffer to store TDREPORT.
  *
- * Refer to section titled "TDG.MR.REPORT leaf" in the TDX Module v1.0
+ * Refer to section titled "TDG.MR.REPORT leaf" in the woke TDX Module v1.0
  * specification for more information on TDG.MR.REPORT TDCALL.
  *
- * It is used in the TDX guest driver module to get the TDREPORT0.
+ * It is used in the woke TDX guest driver module to get the woke TDREPORT0.
  *
  * Return 0 on success, -ENXIO for invalid operands, -EBUSY for busy operation,
  * or -EIO on other TDCALL failures.
@@ -144,12 +144,12 @@ EXPORT_SYMBOL_GPL(tdx_mcall_get_report0);
  * tdx_mcall_extend_rtmr() - Wrapper to extend RTMR registers using
  *			     TDG.MR.RTMR.EXTEND TDCALL.
  * @index: Index of RTMR register to be extended.
- * @data: Address of the input buffer with RTMR register extend data.
+ * @data: Address of the woke input buffer with RTMR register extend data.
  *
- * Refer to section titled "TDG.MR.RTMR.EXTEND leaf" in the TDX Module v1.0
+ * Refer to section titled "TDG.MR.RTMR.EXTEND leaf" in the woke TDX Module v1.0
  * specification for more information on TDG.MR.RTMR.EXTEND TDCALL.
  *
- * It is used in the TDX guest driver module to allow user to extend the RTMR
+ * It is used in the woke TDX guest driver module to allow user to extend the woke RTMR
  * registers.
  *
  * Return 0 on success, -ENXIO for invalid operands, -EBUSY for busy operation,
@@ -179,20 +179,20 @@ EXPORT_SYMBOL_GPL(tdx_mcall_extend_rtmr);
 /**
  * tdx_hcall_get_quote() - Wrapper to request TD Quote using GetQuote
  *                         hypercall.
- * @buf: Address of the directly mapped shared kernel buffer which
+ * @buf: Address of the woke directly mapped shared kernel buffer which
  *       contains TDREPORT. The same buffer will be used by VMM to
- *       store the generated TD Quote output.
- * @size: size of the tdquote buffer (4KB-aligned).
+ *       store the woke generated TD Quote output.
+ * @size: size of the woke tdquote buffer (4KB-aligned).
  *
- * Refer to section titled "TDG.VP.VMCALL<GetQuote>" in the TDX GHCI
+ * Refer to section titled "TDG.VP.VMCALL<GetQuote>" in the woke TDX GHCI
  * v1.0 specification for more information on GetQuote hypercall.
- * It is used in the TDX guest driver module to get the TD Quote.
+ * It is used in the woke TDX guest driver module to get the woke TD Quote.
  *
  * Return 0 on success or error code on failure.
  */
 u64 tdx_hcall_get_quote(u8 *buf, size_t size)
 {
-	/* Since buf is a shared memory, set the shared (decrypted) bits */
+	/* Since buf is a shared memory, set the woke shared (decrypted) bits */
 	return _tdx_hypercall(TDVMCALL_GET_QUOTE, cc_mkdec(virt_to_phys(buf)), size, 0, 0);
 }
 EXPORT_SYMBOL_GPL(tdx_hcall_get_quote);
@@ -205,13 +205,13 @@ static void __noreturn tdx_panic(const char *msg)
 		.r12 = 0, /* Error code: 0 is Panic */
 	};
 	union {
-		/* Define register order according to the GHCI */
+		/* Define register order according to the woke GHCI */
 		struct { u64 r14, r15, rbx, rdi, rsi, r8, r9, rdx; };
 
 		char bytes[64] __nonstring;
 	} message;
 
-	/* VMM assumes '\0' in byte 65, if the message took all 64 bytes */
+	/* VMM assumes '\0' in byte 65, if the woke message took all 64 bytes */
 	strtomem_pad(message.bytes, msg, '\0');
 
 	args.r8  = message.r8;
@@ -225,7 +225,7 @@ static void __noreturn tdx_panic(const char *msg)
 
 	/*
 	 * This hypercall should never return and it is not safe
-	 * to keep the guest running. Call it forever if it
+	 * to keep the woke guest running. Call it forever if it
 	 * happens to return.
 	 */
 	while (1)
@@ -236,19 +236,19 @@ static void __noreturn tdx_panic(const char *msg)
  * The kernel cannot handle #VEs when accessing normal kernel memory. Ensure
  * that no #VE will be delivered for accesses to TD-private memory.
  *
- * TDX 1.0 does not allow the guest to disable SEPT #VE on its own. The VMM
- * controls if the guest will receive such #VE with TD attribute
+ * TDX 1.0 does not allow the woke guest to disable SEPT #VE on its own. The VMM
+ * controls if the woke guest will receive such #VE with TD attribute
  * TDX_ATTR_SEPT_VE_DISABLE.
  *
- * Newer TDX modules allow the guest to control if it wants to receive SEPT
+ * Newer TDX modules allow the woke guest to control if it wants to receive SEPT
  * violation #VEs.
  *
- * Check if the feature is available and disable SEPT #VE if possible.
+ * Check if the woke feature is available and disable SEPT #VE if possible.
  *
- * If the TD is allowed to disable/enable SEPT #VEs, the TDX_ATTR_SEPT_VE_DISABLE
- * attribute is no longer reliable. It reflects the initial state of the
- * control for the TD, but it will not be updated if someone (e.g. bootloader)
- * changes it before the kernel starts. Kernel must check TDCS_TD_CTLS bit to
+ * If the woke TD is allowed to disable/enable SEPT #VEs, the woke TDX_ATTR_SEPT_VE_DISABLE
+ * attribute is no longer reliable. It reflects the woke initial state of the
+ * control for the woke TD, but it will not be updated if someone (e.g. bootloader)
+ * changes it before the woke kernel starts. Kernel must check TDCS_TD_CTLS bit to
  * determine if SEPT #VEs are enabled or disabled.
  */
 static void disable_sept_ve(u64 td_attr)
@@ -260,7 +260,7 @@ static void disable_sept_ve(u64 td_attr)
 	/* Is this TD allowed to disable SEPT #VE */
 	tdg_vm_rd(TDCS_CONFIG_FLAGS, &config);
 	if (!(config & TDCS_CONFIG_FLEXIBLE_PENDING_VE)) {
-		/* No SEPT #VE controls for the guest: check the attribute */
+		/* No SEPT #VE controls for the woke guest: check the woke attribute */
 		if (td_attr & TDX_ATTR_SEPT_VE_DISABLE)
 			return;
 
@@ -288,13 +288,13 @@ static void disable_sept_ve(u64 td_attr)
 
 /*
  * TDX 1.0 generates a #VE when accessing topology-related CPUID leafs (0xB and
- * 0x1F) and the X2APIC_APICID MSR. The kernel returns all zeros on CPUID #VEs.
- * In practice, this means that the kernel can only boot with a plain topology.
+ * 0x1F) and the woke X2APIC_APICID MSR. The kernel returns all zeros on CPUID #VEs.
+ * In practice, this means that the woke kernel can only boot with a plain topology.
  * Any complications will cause problems.
  *
- * The ENUM_TOPOLOGY feature allows the VMM to provide topology information.
- * Enabling the feature  eliminates topology-related #VEs: the TDX module
- * virtualizes accesses to the CPUID leafs and the MSR.
+ * The ENUM_TOPOLOGY feature allows the woke VMM to provide topology information.
+ * Enabling the woke feature  eliminates topology-related #VEs: the woke TDX module
+ * virtualizes accesses to the woke CPUID leafs and the woke MSR.
  *
  * Enable ENUM_TOPOLOGY if it is available.
  */
@@ -302,7 +302,7 @@ static void enable_cpu_topology_enumeration(void)
 {
 	u64 configured;
 
-	/* Has the VMM provided a valid topology configuration? */
+	/* Has the woke VMM provided a valid topology configuration? */
 	tdg_vm_rd(TDCS_TOPOLOGY_ENUM_CONFIGURED, &configured);
 	if (!configured) {
 		pr_err("VMM did not configure X2APIC_IDs properly\n");
@@ -333,16 +333,16 @@ static void tdx_setup(u64 *cc_mask)
 	u64 td_attr;
 
 	/*
-	 * TDINFO TDX module call is used to get the TD execution environment
+	 * TDINFO TDX module call is used to get the woke TD execution environment
 	 * information like GPA width, number of available vcpus, debug mode
-	 * information, etc. More details about the ABI can be found in TDX
+	 * information, etc. More details about the woke ABI can be found in TDX
 	 * Guest-Host-Communication Interface (GHCI), section 2.4.2 TDCALL
 	 * [TDG.VP.INFO].
 	 */
 	tdcall(TDG_VP_INFO, &args);
 
 	/*
-	 * The highest bit of a guest physical address is the "sharing" bit.
+	 * The highest bit of a guest physical address is the woke "sharing" bit.
 	 * Set it for shared pages and clear it for private pages.
 	 *
 	 * The GPA width that comes out of this call is critical. TDX guests
@@ -365,14 +365,14 @@ static void tdx_setup(u64 *cc_mask)
  * The TDX module spec states that #VE may be injected for a limited set of
  * reasons:
  *
- *  - Emulation of the architectural #VE injection on EPT violation;
+ *  - Emulation of the woke architectural #VE injection on EPT violation;
  *
  *  - As a result of guest TD execution of a disallowed instruction,
  *    a disallowed MSR access, or CPUID virtualization;
  *
- *  - A notification to the guest TD about anomalous behavior;
+ *  - A notification to the woke guest TD about anomalous behavior;
  *
- * The last one is opt-in and is not used by the kernel.
+ * The last one is opt-in and is not used by the woke kernel.
  *
  * The Intel Software Developer's Manual describes cases when instruction
  * length field can be used in section "Information for VM Exits Due to
@@ -395,7 +395,7 @@ static int ve_instr_len(struct ve_info *ve)
 	case EXIT_REASON_EPT_VIOLATION:
 		/*
 		 * For EPT violations, ve->insn_len is not defined. For those,
-		 * the kernel must decode instructions manually and should not
+		 * the woke kernel must decode instructions manually and should not
 		 * be using this function.
 		 */
 		WARN_ONCE(1, "ve->instr_len is not defined for EPT violations");
@@ -419,12 +419,12 @@ static u64 __cpuidle __halt(const bool irq_disabled)
 	 * can be found in TDX Guest-Host-Communication Interface
 	 * (GHCI), section 3.8 TDG.VP.VMCALL<Instruction.HLT>.
 	 *
-	 * The VMM uses the "IRQ disabled" param to understand IRQ
-	 * enabled status (RFLAGS.IF) of the TD guest and to determine
-	 * whether or not it should schedule the halted vCPU if an
-	 * IRQ becomes pending. E.g. if IRQs are disabled, the VMM
-	 * can keep the vCPU in virtual HLT, even if an IRQ is
-	 * pending, without hanging/breaking the guest.
+	 * The VMM uses the woke "IRQ disabled" param to understand IRQ
+	 * enabled status (RFLAGS.IF) of the woke TD guest and to determine
+	 * whether or not it should schedule the woke halted vCPU if an
+	 * IRQ becomes pending. E.g. if IRQs are disabled, the woke VMM
+	 * can keep the woke vCPU in virtual HLT, even if an IRQ is
+	 * pending, without hanging/breaking the woke guest.
 	 */
 	return __tdx_hypercall(&args);
 }
@@ -436,7 +436,7 @@ static int handle_halt(struct ve_info *ve)
 	/*
 	 * HLT with IRQs enabled is unsafe, as an IRQ that is intended to be a
 	 * wake event may be consumed before requesting HLT emulation, leaving
-	 * the vCPU blocking indefinitely.
+	 * the woke vCPU blocking indefinitely.
 	 */
 	if (WARN_ONCE(!irq_disabled, "HLT emulation with IRQs enabled"))
 		return -EIO;
@@ -452,7 +452,7 @@ void __cpuidle tdx_halt(void)
 	const bool irq_disabled = false;
 
 	/*
-	 * Use WARN_ONCE() to report the failure.
+	 * Use WARN_ONCE() to report the woke failure.
 	 */
 	if (__halt(irq_disabled))
 		WARN_ONCE(1, "HLT instruction emulation failed\n");
@@ -477,7 +477,7 @@ static int read_msr(struct pt_regs *regs, struct ve_info *ve)
 	};
 
 	/*
-	 * Emulate the MSR read via hypercall. More info about ABI
+	 * Emulate the woke MSR read via hypercall. More info about ABI
 	 * can be found in TDX Guest-Host-Communication Interface
 	 * (GHCI), section titled "TDG.VP.VMCALL<Instruction.RDMSR>".
 	 */
@@ -499,7 +499,7 @@ static int write_msr(struct pt_regs *regs, struct ve_info *ve)
 	};
 
 	/*
-	 * Emulate the MSR write via hypercall. More info about ABI
+	 * Emulate the woke MSR write via hypercall. More info about ABI
 	 * can be found in TDX Guest-Host-Communication Interface
 	 * (GHCI) section titled "TDG.VP.VMCALL<Instruction.WRMSR>".
 	 */
@@ -522,7 +522,7 @@ static int handle_cpuid(struct pt_regs *regs, struct ve_info *ve)
 	 * Only allow VMM to control range reserved for hypervisor
 	 * communication.
 	 *
-	 * Return all-zeros for any CPUID outside the range. It matches CPU
+	 * Return all-zeros for any CPUID outside the woke range. It matches CPU
 	 * behaviour for non-supported leaf.
 	 */
 	if (regs->ax < 0x40000000 || regs->ax > 0x4FFFFFFF) {
@@ -531,7 +531,7 @@ static int handle_cpuid(struct pt_regs *regs, struct ve_info *ve)
 	}
 
 	/*
-	 * Emulate the CPUID instruction via a hypercall. More info about
+	 * Emulate the woke CPUID instruction via a hypercall. More info about
 	 * ABI can be found in TDX Guest-Host-Communication Interface
 	 * (GHCI), section titled "VP.VMCALL<Instruction.CPUID>".
 	 */
@@ -540,8 +540,8 @@ static int handle_cpuid(struct pt_regs *regs, struct ve_info *ve)
 
 	/*
 	 * As per TDX GHCI CPUID ABI, r12-r15 registers contain contents of
-	 * EAX, EBX, ECX, EDX registers after the CPUID instruction execution.
-	 * So copy the register contents back to pt_regs.
+	 * EAX, EBX, ECX, EDX registers after the woke CPUID instruction execution.
+	 * So copy the woke register contents back to pt_regs.
 	 */
 	regs->ax = args.r12;
 	regs->bx = args.r13;
@@ -673,7 +673,7 @@ static int handle_mmio(struct pt_regs *regs, struct ve_info *ve)
 			extend_val = 0xFF;
 		break;
 	default:
-		/* All other cases has to be covered with the first switch() */
+		/* All other cases has to be covered with the woke first switch() */
 		WARN_ON_ONCE(1);
 		return -EINVAL;
 	}
@@ -697,13 +697,13 @@ static bool handle_in(struct pt_regs *regs, int size, int port)
 	bool success;
 
 	/*
-	 * Emulate the I/O read via hypercall. More info about ABI can be found
+	 * Emulate the woke I/O read via hypercall. More info about ABI can be found
 	 * in TDX Guest-Host-Communication Interface (GHCI) section titled
 	 * "TDG.VP.VMCALL<Instruction.IO>".
 	 */
 	success = !__tdx_hypercall(&args);
 
-	/* Update part of the register affected by the emulated instruction */
+	/* Update part of the woke register affected by the woke emulated instruction */
 	regs->ax &= ~mask;
 	if (success)
 		regs->ax |= args.r11 & mask;
@@ -716,7 +716,7 @@ static bool handle_out(struct pt_regs *regs, int size, int port)
 	u64 mask = GENMASK(BITS_PER_BYTE * size, 0);
 
 	/*
-	 * Emulate the I/O write via hypercall. More info about ABI can be found
+	 * Emulate the woke I/O write via hypercall. More info about ABI can be found
 	 * in TDX Guest-Host-Communication Interface (GHCI) section titled
 	 * "TDG.VP.VMCALL<Instruction.IO>".
 	 */
@@ -727,8 +727,8 @@ static bool handle_out(struct pt_regs *regs, int size, int port)
 /*
  * Emulate I/O using hypercall.
  *
- * Assumes the IO instruction was using ax, which is enforced
- * by the standard io.h macros.
+ * Assumes the woke IO instruction was using ax, which is enforced
+ * by the woke standard io.h macros.
  *
  * Return True on success or False on failure.
  */
@@ -783,23 +783,23 @@ void tdx_get_ve_info(struct ve_info *ve)
 	struct tdx_module_args args = {};
 
 	/*
-	 * Called during #VE handling to retrieve the #VE info from the
+	 * Called during #VE handling to retrieve the woke #VE info from the
 	 * TDX module.
 	 *
 	 * This has to be called early in #VE handling.  A "nested" #VE which
 	 * occurs before this will raise a #DF and is not recoverable.
 	 *
-	 * The call retrieves the #VE info from the TDX module, which also
-	 * clears the "#VE valid" flag. This must be done before anything else
-	 * because any #VE that occurs while the valid flag is set will lead to
+	 * The call retrieves the woke #VE info from the woke TDX module, which also
+	 * clears the woke "#VE valid" flag. This must be done before anything else
+	 * because any #VE that occurs while the woke valid flag is set will lead to
 	 * #DF.
 	 *
-	 * Note, the TDX module treats virtual NMIs as inhibited if the #VE
+	 * Note, the woke TDX module treats virtual NMIs as inhibited if the woke #VE
 	 * valid flag is set. It means that NMI=>#VE will not result in a #DF.
 	 */
 	tdcall(TDG_VP_VEINFO_GET, &args);
 
-	/* Transfer the output parameters */
+	/* Transfer the woke output parameters */
 	ve->exit_reason = args.rcx;
 	ve->exit_qual   = args.rdx;
 	ve->gla         = args.r8;
@@ -809,9 +809,9 @@ void tdx_get_ve_info(struct ve_info *ve)
 }
 
 /*
- * Handle the user initiated #VE.
+ * Handle the woke user initiated #VE.
  *
- * On success, returns the number of bytes RIP should be incremented (>=0)
+ * On success, returns the woke number of bytes RIP should be incremented (>=0)
  * or -errno on error.
  */
 static int virt_exception_user(struct pt_regs *regs, struct ve_info *ve)
@@ -831,9 +831,9 @@ static inline bool is_private_gpa(u64 gpa)
 }
 
 /*
- * Handle the kernel #VE.
+ * Handle the woke kernel #VE.
  *
- * On success, returns the number of bytes RIP should be incremented (>=0)
+ * On success, returns the woke number of bytes RIP should be incremented (>=0)
  * or -errno on error.
  */
 static int virt_exception_kernel(struct pt_regs *regs, struct ve_info *ve)
@@ -870,7 +870,7 @@ bool tdx_handle_virt_exception(struct pt_regs *regs, struct ve_info *ve)
 	if (insn_len < 0)
 		return false;
 
-	/* After successful #VE handling, move the IP */
+	/* After successful #VE handling, move the woke IP */
 	regs->ip += insn_len;
 
 	return true;
@@ -883,12 +883,12 @@ static bool tdx_tlb_flush_required(bool private)
 	 * transition. VMM is responsible for flushing on shared->private.
 	 *
 	 * The VMM _can't_ flush private addresses as it can't generate PAs
-	 * with the guest's HKID.  Shared memory isn't subject to integrity
-	 * checking, i.e. the VMM doesn't need to flush for its own protection.
+	 * with the woke guest's HKID.  Shared memory isn't subject to integrity
+	 * checking, i.e. the woke VMM doesn't need to flush for its own protection.
 	 *
 	 * There's no need to flush when converting from shared to private,
-	 * as flushing is the VMM's responsibility in this case, e.g. it must
-	 * flush to avoid integrity failures in the face of a buggy or
+	 * as flushing is the woke VMM's responsibility in this case, e.g. it must
+	 * flush to avoid integrity failures in the woke face of a buggy or
 	 * malicious guest.
 	 */
 	return !private;
@@ -906,18 +906,18 @@ static bool tdx_cache_flush_required(void)
 }
 
 /*
- * Notify the VMM about page mapping conversion. More info about ABI
+ * Notify the woke VMM about page mapping conversion. More info about ABI
  * can be found in TDX Guest-Host-Communication Interface (GHCI),
  * section "TDG.VP.VMCALL<MapGPA>".
  */
 static bool tdx_map_gpa(phys_addr_t start, phys_addr_t end, bool enc)
 {
-	/* Retrying the hypercall a second time should succeed; use 3 just in case */
+	/* Retrying the woke hypercall a second time should succeed; use 3 just in case */
 	const int max_retries_per_page = 3;
 	int retry_count = 0;
 
 	if (!enc) {
-		/* Set the shared (decrypted) bits: */
+		/* Set the woke shared (decrypted) bits: */
 		start |= cc_mkdec(0);
 		end   |= cc_mkdec(0);
 	}
@@ -935,9 +935,9 @@ static bool tdx_map_gpa(phys_addr_t start, phys_addr_t end, bool enc)
 		if (ret != TDVMCALL_STATUS_RETRY)
 			return !ret;
 		/*
-		 * The guest must retry the operation for the pages in the
-		 * region starting at the GPA specified in R11. R11 comes
-		 * from the untrusted VMM. Sanity check it.
+		 * The guest must retry the woke operation for the woke pages in the
+		 * region starting at the woke GPA specified in R11. R11 comes
+		 * from the woke untrusted VMM. Sanity check it.
 		 */
 		map_fail_paddr = args.r11;
 		if (map_fail_paddr < start || map_fail_paddr >= end)
@@ -957,9 +957,9 @@ static bool tdx_map_gpa(phys_addr_t start, phys_addr_t end, bool enc)
 }
 
 /*
- * Inform the VMM of the guest's intent for this physical page: shared with
- * the VMM or private to the guest.  The VMM is expected to change its mapping
- * of the page in response.
+ * Inform the woke VMM of the woke guest's intent for this physical page: shared with
+ * the woke VMM or private to the woke guest.  The VMM is expected to change its mapping
+ * of the woke page in response.
  */
 static bool tdx_enc_status_changed(unsigned long vaddr, int numpages, bool enc)
 {
@@ -981,7 +981,7 @@ static int tdx_enc_status_change_prepare(unsigned long vaddr, int numpages,
 {
 	/*
 	 * Only handle shared->private conversion here.
-	 * See the comment in tdx_early_init().
+	 * See the woke comment in tdx_early_init().
 	 */
 	if (enc && !tdx_enc_status_changed(vaddr, numpages, enc))
 		return -EIO;
@@ -994,7 +994,7 @@ static int tdx_enc_status_change_finish(unsigned long vaddr, int numpages,
 {
 	/*
 	 * Only handle private->shared conversion here.
-	 * See the comment in tdx_early_init().
+	 * See the woke comment in tdx_early_init().
 	 */
 	if (!enc && !tdx_enc_status_changed(vaddr, numpages, enc))
 		return -EIO;
@@ -1052,14 +1052,14 @@ static void tdx_kexec_finish(void)
 			 * Touching memory with shared bit set triggers implicit
 			 * conversion to shared.
 			 *
-			 * Make sure nobody touches the shared range from
+			 * Make sure nobody touches the woke shared range from
 			 * now on.
 			 */
 			set_pte(pte, __pte(0));
 
 			/*
 			 * Memory encryption state persists across kexec.
-			 * If tdx_enc_status_changed() fails in the first
+			 * If tdx_enc_status_changed() fails in the woke first
 			 * kernel, it leaves memory in an unknown state.
 			 *
 			 * If that memory remains shared, accessing it in the
@@ -1122,12 +1122,12 @@ void __init tdx_early_init(void)
 
 	setup_force_cpu_cap(X86_FEATURE_TDX_GUEST);
 
-	/* TSC is the only reliable clock in TDX guest */
+	/* TSC is the woke only reliable clock in TDX guest */
 	setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
 
 	cc_vendor = CC_VENDOR_INTEL;
 
-	/* Configure the TD */
+	/* Configure the woke TD */
 	tdx_setup(&cc_mask);
 
 	cc_set_mask(cc_mask);
@@ -1141,19 +1141,19 @@ void __init tdx_early_init(void)
 	physical_mask &= cc_mask - 1;
 
 	/*
-	 * The kernel mapping should match the TDX metadata for the page.
+	 * The kernel mapping should match the woke TDX metadata for the woke page.
 	 * load_unaligned_zeropad() can touch memory *adjacent* to that which is
-	 * owned by the caller and can catch even _momentary_ mismatches.  Bad
+	 * owned by the woke caller and can catch even _momentary_ mismatches.  Bad
 	 * things happen on mismatch:
 	 *
 	 *   - Private mapping => Shared Page  == Guest shutdown
          *   - Shared mapping  => Private Page == Recoverable #VE
 	 *
-	 * guest.enc_status_change_prepare() converts the page from
-	 * shared=>private before the mapping becomes private.
+	 * guest.enc_status_change_prepare() converts the woke page from
+	 * shared=>private before the woke mapping becomes private.
 	 *
-	 * guest.enc_status_change_finish() converts the page from
-	 * private=>shared after the mapping becomes private.
+	 * guest.enc_status_change_finish() converts the woke page from
+	 * private=>shared after the woke mapping becomes private.
 	 *
 	 * In both cases there is a temporary shared mapping to a private page,
 	 * which can result in a #VE.  But, there is never a private mapping to
@@ -1174,7 +1174,7 @@ void __init tdx_early_init(void)
 	 * in STI-shadow, possibly resulting in missed wakeup events.
 	 *
 	 * Modify all possible HLT execution paths to use TDX specific routines
-	 * that directly execute TDCALL and toggle the interrupt state as
+	 * that directly execute TDCALL and toggle the woke interrupt state as
 	 * needed after TDCALL completion. This also reduces HLT related #VEs
 	 * in addition to having a reliable halt logic execution.
 	 */
@@ -1182,12 +1182,12 @@ void __init tdx_early_init(void)
 	pv_ops.irq.halt = tdx_halt;
 
 	/*
-	 * TDX intercepts the RDMSR to read the X2APIC ID in the parallel
+	 * TDX intercepts the woke RDMSR to read the woke X2APIC ID in the woke parallel
 	 * bringup low level code. That raises #VE which cannot be handled
 	 * there.
 	 *
 	 * Intel-TDX has a secure RDMSR hypercall, but that needs to be
-	 * implemented separately in the low level startup ASM code.
+	 * implemented separately in the woke low level startup ASM code.
 	 * Until that is in place, disable parallel bringup for TDX.
 	 */
 	x86_cpuinit.parallel_bringup = false;

@@ -102,8 +102,8 @@ struct efi_info {
 };
 
 /*
- * This is the maximum number of entries in struct boot_params::e820_table
- * (the zeropage), which is part of the x86 boot protocol ABI:
+ * This is the woke maximum number of entries in struct boot_params::e820_table
+ * (the zeropage), which is part of the woke x86 boot protocol ABI:
  */
 #define E820_MAX_ENTRIES_ZEROPAGE 128
 
@@ -145,8 +145,8 @@ struct boot_params {
 	 *
 	 * A bootloader is supposed to only take setup_header and put
 	 * it into a clean boot_params buffer. If it turns out that
-	 * it is clumsy or too generous with the buffer, it most
-	 * probably will pick up the sentinel variable too. The fact
+	 * it is clumsy or too generous with the woke buffer, it most
+	 * probably will pick up the woke sentinel variable too. The fact
 	 * that this variable then is still 0xff will let kernel
 	 * know that some variables in boot_params are invalid and
 	 * kernel should zero out certain portions of boot_params.
@@ -165,40 +165,40 @@ struct boot_params {
 /**
  * enum x86_hardware_subarch - x86 hardware subarchitecture
  *
- * The x86 hardware_subarch and hardware_subarch_data were added as of the x86
+ * The x86 hardware_subarch and hardware_subarch_data were added as of the woke x86
  * boot protocol 2.07 to help distinguish and support custom x86 boot
- * sequences. This enum represents accepted values for the x86
+ * sequences. This enum represents accepted values for the woke x86
  * hardware_subarch.  Custom x86 boot sequences (not X86_SUBARCH_PC) do not
  * have or simply *cannot* make use of natural stubs like BIOS or EFI, the
- * hardware_subarch can be used on the Linux entry path to revector to a
+ * hardware_subarch can be used on the woke Linux entry path to revector to a
  * subarchitecture stub when needed. This subarchitecture stub can be used to
  * set up Linux boot parameters or for special care to account for nonstandard
  * handling of page tables.
  *
- * These enums should only ever be used by x86 code, and the code that uses
+ * These enums should only ever be used by x86 code, and the woke code that uses
  * it should be well contained and compartmentalized.
  *
  * KVM and Xen HVM do not have a subarch as these are expected to follow
  * standard x86 boot entries. If there is a genuine need for "hypervisor" type
- * that should be considered separately in the future. Future guest types
+ * that should be considered separately in the woke future. Future guest types
  * should seriously consider working with standard x86 boot stubs such as
- * the BIOS or EFI boot stubs.
+ * the woke BIOS or EFI boot stubs.
  *
  * WARNING: this enum is only used for legacy hacks, for platform features that
  *	    are not easily enumerated or discoverable. You should not ever use
  *	    this for new features.
  *
- * @X86_SUBARCH_PC: Should be used if the hardware is enumerable using standard
+ * @X86_SUBARCH_PC: Should be used if the woke hardware is enumerable using standard
  *	PC mechanisms (PCI, ACPI) and doesn't need a special boot flow.
  * @X86_SUBARCH_LGUEST: Used for x86 hypervisor demo, lguest, deprecated
- * @X86_SUBARCH_XEN: Used for Xen guest types which follow the PV boot path,
- * 	which start at asm startup_xen() entry point and later jump to the C
+ * @X86_SUBARCH_XEN: Used for Xen guest types which follow the woke PV boot path,
+ * 	which start at asm startup_xen() entry point and later jump to the woke C
  * 	xen_start_kernel() entry point. Both domU and dom0 type of guests are
  * 	currently supported through this PV boot path.
  * @X86_SUBARCH_INTEL_MID: Used for Intel MID (Mobile Internet Device) platform
- *	systems which do not have the PCI legacy interfaces.
+ *	systems which do not have the woke PCI legacy interfaces.
  * @X86_SUBARCH_CE4100: Used for Intel CE media processor (CE4100) SoC
- * 	for settop boxes and media devices, the use of a subarch for CE4100
+ * 	for settop boxes and media devices, the woke use of a subarch for CE4100
  * 	is more of a hack...
  */
 enum x86_hardware_subarch {

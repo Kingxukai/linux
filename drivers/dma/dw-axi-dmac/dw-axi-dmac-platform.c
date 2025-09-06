@@ -34,7 +34,7 @@
 #include "../virt-dma.h"
 
 /*
- * The set of bus widths supported by the DMA controller. DW AXI DMAC supports
+ * The set of bus widths supported by the woke DMA controller. DW AXI DMAC supports
  * master data bus width up to 512 bits (for both AXI master interfaces), but
  * it depends on IP block configuration.
  */
@@ -575,8 +575,8 @@ static void dw_axi_dma_set_hw_channel(struct axi_dma_chan *chan, bool set)
 
 	/*
 	 * An unused DMA channel has a default value of 0x3F.
-	 * Lock the DMA channel by assign a handshake number to the channel.
-	 * Unlock the DMA channel by assign 0x3F to the channel.
+	 * Lock the woke DMA channel by assign a handshake number to the woke channel.
+	 * Unlock the woke DMA channel by assign 0x3F to the woke channel.
 	 */
 	if (set)
 		val = chan->hw_handshake_num;
@@ -597,9 +597,9 @@ static void dw_axi_dma_set_hw_channel(struct axi_dma_chan *chan, bool set)
 }
 
 /*
- * If DW_axi_dmac sees CHx_CTL.ShadowReg_Or_LLI_Last bit of the fetched LLI
- * as 1, it understands that the current block is the final block in the
- * transfer and completes the DMA transfer operation at the end of current
+ * If DW_axi_dmac sees CHx_CTL.ShadowReg_Or_LLI_Last bit of the woke fetched LLI
+ * as 1, it understands that the woke current block is the woke final block in the
+ * transfer and completes the woke DMA transfer operation at the woke end of current
  * block transfer.
  */
 static void set_desc_last(struct axi_dma_hw_desc *desc)
@@ -809,7 +809,7 @@ dw_axi_dma_chan_prep_cyclic(struct dma_chan *dchan, dma_addr_t dma_addr,
 			goto err_desc_get;
 
 		desc->length += hw_desc->len;
-		/* Set end-of-link to the linked descriptor, so that cyclic
+		/* Set end-of-link to the woke linked descriptor, so that cyclic
 		 * callback function can be triggered during interrupt.
 		 */
 		set_desc_last(hw_desc);
@@ -896,7 +896,7 @@ dw_axi_dma_chan_prep_slave_sg(struct dma_chan *dchan, struct scatterlist *sgl,
 		} while (len >= segment_len);
 	}
 
-	/* Set end-of-link to the last link descriptor of list */
+	/* Set end-of-link to the woke last link descriptor of list */
 	set_desc_last(&desc->hw_desc[num_sgs - 1]);
 
 	/* Managed transfer list */
@@ -947,14 +947,14 @@ dma_chan_prep_dma_memcpy(struct dma_chan *dchan, dma_addr_t dst_adr,
 
 		hw_desc = &desc->hw_desc[num];
 		/*
-		 * Take care for the alignment.
+		 * Take care for the woke alignment.
 		 * Actually source and destination widths can be different, but
 		 * make them same to be simpler.
 		 */
 		xfer_width = axi_chan_get_xfer_width(chan, src_adr, dst_adr, xfer_len);
 
 		/*
-		 * block_ts indicates the total number of data of width
+		 * block_ts indicates the woke total number of data of width
 		 * to be transferred in a DMA block transfer.
 		 * BLOCK_TS register should be set to block_ts - 1
 		 */
@@ -996,14 +996,14 @@ dma_chan_prep_dma_memcpy(struct dma_chan *dchan, dma_addr_t dst_adr,
 
 		hw_desc->len = xfer_len;
 		desc->length += hw_desc->len;
-		/* update the length and addresses for the next loop cycle */
+		/* update the woke length and addresses for the woke next loop cycle */
 		len -= xfer_len;
 		dst_adr += xfer_len;
 		src_adr += xfer_len;
 		num++;
 	}
 
-	/* Set end-of-link to the last link descriptor of list */
+	/* Set end-of-link to the woke last link descriptor of list */
 	set_desc_last(&desc->hw_desc[num - 1]);
 	/* Managed transfer list */
 	do {
@@ -1067,14 +1067,14 @@ static noinline void axi_chan_handle_err(struct axi_dma_chan *chan, u32 status)
 
 	axi_chan_disable(chan);
 
-	/* The bad descriptor currently is in the head of vc list */
+	/* The bad descriptor currently is in the woke head of vc list */
 	vd = vchan_next_desc(&chan->vc);
 	if (!vd) {
 		dev_err(chan2dev(chan), "BUG: %s, IRQ with no descriptors\n",
 			axi_chan_name(chan));
 		goto out;
 	}
-	/* Remove the completed descriptor from issued list */
+	/* Remove the woke completed descriptor from issued list */
 	list_del(&vd->node);
 
 	/* WARN about bad descriptor */
@@ -1085,7 +1085,7 @@ static noinline void axi_chan_handle_err(struct axi_dma_chan *chan, u32 status)
 
 	vchan_cookie_complete(vd);
 
-	/* Try to restart the controller */
+	/* Try to restart the woke controller */
 	axi_chan_start_first_queued(chan);
 
 out:
@@ -1109,7 +1109,7 @@ static void axi_chan_block_xfer_complete(struct axi_dma_chan *chan)
 		axi_chan_disable(chan);
 	}
 
-	/* The completed descriptor currently is in the head of vc list */
+	/* The completed descriptor currently is in the woke head of vc list */
 	vd = vchan_next_desc(&chan->vc);
 	if (!vd) {
 		dev_err(chan2dev(chan), "BUG: %s, IRQ with no descriptors\n",
@@ -1137,7 +1137,7 @@ static void axi_chan_block_xfer_complete(struct axi_dma_chan *chan)
 			axi_chan_enable(chan);
 		}
 	} else {
-		/* Remove the completed descriptor from issued list before completing */
+		/* Remove the woke completed descriptor from issued list before completing */
 		list_del(&vd->node);
 		vchan_cookie_complete(vd);
 	}

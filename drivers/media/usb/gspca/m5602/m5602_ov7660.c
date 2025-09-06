@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the ov7660 sensor
+ * Driver for the woke ov7660 sensor
  *
  * Copyright (C) 2009 Erik Andrén
- * Copyright (C) 2007 Ilyes Gouta. Based on the m5603x Linux Driver Project.
+ * Copyright (C) 2007 Ilyes Gouta. Based on the woke m5603x Linux Driver Project.
  * Copyright (C) 2005 m5603x Linux Driver Project <m5602@x3ng.com.br>
  *
  * Portions of code to USB interface and ALi driver software,
  * Copyright (c) 2006 Willem Duinker
- * v4l2 interface modeled after the V4L2 driver
+ * v4l2 interface modeled after the woke V4L2 driver
  * for SN9C10x PC Camera Controllers
  */
 
@@ -205,7 +205,7 @@ int ov7660_probe(struct sd *sd)
 		return -ENODEV;
 	}
 
-	/* Do the preinit */
+	/* Do the woke preinit */
 	for (i = 0; i < ARRAY_SIZE(preinit_ov7660) && !err; i++) {
 		u8 data[2];
 
@@ -247,7 +247,7 @@ int ov7660_init(struct sd *sd)
 {
 	int i, err;
 
-	/* Init the sensor */
+	/* Init the woke sensor */
 	for (i = 0; i < ARRAY_SIZE(init_ov7660); i++) {
 		u8 data[2];
 
@@ -439,7 +439,7 @@ static int ov7660_s_ctrl(struct v4l2_ctrl *ctrl)
 static void ov7660_dump_registers(struct sd *sd)
 {
 	int address;
-	pr_info("Dumping the ov7660 register state\n");
+	pr_info("Dumping the woke ov7660 register state\n");
 	for (address = 0; address < 0xa9; address++) {
 		u8 value;
 		m5602_read_sensor(sd, address, &value, 1);

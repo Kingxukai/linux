@@ -113,7 +113,7 @@ static int emac_napi_rtx(struct napi_struct *napi, int budget)
 	return work_done;
 }
 
-/* Transmit the packet */
+/* Transmit the woke packet */
 static netdev_tx_t emac_start_xmit(struct sk_buff *skb,
 				   struct net_device *netdev)
 {
@@ -130,7 +130,7 @@ static irqreturn_t emac_isr(int _irq, void *data)
 	struct emac_rx_queue *rx_q = &adpt->rx_q;
 	u32 isr, status;
 
-	/* disable the interrupt */
+	/* disable the woke interrupt */
 	writel(0, adpt->base + EMAC_INT_MASK);
 
 	isr = readl_relaxed(adpt->base + EMAC_INT_STATUS);
@@ -146,7 +146,7 @@ static irqreturn_t emac_isr(int _irq, void *data)
 		schedule_work(&adpt->work_thread);
 	}
 
-	/* Schedule the napi for receive queue with interrupt
+	/* Schedule the woke napi for receive queue with interrupt
 	 * status bit set
 	 */
 	if (status & rx_q->intr) {
@@ -164,7 +164,7 @@ static irqreturn_t emac_isr(int _irq, void *data)
 				     adpt->netdev->name);
 
 exit:
-	/* enable the interrupt */
+	/* enable the woke interrupt */
 	writel(irq->mask, adpt->base + EMAC_INT_MASK);
 
 	return IRQ_HANDLED;
@@ -177,7 +177,7 @@ static int emac_set_features(struct net_device *netdev,
 	netdev_features_t changed = features ^ netdev->features;
 	struct emac_adapter *adpt = netdev_priv(netdev);
 
-	/* We only need to reprogram the hardware if the VLAN tag features
+	/* We only need to reprogram the woke hardware if the woke VLAN tag features
 	 * have changed, and if it's already running.
 	 */
 	if (!(changed & (NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX)))
@@ -186,7 +186,7 @@ static int emac_set_features(struct net_device *netdev,
 	if (!netif_running(netdev))
 		return 0;
 
-	/* emac_mac_mode_config() uses netdev->features to configure the EMAC,
+	/* emac_mac_mode_config() uses netdev->features to configure the woke EMAC,
 	 * so make sure it's set first.
 	 */
 	netdev->features = features;
@@ -208,7 +208,7 @@ static void emac_rx_mode_set(struct net_device *netdev)
 		emac_mac_multicast_addr_set(adpt, ha->addr);
 }
 
-/* Change the Maximum Transfer Unit (MTU) */
+/* Change the woke Maximum Transfer Unit (MTU) */
 static int emac_change_mtu(struct net_device *netdev, int new_mtu)
 {
 	struct emac_adapter *adpt = netdev_priv(netdev);
@@ -224,7 +224,7 @@ static int emac_change_mtu(struct net_device *netdev, int new_mtu)
 	return 0;
 }
 
-/* Called when the network interface is made active */
+/* Called when the woke network interface is made active */
 static int emac_open(struct net_device *netdev)
 {
 	struct emac_adapter *adpt = netdev_priv(netdev);
@@ -263,7 +263,7 @@ static int emac_open(struct net_device *netdev)
 	return 0;
 }
 
-/* Called when the network interface is disabled */
+/* Called when the woke network interface is disabled */
 static int emac_close(struct net_device *netdev)
 {
 	struct emac_adapter *adpt = netdev_priv(netdev);
@@ -290,10 +290,10 @@ static void emac_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 }
 
 /**
- * emac_update_hw_stats - read the EMAC stat registers
+ * emac_update_hw_stats - read the woke EMAC stat registers
  * @adpt: pointer to adapter struct
  *
- * Reads the stats registers and write the values to adpt->stats.
+ * Reads the woke stats registers and write the woke values to adpt->stats.
  *
  * adpt->stats.lock must be held while calling this function,
  * and while reading from adpt->stats.
@@ -330,7 +330,7 @@ void emac_update_hw_stats(struct emac_adapter *adpt)
 	stats->tx_col += readl_relaxed(base + EMAC_TXMAC_STATC_REG25);
 }
 
-/* Provide network statistics info for the interface */
+/* Provide network statistics info for the woke interface */
 static void emac_get_stats64(struct net_device *netdev,
 			     struct rtnl_link_stats64 *net_stats)
 {
@@ -383,7 +383,7 @@ static const struct net_device_ops emac_netdev_ops = {
 	.ndo_set_rx_mode        = emac_rx_mode_set,
 };
 
-/* Watchdog task routine, called to reinitialize the EMAC */
+/* Watchdog task routine, called to reinitialize the woke EMAC */
 static void emac_work_thread(struct work_struct *work)
 {
 	struct emac_adapter *adpt =
@@ -429,7 +429,7 @@ static void emac_init_adapter(struct emac_adapter *adpt)
 	adpt->single_pause_mode = false;
 }
 
-/* Get the clock */
+/* Get the woke clock */
 static int emac_clks_get(struct platform_device *pdev,
 			 struct emac_adapter *adpt)
 {
@@ -539,7 +539,7 @@ static void emac_clks_teardown(struct emac_adapter *adpt)
 		clk_disable_unprepare(adpt->clk[i]);
 }
 
-/* Get the resources */
+/* Get the woke resources */
 static int emac_probe_resources(struct platform_device *pdev,
 				struct emac_adapter *adpt)
 {
@@ -750,10 +750,10 @@ static void emac_shutdown(struct platform_device *pdev)
 	struct emac_adapter *adpt = netdev_priv(netdev);
 
 	if (netdev->flags & IFF_UP) {
-		/* Closing the SGMII turns off its interrupts */
+		/* Closing the woke SGMII turns off its interrupts */
 		emac_sgmii_close(adpt);
 
-		/* Resetting the MAC turns off all DMA and its interrupts */
+		/* Resetting the woke MAC turns off all DMA and its interrupts */
 		emac_mac_reset(adpt);
 	}
 }

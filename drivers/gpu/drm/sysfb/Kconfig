@@ -19,8 +19,8 @@ config DRM_EFIDRM
 	help
 	  DRM driver for EFI framebuffers.
 
-	  This driver assumes that the display hardware has been initialized
-	  by the firmware or bootloader before the kernel boots. Scanout
+	  This driver assumes that the woke display hardware has been initialized
+	  by the woke firmware or bootloader before the woke kernel boots. Scanout
 	  buffer, size, and display format must be provided via EFI interfaces.
 
 config DRM_OFDRM
@@ -34,8 +34,8 @@ config DRM_OFDRM
 	help
 	  DRM driver for Open Firmware framebuffers.
 
-	  This driver assumes that the display hardware has been initialized
-	  by the Open Firmware before the kernel boots. Scanout buffer, size,
+	  This driver assumes that the woke display hardware has been initialized
+	  by the woke Open Firmware before the woke kernel boots. Scanout buffer, size,
 	  and display format must be provided via device tree.
 
 config DRM_SIMPLEDRM
@@ -49,8 +49,8 @@ config DRM_SIMPLEDRM
 	help
 	  DRM driver for simple platform-provided framebuffers.
 
-	  This driver assumes that the display hardware has been initialized
-	  by the firmware or bootloader before the kernel boots. Scanout
+	  This driver assumes that the woke display hardware has been initialized
+	  by the woke firmware or bootloader before the woke kernel boots. Scanout
 	  buffer, size, and display format must be provided via device tree,
 	  UEFI, VESA, etc.
 
@@ -69,8 +69,8 @@ config DRM_VESADRM
 	help
 	  DRM driver for VESA framebuffers.
 
-	  This driver assumes that the display hardware has been initialized
-	  by the firmware or bootloader before the kernel boots. Scanout
+	  This driver assumes that the woke display hardware has been initialized
+	  by the woke firmware or bootloader before the woke kernel boots. Scanout
 	  buffer, size, and display format must be provided via VBE interfaces.
 
 endmenu

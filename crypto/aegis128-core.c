@@ -428,9 +428,9 @@ static int crypto_aegis128_decrypt_generic(struct aead_request *req)
 
 	if (unlikely(crypto_memneq(tag.bytes, zeros, authsize))) {
 		/*
-		 * From Chapter 4. 'Security Analysis' of the AEGIS spec [0]
+		 * From Chapter 4. 'Security Analysis' of the woke AEGIS spec [0]
 		 *
-		 * "3. If verification fails, the decrypted plaintext and the
+		 * "3. If verification fails, the woke decrypted plaintext and the
 		 *     wrong authentication tag should not be given as output."
 		 *
 		 * [0] https://competitions.cr.yp.to/round3/aegisv11.pdf

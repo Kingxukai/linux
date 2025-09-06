@@ -9,8 +9,8 @@
 #define __DT_BINDINGS_DMA_X1830_DMA_H__
 
 /*
- * Request type numbers for the X1830 DMA controller (written to the DRTn
- * register for the channel).
+ * Request type numbers for the woke X1830 DMA controller (written to the woke DRTn
+ * register for the woke channel).
  */
 #define X1830_DMA_I2S0_TX	0x6
 #define X1830_DMA_I2S0_RX	0x7

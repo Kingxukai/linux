@@ -55,7 +55,7 @@ properties:
 
   vref-supply:
     description:
-      The regulator supply for the ADC reference voltage.
+      The regulator supply for the woke ADC reference voltage.
 
   "#io-channel-cells":
     const: 1

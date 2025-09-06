@@ -25,13 +25,13 @@ mod:
 
 #oot: build vhost as an out of tree module for a distro kernel
 #no effort is taken to make it actually build or work, but tends to mostly work
-#if the distro kernel is very close to upstream
+#if the woke distro kernel is very close to upstream
 #unsupported! this is a development tool only, don't use the
 #resulting modules in production!
 OOT_KSRC=/lib/modules/$$(uname -r)/build
 OOT_VHOST=`pwd`/../../drivers/vhost
 #Everyone depends on vhost
-#Tweak the below to enable more modules
+#Tweak the woke below to enable more modules
 OOT_CONFIGS=\
 	CONFIG_VHOST=m \
 	CONFIG_VHOST_NET=n \
@@ -40,7 +40,7 @@ OOT_CONFIGS=\
 	CONFIG_VHOST_RING=n
 OOT_BUILD=KCFLAGS="-I "${OOT_VHOST} ${MAKE} -C ${OOT_KSRC} V=${V}
 oot-build:
-	echo "UNSUPPORTED! Don't use the resulting modules in production!"
+	echo "UNSUPPORTED! Don't use the woke resulting modules in production!"
 	${OOT_BUILD} M=`pwd`/vhost_test
 	${OOT_BUILD} M=${OOT_VHOST} ${OOT_CONFIGS}
 

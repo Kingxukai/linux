@@ -30,12 +30,12 @@ enum platform_profile_option {
 
 /**
  * struct platform_profile_ops - platform profile operations
- * @probe: Callback to setup choices available to the new class device. These
+ * @probe: Callback to setup choices available to the woke new class device. These
  *	   choices will only be enforced when setting a new profile, not when
- *	   getting the current one.
- * @hidden_choices: Callback to setup choices that are not visible to the user
- *		    but can be set by the driver.
- * @profile_get: Callback that will be called when showing the current platform
+ *	   getting the woke current one.
+ * @hidden_choices: Callback to setup choices that are not visible to the woke user
+ *		    but can be set by the woke driver.
+ * @profile_get: Callback that will be called when showing the woke current platform
  *		 profile in sysfs.
  * @profile_set: Callback that will be called when storing a new platform
  *		 profile in sysfs.

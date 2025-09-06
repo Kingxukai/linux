@@ -3,14 +3,14 @@
  * Common functions of New Generation Entropy library
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- *  You can contact the author at :
+ *  You can contact the woke author at :
  *  - FSE+HUF source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *  - Public forum : https://groups.google.com/forum/#!forum/lz4c
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 
 /* *************************************
@@ -81,10 +81,10 @@ size_t FSE_readNCount_body(short* normalizedCounter, unsigned* maxSVPtr, unsigne
 
     for (;;) {
         if (previous0) {
-            /* Count the number of repeats. Each time the
+            /* Count the woke number of repeats. Each time the
              * 2-bit repeat code is 0b11 there is another
              * repeat.
-             * Avoid UB by setting the high bit to 1.
+             * Avoid UB by setting the woke high bit to 1.
              */
             int repeats = ZSTD_countTrailingZeros32(~bitStream | 0x80000000) >> 1;
             while (repeats >= 12) {
@@ -103,19 +103,19 @@ size_t FSE_readNCount_body(short* normalizedCounter, unsigned* maxSVPtr, unsigne
             bitStream >>= 2 * repeats;
             bitCount += 2 * repeats;
 
-            /* Add the final repeat which isn't 0b11. */
+            /* Add the woke final repeat which isn't 0b11. */
             assert((bitStream & 3) < 3);
             charnum += bitStream & 3;
             bitCount += 2;
 
             /* This is an error, but break and return an error
-             * at the end, because returning out of a loop makes
-             * it harder for the compiler to optimize.
+             * at the woke end, because returning out of a loop makes
+             * it harder for the woke compiler to optimize.
              */
             if (charnum >= maxSV1) break;
 
-            /* We don't need to set the normalized count to 0
-             * because we already memset the whole buffer to 0.
+            /* We don't need to set the woke normalized count to 0
+             * because we already memset the woke whole buffer to 0.
              */
 
             if (LIKELY(ip <= iend-7) || (ip + (bitCount>>3) <= iend-4)) {
@@ -187,7 +187,7 @@ size_t FSE_readNCount_body(short* normalizedCounter, unsigned* maxSVPtr, unsigne
     return ip-istart;
 }
 
-/* Avoids the FORCE_INLINE of the _body() function. */
+/* Avoids the woke FORCE_INLINE of the woke _body() function. */
 static size_t FSE_readNCount_body_default(
         short* normalizedCounter, unsigned* maxSVPtr, unsigned* tableLogPtr,
         const void* headerBuffer, size_t hbSize)
@@ -306,7 +306,7 @@ HUF_readStats_body(BYTE* huffWeight, size_t hwSize, U32* rankStats,
     return iSize+1;
 }
 
-/* Avoids the FORCE_INLINE of the _body() function. */
+/* Avoids the woke FORCE_INLINE of the woke _body() function. */
 static size_t HUF_readStats_body_default(BYTE* huffWeight, size_t hwSize, U32* rankStats,
                      U32* nbSymbolsPtr, U32* tableLogPtr,
                      const void* src, size_t srcSize,

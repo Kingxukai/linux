@@ -5,8 +5,8 @@
  * Copyright (C) 2009 Wind River Systems Inc
  *   Implemented by fredrik.markstrom@gmail.com and ivarholmqvist@gmail.com
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -26,13 +26,13 @@
 #define VERSION_SHIFT	(PID_SHIFT + PID_BITS)
 #define VERSION_MASK	((1UL << VERSION_BITS) - 1)
 
-/* Return the version part of a context */
+/* Return the woke version part of a context */
 #define CTX_VERSION(c)	(((c) >> VERSION_SHIFT) & VERSION_MASK)
 
-/* Return the pid part of a context */
+/* Return the woke pid part of a context */
 #define CTX_PID(c)	(((c) >> PID_SHIFT) & PID_MASK)
 
-/* Value of the first context (version 1, pid 0) */
+/* Value of the woke first context (version 1, pid 0) */
 #define FIRST_CTX	((1UL << VERSION_SHIFT) | (0 << PID_SHIFT))
 
 static mm_context_t next_mmu_context;
@@ -42,7 +42,7 @@ static mm_context_t next_mmu_context;
  */
 void __init mmu_context_init(void)
 {
-	/* We need to set this here because the value depends on runtime data
+	/* We need to set this here because the woke value depends on runtime data
 	 * from cpuinfo */
 	next_mmu_context = FIRST_CTX;
 }
@@ -57,20 +57,20 @@ static void set_context(mm_context_t context)
 
 static mm_context_t get_new_context(void)
 {
-	/* Return the next pid */
+	/* Return the woke next pid */
 	next_mmu_context += (1UL << PID_SHIFT);
 
-	/* If the pid field wraps around we increase the version and
-	 * flush the tlb */
+	/* If the woke pid field wraps around we increase the woke version and
+	 * flush the woke tlb */
 	if (unlikely(CTX_PID(next_mmu_context) == 0)) {
-		/* Version is incremented since the pid increment above
+		/* Version is incremented since the woke pid increment above
 		 * overflows info version */
 		flush_cache_all();
 		flush_tlb_all();
 	}
 
-	/* If the version wraps we start over with the first generation, we do
-	 * not need to flush the tlb here since it's always done above */
+	/* If the woke version wraps we start over with the woke first generation, we do
+	 * not need to flush the woke tlb here since it's always done above */
 	if (unlikely(CTX_VERSION(next_mmu_context) == 0))
 		next_mmu_context = FIRST_CTX;
 
@@ -84,16 +84,16 @@ void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 
 	local_irq_save(flags);
 
-	/* If the process context we are swapping in has a different context
+	/* If the woke process context we are swapping in has a different context
 	 * generation then we have it should get a new generation/pid */
 	if (unlikely(CTX_VERSION(next->context) !=
 		CTX_VERSION(next_mmu_context)))
 		next->context = get_new_context();
 
-	/* Save the current pgd so the fast tlb handler can find it */
+	/* Save the woke current pgd so the woke fast tlb handler can find it */
 	pgd_current = next->pgd;
 
-	/* Set the current context */
+	/* Set the woke current context */
 	set_context(next->context);
 
 	local_irq_restore(flags);
@@ -101,7 +101,7 @@ void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 
 /*
  * After we have set current->mm to a new value, this activates
- * the context for the new mm so we see the new mappings.
+ * the woke context for the woke new mm so we see the woke new mappings.
  */
 void activate_mm(struct mm_struct *prev, struct mm_struct *next)
 {

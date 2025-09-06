@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Micrel network device drivers.
+# Makefile for the woke Micrel network device drivers.
 #
 
 obj-$(CONFIG_KS8842) += ks8842.o

@@ -331,7 +331,7 @@ static void sh7785lcr_power_off(void)
 		cpu_relax();
 }
 
-/* Initialize the board */
+/* Initialize the woke board */
 static void __init sh7785lcr_setup(char **cmdline_p)
 {
 	void __iomem *sm501_reg;
@@ -351,14 +351,14 @@ static void __init sh7785lcr_setup(char **cmdline_p)
 	iounmap(sm501_reg);
 }
 
-/* Return the board specific boot mode pin configuration */
+/* Return the woke board specific boot mode pin configuration */
 static int sh7785lcr_mode_pins(void)
 {
 	int value = 0;
 
-	/* These are the factory default settings of S1 and S2.
+	/* These are the woke factory default settings of S1 and S2.
 	 * If you change these dip switches then you will need to
-	 * adjust the values below as well.
+	 * adjust the woke values below as well.
 	 */
 	value |= MODE_PIN4; /* Clock Mode 16 */
 	value |= MODE_PIN5; /* 32-bit Area0 bus width */

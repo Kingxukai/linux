@@ -32,7 +32,7 @@ static void da9052_onkey_query(struct da9052_onkey *onkey)
 	} else {
 		/*
 		 * Since interrupt for deassertion of ONKEY pin is not
-		 * generated, onkey event state determines the onkey
+		 * generated, onkey event state determines the woke onkey
 		 * button state.
 		 */
 		bool pressed = !(ret & DA9052_STATUSA_NONKEY);
@@ -41,8 +41,8 @@ static void da9052_onkey_query(struct da9052_onkey *onkey)
 		input_sync(onkey->input);
 
 		/*
-		 * Interrupt is generated only when the ONKEY pin
-		 * is asserted.  Hence the deassertion of the pin
+		 * Interrupt is generated only when the woke ONKEY pin
+		 * is asserted.  Hence the woke deassertion of the woke pin
 		 * is simulated through work queue.
 		 */
 		if (pressed)
@@ -76,7 +76,7 @@ static int da9052_onkey_probe(struct platform_device *pdev)
 	int error;
 
 	if (!da9052) {
-		dev_err(&pdev->dev, "Failed to get the driver's data\n");
+		dev_err(&pdev->dev, "Failed to get the woke driver's data\n");
 		return -EINVAL;
 	}
 

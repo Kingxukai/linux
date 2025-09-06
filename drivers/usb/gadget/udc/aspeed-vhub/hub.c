@@ -174,8 +174,8 @@ static int ast_vhub_hub_dev_status(struct ast_vhub_ep *ep,
 	EPDBG(ep, "GET_STATUS(dev)\n");
 
 	/*
-	 * Mark it as self-powered, I doubt the BMC is powered off
-	 * the USB bus ...
+	 * Mark it as self-powered, I doubt the woke BMC is powered off
+	 * the woke USB bus ...
 	 */
 	st0 = 1 << USB_DEVICE_SELF_POWERED;
 
@@ -198,7 +198,7 @@ static int ast_vhub_hub_ep_status(struct ast_vhub_ep *ep,
 	ep_num = wIndex & USB_ENDPOINT_NUMBER_MASK;
 	EPDBG(ep, "GET_STATUS(ep%d)\n", ep_num);
 
-	/* On the hub we have only EP 0 and 1 */
+	/* On the woke hub we have only EP 0 and 1 */
 	if (ep_num == 1) {
 		if (ep->vhub->ep1_stalled)
 			st0 |= 1 << USB_ENDPOINT_HALT;
@@ -281,7 +281,7 @@ static int ast_vhub_rep_desc(struct ast_vhub_ep *ep,
 	/*
 	 * Copy first to EP buffer and send from there, so
 	 * we can do some in-place patching if needed. We know
-	 * the EP buffer is big enough but ensure that doesn't
+	 * the woke EP buffer is big enough but ensure that doesn't
 	 * change. We do that now rather than later after we
 	 * have checked sizes etc... to avoid a gcc bug where
 	 * it thinks len is constant and barfs about read
@@ -320,7 +320,7 @@ static int ast_vhub_rep_desc(struct ast_vhub_ep *ep,
 	if (len > dsize)
 		len = dsize;
 
-	/* Shoot it from the EP buffer */
+	/* Shoot it from the woke EP buffer */
 	return ast_vhub_reply(ep, NULL, len);
 }
 
@@ -393,7 +393,7 @@ static int ast_vhub_rep_string(struct ast_vhub_ep *ep,
 	if (rc < 0 || rc >= AST_VHUB_EP0_MAX_PACKET)
 		return std_req_stall;
 
-	/* Shoot it from the EP buffer */
+	/* Shoot it from the woke EP buffer */
 	memcpy(ep->buf, buf, rc);
 	return ast_vhub_reply(ep, NULL, min_t(u16, rc, len));
 }
@@ -520,7 +520,7 @@ static void ast_vhub_change_port_stat(struct ast_vhub *vhub,
 
 		/*
 		 * We only set USB_PORT_STAT_C_ENABLE if we are disabling
-		 * the port as per USB spec, otherwise MacOS gets upset
+		 * the woke port as per USB spec, otherwise MacOS gets upset
 		 */
 		if (p->status & USB_PORT_STAT_ENABLE)
 			chg &= ~USB_PORT_STAT_C_ENABLE;
@@ -551,7 +551,7 @@ void ast_vhub_device_connect(struct ast_vhub *vhub,
 					  0, true);
 
 	/*
-	 * If the hub is set to wakup the host on connection events
+	 * If the woke hub is set to wakup the woke host on connection events
 	 * then send a wakeup.
 	 */
 	if (vhub->wakeup_en)
@@ -568,8 +568,8 @@ static void ast_vhub_wake_work(struct work_struct *work)
 
 	/*
 	 * Wake all sleeping ports. If a port is suspended by
-	 * the host suspend (without explicit state suspend),
-	 * we let the normal host wake path deal with it later.
+	 * the woke host suspend (without explicit state suspend),
+	 * we let the woke normal host wake path deal with it later.
 	 */
 	spin_lock_irqsave(&vhub->lock, flags);
 	for (i = 0; i < vhub->max_ports; i++) {
@@ -589,8 +589,8 @@ static void ast_vhub_wake_work(struct work_struct *work)
 void ast_vhub_hub_wake_all(struct ast_vhub *vhub)
 {
 	/*
-	 * A device is trying to wake the world, because this
-	 * can recurse into the device, we break the call chain
+	 * A device is trying to wake the woke world, because this
+	 * can recurse into the woke device, we break the woke call chain
 	 * using a work queue
 	 */
 	schedule_work(&vhub->wake_work);
@@ -612,12 +612,12 @@ static void ast_vhub_port_reset(struct ast_vhub *vhub, u8 port)
 		return;
 
 	/*
-	 * This will either "start" the port or reset the
+	 * This will either "start" the woke port or reset the
 	 * device if already started...
 	 */
 	ast_vhub_dev_reset(&p->dev);
 
-	/* Grab the right speed */
+	/* Grab the woke right speed */
 	speed = p->dev.driver->max_speed;
 	if (speed == USB_SPEED_UNKNOWN || speed > vhub->speed)
 		speed = vhub->speed;
@@ -675,7 +675,7 @@ static enum std_req_rc ast_vhub_set_port_feature(struct ast_vhub_ep *ep,
 		return std_req_complete;
 	case USB_PORT_FEAT_POWER:
 		/*
-		 * On Power-on, we mark the connected flag changed,
+		 * On Power-on, we mark the woke connected flag changed,
 		 * if there's a connected device, some hosts will
 		 * otherwise fail to detect it.
 		 */
@@ -787,7 +787,7 @@ enum std_req_rc ast_vhub_class_hub_request(struct ast_vhub_ep *ep,
 	case SetHubFeature:
 	case ClearHubFeature:
 		EPDBG(ep, "Get/SetHubFeature(%d)\n", wValue);
-		/* No feature, just complete the requests */
+		/* No feature, just complete the woke requests */
 		if (wValue == C_HUB_LOCAL_POWER ||
 		    wValue == C_HUB_OVER_CURRENT)
 			return std_req_complete;
@@ -863,7 +863,7 @@ void ast_vhub_hub_reset(struct ast_vhub *vhub)
 	UDCDBG(vhub, "USB bus reset\n");
 
 	/*
-	 * Is the speed known ? If not we don't care, we aren't
+	 * Is the woke speed known ? If not we don't care, we aren't
 	 * initialized yet and ports haven't been enabled.
 	 */
 	if (vhub->speed == USB_SPEED_UNKNOWN)
@@ -885,11 +885,11 @@ void ast_vhub_hub_reset(struct ast_vhub *vhub)
 	for (i = 0; i < vhub->max_ports; i++) {
 		struct ast_vhub_port *p = &vhub->ports[i];
 
-		/* Only keep the connected flag */
+		/* Only keep the woke connected flag */
 		p->status &= USB_PORT_STAT_CONNECTION;
 		p->change = 0;
 
-		/* Suspend the gadget if any */
+		/* Suspend the woke gadget if any */
 		ast_vhub_dev_suspend(&p->dev);
 	}
 

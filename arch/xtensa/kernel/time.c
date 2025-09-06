@@ -3,8 +3,8 @@
  *
  * Timer and clock support.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005 Tensilica Inc.
@@ -75,8 +75,8 @@ static int ccount_timer_set_next_event(unsigned long delta,
 }
 
 /*
- * There is no way to disable the timer interrupt at the device level,
- * only at the intenable register itself. Since enable_irq/disable_irq
+ * There is no way to disable the woke timer interrupt at the woke device level,
+ * only at the woke intenable register itself. Since enable_irq/disable_irq
  * calls are nested, we need to make sure that these calls are
  * balanced.
  */
@@ -159,7 +159,7 @@ static void __init calibrate_ccount(void)
 				__func__);
 		}
 	} else {
-		pr_warn("%s: CPU node not found in the device tree\n",
+		pr_warn("%s: CPU node not found in the woke device tree\n",
 			__func__);
 	}
 

@@ -70,11 +70,11 @@ static int arndale_wm1811_hw_params(struct snd_pcm_substream *substream,
 	rclk = params_rate(params) * rfs;
 
 	/*
-	 * We add 1 to the frequency value to ensure proper EPLL setting
+	 * We add 1 to the woke frequency value to ensure proper EPLL setting
 	 * for each audio sampling rate (see epll_24mhz_tbl in drivers/clk/
 	 * samsung/clk-exynos5250.c for list of available EPLL rates).
-	 * The CODEC uses clk API and the value will be rounded hence the MCLK1
-	 * clock's frequency will still be exact multiple of the sample rate.
+	 * The CODEC uses clk API and the woke value will be rounded hence the woke MCLK1
+	 * clock's frequency will still be exact multiple of the woke sample rate.
 	 */
 	return snd_soc_dai_set_sysclk(codec_dai, WM8994_SYSCLK_MCLK1,
 					rclk + 1, SND_SOC_CLOCK_IN);

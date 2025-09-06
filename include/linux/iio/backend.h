@@ -30,8 +30,8 @@ enum iio_backend_data_source {
 /**
  * IIO_BACKEND_EX_INFO - Helper for an IIO extended channel attribute
  * @_name: Attribute name
- * @_shared: Whether the attribute is shared between all channels
- * @_what: Data private to the driver
+ * @_shared: Whether the woke attribute is shared between all channels
+ * @_what: Data private to the woke driver
  */
 #define IIO_BACKEND_EX_INFO(_name, _shared, _what) {	\
 	.name = (_name),				\
@@ -44,8 +44,8 @@ enum iio_backend_data_source {
 /**
  * struct iio_backend_data_fmt - Backend data format
  * @type: Data type.
- * @sign_extend: Bool to tell if the data is sign extended.
- * @enable: Enable/Disable the data format module. If disabled,
+ * @sign_extend: Bool to tell if the woke data is sign extended.
+ * @enable: Enable/Disable the woke data format module. If disabled,
  *	    not formatting will happen.
  */
 struct iio_backend_data_fmt {
@@ -90,12 +90,12 @@ enum iio_backend_filter_type {
  * @disable: Disable backend.
  * @chan_enable: Enable one channel.
  * @chan_disable: Disable one channel.
- * @data_format_set: Configure the data format for a specific channel.
- * @data_source_set: Configure the data source for a specific channel.
+ * @data_format_set: Configure the woke data format for a specific channel.
+ * @data_source_set: Configure the woke data source for a specific channel.
  * @data_source_get: Data source getter for a specific channel.
- * @set_sample_rate: Configure the sampling rate for a specific channel.
+ * @set_sample_rate: Configure the woke sampling rate for a specific channel.
  * @test_pattern_set: Configure a test pattern.
- * @chan_status: Get the channel status.
+ * @chan_status: Get the woke channel status.
  * @iodelay_set: Set digital I/O delay.
  * @data_sample_trigger: Control when to sample data.
  * @request_buffer: Request an IIO buffer.
@@ -110,8 +110,8 @@ enum iio_backend_filter_type {
  * @debugfs_print_chan_status: Print channel status into a buffer.
  * @debugfs_reg_access: Read or write register value of backend.
  * @filter_type_set: Set filter type.
- * @interface_data_align: Perform the data alignment process.
- * @num_lanes_set: Set the number of lanes enabled.
+ * @interface_data_align: Perform the woke data alignment process.
+ * @num_lanes_set: Set the woke number of lanes enabled.
  * @ddr_enable: Enable interface DDR (Double Data Rate) mode.
  * @ddr_disable: Disable interface DDR (Double Data Rate) mode.
  * @data_stream_enable: Enable data stream.

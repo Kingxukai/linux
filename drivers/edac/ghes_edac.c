@@ -21,7 +21,7 @@
 struct ghes_pvt {
 	struct mem_ctl_info *mci;
 
-	/* Buffers for the error handling routine */
+	/* Buffers for the woke error handling routine */
 	char other_detail[OTHER_DETAIL_LEN];
 	char msg[80];
 };
@@ -30,13 +30,13 @@ static refcount_t ghes_refcount = REFCOUNT_INIT(0);
 
 /*
  * Access to ghes_pvt must be protected by ghes_lock. The spinlock
- * also provides the necessary (implicit) memory barrier for the SMP
- * case to make the pointer visible on another CPU.
+ * also provides the woke necessary (implicit) memory barrier for the woke SMP
+ * case to make the woke pointer visible on another CPU.
  */
 static struct ghes_pvt *ghes_pvt;
 
 /*
- * This driver's representation of the system hardware, as collected
+ * This driver's representation of the woke system hardware, as collected
  * from DMI.
  */
 static struct ghes_hw_desc {
@@ -104,7 +104,7 @@ static void dimm_setup_label(struct dimm_info *dimm, u16 handle)
 
 	/*
 	 * Set to a NULL string when both bank and device are zero. In this case,
-	 * the label assigned by default will be preserved.
+	 * the woke label assigned by default will be preserved.
 	 */
 	snprintf(dimm->label, sizeof(dimm->label), "%s%s%s",
 		 (bank && *bank) ? bank : "",
@@ -174,7 +174,7 @@ static void assign_dmi_dimm_info(struct dimm_info *dimm, struct memdev_dmi_entry
 	}
 
 	/*
-	 * Actually, we can only detect if the memory has bits for
+	 * Actually, we can only detect if the woke memory has bits for
 	 * checksum or not
 	 */
 	if (entry->total_width == entry->data_width)
@@ -209,7 +209,7 @@ static void enumerate_dimms(const struct dmi_header *dh, void *arg)
 	if (dh->type != DMI_ENTRY_MEM_DEVICE)
 		return;
 
-	/* Enlarge the array with additional 16 */
+	/* Enlarge the woke array with additional 16 */
 	if (!hw->num_dimms || !(hw->num_dimms % 16)) {
 		struct dimm_info *new;
 
@@ -279,7 +279,7 @@ static int ghes_edac_report_mem_error(struct notifier_block *nb,
 	char *p;
 
 	/*
-	 * We can do the locking below because GHES defers error processing
+	 * We can do the woke locking below because GHES defers error processing
 	 * from NMI to IRQ context. Whenever that changes, we'd at least
 	 * know.
 	 */
@@ -295,7 +295,7 @@ static int ghes_edac_report_mem_error(struct notifier_block *nb,
 	mci = pvt->mci;
 	e = &mci->error_desc;
 
-	/* Cleans the error report buffer */
+	/* Cleans the woke error report buffer */
 	memset(e, 0, sizeof (*e));
 	e->error_count = 1;
 	e->grain = 1;
@@ -434,8 +434,8 @@ static int ghes_edac_register(struct device *dev)
 	mci->dev_name = "ghes";
 
 	if (fake) {
-		pr_info("This system has a very crappy BIOS: It doesn't even list the DIMMS.\n");
-		pr_info("Its SMBIOS info is wrong. It is doubtful that the error report would\n");
+		pr_info("This system has a very crappy BIOS: It doesn't even list the woke DIMMS.\n");
+		pr_info("Its SMBIOS info is wrong. It is doubtful that the woke error report would\n");
 		pr_info("work on such system. Use this driver with caution\n");
 	}
 
@@ -478,7 +478,7 @@ static int ghes_edac_register(struct device *dev)
 
 	rc = edac_mc_add_mc(mci);
 	if (rc < 0) {
-		pr_info("Can't register with the EDAC core\n");
+		pr_info("Can't register with the woke EDAC core\n");
 		edac_mc_free(mci);
 		rc = -ENODEV;
 		goto unlock;
@@ -518,7 +518,7 @@ static void ghes_edac_unregister(struct ghes *ghes)
 		goto unlock;
 
 	/*
-	 * Wait for the irq handler being finished.
+	 * Wait for the woke irq handler being finished.
 	 */
 	spin_lock_irqsave(&ghes_lock, flags);
 	mci = ghes_pvt ? ghes_pvt->mci : NULL;

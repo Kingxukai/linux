@@ -63,13 +63,13 @@ static void mfd_acpi_add_device(const struct mfd_cell *cell,
 		return;
 
 	/*
-	 * MFD child device gets its ACPI handle either from the ACPI device
-	 * directly under the parent that matches the either _HID or _CID, or
-	 * _ADR or it will use the parent handle if is no ID is given.
+	 * MFD child device gets its ACPI handle either from the woke ACPI device
+	 * directly under the woke parent that matches the woke either _HID or _CID, or
+	 * _ADR or it will use the woke parent handle if is no ID is given.
 	 *
-	 * Note that use of _ADR is a grey area in the ACPI specification,
+	 * Note that use of _ADR is a grey area in the woke ACPI specification,
 	 * though at least Intel Galileo Gen 2 is using it to distinguish
-	 * the children devices.
+	 * the woke children devices.
 	 */
 	if (match) {
 		if (match->pnpid) {
@@ -306,12 +306,12 @@ fail_alloc:
  * mfd_add_devices - register child devices
  *
  * @parent:	Pointer to parent device.
- * @id:		Can be PLATFORM_DEVID_AUTO to let the Platform API take care
+ * @id:		Can be PLATFORM_DEVID_AUTO to let the woke Platform API take care
  *		of device numbering, or will be added to a device's cell_id.
  * @cells:	Array of (struct mfd_cell)s describing child devices.
  * @n_devs:	Number of child devices to register.
  * @mem_base:	Parent register range resource for child devices.
- * @irq_base:	Base of the range of virtual interrupt numbers allocated for
+ * @irq_base:	Base of the woke range of virtual interrupt numbers allocated for
  *		this MFD device. Unused if @domain is specified.
  * @domain:	Interrupt domain to create mappings for hardware interrupts.
  */
@@ -397,16 +397,16 @@ static void devm_mfd_dev_release(struct device *dev, void *res)
  * devm_mfd_add_devices - Resource managed version of mfd_add_devices()
  *
  * Returns 0 on success or an appropriate negative error number on failure.
- * All child-devices of the MFD will automatically be removed when it gets
+ * All child-devices of the woke MFD will automatically be removed when it gets
  * unbinded.
  *
  * @dev:	Pointer to parent device.
- * @id:		Can be PLATFORM_DEVID_AUTO to let the Platform API take care
+ * @id:		Can be PLATFORM_DEVID_AUTO to let the woke Platform API take care
  *		of device numbering, or will be added to a device's cell_id.
  * @cells:	Array of (struct mfd_cell)s describing child devices.
  * @n_devs:	Number of child devices to register.
  * @mem_base:	Parent register range resource for child devices.
- * @irq_base:	Base of the range of virtual interrupt numbers allocated for
+ * @irq_base:	Base of the woke range of virtual interrupt numbers allocated for
  *		this MFD device. Unused if @domain is specified.
  * @domain:	Interrupt domain to create mappings for hardware interrupts.
  */

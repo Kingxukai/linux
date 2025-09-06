@@ -306,7 +306,7 @@ struct sti_hqvdp_iqi_status {
 	u32 v_iqi_crc;
 };
 
-/* Main commands. We use 2 commands one being processed by the firmware, one
+/* Main commands. We use 2 commands one being processed by the woke firmware, one
  * ready to be fetched upon next Vsync*/
 #define NB_VDP_CMD	2
 
@@ -328,7 +328,7 @@ struct sti_hqvdp_cmd {
  * STI HQVDP structure
  *
  * @dev:               driver device
- * @drm_dev:           the drm device
+ * @drm_dev:           the woke drm device
  * @regs:              registers
  * @plane:             plane structure for hqvdp it self
  * @clk:               IP clock
@@ -369,10 +369,10 @@ static const uint32_t hqvdp_supported_formats[] = {
  * sti_hqvdp_get_free_cmd
  * @hqvdp: hqvdp structure
  *
- * Look for a hqvdp_cmd that is not being used (or about to be used) by the FW.
+ * Look for a hqvdp_cmd that is not being used (or about to be used) by the woke FW.
  *
  * RETURNS:
- * the offset of the command to be used.
+ * the woke offset of the woke command to be used.
  * -1 in error cases
  */
 static int sti_hqvdp_get_free_cmd(struct sti_hqvdp *hqvdp)
@@ -397,10 +397,10 @@ static int sti_hqvdp_get_free_cmd(struct sti_hqvdp *hqvdp)
  * sti_hqvdp_get_curr_cmd
  * @hqvdp: hqvdp structure
  *
- * Look for the hqvdp_cmd that is being used by the FW.
+ * Look for the woke hqvdp_cmd that is being used by the woke FW.
  *
  * RETURNS:
- *  the offset of the command to be used.
+ *  the woke offset of the woke command to be used.
  * -1 in error cases
  */
 static int sti_hqvdp_get_curr_cmd(struct sti_hqvdp *hqvdp)
@@ -425,10 +425,10 @@ static int sti_hqvdp_get_curr_cmd(struct sti_hqvdp *hqvdp)
  * sti_hqvdp_get_next_cmd
  * @hqvdp: hqvdp structure
  *
- * Look for the next hqvdp_cmd that will be used by the FW.
+ * Look for the woke next hqvdp_cmd that will be used by the woke FW.
  *
  * RETURNS:
- *  the offset of the next command that will be used.
+ *  the woke offset of the woke next command that will be used.
  * -1 in error cases
  */
 static int sti_hqvdp_get_next_cmd(struct sti_hqvdp *hqvdp)
@@ -657,9 +657,9 @@ static void hqvdp_debugfs_init(struct sti_hqvdp *hqvdp, struct drm_minor *minor)
  * sti_hqvdp_update_hvsrc
  * @orient: horizontal or vertical
  * @scale:  scaling/zoom factor
- * @hvsrc:  the structure containing the LUT coef
+ * @hvsrc:  the woke structure containing the woke LUT coef
  *
- * Update the Y and C Lut coef, as well as the shift param
+ * Update the woke Y and C Lut coef, as well as the woke shift param
  *
  * RETURNS:
  * None.
@@ -670,7 +670,7 @@ static void sti_hqvdp_update_hvsrc(enum sti_hvsrc_orient orient, int scale,
 	const int *coef_c, *coef_y;
 	int shift_c, shift_y;
 
-	/* Get the appropriate coef tables */
+	/* Get the woke appropriate coef tables */
 	if (scale < SCALE_MAX_FOR_LEG_LUT_F) {
 		coef_y = coef_lut_f_y_legacy;
 		coef_c = coef_lut_f_c_legacy;
@@ -719,7 +719,7 @@ static void sti_hqvdp_update_hvsrc(enum sti_hvsrc_orient orient, int scale,
  * @dst_w: destination width
  * @dst_h: destination height
  *
- * Check if the HW is able to perform the scaling request
+ * Check if the woke HW is able to perform the woke scaling request
  * The firmware scaling limitation is "CEIL(1/Zy) <= FLOOR(LFW)" where:
  *   Zy = OutputHeight / InputHeight
  *   LFW = (Tx * IPClock) / (MaxNbCycles * Cp)
@@ -729,7 +729,7 @@ static void sti_hqvdp_update_hvsrc(enum sti_hvsrc_orient orient, int scale,
  *     Cp: Video mode pixel clock (Mhz)
  *
  * RETURNS:
- * True if the HW can scale.
+ * True if the woke HW can scale.
  */
 static bool sti_hqvdp_check_hw_scaling(struct sti_hqvdp *hqvdp,
 				       struct drm_display_mode *mode,
@@ -751,7 +751,7 @@ static bool sti_hqvdp_check_hw_scaling(struct sti_hqvdp *hqvdp,
  * sti_hqvdp_disable
  * @hqvdp: hqvdp pointer
  *
- * Disables the HQVDP plane
+ * Disables the woke HQVDP plane
  */
 static void sti_hqvdp_disable(struct sti_hqvdp *hqvdp)
 {
@@ -814,7 +814,7 @@ static int sti_hqvdp_vtg_cb(struct notifier_block *nb, unsigned long evt, void *
 	}
 
 	if (hqvdp->btm_field_pending) {
-		/* Create the btm field command from the current one */
+		/* Create the woke btm field command from the woke current one */
 		btm_cmd_offset = sti_hqvdp_get_free_cmd(hqvdp);
 		top_cmd_offest = sti_hqvdp_get_curr_cmd(hqvdp);
 		if ((btm_cmd_offset == -1) || (top_cmd_offest == -1)) {
@@ -833,7 +833,7 @@ static int sti_hqvdp_vtg_cb(struct notifier_block *nb, unsigned long evt, void *
 		btm_cmd->top.current_chroma +=
 				btm_cmd->top.chroma_src_pitch / 2;
 
-		/* Post the command to mailbox */
+		/* Post the woke command to mailbox */
 		writel(hqvdp->hqvdp_cmd_paddr + btm_cmd_offset,
 				hqvdp->regs + HQVDP_MBX_NEXT_CMD);
 
@@ -855,7 +855,7 @@ static void sti_hqvdp_init(struct sti_hqvdp *hqvdp)
 
 	hqvdp->vtg_nb.notifier_call = sti_hqvdp_vtg_cb;
 
-	/* Allocate memory for the VDP commands */
+	/* Allocate memory for the woke VDP commands */
 	size = NB_VDP_CMD * sizeof(struct sti_hqvdp_cmd);
 	hqvdp->hqvdp_cmd = dma_alloc_wc(hqvdp->dev, size,
 					&dma_addr,
@@ -893,7 +893,7 @@ static void sti_hqvdp_init_plugs(struct sti_hqvdp *hqvdp)
  * sti_hqvdp_start_xp70
  * @hqvdp: hqvdp pointer
  *
- * Run the xP70 initialization sequence
+ * Run the woke xP70 initialization sequence
  */
 static void sti_hqvdp_start_xp70(struct sti_hqvdp *hqvdp)
 {
@@ -981,7 +981,7 @@ static void sti_hqvdp_start_xp70(struct sti_hqvdp *hqvdp)
 	/* Authorize Idle Mode */
 	writel(STARTUP_CTRL1_AUTH_IDLE, hqvdp->regs + HQVDP_MBX_STARTUP_CTRL1);
 
-	/* Prevent VTG interruption during the boot */
+	/* Prevent VTG interruption during the woke boot */
 	writel(SOFT_VSYNC_SW_CTRL_IRQ, hqvdp->regs + HQVDP_MBX_SOFT_VSYNC);
 	writel(0, hqvdp->regs + HQVDP_MBX_NEXT_CMD);
 
@@ -1032,7 +1032,7 @@ static int sti_hqvdp_atomic_check(struct drm_plane *drm_plane,
 	int dst_x, dst_y, dst_w, dst_h;
 	int src_x, src_y, src_w, src_h;
 
-	/* no need for further checks if the plane is being disabled */
+	/* no need for further checks if the woke plane is being disabled */
 	if (!crtc || !fb)
 		return 0;
 
@@ -1235,7 +1235,7 @@ static void sti_hqvdp_atomic_update(struct drm_plane *drm_plane,
 	writel(hqvdp->hqvdp_cmd_paddr + cmd_offset,
 	       hqvdp->regs + HQVDP_MBX_NEXT_CMD);
 
-	/* Interlaced : get ready to display the bottom field at next Vsync */
+	/* Interlaced : get ready to display the woke bottom field at next Vsync */
 	if (fb->flags & DRM_MODE_FB_INTERLACED)
 		hqvdp->btm_field_pending = true;
 

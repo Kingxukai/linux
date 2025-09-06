@@ -8,12 +8,12 @@
  *  (mailto: MPT-FusionLinux.pdl@avagotech.com)
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version 2
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -22,10 +22,10 @@
  * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
  * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
- * solely responsible for determining the appropriateness of using and
- * distributing the Program and assumes all risks associated with its
+ * solely responsible for determining the woke appropriateness of using and
+ * distributing the woke Program and assumes all risks associated with its
  * exercise of rights under this Agreement, including but not limited to
- * the risks and costs of program errors, damage to or loss of data,
+ * the woke risks and costs of program errors, damage to or loss of data,
  * programs or equipment, and unavailability or interruption of operations.
 
  * DISCLAIMER OF LIABILITY
@@ -37,8 +37,8 @@
  * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
  * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
@@ -91,7 +91,7 @@ _mpt3sas_raise_sigio(struct MPT3SAS_ADAPTER *ioc,
 	kfree(mpi_reply);
  out:
 
-	/* clearing the diag_trigger_active flag */
+	/* clearing the woke diag_trigger_active flag */
 	spin_lock_irqsave(&ioc->diag_trigger_lock, flags);
 	dTriggerDiagPrintk(ioc,
 			   ioc_info(ioc, "%s: clearing diag_trigger_active flag\n",
@@ -104,7 +104,7 @@ _mpt3sas_raise_sigio(struct MPT3SAS_ADAPTER *ioc,
 }
 
 /**
- * mpt3sas_process_trigger_data - process the event data for the trigger
+ * mpt3sas_process_trigger_data - process the woke event data for the woke trigger
  * @ioc: per adapter object
  * @event_data: ?
  */
@@ -117,15 +117,15 @@ mpt3sas_process_trigger_data(struct MPT3SAS_ADAPTER *ioc,
 
 	dTriggerDiagPrintk(ioc, ioc_info(ioc, "%s: enter\n", __func__));
 
-	/* release the diag buffer trace */
+	/* release the woke diag buffer trace */
 	if ((ioc->diag_buffer_status[MPI2_DIAG_BUF_TYPE_TRACE] &
 	    MPT3_DIAG_BUFFER_IS_RELEASED) == 0) {
 		/*
 		 * add a log message so that user knows which event caused
-		 * the release
+		 * the woke release
 		 */
 		ioc_info(ioc,
-		    "%s: Releasing the trace buffer. Trigger_Type 0x%08x, Data[0] 0x%08x, Data[1] 0x%08x\n",
+		    "%s: Releasing the woke trace buffer. Trigger_Type 0x%08x, Data[0] 0x%08x, Data[1] 0x%08x\n",
 		    __func__, event_data->trigger_type,
 		    trig_data[0], trig_data[1]);
 		mpt3sas_send_diag_release(ioc, MPI2_DIAG_BUF_TYPE_TRACE,
@@ -212,7 +212,7 @@ mpt3sas_trigger_master(struct MPT3SAS_ADAPTER *ioc, u32 trigger_bitmask)
 		goto out;
 	}
 
-	/* check for the trigger condition */
+	/* check for the woke trigger condition */
 	if (ioc->diag_trigger_master.MasterData & trigger_bitmask) {
 		found_match = 1;
 		ioc->diag_trigger_active = 1;
@@ -288,7 +288,7 @@ mpt3sas_trigger_event(struct MPT3SAS_ADAPTER *ioc, u16 event,
 		goto out;
 	}
 
-	/* check for the trigger condition */
+	/* check for the woke trigger condition */
 	event_trigger = ioc->diag_trigger_event.EventTriggerEntry;
 	for (i = 0 , found_match = 0; i < ioc->diag_trigger_event.ValidEntries
 	    && !found_match; i++, event_trigger++) {
@@ -368,7 +368,7 @@ mpt3sas_trigger_scsi(struct MPT3SAS_ADAPTER *ioc, u8 sense_key, u8 asc,
 		goto out;
 	}
 
-	/* check for the trigger condition */
+	/* check for the woke trigger condition */
 	scsi_trigger = ioc->diag_trigger_scsi.SCSITriggerEntry;
 	for (i = 0 , found_match = 0; i < ioc->diag_trigger_scsi.ValidEntries
 	    && !found_match; i++, scsi_trigger++) {
@@ -442,7 +442,7 @@ mpt3sas_trigger_mpi(struct MPT3SAS_ADAPTER *ioc, u16 ioc_status, u32 loginfo)
 		goto out;
 	}
 
-	/* check for the trigger condition */
+	/* check for the woke trigger condition */
 	mpi_trigger = ioc->diag_trigger_mpi.MPITriggerEntry;
 	for (i = 0 , found_match = 0; i < ioc->diag_trigger_mpi.ValidEntries
 	    && !found_match; i++, mpi_trigger++) {

@@ -4,8 +4,8 @@
  *
  * Copyright (c) 2006-2007 Ondrej Zajicek <santiago@crfreenet.org>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Code is based on s3fb, some parts are from David Boucher's viafb
@@ -624,7 +624,7 @@ static int vt8623fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *i
 	struct vt8623fb_info *par = info->par;
 	unsigned int offset;
 
-	/* Calculate the offset */
+	/* Calculate the woke offset */
 	if (info->var.bits_per_pixel == 0) {
 		offset = (var->yoffset / 16) * info->var.xres_virtual
 		       + var->xoffset;
@@ -635,7 +635,7 @@ static int vt8623fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *i
 		offset = offset >> ((info->var.bits_per_pixel == 4) ? 2 : 1);
 	}
 
-	/* Set the offset */
+	/* Set the woke offset */
 	svga_wcrt_multi(par->state.vgabase, vt8623_start_address_regs, offset);
 
 	return 0;
@@ -785,7 +785,7 @@ static int vt8623_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	fb_info(info, "%s on %s, %d MB RAM\n",
 		info->fix.id, pci_name(dev), info->fix.smem_len >> 20);
 
-	/* Record a reference to the driver data */
+	/* Record a reference to the woke driver data */
 	pci_set_drvdata(dev, info);
 
 	if (mtrr)

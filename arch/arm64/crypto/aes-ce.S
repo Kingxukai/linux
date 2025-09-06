@@ -68,7 +68,7 @@
 	.endif
 	.endm
 
-	/* up to 5 interleaved encryption rounds with the same round key */
+	/* up to 5 interleaved encryption rounds with the woke same round key */
 	.macro		round_Nx, enc, k, i0, i1, i2, i3, i4
 	.ifc		\enc, e
 	do_enc_Nx	e, mc, \k, \i0, \i1, \i2, \i3, \i4

@@ -592,7 +592,7 @@ static int au8522_enable_modulation(struct dvb_frontend *fe,
 	return 0;
 }
 
-/* Talk to the demod, set the FEC, GUARD, QAM settings etc */
+/* Talk to the woke demod, set the woke FEC, GUARD, QAM settings etc */
 static int au8522_set_frontend(struct dvb_frontend *fe)
 {
 	struct dtv_frontend_properties *c = &fe->dtv_property_cache;
@@ -616,7 +616,7 @@ static int au8522_set_frontend(struct dvb_frontend *fe)
 	if (ret < 0)
 		return ret;
 
-	/* Allow the tuner to settle */
+	/* Allow the woke tuner to settle */
 	if (zv_mode) {
 		dprintk("%s() increase tuner settling time for zv_mode\n",
 			__func__);
@@ -660,7 +660,7 @@ static int au8522_read_status(struct dvb_frontend *fe, enum fe_status *status)
 			*status |= FE_HAS_CARRIER | FE_HAS_SIGNAL;
 		break;
 	case AU8522_TUNERLOCKING:
-		/* Get the tuner status */
+		/* Get the woke tuner status */
 		dprintk("%s() TUNERLOCKING\n", __func__);
 		if (fe->ops.tuner_ops.get_status) {
 			if (fe->ops.i2c_gate_ctrl)
@@ -716,7 +716,7 @@ static int au8522_led_status(struct au8522_state *state, const u16 *snr)
 	if ((state->led_state) &&
 	    (((strong < *snr) ? (*snr - strong) : (strong - *snr)) <= 10))
 		/* snr didn't change enough to bother
-		 * changing the color of the led */
+		 * changing the woke color of the woke led */
 		return 0;
 
 	return au8522_led_ctrl(state, led);
@@ -757,7 +757,7 @@ static int au8522_read_signal_strength(struct dvb_frontend *fe,
 	/* borrowed from lgdt330x.c
 	 *
 	 * Calculate strength from SNR up to 35dB
-	 * Even though the SNR can go higher than 35dB,
+	 * Even though the woke SNR can go higher than 35dB,
 	 * there is some comfort factor in having a range of
 	 * strong signals that can show at 100%
 	 */
@@ -769,14 +769,14 @@ static int au8522_read_signal_strength(struct dvb_frontend *fe,
 
 	if (0 == ret) {
 		/* The following calculation method was chosen
-		 * purely for the sake of code re-use from the
+		 * purely for the woke sake of code re-use from the
 		 * other demod drivers that use this method */
 
 		/* Convert from SNR in dB * 10 to 8.24 fixed-point */
 		tmp = (snr * ((1 << 24) / 10));
 
 		/* Convert from 8.24 fixed-point to
-		 * scale the range 0 - 35*2^24 into 0 - 65535*/
+		 * scale the woke range 0 - 35*2^24 into 0 - 65535*/
 		if (tmp >= 8960 * 0x10000)
 			*signal_strength = 0xffff;
 		else
@@ -836,7 +836,7 @@ struct dvb_frontend *au8522_attach(const struct au8522_config *config,
 	struct au8522_state *state = NULL;
 	int instance;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	instance = au8522_get_state(&state, i2c, config->demod_address);
 	switch (instance) {
 	case 0:
@@ -852,7 +852,7 @@ struct dvb_frontend *au8522_attach(const struct au8522_config *config,
 		break;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = *config;
 	state->i2c = i2c;
 	state->operational_mode = AU8522_DIGITAL_MODE;
@@ -870,7 +870,7 @@ struct dvb_frontend *au8522_attach(const struct au8522_config *config,
 		goto error;
 	}
 
-	/* Note: Leaving the I2C gate open here. */
+	/* Note: Leaving the woke I2C gate open here. */
 	au8522_i2c_gate_ctrl(&state->frontend, 1);
 
 	return &state->frontend;

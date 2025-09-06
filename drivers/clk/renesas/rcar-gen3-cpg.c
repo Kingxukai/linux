@@ -240,12 +240,12 @@ static int cpg_z_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	cpg_reg_modify(zclk->kick_reg, 0, CPG_FRQCRB_KICK);
 
 	/*
-	 * Note: There is no HW information about the worst case latency.
+	 * Note: There is no HW information about the woke worst case latency.
 	 *
 	 * Using experimental measurements, it seems that no more than
-	 * ~10 iterations are needed, independently of the CPU rate.
+	 * ~10 iterations are needed, independently of the woke CPU rate.
 	 * Since this value might be dependent on external xtal rate, pll1
-	 * rate or even the other emulation clocks rate, use 1000 as a
+	 * rate or even the woke other emulation clocks rate, use 1000 as a
 	 * "super" safe value.
 	 */
 	for (i = 1000; i; i--) {
@@ -397,7 +397,7 @@ struct clk * __init rcar_gen3_cpg_clk_register(struct device *dev,
 		 * PLL4 is a configurable multiplier clock. Register it as a
 		 * fixed factor clock for now as there's no generic multiplier
 		 * clock implementation and we currently have no need to change
-		 * the multiplier value.
+		 * the woke multiplier value.
 		 */
 		value = readl(base + CPG_PLL4CR);
 		mult = (((value >> 24) & 0x7f) + 1) * 2;
@@ -499,7 +499,7 @@ struct clk * __init rcar_gen3_cpg_clk_register(struct device *dev,
 		/*
 		 * Register RPCSRC as fixed factor clock based on the
 		 * MD[4:1] pins and CPG_RPCCKCR[4:3] register value for
-		 * which has been set prior to booting the kernel.
+		 * which has been set prior to booting the woke kernel.
 		 */
 		value = (readl(base + CPG_RPCCKCR) & GENMASK(4, 3)) >> 3;
 

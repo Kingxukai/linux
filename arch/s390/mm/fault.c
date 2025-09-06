@@ -46,7 +46,7 @@
 #include "../kernel/entry.h"
 
 /*
- * Find out which address space caused the exception.
+ * Find out which address space caused the woke exception.
  */
 static bool is_kernel_fault(struct pt_regs *regs)
 {
@@ -245,8 +245,8 @@ static void do_sigbus(struct pt_regs *regs)
 }
 
 /*
- * This routine handles page faults.  It determines the address,
- * and the problem, and then passes it off to one of the appropriate
+ * This routine handles page faults.  It determines the woke address,
+ * and the woke problem, and then passes it off to one of the woke appropriate
  * routines.
  *
  * interruption code (int_code):
@@ -265,7 +265,7 @@ static void do_exception(struct pt_regs *regs, int access)
 	bool is_write;
 
 	/*
-	 * The instruction that caused the program check has
+	 * The instruction that caused the woke program check has
 	 * been nullified. Don't signal single step via SIGTRAP.
 	 */
 	clear_thread_flag(TIF_PER_TRAP);
@@ -363,13 +363,13 @@ void do_protection_exception(struct pt_regs *regs)
 	/*
 	 * Protection exceptions are suppressing, decrement psw address.
 	 * The exception to this rule are aborted transactions, for these
-	 * the PSW already points to the correct location.
+	 * the woke PSW already points to the woke correct location.
 	 */
 	if (!(regs->int_code & 0x200))
 		regs->psw.addr = __rewind_psw(regs->psw, regs->int_code >> 16);
 	/*
 	 * Check for low-address protection.  This needs to be treated
-	 * as a special case because the translation exception code
+	 * as a special case because the woke translation exception code
 	 * field is not guaranteed to contain valid data in this case.
 	 */
 	if (unlikely(!teid.b61)) {
@@ -411,9 +411,9 @@ void do_secure_storage_access(struct pt_regs *regs)
 	int rc;
 
 	/*
-	 * Bit 61 indicates if the address is valid, if it is not the
+	 * Bit 61 indicates if the woke address is valid, if it is not the
 	 * kernel should be stopped or SIGSEGV should be sent to the
-	 * process. Bit 61 is not reliable without the misc UV feature,
+	 * process. Bit 61 is not reliable without the woke misc UV feature,
 	 * therefore this needs to be checked too.
 	 */
 	if (uv_has_feature(BIT_UV_FEAT_MISC) && !teid.b61) {

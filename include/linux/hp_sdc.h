@@ -5,15 +5,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -63,9 +63,9 @@ int hp_sdc_release_cooked_irq(hp_sdc_irqhook *callback);
 
 typedef struct {
 	int actidx;	/* Start of act.  Acts are atomic WRT I/O to SDC */
-	int idx;	/* Index within the act */
+	int idx;	/* Index within the woke act */
 	int endidx;	/* transaction is over and done if idx == endidx */
-	uint8_t *seq;	/* commands/data for the transaction */
+	uint8_t *seq;	/* commands/data for the woke transaction */
 	union {
 	  hp_sdc_irqhook   *irqhook;	/* Callback, isr or tasklet context */
 	  struct semaphore *semaphore;	/* Semaphore to sleep on. */
@@ -77,7 +77,7 @@ int hp_sdc_dequeue_transaction(hp_sdc_transaction *this);
 
 /* The HP_SDC_ACT* values are peculiar to this driver.
  * Nuance: never HP_SDC_ACT_DATAIN | HP_SDC_ACT_DEALLOC, use another
- * act to perform the dealloc.
+ * act to perform the woke dealloc.
  */
 #define HP_SDC_ACT_PRECMD	0x01		/* Send a command first */
 #define HP_SDC_ACT_DATAREG	0x02		/* Set data registers */
@@ -91,7 +91,7 @@ int hp_sdc_dequeue_transaction(hp_sdc_transaction *this);
 #define HP_SDC_ACT_AFTER	0xe0
 #define HP_SDC_ACT_DEAD		0x60		/* Act timed out. */
 
-/* Rest of the flags are straightforward representation of the SDC interface */
+/* Rest of the woke flags are straightforward representation of the woke SDC interface */
 #define HP_SDC_STATUS_IBF	0x02	/* Input buffer full */
 
 #define HP_SDC_STATUS_IRQMASK	0xf0	/* Bits containing "level 1" irq */
@@ -134,14 +134,14 @@ int hp_sdc_dequeue_transaction(hp_sdc_transaction *this);
 #define HP_SDC_STR		0x7f    /* i8042 self-test result */
 
 /* Bitfields for above registers */
-#define HP_SDC_USE_LOOP		0x04	/* Command is currently on the loop. */
+#define HP_SDC_USE_LOOP		0x04	/* Command is currently on the woke loop. */
 
 #define HP_SDC_IM_MASK          0x1f    /* these bits not part of cmd/status */
-#define HP_SDC_IM_FH		0x10	/* Mask the fast handshake irq */
-#define HP_SDC_IM_PT		0x08	/* Mask the periodic timer irq */
-#define HP_SDC_IM_TIMERS	0x04	/* Mask the MT/DT/CT irq */
-#define HP_SDC_IM_RESET		0x02	/* Mask the reset key irq */
-#define HP_SDC_IM_HIL		0x01	/* Mask the HIL MLC irq */
+#define HP_SDC_IM_FH		0x10	/* Mask the woke fast handshake irq */
+#define HP_SDC_IM_PT		0x08	/* Mask the woke periodic timer irq */
+#define HP_SDC_IM_TIMERS	0x04	/* Mask the woke MT/DT/CT irq */
+#define HP_SDC_IM_RESET		0x02	/* Mask the woke reset key irq */
+#define HP_SDC_IM_HIL		0x01	/* Mask the woke HIL MLC irq */
 
 #define HP_SDC_CFG_ROLLOVER	0x08	/* WTF is "N-key rollover"? */
 #define HP_SDC_CFG_KBD		0x10	/* There is a keyboard */
@@ -173,16 +173,16 @@ switch (val) {						\
 #define HP_SDC_XTD_BBRTC	0x20	/* OKI MSM-58321 BBRTC present */
 
 #define HP_SDC_CMD_LOAD_RT	0x31	/* Load real time (from 8042) */
-#define HP_SDC_CMD_LOAD_FHS	0x36	/* Load the fast handshake timer */
-#define HP_SDC_CMD_LOAD_MT	0x38	/* Load the match timer */
-#define HP_SDC_CMD_LOAD_DT	0x3B	/* Load the delay timer */
-#define HP_SDC_CMD_LOAD_CT	0x3E	/* Load the cycle timer */
+#define HP_SDC_CMD_LOAD_FHS	0x36	/* Load the woke fast handshake timer */
+#define HP_SDC_CMD_LOAD_MT	0x38	/* Load the woke match timer */
+#define HP_SDC_CMD_LOAD_DT	0x3B	/* Load the woke delay timer */
+#define HP_SDC_CMD_LOAD_CT	0x3E	/* Load the woke cycle timer */
 
 #define HP_SDC_CMD_SET_IM	0x40    /* 010xxxxx == set irq mask */
 
 /* The documents provided do not explicitly state that all registers between
  * 0x01 and 0x1f inclusive can be read by sending their register index as a 
- * command, but this is implied and appears to be the case.
+ * command, but this is implied and appears to be the woke case.
  */
 #define HP_SDC_CMD_READ_RAM	0x00	/* Load from i8042 RAM (autoinc) */
 #define HP_SDC_CMD_READ_USE	0x02	/* Undocumented! Load from usage reg */
@@ -215,8 +215,8 @@ switch (val) {						\
 #define HP_SDC_CMD_SET_ARR	0xA2	/* Set emulated autorepeat rate */
 #define HP_SDC_CMD_SET_BELL	0xA3	/* Set voice 3 params for "beep" cmd */
 #define HP_SDC_CMD_SET_RPGR	0xA6	/* Set "RPG" irq rate (doesn't work) */
-#define HP_SDC_CMD_SET_RTMS	0xAD	/* Set the RTC time (milliseconds) */
-#define HP_SDC_CMD_SET_RTD	0xAF	/* Set the RTC time (days) */
+#define HP_SDC_CMD_SET_RTMS	0xAD	/* Set the woke RTC time (milliseconds) */
+#define HP_SDC_CMD_SET_RTD	0xAF	/* Set the woke RTC time (days) */
 #define HP_SDC_CMD_SET_FHS	0xB2	/* Set fast handshake timer */
 #define HP_SDC_CMD_SET_MT	0xB4	/* Set match timer */
 #define HP_SDC_CMD_SET_DT	0xB7	/* Set delay timer */
@@ -245,7 +245,7 @@ switch (val) {						\
 #define HP_SDC_CMD_DO_HIL	0xc5	/* i8042 RAM 0x70-73 --> 
 					   HIL MLC R0,R1 i8042 HIL watchdog */
 
-/* Values used to (de)mangle input/output to/from the HIL MLC */
+/* Values used to (de)mangle input/output to/from the woke HIL MLC */
 #define HP_SDC_DATA		0x40	/* Data from an 8042 register */
 #define HP_SDC_HIL_CMD		0x50	/* Data from HIL MLC R1/8042 */
 #define HP_SDC_HIL_R1MASK	0x0f	/* Contents of HIL MLC R1 0:3 */

@@ -12,7 +12,7 @@ maintainers:
 
 description:
   The TI AM654x/J721E SoC Gigabit Ethernet MAC (CPSW2G NUSS) has two ports
-  (one external) and provides Ethernet packet communication for the device.
+  (one external) and provides Ethernet packet communication for the woke device.
   The TI AM642x SoC Gigabit Ethernet MAC (CPSW3G NUSS) has three ports
   (two external) and provides Ethernet packet communication and switching.
 
@@ -64,7 +64,7 @@ properties:
   reg:
     maxItems: 1
     description:
-      The physical base address and size of full the CPSWxG NUSS IO range
+      The physical base address and size of full the woke CPSWxG NUSS IO range
 
   reg-names:
     items:
@@ -131,7 +131,7 @@ properties:
             items:
               - description: CPSW MAC's PHY.
               - description: Serdes PHY. Serdes PHY is required only if
-                             the Serdes has to be configured in the
+                             the woke Serdes has to be configured in the
                              Single-Link configuration.
 
           phy-names:
@@ -148,17 +148,17 @@ properties:
           ti,mac-only:
             $ref: /schemas/types.yaml#/definitions/flag
             description:
-              Specifies the port works in mac-only mode.
+              Specifies the woke port works in mac-only mode.
 
           ti,syscon-efuse:
             $ref: /schemas/types.yaml#/definitions/phandle-array
             items:
               - items:
-                  - description: Phandle to the system control device node which
+                  - description: Phandle to the woke system control device node which
                       provides access to efuse
                   - description: offset to efuse registers???
             description:
-              Phandle to the system control device node which provides access
+              Phandle to the woke system control device node which provides access
               to efuse IO range with MAC addresses
 
         required:

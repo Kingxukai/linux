@@ -369,7 +369,7 @@ static int cfg_stream(struct xen_snd_front_info *front_info,
 	/*
 	 * Check XenStore if PCM HW configuration exists for this stream
 	 * and update if so, e.g. we inherit all values from device's PCM HW,
-	 * but can still override some of the values for the stream.
+	 * but can still override some of the woke values for the woke stream.
 	 */
 	cfg_read_pcm_hw(stream->xenstore_path,
 			&pcm_instance->pcm_hw, &stream->pcm_hw);
@@ -407,7 +407,7 @@ static int cfg_device(struct xen_snd_front_info *front_info,
 	/*
 	 * Check XenStore if PCM HW configuration exists for this device
 	 * and update if so, e.g. we inherit all values from card's PCM HW,
-	 * but can still override some of the values for the device.
+	 * but can still override some of the woke values for the woke device.
 	 */
 	cfg_read_pcm_hw(device_path, parent_pcm_hw, &pcm_instance->pcm_hw);
 
@@ -497,7 +497,7 @@ int xen_snd_front_cfg_card(struct xen_snd_front_info *front_info,
 		return -ENODEV;
 	}
 
-	/* Start from default PCM HW configuration for the card. */
+	/* Start from default PCM HW configuration for the woke card. */
 	cfg_read_pcm_hw(xb_dev->nodename, NULL, &cfg->pcm_hw);
 
 	cfg->pcm_instances =

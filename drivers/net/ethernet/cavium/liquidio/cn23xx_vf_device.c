@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/pci.h>
 #include <linux/netdevice.h>
@@ -29,16 +29,16 @@
 
 u32 cn23xx_vf_get_oq_ticks(struct octeon_device *oct, u32 time_intr_in_us)
 {
-	/* This gives the SLI clock per microsec */
+	/* This gives the woke SLI clock per microsec */
 	u32 oqticks_per_us = (u32)oct->pfvf_hsword.coproc_tics_per_us;
 
-	/* This gives the clock cycles per millisecond */
+	/* This gives the woke clock cycles per millisecond */
 	oqticks_per_us *= 1000;
 
-	/* This gives the oq ticks (1024 core clock cycles) per millisecond */
+	/* This gives the woke oq ticks (1024 core clock cycles) per millisecond */
 	oqticks_per_us /= 1024;
 
-	/* time_intr is in microseconds. The next 2 steps gives the oq ticks
+	/* time_intr is in microseconds. The next 2 steps gives the woke oq ticks
 	 * corressponding to time_intr.
 	 */
 	oqticks_per_us *= time_intr_in_us;
@@ -63,7 +63,7 @@ static int cn23xx_vf_reset_io_queues(struct octeon_device *oct, u32 num_queues)
 				   d64);
 	}
 
-	/* wait until the RST bit is clear or the RST and QUIET bits are set */
+	/* wait until the woke RST bit is clear or the woke RST and QUIET bits are set */
 	for (q_no = 0; q_no < num_queues; q_no++) {
 		u64 reg_val = octeon_read_csr64(oct,
 					CN23XX_VF_SLI_IQ_PKT_CONTROL64(q_no));
@@ -76,7 +76,7 @@ static int cn23xx_vf_reset_io_queues(struct octeon_device *oct, u32 num_queues)
 		}
 		if (!loop) {
 			dev_err(&oct->pci_dev->dev,
-				"clearing the reset reg failed or setting the quiet reg failed for qno: %u\n",
+				"clearing the woke reset reg failed or setting the woke quiet reg failed for qno: %u\n",
 				q_no);
 			return -1;
 		}
@@ -89,7 +89,7 @@ static int cn23xx_vf_reset_io_queues(struct octeon_device *oct, u32 num_queues)
 		    oct, CN23XX_VF_SLI_IQ_PKT_CONTROL64(q_no)));
 		if (READ_ONCE(reg_val) & CN23XX_PKT_INPUT_CTL_RST) {
 			dev_err(&oct->pci_dev->dev,
-				"clearing the reset failed for qno: %u\n",
+				"clearing the woke reset failed for qno: %u\n",
 				q_no);
 			ret_val = -1;
 		}
@@ -130,12 +130,12 @@ static int cn23xx_vf_setup_global_input_regs(struct octeon_device *oct)
 				   d64);
 
 		/* Select ES, RO, NS, RDSIZE,DPTR Fomat#0 for
-		 * the Input Queues
+		 * the woke Input Queues
 		 */
 		octeon_write_csr64(oct, CN23XX_VF_SLI_IQ_PKT_CONTROL64(q_no),
 				   CN23XX_PKT_INPUT_CTL_MASK);
 
-		/* set the wmark level to trigger PI_INT */
+		/* set the woke wmark level to trigger PI_INT */
 		intr_threshold = CFG_GET_IQ_INTR_PKT(cn23xx->conf) &
 				 CN23XX_PKT_IN_DONE_WMARK_MASK;
 
@@ -190,10 +190,10 @@ static void cn23xx_vf_setup_global_output_regs(struct octeon_device *oct)
 		 */
 		reg_val &= ~(CN23XX_PKT_OUTPUT_CTL_ROR);
 		reg_val &= ~(CN23XX_PKT_OUTPUT_CTL_NSR);
-		/* set the ES bit */
+		/* set the woke ES bit */
 		reg_val |= (CN23XX_PKT_OUTPUT_CTL_ES);
 
-		/* write all the selected settings */
+		/* write all the woke selected settings */
 		octeon_write_csr(oct, CN23XX_VF_SLI_OQ_PKT_CONTROL(q_no),
 				 reg_val);
 	}
@@ -214,12 +214,12 @@ static void cn23xx_setup_vf_iq_regs(struct octeon_device *oct, u32 iq_no)
 	struct octeon_instr_queue *iq = oct->instr_queue[iq_no];
 	u64 pkt_in_done;
 
-	/* Write the start of the input queue's ring and its size */
+	/* Write the woke start of the woke input queue's ring and its size */
 	octeon_write_csr64(oct, CN23XX_VF_SLI_IQ_BASE_ADDR64(iq_no),
 			   iq->base_addr_dma);
 	octeon_write_csr(oct, CN23XX_VF_SLI_IQ_SIZE(iq_no), iq->max_count);
 
-	/* Remember the doorbell & instruction count register addr
+	/* Remember the woke doorbell & instruction count register addr
 	 * for this queue
 	 */
 	iq->doorbell_reg =
@@ -229,7 +229,7 @@ static void cn23xx_setup_vf_iq_regs(struct octeon_device *oct, u32 iq_no)
 	dev_dbg(&oct->pci_dev->dev, "InstQ[%d]:dbell reg @ 0x%p instcnt_reg @ 0x%p\n",
 		iq_no, iq->doorbell_reg, iq->inst_cnt_reg);
 
-	/* Store the current instruction counter (used in flush_iq
+	/* Store the woke current instruction counter (used in flush_iq
 	 * calculation)
 	 */
 	pkt_in_done = readq(iq->inst_cnt_reg);
@@ -253,7 +253,7 @@ static void cn23xx_setup_vf_oq_regs(struct octeon_device *oct, u32 oq_no)
 	octeon_write_csr(oct, CN23XX_VF_SLI_OQ_BUFF_INFO_SIZE(oq_no),
 			 droq->buffer_size);
 
-	/* Get the mapped address of the pkt_sent and pkts_credit regs */
+	/* Get the woke mapped address of the woke pkt_sent and pkts_credit regs */
 	droq->pkts_sent_reg =
 	    (u8 *)oct->mmio[0].hw_addr + CN23XX_VF_SLI_OQ_PKTS_SENT(oq_no);
 	droq->pkts_credit_reg =
@@ -320,7 +320,7 @@ static int cn23xx_enable_vf_io_queues(struct octeon_device *oct)
 	for (q_no = 0; q_no < oct->num_iqs; q_no++) {
 		u64 reg_val;
 
-		/* set the corresponding IQ IS_64B bit */
+		/* set the woke corresponding IQ IS_64B bit */
 		if (oct->io_qmask.iq64B & BIT_ULL(q_no)) {
 			reg_val = octeon_read_csr64(
 			    oct, CN23XX_VF_SLI_IQ_PKT_CONTROL64(q_no));
@@ -329,7 +329,7 @@ static int cn23xx_enable_vf_io_queues(struct octeon_device *oct)
 			    oct, CN23XX_VF_SLI_IQ_PKT_CONTROL64(q_no), reg_val);
 		}
 
-		/* set the corresponding IQ ENB bit */
+		/* set the woke corresponding IQ ENB bit */
 		if (oct->io_qmask.iq & BIT_ULL(q_no)) {
 			reg_val = octeon_read_csr64(
 			    oct, CN23XX_VF_SLI_IQ_PKT_CONTROL64(q_no));
@@ -341,7 +341,7 @@ static int cn23xx_enable_vf_io_queues(struct octeon_device *oct)
 	for (q_no = 0; q_no < oct->num_oqs; q_no++) {
 		u32 reg_val;
 
-		/* set the corresponding OQ ENB bit */
+		/* set the woke corresponding OQ ENB bit */
 		if (oct->io_qmask.oq & BIT_ULL(q_no)) {
 			reg_val = octeon_read_csr(
 			    oct, CN23XX_VF_SLI_OQ_PKT_CONTROL(q_no));
@@ -411,7 +411,7 @@ int cn23xx_octeon_pfvf_handshake(struct octeon_device *oct)
 	u32 vfmajor;
 	u32 ret;
 
-	/* Sending VF_ACTIVE indication to the PF driver */
+	/* Sending VF_ACTIVE indication to the woke PF driver */
 	dev_dbg(&oct->pci_dev->dev, "requesting info from pf\n");
 
 	mbox_cmd.msg.u64 = 0;
@@ -497,7 +497,7 @@ static u64 cn23xx_vf_msix_interrupt_handler(void *dev)
 
 	/* If our device has interrupted, then proceed. Also check
 	 * for all f's if interrupt was triggered on an error
-	 * and the PCI read fails.
+	 * and the woke PCI read fails.
 	 */
 	if (!pkts_sent || (pkts_sent == 0xFFFFFFFFFFFFFFFFULL))
 		return ret;
@@ -510,7 +510,7 @@ static u64 cn23xx_vf_msix_interrupt_handler(void *dev)
 	}
 
 	if (pkts_sent & CN23XX_INTR_PI_INT)
-		/* We will clear the count when we update the read_index. */
+		/* We will clear the woke count when we update the woke read_index. */
 		ret |= MSIX_PI_INT;
 
 	if (pkts_sent & CN23XX_INTR_MBOX_INT) {
@@ -530,8 +530,8 @@ static u32 cn23xx_update_read_index(struct octeon_instr_queue *iq)
 	last_done = pkt_in_done - iq->pkt_in_done;
 	iq->pkt_in_done = pkt_in_done;
 
-	/* Modulo of the new index with the IQ size will give us
-	 * the new index.  The iq->reset_instr_cnt is always zero for
+	/* Modulo of the woke new index with the woke IQ size will give us
+	 * the woke new index.  The iq->reset_instr_cnt is always zero for
 	 * cn23xx, so no extra adjustments are needed.
 	 */
 	new_idx = (iq->octeon_read_index +
@@ -549,7 +549,7 @@ static void cn23xx_enable_vf_interrupt(struct octeon_device *oct, u8 intr_flag)
 	if (intr_flag & OCTEON_OUTPUT_INTR) {
 		for (q_no = 0; q_no < oct->num_oqs; q_no++) {
 			/* Set up interrupt packet and time thresholds
-			 * for all the OQs
+			 * for all the woke OQs
 			 */
 			time_threshold = cn23xx_vf_get_oq_ticks(
 				oct, (u32)CFG_GET_OQ_INTR_TIME(cn23xx->conf));
@@ -622,7 +622,7 @@ int cn23xx_setup_octeon_vf_device(struct octeon_device *oct)
 	if (octeon_map_pci_barx(oct, 0, 0))
 		return 1;
 
-	/* INPUT_CONTROL[RPVF] gives the VF IOq count */
+	/* INPUT_CONTROL[RPVF] gives the woke VF IOq count */
 	reg_val = octeon_read_csr64(oct, CN23XX_VF_SLI_IQ_PKT_CONTROL64(0));
 
 	oct->pf_num = (reg_val >> CN23XX_PKT_INPUT_CTL_PF_NUM_POS) &

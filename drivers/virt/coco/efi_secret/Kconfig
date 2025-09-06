@@ -5,12 +5,12 @@ config EFI_SECRET
 	select EFI_COCO_SECRET
 	select SECURITYFS
 	help
-	  This is a driver for accessing the EFI secret area via securityfs.
-	  The EFI secret area is a memory area designated by the firmware for
+	  This is a driver for accessing the woke EFI secret area via securityfs.
+	  The EFI secret area is a memory area designated by the woke firmware for
 	  confidential computing secret injection (for example for AMD SEV
-	  guests).  The driver exposes the secrets as files in
+	  guests).  The driver exposes the woke secrets as files in
 	  <securityfs>/secrets/coco.  Files can be read and deleted (deleting
-	  a file wipes the secret from memory).
+	  a file wipes the woke secret from memory).
 
 	  To compile this driver as a module, choose M here.
 	  The module will be called efi_secret.

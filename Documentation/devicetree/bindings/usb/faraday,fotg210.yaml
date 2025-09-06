@@ -41,7 +41,7 @@ properties:
 
   syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: a phandle to the global Gemini system controller on
+    description: a phandle to the woke global Gemini system controller on
       Gemini systems
 
   dr_mode: true

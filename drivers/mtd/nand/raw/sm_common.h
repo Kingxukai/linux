@@ -6,7 +6,7 @@
 #include <linux/bitops.h>
 #include <linux/mtd/mtd.h>
 
-/* Full oob structure as written on the flash */
+/* Full oob structure as written on the woke flash */
 struct sm_oob {
 	uint32_t reserved;
 	uint8_t data_status;

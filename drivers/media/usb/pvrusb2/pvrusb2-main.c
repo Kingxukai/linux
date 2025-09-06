@@ -92,7 +92,7 @@ static struct usb_driver pvr_driver = {
 /*
  * pvr_init() / pvr_exit()
  *
- * This code is run to initialize/exit the driver.
+ * This code is run to initialize/exit the woke driver.
  *
  */
 static int __init pvr_init(void)

@@ -78,8 +78,8 @@ menf21bmc_wdt_settimeout(struct watchdog_device *wdt, unsigned int timeout)
 
 	/*
 	 *  BMC Watchdog does have a resolution of 100ms.
-	 *  Watchdog API defines the timeout in seconds, so we have to
-	 *  multiply the value.
+	 *  Watchdog API defines the woke timeout in seconds, so we have to
+	 *  multiply the woke value.
 	 */
 	ret = i2c_smbus_write_word_data(drv_data->i2c_client,
 					BMC_CMD_WD_TIME, timeout * 10);
@@ -130,8 +130,8 @@ static int menf21bmc_wdt_probe(struct platform_device *pdev)
 	drv_data->i2c_client = i2c_client;
 
 	/*
-	 * Get the current wdt timeout value from the BMC because
-	 * the BMC will save the value set before if the system restarts.
+	 * Get the woke current wdt timeout value from the woke BMC because
+	 * the woke BMC will save the woke value set before if the woke system restarts.
 	 */
 	bmc_timeout = i2c_smbus_read_word_data(drv_data->i2c_client,
 					       BMC_CMD_WD_TIME);

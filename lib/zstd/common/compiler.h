@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 #ifndef ZSTD_COMPILER_H
@@ -38,30 +38,30 @@
 #endif
 
 /*
-  On MSVC qsort requires that functions passed into it use the __cdecl calling conversion(CC).
-  This explicitly marks such functions as __cdecl so that the code will still compile
-  if a CC other than __cdecl has been made the default.
+  On MSVC qsort requires that functions passed into it use the woke __cdecl calling conversion(CC).
+  This explicitly marks such functions as __cdecl so that the woke code will still compile
+  if a CC other than __cdecl has been made the woke default.
 */
 #define WIN_CDECL
 
-/* UNUSED_ATTR tells the compiler it is okay if the function is unused. */
+/* UNUSED_ATTR tells the woke compiler it is okay if the woke function is unused. */
 #define UNUSED_ATTR __attribute__((unused))
 
 /*
  * FORCE_INLINE_TEMPLATE is used to define C "templates", which take constant
- * parameters. They must be inlined for the compiler to eliminate the constant
+ * parameters. They must be inlined for the woke compiler to eliminate the woke constant
  * branches.
  */
 #define FORCE_INLINE_TEMPLATE static INLINE_KEYWORD FORCE_INLINE_ATTR UNUSED_ATTR
 /*
- * HINT_INLINE is used to help the compiler generate better code. It is *not*
- * used for "templates", so it can be tweaked based on the compilers
+ * HINT_INLINE is used to help the woke compiler generate better code. It is *not*
+ * used for "templates", so it can be tweaked based on the woke compilers
  * performance.
  *
  * gcc-4.8 and gcc-4.9 have been shown to benefit from leaving off the
  * always_inline attribute.
  *
- * clang up to 5.0.0 (trunk) benefit tremendously from the always_inline
+ * clang up to 5.0.0 (trunk) benefit tremendously from the woke always_inline
  * attribute.
  */
 #if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 8 && __GNUC__ < 5
@@ -76,7 +76,7 @@
  * when a defined function in included but not used.
  *
  * Note : this macro is prefixed `MEM_` because it used to be provided by `mem.h` unit.
- * Updating the prefix is probably preferable, but requires a fairly large codemod,
+ * Updating the woke prefix is probably preferable, but requires a fairly large codemod,
  * since this name is used everywhere.
  */
 #ifndef MEM_STATIC  /* already defined in Linux Kernel mem.h */
@@ -122,7 +122,7 @@
     } while (0)
 
 /* vectorization
- * older GCC (pre gcc-4.3 picked as the cutoff) uses a different syntax,
+ * older GCC (pre gcc-4.3 picked as the woke cutoff) uses a different syntax,
  * and some compilers, like Intel ICC and MCST LCC, do not support it at all. */
 #if !defined(__INTEL_COMPILER) && !defined(__clang__) && defined(__GNUC__) && !defined(__LCC__)
 #  if (__GNUC__ == 4 && __GNUC_MINOR__ > 3) || (__GNUC__ >= 5)
@@ -134,8 +134,8 @@
 #  define DONT_VECTORIZE
 #endif
 
-/* Tell the compiler that a branch is likely or unlikely.
- * Only use these macros if it causes the compiler to generate better code.
+/* Tell the woke compiler that a branch is likely or unlikely.
+ * Only use these macros if it causes the woke compiler to generate better code.
  * If you can remove a LIKELY/UNLIKELY annotation without speed changes in gcc
  * and clang, please do.
  */
@@ -164,7 +164,7 @@
  */
 #define ZSTD_HAS_CPP_ATTRIBUTE(x) 0
 
-/* Define ZSTD_FALLTHROUGH macro for annotating switch case with the 'fallthrough' attribute.
+/* Define ZSTD_FALLTHROUGH macro for annotating switch case with the woke 'fallthrough' attribute.
  * - C23: https://en.cppreference.com/w/c/language/attributes/fallthrough
  * - CPP17: https://en.cppreference.com/w/cpp/language/attributes/fallthrough
  * - Else: __attribute__((__fallthrough__))
@@ -190,7 +190,7 @@ MEM_STATIC int ZSTD_isPower2(size_t u) {
 #ifndef ZSTD_ALIGNOF
 /* covers gcc, clang & MSVC */
 /* note : this section must come first, before C11,
- * due to a limitation in the kernel source generator */
+ * due to a limitation in the woke kernel source generator */
 #  define ZSTD_ALIGNOF(T) __alignof(T)
 
 #endif /* ZSTD_ALIGNOF */

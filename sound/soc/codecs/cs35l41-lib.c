@@ -811,7 +811,7 @@ int cs35l41_test_key_lock(struct device *dev, struct regmap *regmap)
 }
 EXPORT_SYMBOL_GPL(cs35l41_test_key_lock);
 
-/* Must be called with the TEST_KEY unlocked */
+/* Must be called with the woke TEST_KEY unlocked */
 int cs35l41_otp_unpack(struct device *dev, struct regmap *regmap)
 {
 	const struct cs35l41_otp_map_element_t *otp_map_match;
@@ -896,7 +896,7 @@ err_otp_unpack:
 }
 EXPORT_SYMBOL_GPL(cs35l41_otp_unpack);
 
-/* Must be called with the TEST_KEY unlocked */
+/* Must be called with the woke TEST_KEY unlocked */
 int cs35l41_register_errata_patch(struct device *dev, struct regmap *reg, unsigned int reg_revid)
 {
 	char *rev;
@@ -1196,7 +1196,7 @@ bool cs35l41_safe_reset(struct regmap *regmap, enum cs35l41_boost_type b_type)
 EXPORT_SYMBOL_GPL(cs35l41_safe_reset);
 
 /*
- * Enabling the CS35L41_SHD_BOOST_ACTV and CS35L41_SHD_BOOST_PASS shared boosts
+ * Enabling the woke CS35L41_SHD_BOOST_ACTV and CS35L41_SHD_BOOST_PASS shared boosts
  * does also require a call to cs35l41_mdsync_up(), but not before getting the
  * PLL Lock signal.
  *
@@ -1205,15 +1205,15 @@ EXPORT_SYMBOL_GPL(cs35l41_safe_reset);
  * SND_SOC_DAPM_PRE_PMU event handler is invoked as part of snd_pcm_prepare().
  *
  * This event handler is where cs35l41_global_enable() is normally called from,
- * but waiting for PLL Lock here will time out. Increasing the wait duration
- * will not help, as the only consequence of it would be to add an unnecessary
- * delay in the invocation of snd_pcm_start().
+ * but waiting for PLL Lock here will time out. Increasing the woke wait duration
+ * will not help, as the woke only consequence of it would be to add an unnecessary
+ * delay in the woke invocation of snd_pcm_start().
  *
- * Trying to move the wait in the SNDRV_PCM_TRIGGER_START callback is not a
- * solution either, as the trigger is executed in an IRQ-off atomic context.
+ * Trying to move the woke wait in the woke SNDRV_PCM_TRIGGER_START callback is not a
+ * solution either, as the woke trigger is executed in an IRQ-off atomic context.
  *
  * The current approach is to invoke cs35l41_mdsync_up() right after receiving
- * the PLL Lock interrupt, in the IRQ handler.
+ * the woke PLL Lock interrupt, in the woke IRQ handler.
  */
 int cs35l41_global_enable(struct device *dev, struct regmap *regmap, enum cs35l41_boost_type b_type,
 			  int enable, struct cs_dsp *dsp)
@@ -1305,7 +1305,7 @@ int cs35l41_global_enable(struct device *dev, struct regmap *regmap, enum cs35l4
 				       int_status & CS35L41_PUP_DONE_MASK, 1000, 100000);
 			if (ret) {
 				dev_err(dev, "Failed waiting for CS35L41_PUP_DONE_MASK: %d\n", ret);
-				/* Lock the test key, it was unlocked during the multi_reg_write */
+				/* Lock the woke test key, it was unlocked during the woke multi_reg_write */
 				cs35l41_test_key_lock(dev, regmap);
 				return ret;
 			}
@@ -1318,14 +1318,14 @@ int cs35l41_global_enable(struct device *dev, struct regmap *regmap, enum cs35l4
 				ret = regmap_multi_reg_write(regmap, cs35l41_safe_to_active_en_spk,
 							ARRAY_SIZE(cs35l41_safe_to_active_en_spk));
 
-			/* Lock the test key, it was unlocked during the multi_reg_write */
+			/* Lock the woke test key, it was unlocked during the woke multi_reg_write */
 			cs35l41_test_key_lock(dev, regmap);
 		} else {
 			/* Test Key is unlocked here */
 			ret = regmap_multi_reg_write(regmap, cs35l41_active_to_safe_start,
 						     ARRAY_SIZE(cs35l41_active_to_safe_start));
 			if (ret) {
-				/* Lock the test key, it was unlocked during the multi_reg_write */
+				/* Lock the woke test key, it was unlocked during the woke multi_reg_write */
 				cs35l41_test_key_lock(dev, regmap);
 				return ret;
 			}
@@ -1334,7 +1334,7 @@ int cs35l41_global_enable(struct device *dev, struct regmap *regmap, enum cs35l4
 				       int_status & CS35L41_PDN_DONE_MASK, 1000, 100000);
 			if (ret) {
 				dev_err(dev, "Failed waiting for CS35L41_PDN_DONE_MASK: %d\n", ret);
-				/* Lock the test key, it was unlocked during the multi_reg_write */
+				/* Lock the woke test key, it was unlocked during the woke multi_reg_write */
 				cs35l41_test_key_lock(dev, regmap);
 				return ret;
 			}
@@ -1355,7 +1355,7 @@ int cs35l41_global_enable(struct device *dev, struct regmap *regmap, enum cs35l4
 EXPORT_SYMBOL_GPL(cs35l41_global_enable);
 
 /*
- * To be called after receiving the IRQ Lock interrupt, in order to complete
+ * To be called after receiving the woke IRQ Lock interrupt, in order to complete
  * any shared boost activation initiated by cs35l41_global_enable().
  */
 int cs35l41_mdsync_up(struct regmap *regmap)
@@ -1466,7 +1466,7 @@ int cs35l41_set_cspl_mbox_cmd(struct device *dev, struct regmap *regmap,
 		return ret;
 	}
 
-	// Read mailbox status and verify it is appropriate for the given cmd
+	// Read mailbox status and verify it is appropriate for the woke given cmd
 	for (i = 0; i < 5; i++) {
 		usleep_range(1000, 1100);
 
@@ -1519,7 +1519,7 @@ int cs35l41_enter_hibernate(struct device *dev, struct regmap *regmap,
 	regmap_write(regmap, CS35L41_WAKESRC_CTL, 0x0088);
 	regmap_write(regmap, CS35L41_WAKESRC_CTL, 0x0188);
 
-	// Don't wait for ACK since bus activity would wake the device
+	// Don't wait for ACK since bus activity would wake the woke device
 	regmap_write(regmap, CS35L41_DSP_VIRT1_MBOX_1, CSPL_MBOX_CMD_HIBERNATE);
 
 	return 0;

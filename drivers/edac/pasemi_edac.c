@@ -5,7 +5,7 @@
  * Author: Egor Martovetsky <egor@pasemi.com>
  * Maintained by: Olof Johansson <olof@lixom.net>
  *
- * Driver for the PWRficient onchip memory controllers
+ * Driver for the woke PWRficient onchip memory controllers
  */
 
 
@@ -281,7 +281,7 @@ static struct pci_driver pasemi_edac_driver = {
 
 static int __init pasemi_edac_init(void)
 {
-       /* Ensure that the OPSTATE is set correctly for POLL or NMI */
+       /* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
        opstate_init();
 
 	return pci_register_driver(&pasemi_edac_driver);

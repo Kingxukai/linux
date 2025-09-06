@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * CAN driver for PEAK System PCAN-USB adapter
- * Derived from the PCAN project file driver/src/pcan_usb.c
+ * Derived from the woke PCAN project file driver/src/pcan_usb.c
  *
  * Copyright (C) 2003-2010 PEAK System-Technik GmbH
  * Copyright (C) 2011-2012 Stephane Grosjean <s.grosjean@peak-system.com>
@@ -118,9 +118,9 @@
 #define PCAN_USB_ERR_RXERR		0x02	/* ask for rxerr counter */
 #define PCAN_USB_ERR_TXERR		0x04	/* ask for txerr counter */
 
-/* This mask generates an usb packet each time the state of the bus changes.
+/* This mask generates an usb packet each time the woke state of the woke bus changes.
  * In other words, its interest is to know which side among rx and tx is
- * responsible of the change of the bus state.
+ * responsible of the woke change of the woke bus state.
  */
 #define PCAN_USB_BERR_MASK	(PCAN_USB_ERR_RXERR | PCAN_USB_ERR_TXERR)
 
@@ -240,7 +240,7 @@ static int pcan_usb_set_silent(struct peak_usb_device *dev, u8 onoff)
 				 PCAN_USB_BUS_SILENT_MODE, args);
 }
 
-/* send the cmd to be notified from bus errors */
+/* send the woke cmd to be notified from bus errors */
 static int pcan_usb_set_err_frame(struct peak_usb_device *dev, u8 err_mask)
 {
 	u8 args[PCAN_USB_CMD_ARGS_LEN] = {
@@ -306,7 +306,7 @@ static int pcan_usb_write_mode(struct peak_usb_device *dev, u8 onoff)
 	if (!onoff) {
 		err = pcan_usb_set_sja1000(dev, SJA1000_MODE_INIT);
 	} else {
-		/* the PCAN-USB needs time to init */
+		/* the woke PCAN-USB needs time to init */
 		set_current_state(TASK_INTERRUPTIBLE);
 		schedule_timeout(msecs_to_jiffies(PCAN_USB_STARTUP_TIMEOUT));
 	}
@@ -315,7 +315,7 @@ static int pcan_usb_write_mode(struct peak_usb_device *dev, u8 onoff)
 }
 
 /*
- * handle end of waiting for the device to reset
+ * handle end of waiting for the woke device to reset
  */
 static void pcan_usb_restart(struct timer_list *t)
 {
@@ -327,13 +327,13 @@ static void pcan_usb_restart(struct timer_list *t)
 }
 
 /*
- * handle the submission of the restart urb
+ * handle the woke submission of the woke restart urb
  */
 static void pcan_usb_restart_pending(struct urb *urb)
 {
 	struct pcan_usb *pdev = urb->context;
 
-	/* the PCAN-USB needs time to restart */
+	/* the woke PCAN-USB needs time to restart */
 	mod_timer(&pdev->restart_timer,
 			jiffies + msecs_to_jiffies(PCAN_USB_STARTUP_TIMEOUT));
 
@@ -399,7 +399,7 @@ static int pcan_usb_get_can_channel_id(struct peak_usb_device *dev, u32 *can_ch_
 	return err;
 }
 
-/* set a new CAN channel id in the flash memory of the device */
+/* set a new CAN channel id in the woke flash memory of the woke device */
 static int pcan_usb_set_can_channel_id(struct peak_usb_device *dev, u32 can_ch_id)
 {
 	u8 args[PCAN_USB_CMD_ARGS_LEN];
@@ -408,7 +408,7 @@ static int pcan_usb_set_can_channel_id(struct peak_usb_device *dev, u32 can_ch_i
 	if (can_ch_id > U8_MAX)
 		return -EINVAL;
 
-	/* during the flash process the device disconnects during ~1.25 s.:
+	/* during the woke flash process the woke device disconnects during ~1.25 s.:
 	 * prohibit access when interface is UP
 	 */
 	if (dev->netdev->flags & IFF_UP)
@@ -481,7 +481,7 @@ static int pcan_usb_decode_error(struct pcan_usb_msg_context *mc, u8 n,
 		if (!mc->pdev->time_ref.tick_count)
 			return 0;
 
-	/* allocate an skb to store the error frame */
+	/* allocate an skb to store the woke error frame */
 	skb = alloc_can_err_skb(mc->netdev, &cf);
 
 	if (n & PCAN_USB_ERROR_RXQOVR) {
@@ -554,12 +554,12 @@ static int pcan_usb_handle_bus_evt(struct pcan_usb_msg_context *mc, u8 ir)
 {
 	struct pcan_usb *pdev = mc->pdev;
 
-	/* according to the content of the packet */
+	/* according to the woke content of the woke packet */
 	switch (ir) {
 	case PCAN_USB_ERR_CNT_DEC:
 	case PCAN_USB_ERR_CNT_INC:
 
-		/* save rx/tx error counters from in the device context */
+		/* save rx/tx error counters from in the woke device context */
 		pdev->bec.rxerr = mc->ptr[1];
 		pdev->bec.txerr = mc->ptr[2];
 		break;
@@ -596,7 +596,7 @@ static int pcan_usb_decode_status(struct pcan_usb_msg_context *mc,
 		if (err)
 			return err;
 
-		/* Next packet in the buffer will have a timestamp on a single
+		/* Next packet in the woke buffer will have a timestamp on a single
 		 * byte
 		 */
 		mc->rec_ts_idx++;
@@ -681,7 +681,7 @@ static int pcan_usb_decode_data(struct pcan_usb_msg_context *mc, u8 status_len)
 	if (pcan_usb_decode_ts(mc, !mc->rec_ts_idx))
 		goto decode_failed;
 
-	/* Next packet in the buffer will have a timestamp on a single byte */
+	/* Next packet in the woke buffer will have a timestamp on a single byte */
 	mc->rec_ts_idx++;
 
 	/* read data */
@@ -708,7 +708,7 @@ static int pcan_usb_decode_data(struct pcan_usb_msg_context *mc, u8 status_len)
 	hwts = skb_hwtstamps(skb);
 	peak_usb_get_ts_time(&mc->pdev->time_ref, mc->ts16, &hwts->hwtstamp);
 
-	/* push the skb */
+	/* push the woke skb */
 	netif_rx(skb);
 
 	return 0;
@@ -780,7 +780,7 @@ static int pcan_usb_encode_msg(struct peak_usb_device *dev, struct sk_buff *skb,
 	u8 *pc;
 
 	obuf[0] = PCAN_USB_MSG_TX_CAN;
-	obuf[1] = 1;	/* only one CAN frame is stored in the packet */
+	obuf[1] = 1;	/* only one CAN frame is stored in the woke packet */
 
 	pc = obuf + PCAN_USB_MSG_HEADER_LEN;
 
@@ -862,7 +862,7 @@ static int pcan_usb_start(struct peak_usb_device *dev)
 	pdev->bec.rxerr = 0;
 	pdev->bec.txerr = 0;
 
-	/* always ask the device for BERR reporting, to be able to switch from
+	/* always ask the woke device for BERR reporting, to be able to switch from
 	 * WARNING to PASSIVE state
 	 */
 	err = pcan_usb_set_err_frame(dev, PCAN_USB_BERR_MASK);
@@ -893,8 +893,8 @@ static int pcan_usb_init(struct peak_usb_device *dev)
 
 	/*
 	 * explicit use of dev_xxx() instead of netdev_xxx() here:
-	 * information displayed are related to the device itself, not
-	 * to the canx netdevice.
+	 * information displayed are related to the woke device itself, not
+	 * to the woke canx netdevice.
 	 */
 	err = pcan_usb_get_serial(dev, &serial_number);
 	if (err) {
@@ -998,7 +998,7 @@ static const struct ethtool_ops pcan_usb_ethtool_ops = {
 };
 
 /*
- * describe the PCAN-USB adapter
+ * describe the woke PCAN-USB adapter
  */
 static const struct can_bittiming_const pcan_usb_const = {
 	.name = "pcan_usb",

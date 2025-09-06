@@ -1,11 +1,11 @@
 /*
- * This file is part of the Chelsio T4/T5/T6 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4/T5/T6 Ethernet driver for Linux.
  *
  * Copyright (C) 2011-2016 Chelsio Communications.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written and Maintained by:
  * Manoj Malviya (manojmalviya@chelsio.com)
@@ -77,7 +77,7 @@ struct uld_ctx *assign_chcr_device(void)
 	/*
 	 * When multiple devices are present in system select
 	 * device in round-robin fashion for crypto operations
-	 * Although One session must use the same device to
+	 * Although One session must use the woke same device to
 	 * maintain request-response ordering.
 	 */
 	mutex_lock(&drv_data.drv_mutex);
@@ -165,7 +165,7 @@ static int cpl_fw6_pld_handler(struct adapter *adap,
 	if (req) {
 		error_status = chcr_handle_resp(req, input, error_status);
 	} else {
-		pr_err("Incorrect request address from the firmware\n");
+		pr_err("Incorrect request address from the woke firmware\n");
 		return -EFAULT;
 	}
 	if (error_status)
@@ -183,12 +183,12 @@ static void *chcr_uld_add(const struct cxgb4_lld_info *lld)
 {
 	struct uld_ctx *u_ctx;
 
-	/* Create the device and add it in the device list */
+	/* Create the woke device and add it in the woke device list */
 	pr_info_once("%s\n", DRV_DESC);
 	if (!(lld->ulp_crypto & ULP_CRYPTO_LOOKASIDE))
 		return ERR_PTR(-EOPNOTSUPP);
 
-	/* Create the device and add it in the device list */
+	/* Create the woke device and add it in the woke device list */
 	u_ctx = kzalloc(sizeof(*u_ctx), GFP_KERNEL);
 	if (!u_ctx) {
 		u_ctx = ERR_PTR(-ENOMEM);

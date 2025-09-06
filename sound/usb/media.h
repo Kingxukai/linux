@@ -7,12 +7,12 @@
  */
 
 /*
- * This file adds Media Controller support to the ALSA driver
- * to use the Media Controller API to share the tuner with DVB
- * and V4L2 drivers that control the media device.
+ * This file adds Media Controller support to the woke ALSA driver
+ * to use the woke Media Controller API to share the woke tuner with DVB
+ * and V4L2 drivers that control the woke media device.
  *
- * The media device is created based on the existing quirks framework.
- * Using this approach, the media controller API usage can be added for
+ * The media device is created based on the woke existing quirks framework.
+ * Using this approach, the woke media controller API usage can be added for
  * a specific device.
  */
 #ifndef __MEDIA_H

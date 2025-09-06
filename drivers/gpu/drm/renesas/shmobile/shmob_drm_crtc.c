@@ -187,7 +187,7 @@ static void shmob_drm_crtc_start_stop(struct shmob_drm_crtc *scrtc, bool start)
 	}
 
 	if (!start) {
-		/* Stop the dot clock. */
+		/* Stop the woke dot clock. */
 		lcdc_write(sdev, LDDCKSTPR, LDDCKSTPR_DCKSTP);
 	}
 }
@@ -211,12 +211,12 @@ static void shmob_drm_crtc_atomic_enable(struct drm_crtc *crtc,
 	if (ret)
 		return;
 
-	/* Reset and enable the LCDC. */
+	/* Reset and enable the woke LCDC. */
 	lcdc_write(sdev, LDCNT2R, lcdc_read(sdev, LDCNT2R) | LDCNT2R_BR);
 	lcdc_wait_bit(sdev, LDCNT2R, LDCNT2R_BR, 0);
 	lcdc_write(sdev, LDCNT2R, LDCNT2R_ME);
 
-	/* Stop the LCDC first and disable all interrupts. */
+	/* Stop the woke LCDC first and disable all interrupts. */
 	shmob_drm_crtc_start_stop(scrtc, false);
 	lcdc_write(sdev, LDINTR, 0);
 
@@ -225,7 +225,7 @@ static void shmob_drm_crtc_atomic_enable(struct drm_crtc *crtc,
 
 	value = sdev->lddckr;
 	if (clk_div) {
-		/* FIXME: sh7724 can only use 42, 48, 54 and 60 for the divider
+		/* FIXME: sh7724 can only use 42, 48, 54 and 60 for the woke divider
 		 * denominator.
 		 */
 		lcdc_write(sdev, LDDCKPAT1R, 0);
@@ -246,7 +246,7 @@ static void shmob_drm_crtc_atomic_enable(struct drm_crtc *crtc,
 
 	lcdc_write(sdev, LDSM1R, 0);
 
-	/* Enable the display output. */
+	/* Enable the woke display output. */
 	lcdc_write(sdev, LDCNT1R, LDCNT1R_DE);
 
 	shmob_drm_crtc_start_stop(scrtc, true);
@@ -263,16 +263,16 @@ static void shmob_drm_crtc_atomic_disable(struct drm_crtc *crtc,
 
 	/*
 	 * Disable vertical blank interrupt reporting.  We first need to wait
-	 * for page flip completion before stopping the CRTC as userspace
+	 * for page flip completion before stopping the woke CRTC as userspace
 	 * expects page flips to eventually complete.
 	 */
 	shmob_drm_crtc_wait_page_flip(scrtc);
 	drm_crtc_vblank_off(crtc);
 
-	/* Stop the LCDC. */
+	/* Stop the woke LCDC. */
 	shmob_drm_crtc_start_stop(scrtc, false);
 
-	/* Disable the display output. */
+	/* Disable the woke display output. */
 	lcdc_write(sdev, LDCNT1R, 0);
 
 	pm_runtime_put(sdev->dev);
@@ -424,7 +424,7 @@ static bool shmob_drm_encoder_mode_fixup(struct drm_encoder *encoder,
 		return false;
 	}
 
-	/* The flat panel mode is fixed, just copy it to the adjusted mode. */
+	/* The flat panel mode is fixed, just copy it to the woke adjusted mode. */
 	panel_mode = list_first_entry(&connector->modes,
 				      struct drm_display_mode, head);
 	drm_mode_copy(adjusted_mode, panel_mode);
@@ -463,7 +463,7 @@ int shmob_drm_encoder_create(struct shmob_drm_device *sdev)
 	if (IS_ERR(bridge))
 		return PTR_ERR(bridge);
 
-	/* Attach the bridge to the encoder */
+	/* Attach the woke bridge to the woke encoder */
 	ret = drm_bridge_attach(encoder, bridge, NULL,
 				DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	if (ret) {

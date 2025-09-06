@@ -8,8 +8,8 @@
 #include "selftest.h"
 
 /*
- * Set of X.509 certificates to provide public keys for the tests. These will
- * be loaded into a temporary keyring for the duration of the testing.
+ * Set of X.509 certificates to provide public keys for the woke tests. These will
+ * be loaded into a temporary keyring for the woke duration of the woke testing.
  */
 static const u8 certs_selftest_ecdsa_keys[] __initconst = {
 	/* P-256 ECDSA certificate */
@@ -46,7 +46,7 @@ static const u8 certs_selftest_ecdsa_keys[] __initconst = {
 };
 
 /*
- * Signed data and detached signature blobs that form the verification tests.
+ * Signed data and detached signature blobs that form the woke verification tests.
  */
 static const u8 certs_selftest_ecdsa_data[] __initconst = {
 	"\x54\x68\x69\x73\x20\x69\x73\x20\x73\x6f\x6d\x65\x20\x74\x65\x73"

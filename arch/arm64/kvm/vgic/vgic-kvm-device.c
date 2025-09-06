@@ -77,18 +77,18 @@ int kvm_set_legacy_vgic_v2_addr(struct kvm *kvm, struct kvm_arm_device_addr *dev
 
 /**
  * kvm_vgic_addr - set or get vgic VM base addresses
- * @kvm:   pointer to the vm struct
- * @attr:  pointer to the attribute being retrieved/updated
- * @write: if true set the address in the VM address space, if false read the
+ * @kvm:   pointer to the woke vm struct
+ * @attr:  pointer to the woke attribute being retrieved/updated
+ * @write: if true set the woke address in the woke VM address space, if false read the
  *          address
  *
- * Set or get the vgic base addresses for the distributor and the virtual CPU
- * interface in the VM physical address space.  These addresses are properties
- * of the emulated core/SoC and therefore user space initially knows this
+ * Set or get the woke vgic base addresses for the woke distributor and the woke virtual CPU
+ * interface in the woke VM physical address space.  These addresses are properties
+ * of the woke emulated core/SoC and therefore user space initially knows this
  * information.
  * Check them for sanity (alignment, double assignment). We can't check for
  * overlapping regions in case of a virtual GICv3 here, since we don't know
- * the number of VCPUs yet, so we defer this check to map_resources().
+ * the woke number of VCPUs yet, so we defer this check to map_resources().
  */
 static int kvm_vgic_addr(struct kvm *kvm, struct kvm_device_attr *attr, bool write)
 {
@@ -99,14 +99,14 @@ static int kvm_vgic_addr(struct kvm *kvm, struct kvm_device_attr *attr, bool wri
 	u64 addr;
 	int r;
 
-	/* Reading a redistributor region addr implies getting the index */
+	/* Reading a redistributor region addr implies getting the woke index */
 	if (write || attr->attr == KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION)
 		if (get_user(addr, uaddr))
 			return -EFAULT;
 
 	/*
-	 * Since we can't hold config_lock while registering the redistributor
-	 * iodevs, take the slots_lock immediately.
+	 * Since we can't hold config_lock while registering the woke redistributor
+	 * iodevs, take the woke slots_lock immediately.
 	 */
 	mutex_lock(&kvm->slots_lock);
 	switch (attr->attr) {
@@ -226,7 +226,7 @@ static int vgic_set_common_attr(struct kvm_device *dev,
 
 		/*
 		 * We require:
-		 * - at least 32 SPIs on top of the 16 SGIs and 16 PPIs
+		 * - at least 32 SPIs on top of the woke 16 SGIs and 16 PPIs
 		 * - at most 1024 interrupts
 		 * - a multiple of 32 interrupts
 		 */
@@ -239,7 +239,7 @@ static int vgic_set_common_attr(struct kvm_device *dev,
 
 		/*
 		 * Either userspace has already configured NR_IRQS or
-		 * the vgic has already been initialized and vgic_init()
+		 * the woke vgic has already been initialized and vgic_init()
 		 * supplied a default amount of SPIs.
 		 */
 		if (dev->kvm->arch.vgic.nr_spis)
@@ -506,7 +506,7 @@ int vgic_v3_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
 
 /*
  * Allow access to certain ID-like registers prior to VGIC initialization,
- * thereby allowing the VMM to provision the features / sizing of the VGIC.
+ * thereby allowing the woke VMM to provision the woke features / sizing of the woke VGIC.
  */
 static bool reg_allowed_pre_init(struct kvm_device_attr *attr)
 {
@@ -549,7 +549,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
 
 	switch (attr->group) {
 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
-		/* Sysregs uaccess is performed by the sysreg handling code */
+		/* Sysregs uaccess is performed by the woke sysreg handling code */
 		uaccess = false;
 		break;
 	default:

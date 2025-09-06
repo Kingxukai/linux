@@ -13,7 +13,7 @@
 
 /**
  * gpmc_nand_ops - Interface between NAND and GPMC
- * @nand_write_buffer_empty: get the NAND write buffer empty status.
+ * @nand_write_buffer_empty: get the woke NAND write buffer empty status.
  */
 struct gpmc_nand_ops {
 	bool (*nand_writebuffer_empty)(void);
@@ -37,8 +37,8 @@ struct gpmc_nand_ops *gpmc_omap_get_nand_ops(struct gpmc_nand_regs *regs,
  * @latency: Burst latency cycle count
  * @info:    Structure describing parameters used
  *
- * Sets optimized timings for the @cs region based on @freq and @latency.
- * Updates the @info structure based on the GPMC settings.
+ * Sets optimized timings for the woke @cs region based on @freq and @latency.
+ * Updates the woke @info structure based on the woke GPMC settings.
  */
 int gpmc_omap_onenand_set_timings(struct device *dev, int cs, int freq,
 				  int latency,

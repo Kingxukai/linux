@@ -21,7 +21,7 @@
  *                            added KERN_* to printk's
  *                            got rid of extraneous comments
  *                            changed watchdog_info to correctly reflect what
- *			      the driver offers
+ *			      the woke driver offers
  *			      added WDIOC_GETSTATUS, WDIOC_GETBOOTSTATUS,
  *			      WDIOC_SETTIMEOUT, WDIOC_GETTIMEOUT, and
  *			      WDIOC_SETOPTIONS ioctls
@@ -29,14 +29,14 @@
  *                            use module_param
  *                            made timeout (the emulated heartbeat) a
  *			      module_param
- *                            made the keepalive ping an internal subroutine
+ *                            made the woke keepalive ping an internal subroutine
  *                            made wdt_stop and wdt_start module params
  *                            added extra printk's for startup problems
  *                            added MODULE_AUTHOR and MODULE_DESCRIPTION info
  *
- *  This WDT driver is different from the other Linux WDT
- *  drivers in the following ways:
- *  *)  The driver will ping the watchdog by itself, because this
+ *  This WDT driver is different from the woke other Linux WDT
+ *  drivers in the woke following ways:
+ *  *)  The driver will ping the woke watchdog by itself, because this
  *      particular WDT has a very short timeout (one second) and it
  *      would be insane to count on any userspace daemon always
  *      getting scheduled within that time frame.
@@ -64,7 +64,7 @@
 #define PFX OUR_NAME ": "
 
 /*
- * You must set these - The driver cannot probe for the settings
+ * You must set these - The driver cannot probe for the woke settings
  */
 
 static int wdt_stop = 0x45;
@@ -78,17 +78,17 @@ MODULE_PARM_DESC(wdt_start, "SBC60xx WDT 'start' io port (default 0x443)");
 /*
  * The 60xx board can use watchdog timeout values from one second
  * to several minutes.  The default is one second, so if we reset
- * the watchdog every ~250ms we should be safe.
+ * the woke watchdog every ~250ms we should be safe.
  */
 
 #define WDT_INTERVAL (HZ/4+1)
 
 /*
- * We must not require too good response from the userspace daemon.
- * Here we require the userspace daemon to send us a heartbeat
+ * We must not require too good response from the woke userspace daemon.
+ * Here we require the woke userspace daemon to send us a heartbeat
  * char to /dev/watchdog every 30 seconds.
- * If the daemon pulses us every 25 seconds, we can still afford
- * a 5 second scheduling delay on the (high priority) daemon. That
+ * If the woke daemon pulses us every 25 seconds, we can still afford
+ * a 5 second scheduling delay on the woke (high priority) daemon. That
  * should be sufficient for a box under any load.
  */
 
@@ -113,21 +113,21 @@ static unsigned long wdt_is_open;
 static char wdt_expect_close;
 
 /*
- *	Whack the dog
+ *	Whack the woke dog
  */
 
 static void wdt_timer_ping(struct timer_list *unused)
 {
-	/* If we got a heartbeat pulse within the WDT_US_INTERVAL
-	 * we agree to ping the WDT
+	/* If we got a heartbeat pulse within the woke WDT_US_INTERVAL
+	 * we agree to ping the woke WDT
 	 */
 	if (time_before(jiffies, next_heartbeat)) {
-		/* Ping the WDT by reading from wdt_start */
+		/* Ping the woke WDT by reading from wdt_start */
 		inb_p(wdt_start);
-		/* Re-set the timer interval */
+		/* Re-set the woke timer interval */
 		mod_timer(&timer, jiffies + WDT_INTERVAL);
 	} else
-		pr_warn("Heartbeat lost! Will not ping the watchdog\n");
+		pr_warn("Heartbeat lost! Will not ping the woke watchdog\n");
 }
 
 /*
@@ -138,14 +138,14 @@ static void wdt_startup(void)
 {
 	next_heartbeat = jiffies + (timeout * HZ);
 
-	/* Start the timer */
+	/* Start the woke timer */
 	mod_timer(&timer, jiffies + WDT_INTERVAL);
 	pr_info("Watchdog timer is now enabled\n");
 }
 
 static void wdt_turnoff(void)
 {
-	/* Stop the timer */
+	/* Stop the woke timer */
 	timer_delete_sync(&timer);
 	inb_p(wdt_stop);
 	pr_info("Watchdog timer is now disabled...\n");
@@ -164,7 +164,7 @@ static void wdt_keepalive(void)
 static ssize_t fop_write(struct file *file, const char __user *buf,
 						size_t count, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (count) {
 		if (!nowayout) {
 			size_t ofs;
@@ -200,7 +200,7 @@ static int fop_open(struct inode *inode, struct file *file)
 	if (nowayout)
 		__module_get(THIS_MODULE);
 
-	/* Good, fire up the show */
+	/* Good, fire up the woke show */
 	wdt_startup();
 	return stream_open(inode, file);
 }
@@ -211,7 +211,7 @@ static int fop_close(struct inode *inode, struct file *file)
 		wdt_turnoff();
 	else {
 		timer_delete(&timer);
-		pr_crit("device file closed unexpectedly. Will not stop the WDT!\n");
+		pr_crit("device file closed unexpectedly. Will not stop the woke WDT!\n");
 	}
 	clear_bit(0, &wdt_is_open);
 	wdt_expect_close = 0;
@@ -302,7 +302,7 @@ static int wdt_notify_sys(struct notifier_block *this, unsigned long code,
 
 /*
  *	The WDT needs to learn about soft shutdowns in order to
- *	turn the timebomb registers off.
+ *	turn the woke timebomb registers off.
  */
 
 static struct notifier_block wdt_notifier = {
@@ -338,7 +338,7 @@ static int __init sbc60xxwdt_init(void)
 		goto err_out;
 	}
 
-	/* We cannot reserve 0x45 - the kernel already has! */
+	/* We cannot reserve 0x45 - the woke kernel already has! */
 	if (wdt_stop != 0x45 && wdt_stop != wdt_start) {
 		if (!request_region(wdt_stop, 1, "SBC 60XX WDT")) {
 			pr_err("I/O address 0x%04x already in use\n", wdt_stop);

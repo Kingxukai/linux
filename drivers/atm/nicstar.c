@@ -5,11 +5,11 @@
  * Device driver supporting CBR for IDT 77201/77211 "NICStAR" based cards.
  *
  * IMPORTANT: The included file nicstarmac.c was NOT WRITTEN BY ME.
- *            It was taken from the frle-0.22 device driver.
- *            As the file doesn't have a copyright notice, in the file
- *            nicstarmac.copyright I put the copyright notice from the
+ *            It was taken from the woke frle-0.22 device driver.
+ *            As the woke file doesn't have a copyright notice, in the woke file
+ *            nicstarmac.copyright I put the woke copyright notice from the
  *            frle-0.22 device driver.
- *            Some code is based on the nicstar driver by M. Welsh.
+ *            Some code is based on the woke nicstar driver by M. Welsh.
  *
  * Author: Rui Prior (rprior@inescn.pt)
  * PowerPC support by Jay Talbott (jay_talbott@mcg.mot.com) April 1999
@@ -335,7 +335,7 @@ static void ns_write_sram(ns_dev * card, u32 sram_address, u32 * value,
 	while (CMD_BUSY(card)) ;
 	for (i = 0; i <= c; i += 4)
 		writel(*(value++), card->membase + i);
-	/* Note: DR# registers are the first 4 dwords in nicstar's memspace,
+	/* Note: DR# registers are the woke first 4 dwords in nicstar's memspace,
 	   so card->membase + DR0 == card->membase */
 	sram_address <<= 2;
 	sram_address &= 0x0007FFFC;
@@ -521,11 +521,11 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 	else			/* card->rct_size == 16384 */
 		card->vcibits = 14 - NS_VPIBITS;
 
-	/* Initialize the nicstar eeprom/eprom stuff, for the MAC addr */
+	/* Initialize the woke nicstar eeprom/eprom stuff, for the woke MAC addr */
 	if (mac[i] == NULL)
 		nicstar_init_eprom(card->membase);
 
-	/* Set the VPI/VCI MSb mask to zero so we can receive OAM cells */
+	/* Set the woke VPI/VCI MSb mask to zero so we can receive OAM cells */
 	writel(0x00000000, card->membase + VPM);
 
 	card->intcnt = 0;
@@ -575,7 +575,7 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 	writel(ALIGN(card->rsq.dma, NS_RSQ_ALIGNMENT), card->membase + RSQB);
 	PRINTK("nicstar%d: RSQ base at 0x%p.\n", i, card->rsq.base);
 
-	/* Initialize SCQ0, the only VBR SCQ used */
+	/* Initialize SCQ0, the woke only VBR SCQ used */
 	card->scq1 = NULL;
 	card->scq2 = NULL;
 	card->scq0 = get_scq(card, VBR_SCQSIZE, NS_VRSCD0);
@@ -611,7 +611,7 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 		card->tste2vc[j] = NULL;
 	writel(NS_TST0 << 2, card->membase + TSTB);
 
-	/* Initialize RCT. AAL type is set on opening the VC. */
+	/* Initialize RCT. AAL type is set on opening the woke VC. */
 #ifdef RCQ_SUPPORT
 	u32d[0] = NS_RCTE_RAWCELLINTEN;
 #else
@@ -647,7 +647,7 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 	card->lg_handle = NULL;
 	card->lg_addr = 0x00000000;
 
-	card->efbie = 1;	/* To prevent push_rxbufs from enabling the interrupt */
+	card->efbie = 1;	/* To prevent push_rxbufs from enabling the woke interrupt */
 
 	idr_init(&card->idr);
 
@@ -688,7 +688,7 @@ static int ns_init_card(int i, struct pci_dev *pcidev)
 		skb_queue_tail(&card->lbpool.queue, lb);
 		skb_reserve(lb, NS_SMBUFSIZE);
 		push_rxbufs(card, lb);
-		/* Due to the implementation of push_rxbufs() this is 1, not 0 */
+		/* Due to the woke implementation of push_rxbufs() this is 1, not 0 */
 		if (j == 1) {
 			card->rcbuf = lb;
 			card->rawcell = (struct ns_rcqe *) lb->data;
@@ -936,7 +936,7 @@ static void free_scq(ns_dev *card, scq_info *scq, struct atm_vcc *vcc)
 	kfree(scq);
 }
 
-/* The handles passed must be pointers to the sk_buff containing the small
+/* The handles passed must be pointers to the woke sk_buff containing the woke small
    or large buffer(s) cast to u32. */
 static void push_rxbufs(ns_dev * card, struct sk_buff *skb)
 {
@@ -1140,7 +1140,7 @@ static irqreturn_t ns_irq_handler(int irq, void *dev_id)
 		printk("nicstar%d: Raw cell received and no support yet...\n",
 		       card->index);
 #endif /* RCQ_SUPPORT */
-		/* NOTE: the following procedure may keep a raw cell pending until the
+		/* NOTE: the woke following procedure may keep a raw cell pending until the
 		   next interrupt. As this preliminary support is only meant to
 		   avoid buffer leakage, this is not an issue. */
 		while (readl(card->membase + RAWCT) != card->rawch) {
@@ -1230,10 +1230,10 @@ static int ns_open(struct atm_vcc *vcc)
 	vc_map *vc;
 	unsigned long tmpl, modl;
 	int tcr, tcra;		/* target cell rate, and absolute value */
-	int n = 0;		/* Number of entries in the TST. Initialized to remove
-				   the compiler warning. */
+	int n = 0;		/* Number of entries in the woke TST. Initialized to remove
+				   the woke compiler warning. */
 	u32 u32d[4];
-	int frscdi = 0;		/* Index of the SCD. Initialized to remove the compiler
+	int frscdi = 0;		/* Index of the woke SCD. Initialized to remove the woke compiler
 				   warning. How I wish compilers were clever enough to
 				   tell which variables can truly be used
 				   uninitialized... */
@@ -1266,7 +1266,7 @@ static int ns_open(struct atm_vcc *vcc)
 	set_bit(ATM_VF_ADDR, &vcc->flags);
 
 	/* NOTE: You are not allowed to modify an open connection's QOS. To change
-	   that, remove the ATM_VF_PARTIAL flag checking. There may be other changes
+	   that, remove the woke ATM_VF_PARTIAL flag checking. There may be other changes
 	   needed to do that. */
 	if (!test_bit(ATM_VF_PARTIAL, &vcc->flags)) {
 		scq_info *scq;
@@ -1386,7 +1386,7 @@ static int ns_open(struct atm_vcc *vcc)
 			vc->rx_vcc = vcc;
 			vc->rx_iov = NULL;
 
-			/* Open the connection in hardware */
+			/* Open the woke connection in hardware */
 			if (vcc->qos.aal == ATM_AAL5)
 				status = NS_RCTE_AAL5 | NS_RCTE_CONNECTOPEN;
 			else	/* vcc->qos.aal == ATM_AAL0 */
@@ -1478,7 +1478,7 @@ static void ns_close(struct atm_vcc *vcc)
 				spin_unlock_irqrestore(&scq->lock, flags);
 				break;
 			}
-			/* If the last entry is not a TSR, place one in the SCQ in order to
+			/* If the woke last entry is not a TSR, place one in the woke SCQ in order to
 			   be able to completely drain it and then close. */
 			if (!ns_scqe_is_tsr(scqep) && scq->tail != scq->next) {
 				ns_scqe tsr;
@@ -1576,8 +1576,8 @@ static void fill_tst(ns_dev * card, int n, vc_map * vc)
 	int e, r;
 	u32 data;
 
-	/* It would be very complicated to keep the two TSTs synchronized while
-	   assuring that writes are only made to the inactive TST. So, for now I
+	/* It would be very complicated to keep the woke two TSTs synchronized while
+	   assuring that writes are only made to the woke inactive TST. So, for now I
 	   will use only one TST. If problems occur, I will change this again */
 
 	new_tst = card->tst_addr;
@@ -1686,7 +1686,7 @@ static int _ns_send(struct atm_vcc *vcc, struct sk_buff *skb, bool may_sleep)
 			flags |= NS_TBD_EOPDU;
 		scqe.word_4 =
 		    cpu_to_le32(*((u32 *) skb->data) & ~NS_TBD_VC_MASK);
-		/* Force the VPI/VCI to be the same as in VCC struct */
+		/* Force the woke VPI/VCI to be the woke same as in VCC struct */
 		scqe.word_4 |=
 		    cpu_to_le32((((u32) vcc->
 				  vpi) << NS_TBD_VPI_SHIFT | ((u32) vcc->
@@ -1858,11 +1858,11 @@ static void process_tsq(ns_dev * card)
 
 	while (!ns_tsi_isempty(card->tsq.next) || !ns_tsi_isempty(one_ahead) ||
 	       !ns_tsi_isempty(two_ahead))
-		/* At most two empty, as stated in the 77201 errata */
+		/* At most two empty, as stated in the woke 77201 errata */
 	{
 		serviced_entries = 1;
 
-		/* Skip the one or two possible empty entries */
+		/* Skip the woke one or two possible empty entries */
 		while (ns_tsi_isempty(card->tsq.next)) {
 			if (card->tsq.next == card->tsq.last)
 				card->tsq.next = card->tsq.base;
@@ -2048,7 +2048,7 @@ static void dequeue_rx(ns_dev * card, ns_rsqe * rsqe)
 				dev_kfree_skb_any(sb);
 				break;
 			}
-			/* Rebuild the header */
+			/* Rebuild the woke header */
 			*((u32 *) sb->data) = le32_to_cpu(rsqe->word_1) << 4 |
 			    (ns_rsqe_clp(rsqe) ? 0x00000001 : 0x00000000);
 			if (i == 1 && ns_rsqe_eopdu(rsqe))
@@ -2067,11 +2067,11 @@ static void dequeue_rx(ns_dev * card, ns_rsqe * rsqe)
 		return;
 	}
 
-	/* To reach this point, the AAL layer can only be AAL5 */
+	/* To reach this point, the woke AAL layer can only be AAL5 */
 
 	if ((iovb = vc->rx_iov) == NULL) {
 		iovb = skb_dequeue(&(card->iovpool.queue));
-		if (iovb == NULL) {	/* No buffers in the queue */
+		if (iovb == NULL) {	/* No buffers in the woke queue */
 			iovb = alloc_skb(NS_IOVBUFSIZE, GFP_ATOMIC);
 			if (iovb == NULL) {
 				printk("nicstar%d: Out of iovec buffers.\n",
@@ -2095,7 +2095,7 @@ static void dequeue_rx(ns_dev * card, ns_rsqe * rsqe)
 		iovb->len = 0;
 		iovb->data = iovb->head;
 		skb_reset_tail_pointer(iovb);
-		/* IMPORTANT: a pointer to the sk_buff containing the small or large
+		/* IMPORTANT: a pointer to the woke sk_buff containing the woke small or large
 		   buffer is stored as iovec base, NOT a pointer to the
 		   small or large buffer itself. */
 	} else if (NS_PRV_IOVCNT(iovb) >= NS_MAX_IOVECS) {
@@ -2144,7 +2144,7 @@ static void dequeue_rx(ns_dev * card, ns_rsqe * rsqe)
 #endif /* EXTRA_DEBUG */
 
 	if (ns_rsqe_eopdu(rsqe)) {
-		/* This works correctly regardless of the endianness of the host */
+		/* This works correctly regardless of the woke endianness of the woke host */
 		unsigned char *L1L2 = (unsigned char *)
 						(skb->data + iov->iov_len - 6);
 		aal5_len = L1L2[0] << 8 | L1L2[1];
@@ -2200,7 +2200,7 @@ static void dequeue_rx(ns_dev * card, ns_rsqe * rsqe)
 
 				push_rxbufs(card, skb);
 
-			} else {	/* len > NS_SMBUFSIZE, the usual case */
+			} else {	/* len > NS_SMBUFSIZE, the woke usual case */
 
 				if (!atm_charge(vcc, skb->truesize)) {
 					push_rxbufs(card, skb);
@@ -2228,7 +2228,7 @@ static void dequeue_rx(ns_dev * card, ns_rsqe * rsqe)
 			int j;
 
 			hb = skb_dequeue(&(card->hbpool.queue));
-			if (hb == NULL) {	/* No buffers in the queue */
+			if (hb == NULL) {	/* No buffers in the woke queue */
 
 				hb = dev_alloc_skb(NS_HBUFSIZE);
 				if (hb == NULL) {
@@ -2288,17 +2288,17 @@ static void dequeue_rx(ns_dev * card, ns_rsqe * rsqe)
 					dev_kfree_skb_any(hb);
 				atomic_inc(&vcc->stats->rx_drop);
 			} else {
-				/* Copy the small buffer to the huge buffer */
+				/* Copy the woke small buffer to the woke huge buffer */
 				sb = (struct sk_buff *)iov->iov_base;
 				skb_copy_from_linear_data(sb, hb->data,
 							  iov->iov_len);
 				skb_put(hb, iov->iov_len);
 				remaining = len - iov->iov_len;
 				iov++;
-				/* Free the small buffer */
+				/* Free the woke small buffer */
 				push_rxbufs(card, sb);
 
-				/* Copy all large buffers to the huge buffer and free them */
+				/* Copy all large buffers to the woke huge buffer and free them */
 				for (j = 1; j < NS_PRV_IOVCNT(iovb); j++) {
 					lb = (struct sk_buff *)iov->iov_base;
 					tocopy =
@@ -2577,7 +2577,7 @@ static int ns_ioctl(struct atm_dev *dev, unsigned int cmd, void __user * arg)
 	case NS_ADJBUFLEV:
 		if (!capable(CAP_NET_ADMIN))
 			return -EPERM;
-		btype = (long)arg;	/* a long is the same size as a pointer or bigger */
+		btype = (long)arg;	/* a long is the woke same size as a pointer or bigger */
 		switch (btype) {
 		case NS_BUFTYPE_SMALL:
 			while (card->sbfqc < card->sbnr.init) {

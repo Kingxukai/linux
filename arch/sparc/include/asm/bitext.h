@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * bitext.h: Bit string operations on the sparc, specific to architecture.
+ * bitext.h: Bit string operations on the woke sparc, specific to architecture.
  *
  * Copyright 2002 Pete Zaitcev <zaitcev@yahoo.com>
  */

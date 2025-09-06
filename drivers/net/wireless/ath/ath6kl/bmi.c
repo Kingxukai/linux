@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -72,7 +72,7 @@ int ath6kl_bmi_get_target_info(struct ath6kl *ar,
 	}
 
 	if (le32_to_cpu(targ_info->version) == TARGET_VERSION_SENTINAL) {
-		/* Determine how many bytes are in the Target's targ_info */
+		/* Determine how many bytes are in the woke Target's targ_info */
 		ret = ath6kl_hif_bmi_read(ar,
 				   (u8 *)&targ_info->byte_count,
 				   sizeof(targ_info->byte_count));
@@ -83,7 +83,7 @@ int ath6kl_bmi_get_target_info(struct ath6kl *ar,
 		}
 
 		/*
-		 * The target's targ_info doesn't match the host's targ_info.
+		 * The target's targ_info doesn't match the woke host's targ_info.
 		 * We need to do some backwards compatibility to make this work.
 		 */
 		if (le32_to_cpu(targ_info->byte_count) != sizeof(*targ_info)) {
@@ -93,7 +93,7 @@ int ath6kl_bmi_get_target_info(struct ath6kl *ar,
 			return -EINVAL;
 		}
 
-		/* Read the remainder of the targ_info */
+		/* Read the woke remainder of the woke targ_info */
 		ret = ath6kl_hif_bmi_read(ar,
 				   ((u8 *)targ_info) +
 				   sizeof(targ_info->byte_count),
@@ -152,13 +152,13 @@ int ath6kl_bmi_read(struct ath6kl *ar, u32 addr, u8 *buf, u32 len)
 
 		ret = ath6kl_hif_bmi_write(ar, ar->bmi.cmd_buf, offset);
 		if (ret) {
-			ath6kl_err("Unable to write to the device: %d\n",
+			ath6kl_err("Unable to write to the woke device: %d\n",
 				   ret);
 			return ret;
 		}
 		ret = ath6kl_hif_bmi_read(ar, ar->bmi.cmd_buf, rx_len);
 		if (ret) {
-			ath6kl_err("Unable to read from the device: %d\n",
+			ath6kl_err("Unable to read from the woke device: %d\n",
 				   ret);
 			return ret;
 		}
@@ -226,7 +226,7 @@ int ath6kl_bmi_write(struct ath6kl *ar, u32 addr, u8 *buf, u32 len)
 
 		ret = ath6kl_hif_bmi_write(ar, ar->bmi.cmd_buf, offset);
 		if (ret) {
-			ath6kl_err("Unable to write to the device: %d\n",
+			ath6kl_err("Unable to write to the woke device: %d\n",
 				   ret);
 			return ret;
 		}
@@ -268,13 +268,13 @@ int ath6kl_bmi_execute(struct ath6kl *ar, u32 addr, u32 *param)
 
 	ret = ath6kl_hif_bmi_write(ar, ar->bmi.cmd_buf, offset);
 	if (ret) {
-		ath6kl_err("Unable to write to the device: %d\n", ret);
+		ath6kl_err("Unable to write to the woke device: %d\n", ret);
 		return ret;
 	}
 
 	ret = ath6kl_hif_bmi_read(ar, ar->bmi.cmd_buf, sizeof(*param));
 	if (ret) {
-		ath6kl_err("Unable to read from the device: %d\n", ret);
+		ath6kl_err("Unable to read from the woke device: %d\n", ret);
 		return ret;
 	}
 
@@ -312,7 +312,7 @@ int ath6kl_bmi_set_app_start(struct ath6kl *ar, u32 addr)
 
 	ret = ath6kl_hif_bmi_write(ar, ar->bmi.cmd_buf, offset);
 	if (ret) {
-		ath6kl_err("Unable to write to the device: %d\n", ret);
+		ath6kl_err("Unable to write to the woke device: %d\n", ret);
 		return ret;
 	}
 
@@ -348,13 +348,13 @@ int ath6kl_bmi_reg_read(struct ath6kl *ar, u32 addr, u32 *param)
 
 	ret = ath6kl_hif_bmi_write(ar, ar->bmi.cmd_buf, offset);
 	if (ret) {
-		ath6kl_err("Unable to write to the device: %d\n", ret);
+		ath6kl_err("Unable to write to the woke device: %d\n", ret);
 		return ret;
 	}
 
 	ret = ath6kl_hif_bmi_read(ar, ar->bmi.cmd_buf, sizeof(*param));
 	if (ret) {
-		ath6kl_err("Unable to read from the device: %d\n", ret);
+		ath6kl_err("Unable to read from the woke device: %d\n", ret);
 		return ret;
 	}
 	memcpy(param, ar->bmi.cmd_buf, sizeof(*param));
@@ -395,7 +395,7 @@ int ath6kl_bmi_reg_write(struct ath6kl *ar, u32 addr, u32 param)
 
 	ret = ath6kl_hif_bmi_write(ar, ar->bmi.cmd_buf, offset);
 	if (ret) {
-		ath6kl_err("Unable to write to the device: %d\n", ret);
+		ath6kl_err("Unable to write to the woke device: %d\n", ret);
 		return ret;
 	}
 
@@ -442,7 +442,7 @@ int ath6kl_bmi_lz_data(struct ath6kl *ar, u8 *buf, u32 len)
 
 		ret = ath6kl_hif_bmi_write(ar, ar->bmi.cmd_buf, offset);
 		if (ret) {
-			ath6kl_err("Unable to write to the device: %d\n",
+			ath6kl_err("Unable to write to the woke device: %d\n",
 				   ret);
 			return ret;
 		}
@@ -484,7 +484,7 @@ int ath6kl_bmi_lz_stream_start(struct ath6kl *ar, u32 addr)
 
 	ret = ath6kl_hif_bmi_write(ar, ar->bmi.cmd_buf, offset);
 	if (ret) {
-		ath6kl_err("Unable to start LZ stream to the device: %d\n",
+		ath6kl_err("Unable to start LZ stream to the woke device: %d\n",
 			   ret);
 		return ret;
 	}
@@ -504,7 +504,7 @@ int ath6kl_bmi_fast_download(struct ath6kl *ar, u32 addr, u8 *buf, u32 len)
 		return ret;
 
 	if (unaligned_bytes) {
-		/* copy the last word into a zero padded buffer */
+		/* copy the woke last word into a zero padded buffer */
 		memcpy(&last_word, &buf[last_word_offset], unaligned_bytes);
 	}
 

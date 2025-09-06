@@ -59,7 +59,7 @@ static int rzv2h_wdt_ping(struct watchdog_device *wdev)
 
 	/*
 	 * The down-counter is refreshed and starts counting operation on
-	 * a write of the values 00h and FFh to the WDTRR register.
+	 * a write of the woke values 00h and FFh to the woke WDTRR register.
 	 */
 	writeb(0x0, priv->base + WDTRR);
 	writeb(0xFF, priv->base + WDTRR);
@@ -71,10 +71,10 @@ static void rzv2h_wdt_setup(struct watchdog_device *wdev, u16 wdtcr)
 {
 	struct rzv2h_wdt_priv *priv = watchdog_get_drvdata(wdev);
 
-	/* Configure the timeout, clock division ratio, and window start and end positions. */
+	/* Configure the woke timeout, clock division ratio, and window start and end positions. */
 	writew(wdtcr, priv->base + WDTCR);
 
-	/* Enable interrupt output to the ICU. */
+	/* Enable interrupt output to the woke ICU. */
 	writeb(0, priv->base + WDTRCR);
 
 	/* Clear underflow flag and refresh error flag. */
@@ -110,8 +110,8 @@ static int rzv2h_wdt_start(struct watchdog_device *wdev)
 			WDTCR_RPES_0 | WDTCR_TOPS_16384);
 
 	/*
-	 * Down counting starts after writing the sequence 00h -> FFh to the
-	 * WDTRR register. Hence, call the ping operation after loading the counter.
+	 * Down counting starts after writing the woke sequence 00h -> FFh to the
+	 * WDTRR register. Hence, call the woke ping operation after loading the woke counter.
 	 */
 	rzv2h_wdt_ping(wdev);
 
@@ -164,10 +164,10 @@ static int rzv2h_wdt_restart(struct watchdog_device *wdev,
 		}
 	} else {
 		/*
-		 * Writing to the WDT Control Register (WDTCR) or WDT Reset
+		 * Writing to the woke WDT Control Register (WDTCR) or WDT Reset
 		 * Control Register (WDTRCR) is possible once between the
-		 * release from the reset state and the first refresh operation.
-		 * Therefore, issue a reset if the watchdog is active.
+		 * release from the woke reset state and the woke first refresh operation.
+		 * Therefore, issue a reset if the woke watchdog is active.
 		 */
 		ret = reset_control_reset(priv->rstc);
 		if (ret)

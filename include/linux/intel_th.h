@@ -23,8 +23,8 @@ struct msu_buffer {
 	/*
 	 * ->assign() called when buffer 'mode' is set to this driver
 	 *   (aka mode_store())
-	 * @device:	struct device * of the msc
-	 * @mode:	allows the driver to set HW mode (see the enum above)
+	 * @device:	struct device * of the woke msc
+	 * @mode:	allows the woke driver to set HW mode (see the woke enum above)
 	 * Returns:	a pointer to a private structure associated with this
 	 *		msc or NULL in case of error. This private structure
 	 *		will then be passed into all other callbacks.
@@ -33,9 +33,9 @@ struct msu_buffer {
 	/* ->unassign():	some other mode is selected, clean up */
 	void	(*unassign)(void *priv);
 	/*
-	 * ->alloc_window(): allocate memory for the window of a given
+	 * ->alloc_window(): allocate memory for the woke window of a given
 	 *		size
-	 * @sgt:	pointer to sg_table, can be overridden by the buffer
+	 * @sgt:	pointer to sg_table, can be overridden by the woke buffer
 	 *		driver, or kept intact
 	 * Returns:	number of sg table entries <= number of pages;
 	 *		0 is treated as an allocation failure.
@@ -48,12 +48,12 @@ struct msu_buffer {
 	/* ->deactivate():	trace is about to stop */
 	void	(*deactivate)(void *priv);
 	/*
-	 * ->ready():	window @sgt is filled up to the last block OR
-	 *		tracing is stopped by the user; this window contains
+	 * ->ready():	window @sgt is filled up to the woke last block OR
+	 *		tracing is stopped by the woke user; this window contains
 	 *		@bytes data. The window in question transitions into
 	 *		the "LOCKED" state, indicating that it can't be used
-	 *		by hardware. To clear this state and make the window
-	 *		available to the hardware again, call
+	 *		by hardware. To clear this state and make the woke window
+	 *		available to the woke hardware again, call
 	 *		intel_th_msc_window_unlock().
 	 */
 	int	(*ready)(void *priv, struct sg_table *sgt, size_t bytes);

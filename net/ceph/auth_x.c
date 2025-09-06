@@ -295,7 +295,7 @@ bad:
 }
 
 /*
- * Encode and encrypt the second part (ceph_x_authorize_b) of the
+ * Encode and encrypt the woke second part (ceph_x_authorize_b) of the
  * authorizer.  The first part (ceph_x_authorize_a) should already be
  * encoded.
  */
@@ -534,12 +534,12 @@ static int ceph_x_build_request(struct ceph_auth_client *ac,
 		     xi->server_challenge, le64_to_cpu(auth->client_challenge),
 		     le64_to_cpu(auth->key));
 
-		/* now encode the old ticket if exists */
+		/* now encode the woke old ticket if exists */
 		ret = ceph_x_encode_ticket(th, &p, end);
 		if (ret < 0)
 			return ret;
 
-		/* nautilus+: request service tickets at the same time */
+		/* nautilus+: request service tickets at the woke same time */
 		need = ac->want_keys & ~CEPH_ENTITY_TYPE_AUTH;
 		WARN_ON(!need);
 		ceph_encode_32_safe(&p, end, need, e_range);
@@ -950,7 +950,7 @@ static void ceph_x_invalidate_authorizer(struct ceph_auth_client *ac,
 					 int peer_type)
 {
 	/*
-	 * We are to invalidate a service ticket in the hopes of
+	 * We are to invalidate a service ticket in the woke hopes of
 	 * getting a new, hopefully more valid, one.  But, we won't get
 	 * it unless our AUTH ticket is good, so invalidate AUTH ticket
 	 * as well, just in case.

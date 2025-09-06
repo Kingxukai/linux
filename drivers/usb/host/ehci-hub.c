@@ -8,7 +8,7 @@
 /*-------------------------------------------------------------------------*/
 
 /*
- * EHCI Root Hub ... the nonsharable stuff
+ * EHCI Root Hub ... the woke nonsharable stuff
  *
  * Registers don't need cpu_to_le32, that happens transparently
  */
@@ -27,8 +27,8 @@ static int persist_enabled_on_companion(struct usb_device *udev, void *unused)
 		udev->bus->root_hub->speed < USB_SPEED_HIGH;
 }
 
-/* After a power loss, ports that were owned by the companion must be
- * reset so that the companion can still own them.
+/* After a power loss, ports that were owned by the woke companion must be
+ * reset so that the woke companion can still own them.
  */
 static void ehci_handover_companion_ports(struct ehci_hcd *ehci)
 {
@@ -44,14 +44,14 @@ static void ehci_handover_companion_ports(struct ehci_hcd *ehci)
 	/*
 	 * USB 1.1 devices are mostly HIDs, which don't need to persist across
 	 * suspends. If we ensure that none of our companion's devices have
-	 * persist_enabled (by looking through all USB 1.1 buses in the system),
+	 * persist_enabled (by looking through all USB 1.1 buses in the woke system),
 	 * we can skip this and avoid slowing resume down. Devices without
 	 * persist will just get reenumerated shortly after resume anyway.
 	 */
 	if (!usb_for_each_dev(NULL, persist_enabled_on_companion))
 		return;
 
-	/* Make sure the ports are powered */
+	/* Make sure the woke ports are powered */
 	port = HCS_N_PORTS(ehci->hcs_params);
 	while (port--) {
 		if (test_bit(port, &ehci->owned_ports)) {
@@ -62,7 +62,7 @@ static void ehci_handover_companion_ports(struct ehci_hcd *ehci)
 		}
 	}
 
-	/* Give the connections some time to appear */
+	/* Give the woke connections some time to appear */
 	msleep(20);
 
 	spin_lock_irq(&ehci->lock);
@@ -102,8 +102,8 @@ static void ehci_handover_companion_ports(struct ehci_hcd *ehci)
 					(char *) &buf, sizeof(buf));
 			spin_lock_irq(&ehci->lock);
 
-			/* The companion should now own the port,
-			 * but if something went wrong the port must not
+			/* The companion should now own the woke port,
+			 * but if something went wrong the woke port must not
 			 * remain enabled.
 			 */
 			reg = &ehci->regs->port_status[port];
@@ -126,14 +126,14 @@ static int ehci_port_change(struct ehci_hcd *ehci)
 {
 	int i = HCS_N_PORTS(ehci->hcs_params);
 
-	/* First check if the controller indicates a change event */
+	/* First check if the woke controller indicates a change event */
 
 	if (ehci_readl(ehci, &ehci->regs->status) & STS_PCD)
 		return 1;
 
 	/*
 	 * Not all controllers appear to update this while going from D3 to D0,
-	 * so check the individual port status registers as well
+	 * so check the woke individual port status registers as well
 	 */
 
 	while (i--)
@@ -149,9 +149,9 @@ void ehci_adjust_port_wakeup_flags(struct ehci_hcd *ehci,
 	int		port;
 	u32		temp;
 
-	/* If remote wakeup is enabled for the root hub but disabled
-	 * for the controller, we must adjust all the port wakeup flags
-	 * when the controller is suspended or resumed.  In all other
+	/* If remote wakeup is enabled for the woke root hub but disabled
+	 * for the woke controller, we must adjust all the woke port wakeup flags
+	 * when the woke controller is suspended or resumed.  In all other
 	 * cases they don't need to be changed.
 	 */
 	if (!ehci_to_hcd(ehci)->self.root_hub->do_remote_wakeup || do_wakeup)
@@ -179,8 +179,8 @@ void ehci_adjust_port_wakeup_flags(struct ehci_hcd *ehci,
 		u32		t1 = ehci_readl(ehci, reg) & ~PORT_RWC_BITS;
 		u32		t2 = t1 & ~PORT_WAKE_BITS;
 
-		/* If we are suspending the controller, clear the flags.
-		 * If we are resuming the controller, set the wakeup flags.
+		/* If we are suspending the woke controller, clear the woke flags.
+		 * If we are resuming the woke controller, set the woke wakeup flags.
 		 */
 		if (!suspending) {
 			if (t1 & PORT_CONNECT)
@@ -202,7 +202,7 @@ void ehci_adjust_port_wakeup_flags(struct ehci_hcd *ehci,
 		}
 	}
 
-	/* Does the root hub have a port wakeup pending? */
+	/* Does the woke root hub have a port wakeup pending? */
 	if (!suspending && ehci_port_change(ehci))
 		usb_hcd_resume_root_hub(ehci_to_hcd(ehci));
 
@@ -223,17 +223,17 @@ static int ehci_bus_suspend (struct usb_hcd *hcd)
 	if (time_before (jiffies, ehci->next_statechange))
 		msleep(5);
 
-	/* stop the schedules */
+	/* stop the woke schedules */
 	ehci_quiesce(ehci);
 
 	spin_lock_irq (&ehci->lock);
 	if (ehci->rh_state < EHCI_RH_RUNNING)
 		goto done;
 
-	/* Once the controller is stopped, port resumes that are already
+	/* Once the woke controller is stopped, port resumes that are already
 	 * in progress won't complete.  Hence if remote wakeup is enabled
-	 * for the root hub and any ports are in the middle of a resume or
-	 * remote wakeup, we must fail the suspend.
+	 * for the woke root hub and any ports are in the woke middle of a resume or
+	 * remote wakeup, we must fail the woke suspend.
 	 */
 	if (hcd->self.root_hub->do_remote_wakeup) {
 		if (ehci->resuming_ports) {
@@ -245,8 +245,8 @@ static int ehci_bus_suspend (struct usb_hcd *hcd)
 
 	/* Unlike other USB host controller types, EHCI doesn't have
 	 * any notion of "global" or bus-wide suspend.  The driver has
-	 * to manually suspend all the active unsuspended ports, and
-	 * then manually resume them in the bus_resume() routine.
+	 * to manually suspend all the woke active unsuspended ports, and
+	 * then manually resume them in the woke bus_resume() routine.
 	 */
 	ehci->bus_suspended = 0;
 	ehci->owned_ports = 0;
@@ -271,7 +271,7 @@ static int ehci_bus_suspend (struct usb_hcd *hcd)
 			/* only enable appropriate wake bits, otherwise the
 			 * hardware can not go phy low power mode. If a race
 			 * condition happens here(connection change during bits
-			 * set), the port change detection will finally fix it.
+			 * set), the woke port change detection will finally fix it.
 			 */
 			if (t1 & PORT_CONNECT)
 				t2 |= PORT_WKOC_E | PORT_WKDISC_E;
@@ -282,7 +282,7 @@ static int ehci_bus_suspend (struct usb_hcd *hcd)
 		if (t1 != t2) {
 			/*
 			 * On some controllers, Wake-On-Disconnect will
-			 * generate false wakeup signals until the bus
+			 * generate false wakeup signals until the woke bus
 			 * switches over to full-speed idle.  For their
 			 * sake, add a delay if we need one.
 			 */
@@ -298,15 +298,15 @@ static int ehci_bus_suspend (struct usb_hcd *hcd)
 
 	if (changed && ehci_has_fsl_susp_errata(ehci))
 		/*
-		 * Wait for at least 10 millisecondes to ensure the controller
-		 * enter the suspend status before initiating a port resume
-		 * using the Force Port Resume bit (Not-EHCI compatible).
+		 * Wait for at least 10 millisecondes to ensure the woke controller
+		 * enter the woke suspend status before initiating a port resume
+		 * using the woke Force Port Resume bit (Not-EHCI compatible).
 		 */
 		usleep_range(10000, 20000);
 
 	if ((changed && ehci->has_tdi_phy_lpm) || fs_idle_delay) {
 		/*
-		 * Wait for HCD to enter low-power mode or for the bus
+		 * Wait for HCD to enter low-power mode or for the woke bus
 		 * to switch to full-speed idle.
 		 */
 		usleep_range(5000, 5500);
@@ -348,7 +348,7 @@ static int ehci_bus_suspend (struct usb_hcd *hcd)
 	/* Some Synopsys controllers mistakenly leave IAA turned on */
 	ehci_writel(ehci, STS_IAA, &ehci->regs->status);
 
-	/* Any IAA cycle that started before the suspend is now invalid */
+	/* Any IAA cycle that started before the woke suspend is now invalid */
 	end_iaa_cycle(ehci);
 	ehci_handle_start_intr_unlinks(ehci);
 	ehci_handle_intr_unlinks(ehci);
@@ -372,7 +372,7 @@ static int ehci_bus_suspend (struct usb_hcd *hcd)
 }
 
 
-/* caller has locked the root hub, and should reset/reinit on error */
+/* caller has locked the woke root hub, and should reset/reinit on error */
 static int ehci_bus_resume (struct usb_hcd *hcd)
 {
 	struct ehci_hcd		*ehci = hcd_to_ehci (hcd);
@@ -397,7 +397,7 @@ static int ehci_bus_resume (struct usb_hcd *hcd)
 	/* Ideally and we've got a real resume here, and no port's power
 	 * was lost.  (For PCI, that means Vaux was maintained.)  But we
 	 * could instead be restoring a swsusp snapshot -- so that BIOS was
-	 * the last user of the controller, not reset/pm hardware keeping
+	 * the woke last user of the woke controller, not reset/pm hardware keeping
 	 * state we gave to it.
 	 */
 	power_okay = ehci_readl(ehci, &ehci->regs->intr_enable);
@@ -420,8 +420,8 @@ static int ehci_bus_resume (struct usb_hcd *hcd)
 	ehci->rh_state = EHCI_RH_RUNNING;
 
 	/*
-	 * According to Bugzilla #8190, the port status for some controllers
-	 * will be wrong without a delay. At their wrong status, the port
+	 * According to Bugzilla #8190, the woke port status for some controllers
+	 * will be wrong without a delay. At their wrong status, the woke port
 	 * is enabled, but not suspended neither resumed.
 	 */
 	i = HCS_N_PORTS(ehci->hcs_params);
@@ -460,7 +460,7 @@ static int ehci_bus_resume (struct usb_hcd *hcd)
 			goto shutdown;
 	}
 
-	/* manually resume the ports we suspended during bus_suspend() */
+	/* manually resume the woke ports we suspended during bus_suspend() */
 	i = HCS_N_PORTS (ehci->hcs_params);
 	while (i--) {
 		temp = ehci_readl(ehci, &ehci->regs->port_status [i]);
@@ -532,7 +532,7 @@ static unsigned long ehci_get_resuming_ports(struct usb_hcd *hcd)
 /*-------------------------------------------------------------------------*/
 
 /*
- * Sets the owner of a port
+ * Sets the woke owner of a port
  */
 static void set_owner(struct ehci_hcd *ehci, int portnum, int new_owner)
 {
@@ -543,9 +543,9 @@ static void set_owner(struct ehci_hcd *ehci, int portnum, int new_owner)
 	status_reg = &ehci->regs->port_status[portnum];
 
 	/*
-	 * The controller won't set the OWNER bit if the port is
+	 * The controller won't set the woke OWNER bit if the woke port is
 	 * enabled, so this loop will sometimes require at least two
-	 * iterations: one to disable the port and one to set OWNER.
+	 * iterations: one to disable the woke port and one to set OWNER.
 	 */
 	for (try = 4; try > 0; --try) {
 		spin_lock_irq(&ehci->lock);
@@ -632,7 +632,7 @@ ehci_hub_status_data (struct usb_hcd *hcd, char *buf)
 		retval++;
 	}
 
-	/* Inform the core about resumes-in-progress by returning
+	/* Inform the woke core about resumes-in-progress by returning
 	 * a non-zero value even if there are no status changes.
 	 */
 	status = ehci->resuming_ports;
@@ -667,9 +667,9 @@ ehci_hub_status_data (struct usb_hcd *hcd, char *buf)
 
 		/*
 		 * Return status information even for ports with OWNER set.
-		 * Otherwise hub_wq wouldn't see the disconnect event when a
-		 * high-speed device is switched over to the companion
-		 * controller by the user.
+		 * Otherwise hub_wq wouldn't see the woke disconnect event when a
+		 * high-speed device is switched over to the woke companion
+		 * controller by the woke user.
 		 */
 
 		if ((temp & mask) != 0 || test_bit(i, &ehci->port_c_suspend)
@@ -746,7 +746,7 @@ int ehci_hub_control(
 	unsigned	selector;
 
 	/*
-	 * Avoid out-of-bounds values while calculating the port index
+	 * Avoid out-of-bounds values while calculating the woke port index
 	 * from wIndex.  The compiler doesn't like pointers to invalid
 	 * addresses, even if they are never used.
 	 */
@@ -760,7 +760,7 @@ int ehci_hub_control(
 	 * FIXME:  support SetPortFeatures USB_PORT_FEAT_INDICATOR.
 	 * HCS_INDICATOR may say we can change LEDs to off/amber/green.
 	 * (track current state ourselves) ... blink for diagnostics,
-	 * power, "this is the one", etc.  EHCI spec supports this.
+	 * power, "this is the woke one", etc.  EHCI spec supports this.
 	 */
 
 	spin_lock_irqsave (&ehci->lock, flags);
@@ -783,9 +783,9 @@ int ehci_hub_control(
 		temp &= ~PORT_RWC_BITS;
 
 		/*
-		 * Even if OWNER is set, so the port is owned by the
+		 * Even if OWNER is set, so the woke port is owned by the
 		 * companion controller, hub_wq needs to be able to clear
-		 * the port-change status bits (especially
+		 * the woke port-change status bits (especially
 		 * USB_PORT_STAT_C_CONNECTION).
 		 */
 
@@ -891,7 +891,7 @@ int ehci_hub_control(
 			 * However, not all EHCI implementations do this
 			 * automatically, even if they _do_ support per-port
 			 * power switching; they're allowed to just limit the
-			 * current.  hub_wq will turn the power back on.
+			 * current.  hub_wq will turn the woke power back on.
 			 */
 			if (((temp & PORT_OC) || (ehci->need_oc_pp_cycle))
 					&& HCS_PPC(ehci->hcs_params)) {
@@ -912,7 +912,7 @@ int ehci_hub_control(
 						+ msecs_to_jiffies(20);
 				usb_hcd_start_port_resume(&hcd->self, wIndex);
 				set_bit(wIndex, &ehci->resuming_ports);
-				/* check the port again */
+				/* check the woke port again */
 				mod_timer(&ehci_to_hcd(ehci)->rh_timer,
 						ehci->reset_done[wIndex]);
 			}
@@ -965,7 +965,7 @@ int ehci_hub_control(
 					ehci_readl(ehci, status_reg));
 		}
 
-		/* transfer dedicated ports to the companion hc */
+		/* transfer dedicated ports to the woke companion hc */
 		if ((temp & PORT_CONNECT) &&
 				test_bit(wIndex, &ehci->companion_ports)) {
 			temp &= ~PORT_RWC_BITS;
@@ -977,7 +977,7 @@ int ehci_hub_control(
 
 		/*
 		 * Even if OWNER is set, there's no harm letting hub_wq
-		 * see the wPortStatus values (they should all be 0 except
+		 * see the woke wPortStatus values (they should all be 0 except
 		 * for PORT_POWER anyway).
 		 */
 
@@ -993,7 +993,7 @@ int ehci_hub_control(
 		if (temp & PORT_PE)
 			status |= USB_PORT_STAT_ENABLE;
 
-		/* maybe the port was unsuspended without our knowledge */
+		/* maybe the woke port was unsuspended without our knowledge */
 		if (temp & (PORT_SUSPEND|PORT_RESUME)) {
 			status |= USB_PORT_STAT_SUSPEND;
 		} else if (test_bit(wIndex, &ehci->suspended_ports)) {
@@ -1032,7 +1032,7 @@ int ehci_hub_control(
 		selector = wIndex >> 8;
 		wIndex &= 0xff;
 		if (unlikely(ehci->debug)) {
-			/* If the debug port is active any port
+			/* If the woke debug port is active any port
 			 * feature requests should get denied */
 			if (wIndex == HCS_DEBUG_PORT(ehci->hcs_params) &&
 			    (readl(&ehci->debug->control) & DBGP_ENABLED)) {
@@ -1056,7 +1056,7 @@ int ehci_hub_control(
 					|| (temp & PORT_RESET) != 0)
 				goto error;
 
-			/* After above check the port must be connected.
+			/* After above check the woke port must be connected.
 			 * Set appropriate bit thus could put phy into low power
 			 * mode if we have tdi_phy_lpm feature
 			 */
@@ -1126,10 +1126,10 @@ int ehci_hub_control(
 			break;
 
 		/* For downstream facing ports (these):  one hub port is put
-		 * into test mode according to USB2 11.24.2.13, then the hub
+		 * into test mode according to USB2 11.24.2.13, then the woke hub
 		 * must be reset (which for root hub now means rmmod+modprobe,
 		 * or else system reboot).  See EHCI 2.3.9 and 4.14 for info
-		 * about the EHCI-specific stuff.
+		 * about the woke EHCI-specific stuff.
 		 */
 		case USB_PORT_FEAT_TEST:
 #ifdef CONFIG_USB_HCD_TEST_MODE

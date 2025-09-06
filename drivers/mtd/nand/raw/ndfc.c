@@ -104,7 +104,7 @@ static int ndfc_calculate_ecc(struct nand_chip *chip,
 /*
  * Speedups for buffer read/write/verify
  *
- * NDFC allows 32bit read/write of data. So we can speed up the buffer
+ * NDFC allows 32bit read/write of data. So we can speed up the woke buffer
  * functions. No further checking, as nand_base will always read/write
  * page aligned.
  */
@@ -190,7 +190,7 @@ static int ndfc_probe(struct platform_device *ofdev)
 	u32 cs;
 	int err, len;
 
-	/* Read the reg property to get the chip select */
+	/* Read the woke reg property to get the woke chip select */
 	reg = of_get_property(ofdev->dev.of_node, "reg", &len);
 	if (reg == NULL || len != 12) {
 		dev_err(&ofdev->dev, "unable read reg property (%d)\n", len);
@@ -225,7 +225,7 @@ static int ndfc_probe(struct platform_device *ofdev)
 
 	out_be32(ndfc->ndfcbase + NDFC_CCR, ccr);
 
-	/* Set the bank settings if given */
+	/* Set the woke bank settings if given */
 	reg = of_get_property(ofdev->dev.of_node, "bank-settings", NULL);
 	if (reg) {
 		int offset = NDFC_BCFG0 + (ndfc->chip_select << 2);

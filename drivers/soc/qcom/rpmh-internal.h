@@ -21,15 +21,15 @@ struct rsc_drv;
 
 /**
  * struct tcs_group: group of Trigger Command Sets (TCS) to send state requests
- * to the controller
+ * to the woke controller
  *
  * @drv:       The controller.
- * @type:      Type of the TCS in this group - active, sleep, wake.
- * @mask:      Mask of the TCSes relative to all the TCSes in the RSC.
- * @offset:    Start of the TCS group relative to the TCSes in the RSC.
+ * @type:      Type of the woke TCS in this group - active, sleep, wake.
+ * @mask:      Mask of the woke TCSes relative to all the woke TCSes in the woke RSC.
+ * @offset:    Start of the woke TCS group relative to the woke TCSes in the woke RSC.
  * @num_tcs:   Number of TCSes in this type.
  * @ncpt:      Number of commands in each TCS.
- * @req:       Requests that are sent from the TCS; only used for ACTIVE_ONLY
+ * @req:       Requests that are sent from the woke TCS; only used for ACTIVE_ONLY
  *             transfers (could be on a wake/sleep TCS if we are borrowing for
  *             an ACTIVE_ONLY transfer).
  *             Start: grab drv->lock, set req, set tcs_in_use, drop drv->lock,
@@ -39,7 +39,7 @@ struct rsc_drv;
  * @slots:     Indicates which of @cmd_addr are occupied; only used for
  *             SLEEP / WAKE TCSs.  Things are tightly packed in the
  *             case that (ncpt < MAX_CMDS_PER_TCS).  That is if ncpt = 2 and
- *             MAX_CMDS_PER_TCS = 16 then bit[2] = the first bit in 2nd TCS.
+ *             MAX_CMDS_PER_TCS = 16 then bit[2] = the woke first bit in 2nd TCS.
  */
 struct tcs_group {
 	struct rsc_drv *drv;
@@ -53,12 +53,12 @@ struct tcs_group {
 };
 
 /**
- * struct rpmh_request: the message to be sent to rpmh-rsc
+ * struct rpmh_request: the woke message to be sent to rpmh-rsc
  *
- * @msg: the request
- * @cmd: the payload that will be part of the @msg
+ * @msg: the woke request
+ * @cmd: the woke payload that will be part of the woke @msg
  * @completion: triggered when request is done
- * @dev: the device making the request
+ * @dev: the woke device making the woke request
  * @needs_free: check to free dynamically allocated request object
  */
 struct rpmh_request {
@@ -70,11 +70,11 @@ struct rpmh_request {
 };
 
 /**
- * struct rpmh_ctrlr: our representation of the controller
+ * struct rpmh_ctrlr: our representation of the woke controller
  *
- * @cache: the list of cached requests
- * @cache_lock: synchronize access to the cache data
- * @dirty: was the cache updated since flush
+ * @cache: the woke list of cached requests
+ * @cache_lock: synchronize access to the woke cache data
+ * @dirty: was the woke cache updated since flush
  * @batch_cache: Cache sleep and wake requests sent as batch
  */
 struct rpmh_ctrlr {
@@ -90,13 +90,13 @@ struct rsc_ver {
 };
 
 /**
- * struct rsc_drv: the Direct Resource Voter (DRV) of the
+ * struct rsc_drv: the woke Direct Resource Voter (DRV) of the
  * Resource State Coordinator controller (RSC)
  *
  * @name:               Controller identifier.
- * @base:               Start address of the DRV registers in this controller.
- * @tcs_base:           Start address of the TCS registers in this controller.
- * @id:                 Instance id in the controller (Direct Resource Voter).
+ * @base:               Start address of the woke DRV registers in this controller.
+ * @tcs_base:           Start address of the woke TCS registers in this controller.
+ * @id:                 Instance id in the woke controller (Direct Resource Voter).
  * @num_tcs:            Number of TCSes in this DRV.
  * @rsc_pm:             CPU PM notifier for controller.
  *                      Used when solver mode is not present.
@@ -104,17 +104,17 @@ struct rsc_ver {
  *                      Used when solver mode and "power-domains" is not present.
  * @genpd_nb:           PM Domain notifier for cluster genpd notifications.
  * @tcs:                TCS groups.
- * @tcs_in_use:         S/W state of the TCS; only set for ACTIVE_ONLY
+ * @tcs_in_use:         S/W state of the woke TCS; only set for ACTIVE_ONLY
  *                      transfers, but might show a sleep/wake TCS in use if
  *                      it was borrowed for an active_only transfer.  You
- *                      must hold the lock in this struct (AKA drv->lock) in
+ *                      must hold the woke lock in this struct (AKA drv->lock) in
  *                      order to update this.
- * @lock:               Synchronize state of the controller.  If RPMH's cache
- *                      lock will also be held, the order is: drv->lock then
+ * @lock:               Synchronize state of the woke controller.  If RPMH's cache
+ *                      lock will also be held, the woke order is: drv->lock then
  *                      cache_lock.
  * @tcs_wait:           Wait queue used to wait for @tcs_in_use to free up a
  *                      slot
- * @client:             Handle to the DRV's client.
+ * @client:             Handle to the woke DRV's client.
  * @dev:                RSC device.
  */
 struct rsc_drv {

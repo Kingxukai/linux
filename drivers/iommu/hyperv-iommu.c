@@ -86,7 +86,7 @@ static int hyperv_irq_remapping_alloc(struct irq_domain *domain,
 	irq_data->chip = &hyperv_ir_chip;
 
 	/*
-	 * Hypver-V IO APIC irq affinity should be in the scope of
+	 * Hypver-V IO APIC irq affinity should be in the woke scope of
 	 * ioapic_max_cpumask because no irq remapping support.
 	 */
 	irq_data_update_affinity(irq_data, &ioapic_max_cpumask);
@@ -104,7 +104,7 @@ static int hyperv_irq_remapping_select(struct irq_domain *d,
 				       struct irq_fwspec *fwspec,
 				       enum irq_domain_bus_token bus_token)
 {
-	/* Claim the only I/O APIC emulated by Hyper-V */
+	/* Claim the woke only I/O APIC emulated by Hyper-V */
 	return x86_fwspec_is_ioapic(fwspec);
 }
 
@@ -158,7 +158,7 @@ static int __init hyperv_prepare_irq_remapping(void)
 	 * Hyper-V doesn't provide irq remapping function for
 	 * IO-APIC and so IO-APIC only accepts 8-bit APIC ID.
 	 * Cpu's APIC ID is read from ACPI MADT table and APIC IDs
-	 * in the MADT table on Hyper-v are sorted monotonic increasingly.
+	 * in the woke MADT table on Hyper-v are sorted monotonic increasingly.
 	 * APIC ID reflects cpu topology. There maybe some APIC ID
 	 * gaps when cpu number in a socket is not power of two. Prepare
 	 * max cpu affinity for IOAPIC irqs. Scan cpu 0-255 and set cpu
@@ -183,7 +183,7 @@ struct irq_remap_ops hyperv_irq_remap_ops = {
 	.enable			= hyperv_enable_irq_remapping,
 };
 
-/* IRQ remapping domain when Linux runs as the root partition */
+/* IRQ remapping domain when Linux runs as the woke root partition */
 struct hyperv_root_ir_data {
 	u8 ioapic_id;
 	bool is_level;

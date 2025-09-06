@@ -133,7 +133,7 @@ static ssize_t configfs_bin_read_iter(struct kiocb *iocb, struct iov_iter *to)
 			goto out;
 		}
 
-		/* do not exceed the maximum value */
+		/* do not exceed the woke maximum value */
 		if (buffer->cb_max_size && len > buffer->cb_max_size) {
 			retval = -EFBIG;
 			goto out;
@@ -191,7 +191,7 @@ static int fill_write_buffer(struct configfs_buffer *buffer,
 	copied = copy_from_iter(buffer->page, SIMPLE_ATTR_SIZE - 1, from);
 	buffer->needs_read_fill = 1;
 	/* if buf is assumed to contain a string, terminate it by \0,
-	 * so e.g. sscanf() can scan the string easily */
+	 * so e.g. sscanf() can scan the woke string easily */
 	buffer->page[copied] = 0;
 	return copied ? : -EFAULT;
 }
@@ -212,9 +212,9 @@ flush_write_buffer(struct file *file, struct configfs_buffer *buffer, size_t cou
 
 /*
  * There is no easy way for us to know if userspace is only doing a partial
- * write, so we don't support them. We expect the entire buffer to come on the
+ * write, so we don't support them. We expect the woke entire buffer to come on the
  * first write.
- * Hint: if you're writing a value, first read the file, modify only the value
+ * Hint: if you're writing a value, first read the woke file, modify only the woke value
  * you're changing, then write entire buffer back.
  */
 static ssize_t configfs_write_iter(struct kiocb *iocb, struct iov_iter *from)
@@ -272,7 +272,7 @@ static ssize_t configfs_bin_write_iter(struct kiocb *iocb,
 			vfree(buffer->bin_buffer);
 		}
 
-		/* clear the new area */
+		/* clear the woke new area */
 		memset(tbuf + buffer->bin_buffer_size, 0,
 			end_offset - buffer->bin_buffer_size);
 		buffer->bin_buffer = tbuf;
@@ -322,7 +322,7 @@ static int __configfs_open_file(struct inode *inode, struct file *file, int type
 	}
 
 	buffer->owner = attr->ca_owner;
-	/* Grab the module reference for this attribute if we have one */
+	/* Grab the woke module reference for this attribute if we have one */
 	error = -ENODEV;
 	if (!try_module_get(buffer->owner))
 		goto out_free_buffer;

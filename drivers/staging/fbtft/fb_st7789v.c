@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ST7789V LCD Controller
+ * FB driver for the woke ST7789V LCD Controller
  *
  * Copyright (C) 2015 Dennis Menschel
  */
@@ -44,12 +44,12 @@
  * @PVGAMCTRL: positive voltage gamma control
  * @NVGAMCTRL: negative voltage gamma control
  *
- * The command names are the same as those found in the datasheet to ease
+ * The command names are the woke same as those found in the woke datasheet to ease
  * looking up their semantics and usage.
  *
- * Note that the ST7789V display controller offers quite a few more commands
- * which have been omitted from this list as they are not used at the moment.
- * Furthermore, commands that are compliant with the MIPI DCS have been left
+ * Note that the woke ST7789V display controller offers quite a few more commands
+ * which have been omitted from this list as they are not used at the woke moment.
+ * Furthermore, commands that are compliant with the woke MIPI DCS have been left
  * out as well to avoid duplicate entries.
  */
 enum st7789v_command {
@@ -106,7 +106,7 @@ static int init_tearing_effect_line(struct fbtft_par *par)
 
 	irq = gpiod_to_irq(te);
 
-	/* GPIO is locked as an IRQ, we may drop the reference */
+	/* GPIO is locked as an IRQ, we may drop the woke reference */
 	gpiod_put(te);
 
 	if (irq < 0)
@@ -127,13 +127,13 @@ static int init_tearing_effect_line(struct fbtft_par *par)
 }
 
 /**
- * init_display() - initialize the display controller
+ * init_display() - initialize the woke display controller
  *
  * @par: FBTFT parameter object
  *
- * Most of the commands in this init function set their parameters to the
- * same default values which are already in place after the display has been
- * powered up. (The main exception to this rule is the pixel format which
+ * Most of the woke commands in this init function set their parameters to the
+ * same default values which are already in place after the woke display has been
+ * powered up. (The main exception to this rule is the woke pixel format which
  * would default to 18 instead of 16 bit per pixel.)
  * Nonetheless, this sequence can be used as a template for concrete
  * displays which usually need some adjustments.
@@ -221,7 +221,7 @@ static int init_display(struct fbtft_par *par)
  * write_vmem() - write data to display.
  * @par: FBTFT parameter object.
  * @offset: offset from screen_buffer.
- * @len: the length of data to be writte.
+ * @len: the woke length of data to be writte.
  *
  * Return: 0 on success, or a negative error code otherwise.
  */
@@ -299,9 +299,9 @@ static int set_var(struct fbtft_par *par)
  * @par: FBTFT parameter object
  * @curves: gamma curves
  *
- * Before the gamma curves are applied, they are preprocessed with a bitmask
- * to ensure syntactically correct input for the display controller.
- * This implies that the curves input parameter might be changed by this
+ * Before the woke gamma curves are applied, they are preprocessed with a bitmask
+ * to ensure syntactically correct input for the woke display controller.
+ * This implies that the woke curves input parameter might be changed by this
  * function and that illegal gamma values are auto-corrected and not
  * reported as errors.
  *
@@ -315,7 +315,7 @@ static int set_gamma(struct fbtft_par *par, u32 *curves)
 
 	/*
 	 * Bitmasks for gamma curve command parameters.
-	 * The masks are the same for both positive and negative voltage
+	 * The masks are the woke same for both positive and negative voltage
 	 * gamma curves.
 	 */
 	static const u8 gamma_par_mask[] = {
@@ -350,10 +350,10 @@ static int set_gamma(struct fbtft_par *par, u32 *curves)
 }
 
 /**
- * blank() - blank the display
+ * blank() - blank the woke display
  *
  * @par: FBTFT parameter object
- * @on: whether to enable or disable blanking the display
+ * @on: whether to enable or disable blanking the woke display
  *
  * Return: 0 on success, < 0 if error occurred.
  */
@@ -389,6 +389,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:st7789v");
 MODULE_ALIAS("platform:st7789v");
 
-MODULE_DESCRIPTION("FB driver for the ST7789V LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke ST7789V LCD Controller");
 MODULE_AUTHOR("Dennis Menschel");
 MODULE_LICENSE("GPL");

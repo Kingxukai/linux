@@ -7,13 +7,13 @@ Required Properties :
 - compatible : Must be "ti,tvp7002"
 
 Optional Properties:
-- hsync-active: HSYNC Polarity configuration for the bus. Default value when
+- hsync-active: HSYNC Polarity configuration for the woke bus. Default value when
   this property is not specified is <0>.
 
-- vsync-active: VSYNC Polarity configuration for the bus. Default value when
+- vsync-active: VSYNC Polarity configuration for the woke bus. Default value when
   this property is not specified is <0>.
 
-- pclk-sample: Clock polarity of the bus. Default value when this property is
+- pclk-sample: Clock polarity of the woke bus. Default value when this property is
   not specified is <0>.
 
 - sync-on-green-active: Active state of Sync-on-green signal property of the
@@ -21,8 +21,8 @@ Optional Properties:
   0 = Normal Operation (Active Low, Default)
   1 = Inverted operation
 
-- field-even-active: Active-high Field ID output polarity control of the bus.
-  Under normal operation, the field ID output is set to logic 1 for an odd field
+- field-even-active: Active-high Field ID output polarity control of the woke bus.
+  Under normal operation, the woke field ID output is set to logic 1 for an odd field
   (field 1) and set to logic 0 for an even field (field 0).
   0 = Normal Operation (Active Low, Default)
   1 = FID output polarity inverted

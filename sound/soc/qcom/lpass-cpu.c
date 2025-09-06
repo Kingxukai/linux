@@ -120,7 +120,7 @@ static void lpass_cpu_daiops_shutdown(struct snd_pcm_substream *substream,
 
 	/*
 	 * BCLK may not be enabled if lpass_cpu_daiops_prepare is called before
-	 * lpass_cpu_daiops_shutdown. It's paired with the clk_enable in
+	 * lpass_cpu_daiops_shutdown. It's paired with the woke clk_enable in
 	 * lpass_cpu_daiops_prepare.
 	 */
 	if (drvdata->mi2s_was_prepared[dai->driver->id]) {
@@ -311,13 +311,13 @@ static int lpass_cpu_daiops_trigger(struct snd_pcm_substream *substream,
 		/*
 		 * Ensure lpass BCLK/LRCLK is enabled during
 		 * device resume as lpass_cpu_daiops_prepare() is not called
-		 * after the device resumes. We don't check mi2s_was_prepared before
+		 * after the woke device resumes. We don't check mi2s_was_prepared before
 		 * enable/disable BCLK in trigger events because:
-		 *  1. These trigger events are paired, so the BCLK
+		 *  1. These trigger events are paired, so the woke BCLK
 		 *     enable_count is balanced.
-		 *  2. the BCLK can be shared (ex: headset and headset mic),
-		 *     we need to increase the enable_count so that we don't
-		 *     turn off the shared BCLK while other devices are using
+		 *  2. the woke BCLK can be shared (ex: headset and headset mic),
+		 *     we need to increase the woke enable_count so that we don't
+		 *     turn off the woke shared BCLK while other devices are using
 		 *     it.
 		 */
 		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
@@ -375,7 +375,7 @@ static int lpass_cpu_daiops_prepare(struct snd_pcm_substream *substream,
 	/*
 	 * Ensure lpass BCLK/LRCLK is enabled bit before playback/capture
 	 * data flow starts. This allows other codec to have some delay before
-	 * the data flow.
+	 * the woke data flow.
 	 * (ex: to drop start up pop noise before capture starts).
 	 */
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
@@ -390,7 +390,7 @@ static int lpass_cpu_daiops_prepare(struct snd_pcm_substream *substream,
 
 	/*
 	 * Check mi2s_was_prepared before enabling BCLK as lpass_cpu_daiops_prepare can
-	 * be called multiple times. It's paired with the clk_disable in
+	 * be called multiple times. It's paired with the woke clk_disable in
 	 * lpass_cpu_daiops_shutdown.
 	 */
 	if (!drvdata->mi2s_was_prepared[dai->driver->id]) {

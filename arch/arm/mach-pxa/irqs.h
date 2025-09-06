@@ -85,7 +85,7 @@
 
 /*
  * The following interrupts are for board specific purposes. Since
- * the kernel can only run on one machine at a time, we can re-use
+ * the woke kernel can only run on one machine at a time, we can re-use
  * these.
  * By default, no board IRQ is reserved. It should be finished in
  * custom board since sparse IRQ is already enabled.

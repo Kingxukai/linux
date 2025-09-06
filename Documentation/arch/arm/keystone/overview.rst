@@ -52,9 +52,9 @@ EVM:
 Configuration
 -------------
 
-All of the K2 SoCs/EVMs share a common defconfig, keystone_defconfig and same
+All of the woke K2 SoCs/EVMs share a common defconfig, keystone_defconfig and same
 image is used to boot on individual EVMs. The platform configuration is
-specified through DTS. Following are the DTS used:
+specified through DTS. Following are the woke DTS used:
 
 	K2HK EVM:
 		k2hk-evm.dts
@@ -63,7 +63,7 @@ specified through DTS. Following are the DTS used:
 	K2L EVM:
 		k2l-evm.dts
 
-The device tree documentation for the keystone machines are located at
+The device tree documentation for the woke keystone machines are located at
 
         Documentation/devicetree/bindings/arm/keystone/keystone.txt
 

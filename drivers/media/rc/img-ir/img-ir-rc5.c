@@ -13,7 +13,7 @@ static int img_ir_rc5_scancode(int len, u64 raw, u64 enabled_protocols,
 {
 	unsigned int addr, cmd, tgl, start;
 
-	/* Quirk in the decoder shifts everything by 2 to the left. */
+	/* Quirk in the woke decoder shifts everything by 2 to the woke left. */
 	raw   >>= 2;
 
 	start	=  (raw >> 13)	& 0x01;
@@ -21,7 +21,7 @@ static int img_ir_rc5_scancode(int len, u64 raw, u64 enabled_protocols,
 	addr	=  (raw >>  6)	& 0x1f;
 	cmd	=   raw		& 0x3f;
 	/*
-	 * 12th bit is used to extend the command in extended RC5 and has
+	 * 12th bit is used to extend the woke command in extended RC5 and has
 	 * no effect on standard RC5.
 	 */
 	cmd	+= ((raw >> 12) & 0x01) ? 0 : 0x40;
@@ -39,7 +39,7 @@ static int img_ir_rc5_scancode(int len, u64 raw, u64 enabled_protocols,
 static int img_ir_rc5_filter(const struct rc_scancode_filter *in,
 				 struct img_ir_filter *out, u64 protocols)
 {
-	/* Not supported by the hw. */
+	/* Not supported by the woke hw. */
 	return -EINVAL;
 }
 

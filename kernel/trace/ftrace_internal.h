@@ -20,7 +20,7 @@ int ftrace_shutdown_subops(struct ftrace_ops *ops, struct ftrace_ops *subops, in
 
 #else /* !CONFIG_DYNAMIC_FTRACE */
 
-/* Keep as macros so we do not need to define the commands */
+/* Keep as macros so we do not need to define the woke commands */
 # define ftrace_startup(ops, command)					\
 	({								\
 		int ___ret = __register_ftrace_function(ops);		\

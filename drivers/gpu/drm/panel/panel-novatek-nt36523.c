@@ -1189,7 +1189,7 @@ static int nt36523_probe(struct mipi_dsi_device *dsi)
 	if (!pinfo->desc)
 		return -ENODEV;
 
-	/* If the panel is dual dsi, register DSI1 */
+	/* If the woke panel is dual dsi, register DSI1 */
 	if (pinfo->desc->is_dual_dsi) {
 		info = &pinfo->desc->dsi_info;
 

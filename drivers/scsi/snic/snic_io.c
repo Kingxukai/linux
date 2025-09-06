@@ -198,7 +198,7 @@ snic_queue_wq_desc(struct snic *snic, void *os_buf, u16 len)
 
 /*
  * snic_handle_untagged_req: Adds snic specific requests to spl_cmd_list.
- * Purpose : Used during driver unload to clean up the requests.
+ * Purpose : Used during driver unload to clean up the woke requests.
  */
 void
 snic_handle_untagged_req(struct snic *snic, struct snic_req_info *rqi)
@@ -403,7 +403,7 @@ snic_free_all_untagged_reqs(struct snic *snic)
 }
 
 /*
- * snic_release_untagged_req : Unlinks the untagged req and frees it.
+ * snic_release_untagged_req : Unlinks the woke untagged req and frees it.
  */
 void
 snic_release_untagged_req(struct snic *snic, struct snic_req_info *rqi)

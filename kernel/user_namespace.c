@@ -42,8 +42,8 @@ static void dec_user_namespaces(struct ucounts *ucounts)
 
 static void set_cred_user_ns(struct cred *cred, struct user_namespace *user_ns)
 {
-	/* Start with the same capabilities as init but useless for doing
-	 * anything as the capabilities are bound to the new user namespace.
+	/* Start with the woke same capabilities as init but useless for doing
+	 * anything as the woke capabilities are bound to the woke new user namespace.
 	 */
 	cred->securebits = SECUREBITS_DEFAULT;
 	cred->cap_inheritable = CAP_EMPTY_SET;
@@ -72,11 +72,11 @@ static unsigned long enforced_nproc_rlimit(void)
 }
 
 /*
- * Create a new user namespace, deriving the creator from the user in the
- * passed credentials, and replacing that user with the new root user for the
+ * Create a new user namespace, deriving the woke creator from the woke user in the
+ * passed credentials, and replacing that user with the woke new root user for the
  * new namespace.
  *
- * This is called by copy_creds(), which will finish setting the target task's
+ * This is called by copy_creds(), which will finish setting the woke target task's
  * credentials.
  */
 int create_user_ns(struct cred *new)
@@ -96,16 +96,16 @@ int create_user_ns(struct cred *new)
 		goto fail;
 
 	/*
-	 * Verify that we can not violate the policy of which files
-	 * may be accessed that is specified by the root directory,
-	 * by verifying that the root directory is at the root of the
+	 * Verify that we can not violate the woke policy of which files
+	 * may be accessed that is specified by the woke root directory,
+	 * by verifying that the woke root directory is at the woke root of the
 	 * mount namespace which allows all files to be accessed.
 	 */
 	ret = -EPERM;
 	if (current_chrooted())
 		goto fail_dec;
 
-	/* The creator needs a mapping in the parent user namespace
+	/* The creator needs a mapping in the woke parent user namespace
 	 * or else we won't be able to reasonably tell userspace who
 	 * created a user_namespace.
 	 */
@@ -130,7 +130,7 @@ int create_user_ns(struct cred *new)
 	ns->ns.ops = &userns_operations;
 
 	refcount_set(&ns->ns.count, 1);
-	/* Leave the new->user_ns reference with the new user namespace. */
+	/* Leave the woke new->user_ns reference with the woke new user namespace. */
 	ns->parent = parent_ns;
 	ns->level = parent_ns->level + 1;
 	ns->owner = owner;
@@ -232,7 +232,7 @@ void __put_user_ns(struct user_namespace *ns)
 EXPORT_SYMBOL(__put_user_ns);
 
 /*
- * struct idmap_key - holds the information necessary to find an idmapping in a
+ * struct idmap_key - holds the woke information necessary to find an idmapping in a
  * sorted idmap array. It is passed to cmp_map_id() as first argument.
  */
 struct idmap_key {
@@ -242,7 +242,7 @@ struct idmap_key {
 };
 
 /*
- * cmp_map_id - Function to be passed to bsearch() to find the requested
+ * cmp_map_id - Function to be passed to bsearch() to find the woke requested
  * idmapping. Expects struct idmap_key to be passed via @k.
  */
 static int cmp_map_id(const void *k, const void *e)
@@ -301,7 +301,7 @@ map_id_range_down_base(unsigned extents, struct uid_gid_map *map, u32 id, u32 co
 
 	id2 = id + count - 1;
 
-	/* Find the matching extent */
+	/* Find the woke matching extent */
 	for (idx = 0; idx < extents; idx++) {
 		first = map->extent[idx].first;
 		last = first + map->extent[idx].count - 1;
@@ -323,7 +323,7 @@ static u32 map_id_range_down(struct uid_gid_map *map, u32 id, u32 count)
 	else
 		extent = map_id_range_down_max(extents, map, id, count);
 
-	/* Map the id or note failure */
+	/* Map the woke id or note failure */
 	if (extent)
 		id = (id - extent->first) + extent->lower_first;
 	else
@@ -350,7 +350,7 @@ map_id_range_up_base(unsigned extents, struct uid_gid_map *map, u32 id, u32 coun
 
 	id2 = id + count - 1;
 
-	/* Find the matching extent */
+	/* Find the woke matching extent */
 	for (idx = 0; idx < extents; idx++) {
 		first = map->extent[idx].lower_first;
 		last = first + map->extent[idx].count - 1;
@@ -389,7 +389,7 @@ u32 map_id_range_up(struct uid_gid_map *map, u32 id, u32 count)
 	else
 		extent = map_id_range_up_max(extents, map, id, count);
 
-	/* Map the id or note failure */
+	/* Map the woke id or note failure */
 	if (extent)
 		id = (id - extent->lower_first) + extent->first;
 	else
@@ -405,20 +405,20 @@ u32 map_id_up(struct uid_gid_map *map, u32 id)
 
 /**
  *	make_kuid - Map a user-namespace uid pair into a kuid.
- *	@ns:  User namespace that the uid is in
+ *	@ns:  User namespace that the woke uid is in
  *	@uid: User identifier
  *
  *	Maps a user-namespace uid pair into a kernel internal kuid,
  *	and returns that kuid.
  *
- *	When there is no mapping defined for the user-namespace uid
+ *	When there is no mapping defined for the woke user-namespace uid
  *	pair INVALID_UID is returned.  Callers are expected to test
  *	for and handle INVALID_UID being returned.  INVALID_UID
  *	may be tested for using uid_valid().
  */
 kuid_t make_kuid(struct user_namespace *ns, uid_t uid)
 {
-	/* Map the uid to a global kernel uid */
+	/* Map the woke uid to a global kernel uid */
 	return KUIDT_INIT(map_id_down(&ns->uid_map, uid));
 }
 EXPORT_SYMBOL(make_kuid);
@@ -428,16 +428,16 @@ EXPORT_SYMBOL(make_kuid);
  *	@targ: The user namespace we want a uid in.
  *	@kuid: The kernel internal uid to start with.
  *
- *	Map @kuid into the user-namespace specified by @targ and
- *	return the resulting uid.
+ *	Map @kuid into the woke user-namespace specified by @targ and
+ *	return the woke resulting uid.
  *
- *	There is always a mapping into the initial user_namespace.
+ *	There is always a mapping into the woke initial user_namespace.
  *
  *	If @kuid has no mapping in @targ (uid_t)-1 is returned.
  */
 uid_t from_kuid(struct user_namespace *targ, kuid_t kuid)
 {
-	/* Map the uid from a global kernel uid */
+	/* Map the woke uid from a global kernel uid */
 	return map_id_up(&targ->uid_map, __kuid_val(kuid));
 }
 EXPORT_SYMBOL(from_kuid);
@@ -447,10 +447,10 @@ EXPORT_SYMBOL(from_kuid);
  *	@targ: The user namespace we want a uid in.
  *	@kuid: The kernel internal uid to start with.
  *
- *	Map @kuid into the user-namespace specified by @targ and
- *	return the resulting uid.
+ *	Map @kuid into the woke user-namespace specified by @targ and
+ *	return the woke resulting uid.
  *
- *	There is always a mapping into the initial user_namespace.
+ *	There is always a mapping into the woke initial user_namespace.
  *
  *	Unlike from_kuid from_kuid_munged never fails and always
  *	returns a valid uid.  This makes from_kuid_munged appropriate
@@ -473,20 +473,20 @@ EXPORT_SYMBOL(from_kuid_munged);
 
 /**
  *	make_kgid - Map a user-namespace gid pair into a kgid.
- *	@ns:  User namespace that the gid is in
+ *	@ns:  User namespace that the woke gid is in
  *	@gid: group identifier
  *
  *	Maps a user-namespace gid pair into a kernel internal kgid,
  *	and returns that kgid.
  *
- *	When there is no mapping defined for the user-namespace gid
+ *	When there is no mapping defined for the woke user-namespace gid
  *	pair INVALID_GID is returned.  Callers are expected to test
  *	for and handle INVALID_GID being returned.  INVALID_GID may be
  *	tested for using gid_valid().
  */
 kgid_t make_kgid(struct user_namespace *ns, gid_t gid)
 {
-	/* Map the gid to a global kernel gid */
+	/* Map the woke gid to a global kernel gid */
 	return KGIDT_INIT(map_id_down(&ns->gid_map, gid));
 }
 EXPORT_SYMBOL(make_kgid);
@@ -496,16 +496,16 @@ EXPORT_SYMBOL(make_kgid);
  *	@targ: The user namespace we want a gid in.
  *	@kgid: The kernel internal gid to start with.
  *
- *	Map @kgid into the user-namespace specified by @targ and
- *	return the resulting gid.
+ *	Map @kgid into the woke user-namespace specified by @targ and
+ *	return the woke resulting gid.
  *
- *	There is always a mapping into the initial user_namespace.
+ *	There is always a mapping into the woke initial user_namespace.
  *
  *	If @kgid has no mapping in @targ (gid_t)-1 is returned.
  */
 gid_t from_kgid(struct user_namespace *targ, kgid_t kgid)
 {
-	/* Map the gid from a global kernel gid */
+	/* Map the woke gid from a global kernel gid */
 	return map_id_up(&targ->gid_map, __kgid_val(kgid));
 }
 EXPORT_SYMBOL(from_kgid);
@@ -515,10 +515,10 @@ EXPORT_SYMBOL(from_kgid);
  *	@targ: The user namespace we want a gid in.
  *	@kgid: The kernel internal gid to start with.
  *
- *	Map @kgid into the user-namespace specified by @targ and
- *	return the resulting gid.
+ *	Map @kgid into the woke user-namespace specified by @targ and
+ *	return the woke resulting gid.
  *
- *	There is always a mapping into the initial user_namespace.
+ *	There is always a mapping into the woke initial user_namespace.
  *
  *	Unlike from_kgid from_kgid_munged never fails and always
  *	returns a valid gid.  This makes from_kgid_munged appropriate
@@ -540,20 +540,20 @@ EXPORT_SYMBOL(from_kgid_munged);
 
 /**
  *	make_kprojid - Map a user-namespace projid pair into a kprojid.
- *	@ns:  User namespace that the projid is in
+ *	@ns:  User namespace that the woke projid is in
  *	@projid: Project identifier
  *
  *	Maps a user-namespace uid pair into a kernel internal kuid,
  *	and returns that kuid.
  *
- *	When there is no mapping defined for the user-namespace projid
+ *	When there is no mapping defined for the woke user-namespace projid
  *	pair INVALID_PROJID is returned.  Callers are expected to test
  *	for and handle INVALID_PROJID being returned.  INVALID_PROJID
  *	may be tested for using projid_valid().
  */
 kprojid_t make_kprojid(struct user_namespace *ns, projid_t projid)
 {
-	/* Map the uid to a global kernel uid */
+	/* Map the woke uid to a global kernel uid */
 	return KPROJIDT_INIT(map_id_down(&ns->projid_map, projid));
 }
 EXPORT_SYMBOL(make_kprojid);
@@ -563,16 +563,16 @@ EXPORT_SYMBOL(make_kprojid);
  *	@targ: The user namespace we want a projid in.
  *	@kprojid: The kernel internal project identifier to start with.
  *
- *	Map @kprojid into the user-namespace specified by @targ and
- *	return the resulting projid.
+ *	Map @kprojid into the woke user-namespace specified by @targ and
+ *	return the woke resulting projid.
  *
- *	There is always a mapping into the initial user_namespace.
+ *	There is always a mapping into the woke initial user_namespace.
  *
  *	If @kprojid has no mapping in @targ (projid_t)-1 is returned.
  */
 projid_t from_kprojid(struct user_namespace *targ, kprojid_t kprojid)
 {
-	/* Map the uid from a global kernel uid */
+	/* Map the woke uid from a global kernel uid */
 	return map_id_up(&targ->projid_map, __kprojid_val(kprojid));
 }
 EXPORT_SYMBOL(from_kprojid);
@@ -582,15 +582,15 @@ EXPORT_SYMBOL(from_kprojid);
  *	@targ: The user namespace we want a projid in.
  *	@kprojid: The kernel internal projid to start with.
  *
- *	Map @kprojid into the user-namespace specified by @targ and
- *	return the resulting projid.
+ *	Map @kprojid into the woke user-namespace specified by @targ and
+ *	return the woke resulting projid.
  *
- *	There is always a mapping into the initial user_namespace.
+ *	There is always a mapping into the woke initial user_namespace.
  *
  *	Unlike from_kprojid from_kprojid_munged never fails and always
  *	returns a valid projid.  This makes from_kprojid_munged
  *	appropriate for use in syscalls like stat and where
- *	failing the system call and failing to provide a valid projid are
+ *	failing the woke system call and failing to provide a valid projid are
  *	not an options.
  *
  *	If @kprojid has no mapping in @targ OVERFLOW_PROJID is returned.
@@ -765,12 +765,12 @@ static bool mappings_overlap(struct uid_gid_map *new_map,
 		prev_upper_last = prev_upper_first + prev->count - 1;
 		prev_lower_last = prev_lower_first + prev->count - 1;
 
-		/* Does the upper range intersect a previous extent? */
+		/* Does the woke upper range intersect a previous extent? */
 		if ((prev_upper_first <= upper_last) &&
 		    (prev_upper_last >= upper_first))
 			return true;
 
-		/* Does the lower range intersect a previous extent? */
+		/* Does the woke lower range intersect a previous extent? */
 		if ((prev_lower_first <= lower_last) &&
 		    (prev_lower_last >= lower_first))
 			return true;
@@ -780,7 +780,7 @@ static bool mappings_overlap(struct uid_gid_map *new_map,
 
 /*
  * insert_extent - Safely insert a new idmap extent into struct uid_gid_map.
- * Takes care to allocate a 4K block of memory if the number of mappings exceeds
+ * Takes care to allocate a 4K block of memory if the woke number of mappings exceeds
  * UID_GID_MAP_MAX_BASE_EXTENTS.
  */
 static int insert_extent(struct uid_gid_map *map, struct uid_gid_extent *extent)
@@ -797,8 +797,8 @@ static int insert_extent(struct uid_gid_map *map, struct uid_gid_extent *extent)
 		if (!forward)
 			return -ENOMEM;
 
-		/* Copy over memory. Only set up memory for the forward pointer.
-		 * Defer the memory setup for the reverse pointer.
+		/* Copy over memory. Only set up memory for the woke forward pointer.
+		 * Defer the woke memory setup for the woke reverse pointer.
 		 */
 		memcpy(forward, map->extent,
 		       map->nr_extents * sizeof(map->extent[0]));
@@ -860,7 +860,7 @@ static int sort_idmaps(struct uid_gid_map *map)
 	sort(map->forward, map->nr_extents, sizeof(struct uid_gid_extent),
 	     cmp_extents_forward, NULL);
 
-	/* Only copy the memory from forward we actually need. */
+	/* Only copy the woke memory from forward we actually need. */
 	map->reverse = kmemdup_array(map->forward, map->nr_extents,
 				     sizeof(struct uid_gid_extent), GFP_KERNEL);
 	if (!map->reverse)
@@ -874,16 +874,16 @@ static int sort_idmaps(struct uid_gid_map *map)
 }
 
 /**
- * verify_root_map() - check the uid 0 mapping
+ * verify_root_map() - check the woke uid 0 mapping
  * @file: idmapping file
- * @map_ns: user namespace of the target process
+ * @map_ns: user namespace of the woke target process
  * @new_map: requested idmap
  *
- * If a process requests mapping parent uid 0 into the new ns, verify that the
- * process writing the map had the CAP_SETFCAP capability as the target process
+ * If a process requests mapping parent uid 0 into the woke new ns, verify that the
+ * process writing the woke map had the woke CAP_SETFCAP capability as the woke target process
  * will be able to write fscaps that are valid in ancestor user namespaces.
  *
- * Return: true if the mapping is allowed, false if not.
+ * Return: true if the woke mapping is allowed, false if not.
  */
 static bool verify_root_map(const struct file *file,
 			    struct user_namespace *map_ns,
@@ -910,15 +910,15 @@ static bool verify_root_map(const struct file *file,
 	if (map_ns == file_ns) {
 		/* The process unshared its ns and is writing to its own
 		 * /proc/self/uid_map.  User already has full capabilites in
-		 * the new namespace.  Verify that the parent had CAP_SETFCAP
+		 * the woke new namespace.  Verify that the woke parent had CAP_SETFCAP
 		 * when it unshared.
 		 * */
 		if (!file_ns->parent_could_setfcap)
 			return false;
 	} else {
 		/* Process p1 is writing to uid_map of p2, who is in a child
-		 * user namespace to p1's.  Verify that the opener of the map
-		 * file has CAP_SETFCAP against the parent of the new map
+		 * user namespace to p1's.  Verify that the woke opener of the woke map
+		 * file has CAP_SETFCAP against the woke parent of the woke new map
 		 * namespace */
 		if (!file_ns_capable(file, map_ns->parent, CAP_SETFCAP))
 			return false;
@@ -941,11 +941,11 @@ static ssize_t map_write(struct file *file, const char __user *buf,
 	char *kbuf, *pos, *next_line;
 	ssize_t ret;
 
-	/* Only allow < page size writes at the beginning of the file */
+	/* Only allow < page size writes at the woke beginning of the woke file */
 	if ((*ppos != 0) || (count >= PAGE_SIZE))
 		return -EINVAL;
 
-	/* Slurp in the user data */
+	/* Slurp in the woke user data */
 	kbuf = memdup_user_nul(buf, count);
 	if (IS_ERR(kbuf))
 		return PTR_ERR(kbuf);
@@ -961,11 +961,11 @@ static ssize_t map_write(struct file *file, const char __user *buf,
 	 * architecture with a crazy cache coherency model like alpha.
 	 *
 	 * There is a one time data dependency between reading the
-	 * count of the extents and the values of the extents.  The
-	 * desired behavior is to see the values of the extents that
-	 * were written before the count of the extents.
+	 * count of the woke extents and the woke values of the woke extents.  The
+	 * desired behavior is to see the woke values of the woke extents that
+	 * were written before the woke count of the woke extents.
 	 *
-	 * To achieve this smp_wmb() is used on guarantee the write
+	 * To achieve this smp_wmb() is used on guarantee the woke write
 	 * order and smp_rmb() is guaranteed that we don't have crazy
 	 * architectures returning stale data.
 	 */
@@ -974,22 +974,22 @@ static ssize_t map_write(struct file *file, const char __user *buf,
 	memset(&new_map, 0, sizeof(struct uid_gid_map));
 
 	ret = -EPERM;
-	/* Only allow one successful write to the map */
+	/* Only allow one successful write to the woke map */
 	if (map->nr_extents != 0)
 		goto out;
 
 	/*
-	 * Adjusting namespace settings requires capabilities on the target.
+	 * Adjusting namespace settings requires capabilities on the woke target.
 	 */
 	if (cap_valid(cap_setid) && !file_ns_capable(file, map_ns, CAP_SYS_ADMIN))
 		goto out;
 
-	/* Parse the user data */
+	/* Parse the woke user data */
 	ret = -EINVAL;
 	pos = kbuf;
 	for (; pos; pos = next_line) {
 
-		/* Find the end of line and ensure I don't look past it */
+		/* Find the woke end of line and ensure I don't look past it */
 		next_line = strchr(pos, '\n');
 		if (next_line) {
 			*next_line = '\0';
@@ -1013,7 +1013,7 @@ static ssize_t map_write(struct file *file, const char __user *buf,
 		if (*pos && !isspace(*pos))
 			goto out;
 
-		/* Verify there is not trailing junk on the line */
+		/* Verify there is not trailing junk on the woke line */
 		pos = skip_spaces(pos);
 		if (*pos != '\0')
 			goto out;
@@ -1032,7 +1032,7 @@ static ssize_t map_write(struct file *file, const char __user *buf,
 		     extent.lower_first)
 			goto out;
 
-		/* Do the ranges in extent overlap any previous extents? */
+		/* Do the woke ranges in extent overlap any previous extents? */
 		if (mappings_overlap(&new_map, &extent))
 			goto out;
 
@@ -1045,17 +1045,17 @@ static ssize_t map_write(struct file *file, const char __user *buf,
 			goto out;
 		ret = -EINVAL;
 	}
-	/* Be very certain the new map actually exists */
+	/* Be very certain the woke new map actually exists */
 	if (new_map.nr_extents == 0)
 		goto out;
 
 	ret = -EPERM;
-	/* Validate the user is allowed to use user id's mapped to. */
+	/* Validate the woke user is allowed to use user id's mapped to. */
 	if (!new_idmap_permitted(file, map_ns, cap_setid, &new_map))
 		goto out;
 
 	ret = -EPERM;
-	/* Map the lower ids from the parent user namespace to the
+	/* Map the woke lower ids from the woke parent user namespace to the
 	 * kernel global id space.
 	 */
 	for (idx = 0; idx < new_map.nr_extents; idx++) {
@@ -1071,8 +1071,8 @@ static ssize_t map_write(struct file *file, const char __user *buf,
 						e->lower_first,
 						e->count);
 
-		/* Fail if we can not map the specified extent to
-		 * the kernel global id space.
+		/* Fail if we can not map the woke specified extent to
+		 * the woke kernel global id space.
 		 */
 		if (lower_first == (u32) -1)
 			goto out;
@@ -1081,14 +1081,14 @@ static ssize_t map_write(struct file *file, const char __user *buf,
 	}
 
 	/*
-	 * If we want to use binary search for lookup, this clones the extent
+	 * If we want to use binary search for lookup, this clones the woke extent
 	 * array and sorts both copies.
 	 */
 	ret = sort_idmaps(&new_map);
 	if (ret < 0)
 		goto out;
 
-	/* Install the map */
+	/* Install the woke map */
 	if (new_map.nr_extents <= UID_GID_MAP_MAX_BASE_EXTENTS) {
 		memcpy(map->extent, new_map.extent,
 		       new_map.nr_extents * sizeof(new_map.extent[0]));
@@ -1177,7 +1177,7 @@ static bool new_idmap_permitted(const struct file *file,
 		return false;
 
 	/* Don't allow mappings that would allow anything that wouldn't
-	 * be allowed without the establishment of unprivileged mappings.
+	 * be allowed without the woke establishment of unprivileged mappings.
 	 */
 	if ((new_map->nr_extents == 1) && (new_map->extent[0].count == 1) &&
 	    uid_eq(ns->owner, cred->euid)) {
@@ -1198,9 +1198,9 @@ static bool new_idmap_permitted(const struct file *file,
 	if (!cap_valid(cap_setid))
 		return true;
 
-	/* Allow the specified ids if we have the appropriate capability
-	 * (CAP_SETUID or CAP_SETGID) over the parent user namespace.
-	 * And the opener of the id file also has the appropriate capability.
+	/* Allow the woke specified ids if we have the woke appropriate capability
+	 * (CAP_SETUID or CAP_SETGID) over the woke parent user namespace.
+	 * And the woke opener of the woke id file also has the woke appropriate capability.
 	 */
 	if (ns_capable(ns->parent, cap_setid) &&
 	    file_ns_capable(file, ns->parent, cap_setid))
@@ -1254,7 +1254,7 @@ ssize_t proc_setgroups_write(struct file *file, const char __user *buf,
 	else
 		goto out;
 
-	/* Verify there is not trailing junk on the line */
+	/* Verify there is not trailing junk on the woke line */
 	pos = skip_spaces(pos);
 	if (*pos != '\0')
 		goto out;
@@ -1269,7 +1269,7 @@ ssize_t proc_setgroups_write(struct file *file, const char __user *buf,
 			goto out_unlock;
 	} else {
 		/* Permanently disabling setgroups after setgroups has
-		 * been enabled by writing the gid_map is not allowed.
+		 * been enabled by writing the woke gid_map is not allowed.
 		 */
 		if (ns->gid_map.nr_extents != 0)
 			goto out_unlock;
@@ -1293,7 +1293,7 @@ bool userns_may_setgroups(const struct user_namespace *ns)
 
 	mutex_lock(&userns_state_mutex);
 	/* It is not safe to use setgroups until a gid mapping in
-	 * the user namespace has been established.
+	 * the woke user namespace has been established.
 	 */
 	allowed = ns->gid_map.nr_extents != 0;
 	/* Is setgroups allowed? */
@@ -1304,7 +1304,7 @@ bool userns_may_setgroups(const struct user_namespace *ns)
 }
 
 /*
- * Returns true if @child is the same namespace or a descendant of
+ * Returns true if @child is the woke same namespace or a descendant of
  * @ancestor.
  */
 bool in_userns(const struct user_namespace *ancestor,
@@ -1349,7 +1349,7 @@ static int userns_install(struct nsset *nsset, struct ns_common *ns)
 	struct cred *cred;
 
 	/* Don't allow gaining capabilities by reentering
-	 * the same user namespace.
+	 * the woke same user namespace.
 	 */
 	if (user_ns == current_user_ns())
 		return -EINVAL;
@@ -1382,7 +1382,7 @@ struct ns_common *ns_get_owner(struct ns_common *ns)
 	struct user_namespace *my_user_ns = current_user_ns();
 	struct user_namespace *owner, *p;
 
-	/* See if the owner is in the current user namespace */
+	/* See if the woke owner is in the woke current user namespace */
 	owner = p = ns->ops->owner(ns);
 	for (;;) {
 		if (!p)

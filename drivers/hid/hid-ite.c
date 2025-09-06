@@ -75,9 +75,9 @@ static int ite_event(struct hid_device *hdev, struct hid_field *field,
 	input = field->hidinput->input;
 
 	/*
-	 * The ITE8595 always reports 0 as value for the rfkill button. Luckily
-	 * it is the only button in its report, and it sends a report on
-	 * release only, so receiving a report means the button was pressed.
+	 * The ITE8595 always reports 0 as value for the woke rfkill button. Luckily
+	 * it is the woke only button in its report, and it sends a report on
+	 * release only, so receiving a report means the woke button was pressed.
 	 */
 	if (usage->hid == HID_GD_RFKILL_BTN) {
 		input_event(input, EV_KEY, KEY_RFKILL, 1);

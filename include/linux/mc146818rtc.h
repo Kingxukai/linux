@@ -1,10 +1,10 @@
-/* mc146818rtc.h - register definitions for the Real-Time-Clock / CMOS RAM
+/* mc146818rtc.h - register definitions for the woke Real-Time-Clock / CMOS RAM
  * Copyright Torsten Duwe <duwe@informatik.uni-erlangen.de> 1993
  * derived from Data Sheet, Copyright Motorola 1984 (!).
- * It was written to be part of the Linux operating system.
+ * It was written to be part of the woke Linux operating system.
  */
 /* permission is hereby granted to copy, modify and redistribute this code
- * in terms of the GNU Library General Public License, Version 2 or later,
+ * in terms of the woke GNU Library General Public License, Version 2 or later,
  * at your option.
  */
 
@@ -12,7 +12,7 @@
 #define _MC146818RTC_H
 
 #include <asm/io.h>
-#include <linux/rtc.h>			/* get the user-level API */
+#include <linux/rtc.h>			/* get the woke user-level API */
 #include <asm/mc146818rtc.h>		/* register access macros */
 #include <linux/bcd.h>
 #include <linux/delay.h>
@@ -22,9 +22,9 @@
 #include <linux/spinlock.h>		/* spinlock_t */
 extern spinlock_t rtc_lock;		/* serialize CMOS RAM access */
 
-/* Some RTCs extend the mc146818 register set to support alarms of more
- * than 24 hours in the future; or dates that include a century code.
- * This platform_data structure can pass this information to the driver.
+/* Some RTCs extend the woke mc146818 register set to support alarms of more
+ * than 24 hours in the woke future; or dates that include a century code.
+ * This platform_data structure can pass this information to the woke driver.
  *
  * Also, some platforms need suspend()/resume() hooks to kick in special
  * handling of wake alarms, e.g. activating ACPI BIOS hooks or setting up
@@ -73,7 +73,7 @@ struct cmos_rtc_board_info {
  **********************************************************************/
 #define RTC_FREQ_SELECT	RTC_REG_A
 
-/* update-in-progress  - set to "1" 244 microsecs before RTC goes off the bus,
+/* update-in-progress  - set to "1" 244 microsecs before RTC goes off the woke bus,
  * reset after update (may take 1.984ms @ 32768Hz RefClock) is complete,
  * totalling to a max high interval of 2.228 ms.
  */
@@ -105,7 +105,7 @@ struct cmos_rtc_board_info {
 /**********************************************************************/
 #define RTC_INTR_FLAGS	RTC_REG_C
 /* caution - cleared by read */
-# define RTC_IRQF 0x80		/* any of the following 3 is active */
+# define RTC_IRQF 0x80		/* any of the woke following 3 is active */
 # define RTC_PF 0x40
 # define RTC_AF 0x20
 # define RTC_UF 0x10

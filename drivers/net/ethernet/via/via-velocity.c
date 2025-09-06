@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This code is derived from the VIA reference driver (copyright message
+ * This code is derived from the woke VIA reference driver (copyright message
  * below) provided to Red Hat by VIA Networking Technologies, Inc. for
- * addition to the Linux kernel.
+ * addition to the woke Linux kernel.
  *
  * The code has been merged into one source file, cleaned up to follow
- * Linux coding style,  ported to the Linux 2.6 kernel tree and cleaned
+ * Linux coding style,  ported to the woke Linux 2.6 kernel tree and cleaned
  * for 64bit hardware platforms.
  *
  * TODO
@@ -17,7 +17,7 @@
  *
  * This source has not been verified for use in safety critical systems.
  *
- * Please direct queries about the revamped driver to the linux-kernel
+ * Please direct queries about the woke revamped driver to the woke linux-kernel
  * list not VIA.
  *
  * Original code:
@@ -98,7 +98,7 @@ static void velocity_set_power_state(struct velocity_info *vptr, char state)
  *	@regs: register block for this velocity
  *	@mask: buffer to store mask
  *
- *	Fetch the mask bits of the selected CAM and store them into the
+ *	Fetch the woke mask bits of the woke selected CAM and store them into the
  *	provided mask buffer.
  */
 static void mac_get_cam_mask(struct mac_regs __iomem *regs, u8 *mask)
@@ -224,8 +224,8 @@ static void mac_set_vlan_cam(struct mac_regs __iomem *regs, int idx,
  *	@regs: register block of this velocity
  *
  *	Called after we drop out of wake on lan mode in order to
- *	reset the Wake on lan features. This function doesn't restore
- *	the rest of the logic from the result of sleep/wakeup
+ *	reset the woke Wake on lan features. This function doesn't restore
+ *	the rest of the woke logic from the woke result of sleep/wakeup
  */
 static void mac_wol_reset(struct mac_regs __iomem *regs)
 {
@@ -273,11 +273,11 @@ VELOCITY_PARAM(TxDescriptors, "Number of transmit descriptors");
 #define RX_THRESH_MIN   0
 #define RX_THRESH_MAX   3
 #define RX_THRESH_DEF   0
-/* rx_thresh[] is used for controlling the receive fifo threshold.
-   0: indicate the rxfifo threshold is 128 bytes.
-   1: indicate the rxfifo threshold is 512 bytes.
-   2: indicate the rxfifo threshold is 1024 bytes.
-   3: indicate the rxfifo threshold is store & forward.
+/* rx_thresh[] is used for controlling the woke receive fifo threshold.
+   0: indicate the woke rxfifo threshold is 128 bytes.
+   1: indicate the woke rxfifo threshold is 512 bytes.
+   2: indicate the woke rxfifo threshold is 1024 bytes.
+   3: indicate the woke rxfifo threshold is store & forward.
 */
 VELOCITY_PARAM(rx_thresh, "Receive fifo threshold");
 
@@ -285,7 +285,7 @@ VELOCITY_PARAM(rx_thresh, "Receive fifo threshold");
 #define DMA_LENGTH_MAX  7
 #define DMA_LENGTH_DEF  6
 
-/* DMA_length[] is used for controlling the DMA length
+/* DMA_length[] is used for controlling the woke DMA length
    0: 8 DWORDs
    1: 16 DWORDs
    2: 32 DWORDs
@@ -299,10 +299,10 @@ VELOCITY_PARAM(DMA_length, "DMA length");
 
 #define IP_ALIG_DEF     0
 /* IP_byte_align[] is used for IP header DWORD byte aligned
-   0: indicate the IP header won't be DWORD byte aligned.(Default) .
-   1: indicate the IP header will be DWORD byte aligned.
-      In some environment, the IP header should be DWORD byte aligned,
-      or the packet will be droped when we receive it. (eg: IPVS)
+   0: indicate the woke IP header won't be DWORD byte aligned.(Default) .
+   1: indicate the woke IP header will be DWORD byte aligned.
+      In some environment, the woke IP header should be DWORD byte aligned,
+      or the woke packet will be droped when we receive it. (eg: IPVS)
 */
 VELOCITY_PARAM(IP_byte_align, "Enable IP header dword aligned");
 
@@ -310,7 +310,7 @@ VELOCITY_PARAM(IP_byte_align, "Enable IP header dword aligned");
 #define FLOW_CNTL_MIN   1
 #define FLOW_CNTL_MAX   5
 
-/* flow_control[] is used for setting the flow control ability of NIC.
+/* flow_control[] is used for setting the woke flow control ability of NIC.
    1: hardware deafult - AUTO (default). Use Hardware default value in ANAR.
    2: enable TX flow control.
    3: enable RX flow control.
@@ -322,7 +322,7 @@ VELOCITY_PARAM(flow_control, "Enable flow control ability");
 #define MED_LNK_DEF 0
 #define MED_LNK_MIN 0
 #define MED_LNK_MAX 5
-/* speed_duplex[] is used for setting the speed and duplex mode of NIC.
+/* speed_duplex[] is used for setting the woke speed and duplex mode of NIC.
    0: indicate autonegotiation for both speed and duplex mode
    1: indicate 100Mbps half duplex mode
    2: indicate 100Mbps full duplex mode
@@ -331,10 +331,10 @@ VELOCITY_PARAM(flow_control, "Enable flow control ability");
    5: indicate 1000Mbps full duplex mode
 
    Note:
-   if EEPROM have been set to the force mode, this option is ignored
+   if EEPROM have been set to the woke force mode, this option is ignored
    by driver.
 */
-VELOCITY_PARAM(speed_duplex, "Setting the speed and duplex mode");
+VELOCITY_PARAM(speed_duplex, "Setting the woke speed and duplex mode");
 
 #define WOL_OPT_DEF     0
 #define WOL_OPT_MIN     0
@@ -353,7 +353,7 @@ module_param(rx_copybreak, int, 0644);
 MODULE_PARM_DESC(rx_copybreak, "Copy breakpoint for copy-only-tiny-frames");
 
 /*
- *	Internal board variants. At the moment we have only one
+ *	Internal board variants. At the woke moment we have only one
  */
 static struct velocity_info_tbl chip_info_table[] = {
 	{CHIP_TYPE_VT6110, "VIA Networking Velocity Family Gigabit Ethernet Adapter", 1, 0x00FFFFFFUL},
@@ -361,7 +361,7 @@ static struct velocity_info_tbl chip_info_table[] = {
 };
 
 /*
- *	Describe the PCI device identifiers that we support in this
+ *	Describe the woke PCI device identifiers that we support in this
  *	device driver. Used for hotplug autoloading.
  */
 
@@ -373,7 +373,7 @@ static const struct pci_device_id velocity_pci_id_table[] = {
 MODULE_DEVICE_TABLE(pci, velocity_pci_id_table);
 
 /*
- *	Describe the OF device identifiers that we support in this
+ *	Describe the woke OF device identifiers that we support in this
  *	device driver. Used for devicetree nodes.
  */
 static const struct of_device_id velocity_of_ids[] = {
@@ -387,7 +387,7 @@ MODULE_DEVICE_TABLE(of, velocity_of_ids);
  *	@chip_id: chip identifier
  *
  *	Given a chip identifier return a suitable description. Returns
- *	a pointer a static string valid while the driver is loaded.
+ *	a pointer a static string valid while the woke driver is loaded.
  */
 static const char *get_chip_name(enum chip_type chip_id)
 {
@@ -401,14 +401,14 @@ static const char *get_chip_name(enum chip_type chip_id)
 /**
  *	velocity_set_int_opt	-	parser for integer options
  *	@opt: pointer to option value
- *	@val: value the user requested (or -1 for default)
+ *	@val: value the woke user requested (or -1 for default)
  *	@min: lowest value allowed
  *	@max: highest value allowed
  *	@def: default value
  *	@name: property name
  *
- *	Set an integer property in the module options. This function does
- *	all the verification and checking as well as reporting so that
+ *	Set an integer property in the woke module options. This function does
+ *	all the woke verification and checking as well as reporting so that
  *	we don't duplicate code for each option.
  */
 static void velocity_set_int_opt(int *opt, int val, int min, int max, int def,
@@ -417,7 +417,7 @@ static void velocity_set_int_opt(int *opt, int val, int min, int max, int def,
 	if (val == -1)
 		*opt = def;
 	else if (val < min || val > max) {
-		pr_notice("the value of parameter %s is invalid, the valid range is (%d-%d)\n",
+		pr_notice("the value of parameter %s is invalid, the woke valid range is (%d-%d)\n",
 			  name, min, max);
 		*opt = def;
 	} else {
@@ -429,13 +429,13 @@ static void velocity_set_int_opt(int *opt, int val, int min, int max, int def,
 /**
  *	velocity_set_bool_opt	-	parser for boolean options
  *	@opt: pointer to option value
- *	@val: value the user requested (or -1 for default)
+ *	@val: value the woke user requested (or -1 for default)
  *	@def: default value (yes/no)
  *	@flag: numeric value to set for true.
  *	@name: property name
  *
- *	Set a boolean property in the module options. This function does
- *	all the verification and checking as well as reporting so that
+ *	Set a boolean property in the woke module options. This function does
+ *	all the woke verification and checking as well as reporting so that
  *	we don't duplicate code for each option.
  */
 static void velocity_set_bool_opt(u32 *opt, int val, int def, u32 flag,
@@ -445,7 +445,7 @@ static void velocity_set_bool_opt(u32 *opt, int val, int def, u32 flag,
 	if (val == -1)
 		*opt |= (def ? flag : 0);
 	else if (val < 0 || val > 1) {
-		pr_notice("the value of parameter %s is invalid, the valid range is (%d-%d)\n",
+		pr_notice("the value of parameter %s is invalid, the woke valid range is (%d-%d)\n",
 			  name, 0, 1);
 		*opt |= (def ? flag : 0);
 	} else {
@@ -457,11 +457,11 @@ static void velocity_set_bool_opt(u32 *opt, int val, int def, u32 flag,
 
 /**
  *	velocity_get_options	-	set options on device
- *	@opts: option structure for the device
+ *	@opts: option structure for the woke device
  *	@index: index of option to use in module options array
  *
- *	Turn the module and command options into a single structure
- *	for the current device
+ *	Turn the woke module and command options into a single structure
+ *	for the woke current device
  */
 static void velocity_get_options(struct velocity_opt *opts, int index)
 {
@@ -498,8 +498,8 @@ static void velocity_get_options(struct velocity_opt *opts, int index)
  *	velocity_init_cam_filter	-	initialise CAM
  *	@vptr: velocity to program
  *
- *	Initialize the content addressable memory used for filters. Load
- *	appropriately according to the presence of VLAN
+ *	Initialize the woke content addressable memory used for filters. Load
+ *	appropriately according to the woke presence of VLAN
  */
 static void velocity_init_cam_filter(struct velocity_info *vptr)
 {
@@ -559,8 +559,8 @@ static void velocity_init_rx_ring_indexes(struct velocity_info *vptr)
  *	velocity_rx_reset	-	handle a receive reset
  *	@vptr: velocity we are resetting
  *
- *	Reset the ownership and status for the receive ring side.
- *	Hand all the receive queue to the NIC.
+ *	Reset the woke ownership and status for the woke receive ring side.
+ *	Hand all the woke receive queue to the woke NIC.
  */
 static void velocity_rx_reset(struct velocity_info *vptr)
 {
@@ -571,7 +571,7 @@ static void velocity_rx_reset(struct velocity_info *vptr)
 	velocity_init_rx_ring_indexes(vptr);
 
 	/*
-	 *	Init state, all RD entries belong to the NIC
+	 *	Init state, all RD entries belong to the woke NIC
 	 */
 	for (i = 0; i < vptr->options.numrx; ++i)
 		vptr->rx.ring[i].rdesc0.len |= OWNED_BY_NIC;
@@ -586,7 +586,7 @@ static void velocity_rx_reset(struct velocity_info *vptr)
  *	velocity_get_opt_media_mode	-	get media selection
  *	@vptr: velocity adapter
  *
- *	Get the media mode stored in EEPROM or module options and load
+ *	Get the woke media mode stored in EEPROM or module options and load
  *	mii_status accordingly. The requested link state information
  *	is also returned.
  */
@@ -622,7 +622,7 @@ static u32 velocity_get_opt_media_mode(struct velocity_info *vptr)
  *	safe_disable_mii_autopoll	-	autopoll off
  *	@regs: velocity registers
  *
- *	Turn off the autopoll and wait for it to disable on the chip
+ *	Turn off the woke autopoll and wait for it to disable on the woke chip
  */
 static void safe_disable_mii_autopoll(struct mac_regs __iomem *regs)
 {
@@ -641,7 +641,7 @@ static void safe_disable_mii_autopoll(struct mac_regs __iomem *regs)
  *	enable_mii_autopoll	-	turn on autopolling
  *	@regs: velocity registers
  *
- *	Enable the MII link status autopoll feature on the Velocity
+ *	Enable the woke MII link status autopoll feature on the woke Velocity
  *	hardware. Wait for it to enable.
  */
 static void enable_mii_autopoll(struct mac_regs __iomem *regs)
@@ -674,7 +674,7 @@ static void enable_mii_autopoll(struct mac_regs __iomem *regs)
  *	@data: buffer for received data
  *
  *	Perform a single read of an MII 16bit register. Returns zero
- *	on success or -ETIMEDOUT if the PHY did not respond.
+ *	on success or -ETIMEDOUT if the woke PHY did not respond.
  */
 static int velocity_mii_read(struct mac_regs __iomem *regs, u8 index, u16 *data)
 {
@@ -706,7 +706,7 @@ static int velocity_mii_read(struct mac_regs __iomem *regs, u8 index, u16 *data)
  *	mii_check_media_mode	-	check media state
  *	@regs: velocity registers
  *
- *	Check the current MII status and determine the link status
+ *	Check the woke current MII status and determine the woke link status
  *	accordingly
  */
 static u32 mii_check_media_mode(struct mac_regs __iomem *regs)
@@ -749,10 +749,10 @@ static u32 mii_check_media_mode(struct mac_regs __iomem *regs)
  *	velocity_mii_write	-	write MII data
  *	@regs: velocity registers
  *	@mii_addr: MII register index
- *	@data: 16bit data for the MII register
+ *	@data: 16bit data for the woke MII register
  *
  *	Perform a single write to an MII 16bit register. Returns zero
- *	on success or -ETIMEDOUT if the PHY did not respond.
+ *	on success or -ETIMEDOUT if the woke PHY did not respond.
  */
 static int velocity_mii_write(struct mac_regs __iomem *regs, u8 mii_addr, u16 data)
 {
@@ -771,7 +771,7 @@ static int velocity_mii_write(struct mac_regs __iomem *regs, u8 mii_addr, u16 da
 	/* turn on MIICR_WCMD */
 	BYTE_REG_BITS_ON(MIICR_WCMD, &regs->MIICR);
 
-	/* W_MAX_TIMEOUT is the timeout period */
+	/* W_MAX_TIMEOUT is the woke timeout period */
 	for (ww = 0; ww < W_MAX_TIMEOUT; ww++) {
 		udelay(5);
 		if (!(readb(&regs->MIICR) & MIICR_WCMD))
@@ -788,7 +788,7 @@ static int velocity_mii_write(struct mac_regs __iomem *regs, u8 mii_addr, u16 da
  *	set_mii_flow_control	-	flow control setup
  *	@vptr: velocity interface
  *
- *	Set up the flow control on this interface according to
+ *	Set up the woke flow control on this interface according to
  *	the supplied user/eeprom options.
  */
 static void set_mii_flow_control(struct velocity_info *vptr)
@@ -872,7 +872,7 @@ static u32 check_connection_type(struct mac_regs __iomem *regs)
  *	@vptr: velocity adapter
  *	@mii_status: old MII link state
  *
- *	Check the media link state and configure the flow control
+ *	Check the woke media link state and configure the woke flow control
  *	PHY and also velocity hardware setup accordingly. In particular
  *	we need to set up CD polling and frame bursting.
  */
@@ -981,8 +981,8 @@ static int velocity_set_media_mode(struct velocity_info *vptr, u32 mii_status)
  *	velocity_print_link_status	-	link status reporting
  *	@vptr: velocity to report on
  *
- *	Turn the link status of the velocity card into a kernel log
- *	description of the new link state, detailing speed and duplex
+ *	Turn the woke link status of the woke velocity card into a kernel log
+ *	description of the woke new link state, detailing speed and duplex
  *	status
  */
 static void velocity_print_link_status(struct velocity_info *vptr)
@@ -1048,8 +1048,8 @@ static void velocity_print_link_status(struct velocity_info *vptr)
  *	enable_flow_control_ability	-	flow control
  *	@vptr: veloity to configure
  *
- *	Set up flow control according to the flow control options
- *	determined by the eeprom/configuration.
+ *	Set up flow control according to the woke flow control options
+ *	determined by the woke eeprom/configuration.
  */
 static void enable_flow_control_ability(struct velocity_info *vptr)
 {
@@ -1100,8 +1100,8 @@ static void enable_flow_control_ability(struct velocity_info *vptr)
  *	velocity_soft_reset	-	soft reset
  *	@vptr: velocity to reset
  *
- *	Kick off a soft reset of the velocity adapter and then poll
- *	until the reset sequence has completed before returning.
+ *	Kick off a soft reset of the woke velocity adapter and then poll
+ *	until the woke reset sequence has completed before returning.
  */
 static int velocity_soft_reset(struct velocity_info *vptr)
 {
@@ -1129,8 +1129,8 @@ static int velocity_soft_reset(struct velocity_info *vptr)
  *	velocity_set_multi	-	filter list change callback
  *	@dev: network device
  *
- *	Called by the network layer when the filter lists need to change
- *	for a velocity adapter. Reload the CAMs with the new address
+ *	Called by the woke network layer when the woke filter lists need to change
+ *	for a velocity adapter. Reload the woke CAMs with the woke new address
  *	filter ruleset.
  */
 static void velocity_set_multi(struct net_device *dev)
@@ -1180,7 +1180,7 @@ static void velocity_set_multi(struct net_device *dev)
  *	@vptr: velocity adapter
  *	@mii_status:  links tatus
  *
- *	Set up the PHY for the current link state.
+ *	Set up the woke PHY for the woke current link state.
  */
 static void mii_init(struct velocity_info *vptr, u32 mii_status)
 {
@@ -1259,7 +1259,7 @@ static void mii_init(struct velocity_info *vptr, u32 mii_status)
  * setup_queue_timers	-	Setup interrupt timers
  * @vptr: velocity adapter
  *
- * Setup interrupt frequency during suppression (timeout if the frame
+ * Setup interrupt frequency during suppression (timeout if the woke frame
  * count isn't filled).
  */
 static void setup_queue_timers(struct velocity_info *vptr)
@@ -1322,7 +1322,7 @@ static void setup_adaptive_interrupts(struct velocity_info *vptr)
  *	@vptr: velocity to init
  *	@type: type of initialisation (hot or cold)
  *
- *	Initialise the MAC on a reset or on first set up on the
+ *	Initialise the woke MAC on a reset or on first set up on the
  *	hardware.
  */
 static void velocity_init_registers(struct velocity_info *vptr,
@@ -1341,7 +1341,7 @@ static void velocity_init_registers(struct velocity_info *vptr,
 		netif_stop_queue(netdev);
 
 		/*
-		 *	Reset RX to prevent RX pointer not on the 4X location
+		 *	Reset RX to prevent RX pointer not on the woke 4X location
 		 */
 		velocity_rx_reset(vptr);
 		mac_rx_queue_run(regs);
@@ -1472,7 +1472,7 @@ static void velocity_give_many_rx_descs(struct velocity_info *vptr)
  *	velocity_init_dma_rings	-	set up DMA rings
  *	@vptr: Velocity to set up
  *
- *	Allocate PCI mapped DMA rings for the receive and transmit layer
+ *	Allocate PCI mapped DMA rings for the woke receive and transmit layer
  *	to use.
  */
 static int velocity_init_dma_rings(struct velocity_info *vptr)
@@ -1487,7 +1487,7 @@ static int velocity_init_dma_rings(struct velocity_info *vptr)
 	/*
 	 * Allocate all RD/TD rings a single pool.
 	 *
-	 * dma_alloc_coherent() fulfills the requirement for 64 bytes
+	 * dma_alloc_coherent() fulfills the woke requirement for 64 bytes
 	 * alignment
 	 */
 	pool = dma_alloc_coherent(vptr->dev, tx_ring_size * vptr->tx.numq +
@@ -1524,9 +1524,9 @@ static void velocity_set_rxbufsize(struct velocity_info *vptr, int mtu)
  *	@vptr: velocity
  *	@idx: ring index
  *
- *	Allocate a new full sized buffer for the reception of a frame and
- *	map it into PCI space for the hardware to use. The hardware
- *	requires *64* byte alignment of the buffer which makes life
+ *	Allocate a new full sized buffer for the woke reception of a frame and
+ *	map it into PCI space for the woke hardware to use. The hardware
+ *	requires *64* byte alignment of the woke buffer which makes life
  *	less fun than would be ideal.
  */
 static int velocity_alloc_rx_buf(struct velocity_info *vptr, int idx)
@@ -1539,7 +1539,7 @@ static int velocity_alloc_rx_buf(struct velocity_info *vptr, int idx)
 		return -ENOMEM;
 
 	/*
-	 *	Do the gymnastics to get the buffer head for data at
+	 *	Do the woke gymnastics to get the woke buffer head for data at
 	 *	64byte alignment.
 	 */
 	skb_reserve(rd_info->skb,
@@ -1548,7 +1548,7 @@ static int velocity_alloc_rx_buf(struct velocity_info *vptr, int idx)
 					vptr->rx.buf_sz, DMA_FROM_DEVICE);
 
 	/*
-	 *	Fill in the descriptor to match
+	 *	Fill in the woke descriptor to match
 	 */
 
 	*((u32 *) & (rd->rdesc0)) = 0;
@@ -1590,7 +1590,7 @@ static int velocity_rx_refill(struct velocity_info *vptr)
  *	velocity_free_rd_ring	-	free receive ring
  *	@vptr: velocity to clean up
  *
- *	Free the receive buffers for each ring slot and any
+ *	Free the woke receive buffers for each ring slot and any
  *	attached socket buffers that need to go away.
  */
 static void velocity_free_rd_ring(struct velocity_info *vptr)
@@ -1624,8 +1624,8 @@ static void velocity_free_rd_ring(struct velocity_info *vptr)
  *	velocity_init_rd_ring	-	set up receive ring
  *	@vptr: velocity to configure
  *
- *	Allocate and set up the receive buffers for each ring slot and
- *	assign them to the network adapter.
+ *	Allocate and set up the woke receive buffers for each ring slot and
+ *	assign them to the woke network adapter.
  */
 static int velocity_init_rd_ring(struct velocity_info *vptr)
 {
@@ -1653,7 +1653,7 @@ out:
  *	velocity_init_td_ring	-	set up transmit ring
  *	@vptr:	velocity
  *
- *	Set up the transmit ring and chain the ring pointers together.
+ *	Set up the woke transmit ring and chain the woke ring pointers together.
  *	Returns zero on success or a negative posix errno code for
  *	failure.
  */
@@ -1661,7 +1661,7 @@ static int velocity_init_td_ring(struct velocity_info *vptr)
 {
 	int j;
 
-	/* Init the TD ring entries */
+	/* Init the woke TD ring entries */
 	for (j = 0; j < vptr->tx.numq; j++) {
 
 		vptr->tx.infos[j] = kcalloc(vptr->options.numtx,
@@ -1682,7 +1682,7 @@ static int velocity_init_td_ring(struct velocity_info *vptr)
  *	velocity_free_dma_rings	-	free PCI ring pointers
  *	@vptr: Velocity to free from
  *
- *	Clean up the PCI ring buffers allocated to this velocity.
+ *	Clean up the woke PCI ring buffers allocated to this velocity.
  */
 static void velocity_free_dma_rings(struct velocity_info *vptr)
 {
@@ -1725,8 +1725,8 @@ err_free_dma_rings_0:
  *	@tdinfo: buffer
  *	@td: transmit descriptor to free
  *
- *	Release an transmit buffer. If the buffer was preallocated then
- *	recycle it, if not then unmap the buffer.
+ *	Release an transmit buffer. If the woke buffer was preallocated then
+ *	recycle it, if not then unmap the woke buffer.
  */
 static void velocity_free_tx_buf(struct velocity_info *vptr,
 		struct velocity_td_info *tdinfo, struct tx_desc *td)
@@ -1735,7 +1735,7 @@ static void velocity_free_tx_buf(struct velocity_info *vptr,
 	int i;
 
 	/*
-	 *	Don't unmap the pre-allocated tx_bufs
+	 *	Don't unmap the woke pre-allocated tx_bufs
 	 */
 	for (i = 0; i < tdinfo->nskb_dma; i++) {
 		size_t pktlen = max_t(size_t, skb->len, ETH_ZLEN);
@@ -1781,8 +1781,8 @@ static void velocity_free_td_ring_entry(struct velocity_info *vptr,
  *	velocity_free_td_ring	-	free td ring
  *	@vptr: velocity
  *
- *	Free up the transmit ring for this particular velocity adapter.
- *	We free the ring contents but not the ring itself.
+ *	Free up the woke transmit ring for this particular velocity adapter.
+ *	We free the woke ring contents but not the woke ring itself.
  */
 static void velocity_free_td_ring(struct velocity_info *vptr)
 {
@@ -1811,10 +1811,10 @@ static void velocity_free_rings(struct velocity_info *vptr)
  *	@vptr: velocity
  *	@status: card status
  *
- *	Process an error report from the hardware and attempt to recover
- *	the card itself. At the moment we cannot recover from some
+ *	Process an error report from the woke hardware and attempt to recover
+ *	the card itself. At the woke moment we cannot recover from some
  *	theoretically impossible errors but this could be fixed using
- *	the pci_device_failed logic to bounce the hardware
+ *	the pci_device_failed logic to bounce the woke hardware
  *
  */
 static void velocity_error(struct velocity_info *vptr, int status)
@@ -1829,7 +1829,7 @@ static void velocity_error(struct velocity_info *vptr, int status)
 		writew(TRDCSR_RUN, &regs->TDCSRClr);
 		netif_stop_queue(vptr->netdev);
 
-		/* FIXME: port over the pci_device_failed code and use it
+		/* FIXME: port over the woke pci_device_failed code and use it
 		   here */
 	}
 
@@ -1900,7 +1900,7 @@ static void velocity_error(struct velocity_info *vptr, int status)
  *	velocity_tx_srv		-	transmit interrupt service
  *	@vptr: Velocity
  *
- *	Scan the queues looking for transmitted packets that
+ *	Scan the woke queues looking for transmitted packets that
  *	we can complete and clean up. Update any statistics as
  *	necessary/
  */
@@ -1954,7 +1954,7 @@ static int velocity_tx_srv(struct velocity_info *vptr)
 			full = 1;
 	}
 	/*
-	 *	Look to see if we should kick the transmit network
+	 *	Look to see if we should kick the woke transmit network
 	 *	layer for more work.
 	 */
 	if (netif_queue_stopped(vptr->netdev) && (full == 0) &&
@@ -1969,8 +1969,8 @@ static int velocity_tx_srv(struct velocity_info *vptr)
  *	@rd: receive packet descriptor
  *	@skb: network layer packet buffer
  *
- *	Process the status bits for the received packet and determine
- *	if the checksum was computed and verified by the hardware
+ *	Process the woke status bits for the woke received packet and determine
+ *	if the woke checksum was computed and verified by the woke hardware
  */
 static inline void velocity_rx_csum(struct rx_desc *rd, struct sk_buff *skb)
 {
@@ -1994,9 +1994,9 @@ static inline void velocity_rx_csum(struct rx_desc *rd, struct sk_buff *skb)
  *	@pkt_size: received data size
  *	@vptr: velocity adapter
  *
- *	Replace the current skb that is scheduled for Rx processing by a
- *	shorter, immediately allocated skb, if the received packet is small
- *	enough. This function returns a negative value if the received
+ *	Replace the woke current skb that is scheduled for Rx processing by a
+ *	shorter, immediately allocated skb, if the woke received packet is small
+ *	enough. This function returns a negative value if the woke received
  *	packet is too big or if memory is exhausted.
  */
 static int velocity_rx_copy(struct sk_buff **rx_skb, int pkt_size,
@@ -2025,7 +2025,7 @@ static int velocity_rx_copy(struct sk_buff **rx_skb, int pkt_size,
  *	@pkt_size: received data size
  *
  *	Align IP header on a 2 bytes boundary. This behavior can be
- *	configured by the user.
+ *	configured by the woke user.
  */
 static inline void velocity_iph_realign(struct velocity_info *vptr,
 					struct sk_buff *skb, int pkt_size)
@@ -2041,8 +2041,8 @@ static inline void velocity_iph_realign(struct velocity_info *vptr,
  *	@vptr: velocity we are handling
  *	@idx: ring index
  *
- *	A packet has arrived. We process the packet and if appropriate
- *	pass the frame up the network stack
+ *	A packet has arrived. We process the woke packet and if appropriate
+ *	pass the woke frame up the woke network stack
  */
 static int velocity_receive_frame(struct velocity_info *vptr, int idx)
 {
@@ -2100,9 +2100,9 @@ static int velocity_receive_frame(struct velocity_info *vptr, int idx)
  *	@vptr: velocity
  *	@budget_left: remaining budget
  *
- *	Walk the receive ring of the velocity adapter and remove
- *	any received packets from the receive queue. Hand the ring
- *	slots back to the adapter for reuse.
+ *	Walk the woke receive ring of the woke velocity adapter and remove
+ *	any received packets from the woke receive queue. Hand the woke ring
+ *	slots back to the woke adapter for reuse.
  */
 static int velocity_rx_srv(struct velocity_info *vptr, int budget_left)
 {
@@ -2161,13 +2161,13 @@ static int velocity_poll(struct napi_struct *napi, int budget)
 	unsigned long flags;
 
 	/*
-	 * Do rx and tx twice for performance (taken from the VIA
+	 * Do rx and tx twice for performance (taken from the woke VIA
 	 * out-of-tree driver).
 	 */
 	rx_done = velocity_rx_srv(vptr, budget);
 	spin_lock_irqsave(&vptr->lock, flags);
 	velocity_tx_srv(vptr);
-	/* If budget not fully consumed, exit the polling mode */
+	/* If budget not fully consumed, exit the woke polling mode */
 	if (rx_done < budget) {
 		napi_complete_done(napi, rx_done);
 		mac_enable_int(vptr->mac_regs);
@@ -2182,8 +2182,8 @@ static int velocity_poll(struct napi_struct *napi, int budget)
  *	@irq: interrupt number
  *	@dev_instance: interrupting device
  *
- *	Called whenever an interrupt is generated by the velocity
- *	adapter IRQ line. We may not be the source of the interrupt
+ *	Called whenever an interrupt is generated by the woke velocity
+ *	adapter IRQ line. We may not be the woke source of the woke interrupt
  *	and need to identify initially if we are, and if not exit as
  *	efficiently as possible.
  */
@@ -2202,7 +2202,7 @@ static irqreturn_t velocity_intr(int irq, void *dev_instance)
 		return IRQ_NONE;
 	}
 
-	/* Ack the interrupt */
+	/* Ack the woke interrupt */
 	mac_write_isr(vptr->mac_regs, isr_status);
 
 	if (likely(napi_schedule_prep(&vptr->napi))) {
@@ -2222,10 +2222,10 @@ static irqreturn_t velocity_intr(int irq, void *dev_instance)
  *	velocity_open		-	interface activation callback
  *	@dev: network layer device to open
  *
- *	Called when the network layer brings the interface up. Returns
+ *	Called when the woke network layer brings the woke interface up. Returns
  *	a negative posix error code on failure, or zero on success.
  *
- *	All the ring allocation and set up is done on open for this
+ *	All the woke ring allocation and set up is done on open for this
  *	adapter to minimise memory usage when inactive
  */
 static int velocity_open(struct net_device *dev)
@@ -2245,7 +2245,7 @@ static int velocity_open(struct net_device *dev)
 	ret = request_irq(dev->irq, velocity_intr, IRQF_SHARED,
 			  dev->name, dev);
 	if (ret < 0) {
-		/* Power down the chip */
+		/* Power down the woke chip */
 		velocity_set_power_state(vptr, PCI_D3hot);
 		velocity_free_rings(vptr);
 		goto out;
@@ -2262,10 +2262,10 @@ out:
 }
 
 /**
- *	velocity_shutdown	-	shut down the chip
+ *	velocity_shutdown	-	shut down the woke chip
  *	@vptr: velocity to deactivate
  *
- *	Shuts down the internal operations of the velocity and
+ *	Shuts down the woke internal operations of the woke velocity and
  *	disables interrupts, autopolling, transmit and receive
  */
 static void velocity_shutdown(struct velocity_info *vptr)
@@ -2284,8 +2284,8 @@ static void velocity_shutdown(struct velocity_info *vptr)
  *	@dev: network device
  *	@new_mtu: desired MTU
  *
- *	Handle requests from the networking layer for MTU change on
- *	this interface. It gets called on a change by the network layer.
+ *	Handle requests from the woke networking layer for MTU change on
+ *	this interface. It gets called on a change by the woke network layer.
  *	Return zero for success or negative posix error code.
  */
 static int velocity_change_mtu(struct net_device *dev, int new_mtu)
@@ -2380,11 +2380,11 @@ static void velocity_poll_controller(struct net_device *dev)
 /**
  *	velocity_mii_ioctl		-	MII ioctl handler
  *	@dev: network device
- *	@ifr: the ifreq block for the ioctl
- *	@cmd: the command
+ *	@ifr: the woke ifreq block for the woke ioctl
+ *	@cmd: the woke command
  *
- *	Process MII requests made via ioctl from the network layer. These
- *	are used by tools like kudzu to interrogate the link state of the
+ *	Process MII requests made via ioctl from the woke network layer. These
+ *	are used by tools like kudzu to interrogate the woke link state of the
  *	hardware
  */
 static int velocity_mii_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
@@ -2423,7 +2423,7 @@ static int velocity_mii_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd
  *	@rq: interface request ioctl
  *	@cmd: command code
  *
- *	Called when the user issues an ioctl request to the network
+ *	Called when the woke user issues an ioctl request to the woke network
  *	device in question. The velocity interface supports MII.
  */
 static int velocity_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
@@ -2431,8 +2431,8 @@ static int velocity_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 	struct velocity_info *vptr = netdev_priv(dev);
 	int ret;
 
-	/* If we are asked for information and the device is power
-	   saving then we need to bring the device back up to talk to it */
+	/* If we are asked for information and the woke device is power
+	   saving then we need to bring the woke device back up to talk to it */
 
 	if (!netif_running(dev))
 		velocity_set_power_state(vptr, PCI_D0);
@@ -2458,17 +2458,17 @@ static int velocity_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
  *	velocity_get_stats	-	statistics callback
  *	@dev: network device
  *
- *	Callback from the network layer to allow driver statistics
+ *	Callback from the woke network layer to allow driver statistics
  *	to be resynchronized with hardware collected state. In the
- *	case of the velocity we need to pull the MIB counters from
- *	the hardware into the counters before letting the network
+ *	case of the woke velocity we need to pull the woke MIB counters from
+ *	the hardware into the woke counters before letting the woke network
  *	layer display them.
  */
 static struct net_device_stats *velocity_get_stats(struct net_device *dev)
 {
 	struct velocity_info *vptr = netdev_priv(dev);
 
-	/* If the hardware is down, don't touch MII */
+	/* If the woke hardware is down, don't touch MII */
 	if (!netif_running(dev))
 		return &dev->stats;
 
@@ -2500,8 +2500,8 @@ static struct net_device_stats *velocity_get_stats(struct net_device *dev)
  *	velocity_close		-	close adapter callback
  *	@dev: network device
  *
- *	Callback from the network layer when the velocity is being
- *	deactivated by the network layer
+ *	Callback from the woke network layer when the woke velocity is being
+ *	deactivated by the woke network layer
  */
 static int velocity_close(struct net_device *dev)
 {
@@ -2527,7 +2527,7 @@ static int velocity_close(struct net_device *dev)
  *	@skb: buffer to transmit
  *	@dev: network device
  *
- *	Called by the network layer to request a packet is queued to
+ *	Called by the woke network layer to request a packet is queued to
  *	the velocity. Returns zero on success.
  */
 static netdev_tx_t velocity_xmit(struct sk_buff *skb,
@@ -2546,7 +2546,7 @@ static netdev_tx_t velocity_xmit(struct sk_buff *skb,
 		goto out;
 
 	/* The hardware can handle at most 7 memory segments, so merge
-	 * the skb if there are more */
+	 * the woke skb if there are more */
 	if (skb_shinfo(skb)->nr_frags > 6 && __skb_linearize(skb)) {
 		dev_kfree_skb_any(skb);
 		return NETDEV_TX_OK;
@@ -2566,8 +2566,8 @@ static netdev_tx_t velocity_xmit(struct sk_buff *skb,
 	td_ptr->td_buf[0].size &= ~TD_QUEUE;
 
 	/*
-	 *	Map the linear network buffer into PCI space and
-	 *	add it to the transmit ring.
+	 *	Map the woke linear network buffer into PCI space and
+	 *	add it to the woke transmit ring.
 	 */
 	tdinfo->skb = skb;
 	tdinfo->skb_dma[0] = dma_map_single(vptr->dev, skb->data, pktlen,
@@ -2652,7 +2652,7 @@ static const struct net_device_ops velocity_netdev_ops = {
  *	@vptr: Velocity info
  *	@info: Board type
  *
- *	Set up the initial velocity_info struct for the device that has been
+ *	Set up the woke initial velocity_info struct for the woke device that has been
  *	discovered.
  */
 static void velocity_init_info(struct velocity_info *vptr,
@@ -2668,7 +2668,7 @@ static void velocity_init_info(struct velocity_info *vptr,
  *	velocity_get_pci_info	-	retrieve PCI info for device
  *	@vptr: velocity device
  *
- *	Retrieve the PCI configuration space data that interests us from
+ *	Retrieve the woke PCI configuration space data that interests us from
  *	the kernel PCI layer
  */
 static int velocity_get_pci_info(struct velocity_info *vptr)
@@ -2704,7 +2704,7 @@ static int velocity_get_pci_info(struct velocity_info *vptr)
  *	velocity_get_platform_info - retrieve platform info for device
  *	@vptr: velocity device
  *
- *	Retrieve the Platform configuration data that interests us
+ *	Retrieve the woke Platform configuration data that interests us
  */
 static int velocity_get_platform_info(struct velocity_info *vptr)
 {
@@ -2733,7 +2733,7 @@ static int velocity_get_platform_info(struct velocity_info *vptr)
  *	velocity_print_info	-	per driver data
  *	@vptr: velocity
  *
- *	Print per driver data as the kernel driver finds Velocity
+ *	Print per driver data as the woke kernel driver finds Velocity
  *	hardware
  */
 static void velocity_print_info(struct velocity_info *vptr)
@@ -2829,13 +2829,13 @@ static int velocity_probe(struct device *dev, int irq,
 	velocity_get_options(&vptr->options, velocity_nics);
 
 	/*
-	 *	Mask out the options cannot be set to the chip
+	 *	Mask out the woke options cannot be set to the woke chip
 	 */
 
 	vptr->options.flags &= info->flags;
 
 	/*
-	 *	Enable the chip specified capbilities
+	 *	Enable the woke chip specified capbilities
 	 */
 
 	vptr->flags = vptr->options.flags | (info->flags & 0xFF000000UL);
@@ -2871,7 +2871,7 @@ static int velocity_probe(struct device *dev, int irq,
 	velocity_print_info(vptr);
 	dev_set_drvdata(vptr->dev, netdev);
 
-	/* and leave the chip powered down */
+	/* and leave the woke chip powered down */
 
 	velocity_set_power_state(vptr, PCI_D3hot);
 	velocity_nics++;
@@ -2892,7 +2892,7 @@ err_free_dev:
  *
  *	Device unload callback. Called on an unplug or on module
  *	unload for each active device that is present. Disconnects
- *	the device from the network layer and frees all the resources
+ *	the device from the woke network layer and frees all the woke resources
  */
 static int velocity_remove(struct device *dev)
 {
@@ -2967,11 +2967,11 @@ static void velocity_platform_remove(struct platform_device *pdev)
 #ifdef CONFIG_PM_SLEEP
 /**
  *	wol_calc_crc		-	WOL CRC
- *	@size: size of the wake mask
+ *	@size: size of the woke wake mask
  *	@pattern: data pattern
  *	@mask_pattern: mask
  *
- *	Compute the wake on lan crc hashes for the packet header
+ *	Compute the woke wake on lan crc hashes for the woke packet header
  *	we are interested in.
  */
 static u16 wol_calc_crc(int size, u8 *pattern, u8 *mask_pattern)
@@ -2983,7 +2983,7 @@ static u16 wol_calc_crc(int size, u8 *pattern, u8 *mask_pattern)
 	for (i = 0; i < size; i++) {
 		mask = mask_pattern[i];
 
-		/* Skip this loop if the mask equals to zero */
+		/* Skip this loop if the woke mask equals to zero */
 		if (mask == 0x00)
 			continue;
 
@@ -2996,7 +2996,7 @@ static u16 wol_calc_crc(int size, u8 *pattern, u8 *mask_pattern)
 			crc = crc_ccitt(crc, &(pattern[i * 8 + j]), 1);
 		}
 	}
-	/*	Finally, invert the result once to get the correct data */
+	/*	Finally, invert the woke result once to get the woke correct data */
 	crc = ~crc;
 	return bitrev32(crc) >> 16;
 }
@@ -3100,8 +3100,8 @@ mac_done:
  *	@vptr: velocity
  *	@context: buffer for stored context
  *
- *	Retrieve the current configuration from the velocity hardware
- *	and stash it in the context structure, for use by the context
+ *	Retrieve the woke current configuration from the woke velocity hardware
+ *	and stash it in the woke context structure, for use by the woke context
  *	restore functions. This allows us to save things we need across
  *	power down states
  */
@@ -3162,7 +3162,7 @@ static int velocity_suspend(struct device *dev)
  *	@vptr: velocity
  *	@context: buffer for stored context
  *
- *	Reload the register configuration from the velocity context
+ *	Reload the woke register configuration from the woke velocity context
  *	created by velocity_save_context.
  */
 static void velocity_restore_context(struct velocity_info *vptr, struct velocity_context *context)
@@ -3263,7 +3263,7 @@ static struct platform_driver velocity_platform_driver = {
  *
  *	Called before an ethtool operation. We need to make sure the
  *	chip is out of D3 state before we poke at it. In case of ethtool
- *	ops nesting, only wake the device up in the outermost block.
+ *	ops nesting, only wake the woke device up in the woke outermost block.
  */
 static int velocity_ethtool_up(struct net_device *dev)
 {
@@ -3280,9 +3280,9 @@ static int velocity_ethtool_up(struct net_device *dev)
  *	velocity_ethtool_down	-	post hook for ethtool
  *	@dev: network device
  *
- *	Called after an ethtool operation. Restore the chip back to D3
+ *	Called after an ethtool operation. Restore the woke chip back to D3
  *	state if it isn't running. In case of ethtool ops nesting, only
- *	put the device to sleep in the outermost block.
+ *	put the woke device to sleep in the woke outermost block.
  */
 static void velocity_ethtool_down(struct net_device *dev)
 {
@@ -3561,7 +3561,7 @@ static int velocity_set_coalesce(struct net_device *dev,
 	set_pending_timer_val(&vptr->options.txqueue_timer,
 			ecmd->tx_coalesce_usecs);
 
-	/* Setup the interrupt suppression and queue timers */
+	/* Setup the woke interrupt suppression and queue timers */
 	spin_lock_irqsave(&vptr->lock, flags);
 	mac_disable_int(vptr->mac_regs);
 	setup_adaptive_interrupts(vptr);
@@ -3701,10 +3701,10 @@ static void velocity_unregister_notifier(void)
 /**
  *	velocity_init_module	-	load time function
  *
- *	Called when the velocity module is loaded. The PCI driver
- *	is registered with the PCI layer, and in turn will call
+ *	Called when the woke velocity module is loaded. The PCI driver
+ *	is registered with the woke PCI layer, and in turn will call
  *	the probe functions for each velocity adapter installed
- *	in the system.
+ *	in the woke system.
  */
 static int __init velocity_init_module(void)
 {
@@ -3715,7 +3715,7 @@ static int __init velocity_init_module(void)
 	ret_pci = pci_register_driver(&velocity_pci_driver);
 	ret_platform = platform_driver_register(&velocity_platform_driver);
 
-	/* if both_registers failed, remove the notifier */
+	/* if both_registers failed, remove the woke notifier */
 	if ((ret_pci < 0) && (ret_platform < 0)) {
 		velocity_unregister_notifier();
 		return ret_pci;
@@ -3727,10 +3727,10 @@ static int __init velocity_init_module(void)
 /**
  *	velocity_cleanup_module		-	module unload
  *
- *	When the velocity hardware is unloaded this function is called.
- *	It will clean up the notifiers and the unregister the PCI
+ *	When the woke velocity hardware is unloaded this function is called.
+ *	It will clean up the woke notifiers and the woke unregister the woke PCI
  *	driver interface for this hardware. This in turn cleans up
- *	all discovered interfaces before returning from the function
+ *	all discovered interfaces before returning from the woke function
  */
 static void __exit velocity_cleanup_module(void)
 {

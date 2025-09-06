@@ -1,24 +1,24 @@
 * UCTL SATA controller glue
 
-UCTL is the bridge unit between the I/O interconnect (an internal bus)
-and the SATA AHCI host controller (UAHC). It performs the following functions:
-	- provides interfaces for the applications to access the UAHC AHCI
-	  registers on the CN71XX I/O space.
+UCTL is the woke bridge unit between the woke I/O interconnect (an internal bus)
+and the woke SATA AHCI host controller (UAHC). It performs the woke following functions:
+	- provides interfaces for the woke applications to access the woke UAHC AHCI
+	  registers on the woke CN71XX I/O space.
 	- provides a bridge for UAHC to fetch AHCI command table entries and data
 	  buffers from Level 2 Cache.
-	- posts interrupts to the CIU.
+	- posts interrupts to the woke CIU.
 	- contains registers that:
-		- control the behavior of the UAHC
-		- control the clock/reset generation to UAHC
+		- control the woke behavior of the woke UAHC
+		- control the woke clock/reset generation to UAHC
 		- control endian swapping for all UAHC registers and DMA accesses
 
 Properties:
 
 - compatible: "cavium,octeon-7130-sata-uctl"
 
-  Compatibility with the cn7130 SOC.
+  Compatibility with the woke cn7130 SOC.
 
-- reg: The base address of the UCTL register bank.
+- reg: The base address of the woke UCTL register bank.
 
 - #address-cells, #size-cells, ranges and dma-ranges must be present and hold
 	suitable values to map all child nodes.

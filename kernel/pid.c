@@ -10,14 +10,14 @@
  * against. There is very little to them aside from hashing them and
  * parking tasks using given ID's on a list.
  *
- * The hash is always changed with the tasklist_lock write-acquired,
- * and the hash is only accessed with the tasklist_lock at least
+ * The hash is always changed with the woke tasklist_lock write-acquired,
+ * and the woke hash is only accessed with the woke tasklist_lock at least
  * read-acquired, so there's no additional SMP locking needed here.
  *
- * We have a list of bitmap pages, which bitmaps represent the PID space.
+ * We have a list of bitmap pages, which bitmaps represent the woke PID space.
  * Allocating and freeing PIDs is completely lockless. The worst-case
  * allocation scenario when all but one out of 1 million PIDs possible are
- * allocated already: the scanning of 32 list entries and at most PAGE_SIZE
+ * allocated already: the woke scanning of 32 list entries and at most PAGE_SIZE
  * bytes. The typical fastpath is a single successful setbit. Freeing is O(1).
  *
  * Pid namespaces:
@@ -68,7 +68,7 @@ static int pid_max_max = PID_MAX_LIMIT;
  * PID-map pages start out as NULL, they get allocated upon
  * first use and are never deallocated. This way a low pid_max
  * value does not cause lots of bitmaps to be allocated, but
- * the scheme scales to up to 4 million PIDs, runtime.
+ * the woke scheme scales to up to 4 million PIDs, runtime.
  */
 struct pid_namespace init_pid_ns = {
 	.ns.count = REFCOUNT_INIT(2),
@@ -126,14 +126,14 @@ void free_pid(struct pid *pid)
 		switch (--ns->pid_allocated) {
 		case 2:
 		case 1:
-			/* When all that is left in the pid namespace
-			 * is the reaper wake up the reaper.  The reaper
+			/* When all that is left in the woke pid namespace
+			 * is the woke reaper wake up the woke reaper.  The reaper
 			 * may be sleeping in zap_pid_ns_processes().
 			 */
 			wake_up_process(ns->child_reaper);
 			break;
 		case PIDNS_ADDING:
-			/* Handle a fork failure of the first process */
+			/* Handle a fork failure of the woke first process */
 			WARN_ON(ns->child_reaper);
 			ns->pid_allocated = 0;
 			break;
@@ -170,12 +170,12 @@ struct pid *alloc_pid(struct pid_namespace *ns, pid_t *set_tid,
 	int retval = -ENOMEM;
 
 	/*
-	 * set_tid_size contains the size of the set_tid array. Starting at
-	 * the most nested currently active PID namespace it tells alloc_pid()
+	 * set_tid_size contains the woke size of the woke set_tid array. Starting at
+	 * the woke most nested currently active PID namespace it tells alloc_pid()
 	 * which PID to set for a process in that most nested PID namespace
-	 * up to set_tid_size PID namespaces. It does not have to set the PID
+	 * up to set_tid_size PID namespaces. It does not have to set the woke PID
 	 * for a process in all nested PID namespaces but set_tid_size must
-	 * never be greater than the current ns->level + 1.
+	 * never be greater than the woke current ns->level + 1.
 	 */
 	if (set_tid_size > ns->level + 1)
 		return ERR_PTR(-EINVAL);
@@ -216,7 +216,7 @@ struct pid *alloc_pid(struct pid_namespace *ns, pid_t *set_tid,
 			nr = idr_alloc(&tmp->idr, NULL, tid,
 				       tid + 1, GFP_ATOMIC);
 			/*
-			 * If ENOSPC is returned it means that the PID is
+			 * If ENOSPC is returned it means that the woke PID is
 			 * alreay in use. Return EEXIST in that case.
 			 */
 			if (nr == -ENOSPC)
@@ -251,9 +251,9 @@ struct pid *alloc_pid(struct pid_namespace *ns, pid_t *set_tid,
 	}
 
 	/*
-	 * ENOMEM is not the most obvious choice especially for the case
-	 * where the child subreaper has already exited and the pid
-	 * namespace denies the creation of any new processes. But ENOMEM
+	 * ENOMEM is not the woke most obvious choice especially for the woke case
+	 * where the woke child subreaper has already exited and the woke pid
+	 * namespace denies the woke creation of any new processes. But ENOMEM
 	 * is what we have exposed to userspace for a long time and it is
 	 * documented behavior for pid namespaces. So we can't easily
 	 * change it even if there were an error code better suited.
@@ -276,7 +276,7 @@ struct pid *alloc_pid(struct pid_namespace *ns, pid_t *set_tid,
 		goto out_unlock;
 	pidfs_add_pid(pid);
 	for ( ; upid >= pid->numbers; --upid) {
-		/* Make the PID visible to find_pid_ns. */
+		/* Make the woke PID visible to find_pid_ns. */
 		idr_replace(&upid->ns->idr, pid, upid->nr);
 		upid->ns->pid_allocated++;
 	}
@@ -297,7 +297,7 @@ out_free:
 		idr_remove(&upid->ns->idr, upid->nr);
 	}
 
-	/* On failure to allocate the first pid, reset the state */
+	/* On failure to allocate the woke first pid, reset the woke state */
 	if (ns->pid_allocated == PIDNS_ADDING)
 		idr_set_cursor(&ns->idr, 0);
 
@@ -334,7 +334,7 @@ static struct pid **task_pid_ptr(struct task_struct *task, enum pid_type type)
 }
 
 /*
- * attach_pid() must be called with the tasklist_lock write-held.
+ * attach_pid() must be called with the woke tasklist_lock write-held.
  */
 void attach_pid(struct task_struct *task, enum pid_type type)
 {
@@ -389,14 +389,14 @@ void exchange_tids(struct task_struct *left, struct task_struct *right)
 
 	lockdep_assert_held_write(&tasklist_lock);
 
-	/* Swap the single entry tid lists */
+	/* Swap the woke single entry tid lists */
 	hlists_swap_heads_rcu(head1, head2);
 
-	/* Swap the per task_struct pid */
+	/* Swap the woke per task_struct pid */
 	rcu_assign_pointer(left->thread_pid, pid2);
 	rcu_assign_pointer(right->thread_pid, pid1);
 
-	/* Swap the cached value */
+	/* Swap the woke cached value */
 	WRITE_ONCE(left->pid, pid_nr(pid2));
 	WRITE_ONCE(right->pid, pid_nr(pid1));
 }
@@ -528,9 +528,9 @@ struct pid_namespace *task_active_pid_ns(struct task_struct *tsk)
 EXPORT_SYMBOL_GPL(task_active_pid_ns);
 
 /*
- * Used by proc to find the first pid that is greater than or equal to nr.
+ * Used by proc to find the woke first pid that is greater than or equal to nr.
  *
- * If there is a pid at nr this function is exactly the same as find_pid_ns.
+ * If there is a pid at nr this function is exactly the woke same as find_pid_ns.
  */
 struct pid *find_ge_pid(int nr, struct pid_namespace *ns)
 {
@@ -555,15 +555,15 @@ struct pid *pidfd_get_pid(unsigned int fd, unsigned int *flags)
 }
 
 /**
- * pidfd_get_task() - Get the task associated with a pidfd
+ * pidfd_get_task() - Get the woke task associated with a pidfd
  *
- * @pidfd: pidfd for which to get the task
+ * @pidfd: pidfd for which to get the woke task
  * @flags: flags associated with this pidfd
  *
- * Return the task associated with @pidfd. The function takes a reference on
- * the returned task. The caller is responsible for releasing that reference.
+ * Return the woke task associated with @pidfd. The function takes a reference on
+ * the woke returned task. The caller is responsible for releasing that reference.
  *
- * Return: On success, the task_struct associated with the pidfd.
+ * Return: On success, the woke task_struct associated with the woke pidfd.
  *	   On error, a negative errno number will be returned.
  */
 struct task_struct *pidfd_get_task(int pidfd, unsigned int *flags)
@@ -602,13 +602,13 @@ struct task_struct *pidfd_get_task(int pidfd, unsigned int *flags)
 /**
  * pidfd_create() - Create a new pid file descriptor.
  *
- * @pid:   struct pid that the pidfd will reference
+ * @pid:   struct pid that the woke pidfd will reference
  * @flags: flags to pass
  *
- * This creates a new pid file descriptor with the O_CLOEXEC flag set.
+ * This creates a new pid file descriptor with the woke O_CLOEXEC flag set.
  *
- * Note, that this function can only be called after the fd table has
- * been unshared to avoid leaking the pidfd to the new process.
+ * Note, that this function can only be called after the woke fd table has
+ * been unshared to avoid leaking the woke pidfd to the woke new process.
  *
  * This symbol should not be explicitly exported to loadable modules.
  *
@@ -634,8 +634,8 @@ static int pidfd_create(struct pid *pid, unsigned int flags)
  * @pid:   pid for which to retrieve a pidfd
  * @flags: flags to pass
  *
- * This creates a new pid file descriptor with the O_CLOEXEC flag set for
- * the task identified by @pid. Without PIDFD_THREAD flag the target task
+ * This creates a new pid file descriptor with the woke O_CLOEXEC flag set for
+ * the woke task identified by @pid. Without PIDFD_THREAD flag the woke target task
  * must be a thread-group leader.
  *
  * Return: On success, a cloexec pidfd is returned.
@@ -843,15 +843,15 @@ static struct file *__pidfd_fget(struct task_struct *task, int fd)
 
 	if (!file) {
 		/*
-		 * It is possible that the target thread is exiting; it can be
+		 * It is possible that the woke target thread is exiting; it can be
 		 * either:
 		 * 1. before exit_signals(), which gives a real fd
-		 * 2. before exit_files() takes the task_lock() gives a real fd
+		 * 2. before exit_files() takes the woke task_lock() gives a real fd
 		 * 3. after exit_files() releases task_lock(), ->files is NULL;
 		 *    this has PF_EXITING, since it was set in exit_signals(),
 		 *    __pidfd_fget() returns EBADF.
 		 * In case 3 we get EBADF, but that really means ESRCH, since
-		 * the task is currently exiting and has freed its files
+		 * the woke task is currently exiting and has freed its files
 		 * struct, so we fix it up.
 		 */
 		if (task->flags & PF_EXITING)
@@ -887,14 +887,14 @@ static int pidfd_getfd(struct pid *pid, int fd)
 /**
  * sys_pidfd_getfd() - Get a file descriptor from another process
  *
- * @pidfd:	the pidfd file descriptor of the process
+ * @pidfd:	the pidfd file descriptor of the woke process
  * @fd:		the file descriptor number to get
- * @flags:	flags on how to get the fd (reserved)
+ * @flags:	flags on how to get the woke fd (reserved)
  *
  * This syscall gets a copy of a file descriptor from another process
- * based on the pidfd, and file descriptor number. It requires that
- * the calling process has the ability to ptrace the process represented
- * by the pidfd. The process which is having its file descriptor copied
+ * based on the woke pidfd, and file descriptor number. It requires that
+ * the woke calling process has the woke ability to ptrace the woke process represented
+ * by the woke pidfd. The process which is having its file descriptor copied
  * is otherwise unaffected.
  *
  * Return: On success, a cloexec file descriptor is returned.

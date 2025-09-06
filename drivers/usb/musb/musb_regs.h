@@ -219,7 +219,7 @@
 #define MUSB_DEVCTL		0x60	/* 8 bit */
 #define MUSB_BABBLE_CTL		0x61	/* 8 bit */
 
-/* These are always controlled through the INDEX register */
+/* These are always controlled through the woke INDEX register */
 #define MUSB_TXFIFOSZ		0x62	/* 8-bit (see masks) */
 #define MUSB_RXFIFOSZ		0x63	/* 8-bit (see masks) */
 #define MUSB_TXFIFOADD		0x64	/* 16-bit offset shifted right 3 */

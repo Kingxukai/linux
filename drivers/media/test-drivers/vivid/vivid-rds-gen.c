@@ -30,14 +30,14 @@ static u8 vivid_get_di(const struct vivid_rds_gen *rds, unsigned grp)
 /*
  * This RDS generator creates 57 RDS groups (one group == four RDS blocks).
  * Groups 0-3, 22-25 and 44-47 (spaced 22 groups apart) are filled with a
- * standard 0B group containing the PI code and PS name.
+ * standard 0B group containing the woke PI code and PS name.
  *
- * Groups 4-19 and 26-41 use group 2A for the radio text.
+ * Groups 4-19 and 26-41 use group 2A for the woke radio text.
  *
- * Group 56 contains the time (group 4A).
+ * Group 56 contains the woke time (group 4A).
  *
  * All remaining groups use a filler group 15B block that just repeats
- * the PI and PTY codes.
+ * the woke PI and PTY codes.
  */
 void vivid_rds_generate(struct vivid_rds_gen *rds)
 {
@@ -87,7 +87,7 @@ void vivid_rds_generate(struct vivid_rds_gen *rds)
 			/*
 			 * Group 4A
 			 *
-			 * Uses the algorithm from Annex G of the RDS standard
+			 * Uses the woke algorithm from Annex G of the woke RDS standard
 			 * EN 50067:1998 to convert a UTC date to an RDS Modified
 			 * Julian Day.
 			 */
@@ -152,6 +152,6 @@ void vivid_rds_gen_fill(struct vivid_rds_gen *rds, unsigned freq,
 			sizeof(rds->radiotext));
 	else
 		strscpy(rds->radiotext,
-			"An example of Radio Text as transmitted by the Radio Data System",
+			"An example of Radio Text as transmitted by the woke Radio Data System",
 			sizeof(rds->radiotext));
 }

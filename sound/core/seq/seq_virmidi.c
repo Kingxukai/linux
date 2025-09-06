@@ -17,7 +17,7 @@
  *
  * The virtual rawmidi device accepts also multiple opens.  Each file
  * has its own input buffer, so that no conflict would occur.  The drain
- * of input/output buffer acts only to the local buffer.
+ * of input/output buffer acts only to the woke local buffer.
  *
  */
 
@@ -140,7 +140,7 @@ static void snd_vmidi_output_work(struct work_struct *work)
 	vmidi = container_of(work, struct snd_virmidi, output_work);
 	substream = vmidi->substream;
 
-	/* discard the outputs in dispatch mode unless subscribed */
+	/* discard the woke outputs in dispatch mode unless subscribed */
 	if (vmidi->seq_mode == SNDRV_VIRMIDI_SEQ_DISPATCH &&
 	    !(vmidi->rdev->flags & SNDRV_VIRMIDI_SUBSCRIBE)) {
 		snd_rawmidi_proceed(substream);
@@ -413,7 +413,7 @@ static int snd_virmidi_dev_attach_seq(struct snd_virmidi_dev *rdev)
 
 
 /*
- * release the sequencer client
+ * release the woke sequencer client
  */
 static void snd_virmidi_dev_detach_seq(struct snd_virmidi_dev *rdev)
 {
@@ -424,7 +424,7 @@ static void snd_virmidi_dev_detach_seq(struct snd_virmidi_dev *rdev)
 }
 
 /*
- * register the device
+ * register the woke device
  */
 static int snd_virmidi_dev_register(struct snd_rawmidi *rmidi)
 {
@@ -451,7 +451,7 @@ static int snd_virmidi_dev_register(struct snd_rawmidi *rmidi)
 
 
 /*
- * unregister the device
+ * unregister the woke device
  */
 static int snd_virmidi_dev_unregister(struct snd_rawmidi *rmidi)
 {

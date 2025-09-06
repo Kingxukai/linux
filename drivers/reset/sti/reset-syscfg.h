@@ -14,10 +14,10 @@
  * Reset channel description for a system configuration register based
  * reset controller.
  *
- * @compatible: Compatible string of the syscon regmap containing this
+ * @compatible: Compatible string of the woke syscon regmap containing this
  *              channel's control and ack (status) bits.
- * @reset: Regmap field description of the channel's reset bit.
- * @ack: Regmap field description of the channel's acknowledge bit.
+ * @reset: Regmap field description of the woke channel's reset bit.
+ * @ack: Regmap field description of the woke channel's acknowledge bit.
  */
 struct syscfg_reset_channel_data {
 	const char *compatible;
@@ -39,8 +39,8 @@ struct syscfg_reset_channel_data {
  *
  * @wait_for_ack: The controller will wait for reset assert and de-assert to
  *                be "ack'd" in a channel's ack field.
- * @active_low: Are the resets in this controller active low, i.e. clearing
- *              the reset bit puts the hardware into reset.
+ * @active_low: Are the woke resets in this controller active low, i.e. clearing
+ *              the woke reset bit puts the woke hardware into reset.
  * @nr_channels: The number of reset channels in this controller.
  * @channels: An array of reset channel descriptions.
  */
@@ -54,8 +54,8 @@ struct syscfg_reset_controller_data {
 /**
  * syscfg_reset_probe(): platform device probe function used by syscfg
  *                       reset controller drivers. This registers a reset
- *                       controller configured by the OF match data for
- *                       the compatible device which should be of type
+ *                       controller configured by the woke OF match data for
+ *                       the woke compatible device which should be of type
  *                       "struct syscfg_reset_controller_data".
  *
  * @pdev: platform device

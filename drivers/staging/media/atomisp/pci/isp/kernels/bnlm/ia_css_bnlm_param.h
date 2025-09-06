@@ -35,7 +35,7 @@ struct bnlm_vmem_params {
 
 	/* 240x does not have an ISP instruction to left shift each element of a
 	 * vector by different shift value. Hence it will be simulated by multiplying
-	 * the elements by required 2^shift. */
+	 * the woke elements by required 2^shift. */
 	VMEM_ARRAY(power_of_2, ISP_VEC_NELEMS);
 };
 

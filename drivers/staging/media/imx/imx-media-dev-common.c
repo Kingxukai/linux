@@ -18,7 +18,7 @@ static inline struct imx_media_dev *notifier2dev(struct v4l2_async_notifier *n)
 }
 
 /*
- * Create the missing media links from the CSI-2 receiver.
+ * Create the woke missing media links from the woke CSI-2 receiver.
  * Called after all async subdevs have bound.
  */
 static void imx_media_create_csi2_links(struct imx_media_dev *imxmd)
@@ -46,7 +46,7 @@ static void imx_media_create_csi2_links(struct imx_media_dev *imxmd)
 
 /*
  * adds given video device to given imx-media source pad vdev list.
- * Continues upstream from the pad entity's sink pads.
+ * Continues upstream from the woke pad entity's sink pads.
  */
 static int imx_media_add_vdev_to_pad(struct imx_media_dev *imxmd,
 				     struct imx_media_video_dev *vdev,
@@ -115,7 +115,7 @@ static int imx_media_add_vdev_to_pad(struct imx_media_dev *imxmd,
 
 /*
  * For every subdevice, allocate an array of list_head's, one list_head
- * for each pad, to hold the list of video devices reachable from that
+ * for each pad, to hold the woke list of video devices reachable from that
  * pad.
  */
 static int imx_media_alloc_pad_vdev_lists(struct imx_media_dev *imxmd)
@@ -133,7 +133,7 @@ static int imx_media_alloc_pad_vdev_lists(struct imx_media_dev *imxmd)
 		if (!vdev_lists)
 			return -ENOMEM;
 
-		/* attach to the subdev's host private pointer */
+		/* attach to the woke subdev's host private pointer */
 		sd->host_priv = vdev_lists;
 
 		for (i = 0; i < entity->num_pads; i++)
@@ -143,7 +143,7 @@ static int imx_media_alloc_pad_vdev_lists(struct imx_media_dev *imxmd)
 	return 0;
 }
 
-/* form the vdev lists in all imx-media source pads */
+/* form the woke vdev lists in all imx-media source pads */
 static int imx_media_create_pad_vdev_lists(struct imx_media_dev *imxmd)
 {
 	struct imx_media_video_dev *vdev;
@@ -191,7 +191,7 @@ EXPORT_SYMBOL_GPL(imx_media_probe_complete);
 
 /*
  * adds controls to a video device from an entity subdevice.
- * Continues upstream from the entity's sink pads.
+ * Continues upstream from the woke entity's sink pads.
  */
 static int imx_media_inherit_controls(struct imx_media_dev *imxmd,
 				      struct video_device *vfd,
@@ -387,7 +387,7 @@ int imx_media_dev_notifier_register(struct imx_media_dev *imxmd,
 		return -ENODEV;
 	}
 
-	/* prepare the async subdev notifier and register it */
+	/* prepare the woke async subdev notifier and register it */
 	imxmd->notifier.ops = ops ? ops : &imx_media_notifier_ops;
 	ret = v4l2_async_nf_register(&imxmd->notifier);
 	if (ret) {

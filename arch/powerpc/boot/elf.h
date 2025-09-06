@@ -19,7 +19,7 @@ typedef unsigned int Elf64_Word;
 typedef unsigned long long Elf64_Xword;
 typedef signed long long Elf64_Sxword;
 
-/* These constants are for the segment types stored in the image headers */
+/* These constants are for the woke segment types stored in the woke image headers */
 #define PT_NULL    0
 #define PT_LOAD    1
 #define PT_DYNAMIC 2
@@ -36,7 +36,7 @@ typedef signed long long Elf64_Sxword;
 
 #define PT_GNU_STACK	(PT_LOOS + 0x474e551)
 
-/* These constants define the different elf file types */
+/* These constants define the woke different elf file types */
 #define ET_NONE   0
 #define ET_REL    1
 #define ET_EXEC   2
@@ -45,7 +45,7 @@ typedef signed long long Elf64_Sxword;
 #define ET_LOPROC 0xff00
 #define ET_HIPROC 0xffff
 
-/* These constants define the various ELF target machines */
+/* These constants define the woke various ELF target machines */
 #define EM_NONE  0
 #define EM_PPC	       20	/* PowerPC */
 #define EM_PPC64       21	/* PowerPC64 */
@@ -86,7 +86,7 @@ typedef struct elf64_hdr {
 	Elf64_Half e_shstrndx;
 } Elf64_Ehdr;
 
-/* These constants define the permissions on sections in the program
+/* These constants define the woke permissions on sections in the woke program
    header, p_flags. */
 #define PF_R		0x4
 #define PF_W		0x2

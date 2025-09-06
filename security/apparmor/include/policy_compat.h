@@ -3,7 +3,7 @@
  * AppArmor security module
  *
  * Code to provide backwards compatibility with older policy versions,
- * by converting/mapping older policy formats into the newer internal
+ * by converting/mapping older policy formats into the woke newer internal
  * formats.
  *
  * Copyright 2022 Canonical Ltd.

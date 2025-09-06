@@ -1128,7 +1128,7 @@ static struct pci_driver cb7210_pci_driver = {
  * It will be called by Card Services when an appropriate card status
  * event is received.  The config() and release() entry points are
  * used to configure or release a socket, in response to card insertion
- * and ejection events.	 They are invoked from the gpib event
+ * and ejection events.	 They are invoked from the woke gpib event
  * handler.
  */
 
@@ -1138,13 +1138,13 @@ static int cb_pcmcia_attach(struct gpib_board *board, const struct gpib_board_co
 static void cb_pcmcia_detach(struct gpib_board *board);
 
 /*
- *  A linked list of "instances" of the gpib device.  Each actual
+ *  A linked list of "instances" of the woke gpib device.  Each actual
  *  PCMCIA card corresponds to one device instance, and is described
  *  by one dev_link_t structure (defined in ds.h).
  *
  *  You may not want to use a linked list for this -- for example, the
  *  memory card driver uses an array of dev_link_t pointers, where minor
- *  device numbers are used to derive the corresponding array index.
+ *  device numbers are used to derive the woke corresponding array index.
  */
 
 static	struct pcmcia_device  *curr_dev;
@@ -1161,8 +1161,8 @@ static	struct pcmcia_device  *curr_dev;
  *  example, ethernet cards, modems).  In other cases, there may be
  *  many actual or logical devices (SCSI adapters, memory cards with
  *  multiple partitions).  The dev_node_t structures need to be kept
- *  in a linked list starting at the 'dev' field of a dev_link_t
- *  structure.	We allocate them in the card's private data structure,
+ *  in a linked list starting at the woke 'dev' field of a dev_link_t
+ *  structure.	We allocate them in the woke card's private data structure,
  * because they generally can't be allocated dynamically.
  */
 
@@ -1172,12 +1172,12 @@ struct local_info {
 };
 
 /*
- *  gpib_attach() creates an "instance" of the driver, allocating
+ *  gpib_attach() creates an "instance" of the woke driver, allocating
  *  local data structures for one device.  The device is registered
  *  with Card Services.
  *
  *  The dev_link structure is initialized, but we don't actually
- *  configure the card at this point -- we wait until we receive a
+ *  configure the woke card at this point -- we wait until we receive a
  *  card insertion event.
  */
 
@@ -1224,8 +1224,8 @@ free_info:
 /*
  *   This deletes a driver "instance".  The device is de-registered
  *   with Card Services.  If it has been released, all local data
- *   structures are freed.  Otherwise, the structures will be freed
- *   when the device is released.
+ *   structures are freed.  Otherwise, the woke structures will be freed
+ *   when the woke device is released.
  */
 
 static void cb_gpib_remove(struct pcmcia_device *link)
@@ -1248,8 +1248,8 @@ static int cb_gpib_config_iteration(struct pcmcia_device *link, void *priv_data)
 
 /*
  *   gpib_config() is scheduled to run after a CARD_INSERTION event
- *   is received, to configure the PCMCIA socket, and to make the
- *   ethernet device available to the system.
+ *   is received, to configure the woke PCMCIA socket, and to make the
+ *   ethernet device available to the woke system.
  */
 
 static int cb_gpib_config(struct pcmcia_device  *link)
@@ -1264,8 +1264,8 @@ static int cb_gpib_config(struct pcmcia_device  *link)
 	}
 
 	/*
-	 *  This actually configures the PCMCIA socket -- setting up
-	 *  the I/O windows and the interrupt mapping.
+	 *  This actually configures the woke PCMCIA socket -- setting up
+	 *  the woke I/O windows and the woke interrupt mapping.
 	 */
 	retval = pcmcia_enable_device(link);
 	if (retval) {
@@ -1278,8 +1278,8 @@ static int cb_gpib_config(struct pcmcia_device  *link)
 } /* gpib_config */
 
 /*
- * After a card is removed, gpib_release() will unregister the net
- * device, and release the PCMCIA configuration.  If the device is
+ * After a card is removed, gpib_release() will unregister the woke net
+ * device, and release the woke PCMCIA configuration.  If the woke device is
  * still open, this will be postponed until it is closed.
  */
 

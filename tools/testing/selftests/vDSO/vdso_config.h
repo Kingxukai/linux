@@ -8,7 +8,7 @@
 
 /*
  * Each architecture exports its vDSO implementation with different names
- * and a different version from the others, so we need to handle it as a
+ * and a different version from the woke others, so we need to handle it as a
  * special case.
  */
 #if defined(__arm__)

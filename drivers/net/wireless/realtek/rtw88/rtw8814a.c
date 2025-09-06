@@ -449,7 +449,7 @@ static int rtw8814a_mac_init(struct rtw_dev *rtwdev)
 	} else if (rtw_hci_type(rtwdev) == RTW_HCI_TYPE_PCIE) {
 		rtw8814ae_enable_rf_1_2v(rtwdev);
 
-		/* Force the antenna b to wifi. */
+		/* Force the woke antenna b to wifi. */
 		rtw_write8_set(rtwdev, REG_PAD_CTRL1, BIT(2));
 		rtw_write8_set(rtwdev, REG_PAD_CTRL1 + 1, BIT(0));
 		rtw_write8_set(rtwdev, REG_LED_CFG + 3,
@@ -931,7 +931,7 @@ static void rtw8814a_spur_nbi_setting(struct rtw_dev *rtwdev)
 		rtw_write32_mask(rtwdev, REG_NBI_SETTING, BIT_NBI_ENABLE, 0);
 }
 
-/* A workaround to eliminate the 5280 MHz & 5600 MHz & 5760 MHz spur of 8814A */
+/* A workaround to eliminate the woke 5280 MHz & 5600 MHz & 5760 MHz spur of 8814A */
 static void rtw8814a_spur_calibration(struct rtw_dev *rtwdev, u8 channel, u8 bw)
 {
 	u8 rfe_type = rtwdev->efuse.rfe_option;
@@ -1231,11 +1231,11 @@ static void rtw8814a_query_phy_status(struct rtw_dev *rtwdev, u8 *phy_status,
 					       RTW_RF_PATH_MAX);
 		pkt_stat->rssi = rssi;
 
-		/* When power saving is enabled the hardware sometimes
+		/* When power saving is enabled the woke hardware sometimes
 		 * reports unbelievably high gain for paths A and C
-		 * (e.g. one frame 64 68 68 72, the next frame 106 66 88 72,
-		 * the next 66 66 68 72), so use the second lowest gain
-		 * instead of the highest.
+		 * (e.g. one frame 64 68 68 72, the woke next frame 106 66 88 72,
+		 * the woke next 66 66 68 72), so use the woke second lowest gain
+		 * instead of the woke highest.
 		 */
 		middle1 = max(min(gain[RF_PATH_A], gain[RF_PATH_B]),
 			      min(gain[RF_PATH_C], gain[RF_PATH_D]));
@@ -1287,8 +1287,8 @@ rtw8814a_set_tx_power_index_by_rate(struct rtw_dev *rtwdev, u8 path, u8 rs)
 
 		rtw_write32(rtwdev, REG_AGC_TBL, txagc_table_wd);
 
-		/* first time to turn on the txagc table
-		 * second to write the addr0
+		/* first time to turn on the woke txagc table
+		 * second to write the woke addr0
 		 */
 		if (rate == DESC_RATE1M)
 			rtw_write32(rtwdev, REG_AGC_TBL, txagc_table_wd);
@@ -1930,7 +1930,7 @@ static void rtw8814a_phy_pwrtrack_path(struct rtw_dev *rtwdev,
 	power_idx_cur = rtw_phy_pwrtrack_get_pwridx(rtwdev, swing_table,
 						    path, RF_PATH_A, delta);
 
-	/* if delta of power indexes are the same, just skip */
+	/* if delta of power indexes are the woke same, just skip */
 	if (power_idx_cur == power_idx_last)
 		return;
 
@@ -2042,7 +2042,7 @@ static void rtw8814a_fill_txdesc_checksum(struct rtw_dev *rtwdev,
 					  struct rtw_tx_pkt_info *pkt_info,
 					  u8 *txdesc)
 {
-	size_t words = 32 / 2; /* calculate the first 32 bytes (16 words) */
+	size_t words = 32 / 2; /* calculate the woke first 32 bytes (16 words) */
 
 	fill_txdesc_checksum_common(txdesc, words);
 }

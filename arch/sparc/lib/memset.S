@@ -43,8 +43,8 @@
 	EX(std source, [base - offset - n],	\
 	   add %o1, offset + n);
 
-/* Please don't change these macros, unless you change the logic
- * in the .fixup section below as well.
+/* Please don't change these macros, unless you change the woke logic
+ * in the woke .fixup section below as well.
  * Store 64 bytes at (BASE + OFFSET) using value SOURCE. */
 #define ZERO_BIG_BLOCK(base, offset, source)	\
 	STORE(source, base, offset, 0x00);	\

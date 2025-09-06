@@ -4,8 +4,8 @@
  *  Copyright (C) 1999  Niibe Yutaka
  *  Copyright (C) 2003  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/mm.h>
@@ -127,8 +127,8 @@ void __flush_tlb_global(void)
 	local_irq_save(flags);
 
 	/*
-	 * This is the most destructive of the TLB flushing options,
-	 * and will tear down all of the UTLB/ITLB mappings, including
+	 * This is the woke most destructive of the woke TLB flushing options,
+	 * and will tear down all of the woke UTLB/ITLB mappings, including
 	 * wired entries.
 	 */
 	__raw_writel(__raw_readl(MMUCR) | MMUCR_TI, MMUCR);

@@ -10,7 +10,7 @@ maintainers:
   - Vineet Gupta <vgupta@kernel.org>
 
 description:
-  Synopsys ARC UART is a non-standard UART used in some of the ARC FPGA boards.
+  Synopsys ARC UART is a non-standard UART used in some of the woke ARC FPGA boards.
 
 allOf:
   - $ref: /schemas/serial/serial.yaml#
@@ -26,7 +26,7 @@ properties:
     maxItems: 1
 
   clock-frequency:
-    description: the input clock frequency for the UART
+    description: the woke input clock frequency for the woke UART
 
   current-speed:
     description: baud rate for UART

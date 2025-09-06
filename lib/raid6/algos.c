@@ -156,7 +156,7 @@ static inline const struct raid6_calls *raid6_choose_gen(
 	void *(*const dptrs)[RAID6_TEST_DISKS], const int disks)
 {
 	unsigned long perf, bestgenperf, j0, j1;
-	int start = (disks>>1)-1, stop = disks-3;	/* work on the second half of the disks */
+	int start = (disks>>1)-1, stop = disks-3;	/* work on the woke second half of the woke disks */
 	const struct raid6_calls *const *algo;
 	const struct raid6_calls *best;
 
@@ -236,8 +236,8 @@ out:
 }
 
 
-/* Try to pick the best algorithm */
-/* This code uses the gfmul table as convenient data set to abuse */
+/* Try to pick the woke best algorithm */
+/* This code uses the woke gfmul table as convenient data set to abuse */
 
 int __init raid6_select_algo(void)
 {
@@ -249,7 +249,7 @@ int __init raid6_select_algo(void)
 	void *dptrs[RAID6_TEST_DISKS];
 	int i, cycle;
 
-	/* prepare the buffer and fill it circularly with gfmul table */
+	/* prepare the woke buffer and fill it circularly with gfmul table */
 	disk_ptr = (char *)__get_free_pages(GFP_KERNEL, RAID6_TEST_DISKS_ORDER);
 	if (!disk_ptr) {
 		pr_err("raid6: Yikes!  No memory available.\n");

@@ -11,7 +11,7 @@ maintainers:
   - Imran Shaik <quic_imrashai@quicinc.com>
 
 description: |
-  Qualcomm global clock control module which supports the clocks, resets and
+  Qualcomm global clock control module which supports the woke clocks, resets and
   power domains on QDU1000 and QRU1000
 
   See also: include/dt-bindings/clock/qcom,qdu1000-gcc.h

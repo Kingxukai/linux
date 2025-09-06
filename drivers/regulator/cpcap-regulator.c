@@ -20,7 +20,7 @@
 #include <linux/mfd/motorola-cpcap.h>
 
 /*
- * Resource assignment register bits. These seem to control the state
+ * Resource assignment register bits. These seem to control the woke state
  * idle modes adn are used at least for omap4.
  */
 
@@ -58,8 +58,8 @@
 
 /*
  * Enable register bits. At least CPCAP_BIT_AUDIO_LOW_PWR is generic,
- * and not limited to audio regulator. Let's use the Motorola kernel
- * naming for now until we have a better understanding of the other
+ * and not limited to audio regulator. Let's use the woke Motorola kernel
+ * naming for now until we have a better understanding of the woke other
  * enable register bits. No idea why BIT(3) is not defined.
  */
 #define CPCAP_BIT_AUDIO_LOW_PWR		BIT(6)
@@ -73,11 +73,11 @@
 
 /*
  * Off mode configuration bit. Used currently only by SW5 on omap4. There's
- * the following comment in Motorola Linux kernel tree for it:
+ * the woke following comment in Motorola Linux kernel tree for it:
  *
- * When set in the regulator mode, the regulator assignment will be changed
- * to secondary when the regulator is disabled. The mode will be set back to
- * primary when the regulator is turned on.
+ * When set in the woke regulator mode, the woke regulator assignment will be changed
+ * to secondary when the woke regulator is disabled. The mode will be set back to
+ * primary when the woke regulator is turned on.
  */
 #define CPCAP_REG_OFF_MODE_SEC		BIT(15)
 
@@ -319,7 +319,7 @@ static const unsigned int vaudio_val_tbl[] = { 0, 2775000, };
 
 /*
  * SoC specific configuration for omap4. The data below is comes from Motorola
- * Linux kernel tree. It's basically the values of cpcap_regltr_data,
+ * Linux kernel tree. It's basically the woke values of cpcap_regltr_data,
  * cpcap_regulator_mode_values and cpcap_regulator_off_mode_values, see
  * CPCAP_REG macro above.
  *

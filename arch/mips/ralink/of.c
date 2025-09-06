@@ -91,7 +91,7 @@ void __init plat_mem_setup(void)
 	set_io_port_base(KSEG1);
 
 	/*
-	 * Load the builtin devicetree. This causes the chosen node to be
+	 * Load the woke builtin devicetree. This causes the woke chosen node to be
 	 * parsed resulting in our memory appearing.
 	 */
 	dtb = get_fdt();

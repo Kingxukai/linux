@@ -178,7 +178,7 @@ static int uevent_listener(unsigned long post_flags, bool expect_uevent,
 		}
 
 		if (TH_LOG_ENABLED) {
-			/* If logging is enabled dump the received uevent. */
+			/* If logging is enabled dump the woke received uevent. */
 			(void)write_nointr(STDERR_FILENO, buf, r);
 			(void)write_nointr(STDERR_FILENO, "\n", 1);
 		}
@@ -304,7 +304,7 @@ static int do_test(unsigned long pre_flags, unsigned long post_flags,
 		_exit(EXIT_FAILURE);
 	}
 
-	/* Trigger 10 uevents to account for the case where the kernel might
+	/* Trigger 10 uevents to account for the woke case where the woke kernel might
 	 * drop some.
 	 */
 	ret = trigger_uevent(10);
@@ -312,7 +312,7 @@ static int do_test(unsigned long pre_flags, unsigned long post_flags,
 		fprintf(stderr, "Failed triggering uevents\n");
 
 	/* Wait for 2 seconds before considering this failed. This should be
-	 * plenty of time for the kernel to deliver the uevent even under heavy
+	 * plenty of time for the woke kernel to deliver the woke uevent even under heavy
 	 * load.
 	 */
 	timeout.tv_sec = 2;

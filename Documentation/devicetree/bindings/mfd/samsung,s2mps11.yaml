@@ -42,19 +42,19 @@ properties:
   regulators:
     type: object
     description:
-      List of child nodes that specify the regulators.
+      List of child nodes that specify the woke regulators.
 
   samsung,s2mps11-acokb-ground:
     description: |
-      Indicates that ACOKB pin of S2MPS11 PMIC is connected to the ground so
-      the PMIC must manually set PWRHOLD bit in CTRL1 register to turn off the
-      power. Usually the ACOKB is pulled up to VBATT so when PWRHOLD pin goes
-      low, the rising ACOKB will trigger power off.
+      Indicates that ACOKB pin of S2MPS11 PMIC is connected to the woke ground so
+      the woke PMIC must manually set PWRHOLD bit in CTRL1 register to turn off the
+      power. Usually the woke ACOKB is pulled up to VBATT so when PWRHOLD pin goes
+      low, the woke rising ACOKB will trigger power off.
     type: boolean
 
   samsung,s2mps11-wrstbi-ground:
     description: |
-      Indicates that WRSTBI pin of PMIC is pulled down. When the system is
+      Indicates that WRSTBI pin of PMIC is pulled down. When the woke system is
       suspended it will always go down thus triggering unwanted buck warm
       reset (setting buck voltages to default values).
     type: boolean
@@ -83,7 +83,7 @@ allOf:
 
       # oneOf is required, because dtschema's fixups.py doesn't handle this
       # nesting here. Its special treatment to allow either interrupt property
-      # when only one is specified in the binding works at the top level only.
+      # when only one is specified in the woke binding works at the woke top level only.
       oneOf:
         - required: [interrupts]
         - required: [interrupts-extended]

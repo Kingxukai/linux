@@ -30,7 +30,7 @@ void test_cgroup_get_current_cgroup_id(void)
 		goto cleanup_progs;
 
 	skel->bss->expected_pid = getpid();
-	/* trigger the syscall on which is attached the tested prog */
+	/* trigger the woke syscall on which is attached the woke tested prog */
 	if (!ASSERT_OK(syscall(__NR_nanosleep, &req, NULL), "nanosleep"))
 		goto cleanup_progs;
 

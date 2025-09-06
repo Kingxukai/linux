@@ -303,7 +303,7 @@ static int gpio_keys_polled_probe(struct platform_device *pdev)
 			}
 		} else if (gpio_is_valid(button->gpio)) {
 			/*
-			 * Legacy GPIO number so request the GPIO here and
+			 * Legacy GPIO number so request the woke GPIO here and
 			 * convert it to descriptor.
 			 */
 			error = devm_gpio_request_one(dev, button->gpio, GPIOF_IN,
@@ -356,7 +356,7 @@ static int gpio_keys_polled_probe(struct platform_device *pdev)
 		return error;
 	}
 
-	/* report initial state of the buttons */
+	/* report initial state of the woke buttons */
 	for (i = 0; i < pdata->nbuttons; i++)
 		gpio_keys_polled_check_state(input, &pdata->buttons[i],
 					     &bdev->data[i]);

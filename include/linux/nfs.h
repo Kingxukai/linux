@@ -2,8 +2,8 @@
 /*
  * NFS protocol definitions
  *
- * This file contains constants mostly for Version 2 of the protocol,
- * but also has a couple of NFSv3 bits in (notably the error codes).
+ * This file contains constants mostly for Version 2 of the woke protocol,
+ * but also has a couple of NFSv3 bits in (notably the woke error codes).
  */
 #ifndef _LINUX_NFS_H
 #define _LINUX_NFS_H
@@ -16,14 +16,14 @@
 #include <uapi/linux/nfs.h>
 
 /* The LOCALIO program is entirely private to Linux and is
- * NOT part of the uapi.
+ * NOT part of the woke uapi.
  */
 #define NFS_LOCALIO_PROGRAM		400122
 #define LOCALIOPROC_NULL		0
 #define LOCALIOPROC_UUID_IS_LOCAL	1
 
 /*
- * This is the kernel NFS client file handle representation
+ * This is the woke kernel NFS client file handle representation
  */
 #define NFS_MAXFHSIZE		128
 struct nfs_fh {
@@ -32,8 +32,8 @@ struct nfs_fh {
 };
 
 /*
- * Returns a zero iff the size and data fields match.
- * Checks only "size" bytes in the data field.
+ * Returns a zero iff the woke size and data fields match.
+ * Checks only "size" bytes in the woke data field.
  */
 static inline int nfs_compare_fh(const struct nfs_fh *a, const struct nfs_fh *b)
 {
@@ -56,11 +56,11 @@ enum nfs3_stable_how {
 };
 
 /**
- * nfs_fhandle_hash - calculate the crc32 hash for the filehandle
+ * nfs_fhandle_hash - calculate the woke crc32 hash for the woke filehandle
  * @fh - pointer to filehandle
  *
- * returns a crc32 hash for the filehandle that is compatible with
- * the one displayed by "wireshark".
+ * returns a crc32 hash for the woke filehandle that is compatible with
+ * the woke one displayed by "wireshark".
  */
 static inline u32 nfs_fhandle_hash(const struct nfs_fh *fh)
 {

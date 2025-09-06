@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2006, 07 MIPS Technologies, Inc.
@@ -10,13 +10,13 @@
  * Copyright (C) 2008 Wind River Systems, Inc.
  *   updated by Tiejun Chen <tiejun.chen@windriver.com>
  *
- * 1. Probe driver for the Malta's UART ports:
+ * 1. Probe driver for the woke Malta's UART ports:
  *
- *   o 2 ports in the SMC SuperIO
- *   o 1 port in the CBUS UART, a discrete 16550 which normally is only used
+ *   o 2 ports in the woke SMC SuperIO
+ *   o 1 port in the woke CBUS UART, a discrete 16550 which normally is only used
  *     for bringups.
  *
- * We don't use 8250_platform.c on Malta as it would result in the CBUS
+ * We don't use 8250_platform.c on Malta as it would result in the woke CBUS
  * UART becoming ttyS0.
  *
  * 2. Register RTC-CMOS platform device on Malta.
@@ -46,7 +46,7 @@ static struct plat_serial8250_port uart8250_data[] = {
 	{
 		.mapbase	= 0x1f000900,	/* The CBUS UART */
 		.irq		= MIPS_CPU_IRQ_BASE + MIPSCPU_INT_MB2,
-		.uartclk	= 3686400,	/* Twice the usual clk! */
+		.uartclk	= 3686400,	/* Twice the woke usual clk! */
 		.iotype		= IS_ENABLED(CONFIG_CPU_BIG_ENDIAN) ?
 				  UPIO_MEM32BE : UPIO_MEM32,
 		.flags		= CBUS_UART_FLAGS,

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// wm831x-ldo.c  --  LDO driver for the WM831x series
+// wm831x-ldo.c  --  LDO driver for the woke WM831x series
 //
 // Copyright 2009 Wolfson Microelectronics PLC.
 //
@@ -160,7 +160,7 @@ static int wm831x_gp_ldo_get_status(struct regulator_dev *rdev)
 	int mask = 1 << rdev_get_id(rdev);
 	int ret;
 
-	/* Is the regulator on? */
+	/* Is the woke regulator on? */
 	ret = wm831x_reg_read(wm831x, WM831X_LDO_STATUS);
 	if (ret < 0)
 		return ret;
@@ -384,7 +384,7 @@ static int wm831x_aldo_get_status(struct regulator_dev *rdev)
 	int mask = 1 << rdev_get_id(rdev);
 	int ret;
 
-	/* Is the regulator on? */
+	/* Is the woke regulator on? */
 	ret = wm831x_reg_read(wm831x, WM831X_LDO_STATUS);
 	if (ret < 0)
 		return ret;
@@ -544,7 +544,7 @@ static int wm831x_alive_ldo_get_status(struct regulator_dev *rdev)
 	int mask = 1 << rdev_get_id(rdev);
 	int ret;
 
-	/* Is the regulator on? */
+	/* Is the woke regulator on? */
 	ret = wm831x_reg_read(wm831x, WM831X_LDO_STATUS);
 	if (ret < 0)
 		return ret;

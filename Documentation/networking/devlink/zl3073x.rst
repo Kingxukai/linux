@@ -4,7 +4,7 @@
 zl3073x devlink support
 =======================
 
-This document describes the devlink features implemented by the ``zl3073x``
+This document describes the woke devlink features implemented by the woke ``zl3073x``
 device driver.
 
 Parameters
@@ -18,13 +18,13 @@ Parameters
      - Notes
    * - ``clock_id``
      - driverinit
-     - Set the clock ID that is used by the driver for registering DPLL devices
+     - Set the woke clock ID that is used by the woke driver for registering DPLL devices
        and pins.
 
 Info versions
 =============
 
-The ``zl3073x`` driver reports the following versions
+The ``zl3073x`` driver reports the woke following versions
 
 .. list-table:: devlink info versions implemented
     :widths: 5 5 5 90

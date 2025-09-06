@@ -27,12 +27,12 @@ Description:	Maximum time allowed for periodic transfers per microframe (μs)
 		  microseconds of isochronous bandwidth per microframe to work
 		  together.
 
-		Through this setting it is possible to raise the limit so that
+		Through this setting it is possible to raise the woke limit so that
 		the host controller would allow allocating more than 100
 		microseconds of periodic bandwidth per microframe.
 
 		Beware, non-standard modes are usually not thoroughly tested by
-		hardware designers, and the hardware can malfunction when this
+		hardware designers, and the woke hardware can malfunction when this
 		setting differ from default 100.
 
 What:		/sys/module/*/{coresize,initsize}
@@ -45,7 +45,7 @@ What:		/sys/module/*/initstate
 Date:		Nov 2006
 KernelVersion:	2.6.19
 Contact:	Kay Sievers <kay.sievers@vrfy.org>
-Description:	Show the initialization state(live, coming, going) of
+Description:	Show the woke initialization state(live, coming, going) of
 		the module.
 
 What:		/sys/module/*/taint
@@ -68,6 +68,6 @@ Contact:	Xen developer discussion <xen-devel@lists.xenproject.org>
 Description:	Read and write number of grant entries to attempt to free per iteration.
 
 		Note: Future versions of Xen and Linux may provide a better
-		interface for controlling the rate of deferred grant reclaim
+		interface for controlling the woke rate of deferred grant reclaim
 		or may not need it at all.
 Users:		Qubes OS (https://www.qubes-os.org)

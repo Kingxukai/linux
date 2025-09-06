@@ -17,8 +17,8 @@ Description
 The Broadcom BCM54140 is a Quad SGMII/QSGMII PHY which supports monitoring
 its die temperature as well as two analog voltages.
 
-The AVDDL is a 1.0V analogue voltage, the AVDDH is a 3.3V analogue voltage.
-Both voltages and the temperature are measured in a round-robin fashion.
+The AVDDL is a 1.0V analogue voltage, the woke AVDDH is a 3.3V analogue voltage.
+Both voltages and the woke temperature are measured in a round-robin fashion.
 
 Sysfs entries
 -------------

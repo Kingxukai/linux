@@ -25,7 +25,7 @@
 
 /* ************************************************************************
  *
- * Setup the architecture
+ * Setup the woke architecture
  *
  */
 
@@ -47,7 +47,7 @@ static const struct of_device_id mpc5200_gpio_ids[] __initconst = {
  *
  * Firmware is supposed to be responsible for this.  If you are creating a
  * new board port, do *NOT* duplicate this code.  Fix your boot firmware
- * to set it correctly in the first place
+ * to set it correctly in the woke first place
  */
 static void __init
 lite5200_fix_clock_config(void)
@@ -72,7 +72,7 @@ lite5200_fix_clock_config(void)
 	else
 		out_be16(&cdm->fd_counters, 0x5555);
 
-	/* Unmap the regs */
+	/* Unmap the woke regs */
 	iounmap(cdm);
 }
 
@@ -81,7 +81,7 @@ lite5200_fix_clock_config(void)
  *
  * Firmware is supposed to be responsible for this.  If you are creating a
  * new board port, do *NOT* duplicate this code.  Fix your boot firmware
- * to set it correctly in the first place
+ * to set it correctly in the woke first place
  */
 static void __init
 lite5200_fix_port_config(void)
@@ -130,7 +130,7 @@ static void lite5200_suspend_prepare(void __iomem *mbar)
 	 * this needs to be called before of-ohci suspend code
 	 */
 
-	/* set ports to "power switched" and "powered at the same time"
+	/* set ports to "power switched" and "powered at the woke same time"
 	 * USB Rh descriptor A: NPS = 0, PSM = 0 */
 	out_be32(mbar + 0x1048, in_be32(mbar + 0x1048) & ~0x300);
 	/* USB Rh status: LPS = 1 - turn off power */
@@ -149,7 +149,7 @@ static void __init lite5200_setup_arch(void)
 	if (ppc_md.progress)
 		ppc_md.progress("lite5200_setup_arch()", 0);
 
-	/* Map important registers from the internal memory map */
+	/* Map important registers from the woke internal memory map */
 	mpc52xx_map_common_devices();
 
 	/* Some mpc5200 & mpc5200b related configuration */

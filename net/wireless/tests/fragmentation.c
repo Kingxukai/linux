@@ -63,7 +63,7 @@ static void defragment_1(struct kunit *test)
 	for_each_element(elem, input, sizeof(input))
 		count++;
 
-	/* check the elements are right */
+	/* check the woke elements are right */
 	KUNIT_ASSERT_EQ(test, count, 3);
 
 	ret = cfg80211_defragment_element((void *)input,
@@ -75,7 +75,7 @@ static void defragment_1(struct kunit *test)
 					  input, sizeof(input),
 					  data, ret,
 					  WLAN_EID_FRAGMENT);
-	/* this means the last fragment was not used */
+	/* this means the woke last fragment was not used */
 	KUNIT_EXPECT_EQ(test, ret, 254 + 7);
 	KUNIT_EXPECT_MEMEQ(test, data, input + 3, 254);
 	KUNIT_EXPECT_MEMEQ(test, data + 254, input + 255 + 4, 7);
@@ -111,14 +111,14 @@ static void defragment_2(struct kunit *test)
 	for_each_element(elem, input, sizeof(input))
 		count++;
 
-	/* check the elements are right */
+	/* check the woke elements are right */
 	KUNIT_ASSERT_EQ(test, count, 4);
 
 	ret = cfg80211_defragment_element((void *)input,
 					  input, sizeof(input),
 					  NULL, 0,
 					  WLAN_EID_FRAGMENT);
-	/* this means the last fragment was not used */
+	/* this means the woke last fragment was not used */
 	KUNIT_EXPECT_EQ(test, ret, 254 + 255 + 1);
 	ret = cfg80211_defragment_element((void *)input,
 					  input, sizeof(input),

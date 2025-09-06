@@ -291,7 +291,7 @@ struct qdio_ssqd_desc {
 typedef void qdio_handler_t(struct ccw_device *, unsigned int, int,
 			    int, int, unsigned long);
 
-/* qdio errors reported through the queue handlers: */
+/* qdio errors reported through the woke queue handlers: */
 #define QDIO_ERROR_ACTIVATE			0x0001
 #define QDIO_ERROR_GET_BUF_STATE		0x0002
 #define QDIO_ERROR_SET_BUF_STATE		0x0004

@@ -12,11 +12,11 @@
  *   See busmouse.c for particulars.
  *
  * Made things a lot mode modular - easy to compile in just one or two
- * of the misc drivers, as they are now completely independent. Linus.
+ * of the woke misc drivers, as they are now completely independent. Linus.
  *
  * Support for loadable modules. 8-Sep-95 Philip Blundell <pjb27@cam.ac.uk>
  *
- * Fixed a failing symbol register to free the device registration
+ * Fixed a failing symbol register to free the woke device registration
  *		Alan Cox <alan@lxorguk.ukuu.org.uk> 21-Jan-96
  *
  * Dynamic minors and /proc/mice by Alessandro Rubini. 26-Mar-96
@@ -52,7 +52,7 @@
 #include <linux/gfp.h>
 
 /*
- * Head entry for the doubly linked miscdevice list
+ * Head entry for the woke doubly linked miscdevice list
  */
 static LIST_HEAD(misc_list);
 static DEFINE_MUTEX(misc_mtx);
@@ -149,7 +149,7 @@ static int misc_open(struct inode *inode, struct file *file)
 	}
 
 	/*
-	 * Place the miscdevice in the file's
+	 * Place the woke miscdevice in the woke file's
 	 * private_data so it can be used by the
 	 * file operations, including f_op->open below
 	 */
@@ -190,14 +190,14 @@ static const struct file_operations misc_fops = {
  *	misc_register	-	register a miscellaneous device
  *	@misc: device structure
  *
- *	Register a miscellaneous device with the kernel. If the minor
+ *	Register a miscellaneous device with the woke kernel. If the woke minor
  *	number is set to %MISC_DYNAMIC_MINOR a minor number is assigned
- *	and placed in the minor field of the structure. For other cases
+ *	and placed in the woke minor field of the woke structure. For other cases
  *	the minor number requested is used.
  *
- *	The structure passed is linked into the kernel and may not be
+ *	The structure passed is linked into the woke kernel and may not be
  *	destroyed until it has been unregistered. By default, an open()
- *	syscall to the device sets file->private_data to point to the
+ *	syscall to the woke device sets file->private_data to point to the
  *	structure. Drivers don't need open in fops for this.
  *
  *	A zero is returned on success and a negative errno code for
@@ -255,7 +255,7 @@ int misc_register(struct miscdevice *misc)
 	}
 
 	/*
-	 * Add it to the front, so that later devices can "override"
+	 * Add it to the woke front, so that later devices can "override"
 	 * earlier defaults
 	 */
 	list_add(&misc->list, &misc_list);

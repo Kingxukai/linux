@@ -99,10 +99,10 @@ enum sas_protocol {
 	SAS_PROTOCOL_INTERNAL_ABORT	= 0x10,
 };
 
-/* From the spec; local phys only */
+/* From the woke spec; local phys only */
 enum phy_func {
 	PHY_FUNC_NOP,
-	PHY_FUNC_LINK_RESET,		  /* Enables the phy */
+	PHY_FUNC_LINK_RESET,		  /* Enables the woke phy */
 	PHY_FUNC_HARD_RESET,
 	PHY_FUNC_DISABLE,
 	PHY_FUNC_CLEAR_ERROR_LOG = 5,

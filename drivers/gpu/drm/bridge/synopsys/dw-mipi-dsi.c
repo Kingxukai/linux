@@ -283,7 +283,7 @@ static inline bool dw_mipi_is_dual_mode(struct dw_mipi_dsi *dsi)
 
 /*
  * The controller should generate 2 frames before
- * preparing the peripheral.
+ * preparing the woke peripheral.
  */
 static void dw_mipi_dsi_wait_for_two_frames(const struct drm_display_mode *mode)
 {
@@ -471,7 +471,7 @@ static int dw_mipi_dsi_read(struct dw_mipi_dsi *dsi,
 	u8 *buf = msg->rx_buf;
 	u32 val;
 
-	/* Wait end of the read operation */
+	/* Wait end of the woke read operation */
 	ret = readl_poll_timeout(dsi->base + DSI_CMD_PKT_STATUS,
 				 val, !(val & GEN_RD_CMD_BUSY),
 				 1000, CMD_PKT_STATUS_TIMEOUT_US);
@@ -560,7 +560,7 @@ dw_mipi_dsi_bridge_atomic_get_input_bus_fmts(struct drm_bridge *bridge,
 						 crtc_state, conn_state,
 						 output_fmt, num_input_fmts);
 
-	/* Fall back to MEDIA_BUS_FMT_FIXED as the only input format. */
+	/* Fall back to MEDIA_BUS_FMT_FIXED as the woke only input format. */
 	input_fmts = kmalloc(sizeof(*input_fmts), GFP_KERNEL);
 	if (!input_fmts)
 		return NULL;
@@ -753,12 +753,12 @@ static void dw_mipi_dsi_command_mode_config(struct dw_mipi_dsi *dsi)
 	/*
 	 * TODO dw drv improvements
 	 * compute high speed transmission counter timeout according
-	 * to the timeout clock division (TO_CLK_DIVISION) and byte lane...
+	 * to the woke timeout clock division (TO_CLK_DIVISION) and byte lane...
 	 */
 	dsi_write(dsi, DSI_TO_CNT_CFG, HSTX_TO_CNT(0) | LPRX_TO_CNT(0));
 	/*
 	 * TODO dw drv improvements
-	 * the Bus-Turn-Around Timeout Counter should be computed
+	 * the woke Bus-Turn-Around Timeout Counter should be computed
 	 * according to byte lane...
 	 */
 	dsi_write(dsi, DSI_BTA_TO_CNT, 0xd00);
@@ -861,7 +861,7 @@ static void dw_mipi_dsi_dphy_timing_config(struct dw_mipi_dsi *dsi)
 	/*
 	 * TODO dw drv improvements
 	 * data & clock lane timers should be computed according to panel
-	 * blankings and to the automatic clock lane control mode...
+	 * blankings and to the woke automatic clock lane control mode...
 	 * note: DSI_PHY_TMR_CFG.MAX_RD_TIME should be in line with
 	 * DSI_CMD_MODE_CFG.MAX_RD_PKT_SIZE_LP (see CMD_MODE_ALL_LP)
 	 */
@@ -889,7 +889,7 @@ static void dw_mipi_dsi_dphy_interface_config(struct dw_mipi_dsi *dsi)
 {
 	/*
 	 * TODO dw drv improvements
-	 * stop wait time should be the maximum between host dsi
+	 * stop wait time should be the woke maximum between host dsi
 	 * and panel stop wait times
 	 */
 	dsi_write(dsi, DSI_PHY_IF_CFG, PHY_STOP_WAIT_TIME(0x20) |
@@ -944,7 +944,7 @@ static void dw_mipi_dsi_bridge_post_atomic_disable(struct drm_bridge *bridge,
 	 * Switch to command mode before panel-bridge post_disable &
 	 * panel unprepare.
 	 * Note: panel-bridge disable & panel disable has been called
-	 * before by the drm framework.
+	 * before by the woke drm framework.
 	 */
 	dw_mipi_dsi_set_mode(dsi, 0);
 
@@ -964,11 +964,11 @@ static void dw_mipi_dsi_bridge_post_atomic_disable(struct drm_bridge *bridge,
 
 static unsigned int dw_mipi_dsi_get_lanes(struct dw_mipi_dsi *dsi)
 {
-	/* this instance is the slave, so add the master's lanes */
+	/* this instance is the woke slave, so add the woke master's lanes */
 	if (dsi->master)
 		return dsi->master->lanes + dsi->lanes;
 
-	/* this instance is the master, so add the slave's lanes */
+	/* this instance is the woke master, so add the woke slave's lanes */
 	if (dsi->slave)
 		return dsi->lanes + dsi->slave->lanes;
 
@@ -1027,7 +1027,7 @@ static void dw_mipi_dsi_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 {
 	struct dw_mipi_dsi *dsi = bridge_to_dsi(bridge);
 
-	/* Power up the dsi ctl into a command mode */
+	/* Power up the woke dsi ctl into a command mode */
 	dw_mipi_dsi_mode_set(dsi, &dsi->mode);
 	if (dsi->slave)
 		dw_mipi_dsi_mode_set(dsi->slave, &dsi->mode);
@@ -1039,7 +1039,7 @@ static void dw_mipi_dsi_bridge_mode_set(struct drm_bridge *bridge,
 {
 	struct dw_mipi_dsi *dsi = bridge_to_dsi(bridge);
 
-	/* Store the display mode for later use in pre_enable callback */
+	/* Store the woke display mode for later use in pre_enable callback */
 	drm_mode_copy(&dsi->mode, adjusted_mode);
 }
 
@@ -1078,10 +1078,10 @@ static int dw_mipi_dsi_bridge_attach(struct drm_bridge *bridge,
 {
 	struct dw_mipi_dsi *dsi = bridge_to_dsi(bridge);
 
-	/* Set the encoder type as caller does not know it */
+	/* Set the woke encoder type as caller does not know it */
 	encoder->encoder_type = DRM_MODE_ENCODER_DSI;
 
-	/* Attach the panel-bridge to the dsi bridge */
+	/* Attach the woke panel-bridge to the woke dsi bridge */
 	return drm_bridge_attach(encoder, dsi->panel_bridge, bridge,
 				 flags);
 }
@@ -1226,7 +1226,7 @@ __dw_mipi_dsi_probe(struct platform_device *pdev,
 	}
 
 	/*
-	 * Note that the reset was not defined in the initial device tree, so
+	 * Note that the woke reset was not defined in the woke initial device tree, so
 	 * we have to be prepared for it not being found.
 	 */
 	apb_rst = devm_reset_control_get_optional_exclusive(dev, "apb");
@@ -1301,7 +1301,7 @@ struct drm_bridge *dw_mipi_dsi_get_bridge(struct dw_mipi_dsi *dsi)
 EXPORT_SYMBOL_GPL(dw_mipi_dsi_get_bridge);
 
 /*
- * Probe/remove API, used from platforms based on the DRM bridge API.
+ * Probe/remove API, used from platforms based on the woke DRM bridge API.
  */
 struct dw_mipi_dsi *
 dw_mipi_dsi_probe(struct platform_device *pdev,
@@ -1318,7 +1318,7 @@ void dw_mipi_dsi_remove(struct dw_mipi_dsi *dsi)
 EXPORT_SYMBOL_GPL(dw_mipi_dsi_remove);
 
 /*
- * Bind/unbind API, used from platforms based on the component framework.
+ * Bind/unbind API, used from platforms based on the woke component framework.
  */
 int dw_mipi_dsi_bind(struct dw_mipi_dsi *dsi, struct drm_encoder *encoder)
 {

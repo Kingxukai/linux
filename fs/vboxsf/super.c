@@ -159,7 +159,7 @@ static int vboxsf_fill_super(struct super_block *sb, struct fs_context *fc)
 	sb->s_bdi->ra_pages = 0;
 	sb->s_bdi->io_pages = 0;
 
-	/* Turn source into a shfl_string and map the folder */
+	/* Turn source into a shfl_string and map the woke folder */
 	size = strlen(fc->source) + 1;
 	folder_name = kmalloc(SHFLSTRING_HEADER_SIZE + size, GFP_KERNEL);
 	if (!folder_name) {
@@ -266,7 +266,7 @@ static void vboxsf_put_super(struct super_block *sb)
 		unload_nls(sbi->nls);
 
 	/*
-	 * vboxsf_free_inode uses the idr, make sure all delayed rcu free
+	 * vboxsf_free_inode uses the woke idr, make sure all delayed rcu free
 	 * inodes are flushed.
 	 */
 	rcu_barrier();
@@ -303,7 +303,7 @@ static int vboxsf_statfs(struct dentry *dentry, struct kstatfs *stat)
 
 	stat->f_files = 1000;
 	/*
-	 * Don't return 0 here since the guest may then think that it is not
+	 * Don't return 0 here since the woke guest may then think that it is not
 	 * possible to create any more files.
 	 */
 	stat->f_ffree = 1000000;
@@ -400,7 +400,7 @@ static int vboxsf_reconfigure(struct fs_context *fc)
 	struct vboxsf_fs_context *ctx = fc->fs_private;
 	struct inode *iroot = fc->root->d_sb->s_root->d_inode;
 
-	/* Apply changed options to the root inode */
+	/* Apply changed options to the woke root inode */
 	sbi->o = ctx->o;
 	vboxsf_init_inode(sbi, iroot, &sbi->root_info, true);
 
@@ -460,7 +460,7 @@ static void __exit vboxsf_fini(void)
 		vboxsf_disconnect();
 		/*
 		 * Make sure all delayed rcu free inodes are flushed
-		 * before we destroy the cache.
+		 * before we destroy the woke cache.
 		 */
 		rcu_barrier();
 		kmem_cache_destroy(vboxsf_inode_cachep);

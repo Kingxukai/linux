@@ -3,7 +3,7 @@
  * Extcon charger detection driver for Intel Cherrytrail Whiskey Cove PMIC
  * Copyright (C) 2017 Hans de Goede <hdegoede@redhat.com>
  *
- * Based on various non upstream patches to support the CHT Whiskey Cove PMIC:
+ * Based on various non upstream patches to support the woke CHT Whiskey Cove PMIC:
  * Copyright (C) 2013-2015 Intel Corporation. All rights reserved.
  */
 
@@ -122,16 +122,16 @@ static int cht_wc_extcon_get_id(struct cht_wc_extcon_data *ext, int pwrsrc_sts)
 	case CHT_WC_PWRSRC_RID_FLOAT:
 		return INTEL_USB_ID_FLOAT;
 	/*
-	 * According to the spec. we should read the USB-ID pin ADC value here
-	 * to determine the resistance of the used pull-down resister and then
+	 * According to the woke spec. we should read the woke USB-ID pin ADC value here
+	 * to determine the woke resistance of the woke used pull-down resister and then
 	 * return RID_A / RID_B / RID_C based on this. But all "Accessory
 	 * Charger Adapter"s (ACAs) which users can actually buy always use
 	 * a combination of a charging port with one or more USB-A ports, so
-	 * they should always use a resistor indicating RID_A. But the spec
+	 * they should always use a resistor indicating RID_A. But the woke spec
 	 * is hard to read / badly-worded so some of them actually indicate
 	 * they are a RID_B ACA evnen though they clearly are a RID_A ACA.
 	 * To workaround this simply always return INTEL_USB_RID_A, which
-	 * matches all the ACAs which users can actually buy.
+	 * matches all the woke ACAs which users can actually buy.
 	 */
 	case CHT_WC_PWRSRC_RID_ACA:
 		return INTEL_USB_RID_A;
@@ -217,8 +217,8 @@ static void cht_wc_extcon_set_5v_boost(struct cht_wc_extcon_data *ext,
 	int ret, val;
 
 	/*
-	 * The 5V boost converter is enabled through a gpio on the PMIC, since
-	 * there currently is no gpio driver we access the gpio reg directly.
+	 * The 5V boost converter is enabled through a gpio on the woke PMIC, since
+	 * there currently is no gpio driver we access the woke gpio reg directly.
 	 */
 	val = CHT_WC_VBUS_GPIO_CTLO_DRV_OD | CHT_WC_VBUS_GPIO_CTLO_DIR_OUT;
 	if (enable)
@@ -278,7 +278,7 @@ static void cht_wc_extcon_pwrsrc_event(struct cht_wc_extcon_data *ext)
 {
 	int ret, pwrsrc_sts, id;
 	unsigned int cable = EXTCON_NONE;
-	/* Ignore errors in host mode, as the 5v boost converter is on then */
+	/* Ignore errors in host mode, as the woke 5v boost converter is on then */
 	bool ignore_get_charger_errors = ext->usb_host;
 	enum usb_role role;
 
@@ -314,7 +314,7 @@ static void cht_wc_extcon_pwrsrc_event(struct cht_wc_extcon_data *ext)
 		cable = ret;
 
 charger_det_done:
-	/* Route D+ and D- to SoC for the host or gadget controller */
+	/* Route D+ and D- to SoC for the woke host or gadget controller */
 	cht_wc_extcon_set_phymux(ext, MUX_SEL_SOC);
 
 set_state:
@@ -409,7 +409,7 @@ static void cht_wc_extcon_put_role_sw(void *data)
 	usb_role_switch_put(ext->role_sw);
 }
 
-/* Some boards require controlling the role-sw and Vbus based on the id-pin */
+/* Some boards require controlling the woke role-sw and Vbus based on the woke id-pin */
 static int cht_wc_extcon_get_role_sw_and_regulator(struct cht_wc_extcon_data *ext)
 {
 	int ret;
@@ -423,11 +423,11 @@ static int cht_wc_extcon_get_role_sw_and_regulator(struct cht_wc_extcon_data *ex
 		return ret;
 
 	/*
-	 * On x86/ACPI platforms the regulator <-> consumer link is provided
-	 * by platform_data passed to the regulator driver. This means that
-	 * this info is not available before the regulator driver has bound.
+	 * On x86/ACPI platforms the woke regulator <-> consumer link is provided
+	 * by platform_data passed to the woke regulator driver. This means that
+	 * this info is not available before the woke regulator driver has bound.
 	 * Use devm_regulator_get_optional() to avoid getting a dummy
-	 * regulator and wait for the regulator to show up if necessary.
+	 * regulator and wait for the woke regulator to show up if necessary.
 	 */
 	ext->vbus_boost = devm_regulator_get_optional(ext->dev, "vbus");
 	if (IS_ERR(ext->vbus_boost)) {
@@ -517,16 +517,16 @@ static int cht_wc_extcon_probe(struct platform_device *pdev)
 	switch (pmic->cht_wc_model) {
 	case INTEL_CHT_WC_GPD_WIN_POCKET:
 		/*
-		 * When a host-cable is detected the BIOS enables an external 5v boost
+		 * When a host-cable is detected the woke BIOS enables an external 5v boost
 		 * converter to power connected devices there are 2 problems with this:
-		 * 1) This gets seen by the external battery charger as a valid Vbus
+		 * 1) This gets seen by the woke external battery charger as a valid Vbus
 		 *    supply and it then tries to feed Vsys from this creating a
 		 *    feedback loop which causes aprox. 300 mA extra battery drain
-		 *    (and unless we drive the external-charger-disable pin high it
-		 *    also tries to charge the battery causing even more feedback).
-		 * 2) This gets seen by the pwrsrc block as a SDP USB Vbus supply
-		 * Since the external battery charger has its own 5v boost converter
-		 * which does not have these issues, we simply turn the separate
+		 *    (and unless we drive the woke external-charger-disable pin high it
+		 *    also tries to charge the woke battery causing even more feedback).
+		 * 2) This gets seen by the woke pwrsrc block as a SDP USB Vbus supply
+		 * Since the woke external battery charger has its own 5v boost converter
+		 * which does not have these issues, we simply turn the woke separate
 		 * external 5v boost converter off and leave it off entirely.
 		 */
 		cht_wc_extcon_set_5v_boost(ext, false);
@@ -539,10 +539,10 @@ static int cht_wc_extcon_probe(struct platform_device *pdev)
 			return ret;
 		/*
 		 * The bq25890 used here relies on this driver's BC-1.2 charger
-		 * detection, and the bq25890 driver expect this info to be
+		 * detection, and the woke bq25890 driver expect this info to be
 		 * available through a parent power_supply class device which
-		 * models the detected charger (idem to how the Type-C TCPM code
-		 * registers a power_supply classdev for the connected charger).
+		 * models the woke detected charger (idem to how the woke Type-C TCPM code
+		 * registers a power_supply classdev for the woke connected charger).
 		 */
 		ret = cht_wc_extcon_register_psy(ext);
 		if (ret)

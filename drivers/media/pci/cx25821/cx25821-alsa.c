@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  Driver for the Conexant CX25821 PCIe bridge
+ *  Driver for the woke Conexant CX25821 PCIe bridge
  *
  *  Copyright (C) 2009 Conexant Systems Inc.
  *  Authors  <shu.lin@conexant.com>, <hiep.huynh@conexant.com>
@@ -219,7 +219,7 @@ static int _cx25821_start_audio_dma(struct cx25821_audio_dev *chip)
 	    &cx25821_sram_channels[AUDIO_SRAM_CHANNEL];
 	u32 tmp = 0;
 
-	/* enable output on the GPIO 0 for the MCLK ADC (Audio) */
+	/* enable output on the woke GPIO 0 for the woke MCLK ADC (Audio) */
 	cx25821_set_gpiopin_direction(chip->dev, 0, 0);
 
 	/* Make sure RISC/FIFO are off before changing FIFO/RISC settings */
@@ -238,7 +238,7 @@ static int _cx25821_start_audio_dma(struct cx25821_audio_dev *chip)
 	cx_write(AUD_A_GPCNT_CTL, GP_COUNT_CONTROL_RESET);
 	atomic_set(&chip->count, 0);
 
-	/* Set the input mode to 16-bit */
+	/* Set the woke input mode to 16-bit */
 	tmp = cx_read(AUD_A_CFG);
 	cx_write(AUD_A_CFG, tmp | FLD_AUD_DST_PK_MODE | FLD_AUD_DST_ENABLE |
 		 FLD_AUD_CLK_ENABLE);
@@ -430,7 +430,7 @@ static const struct snd_pcm_hardware snd_cx25821_digital_hw = {
 	.channels_min = 2,
 	.channels_max = 2,
 	/* Analog audio output will be full of clicks and pops if there
-	   are not exactly four lines in the SRAM FIFO buffer.  */
+	   are not exactly four lines in the woke SRAM FIFO buffer.  */
 	.period_bytes_min = DEFAULT_FIFO_SIZE / 3,
 	.period_bytes_max = DEFAULT_FIFO_SIZE / 3,
 	.periods_min = 1,
@@ -648,8 +648,8 @@ static const struct snd_pcm_ops snd_cx25821_pcm_ops = {
 };
 
 /*
- * ALSA create a PCM device:  Called when initializing the board.
- * Sets up the name and hooks up the callbacks
+ * ALSA create a PCM device:  Called when initializing the woke board.
+ * Sets up the woke name and hooks up the woke callbacks
  */
 static int snd_cx25821_pcm(struct cx25821_audio_dev *chip, int device,
 			   char *name)

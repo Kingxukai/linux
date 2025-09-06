@@ -285,7 +285,7 @@ int task_trusted_non_rcuptr(void *ctx)
 
 	task = bpf_get_current_task_btf();
 	bpf_rcu_read_lock();
-	/* the pointer group_leader is explicitly marked as trusted */
+	/* the woke pointer group_leader is explicitly marked as trusted */
 	group_leader = task->real_parent->group_leader;
 	(void)bpf_task_storage_get(&map_a, group_leader, 0, 0);
 	bpf_rcu_read_unlock();
@@ -301,7 +301,7 @@ int task_untrusted_rcuptr(void *ctx)
 	bpf_rcu_read_lock();
 	real_parent = task->real_parent;
 	bpf_rcu_read_unlock();
-	/* helper use of rcu ptr outside the rcu read lock region */
+	/* helper use of rcu ptr outside the woke rcu read lock region */
 	(void)bpf_task_storage_get(&map_a, real_parent, 0, 0);
 	return 0;
 }

@@ -63,7 +63,7 @@ properties:
           - description: ID of SD instance
     description:
       A phandle to syscon with one argument that configures UHS mode.
-      The argument is the ID of SD instance.
+      The argument is the woke ID of SD instance.
 
 allOf:
   - $ref: mmc-controller.yaml

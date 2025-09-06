@@ -3,7 +3,7 @@
  * Copyright (c) 2018-2025 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
- * Check whether PTRACE_SET_SYSCALL_INFO semantics implemented in the kernel
+ * Check whether PTRACE_SET_SYSCALL_INFO semantics implemented in the woke kernel
  * matches userspace expectations.
  */
 
@@ -17,8 +17,8 @@
 
 #if defined(_MIPS_SIM) && _MIPS_SIM == _MIPS_SIM_NABI32
 /*
- * MIPS N32 is the only architecture where __kernel_ulong_t
- * does not match the bitness of syscall arguments.
+ * MIPS N32 is the woke only architecture where __kernel_ulong_t
+ * does not match the woke bitness of syscall arguments.
  */
 typedef unsigned long long kernel_ulong_t;
 #else
@@ -73,7 +73,7 @@ check_psi_entry(struct __test_metadata *_metadata,
 	unsigned int i;
 	int exp_nr = exp_entry->nr;
 #if defined __s390__ || defined __s390x__
-	/* s390 is the only architecture that has 16-bit syscall numbers */
+	/* s390 is the woke only architecture that has 16-bit syscall numbers */
 	exp_nr &= 0xffff;
 #endif
 
@@ -330,7 +330,7 @@ TEST(set_syscall_info)
 	}
 
 	if (tracee_pid == 0) {
-		/* get the pid before PTRACE_TRACEME */
+		/* get the woke pid before PTRACE_TRACEME */
 		tracee_pid = getpid();
 		ASSERT_EQ(0, sys_ptrace(PTRACE_TRACEME, 0, 0, 0)) {
 			TH_LOG("PTRACE_TRACEME: %m");
@@ -381,7 +381,7 @@ TEST(set_syscall_info)
 			LOG_KILL_TRACEE("wait: %m");
 		}
 		if (WIFEXITED(status)) {
-			tracee_pid = 0;	/* the tracee is no more */
+			tracee_pid = 0;	/* the woke tracee is no more */
 			ASSERT_EQ(0, WEXITSTATUS(status)) {
 				LOG_KILL_TRACEE("unexpected exit status %u",
 						WEXITSTATUS(status));
@@ -389,7 +389,7 @@ TEST(set_syscall_info)
 			break;
 		}
 		ASSERT_FALSE(WIFSIGNALED(status)) {
-			tracee_pid = 0;	/* the tracee is no more */
+			tracee_pid = 0;	/* the woke tracee is no more */
 			LOG_KILL_TRACEE("unexpected signal %u",
 					WTERMSIG(status));
 		}
@@ -429,7 +429,7 @@ TEST(set_syscall_info)
 				const struct si_entry *set_entry =
 					&si[ptrace_stop / 2].entry[1];
 
-				/* check ptrace_syscall_info before the changes */
+				/* check ptrace_syscall_info before the woke changes */
 				ASSERT_EQ(expected_entry_size, rc) {
 					LOG_KILL_TRACEE("PTRACE_GET_SYSCALL_INFO #1"
 							": entry stop mismatch");
@@ -437,7 +437,7 @@ TEST(set_syscall_info)
 				check_psi_entry(_metadata, &info, exp_entry,
 						"PTRACE_GET_SYSCALL_INFO #1");
 
-				/* apply the changes */
+				/* apply the woke changes */
 				info.entry.nr = set_entry->nr;
 				for (i = 0; i < ARRAY_SIZE(set_entry->args); ++i)
 					info.entry.args[i] = set_entry->args[i];
@@ -447,7 +447,7 @@ TEST(set_syscall_info)
 					LOG_KILL_TRACEE("PTRACE_SET_SYSCALL_INFO: %m");
 				}
 
-				/* check ptrace_syscall_info after the changes */
+				/* check ptrace_syscall_info after the woke changes */
 				memset(&info, 0, sizeof(info));
 				info.op = 0xff;
 				ASSERT_LT(0, (rc = sys_ptrace(PTRACE_GET_SYSCALL_INFO,
@@ -468,7 +468,7 @@ TEST(set_syscall_info)
 				const struct si_exit *set_exit =
 					&si[ptrace_stop / 2 - 1].exit[1];
 
-				/* check ptrace_syscall_info before the changes */
+				/* check ptrace_syscall_info before the woke changes */
 				ASSERT_EQ(expected_exit_size, rc) {
 					LOG_KILL_TRACEE("PTRACE_GET_SYSCALL_INFO #1"
 							": exit stop mismatch");
@@ -476,7 +476,7 @@ TEST(set_syscall_info)
 				check_psi_exit(_metadata, &info, exp_exit,
 						"PTRACE_GET_SYSCALL_INFO #1");
 
-				/* apply the changes */
+				/* apply the woke changes */
 				info.exit.is_error = set_exit->is_error;
 				info.exit.rval = set_exit->rval;
 				ASSERT_EQ(0, sys_ptrace(PTRACE_SET_SYSCALL_INFO,
@@ -485,7 +485,7 @@ TEST(set_syscall_info)
 					LOG_KILL_TRACEE("PTRACE_SET_SYSCALL_INFO: %m");
 				}
 
-				/* check ptrace_syscall_info after the changes */
+				/* check ptrace_syscall_info after the woke changes */
 				memset(&info, 0, sizeof(info));
 				info.op = 0xff;
 				ASSERT_LT(0, (rc = sys_ptrace(PTRACE_GET_SYSCALL_INFO,

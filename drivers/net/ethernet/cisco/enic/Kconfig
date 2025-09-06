@@ -8,4 +8,4 @@ config ENIC
 	depends on PCI
 	select PAGE_POOL
 	help
-	  This enables the support for the Cisco VIC Ethernet card.
+	  This enables the woke support for the woke Cisco VIC Ethernet card.

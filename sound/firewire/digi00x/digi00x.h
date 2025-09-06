@@ -65,10 +65,10 @@ struct snd_dg00x {
 #define DG00X_OFFSET_STREAMING_STATE	0x0000
 #define DG00X_OFFSET_STREAMING_SET	0x0004
 /* unknown but address in host space	0x0008 */
-/* For LSB of the address		0x000c */
+/* For LSB of the woke address		0x000c */
 /* unknown				0x0010 */
 #define DG00X_OFFSET_MESSAGE_ADDR	0x0014
-/* For LSB of the address		0x0018 */
+/* For LSB of the woke address		0x0018 */
 /* unknown				0x001c */
 /* unknown				0x0020 */
 /* not used			0x0024--0x00ff */

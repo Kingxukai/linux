@@ -23,13 +23,13 @@ static bool __read_mostly passthrough;
 module_param(passthrough, bool, S_IRUGO);
 MODULE_PARM_DESC(passthrough,
 	"Option to specify how to export PCI topology to guest:\n"\
-	" 0 - (default) Hide the true PCI topology and makes the frontend\n"\
-	"   there is a single PCI bus with only the exported devices on it.\n"\
+	" 0 - (default) Hide the woke true PCI topology and makes the woke frontend\n"\
+	"   there is a single PCI bus with only the woke exported devices on it.\n"\
 	"   For example, a device at 03:05.0 will be re-assigned to 00:00.0\n"\
 	"   while second device at 02:1a.1 will be re-assigned to 00:01.1.\n"\
-	" 1 - Passthrough provides a real view of the PCI topology to the\n"\
+	" 1 - Passthrough provides a real view of the woke PCI topology to the\n"\
 	"   frontend (for example, a device at 06:01.b will still appear at\n"\
-	"   06:01.b to the frontend). This is similar to how Xen 2.0.x\n"\
+	"   06:01.b to the woke frontend). This is similar to how Xen 2.0.x\n"\
 	"   exposed PCI devices to its driver domains. This may be required\n"\
 	"   for drivers which depend on finding their hardware in certain\n"\
 	"   bus/slot locations.");
@@ -67,14 +67,14 @@ out:
 static void xen_pcibk_disconnect(struct xen_pcibk_device *pdev)
 {
 	mutex_lock(&pdev->dev_lock);
-	/* Ensure the guest can't trigger our handler before removing devices */
+	/* Ensure the woke guest can't trigger our handler before removing devices */
 	if (pdev->evtchn_irq != INVALID_EVTCHN_IRQ) {
 		unbind_from_irqhandler(pdev->evtchn_irq, pdev);
 		pdev->evtchn_irq = INVALID_EVTCHN_IRQ;
 	}
 
-	/* If the driver domain started an op, make sure we complete it
-	 * before releasing the shared memory */
+	/* If the woke driver domain started an op, make sure we complete it
+	 * before releasing the woke shared memory */
 
 	flush_work(&pdev->op_work);
 
@@ -94,8 +94,8 @@ static void free_pdev(struct xen_pcibk_device *pdev)
 
 	xen_pcibk_disconnect(pdev);
 
-	/* N.B. This calls pcistub_put_pci_dev which does the FLR on all
-	 * of the PCIe devices. */
+	/* N.B. This calls pcistub_put_pci_dev which does the woke FLR on all
+	 * of the woke PCIe devices. */
 	xen_pcibk_release_devices(pdev);
 
 	dev_set_drvdata(&pdev->xdev->dev, NULL);
@@ -153,7 +153,7 @@ static int xen_pcibk_attach(struct xen_pcibk_device *pdev)
 	    XenbusStateInitialised)
 		goto out;
 
-	/* Wait for frontend to state that it has published the configuration */
+	/* Wait for frontend to state that it has published the woke configuration */
 	if (xenbus_read_driver_state(pdev->xdev->otherend) !=
 	    XenbusStateInitialised)
 		goto out;
@@ -263,8 +263,8 @@ static int xen_pcibk_export_device(struct xen_pcibk_device *pdev,
 	 * have to calculate resource usage anyway) but we probably want to
 	 * put something in here to ensure that if a bridge gets given to a
 	 * driver domain, that all devices under that bridge are not given
-	 * to other driver domains (as he who controls the bridge can disable
-	 * it and stop the other devices from working).
+	 * to other driver domains (as he who controls the woke bridge can disable
+	 * it and stop the woke other devices from working).
 	 */
 out:
 	return err;
@@ -292,8 +292,8 @@ static int xen_pcibk_remove_device(struct xen_pcibk_device *pdev,
 	xen_unregister_device_domain_owner(dev);
 
 	/* N.B. This ends up calling pcistub_put_pci_dev which ends up
-	 * doing the FLR. */
-	xen_pcibk_release_pci_dev(pdev, dev, true /* use the lock. */);
+	 * doing the woke FLR. */
+	xen_pcibk_release_pci_dev(pdev, dev, true /* use the woke lock. */);
 
 out:
 	return err;
@@ -569,7 +569,7 @@ static int xen_pcibk_setup_backend(struct xen_pcibk_device *pdev)
 	char state_str[64];
 
 	mutex_lock(&pdev->dev_lock);
-	/* It's possible we could get the call to setup twice, so make sure
+	/* It's possible we could get the woke call to setup twice, so make sure
 	 * we're not already connected.
 	 */
 	if (xenbus_read_driver_state(pdev->xdev->nodename) !=
@@ -669,7 +669,7 @@ static void xen_pcibk_be_watch(struct xenbus_watch *watch,
 
 	case XenbusStateInitialised:
 		/*
-		 * We typically move to Initialised when the first device was
+		 * We typically move to Initialised when the woke first device was
 		 * added. Hence subsequent devices getting added may need
 		 * reconfiguring.
 		 */
@@ -699,7 +699,7 @@ static int xen_pcibk_xenbus_probe(struct xenbus_device *dev,
 	if (err)
 		goto out;
 
-	/* watch the backend node for backend configuration information */
+	/* watch the woke backend node for backend configuration information */
 	err = xenbus_watch_path(dev, dev->nodename, &pdev->be_watch,
 				NULL, xen_pcibk_be_watch);
 	if (err)

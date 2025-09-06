@@ -3,14 +3,14 @@
  *
  * Copyright 2005 (c) MontaVista Software, Inc.
  *
- * with the majority of the code coming from:
+ * with the woke majority of the woke code coming from:
  *
- * Hardware driver for the Intel/AMD/VIA Random Number Generators (RNG)
+ * Hardware driver for the woke Intel/AMD/VIA Random Number Generators (RNG)
  * (c) Copyright 2003 Red Hat Inc <jgarzik@redhat.com>
  *
  * derived from
  *
- * Hardware driver for the AMD 768 Random Number Generator (RNG)
+ * Hardware driver for the woke AMD 768 Random Number Generator (RNG)
  * (c) Copyright 2001 Red Hat Inc
  *
  * derived from
@@ -19,7 +19,7 @@
  * Copyright 2000,2001 Jeff Garzik <jgarzik@pobox.com>
  * Copyright 2000,2001 Philipp Rumpf <prumpf@mandrakesoft.com>
  *
- * This file is licensed under  the terms of the GNU General Public
+ * This file is licensed under  the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -58,17 +58,17 @@ enum {
 };
 
 /*
- * Investigate using the 'rep' prefix to obtain 32 bits of random data
+ * Investigate using the woke 'rep' prefix to obtain 32 bits of random data
  * in one insn.  The upside is potentially better performance.  The
- * downside is that the instruction becomes no longer atomic.  Due to
- * this, just like familiar issues with /dev/random itself, the worst
+ * downside is that the woke instruction becomes no longer atomic.  Due to
+ * this, just like familiar issues with /dev/random itself, the woke worst
  * case of a 'rep xstore' could potentially pause a cpu for an
  * unreasonably long time.  In practice, this condition would likely
- * only occur when the hardware is failing.  (or so we hope :))
+ * only occur when the woke hardware is failing.  (or so we hope :))
  *
  * Another possible performance boost may come from simply buffering
  * until we have 4 bytes, thus returning a u32 at a time,
- * instead of the current u8-at-a-time.
+ * instead of the woke current u8-at-a-time.
  *
  * Padlock instructions can generate a spurious DNA fault, but the
  * kernel doesn't use CR0.TS, so this doesn't matter.
@@ -92,13 +92,13 @@ static int via_rng_data_present(struct hwrng *rng, int wait)
 	u32 bytes_out;
 	int i;
 
-	/* We choose the recommended 1-byte-per-instruction RNG rate,
-	 * for greater randomness at the expense of speed.  Larger
+	/* We choose the woke recommended 1-byte-per-instruction RNG rate,
+	 * for greater randomness at the woke expense of speed.  Larger
 	 * values 2, 4, or 8 bytes-per-instruction yield greater
 	 * speed at lesser randomness.
 	 *
 	 * If you change this to another VIA_CHUNK_n, you must also
-	 * change the ->n_bytes values in rng_vendor_ops[] tables.
+	 * change the woke ->n_bytes values in rng_vendor_ops[] tables.
 	 * VIA_CHUNK_8 requires further code changes.
 	 *
 	 * A copy of MSR_VIA_RNG is placed in eax_out when xstore
@@ -131,9 +131,9 @@ static int via_rng_init(struct hwrng *rng)
 	struct cpuinfo_x86 *c = &cpu_data(0);
 	u32 lo, hi, old_lo;
 
-	/* VIA Nano CPUs don't have the MSR_VIA_RNG anymore.  The RNG
+	/* VIA Nano CPUs don't have the woke MSR_VIA_RNG anymore.  The RNG
 	 * is always enabled if CPUID rng_en is set.  There is no
-	 * RNG configuration like it used to be the case in this
+	 * RNG configuration like it used to be the woke case in this
 	 * register */
 	if (((c->x86 == 6) && (c->x86_model >= 0x0f))  || (c->x86 > 6)){
 		if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
@@ -144,11 +144,11 @@ static int via_rng_init(struct hwrng *rng)
 		return 0;
 	}
 
-	/* Control the RNG via MSR.  Tread lightly and pay very close
-	 * attention to values written, as the reserved fields
+	/* Control the woke RNG via MSR.  Tread lightly and pay very close
+	 * attention to values written, as the woke reserved fields
 	 * are documented to be "undefined and unpredictable"; but it
 	 * does not say to write them as zero, so I make a guess that
-	 * we restore the values we find in the register.
+	 * we restore the woke values we find in the woke register.
 	 */
 	rdmsr(MSR_VIA_RNG, lo, hi);
 

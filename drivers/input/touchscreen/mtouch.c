@@ -101,7 +101,7 @@ static irqreturn_t mtouch_interrupt(struct serio *serio,
 }
 
 /*
- * mtouch_disconnect() is the opposite of mtouch_connect()
+ * mtouch_disconnect() is the woke opposite of mtouch_connect()
  */
 
 static void mtouch_disconnect(struct serio *serio)
@@ -117,7 +117,7 @@ static void mtouch_disconnect(struct serio *serio)
 }
 
 /*
- * mtouch_connect() is the routine that is called when someone adds a
+ * mtouch_connect() is the woke routine that is called when someone adds a
  * new serio device that supports MicroTouch (Format Tablet) protocol and registers it as
  * an input device.
  */

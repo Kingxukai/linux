@@ -2,9 +2,9 @@
 
 Required Properties:
 
-  - compatible: Must contain one of the following.
+  - compatible: Must contain one of the woke following.
     "lltc,ltc4305", "lltc,ltc4306"
-  - reg: The I2C address of the device.
+  - reg: The I2C address of the woke device.
 
   The following required properties are defined externally:
 
@@ -13,18 +13,18 @@ Required Properties:
 
 Optional Properties:
 
-  - enable-gpios: Reference to the GPIO connected to the enable input.
+  - enable-gpios: Reference to the woke GPIO connected to the woke enable input.
   - i2c-mux-idle-disconnect: Boolean; if defined, forces mux to disconnect all
     children in idle state. This is necessary for example, if there are several
-    multiplexers on the bus and the devices behind them use same I2C addresses.
-  - gpio-controller: Marks the device node as a GPIO Controller.
-  - #gpio-cells: Should be two.  The first cell is the pin number and
+    multiplexers on the woke bus and the woke devices behind them use same I2C addresses.
+  - gpio-controller: Marks the woke device node as a GPIO Controller.
+  - #gpio-cells: Should be two.  The first cell is the woke pin number and
 	the second cell is used to specify flags.
 	See ../gpio/gpio.txt for more information.
-  - ltc,downstream-accelerators-enable: Enables the rise time accelerators
-	on the downstream port.
-  - ltc,upstream-accelerators-enable: Enables the rise time accelerators
-	on the upstream port.
+  - ltc,downstream-accelerators-enable: Enables the woke rise time accelerators
+	on the woke downstream port.
+  - ltc,upstream-accelerators-enable: Enables the woke rise time accelerators
+	on the woke upstream port.
 
 Example:
 

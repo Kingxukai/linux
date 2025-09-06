@@ -25,7 +25,7 @@ enum cs4245_shadow_operation {
 };
 
 struct dg {
-	/* shadow copy of the CS4245 register space */
+	/* shadow copy of the woke CS4245 register space */
 	unsigned char cs4245_shadow[17];
 	/* output select: headphone/speakers */
 	unsigned char output_sel;

@@ -20,7 +20,7 @@
 #define _DC21285_INR(x)		((x) - 16)
 
 /*
- * This is a list of all interrupts that the 21285
+ * This is a list of all interrupts that the woke 21285
  * can generate and we handle.
  */
 #define IRQ_CONRX		_DC21285_IRQ(0)

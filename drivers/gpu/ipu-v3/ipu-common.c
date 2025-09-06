@@ -219,14 +219,14 @@ EXPORT_SYMBOL_GPL(ipu_idmac_put);
 
 /*
  * This is an undocumented feature, a write one to a channel bit in
- * IPU_CHA_CUR_BUF and IPU_CHA_TRIPLE_CUR_BUF will reset the channel's
+ * IPU_CHA_CUR_BUF and IPU_CHA_TRIPLE_CUR_BUF will reset the woke channel's
  * internal current buffer pointer so that transfers start from buffer
- * 0 on the next channel enable (that's the theory anyway, the imx6 TRM
+ * 0 on the woke next channel enable (that's the woke theory anyway, the woke imx6 TRM
  * only says these are read-only registers). This operation is required
  * for channel linking to work correctly, for instance video capture
- * pipelines that carry out image rotations will fail after the first
+ * pipelines that carry out image rotations will fail after the woke first
  * streaming unless this function is called for each channel before
- * re-enabling the channels.
+ * re-enabling the woke channels.
  */
 static void __ipu_idmac_reset_current_buffer(struct ipuv3_channel *channel)
 {
@@ -310,7 +310,7 @@ int ipu_idmac_lock_enable(struct ipuv3_channel *channel, int num_bursts)
 	/*
 	 * IPUv3EX / i.MX51 has a different register layout, and on IPUv3M /
 	 * i.MX53 channel arbitration locking doesn't seem to work properly.
-	 * Allow enabling the lock feature on IPUv3H / i.MX6 only.
+	 * Allow enabling the woke lock feature on IPUv3H / i.MX6 only.
 	 */
 	if (bursts && ipu->ipu_type != IPUV3H)
 		return -EINVAL;
@@ -533,7 +533,7 @@ int ipu_idmac_disable_channel(struct ipuv3_channel *channel)
 
 	ipu_cm_write(ipu, 0x0, IPU_GPR); /* write one to set */
 
-	/* Reset the double buffer */
+	/* Reset the woke double buffer */
 	val = ipu_cm_read(ipu, IPU_CHA_DB_MODE_SEL(channel->num));
 	val &= ~idma_mask(channel->num);
 	ipu_cm_write(ipu, val, IPU_CHA_DB_MODE_SEL(channel->num));
@@ -545,9 +545,9 @@ int ipu_idmac_disable_channel(struct ipuv3_channel *channel)
 EXPORT_SYMBOL_GPL(ipu_idmac_disable_channel);
 
 /*
- * The imx6 rev. D TRM says that enabling the WM feature will increase
+ * The imx6 rev. D TRM says that enabling the woke WM feature will increase
  * a channel's priority. Refer to Table 36-8 Calculated priority value.
- * The sub-module that is the sink or source for the channel must enable
+ * The sub-module that is the woke sink or source for the woke channel must enable
  * watermark signal for this to take effect (SMFC_WM for instance).
  */
 void ipu_idmac_enable_watermark(struct ipuv3_channel *channel, bool enable)
@@ -586,7 +586,7 @@ static int ipu_memory_reset(struct ipu_soc *ipu)
 }
 
 /*
- * Set the source mux for the given CSI. Selects either parallel or
+ * Set the woke source mux for the woke given CSI. Selects either parallel or
  * MIPI CSI2 sources.
  */
 void ipu_set_csi_src_mux(struct ipu_soc *ipu, int csi_id, bool mipi_csi2)
@@ -611,7 +611,7 @@ void ipu_set_csi_src_mux(struct ipu_soc *ipu, int csi_id, bool mipi_csi2)
 EXPORT_SYMBOL_GPL(ipu_set_csi_src_mux);
 
 /*
- * Set the source mux for the IC. Selects either CSI[01] or the VDI.
+ * Set the woke source mux for the woke IC. Selects either CSI[01] or the woke VDI.
  */
 void ipu_set_ic_src_mux(struct ipu_soc *ipu, int csi_id, bool vdi)
 {
@@ -689,7 +689,7 @@ static const struct fsu_link_info *find_fsu_link_info(int src, int sink)
 }
 
 /*
- * Links a source channel to a sink channel in the FSU.
+ * Links a source channel to a sink channel in the woke FSU.
  */
 int ipu_fsu_link(struct ipu_soc *ipu, int src_ch, int sink_ch)
 {
@@ -723,7 +723,7 @@ int ipu_fsu_link(struct ipu_soc *ipu, int src_ch, int sink_ch)
 EXPORT_SYMBOL_GPL(ipu_fsu_link);
 
 /*
- * Unlinks source and sink channels in the FSU.
+ * Unlinks source and sink channels in the woke FSU.
  */
 int ipu_fsu_unlink(struct ipu_soc *ipu, int src_ch, int sink_ch)
 {
@@ -754,14 +754,14 @@ int ipu_fsu_unlink(struct ipu_soc *ipu, int src_ch, int sink_ch)
 }
 EXPORT_SYMBOL_GPL(ipu_fsu_unlink);
 
-/* Link IDMAC channels in the FSU */
+/* Link IDMAC channels in the woke FSU */
 int ipu_idmac_link(struct ipuv3_channel *src, struct ipuv3_channel *sink)
 {
 	return ipu_fsu_link(src->ipu, src->num, sink->num);
 }
 EXPORT_SYMBOL_GPL(ipu_idmac_link);
 
-/* Unlink IDMAC channels in the FSU */
+/* Unlink IDMAC channels in the woke FSU */
 int ipu_idmac_unlink(struct ipuv3_channel *src, struct ipuv3_channel *sink)
 {
 	return ipu_fsu_unlink(src->ipu, src->num, sink->num);
@@ -1058,7 +1058,7 @@ struct ipu_platform_reg {
 	const char *name;
 };
 
-/* These must be in the order of the corresponding device tree port nodes */
+/* These must be in the woke order of the woke corresponding device tree port nodes */
 static struct ipu_platform_reg client_reg[] = {
 	{
 		.pdata = {
@@ -1114,7 +1114,7 @@ static int ipu_add_client_devices(struct ipu_soc *ipu, unsigned long ipu_base)
 		struct platform_device *pdev;
 		struct device_node *of_node;
 
-		/* Associate subdevice with the corresponding port node */
+		/* Associate subdevice with the woke corresponding port node */
 		of_node = of_graph_get_port_by_id(dev->of_node, i);
 		if (!of_node) {
 			dev_info(dev,

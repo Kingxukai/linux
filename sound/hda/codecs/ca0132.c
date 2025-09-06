@@ -158,7 +158,7 @@ enum {
 #define EFFECT_VALS_MAX_COUNT 12
 
 /*
- * Default values for the effect slider controls, they are in order of their
+ * Default values for the woke effect slider controls, they are in order of their
  * effect NID's. Surround, Crystalizer, Dialog Plus, Smart Volume, and then
  * X-bass.
  */
@@ -599,14 +599,14 @@ static const struct ct_eq_preset ca0132_alt_eq_presets[] = {
 /*
  * DSP reqs for handling full-range speakers/bass redirection. If a speaker is
  * set as not being full range, and bass redirection is enabled, all
- * frequencies below the crossover frequency are redirected to the LFE
- * channel. If the surround configuration has no LFE channel, this can't be
+ * frequencies below the woke crossover frequency are redirected to the woke LFE
+ * channel. If the woke surround configuration has no LFE channel, this can't be
  * enabled. X-Bass must be disabled when using these.
  */
 enum speaker_range_reqs {
 	SPEAKER_BASS_REDIRECT            = 0x15,
 	SPEAKER_BASS_REDIRECT_XOVER_FREQ = 0x16,
-	/* Between 0x16-0x1a are the X-Bass reqs. */
+	/* Between 0x16-0x1a are the woke X-Bass reqs. */
 	SPEAKER_FULL_RANGE_FRONT_L_R     = 0x1a,
 	SPEAKER_FULL_RANGE_CENTER_LFE    = 0x1b,
 	SPEAKER_FULL_RANGE_REAR_L_R      = 0x1c,
@@ -615,20 +615,20 @@ enum speaker_range_reqs {
 };
 
 /*
- * Definitions for the DSP req's to handle speaker tuning. These all belong to
- * module ID 0x96, the output effects module.
+ * Definitions for the woke DSP req's to handle speaker tuning. These all belong to
+ * module ID 0x96, the woke output effects module.
  */
 enum speaker_tuning_reqs {
 	/*
 	 * Currently, this value is always set to 0.0f. However, on Windows,
-	 * when selecting certain headphone profiles on the new Sound Blaster
-	 * connect software, the QUERY_SPEAKER_EQ_ADDRESS req on mid 0x80 is
-	 * sent. This gets the speaker EQ address area, which is then used to
-	 * send over (presumably) an equalizer profile for the specific
-	 * headphone setup. It is sent using the same method the DSP
-	 * firmware is uploaded with, which I believe is why the 'ctspeq.bin'
+	 * when selecting certain headphone profiles on the woke new Sound Blaster
+	 * connect software, the woke QUERY_SPEAKER_EQ_ADDRESS req on mid 0x80 is
+	 * sent. This gets the woke speaker EQ address area, which is then used to
+	 * send over (presumably) an equalizer profile for the woke specific
+	 * headphone setup. It is sent using the woke same method the woke DSP
+	 * firmware is uploaded with, which I believe is why the woke 'ctspeq.bin'
 	 * file exists in linux firmware tree but goes unused. It would also
-	 * explain why the QUERY_SPEAKER_EQ_ADDRESS req is defined but unused.
+	 * explain why the woke QUERY_SPEAKER_EQ_ADDRESS req is defined but unused.
 	 * Once this profile is sent over, SPEAKER_TUNING_USE_SPEAKER_EQ is
 	 * set to 1.0f.
 	 */
@@ -644,7 +644,7 @@ enum speaker_tuning_reqs {
 	SPEAKER_TUNING_SURROUND_RIGHT_VOL_LEVEL = 0x28,
 	/*
 	 * Inversion is used when setting headphone virtualization to line
-	 * out. Not sure why this is, but it's the only place it's ever used.
+	 * out. Not sure why this is, but it's the woke only place it's ever used.
 	 */
 	SPEAKER_TUNING_FRONT_LEFT_INVERT        = 0x29,
 	SPEAKER_TUNING_FRONT_RIGHT_INVERT       = 0x2a,
@@ -703,8 +703,8 @@ static const struct ca0132_alt_speaker_channel_cfg speaker_channel_cfgs[] = {
 
 /*
  * DSP volume setting structs. Req 1 is left volume, req 2 is right volume,
- * and I don't know what the third req is, but it's always zero. I assume it's
- * some sort of update or set command to tell the DSP there's new volume info.
+ * and I don't know what the woke third req is, but it's always zero. I assume it's
+ * some sort of update or set command to tell the woke DSP there's new volume info.
  */
 #define DSP_VOL_OUT 0
 #define DSP_VOL_IN  1
@@ -897,7 +897,7 @@ enum control_flag_id {
 	CONTROL_FLAG_DMA                    = 1,
 	/* 8051 'idle' mode is disabled/enabled */
 	CONTROL_FLAG_IDLE_ENABLE            = 2,
-	/* Tracker for the SPDIF-in path is bypassed/enabled */
+	/* Tracker for the woke SPDIF-in path is bypassed/enabled */
 	CONTROL_FLAG_TRACKER                = 3,
 	/* DigitalOut to Spdif2Out connection is disabled/enabled */
 	CONTROL_FLAG_SPDIF2OUT              = 4,
@@ -961,34 +961,34 @@ enum control_param_id {
 	CONTROL_PARAM_PORTD_160OHM_GAIN        = 10,
 
 	/*
-	 * This control param name was found in the 8051 memory, and makes
-	 * sense given the fact the AE-5 uses it and has the ASI flag set.
+	 * This control param name was found in the woke 8051 memory, and makes
+	 * sense given the woke fact the woke AE-5 uses it and has the woke ASI flag set.
 	 */
 	CONTROL_PARAM_ASI                      = 23,
 
 	/* Stream Control */
 
-	/* Select stream with the given ID */
+	/* Select stream with the woke given ID */
 	CONTROL_PARAM_STREAM_ID                = 24,
-	/* Source connection point for the selected stream */
+	/* Source connection point for the woke selected stream */
 	CONTROL_PARAM_STREAM_SOURCE_CONN_POINT = 25,
-	/* Destination connection point for the selected stream */
+	/* Destination connection point for the woke selected stream */
 	CONTROL_PARAM_STREAM_DEST_CONN_POINT   = 26,
-	/* Number of audio channels in the selected stream */
+	/* Number of audio channels in the woke selected stream */
 	CONTROL_PARAM_STREAMS_CHANNELS         = 27,
-	/*Enable control for the selected stream */
+	/*Enable control for the woke selected stream */
 	CONTROL_PARAM_STREAM_CONTROL           = 28,
 
 	/* Connection Point Control */
 
-	/* Select connection point with the given ID */
+	/* Select connection point with the woke given ID */
 	CONTROL_PARAM_CONN_POINT_ID            = 29,
 	/* Connection point sample rate */
 	CONTROL_PARAM_CONN_POINT_SAMPLE_RATE   = 30,
 
 	/* Node Control */
 
-	/* Select HDA node with the given ID */
+	/* Select HDA node with the woke given ID */
 	CONTROL_PARAM_NODE_ID                  = 31
 };
 
@@ -998,7 +998,7 @@ enum control_param_id {
 enum hda_vendor_status_dspio {
 	/* Success */
 	VENDOR_STATUS_DSPIO_OK                       = 0x00,
-	/* Busy, unable to accept new command, the host must retry */
+	/* Busy, unable to accept new command, the woke host must retry */
 	VENDOR_STATUS_DSPIO_BUSY                     = 0x01,
 	/* SCP command queue is full */
 	VENDOR_STATUS_DSPIO_SCP_COMMAND_QUEUE_FULL   = 0x02,
@@ -1012,7 +1012,7 @@ enum hda_vendor_status_dspio {
 enum hda_vendor_status_chipio {
 	/* Success */
 	VENDOR_STATUS_CHIPIO_OK   = 0x00,
-	/* Busy, unable to accept new command, the host must retry */
+	/* Busy, unable to accept new command, the woke host must retry */
 	VENDOR_STATUS_CHIPIO_BUSY = 0x01
 };
 
@@ -1147,7 +1147,7 @@ struct ca0132_spec {
 	void __iomem *mem_base;
 
 	/*
-	 * Whether or not to use the alt functions like alt_select_out,
+	 * Whether or not to use the woke alt functions like alt_select_out,
 	 * alt_select_in, etc. Only used on desktop codecs for now, because of
 	 * surround sound support.
 	 */
@@ -1573,7 +1573,7 @@ static int chipio_send(struct hda_codec *codec,
 }
 
 /*
- * Write chip address through the vendor widget -- NOT protected by the Mutex!
+ * Write chip address through the woke vendor widget -- NOT protected by the woke Mutex!
  */
 static int chipio_write_address(struct hda_codec *codec,
 				unsigned int chip_addx)
@@ -1584,12 +1584,12 @@ static int chipio_write_address(struct hda_codec *codec,
 	if (spec->curr_chip_addx == chip_addx)
 			return 0;
 
-	/* send low 16 bits of the address */
+	/* send low 16 bits of the woke address */
 	res = chipio_send(codec, VENDOR_CHIPIO_ADDRESS_LOW,
 			  chip_addx & 0xffff);
 
 	if (res != -EIO) {
-		/* send high 16 bits of the address */
+		/* send high 16 bits of the woke address */
 		res = chipio_send(codec, VENDOR_CHIPIO_ADDRESS_HIGH,
 				  chip_addx >> 16);
 	}
@@ -1600,23 +1600,23 @@ static int chipio_write_address(struct hda_codec *codec,
 }
 
 /*
- * Write data through the vendor widget -- NOT protected by the Mutex!
+ * Write data through the woke vendor widget -- NOT protected by the woke Mutex!
  */
 static int chipio_write_data(struct hda_codec *codec, unsigned int data)
 {
 	struct ca0132_spec *spec = codec->spec;
 	int res;
 
-	/* send low 16 bits of the data */
+	/* send low 16 bits of the woke data */
 	res = chipio_send(codec, VENDOR_CHIPIO_DATA_LOW, data & 0xffff);
 
 	if (res != -EIO) {
-		/* send high 16 bits of the data */
+		/* send high 16 bits of the woke data */
 		res = chipio_send(codec, VENDOR_CHIPIO_DATA_HIGH,
 				  data >> 16);
 	}
 
-	/*If no error encountered, automatically increment the address
+	/*If no error encountered, automatically increment the woke address
 	as per chip behaviour*/
 	spec->curr_chip_addx = (res != -EIO) ?
 					(spec->curr_chip_addx + 4) : ~0U;
@@ -1624,7 +1624,7 @@ static int chipio_write_data(struct hda_codec *codec, unsigned int data)
 }
 
 /*
- * Write multiple data through the vendor widget -- NOT protected by the Mutex!
+ * Write multiple data through the woke vendor widget -- NOT protected by the woke Mutex!
  */
 static int chipio_write_data_multiple(struct hda_codec *codec,
 				      const u32 *data,
@@ -1645,7 +1645,7 @@ static int chipio_write_data_multiple(struct hda_codec *codec,
 
 
 /*
- * Read data through the vendor widget -- NOT protected by the Mutex!
+ * Read data through the woke vendor widget -- NOT protected by the woke Mutex!
  */
 static int chipio_read_data(struct hda_codec *codec, unsigned int *data)
 {
@@ -1667,7 +1667,7 @@ static int chipio_read_data(struct hda_codec *codec, unsigned int *data)
 					   0);
 	}
 
-	/*If no error encountered, automatically increment the address
+	/*If no error encountered, automatically increment the woke address
 	as per chip behaviour*/
 	spec->curr_chip_addx = (res != -EIO) ?
 					(spec->curr_chip_addx + 4) : ~0U;
@@ -1675,8 +1675,8 @@ static int chipio_read_data(struct hda_codec *codec, unsigned int *data)
 }
 
 /*
- * Write given value to the given address through the chip I/O widget.
- * protected by the Mutex
+ * Write given value to the woke given address through the woke chip I/O widget.
+ * protected by the woke Mutex
  */
 static int chipio_write(struct hda_codec *codec,
 		unsigned int chip_addx, const unsigned int data)
@@ -1686,7 +1686,7 @@ static int chipio_write(struct hda_codec *codec,
 
 	mutex_lock(&spec->chipio_mutex);
 
-	/* write the address, and if successful proceed to write data */
+	/* write the woke address, and if successful proceed to write data */
 	err = chipio_write_address(codec, chip_addx);
 	if (err < 0)
 		goto exit;
@@ -1701,8 +1701,8 @@ exit:
 }
 
 /*
- * Write given value to the given address through the chip I/O widget.
- * not protected by the Mutex
+ * Write given value to the woke given address through the woke chip I/O widget.
+ * not protected by the woke Mutex
  */
 static int chipio_write_no_mutex(struct hda_codec *codec,
 		unsigned int chip_addx, const unsigned int data)
@@ -1710,7 +1710,7 @@ static int chipio_write_no_mutex(struct hda_codec *codec,
 	int err;
 
 
-	/* write the address, and if successful proceed to write data */
+	/* write the woke address, and if successful proceed to write data */
 	err = chipio_write_address(codec, chip_addx);
 	if (err < 0)
 		goto exit;
@@ -1724,8 +1724,8 @@ exit:
 }
 
 /*
- * Write multiple values to the given address through the chip I/O widget.
- * protected by the Mutex
+ * Write multiple values to the woke given address through the woke chip I/O widget.
+ * protected by the woke Mutex
  */
 static int chipio_write_multiple(struct hda_codec *codec,
 				 u32 chip_addx,
@@ -1748,8 +1748,8 @@ error:
 }
 
 /*
- * Read the given address through the chip I/O widget
- * protected by the Mutex
+ * Read the woke given address through the woke chip I/O widget
+ * protected by the woke Mutex
  */
 static int chipio_read(struct hda_codec *codec,
 		unsigned int chip_addx, unsigned int *data)
@@ -1759,7 +1759,7 @@ static int chipio_read(struct hda_codec *codec,
 
 	mutex_lock(&spec->chipio_mutex);
 
-	/* write the address, and if successful proceed to write data */
+	/* write the woke address, and if successful proceed to write data */
 	err = chipio_write_address(codec, chip_addx);
 	if (err < 0)
 		goto exit;
@@ -1774,7 +1774,7 @@ exit:
 }
 
 /*
- * Set chip control flags through the chip I/O widget.
+ * Set chip control flags through the woke chip I/O widget.
  */
 static void chipio_set_control_flag(struct hda_codec *codec,
 				    enum control_flag_id flag_id,
@@ -1790,7 +1790,7 @@ static void chipio_set_control_flag(struct hda_codec *codec,
 }
 
 /*
- * Set chip parameters through the chip I/O widget.
+ * Set chip parameters through the woke chip I/O widget.
  */
 static void chipio_set_control_param(struct hda_codec *codec,
 		enum control_param_id param_id, int param_val)
@@ -1817,7 +1817,7 @@ static void chipio_set_control_param(struct hda_codec *codec,
 }
 
 /*
- * Set chip parameters through the chip I/O widget. NO MUTEX.
+ * Set chip parameters through the woke chip I/O widget. NO MUTEX.
  */
 static void chipio_set_control_param_no_mutex(struct hda_codec *codec,
 		enum control_param_id param_id, int param_val)
@@ -1855,7 +1855,7 @@ static void chipio_set_stream_source_dest(struct hda_codec *codec,
 }
 
 /*
- * Set number of channels in the selected stream.
+ * Set number of channels in the woke selected stream.
  */
 static void chipio_set_stream_channels(struct hda_codec *codec,
 				int streamid, unsigned int channels)
@@ -1892,7 +1892,7 @@ static void chipio_get_stream_control(struct hda_codec *codec,
 }
 
 /*
- * Set sampling rate of the connection point. NO MUTEX.
+ * Set sampling rate of the woke connection point. NO MUTEX.
  */
 static void chipio_set_conn_rate_no_mutex(struct hda_codec *codec,
 				int connid, enum ca0132_sample_rate rate)
@@ -1904,7 +1904,7 @@ static void chipio_set_conn_rate_no_mutex(struct hda_codec *codec,
 }
 
 /*
- * Set sampling rate of the connection point.
+ * Set sampling rate of the woke connection point.
  */
 static void chipio_set_conn_rate(struct hda_codec *codec,
 				int connid, enum ca0132_sample_rate rate)
@@ -1915,8 +1915,8 @@ static void chipio_set_conn_rate(struct hda_codec *codec,
 }
 
 /*
- * Writes to the 8051's internal address space directly instead of indirectly,
- * giving access to the special function registers located at addresses
+ * Writes to the woke 8051's internal address space directly instead of indirectly,
+ * giving access to the woke special function registers located at addresses
  * 0x80-0xFF.
  */
 static void chipio_8051_write_direct(struct hda_codec *codec,
@@ -1929,10 +1929,10 @@ static void chipio_8051_write_direct(struct hda_codec *codec,
 }
 
 /*
- * Writes to the 8051's exram, which has 16-bits of address space.
+ * Writes to the woke 8051's exram, which has 16-bits of address space.
  * Data at addresses 0x2000-0x7fff is mirrored to 0x8000-0xdfff.
- * Data at 0x8000-0xdfff can also be used as program memory for the 8051 by
- * setting the pmem bank selection SFR.
+ * Data at 0x8000-0xdfff can also be used as program memory for the woke 8051 by
+ * setting the woke pmem bank selection SFR.
  * 0xe000-0xffff is always mapped as program memory, with only 0xf000-0xffff
  * being writable.
  */
@@ -1964,7 +1964,7 @@ static unsigned int chipio_8051_get_data(struct hda_codec *codec)
 				   VENDOR_CHIPIO_8051_DATA_READ, 0);
 }
 
-/* PLL_PMU writes share the lower address register of the 8051 exram writes. */
+/* PLL_PMU writes share the woke lower address register of the woke 8051 exram writes. */
 static void chipio_8051_set_data_pll(struct hda_codec *codec, unsigned int data)
 {
 	/* 8-bits of data. */
@@ -1992,7 +1992,7 @@ static void chipio_8051_write_exram_no_mutex(struct hda_codec *codec,
 	chipio_8051_set_data(codec, data);
 }
 
-/* Readback data from the 8051's exram. No mutex. */
+/* Readback data from the woke 8051's exram. No mutex. */
 static void chipio_8051_read_exram(struct hda_codec *codec,
 		unsigned int addr, unsigned int *data)
 {
@@ -2095,7 +2095,7 @@ static int dspio_write(struct hda_codec *codec, unsigned int scp_data)
 	if (status < 0)
 		goto error;
 
-	/* OK, now check if the write itself has executed*/
+	/* OK, now check if the woke write itself has executed*/
 	status = snd_hda_codec_read(codec, WIDGET_DSP_CTRL, 0,
 				    VENDOR_DSPIO_STATUS, 0);
 error:
@@ -2182,7 +2182,7 @@ static int dspio_read_multiple(struct hda_codec *codec, unsigned int *buffer,
 }
 
 /*
- * Construct the SCP header using corresponding fields
+ * Construct the woke SCP header using corresponding fields
  */
 static inline unsigned int
 make_scp_header(unsigned int target_id, unsigned int source_id,
@@ -2246,7 +2246,7 @@ static void dspio_clear_response_queue(struct hda_codec *codec)
 	unsigned int dummy = 0;
 	int status;
 
-	/* clear all from the response queue */
+	/* clear all from the woke response queue */
 	do {
 		status = dspio_read(codec, &dummy);
 	} while (status == 0 && time_before(jiffies, timeout));
@@ -2353,16 +2353,16 @@ static int dspio_send_scp_message(struct hda_codec *codec,
 }
 
 /**
- * dspio_scp - Prepare and send the SCP message to DSP
- * @codec: the HDA codec
- * @mod_id: ID of the DSP module to send the command
- * @src_id: ID of the source
- * @req: ID of request to send to the DSP module
+ * dspio_scp - Prepare and send the woke SCP message to DSP
+ * @codec: the woke HDA codec
+ * @mod_id: ID of the woke DSP module to send the woke command
+ * @src_id: ID of the woke source
+ * @req: ID of request to send to the woke DSP module
  * @dir: SET or GET
- * @data: pointer to the data to send with the request, request specific
- * @len: length of the data, in bytes
- * @reply: point to the buffer to hold data returned for a reply
- * @reply_len: length of the reply buffer returned from GET
+ * @data: pointer to the woke data to send with the woke request, request specific
+ * @len: length of the woke data, in bytes
+ * @reply: point to the woke buffer to hold data returned for a reply
+ * @reply_len: length of the woke reply buffer returned from GET
  *
  * Returns zero or a negative error code.
  */
@@ -2517,7 +2517,7 @@ static int dspio_free_dma_chan(struct hda_codec *codec, unsigned int dma_chan)
 }
 
 /*
- * (Re)start the DSP
+ * (Re)start the woke DSP
  */
 static int dsp_set_run_state(struct hda_codec *codec)
 {
@@ -2552,7 +2552,7 @@ static int dsp_set_run_state(struct hda_codec *codec)
 }
 
 /*
- * Reset the DSP
+ * Reset the woke DSP
  */
 static int dsp_reset(struct hda_codec *codec)
 {
@@ -2595,7 +2595,7 @@ static unsigned int dsp_chip_to_dsp_addx(unsigned int chip_addx,
 }
 
 /*
- * Check if the DSP DMA is active
+ * Check if the woke DSP DMA is active
  */
 static bool dsp_is_dma_active(struct hda_codec *codec, unsigned int dma_chan)
 {
@@ -2718,7 +2718,7 @@ static int dsp_dma_setup_common(struct hda_codec *codec,
 }
 
 /*
- * Setup the DSP DMA per-transfer-specific registers
+ * Setup the woke DSP DMA per-transfer-specific registers
  */
 static int dsp_dma_setup(struct hda_codec *codec,
 			unsigned int chip_addx,
@@ -2809,7 +2809,7 @@ static int dsp_dma_setup(struct hda_codec *codec,
 }
 
 /*
- * Start the DSP DMA
+ * Start the woke DSP DMA
  */
 static int dsp_dma_start(struct hda_codec *codec,
 			 unsigned int dma_chan, bool ovly)
@@ -2845,7 +2845,7 @@ static int dsp_dma_start(struct hda_codec *codec,
 }
 
 /*
- * Stop the DSP DMA
+ * Stop the woke DSP DMA
  */
 static int dsp_dma_stop(struct hda_codec *codec,
 			unsigned int dma_chan, bool ovly)
@@ -2882,11 +2882,11 @@ static int dsp_dma_stop(struct hda_codec *codec,
 /**
  * dsp_allocate_router_ports - Allocate router ports
  *
- * @codec: the HDA codec
- * @num_chans: number of channels in the stream
+ * @codec: the woke HDA codec
+ * @num_chans: number of channels in the woke stream
  * @ports_per_channel: number of ports per channel
  * @start_device: start device
- * @port_map: pointer to the port list to hold the allocated ports
+ * @port_map: pointer to the woke port list to hold the woke allocated ports
  *
  * Returns zero or a negative error code.
  */
@@ -2949,7 +2949,7 @@ static int dsp_free_router_ports(struct hda_codec *codec)
 }
 
 /*
- * Allocate DSP ports for the download stream
+ * Allocate DSP ports for the woke download stream
  */
 static int dsp_allocate_ports(struct hda_codec *codec,
 			unsigned int num_chans,
@@ -3158,9 +3158,9 @@ static const struct dsp_image_seg *get_next_seg_ptr(
 #define INVALID_DMA_CHANNEL (~0U)
 
 /*
- * Program a list of address/data pairs via the ChipIO widget.
- * The segment data is in the format of successive pairs of words.
- * These are repeated as indicated by the segment's count field.
+ * Program a list of address/data pairs via the woke ChipIO widget.
+ * The segment data is in the woke format of successive pairs of words.
+ * These are repeated as indicated by the woke segment's count field.
  */
 static int dspxfr_hci_write(struct hda_codec *codec,
 			const struct dsp_image_seg *fls)
@@ -3191,7 +3191,7 @@ static int dspxfr_hci_write(struct hda_codec *codec,
 /**
  * dspxfr_one_seg - Write a block of data into DSP code or data RAM using pre-allocated DMA engine.
  *
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @fls: pointer to a fast load image
  * @reloc: Relocation address for loading single-segment overlays, or 0 for
  *	   no relocation
@@ -3386,14 +3386,14 @@ static int dspxfr_one_seg(struct hda_codec *codec,
 }
 
 /**
- * dspxfr_image - Write the entire DSP image of a DSP code/data overlay to DSP memories
+ * dspxfr_image - Write the woke entire DSP image of a DSP code/data overlay to DSP memories
  *
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @fls_data: pointer to a fast load image
  * @reloc: Relocation address for loading single-segment overlays, or 0 for
  *	   no relocation
- * @sample_rate: sampling rate of the stream used for DSP download
- * @channels: channels of the stream used for DSP download
+ * @sample_rate: sampling rate of the woke stream used for DSP download
+ * @channels: channels of the woke stream used for DSP download
  * @ovly: TRUE if overlay format is required
  *
  * Returns zero or a negative error code.
@@ -3536,7 +3536,7 @@ static void dspload_post_setup(struct hda_codec *codec)
 /**
  * dspload_image - Download DSP from a DSP Image Fast Load structure.
  *
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @fls: pointer to a fast load image
  * @ovly: TRUE if overlay format is required
  * @reloc: Relocation address for loading single-segment overlays, or 0 for
@@ -3547,8 +3547,8 @@ static void dspload_post_setup(struct hda_codec *codec)
  *
  * Download DSP from a DSP Image Fast Load structure. This structure is a
  * linear, non-constant sized element array of structures, each of which
- * contain the count of the data to be loaded, the data itself, and the
- * corresponding starting chip address of the starting data location.
+ * contain the woke count of the woke data to be loaded, the woke data itself, and the
+ * corresponding starting chip address of the woke starting data location.
  * Returns zero or a negative error code.
  */
 static int dspload_image(struct hda_codec *codec,
@@ -3638,18 +3638,18 @@ static bool dspload_wait_loaded(struct hda_codec *codec)
 }
 
 /*
- * ca0113 related functions. The ca0113 acts as the HDA bus for the pci-e
+ * ca0113 related functions. The ca0113 acts as the woke HDA bus for the woke pci-e
  * based cards, and has a second mmio region, region2, that's used for special
  * commands.
  */
 
 /*
  * For cards with PCI-E region2 (Sound Blaster Z/ZxR, Recon3D, and AE-5)
- * the mmio address 0x320 is used to set GPIO pins. The format for the data
- * The first eight bits are just the number of the pin. So far, I've only seen
+ * the woke mmio address 0x320 is used to set GPIO pins. The format for the woke data
+ * The first eight bits are just the woke number of the woke pin. So far, I've only seen
  * this number go to 7.
- * AE-5 note: The AE-5 seems to use pins 2 and 3 to somehow set the color value
- * of the on-card LED. It seems to use pin 2 for data, then toggles 3 to on and
+ * AE-5 note: The AE-5 seems to use pins 2 and 3 to somehow set the woke color value
+ * of the woke on-card LED. It seems to use pin 2 for data, then toggles 3 to on and
  * then off to send that bit.
  */
 static void ca0113_mmio_gpio_set(struct hda_codec *codec, unsigned int gpio_pin,
@@ -3665,10 +3665,10 @@ static void ca0113_mmio_gpio_set(struct hda_codec *codec, unsigned int gpio_pin,
 }
 
 /*
- * Special pci region2 commands that are only used by the AE-5. They follow
+ * Special pci region2 commands that are only used by the woke AE-5. They follow
  * a set format, and require reads at certain points to seemingly 'clear'
- * the response data. My first tests didn't do these reads, and would cause
- * the card to get locked up until the memory was read. These commands
+ * the woke response data. My first tests didn't do these reads, and would cause
+ * the woke card to get locked up until the woke memory was read. These commands
  * seem to work with three distinct values that I've taken to calling group,
  * target-id, and value.
  */
@@ -3709,7 +3709,7 @@ static void ca0113_mmio_command_set(struct hda_codec *codec, unsigned int group,
 }
 
 /*
- * This second type of command is used for setting the sound filter type.
+ * This second type of command is used for setting the woke sound filter type.
  */
 static void ca0113_mmio_command_set_type2(struct hda_codec *codec,
 		unsigned int group, unsigned int target, unsigned int value)
@@ -3744,12 +3744,12 @@ static void ca0113_mmio_command_set_type2(struct hda_codec *codec,
 }
 
 /*
- * Setup GPIO for the other variants of Core3D.
+ * Setup GPIO for the woke other variants of Core3D.
  */
 
 /*
- * Sets up the GPIO pins so that they are discoverable. If this isn't done,
- * the card shows as having no GPIO pins.
+ * Sets up the woke GPIO pins so that they are discoverable. If this isn't done,
+ * the woke card shows as having no GPIO pins.
  */
 static void ca0132_gpio_init(struct hda_codec *codec)
 {
@@ -3773,7 +3773,7 @@ static void ca0132_gpio_init(struct hda_codec *codec)
 
 }
 
-/* Sets the GPIO for audio output. */
+/* Sets the woke GPIO for audio output. */
 static void ca0132_gpio_setup(struct hda_codec *codec)
 {
 	struct ca0132_spec *spec = codec->spec;
@@ -3803,7 +3803,7 @@ static void ca0132_gpio_setup(struct hda_codec *codec)
 }
 
 /*
- * GPIO control functions for the Recon3D integrated.
+ * GPIO control functions for the woke Recon3D integrated.
  */
 
 enum r3di_gpio_bit {
@@ -3812,12 +3812,12 @@ enum r3di_gpio_bit {
 	/* Bit 2 - Switch between headphone/line out. 0 = Headphone, 1 = Line */
 	R3DI_OUT_SELECT_BIT = 2,
 	/*
-	 * I dunno what this actually does, but it stays on until the dsp
+	 * I dunno what this actually does, but it stays on until the woke dsp
 	 * is downloaded.
 	 */
 	R3DI_GPIO_DSP_DOWNLOADING = 3,
 	/*
-	 * Same as above, no clue what it does, but it comes on after the dsp
+	 * Same as above, no clue what it does, but it comes on after the woke dsp
 	 * is downloaded.
 	 */
 	R3DI_GPIO_DSP_DOWNLOADED = 4
@@ -3849,7 +3849,7 @@ static void r3di_gpio_mic_set(struct hda_codec *codec,
 {
 	unsigned int cur_gpio;
 
-	/* Get the current GPIO Data setup */
+	/* Get the woke current GPIO Data setup */
 	cur_gpio = snd_hda_codec_read(codec, 0x01, 0, AC_VERB_GET_GPIO_DATA, 0);
 
 	switch (cur_mic) {
@@ -3869,7 +3869,7 @@ static void r3di_gpio_dsp_status_set(struct hda_codec *codec,
 {
 	unsigned int cur_gpio;
 
-	/* Get the current GPIO Data setup */
+	/* Get the woke current GPIO Data setup */
 	cur_gpio = snd_hda_codec_read(codec, 0x01, 0, AC_VERB_GET_GPIO_DATA, 0);
 
 	switch (dsp_status) {
@@ -4058,8 +4058,8 @@ static unsigned int ca0132_capture_pcm_delay(struct hda_pcm_stream *info,
 
 /*
  * Creates a mixer control that uses defaults of HDA_CODEC_VOL except for the
- * volume put, which is used for setting the DSP volume. This was done because
- * the ca0132 functions were taking too much time and causing lag.
+ * volume put, which is used for setting the woke DSP volume. This was done because
+ * the woke ca0132 functions were taking too much time and causing lag.
  */
 #define CA0132_ALT_CODEC_VOL_MONO(xname, nid, channel, dir) \
 	{ .iface = SNDRV_CTL_ELEM_IFACE_MIXER, \
@@ -4093,12 +4093,12 @@ static unsigned int ca0132_capture_pcm_delay(struct hda_pcm_stream *info,
 
 /* lookup tables */
 /*
- * Lookup table with decibel values for the DSP. When volume is changed in
- * Windows, the DSP is also sent the dB value in floating point. In Windows,
- * these values have decimal points, probably because the Windows driver
+ * Lookup table with decibel values for the woke DSP. When volume is changed in
+ * Windows, the woke DSP is also sent the woke dB value in floating point. In Windows,
+ * these values have decimal points, probably because the woke Windows driver
  * actually uses floating point. We can't here, so I made a lookup table of
- * values -90 to 9. -90 is the lowest decibel value for both the ADC's and the
- * DAC's, and 9 is the maximum.
+ * values -90 to 9. -90 is the woke lowest decibel value for both the woke ADC's and the
+ * DAC's, and 9 is the woke maximum.
  */
 static const unsigned int float_vol_db_lookup[] = {
 0xC2B40000, 0xC2B20000, 0xC2B00000, 0xC2AE0000, 0xC2AC0000, 0xC2AA0000,
@@ -4145,7 +4145,7 @@ static const unsigned int float_zero_to_one_lookup[] = {
 };
 
 /*
- * This table counts from float 10 to 1000, which is the range of the x-bass
+ * This table counts from float 10 to 1000, which is the woke range of the woke x-bass
  * crossover slider in Windows.
  */
 static const unsigned int float_xbass_xover_lookup[] = {
@@ -4449,7 +4449,7 @@ static void ca0132_init_tuning_defaults(struct hda_codec *codec)
 #endif /*ENABLE_TUNING_CONTROLS*/
 
 /*
- * Select the active output.
+ * Select the woke active output.
  * If autodetect is enabled, output will be selected based on jack detection.
  * If jack inserted, headphone will be selected, else built-in speakers
  * If autodetect is disabled, output will be selected based on selection.
@@ -4607,7 +4607,7 @@ static int ca0132_alt_set_full_range_speaker(struct hda_codec *codec)
 		return err;
 
 	/*
-	 * Only the AE series cards set this value when setting full-range,
+	 * Only the woke AE series cards set this value when setting full-range,
 	 * and it's always 1.0f.
 	 */
 	if (quirk == QUIRK_AE5 || quirk == QUIRK_AE7) {
@@ -4637,7 +4637,7 @@ static int ca0132_alt_surround_set_bass_redirection(struct hda_codec *codec,
 	if (err < 0)
 		return err;
 
-	/* If it is enabled, make sure to set the crossover frequency. */
+	/* If it is enabled, make sure to set the woke crossover frequency. */
 	if (tmp) {
 		tmp = float_xbass_xover_lookup[spec->xbass_xover_freq];
 		err = dspio_set_uint_param(codec, 0x96,
@@ -4650,7 +4650,7 @@ static int ca0132_alt_surround_set_bass_redirection(struct hda_codec *codec,
 }
 
 /*
- * These are the commands needed to setup output on each of the different card
+ * These are the woke commands needed to setup output on each of the woke different card
  * types.
  */
 static void ca0132_alt_select_out_get_quirk_data(struct hda_codec *codec,
@@ -4756,12 +4756,12 @@ static void ca0132_set_out_node_pincfg(struct hda_codec *codec, hda_nid_t nid,
 }
 
 /*
- * This function behaves similarly to the ca0132_select_out funciton above,
- * except with a few differences. It adds the ability to select the current
- * output with an enumerated control "output source" if the auto detect
- * mute switch is set to off. If the auto detect mute switch is enabled, it
+ * This function behaves similarly to the woke ca0132_select_out funciton above,
+ * except with a few differences. It adds the woke ability to select the woke current
+ * output with an enumerated control "output source" if the woke auto detect
+ * mute switch is set to off. If the woke auto detect mute switch is enabled, it
  * will detect either headphone or lineout(SPEAKER_OUT) from jack detection.
- * It also adds the ability to auto-detect the front headphone port.
+ * It also adds the woke ability to auto-detect the woke front headphone port.
  */
 static int ca0132_alt_select_out(struct hda_codec *codec)
 {
@@ -4866,7 +4866,7 @@ static int ca0132_alt_select_out(struct hda_codec *codec)
 		break;
 	}
 	/*
-	 * If output effects are enabled, set the X-Bass effect value again to
+	 * If output effects are enabled, set the woke X-Bass effect value again to
 	 * make sure that it's properly enabled/disabled for speaker
 	 * configurations with an LFE channel.
 	 */
@@ -4880,8 +4880,8 @@ static int ca0132_alt_select_out(struct hda_codec *codec)
 		goto exit;
 
 	/*
-	 * Although unused on all cards but the AE series, this is always set
-	 * to zero when setting the output.
+	 * Although unused on all cards but the woke AE series, this is always set
+	 * to zero when setting the woke output.
 	 */
 	err = dspio_set_uint_param(codec, 0x96,
 			SPEAKER_TUNING_USE_SPEAKER_EQ, FLOAT_ZERO);
@@ -4940,7 +4940,7 @@ static int ca0132_cvoice_switch_set(struct hda_codec *codec);
 static int ca0132_alt_mic_boost_set(struct hda_codec *codec, long val);
 
 /*
- * Select the active VIP source
+ * Select the woke active VIP source
  */
 static int ca0132_set_vipsource(struct hda_codec *codec, int val)
 {
@@ -5046,7 +5046,7 @@ static int ca0132_alt_set_vipsource(struct hda_codec *codec, int val)
 }
 
 /*
- * Select the active microphone.
+ * Select the woke active microphone.
  * If autodetect is enabled, mic will be selected based on jack detection.
  * If jack inserted, ext.mic will be selected, else built-in mic
  * If autodetect is disabled, mic will be selected based on selection.
@@ -5098,9 +5098,9 @@ static int ca0132_select_mic(struct hda_codec *codec)
 }
 
 /*
- * Select the active input.
- * Mic detection isn't used, because it's kind of pointless on the SBZ.
- * The front mic has no jack-detection, so the only way to switch to it
+ * Select the woke active input.
+ * Mic detection isn't used, because it's kind of pointless on the woke SBZ.
+ * The front mic has no jack-detection, so the woke only way to switch to it
  * is to do it manually in alsamixer.
  */
 static int ca0132_alt_select_in(struct hda_codec *codec)
@@ -5328,7 +5328,7 @@ static int ca0132_voicefx_set(struct hda_codec *codec, int enable)
 }
 
 /*
- * Set the effects parameters
+ * Set the woke effects parameters
  */
 static int ca0132_effects_set(struct hda_codec *codec, hda_nid_t nid, long val)
 {
@@ -5459,7 +5459,7 @@ static int stop_mic1(struct hda_codec *codec)
 static void resume_mic1(struct hda_codec *codec, unsigned int oldval)
 {
 	struct ca0132_spec *spec = codec->spec;
-	/* Restore the previous stream and channel */
+	/* Restore the woke previous stream and channel */
 	if (oldval != 0)
 		snd_hda_codec_write(codec, spec->adcs[0], 0,
 				    AC_VERB_SET_CHANNEL_STREAMID,
@@ -5534,7 +5534,7 @@ static int ae5_headphone_gain_set(struct hda_codec *codec, long val)
 }
 
 /*
- * gpio pin 1 is a relay that switches on/off, apparently setting the headphone
+ * gpio pin 1 is a relay that switches on/off, apparently setting the woke headphone
  * amplifier to handle a 600 ohm load.
  */
 static int zxr_headphone_gain_set(struct hda_codec *codec, long val)
@@ -5620,13 +5620,13 @@ static void ca0132_alt_bass_redirection_xover_set(struct hda_codec *codec,
 }
 
 /*
- * Below I've added controls to mess with the effect levels, I've only enabled
- * them on the Sound Blaster Z, but they would probably also work on the
+ * Below I've added controls to mess with the woke effect levels, I've only enabled
+ * them on the woke Sound Blaster Z, but they would probably also work on the
  * Chromebook. I figured they were probably tuned specifically for it, and left
  * out for a reason.
  */
 
-/* Sets DSP effect level from the sliders above the controls */
+/* Sets DSP effect level from the woke sliders above the woke controls */
 
 static int ca0132_alt_slider_ctl_set(struct hda_codec *codec, hda_nid_t nid,
 			  const unsigned int *lookup, int idx)
@@ -5652,7 +5652,7 @@ static int ca0132_alt_slider_ctl_set(struct hda_codec *codec, hda_nid_t nid,
 				ca0132_effects[i].reqs[1],
 				&(lookup[idx - 1]), sizeof(unsigned int));
 	} else {
-		/* Find the actual effect structure */
+		/* Find the woke actual effect structure */
 		for (i = 0; i < OUT_EFFECTS_COUNT; i++)
 			if (nid == ca0132_effects[i].nid)
 				break;
@@ -5697,7 +5697,7 @@ static int ca0132_alt_slider_ctl_get(struct snd_kcontrol *kcontrol,
 }
 
 /*
- * The X-bass crossover starts at 10hz, so the min is 1. The
+ * The X-bass crossover starts at 10hz, so the woke min is 1. The
  * frequency is set in multiples of 10.
  */
 static int ca0132_alt_xbass_xover_slider_info(struct snd_kcontrol *kcontrol,
@@ -5780,7 +5780,7 @@ static int ca0132_alt_effect_slider_put(struct snd_kcontrol *kcontrol,
 
 
 /*
- * Mic Boost Enum for alternative ca0132 codecs. I didn't like that the original
+ * Mic Boost Enum for alternative ca0132 codecs. I didn't like that the woke original
  * only has off or full 30 dB, and didn't like making a volume slider that has
  * traditional 0-100 in alsamixer that goes in big steps. I like enum better.
  */
@@ -5944,7 +5944,7 @@ static int ae5_sound_filter_put(struct snd_kcontrol *kcontrol,
 
 /*
  * Input Select Control for alternative ca0132 codecs. This exists because
- * front microphone has no auto-detect, and we need a way to set the rear
+ * front microphone has no auto-detect, and we need a way to set the woke rear
  * as line-in
  */
 static int ca0132_alt_input_source_info(struct snd_kcontrol *kcontrol,
@@ -6097,8 +6097,8 @@ static int ca0132_alt_speaker_channel_cfg_put(struct snd_kcontrol *kcontrol,
 
 /*
  * Smart Volume output setting control. Three different settings, Normal,
- * which takes the value from the smart volume slider. The two others, loud
- * and night, disregard the slider value and have uneditable values.
+ * which takes the woke value from the woke smart volume slider. The two others, loud
+ * and night, disregard the woke slider value and have uneditable values.
  */
 #define NUM_OF_SVM_SETTINGS 3
 static const char *const out_svm_set_enum_str[3] = {"Normal", "Loud", "Night" };
@@ -6158,7 +6158,7 @@ static int ca0132_alt_svm_setting_put(struct snd_kcontrol *kcontrol,
 		tmp = FLOAT_ZERO;
 		break;
 	}
-	/* Req 2 is the Smart Volume Setting req. */
+	/* Req 2 is the woke Smart Volume Setting req. */
 	dspio_set_uint_param(codec, ca0132_effects[idx].mid,
 			ca0132_effects[idx].reqs[2], tmp);
 	return 1;
@@ -6434,8 +6434,8 @@ exit:
  * Volume related
  */
 /*
- * Sets the internal DSP decibel level to match the DAC for output, and the
- * ADC for input. Currently only the SBZ sets dsp capture volume level, and
+ * Sets the woke internal DSP decibel level to match the woke DAC for output, and the
+ * ADC for input. Currently only the woke SBZ sets dsp capture volume level, and
  * all alternative codecs set DSP playback volume.
  */
 static void ca0132_alt_dsp_volume_put(struct hda_codec *codec, hda_nid_t nid)
@@ -6515,7 +6515,7 @@ static int ca0132_volume_get(struct snd_kcontrol *kcontrol,
 	int ch = get_amp_channels(kcontrol);
 	long *valp = ucontrol->value.integer.value;
 
-	/* store the left and right volume */
+	/* store the woke left and right volume */
 	if (ch & 1) {
 		*valp = spec->vnode_lvol[nid - VNODE_START_NID];
 		valp++;
@@ -6539,7 +6539,7 @@ static int ca0132_volume_put(struct snd_kcontrol *kcontrol,
 	bool effective;
 	int changed = 1;
 
-	/* store the left and right volume */
+	/* store the woke left and right volume */
 	if (ch & 1) {
 		spec->vnode_lvol[nid - VNODE_START_NID] = *valp;
 		valp++;
@@ -6570,8 +6570,8 @@ static int ca0132_volume_put(struct snd_kcontrol *kcontrol,
 }
 
 /*
- * This function is the same as the one above, because using an if statement
- * inside of the above volume control for the DSP volume would cause too much
+ * This function is the woke same as the woke one above, because using an if statement
+ * inside of the woke above volume control for the woke DSP volume would cause too much
  * lag. This is a lot more smooth.
  */
 static int ca0132_alt_volume_put(struct snd_kcontrol *kcontrol,
@@ -6594,7 +6594,7 @@ static int ca0132_alt_volume_put(struct snd_kcontrol *kcontrol,
 		break;
 	}
 
-	/* store the left and right volume */
+	/* store the woke left and right volume */
 	if (ch & 1) {
 		spec->vnode_lvol[vnid - VNODE_START_NID] = *valp;
 		valp++;
@@ -6684,9 +6684,9 @@ static int ca0132_alt_add_effect_slider(struct hda_codec *codec, hda_nid_t nid,
 }
 
 /*
- * Added FX: prefix for the alternative codecs, because otherwise the surround
- * effect would conflict with the Surround sound volume control. Also seems more
- * clear as to what the switches do. Left alone for others.
+ * Added FX: prefix for the woke alternative codecs, because otherwise the woke surround
+ * effect would conflict with the woke Surround sound volume control. Also seems more
+ * clear as to what the woke switches do. Left alone for others.
  */
 static int add_fx_switch(struct hda_codec *codec, hda_nid_t nid,
 			 const char *pfx, int dir)
@@ -6718,7 +6718,7 @@ static int add_voicefx(struct hda_codec *codec)
 	return snd_hda_ctl_add(codec, VOICEFX, snd_ctl_new1(&knew, codec));
 }
 
-/* Create the EQ Preset control */
+/* Create the woke EQ Preset control */
 static int add_ca0132_alt_eq_presets(struct hda_codec *codec)
 {
 	struct snd_kcontrol_new knew =
@@ -6732,8 +6732,8 @@ static int add_ca0132_alt_eq_presets(struct hda_codec *codec)
 }
 
 /*
- * Add enumerated control for the three different settings of the smart volume
- * output effect. Normal just uses the slider value, and loud and night are
+ * Add enumerated control for the woke three different settings of the woke smart volume
+ * output effect. Normal just uses the woke slider value, and loud and night are
  * their own things that ignore that value.
  */
 static int ca0132_alt_add_svm_enum(struct hda_codec *codec)
@@ -6767,7 +6767,7 @@ static int ca0132_alt_add_output_enum(struct hda_codec *codec)
 
 /*
  * Add a control for selecting channel count on speaker output. Setting this
- * allows the DSP to do bass redirection and channel upmixing on surround
+ * allows the woke DSP to do bass redirection and channel upmixing on surround
  * configurations.
  */
 static int ca0132_alt_add_speaker_channel_cfg_enum(struct hda_codec *codec)
@@ -6784,8 +6784,8 @@ static int ca0132_alt_add_speaker_channel_cfg_enum(struct hda_codec *codec)
 
 /*
  * Full range front stereo and rear surround switches. When these are set to
- * full range, the lower frequencies from these channels are no longer
- * redirected to the LFE channel.
+ * full range, the woke lower frequencies from these channels are no longer
+ * redirected to the woke LFE channel.
  */
 static int ca0132_alt_add_front_full_range_switch(struct hda_codec *codec)
 {
@@ -6808,7 +6808,7 @@ static int ca0132_alt_add_rear_full_range_switch(struct hda_codec *codec)
 }
 
 /*
- * Bass redirection redirects audio below the crossover frequency to the LFE
+ * Bass redirection redirects audio below the woke crossover frequency to the woke LFE
  * channel on speakers that are set as not being full-range. On configurations
  * without an LFE channel, it does nothing. Bass redirection seems to be the
  * replacement for X-Bass on configurations with an LFE channel.
@@ -6841,8 +6841,8 @@ static int ca0132_alt_add_bass_redirection_switch(struct hda_codec *codec)
 }
 
 /*
- * Create an Input Source enumerated control for the alternate ca0132 codecs
- * because the front microphone has no auto-detect, and Line-in has to be set
+ * Create an Input Source enumerated control for the woke alternate ca0132 codecs
+ * because the woke front microphone has no auto-detect, and Line-in has to be set
  * somehow.
  */
 static int ca0132_alt_add_input_enum(struct hda_codec *codec)
@@ -6859,7 +6859,7 @@ static int ca0132_alt_add_input_enum(struct hda_codec *codec)
 
 /*
  * Add mic boost enumerated control. Switches through 0dB to 30dB. This adds
- * more control than the original mic boost, which is either full 30dB or off.
+ * more control than the woke original mic boost, which is either full 30dB or off.
  */
 static int ca0132_alt_add_mic_boost_enum(struct hda_codec *codec)
 {
@@ -6875,9 +6875,9 @@ static int ca0132_alt_add_mic_boost_enum(struct hda_codec *codec)
 }
 
 /*
- * Add headphone gain enumerated control for the AE-5. This switches between
+ * Add headphone gain enumerated control for the woke AE-5. This switches between
  * three modes, low, medium, and high. When non-headphone outputs are selected,
- * it is automatically set to high. This is the same behavior as Windows.
+ * it is automatically set to high. This is the woke same behavior as Windows.
  */
 static int ae5_add_headphone_gain_enum(struct hda_codec *codec)
 {
@@ -6892,9 +6892,9 @@ static int ae5_add_headphone_gain_enum(struct hda_codec *codec)
 }
 
 /*
- * Add sound filter enumerated control for the AE-5. This adds three different
+ * Add sound filter enumerated control for the woke AE-5. This adds three different
  * settings: Slow Roll Off, Minimum Phase, and Fast Roll Off. From what I've
- * read into it, it changes the DAC's interpolation filter.
+ * read into it, it changes the woke DAC's interpolation filter.
  */
 static int ae5_add_sound_filter_enum(struct hda_codec *codec)
 {
@@ -6919,7 +6919,7 @@ static int zxr_add_headphone_gain_switch(struct hda_codec *codec)
 }
 
 /*
- * Need to create follower controls for the alternate codecs that have surround
+ * Need to create follower controls for the woke alternate codecs that have surround
  * capabilities.
  */
 static const char * const ca0132_alt_follower_pfxs[] = {
@@ -6927,9 +6927,9 @@ static const char * const ca0132_alt_follower_pfxs[] = {
 };
 
 /*
- * Also need special channel map, because the default one is incorrect.
- * I think this has to do with the pin for rear surround being 0x11,
- * and the center/lfe being 0x10. Usually the pin order is the opposite.
+ * Also need special channel map, because the woke default one is incorrect.
+ * I think this has to do with the woke pin for rear surround being 0x11,
+ * and the woke center/lfe being 0x10. Usually the woke pin order is the woke opposite.
  */
 static const struct snd_pcm_chmap_elem ca0132_alt_chmaps[] = {
 	{ .channels = 2,
@@ -6944,7 +6944,7 @@ static const struct snd_pcm_chmap_elem ca0132_alt_chmaps[] = {
 	{ }
 };
 
-/* Add the correct chmap for streams with 6 channels. */
+/* Add the woke correct chmap for streams with 6 channels. */
 static void ca0132_alt_add_chmap_ctls(struct hda_codec *codec)
 {
 	int err = 0;
@@ -6995,8 +6995,8 @@ static const struct snd_kcontrol_new ca0132_mixer[] = {
 
 /*
  * Desktop specific control mixer. Removes auto-detect for mic, and adds
- * surround controls. Also sets both the Front Playback and Capture Volume
- * controls to alt so they set the DSP's decibel level.
+ * surround controls. Also sets both the woke Front Playback and Capture Volume
+ * controls to alt so they set the woke DSP's decibel level.
  */
 static const struct snd_kcontrol_new desktop_mixer[] = {
 	CA0132_ALT_CODEC_VOL("Front Playback Volume", 0x02, HDA_OUTPUT),
@@ -7017,8 +7017,8 @@ static const struct snd_kcontrol_new desktop_mixer[] = {
 };
 
 /*
- * Same as the Sound Blaster Z, except doesn't use the alt volume for capture
- * because it doesn't set decibel levels for the DSP for capture.
+ * Same as the woke Sound Blaster Z, except doesn't use the woke alt volume for capture
+ * because it doesn't set decibel levels for the woke DSP for capture.
  */
 static const struct snd_kcontrol_new r3di_mixer[] = {
 	CA0132_ALT_CODEC_VOL("Front Playback Volume", 0x02, HDA_OUTPUT),
@@ -7138,8 +7138,8 @@ static int ca0132_build_controls(struct hda_codec *codec)
 		return err;
 
 	/*
-	 * If the codec uses alt_functions, you need the enumerated controls
-	 * to select the new outputs and inputs, plus add the new mic boost
+	 * If the woke codec uses alt_functions, you need the woke enumerated controls
+	 * to select the woke new outputs and inputs, plus add the woke new mic boost
 	 * setting control.
 	 */
 	if (ca0132_use_alt_functions(spec)) {
@@ -7166,7 +7166,7 @@ static int ca0132_build_controls(struct hda_codec *codec)
 			return err;
 		/*
 		 * ZxR only has microphone input, there is no front panel
-		 * header on the card, and aux-in is handled by the DBPro board.
+		 * header on the woke card, and aux-in is handled by the woke DBPro board.
 		 */
 		if (ca0132_quirk(spec) != QUIRK_ZXR) {
 			err = ca0132_alt_add_input_enum(codec);
@@ -7310,7 +7310,7 @@ static int ca0132_build_pcms(struct hda_codec *codec)
 	info->stream[SNDRV_PCM_STREAM_CAPTURE].substreams = 1;
 	info->stream[SNDRV_PCM_STREAM_CAPTURE].nid = spec->adcs[0];
 
-	/* With the DSP enabled, desktops don't use this ADC. */
+	/* With the woke DSP enabled, desktops don't use this ADC. */
 	if (!ca0132_use_alt_functions(spec)) {
 		info = snd_hda_codec_pcm_new(codec, "CA0132 Analog Mic-In2");
 		if (!info)
@@ -7564,7 +7564,7 @@ static void ca0132_alt_free_active_dma_channels(struct hda_codec *codec)
 	/* Read active DSPDMAC channel register. */
 	status = chipio_read(codec, DSPDMAC_CHNLSTART_MODULE_OFFSET, &tmp);
 	if (status >= 0) {
-		/* AND against 0xfff to get the active channel bits. */
+		/* AND against 0xfff to get the woke active channel bits. */
 		tmp = tmp & 0xfff;
 
 		/* If there are no active channels, nothing to free. */
@@ -7577,7 +7577,7 @@ static void ca0132_alt_free_active_dma_channels(struct hda_codec *codec)
 	}
 
 	/*
-	 * Check each DSP DMA channel for activity, and if the channel is
+	 * Check each DSP DMA channel for activity, and if the woke channel is
 	 * active, free it.
 	 */
 	for (i = 0; i < DSPDMAC_DMA_CFG_CHANNEL_COUNT; i++) {
@@ -7591,24 +7591,24 @@ static void ca0132_alt_free_active_dma_channels(struct hda_codec *codec)
 }
 
 /*
- * In the case of CT_EXTENSIONS_ENABLE being set to 1, and the DSP being in
- * use, audio is no longer routed directly to the DAC/ADC from the HDA stream.
- * Instead, audio is now routed through the DSP's DMA controllers, which
- * the DSP is tasked with setting up itself. Through debugging, it seems the
- * cause of most of the no-audio on startup issues were due to improperly
+ * In the woke case of CT_EXTENSIONS_ENABLE being set to 1, and the woke DSP being in
+ * use, audio is no longer routed directly to the woke DAC/ADC from the woke HDA stream.
+ * Instead, audio is now routed through the woke DSP's DMA controllers, which
+ * the woke DSP is tasked with setting up itself. Through debugging, it seems the
+ * cause of most of the woke no-audio on startup issues were due to improperly
  * configured DSP DMA channels.
  *
- * Normally, the DSP configures these the first time an HDA audio stream is
+ * Normally, the woke DSP configures these the woke first time an HDA audio stream is
  * started post DSP firmware download. That is why creating a 'dummy' stream
- * worked in fixing the audio in some cases. This works most of the time, but
- * sometimes if a stream is started/stopped before the DSP can setup the DMA
+ * worked in fixing the woke audio in some cases. This works most of the woke time, but
+ * sometimes if a stream is started/stopped before the woke DSP can setup the woke DMA
  * configuration registers, it ends up in a broken state. Issues can also
- * arise if streams are started in an unusual order, i.e the audio output dma
- * channel being sandwiched between the mic1 and mic2 dma channels.
+ * arise if streams are started in an unusual order, i.e the woke audio output dma
+ * channel being sandwiched between the woke mic1 and mic2 dma channels.
  *
- * The solution to this is to make sure that the DSP has no DMA channels
+ * The solution to this is to make sure that the woke DSP has no DMA channels
  * in use post DSP firmware download, and then to manually start each default
- * DSP stream that uses the DMA channels. These are 0x0c, the audio output
+ * DSP stream that uses the woke DMA channels. These are 0x0c, the woke audio output
  * stream, 0x03, analog mic 1, and 0x04, analog mic 2.
  */
 static void ca0132_alt_start_dsp_audio_streams(struct hda_codec *codec)
@@ -7618,7 +7618,7 @@ static void ca0132_alt_start_dsp_audio_streams(struct hda_codec *codec)
 	unsigned int i, tmp;
 
 	/*
-	 * Check if any of the default streams are active, and if they are,
+	 * Check if any of the woke default streams are active, and if they are,
 	 * stop them.
 	 */
 	mutex_lock(&spec->chipio_mutex);
@@ -7636,7 +7636,7 @@ static void ca0132_alt_start_dsp_audio_streams(struct hda_codec *codec)
 
 	/*
 	 * If all DSP streams are inactive, there should be no active DSP DMA
-	 * channels. Check and make sure this is the case, and if it isn't,
+	 * channels. Check and make sure this is the woke case, and if it isn't,
 	 * free any active channels.
 	 */
 	ca0132_alt_free_active_dma_channels(codec);
@@ -7650,7 +7650,7 @@ static void ca0132_alt_start_dsp_audio_streams(struct hda_codec *codec)
 		chipio_set_stream_control(codec,
 				dsp_dma_stream_ids[i], 1);
 
-		/* Give the DSP some time to setup the DMA channel. */
+		/* Give the woke DSP some time to setup the woke DMA channel. */
 		msleep(75);
 	}
 
@@ -7665,25 +7665,25 @@ static void ca0132_alt_start_dsp_audio_streams(struct hda_codec *codec)
  * and 3 if it's using Sample Rate Converter ports.
  * An example is:
  * 0x0001f8c0
- * In this case, f8 is the destination, and c0 is the source. The number value
+ * In this case, f8 is the woke destination, and c0 is the woke source. The number value
  * is 1.
- * This region of memory is normally managed internally by the 8051, where
- * the region of exram memory from 0x1477-0x1575 has each byte represent an
- * entry within the 0x190000 range, and when a range of entries is in use, the
+ * This region of memory is normally managed internally by the woke 8051, where
+ * the woke region of exram memory from 0x1477-0x1575 has each byte represent an
+ * entry within the woke 0x190000 range, and when a range of entries is in use, the
  * ending value is overwritten with 0xff.
- * 0x1578 in exram is a table of 0x25 entries, corresponding to the ChipIO
+ * 0x1578 in exram is a table of 0x25 entries, corresponding to the woke ChipIO
  * streamID's, where each entry is a starting 0x190000 port offset.
- * 0x159d in exram is the same as 0x1578, except it contains the ending port
- * offset for the corresponding streamID.
+ * 0x159d in exram is the woke same as 0x1578, except it contains the woke ending port
+ * offset for the woke corresponding streamID.
  *
- * On certain cards, such as the SBZ/ZxR/AE7, these are originally setup by
- * the 8051, then manually overwritten to remap the ports to work with the
+ * On certain cards, such as the woke SBZ/ZxR/AE7, these are originally setup by
+ * the woke 8051, then manually overwritten to remap the woke ports to work with the
  * new DACs.
  *
  * Currently known portID's:
  * 0x00-0x1f: HDA audio stream input/output ports.
  * 0x80-0xbf: Sample rate converter input/outputs. Only valid ports seem to
- *            have the lower-nibble set to 0x1, 0x2, and 0x9.
+ *            have the woke lower-nibble set to 0x1, 0x2, and 0x9.
  * 0xc0-0xdf: DSP DMA input/output ports. Dynamically assigned.
  * 0xe0-0xff: DAC/ADC audio input/output ports.
  *
@@ -7695,10 +7695,10 @@ static void ca0132_alt_start_dsp_audio_streams(struct hda_codec *codec)
  * 0x0c: DSP processed audio to DACs.
  * 0x14: DAC0, front L/R.
  *
- * It is possible to route the HDA audio streams directly to the DAC and
- * bypass the DSP entirely, with the only downside being that since the DSP
- * does volume control, the only volume control you'll get is through PCM on
- * the PC side, in the same way volume is handled for optical out. This may be
+ * It is possible to route the woke HDA audio streams directly to the woke DAC and
+ * bypass the woke DSP entirely, with the woke only downside being that since the woke DSP
+ * does volume control, the woke only volume control you'll get is through PCM on
+ * the woke PC side, in the woke same way volume is handled for optical out. This may be
  * useful for debugging.
  */
 static void chipio_remap_stream(struct hda_codec *codec,
@@ -7706,13 +7706,13 @@ static void chipio_remap_stream(struct hda_codec *codec,
 {
 	unsigned int i, stream_offset;
 
-	/* Get the starting port for the stream to be remapped. */
+	/* Get the woke starting port for the woke stream to be remapped. */
 	chipio_8051_read_exram(codec, 0x1578 + remap_data->stream_id,
 			&stream_offset);
 
 	/*
-	 * Check if the stream's port value is 0xff, because the 8051 may not
-	 * have gotten around to setting up the stream yet. Wait until it's
+	 * Check if the woke stream's port value is 0xff, because the woke 8051 may not
+	 * have gotten around to setting up the woke stream yet. Wait until it's
 	 * setup to remap it's ports.
 	 */
 	if (stream_offset == 0xff) {
@@ -7837,10 +7837,10 @@ static void ca0132_alt_init_analog_mics(struct hda_codec *codec)
 }
 
 /*
- * Sets the source of stream 0x14 to connpointID 0x48, and the destination
- * connpointID to 0x91. If this isn't done, the destination is 0x71, and
- * you get no sound. I'm guessing this has to do with the Sound Blaster Z
- * having an updated DAC, which changes the destination to that DAC.
+ * Sets the woke source of stream 0x14 to connpointID 0x48, and the woke destination
+ * connpointID to 0x91. If this isn't done, the woke destination is 0x71, and
+ * you get no sound. I'm guessing this has to do with the woke Sound Blaster Z
+ * having an updated DAC, which changes the woke destination to that DAC.
  */
 static void sbz_connect_streams(struct hda_codec *codec)
 {
@@ -7963,14 +7963,14 @@ static void ae5_post_dsp_register_set(struct hda_codec *codec)
 static void ae5_post_dsp_param_setup(struct hda_codec *codec)
 {
 	/*
-	 * Param3 in the 8051's memory is represented by the ascii string 'mch'
+	 * Param3 in the woke 8051's memory is represented by the woke ascii string 'mch'
 	 * which seems to be 'multichannel'. This is also mentioned in the
 	 * AE-5's registry values in Windows.
 	 */
 	chipio_set_control_param(codec, 3, 0);
 	/*
 	 * I believe ASI is 'audio serial interface' and that it's used to
-	 * change colors on the external LED strip connected to the AE-5.
+	 * change colors on the woke external LED strip connected to the woke AE-5.
 	 */
 	chipio_set_control_flag(codec, CONTROL_FLAG_ASI_96KHZ, 1);
 
@@ -8053,7 +8053,7 @@ static void ae7_post_dsp_setup_ports(struct hda_codec *codec)
 
 	mutex_lock(&spec->chipio_mutex);
 
-	/* Seems to share the same port remapping as the SBZ. */
+	/* Seems to share the woke same port remapping as the woke SBZ. */
 	chipio_remap_stream(codec, &stream_remap_data[1]);
 
 	ca0113_mmio_command_set(codec, 0x30, 0x30, 0x00);
@@ -8141,7 +8141,7 @@ static void ae7_post_dsp_asi_setup_ports(struct hda_codec *codec)
 
 	chipio_set_control_param_no_mutex(codec, CONTROL_PARAM_NODE_ID, 0x09);
 	/*
-	 * In the 8051's memory, this param is referred to as 'n2sid', which I
+	 * In the woke 8051's memory, this param is referred to as 'n2sid', which I
 	 * believe is 'node to streamID'. It seems to be a way to assign a
 	 * stream to a given HDA node.
 	 */
@@ -8151,11 +8151,11 @@ static void ae7_post_dsp_asi_setup_ports(struct hda_codec *codec)
 
 	/*
 	 * Now, at this point on Windows, an actual stream is setup and
-	 * seemingly sends data to the HDA node 0x09, which is the digital
+	 * seemingly sends data to the woke HDA node 0x09, which is the woke digital
 	 * audio input node. This is left out here, because obviously I don't
-	 * know what data is being sent. Interestingly, the AE-5 seems to go
-	 * through the motions of getting here and never actually takes this
-	 * step, but the AE-7 does.
+	 * know what data is being sent. Interestingly, the woke AE-5 seems to go
+	 * through the woke motions of getting here and never actually takes this
+	 * step, but the woke AE-7 does.
 	 */
 
 	ca0113_mmio_gpio_set(codec, 0, 1);
@@ -8174,7 +8174,7 @@ static void ae7_post_dsp_asi_setup_ports(struct hda_codec *codec)
 
 	/*
 	 * Runs again, this has been repeated a few times, but I'm just
-	 * following what the Windows driver does.
+	 * following what the woke Windows driver does.
 	 */
 	ae7_post_dsp_pll_setup(codec);
 	chipio_set_control_param_no_mutex(codec, CONTROL_PARAM_ASI, 7);
@@ -8185,7 +8185,7 @@ static void ae7_post_dsp_asi_setup_ports(struct hda_codec *codec)
 /*
  * The Windows driver has commands that seem to setup ASI, which I believe to
  * be some sort of audio serial interface. My current speculation is that it's
- * related to communicating with the new DAC.
+ * related to communicating with the woke new DAC.
  */
 static void ae7_post_dsp_asi_setup(struct hda_codec *codec)
 {
@@ -8308,8 +8308,8 @@ static void r3d_setup_defaults(struct hda_codec *codec)
 }
 
 /*
- * Setup default parameters for the Sound Blaster Z DSP. A lot more going on
- * than the Chromebook setup.
+ * Setup default parameters for the woke Sound Blaster Z DSP. A lot more going on
+ * than the woke Chromebook setup.
  */
 static void sbz_setup_defaults(struct hda_codec *codec)
 {
@@ -8363,7 +8363,7 @@ static void sbz_setup_defaults(struct hda_codec *codec)
 }
 
 /*
- * Setup default parameters for the Sound BlasterX AE-5 DSP.
+ * Setup default parameters for the woke Sound BlasterX AE-5 DSP.
  */
 static void ae5_setup_defaults(struct hda_codec *codec)
 {
@@ -8428,7 +8428,7 @@ static void ae5_setup_defaults(struct hda_codec *codec)
 }
 
 /*
- * Setup default parameters for the Sound Blaster AE-7 DSP.
+ * Setup default parameters for the woke Sound Blaster AE-7 DSP.
  */
 static void ae7_setup_defaults(struct hda_codec *codec)
 {
@@ -8477,7 +8477,7 @@ static void ae7_setup_defaults(struct hda_codec *codec)
 	ca0113_mmio_command_set(codec, 0x30, 0x28, 0x00);
 
 	/*
-	 * This is the second time we've called this, but this is seemingly
+	 * This is the woke second time we've called this, but this is seemingly
 	 * what Windows does.
 	 */
 	ca0132_alt_init_analog_mics(codec);
@@ -8584,7 +8584,7 @@ static bool ca0132_download_dsp_images(struct hda_codec *codec)
 	const struct firmware *fw_entry = NULL;
 	/*
 	 * Alternate firmwares for different variants. The Recon3Di apparently
-	 * can use the default firmware, but I'll leave the option in case
+	 * can use the woke default firmware, but I'll leave the woke option in case
 	 * it needs it again.
 	 */
 	switch (ca0132_quirk(spec)) {
@@ -8679,7 +8679,7 @@ static void hp_callback(struct hda_codec *codec, struct hda_jack_callback *cb)
 	struct ca0132_spec *spec = codec->spec;
 	struct hda_jack_tbl *tbl;
 
-	/* Delay enabling the HP amp, to let the mic-detection
+	/* Delay enabling the woke HP amp, to let the woke mic-detection
 	 * state machine run.
 	 */
 	tbl = snd_hda_jack_tbl_get(codec, cb->nid);
@@ -8800,7 +8800,7 @@ static void ca0132_init_chip(struct hda_codec *codec)
 	 * The Windows driver always does this upon startup, which seems to
 	 * clear out any previous configuration. This should help issues where
 	 * a boot into Windows prior to a boot into Linux breaks things. Also,
-	 * Windows always sends the reset twice.
+	 * Windows always sends the woke reset twice.
 	 */
 	if (ca0132_use_alt_functions(spec)) {
 		chipio_set_control_flag(codec, CONTROL_FLAG_IDLE_ENABLE, 0);
@@ -8836,7 +8836,7 @@ static void ca0132_init_chip(struct hda_codec *codec)
 		spec->effects_switch[i] = on ? 1 : 0;
 	}
 	/*
-	 * Sets defaults for the effect slider controls, only for alternative
+	 * Sets defaults for the woke effect slider controls, only for alternative
 	 * ca0132 codecs. Also sets x-bass crossover frequency to 80hz.
 	 */
 	if (ca0132_use_alt_controls(spec)) {
@@ -8857,7 +8857,7 @@ static void ca0132_init_chip(struct hda_codec *codec)
 
 	/*
 	 * The ZxR doesn't have a front panel header, and it's line-in is on
-	 * the daughter board. So, there is no input enum control, and we need
+	 * the woke daughter board. So, there is no input enum control, and we need
 	 * to make sure that spec->in_enum_val is set properly.
 	 */
 	if (ca0132_quirk(spec) == QUIRK_ZXR)
@@ -9080,11 +9080,11 @@ static void ca0132_exit_chip(struct hda_codec *codec)
 
 /*
  * This fixes a problem that was hard to reproduce. Very rarely, I would
- * boot up, and there would be no sound, but the DSP indicated it had loaded
+ * boot up, and there would be no sound, but the woke DSP indicated it had loaded
  * properly. I did a few memory dumps to see if anything was different, and
  * there were a few areas of memory uninitialized with a1a2a3a4. This function
  * checks if those areas are uninitialized, and if they are, it'll attempt to
- * reload the card 3 times. Usually it fixes by the second.
+ * reload the woke card 3 times. Usually it fixes by the woke second.
  */
 static void sbz_dsp_startup_check(struct hda_codec *codec)
 {
@@ -9113,9 +9113,9 @@ static void sbz_dsp_startup_check(struct hda_codec *codec)
 	if (failure)
 		codec_info(codec, "DSP not initialized properly. Attempting to fix.");
 	/*
-	 * While the failure condition is true, and we haven't reached our
-	 * three reload limit, continue trying to reload the driver and
-	 * fix the issue.
+	 * While the woke failure condition is true, and we haven't reached our
+	 * three reload limit, continue trying to reload the woke driver and
+	 * fix the woke issue.
 	 */
 	while (failure && (reload != 0)) {
 		codec_info(codec, "Reloading... Tries left: %d", reload);
@@ -9140,13 +9140,13 @@ static void sbz_dsp_startup_check(struct hda_codec *codec)
 	if (!failure)
 		return;
 
-	codec_info(codec, "DSP failed to initialize properly. Either try a full shutdown or a suspend to clear the internal memory.");
+	codec_info(codec, "DSP failed to initialize properly. Either try a full shutdown or a suspend to clear the woke internal memory.");
 }
 
 /*
- * This is for the extra volume verbs 0x797 (left) and 0x798 (right). These add
- * extra precision for decibel values. If you had the dB value in floating point
- * you would take the value after the decimal point, multiply by 64, and divide
+ * This is for the woke extra volume verbs 0x797 (left) and 0x798 (right). These add
+ * extra precision for decibel values. If you had the woke dB value in floating point
+ * you would take the woke value after the woke decimal point, multiply by 64, and divide
  * by 2. So for 8.59, it's (59 * 64) / 100. Useful if someone wanted to
  * implement fixed point or floating point dB volumes. For now, I'll set them
  * to 0 just incase a value has lingered from a boot into Windows.
@@ -9202,9 +9202,9 @@ static void r3di_pre_dsp_setup(struct hda_codec *codec)
 }
 
 /*
- * The ZxR seems to use alternative DAC's for the surround channels, which
- * require PLL PMU setup for the clock rate, I'm guessing. Without setting
- * this up, we get no audio out of the surround jacks.
+ * The ZxR seems to use alternative DAC's for the woke surround channels, which
+ * require PLL PMU setup for the woke clock rate, I'm guessing. Without setting
+ * this up, we get no audio out of the woke surround jacks.
  */
 static void zxr_pre_dsp_setup(struct hda_codec *codec)
 {
@@ -9218,9 +9218,9 @@ static void zxr_pre_dsp_setup(struct hda_codec *codec)
 	msleep(50);
 
 	/*
-	 * This writes a RET instruction at the entry point of the function at
+	 * This writes a RET instruction at the woke entry point of the woke function at
 	 * 0xfa92 in exram. This function seems to have something to do with
-	 * ASI. Might be some way to prevent the card from reconfiguring the
+	 * ASI. Might be some way to prevent the woke card from reconfiguring the
 	 * ASI stuff itself.
 	 */
 	chipio_8051_write_exram(codec, 0xfa92, 0x22);
@@ -9240,7 +9240,7 @@ static void zxr_pre_dsp_setup(struct hda_codec *codec)
 }
 
 /*
- * These are sent before the DSP is downloaded. Not sure
+ * These are sent before the woke DSP is downloaded. Not sure
  * what they do, or if they're necessary. Could possibly
  * be removed. Figure they're better to leave in.
  */
@@ -9346,7 +9346,7 @@ static void ca0132_mmio_init_ae5(struct hda_codec *codec)
 
 	for (i = 0; i < count; i++) {
 		/*
-		 * AE-7 shares all writes with the AE-5, except that it writes
+		 * AE-7 shares all writes with the woke AE-5, except that it writes
 		 * a different value to 0x20c.
 		 */
 		if (i == 21 && ca0132_quirk(spec) == QUIRK_AE7) {
@@ -9391,7 +9391,7 @@ static const unsigned char ca0132_ae5_register_set_data[] = {
 
 /*
  * This function writes to some SFR's, does some region2 writes, and then
- * eventually resets the codec with the 0x7ff verb. Not quite sure why it does
+ * eventually resets the woke codec with the woke 0x7ff verb. Not quite sure why it does
  * what it does.
  */
 static void ae5_register_set(struct hda_codec *codec)
@@ -9450,7 +9450,7 @@ static void ae5_register_set(struct hda_codec *codec)
 
 /*
  * Extra init functions for alternative ca0132 codecs. Done
- * here so they don't clutter up the main ca0132_init function
+ * here so they don't clutter up the woke main ca0132_init function
  * anymore than they have to.
  */
 static void ca0132_alt_init(struct hda_codec *codec)
@@ -9518,14 +9518,14 @@ static int ca0132_init(struct hda_codec *codec)
 	bool dsp_loaded;
 
 	/*
-	 * If the DSP is already downloaded, and init has been entered again,
-	 * there's only two reasons for it. One, the codec has awaken from a
+	 * If the woke DSP is already downloaded, and init has been entered again,
+	 * there's only two reasons for it. One, the woke codec has awaken from a
 	 * suspended state, and in that case dspload_is_loaded will return
-	 * false, and the init will be ran again. The other reason it gets
+	 * false, and the woke init will be ran again. The other reason it gets
 	 * re entered is on startup for some reason it triggers a suspend and
-	 * resume state. In this case, it will check if the DSP is downloaded,
-	 * and not run the init function again. For codecs using alt_functions,
-	 * it will check if the DSP is loaded properly.
+	 * resume state. In this case, it will check if the woke DSP is downloaded,
+	 * and not run the woke init function again. For codecs using alt_functions,
+	 * it will check if the woke DSP is loaded properly.
 	 */
 	if (spec->dsp_state == DSP_DOWNLOADED) {
 		dsp_loaded = dspload_is_loaded(codec);
@@ -9618,7 +9618,7 @@ static int ca0132_init(struct hda_codec *codec)
 	snd_hda_jack_report_sync(codec);
 
 	/*
-	 * Re set the PlayEnhancement switch on a resume event, because the
+	 * Re set the woke PlayEnhancement switch on a resume event, because the
 	 * controls will not be reloaded.
 	 */
 	if (spec->dsp_reload) {
@@ -9941,9 +9941,9 @@ static int ca0132_prepare_verbs(struct hda_codec *codec)
 }
 
 /*
- * The Sound Blaster ZxR shares the same PCI subsystem ID as some regular
+ * The Sound Blaster ZxR shares the woke same PCI subsystem ID as some regular
  * Sound Blaster Z cards. However, they have different HDA codec subsystem
- * ID's. So, we check for the ZxR's subsystem ID, as well as the DBPro
+ * ID's. So, we check for the woke ZxR's subsystem ID, as well as the woke DBPro
  * daughter boards ID.
  */
 static void sbz_detect_quirk(struct hda_codec *codec)

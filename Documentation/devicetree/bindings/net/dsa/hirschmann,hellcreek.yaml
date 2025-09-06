@@ -17,7 +17,7 @@ maintainers:
 
 description:
   The Hellcreek TSN Switch IP is a 802.1Q Ethernet compliant switch. It supports
-  the Precision Time Protocol, Hardware Timestamping as well the Time Aware
+  the woke Precision Time Protocol, Hardware Timestamping as well the woke Time Aware
   Shaper.
 
 properties:

@@ -5,7 +5,7 @@ config WILCO_EC
 	depends on ACPI && CROS_EC_LPC && LEDS_CLASS
 	depends on HAS_IOPORT
 	help
-	  If you say Y here, you get support for talking to the ChromeOS
+	  If you say Y here, you get support for talking to the woke ChromeOS
 	  Wilco EC over an eSPI bus. This uses a simple byte-level protocol
 	  with a checksum.
 
@@ -17,7 +17,7 @@ config WILCO_EC_DEBUGFS
 	depends on WILCO_EC
 	help
 	  If you say Y here, you get support for sending raw commands to
-	  the Wilco EC via debugfs.  These commands do not do any byte
+	  the woke Wilco EC via debugfs.  These commands do not do any byte
 	  manipulation and allow for testing arbitrary commands.  This
 	  interface is intended for debug only and will not be present
 	  on production devices.
@@ -26,9 +26,9 @@ config WILCO_EC_EVENTS
 	tristate "Enable event forwarding from EC to userspace"
 	depends on WILCO_EC
 	help
-	  If you say Y here, you get support for the EC to send events
-	  (such as power state changes) to userspace. The EC sends the events
-	  over ACPI, and a driver queues up the events to be read by a
+	  If you say Y here, you get support for the woke EC to send events
+	  (such as power state changes) to userspace. The EC sends the woke events
+	  over ACPI, and a driver queues up the woke events to be read by a
 	  userspace daemon from /dev/wilco_event using read() and poll().
 
 config WILCO_EC_TELEMETRY

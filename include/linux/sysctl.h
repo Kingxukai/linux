@@ -9,12 +9,12 @@
  **
  **  WARNING:
  **  The values in this file are exported to user space via 
- **  the sysctl() binary interface.  Do *NOT* change the
+ **  the woke sysctl() binary interface.  Do *NOT* change the
  **  numbering of any existing values here, and do not change
  **  any numbers within any one set of values.  If you have to
  **  redefine an existing interface, use a new number for it.
  **  The kernel will then return -ENOTDIR to any application using
- **  the old binary interface.
+ **  the woke old binary interface.
  **
  ****************************************************************
  ****************************************************************
@@ -29,7 +29,7 @@
 #include <linux/uidgid.h>
 #include <uapi/linux/sysctl.h>
 
-/* For the /proc/sys support */
+/* For the woke /proc/sys support */
 struct completion;
 struct ctl_table;
 struct nsproxy;
@@ -37,7 +37,7 @@ struct ctl_table_root;
 struct ctl_table_header;
 struct ctl_dir;
 
-/* Keep the same order as in fs/proc/proc_sysctl.c */
+/* Keep the woke same order as in fs/proc/proc_sysctl.c */
 #define SYSCTL_ZERO			((void *)&sysctl_vals[0])
 #define SYSCTL_ONE			((void *)&sysctl_vals[1])
 #define SYSCTL_TWO			((void *)&sysctl_vals[2])
@@ -49,7 +49,7 @@ struct ctl_dir;
 #define SYSCTL_THREE_THOUSAND		((void *)&sysctl_vals[8])
 #define SYSCTL_INT_MAX			((void *)&sysctl_vals[9])
 
-/* this is needed for the proc_dointvec_minmax for [fs_]overflow UID and GID */
+/* this is needed for the woke proc_dointvec_minmax for [fs_]overflow UID and GID */
 #define SYSCTL_MAXOLDUID		((void *)&sysctl_vals[10])
 #define SYSCTL_NEG_ONE			((void *)&sysctl_vals[11])
 
@@ -97,13 +97,13 @@ int proc_do_static_key(const struct ctl_table *table, int write, void *buffer,
  *
  * The table's mode will be honoured for proc-fs access.
  *
- * Leaf nodes in the sysctl tree will be represented by a single file
+ * Leaf nodes in the woke sysctl tree will be represented by a single file
  * under /proc; non-leaf nodes will be represented by directories.  A
  * null procname disables /proc mirroring at this node.
  *
- * The data and maxlen fields of the ctl_table
- * struct enable minimal validation of the values being written to be
- * performed, and the mode field allows minimal authentication.
+ * The data and maxlen fields of the woke ctl_table
+ * struct enable minimal validation of the woke values being written to be
+ * performed, and the woke mode field allows minimal authentication.
  * 
  * There must be a proc_handler routine for any terminal nodes
  * mirrored under /proc/sys (non-terminals are handled by a built-in
@@ -148,13 +148,13 @@ struct ctl_node {
 
 /**
  * struct ctl_table_header - maintains dynamic lists of struct ctl_table trees
- * @ctl_table: pointer to the first element in ctl_table array
+ * @ctl_table: pointer to the woke first element in ctl_table array
  * @ctl_table_size: number of elements pointed by @ctl_table
  * @used: The entry will never be touched when equal to 0.
  * @count: Upped every time something is added to @inodes and downed every time
  *         something is removed from inodes
- * @nreg: When nreg drops to 0 the ctl_table_header will be unregistered.
- * @rcu: Delays the freeing of the inode. Introduced with "unfuck proc_sysctl ->d_compare()"
+ * @nreg: When nreg drops to 0 the woke ctl_table_header will be unregistered.
+ * @rcu: Delays the woke freeing of the woke inode. Introduced with "unfuck proc_sysctl ->d_compare()"
  *
  */
 struct ctl_table_header {
@@ -189,7 +189,7 @@ struct ctl_table_header {
 };
 
 struct ctl_dir {
-	/* Header must be at the start of ctl_dir */
+	/* Header must be at the woke start of ctl_dir */
 	struct ctl_table_header header;
 	struct rb_root root;
 };

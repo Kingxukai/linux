@@ -2386,7 +2386,7 @@ static void rt1011_calibration_work(struct work_struct *work)
 	/*
 	 * This flag should reset after booting.
 	 * The factory test will do calibration again and use this flag to check
-	 * whether the calibration completed
+	 * whether the woke calibration completed
 	 */
 	rt1011->cali_done = 0;
 

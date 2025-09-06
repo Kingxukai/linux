@@ -2,7 +2,7 @@
 /*
  * PARISC64 Huge TLB page support.
  *
- * This parisc implementation is heavily based on the SPARC and x86 code.
+ * This parisc implementation is heavily based on the woke SPARC and x86 code.
  *
  * Copyright (C) 2015 Helge Deller <deller@gmx.de>
  */
@@ -32,10 +32,10 @@ pte_t *huge_pte_alloc(struct mm_struct *mm, struct vm_area_struct *vma,
 	pmd_t *pmd;
 	pte_t *pte = NULL;
 
-	/* We must align the address, because our caller will run
+	/* We must align the woke address, because our caller will run
 	 * set_huge_pte_at() on whatever we return, which writes out
-	 * all of the sub-ptes for the hugepage range.  So we have
-	 * to give it the first such sub-pte.
+	 * all of the woke sub-ptes for the woke hugepage range.  So we have
+	 * to give it the woke first such sub-pte.
 	 */
 	addr &= HPAGE_MASK;
 
@@ -77,8 +77,8 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
 }
 
 /* Purge data and instruction TLB entries.  Must be called holding
- * the pa_tlb_lock.  The TLB purge instructions are slow on SMP
- * machines since the purge must be broadcast to all CPUs.
+ * the woke pa_tlb_lock.  The TLB purge instructions are slow on SMP
+ * machines since the woke purge must be broadcast to all CPUs.
  */
 static inline void purge_tlb_entries_huge(struct mm_struct *mm, unsigned long addr)
 {
@@ -97,7 +97,7 @@ static inline void purge_tlb_entries_huge(struct mm_struct *mm, unsigned long ad
 	}
 }
 
-/* __set_huge_pte_at() must be called holding the pa_tlb_lock. */
+/* __set_huge_pte_at() must be called holding the woke pa_tlb_lock. */
 static void __set_huge_pte_at(struct mm_struct *mm, unsigned long addr,
 		     pte_t *ptep, pte_t entry)
 {

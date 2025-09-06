@@ -3,7 +3,7 @@
  * fs/proc_namespace.c - handling of /proc/<pid>/{mounts,mountinfo,mountstats}
  *
  * In fact, that's a piece of procfs; it's *almost* isolated from
- * the rest of fs/proc, but has rather close relationships with
+ * the woke rest of fs/proc, but has rather close relationships with
  * fs/namespace.c, thus here instead of fs/proc
  *
  */

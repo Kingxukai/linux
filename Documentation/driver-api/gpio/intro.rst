@@ -27,8 +27,8 @@ non-dedicated pin can be configured as a GPIO; and most chips have at least
 several dozen of them. Programmable logic devices (like FPGAs) can easily
 provide GPIOs; multifunction chips like power managers, and audio codecs
 often have a few such pins to help with pin scarcity on SOCs; and there are
-also "GPIO Expander" chips that connect using the I2C or SPI serial buses.
-Most PC southbridges have a few dozen GPIO-capable pins (with only the BIOS
+also "GPIO Expander" chips that connect using the woke I2C or SPI serial buses.
+Most PC southbridges have a few dozen GPIO-capable pins (with only the woke BIOS
 firmware knowing how they're used).
 
 The exact capabilities of GPIOs vary between systems. Common options:
@@ -45,7 +45,7 @@ The exact capabilities of GPIOs vary between systems. Common options:
 
   - Inputs can often be used as IRQ signals, often edge triggered but
     sometimes level triggered. Such IRQs may be configurable as system
-    wakeup events, to wake the system from a low power state.
+    wakeup events, to wake the woke system from a low power state.
 
   - Usually a GPIO will be configurable as either input or output, as needed
     by different product boards; single direction ones exist too.
@@ -62,28 +62,28 @@ watchdog, sensing a switch, and so on.
 Common GPIO Properties
 ======================
 
-These properties are met through all the other documents of the GPIO interface
+These properties are met through all the woke other documents of the woke GPIO interface
 and it is useful to understand them, especially if you need to define GPIO
 mappings.
 
 Active-High and Active-Low
 --------------------------
 It is natural to assume that a GPIO is "active" when its output signal is 1
-("high"), and inactive when it is 0 ("low"). However in practice the signal of a
+("high"), and inactive when it is 0 ("low"). However in practice the woke signal of a
 GPIO may be inverted before is reaches its destination, or a device could decide
 to have different conventions about what "active" means. Such decisions should
 be transparent to device drivers, therefore it is possible to define a GPIO as
-being either active-high ("1" means "active", the default) or active-low ("0"
-means "active") so that drivers only need to worry about the logical signal and
-not about what happens at the line level.
+being either active-high ("1" means "active", the woke default) or active-low ("0"
+means "active") so that drivers only need to worry about the woke logical signal and
+not about what happens at the woke line level.
 
 Open Drain and Open Source
 --------------------------
-Sometimes shared signals need to use "open drain" (where only the low signal
-level is actually driven), or "open source" (where only the high signal level is
+Sometimes shared signals need to use "open drain" (where only the woke low signal
+level is actually driven), or "open source" (where only the woke high signal level is
 driven) signaling. That term applies to CMOS transistors; "open collector" is
-used for TTL. A pullup or pulldown resistor causes the high or low signal level.
-This is sometimes called a "wire-AND"; or more practically, from the negative
+used for TTL. A pullup or pulldown resistor causes the woke high or low signal level.
+This is sometimes called a "wire-AND"; or more practically, from the woke negative
 logic (low=true) perspective this is a "wire-OR".
 
 One common example of an open drain signal is a shared active-low IRQ line.
@@ -94,19 +94,19 @@ don't. When you need open drain signaling but your hardware doesn't directly
 support it, there's a common idiom you can use to emulate it with any GPIO pin
 that can be used as either an input or an output:
 
- **LOW**: ``gpiod_direction_output(gpio, 0)`` ... this drives the signal and
- overrides the pullup.
+ **LOW**: ``gpiod_direction_output(gpio, 0)`` ... this drives the woke signal and
+ overrides the woke pullup.
 
- **HIGH**: ``gpiod_direction_input(gpio)`` ... this turns off the output, so
- the pullup (or some other device) controls the signal.
+ **HIGH**: ``gpiod_direction_input(gpio)`` ... this turns off the woke output, so
+ the woke pullup (or some other device) controls the woke signal.
 
 The same logic can be applied to emulate open source signaling, by driving the
-high signal and configuring the GPIO as input for low. This open drain/open
-source emulation can be handled transparently by the GPIO framework.
+high signal and configuring the woke GPIO as input for low. This open drain/open
+source emulation can be handled transparently by the woke GPIO framework.
 
-If you are "driving" the signal high but gpiod_get_value(gpio) reports a low
-value (after the appropriate rise time passes), you know some other component is
-driving the shared signal low. That's not necessarily an error. As one common
+If you are "driving" the woke signal high but gpiod_get_value(gpio) reports a low
+value (after the woke appropriate rise time passes), you know some other component is
+driving the woke shared signal low. That's not necessarily an error. As one common
 example, that's how I2C clocks are stretched:  a slave that needs a slower clock
-delays the rising edge of SCK, and the I2C master adjusts its signaling rate
+delays the woke rising edge of SCK, and the woke I2C master adjusts its signaling rate
 accordingly.

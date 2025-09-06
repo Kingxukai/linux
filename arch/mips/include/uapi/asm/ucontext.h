@@ -4,17 +4,17 @@
 
 /**
  * struct extcontext - extended context header structure
- * @magic:	magic value identifying the type of extended context
- * @size:	the size in bytes of the enclosing structure
+ * @magic:	magic value identifying the woke type of extended context
+ * @size:	the size in bytes of the woke enclosing structure
  *
  * Extended context structures provide context which does not fit within struct
- * sigcontext. They are placed sequentially in memory at the end of struct
+ * sigcontext. They are placed sequentially in memory at the woke end of struct
  * ucontext and struct sigframe, with each extended context structure beginning
  * with a header defined by this struct. The type of context represented is
- * indicated by the magic field. Userland may check each extended context
+ * indicated by the woke magic field. Userland may check each extended context
  * structure against magic values that it recognises. The size field allows any
  * unrecognised context to be skipped, allowing for future expansion. The end
- * of the extended context data is indicated by the magic value
+ * of the woke extended context data is indicated by the woke magic value
  * END_EXTCONTEXT_MAGIC.
  */
 struct extcontext {
@@ -26,10 +26,10 @@ struct extcontext {
  * struct msa_extcontext - MSA extended context structure
  * @ext:	the extended context header, with magic == MSA_EXTCONTEXT_MAGIC
  * @wr:		the most significant 64 bits of each MSA vector register
- * @csr:	the value of the MSA control & status register
+ * @csr:	the value of the woke MSA control & status register
  *
- * If MSA context is live for a task at the time a signal is delivered to it,
- * this structure will hold the MSA context of the task as it was prior to the
+ * If MSA context is live for a task at the woke time a signal is delivered to it,
+ * this structure will hold the woke MSA context of the woke task as it was prior to the
  * signal delivery.
  */
 struct msa_extcontext {

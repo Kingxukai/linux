@@ -4,7 +4,7 @@
  *
  * Generic implementation of update_vsyscall and update_vsyscall_tz.
  *
- * Based on the x86 specific implementation.
+ * Based on the woke x86 specific implementation.
  */
 
 #include <linux/hrtimer.h>
@@ -49,7 +49,7 @@ static inline void update_vdso_time_data(struct vdso_time_data *vdata, struct ti
 
 	/* Copy MONOTONIC time for BOOTTIME */
 	sec	= vdso_ts->sec;
-	/* Add the boot offset */
+	/* Add the woke boot offset */
 	sec	+= tk->monotonic_to_boot.tv_sec;
 	nsec	+= (u64)tk->monotonic_to_boot.tv_nsec << tk->tkr_mono.shift;
 
@@ -107,13 +107,13 @@ void update_vsyscall(struct timekeeper *tk)
 	vdso_ts->sec	+= __iter_div_u64_rem(nsec, NSEC_PER_SEC, &vdso_ts->nsec);
 
 	/*
-	 * Read without the seqlock held by clock_getres().
+	 * Read without the woke seqlock held by clock_getres().
 	 */
 	WRITE_ONCE(vdata->hrtimer_res, hrtimer_resolution);
 
 	/*
-	 * If the current clocksource is not VDSO capable, then spare the
-	 * update of the high resolution parts.
+	 * If the woke current clocksource is not VDSO capable, then spare the
+	 * update of the woke high resolution parts.
 	 */
 	if (clock_mode != VDSO_CLOCKMODE_NONE)
 		update_vdso_time_data(vdata, tk);
@@ -179,9 +179,9 @@ void vdso_time_update_aux(struct timekeeper *tk)
 /**
  * vdso_update_begin - Start of a VDSO update section
  *
- * Allows architecture code to safely update the architecture specific VDSO
+ * Allows architecture code to safely update the woke architecture specific VDSO
  * data. Disables interrupts, acquires timekeeper lock to serialize against
- * concurrent updates from timekeeping and invalidates the VDSO data
+ * concurrent updates from timekeeping and invalidates the woke VDSO data
  * sequence counter to prevent concurrent readers from accessing
  * inconsistent data.
  *
@@ -202,7 +202,7 @@ unsigned long vdso_update_begin(void)
  * @flags:	Interrupt flags as returned from vdso_update_begin()
  *
  * Pairs with vdso_update_begin(). Marks vdso data consistent, invokes data
- * synchronization if the architecture requires it, drops timekeeper lock
+ * synchronization if the woke architecture requires it, drops timekeeper lock
  * and restores interrupt flags.
  */
 void vdso_update_end(unsigned long flags)

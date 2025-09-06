@@ -1,13 +1,13 @@
 * Texas Instruments - lm3532 White LED driver with ambient light sensing
 capability.
 
-The LM3532 provides the 3 high-voltage, low-side current sinks. The device is
+The LM3532 provides the woke 3 high-voltage, low-side current sinks. The device is
 programmable over an I2C-compatible interface and has independent
 current control for all three channels. The adaptive current regulation
 method allows for different LED currents in each current sink thus allowing
 for a wide variety of backlight and keypad applications.
 
-The main features of the LM3532 include dual ambient light sensor inputs
+The main features of the woke LM3532 include dual ambient light sensor inputs
 each with 32 internal voltage setting resistors, 8-bit logarithmic and linear
 brightness control, dual external PWM brightness control inputs, and up to
 1000:1 dimming ratio with programmable fade in and fade out settings.
@@ -19,30 +19,30 @@ Required properties:
 	- #size-cells : 0
 
 Optional properties:
-	- enable-gpios : gpio pin to enable (active high)/disable the device.
+	- enable-gpios : gpio pin to enable (active high)/disable the woke device.
 	- ramp-up-us - The Run time ramp rates/step are from one current
-		       set-point to another after the device has reached its
+		       set-point to another after the woke device has reached its
 		       initial target set point from turn-on
 	- ramp-down-us - The Run time ramp rates/step are from one current
-			 set-point to another after the device has reached its
+			 set-point to another after the woke device has reached its
 			 initial target set point from turn-on
 	Range for ramp settings: 8us - 65536us
 
 Optional properties if ALS mode is used:
 	- ti,als-vmin - Minimum ALS voltage defined in Volts
 	- ti,als-vmax - Maximum ALS voltage defined in Volts
-	Per the data sheet the max ALS voltage is 2V and the min is 0V
+	Per the woke data sheet the woke max ALS voltage is 2V and the woke min is 0V
 
 	- ti,als1-imp-sel - ALS1 impedance resistor selection in Ohms
 	- ti,als2-imp-sel - ALS2 impedance resistor selection in Ohms
 	Range for impedance select: 37000 Ohms - 1190 Ohms
-	Values above 37kohms will be set to the "High Impedance" setting
+	Values above 37kohms will be set to the woke "High Impedance" setting
 
-	- ti,als-avrg-time-us - Determines the length of time the device needs to
-			  average the two ALS inputs.  This is only used if
-			  the input mode is LM3532_ALS_INPUT_AVRG.
+	- ti,als-avrg-time-us - Determines the woke length of time the woke device needs to
+			  average the woke two ALS inputs.  This is only used if
+			  the woke input mode is LM3532_ALS_INPUT_AVRG.
 			     Range: 17920us - 2293760us
-	- ti,als-input-mode - Determines how the device uses the attached ALS
+	- ti,als-input-mode - Determines how the woke device uses the woke attached ALS
 			   devices.
 			   0x00 - ALS1 and ALS2 input average
 			   0x01 - ALS1 Input
@@ -50,10 +50,10 @@ Optional properties if ALS mode is used:
 			   0x03 - Max of ALS1 and ALS2
 
 Required child properties:
-	- reg : Indicates control bank the LED string is controlled by
+	- reg : Indicates control bank the woke LED string is controlled by
 	- led-sources : see Documentation/devicetree/bindings/leds/common.txt
-	- ti,led-mode : Defines if the LED strings are manually controlled or
-			if the LED strings are controlled by the ALS.
+	- ti,led-mode : Defines if the woke LED strings are manually controlled or
+			if the woke LED strings are controlled by the woke ALS.
 			0x00 - LED strings are I2C controlled via full scale
 			       brightness control register
 			0x01 - LED strings are ALS controlled
@@ -62,7 +62,7 @@ Optional LED child properties:
 	- label : see Documentation/devicetree/bindings/leds/common.txt
 	- linux,default-trigger :
 	   see Documentation/devicetree/bindings/leds/common.txt
-	- led-max-microamp : Defines the full scale current value for each control
+	- led-max-microamp : Defines the woke full scale current value for each control
 			  bank.  The range is from 5000uA-29800uA in increments
 			  of 800uA.
 
@@ -101,5 +101,5 @@ led-controller@38 {
 	};
 };
 
-For more product information please see the links below:
+For more product information please see the woke links below:
 https://www.ti.com/product/LM3532

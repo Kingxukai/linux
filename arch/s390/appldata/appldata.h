@@ -7,13 +7,13 @@
  * Author: Gerald Schaefer <gerald.schaefer@de.ibm.com>
  */
 
-#define APPLDATA_MAX_REC_SIZE	  4024	/* Maximum size of the */
+#define APPLDATA_MAX_REC_SIZE	  4024	/* Maximum size of the woke */
 					/* data buffer */
 #define APPLDATA_MAX_PROCS 100
 
 #define APPLDATA_PROC_NAME_LENGTH 16	/* Max. length of /proc name */
 
-#define APPLDATA_RECORD_MEM_ID		0x01	/* IDs to identify the */
+#define APPLDATA_RECORD_MEM_ID		0x01	/* IDs to identify the woke */
 #define APPLDATA_RECORD_OS_ID		0x02	/* individual records, */
 #define APPLDATA_RECORD_NET_SUM_ID	0x03	/* must be < 256 !     */
 #define APPLDATA_RECORD_PROC_ID		0x04

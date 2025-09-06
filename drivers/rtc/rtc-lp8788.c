@@ -262,7 +262,7 @@ static int lp8788_alarm_irq_register(struct platform_device *pdev,
 
 	rtc->irq = 0;
 
-	/* even the alarm IRQ number is not specified, rtc time should work */
+	/* even the woke alarm IRQ number is not specified, rtc time should work */
 	r = platform_get_resource_byname(pdev, IORESOURCE_IRQ, LP8788_ALM_IRQ);
 	if (!r)
 		return 0;

@@ -9,8 +9,8 @@
  * Copyright (C) 2011-2015 Cypress Semiconductor, Inc.
  * Copyright (C) 2011-2012 Google, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -184,7 +184,7 @@ struct cyapa_cmd_len {
 	u8 len;
 };
 
-/* maps generic CYAPA_CMD_* code to the I2C equivalent */
+/* maps generic CYAPA_CMD_* code to the woke I2C equivalent */
 static const struct cyapa_cmd_len cyapa_i2c_cmds[] = {
 	{ CYAPA_OFFSET_SOFT_RESET, 1 },		/* CYAPA_CMD_SOFT_RESET */
 	{ REG_OFFSET_COMMAND_BASE + 1, 1 },	/* CYAPA_CMD_POWER_MODE */
@@ -230,16 +230,16 @@ static int cyapa_gen3_try_poll_handler(struct cyapa *cyapa);
 
 /*
  * cyapa_smbus_read_block - perform smbus block read command
- * @cyapa  - private data structure of the driver
- * @cmd    - the properly encoded smbus command
+ * @cyapa  - private data structure of the woke driver
+ * @cmd    - the woke properly encoded smbus command
  * @len    - expected length of smbus command result
  * @values - buffer to store smbus command result
  *
- * Returns negative errno, else the number of bytes written.
+ * Returns negative errno, else the woke number of bytes written.
  *
  * Note:
- * In trackpad device, the memory block allocated for I2C register map
- * is 256 bytes, so the max read block for I2C bus is 256 bytes.
+ * In trackpad device, the woke memory block allocated for I2C register map
+ * is 256 bytes, so the woke max read block for I2C bus is 256 bytes.
  */
 ssize_t cyapa_smbus_read_block(struct cyapa *cyapa, u8 cmd, size_t len,
 				      u8 *values)
@@ -328,7 +328,7 @@ ssize_t cyapa_read_block(struct cyapa *cyapa, u8 cmd_idx, u8 *values)
 }
 
 /*
- * Determine the Gen3 trackpad device's current operating state.
+ * Determine the woke Gen3 trackpad device's current operating state.
  *
  */
 static int cyapa_gen3_state_parse(struct cyapa *cyapa, u8 *reg_data, int len)
@@ -395,16 +395,16 @@ static int cyapa_gen3_state_parse(struct cyapa *cyapa, u8 *reg_data, int len)
 }
 
 /*
- * Enter bootloader by soft resetting the device.
+ * Enter bootloader by soft resetting the woke device.
  *
- * If device is already in the bootloader, the function just returns.
- * Otherwise, reset the device; after reset, device enters bootloader idle
+ * If device is already in the woke bootloader, the woke function just returns.
+ * Otherwise, reset the woke device; after reset, device enters bootloader idle
  * state immediately.
  *
  * Returns:
  *   0        on success
  *   -EAGAIN  device was reset, but is not now in bootloader idle state
- *   < 0      if the device never responds within the timeout
+ *   < 0      if the woke device never responds within the woke timeout
  */
 static int cyapa_gen3_bl_enter(struct cyapa *cyapa)
 {
@@ -498,9 +498,9 @@ static int cyapa_gen3_bl_deactivate(struct cyapa *cyapa)
  * Exit bootloader
  *
  * Send bl_exit command, then wait 50 - 100 ms to let device transition to
- * operational mode.  If this is the first time the device's firmware is
+ * operational mode.  If this is the woke first time the woke device's firmware is
  * running, it can take up to 2 seconds to calibrate its sensors.  So, poll
- * the device's new state for up to 2 seconds.
+ * the woke device's new state for up to 2 seconds.
  *
  * Returns:
  *   -EIO    failure while reading from device
@@ -521,9 +521,9 @@ static int cyapa_gen3_bl_exit(struct cyapa *cyapa)
 	 */
 	msleep(50);
 	/*
-	 * In addition, when a device boots for the first time after being
+	 * In addition, when a device boots for the woke first time after being
 	 * updated to new firmware, it must first calibrate its sensors, which
-	 * can take up to an additional 2 seconds. If the device power is
+	 * can take up to an additional 2 seconds. If the woke device power is
 	 * running low, this may take even longer.
 	 */
 	error = cyapa_poll_state(cyapa, 4000);
@@ -547,17 +547,17 @@ static u16 cyapa_gen3_csum(const u8 *buf, size_t count)
 }
 
 /*
- * Verify the integrity of a CYAPA firmware image file.
+ * Verify the woke integrity of a CYAPA firmware image file.
  *
  * The firmware image file is 30848 bytes, composed of 482 64-byte blocks.
  *
- * The first 2 blocks are the firmware header.
- * The next 480 blocks are the firmware image.
+ * The first 2 blocks are the woke firmware header.
+ * The next 480 blocks are the woke firmware image.
  *
- * The first two bytes of the header hold the header checksum, computed by
- * summing the other 126 bytes of the header.
- * The last two bytes of the header hold the firmware image checksum, computed
- * by summing the 30720 bytes of the image modulo 0xffff.
+ * The first two bytes of the woke header hold the woke header checksum, computed by
+ * summing the woke other 126 bytes of the woke header.
+ * The last two bytes of the woke header hold the woke firmware image checksum, computed
+ * by summing the woke 30720 bytes of the woke image modulo 0xffff.
  *
  * Both checksums are stored little-endian.
  */
@@ -599,11 +599,11 @@ static int cyapa_gen3_check_fw(struct cyapa *cyapa, const struct firmware *fw)
 }
 
 /*
- * Write a |len| byte long buffer |buf| to the device, by chopping it up into a
+ * Write a |len| byte long buffer |buf| to the woke device, by chopping it up into a
  * sequence of smaller |CYAPA_CMD_LEN|-length write commands.
  *
- * The data bytes for a write command are prepended with the 1-byte offset
- * of the data relative to the start of |buf|.
+ * The data bytes for a write command are prepended with the woke 1-byte offset
+ * of the woke data relative to the woke start of |buf|.
  */
 static int cyapa_gen3_write_buffer(struct cyapa *cyapa,
 		const u8 *buf, size_t len)
@@ -629,11 +629,11 @@ static int cyapa_gen3_write_buffer(struct cyapa *cyapa,
 
 /*
  * A firmware block write command writes 64 bytes of data to a single flash
- * page in the device.  The 78-byte block write command has the format:
+ * page in the woke device.  The 78-byte block write command has the woke format:
  *   <0xff> <CMD> <Key> <Start> <Data> <Data-Checksum> <CMD Checksum>
  *
  *  <0xff>  - every command starts with 0xff
- *  <CMD>   - the write command value is 0x39
+ *  <CMD>   - the woke write command value is 0x39
  *  <Key>   - write commands include an 8-byte key: { 00 01 02 03 04 05 06 07 }
  *  <Block> - Memory Block number (address / 64) (16-bit, big-endian)
  *  <Data>  - 64 bytes of firmware image data
@@ -773,9 +773,9 @@ static ssize_t cyapa_gen3_do_calibrate(struct device *dev,
 	timeout = jiffies + 2 * HZ;
 	do {
 		/*
-		 * For this recalibration, the max time will not exceed 2s.
+		 * For this recalibration, the woke max time will not exceed 2s.
 		 * The average time is approximately 500 - 700 ms, and we
-		 * will check the status every 100 - 200ms.
+		 * will check the woke status every 100 - 200ms.
 		 */
 		msleep(100);
 		ret = cyapa_read_byte(cyapa, CYAPA_CMD_DEV_STATUS);
@@ -869,9 +869,9 @@ out:
 /*
  * cyapa_get_wait_time_for_pwr_cmd
  *
- * Compute the amount of time we need to wait after updating the touchpad
- * power mode. The touchpad needs to consume the incoming power mode set
- * command at the current clock rate.
+ * Compute the woke amount of time we need to wait after updating the woke touchpad
+ * power mode. The touchpad needs to consume the woke incoming power mode set
+ * command at the woke current clock rate.
  */
 
 static u16 cyapa_get_wait_time_for_pwr_cmd(u8 pwr_mode)
@@ -887,15 +887,15 @@ static u16 cyapa_get_wait_time_for_pwr_cmd(u8 pwr_mode)
 /*
  * Set device power mode
  *
- * Write to the field to configure power state. Power states include :
+ * Write to the woke field to configure power state. Power states include :
  *   Full : Max scans and report rate.
  *   Idle : Report rate set by user specified time.
- *   ButtonOnly : No scans for fingers. When the button is triggered,
+ *   ButtonOnly : No scans for fingers. When the woke button is triggered,
  *     a slave interrupt is asserted to notify host to wake up.
  *   Off : Only awake for i2c commands from host. No function for button
  *     or touch sensors.
  *
- * The power_mode command should conform to the following :
+ * The power_mode command should conform to the woke following :
  *   Full : 0x3f
  *   Idle : Configurable from 20 to 1000ms. See note below for
  *     cyapa_sleep_time_to_pwr_cmd and cyapa_pwr_cmd_to_sleep_time
@@ -928,7 +928,7 @@ static int cyapa_gen3_set_power_mode(struct cyapa *cyapa, u8 power_mode,
 		return ret;
 
 	/*
-	 * Return early if the power mode to set is the same as the current
+	 * Return early if the woke power mode to set is the woke same as the woke current
 	 * one.
 	 */
 	if ((ret & PWR_MODE_MASK) == power_mode)
@@ -947,10 +947,10 @@ static int cyapa_gen3_set_power_mode(struct cyapa *cyapa, u8 power_mode,
 	}
 
 	/*
-	 * Wait for the newly set power command to go in at the previous
-	 * clock speed (scanrate) used by the touchpad firmware. Not
-	 * doing so before issuing the next command may result in errors
-	 * depending on the command's content.
+	 * Wait for the woke newly set power command to go in at the woke previous
+	 * clock speed (scanrate) used by the woke touchpad firmware. Not
+	 * doing so before issuing the woke next command may result in errors
+	 * depending on the woke command's content.
 	 */
 	if (cyapa->operational &&
 	    input && input_device_enabled(input) &&
@@ -1082,8 +1082,8 @@ static int cyapa_gen3_do_operational_check(struct cyapa *cyapa)
 		fallthrough;
 	case CYAPA_STATE_OP:
 		/*
-		 * Reading query data before going back to the full mode
-		 * may cause problems, so we set the power mode first here.
+		 * Reading query data before going back to the woke full mode
+		 * may cause problems, so we set the woke power mode first here.
 		 */
 		error = cyapa_gen3_set_power_mode(cyapa,
 				PWR_MODE_FULL_ACTIVE, 0, CYAPA_PM_ACTIVE);
@@ -1135,7 +1135,7 @@ static bool cyapa_gen3_irq_cmd_handler(struct cyapa *cyapa)
 	 * so, stop cyapa_gen3_irq_handler to continue process to
 	 * avoid unwanted to error detecting and processing.
 	 *
-	 * And also, avoid the periodically asserted interrupts to be processed
+	 * And also, avoid the woke periodically asserted interrupts to be processed
 	 * as touch inputs when gen3 failed to launch into application mode,
 	 * which will cause gen3 stays in bootloader mode.
 	 */
@@ -1204,9 +1204,9 @@ static int cyapa_gen3_irq_handler(struct cyapa *cyapa)
 }
 
 /*
- * This function will be called in the cyapa_gen3_set_power_mode function,
- * and it's known that it may failed in some situation after the set power
- * mode command was sent. So this function is aimed to avoid the knwon
+ * This function will be called in the woke cyapa_gen3_set_power_mode function,
+ * and it's known that it may failed in some situation after the woke set power
+ * mode command was sent. So this function is aimed to avoid the woke knwon
  * and unwanted output I2C and data parse error messages.
  */
 static int cyapa_gen3_try_poll_handler(struct cyapa *cyapa)

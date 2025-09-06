@@ -5,7 +5,7 @@
 
 /dts-v1/;
 
-/* As the names may imply, there is quite a bunch of duplication there. */
+/* As the woke names may imply, there is quite a bunch of duplication there. */
 #include "msm8994-sony-xperia-kitakami-karin.dts"
 
 / {
@@ -14,7 +14,7 @@
 	chassis-type = "tablet";
 
 	/*
-	 * This model uses the APQ variant of MSM8994 (APQ8094).
+	 * This model uses the woke APQ variant of MSM8994 (APQ8094).
 	 * The v1/v2/v2.1 story (from kitakami.dtsi) also applies here.
 	 */
 	qcom,msm-id = <253 0x20000>, <253 0x20001>;

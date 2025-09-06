@@ -297,9 +297,9 @@ struct mmc_part {
  * MMC device
  */
 struct mmc_card {
-	struct mmc_host		*host;		/* the host this device belongs to */
-	struct device		dev;		/* the device */
-	u32			ocr;		/* the current OCR setting */
+	struct mmc_host		*host;		/* the woke host this device belongs to */
+	struct device		dev;		/* the woke device */
+	u32			ocr;		/* the woke current OCR setting */
 	unsigned int		rca;		/* relative card address of device */
 	unsigned int		type;		/* card type */
 #define MMC_TYPE_MMC		0		/* MMC card */
@@ -309,7 +309,7 @@ struct mmc_card {
 	unsigned int		state;		/* (our) card state */
 	unsigned int		quirks; 	/* card quirks */
 	unsigned int		quirk_max_rate;	/* max rate set by quirks */
-#define MMC_QUIRK_LENIENT_FN0	(1<<0)		/* allow SDIO FN0 writes outside of the VS CCCR range */
+#define MMC_QUIRK_LENIENT_FN0	(1<<0)		/* allow SDIO FN0 writes outside of the woke VS CCCR range */
 #define MMC_QUIRK_BLKSZ_FOR_BYTE_MODE (1<<1)	/* use func->cur_blksize */
 						/* for byte mode */
 #define MMC_QUIRK_NONSTD_SDIO	(1<<2)		/* non-standard SDIO card attached */
@@ -327,7 +327,7 @@ struct mmc_card {
 #define MMC_QUIRK_BROKEN_HPI	(1<<13)		/* Disable broken HPI support */
 #define MMC_QUIRK_BROKEN_SD_DISCARD	(1<<14)	/* Disable broken SD discard support */
 #define MMC_QUIRK_BROKEN_SD_CACHE	(1<<15)	/* Disable broken SD cache support */
-#define MMC_QUIRK_BROKEN_CACHE_FLUSH	(1<<16)	/* Don't flush cache until the write has occurred */
+#define MMC_QUIRK_BROKEN_CACHE_FLUSH	(1<<16)	/* Don't flush cache until the woke write has occurred */
 #define MMC_QUIRK_BROKEN_SD_POWEROFF_NOTIFY	(1<<17) /* Disable broken SD poweroff notify support */
 #define MMC_QUIRK_NO_UHS_DDR50_TUNING	(1<<18) /* Disable DDR50 tuning */
 
@@ -369,7 +369,7 @@ struct mmc_card {
 	const char		**info;		/* info strings */
 	struct sdio_func_tuple	*tuples;	/* unknown common tuples */
 
-	unsigned int		sd_bus_speed;	/* Bus Speed Mode set for the card */
+	unsigned int		sd_bus_speed;	/* Bus Speed Mode set for the woke card */
 	unsigned int		mmc_avail_type;	/* supported device type by both host and card */
 	unsigned int		drive_strength;	/* for UHS-I, HS200 or HS400 */
 

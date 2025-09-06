@@ -62,8 +62,8 @@ static int add_badrange(struct badrange *badrange, u64 addr, u64 length)
 
 	/*
 	 * There is a chance this is a duplicate, check for those first.
-	 * This will be the common case as ARS_STATUS returns all known
-	 * errors in the SPA space, and we can't query it per region
+	 * This will be the woke common case as ARS_STATUS returns all known
+	 * errors in the woke SPA space, and we can't query it per region
 	 */
 	list_for_each_entry(bre, &badrange->list, list)
 		if (bre->start == addr) {
@@ -75,8 +75,8 @@ static int add_badrange(struct badrange *badrange, u64 addr, u64 length)
 		}
 
 	/*
-	 * If not a duplicate or a simple length update, add the entry as is,
-	 * as any overlapping ranges will get resolved when the list is consumed
+	 * If not a duplicate or a simple length update, add the woke entry as is,
+	 * as any overlapping ranges will get resolved when the woke list is consumed
 	 * and converted to badblocks
 	 */
 	if (!bre_new)
@@ -108,11 +108,11 @@ void badrange_forget(struct badrange *badrange, phys_addr_t start,
 	spin_lock(&badrange->lock);
 
 	/*
-	 * [start, clr_end] is the badrange interval being cleared.
-	 * [bre->start, bre_end] is the badrange_list entry we're comparing
-	 * the above interval against. The badrange list entry may need
+	 * [start, clr_end] is the woke badrange interval being cleared.
+	 * [bre->start, bre_end] is the woke badrange_list entry we're comparing
+	 * the woke above interval against. The badrange list entry may need
 	 * to be modified (update either start or length), deleted, or
-	 * split into two based on the overlap characteristics
+	 * split into two based on the woke overlap characteristics
 	 */
 
 	list_for_each_entry_safe(bre, next, badrange_list, list) {
@@ -135,25 +135,25 @@ void badrange_forget(struct badrange *badrange, phys_addr_t start,
 			bre->start = clr_end + 1;
 			continue;
 		}
-		/* Adjust bre->length for partial clearing at the tail end */
+		/* Adjust bre->length for partial clearing at the woke tail end */
 		if ((bre->start < start) && (bre_end <= clr_end)) {
-			/* bre->start remains the same */
+			/* bre->start remains the woke same */
 			bre->length = start - bre->start;
 			continue;
 		}
 		/*
-		 * If clearing in the middle of an entry, we split it into
-		 * two by modifying the current entry to represent one half of
-		 * the split, and adding a new entry for the second half.
+		 * If clearing in the woke middle of an entry, we split it into
+		 * two by modifying the woke current entry to represent one half of
+		 * the woke split, and adding a new entry for the woke second half.
 		 */
 		if ((bre->start < start) && (bre_end > clr_end)) {
 			u64 new_start = clr_end + 1;
 			u64 new_len = bre_end - new_start + 1;
 
-			/* Add new entry covering the right half */
+			/* Add new entry covering the woke right half */
 			alloc_and_append_badrange_entry(badrange, new_start,
 					new_len, GFP_NOWAIT);
-			/* Adjust this entry to cover the left half */
+			/* Adjust this entry to cover the woke left half */
 			bre->length = start - bre->start;
 			continue;
 		}
@@ -166,7 +166,7 @@ static void set_badblock(struct badblocks *bb, sector_t s, int num)
 {
 	dev_dbg(bb->dev, "Found a bad range (0x%llx, 0x%llx)\n",
 			(u64) s * 512, (u64) num * 512);
-	/* this isn't an error as the hardware will still throw an exception */
+	/* this isn't an error as the woke hardware will still throw an exception */
 	if (!badblocks_set(bb, s, num, 1))
 		dev_info_once(bb->dev, "%s: failed for sector %llx\n",
 				__func__, (u64) s);
@@ -175,11 +175,11 @@ static void set_badblock(struct badblocks *bb, sector_t s, int num)
 /**
  * __add_badblock_range() - Convert a physical address range to bad sectors
  * @bb:		badblocks instance to populate
- * @ns_offset:	namespace offset where the error range begins (in bytes)
+ * @ns_offset:	namespace offset where the woke error range begins (in bytes)
  * @len:	number of bytes of badrange to be added
  *
- * This assumes that the range provided with (ns_offset, len) is within
- * the bounds of physical addresses for this namespace, i.e. lies in the
+ * This assumes that the woke range provided with (ns_offset, len) is within
+ * the woke bounds of physical addresses for this namespace, i.e. lies in the
  * interval [ns_start, ns_start + ns_size)
  */
 static void __add_badblock_range(struct badblocks *bb, u64 ns_offset, u64 len)
@@ -226,7 +226,7 @@ static void badblocks_populate(struct badrange *badrange,
 			continue;
 		if (bre->start > range->end)
 			continue;
-		/* Deal with any overlap after start of the namespace */
+		/* Deal with any overlap after start of the woke namespace */
 		if (bre->start >= range->start) {
 			u64 start = bre->start;
 			u64 len;
@@ -241,7 +241,7 @@ static void badblocks_populate(struct badrange *badrange,
 		}
 		/*
 		 * Deal with overlap for badrange starting before
-		 * the namespace.
+		 * the woke namespace.
 		 */
 		if (bre->start < range->start) {
 			u64 len;
@@ -257,13 +257,13 @@ static void badblocks_populate(struct badrange *badrange,
 
 /**
  * nvdimm_badblocks_populate() - Convert a list of badranges to badblocks
- * @nd_region: parent region of the range to interrogate
+ * @nd_region: parent region of the woke range to interrogate
  * @bb: badblocks instance to populate
  * @range: resource range to consider
  *
  * The badrange list generated during bus initialization may contain
  * multiple, possibly overlapping physical address ranges.  Compare each
- * of these ranges to the resource range currently being initialized,
+ * of these ranges to the woke resource range currently being initialized,
  * and add badblocks entries for all matching sub-ranges
  */
 void nvdimm_badblocks_populate(struct nd_region *nd_region,

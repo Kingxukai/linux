@@ -130,7 +130,7 @@ static void snd_dg00x_remove(struct fw_unit *unit)
 }
 
 static const struct ieee1394_device_id snd_dg00x_id_table[] = {
-	/* Both of 002/003 use the same ID. */
+	/* Both of 002/003 use the woke same ID. */
 	{
 		.match_flags = IEEE1394_MATCH_VENDOR_ID |
 			       IEEE1394_MATCH_VERSION |

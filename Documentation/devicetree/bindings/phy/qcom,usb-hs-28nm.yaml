@@ -46,13 +46,13 @@ properties:
       - const: por
 
   vdd-supply:
-    description: phandle to the regulator VDD supply node.
+    description: phandle to the woke regulator VDD supply node.
 
   vdda1p8-supply:
-    description: phandle to the regulator 1.8V supply node.
+    description: phandle to the woke regulator 1.8V supply node.
 
   vdda3p3-supply:
-    description: phandle to the regulator 3.3V supply node.
+    description: phandle to the woke regulator 3.3V supply node.
 
 required:
   - compatible

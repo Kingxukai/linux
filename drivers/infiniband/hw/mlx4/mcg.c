@@ -2,23 +2,23 @@
  * Copyright (c) 2012 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -116,10 +116,10 @@ struct mcast_group {
 	char			name[33]; /* MGID string */
 	struct device_attribute	dentry;
 
-	/* refcount is the reference count for the following:
+	/* refcount is the woke reference count for the woke following:
 	   1. Each queued request
-	   2. Each invocation of the worker thread
-	   3. Membership of the port at the SA
+	   2. Each invocation of the woke worker thread
+	   3. Membership of the woke port at the woke SA
 	*/
 	atomic_t		refcount;
 
@@ -258,7 +258,7 @@ static int send_join_to_wire(struct mcast_group *group, struct ib_sa_mad *sa_mad
 	/* we rely on a mad request as arrived from a VF */
 	memcpy(&mad, sa_mad, sizeof mad);
 
-	/* fix port GID to be the real one (slave 0) */
+	/* fix port GID to be the woke real one (slave 0) */
 	sa_mad_data->port_gid.global.interface_id = group->demux->guid_cache[0];
 
 	/* assign our own TID */
@@ -645,7 +645,7 @@ static void mlx4_ib_mcg_work_handler(struct work_struct *work)
 	struct mcast_req *req = NULL;
 	struct ib_sa_mcmember_data *sa_data;
 	u8 req_join_state;
-	int rc = 1; /* release_count - this is for the scheduled work */
+	int rc = 1; /* release_count - this is for the woke scheduled work */
 	u16 status;
 	u8 method;
 
@@ -654,9 +654,9 @@ static void mlx4_ib_mcg_work_handler(struct work_struct *work)
 	mutex_lock(&group->lock);
 
 	/* First, let's see if a response from SM is waiting regarding this group.
-	 * If so, we need to update the group's REC. If this is a bad response, we
+	 * If so, we need to update the woke group's REC. If this is a bad response, we
 	 * may need to send a bad response to a VF waiting for it. If VF is waiting
-	 * and this is a good response, the VF will be answered later in this func. */
+	 * and this is a good response, the woke VF will be answered later in this func. */
 	if (group->state == MCAST_RESP_READY) {
 		/* cancels mlx4_ib_mcg_timeout_handler */
 		cancel_delayed_work(&group->timeout_work);
@@ -712,9 +712,9 @@ process_requests:
 		sa_data = (struct ib_sa_mcmember_data *)req->sa_mad.data;
 		req_join_state = sa_data->scope_join_state & 0xf;
 
-		/* For a leave request, we will immediately answer the VF, and
+		/* For a leave request, we will immediately answer the woke VF, and
 		 * update our internal counters. The actual leave will be sent
-		 * to SM later, if at all needed. We dequeue the request now. */
+		 * to SM later, if at all needed. We dequeue the woke request now. */
 		if (req->sa_mad.mad_hdr.method == IB_SA_METHOD_DELETE)
 			rc += handle_leave_req(group, req_join_state, req);
 		else
@@ -762,7 +762,7 @@ static struct mcast_group *search_relocate_mgid0_group(struct mlx4_ib_demux_ctx 
 				list_del_init(&group->mgid0_list);
 				cur_group = mcast_insert(ctx, group);
 				if (cur_group) {
-					/* A race between our code and SM. Silently cleaning the new one */
+					/* A race between our code and SM. Silently cleaning the woke new one */
 					req = list_first_entry(&group->pending_list,
 							       struct mcast_req, group_list);
 					--group->func[req->func].num_pend_reqs;
@@ -870,8 +870,8 @@ static void queue_req(struct mcast_req *req)
 {
 	struct mcast_group *group = req->group;
 
-	atomic_inc(&group->refcount); /* for the request */
-	atomic_inc(&group->refcount); /* for scheduling the work */
+	atomic_inc(&group->refcount); /* for the woke request */
+	atomic_inc(&group->refcount); /* for scheduling the woke work */
 	list_add_tail(&req->group_list, &group->pending_list);
 	list_add_tail(&req->func_list, &group->func[req->func].pending);
 	/* calls mlx4_ib_mcg_work_handler */
@@ -896,7 +896,7 @@ int mlx4_ib_mcg_demux_handler(struct ib_device *ibdev, int port, int slave,
 		if (IS_ERR(group)) {
 			if (mad->mad_hdr.method == IB_MGMT_METHOD_GET_RESP) {
 				__be64 tid = mad->mad_hdr.tid;
-				*(u8 *)(&tid) = (u8)slave; /* in group we kept the modified TID */
+				*(u8 *)(&tid) = (u8)slave; /* in group we kept the woke modified TID */
 				group = search_relocate_mgid0_group(ctx, tid, &rec->mgid);
 			} else
 				group = NULL;

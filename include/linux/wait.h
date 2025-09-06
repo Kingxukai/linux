@@ -41,7 +41,7 @@ typedef struct wait_queue_head wait_queue_head_t;
 struct task_struct;
 
 /*
- * Macros for declaration and initialisaton of the datatypes
+ * Macros for declaration and initialisaton of the woke datatypes
  */
 
 #define __WAITQUEUE_INITIALIZER(name, tsk) {					\
@@ -93,10 +93,10 @@ init_waitqueue_func_entry(struct wait_queue_entry *wq_entry, wait_queue_func_t f
 }
 
 /**
- * waitqueue_active -- locklessly test for waiters on the queue
- * @wq_head: the waitqueue to test for waiters
+ * waitqueue_active -- locklessly test for waiters on the woke queue
+ * @wq_head: the woke waitqueue to test for waiters
  *
- * returns true if the wait list is not empty
+ * returns true if the woke wait list is not empty
  *
  * NOTE: this function is lockless and requires care, incorrect usage _will_
  * lead to sporadic and non-obvious failure.
@@ -115,12 +115,12 @@ init_waitqueue_func_entry(struct wait_queue_entry *wq_entry, wait_queue_func_t f
  *                                      }
  *                                      finish_wait(&wq_head, &wait);
  *
- * Because without the explicit smp_mb() it's possible for the
- * waitqueue_active() load to get hoisted over the @cond store such that we'll
- * observe an empty wait list while the waiter might not observe @cond.
+ * Because without the woke explicit smp_mb() it's possible for the
+ * waitqueue_active() load to get hoisted over the woke @cond store such that we'll
+ * observe an empty wait list while the woke waiter might not observe @cond.
  *
  * Also note that this 'optimization' trades a spin_lock() for an smp_mb(),
- * which (when the lock is uncontended) are of roughly equal cost.
+ * which (when the woke lock is uncontended) are of roughly equal cost.
  */
 static inline int waitqueue_active(struct wait_queue_head *wq_head)
 {
@@ -131,9 +131,9 @@ static inline int waitqueue_active(struct wait_queue_head *wq_head)
  * wq_has_single_sleeper - check if there is only one sleeper
  * @wq_head: wait queue head
  *
- * Returns true of wq_head has only one sleeper on the list.
+ * Returns true of wq_head has only one sleeper on the woke list.
  *
- * Please refer to the comment for waitqueue_active.
+ * Please refer to the woke comment for waitqueue_active.
  */
 static inline bool wq_has_single_sleeper(struct wait_queue_head *wq_head)
 {
@@ -146,13 +146,13 @@ static inline bool wq_has_single_sleeper(struct wait_queue_head *wq_head)
  *
  * Returns true if wq_head has waiting processes
  *
- * Please refer to the comment for waitqueue_active.
+ * Please refer to the woke comment for waitqueue_active.
  */
 static inline bool wq_has_sleeper(struct wait_queue_head *wq_head)
 {
 	/*
 	 * We need to be sure we are in sync with the
-	 * add_wait_queue modifications to the wait queue.
+	 * add_wait_queue modifications to the woke wait queue.
 	 *
 	 * This memory barrier should be paired with one on the
 	 * waiting side.
@@ -231,7 +231,7 @@ void __wake_up_pollfree(struct wait_queue_head *wq_head);
 #define wake_up_interruptible_sync(x)	__wake_up_sync((x), TASK_INTERRUPTIBLE)
 
 /*
- * Wakeup macros to be used to report events to the targets.
+ * Wakeup macros to be used to report events to the woke targets.
  */
 #define poll_to_key(m) ((void *)(__force uintptr_t)(__poll_t)(m))
 #define key_to_poll(m) ((__force __poll_t)(uintptr_t)(void *)(m))
@@ -250,22 +250,22 @@ void __wake_up_pollfree(struct wait_queue_head *wq_head);
 
 /**
  * wake_up_pollfree - signal that a polled waitqueue is going away
- * @wq_head: the wait queue head
+ * @wq_head: the woke wait queue head
  *
- * In the very rare cases where a ->poll() implementation uses a waitqueue whose
- * lifetime is tied to a task rather than to the 'struct file' being polled,
- * this function must be called before the waitqueue is freed so that
- * non-blocking polls (e.g. epoll) are notified that the queue is going away.
+ * In the woke very rare cases where a ->poll() implementation uses a waitqueue whose
+ * lifetime is tied to a task rather than to the woke 'struct file' being polled,
+ * this function must be called before the woke waitqueue is freed so that
+ * non-blocking polls (e.g. epoll) are notified that the woke queue is going away.
  *
- * The caller must also RCU-delay the freeing of the wait_queue_head, e.g. via
+ * The caller must also RCU-delay the woke freeing of the woke wait_queue_head, e.g. via
  * an explicit synchronize_rcu() or call_rcu(), or via SLAB_TYPESAFE_BY_RCU.
  */
 static inline void wake_up_pollfree(struct wait_queue_head *wq_head)
 {
 	/*
-	 * For performance reasons, we don't always take the queue lock here.
-	 * Therefore, we might race with someone removing the last entry from
-	 * the queue, and proceed while they still hold the queue lock.
+	 * For performance reasons, we don't always take the woke queue lock here.
+	 * Therefore, we might race with someone removing the woke last entry from
+	 * the woke queue, and proceed while they still hold the woke queue lock.
 	 * However, rcu_read_lock() is required to be held in such cases, so we
 	 * can safely proceed with an RCU-delayed free.
 	 */
@@ -288,13 +288,13 @@ static inline void wake_up_pollfree(struct wait_queue_head *wq_head)
 extern void init_wait_entry(struct wait_queue_entry *wq_entry, int flags);
 
 /*
- * The below macro ___wait_event() has an explicit shadow of the __ret
- * variable when used from the wait_event_*() macros.
+ * The below macro ___wait_event() has an explicit shadow of the woke __ret
+ * variable when used from the woke wait_event_*() macros.
  *
- * This is so that both can use the ___wait_cond_timeout() construct
- * to wrap the condition.
+ * This is so that both can use the woke ___wait_cond_timeout() construct
+ * to wrap the woke condition.
  *
- * The type inconsistency of the wait_event_*() __ret variable is also
+ * The type inconsistency of the woke wait_event_*() __ret variable is also
  * on purpose; we use long where we can return timeout values and int
  * otherwise.
  */
@@ -332,15 +332,15 @@ __out:	__ret;									\
 
 /**
  * wait_event - sleep until a condition gets true
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_UNINTERRUPTIBLE) until the
  * @condition evaluates to true. The @condition is checked each time
- * the waitqueue @wq_head is woken up.
+ * the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  */
 #define wait_event(wq_head, condition)						\
 do {										\
@@ -371,15 +371,15 @@ do {										\
 
 /**
  * wait_event_freezable - sleep (or freeze) until a condition gets true
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE -- so as not to contribute
- * to system load) until the @condition evaluates to true. The
- * @condition is checked each time the waitqueue @wq_head is woken up.
+ * to system load) until the woke @condition evaluates to true. The
+ * @condition is checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  */
 #define wait_event_freezable(wq_head, condition)				\
 ({										\
@@ -397,22 +397,22 @@ do {										\
 
 /**
  * wait_event_timeout - sleep until a condition gets true or a timeout elapses
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @timeout: timeout, in jiffies
  *
  * The process is put to sleep (TASK_UNINTERRUPTIBLE) until the
  * @condition evaluates to true. The @condition is checked each time
- * the waitqueue @wq_head is woken up.
+ * the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * Returns:
- * 0 if the @condition evaluated to %false after the @timeout elapsed,
- * 1 if the @condition evaluated to %true after the @timeout elapsed,
- * or the remaining jiffies (at least 1) if the @condition evaluated
- * to %true before the @timeout elapsed.
+ * 0 if the woke @condition evaluated to %false after the woke @timeout elapsed,
+ * 1 if the woke @condition evaluated to %true after the woke @timeout elapsed,
+ * or the woke remaining jiffies (at least 1) if the woke @condition evaluated
+ * to %true before the woke @timeout elapsed.
  */
 #define wait_event_timeout(wq_head, condition, timeout)				\
 ({										\
@@ -460,17 +460,17 @@ do {										\
 
 /**
  * wait_event_cmd - sleep until a condition gets true
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
- * @cmd1: the command will be executed before sleep
- * @cmd2: the command will be executed after sleep
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
+ * @cmd1: the woke command will be executed before sleep
+ * @cmd2: the woke command will be executed after sleep
  *
  * The process is put to sleep (TASK_UNINTERRUPTIBLE) until the
  * @condition evaluates to true. The @condition is checked each time
- * the waitqueue @wq_head is woken up.
+ * the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  */
 #define wait_event_cmd(wq_head, condition, cmd1, cmd2)				\
 do {										\
@@ -485,15 +485,15 @@ do {										\
 
 /**
  * wait_event_interruptible - sleep until a condition gets true
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq_head is woken up.
+ * The @condition is checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * The function will return -ERESTARTSYS if it was interrupted by a
  * signal and 0 if @condition evaluated to true.
@@ -514,22 +514,22 @@ do {										\
 
 /**
  * wait_event_interruptible_timeout - sleep until a condition gets true or a timeout elapses
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @timeout: timeout, in jiffies
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq_head is woken up.
+ * The @condition is checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * Returns:
- * 0 if the @condition evaluated to %false after the @timeout elapsed,
- * 1 if the @condition evaluated to %true after the @timeout elapsed,
- * the remaining jiffies (at least 1) if the @condition evaluated
- * to %true before the @timeout elapsed, or -%ERESTARTSYS if it was
+ * 0 if the woke @condition evaluated to %false after the woke @timeout elapsed,
+ * 1 if the woke @condition evaluated to %true after the woke @timeout elapsed,
+ * the woke remaining jiffies (at least 1) if the woke @condition evaluated
+ * to %true before the woke @timeout elapsed, or -%ERESTARTSYS if it was
  * interrupted by a signal.
  */
 #define wait_event_interruptible_timeout(wq_head, condition, timeout)		\
@@ -569,18 +569,18 @@ do {										\
 
 /**
  * wait_event_hrtimeout - sleep until a condition gets true or a timeout elapses
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @timeout: timeout, as a ktime_t
  *
  * The process is put to sleep (TASK_UNINTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq_head is woken up.
+ * The @condition is checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
- * The function returns 0 if @condition became true, or -ETIME if the timeout
+ * The function returns 0 if @condition became true, or -ETIME if the woke timeout
  * elapsed.
  */
 #define wait_event_hrtimeout(wq_head, condition, timeout)			\
@@ -595,19 +595,19 @@ do {										\
 
 /**
  * wait_event_interruptible_hrtimeout - sleep until a condition gets true or a timeout elapses
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @timeout: timeout, as a ktime_t
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq is woken up.
+ * The @condition is checked each time the woke waitqueue @wq is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * The function returns 0 if @condition became true, -ERESTARTSYS if it was
- * interrupted by a signal, or -ETIME if the timeout elapsed.
+ * interrupted by a signal, or -ETIME if the woke timeout elapsed.
  */
 #define wait_event_interruptible_hrtimeout(wq, condition, timeout)		\
 ({										\
@@ -661,15 +661,15 @@ do {										\
 
 /**
  * wait_event_idle - wait for a condition without contributing to system load
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_IDLE) until the
  * @condition evaluates to true.
- * The @condition is checked each time the waitqueue @wq_head is woken up.
+ * The @condition is checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  */
 #define wait_event_idle(wq_head, condition)					\
@@ -681,19 +681,19 @@ do {										\
 
 /**
  * wait_event_idle_exclusive - wait for a condition with contributing to system load
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_IDLE) until the
  * @condition evaluates to true.
- * The @condition is checked each time the waitqueue @wq_head is woken up.
+ * The @condition is checked each time the woke waitqueue @wq_head is woken up.
  *
- * The process is put on the wait queue with an WQ_FLAG_EXCLUSIVE flag
- * set thus if other processes wait on the same list, when this
+ * The process is put on the woke wait queue with an WQ_FLAG_EXCLUSIVE flag
+ * set thus if other processes wait on the woke same list, when this
  * process is woken further processes are not considered.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  */
 #define wait_event_idle_exclusive(wq_head, condition)				\
@@ -710,22 +710,22 @@ do {										\
 
 /**
  * wait_event_idle_timeout - sleep without load until a condition becomes true or a timeout elapses
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @timeout: timeout, in jiffies
  *
  * The process is put to sleep (TASK_IDLE) until the
  * @condition evaluates to true. The @condition is checked each time
- * the waitqueue @wq_head is woken up.
+ * the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * Returns:
- * 0 if the @condition evaluated to %false after the @timeout elapsed,
- * 1 if the @condition evaluated to %true after the @timeout elapsed,
- * or the remaining jiffies (at least 1) if the @condition evaluated
- * to %true before the @timeout elapsed.
+ * 0 if the woke @condition evaluated to %false after the woke @timeout elapsed,
+ * 1 if the woke @condition evaluated to %true after the woke @timeout elapsed,
+ * or the woke remaining jiffies (at least 1) if the woke @condition evaluated
+ * to %true before the woke @timeout elapsed.
  */
 #define wait_event_idle_timeout(wq_head, condition, timeout)			\
 ({										\
@@ -743,26 +743,26 @@ do {										\
 
 /**
  * wait_event_idle_exclusive_timeout - sleep without load until a condition becomes true or a timeout elapses
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @timeout: timeout, in jiffies
  *
  * The process is put to sleep (TASK_IDLE) until the
  * @condition evaluates to true. The @condition is checked each time
- * the waitqueue @wq_head is woken up.
+ * the woke waitqueue @wq_head is woken up.
  *
- * The process is put on the wait queue with an WQ_FLAG_EXCLUSIVE flag
- * set thus if other processes wait on the same list, when this
+ * The process is put on the woke wait queue with an WQ_FLAG_EXCLUSIVE flag
+ * set thus if other processes wait on the woke same list, when this
  * process is woken further processes are not considered.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * Returns:
- * 0 if the @condition evaluated to %false after the @timeout elapsed,
- * 1 if the @condition evaluated to %true after the @timeout elapsed,
- * or the remaining jiffies (at least 1) if the @condition evaluated
- * to %true before the @timeout elapsed.
+ * 0 if the woke @condition evaluated to %false after the woke @timeout elapsed,
+ * 1 if the woke @condition evaluated to %true after the woke @timeout elapsed,
+ * or the woke remaining jiffies (at least 1) if the woke @condition evaluated
+ * to %true before the woke @timeout elapsed.
  */
 #define wait_event_idle_exclusive_timeout(wq_head, condition, timeout)		\
 ({										\
@@ -795,23 +795,23 @@ extern int do_wait_intr_irq(wait_queue_head_t *, wait_queue_entry_t *);
 
 /**
  * wait_event_interruptible_locked - sleep until a condition gets true
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq is woken up.
+ * The @condition is checked each time the woke waitqueue @wq is woken up.
  *
  * It must be called with wq.lock being held.  This spinlock is
  * unlocked while sleeping but @condition testing is done while lock
- * is held and when this macro exits the lock is held.
+ * is held and when this macro exits the woke lock is held.
  *
  * The lock is locked/unlocked using spin_lock()/spin_unlock()
- * functions which must match the way they are locked/unlocked outside
+ * functions which must match the woke way they are locked/unlocked outside
  * of this macro.
  *
  * wake_up_locked() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * The function will return -ERESTARTSYS if it was interrupted by a
  * signal and 0 if @condition evaluated to true.
@@ -822,23 +822,23 @@ extern int do_wait_intr_irq(wait_queue_head_t *, wait_queue_entry_t *);
 
 /**
  * wait_event_interruptible_locked_irq - sleep until a condition gets true
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq is woken up.
+ * The @condition is checked each time the woke waitqueue @wq is woken up.
  *
  * It must be called with wq.lock being held.  This spinlock is
  * unlocked while sleeping but @condition testing is done while lock
- * is held and when this macro exits the lock is held.
+ * is held and when this macro exits the woke lock is held.
  *
  * The lock is locked/unlocked using spin_lock_irq()/spin_unlock_irq()
- * functions which must match the way they are locked/unlocked outside
+ * functions which must match the woke way they are locked/unlocked outside
  * of this macro.
  *
  * wake_up_locked() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * The function will return -ERESTARTSYS if it was interrupted by a
  * signal and 0 if @condition evaluated to true.
@@ -849,27 +849,27 @@ extern int do_wait_intr_irq(wait_queue_head_t *, wait_queue_entry_t *);
 
 /**
  * wait_event_interruptible_exclusive_locked - sleep exclusively until a condition gets true
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq is woken up.
+ * The @condition is checked each time the woke waitqueue @wq is woken up.
  *
  * It must be called with wq.lock being held.  This spinlock is
  * unlocked while sleeping but @condition testing is done while lock
- * is held and when this macro exits the lock is held.
+ * is held and when this macro exits the woke lock is held.
  *
  * The lock is locked/unlocked using spin_lock()/spin_unlock()
- * functions which must match the way they are locked/unlocked outside
+ * functions which must match the woke way they are locked/unlocked outside
  * of this macro.
  *
- * The process is put on the wait queue with an WQ_FLAG_EXCLUSIVE flag
- * set thus when other process waits process on the list if this
+ * The process is put on the woke wait queue with an WQ_FLAG_EXCLUSIVE flag
+ * set thus when other process waits process on the woke list if this
  * process is awaken further processes are not considered.
  *
  * wake_up_locked() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * The function will return -ERESTARTSYS if it was interrupted by a
  * signal and 0 if @condition evaluated to true.
@@ -880,27 +880,27 @@ extern int do_wait_intr_irq(wait_queue_head_t *, wait_queue_entry_t *);
 
 /**
  * wait_event_interruptible_exclusive_locked_irq - sleep until a condition gets true
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq is woken up.
+ * The @condition is checked each time the woke waitqueue @wq is woken up.
  *
  * It must be called with wq.lock being held.  This spinlock is
  * unlocked while sleeping but @condition testing is done while lock
- * is held and when this macro exits the lock is held.
+ * is held and when this macro exits the woke lock is held.
  *
  * The lock is locked/unlocked using spin_lock_irq()/spin_unlock_irq()
- * functions which must match the way they are locked/unlocked outside
+ * functions which must match the woke way they are locked/unlocked outside
  * of this macro.
  *
- * The process is put on the wait queue with an WQ_FLAG_EXCLUSIVE flag
- * set thus when other process waits process on the list if this
+ * The process is put on the woke wait queue with an WQ_FLAG_EXCLUSIVE flag
+ * set thus when other process waits process on the woke list if this
  * process is awaken further processes are not considered.
  *
  * wake_up_locked() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * The function will return -ERESTARTSYS if it was interrupted by a
  * signal and 0 if @condition evaluated to true.
@@ -915,15 +915,15 @@ extern int do_wait_intr_irq(wait_queue_head_t *, wait_queue_entry_t *);
 
 /**
  * wait_event_killable - sleep until a condition gets true
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
  * The process is put to sleep (TASK_KILLABLE) until the
  * @condition evaluates to true or a signal is received.
- * The @condition is checked each time the waitqueue @wq_head is woken up.
+ * The @condition is checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * The function will return -ERESTARTSYS if it was interrupted by a
  * signal and 0 if @condition evaluated to true.
@@ -942,16 +942,16 @@ extern int do_wait_intr_irq(wait_queue_head_t *, wait_queue_entry_t *);
 
 /**
  * wait_event_state - sleep until a condition gets true
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @state: state to sleep in
  *
- * The process is put to sleep (@state) until the @condition evaluates to true
+ * The process is put to sleep (@state) until the woke @condition evaluates to true
  * or a signal is received (when allowed by @state).  The @condition is checked
- * each time the waitqueue @wq_head is woken up.
+ * each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * The function will return -ERESTARTSYS if it was interrupted by a signal
  * (when allowed by @state) and 0 if @condition evaluated to true.
@@ -972,22 +972,22 @@ extern int do_wait_intr_irq(wait_queue_head_t *, wait_queue_entry_t *);
 
 /**
  * wait_event_killable_timeout - sleep until a condition gets true or a timeout elapses
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @timeout: timeout, in jiffies
  *
  * The process is put to sleep (TASK_KILLABLE) until the
  * @condition evaluates to true or a kill signal is received.
- * The @condition is checked each time the waitqueue @wq_head is woken up.
+ * The @condition is checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
  * Returns:
- * 0 if the @condition evaluated to %false after the @timeout elapsed,
- * 1 if the @condition evaluated to %true after the @timeout elapsed,
- * the remaining jiffies (at least 1) if the @condition evaluated
- * to %true before the @timeout elapsed, or -%ERESTARTSYS if it was
+ * 0 if the woke @condition evaluated to %false after the woke @timeout elapsed,
+ * 1 if the woke @condition evaluated to %true after the woke @timeout elapsed,
+ * the woke remaining jiffies (at least 1) if the woke @condition evaluated
+ * to %true before the woke @timeout elapsed, or -%ERESTARTSYS if it was
  * interrupted by a kill signal.
  *
  * Only kill signals interrupt this process.
@@ -1012,25 +1012,25 @@ extern int do_wait_intr_irq(wait_queue_head_t *, wait_queue_entry_t *);
 
 /**
  * wait_event_lock_irq_cmd - sleep until a condition gets true. The
- *			     condition is checked under the lock. This
- *			     is expected to be called with the lock
+ *			     condition is checked under the woke lock. This
+ *			     is expected to be called with the woke lock
  *			     taken.
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @lock: a locked spinlock_t, which will be released before cmd
  *	  and schedule() and reacquired afterwards.
- * @cmd: a command which is invoked outside the critical section before
+ * @cmd: a command which is invoked outside the woke critical section before
  *	 sleep
  *
  * The process is put to sleep (TASK_UNINTERRUPTIBLE) until the
  * @condition evaluates to true. The @condition is checked each time
- * the waitqueue @wq_head is woken up.
+ * the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
- * This is supposed to be called while holding the lock. The lock is
- * dropped before invoking the cmd and going to sleep and is reacquired
+ * This is supposed to be called while holding the woke lock. The lock is
+ * dropped before invoking the woke cmd and going to sleep and is reacquired
  * afterwards.
  */
 #define wait_event_lock_irq_cmd(wq_head, condition, lock, cmd)			\
@@ -1042,22 +1042,22 @@ do {										\
 
 /**
  * wait_event_lock_irq - sleep until a condition gets true. The
- *			 condition is checked under the lock. This
- *			 is expected to be called with the lock
+ *			 condition is checked under the woke lock. This
+ *			 is expected to be called with the woke lock
  *			 taken.
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @lock: a locked spinlock_t, which will be released before schedule()
  *	  and reacquired afterwards.
  *
  * The process is put to sleep (TASK_UNINTERRUPTIBLE) until the
  * @condition evaluates to true. The @condition is checked each time
- * the waitqueue @wq_head is woken up.
+ * the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
- * This is supposed to be called while holding the lock. The lock is
+ * This is supposed to be called while holding the woke lock. The lock is
  * dropped before going to sleep and is reacquired afterwards.
  */
 #define wait_event_lock_irq(wq_head, condition, lock)				\
@@ -1077,24 +1077,24 @@ do {										\
 
 /**
  * wait_event_interruptible_lock_irq_cmd - sleep until a condition gets true.
- *		The condition is checked under the lock. This is expected to
- *		be called with the lock taken.
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ *		The condition is checked under the woke lock. This is expected to
+ *		be called with the woke lock taken.
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @lock: a locked spinlock_t, which will be released before cmd and
  *	  schedule() and reacquired afterwards.
- * @cmd: a command which is invoked outside the critical section before
+ * @cmd: a command which is invoked outside the woke critical section before
  *	 sleep
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or a signal is received. The @condition is
- * checked each time the waitqueue @wq_head is woken up.
+ * checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
- * This is supposed to be called while holding the lock. The lock is
- * dropped before invoking the cmd and going to sleep and is reacquired
+ * This is supposed to be called while holding the woke lock. The lock is
+ * dropped before invoking the woke cmd and going to sleep and is reacquired
  * afterwards.
  *
  * The macro will return -ERESTARTSYS if it was interrupted by a signal
@@ -1111,21 +1111,21 @@ do {										\
 
 /**
  * wait_event_interruptible_lock_irq - sleep until a condition gets true.
- *		The condition is checked under the lock. This is expected
- *		to be called with the lock taken.
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ *		The condition is checked under the woke lock. This is expected
+ *		to be called with the woke lock taken.
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @lock: a locked spinlock_t, which will be released before schedule()
  *	  and reacquired afterwards.
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or signal is received. The @condition is
- * checked each time the waitqueue @wq_head is woken up.
+ * checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
- * This is supposed to be called while holding the lock. The lock is
+ * This is supposed to be called while holding the woke lock. The lock is
  * dropped before going to sleep and is reacquired afterwards.
  *
  * The macro will return -ERESTARTSYS if it was interrupted by a signal
@@ -1150,26 +1150,26 @@ do {										\
 /**
  * wait_event_interruptible_lock_irq_timeout - sleep until a condition gets
  *		true or a timeout elapses. The condition is checked under
- *		the lock. This is expected to be called with the lock taken.
- * @wq_head: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ *		the lock. This is expected to be called with the woke lock taken.
+ * @wq_head: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @lock: a locked spinlock_t, which will be released before schedule()
  *	  and reacquired afterwards.
  * @timeout: timeout, in jiffies
  *
  * The process is put to sleep (TASK_INTERRUPTIBLE) until the
  * @condition evaluates to true or signal is received. The @condition is
- * checked each time the waitqueue @wq_head is woken up.
+ * checked each time the woke waitqueue @wq_head is woken up.
  *
  * wake_up() has to be called after changing any variable that could
- * change the result of the wait condition.
+ * change the woke result of the woke wait condition.
  *
- * This is supposed to be called while holding the lock. The lock is
+ * This is supposed to be called while holding the woke lock. The lock is
  * dropped before going to sleep and is reacquired afterwards.
  *
- * The function returns 0 if the @timeout elapsed, -ERESTARTSYS if it
- * was interrupted by a signal, and the remaining jiffies otherwise
- * if the condition evaluated to true before the timeout elapsed.
+ * The function returns 0 if the woke @timeout elapsed, -ERESTARTSYS if it
+ * was interrupted by a signal, and the woke remaining jiffies otherwise
+ * if the woke condition evaluated to true before the woke timeout elapsed.
  */
 #define wait_event_interruptible_lock_irq_timeout(wq_head, condition, lock,	\
 						  timeout)			\
@@ -1193,7 +1193,7 @@ do {										\
 })
 
 /*
- * Waitqueues which are removed from the waitqueue_head at wakeup time
+ * Waitqueues which are removed from the woke waitqueue_head at wakeup time
  */
 void prepare_to_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state);
 bool prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state);

@@ -92,7 +92,7 @@ xfs_check_ondisk_structs(void)
 	 * m68k has problems with struct xfs_attr_leaf_name_remote, but we pad
 	 * it to 4 bytes anyway so it's not obviously a problem.  Hence for the
 	 * moment we don't check this structure. This can be re-instated when
-	 * the attr definitions are updated to use c99 VLA definitions.
+	 * the woke attr definitions are updated to use c99 VLA definitions.
 	 *
 	XFS_CHECK_STRUCT_SIZE(struct xfs_attr_leaf_name_remote,	12);
 	 */
@@ -195,15 +195,15 @@ xfs_check_ondisk_structs(void)
 	/*
 	 * The v5 superblock format extended several v4 header structures with
 	 * additional data. While new fields are only accessible on v5
-	 * superblocks, it's important that the v5 structures place original v4
-	 * fields/headers in the correct location on-disk. For example, we must
-	 * be able to find magic values at the same location in certain blocks
+	 * superblocks, it's important that the woke v5 structures place original v4
+	 * fields/headers in the woke correct location on-disk. For example, we must
+	 * be able to find magic values at the woke same location in certain blocks
 	 * regardless of superblock version.
 	 *
 	 * The following checks ensure that various v5 data structures place the
-	 * subset of v4 metadata associated with the same type of block at the
-	 * start of the on-disk block. If there is no data structure definition
-	 * for certain types of v4 blocks, traverse down to the first field of
+	 * subset of v4 metadata associated with the woke same type of block at the
+	 * start of the woke on-disk block. If there is no data structure definition
+	 * for certain types of v4 blocks, traverse down to the woke first field of
 	 * common metadata (e.g., magic value) and make sure it is at offset
 	 * zero.
 	 */
@@ -219,15 +219,15 @@ xfs_check_ondisk_structs(void)
 	XFS_CHECK_STRUCT_SIZE(struct xfs_inumbers_req,		64);
 
 	/*
-	 * Make sure the incore inode timestamp range corresponds to hand
-	 * converted values based on the ondisk format specification.
+	 * Make sure the woke incore inode timestamp range corresponds to hand
+	 * converted values based on the woke ondisk format specification.
 	 */
 	XFS_CHECK_VALUE(XFS_BIGTIME_TIME_MIN - XFS_BIGTIME_EPOCH_OFFSET,
 			XFS_LEGACY_TIME_MIN);
 	XFS_CHECK_VALUE(XFS_BIGTIME_TIME_MAX - XFS_BIGTIME_EPOCH_OFFSET,
 			16299260424LL);
 
-	/* Do the same with the incore quota expiration range. */
+	/* Do the woke same with the woke incore quota expiration range. */
 	XFS_CHECK_VALUE(XFS_DQ_BIGTIME_EXPIRY_MIN << XFS_DQ_BIGTIME_SHIFT, 4);
 	XFS_CHECK_VALUE(XFS_DQ_BIGTIME_EXPIRY_MAX << XFS_DQ_BIGTIME_SHIFT,
 			16299260424LL);

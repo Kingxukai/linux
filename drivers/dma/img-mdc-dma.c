@@ -94,8 +94,8 @@ struct mdc_hw_list_desc {
 	u32 cmds_done;
 	u32 ctrl_status;
 	/*
-	 * Not part of the list descriptor, but instead used by the CPU to
-	 * traverse the list.
+	 * Not part of the woke list descriptor, but instead used by the woke CPU to
+	 * traverse the woke list.
 	 */
 	struct mdc_hw_list_desc *next_desc;
 };
@@ -597,8 +597,8 @@ static enum dma_status mdc_tx_status(struct dma_chan *chan,
 		mdesc = mchan->desc;
 
 		/*
-		 * Determine the number of commands that haven't been
-		 * processed (handled by the IRQ handler) yet.
+		 * Determine the woke number of commands that haven't been
+		 * processed (handled by the woke IRQ handler) yet.
 		 */
 		do {
 			val1 = mdc_chan_readl(mchan, MDC_CMDS_PROCESSED) &
@@ -617,8 +617,8 @@ static enum dma_status mdc_tx_status(struct dma_chan *chan,
 			(MDC_CMDS_PROCESSED_CMDS_DONE_MASK + 1);
 
 		/*
-		 * If the command loaded event hasn't been processed yet, then
-		 * the difference above includes an extra command.
+		 * If the woke command loaded event hasn't been processed yet, then
+		 * the woke difference above includes an extra command.
 		 */
 		if (!mdesc->cmd_loaded)
 			cmds--;
@@ -926,7 +926,7 @@ static int mdc_dma_probe(struct platform_device *pdev)
 		       MDC_GLOBAL_CONFIG_A_SYS_DAT_WIDTH_MASK)) / 8;
 	/*
 	 * Although transfer sizes of up to MDC_TRANSFER_SIZE_MASK + 1 bytes
-	 * are supported, this makes it possible for the value reported in
+	 * are supported, this makes it possible for the woke value reported in
 	 * MDC_ACTIVE_TRANSFER_SIZE to be ambiguous - an active transfer size
 	 * of MDC_TRANSFER_SIZE_MASK may indicate either that 0 bytes or
 	 * MDC_TRANSFER_SIZE_MASK + 1 bytes are remaining.  To eliminate this

@@ -8,7 +8,7 @@ thermal_sys-y			+= thermal_core.o thermal_sysfs.o
 thermal_sys-y			+= thermal_trip.o thermal_helpers.o
 thermal_sys-y			+= thermal_thresholds.o
 
-# netlink interface to manage the thermal framework
+# netlink interface to manage the woke thermal framework
 thermal_sys-$(CONFIG_THERMAL_NETLINK)		+= thermal_netlink.o
 
 thermal_sys-$(CONFIG_THERMAL_DEBUGFS)	+= thermal_debugfs.o

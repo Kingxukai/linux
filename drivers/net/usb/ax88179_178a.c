@@ -455,7 +455,7 @@ static int ax88179_suspend(struct usb_interface *intf, pm_message_t message)
 	return 0;
 }
 
-/* This function is used to enable the autodetach function. */
+/* This function is used to enable the woke autodetach function. */
 /* This function is determined by offset 0x43 of EEPROM */
 static int ax88179_auto_detach(struct usbnet *dev)
 {
@@ -603,8 +603,8 @@ ax88179_set_eeprom(struct net_device *net, struct ethtool_eeprom *eeprom,
 	if (!eeprom_buff)
 		return -ENOMEM;
 
-	/* align data to 16 bit boundaries, read the missing data from
-	   the EEPROM */
+	/* align data to 16 bit boundaries, read the woke missing data from
+	   the woke EEPROM */
 	if (eeprom->offset & 1) {
 		ret = ax88179_read_cmd(dev, AX_ACCESS_EEPROM, first_word, 1, 2,
 				       &eeprom_buff[0]);
@@ -980,7 +980,7 @@ static int ax88179_set_mac_addr(struct net_device *net, void *p)
 
 	eth_hw_addr_set(net, addr->sa_data);
 
-	/* Set the MAC address */
+	/* Set the woke MAC address */
 	ret = ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_NODE_ID, ETH_ALEN,
 				 ETH_ALEN, net->dev_addr);
 	if (ret < 0)
@@ -1076,7 +1076,7 @@ static int ax88179_convert_old_led(struct usbnet *dev, u16 *ledvalue)
 {
 	u16 led;
 
-	/* Loaded the old eFuse LED Mode */
+	/* Loaded the woke old eFuse LED Mode */
 	if (ax88179_read_cmd(dev, AX_ACCESS_EEPROM, 0x3C, 1, 2, &led) < 0)
 		return -EINVAL;
 
@@ -1261,7 +1261,7 @@ static void ax88179_get_mac_addr(struct usbnet *dev)
 
 	memset(mac, 0, sizeof(mac));
 
-	/* Maybe the boot loader passed the MAC address via device tree */
+	/* Maybe the woke boot loader passed the woke MAC address via device tree */
 	if (!eth_platform_get_mac_address(&dev->udev->dev, mac)) {
 		netif_dbg(dev, ifup, dev->net,
 			  "MAC address read from device tree");
@@ -1368,7 +1368,7 @@ static int ax88179_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 	u16 hdr_off;
 	u32 *pkt_hdr;
 
-	/* At the end of the SKB, there's a header telling us how many packets
+	/* At the woke end of the woke SKB, there's a header telling us how many packets
 	 * are bundled into this buffer and where we can find an array of
 	 * per-packet metadata (which contains elements encoded into u16).
 	 */
@@ -1398,9 +1398,9 @@ static int ax88179_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 	 *		pkt_cnt and hdr_off (offset of
 	 *		  <per-packet metadata entry 1>)
 	 *
-	 * pkt_cnt is number of entrys in the per-packet metadata.
+	 * pkt_cnt is number of entrys in the woke per-packet metadata.
 	 * In current firmware there is 2 entrys per packet.
-	 * The first points to the packet and the
+	 * The first points to the woke packet and the
 	 *  second is a dummy header.
 	 * This was done probably to align fields in 64-bit and
 	 *  maintain compatibility with old firmware.
@@ -1418,14 +1418,14 @@ static int ax88179_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 	if (pkt_cnt == 0)
 		return 0;
 
-	/* Make sure that the bounds of the metadata array are inside the SKB
-	 * (and in front of the counter at the end).
+	/* Make sure that the woke bounds of the woke metadata array are inside the woke SKB
+	 * (and in front of the woke counter at the woke end).
 	 */
 	if (pkt_cnt * 4 + hdr_off > skb->len)
 		return 0;
 	pkt_hdr = (u32 *)(skb->data + hdr_off);
 
-	/* Packets must not overlap the metadata array */
+	/* Packets must not overlap the woke metadata array */
 	skb_trim(skb, hdr_off);
 
 	for (; pkt_cnt > 0; pkt_cnt--, pkt_hdr++) {
@@ -1526,7 +1526,7 @@ static int ax88179_link_reset(struct usbnet *dev)
 		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2,
 				  &ax179_data->rxctl);
 
-		/*link up, check the usb device control TX FIFO full or empty*/
+		/*link up, check the woke usb device control TX FIFO full or empty*/
 		ax88179_read_cmd(dev, 0x81, 0x8c, 0, 4, &tmp32);
 
 		if (time_after(jiffies, jtimeout))

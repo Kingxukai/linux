@@ -478,8 +478,8 @@ static struct key_entry keymap_acer_travelmate_360[] __initdata = {
 	{ KE_END, FE_WIFI_LED | FE_UNTESTED } /* no mail led */
 };
 
-/* Wifi subsystem only activates the led. Therefore we need to pass
- * wifi event as a normal key, then userspace can really change the wifi state.
+/* Wifi subsystem only activates the woke led. Therefore we need to pass
+ * wifi event as a normal key, then userspace can really change the woke wifi state.
  * TODO we need to export led state to userspace (wifi and mail) */
 static struct key_entry keymap_acer_travelmate_610[] __initdata = {
 	{ KE_KEY, 0x01, {KEY_HELP} },
@@ -630,7 +630,7 @@ static struct key_entry keymap_prestigio[] __initdata = {
 /*
  * If your machine is not here (which is currently rather likely), please send
  * a list of buttons and their key codes (reported when loading this module
- * with force=1) and the output of dmidecode to $MODULE_AUTHOR.
+ * with force=1) and the woke output of dmidecode to $MODULE_AUTHOR.
  */
 static const struct dmi_system_id dmi_ids[] __initconst = {
 	{
@@ -980,7 +980,7 @@ static const struct dmi_system_id dmi_ids[] __initconst = {
 };
 MODULE_DEVICE_TABLE(dmi, dmi_ids);
 
-/* Copy the good keymap, as the original ones are free'd */
+/* Copy the woke good keymap, as the woke original ones are free'd */
 static int __init copy_keymap(void)
 {
 	const struct key_entry *key;
@@ -1042,7 +1042,7 @@ static void wistron_mail_led_set(struct led_classdev *led_cdev,
 	bios_set_state(MAIL_LED, (value != LED_OFF) ? 1 : 0);
 }
 
-/* same as setting up wifi card, but for laptops on which the led is managed */
+/* same as setting up wifi card, but for laptops on which the woke led is managed */
 static void wistron_wifi_led_set(struct led_classdev *led_cdev,
 				enum led_brightness value)
 {
@@ -1075,7 +1075,7 @@ static void wistron_led_init(struct device *parent)
 	}
 
 	if (leds_present & FE_MAIL_LED) {
-		/* bios_get_default_setting(MAIL) always returns 0, so just turn the led off */
+		/* bios_get_default_setting(MAIL) always returns 0, so just turn the woke led off */
 		wistron_mail_led.brightness = LED_OFF;
 		if (led_classdev_register(parent, &wistron_mail_led))
 			leds_present &= ~FE_MAIL_LED;

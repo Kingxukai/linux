@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Mixer controls for the Xonar DG/DGX
+ * Mixer controls for the woke Xonar DG/DGX
  *
  * Copyright (c) Clemens Ladisch <clemens@ladisch.de>
  * Copyright (c) Roman Volkov <v1ron@mail.ru>

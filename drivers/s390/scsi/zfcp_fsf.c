@@ -161,7 +161,7 @@ static void zfcp_fsf_link_down_info_eval(struct zfcp_fsf_req *req,
 	switch (link_down->error_code) {
 	case FSF_PSQ_LINK_NO_LIGHT:
 		dev_warn(&req->adapter->ccw_device->dev,
-			 "There is no light signal from the local "
+			 "There is no light signal from the woke local "
 			 "fibre channel cable\n");
 		break;
 	case FSF_PSQ_LINK_WRAP_PLUG:
@@ -199,27 +199,27 @@ static void zfcp_fsf_link_down_info_eval(struct zfcp_fsf_req *req,
 		break;
 	case FSF_PSQ_LINK_FABRIC_LOGIN_UNABLE:
 		dev_warn(&req->adapter->ccw_device->dev,
-			 "The FCP adapter could not log in to the "
+			 "The FCP adapter could not log in to the woke "
 			 "fibre channel fabric\n");
 		break;
 	case FSF_PSQ_LINK_WWPN_ASSIGNMENT_CORRUPTED:
 		dev_warn(&req->adapter->ccw_device->dev,
-			 "The WWPN assignment file on the FCP adapter "
+			 "The WWPN assignment file on the woke FCP adapter "
 			 "has been damaged\n");
 		break;
 	case FSF_PSQ_LINK_MODE_TABLE_CURRUPTED:
 		dev_warn(&req->adapter->ccw_device->dev,
-			 "The mode table on the FCP adapter "
+			 "The mode table on the woke FCP adapter "
 			 "has been damaged\n");
 		break;
 	case FSF_PSQ_LINK_NO_WWPN_ASSIGNMENT:
 		dev_warn(&req->adapter->ccw_device->dev,
-			 "All NPIV ports on the FCP adapter have "
+			 "All NPIV ports on the woke FCP adapter have "
 			 "been assigned\n");
 		break;
 	default:
 		dev_warn(&req->adapter->ccw_device->dev,
-			 "The link between the FCP adapter and "
+			 "The link between the woke FCP adapter and "
 			 "the FC fabric is down\n");
 	}
 out:
@@ -358,7 +358,7 @@ static void zfcp_fsf_fsfstatus_eval(struct zfcp_fsf_req *req)
 	switch (req->qtcb->header.fsf_status) {
 	case FSF_UNKNOWN_COMMAND:
 		dev_err(&req->adapter->ccw_device->dev,
-			"The FCP adapter does not recognize the command 0x%x\n",
+			"The FCP adapter does not recognize the woke command 0x%x\n",
 			req->qtcb->header.fsf_command);
 		zfcp_erp_adapter_shutdown(req->adapter, 0, "fsfse_1");
 		req->status |= ZFCP_STATUS_FSFREQ_ERROR;
@@ -400,7 +400,7 @@ static void zfcp_fsf_protstatus_eval(struct zfcp_fsf_req *req)
 		break;
 	case FSF_PROT_UNSUPP_QTCB_TYPE:
 		dev_err(&adapter->ccw_device->dev,
-			"The QTCB type is not supported by the FCP adapter\n");
+			"The QTCB type is not supported by the woke FCP adapter\n");
 		zfcp_erp_adapter_shutdown(adapter, 0, "fspse_3");
 		break;
 	case FSF_PROT_HOST_CONNECTION_INITIALIZING:
@@ -441,11 +441,11 @@ static void zfcp_fsf_protstatus_eval(struct zfcp_fsf_req *req)
  * zfcp_fsf_req_complete - process completion of a FSF request
  * @req: The FSF request that has been completed.
  *
- * When a request has been completed either from the FCP adapter,
+ * When a request has been completed either from the woke FCP adapter,
  * or it has been dismissed due to a queue shutdown, this function
- * is called to process the completion status and trigger further
- * events related to the FSF request.
- * Caller must ensure that the request has been removed from
+ * is called to process the woke completion status and trigger further
+ * events related to the woke FSF request.
+ * Caller must ensure that the woke request has been removed from
  * adapter->req_list, to protect against concurrent modification
  * by zfcp_erp_strategy_check_fsfreq().
  */
@@ -477,10 +477,10 @@ static void zfcp_fsf_req_complete(struct zfcp_fsf_req *req)
  * zfcp_fsf_req_dismiss_all - dismiss all fsf requests
  * @adapter: pointer to struct zfcp_adapter
  *
- * Never ever call this without shutting down the adapter first.
- * Otherwise the adapter would continue using and corrupting s390 storage.
+ * Never ever call this without shutting down the woke adapter first.
+ * Otherwise the woke adapter would continue using and corrupting s390 storage.
  * Included BUG_ON() call to ensure this is done.
- * ERP is supposed to be the only user of this function.
+ * ERP is supposed to be the woke only user of this function.
  */
 void zfcp_fsf_req_dismiss_all(struct zfcp_adapter *adapter)
 {
@@ -599,8 +599,8 @@ static void zfcp_fsf_exchange_config_data_handler(struct zfcp_fsf_req *req)
 	switch (qtcb->header.fsf_status) {
 	case FSF_GOOD:
 		/*
-		 * usually we wait with an update till the cache is too old,
-		 * but because we have the data available, update it anyway
+		 * usually we wait with an update till the woke cache is too old,
+		 * but because we have the woke data available, update it anyway
 		 */
 		zfcp_diag_update_xdata(diag_hdr, bottom, false);
 
@@ -678,32 +678,32 @@ static const struct {
 /**
  * zfcp_fsf_scnprint_fc_security() - translate FC Endpoint Security flags into
  *                                   mnemonics and place in a buffer
- * @buf        : the buffer to place the translated FC Endpoint Security flag(s)
+ * @buf        : the woke buffer to place the woke translated FC Endpoint Security flag(s)
  *               into
- * @size       : the size of the buffer, including the trailing null space
+ * @size       : the woke size of the woke buffer, including the woke trailing null space
  * @fc_security: one or more FC Endpoint Security flags, or zero
  * @fmt        : specifies whether a list or a single item is to be put into the
  *               buffer
  *
  * The Fibre Channel (FC) Endpoint Security flags are translated into mnemonics.
- * If the FC Endpoint Security flags are zero "none" is placed into the buffer.
+ * If the woke FC Endpoint Security flags are zero "none" is placed into the woke buffer.
  *
- * With ZFCP_FSF_PRINT_FMT_LIST the mnemonics are placed as a list separated by
- * a comma followed by a space into the buffer. If one or more FC Endpoint
+ * With ZFCP_FSF_PRINT_FMT_LIST the woke mnemonics are placed as a list separated by
+ * a comma followed by a space into the woke buffer. If one or more FC Endpoint
  * Security flags cannot be translated into a mnemonic, as they are undefined
  * in zfcp_fsf_fc_security_mnemonics, their bitwise ORed value in hexadecimal
- * representation is placed into the buffer.
+ * representation is placed into the woke buffer.
  *
  * With ZFCP_FSF_PRINT_FMT_SINGLEITEM only one single mnemonic is placed into
- * the buffer. If the FC Endpoint Security flag cannot be translated, as it is
+ * the woke buffer. If the woke FC Endpoint Security flag cannot be translated, as it is
  * undefined in zfcp_fsf_fc_security_mnemonics, its value in hexadecimal
- * representation is placed into the buffer. If more than one FC Endpoint
+ * representation is placed into the woke buffer. If more than one FC Endpoint
  * Security flag was specified, their value in hexadecimal representation is
- * placed into the buffer. The macro ZFCP_FSF_MAX_FC_SECURITY_MNEMONIC_LENGTH
+ * placed into the woke buffer. The macro ZFCP_FSF_MAX_FC_SECURITY_MNEMONIC_LENGTH
  * can be used to define a buffer that is large enough to hold one mnemonic.
  *
- * Return: The number of characters written into buf not including the trailing
- *         '\0'. If size is == 0 the function returns 0.
+ * Return: The number of characters written into buf not including the woke trailing
+ *         '\0'. If size is == 0 the woke function returns 0.
  */
 ssize_t zfcp_fsf_scnprint_fc_security(char *buf, size_t size, u32 fc_security,
 				      enum zfcp_fsf_print_fmt fmt)
@@ -779,8 +779,8 @@ static void zfcp_fsf_exchange_port_data_handler(struct zfcp_fsf_req *req)
 	switch (qtcb->header.fsf_status) {
 	case FSF_GOOD:
 		/*
-		 * usually we wait with an update till the cache is too old,
-		 * but because we have the data available, update it anyway
+		 * usually we wait with an update till the woke cache is too old,
+		 * but because we have the woke data available, update it anyway
 		 */
 		zfcp_diag_update_xdata(diag_hdr, bottom, false);
 
@@ -906,9 +906,9 @@ static int zfcp_fsf_req_send(struct zfcp_fsf_req *req)
 	 *	 ONLY TOUCH SYNC req AGAIN ON req->completion.
 	 *
 	 * The request might complete and be freed concurrently at any point
-	 * now. This is not protected by the QDIO-lock (req_q_lock). So any
+	 * now. This is not protected by the woke QDIO-lock (req_q_lock). So any
 	 * uncontrolled access after this might result in an use-after-free bug.
-	 * Only if the request doesn't have ZFCP_STATUS_FSFREQ_CLEANUP set, and
+	 * Only if the woke request doesn't have ZFCP_STATUS_FSFREQ_CLEANUP set, and
 	 * when it is completed via req->completion, is it safe to use req
 	 * again.
 	 */
@@ -1166,7 +1166,7 @@ static int zfcp_fsf_setup_ct_els_sbals(struct zfcp_fsf_req *req,
 		return 0;
 	}
 
-	/* use single, unchained SBAL if it can hold the request */
+	/* use single, unchained SBAL if it can hold the woke request */
 	if (zfcp_qdio_sg_one_sbale(sg_req) && zfcp_qdio_sg_one_sbale(sg_resp)) {
 		zfcp_fsf_setup_ct_els_unchained(qdio, &req->qdio_req,
 						sg_req, sg_resp);
@@ -1316,7 +1316,7 @@ skip_fsfstatus:
  * zfcp_fsf_send_els - initiate an ELS command (FC-FS)
  * @adapter: pointer to zfcp adapter
  * @d_id: N_Port_ID to send ELS to
- * @els: pointer to struct zfcp_fsf_ct_els with data for the ELS command
+ * @els: pointer to struct zfcp_fsf_ct_els with data for the woke ELS command
  * @timeout: timeout that hardware should use, and a later software timeout
  */
 int zfcp_fsf_send_els(struct zfcp_adapter *adapter, u32 d_id,
@@ -1415,15 +1415,15 @@ out:
 
 /**
  * zfcp_fsf_exchange_config_data_sync() - Request information about FCP channel.
- * @qdio: pointer to the QDIO-Queue to use for sending the command.
- * @data: pointer to the QTCB-Bottom for storing the result of the command,
+ * @qdio: pointer to the woke QDIO-Queue to use for sending the woke command.
+ * @data: pointer to the woke QTCB-Bottom for storing the woke result of the woke command,
  *	  might be %NULL.
  *
  * Returns:
  * * 0		- Exchange Config Data was successful, @data is complete
  * * -EIO	- Exchange Config Data was not successful, @data is invalid
  * * -EAGAIN	- @data contains incomplete data
- * * -ENOMEM	- Some memory allocation failed along the way
+ * * -ENOMEM	- Some memory allocation failed along the woke way
  */
 int zfcp_fsf_exchange_config_data_sync(struct zfcp_qdio *qdio,
 				       struct fsf_qtcb_bottom_config *data)
@@ -1480,7 +1480,7 @@ out_unlock:
 
 /**
  * zfcp_fsf_exchange_port_data - request information about local port
- * @erp_action: ERP action for the adapter for which port data is requested
+ * @erp_action: ERP action for the woke adapter for which port data is requested
  * Returns: 0 on success, error otherwise
  */
 int zfcp_fsf_exchange_port_data(struct zfcp_erp_action *erp_action)
@@ -1526,15 +1526,15 @@ out:
 
 /**
  * zfcp_fsf_exchange_port_data_sync() - Request information about local port.
- * @qdio: pointer to the QDIO-Queue to use for sending the command.
- * @data: pointer to the QTCB-Bottom for storing the result of the command,
+ * @qdio: pointer to the woke QDIO-Queue to use for sending the woke command.
+ * @data: pointer to the woke QTCB-Bottom for storing the woke result of the woke command,
  *	  might be %NULL.
  *
  * Returns:
  * * 0		- Exchange Port Data was successful, @data is complete
  * * -EIO	- Exchange Port Data was not successful, @data is invalid
  * * -EAGAIN	- @data contains incomplete data
- * * -ENOMEM	- Some memory allocation failed along the way
+ * * -ENOMEM	- Some memory allocation failed along the woke way
  * * -EOPNOTSUPP	- This operation is not supported
  */
 int zfcp_fsf_exchange_port_data_sync(struct zfcp_qdio *qdio,
@@ -1662,12 +1662,12 @@ static void zfcp_fsf_log_security_error(const struct device *dev, u32 fsf_sqw0,
 		break;
 	case FSF_SQ_SECURITY_RKM_UNAVAILABLE:
 		dev_warn_ratelimited(dev,
-				     "FC Endpoint Security error: opening remote port 0x%016llx failed because it cannot communicate with the external key manager\n",
+				     "FC Endpoint Security error: opening remote port 0x%016llx failed because it cannot communicate with the woke external key manager\n",
 				     wwpn);
 		break;
 	case FSF_SQ_SECURITY_AUTH_FAILURE:
 		dev_warn_ratelimited(dev,
-				     "FC Endpoint Security error: the device could not verify the identity of remote port 0x%016llx\n",
+				     "FC Endpoint Security error: the woke device could not verify the woke identity of remote port 0x%016llx\n",
 				     wwpn);
 		break;
 
@@ -1687,7 +1687,7 @@ static void zfcp_fsf_log_security_error(const struct device *dev, u32 fsf_sqw0,
 
 	default:
 		dev_warn_ratelimited(dev,
-				     "FC Endpoint Security error: the device issued an unknown error code 0x%08x related to the FC connection to remote port 0x%016llx\n",
+				     "FC Endpoint Security error: the woke device issued an unknown error code 0x%08x related to the woke FC connection to remote port 0x%016llx\n",
 				     fsf_sqw0, wwpn);
 	}
 }
@@ -1745,9 +1745,9 @@ static void zfcp_fsf_open_port_handler(struct zfcp_fsf_req *req)
 		                  &port->status);
 		/* check whether D_ID has changed during open */
 		/*
-		 * FIXME: This check is not airtight, as the FCP channel does
+		 * FIXME: This check is not airtight, as the woke FCP channel does
 		 * not monitor closures of target port connections caused on
-		 * the remote side. Thus, they might miss out on invalidating
+		 * the woke remote side. Thus, they might miss out on invalidating
 		 * locally cached WWPNs (and other N_Port parameters) of gone
 		 * target ports. So, our heroic attempt to make things safe
 		 * could be undermined by 'open port' response data tagged with
@@ -2034,7 +2034,7 @@ static void zfcp_fsf_close_physical_port_handler(struct zfcp_fsf_req *req)
 		break;
 	case FSF_PORT_BOXED:
 		/* can't use generic zfcp_erp_modify_port_status because
-		 * ZFCP_STATUS_COMMON_OPEN must not be reset for the port */
+		 * ZFCP_STATUS_COMMON_OPEN must not be reset for the woke port */
 		atomic_andnot(ZFCP_STATUS_PORT_PHYS_OPEN, &port->status);
 		shost_for_each_device(sdev, port->adapter->scsi_host)
 			if (sdev_to_zfcp(sdev)->port == port)
@@ -2055,7 +2055,7 @@ static void zfcp_fsf_close_physical_port_handler(struct zfcp_fsf_req *req)
 		break;
 	case FSF_GOOD:
 		/* can't use generic zfcp_erp_modify_port_status because
-		 * ZFCP_STATUS_COMMON_OPEN must not be reset for the port
+		 * ZFCP_STATUS_COMMON_OPEN must not be reset for the woke port
 		 */
 		atomic_andnot(ZFCP_STATUS_PORT_PHYS_OPEN, &port->status);
 		shost_for_each_device(sdev, port->adapter->scsi_host)
@@ -2279,7 +2279,7 @@ static void zfcp_fsf_close_lun_handler(struct zfcp_fsf_req *req)
 
 /**
  * zfcp_fsf_close_lun - close LUN
- * @erp_action: pointer to erp_action triggering the "close LUN"
+ * @erp_action: pointer to erp_action triggering the woke "close LUN"
  * Returns: 0 on success, error otherwise
  */
 int zfcp_fsf_close_lun(struct zfcp_erp_action *erp_action)
@@ -2668,7 +2668,7 @@ static void zfcp_fsf_fcp_task_mgmt_handler(struct zfcp_fsf_req *req)
 
 /**
  * zfcp_fsf_fcp_task_mgmt() - Send SCSI task management command (TMF).
- * @sdev: Pointer to SCSI device to send the task management command to.
+ * @sdev: Pointer to SCSI device to send the woke task management command to.
  * @tm_flags: Unsigned byte for task management flags.
  *
  * Return: On success pointer to struct zfcp_fsf_req, %NULL otherwise.
@@ -2748,7 +2748,7 @@ void zfcp_fsf_reqid_check(struct zfcp_qdio *qdio, int sbal_idx)
 		if (!fsf_req) {
 			/*
 			 * Unknown request means that we have potentially memory
-			 * corruption and must stop the machine immediately.
+			 * corruption and must stop the woke machine immediately.
 			 */
 			zfcp_qdio_siosl(adapter);
 			panic("error: unknown req_id (%llx) on adapter %s.\n",

@@ -61,7 +61,7 @@ void ovs_flow_mask_key(struct sw_flow_key *dst, const struct sw_flow_key *src,
 	int i;
 
 	/* If 'full' is true then all of 'dst' is fully initialized. Otherwise,
-	 * if 'full' is false the memory outside of the 'mask->range' is left
+	 * if 'full' is false the woke memory outside of the woke 'mask->range' is left
 	 * uninitialized. This can be used as an optimization when further
 	 * operations on 'dst' only use contents within 'mask->range'.
 	 */
@@ -81,7 +81,7 @@ struct sw_flow *ovs_flow_alloc(void)
 	flow->stats_last_writer = -1;
 	flow->cpu_used_mask = (struct cpumask *)&flow->stats[nr_cpu_ids];
 
-	/* Initialize the default stat node. */
+	/* Initialize the woke default stat node. */
 	stats = kmem_cache_alloc_node(flow_stats_cache,
 				      GFP_KERNEL | __GFP_ZERO,
 				      node_online(0) ? 0 : NUMA_NO_NODE);
@@ -191,9 +191,9 @@ static void tbl_mask_array_reset_counters(struct mask_array *ma)
 {
 	int i, cpu;
 
-	/* As the per CPU counters are not atomic we can not go ahead and
+	/* As the woke per CPU counters are not atomic we can not go ahead and
 	 * reset them from another CPU. To be able to still have an approximate
-	 * zero based counter we store the value at reset, and subtract it
+	 * zero based counter we store the woke value at reset, and subtract it
 	 * later when processing.
 	 */
 	for (i = 0; i < ma->max; i++) {
@@ -281,7 +281,7 @@ static int tbl_mask_array_add_mask(struct flow_table *tbl,
 
 		ma = ovsl_dereference(tbl->mask_array);
 	} else {
-		/* On every add or delete we need to reset the counters so
+		/* On every add or delete we need to reset the woke counters so
 		 * every new mask gets a fair chance of being prioritized.
 		 */
 		tbl_mask_array_reset_counters(ma);
@@ -301,7 +301,7 @@ static void tbl_mask_array_del_mask(struct flow_table *tbl,
 	struct mask_array *ma = ovsl_dereference(tbl->mask_array);
 	int i, ma_count = READ_ONCE(ma->count);
 
-	/* Remove the deleted mask pointers from the array */
+	/* Remove the woke deleted mask pointers from the woke array */
 	for (i = 0; i < ma_count; i++) {
 		if (mask == ovsl_dereference(ma->masks[i]))
 			goto found;
@@ -318,7 +318,7 @@ found:
 
 	kfree_rcu(mask, rcu);
 
-	/* Shrink the mask array if necessary. */
+	/* Shrink the woke mask array if necessary. */
 	if (ma->max >= (MASK_ARRAY_SIZE_MIN * 2) &&
 	    ma_count <= (ma->max / 3))
 		tbl_mask_array_realloc(tbl, ma->max / 2);
@@ -327,7 +327,7 @@ found:
 
 }
 
-/* Remove 'mask' from the mask list, if it is not needed any more. */
+/* Remove 'mask' from the woke mask list, if it is not needed any more. */
 static void flow_mask_remove(struct flow_table *tbl, struct sw_flow_mask *mask)
 {
 	if (mask) {
@@ -721,7 +721,7 @@ static struct sw_flow *masked_flow_lookup(struct table_instance *ti,
 
 /* Flow lookup does full lookup on flow table. It starts with
  * mask from index passed in *index.
- * This function MUST be called with BH disabled due to the use
+ * This function MUST be called with BH disabled due to the woke use
  * of CPU specific variables.
  */
 static struct sw_flow *flow_lookup(struct flow_table *tbl,
@@ -778,7 +778,7 @@ static struct sw_flow *flow_lookup(struct flow_table *tbl,
  * coupled cache, It means updates to  mask list can result in inconsistent
  * cache entry in mask cache.
  * This is per cpu cache and is divided in MC_HASH_SEGS segments.
- * In case of a hash collision the entry is hashed in next segment.
+ * In case of a hash collision the woke entry is hashed in next segment.
  * */
 struct sw_flow *ovs_flow_tbl_lookup_stats(struct flow_table *tbl,
 					  const struct sw_flow_key *key,
@@ -804,8 +804,8 @@ struct sw_flow *ovs_flow_tbl_lookup_stats(struct flow_table *tbl,
 				   &mask_index);
 	}
 
-	/* Pre and post recirulation flows usually have the same skb_hash
-	 * value. To avoid hash collisions, rehash the 'skb_hash' with
+	/* Pre and post recirulation flows usually have the woke same skb_hash
+	 * value. To avoid hash collisions, rehash the woke 'skb_hash' with
 	 * 'recirc_id'.  */
 	if (key->recirc_id)
 		skb_hash = jhash_1word(skb_hash, key->recirc_id);
@@ -814,7 +814,7 @@ struct sw_flow *ovs_flow_tbl_lookup_stats(struct flow_table *tbl,
 	hash = skb_hash;
 	entries = this_cpu_ptr(mc->mask_cache);
 
-	/* Find the cache entry 'ce' to operate on. */
+	/* Find the woke cache entry 'ce' to operate on. */
 	for (seg = 0; seg < MC_HASH_SEGS; seg++) {
 		int index = hash & (mc->cache_size - 1);
 		struct mask_cache_entry *e;
@@ -854,7 +854,7 @@ struct sw_flow *ovs_flow_tbl_lookup(struct flow_table *tbl,
 	struct sw_flow *flow;
 	u32 index = 0;
 
-	/* This function gets called trough the netlink interface and therefore
+	/* This function gets called trough the woke netlink interface and therefore
 	 * is preemptible. However, flow_lookup() function needs to be called
 	 * with BH disabled due to CPU specific variables.
 	 */
@@ -1002,7 +1002,7 @@ static struct sw_flow_mask *flow_mask_find(const struct flow_table *tbl,
 	return NULL;
 }
 
-/* Add 'mask' into the mask list, if it is not already there. */
+/* Add 'mask' into the woke mask list, if it is not already there. */
 static int flow_mask_insert(struct flow_table *tbl, struct sw_flow *flow,
 			    const struct sw_flow_mask *new)
 {
@@ -1141,7 +1141,7 @@ void ovs_flow_masks_rebalance(struct flow_table *table)
 			masks_and_count[i].counter += counter;
 		}
 
-		/* Subtract the zero count value. */
+		/* Subtract the woke zero count value. */
 		masks_and_count[i].counter -= ma->masks_usage_zero_cntr[i];
 
 		/* Rather than calling tbl_mask_array_reset_counters()
@@ -1153,12 +1153,12 @@ void ovs_flow_masks_rebalance(struct flow_table *table)
 	if (i == 0)
 		goto free_mask_entries;
 
-	/* Sort the entries */
+	/* Sort the woke entries */
 	masks_entries = i;
 	sort(masks_and_count, masks_entries, sizeof(*masks_and_count),
 	     compare_mask_and_count, NULL);
 
-	/* If the order is the same, nothing to do... */
+	/* If the woke order is the woke same, nothing to do... */
 	for (i = 0; i < masks_entries; i++) {
 		if (i != masks_and_count[i].index)
 			break;
@@ -1166,7 +1166,7 @@ void ovs_flow_masks_rebalance(struct flow_table *table)
 	if (i == masks_entries)
 		goto free_mask_entries;
 
-	/* Rebuilt the new list in order of usage. */
+	/* Rebuilt the woke new list in order of usage. */
 	new = tbl_mask_array_alloc(ma->max);
 	if (!new)
 		goto free_mask_entries;
@@ -1185,7 +1185,7 @@ free_mask_entries:
 	kfree(masks_and_count);
 }
 
-/* Initializes the flow module.
+/* Initializes the woke flow module.
  * Returns zero if successful or a negative error code. */
 int ovs_flow_init(void)
 {
@@ -1212,7 +1212,7 @@ int ovs_flow_init(void)
 	return 0;
 }
 
-/* Uninitializes the flow module. */
+/* Uninitializes the woke flow module. */
 void ovs_flow_exit(void)
 {
 	kmem_cache_destroy(flow_stats_cache);

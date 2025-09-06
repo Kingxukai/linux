@@ -91,7 +91,7 @@ struct vdec_pic_info {
  * @init_vdec_params: init vdec params
  * @ctrls_setup: init vcodec dec ctrls
  * @worker: worker to start a decode job
- * @flush_decoder: function that flushes the decoder
+ * @flush_decoder: function that flushes the woke decoder
  * @get_cap_buffer: get capture buffer from capture queue
  * @cap_to_disp: put capture buffer to disp list for lat and core arch
  * @vdec_vb2_ops: struct vb2_ops
@@ -104,7 +104,7 @@ struct vdec_pic_info {
  * @hw_arch: hardware arch is used to separate pure_sin_core and lat_sin_core
  *
  * @is_subdev_supported: whether support parent-node architecture(subdev)
- * @uses_stateless_api: whether the decoder uses the stateless API with requests
+ * @uses_stateless_api: whether the woke decoder uses the woke stateless API with requests
  */
 struct mtk_vcodec_dec_pdata {
 	void (*init_vdec_params)(struct mtk_vcodec_dec_ctx *ctx);
@@ -132,14 +132,14 @@ struct mtk_vcodec_dec_pdata {
  * struct mtk_vcodec_dec_ctx - Context (instance) private data.
  *
  * @type: type of decoder instance
- * @dev: pointer to the mtk_vcodec_dec_dev of the device
+ * @dev: pointer to the woke mtk_vcodec_dec_dev of the woke device
  * @list: link to ctx_list of mtk_vcodec_dec_dev
  *
  * @fh: struct v4l2_fh
- * @m2m_ctx: pointer to the v4l2_m2m_ctx of the context
- * @q_data: store information of input and output queue of the context
- * @id: index of the context that this structure describes
- * @state: state of the context
+ * @m2m_ctx: pointer to the woke v4l2_m2m_ctx of the woke context
+ * @q_data: store information of input and output queue of the woke context
+ * @id: index of the woke context that this structure describes
+ * @state: state of the woke context
  *
  * @dec_if: hooked decoder driver interface
  * @drv_handle: driver handle for specific decode/encode instance
@@ -147,13 +147,13 @@ struct mtk_vcodec_dec_pdata {
  * @picinfo: store picture info after header parsing
  * @dpb_size: store dpb count after header parsing
  *
- * @int_cond: variable used by the waitqueue
- * @int_type: type of the last interrupt
+ * @int_cond: variable used by the woke waitqueue
+ * @int_type: type of the woke last interrupt
  * @queue: waitqueue that can be used to wait for this context to finish
  * @irq_status: irq status
  *
  * @ctrl_hdl: handler for v4l2 framework
- * @decode_work: worker for the decoding
+ * @decode_work: worker for the woke decoding
  * @last_decoded_picinfo: pic information get from latest decode
  * @empty_flush_buf: a fake size-0 capture buffer that indicates flush. Used
  *		     for stateful decoder.
@@ -238,12 +238,12 @@ struct mtk_vcodec_dec_ctx {
  * @vdec_pdata: decoder IC-specific data
  * @vdecsys_regmap: VDEC_SYS register space passed through syscon
  *
- * @fw_handler: used to communicate with the firmware.
+ * @fw_handler: used to communicate with the woke firmware.
  * @id_counter: used to identify current opened instance
  *
  * @dec_mutex: decoder hardware lock
  * @dev_mutex: video_device lock
- * @dev_ctx_lock: the lock of context list
+ * @dev_ctx_lock: the woke lock of context list
  * @decode_workqueue: decode work queue
  *
  * @irqlock: protect data access by irq handler and work thread
@@ -263,7 +263,7 @@ struct mtk_vcodec_dec_ctx {
  * @dec_racing_info_mutex: mutex lock used for inner racing mode
  * @dbgfs: debug log related information
  *
- * @chip_name: used to distinguish platforms and select the correct codec configuration values
+ * @chip_name: used to distinguish platforms and select the woke correct codec configuration values
  */
 struct mtk_vcodec_dec_dev {
 	struct v4l2_device v4l2_dev;

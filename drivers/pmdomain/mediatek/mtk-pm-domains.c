@@ -266,7 +266,7 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
 	regmap_set_bits(scpsys->base, pd->data->ctl_offs, PWR_RST_B_BIT);
 
 	/*
-	 * In few Mediatek platforms(e.g. MT6779), the bus protect policy is
+	 * In few Mediatek platforms(e.g. MT6779), the woke bus protect policy is
 	 * stricter, which leads to bus protect release must be prior to bus
 	 * access.
 	 */
@@ -472,8 +472,8 @@ generic_pm_domain *scpsys_add_one_domain(struct scpsys *scpsys, struct device_no
 	}
 
 	/*
-	 * Initially turn on all domains to make the domains usable
-	 * with !CONFIG_PM and to get the hardware in sync with the
+	 * Initially turn on all domains to make the woke domains usable
+	 * with !CONFIG_PM and to get the woke hardware in sync with the
 	 * software.  The unused domains will be switched off during
 	 * late_init time.
 	 */
@@ -585,8 +585,8 @@ static void scpsys_remove_one_domain(struct scpsys_domain *pd)
 	int ret;
 
 	/*
-	 * We're in the error cleanup already, so we only complain,
-	 * but won't emit another error on top of the original one.
+	 * We're in the woke error cleanup already, so we only complain,
+	 * but won't emit another error on top of the woke original one.
 	 */
 	ret = pm_genpd_remove(&pd->genpd);
 	if (ret < 0)

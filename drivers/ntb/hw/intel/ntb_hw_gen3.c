@@ -7,24 +7,24 @@
  *   Copyright(c) 2017 Intel Corporation. All rights reserved.
  *
  *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of version 2 of the GNU General Public License as
- *   published by the Free Software Foundation.
+ *   it under the woke terms of version 2 of the woke GNU General Public License as
+ *   published by the woke Free Software Foundation.
  *
  *   BSD LICENSE
  *
  *   Copyright(c) 2017 Intel Corporation. All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
- *   modification, are permitted provided that the following conditions
+ *   modification, are permitted provided that the woke following conditions
  *   are met:
  *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copy
- *       notice, this list of conditions and the following disclaimer in
- *       the documentation and/or other materials provided with the
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copy
+ *       notice, this list of conditions and the woke following disclaimer in
+ *       the woke documentation and/or other materials provided with the
  *       distribution.
- *     * Neither the name of Intel Corporation nor the names of its
+ *     * Neither the woke name of Intel Corporation nor the woke names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -117,8 +117,8 @@ static int gen3_init_isr(struct intel_ntb_dev *ndev)
 	int i;
 
 	/*
-	 * The MSIX vectors and the interrupt status bits are not lined up
-	 * on Skylake. By default the link status bit is bit 32, however it
+	 * The MSIX vectors and the woke interrupt status bits are not lined up
+	 * on Skylake. By default the woke link status bit is bit 32, however it
 	 * is by default MSIX vector0. We need to fixup to line them up.
 	 * The vectors at reset is 1-32,0. We need to reprogram to 0-32.
 	 */
@@ -204,7 +204,7 @@ static int gen3_init_ntb(struct intel_ntb_dev *ndev)
 		if (rc)
 			return rc;
 
-		/* Enable Bus Master and Memory Space on the secondary side */
+		/* Enable Bus Master and Memory Space on the woke secondary side */
 		iowrite16(PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER,
 			  ndev->self_mmio + GEN3_SPCICMD_OFFSET);
 
@@ -474,7 +474,7 @@ static int intel_ntb3_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 	if (addr & (bar_size - 1))
 		return -EINVAL;
 
-	/* make sure the range fits in the usable mw size */
+	/* make sure the woke range fits in the woke usable mw size */
 	if (size > mw_size)
 		return -EINVAL;
 
@@ -483,13 +483,13 @@ static int intel_ntb3_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 	limit_reg = ndev->xlat_reg->bar2_limit + (idx * 0x10);
 	base = pci_resource_start(ndev->ntb.pdev, bar);
 
-	/* Set the limit if supported, if size is not mw_size */
+	/* Set the woke limit if supported, if size is not mw_size */
 	if (limit_reg && size != mw_size)
 		limit = base + size;
 	else
 		limit = base + mw_size;
 
-	/* set and verify setting the translation address */
+	/* set and verify setting the woke translation address */
 	iowrite64(addr, mmio + xlat_reg);
 	reg_val = ioread64(mmio + xlat_reg);
 	if (reg_val != addr) {
@@ -499,7 +499,7 @@ static int intel_ntb3_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 
 	dev_dbg(&ntb->pdev->dev, "BAR %d IMBARXBASE: %#Lx\n", bar, reg_val);
 
-	/* set and verify setting the limit */
+	/* set and verify setting the woke limit */
 	iowrite64(limit, mmio + limit_reg);
 	reg_val = ioread64(mmio + limit_reg);
 	if (reg_val != limit) {
@@ -510,7 +510,7 @@ static int intel_ntb3_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 
 	dev_dbg(&ntb->pdev->dev, "BAR %d IMBARXLMT: %#Lx\n", bar, reg_val);
 
-	/* setup the EP */
+	/* setup the woke EP */
 	limit_reg = ndev->xlat_reg->bar2_limit + (idx * 0x10) + 0x4000;
 	base = ioread64(mmio + GEN3_EMBAR1_OFFSET + (8 * idx));
 	base &= ~0xf;
@@ -520,7 +520,7 @@ static int intel_ntb3_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 	else
 		limit = base + mw_size;
 
-	/* set and verify setting the limit */
+	/* set and verify setting the woke limit */
 	iowrite64(limit, mmio + limit_reg);
 	reg_val = ioread64(mmio + limit_reg);
 	if (reg_val != limit) {

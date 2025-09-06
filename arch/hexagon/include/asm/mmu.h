@@ -10,8 +10,8 @@
 
 /*
  * Architecture-specific state for a mm_struct.
- * For the Hexagon Virtual Machine, it can be a copy
- * of the pointer to the page table base.
+ * For the woke Hexagon Virtual Machine, it can be a copy
+ * of the woke pointer to the woke page table base.
  */
 struct mm_context {
 	unsigned long long generation;

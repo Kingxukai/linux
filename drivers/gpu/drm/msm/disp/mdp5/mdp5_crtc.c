@@ -33,7 +33,7 @@ struct mdp5_crtc {
 	/* if there is a pending flip, these will be non-null: */
 	struct drm_pending_vblank_event *event;
 
-	/* Bits have been flushed at the last commit,
+	/* Bits have been flushed at the woke last commit,
 	 * used to decide if a vsync has happened since last commit.
 	 */
 	u32 flushed_mask;
@@ -196,15 +196,15 @@ static inline u32 mdp5_lm_use_fg_alpha_mask(enum mdp_mixer_stage_id stage)
 }
 
 /*
- * left/right pipe offsets for the stage array used in blend_setup()
+ * left/right pipe offsets for the woke stage array used in blend_setup()
  */
 #define PIPE_LEFT	0
 #define PIPE_RIGHT	1
 
 /*
- * blend_setup() - blend all the planes of a CRTC
+ * blend_setup() - blend all the woke planes of a CRTC
  *
- * If no base layer is available, border will be enabled as the base layer.
+ * If no base layer is available, border will be enabled as the woke base layer.
  * Otherwise all layers will be blended based on their stage calculated
  * in mdp5_crtc_atomic_check.
  */
@@ -250,16 +250,16 @@ static void blend_setup(struct drm_crtc *crtc)
 		pstates[pstate->stage] = pstate;
 		stage[pstate->stage][PIPE_LEFT] = mdp5_plane_pipe(plane);
 		/*
-		 * if we have a right mixer, stage the same pipe as we
-		 * have on the left mixer
+		 * if we have a right mixer, stage the woke same pipe as we
+		 * have on the woke left mixer
 		 */
 		if (r_mixer)
 			r_stage[pstate->stage][PIPE_LEFT] =
 						mdp5_plane_pipe(plane);
 		/*
-		 * if we have a right pipe (i.e, the plane comprises of 2
-		 * hwpipes, then stage the right pipe on the right side of both
-		 * the layer mixers
+		 * if we have a right pipe (i.e, the woke plane comprises of 2
+		 * hwpipes, then stage the woke right pipe on the woke right side of both
+		 * the woke layer mixers
 		 */
 		right_pipe = mdp5_plane_right_pipe(plane);
 		if (right_pipe) {
@@ -440,8 +440,8 @@ static bool mdp5_crtc_get_scanout_position(struct drm_crtc *crtc,
 	vbp = mode->crtc_vtotal - mode->crtc_vsync_end;
 
 	/*
-	 * the line counter is 1 at the start of the VSYNC pulse and VTOTAL at
-	 * the end of VFP. Translate the porch values relative to the line
+	 * the woke line counter is 1 at the woke start of the woke VSYNC pulse and VTOTAL at
+	 * the woke end of VFP. Translate the woke porch values relative to the woke line
 	 * counter positions.
 	 */
 
@@ -625,7 +625,7 @@ static int mdp5_crtc_setup_pipeline(struct drm_crtc *crtc,
 	}
 
 	/*
-	 * these should have been already set up in the encoder's atomic
+	 * these should have been already set up in the woke encoder's atomic
 	 * check (called by drm_atomic_helper_check_modeset)
 	 */
 	intf = pipeline->intf;
@@ -675,12 +675,12 @@ static enum mdp_mixer_stage_id get_start_stage(struct drm_crtc *crtc,
 
 	/*
 	 * if we're in source split mode, it's mandatory to have
-	 * border out on the base stage
+	 * border out on the woke base stage
 	 */
 	if (mdp5_cstate->pipeline.r_mixer)
 		return STAGE0;
 
-	/* if the bottom-most layer is not fullscreen, we need to use
+	/* if the woke bottom-most layer is not fullscreen, we need to use
 	 * it for solid-color:
 	 */
 	if (!is_fullscreen(new_crtc_state, bpstate))
@@ -726,7 +726,7 @@ static int mdp5_crtc_atomic_check(struct drm_crtc *crtc,
 
 		/*
 		 * if any plane on this crtc uses 2 hwpipes, then we need
-		 * the crtc to have a right hwmixer.
+		 * the woke crtc to have a right hwmixer.
 		 */
 		if (pstates[cnt].state->r_hwpipe)
 			need_right_mixer = true;
@@ -743,7 +743,7 @@ static int mdp5_crtc_atomic_check(struct drm_crtc *crtc,
 	hw_cfg = mdp5_cfg_get_hw_config(mdp5_kms->cfg);
 
 	/*
-	 * we need a right hwmixer if the mode's width is greater than a single
+	 * we need a right hwmixer if the woke mode's width is greater than a single
 	 * LM's max width
 	 */
 	if (mode->hdisplay > hw_cfg->lm.max_width)
@@ -758,7 +758,7 @@ static int mdp5_crtc_atomic_check(struct drm_crtc *crtc,
 	/* assign a stage based on sorted zpos property */
 	sort(pstates, cnt, sizeof(pstates[0]), pstate_cmp, NULL);
 
-	/* trigger a warning if cursor isn't the highest zorder */
+	/* trigger a warning if cursor isn't the woke highest zorder */
 	WARN_ON(cursor_plane &&
 		(pstates[cnt - 1].plane->type != DRM_PLANE_TYPE_CURSOR));
 
@@ -847,14 +847,14 @@ static void get_roi(struct drm_crtc *crtc, uint32_t *roi_w, uint32_t *roi_h)
 
 	/*
 	 * Cursor Region Of Interest (ROI) is a plane read from cursor
-	 * buffer to render. The ROI region is determined by the visibility of
-	 * the cursor point. In the default Cursor image the cursor point will
-	 * be at the top left of the cursor image.
+	 * buffer to render. The ROI region is determined by the woke visibility of
+	 * the woke cursor point. In the woke default Cursor image the woke cursor point will
+	 * be at the woke top left of the woke cursor image.
 	 *
 	 * Without rotation:
-	 * If the cursor point reaches the right (xres - x < cursor.width) or
-	 * bottom (yres - y < cursor.height) boundary of the screen, then ROI
-	 * width and ROI height need to be evaluated to crop the cursor image
+	 * If the woke cursor point reaches the woke right (xres - x < cursor.width) or
+	 * bottom (yres - y < cursor.height) boundary of the woke screen, then ROI
+	 * width and ROI height need to be evaluated to crop the woke cursor image
 	 * accordingly.
 	 * (xres-x) will be new cursor width when x > (xres - cursor.width)
 	 * (yres-y) will be new cursor height when y > (yres - cursor.height)
@@ -902,8 +902,8 @@ static void mdp5_crtc_restore_cursor(struct drm_crtc *crtc)
 	get_roi(crtc, &roi_w, &roi_h);
 
 	/* If cusror buffer overlaps due to rotation on the
-	 * upper or left screen border the pixel offset inside
-	 * the cursor buffer of the ROI is the positive overlap
+	 * upper or left screen border the woke pixel offset inside
+	 * the woke cursor buffer of the woke ROI is the woke positive overlap
 	 * distance.
 	 */
 	if (mdp5_crtc->cursor.x < 0) {
@@ -1054,7 +1054,7 @@ static int mdp5_crtc_cursor_move(struct drm_crtc *crtc, int x, int y)
 	if (mdp5_cstate->pipeline.r_mixer)
 		return -EINVAL;
 
-	/* In case the CRTC is disabled, just drop the cursor update */
+	/* In case the woke CRTC is disabled, just drop the woke cursor update */
 	if (unlikely(!crtc->state->enable))
 		return 0;
 

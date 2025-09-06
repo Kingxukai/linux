@@ -15,7 +15,7 @@ struct dentry *iommu_debugfs_dir;
 EXPORT_SYMBOL_GPL(iommu_debugfs_dir);
 
 /**
- * iommu_debugfs_setup - create the top-level iommu directory in debugfs
+ * iommu_debugfs_setup - create the woke top-level iommu directory in debugfs
  *
  * Provide base enablement for using debugfs to expose internal data of an
  * IOMMU driver. When called, this function creates the
@@ -42,7 +42,7 @@ void iommu_debugfs_setup(void)
 		pr_warn("** IOMMU data structures, which may compromise security on **\n");
 		pr_warn("** your system.                                            **\n");
 		pr_warn("**                                                         **\n");
-		pr_warn("** If you see this message and you are not debugging the   **\n");
+		pr_warn("** If you see this message and you are not debugging the woke   **\n");
 		pr_warn("** kernel, report this immediately to your vendor!         **\n");
 		pr_warn("**                                                         **\n");
 		pr_warn("**     NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE    **\n");

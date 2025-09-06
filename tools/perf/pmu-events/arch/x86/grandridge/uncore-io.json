@@ -117,7 +117,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.ALL_PARTS",
@@ -129,7 +129,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.PART0",
@@ -141,7 +141,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.PART1",
@@ -153,7 +153,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.PART2",
@@ -165,7 +165,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.PART3",
@@ -177,7 +177,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.PART4",
@@ -189,7 +189,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.PART5",
@@ -201,7 +201,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.PART6",
@@ -213,7 +213,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Count of allocations in the completion buffer",
+        "BriefDescription": "Count of allocations in the woke completion buffer",
         "Counter": "2,3",
         "EventCode": "0xD5",
         "EventName": "UNC_IIO_COMP_BUF_OCCUPANCY.CMPD.PART7",
@@ -225,7 +225,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.ALL_PARTS",
@@ -236,7 +236,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.PART0",
@@ -248,7 +248,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.PART1",
@@ -260,7 +260,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.PART2",
@@ -272,7 +272,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.PART3",
@@ -284,7 +284,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.PART4",
@@ -296,7 +296,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.PART5",
@@ -308,7 +308,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.PART6",
@@ -320,7 +320,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core reporting completion of Card read from Core DRAM",
+        "BriefDescription": "Data requested by the woke CPU : Core reporting completion of Card read from Core DRAM",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_READ.PART7",
@@ -332,7 +332,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.ALL_PARTS",
@@ -343,7 +343,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.PART0",
@@ -354,7 +354,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.PART1",
@@ -365,7 +365,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.PART2",
@@ -376,7 +376,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.PART3",
@@ -387,7 +387,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.PART4",
@@ -398,7 +398,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.PART5",
@@ -409,7 +409,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.PART6",
@@ -420,7 +420,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Data requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC0",
         "EventName": "UNC_IIO_DATA_REQ_BY_CPU.MEM_WRITE.PART7",
@@ -431,7 +431,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card reading from DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_READ.PART0",
@@ -442,7 +442,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card reading from DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_READ.PART1",
@@ -453,7 +453,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card reading from DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_READ.PART2",
@@ -464,7 +464,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card reading from DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_READ.PART3",
@@ -475,7 +475,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card reading from DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_READ.PART4",
@@ -486,7 +486,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card reading from DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_READ.PART5",
@@ -497,7 +497,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card reading from DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_READ.PART6",
@@ -508,7 +508,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card reading from DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_READ.PART7",
@@ -519,7 +519,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card writing to DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_WRITE.PART0",
@@ -530,7 +530,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card writing to DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_WRITE.PART1",
@@ -541,7 +541,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card writing to DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_WRITE.PART2",
@@ -552,7 +552,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card writing to DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_WRITE.PART3",
@@ -563,7 +563,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card writing to DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_WRITE.PART4",
@@ -574,7 +574,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card writing to DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_WRITE.PART5",
@@ -585,7 +585,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card writing to DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_WRITE.PART6",
@@ -596,7 +596,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Four byte data request of the CPU : Card writing to DRAM",
+        "BriefDescription": "Four byte data request of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.MEM_WRITE.PART7",
@@ -607,7 +607,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Data requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.PEER_WRITE.PART0",
@@ -619,7 +619,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Data requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.PEER_WRITE.PART1",
@@ -631,7 +631,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Data requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.PEER_WRITE.PART2",
@@ -643,7 +643,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Data requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.PEER_WRITE.PART3",
@@ -655,7 +655,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Data requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.PEER_WRITE.PART4",
@@ -667,7 +667,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Data requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.PEER_WRITE.PART5",
@@ -679,7 +679,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Data requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.PEER_WRITE.PART6",
@@ -691,7 +691,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Data requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Data requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x83",
         "EventName": "UNC_IIO_DATA_REQ_OF_CPU.PEER_WRITE.PART7",
@@ -908,7 +908,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Posted requests sent by the integrated IO (IIO) controller to the Ubox, useful for counting message signaled interrupts (MSI).",
+        "BriefDescription": "Posted requests sent by the woke integrated IO (IIO) controller to the woke Ubox, useful for counting message signaled interrupts (MSI).",
         "Counter": "0,1,2,3",
         "EventCode": "0x8e",
         "EventName": "UNC_IIO_NUM_REQ_OF_CPU_BY_TGT.UBOX_POSTED",
@@ -930,7 +930,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core reading from Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core reading from Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_READ.PART0",
@@ -941,7 +941,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core reading from Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core reading from Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_READ.PART1",
@@ -952,7 +952,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core reading from Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core reading from Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_READ.PART2",
@@ -963,7 +963,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core reading from Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core reading from Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_READ.PART3",
@@ -974,7 +974,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core reading from Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core reading from Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_READ.PART4",
@@ -985,7 +985,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core reading from Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core reading from Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_READ.PART5",
@@ -996,7 +996,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core reading from Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core reading from Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_READ.PART6",
@@ -1007,7 +1007,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core reading from Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core reading from Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_READ.PART7",
@@ -1018,7 +1018,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_WRITE.PART0",
@@ -1029,7 +1029,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_WRITE.PART1",
@@ -1040,7 +1040,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_WRITE.PART2",
@@ -1051,7 +1051,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_WRITE.PART3",
@@ -1062,7 +1062,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_WRITE.PART4",
@@ -1073,7 +1073,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_WRITE.PART5",
@@ -1084,7 +1084,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_WRITE.PART6",
@@ -1095,7 +1095,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested by the CPU : Core writing to Cards MMIO space",
+        "BriefDescription": "Number Transactions requested by the woke CPU : Core writing to Cards MMIO space",
         "Counter": "2,3",
         "EventCode": "0xC1",
         "EventName": "UNC_IIO_TXN_REQ_BY_CPU.MEM_WRITE.PART7",
@@ -1106,7 +1106,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card reading from DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_READ.PART0",
@@ -1117,7 +1117,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card reading from DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_READ.PART1",
@@ -1128,7 +1128,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card reading from DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_READ.PART2",
@@ -1139,7 +1139,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card reading from DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_READ.PART3",
@@ -1150,7 +1150,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card reading from DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_READ.PART4",
@@ -1161,7 +1161,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card reading from DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_READ.PART5",
@@ -1172,7 +1172,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card reading from DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_READ.PART6",
@@ -1183,7 +1183,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card reading from DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card reading from DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_READ.PART7",
@@ -1194,7 +1194,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_WRITE.PART0",
@@ -1205,7 +1205,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_WRITE.PART1",
@@ -1216,7 +1216,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_WRITE.PART2",
@@ -1227,7 +1227,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_WRITE.PART3",
@@ -1238,7 +1238,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_WRITE.PART4",
@@ -1249,7 +1249,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_WRITE.PART5",
@@ -1260,7 +1260,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_WRITE.PART6",
@@ -1271,7 +1271,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to DRAM",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to DRAM",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.MEM_WRITE.PART7",
@@ -1282,7 +1282,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.PEER_WRITE.PART0",
@@ -1294,7 +1294,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.PEER_WRITE.PART1",
@@ -1306,7 +1306,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.PEER_WRITE.PART2",
@@ -1318,7 +1318,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.PEER_WRITE.PART3",
@@ -1330,7 +1330,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.PEER_WRITE.PART4",
@@ -1342,7 +1342,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.PEER_WRITE.PART5",
@@ -1354,7 +1354,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.PEER_WRITE.PART6",
@@ -1366,7 +1366,7 @@
         "Unit": "IIO"
     },
     {
-        "BriefDescription": "Number Transactions requested of the CPU : Card writing to another Card (same or different stack)",
+        "BriefDescription": "Number Transactions requested of the woke CPU : Card writing to another Card (same or different stack)",
         "Counter": "0,1",
         "EventCode": "0x84",
         "EventName": "UNC_IIO_TXN_REQ_OF_CPU.PEER_WRITE.PART7",

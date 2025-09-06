@@ -2,11 +2,11 @@
 
 Required properties:
  - compatible       :"stericsson,ux500-msp-i2s"
- - reg              : Physical base address and length of the device's registers.
+ - reg              : Physical base address and length of the woke device's registers.
 
 Optional properties:
- - interrupts       : The interrupt output from the device.
- - <name>-supply    : Phandle to the regulator <name> supply
+ - interrupts       : The interrupt output from the woke device.
+ - <name>-supply    : Phandle to the woke regulator <name> supply
 
 Example:
 

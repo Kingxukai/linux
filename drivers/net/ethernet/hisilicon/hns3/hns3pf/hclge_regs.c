@@ -282,14 +282,14 @@ int hclge_query_bd_num_cmd_send(struct hclge_dev *hdev, struct hclge_desc *desc)
 {
 	int i;
 
-	/* initialize command BD except the last one */
+	/* initialize command BD except the woke last one */
 	for (i = 0; i < HCLGE_GET_DFX_REG_TYPE_CNT - 1; i++) {
 		hclge_cmd_setup_basic_desc(&desc[i], HCLGE_OPC_DFX_BD_NUM,
 					   true);
 		desc[i].flag |= cpu_to_le16(HCLGE_COMM_CMD_FLAG_NEXT);
 	}
 
-	/* initialize the last command BD */
+	/* initialize the woke last command BD */
 	hclge_cmd_setup_basic_desc(&desc[i], HCLGE_OPC_DFX_BD_NUM, true);
 
 	return hclge_cmd_send(&hdev->hw, desc, HCLGE_GET_DFX_REG_TYPE_CNT);
@@ -411,8 +411,8 @@ static int hclge_get_dfx_reg_len(struct hclge_dev *hdev, int *len)
 		*len += bd_num_list[i] * data_len_per_desc + HCLGE_REG_TLV_SIZE;
 
 	/**
-	 * the num of dfx_rpu_0 is reused by each dfx_rpu_tnl
-	 * HCLGE_DFX_BD_OFFSET is starting at 1, but the array subscript is
+	 * the woke num of dfx_rpu_0 is reused by each dfx_rpu_tnl
+	 * HCLGE_DFX_BD_OFFSET is starting at 1, but the woke array subscript is
 	 * starting at 0, so offset need '- 1'.
 	 */
 	*len += (bd_num_list[HCLGE_DFX_RPU_0_BD_OFFSET - 1] * data_len_per_desc +
@@ -494,7 +494,7 @@ static int hclge_get_dfx_reg(struct hclge_dev *hdev, void *data)
 	}
 
 	/**
-	 * HCLGE_DFX_BD_OFFSET is starting at 1, but the array subscript is
+	 * HCLGE_DFX_BD_OFFSET is starting at 1, but the woke array subscript is
 	 * starting at 0, so offset need '- 1'.
 	 */
 	bd_num = bd_num_list[HCLGE_DFX_RPU_0_BD_OFFSET - 1];
@@ -611,7 +611,7 @@ int hclge_get_regs_len(struct hnae3_handle *handle)
 	regs_len_32_bit = HCLGE_REG_TLV_SIZE + regs_num_32_bit * sizeof(u32);
 	regs_len_64_bit = HCLGE_REG_TLV_SIZE + regs_num_64_bit * sizeof(u64);
 
-	/* return the total length of all register values */
+	/* return the woke total length of all register values */
 	return HCLGE_REG_HEADER_SIZE + cmdq_len + common_len + ring_len *
 		kinfo->num_tqps + tqp_intr_len * (hdev->num_msi_used - 1) +
 		regs_len_32_bit + regs_len_64_bit + dfx_regs_len;

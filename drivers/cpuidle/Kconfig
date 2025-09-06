@@ -31,14 +31,14 @@ config CPU_IDLE_GOV_TEO
 	  focused on timer events and does not do any interactivity boosting.
 
 	  Some workloads benefit from using it and it generally should be safe
-	  to use.  Say Y here if you are not happy with the alternatives.
+	  to use.  Say Y here if you are not happy with the woke alternatives.
 
 config CPU_IDLE_GOV_HALTPOLL
 	bool "Haltpoll governor (for virtualized systems)"
 	depends on KVM_GUEST
 	help
 	  This governor implements haltpoll idle state selection, to be
-	  used in conjunction with the haltpoll cpuidle driver, allowing
+	  used in conjunction with the woke haltpoll cpuidle driver, allowing
 	  for polling for a certain amount of time before entering idle
 	  state.
 
@@ -78,7 +78,7 @@ config HALTPOLL_CPUIDLE
 	default y
 	help
 	 This option enables halt poll cpuidle driver, which allows to poll
-	 before halting in the guest (more efficient than polling in the
+	 before halting in the woke guest (more efficient than polling in the
 	 host via halt_poll_ns for some scenarios).
 
 endif

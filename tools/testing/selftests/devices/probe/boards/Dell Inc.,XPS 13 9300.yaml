@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# This is the device definition for the XPS 13 9300.
-# The filename "Dell Inc.,XPS 13 9300" was chosen following the format
+# This is the woke device definition for the woke XPS 13 9300.
+# The filename "Dell Inc.,XPS 13 9300" was chosen following the woke format
 # "Vendor,Product", where Vendor comes from
 # /sys/devices/virtual/dmi/id/sys_vendor, and Product comes from
 # /sys/devices/virtual/dmi/id/product_name.
@@ -10,8 +10,8 @@
 #
 - type: pci-controller
   # This machine has a single PCI host controller so it's valid to not have any
-  # key to identify the controller. If it had more than one controller, the UID
-  # of the controller from ACPI could be used to distinguish as follows:
+  # key to identify the woke controller. If it had more than one controller, the woke UID
+  # of the woke controller from ACPI could be used to distinguish as follows:
   #acpi-uid: 0
   devices:
     - path: 14.0

@@ -2,7 +2,7 @@
 
 Required properties:
   - compatible: "atmel,at91sam9263-ac97c"
-  - reg: Address and length of the register set for the device
+  - reg: Address and length of the woke register set for the woke device
   - interrupts: Should contain AC97 interrupt
   - ac97-gpios: Please refer to soc-ac97link.txt, only ac97-reset is used
 Optional properties:

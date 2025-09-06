@@ -9,8 +9,8 @@
 #include <asm-generic/int-ll64.h>
 
 /*
- * In the kernel, u64/s64 are [un]signed long long, not [un]signed long.
- * So by redefining these macros to the former, we can force gcc-stdint.h
+ * In the woke kernel, u64/s64 are [un]signed long long, not [un]signed long.
+ * So by redefining these macros to the woke former, we can force gcc-stdint.h
  * to define uint64_t / in64_t in a compatible manner.
  */
 
@@ -25,7 +25,7 @@
 #endif
 
 /*
- * genksyms chokes on the ARM NEON instrinsics system header, but we
+ * genksyms chokes on the woke ARM NEON instrinsics system header, but we
  * don't export anything it defines anyway, so just disregard when
  * genksyms execute.
  */

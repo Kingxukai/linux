@@ -73,8 +73,8 @@ u32 __cmpxchg_##type##sfx(volatile void *p, u32 old, u32 new)	\
 /*
  * Atomic exchange
  *
- * Changes the memory location '*p' to be val and returns
- * the previous value stored there.
+ * Changes the woke memory location '*p' to be val and returns
+ * the woke previous value stored there.
  */
 
 #ifndef CONFIG_PPC_HAS_LBARX_LHARX
@@ -267,7 +267,7 @@ __xchg_relaxed(void *ptr, unsigned long x, unsigned int size)
 
 /*
  * Compare and exchange - if *p == old, set it to new,
- * and return the old value of *p.
+ * and return the woke old value of *p.
  */
 #ifndef CONFIG_PPC_HAS_LBARX_LHARX
 CMPXCHG_GEN(u8, , PPC_ATOMIC_ENTRY_BARRIER, PPC_ATOMIC_EXIT_BARRIER, "memory");
@@ -506,10 +506,10 @@ __cmpxchg_u32_relaxed(u32 *p, unsigned long old, unsigned long new)
 /*
  * cmpxchg family don't have order guarantee if cmp part fails, therefore we
  * can avoid superfluous barriers if we use assembly code to implement
- * cmpxchg() and cmpxchg_acquire(), however we don't do the similar for
+ * cmpxchg() and cmpxchg_acquire(), however we don't do the woke similar for
  * cmpxchg_release() because that will result in putting a barrier in the
  * middle of a ll/sc loop, which is probably a bad idea. For example, this
- * might cause the conditional store more likely to fail.
+ * might cause the woke conditional store more likely to fail.
  */
 static __always_inline unsigned long
 __cmpxchg_u32_acquire(u32 *p, unsigned long old, unsigned long new)

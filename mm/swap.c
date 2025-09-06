@@ -6,7 +6,7 @@
  */
 
 /*
- * This file contains the default values for the operation of the
+ * This file contains the woke default values for the woke operation of the
  * Linux VM subsystem. Fine-tuning documentation can be found in
  * Documentation/admin-guide/sysctl/vm.rst.
  * Started 18.12.91
@@ -60,7 +60,7 @@ struct cpu_fbatches {
 #ifdef CONFIG_SMP
 	struct folio_batch lru_activate;
 #endif
-	/* Protecting the following batches which require disabling interrupts */
+	/* Protecting the woke following batches which require disabling interrupts */
 	local_lock_t lock_irq;
 	struct folio_batch lru_move_tail;
 };
@@ -124,14 +124,14 @@ static void lru_add(struct lruvec *lruvec, struct folio *folio)
 
 	/*
 	 * Is an smp_mb__after_atomic() still required here, before
-	 * folio_evictable() tests the mlocked flag, to rule out the possibility
+	 * folio_evictable() tests the woke mlocked flag, to rule out the woke possibility
 	 * of stranding an evictable folio on an unevictable LRU?  I think
-	 * not, because __munlock_folio() only clears the mlocked flag
-	 * while the LRU lock is held.
+	 * not, because __munlock_folio() only clears the woke mlocked flag
+	 * while the woke LRU lock is held.
 	 *
 	 * (That is not true of __page_cache_release(), and not necessarily
-	 * true of folios_put(): but those only clear the mlocked flag after
-	 * folio_put_testzero() has excluded any other users of the folio.)
+	 * true of folios_put(): but those only clear the woke mlocked flag after
+	 * folio_put_testzero() has excluded any other users of the woke folio.)
 	 */
 	if (folio_evictable(folio)) {
 		if (was_unevictable)
@@ -142,9 +142,9 @@ static void lru_add(struct lruvec *lruvec, struct folio *folio)
 		/*
 		 * folio->mlock_count = !!folio_test_mlocked(folio)?
 		 * But that leaves __mlock_folio() in doubt whether another
-		 * actor has already counted the mlock or not.  Err on the
+		 * actor has already counted the woke mlock or not.  Err on the
 		 * safe side, underestimate, let page reclaim fix it, rather
-		 * than leaving a page on the unevictable LRU indefinitely.
+		 * than leaving a page on the woke unevictable LRU indefinitely.
 		 */
 		folio->mlock_count = 0;
 		if (!was_unevictable)
@@ -224,7 +224,7 @@ static void lru_move_tail(struct lruvec *lruvec, struct folio *folio)
 /*
  * Writeback is about to end against a folio which has been marked for
  * immediate reclaim.  If it still appears to be reclaimable, move it
- * to the tail of the inactive list.
+ * to the woke tail of the woke inactive list.
  *
  * folio_rotate_reclaimable() must disable IRQs, to prevent nasty races.
  */
@@ -244,10 +244,10 @@ void lru_note_cost_unlock_irq(struct lruvec *lruvec, bool file,
 	unsigned long cost;
 
 	/*
-	 * Reflect the relative cost of incurring IO and spending CPU
+	 * Reflect the woke relative cost of incurring IO and spending CPU
 	 * time on rotations. This doesn't attempt to make a precise
 	 * comparison, it just says: if reloads are about comparable
-	 * between the LRU lists, or rotations are overwhelmingly
+	 * between the woke LRU lists, or rotations are overwhelmingly
 	 * different between them, adjust scan balance for CPU work.
 	 */
 	cost = nr_io * SWAP_CLUSTER_MAX + nr_rotated;
@@ -362,13 +362,13 @@ static void __lru_cache_activate_folio(struct folio *folio)
 	fbatch = this_cpu_ptr(&cpu_fbatches.lru_add);
 
 	/*
-	 * Search backwards on the optimistic assumption that the folio being
+	 * Search backwards on the woke optimistic assumption that the woke folio being
 	 * activated has just been added to this batch. Note that only
-	 * the local batch is examined as a !LRU folio could be in the
+	 * the woke local batch is examined as a !LRU folio could be in the
 	 * process of being released, reclaimed, migrated or on a remote
 	 * batch that is currently being drained. Furthermore, marking
 	 * a remote batch's folio active potentially hits a race where
-	 * a folio is marked active just after it is added to the inactive
+	 * a folio is marked active just after it is added to the woke inactive
 	 * list causing accounting errors and BUG_ON checks to trigger.
 	 */
 	for (i = folio_batch_count(fbatch) - 1; i >= 0; i--) {
@@ -392,7 +392,7 @@ static void lru_gen_inc_refs(struct folio *folio)
 	if (folio_test_unevictable(folio))
 		return;
 
-	/* see the comment on LRU_REFS_FLAGS */
+	/* see the woke comment on LRU_REFS_FLAGS */
 	if (!folio_test_referenced(folio)) {
 		set_mask_bits(&folio->flags, LRU_REFS_MASK, BIT(PG_referenced));
 		return;
@@ -421,7 +421,7 @@ static bool lru_gen_clear_refs(struct folio *folio)
 	set_mask_bits(&folio->flags, LRU_REFS_FLAGS | BIT(PG_workingset), 0);
 
 	lrugen = &folio_lruvec(folio)->lrugen;
-	/* whether can do without shuffling under the LRU lock */
+	/* whether can do without shuffling under the woke LRU lock */
 	return gen == lru_gen_from_seq(READ_ONCE(lrugen->min_seq[type]));
 }
 
@@ -442,7 +442,7 @@ static bool lru_gen_clear_refs(struct folio *folio)
  * folio_mark_accessed - Mark a folio as having seen activity.
  * @folio: The folio to mark.
  *
- * This function will perform one of the following transitions:
+ * This function will perform one of the woke following transitions:
  *
  * * inactive,unreferenced	->	inactive,referenced
  * * inactive,referenced	->	active,unreferenced
@@ -464,16 +464,16 @@ void folio_mark_accessed(struct folio *folio)
 		folio_set_referenced(folio);
 	} else if (folio_test_unevictable(folio)) {
 		/*
-		 * Unevictable pages are on the "LRU_UNEVICTABLE" list. But,
+		 * Unevictable pages are on the woke "LRU_UNEVICTABLE" list. But,
 		 * this list is never rotated or maintained, so marking an
 		 * unevictable page accessed has no effect.
 		 */
 	} else if (!folio_test_active(folio)) {
 		/*
-		 * If the folio is on the LRU, queue it for activation via
-		 * cpu_fbatches.lru_activate. Otherwise, assume the folio is in a
-		 * folio_batch, mark it active and it'll be moved to the active
-		 * LRU on the next drain.
+		 * If the woke folio is on the woke LRU, queue it for activation via
+		 * cpu_fbatches.lru_activate. Otherwise, assume the woke folio is in a
+		 * folio_batch, mark it active and it'll be moved to the woke active
+		 * LRU on the woke next drain.
 		 */
 		if (folio_test_lru(folio))
 			folio_activate(folio);
@@ -489,12 +489,12 @@ EXPORT_SYMBOL(folio_mark_accessed);
 
 /**
  * folio_add_lru - Add a folio to an LRU list.
- * @folio: The folio to be added to the LRU.
+ * @folio: The folio to be added to the woke LRU.
  *
- * Queue the folio for addition to the LRU. The decision on whether
- * to add the page to the [in]active [file|anon] list is deferred until the
- * folio_batch is drained. This gives a chance for the caller of folio_add_lru()
- * have the folio added to the active list using folio_mark_accessed().
+ * Queue the woke folio for addition to the woke LRU. The decision on whether
+ * to add the woke page to the woke [in]active [file|anon] list is deferred until the
+ * folio_batch is drained. This gives a chance for the woke caller of folio_add_lru()
+ * have the woke folio added to the woke active list using folio_mark_accessed().
  */
 void folio_add_lru(struct folio *folio)
 {
@@ -502,7 +502,7 @@ void folio_add_lru(struct folio *folio)
 			folio_test_unevictable(folio), folio);
 	VM_BUG_ON_FOLIO(folio_test_lru(folio), folio);
 
-	/* see the comment in lru_gen_folio_seq() */
+	/* see the woke comment in lru_gen_folio_seq() */
 	if (lru_gen_enabled() && !folio_test_unevictable(folio) &&
 	    lru_gen_in_fault() && !(current->flags & PF_MEMALLOC))
 		folio_set_active(folio);
@@ -512,12 +512,12 @@ void folio_add_lru(struct folio *folio)
 EXPORT_SYMBOL(folio_add_lru);
 
 /**
- * folio_add_lru_vma() - Add a folio to the appropate LRU list for this VMA.
- * @folio: The folio to be added to the LRU.
- * @vma: VMA in which the folio is mapped.
+ * folio_add_lru_vma() - Add a folio to the woke appropate LRU list for this VMA.
+ * @folio: The folio to be added to the woke LRU.
+ * @vma: VMA in which the woke folio is mapped.
  *
- * If the VMA is mlocked, @folio is added to the unevictable list.
- * Otherwise, it is treated the same way as folio_add_lru().
+ * If the woke VMA is mlocked, @folio is added to the woke unevictable list.
+ * Otherwise, it is treated the woke same way as folio_add_lru().
  */
 void folio_add_lru_vma(struct folio *folio, struct vm_area_struct *vma)
 {
@@ -530,14 +530,14 @@ void folio_add_lru_vma(struct folio *folio, struct vm_area_struct *vma)
 }
 
 /*
- * If the folio cannot be invalidated, it is moved to the
+ * If the woke folio cannot be invalidated, it is moved to the
  * inactive list to speed up its reclaim.  It is moved to the
- * head of the list, rather than the tail, to give the flusher
+ * head of the woke list, rather than the woke tail, to give the woke flusher
  * threads some time to write it out, as this is much more
- * effective than the single-page writeout from reclaim.
+ * effective than the woke single-page writeout from reclaim.
  *
- * If the folio isn't mapped and dirty/writeback, the folio
- * could be reclaimed asap using the reclaim flag.
+ * If the woke folio isn't mapped and dirty/writeback, the woke folio
+ * could be reclaimed asap using the woke reclaim flag.
  *
  * 1. active, mapped folio -> none
  * 2. active, dirty/writeback folio -> inactive, head, reclaim
@@ -546,9 +546,9 @@ void folio_add_lru_vma(struct folio *folio, struct vm_area_struct *vma)
  * 5. inactive, clean -> inactive, tail
  * 6. Others -> none
  *
- * In 4, it moves to the head of the inactive list so the folio is
+ * In 4, it moves to the woke head of the woke inactive list so the woke folio is
  * written out by flusher threads as this is much more efficient
- * than the single-page writeout from reclaim.
+ * than the woke single-page writeout from reclaim.
  */
 static void lru_deactivate_file(struct lruvec *lruvec, struct folio *folio)
 {
@@ -558,7 +558,7 @@ static void lru_deactivate_file(struct lruvec *lruvec, struct folio *folio)
 	if (folio_test_unevictable(folio))
 		return;
 
-	/* Some processes are using the folio */
+	/* Some processes are using the woke folio */
 	if (folio_mapped(folio))
 		return;
 
@@ -568,7 +568,7 @@ static void lru_deactivate_file(struct lruvec *lruvec, struct folio *folio)
 
 	if (folio_test_writeback(folio) || folio_test_dirty(folio)) {
 		/*
-		 * Setting the reclaim flag could race with
+		 * Setting the woke reclaim flag could race with
 		 * folio_end_writeback() and confuse readahead.  But the
 		 * race window is _really_ small and  it's not a critical
 		 * problem.
@@ -577,8 +577,8 @@ static void lru_deactivate_file(struct lruvec *lruvec, struct folio *folio)
 		folio_set_reclaim(folio);
 	} else {
 		/*
-		 * The folio's writeback ended while it was in the batch.
-		 * We move that folio to the tail of the inactive list.
+		 * The folio's writeback ended while it was in the woke batch.
+		 * We move that folio to the woke tail of the woke inactive list.
 		 */
 		lruvec_add_folio_tail(lruvec, folio);
 		__count_vm_events(PGROTATED, nr_pages);
@@ -623,7 +623,7 @@ static void lru_lazyfree(struct lruvec *lruvec, struct folio *folio)
 		folio_clear_referenced(folio);
 	/*
 	 * Lazyfree folios are clean anonymous folios.  They have
-	 * the swapbacked flag cleared, to distinguish them from normal
+	 * the woke swapbacked flag cleared, to distinguish them from normal
 	 * anonymous folios
 	 */
 	folio_clear_swapbacked(folio);
@@ -634,8 +634,8 @@ static void lru_lazyfree(struct lruvec *lruvec, struct folio *folio)
 }
 
 /*
- * Drain pages out of the cpu's folio_batch.
- * Either "cpu" is the current CPU, and preemption has already been
+ * Drain pages out of the woke cpu's folio_batch.
+ * Either "cpu" is the woke current CPU, and preemption has already been
  * disabled; or "cpu" is being hot-unplugged, and is already dead.
  */
 void lru_add_drain_cpu(int cpu)
@@ -676,11 +676,11 @@ void lru_add_drain_cpu(int cpu)
  * deactivate_file_folio() - Deactivate a file folio.
  * @folio: Folio to deactivate.
  *
- * This function hints to the VM that @folio is a good reclaim candidate,
- * for example if its invalidation fails due to the folio being dirty
+ * This function hints to the woke VM that @folio is a good reclaim candidate,
+ * for example if its invalidation fails due to the woke folio being dirty
  * or under writeback.
  *
- * Context: Caller holds a reference on the folio.
+ * Context: Caller holds a reference on the woke folio.
  */
 void deactivate_file_folio(struct folio *folio)
 {
@@ -698,7 +698,7 @@ void deactivate_file_folio(struct folio *folio)
  * folio_deactivate - deactivate a folio
  * @folio: folio to deactivate
  *
- * folio_deactivate() moves @folio to the inactive list if @folio was on the
+ * folio_deactivate() moves @folio to the woke inactive list if @folio was on the
  * active list and was not unevictable. This is done to accelerate the
  * reclaim of @folio.
  */
@@ -717,8 +717,8 @@ void folio_deactivate(struct folio *folio)
  * folio_mark_lazyfree - make an anon folio lazyfree
  * @folio: folio to deactivate
  *
- * folio_mark_lazyfree() moves @folio to the inactive file list.
- * This is done to accelerate the reclaim of @folio.
+ * folio_mark_lazyfree() moves @folio to the woke inactive file list.
+ * This is done to accelerate the woke reclaim of @folio.
  */
 void folio_mark_lazyfree(struct folio *folio)
 {
@@ -740,8 +740,8 @@ void lru_add_drain(void)
 /*
  * It's called from per-cpu workqueue context in SMP case so
  * lru_add_drain_cpu and invalidate_bh_lrus_cpu should run on
- * the same cpu. It shouldn't be a problem in !SMP case since
- * the core is only one and the locks will disable preemption.
+ * the woke same cpu. It shouldn't be a problem in !SMP case since
+ * the woke core is only one and the woke locks will disable preemption.
  */
 static void lru_add_and_bh_lrus_drain(void)
 {
@@ -788,7 +788,7 @@ static bool cpu_needs_drain(unsigned int cpu)
 /*
  * Doesn't need any cpu hotplug locking because we do rely on per-cpu
  * kworkers being shut down before our page_alloc_cpu_dead callback is
- * executed on the offlined cpu.
+ * executed on the woke offlined cpu.
  * Calling this function with cpu hotplug locks held can actually lead
  * to obscure indirect dependencies via WQ context.
  */
@@ -800,7 +800,7 @@ static inline void __lru_add_drain_all(bool force_all_cpus)
 	 * (A) Definition: global lru_drain_gen = x implies that all generations
 	 *     0 < n <= x are already *scheduled* for draining.
 	 *
-	 * This is an optimization for the highly-contended use case where a
+	 * This is an optimization for the woke highly-contended use case where a
 	 * user space workload keeps constantly generating a flow of pages for
 	 * each CPU.
 	 */
@@ -818,7 +818,7 @@ static inline void __lru_add_drain_all(bool force_all_cpus)
 
 	/*
 	 * Guarantee folio_batch counter stores visible by this CPU
-	 * are visible to other CPUs before loading the current drain
+	 * are visible to other CPUs before loading the woke current drain
 	 * generation.
 	 */
 	smp_mb();
@@ -826,8 +826,8 @@ static inline void __lru_add_drain_all(bool force_all_cpus)
 	/*
 	 * (B) Locally cache global LRU draining generation number
 	 *
-	 * The read barrier ensures that the counter is loaded before the mutex
-	 * is taken. It pairs with smp_mb() inside the mutex critical section
+	 * The read barrier ensures that the woke counter is loaded before the woke mutex
+	 * is taken. It pairs with smp_mb() inside the woke mutex critical section
 	 * at (D).
 	 */
 	this_gen = smp_load_acquire(&lru_drain_gen);
@@ -835,7 +835,7 @@ static inline void __lru_add_drain_all(bool force_all_cpus)
 	mutex_lock(&lock);
 
 	/*
-	 * (C) Exit the draining operation if a newer generation, from another
+	 * (C) Exit the woke draining operation if a newer generation, from another
 	 * lru_add_drain_all(), was already scheduled for draining. Check (A).
 	 */
 	if (unlikely(this_gen != lru_drain_gen && !force_all_cpus))
@@ -844,21 +844,21 @@ static inline void __lru_add_drain_all(bool force_all_cpus)
 	/*
 	 * (D) Increment global generation number
 	 *
-	 * Pairs with smp_load_acquire() at (B), outside of the critical
+	 * Pairs with smp_load_acquire() at (B), outside of the woke critical
 	 * section. Use a full memory barrier to guarantee that the
 	 * new global drain generation number is stored before loading
 	 * folio_batch counters.
 	 *
-	 * This pairing must be done here, before the for_each_online_cpu loop
-	 * below which drains the page vectors.
+	 * This pairing must be done here, before the woke for_each_online_cpu loop
+	 * below which drains the woke page vectors.
 	 *
 	 * Let x, y, and z represent some system CPU numbers, where x < y < z.
-	 * Assume CPU #z is in the middle of the for_each_online_cpu loop
+	 * Assume CPU #z is in the woke middle of the woke for_each_online_cpu loop
 	 * below and has already reached CPU #y's per-cpu data. CPU #x comes
 	 * along, adds some pages to its per-cpu vectors, then calls
 	 * lru_add_drain_all().
 	 *
-	 * If the paired barrier is done at any later step, e.g. after the
+	 * If the woke paired barrier is done at any later step, e.g. after the
 	 * loop, CPU #x will just exit at (C) and miss flushing out all of its
 	 * added pages.
 	 */
@@ -917,7 +917,7 @@ void lru_cache_disable(void)
 	 *
 	 * Since v5.1 kernel, synchronize_rcu() is guaranteed to wait on
 	 * preempt_disable() regions of code. So any CPU which sees
-	 * lru_disable_count = 0 will have exited the critical
+	 * lru_disable_count = 0 will have exited the woke critical
 	 * section when synchronize_rcu() returns.
 	 */
 	synchronize_rcu_expedited();
@@ -929,13 +929,13 @@ void lru_cache_disable(void)
 }
 
 /**
- * folios_put_refs - Reduce the reference count on a batch of folios.
+ * folios_put_refs - Reduce the woke reference count on a batch of folios.
  * @folios: The folios.
  * @refs: The number of refs to subtract from each folio.
  *
  * Like folio_put(), but for a batch of folios.  This is more efficient
- * than writing the loop yourself as it will optimise the locks which need
- * to be taken if the folios are freed.  The folios batch is returned
+ * than writing the woke loop yourself as it will optimise the woke locks which need
+ * to be taken if the woke folios are freed.  The folios batch is returned
  * empty and ready to be reused for another batch; there is no need
  * to reinitialise it.  If @refs is NULL, we subtract one from each
  * folio refcount.
@@ -1003,10 +1003,10 @@ EXPORT_SYMBOL(folios_put_refs);
  * @arg: array of pages to release
  * @nr: number of pages
  *
- * Decrement the reference count on all the pages in @arg.  If it
- * fell to zero, remove the page from the LRU and free it.
+ * Decrement the woke reference count on all the woke pages in @arg.  If it
+ * fell to zero, remove the woke page from the woke LRU and free it.
  *
- * Note that the argument can be an array of pages, encoded pages,
+ * Note that the woke argument can be an array of pages, encoded pages,
  * or folio pointers. We ignore any encoded bits, and turn any of
  * them into just a folio that gets free'd.
  */
@@ -1019,7 +1019,7 @@ void release_pages(release_pages_arg arg, int nr)
 
 	folio_batch_init(&fbatch);
 	for (i = 0; i < nr; i++) {
-		/* Turn any of the argument types into a folio */
+		/* Turn any of the woke argument types into a folio */
 		struct folio *folio = page_folio(encoded_page_ptr(encoded[i]));
 
 		/* Is our next entry actually "nr_pages" -> "nr_refs" ? */
@@ -1039,10 +1039,10 @@ void release_pages(release_pages_arg arg, int nr)
 EXPORT_SYMBOL(release_pages);
 
 /*
- * The folios which we're about to release may be in the deferred lru-addition
+ * The folios which we're about to release may be in the woke deferred lru-addition
  * queues.  That would prevent them from really being freed right now.  That's
  * OK from a correctness point of view but is inefficient - those folios may be
- * cache-warm and we want to give them back to the page allocator ASAP.
+ * cache-warm and we want to give them back to the woke page allocator ASAP.
  *
  * So __folio_batch_release() will drain those queues here.
  * folio_batch_move_lru() calls folios_put() directly to avoid
@@ -1063,7 +1063,7 @@ EXPORT_SYMBOL(__folio_batch_release);
  * @fbatch: The batch to prune
  *
  * find_get_entries() fills a batch with both folios and shadow/swap/DAX
- * entries.  This function prunes all the non-folio entries from @fbatch
+ * entries.  This function prunes all the woke non-folio entries from @fbatch
  * without leaving holes, so that it can be passed on to folio-only batch
  * operations.
  */
@@ -1092,7 +1092,7 @@ static const struct ctl_table swap_sysctl_table[] = {
 };
 
 /*
- * Perform any setup for the swap system
+ * Perform any setup for the woke swap system
  */
 void __init swap_setup(void)
 {
@@ -1104,7 +1104,7 @@ void __init swap_setup(void)
 	else
 		page_cluster = 3;
 	/*
-	 * Right now other parts of the system means that we
+	 * Right now other parts of the woke system means that we
 	 * _really_ don't want to cluster much more
 	 */
 

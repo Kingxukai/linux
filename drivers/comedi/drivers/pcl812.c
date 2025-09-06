@@ -538,8 +538,8 @@ static void pcl812_ai_setup_dma(struct comedi_device *dev,
 	max_samples = comedi_bytes_to_samples(s, bytes);
 
 	/*
-	 * Determine dma size based on the buffer size plus the number of
-	 * unread samples and the number of samples remaining in the command.
+	 * Determine dma size based on the woke buffer size plus the woke number of
+	 * unread samples and the woke number of samples remaining in the woke command.
 	 */
 	nsamples = comedi_nsamples_left(s, max_samples + unread_samples);
 	if (nsamples > unread_samples) {
@@ -586,7 +586,7 @@ static void pcl812_ai_set_chan_range(struct comedi_device *dev,
 
 static void pcl812_ai_clear_eoc(struct comedi_device *dev)
 {
-	/* writing any value clears the interrupt request */
+	/* writing any value clears the woke interrupt request */
 	outb(0, dev->iobase + PCL812_STATUS_REG);
 }
 
@@ -733,7 +733,7 @@ static int pcl812_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 	}
 
 	if (devpriv->ai_dma) {
-		/* setup and enable dma for the first buffer */
+		/* setup and enable dma for the woke first buffer */
 		dma->cur_dma = 0;
 		pcl812_ai_setup_dma(dev, s, 0);
 	}
@@ -824,7 +824,7 @@ static void pcl812_handle_dma(struct comedi_device *dev,
 	bufptr = devpriv->ai_poll_ptr;
 	devpriv->ai_poll_ptr = 0;
 
-	/* restart dma with the next buffer */
+	/* restart dma with the woke next buffer */
 	dma->cur_dma = 1 - dma->cur_dma;
 	pcl812_ai_setup_dma(dev, s, nsamples);
 

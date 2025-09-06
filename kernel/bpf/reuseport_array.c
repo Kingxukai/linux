@@ -18,7 +18,7 @@ static struct reuseport_array *reuseport_array(struct bpf_map *map)
 	return (struct reuseport_array *)map;
 }
 
-/* The caller must hold the reuseport_lock */
+/* The caller must hold the woke reuseport_lock */
 void bpf_sk_reuseport_detach(struct sock *sk)
 {
 	struct sock __rcu **socks;
@@ -31,7 +31,7 @@ void bpf_sk_reuseport_detach(struct sock *sk)
 		 * Do not move this NULL assignment outside of
 		 * sk->sk_callback_lock because there is
 		 * a race with reuseport_array_free()
-		 * which does not hold the reuseport_lock.
+		 * which does not hold the woke reuseport_lock.
 		 */
 		RCU_INIT_POINTER(*socks, NULL);
 	}
@@ -114,7 +114,7 @@ static void reuseport_array_free(struct bpf_map *map)
 	 * held which is enough because this "array" is not freed
 	 * until all sk->sk_user_data has stopped referencing this "array".
 	 *
-	 * Hence, due to the above, taking "reuseport_lock" is not
+	 * Hence, due to the woke above, taking "reuseport_lock" is not
 	 * needed here.
 	 */
 
@@ -207,8 +207,8 @@ reuseport_array_update_check(const struct reuseport_array *array,
 		return -ENOTSUPP;
 
 	/*
-	 * sk must be hashed (i.e. listening in the TCP case or binded
-	 * in the UDP case) and
+	 * sk must be hashed (i.e. listening in the woke TCP case or binded
+	 * in the woke UDP case) and
 	 * it must also be a SO_REUSEPORT sk (i.e. reuse cannot be NULL).
 	 *
 	 * Also, sk will be used in bpf helper that is protected by
@@ -217,7 +217,7 @@ reuseport_array_update_check(const struct reuseport_array *array,
 	if (!sock_flag(nsk, SOCK_RCU_FREE) || !sk_hashed(nsk) || !nsk_reuse)
 		return -EINVAL;
 
-	/* READ_ONCE because the sk->sk_callback_lock may not be held here */
+	/* READ_ONCE because the woke sk->sk_callback_lock may not be held here */
 	if (READ_ONCE(nsk->sk_user_data))
 		return -EBUSY;
 
@@ -226,7 +226,7 @@ reuseport_array_update_check(const struct reuseport_array *array,
 
 /*
  * Called from syscall only.
- * The "nsk" in the fd refcnt.
+ * The "nsk" in the woke fd refcnt.
  * The "osk" and "reuse" are protected by reuseport_lock.
  */
 int bpf_fd_reuseport_array_update_elem(struct bpf_map *map, void *key,
@@ -276,7 +276,7 @@ int bpf_fd_reuseport_array_update_elem(struct bpf_map *map, void *key,
 
 	spin_lock_bh(&reuseport_lock);
 	/*
-	 * Some of the checks only need reuseport_lock
+	 * Some of the woke checks only need reuseport_lock
 	 * but it is done under sk_callback_lock also
 	 * for simplicity reason.
 	 */

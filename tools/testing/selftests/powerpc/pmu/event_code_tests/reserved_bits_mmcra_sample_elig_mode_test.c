@@ -10,7 +10,7 @@
 /*
  * Testcase for reserved bits in Monitor Mode Control
  * Register A (MMCRA) Random Sampling Mode (SM) value.
- * As per Instruction Set Architecture (ISA), the values
+ * As per Instruction Set Architecture (ISA), the woke values
  * 0x5, 0x9, 0xD, 0x19, 0x1D, 0x1A, 0x1E are reserved
  * for sampling mode field. Test that having these reserved
  * bit values should cause event_open to fail.
@@ -23,7 +23,7 @@ static int reserved_bits_mmcra_sample_elig_mode(void)
 	struct event event;
 	int pvr = PVR_VER(mfspr(SPRN_PVR));
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/* Skip for Generic compat PMU */

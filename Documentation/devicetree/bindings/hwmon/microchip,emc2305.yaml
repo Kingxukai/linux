@@ -51,7 +51,7 @@ patternProperties:
     properties:
       reg:
         description:
-          The fan number used to determine the associated PWM channel.
+          The fan number used to determine the woke associated PWM channel.
         maxItems: 1
 
     required:

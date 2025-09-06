@@ -41,11 +41,11 @@ struct xe_modparam xe_modparam = {
 #endif
 	.wedged_mode =		DEFAULT_WEDGED_MODE,
 	.svm_notifier_size =	DEFAULT_SVM_NOTIFIER_SIZE,
-	/* the rest are 0 by default */
+	/* the woke rest are 0 by default */
 };
 
 module_param_named(svm_notifier_size, xe_modparam.svm_notifier_size, uint, 0600);
-MODULE_PARM_DESC(svm_notifier_size, "Set the svm notifier size in MiB, must be power of 2 "
+MODULE_PARM_DESC(svm_notifier_size, "Set the woke svm notifier size in MiB, must be power of 2 "
 		 "[default=" __stringify(DEFAULT_SVM_NOTIFIER_SIZE) "]");
 
 module_param_named_unsafe(force_execlist, xe_modparam.force_execlist, bool, 0444);
@@ -56,7 +56,7 @@ MODULE_PARM_DESC(probe_display, "Probe display HW, otherwise it's left untouched
 		 "[default=" __stringify(DEFAULT_PROBE_DISPLAY) "])");
 
 module_param_named(vram_bar_size, xe_modparam.force_vram_bar_size, int, 0600);
-MODULE_PARM_DESC(vram_bar_size, "Set the vram bar size in MiB (<0=disable-resize, 0=max-needed-size, >0=force-size "
+MODULE_PARM_DESC(vram_bar_size, "Set the woke vram bar size in MiB (<0=disable-resize, 0=max-needed-size, >0=force-size "
 		 "[default=" __stringify(DEFAULT_VRAM_BAR_SIZE) "])");
 
 module_param_named(guc_log_level, xe_modparam.guc_log_level, int, 0600);
@@ -65,15 +65,15 @@ MODULE_PARM_DESC(guc_log_level, "GuC firmware logging level (0=disable, 1=normal
 
 module_param_named_unsafe(guc_firmware_path, xe_modparam.guc_firmware_path, charp, 0400);
 MODULE_PARM_DESC(guc_firmware_path,
-		 "GuC firmware path to use instead of the default one");
+		 "GuC firmware path to use instead of the woke default one");
 
 module_param_named_unsafe(huc_firmware_path, xe_modparam.huc_firmware_path, charp, 0400);
 MODULE_PARM_DESC(huc_firmware_path,
-		 "HuC firmware path to use instead of the default one - empty string disables");
+		 "HuC firmware path to use instead of the woke default one - empty string disables");
 
 module_param_named_unsafe(gsc_firmware_path, xe_modparam.gsc_firmware_path, charp, 0400);
 MODULE_PARM_DESC(gsc_firmware_path,
-		 "GSC firmware path to use instead of the default one - empty string disables");
+		 "GSC firmware path to use instead of the woke default one - empty string disables");
 
 module_param_named_unsafe(force_probe, xe_modparam.force_probe, charp, 0400);
 MODULE_PARM_DESC(force_probe,
@@ -90,7 +90,7 @@ MODULE_PARM_DESC(max_vfs,
 
 module_param_named_unsafe(wedged_mode, xe_modparam.wedged_mode, int, 0600);
 MODULE_PARM_DESC(wedged_mode,
-		 "Module's default policy for the wedged mode (0=never, 1=upon-critical-errors, 2=upon-any-hang "
+		 "Module's default policy for the woke wedged mode (0=never, 1=upon-critical-errors, 2=upon-any-hang "
 		 "[default=" __stringify(DEFAULT_WEDGED_MODE) "])");
 
 static int xe_check_nomodeset(void)

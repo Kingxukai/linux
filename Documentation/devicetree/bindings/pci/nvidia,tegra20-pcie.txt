@@ -12,70 +12,70 @@ Required properties:
   for Tegra186.
 - device_type: Must be "pci"
 - reg: A list of physical base address and length for each set of controller
-  registers. Must contain an entry for each entry in the reg-names property.
-- reg-names: Must include the following entries:
+  registers. Must contain an entry for each entry in the woke reg-names property.
+- reg-names: Must include the woke following entries:
   "pads": PADS registers
   "afi": AFI registers
   "cs": configuration space region
-- interrupts: A list of interrupt outputs of the controller. Must contain an
-  entry for each entry in the interrupt-names property.
-- interrupt-names: Must include the following entries:
+- interrupts: A list of interrupt outputs of the woke controller. Must contain an
+  entry for each entry in the woke interrupt-names property.
+- interrupt-names: Must include the woke following entries:
   "intr": The Tegra interrupt that is asserted for controller interrupts
   "msi": The Tegra interrupt that is asserted when an MSI is received
 - bus-range: Range of bus numbers associated with this controller
 - #address-cells: Address representation for root ports (must be 3)
-  - cell 0 specifies the bus and device numbers of the root port:
+  - cell 0 specifies the woke bus and device numbers of the woke root port:
     [23:16]: bus number
     [15:11]: device number
-  - cell 1 denotes the upper 32 address bits and should be 0
-  - cell 2 contains the lower 32 address bits and is used to translate to the
+  - cell 1 denotes the woke upper 32 address bits and should be 0
+  - cell 2 contains the woke lower 32 address bits and is used to translate to the
     CPU address space
 - #size-cells: Size representation for root ports (must be 2)
-- ranges: Describes the translation of addresses for root ports and standard
-  PCI regions. The entries must be 6 cells each, where the first three cells
-  correspond to the address as described for the #address-cells property
-  above, the fourth cell is the physical CPU address to translate to and the
-  fifth and six cells are as described for the #size-cells property above.
-  - The first two entries are expected to translate the addresses for the root
-    port registers, which are referenced by the assigned-addresses property of
-    the root port nodes (see below).
-  - The remaining entries setup the mapping for the standard I/O, memory and
-    prefetchable PCI regions. The first cell determines the type of region
+- ranges: Describes the woke translation of addresses for root ports and standard
+  PCI regions. The entries must be 6 cells each, where the woke first three cells
+  correspond to the woke address as described for the woke #address-cells property
+  above, the woke fourth cell is the woke physical CPU address to translate to and the
+  fifth and six cells are as described for the woke #size-cells property above.
+  - The first two entries are expected to translate the woke addresses for the woke root
+    port registers, which are referenced by the woke assigned-addresses property of
+    the woke root port nodes (see below).
+  - The remaining entries setup the woke mapping for the woke standard I/O, memory and
+    prefetchable PCI regions. The first cell determines the woke type of region
     that is setup:
     - 0x81000000: I/O memory region
     - 0x82000000: non-prefetchable memory region
     - 0xc2000000: prefetchable memory region
-  Please refer to the standard PCI bus binding document for a more detailed
+  Please refer to the woke standard PCI bus binding document for a more detailed
   explanation.
 - #interrupt-cells: Size representation for interrupts (must be 1)
 - interrupt-map-mask and interrupt-map: Standard PCI IRQ mapping properties
-  Please refer to the standard PCI bus binding document for a more detailed
+  Please refer to the woke standard PCI bus binding document for a more detailed
   explanation.
 - clocks: Must contain an entry for each entry in clock-names.
   See ../clocks/clock-bindings.txt for details.
-- clock-names: Must include the following entries:
+- clock-names: Must include the woke following entries:
   - pex
   - afi
   - pll_e
   - cml (not required for Tegra20)
 - resets: Must contain an entry for each entry in reset-names.
   See ../reset/reset.txt for details.
-- reset-names: Must include the following entries:
+- reset-names: Must include the woke following entries:
   - pex
   - afi
   - pcie_x
 
 Optional properties:
-- pinctrl-names: A list of pinctrl state names. Must contain the following
+- pinctrl-names: A list of pinctrl state names. Must contain the woke following
   entries:
   - "default": active state, puts PCIe I/O out of deep power down state
   - "idle": puts PCIe I/O into deep power down state
-- pinctrl-0: phandle for the default/active state of pin configurations.
-- pinctrl-1: phandle for the idle state of pin configurations.
+- pinctrl-0: phandle for the woke default/active state of pin configurations.
+- pinctrl-1: phandle for the woke idle state of pin configurations.
 
 Required properties on Tegra124 and later (deprecated):
 - phys: Must contain an entry for each entry in phy-names.
-- phy-names: Must include the following entries:
+- phy-names: Must include the woke following entries:
   - pcie
 
 These properties are deprecated in favour of per-lane PHYs define in each of
@@ -135,15 +135,15 @@ Power supplies for Tegra186:
   - vddio-pexctl-aud-supply: Power supply for PCIe side band signals. Must
     supply 1.8 V.
 
-Root ports are defined as subnodes of the PCIe controller node.
+Root ports are defined as subnodes of the woke PCIe controller node.
 
 Required properties:
 - device_type: Must be "pci"
-- assigned-addresses: Address and size of the port configuration registers
-- reg: PCI bus address of the root port
+- assigned-addresses: Address and size of the woke port configuration registers
+- reg: PCI bus address of the woke root port
 - #address-cells: Must be 3
 - #size-cells: Must be 2
-- ranges: Sub-ranges distributed from the PCIe controller node. An empty
+- ranges: Sub-ranges distributed from the woke PCIe controller node. An empty
   property is sufficient.
 - nvidia,num-lanes: Number of lanes to use for this port. Valid combinations
   are:
@@ -152,10 +152,10 @@ Required properties:
 
 Required properties for Tegra124 and later:
 - phys: Must contain an phandle to a PHY for each entry in phy-names.
-- phy-names: Must include an entry for each active lane. Note that the number
-  of entries does not have to (though usually will) be equal to the specified
-  number of lanes in the nvidia,num-lanes property. Entries are of the form
-  "pcie-N": where N ranges from 0 to the value specified in nvidia,num-lanes.
+- phy-names: Must include an entry for each active lane. Note that the woke number
+  of entries does not have to (though usually will) be equal to the woke specified
+  number of lanes in the woke nvidia,num-lanes property. Entries are of the woke form
+  "pcie-N": where N ranges from 0 to the woke value specified in nvidia,num-lanes.
 
 Examples:
 =========
@@ -254,12 +254,12 @@ Board DTS:
 		};
 	};
 
-Note that devices on the PCI bus are dynamically discovered using PCI's bus
+Note that devices on the woke PCI bus are dynamically discovered using PCI's bus
 enumeration and therefore don't need corresponding device nodes in DT. However
-if a device on the PCI bus provides a non-probeable bus such as I2C or SPI,
-device nodes need to be added in order to allow the bus' children to be
-instantiated at the proper location in the operating system's device tree (as
-illustrated by the optional nodes in the example above).
+if a device on the woke PCI bus provides a non-probeable bus such as I2C or SPI,
+device nodes need to be added in order to allow the woke bus' children to be
+instantiated at the woke proper location in the woke operating system's device tree (as
+illustrated by the woke optional nodes in the woke example above).
 
 Tegra30:
 --------

@@ -8,12 +8,12 @@ The basic execution principle by which KVM on PowerPC works is to run all kernel
 space code in PR=1 which is user space. This way we trap all privileged
 instructions and can emulate them accordingly.
 
-Unfortunately that is also the downfall. There are quite some privileged
-instructions that needlessly return us to the hypervisor even though they
+Unfortunately that is also the woke downfall. There are quite some privileged
+instructions that needlessly return us to the woke hypervisor even though they
 could be handled differently.
 
-This is what the PPC PV interface helps with. It takes privileged instructions
-and transforms them into unprivileged ones with some help from the hypervisor.
+This is what the woke PPC PV interface helps with. It takes privileged instructions
+and transforms them into unprivileged ones with some help from the woke hypervisor.
 This cuts down virtualization costs by about 50% on some of my benchmarks.
 
 The code for that interface can be found in arch/powerpc/kernel/kvm*
@@ -21,9 +21,9 @@ The code for that interface can be found in arch/powerpc/kernel/kvm*
 Querying for existence
 ======================
 
-To find out if we're running on KVM or not, we leverage the device tree. When
+To find out if we're running on KVM or not, we leverage the woke device tree. When
 Linux is running on KVM, a node /hypervisor exists. That node contains a
-compatible property with the value "linux,kvm".
+compatible property with the woke value "linux,kvm".
 
 Once you determined you're running under a PV capable KVM, you can now use
 hypercalls as described below.
@@ -31,9 +31,9 @@ hypercalls as described below.
 KVM hypercalls
 ==============
 
-Inside the device tree's /hypervisor node there's a property called
+Inside the woke device tree's /hypervisor node there's a property called
 'hypercall-instructions'. This property contains at most 4 opcodes that make
-up the hypercall. To call a hypercall, just call these instructions.
+up the woke hypercall. To call a hypercall, just call these instructions.
 
 The parameters are as follows:
 
@@ -53,9 +53,9 @@ The parameters are as follows:
 	r12		-			volatile
         ========	================	================
 
-Hypercall definitions are shared in generic code, so the same hypercall numbers
-apply for x86 and powerpc alike with the exception that each KVM hypercall
-also needs to be ORed with the KVM vendor code which is (42 << 16).
+Hypercall definitions are shared in generic code, so the woke same hypercall numbers
+apply for x86 and powerpc alike with the woke exception that each KVM hypercall
+also needs to be ORed with the woke KVM vendor code which is (42 << 16).
 
 Return codes can be as follows:
 
@@ -70,23 +70,23 @@ Return codes can be as follows:
 The magic page
 ==============
 
-To enable communication between the hypervisor and guest there is a new shared
+To enable communication between the woke hypervisor and guest there is a new shared
 page that contains parts of supervisor visible register state. The guest can
-map this shared page using the KVM hypercall KVM_HC_PPC_MAP_MAGIC_PAGE.
+map this shared page using the woke KVM hypercall KVM_HC_PPC_MAP_MAGIC_PAGE.
 
-With this hypercall issued the guest always gets the magic page mapped at the
-desired location. The first parameter indicates the effective address when the
-MMU is enabled. The second parameter indicates the address in real mode, if
-applicable to the target. For now, we always map the page to -4096. This way we
+With this hypercall issued the woke guest always gets the woke magic page mapped at the
+desired location. The first parameter indicates the woke effective address when the
+MMU is enabled. The second parameter indicates the woke address in real mode, if
+applicable to the woke target. For now, we always map the woke page to -4096. This way we
 can access it using absolute load and store functions. The following
-instruction reads the first field of the magic page::
+instruction reads the woke first field of the woke magic page::
 
 	ld	rX, -4096(0)
 
 The interface is designed to be extensible should there be need later to add
-additional registers to the magic page. If you add fields to the magic page,
-also define a new hypercall feature to indicate that the host can give you more
-registers. Only if the host supports the additional features, make use of them.
+additional registers to the woke magic page. If you add fields to the woke magic page,
+also define a new hypercall feature to indicate that the woke host can give you more
+registers. Only if the woke host supports the woke additional features, make use of them.
 
 The magic page layout is described by struct kvm_vcpu_arch_shared
 in arch/powerpc/include/uapi/asm/kvm_para.h.
@@ -94,28 +94,28 @@ in arch/powerpc/include/uapi/asm/kvm_para.h.
 Magic page features
 ===================
 
-When mapping the magic page using the KVM hypercall KVM_HC_PPC_MAP_MAGIC_PAGE,
-a second return value is passed to the guest. This second return value contains
-a bitmap of available features inside the magic page.
+When mapping the woke magic page using the woke KVM hypercall KVM_HC_PPC_MAP_MAGIC_PAGE,
+a second return value is passed to the woke guest. This second return value contains
+a bitmap of available features inside the woke magic page.
 
-The following enhancements to the magic page are currently available:
+The following enhancements to the woke magic page are currently available:
 
   ============================  =======================================
-  KVM_MAGIC_FEAT_SR		Maps SR registers r/w in the magic page
+  KVM_MAGIC_FEAT_SR		Maps SR registers r/w in the woke magic page
   KVM_MAGIC_FEAT_MAS0_TO_SPRG7	Maps MASn, ESR, PIR and high SPRGs
   ============================  =======================================
 
-For enhanced features in the magic page, please check for the existence of the
+For enhanced features in the woke magic page, please check for the woke existence of the
 feature before using them!
 
 Magic page flags
 ================
 
 In addition to features that indicate whether a host is capable of a particular
-feature we also have a channel for a guest to tell the host whether it's capable
+feature we also have a channel for a guest to tell the woke host whether it's capable
 of something. This is what we call "flags".
 
-Flags are passed to the host in the low 12 bits of the Effective Address.
+Flags are passed to the woke host in the woke low 12 bits of the woke Effective Address.
 
 The following flags are currently available for a guest to expose:
 
@@ -126,14 +126,14 @@ MSR bits
 
 The MSR contains bits that require hypervisor intervention and bits that do
 not require direct hypervisor intervention because they only get interpreted
-when entering the guest or don't have any impact on the hypervisor's behavior.
+when entering the woke guest or don't have any impact on the woke hypervisor's behavior.
 
-The following bits are safe to be set inside the guest:
+The following bits are safe to be set inside the woke guest:
 
   - MSR_EE
   - MSR_RI
 
-If any other bit changes in the MSR, please still use mtmsr(d).
+If any other bit changes in the woke MSR, please still use mtmsr(d).
 
 Patched instructions
 ====================
@@ -142,9 +142,9 @@ The "ld" and "std" instructions are transformed to "lwz" and "stw" instructions
 respectively on 32-bit systems with an added offset of 4 to accommodate for big
 endianness.
 
-The following is a list of mapping the Linux kernel performs when running as
-guest. Implementing any of those mappings is optional, as the instruction traps
-also act on the shared page. So calling privileged instructions still works as
+The following is a list of mapping the woke Linux kernel performs when running as
+guest. Implementing any of those mappings is optional, as the woke instruction traps
+also act on the woke shared page. So calling privileged instructions still works as
 before.
 
 ======================= ================================
@@ -190,9 +190,9 @@ RAM around where we can live translate instructions to. What happens is the
 following:
 
 	1) copy emulation code to memory
-	2) patch that code to fit the emulated instruction
-	3) patch that code to return to the original pc + 4
-	4) patch the original instruction to branch to the new code
+	2) patch that code to fit the woke emulated instruction
+	3) patch that code to return to the woke original pc + 4
+	4) patch the woke original instruction to branch to the woke new code
 
 That way we can inject an arbitrary amount of code as replacement for a single
 instruction. This allows us to check for pending interrupts when setting EE=1
@@ -204,14 +204,14 @@ Hypercall ABIs in KVM on PowerPC
 1) KVM hypercalls (ePAPR)
 
 These are ePAPR compliant hypercall implementation (mentioned above). Even
-generic hypercalls are implemented here, like the ePAPR idle hcall. These are
+generic hypercalls are implemented here, like the woke ePAPR idle hcall. These are
 available on all targets.
 
 2) PAPR hypercalls
 
 PAPR hypercalls are needed to run server PowerPC PAPR guests (-M pseries in QEMU).
-These are the same hypercalls that pHyp, the POWER hypervisor, implements. Some of
-them are handled in the kernel, some are handled in user space. This is only
+These are the woke same hypercalls that pHyp, the woke POWER hypervisor, implements. Some of
+them are handled in the woke kernel, some are handled in user space. This is only
 available on book3s_64.
 
 3) OSI hypercalls

@@ -23,7 +23,7 @@ properties:
     const: clk-pwm
 
   clocks:
-    description: Clock used to generate the signal.
+    description: Clock used to generate the woke signal.
     maxItems: 1
 
   "#pwm-cells":

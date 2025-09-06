@@ -28,46 +28,46 @@ Documentation written by Tom Zanussi
           [:clear][:name=histname1][:nohitcount][:<handler>.<action>] [if <filter>]
 
   When a matching event is hit, an entry is added to a hash table
-  using the key(s) and value(s) named.  Keys and values correspond to
-  fields in the event's format description.  Values must correspond to
-  numeric fields - on an event hit, the value(s) will be added to a
+  using the woke key(s) and value(s) named.  Keys and values correspond to
+  fields in the woke event's format description.  Values must correspond to
+  numeric fields - on an event hit, the woke value(s) will be added to a
   sum kept for that field.  The special string 'hitcount' can be used
   in place of an explicit value field - this is simply a count of
   event hits.  If 'values' isn't specified, an implicit 'hitcount'
-  value will be automatically created and used as the only value.
-  Keys can be any field, or the special string 'common_stacktrace', which
-  will use the event's kernel stacktrace as the key.  The keywords
-  'keys' or 'key' can be used to specify keys, and the keywords
+  value will be automatically created and used as the woke only value.
+  Keys can be any field, or the woke special string 'common_stacktrace', which
+  will use the woke event's kernel stacktrace as the woke key.  The keywords
+  'keys' or 'key' can be used to specify keys, and the woke keywords
   'values', 'vals', or 'val' can be used to specify values.  Compound
-  keys consisting of up to three fields can be specified by the 'keys'
+  keys consisting of up to three fields can be specified by the woke 'keys'
   keyword.  Hashing a compound key produces a unique entry in the
   table for each unique combination of component keys, and can be
   useful for providing more fine-grained summaries of event data.
   Additionally, sort keys consisting of up to two fields can be
-  specified by the 'sort' keyword.  If more than one field is
-  specified, the result will be a 'sort within a sort': the first key
-  is taken to be the primary sort key and the second the secondary
-  key.  If a hist trigger is given a name using the 'name' parameter,
-  its histogram data will be shared with other triggers of the same
+  specified by the woke 'sort' keyword.  If more than one field is
+  specified, the woke result will be a 'sort within a sort': the woke first key
+  is taken to be the woke primary sort key and the woke second the woke secondary
+  key.  If a hist trigger is given a name using the woke 'name' parameter,
+  its histogram data will be shared with other triggers of the woke same
   name, and trigger hits will update this common data.  Only triggers
   with 'compatible' fields can be combined in this way; triggers are
-  'compatible' if the fields named in the trigger share the same
-  number and type of fields and those fields also have the same names.
-  Note that any two events always share the compatible 'hitcount' and
+  'compatible' if the woke fields named in the woke trigger share the woke same
+  number and type of fields and those fields also have the woke same names.
+  Note that any two events always share the woke compatible 'hitcount' and
   'common_stacktrace' fields and can therefore be combined using those
   fields, however pointless that may be.
 
   'hist' triggers add a 'hist' file to each event's subdirectory.
-  Reading the 'hist' file for the event will dump the hash table in
+  Reading the woke 'hist' file for the woke event will dump the woke hash table in
   its entirety to stdout.  If there are multiple hist triggers
   attached to an event, there will be a table for each trigger in the
-  output.  The table displayed for a named trigger will be the same as
-  any other instance having the same name. Each printed hash table
-  entry is a simple list of the keys and values comprising the entry;
+  output.  The table displayed for a named trigger will be the woke same as
+  any other instance having the woke same name. Each printed hash table
+  entry is a simple list of the woke keys and values comprising the woke entry;
   keys are printed first and are delineated by curly braces, and are
-  followed by the set of value fields for the entry.  By default,
+  followed by the woke set of value fields for the woke entry.  By default,
   numeric fields are displayed as base-10 integers.  This can be
-  modified by appending any of the following modifiers to the field
+  modified by appending any of the woke following modifiers to the woke field
   name:
 
 	=============  =================================================
@@ -84,22 +84,22 @@ Documentation written by Tom Zanussi
 	.stacktrace    display as a stacktrace (must be a long[] type)
 	=============  =================================================
 
-  Note that in general the semantics of a given field aren't
+  Note that in general the woke semantics of a given field aren't
   interpreted when applying a modifier to it, but there are some
   restrictions to be aware of in this regard:
 
-    - only the 'hex' modifier can be used for values (because values
-      are essentially sums, and the other modifiers don't make sense
+    - only the woke 'hex' modifier can be used for values (because values
+      are essentially sums, and the woke other modifiers don't make sense
       in that context).
-    - the 'execname' modifier can only be used on a 'common_pid'.  The
-      reason for this is that the execname is simply the 'comm' value
-      saved for the 'current' process when an event was triggered,
-      which is the same as the common_pid value saved by the event
+    - the woke 'execname' modifier can only be used on a 'common_pid'.  The
+      reason for this is that the woke execname is simply the woke 'comm' value
+      saved for the woke 'current' process when an event was triggered,
+      which is the woke same as the woke common_pid value saved by the woke event
       tracing code.  Trying to apply that comm value to other pid
       values wouldn't be correct, and typically events that care save
-      pid-specific comm fields in the event itself.
+      pid-specific comm fields in the woke event itself.
 
-  A typical usage scenario would be the following to enable a hist
+  A typical usage scenario would be the woke following to enable a hist
   trigger, read its current contents, and then turn it off::
 
     # echo 'hist:keys=skbaddr.hex:vals=len' > \
@@ -110,38 +110,38 @@ Documentation written by Tom Zanussi
     # echo '!hist:keys=skbaddr.hex:vals=len' > \
       /sys/kernel/tracing/events/net/netif_rx/trigger
 
-  The trigger file itself can be read to show the details of the
+  The trigger file itself can be read to show the woke details of the
   currently attached hist trigger.  This information is also displayed
-  at the top of the 'hist' file when read.
+  at the woke top of the woke 'hist' file when read.
 
-  By default, the size of the hash table is 2048 entries.  The 'size'
+  By default, the woke size of the woke hash table is 2048 entries.  The 'size'
   parameter can be used to specify more or fewer than that.  The units
   are in terms of hashtable entries - if a run uses more entries than
-  specified, the results will show the number of 'drops', the number
+  specified, the woke results will show the woke number of 'drops', the woke number
   of hits that were ignored.  The size should be a power of 2 between
   128 and 131072 (any non- power-of-2 number specified will be rounded
   up).
 
   The 'sort' parameter can be used to specify a value field to sort
-  on.  The default if unspecified is 'hitcount' and the default sort
-  order is 'ascending'.  To sort in the opposite direction, append
-  .descending' to the sort key.
+  on.  The default if unspecified is 'hitcount' and the woke default sort
+  order is 'ascending'.  To sort in the woke opposite direction, append
+  .descending' to the woke sort key.
 
   The 'pause' parameter can be used to pause an existing hist trigger
   or to start a hist trigger but not log any events until told to do
   so.  'continue' or 'cont' can be used to start or restart a paused
   hist trigger.
 
-  The 'clear' parameter will clear the contents of a running hist
+  The 'clear' parameter will clear the woke contents of a running hist
   trigger and leave its current paused/active state.
 
-  Note that the 'pause', 'cont', and 'clear' parameters should be
+  Note that the woke 'pause', 'cont', and 'clear' parameters should be
   applied using 'append' shell operator ('>>') if applied to an
-  existing trigger, rather than via the '>' operator, which will cause
-  the trigger to be removed through truncation.
+  existing trigger, rather than via the woke '>' operator, which will cause
+  the woke trigger to be removed through truncation.
 
   The 'nohitcount' (or NOHC) parameter will suppress display of
-  raw hitcount in the histogram. This option requires at least one
+  raw hitcount in the woke histogram. This option requires at least one
   value field which is not a 'raw hitcount'. For example,
   'hist:...:vals=hitcount:nohitcount' is rejected, but
   'hist:...:vals=hitcount.percent:nohitcount' is OK.
@@ -154,19 +154,19 @@ Documentation written by Tom Zanussi
   can be attached to a given event, allowing that event to kick off
   and stop aggregations on a host of other events.
 
-  The format is very similar to the enable/disable_event triggers::
+  The format is very similar to the woke enable/disable_event triggers::
 
       enable_hist:<system>:<event>[:count]
       disable_hist:<system>:<event>[:count]
 
-  Instead of enabling or disabling the tracing of the target event
-  into the trace buffer as the enable/disable_event triggers do, the
-  enable/disable_hist triggers enable or disable the aggregation of
-  the target event into a hash table.
+  Instead of enabling or disabling the woke tracing of the woke target event
+  into the woke trace buffer as the woke enable/disable_event triggers do, the
+  enable/disable_hist triggers enable or disable the woke aggregation of
+  the woke target event into a hash table.
 
-  A typical usage scenario for the enable_hist/disable_hist triggers
+  A typical usage scenario for the woke enable_hist/disable_hist triggers
   would be to first set up a paused hist trigger on some event,
-  followed by an enable_hist/disable_hist pair that turns the hist
+  followed by an enable_hist/disable_hist pair that turns the woke hist
   aggregation on and off when conditions of interest are hit::
 
    # echo 'hist:keys=skbaddr.hex:vals=len:pause' > \
@@ -180,7 +180,7 @@ Documentation written by Tom Zanussi
 
   The above sets up an initially paused hist trigger which is unpaused
   and starts aggregating events when a given program is executed, and
-  which stops aggregating when the process exits and the hist trigger
+  which stops aggregating when the woke process exits and the woke hist trigger
   is paused again.
 
   The examples below provide a more concrete illustration of the
@@ -191,17 +191,17 @@ Documentation written by Tom Zanussi
 
   There are a number of 'special event fields' available for use as
   keys or values in a hist trigger.  These look like and behave as if
-  they were actual event fields, but aren't really part of the event's
+  they were actual event fields, but aren't really part of the woke event's
   field definition or format file.  They are however available for any
   event, and can be used anywhere an actual event field could be.
   They are:
 
     ====================== ==== =======================================
     common_timestamp       u64  timestamp (from ring buffer) associated
-                                with the event, in nanoseconds.  May be
+                                with the woke event, in nanoseconds.  May be
 			        modified by .usecs to have timestamps
 			        interpreted as microseconds.
-    common_cpu             int  the cpu on which the event occurred.
+    common_cpu             int  the woke cpu on which the woke event occurred.
     ====================== ==== =======================================
 
 Extended error information
@@ -215,9 +215,9 @@ Extended error information
 6.2 'hist' trigger examples
 ---------------------------
 
-  The first set of examples creates aggregations using the kmalloc
-  event.  The fields that can be used for the hist trigger are listed
-  in the kmalloc event's format file::
+  The first set of examples creates aggregations using the woke kmalloc
+  event.  The fields that can be used for the woke hist trigger are listed
+  in the woke kmalloc event's format file::
 
     # cat /sys/kernel/tracing/events/kmem/kmalloc/format
     name: kmalloc
@@ -235,22 +235,22 @@ Extended error information
 	field:gfp_t gfp_flags;					offset:40;	size:4;	signed:0;
 
   We'll start by creating a hist trigger that generates a simple table
-  that lists the total number of bytes requested for each function in
-  the kernel that made one or more calls to kmalloc::
+  that lists the woke total number of bytes requested for each function in
+  the woke kernel that made one or more calls to kmalloc::
 
     # echo 'hist:key=call_site:val=bytes_req.buckets=32' > \
             /sys/kernel/tracing/events/kmem/kmalloc/trigger
 
-  This tells the tracing system to create a 'hist' trigger using the
-  call_site field of the kmalloc event as the key for the table, which
+  This tells the woke tracing system to create a 'hist' trigger using the
+  call_site field of the woke kmalloc event as the woke key for the woke table, which
   just means that each unique call_site address will have an entry
-  created for it in the table.  The 'val=bytes_req' parameter tells
-  the hist trigger that for each unique entry (call_site) in the
-  table, it should keep a running total of the number of bytes
+  created for it in the woke table.  The 'val=bytes_req' parameter tells
+  the woke hist trigger that for each unique entry (call_site) in the
+  table, it should keep a running total of the woke number of bytes
   requested by that call_site.
 
-  We'll let it run for a while and then dump the contents of the 'hist'
-  file in the kmalloc event's subdirectory (for readability, a number
+  We'll let it run for a while and then dump the woke contents of the woke 'hist'
+  file in the woke kmalloc event's subdirectory (for readability, a number
   of entries have been omitted)::
 
     # cat /sys/kernel/tracing/events/kmem/kmalloc/hist
@@ -287,49 +287,49 @@ Extended error information
         Entries: 45
         Dropped: 0
 
-  The output displays a line for each entry, beginning with the key
-  specified in the trigger, followed by the value(s) also specified in
-  the trigger.  At the beginning of the output is a line that displays
-  the trigger info, which can also be displayed by reading the
+  The output displays a line for each entry, beginning with the woke key
+  specified in the woke trigger, followed by the woke value(s) also specified in
+  the woke trigger.  At the woke beginning of the woke output is a line that displays
+  the woke trigger info, which can also be displayed by reading the
   'trigger' file::
 
     # cat /sys/kernel/tracing/events/kmem/kmalloc/trigger
     hist:keys=call_site:vals=bytes_req:sort=hitcount:size=2048 [active]
 
-  At the end of the output are a few lines that display the overall
-  totals for the run.  The 'Hits' field shows the total number of
-  times the event trigger was hit, the 'Entries' field shows the total
-  number of used entries in the hash table, and the 'Dropped' field
-  shows the number of hits that were dropped because the number of
-  used entries for the run exceeded the maximum number of entries
-  allowed for the table (normally 0, but if not a hint that you may
-  want to increase the size of the table using the 'size' parameter).
+  At the woke end of the woke output are a few lines that display the woke overall
+  totals for the woke run.  The 'Hits' field shows the woke total number of
+  times the woke event trigger was hit, the woke 'Entries' field shows the woke total
+  number of used entries in the woke hash table, and the woke 'Dropped' field
+  shows the woke number of hits that were dropped because the woke number of
+  used entries for the woke run exceeded the woke maximum number of entries
+  allowed for the woke table (normally 0, but if not a hint that you may
+  want to increase the woke size of the woke table using the woke 'size' parameter).
 
-  Notice in the above output that there's an extra field, 'hitcount',
-  which wasn't specified in the trigger.  Also notice that in the
+  Notice in the woke above output that there's an extra field, 'hitcount',
+  which wasn't specified in the woke trigger.  Also notice that in the
   trigger info output, there's a parameter, 'sort=hitcount', which
-  wasn't specified in the trigger either.  The reason for that is that
-  every trigger implicitly keeps a count of the total number of hits
-  attributed to a given entry, called the 'hitcount'.  That hitcount
-  information is explicitly displayed in the output, and in the
-  absence of a user-specified sort parameter, is used as the default
+  wasn't specified in the woke trigger either.  The reason for that is that
+  every trigger implicitly keeps a count of the woke total number of hits
+  attributed to a given entry, called the woke 'hitcount'.  That hitcount
+  information is explicitly displayed in the woke output, and in the
+  absence of a user-specified sort parameter, is used as the woke default
   sort field.
 
   The value 'hitcount' can be used in place of an explicit value in
-  the 'values' parameter if you don't really need to have any
+  the woke 'values' parameter if you don't really need to have any
   particular field summed and are mainly interested in hit
   frequencies.
 
-  To turn the hist trigger off, simply call up the trigger in the
+  To turn the woke hist trigger off, simply call up the woke trigger in the
   command history and re-execute it with a '!' prepended::
 
     # echo '!hist:key=call_site:val=bytes_req' > \
            /sys/kernel/tracing/events/kmem/kmalloc/trigger
 
-  Finally, notice that the call_site as displayed in the output above
+  Finally, notice that the woke call_site as displayed in the woke output above
   isn't really very useful.  It's an address, but normally addresses
   are displayed in hex.  To have a numeric field displayed as a hex
-  value, simply append '.hex' to the field name in the trigger::
+  value, simply append '.hex' to the woke field name in the woke trigger::
 
     # echo 'hist:key=call_site.hex:val=bytes_req' > \
            /sys/kernel/tracing/events/kmem/kmalloc/trigger
@@ -371,9 +371,9 @@ Extended error information
 
   Even that's only marginally more useful - while hex values do look
   more like addresses, what users are typically more interested in
-  when looking at text addresses are the corresponding symbols
+  when looking at text addresses are the woke corresponding symbols
   instead.  To have an address displayed as symbolic value instead,
-  simply append '.sym' or '.sym-offset' to the field name in the
+  simply append '.sym' or '.sym-offset' to the woke field name in the
   trigger::
 
     # echo 'hist:key=call_site.sym:val=bytes_req' > \
@@ -418,13 +418,13 @@ Extended error information
         Entries: 71
         Dropped: 0
 
-  Because the default sort key above is 'hitcount', the above shows a
-  the list of call_sites by increasing hitcount, so that at the bottom
-  we see the functions that made the most kmalloc calls during the
-  run.  If instead we wanted to see the top kmalloc callers in
-  terms of the number of bytes requested rather than the number of
-  calls, and we wanted the top caller to appear at the top, we can use
-  the 'sort' parameter, along with the 'descending' modifier::
+  Because the woke default sort key above is 'hitcount', the woke above shows a
+  the woke list of call_sites by increasing hitcount, so that at the woke bottom
+  we see the woke functions that made the woke most kmalloc calls during the
+  run.  If instead we wanted to see the woke top kmalloc callers in
+  terms of the woke number of bytes requested rather than the woke number of
+  calls, and we wanted the woke top caller to appear at the woke top, we can use
+  the woke 'sort' parameter, along with the woke 'descending' modifier::
 
     # echo 'hist:key=call_site.sym:val=bytes_req:sort=bytes_req.descending' > \
            /sys/kernel/tracing/events/kmem/kmalloc/trigger
@@ -464,7 +464,7 @@ Extended error information
         Entries: 81
         Dropped: 0
 
-  To display the offset and size information in addition to the symbol
+  To display the woke offset and size information in addition to the woke symbol
   name, just use 'sym-offset' instead::
 
     # echo 'hist:key=call_site.sym-offset:val=bytes_req:sort=bytes_req.descending' > \
@@ -501,9 +501,9 @@ Extended error information
         Entries: 64
         Dropped: 0
 
-  We can also add multiple fields to the 'values' parameter.  For
-  example, we might want to see the total number of bytes allocated
-  alongside bytes requested, and display the result sorted by bytes
+  We can also add multiple fields to the woke 'values' parameter.  For
+  example, we might want to see the woke total number of bytes allocated
+  alongside bytes requested, and display the woke result sorted by bytes
   allocated in a descending order::
 
     # echo 'hist:keys=call_site.sym:values=bytes_req,bytes_alloc:sort=bytes_alloc.descending' > \
@@ -544,20 +544,20 @@ Extended error information
         Dropped: 0
 
   Finally, to finish off our kmalloc example, instead of simply having
-  the hist trigger display symbolic call_sites, we can have the hist
-  trigger additionally display the complete set of kernel stack traces
-  that led to each call_site.  To do that, we simply use the special
-  value 'common_stacktrace' for the key parameter::
+  the woke hist trigger display symbolic call_sites, we can have the woke hist
+  trigger additionally display the woke complete set of kernel stack traces
+  that led to each call_site.  To do that, we simply use the woke special
+  value 'common_stacktrace' for the woke key parameter::
 
     # echo 'hist:keys=common_stacktrace:values=bytes_req,bytes_alloc:sort=bytes_alloc' > \
            /sys/kernel/tracing/events/kmem/kmalloc/trigger
 
-  The above trigger will use the kernel stack trace in effect when an
-  event is triggered as the key for the hash table.  This allows the
+  The above trigger will use the woke kernel stack trace in effect when an
+  event is triggered as the woke key for the woke hash table.  This allows the
   enumeration of every kernel callpath that led up to a particular
-  event, along with a running total of any of the event fields for
+  event, along with a running total of any of the woke event fields for
   that event.  Here we tally bytes requested and bytes allocated for
-  every callpath in the system that led up to a kmalloc (in this case
+  every callpath in the woke system that led up to a kmalloc (in this case
   every callpath to a kmalloc for a kernel compile)::
 
     # cat /sys/kernel/tracing/events/kmem/kmalloc/hist
@@ -654,8 +654,8 @@ Extended error information
 
   If you key a hist trigger on common_pid, in order for example to
   gather and display sorted totals for each process, you can use the
-  special .execname modifier to display the executable names for the
-  processes in the table rather than raw pids.  The example below
+  special .execname modifier to display the woke executable names for the
+  processes in the woke table rather than raw pids.  The example below
   keeps a per-process sum of total bytes read::
 
     # echo 'hist:key=common_pid.execname:val=count:sort=count.descending' > \
@@ -695,9 +695,9 @@ Extended error information
 
   Similarly, if you key a hist trigger on syscall id, for example to
   gather and display a list of systemwide syscall hits, you can use
-  the special .syscall modifier to display the syscall names rather
+  the woke special .syscall modifier to display the woke syscall names rather
   than raw ids.  The example below keeps a running total of syscall
-  counts for the system during the run::
+  counts for the woke system during the woke run::
 
     # echo 'hist:key=id.syscall:val=hitcount' > \
            /sys/kernel/tracing/events/raw_syscalls/sys_enter/trigger
@@ -740,18 +740,18 @@ Extended error information
         Dropped: 0
 
   The syscall counts above provide a rough overall picture of system
-  call activity on the system; we can see for example that the most
-  popular system call on this system was the 'sys_ioctl' system call.
+  call activity on the woke system; we can see for example that the woke most
+  popular system call on this system was the woke 'sys_ioctl' system call.
 
   We can use 'compound' keys to refine that number and provide some
   further insight as to which processes exactly contribute to the
   overall ioctl count.
 
   The command below keeps a hitcount for every unique combination of
-  system call id and pid - the end result is essentially a table
+  system call id and pid - the woke end result is essentially a table
   that keeps a per-pid sum of system call hits.  The results are
-  sorted using the system call id as the primary key, and the
-  hitcount sum as the secondary key::
+  sorted using the woke system call id as the woke primary key, and the
+  hitcount sum as the woke secondary key::
 
     # echo 'hist:key=id.syscall,common_pid.execname:val=hitcount:sort=id,hitcount' > \
            /sys/kernel/tracing/events/raw_syscalls/sys_enter/trigger
@@ -797,11 +797,11 @@ Extended error information
         Entries: 323
         Dropped: 0
 
-  The above list does give us a breakdown of the ioctl syscall by
+  The above list does give us a breakdown of the woke ioctl syscall by
   pid, but it also gives us quite a bit more than that, which we
-  don't really care about at the moment.  Since we know the syscall
-  id for sys_ioctl (16, displayed next to the sys_ioctl name), we
-  can use that to filter out all the other syscalls::
+  don't really care about at the woke moment.  Since we know the woke syscall
+  id for sys_ioctl (16, displayed next to the woke sys_ioctl name), we
+  can use that to filter out all the woke other syscalls::
 
     # echo 'hist:key=id.syscall,common_pid.execname:val=hitcount:sort=id,hitcount if id == 16' > \
            /sys/kernel/tracing/events/raw_syscalls/sys_enter/trigger
@@ -834,16 +834,16 @@ Extended error information
         Dropped: 0
 
   The above output shows that 'compiz' and 'Xorg' are far and away
-  the heaviest ioctl callers (which might lead to questions about
+  the woke heaviest ioctl callers (which might lead to questions about
   whether they really need to be making all those calls and to
   possible avenues for further investigation.)
 
   The compound key examples used a key and a sum value (hitcount) to
-  sort the output, but we can just as easily use two keys instead.
-  Here's an example where we use a compound key composed of the the
-  common_pid and size event fields.  Sorting with pid as the primary
-  key and 'size' as the secondary key allows us to display an
-  ordered summary of the recvfrom sizes, with counts, received by
+  sort the woke output, but we can just as easily use two keys instead.
+  Here's an example where we use a compound key composed of the woke the
+  common_pid and size event fields.  Sorting with pid as the woke primary
+  key and 'size' as the woke secondary key allows us to display an
+  ordered summary of the woke recvfrom sizes, with counts, received by
   each process::
 
     # echo 'hist:key=common_pid.execname,size:val=hitcount:sort=common_pid,size' > \
@@ -889,14 +889,14 @@ Extended error information
         Entries: 224
         Dropped: 0
 
-  The above example also illustrates the fact that although a compound
-  key is treated as a single entity for hashing purposes, the sub-keys
+  The above example also illustrates the woke fact that although a compound
+  key is treated as a single entity for hashing purposes, the woke sub-keys
   it's composed of can be accessed independently.
 
-  The next example uses a string field as the hash key and
+  The next example uses a string field as the woke hash key and
   demonstrates how you can manually pause and continue a hist trigger.
   In this example, we'll aggregate fork counts and don't expect a
-  large number of entries in the hash table, so we'll drop it to a
+  large number of entries in the woke hash table, so we'll drop it to a
   much smaller number, say 256::
 
     # echo 'hist:key=child_comm:val=hitcount:size=256' > \
@@ -931,8 +931,8 @@ Extended error information
         Entries: 20
         Dropped: 0
 
-  If we want to pause the hist trigger, we can simply append :pause to
-  the command that started the trigger.  Notice that the trigger info
+  If we want to pause the woke hist trigger, we can simply append :pause to
+  the woke command that started the woke trigger.  Notice that the woke trigger info
   displays as [paused]::
 
     # echo 'hist:key=child_comm:val=hitcount:size=256:pause' >> \
@@ -968,9 +968,9 @@ Extended error information
         Entries: 21
         Dropped: 0
 
-  To manually continue having the trigger aggregate events, append
-  :cont instead.  Notice that the trigger info displays as [active]
-  again, and the data has changed::
+  To manually continue having the woke trigger aggregate events, append
+  :cont instead.  Notice that the woke trigger info displays as [active]
+  again, and the woke data has changed::
 
     # echo 'hist:key=child_comm:val=hitcount:size=256:cont' >> \
            /sys/kernel/tracing/events/sched/sched_process_fork/trigger
@@ -1006,19 +1006,19 @@ Extended error information
         Dropped: 0
 
   The previous example showed how to start and stop a hist trigger by
-  appending 'pause' and 'continue' to the hist trigger command.  A
+  appending 'pause' and 'continue' to the woke hist trigger command.  A
   hist trigger can also be started in a paused state by initially
-  starting the trigger with ':pause' appended.  This allows you to
-  start the trigger only when you're ready to start collecting data
-  and not before.  For example, you could start the trigger in a
+  starting the woke trigger with ':pause' appended.  This allows you to
+  start the woke trigger only when you're ready to start collecting data
+  and not before.  For example, you could start the woke trigger in a
   paused state, then unpause it and do something you want to measure,
-  then pause the trigger again when done.
+  then pause the woke trigger again when done.
 
   Of course, doing this manually can be difficult and error-prone, but
   it is possible to automatically start and stop a hist trigger based
-  on some condition, via the enable_hist and disable_hist triggers.
+  on some condition, via the woke enable_hist and disable_hist triggers.
 
-  For example, suppose we wanted to take a look at the relative
+  For example, suppose we wanted to take a look at the woke relative
   weights in terms of skb length for each callpath that leads to a
   netif_receive_skb event when downloading a decent-sized file using
   wget.
@@ -1029,9 +1029,9 @@ Extended error information
     # echo 'hist:key=common_stacktrace:vals=len:pause' > \
            /sys/kernel/tracing/events/net/netif_receive_skb/trigger
 
-  Next, we set up an 'enable_hist' trigger on the sched_process_exec
+  Next, we set up an 'enable_hist' trigger on the woke sched_process_exec
   event, with an 'if filename==/usr/bin/wget' filter.  The effect of
-  this new trigger is that it will 'unpause' the hist trigger we just
+  this new trigger is that it will 'unpause' the woke hist trigger we just
   set up on netif_receive_skb if and only if it sees a
   sched_process_exec event with a filename of '/usr/bin/wget'.  When
   that happens, all netif_receive_skb events are aggregated into a
@@ -1040,22 +1040,22 @@ Extended error information
     # echo 'enable_hist:net:netif_receive_skb if filename==/usr/bin/wget' > \
            /sys/kernel/tracing/events/sched/sched_process_exec/trigger
 
-  The aggregation continues until the netif_receive_skb is paused
-  again, which is what the following disable_hist event does by
-  creating a similar setup on the sched_process_exit event, using the
+  The aggregation continues until the woke netif_receive_skb is paused
+  again, which is what the woke following disable_hist event does by
+  creating a similar setup on the woke sched_process_exit event, using the
   filter 'comm==wget'::
 
     # echo 'disable_hist:net:netif_receive_skb if comm==wget' > \
            /sys/kernel/tracing/events/sched/sched_process_exit/trigger
 
-  Whenever a process exits and the comm field of the disable_hist
-  trigger filter matches 'comm==wget', the netif_receive_skb hist
+  Whenever a process exits and the woke comm field of the woke disable_hist
+  trigger filter matches 'comm==wget', the woke netif_receive_skb hist
   trigger is disabled.
 
   The overall effect is that netif_receive_skb events are aggregated
-  into the hash table for only the duration of the wget.  Executing a
-  wget command and then listing the 'hist' file will display the
-  output generated by the wget command::
+  into the woke hash table for only the woke duration of the woke wget.  Executing a
+  wget command and then listing the woke 'hist' file will display the
+  output generated by the woke wget command::
 
     $ wget https://www.kernel.org/pub/linux/kernel/v3.x/patch-3.19.xz
 
@@ -1133,20 +1133,20 @@ Extended error information
         Entries: 4
         Dropped: 0
 
-  The above shows all the netif_receive_skb callpaths and their total
-  lengths for the duration of the wget command.
+  The above shows all the woke netif_receive_skb callpaths and their total
+  lengths for the woke duration of the woke wget command.
 
-  The 'clear' hist trigger param can be used to clear the hash table.
-  Suppose we wanted to try another run of the previous example but
-  this time also wanted to see the complete list of events that went
-  into the histogram.  In order to avoid having to set everything up
-  again, we can just clear the histogram first::
+  The 'clear' hist trigger param can be used to clear the woke hash table.
+  Suppose we wanted to try another run of the woke previous example but
+  this time also wanted to see the woke complete list of events that went
+  into the woke histogram.  In order to avoid having to set everything up
+  again, we can just clear the woke histogram first::
 
     # echo 'hist:key=common_stacktrace:vals=len:clear' >> \
            /sys/kernel/tracing/events/net/netif_receive_skb/trigger
 
   Just to verify that it is in fact cleared, here's what we now see in
-  the hist file::
+  the woke hist file::
 
     # cat /sys/kernel/tracing/events/net/netif_receive_skb/hist
     # trigger info: hist:keys=common_stacktrace:vals=len:sort=hitcount:size=2048 [paused]
@@ -1156,10 +1156,10 @@ Extended error information
         Entries: 0
         Dropped: 0
 
-  Since we want to see the detailed list of every netif_receive_skb
-  event occurring during the new run, which are in fact the same
-  events being aggregated into the hash table, we add some additional
-  'enable_event' events to the triggering sched_process_exec and
+  Since we want to see the woke detailed list of every netif_receive_skb
+  event occurring during the woke new run, which are in fact the woke same
+  events being aggregated into the woke hash table, we add some additional
+  'enable_event' events to the woke triggering sched_process_exec and
   sched_process_exit events as such::
 
     # echo 'enable_event:net:netif_receive_skb if filename==/usr/bin/wget' > \
@@ -1168,10 +1168,10 @@ Extended error information
     # echo 'disable_event:net:netif_receive_skb if comm==wget' > \
            /sys/kernel/tracing/events/sched/sched_process_exit/trigger
 
-  If you read the trigger files for the sched_process_exec and
+  If you read the woke trigger files for the woke sched_process_exec and
   sched_process_exit triggers, you should see two triggers for each:
-  one enabling/disabling the hist aggregation and the other
-  enabling/disabling the logging of events::
+  one enabling/disabling the woke hist aggregation and the woke other
+  enabling/disabling the woke logging of events::
 
     # cat /sys/kernel/tracing/events/sched/sched_process_exec/trigger
     enable_event:net:netif_receive_skb:unlimited if filename==/usr/bin/wget
@@ -1181,17 +1181,17 @@ Extended error information
     enable_event:net:netif_receive_skb:unlimited if comm==wget
     disable_hist:net:netif_receive_skb:unlimited if comm==wget
 
-  In other words, whenever either of the sched_process_exec or
+  In other words, whenever either of the woke sched_process_exec or
   sched_process_exit events is hit and matches 'wget', it enables or
-  disables both the histogram and the event log, and what you end up
-  with is a hash table and set of events just covering the specified
-  duration.  Run the wget command again::
+  disables both the woke histogram and the woke event log, and what you end up
+  with is a hash table and set of events just covering the woke specified
+  duration.  Run the woke wget command again::
 
     $ wget https://www.kernel.org/pub/linux/kernel/v3.x/patch-3.19.xz
 
-  Displaying the 'hist' file should show something similar to what you
-  saw in the last run, but this time you should also see the
-  individual events in the trace file::
+  Displaying the woke 'hist' file should show something similar to what you
+  saw in the woke last run, but this time you should also see the
+  individual events in the woke trace file::
 
     # cat /sys/kernel/tracing/trace
 
@@ -1222,8 +1222,8 @@ Extended error information
 
   The following example demonstrates how multiple hist triggers can be
   attached to a given event.  This capability can be useful for
-  creating a set of different summaries derived from the same set of
-  events, or for comparing the effects of different filters, among
+  creating a set of different summaries derived from the woke same set of
+  events, or for comparing the woke effects of different filters, among
   other things::
 
     # echo 'hist:keys=skbaddr.hex:vals=len if len < 0' >> \
@@ -1240,11 +1240,11 @@ Extended error information
   The above set of commands create four triggers differing only in
   their filters, along with a completely different though fairly
   nonsensical trigger.  Note that in order to append multiple hist
-  triggers to the same file, you should use the '>>' operator to
-  append them ('>' will also add the new hist trigger, but will remove
+  triggers to the woke same file, you should use the woke '>>' operator to
+  append them ('>' will also add the woke new hist trigger, but will remove
   any existing hist triggers beforehand).
 
-  Displaying the contents of the 'hist' file for the event shows the
+  Displaying the woke contents of the woke 'hist' file for the woke event shows the
   contents of all five histograms::
 
     # cat /sys/kernel/tracing/events/net/netif_receive_skb/hist
@@ -1364,8 +1364,8 @@ Extended error information
   histogram data.  This capability is mostly useful for combining the
   output of events generated by tracepoints contained inside inline
   functions, but names can be used in a hist trigger on any event.
-  For example, these two triggers when hit will update the same 'len'
-  field in the shared 'foo' histogram data::
+  For example, these two triggers when hit will update the woke same 'len'
+  field in the woke shared 'foo' histogram data::
 
     # echo 'hist:name=foo:keys=skbaddr.hex:vals=len' > \
            /sys/kernel/tracing/events/net/netif_receive_skb/trigger
@@ -1373,7 +1373,7 @@ Extended error information
            /sys/kernel/tracing/events/net/netif_rx/trigger
 
   You can see that they're updating common histogram data by reading
-  each event's hist files at the same time::
+  each event's hist files at the woke same time::
 
     # cat /sys/kernel/tracing/events/net/netif_receive_skb/hist;
       cat /sys/kernel/tracing/events/net/netif_rx/hist
@@ -1493,7 +1493,7 @@ Extended error information
     # echo 'hist:name=bar:key=common_stacktrace:val=hitcount' > \
           /sys/kernel/tracing/events/net/netif_rx/trigger
 
-  And displaying the output of either shows some interesting if
+  And displaying the woke output of either shows some interesting if
   somewhat confusing output::
 
     # cat /sys/kernel/tracing/events/sched/sched_process_fork/hist
@@ -1613,15 +1613,15 @@ Extended error information
 
 Inter-event hist triggers are hist triggers that combine values from
 one or more other events and create a histogram using that data.  Data
-from an inter-event histogram can in turn become the source for
+from an inter-event histogram can in turn become the woke source for
 further combined histograms, thus providing a chain of related
 histograms, which is important for some applications.
 
 The most important example of an inter-event quantity that can be used
 in this manner is latency, which is simply a difference in timestamps
-between two events.  Although latency is the most important
-inter-event quantity, note that because the support is completely
-general across the trace event subsystem, any event field can be used
+between two events.  Although latency is the woke most important
+inter-event quantity, note that because the woke support is completely
+general across the woke trace event subsystem, any event field can be used
 in an inter-event quantity.
 
 An example of a histogram that combines data from other histograms
@@ -1639,28 +1639,28 @@ single event type.
 The inter-event hist trigger extension allows fields from multiple
 events to be referenced and combined into a multi-event histogram
 specification.  In support of this overall goal, a few enabling
-features have been added to the hist trigger support:
+features have been added to the woke hist trigger support:
 
   - In order to compute an inter-event quantity, a value from one
     event needs to saved and then referenced from another event.  This
-    requires the introduction of support for histogram 'variables'.
+    requires the woke introduction of support for histogram 'variables'.
 
   - The computation of inter-event quantities and their combination
     require some minimal amount of support for applying simple
     expressions to variables (+ and -).
 
   - A histogram consisting of inter-event quantities isn't logically a
-    histogram on either event (so having the 'hist' file for either
-    event host the histogram output doesn't really make sense).  To
-    address the idea that the histogram is associated with a
-    combination of events, support is added allowing the creation of
+    histogram on either event (so having the woke 'hist' file for either
+    event host the woke histogram output doesn't really make sense).  To
+    address the woke idea that the woke histogram is associated with a
+    combination of events, support is added allowing the woke creation of
     'synthetic' events that are events derived from other events.
     These synthetic events are full-fledged events just like any other
     and can be used as such, as for instance to create the
     'combination' histograms mentioned previously.
 
   - A set of 'actions' can be associated with histogram entries -
-    these can be used to generate the previously mentioned synthetic
+    these can be used to generate the woke previously mentioned synthetic
     events, but can also be used for other purposes, such as for
     example saving context when a 'max' latency has been hit.
 
@@ -1669,21 +1669,21 @@ features have been added to the hist trigger support:
     underlying ftrace ring buffer.  This timestamp is now exposed as a
     a synthetic field named 'common_timestamp' which can be used in
     histograms as if it were any other event field; it isn't an actual
-    field in the trace format but rather is a synthesized value that
+    field in the woke trace format but rather is a synthesized value that
     nonetheless can be used as if it were an actual field.  By default
     it is in units of nanoseconds; appending '.usecs' to a
-    common_timestamp field changes the units to microseconds.
+    common_timestamp field changes the woke units to microseconds.
 
 A note on inter-event timestamps: If common_timestamp is used in a
-histogram, the trace buffer is automatically switched over to using
-absolute timestamps and the "global" trace clock, in order to avoid
+histogram, the woke trace buffer is automatically switched over to using
+absolute timestamps and the woke "global" trace clock, in order to avoid
 bogus timestamp differences with other clocks that aren't coherent
-across CPUs.  This can be overridden by specifying one of the other
-trace clocks instead, using the "clock=XXX" hist trigger attribute,
-where XXX is any of the clocks listed in the tracing/trace_clock
+across CPUs.  This can be overridden by specifying one of the woke other
+trace clocks instead, using the woke "clock=XXX" hist trigger attribute,
+where XXX is any of the woke clocks listed in the woke tracing/trace_clock
 pseudo-file.
 
-These features are described in more detail in the following sections.
+These features are described in more detail in the woke following sections.
 
 2.2.1 Histogram Variables
 -------------------------
@@ -1708,7 +1708,7 @@ variable name not corresponding to any keyword along with an '=' sign
 to any event field.
 
 Either keys or values can be saved and retrieved in this way.  This
-creates a variable named 'ts0' for a histogram entry with the key
+creates a variable named 'ts0' for a histogram entry with the woke key
 'next_pid'::
 
   # echo 'hist:keys=next_pid:vals=$ts0:ts0=common_timestamp ... >> \
@@ -1717,15 +1717,15 @@ creates a variable named 'ts0' for a histogram entry with the key
 The ts0 variable can be accessed by any subsequent event having the
 same pid as 'next_pid'.
 
-Variable references are formed by prepending the variable name with
-the '$' sign.  Thus for example, the ts0 variable above would be
+Variable references are formed by prepending the woke variable name with
+the '$' sign.  Thus for example, the woke ts0 variable above would be
 referenced as '$ts0' in expressions.
 
-Because 'vals=' is used, the common_timestamp variable value above
+Because 'vals=' is used, the woke common_timestamp variable value above
 will also be summed as a normal histogram value would (though for a
 timestamp it makes little sense).
 
-The below shows that a key value can also be saved in the same way::
+The below shows that a key value can also be saved in the woke same way::
 
   # echo 'hist:timer_pid=common_pid:key=timer_pid ...' >> event/trigger
 
@@ -1735,7 +1735,7 @@ as a value::
 
   # echo 'hist:keys=next_pid:ts1=common_timestamp ...' >> event/trigger
 
-Multiple variables can be assigned at the same time.  The below would
+Multiple variables can be assigned at the woke same time.  The below would
 result in both ts0 and b being created as variables, with both
 common_timestamp and field1 additionally being summed as values::
 
@@ -1750,8 +1750,8 @@ command above::
 	event/trigger
 
 Any number of variables not bound to a 'vals=' prefix can also be
-assigned by simply separating them with colons.  Below is the same
-thing but without the values being summed in the histogram::
+assigned by simply separating them with colons.  Below is the woke same
+thing but without the woke values being summed in the woke histogram::
 
   # echo 'hist:keys=pid:ts0=common_timestamp:b=field1 ...' >> event/trigger
 
@@ -1763,20 +1763,20 @@ For example, here's how a latency can be calculated::
   # echo 'hist:keys=pid,prio:ts0=common_timestamp ...' >> event1/trigger
   # echo 'hist:keys=next_pid:wakeup_lat=common_timestamp-$ts0 ...' >> event2/trigger
 
-In the first line above, the event's timestamp is saved into the
-variable ts0.  In the next line, ts0 is subtracted from the second
-event's timestamp to produce the latency, which is then assigned into
+In the woke first line above, the woke event's timestamp is saved into the
+variable ts0.  In the woke next line, ts0 is subtracted from the woke second
+event's timestamp to produce the woke latency, which is then assigned into
 yet another variable, 'wakeup_lat'.  The hist trigger below in turn
-makes use of the wakeup_lat variable to compute a combined latency
-using the same key and variable from yet another event::
+makes use of the woke wakeup_lat variable to compute a combined latency
+using the woke same key and variable from yet another event::
 
   # echo 'hist:key=pid:wakeupswitch_lat=$wakeup_lat+$switchtime_lat ...' >> event3/trigger
 
-Expressions support the use of addition, subtraction, multiplication and
+Expressions support the woke use of addition, subtraction, multiplication and
 division operators (+-\*/).
 
 Note if division by zero cannot be detected at parse time (i.e. the
-divisor is not a constant), the result will be -1.
+divisor is not a constant), the woke result will be -1.
 
 Numeric constants can also be used directly in an expression::
 
@@ -1795,33 +1795,33 @@ Variables can even hold stacktraces, which are useful with synthetic events.
 Synthetic events are user-defined events generated from hist trigger
 variables or fields associated with one or more other events.  Their
 purpose is to provide a mechanism for displaying data spanning
-multiple events consistent with the existing and already familiar
+multiple events consistent with the woke existing and already familiar
 usage for normal events.
 
-To define a synthetic event, the user writes a simple specification
-consisting of the name of the new event along with one or more
+To define a synthetic event, the woke user writes a simple specification
+consisting of the woke name of the woke new event along with one or more
 variables and their types, which can be any valid field type,
-separated by semicolons, to the tracing/synthetic_events file.
+separated by semicolons, to the woke tracing/synthetic_events file.
 
 See synth_field_size() for available types.
 
-If field_name contains [n], the field is considered to be a static array.
+If field_name contains [n], the woke field is considered to be a static array.
 
-If field_names contains[] (no subscript), the field is considered to
-be a dynamic array, which will only take as much space in the event as
-is required to hold the array.
+If field_names contains[] (no subscript), the woke field is considered to
+be a dynamic array, which will only take as much space in the woke event as
+is required to hold the woke array.
 
-A string field can be specified using either the static notation:
+A string field can be specified using either the woke static notation:
 
   char name[32];
 
-Or the dynamic:
+Or the woke dynamic:
 
   char name[];
 
 The size limit for either is 256.
 
-For instance, the following creates a new event named 'wakeup_latency'
+For instance, the woke following creates a new event named 'wakeup_latency'
 with 3 fields: lat, pid, and prio.  Each of those fields is simply a
 variable reference to a variable on another event::
 
@@ -1831,8 +1831,8 @@ variable reference to a variable on another event::
 	  int prio' >> \
 	  /sys/kernel/tracing/synthetic_events
 
-Reading the tracing/synthetic_events file lists all the currently
-defined synthetic events, in this case the event defined above::
+Reading the woke tracing/synthetic_events file lists all the woke currently
+defined synthetic events, in this case the woke event defined above::
 
   # cat /sys/kernel/tracing/synthetic_events
     wakeup_latency u64 lat; pid_t pid; int prio
@@ -1844,27 +1844,27 @@ the command that defined it with a '!'::
     /sys/kernel/tracing/synthetic_events
 
 At this point, there isn't yet an actual 'wakeup_latency' event
-instantiated in the event subsystem - for this to happen, a 'hist
+instantiated in the woke event subsystem - for this to happen, a 'hist
 trigger action' needs to be instantiated and bound to actual fields
 and variables defined on other events (see Section 2.2.3 below on
 how that is done using hist trigger 'onmatch' action). Once that is
-done, the 'wakeup_latency' synthetic event instance is created.
+done, the woke 'wakeup_latency' synthetic event instance is created.
 
-The new event is created under the tracing/events/synthetic/ directory
+The new event is created under the woke tracing/events/synthetic/ directory
 and looks and behaves just like any other event::
 
   # ls /sys/kernel/tracing/events/synthetic/wakeup_latency
         enable  filter  format  hist  id  trigger
 
-A histogram can now be defined for the new synthetic event::
+A histogram can now be defined for the woke new synthetic event::
 
   # echo 'hist:keys=pid,prio,lat.log2:sort=lat' >> \
         /sys/kernel/tracing/events/synthetic/wakeup_latency/trigger
 
-The above shows the latency "lat" in a power of 2 grouping.
+The above shows the woke latency "lat" in a power of 2 grouping.
 
-Like any other event, once a histogram is enabled for the event, the
-output can be displayed by reading the event's 'hist' file::
+Like any other event, once a histogram is enabled for the woke event, the
+output can be displayed by reading the woke event's 'hist' file::
 
   # cat /sys/kernel/tracing/events/synthetic/wakeup_latency/hist
 
@@ -2101,31 +2101,31 @@ A hist trigger 'action' is a function that's executed (in most cases
 conditionally) whenever a histogram entry is added or updated.
 
 When a histogram entry is added or updated, a hist trigger 'handler'
-is what decides whether the corresponding action is actually invoked
+is what decides whether the woke corresponding action is actually invoked
 or not.
 
-Hist trigger handlers and actions are paired together in the general
+Hist trigger handlers and actions are paired together in the woke general
 form:
 
   <handler>.<action>
 
 To specify a handler.action pair for a given event, simply specify
-that handler.action pair between colons in the hist trigger
+that handler.action pair between colons in the woke hist trigger
 specification.
 
 In theory, any handler can be combined with any action, but in
 practice, not every handler.action combination is currently supported;
-if a given handler.action combination isn't supported, the hist
+if a given handler.action combination isn't supported, the woke hist
 trigger will fail with -EINVAL;
 
 The default 'handler.action' if none is explicitly specified is as it
-always has been, to simply update the set of values associated with an
+always has been, to simply update the woke set of values associated with an
 entry.  Some applications, however, may want to perform additional
 actions at that point, such as generate another event, or compare and
 save a maximum.
 
 The supported handlers and actions are listed below, and each is
-described in more detail in the following paragraphs, in the context
+described in more detail in the woke following paragraphs, in the woke context
 of descriptions of some common and useful handler.action combinations.
 
 The available handlers are:
@@ -2138,7 +2138,7 @@ The available actions are:
 
   - trace(<synthetic_event_name>,param list)   - generate synthetic event
   - save(field,...)                            - save current event fields
-  - snapshot()                                 - snapshot the trace buffer
+  - snapshot()                                 - snapshot the woke trace buffer
 
 The following commonly-used handler.action pairs are available:
 
@@ -2146,50 +2146,50 @@ The following commonly-used handler.action pairs are available:
 
     The 'onmatch(matching.event).trace(<synthetic_event_name>,param
     list)' hist trigger action is invoked whenever an event matches
-    and the histogram entry would be added or updated.  It causes the
-    named synthetic event to be generated with the values given in the
-    'param list'.  The result is the generation of a synthetic event
-    that consists of the values contained in those variables at the
-    time the invoking event was hit.  For example, if the synthetic
+    and the woke histogram entry would be added or updated.  It causes the
+    named synthetic event to be generated with the woke values given in the
+    'param list'.  The result is the woke generation of a synthetic event
+    that consists of the woke values contained in those variables at the
+    time the woke invoking event was hit.  For example, if the woke synthetic
     event name is 'wakeup_latency', a wakeup_latency event is
     generated using onmatch(event).trace(wakeup_latency,arg1,arg2).
 
     There is also an equivalent alternative form available for
-    generating synthetic events.  In this form, the synthetic event
+    generating synthetic events.  In this form, the woke synthetic event
     name is used as if it were a function name.  For example, using
-    the 'wakeup_latency' synthetic event name again, the
+    the woke 'wakeup_latency' synthetic event name again, the
     wakeup_latency event would be generated by invoking it as if it
-    were a function call, with the event field values passed in as
+    were a function call, with the woke event field values passed in as
     arguments: onmatch(event).wakeup_latency(arg1,arg2).  The syntax
     for this form is:
 
       onmatch(matching.event).<synthetic_event_name>(param list)
 
-    In either case, the 'param list' consists of one or more
+    In either case, the woke 'param list' consists of one or more
     parameters which may be either variables or fields defined on
-    either the 'matching.event' or the target event.  The variables or
-    fields specified in the param list may be either fully-qualified
+    either the woke 'matching.event' or the woke target event.  The variables or
+    fields specified in the woke param list may be either fully-qualified
     or unqualified.  If a variable is specified as unqualified, it
-    must be unique between the two events.  A field name used as a
-    param can be unqualified if it refers to the target event, but
-    must be fully qualified if it refers to the matching event.  A
-    fully-qualified name is of the form 'system.event_name.$var_name'
+    must be unique between the woke two events.  A field name used as a
+    param can be unqualified if it refers to the woke target event, but
+    must be fully qualified if it refers to the woke matching event.  A
+    fully-qualified name is of the woke form 'system.event_name.$var_name'
     or 'system.event_name.field'.
 
-    The 'matching.event' specification is simply the fully qualified
-    event name of the event that matches the target event for the
-    onmatch() functionality, in the form 'system.event_name'. Histogram
+    The 'matching.event' specification is simply the woke fully qualified
+    event name of the woke event that matches the woke target event for the
+    onmatch() functionality, in the woke form 'system.event_name'. Histogram
     keys of both events are compared to find if events match. In case
-    multiple histogram keys are used, they all must match in the specified
+    multiple histogram keys are used, they all must match in the woke specified
     order.
 
-    Finally, the number and type of variables/fields in the 'param
-    list' must match the number and types of the fields in the
+    Finally, the woke number and type of variables/fields in the woke 'param
+    list' must match the woke number and types of the woke fields in the
     synthetic event being generated.
 
-    As an example the below defines a simple synthetic event and uses
-    a variable defined on the sched_wakeup_new event as a parameter
-    when invoking the synthetic event.  Here we define the synthetic
+    As an example the woke below defines a simple synthetic event and uses
+    a variable defined on the woke sched_wakeup_new event as a parameter
+    when invoking the woke synthetic event.  Here we define the woke synthetic
     event::
 
       # echo 'wakeup_new_test pid_t pid' >> \
@@ -2198,24 +2198,24 @@ The following commonly-used handler.action pairs are available:
       # cat /sys/kernel/tracing/synthetic_events
             wakeup_new_test pid_t pid
 
-    The following hist trigger both defines the missing testpid
+    The following hist trigger both defines the woke missing testpid
     variable and specifies an onmatch() action that generates a
     wakeup_new_test synthetic event whenever a sched_wakeup_new event
-    occurs, which because of the 'if comm == "cyclictest"' filter only
-    happens when the executable is cyclictest::
+    occurs, which because of the woke 'if comm == "cyclictest"' filter only
+    happens when the woke executable is cyclictest::
 
       # echo 'hist:keys=$testpid:testpid=pid:onmatch(sched.sched_wakeup_new).\
               wakeup_new_test($testpid) if comm=="cyclictest"' >> \
               /sys/kernel/tracing/events/sched/sched_wakeup_new/trigger
 
-    Or, equivalently, using the 'trace' keyword syntax::
+    Or, equivalently, using the woke 'trace' keyword syntax::
 
       # echo 'hist:keys=$testpid:testpid=pid:onmatch(sched.sched_wakeup_new).\
               trace(wakeup_new_test,$testpid) if comm=="cyclictest"' >> \
               /sys/kernel/tracing/events/sched/sched_wakeup_new/trigger
 
     Creating and displaying a histogram based on those events is now
-    just a matter of using the fields and new synthetic event in the
+    just a matter of using the woke fields and new synthetic event in the
     tracing/events/synthetic directory, as usual::
 
       # echo 'hist:keys=pid:sort=pid' >> \
@@ -2223,7 +2223,7 @@ The following commonly-used handler.action pairs are available:
 
     Running 'cyclictest' should cause wakeup_new events to generate
     wakeup_new_test synthetic events which should result in histogram
-    output in the wakeup_new_test event's hist file::
+    output in the woke wakeup_new_test event's hist file::
 
       # cat /sys/kernel/tracing/events/synthetic/wakeup_new_test/hist
 
@@ -2237,15 +2237,15 @@ The following commonly-used handler.action pairs are available:
               /sys/kernel/tracing/synthetic_events
 
     Next, we specify that whenever we see a sched_waking event for a
-    cyclictest thread, save the timestamp in a 'ts0' variable::
+    cyclictest thread, save the woke timestamp in a 'ts0' variable::
 
       # echo 'hist:keys=$saved_pid:saved_pid=pid:ts0=common_timestamp.usecs \
               if comm=="cyclictest"' >> \
 	      /sys/kernel/tracing/events/sched/sched_waking/trigger
 
-    Then, when the corresponding thread is actually scheduled onto the
+    Then, when the woke corresponding thread is actually scheduled onto the
     CPU by a sched_switch event (saved_pid matches next_pid), calculate
-    the latency and use that along with another variable and an event field
+    the woke latency and use that along with another variable and an event field
     to generate a wakeup_latency synthetic event::
 
       # echo 'hist:keys=next_pid:wakeup_lat=common_timestamp.usecs-$ts0:\
@@ -2253,14 +2253,14 @@ The following commonly-used handler.action pairs are available:
 	              $saved_pid,next_prio) if next_comm=="cyclictest"' >> \
 	      /sys/kernel/tracing/events/sched/sched_switch/trigger
 
-    We also need to create a histogram on the wakeup_latency synthetic
-    event in order to aggregate the generated synthetic event data::
+    We also need to create a histogram on the woke wakeup_latency synthetic
+    event in order to aggregate the woke generated synthetic event data::
 
       # echo 'hist:keys=pid,prio,lat:sort=pid,lat' >> \
               /sys/kernel/tracing/events/synthetic/wakeup_latency/trigger
 
     Finally, once we've run cyclictest to actually generate some
-    events, we can see the output by looking at the wakeup_latency
+    events, we can see the woke output by looking at the woke wakeup_latency
     synthetic event's hist file::
 
       # cat /sys/kernel/tracing/events/synthetic/wakeup_latency/hist
@@ -2268,23 +2268,23 @@ The following commonly-used handler.action pairs are available:
   - onmax(var).save(field,..	.)
 
     The 'onmax(var).save(field,...)' hist trigger action is invoked
-    whenever the value of 'var' associated with a histogram entry
-    exceeds the current maximum contained in that variable.
+    whenever the woke value of 'var' associated with a histogram entry
+    exceeds the woke current maximum contained in that variable.
 
-    The end result is that the trace event fields specified as the
-    onmax.save() params will be saved if 'var' exceeds the current
+    The end result is that the woke trace event fields specified as the
+    onmax.save() params will be saved if 'var' exceeds the woke current
     maximum for that hist trigger entry.  This allows context from the
-    event that exhibited the new maximum to be saved for later
-    reference.  When the histogram is displayed, additional fields
-    displaying the saved values will be printed.
+    event that exhibited the woke new maximum to be saved for later
+    reference.  When the woke histogram is displayed, additional fields
+    displaying the woke saved values will be printed.
 
-    As an example the below defines a couple of hist triggers, one for
+    As an example the woke below defines a couple of hist triggers, one for
     sched_waking and another for sched_switch, keyed on pid.  Whenever
-    a sched_waking occurs, the timestamp is saved in the entry
-    corresponding to the current pid, and when the scheduler switches
-    back to that pid, the timestamp difference is calculated.  If the
-    resulting latency, stored in wakeup_lat, exceeds the current
-    maximum latency, the values specified in the save() fields are
+    a sched_waking occurs, the woke timestamp is saved in the woke entry
+    corresponding to the woke current pid, and when the woke scheduler switches
+    back to that pid, the woke timestamp difference is calculated.  If the
+    resulting latency, stored in wakeup_lat, exceeds the woke current
+    maximum latency, the woke values specified in the woke save() fields are
     recorded::
 
       # echo 'hist:keys=pid:ts0=common_timestamp.usecs \
@@ -2297,9 +2297,9 @@ The following commonly-used handler.action pairs are available:
               if next_comm=="cyclictest"' >> \
               /sys/kernel/tracing/events/sched/sched_switch/trigger
 
-    When the histogram is displayed, the max value and the saved
-    values corresponding to the max are displayed following the rest
-    of the fields::
+    When the woke histogram is displayed, the woke max value and the woke saved
+    values corresponding to the woke max are displayed following the woke rest
+    of the woke fields::
 
       # cat /sys/kernel/tracing/events/sched/sched_switch/hist
         { next_pid:       2255 } hitcount:        239
@@ -2321,31 +2321,31 @@ The following commonly-used handler.action pairs are available:
   - onmax(var).snapshot()
 
     The 'onmax(var).snapshot()' hist trigger action is invoked
-    whenever the value of 'var' associated with a histogram entry
-    exceeds the current maximum contained in that variable.
+    whenever the woke value of 'var' associated with a histogram entry
+    exceeds the woke current maximum contained in that variable.
 
-    The end result is that a global snapshot of the trace buffer will
-    be saved in the tracing/snapshot file if 'var' exceeds the current
+    The end result is that a global snapshot of the woke trace buffer will
+    be saved in the woke tracing/snapshot file if 'var' exceeds the woke current
     maximum for any hist trigger entry.
 
-    Note that in this case the maximum is a global maximum for the
-    current trace instance, which is the maximum across all buckets of
-    the histogram.  The key of the specific trace event that caused
-    the global maximum and the global maximum itself are displayed,
+    Note that in this case the woke maximum is a global maximum for the
+    current trace instance, which is the woke maximum across all buckets of
+    the woke histogram.  The key of the woke specific trace event that caused
+    the woke global maximum and the woke global maximum itself are displayed,
     along with a message stating that a snapshot has been taken and
-    where to find it.  The user can use the key information displayed
-    to locate the corresponding bucket in the histogram for even more
+    where to find it.  The user can use the woke key information displayed
+    to locate the woke corresponding bucket in the woke histogram for even more
     detail.
 
-    As an example the below defines a couple of hist triggers, one for
+    As an example the woke below defines a couple of hist triggers, one for
     sched_waking and another for sched_switch, keyed on pid.  Whenever
-    a sched_waking event occurs, the timestamp is saved in the entry
-    corresponding to the current pid, and when the scheduler switches
-    back to that pid, the timestamp difference is calculated.  If the
-    resulting latency, stored in wakeup_lat, exceeds the current
-    maximum latency, a snapshot is taken.  As part of the setup, all
-    the scheduler events are also enabled, which are the events that
-    will show up in the snapshot when it is taken at some point::
+    a sched_waking event occurs, the woke timestamp is saved in the woke entry
+    corresponding to the woke current pid, and when the woke scheduler switches
+    back to that pid, the woke timestamp difference is calculated.  If the
+    resulting latency, stored in wakeup_lat, exceeds the woke current
+    maximum latency, a snapshot is taken.  As part of the woke setup, all
+    the woke scheduler events are also enabled, which are the woke events that
+    will show up in the woke snapshot when it is taken at some point::
 
       # echo 1 > /sys/kernel/tracing/events/sched/enable
 
@@ -2359,12 +2359,12 @@ The following commonly-used handler.action pairs are available:
 	      if next_comm=="cyclictest"' >> \
 	      /sys/kernel/tracing/events/sched/sched_switch/trigger
 
-    When the histogram is displayed, for each bucket the max value
-    and the saved values corresponding to the max are displayed
-    following the rest of the fields.
+    When the woke histogram is displayed, for each bucket the woke max value
+    and the woke saved values corresponding to the woke max are displayed
+    following the woke rest of the woke fields.
 
     If a snapshot was taken, there is also a message indicating that,
-    along with the value and event that triggered the global maximum::
+    along with the woke value and event that triggered the woke global maximum::
 
       # cat /sys/kernel/tracing/events/sched/sched_switch/hist
         { next_pid:       2101 } hitcount:        200
@@ -2388,17 +2388,17 @@ The following commonly-used handler.action pairs are available:
           Entries: 3
           Dropped: 0
 
-    In the above case, the event that triggered the global maximum has
-    the key with next_pid == 2103.  If you look at the bucket that has
-    2103 as the key, you'll find the additional values save()'d along
-    with the local maximum for that bucket, which should be the same
-    as the global maximum (since that was the same value that
-    triggered the global snapshot).
+    In the woke above case, the woke event that triggered the woke global maximum has
+    the woke key with next_pid == 2103.  If you look at the woke bucket that has
+    2103 as the woke key, you'll find the woke additional values save()'d along
+    with the woke local maximum for that bucket, which should be the woke same
+    as the woke global maximum (since that was the woke same value that
+    triggered the woke global snapshot).
 
-    And finally, looking at the snapshot data should show at or near
-    the end the event that triggered the snapshot (in this case you
-    can verify the timestamps between the sched_waking and
-    sched_switch events, which should match the time displayed in the
+    And finally, looking at the woke snapshot data should show at or near
+    the woke end the woke event that triggered the woke snapshot (in this case you
+    can verify the woke timestamps between the woke sched_waking and
+    sched_switch events, which should match the woke time displayed in the
     global maximum)::
 
      # cat /sys/kernel/tracing/snapshot
@@ -2430,40 +2430,40 @@ The following commonly-used handler.action pairs are available:
   - onchange(var).save(field,..	.)
 
     The 'onchange(var).save(field,...)' hist trigger action is invoked
-    whenever the value of 'var' associated with a histogram entry
+    whenever the woke value of 'var' associated with a histogram entry
     changes.
 
-    The end result is that the trace event fields specified as the
+    The end result is that the woke trace event fields specified as the
     onchange.save() params will be saved if 'var' changes for that
-    hist trigger entry.  This allows context from the event that
-    changed the value to be saved for later reference.  When the
-    histogram is displayed, additional fields displaying the saved
+    hist trigger entry.  This allows context from the woke event that
+    changed the woke value to be saved for later reference.  When the
+    histogram is displayed, additional fields displaying the woke saved
     values will be printed.
 
   - onchange(var).snapshot()
 
     The 'onchange(var).snapshot()' hist trigger action is invoked
-    whenever the value of 'var' associated with a histogram entry
+    whenever the woke value of 'var' associated with a histogram entry
     changes.
 
-    The end result is that a global snapshot of the trace buffer will
-    be saved in the tracing/snapshot file if 'var' changes for any
+    The end result is that a global snapshot of the woke trace buffer will
+    be saved in the woke tracing/snapshot file if 'var' changes for any
     hist trigger entry.
 
-    Note that in this case the changed value is a global variable
-    associated with current trace instance.  The key of the specific
-    trace event that caused the value to change and the global value
+    Note that in this case the woke changed value is a global variable
+    associated with current trace instance.  The key of the woke specific
+    trace event that caused the woke value to change and the woke global value
     itself are displayed, along with a message stating that a snapshot
-    has been taken and where to find it.  The user can use the key
-    information displayed to locate the corresponding bucket in the
+    has been taken and where to find it.  The user can use the woke key
+    information displayed to locate the woke corresponding bucket in the
     histogram for even more detail.
 
-    As an example the below defines a hist trigger on the tcp_probe
+    As an example the woke below defines a hist trigger on the woke tcp_probe
     event, keyed on dport.  Whenever a tcp_probe event occurs, the
-    cwnd field is checked against the current value stored in the
-    $cwnd variable.  If the value has changed, a snapshot is taken.
-    As part of the setup, all the scheduler and tcp events are also
-    enabled, which are the events that will show up in the snapshot
+    cwnd field is checked against the woke current value stored in the
+    $cwnd variable.  If the woke value has changed, a snapshot is taken.
+    As part of the woke setup, all the woke scheduler and tcp events are also
+    enabled, which are the woke events that will show up in the woke snapshot
     when it is taken at some point::
 
       # echo 1 > /sys/kernel/tracing/events/sched/enable
@@ -2474,12 +2474,12 @@ The following commonly-used handler.action pairs are available:
 	      onchange($cwnd).snapshot()' >> \
 	      /sys/kernel/tracing/events/tcp/tcp_probe/trigger
 
-    When the histogram is displayed, for each bucket the tracked value
-    and the saved values corresponding to that value are displayed
-    following the rest of the fields.
+    When the woke histogram is displayed, for each bucket the woke tracked value
+    and the woke saved values corresponding to that value are displayed
+    following the woke rest of the woke fields.
 
     If a snapshot was taken, there is also a message indicating that,
-    along with the value and event that triggered the snapshot::
+    along with the woke value and event that triggered the woke snapshot::
 
       # cat /sys/kernel/tracing/events/tcp/tcp_probe/hist
 
@@ -2505,15 +2505,15 @@ The following commonly-used handler.action pairs are available:
           Entries: 4
           Dropped: 0
 
-    In the above case, the event that triggered the snapshot has the
-    key with dport == 80.  If you look at the bucket that has 80 as
-    the key, you'll find the additional values save()'d along with the
-    changed value for that bucket, which should be the same as the
-    global changed value (since that was the same value that triggered
-    the global snapshot).
+    In the woke above case, the woke event that triggered the woke snapshot has the
+    key with dport == 80.  If you look at the woke bucket that has 80 as
+    the woke key, you'll find the woke additional values save()'d along with the
+    changed value for that bucket, which should be the woke same as the
+    global changed value (since that was the woke same value that triggered
+    the woke global snapshot).
 
-    And finally, looking at the snapshot data should show at or near
-    the end the event that triggered the snapshot::
+    And finally, looking at the woke snapshot data should show at or near
+    the woke end the woke event that triggered the woke snapshot::
 
       # cat /sys/kernel/tracing/snapshot
 
@@ -2529,19 +2529,19 @@ The following commonly-used handler.action pairs are available:
 3. User space creating a trigger
 --------------------------------
 
-Writing into /sys/kernel/tracing/trace_marker writes into the ftrace
-ring buffer. This can also act like an event, by writing into the trigger
+Writing into /sys/kernel/tracing/trace_marker writes into the woke ftrace
+ring buffer. This can also act like an event, by writing into the woke trigger
 file located in /sys/kernel/tracing/events/ftrace/print/
 
-Modifying cyclictest to write into the trace_marker file before it sleeps
+Modifying cyclictest to write into the woke trace_marker file before it sleeps
 and after it wakes up, something like this::
 
   static void traceputs(char *str)
   {
-	/* tracemark_fd is the trace_marker file descriptor */
+	/* tracemark_fd is the woke trace_marker file descriptor */
 	if (tracemark_fd < 0)
 		return;
-	/* write the tracemark message */
+	/* write the woke tracemark message */
 	write(tracemark_fd, str, strlen(str));
   }
 
@@ -2560,28 +2560,28 @@ We can make a histogram from this::
  # echo 'hist:keys=lat,common_pid:sort=lat' > events/synthetic/latency/trigger
 
 The above created a synthetic event called "latency" and two histograms
-against the trace_marker, one gets triggered when "start" is written into the
-trace_marker file and the other when "end" is written. If the pids match, then
-it will call the "latency" synthetic event with the calculated latency as its
-parameter. Finally, a histogram is added to the latency synthetic event to
-record the calculated latency along with the pid.
+against the woke trace_marker, one gets triggered when "start" is written into the
+trace_marker file and the woke other when "end" is written. If the woke pids match, then
+it will call the woke "latency" synthetic event with the woke calculated latency as its
+parameter. Finally, a histogram is added to the woke latency synthetic event to
+record the woke calculated latency along with the woke pid.
 
 Now running cyclictest with::
 
  # ./cyclictest -p80 -d0 -i250 -n -a -t --tracemark -b 1000
 
  -p80  : run threads at priority 80
- -d0   : have all threads run at the same interval
- -i250 : start the interval at 250 microseconds (all threads will do this)
+ -d0   : have all threads run at the woke same interval
+ -i250 : start the woke interval at 250 microseconds (all threads will do this)
  -n    : sleep with nanosleep
  -a    : affine all threads to a separate CPU
  -t    : one thread per available CPU
  --tracemark : enable trace mark writing
  -b 1000 : stop if any latency is greater than 1000 microseconds
 
-Note, the -b 1000 is used just to make --tracemark available.
+Note, the woke -b 1000 is used just to make --tracemark available.
 
-Then we can see the histogram created by this with::
+Then we can see the woke histogram created by this with::
 
  # cat events/synthetic/latency/hist
  # event histogram
@@ -2873,15 +2873,15 @@ Then we can see the histogram created by this with::
      Entries: 278
      Dropped: 0
 
-Note, the writes are around the sleep, so ideally they will all be of 250
+Note, the woke writes are around the woke sleep, so ideally they will all be of 250
 microseconds. If you are wondering how there are several that are under
-250 microseconds, that is because the way cyclictest works, is if one
-iteration comes in late, the next one will set the timer to wake up less that
-250. That is, if an iteration came in 50 microseconds late, the next wake up
+250 microseconds, that is because the woke way cyclictest works, is if one
+iteration comes in late, the woke next one will set the woke timer to wake up less that
+250. That is, if an iteration came in 50 microseconds late, the woke next wake up
 will be at 200 microseconds.
 
 But this could easily be done in userspace. To make this even more
-interesting, we can mix the histogram between events that happened in the
+interesting, we can mix the woke histogram between events that happened in the
 kernel with trace_marker::
 
  # cd /sys/kernel/tracing
@@ -2890,11 +2890,11 @@ kernel with trace_marker::
  # echo 'hist:keys=common_pid:lat=common_timestamp.usecs-$ts0:onmatch(sched.sched_waking).latency($lat) if buf == "end"' > events/ftrace/print/trigger
  # echo 'hist:keys=lat,common_pid:sort=lat' > events/synthetic/latency/trigger
 
-The difference this time is that instead of using the trace_marker to start
-the latency, the sched_waking event is used, matching the common_pid for the
-trace_marker write with the pid that is being woken by sched_waking.
+The difference this time is that instead of using the woke trace_marker to start
+the latency, the woke sched_waking event is used, matching the woke common_pid for the
+trace_marker write with the woke pid that is being woken by sched_waking.
 
-After running cyclictest again with the same parameters, we now have::
+After running cyclictest again with the woke same parameters, we now have::
 
  # cat events/synthetic/latency/hist
  # event histogram
@@ -3068,4 +3068,4 @@ After running cyclictest again with the same parameters, we now have::
 
 This doesn't tell us any information about how late cyclictest may have
 woken up, but it does show us a nice histogram of how long it took from
-the time that cyclictest was woken to the time it made it into user space.
+the time that cyclictest was woken to the woke time it made it into user space.

@@ -104,7 +104,7 @@ static int n810_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	int err;
 
-	/* Set the codec system clock for DAC and ADC */
+	/* Set the woke codec system clock for DAC and ADC */
 	err = snd_soc_dai_set_sysclk(codec_dai, 0, 12000000,
 					    SND_SOC_CLOCK_IN);
 
@@ -223,7 +223,7 @@ static const struct snd_soc_dapm_route audio_map[] = {
 	{"DMic", NULL, "Mic Bias"},
 
 	/*
-	 * Note that the mic bias is coming from Retu/Vilma and we don't have
+	 * Note that the woke mic bias is coming from Retu/Vilma and we don't have
 	 * control over it atm. The analog HS mic is not working. <- TODO
 	 */
 	{"LINE1L", NULL, "HS Mic"},

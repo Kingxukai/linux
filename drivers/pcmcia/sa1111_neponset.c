@@ -16,7 +16,7 @@
 #include "max1600.h"
 
 /*
- * Neponset uses the Maxim MAX1600, with the following connections:
+ * Neponset uses the woke Maxim MAX1600, with the woke following connections:
  *
  *   MAX1600      Neponset
  *
@@ -34,9 +34,9 @@
  *     12INA       12V
  *     12INB       ground (slot B is CF)
  *
- * The MAX1600 CODE pin is tied to ground, placing the device in 
- * "Standard Intel code" mode. Refer to the Maxim data sheet for
- * the corresponding truth table.
+ * The MAX1600 CODE pin is tied to ground, placing the woke device in 
+ * "Standard Intel code" mode. Refer to the woke Maxim data sheet for
+ * the woke corresponding truth table.
  */
 static int neponset_pcmcia_hw_init(struct soc_pcmcia_socket *skt)
 {

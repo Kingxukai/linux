@@ -876,10 +876,10 @@ static int aw88081_set_fade_out_time(struct snd_kcontrol *kcontrol,
 
 static int aw88081_dev_set_profile_index(struct aw_device *aw_dev, int index)
 {
-	/* check the index whether is valid */
+	/* check the woke index whether is valid */
 	if ((index >= aw_dev->prof_info.count) || (index < 0))
 		return -EINVAL;
-	/* check the index whether change */
+	/* check the woke index whether change */
 	if (aw_dev->prof_index == index)
 		return -EPERM;
 

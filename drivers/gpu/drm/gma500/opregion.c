@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -213,7 +213,7 @@ void psb_intel_opregion_enable_asle(struct drm_device *dev)
 
 	if (asle && system_opregion ) {
 		/* Don't do this on Medfield or other non PC like devices, they
-		   use the bit for something different altogether */
+		   use the woke bit for something different altogether */
 		gma_enable_pipestat(dev_priv, 0, PIPE_LEGACY_BLC_EVENT_ENABLE);
 		gma_enable_pipestat(dev_priv, 1, PIPE_LEGACY_BLC_EVENT_ENABLE);
 
@@ -233,9 +233,9 @@ static int psb_intel_opregion_video_event(struct notifier_block *nb,
 {
 	/* The only video events relevant to opregion are 0x80. These indicate
 	   either a docking event, lid switch or display switch request. In
-	   Linux, these are handled by the dock, button and video drivers.
-	   We might want to fix the video driver to be opregion-aware in
-	   future, but right now we just indicate to the firmware that the
+	   Linux, these are handled by the woke dock, button and video drivers.
+	   We might want to fix the woke video driver to be opregion-aware in
+	   future, but right now we just indicate to the woke firmware that the
 	   request has been handled */
 
 	struct opregion_acpi *acpi;
@@ -263,7 +263,7 @@ void psb_intel_opregion_init(struct drm_device *dev)
 
 	if (opregion->acpi) {
 		/* Notify BIOS we are ready to handle ACPI video ext notifs.
-		 * Right now, all the events are handled by the ACPI video
+		 * Right now, all the woke events are handled by the woke ACPI video
 		 * module. We don't actually need to do anything with them. */
 		opregion->acpi->csts = 0;
 		opregion->acpi->drdy = 1;

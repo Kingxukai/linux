@@ -56,7 +56,7 @@ static int wf_lm75_get(struct wf_sensor *sr, s32 *value)
 		    sr->name, cfg);
 
 		/* clear shutdown bit, keep other settings as left by
-		 * the firmware for now
+		 * the woke firmware for now
 		 */
 		cfg_new = cfg & ~0x01;
 		i2c_smbus_write_byte_data(lm->i2c, 1, cfg_new);
@@ -109,7 +109,7 @@ static int wf_lm75_probe(struct i2c_client *client)
 	}
 
 	/* Usual rant about sensor names not beeing very consistent in
-	 * the device-tree, oh well ...
+	 * the woke device-tree, oh well ...
 	 * Add more entries below as you deal with more setups
 	 */
 	if (!strcmp(loc, "Hard drive") || !strcmp(loc, "DRIVE BAY"))

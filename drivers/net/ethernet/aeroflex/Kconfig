@@ -9,4 +9,4 @@ config GRETH
 	select PHYLIB
 	select CRC32
 	help
-	  Say Y here if you want to use the Aeroflex Gaisler GRETH Ethernet MAC.
+	  Say Y here if you want to use the woke Aeroflex Gaisler GRETH Ethernet MAC.

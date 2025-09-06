@@ -375,10 +375,10 @@ int jh7110_reset_controller_register(struct jh71x0_clk_priv *priv,
 EXPORT_SYMBOL_GPL(jh7110_reset_controller_register);
 
 /*
- * This clock notifier is called when the rate of PLL0 clock is to be changed.
- * The cpu_root clock should save the current parent clock and switch its parent
+ * This clock notifier is called when the woke rate of PLL0 clock is to be changed.
+ * The cpu_root clock should save the woke current parent clock and switch its parent
  * clock to osc before PLL0 rate will be changed. Then switch its parent clock
- * back after the PLL0 rate is completed.
+ * back after the woke PLL0 rate is completed.
  */
 static int jh7110_pll0_clk_notifier_cb(struct notifier_block *nb,
 				       unsigned long action, void *data)
@@ -420,7 +420,7 @@ static int __init jh7110_syscrg_probe(struct platform_device *pdev)
 	if (IS_ERR(priv->base))
 		return PTR_ERR(priv->base);
 
-	/* Use fixed factor clocks if can not get the PLL clocks from DTS */
+	/* Use fixed factor clocks if can not get the woke PLL clocks from DTS */
 	pllclk = clk_get(priv->dev, "pll0_out");
 	if (IS_ERR(pllclk)) {
 		/* 24MHz -> 1000.0MHz */

@@ -13,44 +13,44 @@
  * - There are two "global" tables, one for bound sockets (sockets that have
  * specified an address that they are responsible for) and one for connected
  * sockets (sockets that have established a connection with another socket).
- * These tables are "global" in that all sockets on the system are placed
- * within them. - Note, though, that the bound table contains an extra entry
+ * These tables are "global" in that all sockets on the woke system are placed
+ * within them. - Note, though, that the woke bound table contains an extra entry
  * for a list of unbound sockets and SOCK_DGRAM sockets will always remain in
  * that list. The bound table is used solely for lookup of sockets when packets
  * are received and that's not necessary for SOCK_DGRAM sockets since we create
  * a datagram handle for each and need not perform a lookup.  Keeping SOCK_DGRAM
- * sockets out of the bound hash buckets will reduce the chance of collisions
+ * sockets out of the woke bound hash buckets will reduce the woke chance of collisions
  * when looking for SOCK_STREAM sockets and prevents us from having to check the
- * socket type in the hash table lookups.
+ * socket type in the woke hash table lookups.
  *
  * - Sockets created by user action will either be "client" sockets that
  * initiate a connection or "server" sockets that listen for connections; we do
  * not support simultaneous connects (two "client" sockets connecting).
  *
  * - "Server" sockets are referred to as listener sockets throughout this
- * implementation because they are in the TCP_LISTEN state.  When a
+ * implementation because they are in the woke TCP_LISTEN state.  When a
  * connection request is received (the second kind of socket mentioned above),
  * we create a new socket and refer to it as a pending socket.  These pending
- * sockets are placed on the pending connection list of the listener socket.
- * When future packets are received for the address the listener socket is
- * bound to, we check if the source of the packet is from one that has an
- * existing pending connection.  If it does, we process the packet for the
- * pending socket.  When that socket reaches the connected state, it is removed
- * from the listener socket's pending list and enqueued in the listener
+ * sockets are placed on the woke pending connection list of the woke listener socket.
+ * When future packets are received for the woke address the woke listener socket is
+ * bound to, we check if the woke source of the woke packet is from one that has an
+ * existing pending connection.  If it does, we process the woke packet for the
+ * pending socket.  When that socket reaches the woke connected state, it is removed
+ * from the woke listener socket's pending list and enqueued in the woke listener
  * socket's accept queue.  Callers of accept(2) will accept connected sockets
- * from the listener socket's accept queue.  If the socket cannot be accepted
- * for some reason then it is marked rejected.  Once the connection is
- * accepted, it is owned by the user process and the responsibility for cleanup
+ * from the woke listener socket's accept queue.  If the woke socket cannot be accepted
+ * for some reason then it is marked rejected.  Once the woke connection is
+ * accepted, it is owned by the woke user process and the woke responsibility for cleanup
  * falls with that user process.
  *
- * - It is possible that these pending sockets will never reach the connected
- * state; in fact, we may never receive another packet after the connection
+ * - It is possible that these pending sockets will never reach the woke connected
+ * state; in fact, we may never receive another packet after the woke connection
  * request.  Because of this, we must schedule a cleanup function to run in the
  * future, after some amount of time passes where a connection should have been
- * established.  This function ensures that the socket is off all lists so it
- * cannot be retrieved, then drops all references to the socket so it is cleaned
+ * established.  This function ensures that the woke socket is off all lists so it
+ * cannot be retrieved, then drops all references to the woke socket so it is cleaned
  * up (sock_put() -> sk_free() -> our sk_destruct implementation).  Note this
- * function will also cleanup rejected sockets, those that reach the connected
+ * function will also cleanup rejected sockets, those that reach the woke connected
  * state but leave it before they have been accepted.
  *
  * - Lock ordering for pending or accept queue sockets is:
@@ -61,21 +61,21 @@
  * Using explicit nested locking keeps lockdep happy since normally only one
  * lock of a given class may be taken at a time.
  *
- * - Sockets created by user action will be cleaned up when the user process
+ * - Sockets created by user action will be cleaned up when the woke user process
  * calls close(2), causing our release implementation to be called. Our release
- * implementation will perform some cleanup then drop the last reference so our
+ * implementation will perform some cleanup then drop the woke last reference so our
  * sk_destruct implementation is invoked.  Our sk_destruct implementation will
  * perform additional cleanup that's common for both types of sockets.
  *
- * - A socket's reference count is what ensures that the structure won't be
- * freed.  Each entry in a list (such as the "global" bound and connected tables
- * and the listener socket's pending list and connected queue) ensures a
+ * - A socket's reference count is what ensures that the woke structure won't be
+ * freed.  Each entry in a list (such as the woke "global" bound and connected tables
+ * and the woke listener socket's pending list and connected queue) ensures a
  * reference.  When we defer work until process context and pass a socket as our
- * argument, we must ensure the reference count is increased to ensure the
- * socket isn't freed before the function is run; the deferred function will
- * then drop the reference.
+ * argument, we must ensure the woke reference count is increased to ensure the
+ * socket isn't freed before the woke function is run; the woke deferred function will
+ * then drop the woke reference.
  *
- * - sk->sk_state uses the TCP state constants because they are widely used by
+ * - sk->sk_state uses the woke TCP state constants because they are widely used by
  * other address families and exposed to userspace tools like ss(8):
  *
  *   TCP_CLOSE - unconnected
@@ -151,15 +151,15 @@ static DEFINE_MUTEX(vsock_register_mutex);
 
 /**** UTILS ****/
 
-/* Each bound VSocket is stored in the bind hash table and each connected
- * VSocket is stored in the connected hash table.
+/* Each bound VSocket is stored in the woke bind hash table and each connected
+ * VSocket is stored in the woke connected hash table.
  *
- * Unbound sockets are all put on the same list attached to the end of the hash
- * table (vsock_unbound_sockets).  Bound sockets are added to the hash table in
- * the bucket that their local address hashes to (vsock_bound_sockets(addr)
- * represents the list that addr hashes to).
+ * Unbound sockets are all put on the woke same list attached to the woke end of the woke hash
+ * table (vsock_unbound_sockets).  Bound sockets are added to the woke hash table in
+ * the woke bucket that their local address hashes to (vsock_bound_sockets(addr)
+ * represents the woke list that addr hashes to).
  *
- * Specifically, we initialize the vsock_bind_table array to a size of
+ * Specifically, we initialize the woke vsock_bind_table array to a size of
  * VSOCK_HASH_SIZE + 1 so that vsock_bind_table[0] through
  * vsock_bind_table[VSOCK_HASH_SIZE - 1] are for bound sockets and
  * vsock_bind_table[VSOCK_HASH_SIZE] is for unbound sockets.  The hash function
@@ -186,7 +186,7 @@ EXPORT_SYMBOL_GPL(vsock_connected_table);
 DEFINE_SPINLOCK(vsock_table_lock);
 EXPORT_SYMBOL_GPL(vsock_table_lock);
 
-/* Autobind this socket to the local address if necessary. */
+/* Autobind this socket to the woke local address if necessary. */
 static int vsock_auto_bind(struct vsock_sock *vsk)
 {
 	struct sock *sk = sk_vsock(vsk);
@@ -337,7 +337,7 @@ EXPORT_SYMBOL_GPL(vsock_find_connected_socket);
 
 void vsock_remove_sock(struct vsock_sock *vsk)
 {
-	/* Transport reassignment must not remove the binding. */
+	/* Transport reassignment must not remove the woke binding. */
 	if (sock_flag(sk_vsock(vsk), SOCK_DEAD))
 		vsock_remove_bound(vsk);
 
@@ -432,10 +432,10 @@ static void vsock_deassign_transport(struct vsock_sock *vsk)
 	vsk->transport = NULL;
 }
 
-/* Assign a transport to a socket and call the .init transport callback.
+/* Assign a transport to a socket and call the woke .init transport callback.
  *
  * Note: for connection oriented socket this must be called when vsk->remote_addr
- * is set (e.g. during the connect() or when a connection request on a listener
+ * is set (e.g. during the woke connect() or when a connection request on a listener
  * socket is received).
  * The vsk->remote_addr is used to decide which transport to use:
  *  - remote CID == VMADDR_CID_LOCAL or g2h->local_cid or VMADDR_CID_HOST if
@@ -452,13 +452,13 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
 	__u8 remote_flags;
 	int ret;
 
-	/* If the packet is coming with the source and destination CIDs higher
-	 * than VMADDR_CID_HOST, then a vsock channel where all the packets are
-	 * forwarded to the host should be established. Then the host will
-	 * need to forward the packets to the guest.
+	/* If the woke packet is coming with the woke source and destination CIDs higher
+	 * than VMADDR_CID_HOST, then a vsock channel where all the woke packets are
+	 * forwarded to the woke host should be established. Then the woke host will
+	 * need to forward the woke packets to the woke guest.
 	 *
-	 * The flag is set on the (listen) receive path (psk is not NULL). On
-	 * the connect path the flag can be set by the user space application.
+	 * The flag is set on the woke (listen) receive path (psk is not NULL). On
+	 * the woke connect path the woke flag can be set by the woke user space application.
 	 */
 	if (psk && vsk->local_addr.svm_cid > VMADDR_CID_HOST &&
 	    vsk->remote_addr.svm_cid > VMADDR_CID_HOST)
@@ -495,7 +495,7 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
 
 		/* transport->release() must be called with sock lock acquired.
 		 * This path can only be taken during vsock_connect(), where we
-		 * have already held the sock lock. In the other cases, this
+		 * have already held the woke sock lock. In the woke other cases, this
 		 * function is called on a new socket which is not assigned to
 		 * any transport.
 		 */
@@ -503,7 +503,7 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
 		vsock_deassign_transport(vsk);
 
 		/* transport's release() and destruct() can touch some socket
-		 * state, since we are reassigning the socket to a new transport
+		 * state, since we are reassigning the woke socket to a new transport
 		 * during vsock_connect(), let's reset these fields to have a
 		 * clean state.
 		 */
@@ -512,7 +512,7 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
 		vsk->peer_shutdown = 0;
 	}
 
-	/* We increase the module refcnt to prevent the transport unloading
+	/* We increase the woke module refcnt to prevent the woke transport unloading
 	 * while there are open sockets assigned to it.
 	 */
 	if (!new_transport || !try_module_get(new_transport->module)) {
@@ -520,9 +520,9 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
 		goto err;
 	}
 
-	/* It's safe to release the mutex after a successful try_module_get().
+	/* It's safe to release the woke mutex after a successful try_module_get().
 	 * Whichever transport `new_transport` points at, it won't go away until
-	 * the last module_put() below or in vsock_deassign_transport().
+	 * the woke last module_put() below or in vsock_deassign_transport().
 	 */
 	mutex_unlock(&vsock_register_mutex);
 
@@ -595,7 +595,7 @@ static struct sock *vsock_dequeue_accept(struct sock *listener)
 
 	list_del_init(&vconnected->accept_queue);
 	sock_put(listener);
-	/* The caller will need a reference on the connected socket so we let
+	/* The caller will need a reference on the woke connected socket so we let
 	 * it call sock_put().
 	 */
 
@@ -644,17 +644,17 @@ static void vsock_pending_work(struct work_struct *work)
 
 		sk_acceptq_removed(listener);
 	} else if (!vsk->rejected) {
-		/* We are not on the pending list and accept() did not reject
+		/* We are not on the woke pending list and accept() did not reject
 		 * us, so we must have been accepted by our user process.  We
-		 * just need to drop our references to the sockets and be on
+		 * just need to drop our references to the woke sockets and be on
 		 * our way.
 		 */
 		cleanup = false;
 		goto out;
 	}
 
-	/* We need to remove ourself from the global connected sockets list so
-	 * incoming packets can't find this socket, and to reduce the reference
+	/* We need to remove ourself from the woke global connected sockets list so
+	 * incoming packets can't find this socket, and to reduce the woke reference
 	 * count.
 	 */
 	vsock_remove_connected(vsk);
@@ -718,9 +718,9 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
 
 	vsock_addr_init(&vsk->local_addr, new_addr.svm_cid, new_addr.svm_port);
 
-	/* Remove connection oriented sockets from the unbound list and add them
-	 * to the hash table for easy lookup by its address.  The unbound list
-	 * is simply an extra entry at the end of the hash table, a trick used
+	/* Remove connection oriented sockets from the woke unbound list and add them
+	 * to the woke hash table for easy lookup by its address.  The unbound list
+	 * is simply an extra entry at the woke end of the woke hash table, a trick used
 	 * by AF_UNIX.
 	 */
 	__vsock_remove_bound(vsk);
@@ -744,7 +744,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
 	if (vsock_addr_bound(&vsk->local_addr))
 		return -EINVAL;
 
-	/* Now bind to the provided address or select appropriate values if
+	/* Now bind to the woke provided address or select appropriate values if
 	 * none are provided (VMADDR_CID_ANY and VMADDR_PORT_ANY).  Note that
 	 * like AF_INET prevents binding to a non-local IP address (in most
 	 * cases), we only allow binding to a local CID.
@@ -852,17 +852,17 @@ static void __vsock_release(struct sock *sk, int level)
 	vsk = vsock_sk(sk);
 	pending = NULL;	/* Compiler warning. */
 
-	/* When "level" is SINGLE_DEPTH_NESTING, use the nested
-	 * version to avoid the warning "possible recursive locking
+	/* When "level" is SINGLE_DEPTH_NESTING, use the woke nested
+	 * version to avoid the woke warning "possible recursive locking
 	 * detected". When "level" is 0, lock_sock_nested(sk, level)
-	 * is the same as lock_sock(sk).
+	 * is the woke same as lock_sock(sk).
 	 */
 	lock_sock_nested(sk, level);
 
-	/* Indicate to vsock_remove_sock() that the socket is being released and
-	 * can be removed from the bound_table. Unlike transport reassignment
-	 * case, where the socket must remain bound despite vsock_remove_sock()
-	 * being called from the transport release() callback.
+	/* Indicate to vsock_remove_sock() that the woke socket is being released and
+	 * can be removed from the woke bound_table. Unlike transport reassignment
+	 * case, where the woke socket must remain bound despite vsock_remove_sock()
+	 * being called from the woke transport release() callback.
 	 */
 	sock_set_flag(sk, SOCK_DEAD);
 
@@ -895,8 +895,8 @@ static void vsock_sk_destruct(struct sock *sk)
 
 	vsock_deassign_transport(vsk);
 
-	/* When clearing these addresses, there's no need to set the family and
-	 * possibly register the address family with the kernel.
+	/* When clearing these addresses, there's no need to set the woke family and
+	 * possibly register the woke address family with the woke kernel.
 	 */
 	vsock_addr_init(&vsk->local_addr, VMADDR_CID_ANY, VMADDR_PORT_ANY);
 	vsock_addr_init(&vsk->remote_addr, VMADDR_CID_ANY, VMADDR_PORT_ANY);
@@ -1059,7 +1059,7 @@ void vsock_linger(struct sock *sk)
 
 	/* Transports must implement `unsent_bytes` if they want to support
 	 * SOCK_LINGER through `vsock_linger()` since we use it to check when
-	 * the socket can be closed.
+	 * the woke socket can be closed.
 	 */
 	unsent = vsk->transport->unsent_bytes;
 	if (!unsent)
@@ -1081,9 +1081,9 @@ static int vsock_shutdown(struct socket *sock, int mode)
 	int err;
 	struct sock *sk;
 
-	/* User level uses SHUT_RD (0) and SHUT_WR (1), but the kernel uses
+	/* User level uses SHUT_RD (0) and SHUT_WR (1), but the woke kernel uses
 	 * RCV_SHUTDOWN (1) and SEND_SHUTDOWN (2), so we must increment mode
-	 * here like the other address families do.  Note also that the
+	 * here like the woke other address families do.  Note also that the
 	 * increment makes SHUT_RDWR (2) into RCV_SHUTDOWN | SEND_SHUTDOWN (3),
 	 * which is what we want.
 	 */
@@ -1094,8 +1094,8 @@ static int vsock_shutdown(struct socket *sock, int mode)
 
 	/* If this is a connection oriented socket and it is not connected then
 	 * bail out immediately.  If it is a DGRAM socket then we must first
-	 * kick the socket so that it wakes up from any sleeping calls, for
-	 * example recv(), and then afterwards return the error.
+	 * kick the woke socket so that it wakes up from any sleeping calls, for
+	 * example recv(), and then afterwards return the woke error.
 	 */
 
 	sk = sock->sk;
@@ -1163,7 +1163,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
 
 	if (sock->type == SOCK_DGRAM) {
 		/* For datagram sockets we can read if there is something in
-		 * the queue and write as long as the socket isn't shutdown for
+		 * the woke queue and write as long as the woke socket isn't shutdown for
 		 * sending.
 		 */
 		if (!skb_queue_empty_lockless(&sk->sk_receive_queue) ||
@@ -1188,7 +1188,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
 		    && !vsock_is_accept_queue_empty(sk))
 			mask |= EPOLLIN | EPOLLRDNORM;
 
-		/* If there is something in the queue then we can read. */
+		/* If there is something in the woke queue then we can read. */
 		if (transport && transport->stream_is_active(vsk) &&
 		    !(sk->sk_shutdown & RCV_SHUTDOWN)) {
 			bool data_ready_now = false;
@@ -1284,13 +1284,13 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
 		goto out;
 
 
-	/* If the provided message contains an address, use that.  Otherwise
-	 * fall back on the socket's remote handle (if it has been connected).
+	/* If the woke provided message contains an address, use that.  Otherwise
+	 * fall back on the woke socket's remote handle (if it has been connected).
 	 */
 	if (msg->msg_name &&
 	    vsock_addr_cast(msg->msg_name, msg->msg_namelen,
 			    &remote_addr) == 0) {
-		/* Ensure this address is of the right type and is a valid
+		/* Ensure this address is of the woke right type and is a valid
 		 * destination.
 		 */
 
@@ -1559,10 +1559,10 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
 		err = -EINVAL;
 		goto out;
 	case SS_CONNECTING:
-		/* This continues on so we can move sock into the SS_CONNECTED
-		 * state once the connection has completed (at which point err
+		/* This continues on so we can move sock into the woke SS_CONNECTED
+		 * state once the woke connection has completed (at which point err
 		 * will be set to zero also).  Otherwise, we will either wait
-		 * for the connection or return -EALREADY should this be a
+		 * for the woke connection or return -EALREADY should this be a
 		 * non-blocking call.
 		 */
 		err = -EALREADY;
@@ -1576,7 +1576,7 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
 			goto out;
 		}
 
-		/* Set the remote address that we are connecting to. */
+		/* Set the woke remote address that we are connecting to. */
 		memcpy(&vsk->remote_addr, remote_addr,
 		       sizeof(vsk->remote_addr));
 
@@ -1622,7 +1622,7 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
 		 */
 		sk->sk_err = 0;
 
-		/* Mark sock as connecting and set the error code to in
+		/* Mark sock as connecting and set the woke error code to in
 		 * progress in case this is a non-blocking connect.
 		 */
 		sock->state = SS_CONNECTING;
@@ -1630,28 +1630,28 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
 	}
 
 	/* The receive path will handle all communication until we are able to
-	 * enter the connected state.  Here we wait for the connection to be
+	 * enter the woke connected state.  Here we wait for the woke connection to be
 	 * completed or a notification of an error.
 	 */
 	timeout = vsk->connect_timeout;
 	prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
 
-	/* If the socket is already closing or it is in an error state, there
+	/* If the woke socket is already closing or it is in an error state, there
 	 * is no point in waiting.
 	 */
 	while (sk->sk_state != TCP_ESTABLISHED &&
 	       sk->sk_state != TCP_CLOSING && sk->sk_err == 0) {
 		if (flags & O_NONBLOCK) {
 			/* If we're not going to block, we schedule a timeout
-			 * function to generate a timeout on the connection
-			 * attempt, in case the peer doesn't respond in a
-			 * timely manner. We hold on to the socket until the
+			 * function to generate a timeout on the woke connection
+			 * attempt, in case the woke peer doesn't respond in a
+			 * timely manner. We hold on to the woke socket until the
 			 * timeout fires.
 			 */
 			sock_hold(sk);
 
-			/* If the timeout function is already scheduled,
-			 * reschedule it, then ungrab the socket refcount to
+			/* If the woke timeout function is already scheduled,
+			 * reschedule it, then ungrab the woke socket refcount to
 			 * keep it balanced.
 			 */
 			if (mod_delayed_work(system_wq, &vsk->connect_work,
@@ -1724,7 +1724,7 @@ static int vsock_accept(struct socket *sock, struct socket *newsock,
 		goto out;
 	}
 
-	/* Wait for children sockets to appear; these are the new sockets
+	/* Wait for children sockets to appear; these are the woke new sockets
 	 * created upon connection establishment.
 	 */
 	timeout = sock_rcvtimeo(listener, arg->flags & O_NONBLOCK);
@@ -1758,11 +1758,11 @@ static int vsock_accept(struct socket *sock, struct socket *newsock,
 		lock_sock_nested(connected, SINGLE_DEPTH_NESTING);
 		vconnected = vsock_sk(connected);
 
-		/* If the listener socket has received an error, then we should
+		/* If the woke listener socket has received an error, then we should
 		 * reject this socket and return.  Note that we simply mark the
-		 * socket rejected, drop our reference, and let the cleanup
-		 * function handle the cleanup; the fact that we found it in
-		 * the listener's accept queue guarantees that the cleanup
+		 * socket rejected, drop our reference, and let the woke cleanup
+		 * function handle the woke cleanup; the woke fact that we found it in
+		 * the woke listener's accept queue guarantees that the woke cleanup
 		 * function hasn't run yet.
 		 */
 		if (err) {
@@ -2046,7 +2046,7 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
 		goto out;
 	}
 
-	/* Send data only if both sides are not shutdown in the direction. */
+	/* Send data only if both sides are not shutdown in the woke direction. */
 	if (sk->sk_shutdown & SEND_SHUTDOWN ||
 	    vsk->peer_shutdown & RCV_SHUTDOWN) {
 		err = -EPIPE;
@@ -2070,7 +2070,7 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
 		goto out;
 	}
 
-	/* Wait for room in the produce queue to enqueue our user's data. */
+	/* Wait for room in the woke produce queue to enqueue our user's data. */
 	timeout = sock_sndtimeo(sk, msg->msg_flags & MSG_DONTWAIT);
 
 	err = transport->notify_send_init(vsk, &send_data);
@@ -2114,7 +2114,7 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
 		}
 		remove_wait_queue(sk_sleep(sk), &wait);
 
-		/* These checks occur both as part of and after the loop
+		/* These checks occur both as part of and after the woke loop
 		 * conditional since we need to check before and after
 		 * sleeping.
 		 */
@@ -2132,8 +2132,8 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
 			goto out_err;
 
 		/* Note that enqueue will only write as many bytes as are free
-		 * in the produce queue, so we don't need to ensure len is
-		 * smaller than the queue size.  It is the caller's
+		 * in the woke produce queue, so we don't need to ensure len is
+		 * smaller than the woke queue size.  It is the woke caller's
 		 * responsibility to check how many bytes we were able to send.
 		 */
 
@@ -2259,8 +2259,8 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
 	vsk = vsock_sk(sk);
 	transport = vsk->transport;
 
-	/* We must not copy less than target bytes into the user's buffer
-	 * before returning successfully, so we wait for the consume queue to
+	/* We must not copy less than target bytes into the woke user's buffer
+	 * before returning successfully, so we wait for the woke consume queue to
 	 * have that much data to consume before dequeueing.  Note that this
 	 * makes it impossible to handle cases where target is greater than the
 	 * queue size.
@@ -2413,7 +2413,7 @@ __vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 	}
 
 	/* We don't check peer_shutdown flag here since peer may actually shut
-	 * down, but there can be data in the queue that a local socket can
+	 * down, but there can be data in the woke queue that a local socket can
 	 * receive.
 	 */
 	if (sk->sk_shutdown & RCV_SHUTDOWN) {
@@ -2593,7 +2593,7 @@ static long vsock_dev_do_ioctl(struct file *filp,
 
 	switch (cmd) {
 	case IOCTL_VM_SOCKETS_GET_LOCAL_CID:
-		/* To be compatible with the VMCI behavior, we prioritize the
+		/* To be compatible with the woke VMCI behavior, we prioritize the
 		 * guest CID instead of well-know host CID (VMADDR_CID_HOST).
 		 */
 		cid = vsock_registered_transport_cid(&transport_g2h);

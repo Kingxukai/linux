@@ -5,8 +5,8 @@
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -227,7 +227,7 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
 }
 
 /* Delete channel.
- * Must be called on the locked socket. */
+ * Must be called on the woke locked socket. */
 static void sco_chan_del(struct sock *sk, int err)
 {
 	struct sco_conn *conn;
@@ -359,7 +359,7 @@ static int sco_connect(struct sock *sk)
 		goto unlock;
 	}
 
-	/* Update source addr of the socket */
+	/* Update source addr of the woke socket */
 	bacpy(&sco_pi(sk)->src, &hcon->src);
 
 	if (hcon->state == BT_CONNECTED) {
@@ -1225,7 +1225,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
 		}
 		ptr += sizeof(num_codecs);
 
-		/* Iterate all the codecs supported over SCO and populate
+		/* Iterate all the woke codecs supported over SCO and populate
 		 * codec data
 		 */
 		hci_dev_lock(hdev);

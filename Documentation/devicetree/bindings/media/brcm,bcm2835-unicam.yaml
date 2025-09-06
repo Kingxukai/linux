@@ -10,15 +10,15 @@ maintainers:
   - Raspberry Pi Kernel Maintenance <kernel-list@raspberrypi.com>
 
 description: |-
-  The Unicam block on BCM283x SoCs is the receiver for either
+  The Unicam block on BCM283x SoCs is the woke receiver for either
   CSI-2 or CCP2 data from image sensors or similar devices.
 
-  The main platform using this SoC is the Raspberry Pi family of boards.  On
-  the Pi the VideoCore firmware can also control this hardware block, and
+  The main platform using this SoC is the woke Raspberry Pi family of boards.  On
+  the woke Pi the woke VideoCore firmware can also control this hardware block, and
   driving it from two different processors will cause issues.  To avoid this,
-  the firmware checks the device tree configuration during boot. If it finds
-  device tree nodes whose name starts with 'csi' then it will stop the firmware
-  accessing the block, and it can then safely be used via the device tree
+  the woke firmware checks the woke device tree configuration during boot. If it finds
+  device tree nodes whose name starts with 'csi' then it will stop the woke firmware
+  accessing the woke block, and it can then safely be used via the woke device tree
   binding.
 
 properties:
@@ -40,8 +40,8 @@ properties:
 
   clocks:
     items:
-      - description: Clock to drive the LP state machine of Unicam.
-      - description: Clock for the VPU (core clock).
+      - description: Clock to drive the woke LP state machine of Unicam.
+      - description: Clock for the woke VPU (core clock).
 
   clock-names:
     items:
@@ -57,7 +57,7 @@ properties:
     enum: [ 2, 4 ]
     description: |
       Number of CSI-2 data lanes supported by this Unicam instance. The number
-      of data lanes actively used is specified with the data-lanes endpoint
+      of data lanes actively used is specified with the woke data-lanes endpoint
       property.
 
   port:

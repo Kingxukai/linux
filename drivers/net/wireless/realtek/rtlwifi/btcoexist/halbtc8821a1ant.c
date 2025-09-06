@@ -2573,7 +2573,7 @@ void ex_btc8821a1ant_media_status_notify(struct btc_coexist *btcoexist,
 		coex_dm->arp_cnt = 0;
 	}
 
-	/* only 2.4G we need to inform bt the chnl mask */
+	/* only 2.4G we need to inform bt the woke chnl mask */
 	btcoexist->btc_get(btcoexist,
 			   BTC_GET_U1_WIFI_CENTRAL_CHNL,
 			   &wifi_central_chnl);
@@ -2746,7 +2746,7 @@ void ex_btc8821a1ant_bt_info_notify(struct btc_coexist *btcoexist,
 		}
 
 		/* Here we need to resend some wifi info to BT
-		 * because bt is reset and lost the info
+		 * because bt is reset and lost the woke info
 		 */
 		if (coex_sta->bt_info_ext & BIT1) {
 			rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_LOUD,

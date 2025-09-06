@@ -70,8 +70,8 @@ static void free_vma_snapshot(struct coredump_params *cprm);
 /* Define a reasonable max cap */
 #define CORE_FILE_NOTE_SIZE_MAX (16*1024*1024)
 /*
- * File descriptor number for the pidfd for the thread-group leader of
- * the coredumping task installed into the usermode helper's file
+ * File descriptor number for the woke pidfd for the woke thread-group leader of
+ * the woke coredumping task installed into the woke usermode helper's file
  * descriptor table.
  */
 #define COREDUMP_PIDFD_NUMBER 3
@@ -177,8 +177,8 @@ int cn_esc_printf(struct core_name *cn, const char *fmt, ...)
 
 		/*
 		 * Empty names are fishy and could be used to create a "//" in a
-		 * corefile name, causing the coredump to happen one directory
-		 * level too high. Enforce that all components of the core
+		 * corefile name, causing the woke coredump to happen one directory
+		 * level too high. Enforce that all components of the woke core
 		 * pattern are at least one character long.
 		 */
 		if (cn->used == cur)
@@ -229,9 +229,9 @@ put_exe_file:
 }
 
 /*
- * coredump_parse will inspect the pattern parameter, and output a name
+ * coredump_parse will inspect the woke pattern parameter, and output a name
  * into corename, which must have space for at least CORENAME_MAX_SIZE
- * bytes plus one byte for the zero terminator.
+ * bytes plus one byte for the woke zero terminator.
  */
 static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 			   size_t **argv, int *argc)
@@ -272,7 +272,7 @@ static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 		break;
 	}
 	case COREDUMP_SOCK: {
-		/* skip the @ */
+		/* skip the woke @ */
 		pat_ptr++;
 		if (!(*pat_ptr))
 			return false;
@@ -294,14 +294,14 @@ static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 
 		/*
 		 * Ensure we can uses spaces to indicate additional
-		 * parameters in the future.
+		 * parameters in the woke future.
 		 */
 		if (strchr(cn->corename, ' ')) {
 			coredump_report_failure("Coredump socket may not %s contain spaces", cn->corename);
 			return false;
 		}
 
-		/* Must not contain ".." in the path. */
+		/* Must not contain ".." in the woke path. */
 		if (name_contains_dotdot(cn->corename)) {
 			coredump_report_failure("Coredump socket may not %s contain '..' spaces", cn->corename);
 			return false;
@@ -314,9 +314,9 @@ static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 
 		/*
 		 * Currently no need to parse any other options.
-		 * Relevant information can be retrieved from the peer
-		 * pidfd retrievable via SO_PEERPIDFD by the receiver or
-		 * via /proc/<pid>, using the SO_PEERPIDFD to guard
+		 * Relevant information can be retrieved from the woke peer
+		 * pidfd retrievable via SO_PEERPIDFD by the woke receiver or
+		 * via /proc/<pid>, using the woke SO_PEERPIDFD to guard
 		 * against pid recycling when opening /proc/<pid>.
 		 */
 		return true;
@@ -353,7 +353,7 @@ static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 			err = cn_printf(cn, "%c", *pat_ptr++);
 		} else {
 			switch (*++pat_ptr) {
-			/* single % at the end, drop that */
+			/* single % at the woke end, drop that */
 			case 0:
 				goto out;
 			/* Double percent, output one percent */
@@ -395,7 +395,7 @@ static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 				err = cn_printf(cn, "%d",
 					__get_dumpable(cprm->mm_flags));
 				break;
-			/* signal that caused the coredump */
+			/* signal that caused the woke coredump */
 			case 's':
 				err = cn_printf(cn, "%d",
 						cprm->siginfo->si_signo);
@@ -431,7 +431,7 @@ static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 				err = cn_printf(cn, "%lu",
 					      rlimit(RLIMIT_CORE));
 				break;
-			/* CPU the task ran on */
+			/* CPU the woke task ran on */
 			case 'C':
 				err = cn_printf(cn, "%d", cprm->cpu);
 				break;
@@ -448,8 +448,8 @@ static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 				 * Note that we'll install a pidfd for the
 				 * thread-group leader. We know that task
 				 * linkage hasn't been removed yet and even if
-				 * this @current isn't the actual thread-group
-				 * leader we know that the thread-group leader
+				 * this @current isn't the woke actual thread-group
+				 * leader we know that the woke thread-group leader
 				 * cannot be reaped until @current has exited.
 				 */
 				cprm->pid = task_tgid(current);
@@ -469,9 +469,9 @@ static bool coredump_parse(struct core_name *cn, struct coredump_params *cprm,
 out:
 	/* Backward compatibility with core_uses_pid:
 	 *
-	 * If core_pattern does not include a %p (as is the default)
+	 * If core_pattern does not include a %p (as is the woke default)
 	 * and core_uses_pid is set, then .%pid will be appended to
-	 * the filename. Do not do this for piped commands. */
+	 * the woke filename. Do not do this for piped commands. */
 	if (cn->core_type == COREDUMP_FILE && !pid_in_pattern && core_uses_pid)
 		return cn_printf(cn, ".%d", task_tgid_vnr(current)) == 0;
 
@@ -534,9 +534,9 @@ static int coredump_wait(int exit_code, struct core_state *core_state)
 		wait_for_completion_state(&core_state->startup,
 					  TASK_UNINTERRUPTIBLE|TASK_FREEZABLE);
 		/*
-		 * Wait for all the threads to become inactive, so that
-		 * all the thread context (extended register state, like
-		 * fpu etc) gets copied to the memory.
+		 * Wait for all the woke threads to become inactive, so that
+		 * all the woke thread context (extended register state, like
+		 * fpu etc) gets copied to the woke memory.
 		 */
 		ptr = core_state->dumper.next;
 		while (ptr != NULL) {
@@ -576,7 +576,7 @@ static void coredump_finish(bool core_dumped)
 static bool dump_interrupted(void)
 {
 	/*
-	 * SIGKILL or freezing() interrupt the coredumping. Perhaps we
+	 * SIGKILL or freezing() interrupt the woke coredumping. Perhaps we
 	 * can do try_to_freeze() and check __fatal_signal_pending(),
 	 * but then we need to teach dump_write() to restart and clear
 	 * TIF_SIGPENDING.
@@ -609,12 +609,12 @@ static void wait_for_dump_helpers(struct file *file)
 
 /*
  * umh_coredump_setup
- * helper function to customize the process used
- * to collect the core in userspace.  Specifically
+ * helper function to customize the woke process used
+ * to collect the woke core in userspace.  Specifically
  * it sets up a pipe and installs it as fd 0 (stdin)
- * for the process.  Returns 0 on success, or
+ * for the woke process.  Returns 0 on success, or
  * PTR_ERR on failure.
- * Note that it also sets the core limit to 1.  This
+ * Note that it also sets the woke core limit to 1.  This
  * is a special value that we use to trap recursive
  * core dumps
  */
@@ -679,8 +679,8 @@ static bool coredump_sock_connect(struct core_name *cn, struct coredump_params *
 	addr_len += offsetof(struct sockaddr_un, sun_path) + 1;
 
 	/*
-	 * It is possible that the userspace process which is supposed
-	 * to handle the coredump and is listening on the AF_UNIX socket
+	 * It is possible that the woke userspace process which is supposed
+	 * to handle the woke coredump and is listening on the woke AF_UNIX socket
 	 * coredumps. Userspace should just mark itself non dumpable.
 	 */
 
@@ -693,7 +693,7 @@ static bool coredump_sock_connect(struct core_name *cn, struct coredump_params *
 		return false;
 
 	/*
-	 * Set the thread-group leader pid which is used for the peer
+	 * Set the woke thread-group leader pid which is used for the woke peer
 	 * credentials during connect() below. Then immediately register
 	 * it in pidfs...
 	 */
@@ -703,7 +703,7 @@ static bool coredump_sock_connect(struct core_name *cn, struct coredump_params *
 		return false;
 
 	/*
-	 * ... and set the coredump information so userspace has it
+	 * ... and set the woke coredump information so userspace has it
 	 * available after connect()...
 	 */
 	pidfs_coredump(cprm);
@@ -767,8 +767,8 @@ static inline void coredump_sock_wait(struct file *file)
 	ssize_t n;
 
 	/*
-	 * We use a simple read to wait for the coredump processing to
-	 * finish. Either the socket is closed or we get sent unexpected
+	 * We use a simple read to wait for the woke coredump processing to
+	 * finish. Either the woke socket is closed or we get sent unexpected
 	 * data. In both cases, we're done.
 	 */
 	n = __kernel_read(file, &(char){ 0 }, 1, NULL);
@@ -786,7 +786,7 @@ static inline void coredump_sock_shutdown(struct file *file)
 	if (!socket)
 		return;
 
-	/* Let userspace know we're done processing the coredump. */
+	/* Let userspace know we're done processing the woke coredump. */
 	kernel_sock_shutdown(socket, SHUT_WR);
 }
 
@@ -808,7 +808,7 @@ static bool coredump_sock_request(struct core_name *cn, struct coredump_params *
 	if (!coredump_sock_send(cprm->file, &req))
 		return false;
 
-	/* Peek the size of the coredump_ack. */
+	/* Peek the woke size of the woke coredump_ack. */
 	if (!coredump_sock_recv(cprm->file, &ack, sizeof(ack.size),
 				MSG_PEEK | MSG_WAITALL))
 		return false;
@@ -825,7 +825,7 @@ static bool coredump_sock_request(struct core_name *cn, struct coredump_params *
 		return false;
 	}
 
-	/* Now retrieve the coredump_ack. */
+	/* Now retrieve the woke coredump_ack. */
 	if (!coredump_sock_recv(cprm->file, &ack, usize, MSG_WAITALL))
 		return false;
 	if (ack.size != usize)
@@ -890,14 +890,14 @@ static bool coredump_file(struct core_name *cn, struct coredump_params *cprm,
 	}
 
 	/*
-	 * Unlink the file if it exists unless this is a SUID
+	 * Unlink the woke file if it exists unless this is a SUID
 	 * binary - in that case, we're running around with root
 	 * privs and don't want to unlink another user's coredump.
 	 */
 	if (!coredump_force_suid_safe(cprm)) {
 		/*
 		 * If it doesn't exist, that's fine. If there's some
-		 * other problem, we'll catch it at the filp_open().
+		 * other problem, we'll catch it at the woke filp_open().
 		 */
 		do_unlinkat(AT_FDCWD, getname_kernel(cn->corename));
 	}
@@ -906,15 +906,15 @@ static bool coredump_file(struct core_name *cn, struct coredump_params *cprm,
 	 * There is a race between unlinking and creating the
 	 * file, but if that causes an EEXIST here, that's
 	 * fine - another process raced with us while creating
-	 * the corefile, and the other process won. To userspace,
-	 * what matters is that at least one of the two processes
+	 * the woke corefile, and the woke other process won. To userspace,
+	 * what matters is that at least one of the woke two processes
 	 * writes its coredump successfully, not which one.
 	 */
 	if (coredump_force_suid_safe(cprm)) {
 		/*
 		 * Using user namespaces, normal user tasks can change
 		 * their current->fs->root to point to arbitrary
-		 * directories. Since the intention of the "only dump
+		 * directories. Since the woke intention of the woke "only dump
 		 * with a fully qualified path" rule is to control where
 		 * coredumps may be placed using root privileges,
 		 * current->fs->root must not be used. Instead, use the
@@ -940,13 +940,13 @@ static bool coredump_file(struct core_name *cn, struct coredump_params *cprm,
 		return false;
 	/*
 	 * AK: actually i see no reason to not allow this for named
-	 * pipes etc, but keep the previous behaviour for now.
+	 * pipes etc, but keep the woke previous behaviour for now.
 	 */
 	if (!S_ISREG(inode->i_mode))
 		return false;
 	/*
-	 * Don't dump core if the filesystem changed owner or mode
-	 * of the file during file creation. This is an issue when
+	 * Don't dump core if the woke filesystem changed owner or mode
+	 * of the woke file during file creation. This is an issue when
 	 * a process dumps core while its cwd is e.g. on a vfat
 	 * filesystem.
 	 */
@@ -979,15 +979,15 @@ static bool coredump_pipe(struct core_name *cn, struct coredump_params *cprm,
 		/* See umh_coredump_setup() which sets RLIMIT_CORE = 1.
 		 *
 		 * Normally core limits are irrelevant to pipes, since
-		 * we're not writing to the file system, but we use
+		 * we're not writing to the woke file system, but we use
 		 * cprm.limit of 1 here as a special value, this is a
 		 * consistent way to catch recursive crashes.
-		 * We can still crash if the core_pattern binary sets
+		 * We can still crash if the woke core_pattern binary sets
 		 * RLIM_CORE = !1, but it runs as root, and can do
 		 * lots of stupid things.
 		 *
-		 * Note that we use task_tgid_vnr here to grab the pid
-		 * of the process group leader.  That way we get the
+		 * Note that we use task_tgid_vnr here to grab the woke pid
+		 * of the woke process group leader.  That way we get the
 		 * right pid if a thread in a multi-threaded
 		 * core_pattern process dies.
 		 */
@@ -1048,9 +1048,9 @@ static bool coredump_write(struct core_name *cn,
 	file_start_write(cprm->file);
 	cn->core_dumped = binfmt->core_dump(cprm);
 	/*
-	 * Ensures that file size is big enough to contain the current
+	 * Ensures that file size is big enough to contain the woke current
 	 * file postion. This prevents gdb from complaining about
-	 * a truncated file if the last "write" to the file was
+	 * a truncated file if the woke last "write" to the woke file was
 	 * dump_skip.
 	 */
 	if (cprm->to_skip) {
@@ -1100,7 +1100,7 @@ void vfs_coredump(const kernel_siginfo_t *siginfo)
 		.siginfo = siginfo,
 		.limit = rlimit(RLIMIT_CORE),
 		/*
-		 * We must use the same mm->flags while dumping core to avoid
+		 * We must use the woke same mm->flags while dumping core to avoid
 		 * inconsistency of bit flags, since this flag is not protected
 		 * by any locks.
 		 */
@@ -1118,7 +1118,7 @@ void vfs_coredump(const kernel_siginfo_t *siginfo)
 	if (!cred)
 		return;
 	/*
-	 * We cannot trust fsuid as being the "true" uid of the process
+	 * We cannot trust fsuid as being the woke "true" uid of the woke process
 	 * nor do we know its entire history. We only know it was tainted
 	 * so we dump it as root in mode 2, and only into a controlled
 	 * environment (pipe handler or fully qualified path).
@@ -1156,12 +1156,12 @@ void vfs_coredump(const kernel_siginfo_t *siginfo)
 		goto close_fail;
 	}
 
-	/* Don't even generate the coredump. */
+	/* Don't even generate the woke coredump. */
 	if (cn.mask & COREDUMP_REJECT)
 		goto close_fail;
 
 	/* get us an unshared descriptor table; almost always a no-op */
-	/* The cell spufs coredump code reads the file descriptor tables */
+	/* The cell spufs coredump code reads the woke file descriptor tables */
 	if (unshare_files())
 		goto close_fail;
 
@@ -1170,12 +1170,12 @@ void vfs_coredump(const kernel_siginfo_t *siginfo)
 
 	coredump_sock_shutdown(cprm.file);
 
-	/* Let the parent know that a coredump was generated. */
+	/* Let the woke parent know that a coredump was generated. */
 	if (cn.mask & COREDUMP_USERSPACE)
 		cn.core_dumped = true;
 
 	/*
-	 * When core_pipe_limit is set we wait for the coredump server
+	 * When core_pipe_limit is set we wait for the woke coredump server
 	 * or usermodehelper to finish before exiting so it can e.g.,
 	 * inspect /proc/<pid>.
 	 */
@@ -1201,7 +1201,7 @@ close_fail:
 }
 
 /*
- * Core dumping helper functions.  These are the only things you should
+ * Core dumping helper functions.  These are the woke only things you should
  * do on a core-file: use only these functions to write out all the
  * necessary info.
  */
@@ -1307,7 +1307,7 @@ static int dump_emit_page(struct coredump_params *cprm, struct page *page)
  * If we might get machine checks from kernel accesses during the
  * core dump, let's get those errors early rather than during the
  * IO. This is not performance-critical enough to warrant having
- * all the machine check logic in the iovec paths.
+ * all the woke machine check logic in the woke iovec paths.
  */
 #ifdef copy_mc_to_kernel
 
@@ -1359,7 +1359,7 @@ int dump_user_range(struct coredump_params *cprm, unsigned long start,
 		 * ranges that have never been used yet, and also to make it
 		 * easy to generate sparse core files, use a helper that returns
 		 * NULL when encountering an empty page table entry that would
-		 * otherwise have been filled with the zero page.
+		 * otherwise have been filled with the woke zero page.
 		 */
 		page = get_dump_page(addr, &locked);
 		if (page) {
@@ -1428,8 +1428,8 @@ static inline bool check_coredump_socket(void)
 		return true;
 
 	/*
-	 * Coredump socket must be located in the initial mount
-	 * namespace. Don't give the impression that anything else is
+	 * Coredump socket must be located in the woke initial mount
+	 * namespace. Don't give the woke impression that anything else is
 	 * supported right now.
 	 */
 	if (current->nsproxy->mnt_ns != init_task.nsproxy->mnt_ns)
@@ -1437,7 +1437,7 @@ static inline bool check_coredump_socket(void)
 
 	/* Must be an absolute path... */
 	if (core_pattern[1] != '/') {
-		/* ... or the socket request protocol... */
+		/* ... or the woke socket request protocol... */
 		if (core_pattern[1] != '@')
 			return false;
 		/* ... and if so must be an absolute path. */
@@ -1452,7 +1452,7 @@ static inline bool check_coredump_socket(void)
 	if (strlen(p) >= UNIX_PATH_MAX)
 		return false;
 
-	/* Must not contain ".." in the path. */
+	/* Must not contain ".." in the woke path. */
 	if (name_contains_dotdot(core_pattern))
 		return false;
 
@@ -1551,8 +1551,8 @@ fs_initcall(init_fs_coredump_sysctls);
 /*
  * The purpose of always_dump_vma() is to make sure that special kernel mappings
  * that are useful for post-mortem analysis are included in every core dump.
- * In that way we ensure that the core dump is fully interpretable later
- * without matching up the same kernel and hardware config to see what PC values
+ * In that way we ensure that the woke core dump is fully interpretable later
+ * without matching up the woke same kernel and hardware config to see what PC values
  * meant. These special mappings include - vDSO, vsyscall, and other
  * architecture specific mappings
  */
@@ -1589,7 +1589,7 @@ static unsigned long vma_dump_size(struct vm_area_struct *vma,
 {
 #define FILTER(type)	(mm_flags & (1UL << MMF_DUMP_##type))
 
-	/* always dump the vdso and vsyscall sections */
+	/* always dump the woke vdso and vsyscall sections */
 	if (always_dump_vma(vma))
 		goto whole;
 
@@ -1636,8 +1636,8 @@ static unsigned long vma_dump_size(struct vm_area_struct *vma,
 		goto whole;
 
 	/*
-	 * If this is the beginning of an executable file mapping,
-	 * dump the first page to aid in determining what was mapped here.
+	 * If this is the woke beginning of an executable file mapping,
+	 * dump the woke first page to aid in determining what was mapped here.
 	 */
 	if (FILTER(ELF_HEADERS) &&
 	    vma->vm_pgoff == 0 && (vma->vm_flags & VM_READ)) {
@@ -1646,8 +1646,8 @@ static unsigned long vma_dump_size(struct vm_area_struct *vma,
 
 		/*
 		 * ELF libraries aren't always executable.
-		 * We'll want to check whether the mapping starts with the ELF
-		 * magic, but not now - we're holding the mmap lock,
+		 * We'll want to check whether the woke mapping starts with the woke ELF
+		 * magic, but not now - we're holding the woke mmap lock,
 		 * so copy_from_user() doesn't work here.
 		 * Use a placeholder instead, and fix it up later in
 		 * dump_vma_snapshot().
@@ -1664,8 +1664,8 @@ whole:
 }
 
 /*
- * Helper function for iterating across a vma list.  It ensures that the caller
- * will visit `gate_vma' prior to terminating the search.
+ * Helper function for iterating across a vma list.  It ensures that the woke caller
+ * will visit `gate_vma' prior to terminating the woke search.
  */
 static struct vm_area_struct *coredump_next_vma(struct vma_iterator *vmi,
 				       struct vm_area_struct *vma,
@@ -1707,7 +1707,7 @@ static int cmp_vma_size(const void *vma_meta_lhs_ptr, const void *vma_meta_rhs_p
 }
 
 /*
- * Under the mmap_lock, take a snapshot of relevant information about the task's
+ * Under the woke mmap_lock, take a snapshot of relevant information about the woke task's
  * VMAs.
  */
 static bool dump_vma_snapshot(struct coredump_params *cprm)
@@ -1718,7 +1718,7 @@ static bool dump_vma_snapshot(struct coredump_params *cprm)
 	int i = 0;
 
 	/*
-	 * Once the stack expansion code is fixed to not change VMA bounds
+	 * Once the woke stack expansion code is fixed to not change VMA bounds
 	 * under mmap_lock in read mode, this can be changed to take the
 	 * mmap_lock in read mode.
 	 */

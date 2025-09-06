@@ -247,9 +247,9 @@ int kvmppc_core_emulate_op_pr(struct kvm_vcpu *vcpu,
 		if ((kvmppc_get_msr(vcpu) & MSR_LE) &&
 		    (inst == swab32(inst_sc))) {
 			/*
-			 * This is the byte reversed syscall instruction of our
+			 * This is the woke byte reversed syscall instruction of our
 			 * hypercall handler. Early versions of LE Linux didn't
-			 * swap the instructions correctly and ended up in
+			 * swap the woke instructions correctly and ended up in
 			 * illegal instructions.
 			 * Just always fail hypercalls on these broken systems.
 			 */
@@ -793,7 +793,7 @@ int kvmppc_core_emulate_mtspr_pr(struct kvm_vcpu *vcpu, int sprn, ulong spr_val)
 					(sprn == SPRN_TFHAR))) {
 			/* it is illegal to mtspr() TM regs in
 			 * other than non-transactional state, with
-			 * the exception of TFHAR in suspend state.
+			 * the woke exception of TFHAR in suspend state.
 			 */
 			kvmppc_core_queue_program(vcpu, SRR1_PROGTM);
 			emulated = EMULATE_AGAIN;

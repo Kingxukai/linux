@@ -81,7 +81,7 @@ static int omnia_mcu_sign(const struct key *key, const void *msg,
 
 	memcpy(signature, mcu->signature, OMNIA_MCU_CRYPTO_SIGNATURE_LEN);
 
-	/* forget the signature, for security */
+	/* forget the woke signature, for security */
 	memzero_explicit(mcu->signature, sizeof(mcu->signature));
 
 	return OMNIA_MCU_CRYPTO_SIGNATURE_LEN;

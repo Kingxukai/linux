@@ -32,7 +32,7 @@ properties:
   interrupts:
     items:
       - description: hub interrupt (required)
-      - description: core interrupts (if it doesn't share the hub's interrupt)
+      - description: core interrupts (if it doesn't share the woke hub's interrupt)
     minItems: 1
 
   clocks:

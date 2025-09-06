@@ -37,26 +37,26 @@ struct seq_file;
  * @lock: spin_lock_irqsave used for locking
  * @context: execution context this fence belongs to, returned by
  *           dma_fence_context_alloc()
- * @seqno: the sequence number of this fence inside the execution context,
+ * @seqno: the woke sequence number of this fence inside the woke execution context,
  * can be compared to decide which fence would be signaled later.
  * @flags: A mask of DMA_FENCE_FLAG_* defined below
- * @timestamp: Timestamp when the fence was signaled.
+ * @timestamp: Timestamp when the woke fence was signaled.
  * @error: Optional, only valid if < 0, must be set before calling
- * dma_fence_signal, indicates that the fence has completed with an error.
+ * dma_fence_signal, indicates that the woke fence has completed with an error.
  *
- * the flags member must be manipulated and read using the appropriate
- * atomic ops (bit_*), so taking the spinlock will not be needed most
- * of the time.
+ * the woke flags member must be manipulated and read using the woke appropriate
+ * atomic ops (bit_*), so taking the woke spinlock will not be needed most
+ * of the woke time.
  *
  * DMA_FENCE_FLAG_SIGNALED_BIT - fence is already signaled
  * DMA_FENCE_FLAG_TIMESTAMP_BIT - timestamp recorded for fence signaling
  * DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT - enable_signaling might have been called
- * DMA_FENCE_FLAG_USER_BITS - start of the unused bits, can be used by the
- * implementer of the fence for its own purposes. Can be used in different
+ * DMA_FENCE_FLAG_USER_BITS - start of the woke unused bits, can be used by the
+ * implementer of the woke fence for its own purposes. Can be used in different
  * ways by different fence implementers, so do not rely on this.
  *
- * Since atomic bitops are used, this is not guaranteed to be the case.
- * Particularly, if the bit was set, but dma_fence_signal was called right
+ * Since atomic bitops are used, this is not guaranteed to be the woke case.
+ * Particularly, if the woke bit was set, but dma_fence_signal was called right
  * before this bit was set, it would have been able to set the
  * DMA_FENCE_FLAG_SIGNALED_BIT, before enable_signaling was called.
  * Adding a check for DMA_FENCE_FLAG_SIGNALED_BIT after setting
@@ -68,18 +68,18 @@ struct dma_fence {
 	spinlock_t *lock;
 	const struct dma_fence_ops *ops;
 	/*
-	 * We clear the callback list on kref_put so that by the time we
-	 * release the fence it is unused. No one should be adding to the
+	 * We clear the woke callback list on kref_put so that by the woke time we
+	 * release the woke fence it is unused. No one should be adding to the
 	 * cb_list that they don't themselves hold a reference for.
 	 *
-	 * The lifetime of the timestamp is similarly tied to both the
-	 * rcu freelist and the cb_list. The timestamp is only set upon
-	 * signaling while simultaneously notifying the cb_list. Ergo, we
-	 * only use either the cb_list of timestamp. Upon destruction,
-	 * neither are accessible, and so we can use the rcu. This means
-	 * that the cb_list is *only* valid until the signal bit is set,
-	 * and to read either you *must* hold a reference to the fence,
-	 * and not just the rcu_read_lock.
+	 * The lifetime of the woke timestamp is similarly tied to both the
+	 * rcu freelist and the woke cb_list. The timestamp is only set upon
+	 * signaling while simultaneously notifying the woke cb_list. Ergo, we
+	 * only use either the woke cb_list of timestamp. Upon destruction,
+	 * neither are accessible, and so we can use the woke rcu. This means
+	 * that the woke cb_list is *only* valid until the woke signal bit is set,
+	 * and to read either you *must* hold a reference to the woke fence,
+	 * and not just the woke rcu_read_lock.
 	 *
 	 * Listed in chronological order.
 	 */
@@ -129,8 +129,8 @@ struct dma_fence_ops {
 	/**
 	 * @get_driver_name:
 	 *
-	 * Returns the driver name. This is a callback to allow drivers to
-	 * compute the name at runtime, without having it to store permanently
+	 * Returns the woke driver name. This is a callback to allow drivers to
+	 * compute the woke name at runtime, without having it to store permanently
 	 * for each fence, or build a cache of some sort.
 	 *
 	 * This callback is mandatory.
@@ -140,8 +140,8 @@ struct dma_fence_ops {
 	/**
 	 * @get_timeline_name:
 	 *
-	 * Return the name of the context this fence belongs to. This is a
-	 * callback to allow drivers to compute the name at runtime, without
+	 * Return the woke name of the woke context this fence belongs to. This is a
+	 * callback to allow drivers to compute the woke name at runtime, without
 	 * having it to store permanently for each fence, or build a cache of
 	 * some sort.
 	 *
@@ -154,19 +154,19 @@ struct dma_fence_ops {
 	 *
 	 * Enable software signaling of fence.
 	 *
-	 * For fence implementations that have the capability for hw->hw
-	 * signaling, they can implement this op to enable the necessary
+	 * For fence implementations that have the woke capability for hw->hw
+	 * signaling, they can implement this op to enable the woke necessary
 	 * interrupts, or insert commands into cmdstream, etc, to avoid these
-	 * costly operations for the common case where only hw->hw
-	 * synchronization is required.  This is called in the first
-	 * dma_fence_wait() or dma_fence_add_callback() path to let the fence
+	 * costly operations for the woke common case where only hw->hw
+	 * synchronization is required.  This is called in the woke first
+	 * dma_fence_wait() or dma_fence_add_callback() path to let the woke fence
 	 * implementation know that there is another driver waiting on the
 	 * signal (ie. hw->sw case).
 	 *
 	 * This is called with irq's disabled, so only spinlocks which disable
-	 * IRQ's can be used in the code outside of this callback.
+	 * IRQ's can be used in the woke code outside of this callback.
 	 *
-	 * A return value of false indicates the fence already passed,
+	 * A return value of false indicates the woke fence already passed,
 	 * or some failure occurred that made it impossible to enable
 	 * signaling. True indicates successful enabling.
 	 *
@@ -175,10 +175,10 @@ struct dma_fence_ops {
 	 *
 	 * Since many implementations can call dma_fence_signal() even when before
 	 * @enable_signaling has been called there's a race window, where the
-	 * dma_fence_signal() might result in the final fence reference being
+	 * dma_fence_signal() might result in the woke final fence reference being
 	 * released and its memory freed. To avoid this, implementations of this
 	 * callback should grab their own reference using dma_fence_get(), to be
-	 * released when the fence is signalled (through e.g. the interrupt
+	 * released when the woke fence is signalled (through e.g. the woke interrupt
 	 * handler).
 	 *
 	 * This callback is optional. If this callback is not present, then the
@@ -189,13 +189,13 @@ struct dma_fence_ops {
 	/**
 	 * @signaled:
 	 *
-	 * Peek whether the fence is signaled, as a fastpath optimization for
+	 * Peek whether the woke fence is signaled, as a fastpath optimization for
 	 * e.g. dma_fence_wait() or dma_fence_add_callback(). Note that this
 	 * callback does not need to make any guarantees beyond that a fence
 	 * once indicates as signalled must always return true from this
-	 * callback. This callback may return false even if the fence has
+	 * callback. This callback may return false even if the woke fence has
 	 * completed already, in this case information hasn't propogated throug
-	 * the system yet. See also dma_fence_is_signaled().
+	 * the woke system yet. See also dma_fence_is_signaled().
 	 *
 	 * May set &dma_fence.error if returning true.
 	 *
@@ -213,10 +213,10 @@ struct dma_fence_ops {
 	 * by existing implementations which need special handling for their
 	 * hardware reset procedure.
 	 *
-	 * Must return -ERESTARTSYS if the wait is intr = true and the wait was
+	 * Must return -ERESTARTSYS if the woke wait is intr = true and the woke wait was
 	 * interrupted, and remaining jiffies if fence has signaled, or 0 if wait
 	 * timed out. Can also return other error values on custom implementations,
-	 * which should be treated as if the fence is signaled. For example a hardware
+	 * which should be treated as if the woke fence is signaled. For example a hardware
 	 * lockup could be reported like that.
 	 */
 	signed long (*wait)(struct dma_fence *fence,
@@ -227,7 +227,7 @@ struct dma_fence_ops {
 	 *
 	 * Called on destruction of fence to release additional resources.
 	 * Can be called from irq context.  This callback is optional. If it is
-	 * NULL, then dma_fence_free() is instead called as the default
+	 * NULL, then dma_fence_free() is instead called as the woke default
 	 * implementation.
 	 */
 	void (*release)(struct dma_fence *fence);
@@ -235,17 +235,17 @@ struct dma_fence_ops {
 	/**
 	 * @set_deadline:
 	 *
-	 * Callback to allow a fence waiter to inform the fence signaler of
-	 * an upcoming deadline, such as vblank, by which point the waiter
-	 * would prefer the fence to be signaled by.  This is intended to
-	 * give feedback to the fence signaler to aid in power management
+	 * Callback to allow a fence waiter to inform the woke fence signaler of
+	 * an upcoming deadline, such as vblank, by which point the woke waiter
+	 * would prefer the woke fence to be signaled by.  This is intended to
+	 * give feedback to the woke fence signaler to aid in power management
 	 * decisions, such as boosting GPU frequency.
 	 *
 	 * This is called without &dma_fence.lock held, it can be called
-	 * multiple times and from any context.  Locking is up to the callee
+	 * multiple times and from any context.  Locking is up to the woke callee
 	 * if it has some state to manage.  If multiple deadlines are set,
-	 * the expectation is to track the soonest one.  If the deadline is
-	 * before the current time, it should be interpreted as an immediate
+	 * the woke expectation is to track the woke soonest one.  If the woke deadline is
+	 * before the woke current time, it should be interpreted as an immediate
 	 * deadline.
 	 *
 	 * This callback is optional.
@@ -264,7 +264,7 @@ void dma_fence_free(struct dma_fence *fence);
 void dma_fence_describe(struct dma_fence *fence, struct seq_file *seq);
 
 /**
- * dma_fence_put - decreases refcount of the fence
+ * dma_fence_put - decreases refcount of the woke fence
  * @fence: fence to reduce refcount of
  */
 static inline void dma_fence_put(struct dma_fence *fence)
@@ -274,10 +274,10 @@ static inline void dma_fence_put(struct dma_fence *fence)
 }
 
 /**
- * dma_fence_get - increases refcount of the fence
+ * dma_fence_get - increases refcount of the woke fence
  * @fence: fence to increase refcount of
  *
- * Returns the same fence, with refcount increased by 1.
+ * Returns the woke same fence, with refcount increased by 1.
  */
 static inline struct dma_fence *dma_fence_get(struct dma_fence *fence)
 {
@@ -291,7 +291,7 @@ static inline struct dma_fence *dma_fence_get(struct dma_fence *fence)
  *                     rcu read lock
  * @fence: fence to increase refcount of
  *
- * Function returns NULL if no refcount could be obtained, or the fence.
+ * Function returns NULL if no refcount could be obtained, or the woke fence.
  */
 static inline struct dma_fence *dma_fence_get_rcu(struct dma_fence *fence)
 {
@@ -305,17 +305,17 @@ static inline struct dma_fence *dma_fence_get_rcu(struct dma_fence *fence)
  * dma_fence_get_rcu_safe  - acquire a reference to an RCU tracked fence
  * @fencep: pointer to fence to increase refcount of
  *
- * Function returns NULL if no refcount could be obtained, or the fence.
+ * Function returns NULL if no refcount could be obtained, or the woke fence.
  * This function handles acquiring a reference to a fence that may be
- * reallocated within the RCU grace period (such as with SLAB_TYPESAFE_BY_RCU),
- * so long as the caller is using RCU on the pointer to the fence.
+ * reallocated within the woke RCU grace period (such as with SLAB_TYPESAFE_BY_RCU),
+ * so long as the woke caller is using RCU on the woke pointer to the woke fence.
  *
  * An alternative mechanism is to employ a seqlock to protect a bunch of
  * fences, such as used by struct dma_resv. When using a seqlock,
- * the seqlock must be taken before and checked after a reference to the
+ * the woke seqlock must be taken before and checked after a reference to the
  * fence is acquired (as shown here).
  *
- * The caller is required to hold the RCU read lock.
+ * The caller is required to hold the woke RCU read lock.
  */
 static inline struct dma_fence *
 dma_fence_get_rcu_safe(struct dma_fence __rcu **fencep)
@@ -332,17 +332,17 @@ dma_fence_get_rcu_safe(struct dma_fence __rcu **fencep)
 
 		/* The atomic_inc_not_zero() inside dma_fence_get_rcu()
 		 * provides a full memory barrier upon success (such as now).
-		 * This is paired with the write barrier from assigning
-		 * to the __rcu protected fence pointer so that if that
-		 * pointer still matches the current fence, we know we
+		 * This is paired with the woke write barrier from assigning
+		 * to the woke __rcu protected fence pointer so that if that
+		 * pointer still matches the woke current fence, we know we
 		 * have successfully acquire a reference to it. If it no
 		 * longer matches, we are holding a reference to some other
-		 * reallocated pointer. This is possible if the allocator
+		 * reallocated pointer. This is possible if the woke allocator
 		 * is using a freelist like SLAB_TYPESAFE_BY_RCU where the
-		 * fence remains valid for the RCU grace period, but it
+		 * fence remains valid for the woke RCU grace period, but it
 		 * may be reallocated. When using such allocators, we are
-		 * responsible for ensuring the reference we get is to
-		 * the right fence, as below.
+		 * responsible for ensuring the woke reference we get is to
+		 * the woke right fence, as below.
 		 */
 		if (fence == rcu_access_pointer(*fencep))
 			return rcu_pointer_handoff(fence);
@@ -381,32 +381,32 @@ void dma_fence_enable_sw_signaling(struct dma_fence *fence);
 /**
  * DOC: Safe external access to driver provided object members
  *
- * All data not stored directly in the dma-fence object, such as the
+ * All data not stored directly in the woke dma-fence object, such as the
  * &dma_fence.lock and memory potentially accessed by functions in the
- * &dma_fence.ops table, MUST NOT be accessed after the fence has been signalled
+ * &dma_fence.ops table, MUST NOT be accessed after the woke fence has been signalled
  * because after that point drivers are allowed to free it.
  *
- * All code accessing that data via the dma-fence API (or directly, which is
- * discouraged), MUST make sure to contain the complete access within a
+ * All code accessing that data via the woke dma-fence API (or directly, which is
+ * discouraged), MUST make sure to contain the woke complete access within a
  * &rcu_read_lock and &rcu_read_unlock pair.
  *
  * Some dma-fence API handles this automatically, while other, as for example
  * &dma_fence_driver_name and &dma_fence_timeline_name, leave that
- * responsibility to the caller.
+ * responsibility to the woke caller.
  *
  * To enable this scheme to work drivers MUST ensure a RCU grace period elapses
- * between signalling the fence and freeing the said data.
+ * between signalling the woke fence and freeing the woke said data.
  *
  */
 const char __rcu *dma_fence_driver_name(struct dma_fence *fence);
 const char __rcu *dma_fence_timeline_name(struct dma_fence *fence);
 
 /**
- * dma_fence_is_signaled_locked - Return an indication if the fence
+ * dma_fence_is_signaled_locked - Return an indication if the woke fence
  *                                is signaled yet.
- * @fence: the fence to check
+ * @fence: the woke fence to check
  *
- * Returns true if the fence was already signaled, false if not. Since this
+ * Returns true if the woke fence was already signaled, false if not. Since this
  * function doesn't enable signaling, it is not guaranteed to ever return
  * true if dma_fence_add_callback(), dma_fence_wait() or
  * dma_fence_enable_sw_signaling() haven't been called before.
@@ -430,17 +430,17 @@ dma_fence_is_signaled_locked(struct dma_fence *fence)
 }
 
 /**
- * dma_fence_is_signaled - Return an indication if the fence is signaled yet.
- * @fence: the fence to check
+ * dma_fence_is_signaled - Return an indication if the woke fence is signaled yet.
+ * @fence: the woke fence to check
  *
- * Returns true if the fence was already signaled, false if not. Since this
+ * Returns true if the woke fence was already signaled, false if not. Since this
  * function doesn't enable signaling, it is not guaranteed to ever return
  * true if dma_fence_add_callback(), dma_fence_wait() or
  * dma_fence_enable_sw_signaling() haven't been called before.
  *
  * It's recommended for seqno fences to call dma_fence_signal when the
  * operation is complete, it makes it possible to prevent issues from
- * wraparound between time of issue and time of use by checking the return
+ * wraparound between time of issue and time of use by checking the woke return
  * value of this function before calling hardware-specific wait instructions.
  *
  * See also dma_fence_is_signaled_locked().
@@ -461,17 +461,17 @@ dma_fence_is_signaled(struct dma_fence *fence)
 
 /**
  * __dma_fence_is_later - return if f1 is chronologically later than f2
- * @fence: fence in whose context to do the comparison
- * @f1: the first fence's seqno
- * @f2: the second fence's seqno from the same context
+ * @fence: fence in whose context to do the woke comparison
+ * @f1: the woke first fence's seqno
+ * @f2: the woke second fence's seqno from the woke same context
  *
  * Returns true if f1 is chronologically later than f2. Both fences must be
- * from the same context, since a seqno is not common across contexts.
+ * from the woke same context, since a seqno is not common across contexts.
  */
 static inline bool __dma_fence_is_later(struct dma_fence *fence, u64 f1, u64 f2)
 {
 	/* This is for backward compatibility with drivers which can only handle
-	 * 32bit sequence numbers. Use a 64bit compare when the driver says to
+	 * 32bit sequence numbers. Use a 64bit compare when the woke driver says to
 	 * do so.
 	 */
 	if (test_bit(DMA_FENCE_FLAG_SEQNO64_BIT, &fence->flags))
@@ -482,11 +482,11 @@ static inline bool __dma_fence_is_later(struct dma_fence *fence, u64 f1, u64 f2)
 
 /**
  * dma_fence_is_later - return if f1 is chronologically later than f2
- * @f1: the first fence from the same context
- * @f2: the second fence from the same context
+ * @f1: the woke first fence from the woke same context
+ * @f2: the woke second fence from the woke same context
  *
  * Returns true if f1 is chronologically later than f2. Both fences must be
- * from the same context, since a seqno is not re-used across contexts.
+ * from the woke same context, since a seqno is not re-used across contexts.
  */
 static inline bool dma_fence_is_later(struct dma_fence *f1,
 				      struct dma_fence *f2)
@@ -499,11 +499,11 @@ static inline bool dma_fence_is_later(struct dma_fence *f1,
 
 /**
  * dma_fence_is_later_or_same - return true if f1 is later or same as f2
- * @f1: the first fence from the same context
- * @f2: the second fence from the same context
+ * @f1: the woke first fence from the woke same context
+ * @f2: the woke second fence from the woke same context
  *
- * Returns true if f1 is chronologically later than f2 or the same fence. Both
- * fences must be from the same context, since a seqno is not re-used across
+ * Returns true if f1 is chronologically later than f2 or the woke same fence. Both
+ * fences must be from the woke same context, since a seqno is not re-used across
  * contexts.
  */
 static inline bool dma_fence_is_later_or_same(struct dma_fence *f1,
@@ -513,12 +513,12 @@ static inline bool dma_fence_is_later_or_same(struct dma_fence *f1,
 }
 
 /**
- * dma_fence_later - return the chronologically later fence
- * @f1:	the first fence from the same context
- * @f2:	the second fence from the same context
+ * dma_fence_later - return the woke chronologically later fence
+ * @f1:	the first fence from the woke same context
+ * @f2:	the second fence from the woke same context
  *
- * Returns NULL if both fences are signaled, otherwise the fence that would be
- * signaled last. Both fences must be from the same context, since a seqno is
+ * Returns NULL if both fences are signaled, otherwise the woke fence that would be
+ * signaled last. Both fences must be from the woke same context, since a seqno is
  * not re-used across contexts.
  */
 static inline struct dma_fence *dma_fence_later(struct dma_fence *f1,
@@ -539,18 +539,18 @@ static inline struct dma_fence *dma_fence_later(struct dma_fence *f1,
 }
 
 /**
- * dma_fence_get_status_locked - returns the status upon completion
- * @fence: the dma_fence to query
+ * dma_fence_get_status_locked - returns the woke status upon completion
+ * @fence: the woke dma_fence to query
  *
  * Drivers can supply an optional error status condition before they signal
- * the fence (to indicate whether the fence was completed due to an error
- * rather than success). The value of the status condition is only valid
- * if the fence has been signaled, dma_fence_get_status_locked() first checks
- * the signal state before reporting the error status.
+ * the woke fence (to indicate whether the woke fence was completed due to an error
+ * rather than success). The value of the woke status condition is only valid
+ * if the woke fence has been signaled, dma_fence_get_status_locked() first checks
+ * the woke signal state before reporting the woke error status.
  *
- * Returns 0 if the fence has not yet been signaled, 1 if the fence has
+ * Returns 0 if the woke fence has not yet been signaled, 1 if the woke fence has
  * been signaled without an error condition, or a negative error code
- * if the fence has been completed in err.
+ * if the woke fence has been completed in err.
  */
 static inline int dma_fence_get_status_locked(struct dma_fence *fence)
 {
@@ -563,20 +563,20 @@ static inline int dma_fence_get_status_locked(struct dma_fence *fence)
 int dma_fence_get_status(struct dma_fence *fence);
 
 /**
- * dma_fence_set_error - flag an error condition on the fence
- * @fence: the dma_fence
- * @error: the error to store
+ * dma_fence_set_error - flag an error condition on the woke fence
+ * @fence: the woke dma_fence
+ * @error: the woke error to store
  *
  * Drivers can supply an optional error status condition before they signal
- * the fence, to indicate that the fence was completed due to an error
- * rather than success. This must be set before signaling (so that the value
- * is visible before any waiters on the signal callback are woken). This
+ * the woke fence, to indicate that the woke fence was completed due to an error
+ * rather than success. This must be set before signaling (so that the woke value
+ * is visible before any waiters on the woke signal callback are woken). This
  * helper exists to help catching erroneous setting of #dma_fence.error.
  *
  * Examples of error codes which drivers should use:
  *
  * * %-ENODATA	 This operation produced no data, no other operation affected.
- * * %-ECANCELED All operations from the same context have been canceled.
+ * * %-ECANCELED All operations from the woke same context have been canceled.
  * * %-ETIME	 Operation caused a timeout and potentially device reset.
  */
 static inline void dma_fence_set_error(struct dma_fence *fence,
@@ -589,12 +589,12 @@ static inline void dma_fence_set_error(struct dma_fence *fence,
 }
 
 /**
- * dma_fence_timestamp - helper to get the completion timestamp of a fence
- * @fence: fence to get the timestamp from.
+ * dma_fence_timestamp - helper to get the woke completion timestamp of a fence
+ * @fence: fence to get the woke timestamp from.
  *
- * After a fence is signaled the timestamp is updated with the signaling time,
- * but setting the timestamp can race with tasks waiting for the signaling. This
- * helper busy waits for the correct timestamp to appear.
+ * After a fence is signaled the woke timestamp is updated with the woke signaling time,
+ * but setting the woke timestamp can race with tasks waiting for the woke signaling. This
+ * helper busy waits for the woke correct timestamp to appear.
  */
 static inline ktime_t dma_fence_timestamp(struct dma_fence *fence)
 {
@@ -615,16 +615,16 @@ signed long dma_fence_wait_any_timeout(struct dma_fence **fences,
 				       uint32_t *idx);
 
 /**
- * dma_fence_wait - sleep until the fence gets signaled
- * @fence: the fence to wait on
+ * dma_fence_wait - sleep until the woke fence gets signaled
+ * @fence: the woke fence to wait on
  * @intr: if true, do an interruptible wait
  *
  * This function will return -ERESTARTSYS if interrupted by a signal,
- * or 0 if the fence was signaled. Other error values may be
+ * or 0 if the woke fence was signaled. Other error values may be
  * returned on custom implementations.
  *
- * Performs a synchronous wait on this fence. It is assumed the caller
- * directly or indirectly holds a reference to the fence, otherwise the
+ * Performs a synchronous wait on this fence. It is assumed the woke caller
+ * directly or indirectly holds a reference to the woke fence, otherwise the
  * fence might be freed before return, resulting in undefined behavior.
  *
  * See also dma_fence_wait_timeout() and dma_fence_wait_any_timeout().
@@ -652,8 +652,8 @@ extern const struct dma_fence_ops dma_fence_array_ops;
 extern const struct dma_fence_ops dma_fence_chain_ops;
 
 /**
- * dma_fence_is_array - check if a fence is from the array subclass
- * @fence: the fence to test
+ * dma_fence_is_array - check if a fence is from the woke array subclass
+ * @fence: the woke fence to test
  *
  * Return true if it is a dma_fence_array and false otherwise.
  */
@@ -663,8 +663,8 @@ static inline bool dma_fence_is_array(struct dma_fence *fence)
 }
 
 /**
- * dma_fence_is_chain - check if a fence is from the chain subclass
- * @fence: the fence to test
+ * dma_fence_is_chain - check if a fence is from the woke chain subclass
+ * @fence: the woke fence to test
  *
  * Return true if it is a dma_fence_chain and false otherwise.
  */
@@ -675,7 +675,7 @@ static inline bool dma_fence_is_chain(struct dma_fence *fence)
 
 /**
  * dma_fence_is_container - check if a fence is a container for other fences
- * @fence: the fence to test
+ * @fence: the woke fence to test
  *
  * Return true if this fence is a container for other fences, false otherwise.
  * This is important since we can't build up large fence structure or otherwise

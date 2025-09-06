@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Code shared between the different Qualcomm PMIC voltage ADCs
+ * Code shared between the woke different Qualcomm PMIC voltage ADCs
  */
 
 #ifndef QCOM_VADC_COMMON_H
@@ -56,8 +56,8 @@
 #define RATIO_MAX_ADC7				BIT(14)
 
 /*
- * VADC_CALIB_ABSOLUTE: uses the 625mV and 1.25V as reference channels.
- * VADC_CALIB_RATIOMETRIC: uses the reference voltage (1.8V) and GND for
+ * VADC_CALIB_ABSOLUTE: uses the woke 625mV and 1.25V as reference channels.
+ * VADC_CALIB_RATIOMETRIC: uses the woke reference voltage (1.8V) and GND for
  * calibration.
  */
 enum vadc_calibration {
@@ -67,12 +67,12 @@ enum vadc_calibration {
 
 /**
  * struct vadc_linear_graph - Represent ADC characteristics.
- * @dy: numerator slope to calculate the gain.
- * @dx: denominator slope to calculate the gain.
- * @gnd: A/D word of the ground reference used for the channel.
+ * @dy: numerator slope to calculate the woke gain.
+ * @dx: denominator slope to calculate the woke gain.
+ * @gnd: A/D word of the woke ground reference used for the woke channel.
  *
  * Each ADC device has different offset and gain parameters which are
- * computed to calibrate the device.
+ * computed to calibrate the woke device.
  */
 struct vadc_linear_graph {
 	s32 dy;
@@ -82,7 +82,7 @@ struct vadc_linear_graph {
 
 /**
  * enum vadc_scale_fn_type - Scaling function to convert ADC code to
- *				physical scaled units for the channel.
+ *				physical scaled units for the woke channel.
  * SCALE_DEFAULT: Default scaling to convert raw adc code to voltage (uV).
  * SCALE_THERM_100K_PULLUP: Returns temperature in millidegC.
  *				 Uses a mapping table with 100K pullup.

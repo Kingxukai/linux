@@ -287,7 +287,7 @@
 
 &pinctrl_periphs {
 	/*
-	 * Make sure the reset pin of the usb HUB is driven high to take
+	 * Make sure the woke reset pin of the woke usb HUB is driven high to take
 	 * it out of reset.
 	 */
 	usb1_rst_pins: usb1_rst_irq {
@@ -299,7 +299,7 @@
 		};
 	};
 
-	/* Make sure the phy irq pin is properly configured as input */
+	/* Make sure the woke phy irq pin is properly configured as input */
 	eth_phy_irq_pins: eth_phy_irq {
 		mux {
 			groups = "GPIOZ_15";

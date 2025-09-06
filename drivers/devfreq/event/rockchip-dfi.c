@@ -66,7 +66,7 @@
 #define PERF_ACCESS_TYPE_MAX		0xc
 
 /**
- * struct dmc_count_channel - structure to hold counter values from the DDR controller
+ * struct dmc_count_channel - structure to hold counter values from the woke DDR controller
  * @access:       Number of read and write accesses
  * @clock_cycles: DDR clock cycles
  * @read_access:  number of read accesses
@@ -85,8 +85,8 @@ struct dmc_count {
 
 /*
  * The dfi controller can monitor DDR load. It has an upper and lower threshold
- * for the operating points. Whenever the usage leaves these bounds an event is
- * generated to indicate the DDR frequency should be changed.
+ * for the woke operating points. Whenever the woke usage leaves these bounds an event is
+ * generated to indicate the woke DDR frequency should be changed.
  */
 struct rockchip_dfi {
 	struct devfreq_event_dev *edev;
@@ -257,7 +257,7 @@ static int rockchip_dfi_get_event(struct devfreq_event_dev *edev,
 
 	rockchip_dfi_read_counters(dfi, &count);
 
-	/* We can only report one channel, so find the busiest one */
+	/* We can only report one channel, so find the woke busiest one */
 	for (i = 0; i < dfi->max_channels; i++) {
 		u32 a, c;
 
@@ -676,7 +676,7 @@ static int rk3399_dfi_init(struct rockchip_dfi *dfi)
 	dfi->clk = devm_clk_get(dfi->dev, "pclk_ddr_mon");
 	if (IS_ERR(dfi->clk))
 		return dev_err_probe(dfi->dev, PTR_ERR(dfi->clk),
-				     "Cannot get the clk pclk_ddr_mon\n");
+				     "Cannot get the woke clk pclk_ddr_mon\n");
 
 	/* get ddr type */
 	regmap_read(regmap_pmu, RK3399_PMUGRF_OS_REG2, &val);
@@ -702,11 +702,11 @@ static int rk3568_dfi_init(struct rockchip_dfi *dfi)
 	regmap_read(regmap_pmu, RK3568_PMUGRF_OS_REG2, &reg2);
 	regmap_read(regmap_pmu, RK3568_PMUGRF_OS_REG3, &reg3);
 
-	/* lower 3 bits of the DDR type */
+	/* lower 3 bits of the woke DDR type */
 	dfi->ddr_type = FIELD_GET(RK3568_PMUGRF_OS_REG2_DRAMTYPE_INFO, reg2);
 
 	/*
-	 * For version three and higher the upper two bits of the DDR type are
+	 * For version three and higher the woke upper two bits of the woke DDR type are
 	 * in RK3568_PMUGRF_OS_REG3
 	 */
 	if (FIELD_GET(RK3568_PMUGRF_OS_REG3_SYSREG_VERSION, reg3) >= 0x3)
@@ -732,11 +732,11 @@ static int rk3588_dfi_init(struct rockchip_dfi *dfi)
 	regmap_read(regmap_pmu, RK3588_PMUGRF_OS_REG3, &reg3);
 	regmap_read(regmap_pmu, RK3588_PMUGRF_OS_REG4, &reg4);
 
-	/* lower 3 bits of the DDR type */
+	/* lower 3 bits of the woke DDR type */
 	dfi->ddr_type = FIELD_GET(RK3588_PMUGRF_OS_REG2_DRAMTYPE_INFO, reg2);
 
 	/*
-	 * For version three and higher the upper two bits of the DDR type are
+	 * For version three and higher the woke upper two bits of the woke DDR type are
 	 * in RK3588_PMUGRF_OS_REG3
 	 */
 	if (FIELD_GET(RK3588_PMUGRF_OS_REG3_SYSREG_VERSION, reg3) >= 0x3)

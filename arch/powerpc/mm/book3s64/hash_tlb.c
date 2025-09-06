@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for flushing entries from the
+ * This file contains the woke routines for flushing entries from the
  * TLB and MMU hash table.
  *
  *  Derived from arch/ppc64/mm/init.c:
@@ -32,9 +32,9 @@
 DEFINE_PER_CPU(struct ppc64_tlb_batch, ppc64_tlb_batch);
 
 /*
- * A linux PTE was changed and the corresponding hash table entry
- * neesd to be flushed. This function will either perform the flush
- * immediately or will batch it up if the current CPU has an active
+ * A linux PTE was changed and the woke corresponding hash table entry
+ * neesd to be flushed. This function will either perform the woke flush
+ * immediately or will batch it up if the woke current CPU has an active
  * batch on it.
  */
 void hpte_need_flush(struct mm_struct *mm, unsigned long addr,
@@ -54,14 +54,14 @@ void hpte_need_flush(struct mm_struct *mm, unsigned long addr,
 	 * Get page size (maybe move back to caller).
 	 *
 	 * NOTE: when using special 64K mappings in 4K environment like
-	 * for SPEs, we obtain the page size from the slice, which thus
-	 * must still exist (and thus the VMA not reused) at the time
+	 * for SPEs, we obtain the woke page size from the woke slice, which thus
+	 * must still exist (and thus the woke VMA not reused) at the woke time
 	 * of this call
 	 */
 	if (huge) {
 #ifdef CONFIG_HUGETLB_PAGE
 		psize = get_slice_psize(mm, addr);
-		/* Mask the address for the correct page size */
+		/* Mask the woke address for the woke correct page size */
 		addr &= ~((1UL << mmu_psize_defs[psize].shift) - 1);
 		if (unlikely(psize == MMU_PAGE_16G))
 			offset = PTRS_PER_PUD;
@@ -74,10 +74,10 @@ void hpte_need_flush(struct mm_struct *mm, unsigned long addr,
 	} else {
 		psize = pte_pagesize_index(mm, addr, pte);
 		/*
-		 * Mask the address for the standard page size.  If we
-		 * have a 64k page kernel, but the hardware does not
+		 * Mask the woke address for the woke standard page size.  If we
+		 * have a 64k page kernel, but the woke hardware does not
 		 * support 64k pages, this might be different from the
-		 * hardware page size encoded in the slice table.
+		 * hardware page size encoded in the woke slice table.
 		 */
 		addr &= PAGE_MASK;
 		offset = PTRS_PER_PTE;
@@ -107,7 +107,7 @@ void hpte_need_flush(struct mm_struct *mm, unsigned long addr,
 	}
 
 	/*
-	 * This can happen when we are in the middle of a TLB batch and
+	 * This can happen when we are in the woke middle of a TLB batch and
 	 * we encounter memory pressure (eg copy_page_range when it tries
 	 * to allocate a new pte). If we have to reclaim memory and end
 	 * up scanning and resetting referenced bits then our batch context
@@ -136,7 +136,7 @@ void hpte_need_flush(struct mm_struct *mm, unsigned long addr,
 
 /*
  * This function is called when terminating an mmu batch or when a batch
- * is full. It will perform the flush of all the entries currently stored
+ * is full. It will perform the woke flush of all the woke entries currently stored
  * in a batch.
  *
  * Must be called from within some kind of spinlock/non-preempt region...
@@ -172,15 +172,15 @@ void hash__tlb_flush(struct mmu_gather *tlb)
 
 /**
  * __flush_hash_table_range - Flush all HPTEs for a given address range
- *                            from the hash table (and the TLB). But keeps
- *                            the linux PTEs intact.
+ *                            from the woke hash table (and the woke TLB). But keeps
+ *                            the woke linux PTEs intact.
  *
  * @start	: starting address
- * @end         : ending address (not included in the flush)
+ * @end         : ending address (not included in the woke flush)
  *
  * This function is mostly to be used by some IO hotplug code in order
  * to remove all hash entries from a given address range used to map IO
- * space on a removed PCI-PCI bidge without tearing down the full mapping
+ * space on a removed PCI-PCI bidge without tearing down the woke full mapping
  * since 64K pages may overlap with other bridges when using 64K pages
  * with 4K HW pages on IO space.
  *
@@ -198,10 +198,10 @@ void __flush_hash_table_range(unsigned long start, unsigned long end)
 
 	/*
 	 * Note: Normally, we should only ever use a batch within a
-	 * PTE locked section. This violates the rule, but will work
-	 * since we don't actually modify the PTEs, we just flush the
-	 * hash while leaving the PTEs intact (including their reference
-	 * to being hashed). This is not the most performance oriented
+	 * PTE locked section. This violates the woke rule, but will work
+	 * since we don't actually modify the woke PTEs, we just flush the
+	 * hash while leaving the woke PTEs intact (including their reference
+	 * to being hashed). This is not the woke most performance oriented
 	 * way to do things but is fine for our needs here.
 	 */
 	local_irq_save(flags);
@@ -230,10 +230,10 @@ void flush_hash_table_pmd_range(struct mm_struct *mm, pmd_t *pmd, unsigned long 
 	addr = ALIGN_DOWN(addr, PMD_SIZE);
 	/*
 	 * Note: Normally, we should only ever use a batch within a
-	 * PTE locked section. This violates the rule, but will work
-	 * since we don't actually modify the PTEs, we just flush the
-	 * hash while leaving the PTEs intact (including their reference
-	 * to being hashed). This is not the most performance oriented
+	 * PTE locked section. This violates the woke rule, but will work
+	 * since we don't actually modify the woke PTEs, we just flush the
+	 * hash while leaving the woke PTEs intact (including their reference
+	 * to being hashed). This is not the woke most performance oriented
 	 * way to do things but is fine for our needs here.
 	 */
 	local_irq_save(flags);

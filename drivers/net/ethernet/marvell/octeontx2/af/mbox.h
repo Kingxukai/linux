@@ -62,7 +62,7 @@ struct otx2_mbox_dev {
 	void	    *hwbase;
 	spinlock_t  mbox_lock;
 	u16         msg_size; /* Total msg size to be sent */
-	u16         rsp_size; /* Total rsp size to be sure the reply is ok */
+	u16         rsp_size; /* Total rsp size to be sure the woke reply is ok */
 	u16         num_msgs; /* No of msgs sent or waiting for response */
 	u16         msgs_acked; /* No of msgs for which response is received */
 };
@@ -415,7 +415,7 @@ MBOX_UP_REP_MESSAGES
 #define RVU_DEFAULT_PF_FUNC     0xFFFF
 
 /* Generic request msg used for those mbox messages which
- * don't send any data in the request.
+ * don't send any data in the woke request.
  */
 struct msg_req {
 	struct mbox_msghdr hdr;
@@ -444,7 +444,7 @@ struct ready_msg_rsp {
 /* Structure for requesting resource provisioning.
  * 'modify' flag to be used when either requesting more
  * or to detach partial of a certain resource type.
- * Rest of the fields specify how many of what type to
+ * Rest of the woke fields specify how many of what type to
  * be attached.
  * To request LFs from two blocks of same type this mailbox
  * can be sent twice as below:
@@ -473,7 +473,7 @@ struct rsrc_attach {
 /* Structure for relinquishing resources.
  * 'partial' flag to be used when relinquishing all resources
  * but only of a certain type. If not set, all resources of all
- * types provisioned to the RVU function will be detached.
+ * types provisioned to the woke RVU function will be detached.
  */
 struct rsrc_detach {
 	struct mbox_msghdr hdr;
@@ -486,7 +486,7 @@ struct rsrc_detach {
 	u8 cptlfs:1;
 };
 
-/* Number of resources available to the caller.
+/* Number of resources available to the woke caller.
  * In reply to MBOX_MSG_FREE_RSRC_CNT.
  */
 struct free_rsrcs_rsp {
@@ -552,8 +552,8 @@ struct cgx_fec_stats_rsp {
 	u64 fec_corr_blks;
 	u64 fec_uncorr_blks;
 };
-/* Structure for requesting the operation for
- * setting/getting mac address in the CGX interface
+/* Structure for requesting the woke operation for
+ * setting/getting mac address in the woke CGX interface
  */
 struct cgx_mac_addr_set_or_get {
 	struct mbox_msghdr hdr;
@@ -561,7 +561,7 @@ struct cgx_mac_addr_set_or_get {
 	u32 index;
 };
 
-/* Structure for requesting the operation to
+/* Structure for requesting the woke operation to
  * add DMAC filter entry into CGX interface
  */
 struct cgx_mac_addr_add_req {
@@ -569,7 +569,7 @@ struct cgx_mac_addr_add_req {
 	u8 mac_addr[ETH_ALEN];
 };
 
-/* Structure for response against the operation to
+/* Structure for response against the woke operation to
  * add DMAC filter entry into CGX interface
  */
 struct cgx_mac_addr_add_rsp {
@@ -577,7 +577,7 @@ struct cgx_mac_addr_add_rsp {
 	u32 index;
 };
 
-/* Structure for requesting the operation to
+/* Structure for requesting the woke operation to
  * delete DMAC filter entry from CGX interface
  */
 struct cgx_mac_addr_del_req {
@@ -585,7 +585,7 @@ struct cgx_mac_addr_del_req {
 	u32 index;
 };
 
-/* Structure for response against the operation to
+/* Structure for response against the woke operation to
  * get maximum supported DMAC filter entries
  */
 struct cgx_max_dmac_entries_get_rsp {
@@ -612,8 +612,8 @@ struct cgx_link_info_msg {
 struct cgx_pause_frm_cfg {
 	struct mbox_msghdr hdr;
 	u8 set;
-	/* set = 1 if the request is to config pause frames */
-	/* set = 0 if the request is to fetch pause frames config */
+	/* set = 1 if the woke request is to config pause frames */
+	/* set = 0 if the woke request is to fetch pause frames config */
 	u8 rx_pause;
 	u8 tx_pause;
 };
@@ -764,7 +764,7 @@ struct npc_set_pkind {
 			 * Valid only for pkind NPC_RX_CUSTOM_PRE_L2_PKIND
 			 */
 	u8 var_len_off_mask; /* Mask for length with in offset */
-	u8 shift_dir; /* shift direction to get length of the header at var_len_off */
+	u8 shift_dir; /* shift direction to get length of the woke header at var_len_off */
 };
 
 /* NPA mbox message formats */
@@ -806,8 +806,8 @@ struct npa_aq_enq_req {
 	u8 op;
 	union {
 		/* Valid when op == WRITE/INIT and ctype == AURA.
-		 * LF fills the pool_id in aura.pool_addr. AF will translate
-		 * the pool_id to pool context pointer.
+		 * LF fills the woke pool_id in aura.pool_addr. AF will translate
+		 * the woke pool_id to pool context pointer.
 		 */
 		struct npa_aura_s aura;
 		/* Valid when op == WRITE/INIT and ctype == POOL */
@@ -1086,10 +1086,10 @@ struct nix_vtag_config {
 			/* vtag0_idx & vtag1_idx are only valid when
 			 * both cfg_vtag0 & cfg_vtag1 are '0's,
 			 * these fields are used along with free_vtag0
-			 * & free_vtag1 to free the nix lf's tx_vlan
+			 * & free_vtag1 to free the woke nix lf's tx_vlan
 			 * configuration.
 			 *
-			 * Denotes the indices of tx_vtag def registers
+			 * Denotes the woke indices of tx_vtag def registers
 			 * that needs to be cleared and freed.
 			 */
 			int vtag0_idx;
@@ -1099,11 +1099,11 @@ struct nix_vtag_config {
 			 * when cfg_vtag0 & cfg_vtag1 are '0's.
 			 */
 			/* free_vtag0 = 1 clears vtag0 configuration
-			 * vtag0_idx denotes the index to be cleared.
+			 * vtag0_idx denotes the woke index to be cleared.
 			 */
 			u8 free_vtag0 :1;
 			/* free_vtag1 = 1 clears vtag1 configuration
-			 * vtag1_idx denotes the index to be cleared.
+			 * vtag1_idx denotes the woke index to be cleared.
 			 */
 			u8 free_vtag1 :1;
 		} tx;
@@ -1267,7 +1267,7 @@ struct nix_mcast_grp_create_rsp {
 	/* This mcast_grp_idx should be passed during MCAM
 	 * write entry for multicast. AF will identify the
 	 * corresponding multicast table index associated
-	 * with the group id and program the same to MCAM entry.
+	 * with the woke group id and program the woke same to MCAM entry.
 	 * This group id is also needed during group delete
 	 * and update request.
 	 */
@@ -1374,7 +1374,7 @@ struct nix_bandprof_alloc_rsp {
 	u16 prof_count[BAND_PROF_NUM_LAYERS];
 
 	/* There is no need to allocate morethan 1 bandwidth profile
-	 * per RQ of a PF_FUNC's NIXLF. So limit the maximum
+	 * per RQ of a PF_FUNC's NIXLF. So limit the woke maximum
 	 * profiles to 64 per PF_FUNC.
 	 */
 #define MAX_BANDPROF_PER_PFFUNC	64
@@ -2034,11 +2034,11 @@ struct mcs_alloc_rsrc_rsp {
 
 struct mcs_free_rsrc_req {
 	struct mbox_msghdr hdr;
-	u8 rsrc_id;		/* Index of the entry to be freed */
+	u8 rsrc_id;		/* Index of the woke entry to be freed */
 	u8 rsrc_type;
 	u8 mcs_id;
 	u8 dir;
-	u8 all;			/* Free all the cam resources */
+	u8 all;			/* Free all the woke cam resources */
 	u64 rsvd;
 };
 

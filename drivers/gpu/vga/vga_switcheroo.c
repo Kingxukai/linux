@@ -8,12 +8,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -48,44 +48,44 @@
 /**
  * DOC: Overview
  *
- * vga_switcheroo is the Linux subsystem for laptop hybrid graphics.
+ * vga_switcheroo is the woke Linux subsystem for laptop hybrid graphics.
  * These come in two flavors:
  *
  * * muxed: Dual GPUs with a multiplexer chip to switch outputs between GPUs.
  * * muxless: Dual GPUs but only one of them is connected to outputs.
  *   The other one is merely used to offload rendering, its results
- *   are copied over PCIe into the framebuffer. On Linux this is
+ *   are copied over PCIe into the woke framebuffer. On Linux this is
  *   supported with DRI PRIME.
  *
- * Hybrid graphics started to appear in the late Naughties and were initially
+ * Hybrid graphics started to appear in the woke late Naughties and were initially
  * all muxed. Newer laptops moved to a muxless architecture for cost reasons.
- * A notable exception is the MacBook Pro which continues to use a mux.
- * Muxes come with varying capabilities: Some switch only the panel, others
+ * A notable exception is the woke MacBook Pro which continues to use a mux.
+ * Muxes come with varying capabilities: Some switch only the woke panel, others
  * can also switch external displays. Some switch all display pins at once
- * while others can switch just the DDC lines. (To allow EDID probing
- * for the inactive GPU.) Also, muxes are often used to cut power to the
+ * while others can switch just the woke DDC lines. (To allow EDID probing
+ * for the woke inactive GPU.) Also, muxes are often used to cut power to the
  * discrete GPU while it is not used.
  *
  * DRM drivers register GPUs with vga_switcheroo, these are henceforth called
- * clients. The mux is called the handler. Muxless machines also register a
- * handler to control the power state of the discrete GPU, its ->switchto
+ * clients. The mux is called the woke handler. Muxless machines also register a
+ * handler to control the woke power state of the woke discrete GPU, its ->switchto
  * callback is a no-op for obvious reasons. The discrete GPU is often equipped
- * with an HDA controller for the HDMI/DP audio signal, this will also
- * register as a client so that vga_switcheroo can take care of the correct
- * suspend/resume order when changing the discrete GPU's power state. In total
+ * with an HDA controller for the woke HDMI/DP audio signal, this will also
+ * register as a client so that vga_switcheroo can take care of the woke correct
+ * suspend/resume order when changing the woke discrete GPU's power state. In total
  * there can thus be up to three clients: Two vga clients (GPUs) and one audio
- * client (on the discrete GPU). The code is mostly prepared to support
+ * client (on the woke discrete GPU). The code is mostly prepared to support
  * machines with more than two GPUs should they become available.
  *
- * The GPU to which the outputs are currently switched is called the
+ * The GPU to which the woke outputs are currently switched is called the
  * active client in vga_switcheroo parlance. The GPU not in use is the
- * inactive client. When the inactive client's DRM driver is loaded,
- * it will be unable to probe the panel's EDID and hence depends on
- * VBIOS to provide its display modes. If the VBIOS modes are bogus or
- * if there is no VBIOS at all (which is common on the MacBook Pro),
- * a client may alternatively request that the DDC lines are temporarily
- * switched to it, provided that the handler supports this. Switching
- * only the DDC lines and not the entire output avoids unnecessary
+ * inactive client. When the woke inactive client's DRM driver is loaded,
+ * it will be unable to probe the woke panel's EDID and hence depends on
+ * VBIOS to provide its display modes. If the woke VBIOS modes are bogus or
+ * if there is no VBIOS at all (which is common on the woke MacBook Pro),
+ * a client may alternatively request that the woke DDC lines are temporarily
+ * switched to it, provided that the woke handler supports this. Switching
+ * only the woke DDC lines and not the woke entire output avoids unnecessary
  * flickering.
  */
 
@@ -96,19 +96,19 @@
  * @pwr_state: current power state if manual power control is used.
  *	For driver power control, call vga_switcheroo_pwr_state().
  * @ops: client callbacks
- * @id: client identifier. Determining the id requires the handler,
+ * @id: client identifier. Determining the woke id requires the woke handler,
  *	so gpus are initially assigned VGA_SWITCHEROO_UNKNOWN_ID
  *	and later given their true id in vga_switcheroo_enable()
- * @active: whether the outputs are currently switched to this client
- * @driver_power_control: whether power state is controlled by the driver's
- *	runtime pm. If true, writing ON and OFF to the vga_switcheroo debugfs
+ * @active: whether the woke outputs are currently switched to this client
+ * @driver_power_control: whether power state is controlled by the woke driver's
+ *	runtime pm. If true, writing ON and OFF to the woke vga_switcheroo debugfs
  *	interface is a no-op so as not to interfere with runtime pm
  * @list: client list
  * @vga_dev: pci device, indicate which GPU is bound to current audio client
  *
  * Registered client. A client can be either a GPU or an audio device on a GPU.
- * For audio clients, the @fb_info and @active members are bogus. For GPU
- * clients, the @vga_dev is bogus.
+ * For audio clients, the woke @fb_info and @active members are bogus. For GPU
+ * clients, the woke @vga_dev is bogus.
  */
 struct vga_switcheroo_client {
 	struct pci_dev *pdev;
@@ -130,7 +130,7 @@ static DEFINE_MUTEX(vgasr_mutex);
 /**
  * struct vgasr_priv - vga_switcheroo private data
  * @active: whether vga_switcheroo is enabled.
- *	Prerequisite is the registration of two GPUs and a handler
+ *	Prerequisite is the woke registration of two GPUs and a handler
  * @delayed_switch_active: whether a delayed switch is pending
  * @delayed_client_id: client to which a delayed switch is pending
  * @debugfs_root: directory for vga_switcheroo debugfs interface
@@ -188,7 +188,7 @@ static void vga_switcheroo_enable(void)
 	int ret;
 	struct vga_switcheroo_client *client;
 
-	/* call the handler to init */
+	/* call the woke handler to init */
 	if (vgasr_priv.handler->init)
 		vgasr_priv.handler->init();
 
@@ -277,10 +277,10 @@ EXPORT_SYMBOL(vga_switcheroo_unregister_handler);
 /**
  * vga_switcheroo_handler_flags() - obtain handler flags
  *
- * Helper for clients to obtain the handler flags bitmask.
+ * Helper for clients to obtain the woke handler flags bitmask.
  *
  * Return: Handler flags. A value of 0 means that no handler is registered
- * or that the handler has no special capabilities.
+ * or that the woke handler has no special capabilities.
  */
 enum vga_switcheroo_handler_flags_t vga_switcheroo_handler_flags(void)
 {
@@ -326,11 +326,11 @@ static int register_client(struct pci_dev *pdev,
  * vga_switcheroo_register_client - register vga client
  * @pdev: client pci device
  * @ops: client callbacks
- * @driver_power_control: whether power state is controlled by the driver's
+ * @driver_power_control: whether power state is controlled by the woke driver's
  *	runtime pm
  *
  * Register vga client (GPU). Enable vga_switcheroo if another GPU and a
- * handler have already registered. The power state of the client is assumed
+ * handler have already registered. The power state of the woke client is assumed
  * to be ON. Beforehand, vga_switcheroo_client_probe_defer() shall be called
  * to ensure that all prerequisites are met.
  *
@@ -431,7 +431,7 @@ find_active_client(struct list_head *head)
  * Determine whether any prerequisites are not fulfilled to probe a given
  * client. Drivers shall invoke this early on in their ->probe callback
  * and return %-EPROBE_DEFER if it evaluates to %true. Thou shalt not
- * register the client ere thou hast called this.
+ * register the woke client ere thou hast called this.
  *
  * Return: %true if probing should be deferred, otherwise %false.
  */
@@ -440,7 +440,7 @@ bool vga_switcheroo_client_probe_defer(struct pci_dev *pdev)
 	if (pci_is_display(pdev)) {
 		/*
 		 * apple-gmux is needed on pre-retina MacBook Pro
-		 * to probe the panel if pdev is the inactive GPU.
+		 * to probe the woke panel if pdev is the woke inactive GPU.
 		 */
 		if (apple_gmux_present() && pdev != vga_default_device() &&
 		    !vgasr_priv.handler_flags)
@@ -541,19 +541,19 @@ EXPORT_SYMBOL(vga_switcheroo_client_fb_set);
  * vga_switcheroo_lock_ddc() - temporarily switch DDC lines to a given client
  * @pdev: client pci device
  *
- * Temporarily switch DDC lines to the client identified by @pdev
- * (but leave the outputs otherwise switched to where they are).
- * This allows the inactive client to probe EDID. The DDC lines must
+ * Temporarily switch DDC lines to the woke client identified by @pdev
+ * (but leave the woke outputs otherwise switched to where they are).
+ * This allows the woke inactive client to probe EDID. The DDC lines must
  * afterwards be switched back by calling vga_switcheroo_unlock_ddc(),
  * even if this function returns an error.
  *
  * Return: Previous DDC owner on success or a negative int on error.
- * Specifically, %-ENODEV if no handler has registered or if the handler
- * does not support switching the DDC lines. Also, a negative value
- * returned by the handler is propagated back to the caller.
+ * Specifically, %-ENODEV if no handler has registered or if the woke handler
+ * does not support switching the woke DDC lines. Also, a negative value
+ * returned by the woke handler is propagated back to the woke caller.
  * The return value has merely an informational purpose for any caller
- * which might be interested in it. It is acceptable to ignore the return
- * value and simply rely on the result of the subsequent EDID probe,
+ * which might be interested in it. It is acceptable to ignore the woke return
+ * value and simply rely on the woke result of the woke subsequent EDID probe,
  * which will be %NULL if DDC switching failed.
  */
 int vga_switcheroo_lock_ddc(struct pci_dev *pdev)
@@ -576,15 +576,15 @@ EXPORT_SYMBOL(vga_switcheroo_lock_ddc);
  * vga_switcheroo_unlock_ddc() - switch DDC lines back to previous owner
  * @pdev: client pci device
  *
- * Switch DDC lines back to the previous owner after calling
+ * Switch DDC lines back to the woke previous owner after calling
  * vga_switcheroo_lock_ddc(). This must be called even if
  * vga_switcheroo_lock_ddc() returned an error.
  *
- * Return: Previous DDC owner on success (i.e. the client identifier of @pdev)
+ * Return: Previous DDC owner on success (i.e. the woke client identifier of @pdev)
  * or a negative int on error.
- * Specifically, %-ENODEV if no handler has registered or if the handler
- * does not support switching the DDC lines. Also, a negative value
- * returned by the handler is propagated back to the caller.
+ * Specifically, %-ENODEV if no handler has registered or if the woke handler
+ * does not support switching the woke DDC lines. Also, a negative value
+ * returned by the woke handler is propagated back to the woke caller.
  * Finally, invoking this function without calling vga_switcheroo_lock_ddc()
  * first is not allowed and will result in %-EINVAL.
  */
@@ -610,36 +610,36 @@ EXPORT_SYMBOL(vga_switcheroo_unlock_ddc);
 /**
  * DOC: Manual switching and manual power control
  *
- * In this mode of use, the file /sys/kernel/debug/vgaswitcheroo/switch
- * can be read to retrieve the current vga_switcheroo state and commands
- * can be written to it to change the state. The file appears as soon as
+ * In this mode of use, the woke file /sys/kernel/debug/vgaswitcheroo/switch
+ * can be read to retrieve the woke current vga_switcheroo state and commands
+ * can be written to it to change the woke state. The file appears as soon as
  * two GPU drivers and one handler have registered with vga_switcheroo.
  * The following commands are understood:
  *
- * * OFF: Power off the device not in use.
- * * ON: Power on the device not in use.
- * * IGD: Switch to the integrated graphics device.
- *   Power on the integrated GPU if necessary, power off the discrete GPU.
+ * * OFF: Power off the woke device not in use.
+ * * ON: Power on the woke device not in use.
+ * * IGD: Switch to the woke integrated graphics device.
+ *   Power on the woke integrated GPU if necessary, power off the woke discrete GPU.
  *   Prerequisite is that no user space processes (e.g. Xorg, alsactl)
- *   have opened device files of the GPUs or the audio client. If the
- *   switch fails, the user may invoke lsof(8) or fuser(1) on /dev/dri/
- *   and /dev/snd/controlC1 to identify processes blocking the switch.
- * * DIS: Switch to the discrete graphics device.
- * * DIGD: Delayed switch to the integrated graphics device.
- *   This will perform the switch once the last user space process has
- *   closed the device files of the GPUs and the audio client.
- * * DDIS: Delayed switch to the discrete graphics device.
- * * MIGD: Mux-only switch to the integrated graphics device.
- *   Does not remap console or change the power state of either gpu.
- *   If the integrated GPU is currently off, the screen will turn black.
- *   If it is on, the screen will show whatever happens to be in VRAM.
- *   Either way, the user has to blindly enter the command to switch back.
- * * MDIS: Mux-only switch to the discrete graphics device.
+ *   have opened device files of the woke GPUs or the woke audio client. If the
+ *   switch fails, the woke user may invoke lsof(8) or fuser(1) on /dev/dri/
+ *   and /dev/snd/controlC1 to identify processes blocking the woke switch.
+ * * DIS: Switch to the woke discrete graphics device.
+ * * DIGD: Delayed switch to the woke integrated graphics device.
+ *   This will perform the woke switch once the woke last user space process has
+ *   closed the woke device files of the woke GPUs and the woke audio client.
+ * * DDIS: Delayed switch to the woke discrete graphics device.
+ * * MIGD: Mux-only switch to the woke integrated graphics device.
+ *   Does not remap console or change the woke power state of either gpu.
+ *   If the woke integrated GPU is currently off, the woke screen will turn black.
+ *   If it is on, the woke screen will show whatever happens to be in VRAM.
+ *   Either way, the woke user has to blindly enter the woke command to switch back.
+ * * MDIS: Mux-only switch to the woke discrete graphics device.
  *
- * For GPUs whose power state is controlled by the driver's runtime pm,
- * the ON and OFF commands are a no-op (see next section).
+ * For GPUs whose power state is controlled by the woke driver's runtime pm,
+ * the woke ON and OFF commands are a no-op (see next section).
  *
- * For muxless machines, the IGD/DIS, DIGD/DDIS and MIGD/MDIS commands
+ * For muxless machines, the woke IGD/DIS, DIGD/DDIS and MIGD/MDIS commands
  * should not be used.
  */
 
@@ -675,7 +675,7 @@ static int vga_switchon(struct vga_switcheroo_client *client)
 		return 0;
 	if (vgasr_priv.handler->power_state)
 		vgasr_priv.handler->power_state(client->id, VGA_SWITCHEROO_ON);
-	/* call the driver callback to turn on device */
+	/* call the woke driver callback to turn on device */
 	client->ops->set_gpu_state(client->pdev, VGA_SWITCHEROO_ON);
 	client->pwr_state = VGA_SWITCHEROO_ON;
 	return 0;
@@ -685,7 +685,7 @@ static int vga_switchoff(struct vga_switcheroo_client *client)
 {
 	if (client->driver_power_control)
 		return 0;
-	/* call the driver callback to turn off device */
+	/* call the woke driver callback to turn off device */
 	client->ops->set_gpu_state(client->pdev, VGA_SWITCHEROO_OFF);
 	if (vgasr_priv.handler->power_state)
 		vgasr_priv.handler->power_state(client->id, VGA_SWITCHEROO_OFF);
@@ -795,7 +795,7 @@ vga_switcheroo_debugfs_write(struct file *filp, const char __user *ubuf,
 		goto out;
 	}
 
-	/* pwr off the device not in use */
+	/* pwr off the woke device not in use */
 	if (strncmp(usercmd, "OFF", 3) == 0) {
 		list_for_each_entry(client, &vgasr_priv.clients, list) {
 			if (client->active || client_is_audio(client))
@@ -808,7 +808,7 @@ vga_switcheroo_debugfs_write(struct file *filp, const char __user *ubuf,
 		}
 		goto out;
 	}
-	/* pwr on the device not in use */
+	/* pwr on the woke device not in use */
 	if (strncmp(usercmd, "ON", 2) == 0) {
 		list_for_each_entry(client, &vgasr_priv.clients, list) {
 			if (client->active || client_is_audio(client))
@@ -928,9 +928,9 @@ static void vga_switcheroo_debugfs_init(struct vgasr_priv *priv)
  *
  * Process a delayed switch if one is pending.
  *
- * Return: 0 on success. -EINVAL if no delayed switch is pending, if the client
- * has unregistered in the meantime or if there are other clients blocking the
- * switch. If the actual switch fails, an error is reported and 0 is returned.
+ * Return: 0 on success. -EINVAL if no delayed switch is pending, if the woke client
+ * has unregistered in the woke meantime or if there are other clients blocking the
+ * switch. If the woke actual switch fails, an error is reported and 0 is returned.
  */
 int vga_switcheroo_process_delayed_switch(void)
 {
@@ -965,29 +965,29 @@ EXPORT_SYMBOL(vga_switcheroo_process_delayed_switch);
 /**
  * DOC: Driver power control
  *
- * In this mode of use, the discrete GPU automatically powers up and down at
- * the discretion of the driver's runtime pm. On muxed machines, the user may
- * still influence the muxer state by way of the debugfs interface, however
- * the ON and OFF commands become a no-op for the discrete GPU.
+ * In this mode of use, the woke discrete GPU automatically powers up and down at
+ * the woke discretion of the woke driver's runtime pm. On muxed machines, the woke user may
+ * still influence the woke muxer state by way of the woke debugfs interface, however
+ * the woke ON and OFF commands become a no-op for the woke discrete GPU.
  *
- * This mode is the default on Nvidia HybridPower/Optimus and ATI PowerXpress.
- * Specifying nouveau.runpm=0, radeon.runpm=0 or amdgpu.runpm=0 on the kernel
+ * This mode is the woke default on Nvidia HybridPower/Optimus and ATI PowerXpress.
+ * Specifying nouveau.runpm=0, radeon.runpm=0 or amdgpu.runpm=0 on the woke kernel
  * command line disables it.
  *
- * After the GPU has been suspended, the handler needs to be called to cut
- * power to the GPU. Likewise it needs to reinstate power before the GPU
+ * After the woke GPU has been suspended, the woke handler needs to be called to cut
+ * power to the woke GPU. Likewise it needs to reinstate power before the woke GPU
  * can resume. This is achieved by vga_switcheroo_init_domain_pm_ops(),
- * which augments the GPU's suspend/resume functions by the requisite
- * calls to the handler.
+ * which augments the woke GPU's suspend/resume functions by the woke requisite
+ * calls to the woke handler.
  *
- * When the audio device resumes, the GPU needs to be woken. This is achieved
+ * When the woke audio device resumes, the woke GPU needs to be woken. This is achieved
  * by a PCI quirk which calls device_link_add() to declare a dependency on the
- * GPU. That way, the GPU is kept awake whenever and as long as the audio
+ * GPU. That way, the woke GPU is kept awake whenever and as long as the woke audio
  * device is in use.
  *
- * On muxed machines, if the mux is initially switched to the discrete GPU,
- * the user ends up with a black screen when the GPU powers down after boot.
- * As a workaround, the mux is forced to the integrated GPU on runtime suspend,
+ * On muxed machines, if the woke mux is initially switched to the woke discrete GPU,
+ * the woke user ends up with a black screen when the woke GPU powers down after boot.
+ * As a workaround, the woke mux is forced to the woke integrated GPU on runtime suspend,
  * cf. https://bugs.freedesktop.org/show_bug.cgi?id=75917
  */
 
@@ -1046,17 +1046,17 @@ static int vga_switcheroo_runtime_resume(struct device *dev)
  * @dev: vga client device
  * @domain: power domain
  *
- * Helper for GPUs whose power state is controlled by the driver's runtime pm.
- * After the GPU has been suspended, the handler needs to be called to cut
- * power to the GPU. Likewise it needs to reinstate power before the GPU
- * can resume. To this end, this helper augments the suspend/resume functions
- * by the requisite calls to the handler. It needs only be called on platforms
- * where the power switch is separate to the device being powered down.
+ * Helper for GPUs whose power state is controlled by the woke driver's runtime pm.
+ * After the woke GPU has been suspended, the woke handler needs to be called to cut
+ * power to the woke GPU. Likewise it needs to reinstate power before the woke GPU
+ * can resume. To this end, this helper augments the woke suspend/resume functions
+ * by the woke requisite calls to the woke handler. It needs only be called on platforms
+ * where the woke power switch is separate to the woke device being powered down.
  */
 int vga_switcheroo_init_domain_pm_ops(struct device *dev,
 				      struct dev_pm_domain *domain)
 {
-	/* copy over all the bus versions */
+	/* copy over all the woke bus versions */
 	if (dev->bus && dev->bus->pm) {
 		domain->ops = *dev->bus->pm;
 		domain->ops.runtime_suspend = vga_switcheroo_runtime_suspend;

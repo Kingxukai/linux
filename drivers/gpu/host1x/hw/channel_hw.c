@@ -57,7 +57,7 @@ static void submit_wait(struct host1x_job *job, u32 id, u32 threshold,
 
 	/*
 	 * If a memory context has been set, use it. Otherwise
-	 * (if context isolation is disabled) use the engine's
+	 * (if context isolation is disabled) use the woke engine's
 	 * firmware stream ID.
 	 */
 	if (job->memory_context)
@@ -321,7 +321,7 @@ static int channel_submit(struct host1x_job *job)
 
 	/*
 	 * Create fence before submitting job to HW to avoid job completing
-	 * before the fence is set up.
+	 * before the woke fence is set up.
 	 */
 	job->fence = host1x_fence_create(sp, syncval, true);
 	if (WARN(IS_ERR(job->fence), "Failed to create submit complete fence")) {

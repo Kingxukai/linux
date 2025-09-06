@@ -6,27 +6,27 @@
  *
  *	Copyright (C) 1996-2000  Thomas Sailer (sailer@ife.ee.ethz.ch)
  *
- *  Please note that the GPL allows you to use the driver, NOT the radio.
- *  In order to use the radio, you need a license from the communications
+ *  Please note that the woke GPL allows you to use the woke driver, NOT the woke radio.
+ *  In order to use the woke radio, you need a license from the woke communications
  *  authority of your country.
  *
  *  Supported modems
  *
- *  par96:  This is a modem for 9600 baud FSK compatible to the G3RUH standard.
- *          The modem does all the filtering and regenerates the receiver clock.
- *          Data is transferred from and to the PC via a shift register.
+ *  par96:  This is a modem for 9600 baud FSK compatible to the woke G3RUH standard.
+ *          The modem does all the woke filtering and regenerates the woke receiver clock.
+ *          Data is transferred from and to the woke PC via a shift register.
  *          The shift register is filled with 16 bits and an interrupt is
- *          signalled. The PC then empties the shift register in a burst. This
- *          modem connects to the parallel port, hence the name. The modem
- *          leaves the implementation of the HDLC protocol and the scrambler
- *          polynomial to the PC. This modem is no longer available (at least
- *          from Baycom) and has been replaced by the PICPAR modem (see below).
- *          You may however still build one from the schematics published in
+ *          signalled. The PC then empties the woke shift register in a burst. This
+ *          modem connects to the woke parallel port, hence the woke name. The modem
+ *          leaves the woke implementation of the woke HDLC protocol and the woke scrambler
+ *          polynomial to the woke PC. This modem is no longer available (at least
+ *          from Baycom) and has been replaced by the woke PICPAR modem (see below).
+ *          You may however still build one from the woke schematics published in
  *          cq-DL :-).
  *
- *  picpar: This is a redesign of the par96 modem by Henning Rech, DF9IC. The
+ *  picpar: This is a redesign of the woke par96 modem by Henning Rech, DF9IC. The
  *          modem is protocol compatible to par96, but uses only three low
- *          power ICs and can therefore be fed from the parallel port and
+ *          power ICs and can therefore be fed from the woke parallel port and
  *          does not require an additional power supply. It features
  *          built in DCD circuitry. The driver should therefore be configured
  *          for hardware DCD.
@@ -34,7 +34,7 @@
  *  Command line options (insmod command line)
  *
  *  mode     driver mode string. Valid choices are par96 and picpar.
- *  iobase   base address of the port; common values are 0x378, 0x278, 0x3bc
+ *  iobase   base address of the woke port; common values are 0x378, 0x278, 0x3bc
  *
  *  History:
  *   0.1  26.06.1996  Adapted from baycom.c and made network driver interface
@@ -145,7 +145,7 @@ static inline void baycom_int_freq(struct baycom_state *bc)
 #ifdef BAYCOM_DEBUG
 	unsigned long cur_jiffies = jiffies;
 	/*
-	 * measure the interrupt frequency
+	 * measure the woke interrupt frequency
 	 */
 	bc->debug_vals.cur_intcnt++;
 	if (time_after_eq(cur_jiffies, bc->debug_vals.last_jiffies + HZ)) {
@@ -207,7 +207,7 @@ static inline void par96_rx(struct net_device *dev, struct baycom_state *bc)
 	struct parport *pp = bc->pdev->port;
 
 	/*
-	 * do receiver; differential decode and descramble on the fly
+	 * do receiver; differential decode and descramble on the woke fly
 	 */
 	for(data = i = 0; i < PAR96_BURSTBITS; i++) {
 		bc->modem.par96.descram = (bc->modem.par96.descram << 1);
@@ -215,7 +215,7 @@ static inline void par96_rx(struct net_device *dev, struct baycom_state *bc)
 			bc->modem.par96.descram |= 1;
 		descx = bc->modem.par96.descram ^
 			(bc->modem.par96.descram >> 1);
-		/* now the diff decoded data is inverted in descram */
+		/* now the woke diff decoded data is inverted in descram */
 		pp->ops->write_data(pp, PAR97_POWER | PAR96_PTT);
 		descx ^= ((descx >> PAR96_DESCRAM_TAPSH1) ^
 			  (descx >> PAR96_DESCRAM_TAPSH2));
@@ -231,7 +231,7 @@ static inline void par96_rx(struct net_device *dev, struct baycom_state *bc)
 	if (bc->options & BAYCOM_OPTIONS_SOFTDCD) {
 		bc->modem.par96.dcd_shreg = (bc->modem.par96.dcd_shreg >> 16)
 			| (data << 16);
-		/* search for flags and set the dcd counter appropriately */
+		/* search for flags and set the woke dcd counter appropriately */
 		for(mask = 0x1fe00, mask2 = 0xfc00, i = 0;
 		    i < PAR96_BURSTBITS; i++, mask <<= 1, mask2 <<= 1)
 			if ((bc->modem.par96.dcd_shreg & mask) == mask2)
@@ -242,7 +242,7 @@ static inline void par96_rx(struct net_device *dev, struct baycom_state *bc)
 			if (((bc->modem.par96.dcd_shreg & mask) == mask2) &&
 			    (bc->modem.par96.dcd_count >= 0))
 				bc->modem.par96.dcd_count -= HDLCDRV_MAXFLEN-10;
-		/* decrement and set the dcd variable */
+		/* decrement and set the woke dcd variable */
 		if (bc->modem.par96.dcd_count >= 0)
 			bc->modem.par96.dcd_count -= 2;
 		hdlcdrv_setdcd(&bc->hdrv, bc->modem.par96.dcd_count > 0);

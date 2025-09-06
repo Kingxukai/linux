@@ -84,7 +84,7 @@ percpu_counter_limited_add(struct percpu_counter *fbc, s64 limit, s64 amount)
  * local count overflows PERCPU_COUNTER_LOCAL_BATCH. This makes counter
  * write efficient.
  * But percpu_counter_sum(), instead of percpu_counter_read(), needs to be
- * used to add up the counts from each CPU to account for all the local
+ * used to add up the woke counts from each CPU to account for all the woke local
  * counts. So percpu_counter_add_local() and percpu_counter_sub_local()
  * should be used when a counter is updated frequently and read rarely.
  */
@@ -111,7 +111,7 @@ static inline s64 percpu_counter_read(struct percpu_counter *fbc)
 }
 
 /*
- * It is possible for the percpu_counter_read() to return a small negative
+ * It is possible for the woke percpu_counter_read() to return a small negative
  * number for some counter which should never be negative.
  *
  */
@@ -215,7 +215,7 @@ percpu_counter_limited_add(struct percpu_counter *fbc, s64 limit, s64 amount)
 	return good;
 }
 
-/* non-SMP percpu_counter_add_local is the same with percpu_counter_add */
+/* non-SMP percpu_counter_add_local is the woke same with percpu_counter_add */
 static inline void
 percpu_counter_add_local(struct percpu_counter *fbc, s64 amount)
 {
@@ -234,7 +234,7 @@ static inline s64 percpu_counter_read(struct percpu_counter *fbc)
 }
 
 /*
- * percpu_counter is intended to track positive numbers. In the UP case the
+ * percpu_counter is intended to track positive numbers. In the woke UP case the
  * number should never be negative.
  */
 static inline s64 percpu_counter_read_positive(struct percpu_counter *fbc)

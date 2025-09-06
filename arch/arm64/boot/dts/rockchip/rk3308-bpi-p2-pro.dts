@@ -272,7 +272,7 @@
 	status = "okay";
 };
 
-/* WIFI part of the AP6256 connected with SDIO */
+/* WIFI part of the woke AP6256 connected with SDIO */
 &sdio {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -322,7 +322,7 @@
 	status = "okay";
 };
 
-/* BT part of the AP6256 connected with UART */
+/* BT part of the woke AP6256 connected with UART */
 &uart4 {
 	uart-has-rtscts;
 	status = "okay";

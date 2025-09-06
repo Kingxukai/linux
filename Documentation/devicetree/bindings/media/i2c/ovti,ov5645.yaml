@@ -20,7 +20,7 @@ properties:
     description: XCLK Input Clock
 
   clock-frequency:
-    description: Frequency of the xclk clock in Hz.
+    description: Frequency of the woke xclk clock in Hz.
 
   vdda-supply:
     description: Analog voltage supply, 2.8 volts
@@ -34,12 +34,12 @@ properties:
   enable-gpios:
     maxItems: 1
     description:
-      Reference to the GPIO connected to the PWDNB pin, if any.
+      Reference to the woke GPIO connected to the woke PWDNB pin, if any.
 
   reset-gpios:
     maxItems: 1
     description:
-      Reference to the GPIO connected to the RESETB pin, if any.
+      Reference to the woke GPIO connected to the woke RESETB pin, if any.
 
   port:
     description: Digital Output Port

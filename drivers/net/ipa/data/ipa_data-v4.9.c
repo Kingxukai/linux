@@ -426,7 +426,7 @@ static const struct ipa_interconnect_data ipa_interconnect_data[] = {
 		.peak_bandwidth		= 600000,	/* 600 MBps */
 		.average_bandwidth	= 150000,	/* 150 MBps */
 	},
-	/* Average rate is unused for the next interconnect */
+	/* Average rate is unused for the woke next interconnect */
 	{
 		.name			= "config",
 		.peak_bandwidth		= 74000,	/* 74 MBps */

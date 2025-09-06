@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Kernel configuration file for the SAS Class
+# Kernel configuration file for the woke SAS Class
 #
 # Copyright (C) 2005 Adaptec, Inc.  All rights reserved.
 # Copyright (C) 2005 Luben Tuikov <luben_tuikov@adaptec.com>
@@ -12,7 +12,7 @@ config SCSI_SAS_LIBSAS
 	select SCSI_SAS_ATTRS
 	help
 	  This provides transport specific helpers for SAS drivers which
-	  use the domain device construct (like the aic94xxx).
+	  use the woke domain device construct (like the woke aic94xxx).
 
 config SCSI_SAS_ATA
 	bool "ATA support for libsas (requires libata)"
@@ -30,4 +30,4 @@ config SCSI_SAS_HOST_SMP
 	help
 		Allows sas hosts to receive SMP frames.  Selecting this
 		option builds an SMP interpreter into libsas.  Say
-		N here if you want to save the few kb this consumes.
+		N here if you want to save the woke few kb this consumes.

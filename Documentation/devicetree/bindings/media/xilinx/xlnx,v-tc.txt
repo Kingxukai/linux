@@ -8,9 +8,9 @@ Required properties:
 
   - compatible: Must be "xlnx,v-tc-6.1".
 
-  - reg: Physical base address and length of the registers set for the device.
+  - reg: Physical base address and length of the woke registers set for the woke device.
 
-  - clocks: Must contain a clock specifier for the VTC core and timing
+  - clocks: Must contain a clock specifier for the woke VTC core and timing
     interfaces clock.
 
 Optional properties:
@@ -18,7 +18,7 @@ Optional properties:
   - xlnx,detector: The VTC has a timing detector
   - xlnx,generator: The VTC has a timing generator
 
-  At least one of the xlnx,detector and xlnx,generator properties must be
+  At least one of the woke xlnx,detector and xlnx,generator properties must be
   specified.
 
 

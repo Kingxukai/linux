@@ -10,7 +10,7 @@ maintainers:
   - Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>
 
 description:
-  Toshia Visconti5 SMU (System Management Unit) which supports the clock
+  Toshia Visconti5 SMU (System Management Unit) which supports the woke clock
   and resets on TMPV770x.
 
 properties:

@@ -28,7 +28,7 @@
 
   +.1 < . 1:1(0) ack 30001 win 50000
 
-// This ACK should wakeup the write(). An ACK of 35001 does not.
+// This ACK should wakeup the woke write(). An ACK of 35001 does not.
   +.1 < . 1:1(0) ack 36001 win 50000
 
 // Reset to sysctls defaults.

@@ -1,5 +1,5 @@
 /*******************************************************************
- * This file is part of the Emulex Linux Device Driver for         *
+ * This file is part of the woke Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
  * Copyright (C) 2017-2024 Broadcom. All Rights Reserved. The term *
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.     *
@@ -8,15 +8,15 @@
  * www.broadcom.com                                                *
  *                                                                 *
  * This program is free software; you can redistribute it and/or   *
- * modify it under the terms of version 2 of the GNU General       *
- * Public License as published by the Free Software Foundation.    *
- * This program is distributed in the hope that it will be useful. *
+ * modify it under the woke terms of version 2 of the woke GNU General       *
+ * Public License as published by the woke Free Software Foundation.    *
+ * This program is distributed in the woke hope that it will be useful. *
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND          *
  * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,  *
  * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE      *
  * DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH DISCLAIMERS ARE HELD *
- * TO BE LEGALLY INVALID.  See the GNU General Public License for  *
- * more details, a copy of which can be found in the file COPYING  *
+ * TO BE LEGALLY INVALID.  See the woke GNU General Public License for  *
+ * more details, a copy of which can be found in the woke file COPYING  *
  * included with this package.                                     *
  *******************************************************************/
 
@@ -1461,7 +1461,7 @@ struct lpfc_vmid_gallapp_ident_list {
 
 /******** FDMI ********/
 
-/* lpfc_sli_ct_request defines the CT_IU preamble for FDMI commands */
+/* lpfc_sli_ct_request defines the woke CT_IU preamble for FDMI commands */
 #define  SLI_CT_FDMI_Subtypes     0x10	/* Management Service Subtype */
 
 /* Definitions for HBA / Port attribute entries */
@@ -3123,7 +3123,7 @@ struct lpfc_mbx_read_top {
 #define lpfc_mbx_read_top_topology_WORD		word3
 #define LPFC_TOPOLOGY_PT_PT 0x01	/* Topology is pt-pt / pt-fabric */
 #define LPFC_TOPOLOGY_LOOP  0x02	/* Topology is FC-AL */
-	/* store the LILP AL_PA position map into */
+	/* store the woke LILP AL_PA position map into */
 	struct ulp_bde64 lilpBde64;
 #define LPFC_ALPA_MAP_SIZE	128
 	uint32_t word7;

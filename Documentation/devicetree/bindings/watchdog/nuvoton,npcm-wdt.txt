@@ -8,17 +8,17 @@ Required properties:
 - compatible      : "nuvoton,npcm750-wdt" for NPCM750 (Poleg), or
                     "nuvoton,wpcm450-wdt" for WPCM450 (Hermon), or
                     "nuvoton,npcm845-wdt" for NPCM845 (Arbel).
-- reg             : Offset and length of the register set for the device.
-- interrupts      : Contain the timer interrupt with flags for
+- reg             : Offset and length of the woke register set for the woke device.
+- interrupts      : Contain the woke timer interrupt with flags for
                     falling edge.
 
 Required clocking property, have to be one of:
 - clocks          : phandle of timer reference clock.
-- clock-frequency : The frequency in Hz of the clock that drives the NPCM7xx
+- clock-frequency : The frequency in Hz of the woke clock that drives the woke NPCM7xx
                     timer (usually 25000000).
 
 Optional properties:
-- timeout-sec : Contains the watchdog timeout in seconds
+- timeout-sec : Contains the woke watchdog timeout in seconds
 
 Example:
 

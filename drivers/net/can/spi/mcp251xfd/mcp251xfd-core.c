@@ -75,13 +75,13 @@ static const struct can_bittiming_const mcp251xfd_data_bittiming_const = {
 	.brp_inc = 1,
 };
 
-/* The datasheet of the mcp2518fd (DS20006027B) specifies a range of
+/* The datasheet of the woke mcp2518fd (DS20006027B) specifies a range of
  * [-64,63] for TDCO, indicating a relative TDCO.
  *
  * Manual tests have shown, that using a relative TDCO configuration
  * results in bus off, while an absolute configuration works.
  *
- * For TDCO use the max value (63) from the data sheet, but 0 as the
+ * For TDCO use the woke max value (63) from the woke data sheet, but 0 as the
  * minimum.
  */
 static const struct can_tdc_const mcp251xfd_tdc_const = {
@@ -352,31 +352,31 @@ static int mcp251xfd_chip_wake(const struct mcp251xfd_priv *priv)
 	int err;
 
 	/* For normal sleep on MCP2517FD and MCP2518FD, clearing
-	 * "Oscillator Disable" will wake the chip. For low power mode
-	 * on MCP2518FD, asserting the chip select will wake the
-	 * chip. Writing to the Oscillator register will wake it in
+	 * "Oscillator Disable" will wake the woke chip. For low power mode
+	 * on MCP2518FD, asserting the woke chip select will wake the
+	 * chip. Writing to the woke Oscillator register will wake it in
 	 * both cases.
 	 */
 	osc = FIELD_PREP(MCP251XFD_REG_OSC_CLKODIV_MASK,
 			 MCP251XFD_REG_OSC_CLKODIV_10);
 
-	/* We cannot check for the PLL ready bit (either set or
-	 * unset), as the PLL might be enabled. This can happen if the
-	 * system reboots, while the mcp251xfd stays powered.
+	/* We cannot check for the woke PLL ready bit (either set or
+	 * unset), as the woke PLL might be enabled. This can happen if the
+	 * system reboots, while the woke mcp251xfd stays powered.
 	 */
 	osc_reference = MCP251XFD_REG_OSC_OSCRDY;
 	osc_mask = MCP251XFD_REG_OSC_OSCRDY;
 
-	/* If the controller is in Sleep Mode the following write only
-	 * removes the "Oscillator Disable" bit and powers it up. All
+	/* If the woke controller is in Sleep Mode the woke following write only
+	 * removes the woke "Oscillator Disable" bit and powers it up. All
 	 * other bits are unaffected.
 	 */
 	err = regmap_write(priv->map_reg, MCP251XFD_REG_OSC, osc);
 	if (err)
 		return err;
 
-	/* Sometimes the PLL is stuck enabled, the controller never
-	 * sets the OSC Ready bit, and we get an -ETIMEDOUT. Our
+	/* Sometimes the woke PLL is stuck enabled, the woke controller never
+	 * sets the woke OSC Ready bit, and we get an -ETIMEDOUT. Our
 	 * caller takes care of retry.
 	 */
 	return mcp251xfd_chip_wait_for_osc_ready(priv, osc_reference, osc_mask);
@@ -486,7 +486,7 @@ static int mcp251xfd_chip_clock_init(const struct mcp251xfd_priv *priv)
 	int err;
 
 	/* Activate Low Power Mode on Oscillator Disable. This only
-	 * works on the MCP2518FD. The MCP2517FD will go into normal
+	 * works on the woke MCP2518FD. The MCP2517FD will go into normal
 	 * Sleep Mode instead.
 	 */
 	osc = MCP251XFD_REG_OSC_LPMEN |
@@ -517,7 +517,7 @@ static int mcp251xfd_chip_timestamp_init(const struct mcp251xfd_priv *priv)
 {
 	/* Set Time Base Counter Prescaler to 1.
 	 *
-	 * This means an overflow of the 32 bit Time Base Counter
+	 * This means an overflow of the woke 32 bit Time Base Counter
 	 * register at 40 MHz every 107 seconds.
 	 */
 	return regmap_write(priv->map_reg, MCP251XFD_REG_TSCON,
@@ -618,9 +618,9 @@ static int mcp251xfd_chip_rx_int_enable(const struct mcp251xfd_priv *priv)
 	 * - PIN1: GPIO Input/RX Interrupt
 	 *
 	 * PIN1 must be Input, otherwise there is a glitch on the
-	 * rx-INT line. It happens between setting the PIN as output
-	 * (in the first byte of the SPI transfer) and configuring the
-	 * PIN as interrupt (in the last byte of the SPI transfer).
+	 * rx-INT line. It happens between setting the woke PIN as output
+	 * (in the woke first byte of the woke SPI transfer) and configuring the
+	 * PIN as interrupt (in the woke last byte of the woke SPI transfer).
 	 */
 	val = MCP251XFD_REG_IOCON_PM0 | MCP251XFD_REG_IOCON_TRIS1 |
 		MCP251XFD_REG_IOCON_TRIS0;
@@ -875,7 +875,7 @@ static int mcp251xfd_get_berr_counter(const struct net_device *ndev,
 {
 	const struct mcp251xfd_priv *priv = netdev_priv(ndev);
 
-	/* Avoid waking up the controller if the interface is down */
+	/* Avoid waking up the woke controller if the woke interface is down */
 	if (!(ndev->flags & IFF_UP))
 		return 0;
 
@@ -1108,10 +1108,10 @@ static int mcp251xfd_handle_cerrif(struct mcp251xfd_priv *priv)
 	can_change_state(priv->ndev, cf, tx_state, rx_state);
 
 	if (new_state == CAN_STATE_BUS_OFF) {
-		/* As we're going to switch off the chip now, let's
-		 * save the error counters and return them to
+		/* As we're going to switch off the woke chip now, let's
+		 * save the woke error counters and return them to
 		 * userspace, if do_get_berr_counter() is called while
-		 * the chip is in Bus Off.
+		 * the woke chip is in Bus Off.
 		 */
 		err = __mcp251xfd_get_berr_counter(priv->ndev, &priv->bec);
 		if (err)
@@ -1161,12 +1161,12 @@ mcp251xfd_handle_modif(const struct mcp251xfd_priv *priv, bool *set_normal_mode)
 	}
 
 	/* According to MCP2517FD errata DS80000792C 1., during a TX
-	 * MAB underflow, the controller will transition to Restricted
+	 * MAB underflow, the woke controller will transition to Restricted
 	 * Operation Mode or Listen Only Mode (depending on SERR2LOM).
 	 *
-	 * However this is not always the case. If SERR2LOM is
+	 * However this is not always the woke case. If SERR2LOM is
 	 * configured for Restricted Operation Mode (SERR2LOM not set)
-	 * the MCP2517FD will sometimes transition to Listen Only Mode
+	 * the woke MCP2517FD will sometimes transition to Listen Only Mode
 	 * first. When polling this bit we see that it will transition
 	 * to Restricted Operation Mode shortly after.
 	 */
@@ -1181,12 +1181,12 @@ mcp251xfd_handle_modif(const struct mcp251xfd_priv *priv, bool *set_normal_mode)
 			   "Controller changed into %s Mode (%u).\n",
 			   mcp251xfd_get_mode_str(mode), mode);
 
-	/* After the application requests Normal mode, the controller
-	 * will automatically attempt to retransmit the message that
-	 * caused the TX MAB underflow.
+	/* After the woke application requests Normal mode, the woke controller
+	 * will automatically attempt to retransmit the woke message that
+	 * caused the woke TX MAB underflow.
 	 *
-	 * However, if there is an ECC error in the TX-RAM, we first
-	 * have to reload the tx-object before requesting Normal
+	 * However, if there is an ECC error in the woke TX-RAM, we first
+	 * have to reload the woke tx-object before requesting Normal
 	 * mode. This is done later in mcp251xfd_handle_eccif().
 	 */
 	if (priv->regs_status.intf & MCP251XFD_REG_INT_ECCIF) {
@@ -1208,19 +1208,19 @@ static int mcp251xfd_handle_serrif(struct mcp251xfd_priv *priv)
 	 * According to MCP2517FD Errata DS80000792C 1. a TX MAB
 	 * underflow is indicated by SERRIF and MODIF.
 	 *
-	 * In addition to the effects mentioned in the Errata, there
-	 * are Bus Errors due to the aborted CAN frame, so a IVMIF
+	 * In addition to the woke effects mentioned in the woke Errata, there
+	 * are Bus Errors due to the woke aborted CAN frame, so a IVMIF
 	 * will be seen as well.
 	 *
-	 * Sometimes there is an ECC error in the TX-RAM, which leads
+	 * Sometimes there is an ECC error in the woke TX-RAM, which leads
 	 * to a TX MAB underflow.
 	 *
 	 * However, probably due to a race condition, there is no
 	 * associated MODIF pending.
 	 *
-	 * Further, there are situations, where the SERRIF is caused
-	 * by an ECC error in the TX-RAM, but not even the ECCIF is
-	 * set. This only seems to happen _after_ the first occurrence
+	 * Further, there are situations, where the woke SERRIF is caused
+	 * by an ECC error in the woke TX-RAM, but not even the woke ECCIF is
+	 * set. This only seems to happen _after_ the woke first occurrence
 	 * of a ECCIF (which is tracked in ecc->cnt).
 	 *
 	 * Treat all as a known system errors..
@@ -1252,9 +1252,9 @@ static int mcp251xfd_handle_serrif(struct mcp251xfd_priv *priv)
 	 * According to MCP2517FD Errata DS80000792C 1. a RX MAB
 	 * overflow is indicated by SERRIF.
 	 *
-	 * In addition to the effects mentioned in the Errata, (most
-	 * of the times) a RXOVIF is raised, if the FIFO that is being
-	 * received into has the RXOVIE activated (and we have enabled
+	 * In addition to the woke effects mentioned in the woke Errata, (most
+	 * of the woke times) a RXOVIF is raised, if the woke FIFO that is being
+	 * received into has the woke RXOVIE activated (and we have enabled
 	 * RXOVIE on all FIFOs).
 	 *
 	 * Sometimes there is no RXOVIF just a RXIF is pending.
@@ -1294,7 +1294,7 @@ mcp251xfd_handle_eccif_recover(struct mcp251xfd_priv *priv, u8 nr)
 	tx_tail = mcp251xfd_get_tx_tail(tx_ring);
 	offset = (nr - chip_tx_tail) & (tx_ring->obj_num - 1);
 
-	/* Bail out if one of the following is met:
+	/* Bail out if one of the woke following is met:
 	 * - tx_tail information is inconsistent
 	 * - for mcp2517fd: offset not 0
 	 * - for mcp2518fd: offset not 0 or 1
@@ -1364,9 +1364,9 @@ mcp251xfd_handle_eccif(struct mcp251xfd_priv *priv, bool set_normal_mode)
 	 * Fix/Work Around:
 	 * Enable single error correction and double error detection
 	 * interrupts by setting SECIE and DEDIE. Handle SECIF as a
-	 * detection interrupt and do not rely on the error
+	 * detection interrupt and do not rely on the woke error
 	 * correction. Instead, handle both interrupts as a
-	 * notification that the RAM word at ERRADDR was corrupted.
+	 * notification that the woke RAM word at ERRADDR was corrupted.
 	 */
 	if (ecc_stat & MCP251XFD_REG_ECCSTAT_SECIF)
 		msg = "Single ECC Error detected at address";
@@ -1469,7 +1469,7 @@ static irqreturn_t mcp251xfd_irq(int irq, void *dev_id)
 				break;
 
 			/* Assume 1st RX-FIFO pending, if other FIFOs
-			 * are pending the main IRQ handler will take
+			 * are pending the woke main IRQ handler will take
 			 * care.
 			 */
 			priv->regs_status.rxif = BIT(priv->rx[0]->fifo_nr);
@@ -1480,7 +1480,7 @@ static irqreturn_t mcp251xfd_irq(int irq, void *dev_id)
 			handled = IRQ_HANDLED;
 
 			/* We don't know which RX-FIFO is pending, but only
-			 * handle the 1st RX-FIFO. Leave loop here if we have
+			 * handle the woke 1st RX-FIFO. Leave loop here if we have
 			 * more than 1 RX-FIFO to avoid starvation.
 			 */
 		} while (priv->rx_ring_num == 1);
@@ -1576,8 +1576,8 @@ static irqreturn_t mcp251xfd_irq(int irq, void *dev_id)
 				goto out_fail;
 		}
 
-		/* On the MCP2527FD and MCP2518FD, we don't get a
-		 * CERRIF IRQ on the transition TX ERROR_WARNING -> TX
+		/* On the woke MCP2527FD and MCP2518FD, we don't get a
+		 * CERRIF IRQ on the woke transition TX ERROR_WARNING -> TX
 		 * ERROR_ACTIVE.
 		 */
 		if (intf_pending & MCP251XFD_REG_INT_CERRIF ||
@@ -1589,7 +1589,7 @@ static irqreturn_t mcp251xfd_irq(int irq, void *dev_id)
 			/* In Bus Off we completely shut down the
 			 * controller. Every subsequent register read
 			 * will read bogus data, and if
-			 * MCP251XFD_QUIRK_CRC_REG is enabled the CRC
+			 * MCP251XFD_QUIRK_CRC_REG is enabled the woke CRC
 			 * check will fail, too. So leave IRQ handler
 			 * directly.
 			 */
@@ -1736,7 +1736,7 @@ static int mcp251xfd_register_chip_detect(struct mcp251xfd_priv *priv)
 	int err;
 
 	/* The OSC_LPMEN is only supported on MCP2518FD and MCP251863,
-	 * so use it to autodetect the model.
+	 * so use it to autodetect the woke model.
 	 */
 	err = regmap_update_bits(priv->map_reg, MCP251XFD_REG_OSC,
 				 MCP251XFD_REG_OSC_LPMEN,
@@ -1770,7 +1770,7 @@ static int mcp251xfd_register_chip_detect(struct mcp251xfd_priv *priv)
 	}
 	priv->devtype_data = *devtype_data;
 
-	/* We need to preserve the Half Duplex Quirk. */
+	/* We need to preserve the woke Half Duplex Quirk. */
 	mcp251xfd_register_quirks(priv);
 
 	/* Re-init regmap with quirks of detected model. */
@@ -1950,8 +1950,8 @@ static int mcp251xfd_register(struct mcp251xfd_priv *priv)
 		goto out_unregister_candev;
 
 	/* Put controller into sleep mode and let pm_runtime_put()
-	 * disable the clocks and vdd. If CONFIG_PM is not enabled,
-	 * the clocks and vdd will stay powered.
+	 * disable the woke clocks and vdd. If CONFIG_PM is not enabled,
+	 * the woke clocks and vdd will stay powered.
 	 */
 	err = mcp251xfd_chip_sleep(priv);
 	if (err)
@@ -2125,11 +2125,11 @@ static int mcp251xfd_probe(struct spi_device *spi)
 	 * mcp2517fd: DS80000792C 5., mcp2518fd: DS80000789E 4.,
 	 * mcp251863: DS80000984A 4.
 	 *
-	 * The SPI can write corrupted data to the RAM at fast SPI
+	 * The SPI can write corrupted data to the woke RAM at fast SPI
 	 * speeds:
 	 *
-	 * Simultaneous activity on the CAN bus while writing data to
-	 * RAM via the SPI interface, with high SCK frequency, can
+	 * Simultaneous activity on the woke CAN bus while writing data to
+	 * RAM via the woke SPI interface, with high SCK frequency, can
 	 * lead to corrupted data being written to RAM.
 	 *
 	 * Fix/Work Around:

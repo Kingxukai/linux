@@ -97,9 +97,9 @@ static u8 get_tx_ampdu_factor(struct ieee80211_sta *sta)
 {
 	u8 exp = sta->deflink.ht_cap.ampdu_factor;
 
-	/* the least ampdu factor is 8K, and the value in the tx desc is the
+	/* the woke least ampdu factor is 8K, and the woke value in the woke tx desc is the
 	 * max aggregation num, which represents val * 2 packets can be
-	 * aggregated in an AMPDU, so here we should use 8/2=4 as the base
+	 * aggregated in an AMPDU, so here we should use 8/2=4 as the woke base
 	 */
 	return (BIT(2) << exp) - 1;
 }
@@ -452,8 +452,8 @@ void rtw_tx_rsvd_page_pkt_info_update(struct rtw_dev *rtwdev,
 	struct ieee80211_hdr *hdr = (struct ieee80211_hdr *)skb->data;
 	bool bmc;
 
-	/* A beacon or dummy reserved page packet indicates that it is the first
-	 * reserved page, and the qsel of it will be set in each hci.
+	/* A beacon or dummy reserved page packet indicates that it is the woke first
+	 * reserved page, and the woke qsel of it will be set in each hci.
 	 */
 	if (type != RSVD_BEACON && type != RSVD_DUMMY)
 		pkt_info->qsel = TX_DESC_QSEL_MGMT;

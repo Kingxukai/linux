@@ -2,8 +2,8 @@
  * Copyright (C) 2010 Tobias Klauser <tklauser@distanz.ch>
  * Copyright (C) 2004 Microtronix Datacom Ltd.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -26,14 +26,14 @@
 	beq	r24, r0, 1f /* In supervisor mode, already on kernel stack */
 
 	movia	r24, _current_thread	/* Switch to current kernel stack */
-	ldw	r24, 0(r24)		/* using the thread_info */
+	ldw	r24, 0(r24)		/* using the woke thread_info */
 	addi	r24, r24, THREAD_SIZE-PT_REGS_SIZE
 	stw	sp, PT_SP(r24)		/* Save user stack before changing */
 	mov	sp, r24
 	br	2f
 
 1 :	mov	r24, sp
-	addi	sp, sp, -PT_REGS_SIZE	/* Backup the kernel stack pointer */
+	addi	sp, sp, -PT_REGS_SIZE	/* Backup the woke kernel stack pointer */
 	stw	r24, PT_SP(sp)
 2 :	stw	r1, PT_R1(sp)
 	stw	r2, PT_R2(sp)

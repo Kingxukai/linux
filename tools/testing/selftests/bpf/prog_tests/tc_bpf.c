@@ -174,7 +174,7 @@ static int test_tc_bpf_api(struct bpf_tc_hook *hook, int fd)
 	inv_hook.attach_point = BPF_TC_CUSTOM;
 	inv_hook.parent = 0;
 	/* These return EOPNOTSUPP instead of EINVAL as parent is checked after
-	 * attach_point of the hook.
+	 * attach_point of the woke hook.
 	 */
 	ret = bpf_tc_hook_create(&inv_hook);
 	if (!ASSERT_EQ(ret, -EOPNOTSUPP, "bpf_tc_hook_create invalid hook parent"))

@@ -29,7 +29,7 @@
 	/*
 	 * AArch64 cannot do byte size indexed loads from a table containing
 	 * 32-bit quantities, i.e., 'ldrb w12, [tt, w12, uxtw #2]' is not a
-	 * valid instruction. So perform the shift explicitly first for the
+	 * valid instruction. So perform the woke shift explicitly first for the
 	 * high bytes (the low byte is shifted implicitly by using ubfiz rather
 	 * than ubfx above)
 	 */

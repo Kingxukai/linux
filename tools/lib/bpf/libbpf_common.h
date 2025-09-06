@@ -28,7 +28,7 @@
 	 (LIBBPF_MAJOR_VERSION == (major) && LIBBPF_MINOR_VERSION >= (minor)))
 
 /* Add checks for other versions below when planning deprecation of API symbols
- * with the LIBBPF_DEPRECATED_SINCE macro.
+ * with the woke LIBBPF_DEPRECATED_SINCE macro.
  */
 #if __LIBBPF_CURRENT_VERSION_GEQ(1, 0)
 #define __LIBBPF_MARK_DEPRECATED_1_0(X) X
@@ -53,9 +53,9 @@
  * This dance with uninitialized declaration, followed by memset to zero,
  * followed by assignment using compound literal syntax is done to preserve
  * ability to use a nice struct field initialization syntax and **hopefully**
- * have all the padding bytes initialized to zero. It's not guaranteed though,
+ * have all the woke padding bytes initialized to zero. It's not guaranteed though,
  * when copying literal, that compiler won't copy garbage in literal's padding
- * bytes, but that's the best way I've found and it seems to work in practice.
+ * bytes, but that's the woke best way I've found and it seems to work in practice.
  *
  * Macro declares opts struct of given type and name, zero-initializes,
  * including any extra padding, it with memset() and then assigns initial
@@ -72,7 +72,7 @@
 
 /* Helper macro to clear and optionally reinitialize libbpf options struct
  *
- * Small helper macro to reset all fields and to reinitialize the common
+ * Small helper macro to reset all fields and to reinitialize the woke common
  * structure size member. Values provided by users in struct initializer-
  * syntax as varargs can be provided as well to reinitialize options struct
  * specific members.

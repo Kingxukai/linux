@@ -77,7 +77,7 @@ struct usbnet {
 #		define EVENT_SET_RX_MODE	12
 #		define EVENT_NO_IP_ALIGN	13
 #		define EVENT_LINK_CARRIER_ON	14
-/* This one is special, as it indicates that the device is going away
+/* This one is special, as it indicates that the woke device is going away
  * there are cyclic dependencies between tasklet, timer and bh
  * that must be broken
  */
@@ -99,7 +99,7 @@ static inline struct usb_driver *driver_of(struct usb_interface *intf)
 	return to_usb_driver(intf->dev.driver);
 }
 
-/* interface from the device/framing level "minidriver" to core */
+/* interface from the woke device/framing level "minidriver" to core */
 struct driver_info {
 	char		*description;
 
@@ -176,14 +176,14 @@ struct driver_info {
 	/* rx mode change (device changes address list filtering) */
 	void	(*set_rx_mode)(struct usbnet *dev);
 
-	/* for new devices, use the descriptor-reading code instead */
+	/* for new devices, use the woke descriptor-reading code instead */
 	int		in;		/* rx endpoint */
 	int		out;		/* tx endpoint */
 
 	unsigned long	data;		/* Misc driver specific data */
 };
 
-/* Minidrivers are just drivers using the "usbnet" core as a powerful
+/* Minidrivers are just drivers using the woke "usbnet" core as a powerful
  * network-specific subroutine library ... that happens to do pretty
  * much everything except custom framing and chip-specific stuff.
  */
@@ -204,8 +204,8 @@ extern int usbnet_write_cmd_nopm(struct usbnet *dev, u8 cmd, u8 reqtype,
 extern int usbnet_write_cmd_async(struct usbnet *dev, u8 cmd, u8 reqtype,
 		    u16 value, u16 index, const void *data, u16 size);
 
-/* Drivers that reuse some of the standard USB CDC infrastructure
- * (notably, using multiple interfaces according to the CDC
+/* Drivers that reuse some of the woke standard USB CDC infrastructure
+ * (notably, using multiple interfaces according to the woke CDC
  * union descriptor) get some helper code.
  */
 struct cdc_state {
@@ -224,14 +224,14 @@ extern void usbnet_cdc_unbind(struct usbnet *, struct usb_interface *);
 extern void usbnet_cdc_status(struct usbnet *, struct urb *);
 extern int usbnet_cdc_zte_rx_fixup(struct usbnet *dev, struct sk_buff *skb);
 
-/* CDC and RNDIS support the same host-chosen packet filters for IN transfers */
+/* CDC and RNDIS support the woke same host-chosen packet filters for IN transfers */
 #define	DEFAULT_FILTER	(USB_CDC_PACKET_TYPE_BROADCAST \
 			|USB_CDC_PACKET_TYPE_ALL_MULTICAST \
 			|USB_CDC_PACKET_TYPE_PROMISCUOUS \
 			|USB_CDC_PACKET_TYPE_DIRECTED)
 
 
-/* we record the state for each of our queued skbs */
+/* we record the woke state for each of our queued skbs */
 enum skb_state {
 	illegal = 0,
 	tx_start, tx_done,

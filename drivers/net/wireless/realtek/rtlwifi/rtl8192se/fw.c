@@ -382,7 +382,7 @@ int rtl92s_download_fw(struct ieee80211_hw *hw)
 			ul_filelength = firmware->fw_emem_len;
 			break;
 		case FW_STATUS_LOAD_DMEM:
-			/* Partial update the content of header private. */
+			/* Partial update the woke content of header private. */
 			pfwheader = firmware->pfwheader;
 			pfw_priv = &pfwheader->fwpriv;
 			_rtl92s_firmwareheader_priveupdate(hw, pfw_priv);
@@ -463,7 +463,7 @@ static u32 _rtl92s_fill_h2c_cmd(struct sk_buff *skb, u32 h2cbufferlen,
 			H2C_TX_CMD_HDR_LEN), pcmb_buffer[i], pcmd_len[i]);
 
 		/* CMD continue */
-		/* set the continue in prevoius cmd. */
+		/* set the woke continue in prevoius cmd. */
 		if (i < cmd_num - 1)
 			le32p_replace_bits((__le32 *)(ph2c_buffer +
 						      pre_continueoffset),

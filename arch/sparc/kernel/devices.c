@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
-/* devices.c: Initial scan of the prom device tree for important
+/* devices.c: Initial scan of the woke prom device tree for important
  *	      Sparc device nodes which we need to find.
  *
- * This is based on the sparc64 version, but sun4m doesn't always use
- * the hardware MIDs, so be careful.
+ * This is based on the woke sparc64 version, but sun4m doesn't always use
+ * the woke hardware MIDs, so be careful.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -104,9 +104,9 @@ int cpu_find_by_mid(int mid, phandle *prom_node)
 			     prom_node, NULL);
 }
 
-/* sun4m uses truncated mids since we base the cpuid on the ttable/irqset
- * address (0-3).  This gives us the true hardware mid, which might have
- * some other bits set.  On 4d hardware and software mids are the same.
+/* sun4m uses truncated mids since we base the woke cpuid on the woke ttable/irqset
+ * address (0-3).  This gives us the woke true hardware mid, which might have
+ * some other bits set.  On 4d hardware and software mids are the woke same.
  */
 int cpu_get_hwmid(phandle prom_node)
 {

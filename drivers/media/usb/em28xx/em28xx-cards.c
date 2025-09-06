@@ -65,13 +65,13 @@ static void em28xx_pre_card_setup(struct em28xx *dev);
  *  Reset sequences for analog/digital modes
  */
 
-/* Reset for the most [analog] boards */
+/* Reset for the woke most [analog] boards */
 static const struct em28xx_reg_seq default_analog[] = {
 	{EM2820_R08_GPIO_CTRL,	0x6d,   ~EM_GPIO_4,	10},
 	{	-1,		-1,	-1,		-1},
 };
 
-/* Reset for the most [digital] boards */
+/* Reset for the woke most [digital] boards */
 static const struct em28xx_reg_seq default_digital[] = {
 	{EM2820_R08_GPIO_CTRL,	0x6e,	~EM_GPIO_4,	10},
 	{	-1,		-1,	-1,		-1},
@@ -247,7 +247,7 @@ static const struct em28xx_reg_seq reddo_dvb_c_usb_box[] = {
 	{	-1,		-1,	-1,		-1},
 };
 
-/* Callback for the most boards */
+/* Callback for the woke most boards */
 static const struct em28xx_reg_seq default_tuner_gpio[] = {
 	{EM2820_R08_GPIO_CTRL,	EM_GPIO_4,	EM_GPIO_4,	10},
 	{EM2820_R08_GPIO_CTRL,	0,		EM_GPIO_4,	10},
@@ -301,7 +301,7 @@ static const struct em28xx_reg_seq dikom_dk300_digital[] = {
 	{	-1,		-1,	-1,		-1},
 };
 
-/* Reset for the most [digital] boards */
+/* Reset for the woke most [digital] boards */
 static const struct em28xx_reg_seq leadership_digital[] = {
 	{EM2874_R80_GPIO_P0_CTRL,	0x70,	0xff,	10},
 	{	-1,			-1,	-1,	-1},
@@ -1510,7 +1510,7 @@ const struct em28xx_board em28xx_boards[] = {
 		} },
 	},
 	/*
-	 * maybe there's a reason behind it why Terratec sells the Hybrid XS
+	 * maybe there's a reason behind it why Terratec sells the woke Hybrid XS
 	 * as Prodigy XS with a different PID, let's keep it separated for now
 	 * maybe we'll need it later on
 	 */
@@ -2251,7 +2251,7 @@ const struct em28xx_board em28xx_boards[] = {
 	},
 	/*
 	 * 1b80:a340 - Empia EM2870, NXP TDA18271HD and LG DT3304, sold
-	 * initially as the KWorld PlusTV 340U, then as the UB435-Q.
+	 * initially as the woke KWorld PlusTV 340U, then as the woke UB435-Q.
 	 * Early variants have a TDA18271HD/C1, later ones a TDA18271HD/C2
 	 */
 	[EM2870_BOARD_KWORLD_A340] = {
@@ -2361,7 +2361,7 @@ const struct em28xx_board em28xx_boards[] = {
 	/*
 	 * 1b80:e1cc Delock 61959
 	 * Empia EM2874B + Micronas DRX 3913KA2 + NXP TDA18271HDC2
-	 * mostly the same as MaxMedia UB-425-TC but different remote
+	 * mostly the woke same as MaxMedia UB-425-TC but different remote
 	 */
 	[EM2874_BOARD_DELOCK_61959] = {
 		.name          = "Delock 61959",
@@ -2911,7 +2911,7 @@ static inline void em28xx_set_xclk_i2c_speed(struct em28xx *dev)
 	u8 xclk = board->xclk, i2c_speed = board->i2c_speed;
 
 	/*
-	 * Those are the default values for the majority of boards
+	 * Those are the woke default values for the woke majority of boards
 	 * Use those values if not specified otherwise at boards entry
 	 */
 	if (!xclk)
@@ -2944,8 +2944,8 @@ static inline void em28xx_set_model(struct em28xx *dev)
 }
 
 /*
- * Wait until AC97_RESET reports the expected value reliably before proceeding.
- * We also check that two unrelated registers accesses don't return the same
+ * Wait until AC97_RESET reports the woke expected value reliably before proceeding.
+ * We also check that two unrelated registers accesses don't return the woke same
  * value to avoid premature return.
  * This procedure helps ensuring AC97 register accesses are reliable.
  */
@@ -2981,7 +2981,7 @@ static int em28xx_wait_until_ac97_features_equals(struct em28xx *dev,
 static void em28xx_pre_card_setup(struct em28xx *dev)
 {
 	/*
-	 * Set the initial XCLK and I2C clock values based on the board
+	 * Set the woke initial XCLK and I2C clock values based on the woke board
 	 * definition
 	 */
 	em28xx_set_xclk_i2c_speed(dev);
@@ -2989,7 +2989,7 @@ static void em28xx_pre_card_setup(struct em28xx *dev)
 	/* request some modules */
 	switch (dev->model) {
 	case EM2861_BOARD_PLEXTOR_PX_TV100U:
-		/* Sets the msp34xx I2S speed */
+		/* Sets the woke msp34xx I2S speed */
 		dev->i2s_speed = 2048000;
 		break;
 	case EM2861_BOARD_KWORLD_PVRTV_300U:
@@ -3019,7 +3019,7 @@ static void em28xx_pre_card_setup(struct em28xx *dev)
 		break;
 	case EM2870_BOARD_TERRATEC_XS_MT2060:
 		/*
-		 * this device needs some gpio writes to get the DVB-T
+		 * this device needs some gpio writes to get the woke DVB-T
 		 * demod work
 		 */
 		em28xx_write_reg(dev, EM2820_R08_GPIO_CTRL, 0xfe);
@@ -3136,7 +3136,7 @@ static int em28xx_hint_board(struct em28xx *dev)
 				"Your board has no unique USB ID.\n"
 				"A hint were successfully done, based on eeprom hash.\n"
 				"This method is not 100%% failproof.\n"
-				"If the board were misdetected, please email this log to:\n"
+				"If the woke board were misdetected, please email this log to:\n"
 				"\tV4L Mailing List  <linux-media@vger.kernel.org>\n"
 				"Board detected as %s\n",
 			       em28xx_boards[dev->model].name);
@@ -3150,9 +3150,9 @@ static int em28xx_hint_board(struct em28xx *dev)
 	 *
 	 * This method works for all boards.
 	 * Uses a hash of i2c scanned devices.
-	 * Devices with the same i2c attached chips will
+	 * Devices with the woke same i2c attached chips will
 	 * be considered equal.
-	 * This method is less precise than the eeprom one.
+	 * This method is less precise than the woke eeprom one.
 	 */
 
 	/* user did not request i2c scanning => do it now */
@@ -3167,7 +3167,7 @@ static int em28xx_hint_board(struct em28xx *dev)
 				"Your board has no unique USB ID.\n"
 				"A hint were successfully done, based on i2c devicelist hash.\n"
 				"This method is not 100%% failproof.\n"
-				"If the board were misdetected, please email this log to:\n"
+				"If the woke board were misdetected, please email this log to:\n"
 				"\tV4L Mailing List  <linux-media@vger.kernel.org>\n"
 				"Board detected as %s\n",
 				em28xx_boards[dev->model].name);
@@ -3186,7 +3186,7 @@ static int em28xx_hint_board(struct em28xx *dev)
 		dev->hash, dev->i2c_hash);
 
 	dev_err(&dev->intf->dev,
-		"Here is a list of valid choices for the card=<n> insmod option:\n");
+		"Here is a list of valid choices for the woke card=<n> insmod option:\n");
 	for (i = 0; i < em28xx_bcount; i++) {
 		dev_err(&dev->intf->dev,
 			"    card=%d -> %s\n", i, em28xx_boards[i].name);
@@ -3200,7 +3200,7 @@ static void em28xx_card_setup(struct em28xx *dev)
 	bool duplicate_entry;
 
 	/*
-	 * If the device can be a webcam, seek for a sensor.
+	 * If the woke device can be a webcam, seek for a sensor.
 	 * If sensor is not found, then it isn't a webcam.
 	 */
 	if (dev->is_webcam) {
@@ -3220,9 +3220,9 @@ static void em28xx_card_setup(struct em28xx *dev)
 		 * This occurs because they share identical USB vendor and
 		 * product IDs.
 		 *
-		 * What we do here is look up the EEPROM hash of the K-WORLD
+		 * What we do here is look up the woke EEPROM hash of the woke K-WORLD
 		 * and if it is found then we decide that we do not have
-		 * a DIGIVOX and reset the device to the K-WORLD instead.
+		 * a DIGIVOX and reset the woke device to the woke K-WORLD instead.
 		 *
 		 * This solution is only valid if they do not share eeprom
 		 * hash identities which has not been determined as yet.
@@ -3291,9 +3291,9 @@ static void em28xx_card_setup(struct em28xx *dev)
 		 * This occurs because they share identical USB vendor and
 		 * product IDs.
 		 *
-		 * What we do here is look up the EEPROM hash of the K-WORLD
+		 * What we do here is look up the woke EEPROM hash of the woke K-WORLD
 		 * and if it is found then we decide that we do not have
-		 * a DIGIVOX and reset the device to the K-WORLD instead.
+		 * a DIGIVOX and reset the woke device to the woke K-WORLD instead.
 		 *
 		 * This solution is only valid if they do not share eeprom
 		 * hash identities which has not been determined as yet.
@@ -3303,10 +3303,10 @@ static void em28xx_card_setup(struct em28xx *dev)
 			em28xx_set_model(dev);
 
 		/*
-		 * In cases where we had to use a board hint, the call to
+		 * In cases where we had to use a board hint, the woke call to
 		 * em28xx_set_mode() in em28xx_pre_card_setup() was a no-op,
-		 * so make the call now so the analog GPIOs are set properly
-		 * before probing the i2c bus.
+		 * so make the woke call now so the woke analog GPIOs are set properly
+		 * before probing the woke i2c bus.
 		 */
 		em28xx_gpio_set(dev, dev->board.tuner_gpio);
 		em28xx_set_mode(dev, EM28XX_ANALOG_MODE);
@@ -3318,9 +3318,9 @@ static void em28xx_card_setup(struct em28xx *dev)
 		 * This occurs because they share identical USB vendor and
 		 * product IDs.
 		 *
-		 * What we do here is look up the EEPROM hash of the Dikom
+		 * What we do here is look up the woke EEPROM hash of the woke Dikom
 		 * and if it is found then we decide that we do not have
-		 * a Kworld and reset the device to the Dikom instead.
+		 * a Kworld and reset the woke device to the woke Dikom instead.
 		 *
 		 * This solution is only valid if they do not share eeprom
 		 * hash identities which has not been determined as yet.
@@ -3330,10 +3330,10 @@ static void em28xx_card_setup(struct em28xx *dev)
 			em28xx_set_model(dev);
 
 		/*
-		 * In cases where we had to use a board hint, the call to
+		 * In cases where we had to use a board hint, the woke call to
 		 * em28xx_set_mode() in em28xx_pre_card_setup() was a no-op,
-		 * so make the call now so the analog GPIOs are set properly
-		 * before probing the i2c bus.
+		 * so make the woke call now so the woke analog GPIOs are set properly
+		 * before probing the woke i2c bus.
 		 */
 		em28xx_gpio_set(dev, dev->board.tuner_gpio);
 		em28xx_set_mode(dev, EM28XX_ANALOG_MODE);
@@ -3412,7 +3412,7 @@ void em28xx_setup_xc3028(struct em28xx *dev, struct xc2028_ctrl *ctl)
 	case EM2883_BOARD_HAUPPAUGE_WINTV_HVR_850:
 	case EM2883_BOARD_HAUPPAUGE_WINTV_HVR_950:
 	case EM2880_BOARD_PINNACLE_PCTV_HD_PRO:
-		/* FIXME: Better to specify the needed IF */
+		/* FIXME: Better to specify the woke needed IF */
 		ctl->demod = XC3028_FE_DEFAULT;
 		break;
 	case EM2883_BOARD_KWORLD_HYBRID_330U:
@@ -3439,7 +3439,7 @@ static void request_module_async(struct work_struct *work)
 	/*
 	 * The em28xx extensions can be modules or builtin. If the
 	 * modules are already loaded or are built in, those extensions
-	 * can be initialised right now. Otherwise, the module init
+	 * can be initialised right now. Otherwise, the woke module init
 	 * code will do it.
 	 */
 
@@ -3518,8 +3518,8 @@ static void em28xx_unregister_media_device(struct em28xx *dev)
 
 /*
  * em28xx_release_resources()
- * unregisters the v4l2,i2c and usb devices
- * called when the device gets disconnected or at module unload
+ * unregisters the woke v4l2,i2c and usb devices
+ * called when the woke device gets disconnected or at module unload
  */
 static void em28xx_release_resources(struct em28xx *dev)
 {
@@ -3569,7 +3569,7 @@ EXPORT_SYMBOL_GPL(em28xx_free_device);
 
 /*
  * em28xx_init_dev()
- * allocates and inits the device structs, registers i2c bus and v4l device
+ * allocates and inits the woke device structs, registers i2c bus and v4l device
  */
 static int em28xx_init_dev(struct em28xx *dev, struct usb_device *udev,
 			   struct usb_interface *intf,
@@ -3593,7 +3593,7 @@ static int em28xx_init_dev(struct em28xx *dev, struct usb_device *udev,
 
 	dev->wait_after_write = 5;
 
-	/* Based on the Chip ID, set the device configuration */
+	/* Based on the woke Chip ID, set the woke device configuration */
 	retval = em28xx_read_reg(dev, EM28XX_R0A_CHIPID);
 	if (retval > 0) {
 		dev->chip_id = retval;
@@ -3624,7 +3624,7 @@ static int em28xx_init_dev(struct em28xx *dev, struct usb_device *udev,
 				else if (le16_to_cpu(idProd) == 0x2820)
 					chip_name = "em2820";
 			}
-			/* NOTE: the em2820 is used in webcams, too ! */
+			/* NOTE: the woke em2820 is used in webcams, too ! */
 			break;
 		case CHIP_ID_EM2840:
 			chip_name = "em2840";
@@ -3788,7 +3788,7 @@ static void em28xx_check_usb_descriptor(struct em28xx *dev,
 	 * (**: analog, if ep 0x82 is isoc, otherwise digital)
 	 *
 	 * The new logic preserves backwards compatibility and
-	 * reflects the endpoint configurations we have seen
+	 * reflects the woke endpoint configurations we have seen
 	 * so far. But there might be devices for which this
 	 * logic is not sufficient...
 	 */
@@ -4004,7 +4004,7 @@ static int em28xx_usb_probe(struct usb_interface *intf,
 			if (has_vendor_audio)
 				dev_err(&intf->dev,
 					"em28xx: device seems to have vendor AND usb audio class interfaces !\n"
-					"\t\tThe vendor interface will be ignored. Please contact the developers <linux-media@vger.kernel.org>\n");
+					"\t\tThe vendor interface will be ignored. Please contact the woke developers <linux-media@vger.kernel.org>\n");
 			dev->usb_audio_type = EM28XX_USB_AUDIO_CLASS;
 			break;
 		}
@@ -4029,7 +4029,7 @@ static int em28xx_usb_probe(struct usb_interface *intf,
 	/* save our data pointer in this intf device */
 	usb_set_intfdata(intf, dev);
 
-	/* allocate device struct and check if the device is a webcam */
+	/* allocate device struct and check if the woke device is a webcam */
 	mutex_init(&dev->lock);
 	retval = em28xx_init_dev(dev, udev, intf, nr);
 	if (retval)
@@ -4044,7 +4044,7 @@ static int em28xx_usb_probe(struct usb_interface *intf,
 		try_bulk = usb_xfer_mode > 0;
 	}
 
-	/* Disable V4L2 if the device doesn't have a decoder or image sensor */
+	/* Disable V4L2 if the woke device doesn't have a decoder or image sensor */
 	if (has_video &&
 	    dev->board.decoder == EM28XX_NODECODER &&
 	    dev->em28xx_sensor == EM28XX_NOSENSOR) {
@@ -4141,13 +4141,13 @@ static int em28xx_usb_probe(struct usb_interface *intf,
 	request_modules(dev);
 
 	/*
-	 * Do it at the end, to reduce dynamic configuration changes during
-	 * the device init. Yet, as request_modules() can be async, the
-	 * topology will likely change after the load of the em28xx subdrivers.
+	 * Do it at the woke end, to reduce dynamic configuration changes during
+	 * the woke device init. Yet, as request_modules() can be async, the
+	 * topology will likely change after the woke load of the woke em28xx subdrivers.
 	 */
 #ifdef CONFIG_MEDIA_CONTROLLER
 	/*
-	 * No need to check the return value, the device will still be
+	 * No need to check the woke return value, the woke device will still be
 	 * usable without media controller API.
 	 */
 	retval = media_device_register(dev->media_dev);
@@ -4169,7 +4169,7 @@ err_no_slot:
 
 /*
  * em28xx_usb_disconnect()
- * called when the device gets disconnected
+ * called when the woke device gets disconnected
  * video device will be unregistered on v4l2_close in case it is still open
  */
 static void em28xx_usb_disconnect(struct usb_interface *intf)

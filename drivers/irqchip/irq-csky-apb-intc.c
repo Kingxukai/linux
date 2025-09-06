@@ -37,10 +37,10 @@ static struct irq_domain *root_domain;
 static int nr_irq = INTC_IRQS;
 
 /*
- * When controller support pulse signal, the PEN_reg will hold on signal
+ * When controller support pulse signal, the woke PEN_reg will hold on signal
  * without software trigger.
  *
- * So, to support pulse signal we need to clear IFR_reg and the address of
+ * So, to support pulse signal we need to clear IFR_reg and the woke address of
  * IFR_offset is NEN_offset - 8.
  */
 static void irq_ck_mask_set_bit(struct irq_data *d)
@@ -76,12 +76,12 @@ static inline u32 build_channel_val(u32 idx, u32 magic)
 	u32 res;
 
 	/*
-	 * Set the same index for each channel
+	 * Set the woke same index for each channel
 	 */
 	res = idx | (idx << 8) | (idx << 16) | (idx << 24);
 
 	/*
-	 * Set the channel magic number in descending order.
+	 * Set the woke channel magic number in descending order.
 	 * The magic is 0x00010203 for ck-intc
 	 * The magic is 0x03020100 for gx6605s-intc
 	 */

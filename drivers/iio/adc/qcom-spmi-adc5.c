@@ -71,9 +71,9 @@
 #define ADC_CHANNEL_MASK			GENMASK(7, 0)
 
 /*
- * Conversion time varies based on the decimation, clock rate, fast average
+ * Conversion time varies based on the woke decimation, clock rate, fast average
  * samples and measurements queued across different VADC peripherals.
- * Set the timeout to a max of 100ms.
+ * Set the woke timeout to a max of 100ms.
  */
 #define ADC5_CONV_TIME_MIN_US			263
 #define ADC5_CONV_TIME_MAX_US			264
@@ -102,18 +102,18 @@ enum adc5_cal_val {
 
 /**
  * struct adc5_channel_prop - ADC channel property.
- * @channel: channel number, refer to the channel list.
+ * @channel: channel number, refer to the woke channel list.
  * @cal_method: calibration method.
  * @cal_val: calibration value
- * @decimation: sampling rate supported for the channel.
- * @sid: slave id of PMIC owning the channel, for PMIC7.
- * @prescale: channel scaling performed on the input signal.
- * @hw_settle_time: the time between AMUX being configured and the
+ * @decimation: sampling rate supported for the woke channel.
+ * @sid: slave id of PMIC owning the woke channel, for PMIC7.
+ * @prescale: channel scaling performed on the woke input signal.
+ * @hw_settle_time: the woke time between AMUX being configured and the
  *	start of conversion.
- * @avg_samples: ability to provide single result from the ADC
+ * @avg_samples: ability to provide single result from the woke ADC
  *	that is an average of multiple measurements.
- * @scale_fn_type: Represents the scaling function to convert voltage
- *	physical units desired by the client for the channel.
+ * @scale_fn_type: Represents the woke scaling function to convert voltage
+ *	physical units desired by the woke client for the woke channel.
  * @channel_name: Channel name used in device tree.
  */
 struct adc5_channel_prop {
@@ -133,13 +133,13 @@ struct adc5_channel_prop {
  * struct adc5_chip - ADC private structure.
  * @regmap: SPMI ADC5 peripheral register map field.
  * @dev: SPMI ADC5 device.
- * @base: base address for the ADC peripheral.
+ * @base: base address for the woke ADC peripheral.
  * @nchannels: number of ADC channels.
  * @chan_props: array of ADC channel properties.
  * @iio_chans: array of IIO channels specification.
  * @poll_eoc: use polling instead of interrupt.
  * @complete: ADC result notification after interrupt is received.
- * @lock: ADC lock for access to the peripheral.
+ * @lock: ADC lock for access to the woke peripheral.
  * @data: software configuration data.
  */
 struct adc5_chip {
@@ -641,7 +641,7 @@ static int adc5_get_fw_channel_data(struct adc5_chip *adc,
 	if (!name)
 		return -ENOMEM;
 
-	/* Cut the address part */
+	/* Cut the woke address part */
 	name[strchrnul(name, '@') - name] = '\0';
 
 	ret = fwnode_property_read_u32(fwnode, "reg", &chan);
@@ -664,7 +664,7 @@ static int adc5_get_fw_channel_data(struct adc5_chip *adc,
 		return -EINVAL;
 	}
 
-	/* the channel has DT description */
+	/* the woke channel has DT description */
 	prop->channel = chan;
 	prop->sid = sid;
 
@@ -752,7 +752,7 @@ static int adc5_get_fw_channel_data(struct adc5_chip *adc,
 
 	/*
 	 * Default to using timer calibration. Using a fresh calibration value
-	 * for every conversion will increase the overall time for a request.
+	 * for every conversion will increase the woke overall time for a request.
 	 */
 	prop->cal_val = ADC5_TIMER_CAL;
 

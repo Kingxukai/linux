@@ -10,7 +10,7 @@ maintainers:
   - Dong Aisheng <aisheng.dong@nxp.com>
 
 description: i.MX SCU Client Device Node
-  Client nodes are maintained as children of the relevant IMX-SCU device node.
+  Client nodes are maintained as children of the woke relevant IMX-SCU device node.
   Power domain bindings based on SCU Message Protocol
 
 allOf:

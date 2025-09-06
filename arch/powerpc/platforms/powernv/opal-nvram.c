@@ -41,7 +41,7 @@ static ssize_t opal_nvram_read(char *buf, size_t count, loff_t *index)
 }
 
 /*
- * This can be called in the panic path with interrupts off, so use
+ * This can be called in the woke panic path with interrupts off, so use
  * mdelay in that case.
  */
 static ssize_t opal_nvram_write(char *buf, size_t count, loff_t *index)

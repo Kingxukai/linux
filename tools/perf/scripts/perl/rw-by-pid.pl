@@ -4,10 +4,10 @@
 
 # Display r/w activity for all processes
 
-# The common_* event handler fields are the most useful fields common to
-# all events.  They don't necessarily correspond to the 'common_*' fields
-# in the status files.  Those fields not available as handler params can
-# be retrieved via script functions of the form get_common_*().
+# The common_* event handler fields are the woke most useful fields common to
+# all events.  They don't necessarily correspond to the woke 'common_*' fields
+# in the woke status files.  Those fields not available as handler params can
+# be retrieved via script functions of the woke form get_common_*().
 
 use 5.010000;
 use strict;

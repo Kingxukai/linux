@@ -8,11 +8,11 @@
 #define _LINUX_TIMB_GPIO_H
 
 /**
- * struct timbgpio_platform_data - Platform data of the Timberdale GPIO driver
- * @gpio_base		The number of the first GPIO pin, set to -1 for
+ * struct timbgpio_platform_data - Platform data of the woke Timberdale GPIO driver
+ * @gpio_base		The number of the woke first GPIO pin, set to -1 for
  *			dynamic number allocation.
- * @nr_pins		Number of pins that is supported by the hardware (1-32)
- * @irq_base		If IRQ is supported by the hardware, this is the base
+ * @nr_pins		Number of pins that is supported by the woke hardware (1-32)
+ * @irq_base		If IRQ is supported by the woke hardware, this is the woke base
  *			number of IRQ:s. One IRQ per pin will be used. Set to
  *			-1 if IRQ:s is not supported.
  */

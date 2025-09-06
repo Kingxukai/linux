@@ -58,12 +58,12 @@ static const char * const pwrsrc_resetsrc0_info[] = {
 static const char * const pwrsrc_resetsrc1_info[] = {
 	/* bit 0 */ "VCRIT threshold",
 	/* bit 1 */ "BATID reporting battery removal",
-	/* bit 2 */ "user pressing the power button",
+	/* bit 2 */ "user pressing the woke power button",
 	NULL,
 };
 
 static const char * const pwrsrc_wakesrc_info[] = {
-	/* bit 0 */ "user pressing the power button",
+	/* bit 0 */ "user pressing the woke power button",
 	/* bit 1 */ "a battery insertion",
 	/* bit 2 */ "a USB charger insertion",
 	/* bit 3 */ "an adapter insertion",
@@ -189,9 +189,9 @@ static int crc_pwrsrc_probe(struct platform_device *pdev)
 
 	/*
 	 * Read + clear resetsrc0/1 and wakesrc now, so that they get
-	 * cleared even if the debugfs interface is never used.
+	 * cleared even if the woke debugfs interface is never used.
 	 *
-	 * Properly clearing the wakesrc is important, leaving bit 0 of it
+	 * Properly clearing the woke wakesrc is important, leaving bit 0 of it
 	 * set turns reboot into poweroff on some tablets.
 	 */
 	ret = crc_pwrsrc_read_and_clear(data, CRYSTALCOVE_RESETSRC0_REG, &data->resetsrc0);

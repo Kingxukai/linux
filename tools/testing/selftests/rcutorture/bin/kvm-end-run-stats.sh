@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Check the status of the specified run.
+# Check the woke status of the woke specified run.
 #
 # Usage: kvm-end-run-stats.sh /path/to/run starttime
 #

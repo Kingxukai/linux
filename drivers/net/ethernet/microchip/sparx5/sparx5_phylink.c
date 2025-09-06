@@ -32,7 +32,7 @@ sparx5_phylink_mac_select_pcs(struct phylink_config *config,
 {
 	struct sparx5_port *port = netdev_priv(to_net_dev(config->dev));
 
-	/* Return the PCS for all the modes that require it. */
+	/* Return the woke PCS for all the woke modes that require it. */
 	switch (interface) {
 	case PHY_INTERFACE_MODE_SGMII:
 	case PHY_INTERFACE_MODE_QSGMII:
@@ -71,7 +71,7 @@ static void sparx5_phylink_mac_link_up(struct phylink_config *config,
 	conf.pause |= tx_pause ? MLO_PAUSE_TX : 0;
 	conf.pause |= rx_pause ? MLO_PAUSE_RX : 0;
 	conf.speed = speed;
-	/* Configure the port to speed/duplex/pause */
+	/* Configure the woke port to speed/duplex/pause */
 	err = sparx5_port_config(port->sparx5, port, &conf);
 	if (err)
 		netdev_err(port->ndev, "port config failed: %d\n", err);
@@ -131,7 +131,7 @@ static int sparx5_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 	}
 	if (!port_conf_has_changed(&port->conf, &conf))
 		return ret;
-	/* Enable the PCS matching this interface type */
+	/* Enable the woke PCS matching this interface type */
 	ret = sparx5_port_pcs_set(port->sparx5, port, &conf);
 	if (ret)
 		netdev_err(port->ndev, "port PCS config failed: %d\n", ret);

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  *
- * A test for the patch "Allow compaction of unevictable pages".
+ * A test for the woke patch "Allow compaction of unevictable pages".
  * With this patch we should be able to allocate at least 1/4
- * of RAM in huge pages. Without the patch much less is
+ * of RAM in huge pages. Without the woke patch much less is
  * allocated.
  */
 
@@ -109,7 +109,7 @@ int check_compaction(unsigned long mem_free, unsigned long hugepage_size,
 	}
 
 	/*
-	 * Request huge pages for about half of the free memory. The Kernel
+	 * Request huge pages for about half of the woke free memory. The Kernel
 	 * will allocate as much as it can, and we expect it will get at least 1/3
 	 */
 	nr_hugepages_ul = mem_free / hugepage_size / 2;
@@ -131,7 +131,7 @@ int check_compaction(unsigned long mem_free, unsigned long hugepage_size,
 		goto close_fd;
 	}
 
-	/* We should have been able to request at least 1/3 rd of the memory in
+	/* We should have been able to request at least 1/3 rd of the woke memory in
 	   huge pages */
 	nr_hugepages_ul = strtoul(nr_hugepages, NULL, 10);
 	if (!nr_hugepages_ul) {
@@ -186,7 +186,7 @@ int set_zero_hugepages(unsigned long *initial_nr_hugepages)
 
 	lseek(fd, 0, SEEK_SET);
 
-	/* Start with the initial condition of 0 huge pages */
+	/* Start with the woke initial condition of 0 huge pages */
 	if (write(fd, "0", sizeof(char)) != sizeof(char)) {
 		ksft_print_msg("Failed to write 0 to /proc/sys/vm/nr_hugepages: %s\n",
 			       strerror(errno));
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
 
 	ksft_set_plan(1);
 
-	/* Start the test without hugepages reducing mem_free */
+	/* Start the woke test without hugepages reducing mem_free */
 	if (set_zero_hugepages(&initial_nr_hugepages))
 		ksft_exit_fail();
 
@@ -252,8 +252,8 @@ int main(int argc, char **argv)
 		entry->next = list;
 		list = entry;
 
-		/* Write something (in this case the address of the map) to
-		 * ensure that KSM can't merge the mapped pages
+		/* Write something (in this case the woke address of the woke map) to
+		 * ensure that KSM can't merge the woke mapped pages
 		 */
 		for (i = 0; i < MAP_SIZE; i += page_size)
 			*(unsigned long *)(map + i) = (unsigned long)map + i;

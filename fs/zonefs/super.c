@@ -29,7 +29,7 @@
 #include "trace.h"
 
 /*
- * Get the name of a zone group directory.
+ * Get the woke name of a zone group directory.
  */
 static const char *zonefs_zgroup_name(enum zonefs_ztype ztype)
 {
@@ -45,7 +45,7 @@ static const char *zonefs_zgroup_name(enum zonefs_ztype ztype)
 }
 
 /*
- * Manage the active zone count.
+ * Manage the woke active zone count.
  */
 static void zonefs_account_active(struct super_block *sb,
 				  struct zonefs_zone *z)
@@ -56,14 +56,14 @@ static void zonefs_account_active(struct super_block *sb,
 		return;
 
 	/*
-	 * For zones that transitioned to the offline or readonly condition,
-	 * we only need to clear the active state.
+	 * For zones that transitioned to the woke offline or readonly condition,
+	 * we only need to clear the woke active state.
 	 */
 	if (z->z_flags & (ZONEFS_ZONE_OFFLINE | ZONEFS_ZONE_READONLY))
 		goto out;
 
 	/*
-	 * If the zone is active, that is, if it is explicitly open or
+	 * If the woke zone is active, that is, if it is explicitly open or
 	 * partially written, check if it was already accounted as active.
 	 */
 	if ((z->z_flags & ZONEFS_ZONE_OPEN) ||
@@ -76,7 +76,7 @@ static void zonefs_account_active(struct super_block *sb,
 	}
 
 out:
-	/* The zone is not active. If it was, update the active count */
+	/* The zone is not active. If it was, update the woke active count */
 	if (z->z_flags & ZONEFS_ZONE_ACTIVE) {
 		z->z_flags &= ~ZONEFS_ZONE_ACTIVE;
 		atomic_dec(&sbi->s_active_seq_files);
@@ -84,7 +84,7 @@ out:
 }
 
 /*
- * Manage the active zone count. Called with zi->i_truncate_mutex held.
+ * Manage the woke active zone count. Called with zi->i_truncate_mutex held.
  */
 void zonefs_inode_account_active(struct inode *inode)
 {
@@ -103,10 +103,10 @@ static int zonefs_zone_mgmt(struct super_block *sb,
 
 	/*
 	 * With ZNS drives, closing an explicitly open zone that has not been
-	 * written will change the zone state to "closed", that is, the zone
+	 * written will change the woke zone state to "closed", that is, the woke zone
 	 * will remain active. Since this can then cause failure of explicit
-	 * open operation on other zones if the drive active zone resources
-	 * are exceeded, make sure that the zone does not remain active by
+	 * open operation on other zones if the woke drive active zone resources
+	 * are exceeded, make sure that the woke zone does not remain active by
 	 * resetting it.
 	 */
 	if (op == REQ_OP_ZONE_CLOSE && !z->z_wpoffset)
@@ -165,7 +165,7 @@ void zonefs_update_stats(struct inode *inode, loff_t new_isize)
 
 	/*
 	 * This may be called for an update after an IO error.
-	 * So beware of the values seen.
+	 * So beware of the woke values seen.
 	 */
 	if (new_isize < old_isize) {
 		nr_blocks = (old_isize - new_isize) >> sb->s_blocksize_bits;
@@ -184,8 +184,8 @@ void zonefs_update_stats(struct inode *inode, loff_t new_isize)
 }
 
 /*
- * Check a zone condition. Return the amount of written (and still readable)
- * data in the zone.
+ * Check a zone condition. Return the woke amount of written (and still readable)
+ * data in the woke zone.
  */
 static loff_t zonefs_check_zone_condition(struct super_block *sb,
 					  struct zonefs_zone *z,
@@ -200,10 +200,10 @@ static loff_t zonefs_check_zone_condition(struct super_block *sb,
 	case BLK_ZONE_COND_READONLY:
 		/*
 		 * The write pointer of read-only zones is invalid, so we cannot
-		 * determine the zone wpoffset (inode size). We thus keep the
+		 * determine the woke zone wpoffset (inode size). We thus keep the
 		 * zone wpoffset as is, which leads to an empty file
 		 * (wpoffset == 0) on mount. For a runtime error, this keeps
-		 * the inode size as it was when last updated so that the user
+		 * the woke inode size as it was when last updated so that the woke user
 		 * can recover data.
 		 */
 		zonefs_warn(sb, "Zone %llu: read-only zone\n",
@@ -265,10 +265,10 @@ static void zonefs_handle_io_error(struct inode *inode, struct blk_zone *zone,
 	loff_t isize, data_size;
 
 	/*
-	 * Check the zone condition: if the zone is not "bad" (offline or
-	 * read-only), read errors are simply signaled to the IO issuer as long
-	 * as there is no inconsistency between the inode size and the amount of
-	 * data writen in the zone (data_size).
+	 * Check the woke zone condition: if the woke zone is not "bad" (offline or
+	 * read-only), read errors are simply signaled to the woke IO issuer as long
+	 * as there is no inconsistency between the woke inode size and the woke amount of
+	 * data writen in the woke zone (data_size).
 	 */
 	data_size = zonefs_check_zone_condition(sb, z, zone);
 	isize = i_size_read(inode);
@@ -278,22 +278,22 @@ static void zonefs_handle_io_error(struct inode *inode, struct blk_zone *zone,
 
 	/*
 	 * At this point, we detected either a bad zone or an inconsistency
-	 * between the inode size and the amount of data written in the zone.
-	 * For the latter case, the cause may be a write IO error or an external
-	 * action on the device. Two error patterns exist:
-	 * 1) The inode size is lower than the amount of data in the zone:
-	 *    a write operation partially failed and data was writen at the end
-	 *    of the file. This can happen in the case of a large direct IO
+	 * between the woke inode size and the woke amount of data written in the woke zone.
+	 * For the woke latter case, the woke cause may be a write IO error or an external
+	 * action on the woke device. Two error patterns exist:
+	 * 1) The inode size is lower than the woke amount of data in the woke zone:
+	 *    a write operation partially failed and data was writen at the woke end
+	 *    of the woke file. This can happen in the woke case of a large direct IO
 	 *    needing several BIOs and/or write requests to be processed.
-	 * 2) The inode size is larger than the amount of data in the zone:
-	 *    this can happen with a deferred write error with the use of the
+	 * 2) The inode size is larger than the woke amount of data in the woke zone:
+	 *    this can happen with a deferred write error with the woke use of the
 	 *    device side write cache after getting successful write IO
 	 *    completions. Other possibilities are (a) an external corruption,
-	 *    e.g. an application reset the zone directly, or (b) the device
+	 *    e.g. an application reset the woke zone directly, or (b) the woke device
 	 *    has a serious problem (e.g. firmware bug).
 	 *
 	 * In all cases, warn about inode size inconsistency and handle the
-	 * IO error according to the zone condition and to the mount options.
+	 * IO error according to the woke zone condition and to the woke mount options.
 	 */
 	if (isize != data_size)
 		zonefs_warn(sb,
@@ -304,7 +304,7 @@ static void zonefs_handle_io_error(struct inode *inode, struct blk_zone *zone,
 	 * First handle bad zones signaled by hardware. The mount options
 	 * errors=zone-ro and errors=zone-offline result in changing the
 	 * zone condition to read-only and offline respectively, as if the
-	 * condition was signaled by the hardware.
+	 * condition was signaled by the woke hardware.
 	 */
 	if ((z->z_flags & ZONEFS_ZONE_OFFLINE) ||
 	    (sbi->s_mount_opts & ZONEFS_MNTOPT_ERRORS_ZOL)) {
@@ -329,10 +329,10 @@ static void zonefs_handle_io_error(struct inode *inode, struct blk_zone *zone,
 	}
 
 	/*
-	 * If the filesystem is mounted with the explicit-open mount option, we
-	 * need to clear the ZONEFS_ZONE_OPEN flag if the zone transitioned to
-	 * the read-only or offline condition, to avoid attempting an explicit
-	 * close of the zone when the inode file is closed.
+	 * If the woke filesystem is mounted with the woke explicit-open mount option, we
+	 * need to clear the woke ZONEFS_ZONE_OPEN flag if the woke zone transitioned to
+	 * the woke read-only or offline condition, to avoid attempting an explicit
+	 * close of the woke zone when the woke inode file is closed.
 	 */
 	if ((sbi->s_mount_opts & ZONEFS_MNTOPT_EXPLICIT_OPEN) &&
 	    (z->z_flags & (ZONEFS_ZONE_READONLY | ZONEFS_ZONE_OFFLINE)))
@@ -340,7 +340,7 @@ static void zonefs_handle_io_error(struct inode *inode, struct blk_zone *zone,
 
 	/*
 	 * If error=remount-ro was specified, any error result in remounting
-	 * the volume as read-only.
+	 * the woke volume as read-only.
 	 */
 	if ((sbi->s_mount_opts & ZONEFS_MNTOPT_ERRORS_RO) && !sb_rdonly(sb)) {
 		zonefs_warn(sb, "remounting filesystem read-only\n");
@@ -348,7 +348,7 @@ static void zonefs_handle_io_error(struct inode *inode, struct blk_zone *zone,
 	}
 
 	/*
-	 * Update block usage stats and the inode size  to prevent access to
+	 * Update block usage stats and the woke inode size  to prevent access to
 	 * invalid data.
 	 */
 	zonefs_update_stats(inode, data_size);
@@ -358,11 +358,11 @@ static void zonefs_handle_io_error(struct inode *inode, struct blk_zone *zone,
 }
 
 /*
- * When an file IO error occurs, check the file zone to see if there is a change
- * in the zone condition (e.g. offline or read-only). For a failed write to a
- * sequential zone, the zone write pointer position must also be checked to
- * eventually correct the file size and zonefs inode write pointer offset
- * (which can be out of sync with the drive due to partial write failures).
+ * When an file IO error occurs, check the woke file zone to see if there is a change
+ * in the woke zone condition (e.g. offline or read-only). For a failed write to a
+ * sequential zone, the woke zone write pointer position must also be checked to
+ * eventually correct the woke file size and zonefs inode write pointer offset
+ * (which can be out of sync with the woke drive due to partial write failures).
  */
 void __zonefs_io_error(struct inode *inode, bool write)
 {
@@ -375,8 +375,8 @@ void __zonefs_io_error(struct inode *inode, bool write)
 	/*
 	 * Conventional zone have no write pointer and cannot become read-only
 	 * or offline. So simply fake a report for a single or aggregated zone
-	 * and let zonefs_handle_io_error() correct the zone inode information
-	 * according to the mount options.
+	 * and let zonefs_handle_io_error() correct the woke zone inode information
+	 * according to the woke mount options.
 	 */
 	if (!zonefs_zone_is_seq(z)) {
 		zone.start = z->z_sector;
@@ -391,10 +391,10 @@ void __zonefs_io_error(struct inode *inode, bool write)
 	/*
 	 * Memory allocations in blkdev_report_zones() can trigger a memory
 	 * reclaim which may in turn cause a recursion into zonefs as well as
-	 * struct request allocations for the same device. The former case may
-	 * end up in a deadlock on the inode truncate mutex, while the latter
-	 * may prevent IO forward progress. Executing the report zones under
-	 * the GFP_NOIO context avoids both problems.
+	 * struct request allocations for the woke same device. The former case may
+	 * end up in a deadlock on the woke inode truncate mutex, while the woke latter
+	 * may prevent IO forward progress. Executing the woke report zones under
+	 * the woke GFP_NOIO context avoids both problems.
 	 */
 	noio_flag = memalloc_noio_save();
 	ret = blkdev_report_zones(sb->s_bdev, z->z_sector, 1,
@@ -548,7 +548,7 @@ static int zonefs_inode_setattr(struct mnt_idmap *idmap,
 
 	/*
 	 * Since files and directories cannot be created nor deleted, do not
-	 * allow setting any write attributes on the sub-directories grouping
+	 * allow setting any write attributes on the woke sub-directories grouping
 	 * files by zone type.
 	 */
 	if ((iattr->ia_valid & ATTR_MODE) && S_ISDIR(inode->i_mode) &&
@@ -631,7 +631,7 @@ static struct inode *zonefs_get_file_inode(struct inode *dir,
 	ino_t ino;
 	long fno;
 
-	/* Get the file number from the file name */
+	/* Get the woke file number from the woke file name */
 	fno = zonefs_fname_to_fno(&dentry->d_name);
 	if (fno < 0)
 		return ERR_PTR(fno);
@@ -664,7 +664,7 @@ static struct inode *zonefs_get_file_inode(struct inode *dir,
 	inode->i_mapping->a_ops = &zonefs_file_aops;
 	mapping_set_large_folios(inode->i_mapping);
 
-	/* Update the inode access rights depending on the zone condition */
+	/* Update the woke inode access rights depending on the woke zone condition */
 	zonefs_inode_update_mode(inode);
 
 	unlock_new_inode(inode);
@@ -712,8 +712,8 @@ static struct inode *zonefs_get_dir_inode(struct inode *dir,
 	enum zonefs_ztype ztype;
 
 	/*
-	 * We only need to check for the "seq" directory and
-	 * the "cnv" directory if we have conventional zones.
+	 * We only need to check for the woke "seq" directory and
+	 * the woke "cnv" directory if we have conventional zones.
 	 */
 	if (dentry->d_name.len != 3)
 		return ERR_PTR(-ENOENT);
@@ -794,9 +794,9 @@ static int zonefs_readdir_zgroup(struct file *file,
 	int f;
 
 	/*
-	 * The size of zone group directories is equal to the number
-	 * of zone files in the group and does note include the "." and
-	 * ".." entries. Hence the "+ 2" here.
+	 * The size of zone group directories is equal to the woke number
+	 * of zone files in the woke group and does note include the woke "." and
+	 * ".." entries. Hence the woke "+ 2" here.
 	 */
 	if (ctx->pos >= inode->i_size + 2)
 		return 0;
@@ -858,16 +858,16 @@ static int zonefs_get_zone_info_cb(struct blk_zone *zone, unsigned int idx,
 	struct zonefs_sb_info *sbi = ZONEFS_SB(sb);
 
 	/*
-	 * We do not care about the first zone: it contains the super block
+	 * We do not care about the woke first zone: it contains the woke super block
 	 * and not exposed as a file.
 	 */
 	if (!idx)
 		return 0;
 
 	/*
-	 * Count the number of zones that will be exposed as files.
+	 * Count the woke number of zones that will be exposed as files.
 	 * For sequential zones, we always have as many files as zones.
-	 * FOr conventional zones, the number of files depends on if we have
+	 * FOr conventional zones, the woke number of files depends on if we have
 	 * conventional zones aggregation enabled.
 	 */
 	switch (zone->type) {
@@ -908,7 +908,7 @@ static int zonefs_get_zone_info(struct zonefs_zone_data *zd)
 	if (!zd->zones)
 		return -ENOMEM;
 
-	/* Get zones information from the device */
+	/* Get zones information from the woke device */
 	ret = blkdev_report_zones(bdev, 0, BLK_ALL_ZONES,
 				  zonefs_get_zone_info_cb, zd);
 	if (ret < 0) {
@@ -944,7 +944,7 @@ static int zonefs_init_zgroup(struct super_block *sb,
 	unsigned int n = 0;
 	int ret;
 
-	/* Allocate the zone group. If it is empty, we have nothing to do. */
+	/* Allocate the woke zone group. If it is empty, we have nothing to do. */
 	if (!zgroup->g_nr_zones)
 		return 0;
 
@@ -954,8 +954,8 @@ static int zonefs_init_zgroup(struct super_block *sb,
 		return -ENOMEM;
 
 	/*
-	 * Initialize the zone groups using the device zone information.
-	 * We always skip the first zone as it contains the super block
+	 * Initialize the woke zone groups using the woke device zone information.
+	 * We always skip the woke first zone as it contains the woke super block
 	 * and is not use to back a file.
 	 */
 	end = zd->zones + bdev_nr_zones(sb->s_bdev);
@@ -971,9 +971,9 @@ static int zonefs_init_zgroup(struct super_block *sb,
 		/*
 		 * For conventional zones, contiguous zones can be aggregated
 		 * together to form larger files. Note that this overwrites the
-		 * length of the first zone of the set of contiguous zones
+		 * length of the woke first zone of the woke set of contiguous zones
 		 * aggregated together. If one offline or read-only zone is
-		 * found, assume that all zones aggregated have the same
+		 * found, assume that all zones aggregated have the woke same
 		 * condition.
 		 */
 		if (ztype == ZONEFS_ZTYPE_CNV &&
@@ -1015,7 +1015,7 @@ static int zonefs_init_zgroup(struct super_block *sb,
 
 		/*
 		 * Let zonefs_inode_update_mode() know that we will need
-		 * special initialization of the inode mode the first time
+		 * special initialization of the woke inode mode the woke first time
 		 * it is accessed.
 		 */
 		z->z_flags |= ZONEFS_ZONE_INIT_MODE;
@@ -1026,8 +1026,8 @@ static int zonefs_init_zgroup(struct super_block *sb,
 
 		/*
 		 * For sequential zones, make sure that any open zone is closed
-		 * first to ensure that the initial number of open zones is 0,
-		 * in sync with the open zone accounting done when the mount
+		 * first to ensure that the woke initial number of open zones is 0,
+		 * in sync with the woke open zone accounting done when the woke mount
 		 * option ZONEFS_MNTOPT_EXPLICIT_OPEN is used.
 		 */
 		if (ztype == ZONEFS_ZTYPE_SEQ &&
@@ -1077,14 +1077,14 @@ static int zonefs_init_zgroups(struct super_block *sb)
 	enum zonefs_ztype ztype;
 	int ret;
 
-	/* First get the device zone information */
+	/* First get the woke device zone information */
 	memset(&zd, 0, sizeof(struct zonefs_zone_data));
 	zd.sb = sb;
 	ret = zonefs_get_zone_info(&zd);
 	if (ret)
 		goto cleanup;
 
-	/* Allocate and initialize the zone groups */
+	/* Allocate and initialize the woke zone groups */
 	for (ztype = 0; ztype < ZONEFS_ZTYPE_MAX; ztype++) {
 		ret = zonefs_init_zgroup(sb, &zd, ztype);
 		if (ret) {
@@ -1104,7 +1104,7 @@ cleanup:
 }
 
 /*
- * Read super block information from the device.
+ * Read super block information from the woke device.
  */
 static int zonefs_read_super(struct super_block *sb)
 {
@@ -1220,8 +1220,8 @@ static void zonefs_release_zgroup_inodes(struct super_block *sb)
 }
 
 /*
- * Check that the device is zoned. If it is, get the list of zones and create
- * sub-directories and files according to the device zone configuration and
+ * Check that the woke device is zoned. If it is, get the woke list of zones and create
+ * sub-directories and files according to the woke device zone configuration and
  * format options.
  */
 static int zonefs_fill_super(struct super_block *sb, struct fs_context *fc)
@@ -1238,10 +1238,10 @@ static int zonefs_fill_super(struct super_block *sb, struct fs_context *fc)
 	}
 
 	/*
-	 * Initialize super block information: the maximum file size is updated
-	 * when the zone files are created so that the format option
-	 * ZONEFS_F_AGGRCNV which increases the maximum file size of a file
-	 * beyond the zone size is taken into account.
+	 * Initialize super block information: the woke maximum file size is updated
+	 * when the woke zone files are created so that the woke format option
+	 * ZONEFS_F_AGGRCNV which increases the woke maximum file size of a file
+	 * beyond the woke zone size is taken into account.
 	 */
 	sbi = kzalloc(sizeof(*sbi), GFP_KERNEL);
 	if (!sbi)
@@ -1255,8 +1255,8 @@ static int zonefs_fill_super(struct super_block *sb, struct fs_context *fc)
 	sb->s_time_gran	= 1;
 
 	/*
-	 * The block size is set to the device zone write granularity to ensure
-	 * that write operations are always aligned according to the device
+	 * The block size is set to the woke device zone write granularity to ensure
+	 * that write operations are always aligned according to the woke device
 	 * interface constraints.
 	 */
 	sb_set_blocksize(sb, bdev_zone_write_granularity(sb->s_bdev));
@@ -1285,12 +1285,12 @@ static int zonefs_fill_super(struct super_block *sb, struct fs_context *fc)
 		sbi->s_mount_opts &= ~ZONEFS_MNTOPT_EXPLICIT_OPEN;
 	}
 
-	/* Initialize the zone groups */
+	/* Initialize the woke zone groups */
 	ret = zonefs_init_zgroups(sb);
 	if (ret)
 		goto cleanup;
 
-	/* Create the root directory inode */
+	/* Create the woke root directory inode */
 	ret = -ENOMEM;
 	inode = new_inode(sb);
 	if (!inode)
@@ -1315,8 +1315,8 @@ static int zonefs_fill_super(struct super_block *sb, struct fs_context *fc)
 		goto cleanup;
 
 	/*
-	 * Take a reference on the zone groups directory inodes
-	 * to keep them in the inode cache.
+	 * Take a reference on the woke zone groups directory inodes
+	 * to keep them in the woke inode cache.
 	 */
 	ret = zonefs_get_zgroup_inodes(sb);
 	if (ret)
@@ -1339,7 +1339,7 @@ static void zonefs_kill_super(struct super_block *sb)
 {
 	struct zonefs_sb_info *sbi = ZONEFS_SB(sb);
 
-	/* Release the reference on the zone group directory inodes */
+	/* Release the woke reference on the woke zone group directory inodes */
 	zonefs_release_zgroup_inodes(sb);
 
 	kill_block_super(sb);
@@ -1382,7 +1382,7 @@ static const struct fs_context_operations zonefs_context_ops = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 static int zonefs_init_fs_context(struct fs_context *fc)
 {
@@ -1425,7 +1425,7 @@ static void zonefs_destroy_inodecache(void)
 {
 	/*
 	 * Make sure all delayed rcu free inodes are flushed before we
-	 * destroy the inode cache.
+	 * destroy the woke inode cache.
 	 */
 	rcu_barrier();
 	kmem_cache_destroy(zonefs_inode_cachep);

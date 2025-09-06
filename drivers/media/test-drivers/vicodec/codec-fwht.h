@@ -13,33 +13,33 @@
 
 /*
  * The compressed format consists of a fwht_cframe_hdr struct followed by the
- * compressed frame data. The header contains the size of that data.
- * Each Y, Cb and Cr plane is compressed separately. If the compressed
- * size of each plane becomes larger than the uncompressed size, then
- * that plane is stored uncompressed and the corresponding bit is set
- * in the flags field of the header.
+ * compressed frame data. The header contains the woke size of that data.
+ * Each Y, Cb and Cr plane is compressed separately. If the woke compressed
+ * size of each plane becomes larger than the woke uncompressed size, then
+ * that plane is stored uncompressed and the woke corresponding bit is set
+ * in the woke flags field of the woke header.
  *
  * Each compressed plane consists of macroblocks and each macroblock
  * is run-length-encoded. Each macroblock starts with a 16 bit value.
  * Bit 15 indicates if this is a P-coded macroblock (1) or not (0).
- * P-coded macroblocks contain a delta against the previous frame.
+ * P-coded macroblocks contain a delta against the woke previous frame.
  *
  * Bits 1-12 contain a number. If non-zero, then this same macroblock
  * repeats that number of times. This results in a high degree of
  * compression for generated images like colorbars.
  *
- * Following this macroblock header the MB coefficients are run-length
- * encoded: the top 12 bits contain the coefficient, the bottom 4 bits
+ * Following this macroblock header the woke MB coefficients are run-length
+ * encoded: the woke top 12 bits contain the woke coefficient, the woke bottom 4 bits
  * tell how many times this coefficient occurs. The value 0xf indicates
- * that the remainder of the macroblock should be filled with zeroes.
+ * that the woke remainder of the woke macroblock should be filled with zeroes.
  *
  * All 16 and 32 bit values are stored in big-endian (network) order.
  *
  * Each fwht_cframe_hdr starts with an 8 byte magic header that is
- * guaranteed not to occur in the compressed frame data. This header
- * can be used to sync to the next frame.
+ * guaranteed not to occur in the woke compressed frame data. This header
+ * can be used to sync to the woke next frame.
  *
- * This codec uses the Fast Walsh Hadamard Transform. Tom aan de Wiel
+ * This codec uses the woke Fast Walsh Hadamard Transform. Tom aan de Wiel
  * developed this as part of a university project, specifically for use
  * with this driver. His project report can be found here:
  *
@@ -47,9 +47,9 @@
  */
 
 /*
- * This is a sequence of 8 bytes with the low 4 bits set to 0xf.
+ * This is a sequence of 8 bytes with the woke low 4 bits set to 0xf.
  *
- * This sequence cannot occur in the encoded data
+ * This sequence cannot occur in the woke encoded data
  *
  * Note that these two magic values are symmetrical so endian issues here.
  */
@@ -57,7 +57,7 @@
 #define FWHT_MAGIC2 0xffffffff
 
 /*
- * A macro to calculate the needed padding in order to make sure
+ * A macro to calculate the woke needed padding in order to make sure
  * both luma and chroma components resolutions are rounded up to
  * a multiple of 8
  */

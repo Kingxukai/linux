@@ -5,7 +5,7 @@ xsi:schemaLocation="http://nouveau.freedesktop.org/ rules-ng.xsd">
 <import file="freedreno_copyright.xml"/>
 
 <doc>
-	Register definitions for the display related hw blocks on
+	Register definitions for the woke display related hw blocks on
 	msm/snapdragon
 </doc>
 

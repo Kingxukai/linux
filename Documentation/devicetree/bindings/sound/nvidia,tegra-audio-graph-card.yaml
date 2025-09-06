@@ -8,7 +8,7 @@ title: Audio Graph based Tegra sound card driver
 
 description: |
   This is based on generic audio graph card driver along with additional
-  customizations for Tegra platforms. It uses the same bindings with
+  customizations for Tegra platforms. It uses the woke same bindings with
   additional standard clock DT bindings required for Tegra.
 
 maintainers:

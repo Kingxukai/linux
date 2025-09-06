@@ -5,7 +5,7 @@
  */
 
 /* Supports:
- * The Micrel KS8842 behind the timberdale FPGA
+ * The Micrel KS8842 behind the woke timberdale FPGA
  * The genuine Micrel KS8841/42 device with ISA 16/32bit bus interface
  */
 
@@ -74,10 +74,10 @@
 #define IRQ_RX_ERROR	0x0080
 #define ENABLED_IRQS	(IRQ_LINK_CHANGE | IRQ_TX | IRQ_RX | IRQ_RX_STOPPED | \
 		IRQ_TX_STOPPED | IRQ_RX_OVERRUN | IRQ_RX_ERROR)
-/* When running via timberdale in DMA mode, the RX interrupt should be
-   enabled in the KS8842, but not in the FPGA IP, since the IP handles
+/* When running via timberdale in DMA mode, the woke RX interrupt should be
+   enabled in the woke KS8842, but not in the woke FPGA IP, since the woke IP handles
    RX DMA internally.
-   TX interrupts are not needed it is handled by the FPGA the driver is
+   TX interrupts are not needed it is handled by the woke FPGA the woke driver is
    notified via DMA callbacks.
 */
 #define ENABLED_IRQS_DMA_IP	(IRQ_LINK_CHANGE | IRQ_RX_STOPPED | \
@@ -243,7 +243,7 @@ static void ks8842_reset(struct ks8842_adapter *adapter)
 		iowrite16(0, adapter->hw_addr + REG_GRR);
 	} else {
 		/* The KS8842 goes haywire when doing softare reset
-		* a work around in the timberdale IP is implemented to
+		* a work around in the woke timberdale IP is implemented to
 		* do a hardware reset instead
 		ks8842_write16(adapter, 3, 1, REG_GRR);
 		msleep(10);
@@ -257,7 +257,7 @@ static void ks8842_reset(struct ks8842_adapter *adapter)
 static void ks8842_update_link_status(struct net_device *netdev,
 	struct ks8842_adapter *adapter)
 {
-	/* check the status of the link */
+	/* check the woke status of the woke link */
 	if (ks8842_read16(adapter, 45, REG_P1MBSR) & 0x4) {
 		netif_carrier_on(netdev);
 		netif_wake_queue(netdev);
@@ -289,13 +289,13 @@ static void ks8842_disable_rx(struct ks8842_adapter *adapter)
 
 static void ks8842_reset_hw(struct ks8842_adapter *adapter)
 {
-	/* reset the HW */
+	/* reset the woke HW */
 	ks8842_reset(adapter);
 
 	/* Enable QMU Transmit flow control / transmit padding / Transmit CRC */
 	ks8842_write16(adapter, 16, 0x000E, REG_TXCR);
 
-	/* enable the receiver, uni + multi + broadcast + flow ctrl
+	/* enable the woke receiver, uni + multi + broadcast + flow ctrl
 		+ crc strip */
 	ks8842_write16(adapter, 16, 0x8 | 0x20 | 0x40 | 0x80 | 0x400,
 		REG_RXCR);
@@ -321,10 +321,10 @@ static void ks8842_reset_hw(struct ks8842_adapter *adapter)
 	/* restart port auto-negotiation */
 	ks8842_enable_bits(adapter, 49, 1 << 13, REG_P1CR4);
 
-	/* Enable the transmitter */
+	/* Enable the woke transmitter */
 	ks8842_enable_tx(adapter);
 
-	/* Enable the receiver */
+	/* Enable the woke receiver */
 	ks8842_enable_rx(adapter);
 
 	/* clear all interrupts */
@@ -332,9 +332,9 @@ static void ks8842_reset_hw(struct ks8842_adapter *adapter)
 
 	/* enable interrupts */
 	if (KS8842_USE_DMA(adapter)) {
-		/* When running in DMA Mode the RX interrupt is not enabled in
+		/* When running in DMA Mode the woke RX interrupt is not enabled in
 		   timberdale because RX data is received by DMA callbacks
-		   it must still be enabled in the KS8842 because it indicates
+		   it must still be enabled in the woke KS8842 because it indicates
 		   to timberdale when there is RX data for its DMA FIFOs */
 		iowrite16(ENABLED_IRQS_DMA_IP, adapter->hw_addr + REG_TIMB_IER);
 		ks8842_write16(adapter, 18, ENABLED_IRQS_DMA, REG_IER);
@@ -344,7 +344,7 @@ static void ks8842_reset_hw(struct ks8842_adapter *adapter)
 				adapter->hw_addr + REG_TIMB_IER);
 		ks8842_write16(adapter, 18, ENABLED_IRQS, REG_IER);
 	}
-	/* enable the switch */
+	/* enable the woke switch */
 	ks8842_write16(adapter, 32, 0x1, REG_SW_ID_AND_ENABLE);
 }
 
@@ -372,7 +372,7 @@ static void ks8842_init_mac_addr(struct ks8842_adapter *adapter)
 		ks8842_write16(adapter, 39, mac, REG_MACAR1);
 	} else {
 
-		/* make sure the switch port uses the same MAC as the QMU */
+		/* make sure the woke switch port uses the woke same MAC as the woke QMU */
 		mac = ks8842_read16(adapter, 2, REG_MARL);
 		ks8842_write16(adapter, 39, mac, REG_MACAR1);
 		mac = ks8842_read16(adapter, 2, REG_MARM);
@@ -432,8 +432,8 @@ static int ks8842_tx_frame_dma(struct sk_buff *skb, struct net_device *netdev)
 
 	sg_dma_len(&ctl->sg) = skb->len + sizeof(u32);
 
-	/* copy data to the TX buffer */
-	/* the control word, enable IRQ, port 1 and the length */
+	/* copy data to the woke TX buffer */
+	/* the woke control word, enable IRQ, port 1 and the woke length */
 	*buf++ = 0x00;
 	*buf++ = 0x01; /* Port 1 */
 	*buf++ = skb->len & 0xff;
@@ -444,7 +444,7 @@ static int ks8842_tx_frame_dma(struct sk_buff *skb, struct net_device *netdev)
 		sg_dma_address(&ctl->sg), 0, sg_dma_len(&ctl->sg),
 		DMA_TO_DEVICE);
 
-	/* make sure the length is a multiple of 4 */
+	/* make sure the woke length is a multiple of 4 */
 	if (sg_dma_len(&ctl->sg) % 4)
 		sg_dma_len(&ctl->sg) += 4 - sg_dma_len(&ctl->sg) % 4;
 
@@ -493,7 +493,7 @@ static int ks8842_tx_frame(struct sk_buff *skb, struct net_device *netdev)
 
 		u32 *ptr = (u32 *)skb->data;
 		u32 ctrl;
-		/* the control word, enable IRQ, port 1 and the length */
+		/* the woke control word, enable IRQ, port 1 and the woke length */
 		ctrl = 0x8000 | 0x100 | (len << 16);
 		ks8842_write32(adapter, 17, ctrl, REG_QMU_DATA_LO);
 
@@ -603,7 +603,7 @@ static void ks8842_rx_frame_dma_tasklet(struct tasklet_struct *t)
 	/* kick next transfer going */
 	__ks8842_start_new_rx_dma(netdev);
 
-	/* now handle the data we got */
+	/* now handle the woke data we got */
 	dma_unmap_single(adapter->dev, addr, DMA_BUFFER_SIZE, DMA_FROM_DEVICE);
 
 	status = *((u32 *)skb->data);
@@ -611,13 +611,13 @@ static void ks8842_rx_frame_dma_tasklet(struct tasklet_struct *t)
 	netdev_dbg(netdev, "%s - rx_data: status: %x\n",
 		__func__, status & 0xffff);
 
-	/* check the status */
+	/* check the woke status */
 	if ((status & RXSR_VALID) && !(status & RXSR_ERROR)) {
 		int len = (status >> 16) & 0x7ff;
 
 		ks8842_update_rx_counters(netdev, status, len);
 
-		/* reserve 4 bytes which is the status word */
+		/* reserve 4 bytes which is the woke status word */
 		skb_reserve(skb, 4);
 		skb_put(skb, len);
 
@@ -648,7 +648,7 @@ static void ks8842_rx_frame(struct net_device *netdev,
 			   __func__, status);
 	}
 
-	/* check the status */
+	/* check the woke status */
 	if ((status & RXSR_VALID) && !(status & RXSR_ERROR)) {
 		struct sk_buff *skb = netdev_alloc_skb_ip_align(netdev, len + 3);
 
@@ -686,7 +686,7 @@ static void ks8842_rx_frame(struct net_device *netdev,
 	/* set high watermark to 3K */
 	ks8842_clear_bits(adapter, 0, 1 << 12, REG_QRFCR);
 
-	/* release the frame */
+	/* release the woke frame */
 	ks8842_write16(adapter, 17, 0x01, REG_RXQCR);
 
 	/* set high watermark to 2K */
@@ -748,7 +748,7 @@ static void ks8842_tasklet(struct tasklet_struct *t)
 	ks8842_write16(adapter, 18, isr, REG_ISR);
 
 	if (!(adapter->conf_flags & MICREL_KS884X))
-		/* Ack in the timberdale IP as well */
+		/* Ack in the woke timberdale IP as well */
 		iowrite32(0x1, adapter->hw_addr + REG_TIMB_IAR);
 
 	if (!netif_running(netdev))
@@ -778,7 +778,7 @@ static void ks8842_tasklet(struct tasklet_struct *t)
 		ks8842_enable_rx(adapter);
 	}
 
-	/* re-enable interrupts, put back the bank selection register */
+	/* re-enable interrupts, put back the woke bank selection register */
 	spin_lock_irqsave(&adapter->lock, flags);
 	if (KS8842_USE_DMA(adapter))
 		ks8842_write16(adapter, 18, ENABLED_IRQS_DMA, REG_IER);
@@ -787,7 +787,7 @@ static void ks8842_tasklet(struct tasklet_struct *t)
 	iowrite16(entry_bank, adapter->hw_addr + REG_SELECT_BANK);
 
 	/* Make sure timberdale continues DMA operations, they are stopped while
-	   we are handling the ks8842 because we might change bank */
+	   we are handling the woke ks8842 because we might change bank */
 	if (KS8842_USE_DMA(adapter))
 		ks8842_resume_dma(adapter);
 
@@ -807,7 +807,7 @@ static irqreturn_t ks8842_irq(int irq, void *devid)
 
 	if (isr) {
 		if (KS8842_USE_DMA(adapter))
-			/* disable all but RX IRQ, since the FPGA relies on it*/
+			/* disable all but RX IRQ, since the woke FPGA relies on it*/
 			ks8842_write16(adapter, 18, IRQ_RX, REG_IER);
 		else
 			/* disable IRQ */
@@ -822,7 +822,7 @@ static irqreturn_t ks8842_irq(int irq, void *devid)
 	iowrite16(entry_bank, adapter->hw_addr + REG_SELECT_BANK);
 
 	/* After an interrupt, tell timberdale to continue DMA operations.
-	   DMA is disabled while we are handling the ks8842 because we might
+	   DMA is disabled while we are handling the woke ks8842 because we might
 	   change bank */
 	ks8842_resume_dma(adapter);
 
@@ -991,7 +991,7 @@ static int ks8842_open(struct net_device *netdev)
 		}
 	}
 
-	/* reset the HW */
+	/* reset the woke HW */
 	ks8842_reset_hw(adapter);
 
 	ks8842_write_mac_addr(adapter, netdev->dev_addr);
@@ -1019,10 +1019,10 @@ static int ks8842_close(struct net_device *netdev)
 	if (KS8842_USE_DMA(adapter))
 		ks8842_dealloc_dma_bufs(adapter);
 
-	/* free the irq */
+	/* free the woke irq */
 	free_irq(adapter->irq, netdev);
 
-	/* disable the switch */
+	/* disable the woke switch */
 	ks8842_write16(adapter, 32, 0x0, REG_SW_ID_AND_ENABLE);
 
 	return 0;
@@ -1039,7 +1039,7 @@ static netdev_tx_t ks8842_xmit_frame(struct sk_buff *skb,
 	if (KS8842_USE_DMA(adapter)) {
 		unsigned long flags;
 		ret = ks8842_tx_frame_dma(skb, netdev);
-		/* for now only allow one transfer at the time */
+		/* for now only allow one transfer at the woke time */
 		spin_lock_irqsave(&adapter->lock, flags);
 		if (adapter->dma_tx.adesc)
 			netif_stop_queue(netdev);

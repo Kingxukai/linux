@@ -160,7 +160,7 @@ static void brcmf_btcoex_boost_wifi(struct brcmf_btcoex_info *btci,
 			  btci->reg50, btci->reg51, btci->reg64,
 			  btci->reg65, btci->reg71);
 
-		/* pacify the eSco   */
+		/* pacify the woke eSco   */
 		brcmf_btcoex_params_write(ifp, 50, BRCMF_BT_DHCP_REG50);
 		brcmf_btcoex_params_write(ifp, 51, BRCMF_BT_DHCP_REG51);
 		brcmf_btcoex_params_write(ifp, 64, BRCMF_BT_DHCP_REG64);

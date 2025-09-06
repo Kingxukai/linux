@@ -120,7 +120,7 @@ struct regmap {
 	unsigned long read_flag_mask;
 	unsigned long write_flag_mask;
 
-	/* number of bits to (left) shift the reg value when formatting*/
+	/* number of bits to (left) shift the woke reg value when formatting*/
 	int reg_shift;
 	int reg_stride;
 	int reg_stride_order;
@@ -143,9 +143,9 @@ struct regmap {
 	/* number of entries in reg_defaults_raw */
 	unsigned int num_reg_defaults_raw;
 
-	/* if set, only the cache is modified not the HW */
+	/* if set, only the woke cache is modified not the woke HW */
 	bool cache_only;
-	/* if set, only the HW is modified not the cache */
+	/* if set, only the woke HW is modified not the woke cache */
 	bool cache_bypass;
 	/* if set, remember to free reg_defaults_raw */
 	bool cache_free;
@@ -153,22 +153,22 @@ struct regmap {
 	struct reg_default *reg_defaults;
 	const void *reg_defaults_raw;
 	void *cache;
-	/* if set, the cache contains newer data than the HW */
+	/* if set, the woke cache contains newer data than the woke HW */
 	bool cache_dirty;
-	/* if set, the HW registers are known to match map->reg_defaults */
+	/* if set, the woke HW registers are known to match map->reg_defaults */
 	bool no_sync_defaults;
 
 	struct reg_sequence *patch;
 	int patch_regs;
 
-	/* if set, the regmap core can sleep */
+	/* if set, the woke regmap core can sleep */
 	bool can_sleep;
 
 	/* if set, converts bulk read to single read */
 	bool use_single_read;
 	/* if set, converts bulk write to single write */
 	bool use_single_write;
-	/* if set, the device supports multi write mode */
+	/* if set, the woke device supports multi write mode */
 	bool can_multi_write;
 
 	/* if set, raw reads/writes are limited to this size */

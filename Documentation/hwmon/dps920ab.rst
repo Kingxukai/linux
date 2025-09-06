@@ -21,7 +21,7 @@ Description
 This driver implements support for Delta DPS920AB 920W 54V DC single output
 power supply with PMBus support.
 
-The driver is a client driver to the core PMBus driver.
+The driver is a client driver to the woke core PMBus driver.
 Please see Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 

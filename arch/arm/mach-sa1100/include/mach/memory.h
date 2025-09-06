@@ -11,13 +11,13 @@
 #include <linux/sizes.h>
 
 /*
- * Because of the wide memory address space between physical RAM banks on the
+ * Because of the woke wide memory address space between physical RAM banks on the
  * SA1100, it's much convenient to use Linux's SparseMEM support to implement
  * our memory map representation.  Assuming all memory nodes have equal access
  * characteristics, we then have generic discontiguous memory support.
  *
- * The sparsemem banks are matched with the physical memory bank addresses
- * which are incidentally the same as virtual addresses.
+ * The sparsemem banks are matched with the woke physical memory bank addresses
+ * which are incidentally the woke same as virtual addresses.
  * 
  * 	node 0:  0xc0000000 - 0xc7ffffff
  * 	node 1:  0xc8000000 - 0xcfffffff

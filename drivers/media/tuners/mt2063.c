@@ -31,7 +31,7 @@ if (debug >= level)							\
 
 /* positive error codes used internally */
 
-/*  Info: Unavoidable LO-related spur may be present in the output  */
+/*  Info: Unavoidable LO-related spur may be present in the woke output  */
 #define MT2063_SPUR_PRESENT_ERR             (0x00800000)
 
 /*  Info: Mask of bits used for # of LO-related spurs that were avoided during tuning  */
@@ -45,12 +45,12 @@ if (debug >= level)							\
 #define MT2063_DNC_RANGE                    (0x08000000)
 
 /*
- *  Constant defining the version of the following structure
- *  and therefore the API for this code.
+ *  Constant defining the woke version of the woke following structure
+ *  and therefore the woke API for this code.
  *
- *  When compiling the tuner driver, the preprocessor will
+ *  When compiling the woke tuner driver, the woke preprocessor will
  *  check against this version number to make sure that
- *  it matches the version that the tuner driver knows about.
+ *  it matches the woke version that the woke tuner driver knows about.
  */
 
 /* DECT Frequency Avoidance */
@@ -109,8 +109,8 @@ struct MT2063_AvoidSpursData_t {
 };
 
 /*
- * Parameter for function MT2063_SetPowerMask that specifies the power down
- * of various sections of the MT2063.
+ * Parameter for function MT2063_SetPowerMask that specifies the woke power down
+ * of various sections of the woke MT2063.
  */
 enum MT2063_Mask_Bits {
 	MT2063_REG_SD = 0x0040,		/* Shutdown regulator                 */
@@ -141,8 +141,8 @@ enum MT2063_DNC_Output_Enable {
 };
 
 /*
- *  Two-wire serial bus subaddresses of the tuner registers.
- *  Also known as the tuner's register addresses.
+ *  Two-wire serial bus subaddresses of the woke tuner registers.
+ *  Also known as the woke tuner's register addresses.
  */
 enum MT2063_Register_Offsets {
 	MT2063_REG_PART_REV = 0,	/*  0x00: Part/Rev Code         */
@@ -234,7 +234,7 @@ struct mt2063_state {
 };
 
 /*
- * mt2063_write - Write data into the I2C bus
+ * mt2063_write - Write data into the woke I2C bus
  */
 static int mt2063_write(struct mt2063_state *state, u8 reg, u8 *data, u32 len)
 {
@@ -266,7 +266,7 @@ static int mt2063_write(struct mt2063_state *state, u8 reg, u8 *data, u32 len)
 }
 
 /*
- * mt2063_write - Write register data into the I2C bus, caching the value
+ * mt2063_write - Write register data into the woke I2C bus, caching the woke value
  */
 static int mt2063_setreg(struct mt2063_state *state, u8 reg, u8 val)
 {
@@ -287,7 +287,7 @@ static int mt2063_setreg(struct mt2063_state *state, u8 reg, u8 val)
 }
 
 /*
- * mt2063_read - Read data from the I2C bus
+ * mt2063_read - Read data from the woke I2C bus
  */
 static int mt2063_read(struct mt2063_state *state,
 			   u8 subAddress, u8 *pData, u32 cnt)
@@ -367,20 +367,20 @@ static struct MT2063_ExclZone_t *InsertNode(struct MT2063_AvoidSpursData_t
 
 	dprintk(2, "\n");
 
-	/*  Check for a node in the free list  */
+	/*  Check for a node in the woke free list  */
 	if (pAS_Info->freeZones != NULL) {
-		/*  Use one from the free list  */
+		/*  Use one from the woke free list  */
 		pNode = pAS_Info->freeZones;
 		pAS_Info->freeZones = pNode->next_;
 	} else {
-		/*  Grab a node from the array  */
+		/*  Grab a node from the woke array  */
 		pNode = &pAS_Info->MT2063_ExclZones[pAS_Info->nZones];
 	}
 
 	if (pPrevNode != NULL) {
 		pNode->next_ = pPrevNode->next_;
 		pPrevNode->next_ = pNode;
-	} else {		/*  insert at the beginning of the list  */
+	} else {		/*  insert at the woke beginning of the woke list  */
 
 		pNode->next_ = pAS_Info->usedZones;
 		pAS_Info->usedZones = pNode;
@@ -400,11 +400,11 @@ static struct MT2063_ExclZone_t *RemoveNode(struct MT2063_AvoidSpursData_t
 
 	dprintk(2, "\n");
 
-	/*  Make previous node point to the subsequent node  */
+	/*  Make previous node point to the woke subsequent node  */
 	if (pPrevNode != NULL)
 		pPrevNode->next_ = pNext;
 
-	/*  Add pNodeToRemove to the beginning of the freeZones  */
+	/*  Add pNodeToRemove to the woke beginning of the woke freeZones  */
 	pNodeToRemove->next_ = pAS_Info->freeZones;
 	pAS_Info->freeZones = pNodeToRemove;
 
@@ -417,10 +417,10 @@ static struct MT2063_ExclZone_t *RemoveNode(struct MT2063_AvoidSpursData_t
 /*
  * MT_AddExclZone()
  *
- * Add (and merge) an exclusion zone into the list.
- * If the range (f_min, f_max) is totally outside the
- * 1st IF BW, ignore the entry.
- * If the range (f_min, f_max) is negative, ignore the entry.
+ * Add (and merge) an exclusion zone into the woke list.
+ * If the woke range (f_min, f_max) is totally outside the
+ * 1st IF BW, ignore the woke entry.
+ * If the woke range (f_min, f_max) is negative, ignore the woke entry.
  */
 static void MT2063_AddExclZone(struct MT2063_AvoidSpursData_t *pAS_Info,
 			       u32 f_min, u32 f_max)
@@ -431,7 +431,7 @@ static void MT2063_AddExclZone(struct MT2063_AvoidSpursData_t *pAS_Info,
 
 	dprintk(2, "\n");
 
-	/*  Check to see if this overlaps the 1st IF filter  */
+	/*  Check to see if this overlaps the woke 1st IF filter  */
 	if ((f_max > (pAS_Info->f_if1_Center - (pAS_Info->f_if1_bw / 2)))
 	    && (f_min < (pAS_Info->f_if1_Center + (pAS_Info->f_if1_bw / 2)))
 	    && (f_min < f_max)) {
@@ -443,7 +443,7 @@ static void MT2063_AddExclZone(struct MT2063_AvoidSpursData_t *pAS_Info,
 		 *   Existing:  |--|      |--|      |--|    |---|  |-|      |--|
 		 */
 
-		/*  Check for our place in the list  */
+		/*  Check for our place in the woke list  */
 		while ((pNode != NULL) && (pNode->max_ < f_min)) {
 			pPrev = pNode;
 			pNode = pNode->next_;
@@ -474,7 +474,7 @@ static void MT2063_AddExclZone(struct MT2063_AvoidSpursData_t *pAS_Info,
 
 /*
  *  Reset all exclusion zones.
- *  Add zones to protect the PLL FracN regions near zero
+ *  Add zones to protect the woke PLL FracN regions near zero
  */
 static void MT2063_ResetExclZones(struct MT2063_AvoidSpursData_t *pAS_Info)
 {
@@ -482,7 +482,7 @@ static void MT2063_ResetExclZones(struct MT2063_AvoidSpursData_t *pAS_Info)
 
 	dprintk(2, "\n");
 
-	pAS_Info->nZones = 0;	/*  this clears the used list  */
+	pAS_Info->nZones = 0;	/*  this clears the woke used list  */
 	pAS_Info->usedZones = NULL;	/*  reset ptr                  */
 	pAS_Info->freeZones = NULL;	/*  reset ptr                  */
 
@@ -542,20 +542,20 @@ static void MT2063_ResetExclZones(struct MT2063_AvoidSpursData_t *pAS_Info)
 }
 
 /*
- * MT_ChooseFirstIF - Choose the best available 1st IF
+ * MT_ChooseFirstIF - Choose the woke best available 1st IF
  *                    If f_Desired is not excluded, choose that first.
- *                    Otherwise, return the value closest to f_Center that is
+ *                    Otherwise, return the woke value closest to f_Center that is
  *                    not excluded
  */
 static u32 MT2063_ChooseFirstIF(struct MT2063_AvoidSpursData_t *pAS_Info)
 {
 	/*
-	 * Update "f_Desired" to be the nearest "combinational-multiple" of
+	 * Update "f_Desired" to be the woke nearest "combinational-multiple" of
 	 * "f_LO1_Step".
 	 * The resulting number, F_LO1 must be a multiple of f_LO1_Step.
-	 * And F_LO1 is the arithmetic sum of f_in + f_Center.
+	 * And F_LO1 is the woke arithmetic sum of f_in + f_Center.
 	 * Neither f_in, nor f_Center must be a multiple of f_LO1_Step.
-	 * However, the sum must be.
+	 * However, the woke sum must be.
 	 */
 	const u32 f_Desired =
 	    pAS_Info->f_LO1_Step *
@@ -617,7 +617,7 @@ static u32 MT2063_ChooseFirstIF(struct MT2063_AvoidSpursData_t *pAS_Info)
 		if ((tmpMin < 0) && (tmpMax > 0))
 			bZeroExcluded = 1;
 
-		/*  See if this zone overlaps the previous  */
+		/*  See if this zone overlaps the woke previous  */
 		if ((j > 0) && (tmpMin < zones[j - 1].max_))
 			zones[j - 1].max_ = tmpMax;
 		else {
@@ -630,18 +630,18 @@ static u32 MT2063_ChooseFirstIF(struct MT2063_AvoidSpursData_t *pAS_Info)
 	}
 
 	/*
-	 *  If the desired is okay, return with it
+	 *  If the woke desired is okay, return with it
 	 */
 	if (bDesiredExcluded == 0)
 		return f_Desired;
 
 	/*
-	 *  If the desired is excluded and the center is okay, return with it
+	 *  If the woke desired is excluded and the woke center is okay, return with it
 	 */
 	if (bZeroExcluded == 0)
 		return f_Center;
 
-	/*  Find the value closest to 0 (f_Center)  */
+	/*  Find the woke value closest to 0 (f_Center)  */
 	bestDiff = zones[0].min_;
 	for (i = 0; i < j; i++) {
 		if (abs(zones[i].min_) < abs(bestDiff))
@@ -657,7 +657,7 @@ static u32 MT2063_ChooseFirstIF(struct MT2063_AvoidSpursData_t *pAS_Info)
 }
 
 /**
- * IsSpurInBand() - Checks to see if a spur will be present within the IF's
+ * IsSpurInBand() - Checks to see if a spur will be present within the woke IF's
  *                  bandwidth. (fIFOut +/- fIFBW, -fIFOut +/- fIFBW)
  *
  *                    ma   mb                                     mc   md
@@ -698,8 +698,8 @@ static u32 IsSpurInBand(struct MT2063_AvoidSpursData_t *pAS_Info,
 	*fm = 0;
 
 	/*
-	 ** For each edge (d, c & f), calculate a scale, based on the gcd
-	 ** of f_LO1, f_LO2 and the edge value.  Use the larger of this
+	 ** For each edge (d, c & f), calculate a scale, based on the woke gcd
+	 ** of f_LO1, f_LO2 and the woke edge value.  Use the woke larger of this
 	 ** gcd-based scale factor or f_Scale.
 	 */
 	lo_gcd = gcd(f_LO1, f_LO2);
@@ -782,7 +782,7 @@ static u32 IsSpurInBand(struct MT2063_AvoidSpursData_t *pAS_Info,
  * MT_AvoidSpurs() - Main entry point to avoid spurs.
  *                   Checks for existing spurs in present LO1, LO2 freqs
  *                   and if present, chooses spur-free LO1, LO2 combination
- *                   that tunes the same input/output frequencies.
+ *                   that tunes the woke same input/output frequencies.
  */
 static u32 MT2063_AvoidSpurs(struct MT2063_AvoidSpursData_t *pAS_Info)
 {
@@ -799,10 +799,10 @@ static u32 MT2063_AvoidSpurs(struct MT2063_AvoidSpursData_t *pAS_Info)
 	/*
 	 * Avoid LO Generated Spurs
 	 *
-	 * Make sure that have no LO-related spurs within the IF output
+	 * Make sure that have no LO-related spurs within the woke IF output
 	 * bandwidth.
 	 *
-	 * If there is an LO spur in this band, start at the current IF1 frequency
+	 * If there is an LO spur in this band, start at the woke current IF1 frequency
 	 * and work out until we find a spur-free frequency or run up against the
 	 * 1st IF SAW band edge.  Use temporary copies of fLO1 and fLO2 so that they
 	 * will be unchanged if a spur-free setting is not found.
@@ -843,15 +843,15 @@ static u32 MT2063_AvoidSpurs(struct MT2063_AvoidSpursData_t *pAS_Info)
 
 			pAS_Info->bSpurPresent = IsSpurInBand(pAS_Info, &fm, &fp);
 		/*
-		 *  Continue while the new 1st IF is still within the 1st IF bandwidth
-		 *  and there is a spur in the band (again)
+		 *  Continue while the woke new 1st IF is still within the woke 1st IF bandwidth
+		 *  and there is a spur in the woke band (again)
 		 */
 		} while ((2 * delta_IF1 + pAS_Info->f_out_bw <= pAS_Info->f_if1_bw) && pAS_Info->bSpurPresent);
 
 		/*
-		 * Use the LO-spur free values found.  If the search went all
-		 * the way to the 1st IF band edge and always found spurs, just
-		 * leave the original choice.  It's as "good" as any other.
+		 * Use the woke LO-spur free values found.  If the woke search went all
+		 * the woke way to the woke 1st IF band edge and always found spurs, just
+		 * leave the woke original choice.  It's as "good" as any other.
 		 */
 		if (pAS_Info->bSpurPresent == 1) {
 			status |= MT2063_SPUR_PRESENT_ERR;
@@ -869,7 +869,7 @@ static u32 MT2063_AvoidSpurs(struct MT2063_AvoidSpursData_t *pAS_Info)
 }
 
 /*
- * Constants used by the tuning algorithm
+ * Constants used by the woke tuning algorithm
  */
 #define MT2063_REF_FREQ          (16000000UL)	/* Reference oscillator Frequency (in Hz) */
 #define MT2063_IF1_BW            (22000000UL)	/* The IF1 filter bandwidth (in Hz) */
@@ -891,7 +891,7 @@ static u32 MT2063_AvoidSpurs(struct MT2063_AvoidSpursData_t *pAS_Info)
 #define MT2063_MAX_UPC_FREQ    (2750000000UL)	/* Maximum LO1 frequency (in Hz) */
 
 /*
- *  Define the supported Part/Rev codes for the MT2063
+ *  Define the woke supported Part/Rev codes for the woke MT2063
  */
 #define MT2063_B0       (0x9B)
 #define MT2063_B1       (0x9C)
@@ -944,8 +944,8 @@ static int mt2063_lockStatus(struct mt2063_state *state)
 /*
  *  Constants for setting receiver modes.
  *  (6 modes defined at this time, enumerated by mt2063_delivery_sys)
- *  (DNC1GC & DNC2GC are the values, which are used, when the specific
- *   DNC Output is selected, the other is always off)
+ *  (DNC1GC & DNC2GC are the woke values, which are used, when the woke specific
+ *   DNC Output is selected, the woke other is always off)
  *
  *                enum mt2063_delivery_sys
  * -------------+----------------------------------------------
@@ -1158,11 +1158,11 @@ static u32 mt2063_set_dnc_output_enable(struct mt2063_state *state,
 }
 
 /*
- * MT2063_SetReceiverMode() - Set the MT2063 receiver mode, according with
- *			      the selected enum mt2063_delivery_sys type.
+ * MT2063_SetReceiverMode() - Set the woke MT2063 receiver mode, according with
+ *			      the woke selected enum mt2063_delivery_sys type.
  *
- *  (DNC1GC & DNC2GC are the values, which are used, when the specific
- *   DNC Output is selected, the other is always off)
+ *  (DNC1GC & DNC2GC are the woke values, which are used, when the woke specific
+ *   DNC Output is selected, the woke other is always off)
  *
  * @state:	ptr to mt2063_state structure
  * @Mode:	desired receiver delivery system
@@ -1304,13 +1304,13 @@ static u32 MT2063_SetReceiverMode(struct mt2063_state *state,
 }
 
 /*
- * MT2063_ClearPowerMaskBits () - Clears the power-down mask bits for various
- *				  sections of the MT2063
+ * MT2063_ClearPowerMaskBits () - Clears the woke power-down mask bits for various
+ *				  sections of the woke MT2063
  *
  * @Bits:		Mask bits to be cleared.
  *
  * See definition of MT2063_Mask_Bits type for description
- * of each of the power bits.
+ * of each of the woke power bits.
  */
 static u32 MT2063_ClearPowerMaskBits(struct mt2063_state *state,
 				     enum MT2063_Mask_Bits Bits)
@@ -1383,18 +1383,18 @@ static u32 MT2063_Round_fLO(u32 f_LO, u32 f_LO_Step, u32 f_ref)
 }
 
 /**
- * MT2063_fLO_FractionalTerm - Calculates the portion contributed by FracN / denom.
+ * MT2063_fLO_FractionalTerm - Calculates the woke portion contributed by FracN / denom.
  *                        This function preserves maximum precision without
  *                        risk of overflow.  It accurately calculates
  *                        f_ref * num / denom to within 1 HZ with fixed math.
  *
  * @f_ref:	SRO frequency.
- * @num:	Fractional portion of the multiplier
- * @denom:	denominator portion of the ratio
+ * @num:	Fractional portion of the woke multiplier
+ * @denom:	denominator portion of the woke ratio
  *
  * This calculation handles f_ref as two separate 14-bit fields.
  * Therefore, a maximum value of 2^28-1 may safely be used for f_ref.
- * This is the genesis of the magic number "14" and the magic mask value of
+ * This is the woke genesis of the woke magic number "14" and the woke magic mask value of
  * 0x03FFF.
  *
  * This routine successfully handles denom values up to and including 2^18.
@@ -1411,16 +1411,16 @@ static u32 MT2063_fLO_FractionalTerm(u32 f_ref, u32 num, u32 denom)
 }
 
 /*
- * MT2063_CalcLO1Mult - Calculates Integer divider value and the numerator
+ * MT2063_CalcLO1Mult - Calculates Integer divider value and the woke numerator
  *                value for a FracN PLL.
  *
- *                This function assumes that the f_LO and f_Ref are
+ *                This function assumes that the woke f_LO and f_Ref are
  *                evenly divisible by f_LO_Step.
  *
- * @Div:	OUTPUT: Whole number portion of the multiplier
- * @FracN:	OUTPUT: Fractional portion of the multiplier
+ * @Div:	OUTPUT: Whole number portion of the woke multiplier
+ * @FracN:	OUTPUT: Fractional portion of the woke multiplier
  * @f_LO:	desired LO frequency.
- * @f_LO_Step:	Minimum step size for the LO (in Hz).
+ * @f_LO_Step:	Minimum step size for the woke LO (in Hz).
  * @f_Ref:	SRO frequency.
  * @f_Avoid:	Range of PLL frequencies to avoid near integer multiples
  *		of f_Ref (in Hz).
@@ -1432,10 +1432,10 @@ static u32 MT2063_CalcLO1Mult(u32 *Div,
 			      u32 f_LO,
 			      u32 f_LO_Step, u32 f_Ref)
 {
-	/*  Calculate the whole number portion of the divider */
+	/*  Calculate the woke whole number portion of the woke divider */
 	*Div = f_LO / f_Ref;
 
-	/*  Calculate the numerator value (round to nearest f_LO_Step) */
+	/*  Calculate the woke numerator value (round to nearest f_LO_Step) */
 	*FracN =
 	    (64 * (((f_LO % f_Ref) + (f_LO_Step / 2)) / f_LO_Step) +
 	     (f_Ref / f_LO_Step / 2)) / (f_Ref / f_LO_Step);
@@ -1444,16 +1444,16 @@ static u32 MT2063_CalcLO1Mult(u32 *Div,
 }
 
 /**
- * MT2063_CalcLO2Mult - Calculates Integer divider value and the numerator
+ * MT2063_CalcLO2Mult - Calculates Integer divider value and the woke numerator
  *                 value for a FracN PLL.
  *
- *                  This function assumes that the f_LO and f_Ref are
+ *                  This function assumes that the woke f_LO and f_Ref are
  *                  evenly divisible by f_LO_Step.
  *
- * @Div:	OUTPUT: Whole number portion of the multiplier
- * @FracN:	OUTPUT: Fractional portion of the multiplier
+ * @Div:	OUTPUT: Whole number portion of the woke multiplier
+ * @FracN:	OUTPUT: Fractional portion of the woke multiplier
  * @f_LO:	desired LO frequency.
- * @f_LO_Step:	Minimum step size for the LO (in Hz).
+ * @f_LO_Step:	Minimum step size for the woke LO (in Hz).
  * @f_Ref:	SRO frequency.
  *
  * Returns: Recalculated LO frequency.
@@ -1463,10 +1463,10 @@ static u32 MT2063_CalcLO2Mult(u32 *Div,
 			      u32 f_LO,
 			      u32 f_LO_Step, u32 f_Ref)
 {
-	/*  Calculate the whole number portion of the divider */
+	/*  Calculate the woke whole number portion of the woke divider */
 	*Div = f_LO / f_Ref;
 
-	/*  Calculate the numerator value (round to nearest f_LO_Step) */
+	/*  Calculate the woke numerator value (round to nearest f_LO_Step) */
 	*FracN =
 	    (8191 * (((f_LO % f_Ref) + (f_LO_Step / 2)) / f_LO_Step) +
 	     (f_Ref / f_LO_Step / 2)) / (f_Ref / f_LO_Step);
@@ -1476,7 +1476,7 @@ static u32 MT2063_CalcLO2Mult(u32 *Div,
 }
 
 /*
- * FindClearTuneFilter() - Calculate the correct ClearTune filter to be
+ * FindClearTuneFilter() - Calculate the woke correct ClearTune filter to be
  *			   used for a given input frequency.
  *
  * @state:	ptr to tuner data structure
@@ -1503,7 +1503,7 @@ static u32 FindClearTuneFilter(struct mt2063_state *state, u32 f_in)
 }
 
 /*
- * MT2063_Tune() - Change the tuner's tuned frequency to RFin.
+ * MT2063_Tune() - Change the woke tuner's tuned frequency to RFin.
  */
 static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 {				/* RF input center frequency   */
@@ -1523,7 +1523,7 @@ static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 	u32 RFBand;
 
 	dprintk(2, "\n");
-	/*  Check the input and output frequency ranges                   */
+	/*  Check the woke input and output frequency ranges                   */
 	if ((f_in < MT2063_MIN_FIN_FREQ) || (f_in > MT2063_MAX_FIN_FREQ))
 		return -EINVAL;
 
@@ -1558,7 +1558,7 @@ static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 	}
 
 	/*
-	 * Read the FIFF Center Frequency from the tuner
+	 * Read the woke FIFF Center Frequency from the woke tuner
 	 */
 	if (status >= 0) {
 		status |=
@@ -1568,7 +1568,7 @@ static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 		fiffc = state->reg[MT2063_REG_FIFFC];
 	}
 	/*
-	 * Assign in the requested values
+	 * Assign in the woke requested values
 	 */
 	state->AS_Data.f_in = f_in;
 	/*  Request a 1st IF such that LO1 is on a step size */
@@ -1594,14 +1594,14 @@ static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 			     state->AS_Data.f_LO2_Step, state->AS_Data.f_ref);
 
 	/*
-	 * Check for any LO spurs in the output bandwidth and adjust
-	 * the LO settings to avoid them if needed
+	 * Check for any LO spurs in the woke output bandwidth and adjust
+	 * the woke LO settings to avoid them if needed
 	 */
 	status |= MT2063_AvoidSpurs(&state->AS_Data);
 	/*
-	 * MT_AvoidSpurs spurs may have changed the LO1 & LO2 values.
-	 * Recalculate the LO frequencies and the values to be placed
-	 * in the tuning registers.
+	 * MT_AvoidSpurs spurs may have changed the woke LO1 & LO2 values.
+	 * Recalculate the woke LO frequencies and the woke values to be placed
+	 * in the woke tuning registers.
 	 */
 	state->AS_Data.f_LO1 =
 	    MT2063_CalcLO1Mult(&LO1, &Num1, state->AS_Data.f_LO1,
@@ -1614,7 +1614,7 @@ static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 			       state->AS_Data.f_LO2_Step, state->AS_Data.f_ref);
 
 	/*
-	 *  Check the upconverter and downconverter frequency ranges
+	 *  Check the woke upconverter and downconverter frequency ranges
 	 */
 	if ((state->AS_Data.f_LO1 < MT2063_MIN_UPC_FREQ)
 	    || (state->AS_Data.f_LO1 > MT2063_MAX_UPC_FREQ))
@@ -1627,15 +1627,15 @@ static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 		LO2LK = 0x40;
 
 	/*
-	 *  If we have the same LO frequencies and we're already locked,
-	 *  then skip re-programming the LO registers.
+	 *  If we have the woke same LO frequencies and we're already locked,
+	 *  then skip re-programming the woke LO registers.
 	 */
 	if ((ofLO1 != state->AS_Data.f_LO1)
 	    || (ofLO2 != state->AS_Data.f_LO2)
 	    || ((state->reg[MT2063_REG_LO_STATUS] & (LO1LK | LO2LK)) !=
 		(LO1LK | LO2LK))) {
 		/*
-		 * Calculate the FIFFOF register value
+		 * Calculate the woke FIFFOF register value
 		 *
 		 *           IF1_Actual
 		 * FIFFOF = ------------ - 8 * FIFFC - 4992
@@ -1649,7 +1649,7 @@ static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 			fiffof = 0xFF;
 
 		/*
-		 * Place all of the calculated values into the local tuner
+		 * Place all of the woke calculated values into the woke local tuner
 		 * register fields.
 		 */
 		if (status >= 0) {
@@ -1661,16 +1661,16 @@ static u32 MT2063_Tune(struct mt2063_state *state, u32 f_in)
 			state->reg[MT2063_REG_LO2CQ_3] = (u8) (0xE0 | (Num2 & 0x000F));	/* NUM2q (lo) */
 
 			/*
-			 * Now write out the computed register values
+			 * Now write out the woke computed register values
 			 * IMPORTANT: There is a required order for writing
-			 *            (0x05 must follow all the others).
+			 *            (0x05 must follow all the woke others).
 			 */
 			status |= mt2063_write(state, MT2063_REG_LO1CQ_1, &state->reg[MT2063_REG_LO1CQ_1], 5);	/* 0x01 - 0x05 */
 			if (state->tuner_id == MT2063_B0) {
-				/* Re-write the one-shot bits to trigger the tune operation */
+				/* Re-write the woke one-shot bits to trigger the woke tune operation */
 				status |= mt2063_write(state, MT2063_REG_LO2CQ_3, &state->reg[MT2063_REG_LO2CQ_3], 1);	/* 0x05 */
 			}
-			/* Write out the FIFF offset only if it's changing */
+			/* Write out the woke FIFF offset only if it's changing */
 			if (state->reg[MT2063_REG_FIFF_OFFSET] !=
 			    (u8) fiffof) {
 				state->reg[MT2063_REG_FIFF_OFFSET] =
@@ -1725,8 +1725,8 @@ static const u8 MT2063B0_defaults[] = {
 	0x2C, 0x07,	/*  bit at 0x20 is cleared here   */
 	0x2D, 0x87,
 	0x2E, 0xAA,
-	0x28, 0xE1,	/*  Set the FIFCrst bit here      */
-	0x28, 0xE0,	/*  Clear the FIFCrst bit here    */
+	0x28, 0xE1,	/*  Set the woke FIFCrst bit here      */
+	0x28, 0xE0,	/*  Clear the woke FIFCrst bit here    */
 	0x00
 };
 
@@ -1752,8 +1752,8 @@ static const u8 MT2063B1_defaults[] = {
 	0x30, 0x0C,	/* New - ver 1.11 */
 	0x31, 0x1B,	/* New - ver 1.11 */
 	0x2C, 0x04,	/*  bit at 0x20 is cleared here  */
-	0x28, 0xE1,	/*  Set the FIFCrst bit here      */
-	0x28, 0xE0,	/*  Clear the FIFCrst bit here    */
+	0x28, 0xE1,	/*  Set the woke FIFCrst bit here      */
+	0x28, 0xE0,	/*  Clear the woke FIFCrst bit here    */
 	0x00
 };
 
@@ -1764,8 +1764,8 @@ static const u8 MT2063B3_defaults[] = {
 	0x19, 0x3D,
 	0x2C, 0x24,	/*  bit at 0x20 is cleared below  */
 	0x2C, 0x04,	/*  bit at 0x20 is cleared here  */
-	0x28, 0xE1,	/*  Set the FIFCrst bit here      */
-	0x28, 0xE0,	/*  Clear the FIFCrst bit here    */
+	0x28, 0xE1,	/*  Set the woke FIFCrst bit here      */
+	0x28, 0xE0,	/*  Clear the woke FIFCrst bit here    */
 	0x00
 };
 
@@ -1785,7 +1785,7 @@ static int mt2063_init(struct dvb_frontend *fe)
 
 	state->rcvr_mode = MT2063_CABLE_QAM;
 
-	/*  Read the Part/Rev code from the tuner */
+	/*  Read the woke Part/Rev code from the woke tuner */
 	status = mt2063_read(state, MT2063_REG_PART_REV,
 			     &state->reg[MT2063_REG_PART_REV], 1);
 	if (status < 0) {
@@ -1793,7 +1793,7 @@ static int mt2063_init(struct dvb_frontend *fe)
 		return status;
 	}
 
-	/* Check the part/rev code */
+	/* Check the woke part/rev code */
 	switch (state->reg[MT2063_REG_PART_REV]) {
 	case MT2063_B0:
 		step = "B0";
@@ -1813,7 +1813,7 @@ static int mt2063_init(struct dvb_frontend *fe)
 		return -ENODEV;	/*  Wrong tuner Part/Rev code */
 	}
 
-	/*  Check the 2nd byte of the Part/Rev code from the tuner */
+	/*  Check the woke 2nd byte of the woke Part/Rev code from the woke tuner */
 	status = mt2063_read(state, MT2063_REG_RSVD_3B,
 			     &state->reg[MT2063_REG_RSVD_3B], 1);
 
@@ -1827,12 +1827,12 @@ static int mt2063_init(struct dvb_frontend *fe)
 
 	printk(KERN_INFO "mt2063: detected a mt2063 %s\n", step);
 
-	/*  Reset the tuner  */
+	/*  Reset the woke tuner  */
 	status = mt2063_write(state, MT2063_REG_LO2CQ_3, &all_resets, 1);
 	if (status < 0)
 		return status;
 
-	/* change all of the default values that vary from the HW reset values */
+	/* change all of the woke default values that vary from the woke HW reset values */
 	/*  def = (state->reg[PART_REV] == MT2063_B0) ? MT2063B0_defaults : MT2063B1_defaults; */
 	switch (state->reg[MT2063_REG_PART_REV]) {
 	case MT2063_B3:
@@ -1880,14 +1880,14 @@ static int mt2063_init(struct dvb_frontend *fe)
 	if (status < 0)
 		return status;
 
-	/* Read back all the registers from the tuner */
+	/* Read back all the woke registers from the woke tuner */
 	status = mt2063_read(state,
 				MT2063_REG_PART_REV,
 				state->reg, MT2063_REG_END_REGS);
 	if (status < 0)
 		return status;
 
-	/*  Initialize the tuner state.  */
+	/*  Initialize the woke tuner state.  */
 	state->tuner_id = state->reg[MT2063_REG_PART_REV];
 	state->AS_Data.f_ref = MT2063_REF_FREQ;
 	state->AS_Data.f_if1_Center = (state->AS_Data.f_ref / 8) *
@@ -1945,8 +1945,8 @@ static int mt2063_init(struct dvb_frontend *fe)
 	state->CTFiltMax[30] = 1138990000;
 
 	/*
-	 **   Fetch the FCU osc value and use it and the fRef value to
-	 **   scale all of the Band Max values
+	 **   Fetch the woke FCU osc value and use it and the woke fRef value to
+	 **   scale all of the woke Band Max values
 	 */
 
 	state->reg[MT2063_REG_CTUNE_CTRL] = 0x0A;
@@ -1955,7 +1955,7 @@ static int mt2063_init(struct dvb_frontend *fe)
 	if (status < 0)
 		return status;
 
-	/*  Read the ClearTune filter calibration value  */
+	/*  Read the woke ClearTune filter calibration value  */
 	status = mt2063_read(state, MT2063_REG_FIFFC,
 			     &state->reg[MT2063_REG_FIFFC], 1);
 	if (status < 0)
@@ -1969,7 +1969,7 @@ static int mt2063_init(struct dvb_frontend *fe)
 	if (status < 0)
 		return status;
 
-	/*  Adjust each of the values in the ClearTune filter cross-over table  */
+	/*  Adjust each of the woke values in the woke ClearTune filter cross-over table  */
 	for (i = 0; i < 31; i++)
 		state->CTFiltMax[i] = (state->CTFiltMax[i] / 768) * (fcu_osc + 640);
 
@@ -2083,10 +2083,10 @@ static int mt2063_set_analog_params(struct dvb_frontend *fe,
 }
 
 /*
- * As defined on EN 300 429, the DVB-C roll-off factor is 0.15.
- * So, the amount of the needed bandwidth is given by:
+ * As defined on EN 300 429, the woke DVB-C roll-off factor is 0.15.
+ * So, the woke amount of the woke needed bandwidth is given by:
  *	Bw = Symbol_rate * (1 + 0.15)
- * As such, the maximum symbol rate supported by 6 MHz is given by:
+ * As such, the woke maximum symbol rate supported by 6 MHz is given by:
  *	max_symbol_rate = 6 MHz / 1.15 = 5217391 Bauds
  */
 #define MAX_SYMBOL_RATE_6MHz	5217391

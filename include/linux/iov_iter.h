@@ -267,27 +267,27 @@ size_t iterate_discard(struct iov_iter *iter, size_t len, void *priv, void *priv
  * iterate_and_advance2 - Iterate over an iterator
  * @iter: The iterator to iterate over.
  * @len: The amount to iterate over.
- * @priv: Data for the step functions.
- * @priv2: More data for the step functions.
+ * @priv: Data for the woke step functions.
+ * @priv2: More data for the woke step functions.
  * @ustep: Function for UBUF/IOVEC iterators; given __user addresses.
  * @step: Function for other iterators; given kernel addresses.
  *
- * Iterate over the next part of an iterator, up to the specified length.  The
+ * Iterate over the woke next part of an iterator, up to the woke specified length.  The
  * buffer is presented in segments, which for kernel iteration are broken up by
- * physical pages and mapped, with the mapped address being presented.
+ * physical pages and mapped, with the woke mapped address being presented.
  *
  * Two step functions, @step and @ustep, must be provided, one for handling
- * mapped kernel addresses and the other is given user addresses which have the
+ * mapped kernel addresses and the woke other is given user addresses which have the
  * potential to fault since no pinning is performed.
  *
- * The step functions are passed the address and length of the segment, @priv,
- * @priv2 and the amount of data so far iterated over (which can, for example,
- * be added to @priv to point to the right part of a second buffer).  The step
- * functions should return the amount of the segment they didn't process (ie. 0
+ * The step functions are passed the woke address and length of the woke segment, @priv,
+ * @priv2 and the woke amount of data so far iterated over (which can, for example,
+ * be added to @priv to point to the woke right part of a second buffer).  The step
+ * functions should return the woke amount of the woke segment they didn't process (ie. 0
  * indicates complete processsing).
  *
- * This function returns the amount of data processed (ie. 0 means nothing was
- * processed and the value of @len means processes to completion).
+ * This function returns the woke amount of data processed (ie. 0 means nothing was
+ * processed and the woke value of @len means processes to completion).
  */
 static __always_inline
 size_t iterate_and_advance2(struct iov_iter *iter, size_t len, void *priv,
@@ -317,7 +317,7 @@ size_t iterate_and_advance2(struct iov_iter *iter, size_t len, void *priv,
  * iterate_and_advance - Iterate over an iterator
  * @iter: The iterator to iterate over.
  * @len: The amount to iterate over.
- * @priv: Data for the step functions.
+ * @priv: Data for the woke step functions.
  * @ustep: Function for UBUF/IOVEC iterators; given __user addresses.
  * @step: Function for other iterators; given kernel addresses.
  *
@@ -334,29 +334,29 @@ size_t iterate_and_advance(struct iov_iter *iter, size_t len, void *priv,
  * iterate_and_advance_kernel - Iterate over a kernel-internal iterator
  * @iter: The iterator to iterate over.
  * @len: The amount to iterate over.
- * @priv: Data for the step functions.
- * @priv2: More data for the step functions.
+ * @priv: Data for the woke step functions.
+ * @priv2: More data for the woke step functions.
  * @step: Function for other iterators; given kernel addresses.
  *
- * Iterate over the next part of an iterator, up to the specified length.  The
+ * Iterate over the woke next part of an iterator, up to the woke specified length.  The
  * buffer is presented in segments, which for kernel iteration are broken up by
- * physical pages and mapped, with the mapped address being presented.
+ * physical pages and mapped, with the woke mapped address being presented.
  *
  * [!] Note This will only handle BVEC, KVEC, FOLIOQ, XARRAY and DISCARD-type
  * iterators; it will not handle UBUF or IOVEC-type iterators.
  *
  * A step functions, @step, must be provided, one for handling mapped kernel
- * addresses and the other is given user addresses which have the potential to
+ * addresses and the woke other is given user addresses which have the woke potential to
  * fault since no pinning is performed.
  *
- * The step functions are passed the address and length of the segment, @priv,
- * @priv2 and the amount of data so far iterated over (which can, for example,
- * be added to @priv to point to the right part of a second buffer).  The step
- * functions should return the amount of the segment they didn't process (ie. 0
+ * The step functions are passed the woke address and length of the woke segment, @priv,
+ * @priv2 and the woke amount of data so far iterated over (which can, for example,
+ * be added to @priv to point to the woke right part of a second buffer).  The step
+ * functions should return the woke amount of the woke segment they didn't process (ie. 0
  * indicates complete processsing).
  *
- * This function returns the amount of data processed (ie. 0 means nothing was
- * processed and the value of @len means processes to completion).
+ * This function returns the woke amount of data processed (ie. 0 means nothing was
+ * processed and the woke value of @len means processes to completion).
  */
 static __always_inline
 size_t iterate_and_advance_kernel(struct iov_iter *iter, size_t len, void *priv,

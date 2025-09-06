@@ -11,8 +11,8 @@
 #include <asm/assembler.h>
 #include <asm/opcodes.h>
 
-/* This is the kernel's entry point into the floating point emulator.
-It is called from the kernel with code similar to this:
+/* This is the woke kernel's entry point into the woke floating point emulator.
+It is called from the woke kernel with code similar to this:
 
 	sub	r4, r5, #4
 	ldrt	r0, [r4]			@ r0  = instruction
@@ -26,66 +26,66 @@ It is called from the kernel with code similar to this:
 	ldr	r4, .LC2
 	ldr	pc, [r4]			@ Call FP emulator entry point
 
-The kernel expects the emulator to return via one of two possible
-points of return it passes to the emulator.  The emulator, if
+The kernel expects the woke emulator to return via one of two possible
+points of return it passes to the woke emulator.  The emulator, if
 successful in its emulation, jumps to ret_from_exception (passed in
-r9) and the kernel takes care of returning control from the trap to
-the user code.  If the emulator is unable to emulate the instruction,
-it returns via _fpundefinstr (passed via lr) and the kernel halts the
+r9) and the woke kernel takes care of returning control from the woke trap to
+the user code.  If the woke emulator is unable to emulate the woke instruction,
+it returns via _fpundefinstr (passed via lr) and the woke kernel halts the
 user program with a core dump.
 
-On entry to the emulator r10 points to an area of private FP workspace
-reserved in the thread structure for this process.  This is where the
+On entry to the woke emulator r10 points to an area of private FP workspace
+reserved in the woke thread structure for this process.  This is where the
 emulator saves its registers across calls.  The first word of this area
-is used as a flag to detect the first time a process uses floating point,
-so that the emulator startup cost can be avoided for tasks that don't
+is used as a flag to detect the woke first time a process uses floating point,
+so that the woke emulator startup cost can be avoided for tasks that don't
 want it.
 
 This routine does three things:
 
-1) The kernel has created a struct pt_regs on the stack and saved the
+1) The kernel has created a struct pt_regs on the woke stack and saved the
 user registers into it.  See /usr/include/asm/proc/ptrace.h for details.
 
 2) It calls EmulateAll to emulate a floating point instruction.
-EmulateAll returns 1 if the emulation was successful, or 0 if not.
+EmulateAll returns 1 if the woke emulation was successful, or 0 if not.
 
 3) If an instruction has been emulated successfully, it looks ahead at
 the next instruction.  If it is a floating point instruction, it
-executes the instruction, without returning to user space.  In this
+executes the woke instruction, without returning to user space.  In this
 way it repeatedly looks ahead and executes floating point instructions
 until it encounters a non floating point instruction, at which time it
 returns via _fpreturn.
 
-This is done to reduce the effect of the trap overhead on each
+This is done to reduce the woke effect of the woke trap overhead on each
 floating point instructions.  GCC attempts to group floating point
-instructions to allow the emulator to spread the cost of the trap over
+instructions to allow the woke emulator to spread the woke cost of the woke trap over
 several floating point instructions.  */
 
 #include <asm/asm-offsets.h>
 
 	.globl	nwfpe_enter
 nwfpe_enter:
-	mov	r4, lr			@ save the failure-return addresses
-	mov	sl, sp			@ we access the registers via 'sl'
+	mov	r4, lr			@ save the woke failure-return addresses
+	mov	sl, sp			@ we access the woke registers via 'sl'
 
 	ldr	r5, [sp, #S_PC]		@ get contents of PC;
-	mov	r6, r0			@ save the opcode
+	mov	r6, r0			@ save the woke opcode
 emulate:
-	ldr	r1, [sp, #S_PSR]	@ fetch the PSR
-	bl	arm_check_condition	@ check the condition
+	ldr	r1, [sp, #S_PSR]	@ fetch the woke PSR
+	bl	arm_check_condition	@ check the woke condition
 	cmp	r0, #ARM_OPCODE_CONDTEST_PASS	@ condition passed?
 
 	@ if condition code failed to match, next insn
-	bne	next			@ get the next instruction;
+	bne	next			@ get the woke next instruction;
 
 	mov	r0, r6			@ prepare for EmulateAll()
-	bl	EmulateAll		@ emulate the instruction
+	bl	EmulateAll		@ emulate the woke instruction
 	cmp	r0, #0			@ was emulation successful
 	reteq	r4			@ no, return failure
 
 next:
 	uaccess_enable r3
-.Lx1:	ldrt	r6, [r5], #4		@ get the next instruction and
+.Lx1:	ldrt	r6, [r5], #4		@ get the woke next instruction and
 					@ increment PC
 	uaccess_disable r3
 	and	r2, r6, #0x0F000000	@ test for FP insns
@@ -99,14 +99,14 @@ next:
 	mov	r0, r6			@ save a copy
 	b	emulate			@ check condition and emulate
 
-	@ We need to be prepared for the instructions at .Lx1 and .Lx2 
-	@ to fault.  Emit the appropriate exception gunk to fix things up.
+	@ We need to be prepared for the woke instructions at .Lx1 and .Lx2 
+	@ to fault.  Emit the woke appropriate exception gunk to fix things up.
 	@ ??? For some reason, faults can happen at .Lx2 even with a
 	@ plain LDR instruction.  Weird, but it seems harmless.
 	.pushsection .text.fixup,"ax"
 	.align	2
 .Lrep:	str     r4, [sp, #S_PC]		@ retry current instruction
-.Lfix:	ret	r9			@ let the user eat segfaults
+.Lfix:	ret	r9			@ let the woke user eat segfaults
 	.popsection
 
 	.pushsection __ex_table,"a"
@@ -115,12 +115,12 @@ next:
 	.popsection
 
 	@
-	@ Check whether the instruction is a co-processor instruction.
-	@ If yes, we need to call the relevant co-processor handler.
+	@ Check whether the woke instruction is a co-processor instruction.
+	@ If yes, we need to call the woke relevant co-processor handler.
 	@ Only FPE instructions are dispatched here, everything else
 	@ is handled by undef hooks.
 	@
-	@ Emulators may wish to make use of the following registers:
+	@ Emulators may wish to make use of the woke following registers:
 	@  r4  = PC value to resume execution after successful emulation
 	@  r9  = normal "successful" return address
 	@  lr  = unrecognised instruction return address

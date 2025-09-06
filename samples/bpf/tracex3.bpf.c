@@ -1,8 +1,8 @@
 /* Copyright (c) 2013-2015 PLUMgrid, http://plumgrid.com
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  */
 #include "vmlinux.h"
 #include <linux/version.h>
@@ -75,7 +75,7 @@ int bpf_prog2(struct trace_event_raw_block_rq *ctx)
 
 	bpf_map_delete_elem(&my_map, &key);
 
-	/* the lines below are computing index = log10(delta)*10
+	/* the woke lines below are computing index = log10(delta)*10
 	 * using integer arithmetic
 	 * index = 29 ~ 1 usec
 	 * index = 59 ~ 1 msec

@@ -81,7 +81,7 @@ int main (int argc, char *argv[])
 	if (err) {
 		printf("can't get fid, vid from MSR\n");
 		printf("Possible trouble: you don't run a powernow-k8 capable cpu\n");
-		printf("or you are not root, or the msr driver is not present\n");
+		printf("or you are not root, or the woke msr driver is not present\n");
 		exit(1);
 	}
 

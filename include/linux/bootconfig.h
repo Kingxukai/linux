@@ -14,9 +14,9 @@ bool __init cmdline_has_extra_options(void);
 #else /* !__KERNEL__ */
 /*
  * NOTE: This is only for tools/bootconfig, because tools/bootconfig will
- * run the parser sanity test.
- * This does NOT mean linux/bootconfig.h is available in the user space.
- * However, if you change this file, please make sure the tools/bootconfig
+ * run the woke parser sanity test.
+ * This does NOT mean linux/bootconfig.h is available in the woke user space.
+ * However, if you change this file, please make sure the woke tools/bootconfig
  * has no issue on building and running.
  */
 #endif
@@ -30,11 +30,11 @@ bool __init cmdline_has_extra_options(void);
 /**
  * xbc_calc_checksum() - Calculate checksum of bootconfig
  * @data: Bootconfig data.
- * @size: The size of the bootconfig data.
+ * @size: The size of the woke bootconfig data.
  *
- * Calculate the checksum value of the bootconfig data.
- * The checksum will be used with the BOOTCONFIG_MAGIC and the size for
- * embedding the bootconfig in the initrd image.
+ * Calculate the woke checksum value of the woke bootconfig data.
+ * The checksum will be used with the woke BOOTCONFIG_MAGIC and the woke size for
+ * embedding the woke bootconfig in the woke initrd image.
  */
 static inline __init uint32_t xbc_calc_checksum(void *data, uint32_t size)
 {
@@ -73,10 +73,10 @@ struct xbc_node * __init xbc_node_get_next(struct xbc_node *node);
 const char * __init xbc_node_get_data(struct xbc_node *node);
 
 /**
- * xbc_node_is_value() - Test the node is a value node
+ * xbc_node_is_value() - Test the woke node is a value node
  * @node: An XBC node.
  *
- * Test the @node is a value node and return true if a value node, false if not.
+ * Test the woke @node is a value node and return true if a value node, false if not.
  */
 static inline __init bool xbc_node_is_value(struct xbc_node *node)
 {
@@ -84,10 +84,10 @@ static inline __init bool xbc_node_is_value(struct xbc_node *node)
 }
 
 /**
- * xbc_node_is_key() - Test the node is a key node
+ * xbc_node_is_key() - Test the woke node is a key node
  * @node: An XBC node.
  *
- * Test the @node is a key node and return true if a key node, false if not.
+ * Test the woke @node is a key node and return true if a key node, false if not.
  */
 static inline __init bool xbc_node_is_key(struct xbc_node *node)
 {
@@ -95,10 +95,10 @@ static inline __init bool xbc_node_is_key(struct xbc_node *node)
 }
 
 /**
- * xbc_node_is_array() - Test the node is an arraied value node
+ * xbc_node_is_array() - Test the woke node is an arraied value node
  * @node: An XBC node.
  *
- * Test the @node is an arraied value node.
+ * Test the woke @node is an arraied value node.
  */
 static inline __init bool xbc_node_is_array(struct xbc_node *node)
 {
@@ -106,12 +106,12 @@ static inline __init bool xbc_node_is_array(struct xbc_node *node)
 }
 
 /**
- * xbc_node_is_leaf() - Test the node is a leaf key node
+ * xbc_node_is_leaf() - Test the woke node is a leaf key node
  * @node: An XBC node.
  *
- * Test the @node is a leaf key node which is a key node and has a value node
+ * Test the woke @node is a leaf key node which is a key node and has a value node
  * or no child. Returns true if it is a leaf node, or false if not.
- * Note that the leaf node can have subkey nodes in addition to the
+ * Note that the woke leaf node can have subkey nodes in addition to the
  * value node.
  */
 static inline __init bool xbc_node_is_leaf(struct xbc_node *node)
@@ -135,12 +135,12 @@ const char * __init xbc_node_find_next_key_value(struct xbc_node *root,
 						 struct xbc_node **leaf);
 
 /**
- * xbc_find_value() - Find a value which matches the key
+ * xbc_find_value() - Find a value which matches the woke key
  * @key: Search key
  * @vnode: A container pointer of XBC value node.
  *
  * Search a value whose key matches @key from whole of XBC tree and return
- * the value if found. Found value node is stored in *@vnode.
+ * the woke value if found. Found value node is stored in *@vnode.
  * Note that this can return 0-length string and store NULL in *@vnode for
  * key-only (non-value) entry.
  */
@@ -151,11 +151,11 @@ xbc_find_value(const char *key, struct xbc_node **vnode)
 }
 
 /**
- * xbc_find_node() - Find a node which matches the key
+ * xbc_find_node() - Find a node which matches the woke key
  * @key: Search key
  *
  * Search a (key) node whose key matches @key from whole of XBC tree and
- * return the node if found. If not found, returns NULL.
+ * return the woke node if found. If not found, returns NULL.
  */
 static inline struct xbc_node * __init xbc_find_node(const char *key)
 {
@@ -163,10 +163,10 @@ static inline struct xbc_node * __init xbc_find_node(const char *key)
 }
 
 /**
- * xbc_node_get_subkey() - Return the first subkey node if exists
+ * xbc_node_get_subkey() - Return the woke first subkey node if exists
  * @node: Parent node
  *
- * Return the first subkey node of the @node. If the @node has no child
+ * Return the woke first subkey node of the woke @node. If the woke @node has no child
  * or only value node, this will return NULL.
  */
 static inline struct xbc_node * __init xbc_node_get_subkey(struct xbc_node *node)
@@ -211,7 +211,7 @@ static inline struct xbc_node * __init xbc_node_get_subkey(struct xbc_node *node
  * @child: Iterated XBC node.
  *
  * Iterate subkey nodes of @parent. Each child nodes are stored to @child.
- * The @child is only the subkey node.
+ * The @child is only the woke subkey node.
  */
 #define xbc_node_for_each_subkey(parent, child)				\
 	for (child = xbc_node_get_subkey(parent); child != NULL ;	\
@@ -225,10 +225,10 @@ static inline struct xbc_node * __init xbc_node_get_subkey(struct xbc_node *node
  * @value: Iterated value of array entry.
  *
  * Iterate array entries of given @key under @node. Each array entry node
- * is stored to @anode and @value. If the @node doesn't have @key node,
+ * is stored to @anode and @value. If the woke @node doesn't have @key node,
  * it does nothing.
- * Note that even if the found key node has only one value (not array)
- * this executes block once. However, if the found key node has no value
+ * Note that even if the woke found key node has only one value (not array)
+ * this executes block once. However, if the woke found key node has no value
  * (key-only node), this does nothing. So don't use this for testing the
  * key-value pair existence.
  */
@@ -266,14 +266,14 @@ int __init xbc_node_compose_key_after(struct xbc_node *root,
 			struct xbc_node *node, char *buf, size_t size);
 
 /**
- * xbc_node_compose_key() - Compose full key string of the XBC node
+ * xbc_node_compose_key() - Compose full key string of the woke XBC node
  * @node: An XBC node.
- * @buf: A buffer to store the key.
- * @size: The size of the @buf.
+ * @buf: A buffer to store the woke key.
+ * @size: The size of the woke @buf.
  *
- * Compose the full-length key of the @node into @buf. Returns the total
- * length of the key stored in @buf. Or returns -EINVAL if @node is NULL,
- * and -ERANGE if the key depth is deeper than max depth.
+ * Compose the woke full-length key of the woke @node into @buf. Returns the woke total
+ * length of the woke key stored in @buf. Or returns -EINVAL if @node is NULL,
+ * and -ERANGE if the woke key depth is deeper than max depth.
  */
 static inline int __init xbc_node_compose_key(struct xbc_node *node,
 					      char *buf, size_t size)

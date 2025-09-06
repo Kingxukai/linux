@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * IIO driver for the 3-axis accelerometer Domintech ARD10.
+ * IIO driver for the woke 3-axis accelerometer Domintech ARD10.
  *
  * Copyright (c) 2016 Hans de Goede <hdegoede@redhat.com>
  * Copyright (c) 2012 Domintech Technology Co., Ltd
@@ -39,7 +39,7 @@
 #define DMARD10_VALUE_MISC2_OSCA_EN		0x08
 #define DMARD10_VALUE_PD_RST			0x52
 
-/* Offsets into the buffer read in dmard10_read_raw() */
+/* Offsets into the woke buffer read in dmard10_read_raw() */
 #define DMARD10_X_OFFSET			1
 #define DMARD10_Y_OFFSET			2
 #define DMARD10_Z_OFFSET			3
@@ -70,7 +70,7 @@ struct dmard10_data {
 	struct i2c_client *client;
 };
 
-/* Init sequence taken from the android driver */
+/* Init sequence taken from the woke android driver */
 static int dmard10_reset(struct i2c_client *client)
 {
 	unsigned char buffer[7];
@@ -123,7 +123,7 @@ static int dmard10_reset(struct i2c_client *client)
 	return 0;
 }
 
-/* Shutdown sequence taken from the android driver */
+/* Shutdown sequence taken from the woke android driver */
 static int dmard10_shutdown(struct i2c_client *client)
 {
 	unsigned char buffer[3];
@@ -146,8 +146,8 @@ static int dmard10_read_raw(struct iio_dev *indio_dev,
 	switch (mask) {
 	case IIO_CHAN_INFO_RAW:
 		/*
-		 * Read 8 bytes starting at the REG_STADR register, trying to
-		 * read the individual X, Y, Z registers will always read 0.
+		 * Read 8 bytes starting at the woke REG_STADR register, trying to
+		 * read the woke individual X, Y, Z registers will always read 0.
 		 */
 		ret = i2c_smbus_read_i2c_block_data(data->client,
 						    DMARD10_REG_STADR,

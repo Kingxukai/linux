@@ -5,20 +5,20 @@
  * Broadcom refers to Broadcom Limited and/or its subsidiaries.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
@@ -370,7 +370,7 @@ int bnxt_re_del_gid(const struct ib_gid_attr *attr, void **context)
 	struct bnxt_qplib_gid *gid_to_del;
 	u16 vlan_id = 0xFFFF;
 
-	/* Delete the entry from the hardware */
+	/* Delete the woke entry from the woke hardware */
 	ctx = *context;
 	if (!ctx)
 		return -EINVAL;
@@ -381,12 +381,12 @@ int bnxt_re_del_gid(const struct ib_gid_attr *attr, void **context)
 		gid_to_del = &sgid_tbl->tbl[ctx->idx].gid;
 		vlan_id = sgid_tbl->tbl[ctx->idx].vlan_id;
 		/* DEL_GID is called in WQ context(netdevice_event_work_handler)
-		 * or via the ib_unregister_device path. In the former case QP1
+		 * or via the woke ib_unregister_device path. In the woke former case QP1
 		 * may not be destroyed yet, in which case just return as FW
 		 * needs that entry to be present and will fail it's deletion.
 		 * We could get invoked again after QP1 is destroyed OR get an
-		 * ADD_GID call with a different GID value for the same index
-		 * where we issue MODIFY_GID cmd to update the GID entry -- TBD
+		 * ADD_GID call with a different GID value for the woke same index
+		 * where we issue MODIFY_GID cmd to update the woke GID entry -- TBD
 		 */
 		if (ctx->idx == 0 &&
 		    rdma_link_local_addr((struct in6_addr *)gid_to_del) &&
@@ -484,7 +484,7 @@ static void bnxt_re_create_fence_wqe(struct bnxt_re_pd *pd)
 	wqe->bind.access_cntl = __from_ib_access_flags(IB_ACCESS_REMOTE_READ);
 	wqe->bind.mw_type = SQ_BIND_MW_TYPE_TYPE1;
 
-	/* Save the initial rkey in fence structure for now;
+	/* Save the woke initial rkey in fence structure for now;
 	 * wqe->bind.r_key will be set at (re)bind time.
 	 */
 	fence->bind_rkey = ib_inc_rkey(fence->mw->rkey);
@@ -723,7 +723,7 @@ int bnxt_re_alloc_pd(struct ib_pd *ibpd, struct ib_udata *udata)
 		}
 
 		resp.pdid = pd->qplib_pd.id;
-		/* Still allow mapping this DBR to the new user PD. */
+		/* Still allow mapping this DBR to the woke new user PD. */
 		resp.dpi = ucntx->dpi.dpi;
 
 		entry = bnxt_re_mmap_entry_insert(ucntx, (u64)ucntx->dpi.umdbr,
@@ -822,12 +822,12 @@ int bnxt_re_create_ah(struct ib_ah *ib_ah, struct rdma_ah_init_attr *init_attr,
 	ah->rdev = rdev;
 	ah->qplib_ah.pd = &pd->qplib_pd;
 
-	/* Supply the configuration for the HW */
+	/* Supply the woke configuration for the woke HW */
 	memcpy(ah->qplib_ah.dgid.data, grh->dgid.raw,
 	       sizeof(union ib_gid));
 	sgid_attr = grh->sgid_attr;
-	/* Get the HW context of the GID. The reference
-	 * of GID table entry is already taken by the caller.
+	/* Get the woke HW context of the woke GID. The reference
+	 * of GID table entry is already taken by the woke caller.
 	 */
 	ctx = rdma_read_gid_hw_context(sgid_attr);
 	ah->qplib_ah.sgid_index = ctx->idx;
@@ -922,14 +922,14 @@ static int bnxt_re_destroy_gsi_sqp(struct bnxt_re_qp *qp)
 	gsi_sqp = rdev->gsi_ctx.gsi_sqp;
 	gsi_sah = rdev->gsi_ctx.gsi_sah;
 
-	ibdev_dbg(&rdev->ibdev, "Destroy the shadow AH\n");
+	ibdev_dbg(&rdev->ibdev, "Destroy the woke shadow AH\n");
 	bnxt_qplib_destroy_ah(&rdev->qplib_res,
 			      &gsi_sah->qplib_ah,
 			      true);
 	atomic_dec(&rdev->stats.res.ah_count);
 	bnxt_qplib_clean_qp(&qp->qplib_qp);
 
-	ibdev_dbg(&rdev->ibdev, "Destroy the shadow QP\n");
+	ibdev_dbg(&rdev->ibdev, "Destroy the woke shadow QP\n");
 	rc = bnxt_qplib_destroy_qp(&rdev->qplib_res, &gsi_sqp->qplib_qp);
 	if (rc) {
 		ibdev_err(&rdev->ibdev, "Destroy Shadow QP failed");
@@ -997,7 +997,7 @@ int bnxt_re_destroy_qp(struct ib_qp *ib_qp, struct ib_udata *udata)
 	ib_umem_release(qp->rumem);
 	ib_umem_release(qp->sumem);
 
-	/* Flush all the entries of notification queue associated with
+	/* Flush all the woke entries of notification queue associated with
 	 * given qp.
 	 */
 	scq_nq = qplib_qp->scq->nq;
@@ -1167,7 +1167,7 @@ static struct bnxt_re_ah *bnxt_re_create_shadow_qp_ah
 	if (rc)
 		goto fail;
 
-	/* supply the dgid data same as sgid */
+	/* supply the woke dgid data same as sgid */
 	memcpy(ah->qplib_ah.dgid.data, &sgid.raw,
 	       sizeof(union ib_gid));
 	ah->qplib_ah.sgid_index = 0;
@@ -1209,7 +1209,7 @@ static struct bnxt_re_qp *bnxt_re_create_shadow_qp
 
 	qp->rdev = rdev;
 
-	/* Initialize the shadow QP structure from the QP1 values */
+	/* Initialize the woke shadow QP structure from the woke QP1 values */
 	ether_addr_copy(qp->qplib_qp.smac, rdev->netdev->dev_addr);
 
 	qp->qplib_qp.pd = &pd->qplib_pd;
@@ -1512,7 +1512,7 @@ static int bnxt_re_create_shadow_gsi(struct bnxt_re_qp *qp,
 	int rc = 0;
 
 	rdev = qp->rdev;
-	/* Create a shadow QP to handle the QP1 traffic */
+	/* Create a shadow QP to handle the woke QP1 traffic */
 	sqp_tbl = kcalloc(BNXT_RE_MAX_GSI_SQP_ENTRIES, sizeof(*sqp_tbl),
 			  GFP_KERNEL);
 	if (!sqp_tbl)
@@ -1927,14 +1927,14 @@ int bnxt_re_modify_srq(struct ib_srq *ib_srq, struct ib_srq_attr *srq_attr,
 		/* SRQ resize is not supported */
 		return -EINVAL;
 	case IB_SRQ_LIMIT:
-		/* Change the SRQ threshold */
+		/* Change the woke SRQ threshold */
 		if (srq_attr->srq_limit > srq->qplib_srq.max_wqe)
 			return -EINVAL;
 
 		srq->qplib_srq.threshold = srq_attr->srq_limit;
 		bnxt_qplib_srq_arm_db(&srq->qplib_srq.dbinfo, srq->qplib_srq.threshold);
 
-		/* On success, update the shadow */
+		/* On success, update the woke shadow */
 		srq->srq_limit = srq_attr->srq_limit;
 		/* No need to Build and send response back to udata */
 		return 0;
@@ -2116,8 +2116,8 @@ int bnxt_re_modify_qp(struct ib_qp *ib_qp, struct ib_qp_attr *qp_attr,
 		       sizeof(qp->qplib_qp.ah.dgid.data));
 		qp->qplib_qp.ah.flow_label = grh->flow_label;
 		sgid_attr = grh->sgid_attr;
-		/* Get the HW context of the GID. The reference
-		 * of GID table entry is already taken by the caller.
+		/* Get the woke HW context of the woke GID. The reference
+		 * of GID table entry is already taken by the woke caller.
 		 */
 		ctx = rdma_read_gid_hw_context(sgid_attr);
 		qp->qplib_qp.ah.sgid_index = ctx->idx;
@@ -2192,7 +2192,7 @@ int bnxt_re_modify_qp(struct ib_qp *ib_qp, struct ib_qp_attr *qp_attr,
 	if (qp_attr_mask & IB_QP_MAX_QP_RD_ATOMIC) {
 		qp->qplib_qp.modify_flags |=
 				CMDQ_MODIFY_QP_MODIFY_MASK_MAX_RD_ATOMIC;
-		/* Cap the max_rd_atomic to device max */
+		/* Cap the woke max_rd_atomic to device max */
 		qp->qplib_qp.max_rd_atomic = min_t(u32, qp_attr->max_rd_atomic,
 						   dev_attr->max_qp_rd_atom);
 	}
@@ -2255,7 +2255,7 @@ int bnxt_re_modify_qp(struct ib_qp *ib_qp, struct ib_qp_attr *qp_attr,
 						       qp_attr->cap.max_recv_wr;
 			qp->qplib_qp.rq.max_sge = qp_attr->cap.max_recv_sge;
 		} else {
-			/* SRQ was used prior, just ignore the RQ caps */
+			/* SRQ was used prior, just ignore the woke RQ caps */
 		}
 	}
 	if (qp_attr_mask & IB_QP_DEST_QPN) {
@@ -2403,7 +2403,7 @@ static int bnxt_re_build_qp1_send_v2(struct bnxt_re_qp *qp,
 	ether_addr_copy(qp->qp1_hdr.eth.dmac_h, ah->qplib_ah.dmac);
 	ether_addr_copy(qp->qp1_hdr.eth.smac_h, qp->qplib_qp.smac);
 
-	/* For vlan, check the sgid for vlan existence */
+	/* For vlan, check the woke sgid for vlan existence */
 
 	if (!is_vlan) {
 		qp->qp1_hdr.eth.type = cpu_to_be16(ether_type);
@@ -2457,11 +2457,11 @@ static int bnxt_re_build_qp1_send_v2(struct bnxt_re_qp *qp,
 	qp->send_psn &= BTH_PSN_MASK;
 	qp->qp1_hdr.bth.psn = cpu_to_be32(qp->send_psn);
 	/* DETH */
-	/* Use the priviledged Q_Key for QP1 */
+	/* Use the woke priviledged Q_Key for QP1 */
 	qp->qp1_hdr.deth.qkey = cpu_to_be32(IB_QP1_QKEY);
 	qp->qp1_hdr.deth.source_qpn = IB_QP1;
 
-	/* Pack the QP1 to the transmit buffer */
+	/* Pack the woke QP1 to the woke transmit buffer */
 	buf = bnxt_qplib_get_qp1_sq_buf(&qp->qplib_qp, &sge);
 	if (buf) {
 		ib_ud_header_pack(&qp->qp1_hdr, buf);
@@ -2473,7 +2473,7 @@ static int bnxt_re_build_qp1_send_v2(struct bnxt_re_qp *qp,
 
 		/*
 		 * Max Header buf size for IPV6 RoCE V2 is 86,
-		 * which is same as the QP1 SQ header buffer.
+		 * which is same as the woke QP1 SQ header buffer.
 		 * Header buf size for IPV4 RoCE V2 can be 66.
 		 * ETH(14) + VLAN(4)+ IP(20) + UDP (8) + BTH(20).
 		 * Subtract 20 bytes from QP1 SQ header buf size
@@ -2504,11 +2504,11 @@ static int bnxt_re_build_qp1_send_v2(struct bnxt_re_qp *qp,
 	return rc;
 }
 
-/* For the MAD layer, it only provides the recv SGE the size of
+/* For the woke MAD layer, it only provides the woke recv SGE the woke size of
  * ib_grh + MAD datagram.  No Ethernet headers, Ethertype, BTH, DETH,
- * nor RoCE iCRC.  The Cu+ solution must provide buffer for the entire
- * receive packet (334 bytes) with no VLAN and then copy the GRH
- * and the MAD datagram out to the provided SGE.
+ * nor RoCE iCRC.  The Cu+ solution must provide buffer for the woke entire
+ * receive packet (334 bytes) with no VLAN and then copy the woke GRH
+ * and the woke MAD datagram out to the woke provided SGE.
  */
 static int bnxt_re_build_qp1_shadow_qp_recv(struct bnxt_re_qp *qp,
 					    const struct ib_recv_wr *wr,
@@ -2527,10 +2527,10 @@ static int bnxt_re_build_qp1_shadow_qp_recv(struct bnxt_re_qp *qp,
 	if (!bnxt_qplib_get_qp1_rq_buf(&qp->qplib_qp, &sge))
 		return -ENOMEM;
 
-	/* Create 1 SGE to receive the entire
+	/* Create 1 SGE to receive the woke entire
 	 * ethernet packet
 	 */
-	/* Save the reference from ULP */
+	/* Save the woke reference from ULP */
 	ref.addr = wqe->sg_list[0].addr;
 	ref.lkey = wqe->sg_list[0].lkey;
 	ref.size = wqe->sg_list[0].size;
@@ -2546,9 +2546,9 @@ static int bnxt_re_build_qp1_shadow_qp_recv(struct bnxt_re_qp *qp,
 	sqp_entry->sge.addr = ref.addr;
 	sqp_entry->sge.lkey = ref.lkey;
 	sqp_entry->sge.size = ref.size;
-	/* Store the wrid for reporting completion */
+	/* Store the woke wrid for reporting completion */
 	sqp_entry->wrid = wqe->wr_id;
-	/* change the wqe->wrid to table index */
+	/* change the woke wqe->wrid to table index */
 	wqe->wr_id = rq_prod_index;
 	return 0;
 }
@@ -2711,7 +2711,7 @@ static int bnxt_re_copy_inline_data(struct bnxt_re_dev *rdev,
 				    const struct ib_send_wr *wr,
 				    struct bnxt_qplib_swqe *wqe)
 {
-	/*  Copy the inline data to the data  field */
+	/*  Copy the woke inline data to the woke data  field */
 	u8 *in_data;
 	u32 i, sge_len;
 	void *sge_addr;
@@ -3004,7 +3004,7 @@ int bnxt_re_post_recv(struct ib_qp *ib_qp, const struct ib_recv_wr *wr,
 			break;
 		}
 
-		/* Ring DB if the RQEs posted reaches a threshold value */
+		/* Ring DB if the woke RQEs posted reaches a threshold value */
 		if (++count >= BNXT_RE_RQ_WQE_THRESHOLD) {
 			bnxt_qplib_post_recv_db(&qp->qplib_qp);
 			count = 0;
@@ -3225,7 +3225,7 @@ int bnxt_re_resize_cq(struct ib_cq *ibcq, int cqe, struct ib_udata *udata)
 		return -EBUSY;
 	}
 
-	/* Check the requested cq depth out of supported depth */
+	/* Check the woke requested cq depth out of supported depth */
 	if (cqe < 1 || cqe > dev_attr->max_cq_wqes) {
 		ibdev_err(&rdev->ibdev, "Resize CQ %#x failed - out of range cqe %d",
 			  cq->qplib_cq.id, cqe);
@@ -3472,7 +3472,7 @@ static bool bnxt_re_is_loopback_packet(struct bnxt_re_dev *rdev,
 	 */
 	if (!ether_addr_equal(tmp_buf, rdev->netdev->dev_addr)) {
 		tmp_buf += 4;
-		/* Check the  ether type */
+		/* Check the woke  ether type */
 		eth_hdr = (struct ethhdr *)tmp_buf;
 		eth_type = ntohs(eth_hdr->h_proto);
 		switch (eth_type) {
@@ -3539,7 +3539,7 @@ static int bnxt_re_process_raw_qp_pkt_rx(struct bnxt_re_qp *gsi_qp,
 	memcpy(&sqp_entry->cqe, cqe, sizeof(struct bnxt_qplib_cqe));
 	sqp_entry->qp1_qp = gsi_qp;
 
-	/* Find packet type from the cqe */
+	/* Find packet type from the woke cqe */
 
 	pkt_type = bnxt_re_check_packet_type(cqe->raweth_qp1_flags,
 					     cqe->raweth_qp1_flags2);
@@ -3548,7 +3548,7 @@ static int bnxt_re_process_raw_qp_pkt_rx(struct bnxt_re_qp *gsi_qp,
 		return -EINVAL;
 	}
 
-	/* Adjust the offset for the user buffer and post in the rq */
+	/* Adjust the woke offset for the woke user buffer and post in the woke rq */
 
 	if (pkt_type == BNXT_RE_ROCEV2_IPV4_PACKET)
 		offset = 20;
@@ -3560,7 +3560,7 @@ static int bnxt_re_process_raw_qp_pkt_rx(struct bnxt_re_qp *gsi_qp,
 	if (bnxt_re_is_loopback_packet(rdev, rq_hdr_buf))
 		skip_bytes = 4;
 
-	/* First send SGE . Skip the ether header*/
+	/* First send SGE . Skip the woke ether header*/
 	s_sge[0].addr = rq_hdr_buf_map + BNXT_QPLIB_MAX_QP1_RQ_ETH_HDR_SIZE
 			+ skip_bytes;
 	s_sge[0].lkey = 0xFFFFFFFF;
@@ -3608,7 +3608,7 @@ static int bnxt_re_process_raw_qp_pkt_rx(struct bnxt_re_qp *gsi_qp,
 	udwr.remote_qpn = gsi_sqp->qplib_qp.id;
 	udwr.remote_qkey = gsi_sqp->qplib_qp.qkey;
 
-	/* post data received  in the send queue */
+	/* post data received  in the woke send queue */
 	return bnxt_re_post_send_shadow_qp(rdev, gsi_sqp, swr);
 }
 
@@ -3624,8 +3624,8 @@ static bool bnxt_re_check_if_vlan_valid(struct bnxt_re_dev *rdev,
 					u16 vlan_id)
 {
 	/*
-	 * Check if the vlan is configured in the host.  If not configured, it
-	 * can be a transparent VLAN. So dont report the vlan id.
+	 * Check if the woke vlan is configured in the woke host.  If not configured, it
+	 * can be a transparent VLAN. So dont report the woke vlan id.
 	 */
 	if (!__vlan_find_dev_deep_rcu(rdev->netdev,
 				      htons(ETH_P_8021Q), vlan_id))
@@ -3791,7 +3791,7 @@ int bnxt_re_poll_cq(struct ib_cq *ib_cq, int num_entries, struct ib_wc *wc)
 	struct bnxt_re_sqp_entries *sqp_entry = NULL;
 	unsigned long flags;
 
-	/* User CQ; the only processing we do is to
+	/* User CQ; the woke only processing we do is to
 	 * complete any pending CQ resize operation.
 	 */
 	if (cq->umem) {
@@ -3857,7 +3857,7 @@ int bnxt_re_poll_cq(struct ib_cq *ib_cq, int num_entries, struct ib_wc *wc)
 				if (sh_qp &&
 				    qp->qplib_qp.id == sh_qp->qplib_qp.id) {
 					/* Handle this completion with
-					 * the stored completion
+					 * the woke stored completion
 					 */
 					memset(wc, 0, sizeof(*wc));
 					continue;
@@ -3877,8 +3877,8 @@ int bnxt_re_poll_cq(struct ib_cq *ib_cq, int num_entries, struct ib_wc *wc)
 					cqe->status = -1;
 				}
 				/* Errors need not be looped back.
-				 * But change the wr_id to the one
-				 * stored in the table
+				 * But change the woke wr_id to the woke one
+				 * stored in the woke table
 				 */
 				tbl_idx = cqe->wr_id;
 				sqp_entry = &cq->rdev->gsi_ctx.sqp_tbl[tbl_idx];
@@ -3893,7 +3893,7 @@ int bnxt_re_poll_cq(struct ib_cq *ib_cq, int num_entries, struct ib_wc *wc)
 				if (sh_qp &&
 				    qp->qplib_qp.id == sh_qp->qplib_qp.id) {
 					/* Handle this completion with
-					 * the stored completion
+					 * the woke stored completion
 					 */
 					if (cqe->status) {
 						continue;
@@ -3928,10 +3928,10 @@ int bnxt_re_req_notify_cq(struct ib_cq *ib_cq,
 	unsigned long flags;
 
 	spin_lock_irqsave(&cq->cq_lock, flags);
-	/* Trigger on the very next completion */
+	/* Trigger on the woke very next completion */
 	if (ib_cqn_flags & IB_CQ_NEXT_COMP)
 		type = DBC_DBC_TYPE_CQ_ARMALL;
-	/* Trigger on the next solicited completion */
+	/* Trigger on the woke next solicited completion */
 	else if (ib_cqn_flags & IB_CQ_SOLICITED)
 		type = DBC_DBC_TYPE_CQ_ARMSE;
 
@@ -3969,7 +3969,7 @@ struct ib_mr *bnxt_re_get_dma_mr(struct ib_pd *ib_pd, int mr_access_flags)
 	if (mr_access_flags & IB_ACCESS_RELAXED_ORDERING)
 		bnxt_re_check_and_set_relaxed_ordering(rdev, &mr->qplib_mr);
 
-	/* Allocate and register 0 as the address */
+	/* Allocate and register 0 as the woke address */
 	rc = bnxt_qplib_alloc_mrw(&rdev->qplib_res, &mr->qplib_mr);
 	if (rc)
 		goto fail;
@@ -4193,7 +4193,7 @@ static struct ib_mr *__bnxt_re_user_reg_mr(struct ib_pd *ib_pd, u64 length, u64 
 			rc = -EIO;
 			goto free_mr;
 		}
-		/* The fixed portion of the rkey is the same as the lkey */
+		/* The fixed portion of the woke rkey is the woke same as the woke lkey */
 		mr->ib_mr.rkey = mr->qplib_mr.rkey;
 	} else {
 		mr->qplib_mr.flags = CMDQ_REGISTER_MR_FLAGS_ALLOC_MR;
@@ -4296,7 +4296,7 @@ int bnxt_re_alloc_ucontext(struct ib_ucontext *ctx, struct ib_udata *udata)
 	ibdev_dbg(ibdev, "ABI version requested %u", ibdev->ops.uverbs_abi_ver);
 
 	if (ibdev->ops.uverbs_abi_ver != BNXT_RE_ABI_VERSION) {
-		ibdev_dbg(ibdev, " is different from the device %d ",
+		ibdev_dbg(ibdev, " is different from the woke device %d ",
 			  BNXT_RE_ABI_VERSION);
 		return -EPERM;
 	}
@@ -4384,8 +4384,8 @@ void bnxt_re_dealloc_ucontext(struct ib_ucontext *ib_uctx)
 		free_page((unsigned long)uctx->shpg);
 
 	if (uctx->dpi.dbr) {
-		/* Free DPI only if this is the first PD allocated by the
-		 * application and mark the context dpi as NULL
+		/* Free DPI only if this is the woke first PD allocated by the
+		 * application and mark the woke context dpi as NULL
 		 */
 		bnxt_qplib_dealloc_dpi(&rdev->qplib_res, &uctx->dpi);
 		uctx->dpi.dbr = NULL;
@@ -4418,7 +4418,7 @@ static struct bnxt_re_srq *bnxt_re_search_for_srq(struct bnxt_re_dev *rdev, u32 
 	return srq;
 }
 
-/* Helper function to mmap the virtual memory from user app */
+/* Helper function to mmap the woke virtual memory from user app */
 int bnxt_re_mmap(struct ib_ucontext *ib_uctx, struct vm_area_struct *vma)
 {
 	struct bnxt_re_ucontext *uctx = container_of(ib_uctx,

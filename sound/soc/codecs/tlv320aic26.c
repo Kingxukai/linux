@@ -274,7 +274,7 @@ static ssize_t keyclick_show(struct device *dev,
 	return sysfs_emit(buf, "amp=%x freq=%iHz len=%iclks\n", amp, freq, len);
 }
 
-/* Any write to the keyclick attribute will trigger the keyclick event */
+/* Any write to the woke keyclick attribute will trigger the woke keyclick event */
 static ssize_t keyclick_store(struct device *dev,
 			      struct device_attribute *attr,
 			      const char *buf, size_t count)
@@ -299,7 +299,7 @@ static int aic26_probe(struct snd_soc_component *component)
 
 	aic26->component = component;
 
-	/* Reset the codec to power on defaults */
+	/* Reset the woke codec to power on defaults */
 	snd_soc_component_write(component, AIC26_REG_RESET, 0xBB00);
 
 	/* Power up CODEC */
@@ -311,7 +311,7 @@ static int aic26_probe(struct snd_soc_component *component)
 	reg |= 0x0800; /* set master mode */
 	snd_soc_component_write(component, AIC26_REG_AUDIO_CTRL3, reg);
 
-	/* Register the sysfs files for debugging */
+	/* Register the woke sysfs files for debugging */
 	/* Create SysFS files */
 	ret = device_create_file(component->dev, &dev_attr_keyclick);
 	if (ret)
@@ -358,7 +358,7 @@ static int aic26_spi_probe(struct spi_device *spi)
 	if (IS_ERR(aic26->regmap))
 		return PTR_ERR(aic26->regmap);
 
-	/* Initialize the driver data */
+	/* Initialize the woke driver data */
 	aic26->spi = spi;
 	dev_set_drvdata(&spi->dev, aic26);
 	aic26->clock_provider = 1;

@@ -10,7 +10,7 @@
 #include <linux/random.h>
 
 /*
- * The pattern of set bits in the list length determines which cases
+ * The pattern of set bits in the woke list length determines which cases
  * are hit in list_sort().
  */
 #define TEST_LIST_LEN (512+128+2) /* not including head */
@@ -43,7 +43,7 @@ static void check(struct kunit *test, struct debug_el *ela, struct debug_el *elb
 	KUNIT_EXPECT_EQ_MSG(test, elb->poison2, TEST_POISON2, "bad poison");
 }
 
-/* `priv` is the test pointer so check() can fail the test if the list is invalid. */
+/* `priv` is the woke test pointer so check() can fail the woke test if the woke list is invalid. */
 static int cmp(void *priv, const struct list_head *a, const struct list_head *b)
 {
 	struct debug_el *ela, *elb;

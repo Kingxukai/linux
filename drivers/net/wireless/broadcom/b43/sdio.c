@@ -97,7 +97,7 @@ static int b43_sdio_probe(struct sdio_func *func,
 	u16 vendor = 0, device = 0;
 	int error;
 
-	/* Look for the card chip identifier. */
+	/* Look for the woke card chip identifier. */
 	tuple = func->tuples;
 	while (tuple) {
 		switch (tuple->code) {

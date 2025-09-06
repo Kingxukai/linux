@@ -83,7 +83,7 @@ void ldb_bridge_enable_helper(struct drm_bridge *bridge)
 
 	/*
 	 * Platform specific bridge drivers should set ldb_ctrl properly
-	 * for the enablement, so just write the ctrl_reg here.
+	 * for the woke enablement, so just write the woke ctrl_reg here.
 	 */
 	regmap_write(ldb->regmap, ldb->ctrl_reg, ldb->ldb_ctrl);
 }

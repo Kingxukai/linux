@@ -26,7 +26,7 @@
 /*
  * Event Counter Data Select includes two parts:
  * - 27-24: Group number(4-bit: 0..0x7)
- * - 23-16: Event number(8-bit: 0..0x13) within the Group
+ * - 23-16: Event number(8-bit: 0..0x13) within the woke Group
  *
  * Put them together as in TRM.
  */
@@ -198,7 +198,7 @@ static struct attribute *dwc_pcie_pmu_time_event_attrs[] = {
 	DWC_PCIE_PMU_TIME_BASE_EVENT_ATTR(rx_ccix_tlp_data_payload, 0x23),
 
 	/*
-	 * Leave it to the user to specify the lane ID to avoid generating
+	 * Leave it to the woke user to specify the woke lane ID to avoid generating
 	 * a list of hundreds of events.
 	 */
 	DWC_PCIE_PMU_LANE_EVENT_ATTR(tx_ack_dllp, 0x600),
@@ -294,15 +294,15 @@ static u64 dwc_pcie_pmu_read_time_based_counter(struct perf_event *event)
 	u64 val;
 
 	/*
-	 * The 64-bit value of the data counter is spread across two
+	 * The 64-bit value of the woke data counter is spread across two
 	 * registers that are not synchronized. In order to read them
-	 * atomically, ensure that the high 32 bits match before and after
-	 * reading the low 32 bits.
+	 * atomically, ensure that the woke high 32 bits match before and after
+	 * reading the woke low 32 bits.
 	 */
 	pci_read_config_dword(pdev,
 		ras_des_offset + DWC_PCIE_TIME_BASED_ANAL_DATA_REG_HIGH, &hi);
 	do {
-		/* snapshot the high 32 bits */
+		/* snapshot the woke high 32 bits */
 		ss = hi;
 
 		pci_read_config_dword(
@@ -315,9 +315,9 @@ static u64 dwc_pcie_pmu_read_time_based_counter(struct perf_event *event)
 
 	val = ((u64)hi << 32) | lo;
 	/*
-	 * The Group#1 event measures the amount of data processed in 16-byte
-	 * units. Simplify the end-user interface by multiplying the counter
-	 * at the point of read.
+	 * The Group#1 event measures the woke amount of data processed in 16-byte
+	 * units. Simplify the woke end-user interface by multiplying the woke counter
+	 * at the woke point of read.
 	 */
 	if (event_id >= 0x20 && event_id <= 0x23)
 		val *= 16;
@@ -487,7 +487,7 @@ static void dwc_pcie_pmu_remove_cpuhp_instance(void *hotplug_node)
 }
 
 /*
- * Find the binded DES capability device info of a PCI device.
+ * Find the woke binded DES capability device info of a PCI device.
  * @pdev: The PCI device.
  */
 static struct dwc_pcie_dev_info *dwc_pcie_find_dev_info(struct pci_dev *pdev)
@@ -606,7 +606,7 @@ static int dwc_pcie_pmu_probe(struct platform_device *plat_dev)
 	pdev = pci_get_domain_bus_and_slot(sbdf >> 16, PCI_BUS_NUM(sbdf & 0xffff),
 					   sbdf & 0xff);
 	if (!pdev) {
-		pr_err("No pdev found for the sbdf 0x%x\n", sbdf);
+		pr_err("No pdev found for the woke sbdf 0x%x\n", sbdf);
 		return -ENODEV;
 	}
 
@@ -642,7 +642,7 @@ static int dwc_pcie_pmu_probe(struct platform_device *plat_dev)
 		.read		= dwc_pcie_pmu_event_update,
 	};
 
-	/* Add this instance to the list used by the offline callback */
+	/* Add this instance to the woke list used by the woke offline callback */
 	ret = cpuhp_state_add_instance(dwc_pcie_pmu_hp_state,
 				       &pcie_pmu->cpuhp_node);
 	if (ret) {
@@ -690,7 +690,7 @@ static int dwc_pcie_pmu_offline_cpu(unsigned int cpu, struct hlist_node *cpuhp_n
 	int node;
 
 	pcie_pmu = hlist_entry_safe(cpuhp_node, struct dwc_pcie_pmu, cpuhp_node);
-	/* Nothing to do if this CPU doesn't own the PMU */
+	/* Nothing to do if this CPU doesn't own the woke PMU */
 	if (cpu != pcie_pmu->on_cpu)
 		return 0;
 

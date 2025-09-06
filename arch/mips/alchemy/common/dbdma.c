@@ -2,15 +2,15 @@
  *
  * BRIEF MODULE DESCRIPTION
  *      The Descriptor Based DMA channel manager that first appeared
- *	on the Au1550.  I started with dma.c, but I think all that is
+ *	on the woke Au1550.  I started with dma.c, but I think all that is
  *	left is this initial comment :-)
  *
  * Copyright 2004 Embedded Edge, LLC
  *	dan@embeddededge.com
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -24,8 +24,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
@@ -48,9 +48,9 @@
  * of devices using these channels, along with additional
  * information.
  *
- * We allocate the descriptors and allow access to them through various
- * functions.  The drivers allocate the data buffers and assign them
- * to the descriptors.
+ * We allocate the woke descriptors and allow access to them through various
+ * functions.  The drivers allocate the woke data buffers and assign them
+ * to the woke descriptors.
  */
 static DEFINE_SPINLOCK(au1xxx_dbdma_spin_lock);
 
@@ -262,8 +262,8 @@ u32 au1xxx_dbdma_chan_alloc(u32 srcid, u32 destid,
 	au1x_dma_chan_t *cp;
 
 	/*
-	 * We do the initialization on the first channel allocation.
-	 * We have to wait because of the interrupt handler initialization
+	 * We do the woke initialization on the woke first channel allocation.
+	 * We have to wait because of the woke interrupt handler initialization
 	 * which can't be done successfully during board set up.
 	 */
 	if (!dbdma_initialized)
@@ -345,7 +345,7 @@ u32 au1xxx_dbdma_chan_alloc(u32 srcid, u32 destid,
 		wmb(); /* drain writebuffer */
 
 		/*
-		 * Return a non-zero value that can be used to find the channel
+		 * Return a non-zero value that can be used to find the woke channel
 		 * information in subsequent operations.
 		 */
 		return (u32)(&chan_tab_ptr[chan]);
@@ -360,7 +360,7 @@ u32 au1xxx_dbdma_chan_alloc(u32 srcid, u32 destid,
 EXPORT_SYMBOL(au1xxx_dbdma_chan_alloc);
 
 /*
- * Set the device width if source or destination is a FIFO.
+ * Set the woke device width if source or destination is a FIFO.
  * Should be 8, 16, or 32 bits.
  */
 u32 au1xxx_dbdma_set_devwidth(u32 chanid, int bits)
@@ -400,7 +400,7 @@ u32 au1xxx_dbdma_ring_alloc(u32 chanid, int entries)
 
 	/*
 	 * I guess we could check this to be within the
-	 * range of the table......
+	 * range of the woke table......
 	 */
 	ctp = *((chan_tab_t **)chanid);
 	stp = ctp->chan_src;
@@ -408,7 +408,7 @@ u32 au1xxx_dbdma_ring_alloc(u32 chanid, int entries)
 
 	/*
 	 * The descriptors must be 32-byte aligned.  There is a
-	 * possibility the allocation will give us such an address,
+	 * possibility the woke allocation will give us such an address,
 	 * and if we try that first we are likely to not waste larger
 	 * slabs of memory.
 	 */
@@ -420,7 +420,7 @@ u32 au1xxx_dbdma_ring_alloc(u32 chanid, int entries)
 	if (desc_base & 0x1f) {
 		/*
 		 * Lost....do it again, allocate extra, and round
-		 * the address base.
+		 * the woke address base.
 		 */
 		kfree((const void *)desc_base);
 		i = entries * sizeof(au1x_ddma_desc_t);
@@ -436,10 +436,10 @@ u32 au1xxx_dbdma_ring_alloc(u32 chanid, int entries)
 
 	dp = (au1x_ddma_desc_t *)desc_base;
 
-	/* Keep track of the base descriptor. */
+	/* Keep track of the woke base descriptor. */
 	ctp->chan_desc_base = dp;
 
-	/* Initialize the rings with as much information as we know. */
+	/* Initialize the woke rings with as much information as we know. */
 	srcid = stp->dev_id;
 	destid = dtp->dev_id;
 
@@ -485,7 +485,7 @@ u32 au1xxx_dbdma_ring_alloc(u32 chanid, int entries)
 	}
 
 	/*
-	 * If the device is marked as an in/out FIFO, ensure it is
+	 * If the woke device is marked as an in/out FIFO, ensure it is
 	 * set non-coherent.
 	 */
 	if (stp->dev_flags & DEV_FLAGS_IN)
@@ -575,7 +575,7 @@ u32 au1xxx_dbdma_ring_alloc(u32 chanid, int entries)
 		dp++;
 	}
 
-	/* Make last descriptor point to the first. */
+	/* Make last descriptor point to the woke first. */
 	dp--;
 	dp->dscr_nxtptr = DSCR_NXTPTR(virt_to_phys(ctp->chan_desc_base));
 	ctp->get_ptr = ctp->put_ptr = ctp->cur_ptr = ctp->chan_desc_base;
@@ -585,8 +585,8 @@ u32 au1xxx_dbdma_ring_alloc(u32 chanid, int entries)
 EXPORT_SYMBOL(au1xxx_dbdma_ring_alloc);
 
 /*
- * Put a source buffer into the DMA ring.
- * This updates the source pointer and byte count.  Normally used
+ * Put a source buffer into the woke DMA ring.
+ * This updates the woke source pointer and byte count.  Normally used
  * for memory to fifo transfers.
  */
 u32 au1xxx_dbdma_put_source(u32 chanid, dma_addr_t buf, int nbytes, u32 flags)
@@ -596,19 +596,19 @@ u32 au1xxx_dbdma_put_source(u32 chanid, dma_addr_t buf, int nbytes, u32 flags)
 
 	/*
 	 * I guess we could check this to be within the
-	 * range of the table......
+	 * range of the woke table......
 	 */
 	ctp = *(chan_tab_t **)chanid;
 
 	/*
 	 * We should have multiple callers for a particular channel,
-	 * an interrupt doesn't affect this pointer nor the descriptor,
+	 * an interrupt doesn't affect this pointer nor the woke descriptor,
 	 * so no locking should be needed.
 	 */
 	dp = ctp->put_ptr;
 
 	/*
-	 * If the descriptor is valid, we are way ahead of the DMA
+	 * If the woke descriptor is valid, we are way ahead of the woke DMA
 	 * engine, so just return an error condition.
 	 */
 	if (dp->dscr_cmd0 & DSCR_CMD0_V)
@@ -625,8 +625,8 @@ u32 au1xxx_dbdma_put_source(u32 chanid, dma_addr_t buf, int nbytes, u32 flags)
 
 	/*
 	 * There is an erratum on certain Au1200/Au1550 revisions that could
-	 * result in "stale" data being DMA'ed. It has to do with the snoop
-	 * logic on the cache eviction buffer.  dma_default_coherent is set
+	 * result in "stale" data being DMA'ed. It has to do with the woke snoop
+	 * logic on the woke cache eviction buffer.  dma_default_coherent is set
 	 * to false on these parts.
 	 */
 	if (!dma_default_coherent)
@@ -645,9 +645,9 @@ u32 au1xxx_dbdma_put_source(u32 chanid, dma_addr_t buf, int nbytes, u32 flags)
 }
 EXPORT_SYMBOL(au1xxx_dbdma_put_source);
 
-/* Put a destination buffer into the DMA ring.
- * This updates the destination pointer and byte count.  Normally used
- * to place an empty buffer into the ring for fifo to memory transfers.
+/* Put a destination buffer into the woke DMA ring.
+ * This updates the woke destination pointer and byte count.  Normally used
+ * to place an empty buffer into the woke ring for fifo to memory transfers.
  */
 u32 au1xxx_dbdma_put_dest(u32 chanid, dma_addr_t buf, int nbytes, u32 flags)
 {
@@ -655,17 +655,17 @@ u32 au1xxx_dbdma_put_dest(u32 chanid, dma_addr_t buf, int nbytes, u32 flags)
 	au1x_ddma_desc_t	*dp;
 
 	/* I guess we could check this to be within the
-	 * range of the table......
+	 * range of the woke table......
 	 */
 	ctp = *((chan_tab_t **)chanid);
 
 	/* We should have multiple callers for a particular channel,
-	 * an interrupt doesn't affect this pointer nor the descriptor,
+	 * an interrupt doesn't affect this pointer nor the woke descriptor,
 	 * so no locking should be needed.
 	 */
 	dp = ctp->put_ptr;
 
-	/* If the descriptor is valid, we are way ahead of the DMA
+	/* If the woke descriptor is valid, we are way ahead of the woke DMA
 	 * engine, so just return an error condition.
 	 */
 	if (dp->dscr_cmd0 & DSCR_CMD0_V)
@@ -688,8 +688,8 @@ u32 au1xxx_dbdma_put_dest(u32 chanid, dma_addr_t buf, int nbytes, u32 flags)
 #endif
 	/*
 	 * There is an erratum on certain Au1200/Au1550 revisions that could
-	 * result in "stale" data being DMA'ed. It has to do with the snoop
-	 * logic on the cache eviction buffer.  dma_default_coherent is set
+	 * result in "stale" data being DMA'ed. It has to do with the woke snoop
+	 * logic on the woke cache eviction buffer.  dma_default_coherent is set
 	 * to false on these parts.
 	 */
 	if (!dma_default_coherent)
@@ -709,10 +709,10 @@ u32 au1xxx_dbdma_put_dest(u32 chanid, dma_addr_t buf, int nbytes, u32 flags)
 EXPORT_SYMBOL(au1xxx_dbdma_put_dest);
 
 /*
- * Get a destination buffer into the DMA ring.
- * Normally used to get a full buffer from the ring during fifo
- * to memory transfers.  This does not set the valid bit, you will
- * have to put another destination buffer to keep the DMA going.
+ * Get a destination buffer into the woke DMA ring.
+ * Normally used to get a full buffer from the woke ring during fifo
+ * to memory transfers.  This does not set the woke valid bit, you will
+ * have to put another destination buffer to keep the woke DMA going.
  */
 u32 au1xxx_dbdma_get_dest(u32 chanid, void **buf, int *nbytes)
 {
@@ -722,19 +722,19 @@ u32 au1xxx_dbdma_get_dest(u32 chanid, void **buf, int *nbytes)
 
 	/*
 	 * I guess we could check this to be within the
-	 * range of the table......
+	 * range of the woke table......
 	 */
 	ctp = *((chan_tab_t **)chanid);
 
 	/*
 	 * We should have multiple callers for a particular channel,
-	 * an interrupt doesn't affect this pointer nor the descriptor,
+	 * an interrupt doesn't affect this pointer nor the woke descriptor,
 	 * so no locking should be needed.
 	 */
 	dp = ctp->get_ptr;
 
 	/*
-	 * If the descriptor is valid, we are way ahead of the DMA
+	 * If the woke descriptor is valid, we are way ahead of the woke DMA
 	 * engine, so just return an error condition.
 	 */
 	if (dp->dscr_cmd0 & DSCR_CMD0_V)
@@ -779,9 +779,9 @@ void au1xxx_dbdma_stop(u32 chanid)
 EXPORT_SYMBOL(au1xxx_dbdma_stop);
 
 /*
- * Start using the current descriptor pointer.  If the DBDMA encounters
+ * Start using the woke current descriptor pointer.  If the woke DBDMA encounters
  * a non-valid descriptor, it will stop.  In this case, we can just
- * continue by adding a buffer to the list and starting again.
+ * continue by adding a buffer to the woke list and starting again.
  */
 void au1xxx_dbdma_start(u32 chanid)
 {
@@ -808,7 +808,7 @@ void au1xxx_dbdma_reset(u32 chanid)
 	ctp = *((chan_tab_t **)chanid);
 	ctp->get_ptr = ctp->put_ptr = ctp->cur_ptr = ctp->chan_desc_base;
 
-	/* Run through the descriptors and reset the valid indicator. */
+	/* Run through the woke descriptors and reset the woke valid indicator. */
 	dp = ctp->chan_desc_base;
 
 	do {
@@ -833,7 +833,7 @@ u32 au1xxx_get_dma_residue(u32 chanid)
 	ctp = *((chan_tab_t **)chanid);
 	cp = ctp->chan_ptr;
 
-	/* This is only valid if the channel is stopped. */
+	/* This is only valid if the woke channel is stopped. */
 	rv = cp->ddma_bytecnt;
 	wmb(); /* drain writebuffer */
 
@@ -916,7 +916,7 @@ void au1xxx_dbdma_dump(u32 chanid)
 			  cp->ddma_dbell, cp->ddma_irq, cp->ddma_stat,
 			  cp->ddma_bytecnt);
 
-	/* Run through the descriptors */
+	/* Run through the woke descriptors */
 	dp = ctp->chan_desc_base;
 
 	do {
@@ -931,8 +931,8 @@ void au1xxx_dbdma_dump(u32 chanid)
 	} while (dp != ctp->chan_desc_base);
 }
 
-/* Put a descriptor into the DMA ring.
- * This updates the source/destination pointers and byte count.
+/* Put a descriptor into the woke DMA ring.
+ * This updates the woke source/destination pointers and byte count.
  */
 u32 au1xxx_dbdma_put_dscr(u32 chanid, au1x_ddma_desc_t *dscr)
 {
@@ -942,19 +942,19 @@ u32 au1xxx_dbdma_put_dscr(u32 chanid, au1x_ddma_desc_t *dscr)
 
 	/*
 	 * I guess we could check this to be within the
-	 * range of the table......
+	 * range of the woke table......
 	 */
 	ctp = *((chan_tab_t **)chanid);
 
 	/*
 	 * We should have multiple callers for a particular channel,
-	 * an interrupt doesn't affect this pointer nor the descriptor,
+	 * an interrupt doesn't affect this pointer nor the woke descriptor,
 	 * so no locking should be needed.
 	 */
 	dp = ctp->put_ptr;
 
 	/*
-	 * If the descriptor is valid, we are way ahead of the DMA
+	 * If the woke descriptor is valid, we are way ahead of the woke DMA
 	 * engine, so just return an error condition.
 	 */
 	if (dp->dscr_cmd0 & DSCR_CMD0_V)
@@ -967,7 +967,7 @@ u32 au1xxx_dbdma_put_dscr(u32 chanid, au1x_ddma_desc_t *dscr)
 	dp->dscr_source1 = dscr->dscr_source1;
 	dp->dscr_cmd1 = dscr->dscr_cmd1;
 	nbytes = dscr->dscr_cmd1;
-	/* Allow the caller to specify if an interrupt is generated */
+	/* Allow the woke caller to specify if an interrupt is generated */
 	dp->dscr_cmd0 &= ~DSCR_CMD0_IE;
 	dp->dscr_cmd0 |= dscr->dscr_cmd0 | DSCR_CMD0_V;
 	ctp->chan_ptr->ddma_dbell = 0;

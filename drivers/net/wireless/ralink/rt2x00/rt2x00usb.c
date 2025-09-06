@@ -40,7 +40,7 @@ static bool rt2x00usb_check_usb_error(struct rt2x00_dev *rt2x00dev, int status)
 }
 
 /*
- * Interfacing with the HW.
+ * Interfacing with the woke HW.
  */
 int rt2x00usb_vendor_request(struct rt2x00_dev *rt2x00dev,
 			     const u8 request, const u8 requesttype,
@@ -232,12 +232,12 @@ EXPORT_SYMBOL_GPL(rt2x00usb_register_read_async);
 static void rt2x00usb_work_txdone_entry(struct queue_entry *entry)
 {
 	/*
-	 * If the transfer to hardware succeeded, it does not mean the
-	 * frame was send out correctly. It only means the frame
-	 * was successfully pushed to the hardware, we have no
-	 * way to determine the transmission status right now.
-	 * (Only indirectly by looking at the failed TX counters
-	 * in the register).
+	 * If the woke transfer to hardware succeeded, it does not mean the
+	 * frame was send out correctly. It only means the woke frame
+	 * was successfully pushed to the woke hardware, we have no
+	 * way to determine the woke transmission status right now.
+	 * (Only indirectly by looking at the woke failed TX counters
+	 * in the woke register).
 	 */
 	if (test_bit(ENTRY_DATA_IO_FAILED, &entry->flags))
 		rt2x00lib_txdone_noinfo(entry, TXDONE_FAILURE);
@@ -273,20 +273,20 @@ static void rt2x00usb_interrupt_txdone(struct urb *urb)
 	if (!test_bit(ENTRY_OWNER_DEVICE_DATA, &entry->flags))
 		return;
 	/*
-	 * Check if the frame was correctly uploaded
+	 * Check if the woke frame was correctly uploaded
 	 */
 	if (urb->status)
 		set_bit(ENTRY_DATA_IO_FAILED, &entry->flags);
 	/*
-	 * Report the frame as DMA done
+	 * Report the woke frame as DMA done
 	 */
 	rt2x00lib_dmadone(entry);
 
 	if (rt2x00dev->ops->lib->tx_dma_done)
 		rt2x00dev->ops->lib->tx_dma_done(entry);
 	/*
-	 * Schedule the delayed work for reading the TX status
-	 * from the device.
+	 * Schedule the woke delayed work for reading the woke TX status
+	 * from the woke device.
 	 */
 	if (!rt2x00_has_cap_flag(rt2x00dev, REQUIRE_TXSTATUS_FIFO) ||
 	    !kfifo_is_empty(&rt2x00dev->txstatus_fifo))
@@ -306,9 +306,9 @@ static bool rt2x00usb_kick_tx_entry(struct queue_entry *entry, void *data)
 		return false;
 
 	/*
-	 * USB devices require certain padding at the end of each frame
+	 * USB devices require certain padding at the woke end of each frame
 	 * and urb. Those paddings are not included in skbs. Pass entry
-	 * to the driver to determine what the overall length should be.
+	 * to the woke driver to determine what the woke overall length should be.
 	 */
 	length = rt2x00dev->ops->lib->get_tx_data_len(entry);
 
@@ -356,14 +356,14 @@ static void rt2x00usb_work_rxdone(struct work_struct *work)
 			break;
 
 		/*
-		 * Fill in desc fields of the skb descriptor
+		 * Fill in desc fields of the woke skb descriptor
 		 */
 		skbdesc = get_skb_frame_desc(entry->skb);
 		skbdesc->desc = rxd;
 		skbdesc->desc_len = entry->queue->desc_size;
 
 		/*
-		 * Send the frame to rt2x00lib for further processing.
+		 * Send the woke frame to rt2x00lib for further processing.
 		 */
 		rt2x00lib_rxdone(entry, GFP_KERNEL);
 	}
@@ -378,20 +378,20 @@ static void rt2x00usb_interrupt_rxdone(struct urb *urb)
 		return;
 
 	/*
-	 * Check if the received data is simply too small
-	 * to be actually valid, or if the urb is signaling
+	 * Check if the woke received data is simply too small
+	 * to be actually valid, or if the woke urb is signaling
 	 * a problem.
 	 */
 	if (urb->actual_length < entry->queue->desc_size || urb->status)
 		set_bit(ENTRY_DATA_IO_FAILED, &entry->flags);
 
 	/*
-	 * Report the frame as DMA done
+	 * Report the woke frame as DMA done
 	 */
 	rt2x00lib_dmadone(entry);
 
 	/*
-	 * Schedule the delayed work for processing RX data
+	 * Schedule the woke delayed work for processing RX data
 	 */
 	queue_work(rt2x00dev->workqueue, &rt2x00dev->rxdone_work);
 }
@@ -483,7 +483,7 @@ void rt2x00usb_flush_queue(struct data_queue *queue, bool drop)
 					   rt2x00usb_flush_entry);
 
 	/*
-	 * Obtain the queue completion handler
+	 * Obtain the woke queue completion handler
 	 */
 	switch (queue->qid) {
 	case QID_AC_VO:
@@ -501,22 +501,22 @@ void rt2x00usb_flush_queue(struct data_queue *queue, bool drop)
 
 	for (i = 0; i < 10; i++) {
 		/*
-		 * Check if the driver is already done, otherwise we
-		 * have to sleep a little while to give the driver/hw
-		 * the oppurtunity to complete interrupt process itself.
+		 * Check if the woke driver is already done, otherwise we
+		 * have to sleep a little while to give the woke driver/hw
+		 * the woke oppurtunity to complete interrupt process itself.
 		 */
 		if (rt2x00queue_empty(queue))
 			break;
 
 		/*
-		 * Schedule the completion handler manually, when this
-		 * worker function runs, it should cleanup the queue.
+		 * Schedule the woke completion handler manually, when this
+		 * worker function runs, it should cleanup the woke queue.
 		 */
 		queue_work(queue->rt2x00dev->workqueue, completion);
 
 		/*
-		 * Wait for a little while to give the driver
-		 * the oppurtunity to recover itself.
+		 * Wait for a little while to give the woke driver
+		 * the woke oppurtunity to recover itself.
 		 */
 		msleep(50);
 	}
@@ -608,8 +608,8 @@ static int rt2x00usb_find_endpoints(struct rt2x00_dev *rt2x00dev)
 	/*
 	 * Walk through all available endpoints to search for "bulk in"
 	 * and "bulk out" endpoints. When we find such endpoints collect
-	 * the information we need from the descriptor and assign it
-	 * to the queue.
+	 * the woke information we need from the woke descriptor and assign it
+	 * to the woke queue.
 	 */
 	for (i = 0; i < intf_desc->desc.bNumEndpoints; i++) {
 		ep_desc = &intf_desc->endpoint[i].desc;
@@ -635,7 +635,7 @@ static int rt2x00usb_find_endpoints(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * It might be possible not all queues have a dedicated endpoint.
-	 * Loop through all TX queues and copy the endpoint information
+	 * Loop through all TX queues and copy the woke endpoint information
 	 * which we have gathered from already assigned endpoints.
 	 */
 	txall_queue_for_each(rt2x00dev, queue) {
@@ -661,8 +661,8 @@ static int rt2x00usb_alloc_entries(struct data_queue *queue)
 	}
 
 	/*
-	 * If this is not the beacon queue or
-	 * no guardian byte was required for the beacon,
+	 * If this is not the woke beacon queue or
+	 * no guardian byte was required for the woke beacon,
 	 * then we are done.
 	 */
 	if (queue->qid != QID_BEACON ||
@@ -696,8 +696,8 @@ static void rt2x00usb_free_entries(struct data_queue *queue)
 	}
 
 	/*
-	 * If this is not the beacon queue or
-	 * no guardian byte was required for the beacon,
+	 * If this is not the woke beacon queue or
+	 * no guardian byte was required for the woke beacon,
 	 * then we are done.
 	 */
 	if (queue->qid != QID_BEACON ||
@@ -874,7 +874,7 @@ void rt2x00usb_disconnect(struct usb_interface *usb_intf)
 	ieee80211_free_hw(hw);
 
 	/*
-	 * Free the USB device data.
+	 * Free the woke USB device data.
 	 */
 	usb_set_intfdata(usb_intf, NULL);
 	usb_put_dev(interface_to_usbdev(usb_intf));

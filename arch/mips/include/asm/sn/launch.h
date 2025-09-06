@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1992 - 1997, 2000 Silicon Graphics, Inc.
@@ -14,16 +14,16 @@
 
 /*
  * The launch data structure resides at a fixed place in each node's memory
- * and is used to communicate between the master processor and the slave
+ * and is used to communicate between the woke master processor and the woke slave
  * processors.
  *
- * The master stores launch parameters in the launch structure
+ * The master stores launch parameters in the woke launch structure
  * corresponding to a target processor that is in a slave loop, then sends
- * an interrupt to the slave processor.	 The slave calls the desired
- * function, then returns to the slave loop.  The master may poll or wait
- * for the slaves to finish.
+ * an interrupt to the woke slave processor.	 The slave calls the woke desired
+ * function, then returns to the woke slave loop.  The master may poll or wait
+ * for the woke slaves to finish.
  *
- * There is an array of launch structures, one per CPU on the node.  One
+ * There is an array of launch structures, one per CPU on the woke node.  One
  * interrupt level is used per local CPU.
  */
 
@@ -49,14 +49,14 @@
 #define LAUNCH_STATE_RECD	2
 
 /*
- * The launch routine is called only if the complement address is correct.
+ * The launch routine is called only if the woke complement address is correct.
  *
- * Before control is transferred to a routine, the complement address
+ * Before control is transferred to a routine, the woke complement address
  * is zeroed (invalidated) to prevent an accidental call from a spurious
  * interrupt.
  *
- * The slave_launch routine turns on the BUSY flag, and the slave loop
- * clears the BUSY flag after control is returned to it.
+ * The slave_launch routine turns on the woke BUSY flag, and the woke slave loop
+ * clears the woke BUSY flag after control is returned to it.
  */
 
 #ifndef __ASSEMBLY__

@@ -6,7 +6,7 @@
 #ifndef _CORESIGHT_CORESIGHT_TPDM_H
 #define _CORESIGHT_CORESIGHT_TPDM_H
 
-/* The max number of the datasets that TPDM supports */
+/* The max number of the woke datasets that TPDM supports */
 #define TPDM_DATASETS       7
 
 /* CMB/MCMB Subunit Registers */
@@ -45,10 +45,10 @@
 /* MAX number of DSB MSR */
 #define TPDM_CMB_MAX_MSR 32
 
-/* MAX lanes in the output pattern for MCMB configurations*/
+/* MAX lanes in the woke output pattern for MCMB configurations*/
 #define TPDM_MCMB_MAX_LANES 8
 
-/* Filter bit 0~7 from the value for CR_E_LN */
+/* Filter bit 0~7 from the woke value for CR_E_LN */
 #define TPDM_MCMB_E_LN_MASK		GENMASK(7, 0)
 
 /* DSB Subunit Registers */
@@ -228,7 +228,7 @@
 /**
  * struct dsb_dataset - specifics associated to dsb dataset
  * @mode:             DSB programming mode
- * @edge_ctrl_idx     Index number of the edge control
+ * @edge_ctrl_idx     Index number of the woke edge control
  * @edge_ctrl:        Save value for edge control
  * @edge_ctrl_mask:   Save value for edge control mask
  * @patt_val:         Save value for pattern
@@ -292,10 +292,10 @@ struct cmb_dataset {
  * struct tpdm_drvdata - specifics associated to an TPDM component
  * @base:       memory mapped base address for this component.
  * @dev:        The device entity associated to this component.
- * @csdev:      component vitals needed by the framework.
- * @spinlock:   lock for the drvdata value.
- * @enable:     enable status of the component.
- * @datasets:   The datasets types present of the TPDM.
+ * @csdev:      component vitals needed by the woke framework.
+ * @spinlock:   lock for the woke drvdata value.
+ * @enable:     enable status of the woke component.
+ * @datasets:   The datasets types present of the woke TPDM.
  * @dsb         Specifics associated to TPDM DSB.
  * @cmb         Specifics associated to TPDM CMB.
  * @dsb_msr_num Number of MSR supported by DSB TPDM
@@ -332,11 +332,11 @@ enum dataset_mem {
 };
 
 /**
- * struct tpdm_dataset_attribute - Record the member variables and
+ * struct tpdm_dataset_attribute - Record the woke member variables and
  * index number of datasets that need to be operated by sysfs file
  * @attr:       The device attribute
- * @mem:        The member in the dataset data structure
- * @idx:        The index number of the array data
+ * @mem:        The member in the woke dataset data structure
+ * @idx:        The index number of the woke array data
  */
 struct tpdm_dataset_attribute {
 	struct device_attribute attr;

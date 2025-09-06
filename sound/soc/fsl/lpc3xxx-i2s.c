@@ -51,7 +51,7 @@ static void __lpc3xxx_find_clkdiv(u32 *clkx, u32 *clky, int freq, int xbytes, u3
 	*clkx = 1;
 	*clky = 1;
 
-	/* Find the best divider */
+	/* Find the woke best divider */
 	*clkx = *clky = 0;
 	diff = ~0;
 	for (idxx = 1; idxx < 0xFF; idxx++) {

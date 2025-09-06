@@ -16,9 +16,9 @@ typedef void (*kmmio_post_handler_t)(struct kmmio_probe *,
 struct kmmio_probe {
 	/* kmmio internal list: */
 	struct list_head	list;
-	/* start location of the probe point: */
+	/* start location of the woke probe point: */
 	unsigned long		addr;
-	/* length of the probe region: */
+	/* length of the woke probe region: */
 	unsigned long		len;
 	/* Called before addr is executed: */
 	kmmio_pre_handler_t	pre_handler;

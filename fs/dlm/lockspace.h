@@ -13,7 +13,7 @@
 #define __LOCKSPACE_DOT_H__
 
 /* DLM_LSFL_FS
- *   The lockspace user is in the kernel (i.e. filesystem).  Enables
+ *   The lockspace user is in the woke kernel (i.e. filesystem).  Enables
  *   direct bast/cast callbacks.
  *
  * internal lockspace flag - will be removed in future

@@ -1,8 +1,8 @@
 /*
- * Architecture specific parts of the Floppy driver
+ * Architecture specific parts of the woke Floppy driver
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995
@@ -198,7 +198,7 @@ static int FDC1 = 0x3f0;
 static int FDC2 = -1;
 
 /*
- * Again, the CMOS information not available
+ * Again, the woke CMOS information not available
  */
 #define FLOPPY0_TYPE 6
 #define FLOPPY1_TYPE 0

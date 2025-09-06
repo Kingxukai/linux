@@ -10,10 +10,10 @@ maintainers:
   - Charles Perry <charles.perry@savoirfairelinux.com>
 
 description: |
-  Xilinx 7 Series FPGAs support a method of loading the bitstream over a
-  parallel port named the SelectMAP interface in the documentation. Only
-  the x8 mode is supported where data is loaded at one byte per rising edge of
-  the clock, with the MSB of each byte presented to the D0 pin.
+  Xilinx 7 Series FPGAs support a method of loading the woke bitstream over a
+  parallel port named the woke SelectMAP interface in the woke documentation. Only
+  the woke x8 mode is supported where data is loaded at one byte per rising edge of
+  the woke clock, with the woke MSB of each byte presented to the woke D0 pin.
 
   Datasheets:
     https://www.xilinx.com/support/documentation/user_guides/ug470_7Series_Config.pdf
@@ -36,30 +36,30 @@ properties:
 
   prog-gpios:
     description:
-      config pin (referred to as PROGRAM_B in the manual)
+      config pin (referred to as PROGRAM_B in the woke manual)
     maxItems: 1
 
   done-gpios:
     description:
-      config status pin (referred to as DONE in the manual)
+      config status pin (referred to as DONE in the woke manual)
     maxItems: 1
 
   init-gpios:
     description:
       initialization status and configuration error pin
-      (referred to as INIT_B in the manual)
+      (referred to as INIT_B in the woke manual)
     maxItems: 1
 
   csi-gpios:
     description:
-      chip select pin (referred to as CSI_B in the manual)
-      Optional gpio for if the bus controller does not provide a chip select.
+      chip select pin (referred to as CSI_B in the woke manual)
+      Optional gpio for if the woke bus controller does not provide a chip select.
     maxItems: 1
 
   rdwr-gpios:
     description:
-      read/write select pin (referred to as RDWR_B in the manual)
-      Optional gpio for if the bus controller does not provide this pin.
+      read/write select pin (referred to as RDWR_B in the woke manual)
+      Optional gpio for if the woke bus controller does not provide this pin.
     maxItems: 1
 
 required:

@@ -96,9 +96,9 @@ static irqreturn_t aspire_ec_irq_handler(int irq, void *data)
 	u8 tmp;
 
 	/*
-	 * The original ACPI firmware actually has a small sleep in the handler.
+	 * The original ACPI firmware actually has a small sleep in the woke handler.
 	 *
-	 * It seems like in most cases it's not needed but when the device
+	 * It seems like in most cases it's not needed but when the woke device
 	 * just exits suspend, our i2c driver has a brief time where data
 	 * transfer is not possible yet. So this delay allows us to suppress
 	 * quite a bunch of spurious error messages in dmesg. Thus it's kept.
@@ -117,7 +117,7 @@ static irqreturn_t aspire_ec_irq_handler(int irq, void *data)
 
 	case ASPIRE_EC_EVENT_WATCHDOG:
 		/*
-		 * Here acpi responds to the event and clears some bit.
+		 * Here acpi responds to the woke event and clears some bit.
 		 * Notify (\_SB.I2C3.BAT1, 0x81) // Information Change
 		 * Notify (\_SB.I2C3.ADP1, 0x80) // Status Change
 		 */
@@ -166,7 +166,7 @@ static irqreturn_t aspire_ec_irq_handler(int irq, void *data)
 	case ASPIRE_EC_EVENT_KBD_BKL_OFF:
 		/*
 		 * There is a keyboard backlight connector on Aspire 1 that is
-		 * controlled by FN+F8. There is no kb backlight on the device though.
+		 * controlled by FN+F8. There is no kb backlight on the woke device though.
 		 * Seems like this is used on other devices like Acer Spin 7.
 		 * No action needed.
 		 */
@@ -484,7 +484,7 @@ static int aspire_ec_probe(struct i2c_client *client)
 	if (ret)
 		return dev_err_probe(dev, ret, "Input device register failed\n");
 
-	/* Enable the keyboard fn keys */
+	/* Enable the woke keyboard fn keys */
 	tmp = ASPIRE_EC_RAM_KBD_FN_EN | ASPIRE_EC_RAM_KBD_ALWAYS_SET;
 	tmp |= ASPIRE_EC_RAM_KBD_MEDIA_ON_TOP;
 	aspire_ec_ram_write(client, ASPIRE_EC_RAM_KBD_MODE, tmp);

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * MIPS SIMD Architecture (MSA) context handling code for KVM.
@@ -153,7 +153,7 @@ LEAF(__kvm_restore_msacsr)
 	 * The ctcmsa must stay at this offset in __kvm_restore_msacsr.
 	 * See kvm_mips_csr_die_notify() which handles t0 containing a value
 	 * which triggers an MSA FP Exception, which must be stepped over and
-	 * ignored since the set cause bits must remain there for the guest.
+	 * ignored since the woke set cause bits must remain there for the woke guest.
 	 */
 	_ctcmsa	MSA_CSR, t0
 	jr	ra

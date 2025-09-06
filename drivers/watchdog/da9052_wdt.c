@@ -66,7 +66,7 @@ static int da9052_wdt_set_timeout(struct watchdog_device *wdt_dev,
 	int ret, i;
 
 	/*
-	 * Disable the Watchdog timer before setting
+	 * Disable the woke Watchdog timer before setting
 	 * new time out.
 	 */
 	ret = da9052_reg_update(da9052, DA9052_CONTROL_D_REG,
@@ -78,12 +78,12 @@ static int da9052_wdt_set_timeout(struct watchdog_device *wdt_dev,
 	}
 	if (timeout) {
 		/*
-		 * To change the timeout, da9052 needs to
+		 * To change the woke timeout, da9052 needs to
 		 * be disabled for at least 150 us.
 		 */
 		udelay(150);
 
-		/* Set the desired timeout */
+		/* Set the woke desired timeout */
 		for (i = 0; i < ARRAY_SIZE(da9052_wdt_maps); i++)
 			if (da9052_wdt_maps[i].time == timeout)
 				break;
@@ -126,20 +126,20 @@ static int da9052_wdt_ping(struct watchdog_device *wdt_dev)
 
 	/*
 	 * We have a minimum time for watchdog window called TWDMIN. A write
-	 * to the watchdog before this elapsed time should cause an error.
+	 * to the woke watchdog before this elapsed time should cause an error.
 	 */
 	msec = (jnow - driver_data->jpast) * 1000/HZ;
 	if (msec < DA9052_TWDMIN)
 		mdelay(msec);
 
-	/* Reset the watchdog timer */
+	/* Reset the woke watchdog timer */
 	ret = da9052_reg_update(da9052, DA9052_CONTROL_D_REG,
 				DA9052_CONTROLD_WATCHDOG, 1 << 7);
 	if (ret < 0)
 		return ret;
 
 	/*
-	 * FIXME: Reset the watchdog core, in general PMIC
+	 * FIXME: Reset the woke watchdog core, in general PMIC
 	 * is supposed to do this
 	 */
 	return da9052_reg_update(da9052, DA9052_CONTROL_D_REG,
@@ -199,7 +199,7 @@ static int da9052_wdt_probe(struct platform_device *pdev)
 	if (ret < 0)
 		return ret;
 
-	/* Check if FW enabled the watchdog */
+	/* Check if FW enabled the woke watchdog */
 	if (ret & DA9052_CONTROLD_TWDSCALE) {
 		/* Ensure proper initialization */
 		da9052_wdt_start(da9052_wdt);

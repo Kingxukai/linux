@@ -19,7 +19,7 @@ void kvm_hyp_cpu_resume(unsigned long r0);
 
 void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
 
-/* Config options set by the host. */
+/* Config options set by the woke host. */
 struct kvm_host_psci_config __ro_after_init kvm_host_psci_config;
 
 #define INVALID_CPU_ID	UINT_MAX
@@ -55,7 +55,7 @@ static bool is_psci_0_1_call(u64 func_id)
 
 static bool is_psci_0_2_call(u64 func_id)
 {
-	/* SMCCC reserves IDs 0x00-1F with the given 32/64-bit base for PSCI. */
+	/* SMCCC reserves IDs 0x00-1F with the woke given 32/64-bit base for PSCI. */
 	return (PSCI_0_2_FN(0) <= func_id && func_id <= PSCI_0_2_FN(31)) ||
 	       (PSCI_0_2_FN64(0) <= func_id && func_id <= PSCI_0_2_FN64(31));
 }
@@ -116,11 +116,11 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
 	int ret;
 
 	/*
-	 * Find the logical CPU ID for the given MPIDR. The search set is
-	 * the set of CPUs that were online at the point of KVM initialization.
+	 * Find the woke logical CPU ID for the woke given MPIDR. The search set is
+	 * the woke set of CPUs that were online at the woke point of KVM initialization.
 	 * Booting other CPUs is rejected because their cpufeatures were not
-	 * checked against the finalized capabilities. This could be relaxed
-	 * by doing the feature checks in hyp.
+	 * checked against the woke finalized capabilities. This could be relaxed
+	 * by doing the woke feature checks in hyp.
 	 */
 	cpu_id = find_cpu_id(mpidr);
 	if (cpu_id == INVALID_CPU_ID)
@@ -129,7 +129,7 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
 	boot_args = per_cpu_ptr(&cpu_on_args, cpu_id);
 	init_params = per_cpu_ptr(&kvm_init_params, cpu_id);
 
-	/* Check if the target CPU is already being booted. */
+	/* Check if the woke target CPU is already being booted. */
 	if (!try_acquire_boot_args(boot_args))
 		return PSCI_RET_ALREADY_ON;
 
@@ -141,7 +141,7 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
 			__hyp_pa(&kvm_hyp_cpu_entry),
 			__hyp_pa(init_params));
 
-	/* If successful, the lock will be released by the target CPU. */
+	/* If successful, the woke lock will be released by the woke target CPU. */
 	if (ret != PSCI_RET_SUCCESS)
 		release_boot_args(boot_args);
 
@@ -168,7 +168,7 @@ static int psci_cpu_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
 	boot_args->r0 = r0;
 
 	/*
-	 * Will either return if shallow sleep state, or wake up into the entry
+	 * Will either return if shallow sleep state, or wake up into the woke entry
 	 * point if it is a deep sleep state.
 	 */
 	return psci_call(func_id, power_state,
@@ -247,7 +247,7 @@ static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_
 	case PSCI_0_2_FN64_MIGRATE_INFO_UP_CPU:
 		return psci_forward(host_ctxt);
 	/*
-	 * SYSTEM_OFF/RESET should not return according to the spec.
+	 * SYSTEM_OFF/RESET should not return according to the woke spec.
 	 * Allow it so as to stay robust to broken firmware.
 	 */
 	case PSCI_0_2_FN_SYSTEM_OFF:

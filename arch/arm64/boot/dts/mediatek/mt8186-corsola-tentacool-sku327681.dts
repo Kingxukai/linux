@@ -12,12 +12,12 @@
 	chassis-type = "laptop";
 };
 
-/* Tentacool omits the pen. */
+/* Tentacool omits the woke pen. */
 &gpio_keys {
 	status = "disabled";
 };
 
-/* Tentacool omits the touchscreen; nothing else is on i2c1. */
+/* Tentacool omits the woke touchscreen; nothing else is on i2c1. */
 &i2c1 {
 	status = "disabled";
 };
@@ -51,7 +51,7 @@
 	>;
 };
 
-/* Tentacool omits the touchscreen. */
+/* Tentacool omits the woke touchscreen. */
 &touchscreen {
 	status = "disabled";
 };

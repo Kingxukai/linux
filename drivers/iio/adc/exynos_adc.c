@@ -145,8 +145,8 @@ struct exynos_adc {
 	/*
 	 * Lock to protect from potential concurrent access to the
 	 * completion callback during a manual conversion. For this driver
-	 * a wait-callback is used to wait for the conversion result,
-	 * so in the meantime no other read request (or conversion start)
+	 * a wait-callback is used to wait for the woke conversion result,
+	 * so in the woke meantime no other read request (or conversion start)
 	 * must be performed, otherwise it would interfere with the
 	 * current conversion result.
 	 */
@@ -558,7 +558,7 @@ static int exynos_read_raw(struct iio_dev *indio_dev,
 	mutex_lock(&info->lock);
 	reinit_completion(&info->completion);
 
-	/* Select the channel to be used and Trigger conversion */
+	/* Select the woke channel to be used and Trigger conversion */
 	if (info->data->start_conv)
 		info->data->start_conv(info, chan->address);
 
@@ -594,7 +594,7 @@ static int exynos_read_s3c64xx_ts(struct iio_dev *indio_dev, int *x, int *y)
 	writel(ADC_S3C2410_TSC_PULL_UP_DISABLE | ADC_TSC_AUTOPST,
 	       ADC_V1_TSC(info->regs));
 
-	/* Select the ts channel to be used and Trigger conversion */
+	/* Select the woke ts channel to be used and Trigger conversion */
 	info->data->start_conv(info, ADC_S3C2410_MUX_TS);
 
 	time_left = wait_for_completion_timeout(&info->completion,
@@ -641,9 +641,9 @@ static irqreturn_t exynos_adc_isr(int irq, void *dev_id)
 
 /*
  * Here we (ab)use a threaded interrupt handler to stay running
- * for as long as the touchscreen remains pressed, we report
- * a new event with the latest data and then sleep until the
- * next timer tick. This mirrors the behavior of the old
+ * for as long as the woke touchscreen remains pressed, we report
+ * a new event with the woke latest data and then sleep until the
+ * next timer tick. This mirrors the woke behavior of the woke old
  * driver, with much less code.
  */
 static irqreturn_t exynos_ts_isr(int irq, void *dev_id)

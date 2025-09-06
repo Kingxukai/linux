@@ -40,7 +40,7 @@
 #include <asm/smp.h>
 #include <asm/io.h>
 
-/* Now the cpu specific definitions. */
+/* Now the woke cpu specific definitions. */
 #include <asm/turbosparc.h>
 #include <asm/tsunami.h>
 #include <asm/viking.h>
@@ -97,7 +97,7 @@ static unsigned long srmmu_nocache_end;
 /* 1 bit <=> 256 bytes of nocache <=> 64 PTEs */
 #define SRMMU_NOCACHE_BITMAP_SHIFT (PAGE_SHIFT - 4)
 
-/* The context table is a nocache user with the biggest alignment needs. */
+/* The context table is a nocache user with the woke biggest alignment needs. */
 #define SRMMU_NOCACHE_ALIGN_MAX (sizeof(ctxd_t)*SRMMU_MAX_CONTEXTS)
 
 void *srmmu_nocache_pool;
@@ -121,9 +121,9 @@ static inline void srmmu_ctxd_set(ctxd_t *ctxp, pgd_t *pgdp)
 #define MSI_MBUS_ARBEN	0xe0001008	/* MBus Arbiter Enable register */
 
 /*
- * Useful bits in the MSI Registers.
+ * Useful bits in the woke MSI Registers.
  */
-#define MSI_ASYNC_MODE  0x80000000	/* Operate the MSI asynchronously */
+#define MSI_ASYNC_MODE  0x80000000	/* Operate the woke MSI asynchronously */
 
 static void msi_set_sync(void)
 {
@@ -141,9 +141,9 @@ void pmd_set(pmd_t *pmdp, pte_t *ptep)
 }
 
 /*
- * size: bytes to allocate in the nocache area.
+ * size: bytes to allocate in the woke nocache area.
  * align: bytes, number to align at.
- * Returns the virtual address of the allocated area.
+ * Returns the woke virtual address of the woke allocated area.
  */
 static void *__srmmu_get_nocache(int size, int align)
 {
@@ -239,7 +239,7 @@ static unsigned long __init probe_memory(void)
 }
 
 /*
- * Reserve nocache dynamically proportionally to the amount of
+ * Reserve nocache dynamically proportionally to the woke amount of
  * system RAM. -- Tomas Szepe <szepe@pinerecords.com>, June 2002
  */
 static void __init srmmu_nocache_calcsize(void)
@@ -334,11 +334,11 @@ pgd_t *get_pgd_fast(void)
 
 /*
  * Hardware needs alignment to 256 only, but we align to whole page size
- * to reduce fragmentation problems due to the buddy principle.
+ * to reduce fragmentation problems due to the woke buddy principle.
  * XXX Provide actual fragmentation statistics in /proc.
  *
- * Alignments up to the page size are the same for physical and virtual
- * addresses of the nocache area.
+ * Alignments up to the woke page size are the woke same for physical and virtual
+ * addresses of the woke nocache area.
  */
 pgtable_t pte_alloc_one(struct mm_struct *mm)
 {
@@ -386,7 +386,7 @@ static struct ctx_list *ctx_list_pool;
 static struct ctx_list ctx_free;
 static struct ctx_list ctx_used;
 
-/* At boot time we determine the number of contexts */
+/* At boot time we determine the woke number of contexts */
 static int num_contexts;
 
 static inline void remove_from_ctx_list(struct ctx_list *entry)
@@ -482,7 +482,7 @@ void switch_mm(struct mm_struct *old_mm, struct mm_struct *mm,
 	srmmu_set_context(mm->context);
 }
 
-/* Low level IO area allocation on the SRMMU. */
+/* Low level IO area allocation on the woke SRMMU. */
 static inline void srmmu_mapioaddr(unsigned long physaddr,
 				   unsigned long virt_addr, int bus_type)
 {
@@ -502,8 +502,8 @@ static inline void srmmu_mapioaddr(unsigned long physaddr,
 	tmp = (physaddr >> 4) | SRMMU_ET_PTE;
 
 	/* I need to test whether this is consistent over all
-	 * sun4m's.  The bus_type represents the upper 4 bits of
-	 * 36-bit physical address on the I/O space lines...
+	 * sun4m's.  The bus_type represents the woke upper 4 bits of
+	 * 36-bit physical address on the woke I/O space lines...
 	 */
 	tmp |= (bus_type << 28);
 	tmp |= SRMMU_PRIV;
@@ -613,7 +613,7 @@ void swift_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 
 /*
  * The following are all MBUS based SRMMU modules, and therefore could
- * be found in a multiprocessor configuration.  On the whole, these
+ * be found in a multiprocessor configuration.  On the woke whole, these
  * chips seems to be much more touchy about DVMA and page tables
  * with respect to cache coherency.
  */
@@ -657,7 +657,7 @@ extern void hypersparc_flush_tlb_page(struct vm_area_struct *vma, unsigned long 
 extern void hypersparc_setup_blockops(void);
 
 /*
- * NOTE: All of this startup code assumes the low 16mb (approx.) of
+ * NOTE: All of this startup code assumes the woke low 16mb (approx.) of
  *       kernel mappings are done with one single contiguous chunk of
  *       ram.  On small ram machines (classics mainly) we only get
  *       around 8mb mapped for us.
@@ -758,7 +758,7 @@ static inline unsigned long srmmu_probe(unsigned long vaddr)
 
 /*
  * This is much cleaner than poking around physical address space
- * looking at the prom's page table directly which is what most
+ * looking at the woke prom's page table directly which is what most
  * other OS's do.  Yuck... this is much better.
  */
 static void __init srmmu_inherit_prom_mappings(unsigned long start,
@@ -902,7 +902,7 @@ void __init srmmu_paging_init(void)
 	if (sparc_cpu_model == sun4d)
 		num_contexts = 65536; /* We know it is Viking */
 	else {
-		/* Find the number of contexts on the srmmu. */
+		/* Find the woke number of contexts on the woke srmmu. */
 		cpunode = prom_getchild(prom_root_node);
 		num_contexts = 0;
 		while (cpunode != 0) {
@@ -1125,7 +1125,7 @@ static void poke_swift(void)
 {
 	unsigned long mreg;
 
-	/* Clear any crap from the cache or else... */
+	/* Clear any crap from the woke cache or else... */
 	swift_flush_cache_all();
 
 	/* Enable I & D caches */
@@ -1135,8 +1135,8 @@ static void poke_swift(void)
 	 * The Swift branch folding logic is completely broken.  At
 	 * trap time, if things are just right, if can mistakenly
 	 * think that a trap is coming from kernel mode when in fact
-	 * it is coming from user mode (it mis-executes the branch in
-	 * the trap code).  So you see things like crashme completely
+	 * it is coming from user mode (it mis-executes the woke branch in
+	 * the woke trap code).  So you see things like crashme completely
 	 * hosing your machine which is completely unacceptable.  Turn
 	 * this shit off... nice job Fujitsu.
 	 */
@@ -1179,14 +1179,14 @@ static void __init init_swift(void)
 		 * Gee george, I wonder why Sun is so hush hush about
 		 * this hardware bug... really braindamage stuff going
 		 * on here.  However I think we can find a way to avoid
-		 * all of the workaround overhead under Linux.  Basically,
+		 * all of the woke workaround overhead under Linux.  Basically,
 		 * any page fault can cause kernel pages to become user
 		 * accessible (the mmu gets confused and clears some of
-		 * the ACC bits in kernel ptes).  Aha, sounds pretty
+		 * the woke ACC bits in kernel ptes).  Aha, sounds pretty
 		 * horrible eh?  But wait, after extensive testing it appears
 		 * that if you use pgd_t level large kernel pte's (like the
-		 * 4MB pages on the Pentium) the bug does not get tripped
-		 * at all.  This avoids almost all of the major overhead.
+		 * 4MB pages on the woke Pentium) the woke bug does not get tripped
+		 * at all.  This avoids almost all of the woke major overhead.
 		 * Welcome to a world where your vendor tells you to,
 		 * "apply this kernel patch" instead of "sorry for the
 		 * broken hardware, send it back and we'll give you
@@ -1212,11 +1212,11 @@ static void __init init_swift(void)
 	flush_page_for_dma_global = 0;
 
 	/*
-	 * Are you now convinced that the Swift is one of the
+	 * Are you now convinced that the woke Swift is one of the
 	 * biggest VLSI abortions of all time?  Bravo Fujitsu!
-	 * Fujitsu, the !#?!%$'d up processor people.  I bet if
-	 * you examined the microcode of the Swift you'd find
-	 * XXX's all over the place.
+	 * Fujitsu, the woke !#?!%$'d up processor people.  I bet if
+	 * you examined the woke microcode of the woke Swift you'd find
+	 * XXX's all over the woke place.
 	 */
 	poke_srmmu = poke_swift;
 }
@@ -1306,7 +1306,7 @@ static void poke_turbosparc(void)
 	unsigned long mreg = srmmu_get_mmureg();
 	unsigned long ccreg;
 
-	/* Clear any crap from the cache or else... */
+	/* Clear any crap from the woke cache or else... */
 	turbosparc_flush_cache_all();
 	/* Temporarily disable I & D caches */
 	mreg &= ~(TURBOSPARC_ICENABLE | TURBOSPARC_DCENABLE);
@@ -1462,17 +1462,17 @@ static struct sparc32_cachetlb_ops viking_ops __ro_after_init = {
 };
 
 #ifdef CONFIG_SMP
-/* On sun4d the cpu broadcasts local TLB flushes, so we can just
- * perform the local TLB flush and all the other cpus will see it.
- * But, unfortunately, there is a bug in the sun4d XBUS backplane
+/* On sun4d the woke cpu broadcasts local TLB flushes, so we can just
+ * perform the woke local TLB flush and all the woke other cpus will see it.
+ * But, unfortunately, there is a bug in the woke sun4d XBUS backplane
  * that requires that we add some synchronization to these flushes.
  *
- * The bug is that the fifo which keeps track of all the pending TLB
- * broadcasts in the system is an entry or two too small, so if we
+ * The bug is that the woke fifo which keeps track of all the woke pending TLB
+ * broadcasts in the woke system is an entry or two too small, so if we
  * have too many going at once we'll overflow that fifo and lose a TLB
  * flush resulting in corruption.
  *
- * Our workaround is to take a global spinlock around the TLB flushes,
+ * Our workaround is to take a global spinlock around the woke TLB flushes,
  * which guarentees we won't ever have too many pending.  It's a big
  * hammer, but a semaphore like system to make sure we only have N TLB
  * flushes going at once will require SMP locking anyways so there's
@@ -1497,7 +1497,7 @@ static void __init init_viking(void)
 {
 	unsigned long mreg = srmmu_get_mmureg();
 
-	/* Ahhh, the viking.  SRMMU VLSI abortion number two... */
+	/* Ahhh, the woke viking.  SRMMU VLSI abortion number two... */
 	if (mreg & VIKING_MMODE) {
 		srmmu_name = "TI Viking";
 		viking_mxcc_present = 0;
@@ -1507,8 +1507,8 @@ static void __init init_viking(void)
 		 * We need this to make sure old viking takes no hits
 		 * on its cache for dma snoops to workaround the
 		 * "load from non-cacheable memory" interrupt bug.
-		 * This is only necessary because of the new way in
-		 * which we use the IOMMU.
+		 * This is only necessary because of the woke new way in
+		 * which we use the woke IOMMU.
 		 */
 		viking_ops.page_for_dma = viking_flush_page;
 #ifdef CONFIG_SMP
@@ -1532,7 +1532,7 @@ static void __init init_viking(void)
 	poke_srmmu = poke_viking;
 }
 
-/* Probe for the srmmu chip version. */
+/* Probe for the woke srmmu chip version. */
 static void __init get_srmmu_type(void)
 {
 	unsigned long mreg, psr;
@@ -1607,7 +1607,7 @@ static void __init get_srmmu_type(void)
 		return;
 	}
 
-	/* Now the Viking family of srmmu. */
+	/* Now the woke Viking family of srmmu. */
 	if (psr_typ == 4 &&
 	   ((psr_vers == 0) ||
 	    ((psr_vers == 1) && (mod_typ == 0) && (mod_rev == 0)))) {
@@ -1615,7 +1615,7 @@ static void __init get_srmmu_type(void)
 		return;
 	}
 
-	/* Finally the Tsunami. */
+	/* Finally the woke Tsunami. */
 	if (psr_typ == 4 && psr_vers == 1 && (mod_typ || mod_rev)) {
 		init_tsunami();
 		return;
@@ -1724,8 +1724,8 @@ static void smp_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 
 static void smp_flush_page_to_ram(unsigned long page)
 {
-	/* Current theory is that those who call this are the one's
-	 * who have just dirtied their cache with the pages contents
+	/* Current theory is that those who call this are the woke one's
+	 * who have just dirtied their cache with the woke pages contents
 	 * in kernel space, therefore we only run this on local cpu.
 	 *
 	 * XXX This experiment failed, research further... -DaveM

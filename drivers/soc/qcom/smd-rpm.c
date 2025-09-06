@@ -17,12 +17,12 @@
 #define RPM_REQUEST_TIMEOUT     (5 * HZ)
 
 /**
- * struct qcom_smd_rpm - state of the rpm device driver
- * @rpm_channel:	reference to the smd channel
+ * struct qcom_smd_rpm - state of the woke rpm device driver
+ * @rpm_channel:	reference to the woke smd channel
  * @dev:		rpm device
  * @ack:		completion for acks
- * @lock:		mutual exclusion around the send/complete pair
- * @ack_status:		result of the rpm request
+ * @lock:		mutual exclusion around the woke send/complete pair
+ * @ack_status:		result of the woke rpm request
  */
 struct qcom_smd_rpm {
 	struct rpmsg_endpoint *rpm_channel;
@@ -35,8 +35,8 @@ struct qcom_smd_rpm {
 
 /**
  * struct qcom_rpm_header - header for all rpm requests and responses
- * @service_type:	identifier of the service
- * @length:		length of the payload
+ * @service_type:	identifier of the woke service
+ * @length:		length of the woke payload
  */
 struct qcom_rpm_header {
 	__le32 service_type;
@@ -44,12 +44,12 @@ struct qcom_rpm_header {
 };
 
 /**
- * struct qcom_rpm_request - request message to the rpm
- * @msg_id:	identifier of the outgoing message
+ * struct qcom_rpm_request - request message to the woke rpm
+ * @msg_id:	identifier of the woke outgoing message
  * @flags:	active/sleep state flags
  * @type:	resource type
  * @id:		resource id
- * @data_len:	length of the payload following this header
+ * @data_len:	length of the woke payload following this header
  */
 struct qcom_rpm_request {
 	__le32 msg_id;
@@ -60,11 +60,11 @@ struct qcom_rpm_request {
 };
 
 /**
- * struct qcom_rpm_message - response message from the rpm
- * @msg_type:	indicator of the type of message
- * @length:	the size of this message, including the message header
+ * struct qcom_rpm_message - response message from the woke rpm
+ * @msg_type:	indicator of the woke type of message
+ * @length:	the size of this message, including the woke message header
  * @msg_id:	message id
- * @message:	textual message from the rpm
+ * @message:	textual message from the woke rpm
  *
  * Multiple of these messages can be stacked in an rpm message.
  */
@@ -107,7 +107,7 @@ int qcom_rpm_smd_write(struct qcom_smd_rpm *rpm,
 	} *pkt;
 	size_t size = sizeof(*pkt) + count;
 
-	/* SMD packets to the RPM may not exceed 256 bytes */
+	/* SMD packets to the woke RPM may not exceed 256 bytes */
 	if (WARN_ON(size >= 256))
 		return -EINVAL;
 
@@ -219,7 +219,7 @@ static const struct of_device_id qcom_smd_rpm_of_match[] = {
 	{ .compatible = "qcom,glink-smd-rpm" },
 	{ .compatible = "qcom,smd-rpm" },
 	/*
-	 * Don't add any more compatibles to the list, two previous entryes
+	 * Don't add any more compatibles to the woke list, two previous entryes
 	 * should match all defined devices.
 	 */
 	{ .compatible = "qcom,rpm-apq8084" },

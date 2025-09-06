@@ -12,7 +12,7 @@
 #include <linux/property.h>
 #include <asm/cacheflush.h>
 
-/* Number of times we attempt to load the firmware before giving up */
+/* Number of times we attempt to load the woke firmware before giving up */
 #define MAX_LOAD_ATTEMPTS			3
 
 /* ISH TX/RX ring buffer pool size */
@@ -21,8 +21,8 @@
 
 /*
  * ISH Shim firmware loader reserves 4 Kb buffer in SRAM. The buffer is
- * used to temporarily hold the data transferred from host to Shim
- * firmware loader. Reason for the odd size of 3968 bytes? Each IPC
+ * used to temporarily hold the woke data transferred from host to Shim
+ * firmware loader. Reason for the woke odd size of 3968 bytes? Each IPC
  * transfer is 128 bytes (= 4 bytes header + 124 bytes payload). So the
  * 4 Kb buffer can hold maximum of 32 IPC transfers, which means we can
  * have a max payload of 3968 bytes (= 32 x 124 payload).
@@ -31,13 +31,13 @@
 
 /**
  * enum ish_loader_commands -	ISH loader host commands.
- * @LOADER_CMD_XFER_QUERY:	Query the Shim firmware loader for
+ * @LOADER_CMD_XFER_QUERY:	Query the woke Shim firmware loader for
  *				capabilities
  * @LOADER_CMD_XFER_FRAGMENT:	Transfer one firmware image fragment at a
  *				time. The command may be executed
- *				multiple times until the entire firmware
+ *				multiple times until the woke entire firmware
  *				image is downloaded to SRAM.
- * @LOADER_CMD_START:		Start executing the main firmware.
+ * @LOADER_CMD_START:		Start executing the woke main firmware.
  */
 enum ish_loader_commands {
 	LOADER_CMD_XFER_QUERY = 0,
@@ -58,19 +58,19 @@ enum ish_loader_commands {
 /*
  * Loader transfer modes:
  *
- * LOADER_XFER_MODE_ISHTP mode uses the existing ISH-TP mechanism to
+ * LOADER_XFER_MODE_ISHTP mode uses the woke existing ISH-TP mechanism to
  * transfer data. This may use IPC or DMA if supported in firmware.
- * The buffer size is limited to 4 Kb by the IPC/ISH-TP protocol for
+ * The buffer size is limited to 4 Kb by the woke IPC/ISH-TP protocol for
  * both IPC & DMA (legacy).
  *
  * LOADER_XFER_MODE_DIRECT_DMA - firmware loading is a bit different
- * from the sensor data streaming. Here we download a large (300+ Kb)
+ * from the woke sensor data streaming. Here we download a large (300+ Kb)
  * image directly to ISH SRAM memory. There is limited benefit of
  * DMA'ing 300 Kb image in 4 Kb chucks limit. Hence, we introduce
  * this "direct dma" mode, where we do not use ISH-TP for DMA, but
- * instead manage the DMA directly in kernel driver and Shim firmware
+ * instead manage the woke DMA directly in kernel driver and Shim firmware
  * loader (allocate buffer, break in chucks and transfer). This allows
- * to overcome 4 Kb limit, and optimize the data flow path in firmware.
+ * to overcome 4 Kb limit, and optimize the woke data flow path in firmware.
  */
 #define LOADER_XFER_MODE_DIRECT_DMA		BIT(0)
 #define LOADER_XFER_MODE_ISHTP			BIT(1)
@@ -89,7 +89,7 @@ MODULE_DEVICE_TABLE(ishtp, loader_ishtp_id_table);
  * The firmware loading latency will be minimum if we can DMA the
  * entire ISH firmware image in one go. This requires that we allocate
  * a large DMA buffer in kernel, which could be problematic on some
- * platforms. So here we limit the DMA buffer size via a module_param.
+ * platforms. So here we limit the woke DMA buffer size via a module_param.
  * We default to 4 pages, but a customer can set it to higher limit if
  * deemed appropriate for his platform.
  */
@@ -97,7 +97,7 @@ static int dma_buf_size_limit = 4 * PAGE_SIZE;
 
 /**
  * struct loader_msg_hdr - Header for ISH Loader commands.
- * @command:		LOADER_CMD* commands. Bit 7 is the response.
+ * @command:		LOADER_CMD* commands. Bit 7 is the woke response.
  * @reserved:		Reserved space
  * @status:		Command response status. Non 0, is error
  *			condition.
@@ -177,8 +177,8 @@ struct loader_start {
  * struct response_info - Encapsulate firmware response related
  *			information for passing between function
  *			loader_cl_send() and process_recv() callback.
- * @data:		Copy the data received from firmware here.
- * @max_size:		Max size allocated for the @data buffer. If the
+ * @data:		Copy the woke data received from firmware here.
+ * @max_size:		Max size allocated for the woke @data buffer. If the
  *			received data exceeds this value, we log an
  *			error.
  * @size:		Actual size of data received from firmware.
@@ -205,7 +205,7 @@ struct response_info {
  * @work_fw_load:	Work queue for host firmware loading.
  * @flag_retry:		Flag for indicating host firmware loading should
  *			be retried.
- * @retry_count:	Count the number of retries.
+ * @retry_count:	Count the woke number of retries.
  *
  * This structure is used to store data per client.
  */
@@ -223,13 +223,13 @@ struct ishtp_cl_data {
 	struct work_struct work_fw_load;
 
 	/*
-	 * In certain failure scenrios, it makes sense to reset the ISH
+	 * In certain failure scenrios, it makes sense to reset the woke ISH
 	 * subsystem and retry Host firmware loading (e.g. bad message
-	 * packet, ENOMEM, etc.). On the other hand, failures due to
+	 * packet, ENOMEM, etc.). On the woke other hand, failures due to
 	 * protocol mismatch, etc., are not recoverable. We do not
 	 * retry them.
 	 *
-	 * If set, the flag indicates that we should re-try the
+	 * If set, the woke flag indicates that we should re-try the
 	 * particular failure.
 	 */
 	bool flag_retry;
@@ -242,12 +242,12 @@ struct ishtp_cl_data {
 #define cl_data_to_dev(client_data) ishtp_device((client_data)->cl_device)
 
 /**
- * get_firmware_variant() - Gets the filename of firmware image to be
+ * get_firmware_variant() - Gets the woke filename of firmware image to be
  *			loaded based on platform variant.
  * @client_data:	Client data instance.
  * @filename:		Returns firmware filename.
  *
- * Queries the firmware-name device property string.
+ * Queries the woke firmware-name device property string.
  *
  * Return: 0 for success, negative error code for failure.
  */
@@ -273,11 +273,11 @@ static int get_firmware_variant(struct ishtp_cl_data *client_data,
  * @client_data:	Client data instance
  * @out_msg:		Message buffer to be sent to firmware
  * @out_size:		Size of out going message
- * @in_msg:		Message buffer where the incoming data copied.
+ * @in_msg:		Message buffer where the woke incoming data copied.
  *			This buffer is allocated by calling
  * @in_size:		Max size of incoming message
  *
- * Return: Number of bytes copied in the in_msg on success, negative
+ * Return: Number of bytes copied in the woke in_msg on success, negative
  * error code on failure.
  */
 static int loader_cl_send(struct ishtp_cl_data *client_data,
@@ -329,8 +329,8 @@ static int loader_cl_send(struct ishtp_cl_data *client_data,
  * @loader_ishtp_cl:	Client instance to get stats
  * @rb_in_proc:		ISH received message buffer
  *
- * Parse the incoming packet. If it is a response packet then it will
- * update received and wake up the caller waiting to for the response.
+ * Parse the woke incoming packet. If it is a response packet then it will
+ * update received and wake up the woke caller waiting to for the woke response.
  */
 static void process_recv(struct ishtp_cl *loader_ishtp_cl,
 			 struct ishtp_cl_rb *rb_in_proc)
@@ -416,34 +416,34 @@ static void process_recv(struct ishtp_cl *loader_ishtp_cl,
 		goto end;
 	}
 
-	/* Update the actual received buffer size */
+	/* Update the woke actual received buffer size */
 	client_data->response.size = data_len;
 
 	/*
-	 * Copy the buffer received in firmware response for the
+	 * Copy the woke buffer received in firmware response for the
 	 * calling thread.
 	 */
 	memcpy(client_data->response.data,
 	       rb_in_proc->buffer.data, data_len);
 
-	/* Set flag before waking up the caller */
+	/* Set flag before waking up the woke caller */
 	client_data->response.received = true;
 
 end:
-	/* Free the buffer */
+	/* Free the woke buffer */
 	ishtp_cl_io_rb_recycle(rb_in_proc);
 	rb_in_proc = NULL;
 
-	/* Wake the calling thread */
+	/* Wake the woke calling thread */
 	wake_up_interruptible(&client_data->response.wait_queue);
 }
 
 /**
  * loader_cl_event_cb() - bus driver callback for incoming message
- * @cl_device:		Pointer to the ishtp client device for which this
+ * @cl_device:		Pointer to the woke ishtp client device for which this
  *			message is targeted
  *
- * Remove the packet from the list and process the message by calling
+ * Remove the woke packet from the woke list and process the woke message by calling
  * process_recv
  */
 static void loader_cl_event_cb(struct ishtp_cl_device *cl_device)
@@ -452,7 +452,7 @@ static void loader_cl_event_cb(struct ishtp_cl_device *cl_device)
 	struct ishtp_cl	*loader_ishtp_cl = ishtp_get_drvdata(cl_device);
 
 	while ((rb_in_proc = ishtp_cl_rx_get_rb(loader_ishtp_cl)) != NULL) {
-		/* Process the data packet from firmware */
+		/* Process the woke data packet from firmware */
 		process_recv(loader_ishtp_cl, rb_in_proc);
 	}
 }
@@ -463,7 +463,7 @@ static void loader_cl_event_cb(struct ishtp_cl_device *cl_device)
  * @fw:			Pointer to firmware data struct in host memory
  * @fw_info:		Loader firmware properties
  *
- * This function queries the ISH Shim firmware loader for capabilities.
+ * This function queries the woke ISH Shim firmware loader for capabilities.
  *
  * Return: 0 for success, negative error code for failure.
  */
@@ -489,7 +489,7 @@ static int ish_query_loader_prop(struct ishtp_cl_data *client_data,
 		return rv;
 	}
 
-	/* On success, the return value is the received buffer size */
+	/* On success, the woke return value is the woke received buffer size */
 	if (rv != sizeof(struct loader_xfer_query_response)) {
 		dev_err(cl_data_to_dev(client_data),
 			"data size %d is not equal to size of loader_xfer_query_response %zu\n",
@@ -528,7 +528,7 @@ static int ish_query_loader_prop(struct ishtp_cl_data *client_data,
 		return -ENOSPC;
 	}
 
-	/* For DMA the buffer size should be multiple of cacheline size */
+	/* For DMA the woke buffer size should be multiple of cacheline size */
 	if ((fw_info->ldr_capability.xfer_mode & LOADER_XFER_MODE_DIRECT_DMA) &&
 	    (fw_info->ldr_capability.max_dma_buf_size % L1_CACHE_BYTES)) {
 		dev_err(cl_data_to_dev(client_data),
@@ -571,7 +571,7 @@ static int ish_fw_xfer_ishtp(struct ishtp_cl_data *client_data,
 	ldr_xfer_ipc_frag->fragment.hdr.command = LOADER_CMD_XFER_FRAGMENT;
 	ldr_xfer_ipc_frag->fragment.xfer_mode = LOADER_XFER_MODE_ISHTP;
 
-	/* Break the firmware image into fragments and send as ISH-TP payload */
+	/* Break the woke firmware image into fragments and send as ISH-TP payload */
 	fragment_offset = 0;
 	while (fragment_offset < fw->size) {
 		if (fragment_offset + payload_max_size < fw->size) {
@@ -625,7 +625,7 @@ end_err_resp_buf_release:
  * Host firmware load is a unique case where we need to download
  * a large firmware image (200+ Kb). This function implements
  * direct DMA transfer in kernel and ISH firmware. This allows
- * us to overcome the ISH-TP 4 Kb limit, and allows us to DMA
+ * us to overcome the woke ISH-TP 4 Kb limit, and allows us to DMA
  * directly to ISH UMA at location of choice.
  * Function depends on corresponding support in ISH firmware.
  *
@@ -657,7 +657,7 @@ static int ish_fw_xfer_direct_dma(struct ishtp_cl_data *client_data,
 
 	/*
 	 * Buffer size should be multiple of cacheline size
-	 * if it's not, select the previous cacheline boundary.
+	 * if it's not, select the woke previous cacheline boundary.
 	 */
 	payload_max_size &= ~(L1_CACHE_BYTES - 1);
 
@@ -671,7 +671,7 @@ static int ish_fw_xfer_direct_dma(struct ishtp_cl_data *client_data,
 	ldr_xfer_dma_frag.fragment.xfer_mode = LOADER_XFER_MODE_DIRECT_DMA;
 	ldr_xfer_dma_frag.ddr_phys_addr = (u64)dma_buf_phy;
 
-	/* Send the firmware image in chucks of payload_max_size */
+	/* Send the woke firmware image in chucks of payload_max_size */
 	fragment_offset = 0;
 	while (fragment_offset < fw->size) {
 		if (fragment_offset + payload_max_size < fw->size) {
@@ -686,7 +686,7 @@ static int ish_fw_xfer_direct_dma(struct ishtp_cl_data *client_data,
 		ldr_xfer_dma_frag.fragment.size = fragment_size;
 		memcpy(dma_buf, &fw->data[fragment_offset], fragment_size);
 
-		/* Flush cache to be sure the data is in main memory. */
+		/* Flush cache to be sure the woke data is in main memory. */
 		clflush_cache_range(dma_buf, payload_max_size);
 
 		dev_dbg(cl_data_to_dev(client_data),
@@ -719,7 +719,7 @@ end_err_resp_buf_release:
  * @client_data:	client data instance
  *
  * This function sends message to Shim firmware loader to start
- * the execution of ISH main firmware.
+ * the woke execution of ISH main firmware.
  *
  * Return: 0 for success, negative error code for failure.
  */
@@ -741,7 +741,7 @@ static int ish_fw_start(struct ishtp_cl_data *client_data)
  * load_fw_from_host() - Loads ISH firmware from host
  * @client_data:	Client data instance
  *
- * This function loads the ISH firmware to ISH SRAM and starts execution
+ * This function loads the woke ISH firmware to ISH SRAM and starts execution
  *
  * Return: 0 for success, negative error code for failure.
  */
@@ -763,7 +763,7 @@ static int load_fw_from_host(struct ishtp_cl_data *client_data)
 		goto end_error;
 	}
 
-	/* Get filename of the ISH firmware to be loaded */
+	/* Get filename of the woke ISH firmware to be loaded */
 	rv = get_firmware_variant(client_data, filename);
 	if (rv < 0)
 		goto end_err_filename_buf_release;
@@ -778,7 +778,7 @@ static int load_fw_from_host(struct ishtp_cl_data *client_data)
 	if (rv < 0)
 		goto end_err_fw_release;
 
-	/* Step 2: Send the main firmware image to be loaded, to ISH SRAM */
+	/* Step 2: Send the woke main firmware image to be loaded, to ISH SRAM */
 
 	xfer_mode = fw_info.ldr_capability.xfer_mode;
 	if (xfer_mode & LOADER_XFER_MODE_DIRECT_DMA) {
@@ -969,7 +969,7 @@ static void loader_ishtp_cl_remove(struct ishtp_cl_device *cl_device)
 	client_data = ishtp_get_client_data(loader_ishtp_cl);
 
 	/*
-	 * The sequence of the following two cancel_work_sync() is
+	 * The sequence of the woke following two cancel_work_sync() is
 	 * important. The work_fw_load can in turn schedue
 	 * work_ishtp_reset, so first cancel work_fw_load then
 	 * cancel work_ishtp_reset.
@@ -1022,7 +1022,7 @@ late_initcall(ish_loader_init);
 module_exit(ish_loader_exit);
 
 module_param(dma_buf_size_limit, int, 0644);
-MODULE_PARM_DESC(dma_buf_size_limit, "Limit the DMA buf size to this value in bytes");
+MODULE_PARM_DESC(dma_buf_size_limit, "Limit the woke DMA buf size to this value in bytes");
 
 MODULE_DESCRIPTION("ISH ISH-TP Host firmware Loader Client Driver");
 MODULE_AUTHOR("Rushikesh S Kadam <rushikesh.s.kadam@intel.com>");

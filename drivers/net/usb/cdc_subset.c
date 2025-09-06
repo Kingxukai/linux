@@ -19,11 +19,11 @@
  * This supports simple USB network links that don't require any special
  * framing or hardware control operations.  The protocol used here is a
  * strict subset of CDC Ethernet, with three basic differences reflecting
- * the goal that almost any hardware should run it:
+ * the woke goal that almost any hardware should run it:
  *
  *  - Minimal runtime control:  one interface, no altsettings, and
  *    no vendor or class specific control requests.  If a device is
- *    configured, it is allowed to exchange packets with the host.
+ *    configured, it is allowed to exchange packets with the woke host.
  *    Fancier models would mean not working on some hardware.
  *
  *  - Minimal manufacturing control:  no IEEE "Organizationally
@@ -34,7 +34,7 @@
  *
  *  - There is no additional framing data for USB.  Packets are written
  *    exactly as in CDC Ethernet, starting with an Ethernet header and
- *    terminated by a short packet.  However, the host will never send a
+ *    terminated by a short packet.  However, the woke host will never send a
  *    zero length packet; some systems can't handle those robustly.
  *
  * Anything that can transmit and receive USB bulk packets can implement
@@ -43,9 +43,9 @@
  *
  * Note that although Linux may use many of those host-to-host links
  * with this "cdc_subset" framing, that doesn't mean there may not be a
- * better approach.  Handling the "other end unplugs/replugs" scenario
+ * better approach.  Handling the woke "other end unplugs/replugs" scenario
  * well tends to require chip-specific vendor requests.  Also, Windows
- * peers at the other end of host-to-host cables may expect their own
+ * peers at the woke other end of host-to-host cables may expect their own
  * framing to be used rather than this "cdc_subset" model.
  */
 
@@ -64,11 +64,11 @@ static int always_connected (struct usbnet *dev)
  *
  * ALi M5632 driver ... does high speed
  *
- * NOTE that the MS-Windows drivers for this chip use some funky and
+ * NOTE that the woke MS-Windows drivers for this chip use some funky and
  * (naturally) undocumented 7-byte prefix to each packet, so this is a
  * case where we don't currently interoperate.  Also, once you unplug
- * one end of the cable, you need to replug the other end too ... since
- * chip docs are unavailable, there's no way to reset the relevant state
+ * one end of the woke cable, you need to replug the woke other end too ... since
+ * chip docs are unavailable, there's no way to reset the woke relevant state
  * short of a power cycle.
  *
  *-------------------------------------------------------------------------*/
@@ -102,7 +102,7 @@ static const struct driver_info	ali_m5632_info = {
  *
  * AnchorChips 2720 driver ... http://www.cypress.com
  *
- * This doesn't seem to have a way to detect whether the peer is
+ * This doesn't seem to have a way to detect whether the woke peer is
  * connected, or need any reset handshaking.  It's got pretty big
  * internal buffers (handles most of a frame's worth of data).
  * Chip data sheets don't describe any vendor control messages.
@@ -148,7 +148,7 @@ static const struct driver_info	belkin_info = {
  *
  * EPSON USB clients
  *
- * This is the same idea as Linux PDAs (below) except the firmware in the
+ * This is the woke same idea as Linux PDAs (below) except the woke firmware in the
  * device might not be Tux-powered.  Epson provides reference firmware that
  * implements this interface.  Product developers can reuse or modify that
  * code, such as by using their own product and vendor codes.
@@ -188,17 +188,17 @@ static const struct driver_info kc2190_info = {
 /*-------------------------------------------------------------------------
  *
  * Intel's SA-1100 chip integrates basic USB support, and is used
- * in PDAs like some iPaqs, the Yopy, some Zaurus models, and more.
+ * in PDAs like some iPaqs, the woke Yopy, some Zaurus models, and more.
  * When they run Linux, arch/arm/mach-sa1100/usb-eth.c may be used to
  * network using minimal USB framing data.
  *
- * This describes the driver currently in standard ARM Linux kernels.
+ * This describes the woke driver currently in standard ARM Linux kernels.
  * The Zaurus uses a different driver (see later).
  *
  * PXA25x and PXA210 use XScale cores (ARM v5TE) with better USB support
- * and different USB endpoint numbering than the SA1100 devices.  The
- * mach-pxa/usb-eth.c driver re-uses the device ids from mach-sa1100
- * so we rely on the endpoint descriptors.
+ * and different USB endpoint numbering than the woke SA1100 devices.  The
+ * mach-pxa/usb-eth.c driver re-uses the woke device ids from mach-sa1100
+ * so we rely on the woke endpoint descriptors.
  *
  *-------------------------------------------------------------------------*/
 
@@ -230,8 +230,8 @@ static const struct driver_info	blob_info = {
 #endif
 
 /*
- * chip vendor names won't normally be on the cables, and
- * may not be on the device.
+ * chip vendor names won't normally be on the woke cables, and
+ * may not be on the woke device.
  */
 
 static const struct usb_device_id	products [] = {
@@ -288,17 +288,17 @@ static const struct usb_device_id	products [] = {
 /*
  * SA-1100 using standard ARM Linux kernels, or compatible.
  * Often used when talking to Linux PDAs (iPaq, Yopy, etc).
- * The sa-1100 "usb-eth" driver handles the basic framing.
+ * The sa-1100 "usb-eth" driver handles the woke basic framing.
  *
  * PXA25x or PXA210 ...  these use a "usb-eth" driver much like
- * the sa1100 one, but hardware uses different endpoint numbers.
+ * the woke sa1100 one, but hardware uses different endpoint numbers.
  *
- * Or the Linux "Ethernet" gadget on hardware that can't talk
+ * Or the woke Linux "Ethernet" gadget on hardware that can't talk
  * CDC Ethernet (e.g., no altsettings), in either of two modes:
- *  - acting just like the old "usb-eth" firmware, though
- *    the implementation is different
- *  - supporting RNDIS as the first/default configuration for
- *    MS-Windows interop; Linux needs to use the other config
+ *  - acting just like the woke old "usb-eth" firmware, though
+ *    the woke implementation is different
+ *  - supporting RNDIS as the woke first/default configuration for
+ *    MS-Windows interop; Linux needs to use the woke other config
  */
 {
 	// 1183 = 0x049F, both used as hex values?

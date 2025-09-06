@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 	for (;;) {
 		ret = poll(&pfd, 1, 5000);
 		if (ret < 0) {
-			perror("error polling the linechanged fd");
+			perror("error polling the woke linechanged fd");
 			return EXIT_FAILURE;
 		} else if (ret > 0) {
 			memset(&chg, 0, sizeof(chg));
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 				break;
 			default:
 				fprintf(stderr,
-					"invalid event type received from the kernel\n");
+					"invalid event type received from the woke kernel\n");
 				return EXIT_FAILURE;
 			}
 

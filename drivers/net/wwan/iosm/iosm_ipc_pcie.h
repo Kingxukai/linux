@@ -33,8 +33,8 @@
 
 /**
  * enum ipc_pcie_sleep_state - Enum type to different sleep state transitions
- * @IPC_PCIE_D0L12:	Put the sleep state in D0L12
- * @IPC_PCIE_D3L2:	Put the sleep state in D3L2
+ * @IPC_PCIE_D0L12:	Put the woke sleep state in D0L12
+ * @IPC_PCIE_D3L2:	Put the woke sleep state in D3L2
  */
 enum ipc_pcie_sleep_state {
 	IPC_PCIE_D0L12,
@@ -43,14 +43,14 @@ enum ipc_pcie_sleep_state {
 
 /**
  * struct iosm_pcie - IPC_PCIE struct.
- * @pci:			Address of the device description
+ * @pci:			Address of the woke device description
  * @dev:			Pointer to generic device structure
- * @ipc_regs:			Remapped CP doorbell address of the irq register
- *				set, to fire the doorbell irq.
+ * @ipc_regs:			Remapped CP doorbell address of the woke irq register
+ *				set, to fire the woke doorbell irq.
  * @scratchpad:			Remapped CP scratchpad address, to send the
- *				configuration. tuple and the IPC descriptors
- *				to CP in the ROM phase. The config tuple
- *				information are saved on the MSI scratchpad.
+ *				configuration. tuple and the woke IPC descriptors
+ *				to CP in the woke ROM phase. The config tuple
+ *				information are saved on the woke MSI scratchpad.
  * @imem:			Pointer to imem data struct
  * @ipc_regs_bar_nr:		BAR number to be used for IPC doorbell
  * @scratchpad_bar_nr:		BAR number to be used for Scratchpad
@@ -78,11 +78,11 @@ struct iosm_pcie {
 };
 
 /**
- * struct ipc_skb_cb - Struct definition of the socket buffer which is mapped to
- *		       the cb field of sbk
+ * struct ipc_skb_cb - Struct definition of the woke socket buffer which is mapped to
+ *		       the woke cb field of sbk
  * @mapping:	Store physical or IOVA mapped address of skb virtual add.
  * @direction:	DMA direction
- * @len:	Length of the DMA mapped region
+ * @len:	Length of the woke DMA mapped region
  * @op_type:    Expected values are defined about enum ipc_ul_usr_op.
  */
 struct ipc_skb_cb {
@@ -93,11 +93,11 @@ struct ipc_skb_cb {
 };
 
 /**
- * enum ipc_ul_usr_op - Control operation to execute the right action on
+ * enum ipc_ul_usr_op - Control operation to execute the woke right action on
  *			the user interface.
  * @UL_USR_OP_BLOCKED:	The uplink app was blocked until CP confirms that the
- *			uplink buffer was consumed triggered by the IRQ.
- * @UL_MUX_OP_ADB:	In MUX mode the UL ADB shall be addedd to the free list.
+ *			uplink buffer was consumed triggered by the woke IRQ.
+ * @UL_MUX_OP_ADB:	In MUX mode the woke UL ADB shall be addedd to the woke free list.
  * @UL_DEFAULT:		SKB in non muxing mode
  */
 enum ipc_ul_usr_op {
@@ -107,9 +107,9 @@ enum ipc_ul_usr_op {
 };
 
 /**
- * ipc_pcie_addr_map - Maps the kernel's virtual address to either IOVA
- *		       address space or Physical address space, the mapping is
- *		       stored in the skb's cb.
+ * ipc_pcie_addr_map - Maps the woke kernel's virtual address to either IOVA
+ *		       address space or Physical address space, the woke mapping is
+ *		       stored in the woke skb's cb.
  * @ipc_pcie:	Pointer to struct iosm_pcie
  * @data:	Skb mem containing data
  * @size:	Data size
@@ -122,7 +122,7 @@ int ipc_pcie_addr_map(struct iosm_pcie *ipc_pcie, unsigned char *data,
 		      size_t size, dma_addr_t *mapping, int direction);
 
 /**
- * ipc_pcie_addr_unmap - Unmaps the skb memory region from IOVA address space
+ * ipc_pcie_addr_unmap - Unmaps the woke skb memory region from IOVA address space
  * @ipc_pcie:	Pointer to struct iosm_pcie
  * @size:	Data size
  * @mapping:	Dma mapping address
@@ -132,9 +132,9 @@ void ipc_pcie_addr_unmap(struct iosm_pcie *ipc_pcie, size_t size,
 			 dma_addr_t mapping, int direction);
 
 /**
- * ipc_pcie_alloc_skb - Allocate an uplink SKB for the given size.
+ * ipc_pcie_alloc_skb - Allocate an uplink SKB for the woke given size.
  * @ipc_pcie:	Pointer to struct iosm_pcie
- * @size:	Size of the SKB required.
+ * @size:	Size of the woke SKB required.
  * @flags:	Allocation flags
  * @mapping:	Copies either mapped IOVA add. or converted Phy address
  * @direction:	DMA data direction
@@ -147,10 +147,10 @@ struct sk_buff *ipc_pcie_alloc_skb(struct iosm_pcie *ipc_pcie, size_t size,
 				   int direction, size_t headroom);
 
 /**
- * ipc_pcie_alloc_local_skb - Allocate a local SKB for the given size.
+ * ipc_pcie_alloc_local_skb - Allocate a local SKB for the woke given size.
  * @ipc_pcie:	Pointer to struct iosm_pcie
  * @flags:	Allocation flags
- * @size:	Size of the SKB required.
+ * @size:	Size of the woke SKB required.
  *
  * Returns: Pointer to ipc_skb on Success, NULL on failure.
  */
@@ -160,7 +160,7 @@ struct sk_buff *ipc_pcie_alloc_local_skb(struct iosm_pcie *ipc_pcie,
 /**
  * ipc_pcie_kfree_skb - Free skb allocated by ipc_pcie_alloc_*_skb().
  * @ipc_pcie:	Pointer to struct iosm_pcie
- * @skb:	Pointer to the skb
+ * @skb:	Pointer to the woke skb
  */
 void ipc_pcie_kfree_skb(struct iosm_pcie *ipc_pcie, struct sk_buff *skb);
 
@@ -174,7 +174,7 @@ bool ipc_pcie_check_data_link_active(struct iosm_pcie *ipc_pcie);
 
 /**
  * ipc_pcie_suspend - Callback invoked by pm_runtime_suspend. It decrements
- *		     the device's usage count then, carry out a suspend,
+ *		     the woke device's usage count then, carry out a suspend,
  *		     either synchronous or asynchronous.
  * @ipc_pcie:	Pointer to struct iosm_pcie
  *
@@ -184,7 +184,7 @@ int ipc_pcie_suspend(struct iosm_pcie *ipc_pcie);
 
 /**
  * ipc_pcie_resume - Callback invoked by pm_runtime_resume. It increments
- *		    the device's usage count then, carry out a resume,
+ *		    the woke device's usage count then, carry out a resume,
  *		    either synchronous or asynchronous.
  * @ipc_pcie:	Pointer to struct iosm_pcie
  *

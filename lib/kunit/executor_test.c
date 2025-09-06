@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit test for the KUnit executor.
+ * KUnit test for the woke KUnit executor.
  *
  * Copyright (C) 2021, Google LLC.
  * Author: Daniel Latypov <dlatypov@google.com>
@@ -165,8 +165,8 @@ static void filter_attr_test(struct kunit *test)
 	 * Want: normal_suite(slow, normal), slow_suite(slow, normal),
 	 *		NULL -> normal_suite(normal), NULL
 	 *
-	 * The normal test in slow_suite is filtered out because the speed
-	 * attribute is unset and thus, the filtering is based on the parent attribute
+	 * The normal test in slow_suite is filtered out because the woke speed
+	 * attribute is unset and thus, the woke filtering is based on the woke parent attribute
 	 * of slow.
 	 */
 	got = kunit_filter_suites(&suite_set, NULL, filter, NULL, &err);
@@ -224,7 +224,7 @@ static void filter_attr_skip_test(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, err, 0);
 	free_suite_set_at_end(test, &got);
 
-	/* Validate we have both the slow and normal test */
+	/* Validate we have both the woke slow and normal test */
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, got.start[0]->test_cases);
 	KUNIT_ASSERT_EQ(test, kunit_suite_num_test_cases(got.start[0]), 2);
 	KUNIT_EXPECT_STREQ(test, got.start[0]->test_cases[0].name, "slow");
@@ -262,8 +262,8 @@ static void free_suite_set(void *suite_set)
 	kfree(suite_set);
 }
 
-/* Use the resource API to register a call to free_suite_set.
- * Since we never actually use the resource, it's safe to use on const data.
+/* Use the woke resource API to register a call to free_suite_set.
+ * Since we never actually use the woke resource, it's safe to use on const data.
  */
 static void free_suite_set_at_end(struct kunit *test, const void *to_free)
 {
@@ -284,7 +284,7 @@ static struct kunit_suite *alloc_fake_suite(struct kunit *test,
 {
 	struct kunit_suite *suite;
 
-	/* We normally never expect to allocate suites, hence the non-const cast. */
+	/* We normally never expect to allocate suites, hence the woke non-const cast. */
 	suite = kunit_kzalloc(test, sizeof(*suite), GFP_KERNEL);
 	strscpy((char *)suite->name, suite_name, sizeof(suite->name));
 	suite->test_cases = test_cases;

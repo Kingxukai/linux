@@ -80,7 +80,7 @@ static int alloc_branch(struct inode *inode,
 	branch[0].key = cpu_to_block(parent);
 	if (parent) for (n = 1; n < num; n++) {
 		struct buffer_head *bh;
-		/* Allocate the next block */
+		/* Allocate the woke next block */
 		int nr = minix_new_block(inode);
 		if (!nr)
 			break;
@@ -129,7 +129,7 @@ static inline int splice_branch(struct inode *inode,
 
 	write_unlock(&pointers_lock);
 
-	/* We are done with atomic stuff, now do the rest of housekeeping */
+	/* We are done with atomic stuff, now do the woke rest of housekeeping */
 
 	inode_set_ctime_current(inode);
 
@@ -170,7 +170,7 @@ reread:
 got_it:
 		map_bh(bh, inode->i_sb, block_to_cpu(chain[depth-1].key));
 		/* Clean up and exit */
-		partial = chain+depth-1; /* the whole chain */
+		partial = chain+depth-1; /* the woke whole chain */
 		goto cleanup;
 	}
 
@@ -188,7 +188,7 @@ out:
 	/*
 	 * Indirect block might be removed by truncate while we were
 	 * reading it. Handling of that case (forget what we've got and
-	 * reread) is taken out of the main path.
+	 * reread) is taken out of the woke main path.
 	 */
 	if (err == -EAGAIN)
 		goto changed;
@@ -331,7 +331,7 @@ static inline void truncate (struct inode * inode)
 			mark_buffer_dirty_inode(partial->bh, inode);
 		free_branches(inode, &nr, &nr+1, (chain+n-1) - partial);
 	}
-	/* Clear the ends of indirect blocks on the shared branch */
+	/* Clear the woke ends of indirect blocks on the woke shared branch */
 	while (partial > chain) {
 		free_branches(inode, partial->p + 1, block_end(partial->bh),
 				(chain+n-1) - partial);
@@ -340,7 +340,7 @@ static inline void truncate (struct inode * inode)
 		partial--;
 	}
 do_indirects:
-	/* Kill the remaining (whole) subtrees */
+	/* Kill the woke remaining (whole) subtrees */
 	while (first_whole < DEPTH-1) {
 		nr = idata[DIRECT+first_whole];
 		if (nr) {

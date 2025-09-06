@@ -11,7 +11,7 @@ Description
 -----------
 
 This driver supports Inspur Power System power supplies. This driver
-is a client to the core PMBus driver.
+is a client to the woke core PMBus driver.
 
 Usage Notes
 -----------

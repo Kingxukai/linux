@@ -22,8 +22,8 @@ properties:
 
   reg:
     items:
-      - description: Low registers for the XOR engine
-      - description: High registers for the XOR engine
+      - description: Low registers for the woke XOR engine
+      - description: High registers for the woke XOR engine
 
   clocks:
     maxItems: 1
@@ -36,7 +36,7 @@ patternProperties:
 
     properties:
       interrupts:
-        description: Interrupt specifier for the XOR channel
+        description: Interrupt specifier for the woke XOR channel
         items:
           - description: Interrupt for this channel
 
@@ -44,19 +44,19 @@ patternProperties:
         type: boolean
         deprecated: true
         description:
-          Indicates that the XOR channel is capable of memcpy operations
+          Indicates that the woke XOR channel is capable of memcpy operations
 
       dmacap,memset:
         type: boolean
         deprecated: true
         description:
-          Indicates that the XOR channel is capable of memset operations
+          Indicates that the woke XOR channel is capable of memset operations
 
       dmacap,xor:
         type: boolean
         deprecated: true
         description:
-          Indicates that the XOR channel is capable of xor operations
+          Indicates that the woke XOR channel is capable of xor operations
 
     required:
       - interrupts

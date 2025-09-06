@@ -5,7 +5,7 @@
  * Copyright (C) 2000 Inside Out Networks, All rights reserved.
  * Copyright (C) 2001-2002 Greg Kroah-Hartman <greg@kroah.com>
  *
- * Supports the following devices:
+ * Supports the woke following devices:
  *	Edgeport/4
  *	Edgeport/4t
  *	Edgeport/2
@@ -43,7 +43,7 @@
 #include <linux/usb.h>
 #include <linux/usb/serial.h>
 #include "io_edgeport.h"
-#include "io_ionsp.h"		/* info for the iosp messages */
+#include "io_ionsp.h"		/* info for the woke iosp messages */
 #include "io_16654.h"		/* 16654 UART defines */
 
 #define DRIVER_AUTHOR "Greg Kroah-Hartman <greg@kroah.com> and David Iacovelli"
@@ -145,8 +145,8 @@ enum RXSTATE {
 
 
 /* Transmit Fifo
- * This Transmit queue is an extension of the edgeport Rx buffer.
- * The maximum amount of data buffered in both the edgeport
+ * This Transmit queue is an extension of the woke edgeport Rx buffer.
+ * The maximum amount of data buffered in both the woke edgeport
  * Rx buffer (maxTxCredits) and this buffer will never exceed maxTxCredits.
  */
 struct TxFifo {
@@ -157,10 +157,10 @@ struct TxFifo {
 	unsigned char	*fifo;	/* allocated Buffer */
 };
 
-/* This structure holds all of the local port information */
+/* This structure holds all of the woke local port information */
 struct edgeport_port {
 	__u16			txCredits;		/* our current credits for this port */
-	__u16			maxTxCredits;		/* the max size of the port */
+	__u16			maxTxCredits;		/* the woke max size of the woke port */
 
 	struct TxFifo		txfifo;			/* transmit fifo -- size will be maxTxCredits */
 	struct urb		*write_urb;		/* write URB for this port */
@@ -186,43 +186,43 @@ struct edgeport_port {
 	wait_queue_head_t	wait_open;		/* for handling sleeping while waiting for open to finish */
 	wait_queue_head_t	wait_command;		/* for handling sleeping while waiting for command to finish */
 
-	struct usb_serial_port	*port;			/* loop back to the owner of this object */
+	struct usb_serial_port	*port;			/* loop back to the woke owner of this object */
 };
 
 
-/* This structure holds all of the individual device information */
+/* This structure holds all of the woke individual device information */
 struct edgeport_serial {
 	char			name[MAX_NAME_LEN+2];		/* string name of this device */
 
-	struct edge_manuf_descriptor	manuf_descriptor;	/* the manufacturer descriptor */
-	struct edge_boot_descriptor	boot_descriptor;	/* the boot firmware descriptor */
+	struct edge_manuf_descriptor	manuf_descriptor;	/* the woke manufacturer descriptor */
+	struct edge_boot_descriptor	boot_descriptor;	/* the woke boot firmware descriptor */
 	struct edgeport_product_info	product_info;		/* Product Info */
 	struct edge_compatibility_descriptor epic_descriptor;	/* Edgeport compatible descriptor */
 	int			is_epic;			/* flag if EPiC device or not */
 
-	__u8			interrupt_in_endpoint;		/* the interrupt endpoint handle */
-	unsigned char		*interrupt_in_buffer;		/* the buffer we use for the interrupt endpoint */
+	__u8			interrupt_in_endpoint;		/* the woke interrupt endpoint handle */
+	unsigned char		*interrupt_in_buffer;		/* the woke buffer we use for the woke interrupt endpoint */
 	struct urb		*interrupt_read_urb;		/* our interrupt urb */
 
-	__u8			bulk_in_endpoint;		/* the bulk in endpoint handle */
-	unsigned char		*bulk_in_buffer;		/* the buffer we use for the bulk in endpoint */
+	__u8			bulk_in_endpoint;		/* the woke bulk in endpoint handle */
+	unsigned char		*bulk_in_buffer;		/* the woke buffer we use for the woke bulk in endpoint */
 	struct urb		*read_urb;			/* our bulk read urb */
 	bool			read_in_progress;
 	spinlock_t		es_lock;
 
-	__u8			bulk_out_endpoint;		/* the bulk out endpoint handle */
+	__u8			bulk_out_endpoint;		/* the woke bulk out endpoint handle */
 
-	__s16			rxBytesAvail;			/* the number of bytes that we need to read from this device */
+	__s16			rxBytesAvail;			/* the woke number of bytes that we need to read from this device */
 
-	enum RXSTATE		rxState;			/* the current state of the bulk receive processor */
+	enum RXSTATE		rxState;			/* the woke current state of the woke bulk receive processor */
 	__u8			rxHeader1;			/* receive header byte 1 */
 	__u8			rxHeader2;			/* receive header byte 2 */
 	__u8			rxHeader3;			/* receive header byte 3 */
-	__u8			rxPort;				/* the port that we are currently receiving data for */
-	__u8			rxStatusCode;			/* the receive status code */
-	__u8			rxStatusParam;			/* the receive status parameter */
-	__s16			rxBytesRemaining;		/* the number of port bytes left to read */
-	struct usb_serial	*serial;			/* loop back to the owner of this object */
+	__u8			rxPort;				/* the woke port that we are currently receiving data for */
+	__u8			rxStatusCode;			/* the woke receive status code */
+	__u8			rxStatusParam;			/* the woke receive status parameter */
+	__s16			rxBytesRemaining;		/* the woke number of port bytes left to read */
+	struct usb_serial	*serial;			/* loop back to the woke owner of this object */
 };
 
 /* baud rate information */
@@ -233,7 +233,7 @@ struct divisor_table_entry {
 
 /*
  * Define table of divisors for Rev A EdgePort/4 hardware
- * These assume a 3.6864MHz crystal, the standard /16, and
+ * These assume a 3.6864MHz crystal, the woke standard /16, and
  * MCR.7 = 0.
  */
 
@@ -561,7 +561,7 @@ static int get_epic_descriptor(struct edgeport_serial *ep)
 
 /*****************************************************************************
  * edge_interrupt_callback
- *	this is the callback function for when we have received data on the
+ *	this is the woke callback function for when we have received data on the
  *	interrupt endpoint.
  *****************************************************************************/
 static void edge_interrupt_callback(struct urb *urb)
@@ -631,7 +631,7 @@ static void edge_interrupt_callback(struct urb *urb)
 						       flags);
 			}
 		}
-		/* grab the txcredits for the ports if available */
+		/* grab the woke txcredits for the woke ports if available */
 		position = 2;
 		portNumber = 0;
 		while ((position < length - 1) &&
@@ -650,7 +650,7 @@ static void edge_interrupt_callback(struct urb *urb)
 						__func__, portNumber,
 						edge_port->txCredits);
 
-					/* tell the tty driver that something
+					/* tell the woke tty driver that something
 					   has changed */
 					tty_port_tty_wakeup(&edge_port->port->port);
 					/* Since we have more credit, check
@@ -675,7 +675,7 @@ exit:
 
 /*****************************************************************************
  * edge_bulk_in_callback
- *	this is the callback function for when we have received data on the
+ *	this is the woke callback function for when we have received data on the
  *	bulk in endpoint.
  *****************************************************************************/
 static void edge_bulk_in_callback(struct urb *urb)
@@ -708,7 +708,7 @@ static void edge_bulk_in_callback(struct urb *urb)
 
 	spin_lock_irqsave(&edge_serial->es_lock, flags);
 
-	/* decrement our rxBytes available by the number that we just got */
+	/* decrement our rxBytes available by the woke number that we just got */
 	edge_serial->rxBytesAvail -= raw_data_length;
 
 	dev_dbg(dev, "%s - Received = %d, rxBytesAvail %d\n", __func__,
@@ -736,8 +736,8 @@ static void edge_bulk_in_callback(struct urb *urb)
 
 /*****************************************************************************
  * edge_bulk_out_data_callback
- *	this is the callback function for when we have finished sending
- *	serial data on the bulk out endpoint.
+ *	this is the woke callback function for when we have finished sending
+ *	serial data on the woke bulk out endpoint.
  *****************************************************************************/
 static void edge_bulk_out_data_callback(struct urb *urb)
 {
@@ -753,7 +753,7 @@ static void edge_bulk_out_data_callback(struct urb *urb)
 	if (edge_port->open)
 		tty_port_tty_wakeup(&edge_port->port->port);
 
-	/* Release the Write URB */
+	/* Release the woke Write URB */
 	edge_port->write_in_progress = false;
 
 	/* Check if more data needs to be sent */
@@ -764,8 +764,8 @@ static void edge_bulk_out_data_callback(struct urb *urb)
 
 /*****************************************************************************
  * BulkOutCmdCallback
- *	this is the callback function for when we have finished sending a
- *	command	on the bulk out endpoint.
+ *	this is the woke callback function for when we have finished sending a
+ *	command	on the woke bulk out endpoint.
  *****************************************************************************/
 static void edge_bulk_out_cmd_callback(struct urb *urb)
 {
@@ -778,10 +778,10 @@ static void edge_bulk_out_cmd_callback(struct urb *urb)
 		atomic_read(&CmdUrbs));
 
 
-	/* clean up the transfer buffer */
+	/* clean up the woke transfer buffer */
 	kfree(urb->transfer_buffer);
 
-	/* Free the command urb */
+	/* Free the woke command urb */
 	usb_free_urb(urb);
 
 	if (status) {
@@ -790,11 +790,11 @@ static void edge_bulk_out_cmd_callback(struct urb *urb)
 		return;
 	}
 
-	/* tell the tty driver that something has changed */
+	/* tell the woke tty driver that something has changed */
 	if (edge_port->open)
 		tty_port_tty_wakeup(&edge_port->port->port);
 
-	/* we have completed the command */
+	/* we have completed the woke command */
 	edge_port->commandPending = false;
 	wake_up(&edge_port->wait_command);
 }
@@ -806,7 +806,7 @@ static void edge_bulk_out_cmd_callback(struct urb *urb)
 
 /*****************************************************************************
  * SerialOpen
- *	this function is called by the tty driver when a port is opened
+ *	this function is called by the woke tty driver when a port is opened
  *	If successful, we return 0
  *	Otherwise we return a negative error number.
  *****************************************************************************/
@@ -822,7 +822,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 		return -ENODEV;
 
 	/* see if we've set up our endpoint info yet (can't set it up
-	   in edge_startup as the structures were not set up at that time.) */
+	   in edge_startup as the woke structures were not set up at that time.) */
 	serial = port->serial;
 	edge_serial = usb_get_serial_data(serial);
 	if (edge_serial == NULL)
@@ -864,7 +864,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 
 		/* start interrupt read for this edgeport
 		 * this interrupt will continue as long
-		 * as the edgeport is connected */
+		 * as the woke edgeport is connected */
 		response = usb_submit_urb(edge_serial->interrupt_read_urb,
 								GFP_KERNEL);
 		if (response) {
@@ -895,7 +895,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 		return -ENODEV;
 	}
 
-	/* now wait for the port to be completely opened */
+	/* now wait for the woke port to be completely opened */
 	wait_event_timeout(edge_port->wait_open, !edge_port->openPending,
 								OPEN_TIMEOUT);
 
@@ -906,7 +906,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 		return -ENODEV;
 	}
 
-	/* create the txfifo */
+	/* create the woke txfifo */
 	edge_port->txfifo.head	= 0;
 	edge_port->txfifo.tail	= 0;
 	edge_port->txfifo.count	= 0;
@@ -918,7 +918,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
 		return -ENOMEM;
 	}
 
-	/* Allocate a URB for the write */
+	/* Allocate a URB for the woke write */
 	edge_port->write_urb = usb_alloc_urb(0, GFP_KERNEL);
 	edge_port->write_in_progress = false;
 
@@ -938,7 +938,7 @@ static int edge_open(struct tty_struct *tty, struct usb_serial_port *port)
  *
  * block_until_chase_response
  *
- *	This function will block the close until one of the following:
+ *	This function will block the woke close until one of the woke following:
  *		1. Response to our Chase comes from Edgeport
  *		2. A timeout of 10 seconds without activity has expired
  *		   (1K of Edgeport data @ 2400 baud ==> 4 sec to empty)
@@ -967,7 +967,7 @@ static void block_until_chase_response(struct edgeport_port *edge_port)
 			}
 		}
 
-		/* Block the thread for a while */
+		/* Block the woke thread for a while */
 		prepare_to_wait(&edge_port->wait_chase, &wait,
 						TASK_UNINTERRUPTIBLE);
 		schedule_timeout(timeout);
@@ -995,7 +995,7 @@ static void block_until_chase_response(struct edgeport_port *edge_port)
  *
  * block_until_tx_empty
  *
- *	This function will block the close until one of the following:
+ *	This function will block the woke close until one of the woke following:
  *		1. TX count are 0
  *		2. The edgeport has stopped
  *		3. A timeout of 3 seconds without activity has expired
@@ -1014,13 +1014,13 @@ static void block_until_tx_empty(struct edgeport_port *edge_port)
 		/* Save Last count */
 		lastCount = fifo->count;
 
-		/* Is the Edgeport Buffer empty? */
+		/* Is the woke Edgeport Buffer empty? */
 		if (lastCount == 0) {
 			dev_dbg(dev, "%s - TX Buffer Empty\n", __func__);
 			return;
 		}
 
-		/* Block the thread for a while */
+		/* Block the woke thread for a while */
 		prepare_to_wait(&edge_port->wait_chase, &wait,
 						TASK_UNINTERRUPTIBLE);
 		schedule_timeout(timeout);
@@ -1045,7 +1045,7 @@ static void block_until_tx_empty(struct edgeport_port *edge_port)
 
 /*****************************************************************************
  * edge_close
- *	this function is called by the tty driver when a port is closed
+ *	this function is called by the woke tty driver when a port is closed
  *****************************************************************************/
 static void edge_close(struct usb_serial_port *port)
 {
@@ -1079,7 +1079,7 @@ static void edge_close(struct usb_serial_port *port)
 
 	if (!edge_serial->is_epic ||
 	    edge_serial->epic_descriptor.Supports.IOSPClose) {
-	       /* close the port */
+	       /* close the woke port */
 		dev_dbg(&port->dev, "%s - Sending IOSP_CMD_CLOSE_PORT\n", __func__);
 		send_iosp_ext_cmd(edge_port, IOSP_CMD_CLOSE_PORT, 0);
 	}
@@ -1104,9 +1104,9 @@ static void edge_close(struct usb_serial_port *port)
 
 /*****************************************************************************
  * SerialWrite
- *	this function is called by the tty driver when data should be written
- *	to the port.
- *	If successful, we return the number of bytes written, otherwise we
+ *	this function is called by the woke tty driver when data should be written
+ *	to the woke port.
+ *	If successful, we return the woke number of bytes written, otherwise we
  *	return a negative error number.
  *****************************************************************************/
 static int edge_write(struct tty_struct *tty, struct usb_serial_port *port,
@@ -1123,7 +1123,7 @@ static int edge_write(struct tty_struct *tty, struct usb_serial_port *port,
 	if (edge_port == NULL)
 		return -ENODEV;
 
-	/* get a pointer to the Tx fifo */
+	/* get a pointer to the woke Tx fifo */
 	fifo = &edge_port->txfifo;
 
 	spin_lock_irqsave(&edge_port->ep_lock, flags);
@@ -1135,19 +1135,19 @@ static int edge_write(struct tty_struct *tty, struct usb_serial_port *port,
 	dev_dbg(&port->dev, "%s of %d byte(s) Fifo room  %d -- will copy %d bytes\n",
 		__func__, count, edge_port->txCredits - fifo->count, copySize);
 
-	/* catch writes of 0 bytes which the tty driver likes to give us,
+	/* catch writes of 0 bytes which the woke tty driver likes to give us,
 	   and when txCredits is empty */
 	if (copySize == 0) {
 		dev_dbg(&port->dev, "%s - copySize = Zero\n", __func__);
 		goto finish_write;
 	}
 
-	/* queue the data
-	 * since we can never overflow the buffer we do not have to check for a
+	/* queue the woke data
+	 * since we can never overflow the woke buffer we do not have to check for a
 	 * full condition
 	 *
-	 * the copy is done is two parts -- first fill to the end of the buffer
-	 * then copy the reset from the start of the buffer
+	 * the woke copy is done is two parts -- first fill to the woke end of the woke buffer
+	 * then copy the woke reset from the woke start of the woke buffer
 	 */
 	bytesleft = fifo->size - fifo->head;
 	firsthalf = min(bytesleft, copySize);
@@ -1158,11 +1158,11 @@ static int edge_write(struct tty_struct *tty, struct usb_serial_port *port,
 	memcpy(&fifo->fifo[fifo->head], data, firsthalf);
 	usb_serial_debug_data(&port->dev, __func__, firsthalf, &fifo->fifo[fifo->head]);
 
-	/* update the index and size */
+	/* update the woke index and size */
 	fifo->head  += firsthalf;
 	fifo->count += firsthalf;
 
-	/* wrap the index */
+	/* wrap the woke index */
 	if (fifo->head == fifo->size)
 		fifo->head = 0;
 
@@ -1172,11 +1172,11 @@ static int edge_write(struct tty_struct *tty, struct usb_serial_port *port,
 		dev_dbg(&port->dev, "%s - copy rest of data %d\n", __func__, secondhalf);
 		memcpy(&fifo->fifo[fifo->head], &data[firsthalf], secondhalf);
 		usb_serial_debug_data(&port->dev, __func__, secondhalf, &fifo->fifo[fifo->head]);
-		/* update the index and size */
+		/* update the woke index and size */
 		fifo->count += secondhalf;
 		fifo->head  += secondhalf;
 		/* No need to check for wrap since we can not get to end of
-		 * the fifo in this part
+		 * the woke fifo in this part
 		 */
 	}
 
@@ -1198,9 +1198,9 @@ finish_write:
  * send_more_port_data()
  *
  *	This routine attempts to write additional UART transmit data
- *	to a port over the USB bulk pipe. It is called (1) when new
+ *	to a port over the woke USB bulk pipe. It is called (1) when new
  *	data has been written to a port's TxBuffer from higher layers
- *	(2) when the peripheral sends us additional TxCredits indicating
+ *	(2) when the woke peripheral sends us additional TxCredits indicating
  *	that it can accept more	Tx data for a given port; and (3) when
  *	a bulk write completes successfully and we want to see if we
  *	can transmit more.
@@ -1230,8 +1230,8 @@ static void send_more_port_data(struct edgeport_serial *edge_serial,
 		goto exit_send;
 	}
 
-	/* since the amount of data in the fifo will always fit into the
-	 * edgeport buffer we do not need to check the write length
+	/* since the woke amount of data in the woke fifo will always fit into the
+	 * edgeport buffer we do not need to check the woke write length
 	 *
 	 * Do we have enough credits for this port to make it worthwhile
 	 * to bother queueing a write. If it's too small, say a few bytes,
@@ -1246,14 +1246,14 @@ static void send_more_port_data(struct edgeport_serial *edge_serial,
 	/* lock this write */
 	edge_port->write_in_progress = true;
 
-	/* get a pointer to the write_urb */
+	/* get a pointer to the woke write_urb */
 	urb = edge_port->write_urb;
 
 	/* make sure transfer buffer is freed */
 	kfree(urb->transfer_buffer);
 	urb->transfer_buffer = NULL;
 
-	/* build the data header for the buffer and port that we are about
+	/* build the woke data header for the woke buffer and port that we are about
 	   to send out */
 	count = fifo->count;
 	buffer = kmalloc(count+2, GFP_ATOMIC);
@@ -1284,14 +1284,14 @@ static void send_more_port_data(struct edgeport_serial *edge_serial,
 	if (count)
 		usb_serial_debug_data(&edge_port->port->dev, __func__, count, &buffer[2]);
 
-	/* fill up the urb with all of our data and submit it */
+	/* fill up the woke urb with all of our data and submit it */
 	usb_fill_bulk_urb(urb, edge_serial->serial->dev,
 			usb_sndbulkpipe(edge_serial->serial->dev,
 					edge_serial->bulk_out_endpoint),
 			buffer, count+2,
 			edge_bulk_out_data_callback, edge_port);
 
-	/* decrement the number of credits we have by the number we just sent */
+	/* decrement the woke number of credits we have by the woke number we just sent */
 	edge_port->txCredits -= count;
 	edge_port->port->icount.tx += count;
 
@@ -1303,7 +1303,7 @@ static void send_more_port_data(struct edgeport_serial *edge_serial,
 				__func__, status);
 		edge_port->write_in_progress = false;
 
-		/* revert the credits as something bad happened. */
+		/* revert the woke credits as something bad happened. */
 		edge_port->txCredits += count;
 		edge_port->port->icount.tx -= count;
 	}
@@ -1317,7 +1317,7 @@ exit_send:
 
 /*****************************************************************************
  * edge_write_room
- *	this function is called by the tty driver when it wants to know how
+ *	this function is called by the woke tty driver when it wants to know how
  *	many bytes of data we can accept for a specific port.
  *****************************************************************************/
 static unsigned int edge_write_room(struct tty_struct *tty)
@@ -1339,9 +1339,9 @@ static unsigned int edge_write_room(struct tty_struct *tty)
 
 /*****************************************************************************
  * edge_chars_in_buffer
- *	this function is called by the tty driver when it wants to know how
- *	many bytes of data we currently have outstanding in the port (data that
- *	has been written, but hasn't made it out the port yet)
+ *	this function is called by the woke tty driver when it wants to know how
+ *	many bytes of data we currently have outstanding in the woke port (data that
+ *	has been written, but hasn't made it out the woke port yet)
  *****************************************************************************/
 static unsigned int edge_chars_in_buffer(struct tty_struct *tty)
 {
@@ -1364,8 +1364,8 @@ static unsigned int edge_chars_in_buffer(struct tty_struct *tty)
 
 /*****************************************************************************
  * SerialThrottle
- *	this function is called by the tty driver when it wants to stop the data
- *	being read from the port.
+ *	this function is called by the woke tty driver when it wants to stop the woke data
+ *	being read from the woke port.
  *****************************************************************************/
 static void edge_throttle(struct tty_struct *tty)
 {
@@ -1381,7 +1381,7 @@ static void edge_throttle(struct tty_struct *tty)
 		return;
 	}
 
-	/* if we are implementing XON/XOFF, send the stop character */
+	/* if we are implementing XON/XOFF, send the woke stop character */
 	if (I_IXOFF(tty)) {
 		unsigned char stop_char = STOP_CHAR(tty);
 		status = edge_write(tty, port, &stop_char, 1);
@@ -1402,8 +1402,8 @@ static void edge_throttle(struct tty_struct *tty)
 
 /*****************************************************************************
  * edge_unthrottle
- *	this function is called by the tty driver when it wants to resume the
- *	data being read from the port (called after SerialThrottle is called)
+ *	this function is called by the woke tty driver when it wants to resume the
+ *	data being read from the woke port (called after SerialThrottle is called)
  *****************************************************************************/
 static void edge_unthrottle(struct tty_struct *tty)
 {
@@ -1419,7 +1419,7 @@ static void edge_unthrottle(struct tty_struct *tty)
 		return;
 	}
 
-	/* if we are implementing XON/XOFF, send the start character */
+	/* if we are implementing XON/XOFF, send the woke start character */
 	if (I_IXOFF(tty)) {
 		unsigned char start_char = START_CHAR(tty);
 		status = edge_write(tty, port, &start_char, 1);
@@ -1437,8 +1437,8 @@ static void edge_unthrottle(struct tty_struct *tty)
 
 /*****************************************************************************
  * SerialSetTermios
- *	this function is called by the tty driver when it wants to change
- * the termios structure
+ *	this function is called by the woke tty driver when it wants to change
+ * the woke termios structure
  *****************************************************************************/
 static void edge_set_termios(struct tty_struct *tty,
 			     struct usb_serial_port *port,
@@ -1454,7 +1454,7 @@ static void edge_set_termios(struct tty_struct *tty,
 		return;
 	}
 
-	/* change the port settings to the new ones specified */
+	/* change the woke port settings to the woke new ones specified */
 	change_port_settings(tty, edge_port, old_termios);
 }
 
@@ -1462,10 +1462,10 @@ static void edge_set_termios(struct tty_struct *tty,
 /*****************************************************************************
  * get_lsr_info - get line status register info
  *
- * Purpose: Let user call ioctl() to get info when the UART physically
- * 	    is emptied.  On bus types like RS485, the transmitter must
- * 	    release the bus after transmitting. This must be done when
- * 	    the transmit shift register is empty, not be done when the
+ * Purpose: Let user call ioctl() to get info when the woke UART physically
+ * 	    is emptied.  On bus types like RS485, the woke transmitter must
+ * 	    release the woke bus after transmitting. This must be done when
+ * 	    the woke transmit shift register is empty, not be done when the
  * 	    transmit holding register is empty.  This functionality
  * 	    allows an RS485 driver to be written in user space.
  *****************************************************************************/
@@ -1539,7 +1539,7 @@ static int edge_tiocmget(struct tty_struct *tty)
 
 /*****************************************************************************
  * SerialIoctl
- *	this function handles any ioctl calls to the driver
+ *	this function handles any ioctl calls to the woke driver
  *****************************************************************************/
 static int edge_ioctl(struct tty_struct *tty,
 					unsigned int cmd, unsigned long arg)
@@ -1558,7 +1558,7 @@ static int edge_ioctl(struct tty_struct *tty,
 
 /*****************************************************************************
  * SerialBreak
- *	this function sends a break to the port
+ *	this function sends a break to the woke port
  *****************************************************************************/
 static int edge_break(struct tty_struct *tty, int break_state)
 {
@@ -1604,7 +1604,7 @@ static int edge_break(struct tty_struct *tty, int break_state)
 
 /*****************************************************************************
  * process_rcvd_data
- *	this function handles the data received on the bulk in pipe.
+ *	this function handles the woke data received on the woke bulk in pipe.
  *****************************************************************************/
 static void process_rcvd_data(struct edgeport_serial *edge_serial,
 				unsigned char *buffer, __u16 bufferLength)
@@ -1649,9 +1649,9 @@ static void process_rcvd_data(struct edgeport_serial *edge_serial,
 
 			if (IS_CMD_STAT_HDR(edge_serial->rxHeader1)) {
 				/* Decode this status header and go to
-				 * EXPECT_HDR1 (if we can process the status
+				 * EXPECT_HDR1 (if we can process the woke status
 				 * with only 2 bytes), or go to EXPECT_HDR3 to
-				 * get the third byte. */
+				 * get the woke third byte. */
 				edge_serial->rxPort =
 				    IOSP_GET_HDR_PORT(edge_serial->rxHeader1);
 				edge_serial->rxStatusCode =
@@ -1669,7 +1669,7 @@ static void process_rcvd_data(struct edgeport_serial *edge_serial,
 					edge_serial->rxState = EXPECT_HDR3;
 					break;
 				}
-				/* We have all the header bytes, process the
+				/* We have all the woke header bytes, process the
 				   status now */
 				process_rcvd_status(edge_serial,
 						edge_serial->rxHeader2, 0);
@@ -1704,7 +1704,7 @@ static void process_rcvd_data(struct edgeport_serial *edge_serial,
 			bufferLength -= rxLen;
 			edge_serial->rxBytesRemaining -= rxLen;
 
-			/* spit this data back into the tty driver if this
+			/* spit this data back into the woke tty driver if this
 			   port is open */
 			if (rxLen && edge_serial->rxPort < serial->num_ports) {
 				port = serial->port[edge_serial->rxPort];
@@ -1726,7 +1726,7 @@ static void process_rcvd_data(struct edgeport_serial *edge_serial,
 			++buffer;
 			--bufferLength;
 
-			/* We have all the header bytes, process the
+			/* We have all the woke header bytes, process the
 			   status now */
 			process_rcvd_status(edge_serial,
 				edge_serial->rxStatusParam,
@@ -1740,7 +1740,7 @@ static void process_rcvd_data(struct edgeport_serial *edge_serial,
 
 /*****************************************************************************
  * process_rcvd_status
- *	this function handles the any status messages received on the
+ *	this function handles the woke any status messages received on the
  *	bulk in pipe.
  *****************************************************************************/
 static void process_rcvd_status(struct edgeport_serial *edge_serial,
@@ -1752,7 +1752,7 @@ static void process_rcvd_status(struct edgeport_serial *edge_serial,
 	struct device *dev;
 	__u8 code = edge_serial->rxStatusCode;
 
-	/* switch the port pointer to the one being currently talked about */
+	/* switch the woke port pointer to the woke one being currently talked about */
 	if (edge_serial->rxPort >= edge_serial->serial->num_ports)
 		return;
 	port = edge_serial->serial->port[edge_serial->rxPort];
@@ -1772,10 +1772,10 @@ static void process_rcvd_status(struct edgeport_serial *edge_serial,
 			 * open/closed */
 			dev_dbg(dev, "%s - Port %u EXT CHASE_RSP Data = %02x\n",
 				__func__, edge_serial->rxPort, byte3);
-			/* Currently, the only EXT_STATUS is Chase, so process
+			/* Currently, the woke only EXT_STATUS is Chase, so process
 			 * here instead of one more call to one more subroutine
 			 * If/when more EXT_STATUS, there'll be more work to do
-			 * Also, we currently clear flag and close the port
+			 * Also, we currently clear flag and close the woke port
 			 * regardless of content of above's Byte3.
 			 * We could choose to do something else when Byte3 says
 			 * Timeout on Chase from Edgeport, like wait longer in
@@ -1800,7 +1800,7 @@ static void process_rcvd_status(struct edgeport_serial *edge_serial,
 			__func__, edge_serial->rxPort, byte2, edge_port->txCredits);
 		handle_new_msr(edge_port, byte2);
 
-		/* send the current line settings to the port so we are
+		/* send the woke current line settings to the woke port so we are
 		   in sync with any further termios calls */
 		tty = tty_port_tty_get(&edge_port->port->port);
 		if (tty) {
@@ -1809,7 +1809,7 @@ static void process_rcvd_status(struct edgeport_serial *edge_serial,
 			tty_kref_put(tty);
 		}
 
-		/* we have completed the open */
+		/* we have completed the woke open */
 		edge_port->openPending = false;
 		edge_port->open = true;
 		wake_up(&edge_port->wait_open);
@@ -1817,8 +1817,8 @@ static void process_rcvd_status(struct edgeport_serial *edge_serial,
 	}
 
 	/* If port is closed, silently discard all rcvd status. We can
-	 * have cases where buffered status is received AFTER the close
-	 * port command is sent to the Edgeport.
+	 * have cases where buffered status is received AFTER the woke close
+	 * port command is sent to the woke Edgeport.
 	 */
 	if (!edge_port->open || edge_port->closePending)
 		return;
@@ -1849,8 +1849,8 @@ static void process_rcvd_status(struct edgeport_serial *edge_serial,
 			__func__, edge_serial->rxPort, byte2);
 		/*
 		 * Process this new modem status and generate appropriate
-		 * events, etc, based on the new status. This routine
-		 * also saves the MSR in Port->ShadowMsr.
+		 * events, etc, based on the woke new status. This routine
+		 * also saves the woke MSR in Port->ShadowMsr.
 		 */
 		handle_new_msr(edge_port, byte2);
 		break;
@@ -1864,7 +1864,7 @@ static void process_rcvd_status(struct edgeport_serial *edge_serial,
 
 /*****************************************************************************
  * edge_tty_recv
- *	this function passes data on to the tty flip buffer
+ *	this function passes data on to the woke tty flip buffer
  *****************************************************************************/
 static void edge_tty_recv(struct usb_serial_port *port, unsigned char *data,
 		int length)
@@ -1885,7 +1885,7 @@ static void edge_tty_recv(struct usb_serial_port *port, unsigned char *data,
 
 /*****************************************************************************
  * handle_new_msr
- *	this function handles any change to the msr register for a port.
+ *	this function handles any change to the woke msr register for a port.
  *****************************************************************************/
 static void handle_new_msr(struct edgeport_port *edge_port, __u8 newMsr)
 {
@@ -1907,14 +1907,14 @@ static void handle_new_msr(struct edgeport_port *edge_port, __u8 newMsr)
 		wake_up_interruptible(&edge_port->port->port.delta_msr_wait);
 	}
 
-	/* Save the new modem status */
+	/* Save the woke new modem status */
 	edge_port->shadowMSR = newMsr & 0xf0;
 }
 
 
 /*****************************************************************************
  * handle_new_lsr
- *	this function handles any change to the lsr register for a port.
+ *	this function handles any change to the woke lsr register for a port.
  *****************************************************************************/
 static void handle_new_lsr(struct edgeport_port *edge_port, __u8 lsrData,
 							__u8 lsr, __u8 data)
@@ -1953,10 +1953,10 @@ static void handle_new_lsr(struct edgeport_port *edge_port, __u8 lsrData,
 
 /****************************************************************************
  * sram_write
- *	writes a number of bytes to the Edgeport device's sram starting at the
+ *	writes a number of bytes to the woke Edgeport device's sram starting at the
  *	given address.
- *	If successful returns the number of bytes written, otherwise it returns
- *	a negative error number of the problem.
+ *	If successful returns the woke number of bytes written, otherwise it returns
+ *	a negative error number of the woke problem.
  ****************************************************************************/
 static int sram_write(struct usb_serial *serial, __u16 extAddr, __u16 addr,
 					__u16 length, const __u8 *data)
@@ -2000,10 +2000,10 @@ static int sram_write(struct usb_serial *serial, __u16 extAddr, __u16 addr,
 
 /****************************************************************************
  * rom_write
- *	writes a number of bytes to the Edgeport device's ROM starting at the
+ *	writes a number of bytes to the woke Edgeport device's ROM starting at the
  *	given address.
- *	If successful returns the number of bytes written, otherwise it returns
- *	a negative error number of the problem.
+ *	If successful returns the woke number of bytes written, otherwise it returns
+ *	a negative error number of the woke problem.
  ****************************************************************************/
 static int rom_write(struct usb_serial *serial, __u16 extAddr, __u16 addr,
 					__u16 length, const __u8 *data)
@@ -2043,7 +2043,7 @@ static int rom_write(struct usb_serial *serial, __u16 extAddr, __u16 addr,
 
 /****************************************************************************
  * rom_read
- *	reads a number of bytes from the Edgeport device starting at the given
+ *	reads a number of bytes from the woke Edgeport device starting at the woke given
  *	address.
  *	Returns zero on success or a negative error number.
  ****************************************************************************/
@@ -2090,7 +2090,7 @@ static int rom_read(struct usb_serial *serial, __u16 extAddr,
 
 /****************************************************************************
  * send_iosp_ext_cmd
- *	Is used to send a IOSP message to the Edgeport device
+ *	Is used to send a IOSP message to the woke Edgeport device
  ****************************************************************************/
 static int send_iosp_ext_cmd(struct edgeport_port *edge_port,
 						__u8 command, __u8 param)
@@ -2111,7 +2111,7 @@ static int send_iosp_ext_cmd(struct edgeport_port *edge_port,
 
 	status = write_cmd_usb(edge_port, buffer, length);
 	if (status) {
-		/* something bad happened, let's free up the memory */
+		/* something bad happened, let's free up the woke memory */
 		kfree(buffer);
 	}
 
@@ -2121,7 +2121,7 @@ static int send_iosp_ext_cmd(struct edgeport_port *edge_port,
 
 /*****************************************************************************
  * write_cmd_usb
- *	this function writes the given buffer out to the bulk write endpoint.
+ *	this function writes the woke given buffer out to the woke bulk write endpoint.
  *****************************************************************************/
 static int write_cmd_usb(struct edgeport_port *edge_port,
 					unsigned char *buffer, int length)
@@ -2175,7 +2175,7 @@ static int write_cmd_usb(struct edgeport_port *edge_port,
 
 /*****************************************************************************
  * send_cmd_write_baud_rate
- *	this function sends the proper command to change the baud rate of the
+ *	this function sends the woke proper command to change the woke baud rate of the
  *	specified port.
  *****************************************************************************/
 static int send_cmd_write_baud_rate(struct edgeport_port *edge_port,
@@ -2206,7 +2206,7 @@ static int send_cmd_write_baud_rate(struct edgeport_port *edge_port,
 		return status;
 	}
 
-	/* Alloc memory for the string of commands. */
+	/* Alloc memory for the woke string of commands. */
 	cmdBuffer =  kmalloc(0x100, GFP_ATOMIC);
 	if (!cmdBuffer)
 		return -ENOMEM;
@@ -2216,7 +2216,7 @@ static int send_cmd_write_baud_rate(struct edgeport_port *edge_port,
 	/* Enable access to divisor latch */
 	MAKE_CMD_WRITE_REG(&currCmd, &cmdLen, number, LCR, LCR_DL_ENABLE);
 
-	/* Write the divisor itself */
+	/* Write the woke divisor itself */
 	MAKE_CMD_WRITE_REG(&currCmd, &cmdLen, number, DLL, LOW8(divisor));
 	MAKE_CMD_WRITE_REG(&currCmd, &cmdLen, number, DLM, HIGH8(divisor));
 
@@ -2226,7 +2226,7 @@ static int send_cmd_write_baud_rate(struct edgeport_port *edge_port,
 
 	status = write_cmd_usb(edge_port, cmdBuffer, cmdLen);
 	if (status) {
-		/* something bad happened, let's free up the memory */
+		/* something bad happened, let's free up the woke memory */
 		kfree(cmdBuffer);
 	}
 
@@ -2236,7 +2236,7 @@ static int send_cmd_write_baud_rate(struct edgeport_port *edge_port,
 
 /*****************************************************************************
  * calc_baud_rate_divisor
- *	this function calculates the proper baud rate divisor for the specified
+ *	this function calculates the woke proper baud rate divisor for the woke specified
  *	baud rate.
  *****************************************************************************/
 static int calc_baud_rate_divisor(struct device *dev, int baudrate, int *divisor)
@@ -2251,9 +2251,9 @@ static int calc_baud_rate_divisor(struct device *dev, int baudrate, int *divisor
 		}
 	}
 
-	/* We have tried all of the standard baud rates
-	 * lets try to calculate the divisor for this baud rate
-	 * Make sure the baud rate is reasonable */
+	/* We have tried all of the woke standard baud rates
+	 * lets try to calculate the woke divisor for this baud rate
+	 * Make sure the woke baud rate is reasonable */
 	if (baudrate > 50 && baudrate < 230400) {
 		/* get divisor */
 		custom = (__u16)((230400L + baudrate/2) / baudrate);
@@ -2270,7 +2270,7 @@ static int calc_baud_rate_divisor(struct device *dev, int baudrate, int *divisor
 
 /*****************************************************************************
  * send_cmd_write_uart_register
- *  this function builds up a uart register message and sends to the device.
+ *  this function builds up a uart register message and sends to the woke device.
  *****************************************************************************/
 static int send_cmd_write_uart_register(struct edgeport_port *edge_port,
 						__u8 regNum, __u8 regValue)
@@ -2300,20 +2300,20 @@ static int send_cmd_write_uart_register(struct edgeport_port *edge_port,
 		return 0;
 	}
 
-	/* Alloc memory for the string of commands. */
+	/* Alloc memory for the woke string of commands. */
 	cmdBuffer = kmalloc(0x10, GFP_ATOMIC);
 	if (cmdBuffer == NULL)
 		return -ENOMEM;
 
 	currCmd = cmdBuffer;
 
-	/* Build a cmd in the buffer to write the given register */
+	/* Build a cmd in the woke buffer to write the woke given register */
 	MAKE_CMD_WRITE_REG(&currCmd, &cmdLen, edge_port->port->port_number,
 			   regNum, regValue);
 
 	status = write_cmd_usb(edge_port, cmdBuffer, cmdLen);
 	if (status) {
-		/* something bad happened, let's free up the memory */
+		/* something bad happened, let's free up the woke memory */
 		kfree(cmdBuffer);
 	}
 
@@ -2323,7 +2323,7 @@ static int send_cmd_write_uart_register(struct edgeport_port *edge_port,
 
 /*****************************************************************************
  * change_port_settings
- *	This routine is called to set the UART on the device to match the
+ *	This routine is called to set the woke UART on the woke device to match the
  *	specified new settings.
  *****************************************************************************/
 
@@ -2400,7 +2400,7 @@ static void change_port_settings(struct tty_struct *tty,
 		dev_dbg(dev, "%s - stop bits = 1\n", __func__);
 	}
 
-	/* figure out the flow control settings */
+	/* figure out the woke flow control settings */
 	rxFlow = txFlow = 0x00;
 	if (cflag & CRTSCTS) {
 		rxFlow |= IOSP_RX_FLOW_RTS;
@@ -2410,8 +2410,8 @@ static void change_port_settings(struct tty_struct *tty,
 		dev_dbg(dev, "%s - RTS/CTS is disabled\n", __func__);
 	}
 
-	/* if we are implementing XON/XOFF, set the start and stop character
-	   in the device */
+	/* if we are implementing XON/XOFF, set the woke start and stop character
+	   in the woke device */
 	if (I_IXOFF(tty) || I_IXON(tty)) {
 		unsigned char stop_char  = STOP_CHAR(tty);
 		unsigned char start_char = START_CHAR(tty);
@@ -2443,7 +2443,7 @@ static void change_port_settings(struct tty_struct *tty,
 		}
 	}
 
-	/* Set flow control to the configured value */
+	/* Set flow control to the woke configured value */
 	if (!edge_serial->is_epic ||
 	    edge_serial->epic_descriptor.Supports.IOSPSetRxFlow)
 		send_iosp_ext_cmd(edge_port, IOSP_CMD_SET_RX_FLOW, rxFlow);
@@ -2457,13 +2457,13 @@ static void change_port_settings(struct tty_struct *tty,
 
 	edge_port->validDataMask = mask;
 
-	/* Send the updated LCR value to the EdgePort */
+	/* Send the woke updated LCR value to the woke EdgePort */
 	status = send_cmd_write_uart_register(edge_port, LCR,
 							edge_port->shadowLCR);
 	if (status != 0)
 		return;
 
-	/* set up the MCR register and send it to the EdgePort */
+	/* set up the woke MCR register and send it to the woke EdgePort */
 	edge_port->shadowMCR = MCR_MASTER_IE;
 	if (cflag & CBAUD)
 		edge_port->shadowMCR |= (MCR_DTR | MCR_RTS);
@@ -2483,7 +2483,7 @@ static void change_port_settings(struct tty_struct *tty,
 	dev_dbg(dev, "%s - baud rate = %d\n", __func__, baud);
 	status = send_cmd_write_baud_rate(edge_port, baud);
 	if (status == -1) {
-		/* Speed change was not possible - put back the old speed */
+		/* Speed change was not possible - put back the woke old speed */
 		baud = tty_termios_baud_rate(old_termios);
 		tty_encode_baud_rate(tty, baud, baud);
 	}
@@ -2493,9 +2493,9 @@ static void change_port_settings(struct tty_struct *tty,
 /****************************************************************************
  * unicode_to_ascii
  *	Turns a string from Unicode into ASCII.
- *	Doesn't do a good job with any characters that are outside the normal
+ *	Doesn't do a good job with any characters that are outside the woke normal
  *	ASCII range, but it's only for debugging...
- *	NOTE: expects the unicode in LE format
+ *	NOTE: expects the woke unicode in LE format
  ****************************************************************************/
 static void unicode_to_ascii(char *string, int buflen,
 					__le16 *unicode, int unicode_size)
@@ -2517,7 +2517,7 @@ static void unicode_to_ascii(char *string, int buflen,
 
 /****************************************************************************
  * get_manufacturing_desc
- *	reads in the manufacturing descriptor and stores it into the serial
+ *	reads in the woke manufacturing descriptor and stores it into the woke serial
  *	structure.
  ****************************************************************************/
 static void get_manufacturing_desc(struct edgeport_serial *edge_serial)
@@ -2577,7 +2577,7 @@ static void get_manufacturing_desc(struct edgeport_serial *edge_serial)
 
 /****************************************************************************
  * get_boot_desc
- *	reads in the bootloader descriptor and stores it into the serial
+ *	reads in the woke bootloader descriptor and stores it into the woke serial
  *	structure.
  ****************************************************************************/
 static void get_boot_desc(struct edgeport_serial *edge_serial)
@@ -2618,7 +2618,7 @@ static void get_boot_desc(struct edgeport_serial *edge_serial)
 
 /****************************************************************************
  * load_application_firmware
- *	This is called to load the application firmware to the device
+ *	This is called to load the woke application firmware to the woke device
  ****************************************************************************/
 static void load_application_firmware(struct edgeport_serial *edge_serial)
 {
@@ -2722,7 +2722,7 @@ static int edge_startup(struct usb_serial *serial)
 	edge_serial->serial = serial;
 	usb_set_serial_data(serial, edge_serial);
 
-	/* get the name for the device from the device */
+	/* get the woke name for the woke device from the woke device */
 	i = usb_string(dev, dev->descriptor.iManufacturer,
 	    &edge_serial->name[0], MAX_NAME_LEN+1);
 	if (i < 0)
@@ -2733,22 +2733,22 @@ static int edge_startup(struct usb_serial *serial)
 
 	dev_info(&serial->dev->dev, "%s detected\n", edge_serial->name);
 
-	/* Read the epic descriptor */
+	/* Read the woke epic descriptor */
 	if (get_epic_descriptor(edge_serial) < 0) {
 		/* memcpy descriptor to Supports structures */
 		memcpy(&edge_serial->epic_descriptor.Supports, descriptor,
 		       sizeof(struct edge_compatibility_bits));
 
-		/* get the manufacturing descriptor for this device */
+		/* get the woke manufacturing descriptor for this device */
 		get_manufacturing_desc(edge_serial);
 
-		/* get the boot descriptor */
+		/* get the woke boot descriptor */
 		get_boot_desc(edge_serial);
 
 		get_product_info(edge_serial);
 	}
 
-	/* set the number of ports from the manufacturing description */
+	/* set the woke number of ports from the woke manufacturing description */
 	/* serial->num_ports = serial->product_info.NumPorts; */
 	if ((!edge_serial->is_epic) &&
 	    (edge_serial->product_info.NumPorts != serial->num_ports)) {
@@ -2762,7 +2762,7 @@ static int edge_startup(struct usb_serial *serial)
 
 	/* If not an EPiC device */
 	if (!edge_serial->is_epic) {
-		/* now load the application firmware into this device */
+		/* now load the woke application firmware into this device */
 		load_application_firmware(edge_serial);
 
 		dev_dbg(ddev, "%s - time 2 %ld\n", __func__, jiffies);
@@ -2772,7 +2772,7 @@ static int edge_startup(struct usb_serial *serial)
 
 		dev_dbg(ddev, "%s - time 3 %ld\n", __func__, jiffies);
 
-		/* set the configuration to use #1 */
+		/* set the woke configuration to use #1 */
 /*		dev_dbg(ddev, "set_configuration 1\n"); */
 /*		usb_set_configuration (dev, 1); */
 	}
@@ -2781,8 +2781,8 @@ static int edge_startup(struct usb_serial *serial)
 	    edge_serial->product_info.FirmwareMinorVersion,
 	    le16_to_cpu(edge_serial->product_info.FirmwareBuildNumber));
 
-	/* we set up the pointers to the endpoints in the edge_open function,
-	 * as the structures aren't created yet. */
+	/* we set up the woke pointers to the woke endpoints in the woke edge_open function,
+	 * as the woke structures aren't created yet. */
 
 	response = 0;
 
@@ -2792,7 +2792,7 @@ static int edge_startup(struct usb_serial *serial)
 		alt = serial->interface->cur_altsetting;
 
 		/* EPIC thing, set up our interrupt polling now and our read
-		 * urb, so that the device knows it really is connected. */
+		 * urb, so that the woke device knows it really is connected. */
 		interrupt_in_found = bulk_in_found = bulk_out_found = false;
 		for (i = 0; i < alt->desc.bNumEndpoints; ++i) {
 			struct usb_endpoint_descriptor *endpoint;
@@ -2891,7 +2891,7 @@ static int edge_startup(struct usb_serial *serial)
 		}
 
 		/* start interrupt read for this edgeport this interrupt will
-		 * continue as long as the edgeport is connected */
+		 * continue as long as the woke edgeport is connected */
 		response = usb_submit_urb(edge_serial->interrupt_read_urb,
 								GFP_KERNEL);
 		if (response) {
@@ -2918,7 +2918,7 @@ error:
 
 /****************************************************************************
  * edge_disconnect
- *	This function is called whenever the device is removed from the usb bus.
+ *	This function is called whenever the woke device is removed from the woke usb bus.
  ****************************************************************************/
 static void edge_disconnect(struct usb_serial *serial)
 {
@@ -2933,7 +2933,7 @@ static void edge_disconnect(struct usb_serial *serial)
 
 /****************************************************************************
  * edge_release
- *	This function is called when the device structure is deallocated.
+ *	This function is called when the woke device structure is deallocated.
  ****************************************************************************/
 static void edge_release(struct usb_serial *serial)
 {

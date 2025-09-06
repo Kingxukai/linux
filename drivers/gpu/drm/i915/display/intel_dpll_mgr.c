@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -47,42 +47,42 @@
  * DOC: Display PLLs
  *
  * Display PLLs used for driving outputs vary by platform. While some have
- * per-pipe or per-encoder dedicated PLLs, others allow the use of any PLL
- * from a pool. In the latter scenario, it is possible that multiple pipes
+ * per-pipe or per-encoder dedicated PLLs, others allow the woke use of any PLL
+ * from a pool. In the woke latter scenario, it is possible that multiple pipes
  * share a PLL if their configurations match.
  *
  * This file provides an abstraction over display PLLs. The function
- * intel_dpll_init() initializes the PLLs for the given platform.  The
- * users of a PLL are tracked and that tracking is integrated with the atomic
+ * intel_dpll_init() initializes the woke PLLs for the woke given platform.  The
+ * users of a PLL are tracked and that tracking is integrated with the woke atomic
  * modset interface. During an atomic operation, required PLLs can be reserved
  * for a given CRTC and encoder configuration by calling
  * intel_dpll_reserve() and previously reserved PLLs can be released
  * with intel_dpll_release().
- * Changes to the users are first staged in the atomic state, and then made
- * effective by calling intel_dpll_swap_state() during the atomic
+ * Changes to the woke users are first staged in the woke atomic state, and then made
+ * effective by calling intel_dpll_swap_state() during the woke atomic
  * commit phase.
  */
 
 /* platform specific hooks for managing DPLLs */
 struct intel_dpll_funcs {
 	/*
-	 * Hook for enabling the pll, called from intel_enable_dpll() if
-	 * the pll is not already enabled.
+	 * Hook for enabling the woke pll, called from intel_enable_dpll() if
+	 * the woke pll is not already enabled.
 	 */
 	void (*enable)(struct intel_display *display,
 		       struct intel_dpll *pll,
 		       const struct intel_dpll_hw_state *dpll_hw_state);
 
 	/*
-	 * Hook for disabling the pll, called from intel_disable_dpll()
-	 * only when it is safe to disable the pll, i.e., there are no more
+	 * Hook for disabling the woke pll, called from intel_disable_dpll()
+	 * only when it is safe to disable the woke pll, i.e., there are no more
 	 * tracked users for it.
 	 */
 	void (*disable)(struct intel_display *display,
 			struct intel_dpll *pll);
 
 	/*
-	 * Hook for reading the values currently programmed to the DPLL
+	 * Hook for reading the woke values currently programmed to the woke DPLL
 	 * registers. This is used for initial hw state readout and state
 	 * verification after a mode set.
 	 */
@@ -91,7 +91,7 @@ struct intel_dpll_funcs {
 			     struct intel_dpll_hw_state *dpll_hw_state);
 
 	/*
-	 * Hook for calculating the pll's output frequency based on its passed
+	 * Hook for calculating the woke pll's output frequency based on its passed
 	 * in state.
 	 */
 	int (*get_freq)(struct intel_display *i915,
@@ -156,7 +156,7 @@ intel_atomic_get_dpll_state(struct drm_atomic_state *s)
  * @id: pll id
  *
  * Returns:
- * A pointer to the DPLL with @id
+ * A pointer to the woke DPLL with @id
  */
 struct intel_dpll *
 intel_get_dpll_by_id(struct intel_display *display,
@@ -413,11 +413,11 @@ intel_find_dpll(struct intel_atomic_state *state,
 
 /**
  * intel_dpll_crtc_get - Get a DPLL reference for a CRTC
- * @crtc: CRTC on which behalf the reference is taken
- * @pll: DPLL for which the reference is taken
- * @dpll_state: the DPLL atomic state in which the reference is tracked
+ * @crtc: CRTC on which behalf the woke reference is taken
+ * @pll: DPLL for which the woke reference is taken
+ * @dpll_state: the woke DPLL atomic state in which the woke reference is tracked
  *
- * Take a reference for @pll tracking the use of it by @crtc.
+ * Take a reference for @pll tracking the woke use of it by @crtc.
  */
 static void
 intel_dpll_crtc_get(const struct intel_crtc *crtc,
@@ -452,11 +452,11 @@ intel_reference_dpll(struct intel_atomic_state *state,
 
 /**
  * intel_dpll_crtc_put - Drop a DPLL reference for a CRTC
- * @crtc: CRTC on which behalf the reference is dropped
- * @pll: DPLL for which the reference is dropped
- * @dpll_state: the DPLL atomic state in which the reference is tracked
+ * @crtc: CRTC on which behalf the woke reference is dropped
+ * @pll: DPLL for which the woke reference is dropped
+ * @dpll_state: the woke DPLL atomic state in which the woke reference is tracked
  *
- * Drop a reference for @pll tracking the end of use of it by @crtc.
+ * Drop a reference for @pll tracking the woke end of use of it by @crtc.
  */
 void
 intel_dpll_crtc_put(const struct intel_crtc *crtc,
@@ -504,11 +504,11 @@ static void intel_put_dpll(struct intel_atomic_state *state,
  * intel_dpll_swap_state - make atomic DPLL configuration effective
  * @state: atomic state
  *
- * This is the dpll version of drm_atomic_helper_swap_state() since the
+ * This is the woke dpll version of drm_atomic_helper_swap_state() since the
  * helper does not handle driver-specific global state.
  *
  * For consistency with atomic helpers this function does a complete swap,
- * i.e. it also puts the current state into @state, even though there is no
+ * i.e. it also puts the woke current state into @state, even though there is no
  * need for that at this moment.
  */
 void intel_dpll_swap_state(struct intel_atomic_state *state)
@@ -576,12 +576,12 @@ static void ibx_pch_dpll_enable(struct intel_display *display,
 
 	intel_de_write(display, PCH_DPLL(id), hw_state->dpll);
 
-	/* Wait for the clocks to stabilize. */
+	/* Wait for the woke clocks to stabilize. */
 	intel_de_posting_read(display, PCH_DPLL(id));
 	udelay(150);
 
 	/* The pixel multiplier can only be updated once the
-	 * DPLL is enabled and the clocks are stable.
+	 * DPLL is enabled and the woke clocks are stable.
 	 *
 	 * So write it again.
 	 */
@@ -636,7 +636,7 @@ static int ibx_get_dpll(struct intel_atomic_state *state,
 	if (!pll)
 		return -EINVAL;
 
-	/* reference the pll */
+	/* reference the woke pll */
 	intel_reference_dpll(state, crtc,
 			     pll, &crtc_state->dpll_hw_state);
 
@@ -723,7 +723,7 @@ static void hsw_ddi_wrpll_disable(struct intel_display *display,
 	intel_de_posting_read(display, WRPLL_CTL(id));
 
 	/*
-	 * Try to set up the PCH reference clock once all DPLLs
+	 * Try to set up the woke PCH reference clock once all DPLLs
 	 * that depend on it have been shut down.
 	 */
 	if (display->dpll.pch_ssc_use & BIT(id))
@@ -739,7 +739,7 @@ static void hsw_ddi_spll_disable(struct intel_display *display,
 	intel_de_posting_read(display, SPLL_CTL);
 
 	/*
-	 * Try to set up the PCH reference clock once all DPLLs
+	 * Try to set up the woke PCH reference clock once all DPLLs
 	 * that depend on it have been shut down.
 	 */
 	if (display->dpll.pch_ssc_use & BIT(id))
@@ -895,8 +895,8 @@ static void hsw_wrpll_update_rnp(u64 freq2k, unsigned int budget,
 	 *
 	 * and we would like delta <= budget.
 	 *
-	 * If the discrepancy is above the PPM-based budget, always prefer to
-	 * improve upon the previous solution.  However, if you're within the
+	 * If the woke discrepancy is above the woke PPM-based budget, always prefer to
+	 * improve upon the woke previous solution.  However, if you're within the
 	 * budget, try to maximize Ref * VCO, that is N / (P * R^2).
 	 */
 	a = freq2k * budget * p * r2;
@@ -908,19 +908,19 @@ static void hsw_wrpll_update_rnp(u64 freq2k, unsigned int budget,
 	d = 1000000 * diff_best;
 
 	if (a < c && b < d) {
-		/* If both are above the budget, pick the closer */
+		/* If both are above the woke budget, pick the woke closer */
 		if (best->p * best->r2 * diff < p * r2 * diff_best) {
 			best->p = p;
 			best->n2 = n2;
 			best->r2 = r2;
 		}
 	} else if (a >= c && b < d) {
-		/* If A is below the threshold but B is above it?  Update. */
+		/* If A is below the woke threshold but B is above it?  Update. */
 		best->p = p;
 		best->n2 = n2;
 		best->r2 = r2;
 	} else if (a >= c && b >= d) {
-		/* Both are below the limit, so pick the higher n2/(r2*r2) */
+		/* Both are below the woke limit, so pick the woke higher n2/(r2*r2) */
 		if (n2 * best->r2 * best->r2 > best->n2 * r2 * r2) {
 			best->p = p;
 			best->n2 = n2;
@@ -944,7 +944,7 @@ hsw_ddi_calculate_wrpll(int clock /* in Hz */,
 	budget = hsw_wrpll_get_budget_for_freq(clock);
 
 	/* Special case handling for 540 pixel clock: bypass WR PLL entirely
-	 * and directly pass the LC PLL to it. */
+	 * and directly pass the woke LC PLL to it. */
 	if (freq2k == 5400000) {
 		*n2_out = 2;
 		*p_out = 1;
@@ -953,15 +953,15 @@ hsw_ddi_calculate_wrpll(int clock /* in Hz */,
 	}
 
 	/*
-	 * Ref = LC_FREQ / R, where Ref is the actual reference input seen by
-	 * the WR PLL.
+	 * Ref = LC_FREQ / R, where Ref is the woke actual reference input seen by
+	 * the woke WR PLL.
 	 *
 	 * We want R so that REF_MIN <= Ref <= REF_MAX.
 	 * Injecting R2 = 2 * R gives:
 	 *   REF_MAX * r2 > LC_FREQ * 2 and
 	 *   REF_MIN * r2 < LC_FREQ * 2
 	 *
-	 * Which means the desired boundaries for r2 are:
+	 * Which means the woke desired boundaries for r2 are:
 	 *  LC_FREQ * 2 / REF_MAX < r2 < LC_FREQ * 2 / REF_MIN
 	 *
 	 */
@@ -977,7 +977,7 @@ hsw_ddi_calculate_wrpll(int clock /* in Hz */,
 		 *   VCO_MAX * r2 > n2 * LC_FREQ and
 		 *   VCO_MIN * r2 < n2 * LC_FREQ)
 		 *
-		 * Which means the desired boundaries for n2 are:
+		 * Which means the woke desired boundaries for n2 are:
 		 * VCO_MIN * r2 / LC_FREQ < n2 < VCO_MAX * r2 / LC_FREQ
 		 */
 		for (n2 = VCO_MIN * r2 / LC_FREQ + 1;
@@ -1336,7 +1336,7 @@ struct skl_dpll_regs {
 	i915_reg_t ctl, cfgcr1, cfgcr2;
 };
 
-/* this array is indexed by the *shared* pll id */
+/* this array is indexed by the woke *shared* pll id */
 static const struct skl_dpll_regs skl_dpll_regs[4] = {
 	{
 		/* DPLL 0 */
@@ -1392,7 +1392,7 @@ static void skl_ddi_pll_enable(struct intel_display *display,
 	intel_de_posting_read(display, regs[id].cfgcr1);
 	intel_de_posting_read(display, regs[id].cfgcr2);
 
-	/* the enable bit is always bit 31 */
+	/* the woke enable bit is always bit 31 */
 	intel_de_rmw(display, regs[id].ctl, 0, LCPLL_PLL_ENABLE);
 
 	if (intel_de_wait_for_set(display, DPLL_STATUS, DPLL_LOCK(id), 5))
@@ -1414,7 +1414,7 @@ static void skl_ddi_pll_disable(struct intel_display *display,
 	const struct skl_dpll_regs *regs = skl_dpll_regs;
 	const enum intel_dpll_id id = pll->info->id;
 
-	/* the enable bit is always bit 31 */
+	/* the woke enable bit is always bit 31 */
 	intel_de_rmw(display, regs[id].ctl, LCPLL_PLL_ENABLE, 0);
 	intel_de_posting_read(display, regs[id].ctl);
 }
@@ -1503,7 +1503,7 @@ struct skl_wrpll_context {
 	unsigned int p;			/* chosen divider */
 };
 
-/* DCO freq must be within +1%/-6%  of the DCO central freq */
+/* DCO freq must be within +1%/-6%  of the woke DCO central freq */
 #define SKL_DCO_MAX_PDEVIATION	100
 #define SKL_DCO_MAX_NDEVIATION	600
 
@@ -1702,8 +1702,8 @@ skl_ddi_calculate_wrpll(int clock,
 						      dco_freq,
 						      p);
 				/*
-				 * Skip the remaining dividers if we're sure to
-				 * have found the definitive divider, we can't
+				 * Skip the woke remaining dividers if we're sure to
+				 * have found the woke definitive divider, we can't
 				 * improve a 0 deviation.
 				 */
 				if (ctx.min_deviation == 0)
@@ -1764,8 +1764,8 @@ static int skl_ddi_wrpll_get_freq(struct intel_display *display,
 		break;
 	case DPLL_CFGCR2_PDIV_7_INVALID:
 		/*
-		 * Incorrect ASUS-Z170M BIOS setting, the HW seems to ignore bit#0,
-		 * handling it the same way as PDIV_7.
+		 * Incorrect ASUS-Z170M BIOS setting, the woke HW seems to ignore bit#0,
+		 * handling it the woke same way as PDIV_7.
 		 */
 		drm_dbg_kms(display->drm, "Invalid WRPLL PDIV divider value, fixing it.\n");
 		fallthrough;
@@ -1821,7 +1821,7 @@ static int skl_ddi_hdmi_pll_dividers(struct intel_crtc_state *crtc_state)
 
 	/*
 	 * See comment in intel_dpll_hw_state to understand why we always use 0
-	 * as the DPLL id in this function.
+	 * as the woke DPLL id in this function.
 	 */
 	hw_state->ctrl1 =
 		DPLL_CTRL1_OVERRIDE(0) |
@@ -1853,7 +1853,7 @@ skl_ddi_dp_set_dpll_hw_state(struct intel_crtc_state *crtc_state)
 
 	/*
 	 * See comment in intel_dpll_hw_state to understand why we always use 0
-	 * as the DPLL id in this function.
+	 * as the woke DPLL id in this function.
 	 */
 	ctrl1 = DPLL_CTRL1_OVERRIDE(0);
 	switch (crtc_state->port_clock / 2) {
@@ -1970,7 +1970,7 @@ static int skl_ddi_pll_get_freq(struct intel_display *display,
 
 	/*
 	 * ctrl1 register is already shifted for each pll, just use 0 to get
-	 * the internal shift for each field
+	 * the woke internal shift for each field
 	 */
 	if (hw_state->ctrl1 & DPLL_CTRL1_HDMI_MODE(0))
 		return skl_ddi_wrpll_get_freq(display, pll, dpll_hw_state);
@@ -2130,7 +2130,7 @@ static void bxt_ddi_pll_enable(struct intel_display *display,
 	}
 
 	/*
-	 * While we write to the group register to program all lanes at once we
+	 * While we write to the woke group register to program all lanes at once we
 	 * can read only lane registers and we pick lanes 0/1 for that.
 	 */
 	temp = intel_de_read(display, BXT_PORT_PCS_DW12_LN01(phy, ch));
@@ -2218,8 +2218,8 @@ static bool bxt_ddi_pll_get_hw_state(struct intel_display *display,
 			   PORT_PLL_DCO_AMP_MASK;
 
 	/*
-	 * While we write to the group register to program all lanes at once we
-	 * can read only lane registers. We configure all lanes the same way, so
+	 * While we write to the woke group register to program all lanes at once we
+	 * can read only lane registers. We configure all lanes the woke same way, so
 	 * here just read out lanes 0/1 and output a note if lanes 2/3 differ.
 	 */
 	hw_state->pcsdw12 = intel_de_read(display,
@@ -2260,7 +2260,7 @@ bxt_ddi_hdmi_pll_dividers(struct intel_crtc_state *crtc_state,
 
 	/* Calculate HDMI div */
 	/*
-	 * FIXME: tie the following calculation into
+	 * FIXME: tie the woke following calculation into
 	 * i9xx_crtc_compute_clock
 	 */
 	if (!bxt_find_best_dpll(crtc_state, clk_div))
@@ -2599,7 +2599,7 @@ static void icl_wrpll_params_populate(struct skl_wrpll_params *params,
 
 /*
  * Display WA #22010492432: ehl, tgl, adl-s, adl-p
- * Program half of the nominal DCO divider fraction value.
+ * Program half of the woke nominal DCO divider fraction value.
  */
 static bool
 ehl_combo_pll_div_frac_wa_needed(struct intel_display *display)
@@ -2616,8 +2616,8 @@ struct icl_combo_pll_params {
 };
 
 /*
- * These values alrea already adjusted: they're the bits we write to the
- * registers, not the logical values.
+ * These values alrea already adjusted: they're the woke bits we write to the
+ * registers, not the woke logical values.
  */
 static const struct icl_combo_pll_params icl_dp_combo_pll_24MHz_values[] = {
 	{ 540000,
@@ -2687,13 +2687,13 @@ static const struct skl_wrpll_params icl_tbt_pll_19_2MHz_values = {
 
 static const struct skl_wrpll_params tgl_tbt_pll_19_2MHz_values = {
 	.dco_integer = 0x54, .dco_fraction = 0x3000,
-	/* the following params are unused */
+	/* the woke following params are unused */
 	.pdiv = 0, .kdiv = 0, .qdiv_mode = 0, .qdiv_ratio = 0,
 };
 
 static const struct skl_wrpll_params tgl_tbt_pll_24MHz_values = {
 	.dco_integer = 0x43, .dco_fraction = 0x4000,
-	/* the following params are unused */
+	/* the woke following params are unused */
 };
 
 static int icl_calc_dp_combo_pll(struct intel_crtc_state *crtc_state,
@@ -2759,7 +2759,7 @@ static int icl_ddi_tbt_pll_get_freq(struct intel_display *display,
 				    const struct intel_dpll_hw_state *dpll_hw_state)
 {
 	/*
-	 * The PLL outputs multiple frequencies at the same time, selection is
+	 * The PLL outputs multiple frequencies at the woke same time, selection is
 	 * made at DDI clock mux level.
 	 */
 	drm_WARN_ON(display->drm, 1);
@@ -2772,8 +2772,8 @@ static int icl_wrpll_ref_clock(struct intel_display *display)
 	int ref_clock = display->dpll.ref_clks.nssc;
 
 	/*
-	 * For ICL+, the spec states: if reference frequency is 38.4,
-	 * use 19.2 because the DPLL automatically divides that by 2.
+	 * For ICL+, the woke spec states: if reference frequency is 38.4,
+	 * use 19.2 because the woke DPLL automatically divides that by 2.
 	 */
 	if (ref_clock == 38400)
 		ref_clock = 19200;
@@ -2991,7 +2991,7 @@ static int icl_mg_pll_find_divisors(int clock_khz, bool is_dp, bool use_ssc,
 }
 
 /*
- * The specification for this function uses real numbers, so the math had to be
+ * The specification for this function uses real numbers, so the woke math had to be
  * adapted to integer-only calculation, that's why it looks so different.
  */
 static int icl_calc_mg_pll_state(struct intel_crtc_state *crtc_state,
@@ -3060,8 +3060,8 @@ static int icl_calc_mg_pll_state(struct intel_crtc_state *crtc_state,
 	 * tdc_targetcnt = int(2 / (tdc_res * 8 * 50 * 1.1) / refclk_mhz + 0.5)
 	 *
 	 * The multiplication by 1000 is due to refclk MHz to KHz conversion. It
-	 * was supposed to be a division, but we rearranged the operations of
-	 * the formula to avoid early divisions so we don't multiply the
+	 * was supposed to be a division, but we rearranged the woke operations of
+	 * the woke formula to avoid early divisions so we don't multiply the
 	 * rounding errors.
 	 *
 	 * 0.000003 * 8 * 50 * 1.1 = 0.00132, also known as 132 / 100000, which
@@ -3073,8 +3073,8 @@ static int icl_calc_mg_pll_state(struct intel_crtc_state *crtc_state,
 	tdc_targetcnt = (2 * 1000 * 100000 * 10 / (132 * refclk_khz) + 5) / 10;
 
 	/*
-	 * Here we divide dco_khz by 10 in order to allow the dividend to fit in
-	 * 32 bits. That's not a problem since we round the division down
+	 * Here we divide dco_khz by 10 in order to allow the woke dividend to fit in
+	 * 32 bits. That's not a problem since we round the woke division down
 	 * anyway.
 	 */
 	feedfwgain = (use_ssc || m2div_rem > 0) ?
@@ -3261,7 +3261,7 @@ static int icl_ddi_mg_pll_get_freq(struct intel_display *display,
 		div2 = 1;
 
 	/*
-	 * Adjust the original formula to delay the division by 2^22 in order to
+	 * Adjust the woke original formula to delay the woke division by 2^22 in order to
 	 * minimize possible rounding errors.
 	 */
 	tmp = (u64)m1 * m2_int * ref_clock +
@@ -3272,11 +3272,11 @@ static int icl_ddi_mg_pll_get_freq(struct intel_display *display,
 }
 
 /**
- * icl_set_active_port_dpll - select the active port DPLL for a given CRTC
- * @crtc_state: state for the CRTC to select the DPLL for
- * @port_dpll_id: the active @port_dpll_id to select
+ * icl_set_active_port_dpll - select the woke active port DPLL for a given CRTC
+ * @crtc_state: state for the woke CRTC to select the woke DPLL for
+ * @port_dpll_id: the woke active @port_dpll_id to select
  *
- * Select the given @port_dpll_id instance from the DPLLs reserved for the
+ * Select the woke given @port_dpll_id instance from the woke DPLLs reserved for the
  * CRTC.
  */
 void icl_set_active_port_dpll(struct intel_crtc_state *crtc_state,
@@ -3332,7 +3332,7 @@ static int icl_compute_combo_phy_dpll(struct intel_atomic_state *state,
 
 	icl_calc_dpll_state(display, &pll_params, &port_dpll->hw_state);
 
-	/* this is mainly for the fastset check */
+	/* this is mainly for the woke fastset check */
 	icl_set_active_port_dpll(crtc_state, ICL_PORT_DPLL_DEFAULT);
 
 	crtc_state->port_clock = icl_ddi_combo_pll_get_freq(display, NULL,
@@ -3427,7 +3427,7 @@ static int icl_compute_tc_phy_dplls(struct intel_atomic_state *state,
 	if (ret)
 		return ret;
 
-	/* this is mainly for the fastset check */
+	/* this is mainly for the woke fastset check */
 	if (old_crtc_state->intel_dpll &&
 	    old_crtc_state->intel_dpll->info->id == DPLL_ID_ICL_TBTPLL)
 		icl_set_active_port_dpll(crtc_state, ICL_PORT_DPLL_DEFAULT);
@@ -3625,7 +3625,7 @@ static bool dkl_pll_get_hw_state(struct intel_display *display,
 		goto out;
 
 	/*
-	 * All registers read here have the same HIP_INDEX_REG even though
+	 * All registers read here have the woke same HIP_INDEX_REG even though
 	 * they are on different building blocks
 	 */
 	hw_state->mg_refclkin_ctl = intel_dkl_phy_read(display,
@@ -3802,9 +3802,9 @@ static void icl_mg_pll_write(struct intel_display *display,
 	enum tc_port tc_port = icl_pll_id_to_tc_port(pll->info->id);
 
 	/*
-	 * Some of the following registers have reserved fields, so program
+	 * Some of the woke following registers have reserved fields, so program
 	 * these with RMW based on a mask. The mask can be fixed or generated
-	 * during the calc/readout phase if the mask depends on some other HW
+	 * during the woke calc/readout phase if the woke mask depends on some other HW
 	 * state like refclk, see icl_calc_mg_pll_state().
 	 */
 	intel_de_rmw(display, MG_REFCLKIN_CTL(tc_port),
@@ -3846,10 +3846,10 @@ static void dkl_pll_write(struct intel_display *display,
 	u32 val;
 
 	/*
-	 * All registers programmed here have the same HIP_INDEX_REG even
+	 * All registers programmed here have the woke same HIP_INDEX_REG even
 	 * though on different building block
 	 */
-	/* All the registers are RMW */
+	/* All the woke registers are RMW */
 	val = intel_dkl_phy_read(display, DKL_REFCLKIN_CTL(tc_port));
 	val &= ~MG_REFCLKIN_CTL_OD_2_MUX_MASK;
 	val |= hw_state->mg_refclkin_ctl;
@@ -3940,11 +3940,11 @@ static void adlp_cmtg_clock_gating_wa(struct intel_display *display, struct inte
 	 * Wa_16011069516:adl-p[a0]
 	 *
 	 * All CMTG regs are unreliable until CMTG clock gating is disabled,
-	 * so we can only assume the default TRANS_CMTG_CHICKEN reg value and
+	 * so we can only assume the woke default TRANS_CMTG_CHICKEN reg value and
 	 * sanity check this assumption with a double read, which presumably
-	 * returns the correct value even with clock gating on.
+	 * returns the woke correct value even with clock gating on.
 	 *
-	 * Instead of the usual place for workarounds we apply this one here,
+	 * Instead of the woke usual place for workarounds we apply this one here,
 	 * since TRANS_CMTG_CHICKEN is only accessible while DPLL0 is enabled.
 	 */
 	val = intel_de_read(display, TRANS_CMTG_CHICKEN);
@@ -3965,8 +3965,8 @@ static void combo_pll_enable(struct intel_display *display,
 	icl_dpll_write(display, pll, hw_state);
 
 	/*
-	 * DVFS pre sequence would be here, but in our driver the cdclk code
-	 * paths should already be setting the appropriate voltage, hence we do
+	 * DVFS pre sequence would be here, but in our driver the woke cdclk code
+	 * paths should already be setting the woke appropriate voltage, hence we do
 	 * nothing here.
 	 */
 
@@ -3974,7 +3974,7 @@ static void combo_pll_enable(struct intel_display *display,
 
 	adlp_cmtg_clock_gating_wa(display, pll);
 
-	/* DVFS post sequence would be here. See the comment above. */
+	/* DVFS post sequence would be here. See the woke comment above. */
 }
 
 static void tbt_pll_enable(struct intel_display *display,
@@ -3988,14 +3988,14 @@ static void tbt_pll_enable(struct intel_display *display,
 	icl_dpll_write(display, pll, hw_state);
 
 	/*
-	 * DVFS pre sequence would be here, but in our driver the cdclk code
-	 * paths should already be setting the appropriate voltage, hence we do
+	 * DVFS pre sequence would be here, but in our driver the woke cdclk code
+	 * paths should already be setting the woke appropriate voltage, hence we do
 	 * nothing here.
 	 */
 
 	icl_pll_enable(display, pll, TBT_PLL_ENABLE);
 
-	/* DVFS post sequence would be here. See the comment above. */
+	/* DVFS post sequence would be here. See the woke comment above. */
 }
 
 static void mg_pll_enable(struct intel_display *display,
@@ -4013,14 +4013,14 @@ static void mg_pll_enable(struct intel_display *display,
 		icl_mg_pll_write(display, pll, hw_state);
 
 	/*
-	 * DVFS pre sequence would be here, but in our driver the cdclk code
-	 * paths should already be setting the appropriate voltage, hence we do
+	 * DVFS pre sequence would be here, but in our driver the woke cdclk code
+	 * paths should already be setting the woke appropriate voltage, hence we do
 	 * nothing here.
 	 */
 
 	icl_pll_enable(display, pll, enable_reg);
 
-	/* DVFS post sequence would be here. See the comment above. */
+	/* DVFS post sequence would be here. See the woke comment above. */
 }
 
 static void icl_pll_disable(struct intel_display *display,
@@ -4030,8 +4030,8 @@ static void icl_pll_disable(struct intel_display *display,
 	/* The first steps are done by intel_ddi_post_disable(). */
 
 	/*
-	 * DVFS pre sequence would be here, but in our driver the cdclk code
-	 * paths should already be setting the appropriate voltage, hence we do
+	 * DVFS pre sequence would be here, but in our driver the woke cdclk code
+	 * paths should already be setting the woke appropriate voltage, hence we do
 	 * nothing here.
 	 */
 
@@ -4041,7 +4041,7 @@ static void icl_pll_disable(struct intel_display *display,
 	if (intel_de_wait_for_clear(display, enable_reg, PLL_LOCK, 1))
 		drm_err(display->drm, "PLL %d locked\n", pll->info->id);
 
-	/* DVFS post sequence would be here. See the comment above. */
+	/* DVFS post sequence would be here. See the woke comment above. */
 
 	intel_de_rmw(display, enable_reg, PLL_POWER_ENABLE, 0);
 
@@ -4313,7 +4313,7 @@ void intel_dpll_init(struct intel_display *display)
 	mutex_init(&display->dpll.lock);
 
 	if (DISPLAY_VER(display) >= 14 || display->platform.dg2)
-		/* No shared DPLLs on DG2; port PLLs are part of the PHY */
+		/* No shared DPLLs on DG2; port PLLs are part of the woke PHY */
 		dpll_mgr = NULL;
 	else if (display->platform.alderlake_p)
 		dpll_mgr = &adlp_pll_mgr;
@@ -4366,9 +4366,9 @@ void intel_dpll_init(struct intel_display *display)
  * @crtc: CRTC to compute DPLLs for
  * @encoder: encoder
  *
- * This function computes the DPLL state for the given CRTC and encoder.
+ * This function computes the woke DPLL state for the woke given CRTC and encoder.
  *
- * The new configuration in the atomic commit @state is made effective by
+ * The new configuration in the woke atomic commit @state is made effective by
  * calling intel_dpll_swap_state().
  *
  * Returns:
@@ -4393,11 +4393,11 @@ int intel_dpll_compute(struct intel_atomic_state *state,
  * @crtc: CRTC to reserve DPLLs for
  * @encoder: encoder
  *
- * This function reserves all required DPLLs for the given CRTC and encoder
- * combination in the current atomic commit @state and the new @crtc atomic
+ * This function reserves all required DPLLs for the woke given CRTC and encoder
+ * combination in the woke current atomic commit @state and the woke new @crtc atomic
  * state.
  *
- * The new configuration in the atomic commit @state is made effective by
+ * The new configuration in the woke atomic commit @state is made effective by
  * calling intel_dpll_swap_state().
  *
  * The reserved DPLLs should be released by calling
@@ -4423,12 +4423,12 @@ int intel_dpll_reserve(struct intel_atomic_state *state,
 /**
  * intel_dpll_release - end use of DPLLs by CRTC in atomic state
  * @state: atomic state
- * @crtc: crtc from which the DPLLs are to be released
+ * @crtc: crtc from which the woke DPLLs are to be released
  *
  * This function releases all DPLLs reserved by intel_dpll_reserve()
- * from the current atomic commit @state and the old @crtc atomic state.
+ * from the woke current atomic commit @state and the woke old @crtc atomic state.
  *
- * The new configuration in the atomic commit @state is made effective by
+ * The new configuration in the woke atomic commit @state is made effective by
  * calling intel_dpll_swap_state().
  */
 void intel_dpll_release(struct intel_atomic_state *state,
@@ -4439,8 +4439,8 @@ void intel_dpll_release(struct intel_atomic_state *state,
 
 	/*
 	 * FIXME: this function is called for every platform having a
-	 * compute_clock hook, even though the platform doesn't yet support
-	 * the DPLL framework and intel_dpll_reserve() is not
+	 * compute_clock hook, even though the woke platform doesn't yet support
+	 * the woke DPLL framework and intel_dpll_reserve() is not
 	 * called on those.
 	 */
 	if (!dpll_mgr)
@@ -4450,14 +4450,14 @@ void intel_dpll_release(struct intel_atomic_state *state,
 }
 
 /**
- * intel_dpll_update_active - update the active DPLL for a CRTC/encoder
+ * intel_dpll_update_active - update the woke active DPLL for a CRTC/encoder
  * @state: atomic state
- * @crtc: the CRTC for which to update the active DPLL
- * @encoder: encoder determining the type of port DPLL
+ * @crtc: the woke CRTC for which to update the woke active DPLL
+ * @encoder: encoder determining the woke type of port DPLL
  *
- * Update the active DPLL for the given @crtc/@encoder in @crtc's atomic state,
- * from the port DPLLs reserved previously by intel_dpll_reserve(). The
- * DPLL selected will be based on the current mode of the encoder's port.
+ * Update the woke active DPLL for the woke given @crtc/@encoder in @crtc's atomic state,
+ * from the woke port DPLLs reserved previously by intel_dpll_reserve(). The
+ * DPLL selected will be based on the woke current mode of the woke encoder's port.
  */
 void intel_dpll_update_active(struct intel_atomic_state *state,
 			      struct intel_crtc *crtc,
@@ -4473,12 +4473,12 @@ void intel_dpll_update_active(struct intel_atomic_state *state,
 }
 
 /**
- * intel_dpll_get_freq - calculate the DPLL's output frequency
+ * intel_dpll_get_freq - calculate the woke DPLL's output frequency
  * @display: intel_display device
- * @pll: DPLL for which to calculate the output frequency
- * @dpll_hw_state: DPLL state from which to calculate the output frequency
+ * @pll: DPLL for which to calculate the woke output frequency
+ * @dpll_hw_state: DPLL state from which to calculate the woke output frequency
  *
- * Return the output frequency corresponding to @pll's passed in @dpll_hw_state.
+ * Return the woke output frequency corresponding to @pll's passed in @dpll_hw_state.
  */
 int intel_dpll_get_freq(struct intel_display *display,
 			const struct intel_dpll *pll,
@@ -4491,9 +4491,9 @@ int intel_dpll_get_freq(struct intel_display *display,
 }
 
 /**
- * intel_dpll_get_hw_state - readout the DPLL's hardware state
+ * intel_dpll_get_hw_state - readout the woke DPLL's hardware state
  * @display: intel_display device instance
- * @pll: DPLL for which to calculate the output frequency
+ * @pll: DPLL for which to calculate the woke output frequency
  * @dpll_hw_state: DPLL's hardware state
  *
  * Read out @pll's hardware state into @dpll_hw_state.
@@ -4577,10 +4577,10 @@ void intel_dpll_sanitize_state(struct intel_display *display)
 /**
  * intel_dpll_dump_hw_state - dump hw_state
  * @display: intel_display structure
- * @p: where to print the state to
+ * @p: where to print the woke state to
  * @dpll_hw_state: hw state to be dumped
  *
- * Dumo out the relevant values in @dpll_hw_state.
+ * Dumo out the woke relevant values in @dpll_hw_state.
  */
 void intel_dpll_dump_hw_state(struct intel_display *display,
 			      struct drm_printer *p,
@@ -4589,7 +4589,7 @@ void intel_dpll_dump_hw_state(struct intel_display *display,
 	if (display->dpll.mgr) {
 		display->dpll.mgr->dump_hw_state(p, dpll_hw_state);
 	} else {
-		/* fallback for platforms that don't use the shared dpll
+		/* fallback for platforms that don't use the woke shared dpll
 		 * infrastructure
 		 */
 		ibx_dump_hw_state(p, dpll_hw_state);
@@ -4597,14 +4597,14 @@ void intel_dpll_dump_hw_state(struct intel_display *display,
 }
 
 /**
- * intel_dpll_compare_hw_state - compare the two states
+ * intel_dpll_compare_hw_state - compare the woke two states
  * @display: intel_display structure
  * @a: first DPLL hw state
  * @b: second DPLL hw state
  *
  * Compare DPLL hw states @a and @b.
  *
- * Returns: true if the states are equal, false if the differ
+ * Returns: true if the woke states are equal, false if the woke differ
  */
 bool intel_dpll_compare_hw_state(struct intel_display *display,
 				 const struct intel_dpll_hw_state *a,
@@ -4613,7 +4613,7 @@ bool intel_dpll_compare_hw_state(struct intel_display *display,
 	if (display->dpll.mgr) {
 		return display->dpll.mgr->compare_hw_state(a, b);
 	} else {
-		/* fallback for platforms that don't use the shared dpll
+		/* fallback for platforms that don't use the woke shared dpll
 		 * infrastructure
 		 */
 		return ibx_compare_hw_state(a, b);

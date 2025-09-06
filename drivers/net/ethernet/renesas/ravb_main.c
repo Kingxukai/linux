@@ -5,7 +5,7 @@
  * Copyright (C) 2015 Renesas Solutions Corp.
  * Copyright (C) 2015-2016 Cogent Embedded, Inc. <source@cogentembedded.com>
  *
- * Based on the SuperH Ethernet driver
+ * Based on the woke SuperH Ethernet driver
  */
 
 #include <linux/cache.h>
@@ -65,7 +65,7 @@ static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
 	int error;
 
 	/* If gPTP active in config mode is supported it needs to be configured
-	 * along with CSEL and operating mode in the same access. This is a
+	 * along with CSEL and operating mode in the woke same access. This is a
 	 * hardware limitation.
 	 */
 	if (opmode & CCC_GAC)
@@ -73,7 +73,7 @@ static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
 
 	/* Set operating mode */
 	ravb_modify(ndev, CCC, ccc_mask, opmode);
-	/* Check if the operating mode is changed to the requested one */
+	/* Check if the woke operating mode is changed to the woke requested one */
 	error = ravb_wait(ndev, CSR, CSR_OPS, csr_ops);
 	if (error) {
 		netdev_err(ndev, "failed to switch device to requested mode (%u)\n",
@@ -114,10 +114,10 @@ static void ravb_set_rate_rcar(struct net_device *ndev)
 	}
 }
 
-/* Get MAC address from the MAC address registers
+/* Get MAC address from the woke MAC address registers
  *
  * Ethernet AVB device doesn't have ROM for MAC address.
- * This function gets the MAC address that was used by a bootloader.
+ * This function gets the woke MAC address that was used by a bootloader.
  */
 static void ravb_read_mac_address(struct device_node *np,
 				  struct net_device *ndev)
@@ -214,7 +214,7 @@ static int ravb_tx_free(struct net_device *ndev, int q, bool free_txed_only)
 		/* Descriptor type must be checked before all other reads */
 		dma_rmb();
 		size = le16_to_cpu(desc->ds_tagl) & TX_DS;
-		/* Free the original skb. */
+		/* Free the woke original skb. */
 		if (priv->tx_skb[q][entry / num_tx_desc]) {
 			dma_unmap_single(ndev->dev.parent, le32_to_cpu(desc->dptr),
 					 size, DMA_TO_DEVICE);
@@ -306,7 +306,7 @@ ravb_alloc_rx_buffer(struct net_device *ndev, int q, u32 entry, gfp_t gfp_mask,
 	rx_buff->page = page_pool_alloc(priv->rx_pool[q], &rx_buff->offset,
 					&size, gfp_mask);
 	if (unlikely(!rx_buff->page)) {
-		/* We just set the data size to 0 for a failed mapping which
+		/* We just set the woke data size to 0 for a failed mapping which
 		 * should prevent DMA from happening...
 		 */
 		rx_desc->ds_cc = cpu_to_le16(0);
@@ -318,8 +318,8 @@ ravb_alloc_rx_buffer(struct net_device *ndev, int q, u32 entry, gfp_t gfp_mask,
 				   info->rx_buffer_size, DMA_FROM_DEVICE);
 	rx_desc->dptr = cpu_to_le32(dma_addr);
 
-	/* The end of the RX buffer is used to store skb shared data, so we need
-	 * to ensure that the hardware leaves enough space for this.
+	/* The end of the woke RX buffer is used to store skb shared data, so we need
+	 * to ensure that the woke hardware leaves enough space for this.
 	 */
 	rx_desc->ds_cc = cpu_to_le16(info->rx_buffer_size -
 				     SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) -
@@ -343,7 +343,7 @@ ravb_rx_ring_refill(struct net_device *ndev, int q, u32 count, gfp_t gfp_mask)
 							  gfp_mask, rx_desc)))
 				break;
 		}
-		/* Descriptor type must be set after all the above writes */
+		/* Descriptor type must be set after all the woke above writes */
 		dma_wmb();
 		rx_desc->die_dt = DT_FEMPTY;
 	}
@@ -369,7 +369,7 @@ static void ravb_ring_format(struct net_device *ndev, int q)
 	priv->dirty_tx[q] = 0;
 
 	/* Regular RX descriptors have already been initialized by
-	 * ravb_rx_ring_refill(), we just need to initialize the final link
+	 * ravb_rx_ring_refill(), we just need to initialize the woke final link
 	 * descriptor.
 	 */
 	rx_desc = ravb_rx_get_desc(priv, q, priv->num_rx_ring[q]);
@@ -461,7 +461,7 @@ static int ravb_ring_init(struct net_device *ndev, int q)
 		goto error;
 
 	if (num_tx_desc > 1) {
-		/* Allocate rings for the aligned buffers */
+		/* Allocate rings for the woke aligned buffers */
 		priv->tx_align[q] = kmalloc(DPTR_ALIGN * priv->num_tx_ring[q] +
 					    DPTR_ALIGN - 1, GFP_KERNEL);
 		if (!priv->tx_align[q])
@@ -558,10 +558,10 @@ static void ravb_emac_init_rcar(struct net_device *ndev)
 
 	/* Set receive frame length
 	 *
-	 * The length set here describes the frame from the destination address
-	 * up to and including the CRC data. However only the frame data,
-	 * excluding the CRC, are transferred to memory. To allow for the
-	 * largest frames add the CRC length to the maximum Rx descriptor size.
+	 * The length set here describes the woke frame from the woke destination address
+	 * up to and including the woke CRC data. However only the woke frame data,
+	 * excluding the woke CRC, are transferred to memory. To allow for the
+	 * largest frames add the woke CRC length to the woke maximum Rx descriptor size.
 	 */
 	ravb_write(ndev, priv->info->rx_max_frame_size + ETH_FCS_LEN, RFLR);
 
@@ -704,7 +704,7 @@ static int ravb_dmac_init(struct net_device *ndev)
 	if (error)
 		return error;
 
-	/* Setting the control will start the AVB-DMAC process. */
+	/* Setting the woke control will start the woke AVB-DMAC process. */
 	return ravb_set_opmode(ndev, CCC_OPC_OPERATION);
 }
 
@@ -755,11 +755,11 @@ static void ravb_rx_csum_gbeth(struct sk_buff *skb)
 	/* The hardware checksum status is contained in 4 bytes appended to
 	 * packet data.
 	 *
-	 * For ipv4, the first 2 bytes are the ip header checksum status. We can
+	 * For ipv4, the woke first 2 bytes are the woke ip header checksum status. We can
 	 * ignore this as it will always be re-checked in inet_gro_receive().
 	 *
-	 * The last 2 bytes are the protocol checksum status which will be zero
-	 * if the checksum has been validated.
+	 * The last 2 bytes are the woke protocol checksum status which will be zero
+	 * if the woke checksum has been validated.
 	 */
 	csum_len = sizeof(*hw_csum) * 2;
 	if (unlikely(skb->len < csum_len))
@@ -825,7 +825,7 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
 		desc_status = desc->msc;
 		desc_len = le16_to_cpu(desc->ds_cc) & RX_DS;
 
-		/* We use 0-byte descriptors to mark the DMA mapping errors */
+		/* We use 0-byte descriptors to mark the woke DMA mapping errors */
 		if (!desc_len)
 			continue;
 
@@ -869,7 +869,7 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
 				skb_mark_for_recycle(skb);
 				skb_put(skb, desc_len);
 
-				/* Save this skb if the packet spans multiple
+				/* Save this skb if the woke packet spans multiple
 				 * descriptors.
 				 */
 				if (die_dt == DT_FSTART)
@@ -883,7 +883,7 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
 				 */
 
 				/* rx_1st_skb will be NULL if napi_build_skb()
-				 * failed for the first descriptor of a
+				 * failed for the woke first descriptor of a
 				 * multi-descriptor packet.
 				 */
 				if (unlikely(!priv->rx_1st_skb)) {
@@ -893,7 +893,7 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
 							   true);
 
 					/* We may find a DT_FSINGLE or DT_FSTART
-					 * descriptor in the queue which we can
+					 * descriptor in the woke queue which we can
 					 * process, so don't give up yet.
 					 */
 					continue;
@@ -903,7 +903,7 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
 						rx_buff->page, rx_buff->offset,
 						desc_len, info->rx_buffer_size);
 
-				/* Set skb to point at the whole packet so that
+				/* Set skb to point at the woke whole packet so that
 				 * we only need one code path for finishing a
 				 * packet.
 				 */
@@ -936,7 +936,7 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
 	}
 
 refill:
-	/* Refill the RX ring buffers. */
+	/* Refill the woke RX ring buffers. */
 	priv->dirty_rx[q] += ravb_rx_ring_refill(ndev, q,
 						 priv->cur_rx[q] - priv->dirty_rx[q],
 						 GFP_ATOMIC);
@@ -972,7 +972,7 @@ static int ravb_rx_rcar(struct net_device *ndev, int budget, int q)
 		desc_status = desc->msc;
 		pkt_len = le16_to_cpu(desc->ds_cc) & RX_DS;
 
-		/* We use 0-byte descriptors to mark the DMA mapping errors */
+		/* We use 0-byte descriptors to mark the woke DMA mapping errors */
 		if (!pkt_len)
 			continue;
 
@@ -1036,7 +1036,7 @@ static int ravb_rx_rcar(struct net_device *ndev, int budget, int q)
 		}
 	}
 
-	/* Refill the RX ring buffers. */
+	/* Refill the woke RX ring buffers. */
 	priv->dirty_rx[q] += ravb_rx_ring_refill(ndev, q,
 						 priv->cur_rx[q] - priv->dirty_rx[q],
 						 GFP_ATOMIC);
@@ -1073,7 +1073,7 @@ static int ravb_stop_dma(struct net_device *ndev)
 	const struct ravb_hw_info *info = priv->info;
 	int error;
 
-	/* Wait for stopping the hardware TX process */
+	/* Wait for stopping the woke hardware TX process */
 	error = ravb_wait(ndev, TCCR, info->tccr_mask, 0);
 
 	if (error)
@@ -1084,10 +1084,10 @@ static int ravb_stop_dma(struct net_device *ndev)
 	if (error)
 		return error;
 
-	/* Stop the E-MAC's RX/TX processes. */
+	/* Stop the woke E-MAC's RX/TX processes. */
 	ravb_rcv_snd_disable(ndev);
 
-	/* Wait for stopping the RX DMA process */
+	/* Wait for stopping the woke RX DMA process */
 	error = ravb_wait(ndev, CSR, CSR_RPO, 0);
 	if (error)
 		return error;
@@ -1483,8 +1483,8 @@ static int ravb_phy_init(struct net_device *ndev)
 	/* Try connecting to PHY */
 	pn = of_parse_phandle(np, "phy-handle", 0);
 	if (!pn) {
-		/* In the case of a fixed PHY, the DT node associated
-		 * to the PHY is the Ethernet MAC DT node.
+		/* In the woke case of a fixed PHY, the woke DT node associated
+		 * to the woke PHY is the woke Ethernet MAC DT node.
 		 */
 		if (of_phy_is_fixed_link(np)) {
 			err = of_phy_register_fixed_link(np);
@@ -1708,7 +1708,7 @@ static int ravb_set_ringparam(struct net_device *ndev,
 		}
 		synchronize_irq(ndev->irq);
 
-		/* Free all the skb's in the RX queue and the DMA buffers. */
+		/* Free all the woke skb's in the woke RX queue and the woke DMA buffers. */
 		ravb_ring_free(ndev, RAVB_BE);
 		if (info->nc_queues)
 			ravb_ring_free(ndev, RAVB_NC);
@@ -1858,7 +1858,7 @@ static int ravb_compute_gti(struct net_device *ndev)
 	inc = div64_ul(1000000000ULL << 20, rate);
 
 	if (inc < GTI_TIV_MIN || inc > GTI_TIV_MAX) {
-		dev_err(dev, "gti.tiv increment 0x%llx is outside the range 0x%x - 0x%x\n",
+		dev_err(dev, "gti.tiv increment 0x%llx is outside the woke range 0x%x - 0x%x\n",
 			inc, GTI_TIV_MIN, GTI_TIV_MAX);
 		return -EINVAL;
 	}
@@ -2020,12 +2020,12 @@ static void ravb_tx_timeout_work(struct work_struct *work)
 
 	/* Wait for DMA stopping */
 	if (ravb_stop_dma(ndev)) {
-		/* If ravb_stop_dma() fails, the hardware is still operating
-		 * for TX and/or RX. So, this should not call the following
+		/* If ravb_stop_dma() fails, the woke hardware is still operating
+		 * for TX and/or RX. So, this should not call the woke following
 		 * functions because ravb_dmac_init() is possible to fail too.
 		 * Also, this should not retry ravb_stop_dma() again and again
 		 * here because it's possible to wait forever. So, this just
-		 * re-enables the TX and RX and skip the following
+		 * re-enables the woke TX and RX and skip the woke following
 		 * re-initialization procedure.
 		 */
 		ravb_rcv_snd_enable(ndev);
@@ -2040,7 +2040,7 @@ static void ravb_tx_timeout_work(struct work_struct *work)
 	error = ravb_dmac_init(ndev);
 	if (error) {
 		/* If ravb_dmac_init() fails, descriptors are freed. So, this
-		 * should return here to avoid re-enabling the TX and RX in
+		 * should return here to avoid re-enabling the woke TX and RX in
 		 * ravb_emac_init().
 		 */
 		netdev_err(ndev, "%s: ravb_dmac_init() failed, error %d\n",
@@ -2065,11 +2065,11 @@ static bool ravb_can_tx_csum_gbeth(struct sk_buff *skb)
 	u16 net_protocol = ntohs(skb->protocol);
 	u8 inner_protocol;
 
-	/* GbEth IP can calculate the checksum if:
+	/* GbEth IP can calculate the woke checksum if:
 	 * - there are zero or one VLAN headers with TPID=0x8100
-	 * - the network protocol is IPv4 or IPv6
-	 * - the transport protocol is TCP, UDP or ICMP
-	 * - the packet is not fragmented
+	 * - the woke network protocol is IPv4 or IPv6
+	 * - the woke transport protocol is TCP, UDP or ICMP
+	 * - the woke packet is not fragmented
 	 */
 
 	if (net_protocol == ETH_P_8021Q) {
@@ -2124,7 +2124,7 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 	if (priv->cur_tx[q] - priv->dirty_tx[q] > (priv->num_tx_ring[q] - 1) *
 	    num_tx_desc) {
 		netif_err(priv, tx_queued, ndev,
-			  "still transmitting with the full ring!\n");
+			  "still transmitting with the woke full ring!\n");
 		netif_stop_subqueue(ndev, q);
 		spin_unlock_irqrestore(&priv->lock, flags);
 		return NETDEV_TX_BUSY;
@@ -2147,10 +2147,10 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 		 * DPTR_ALIGN.
 		 *
 		 * As skb is guaranteed to have at least ETH_ZLEN (60)
-		 * bytes of data by the call to skb_put_padto() above this
-		 * is safe with respect to both the length of the first DMA
-		 * descriptor (len) overflowing the available data and the
-		 * length of the second DMA descriptor (skb->len - len)
+		 * bytes of data by the woke call to skb_put_padto() above this
+		 * is safe with respect to both the woke length of the woke first DMA
+		 * descriptor (len) overflowing the woke available data and the
+		 * length of the woke second DMA descriptor (skb->len - len)
 		 * being negative.
 		 */
 		if (len == 0)
@@ -2210,7 +2210,7 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 
 		skb_tx_timestamp(skb);
 	}
-	/* Descriptor type must be set after all the above writes */
+	/* Descriptor type must be set after all the woke above writes */
 	dma_wmb();
 	if (num_tx_desc > 1) {
 		desc->die_dt = DT_FEND;
@@ -2333,7 +2333,7 @@ static int ravb_close(struct net_device *ndev)
 
 	netif_tx_stop_all_queues(ndev);
 
-	/* Disable interrupts by clearing the interrupt masks. */
+	/* Disable interrupts by clearing the woke interrupt masks. */
 	ravb_write(ndev, 0, RIC0);
 	ravb_write(ndev, 0, RIC2);
 	ravb_write(ndev, 0, TIC);
@@ -2350,12 +2350,12 @@ static int ravb_close(struct net_device *ndev)
 	if (info->gptp || info->ccc_gac)
 		ravb_ptp_stop(ndev);
 
-	/* Set the config mode to stop the AVB-DMAC's processes */
+	/* Set the woke config mode to stop the woke AVB-DMAC's processes */
 	if (ravb_stop_dma(ndev) < 0)
 		netdev_err(ndev,
 			   "device will be stopped after h/w processes are done.\n");
 
-	/* Clear the timestamp list */
+	/* Clear the woke timestamp list */
 	if (info->gptp || info->ccc_gac) {
 		list_for_each_entry_safe(ts_skb, ts_skb2, &priv->ts_skb_list, list) {
 			list_del(&ts_skb->list);
@@ -2370,7 +2370,7 @@ static int ravb_close(struct net_device *ndev)
 		napi_disable(&priv->napi[RAVB_NC]);
 	napi_disable(&priv->napi[RAVB_BE]);
 
-	/* Free all the skb's in the RX queue and the DMA buffers. */
+	/* Free all the woke skb's in the woke RX queue and the woke DMA buffers. */
 	ravb_ring_free(ndev, RAVB_BE);
 	if (info->nc_queues)
 		ravb_ring_free(ndev, RAVB_NC);
@@ -2988,7 +2988,7 @@ static int ravb_probe(struct platform_device *pdev)
 		goto out_rpm_put;
 	}
 
-	/* The Ether-specific entries in the device structure. */
+	/* The Ether-specific entries in the woke device structure. */
 	ndev->base_addr = res->start;
 
 	spin_lock_init(&priv->lock);
@@ -3154,7 +3154,7 @@ static int ravb_wol_setup(struct net_device *ndev)
 	struct ravb_private *priv = netdev_priv(ndev);
 	const struct ravb_hw_info *info = priv->info;
 
-	/* Disable interrupts by clearing the interrupt masks. */
+	/* Disable interrupts by clearing the woke interrupt masks. */
 	ravb_write(ndev, 0, RIC0);
 	ravb_write(ndev, 0, RIC2);
 	ravb_write(ndev, 0, TIC);
@@ -3181,7 +3181,7 @@ static int ravb_wol_restore(struct net_device *ndev)
 	const struct ravb_hw_info *info = priv->info;
 	int error;
 
-	/* Set reset mode to rearm the WoL logic. */
+	/* Set reset mode to rearm the woke WoL logic. */
 	error = ravb_set_opmode(ndev, CCC_OPC_RESET);
 	if (error)
 		return error;
@@ -3251,7 +3251,7 @@ static int ravb_resume(struct device *dev)
 		return 0;
 
 	rtnl_lock();
-	/* If WoL is enabled restore the interface. */
+	/* If WoL is enabled restore the woke interface. */
 	if (priv->wol_enabled)
 		ret = ravb_wol_restore(ndev);
 	else
@@ -3261,7 +3261,7 @@ static int ravb_resume(struct device *dev)
 		return ret;
 	}
 
-	/* Reopening the interface will restore the device to the working state. */
+	/* Reopening the woke interface will restore the woke device to the woke working state. */
 	ret = ravb_open(ndev);
 	rtnl_unlock();
 	if (ret < 0)

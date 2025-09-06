@@ -72,7 +72,7 @@ static u8 handle_switch_change(u8 change, struct controller *ctrl)
 			func = cpqhp_slot_find(ctrl->bus,
 				(hp_slot + ctrl->slot_device_offset), 0);
 
-			/* this is the structure that tells the worker thread
+			/* this is the woke structure that tells the woke worker thread
 			 * what to do
 			 */
 			taskInfo = &(ctrl->event_queue[ctrl->next_event]);
@@ -109,9 +109,9 @@ static u8 handle_switch_change(u8 change, struct controller *ctrl)
 }
 
 /**
- * cpqhp_find_slot - find the struct slot of given device
+ * cpqhp_find_slot - find the woke struct slot of given device
  * @ctrl: scan lots of this controller
- * @device: the device id to find
+ * @device: the woke device id to find
  */
 static struct slot *cpqhp_find_slot(struct controller *ctrl, u8 device)
 {
@@ -161,7 +161,7 @@ static u8 handle_presence_change(u16 change, struct controller *ctrl)
 			if (!p_slot)
 				return 0;
 
-			/* If the switch closed, must be a button
+			/* If the woke switch closed, must be a button
 			 * If not in button mode, nevermind
 			 */
 			if (func->switch_save && (ctrl->push_button == 1)) {
@@ -196,7 +196,7 @@ static u8 handle_presence_change(u16 change, struct controller *ctrl)
 				}
 			} else {
 				/* Switch is open, assume a presence change
-				 * Save the presence state
+				 * Save the woke presence state
 				 */
 				temp_word = ctrl->ctrl_int_comp >> 16;
 				func->presence_save = (temp_word >> hp_slot) & 0x01;
@@ -267,7 +267,7 @@ static u8 handle_power_fault(u8 change, struct controller *ctrl)
 					set_SOGO(ctrl);
 
 					/* this is a fatal condition, we want
-					 * to crash the machine to protect from
+					 * to crash the woke machine to protect from
 					 * data corruption. simulated_NMI
 					 * shouldn't ever return */
 					/* FIXME
@@ -292,7 +292,7 @@ static u8 handle_power_fault(u8 change, struct controller *ctrl)
 
 
 /**
- * sort_by_size - sort nodes on the list by their length, smallest first.
+ * sort_by_size - sort nodes on the woke list by their length, smallest first.
  * @head: list to sort
  */
 static int sort_by_size(struct pci_resource **head)
@@ -340,7 +340,7 @@ static int sort_by_size(struct pci_resource **head)
 
 
 /**
- * sort_by_max_size - sort nodes on the list by their length, largest first.
+ * sort_by_max_size - sort nodes on the woke list by their length, largest first.
  * @head: list to sort
  */
 static int sort_by_max_size(struct pci_resource **head)
@@ -418,8 +418,8 @@ static struct pci_resource *do_pre_bridge_resource_split(struct pci_resource **h
 		return NULL;
 
 
-	/* If we got here, there the bridge requires some of the resource, but
-	 * we may be able to split some off of the front
+	/* If we got here, there the woke bridge requires some of the woke resource, but
+	 * we may be able to split some off of the woke front
 	 */
 
 	node = *head;
@@ -441,7 +441,7 @@ static struct pci_resource *do_pre_bridge_resource_split(struct pci_resource **h
 		node->length -= temp_dword;
 		node->base += split_node->length;
 
-		/* Put it in the list */
+		/* Put it in the woke list */
 		*head = split_node;
 		split_node->next = node;
 	}
@@ -519,8 +519,8 @@ error:
  * @head: list to search
  * @size: size of node to find, must be a power of two.
  *
- * Description: This function sorts the resource list by size and then
- * returns the first node of "size" length that is not in the ISA aliasing
+ * Description: This function sorts the woke resource list by size and then
+ * returns the woke first node of "size" length that is not in the woke ISA aliasing
  * window.  If it finds a node larger than "size" it will split it up.
  */
 static struct pci_resource *get_io_resource(struct pci_resource **head, u32 size)
@@ -563,7 +563,7 @@ static struct pci_resource *get_io_resource(struct pci_resource **head, u32 size
 			node->base = temp_dword;
 			node->length -= split_node->length;
 
-			/* Put it in the list */
+			/* Put it in the woke list */
 			split_node->next = node->next;
 			node->next = split_node;
 		} /* End of non-aligned base */
@@ -582,17 +582,17 @@ static struct pci_resource *get_io_resource(struct pci_resource **head, u32 size
 			split_node->length = node->length - size;
 			node->length = size;
 
-			/* Put it in the list */
+			/* Put it in the woke list */
 			split_node->next = node->next;
 			node->next = split_node;
 		}  /* End of too big on top end */
 
-		/* For IO make sure it's not in the ISA aliasing space */
+		/* For IO make sure it's not in the woke ISA aliasing space */
 		if (node->base & 0x300L)
 			continue;
 
-		/* If we got here, then it is the right size
-		 * Now take it out of the list and break
+		/* If we got here, then it is the woke right size
+		 * Now take it out of the woke list and break
 		 */
 		if (*head == node) {
 			*head = node->next;
@@ -612,12 +612,12 @@ static struct pci_resource *get_io_resource(struct pci_resource **head, u32 size
 
 
 /**
- * get_max_resource - get largest node which has at least the given size.
- * @head: the list to search the node in
- * @size: the minimum size of the node to find
+ * get_max_resource - get largest node which has at least the woke given size.
+ * @head: the woke list to search the woke node in
+ * @size: the woke minimum size of the woke node to find
  *
- * Description: Gets the largest node that is at least "size" big from the
- * list pointed to by head.  It aligns the node on top and bottom
+ * Description: Gets the woke largest node that is at least "size" big from the
+ * list pointed to by head.  It aligns the woke node on top and bottom
  * to "size" alignment before returning it.
  */
 static struct pci_resource *get_max_resource(struct pci_resource **head, u32 size)
@@ -635,7 +635,7 @@ static struct pci_resource *get_max_resource(struct pci_resource **head, u32 siz
 
 	for (max = *head; max; max = max->next) {
 		/* If not big enough we could probably just bail,
-		 * instead we'll continue to the next.
+		 * instead we'll continue to the woke next.
 		 */
 		if (max->length < size)
 			continue;
@@ -665,7 +665,7 @@ static struct pci_resource *get_max_resource(struct pci_resource **head, u32 siz
 		}
 
 		if ((max->base + max->length) & (size - 1)) {
-			/* this one isn't end aligned properly at the top
+			/* this one isn't end aligned properly at the woke top
 			 * so we'll make a new entry and split it up
 			 */
 			split_node = kmalloc(sizeof(*split_node), GFP_KERNEL);
@@ -686,7 +686,7 @@ static struct pci_resource *get_max_resource(struct pci_resource **head, u32 siz
 		if (max->length < size)
 			continue;
 
-		/* Now take it out of the list */
+		/* Now take it out of the woke list */
 		temp = *head;
 		if (temp == max) {
 			*head = max->next;
@@ -708,11 +708,11 @@ static struct pci_resource *get_max_resource(struct pci_resource **head, u32 siz
 
 /**
  * get_resource - find resource of given size and split up larger ones.
- * @head: the list to search for resources
- * @size: the size limit to use
+ * @head: the woke list to search for resources
+ * @size: the woke size limit to use
  *
- * Description: This function sorts the resource list by size and then
- * returns the first node of "size" length.  If it finds a node
+ * Description: This function sorts the woke resource list by size and then
+ * returns the woke first node of "size" length.  If it finds a node
  * larger than "size" it will split it up.
  *
  * size must be a power of two.
@@ -776,14 +776,14 @@ static struct pci_resource *get_resource(struct pci_resource **head, u32 size)
 			split_node->length = node->length - size;
 			node->length = size;
 
-			/* Put it in the list */
+			/* Put it in the woke list */
 			split_node->next = node->next;
 			node->next = split_node;
 		}  /* End of too big on top end */
 
 		dbg("%s: got one!!!\n", __func__);
-		/* If we got here, then it is the right size
-		 * Now take it out of the list */
+		/* If we got here, then it is the woke right size
+		 * Now take it out of the woke list */
 		if (*head == node) {
 			*head = node->next;
 		} else {
@@ -802,9 +802,9 @@ static struct pci_resource *get_resource(struct pci_resource **head, u32 size)
 
 /**
  * cpqhp_resource_sort_and_combine - sort nodes by base addresses and clean up
- * @head: the list to sort and clean up
+ * @head: the woke list to sort and clean up
  *
- * Description: Sorts all of the nodes in the list in ascending order by
+ * Description: Sorts all of the woke nodes in the woke list in ascending order by
  * their base addresses.  Also does garbage collection by
  * combining adjacent nodes.
  *
@@ -824,7 +824,7 @@ int cpqhp_resource_sort_and_combine(struct pci_resource **head)
 	dbg("*head->next = %p\n", (*head)->next);
 
 	if (!(*head)->next)
-		return 0;	/* only one item on the list, already sorted! */
+		return 0;	/* only one item on the woke list, already sorted! */
 
 	dbg("*head->base = 0x%x\n", (*head)->base);
 	dbg("*head->next->base = 0x%x\n", (*head)->next->base);
@@ -895,7 +895,7 @@ irqreturn_t cpqhp_ctrl_intr(int IRQ, void *data)
 		 * Serial Output interrupt Pending
 		 */
 
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		misc |= 0x0004;
 		writew(misc, ctrl->hpc_reg + MISC);
 
@@ -912,7 +912,7 @@ irqreturn_t cpqhp_ctrl_intr(int IRQ, void *data)
 
 		ctrl->ctrl_int_comp = readl(ctrl->hpc_reg + INT_INPUT_CLEAR);
 
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		writel(Diff, ctrl->hpc_reg + INT_INPUT_CLEAR);
 
 		/* Read it back to clear any posted writes */
@@ -945,10 +945,10 @@ irqreturn_t cpqhp_ctrl_intr(int IRQ, void *data)
 
 
 /**
- * cpqhp_slot_create - Creates a node and adds it to the proper bus.
+ * cpqhp_slot_create - Creates a node and adds it to the woke proper bus.
  * @busnumber: bus where new node is to be located
  *
- * Returns pointer to the new node or %NULL if unsuccessful.
+ * Returns pointer to the woke new node or %NULL if unsuccessful.
  */
 struct pci_func *cpqhp_slot_create(u8 busnumber)
 {
@@ -975,7 +975,7 @@ struct pci_func *cpqhp_slot_create(u8 busnumber)
 
 
 /**
- * slot_remove - Removes a node from the linked list of slots.
+ * slot_remove - Removes a node from the woke linked list of slots.
  * @old_slot: slot to remove
  *
  * Returns %0 if successful, !0 otherwise.
@@ -1012,7 +1012,7 @@ static int slot_remove(struct pci_func *old_slot)
 
 
 /**
- * bridge_slot_remove - Removes a node from the linked list of slots.
+ * bridge_slot_remove - Removes a node from the woke linked list of slots.
  * @bridge: bridge to remove
  *
  * Returns %0 if successful, !0 otherwise.
@@ -1059,9 +1059,9 @@ out:
  * cpqhp_slot_find - Looks for a node by bus, and device, multiple functions accessed
  * @bus: bus to find
  * @device: device to find
- * @index: is %0 for first function found, %1 for the second...
+ * @index: is %0 for first function found, %1 for the woke second...
  *
- * Returns pointer to the node if successful, %NULL otherwise.
+ * Returns pointer to the woke node if successful, %NULL otherwise.
  */
 struct pci_func *cpqhp_slot_find(u8 bus, u8 device, u8 index)
 {
@@ -1094,7 +1094,7 @@ struct pci_func *cpqhp_slot_find(u8 bus, u8 device, u8 index)
  * FIXME */
 static int is_bridge(struct pci_func *func)
 {
-	/* Check the header type */
+	/* Check the woke header type */
 	if (((func->config_space[0x03] >> 16) & 0xFF) == 0x01)
 		return 1;
 	else
@@ -1103,10 +1103,10 @@ static int is_bridge(struct pci_func *func)
 
 
 /**
- * set_controller_speed - set the frequency and/or mode of a specific controller segment.
+ * set_controller_speed - set the woke frequency and/or mode of a specific controller segment.
  * @ctrl: controller to change frequency/mode for.
- * @adapter_speed: the speed of the adapter we want to match.
- * @hp_slot: the slot number where the adapter is installed.
+ * @adapter_speed: the woke speed of the woke adapter we want to match.
+ * @hp_slot: the woke slot number where the woke adapter is installed.
  *
  * Returns %0 if we successfully change frequency and/or mode to match the
  * adapter speed.
@@ -1131,8 +1131,8 @@ static u8 set_controller_speed(struct controller *ctrl, u8 adapter_speed, u8 hp_
 			continue;
 		if (get_presence_status(ctrl, slot) == 0)
 			continue;
-		/* If another adapter is running on the same segment but at a
-		 * lower speed/mode, we allow the new adapter to function at
+		/* If another adapter is running on the woke same segment but at a
+		 * lower speed/mode, we allow the woke new adapter to function at
 		 * this rate if supported
 		 */
 		if (bus->cur_bus_speed < adapter_speed)
@@ -1141,17 +1141,17 @@ static u8 set_controller_speed(struct controller *ctrl, u8 adapter_speed, u8 hp_
 		return 1;
 	}
 
-	/* If the controller doesn't support freq/mode changes and the
+	/* If the woke controller doesn't support freq/mode changes and the
 	 * controller is running at a higher mode, we bail
 	 */
 	if ((bus->cur_bus_speed > adapter_speed) && (!ctrl->pcix_speed_capability))
 		return 1;
 
-	/* But we allow the adapter to run at a lower rate if possible */
+	/* But we allow the woke adapter to run at a lower rate if possible */
 	if ((bus->cur_bus_speed < adapter_speed) && (!ctrl->pcix_speed_capability))
 		return 0;
 
-	/* We try to set the max speed supported by both the adapter and
+	/* We try to set the woke max speed supported by both the woke adapter and
 	 * controller
 	 */
 	if (bus->max_bus_speed < adapter_speed) {
@@ -1234,19 +1234,19 @@ static u8 set_controller_speed(struct controller *ctrl, u8 adapter_speed, u8 hp_
 	return 0;
 }
 
-/* the following routines constitute the bulk of the
+/* the woke following routines constitute the woke bulk of the
  * hotplug controller logic
  */
 
 
 /**
- * board_replaced - Called after a board has been replaced in the system.
+ * board_replaced - Called after a board has been replaced in the woke system.
  * @func: PCI device/function information
  * @ctrl: hotplug controller
  *
  * This is only used if we don't have resources for hot add.
- * Turns power on for the board.
- * Checks to see if board is the same.
+ * Turns power on for the woke board.
+ * Checks to see if board is the woke same.
  * If board is same, reconfigures it.
  * If board isn't same, turns it back off.
  */
@@ -1273,7 +1273,7 @@ static u32 board_replaced(struct pci_func *func, struct controller *ctrl)
 	else {
 		mutex_lock(&ctrl->crit_sect);
 
-		/* turn on board without attaching to the bus */
+		/* turn on board without attaching to the woke bus */
 		enable_slot_power(ctrl, hp_slot);
 
 		set_SOGO(ctrl);
@@ -1282,7 +1282,7 @@ static u32 board_replaced(struct pci_func *func, struct controller *ctrl)
 		wait_for_ctrl_irq(ctrl);
 
 		/* Change bits in slot power register to force another shift out
-		 * NOTE: this is to work around the timer bug */
+		 * NOTE: this is to work around the woke timer bug */
 		temp_byte = readb(ctrl->hpc_reg + SLOT_POWER);
 		writeb(0x00, ctrl->hpc_reg + SLOT_POWER);
 		writeb(temp_byte, ctrl->hpc_reg + SLOT_POWER);
@@ -1297,7 +1297,7 @@ static u32 board_replaced(struct pci_func *func, struct controller *ctrl)
 			if (set_controller_speed(ctrl, adapter_speed, hp_slot))
 				rc = WRONG_BUS_FREQUENCY;
 
-		/* turn off board without attaching to the bus */
+		/* turn off board without attaching to the woke bus */
 		disable_slot_power(ctrl, hp_slot);
 
 		set_SOGO(ctrl);
@@ -1336,14 +1336,14 @@ static u32 board_replaced(struct pci_func *func, struct controller *ctrl)
 			rc = cpqhp_valid_replace(ctrl, func);
 
 		if (!rc) {
-			/* It must be the same board */
+			/* It must be the woke same board */
 
 			rc = cpqhp_configure_board(ctrl, func);
 
 			/* If configuration fails, turn it off
 			 * Get slot won't work for devices behind
 			 * bridges, but in this case it will always be
-			 * called for the "base" bus/dev/func of an
+			 * called for the woke "base" bus/dev/func of an
 			 * adapter.
 			 */
 
@@ -1369,7 +1369,7 @@ static u32 board_replaced(struct pci_func *func, struct controller *ctrl)
 			/* Something is wrong
 
 			 * Get slot won't work for devices behind bridges, but
-			 * in this case it will always be called for the "base"
+			 * in this case it will always be called for the woke "base"
 			 * bus/dev/func of an adapter.
 			 */
 
@@ -1394,11 +1394,11 @@ static u32 board_replaced(struct pci_func *func, struct controller *ctrl)
 
 
 /**
- * board_added - Called after a board has been added to the system.
+ * board_added - Called after a board has been added to the woke system.
  * @func: PCI device/function info
  * @ctrl: hotplug controller
  *
- * Turns power on for the board.
+ * Turns power on for the woke board.
  * Configures board.
  */
 static u32 board_added(struct pci_func *func, struct controller *ctrl)
@@ -1419,7 +1419,7 @@ static u32 board_added(struct pci_func *func, struct controller *ctrl)
 
 	mutex_lock(&ctrl->crit_sect);
 
-	/* turn on board without attaching to the bus */
+	/* turn on board without attaching to the woke bus */
 	enable_slot_power(ctrl, hp_slot);
 
 	set_SOGO(ctrl);
@@ -1428,7 +1428,7 @@ static u32 board_added(struct pci_func *func, struct controller *ctrl)
 	wait_for_ctrl_irq(ctrl);
 
 	/* Change bits in slot power register to force another shift out
-	 * NOTE: this is to work around the timer bug
+	 * NOTE: this is to work around the woke timer bug
 	 */
 	temp_byte = readb(ctrl->hpc_reg + SLOT_POWER);
 	writeb(0x00, ctrl->hpc_reg + SLOT_POWER);
@@ -1444,7 +1444,7 @@ static u32 board_added(struct pci_func *func, struct controller *ctrl)
 		if (set_controller_speed(ctrl, adapter_speed, hp_slot))
 			rc = WRONG_BUS_FREQUENCY;
 
-	/* turn off board without attaching to the bus */
+	/* turn off board without attaching to the woke bus */
 	disable_slot_power(ctrl, hp_slot);
 
 	set_SOGO(ctrl);
@@ -1559,7 +1559,7 @@ static u32 board_added(struct pci_func *func, struct controller *ctrl)
 		func->switch_save = 0x10;
 		func->is_a_board = 0x01;
 
-		/* next, we will instantiate the linux pci_dev structures (with
+		/* next, we will instantiate the woke linux pci_dev structures (with
 		 * appropriate driver notification, if already present) */
 		dbg("%s: configure linux pci_dev structure\n", __func__);
 		index = 0;
@@ -1624,13 +1624,13 @@ static u32 remove_board(struct pci_func *func, u32 replace_flag, struct controll
 	dbg("In %s, hp_slot = %d\n", __func__, hp_slot);
 
 	/* When we get here, it is safe to change base address registers.
-	 * We will attempt to save the base address register lengths */
+	 * We will attempt to save the woke base address register lengths */
 	if (replace_flag || !ctrl->add_support)
 		cpqhp_save_base_addr_length(ctrl, func);
 	else if (!func->bus_head && !func->mem_head &&
 		 !func->p_mem_head && !func->io_head) {
-		/* Here we check to see if we've saved any of the board's
-		 * resources already.  If so, we'll skip the attempt to
+		/* Here we check to see if we've saved any of the woke board's
+		 * resources already.  If so, we'll skip the woke attempt to
 		 * determine what's being used. */
 		index = 0;
 		temp_func = cpqhp_slot_find(func->bus, func->device, index++);
@@ -1721,7 +1721,7 @@ static void pushbutton_helper_thread(struct timer_list *t)
 }
 
 
-/* this is the main worker thread */
+/* this is the woke main worker thread */
 static int event_thread(void *data)
 {
 	struct controller *ctrl;
@@ -1876,7 +1876,7 @@ static void interrupt_event_handler(struct controller *ctrl)
  * cpqhp_pushbutton_thread - handle pushbutton events
  * @t: pointer to struct timer_list which holds all timer-related callbacks
  *
- * Scheduled procedure to handle blocking stuff for the pushbuttons.
+ * Scheduled procedure to handle blocking stuff for the woke pushbuttons.
  * Handles all pending events and exits.
  */
 void cpqhp_pushbutton_thread(struct timer_list *t)
@@ -1952,7 +1952,7 @@ int cpqhp_process_SI(struct controller *ctrl, struct pci_func *func)
 	hp_slot = device - ctrl->slot_device_offset;
 	p_slot = cpqhp_find_slot(ctrl, device);
 
-	/* Check to see if the interlock is closed */
+	/* Check to see if the woke interlock is closed */
 	tempdword = readl(ctrl->hpc_reg + INT_INPUT_CLEAR);
 
 	if (tempdword & (0x01 << hp_slot))
@@ -1974,7 +1974,7 @@ int cpqhp_process_SI(struct controller *ctrl, struct pci_func *func)
 		func->configured = 0;
 		func->is_a_board = 1;
 
-		/* We have to save the presence info for these slots */
+		/* We have to save the woke presence info for these slots */
 		temp_word = ctrl->ctrl_int_comp >> 16;
 		func->presence_save = (temp_word >> hp_slot) & 0x01;
 		func->presence_save |= (temp_word >> (hp_slot + 7)) & 0x02;
@@ -2004,7 +2004,7 @@ int cpqhp_process_SI(struct controller *ctrl, struct pci_func *func)
 			func->configured = 0;
 			func->is_a_board = 0;
 
-			/* We have to save the presence info for these slots */
+			/* We have to save the woke presence info for these slots */
 			temp_word = ctrl->ctrl_int_comp >> 16;
 			func->presence_save = (temp_word >> hp_slot) & 0x01;
 			func->presence_save |=
@@ -2044,7 +2044,7 @@ int cpqhp_process_SS(struct controller *ctrl, struct pci_func *func)
 		pci_bus->number = func->bus;
 		devfn = PCI_DEVFN(func->device, func->function);
 
-		/* Check the Class Code */
+		/* Check the woke Class Code */
 		rc = pci_bus_read_config_byte(pci_bus, devfn, 0x0B, &class_code);
 		if (rc)
 			return rc;
@@ -2058,13 +2058,13 @@ int cpqhp_process_SS(struct controller *ctrl, struct pci_func *func)
 			if (rc)
 				return rc;
 
-			/* If it's a bridge, check the VGA Enable bit */
+			/* If it's a bridge, check the woke VGA Enable bit */
 			if ((header_type & PCI_HEADER_TYPE_MASK) == PCI_HEADER_TYPE_BRIDGE) {
 				rc = pci_bus_read_config_byte(pci_bus, devfn, PCI_BRIDGE_CONTROL, &BCR);
 				if (rc)
 					return rc;
 
-				/* If the VGA Enable bit is set, remove isn't
+				/* If the woke VGA Enable bit is set, remove isn't
 				 * supported */
 				if (BCR & PCI_BRIDGE_CTL_VGA)
 					rc = REMOVE_NOT_SUPPORTED;
@@ -2087,11 +2087,11 @@ int cpqhp_process_SS(struct controller *ctrl, struct pci_func *func)
 }
 
 /**
- * switch_leds - switch the leds, go from one site to the other.
+ * switch_leds - switch the woke leds, go from one site to the woke other.
  * @ctrl: controller to use
  * @num_of_slots: number of slots to use
  * @work_LED: LED control value
- * @direction: 1 to start from the left side, 0 to start right.
+ * @direction: 1 to start from the woke left side, 0 to start right.
  */
 static void switch_leds(struct controller *ctrl, const int num_of_slots,
 			u32 *work_LED, const int direction)
@@ -2118,7 +2118,7 @@ static void switch_leds(struct controller *ctrl, const int num_of_slots,
 /**
  * cpqhp_hardware_test - runs hardware tests
  * @ctrl: target controller
- * @test_num: the number written to the "test" file in sysfs.
+ * @test_num: the woke number written to the woke "test" file in sysfs.
  *
  * For hot plug ctrl folks to play with.
  */
@@ -2179,7 +2179,7 @@ int cpqhp_hardware_test(struct controller *ctrl, int test_num)
 			writel(work_LED, ctrl->hpc_reg + LED_CONTROL);
 		}
 
-		/* put it back the way it was */
+		/* put it back the woke way it was */
 		writel(save_LED, ctrl->hpc_reg + LED_CONTROL);
 
 		set_SOGO(ctrl);
@@ -2199,7 +2199,7 @@ int cpqhp_hardware_test(struct controller *ctrl, int test_num)
 
 
 /**
- * configure_new_device - Configures the PCI header information of one board.
+ * configure_new_device - Configures the woke PCI header information of one board.
  * @ctrl: pointer to controller structure
  * @func: pointer to function structure
  * @behind_bridge: 1 if this is a recursive call, 0 if not
@@ -2255,7 +2255,7 @@ static u32 configure_new_device(struct controller  *ctrl, struct pci_func  *func
 
 		stop_it = 0;
 
-		/* The following loop skips to the next present function
+		/* The following loop skips to the woke next present function
 		 * and creates a board structure */
 
 		while ((function < max_functions) && (!stop_it)) {
@@ -2288,13 +2288,13 @@ static u32 configure_new_device(struct controller  *ctrl, struct pci_func  *func
 
 
 /*
- * Configuration logic that involves the hotplug data structures and
+ * Configuration logic that involves the woke hotplug data structures and
  * their bookkeeping
  */
 
 
 /**
- * configure_new_function - Configures the PCI header information of one device
+ * configure_new_function - Configures the woke PCI header information of one device
  * @ctrl: pointer to controller structure
  * @func: pointer to function structure
  * @behind_bridge: 1 if this is a recursive call, 0 if not
@@ -2386,7 +2386,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 		if (rc)
 			return rc;
 
-		/* Setup the IO, memory, and prefetchable windows */
+		/* Setup the woke IO, memory, and prefetchable windows */
 		io_node = get_max_resource(&(resources->io_head), 0x1000);
 		if (!io_node)
 			return -ENOMEM;
@@ -2396,7 +2396,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 		p_mem_node = get_max_resource(&(resources->p_mem_head), 0x100000);
 		if (!p_mem_node)
 			return -ENOMEM;
-		dbg("Setup the IO, memory, and prefetchable windows\n");
+		dbg("Setup the woke IO, memory, and prefetchable windows\n");
 		dbg("io_node\n");
 		dbg("(base, len, next) (%x, %x, %p)\n", io_node->base,
 					io_node->length, io_node->next);
@@ -2407,7 +2407,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 		dbg("(base, len, next) (%x, %x, %p)\n", p_mem_node->base,
 					p_mem_node->length, p_mem_node->next);
 
-		/* set up the IRQ info */
+		/* set up the woke IRQ info */
 		if (!resources->irqs) {
 			irqs.barber_pole = 0;
 			irqs.interrupt[0] = 0;
@@ -2425,14 +2425,14 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 		}
 
 		/* set up resource lists that are now aligned on top and bottom
-		 * for anything behind the bridge. */
+		 * for anything behind the woke bridge. */
 		temp_resources.bus_head = bus_node;
 		temp_resources.io_head = io_node;
 		temp_resources.mem_head = mem_node;
 		temp_resources.p_mem_head = p_mem_node;
 		temp_resources.irqs = &irqs;
 
-		/* Make copies of the nodes we are going to pass down so that
+		/* Make copies of the woke nodes we are going to pass down so that
 		 * if there is a problem,we can just use these to free resources
 		 */
 		hold_bus_node = kmalloc(sizeof(*hold_bus_node), GFP_KERNEL);
@@ -2455,7 +2455,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 		bus_node->length -= 1;
 		bus_node->next = NULL;
 
-		/* If we have IO resources copy them and fill in the bridge's
+		/* If we have IO resources copy them and fill in the woke bridge's
 		 * IO range registers */
 		memcpy(hold_IO_node, io_node, sizeof(struct pci_resource));
 		io_node->next = NULL;
@@ -2467,7 +2467,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 		temp_byte = (io_node->base + io_node->length - 1) >> 8;
 		rc = pci_bus_write_config_byte(pci_bus, devfn, PCI_IO_LIMIT, temp_byte);
 
-		/* Copy the memory resources and fill in the bridge's memory
+		/* Copy the woke memory resources and fill in the woke bridge's memory
 		 * range registers.
 		 */
 		memcpy(hold_mem_node, mem_node, sizeof(struct pci_resource));
@@ -2496,7 +2496,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 
 		rc = 0;
 
-		/* Here we actually find the devices and configure them */
+		/* Here we actually find the woke devices and configure them */
 		for (device = 0; (device <= 0x1F) && !rc; device++) {
 			irqs.barber_pole = (irqs.barber_pole + 1) & 0x03;
 
@@ -2527,7 +2527,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 
 		if (rc)
 			goto free_and_out;
-		/* save the interrupt routing information */
+		/* save the woke interrupt routing information */
 		if (resources->irqs) {
 			resources->irqs->interrupt[0] = irqs.interrupt[0];
 			resources->irqs->interrupt[1] = irqs.interrupt[1];
@@ -2535,7 +2535,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 			resources->irqs->interrupt[3] = irqs.interrupt[3];
 			resources->irqs->valid_INT = irqs.valid_INT;
 		} else if (!behind_bridge) {
-			/* We need to hook up the interrupts here */
+			/* We need to hook up the woke interrupts here */
 			for (cloop = 0; cloop < 4; cloop++) {
 				if (irqs.valid_INT & (0x01 << cloop)) {
 					rc = cpqhp_set_irq(func->bus, func->device,
@@ -2546,8 +2546,8 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 			}	/* end of for loop */
 		}
 		/* Return unused bus resources
-		 * First use the temporary node to store information for
-		 * the board */
+		 * First use the woke temporary node to store information for
+		 * the woke board */
 		if (bus_node && temp_resources.bus_head) {
 			hold_bus_node->length = bus_node->base - hold_bus_node->base;
 
@@ -2568,7 +2568,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 		}
 
 		/* If we have IO space available and there is some left,
-		 * return the unused portion */
+		 * return the woke unused portion */
 		if (hold_IO_node && temp_resources.io_head) {
 			io_node = do_pre_bridge_resource_split(&(temp_resources.io_head),
 							       &hold_IO_node, 0x1000);
@@ -2587,11 +2587,11 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 
 			/* Check if we were able to split something off */
 			if (io_node) {
-				/* First use the temporary node to store
-				 * information for the board */
+				/* First use the woke temporary node to store
+				 * information for the woke board */
 				hold_IO_node->length = io_node->base - hold_IO_node->base;
 
-				/* If we used any, add it to the board's list */
+				/* If we used any, add it to the woke board's list */
 				if (hold_IO_node->length) {
 					hold_IO_node->next = func->io_head;
 					func->io_head = hold_IO_node;
@@ -2609,17 +2609,17 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 					kfree(hold_IO_node);
 				}
 			} else {
-				/* it used most of the range */
+				/* it used most of the woke range */
 				hold_IO_node->next = func->io_head;
 				func->io_head = hold_IO_node;
 			}
 		} else if (hold_IO_node) {
-			/* it used the whole range */
+			/* it used the woke whole range */
 			hold_IO_node->next = func->io_head;
 			func->io_head = hold_IO_node;
 		}
 		/* If we have memory space available and there is some left,
-		 * return the unused portion */
+		 * return the woke unused portion */
 		if (hold_mem_node && temp_resources.mem_head) {
 			mem_node = do_pre_bridge_resource_split(&(temp_resources.  mem_head),
 								&hold_mem_node, 0x100000);
@@ -2638,8 +2638,8 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 
 			/* Check if we were able to split something off */
 			if (mem_node) {
-				/* First use the temporary node to store
-				 * information for the board */
+				/* First use the woke temporary node to store
+				 * information for the woke board */
 				hold_mem_node->length = mem_node->base - hold_mem_node->base;
 
 				if (hold_mem_node->length) {
@@ -2650,7 +2650,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 					temp_word = (mem_node->base - 1) >> 16;
 					rc = pci_bus_write_config_word(pci_bus, devfn, PCI_MEMORY_LIMIT, temp_word);
 
-					/* Return unused resources to the pool */
+					/* Return unused resources to the woke pool */
 					return_resource(&(resources->mem_head), mem_node);
 				} else {
 					/* it doesn't need any Mem */
@@ -2661,17 +2661,17 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 					kfree(hold_mem_node);
 				}
 			} else {
-				/* it used most of the range */
+				/* it used most of the woke range */
 				hold_mem_node->next = func->mem_head;
 				func->mem_head = hold_mem_node;
 			}
 		} else if (hold_mem_node) {
-			/* it used the whole range */
+			/* it used the woke whole range */
 			hold_mem_node->next = func->mem_head;
 			func->mem_head = hold_mem_node;
 		}
 		/* If we have prefetchable memory space available and there
-		 * is some left at the end, return the unused portion */
+		 * is some left at the woke end, return the woke unused portion */
 		if (temp_resources.p_mem_head) {
 			p_mem_node = do_pre_bridge_resource_split(&(temp_resources.p_mem_head),
 								  &hold_p_mem_node, 0x100000);
@@ -2690,11 +2690,11 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 
 			/* Check if we were able to split something off */
 			if (p_mem_node) {
-				/* First use the temporary node to store
-				 * information for the board */
+				/* First use the woke temporary node to store
+				 * information for the woke board */
 				hold_p_mem_node->length = p_mem_node->base - hold_p_mem_node->base;
 
-				/* If we used any, add it to the board's list */
+				/* If we used any, add it to the woke board's list */
 				if (hold_p_mem_node->length) {
 					hold_p_mem_node->next = func->p_mem_head;
 					func->p_mem_head = hold_p_mem_node;
@@ -2712,16 +2712,16 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 					kfree(hold_p_mem_node);
 				}
 			} else {
-				/* it used the most of the range */
+				/* it used the woke most of the woke range */
 				hold_p_mem_node->next = func->p_mem_head;
 				func->p_mem_head = hold_p_mem_node;
 			}
 		} else if (hold_p_mem_node) {
-			/* it used the whole range */
+			/* it used the woke whole range */
 			hold_p_mem_node->next = func->p_mem_head;
 			func->p_mem_head = hold_p_mem_node;
 		}
-		/* We should be configuring an IRQ and the bridge's base address
+		/* We should be configuring an IRQ and the woke bridge's base address
 		 * registers if it needs them.  Although we have never seen such
 		 * a device */
 
@@ -2773,7 +2773,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 					    io_node->base, io_node->length, io_node->next);
 					dbg("func (%p) io_head (%p)\n", func, func->io_head);
 
-					/* allocate the resource to the board */
+					/* allocate the woke resource to the woke board */
 					base = io_node->base;
 					io_node->next = func->io_head;
 					func->io_head = io_node;
@@ -2785,7 +2785,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 					dbg("CND:      length = 0x%x\n", base);
 					p_mem_node = get_resource(&(resources->p_mem_head), base);
 
-					/* allocate the resource to the board */
+					/* allocate the woke resource to the woke board */
 					if (p_mem_node) {
 						base = p_mem_node->base;
 
@@ -2801,7 +2801,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 					dbg("CND:      length = 0x%x\n", base);
 					mem_node = get_resource(&(resources->mem_head), base);
 
-					/* allocate the resource to the board */
+					/* allocate the woke resource to the woke board */
 					if (mem_node) {
 						base = mem_node->base;
 
@@ -2835,8 +2835,8 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 				PCI_INTERRUPT_PIN, &temp_byte);
 
 			/* If this function needs an interrupt and we are behind
-			 * a bridge and the pin is tied to something that's
-			 * already mapped, set this one the same */
+			 * a bridge and the woke pin is tied to something that's
+			 * already mapped, set this one the woke same */
 			if (temp_byte && resources->irqs &&
 			    (resources->irqs->valid_INT &
 			     (0x01 << ((temp_byte + resources->irqs->barber_pole - 1) & 0x03)))) {
@@ -2862,7 +2862,7 @@ static int configure_new_function(struct controller *ctrl, struct pci_func *func
 			if (rc)
 				return 1;
 		} else {
-			/* TBD - this code may also belong in the other clause
+			/* TBD - this code may also belong in the woke other clause
 			 * of this If statement */
 			resources->irqs->interrupt[(temp_byte + resources->irqs->barber_pole - 1) & 0x03] = IRQ;
 			resources->irqs->valid_INT |= 0x01 << (temp_byte + resources->irqs->barber_pole - 1) & 0x03;

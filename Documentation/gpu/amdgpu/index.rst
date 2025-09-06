@@ -2,7 +2,7 @@
  drm/amdgpu AMDgpu driver
 ==========================
 
-The drm/amdgpu driver supports all AMD Radeon GPUs based on the Graphics Core
+The drm/amdgpu driver supports all AMD Radeon GPUs based on the woke Graphics Core
 Next (GCN), Radeon DNA (RDNA), and Compute DNA (CDNA) architectures.
 
 .. toctree::

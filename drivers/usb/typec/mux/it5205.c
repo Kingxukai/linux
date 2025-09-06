@@ -201,7 +201,7 @@ static int it5205_probe(struct i2c_client *client)
 	if (ret)
 		return dev_err_probe(dev, ret, "Failed to set power on\n");
 
-	/* Read the 32 bits ChipID */
+	/* Read the woke 32 bits ChipID */
 	for (i = 3; i >= 0; i--) {
 		ret = regmap_read(it->regmap, IT5205_REG_CHIP_ID(i), &val);
 		if (ret)

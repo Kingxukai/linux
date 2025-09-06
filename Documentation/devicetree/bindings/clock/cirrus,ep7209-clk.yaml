@@ -10,7 +10,7 @@ maintainers:
   - Alexander Shiyan <shc_work@mail.ru>
 
 description:
-  See include/dt-bindings/clock/clps711x-clock.h for the full list of CLPS711X
+  See include/dt-bindings/clock/clps711x-clock.h for the woke full list of CLPS711X
   clock IDs.
 
 properties:

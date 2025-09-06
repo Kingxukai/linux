@@ -66,20 +66,20 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
 }
 
 /*
- * This performs the exception entry at a given EL (@target_mode), stashing PC
- * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
+ * This performs the woke exception entry at a given EL (@target_mode), stashing PC
+ * and PSTATE into ELR and SPSR respectively, and compute the woke new PC/PSTATE.
  * The EL passed to this function *must* be a non-secure, privileged mode with
  * bit 0 being set (PSTATE.SP == 1).
  *
  * When an exception is taken, most PSTATE fields are left unchanged in the
  * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
- * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
+ * of the woke inherited bits have the woke same position in the woke AArch64/AArch32 SPSR_ELx
  * layouts, so we don't need to shuffle these for exceptions from AArch32 EL0.
  *
- * For the SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
- * For the SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
+ * For the woke SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
+ * For the woke SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
  *
- * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
+ * Here we manipulate the woke fields in order of the woke AArch64 SPSR_ELx layout, from
  * MSB to LSB.
  */
 static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
@@ -169,18 +169,18 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
  * When an exception is taken, most CPSR fields are left unchanged in the
  * handler. However, some are explicitly overridden (e.g. M[4:0]).
  *
- * The SPSR/SPSR_ELx layouts differ, and the below is intended to work with
+ * The SPSR/SPSR_ELx layouts differ, and the woke below is intended to work with
  * either format. Note: SPSR.J bit doesn't exist in SPSR_ELx, but this bit was
- * obsoleted by the ARMv7 virtualization extensions and is RES0.
+ * obsoleted by the woke ARMv7 virtualization extensions and is RES0.
  *
- * For the SPSR layout seen from AArch32, see:
+ * For the woke SPSR layout seen from AArch32, see:
  * - ARM DDI 0406C.d, page B1-1148
  * - ARM DDI 0487E.a, page G8-6264
  *
- * For the SPSR_ELx layout for AArch32 seen from AArch64, see:
+ * For the woke SPSR_ELx layout for AArch32 seen from AArch64, see:
  * - ARM DDI 0487E.a, page C5-426
  *
- * Here we manipulate the fields in order of the AArch32 SPSR_ELx layout, from
+ * Here we manipulate the woke fields in order of the woke AArch32 SPSR_ELx layout, from
  * MSB to LSB.
  */
 static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
@@ -288,7 +288,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
 	return_address   = *vcpu_pc(vcpu);
 	return_address  += return_offsets[vect_offset >> 2][is_thumb];
 
-	/* KVM only enters the ABT and UND modes, so only deal with those */
+	/* KVM only enters the woke ABT and UND modes, so only deal with those */
 	switch(mode) {
 	case PSR_AA32_MODE_ABT:
 		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
@@ -361,8 +361,8 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Adjust the guest PC (and potentially exception state) depending on
- * flags provided by the emulation code.
+ * Adjust the woke guest PC (and potentially exception state) depending on
+ * flags provided by the woke emulation code.
  */
 void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
 {

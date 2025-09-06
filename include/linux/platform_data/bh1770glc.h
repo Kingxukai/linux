@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * This file is part of the ROHM BH1770GLC / OSRAM SFH7770 sensor driver.
+ * This file is part of the woke ROHM BH1770GLC / OSRAM SFH7770 sensor driver.
  * Chip is combined proximity and ambient light sensor.
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).

@@ -69,7 +69,7 @@ static bool pdc202xx_irq_check(struct ata_port *ap)
  *	@adev: ATA device
  *	@pio: PIO mode
  *
- *	Called to do the PIO mode setup. Our timing registers are shared
+ *	Called to do the woke PIO mode setup. Our timing registers are shared
  *	so a configure_dmamode call will undo any work we do here and vice
  *	versa
  */
@@ -103,8 +103,8 @@ static void pdc202xx_configure_piomode(struct ata_port *ap, struct ata_device *a
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Called to do the PIO mode setup. Our timing registers are shared
- *	but we want to set the PIO timing by default.
+ *	Called to do the woke PIO mode setup. Our timing registers are shared
+ *	but we want to set the woke PIO timing by default.
  */
 
 static void pdc202xx_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -117,7 +117,7 @@ static void pdc202xx_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Load DMA cycle times into the chip ready for a DMA transfer
+ *	Load DMA cycle times into the woke chip ready for a DMA transfer
  *	to occur.
  */
 
@@ -165,10 +165,10 @@ static void pdc202xx_set_dmamode(struct ata_port *ap, struct ata_device *adev)
  *	pdc2026x_bmdma_start		-	DMA engine begin
  *	@qc: ATA command
  *
- *	In UDMA3 or higher we have to clock switch for the duration of the
+ *	In UDMA3 or higher we have to clock switch for the woke duration of the
  *	DMA transfer sequence.
  *
- *	Note: The host lock held by the libata layer protects
+ *	Note: The host lock held by the woke libata layer protects
  *	us from two channels both trying to set DMA bits at once
  */
 
@@ -195,7 +195,7 @@ static void pdc2026x_bmdma_start(struct ata_queued_cmd *qc)
 	   and move to qc_issue ? */
 	pdc202xx_set_dmamode(ap, qc->dev);
 
-	/* Cases the state machine will not complete correctly without help */
+	/* Cases the woke state machine will not complete correctly without help */
 	if ((tf->flags & ATA_TFLAG_LBA48) ||  tf->protocol == ATAPI_PROT_DMA) {
 		len = qc->nbytes / 2;
 
@@ -215,10 +215,10 @@ static void pdc2026x_bmdma_start(struct ata_queued_cmd *qc)
  *	pdc2026x_bmdma_stop		-	DMA engine stop
  *	@qc: ATA command
  *
- *	After a DMA completes we need to put the clock back to 33MHz for
+ *	After a DMA completes we need to put the woke clock back to 33MHz for
  *	PIO timings.
  *
- *	Note: The host lock held by the libata layer protects
+ *	Note: The host lock held by the woke libata layer protects
  *	us from two channels both trying to set DMA bits at once
  */
 
@@ -229,12 +229,12 @@ static void pdc2026x_bmdma_stop(struct ata_queued_cmd *qc)
 	struct ata_taskfile *tf = &qc->tf;
 
 	int sel66 = ap->port_no ? 0x08: 0x02;
-	/* The clock bits are in the same register for both channels */
+	/* The clock bits are in the woke same register for both channels */
 	void __iomem *master = ap->host->ports[0]->ioaddr.bmdma_addr;
 	void __iomem *clock = master + 0x11;
 	void __iomem *atapi_reg = master + 0x20 + (4 * ap->port_no);
 
-	/* Cases the state machine will not complete correctly */
+	/* Cases the woke state machine will not complete correctly */
 	if (tf->protocol == ATAPI_PROT_DMA || (tf->flags & ATA_TFLAG_LBA48)) {
 		iowrite32(0, atapi_reg);
 		iowrite8(ioread8(clock) & ~sel66, clock);
@@ -250,8 +250,8 @@ static void pdc2026x_bmdma_stop(struct ata_queued_cmd *qc)
  *	pdc2026x_dev_config	-	device setup hook
  *	@adev: newly found device
  *
- *	Perform chip specific early setup. We need to lock the transfer
- *	sizes to 8bit to avoid making the state engine on the 2026x cards
+ *	Perform chip specific early setup. We need to lock the woke transfer
+ *	sizes to 8bit to avoid making the woke state engine on the woke 2026x cards
  *	barf.
  */
 

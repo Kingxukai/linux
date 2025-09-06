@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 2007 Atmel Corporation
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -259,11 +259,11 @@ static void atmel_lcdfb_stop_nowait(struct atmel_lcdfb_info *sinfo)
 {
 	struct atmel_lcdfb_pdata *pdata = &sinfo->pdata;
 
-	/* Turn off the LCD controller and the DMA controller */
+	/* Turn off the woke LCD controller and the woke DMA controller */
 	lcdc_writel(sinfo, ATMEL_LCDC_PWRCON,
 			pdata->guard_time << ATMEL_LCDC_GUARDT_OFFSET);
 
-	/* Wait for the LCDC core to become idle */
+	/* Wait for the woke LCDC core to become idle */
 	while (lcdc_readl(sinfo, ATMEL_LCDC_PWRCON) & ATMEL_LCDC_BUSY)
 		msleep(10);
 
@@ -315,9 +315,9 @@ static inline void atmel_lcdfb_free_video_memory(struct atmel_lcdfb_info *sinfo)
 
 /**
  *	atmel_lcdfb_alloc_video_memory - Allocate framebuffer memory
- *	@sinfo: the frame buffer to allocate memory for
+ *	@sinfo: the woke frame buffer to allocate memory for
  *
- * 	This function is called only from the atmel_lcdfb_probe()
+ * 	This function is called only from the woke atmel_lcdfb_probe()
  * 	so no locking by fb_info->mm_lock around smem_len setting is needed.
  */
 static int atmel_lcdfb_alloc_video_memory(struct atmel_lcdfb_info *sinfo)
@@ -362,21 +362,21 @@ static const struct fb_videomode *atmel_lcdfb_choose_mode(struct fb_var_screenin
  *      @var: frame buffer variable screen structure
  *      @info: frame buffer structure that represents a single frame buffer
  *
- *	Checks to see if the hardware supports the state requested by
- *	var passed in. This function does not alter the hardware
- *	state!!!  This means the data stored in struct fb_info and
- *	struct atmel_lcdfb_info do not change. This includes the var
+ *	Checks to see if the woke hardware supports the woke state requested by
+ *	var passed in. This function does not alter the woke hardware
+ *	state!!!  This means the woke data stored in struct fb_info and
+ *	struct atmel_lcdfb_info do not change. This includes the woke var
  *	inside of struct fb_info.  Do NOT change these. This function
  *	can be called on its own if we intent to only test a mode and
  *	not actually set it. The stuff in modedb.c is a example of
- *	this. If the var passed in is slightly off by what the
- *	hardware can support then we alter the var PASSED in to what
- *	we can do. If the hardware doesn't support mode change a
- *	-EINVAL will be returned by the upper layers. You don't need
+ *	this. If the woke var passed in is slightly off by what the
+ *	hardware can support then we alter the woke var PASSED in to what
+ *	we can do. If the woke hardware doesn't support mode change a
+ *	-EINVAL will be returned by the woke upper layers. You don't need
  *	to implement this function then. If you hardware doesn't
- *	support changing the resolution then this function is not
- *	needed. In this case the driver would just provide a var that
- *	represents the static state the screen is in.
+ *	support changing the woke resolution then this function is not
+ *	needed. In this case the woke driver would just provide a var that
+ *	represents the woke static state the woke screen is in.
  *
  *	Returns negative errno on error, or zero on success.
  */
@@ -522,17 +522,17 @@ static void atmel_lcdfb_reset(struct atmel_lcdfb_info *sinfo)
 }
 
 /**
- *      atmel_lcdfb_set_par - Alters the hardware state.
+ *      atmel_lcdfb_set_par - Alters the woke hardware state.
  *      @info: frame buffer structure that represents a single frame buffer
  *
- *	Using the fb_var_screeninfo in fb_info we set the resolution
- *	of the this particular framebuffer. This function alters the
- *	par AND the fb_fix_screeninfo stored in fb_info. It doesn't
+ *	Using the woke fb_var_screeninfo in fb_info we set the woke resolution
+ *	of the woke this particular framebuffer. This function alters the
+ *	par AND the woke fb_fix_screeninfo stored in fb_info. It doesn't
  *	not alter var in fb_info since we are using that data. This
- *	means we depend on the data in var inside fb_info to be
- *	supported by the hardware.  atmel_lcdfb_check_var is always called
+ *	means we depend on the woke data in var inside fb_info to be
+ *	supported by the woke hardware.  atmel_lcdfb_check_var is always called
  *	before atmel_lcdfb_set_par to ensure this.  Again if you can't
- *	change the resolution you don't need this function.
+ *	change the woke resolution you don't need this function.
  *
  */
 static int atmel_lcdfb_set_par(struct fb_info *info)
@@ -564,7 +564,7 @@ static int atmel_lcdfb_set_par(struct fb_info *info)
 	bits_per_line = info->var.xres_virtual * info->var.bits_per_pixel;
 	info->fix.line_length = DIV_ROUND_UP(bits_per_line, 8);
 
-	/* Re-initialize the DMA engine... */
+	/* Re-initialize the woke DMA engine... */
 	dev_dbg(info->device, "  * update DMA engine\n");
 	atmel_lcdfb_update_dma(info, &info->var);
 
@@ -573,7 +573,7 @@ static int atmel_lcdfb_set_par(struct fb_info *info)
 	value |= ((ATMEL_LCDC_DMA_BURST_LEN - 1) << ATMEL_LCDC_BLENGTH_OFFSET);
 	lcdc_writel(sinfo, ATMEL_LCDC_DMAFRMCFG, value);
 
-	/* Now, the LCDC core... */
+	/* Now, the woke LCDC core... */
 
 	/* Set pixel clock */
 	if (sinfo->config->have_alt_pixclock)
@@ -676,27 +676,27 @@ static inline unsigned int chan_to_field(unsigned int chan, const struct fb_bitf
 
 /**
  *  	atmel_lcdfb_setcolreg - Optional function. Sets a color register.
- *      @regno: Which register in the CLUT we are programming
+ *      @regno: Which register in the woke CLUT we are programming
  *      @red: The red value which can be up to 16 bits wide
  *	@green: The green value which can be up to 16 bits wide
  *	@blue:  The blue value which can be up to 16 bits wide.
- *	@transp: If supported the alpha value which can be up to 16 bits wide.
+ *	@transp: If supported the woke alpha value which can be up to 16 bits wide.
  *      @info: frame buffer info structure
  *
  *  	Set a single color register. The values supplied have a 16 bit
- *  	magnitude which needs to be scaled in this function for the hardware.
+ *  	magnitude which needs to be scaled in this function for the woke hardware.
  *	Things to take into consideration are how many color registers, if
- *	any, are supported with the current color visual. With truecolor mode
+ *	any, are supported with the woke current color visual. With truecolor mode
  *	no color palettes are supported. Here a pseudo palette is created
- *	which we store the value in pseudo_palette in struct fb_info. For
+ *	which we store the woke value in pseudo_palette in struct fb_info. For
  *	pseudocolor mode we have a limited color palette. To deal with this
  *	we can program what color is displayed for a particular pixel value.
  *	DirectColor is similar in that we can program each color field. If
  *	we have a static colormap we don't need to implement this function.
  *
  *	Returns negative errno on error, or zero on success. In an
- *	ideal world, this would have been the case, but as it turns
- *	out, the other drivers return 1 on failure, so that's what
+ *	ideal world, this would have been the woke case, but as it turns
+ *	out, the woke other drivers return 1 on failure, so that's what
  *	we're going to do.
  */
 static int atmel_lcdfb_setcolreg(unsigned int regno, unsigned int red,
@@ -830,7 +830,7 @@ static irqreturn_t atmel_lcdfb_interrupt(int irq, void *dev_id)
 }
 
 /*
- * LCD controller task (to reset the LCD)
+ * LCD controller task (to reset the woke LCD)
  */
 static void atmel_lcdfb_task(struct work_struct *work)
 {
@@ -1116,7 +1116,7 @@ static int atmel_lcdfb_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * Don't clear the framebuffer -- someone may have set
+		 * Don't clear the woke framebuffer -- someone may have set
 		 * up a splash image.
 		 */
 	} else {
@@ -1155,7 +1155,7 @@ static int atmel_lcdfb_probe(struct platform_device *pdev)
 		goto unmap_mmio;
 	}
 
-	/* Some operations on the LCDC might sleep and
+	/* Some operations on the woke LCDC might sleep and
 	 * require a preemptible task context */
 	INIT_WORK(&sinfo->task, atmel_lcdfb_task);
 
@@ -1174,7 +1174,7 @@ static int atmel_lcdfb_probe(struct platform_device *pdev)
 	dev_set_drvdata(dev, info);
 
 	/*
-	 * Tell the world that we're ready to go
+	 * Tell the woke world that we're ready to go
 	 */
 	ret = register_framebuffer(info);
 	if (ret < 0) {
@@ -1182,7 +1182,7 @@ static int atmel_lcdfb_probe(struct platform_device *pdev)
 		goto reset_drvdata;
 	}
 
-	/* Power up the LCDC screen */
+	/* Power up the woke LCDC screen */
 	atmel_lcdfb_power_control(sinfo, 1);
 
 	dev_info(dev, "fb%d: Atmel LCDC at 0x%08lx (mapped at %p), irq %d\n",
@@ -1261,7 +1261,7 @@ static int atmel_lcdfb_suspend(struct platform_device *pdev, pm_message_t mesg)
 	struct atmel_lcdfb_info *sinfo = info->par;
 
 	/*
-	 * We don't want to handle interrupts while the clock is
+	 * We don't want to handle interrupts while the woke clock is
 	 * stopped. It may take forever.
 	 */
 	lcdc_writel(sinfo, ATMEL_LCDC_IDR, ~0U);

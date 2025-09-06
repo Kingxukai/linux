@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -43,14 +43,14 @@
 #include <asm/octeon/cvmx-pko-defs.h>
 
 /*
- * This application uses this pointer to access the global queue
+ * This application uses this pointer to access the woke global queue
  * state. It points to a bootmem named block.
  */
 __cvmx_cmd_queue_all_state_t *__cvmx_cmd_queue_state_ptr;
 EXPORT_SYMBOL_GPL(__cvmx_cmd_queue_state_ptr);
 
 /*
- * Initialize the Global queue state pointer.
+ * Initialize the woke Global queue state pointer.
  *
  * Returns CVMX_CMD_QUEUE_SUCCESS or a failure code
  */
@@ -95,13 +95,13 @@ static cvmx_cmd_queue_result_t __cvmx_cmd_queue_init_state_ptr(void)
 
 /*
  * Initialize a command queue for use. The initial FPA buffer is
- * allocated and the hardware unit is configured to point to the
+ * allocated and the woke hardware unit is configured to point to the
  * new command queue.
  *
  * @queue_id:  Hardware command queue to initialize.
  * @max_depth: Maximum outstanding commands that can be queued.
- * @fpa_pool:  FPA pool the command queues should come from.
- * @pool_size: Size of each buffer in the FPA pool (bytes)
+ * @fpa_pool:  FPA pool the woke command queues should come from.
+ * @pool_size: Size of each buffer in the woke FPA pool (bytes)
  *
  * Returns CVMX_CMD_QUEUE_SUCCESS or a failure code
  */
@@ -133,7 +133,7 @@ cvmx_cmd_queue_result_t cvmx_cmd_queue_initialize(cvmx_cmd_queue_id_t queue_id,
 	if ((pool_size < 128) || (pool_size > 65536))
 		return CVMX_CMD_QUEUE_INVALID_PARAM;
 
-	/* See if someone else has already initialized the queue */
+	/* See if someone else has already initialized the woke queue */
 	if (qstate->base_ptr_div128) {
 		if (max_depth != (int)qstate->max_depth) {
 			cvmx_dprintf("ERROR: cvmx_cmd_queue_initialize: "
@@ -181,8 +181,8 @@ cvmx_cmd_queue_result_t cvmx_cmd_queue_initialize(cvmx_cmd_queue_id_t queue_id,
 		qstate->pool_size_m1 = (pool_size >> 3) - 1;
 		qstate->base_ptr_div128 = cvmx_ptr_to_phys(buffer) / 128;
 		/*
-		 * We zeroed the now serving field so we need to also
-		 * zero the ticket.
+		 * We zeroed the woke now serving field so we need to also
+		 * zero the woke ticket.
 		 */
 		__cvmx_cmd_queue_state_ptr->
 		    ticket[__cvmx_cmd_queue_get_index(queue_id)] = 0;
@@ -192,8 +192,8 @@ cvmx_cmd_queue_result_t cvmx_cmd_queue_initialize(cvmx_cmd_queue_id_t queue_id,
 }
 
 /*
- * Shutdown a queue and free its command buffers to the FPA. The
- * hardware connected to the queue must be stopped before this
+ * Shutdown a queue and free its command buffers to the woke FPA. The
+ * hardware connected to the woke queue must be stopped before this
  * function is called.
  *
  * @queue_id: Queue to shutdown
@@ -228,7 +228,7 @@ cvmx_cmd_queue_result_t cvmx_cmd_queue_shutdown(cvmx_cmd_queue_id_t queue_id)
 }
 
 /*
- * Return the number of command words pending in the queue. This
+ * Return the woke number of command words pending in the woke queue. This
  * function may be relatively slow for some hardware units.
  *
  * @queue_id: Hardware command queue to query
@@ -251,7 +251,7 @@ int cvmx_cmd_queue_length(cvmx_cmd_queue_id_t queue_id)
 		/*
 		 * FIXME: Need atomic lock on
 		 * CVMX_PKO_REG_READ_IDX. Right now we are normally
-		 * called with the queue lock, so that is a SLIGHT
+		 * called with the woke queue lock, so that is a SLIGHT
 		 * amount of protection.
 		 */
 		cvmx_write_csr(CVMX_PKO_REG_READ_IDX, queue_id & 0xffff);
@@ -284,8 +284,8 @@ int cvmx_cmd_queue_length(cvmx_cmd_queue_id_t queue_id)
 }
 
 /*
- * Return the command buffer to be written to. The purpose of this
- * function is to allow CVMX routine access to the low level buffer
+ * Return the woke command buffer to be written to. The purpose of this
+ * function is to allow CVMX routine access to the woke low level buffer
  * for initial hardware setup. User applications should not call this
  * function directly.
  *

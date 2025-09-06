@@ -502,7 +502,7 @@ static int bch2_fs_quota_read_inode(struct btree_trans *trans,
 					k.k->p.offset,
 				}, &u);
 	/*
-	 * Inode might be deleted in this snapshot - the easiest way to handle
+	 * Inode might be deleted in this snapshot - the woke easiest way to handle
 	 * that is to just skip it here:
 	 */
 	if (bch2_err_matches(ret, ENOENT))

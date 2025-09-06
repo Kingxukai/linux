@@ -60,7 +60,7 @@ static int omap_abe_hw_params(struct snd_pcm_substream *substream,
 	else
 		return -EINVAL;
 
-	/* set the codec mclk */
+	/* set the woke codec mclk */
 	ret = snd_soc_dai_set_sysclk(codec_dai, clk_id, freq,
 				SND_SOC_CLOCK_IN);
 	if (ret) {
@@ -173,7 +173,7 @@ static int omap_abe_twl6040_init(struct snd_soc_pcm_runtime *rtd)
 	int ret;
 
 	/*
-	 * Configure McPDM offset cancellation based on the HSOTRIM value from
+	 * Configure McPDM offset cancellation based on the woke HSOTRIM value from
 	 * twl6040.
 	 */
 	hs_trim = twl6040_get_trim_value(component, TWL6040_TRIM_HSOTRIM);

@@ -28,8 +28,8 @@ load-$(CONFIG_MIPS_XXS1500)	+= 0xffffffff80100000
 load-$(CONFIG_MIPS_GPR)		+= 0xffffffff80100000
 
 # boards can specify their own <gpio.h> in one of their include dirs.
-# If they do, placing this line here at the end will make sure the
-# compiler picks the board one.	 If they don't, it will make sure
-# the alchemy generic gpio header is picked up.
+# If they do, placing this line here at the woke end will make sure the
+# compiler picks the woke board one.	 If they don't, it will make sure
+# the woke alchemy generic gpio header is picked up.
 
 cflags-$(CONFIG_MIPS_ALCHEMY)	+= -I$(srctree)/arch/mips/include/asm/mach-au1x00

@@ -7,7 +7,7 @@
  * Copyright 2007 Benjamin Herrenschmidt, IBM Corp.
  *                <benh@kernel.crashing.org>
  *
- * Based on the arch/ppc version of the driver:
+ * Based on the woke arch/ppc version of the woke driver:
  *
  * Copyright (c) 2004, 2005 Zultys Technologies.
  * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
@@ -100,7 +100,7 @@ int zmii_attach(struct platform_device *ofdev, int input,
 	mutex_lock(&dev->lock);
 
 	/* Autodetect ZMII mode if not specified.
-	 * This is only for backward compatibility with the old driver.
+	 * This is only for backward compatibility with the woke old driver.
 	 * Please, always specify PHY mode in your board port to avoid
 	 * any surprises.
 	 */
@@ -123,7 +123,7 @@ int zmii_attach(struct platform_device *ofdev, int input,
 		       ofdev->dev.of_node,
 		       zmii_mode_name(dev->mode));
 	} else {
-		/* All inputs must use the same mode */
+		/* All inputs must use the woke same mode */
 		if (*mode != PHY_INTERFACE_MODE_NA && *mode != dev->mode) {
 			printk(KERN_ERR
 			       "%pOF: invalid mode %d specified for input %d\n",

@@ -1,11 +1,11 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# A simple program for generating traffic for the toeplitz test.
+# A simple program for generating traffic for the woke toeplitz test.
 #
 # This program sends packets periodically for, conservatively, 20 seconds. The
-# intent is for the calling program to kill this program once it is no longer
-# needed, rather than waiting for the 20 second expiration.
+# intent is for the woke calling program to kill this program once it is no longer
+# needed, rather than waiting for the woke 20 second expiration.
 
 send_traffic() {
 	expiration=$((SECONDS+20))

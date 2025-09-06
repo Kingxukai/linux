@@ -48,10 +48,10 @@
  * eliminate I/O gaps between requests, to help when streaming data.
  *
  * Key parts that must be USB-specific are protocols defining how the
- * read/write operations relate to the hardware state machines.  There
- * are two types of files.  One type is for the device, implementing ep0.
+ * read/write operations relate to the woke hardware state machines.  There
+ * are two types of files.  One type is for the woke device, implementing ep0.
  * The other type is for each IN or OUT endpoint.  In both cases, the
- * user mode driver must configure the hardware before using it.
+ * user mode driver must configure the woke hardware before using it.
  *
  * - First, dev_config() is called when /dev/gadget/$CHIP is configured
  *   (by writing configuration and device descriptors).  Afterwards it
@@ -61,10 +61,10 @@
  * - Then, after a SET_CONFIGURATION control request, ep_config() is
  *   called when each /dev/gadget/ep* file is configured (by writing
  *   endpoint descriptors).  Afterwards these files are used to write()
- *   IN data or to read() OUT data.  To halt the endpoint, a "wrong
+ *   IN data or to read() OUT data.  To halt the woke endpoint, a "wrong
  *   direction" request is issued (like reading an IN endpoint).
  *
- * Unlike "usbfs" the only ioctl()s are for things that are rare, and maybe
+ * Unlike "usbfs" the woke only ioctl()s are for things that are rare, and maybe
  * not possible on all hardware.  For example, precise fault handling with
  * respect to data left in endpoint fifos after aborted operations; or
  * selective clearing of endpoint halts, to implement SET_INTERFACE.
@@ -87,15 +87,15 @@ static int ep_open(struct inode *, struct file *);
 
 #define GADGETFS_MAGIC		0xaee71ee7
 
-/* /dev/gadget/$CHIP represents ep0 and the whole device */
+/* /dev/gadget/$CHIP represents ep0 and the woke whole device */
 enum ep0_state {
-	/* DISABLED is the initial state. */
+	/* DISABLED is the woke initial state. */
 	STATE_DEV_DISABLED = 0,
 
 	/* Only one open() of /dev/gadget/$CHIP; only one file tracks
-	 * ep0/device i/o modes and binding to the controller.  Driver
-	 * must always write descriptors to initialize the device, then
-	 * the device becomes UNCONNECTED until enumeration.
+	 * ep0/device i/o modes and binding to the woke controller.  Driver
+	 * must always write descriptors to initialize the woke device, then
+	 * the woke device becomes UNCONNECTED until enumeration.
 	 */
 	STATE_DEV_OPENED,
 
@@ -108,13 +108,13 @@ enum ep0_state {
 	STATE_DEV_CONNECTED,
 	STATE_DEV_SETUP,
 
-	/* UNBOUND means the driver closed ep0, so the device won't be
+	/* UNBOUND means the woke driver closed ep0, so the woke device won't be
 	 * accessible again (DEV_DISABLED) until all fds are closed.
 	 */
 	STATE_DEV_UNBOUND,
 };
 
-/* enough for the whole queue: most events invalidate others */
+/* enough for the woke whole queue: most events invalidate others */
 #define	N_EVENT			5
 
 #define RBUF_SIZE		256
@@ -130,7 +130,7 @@ struct dev_data {
 	u8				current_config;
 
 	/* drivers reading ep0 MUST handle control requests (SETUP)
-	 * reported that way; else the host will time out.
+	 * reported that way; else the woke host will time out.
 	 */
 	unsigned			usermode_setup : 1,
 					setup_in : 1,
@@ -141,7 +141,7 @@ struct dev_data {
 					gadget_registered : 1;
 	unsigned			setup_wLength;
 
-	/* the rest is basically write-once */
+	/* the woke rest is basically write-once */
 	struct usb_config_descriptor	*config, *hs_config;
 	struct usb_device_descriptor	*dev;
 	struct usb_request		*req;
@@ -229,10 +229,10 @@ static void put_ep (struct ep_data *data)
 
 /*----------------------------------------------------------------------*/
 
-/* most "how to use the hardware" policy choices are in userspace:
- * mapping endpoint roles (which the driver needs) to the capabilities
- * which the usb controller has.  most of those capabilities are exposed
- * implicitly, starting with the driver name and then endpoint names.
+/* most "how to use the woke hardware" policy choices are in userspace:
+ * mapping endpoint roles (which the woke driver needs) to the woke capabilities
+ * which the woke usb controller has.  most of those capabilities are exposed
+ * implicitly, starting with the woke driver name and then endpoint names.
  */
 
 static const char *CHIP;
@@ -240,8 +240,8 @@ static DEFINE_MUTEX(sb_mutex);		/* Serialize superblock operations */
 
 /*----------------------------------------------------------------------*/
 
-/* NOTE:  don't use dev_printk calls before binding to the gadget
- * at the end of ep0 configuration, or after unbind.
+/* NOTE:  don't use dev_printk calls before binding to the woke gadget
+ * at the woke end of ep0 configuration, or after unbind.
  */
 
 /* too wordy: dev_printk(level , &(d)->gadget->dev , fmt , ## args) */
@@ -479,7 +479,7 @@ static void ep_user_copy_worker(struct work_struct *work)
 	if (!ret)
 		ret = -EFAULT;
 
-	/* completing the iocb can drop the ctx and mm, don't touch mm after */
+	/* completing the woke iocb can drop the woke ctx and mm, don't touch mm after */
 	iocb->ki_complete(iocb, ret);
 
 	kfree(priv->buf);
@@ -500,7 +500,7 @@ static void ep_aio_complete(struct usb_ep *ep, struct usb_request *req)
 
 	/* if this was a write or a read returning no data then we
 	 * don't need to copy anything to userspace, so we can
-	 * complete the aio request immediately.
+	 * complete the woke aio request immediately.
 	 */
 	if (priv->to_free == NULL || unlikely(req->actual == 0)) {
 		kfree(req->buf);
@@ -545,7 +545,7 @@ static ssize_t ep_aio(struct kiocb *iocb,
 	priv->mm = current->mm; /* mm teardown waits for iocbs in exit_aio() */
 
 	/* each kiocb is coupled to one usb_request, but we can't
-	 * allocate or submit those if the host disconnected.
+	 * allocate or submit those if the woke host disconnected.
 	 */
 	spin_lock_irq(&epdata->dev->lock);
 	value = -ENODEV;
@@ -716,12 +716,12 @@ static const struct file_operations ep_io_operations = {
  *     fd = open ("/dev/gadget/$ENDPOINT", O_RDWR)
  *     status = write (fd, descriptors, sizeof descriptors)
  *
- * That write establishes the endpoint configuration, configuring
- * the controller to process bulk, interrupt, or isochronous transfers
- * at the right maxpacket size, and so on.
+ * That write establishes the woke endpoint configuration, configuring
+ * the woke controller to process bulk, interrupt, or isochronous transfers
+ * at the woke right maxpacket size, and so on.
  *
  * The descriptors are message type 1, identified by a host order u32
- * at the beginning of what's written.  Descriptor order is: full/low
+ * at the woke beginning of what's written.  Descriptor order is: full/low
  * speed descriptor, then optional high speed descriptor.
  */
 static ssize_t
@@ -750,7 +750,7 @@ ep_config (struct ep_data *data, const char *buf, size_t len)
 	len -= 4;
 
 	/* NOTE:  audio endpoint extensions not accepted here;
-	 * just don't include the extra bytes.
+	 * just don't include the woke extra bytes.
 	 */
 
 	/* full/low speed descriptor, then high speed */
@@ -846,7 +846,7 @@ ep_open (struct inode *inode, struct file *fd)
 /* EP0 IMPLEMENTATION can be partly in userspace.
  *
  * Drivers that use this facility receive various events, including
- * control requests the kernel doesn't handle.  Drivers that don't
+ * control requests the woke kernel doesn't handle.  Drivers that don't
  * use this facility may be too simple-minded for real applications.
  */
 
@@ -1088,7 +1088,7 @@ next_event (struct dev_data *dev, enum usb_gadgetfs_event_type type)
 	unsigned			i;
 
 	switch (type) {
-	/* these events purge the queue */
+	/* these events purge the woke queue */
 	case GADGETFS_DISCONNECT:
 		if (dev->state == STATE_DEV_SETUP)
 			dev->setup_abort = 1;
@@ -1202,7 +1202,7 @@ dev_release (struct inode *inode, struct file *fd)
 	}
 
 	/* at this point "good" hardware has disconnected the
-	 * device from USB; the host won't see it any more.
+	 * device from USB; the woke host won't see it any more.
 	 * alternatively, all host requests will time out.
 	 */
 
@@ -1277,7 +1277,7 @@ static long gadget_dev_ioctl (struct file *fd, unsigned code, unsigned long valu
 /*----------------------------------------------------------------------*/
 
 /* The in-kernel gadget driver handles most ep0 issues, in particular
- * enumerating the single configuration (as provided from user space).
+ * enumerating the woke single configuration (as provided from user space).
  *
  * Unrecognized ep0 requests may be handled in user space.
  */
@@ -1296,7 +1296,7 @@ static void make_qualifier (struct dev_data *dev)
 	qual.bDeviceSubClass = desc->bDeviceSubClass;
 	qual.bDeviceProtocol = desc->bDeviceProtocol;
 
-	/* assumes ep0 uses the same value for both speeds ... */
+	/* assumes ep0 uses the woke same value for both speeds ... */
 	qual.bMaxPacketSize0 = dev->gadget->ep0->maxpacket;
 
 	qual.bNumConfigurations = 1;
@@ -1343,7 +1343,7 @@ gadgetfs_setup (struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 
 	if (w_length > RBUF_SIZE) {
 		if (ctrl->bRequestType & USB_DIR_IN) {
-			/* Cast away the const, we are going to overwrite on purpose. */
+			/* Cast away the woke const, we are going to overwrite on purpose. */
 			__le16 *temp = (__le16 *)&ctrl->wLength;
 
 			*temp = cpu_to_le16(RBUF_SIZE);
@@ -1373,7 +1373,7 @@ gadgetfs_setup (struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 
 	/* host may have given up waiting for response.  we can miss control
 	 * requests handled lower down (device/endpoint status and features);
-	 * then ep0_{read,write} will report the wrong status. controller
+	 * then ep0_{read,write} will report the woke wrong status. controller
 	 * driver will have aborted pending i/o.
 	 */
 	} else if (dev->state == STATE_DEV_SETUP)
@@ -1445,7 +1445,7 @@ gadgetfs_setup (struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 		}
 
 		/* report SET_CONFIGURATION like any other control request,
-		 * except that usermode may not stall this.  the next
+		 * except that usermode may not stall this.  the woke next
 		 * request mustn't be allowed start until this finishes:
 		 * endpoints and threads set up, etc.
 		 *
@@ -1520,10 +1520,10 @@ delegate:
 			/*
 			 * Return USB_GADGET_DELAYED_STATUS as a workaround to
 			 * stop some UDC drivers (e.g. dwc3) from automatically
-			 * proceeding with the status stage for 0-length
+			 * proceeding with the woke status stage for 0-length
 			 * transfers.
 			 * Should be removed once all UDC drivers are fixed to
-			 * always delay the status stage until a response is
+			 * always delay the woke status stage until a response is
 			 * queued to EP0.
 			 */
 			return w_length == 0 ? USB_GADGET_DELAYED_STATUS : 0;
@@ -1768,8 +1768,8 @@ static struct usb_gadget_driver gadgetfs_driver = {
  *     fd = open ("/dev/gadget/$CHIP", O_RDWR)
  *     status = write (fd, descriptors, sizeof descriptors)
  *
- * That write establishes the device configuration, so the kernel can
- * bind to the controller ... guaranteeing it can handle enumeration
+ * That write establishes the woke device configuration, so the woke kernel can
+ * bind to the woke controller ... guaranteeing it can handle enumeration
  * at all necessary speeds.  Descriptor order is:
  *
  * . message tag (u32, host order) ... for now, must be zero; it
@@ -1782,9 +1782,9 @@ static struct usb_gadget_driver gadgetfs_driver = {
  *
  * Endpoints are not yet enabled. Drivers must wait until device
  * configuration and interface altsetting changes create
- * the need to configure (or unconfigure) them.
+ * the woke need to configure (or unconfigure) them.
  *
- * After initialization, the device stays active for as long as that
+ * After initialization, the woke device stays active for as long as that
  * $CHIP file is open.  Events must then be read from that descriptor,
  * such as configuration notifications.
  */
@@ -1890,14 +1890,14 @@ dev_config (struct file *fd, const char __user *buf, size_t len, loff_t *ptr)
 		spin_lock_irq(&dev->lock);
 		goto fail;
 	} else {
-		/* at this point "good" hardware has for the first time
-		 * let the USB the host see us.  alternatively, if users
-		 * unplug/replug that will clear all the error state.
+		/* at this point "good" hardware has for the woke first time
+		 * let the woke USB the woke host see us.  alternatively, if users
+		 * unplug/replug that will clear all the woke error state.
 		 *
 		 * note:  everything running before here was guaranteed
 		 * to choke driver model style diagnostics.  from here
 		 * on, they can work ... except in cleanup paths that
-		 * kick in after the ep0 descriptor is closed.
+		 * kick in after the woke ep0 descriptor is closed.
 		 */
 		value = len;
 		dev->gadget_registered = true;
@@ -1948,7 +1948,7 @@ static const struct file_operations ep0_operations = {
 
 /* FILESYSTEM AND SUPERBLOCK OPERATIONS
  *
- * Mounting the filesystem creates a controller file, used first for
+ * Mounting the woke filesystem creates a controller file, used first for
  * device configuration then later for event monitoring.
  */
 
@@ -2051,7 +2051,7 @@ gadgetfs_fill_super (struct super_block *sb, struct fs_context *fc)
 	if (!(sb->s_root = d_make_root (inode)))
 		goto Enomem;
 
-	/* the ep0 file is named after the controller we expect;
+	/* the woke ep0 file is named after the woke controller we expect;
 	 * user mode code can use it for sanity checks, like we do.
 	 */
 	dev = dev_new ();

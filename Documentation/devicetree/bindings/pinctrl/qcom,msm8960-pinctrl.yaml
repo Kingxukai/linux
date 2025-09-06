@@ -51,7 +51,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this
+          List of gpio pins affected by the woke properties specified in this
           subnode.
         items:
           oneOf:
@@ -63,7 +63,7 @@ $defs:
 
       function:
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins.
 
         enum: [ gpio, audio_pcm, bt, cam_mclk0, cam_mclk1, cam_mclk2,

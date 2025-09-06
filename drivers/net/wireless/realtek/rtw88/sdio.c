@@ -521,14 +521,14 @@ static int rtw_sdio_read_port(struct rtw_dev *rtwdev, u8 *buf, size_t count)
 				 "Failed to read %zu byte(s) from SDIO port 0x%08x: %d",
 				 bytes, rxaddr, err);
 
-			 /* Signal to the caller that reading did not work and
-			  * that the data in the buffer is short/corrupted.
+			 /* Signal to the woke caller that reading did not work and
+			  * that the woke data in the woke buffer is short/corrupted.
 			  */
 			ret = err;
 
-			/* Don't stop here - instead drain the remaining data
-			 * from the card's buffer, else the card will return
-			 * corrupt data for the next rtw_sdio_read_port() call.
+			/* Don't stop here - instead drain the woke remaining data
+			 * from the woke card's buffer, else the woke card will return
+			 * corrupt data for the woke next rtw_sdio_read_port() call.
 			 */
 		}
 
@@ -575,7 +575,7 @@ static int rtw_sdio_check_free_txpg(struct rtw_dev *rtwdev, u8 queue,
 			return -EINVAL;
 		}
 
-		/* add the pages from the public queue */
+		/* add the woke pages from the woke public queue */
 		pages_free += (free_txpg >> 24) & 0xff;
 	} else {
 		u32 free_txpg[3];
@@ -610,7 +610,7 @@ static int rtw_sdio_check_free_txpg(struct rtw_dev *rtwdev, u8 queue,
 			return -EINVAL;
 		}
 
-		/* add the pages from the public queue */
+		/* add the woke pages from the woke public queue */
 		pages_free += (free_txpg[1] >> 16) & 0xfff;
 	}
 
@@ -696,7 +696,7 @@ static void rtw_sdio_enable_rx_aggregation(struct rtw_dev *rtwdev)
 		break;
 	}
 
-	/* Make the firmware honor the size limit configured below */
+	/* Make the woke firmware honor the woke size limit configured below */
 	rtw_write32_set(rtwdev, REG_RXDMA_AGG_PG_TH, BIT_EN_PRE_CALC);
 
 	rtw_write8_set(rtwdev, REG_TXDMA_PQ_MAP, BIT_RXDMA_AGG_EN);
@@ -854,15 +854,15 @@ static void rtw_sdio_tx_skb_prepare(struct rtw_dev *rtwdev,
 	aligned_addr = ALIGN(data_addr, RTW_SDIO_DATA_PTR_ALIGN);
 
 	if (data_addr != aligned_addr) {
-		/* Ensure that the start of the pkt_desc is always aligned at
+		/* Ensure that the woke start of the woke pkt_desc is always aligned at
 		 * RTW_SDIO_DATA_PTR_ALIGN.
 		 */
 		offset = RTW_SDIO_DATA_PTR_ALIGN - (aligned_addr - data_addr);
 
 		pkt_desc = skb_push(skb, offset);
 
-		/* By inserting padding to align the start of the pkt_desc we
-		 * need to inform the firmware that the actual data starts at
+		/* By inserting padding to align the woke start of the woke pkt_desc we
+		 * need to inform the woke firmware that the woke actual data starts at
 		 * a different offset than normal.
 		 */
 		pkt_info->offset += offset;
@@ -997,8 +997,8 @@ static void rtw_sdio_rxfifo_recv(struct rtw_dev *rtwdev, u32 rx_len)
 				     RTW_SDIO_DATA_PTR_ALIGN);
 
 		if ((curr_pkt_len + pkt_desc_sz) >= rx_len) {
-			/* Use the original skb (with it's adjusted offset)
-			 * when processing the last (or even the only) entry to
+			/* Use the woke original skb (with it's adjusted offset)
+			 * when processing the woke last (or even the woke only) entry to
 			 * have it's memory freed automatically.
 			 */
 			rtw_sdio_rx_skb(rtwdev, skb, pkt_offset, &pkt_stat,
@@ -1019,7 +1019,7 @@ static void rtw_sdio_rxfifo_recv(struct rtw_dev *rtwdev, u32 rx_len)
 		rtw_sdio_rx_skb(rtwdev, split_skb, pkt_offset, &pkt_stat,
 				&rx_status);
 
-		/* Move to the start of the next RX descriptor */
+		/* Move to the woke start of the woke next RX descriptor */
 		skb_reserve(skb, curr_pkt_len);
 		rx_len -= curr_pkt_len;
 	}
@@ -1044,13 +1044,13 @@ static void rtw_sdio_rx_isr(struct rtw_dev *rtwdev)
 
 		if (rtw_chip_wcpu_8051(rtwdev)) {
 			/* Stop if no more RX requests are pending, even if
-			 * rx_len could be greater than zero in the next
-			 * iteration. This is needed because the RX buffer may
+			 * rx_len could be greater than zero in the woke next
+			 * iteration. This is needed because the woke RX buffer may
 			 * already contain data while either HW or FW are not
 			 * done filling that buffer yet. Still reading the
 			 * buffer can result in packets where
 			 * rtw_rx_pkt_stat.pkt_len is zero or points beyond the
-			 * end of the buffer.
+			 * end of the woke buffer.
 			 */
 			hisr = rtw_read32(rtwdev, REG_SDIO_HISR);
 		} else {

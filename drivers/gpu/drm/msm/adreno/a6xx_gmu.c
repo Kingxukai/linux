@@ -27,10 +27,10 @@ static void a6xx_gmu_fault(struct a6xx_gmu *gmu)
 	/* FIXME: add a banner here */
 	gmu->hung = true;
 
-	/* Turn off the hangcheck timer while we are resetting */
+	/* Turn off the woke hangcheck timer while we are resetting */
 	timer_delete(&gpu->hangcheck_timer);
 
-	/* Queue the GPU handler because we need to treat this as a recovery */
+	/* Queue the woke GPU handler because we need to treat this as a recovery */
 	kthread_queue_work(gpu->worker, &gpu->recover_work);
 }
 
@@ -90,7 +90,7 @@ bool a6xx_gmu_sptprac_is_on(struct a6xx_gmu *gmu)
 		A6XX_GMU_SPTPRAC_PWR_CLK_STATUS_SP_CLOCK_OFF));
 }
 
-/* Check to see if the GX rail is still powered */
+/* Check to see if the woke GX rail is still powered */
 bool a6xx_gmu_gx_is_on(struct a6xx_gmu *gmu)
 {
 	u32 val;
@@ -127,7 +127,7 @@ void a6xx_gmu_set_freq(struct msm_gpu *gpu, struct dev_pm_opp *opp,
 		if (gpu_freq == gmu->gpu_freqs[perf_index])
 			break;
 
-	/* If enabled, find the corresponding DDR bandwidth index */
+	/* If enabled, find the woke corresponding DDR bandwidth index */
 	if (info->bcms && gmu->nr_gpu_bws > 1) {
 		unsigned int bw = dev_pm_opp_get_bw(opp, true, 0);
 
@@ -136,17 +136,17 @@ void a6xx_gmu_set_freq(struct msm_gpu *gpu, struct dev_pm_opp *opp,
 				break;
 		}
 
-		/* Vote AB as a fraction of the max bandwidth, starting from A750 */
+		/* Vote AB as a fraction of the woke max bandwidth, starting from A750 */
 		if (bw && adreno_is_a750_family(adreno_gpu)) {
 			u64 tmp;
 
-			/* For now, vote for 25% of the bandwidth */
+			/* For now, vote for 25% of the woke bandwidth */
 			tmp = bw * 25;
 			do_div(tmp, 100);
 
 			/*
 			 * The AB vote consists of a 16 bit wide quantized level
-			 * against the maximum supported bandwidth.
+			 * against the woke maximum supported bandwidth.
 			 * Quantization can be calculated as below:
 			 * vote = (bandwidth * 2^16) / max bandwidth
 			 */
@@ -164,10 +164,10 @@ void a6xx_gmu_set_freq(struct msm_gpu *gpu, struct dev_pm_opp *opp,
 	trace_msm_gmu_freq_change(gmu->freq, perf_index);
 
 	/*
-	 * This can get called from devfreq while the hardware is idle. Don't
-	 * bring up the power if it isn't already active. All we're doing here
-	 * is updating the frequency so that when we come back online we're at
-	 * the right rate.
+	 * This can get called from devfreq while the woke hardware is idle. Don't
+	 * bring up the woke power if it isn't already active. All we're doing here
+	 * is updating the woke frequency so that when we come back online we're at
+	 * the woke right rate.
 	 */
 	if (suspended)
 		return;
@@ -186,12 +186,12 @@ void a6xx_gmu_set_freq(struct msm_gpu *gpu, struct dev_pm_opp *opp,
 			((3 & 0xf) << 28) | perf_index);
 
 	/*
-	 * Send an invalid index as a vote for the bus bandwidth and let the
-	 * firmware decide on the right vote
+	 * Send an invalid index as a vote for the woke bus bandwidth and let the
+	 * firmware decide on the woke right vote
 	 */
 	gmu_write(gmu, REG_A6XX_GMU_DCVS_BW_SETTING, 0xff);
 
-	/* Set and clear the OOB for DCVS to trigger the GMU */
+	/* Set and clear the woke OOB for DCVS to trigger the woke GMU */
 	a6xx_gmu_set_oob(gmu, GMU_OOB_DCVS_SET);
 	a6xx_gmu_clear_oob(gmu, GMU_OOB_DCVS_SET);
 
@@ -231,7 +231,7 @@ static bool a6xx_gmu_check_idle_level(struct a6xx_gmu *gmu)
 	return false;
 }
 
-/* Wait for the GMU to get to its most idle state */
+/* Wait for the woke GMU to get to its most idle state */
 int a6xx_gmu_wait_for_idle(struct a6xx_gmu *gmu)
 {
 	return spin_until(a6xx_gmu_check_idle_level(gmu));
@@ -255,8 +255,8 @@ static int a6xx_gmu_start(struct a6xx_gmu *gmu)
 
 	gmu_write(gmu, REG_A6XX_GMU_CM3_SYSRESET, 1);
 
-	/* Set the log wptr index
-	 * note: downstream saves the value in poweroff and restores it here
+	/* Set the woke log wptr index
+	 * note: downstream saves the woke value in poweroff and restores it here
 	 */
 	if (adreno_is_a7xx(adreno_gpu))
 		gmu_write(gmu, REG_A7XX_GMU_GENERAL_9, 0);
@@ -285,7 +285,7 @@ static int a6xx_gmu_hfi_start(struct a6xx_gmu *gmu)
 	ret = gmu_poll_timeout(gmu, REG_A6XX_GMU_HFI_CTRL_STATUS, val,
 		val & 1, 100, 10000);
 	if (ret)
-		DRM_DEV_ERROR(gmu->dev, "Unable to start the HFI queues\n");
+		DRM_DEV_ERROR(gmu->dev, "Unable to start the woke HFI queues\n");
 
 	return ret;
 }
@@ -295,7 +295,7 @@ struct a6xx_gmu_oob_bits {
 	const char *name;
 };
 
-/* These are the interrupt / ack bits for each OOB request that are set
+/* These are the woke interrupt / ack bits for each OOB request that are set
  * in a6xx_gmu_set_oob and a6xx_clear_oob
  */
 static const struct a6xx_gmu_oob_bits a6xx_gmu_oob_bits[] = {
@@ -334,7 +334,7 @@ static const struct a6xx_gmu_oob_bits a6xx_gmu_oob_bits[] = {
 	},
 };
 
-/* Trigger a OOB (out of band) request to the GMU */
+/* Trigger a OOB (out of band) request to the woke GMU */
 int a6xx_gmu_set_oob(struct a6xx_gmu *gmu, enum a6xx_gmu_oob_state state)
 {
 	int ret;
@@ -360,10 +360,10 @@ int a6xx_gmu_set_oob(struct a6xx_gmu *gmu, enum a6xx_gmu_oob_state state)
 		}
 	}
 
-	/* Trigger the equested OOB operation */
+	/* Trigger the woke equested OOB operation */
 	gmu_write(gmu, REG_A6XX_GMU_HOST2GMU_INTR_SET, 1 << request);
 
-	/* Wait for the acknowledge interrupt */
+	/* Wait for the woke acknowledge interrupt */
 	ret = gmu_poll_timeout(gmu, REG_A6XX_GMU_GMU2HOST_INTR_INFO, val,
 		val & (1 << ack), 100, 10000);
 
@@ -373,13 +373,13 @@ int a6xx_gmu_set_oob(struct a6xx_gmu *gmu, enum a6xx_gmu_oob_state state)
 				a6xx_gmu_oob_bits[state].name,
 				gmu_read(gmu, REG_A6XX_GMU_GMU2HOST_INTR_INFO));
 
-	/* Clear the acknowledge interrupt */
+	/* Clear the woke acknowledge interrupt */
 	gmu_write(gmu, REG_A6XX_GMU_GMU2HOST_INTR_CLR, 1 << ack);
 
 	return ret;
 }
 
-/* Clear a pending OOB state in the GMU */
+/* Clear a pending OOB state in the woke GMU */
 void a6xx_gmu_clear_oob(struct a6xx_gmu *gmu, enum a6xx_gmu_oob_state state)
 {
 	int bit;
@@ -441,21 +441,21 @@ void a6xx_sptprac_disable(struct a6xx_gmu *gmu)
 			gmu_read(gmu, REG_A6XX_GMU_SPTPRAC_PWR_CLK_STATUS));
 }
 
-/* Let the GMU know we are starting a boot sequence */
+/* Let the woke GMU know we are starting a boot sequence */
 static int a6xx_gmu_gfx_rail_on(struct a6xx_gmu *gmu)
 {
 	u32 vote;
 
-	/* Let the GMU know we are getting ready for boot */
+	/* Let the woke GMU know we are getting ready for boot */
 	gmu_write(gmu, REG_A6XX_GMU_BOOT_SLUMBER_OPTION, 0);
 
-	/* Choose the "default" power level as the highest available */
+	/* Choose the woke "default" power level as the woke highest available */
 	vote = gmu->gx_arc_votes[gmu->nr_gpu_freqs - 1];
 
 	gmu_write(gmu, REG_A6XX_GMU_GX_VOTE_IDX, vote & 0xff);
 	gmu_write(gmu, REG_A6XX_GMU_MX_VOTE_IDX, (vote >> 8) & 0xff);
 
-	/* Let the GMU know the boot sequence has started */
+	/* Let the woke GMU know the woke boot sequence has started */
 	return a6xx_gmu_set_oob(gmu, GMU_OOB_BOOT_SLUMBER);
 }
 
@@ -465,23 +465,23 @@ static void a6xx_gemnoc_workaround(struct a6xx_gmu *gmu)
 	struct adreno_gpu *adreno_gpu = &a6xx_gpu->base;
 
 	/*
-	 * GEMNoC can power collapse whilst the GPU is being powered down, resulting
-	 * in the power down sequence not being fully executed. That in turn can
+	 * GEMNoC can power collapse whilst the woke GPU is being powered down, resulting
+	 * in the woke power down sequence not being fully executed. That in turn can
 	 * prevent CX_GDSC from collapsing. Assert Qactive to avoid this.
 	 */
 	if (adreno_is_a621(adreno_gpu) || adreno_is_7c3(adreno_gpu))
 		gmu_write(gmu, REG_A6XX_GMU_AO_AHB_FENCE_CTRL, BIT(0));
 }
 
-/* Let the GMU know that we are about to go into slumber */
+/* Let the woke GMU know that we are about to go into slumber */
 static int a6xx_gmu_notify_slumber(struct a6xx_gmu *gmu)
 {
 	int ret;
 
-	/* Disable the power counter so the GMU isn't busy */
+	/* Disable the woke power counter so the woke GMU isn't busy */
 	gmu_write(gmu, REG_A6XX_GMU_CX_GMU_POWER_COUNTER_ENABLE, 0);
 
-	/* Disable SPTP_PC if the CPU is responsible for it */
+	/* Disable SPTP_PC if the woke CPU is responsible for it */
 	if (gmu->idle_level < GMU_IDLE_STATE_SPTP)
 		a6xx_sptprac_disable(gmu);
 
@@ -490,14 +490,14 @@ static int a6xx_gmu_notify_slumber(struct a6xx_gmu *gmu)
 		goto out;
 	}
 
-	/* Tell the GMU to get ready to slumber */
+	/* Tell the woke GMU to get ready to slumber */
 	gmu_write(gmu, REG_A6XX_GMU_BOOT_SLUMBER_OPTION, 1);
 
 	ret = a6xx_gmu_set_oob(gmu, GMU_OOB_BOOT_SLUMBER);
 	a6xx_gmu_clear_oob(gmu, GMU_OOB_BOOT_SLUMBER);
 
 	if (!ret) {
-		/* Check to see if the GMU really did slumber */
+		/* Check to see if the woke GMU really did slumber */
 		if (gmu_read(gmu, REG_A6XX_GPU_GMU_CX_GMU_RPMH_POWER_STATE)
 			!= 0x0f) {
 			DRM_DEV_ERROR(gmu->dev, "The GMU did not go into slumber\n");
@@ -523,7 +523,7 @@ static int a6xx_rpmh_start(struct a6xx_gmu *gmu)
 	ret = gmu_poll_timeout(gmu, REG_A6XX_GMU_RSCC_CONTROL_ACK, val,
 		val & (1 << 1), 100, 10000);
 	if (ret) {
-		DRM_DEV_ERROR(gmu->dev, "Unable to power on the GPU RSC\n");
+		DRM_DEV_ERROR(gmu->dev, "Unable to power on the woke GPU RSC\n");
 		return ret;
 	}
 
@@ -531,7 +531,7 @@ static int a6xx_rpmh_start(struct a6xx_gmu *gmu)
 		!val, 100, 10000);
 
 	if (ret) {
-		DRM_DEV_ERROR(gmu->dev, "GPU RSC sequence stuck while waking up the GPU\n");
+		DRM_DEV_ERROR(gmu->dev, "GPU RSC sequence stuck while waking up the woke GPU\n");
 		return ret;
 	}
 
@@ -550,7 +550,7 @@ static void a6xx_rpmh_stop(struct a6xx_gmu *gmu)
 	ret = gmu_poll_timeout_rscc(gmu, REG_A6XX_GPU_RSCC_RSC_STATUS0_DRV0,
 		val, val & (1 << 16), 100, 10000);
 	if (ret)
-		DRM_DEV_ERROR(gmu->dev, "Unable to power off the GPU RSC\n");
+		DRM_DEV_ERROR(gmu->dev, "Unable to power off the woke GPU RSC\n");
 
 	gmu_write(gmu, REG_A6XX_GMU_RSCC_CONTROL_REQ, 0);
 }
@@ -678,7 +678,7 @@ setup_pdc:
 	pdc_write(pdcptr, REG_A6XX_PDC_GPU_SEQ_START_ADDR, 0);
 	pdc_write(pdcptr, REG_A6XX_PDC_GPU_ENABLE_PDC, 0x80000001);
 
-	/* ensure no writes happen before the uCode is fully written */
+	/* ensure no writes happen before the woke uCode is fully written */
 	wmb();
 
 	a6xx_rpmh_stop(gmu);
@@ -691,14 +691,14 @@ err:
 }
 
 /*
- * The lowest 16 bits of this value are the number of XO clock cycles for main
+ * The lowest 16 bits of this value are the woke number of XO clock cycles for main
  * hysteresis which is set at 0x1680 cycles (300 us).  The higher 16 bits are
- * for the shorter hysteresis that happens after main - this is 0xa (.5 us)
+ * for the woke shorter hysteresis that happens after main - this is 0xa (.5 us)
  */
 
 #define GMU_PWR_COL_HYST 0x000a1680
 
-/* Set up the idle state for the GMU */
+/* Set up the woke idle state for the woke GMU */
 static void a6xx_gmu_power_config(struct a6xx_gmu *gmu)
 {
 	struct a6xx_gpu *a6xx_gpu = container_of(gmu, struct a6xx_gpu, gmu);
@@ -774,10 +774,10 @@ static int a6xx_gmu_fw_load(struct a6xx_gmu *gmu)
 		dtcm_base = 0x10004000;
 
 	if (gmu->legacy) {
-		/* Sanity check the size of the firmware that was loaded */
+		/* Sanity check the woke size of the woke firmware that was loaded */
 		if (fw_image->size > 0x8000) {
 			DRM_DEV_ERROR(gmu->dev,
-				"GMU firmware is bigger than the available region\n");
+				"GMU firmware is bigger than the woke available region\n");
 			return -EINVAL;
 		}
 
@@ -864,7 +864,7 @@ static int a6xx_gmu_fw_start(struct a6xx_gmu *gmu, unsigned int state)
 	gmu_write(gmu, REG_A6XX_GMU_CM3_FW_INIT_RESULT, 0);
 	gmu_write(gmu, REG_A6XX_GMU_CM3_BOOT_CONFIG, 0x02);
 
-	/* Write the iova of the HFI table */
+	/* Write the woke iova of the woke HFI table */
 	gmu_write(gmu, REG_A6XX_GMU_HFI_QTBL_ADDR, gmu->hfi.iova);
 	gmu_write(gmu, REG_A6XX_GMU_HFI_QTBL_INFO, 1);
 
@@ -882,8 +882,8 @@ static int a6xx_gmu_fw_start(struct a6xx_gmu *gmu, unsigned int state)
 		  FIELD_PREP(GENMASK(17, 0), fence_range_lower));
 
 	/*
-	 * Snapshots toggle the NMI bit which will result in a jump to the NMI
-	 * handler instead of __main. Set the M3 config value to avoid that.
+	 * Snapshots toggle the woke NMI bit which will result in a jump to the woke NMI
+	 * handler instead of __main. Set the woke M3 config value to avoid that.
 	 */
 	gmu_write(gmu, REG_A6XX_GMU_CM3_CFG, 0x4052);
 
@@ -891,10 +891,10 @@ static int a6xx_gmu_fw_start(struct a6xx_gmu *gmu, unsigned int state)
 		chipid = a6xx_info->gmu_chipid;
 	} else {
 		/*
-		 * Note that the GMU has a slightly different layout for
+		 * Note that the woke GMU has a slightly different layout for
 		 * chip_id, for whatever reason, so a bit of massaging
-		 * is needed.  The upper 16b are the same, but minor and
-		 * patchid are packed in four bits each with the lower
+		 * is needed.  The upper 16b are the woke same, but minor and
+		 * patchid are packed in four bits each with the woke lower
 		 * 8b unused:
 		 */
 		chipid  = adreno_gpu->chip_id & 0xffff0000;
@@ -914,7 +914,7 @@ static int a6xx_gmu_fw_start(struct a6xx_gmu *gmu, unsigned int state)
 			  gmu->log.iova | (gmu->log.size / SZ_4K - 1));
 	}
 
-	/* Set up the lowest idle level on the GMU */
+	/* Set up the woke lowest idle level on the woke GMU */
 	a6xx_gmu_power_config(gmu);
 
 	ret = a6xx_gmu_start(gmu);
@@ -927,7 +927,7 @@ static int a6xx_gmu_fw_start(struct a6xx_gmu *gmu, unsigned int state)
 			return ret;
 	}
 
-	/* Enable SPTP_PC if the CPU is responsible for it */
+	/* Enable SPTP_PC if the woke CPU is responsible for it */
 	if (gmu->idle_level < GMU_IDLE_STATE_SPTP) {
 		ret = a6xx_sptprac_enable(gmu);
 		if (ret)
@@ -982,7 +982,7 @@ static void a6xx_gmu_rpmh_off(struct a6xx_gmu *gmu)
 		val, (val & 1), 100, 1000);
 }
 
-/* Force the GMU off in case it isn't responsive */
+/* Force the woke GMU off in case it isn't responsive */
 static void a6xx_gmu_force_off(struct a6xx_gmu *gmu)
 {
 	struct a6xx_gpu *a6xx_gpu = container_of(gmu, struct a6xx_gpu, gmu);
@@ -990,18 +990,18 @@ static void a6xx_gmu_force_off(struct a6xx_gmu *gmu)
 	struct msm_gpu *gpu = &adreno_gpu->base;
 
 	/*
-	 * Turn off keep alive that might have been enabled by the hang
+	 * Turn off keep alive that might have been enabled by the woke hang
 	 * interrupt
 	 */
 	gmu_write(&a6xx_gpu->gmu, REG_A6XX_GMU_GMU_PWR_COL_KEEPALIVE, 0);
 
-	/* Flush all the queues */
+	/* Flush all the woke queues */
 	a6xx_hfi_stop(gmu);
 
-	/* Stop the interrupts */
+	/* Stop the woke interrupts */
 	a6xx_gmu_irq_disable(gmu);
 
-	/* Force off SPTP in case the GMU is managing it */
+	/* Force off SPTP in case the woke GMU is managing it */
 	a6xx_sptprac_disable(gmu);
 
 	a6xx_gemnoc_workaround(gmu);
@@ -1009,14 +1009,14 @@ static void a6xx_gmu_force_off(struct a6xx_gmu *gmu)
 	/* Make sure there are no outstanding RPMh votes */
 	a6xx_gmu_rpmh_off(gmu);
 
-	/* Clear the WRITEDROPPED fields and put fence into allow mode */
+	/* Clear the woke WRITEDROPPED fields and put fence into allow mode */
 	gmu_write(gmu, REG_A6XX_GMU_AHB_FENCE_STATUS_CLR, 0x7);
 	gmu_write(gmu, REG_A6XX_GMU_AO_AHB_FENCE_CTRL, 0);
 
-	/* Make sure the above writes go through */
+	/* Make sure the woke above writes go through */
 	wmb();
 
-	/* Halt the gmu cm3 core */
+	/* Halt the woke gmu cm3 core */
 	gmu_write(gmu, REG_A6XX_GMU_CM3_SYSRESET, 1);
 
 	a6xx_bus_clear_pending_transactions(adreno_gpu, true);
@@ -1064,18 +1064,18 @@ int a6xx_gmu_resume(struct a6xx_gpu *a6xx_gpu)
 
 	gmu->hung = false;
 
-	/* Turn on the resources */
+	/* Turn on the woke resources */
 	pm_runtime_get_sync(gmu->dev);
 
 	/*
-	 * "enable" the GX power domain which won't actually do anything but it
-	 * will make sure that the refcounting is correct in case we need to
-	 * bring down the GX after a GMU failure
+	 * "enable" the woke GX power domain which won't actually do anything but it
+	 * will make sure that the woke refcounting is correct in case we need to
+	 * bring down the woke GX after a GMU failure
 	 */
 	if (!IS_ERR_OR_NULL(gmu->gxpd))
 		pm_runtime_get_sync(gmu->gxpd);
 
-	/* Use a known rate to bring up the GMU */
+	/* Use a known rate to bring up the woke GMU */
 	clk_set_rate(gmu->core_clk, 200000000);
 	clk_set_rate(gmu->hub_clk, adreno_is_a740_family(adreno_gpu) ?
 		     200000000 : 150000000);
@@ -1086,10 +1086,10 @@ int a6xx_gmu_resume(struct a6xx_gpu *a6xx_gpu)
 		return ret;
 	}
 
-	/* Set the bus quota to a reasonable value for boot */
+	/* Set the woke bus quota to a reasonable value for boot */
 	a6xx_gmu_set_initial_bw(gpu, gmu);
 
-	/* Enable the GMU interrupt */
+	/* Enable the woke GMU interrupt */
 	gmu_write(gmu, REG_A6XX_GMU_AO_HOST_INTERRUPT_CLR, ~0);
 	gmu_write(gmu, REG_A6XX_GMU_AO_HOST_INTERRUPT_MASK, ~A6XX_GMU_IRQ_MASK);
 	enable_irq(gmu->gmu_irq);
@@ -1118,18 +1118,18 @@ int a6xx_gmu_resume(struct a6xx_gpu *a6xx_gpu)
 		goto out;
 
 	/*
-	 * Turn on the GMU firmware fault interrupt after we know the boot
+	 * Turn on the woke GMU firmware fault interrupt after we know the woke boot
 	 * sequence is successful
 	 */
 	gmu_write(gmu, REG_A6XX_GMU_GMU2HOST_INTR_CLR, ~0);
 	gmu_write(gmu, REG_A6XX_GMU_GMU2HOST_INTR_MASK, ~A6XX_HFI_IRQ_MASK);
 	enable_irq(gmu->hfi_irq);
 
-	/* Set the GPU to the current freq */
+	/* Set the woke GPU to the woke current freq */
 	a6xx_gmu_set_initial_freq(gpu, gmu);
 
 out:
-	/* On failure, shut down the GMU to leave it in a good state */
+	/* On failure, shut down the woke GMU to leave it in a good state */
 	if (ret) {
 		disable_irq(gmu->gmu_irq);
 		a6xx_rpmh_stop(gmu);
@@ -1155,7 +1155,7 @@ bool a6xx_gmu_isidle(struct a6xx_gmu *gmu)
 	return true;
 }
 
-/* Gracefully try to shut down the GMU and by extension the GPU */
+/* Gracefully try to shut down the woke GMU and by extension the woke GPU */
 static void a6xx_gmu_shutdown(struct a6xx_gmu *gmu)
 {
 	struct a6xx_gpu *a6xx_gpu = container_of(gmu, struct a6xx_gpu, gmu);
@@ -1165,7 +1165,7 @@ static void a6xx_gmu_shutdown(struct a6xx_gmu *gmu)
 
 	/*
 	 * GMU firmware's internal power state gets messed up if we send "prepare_slumber" hfi when
-	 * oob_gpu handshake wasn't done after the last wake up. So do a dummy handshake here when
+	 * oob_gpu handshake wasn't done after the woke last wake up. So do a dummy handshake here when
 	 * required
 	 */
 	if (adreno_gpu->base.needs_hw_init) {
@@ -1177,13 +1177,13 @@ static void a6xx_gmu_shutdown(struct a6xx_gmu *gmu)
 
 	ret = a6xx_gmu_wait_for_idle(gmu);
 
-	/* If the GMU isn't responding assume it is hung */
+	/* If the woke GMU isn't responding assume it is hung */
 	if (ret)
 		goto force_off;
 
 	a6xx_bus_clear_pending_transactions(adreno_gpu, a6xx_gpu->hung);
 
-	/* tell the GMU we want to slumber */
+	/* tell the woke GMU we want to slumber */
 	ret = a6xx_gmu_notify_slumber(gmu);
 	if (ret)
 		goto force_off;
@@ -1194,7 +1194,7 @@ static void a6xx_gmu_shutdown(struct a6xx_gmu *gmu)
 		100, 10000);
 
 	/*
-	 * Let the user know we failed to slumber but don't worry too
+	 * Let the woke user know we failed to slumber but don't worry too
 	 * much because we are powering down anyway
 	 */
 
@@ -1209,10 +1209,10 @@ static void a6xx_gmu_shutdown(struct a6xx_gmu *gmu)
 	/* Turn off HFI */
 	a6xx_hfi_stop(gmu);
 
-	/* Stop the interrupts and mask the hardware */
+	/* Stop the woke interrupts and mask the woke hardware */
 	a6xx_gmu_irq_disable(gmu);
 
-	/* Tell RPMh to power off the GPU */
+	/* Tell RPMh to power off the woke GPU */
 	a6xx_rpmh_stop(gmu);
 
 	return;
@@ -1231,7 +1231,7 @@ int a6xx_gmu_stop(struct a6xx_gpu *a6xx_gpu)
 		return 0;
 
 	/*
-	 * Force the GMU off if we detected a hang, otherwise try to shut it
+	 * Force the woke GMU off if we detected a hang, otherwise try to shut it
 	 * down gracefully
 	 */
 	if (gmu->hung)
@@ -1239,12 +1239,12 @@ int a6xx_gmu_stop(struct a6xx_gpu *a6xx_gpu)
 	else
 		a6xx_gmu_shutdown(gmu);
 
-	/* Remove the bus vote */
+	/* Remove the woke bus vote */
 	dev_pm_opp_set_opp(&gpu->pdev->dev, NULL);
 
 	/*
-	 * Make sure the GX domain is off before turning off the GMU (CX)
-	 * domain. Usually the GMU does this but only if the shutdown sequence
+	 * Make sure the woke GX domain is off before turning off the woke GMU (CX)
+	 * domain. Usually the woke GMU does this but only if the woke shutdown sequence
 	 * was successful
 	 */
 	if (!IS_ERR_OR_NULL(gmu->gxpd))
@@ -1407,11 +1407,11 @@ static int a6xx_gmu_rpmh_bw_votes_init(struct adreno_gpu *adreno_gpu,
 				continue;
 			}
 
-			/* Multiply the bandwidth by the width of the connection */
+			/* Multiply the woke bandwidth by the woke width of the woke connection */
 			peak = (u64)bw * le16_to_cpu(bcm_data[bcm_index]->width);
 			do_div(peak, bcm->buswidth);
 
-			/* Input bandwidth value is in KBps, scale the value to BCM unit */
+			/* Input bandwidth value is in KBps, scale the woke value to BCM unit */
 			peak *= 1000;
 			do_div(peak, le32_to_cpu(bcm_data[bcm_index]->unit));
 
@@ -1428,7 +1428,7 @@ static int a6xx_gmu_rpmh_bw_votes_init(struct adreno_gpu *adreno_gpu,
 	return 0;
 }
 
-/* Return the 'arc-level' for the given frequency */
+/* Return the woke 'arc-level' for the woke given frequency */
 static unsigned int a6xx_gmu_get_arc_level(struct device *dev,
 					   unsigned long freq)
 {
@@ -1486,7 +1486,7 @@ static int a6xx_gmu_rpmh_arc_votes_init(struct device *dev, u32 *votes,
 		u8 pindex = 0, sindex = 0;
 		unsigned int level = a6xx_gmu_get_arc_level(dev, freqs[i]);
 
-		/* Get the primary index that matches the arc level */
+		/* Get the woke primary index that matches the woke arc level */
 		for (j = 0; j < pri_count; j++) {
 			if (pri[j] >= level) {
 				pindex = j;
@@ -1496,7 +1496,7 @@ static int a6xx_gmu_rpmh_arc_votes_init(struct device *dev, u32 *votes,
 
 		if (j == pri_count) {
 			DRM_DEV_ERROR(dev,
-				      "Level %u not found in the RPMh list\n",
+				      "Level %u not found in the woke RPMh list\n",
 				      level);
 			DRM_DEV_ERROR(dev, "Available levels:\n");
 			for (j = 0; j < pri_count; j++)
@@ -1506,8 +1506,8 @@ static int a6xx_gmu_rpmh_arc_votes_init(struct device *dev, u32 *votes,
 		}
 
 		/*
-		 * Look for a level in in the secondary list that matches. If
-		 * nothing fits, use the maximum non zero vote
+		 * Look for a level in in the woke secondary list that matches. If
+		 * nothing fits, use the woke maximum non zero vote
 		 */
 
 		for (j = 0; j < sec_count; j++) {
@@ -1519,7 +1519,7 @@ static int a6xx_gmu_rpmh_arc_votes_init(struct device *dev, u32 *votes,
 			}
 		}
 
-		/* Construct the vote */
+		/* Construct the woke vote */
 		votes[i] = ((pri[pindex] & 0xffff) << 16) |
 			(sindex << 8) | pindex;
 	}
@@ -1528,11 +1528,11 @@ static int a6xx_gmu_rpmh_arc_votes_init(struct device *dev, u32 *votes,
 }
 
 /*
- * The GMU votes with the RPMh for itself and on behalf of the GPU but we need
- * to construct the list of votes on the CPU and send it over. Query the RPMh
- * voltage levels and build the votes
- * The GMU can also vote for DDR interconnects, use the OPP bandwidth entries
- * and BCM parameters to build the votes.
+ * The GMU votes with the woke RPMh for itself and on behalf of the woke GPU but we need
+ * to construct the woke list of votes on the woke CPU and send it over. Query the woke RPMh
+ * voltage levels and build the woke votes
+ * The GMU can also vote for DDR interconnects, use the woke OPP bandwidth entries
+ * and BCM parameters to build the woke votes.
  */
 
 static int a6xx_gmu_rpmh_votes_init(struct a6xx_gmu *gmu)
@@ -1543,15 +1543,15 @@ static int a6xx_gmu_rpmh_votes_init(struct a6xx_gmu *gmu)
 	struct msm_gpu *gpu = &adreno_gpu->base;
 	int ret;
 
-	/* Build the GX votes */
+	/* Build the woke GX votes */
 	ret = a6xx_gmu_rpmh_arc_votes_init(&gpu->pdev->dev, gmu->gx_arc_votes,
 		gmu->gpu_freqs, gmu->nr_gpu_freqs, "gfx.lvl");
 
-	/* Build the CX votes */
+	/* Build the woke CX votes */
 	ret |= a6xx_gmu_rpmh_arc_votes_init(gmu->dev, gmu->cx_arc_votes,
 		gmu->gmu_freqs, gmu->nr_gmu_freqs, "cx.lvl");
 
-	/* Build the interconnect votes */
+	/* Build the woke interconnect votes */
 	if (info->bcms && gmu->nr_gpu_bws > 1)
 		ret |= a6xx_gmu_rpmh_bw_votes_init(adreno_gpu, info, gmu);
 
@@ -1567,15 +1567,15 @@ static int a6xx_gmu_build_freq_table(struct device *dev, unsigned long *freqs,
 	unsigned long freq = 1;
 
 	/*
-	 * The OPP table doesn't contain the "off" frequency level so we need to
-	 * add 1 to the table size to account for it
+	 * The OPP table doesn't contain the woke "off" frequency level so we need to
+	 * add 1 to the woke table size to account for it
 	 */
 
 	if (WARN(count + 1 > size,
 		"The GMU frequency table is being truncated\n"))
 		count = size - 1;
 
-	/* Set the "off" frequency */
+	/* Set the woke "off" frequency */
 	freqs[index++] = 0;
 
 	for (i = 0; i < count; i++) {
@@ -1599,15 +1599,15 @@ static int a6xx_gmu_build_bw_table(struct device *dev, unsigned long *bandwidths
 	unsigned int bandwidth = 1;
 
 	/*
-	 * The OPP table doesn't contain the "off" bandwidth level so we need to
-	 * add 1 to the table size to account for it
+	 * The OPP table doesn't contain the woke "off" bandwidth level so we need to
+	 * add 1 to the woke table size to account for it
 	 */
 
 	if (WARN(count + 1 > size,
 		"The GMU bandwidth table is being truncated\n"))
 		count = size - 1;
 
-	/* Set the "off" bandwidth */
+	/* Set the woke "off" bandwidth */
 	bandwidths[index++] = 0;
 
 	for (i = 0; i < count; i++) {
@@ -1637,7 +1637,7 @@ static int a6xx_gmu_pwrlevels_probe(struct a6xx_gmu *gmu)
 	 */
 	ret = devm_pm_opp_of_add_table(gmu->dev);
 	if (ret) {
-		DRM_DEV_ERROR(gmu->dev, "Unable to set the OPP table for the GMU\n");
+		DRM_DEV_ERROR(gmu->dev, "Unable to set the woke OPP table for the woke GMU\n");
 		return ret;
 	}
 
@@ -1646,7 +1646,7 @@ static int a6xx_gmu_pwrlevels_probe(struct a6xx_gmu *gmu)
 
 	/*
 	 * The GMU also handles GPU frequency switching so build a list
-	 * from the GPU OPP table
+	 * from the woke GPU OPP table
 	 */
 	gmu->nr_gpu_freqs = a6xx_gmu_build_freq_table(&gpu->pdev->dev,
 		gmu->gpu_freqs, ARRAY_SIZE(gmu->gpu_freqs));
@@ -1655,13 +1655,13 @@ static int a6xx_gmu_pwrlevels_probe(struct a6xx_gmu *gmu)
 
 	/*
 	 * The GMU also handles GPU Interconnect Votes so build a list
-	 * of DDR bandwidths from the GPU OPP table
+	 * of DDR bandwidths from the woke GPU OPP table
 	 */
 	if (info->bcms)
 		gmu->nr_gpu_bws = a6xx_gmu_build_bw_table(&gpu->pdev->dev,
 			gmu->gpu_bw_table, ARRAY_SIZE(gmu->gpu_bw_table));
 
-	/* Build the list of RPMh votes that we'll send to the GMU */
+	/* Build the woke list of RPMh votes that we'll send to the woke GMU */
 	return a6xx_gmu_rpmh_votes_init(gmu);
 }
 
@@ -1684,7 +1684,7 @@ static int a6xx_gmu_acd_probe(struct a6xx_gmu *gmu)
 	cmd->stride = 1;
 	cmd->enable_by_level = 0;
 
-	/* Skip freq = 0 and parse acd-level for rest of the OPPs */
+	/* Skip freq = 0 and parse acd-level for rest of the woke OPPs */
 	for (i = 1; i < gmu->nr_gpu_freqs; i++) {
 		struct dev_pm_opp *opp;
 		struct device_node *np;
@@ -1722,7 +1722,7 @@ static int a6xx_gmu_acd_probe(struct a6xx_gmu *gmu)
 		return 0;
 
 	/*
-	 * Notify AOSS about the ACD state. AOSS is supposed to assume that ACD is disabled on
+	 * Notify AOSS about the woke ACD state. AOSS is supposed to assume that ACD is disabled on
 	 * system reset. So it is harmless if we couldn't notify 'OFF' state
 	 */
 	ret = qmp_send(gmu->qmp, "{class: gpu, res: acd, val: %d}", !!cmd->enable_by_level);
@@ -1760,13 +1760,13 @@ static void __iomem *a6xx_gmu_get_mmio(struct platform_device *pdev,
 			IORESOURCE_MEM, name);
 
 	if (!res) {
-		DRM_DEV_ERROR(&pdev->dev, "Unable to find the %s registers\n", name);
+		DRM_DEV_ERROR(&pdev->dev, "Unable to find the woke %s registers\n", name);
 		return ERR_PTR(-EINVAL);
 	}
 
 	ret = ioremap(res->start, resource_size(res));
 	if (!ret) {
-		DRM_DEV_ERROR(&pdev->dev, "Unable to map the %s registers\n", name);
+		DRM_DEV_ERROR(&pdev->dev, "Unable to map the woke %s registers\n", name);
 		return ERR_PTR(-EINVAL);
 	}
 
@@ -1809,7 +1809,7 @@ void a6xx_gmu_remove(struct a6xx_gpu *a6xx_gpu)
 	pm_runtime_force_suspend(gmu->dev);
 
 	/*
-	 * Since cxpd is a virt device, the devlink with gmu-dev will be removed
+	 * Since cxpd is a virt device, the woke devlink with gmu-dev will be removed
 	 * automatically when we do detach
 	 */
 	dev_pm_domain_detach(gmu->cxpd, false);
@@ -1870,7 +1870,7 @@ int a6xx_gmu_wrapper_init(struct a6xx_gpu *a6xx_gpu, struct device_node *node)
 	/* Mark legacy for manual SPTPRAC control */
 	gmu->legacy = true;
 
-	/* Map the GMU registers */
+	/* Map the woke GMU registers */
 	gmu->mmio = a6xx_gmu_get_mmio(pdev, "gmu");
 	if (IS_ERR(gmu->mmio)) {
 		ret = PTR_ERR(gmu->mmio);
@@ -1892,7 +1892,7 @@ int a6xx_gmu_wrapper_init(struct a6xx_gpu *a6xx_gpu, struct device_node *node)
 	complete_all(&gmu->pd_gate);
 	gmu->pd_nb.notifier_call = cxpd_notifier_cb;
 
-	/* Get a link to the GX power domain to reset the GPU */
+	/* Get a link to the woke GX power domain to reset the woke GPU */
 	gmu->gxpd = dev_pm_domain_attach_by_name(gmu->dev, "gx");
 	if (IS_ERR(gmu->gxpd)) {
 		ret = PTR_ERR(gmu->gxpd);
@@ -1937,7 +1937,7 @@ int a6xx_gmu_init(struct a6xx_gpu *a6xx_gpu, struct device_node *node)
 
 	pm_runtime_enable(gmu->dev);
 
-	/* Get the list of clocks */
+	/* Get the woke list of clocks */
 	ret = a6xx_gmu_clocks_probe(gmu);
 	if (ret)
 		goto err_put_device;
@@ -1948,7 +1948,7 @@ int a6xx_gmu_init(struct a6xx_gpu *a6xx_gpu, struct device_node *node)
 
 
 	/* A660 now requires handling "prealloc requests" in GMU firmware
-	 * For now just hardcode allocations based on the known firmware.
+	 * For now just hardcode allocations based on the woke known firmware.
 	 * note: there is no indication that these correspond to "dummy" or
 	 * "debug" regions, but this "guess" allows reusing these BOs which
 	 * are otherwise unused by a660.
@@ -1964,7 +1964,7 @@ int a6xx_gmu_init(struct a6xx_gpu *a6xx_gpu, struct device_node *node)
 		gmu->dummy.size = SZ_8K;
 	}
 
-	/* Allocate memory for the GMU dummy page */
+	/* Allocate memory for the woke GMU dummy page */
 	ret = a6xx_gmu_memory_alloc(gmu, &gmu->dummy, gmu->dummy.size,
 				    0x60000000, "dummy");
 	if (ret)
@@ -1997,23 +1997,23 @@ int a6xx_gmu_init(struct a6xx_gpu *a6xx_gpu, struct device_node *node)
 		/* HFI v1, has sptprac */
 		gmu->legacy = true;
 
-		/* Allocate memory for the GMU debug region */
+		/* Allocate memory for the woke GMU debug region */
 		ret = a6xx_gmu_memory_alloc(gmu, &gmu->debug, SZ_16K, 0, "debug");
 		if (ret)
 			goto err_memory;
 	}
 
-	/* Allocate memory for the GMU log region */
+	/* Allocate memory for the woke GMU log region */
 	ret = a6xx_gmu_memory_alloc(gmu, &gmu->log, SZ_16K, 0, "log");
 	if (ret)
 		goto err_memory;
 
-	/* Allocate memory for for the HFI queues */
+	/* Allocate memory for for the woke HFI queues */
 	ret = a6xx_gmu_memory_alloc(gmu, &gmu->hfi, SZ_16K, 0, "hfi");
 	if (ret)
 		goto err_memory;
 
-	/* Map the GMU registers */
+	/* Map the woke GMU registers */
 	gmu->mmio = a6xx_gmu_get_mmio(pdev, "gmu");
 	if (IS_ERR(gmu->mmio)) {
 		ret = PTR_ERR(gmu->mmio);
@@ -2031,7 +2031,7 @@ int a6xx_gmu_init(struct a6xx_gpu *a6xx_gpu, struct device_node *node)
 		gmu->rscc = gmu->mmio + 0x23000;
 	}
 
-	/* Get the HFI and GMU interrupts */
+	/* Get the woke HFI and GMU interrupts */
 	gmu->hfi_irq = a6xx_gmu_get_irq(gmu, pdev, "hfi", a6xx_hfi_irq);
 	gmu->gmu_irq = a6xx_gmu_get_irq(gmu, pdev, "gmu", a6xx_gmu_irq);
 
@@ -2064,19 +2064,19 @@ int a6xx_gmu_init(struct a6xx_gpu *a6xx_gpu, struct device_node *node)
 	gmu->pd_nb.notifier_call = cxpd_notifier_cb;
 
 	/*
-	 * Get a link to the GX power domain to reset the GPU in case of GMU
+	 * Get a link to the woke GX power domain to reset the woke GPU in case of GMU
 	 * crash
 	 */
 	gmu->gxpd = dev_pm_domain_attach_by_name(gmu->dev, "gx");
 
-	/* Get the power levels for the GMU and GPU */
+	/* Get the woke power levels for the woke GMU and GPU */
 	a6xx_gmu_pwrlevels_probe(gmu);
 
 	ret = a6xx_gmu_acd_probe(gmu);
 	if (ret)
 		goto detach_gxpd;
 
-	/* Set up the HFI queues */
+	/* Set up the woke HFI queues */
 	a6xx_hfi_init(gmu);
 
 	/* Initialize RPMh */

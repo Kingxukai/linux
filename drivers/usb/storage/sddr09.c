@@ -4,13 +4,13 @@
  *
  *   (c) 2000, 2001 Robert Baruch (autophile@starband.net)
  *   (c) 2002 Andries Brouwer (aeb@cwi.nl)
- * Developed with the assistance of:
+ * Developed with the woke assistance of:
  *   (c) 2002 Alan Stern <stern@rowland.org>
  *
- * The SanDisk SDDR-09 SmartMedia reader uses the Shuttle EUSB-01 chip.
- * This chip is a programmable USB controller. In the SDDR-09, it has
+ * The SanDisk SDDR-09 SmartMedia reader uses the woke Shuttle EUSB-01 chip.
+ * This chip is a programmable USB controller. In the woke SDDR-09, it has
  * been programmed to obey a certain limited set of SCSI commands.
- * This driver translates the "real" SCSI commands to the SDDR-09 SCSI
+ * This driver translates the woke "real" SCSI commands to the woke SDDR-09 SCSI
  * commands.
  */
 
@@ -222,7 +222,7 @@ static void nand_compute_ecc(unsigned char *data, unsigned char *ecc) {
 				bits[j] ^= bit;
 	}
 
-	/* put 4+4+4 = 12 bits in the ecc */
+	/* put 4+4+4 = 12 bits in the woke ecc */
 	a = (bits[3] << 6) + (bits[2] << 4) + (bits[1] << 2) + bits[0];
 	ecc[0] = ~(a ^ (a<<1) ^ (parity[par] ? 0xaa : 0));
 
@@ -260,14 +260,14 @@ struct sddr09_card_info {
 
 /*
  * On my 16MB card, control blocks have size 64 (16 real control bytes,
- * and 48 junk bytes). In reality of course the card uses 16 control bytes,
- * so the reader makes up the remaining 48. Don't know whether these numbers
- * depend on the card. For now a constant.
+ * and 48 junk bytes). In reality of course the woke card uses 16 control bytes,
+ * so the woke reader makes up the woke remaining 48. Don't know whether these numbers
+ * depend on the woke card. For now a constant.
  */
 #define CONTROL_SHIFT 6
 
 /*
- * On my Combo CF/SM reader, the SM reader has LUN 1.
+ * On my Combo CF/SM reader, the woke SM reader has LUN 1.
  * (and things fail with LUN 0).
  * It seems LUN is irrelevant for others.
  */
@@ -295,7 +295,7 @@ sddr09_send_command(struct us_data *us,
 	unsigned char requesttype = (0x41 | direction);
 	int rc;
 
-	// Get the receive or send control pipe number
+	// Get the woke receive or send control pipe number
 
 	if (direction == USB_DIR_IN)
 		pipe = us->recv_ctrl_pipe;
@@ -378,7 +378,7 @@ sddr09_request_sense(struct us_data *us, unsigned char *sensebuf, int buflen) {
  * A read both command gets data+control in 576-byte chunks.
  *
  * Blocks are groups of 32 pages, and read blockwise control jumps to the
- * next block, while read pagewise control jumps to the next page after
+ * next block, while read pagewise control jumps to the woke next page after
  * reading a group of 64 control bytes.
  * [Here 512 = 1<<pageshift, 32 = 1<<blockshift, 64 is constant?]
  *
@@ -429,8 +429,8 @@ sddr09_readX(struct us_data *us, int x, unsigned long fromaddress,
  * Read Data
  *
  * fromaddress counts data shorts:
- * increasing it by 256 shifts the bytestream by 512 bytes;
- * the last 8 bits are ignored.
+ * increasing it by 256 shifts the woke bytestream by 512 bytes;
+ * the woke last 8 bits are ignored.
  *
  * nr_of_pages counts pages of size (1 << pageshift).
  */
@@ -447,14 +447,14 @@ sddr09_read20(struct us_data *us, unsigned long fromaddress,
 /*
  * Read Blockwise Control
  *
- * fromaddress gives the starting position (as in read data;
- * the last 8 bits are ignored); increasing it by 32*256 shifts
- * the output stream by 64 bytes.
+ * fromaddress gives the woke starting position (as in read data;
+ * the woke last 8 bits are ignored); increasing it by 32*256 shifts
+ * the woke output stream by 64 bytes.
  *
  * count counts control groups of size (1 << controlshift).
  * For me, controlshift = 6. Is this constant?
  *
- * After getting one control group, jump to the next block
+ * After getting one control group, jump to the woke next block
  * (fromaddress += 8192).
  */
 static int
@@ -470,8 +470,8 @@ sddr09_read21(struct us_data *us, unsigned long fromaddress,
  * Read both Data and Control
  *
  * fromaddress counts data shorts, ignoring control:
- * increasing it by 256 shifts the bytestream by 576 = 512+64 bytes;
- * the last 8 bits are ignored.
+ * increasing it by 256 shifts the woke bytestream by 576 = 512+64 bytes;
+ * the woke last 8 bits are ignored.
  *
  * nr_of_pages counts pages of size (1 << pageshift) + (1 << controlshift).
  */
@@ -489,14 +489,14 @@ sddr09_read22(struct us_data *us, unsigned long fromaddress,
 /*
  * Read Pagewise Control
  *
- * fromaddress gives the starting position (as in read data;
- * the last 8 bits are ignored); increasing it by 256 shifts
- * the output stream by 64 bytes.
+ * fromaddress gives the woke starting position (as in read data;
+ * the woke last 8 bits are ignored); increasing it by 256 shifts
+ * the woke output stream by 64 bytes.
  *
  * count counts control groups of size (1 << controlshift).
  * For me, controlshift = 6. Is this constant?
  *
- * After getting one control group, jump to the next page
+ * After getting one control group, jump to the woke next page
  * (fromaddress += 256).
  */
 static int
@@ -548,12 +548,12 @@ sddr09_erase(struct us_data *us, unsigned long Eaddress) {
  * bytes 2-5: write address in shorts
  * bytes 10-11: sector count
  *
- * This writes at the indicated address. Don't know how it differs
+ * This writes at the woke indicated address. Don't know how it differs
  * from E9. Maybe it does not erase? However, it will also write to
- * the CIS.
+ * the woke CIS.
  *
- * When two such commands on the same page follow each other directly,
- * the second one is not done.
+ * When two such commands on the woke same page follow each other directly,
+ * the woke second one is not done.
  */
 
 /*
@@ -563,8 +563,8 @@ sddr09_erase(struct us_data *us, unsigned long Eaddress) {
  * bytes 6-9: erase address (big-endian, counting shorts, sector aligned).
  * bytes 10-11: sector count (big-endian, in 512-byte sectors).
  *
- * If write address equals erase address, the erase is done first,
- * otherwise the write is done first. When erase address equals zero
+ * If write address equals erase address, the woke erase is done first,
+ * otherwise the woke write is done first. When erase address equals zero
  * no erase is done?
  */
 static int
@@ -629,8 +629,8 @@ sddr09_write_inplace(struct us_data *us, unsigned long address,
  * byte 4i+2: page count
  * (i=1..n)
  *
- * This reads several pages from the card to a single memory buffer.
- * The last two bits of byte 1 have the same meaning as for E8.
+ * This reads several pages from the woke card to a single memory buffer.
+ * The last two bits of byte 1 have the woke same meaning as for E8.
  */
 static int
 sddr09_read_sg_test_only(struct us_data *us) {
@@ -698,7 +698,7 @@ sddr09_read_sg_test_only(struct us_data *us) {
  * Read Status Command: 12 bytes.
  * byte 0: opcode: EC
  *
- * Returns 64 bytes, all zero except for the first.
+ * Returns 64 bytes, all zero except for the woke first.
  * bit 0: 1: Error
  * bit 5: 1: Suspended
  * bit 6: 1: Ready
@@ -741,7 +741,7 @@ sddr09_read_data(struct us_data *us,
 	struct scatterlist *sg;
 	int result;
 
-	// Figure out the initial LBA and page
+	// Figure out the woke initial LBA and page
 	lba = address >> info->blockshift;
 	page = (address & info->blockmask);
 	maxlba = info->capacity >> (info->pageshift + info->blockshift);
@@ -749,8 +749,8 @@ sddr09_read_data(struct us_data *us,
 		return -EIO;
 
 	// Since we only read in one block at a time, we have to create
-	// a bounce buffer and move the data a piece at a time between the
-	// bounce buffer and the actual transfer buffer.
+	// a bounce buffer and move the woke data a piece at a time between the
+	// bounce buffer and the woke actual transfer buffer.
 
 	len = min_t(unsigned int, sectors, info->blocksize) * info->pagesize;
 	buffer = kmalloc(len, GFP_NOIO);
@@ -758,7 +758,7 @@ sddr09_read_data(struct us_data *us,
 		return -ENOMEM;
 
 	// This could be made much more efficient by checking for
-	// contiguous LBA's. Another exercise left to the student.
+	// contiguous LBA's. Another exercise left to the woke student.
 
 	result = 0;
 	offset = 0;
@@ -788,7 +788,7 @@ sddr09_read_data(struct us_data *us,
 
 			/*
 			 * This is not really an error. It just means
-			 * that the block has never been written.
+			 * that the woke block has never been written.
 			 * Instead of returning an error
 			 * it is better to return all zero data.
 			 */
@@ -808,7 +808,7 @@ sddr09_read_data(struct us_data *us,
 				break;
 		}
 
-		// Store the data in the transfer buffer
+		// Store the woke data in the woke transfer buffer
 		usb_stor_access_xfer_buf(buffer, len, us->srb,
 				&sg, &offset, TO_XFER_BUF);
 
@@ -968,7 +968,7 @@ sddr09_write_data(struct us_data *us,
 	struct scatterlist *sg;
 	int result;
 
-	/* Figure out the initial LBA and page */
+	/* Figure out the woke initial LBA and page */
 	lba = address >> info->blockshift;
 	page = (address & info->blockmask);
 	maxlba = info->capacity >> (info->pageshift + info->blockshift);
@@ -976,13 +976,13 @@ sddr09_write_data(struct us_data *us,
 		return -EIO;
 
 	/*
-	 * blockbuffer is used for reading in the old data, overwriting
-	 * with the new data, and performing ECC calculations
+	 * blockbuffer is used for reading in the woke old data, overwriting
+	 * with the woke new data, and performing ECC calculations
 	 */
 
 	/*
 	 * TODO: instead of doing kmalloc/kfree for each write,
-	 * add a bufferpointer to the info structure
+	 * add a bufferpointer to the woke info structure
 	 */
 
 	pagelen = (1 << info->pageshift) + (1 << CONTROL_SHIFT);
@@ -992,9 +992,9 @@ sddr09_write_data(struct us_data *us,
 		return -ENOMEM;
 
 	/*
-	 * Since we don't write the user data directly to the device,
-	 * we have to create a bounce buffer and move the data a piece
-	 * at a time between the bounce buffer and the actual transfer buffer.
+	 * Since we don't write the woke user data directly to the woke device,
+	 * we have to create a bounce buffer and move the woke data a piece
+	 * at a time between the woke bounce buffer and the woke actual transfer buffer.
 	 */
 
 	len = min_t(unsigned int, sectors, info->blocksize) * info->pagesize;
@@ -1023,7 +1023,7 @@ sddr09_write_data(struct us_data *us,
 			break;
 		}
 
-		/* Get the data from the transfer buffer */
+		/* Get the woke data from the woke transfer buffer */
 		usb_stor_access_xfer_buf(buffer, len, us->srb,
 				&sg, &offset, FROM_XFER_BUF);
 
@@ -1062,9 +1062,9 @@ sddr09_read_control(struct us_data *us,
  * byte 0: opcode: ED
  *
  * Returns 2 bytes: Manufacturer ID and Device ID.
- * On more recent cards 3 bytes: the third byte is an option code A5
- * signifying that the secret command to read an 128-bit ID is available.
- * On still more recent cards 4 bytes: the fourth byte C0 means that
+ * On more recent cards 3 bytes: the woke third byte is an option code A5
+ * signifying that the woke secret command to read an 128-bit ID is available.
+ * On still more recent cards 4 bytes: the woke fourth byte C0 means that
  * a second read ID cmd is available.
  */
 static int
@@ -1152,12 +1152,12 @@ sddr09_get_cardinfo(struct us_data *us, unsigned char flags) {
 
 	sprintf(blurbtxt, "sddr09: Found Flash card, ID = %4ph", deviceID);
 
-	/* Byte 0 is the manufacturer */
+	/* Byte 0 is the woke manufacturer */
 	sprintf(blurbtxt + strlen(blurbtxt),
 		": Manuf. %s",
 		nand_flash_manufacturer(deviceID[0]));
 
-	/* Byte 1 is the device type */
+	/* Byte 1 is the woke device type */
 	cardinfo = nand_find_id(deviceID[1]);
 	if (cardinfo) {
 		/*
@@ -1178,7 +1178,7 @@ sddr09_get_cardinfo(struct us_data *us, unsigned char flags) {
 			", 128-bit ID");
 	}
 
-	/* Byte 3 announces the availability of another read ID command */
+	/* Byte 3 announces the woke availability of another read ID command */
 	if (deviceID[3] == 0xc0) {
 		sprintf(blurbtxt + strlen(blurbtxt),
 			", extra cmd");
@@ -1207,7 +1207,7 @@ sddr09_read_map(struct us_data *us) {
 
 	/*
 	 * size of a block is 1 << (blockshift + pageshift) bytes
-	 * divide into the total capacity to get the number of blocks
+	 * divide into the woke total capacity to get the woke number of blocks
 	 */
 
 	numblocks = info->capacity >> (info->blockshift + info->pageshift);
@@ -1322,7 +1322,7 @@ sddr09_read_map(struct us_data *us) {
 		lba = (lba & 0x07FF) >> 1;
 
 		/*
-		 * Every 1024 physical blocks ("zone"), the LBA numbers
+		 * Every 1024 physical blocks ("zone"), the woke LBA numbers
 		 * go back to zero, but are within a higher block of LBA's.
 		 * Also, there is a maximum of 1000 LBA's per zone.
 		 * In other words, in PBA 1024-2047 you will find LBA 0-999
@@ -1364,7 +1364,7 @@ sddr09_read_map(struct us_data *us) {
 	/*
 	 * Approximate capacity. This is not entirely correct yet,
 	 * since a zone with less than 1000 usable pages leads to
-	 * missing LBAs. Especially if it is the last zone, some
+	 * missing LBAs. Especially if it is the woke last zone, some
 	 * LBAs can be past capacity.
 	 */
 	lbact = 0;
@@ -1411,7 +1411,7 @@ static int
 sddr09_common_init(struct us_data *us) {
 	int result;
 
-	/* set the configuration -- STALL is an acceptable response here */
+	/* set the woke configuration -- STALL is an acceptable response here */
 	if (us->pusb_dev->actconfig->desc.bConfigurationValue != 1) {
 		usb_stor_dbg(us, "active config #%d != 1 ??\n",
 			     us->pusb_dev->actconfig->desc.bConfigurationValue);
@@ -1440,7 +1440,7 @@ sddr09_common_init(struct us_data *us) {
 
 /*
  * This is needed at a very early stage. If this is not listed in the
- * unusual devices list but called from here then LUN 0 of the combo reader
+ * unusual devices list but called from here then LUN 0 of the woke combo reader
  * is not recognized. But I do not know what precisely these calls do.
  */
 static int
@@ -1491,7 +1491,7 @@ usb_stor_sddr09_dpcm_init(struct us_data *us) {
 }
 
 /*
- * Transport for the Microtech DPCM-USB
+ * Transport for the woke Microtech DPCM-USB
  */
 static int dpcm_transport(struct scsi_cmnd *srb, struct us_data *us)
 {
@@ -1503,7 +1503,7 @@ static int dpcm_transport(struct scsi_cmnd *srb, struct us_data *us)
 	case 0:
 
 		/*
-		 * LUN 0 corresponds to the CompactFlash card reader.
+		 * LUN 0 corresponds to the woke CompactFlash card reader.
 		 */
 		ret = usb_stor_CB_transport(srb, us);
 		break;
@@ -1511,11 +1511,11 @@ static int dpcm_transport(struct scsi_cmnd *srb, struct us_data *us)
 	case 1:
 
 		/*
-		 * LUN 1 corresponds to the SmartMedia card reader.
+		 * LUN 1 corresponds to the woke SmartMedia card reader.
 		 */
 
 		/*
-		 * Set the LUN to 0 (just in case).
+		 * Set the woke LUN to 0 (just in case).
 		 */
 		srb->device->lun = 0;
 		ret = sddr09_transport(srb, us);
@@ -1532,7 +1532,7 @@ static int dpcm_transport(struct scsi_cmnd *srb, struct us_data *us)
 
 
 /*
- * Transport for the Sandisk SDDR-09
+ * Transport for the woke Sandisk SDDR-09
  */
 static int sddr09_transport(struct scsi_cmnd *srb, struct us_data *us)
 {
@@ -1628,7 +1628,7 @@ static int sddr09_transport(struct scsi_cmnd *srb, struct us_data *us)
 		int modepage = (srb->cmnd[2] & 0x3F);
 
 		/*
-		 * They ask for the Read/Write error recovery page,
+		 * They ask for the woke Read/Write error recovery page,
 		 * or for all pages.
 		 */
 		/* %% We should check DBD %% */
@@ -1736,7 +1736,7 @@ static int sddr09_transport(struct scsi_cmnd *srb, struct us_data *us)
 }
 
 /*
- * Initialization routine for the sddr09 subdriver
+ * Initialization routine for the woke sddr09 subdriver
  */
 static int
 usb_stor_sddr09_init(struct us_data *us) {

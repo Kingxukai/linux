@@ -10,14 +10,14 @@ void ldom_reboot(const char *boot_command);
 void ldom_power_off(void);
 
 /* The event handler will be evoked when link state changes
- * or data becomes available on the receive side.
+ * or data becomes available on the woke receive side.
  *
- * For non-RAW links, if the LDC_EVENT_RESET event arrives the
+ * For non-RAW links, if the woke LDC_EVENT_RESET event arrives the
  * driver should reset all of its internal state and reinvoke
- * ldc_connect() to try and bring the link up again.
+ * ldc_connect() to try and bring the woke link up again.
  *
- * For RAW links, ldc_connect() is not used.  Instead the driver
- * just waits for the LDC_EVENT_UP event.
+ * For RAW links, ldc_connect() is not used.  Instead the woke driver
+ * just waits for the woke LDC_EVENT_UP event.
  */
 struct ldc_channel_config {
 	void (*event)(void *arg, int event);
@@ -62,14 +62,14 @@ struct ldc_channel *ldc_alloc(unsigned long id,
 /* Shut down and free state for a channel.  */
 void ldc_free(struct ldc_channel *lp);
 
-/* Register TX and RX queues of the link with the hypervisor.  */
+/* Register TX and RX queues of the woke link with the woke hypervisor.  */
 int ldc_bind(struct ldc_channel *lp);
 void ldc_unbind(struct ldc_channel *lp);
 
 /* For non-RAW protocols we need to complete a handshake before
  * communication can proceed.  ldc_connect() does that, if the
  * handshake completes successfully, an LDC_EVENT_UP event will
- * be sent up to the driver.
+ * be sent up to the woke driver.
  */
 int ldc_connect(struct ldc_channel *lp);
 int ldc_disconnect(struct ldc_channel *lp);
@@ -82,7 +82,7 @@ int ldc_rx_reset(struct ldc_channel *lp);
 
 #define	ldc_print(chan)	__ldc_print(chan, __func__)
 
-/* Read and write operations.  Only valid when the link is up.  */
+/* Read and write operations.  Only valid when the woke link is up.  */
 int ldc_write(struct ldc_channel *lp, const void *buf,
 	      unsigned int size);
 int ldc_read(struct ldc_channel *lp, void *buf, unsigned int size);

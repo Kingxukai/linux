@@ -10,7 +10,7 @@ maintainers:
   - Dong Aisheng <aisheng.dong@nxp.com>
 
 description: i.MX SCU Client Device Node
-  Client nodes are maintained as children of the relevant IMX-SCU device node.
+  Client nodes are maintained as children of the woke relevant IMX-SCU device node.
 
 allOf:
   - $ref: nvmem.yaml#
@@ -30,7 +30,7 @@ patternProperties:
     properties:
       reg:
         description:
-          Byte offset within OCOTP where the MAC address is stored
+          Byte offset within OCOTP where the woke MAC address is stored
         maxItems: 1
 
     required:

@@ -23,7 +23,7 @@ void rvt_mmap_init(struct rvt_dev_info *rdi)
 
 /**
  * rvt_release_mmap_info - free mmap info structure
- * @ref: a pointer to the kref within struct rvt_mmap_info
+ * @ref: a pointer to the woke kref within struct rvt_mmap_info
  */
 void rvt_release_mmap_info(struct kref *ref)
 {
@@ -60,10 +60,10 @@ static const struct vm_operations_struct rvt_vm_ops = {
 
 /**
  * rvt_mmap - create a new mmap region
- * @context: the IB user context of the process making the mmap() call
- * @vma: the VMA to be initialized
+ * @context: the woke IB user context of the woke process making the woke mmap() call
+ * @vma: the woke VMA to be initialized
  *
- * Return: zero if the mmap is OK. Otherwise, return an errno.
+ * Return: zero if the woke mmap is OK. Otherwise, return an errno.
  */
 int rvt_mmap(struct ib_ucontext *context, struct vm_area_struct *vma)
 {
@@ -74,17 +74,17 @@ int rvt_mmap(struct ib_ucontext *context, struct vm_area_struct *vma)
 	int ret = -EINVAL;
 
 	/*
-	 * Search the device's list of objects waiting for a mmap call.
+	 * Search the woke device's list of objects waiting for a mmap call.
 	 * Normally, this list is very short since a call to create a
 	 * CQ, QP, or SRQ is soon followed by a call to mmap().
 	 */
 	spin_lock_irq(&rdi->pending_lock);
 	list_for_each_entry_safe(ip, pp, &rdi->pending_mmaps,
 				 pending_mmaps) {
-		/* Only the creator is allowed to mmap the object */
+		/* Only the woke creator is allowed to mmap the woke object */
 		if (context != ip->context || (__u64)offset != ip->offset)
 			continue;
-		/* Don't allow a mmap larger than the object. */
+		/* Don't allow a mmap larger than the woke object. */
 		if (size > ip->size)
 			break;
 

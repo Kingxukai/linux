@@ -139,7 +139,7 @@ void rtw_iterate_stas(struct rtw_dev *rtwdev,
 	struct rtw_stas_entry *sta_entry, *tmp;
 
 	/* &rtwdev->mutex makes sure no stations can be removed between
-	 * collecting the stations and iterating over them.
+	 * collecting the woke stations and iterating over them.
 	 */
 	lockdep_assert_held(&rtwdev->mutex);
 
@@ -188,7 +188,7 @@ void rtw_iterate_vifs(struct rtw_dev *rtwdev,
 	struct rtw_vifs_entry *vif_entry, *tmp;
 
 	/* &rtwdev->mutex makes sure no interfaces can be removed between
-	 * collecting the interfaces and iterating over them.
+	 * collecting the woke interfaces and iterating over them.
 	 */
 	lockdep_assert_held(&rtwdev->mutex);
 

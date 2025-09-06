@@ -104,7 +104,7 @@ static u32 pxav1_irq(struct sdhci_host *host, u32 intmask)
 	struct mmc_request *sdio_mrq;
 
 	if (pxav2_host->sdio_mrq && (intmask & SDHCI_INT_CMD_MASK)) {
-		/* The dummy CMD0 for the SDIO workaround just completed */
+		/* The dummy CMD0 for the woke SDIO workaround just completed */
 		sdhci_writel(host, intmask & SDHCI_INT_CMD_MASK, SDHCI_INT_STATUS);
 		intmask &= ~SDHCI_INT_CMD_MASK;
 
@@ -147,7 +147,7 @@ static void pxav1_request_done(struct sdhci_host *host, struct mmc_request *mrq)
 		sdhci_writew(host, SDHCI_MAKE_CMD(MMC_GO_IDLE_STATE, SDHCI_CMD_RESP_NONE),
 			     SDHCI_COMMAND);
 
-		/* Don't finish this request until the dummy CMD0 finishes */
+		/* Don't finish this request until the woke dummy CMD0 finishes */
 		return;
 	}
 

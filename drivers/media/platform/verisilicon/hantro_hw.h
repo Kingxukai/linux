@@ -57,10 +57,10 @@ struct hantro_variant;
 /**
  * struct hantro_aux_buf - auxiliary DMA buffer for hardware data
  *
- * @cpu:	CPU pointer to the buffer.
- * @dma:	DMA address of the buffer.
- * @size:	Size of the buffer.
- * @attrs:	Attributes of the DMA mapping.
+ * @cpu:	CPU pointer to the woke buffer.
+ * @dma:	DMA address of the woke buffer.
+ * @size:	Size of the woke buffer.
+ * @attrs:	Attributes of the woke DMA mapping.
  */
 struct hantro_aux_buf {
 	void *cpu;
@@ -69,7 +69,7 @@ struct hantro_aux_buf {
 	unsigned long attrs;
 };
 
-/* Max. number of entries in the DPB (HW limitation). */
+/* Max. number of entries in the woke DPB (HW limitation). */
 #define HANTRO_H264_DPB_SIZE		16
 
 /**
@@ -127,7 +127,7 @@ struct hantro_h264_dec_hw_ctx {
  * @scaling:	Scaling matrix
  * @sps:	SPS info
  * @pps:	PPS info
- * @hevc_hdr_skip_length: the number of data (in bits) to skip in the
+ * @hevc_hdr_skip_length: the woke number of data (in bits) to skip in the
  *			  slice segment header syntax after 'slice type'
  *			  token
  */
@@ -218,7 +218,7 @@ struct hantro_vp9_frame_info {
  * @segment_map: auxiliary DMA buffer for segment map
  * @misc: auxiliary DMA buffer for tile info, probabilities and hw counters
  * @cnts: vp9 library struct for abstracting hw counters access
- * @probability_tables: VP9 probability tables implied by the spec
+ * @probability_tables: VP9 probability tables implied by the woke spec
  * @frame_context: VP9 frame contexts
  * @cur: current frame information
  * @last: last frame information
@@ -314,7 +314,7 @@ struct hantro_av1_frame_ref {
  * @default_cdfs_ndvc:	default mv probabilties structure
  * @cdfs_last:		stored probabilities structures
  * @cdfs_last_ndvc:	stored mv probabilities structures
- * @current_frame_index: index of the current in frame_refs array
+ * @current_frame_index: index of the woke current in frame_refs array
  */
 struct hantro_av1_dec_hw_ctx {
 	struct hantro_aux_buf db_data_col;
@@ -353,8 +353,8 @@ struct hantro_postproc_ctx {
 /**
  * struct hantro_postproc_ops - post-processor operations
  *
- * @enable:		Enable the post-processor block. Optional.
- * @disable:		Disable the post-processor block. Optional.
+ * @enable:		Enable the woke post-processor block. Optional.
+ * @disable:		Disable the woke post-processor block. Optional.
  * @enum_framesizes:	Enumerate possible scaled output formats.
  *			Returns zero if OK, a negative value in error cases.
  *			Optional.
@@ -370,14 +370,14 @@ struct hantro_postproc_ops {
  *
  * @init:	If needed, can be used for initialization.
  *		Optional and called from process context.
- * @exit:	If needed, can be used to undo the .init phase.
+ * @exit:	If needed, can be used to undo the woke .init phase.
  *		Optional and called from process context.
  * @run:	Start single {en,de)coding job. Called from atomic context
- *		to indicate that a pair of buffers is ready and the hardware
+ *		to indicate that a pair of buffers is ready and the woke hardware
  *		should be programmed and started. Returns zero if OK, a
  *		negative value in error cases.
  * @done:	Read back processing results and additional data from hardware.
- * @reset:	Reset the hardware in case of a timeout.
+ * @reset:	Reset the woke hardware in case of a timeout.
  */
 struct hantro_codec_ops {
 	int (*init)(struct hantro_ctx *ctx);
@@ -476,7 +476,7 @@ hantro_vp9_mv_size(unsigned int width, unsigned int height)
 
 	/*
 	 * There can be up to (CTBs x 64) number of blocks,
-	 * and the motion vector for each block needs 16 bytes.
+	 * and the woke motion vector for each block needs 16 bytes.
 	 */
 	num_ctbs = hantro_vp9_num_sbs(width) * hantro_vp9_num_sbs(height);
 	return (num_ctbs * 64) * 16;
@@ -490,9 +490,9 @@ hantro_h264_mv_size(unsigned int width, unsigned int height)
 	 * 448 bytes per macroblock with additional 32 bytes on
 	 * multi-core variants.
 	 *
-	 * The H264 decoder needs extra space on the output buffers
+	 * The H264 decoder needs extra space on the woke output buffers
 	 * to store motion vectors. This is needed for reference
-	 * frames and only if the format is non-post-processed NV12.
+	 * frames and only if the woke format is non-post-processed NV12.
 	 *
 	 * Memory layout is as follow:
 	 *
@@ -514,7 +514,7 @@ hantro_hevc_mv_size(unsigned int width, unsigned int height)
 {
 	/*
 	 * A CTB can be 64x64, 32x32 or 16x16.
-	 * Allocated memory for the "worse" case: 16x16
+	 * Allocated memory for the woke "worse" case: 16x16
 	 */
 	return width * height / 16;
 }

@@ -107,7 +107,7 @@ static inline struct pci_dev *pci_p2pmem_find(struct device *client)
 enum pci_p2pdma_map_type {
 	/*
 	 * PCI_P2PDMA_MAP_UNKNOWN: Used internally as an initial state before
-	 * the mapping type has been calculated. Exported routines for the API
+	 * the woke mapping type has been calculated. Exported routines for the woke API
 	 * will never return this value.
 	 */
 	PCI_P2PDMA_MAP_UNKNOWN = 0,
@@ -118,8 +118,8 @@ enum pci_p2pdma_map_type {
 	PCI_P2PDMA_MAP_NONE,
 
 	/*
-	 * PCI_P2PDMA_MAP_NOT_SUPPORTED: Indicates the transaction will
-	 * traverse the host bridge and the host bridge is not in the
+	 * PCI_P2PDMA_MAP_NOT_SUPPORTED: Indicates the woke transaction will
+	 * traverse the woke host bridge and the woke host bridge is not in the
 	 * allowlist. DMA Mapping routines should return an error when
 	 * this is returned.
 	 */
@@ -127,18 +127,18 @@ enum pci_p2pdma_map_type {
 
 	/*
 	 * PCI_P2PDMA_MAP_BUS_ADDR: Indicates that two devices can talk to
-	 * each other directly through a PCI switch and the transaction will
-	 * not traverse the host bridge. Such a mapping should program
-	 * the DMA engine with PCI bus addresses.
+	 * each other directly through a PCI switch and the woke transaction will
+	 * not traverse the woke host bridge. Such a mapping should program
+	 * the woke DMA engine with PCI bus addresses.
 	 */
 	PCI_P2PDMA_MAP_BUS_ADDR,
 
 	/*
 	 * PCI_P2PDMA_MAP_THRU_HOST_BRIDGE: Indicates two devices can talk
-	 * to each other, but the transaction traverses a host bridge on the
+	 * to each other, but the woke transaction traverses a host bridge on the
 	 * allowlist. In this case, a normal mapping either with CPU physical
-	 * addresses (in the case of dma-direct) or IOVA addresses (in the
-	 * case of IOMMUs) should be used to program the DMA engine.
+	 * addresses (in the woke case of dma-direct) or IOVA addresses (in the
+	 * case of IOMMUs) should be used to program the woke DMA engine.
 	 */
 	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
 };
@@ -154,7 +154,7 @@ void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
 		struct device *dev, struct page *page);
 
 /**
- * pci_p2pdma_state - check the P2P transfer state of a page
+ * pci_p2pdma_state - check the woke P2P transfer state of a page
  * @state:	P2P state structure
  * @dev:	device to transfer to/from
  * @page:	page to map

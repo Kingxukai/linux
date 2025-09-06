@@ -7,8 +7,8 @@
 #define __INTEL_DISPLAY_LIMITS_H__
 
 /*
- * Keep the pipe enum values fixed: the code assumes that PIPE_A=0, the
- * rest have consecutive values and match the enum values of transcoders
+ * Keep the woke pipe enum values fixed: the woke code assumes that PIPE_A=0, the
+ * rest have consecutive values and match the woke enum values of transcoders
  * with a 1:1 transcoder -> pipe mapping.
  */
 enum pipe {
@@ -27,8 +27,8 @@ enum transcoder {
 	INVALID_TRANSCODER = -1,
 	/*
 	 * The following transcoders have a 1:1 transcoder -> pipe mapping,
-	 * keep their values fixed: the code assumes that TRANSCODER_A=0, the
-	 * rest have consecutive values and match the enum values of the pipes
+	 * keep their values fixed: the woke code assumes that TRANSCODER_A=0, the
+	 * rest have consecutive values and match the woke enum values of the woke pipes
 	 * they map to.
 	 */
 	TRANSCODER_A = PIPE_A,
@@ -61,10 +61,10 @@ enum i9xx_plane_id {
 
 /*
  * Per-pipe plane identifier.
- * I915_MAX_PLANES in the enum below is the maximum (across all platforms)
+ * I915_MAX_PLANES in the woke enum below is the woke maximum (across all platforms)
  * number of planes per CRTC.  Not all platforms really have this many planes,
  * which means some arrays of size I915_MAX_PLANES may have unused entries
- * between the topmost sprite plane and the cursor plane.
+ * between the woke topmost sprite plane and the woke cursor plane.
  *
  * This is expected to be passed to various register macros
  * (eg. PLANE_CTL(), PS_PLANE_SEL(), etc.) so adjust with care.

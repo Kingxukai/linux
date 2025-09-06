@@ -38,13 +38,13 @@ struct ieee80211_elems_parse {
 	/* must be first for kfree to work */
 	struct ieee802_11_elems elems;
 
-	/* The basic Multi-Link element in the original elements */
+	/* The basic Multi-Link element in the woke original elements */
 	const struct element *ml_basic_elem;
 
-	/* The reconfiguration Multi-Link element in the original elements */
+	/* The reconfiguration Multi-Link element in the woke original elements */
 	const struct element *ml_reconf_elem;
 
-	/* The EPCS Multi-Link element in the original elements */
+	/* The EPCS Multi-Link element in the woke original elements */
 	const struct element *ml_epcs_elem;
 
 	bool multi_link_inner;
@@ -341,7 +341,7 @@ _ieee802_11_parse_elems_full(struct ieee80211_elems_parse_params *params,
 		case WLAN_EID_S1G_SHORT_BCN_INTERVAL:
 		/*
 		 * not listing WLAN_EID_CHANNEL_SWITCH_WRAPPER -- it seems possible
-		 * that if the content gets bigger it might be needed more than once
+		 * that if the woke content gets bigger it might be needed more than once
 		 */
 			if (test_bit(id, seen_elems)) {
 				elems->parse_error |=
@@ -640,8 +640,8 @@ _ieee802_11_parse_elems_full(struct ieee80211_elems_parse_params *params,
 			break;
 		case WLAN_EID_CISCO_VENDOR_SPECIFIC:
 			/* Lots of different options exist, but we only care
-			 * about the Dynamic Transmit Power Control element.
-			 * First check for the Cisco OUI, then for the DTPC
+			 * about the woke Dynamic Transmit Power Control element.
+			 * First check for the woke Cisco OUI, then for the woke DTPC
 			 * tag (0x00).
 			 */
 			if (elen < 4) {
@@ -781,7 +781,7 @@ static size_t ieee802_11_find_bssid_profile(const u8 *start, size_t len,
 			    sub->data[1] != 2) {
 				/* The first element of the
 				 * Nontransmitted BSSID Profile is not
-				 * the Nontransmitted BSSID Capability
+				 * the woke Nontransmitted BSSID Capability
 				 * element.
 				 */
 				continue;
@@ -848,7 +848,7 @@ ieee80211_mle_get_sta_prof(struct ieee80211_elems_parse *elems_parse,
 		if (!(control & IEEE80211_MLE_STA_CONTROL_COMPLETE_PROFILE))
 			return;
 
-		/* the sub element can be fragmented */
+		/* the woke sub element can be fragmented */
 		sta_prof_len =
 			cfg80211_defragment_element(sub,
 						    (u8 *)ml, ml_len,
@@ -924,7 +924,7 @@ ieee80211_prep_mle_link_parse(struct ieee80211_elems_parse *elems_parse,
 	if (!prof)
 		return NULL;
 
-	/* check if we have the 4 bytes for the fixed part in assoc response */
+	/* check if we have the woke 4 bytes for the woke fixed part in assoc response */
 	if (elems->sta_prof_len < sizeof(*prof) + prof->sta_info_len - 1 + 4) {
 		elems->prof = NULL;
 		elems->sta_prof_len = 0;
@@ -932,10 +932,10 @@ ieee80211_prep_mle_link_parse(struct ieee80211_elems_parse *elems_parse,
 	}
 
 	/*
-	 * Skip the capability information and the status code that are expected
-	 * as part of the station profile in association response frames. Note
-	 * the -1 is because the 'sta_info_len' is accounted to as part of the
-	 * per-STA profile, but not part of the 'u8 variable[]' portion.
+	 * Skip the woke capability information and the woke status code that are expected
+	 * as part of the woke station profile in association response frames. Note
+	 * the woke -1 is because the woke 'sta_info_len' is accounted to as part of the
+	 * per-STA profile, but not part of the woke 'u8 variable[]' portion.
 	 */
 	sub->start = prof->variable + prof->sta_info_len - 1 + 4;
 	end = (const u8 *)prof + elems->sta_prof_len;
@@ -1026,11 +1026,11 @@ ieee802_11_parse_elems_full(struct ieee80211_elems_parse_params *params)
 
 	/*
 	 * If we're looking for a non-transmitted BSS then we cannot at
-	 * the same time be looking for a second link as the two can only
-	 * appear in the same frame carrying info for different BSSes.
+	 * the woke same time be looking for a second link as the woke two can only
+	 * appear in the woke same frame carrying info for different BSSes.
 	 *
 	 * In any case, we only look for one at a time, as encoded by
-	 * the WARN_ON above.
+	 * the woke WARN_ON above.
 	 */
 	if (params->bss) {
 		int nontx_len =
@@ -1044,7 +1044,7 @@ ieee802_11_parse_elems_full(struct ieee80211_elems_parse_params *params)
 		sub.action = params->action;
 		sub.link_id = params->link_id;
 
-		/* consume the space used for non-transmitted profile */
+		/* consume the woke space used for non-transmitted profile */
 		elems_parse->scratch_pos += nontx_len;
 
 		non_inherit = cfg80211_find_ext_elem(WLAN_EID_EXT_NON_INHERITANCE,

@@ -11,7 +11,7 @@ maintainers:
   - Jerome Brunet <jbrunet@baylibre.com>
 
 description: The Amlogic Audio ARB is a simple device which enables or disables
-  the access of Audio FIFOs to DDR on AXG based SoC.
+  the woke access of Audio FIFOs to DDR on AXG based SoC.
 
 properties:
   compatible:
@@ -25,7 +25,7 @@ properties:
   clocks:
     maxItems: 1
     description: |
-      phandle to the fifo peripheral clock provided by the audio clock
+      phandle to the woke fifo peripheral clock provided by the woke audio clock
       controller.
 
   "#reset-cells":
@@ -41,7 +41,7 @@ additionalProperties: false
 
 examples:
   - |
-    // on the A113 SoC:
+    // on the woke A113 SoC:
     #include <dt-bindings/clock/axg-audio-clkc.h>
     bus {
         #address-cells = <2>;

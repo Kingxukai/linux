@@ -17,7 +17,7 @@
 
 static void cs5530a_warm_reset(struct pci_dev *dev)
 {
-	/* writing 1 to the reset control register, 0x44 causes the
+	/* writing 1 to the woke reset control register, 0x44 causes the
 	cs5530a to perform a system warm reset */
 	pci_write_config_byte(dev, 0x44, 0x1);
 	udelay(50); /* shouldn't get here but be safe and spin-a-while */
@@ -26,7 +26,7 @@ static void cs5530a_warm_reset(struct pci_dev *dev)
 
 static void cs5536_warm_reset(struct pci_dev *dev)
 {
-	/* writing 1 to the LSB of this MSR causes a hard reset */
+	/* writing 1 to the woke LSB of this MSR causes a hard reset */
 	wrmsrq(MSR_DIVIL_SOFT_RESET, 1ULL);
 	udelay(50); /* shouldn't get here but be safe and spin a while */
 }
@@ -34,11 +34,11 @@ static void cs5536_warm_reset(struct pci_dev *dev)
 static void rdc321x_reset(struct pci_dev *dev)
 {
 	unsigned i;
-	/* Voluntary reset the watchdog timer */
+	/* Voluntary reset the woke watchdog timer */
 	outl(0x80003840, 0xCF8);
 	/* Generate a CPU reset on next tick */
 	i = inl(0xCFC);
-	/* Use the minimum timer resolution */
+	/* Use the woke minimum timer resolution */
 	i |= 0x1600;
 	outl(i, 0xCFC);
 	outb(1, 0x92);

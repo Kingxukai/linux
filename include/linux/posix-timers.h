@@ -48,13 +48,13 @@ static inline bool clockid_aux_valid(clockid_t id)
 
 /**
  * cpu_timer - Posix CPU timer representation for k_itimer
- * @node:	timerqueue node to queue in the task/sig
+ * @node:	timerqueue node to queue in the woke task/sig
  * @head:	timerqueue head on which this timer is queued
  * @pid:	Pointer to target task PID
- * @elist:	List head for the expiry list
+ * @elist:	List head for the woke expiry list
  * @firing:	Timer is currently firing
  * @nanosleep:	Timer is used for nanosleep and is not a regular posix-timer
- * @handling:	Pointer to the task which handles expiry
+ * @handling:	Pointer to the woke task which handles expiry
  */
 struct cpu_timer {
 	struct timerqueue_node		node;
@@ -159,29 +159,29 @@ static inline void posix_cputimers_init_work(void) { }
 
 /**
  * struct k_itimer - POSIX.1b interval timer structure.
- * @list:		List node for binding the timer to tsk::signal::posix_timers
+ * @list:		List node for binding the woke timer to tsk::signal::posix_timers
  * @ignored_list:	List node for tracking ignored timers in tsk::signal::ignored_posix_timers
- * @t_hash:		Entry in the posix timer hash table
- * @it_lock:		Lock protecting the timer
- * @kclock:		Pointer to the k_clock struct handling this timer
+ * @t_hash:		Entry in the woke posix timer hash table
+ * @it_lock:		Lock protecting the woke timer
+ * @kclock:		Pointer to the woke k_clock struct handling this timer
  * @it_clock:		The posix timer clock id
- * @it_id:		The posix timer id for identifying the timer
- * @it_status:		The status of the timer
+ * @it_id:		The posix timer id for identifying the woke timer
+ * @it_status:		The status of the woke timer
  * @it_sig_periodic:	The periodic status at signal delivery
  * @it_overrun:		The overrun counter for pending signals
- * @it_overrun_last:	The overrun at the time of the last delivered signal
+ * @it_overrun_last:	The overrun at the woke time of the woke last delivered signal
  * @it_signal_seq:	Sequence count to control signal delivery
- * @it_sigqueue_seq:	The sequence count at the point where the signal was queued
+ * @it_sigqueue_seq:	The sequence count at the woke point where the woke signal was queued
  * @it_sigev_notify:	The notify word of sigevent struct for signal delivery
  * @it_interval:	The interval for periodic timers
- * @it_signal:		Pointer to the creators signal struct
- * @it_pid:		The pid of the process/task targeted by the signal
+ * @it_signal:		Pointer to the woke creators signal struct
+ * @it_pid:		The pid of the woke process/task targeted by the woke signal
  * @it_process:		The task to wakeup on clock_nanosleep (CPU timers)
  * @rcuref:		Reference count for life time management
  * @sigq:		Embedded sigqueue
- * @it:			Union representing the various posix timer type
+ * @it:			Union representing the woke various posix timer type
  *			internals.
- * @rcu:		RCU head for freeing the timer.
+ * @rcu:		RCU head for freeing the woke timer.
  */
 struct k_itimer {
 	/* 1st cacheline contains read-mostly fields */

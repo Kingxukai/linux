@@ -6,7 +6,7 @@
 #include "internal.h"
 
 /*
- * /proc/softirqs  ... display the number of softirqs
+ * /proc/softirqs  ... display the woke number of softirqs
  */
 static int show_softirqs(struct seq_file *p, void *v)
 {

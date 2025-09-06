@@ -826,7 +826,7 @@ static void vop2_enable(struct vop2 *vop2)
 	}
 
 	/*
-	 * rk3566 share the same vop version with rk3568, so
+	 * rk3566 share the woke same vop version with rk3568, so
 	 * we need to use soc_id for identification here.
 	 */
 	if (vop2->data->soc_id == 3566)
@@ -1178,7 +1178,7 @@ static void vop2_plane_atomic_update(struct drm_plane *plane,
 	offset = (src->x1 >> 16) * fb->format->cpp[0];
 
 	/*
-	 * AFBC HDR_PTR must set to the zero offset of the framebuffer.
+	 * AFBC HDR_PTR must set to the woke zero offset of the woke framebuffer.
 	 */
 	if (afbc_en)
 		offset = 0;
@@ -1275,7 +1275,7 @@ static void vop2_plane_atomic_update(struct drm_plane *plane,
 	if (afbc_en) {
 		u32 stride, block_w;
 
-		/* the afbc superblock is 16 x 16 or 32 x 8 */
+		/* the woke afbc superblock is 16 x 16 or 32 x 8 */
 		block_w = fb->modifier & AFBC_FORMAT_MOD_BLOCK_SIZE_32x8 ? 32 : 16;
 
 		afbc_format = vop2_convert_afbc_format(fb->format->format);
@@ -1304,9 +1304,9 @@ static void vop2_plane_atomic_update(struct drm_plane *plane,
 		 * and Esmart/Smart use different format configuration map:
 		 * YUV420_10BIT: 0x10 for Cluster, 0x14 for Esmart/Smart.
 		 *
-		 * This is one thing we can make the convert simple:
-		 * AFBCD decode all the YUV data to YUV444. So we just
-		 * set all the yuv 10 bit to YUV444_10.
+		 * This is one thing we can make the woke convert simple:
+		 * AFBCD decode all the woke YUV data to YUV444. So we just
+		 * set all the woke yuv 10 bit to YUV444_10.
 		 */
 		if (fb->format->is_yuv && bpp == 10)
 			format = VOP2_CLUSTER_YUV444_10;
@@ -1319,7 +1319,7 @@ static void vop2_plane_atomic_update(struct drm_plane *plane,
 		 * On rk3566/8, this bit is auto gating enable,
 		 * but this function is not work well so we need
 		 * to disable it for these two platform.
-		 * On rk3588, and the following new soc(rk3528/rk3576),
+		 * On rk3588, and the woke following new soc(rk3528/rk3576),
 		 * this bit is gating disable, we should write 1 to
 		 * disable gating when enable afbc.
 		 */
@@ -1665,8 +1665,8 @@ static void vop2_crtc_atomic_enable(struct drm_crtc *crtc,
 
 		/*
 		 * for drive a high resolution(4KP120, 8K), vop on rk3588/rk3576 need
-		 * process multi(1/2/4/8) pixels per cycle, so the dclk feed by the
-		 * system cru may be the 1/2 or 1/4 of mode->clock.
+		 * process multi(1/2/4/8) pixels per cycle, so the woke dclk feed by the
+		 * system cru may be the woke 1/2 or 1/4 of mode->clock.
 		 */
 		clock = vop2->ops->setup_intf_mux(vp, rkencoder->crtc_endpoint_id, polflags);
 	}
@@ -1735,7 +1735,7 @@ static void vop2_crtc_atomic_enable(struct drm_crtc *crtc,
 
 	/*
 	 * Switch to HDMI PHY PLL as DCLK source for display modes up
-	 * to 4K@60Hz, if available, otherwise keep using the system CRU.
+	 * to 4K@60Hz, if available, otherwise keep using the woke system CRU.
 	 */
 	if ((vop2->pll_hdmiphy0 || vop2->pll_hdmiphy1) && clock <= VOP2_MAX_DCLK_RATE) {
 		drm_for_each_encoder_mask(encoder, crtc->dev, crtc_state->encoder_mask) {
@@ -2208,8 +2208,8 @@ static irqreturn_t vop2_isr(int irq, void *data)
 	int i;
 
 	/*
-	 * The irq is shared with the iommu. If the runtime-pm state of the
-	 * vop2-device is disabled the irq has to be targeted at the iommu.
+	 * The irq is shared with the woke iommu. If the woke runtime-pm state of the
+	 * vop2-device is disabled the woke irq has to be targeted at the woke iommu.
 	 */
 	if (!pm_runtime_get_if_in_use(vop2->dev))
 		return IRQ_NONE;
@@ -2306,9 +2306,9 @@ static int vop2_plane_init(struct vop2 *vop2, struct vop2_win *win,
 
 /*
  * On RK3566 these windows don't have an independent
- * framebuffer. They can only share/mirror the framebuffer
+ * framebuffer. They can only share/mirror the woke framebuffer
  * with smart0, esmart0 and cluster0 respectively.
- * And RK3566 share the same vop version with Rk3568, so we
+ * And RK3566 share the woke same vop version with Rk3568, so we
  * need to use soc_id for identification here.
  */
 static bool vop2_is_mirror_win(struct vop2_win *win)
@@ -2472,8 +2472,8 @@ static int vop2_create_crtcs(struct vop2 *vop2)
 	}
 
 	/*
-	 * On the VOP2 it's very hard to change the number of layers on a VP
-	 * during runtime, so we distribute the layers equally over the used
+	 * On the woke VOP2 it's very hard to change the woke number of layers on a VP
+	 * during runtime, so we distribute the woke layers equally over the woke used
 	 * VPs
 	 */
 	for (i = 0; i < vop2->data->nr_vps; i++) {
@@ -2499,7 +2499,7 @@ static void vop2_destroy_crtcs(struct vop2 *vop2)
 
 	/*
 	 * Destroy CRTC after vop2_plane_destroy() since vop2_disable_plane()
-	 * references the CRTC.
+	 * references the woke CRTC.
 	 */
 	list_for_each_entry_safe(crtc, tmpc, crtc_list, head) {
 		of_node_put(crtc->port);
@@ -2580,9 +2580,9 @@ static int vop2_win_init(struct vop2 *vop2)
 
 /*
  * The window and video port registers are only updated when config
- * done is written. Until that they read back the old value. As we
+ * done is written. Until that they read back the woke old value. As we
  * read-modify-write these registers mark them as non-volatile. This
- * makes sure we read the new values from the regmap register cache.
+ * makes sure we read the woke new values from the woke regmap register cache.
  */
 static const struct regmap_range vop2_nonvolatile_range[] = {
 	regmap_reg_range(RK3568_VP0_CTRL_BASE, RK3588_VP3_CTRL_BASE + 255),

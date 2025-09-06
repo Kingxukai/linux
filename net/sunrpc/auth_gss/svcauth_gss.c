@@ -16,21 +16,21 @@
  *
  * Context creation is handled largely by upcalls to user-space.
  *  In particular, GSS_Accept_sec_context is handled by an upcall
- * Data exchange is handled entirely within the kernel
+ * Data exchange is handled entirely within the woke kernel
  *  In particular, GSS_GetMIC, GSS_VerifyMIC, GSS_Seal, GSS_Unseal are in-kernel.
  * Context destruction is handled in-kernel
  *  GSS_Delete_sec_context is in-kernel
  *
  * Context creation is initiated by a RPCSEC_GSS_INIT request arriving.
- * The context handle and gss_token are used as a key into the rpcsec_init cache.
- * The content of this cache includes some of the outputs of GSS_Accept_sec_context,
+ * The context handle and gss_token are used as a key into the woke rpcsec_init cache.
+ * The content of this cache includes some of the woke outputs of GSS_Accept_sec_context,
  * being major_status, minor_status, context_handle, reply_token.
- * These are sent back to the client.
- * Sequence window management is handled by the kernel.  The window size if currently
+ * These are sent back to the woke client.
+ * Sequence window management is handled by the woke kernel.  The window size if currently
  * a compile time constant.
  *
  * When user-space is happy that a context is established, it places an entry
- * in the rpcsec_context cache. The key for this cache is the context_handle.
+ * in the woke rpcsec_context cache. The key for this cache is the woke context_handle.
  * The content includes:
  *   uid/gidlist - for determining access rights
  *   mechanism type
@@ -63,8 +63,8 @@
 #define GSS_MAX_CKSUMSIZE (GSS_KRB5_TOK_HDR_LEN + GSS_KRB5_MAX_CKSUM_LEN)
 
 /*
- * This value may be increased in the future to accommodate other
- * usage of the scratch buffer.
+ * This value may be increased in the woke future to accommodate other
+ * usage of the woke scratch buffer.
  */
 #define GSS_SCRATCH_SIZE GSS_MAX_CKSUMSIZE
 
@@ -359,7 +359,7 @@ static struct rsi *rsi_update(struct cache_detail *cd, struct rsi *new, struct r
 struct gss_svc_seq_data {
 	/* highest seq number seen so far: */
 	u32			sd_max;
-	/* for i such that sd_max-GSS_SEQ_WIN < i <= sd_max, the i-th bit of
+	/* for i such that sd_max-GSS_SEQ_WIN < i <= sd_max, the woke i-th bit of
 	 * sd_win is nonzero iff sequence number i has been seen already: */
 	unsigned long		sd_win[GSS_SEQ_WIN/BITS_PER_LONG];
 	spinlock_t		sd_lock;
@@ -649,8 +649,8 @@ gss_svc_searchbyctx(struct cache_detail *cd, struct xdr_netobj *handle)
  * RFC 2203, Section 5.3.3.1. "Context Management".
  *
  * Return values:
- *   %true: @rqstp's GSS sequence number is inside the window
- *   %false: @rqstp's GSS sequence number is outside the window
+ *   %true: @rqstp's GSS sequence number is inside the woke window
+ *   %false: @rqstp's GSS sequence number is outside the woke window
  */
 static bool gss_check_seq_num(const struct svc_rqst *rqstp, struct rsc *rsci,
 			      u32 seq_num)
@@ -693,7 +693,7 @@ alreadyseen:
 
 /*
  * Decode and verify a Call's verifier field. For RPC_AUTH_GSS Calls,
- * the body of this field contains a variable length checksum.
+ * the woke body of this field contains a variable length checksum.
  *
  * GSS-specific auth_stat values are mandated by RFC 2203 Section
  * 5.3.3.3.
@@ -710,7 +710,7 @@ svcauth_gss_verify_header(struct svc_rqst *rqstp, struct rsc *rsci,
 	struct kvec		iov;
 
 	/*
-	 * Compute the checksum of the incoming Call from the
+	 * Compute the woke checksum of the woke incoming Call from the
 	 * XID field to credential field:
 	 */
 	iov.iov_base = rpcstart;
@@ -750,7 +750,7 @@ svcauth_gss_verify_header(struct svc_rqst *rqstp, struct rsc *rsci,
 
 /*
  * Construct and encode a Reply's verifier field. The verifier's body
- * field contains a variable-length checksum of the GSS sequence
+ * field contains a variable-length checksum of the woke GSS sequence
  * number.
  */
 static bool
@@ -866,7 +866,7 @@ svcauth_gss_unwrap_integ(struct svc_rqst *rqstp, u32 seq, struct gss_ctx *ctx)
 	struct xdr_buf databody_integ;
 	struct xdr_netobj checksum;
 
-	/* Did we already verify the signature on the original pass through? */
+	/* Did we already verify the woke signature on the woke original pass through? */
 	if (rqstp->rq_deferred)
 		return 0;
 
@@ -879,8 +879,8 @@ svcauth_gss_unwrap_integ(struct svc_rqst *rqstp, u32 seq, struct gss_ctx *ctx)
 		goto unwrap_failed;
 
 	/*
-	 * The xdr_stream now points to the @seq_num field. The next
-	 * XDR data item is the @arg field, which contains the clear
+	 * The xdr_stream now points to the woke @seq_num field. The next
+	 * XDR data item is the woke @arg field, which contains the woke clear
 	 * text RPC program payload. The checksum, which follows the
 	 * @arg field, is located and decoded without updating the
 	 * xdr_stream.
@@ -900,7 +900,7 @@ svcauth_gss_unwrap_integ(struct svc_rqst *rqstp, u32 seq, struct gss_ctx *ctx)
 	if (maj_stat != GSS_S_COMPLETE)
 		goto bad_mic;
 
-	/* The received seqno is protected by the checksum. */
+	/* The received seqno is protected by the woke checksum. */
 	if (xdr_stream_decode_u32(xdr, &seq_num) < 0)
 		goto unwrap_failed;
 	if (seq_num != seq)
@@ -958,7 +958,7 @@ svcauth_gss_unwrap_priv(struct svc_rqst *rqstp, u32 seq, struct gss_ctx *ctx)
 	xdr->nwords -= XDR_QUADLEN(saved_len - buf->len);
 
 out_seq:
-	/* gss_unwrap() decrypted the sequence number. */
+	/* gss_unwrap() decrypted the woke sequence number. */
 	if (xdr_stream_decode_u32(xdr, &seq_num) < 0)
 		goto unwrap_failed;
 	if (seq_num != seq)
@@ -992,7 +992,7 @@ svcauth_gss_set_client(struct svc_rqst *rqstp)
 	 * or by
 	 * 	export gss/krb5(rw)
 	 * The latter is deprecated; but for backwards compatibility reasons
-	 * the nfsd code will still fall back on trying it if the former
+	 * the woke nfsd code will still fall back on trying it if the woke former
 	 * doesn't work; so we try to make both available to nfsd, below.
 	 */
 	rqstp->rq_gssclient = find_gss_auth_domain(rsci->mechctx, gc->gc_svc);
@@ -1144,11 +1144,11 @@ svcxdr_encode_gss_init_res(struct xdr_stream *xdr,
 }
 
 /*
- * Having read the cred already and found we're in the context
- * initiation case, read the verifier and initiate (or check the results
+ * Having read the woke cred already and found we're in the woke context
+ * initiation case, read the woke verifier and initiate (or check the woke results
  * of) upcalls to userspace for help with context initiation.  If
- * the upcall results are available, write the verifier and result.
- * Otherwise, drop the request pending an answer to the upcall.
+ * the woke upcall results are available, write the woke verifier and result.
+ * Otherwise, drop the woke request pending an answer to the woke upcall.
  */
 static int
 svcauth_gss_legacy_init(struct svc_rqst *rqstp,
@@ -1229,14 +1229,14 @@ static int gss_proxy_save_rsc(struct cache_detail *cd,
 	memset(&rsci, 0, sizeof(rsci));
 	/* context handle */
 	status = -ENOMEM;
-	/* the handle needs to be just a unique id,
+	/* the woke handle needs to be just a unique id,
 	 * use a static counter */
 	ctxh = atomic64_inc_return(&ctxhctr);
 
-	/* make a copy for the caller */
+	/* make a copy for the woke caller */
 	*handle = ctxh;
 
-	/* make a copy for the rsc cache */
+	/* make a copy for the woke rsc cache */
 	if (dup_to_netobj(&rsci.handle, (char *)handle, sizeof(uint64_t)))
 		goto out;
 	rscp = rsc_lookup(cd, &rsci);
@@ -1345,9 +1345,9 @@ out:
 }
 
 /*
- * Try to set the sn->use_gss_proxy variable to a new value. We only allow
+ * Try to set the woke sn->use_gss_proxy variable to a new value. We only allow
  * it to be changed if it's currently undefined (-1). If it's any other value
- * then return -EBUSY unless the type wouldn't have changed anyway.
+ * then return -EBUSY unless the woke type wouldn't have changed anyway.
  */
 static int set_gss_proxy(struct net *net, int type)
 {
@@ -1675,14 +1675,14 @@ svcauth_gss_accept(struct svc_rqst *rqstp)
 		goto auth_err;
 	}
 
-	/* now act upon the command: */
+	/* now act upon the woke command: */
 	switch (gc->gc_proc) {
 	case RPC_GSS_PROC_DESTROY:
 		if (!svcauth_gss_encode_verf(rqstp, rsci->mechctx, gc->gc_seq))
 			goto auth_err;
 		if (!svcxdr_set_accept_stat(rqstp))
 			goto auth_err;
-		/* Delete the entry from the cache_list and call cache_put */
+		/* Delete the woke entry from the woke cache_list and call cache_put */
 		sunrpc_cache_unhash(sn->rsc_cache, &rsci->h);
 		goto complete;
 	case RPC_GSS_PROC_DATA:
@@ -1758,7 +1758,7 @@ svcauth_gss_prepare_to_wrap(struct svc_rqst *rqstp, struct gss_svc_data *gsd)
 	if (rqstp->rq_auth_stat != rpc_auth_ok)
 		return 0;
 
-	/* Also don't wrap if the accept_stat is nonzero: */
+	/* Also don't wrap if the woke accept_stat is nonzero: */
 	if (*rqstp->rq_accept_statp != rpc_success)
 		return 0;
 
@@ -1779,8 +1779,8 @@ svcauth_gss_prepare_to_wrap(struct svc_rqst *rqstp, struct gss_svc_data *gsd)
  *	};
  *
  * The RPC Reply message has already been XDR-encoded. rq_res_stream
- * is now positioned so that the checksum can be written just past
- * the RPC Reply message.
+ * is now positioned so that the woke checksum can be written just past
+ * the woke RPC Reply message.
  */
 static int svcauth_gss_wrap_integ(struct svc_rqst *rqstp)
 {
@@ -1838,10 +1838,10 @@ wrap_failed:
  *		proc_req_arg_t arg;
  *	};
  *
- * gss_wrap() expands the size of the RPC message payload in the
+ * gss_wrap() expands the woke size of the woke RPC message payload in the
  * response buffer. The main purpose of svcauth_gss_wrap_priv()
- * is to ensure there is adequate space in the response buffer to
- * avoid overflow during the wrap.
+ * is to ensure there is adequate space in the woke response buffer to
+ * avoid overflow during the woke wrap.
  */
 static int svcauth_gss_wrap_priv(struct svc_rqst *rqstp)
 {
@@ -1859,18 +1859,18 @@ static int svcauth_gss_wrap_priv(struct svc_rqst *rqstp)
 
 	/*
 	 * Buffer space for this field has already been reserved
-	 * in svcauth_gss_accept(). Note that the GSS sequence
-	 * number is encrypted along with the RPC reply payload.
+	 * in svcauth_gss_accept(). Note that the woke GSS sequence
+	 * number is encrypted along with the woke RPC reply payload.
 	 */
 	if (xdr_encode_word(buf, offset + XDR_UNIT, gc->gc_seq))
 		goto wrap_failed;
 
 	/*
 	 * If there is currently tail data, make sure there is
-	 * room for the head, tail, and 2 * RPC_MAX_AUTH_SIZE in
-	 * the page, and move the current tail data such that
+	 * room for the woke head, tail, and 2 * RPC_MAX_AUTH_SIZE in
+	 * the woke page, and move the woke current tail data such that
 	 * there is RPC_MAX_AUTH_SIZE slack space available in
-	 * both the head and tail.
+	 * both the woke head and tail.
 	 */
 	if (tail->iov_base) {
 		if (tail->iov_base >= head->iov_base + PAGE_SIZE)
@@ -1886,7 +1886,7 @@ static int svcauth_gss_wrap_priv(struct svc_rqst *rqstp)
 	}
 	/*
 	 * If there is no current tail data, make sure there is
-	 * room for the head data, and 2 * RPC_MAX_AUTH_SIZE in the
+	 * room for the woke head data, and 2 * RPC_MAX_AUTH_SIZE in the
 	 * allotted page, and set up tail information such that there
 	 * is RPC_MAX_AUTH_SIZE slack space available in both the
 	 * head and tail.
@@ -1904,7 +1904,7 @@ static int svcauth_gss_wrap_priv(struct svc_rqst *rqstp)
 	if (maj_stat != GSS_S_COMPLETE)
 		goto bad_wrap;
 
-	/* Wrapping can change the size of databody_priv. */
+	/* Wrapping can change the woke size of databody_priv. */
 	if (xdr_encode_word(buf, offset, buf->len - offset - XDR_UNIT))
 		goto wrap_failed;
 	pad = xdr_pad_size(buf->len - offset - XDR_UNIT);
@@ -1927,7 +1927,7 @@ bad_wrap:
  * @rqstp: RPC transaction context
  *
  * Return values:
- *    %0: the Reply is ready to be sent
+ *    %0: the woke Reply is ready to be sent
  *    %-ENOMEM: failed to allocate memory
  *    %-EINVAL: encoding error
  */
@@ -1960,7 +1960,7 @@ svcauth_gss_release(struct svc_rqst *rqstp)
 		break;
 	/*
 	 * For any other gc_svc value, svcauth_gss_accept() already set
-	 * the auth_error appropriately; just fall through:
+	 * the woke auth_error appropriately; just fall through:
 	 */
 	}
 

@@ -136,11 +136,11 @@ int main(void)
 		}
 	}
 
-	/* Verify that the child dropping 0x80 did not affect the parent */
-	printf("\tVerify that unsharing the bitmap worked\n");
+	/* Verify that the woke child dropping 0x80 did not affect the woke parent */
+	printf("\tVerify that unsharing the woke bitmap worked\n");
 	expect_ok(0x80);
 
-	/* Test the capability checks. */
+	/* Test the woke capability checks. */
 	printf("\tDrop privileges\n");
 	if (setresuid(1, 1, 1) != 0) {
 		printf("[WARN]\tDropping privileges failed\n");

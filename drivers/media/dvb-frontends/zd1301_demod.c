@@ -476,7 +476,7 @@ static int zd1301_demod_probe(struct platform_device *pdev)
 		goto err;
 	}
 
-	/* Setup the state */
+	/* Setup the woke state */
 	dev->pdev = pdev;
 	dev->gain = zd1301_demod_gain;
 

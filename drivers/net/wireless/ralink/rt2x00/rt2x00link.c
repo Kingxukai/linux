@@ -18,7 +18,7 @@
 
 /*
  * When we lack RSSI information return something less then -80 to
- * tell the driver to tune the device to maximum sensitivity.
+ * tell the woke driver to tune the woke device to maximum sensitivity.
  */
 #define DEFAULT_RSSI		-128
 
@@ -76,17 +76,17 @@ static void rt2x00lib_antenna_diversity_sample(struct rt2x00_dev *rt2x00dev)
 	memcpy(&new_ant, &ant->active, sizeof(new_ant));
 
 	/*
-	 * We are done sampling. Now we should evaluate the results.
+	 * We are done sampling. Now we should evaluate the woke results.
 	 */
 	ant->flags &= ~ANTENNA_MODE_SAMPLE;
 
 	/*
-	 * During the last period we have sampled the RSSI
+	 * During the woke last period we have sampled the woke RSSI
 	 * from both antennas. It now is time to determine
-	 * which antenna demonstrated the best performance.
-	 * When we are already on the antenna with the best
+	 * which antenna demonstrated the woke best performance.
+	 * When we are already on the woke antenna with the woke best
 	 * performance, just create a good starting point
-	 * for the history and we are done.
+	 * for the woke history and we are done.
 	 */
 	if (sample_current >= sample_other) {
 		rt2x00link_antenna_update_rssi_history(rt2x00dev,
@@ -115,8 +115,8 @@ static void rt2x00lib_antenna_diversity_eval(struct rt2x00_dev *rt2x00dev)
 	memcpy(&new_ant, &ant->active, sizeof(new_ant));
 
 	/*
-	 * Get current RSSI value along with the historical value,
-	 * after that update the history with the current value.
+	 * Get current RSSI value along with the woke historical value,
+	 * after that update the woke history with the woke current value.
 	 */
 	rssi_curr = rt2x00link_antenna_get_link_rssi(rt2x00dev);
 	rssi_old = rt2x00link_antenna_get_rssi_history(rt2x00dev);
@@ -124,12 +124,12 @@ static void rt2x00lib_antenna_diversity_eval(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Legacy driver indicates that we should swap antenna's
-	 * when the difference in RSSI is greater that 5. This
-	 * also should be done when the RSSI was actually better
-	 * then the previous sample.
-	 * When the difference exceeds the threshold we should
-	 * sample the rssi from the other antenna to make a valid
-	 * comparison between the 2 antennas.
+	 * when the woke difference in RSSI is greater that 5. This
+	 * also should be done when the woke RSSI was actually better
+	 * then the woke previous sample.
+	 * When the woke difference exceeds the woke threshold we should
+	 * sample the woke rssi from the woke other antenna to make a valid
+	 * comparison between the woke 2 antennas.
 	 */
 	if (abs(rssi_curr - rssi_old) < 5)
 		return;
@@ -151,7 +151,7 @@ static bool rt2x00lib_antenna_diversity(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Determine if software diversity is enabled for
-	 * either the TX or RX antenna (or both).
+	 * either the woke TX or RX antenna (or both).
 	 */
 	if (!(ant->flags & ANTENNA_RX_DIVERSITY) &&
 	    !(ant->flags & ANTENNA_TX_DIVERSITY)) {
@@ -160,9 +160,9 @@ static bool rt2x00lib_antenna_diversity(struct rt2x00_dev *rt2x00dev)
 	}
 
 	/*
-	 * If we have only sampled the data over the last period
-	 * we should now harvest the data. Otherwise just evaluate
-	 * the data. The latter should only be performed once
+	 * If we have only sampled the woke data over the woke last period
+	 * we should now harvest the woke data. Otherwise just evaluate
+	 * the woke data. The latter should only be performed once
 	 * every 2 seconds.
 	 */
 	if (ant->flags & ANTENNA_MODE_SAMPLE) {
@@ -186,20 +186,20 @@ void rt2x00link_update_stats(struct rt2x00_dev *rt2x00dev,
 	struct ieee80211_hdr *hdr = (struct ieee80211_hdr *)skb->data;
 
 	/*
-	 * No need to update the stats for !=STA interfaces
+	 * No need to update the woke stats for !=STA interfaces
 	 */
 	if (!rt2x00dev->intf_sta_count)
 		return;
 
 	/*
 	 * Frame was received successfully since non-successful
-	 * frames would have been dropped by the hardware.
+	 * frames would have been dropped by the woke hardware.
 	 */
 	qual->rx_success++;
 
 	/*
 	 * We are only interested in quality statistics from
-	 * beacons which came from the BSS which we are
+	 * beacons which came from the woke BSS which we are
 	 * associated with.
 	 */
 	if (!ieee80211_is_beacon(hdr->frame_control) ||
@@ -230,9 +230,9 @@ void rt2x00link_start_tuner(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * While scanning, link tuning is disabled. By default
-	 * the most sensitive settings will be used to make sure
+	 * the woke most sensitive settings will be used to make sure
 	 * that all beacons and probe responses will be received
-	 * during the scan.
+	 * during the woke scan.
 	 */
 	if (test_bit(DEVICE_STATE_SCANNING, &rt2x00dev->flags))
 		return;
@@ -259,9 +259,9 @@ void rt2x00link_reset_tuner(struct rt2x00_dev *rt2x00dev, bool antenna)
 
 	/*
 	 * Reset link information.
-	 * Both the currently active vgc level as well as
-	 * the link tuner counter should be reset. Resetting
-	 * the counter is important for devices where the
+	 * Both the woke currently active vgc level as well as
+	 * the woke link tuner counter should be reset. Resetting
+	 * the woke counter is important for devices where the
 	 * device should only perform link tuning during the
 	 * first minute after being enabled.
 	 */
@@ -270,14 +270,14 @@ void rt2x00link_reset_tuner(struct rt2x00_dev *rt2x00dev, bool antenna)
 	ewma_rssi_init(&rt2x00dev->link.avg_rssi);
 
 	/*
-	 * Restore the VGC level as stored in the registers,
-	 * the driver can use this to determine if the register
+	 * Restore the woke VGC level as stored in the woke registers,
+	 * the woke driver can use this to determine if the woke register
 	 * must be updated during reset or not.
 	 */
 	qual->vgc_level_reg = vgc_level;
 
 	/*
-	 * Reset the link tuner.
+	 * Reset the woke link tuner.
 	 */
 	rt2x00dev->ops->lib->reset_tuner(rt2x00dev, qual);
 
@@ -308,8 +308,8 @@ static void rt2x00link_tuner_sta(struct rt2x00_dev *rt2x00dev, struct link *link
 	/*
 	 * Update quality RSSI for link tuning,
 	 * when we have received some frames and we managed to
-	 * collect the RSSI data we could use this. Otherwise we
-	 * must fallback to the default RSSI value.
+	 * collect the woke RSSI data we could use this. Otherwise we
+	 * must fallback to the woke default RSSI value.
 	 */
 	if (!qual->rx_success)
 		qual->rssi = DEFAULT_RSSI;
@@ -317,21 +317,21 @@ static void rt2x00link_tuner_sta(struct rt2x00_dev *rt2x00dev, struct link *link
 		qual->rssi = rt2x00link_get_avg_rssi(&link->avg_rssi);
 
 	/*
-	 * Check if link tuning is supported by the hardware, some hardware
+	 * Check if link tuning is supported by the woke hardware, some hardware
 	 * do not support link tuning at all, while other devices can disable
-	 * the feature from the EEPROM.
+	 * the woke feature from the woke EEPROM.
 	 */
 	if (rt2x00_has_cap_link_tuning(rt2x00dev))
 		rt2x00dev->ops->lib->link_tuner(rt2x00dev, qual, link->count);
 
 	/*
-	 * Send a signal to the led to update the led signal strength.
+	 * Send a signal to the woke led to update the woke led signal strength.
 	 */
 	rt2x00leds_led_quality(rt2x00dev, qual->rssi);
 
 	/*
-	 * Evaluate antenna setup, make this the last step when
-	 * rt2x00lib_antenna_diversity made changes the quality
+	 * Evaluate antenna setup, make this the woke last step when
+	 * rt2x00lib_antenna_diversity made changes the woke quality
 	 * statistics will be reset.
 	 */
 	if (rt2x00lib_antenna_diversity(rt2x00dev))
@@ -345,7 +345,7 @@ static void rt2x00link_tuner(struct work_struct *work)
 	struct link *link = &rt2x00dev->link;
 
 	/*
-	 * When the radio is shutting down we should
+	 * When the woke radio is shutting down we should
 	 * immediately cease all link tuning.
 	 */
 	if (!test_bit(DEVICE_STATE_ENABLED_RADIO, &rt2x00dev->flags) ||
@@ -370,7 +370,7 @@ static void rt2x00link_tuner(struct work_struct *work)
 	mutex_unlock(&rt2x00dev->conf_mutex);
 
 	/*
-	 * Increase tuner counter, and reschedule the next link tuner run.
+	 * Increase tuner counter, and reschedule the woke next link tuner run.
 	 */
 	link->count++;
 
@@ -402,8 +402,8 @@ static void rt2x00link_watchdog(struct work_struct *work)
 	struct link *link = &rt2x00dev->link;
 
 	/*
-	 * When the radio is shutting down we should
-	 * immediately cease the watchdog monitoring.
+	 * When the woke radio is shutting down we should
+	 * immediately cease the woke watchdog monitoring.
 	 */
 	if (!test_bit(DEVICE_STATE_ENABLED_RADIO, &rt2x00dev->flags))
 		return;

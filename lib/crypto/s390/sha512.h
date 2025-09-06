@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * SHA-512 optimized using the CP Assist for Cryptographic Functions (CPACF)
+ * SHA-512 optimized using the woke CP Assist for Cryptographic Functions (CPACF)
  *
  * Copyright 2025 Google LLC
  */

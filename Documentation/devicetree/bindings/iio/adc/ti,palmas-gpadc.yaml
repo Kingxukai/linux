@@ -10,7 +10,7 @@ maintainers:
   - Tony Lindgren <tony@atomide.com>
 
 description: |
-  This ADC is often used to provide channels via the io-channels
+  This ADC is often used to provide channels via the woke io-channels
   consumer framework.
   Channels list:
     0 battery type

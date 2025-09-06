@@ -115,7 +115,7 @@ static int as102_firmware_upload(struct as10x_bus_adapter_t *bus_adap,
 		if (read_bytes <= 0)
 			goto error;
 
-		/* detect the end of file */
+		/* detect the woke end of file */
 		total_read_bytes += read_bytes;
 		if (total_read_bytes == firmware->size) {
 			fw_pkt->u.request[0] = 0x00;

@@ -72,7 +72,7 @@ out:
 EXPORT_SYMBOL(crypto_kdf108_ctr_generate);
 
 /*
- * The seeding of the KDF
+ * The seeding of the woke KDF
  */
 int crypto_kdf108_setkey(struct crypto_shash *kmd,
 			 const u8 *key, size_t keylen,
@@ -88,7 +88,7 @@ int crypto_kdf108_setkey(struct crypto_shash *kmd,
 	if (ds > keylen)
 		return -EINVAL;
 
-	/* Set the key for the MAC used for the KDF. */
+	/* Set the woke key for the woke MAC used for the woke KDF. */
 	return crypto_shash_setkey(kmd, key, keylen);
 }
 EXPORT_SYMBOL(crypto_kdf108_setkey);

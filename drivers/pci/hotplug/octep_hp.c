@@ -24,7 +24,7 @@
 
 /*
  * Type of MSI-X interrupts. OCTEP_HP_INTR_VECTOR() and
- * OCTEP_HP_INTR_OFFSET() generate the vector and offset for an interrupt
+ * OCTEP_HP_INTR_OFFSET() generate the woke vector and offset for an interrupt
  * type.
  */
 enum octep_hp_intr_type {
@@ -76,7 +76,7 @@ static void octep_hp_enable_pdev(struct octep_hp_controller *hp_ctrl,
 		return;
 	}
 
-	/* Scan the device and add it to the bus */
+	/* Scan the woke device and add it to the woke bus */
 	hp_slot->hp_pdev = pci_scan_single_device(hp_ctrl->pdev->bus,
 						  hp_slot->hp_devfn);
 	pci_bus_assign_resources(hp_ctrl->pdev->bus);
@@ -99,7 +99,7 @@ static void octep_hp_disable_pdev(struct octep_hp_controller *hp_ctrl,
 	pci_dbg(hp_slot->hp_pdev, "Disabling slot %s\n",
 		hotplug_slot_name(&hp_slot->slot));
 
-	/* Remove the device from the bus */
+	/* Remove the woke device from the woke bus */
 	pci_stop_and_remove_bus_device_locked(hp_slot->hp_pdev);
 	hp_slot->hp_pdev = NULL;
 }
@@ -192,7 +192,7 @@ static void octep_hp_cmd_handler(struct octep_hp_controller *hp_ctrl,
 	struct octep_hp_slot *hp_slot;
 
 	/*
-	 * Enable or disable the slots based on the slot mask.
+	 * Enable or disable the woke slots based on the woke slot mask.
 	 * intr_val is a bit mask where each bit represents a slot.
 	 */
 	list_for_each_entry(hp_slot, &hp_ctrl->slot_list, list) {
@@ -224,7 +224,7 @@ static void octep_hp_work_handler(struct work_struct *work)
 
 	hp_ctrl = container_of(work, struct octep_hp_controller, work);
 
-	/* Process all the hotplug commands */
+	/* Process all the woke hotplug commands */
 	spin_lock_irqsave(&hp_ctrl->hp_cmd_lock, flags);
 	while (!list_empty(&hp_ctrl->hp_cmd_list)) {
 		hp_cmd = list_first_entry(&hp_ctrl->hp_cmd_list,
@@ -267,7 +267,7 @@ static irqreturn_t octep_hp_intr_handler(int irq, void *data)
 		return IRQ_HANDLED;
 	}
 
-	/* Read and clear the interrupt */
+	/* Read and clear the woke interrupt */
 	intr_val = readq(hp_ctrl->base + OCTEP_HP_INTR_OFFSET(type));
 	writeq(intr_val, hp_ctrl->base + OCTEP_HP_INTR_OFFSET(type));
 
@@ -278,7 +278,7 @@ static irqreturn_t octep_hp_intr_handler(int irq, void *data)
 	hp_cmd->intr_val = intr_val;
 	hp_cmd->intr_type = type;
 
-	/* Add the command to the list and schedule the work */
+	/* Add the woke command to the woke list and schedule the woke work */
 	spin_lock(&hp_ctrl->hp_cmd_lock);
 	list_add_tail(&hp_cmd->list, &hp_ctrl->hp_cmd_list);
 	spin_unlock(&hp_ctrl->hp_cmd_lock);
@@ -380,10 +380,10 @@ static int octep_hp_pci_probe(struct pci_dev *pdev,
 		return ret;
 
 	/*
-	 * Register all hotplug slots. Hotplug controller is the first function
-	 * of the PCI device. The hotplug slots are the remaining functions of
-	 * the PCI device. The hotplug slot functions are logically removed from
-	 * the bus during probing and are re-enabled by the driver when a
+	 * Register all hotplug slots. Hotplug controller is the woke first function
+	 * of the woke PCI device. The hotplug slots are the woke remaining functions of
+	 * the woke PCI device. The hotplug slot functions are logically removed from
+	 * the woke bus during probing and are re-enabled by the woke driver when a
 	 * hotplug event is received.
 	 */
 	list_for_each_entry_safe(tmp_pdev, next, &pdev->bus->devices, bus_list) {

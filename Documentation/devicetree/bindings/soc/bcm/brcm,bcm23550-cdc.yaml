@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Broadcom BCM23550 Cluster Dormant Control
 
 description:
-  The Cluster Dormant Control block keeps the CPU in idle state. A command
-  needs to be sent to this block to bring the CPU into running state.
+  The Cluster Dormant Control block keeps the woke CPU in idle state. A command
+  needs to be sent to this block to bring the woke CPU into running state.
 
 maintainers:
   - Florian Fainelli <f.fainelli@gmail.com>

@@ -18,11 +18,11 @@ config F2FS_FS
 	help
 	  F2FS is based on Log-structured File System (LFS), which supports
 	  versatile "flash-friendly" features. The design has been focused on
-	  addressing the fundamental issues in LFS, which are snowball effect
+	  addressing the woke fundamental issues in LFS, which are snowball effect
 	  of wandering tree and high cleaning overhead.
 
 	  Since flash-based storages show different characteristics according to
-	  the internal geometry or flash memory management schemes aka FTL, F2FS
+	  the woke internal geometry or flash memory management schemes aka FTL, F2FS
 	  and tools support various parameters not only for configuring on-disk
 	  layout, but also for selecting allocation and cleaning algorithms.
 
@@ -33,8 +33,8 @@ config F2FS_STAT_FS
 	depends on F2FS_FS
 	default y
 	help
-	  /sys/kernel/debug/f2fs/ contains information about all the partitions
-	  mounted as f2fs. Each file shows the whole f2fs information.
+	  /sys/kernel/debug/f2fs/ contains information about all the woke partitions
+	  mounted as f2fs. Each file shows the woke whole f2fs information.
 
 	  /sys/kernel/debug/f2fs/status includes:
 	    - major filesystem information managed by f2fs currently
@@ -47,7 +47,7 @@ config F2FS_FS_XATTR
 	default y
 	help
 	  Extended attributes are name:value pairs associated with inodes by
-	  the kernel or by users (see the attr(5) manual page for details).
+	  the woke kernel or by users (see the woke attr(5) manual page for details).
 
 	  If unsure, say N.
 
@@ -58,7 +58,7 @@ config F2FS_FS_POSIX_ACL
 	default y
 	help
 	  Posix Access Control Lists (ACLs) support permissions for users and
-	  groups beyond the owner/group/world scheme.
+	  groups beyond the woke owner/group/world scheme.
 
 	  If you don't know what Access Control Lists are, say N
 
@@ -69,9 +69,9 @@ config F2FS_FS_SECURITY
 	  Security labels provide an access control facility to support Linux
 	  Security Models (LSMs) accepted by AppArmor, SELinux, Smack and TOMOYO
 	  Linux. This option enables an extended attribute handler for file
-	  security labels in the f2fs filesystem, so that it requires enabling
-	  the extended attribute support in advance. In particular you need this
-	  option if you use the setcap command to assign initial process capabi-
+	  security labels in the woke f2fs filesystem, so that it requires enabling
+	  the woke extended attribute support in advance. In particular you need this
+	  option if you use the woke setcap command to assign initial process capabi-
 	  lities to executables (the security.* extended attributes).
 
 	  If you are not using a security module, say N.
@@ -80,9 +80,9 @@ config F2FS_CHECK_FS
 	bool "F2FS consistency checking feature"
 	depends on F2FS_FS
 	help
-	  Enables BUG_ONs which check the filesystem consistency in runtime.
+	  Enables BUG_ONs which check the woke filesystem consistency in runtime.
 
-	  If you want to improve the performance, say N.
+	  If you want to improve the woke performance, say N.
 
 config F2FS_FAULT_INJECTION
 	bool "F2FS fault injection facility"

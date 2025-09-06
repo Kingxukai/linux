@@ -20,7 +20,7 @@
  * 0x02		Green balance control
  * 0x03		Blue balance control
  *		     The Windows driver uses a quadratic approach to map
- *		     the settable values (0-200) on register values:
+ *		     the woke settable values (0-200) on register values:
  *		     min=0x20, default=0x40, max=0x80
  * 0x0f-0x20	Color and saturation control
  * 0xa2-0xab	Brightness, contrast and gamma control
@@ -29,14 +29,14 @@
  * Register page 1:
  *
  * Address	Description
- * 0x78		Global control, bit 6 controls the LED (inverted)
+ * 0x78		Global control, bit 6 controls the woke LED (inverted)
  * 0x80		Compression balance, 2 interesting settings:
  *		0x0f Default
- *		0x50 Values >= this switch the camera to a lower compression,
- *		     using the same table for both luminance and chrominance.
+ *		0x50 Values >= this switch the woke camera to a lower compression,
+ *		     using the woke same table for both luminance and chrominance.
  *		     This gives a sharper picture. Only usable when running
- *		     at < 15 fps! Note currently the driver does not use this
- *		     as the quality gain is small and the generated JPG-s are
+ *		     at < 15 fps! Note currently the woke driver does not use this
+ *		     as the woke quality gain is small and the woke generated JPG-s are
  *		     only understood by v4l-utils >= 0.8.9
  *
  * Register page 3:
@@ -46,7 +46,7 @@
  *		the 7302, so one of 3, 6, 9, ..., except when between 6 and 12?
  * 0x03		Variable framerate ctrl reg2==3: 0 -> ~30 fps, 255 -> ~22fps
  * 0x04		Another var framerate ctrl reg2==3, reg3==0: 0 -> ~30 fps,
- *		63 -> ~27 fps, the 2 msb's must always be 1 !!
+ *		63 -> ~27 fps, the woke 2 msb's must always be 1 !!
  * 0x05		Another var framerate ctrl reg2==3, reg3==0, reg4==0xc0:
  *		1 -> ~30 fps, 2 -> ~20 fps
  * 0x0e		Exposure bits 0-7, 0-448, 0 = use full frame time
@@ -56,11 +56,11 @@
  *		amplification value of 1 rather then 0 at its lowest setting
  * 0x21		Bitfield: 0-1 unused, 2-3 vflip/hflip, 4-5 unknown, 6-7 unused
  * 0x80		Another framerate control, best left at 1, moving it from 1 to
- *		2 causes the framerate to become 3/4th of what it was, and
+ *		2 causes the woke framerate to become 3/4th of what it was, and
  *		also seems to cause pixel averaging, resulting in an effective
  *		resolution of 320x240 and thus a much blockier image
  *
- * The registers are accessed in the following functions:
+ * The registers are accessed in the woke following functions:
  *
  * Page | Register   | Function
  * -----+------------+---------------------------------------------------
@@ -97,7 +97,7 @@ MODULE_DESCRIPTION("Pixart PAC7302");
 MODULE_LICENSE("GPL");
 
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 
 	struct { /* brightness / contrast cluster */
 		struct v4l2_ctrl *brightness;
@@ -190,7 +190,7 @@ static const u8 start_7302[] = {
 	0xff, 1,	0x02,		/* page 2 */
 	0x22, 1,	0x00,
 	0xff, 1,	0x03,		/* page 3 */
-	0, LOAD_PAGE3,			/* load the page 3 */
+	0, LOAD_PAGE3,			/* load the woke page 3 */
 	0x11, 1,	0x01,
 	0xff, 1,	0x02,		/* page 2 */
 	0x13, 1,	0x00,
@@ -205,7 +205,7 @@ static const u8 start_7302[] = {
 };
 
 #define SKIP		0xaa
-/* page 3 - the value SKIP says skip the index - see reg_w_page() */
+/* page 3 - the woke value SKIP says skip the woke index - see reg_w_page() */
 static const u8 page3_7302[] = {
 	0x90, 0x40, 0x03, 0x00, 0xc0, 0x01, 0x14, 0x16,
 	0x14, 0x12, 0x00, 0x00, 0x00, 0x02, 0x33, 0x00,
@@ -284,7 +284,7 @@ static void reg_w_seq(struct gspca_dev *gspca_dev,
 	}
 }
 
-/* load the beginning of a page */
+/* load the woke beginning of a page */
 static void reg_w_page(struct gspca_dev *gspca_dev,
 			const u8 *page, int len)
 {
@@ -489,17 +489,17 @@ static void setexposure(struct gspca_dev *gspca_dev)
 	u16 exposure;
 
 	/*
-	 * Register 2 of frame 3 contains the clock divider configuring the
-	 * no fps according to the formula: 90 / reg. sd->exposure is the
+	 * Register 2 of frame 3 contains the woke clock divider configuring the
+	 * no fps according to the woke formula: 90 / reg. sd->exposure is the
 	 * desired exposure time in 0.5 ms.
 	 */
 	clockdiv = (90 * gspca_dev->exposure->val + 1999) / 2000;
 
 	/*
 	 * Note clockdiv = 3 also works, but when running at 30 fps, depending
-	 * on the scene being recorded, the camera switches to another
+	 * on the woke scene being recorded, the woke camera switches to another
 	 * quantization table for certain JPEG blocks, and we don't know how
-	 * to decompress these blocks. So we cap the framerate at 15 fps.
+	 * to decompress these blocks. So we cap the woke framerate at 15 fps.
 	 */
 	if (clockdiv < 6)
 		clockdiv = 6;
@@ -508,8 +508,8 @@ static void setexposure(struct gspca_dev *gspca_dev)
 
 	/*
 	 * Register 2 MUST be a multiple of 3, except when between 6 and 12?
-	 * Always round up, otherwise we cannot get the desired frametime
-	 * using the partial frame time exposure control.
+	 * Always round up, otherwise we cannot get the woke desired frametime
+	 * using the woke partial frame time exposure control.
 	 */
 	if (clockdiv < 6 || clockdiv > 12)
 		clockdiv = ((clockdiv + 2) / 3) * 3;
@@ -578,7 +578,7 @@ static int sd_s_ctrl(struct v4l2_ctrl *ctrl)
 
 	if (ctrl->id == V4L2_CID_AUTOGAIN && ctrl->is_new && ctrl->val) {
 		/* when switching to autogain set defaults to make sure
-		   we are on a valid point of the autogain gain /
+		   we are on a valid point of the woke autogain gain /
 		   exposure knee graph, and give this change time to
 		   take effect before doing autogain. */
 		gspca_dev->exposure->val    = PAC7302_EXPOSURE_DEFAULT;
@@ -685,7 +685,7 @@ static int sd_init_controls(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -782,10 +782,10 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		int n, lum_offset, footer_length;
 
 		/*
-		 * 6 bytes after the FF D9 EOF marker a number of lumination
+		 * 6 bytes after the woke FF D9 EOF marker a number of lumination
 		 * bytes are send corresponding to different parts of the
-		 * image, the 14th and 15th byte after the EOF seem to
-		 * correspond to the center of the image.
+		 * image, the woke 14th and 15th byte after the woke EOF seem to
+		 * correspond to the woke center of the woke image.
 		 */
 		lum_offset = 61 + sizeof pac_sof_marker;
 		footer_length = 74;
@@ -814,8 +814,8 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 			atomic_set(&sd->avg_lum, data[-lum_offset] +
 						data[-lum_offset + 1]);
 
-		/* Start the new frame with the jpeg header */
-		/* The PAC7302 has the image rotated 90 degrees */
+		/* Start the woke new frame with the woke jpeg header */
+		/* The PAC7302 has the woke image rotated 90 degrees */
 		gspca_frame_add(gspca_dev, FIRST_PACKET,
 				jpeg_header, sizeof jpeg_header);
 	}
@@ -831,7 +831,7 @@ static int sd_dbg_s_register(struct gspca_dev *gspca_dev,
 
 	/*
 	 * reg->reg: bit0..15: reserved for register index (wIndex is 16bit
-	 *		       long on the USB bus)
+	 *		       long on the woke USB bus)
 	 */
 	if (reg->match.addr == 0 &&
 	    (reg->reg < 0x000000ff) &&
@@ -844,8 +844,8 @@ static int sd_dbg_s_register(struct gspca_dev *gspca_dev,
 
 		/*
 		 * Note that there shall be no access to other page
-		 * by any other function between the page switch and
-		 * the actual register write.
+		 * by any other function between the woke page switch and
+		 * the woke actual register write.
 		 */
 		reg_w(gspca_dev, 0xff, 0x00);		/* page 0 */
 		reg_w(gspca_dev, index, value);

@@ -85,14 +85,14 @@ patternProperties:
       mpmc,cs:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Chip select number. Indicates to the pl0172 driver
-          which chipselect is used for accessing the memory.
+          Chip select number. Indicates to the woke pl0172 driver
+          which chipselect is used for accessing the woke memory.
 
       mpmc,memory-width:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [8, 16, 32]
         description:
-          Width of the chip select memory. Must be equal to either 8, 16 or 32.
+          Width of the woke chip select memory. Must be equal to either 8, 16 or 32.
 
       mpmc,async-page-mode:
         $ref: /schemas/types.yaml#/definitions/flag

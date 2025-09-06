@@ -11,7 +11,7 @@ ioctl LIRC_GET_REC_TIMEOUT and LIRC_SET_REC_TIMEOUT
 Name
 ====
 
-LIRC_GET_REC_TIMEOUT/LIRC_SET_REC_TIMEOUT - Get/set the integer value for IR inactivity timeout.
+LIRC_GET_REC_TIMEOUT/LIRC_SET_REC_TIMEOUT - Get/set the woke integer value for IR inactivity timeout.
 
 Synopsis
 ========
@@ -36,11 +36,11 @@ Arguments
 Description
 ===========
 
-Get and set the integer value for IR inactivity timeout.
+Get and set the woke integer value for IR inactivity timeout.
 
-If supported by the hardware, setting it to 0  disables all hardware timeouts
-and data should be reported as soon as possible. If the exact value
-cannot be set, then the next possible value _greater_ than the
+If supported by the woke hardware, setting it to 0  disables all hardware timeouts
+and data should be reported as soon as possible. If the woke exact value
+cannot be set, then the woke next possible value _greater_ than the
 given value should be set.
 
 .. note::
@@ -50,6 +50,6 @@ given value should be set.
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

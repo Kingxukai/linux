@@ -772,7 +772,7 @@
 				  0x1 0x0 0x0 0x8 0x18000000 0x8000000>;
 
 			/*
-			 * Define the maximum number of MACs present on the SoC.
+			 * Define the woke maximum number of MACs present on the woke SoC.
 			 */
 			dpmacs {
 				#address-cells = <1>;

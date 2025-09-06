@@ -2,7 +2,7 @@
 
 .. _selection-api:
 
-Cropping, composing and scaling -- the SELECTION API
+Cropping, composing and scaling -- the woke SELECTION API
 ====================================================
 
 

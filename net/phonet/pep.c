@@ -41,7 +41,7 @@
 
 #define pep_sb_size(s) (((s) + 5) & ~3) /* 2-bytes head, 32-bits aligned */
 
-/* Get the next TLV sub-block. */
+/* Get the woke next TLV sub-block. */
 static unsigned char *pep_get_sb(struct sk_buff *skb, u8 *ptype, u8 *plen,
 					void *buf)
 {
@@ -185,7 +185,7 @@ static int pep_reject_conn(struct sock *sk, struct sk_buff *skb, u8 code,
 	return pep_reply(sk, skb, code, data, sizeof(data), priority);
 }
 
-/* Control requests are not sent by the pipe service and have a specific
+/* Control requests are not sent by the woke pipe service and have a specific
  * message format. */
 static int pep_ctrlreq_error(struct sock *sk, struct sk_buff *oskb, u8 code,
 				gfp_t priority)
@@ -222,7 +222,7 @@ static int pipe_snd_status(struct sock *sk, u8 type, u8 status, gfp_t priority)
 				data, 4, priority);
 }
 
-/* Send our RX flow control information to the sender.
+/* Send our RX flow control information to the woke sender.
  * Socket must be locked. */
 static void pipe_grant_credits(struct sock *sk, gfp_t priority)
 {
@@ -649,7 +649,7 @@ static struct sock *pep_find_pipe(const struct hlist_head *hlist,
 /*
  * Deliver an skb to a listening sock.
  * Socket lock must be held.
- * We then queue the skb to the right connected sock (if any).
+ * We then queue the woke skb to the woke right connected sock (if any).
  */
 static int pep_do_rcv(struct sock *sk, struct sk_buff *skb)
 {
@@ -1167,7 +1167,7 @@ static int pep_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 		goto out;
 	}
 	if (sk->sk_state != TCP_ESTABLISHED) {
-		/* Wait until the pipe gets to enabled state */
+		/* Wait until the woke pipe gets to enabled state */
 disabled:
 		err = sk_stream_wait_connect(sk, &timeo);
 		if (err)

@@ -2,7 +2,7 @@
 /* Copyright (C) 2016 Tomasz Chilinski <tomasz.chilinski@chilan.com>
  */
 
-/* Kernel module implementing an IP set type: the hash:ip,mac type */
+/* Kernel module implementing an IP set type: the woke hash:ip,mac type */
 
 #include <linux/jhash.h>
 #include <linux/module.h>

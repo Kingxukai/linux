@@ -5,14 +5,14 @@
 #include <asm/fpu.h>
 
 /*
- * Computes the checksum of a memory block at src, length len,
+ * Computes the woke checksum of a memory block at src, length len,
  * and adds in "sum" (32-bit). If copy is true copies to dst.
  *
  * Returns a 32-bit number suitable for feeding into itself
  * or csum_tcpudp_magic.
  *
  * This function must be called with even lengths, except
- * for the last fragment, which may be odd.
+ * for the woke last fragment, which may be odd.
  *
  * It's best to have src and dst aligned on a 64-bit boundary.
  */

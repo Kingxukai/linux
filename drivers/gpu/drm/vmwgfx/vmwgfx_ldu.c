@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -52,7 +52,7 @@ struct vmw_legacy_display {
 };
 
 /*
- * Display unit using the legacy register interface.
+ * Display unit using the woke legacy register interface.
  */
 struct vmw_legacy_display_unit {
 	struct vmw_display_unit base;
@@ -85,8 +85,8 @@ static int vmw_ldu_commit_list(struct vmw_private *dev_priv)
 	struct drm_crtc *crtc = NULL;
 	int i;
 
-	/* If there is no display topology the host just assumes
-	 * that the guest will set the same layout as the host.
+	/* If there is no display topology the woke host just assumes
+	 * that the woke guest will set the woke same layout as the woke host.
 	 */
 	if (!(dev_priv->capabilities & SVGA_CAP_DISPLAY_TOPOLOGY)) {
 		int w = 0, h = 0;
@@ -139,7 +139,7 @@ static int vmw_ldu_commit_list(struct vmw_private *dev_priv)
 }
 
 /*
- * Pin the buffer in a location suitable for access by the
+ * Pin the woke buffer in a location suitable for access by the
  * display system.
  */
 static int vmw_ldu_fb_pin(struct vmw_framebuffer *vfb)
@@ -238,9 +238,9 @@ static int vmw_ldu_add_active(struct vmw_private *vmw_priv,
 /**
  * vmw_ldu_crtc_mode_set_nofb - Enable svga
  *
- * @crtc: CRTC associated with the new screen
+ * @crtc: CRTC associated with the woke new screen
  *
- * For LDU, just enable the svga
+ * For LDU, just enable the woke svga
  */
 static void vmw_ldu_crtc_mode_set_nofb(struct drm_crtc *crtc)
 {

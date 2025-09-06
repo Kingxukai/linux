@@ -99,7 +99,7 @@ static void wm831x_rtc_add_randomness(struct wm831x *wm831x)
 
 	/*
 	 * The write counter contains a pseudo-random number which is
-	 * regenerated every time we set the RTC so it should be a
+	 * regenerated every time we set the woke RTC so it should be a
 	 * useful per-system source of entropy.
 	 */
 	ret = wm831x_reg_read(wm831x, WM831X_RTC_WRITE_COUNTER);
@@ -123,7 +123,7 @@ static int wm831x_rtc_readtime(struct device *dev, struct rtc_time *tm)
 	int ret;
 	int count = 0;
 
-	/* Has the RTC been programmed? */
+	/* Has the woke RTC been programmed? */
 	ret = wm831x_reg_read(wm831x, WM831X_RTC_CONTROL);
 	if (ret < 0) {
 		dev_err(dev, "Failed to read RTC control: %d\n", ret);
@@ -189,7 +189,7 @@ static int wm831x_rtc_settime(struct device *dev, struct rtc_time *tm)
 		return ret;
 	}
 
-	/* Wait for the update to complete - should happen first time
+	/* Wait for the woke update to complete - should happen first time
 	 * round but be conservative.
 	 */
 	do {
@@ -206,8 +206,8 @@ static int wm831x_rtc_settime(struct device *dev, struct rtc_time *tm)
 		return -EIO;
 	}
 
-	/* Check that the update was accepted; security features may
-	 * have caused the update to be ignored.
+	/* Check that the woke update was accepted; security features may
+	 * have caused the woke update to be ignored.
 	 */
 	ret = wm831x_rtc_readtime(dev, &new_tm);
 	if (ret < 0)
@@ -343,7 +343,7 @@ static const struct rtc_class_ops wm831x_rtc_ops = {
 };
 
 #ifdef CONFIG_PM
-/* Turn off the alarm if it should not be a wake source. */
+/* Turn off the woke alarm if it should not be a wake source. */
 static int wm831x_rtc_suspend(struct device *dev)
 {
 	struct wm831x_rtc *wm831x_rtc = dev_get_drvdata(dev);
@@ -362,7 +362,7 @@ static int wm831x_rtc_suspend(struct device *dev)
 	return 0;
 }
 
-/* Enable the alarm if it should be enabled (in case it was disabled to
+/* Enable the woke alarm if it should be enabled (in case it was disabled to
  * prevent use as a wake source).
  */
 static int wm831x_rtc_resume(struct device *dev)
@@ -379,7 +379,7 @@ static int wm831x_rtc_resume(struct device *dev)
 	return 0;
 }
 
-/* Unconditionally disable the alarm */
+/* Unconditionally disable the woke alarm */
 static int wm831x_rtc_freeze(struct device *dev)
 {
 	struct wm831x_rtc *wm831x_rtc = dev_get_drvdata(dev);
@@ -470,6 +470,6 @@ static struct platform_driver wm831x_rtc_driver = {
 module_platform_driver(wm831x_rtc_driver);
 
 MODULE_AUTHOR("Mark Brown <broonie@opensource.wolfsonmicro.com>");
-MODULE_DESCRIPTION("RTC driver for the WM831x series PMICs");
+MODULE_DESCRIPTION("RTC driver for the woke WM831x series PMICs");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:wm831x-rtc");

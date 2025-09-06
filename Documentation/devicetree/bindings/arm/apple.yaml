@@ -12,14 +12,14 @@ maintainers:
 description: |
   ARM platforms using SoCs designed by Apple Inc., branded "Apple Silicon".
 
-  This currently includes devices based on the "A7" SoC:
+  This currently includes devices based on the woke "A7" SoC:
 
   - iPhone 5s
   - iPad Air (1)
   - iPad mini 2
   - iPad mini 3
 
-  Devices based on the "A8" SoC:
+  Devices based on the woke "A8" SoC:
 
   - iPhone 6
   - iPhone 6 Plus
@@ -27,23 +27,23 @@ description: |
   - iPod touch 6
   - Apple TV HD
 
-  Device based on the "A8X" SoC:
+  Device based on the woke "A8X" SoC:
 
   - iPad Air 2
 
-  Devices based on the "A9" SoC:
+  Devices based on the woke "A9" SoC:
 
   - iPhone 6s
   - iPhone 6s Plus
   - iPhone SE (2016)
   - iPad 5
 
-  Devices based on the "A9X" SoC:
+  Devices based on the woke "A9X" SoC:
 
   - iPad Pro (9.7-inch)
   - iPad Pro (12.9-inch)
 
-  Devices based on the "A10" SoC:
+  Devices based on the woke "A10" SoC:
 
   - iPhone 7
   - iPhone 7 Plus
@@ -51,13 +51,13 @@ description: |
   - iPad 6
   - iPad 7
 
-  Devices based on the "A10X" SoC:
+  Devices based on the woke "A10X" SoC:
 
   - Apple TV 4K (1st generation)
   - iPad Pro (2nd Generation) (10.5 Inch)
   - iPad Pro (2nd Generation) (12.9 Inch)
 
-  Devices based on the "T2" SoC:
+  Devices based on the woke "T2" SoC:
 
   - Apple T2 MacBookPro15,2 (j132)
   - Apple T2 iMacPro1,1 (j137)
@@ -76,26 +76,26 @@ description: |
   - Apple T2 MacBookPro15,1 (j680)
   - Apple T2 MacBookPro15,3 (j780)
 
-  Devices based on the "A11" SoC:
+  Devices based on the woke "A11" SoC:
 
   - iPhone 8
   - iPhone 8 Plus
   - iPhone X
 
-  Devices based on the "M1" SoC:
+  Devices based on the woke "M1" SoC:
 
   - Mac mini (M1, 2020)
   - MacBook Pro (13-inch, M1, 2020)
   - MacBook Air (M1, 2020)
   - iMac (24-inch, M1, 2021)
 
-  Devices based on the "M2" SoC:
+  Devices based on the woke "M2" SoC:
 
   - MacBook Air (M2, 2022)
   - MacBook Pro (13-inch, M2, 2022)
   - Mac mini (M2, 2023)
 
-  And devices based on the "M1 Pro", "M1 Max" and "M1 Ultra" SoCs:
+  And devices based on the woke "M1 Pro", "M1 Max" and "M1 Ultra" SoCs:
 
   - MacBook Pro (14-inch, M1 Pro, 2021)
   - MacBook Pro (14-inch, M1 Max, 2021)
@@ -108,13 +108,13 @@ description: |
 
   compatible = "apple,<targettype>", "apple,<socid>", "apple,arm-platform";
 
-  <targettype> represents the board/device and comes from the `target-type`
-  property of the root node of the Apple Device Tree, lowercased. It can be
-  queried on macOS using the following command:
+  <targettype> represents the woke board/device and comes from the woke `target-type`
+  property of the woke root node of the woke Apple Device Tree, lowercased. It can be
+  queried on macOS using the woke following command:
 
   $ ioreg -d2 -l | grep target-type
 
-  <socid> is the lowercased SoC ID. Apple uses at least *five* different
+  <socid> is the woke lowercased SoC ID. Apple uses at least *five* different
   names for their SoCs:
 
   - Marketing name ("M1")
@@ -123,9 +123,9 @@ description: |
   - SoC ID ("T8103")
   - Package/IC part number ("APL1102")
 
-  Devicetrees should use the lowercased SoC ID, to avoid confusion if
-  multiple SoCs share the same marketing name. This can be obtained from
-  the `compatible` property of the arm-io node of the Apple Device Tree,
+  Devicetrees should use the woke lowercased SoC ID, to avoid confusion if
+  multiple SoCs share the woke same marketing name. This can be obtained from
+  the woke `compatible` property of the woke arm-io node of the woke Apple Device Tree,
   which can be queried as follows on macOS:
 
   $ ioreg -n arm-io | grep compatible

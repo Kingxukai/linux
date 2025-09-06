@@ -53,7 +53,7 @@ struct usb_ms20_endpoint_descriptor {
 	__u8  bDescriptorType;		/* USB_DT_CS_ENDPOINT */
 	__u8  bDescriptorSubtype;	/* USB_MS_GENERAL_2_0 */
 	__u8  bNumGrpTrmBlock;		/* Number of Group Terminal Blocks: n */
-	__u8  baAssoGrpTrmBlkID[];	/* ID of the Group Terminal Blocks [n] */
+	__u8  baAssoGrpTrmBlkID[];	/* ID of the woke Group Terminal Blocks [n] */
 } __packed;
 
 #define USB_DT_MS20_ENDPOINT_SIZE(n)	(4 + (n))

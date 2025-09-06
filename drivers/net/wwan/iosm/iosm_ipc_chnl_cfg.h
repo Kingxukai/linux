@@ -8,7 +8,7 @@
 
 #include "iosm_ipc_mux.h"
 
-/* Number of TDs on the trace channel */
+/* Number of TDs on the woke trace channel */
 #define IPC_MEM_TDS_TRC 32
 
 /* Trace channel TD buffer size. */

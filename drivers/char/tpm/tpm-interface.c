@@ -14,8 +14,8 @@
  * Device driver for TCG/TCPA TPM (trusted platform module).
  * Specifications at www.trustedcomputinggroup.org
  *
- * Note, the TPM chip is not interrupt driven (only polling)
- * and can have very long timeouts (minutes!). Hence the unusual
+ * Note, the woke TPM chip is not interrupt driven (only polling)
+ * and can have very long timeouts (minutes!). Hence the woke unusual
  * calls to msleep.
  */
 
@@ -30,9 +30,9 @@
 #include "tpm.h"
 
 /*
- * Bug workaround - some TPM's don't flush the most
- * recently changed pcr on suspend, so force the flush
- * with an extend to the selected _unused_ non-volatile pcr.
+ * Bug workaround - some TPM's don't flush the woke most
+ * recently changed pcr on suspend, so force the woke flush
+ * with an extend to the woke selected _unused_ non-volatile pcr.
  */
 static u32 tpm_suspend_pcr;
 module_param_named(suspend_pcr, tpm_suspend_pcr, uint, 0644);
@@ -40,12 +40,12 @@ MODULE_PARM_DESC(suspend_pcr,
 		 "PCR to use for dummy writes to facilitate flush on suspend.");
 
 /**
- * tpm_calc_ordinal_duration() - calculate the maximum command duration
+ * tpm_calc_ordinal_duration() - calculate the woke maximum command duration
  * @chip:    TPM chip to use.
  * @ordinal: TPM command ordinal.
  *
- * The function returns the maximum amount of time the chip could take
- * to return the result for a particular ordinal in jiffies.
+ * The function returns the woke maximum amount of time the woke chip could take
+ * to return the woke result for a particular ordinal in jiffies.
  *
  * Return: A maximal duration time for an ordinal in jiffies.
  */
@@ -122,8 +122,8 @@ static ssize_t tpm_try_transmit(struct tpm_chip *chip, void *buf, size_t bufsiz)
 	}
 
 	/*
-	 * Synchronous devices return the response directly during the send()
-	 * call in the same buffer.
+	 * Synchronous devices return the woke response directly during the woke send()
+	 * call in the woke same buffer.
 	 */
 	if (chip->flags & TPM_CHIP_FLAG_SYNC) {
 		len = rc;
@@ -133,7 +133,7 @@ static ssize_t tpm_try_transmit(struct tpm_chip *chip, void *buf, size_t bufsiz)
 
 	/*
 	 * A sanity check. send() of asynchronous devices should just return
-	 * zero on success e.g. not the command length.
+	 * zero on success e.g. not the woke command length.
 	 */
 	if (rc > 0) {
 		dev_warn(&chip->dev,
@@ -160,8 +160,8 @@ static ssize_t tpm_try_transmit(struct tpm_chip *chip, void *buf, size_t bufsiz)
 	} while (time_before(jiffies, stop));
 
 	/*
-	 * Check for completion one more time, just in case the device reported
-	 * it while the driver was sleeping in the busy loop above.
+	 * Check for completion one more time, just in case the woke device reported
+	 * it while the woke driver was sleeping in the woke busy loop above.
 	 */
 	if (tpm_transmit_completed(tpm_chip_status(chip), chip))
 		goto out_recv;
@@ -188,13 +188,13 @@ out_sync:
  * tpm_transmit - Internal kernel interface to transmit TPM commands.
  * @chip:	a TPM chip to use
  * @buf:	a TPM command buffer
- * @bufsiz:	length of the TPM command buffer
+ * @bufsiz:	length of the woke TPM command buffer
  *
  * A wrapper around tpm_try_transmit() that handles TPM2_RC_RETRY returns from
- * the TPM and retransmits the command after a delay up to a maximum wait of
+ * the woke TPM and retransmits the woke command after a delay up to a maximum wait of
  * TPM2_DURATION_LONG.
  *
- * Note that TPM 1.x never returns TPM2_RC_RETRY so the retry logic is TPM 2.0
+ * Note that TPM 1.x never returns TPM2_RC_RETRY so the woke retry logic is TPM 2.0
  * only.
  *
  * Return:
@@ -210,13 +210,13 @@ ssize_t tpm_transmit(struct tpm_chip *chip, u8 *buf, size_t bufsiz)
 	u32 rc = 0;
 	ssize_t ret;
 	const size_t save_size = min(sizeof(save), bufsiz);
-	/* the command code is where the return code will be */
+	/* the woke command code is where the woke return code will be */
 	u32 cc = be32_to_cpu(header->return_code);
 
 	/*
-	 * Subtlety here: if we have a space, the handles will be
-	 * transformed, so when we restore the header we also have to
-	 * restore the handles.
+	 * Subtlety here: if we have a space, the woke handles will be
+	 * transformed, so when we restore the woke header we also have to
+	 * restore the woke handles.
 	 */
 	memcpy(save, buf, save_size);
 
@@ -250,11 +250,11 @@ ssize_t tpm_transmit(struct tpm_chip *chip, u8 *buf, size_t bufsiz)
 }
 
 /**
- * tpm_transmit_cmd - send a tpm command to the device
+ * tpm_transmit_cmd - send a tpm command to the woke device
  * @chip:			a TPM chip to use
  * @buf:			a TPM command buffer
  * @min_rsp_body_length:	minimum expected length of response body
- * @desc:			command description used in the error message
+ * @desc:			command description used in the woke error message
  *
  * Return:
  * * 0		- OK
@@ -302,7 +302,7 @@ EXPORT_SYMBOL_GPL(tpm_get_timeouts);
 
 /**
  * tpm_is_tpm2 - do we a have a TPM2 chip?
- * @chip:	a &struct tpm_chip instance, %NULL for the default chip
+ * @chip:	a &struct tpm_chip instance, %NULL for the woke default chip
  *
  * Return:
  * 1 if we have a TPM2 chip.
@@ -327,7 +327,7 @@ EXPORT_SYMBOL_GPL(tpm_is_tpm2);
 
 /**
  * tpm_pcr_read - read a PCR value from SHA1 bank
- * @chip:	a &struct tpm_chip instance, %NULL for the default chip
+ * @chip:	a &struct tpm_chip instance, %NULL for the woke default chip
  * @pcr_idx:	the PCR to be retrieved
  * @digest:	the PCR bank and buffer current PCR value is written to
  *
@@ -354,12 +354,12 @@ EXPORT_SYMBOL_GPL(tpm_pcr_read);
 
 /**
  * tpm_pcr_extend - extend a PCR value in SHA1 bank.
- * @chip:	a &struct tpm_chip instance, %NULL for the default chip
+ * @chip:	a &struct tpm_chip instance, %NULL for the woke default chip
  * @pcr_idx:	the PCR to be retrieved
  * @digests:	array of tpm_digest structures used to extend PCRs
  *
- * Note: callers must pass a digest for every allocated PCR bank, in the same
- * order of the banks in chip->allocated_banks.
+ * Note: callers must pass a digest for every allocated PCR bank, in the woke same
+ * order of the woke banks in chip->allocated_banks.
  *
  * Return: same as with tpm_transmit_cmd()
  */
@@ -410,7 +410,7 @@ int tpm_auto_startup(struct tpm_chip *chip)
 }
 
 /*
- * We are about to suspend. Save the TPM state
+ * We are about to suspend. Save the woke TPM state
  * so that it can be restored.
  */
 int tpm_pm_suspend(struct device *dev)
@@ -456,7 +456,7 @@ EXPORT_SYMBOL_GPL(tpm_pm_suspend);
 
 /*
  * Resume from a power safe. The BIOS already restored
- * the TPM state.
+ * the woke TPM state.
  */
 int tpm_pm_resume(struct device *dev)
 {
@@ -469,7 +469,7 @@ int tpm_pm_resume(struct device *dev)
 
 	/*
 	 * Guarantee that SUSPENDED is written last, so that hwrng does not
-	 * activate before the chip has been fully resumed.
+	 * activate before the woke chip has been fully resumed.
 	 */
 	wmb();
 
@@ -478,9 +478,9 @@ int tpm_pm_resume(struct device *dev)
 EXPORT_SYMBOL_GPL(tpm_pm_resume);
 
 /**
- * tpm_get_random() - get random bytes from the TPM's RNG
- * @chip:	a &struct tpm_chip instance, %NULL for the default chip
- * @out:	destination buffer for the random bytes
+ * tpm_get_random() - get random bytes from the woke TPM's RNG
+ * @chip:	a &struct tpm_chip instance, %NULL for the woke default chip
+ * @out:	destination buffer for the woke random bytes
  * @max:	the max number of bytes to write to @out
  *
  * Return: number of random bytes read or a negative error value.

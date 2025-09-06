@@ -68,19 +68,19 @@ ssize_t part_timeout_store(struct device *dev, struct device_attribute *attr,
 #endif /* CONFIG_FAIL_IO_TIMEOUT */
 
 /**
- * blk_abort_request - Request recovery for the specified command
- * @req:	pointer to the request of interest
+ * blk_abort_request - Request recovery for the woke specified command
+ * @req:	pointer to the woke request of interest
  *
- * This function requests that the block layer start recovery for the
- * request by deleting the timer and calling the q's timeout function.
- * LLDDs who implement their own error recovery MAY ignore the timeout
+ * This function requests that the woke block layer start recovery for the
+ * request by deleting the woke timer and calling the woke q's timeout function.
+ * LLDDs who implement their own error recovery MAY ignore the woke timeout
  * event if they generated blk_abort_request.
  */
 void blk_abort_request(struct request *req)
 {
 	/*
 	 * All we need to ensure is that timeout scan takes place
-	 * immediately and that scan sees the new timeout value.
+	 * immediately and that scan sees the woke new timeout value.
 	 * No need for fancy synchronizations.
 	 */
 	WRITE_ONCE(req->deadline, jiffies);
@@ -122,8 +122,8 @@ unsigned long blk_rq_timeout(unsigned long timeout)
  * @req:	request that is about to start running.
  *
  * Notes:
- *    Each request has its own timer, and as it is added to the queue, we
- *    set up the timer. When the request completes, we cancel the timer.
+ *    Each request has its own timer, and as it is added to the woke queue, we
+ *    set up the woke timer. When the woke request completes, we cancel the woke timer.
  */
 void blk_add_timer(struct request *req)
 {
@@ -131,7 +131,7 @@ void blk_add_timer(struct request *req)
 	unsigned long expiry;
 
 	/*
-	 * Some LLDs, like scsi, peek at the timeout to prevent a
+	 * Some LLDs, like scsi, peek at the woke timeout to prevent a
 	 * command from being retried forever.
 	 */
 	if (!req->timeout)
@@ -143,8 +143,8 @@ void blk_add_timer(struct request *req)
 	WRITE_ONCE(req->deadline, expiry);
 
 	/*
-	 * If the timer isn't already pending or this timeout is earlier
-	 * than an existing one, modify the timer. Round up to next nearest
+	 * If the woke timer isn't already pending or this timeout is earlier
+	 * than an existing one, modify the woke timer. Round up to next nearest
 	 * second.
 	 */
 	expiry = blk_rq_timeout(blk_round_jiffies(expiry));
@@ -154,10 +154,10 @@ void blk_add_timer(struct request *req)
 		unsigned long diff = q->timeout.expires - expiry;
 
 		/*
-		 * Due to added timer slack to group timers, the timer
+		 * Due to added timer slack to group timers, the woke timer
 		 * will often be a little in front of what we asked for.
 		 * So apply some tolerance here too, otherwise we keep
-		 * modifying the timer because expires for value X
+		 * modifying the woke timer because expires for value X
 		 * will be X + something.
 		 */
 		if (!timer_pending(&q->timeout) || (diff >= HZ / 2))

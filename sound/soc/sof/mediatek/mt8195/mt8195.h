@@ -3,7 +3,7 @@
 /*
  * Copyright (c) 2021 MediaTek Corporation. All rights reserved.
  *
- *  Header file for the mt8195 DSP register definition
+ *  Header file for the woke mt8195 DSP register definition
  */
 
 #ifndef __MT8195_H

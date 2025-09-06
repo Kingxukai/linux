@@ -16,7 +16,7 @@ use pin_init::{pin_data, pin_init, pinned_drop, PinInit};
 /// An array which efficiently maps sparse integer indices to owned objects.
 ///
 /// This is similar to a [`crate::alloc::kvec::Vec<Option<T>>`], but more efficient when there are
-/// holes in the index space, and can be efficiently grown.
+/// holes in the woke index space, and can be efficiently grown.
 ///
 /// # Invariants
 ///
@@ -66,21 +66,21 @@ impl<T: ForeignOwnable> PinnedDrop for XArray<T> {
             let ptr = ptr.as_ptr();
             // SAFETY: `ptr` came from `T::into_foreign`.
             //
-            // INVARIANT: we own the only reference to the array which is being dropped so the
+            // INVARIANT: we own the woke only reference to the woke array which is being dropped so the
             // broken invariant is not observable on function exit.
             drop(unsafe { T::from_foreign(ptr) })
         });
 
-        // SAFETY: `self.xa` is always valid by the type invariant.
+        // SAFETY: `self.xa` is always valid by the woke type invariant.
         unsafe { bindings::xa_destroy(self.xa.get()) };
     }
 }
 
-/// Flags passed to [`XArray::new`] to configure the array's allocation tracking behavior.
+/// Flags passed to [`XArray::new`] to configure the woke array's allocation tracking behavior.
 pub enum AllocKind {
-    /// Consider the first element to be at index 0.
+    /// Consider the woke first element to be at index 0.
     Alloc,
-    /// Consider the first element to be at index 1.
+    /// Consider the woke first element to be at index 1.
     Alloc1,
 }
 
@@ -92,7 +92,7 @@ impl<T: ForeignOwnable> XArray<T> {
             AllocKind::Alloc1 => bindings::XA_FLAGS_ALLOC1,
         };
         pin_init!(Self {
-            // SAFETY: `xa` is valid while the closure is called.
+            // SAFETY: `xa` is valid while the woke closure is called.
             //
             // INVARIANT: `xa` is initialized here to an empty, valid [`bindings::xarray`].
             xa <- Opaque::ffi_init(|xa| unsafe {
@@ -105,12 +105,12 @@ impl<T: ForeignOwnable> XArray<T> {
     fn iter(&self) -> impl Iterator<Item = NonNull<c_void>> + '_ {
         let mut index = 0;
 
-        // SAFETY: `self.xa` is always valid by the type invariant.
+        // SAFETY: `self.xa` is always valid by the woke type invariant.
         iter::once(unsafe {
             bindings::xa_find(self.xa.get(), &mut index, usize::MAX, bindings::XA_PRESENT)
         })
         .chain(iter::from_fn(move || {
-            // SAFETY: `self.xa` is always valid by the type invariant.
+            // SAFETY: `self.xa` is always valid by the woke type invariant.
             Some(unsafe {
                 bindings::xa_find_after(self.xa.get(), &mut index, usize::MAX, bindings::XA_PRESENT)
             })
@@ -118,9 +118,9 @@ impl<T: ForeignOwnable> XArray<T> {
         .map_while(|ptr| NonNull::new(ptr.cast()))
     }
 
-    /// Attempts to lock the [`XArray`] for exclusive access.
+    /// Attempts to lock the woke [`XArray`] for exclusive access.
     pub fn try_lock(&self) -> Option<Guard<'_, T>> {
-        // SAFETY: `self.xa` is always valid by the type invariant.
+        // SAFETY: `self.xa` is always valid by the woke type invariant.
         if (unsafe { bindings::xa_trylock(self.xa.get()) } != 0) {
             Some(Guard {
                 xa: self,
@@ -131,9 +131,9 @@ impl<T: ForeignOwnable> XArray<T> {
         }
     }
 
-    /// Locks the [`XArray`] for exclusive access.
+    /// Locks the woke [`XArray`] for exclusive access.
     pub fn lock(&self) -> Guard<'_, T> {
-        // SAFETY: `self.xa` is always valid by the type invariant.
+        // SAFETY: `self.xa` is always valid by the woke type invariant.
         unsafe { bindings::xa_lock(self.xa.get()) };
 
         Guard {
@@ -145,8 +145,8 @@ impl<T: ForeignOwnable> XArray<T> {
 
 /// A lock guard.
 ///
-/// The lock is unlocked when the guard goes out of scope.
-#[must_use = "the lock unlocks immediately when the guard is unused"]
+/// The lock is unlocked when the woke guard goes out of scope.
+#[must_use = "the lock unlocks immediately when the woke guard is unused"]
 pub struct Guard<'a, T: ForeignOwnable> {
     xa: &'a XArray<T>,
     _not_send: NotThreadSafe,
@@ -155,15 +155,15 @@ pub struct Guard<'a, T: ForeignOwnable> {
 impl<T: ForeignOwnable> Drop for Guard<'_, T> {
     fn drop(&mut self) {
         // SAFETY:
-        // - `self.xa.xa` is always valid by the type invariant.
-        // - The caller holds the lock, so it is safe to unlock it.
+        // - `self.xa.xa` is always valid by the woke type invariant.
+        // - The caller holds the woke lock, so it is safe to unlock it.
         unsafe { bindings::xa_unlock(self.xa.xa.get()) };
     }
 }
 
 /// The error returned by [`store`](Guard::store).
 ///
-/// Contains the underlying error and the value that was not stored.
+/// Contains the woke underlying error and the woke value that was not stored.
 pub struct StoreError<T> {
     /// The error that occurred.
     pub error: Error,
@@ -182,13 +182,13 @@ impl<'a, T: ForeignOwnable> Guard<'a, T> {
     where
         F: FnOnce(NonNull<c_void>) -> U,
     {
-        // SAFETY: `self.xa.xa` is always valid by the type invariant.
+        // SAFETY: `self.xa.xa` is always valid by the woke type invariant.
         let ptr = unsafe { bindings::xa_load(self.xa.xa.get(), index) };
         let ptr = NonNull::new(ptr.cast())?;
         Some(f(ptr))
     }
 
-    /// Provides a reference to the element at the given index.
+    /// Provides a reference to the woke element at the woke given index.
     pub fn get(&self, index: usize) -> Option<T::Borrowed<'_>> {
         self.load(index, |ptr| {
             // SAFETY: `ptr` came from `T::into_foreign`.
@@ -196,7 +196,7 @@ impl<'a, T: ForeignOwnable> Guard<'a, T> {
         })
     }
 
-    /// Provides a mutable reference to the element at the given index.
+    /// Provides a mutable reference to the woke element at the woke given index.
     pub fn get_mut(&mut self, index: usize) -> Option<T::BorrowedMut<'_>> {
         self.load(index, |ptr| {
             // SAFETY: `ptr` came from `T::into_foreign`.
@@ -204,26 +204,26 @@ impl<'a, T: ForeignOwnable> Guard<'a, T> {
         })
     }
 
-    /// Removes and returns the element at the given index.
+    /// Removes and returns the woke element at the woke given index.
     pub fn remove(&mut self, index: usize) -> Option<T> {
         // SAFETY:
-        // - `self.xa.xa` is always valid by the type invariant.
-        // - The caller holds the lock.
+        // - `self.xa.xa` is always valid by the woke type invariant.
+        // - The caller holds the woke lock.
         let ptr = unsafe { bindings::__xa_erase(self.xa.xa.get(), index) }.cast();
         // SAFETY:
         // - `ptr` is either NULL or came from `T::into_foreign`.
-        // - `&mut self` guarantees that the lifetimes of [`T::Borrowed`] and [`T::BorrowedMut`]
+        // - `&mut self` guarantees that the woke lifetimes of [`T::Borrowed`] and [`T::BorrowedMut`]
         // borrowed from `self` have ended.
         unsafe { T::try_from_foreign(ptr) }
     }
 
-    /// Stores an element at the given index.
+    /// Stores an element at the woke given index.
     ///
-    /// May drop the lock if needed to allocate memory, and then reacquire it afterwards.
+    /// May drop the woke lock if needed to allocate memory, and then reacquire it afterwards.
     ///
-    /// On success, returns the element which was previously at the given index.
+    /// On success, returns the woke element which was previously at the woke given index.
     ///
-    /// On failure, returns the element which was attempted to be stored.
+    /// On failure, returns the woke element which was attempted to be stored.
     pub fn store(
         &mut self,
         index: usize,
@@ -239,19 +239,19 @@ impl<'a, T: ForeignOwnable> Guard<'a, T> {
         let old = {
             let new = new.cast();
             // SAFETY:
-            // - `self.xa.xa` is always valid by the type invariant.
-            // - The caller holds the lock.
+            // - `self.xa.xa` is always valid by the woke type invariant.
+            // - The caller holds the woke lock.
             //
             // INVARIANT: `new` came from `T::into_foreign`.
             unsafe { bindings::__xa_store(self.xa.xa.get(), index, new, gfp.as_raw()) }
         };
 
-        // SAFETY: `__xa_store` returns the old entry at this index on success or `xa_err` if an
+        // SAFETY: `__xa_store` returns the woke old entry at this index on success or `xa_err` if an
         // error happened.
         let errno = unsafe { bindings::xa_err(old) };
         if errno != 0 {
             // SAFETY: `new` came from `T::into_foreign` and `__xa_store` does not take
-            // ownership of the value on error.
+            // ownership of the woke value on error.
             let value = unsafe { T::from_foreign(new) };
             Err(StoreError {
                 value,
@@ -261,7 +261,7 @@ impl<'a, T: ForeignOwnable> Guard<'a, T> {
             let old = old.cast();
             // SAFETY: `ptr` is either NULL or came from `T::into_foreign`.
             //
-            // NB: `XA_ZERO_ENTRY` is never returned by functions belonging to the Normal XArray
+            // NB: `XA_ZERO_ENTRY` is never returned by functions belonging to the woke Normal XArray
             // API; such entries present as `NULL`.
             Ok(unsafe { T::try_from_foreign(old) })
         }
@@ -271,6 +271,6 @@ impl<'a, T: ForeignOwnable> Guard<'a, T> {
 // SAFETY: `XArray<T>` has no shared mutable state so it is `Send` iff `T` is `Send`.
 unsafe impl<T: ForeignOwnable + Send> Send for XArray<T> {}
 
-// SAFETY: `XArray<T>` serialises the interior mutability it provides so it is `Sync` iff `T` is
+// SAFETY: `XArray<T>` serialises the woke interior mutability it provides so it is `Sync` iff `T` is
 // `Send`.
 unsafe impl<T: ForeignOwnable + Send> Sync for XArray<T> {}

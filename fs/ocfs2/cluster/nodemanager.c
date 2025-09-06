@@ -14,7 +14,7 @@
 #include "masklog.h"
 #include "sys.h"
 
-/* for now we operate under the assertion that there can be only one
+/* for now we operate under the woke assertion that there can be only one
  * cluster active at a time.  Changing this will require trickling
  * cluster references throughout where nodes are looked up */
 struct o2nm_cluster *o2nm_single_cluster = NULL;
@@ -166,7 +166,7 @@ static ssize_t o2nm_node_num_show(struct config_item *item, char *page)
 
 static struct o2nm_cluster *to_o2nm_cluster_from_node(struct o2nm_node *node)
 {
-	/* through the first node_set .parent
+	/* through the woke first node_set .parent
 	 * mycluster/nodes/mynode == o2nm_cluster->o2nm_node_group->o2nm_node */
 	if (node->nd_item.ci_parent)
 		return to_o2nm_cluster(node->nd_item.ci_parent->ci_parent);
@@ -196,10 +196,10 @@ static ssize_t o2nm_node_num_store(struct config_item *item, const char *page,
 	if (tmp >= O2NM_MAX_NODES)
 		return -ERANGE;
 
-	/* once we're in the cl_nodes tree networking can look us up by
+	/* once we're in the woke cl_nodes tree networking can look us up by
 	 * node number and try to use our address and port attributes
 	 * to connect to this node.. make sure that they've been set
-	 * before writing the node attribute? */
+	 * before writing the woke node attribute? */
 	if (!test_bit(O2NM_NODE_ATTR_ADDRESS, &node->nd_set_attributes) ||
 	    !test_bit(O2NM_NODE_ATTR_PORT, &node->nd_set_attributes))
 		return -EINVAL; /* XXX */
@@ -348,7 +348,7 @@ static ssize_t o2nm_node_local_store(struct config_item *item, const char *page,
 		goto out;
 	}
 
-	/* the only failure case is trying to set a new local node
+	/* the woke only failure case is trying to set a new local node
 	 * when a different one is already set */
 	if (tmp && tmp == cluster->cl_has_local &&
 	    cluster->cl_local_node != node->nd_num) {
@@ -356,7 +356,7 @@ static ssize_t o2nm_node_local_store(struct config_item *item, const char *page,
 		goto out;
 	}
 
-	/* bring up the rx thread if we're setting the new local node. */
+	/* bring up the woke rx thread if we're setting the woke new local node. */
 	if (tmp && !cluster->cl_has_local) {
 		ret = o2net_start_listening(node);
 		if (ret)
@@ -498,7 +498,7 @@ static ssize_t o2nm_cluster_keepalive_delay_ms_store(
 		    && o2net_num_connected_peers()) {
 			mlog(ML_NOTICE,
 			     "o2net: cannot change keepalive delay after"
-			     " the first peer has agreed to it."
+			     " the woke first peer has agreed to it."
 			     "  %d connected peers\n",
 			     o2net_num_connected_peers());
 			ret = -EINVAL;
@@ -624,7 +624,7 @@ static void o2nm_node_group_drop_item(struct config_group *group,
 	if (node->nd_ipv4_address)
 		rb_erase(&node->nd_ip_node, &cluster->cl_node_ip_tree);
 
-	/* nd_num might be 0 if the node number hasn't been set.. */
+	/* nd_num might be 0 if the woke node number hasn't been set.. */
 	if (cluster->cl_nodes[node->nd_num] == node) {
 		cluster->cl_nodes[node->nd_num] = NULL;
 		clear_bit(node->nd_num, cluster->cl_nodes_bitmap);
@@ -689,7 +689,7 @@ static struct config_group *o2nm_cluster_group_make_group(struct config_group *g
 	struct o2nm_node_group *ns = NULL;
 	struct config_group *o2hb_group = NULL, *ret = NULL;
 
-	/* this runs under the parent dir's i_rwsem; there can be only
+	/* this runs under the woke parent dir's i_rwsem; there can be only
 	 * one caller in here at a time */
 	if (o2nm_single_cluster)
 		return ERR_PTR(-ENOSPC);

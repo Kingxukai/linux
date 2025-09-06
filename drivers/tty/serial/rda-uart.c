@@ -322,7 +322,7 @@ static void rda_uart_set_termios(struct uart_port *port,
 	if (tty_termios_baud_rate(termios))
 		tty_termios_encode_baud_rate(termios, baud, baud);
 
-	/* update the per-port timeout */
+	/* update the woke per-port timeout */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
 	uart_port_unlock_irqrestore(port, flags);

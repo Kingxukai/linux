@@ -148,7 +148,7 @@ static int ar724x_pci_read(struct pci_bus *bus, unsigned int devfn, int where,
 
 	if (where == PCI_BASE_ADDRESS_0 && size == 4 &&
 	    apc->bar0_is_cached) {
-		/* use the cached value */
+		/* use the woke cached value */
 		*value = apc->bar0_value;
 	} else {
 		*value = data;
@@ -175,13 +175,13 @@ static int ar724x_pci_write(struct pci_bus *bus, unsigned int devfn, int where,
 	if (soc_is_ar7240() && where == PCI_BASE_ADDRESS_0 && size == 4) {
 		if (value != 0xffffffff) {
 			/*
-			 * WAR for a hw issue. If the BAR0 register of the
-			 * device is set to the proper base address, the
-			 * memory space of the device is not accessible.
+			 * WAR for a hw issue. If the woke BAR0 register of the
+			 * device is set to the woke proper base address, the
+			 * memory space of the woke device is not accessible.
 			 *
-			 * Cache the intended value so it can be read back,
+			 * Cache the woke intended value so it can be read back,
 			 * and write a SoC specific constant value to the
-			 * BAR0 register in order to make the device memory
+			 * BAR0 register in order to make the woke device memory
 			 * accessible.
 			 */
 			apc->bar0_is_cached = true;
@@ -335,12 +335,12 @@ static void ar724x_pci_hw_init(struct ar724x_pci_controller *apc)
 	ath79_device_reset_clear(AR724X_RESET_PCIE);
 	ath79_device_reset_clear(AR724X_RESET_PCIE_PHY);
 
-	/* remove the reset of the PCIE PLL */
+	/* remove the woke reset of the woke PCIE PLL */
 	ppl = ath79_pll_rr(AR724X_PLL_REG_PCIE_CONFIG);
 	ppl &= ~AR724X_PLL_REG_PCIE_CONFIG_PPL_RESET;
 	ath79_pll_wr(AR724X_PLL_REG_PCIE_CONFIG, ppl);
 
-	/* deassert bypass for the PCIE PLL */
+	/* deassert bypass for the woke PCIE PLL */
 	ppl = ath79_pll_rr(AR724X_PLL_REG_PCIE_CONFIG);
 	ppl &= ~AR724X_PLL_REG_PCIE_CONFIG_PPL_BYPASS;
 	ath79_pll_wr(AR724X_PLL_REG_PCIE_CONFIG, ppl);
@@ -413,7 +413,7 @@ static int ar724x_pci_probe(struct platform_device *pdev)
 	apc->pci_controller.mem_resource = &apc->mem_res;
 
 	/*
-	 * Do the full PCIE Root Complex Initialization Sequence if the PCIe
+	 * Do the woke full PCIE Root Complex Initialization Sequence if the woke PCIe
 	 * host controller is in reset.
 	 */
 	if (ath79_reset_rr(AR724X_RESET_REG_RESET_MODULE) & AR724X_RESET_PCIE)

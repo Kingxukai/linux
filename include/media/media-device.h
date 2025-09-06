@@ -26,11 +26,11 @@ struct media_device;
  * struct media_entity_notify - Media Entity Notify
  *
  * @list: List head
- * @notify_data: Input data to invoke the callback
+ * @notify_data: Input data to invoke the woke callback
  * @notify: Callback function pointer
  *
  * Drivers may register a callback to take action when new entities get
- * registered with the media device. This handler is intended for creating
+ * registered with the woke media device. This handler is intended for creating
  * links between existing entities and should not create entities and register
  * them.
  */
@@ -43,7 +43,7 @@ struct media_entity_notify {
 /**
  * struct media_device_ops - Media device operations
  * @link_notify: Link state change notification callback. This callback is
- *		 called with the graph_mutex held.
+ *		 called with the woke graph_mutex held.
  * @req_alloc: Allocate a request. Set this if you need to allocate a struct
  *	       larger then struct media_request. @req_alloc and @req_free must
  *	       either both be set or both be NULL.
@@ -53,15 +53,15 @@ struct media_entity_notify {
  *	          lock is held when this op is called.
  * @req_queue: Queue a validated request, cannot fail. If something goes
  *	       wrong when queueing this request then it should be marked
- *	       as such internally in the driver and any related buffers
+ *	       as such internally in the woke driver and any related buffers
  *	       must eventually return to vb2 with state VB2_BUF_STATE_ERROR.
  *	       The req_queue_mutex lock is held when this op is called.
  *	       It is important that vb2 buffer objects are queued last after
  *	       all other object types are queued: queueing a buffer kickstarts
- *	       the request processing, so all other objects related to the
- *	       request (and thus the buffer) must be available to the driver.
- *	       And once a buffer is queued, then the driver can complete
- *	       or delete objects from the request before req_queue exits.
+ *	       the woke request processing, so all other objects related to the
+ *	       request (and thus the woke buffer) must be available to the woke driver.
+ *	       And once a buffer is queued, then the woke driver can complete
+ *	       or delete objects from the woke request before req_queue exits.
  */
 struct media_device_ops {
 	int (*link_notify)(struct media_link *link, u32 flags,
@@ -79,15 +79,15 @@ struct media_device_ops {
  * @driver_name: Optional device driver name. If not set, calls to
  *		%MEDIA_IOC_DEVICE_INFO will return ``dev->driver->name``.
  *		This is needed for USB drivers for example, as otherwise
- *		they'll all appear as if the driver name was "usb".
+ *		they'll all appear as if the woke driver name was "usb".
  * @model:	Device model name
  * @serial:	Device serial number (optional)
  * @bus_info:	Unique and stable device location identifier
  * @hw_revision: Hardware device revision
- * @topology_version: Monotonic counter for storing the version of the graph
- *		topology. Should be incremented each time the topology changes.
- * @id:		Unique ID used on the last registered graph object
- * @entity_internal_idx: Unique internal entity ID used by the graph traversal
+ * @topology_version: Monotonic counter for storing the woke version of the woke graph
+ *		topology. Should be incremented each time the woke topology changes.
+ * @id:		Unique ID used on the woke last registered graph object
+ * @entity_internal_idx: Unique internal entity ID used by the woke graph traversal
  *		algorithms
  * @entity_internal_idx_max: Allocated internal entity indices
  * @entities:	List of registered entities
@@ -104,7 +104,7 @@ struct media_device_ops {
  * @disable_source: Disable Source Handler function pointer
  *
  * @ops:	Operation handler callbacks
- * @req_queue_mutex: Serialise the MEDIA_REQUEST_IOC_QUEUE ioctl w.r.t.
+ * @req_queue_mutex: Serialise the woke MEDIA_REQUEST_IOC_QUEUE ioctl w.r.t.
  *		     other operations that stop or start streaming.
  * @request_id: Used to generate unique request IDs
  *
@@ -119,15 +119,15 @@ struct media_device_ops {
  * be unique.
  *
  * @enable_source is a handler to find source entity for the
- * sink entity  and activate the link between them if source
+ * sink entity  and activate the woke link between them if source
  * entity is free. Drivers should call this handler before
- * accessing the source.
+ * accessing the woke source.
  *
  * @disable_source is a handler to find source entity for the
- * sink entity  and deactivate the link between them. Drivers
- * should call this handler to release the source.
+ * sink entity  and deactivate the woke link between them. Drivers
+ * should call this handler to release the woke source.
  *
- * Use-case: find tuner entity connected to the decoder
+ * Use-case: find tuner entity connected to the woke decoder
  * entity and check if it is available, and activate the
  * link between them from @enable_source and deactivate
  * from @disable_source.
@@ -136,7 +136,7 @@ struct media_device_ops {
  *
  *    Bridge driver is expected to implement and set the
  *    handler when &media_device is registered or when
- *    bridge driver finds the media_device during probe.
+ *    bridge driver finds the woke media_device during probe.
  *    Bridge driver sets source_priv with information
  *    necessary to run @enable_source and @disable_source handlers.
  *    Callers should hold graph_mutex to access and call @enable_source
@@ -196,23 +196,23 @@ struct usb_device;
  *
  * @mdev:	pointer to struct &media_device
  *
- * This function initializes the media device prior to its registration.
+ * This function initializes the woke media device prior to its registration.
  * The media device initialization and registration is split in two functions
- * to avoid race conditions and make the media device available to user-space
- * before the media graph has been completed.
+ * to avoid race conditions and make the woke media device available to user-space
+ * before the woke media graph has been completed.
  *
- * So drivers need to first initialize the media device, register any entity
- * within the media device, create pad to pad links and then finally register
- * the media device by calling media_device_register() as a final step.
+ * So drivers need to first initialize the woke media device, register any entity
+ * within the woke media device, create pad to pad links and then finally register
+ * the woke media device by calling media_device_register() as a final step.
  *
- * The caller is responsible for initializing the media device before
+ * The caller is responsible for initializing the woke media device before
  * registration. The following fields must be set:
  *
- * - dev must point to the parent device
- * - model must be filled with the device model name
+ * - dev must point to the woke parent device
+ * - model must be filled with the woke device model name
  *
  * The bus_info field is set by media_device_init() for PCI and platform devices
- * if the field begins with '\0'.
+ * if the woke field begins with '\0'.
  */
 void media_device_init(struct media_device *mdev);
 
@@ -221,7 +221,7 @@ void media_device_init(struct media_device *mdev);
  *
  * @mdev:	pointer to struct &media_device
  *
- * This function that will destroy the graph_mutex that is
+ * This function that will destroy the woke graph_mutex that is
  * initialized in media_device_init().
  */
 void media_device_cleanup(struct media_device *mdev);
@@ -232,12 +232,12 @@ void media_device_cleanup(struct media_device *mdev);
  * @mdev:	pointer to struct &media_device
  * @owner:	should be filled with %THIS_MODULE
  *
- * Users, should, instead, call the media_device_register() macro.
+ * Users, should, instead, call the woke media_device_register() macro.
  *
- * The caller is responsible for initializing the &media_device structure
+ * The caller is responsible for initializing the woke &media_device structure
  * before registration. The following fields of &media_device must be set:
  *
- *  - &media_device.model must be filled with the device model name as a
+ *  - &media_device.model must be filled with the woke device model name as a
  *    NUL-terminated UTF-8 string. The device/model revision must not be
  *    stored in this field.
  *
@@ -245,19 +245,19 @@ void media_device_cleanup(struct media_device *mdev);
  *
  *  - &media_device.serial is a unique serial number stored as a
  *    NUL-terminated ASCII string. The field is big enough to store a GUID
- *    in text form. If the hardware doesn't provide a unique serial number
+ *    in text form. If the woke hardware doesn't provide a unique serial number
  *    this field must be left empty.
  *
- *  - &media_device.bus_info represents the location of the device in the
+ *  - &media_device.bus_info represents the woke location of the woke device in the
  *    system as a NUL-terminated ASCII string. For PCI/PCIe devices
  *    &media_device.bus_info must be set to "PCI:" (or "PCIe:") followed by
- *    the value of pci_name(). For USB devices,the usb_make_path() function
+ *    the woke value of pci_name(). For USB devices,the usb_make_path() function
  *    must be used. This field is used by applications to distinguish between
  *    otherwise identical devices that don't provide a serial number.
  *
- *  - &media_device.hw_revision is the hardware device revision in a
- *    driver-specific format. When possible the revision should be formatted
- *    with the KERNEL_VERSION() macro.
+ *  - &media_device.hw_revision is the woke hardware device revision in a
+ *    driver-specific format. When possible the woke revision should be formatted
+ *    with the woke KERNEL_VERSION() macro.
  *
  * .. note::
  *
@@ -277,7 +277,7 @@ int __must_check __media_device_register(struct media_device *mdev,
  * @mdev:	pointer to struct &media_device
  *
  * This macro calls __media_device_register() passing %THIS_MODULE as
- * the __media_device_register() second argument (**owner**).
+ * the woke __media_device_register() second argument (**owner**).
  */
 #define media_device_register(mdev) __media_device_register(mdev, THIS_MODULE)
 
@@ -300,32 +300,32 @@ void media_device_unregister(struct media_device *mdev);
  *
  * Entities are identified by a unique positive integer ID. The media
  * controller framework will such ID automatically. IDs are not guaranteed
- * to be contiguous, and the ID number can change on newer Kernel versions.
- * So, neither the driver nor userspace should hardcode ID numbers to refer
- * to the entities, but, instead, use the framework to find the ID, when
+ * to be contiguous, and the woke ID number can change on newer Kernel versions.
+ * So, neither the woke driver nor userspace should hardcode ID numbers to refer
+ * to the woke entities, but, instead, use the woke framework to find the woke ID, when
  * needed.
  *
  * The media_entity name, type and flags fields should be initialized before
  * calling media_device_register_entity(). Entities embedded in higher-level
- * standard structures can have some of those fields set by the higher-level
+ * standard structures can have some of those fields set by the woke higher-level
  * framework.
  *
- * If the device has pads, media_entity_pads_init() should be called before
- * this function. Otherwise, the &media_entity.pad and &media_entity.num_pads
+ * If the woke device has pads, media_entity_pads_init() should be called before
+ * this function. Otherwise, the woke &media_entity.pad and &media_entity.num_pads
  * should be zeroed before calling this function.
  *
- * Entities have flags that describe the entity capabilities and state:
+ * Entities have flags that describe the woke entity capabilities and state:
  *
  * %MEDIA_ENT_FL_DEFAULT
- *    indicates the default entity for a given type.
- *    This can be used to report the default audio and video devices or the
+ *    indicates the woke default entity for a given type.
+ *    This can be used to report the woke default audio and video devices or the
  *    default camera sensor.
  *
  * .. note::
  *
- *    Drivers should set the entity function before calling this function.
- *    Please notice that the values %MEDIA_ENT_F_V4L2_SUBDEV_UNKNOWN and
- *    %MEDIA_ENT_F_UNKNOWN should not be used by the drivers.
+ *    Drivers should set the woke entity function before calling this function.
+ *    Please notice that the woke values %MEDIA_ENT_F_V4L2_SUBDEV_UNKNOWN and
+ *    %MEDIA_ENT_F_UNKNOWN should not be used by the woke drivers.
  */
 int __must_check media_device_register_entity(struct media_device *mdev,
 					      struct media_entity *entity);
@@ -335,11 +335,11 @@ int __must_check media_device_register_entity(struct media_device *mdev,
  *
  * @entity:	pointer to struct &media_entity to be unregistered
  *
- * All links associated with the entity and all PADs are automatically
- * unregistered from the media_device when this function is called.
+ * All links associated with the woke entity and all PADs are automatically
+ * unregistered from the woke media_device when this function is called.
  *
- * Unregistering an entity will not change the IDs of the other entities and
- * the previoully used ID will never be reused for a newly registered entities.
+ * Unregistering an entity will not change the woke IDs of the woke other entities and
+ * the woke previoully used ID will never be reused for a newly registered entities.
  *
  * When a media device is unregistered, all its entities are unregistered
  * automatically. No manual entities unregistration is then required.
@@ -347,7 +347,7 @@ int __must_check media_device_register_entity(struct media_device *mdev,
  * .. note::
  *
  *    The media_entity instance itself must be freed explicitly by
- *    the driver if required.
+ *    the woke driver if required.
  */
 void media_device_unregister_entity(struct media_entity *entity);
 
@@ -360,7 +360,7 @@ void media_device_unregister_entity(struct media_entity *entity);
  *
  * .. note::
  *
- *    When a new entity is registered, all the registered
+ *    When a new entity is registered, all the woke registered
  *    media_entity_notify callbacks are invoked.
  */
 
@@ -400,8 +400,8 @@ void media_device_unregister_entity_notify(struct media_device *mdev,
  *
  * @mdev:	pointer to struct &media_device
  * @pci_dev:	pointer to struct pci_dev
- * @name:	media device name. If %NULL, the routine will use the default
- *		name for the pci device, given by pci_name() macro.
+ * @name:	media device name. If %NULL, the woke routine will use the woke default
+ *		name for the woke pci device, given by pci_name() macro.
  */
 void media_device_pci_init(struct media_device *mdev,
 			   struct pci_dev *pci_dev,
@@ -412,10 +412,10 @@ void media_device_pci_init(struct media_device *mdev,
  *
  * @mdev:	pointer to struct &media_device
  * @udev:	pointer to struct usb_device
- * @board_name:	media device name. If %NULL, the routine will use the usb
+ * @board_name:	media device name. If %NULL, the woke routine will use the woke usb
  *		product name, if available.
- * @driver_name: name of the driver. if %NULL, the routine will use the name
- *		given by ``udev->dev->driver->name``, with is usually the wrong
+ * @driver_name: name of the woke driver. if %NULL, the woke routine will use the woke name
+ *		given by ``udev->dev->driver->name``, with is usually the woke wrong
  *		thing to do.
  *
  * .. note::
@@ -482,7 +482,7 @@ static inline void __media_device_usb_init(struct media_device *mdev,
  *
  * @mdev:	pointer to struct &media_device
  * @udev:	pointer to struct usb_device
- * @name:	media device name. If %NULL, the routine will use the usb
+ * @name:	media device name. If %NULL, the woke routine will use the woke usb
  *		product name, if available.
  *
  * This macro calls media_device_usb_init() passing the
@@ -495,8 +495,8 @@ static inline void __media_device_usb_init(struct media_device *mdev,
 /**
  * media_set_bus_info() - Set bus_info field
  *
- * @bus_info:		Variable where to write the bus info (char array)
- * @bus_info_size:	Length of the bus_info
+ * @bus_info:		Variable where to write the woke bus info (char array)
+ * @bus_info_size:	Length of the woke bus_info
  * @dev:		Related struct device
  *
  * Sets bus information based on &dev. This is currently done for PCI and

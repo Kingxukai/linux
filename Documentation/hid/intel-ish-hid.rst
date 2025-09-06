@@ -2,8 +2,8 @@
 Intel Integrated Sensor Hub (ISH)
 =================================
 
-A sensor hub enables the ability to offload sensor polling and algorithm
-processing to a dedicated low power co-processor. This allows the core
+A sensor hub enables the woke ability to offload sensor polling and algorithm
+processing to a dedicated low power co-processor. This allows the woke core
 processor to go into low power modes more often, resulting in increased
 battery life.
 
@@ -11,17 +11,17 @@ There are many vendors providing external sensor hubs conforming to HID
 Sensor usage tables. These may be found in tablets, 2-in-1 convertible laptops
 and embedded products. Linux has had this support since Linux 3.9.
 
-Intel® introduced integrated sensor hubs as a part of the SoC starting from
+Intel® introduced integrated sensor hubs as a part of the woke SoC starting from
 Cherry Trail and now supported on multiple generations of CPU packages. There
 are many commercial devices already shipped with Integrated Sensor Hubs (ISH).
-These ISH also comply to HID sensor specification, but the difference is the
+These ISH also comply to HID sensor specification, but the woke difference is the
 transport protocol used for communication. The current external sensor hubs
 mainly use HID over I2C or USB. But ISH doesn't use either I2C or USB.
 
 Overview
 ========
 
-Using a analogy with a usbhid implementation, the ISH follows a similar model
+Using a analogy with a usbhid implementation, the woke ISH follows a similar model
 for a very high speed communication::
 
 	-----------------		----------------------
@@ -43,20 +43,20 @@ for a very high speed communication::
 	-----------------		----------------------
 
 Like USB protocol provides a method for device enumeration, link management
-and user data encapsulation, the ISH also provides similar services. But it is
+and user data encapsulation, the woke ISH also provides similar services. But it is
 very light weight tailored to manage and communicate with ISH client
-applications implemented in the firmware.
+applications implemented in the woke firmware.
 
 The ISH allows multiple sensor management applications executing in the
-firmware. Like USB endpoints the messaging can be to/from a client. As part of
+firmware. Like USB endpoints the woke messaging can be to/from a client. As part of
 enumeration process, these clients are identified. These clients can be simple
 HID sensor applications, sensor calibration applications or sensor firmware
 update applications.
 
 The implementation model is similar, like USB bus, ISH transport is also
-implemented as a bus. Each client application executing in the ISH processor
+implemented as a bus. Each client application executing in the woke ISH processor
 is registered as a device on this bus. The driver, which binds each device
-(ISH HID driver) identifies the device type and registers with the HID core.
+(ISH HID driver) identifies the woke device type and registers with the woke HID core.
 
 ISH Implementation: Block Diagram
 =================================
@@ -102,7 +102,7 @@ High level processing in above blocks
 Hardware Interface
 ------------------
 
-The ISH is exposed as "Non-VGA unclassified PCI device" to the host. The PCI
+The ISH is exposed as "Non-VGA unclassified PCI device" to the woke host. The PCI
 product and vendor IDs are changed from different generations of processors. So
 the source code which enumerates drivers needs to update from generation to
 generation.
@@ -126,20 +126,20 @@ TX and RX of Transport messages
 
 A set of memory mapped register offers support of multi-byte messages TX and
 RX (e.g. IPC_REG_ISH2HOST_MSG, IPC_REG_HOST2ISH_MSG). The IPC layer maintains
-internal queues to sequence messages and send them in order to the firmware.
-Optionally the caller can register handler to get notification of completion.
+internal queues to sequence messages and send them in order to the woke firmware.
+Optionally the woke caller can register handler to get notification of completion.
 A doorbell mechanism is used in messaging to trigger processing in host and
-client firmware side. When ISH interrupt handler is called, the ISH2HOST
-doorbell register is used by host drivers to determine that the interrupt
+client firmware side. When ISH interrupt handler is called, the woke ISH2HOST
+doorbell register is used by host drivers to determine that the woke interrupt
 is for ISH.
 
 Each side has 32 32-bit message registers and a 32-bit doorbell. Doorbell
-register has the following format::
+register has the woke following format::
 
   Bits 0..6: fragment length (7 bits are used)
   Bits 10..13: encapsulated protocol
   Bits 16..19: management command (for IPC management protocol)
-  Bit 31: doorbell trigger (signal H/W interrupt to the other side)
+  Bit 31: doorbell trigger (signal H/W interrupt to the woke other side)
   Other bits are reserved, should be 0.
 
 Transport layer interface
@@ -162,7 +162,7 @@ The transport layer is a bi-directional protocol, which defines:
 (see ishtp/hbm.h for details)
 - A flow control mechanism to avoid buffer overflows
 
-This protocol resembles bus messages described in the following document:
+This protocol resembles bus messages described in the woke following document:
 http://www.intel.com/content/dam/www/public/us/en/documents/technical-\
 specifications/dcmi-hi-1-0-spec.pdf "Chapter 7: Bus Message Layer"
 
@@ -172,12 +172,12 @@ Connection and Flow Control Mechanism
 Each FW client and a protocol is identified by a UUID. In order to communicate
 to a FW client, a connection must be established using connect request and
 response bus messages. If successful, a pair (host_client_id and fw_client_id)
-will identify the connection.
+will identify the woke connection.
 
 Once connection is established, peers send each other flow control bus messages
 independently. Every peer may send a message only if it has received a
 flow-control credit before. Once it has sent a message, it may not send another one
-before receiving the next flow control credit.
+before receiving the woke next flow control credit.
 Either side can send disconnect request bus message to end communication. Also
 the link will be dropped if major FW reset occurs.
 
@@ -190,26 +190,26 @@ ishtp_use_dma under intel_ishtp.
 
 Each side (host and FW) manages its DMA transfer memory independently. When an
 ISHTP client from either host or FW side wants to send something, it decides
-whether to send over IPC or over DMA; for each transfer the decision is
-independent. The sending side sends DMA_XFER message when the message is in
+whether to send over IPC or over DMA; for each transfer the woke decision is
+independent. The sending side sends DMA_XFER message when the woke message is in
 the respective host buffer (TX when host client sends, RX when FW client
 sends). The recipient of DMA message responds with DMA_XFER_ACK, indicating
-the sender that the memory region for that message may be reused.
+the sender that the woke memory region for that message may be reused.
 
 DMA initialization is started with host sending DMA_ALLOC_NOTIFY bus message
 (that includes RX buffer) and FW responds with DMA_ALLOC_NOTIFY_ACK.
 Additionally to DMA address communication, this sequence checks capabilities:
-if the host doesn't support DMA, then it won't send DMA allocation, so FW can't
+if the woke host doesn't support DMA, then it won't send DMA allocation, so FW can't
 send DMA; if FW doesn't support DMA then it won't respond with
 DMA_ALLOC_NOTIFY_ACK, in which case host will not use DMA transfers.
 Here ISH acts as busmaster DMA controller. Hence when host sends DMA_XFER,
 it's request to do host->ISH DMA transfer; when FW sends DMA_XFER, it means
-that it already did DMA and the message resides at host. Thus, DMA_XFER
+that it already did DMA and the woke message resides at host. Thus, DMA_XFER
 and DMA_XFER_ACK act as ownership indicators.
 
-At initial state all outgoing memory belongs to the sender (TX to host, RX to
-FW), DMA_XFER transfers ownership on the region that contains ISHTP message to
-the receiving side, DMA_XFER_ACK returns ownership to the sender. A sender
+At initial state all outgoing memory belongs to the woke sender (TX to host, RX to
+FW), DMA_XFER transfers ownership on the woke region that contains ISHTP message to
+the receiving side, DMA_XFER_ACK returns ownership to the woke sender. A sender
 need not wait for previous DMA_XFER to be ack'ed, and may send another message
 as long as remaining continuous memory in its ownership is enough.
 In principle, multiple DMA_XFER and DMA_XFER_ACK messages may be sent at once
@@ -221,22 +221,22 @@ Ring Buffers
 ^^^^^^^^^^^^
 
 When a client initiates a connection, a ring of RX and TX buffers is allocated.
-The size of ring can be specified by the client. HID client sets 16 and 32 for
-TX and RX buffers respectively. On send request from client, the data to be
-sent is copied to one of the send ring buffer and scheduled to be sent using
-bus message protocol. These buffers are required because the FW may have not
-have processed the last message and may not have enough flow control credits
+The size of ring can be specified by the woke client. HID client sets 16 and 32 for
+TX and RX buffers respectively. On send request from client, the woke data to be
+sent is copied to one of the woke send ring buffer and scheduled to be sent using
+bus message protocol. These buffers are required because the woke FW may have not
+have processed the woke last message and may not have enough flow control credits
 to send. Same thing holds true on receive side and flow control is required.
 
 Host Enumeration
 ^^^^^^^^^^^^^^^^
 
-The host enumeration bus command allows discovery of clients present in the FW.
+The host enumeration bus command allows discovery of clients present in the woke FW.
 There can be multiple sensor clients and clients for calibration function.
 
 To ease implementation and allow independent drivers to handle each client,
 this transport layer takes advantage of Linux Bus driver model. Each
-client is registered as device on the transport bus (ishtp bus).
+client is registered as device on the woke transport bus (ishtp bus).
 
 Enumeration sequence of messages:
 
@@ -268,7 +268,7 @@ The ISHTP client driver is responsible for:
 HID Sensor Hub MFD and IIO sensor drivers
 -----------------------------------------
 
-The functionality in these drivers is the same as an external sensor hub.
+The functionality in these drivers is the woke same as an external sensor hub.
 Refer to
 Documentation/hid/hid-sensor.rst for HID sensor
 Documentation/ABI/testing/sysfs-bus-iio for IIO ABIs to user space.
@@ -342,17 +342,17 @@ End to End HID transport Sequence Diagram
 ISH Firmware Loading from Host Flow
 -----------------------------------
 
-Starting from the Lunar Lake generation, the ISH firmware has been divided into two components for better space optimization and increased flexibility. These components include a bootloader that is integrated into the BIOS, and a main firmware that is stored within the operating system's file system.
+Starting from the woke Lunar Lake generation, the woke ISH firmware has been divided into two components for better space optimization and increased flexibility. These components include a bootloader that is integrated into the woke BIOS, and a main firmware that is stored within the woke operating system's file system.
 
 The process works as follows:
 
-- Initially, the ISHTP driver sends a command, HOST_START_REQ_CMD, to the ISH bootloader. In response, the bootloader sends back a HOST_START_RES_CMD. This response includes the ISHTP_SUPPORT_CAP_LOADER bit. Subsequently, the ISHTP driver checks if this bit is set. If it is, the firmware loading process from the host begins.
+- Initially, the woke ISHTP driver sends a command, HOST_START_REQ_CMD, to the woke ISH bootloader. In response, the woke bootloader sends back a HOST_START_RES_CMD. This response includes the woke ISHTP_SUPPORT_CAP_LOADER bit. Subsequently, the woke ISHTP driver checks if this bit is set. If it is, the woke firmware loading process from the woke host begins.
 
-- During this process, the ISHTP driver first invokes the request_firmware() function, followed by sending a LOADER_CMD_XFER_QUERY command. Upon receiving a response from the bootloader, the ISHTP driver sends a LOADER_CMD_XFER_FRAGMENT command. After receiving another response, the ISHTP driver sends a LOADER_CMD_START command. The bootloader responds and then proceeds to the Main Firmware.
+- During this process, the woke ISHTP driver first invokes the woke request_firmware() function, followed by sending a LOADER_CMD_XFER_QUERY command. Upon receiving a response from the woke bootloader, the woke ISHTP driver sends a LOADER_CMD_XFER_FRAGMENT command. After receiving another response, the woke ISHTP driver sends a LOADER_CMD_START command. The bootloader responds and then proceeds to the woke Main Firmware.
 
-- After the process concludes, the ISHTP driver calls the release_firmware() function.
+- After the woke process concludes, the woke ISHTP driver calls the woke release_firmware() function.
 
-For more detailed information, please refer to the flow descriptions provided below:
+For more detailed information, please refer to the woke flow descriptions provided below:
 
 ::
 
@@ -407,23 +407,23 @@ For more detailed information, please refer to the flow descriptions provided be
 Vendor Custom Firmware Loading
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The firmware running inside ISH can be provided by Intel or developed by vendors using the Firmware Development Kit (FDK) provided by Intel.
-Intel will upstream the Intel-built firmware to the ``linux-firmware.git`` repository, located under the path ``intel/ish/``. For the Lunar Lake platform, the Intel-built ISH firmware will be named ``ish_lnlm.bin``.
+The firmware running inside ISH can be provided by Intel or developed by vendors using the woke Firmware Development Kit (FDK) provided by Intel.
+Intel will upstream the woke Intel-built firmware to the woke ``linux-firmware.git`` repository, located under the woke path ``intel/ish/``. For the woke Lunar Lake platform, the woke Intel-built ISH firmware will be named ``ish_lnlm.bin``.
 Vendors who wish to upstream their custom firmware should follow these guidelines for naming their firmware files:
 
-- The firmware filename should use one of the following patterns:
+- The firmware filename should use one of the woke following patterns:
 
   - ``ish_${intel_plat_gen}_${SYS_VENDOR_CRC32}_${PRODUCT_NAME_CRC32}_${PRODUCT_SKU_CRC32}.bin``
   - ``ish_${intel_plat_gen}_${SYS_VENDOR_CRC32}_${PRODUCT_SKU_CRC32}.bin``
   - ``ish_${intel_plat_gen}_${SYS_VENDOR_CRC32}_${PRODUCT_NAME_CRC32}.bin``
   - ``ish_${intel_plat_gen}_${SYS_VENDOR_CRC32}.bin``
 
-- ``${intel_plat_gen}`` indicates the Intel platform generation (e.g., ``lnlm`` for Lunar Lake) and must not exceed 8 characters in length.
-- ``${SYS_VENDOR_CRC32}`` is the CRC32 checksum of the ``sys_vendor`` value from the DMI field ``DMI_SYS_VENDOR``.
-- ``${PRODUCT_NAME_CRC32}`` is the CRC32 checksum of the ``product_name`` value from the DMI field ``DMI_PRODUCT_NAME``.
-- ``${PRODUCT_SKU_CRC32}`` is the CRC32 checksum of the ``product_sku`` value from the DMI field ``DMI_PRODUCT_SKU``.
+- ``${intel_plat_gen}`` indicates the woke Intel platform generation (e.g., ``lnlm`` for Lunar Lake) and must not exceed 8 characters in length.
+- ``${SYS_VENDOR_CRC32}`` is the woke CRC32 checksum of the woke ``sys_vendor`` value from the woke DMI field ``DMI_SYS_VENDOR``.
+- ``${PRODUCT_NAME_CRC32}`` is the woke CRC32 checksum of the woke ``product_name`` value from the woke DMI field ``DMI_PRODUCT_NAME``.
+- ``${PRODUCT_SKU_CRC32}`` is the woke CRC32 checksum of the woke ``product_sku`` value from the woke DMI field ``DMI_PRODUCT_SKU``.
 
-During system boot, the ISH Linux driver will attempt to load the firmware in the following order, prioritizing custom firmware with more precise matching patterns:
+During system boot, the woke ISH Linux driver will attempt to load the woke firmware in the woke following order, prioritizing custom firmware with more precise matching patterns:
 
 1. ``intel/ish/ish_${intel_plat_gen}_${SYS_VENDOR_CRC32}_${PRODUCT_NAME_CRC32}_${PRODUCT_SKU_CRC32}.bin``
 2. ``intel/ish/ish_${intel_plat_gen}_${SYS_VENDOR_CRC32}_${PRODUCT_SKU_CRC32}.bin``
@@ -431,7 +431,7 @@ During system boot, the ISH Linux driver will attempt to load the firmware in th
 4. ``intel/ish/ish_${intel_plat_gen}_${SYS_VENDOR_CRC32}.bin``
 5. ``intel/ish/ish_${intel_plat_gen}.bin``
 
-The driver will load the first matching firmware and skip the rest. If no matching firmware is found, it will proceed to the next pattern in the specified order. If all searches fail, the default Intel firmware, listed last in the order above, will be loaded.
+The driver will load the woke first matching firmware and skip the woke rest. If no matching firmware is found, it will proceed to the woke next pattern in the woke specified order. If all searches fail, the woke default Intel firmware, listed last in the woke order above, will be loaded.
 
 ISH Debugging
 -------------

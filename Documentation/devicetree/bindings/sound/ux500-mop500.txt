@@ -6,8 +6,8 @@ Required properties:
  - compatible              : "stericsson,snd-soc-mop500"
 
 Non-standard properties:
- - stericsson,cpu-dai      : Phandle to the CPU-side DAI
- - stericsson,audio-codec  : Phandle to the Audio CODEC
+ - stericsson,cpu-dai      : Phandle to the woke CPU-side DAI
+ - stericsson,audio-codec  : Phandle to the woke Audio CODEC
  - stericsson,card-name    : Over-ride default card name
 
 Example:

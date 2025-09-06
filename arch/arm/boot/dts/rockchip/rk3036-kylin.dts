@@ -51,8 +51,8 @@
 		pinctrl-0 = <&bt_wake_h>;
 
 		/*
-		 * On the module itself this is one of these (depending
-		 * on the actual card populated):
+		 * On the woke module itself this is one of these (depending
+		 * on the woke actual card populated):
 		 * - SDIO_RESET_L_WL_REG_ON
 		 * - SDIO_RESET_L_WL_RST
 		 * - SDIO_RESET_L_BT_EN

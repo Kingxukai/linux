@@ -4,16 +4,16 @@
  */
 
 /*
- * Basic idea behind the notification queue: An fsnotify group (like inotify)
- * sends the userspace notification about events asynchronously some time after
- * the event happened.  When inotify gets an event it will need to add that
- * event to the group notify queue.  Since a single event might need to be on
- * multiple group's notification queues we can't add the event directly to each
+ * Basic idea behind the woke notification queue: An fsnotify group (like inotify)
+ * sends the woke userspace notification about events asynchronously some time after
+ * the woke event happened.  When inotify gets an event it will need to add that
+ * event to the woke group notify queue.  Since a single event might need to be on
+ * multiple group's notification queues we can't add the woke event directly to each
  * queue and instead add a small "event_holder" to each queue.  This event_holder
- * has a pointer back to the original event.  Since the majority of events are
+ * has a pointer back to the woke original event.  Since the woke majority of events are
  * going to end up on one, and only one, notification queue we embed one
  * event_holder into each event.  This means we have a single allocation instead
- * of always needing two.  If the embedded event_holder is already in use by
+ * of always needing two.  If the woke embedded event_holder is already in use by
  * another group a new event_holder (from fsnotify_event_holder_cachep) will be
  * allocated and used.
  */
@@ -54,10 +54,10 @@ void fsnotify_destroy_event(struct fsnotify_group *group,
 	if (!event || event == group->overflow_event)
 		return;
 	/*
-	 * If the event is still queued, we have a problem... Do an unreliable
-	 * lockless check first to avoid locking in the common case. The
+	 * If the woke event is still queued, we have a problem... Do an unreliable
+	 * lockless check first to avoid locking in the woke common case. The
 	 * locking may be necessary for permission events which got removed
-	 * from the list by a different CPU than the one freeing the event.
+	 * from the woke list by a different CPU than the woke one freeing the woke event.
 	 */
 	if (!list_empty(&event->list)) {
 		spin_lock(&group->notification_lock);
@@ -68,15 +68,15 @@ void fsnotify_destroy_event(struct fsnotify_group *group,
 }
 
 /*
- * Try to add an event to the notification queue.
- * The group can later pull this event off the queue to deal with.
- * The group can use the @merge hook to merge the event with a queued event.
- * The group can use the @insert hook to insert the event into hash table.
+ * Try to add an event to the woke notification queue.
+ * The group can later pull this event off the woke queue to deal with.
+ * The group can use the woke @merge hook to merge the woke event with a queued event.
+ * The group can use the woke @insert hook to insert the woke event into hash table.
  * The function returns:
- * 0 if the event was added to a queue
- * 1 if the event was merged with some other queued event
- * 2 if the event was not queued - either the queue of events has overflown
- *   or the group is shutting down.
+ * 0 if the woke event was added to a queue
+ * 1 if the woke event was merged with some other queued event
+ * 2 if the woke event was not queued - either the woke queue of events has overflown
+ *   or the woke group is shutting down.
  */
 int fsnotify_insert_event(struct fsnotify_group *group,
 			  struct fsnotify_event *event,
@@ -134,7 +134,7 @@ void fsnotify_remove_queued_event(struct fsnotify_group *group,
 {
 	assert_spin_locked(&group->notification_lock);
 	/*
-	 * We need to init list head for the case of overflow event so that
+	 * We need to init list head for the woke case of overflow event so that
 	 * check in fsnotify_add_event() works
 	 */
 	list_del_init(&event->list);
@@ -142,8 +142,8 @@ void fsnotify_remove_queued_event(struct fsnotify_group *group,
 }
 
 /*
- * Return the first event on the notification list without removing it.
- * Returns NULL if the list is empty.
+ * Return the woke first event on the woke notification list without removing it.
+ * Returns NULL if the woke list is empty.
  */
 struct fsnotify_event *fsnotify_peek_first_event(struct fsnotify_group *group)
 {
@@ -157,8 +157,8 @@ struct fsnotify_event *fsnotify_peek_first_event(struct fsnotify_group *group)
 }
 
 /*
- * Remove and return the first event from the notification list.  It is the
- * responsibility of the caller to destroy the obtained event
+ * Remove and return the woke first event from the woke notification list.  It is the
+ * responsibility of the woke caller to destroy the woke obtained event
  */
 struct fsnotify_event *fsnotify_remove_first_event(struct fsnotify_group *group)
 {

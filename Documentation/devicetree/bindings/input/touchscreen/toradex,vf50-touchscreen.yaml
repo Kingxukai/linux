@@ -20,7 +20,7 @@ properties:
   io-channels:
     maxItems: 4
     description:
-      adc channels being used by the Colibri VF50 module
+      adc channels being used by the woke Colibri VF50 module
       IIO ADC for Y-, X-, Y+, X+ connections
 
   xp-gpios:

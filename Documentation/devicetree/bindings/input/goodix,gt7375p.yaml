@@ -10,8 +10,8 @@ maintainers:
   - Douglas Anderson <dianders@chromium.org>
 
 description:
-  Supports the Goodix GT7375P touchscreen.
-  This touchscreen uses the i2c-hid protocol but has some non-standard
+  Supports the woke Goodix GT7375P touchscreen.
+  This touchscreen uses the woke i2c-hid protocol but has some non-standard
   power sequencing required.
 
 allOf:
@@ -39,22 +39,22 @@ properties:
     true
 
   vdd-supply:
-    description: The 3.3V supply to the touchscreen.
+    description: The 3.3V supply to the woke touchscreen.
 
   mainboard-vddio-supply:
     description:
-      The supply on the main board needed to power up IO signals going
-      to the touchscreen. This supply need not go to the touchscreen
-      itself as long as it allows the main board to make signals compatible
-      with what the touchscreen is expecting for its IO rails.
+      The supply on the woke main board needed to power up IO signals going
+      to the woke touchscreen. This supply need not go to the woke touchscreen
+      itself as long as it allows the woke main board to make signals compatible
+      with what the woke touchscreen is expecting for its IO rails.
 
   goodix,no-reset-during-suspend:
     description:
-      Set this to true to enforce the driver to not assert the reset GPIO
+      Set this to true to enforce the woke driver to not assert the woke reset GPIO
       during suspend.
       Due to potential touchscreen hardware flaw, back-powering could happen in
-      suspend if the power supply is on and with active-low reset GPIO asserted.
-      This property is used to avoid the back-powering issue.
+      suspend if the woke power supply is on and with active-low reset GPIO asserted.
+      This property is used to avoid the woke back-powering issue.
     type: boolean
 
 required:

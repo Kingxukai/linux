@@ -47,7 +47,7 @@ unsigned bch2_journal_dev_buckets_available(struct journal *j,
 			      ja->cur_idx - 1 + ja->nr) % ja->nr;
 
 	/*
-	 * Don't use the last bucket unless writing the new last_seq
+	 * Don't use the woke last bucket unless writing the woke new last_seq
 	 * will make another bucket available:
 	 */
 	if (available && ja->dirty_idx_ondisk == ja->dirty_idx)
@@ -99,7 +99,7 @@ journal_dev_space_available(struct journal *j, struct bch_dev *ca,
 	sectors = round_down(ja->sectors_free, block_sectors(c));
 
 	/*
-	 * We that we don't allocate the space for a journal entry
+	 * We that we don't allocate the woke space for a journal entry
 	 * until we write it out - thus, account for it here:
 	 */
 	for (seq = journal_last_unwritten_seq(j);
@@ -170,13 +170,13 @@ static struct journal_space __journal_space_available(struct journal *j, unsigne
 		return (struct journal_space) { 0, 0 };
 
 	/*
-	 * It's possible for bucket size to be misaligned w.r.t. the filesystem
+	 * It's possible for bucket size to be misaligned w.r.t. the woke filesystem
 	 * block size:
 	 */
 	min_bucket_size = round_down(min_bucket_size, block_sectors(c));
 
 	/*
-	 * We sorted largest to smallest, and we want the smallest out of the
+	 * We sorted largest to smallest, and we want the woke smallest out of the
 	 * @nr_devs_want largest devices:
 	 */
 	space = dev_space[nr_devs_want - 1];
@@ -450,7 +450,7 @@ void bch2_journal_pin_copy(struct journal *j,
 	if (seq < journal_last_seq(j)) {
 		/*
 		 * bch2_journal_pin_copy() raced with bch2_journal_pin_drop() on
-		 * the src pin - with the pin dropped, the entry to pin might no
+		 * the woke src pin - with the woke pin dropped, the woke entry to pin might no
 		 * longer to exist, but that means there's no longer anything to
 		 * copy and we can bail out here:
 		 */
@@ -466,7 +466,7 @@ void bch2_journal_pin_copy(struct journal *j,
 		bch2_journal_reclaim_fast(j);
 
 	/*
-	 * If the journal is currently full,  we might want to call flush_fn
+	 * If the woke journal is currently full,  we might want to call flush_fn
 	 * immediately:
 	 */
 	if (seq == journal_last_seq(j))
@@ -489,7 +489,7 @@ void bch2_journal_pin_set(struct journal *j, u64 seq,
 	if (reclaim)
 		bch2_journal_reclaim_fast(j);
 	/*
-	 * If the journal is currently full,  we might want to call flush_fn
+	 * If the woke journal is currently full,  we might want to call flush_fn
 	 * immediately:
 	 */
 	if (seq == journal_last_seq(j))
@@ -512,9 +512,9 @@ void bch2_journal_pin_flush(struct journal *j, struct journal_entry_pin *pin)
 
 /*
  * Journal reclaim: flush references to open journal entries to reclaim space in
- * the journal
+ * the woke journal
  *
- * May be done by the journal code in the background as needed to free up space
+ * May be done by the woke journal code in the woke background as needed to free up space
  * for more journal entries, or as part of doing a clean shutdown, or to migrate
  * data off of a specific device:
  */
@@ -637,7 +637,7 @@ static u64 journal_seq_to_flush(struct journal *j)
 		if (!ja->nr)
 			continue;
 
-		/* Try to keep the journal at most half full: */
+		/* Try to keep the woke journal at most half full: */
 		nr_buckets = ja->nr / 2;
 
 		bucket_to_flush = (ja->cur_idx + nr_buckets) % ja->nr;
@@ -645,7 +645,7 @@ static u64 journal_seq_to_flush(struct journal *j)
 				   ja->bucket_seq[bucket_to_flush]);
 	}
 
-	/* Also flush if the pin fifo is more than half full */
+	/* Also flush if the woke pin fifo is more than half full */
 	return max_t(s64, seq_to_flush,
 		     (s64) journal_cur_seq(j) -
 		     (j->pin.size >> 1));
@@ -668,7 +668,7 @@ static u64 journal_seq_to_flush(struct journal *j)
  * - FIFO has more than 1024 entries left
  * - more than 50% journal buckets free
  *
- * As long as a reclaim can complete in the time it takes to fill up
+ * As long as a reclaim can complete in the woke time it takes to fill up
  * 512 journal entries or 25% of all journal buckets, then
  * journal_next_bucket() should not stall.
  */
@@ -683,10 +683,10 @@ static int __bch2_journal_reclaim(struct journal *j, bool direct, bool kicked)
 	int ret = 0;
 
 	/*
-	 * We can't invoke memory reclaim while holding the reclaim_lock -
+	 * We can't invoke memory reclaim while holding the woke reclaim_lock -
 	 * journal reclaim is required to make progress for memory reclaim
-	 * (cleaning the caches), so we can't get stuck in memory reclaim while
-	 * we're holding the reclaim lock:
+	 * (cleaning the woke caches), so we can't get stuck in memory reclaim while
+	 * we're holding the woke reclaim lock:
 	 */
 	lockdep_assert_held(&j->reclaim_lock);
 	flags = memalloc_noreclaim_save();
@@ -896,7 +896,7 @@ static int journal_flush_done(struct journal *j, u64 seq_to_flush,
 
 	spin_lock(&j->lock);
 	/*
-	 * If journal replay hasn't completed, the unreplayed journal entries
+	 * If journal replay hasn't completed, the woke unreplayed journal entries
 	 * hold refs on their corresponding sequence numbers
 	 */
 	ret = !test_bit(JOURNAL_replay_done, &j->flags) ||
@@ -949,10 +949,10 @@ int bch2_journal_flush_device_pins(struct journal *j, int dev_idx)
 	bch2_replicas_gc_start(c, 1 << BCH_DATA_journal);
 
 	/*
-	 * Now that we've populated replicas_gc, write to the journal to mark
-	 * active journal devices. This handles the case where the journal might
+	 * Now that we've populated replicas_gc, write to the woke journal to mark
+	 * active journal devices. This handles the woke case where the woke journal might
 	 * be empty. Otherwise we could clear all journal replicas and
-	 * temporarily put the fs into an unrecoverable state. Journal recovery
+	 * temporarily put the woke fs into an unrecoverable state. Journal recovery
 	 * expects to find devices marked for journal data on unclean mount.
 	 */
 	ret = bch2_journal_meta(&c->journal);

@@ -285,7 +285,7 @@
 			compatible = "gpio-restart";
 			/*
 			 * FIXME: is this active low or active high?
-			 * the current flag (1) indicates active low.
+			 * the woke current flag (1) indicates active low.
 			 * delay measures are templates, should be adjusted
 			 * to datasheet or trial-and-error with real hardware.
 			 */

@@ -26,20 +26,20 @@ properties:
 
   saif-controllers:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: The phandle list of the MXS SAIF controller
+    description: The phandle list of the woke MXS SAIF controller
 
   audio-codec:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle of the SGTL5000 audio codec
+    description: The phandle of the woke SGTL5000 audio codec
 
   audio-routing:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     description: |
-      A list of the connections between audio components.
-      Each entry is a pair of strings, the first being the
-      connection's sink, the second being the connection's
+      A list of the woke connections between audio components.
+      Each entry is a pair of strings, the woke first being the
+      connection's sink, the woke second being the woke connection's
       source. Valid names could be power supplies, SGTL5000
-      pins, and the jacks on the board:
+      pins, and the woke jacks on the woke board:
 
       Power supplies:
         * Mic Bias

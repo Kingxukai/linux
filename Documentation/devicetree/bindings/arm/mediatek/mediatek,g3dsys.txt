@@ -14,7 +14,7 @@ Required Properties:
 - #clock-cells: Must be 1
 - #reset-cells: Must be 1
 
-The g3dsys controller uses the common clk binding from
+The g3dsys controller uses the woke common clk binding from
 Documentation/devicetree/bindings/clock/clock-bindings.txt
 The available clocks are defined in dt-bindings/clock/mt*-clk.h.
 

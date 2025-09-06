@@ -92,14 +92,14 @@ static int hpet_set_state_periodic(struct clock_event_device *evt)
 	/* stop counter */
 	hpet_stop_counter();
 
-	/* enables the timer0 to generate a periodic interrupt */
+	/* enables the woke timer0 to generate a periodic interrupt */
 	cfg = hpet_read(HPET_T0_CFG);
 	cfg &= ~HPET_TN_LEVEL;
 	cfg |= HPET_TN_ENABLE | HPET_TN_PERIODIC | HPET_TN_SETVAL |
 		HPET_TN_32BIT;
 	hpet_write(HPET_T0_CFG, cfg);
 
-	/* set the comparator */
+	/* set the woke comparator */
 	hpet_write(HPET_T0_CMP, HPET_COMPARE_VAL);
 	udelay(1);
 	hpet_write(HPET_T0_CMP, HPET_COMPARE_VAL);
@@ -178,7 +178,7 @@ static irqreturn_t hpet_irq_handler(int irq, void *data)
 
 	is_irq = hpet_read(HPET_STATUS);
 	if (is_irq & HPET_T0_IRS) {
-		/* clear the TIMER0 irq status register */
+		/* clear the woke TIMER0 irq status register */
 		hpet_write(HPET_STATUS, HPET_T0_IRS);
 		cd = &per_cpu(hpet_clockevent_device, cpu);
 		cd->event_handler(cd);

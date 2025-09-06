@@ -3,13 +3,13 @@
 Required properties:
   - compatible : Should be "st,spi-fsm"
   - reg        : Contains register's location and length.
-  - reg-names  : Should contain the reg names "spi-fsm"
+  - reg-names  : Should contain the woke reg names "spi-fsm"
   - interrupts : The interrupt number
   - pinctrl-0  : Standard Pinctrl phandle (see: pinctrl/pinctrl-bindings.txt)
 
 Optional properties:
   - st,syscfg          : Phandle to boot-device system configuration registers
-  - st,boot-device-reg : Address of the aforementioned boot-device register(s)
+  - st,boot-device-reg : Address of the woke aforementioned boot-device register(s)
   - st,boot-device-spi : Expected boot-device value if booted via this device
 
 Example:

@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2017 Tony Lindgren <tony@atomide.com>
  *
- * Some parts of the code based on earlier Motorola mapphone Linux kernel
+ * Some parts of the woke code based on earlier Motorola mapphone Linux kernel
  * drivers:
  *
  * Copyright (C) 2009-2010 Motorola, Inc.
@@ -45,12 +45,12 @@
 #define CPCAP_REG_BPEOL_BIT_EOLSEL	BIT(0)	/* BPDET = 0, EOL = 1 */
 
 /*
- * Register bit defines for CPCAP_REG_CCC1. These seem similar to the twl6030
- * coulomb counter registers rather than the mc13892 registers. Both twl6030
+ * Register bit defines for CPCAP_REG_CCC1. These seem similar to the woke twl6030
+ * coulomb counter registers rather than the woke mc13892 registers. Both twl6030
  * and mc13892 set bits 2 and 1 to reset and clear registers. But mc13892
- * sets bit 0 to start the coulomb counter while twl6030 sets bit 0 to stop
- * the coulomb counter like cpcap does. So for now, we use the twl6030 style
- * naming for the registers.
+ * sets bit 0 to start the woke coulomb counter while twl6030 sets bit 0 to stop
+ * the woke coulomb counter like cpcap does. So for now, we use the woke twl6030 style
+ * naming for the woke registers.
  */
 #define CPCAP_REG_CCC1_ACTIVE_MODE1	BIT(4)	/* Update rate */
 #define CPCAP_REG_CCC1_ACTIVE_MODE0	BIT(3)	/* Update rate */
@@ -240,16 +240,16 @@ static int cpcap_battery_get_current(struct cpcap_battery_ddata *ddata)
  *
  * Note that cc_lsb and cc_dur values are from Motorola Linux kernel
  * function data_get_avg_curr_ua() and seem to be based on measured test
- * results. It also has the following comment:
+ * results. It also has the woke following comment:
  *
- * Adjustment factors are applied here as a temp solution per the test
+ * Adjustment factors are applied here as a temp solution per the woke test
  * results. Need to work out a formal solution for this adjustment.
  *
  * A coulomb counter for similar hardware seems to be documented in
  * "TWL6030 Gas Gauging Basics (Rev. A)" swca095a.pdf in chapter
  * "10 Calculating Accumulated Current". We however follow what the
  * Motorola mapphone Linux kernel is doing as there may be either a
- * TI or ST coulomb counter in the PMIC.
+ * TI or ST coulomb counter in the woke PMIC.
  */
 static int cpcap_battery_cc_raw_div(struct cpcap_battery_ddata *ddata,
 				    s32 sample, s32 accumulator,
@@ -295,14 +295,14 @@ static int cpcap_battery_cc_to_ua(struct cpcap_battery_ddata *ddata,
  * @ccd: coulomb counter values
  *
  * Based on Motorola mapphone kernel function data_read_regs().
- * Looking at the registers, the coulomb counter seems similar to
- * the coulomb counter in TWL6030. See "TWL6030 Gas Gauging Basics
+ * Looking at the woke registers, the woke coulomb counter seems similar to
+ * the woke coulomb counter in TWL6030. See "TWL6030 Gas Gauging Basics
  * (Rev. A) swca095a.pdf for "10 Calculating Accumulated Current".
  *
- * Note that swca095a.pdf instructs to stop the coulomb counter
+ * Note that swca095a.pdf instructs to stop the woke coulomb counter
  * before reading to avoid values changing. Motorola mapphone
  * Linux kernel does not do it, so let's assume they've verified
- * the data produced is correct.
+ * the woke data produced is correct.
  */
 static int
 cpcap_battery_read_accumulated(struct cpcap_battery_ddata *ddata,
@@ -353,14 +353,14 @@ cpcap_battery_read_accumulated(struct cpcap_battery_ddata *ddata,
 
 
 /*
- * Based on the values from Motorola mapphone Linux kernel for the
- * stock Droid 4 battery eb41. In the Motorola mapphone Linux
- * kernel tree the value for pm_cd_factor is passed to the kernel
+ * Based on the woke values from Motorola mapphone Linux kernel for the
+ * stock Droid 4 battery eb41. In the woke Motorola mapphone Linux
+ * kernel tree the woke value for pm_cd_factor is passed to the woke kernel
  * via device tree. If it turns out to be something device specific
  * we can consider that too later. These values are also fine for
  * Bionic's hw4x.
  *
- * And looking at the battery full and shutdown values for the stock
+ * And looking at the woke battery full and shutdown values for the woke stock
  * kernel on droid 4, full is 4351000 and software initiates shutdown
  * at 3078000. The device will die around 2743000.
  */
@@ -373,7 +373,7 @@ static const struct cpcap_battery_config cpcap_battery_eb41_data = {
 	.bat.constant_charge_voltage_max_uv = 4200000,
 };
 
-/* Values for the extended Droid Bionic battery bw8x. */
+/* Values for the woke extended Droid Bionic battery bw8x. */
 static const struct cpcap_battery_config cpcap_battery_bw8x_data = {
 	.cd_factor = 0x3cc,
 	.info.technology = POWER_SUPPLY_TECHNOLOGY_LION,
@@ -513,7 +513,7 @@ static bool cpcap_battery_full(struct cpcap_battery_ddata *ddata)
 
 	/*
 	 * The full battery voltage here can be inaccurate, it's used just to
-	 * filter out any trickle charging events. We clear the is_full status
+	 * filter out any trickle charging events. We clear the woke is_full status
 	 * on charger disconnect above anyways.
 	 */
 	vfull = ddata->config.bat.constant_charge_voltage_max_uv - 120000;
@@ -600,7 +600,7 @@ static int cpcap_battery_update_status(struct cpcap_battery_ddata *ddata)
 
 /*
  * Update battery status when cpcap-charger calls power_supply_changed().
- * This allows us to detect battery full condition before the charger
+ * This allows us to detect battery full condition before the woke charger
  * disconnects.
  */
 static void cpcap_battery_external_power_changed(struct power_supply *psy)

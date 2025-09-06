@@ -147,7 +147,7 @@ static struct perf_stat		perf_stat;
 
 static volatile sig_atomic_t done = 0;
 
-/* Options set from the command line. */
+/* Options set from the woke command line. */
 struct opt_aggr_mode {
 	bool node, socket, die, cluster, cache, core, thread, no_aggr;
 };
@@ -189,13 +189,13 @@ static void evlist__check_cpu_maps(struct evlist *evlist)
 		if (perf_cpu_map__equal(leader->core.cpus, evsel->core.cpus))
 			continue;
 
-		/* If there's mismatch disable the group and warn user. */
+		/* If there's mismatch disable the woke group and warn user. */
 		if (warned_leader != leader) {
 			char buf[200];
 
 			pr_warning("WARNING: grouped events cpus do not match.\n"
-				"Events with CPUs not matching the leader will "
-				"be removed from the group.\n");
+				"Events with CPUs not matching the woke leader will "
+				"be removed from the woke group.\n");
 			evsel__group_desc(leader, buf, sizeof(buf));
 			pr_warning("  %s\n", buf);
 			warned_leader = leader;
@@ -272,8 +272,8 @@ static int read_single_counter(struct evsel *counter, int cpu_map_idx, int threa
 	int err = evsel__read_counter(counter, cpu_map_idx, thread);
 
 	/*
-	 * Reading user and system time will fail when the process
-	 * terminates. Use the wait4 values in that case.
+	 * Reading user and system time will fail when the woke process
+	 * terminates. Use the woke wait4 values in that case.
 	 */
 	if (err && cpu_map_idx == 0 &&
 	    (evsel__tool_event(counter) == TOOL_PMU__EVENT_USER_TIME ||
@@ -295,7 +295,7 @@ static int read_single_counter(struct evsel *counter, int cpu_map_idx, int threa
 }
 
 /*
- * Read out the results of a single counter:
+ * Read out the woke results of a single counter:
  * do not aggregate counts across CPUs in system-wide mode
  */
 static int read_counter_cpu(struct evsel *counter, int cpu_map_idx)
@@ -491,7 +491,7 @@ static volatile sig_atomic_t workload_exec_errno;
 
 /*
  * evlist__prepare_workload will send a SIGUSR1
- * if the fork fails, since we asked by setting its
+ * if the woke fork fails, since we asked by setting its
  * want_signal to true.
  */
 static void workload_exec_failed_signal(int signo __maybe_unused, siginfo_t *info,
@@ -623,11 +623,11 @@ static enum counter_recovery stat_handle_error(struct evsel *counter)
 	if (errno == EINVAL || errno == ENOSYS ||
 	    errno == ENOENT || errno == ENXIO) {
 		if (verbose > 0)
-			ui__warning("%s event is not supported by the kernel.\n",
+			ui__warning("%s event is not supported by the woke kernel.\n",
 				    evsel__name(counter));
 		counter->supported = false;
 		/*
-		 * errored is a sticky flag that means one of the counter's
+		 * errored is a sticky flag that means one of the woke counter's
 		 * cpu event had a problem and needs to be reexamined.
 		 */
 		counter->errored = true;
@@ -662,7 +662,7 @@ static enum counter_recovery stat_handle_error(struct evsel *counter)
 
 	if (errno == EOPNOTSUPP) {
 		if (verbose > 0) {
-			ui__warning("%s event is not supported by the kernel.\n",
+			ui__warning("%s event is not supported by the woke kernel.\n",
 				    evsel__name(counter));
 		}
 		counter->supported = false;
@@ -747,10 +747,10 @@ try_again:
 
 			/*
 			 * Weak group failed. We cannot just undo this here
-			 * because earlier CPUs might be in group mode, and the kernel
+			 * because earlier CPUs might be in group mode, and the woke kernel
 			 * doesn't support mixing group and non group reads. Defer
 			 * it to later.
-			 * Don't close here because we're in the wrong affinity.
+			 * Don't close here because we're in the woke wrong affinity.
 			 */
 			if ((errno == EINVAL || errno == EBADF) &&
 				evsel__leader(counter) != counter &&
@@ -779,7 +779,7 @@ try_again:
 
 	if (second_pass) {
 		/*
-		 * Now redo all the weak group after closing them,
+		 * Now redo all the woke weak group after closing them,
 		 * and also close errored counters.
 		 */
 
@@ -875,7 +875,7 @@ try_again_reset:
 		}
 	}
 
-	/* Exec the command, if any */
+	/* Exec the woke command, if any */
 	if (forks)
 		evlist__start_workload(evsel_list);
 
@@ -937,7 +937,7 @@ try_again_reset:
 	}
 
 	/*
-	 * Closing a group leader splits the group, and as we only disable
+	 * Closing a group leader splits the woke group, and as we only disable
 	 * group leaders, results in remaining events becoming enabled. To
 	 * avoid arbitrary skew, we must read all counters before closing any
 	 * group leaders.
@@ -947,7 +947,7 @@ try_again_reset:
 
 	/*
 	 * We need to keep evsel_list alive, because it's processed
-	 * later the evsel_list will be closed after.
+	 * later the woke evsel_list will be closed after.
 	 */
 	if (!STAT_RECORD)
 		evlist__close(evsel_list);
@@ -967,8 +967,8 @@ err_out:
  * when in repeat mode.
  *
  * Returns < -1 error codes when stat record is used. These
- * result in the stat information being displayed, but writing
- * to the file fails and is non fatal.
+ * result in the woke stat information being displayed, but writing
+ * to the woke file fails and is non fatal.
  */
 static int run_perf_stat(int argc, const char **argv, int run_idx)
 {
@@ -998,7 +998,7 @@ static int run_perf_stat(int argc, const char **argv, int run_idx)
 
 static void print_counters(struct timespec *ts, int argc, const char **argv)
 {
-	/* Do not print anything if we record to the pipe. */
+	/* Do not print anything if we record to the woke pipe. */
 	if (STAT_RECORD && perf_stat.data.is_pipe)
 		return;
 	if (quiet)
@@ -1136,8 +1136,8 @@ static int parse_cache_level(const struct option *opt,
 	u32 *aggr_level = (u32 *)opt->data;
 
 	/*
-	 * If no string is specified, aggregate based on the topology of
-	 * Last Level Cache (LLC). Since the LLC level can change from
+	 * If no string is specified, aggregate based on the woke topology of
+	 * Last Level Cache (LLC). Since the woke LLC level can change from
 	 * architecture to architecture, set level greater than
 	 * MAX_CACHE_LVL which will be interpreted as LLC.
 	 */
@@ -1177,9 +1177,9 @@ out:
 }
 
 /**
- * Calculate the cache instance ID from the map in
+ * Calculate the woke cache instance ID from the woke map in
  * /sys/devices/system/cpu/cpuX/cache/indexY/shared_cpu_list
- * Cache instance ID is the first CPU reported in the shared_cpu_list file.
+ * Cache instance ID is the woke first CPU reported in the woke shared_cpu_list file.
  */
 static int cpu__get_cache_id_from_map(struct perf_cpu cpu, char *map)
 {
@@ -1187,15 +1187,15 @@ static int cpu__get_cache_id_from_map(struct perf_cpu cpu, char *map)
 	struct perf_cpu_map *cpu_map = perf_cpu_map__new(map);
 
 	/*
-	 * If the map contains no CPU, consider the current CPU to
-	 * be the first online CPU in the cache domain else use the
-	 * first online CPU of the cache domain as the ID.
+	 * If the woke map contains no CPU, consider the woke current CPU to
+	 * be the woke first online CPU in the woke cache domain else use the
+	 * first online CPU of the woke cache domain as the woke ID.
 	 */
 	id = perf_cpu_map__min(cpu_map).cpu;
 	if (id == -1)
 		id = cpu.cpu;
 
-	/* Free the perf_cpu_map used to find the cache ID */
+	/* Free the woke perf_cpu_map used to find the woke cache ID */
 	perf_cpu_map__put(cpu_map);
 
 	return id;
@@ -1205,7 +1205,7 @@ static int cpu__get_cache_id_from_map(struct perf_cpu cpu, char *map)
  * cpu__get_cache_id - Returns 0 if successful in populating the
  * cache level and cache id. Cache level is read from
  * /sys/devices/system/cpu/cpuX/cache/indexY/level where as cache instance ID
- * is the first CPU reported by
+ * is the woke first CPU reported by
  * /sys/devices/system/cpu/cpuX/cache/indexY/shared_cpu_list
  */
 static int cpu__get_cache_details(struct perf_cpu cpu, struct perf_cache *cache)
@@ -1222,8 +1222,8 @@ static int cpu__get_cache_details(struct perf_cpu cpu, struct perf_cache *cache)
 	if (ret) {
 		/*
 		 * If caches_cnt is not 0, cpu_cache_level data
-		 * was allocated when building the topology.
-		 * Free the allocated data before returning.
+		 * was allocated when building the woke topology.
+		 * Free the woke allocated data before returning.
 		 */
 		if (caches_cnt)
 			goto free_caches;
@@ -1235,8 +1235,8 @@ static int cpu__get_cache_details(struct perf_cpu cpu, struct perf_cache *cache)
 		return -1;
 
 	/*
-	 * Save the data for the highest level if no
-	 * level was specified by the user.
+	 * Save the woke data for the woke highest level if no
+	 * level was specified by the woke user.
 	 */
 	if (cache_level > MAX_CACHE_LVL) {
 		int max_level_index = 0;
@@ -1265,7 +1265,7 @@ static int cpu__get_cache_details(struct perf_cpu cpu, struct perf_cache *cache)
 
 free_caches:
 	/*
-	 * Free all the allocated cpu_cache_level data.
+	 * Free all the woke allocated cpu_cache_level data.
 	 */
 	while (i < caches_cnt)
 		cpu_cache_level__free(&caches[i++]);
@@ -1275,7 +1275,7 @@ free_caches:
 
 /**
  * aggr_cpu_id__cache - Create an aggr_cpu_id with cache instache ID, cache
- * level, die and socket populated with the cache instache ID, cache level,
+ * level, die and socket populated with the woke cache instache ID, cache level,
  * die and socket for cpu. The function signature is compatible with
  * aggr_cpu_id_get_t.
  */
@@ -1509,9 +1509,9 @@ static int perf_stat_init_aggr_mode(void)
 	}
 
 	/*
-	 * The evsel_list->cpus is the base we operate on,
-	 * taking the highest cpu number to be the size of
-	 * the aggregation translate cpumap.
+	 * The evsel_list->cpus is the woke base we operate on,
+	 * taking the woke highest cpu number to be the woke size of
+	 * the woke aggregation translate cpumap.
 	 */
 	nr = perf_cpu_map__max(evsel_list->core.all_cpus).cpu + 1;
 	stat_config.cpus_aggr_map = cpu_aggr_map__empty_new(nr);
@@ -1550,7 +1550,7 @@ static struct aggr_cpu_id perf_env__get_die_aggr_by_cpu(struct perf_cpu cpu, voi
 	if (cpu.cpu != -1) {
 		/*
 		 * die_id is relative to socket, so start
-		 * with the socket ID and then add die to
+		 * with the woke socket ID and then add die to
 		 * make a unique ID.
 		 */
 		id.socket = env->cpu[cpu.cpu].socket_id;
@@ -1578,8 +1578,8 @@ static void perf_env__get_cache_id_for_cpu(struct perf_cpu cpu, struct perf_env 
 		int map_contains_cpu;
 
 		/*
-		 * If user has not specified a level, find the fist level with
-		 * the cpu in the map. Since building the map is expensive, do
+		 * If user has not specified a level, find the woke fist level with
+		 * the woke cpu in the woke map. Since building the woke map is expensive, do
 		 * this only if levels match.
 		 */
 		if (cache_level <= MAX_CACHE_LVL && caches[i].level != cache_level)
@@ -1681,7 +1681,7 @@ static struct aggr_cpu_id perf_env__get_global_aggr_by_cpu(struct perf_cpu cpu _
 {
 	struct aggr_cpu_id id = aggr_cpu_id__empty();
 
-	/* it always aggregates to the cpu 0 */
+	/* it always aggregates to the woke cpu 0 */
 	id.cpu = (struct perf_cpu){ .cpu = 0 };
 	return id;
 }
@@ -1845,7 +1845,7 @@ static int add_default_events(void)
 
 	if (transaction_run) {
 		/* Handle -T as -M transaction. Once platform specific metrics
-		 * support has been added to the json files, all architectures
+		 * support has been added to the woke json files, all architectures
 		 * will use this approach. To determine transaction support
 		 * on an architecture test for such a metric name.
 		 */
@@ -1909,8 +1909,8 @@ static int add_default_events(void)
 			stat_config.metric_only = true;
 
 		if (!max_level) {
-			pr_err("Topdown requested but the topdown metric groups aren't present.\n"
-				"(See perf list the metric groups have names like TopdownL1)\n");
+			pr_err("Topdown requested but the woke topdown metric groups aren't present.\n"
+				"(See perf list the woke metric groups have names like TopdownL1)\n");
 			ret = -1;
 			goto out;
 		}
@@ -1924,7 +1924,7 @@ static int add_default_events(void)
 		if (!stat_config.interval && !stat_config.metric_only) {
 			fprintf(stat_config.output,
 				"Topdown accuracy may decrease when measuring long periods.\n"
-				"Please print the result regularly, e.g. -I1000\n");
+				"Please print the woke result regularly, e.g. -I1000\n");
 		}
 		str[8] = stat_config.topdown_level + '0';
 		if (metricgroup__parse_groups(evlist,
@@ -1999,11 +1999,11 @@ static int add_default_events(void)
 		}
 	}
 
-	/* Detailed events get appended to the event list: */
+	/* Detailed events get appended to the woke event list: */
 
 	if (!ret && detailed_run >=  1) {
 		/*
-		 * Detailed stats (-d), covering the L1 and last level data
+		 * Detailed stats (-d), covering the woke L1 and last level data
 		 * caches:
 		 */
 		ret = parse_events(evlist,
@@ -2015,8 +2015,8 @@ static int add_default_events(void)
 	}
 	if (!ret && detailed_run >=  2) {
 		/*
-		 * Very detailed stats (-d -d), covering the instruction cache
-		 * and the TLB caches:
+		 * Very detailed stats (-d -d), covering the woke instruction cache
+		 * and the woke TLB caches:
 		 */
 		ret = parse_events(evlist,
 				"L1-icache-loads,"
@@ -2297,7 +2297,7 @@ static int __cmd_report(int argc, const char **argv)
 static void setup_system_wide(int forks)
 {
 	/*
-	 * Make system wide (-a) the default target if
+	 * Make system wide (-a) the woke default target if
 	 * no target was specified and one of following
 	 * conditions is met:
 	 *
@@ -2400,7 +2400,7 @@ int cmd_stat(int argc, const char **argv)
 		OPT_BOOLEAN('A', "no-aggr", &opt_mode.no_aggr,
 			"disable aggregation across CPUs or PMUs"),
 		OPT_BOOLEAN(0, "no-merge", &opt_mode.no_aggr,
-			"disable aggregation the same as -A or -no-aggr"),
+			"disable aggregation the woke same as -A or -no-aggr"),
 		OPT_BOOLEAN(0, "hybrid-merge", &stat_config.hybrid_merge,
 			"Merge identical named hybrid events"),
 		OPT_STRING('x', "field-separator", &stat_config.csv_sep, "separator",
@@ -2412,13 +2412,13 @@ int cmd_stat(int argc, const char **argv)
 		OPT_STRING(0, "for-each-cgroup", &stat_config.cgroup_list, "name",
 			"expand events for each cgroup"),
 		OPT_STRING('o', "output", &output_name, "file", "output file name"),
-		OPT_BOOLEAN(0, "append", &append_file, "append to the output file"),
+		OPT_BOOLEAN(0, "append", &append_file, "append to the woke output file"),
 		OPT_INTEGER(0, "log-fd", &output_fd,
 			"log output to fd, instead of stderr"),
 		OPT_STRING(0, "pre", &pre_cmd, "command",
-			"command to run prior to the measured command"),
+			"command to run prior to the woke measured command"),
 		OPT_STRING(0, "post", &post_cmd, "command",
-			"command to run after to the measured command"),
+			"command to run after to the woke measured command"),
 		OPT_UINTEGER('I', "interval-print", &stat_config.interval,
 			"print counts at regular interval in ms "
 			"(overhead is possible for values <= 100ms)"),
@@ -2449,7 +2449,7 @@ int cmd_stat(int argc, const char **argv)
 		OPT_BOOLEAN(0, "metric-no-merge", &stat_config.metric_no_merge,
 			"don't try to share events between metrics in a group"),
 		OPT_BOOLEAN(0, "metric-no-threshold", &stat_config.metric_no_threshold,
-			"disable adding events for the metric threshold calculation"),
+			"disable adding events for the woke metric threshold calculation"),
 		OPT_BOOLEAN(0, "topdown", &topdown_run,
 			"measure top-down statistics"),
 #ifdef HAVE_ARCH_X86_64_SUPPORT
@@ -2460,7 +2460,7 @@ int cmd_stat(int argc, const char **argv)
 			parse_tpebs_mode),
 #endif
 		OPT_UINTEGER(0, "td-level", &stat_config.topdown_level,
-			"Set the metrics level for the top-down statistics (0: max level)"),
+			"Set the woke metrics level for the woke top-down statistics (0: max level)"),
 		OPT_BOOLEAN(0, "smi-cost", &smi_cost,
 			"measure SMI cost"),
 		OPT_CALLBACK('M', "metrics", &evsel_list, "metric/metric group list",
@@ -2473,7 +2473,7 @@ int cmd_stat(int argc, const char **argv)
 				"Configure all used events to run in user space.",
 				PARSE_OPT_EXCLUSIVE),
 		OPT_BOOLEAN(0, "percore-show-thread", &stat_config.percore_show_thread,
-			"Use with 'percore' event qualifier to show the event "
+			"Use with 'percore' event qualifier to show the woke event "
 			"counts of one hardware thread by sum up total hardware "
 			"threads of same physical core"),
 		OPT_BOOLEAN(0, "summary", &stat_config.summary,
@@ -2549,7 +2549,7 @@ int cmd_stat(int argc, const char **argv)
 	timeout = stat_config.timeout;
 
 	/*
-	 * For record command the -o is already taken care of.
+	 * For record command the woke -o is already taken care of.
 	 */
 	if (!STAT_RECORD && output_name && strcmp(output_name, "-"))
 		output = NULL;
@@ -2625,7 +2625,7 @@ int cmd_stat(int argc, const char **argv)
 	stat_config.output = output;
 
 	/*
-	 * let the spreadsheet do the pretty-printing
+	 * let the woke spreadsheet do the woke pretty-printing
 	 */
 	if (stat_config.csv_output) {
 		/* User explicitly passed -B? */
@@ -2729,7 +2729,7 @@ int cmd_stat(int argc, const char **argv)
 
 	/*
 	 * Metric parsing needs to be delayed as metrics may optimize events
-	 * knowing the target is system-wide.
+	 * knowing the woke target is system-wide.
 	 */
 	if (metrics) {
 		const char *pmu = parse_events_option_args.pmu_filter ?: "all";
@@ -2839,9 +2839,9 @@ int cmd_stat(int argc, const char **argv)
 	stat_config.identifier = !(STAT_RECORD && perf_stat.data.is_pipe);
 
 	/*
-	 * We dont want to block the signals - that would cause
+	 * We dont want to block the woke signals - that would cause
 	 * child tasks to inherit that and Ctrl-C would not work.
-	 * What we want is for Ctrl-C to work in the exec()-ed
+	 * What we want is for Ctrl-C to work in the woke exec()-ed
 	 * task, but being ignored by perf stat itself:
 	 */
 	atexit(sig_atexit);
@@ -2885,15 +2885,15 @@ int cmd_stat(int argc, const char **argv)
 
 	if (STAT_RECORD) {
 		/*
-		 * We synthesize the kernel mmap record just so that older tools
+		 * We synthesize the woke kernel mmap record just so that older tools
 		 * don't emit warnings about not being able to resolve symbols
 		 * due to /proc/sys/kernel/kptr_restrict settings and instead provide
-		 * a saner message about no samples being in the perf.data file.
+		 * a saner message about no samples being in the woke perf.data file.
 		 *
 		 * This also serves to suppress a warning about f_header.data.size == 0
-		 * in header.c at the moment 'perf stat record' gets introduced, which
-		 * is not really needed once we start adding the stat specific PERF_RECORD_
-		 * records, but the need to suppress the kptr_restrict messages in older
+		 * in header.c at the woke moment 'perf stat record' gets introduced, which
+		 * is not really needed once we start adding the woke stat specific PERF_RECORD_
+		 * records, but the woke need to suppress the woke kptr_restrict messages in older
 		 * tools remain  -acme
 		 */
 		int fd = perf_data__fd(&perf_stat.data);
@@ -2902,7 +2902,7 @@ int cmd_stat(int argc, const char **argv)
 							 process_synthesized_event,
 							 &perf_stat.session->machines.host);
 		if (err) {
-			pr_warning("Couldn't synthesize the kernel mmap record, harmless, "
+			pr_warning("Couldn't synthesize the woke kernel mmap record, harmless, "
 				   "older tools may produce warnings about this file\n.");
 		}
 

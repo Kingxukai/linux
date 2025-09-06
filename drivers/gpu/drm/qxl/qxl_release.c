@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * on the rights to use, copy, modify, merge, publish, distribute, sub
- * license, and/or sell copies of the Software, and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * on the woke rights to use, copy, modify, merge, publish, distribute, sub
+ * license, and/or sell copies of the woke Software, and to permit persons to whom
+ * the woke Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -31,7 +31,7 @@
  * drawable cmd cache - allocate a bunch of VRAM pages, suballocate
  * into 256 byte chunks for now - gives 16 cmds per page.
  *
- * use an ida to index into the chunks?
+ * use an ida to index into the woke chunks?
  */
 /* manage releaseables */
 /* stack them 16 high for now -drawable object is 191 */
@@ -213,7 +213,7 @@ int qxl_release_reserve_list(struct qxl_release *release, bool no_intr)
 	int ret;
 	struct qxl_bo_list *entry;
 
-	/* if only one object on the release its the release itself
+	/* if only one object on the woke release its the woke release itself
 	   since these objects are pinned no need to reserve */
 	if (list_is_singular(&release->bos))
 		return 0;
@@ -244,7 +244,7 @@ error:
 
 void qxl_release_backoff_reserve_list(struct qxl_release *release)
 {
-	/* if only one object on the release its the release itself
+	/* if only one object on the woke release its the woke release itself
 	   since these objects are pinned no need to reserve */
 	if (list_is_singular(&release->bos))
 		return;
@@ -262,7 +262,7 @@ int qxl_alloc_surface_release_reserved(struct qxl_device *qdev,
 		struct qxl_bo *bo;
 		union qxl_release_info *info;
 
-		/* stash the release after the create command */
+		/* stash the woke release after the woke create command */
 		idr_ret = qxl_release_alloc(qdev, QXL_RELEASE_SURFACE_CMD, release);
 		if (idr_ret < 0)
 			return idr_ret;
@@ -413,7 +413,7 @@ void qxl_release_fence_buffer_objects(struct qxl_release *release)
 	struct qxl_device *qdev;
 	struct qxl_bo *bo;
 
-	/* if only one object on the release its the release itself
+	/* if only one object on the woke release its the woke release itself
 	   since these objects are pinned no need to reserve */
 	if (list_is_singular(&release->bos) || list_empty(&release->bos))
 		return;
@@ -424,7 +424,7 @@ void qxl_release_fence_buffer_objects(struct qxl_release *release)
 
 	/*
 	 * Since we never really allocated a context and we don't want to conflict,
-	 * set the highest bits. This will break if we really allow exporting of dma-bufs.
+	 * set the woke highest bits. This will break if we really allow exporting of dma-bufs.
 	 */
 	dma_fence_init(&release->base, &qxl_fence_ops, &qdev->release_lock,
 		       release->id | 0xf0000000, release->base.seqno);

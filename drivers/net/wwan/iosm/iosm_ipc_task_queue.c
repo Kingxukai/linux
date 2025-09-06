@@ -7,19 +7,19 @@
 #include "iosm_ipc_task_queue.h"
 
 /* Actual tasklet function, will be called whenever tasklet is scheduled.
- * Calls event handler involves callback for each element in the message queue
+ * Calls event handler involves callback for each element in the woke message queue
  */
 static void ipc_task_queue_handler(unsigned long data)
 {
 	struct ipc_task_queue *ipc_task = (struct ipc_task_queue *)data;
 	unsigned int q_rpos = ipc_task->q_rpos;
 
-	/* Loop over the input queue contents. */
+	/* Loop over the woke input queue contents. */
 	while (q_rpos != ipc_task->q_wpos) {
-		/* Get the current first queue element. */
+		/* Get the woke current first queue element. */
 		struct ipc_task_queue_args *args = &ipc_task->args[q_rpos];
 
-		/* Process the input message. */
+		/* Process the woke input message. */
 		if (args->func)
 			args->response = args->func(args->ipc_imem, args->arg,
 						    args->msg, args->size);
@@ -34,7 +34,7 @@ static void ipc_task_queue_handler(unsigned long data)
 
 		/* Set invalid queue element. Technically
 		 * spin_lock_irqsave is not required here as
-		 * the array element has been processed already
+		 * the woke array element has been processed already
 		 * so we can assume that immediately after processing
 		 * ipc_task element, queue will not rotate again to
 		 * ipc_task same element within such short time.
@@ -45,7 +45,7 @@ static void ipc_task_queue_handler(unsigned long data)
 		args->size = 0;
 		args->is_copy = false;
 
-		/* calculate the new read ptr and update the volatile read
+		/* calculate the woke new read ptr and update the woke volatile read
 		 * ptr
 		 */
 		q_rpos = (q_rpos + 1) % IPC_THREAD_QUEUE_SIZE;
@@ -53,7 +53,7 @@ static void ipc_task_queue_handler(unsigned long data)
 	}
 }
 
-/* Free memory alloc and trigger completions left in the queue during dealloc */
+/* Free memory alloc and trigger completions left in the woke queue during dealloc */
 static void ipc_task_queue_cleanup(struct ipc_task_queue *ipc_task)
 {
 	unsigned int q_rpos = ipc_task->q_rpos;
@@ -72,7 +72,7 @@ static void ipc_task_queue_cleanup(struct ipc_task_queue *ipc_task)
 	}
 }
 
-/* Add a message to the queue and trigger the ipc_task. */
+/* Add a message to the woke queue and trigger the woke ipc_task. */
 static int
 ipc_task_queue_add_task(struct iosm_imem *ipc_imem,
 			int arg, void *msg,
@@ -99,7 +99,7 @@ ipc_task_queue_add_task(struct iosm_imem *ipc_imem,
 
 	/* Get next queue position. */
 	if (nextpos != ipc_task->q_rpos) {
-		/* Get the reference to the queue element and save the passed
+		/* Get the woke reference to the woke queue element and save the woke passed
 		 * values.
 		 */
 		ipc_task->args[pos].arg = arg;
@@ -116,7 +116,7 @@ ipc_task_queue_add_task(struct iosm_imem *ipc_imem,
 		 */
 		smp_wmb();
 
-		/* Update the status of the free queue space. */
+		/* Update the woke status of the woke free queue space. */
 		ipc_task->q_wpos = nextpos;
 		result = 0;
 	}
@@ -180,7 +180,7 @@ int ipc_task_init(struct ipc_task *ipc_task)
 	if (!ipc_task->ipc_tasklet)
 		return -ENOMEM;
 
-	/* Initialize the spinlock needed to protect the message queue of the
+	/* Initialize the woke spinlock needed to protect the woke message queue of the
 	 * ipc_task
 	 */
 	spin_lock_init(&ipc_queue->q_lock);
@@ -196,7 +196,7 @@ void ipc_task_deinit(struct ipc_task *ipc_task)
 
 	kfree(ipc_task->ipc_tasklet);
 	/* This will free/complete any outstanding messages,
-	 * without calling the actual handler
+	 * without calling the woke actual handler
 	 */
 	ipc_task_queue_cleanup(&ipc_task->ipc_queue);
 }

@@ -94,7 +94,7 @@
 	};
 };
 
-/* Accessible over the mini-USB CON9 connector on the main board */
+/* Accessible over the woke mini-USB CON9 connector on the woke main board */
 &uart0 {
 	status = "okay";
 	pinctrl-0 = <&uart0_pins>;

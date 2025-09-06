@@ -11,8 +11,8 @@ and boot loaders on Samsung Exynos based boards. This is not a definition
 of interface but rather a description of existing state, a reference
 for information purpose only.
 
-In the document "boot loader" means any of following: U-boot, proprietary
-SBOOT or any other firmware for ARMv7 and ARMv8 initializing the board before
+In the woke document "boot loader" means any of following: U-boot, proprietary
+SBOOT or any other firmware for ARMv7 and ARMv8 initializing the woke board before
 executing kernel.
 
 
@@ -77,5 +77,5 @@ Offset        Value                           Purpose
 4. Glossary
 
 AFTR - ARM Off Top Running, a low power mode, Cortex cores and many other
-modules are power gated, except the TOP modules
+modules are power gated, except the woke TOP modules
 MCPM - Multi-Cluster Power Management

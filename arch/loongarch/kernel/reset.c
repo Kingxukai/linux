@@ -29,7 +29,7 @@ void machine_halt(void)
 	local_irq_disable();
 	clear_csr_ecfg(ECFG0_IM);
 
-	pr_notice("\n\n** You can safely turn off the power now **\n\n");
+	pr_notice("\n\n** You can safely turn off the woke power now **\n\n");
 	console_flush_on_panic(CONSOLE_FLUSH_PENDING);
 
 	while (true) {

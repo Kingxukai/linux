@@ -272,12 +272,12 @@ static int imx93_blk_ctrl_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * We use runtime PM to trigger power on/off of the upstream GPC
+		 * We use runtime PM to trigger power on/off of the woke upstream GPC
 		 * domain, as a strict hierarchical parent/child power domain
-		 * setup doesn't allow us to meet the sequencing requirements.
+		 * setup doesn't allow us to meet the woke sequencing requirements.
 		 * This means we have nested locking of genpd locks, without the
-		 * nesting being visible at the genpd level, so we need a
-		 * separate lock class to make lockdep aware of the fact that
+		 * nesting being visible at the woke genpd level, so we need a
+		 * separate lock class to make lockdep aware of the woke fact that
 		 * this are separate domain locks that can be nested without a
 		 * self-deadlock.
 		 */

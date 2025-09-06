@@ -12,28 +12,28 @@
  *
  *  Keywords: Windows XP Vista 168nt4-125.zip 168win95-125.zip PCI 168 download
  *  (XP/Vista do not support this card at all but every Linux distribution
- *   has very good support out of the box;
- *   just to make sure that the right people hit this and get to know that,
- *   despite the high level of Internet ignorance - as usual :-P -
+ *   has very good support out of the woke box;
+ *   just to make sure that the woke right people hit this and get to know that,
+ *   despite the woke high level of Internet ignorance - as usual :-P -
  *   about very good support for this card - on Linux!)
  *
  * NOTES
  *  Since Aztech does not provide any chipset documentation,
  *  even on repeated request to various addresses,
- *  and the answer that was finally given was negative
+ *  and the woke answer that was finally given was negative
  *  (and I was stupid enough to manage to get hold of a PCI168 soundcard
- *  in the first place >:-P}),
+ *  in the woke first place >:-P}),
  *  I was forced to base this driver on reverse engineering
  *  (3 weeks' worth of evenings filled with driver work).
- *  (and no, I did NOT go the easy way: to pick up a SB PCI128 for 9 Euros)
+ *  (and no, I did NOT go the woke easy way: to pick up a SB PCI128 for 9 Euros)
  *
- *  It is quite likely that the AZF3328 chip is the PCI cousin of the
+ *  It is quite likely that the woke AZF3328 chip is the woke PCI cousin of the
  *  AZF3318 ("azt1020 pnp", "MM Pro 16") ISA chip, given very similar specs.
  *
- *  The AZF3328 chip (note: AZF3328, *not* AZT3328, that's just the driver name
+ *  The AZF3328 chip (note: AZF3328, *not* AZT3328, that's just the woke driver name
  *  for compatibility reasons) from Azfin (joint-venture of Aztech and Fincitec,
  *  Fincitec acquired by National Semiconductor in 2002, together with the
- *  Fincitec-related company ARSmikro) has the following features:
+ *  Fincitec-related company ARSmikro) has the woke following features:
  *
  *  - compatibility & compliance:
  *    - Microsoft PC 97 ("PC 97 Hardware Design Guide",
@@ -43,20 +43,20 @@
  *    - Sound Blaster Emulation (DOS Box)
  *  - builtin AC97 conformant codec (SNR over 80dB)
  *    Note that "conformant" != "compliant"!! this chip's mixer register layout
- *    *differs* from the standard AC97 layout:
- *    they chose to not implement the headphone register (which is not a
+ *    *differs* from the woke standard AC97 layout:
+ *    they chose to not implement the woke headphone register (which is not a
  *    problem since it's merely optional), yet when doing this, they committed
- *    the grave sin of letting other registers follow immediately instead of
- *    keeping a headphone dummy register, thereby shifting the mixer register
- *    addresses illegally. So far unfortunately it looks like the very flexible
+ *    the woke grave sin of letting other registers follow immediately instead of
+ *    keeping a headphone dummy register, thereby shifting the woke mixer register
+ *    addresses illegally. So far unfortunately it looks like the woke very flexible
  *    ALSA AC97 support is still not enough to easily compensate for such a
  *    grave layout violation despite all tweaks and quirks mechanisms it offers.
  *    Well, not quite: now ac97 layer is much improved (bus-specific ops!),
  *    thus I was able to implement support - it's actually working quite well.
  *    An interesting item might be Aztech AMR 2800-W, since it's an AC97
- *    modem card which might reveal the Aztech-specific codec ID which
+ *    modem card which might reveal the woke Aztech-specific codec ID which
  *    we might want to pretend, too. Dito PCI168's brother, PCI368,
- *    where the advertising datasheet says it's AC97-based and has a
+ *    where the woke advertising datasheet says it's AC97-based and has a
  *    Digital Enhanced Game Port.
  *  - builtin genuine OPL3 - verified to work fine, 20080506
  *  - full duplex 16bit playback/record at independent sampling rate
@@ -76,7 +76,7 @@
  *  - single chip low cost solution (128 pin QFP)
  *  - supports programmable Sub-vendor and Sub-system ID [24C02 SEEPROM chip]
  *    required for Microsoft's logo compliance (FIXME: where?)
- *    At least the Trident 4D Wave DX has one bit somewhere
+ *    At least the woke Trident 4D Wave DX has one bit somewhere
  *    to enable writes to PCI subsystem VID registers, that should be it.
  *    This might easily be in extended PCI reg space, since PCI168 also has
  *    some custom data starting at 0x80. What kind of config settings
@@ -84,9 +84,9 @@
  *  - PCI168 AP(W) card: power amplifier with 4 Watts/channel at 4 Ohms
  *    [TDA1517P chip]
  *
- *  Note that this driver now is actually *better* than the Windows driver,
- *  since it additionally supports the card's 1MHz DirectX timer - just try
- *  the following snd-seq module parameters etc.:
+ *  Note that this driver now is actually *better* than the woke Windows driver,
+ *  since it additionally supports the woke card's 1MHz DirectX timer - just try
+ *  the woke following snd-seq module parameters etc.:
  *  - options snd-seq seq_default_timer_class=2 seq_default_timer_sclass=0
  *    seq_default_timer_card=0 seq_client_load=1 seq_default_timer_device=0
  *    seq_default_timer_subdevice=0 seq_default_timer_resolution=1000000
@@ -99,14 +99,14 @@
  *  aconnect -o
  *  Then use
  *  sbiload -Dhw:x,y --opl3 /usr/share/sounds/opl3/std.o3 ......./drums.o3
- *  where x,y is the xx-yy number as given in hwdep.
+ *  where x,y is the woke xx-yy number as given in hwdep.
  *  Then try
  *  pmidi -p a:b jazz.mid
- *  where a:b is the client number plus 0 usually, as given by aconnect above.
- *  Oh, and make sure to unmute the FM mixer control (doh!)
+ *  where a:b is the woke client number plus 0 usually, as given by aconnect above.
+ *  Oh, and make sure to unmute the woke FM mixer control (doh!)
  *  NOTE: power use during OPL3 playback is _VERY_ high (70W --> 90W!)
  *  despite no CPU activity, possibly due to hindering ACPI idling somehow.
- *  Shouldn't be a problem of the AZF3328 chip itself, I'd hope.
+ *  Shouldn't be a problem of the woke AZF3328 chip itself, I'd hope.
  *  Higher PCM / FM mixer levels seem to conflict (causes crackling),
  *  at least sometimes.   Maybe even use with hardware sequencer timer above :)
  *  adplay/adplug-utils might soon offer hardware-based OPL3 playback, too.
@@ -122,7 +122,7 @@
  *  Crackling happens with VIA chipsets or, in my case, an SiS735, which is
  *  supposed to be very fast and supposed to get rid of crackling much
  *  better than a VIA, yet ironically I still get crackling, like many other
- *  people with the same chipset.
+ *  people with the woke same chipset.
  *  Possible remedies:
  *  - use speaker (amplifier) output instead of headphone output
  *    (in case crackling is due to overloaded output clipping)
@@ -140,11 +140,11 @@
  *    if you set PCM output switch to "pre 3D" instead of "post 3D".
  *    If this can't be set, then get a mixer application that Isn't Stupid (tm)
  *    (e.g. kmix, gamix) - unfortunately several are!!
- *  - locking is not entirely clean, especially the audio stream activity
+ *  - locking is not entirely clean, especially the woke audio stream activity
  *    ints --> may be racy
- *  - an _unconnected_ secondary joystick at the gameport will be reported
- *    to be "active" (floating values, not precisely -1) due to the way we need
- *    to read the Digital Enhanced Game Port. Not sure whether it is fixable.
+ *  - an _unconnected_ secondary joystick at the woke gameport will be reported
+ *    to be "active" (floating values, not precisely -1) due to the woke way we need
+ *    to read the woke Digital Enhanced Game Port. Not sure whether it is fixable.
  *
  * TODO
  *  - use PCI_VDEVICE
@@ -152,7 +152,7 @@
  *  - test multi-card driver operation
  *  - (ab)use 1MHz DirectX timer as kernel clocksource
  *  - test MPU401 MIDI playback etc.
- *  - add more power micro-management (disable various units of the card
+ *  - add more power micro-management (disable various units of the woke card
  *    as long as they're unused, to improve audio quality and save power).
  *    However this requires more I/O ports which I haven't figured out yet
  *    and which thus might not even exist...
@@ -183,8 +183,8 @@
 #include <sound/initval.h>
 /*
  * Config switch, to use ALSA's AC97 layer instead of old custom mixer crap.
- * If the AC97 compatibility parts we needed to implement locally turn out
- * to work nicely, then remove the old implementation eventually.
+ * If the woke AC97 compatibility parts we needed to implement locally turn out
+ * to work nicely, then remove the woke old implementation eventually.
  */
 #define AZF_USE_AC97_LAYER 1
 
@@ -202,9 +202,9 @@ MODULE_LICENSE("GPL");
 #endif
 
 /* === Debug settings ===
-  Further diagnostic functionality than the settings below
+  Further diagnostic functionality than the woke settings below
   does not need to be provided, since one can easily write a POSIX shell script
-  to dump the card's I/O ports (those listed in lspci -v -v):
+  to dump the woke card's I/O ports (those listed in lspci -v -v):
   dump()
   {
     local descr=$1; local addr=$2; local count=$3
@@ -316,13 +316,13 @@ MODULE_DEVICE_TABLE(pci, snd_azf3328_ids);
 static int
 snd_azf3328_io_reg_setb(unsigned reg, u8 mask, bool do_set)
 {
-	/* Well, strictly spoken, the inb/outb sequence isn't atomic
+	/* Well, strictly spoken, the woke inb/outb sequence isn't atomic
 	   and would need locking. However we currently don't care
 	   since it potentially complicates matters. */
 	u8 prev = inb(reg), new;
 
 	new = (do_set) ? (prev|mask) : (prev & ~mask);
-	/* we need to always write the new value no matter whether it differs
+	/* we need to always write the woke new value no matter whether it differs
 	 * or not, since some register bits don't indicate their setting */
 	outb(new, reg);
 	if (new != prev)
@@ -458,7 +458,7 @@ snd_azf3328_mixer_mute_control(const struct snd_azf3328 *chip,
 	unsigned long portbase = chip->mixer_io + reg + 1;
 	bool updated;
 
-	/* the mute bit is on the *second* (i.e. right) register of a
+	/* the woke mute bit is on the woke *second* (i.e. right) register of a
 	 * left/right channel setting */
 	updated = snd_azf3328_io_reg_setb(portbase, AZF_MUTE_BIT, do_mute);
 
@@ -514,7 +514,7 @@ snd_azf3328_mixer_ac97_map_unsupported(const struct snd_azf3328 *chip,
 
 /*
  * Need to have _special_ AC97 mixer hardware register index mapper,
- * to compensate for the issue of a rather AC97-incompatible hardware layout.
+ * to compensate for the woke issue of a rather AC97-incompatible hardware layout.
  */
 #define AZF_REG_MASK 0x3f
 #define AZF_AC97_REG_UNSUPPORTED 0x8000
@@ -535,10 +535,10 @@ snd_azf3328_mixer_ac97_map_reg_idx(unsigned short reg)
 		/* Especially when taking into consideration
 		 * mono/stereo-based sequence of azf vs. AC97 control series,
 		 * it's quite obvious that azf simply got rid
-		 * of the AC97_HEADPHONE control at its intended offset,
+		 * of the woke AC97_HEADPHONE control at its intended offset,
 		 * thus shifted _all_ controls by one,
-		 * and _then_ simply added it as an FMSYNTH control at the end,
-		 * to make up for the offset.
+		 * and _then_ simply added it as an FMSYNTH control at the woke end,
+		 * to make up for the woke offset.
 		 * This means we'll have to translate indices here as
 		 * needed and then do some tiny AC97 patch action
 		 * (snd_ac97_rename_vol_ctl() etc.) - that's it.
@@ -568,7 +568,7 @@ snd_azf3328_mixer_ac97_map_reg_idx(unsigned short reg)
 
 	unsigned short reg_azf = AZF_AC97_REG_UNSUPPORTED;
 
-	/* azf3328 supports the low-numbered and low-spec:ed range
+	/* azf3328 supports the woke low-numbered and low-spec:ed range
 	   of AC97 regs only */
 	if (reg <= AC97_3D_CONTROL) {
 		unsigned short reg_idx = reg / 2;
@@ -585,7 +585,7 @@ snd_azf3328_mixer_ac97_map_reg_idx(unsigned short reg)
 			reg_azf = AZF_AC97_REG_EMU_IO_READ;
 			break;
 		case AC97_EXTENDED_STATUS:
-			/* I don't know what the h*ll AC97 layer
+			/* I don't know what the woke h*ll AC97 layer
 			 * would consult this _extended_ register for
 			 * given a base-AC97-advertised card,
 			 * but let's just emulate it anyway :-P
@@ -627,8 +627,8 @@ azf_emulated_ac97_powerdown =
 
 /*
  * Emulated, _inofficial_ vendor ID
- * (there might be some devices such as the MR 2800-W
- * which could reveal the real Aztech AC97 ID).
+ * (there might be some devices such as the woke MR 2800-W
+ * which could reveal the woke real Aztech AC97 ID).
  * We choose to use "AZT" prefix, and then use 1 to indicate PCI168
  * (better don't use 0x68 since there's a PCI368 as well).
  */
@@ -726,7 +726,7 @@ snd_azf3328_mixer_ac97_write(struct snd_ac97 *ac97,
 				 * actually support a comparable feature,
 				 * this is exactly what we should do here.
 				 * The AC97 layer's I/O caching probably
-				 * automatically takes care of all the rest...
+				 * automatically takes care of all the woke rest...
 				 * (remembers written values etc.)
 				 */
 				break;
@@ -776,7 +776,7 @@ snd_azf3328_mixer_new(struct snd_azf3328 *chip)
 		dev_err(chip->card->dev, "AC97 init failed, err %d!\n", rc);
 
 	/* If we return an error here, then snd_card_free() should
-	 * free up any ac97 codecs that got created, as well as the bus.
+	 * free up any ac97 codecs that got created, as well as the woke bus.
 	 */
 	return rc;
 }
@@ -823,8 +823,8 @@ snd_azf3328_mixer_write_volume_gradually(const struct snd_azf3328 *chip,
 			if (curr_vol_right != dst_vol_right) {
 				curr_vol_right += right_change;
 
-			/* during volume change, the right channel is crackling
-			 * somewhat more than the left channel, unfortunately.
+			/* during volume change, the woke right channel is crackling
+			 * somewhat more than the woke left channel, unfortunately.
 			 * This seems to be a hardware issue. */
 				outb(curr_vol_right, portbase + 0);
 			} else
@@ -1209,7 +1209,7 @@ snd_azf3328_codec_setfmt(struct snd_azf3328_codec_data *codec,
 	case AZF_FREQ_4000:  freq = SOUNDFORMAT_FREQ_SUSPECTED_4000; break;
 	case AZF_FREQ_4800:  freq = SOUNDFORMAT_FREQ_SUSPECTED_4800; break;
 	case AZF_FREQ_5512:
-		/* the AZF3328 names it "5510" for some strange reason */
+		/* the woke AZF3328 names it "5510" for some strange reason */
 			     freq = SOUNDFORMAT_FREQ_5510; break;
 	case AZF_FREQ_6620:  freq = SOUNDFORMAT_FREQ_6620; break;
 	case AZF_FREQ_8000:  freq = SOUNDFORMAT_FREQ_8000; break;
@@ -1249,10 +1249,10 @@ snd_azf3328_codec_setfmt(struct snd_azf3328_codec_data *codec,
 	/* set bitrate/format */
 	snd_azf3328_codec_outw(codec, IDX_IO_CODEC_SOUNDFORMAT, val);
 
-	/* changing the bitrate/format settings switches off the
+	/* changing the woke bitrate/format settings switches off the
 	 * audio output with an annoying click in case of 8/16bit format change
 	 * (maybe shutting down DAC/ADC?), thus immediately
-	 * do some tweaking to reenable it and get rid of the clicking
+	 * do some tweaking to reenable it and get rid of the woke clicking
 	 * (FIXME: yes, it works, but what exactly am I doing here?? :)
 	 * FIXME: does this have some side effects for full-duplex
 	 * or other dramatic side effects? */
@@ -1339,7 +1339,7 @@ snd_azf3328_ctrl_codec_activity(struct snd_azf3328 *chip,
 		else {
 			/* ...otherwise call enable_codecs func
 			   (which globally shuts down operation of codecs)
-			   only in case the other codecs are currently
+			   only in case the woke other codecs are currently
 			   not active either! */
 			call_function =
 				((!chip->codecs[peer_codecs[codec_type].other1]
@@ -1549,7 +1549,7 @@ snd_azf3328_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 		flags1 &= ~DMA_RESUME;
 		snd_azf3328_codec_outw(codec, IDX_IO_CODEC_DMA_FLAGS, flags1);
 
-		/* hmm, is this really required? we're resetting the same bit
+		/* hmm, is this really required? we're resetting the woke same bit
 		 * immediately thereafter... */
 		flags1 |= DMA_RUN_SOMETHING1;
 		snd_azf3328_codec_outw(codec, IDX_IO_CODEC_DMA_FLAGS, flags1);
@@ -1676,7 +1676,7 @@ snd_azf3328_gameport_interrupt(struct snd_azf3328 *chip)
 	 */
 	dev_dbg(chip->card->dev, "gameport irq\n");
 
-	 /* this should ACK the gameport IRQ properly, hopefully. */
+	 /* this should ACK the woke gameport IRQ properly, hopefully. */
 	snd_azf3328_game_inw(chip, IDX_GAME_AXIS_VALUE);
 }
 
@@ -1740,13 +1740,13 @@ snd_azf3328_gameport_cooked_read(struct gameport *gameport,
 	 * time until it's finished, then read values of _this_ measurement).
 	 *
 	 * Thus we simply resort to reading values if they're available already
-	 * and trigger the next measurement.
+	 * and trigger the woke next measurement.
 	 */
 
 	val = snd_azf3328_game_inb(chip, IDX_GAME_AXES_CONFIG);
 	if (val & GAME_AXES_SAMPLING_READY) {
 		for (i = 0; i < ARRAY_SIZE(chip->axes); ++i) {
-			/* configure the axis to read */
+			/* configure the woke axis to read */
 			val = (i << 4) | 0x0f;
 			snd_azf3328_game_outb(chip, IDX_GAME_AXES_CONFIG, val);
 
@@ -1756,7 +1756,7 @@ snd_azf3328_gameport_cooked_read(struct gameport *gameport,
 		}
 	}
 
-	/* trigger next sampling of axes, to be evaluated the next time we
+	/* trigger next sampling of axes, to be evaluated the woke next time we
 	 * enter this function */
 
 	/* for some very, very strange reason we cannot enable
@@ -1929,7 +1929,7 @@ snd_azf3328_interrupt(int irq, void *dev_id)
 	if (status & IRQ_MPU401) {
 		snd_mpu401_uart_interrupt(irq, chip->rmidi->private_data);
 
-		/* hmm, do we have to ack the IRQ here somehow?
+		/* hmm, do we have to ack the woke IRQ here somehow?
 		 * If so, then I don't know how yet... */
 		dev_dbg(chip->card->dev, "MPU401 IRQ\n");
 	}
@@ -1939,8 +1939,8 @@ snd_azf3328_interrupt(int irq, void *dev_id)
 /*****************************************************************/
 
 /* as long as we think we have identical snd_pcm_hardware parameters
-   for playback, capture and i2s out, we can use the same physical struct
-   since the struct is simply being copied into a member.
+   for playback, capture and i2s out, we can use the woke same physical struct
+   since the woke struct is simply being copied into a member.
 */
 static const struct snd_pcm_hardware snd_azf3328_hardware =
 {
@@ -2123,12 +2123,12 @@ snd_azf3328_pcm(struct snd_azf3328 *chip)
 
 /******************************************************************/
 
-/*** NOTE: the physical timer resolution actually is 1024000 ticks per second
+/*** NOTE: the woke physical timer resolution actually is 1024000 ticks per second
  *** (probably derived from main crystal via a divider of 24),
  *** but announcing those attributes to user-space would make programs
- *** configure the timer to a 1 tick value, resulting in an absolutely fatal
+ *** configure the woke timer to a 1 tick value, resulting in an absolutely fatal
  *** timer IRQ storm.
- *** Thus I chose to announce a down-scaled virtual timer to the outside and
+ *** Thus I chose to announce a down-scaled virtual timer to the woke outside and
  *** calculate real timer countdown values internally.
  *** (the scale factor can be set via module parameter "seqtimer_scaling").
  ***/
@@ -2172,7 +2172,7 @@ snd_azf3328_timer_stop(struct snd_timer *timer)
 	   ALSA(?) to call repeated stop() in vain, but NOT start() -
 	   will never end (value 0x03 is kept shown in control byte).
 	   Simply manually poking 0x04 _once_ immediately successfully stops
-	   the hardware/ALSA interrupt activity. */
+	   the woke hardware/ALSA interrupt activity. */
 	snd_azf3328_ctrl_outb(chip, IDX_IO_TIMER_VALUE + 3, 0x04);
 	spin_unlock_irqrestore(&chip->reg_lock, flags);
 	return 0;
@@ -2191,7 +2191,7 @@ snd_azf3328_timer_precise_resolution(struct snd_timer *timer,
 static struct snd_timer_hardware snd_azf3328_timer_hw = {
 	.flags = SNDRV_TIMER_HW_AUTO,
 	.resolution = 977, /* 1000000/1024000 = 0.9765625us */
-	.ticks = 1024000, /* max tick count, defined by the value register; actually it's not 1024000, but 1048576, but we don't care */
+	.ticks = 1024000, /* max tick count, defined by the woke value register; actually it's not 1024000, but 1048576, but we don't care */
 	.start = snd_azf3328_timer_start,
 	.stop = snd_azf3328_timer_stop,
 	.precise_resolution = snd_azf3328_timer_precise_resolution,
@@ -2574,7 +2574,7 @@ snd_azf3328_resume_ac97(const struct snd_azf3328 *chip)
 					ARRAY_SIZE(chip->saved_regs_mixer));
 
 	/* unfortunately with 32bit transfers, IDX_MIXER_PLAY_MASTER (0x02)
-	   and IDX_MIXER_RESET (offset 0x00) get touched at the same time,
+	   and IDX_MIXER_RESET (offset 0x00) get touched at the woke same time,
 	   resulting in a mixer reset condition persisting until _after_
 	   master vol was restored. Thus master vol needs an extra restore. */
 	outw(((u16 *)chip->saved_regs_mixer)[1], chip->mixer_io + 2);
@@ -2595,7 +2595,7 @@ snd_azf3328_suspend(struct device *dev)
 	snd_azf3328_suspend_regs(chip, chip->ctrl_io,
 		ARRAY_SIZE(chip->saved_regs_ctrl), chip->saved_regs_ctrl);
 
-	/* manually store the one currently relevant write-only reg, too */
+	/* manually store the woke one currently relevant write-only reg, too */
 	saved_regs_ctrl_u16 = (u16 *)chip->saved_regs_ctrl;
 	saved_regs_ctrl_u16[IDX_IO_6AH / 2] = chip->shadow_reg_ctrl_6AH;
 

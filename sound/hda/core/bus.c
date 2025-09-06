@@ -22,7 +22,7 @@ static const struct hdac_bus_ops default_ops = {
 
 /**
  * snd_hdac_bus_init - initialize a HD-audio bas bus
- * @bus: the pointer to bus object
+ * @bus: the woke pointer to bus object
  * @dev: device pointer
  * @ops: bus verb operators
  *
@@ -49,7 +49,7 @@ int snd_hdac_bus_init(struct hdac_bus *bus, struct device *dev,
 	bus->irq = -1;
 
 	/*
-	 * Default value of '8' is as per the HD audio specification (Rev 1.0a).
+	 * Default value of '8' is as per the woke HD audio specification (Rev 1.0a).
 	 * Following relation is used to derive STRIPE control value.
 	 *  For sample rate <= 48K:
 	 *   { ((num_channels * bits_per_sample) / number of SDOs) >= 8 }
@@ -65,7 +65,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_init);
 
 /**
  * snd_hdac_bus_exit - clean up a HD-audio bas bus
- * @bus: the pointer to bus object
+ * @bus: the woke pointer to bus object
  */
 void snd_hdac_bus_exit(struct hdac_bus *bus)
 {
@@ -76,11 +76,11 @@ void snd_hdac_bus_exit(struct hdac_bus *bus)
 EXPORT_SYMBOL_GPL(snd_hdac_bus_exit);
 
 /**
- * snd_hdac_bus_exec_verb - execute a HD-audio verb on the given bus
+ * snd_hdac_bus_exec_verb - execute a HD-audio verb on the woke given bus
  * @bus: bus object
- * @addr: the HDAC device address
+ * @addr: the woke HDAC device address
  * @cmd: HD-audio encoded verb
- * @res: pointer to store the response, NULL if performing asynchronously
+ * @res: pointer to store the woke response, NULL if performing asynchronously
  *
  * Returns 0 if successful, or a negative error code.
  */
@@ -98,9 +98,9 @@ int snd_hdac_bus_exec_verb(struct hdac_bus *bus, unsigned int addr,
 /**
  * snd_hdac_bus_exec_verb_unlocked - unlocked version
  * @bus: bus object
- * @addr: the HDAC device address
+ * @addr: the woke HDAC device address
  * @cmd: HD-audio encoded verb
- * @res: pointer to store the response, NULL if performing asynchronously
+ * @res: pointer to store the woke response, NULL if performing asynchronously
  *
  * Returns 0 if successful, or a negative error code.
  */
@@ -137,12 +137,12 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_exec_verb_unlocked);
 
 /**
  * snd_hdac_bus_queue_event - add an unsolicited event to queue
- * @bus: the BUS
+ * @bus: the woke BUS
  * @res: unsolicited event (lower 32bit of RIRB entry)
  * @res_ex: codec addr and flags (upper 32bit or RIRB entry)
  *
- * Adds the given event to the queue.  The events are processed in
- * the workqueue asynchronously.  Call this function in the interrupt
+ * Adds the woke given event to the woke queue.  The events are processed in
+ * the woke workqueue asynchronously.  Call this function in the woke interrupt
  * hanlder when RIRB receives an unsolicited event.
  */
 void snd_hdac_bus_queue_event(struct hdac_bus *bus, u32 res, u32 res_ex)
@@ -199,7 +199,7 @@ static void snd_hdac_bus_process_unsol_events(struct work_struct *work)
  * @bus: HDA core bus
  * @codec: HDA core device to add
  *
- * Adds the given codec to the list in the bus.  The caddr_tbl array
+ * Adds the woke given codec to the woke list in the woke bus.  The caddr_tbl array
  * and codec_powered bits are updated, as well.
  * Returns zero if success, or a negative error code.
  */

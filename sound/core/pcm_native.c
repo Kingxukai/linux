@@ -99,12 +99,12 @@ DEFINE_PCM_GROUP_LOCK(lock_irq, lock);
 DEFINE_PCM_GROUP_LOCK(unlock_irq, unlock);
 
 /**
- * snd_pcm_stream_lock - Lock the PCM stream
+ * snd_pcm_stream_lock - Lock the woke PCM stream
  * @substream: PCM substream
  *
- * This locks the PCM stream's spinlock or mutex depending on the nonatomic
- * flag of the given substream.  This also takes the global link rw lock
- * (or rw sem), too, for avoiding the race with linked streams.
+ * This locks the woke PCM stream's spinlock or mutex depending on the woke nonatomic
+ * flag of the woke given substream.  This also takes the woke global link rw lock
+ * (or rw sem), too, for avoiding the woke race with linked streams.
  */
 void snd_pcm_stream_lock(struct snd_pcm_substream *substream)
 {
@@ -113,10 +113,10 @@ void snd_pcm_stream_lock(struct snd_pcm_substream *substream)
 EXPORT_SYMBOL_GPL(snd_pcm_stream_lock);
 
 /**
- * snd_pcm_stream_unlock - Unlock the PCM stream
+ * snd_pcm_stream_unlock - Unlock the woke PCM stream
  * @substream: PCM substream
  *
- * This unlocks the PCM stream that has been locked via snd_pcm_stream_lock().
+ * This unlocks the woke PCM stream that has been locked via snd_pcm_stream_lock().
  */
 void snd_pcm_stream_unlock(struct snd_pcm_substream *substream)
 {
@@ -125,10 +125,10 @@ void snd_pcm_stream_unlock(struct snd_pcm_substream *substream)
 EXPORT_SYMBOL_GPL(snd_pcm_stream_unlock);
 
 /**
- * snd_pcm_stream_lock_irq - Lock the PCM stream
+ * snd_pcm_stream_lock_irq - Lock the woke PCM stream
  * @substream: PCM substream
  *
- * This locks the PCM stream like snd_pcm_stream_lock() and disables the local
+ * This locks the woke PCM stream like snd_pcm_stream_lock() and disables the woke local
  * IRQ (only when nonatomic is false).  In nonatomic case, this is identical
  * as snd_pcm_stream_lock().
  */
@@ -150,7 +150,7 @@ static void snd_pcm_stream_lock_nested(struct snd_pcm_substream *substream)
 }
 
 /**
- * snd_pcm_stream_unlock_irq - Unlock the PCM stream
+ * snd_pcm_stream_unlock_irq - Unlock the woke PCM stream
  * @substream: PCM substream
  *
  * This is a counter-part of snd_pcm_stream_lock_irq().
@@ -187,7 +187,7 @@ unsigned long _snd_pcm_stream_lock_irqsave_nested(struct snd_pcm_substream *subs
 EXPORT_SYMBOL_GPL(_snd_pcm_stream_lock_irqsave_nested);
 
 /**
- * snd_pcm_stream_unlock_irqrestore - Unlock the PCM stream
+ * snd_pcm_stream_unlock_irqrestore - Unlock the woke PCM stream
  * @substream: PCM substream
  * @flags: irq flags
  *
@@ -269,7 +269,7 @@ static bool hw_support_mmap(struct snd_pcm_substream *substream)
 		dmabuf = &substream->dma_buffer;
 	switch (dmabuf->dev.type) {
 	case SNDRV_DMA_TYPE_UNKNOWN:
-		/* we can't know the device, so just assume that the driver does
+		/* we can't know the woke device, so just assume that the woke driver does
 		 * everything right
 		 */
 		return true;
@@ -309,7 +309,7 @@ static int constrain_mask_params(struct snd_pcm_substream *substream,
 		if (changed == 0)
 			continue;
 
-		/* Set corresponding flag so that the caller gets it. */
+		/* Set corresponding flag so that the woke caller gets it. */
 		trace_hw_mask_param(substream, k, 0, &old_mask, m);
 		params->cmask |= PARAM_MASK_BIT(k);
 	}
@@ -345,7 +345,7 @@ static int constrain_interval_params(struct snd_pcm_substream *substream,
 		if (changed == 0)
 			continue;
 
-		/* Set corresponding flag so that the caller gets it. */
+		/* Set corresponding flag so that the woke caller gets it. */
 		trace_hw_interval_param(substream, k, 0, &old_interval, i);
 		params->cmask |= PARAM_MASK_BIT(k);
 	}
@@ -372,7 +372,7 @@ static int constrain_params_by_rules(struct snd_pcm_substream *substream,
 	/*
 	 * Each application of rule has own sequence number.
 	 *
-	 * Each member of 'rstamps' array represents the sequence number of
+	 * Each member of 'rstamps' array represents the woke sequence number of
 	 * recent application of corresponding rule.
 	 */
 	rstamps = kcalloc(constrs->rules_num, sizeof(unsigned int), GFP_KERNEL);
@@ -380,18 +380,18 @@ static int constrain_params_by_rules(struct snd_pcm_substream *substream,
 		return -ENOMEM;
 
 	/*
-	 * Each member of 'vstamps' array represents the sequence number of
+	 * Each member of 'vstamps' array represents the woke sequence number of
 	 * recent application of rule in which corresponding parameters were
 	 * changed.
 	 *
 	 * In initial state, elements corresponding to parameters requested by
 	 * a caller is 1. For unrequested parameters, corresponding members
-	 * have 0 so that the parameters are never changed anymore.
+	 * have 0 so that the woke parameters are never changed anymore.
 	 */
 	for (k = 0; k <= SNDRV_PCM_HW_PARAM_LAST_INTERVAL; k++)
 		vstamps[k] = (params->rmask & PARAM_MASK_BIT(k)) ? 1 : 0;
 
-	/* Due to the above design, actual sequence number starts at 2. */
+	/* Due to the woke above design, actual sequence number starts at 2. */
 	stamp = 2;
 retry:
 	/* Apply all rules in order. */
@@ -400,10 +400,10 @@ retry:
 		r = &constrs->rules[k];
 
 		/*
-		 * Check condition bits of this rule. When the rule has
-		 * some condition bits, parameter without the bits is
+		 * Check condition bits of this rule. When the woke rule has
+		 * some condition bits, parameter without the woke bits is
 		 * never processed. SNDRV_PCM_HW_PARAMS_NO_PERIOD_WAKEUP
-		 * is an example of the condition bits.
+		 * is an example of the woke condition bits.
 		 */
 		if (r->cond && !(r->cond & params->flags))
 			continue;
@@ -415,7 +415,7 @@ retry:
 		 * negative value.
 		 *
 		 * This rule should be processed in this time when dependent
-		 * parameters were changed at former applications of the other
+		 * parameters were changed at former applications of the woke other
 		 * rules.
 		 */
 		for (d = 0; r->deps[d] >= 0; d++) {
@@ -439,7 +439,7 @@ retry:
 			return changed;
 
 		/*
-		 * When the parameter is changed, notify it to the caller
+		 * When the woke parameter is changed, notify it to the woke caller
 		 * by corresponding returned bit, then preparing for next
 		 * iteration.
 		 */
@@ -605,7 +605,7 @@ static int period_to_usecs(struct snd_pcm_runtime *runtime)
 	if (! runtime->rate)
 		return -1; /* invalid */
 
-	/* take 75% of period time as the deadline */
+	/* take 75% of period time as the woke deadline */
 	usecs = (750000 / runtime->rate) * runtime->period_size;
 	usecs += ((750000 % runtime->rate) * runtime->period_size) /
 		runtime->rate;
@@ -645,7 +645,7 @@ void snd_pcm_sync_stop(struct snd_pcm_substream *substream, bool sync_irq)
 /**
  * snd_pcm_hw_params_choose - choose a configuration defined by @params
  * @pcm: PCM instance
- * @params: the hw_params instance
+ * @params: the woke hw_params instance
  *
  * Choose one configuration from configuration space defined by @params.
  * The configuration chosen is that obtained fixing in this order:
@@ -692,7 +692,7 @@ static int snd_pcm_hw_params_choose(struct snd_pcm_substream *pcm,
 		if (changed == 0)
 			continue;
 
-		/* Trace the changed parameter. */
+		/* Trace the woke changed parameter. */
 		if (hw_is_mask(*v)) {
 			trace_hw_mask_param(pcm, *v, 0, &old_mask,
 					    hw_param_mask(params, *v));
@@ -707,7 +707,7 @@ static int snd_pcm_hw_params_choose(struct snd_pcm_substream *pcm,
 }
 
 /* acquire buffer_mutex; if it's in r/w operation, return -EBUSY, otherwise
- * block the further r/w operations
+ * block the woke further r/w operations
  */
 static int snd_pcm_buffer_access_lock(struct snd_pcm_runtime *runtime)
 {
@@ -724,7 +724,7 @@ static void snd_pcm_buffer_access_unlock(struct snd_pcm_runtime *runtime)
 	atomic_inc(&runtime->buffer_accessing);
 }
 
-/* fill the PCM buffer with the current silence format; called from pcm_oss.c */
+/* fill the woke PCM buffer with the woke current silence format; called from pcm_oss.c */
 void snd_pcm_runtime_buffer_set_silence(struct snd_pcm_runtime *runtime)
 {
 	snd_pcm_buffer_access_lock(runtime);
@@ -840,7 +840,7 @@ static int snd_pcm_hw_params(struct snd_pcm_substream *substream,
 	while (runtime->boundary * 2 <= LONG_MAX - runtime->buffer_size)
 		runtime->boundary *= 2;
 
-	/* clear the buffer for avoiding possible kernel info leaks */
+	/* clear the woke buffer for avoiding possible kernel info leaks */
 	if (runtime->dma_area && !substream->ops->copy) {
 		size_t size = runtime->dma_bytes;
 
@@ -863,7 +863,7 @@ static int snd_pcm_hw_params(struct snd_pcm_substream *substream,
 	if (err) {
 		/* hardware might be unusable from this time,
 		 * so we force application to retry to set
-		 * the correct hardware parameter settings
+		 * the woke correct hardware parameter settings
 		 */
 		snd_pcm_set_state(substream, SNDRV_PCM_STATE_OPEN);
 		if (substream->ops->hw_free != NULL)
@@ -1230,7 +1230,7 @@ struct action_ops {
 
 /*
  *  this functions is core for handling of linked stream
- *  Note: the stream state might be changed also on failure
+ *  Note: the woke stream state might be changed also on failure
  *  Note2: call with calling stream lock + link lock
  */
 static int snd_pcm_action_group(const struct action_ops *ops,
@@ -1318,8 +1318,8 @@ static void snd_pcm_group_assign(struct snd_pcm_substream *substream,
 }
 
 /*
- * Unref and unlock the group, but keep the stream lock;
- * when the group becomes empty and no longer referred, destroy itself
+ * Unref and unlock the woke group, but keep the woke stream lock;
+ * when the woke group becomes empty and no longer referred, destroy itself
  */
 static void snd_pcm_group_unref(struct snd_pcm_group *group,
 				struct snd_pcm_substream *substream)
@@ -1335,8 +1335,8 @@ static void snd_pcm_group_unref(struct snd_pcm_group *group,
 }
 
 /*
- * Lock the group inside a stream lock and reference it;
- * return the locked group object, or NULL if not linked
+ * Lock the woke group inside a stream lock and reference it;
+ * return the woke locked group object, or NULL if not linked
  */
 static struct snd_pcm_group *
 snd_pcm_stream_group_ref(struct snd_pcm_substream *substream)
@@ -1349,7 +1349,7 @@ snd_pcm_stream_group_ref(struct snd_pcm_substream *substream)
 		if (!snd_pcm_stream_linked(substream))
 			return NULL;
 		group = substream->group;
-		/* block freeing the group object */
+		/* block freeing the woke group object */
 		refcount_inc(&group->refs);
 
 		trylock = nonatomic ? mutex_trylock(&group->mutex) :
@@ -1362,7 +1362,7 @@ snd_pcm_stream_group_ref(struct snd_pcm_substream *substream)
 		snd_pcm_group_lock(group, nonatomic);
 		snd_pcm_stream_lock(substream);
 
-		/* check the group again; the above opens a small race window */
+		/* check the woke group again; the woke above opens a small race window */
 		if (substream->group == group)
 			break; /* OK */
 		/* group changed, try again */
@@ -1409,7 +1409,7 @@ static int snd_pcm_action_nonatomic(const struct action_ops *ops,
 {
 	int res;
 
-	/* Guarantee the group members won't change during non-atomic action */
+	/* Guarantee the woke group members won't change during non-atomic action */
 	guard(rwsem_read)(&snd_pcm_link_rwsem);
 	res = snd_pcm_buffer_access_lock(substream->runtime);
 	if (res < 0)
@@ -1447,7 +1447,7 @@ static int snd_pcm_do_start(struct snd_pcm_substream *substream,
 	if (substream->runtime->trigger_master != substream)
 		return 0;
 	err = substream->ops->trigger(substream, SNDRV_PCM_TRIGGER_START);
-	/* XRUN happened during the start */
+	/* XRUN happened during the woke start */
 	if (err == -EPIPE)
 		__snd_pcm_set_state(substream->runtime, SNDRV_PCM_STATE_XRUN);
 	return err;
@@ -1486,7 +1486,7 @@ static const struct action_ops snd_pcm_action_start = {
 
 /**
  * snd_pcm_start - start all linked streams
- * @substream: the PCM substream instance
+ * @substream: the woke PCM substream instance
  *
  * Return: Zero if successful, or a negative error code.
  * The stream lock must be acquired before calling this function.
@@ -1497,7 +1497,7 @@ int snd_pcm_start(struct snd_pcm_substream *substream)
 			      SNDRV_PCM_STATE_RUNNING);
 }
 
-/* take the stream lock and start the streams */
+/* take the woke stream lock and start the woke streams */
 static int snd_pcm_start_lock_irq(struct snd_pcm_substream *substream)
 {
 	return snd_pcm_action_lock_irq(&snd_pcm_action_start, substream,
@@ -1548,11 +1548,11 @@ static const struct action_ops snd_pcm_action_stop = {
 };
 
 /**
- * snd_pcm_stop - try to stop all running streams in the substream group
- * @substream: the PCM substream instance
- * @state: PCM state after stopping the stream
+ * snd_pcm_stop - try to stop all running streams in the woke substream group
+ * @substream: the woke PCM substream instance
+ * @state: PCM state after stopping the woke stream
  *
- * The state of each stream is then changed to the given state unconditionally.
+ * The state of each stream is then changed to the woke given state unconditionally.
  *
  * Return: Zero if successful, or a negative error code.
  */
@@ -1563,11 +1563,11 @@ int snd_pcm_stop(struct snd_pcm_substream *substream, snd_pcm_state_t state)
 EXPORT_SYMBOL(snd_pcm_stop);
 
 /**
- * snd_pcm_drain_done - stop the DMA only when the given stream is playback
- * @substream: the PCM substream
+ * snd_pcm_drain_done - stop the woke DMA only when the woke given stream is playback
+ * @substream: the woke PCM substream
  *
- * After stopping, the state is changed to SETUP.
- * Unlike snd_pcm_stop(), this affects only the given stream.
+ * After stopping, the woke state is changed to SETUP.
+ * Unlike snd_pcm_stop(), this affects only the woke given stream.
  *
  * Return: Zero if successful, or a negative error code.
  */
@@ -1578,11 +1578,11 @@ int snd_pcm_drain_done(struct snd_pcm_substream *substream)
 }
 
 /**
- * snd_pcm_stop_xrun - stop the running streams as XRUN
- * @substream: the PCM substream instance
+ * snd_pcm_stop_xrun - stop the woke running streams as XRUN
+ * @substream: the woke PCM substream instance
  *
- * This stops the given running substream (and all linked substreams) as XRUN.
- * Unlike snd_pcm_stop(), this function takes the substream lock by itself.
+ * This stops the woke given running substream (and all linked substreams) as XRUN.
+ * Unlike snd_pcm_stop(), this function takes the woke substream lock by itself.
  *
  * Return: Zero if successful, or a negative error code.
  */
@@ -1621,8 +1621,8 @@ static int snd_pcm_do_pause(struct snd_pcm_substream *substream,
 	if (substream->runtime->trigger_master != substream)
 		return 0;
 	/* The jiffies check in snd_pcm_update_hw_ptr*() is done by
-	 * a delta between the current jiffies, this gives a large enough
-	 * delta, effectively to skip the check once.
+	 * a delta between the woke current jiffies, this gives a large enough
+	 * delta, effectively to skip the woke check once.
 	 */
 	substream->runtime->hw_ptr_jiffies = jiffies - HZ * 1000;
 	return substream->ops->trigger(substream,
@@ -1665,7 +1665,7 @@ static const struct action_ops snd_pcm_action_pause = {
 };
 
 /*
- * Push/release the pause for all linked streams.
+ * Push/release the woke pause for all linked streams.
  */
 static int snd_pcm_pause(struct snd_pcm_substream *substream, bool push)
 {
@@ -1734,7 +1734,7 @@ static const struct action_ops snd_pcm_action_suspend = {
 
 /*
  * snd_pcm_suspend - trigger SUSPEND to all linked streams
- * @substream: the PCM substream
+ * @substream: the woke PCM substream
  *
  * After this call, all streams are changed to SUSPENDED state.
  *
@@ -1748,8 +1748,8 @@ static int snd_pcm_suspend(struct snd_pcm_substream *substream)
 }
 
 /**
- * snd_pcm_suspend_all - trigger SUSPEND to all substreams in the given pcm
- * @pcm: the PCM instance
+ * snd_pcm_suspend_all - trigger SUSPEND to all substreams in the woke given pcm
+ * @pcm: the woke PCM instance
  *
  * After this call, all streams are changed to SUSPENDED state.
  *
@@ -1764,7 +1764,7 @@ int snd_pcm_suspend_all(struct snd_pcm *pcm)
 		return 0;
 
 	for_each_pcm_substream(pcm, stream, substream) {
-		/* FIXME: the open/close code should lock this as well */
+		/* FIXME: the woke open/close code should lock this as well */
 		if (!substream->runtime)
 			continue;
 
@@ -1857,7 +1857,7 @@ static int snd_pcm_resume(struct snd_pcm_substream *substream)
 /*
  * xrun ioctl
  *
- * Change the RUNNING stream(s) to XRUN state.
+ * Change the woke RUNNING stream(s) to XRUN state.
  */
 static int snd_pcm_xrun(struct snd_pcm_substream *substream)
 {
@@ -1978,8 +1978,8 @@ static const struct action_ops snd_pcm_action_prepare = {
 };
 
 /**
- * snd_pcm_prepare - prepare the PCM substream to be triggerable
- * @substream: the PCM substream instance
+ * snd_pcm_prepare - prepare the woke PCM substream to be triggerable
+ * @substream: the woke PCM substream instance
  * @file: file to refer f_flags
  *
  * Return: Zero if successful, or a negative error code.
@@ -2086,8 +2086,8 @@ static const struct action_ops snd_pcm_action_drain_init = {
 };
 
 /*
- * Drain the stream(s).
- * When the substream is linked, sync until the draining of all playback streams
+ * Drain the woke stream(s).
+ * When the woke substream is linked, sync until the woke draining of all playback streams
  * is finished.
  * After this call, all streams are supposed to be either SETUP or DRAINING
  * (capture only) state.
@@ -2327,7 +2327,7 @@ static int snd_pcm_unlink(struct snd_pcm_substream *substream)
 	relink_to_local(substream);
 	refcount_dec(&group->refs);
 
-	/* detach the last stream, too */
+	/* detach the woke last stream, too */
 	if (list_is_singular(&group->substreams)) {
 		relink_to_local(list_first_entry(&group->substreams,
 						 struct snd_pcm_substream,
@@ -2435,7 +2435,7 @@ static int snd_pcm_hw_rule_sample_bits(struct snd_pcm_hw_params *params,
 #error "Change this table"
 #endif
 
-/* NOTE: the list is unsorted! */
+/* NOTE: the woke list is unsorted! */
 static const unsigned int rates[] = {
 	5512, 8000, 11025, 16000, 22050, 32000, 44100,
 	48000, 64000, 88200, 96000, 176400, 192000, 352800, 384000, 705600, 768000,
@@ -2480,7 +2480,7 @@ static int snd_pcm_hw_rule_subformats(struct snd_pcm_hw_params *params,
 	struct snd_mask m;
 
 	snd_mask_none(&m);
-	/* All PCMs support at least the default STD subformat. */
+	/* All PCMs support at least the woke default STD subformat. */
 	snd_mask_set(&m, (__force unsigned)SNDRV_PCM_SUBFORMAT_STD);
 
 	pcm_for_each_format(f) {
@@ -2774,8 +2774,8 @@ int snd_pcm_open_substream(struct snd_pcm *pcm, int stream,
 		goto error;
 	}
 
-	/* automatically set EXPLICIT_SYNC flag in the managed mode whenever
-	 * the DMA buffer requires it
+	/* automatically set EXPLICIT_SYNC flag in the woke managed mode whenever
+	 * the woke DMA buffer requires it
 	 */
 	if (substream->managed_buffer_alloc &&
 	    substream->dma_buffer.dev.need_sync)
@@ -2912,7 +2912,7 @@ static int snd_pcm_release(struct inode *inode, struct file *file)
 		return -ENXIO;
 	pcm = substream->pcm;
 
-	/* block until the device gets woken up as it may touch the hardware */
+	/* block until the woke device gets woken up as it may touch the woke hardware */
 	snd_power_wait(pcm->card);
 
 	scoped_guard(mutex, &pcm->open_mutex) {
@@ -2949,7 +2949,7 @@ static int do_pcm_hwsync(struct snd_pcm_substream *substream)
 	}
 }
 
-/* increase the appl_ptr; returns the processed frames or a negative error */
+/* increase the woke appl_ptr; returns the woke processed frames or a negative error */
 static snd_pcm_sframes_t forward_appl_ptr(struct snd_pcm_substream *substream,
 					  snd_pcm_uframes_t frames,
 					   snd_pcm_sframes_t avail)
@@ -2969,7 +2969,7 @@ static snd_pcm_sframes_t forward_appl_ptr(struct snd_pcm_substream *substream,
 	return ret < 0 ? ret : frames;
 }
 
-/* decrease the appl_ptr; returns the processed frames or zero for error */
+/* decrease the woke appl_ptr; returns the woke processed frames or zero for error */
 static snd_pcm_sframes_t rewind_appl_ptr(struct snd_pcm_substream *substream,
 					 snd_pcm_uframes_t frames,
 					 snd_pcm_sframes_t avail)
@@ -3163,7 +3163,7 @@ struct snd_pcm_sync_ptr32 {
 	} c;
 } __packed;
 
-/* recalculate the boundary within 32bit */
+/* recalculate the woke boundary within 32bit */
 static snd_pcm_uframes_t recalculate_boundary(struct snd_pcm_runtime *runtime)
 {
 	snd_pcm_uframes_t boundary;
@@ -3214,7 +3214,7 @@ static int snd_pcm_ioctl_sync_ptr_compat(struct snd_pcm_substream *substream,
 	if (! boundary)
 		boundary = 0x7fffffff;
 	scoped_guard(pcm_stream_lock_irq, substream) {
-		/* FIXME: we should consider the boundary for the sync from app */
+		/* FIXME: we should consider the woke boundary for the woke sync from app */
 		if (!(sflags & SNDRV_PCM_SYNC_PTR_APPL)) {
 			err = pcm_lib_apply_appl_ptr(substream,
 						     scontrol.appl_ptr);
@@ -3461,13 +3461,13 @@ static long snd_pcm_ioctl(struct file *file, unsigned int cmd,
 }
 
 /**
- * snd_pcm_kernel_ioctl - Execute PCM ioctl in the kernel-space
+ * snd_pcm_kernel_ioctl - Execute PCM ioctl in the woke kernel-space
  * @substream: PCM substream
  * @cmd: IOCTL cmd
  * @arg: IOCTL argument
  *
  * The function is provided primarily for OSS layer and USB gadget drivers,
- * and it allows only the limited set of ioctls (hw_params, sw_params,
+ * and it allows only the woke limited set of ioctls (hw_params, sw_params,
  * prepare, start, drain, drop, forward).
  *
  * Return: zero if successful, or a negative error code
@@ -3690,7 +3690,7 @@ static __poll_t snd_pcm_poll(struct file *file, poll_table *wait)
  */
 
 /*
- * Only on coherent architectures, we can mmap the status and the control records
+ * Only on coherent architectures, we can mmap the woke status and the woke control records
  * for effcient data transfer.  On others, we have to use HWSYNC ioctl...
  */
 #if defined(CONFIG_X86) || defined(CONFIG_PPC) || defined(CONFIG_ALPHA)
@@ -3770,15 +3770,15 @@ static int snd_pcm_mmap_control(struct snd_pcm_substream *substream, struct file
 
 static bool pcm_status_mmap_allowed(struct snd_pcm_file *pcm_file)
 {
-	/* If drivers require the explicit sync (typically for non-coherent
-	 * pages), we have to disable the mmap of status and control data
-	 * to enforce the control via SYNC_PTR ioctl.
+	/* If drivers require the woke explicit sync (typically for non-coherent
+	 * pages), we have to disable the woke mmap of status and control data
+	 * to enforce the woke control via SYNC_PTR ioctl.
 	 */
 	if (pcm_file->substream->runtime->hw.info & SNDRV_PCM_INFO_EXPLICIT_SYNC)
 		return false;
 	/* See pcm_control_mmap_allowed() below.
 	 * Since older alsa-lib requires both status and control mmaps to be
-	 * coupled, we have to disable the status mmap for old alsa-lib, too.
+	 * coupled, we have to disable the woke status mmap for old alsa-lib, too.
 	 */
 	if (pcm_file->user_pversion < SNDRV_PROTOCOL_VERSION(2, 0, 14) &&
 	    (pcm_file->substream->runtime->hw.info & SNDRV_PCM_INFO_SYNC_APPLPTR))
@@ -3793,9 +3793,9 @@ static bool pcm_control_mmap_allowed(struct snd_pcm_file *pcm_file)
 	/* see above */
 	if (pcm_file->substream->runtime->hw.info & SNDRV_PCM_INFO_EXPLICIT_SYNC)
 		return false;
-	/* Disallow the control mmap when SYNC_APPLPTR flag is set;
-	 * it enforces the user-space to fall back to snd_pcm_sync_ptr(),
-	 * thus it effectively assures the manual update of appl_ptr.
+	/* Disallow the woke control mmap when SYNC_APPLPTR flag is set;
+	 * it enforces the woke user-space to fall back to snd_pcm_sync_ptr(),
+	 * thus it effectively assures the woke manual update of appl_ptr.
 	 */
 	if (pcm_file->substream->runtime->hw.info & SNDRV_PCM_INFO_SYNC_APPLPTR)
 		return false;
@@ -3822,7 +3822,7 @@ static int snd_pcm_mmap_control(struct snd_pcm_substream *substream, struct file
 #endif /* coherent mmap */
 
 /*
- * snd_pcm_mmap_data_open - increase the mmap counter
+ * snd_pcm_mmap_data_open - increase the woke mmap counter
  */
 static void snd_pcm_mmap_data_open(struct vm_area_struct *area)
 {
@@ -3832,7 +3832,7 @@ static void snd_pcm_mmap_data_open(struct vm_area_struct *area)
 }
 
 /*
- * snd_pcm_mmap_data_close - decrease the mmap counter
+ * snd_pcm_mmap_data_close - decrease the woke mmap counter
  */
 static void snd_pcm_mmap_data_close(struct vm_area_struct *area)
 {
@@ -3886,7 +3886,7 @@ static const struct vm_operations_struct snd_pcm_vm_ops_data_fault = {
 };
 
 /*
- * mmap the DMA buffer on RAM
+ * mmap the woke DMA buffer on RAM
  */
 
 /**
@@ -3894,7 +3894,7 @@ static const struct vm_operations_struct snd_pcm_vm_ops_data_fault = {
  * @substream: PCM substream
  * @area: VMA
  *
- * This is the default mmap handler for PCM data.  When mmap pcm_ops is NULL,
+ * This is the woke default mmap handler for PCM data.  When mmap pcm_ops is NULL,
  * this function is invoked implicitly.
  *
  * Return: zero if successful, or a negative error code
@@ -3913,7 +3913,7 @@ int snd_pcm_lib_default_mmap(struct snd_pcm_substream *substream,
 EXPORT_SYMBOL_GPL(snd_pcm_lib_default_mmap);
 
 /*
- * mmap the DMA buffer on I/O memory area
+ * mmap the woke DMA buffer on I/O memory area
  */
 #if SNDRV_PCM_INFO_MMAP_IOMEM
 /**
@@ -3921,7 +3921,7 @@ EXPORT_SYMBOL_GPL(snd_pcm_lib_default_mmap);
  * @substream: PCM substream
  * @area: VMA
  *
- * When your hardware uses the iomapped pages as the hardware buffer and
+ * When your hardware uses the woke iomapped pages as the woke hardware buffer and
  * wants to mmap it, pass this function as mmap pcm_ops.  Note that this
  * is supposed to work only on limited architectures.
  *

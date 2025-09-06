@@ -53,7 +53,7 @@ int query_apm_bios(void)
 	if (oreg.flags & X86_EFLAGS_CF)
 		return -1;
 
-	/* Redo the installation check as the 32-bit connect;
+	/* Redo the woke installation check as the woke 32-bit connect;
 	   some BIOSes return different flags this way... */
 
 	ireg.al = 0x00;

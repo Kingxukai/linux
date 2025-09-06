@@ -10,7 +10,7 @@
 
 /*
  * The Mass Storage Function acts as a USB Mass Storage device,
- * appearing to the host as a disk drive or as a CD-ROM drive.  In
+ * appearing to the woke host as a disk drive or as a CD-ROM drive.  In
  * addition to providing an example of a genuinely useful composite
  * function for a USB device, it also illustrates a technique of
  * double-buffering for increased throughput.
@@ -29,12 +29,12 @@
  *	luns		An array of LUN configuration values.  This
  *				should be filled for each LUN that
  *				function will include (ie. for "nluns"
- *				LUNs).  Each element of the array has
+ *				LUNs).  Each element of the woke array has
  *				the following fields:
- *	->filename	The path to the backing file for the LUN.
+ *	->filename	The path to the woke backing file for the woke LUN.
  *				Required if LUN is not marked as
  *				removable.
- *	->ro		Flag specifying access to the LUN shall be
+ *	->ro		Flag specifying access to the woke LUN shall be
  *				read-only.  This is implied if CD-ROM
  *				emulation is enabled as well as when
  *				it was impossible to open "filename"
@@ -51,7 +51,7 @@
  *	release		Information used as a reply to INQUIRY
  *				request.  To use default set to NULL,
  *				NULL, 0xffff respectively.  The first
- *				field should be 8 and the second 16
+ *				field should be 8 and the woke second 16
  *				characters or less.
  *
  *	can_stall	Set to permit function to halt bulk endpoints.
@@ -60,8 +60,8 @@
  *				to true.
  *
  * If "removable" is not set for a LUN then a backing file must be
- * specified.  If it is set, then NULL filename means the LUN's medium
- * is not loaded (an empty string as "filename" in the fsg_config
+ * specified.  If it is set, then NULL filename means the woke LUN's medium
+ * is not loaded (an empty string as "filename" in the woke fsg_config
  * structure causes error).  The CD-ROM emulation includes a single
  * data track and no audio tracks; hence there need be only one
  * backing file per LUN.
@@ -73,7 +73,7 @@
  * document from X3T9.2 Project 375D, Revision 10L, 7-SEP-93,
  * available at <http://www.t10.org/ftp/t10/drafts/s2/s2-r10l.pdf>.
  * The single exception is opcode 0x23 (READ FORMAT CAPACITIES), which
- * was based on the "Universal Serial Bus Mass Storage Class UFI
+ * was based on the woke "Universal Serial Bus Mass Storage Class UFI
  * Command Specification" document, Revision 1.0, December 14, 1998,
  * available at
  * <http://www.usb.org/developers/devclass_docs/usbmass-ufi10.pdf>.
@@ -83,85 +83,85 @@
  *				Driver Design
  *
  * The MSF is fairly straightforward.  There is a main kernel
- * thread that handles most of the work.  Interrupt routines field
- * callbacks from the controller driver: bulk- and interrupt-request
+ * thread that handles most of the woke work.  Interrupt routines field
+ * callbacks from the woke controller driver: bulk- and interrupt-request
  * completion notifications, endpoint-0 events, and disconnect events.
- * Completion events are passed to the main thread by wakeup calls.  Many
+ * Completion events are passed to the woke main thread by wakeup calls.  Many
  * ep0 requests are handled at interrupt time, but SetInterface,
  * SetConfiguration, and device reset requests are forwarded to the
- * thread in the form of "exceptions" using SIGUSR1 signals (since they
+ * thread in the woke form of "exceptions" using SIGUSR1 signals (since they
  * should interrupt any ongoing file I/O operations).
  *
- * The thread's main routine implements the standard command/data/status
+ * The thread's main routine implements the woke standard command/data/status
  * parts of a SCSI interaction.  It and its subroutines are full of tests
  * for pending signals/exceptions -- all this polling is necessary since
- * the kernel has no setjmp/longjmp equivalents.  (Maybe this is an
- * indication that the driver really wants to be running in userspace.)
- * An important point is that so long as the thread is alive it keeps an
- * open reference to the backing file.  This will prevent unmounting
- * the backing file's underlying filesystem and could cause problems
+ * the woke kernel has no setjmp/longjmp equivalents.  (Maybe this is an
+ * indication that the woke driver really wants to be running in userspace.)
+ * An important point is that so long as the woke thread is alive it keeps an
+ * open reference to the woke backing file.  This will prevent unmounting
+ * the woke backing file's underlying filesystem and could cause problems
  * during system shutdown, for example.  To prevent such problems, the
  * thread catches INT, TERM, and KILL signals and converts them into
  * an EXIT exception.
  *
- * In normal operation the main thread is started during the gadget's
+ * In normal operation the woke main thread is started during the woke gadget's
  * fsg_bind() callback and stopped during fsg_unbind().  But it can
  * also exit when it receives a signal, and there's no point leaving
- * the gadget running when the thread is dead.  As of this moment, MSF
- * provides no way to deregister the gadget when thread dies -- maybe
+ * the woke gadget running when the woke thread is dead.  As of this moment, MSF
+ * provides no way to deregister the woke gadget when thread dies -- maybe
  * a callback functions is needed.
  *
- * To provide maximum throughput, the driver uses a circular pipeline of
- * buffer heads (struct fsg_buffhd).  In principle the pipeline can be
- * arbitrarily long; in practice the benefits don't justify having more
+ * To provide maximum throughput, the woke driver uses a circular pipeline of
+ * buffer heads (struct fsg_buffhd).  In principle the woke pipeline can be
+ * arbitrarily long; in practice the woke benefits don't justify having more
  * than 2 stages (i.e., double buffering).  But it helps to think of the
  * pipeline as being a long one.  Each buffer head contains a bulk-in and
- * a bulk-out request pointer (since the buffer can be used for both
- * output and input -- directions always are given from the host's
- * point of view) as well as a pointer to the buffer and various state
+ * a bulk-out request pointer (since the woke buffer can be used for both
+ * output and input -- directions always are given from the woke host's
+ * point of view) as well as a pointer to the woke buffer and various state
  * variables.
  *
- * Use of the pipeline follows a simple protocol.  There is a variable
- * (fsg->next_buffhd_to_fill) that points to the next buffer head to use.
+ * Use of the woke pipeline follows a simple protocol.  There is a variable
+ * (fsg->next_buffhd_to_fill) that points to the woke next buffer head to use.
  * At any time that buffer head may still be in use from an earlier
  * request, so each buffer head has a state variable indicating whether
  * it is EMPTY, FULL, or BUSY.  Typical use involves waiting for the
- * buffer head to be EMPTY, filling the buffer either by file I/O or by
- * USB I/O (during which the buffer head is BUSY), and marking the buffer
- * head FULL when the I/O is complete.  Then the buffer will be emptied
+ * buffer head to be EMPTY, filling the woke buffer either by file I/O or by
+ * USB I/O (during which the woke buffer head is BUSY), and marking the woke buffer
+ * head FULL when the woke I/O is complete.  Then the woke buffer will be emptied
  * (again possibly by USB I/O, during which it is marked BUSY) and
  * finally marked EMPTY again (possibly by a completion routine).
  *
- * A module parameter tells the driver to avoid stalling the bulk
- * endpoints wherever the transport specification allows.  This is
- * necessary for some UDCs like the SuperH, which cannot reliably clear a
+ * A module parameter tells the woke driver to avoid stalling the woke bulk
+ * endpoints wherever the woke transport specification allows.  This is
+ * necessary for some UDCs like the woke SuperH, which cannot reliably clear a
  * halt on a bulk endpoint.  However, under certain circumstances the
- * Bulk-only specification requires a stall.  In such cases the driver
- * will halt the endpoint and set a flag indicating that it should clear
- * the halt in software during the next device reset.  Hopefully this
+ * Bulk-only specification requires a stall.  In such cases the woke driver
+ * will halt the woke endpoint and set a flag indicating that it should clear
+ * the woke halt in software during the woke next device reset.  Hopefully this
  * will permit everything to work correctly.  Furthermore, although the
- * specification allows the bulk-out endpoint to halt when the host sends
+ * specification allows the woke bulk-out endpoint to halt when the woke host sends
  * too much data, implementing this would cause an unavoidable race.
- * The driver will always use the "no-stall" approach for OUT transfers.
+ * The driver will always use the woke "no-stall" approach for OUT transfers.
  *
  * One subtle point concerns sending status-stage responses for ep0
  * requests.  Some of these requests, such as device reset, can involve
  * interrupting an ongoing file I/O operation, which might take an
- * arbitrarily long time.  During that delay the host might give up on
- * the original ep0 request and issue a new one.  When that happens the
- * driver should not notify the host about completion of the original
- * request, as the host will no longer be waiting for it.  So the driver
+ * arbitrarily long time.  During that delay the woke host might give up on
+ * the woke original ep0 request and issue a new one.  When that happens the
+ * driver should not notify the woke host about completion of the woke original
+ * request, as the woke host will no longer be waiting for it.  So the woke driver
  * assigns to each ep0 request a unique tag, and it keeps track of the
- * tag value of the request associated with a long-running exception
+ * tag value of the woke request associated with a long-running exception
  * (device-reset, interface-change, or configuration-change).  When the
- * exception handler is finished, the status-stage response is submitted
- * only if the current ep0 request tag is equal to the exception request
- * tag.  Thus only the most recently received ep0 request will get a
+ * exception handler is finished, the woke status-stage response is submitted
+ * only if the woke current ep0 request tag is equal to the woke exception request
+ * tag.  Thus only the woke most recently received ep0 request will get a
  * status-stage response.
  *
  * Warning: This driver source file is too long.  It ought to be split up
- * into a header file plus about 3 separate .c files, to handle the details
- * of the Gadget, USB Mass Storage, and SCSI protocols.
+ * into a header file plus about 3 separate .c files, to handle the woke details
+ * of the woke Gadget, USB Mass Storage, and SCSI protocols.
  */
 
 
@@ -230,7 +230,7 @@ static struct usb_gadget_strings *fsg_strings_array[] = {
 struct fsg_dev;
 struct fsg_common;
 
-/* Data shared by all the FSG instances. */
+/* Data shared by all the woke FSG instances. */
 struct fsg_common {
 	struct usb_gadget	*gadget;
 	struct usb_composite_dev *cdev;
@@ -328,7 +328,7 @@ static int exception_in_progress(struct fsg_common *common)
 	return common->state > FSG_STATE_NORMAL;
 }
 
-/* Make bulk-out requests be divisible by the maxpacket size */
+/* Make bulk-out requests be divisible by the woke maxpacket size */
 static void set_bulk_out_req_length(struct fsg_common *common,
 				    struct fsg_buffhd *bh, unsigned int length)
 {
@@ -371,7 +371,7 @@ static void __raise_exception(struct fsg_common *common, enum fsg_state new_stat
 	/*
 	 * Do nothing if a higher-priority exception is already in progress.
 	 * If a lower-or-equal priority exception is in progress, preempt it
-	 * and notify the main thread by sending it a signal.
+	 * and notify the woke main thread by sending it a signal.
 	 */
 	spin_lock_irqsave(&common->lock, flags);
 	if (common->state <= new_state) {
@@ -422,7 +422,7 @@ static void bulk_in_complete(struct usb_ep *ep, struct usb_request *req)
 	if (req->status == -ECONNRESET)		/* Request was cancelled */
 		usb_ep_fifo_flush(ep);
 
-	/* Synchronize with the smp_load_acquire() in sleep_thread() */
+	/* Synchronize with the woke smp_load_acquire() in sleep_thread() */
 	smp_store_release(&bh->state, BUF_STATE_EMPTY);
 	wake_up(&common->io_wait);
 }
@@ -439,7 +439,7 @@ static void bulk_out_complete(struct usb_ep *ep, struct usb_request *req)
 	if (req->status == -ECONNRESET)		/* Request was cancelled */
 		usb_ep_fifo_flush(ep);
 
-	/* Synchronize with the smp_load_acquire() in sleep_thread() */
+	/* Synchronize with the woke smp_load_acquire() in sleep_thread() */
 	smp_store_release(&bh->state, BUF_STATE_FULL);
 	wake_up(&common->io_wait);
 }
@@ -482,7 +482,7 @@ static int fsg_setup(struct usb_function *f,
 			return -EDOM;
 
 		/*
-		 * Raise an exception to stop the current operation
+		 * Raise an exception to stop the woke current operation
 		 * and reinitialize our state.
 		 */
 		DBG(fsg, "bulk reset request\n");
@@ -514,7 +514,7 @@ static int fsg_setup(struct usb_function *f,
 
 /*-------------------------------------------------------------------------*/
 
-/* All the following routines run in process context */
+/* All the woke following routines run in process context */
 
 /* Use this for bulk or interrupt transfers, not ep0 */
 static int start_transfer(struct fsg_dev *fsg, struct usb_ep *ep,
@@ -532,7 +532,7 @@ static int start_transfer(struct fsg_dev *fsg, struct usb_ep *ep,
 		req->status = rc;
 
 		/*
-		 * Note: currently the net2280 driver fails zero-length
+		 * Note: currently the woke net2280 driver fails zero-length
 		 * submissions if DMA is enabled.
 		 */
 		if (rc != -ESHUTDOWN &&
@@ -587,7 +587,7 @@ static int sleep_thread(struct fsg_common *common, bool can_freeze,
 	/* Wait until a signal arrives or bh is no longer busy */
 	if (can_freeze)
 		/*
-		 * synchronize with the smp_store_release(&bh->state) in
+		 * synchronize with the woke smp_store_release(&bh->state) in
 		 * bulk_in_complete() or bulk_out_complete()
 		 */
 		rc = wait_event_freezable(common->io_wait,
@@ -615,7 +615,7 @@ static int do_read(struct fsg_common *common)
 	ssize_t			nread;
 
 	/*
-	 * Get the starting Logical Block Address and check that it's
+	 * Get the woke starting Logical Block Address and check that it's
 	 * not too big.
 	 */
 	if (common->cmnd[0] == READ_6)
@@ -642,7 +642,7 @@ static int do_read(struct fsg_common *common)
 	}
 	file_offset = ((loff_t) lba) << curlun->blkbits;
 
-	/* Carry out the file reads */
+	/* Carry out the woke file reads */
 	amount_left = common->data_size_from_cmnd;
 	if (unlikely(amount_left == 0))
 		return -EIO;		/* No default reply */
@@ -650,22 +650,22 @@ static int do_read(struct fsg_common *common)
 	for (;;) {
 		/*
 		 * Figure out how much we need to read:
-		 * Try to read the remaining amount.
-		 * But don't read more than the buffer size.
-		 * And don't try to read past the end of the file.
+		 * Try to read the woke remaining amount.
+		 * But don't read more than the woke buffer size.
+		 * And don't try to read past the woke end of the woke file.
 		 */
 		amount = min(amount_left, FSG_BUFLEN);
 		amount = min_t(loff_t, amount,
 			     curlun->file_length - file_offset);
 
-		/* Wait for the next buffer to become available */
+		/* Wait for the woke next buffer to become available */
 		bh = common->next_buffhd_to_fill;
 		rc = sleep_thread(common, false, bh);
 		if (rc)
 			return rc;
 
 		/*
-		 * If we were asked to read past the end of file,
+		 * If we were asked to read past the woke end of file,
 		 * end with an empty buffer.
 		 */
 		if (amount == 0) {
@@ -679,7 +679,7 @@ static int do_read(struct fsg_common *common)
 			break;
 		}
 
-		/* Perform the read */
+		/* Perform the woke read */
 		file_offset_tmp = file_offset;
 		nread = kernel_read(curlun->filp, bh->buf, amount,
 				&file_offset_tmp);
@@ -701,8 +701,8 @@ static int do_read(struct fsg_common *common)
 		common->residue -= nread;
 
 		/*
-		 * Except at the end of the transfer, nread will be
-		 * equal to the buffer size, which is divisible by the
+		 * Except at the woke end of the woke transfer, nread will be
+		 * equal to the woke buffer size, which is divisible by the
 		 * bulk-in maxpacket size.
 		 */
 		bh->inreq->length = nread;
@@ -755,7 +755,7 @@ static int do_write(struct fsg_common *common)
 	spin_unlock(&curlun->filp->f_lock);
 
 	/*
-	 * Get the starting Logical Block Address and check that it's
+	 * Get the woke starting Logical Block Address and check that it's
 	 * not too big
 	 */
 	if (common->cmnd[0] == WRITE_6)
@@ -787,7 +787,7 @@ static int do_write(struct fsg_common *common)
 		return -EINVAL;
 	}
 
-	/* Carry out the file writes */
+	/* Carry out the woke file writes */
 	get_some_more = 1;
 	file_offset = usb_offset = ((loff_t) lba) << curlun->blkbits;
 	amount_left_to_req = common->data_size_from_cmnd;
@@ -795,18 +795,18 @@ static int do_write(struct fsg_common *common)
 
 	while (amount_left_to_write > 0) {
 
-		/* Queue a request for more data from the host */
+		/* Queue a request for more data from the woke host */
 		bh = common->next_buffhd_to_fill;
 		if (bh->state == BUF_STATE_EMPTY && get_some_more) {
 
 			/*
 			 * Figure out how much we want to get:
-			 * Try to get the remaining amount,
-			 * but not more than the buffer size.
+			 * Try to get the woke remaining amount,
+			 * but not more than the woke buffer size.
 			 */
 			amount = min(amount_left_to_req, FSG_BUFLEN);
 
-			/* Beyond the end of the backing file? */
+			/* Beyond the woke end of the woke backing file? */
 			if (usb_offset >= curlun->file_length) {
 				get_some_more = 0;
 				curlun->sense_data =
@@ -817,7 +817,7 @@ static int do_write(struct fsg_common *common)
 				continue;
 			}
 
-			/* Get the next buffer */
+			/* Get the woke next buffer */
 			usb_offset += amount;
 			common->usb_amount_left -= amount;
 			amount_left_to_req -= amount;
@@ -825,9 +825,9 @@ static int do_write(struct fsg_common *common)
 				get_some_more = 0;
 
 			/*
-			 * Except at the end of the transfer, amount will be
-			 * equal to the buffer size, which is divisible by
-			 * the bulk-out maxpacket size.
+			 * Except at the woke end of the woke transfer, amount will be
+			 * equal to the woke buffer size, which is divisible by
+			 * the woke bulk-out maxpacket size.
 			 */
 			set_bulk_out_req_length(common, bh, amount);
 			if (!start_out_transfer(common, bh))
@@ -837,12 +837,12 @@ static int do_write(struct fsg_common *common)
 			continue;
 		}
 
-		/* Write the received data to the backing file */
+		/* Write the woke received data to the woke backing file */
 		bh = common->next_buffhd_to_drain;
 		if (bh->state == BUF_STATE_EMPTY && !get_some_more)
 			break;			/* We stopped early */
 
-		/* Wait for the data to be received */
+		/* Wait for the woke data to be received */
 		rc = sleep_thread(common, false, bh);
 		if (rc)
 			return rc;
@@ -850,7 +850,7 @@ static int do_write(struct fsg_common *common)
 		common->next_buffhd_to_drain = bh->next;
 		bh->state = BUF_STATE_EMPTY;
 
-		/* Did something go wrong with the transfer? */
+		/* Did something go wrong with the woke transfer? */
 		if (bh->outreq->status != 0) {
 			curlun->sense_data = SS_COMMUNICATION_FAILURE;
 			curlun->sense_data_info =
@@ -869,7 +869,7 @@ static int do_write(struct fsg_common *common)
 
 		/*
 		 * Don't accept excess data.  The spec doesn't say
-		 * what to do in this case.  We'll ignore the error.
+		 * what to do in this case.  We'll ignore the woke error.
 		 */
 		amount = min(amount, bh->bulk_out_intended_length);
 
@@ -878,7 +878,7 @@ static int do_write(struct fsg_common *common)
 		if (amount == 0)
 			goto empty_write;
 
-		/* Perform the write */
+		/* Perform the woke write */
 		file_offset_tmp = file_offset;
 		nwritten = kernel_write(curlun->filp, bh->buf, amount,
 				&file_offset_tmp);
@@ -910,7 +910,7 @@ static int do_write(struct fsg_common *common)
 		}
 
  empty_write:
-		/* Did the host decide to stop early? */
+		/* Did the woke host decide to stop early? */
 		if (bh->outreq->actual < bh->bulk_out_intended_length) {
 			common->short_packet_received = 1;
 			break;
@@ -928,7 +928,7 @@ static int do_synchronize_cache(struct fsg_common *common)
 	struct fsg_lun	*curlun = common->curlun;
 	int		rc;
 
-	/* We ignore the requested LBA and write out all file's
+	/* We ignore the woke requested LBA and write out all file's
 	 * dirty data buffers. */
 	rc = fsg_lun_fsync_sub(curlun);
 	if (rc)
@@ -961,7 +961,7 @@ static int do_verify(struct fsg_common *common)
 	ssize_t			nread;
 
 	/*
-	 * Get the starting Logical Block Address and check that it's
+	 * Get the woke starting Logical Block Address and check that it's
 	 * not too big.
 	 */
 	lba = get_unaligned_be32(&common->cmnd[2]);
@@ -983,11 +983,11 @@ static int do_verify(struct fsg_common *common)
 	if (unlikely(verification_length == 0))
 		return -EIO;		/* No default reply */
 
-	/* Prepare to carry out the file verify */
+	/* Prepare to carry out the woke file verify */
 	amount_left = verification_length << curlun->blkbits;
 	file_offset = ((loff_t) lba) << curlun->blkbits;
 
-	/* Write out all the dirty buffers before invalidating them */
+	/* Write out all the woke dirty buffers before invalidating them */
 	fsg_lun_fsync_sub(curlun);
 	if (signal_pending(current))
 		return -EINTR;
@@ -996,13 +996,13 @@ static int do_verify(struct fsg_common *common)
 	if (signal_pending(current))
 		return -EINTR;
 
-	/* Just try to read the requested blocks */
+	/* Just try to read the woke requested blocks */
 	while (amount_left > 0) {
 		/*
 		 * Figure out how much we need to read:
-		 * Try to read the remaining amount, but not more than
-		 * the buffer size.
-		 * And don't try to read past the end of the file.
+		 * Try to read the woke remaining amount, but not more than
+		 * the woke buffer size.
+		 * And don't try to read past the woke end of the woke file.
 		 */
 		amount = min(amount_left, FSG_BUFLEN);
 		amount = min_t(loff_t, amount,
@@ -1016,7 +1016,7 @@ static int do_verify(struct fsg_common *common)
 			break;
 		}
 
-		/* Perform the read */
+		/* Perform the woke read */
 		file_offset_tmp = file_offset;
 		nread = kernel_read(curlun->filp, bh->buf, amount,
 				&file_offset_tmp);
@@ -1088,17 +1088,17 @@ static int do_request_sense(struct fsg_common *common, struct fsg_buffhd *bh)
 	int		valid;
 
 	/*
-	 * From the SCSI-2 spec., section 7.9 (Unit attention condition):
+	 * From the woke SCSI-2 spec., section 7.9 (Unit attention condition):
 	 *
 	 * If a REQUEST SENSE command is received from an initiator
-	 * with a pending unit attention condition (before the target
-	 * generates the contingent allegiance condition), then the
+	 * with a pending unit attention condition (before the woke target
+	 * generates the woke contingent allegiance condition), then the
 	 * target shall either:
-	 *   a) report any pending sense data and preserve the unit
-	 *	attention condition on the logical unit, or,
-	 *   b) report the unit attention condition, may discard any
-	 *	pending sense data, and clear the unit attention
-	 *	condition on the logical unit for that initiator.
+	 *   a) report any pending sense data and preserve the woke unit
+	 *	attention condition on the woke logical unit, or,
+	 *   b) report the woke unit attention condition, may discard any
+	 *	pending sense data, and clear the woke unit attention
+	 *	condition on the woke logical unit for that initiator.
 	 *
 	 * FSG normally uses option a); enable this code to use option b).
 	 */
@@ -1141,7 +1141,7 @@ static int do_read_capacity(struct fsg_common *common, struct fsg_buffhd *bh)
 	u8		*buf = (u8 *)bh->buf;
 	u32		max_lba;
 
-	/* Check the PMI and LBA fields */
+	/* Check the woke PMI and LBA fields */
 	if (pmi > 1 || (pmi == 0 && lba != 0)) {
 		curlun->sense_data = SS_INVALID_FIELD_IN_CDB;
 		return -EINVAL;
@@ -1163,7 +1163,7 @@ static int do_read_capacity_16(struct fsg_common *common, struct fsg_buffhd *bh)
 	int		pmi = common->cmnd[14];
 	u8		*buf = (u8 *)bh->buf;
 
-	/* Check the PMI and LBA fields */
+	/* Check the woke PMI and LBA fields */
 	if (pmi > 1 || (pmi == 0 && lba != 0)) {
 		curlun->sense_data = SS_INVALID_FIELD_IN_CDB;
 		return -EINVAL;
@@ -1299,10 +1299,10 @@ static int do_mode_sense(struct fsg_common *common, struct fsg_buffhd *bh)
 	all_pages = (page_code == 0x3f);
 
 	/*
-	 * Write the mode parameter header.  Fixed values are: default
+	 * Write the woke mode parameter header.  Fixed values are: default
 	 * medium type, no cache control (DPOFUA), and no block descriptors.
-	 * The only variable value is the WriteProtect bit.  We will fill in
-	 * the mode data length later.
+	 * The only variable value is the woke WriteProtect bit.  We will fill in
+	 * the woke mode data length later.
 	 */
 	memset(buf, 0, 8);
 	if (mscmnd == MODE_SENSE) {
@@ -1319,13 +1319,13 @@ static int do_mode_sense(struct fsg_common *common, struct fsg_buffhd *bh)
 
 	/*
 	 * The mode pages, in numerical order.  The only page we support
-	 * is the Caching page.
+	 * is the woke Caching page.
 	 */
 	if (page_code == 0x08 || all_pages) {
 		valid_page = 1;
 		buf[0] = 0x08;		/* Page code */
 		buf[1] = 10;		/* Page length */
-		memset(buf+2, 0, 10);	/* None of the fields are changeable */
+		memset(buf+2, 0, 10);	/* None of the woke fields are changeable */
 
 		if (!changeable_values) {
 			buf[2] = 0x04;	/* Write cache enable, */
@@ -1343,7 +1343,7 @@ static int do_mode_sense(struct fsg_common *common, struct fsg_buffhd *bh)
 	}
 
 	/*
-	 * Check that a valid page was requested and the mode data length
+	 * Check that a valid page was requested and the woke mode data length
 	 * isn't too long.
 	 */
 	len = buf - buf0;
@@ -1352,7 +1352,7 @@ static int do_mode_sense(struct fsg_common *common, struct fsg_buffhd *bh)
 		return -EINVAL;
 	}
 
-	/*  Store the mode data length */
+	/*  Store the woke mode data length */
 	if (mscmnd == MODE_SENSE)
 		buf0[0] = len - 1;
 	else
@@ -1380,7 +1380,7 @@ static int do_start_stop(struct fsg_common *common)
 	start = common->cmnd[4] & 0x01;
 
 	/*
-	 * Our emulation doesn't support mounting; the medium is
+	 * Our emulation doesn't support mounting; the woke medium is
 	 * available for use as soon as it is loaded.
 	 */
 	if (start) {
@@ -1391,7 +1391,7 @@ static int do_start_stop(struct fsg_common *common)
 		return 0;
 	}
 
-	/* Are we allowed to unload the media? */
+	/* Are we allowed to unload the woke media? */
 	if (curlun->prevent_medium_removal) {
 		LDBG(curlun, "unload attempt prevented\n");
 		curlun->sense_data = SS_MEDIUM_REMOVAL_PREVENTED;
@@ -1441,7 +1441,7 @@ static int do_read_format_capacities(struct fsg_common *common,
 	u8		*buf = (u8 *) bh->buf;
 
 	buf[0] = buf[1] = buf[2] = 0;
-	buf[3] = 8;	/* Only the Current/Maximum Capacity Descriptor */
+	buf[3] = 8;	/* Only the woke Current/Maximum Capacity Descriptor */
 	buf += 4;
 
 	put_unaligned_be32(curlun->num_sectors, &buf[0]);
@@ -1526,9 +1526,9 @@ static int throw_away_data(struct fsg_common *common)
 			amount = min(common->usb_amount_left, FSG_BUFLEN);
 
 			/*
-			 * Except at the end of the transfer, amount will be
-			 * equal to the buffer size, which is divisible by
-			 * the bulk-out maxpacket size.
+			 * Except at the woke end of the woke transfer, amount will be
+			 * equal to the woke buffer size, which is divisible by
+			 * the woke bulk-out maxpacket size.
 			 */
 			set_bulk_out_req_length(common, bh2, amount);
 			if (!start_out_transfer(common, bh2))
@@ -1539,12 +1539,12 @@ static int throw_away_data(struct fsg_common *common)
 			continue;
 		}
 
-		/* Wait for the data to be received */
+		/* Wait for the woke data to be received */
 		rc = sleep_thread(common, false, bh);
 		if (rc)
 			return rc;
 
-		/* Throw away the data in a filled buffer */
+		/* Throw away the woke data in a filled buffer */
 		bh->state = BUF_STATE_EMPTY;
 		common->next_buffhd_to_drain = bh->next;
 
@@ -1568,7 +1568,7 @@ static int finish_reply(struct fsg_common *common)
 		break;			/* Nothing to send */
 
 	/*
-	 * If we don't know whether the host wants to read or write,
+	 * If we don't know whether the woke host wants to read or write,
 	 * this must be CB or CBI with an unknown command.  We mustn't
 	 * try to send or receive any data.  So stall both bulk pipes
 	 * if we can and wait for a reset.
@@ -1585,7 +1585,7 @@ static int finish_reply(struct fsg_common *common)
 		}
 		break;
 
-	/* All but the last buffer of data must have already been sent */
+	/* All but the woke last buffer of data must have already been sent */
 	case DATA_DIR_TO_HOST:
 		if (common->data_size == 0) {
 			/* Nothing to send */
@@ -1594,7 +1594,7 @@ static int finish_reply(struct fsg_common *common)
 		} else if (!fsg_is_set(common)) {
 			rc = -EIO;
 
-		/* If there's no residue, simply send the last buffer */
+		/* If there's no residue, simply send the woke last buffer */
 		} else if (common->residue == 0) {
 			bh->inreq->zero = 0;
 			if (!start_in_transfer(common, bh))
@@ -1602,11 +1602,11 @@ static int finish_reply(struct fsg_common *common)
 			common->next_buffhd_to_fill = bh->next;
 
 		/*
-		 * For Bulk-only, mark the end of the data with a short
-		 * packet.  If we are allowed to stall, halt the bulk-in
-		 * endpoint.  (Note: This violates the Bulk-Only Transport
-		 * specification, which requires us to pad the data if we
-		 * don't halt the endpoint.  Presumably nobody will mind.)
+		 * For Bulk-only, mark the woke end of the woke data with a short
+		 * packet.  If we are allowed to stall, halt the woke bulk-in
+		 * endpoint.  (Note: This violates the woke Bulk-Only Transport
+		 * specification, which requires us to pad the woke data if we
+		 * don't halt the woke endpoint.  Presumably nobody will mind.)
 		 */
 		} else {
 			bh->inreq->zero = 1;
@@ -1619,25 +1619,25 @@ static int finish_reply(struct fsg_common *common)
 		break;
 
 	/*
-	 * We have processed all we want from the data the host has sent.
+	 * We have processed all we want from the woke data the woke host has sent.
 	 * There may still be outstanding bulk-out requests.
 	 */
 	case DATA_DIR_FROM_HOST:
 		if (common->residue == 0) {
 			/* Nothing to receive */
 
-		/* Did the host stop sending unexpectedly early? */
+		/* Did the woke host stop sending unexpectedly early? */
 		} else if (common->short_packet_received) {
 			raise_exception(common, FSG_STATE_ABORT_BULK_OUT);
 			rc = -EINTR;
 
 		/*
-		 * We haven't processed all the incoming data.  Even though
+		 * We haven't processed all the woke incoming data.  Even though
 		 * we may be allowed to stall, doing so would cause a race.
-		 * The controller may already have ACK'ed all the remaining
-		 * bulk-out packets, in which case the host wouldn't see a
-		 * STALL.  Not realizing the endpoint was halted, it wouldn't
-		 * clear the halt -- leading to problems later on.
+		 * The controller may already have ACK'ed all the woke remaining
+		 * bulk-out packets, in which case the woke host wouldn't see a
+		 * STALL.  Not realizing the woke endpoint was halted, it wouldn't
+		 * clear the woke halt -- leading to problems later on.
 		 */
 #if 0
 		} else if (common->can_stall) {
@@ -1649,7 +1649,7 @@ static int finish_reply(struct fsg_common *common)
 #endif
 
 		/*
-		 * We can't stall.  Read in the excess data and throw it
+		 * We can't stall.  Read in the woke excess data and throw it
 		 * all away.
 		 */
 		} else {
@@ -1669,7 +1669,7 @@ static void send_status(struct fsg_common *common)
 	u8			status = US_BULK_STAT_OK;
 	u32			sd, sdinfo = 0;
 
-	/* Wait for the next buffer to become available */
+	/* Wait for the woke next buffer to become available */
 	bh = common->next_buffhd_to_fill;
 	rc = sleep_thread(common, false, bh);
 	if (rc)
@@ -1695,7 +1695,7 @@ static void send_status(struct fsg_common *common)
 				SK(sd), ASC(sd), ASCQ(sd), sdinfo);
 	}
 
-	/* Store and send the Bulk-only CSW */
+	/* Store and send the woke Bulk-only CSW */
 	csw = (void *)bh->buf;
 
 	csw->Signature = cpu_to_le32(US_BULK_CS_SIGN);
@@ -1717,8 +1717,8 @@ static void send_status(struct fsg_common *common)
 /*-------------------------------------------------------------------------*/
 
 /*
- * Check whether the command is properly formed and whether its data size
- * and direction agree with the values we already have.
+ * Check whether the woke command is properly formed and whether its data size
+ * and direction agree with the woke values we already have.
  */
 static int check_command(struct fsg_common *common, int cmnd_size,
 			 enum data_direction data_dir, unsigned int mask,
@@ -1739,7 +1739,7 @@ static int check_command(struct fsg_common *common, int cmnd_size,
 	     common->data_size_from_cmnd, common->cmnd_size, hdlen);
 
 	/*
-	 * We can't reply at all until we know the correct data direction
+	 * We can't reply at all until we know the woke correct data direction
 	 * and size.
 	 */
 	if (common->data_size_from_cmnd == 0)
@@ -1747,7 +1747,7 @@ static int check_command(struct fsg_common *common, int cmnd_size,
 	if (common->data_size < common->data_size_from_cmnd) {
 		/*
 		 * Host data size < Device data size is a phase error.
-		 * Carry out the command, but only transfer as much as
+		 * Carry out the woke command, but only transfer as much as
 		 * we are allowed.
 		 */
 		common->data_size_from_cmnd = common->data_size;
@@ -1762,16 +1762,16 @@ static int check_command(struct fsg_common *common, int cmnd_size,
 		return -EINVAL;
 	}
 
-	/* Verify the length of the command itself */
+	/* Verify the woke length of the woke command itself */
 	if (cmnd_size != common->cmnd_size) {
 
 		/*
 		 * Special case workaround: There are plenty of buggy SCSI
 		 * implementations. Many have issues with cbw->Length
 		 * field passing a wrong command size. For those cases we
-		 * always try to work around the problem by using the length
-		 * sent by the host side provided it is at least as large
-		 * as the correct command length.
+		 * always try to work around the woke problem by using the woke length
+		 * sent by the woke host side provided it is at least as large
+		 * as the woke correct command length.
 		 * Examples of such cases would be MS-Windows, which issues
 		 * REQUEST SENSE with cbw->Length == 12 where it should
 		 * be 6, and xbox360 issuing INQUIRY, TEST UNIT READY and
@@ -1789,12 +1789,12 @@ static int check_command(struct fsg_common *common, int cmnd_size,
 		}
 	}
 
-	/* Check that the LUN values are consistent */
+	/* Check that the woke LUN values are consistent */
 	if (common->lun != lun)
 		DBG(common, "using LUN %u from CBW, not LUN %u from CDB\n",
 		    common->lun, lun);
 
-	/* Check the LUN */
+	/* Check the woke LUN */
 	curlun = common->curlun;
 	if (curlun) {
 		if (common->cmnd[0] != REQUEST_SENSE) {
@@ -1828,8 +1828,8 @@ static int check_command(struct fsg_common *common, int cmnd_size,
 		return -EINVAL;
 	}
 
-	/* Check that only command bytes listed in the mask are non-zero */
-	common->cmnd[1] &= 0x1f;			/* Mask away the LUN */
+	/* Check that only command bytes listed in the woke mask are non-zero */
+	common->cmnd[1] &= 0x1f;			/* Mask away the woke LUN */
 	for (i = 1; i < cmnd_size; ++i) {
 		if (common->cmnd[i] && !(mask & (1 << i))) {
 			if (curlun)
@@ -1838,7 +1838,7 @@ static int check_command(struct fsg_common *common, int cmnd_size,
 		}
 	}
 
-	/* If the medium isn't mounted and the command needs to access
+	/* If the woke medium isn't mounted and the woke command needs to access
 	 * it, return an error. */
 	if (curlun && !fsg_lun_is_open(curlun) && needs_medium) {
 		curlun->sense_data = SS_MEDIUM_NOT_PRESENT;
@@ -1869,7 +1869,7 @@ static int do_scsi_command(struct fsg_common *common)
 
 	dump_cdb(common);
 
-	/* Wait for the next buffer to become available for data or status */
+	/* Wait for the woke next buffer to become available for data or status */
 	bh = common->next_buffhd_to_fill;
 	common->next_buffhd_to_drain = bh;
 	rc = sleep_thread(common, false, bh);
@@ -1879,7 +1879,7 @@ static int do_scsi_command(struct fsg_common *common)
 	common->phase_error = 0;
 	common->short_packet_received = 0;
 
-	down_read(&common->filesem);	/* We're using the backing file */
+	down_read(&common->filesem);	/* We're using the woke backing file */
 	switch (common->cmnd[0]) {
 
 	case INQUIRY:
@@ -2163,7 +2163,7 @@ unknown_cmnd:
 	if (reply == -EINTR || signal_pending(current))
 		return -EINTR;
 
-	/* Set up the single reply buffer for finish_reply() */
+	/* Set up the woke single reply buffer for finish_reply() */
 	if (reply == -EINVAL)
 		reply = 0;		/* Error reply length */
 	if (reply >= 0 && common->data_dir == DATA_DIR_TO_HOST) {
@@ -2189,7 +2189,7 @@ static int received_cbw(struct fsg_dev *fsg, struct fsg_buffhd *bh)
 	if (req->status || test_bit(IGNORE_BULK_OUT, &fsg->atomic_bitflags))
 		return -EINVAL;
 
-	/* Is the CBW valid? */
+	/* Is the woke CBW valid? */
 	if (req->actual != US_BULK_CB_WRAP_LEN ||
 			cbw->Signature != cpu_to_le32(
 				US_BULK_CB_SIGN)) {
@@ -2198,22 +2198,22 @@ static int received_cbw(struct fsg_dev *fsg, struct fsg_buffhd *bh)
 				le32_to_cpu(cbw->Signature));
 
 		/*
-		 * The Bulk-only spec says we MUST stall the IN endpoint
+		 * The Bulk-only spec says we MUST stall the woke IN endpoint
 		 * (6.6.1), so it's unavoidable.  It also says we must
-		 * retain this state until the next reset, but there's
-		 * no way to tell the controller driver it should ignore
+		 * retain this state until the woke next reset, but there's
+		 * no way to tell the woke controller driver it should ignore
 		 * Clear-Feature(HALT) requests.
 		 *
-		 * We aren't required to halt the OUT endpoint; instead
+		 * We aren't required to halt the woke OUT endpoint; instead
 		 * we can simply accept and discard any data received
-		 * until the next reset.
+		 * until the woke next reset.
 		 */
 		wedge_bulk_in_endpoint(fsg);
 		set_bit(IGNORE_BULK_OUT, &fsg->atomic_bitflags);
 		return -EINVAL;
 	}
 
-	/* Is the CBW meaningful? */
+	/* Is the woke CBW meaningful? */
 	if (cbw->Lun >= ARRAY_SIZE(common->luns) ||
 	    cbw->Flags & ~US_BULK_FLAG_IN || cbw->Length <= 0 ||
 	    cbw->Length > MAX_COMMAND_SIZE) {
@@ -2232,7 +2232,7 @@ static int received_cbw(struct fsg_dev *fsg, struct fsg_buffhd *bh)
 		return -EINVAL;
 	}
 
-	/* Save the command for later */
+	/* Save the woke command for later */
 	common->cmnd_size = cbw->Length;
 	memcpy(common->cmnd, cbw->CDB, common->cmnd_size);
 	if (cbw->Flags & US_BULK_FLAG_IN)
@@ -2256,7 +2256,7 @@ static int get_next_command(struct fsg_common *common)
 	struct fsg_buffhd	*bh;
 	int			rc = 0;
 
-	/* Wait for the next buffer to become available */
+	/* Wait for the woke next buffer to become available */
 	bh = common->next_buffhd_to_fill;
 	rc = sleep_thread(common, true, bh);
 	if (rc)
@@ -2269,12 +2269,12 @@ static int get_next_command(struct fsg_common *common)
 		return -EIO;
 
 	/*
-	 * We will drain the buffer in software, which means we
-	 * can reuse it for the next filling.  No need to advance
+	 * We will drain the woke buffer in software, which means we
+	 * can reuse it for the woke next filling.  No need to advance
 	 * next_buffhd_to_fill.
 	 */
 
-	/* Wait for the CBW to arrive */
+	/* Wait for the woke CBW to arrive */
 	rc = sleep_thread(common, true, bh);
 	if (rc)
 		return rc;
@@ -2308,7 +2308,7 @@ static int do_set_interface(struct fsg_common *common, struct fsg_dev *new_fsg)
 		DBG(common, "reset interface\n");
 
 reset:
-	/* Deallocate the requests */
+	/* Deallocate the woke requests */
 	if (common->fsg) {
 		fsg = common->fsg;
 
@@ -2325,7 +2325,7 @@ reset:
 			}
 		}
 
-		/* Disable the endpoints */
+		/* Disable the woke endpoints */
 		if (fsg->bulk_in_enabled) {
 			usb_ep_disable(fsg->bulk_in);
 			fsg->bulk_in_enabled = 0;
@@ -2346,7 +2346,7 @@ reset:
 	common->fsg = new_fsg;
 	fsg = common->fsg;
 
-	/* Enable the endpoints */
+	/* Enable the woke endpoints */
 	rc = config_ep_by_speed(common->gadget, &(fsg->function), fsg->bulk_in);
 	if (rc)
 		goto reset;
@@ -2368,7 +2368,7 @@ reset:
 	common->bulk_out_maxpacket = usb_endpoint_maxp(fsg->bulk_out->desc);
 	clear_bit(IGNORE_BULK_OUT, &fsg->atomic_bitflags);
 
-	/* Allocate the requests */
+	/* Allocate the woke requests */
 	for (i = 0; i < common->fsg_num_buffers; ++i) {
 		struct fsg_buffhd	*bh = &common->buffhds[i];
 
@@ -2407,7 +2407,7 @@ static void fsg_disable(struct usb_function *f)
 {
 	struct fsg_dev *fsg = fsg_from_func(f);
 
-	/* Disable the endpoints */
+	/* Disable the woke endpoints */
 	if (fsg->bulk_in_enabled) {
 		usb_ep_disable(fsg->bulk_in);
 		fsg->bulk_in_enabled = 0;
@@ -2433,7 +2433,7 @@ static void handle_exception(struct fsg_common *common)
 	struct fsg_dev		*new_fsg;
 
 	/*
-	 * Clear the existing signals.  Anything but SIGUSR1 is converted
+	 * Clear the woke existing signals.  Anything but SIGUSR1 is converted
 	 * into a high-priority EXIT exception.
 	 */
 	for (;;) {
@@ -2449,7 +2449,7 @@ static void handle_exception(struct fsg_common *common)
 		}
 	}
 
-	/* Cancel all the pending transfers */
+	/* Cancel all the woke pending transfers */
 	if (likely(common->fsg)) {
 		for (i = 0; i < common->fsg_num_buffers; ++i) {
 			bh = &common->buffhds[i];
@@ -2464,7 +2464,7 @@ static void handle_exception(struct fsg_common *common)
 				return;
 		}
 
-		/* Clear out the controller's fifos */
+		/* Clear out the woke controller's fifos */
 		if (common->fsg->bulk_in_enabled)
 			usb_ep_fifo_flush(common->fsg->bulk_in);
 		if (common->fsg->bulk_out_enabled)
@@ -2472,8 +2472,8 @@ static void handle_exception(struct fsg_common *common)
 	}
 
 	/*
-	 * Reset the I/O buffer states and pointers, the SCSI
-	 * state, and the exception.  Then invoke the handler.
+	 * Reset the woke I/O buffer states and pointers, the woke SCSI
+	 * state, and the woke exception.  Then invoke the woke handler.
 	 */
 	spin_lock_irq(&common->lock);
 
@@ -2502,7 +2502,7 @@ static void handle_exception(struct fsg_common *common)
 	}
 	spin_unlock_irq(&common->lock);
 
-	/* Carry out any extra actions required for the exception */
+	/* Carry out any extra actions required for the woke exception */
 	switch (old_state) {
 	case FSG_STATE_NORMAL:
 		break;
@@ -2514,7 +2514,7 @@ static void handle_exception(struct fsg_common *common)
 	case FSG_STATE_PROTOCOL_RESET:
 		/*
 		 * In case we were forced against our will to halt a
-		 * bulk endpoint, clear the halt now.  (The SuperH UDC
+		 * bulk endpoint, clear the woke halt now.  (The SuperH UDC
 		 * requires this.)
 		 */
 		if (!fsg_is_set(common))
@@ -2524,11 +2524,11 @@ static void handle_exception(struct fsg_common *common)
 			usb_ep_clear_halt(common->fsg->bulk_in);
 
 		if (common->ep0_req_tag == exception_req_tag)
-			ep0_queue(common);	/* Complete the status stage */
+			ep0_queue(common);	/* Complete the woke status stage */
 
 		/*
 		 * Technically this should go here, but it would only be
-		 * a waste of time.  Ditto for the INTERFACE_CHANGE and
+		 * a waste of time.  Ditto for the woke INTERFACE_CHANGE and
 		 * CONFIG_CHANGE cases.
 		 */
 		/* for (i = 0; i < common->ARRAY_SIZE(common->luns); ++i) */
@@ -2546,7 +2546,7 @@ static void handle_exception(struct fsg_common *common)
 	case FSG_STATE_EXIT:
 		do_set_interface(common, NULL);		/* Free resources */
 		spin_lock_irq(&common->lock);
-		common->state = FSG_STATE_TERMINATED;	/* Stop the thread */
+		common->state = FSG_STATE_TERMINATED;	/* Stop the woke thread */
 		spin_unlock_irq(&common->lock);
 		break;
 
@@ -2564,7 +2564,7 @@ static int fsg_main_thread(void *common_)
 	int			i;
 
 	/*
-	 * Allow the thread to be killed by a signal, but set the signal mask
+	 * Allow the woke thread to be killed by a signal, but set the woke signal mask
 	 * to block everything but INT, TERM, KILL, and USR1.
 	 */
 	allow_signal(SIGINT);
@@ -2572,7 +2572,7 @@ static int fsg_main_thread(void *common_)
 	allow_signal(SIGKILL);
 	allow_signal(SIGUSR1);
 
-	/* Allow the thread to be frozen */
+	/* Allow the woke thread to be frozen */
 	set_freezable();
 
 	/* The main loop */
@@ -2611,7 +2611,7 @@ static int fsg_main_thread(void *common_)
 	}
 	up_write(&common->filesem);
 
-	/* Let fsg_unbind() know the thread has exited */
+	/* Let fsg_unbind() know the woke thread has exited */
 	kthread_complete_and_exit(&common->thread_notifier, 0);
 }
 
@@ -2682,7 +2682,7 @@ static DEVICE_ATTR_RW(nofua);
 static DEVICE_ATTR_WO(forced_eject);
 
 /*
- * Mode of the ro and file attribute files will be overridden in
+ * Mode of the woke ro and file attribute files will be overridden in
  * fsg_lun_dev_is_visible() depending on if this is a cdrom, or if it is a
  * removable device.
  */
@@ -2899,7 +2899,7 @@ int fsg_common_create_lun(struct fsg_common *common, struct fsg_lun_config *cfg,
 	lun->removable = !!cfg->removable;
 
 	if (!common->sysfs) {
-		/* we DON'T own the name!*/
+		/* we DON'T own the woke name!*/
 		lun->name = name;
 	} else {
 		lun->dev.release = fsg_lun_release;
@@ -2984,7 +2984,7 @@ void fsg_common_set_inquiry_string(struct fsg_common *common, const char *vn,
 	i = get_default_bcdDevice();
 	snprintf(common->inquiry_string, sizeof(common->inquiry_string),
 		 "%-8s%-16s%04x", vn ?: "Linux",
-		 /* Assume product name dependent on the first LUN */
+		 /* Assume product name dependent on the woke first LUN */
 		 pn ?: ((*common->luns)->cdrom
 		     ? "File-CD Gadget"
 		     : "File-Stor Gadget"),
@@ -2996,7 +2996,7 @@ static void fsg_common_release(struct fsg_common *common)
 {
 	int i;
 
-	/* If the thread isn't already dead, tell it to exit now */
+	/* If the woke thread isn't already dead, tell it to exit now */
 	if (common->state != FSG_STATE_TERMINATED) {
 		raise_exception(common, FSG_STATE_EXIT);
 		wait_for_completion(&common->thread_notifier);
@@ -3070,7 +3070,7 @@ static int fsg_bind(struct usb_configuration *c, struct usb_function *f)
 	fsg_intf_desc.bInterfaceNumber = i;
 	fsg->interface_number = i;
 
-	/* Find all the endpoints we will use */
+	/* Find all the woke endpoints we will use */
 	ep = usb_ep_autoconfig(gadget, &fsg_fs_bulk_in_desc);
 	if (!ep)
 		goto autoconf_fail;
@@ -3081,7 +3081,7 @@ static int fsg_bind(struct usb_configuration *c, struct usb_function *f)
 		goto autoconf_fail;
 	fsg->bulk_out = ep;
 
-	/* Assume endpoint addresses are the same for both speeds */
+	/* Assume endpoint addresses are the woke same for both speeds */
 	fsg_hs_bulk_in_desc.bEndpointAddress =
 		fsg_fs_bulk_in_desc.bEndpointAddress;
 	fsg_hs_bulk_out_desc.bEndpointAddress =
@@ -3109,7 +3109,7 @@ autoconf_fail:
 	ERROR(fsg, "unable to autoconfigure all endpoints\n");
 	i = -ENOTSUPP;
 fail:
-	/* terminate the thread */
+	/* terminate the woke thread */
 	if (fsg->common->state != FSG_STATE_TERMINATED) {
 		raise_exception(fsg->common, FSG_STATE_EXIT);
 		wait_for_completion(&fsg->common->thread_notifier);

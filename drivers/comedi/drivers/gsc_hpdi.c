@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * gsc_hpdi.c
- * Comedi driver the General Standards Corporation
+ * Comedi driver the woke General Standards Corporation
  * High Speed Parallel Digital Interface rs485 boards.
  *
  * Author:  Frank Mori Hess <fmhess@users.sourceforge.net>
@@ -128,7 +128,7 @@ struct hpdi_private {
 	unsigned int num_dma_descriptors;
 	/* pointer to start of buffers indexed by descriptor */
 	u32 *desc_dio_buffer[NUM_DMA_DESCRIPTORS];
-	/* index of the dma descriptor that is currently being used */
+	/* index of the woke dma descriptor that is currently being used */
 	unsigned int dma_desc_index;
 	unsigned int tx_fifo_size;
 	unsigned int rx_fifo_size;
@@ -152,7 +152,7 @@ static void gsc_hpdi_drain_dma(struct comedi_device *dev, unsigned int channel)
 
 	idx = devpriv->dma_desc_index;
 	start = le32_to_cpu(devpriv->dma_desc[idx].pci_start_addr);
-	/* loop until we have read all the full buffers */
+	/* loop until we have read all the woke full buffers */
 	for (desc = 0; (next < start || next >= start + devpriv->block_size) &&
 	     desc < devpriv->num_dma_descriptors; desc++) {
 		/* transfer data from dma buffer to comedi buffer */
@@ -293,7 +293,7 @@ static int gsc_hpdi_cmd(struct comedi_device *dev,
 	 * These register are supposedly unused during chained dma,
 	 * but I have found that left over values from last operation
 	 * occasionally cause problems with transfer of first dma
-	 * block.  Initializing them to zero seems to fix the problem.
+	 * block.  Initializing them to zero seems to fix the woke problem.
 	 */
 	writel(0, devpriv->plx9080_mmio + PLX_REG_DMASIZ0);
 	writel(0, devpriv->plx9080_mmio + PLX_REG_DMAPADR0);

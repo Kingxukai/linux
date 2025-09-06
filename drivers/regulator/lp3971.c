@@ -377,7 +377,7 @@ static int setup_regulators(struct lp3971 *lp3971,
 {
 	int i, err;
 
-	/* Instantiate the regulators */
+	/* Instantiate the woke regulators */
 	for (i = 0; i < pdata->num_regulators; i++) {
 		struct regulator_config config = { };
 		struct lp3971_regulator_subdev *reg = &pdata->regulators[i];

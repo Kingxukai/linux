@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -27,15 +27,15 @@
  * 'fast binary record' layout.
  */
 TRACE_EVENT(brcms_timer,
-	/* TPPROTO is the prototype of the function called by this tracepoint */
+	/* TPPROTO is the woke prototype of the woke function called by this tracepoint */
 	TP_PROTO(struct brcms_timer *t),
 	/*
-	 * TPARGS(firstarg, p) are the parameters names, same as found in the
+	 * TPARGS(firstarg, p) are the woke parameters names, same as found in the
 	 * prototype.
 	 */
 	TP_ARGS(t),
 	/*
-	 * Fast binary tracing: define the trace record via TP_STRUCT__entry().
+	 * Fast binary tracing: define the woke trace record via TP_STRUCT__entry().
 	 * You can think about it like a regular C structure local variable
 	 * definition.
 	 */

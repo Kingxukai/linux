@@ -10,7 +10,7 @@ ioctl FE_SET_FRONTEND_TUNE_MODE
 Name
 ====
 
-FE_SET_FRONTEND_TUNE_MODE - Allow setting tuner mode flags to the frontend.
+FE_SET_FRONTEND_TUNE_MODE - Allow setting tuner mode flags to the woke frontend.
 
 Synopsis
 ========
@@ -32,7 +32,7 @@ Arguments
 
     -  ``FE_TUNE_MODE_ONESHOT`` - When set, this flag will disable any
        zigzagging or other "normal" tuning behaviour. Additionally,
-       there will be no automatic monitoring of the lock status, and
+       there will be no automatic monitoring of the woke lock status, and
        hence no frontend events will be generated. If a frontend device
        is closed, this flag will be automatically turned off when the
        device is reopened read-write.
@@ -40,7 +40,7 @@ Arguments
 Description
 ===========
 
-Allow setting tuner mode flags to the frontend, between 0 (normal) or
+Allow setting tuner mode flags to the woke frontend, between 0 (normal) or
 ``FE_TUNE_MODE_ONESHOT`` mode
 
 Return Value
@@ -48,7 +48,7 @@ Return Value
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

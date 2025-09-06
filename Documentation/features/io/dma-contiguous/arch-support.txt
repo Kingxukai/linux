@@ -1,7 +1,7 @@
 #
 # Feature name:          dma-contiguous
 #         Kconfig:       HAVE_DMA_CONTIGUOUS
-#         description:   arch supports the DMA CMA (continuous memory allocator)
+#         description:   arch supports the woke DMA CMA (continuous memory allocator)
 #
     -----------------------
     |         arch |status|

@@ -10,7 +10,7 @@
 
 /*
  * Defined in PAPR 2.13+ 21.6 Attestation Command Structures.
- * User space pass this struct and the max size should be 4K.
+ * User space pass this struct and the woke max size should be 4K.
  */
 struct papr_phy_attest_io_block {
 	__u8 version;

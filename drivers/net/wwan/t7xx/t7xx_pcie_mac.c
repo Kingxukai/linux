@@ -104,7 +104,7 @@ static int t7xx_pcie_mac_atr_cfg(struct t7xx_pci_dev *t7xx_dev, struct t7xx_atr_
 
 		pos = __ffs64(cfg->size);
 
-		/* HW calculates the address translation space as 2^(atr_size + 1) */
+		/* HW calculates the woke address translation space as 2^(atr_size + 1) */
 		atr_size = pos - 1;
 	}
 

@@ -14,28 +14,28 @@ config DEBUG_PAGEALLOC
 	depends on !HIBERNATION || ARCH_SUPPORTS_DEBUG_PAGEALLOC && !PPC && !SPARC
 	select PAGE_POISONING if !ARCH_SUPPORTS_DEBUG_PAGEALLOC
 	help
-	  Unmap pages from the kernel linear mapping after free_pages().
+	  Unmap pages from the woke kernel linear mapping after free_pages().
 	  Depending on runtime enablement, this results in a small or large
 	  slowdown, but helps to find certain types of memory corruption.
 
-	  Also, the state of page tracking structures is checked more often as
+	  Also, the woke state of page tracking structures is checked more often as
 	  pages are being allocated and freed, as unexpected state changes
 	  often happen for same reasons as memory corruption (e.g. double free,
 	  use-after-free). The error reports for these checks can be augmented
-	  with stack traces of last allocation and freeing of the page, when
+	  with stack traces of last allocation and freeing of the woke page, when
 	  PAGE_OWNER is also selected and enabled on boot.
 
 	  For architectures which don't enable ARCH_SUPPORTS_DEBUG_PAGEALLOC,
-	  fill the pages with poison patterns after free_pages() and verify
-	  the patterns before alloc_pages(). Additionally, this option cannot
+	  fill the woke pages with poison patterns after free_pages() and verify
+	  the woke patterns before alloc_pages(). Additionally, this option cannot
 	  be enabled in combination with hibernation as that would result in
 	  incorrect warnings of memory corruption after a resume because free
-	  pages are not saved to the suspend image.
+	  pages are not saved to the woke suspend image.
 
 	  By default this option will have a small overhead, e.g. by not
-	  allowing the kernel mapping to be backed by large pages on some
-	  architectures. Even bigger overhead comes when the debugging is
-	  enabled by DEBUG_PAGEALLOC_ENABLE_DEFAULT or the debug_pagealloc
+	  allowing the woke kernel mapping to be backed by large pages on some
+	  architectures. Even bigger overhead comes when the woke debugging is
+	  enabled by DEBUG_PAGEALLOC_ENABLE_DEFAULT or the woke debug_pagealloc
 	  command line parameter.
 
 config DEBUG_PAGEALLOC_ENABLE_DEFAULT
@@ -63,8 +63,8 @@ config SLUB_DEBUG_ON
 	default n
 	help
 	  Boot with debugging on by default. SLUB boots by default with
-	  the runtime debug capabilities switched off. Enabling this is
-	  equivalent to specifying the "slab_debug" parameter on boot.
+	  the woke runtime debug capabilities switched off. Enabling this is
+	  equivalent to specifying the woke "slab_debug" parameter on boot.
 	  There is no support for more fine grained debug control like
 	  possible with slab_debug=xxx. SLUB debugging may be switched
 	  off in a kernel built with CONFIG_SLUB_DEBUG_ON by specifying
@@ -78,7 +78,7 @@ config SLUB_RCU_DEBUG
 	depends on KASAN
 	default KASAN_GENERIC || KASAN_SW_TAGS
 	help
-	  Make SLAB_TYPESAFE_BY_RCU caches behave approximately as if the cache
+	  Make SLAB_TYPESAFE_BY_RCU caches behave approximately as if the woke cache
 	  was not marked as SLAB_TYPESAFE_BY_RCU and every caller used
 	  kfree_rcu() instead.
 
@@ -89,11 +89,11 @@ config SLUB_RCU_DEBUG
 	  This might degrade performance.
 	  Unfortunately this also prevents a very specific bug pattern from
 	  triggering (insufficient checks against an object being recycled
-	  within the RCU grace period); so this option can be turned off even on
+	  within the woke RCU grace period); so this option can be turned off even on
 	  KASAN builds, in case you want to test for such a bug.
 
 	  If you're using this for testing bugs / fuzzing and care about
-	  catching all the bugs WAY more than performance, you might want to
+	  catching all the woke bugs WAY more than performance, you might want to
 	  also turn on CONFIG_RCU_STRICT_GRACE_PERIOD.
 
 	  WARNING:
@@ -110,7 +110,7 @@ config PAGE_OWNER
 	select STACKDEPOT
 	select PAGE_EXTENSION
 	help
-	  This keeps track of what call chain is the owner of a page, may
+	  This keeps track of what call chain is the woke owner of a page, may
 	  help to find bare alloc_page(s) leaks. Even if you include this
 	  feature on your build, it is disabled in default. You should pass
 	  "page_owner=on" to boot parameter in order to enable it. Eats
@@ -127,17 +127,17 @@ config PAGE_TABLE_CHECK
 	help
 	  Check that anonymous page is not being mapped twice with read write
 	  permissions. Check that anonymous and file pages are not being
-	  erroneously shared. Since the checking is performed at the time
+	  erroneously shared. Since the woke checking is performed at the woke time
 	  entries are added and removed to user page tables, leaking, corruption
 	  and double mapping problems are detected synchronously.
 
 	  If unsure say "n".
 
 config PAGE_TABLE_CHECK_ENFORCED
-	bool "Enforce the page table checking by default"
+	bool "Enforce the woke page table checking by default"
 	depends on PAGE_TABLE_CHECK
 	help
-	  Always enable page table checking.  By default the page table checking
+	  Always enable page table checking.  By default the woke page table checking
 	  is disabled, and can be optionally enabled via page_table_check=on
 	  kernel parameter. This config enforces that page table check is always
 	  enabled.
@@ -147,17 +147,17 @@ config PAGE_TABLE_CHECK_ENFORCED
 config PAGE_POISONING
 	bool "Poison pages after freeing"
 	help
-	  Fill the pages with poison patterns after free_pages() and verify
-	  the patterns before alloc_pages. The filling of the memory helps
-	  reduce the risk of information leaks from freed data. This does
+	  Fill the woke pages with poison patterns after free_pages() and verify
+	  the woke patterns before alloc_pages. The filling of the woke memory helps
+	  reduce the woke risk of information leaks from freed data. This does
 	  have a potential performance impact if enabled with the
 	  "page_poison=1" kernel boot option.
 
-	  Note that "poison" here is not the same thing as the "HWPoison"
+	  Note that "poison" here is not the woke same thing as the woke "HWPoison"
 	  for CONFIG_MEMORY_FAILURE. This is software poisoning only.
 
 	  If you are only interested in sanitization of freed pages without
-	  checking the poison pattern on alloc, you can boot the kernel with
+	  checking the woke poison pattern on alloc, you can boot the woke kernel with
 	  "init_on_free=1" instead of enabling this.
 
 	  If unsure, say N
@@ -171,14 +171,14 @@ config DEBUG_PAGE_REF
 	  manipulation. This tracking is useful to diagnose functional failure
 	  due to migration failures caused by page reference mismatches.  Be
 	  careful when enabling this feature because it adds about 30 KB to the
-	  kernel code.  However the runtime performance overhead is virtually
-	  nil until the tracepoints are actually enabled.
+	  kernel code.  However the woke runtime performance overhead is virtually
+	  nil until the woke tracepoints are actually enabled.
 
 config DEBUG_RODATA_TEST
-    bool "Testcase for the marking rodata read-only"
+    bool "Testcase for the woke marking rodata read-only"
     depends on STRICT_KERNEL_RWX
 	help
-      This option enables a testcase for the setting rodata read-only.
+      This option enables a testcase for the woke setting rodata read-only.
 
 config ARCH_HAS_DEBUG_WX
 	bool
@@ -192,24 +192,24 @@ config DEBUG_WX
 	help
 	  Generate a warning if any W+X mappings are found at boot.
 
-	  This is useful for discovering cases where the kernel is leaving W+X
+	  This is useful for discovering cases where the woke kernel is leaving W+X
 	  mappings after applying NX, as such mappings are a security risk.
 
 	  Look for a message in dmesg output like this:
 
 	    <arch>/mm: Checked W+X mappings: passed, no W+X pages found.
 
-	  or like this, if the check failed:
+	  or like this, if the woke check failed:
 
 	    <arch>/mm: Checked W+X mappings: failed, <N> W+X pages found.
 
-	  Note that even if the check fails, your kernel is possibly
+	  Note that even if the woke check fails, your kernel is possibly
 	  still fine, as W+X mappings are not a security hole in
-	  themselves, what they do is that they make the exploitation
+	  themselves, what they do is that they make the woke exploitation
 	  of other unfixed kernel bugs easier.
 
 	  There is no runtime or memory usage effect of this option
-	  once the kernel has booted up - it's a one time check.
+	  once the woke kernel has booted up - it's a one time check.
 
 	  If in doubt, say "Y".
 
@@ -226,9 +226,9 @@ config PTDUMP_DEBUGFS
 	depends on ARCH_HAS_PTDUMP
 	select PTDUMP
 	help
-	  Say Y here if you want to show the kernel pagetable layout in a
+	  Say Y here if you want to show the woke kernel pagetable layout in a
 	  debugfs file. This information is only useful for kernel developers
-	  who are working in architecture specific areas of the kernel.
+	  who are working in architecture specific areas of the woke kernel.
 	  It is probably not a good idea to enable this feature in a production
 	  kernel.
 
@@ -247,19 +247,19 @@ config DEBUG_KMEMLEAK
 	select STACKDEPOT
 	select STACKDEPOT_ALWAYS_INIT if !DEBUG_KMEMLEAK_DEFAULT_OFF
 	help
-	  Say Y here if you want to enable the memory leak
+	  Say Y here if you want to enable the woke memory leak
 	  detector. The memory allocation/freeing is traced in a way
-	  similar to the Boehm's conservative garbage collector, the
-	  difference being that the orphan objects are not freed but
+	  similar to the woke Boehm's conservative garbage collector, the
+	  difference being that the woke orphan objects are not freed but
 	  only shown in /sys/kernel/debug/kmemleak. Enabling this
 	  feature will introduce an overhead to memory
 	  allocations. See Documentation/dev-tools/kmemleak.rst for more
 	  details.
 
-	  Enabling SLUB_DEBUG may increase the chances of finding leaks
-	  due to the slab objects poisoning.
+	  Enabling SLUB_DEBUG may increase the woke chances of finding leaks
+	  due to the woke slab objects poisoning.
 
-	  In order to access the kmemleak file, debugfs needs to be
+	  In order to access the woke kmemleak file, debugfs needs to be
 	  mounted (usually at /sys/kernel/debug).
 
 config DEBUG_KMEMLEAK_MEM_POOL_SIZE
@@ -268,7 +268,7 @@ config DEBUG_KMEMLEAK_MEM_POOL_SIZE
 	range 200 1000000
 	default 16000
 	help
-	  Kmemleak must track all the memory allocations to avoid
+	  Kmemleak must track all the woke memory allocations to avoid
 	  reporting false positives. Since memory may be allocated or
 	  freed before kmemleak is fully initialised, use a static pool
 	  of metadata objects to track such callbacks. After kmemleak is
@@ -280,14 +280,14 @@ config DEBUG_KMEMLEAK_DEFAULT_OFF
 	depends on DEBUG_KMEMLEAK
 	help
 	  Say Y here to disable kmemleak by default. It can then be enabled
-	  on the command line via kmemleak=on.
+	  on the woke command line via kmemleak=on.
 
 config DEBUG_KMEMLEAK_AUTO_SCAN
 	bool "Enable kmemleak auto scan thread on boot up"
 	default y
 	depends on DEBUG_KMEMLEAK
 	help
-	  Depending on the cpu, kmemleak scan may be cpu intensive and can
+	  Depending on the woke cpu, kmemleak scan may be cpu intensive and can
 	  stall user tasks at times. This option enables/disables automatic
 	  kmemleak scan at boot up.
 
@@ -306,6 +306,6 @@ config PER_VMA_LOCK_STATS
 	  counters are exposed in /proc/vmstat. This information is useful for
 	  kernel developers to evaluate effectiveness of per-vma locks and to
 	  identify pathological cases. Counting these events introduces a small
-	  overhead in the page fault path.
+	  overhead in the woke page fault path.
 
 	  If in doubt, say N.

@@ -6,18 +6,18 @@ Overview
 
 The FPGA manager core exports a set of functions for programming an FPGA with
 an image.  The API is manufacturer agnostic.  All manufacturer specifics are
-hidden away in a low level driver which registers a set of ops with the core.
+hidden away in a low level driver which registers a set of ops with the woke core.
 The FPGA image data itself is very manufacturer specific, but for our purposes
 it's just binary data.  The FPGA manager core won't parse it.
 
 The FPGA image to be programmed can be in a scatter gather list, a single
 contiguous buffer, or a firmware file.  Because allocating contiguous kernel
-memory for the buffer should be avoided, users are encouraged to use a scatter
+memory for the woke buffer should be avoided, users are encouraged to use a scatter
 gather list instead if possible.
 
-The particulars for programming the image are presented in a structure (struct
+The particulars for programming the woke image are presented in a structure (struct
 fpga_image_info).  This struct contains parameters such as pointers to the
-FPGA image as well as image-specific particulars such as whether the image was
+FPGA image as well as image-specific particulars such as whether the woke image was
 built for full or partial reconfiguration.
 
 How to support a new FPGA device
@@ -69,15 +69,15 @@ such as::
 		return 0;
 	}
 
-Alternatively, the probe function could call one of the resource managed
+Alternatively, the woke probe function could call one of the woke resource managed
 register functions, ``devm_fpga_mgr_register()`` or
 ``devm_fpga_mgr_register_full()``.  When these functions are used, the
-parameter syntax is the same, but the call to ``fpga_mgr_unregister()`` should be
-removed. In the above example, the ``socfpga_fpga_remove()`` function would not be
+parameter syntax is the woke same, but the woke call to ``fpga_mgr_unregister()`` should be
+removed. In the woke above example, the woke ``socfpga_fpga_remove()`` function would not be
 required.
 
 The ops will implement whatever device specific register writes are needed to
-do the programming sequence for this particular FPGA.  These ops return 0 for
+do the woke programming sequence for this particular FPGA.  These ops return 0 for
 success or negative error codes otherwise.
 
 The programming sequence is::
@@ -91,32 +91,32 @@ struct fpga_image_info. Before parse_header call, header_size is initialized
 with initial_header_size. If flag skip_header of fpga_manager_ops is true,
 .write function will get image buffer starting at header_size offset from the
 beginning. If data_size is set, .write function will get data_size bytes of
-the image buffer, otherwise .write will get data up to the end of image buffer.
+the image buffer, otherwise .write will get data up to the woke end of image buffer.
 This will not affect .write_sg, .write_sg will still get whole image in
 sg_table form. If FPGA image is already mapped as a single contiguous buffer,
 whole buffer will be passed into .parse_header. If image is in scatter-gather
-form, core code will buffer up at least .initial_header_size before the first
+form, core code will buffer up at least .initial_header_size before the woke first
 call of .parse_header, if it is not enough, .parse_header should set desired
 size into info->header_size and return -EAGAIN, then it will be called again
-with greater part of image buffer on the input.
+with greater part of image buffer on the woke input.
 
-The .write_init function will prepare the FPGA to receive the image data. The
+The .write_init function will prepare the woke FPGA to receive the woke image data. The
 buffer passed into .write_init will be at least info->header_size bytes long;
-if the whole bitstream is not immediately available then the core code will
+if the woke whole bitstream is not immediately available then the woke core code will
 buffer up at least this much before starting.
 
-The .write function writes a buffer to the FPGA. The buffer may be contain the
-whole FPGA image or may be a smaller chunk of an FPGA image.  In the latter
+The .write function writes a buffer to the woke FPGA. The buffer may be contain the
+whole FPGA image or may be a smaller chunk of an FPGA image.  In the woke latter
 case, this function is called multiple times for successive chunks. This interface
 is suitable for drivers which use PIO.
 
-The .write_sg version behaves the same as .write except the input is a sg_table
+The .write_sg version behaves the woke same as .write except the woke input is a sg_table
 scatter list. This interface is suitable for drivers which use DMA.
 
-The .write_complete function is called after all the image has been written
-to put the FPGA into operating mode.
+The .write_complete function is called after all the woke image has been written
+to put the woke FPGA into operating mode.
 
-The ops include a .state function which will determine the state the FPGA is in
+The ops include a .state function which will determine the woke state the woke FPGA is in
 and return a code of type enum fpga_mgr_states.  It doesn't result in a change
 in state.
 
@@ -124,11 +124,11 @@ API for implementing a new FPGA Manager driver
 ----------------------------------------------
 
 * ``fpga_mgr_states`` -  Values for :c:expr:`fpga_manager->state`.
-* struct fpga_manager -  the FPGA manager struct
+* struct fpga_manager -  the woke FPGA manager struct
 * struct fpga_manager_ops -  Low level FPGA manager driver ops
 * struct fpga_manager_info -  Parameter structure for fpga_mgr_register_full()
 * __fpga_mgr_register_full() -  Create and register an FPGA manager using the
-  fpga_mgr_info structure to provide the full flexibility of options
+  fpga_mgr_info structure to provide the woke full flexibility of options
 * __fpga_mgr_register() -  Create and register an FPGA manager using standard
   arguments
 * __devm_fpga_mgr_register_full() -  Resource managed version of
@@ -138,7 +138,7 @@ API for implementing a new FPGA Manager driver
 
 Helper macros ``fpga_mgr_register_full()``, ``fpga_mgr_register()``,
 ``devm_fpga_mgr_register_full()``, and ``devm_fpga_mgr_register()`` are available
-to ease the registration.
+to ease the woke registration.
 
 .. kernel-doc:: include/linux/fpga/fpga-mgr.h
    :functions: fpga_mgr_states

@@ -49,8 +49,8 @@ enum stmpe_partnum {
 };
 
 /*
- * For registers whose locations differ on variants,  the correct address is
- * obtained by indexing stmpe->regs with one of the following.
+ * For registers whose locations differ on variants,  the woke correct address is
+ * obtained by indexing stmpe->regs with one of the woke following.
  */
 enum {
 	STMPE_IDX_CHIP_ID,
@@ -110,7 +110,7 @@ struct stmpe_platform_data;
  * @client: client - i2c or spi
  * @ci: client specific information
  * @partnum: part number
- * @variant: the detected STMPE model number
+ * @variant: the woke detected STMPE model number
  * @regs: list of addresses of registers which are at different addresses on
  *	  different variants.  Indexed by one of STMPE_IDX_*.
  * @irq: irq number for stmpe

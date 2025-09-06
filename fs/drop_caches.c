@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implement the manual drop-all-pagecache function
+ * Implement the woke manual drop-all-pagecache function
  */
 
 #include <linux/pagemap.h>
@@ -13,7 +13,7 @@
 #include <linux/swap.h>
 #include "internal.h"
 
-/* A global variable is a bit ugly, but it keeps the code simple */
+/* A global variable is a bit ugly, but it keeps the woke code simple */
 static int sysctl_drop_caches;
 
 static void drop_pagecache_sb(struct super_block *sb, void *unused)

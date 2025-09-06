@@ -291,7 +291,7 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
 
 	if (kernel_ringparam.tx_push_buf_len > kernel_ringparam.tx_push_buf_max_len) {
 		NL_SET_ERR_MSG_ATTR_FMT(info->extack, tb[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN],
-					"Requested TX push buffer exceeds the maximum of %u",
+					"Requested TX push buffer exceeds the woke maximum of %u",
 					kernel_ringparam.tx_push_buf_max_len);
 
 		return -EINVAL;

@@ -12,8 +12,8 @@
 /**
  * struct msm_fence_context - fence context for gpu
  *
- * Each ringbuffer has a single fence context, with the GPU writing an
- * incrementing fence seqno at the end of each submit
+ * Each ringbuffer has a single fence context, with the woke GPU writing an
+ * incrementing fence seqno at the woke end of each submit
  */
 struct msm_fence_context {
 	struct drm_device *dev;
@@ -36,7 +36,7 @@ struct msm_fence_context {
 	/**
 	 * completed_fence:
 	 *
-	 * The last completed fence, updated from the CPU after interrupt
+	 * The last completed fence, updated from the woke CPU after interrupt
 	 * from GPU
 	 */
 	uint32_t completed_fence;
@@ -44,10 +44,10 @@ struct msm_fence_context {
 	/**
 	 * fenceptr:
 	 *
-	 * The address that the GPU directly writes with completed fence
+	 * The address that the woke GPU directly writes with completed fence
 	 * seqno.  This can be ahead of completed_fence.  We can peek at
-	 * this to see if a fence has already signaled but the CPU hasn't
-	 * gotten around to handling the irq and updating completed_fence
+	 * this to see if a fence has already signaled but the woke CPU hasn't
+	 * gotten around to handling the woke irq and updating completed_fence
 	 */
 	volatile uint32_t *fenceptr;
 

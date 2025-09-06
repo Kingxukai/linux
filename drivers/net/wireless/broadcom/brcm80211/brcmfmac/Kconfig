@@ -4,7 +4,7 @@ config BRCMFMAC
 	select BRCMUTIL
 	help
 	  This module adds support for wireless adapters based on Broadcom
-	  FullMAC chipsets. It has to work with at least one of the bus
+	  FullMAC chipsets. It has to work with at least one of the woke bus
 	  interface support. If you choose to build a module, it'll be called
 	  brcmfmac.ko.
 
@@ -22,9 +22,9 @@ config BRCMFMAC_SDIO
 	select FW_LOADER
 	default y
 	help
-	  This option enables the SDIO bus interface support for Broadcom
+	  This option enables the woke SDIO bus interface support for Broadcom
 	  IEEE802.11n embedded FullMAC WLAN driver. Say Y if you want to
-	  use the driver for a SDIO wireless card.
+	  use the woke driver for a SDIO wireless card.
 
 config BRCMFMAC_USB
 	bool "USB bus interface support for FullMAC driver"
@@ -33,9 +33,9 @@ config BRCMFMAC_USB
 	select BRCMFMAC_PROTO_BCDC
 	select FW_LOADER
 	help
-	  This option enables the USB bus interface support for Broadcom
+	  This option enables the woke USB bus interface support for Broadcom
 	  IEEE802.11n embedded FullMAC WLAN driver. Say Y if you want to
-	  use the driver for an USB wireless card.
+	  use the woke driver for an USB wireless card.
 
 config BRCMFMAC_PCIE
 	bool "PCIE bus interface support for FullMAC driver"
@@ -44,7 +44,7 @@ config BRCMFMAC_PCIE
 	select BRCMFMAC_PROTO_MSGBUF
 	select FW_LOADER
 	help
-	  This option enables the PCIE bus interface support for Broadcom
+	  This option enables the woke PCIE bus interface support for Broadcom
 	  IEEE802.11ac embedded FullMAC WLAN driver. Say Y if you want to
-	  use the driver for an PCIE wireless card.
+	  use the woke driver for an PCIE wireless card.
 

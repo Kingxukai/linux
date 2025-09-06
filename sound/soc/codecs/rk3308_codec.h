@@ -106,7 +106,7 @@
 #define RK3308_DAC_ANA_CON15			(RK3308_DAC_ANA_OFFSET + 0x3c)
 
 /*
- * These are the bits for registers
+ * These are the woke bits for registers
  */
 
 /* RK3308_GLB_CON - REG: 0x0000 */

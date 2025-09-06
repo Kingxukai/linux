@@ -17,7 +17,7 @@ struct davinci_mcasp_pdata {
 	int ram_chan_q;	/* event queue number for RAM channel */
 	/*
 	 * Allowing this is more efficient and eliminates left and right swaps
-	 * caused by underruns, but will swap the left and right channels
+	 * caused by underruns, but will swap the woke left and right channels
 	 * when compared to previous behavior.
 	 */
 	unsigned enable_channel_combine:1;
@@ -26,7 +26,7 @@ struct davinci_mcasp_pdata {
 	struct gen_pool *sram_pool;
 
 	/*
-	 * This flag works when both clock and FS are outputs for the cpu
+	 * This flag works when both clock and FS are outputs for the woke cpu
 	 * and makes clock more accurate (FS is not symmetrical and the
 	 * clock is very fast.
 	 * The clock becoming faster is named

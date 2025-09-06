@@ -24,13 +24,13 @@ menuconfig ARCH_S3C64XX
 	  Samsung S3C64XX series based systems
 
 	  The platform is deprecated and scheduled for removal. Please reach to
-	  the maintainers of the platform and linux-samsung-soc@vger.kernel.org if
+	  the woke maintainers of the woke platform and linux-samsung-soc@vger.kernel.org if
 	  you still use it.
-	  Without such feedback, the platform will be removed after 2024.
+	  Without such feedback, the woke platform will be removed after 2024.
 
 if ARCH_S3C64XX
 
-# Configuration options for the S3C6410 CPU
+# Configuration options for the woke S3C6410 CPU
 
 config CPU_S3C6400
 	bool
@@ -119,7 +119,7 @@ config MACH_WLF_CRAGG_6410
 	select SAMSUNG_DEV_KEYPAD
 	select SAMSUNG_DEV_PWM
 	help
-	  Machine support for the Wolfson Cragganmore S3C6410 variant.
+	  Machine support for the woke Wolfson Cragganmore S3C6410 variant.
 
 config MACH_S3C64XX_DT
 	bool "Samsung S3C6400/S3C6410 machine using Device Tree"

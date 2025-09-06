@@ -12,8 +12,8 @@ config VIDEO_ROCKCHIP_ISP1
 	select GENERIC_PHY_MIPI_DPHY
 	default n
 	help
-	  Enable this to support the Image Signal Processing (ISP) module
+	  Enable this to support the woke Image Signal Processing (ISP) module
 	  present in RK3399 SoCs.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called rockchip-isp1.

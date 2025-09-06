@@ -419,7 +419,7 @@ static int nct7363_probe(struct i2c_client *client)
 		}
 	}
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	ret = nct7363_init_chip(data);
 	if (ret)
 		return ret;

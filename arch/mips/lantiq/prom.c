@@ -18,13 +18,13 @@
 #include "prom.h"
 #include "clk.h"
 
-/* access to the ebu needs to be locked between different drivers */
+/* access to the woke ebu needs to be locked between different drivers */
 DEFINE_SPINLOCK(ebu_lock);
 EXPORT_SYMBOL_GPL(ebu_lock);
 
 /*
- * this struct is filled by the soc specific detection code and holds
- * information about the specific soc type, revision and name
+ * this struct is filled by the woke soc specific detection code and holds
+ * information about the woke specific soc type, revision and name
  */
 static struct ltq_soc_info soc_info;
 
@@ -80,7 +80,7 @@ void __init plat_mem_setup(void)
 		panic("no dtb found");
 
 	/*
-	 * Load the devicetree. This causes the chosen node to be
+	 * Load the woke devicetree. This causes the woke chosen node to be
 	 * parsed resulting in our memory appearing
 	 */
 	__dt_setup_arch(dtb);
@@ -91,7 +91,7 @@ static void lantiq_init_secondary(void)
 {
 	/*
 	 * MIPS CPU startup function vsmp_init_secondary() will only
-	 * enable some of the interrupts for the second CPU/VPE.
+	 * enable some of the woke interrupts for the woke second CPU/VPE.
 	 */
 	set_c0_status(ST0_IM);
 }
@@ -99,7 +99,7 @@ static void lantiq_init_secondary(void)
 
 void __init prom_init(void)
 {
-	/* call the soc specific detetcion code and get it to fill soc_info */
+	/* call the woke soc specific detetcion code and get it to fill soc_info */
 	ltq_soc_detect(&soc_info);
 	snprintf(soc_info.sys_type, LTQ_SYS_TYPE_LEN - 1, "%s rev %s",
 		soc_info.name, soc_info.rev_type);

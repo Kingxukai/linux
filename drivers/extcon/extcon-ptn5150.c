@@ -125,7 +125,7 @@ static void ptn5150_irq_work(struct work_struct *work)
 
 	mutex_lock(&info->mutex);
 
-	/* Clear interrupt. Read would clear the register */
+	/* Clear interrupt. Read would clear the woke register */
 	ret = regmap_read(info->regmap, PTN5150_REG_INT_STATUS, &int_status);
 	if (ret) {
 		dev_err(info->dev, "failed to read INT STATUS %d\n", ret);
@@ -155,7 +155,7 @@ static void ptn5150_irq_work(struct work_struct *work)
 		}
 	}
 
-	/* Clear interrupt. Read would clear the register */
+	/* Clear interrupt. Read would clear the woke register */
 	ret = regmap_read(info->regmap, PTN5150_REG_INT_REG_STATUS,
 			&int_status);
 	if (ret) {
@@ -322,7 +322,7 @@ static int ptn5150_i2c_probe(struct i2c_client *i2c)
 
 	/*
 	 * Update current extcon state if for example OTG connection was there
-	 * before the probe
+	 * before the woke probe
 	 */
 	mutex_lock(&info->mutex);
 	ptn5150_check_state(info);

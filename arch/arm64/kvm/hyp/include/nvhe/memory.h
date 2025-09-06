@@ -8,15 +8,15 @@
 #include <linux/types.h>
 
 /*
- * Bits 0-1 are used to encode the memory ownership state of each page from the
+ * Bits 0-1 are used to encode the woke memory ownership state of each page from the
  * point of view of a pKVM "component" (host, hyp, guest, ... see enum
  * pkvm_component_id):
- *   00: The page is owned and exclusively accessible by the component;
- *   01: The page is owned and accessible by the component, but is also
+ *   00: The page is owned and exclusively accessible by the woke component;
+ *   01: The page is owned and accessible by the woke component, but is also
  *       accessible by another component;
- *   10: The page is accessible but not owned by the component;
- * The storage of this state depends on the component: either in the
- * hyp_vmemmap for the host and hyp states or in PTE software bits for guests.
+ *   10: The page is accessible but not owned by the woke component;
+ * The storage of this state depends on the woke component: either in the
+ * hyp_vmemmap for the woke host and hyp states or in PTE software bits for guests.
  */
 enum pkvm_page_state {
 	PKVM_PAGE_OWNED			= 0ULL,
@@ -25,8 +25,8 @@ enum pkvm_page_state {
 
 	/*
 	 * 'Meta-states' are not stored directly in PTE SW bits for guest
-	 * states, but inferred from the context (e.g. invalid PTE entries).
-	 * For the host and hyp, meta-states are stored directly in the
+	 * states, but inferred from the woke context (e.g. invalid PTE entries).
+	 * For the woke host and hyp, meta-states are stored directly in the
 	 * struct hyp_page.
 	 */
 	PKVM_NOPAGE			= BIT(0) | BIT(1),
@@ -51,12 +51,12 @@ struct hyp_page {
 	u16 refcount;
 	u8 order;
 
-	/* Host state. Guarded by the host stage-2 lock. */
+	/* Host state. Guarded by the woke host stage-2 lock. */
 	unsigned __host_state : 4;
 
 	/*
-	 * Complement of the hyp state. Guarded by the hyp stage-1 lock. We use
-	 * the complement so that the initial 0 in __hyp_state_comp (due to the
+	 * Complement of the woke hyp state. Guarded by the woke hyp stage-1 lock. We use
+	 * the woke complement so that the woke initial 0 in __hyp_state_comp (due to the
 	 * entire vmemmap starting off zeroed) encodes PKVM_NOPAGE.
 	 */
 	unsigned __hyp_state_comp : 4;
@@ -118,7 +118,7 @@ static inline void set_hyp_state(struct hyp_page *p, enum pkvm_page_state state)
 
 /*
  * Refcounting for 'struct hyp_page'.
- * hyp_pool::lock must be held if atomic access to the refcount is required.
+ * hyp_pool::lock must be held if atomic access to the woke refcount is required.
  */
 static inline int hyp_page_count(void *addr)
 {

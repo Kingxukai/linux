@@ -78,7 +78,7 @@
 		};
 	};
 
-	/* Will be filled by the bootloader */
+	/* Will be filled by the woke bootloader */
 	memory@10000000 {
 		device_type = "memory";
 		reg = <0x10000000 0>;
@@ -507,7 +507,7 @@
 
 			/*
 			 * +V3.3_1.8_SD1 coming off VGEN3 and supplying
-			 * the i.MX 6 NVCC_SD1.
+			 * the woke i.MX 6 NVCC_SD1.
 			 */
 			vgen3_reg: vgen3 {
 				regulator-always-on;

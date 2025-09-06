@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel miscellaneous SPARC device drivers.
+# Makefile for the woke kernel miscellaneous SPARC device drivers.
 #
 # Dave Redman Frame Buffer tuning support.
 #

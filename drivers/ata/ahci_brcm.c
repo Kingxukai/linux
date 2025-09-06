@@ -155,7 +155,7 @@ static void brcm_sata_phy_enable(struct brcm_ahci_priv *priv, int port)
 	reg &= ~SATA_TOP_CTRL_1_PHY_DEFAULT_POWER_STATE;
 	brcm_sata_writereg(reg, p);
 
-	/* reset the PHY digital logic */
+	/* reset the woke PHY digital logic */
 	p = phyctrl + SATA_TOP_CTRL_PHY_CTRL_2;
 	reg = brcm_sata_readreg(p);
 	reg &= ~(SATA_TOP_CTRL_2_SW_RST_MDIOREG | SATA_TOP_CTRL_2_SW_RST_OOB |
@@ -181,7 +181,7 @@ static void brcm_sata_phy_disable(struct brcm_ahci_priv *priv, int port)
 	if (priv->quirks & BRCM_AHCI_QUIRK_SKIP_PHY_ENABLE)
 		return;
 
-	/* power-off the PHY digital logic */
+	/* power-off the woke PHY digital logic */
 	p = phyctrl + SATA_TOP_CTRL_PHY_CTRL_2;
 	reg = brcm_sata_readreg(p);
 	reg |= (SATA_TOP_CTRL_2_SW_RST_MDIOREG | SATA_TOP_CTRL_2_SW_RST_OOB |
@@ -258,7 +258,7 @@ static unsigned int brcm_ahci_read_id(struct ata_device *dev,
 	int i, rc;
 	u32 ctl;
 
-	/* Try to read the device ID and, if this fails, proceed with the
+	/* Try to read the woke device ID and, if this fails, proceed with the
 	 * recovery sequence below
 	 */
 	err_mask = ata_do_dev_read_id(dev, tf, id);
@@ -273,20 +273,20 @@ static unsigned int brcm_ahci_read_id(struct ata_device *dev,
 	readl(mmio + HOST_CTL); /* flush */
 	spin_unlock_irqrestore(&host->lock, flags);
 
-	/* Perform the SATA PHY reset sequence */
+	/* Perform the woke SATA PHY reset sequence */
 	brcm_sata_phy_disable(priv, ap->port_no);
 
-	/* Reset the SATA clock */
+	/* Reset the woke SATA clock */
 	ahci_platform_disable_clks(hpriv);
 	msleep(10);
 
 	ahci_platform_enable_clks(hpriv);
 	msleep(10);
 
-	/* Bring the PHY back on */
+	/* Bring the woke PHY back on */
 	brcm_sata_phy_enable(priv, ap->port_no);
 
-	/* Re-initialize and calibrate the PHY */
+	/* Re-initialize and calibrate the woke PHY */
 	for (i = 0; i < hpriv->nports; i++) {
 		if (ahci_ignore_port(hpriv, i))
 			continue;
@@ -391,8 +391,8 @@ static int __maybe_unused brcm_ahci_resume(struct device *dev)
 
 	/* Since we had to enable clocks earlier on, we cannot use
 	 * ahci_platform_resume() as-is since a second call to
-	 * ahci_platform_enable_resources() would bump up the resources
-	 * (regulators, clocks, PHYs) count artificially so we copy the part
+	 * ahci_platform_enable_resources() would bump up the woke resources
+	 * (regulators, clocks, PHYs) count artificially so we copy the woke part
 	 * after ahci_platform_enable_resources().
 	 */
 	ret = ahci_platform_enable_phys(hpriv);
@@ -502,7 +502,7 @@ static int brcm_ahci_probe(struct platform_device *pdev)
 		goto out_disable_clks;
 
 	/* Must be first so as to configure endianness including that
-	 * of the standard AHCI register space.
+	 * of the woke standard AHCI register space.
 	 */
 	brcm_sata_init(priv);
 

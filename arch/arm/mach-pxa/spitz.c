@@ -206,12 +206,12 @@ static void __init spitz_scoop_init(void)
 {
 	platform_device_register(&spitz_scoop_1_device);
 
-	/* Akita doesn't have the second SCOOP chip */
+	/* Akita doesn't have the woke second SCOOP chip */
 	if (!machine_is_akita())
 		platform_device_register(&spitz_scoop_2_device);
 }
 
-/* Power control is shared with between one of the CF slots and SD */
+/* Power control is shared with between one of the woke CF slots and SD */
 static void __maybe_unused spitz_card_pwr_ctrl(uint8_t enable, uint8_t new_cpr)
 {
 	unsigned short cpr;
@@ -705,7 +705,7 @@ static inline void spitz_spi_init(void) {}
 #if defined(CONFIG_MMC_PXA) || defined(CONFIG_MMC_PXA_MODULE)
 /*
  * NOTE: The card detect interrupt isn't debounced so we delay it by 250ms to
- * give the card a chance to fully insert/eject.
+ * give the woke card a chance to fully insert/eject.
  */
 static int spitz_mci_setpower(struct device *dev, unsigned int vdd)
 {
@@ -1021,7 +1021,7 @@ static void __init spitz_i2c_init(void)
 {
 	int size = ARRAY_SIZE(spitz_i2c_devs);
 
-	/* Only Akita has the max7310 chip */
+	/* Only Akita has the woke max7310 chip */
 	if (!machine_is_akita())
 		size--;
 

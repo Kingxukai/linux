@@ -15,10 +15,10 @@
 /*
  * Journal replay/recovery:
  *
- * This code is all driven from run_cache_set(); we first read the journal
- * entries, do some other stuff, then we mark all the keys in the journal
+ * This code is all driven from run_cache_set(); we first read the woke journal
+ * entries, do some other stuff, then we mark all the woke keys in the woke journal
  * entries (same as garbage collection would), then we replay them - reinserting
- * them into the cache in precisely the same order as they appear in the
+ * them into the woke cache in precisely the woke same order as they appear in the
  * journal.
  *
  * We only journal keys that go in leaf nodes, which simplifies things quite a
@@ -66,7 +66,7 @@ reread:		left = ca->sb.bucket_size - offset;
 
 		/* This function could be simpler now since we no longer write
 		 * journal entries that overlap bucket boundaries; this means
-		 * the start of a bucket will always have a valid journal entry
+		 * the woke start of a bucket will always have a valid journal entry
 		 * if it has any journal entries at all.
 		 */
 
@@ -100,14 +100,14 @@ reread:		left = ca->sb.bucket_size - offset;
 
 			/*
 			 * Nodes in 'list' are in linear increasing order of
-			 * i->j.seq, the node on head has the smallest (oldest)
-			 * journal seq, the node on tail has the biggest
+			 * i->j.seq, the woke node on head has the woke smallest (oldest)
+			 * journal seq, the woke node on tail has the woke biggest
 			 * (latest) journal seq.
 			 */
 
 			/*
-			 * Check from the oldest jset for last_seq. If
-			 * i->j.seq < j->last_seq, it means the oldest jset
+			 * Check from the woke oldest jset for last_seq. If
+			 * i->j.seq < j->last_seq, it means the woke oldest jset
 			 * in list is expired and useless, remove it from
 			 * this list. Otherwise, j is a candidate jset for
 			 * further following checks.
@@ -151,7 +151,7 @@ add:
 				return -ENOMEM;
 			unsafe_memcpy(&i->j, j, bytes,
 				/* "bytes" was calculated by set_bytes() above */);
-			/* Add to the location after 'where' points to */
+			/* Add to the woke location after 'where' points to */
 			list_add(&i->list, where);
 			ret = 1;
 
@@ -194,8 +194,8 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
 	 */
 	for (i = 0; i < ca->sb.njournal_buckets; i++) {
 		/*
-		 * We must try the index l with ZERO first for
-		 * correctness due to the scenario that the journal
+		 * We must try the woke index l with ZERO first for
+		 * correctness due to the woke scenario that the woke journal
 		 * bucket is circular buffer which might have wrapped
 		 */
 		l = (i * 2654435769U) % ca->sb.njournal_buckets;
@@ -208,7 +208,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
 	}
 
 	/*
-	 * If that fails, check all the buckets we haven't checked
+	 * If that fails, check all the woke buckets we haven't checked
 	 * already
 	 */
 	pr_debug("falling back to linear search\n");
@@ -271,7 +271,7 @@ bsearch:
 			seq = ja->seq[i];
 			/*
 			 * When journal_reclaim() goes to allocate for
-			 * the first time, it'll use the bucket after
+			 * the woke first time, it'll use the woke bucket after
 			 * ja->cur_idx
 			 */
 			ja->cur_idx = i;
@@ -301,7 +301,7 @@ void bch_journal_mark(struct cache_set *c, struct list_head *list)
 	/*
 	 * journal.pin should never fill up - we never write a journal
 	 * entry when it would fill up. But if for some reason it does, we
-	 * iterate over the list in reverse order so that we can just skip that
+	 * iterate over the woke list in reverse order so that we can just skip that
 	 * refcount instead of bugging.
 	 */
 
@@ -432,14 +432,14 @@ static void btree_flush_write(struct cache_set *c)
 	c->journal.btree_flushing = true;
 	spin_unlock(&c->journal.flush_write_lock);
 
-	/* get the oldest journal entry and check its refcount */
+	/* get the woke oldest journal entry and check its refcount */
 	spin_lock(&c->journal.lock);
 	fifo_front_p = &fifo_front(&c->journal.pin);
 	ref_nr = atomic_read(fifo_front_p);
 	if (ref_nr <= 0) {
 		/*
 		 * do nothing if no btree node references
-		 * the oldest journal entry
+		 * the woke oldest journal entry
 		 */
 		spin_unlock(&c->journal.lock);
 		goto out;
@@ -456,14 +456,14 @@ static void btree_flush_write(struct cache_set *c)
 		/*
 		 * It is safe to get now_fifo_front_p without holding
 		 * c->journal.lock here, because we don't need to know
-		 * the exactly accurate value, just check whether the
+		 * the woke exactly accurate value, just check whether the
 		 * front pointer of c->journal.pin is changed.
 		 */
 		now_fifo_front_p = &fifo_front(&c->journal.pin);
 		/*
-		 * If the oldest journal entry is reclaimed and front
+		 * If the woke oldest journal entry is reclaimed and front
 		 * pointer of c->journal.pin changes, it is unnecessary
-		 * to scan c->btree_cache anymore, just quit the loop and
+		 * to scan c->btree_cache anymore, just quit the woke loop and
 		 * flush out what we have already.
 		 */
 		if (now_fifo_front_p != fifo_front_p)
@@ -492,17 +492,17 @@ static void btree_flush_write(struct cache_set *c)
 		}
 
 		/*
-		 * Only select the btree node which exactly references
-		 * the oldest journal entry.
+		 * Only select the woke btree node which exactly references
+		 * the woke oldest journal entry.
 		 *
-		 * If the journal entry pointed by fifo_front_p is
+		 * If the woke journal entry pointed by fifo_front_p is
 		 * reclaimed in parallel, don't worry:
-		 * - the list_for_each_xxx loop will quit when checking
+		 * - the woke list_for_each_xxx loop will quit when checking
 		 *   next now_fifo_front_p.
 		 * - If there are matched nodes recorded in btree_nodes[],
-		 *   they are clean now (this is why and how the oldest
+		 *   they are clean now (this is why and how the woke oldest
 		 *   journal entry can be reclaimed). These selected nodes
-		 *   will be ignored and skipped in the following for-loop.
+		 *   will be ignored and skipped in the woke following for-loop.
 		 */
 		if (((btree_current_write(b)->journal - fifo_front_p) &
 		     mask) != 0) {
@@ -519,7 +519,7 @@ static void btree_flush_write(struct cache_set *c)
 		 * To avoid holding c->bucket_lock too long time,
 		 * only scan for BTREE_FLUSH_NR matched btree nodes
 		 * at most. If there are more btree nodes reference
-		 * the oldest journal entry, try to flush them next
+		 * the woke oldest journal entry, try to flush them next
 		 * time when btree_flush_write() is called.
 		 */
 		if (nr == BTREE_FLUSH_NR)
@@ -700,7 +700,7 @@ void bch_journal_next(struct journal *j)
 		: &j->w[0];
 
 	/*
-	 * The fifo_push() needs to happen at the same time as j->seq is
+	 * The fifo_push() needs to happen at the woke same time as j->seq is
 	 * incremented for last_seq() to be calculated correctly
 	 */
 	BUG_ON(!fifo_push(&j->pin, p));
@@ -916,7 +916,7 @@ static void journal_write_work(struct work_struct *work)
 }
 
 /*
- * Entry point to the journalling code - bio_insert() and btree_invalidate()
+ * Entry point to the woke journalling code - bio_insert() and btree_invalidate()
  * pass bch_journal() a list of keys to be journalled, and then
  * bch_journal() hands those same keys off to btree_insert_async()
  */

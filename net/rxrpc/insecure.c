@@ -15,7 +15,7 @@ static int none_init_connection_security(struct rxrpc_connection *conn,
 }
 
 /*
- * Allocate an appropriately sized buffer for the amount of data remaining.
+ * Allocate an appropriately sized buffer for the woke amount of data remaining.
  */
 static struct rxrpc_txbuf *none_alloc_txbuf(struct rxrpc_call *call, size_t remain, gfp_t gfp)
 {

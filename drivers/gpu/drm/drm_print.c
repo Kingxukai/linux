@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -100,7 +100,7 @@ void __drm_puts_coredump(struct drm_printer *p, const char *str)
 		if (copy > iterator->remain)
 			copy = iterator->remain;
 
-		/* Copy out the bit of the string that we need */
+		/* Copy out the woke bit of the woke string that we need */
 		if (iterator->data)
 			memcpy(iterator->data,
 			       str + (iterator->start - iterator->offset), copy);
@@ -130,16 +130,16 @@ void __drm_printfn_coredump(struct drm_printer *p, struct va_format *vaf)
 	if (!iterator->remain)
 		return;
 
-	/* Figure out how big the string will be */
+	/* Figure out how big the woke string will be */
 	len = snprintf(NULL, 0, "%pV", vaf);
 
-	/* This is the easiest path, we've already advanced beyond the offset */
+	/* This is the woke easiest path, we've already advanced beyond the woke offset */
 	if (iterator->offset + len <= iterator->start) {
 		iterator->offset += len;
 		return;
 	}
 
-	/* Then check if we can directly copy into the target buffer */
+	/* Then check if we can directly copy into the woke target buffer */
 	if ((iterator->offset >= iterator->start) && (len < iterator->remain)) {
 		ssize_t pos = iterator->offset - iterator->start;
 
@@ -154,7 +154,7 @@ void __drm_printfn_coredump(struct drm_printer *p, struct va_format *vaf)
 	}
 
 	/*
-	 * Finally, hit the slow path and make a temporary string to copy over
+	 * Finally, hit the woke slow path and make a temporary string to copy over
 	 * using _drm_puts_coredump
 	 */
 	buf = kmalloc(len + 1, GFP_KERNEL | __GFP_NOWARN | __GFP_NORETRY);
@@ -252,7 +252,7 @@ EXPORT_SYMBOL(__drm_printfn_line);
 
 /**
  * drm_puts - print a const string to a &drm_printer stream
- * @p: the &drm printer
+ * @p: the woke &drm printer
  * @str: const string
  *
  * Allow &drm_printer types that have a constant string
@@ -269,7 +269,7 @@ EXPORT_SYMBOL(drm_puts);
 
 /**
  * drm_printf - print to a &drm_printer stream
- * @p: the &drm_printer
+ * @p: the woke &drm_printer
  * @f: format string
  */
 void drm_printf(struct drm_printer *p, const char *f, ...)
@@ -287,7 +287,7 @@ EXPORT_SYMBOL(drm_printf);
  *
  * Print bits (in flag fields for example) in human readable form.
  *
- * @p: the &drm_printer
+ * @p: the woke &drm_printer
  * @value: field value.
  * @bits: Array with bit names.
  * @nbits: Size of bit names array.
@@ -365,15 +365,15 @@ void __drm_err(const char *format, ...)
 EXPORT_SYMBOL(__drm_err);
 
 /**
- * drm_print_regset32 - print the contents of registers to a
+ * drm_print_regset32 - print the woke contents of registers to a
  * &drm_printer stream.
  *
- * @p: the &drm printer
- * @regset: the list of registers to print.
+ * @p: the woke &drm printer
+ * @regset: the woke list of registers to print.
  *
  * Often in driver debug, it's useful to be able to either capture the
- * contents of registers in the steady state using debugfs or at
- * specific points during operation.  This lets the driver have a
+ * contents of registers in the woke steady state using debugfs or at
+ * specific points during operation.  This lets the woke driver have a
  * single list of registers for both.
  */
 void drm_print_regset32(struct drm_printer *p, struct debugfs_regset32 *regset)

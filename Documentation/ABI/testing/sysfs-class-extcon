@@ -2,9 +2,9 @@ What:		/sys/class/extcon/.../
 Date:		February 2012
 Contact:	MyungJoo Ham <myungjoo.ham@samsung.com>
 Description:
-		Provide a place in sysfs for the extcon objects.
+		Provide a place in sysfs for the woke extcon objects.
 		This allows accessing extcon specific variables.
-		The name of extcon object denoted as ... is the name given
+		The name of extcon object denoted as ... is the woke name given
 		with extcon_dev_register.
 
 		One extcon device denotes a single external connector
@@ -23,22 +23,22 @@ What:		/sys/class/extcon/.../name
 Date:		February 2012
 Contact:	MyungJoo Ham <myungjoo.ham@samsung.com>
 Description:
-		The /sys/class/extcon/.../name shows the name of the extcon
-		object. If the extcon object has an optional callback
-		"show_name" defined, the callback will provide the name with
+		The /sys/class/extcon/.../name shows the woke name of the woke extcon
+		object. If the woke extcon object has an optional callback
+		"show_name" defined, the woke callback will provide the woke name with
 		this sysfs node.
 
 What:		/sys/class/extcon/.../state
 Date:		February 2012
 Contact:	MyungJoo Ham <myungjoo.ham@samsung.com>
 Description:
-		The /sys/class/extcon/.../state shows and stores the cable
-		attach/detach information of the corresponding extcon object.
-		If the extcon object has an optional callback "show_state"
-		defined, the showing function is overridden with the optional
+		The /sys/class/extcon/.../state shows and stores the woke cable
+		attach/detach information of the woke corresponding extcon object.
+		If the woke extcon object has an optional callback "show_state"
+		defined, the woke showing function is overridden with the woke optional
 		callback.
 
-		If the default callback for showing function is used, the
+		If the woke default callback for showing function is used, the
 		format is like this::
 
 		    # cat state
@@ -48,20 +48,20 @@ Description:
 		    EAR_JACK=0
 		    #
 
-		In this example, the extcon device has USB_OTG and TA
+		In this example, the woke extcon device has USB_OTG and TA
 		cables attached and HDMI and EAR_JACK cables detached.
 
-		In order to update the state of an extcon device, enter a hex
+		In order to update the woke state of an extcon device, enter a hex
 		state number starting with 0x::
 
 		    # echo 0xHEX > state
 
-		This updates the whole state of the extcon device.
-		Inputs of all the methods are required to meet the
+		This updates the woke whole state of the woke extcon device.
+		Inputs of all the woke methods are required to meet the
 		mutually_exclusive conditions if they exist.
 
 		It is recommended to use this "global" state interface if
-		you need to set the value atomically. The later state
+		you need to set the woke value atomically. The later state
 		interface associated with each cable cannot update
 		multiple cable states of an extcon device simultaneously.
 
@@ -69,7 +69,7 @@ What:		/sys/class/extcon/.../cable.X/name
 Date:		February 2012
 Contact:	MyungJoo Ham <myungjoo.ham@samsung.com>
 Description:
-		The /sys/class/extcon/.../cable.X/name shows the name of cable
+		The /sys/class/extcon/.../cable.X/name shows the woke name of cable
 		"X" (integer between 0 and 31) of an extcon device.
 
 What:		/sys/class/extcon/.../cable.X/state
@@ -85,9 +85,9 @@ What:		/sys/class/extcon/.../mutually_exclusive/...
 Date:		December 2011
 Contact:	MyungJoo Ham <myungjoo.ham@samsung.com>
 Description:
-		Shows the relations of mutually exclusiveness. For example,
-		if the mutually_exclusive array of extcon device is
-		{0x3, 0x5, 0xC, 0x0}, then the output is::
+		Shows the woke relations of mutually exclusiveness. For example,
+		if the woke mutually_exclusive array of extcon device is
+		{0x3, 0x5, 0xC, 0x0}, then the woke output is::
 
 		    # ls mutually_exclusive/
 		    0x3
@@ -95,7 +95,7 @@ Description:
 		    0xc
 		    #
 
-		Note that mutually_exclusive is a sub-directory of the extcon
-		device and the file names under the mutually_exclusive
-		directory show the mutually-exclusive sets, not the contents
-		of the files.
+		Note that mutually_exclusive is a sub-directory of the woke extcon
+		device and the woke file names under the woke mutually_exclusive
+		directory show the woke mutually-exclusive sets, not the woke contents
+		of the woke files.

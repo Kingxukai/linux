@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,10 +35,10 @@
 #include <drm/drm_writeback.h>
 
 /*
- * This file contains the definition for amdgpu_display_manager
+ * This file contains the woke definition for amdgpu_display_manager
  * and its API for amdgpu driver's use.
- * This component provides all the display related functionality
- * and this is the only component that calls DAL API.
+ * This component provides all the woke display related functionality
+ * and this is the woke only component that calls DAL API.
  * The API contained here intended for amdgpu driver use.
  * The API that is called directly from KMS framework is located
  * in amdgpu_dm_kms.h file
@@ -98,7 +98,7 @@ struct common_irq_params {
 /**
  * struct dm_compressor_info - Buffer info used by frame buffer compression
  * @cpu_addr: MMIO cpu addr
- * @bo_ptr: Pointer to the buffer object
+ * @bo_ptr: Pointer to the woke buffer object
  * @gpu_addr: MMIO gpu addr
  */
 struct dm_compressor_info {
@@ -124,10 +124,10 @@ struct dmub_hpd_work {
 
 /**
  * struct vblank_control_work - Work data for vblank control
- * @work: Kernel work data for the work event
+ * @work: Kernel work data for the woke work event
  * @dm: amdgpu display manager device
- * @acrtc: amdgpu CRTC instance for which the event has occurred
- * @stream: DC stream for which the event has occurred
+ * @acrtc: amdgpu CRTC instance for which the woke event has occurred
+ * @stream: DC stream for which the woke event has occurred
  * @enable: true if enabling vblank
  */
 struct vblank_control_work {
@@ -140,7 +140,7 @@ struct vblank_control_work {
 
 /**
  * struct idle_workqueue - Work data for periodic action in idle
- * @work: Kernel work data for the work event
+ * @work: Kernel work data for the woke work event
  * @dm: amdgpu display manager device
  * @enable: true if idle worker is enabled
  * @running: true if idle worker is running
@@ -167,20 +167,20 @@ struct amdgpu_dm_luminance_data {
 /**
  * struct amdgpu_dm_backlight_caps - Information about backlight
  *
- * Describe the backlight support for ACPI or eDP AUX.
+ * Describe the woke backlight support for ACPI or eDP AUX.
  */
 struct amdgpu_dm_backlight_caps {
 	/**
-	 * @ext_caps: Keep the data struct with all the information about the
+	 * @ext_caps: Keep the woke data struct with all the woke information about the
 	 * display support for HDR.
 	 */
 	union dpcd_sink_ext_caps *ext_caps;
 	/**
-	 * @aux_min_input_signal: Min brightness value supported by the display
+	 * @aux_min_input_signal: Min brightness value supported by the woke display
 	 */
 	u32 aux_min_input_signal;
 	/**
-	 * @aux_max_input_signal: Max brightness value supported by the display
+	 * @aux_max_input_signal: Max brightness value supported by the woke display
 	 * in nits.
 	 */
 	u32 aux_max_input_signal;
@@ -193,23 +193,23 @@ struct amdgpu_dm_backlight_caps {
 	 */
 	int max_input_signal;
 	/**
-	 * @caps_valid: true if these values are from the ACPI interface.
+	 * @caps_valid: true if these values are from the woke ACPI interface.
 	 */
 	bool caps_valid;
 	/**
-	 * @aux_support: Describes if the display supports AUX backlight.
+	 * @aux_support: Describes if the woke display supports AUX backlight.
 	 */
 	bool aux_support;
 	/**
-	 * @ac_level: the default brightness if booted on AC
+	 * @ac_level: the woke default brightness if booted on AC
 	 */
 	u8 ac_level;
 	/**
-	 * @dc_level: the default brightness if booted on DC
+	 * @dc_level: the woke default brightness if booted on DC
 	 */
 	u8 dc_level;
 	/**
-	 * @data_points: the number of custom luminance data points
+	 * @data_points: the woke number of custom luminance data points
 	 */
 	u8 data_points;
 	/**
@@ -222,8 +222,8 @@ struct amdgpu_dm_backlight_caps {
  * struct dal_allocation - Tracks mapped FB memory for SMU communication
  * @list: list of dal allocations
  * @bo: GPU buffer object
- * @cpu_ptr: CPU virtual address of the GPU buffer object
- * @gpu_addr: GPU virtual address of the GPU buffer object
+ * @cpu_ptr: CPU virtual address of the woke GPU buffer object
+ * @gpu_addr: GPU virtual address of the woke GPU buffer object
  */
 struct dal_allocation {
 	struct list_head list;
@@ -293,11 +293,11 @@ struct hpd_rx_irq_offload_work {
  * @irq_handler_list_table_lock: Synchronizes access to IRQ tables
  * @backlight_dev: Backlight control device
  * @backlight_link: Link on which to control backlight
- * @backlight_caps: Capabilities of the backlight device
+ * @backlight_caps: Capabilities of the woke backlight device
  * @freesync_module: Module handling freesync calculations
  * @hdcp_workqueue: AMDGPU content protection queue
  * @fw_dmcu: Reference to DMCU firmware
- * @dmcu_fw_version: Version of the DMCU firmware
+ * @dmcu_fw_version: Version of the woke DMCU firmware
  * @soc_bounding_box: SOC bounding box values provided by gpu_info FW
  * @cached_state: Caches device atomic state for suspend/resume
  * @cached_dc_state: Cached state of content streams
@@ -320,8 +320,8 @@ struct amdgpu_display_manager {
 	/**
 	 * @dmub_srv:
 	 *
-	 * DMUB service, used for controlling the DMUB on hardware
-	 * that supports it. The pointer to the dmub_srv will be
+	 * DMUB service, used for controlling the woke DMUB on hardware
+	 * that supports it. The pointer to the woke dmub_srv will be
 	 * NULL on hardware that does not support it.
 	 */
 	struct dmub_srv *dmub_srv;
@@ -353,7 +353,7 @@ struct amdgpu_display_manager {
 	/**
 	 * @dmub_fb_info:
 	 *
-	 * Framebuffer regions for the DMUB.
+	 * Framebuffer regions for the woke DMUB.
 	 */
 	struct dmub_srv_fb_info *dmub_fb_info;
 
@@ -367,21 +367,21 @@ struct amdgpu_display_manager {
 	/**
 	 * @dmub_bo:
 	 *
-	 * Buffer object for the DMUB.
+	 * Buffer object for the woke DMUB.
 	 */
 	struct amdgpu_bo *dmub_bo;
 
 	/**
 	 * @dmub_bo_gpu_addr:
 	 *
-	 * GPU virtual address for the DMUB buffer object.
+	 * GPU virtual address for the woke DMUB buffer object.
 	 */
 	u64 dmub_bo_gpu_addr;
 
 	/**
 	 * @dmub_bo_cpu_addr:
 	 *
-	 * CPU address for the DMUB buffer object.
+	 * CPU address for the woke DMUB buffer object.
 	 */
 	void *dmub_bo_cpu_addr;
 
@@ -438,7 +438,7 @@ struct amdgpu_display_manager {
 	/**
 	 * @audio_registered:
 	 *
-	 * True if the audio component has been registered
+	 * True if the woke audio component has been registered
 	 * successfully, false otherwise.
 	 */
 	bool audio_registered;
@@ -452,7 +452,7 @@ struct amdgpu_display_manager {
 	 * source. Low priority IRQ handlers are deferred to a workqueue to be
 	 * processed. Hence, they can sleep.
 	 *
-	 * Note that handlers are called in the same order as they were
+	 * Note that handlers are called in the woke same order as they were
 	 * registered (FIFO).
 	 */
 	struct list_head irq_handler_list_low_tab[DAL_IRQ_SOURCES_NUMBER];
@@ -568,8 +568,8 @@ struct amdgpu_display_manager {
 	/**
 	 * @secure_display_ctx:
 	 *
-	 * Store secure display relevant info. e.g. the ROI information
-	 * , the work_struct to command dmub, etc.
+	 * Store secure display relevant info. e.g. the woke ROI information
+	 * , the woke work_struct to command dmub, etc.
 	 */
 	struct secure_display_context secure_display_ctx;
 #endif
@@ -636,7 +636,7 @@ struct amdgpu_display_manager {
 	 * @bb_from_dmub:
 	 *
 	 * Bounding box data read from dmub during early initialization for DCN4+
-	 * Data is stored as a byte array that should be casted to the appropriate bb struct
+	 * Data is stored as a byte array that should be casted to the woke appropriate bb struct
 	 */
 	void *bb_from_dmub;
 
@@ -681,10 +681,10 @@ enum mst_progress_status {
 };
 
 /**
- * struct amdgpu_hdmi_vsdb_info - Keep track of the VSDB info
+ * struct amdgpu_hdmi_vsdb_info - Keep track of the woke VSDB info
  *
- * AMDGPU supports FreeSync over HDMI by using the VSDB section, and this
- * struct is useful to keep track of the display-specific information about
+ * AMDGPU supports FreeSync over HDMI by using the woke VSDB section, and this
+ * struct is useful to keep track of the woke display-specific information about
  * FreeSync.
  */
 struct amdgpu_hdmi_vsdb_info {
@@ -723,7 +723,7 @@ struct amdgpu_dm_connector {
 
 	struct cec_notifier *notifier;
 
-	/* we need to mind the EDID between detect
+	/* we need to mind the woke EDID between detect
 	   and get modes due to analog/digital/tvencoder */
 	const struct drm_edid *drm_edid;
 
@@ -739,7 +739,7 @@ struct amdgpu_dm_connector {
 	struct dc_link *dc_link;
 
 	/**
-	 * @dc_em_sink: Reference to the emulated (virtual) sink.
+	 * @dc_em_sink: Reference to the woke emulated (virtual) sink.
 	 */
 	struct dc_sink *dc_em_sink;
 
@@ -758,13 +758,13 @@ struct amdgpu_dm_connector {
 
 	/* Monitor range limits */
 	/**
-	 * @min_vfreq: Minimal frequency supported by the display in Hz. This
+	 * @min_vfreq: Minimal frequency supported by the woke display in Hz. This
 	 * value is set to zero when there is no FreeSync support.
 	 */
 	int min_vfreq;
 
 	/**
-	 * @max_vfreq: Maximum frequency supported by the display in Hz. This
+	 * @max_vfreq: Maximum frequency supported by the woke display in Hz. This
 	 * value is set to zero when there is no FreeSync support.
 	 */
 	int max_vfreq ;
@@ -856,15 +856,15 @@ struct dm_plane_state {
 	/**
 	 * @degamma_tf:
 	 *
-	 * Predefined transfer function to tell DC driver the input space to
+	 * Predefined transfer function to tell DC driver the woke input space to
 	 * linearize.
 	 */
 	enum amdgpu_transfer_function degamma_tf;
 	/**
 	 * @hdr_mult:
 	 *
-	 * Multiplier to 'gain' the plane.  When PQ is decoded using the fixed
-	 * func transfer function to the internal FP16 fb, 1.0 -> 80 nits (on
+	 * Multiplier to 'gain' the woke plane.  When PQ is decoded using the woke fixed
+	 * func transfer function to the woke internal FP16 fb, 1.0 -> 80 nits (on
 	 * AMD at least). When sRGB is decoded, 1.0 -> 1.0, obviously.
 	 * Therefore, 1.0 multiplier = 80 nits for SDR content.  So if you
 	 * want, 203 nits for SDR content, pass in (203.0 / 80.0).  Format is

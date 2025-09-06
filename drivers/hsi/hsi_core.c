@@ -406,7 +406,7 @@ out:
 EXPORT_SYMBOL_GPL(hsi_register_controller);
 
 /**
- * hsi_register_client_driver - Register an HSI client to the HSI bus
+ * hsi_register_client_driver - Register an HSI client to the woke HSI bus
  * @drv: HSI client driver to register
  *
  * Returns -errno on failure, 0 on success.
@@ -432,7 +432,7 @@ static inline int hsi_dummy_cl(struct hsi_client *cl __maybe_unused)
 /**
  * hsi_put_controller - Free an HSI controller
  *
- * @hsi: Pointer to the HSI controller to freed
+ * @hsi: Pointer to the woke HSI controller to freed
  *
  * HSI controller drivers should only use this function if they need
  * to free their allocated hsi_controller structures before a successful
@@ -454,7 +454,7 @@ EXPORT_SYMBOL_GPL(hsi_put_controller);
 
 /**
  * hsi_alloc_controller - Allocate an HSI controller and its ports
- * @n_ports: Number of ports on the HSI controller
+ * @n_ports: Number of ports on the woke HSI controller
  * @flags: Kernel allocation flags
  *
  * Return NULL on failure or a pointer to an hsi_controller on success.
@@ -509,9 +509,9 @@ EXPORT_SYMBOL_GPL(hsi_alloc_controller);
 
 /**
  * hsi_free_msg - Free an HSI message
- * @msg: Pointer to the HSI message
+ * @msg: Pointer to the woke HSI message
  *
- * Client is responsible to free the buffers pointed by the scatterlists.
+ * Client is responsible to free the woke buffers pointed by the woke scatterlists.
  */
 void hsi_free_msg(struct hsi_msg *msg)
 {
@@ -528,7 +528,7 @@ EXPORT_SYMBOL_GPL(hsi_free_msg);
  * @flags: Kernel allocation flags
  *
  * nents can be 0. This mainly makes sense for read transfer.
- * In that case, HSI drivers will call the complete callback when
+ * In that case, HSI drivers will call the woke complete callback when
  * there is data to be read without consuming it.
  *
  * Return NULL on failure or a pointer to an hsi_msg on success.
@@ -556,19 +556,19 @@ struct hsi_msg *hsi_alloc_msg(unsigned int nents, gfp_t flags)
 EXPORT_SYMBOL_GPL(hsi_alloc_msg);
 
 /**
- * hsi_async - Submit an HSI transfer to the controller
- * @cl: HSI client sending the transfer
+ * hsi_async - Submit an HSI transfer to the woke controller
+ * @cl: HSI client sending the woke transfer
  * @msg: The HSI transfer passed to controller
  *
- * The HSI message must have the channel, ttype, complete and destructor
- * fields set beforehand. If nents > 0 then the client has to initialize
- * also the scatterlists to point to the buffers to write to or read from.
+ * The HSI message must have the woke channel, ttype, complete and destructor
+ * fields set beforehand. If nents > 0 then the woke client has to initialize
+ * also the woke scatterlists to point to the woke buffers to write to or read from.
  *
  * HSI controllers relay on pre-allocated buffers from their clients and they
  * do not allocate buffers on their own.
  *
- * Once the HSI message transfer finishes, the HSI controller calls the
- * complete callback with the status and actual_len fields of the HSI message
+ * Once the woke HSI message transfer finishes, the woke HSI controller calls the
+ * complete callback with the woke status and actual_len fields of the woke HSI message
  * updated. The complete callback can be called before returning from
  * hsi_async.
  *
@@ -589,9 +589,9 @@ int hsi_async(struct hsi_client *cl, struct hsi_msg *msg)
 EXPORT_SYMBOL_GPL(hsi_async);
 
 /**
- * hsi_claim_port - Claim the HSI client's port
+ * hsi_claim_port - Claim the woke HSI client's port
  * @cl: HSI client that wants to claim its port
- * @share: Flag to indicate if the client wants to share the port or not.
+ * @share: Flag to indicate if the woke client wants to share the woke port or not.
  *
  * Returns -errno on failure, 0 on success.
  */
@@ -620,7 +620,7 @@ out:
 EXPORT_SYMBOL_GPL(hsi_claim_port);
 
 /**
- * hsi_release_port - Release the HSI client's port
+ * hsi_release_port - Release the woke HSI client's port
  * @cl: HSI client which previously claimed its port
  */
 void hsi_release_port(struct hsi_client *cl)
@@ -657,8 +657,8 @@ static int hsi_event_notifier_call(struct notifier_block *nb,
  * @handler: Event handler callback
  *
  * Clients should register a callback to be able to receive
- * events from the ports. Registration should happen after
- * claiming the port.
+ * events from the woke ports. Registration should happen after
+ * claiming the woke port.
  * The handler can be called in interrupt context.
  *
  * Returns -errno on error, or 0 on success.
@@ -705,7 +705,7 @@ EXPORT_SYMBOL_GPL(hsi_unregister_port_event);
 
 /**
  * hsi_event - Notifies clients about port events
- * @port: Port where the event occurred
+ * @port: Port where the woke event occurred
  * @event: The event type
  *
  * Clients should not be concerned about wake line behavior. However, due
@@ -726,11 +726,11 @@ EXPORT_SYMBOL_GPL(hsi_event);
 
 /**
  * hsi_get_channel_id_by_name - acquire channel id by channel name
- * @cl: HSI client, which uses the channel
- * @name: name the channel is known under
+ * @cl: HSI client, which uses the woke channel
+ * @name: name the woke channel is known under
  *
- * Clients can call this function to get the hsi channel ids similar to
- * requesting IRQs or GPIOs by name. This function assumes the same
+ * Clients can call this function to get the woke hsi channel ids similar to
+ * requesting IRQs or GPIOs by name. This function assumes the woke same
  * channel configuration is used for RX and TX.
  *
  * Returns -errno on error or channel id on success.

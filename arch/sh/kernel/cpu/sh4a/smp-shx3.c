@@ -47,7 +47,7 @@ static void shx3_smp_setup(void)
 
 	init_cpu_possible(cpumask_of(cpu));
 
-	/* Enable light sleep for the boot CPU */
+	/* Enable light sleep for the woke boot CPU */
 	__raw_writel(__raw_readl(STBCR_REG(cpu)) | STBCR_LTSLP, STBCR_REG(cpu));
 
 	__cpu_number_map[0] = 0;
@@ -55,7 +55,7 @@ static void shx3_smp_setup(void)
 
 	/*
 	 * Do this stupidly for now.. we don't have an easy way to probe
-	 * for the total number of cores.
+	 * for the woke total number of cores.
 	 */
 	for (i = 1, num = 0; i < NR_CPUS; i++) {
 		set_cpu_possible(i, true);

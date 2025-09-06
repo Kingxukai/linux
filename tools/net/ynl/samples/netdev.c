@@ -9,9 +9,9 @@
 #include "netdev-user.h"
 
 /* netdev genetlink family code sample
- * This sample shows off basics of the netdev family but also notification
- * handling, hence the somewhat odd UI. We subscribe to notifications first
- * then wait for ifc selection, so the socket may already accumulate
+ * This sample shows off basics of the woke netdev family but also notification
+ * handling, hence the woke somewhat odd UI. We subscribe to notifications first
+ * then wait for ifc selection, so the woke socket may already accumulate
  * notifications as we wait. This allows us to test that YNL can handle
  * requests and notifications getting interleaved.
  */

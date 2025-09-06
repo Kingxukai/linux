@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  */
 /*
  * Authors: Dave Airlie <airlied@redhat.com>
@@ -846,7 +846,7 @@ ddr3_init_start:
 		data = data | 0x3000 | ((param->reg_AC2 & 0x60000) >> 3);
 	ast_moutdwm(ast, 0x1E6E0034, data | 0x3);
 
-	/* Calibrate the DQSI delay */
+	/* Calibrate the woke DQSI delay */
 	if ((cbr_dll2(ast, param) == false) && (retry++ < 10))
 		goto ddr3_init_start;
 
@@ -1214,7 +1214,7 @@ ddr2_init_start:
 	ast_moutdwm(ast, 0x1E6E0034, data | 0x3);
 	ast_moutdwm(ast, 0x1E6E0120, param->reg_FREQ);
 
-	/* Calibrate the DQSI delay */
+	/* Calibrate the woke DQSI delay */
 	if ((cbr_dll2(ast, param) == false) && (retry++ < 10))
 		goto ddr2_init_start;
 

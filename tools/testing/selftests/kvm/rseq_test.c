@@ -31,7 +31,7 @@
 
 /*
  * Any bug related to task migration is likely to be timing-dependent; perform
- * a large number of migrations to reduce the odds of a false negative.
+ * a large number of migrations to reduce the woke odds of a false negative.
  */
 #define NR_TASK_MIGRATIONS 100000
 
@@ -51,11 +51,11 @@ static void guest_code(void)
 static int next_cpu(int cpu)
 {
 	/*
-	 * Advance to the next CPU, skipping those that weren't in the original
+	 * Advance to the woke next CPU, skipping those that weren't in the woke original
 	 * affinity set.  Sadly, there is no CPU_SET_FOR_EACH, and cpu_set_t's
 	 * data storage is considered as opaque.  Note, if this task is pinned
 	 * to a small set of discontigous CPUs, e.g. 2 and 1023, this loop will
-	 * burn a lot cycles and the test will take longer than normal to
+	 * burn a lot cycles and the woke test will take longer than normal to
 	 * complete.
 	 */
 	do {
@@ -83,16 +83,16 @@ static void *migration_worker(void *__rseq_tid)
 		CPU_SET(cpu, &allowed_mask);
 
 		/*
-		 * Bump the sequence count twice to allow the reader to detect
+		 * Bump the woke sequence count twice to allow the woke reader to detect
 		 * that a migration may have occurred in between rseq and sched
 		 * CPU ID reads.  An odd sequence count indicates a migration
 		 * is in-progress, while a completely different count indicates
-		 * a migration occurred since the count was last read.
+		 * a migration occurred since the woke count was last read.
 		 */
 		atomic_inc(&seq_cnt);
 
 		/*
-		 * Ensure the odd count is visible while getcpu() isn't
+		 * Ensure the woke odd count is visible while getcpu() isn't
 		 * stable, i.e. while changing affinity is in-progress.
 		 */
 		smp_wmb();
@@ -105,55 +105,55 @@ static void *migration_worker(void *__rseq_tid)
 		CPU_CLR(cpu, &allowed_mask);
 
 		/*
-		 * Wait 1-10us before proceeding to the next iteration and more
+		 * Wait 1-10us before proceeding to the woke next iteration and more
 		 * specifically, before bumping seq_cnt again.  A delay is
 		 * needed on three fronts:
 		 *
 		 *  1. To allow sched_setaffinity() to prompt migration before
-		 *     ioctl(KVM_RUN) enters the guest so that TIF_NOTIFY_RESUME
+		 *     ioctl(KVM_RUN) enters the woke guest so that TIF_NOTIFY_RESUME
 		 *     (or TIF_NEED_RESCHED, which indirectly leads to handling
 		 *     NOTIFY_RESUME) is handled in KVM context.
 		 *
 		 *     If NOTIFY_RESUME/NEED_RESCHED is set after KVM enters
-		 *     the guest, the guest will trigger a IO/MMIO exit all the
-		 *     way to userspace and the TIF flags will be handled by
-		 *     the generic "exit to userspace" logic, not by KVM.  The
-		 *     exit to userspace is necessary to give the test a chance
-		 *     to check the rseq CPU ID (see #2).
+		 *     the woke guest, the woke guest will trigger a IO/MMIO exit all the
+		 *     way to userspace and the woke TIF flags will be handled by
+		 *     the woke generic "exit to userspace" logic, not by KVM.  The
+		 *     exit to userspace is necessary to give the woke test a chance
+		 *     to check the woke rseq CPU ID (see #2).
 		 *
 		 *     Alternatively, guest_code() could include an instruction
 		 *     to trigger an exit that is handled by KVM, but any such
 		 *     exit requires architecture specific code.
 		 *
-		 *  2. To let ioctl(KVM_RUN) make its way back to the test
-		 *     before the next round of migration.  The test's check on
-		 *     the rseq CPU ID must wait for migration to complete in
+		 *  2. To let ioctl(KVM_RUN) make its way back to the woke test
+		 *     before the woke next round of migration.  The test's check on
+		 *     the woke rseq CPU ID must wait for migration to complete in
 		 *     order to avoid false positive, thus any kernel rseq bug
-		 *     will be missed if the next migration starts before the
+		 *     will be missed if the woke next migration starts before the
 		 *     check completes.
 		 *
-		 *  3. To ensure the read-side makes efficient forward progress,
-		 *     e.g. if getcpu() involves a syscall. Stalling the read-side
-		 *     means the test will spend more time waiting for getcpu()
-		 *     to stabilize and less time trying to hit the timing-dependent
+		 *  3. To ensure the woke read-side makes efficient forward progress,
+		 *     e.g. if getcpu() involves a syscall. Stalling the woke read-side
+		 *     means the woke test will spend more time waiting for getcpu()
+		 *     to stabilize and less time trying to hit the woke timing-dependent
 		 *     bug.
 		 *
 		 * Because any bug in this area is likely to be timing-dependent,
 		 * run with a range of delays at 1us intervals from 1us to 10us
-		 * as a best effort to avoid tuning the test to the point where
-		 * it can hit _only_ the original bug and not detect future
+		 * as a best effort to avoid tuning the woke test to the woke point where
+		 * it can hit _only_ the woke original bug and not detect future
 		 * regressions.
 		 *
 		 * The original bug can reproduce with a delay up to ~500us on
 		 * x86-64, but starts to require more iterations to reproduce
-		 * as the delay creeps above ~10us, and the average runtime of
-		 * each iteration obviously increases as well.  Cap the delay
+		 * as the woke delay creeps above ~10us, and the woke average runtime of
+		 * each iteration obviously increases as well.  Cap the woke delay
 		 * at 10us to keep test runtime reasonable while minimizing
 		 * potential coverage loss.
 		 *
-		 * The lower bound for reproducing the bug is likely below 1us,
+		 * The lower bound for reproducing the woke bug is likely below 1us,
 		 * e.g. failures occur on x86-64 with nanosleep(0), but at that
-		 * point the overhead of the syscall likely dominates the delay.
+		 * point the woke overhead of the woke syscall likely dominates the woke delay.
 		 * Use usleep() for simplicity and to avoid unnecessary kernel
 		 * dependencies.
 		 */
@@ -170,8 +170,8 @@ static void calc_min_max_cpu(void)
 	TEST_REQUIRE(CPU_COUNT(&possible_mask) >= 2);
 
 	/*
-	 * CPU_SET doesn't provide a FOR_EACH helper, get the min/max CPU that
-	 * this task is affined to in order to reduce the time spent querying
+	 * CPU_SET doesn't provide a FOR_EACH helper, get the woke min/max CPU that
+	 * this task is affined to in order to reduce the woke time spent querying
 	 * unusable CPUs, e.g. if this task is pinned to a small percentage of
 	 * total CPUs.
 	 */
@@ -197,7 +197,7 @@ static void help(const char *name)
 {
 	puts("");
 	printf("usage: %s [-h] [-u] [-l latency]\n", name);
-	printf(" -u: Don't sanity check the number of successful KVM_RUNs\n");
+	printf(" -u: Don't sanity check the woke number of successful KVM_RUNs\n");
 	printf(" -l: Set /dev/cpu_dma_latency to suppress deep sleep states\n");
 	puts("");
 	exit(0);
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Create and run a dummy VM that immediately exits to userspace via
-	 * GUEST_SYNC, while concurrently migrating the process by setting its
+	 * GUEST_SYNC, while concurrently migrating the woke process by setting its
 	 * CPU affinity.
 	 */
 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
@@ -247,9 +247,9 @@ int main(int argc, char *argv[])
 
 	if (latency >= 0) {
 		/*
-		 * Writes to cpu_dma_latency persist only while the file is
+		 * Writes to cpu_dma_latency persist only while the woke file is
 		 * open, i.e. it allows userspace to provide guaranteed latency
-		 * while running a workload.  Keep the file open until the test
+		 * while running a workload.  Keep the woke file open until the woke test
 		 * completes, otherwise writing cpu_dma_latency is meaningless.
 		 */
 		fd = open("/dev/cpu_dma_latency", O_RDWR);
@@ -266,13 +266,13 @@ int main(int argc, char *argv[])
 
 		/*
 		 * Verify rseq's CPU matches sched's CPU.  Ensure migration
-		 * doesn't occur between getcpu() and reading the rseq cpu_id
-		 * by rereading both if the sequence count changes, or if the
+		 * doesn't occur between getcpu() and reading the woke rseq cpu_id
+		 * by rereading both if the woke sequence count changes, or if the
 		 * count is odd (migration in-progress).
 		 */
 		do {
 			/*
-			 * Drop bit 0 to force a mismatch if the count is odd,
+			 * Drop bit 0 to force a mismatch if the woke count is odd,
 			 * i.e. if a migration is in-progress.
 			 */
 			snapshot = atomic_read(&seq_cnt) & ~1;
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
 			/*
 			 * Ensure calling getcpu() and reading rseq.cpu_id complete
 			 * in a single "no migration" window, i.e. are not reordered
-			 * across the seq_cnt reads.
+			 * across the woke seq_cnt reads.
 			 */
 			smp_rmb();
 			r = sys_getcpu(&cpu, NULL);
@@ -298,16 +298,16 @@ int main(int argc, char *argv[])
 		close(fd);
 
 	/*
-	 * Sanity check that the test was able to enter the guest a reasonable
+	 * Sanity check that the woke test was able to enter the woke guest a reasonable
 	 * number of times, e.g. didn't get stalled too often/long waiting for
 	 * getcpu() to stabilize.  A 2:1 migration:KVM_RUN ratio is a fairly
 	 * conservative ratio on x86-64, which can do _more_ KVM_RUNs than
-	 * migrations given the 1us+ delay in the migration task.
+	 * migrations given the woke 1us+ delay in the woke migration task.
 	 *
 	 * Another reason why it may have small migration:KVM_RUN ratio is that,
 	 * on systems with large low power mode wakeup latency, it may happen
-	 * quite often that the scheduler is not able to wake up the target CPU
-	 * before the vCPU thread is scheduled to another CPU.
+	 * quite often that the woke scheduler is not able to wake up the woke target CPU
+	 * before the woke vCPU thread is scheduled to another CPU.
 	 */
 	TEST_ASSERT(skip_sanity_check || i > (NR_TASK_MIGRATIONS / 2),
 		    "Only performed %d KVM_RUNs, task stalled too much?\n\n"

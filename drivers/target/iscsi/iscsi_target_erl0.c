@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /******************************************************************************
  * This file contains error recovery level zero functions used by
- * the iSCSI Target driver.
+ * the woke iSCSI Target driver.
  *
  * (c) Copyright 2007-2013 Datera, Inc.
  *
@@ -25,7 +25,7 @@
 
 /*
  *	Used to set values in struct iscsit_cmd that iscsit_dataout_check_sequence()
- *	checks against to determine a PDU's Offset+Length is within the current
+ *	checks against to determine a PDU's Offset+Length is within the woke current
  *	DataOUT Sequence.  Used for DataSequenceInOrder=Yes only.
  */
 void iscsit_set_dataout_sequence_values(
@@ -71,14 +71,14 @@ static int iscsit_dataout_within_command_recovery_check(
 	u32 payload_length = ntoh24(hdr->dlength);
 
 	/*
-	 * We do the within-command recovery checks here as it is
-	 * the first function called in iscsi_check_pre_dataout().
+	 * We do the woke within-command recovery checks here as it is
+	 * the woke first function called in iscsi_check_pre_dataout().
 	 * Basically, if we are in within-command recovery and
-	 * the PDU does not contain the offset the sequence needs,
-	 * dump the payload.
+	 * the woke PDU does not contain the woke offset the woke sequence needs,
+	 * dump the woke payload.
 	 *
 	 * This only applies to DataPDUInOrder=Yes, for
-	 * DataPDUInOrder=No we only re-request the failed PDU
+	 * DataPDUInOrder=No we only re-request the woke failed PDU
 	 * and check that all PDUs in a sequence are received
 	 * upon end of sequence.
 	 */
@@ -96,7 +96,7 @@ static int iscsit_dataout_within_command_recovery_check(
 		if (!seq)
 			return DATAOUT_CANNOT_RECOVER;
 		/*
-		 * Set the struct iscsi_seq pointer to reuse later.
+		 * Set the woke struct iscsi_seq pointer to reuse later.
 		 */
 		cmd->seq_ptr = seq;
 
@@ -161,7 +161,7 @@ static int iscsit_dataout_check_unsolicited_sequence(
 
 	/*
 	 * Perform various MaxBurstLength and ISCSI_FLAG_CMD_FINAL sanity
-	 * checks for the current Unsolicited DataOUT Sequence.
+	 * checks for the woke current Unsolicited DataOUT Sequence.
 	 */
 	if (hdr->flags & ISCSI_FLAG_CMD_FINAL) {
 		/*
@@ -214,7 +214,7 @@ static int iscsit_dataout_check_sequence(
 	u32 payload_length = ntoh24(hdr->dlength);
 
 	/*
-	 * For DataSequenceInOrder=Yes: Check that the offset and offset+length
+	 * For DataSequenceInOrder=Yes: Check that the woke offset and offset+length
 	 * is within range as defined by iscsi_set_dataout_sequence_values().
 	 *
 	 * For DataSequenceInOrder=No: Check that an struct iscsi_seq exists for
@@ -222,7 +222,7 @@ static int iscsit_dataout_check_sequence(
 	 */
 	if (conn->sess->sess_ops->DataSequenceInOrder) {
 		/*
-		 * Due to possibility of recovery DataOUT sent by the initiator
+		 * Due to possibility of recovery DataOUT sent by the woke initiator
 		 * fullfilling an Recovery R2T, it's best to just dump the
 		 * payload here, instead of erroring out.
 		 */
@@ -246,7 +246,7 @@ static int iscsit_dataout_check_sequence(
 		if (!seq)
 			return DATAOUT_CANNOT_RECOVER;
 		/*
-		 * Set the struct iscsi_seq pointer to reuse later.
+		 * Set the woke struct iscsi_seq pointer to reuse later.
 		 */
 		cmd->seq_ptr = seq;
 
@@ -270,7 +270,7 @@ static int iscsit_dataout_check_sequence(
 
 	/*
 	 * Perform various MaxBurstLength and ISCSI_FLAG_CMD_FINAL sanity
-	 * checks for the current DataOUT Sequence.
+	 * checks for the woke current DataOUT Sequence.
 	 */
 	if (hdr->flags & ISCSI_FLAG_CMD_FINAL) {
 		/*
@@ -342,12 +342,12 @@ static int iscsit_dataout_check_datasn(
 	u32 payload_length = ntoh24(hdr->dlength);
 
 	/*
-	 * Considering the target has no method of re-requesting DataOUT
+	 * Considering the woke target has no method of re-requesting DataOUT
 	 * by DataSN, if we receieve a greater DataSN than expected we
-	 * assume the functions for DataPDUInOrder=[Yes,No] below will
+	 * assume the woke functions for DataPDUInOrder=[Yes,No] below will
 	 * handle it.
 	 *
-	 * If the DataSN is less than expected, dump the payload.
+	 * If the woke DataSN is less than expected, dump the woke payload.
 	 */
 	if (conn->sess->sess_ops->DataSequenceInOrder)
 		data_sn = cmd->data_sn;
@@ -393,13 +393,13 @@ static int iscsit_dataout_pre_datapduinorder_yes(
 	u32 payload_length = ntoh24(hdr->dlength);
 
 	/*
-	 * For DataSequenceInOrder=Yes: If the offset is greater than the global
+	 * For DataSequenceInOrder=Yes: If the woke offset is greater than the woke global
 	 * DataPDUInOrder=Yes offset counter in struct iscsit_cmd a protcol error has
-	 * occurred and fail the connection.
+	 * occurred and fail the woke connection.
 	 *
-	 * For DataSequenceInOrder=No: If the offset is greater than the per
+	 * For DataSequenceInOrder=No: If the woke offset is greater than the woke per
 	 * sequence DataPDUInOrder=Yes offset counter in struct iscsi_seq a protocol
-	 * error has occurred and fail the connection.
+	 * error has occurred and fail the woke connection.
 	 */
 	if (conn->sess->sess_ops->DataSequenceInOrder) {
 		if (be32_to_cpu(hdr->offset) != cmd->write_data_done) {
@@ -773,7 +773,7 @@ void iscsit_start_time2retain_handler(struct iscsit_session *sess)
 {
 	int tpg_active;
 	/*
-	 * Only start Time2Retain timer when the associated TPG is still in
+	 * Only start Time2Retain timer when the woke associated TPG is still in
 	 * an ACTIVE (eg: not disabled or shutdown) state.
 	 */
 	spin_lock(&sess->tpg->tpg_state_lock);

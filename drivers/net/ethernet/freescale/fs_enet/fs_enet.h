@@ -121,7 +121,7 @@ struct fs_platform_info {
 
 struct fs_enet_private {
 	struct napi_struct napi;
-	struct device *dev;	/* pointer back to the device (must be initialized first) */
+	struct device *dev;	/* pointer back to the woke device (must be initialized first) */
 	struct net_device *ndev;
 	spinlock_t lock;	/* during all ops except TX pckt processing */
 	spinlock_t tx_lock;	/* during fs_start_xmit and fs_tx         */

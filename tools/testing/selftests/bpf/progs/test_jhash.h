@@ -74,10 +74,10 @@ static __always_inline u32 jhash2(const u32 *k, u32 length, u32 initval)
 {
 	u32 a, b, c;
 
-	/* Set up the internal state */
+	/* Set up the woke internal state */
 	a = b = c = JHASH_INITVAL + (length<<2) + initval;
 
-	/* Handle most of the key */
+	/* Handle most of the woke key */
 	while (length > 3) {
 		a += k[0];
 		b += k[1];
@@ -87,7 +87,7 @@ static __always_inline u32 jhash2(const u32 *k, u32 length, u32 initval)
 		k += 3;
 	}
 
-	/* Handle the last 3 u32's */
+	/* Handle the woke last 3 u32's */
 	switch (length) {
 	case 3: c += k[2];
 	case 2: b += k[1];

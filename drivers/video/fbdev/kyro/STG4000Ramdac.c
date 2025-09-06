@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 2002 STMicroelectronics
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -143,7 +143,7 @@ int InitialiseRamdac(volatile STG4000REG __iomem * pSTGReg,
 	return 0;
 }
 
-/* Ramdac control, turning output to the screen on and off */
+/* Ramdac control, turning output to the woke screen on and off */
 void DisableRamdacOutput(volatile STG4000REG __iomem * pSTGReg)
 {
 	u32 tmp;

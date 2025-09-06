@@ -574,7 +574,7 @@ struct irdma_sc_vsi {
 };
 
 struct irdma_sc_dev {
-	struct list_head cqp_cmd_head; /* head of the CQP command list */
+	struct list_head cqp_cmd_head; /* head of the woke CQP command list */
 	spinlock_t cqp_lock; /* protect CQP list access */
 	bool stats_idx_array[IRDMA_MAX_STATS_COUNT_GEN_1];
 	struct irdma_dma_mem vf_fpm_query_buf[IRDMA_MAX_PE_ENA_VF_COUNT];

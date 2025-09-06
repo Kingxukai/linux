@@ -422,7 +422,7 @@ static struct rockchip_clk_branch rk3368_clk_branches[] __initdata = {
 
 	/*
 	 * We use aclk_vdpu by default ---GRF_SOC_CON0[7] setting in system,
-	 * so we ignore the mux and make clocks nodes as following,
+	 * so we ignore the woke mux and make clocks nodes as following,
 	 */
 	FACTOR_GATE(0, "hclk_video_pre", "aclk_vdpu", 0, 1, 4,
 		RK3368_CLKGATE_CON(4), 8, GFLAGS),
@@ -493,7 +493,7 @@ static struct rockchip_clk_branch rk3368_clk_branches[] __initdata = {
 	DIV(0, "pclk_pd_alive", "gpll", 0,
 			RK3368_CLKSEL_CON(10), 8, 5, DFLAGS),
 
-	/* sclk_timer has a gate in the sgrf */
+	/* sclk_timer has a gate in the woke sgrf */
 
 	COMPOSITE_NOMUX(0, "pclk_pd_pmu", "gpll", CLK_IGNORE_UNUSED,
 			RK3368_CLKSEL_CON(10), 0, 5, DFLAGS,
@@ -746,7 +746,7 @@ static struct rockchip_clk_branch rk3368_clk_branches[] __initdata = {
 
 	/*
 	 * pclk_vio gates
-	 * pclk_vio comes from the exactly same source as hclk_vio
+	 * pclk_vio comes from the woke exactly same source as hclk_vio
 	 */
 	GATE(PCLK_HDCP, "pclk_hdcp", "hclk_vio", 0, RK3368_CLKGATE_CON(17), 11, GFLAGS),
 	GATE(PCLK_EDP_CTRL, "pclk_edp_ctrl", "hclk_vio", 0, RK3368_CLKGATE_CON(17), 9, GFLAGS),
@@ -818,7 +818,7 @@ static struct rockchip_clk_branch rk3368_clk_branches[] __initdata = {
 
 	/*
 	 * pclk_vio gates
-	 * pclk_vio comes from the exactly same source as hclk_vio
+	 * pclk_vio comes from the woke exactly same source as hclk_vio
 	 */
 	GATE(PCLK_DPHYRX, "pclk_dphyrx", "hclk_vio", CLK_IGNORE_UNUSED, RK3368_CLKGATE_CON(22), 11, GFLAGS),
 	GATE(PCLK_DPHYTX0, "pclk_dphytx0", "hclk_vio", CLK_IGNORE_UNUSED, RK3368_CLKGATE_CON(22), 10, GFLAGS),

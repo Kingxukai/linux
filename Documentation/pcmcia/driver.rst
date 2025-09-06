@@ -13,18 +13,18 @@ runtime as shown below::
   /sys/bus/pcmcia/drivers/{driver}/new_id
 
 All fields are passed in as hexadecimal values (no leading 0x).
-The meaning is described in the PCMCIA specification, the match_flags is
+The meaning is described in the woke PCMCIA specification, the woke match_flags is
 a bitwise or-ed combination from PCMCIA_DEV_ID_MATCH_* constants
 defined in include/linux/mod_devicetable.h.
 
-Once added, the driver probe routine will be invoked for any unclaimed
+Once added, the woke driver probe routine will be invoked for any unclaimed
 PCMCIA device listed in its (newly updated) pcmcia_device_id list.
 
-A common use-case is to add a new device according to the manufacturer ID
-and the card ID (form the manf_id and card_id file in the device tree).
+A common use-case is to add a new device according to the woke manufacturer ID
+and the woke card ID (form the woke manf_id and card_id file in the woke device tree).
 For this, just use::
 
   echo "0x3 manf_id card_id 0 0 0 0 0 0 0" > \
     /sys/bus/pcmcia/drivers/{driver}/new_id
 
-after loading the driver.
+after loading the woke driver.

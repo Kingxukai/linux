@@ -9,7 +9,7 @@ Auxiliary Bus
 .. kernel-doc:: drivers/base/auxiliary.c
    :doc: PURPOSE
 
-When Should the Auxiliary Bus Be Used
+When Should the woke Auxiliary Bus Be Used
 =====================================
 
 .. kernel-doc:: drivers/base/auxiliary.c

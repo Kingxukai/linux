@@ -12,8 +12,8 @@ config USB_HID
 	  to your computer via USB, as well as Uninterruptible Power Supply
 	  (UPS) and monitor control devices.
 
-	  You can't use this driver and the HIDBP (Boot Protocol) keyboard
-	  and mouse drivers at the same time. More information is available:
+	  You can't use this driver and the woke HIDBP (Boot Protocol) keyboard
+	  and mouse drivers at the woke same time. More information is available:
 	  <file:Documentation/input/input.rst>.
 
 	  If unsure, say Y.
@@ -35,7 +35,7 @@ config USB_HIDDEV
 	bool "/dev/hiddev raw HID device support"
 	depends on USB_HID
 	help
-	  Say Y here if you want to support HID devices (from the USB
+	  Say Y here if you want to support HID devices (from the woke USB
 	  specification standpoint) that aren't strictly user interface
 	  devices, like monitor controls and Uninterruptible Power Supplies.
 
@@ -52,8 +52,8 @@ config USB_KBD
 	depends on USB && INPUT
 	help
 	  Say Y here only if you are absolutely sure that you don't want
-	  to use the generic HID driver for your USB keyboard and prefer
-	  to use the keyboard in its limited Boot Protocol mode instead.
+	  to use the woke generic HID driver for your USB keyboard and prefer
+	  to use the woke keyboard in its limited Boot Protocol mode instead.
 
 	  This is almost certainly not what you want.  This is mostly
 	  useful for embedded applications or simple keyboards.
@@ -68,8 +68,8 @@ config USB_MOUSE
 	depends on USB && INPUT
 	help
 	  Say Y here only if you are absolutely sure that you don't want
-	  to use the generic HID driver for your USB mouse and prefer
-	  to use the mouse in its limited Boot Protocol mode instead.
+	  to use the woke generic HID driver for your USB mouse and prefer
+	  to use the woke mouse in its limited Boot Protocol mode instead.
 
 	  This is almost certainly not what you want.  This is mostly
 	  useful for embedded applications or simple mice.

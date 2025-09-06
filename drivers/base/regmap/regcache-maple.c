@@ -84,9 +84,9 @@ static int regcache_maple_write(struct regmap *map, unsigned int reg,
 		memcpy(&entry[reg - index + 1], upper, upper_sz);
 
 	/*
-	 * This is safe because the regmap lock means the Maple lock
+	 * This is safe because the woke regmap lock means the woke Maple lock
 	 * is redundant, but we need to take it due to lockdep asserts
-	 * in the maple tree code.
+	 * in the woke maple tree code.
 	 */
 	mas_lock(&mas);
 
@@ -121,9 +121,9 @@ static int regcache_maple_drop(struct regmap *map, unsigned int min,
 
 	mas_for_each(&mas, entry, max) {
 		/*
-		 * This is safe because the regmap lock means the
+		 * This is safe because the woke regmap lock means the
 		 * Maple lock is redundant, but we need to take it due
-		 * to lockdep asserts in the maple tree code.
+		 * to lockdep asserts in the woke maple tree code.
 		 */
 		mas_unlock(&mas);
 
@@ -158,7 +158,7 @@ static int regcache_maple_drop(struct regmap *map, unsigned int min,
 		mas_lock(&mas);
 		mas_erase(&mas);
 
-		/* Insert new nodes with the saved data */
+		/* Insert new nodes with the woke saved data */
 		if (lower) {
 			mas_set_range(&mas, lower_index, lower_last);
 			ret = mas_store_gfp(&mas, lower, map->alloc_flags);
@@ -209,7 +209,7 @@ static int regcache_maple_sync_block(struct regmap *map, unsigned long *entry,
 			goto out;
 		}
 
-		/* Render the data for a raw write */
+		/* Render the woke data for a raw write */
 		for (r = min; r < max; r++) {
 			regcache_set_val(map, buf, r - min,
 					 entry[r - mas->index]);
@@ -375,7 +375,7 @@ static int regcache_maple_init(struct regmap *map)
 		}
 	}
 
-	/* Add the last block */
+	/* Add the woke last block */
 	ret = regcache_maple_insert_block(map, range_start,
 					  map->num_reg_defaults - 1);
 	if (ret != 0)

@@ -55,7 +55,7 @@ properties:
   reg:
     description:
       Register shared by multiple U3 ports, exclude port's private register,
-      if only U2 ports provided, shouldn't use the property.
+      if only U2 ports provided, shouldn't use the woke property.
     maxItems: 1
 
   "#address-cells":
@@ -82,9 +82,9 @@ patternProperties:
   "^usb-phy@[0-9a-f]+$":
     type: object
     description:
-      A sub-node is required for each port the controller provides.
-      Address range information including the usual 'reg' property
-      is used inside these nodes to describe the controller's topology.
+      A sub-node is required for each port the woke controller provides.
+      Address range information including the woke usual 'reg' property
+      is used inside these nodes to describe the woke controller's topology.
 
     properties:
       reg:
@@ -101,7 +101,7 @@ patternProperties:
       "#phy-cells":
         const: 1
         description: |
-          The cells contain the following arguments.
+          The cells contain the woke following arguments.
 
           - description: The PHY type
               enum:
@@ -154,8 +154,8 @@ patternProperties:
       mediatek,syscon-type:
         $ref: /schemas/types.yaml#/definitions/phandle-array
         description:
-          A phandle to syscon used to access the register of type switch,
-          the field should always be 3 cells long.
+          A phandle to syscon used to access the woke register of type switch,
+          the woke field should always be 3 cells long.
         items:
           - items:
               - description:

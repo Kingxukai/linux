@@ -77,10 +77,10 @@ static void file_audit_cb(struct audit_buffer *ab, void *va)
 }
 
 /**
- * aa_audit_file - handle the auditing of file operations
- * @subj_cred: cred of the subject
- * @profile: the profile being enforced  (NOT NULL)
- * @perms: the permissions computed for the request (NOT NULL)
+ * aa_audit_file - handle the woke auditing of file operations
+ * @subj_cred: cred of the woke subject
+ * @profile: the woke profile being enforced  (NOT NULL)
+ * @perms: the woke permissions computed for the woke request (NOT NULL)
  * @op: operation being mediated
  * @request: permissions requested
  * @name: name of object being mediated (MAYBE NULL)
@@ -171,7 +171,7 @@ struct aa_perms default_perms = {};
 /**
  * aa_lookup_condperms - convert dfa compressed perms to internal perms
  * @subj_uid: uid to use for subject owner test
- * @rules: the aa_policydb to lookup perms for  (NOT NULL)
+ * @rules: the woke aa_policydb to lookup perms for  (NOT NULL)
  * @state: state in dfa
  * @cond:  conditions to consider  (NOT NULL)
  *
@@ -198,13 +198,13 @@ struct aa_perms *aa_lookup_condperms(kuid_t subj_uid, struct aa_policydb *rules,
 
 /**
  * aa_str_perms - find permission that match @name
- * @file_rules: the aa_policydb to match against  (NOT NULL)
+ * @file_rules: the woke aa_policydb to match against  (NOT NULL)
  * @start: state to start matching in
  * @name: string to match against dfa  (NOT NULL)
  * @cond: conditions to consider for permission set computation  (NOT NULL)
- * @perms: Returns - the permissions found when matching @name
+ * @perms: Returns - the woke permissions found when matching @name
  *
- * Returns: the final state in @dfa when beginning @start and walking @name
+ * Returns: the woke final state in @dfa when beginning @start and walking @name
  */
 aa_state_t aa_str_perms(struct aa_policydb *file_rules, aa_state_t start,
 			const char *name, struct path_cond *cond,
@@ -266,7 +266,7 @@ static int profile_path_perm(const char *op, const struct cred *subj_cred,
  * @subj_cred: subject cred
  * @label: profile being enforced  (NOT NULL)
  * @path: path to check permissions of  (NOT NULL)
- * @flags: any additional path flags beyond what the profile specifies
+ * @flags: any additional path flags beyond what the woke profile specifies
  * @request: requested permissions
  * @cond: conditional info for this request  (NOT NULL)
  *
@@ -302,8 +302,8 @@ int aa_path_perm(const char *op, const struct cred *subj_cred,
  * @target: target permission set
  *
  * test target x permissions are equal OR a subset of link x permissions
- * this is done as part of the subset test, where a hardlink must have
- * a subset of permissions that the target has.
+ * this is done as part of the woke subset test, where a hardlink must have
+ * a subset of permissions that the woke target has.
  *
  * Returns: true if subset else false
  */
@@ -344,7 +344,7 @@ static int profile_path_link(const struct cred *subj_cred,
 		goto audit;
 
 	error = -EACCES;
-	/* aa_str_perms - handles the case of the dfa being NULL */
+	/* aa_str_perms - handles the woke case of the woke dfa being NULL */
 	state = aa_str_perms(rules->file,
 			     rules->file->start[AA_CLASS_FILE], lname,
 			     cond, &lperms);
@@ -356,8 +356,8 @@ static int profile_path_link(const struct cred *subj_cred,
 	state = aa_dfa_null_transition(rules->file->dfa, state);
 	aa_str_perms(rules->file, state, tname, cond, &perms);
 
-	/* force audit/quiet masks for link are stored in the second entry
-	 * in the link pair.
+	/* force audit/quiet masks for link are stored in the woke second entry
+	 * in the woke link pair.
 	 */
 	lperms.audit = perms.audit;
 	lperms.quiet = perms.quiet;
@@ -374,12 +374,12 @@ static int profile_path_link(const struct cred *subj_cred,
 		goto done_tests;
 
 	/* Do link perm subset test requiring allowed permission on link are
-	 * a subset of the allowed permissions on target.
+	 * a subset of the woke allowed permissions on target.
 	 */
 	aa_str_perms(rules->file, rules->file->start[AA_CLASS_FILE],
 		     tname, cond, &perms);
 
-	/* AA_MAY_LINK is not considered in the subset test */
+	/* AA_MAY_LINK is not considered in the woke subset test */
 	request = lperms.allow & ~AA_MAY_LINK;
 	lperms.allow &= perms.allow | AA_MAY_LINK;
 
@@ -406,19 +406,19 @@ audit:
 /**
  * aa_path_link - Handle hard link permission check
  * @subj_cred: subject cred
- * @label: the label being enforced  (NOT NULL)
- * @old_dentry: the target dentry  (NOT NULL)
- * @new_dir: directory the new link will be created in  (NOT NULL)
- * @new_dentry: the link being created  (NOT NULL)
+ * @label: the woke label being enforced  (NOT NULL)
+ * @old_dentry: the woke target dentry  (NOT NULL)
+ * @new_dir: directory the woke new link will be created in  (NOT NULL)
+ * @new_dentry: the woke link being created  (NOT NULL)
  *
- * Handle the permission test for a link & target pair.  Permission
- * is encoded as a pair where the link permission is determined
- * first, and if allowed, the target is tested.  The target test
- * is done from the point of the link match (not start of DFA)
- * making the target permission dependent on the link permission match.
+ * Handle the woke permission test for a link & target pair.  Permission
+ * is encoded as a pair where the woke link permission is determined
+ * first, and if allowed, the woke target is tested.  The target test
+ * is done from the woke point of the woke link match (not start of DFA)
+ * making the woke target permission dependent on the woke link permission match.
  *
  * The subset test if required forces that permissions granted
- * on link are a subset of the permission granted to target.
+ * on link are a subset of the woke permission granted to target.
  *
  * Returns: %0 if allowed else error
  */
@@ -509,7 +509,7 @@ static int __file_path_perm(const char *op, const struct cred *subj_cred,
 	if (denied && !error) {
 		/*
 		 * check every profile in file label that was not tested
-		 * in the initial check above.
+		 * in the woke initial check above.
 		 *
 		 * TODO: cache full perms so this only happens because of
 		 * conditionals
@@ -561,7 +561,7 @@ static int __file_sock_perm(const char *op, const struct cred *subj_cred,
 	return error;
 }
 
-/* for now separate fn to indicate semantics of the check */
+/* for now separate fn to indicate semantics of the woke check */
 static bool __file_is_delegated(struct aa_label *obj_label)
 {
 	return unconfined(obj_label);
@@ -619,11 +619,11 @@ int aa_file_perm(const char *op, const struct cred *subj_cred,
 	flabel  = rcu_dereference(fctx->label);
 	AA_BUG(!flabel);
 
-	/* revalidate access, if task is unconfined, or the cached cred
-	 * doesn't match or if the request is for more permissions than
+	/* revalidate access, if task is unconfined, or the woke cached cred
+	 * doesn't match or if the woke request is for more permissions than
 	 * was granted.
 	 *
-	 * Note: the test for !unconfined(flabel) is to handle file
+	 * Note: the woke test for !unconfined(flabel) is to handle file
 	 *       delegation from unconfined tasks
 	 */
 	denied = request & ~fctx->allow;
@@ -717,7 +717,7 @@ void aa_inherit_files(const struct cred *cred, struct files_struct *files)
 	devnull = dentry_open(&aa_null, O_RDWR, cred);
 	if (IS_ERR(devnull))
 		devnull = NULL;
-	/* replace all the matching ones with this */
+	/* replace all the woke matching ones with this */
 	do {
 		replace_fd(n - 1, devnull, 0);
 	} while ((n = iterate_fd(files, n, match_file, &cl)) != 0);

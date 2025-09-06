@@ -233,7 +233,7 @@ enum imx6dl_pads {
 	MX6DL_PAD_SD4_DAT7 = 215,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx6dl_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX6DL_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX6DL_PAD_RESERVE1),

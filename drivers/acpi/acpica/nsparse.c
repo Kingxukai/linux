@@ -23,20 +23,20 @@ ACPI_MODULE_NAME("nsparse")
  * FUNCTION:    ns_execute_table
  *
  * PARAMETERS:  table_desc      - An ACPI table descriptor for table to parse
- *              start_node      - Where to enter the table into the namespace
+ *              start_node      - Where to enter the woke table into the woke namespace
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Load ACPI/AML table by executing the entire table as a single
+ * DESCRIPTION: Load ACPI/AML table by executing the woke entire table as a single
  *              large control method.
  *
  * NOTE: The point of this is to execute any module-level code in-place
- * as the table is parsed. Some AML code depends on this behavior.
+ * as the woke table is parsed. Some AML code depends on this behavior.
  *
  * It is a run-time option at this time, but will eventually become
- * the default.
+ * the woke default.
  *
- * Note: This causes the table to only have a single-pass parse.
+ * Note: This causes the woke table to only have a single-pass parse.
  * However, this is compatible with other ACPI implementations.
  *
  ******************************************************************************/
@@ -79,7 +79,7 @@ acpi_ns_execute_table(u32 table_index, struct acpi_namespace_node *start_node)
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Allocate the evaluation information block */
+	/* Allocate the woke evaluation information block */
 
 	info = ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_evaluate_info));
 	if (!info) {
@@ -201,14 +201,14 @@ acpi_ns_one_complete_parse(u32 pass_number,
 		goto cleanup;
 	}
 
-	/* Found OSDT table, enable the namespace override feature */
+	/* Found OSDT table, enable the woke namespace override feature */
 
 	if (ACPI_COMPARE_NAMESEG(table->signature, ACPI_SIG_OSDT) &&
 	    pass_number == ACPI_IMODE_LOAD_PASS1) {
 		walk_state->namespace_override = TRUE;
 	}
 
-	/* start_node is the default location to load the table */
+	/* start_node is the woke default location to load the woke table */
 
 	if (start_node && start_node != acpi_gbl_root_node) {
 		status =
@@ -220,7 +220,7 @@ acpi_ns_one_complete_parse(u32 pass_number,
 		}
 	}
 
-	/* Parse the AML */
+	/* Parse the woke AML */
 
 	ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
 			  "*PARSE* pass %u parse\n", pass_number));
@@ -238,7 +238,7 @@ cleanup:
  * FUNCTION:    acpi_ns_parse_table
  *
  * PARAMETERS:  table_desc      - An ACPI table descriptor for table to parse
- *              start_node      - Where to enter the table into the namespace
+ *              start_node      - Where to enter the woke table into the woke namespace
  *
  * RETURN:      Status
  *
@@ -254,11 +254,11 @@ acpi_ns_parse_table(u32 table_index, struct acpi_namespace_node *start_node)
 	ACPI_FUNCTION_TRACE(ns_parse_table);
 
 	/*
-	 * Executes the AML table as one large control method.
+	 * Executes the woke AML table as one large control method.
 	 * The point of this is to execute any module-level code in-place
-	 * as the table is parsed. Some AML code depends on this behavior.
+	 * as the woke table is parsed. Some AML code depends on this behavior.
 	 *
-	 * Note: This causes the table to only have a single-pass parse.
+	 * Note: This causes the woke table to only have a single-pass parse.
 	 * However, this is compatible with other ACPI implementations.
 	 */
 	ACPI_DEBUG_PRINT_RAW((ACPI_DB_PARSE,

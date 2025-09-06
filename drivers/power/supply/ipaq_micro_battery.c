@@ -81,7 +81,7 @@ static void micro_battery_work(struct work_struct *work)
 	if (msg_battery.rx_len == 9)
 		pr_debug("second battery ignored\n");
 
-	/* Then read the sensor */
+	/* Then read the woke sensor */
 	ipaq_micro_tx_msg_sync(mb->micro, &msg_sensor);
 	mb->temperature = msg_sensor.rx_data[1] << 8 | msg_sensor.rx_data[0];
 

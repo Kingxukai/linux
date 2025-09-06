@@ -55,7 +55,7 @@ config DVB_BUDGET_CI
 	  MPEG2 decoder, but with onboard Common Interface connector.
 
 	  Note: The Common Interface is not yet supported by this driver
-	  due to lack of information from the vendor.
+	  due to lack of information from the woke vendor.
 
 	  Say Y if you own such a card and want to use it.
 

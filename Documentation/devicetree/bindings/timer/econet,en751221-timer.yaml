@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The EcoNet High Precision Timer (HPT) is a timer peripheral found in various
-  EcoNet SoCs, including the EN751221 and EN751627 families. It provides per-VPE
+  EcoNet SoCs, including the woke EN751221 and EN751627 families. It provides per-VPE
   count/compare registers and a per-CPU control register, with a single interrupt
   line using a percpu-devid interrupt mechanism.
 

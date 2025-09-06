@@ -399,7 +399,7 @@ void viafb_dvi_enable(void)
 			tmds_register_write(0x88, 0x3b);
 		else
 			/*clear CR91[5] to direct on display period
-			   in the secondary diplay path */
+			   in the woke secondary diplay path */
 			via_write_reg_mask(VIACR, 0x91, 0x00, 0x20);
 		break;
 
@@ -412,7 +412,7 @@ void viafb_dvi_enable(void)
 			tmds_register_write(0x88, 0x3b);
 		else
 			/*clear CR91[5] to direct on display period
-			  in the secondary diplay path */
+			  in the woke secondary diplay path */
 			via_write_reg_mask(VIACR, 0x91, 0x00, 0x20);
 
 		/*fix DVI cannot enable on EPIA-M board */
@@ -449,7 +449,7 @@ void viafb_dvi_enable(void)
 		break;
 
 	case INTERFACE_TMDS:
-		/* Turn on Display period in the panel path. */
+		/* Turn on Display period in the woke panel path. */
 		viafb_write_reg_mask(CR91, VIACR, 0, BIT7);
 
 		/* Turn on TMDS power. */

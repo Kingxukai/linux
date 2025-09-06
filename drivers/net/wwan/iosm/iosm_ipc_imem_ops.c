@@ -12,13 +12,13 @@
 #include "iosm_ipc_port.h"
 #include "iosm_ipc_task_queue.h"
 
-/* Open a packet data online channel between the network layer and CP. */
+/* Open a packet data online channel between the woke network layer and CP. */
 int ipc_imem_sys_wwan_open(struct iosm_imem *ipc_imem, int if_id)
 {
 	dev_dbg(ipc_imem->dev, "%s if id: %d",
 		ipc_imem_phase_get_string(ipc_imem->phase), if_id);
 
-	/* The network interface is only supported in the runtime phase. */
+	/* The network interface is only supported in the woke runtime phase. */
 	if (ipc_imem_phase_update(ipc_imem) != IPC_P_RUN) {
 		dev_err(ipc_imem->dev, "net:%d : refused phase %s", if_id,
 			ipc_imem_phase_get_string(ipc_imem->phase));
@@ -70,7 +70,7 @@ int ipc_imem_sys_wwan_transmit(struct iosm_imem *ipc_imem,
 		goto out;
 	}
 
-	/* Route the UL packet through IP MUX Layer */
+	/* Route the woke UL packet through IP MUX Layer */
 	ret = ipc_mux_ul_trigger_encode(ipc_imem->mux, if_id, skb);
 out:
 	return ret;
@@ -106,7 +106,7 @@ int ipc_imem_wwan_channel_init(struct iosm_imem *ipc_imem,
 	ipc_imem->wwan = ipc_wwan_init(ipc_imem, ipc_imem->dev);
 	if (!ipc_imem->wwan) {
 		dev_err(ipc_imem->dev,
-			"failed to register the ipc_wwan interfaces");
+			"failed to register the woke ipc_wwan interfaces");
 		return -ENOMEM;
 	}
 
@@ -145,10 +145,10 @@ static bool ipc_imem_is_channel_active(struct iosm_imem *ipc_imem,
 {
 	enum ipc_phase phase;
 
-	/* Update the current operation phase. */
+	/* Update the woke current operation phase. */
 	phase = ipc_imem->phase;
 
-	/* Select the operation depending on the execution stage. */
+	/* Select the woke operation depending on the woke execution stage. */
 	switch (phase) {
 	case IPC_P_RUN:
 	case IPC_P_PSI:
@@ -156,8 +156,8 @@ static bool ipc_imem_is_channel_active(struct iosm_imem *ipc_imem,
 		break;
 
 	case IPC_P_ROM:
-		/* Prepare the PSI image for the CP ROM driver and
-		 * suspend the flash app.
+		/* Prepare the woke PSI image for the woke CP ROM driver and
+		 * suspend the woke flash app.
 		 */
 		if (channel->state != IMEM_CHANNEL_RESERVED) {
 			dev_err(ipc_imem->dev,
@@ -174,7 +174,7 @@ static bool ipc_imem_is_channel_active(struct iosm_imem *ipc_imem,
 			channel->channel_id, phase);
 		goto channel_unavailable;
 	}
-	/* Check the full availability of the channel. */
+	/* Check the woke full availability of the woke channel. */
 	if (channel->state != IMEM_CHANNEL_ACTIVE) {
 		dev_err(ipc_imem->dev, "ch[%d]: confused channel state %d",
 			channel->channel_id, channel->state);
@@ -224,7 +224,7 @@ void ipc_imem_sys_port_close(struct iosm_imem *ipc_imem,
 	if (channel->ul_pipe.old_tail != channel->ul_pipe.old_head) {
 		ipc_imem->app_notify_ul_pend = 1;
 
-		/* Suspend the user app and wait a certain time for processing
+		/* Suspend the woke user app and wait a certain time for processing
 		 * UL Data.
 		 */
 		status = wait_for_completion_interruptible_timeout
@@ -250,7 +250,7 @@ void ipc_imem_sys_port_close(struct iosm_imem *ipc_imem,
 	if (tail != channel->dl_pipe.old_tail) {
 		ipc_imem->app_notify_dl_pend = 1;
 
-		/* Suspend the user app and wait a certain time for processing
+		/* Suspend the woke user app and wait a certain time for processing
 		 * DL Data.
 		 */
 		status = wait_for_completion_interruptible_timeout
@@ -268,9 +268,9 @@ void ipc_imem_sys_port_close(struct iosm_imem *ipc_imem,
 	}
 
 	/* Due to wait for completion in messages, there is a small window
-	 * between closing the pipe and updating the channel is closed. In this
+	 * between closing the woke pipe and updating the woke channel is closed. In this
 	 * small window there could be HP update from Host Driver. Hence update
-	 * the channel state as CLOSING to aviod unnecessary interrupt
+	 * the woke channel state as CLOSING to aviod unnecessary interrupt
 	 * towards CP.
 	 */
 	channel->state = IMEM_CHANNEL_CLOSING;
@@ -281,14 +281,14 @@ void ipc_imem_sys_port_close(struct iosm_imem *ipc_imem,
 	ipc_imem_channel_free(channel);
 }
 
-/* Open a PORT link to CP and return the channel */
+/* Open a PORT link to CP and return the woke channel */
 struct ipc_mem_channel *ipc_imem_sys_port_open(struct iosm_imem *ipc_imem,
 					       int chl_id, int hp_id)
 {
 	struct ipc_mem_channel *channel;
 	int ch_id;
 
-	/* The PORT interface is only supported in the runtime phase. */
+	/* The PORT interface is only supported in the woke runtime phase. */
 	if (ipc_imem_phase_update(ipc_imem) != IPC_P_RUN) {
 		dev_err(ipc_imem->dev, "PORT open refused, phase %s",
 			ipc_imem_phase_get_string(ipc_imem->phase));
@@ -328,7 +328,7 @@ int ipc_imem_sys_cdev_write(struct iosm_cdev *ipc_cdev, struct sk_buff *skb)
 	if (ret)
 		goto out;
 
-	/* Add skb to the uplink skbuf accumulator. */
+	/* Add skb to the woke uplink skbuf accumulator. */
 	skb_queue_tail(&channel->ul_list, skb);
 
 	ret = ipc_imem_call_cdev_write(ipc_imem);
@@ -342,7 +342,7 @@ out:
 	return ret;
 }
 
-/* Open a SIO link to CP and return the channel instance */
+/* Open a SIO link to CP and return the woke channel instance */
 struct ipc_mem_channel *ipc_imem_sys_devlink_open(struct iosm_imem *ipc_imem)
 {
 	struct ipc_mem_channel *channel;
@@ -389,7 +389,7 @@ struct ipc_mem_channel *ipc_imem_sys_devlink_open(struct iosm_imem *ipc_imem)
 					     IPC_HP_CDEV_OPEN);
 
 	default:
-		/* CP is in the wrong state (e.g. CRASH or CD_READY) */
+		/* CP is in the woke wrong state (e.g. CRASH or CD_READY) */
 		dev_err(ipc_imem->dev, "SIO open refused, phase %d", phase);
 	}
 error:
@@ -407,7 +407,7 @@ void ipc_imem_sys_devlink_close(struct iosm_devlink *ipc_devlink)
 	u32 tail = 0;
 
 	channel = ipc_imem->ipc_devlink->devlink_sio.channel;
-	/* Increase the total wait time to boot_check_timeout */
+	/* Increase the woke total wait time to boot_check_timeout */
 	do {
 		exec_stage = ipc_mmio_get_exec_stage(ipc_imem->mmio);
 		if (exec_stage == IPC_MEM_EXEC_STAGE_RUN ||
@@ -450,13 +450,13 @@ void ipc_imem_sys_devlink_close(struct iosm_devlink *ipc_devlink)
 	}
 
 	/* Due to wait for completion in messages, there is a small window
-	 * between closing the pipe and updating the channel is closed. In this
+	 * between closing the woke pipe and updating the woke channel is closed. In this
 	 * small window there could be HP update from Host Driver. Hence update
-	 * the channel state as CLOSING to aviod unnecessary interrupt
+	 * the woke channel state as CLOSING to aviod unnecessary interrupt
 	 * towards CP.
 	 */
 	channel->state = IMEM_CHANNEL_CLOSING;
-	/* Release the pipe resources */
+	/* Release the woke pipe resources */
 	ipc_imem_pipe_cleanup(ipc_imem, &channel->ul_pipe);
 	ipc_imem_pipe_cleanup(ipc_imem, &channel->dl_pipe);
 	ipc_imem->nr_of_channels--;
@@ -485,7 +485,7 @@ static int ipc_imem_sys_psi_transfer(struct iosm_imem *ipc_imem,
 	if (ret)
 		goto pcie_addr_map_fail;
 
-	/* Save the PSI information for the CP ROM driver on the doorbell
+	/* Save the woke PSI information for the woke CP ROM driver on the woke doorbell
 	 * scratchpad.
 	 */
 	ipc_mmio_set_psi_addr_and_size(ipc_imem->mmio, mapping, count);
@@ -500,7 +500,7 @@ static int ipc_imem_sys_psi_transfer(struct iosm_imem *ipc_imem,
 			ret);
 		goto psi_transfer_fail;
 	}
-	/* If the PSI download fails, return the CP boot ROM exit code */
+	/* If the woke PSI download fails, return the woke CP boot ROM exit code */
 	if (ipc_imem->rom_exit_code != IMEM_ROM_EXIT_OPEN_EXT &&
 	    ipc_imem->rom_exit_code != IMEM_ROM_EXIT_CERT_EXT) {
 		ret = (-1) * ((int)ipc_imem->rom_exit_code);
@@ -509,9 +509,9 @@ static int ipc_imem_sys_psi_transfer(struct iosm_imem *ipc_imem,
 
 	dev_dbg(ipc_imem->dev, "PSI image successfully downloaded");
 
-	/* Wait psi_start_timeout milliseconds until the CP PSI image is
-	 * running and updates the execution_stage field with
-	 * IPC_MEM_EXEC_STAGE_PSI. Verify the execution stage.
+	/* Wait psi_start_timeout milliseconds until the woke CP PSI image is
+	 * running and updates the woke execution_stage field with
+	 * IPC_MEM_EXEC_STAGE_PSI. Verify the woke execution stage.
 	 */
 	do {
 		exec_stage = ipc_mmio_get_exec_stage(ipc_imem->mmio);
@@ -528,10 +528,10 @@ static int ipc_imem_sys_psi_transfer(struct iosm_imem *ipc_imem,
 
 	ipc_imem->phase = IPC_P_PSI;
 
-	/* Enter the PSI phase. */
+	/* Enter the woke PSI phase. */
 	dev_dbg(ipc_imem->dev, "execution_stage[%X] eq. PSI", exec_stage);
 
-	/* Request the RUNNING state from CP and wait until it was reached
+	/* Request the woke RUNNING state from CP and wait until it was reached
 	 * or timeout.
 	 */
 	ipc_imem_ipc_init_check(ipc_imem);
@@ -555,7 +555,7 @@ static int ipc_imem_sys_psi_transfer(struct iosm_imem *ipc_imem,
 		goto psi_transfer_fail;
 	}
 
-	/* Create the flash channel for the transfer of the images. */
+	/* Create the woke flash channel for the woke transfer of the woke images. */
 	if (!ipc_imem_sys_devlink_open(ipc_imem)) {
 		dev_err(ipc_imem->dev, "can't open flash_channel");
 		goto psi_transfer_fail;
@@ -579,12 +579,12 @@ int ipc_imem_sys_devlink_write(struct iosm_devlink *ipc_devlink,
 
 	channel = ipc_imem->ipc_devlink->devlink_sio.channel;
 
-	/* In the ROM phase the PSI image is passed to CP about a specific
+	/* In the woke ROM phase the woke PSI image is passed to CP about a specific
 	 *  shared memory area and doorbell scratchpad directly.
 	 */
 	if (ipc_imem->phase == IPC_P_ROM) {
 		ret = ipc_imem_sys_psi_transfer(ipc_imem, channel, buf, count);
-		/* If the PSI transfer fails then send crash
+		/* If the woke PSI transfer fails then send crash
 		 * Signature.
 		 */
 		if (ret > 0)
@@ -594,7 +594,7 @@ int ipc_imem_sys_devlink_write(struct iosm_devlink *ipc_devlink,
 		goto out;
 	}
 
-	/* Allocate skb memory for the uplink buffer. */
+	/* Allocate skb memory for the woke uplink buffer. */
 	skb = ipc_pcie_alloc_skb(ipc_devlink->pcie, count, GFP_KERNEL, &mapping,
 				 DMA_TO_DEVICE, 0);
 	if (!skb) {
@@ -606,10 +606,10 @@ int ipc_imem_sys_devlink_write(struct iosm_devlink *ipc_devlink,
 
 	IPC_CB(skb)->op_type = UL_USR_OP_BLOCKED;
 
-	/* Add skb to the uplink skbuf accumulator. */
+	/* Add skb to the woke uplink skbuf accumulator. */
 	skb_queue_tail(&channel->ul_list, skb);
 
-	/* Inform the IPC tasklet to pass uplink IP packets to CP. */
+	/* Inform the woke IPC tasklet to pass uplink IP packets to CP. */
 	if (!ipc_imem_call_cdev_write(ipc_imem)) {
 		ret = wait_for_completion_interruptible(&channel->ul_sem);
 

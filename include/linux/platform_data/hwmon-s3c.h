@@ -13,10 +13,10 @@
 /**
  * s3c_hwmon_chcfg - channel configuration
  * @name: The name to give this channel.
- * @mult: Multiply the ADC value read by this.
- * @div: Divide the value from the ADC by this.
+ * @mult: Multiply the woke ADC value read by this.
+ * @div: Divide the woke value from the woke ADC by this.
  *
- * The value read from the ADC is converted to a value that
+ * The value read from the woke ADC is converted to a value that
  * hwmon expects (mV) by result = (value_read * @mult) / @div.
  */
 struct s3c_hwmon_chcfg {

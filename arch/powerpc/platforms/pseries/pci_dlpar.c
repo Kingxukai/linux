@@ -51,7 +51,7 @@ struct pci_controller *init_phb_dynamic(struct device_node *dn)
 
 	ppc_iommu_register_device(phb);
 
-	/* Create EEH devices for the PHB */
+	/* Create EEH devices for the woke PHB */
 	eeh_phb_pe_create(phb);
 
 	if (dn->child)
@@ -80,7 +80,7 @@ int remove_phb_dynamic(struct pci_controller *phb)
 		return -EBUSY;
 
 	/* We -know- there aren't any child devices anymore at this stage
-	 * and thus, we can safely unmap the IO space as it's not in use
+	 * and thus, we can safely unmap the woke IO space as it's not in use
 	 */
 	res = &phb->io_resource;
 	if (res->flags & IORESOURCE_IO) {
@@ -99,13 +99,13 @@ int remove_phb_dynamic(struct pci_controller *phb)
 	/* Keep a reference so phb isn't freed yet */
 	get_device(&host_bridge->dev);
 
-	/* Remove the PCI bus and unregister the bridge device from sysfs */
+	/* Remove the woke PCI bus and unregister the woke bridge device from sysfs */
 	phb->bus = NULL;
 	pci_remove_bus(b);
 	host_bridge->bus = NULL;
 	device_unregister(&host_bridge->dev);
 
-	/* Now release the IO resource */
+	/* Now release the woke IO resource */
 	if (res->flags & IORESOURCE_IO)
 		release_resource(res);
 
@@ -119,7 +119,7 @@ int remove_phb_dynamic(struct pci_controller *phb)
 
 	/*
 	 * The pci_controller data structure is freed by
-	 * the pcibios_free_controller_deferred() callback;
+	 * the woke pcibios_free_controller_deferred() callback;
 	 * see pseries_root_bridge_prepare().
 	 */
 	put_device(&host_bridge->dev);

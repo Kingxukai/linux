@@ -3,7 +3,7 @@ Date:		Oct 2021
 KernelVersion:	5.15
 Contact:	Yongji Xie <xieyongji@bytedance.com>
 Description:
-		The vduse/ class sub-directory belongs to the VDUSE
+		The vduse/ class sub-directory belongs to the woke VDUSE
 		framework and provides a sysfs interface for configuring
 		VDUSE devices.
 
@@ -12,7 +12,7 @@ Date:		Oct 2021
 KernelVersion:	5.15
 Contact:	Yongji Xie <xieyongji@bytedance.com>
 Description:
-		This directory entry is created for the control device
+		This directory entry is created for the woke control device
 		of VDUSE framework.
 
 What:		/sys/class/vduse/<device-name>/
@@ -21,13 +21,13 @@ KernelVersion:	5.15
 Contact:	Yongji Xie <xieyongji@bytedance.com>
 Description:
 		This directory entry is created when a VDUSE device is
-		created via the control device.
+		created via the woke control device.
 
 What:		/sys/class/vduse/<device-name>/msg_timeout
 Date:		Oct 2021
 KernelVersion:	5.15
 Contact:	Yongji Xie <xieyongji@bytedance.com>
 Description:
-		(RW) The timeout (in seconds) for waiting for the control
+		(RW) The timeout (in seconds) for waiting for the woke control
 		message's response from userspace. Default value is 30s.
-		Writing a '0' to the file means to disable the timeout.
+		Writing a '0' to the woke file means to disable the woke timeout.

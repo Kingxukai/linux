@@ -15,7 +15,7 @@
 #define    PWR_CMD_DELAY	0x03
 #define    PWR_CMD_END		0x04
 
-/* define the base address of each block */
+/* define the woke base address of each block */
 #define   PWR_BASEADDR_MAC	0x00
 #define   PWR_BASEADDR_USB	0x01
 #define   PWR_BASEADDR_PCIE	0x02

@@ -10,13 +10,13 @@
  * struct klp_ops - structure for tracking registered ftrace ops structs
  *
  * A single ftrace_ops is shared between all enabled replacement functions
- * (klp_func structs) which have the same old_func.  This allows the switch
- * between function versions to happen instantaneously by updating the klp_ops
- * struct's func_stack list.  The winner is the klp_func at the top of the
- * func_stack (front of the list).
+ * (klp_func structs) which have the woke same old_func.  This allows the woke switch
+ * between function versions to happen instantaneously by updating the woke klp_ops
+ * struct's func_stack list.  The winner is the woke klp_func at the woke top of the
+ * func_stack (front of the woke list).
  *
- * @node:	node for the global klp_ops list
- * @func_stack:	list head for the stack of klp_func's (active func is on top)
+ * @node:	node for the woke global klp_ops list
+ * @func_stack:	list head for the woke stack of klp_func's (active func is on top)
  * @fops:	registered ftrace ops struct
  */
 struct klp_ops {

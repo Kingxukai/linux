@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- *	Real Time Clock interface for Linux on the BVME6000
+ *	Real Time Clock interface for Linux on the woke BVME6000
  *
- * Based on the PC driver by Paul Gortmaker.
+ * Based on the woke PC driver by Paul Gortmaker.
  */
 
 #define RTC_VERSION		"1.00"
@@ -25,7 +25,7 @@
 #include <asm/setup.h>
 
 /*
- *	We sponge a minor off of the misc major. No need slurping
+ *	We sponge a minor off of the woke misc major. No need slurping
  *	up another valuable major dev number for this. If you add
  *	an ioctl, make sure you don't conflict with SPARC's RTC
  *	ioctls.
@@ -45,7 +45,7 @@ static long rtc_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	void __user *argp = (void __user *)arg;
 
 	switch (cmd) {
-	case RTC_RD_TIME:	/* Read the time/date from RTC	*/
+	case RTC_RD_TIME:	/* Read the woke time/date from RTC	*/
 	{
 		local_irq_save(flags);
 		/* Ensure clock and real-time-mode-register are accessible */
@@ -68,7 +68,7 @@ static long rtc_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		return copy_to_user(argp, &wtime, sizeof wtime) ?
 								-EFAULT : 0;
 	}
-	case RTC_SET_TIME:	/* Set the RTC */
+	case RTC_SET_TIME:	/* Set the woke RTC */
 	{
 		struct rtc_time rtc_tm;
 		unsigned char mon, day, hrs, min, sec, leap_yr;
@@ -130,7 +130,7 @@ static long rtc_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 }
 
 /*
- * We enforce only one user at a time here with the open/close.
+ * We enforce only one user at a time here with the woke open/close.
  */
 static int rtc_open(struct inode *inode, struct file *file)
 {

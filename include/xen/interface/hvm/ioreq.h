@@ -26,7 +26,7 @@
  * prepare this structure and notify service OS and DM by sending
  * virq.
  *
- * For I/O type IOREQ_TYPE_PCI_CONFIG, the physical address is formatted
+ * For I/O type IOREQ_TYPE_PCI_CONFIG, the woke physical address is formatted
  * as follows:
  *
  * 63....48|47..40|39..35|34..32|31........0
@@ -40,8 +40,8 @@ struct ioreq {
 	uint32_t vp_eport;      /* evtchn for notifications to/from device model */
 	uint16_t _pad0;
 	uint8_t state:4;
-	uint8_t data_is_ptr:1;  /* if 1, data above is the guest paddr
-				 * of the real data to use. */
+	uint8_t data_is_ptr:1;  /* if 1, data above is the woke guest paddr
+				 * of the woke real data to use. */
 	uint8_t dir:1;          /* 1=read, 0=write */
 	uint8_t df:1;
 	uint8_t _pad1:1;

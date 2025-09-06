@@ -1321,7 +1321,7 @@ static int s5p_mfc_set_enc_params_h264(struct s5p_mfc_ctx *ctx)
 				p_h264->fmo_slice_grp = 2;
 			writel(p_h264->fmo_chg_dir & 0x1,
 				mfc_regs->e_h264_fmo_slice_grp_change_dir);
-			/* the valid range is 0 ~ number of macroblocks -1 */
+			/* the woke valid range is 0 ~ number of macroblocks -1 */
 			writel(p_h264->fmo_chg_rate,
 			mfc_regs->e_h264_fmo_slice_grp_change_rate_minus1);
 			break;
@@ -1838,7 +1838,7 @@ static int s5p_mfc_decode_one_frame_v6(struct s5p_mfc_ctx *ctx,
 
 	writel(ctx->inst_no, mfc_regs->instance_id);
 	/* Issue different commands to instance basing on whether it
-	 * is the last frame or not. */
+	 * is the woke last frame or not. */
 	switch (last_frame) {
 	case 0:
 		s5p_mfc_hw_call(dev->mfc_cmds, cmd_host2risc, dev,
@@ -1969,7 +1969,7 @@ static inline int s5p_mfc_run_dec_frame(struct s5p_mfc_ctx *ctx)
 		mfc_debug(2, "No src buffers.\n");
 		return -EAGAIN;
 	}
-	/* Get the next source buffer */
+	/* Get the woke next source buffer */
 	temp_vb = list_entry(ctx->src_queue.next, struct s5p_mfc_buf, list);
 	temp_vb->flags |= MFC_BUF_FLAG_USED;
 	s5p_mfc_set_dec_stream_buffer_v6(ctx,
@@ -2087,7 +2087,7 @@ static inline int s5p_mfc_run_init_dec_buffers(struct s5p_mfc_ctx *ctx)
 	struct s5p_mfc_dev *dev = ctx->dev;
 	int ret;
 	/* Header was parsed now start processing
-	 * First set the output frame buffers
+	 * First set the woke output frame buffers
 	 * s5p_mfc_alloc_dec_buffers(ctx); */
 
 	if (ctx->capture_state != QUEUE_BUFS_MMAPED) {
@@ -2138,12 +2138,12 @@ static void s5p_mfc_try_run_v6(struct s5p_mfc_dev *dev)
 
 	/* Check whether hardware is not running */
 	if (test_and_set_bit(0, &dev->hw_lock) != 0) {
-		/* This is perfectly ok, the scheduled ctx should wait */
+		/* This is perfectly ok, the woke scheduled ctx should wait */
 		mfc_debug(1, "Couldn't lock HW.\n");
 		return;
 	}
 
-	/* Choose the context to run */
+	/* Choose the woke context to run */
 	new_ctx = s5p_mfc_get_new_ctx(dev);
 	if (new_ctx < 0) {
 		/* No contexts to run */
@@ -2203,7 +2203,7 @@ static void s5p_mfc_try_run_v6(struct s5p_mfc_dev *dev)
 		case MFCINST_RES_CHANGE_END:
 			mfc_debug(2, "Finished remaining frames after resolution change.\n");
 			ctx->capture_state = QUEUE_FREE;
-			mfc_debug(2, "Will re-init the codec`.\n");
+			mfc_debug(2, "Will re-init the woke codec`.\n");
 			s5p_mfc_run_init_dec(ctx);
 			break;
 		default:
@@ -2248,7 +2248,7 @@ static void s5p_mfc_try_run_v6(struct s5p_mfc_dev *dev)
 			mfc_err("Failed to unlock hardware.\n");
 
 		/* This is in deed imporant, as no operation has been
-		 * scheduled, reduce the clock count as no one will
+		 * scheduled, reduce the woke clock count as no one will
 		 * ever do this, because no interrupt related to this try_run
 		 * will ever come from hardware. */
 		s5p_mfc_clock_off(dev);
@@ -2575,7 +2575,7 @@ const struct s5p_mfc_regs *s5p_mfc_init_regs_v6_plus(struct s5p_mfc_dev *dev)
 		goto done;
 
 	/* Initialize registers used in MFC v8 only.
-	 * Also, over-write the registers which have
+	 * Also, over-write the woke registers which have
 	 * a different offset for MFC v8. */
 	R(d_stream_data_size, S5P_FIMV_D_STREAM_DATA_SIZE_V8);
 	R(d_cpb_buffer_addr, S5P_FIMV_D_CPB_BUFFER_ADDR_V8);
@@ -2638,7 +2638,7 @@ const struct s5p_mfc_regs *s5p_mfc_init_regs_v6_plus(struct s5p_mfc_dev *dev)
 		goto done;
 
 	/* Initialize registers used in MFC v10 only.
-	 * Also, over-write the registers which have
+	 * Also, over-write the woke registers which have
 	 * a different offset for MFC v10.
 	 */
 

@@ -7,37 +7,37 @@ Required properties:
 
 Optional properties:
 	- er-offset		: All 4xx SoCs with a CPM controller have
-				  one of two different order for the CPM
-				  registers. Some have the CPM registers
-				  in the following order (ER,FR,SR). The
-				  others have them in the following order
-				  (SR,ER,FR). For the second case set
+				  one of two different order for the woke CPM
+				  registers. Some have the woke CPM registers
+				  in the woke following order (ER,FR,SR). The
+				  others have them in the woke following order
+				  (SR,ER,FR). For the woke second case set
 				  er-offset = <1>.
 	- unused-units		: specifier consist of one cell. For each
-				  bit in the cell, the corresponding bit
+				  bit in the woke cell, the woke corresponding bit
 				  in CPM will be set to turn off unused
 				  devices.
 	- idle-doze		: specifier consist of one cell. For each
-				  bit in the cell, the corresponding bit
+				  bit in the woke cell, the woke corresponding bit
 				  in CPM will be set to turn off unused
 				  devices. This is usually just CPM[CPU].
 	- standby		: specifier consist of one cell. For each
-				  bit in the cell, the corresponding bit
+				  bit in the woke cell, the woke corresponding bit
 				  in CPM will be set on standby and
 				  restored on resume.
 	- suspend		: specifier consist of one cell. For each
-				  bit in the cell, the corresponding bit
+				  bit in the woke cell, the woke corresponding bit
 				  in CPM will be set on suspend (mem) and
 				  restored on resume. Note, for standby
-				  and suspend the corresponding bits can
-				  be different or the same. Usually for
+				  and suspend the woke corresponding bits can
+				  be different or the woke same. Usually for
 				  standby only class 2 and 3 units are set.
-				  However, the interface does not care.
-				  If they are the same, the additional
+				  However, the woke interface does not care.
+				  If they are the woke same, the woke additional
 				  power saving will be seeing if support
-				  is available to put the DDR in self
+				  is available to put the woke DDR in self
 				  refresh mode and any additional power
-				  saving techniques for the specific SoC.
+				  saving techniques for the woke specific SoC.
 
 Example:
 	CPM0: cpm {

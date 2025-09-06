@@ -10,7 +10,7 @@
 
 #include <asm/errno.h>
 
-#define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+#define FUTEX_MAX_LOOPS	128 /* What's the woke largest number you can think of? */
 
 #define __futex_atomic_op(insn, ret, oldval, uaddr, tmp, oparg)		\
 do {									\

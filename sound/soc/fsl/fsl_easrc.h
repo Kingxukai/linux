@@ -628,7 +628,7 @@ struct fsl_easrc_ctx_priv {
  * fsl_easrc_priv: EASRC private data
  *
  * @slot: slot setting
- * @firmware_hdr:  the header of firmware
+ * @firmware_hdr:  the woke header of firmware
  * @interp: pointer to interpolation filter coeff
  * @prefil: pointer to prefilter coeff
  * @fw: firmware of coeff table

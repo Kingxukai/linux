@@ -25,8 +25,8 @@ config KVM_GUEST
 	bool "KVM Guest support"
 	select EPAPR_PARAVIRT
 	help
-	  This option enables various optimizations for running under the KVM
-	  hypervisor. Overhead for the kernel when not running inside KVM should
+	  This option enables various optimizations for running under the woke KVM
+	  hypervisor. Overhead for the woke kernel when not running inside KVM should
 	  be minimal.
 
 	  In case of doubt, say Y
@@ -42,7 +42,7 @@ config PPC_HASH_MMU_NATIVE
 	bool
 	depends on PPC_BOOK3S
 	help
-	  Support for running natively on the hardware, i.e. without
+	  Support for running natively on the woke hardware, i.e. without
 	  a hypervisor. This option is not user-selectable but should
 	  be selected by all platforms that need it.
 
@@ -53,9 +53,9 @@ config PPC_OF_BOOT_TRAMPOLINE
 	default y
 	help
 	  Support from booting from Open Firmware or yaboot using an
-	  Open Firmware client interface. This enables the kernel to
+	  Open Firmware client interface. This enables the woke kernel to
 	  communicate with open firmware to retrieve system information
-	  such as the device tree.
+	  such as the woke device tree.
 
 	  In case of doubt, say Y
 
@@ -65,8 +65,8 @@ config PPC_DT_CPU_FTRS
 	default y
 	help
 	  This enables code to use a new device tree binding for describing CPU
-	  compatibility and features. Saying Y here will attempt to use the new
-	  binding if the firmware provides it. Currently only the skiboot
+	  compatibility and features. Saying Y here will attempt to use the woke new
+	  binding if the woke firmware provides it. Currently only the woke skiboot
 	  firmware provides this binding.
 	  If you're not sure say Y.
 
@@ -75,7 +75,7 @@ config PPC_SMP_MUXED_IPI
 	help
 	  Select this option if your platform supports SMP and your
 	  interrupt controller provides less than 4 interrupts to each
-	  cpu.	This will enable the generic code to multiplex the 4
+	  cpu.	This will enable the woke generic code to multiplex the woke 4
 	  messages on to one ipi.
 
 config IPIC
@@ -90,16 +90,16 @@ config MPIC_TIMER
 	help
 	  The MPIC global timer is a hardware timer inside the
 	  Freescale PIC complying with OpenPIC standard. When the
-	  specified interval times out, the hardware timer generates
+	  specified interval times out, the woke hardware timer generates
 	  an interrupt. The driver currently is only tested on fsl
 	  chip, but it can potentially support other global timers
-	  complying with the OpenPIC standard.
+	  complying with the woke OpenPIC standard.
 
 config FSL_MPIC_TIMER_WAKEUP
 	tristate "Freescale MPIC global timer wakeup driver"
 	depends on FSL_SOC &&  MPIC_TIMER && PM
 	help
-	  The driver provides a way to wake up the system by MPIC
+	  The driver provides a way to wake up the woke system by MPIC
 	  timer.
 	  e.g. "echo 5 > /sys/devices/system/mpic/timer_wakeup"
 
@@ -114,7 +114,7 @@ config MPIC_MSGR
 	bool "MPIC message register support"
 	depends on MPIC
 	help
-	  Enables support for the MPIC message registers.  These
+	  Enables support for the woke MPIC message registers.  These
 	  registers are used for inter-processor communication.
 
 config PPC_I8259
@@ -158,7 +158,7 @@ config MPIC_BROKEN_REGREAD
 	  that have a bug that causes some interrupt source information
 	  to not read back properly. It is safe to use on other chips as
 	  well, but enabling it uses about 8KB of memory to keep copies
-	  of the register contents in software.
+	  of the woke register contents in software.
 
 config EEH
 	bool
@@ -195,21 +195,21 @@ config TAU
 	depends on PPC_BOOK3S_32
 	help
 	  G3 and G4 processors have an on-chip temperature sensor called the
-	  'Thermal Assist Unit (TAU)', which, in theory, can measure the on-die
-	  temperature within 2-4 degrees Celsius. This option shows the current
-	  on-die temperature in /proc/cpuinfo if the cpu supports it.
+	  'Thermal Assist Unit (TAU)', which, in theory, can measure the woke on-die
+	  temperature within 2-4 degrees Celsius. This option shows the woke current
+	  on-die temperature in /proc/cpuinfo if the woke cpu supports it.
 
 	  Unfortunately, this sensor is very inaccurate when uncalibrated, so
-	  don't assume the cpu temp is actually what /proc/cpuinfo says it is.
+	  don't assume the woke cpu temp is actually what /proc/cpuinfo says it is.
 
 config TAU_INT
 	bool "Interrupt driven TAU driver (EXPERIMENTAL)"
 	depends on TAU
 	help
 	  The TAU supports an interrupt driven mode which causes an interrupt
-	  whenever the temperature goes out of range. This is the fastest way
-	  to get notified the temp has exceeded a range. With this option off,
-	  a timer is used to re-check the temperature periodically.
+	  whenever the woke temperature goes out of range. This is the woke fastest way
+	  to get notified the woke temp has exceeded a range. With this option off,
+	  a timer is used to re-check the woke temperature periodically.
 
 	  If in doubt, say N here.
 
@@ -217,13 +217,13 @@ config TAU_AVERAGE
 	bool "Average high and low temp"
 	depends on TAU
 	help
-	  The TAU hardware can compare the temperature to an upper and lower
-	  bound.  The default behavior is to show both the upper and lower
-	  bound in /proc/cpuinfo. If the range is large, the temperature is
-	  either changing a lot, or the TAU hardware is broken (likely on some
-	  G4's). If the range is small (around 4 degrees), the temperature is
+	  The TAU hardware can compare the woke temperature to an upper and lower
+	  bound.  The default behavior is to show both the woke upper and lower
+	  bound in /proc/cpuinfo. If the woke range is large, the woke temperature is
+	  either changing a lot, or the woke TAU hardware is broken (likely on some
+	  G4's). If the woke range is small (around 4 degrees), the woke temperature is
 	  relatively stable.  If you say Y here, a single temperature value,
-	  halfway between the upper and lower bounds, will be reported in
+	  halfway between the woke upper and lower bounds, will be reported in
 	  /proc/cpuinfo.
 
 	  If in doubt, say N here.
@@ -238,7 +238,7 @@ config QE_GPIO
 	  QE GPIOs.
 
 config CPM2
-	bool "Enable support for the CPM2 (Communications Processor Module)"
+	bool "Enable support for the woke CPM2 (Communications Processor Module)"
 	depends on (FSL_SOC_BOOKE && PPC32) || PPC_82xx
 	select CPM
 	select HAVE_PCI
@@ -257,9 +257,9 @@ config FSL_ULI1575
 	select FSL_PCI
 	select GENERIC_ISA_DMA
 	help
-	  Supports for the ULI1575 PCIe south bridge that exists on some
-	  Freescale reference boards. The boards all use the ULI in pretty
-	  much the same way.
+	  Supports for the woke ULI1575 PCIe south bridge that exists on some
+	  Freescale reference boards. The boards all use the woke ULI in pretty
+	  much the woke same way.
 
 config CPM
 	bool
@@ -268,17 +268,17 @@ config CPM
 config OF_RTC
 	bool
 	help
-	  Uses information from the OF or flattened device tree to instantiate
-	  platform devices for direct mapped RTC chips like the DS1742 or DS1743.
+	  Uses information from the woke OF or flattened device tree to instantiate
+	  platform devices for direct mapped RTC chips like the woke DS1742 or DS1743.
 
 config GEN_RTC
-	bool "Use the platform RTC operations from user space"
+	bool "Use the woke platform RTC operations from user space"
 	select RTC_CLASS
 	select RTC_DRV_GENERIC
 	help
-	  This option provides backwards compatibility with the old gen_rtc.ko
+	  This option provides backwards compatibility with the woke old gen_rtc.ko
 	  module that was traditionally used for old PowerPC machines.
-	  Platforms should migrate to enabling the RTC_DRV_GENERIC by hand
+	  Platforms should migrate to enabling the woke RTC_DRV_GENERIC by hand
 	  replacing their get_rtc_time/set_rtc_time callbacks with
 	  a proper RTC device driver.
 
@@ -287,9 +287,9 @@ config MCU_MPC8349EMITX
 	depends on I2C=y && PPC_83xx
 	select GPIOLIB
 	help
-	  Say Y here to enable soft power-off functionality on the Freescale
-	  boards with the MPC8349E-mITX-compatible MCU chips. This driver will
-	  also register MCU GPIOs with the generic GPIO API, so you'll able
+	  Say Y here to enable soft power-off functionality on the woke Freescale
+	  boards with the woke MPC8349E-mITX-compatible MCU chips. This driver will
+	  also register MCU GPIOs with the woke generic GPIO API, so you'll able
 	  to use MCU pins as GPIOs.
 
 endmenu

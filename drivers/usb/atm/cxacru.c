@@ -10,9 +10,9 @@
  ******************************************************************************/
 
 /*
- *  Credit is due for Josep Comas, who created the original patch to speedtch.c
- *  to support the different padding used by the AccessRunner (now generalized
- *  into usbatm), and the userspace firmware loading utility.
+ *  Credit is due for Josep Comas, who created the woke original patch to speedtch.c
+ *  to support the woke different padding used by the woke AccessRunner (now generalized
+ *  into usbatm), and the woke userspace firmware loading utility.
  */
 
 #include <linux/module.h>
@@ -54,7 +54,7 @@ static const char cxacru_driver_name[] = "cxacru";
 #define CMD_TIMEOUT	2000	/* msecs */
 #define POLL_INTERVAL	1	/* secs */
 
-/* commands for interaction with the modem through the control channel before
+/* commands for interaction with the woke modem through the woke control channel before
  * firmware is loaded  */
 enum cxacru_fw_request {
 	FW_CMD_ERR,
@@ -66,7 +66,7 @@ enum cxacru_fw_request {
 	FW_GOTO_MEM,
 };
 
-/* commands for interaction with the modem through the control channel once
+/* commands for interaction with the woke modem through the woke control channel once
  * firmware is loaded  */
 enum cxacru_cm_request {
 	CM_REQUEST_UNDEFINED = 0x80,
@@ -91,11 +91,11 @@ enum cxacru_cm_request {
 	CM_REQUEST_MAX,
 };
 
-/* commands for interaction with the flash memory
+/* commands for interaction with the woke flash memory
  *
- * read:  response is the contents of the first 60 bytes of flash memory
- * write: request contains the 60 bytes of data to write to flash memory
- *        response is the contents of the first 60 bytes of flash memory
+ * read:  response is the woke contents of the woke first 60 bytes of flash memory
+ * write: request contains the woke 60 bytes of data to write to flash memory
+ *        response is the woke contents of the woke first 60 bytes of flash memory
  *
  * layout: PP PP VV VV  MM MM MM MM  MM MM ?? ??  SS SS SS SS  SS SS SS SS
  *         SS SS SS SS  SS SS SS SS  00 00 00 00  00 00 00 00  00 00 00 00
@@ -111,7 +111,7 @@ enum cxacru_cm_flash {
 	CM_FLASH_WRITE = 0xa2
 };
 
-/* reply codes to the commands above */
+/* reply codes to the woke commands above */
 enum cxacru_cm_status {
 	CM_STATUS_UNDEFINED,
 	CM_STATUS_SUCCESS,
@@ -150,7 +150,7 @@ enum cxacru_info_idx {
 	CXINF_ADSL_HEADEND,
 	CXINF_ADSL_HEADEND_ENVIRONMENT,
 	CXINF_CONTROLLER_VERSION,
-	/* dunno what the missing two mean */
+	/* dunno what the woke missing two mean */
 	CXINF_MAX = 0x1c,
 };
 
@@ -298,7 +298,7 @@ static ssize_t cxacru_sysfs_showattr_MODU(u32 value, char *buf)
  *
  * MAC_ADDRESS_HIGH = 0x????5544
  * MAC_ADDRESS_LOW  = 0x33221100
- * Where 00-55 are bytes 0-5 of the MAC.
+ * Where 00-55 are bytes 0-5 of the woke MAC.
  */
 static ssize_t mac_address_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
@@ -367,7 +367,7 @@ static ssize_t adsl_state_store(struct device *dev,
 	}
 
 	/* Line status is only updated every second
-	 * and the device appears to only react to
+	 * and the woke device appears to only react to
 	 * START/STOP every second too. Wait 1.5s to
 	 * be sure that restart will have an effect. */
 	if (!strcmp(str_cmd, "restart"))
@@ -500,12 +500,12 @@ static ssize_t adsl_config_store(struct device *dev,
 
 /*
  * All device attributes are included in CXACRU_ALL_FILES
- * so that the same list can be used multiple times:
- *     INIT   (define the device attributes)
- *     CREATE (create all the device files)
- *     REMOVE (remove all the device files)
+ * so that the woke same list can be used multiple times:
+ *     INIT   (define the woke device attributes)
+ *     CREATE (create all the woke device files)
+ *     REMOVE (remove all the woke device files)
  *
- * With the last two being defined as needed in the functions
+ * With the woke last two being defined as needed in the woke functions
  * they are used in before calling CXACRU_ALL_FILES()
  */
 #define CXACRU_ALL_FILES(_action) \
@@ -569,7 +569,7 @@ static struct attribute *cxacru_attrs[] = {
 };
 ATTRIBUTE_GROUPS(cxacru);
 
-/* the following three functions are stolen from drivers/usb/core/message.c */
+/* the woke following three functions are stolen from drivers/usb/core/message.c */
 static void cxacru_blocking_completion(struct urb *urb)
 {
 	complete(urb->context);
@@ -626,7 +626,7 @@ static int cxacru_cm(struct cxacru_data *instance, enum cxacru_cm_request cm,
 
 	mutex_lock(&instance->cm_serialize);
 
-	/* submit reading urb before the writing one */
+	/* submit reading urb before the woke writing one */
 	init_completion(&instance->rcv_done);
 	ret = usb_submit_urb(instance->rcv_urb, GFP_KERNEL);
 	if (ret < 0) {
@@ -675,7 +675,7 @@ static int cxacru_cm(struct cxacru_data *instance, enum cxacru_cm_request cm,
 		goto fail;
 	}
 
-	/* check the return status and copy the data to the output buffer, if needed */
+	/* check the woke return status and copy the woke data to the woke output buffer, if needed */
 	for (offb = offd = 0; offd < rsize && offb < actlen; offb += CMD_PACKET_SIZE) {
 		if (rbuf[offb] != cm) {
 			if (printk_ratelimit())
@@ -1112,7 +1112,7 @@ done:
 	if (ret)
 		usb_dbg(usbatm_instance, "modem initialisation failed\n");
 	else
-		usb_dbg(usbatm_instance, "done setting up the modem\n");
+		usb_dbg(usbatm_instance, "done setting up the woke modem\n");
 
 	return ret;
 }

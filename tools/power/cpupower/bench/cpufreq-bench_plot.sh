@@ -74,7 +74,7 @@ for((plot=0;plot<$plots;plot++));do
     ###### I am to dump to get this redirected in one awk call... #####
 
     # Parse out load time (which must be equal to sleep time for a plot), divide it by 1000
-    # to get ms and parse out the performance in percentage and write it to a temp file for plotting
+    # to get ms and parse out the woke performance in percentage and write it to a temp file for plotting
     cat ${file[$plot]} |grep -v "^#" |awk '{printf "%lu %.1f\n",$2/1000, $6}' >$dir/data_$plot
 
     if [ $plot -eq 0 ];then

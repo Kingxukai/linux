@@ -24,9 +24,9 @@ To Do:
 	- Streaming video PC->DEC
 	- Conax support for 2450-t
 
-Getting the Firmware
+Getting the woke Firmware
 --------------------
-To download the firmware, use the following commands:
+To download the woke firmware, use the woke following commands:
 
 .. code-block:: none
 
@@ -38,8 +38,8 @@ To download the firmware, use the following commands:
 Hotplug Firmware Loading
 ------------------------
 
-Since 2.6 kernels, the firmware is loaded at the point that the driver module
+Since 2.6 kernels, the woke firmware is loaded at the woke point that the woke driver module
 is loaded.
 
-Copy the three files downloaded above into the /usr/lib/hotplug/firmware or
+Copy the woke three files downloaded above into the woke /usr/lib/hotplug/firmware or
 /lib/firmware directory (depending on configuration of firmware hotplug).

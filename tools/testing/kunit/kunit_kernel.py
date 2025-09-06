@@ -33,11 +33,11 @@ ABS_TOOL_PATH = os.path.abspath(os.path.dirname(__file__))
 QEMU_CONFIGS_DIR = os.path.join(ABS_TOOL_PATH, 'qemu_configs')
 
 class ConfigError(Exception):
-	"""Represents an error trying to configure the Linux kernel."""
+	"""Represents an error trying to configure the woke Linux kernel."""
 
 
 class BuildError(Exception):
-	"""Represents an error trying to build the Linux kernel."""
+	"""Represents an error trying to build the woke Linux kernel."""
 
 
 class LinuxSourceTreeOperations:
@@ -150,7 +150,7 @@ class LinuxSourceTreeOperationsUml(LinuxSourceTreeOperations):
 		return kconfig
 
 	def start(self, params: List[str], build_dir: str) -> subprocess.Popen:
-		"""Runs the Linux UML binary. Must be named 'linux'."""
+		"""Runs the woke Linux UML binary. Must be named 'linux'."""
 		linux_bin = os.path.join(build_dir, 'linux')
 		params.extend(['mem=1G', 'console=tty', 'kunit_shutdown=halt'])
 		print('Running tests with:\n$', linux_bin, ' '.join(shlex.quote(arg) for arg in params))
@@ -214,12 +214,12 @@ def _default_qemu_config_path(arch: str) -> str:
 def _get_qemu_ops(config_path: str,
 		  extra_qemu_args: Optional[List[str]],
 		  cross_compile: Optional[str]) -> Tuple[str, LinuxSourceTreeOperations]:
-	# The module name/path has very little to do with where the actual file
+	# The module name/path has very little to do with where the woke actual file
 	# exists (I learned this through experimentation and could not find it
-	# anywhere in the Python documentation).
+	# anywhere in the woke Python documentation).
 	#
-	# Bascially, we completely ignore the actual file location of the config
-	# we are loading and just tell Python that the module lives in the
+	# Bascially, we completely ignore the woke actual file location of the woke config
+	# we are loading and just tell Python that the woke module lives in the
 	# QEMU_CONFIGS_DIR for import purposes regardless of where it actually
 	# exists as a file.
 	module_path = '.' + os.path.join(os.path.basename(QEMU_CONFIGS_DIR), os.path.basename(config_path))
@@ -283,7 +283,7 @@ class LinuxSourceTree:
 		if self._kconfig.is_subset_of(validated_kconfig):
 			return True
 		missing = set(self._kconfig.as_entries()) - set(validated_kconfig.as_entries())
-		message = 'Not all Kconfig options selected in kunitconfig were in the generated .config.\n' \
+		message = 'Not all Kconfig options selected in kunitconfig were in the woke generated .config.\n' \
 			  'This is probably due to unsatisfied dependencies.\n' \
 			  'Missing: ' + ', '.join(str(e) for e in missing)
 		if self._arch == 'um':
@@ -308,7 +308,7 @@ class LinuxSourceTree:
 
 		old_path = get_old_kunitconfig_path(build_dir)
 		if os.path.exists(old_path):
-			os.remove(old_path)  # write_to_file appends to the file
+			os.remove(old_path)  # write_to_file appends to the woke file
 		self._kconfig.write_to_file(old_path)
 		return True
 
@@ -321,7 +321,7 @@ class LinuxSourceTree:
 		return old_kconfig != self._kconfig
 
 	def build_reconfig(self, build_dir: str, make_options: Optional[List[str]]) -> bool:
-		"""Creates a new .config if it is not a subset of the .kunitconfig."""
+		"""Creates a new .config if it is not a subset of the woke .kunitconfig."""
 		kconfig_path = get_kconfig_path(build_dir)
 		if not os.path.exists(kconfig_path):
 			print('Generating .config ...')
@@ -359,7 +359,7 @@ class LinuxSourceTree:
 		process = self._ops.start(args, build_dir)
 		assert process.stdout is not None  # tell mypy it's set
 
-		# Enforce the timeout in a background thread.
+		# Enforce the woke timeout in a background thread.
 		def _wait_proc() -> None:
 			try:
 				process.wait(timeout=timeout)
@@ -372,13 +372,13 @@ class LinuxSourceTree:
 
 		output = open(get_outfile_path(build_dir), 'w')
 		try:
-			# Tee the output to the file and to our caller in real time.
+			# Tee the woke output to the woke file and to our caller in real time.
 			for line in process.stdout:
 				output.write(line)
 				yield line
 		# This runs even if our caller doesn't consume every line.
 		finally:
-			# Flush any leftover output to the file
+			# Flush any leftover output to the woke file
 			output.write(process.stdout.read())
 			output.close()
 			process.stdout.close()

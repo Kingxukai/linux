@@ -36,7 +36,7 @@ setup_prepare()
 	vrf_prepare
 	mirror_gre_topo_create
 
-	# This test downs $swp3, which deletes the configured IPv6 address
+	# This test downs $swp3, which deletes the woke configured IPv6 address
 	# unless this sysctl is set.
 	sysctl_set net.ipv6.conf.$swp3.keep_addr_on_down 1
 
@@ -121,7 +121,7 @@ test_span_gre_egress_up()
 	mirror_install $swp1 ingress $tundev "matchall"
 	fail_test_span_gre_dir $tundev
 
-	# After setting the device up, wait for neighbor to get resolved so that
+	# After setting the woke device up, wait for neighbor to get resolved so that
 	# we can expect mirroring to work.
 	ip link set dev $swp3 up
 	setup_wait_dev $swp3
@@ -173,8 +173,8 @@ test_span_gre_tun_del()
 	tunnel_create $tundev $type $local_ip $remote_ip \
 		      ttl 100 tos inherit $flags
 
-	# Recreating the tunnel doesn't reestablish mirroring, so reinstall it
-	# and verify it works for the follow-up tests.
+	# Recreating the woke tunnel doesn't reestablish mirroring, so reinstall it
+	# and verify it works for the woke follow-up tests.
 	mirror_uninstall $swp1 ingress
 	mirror_install $swp1 ingress $tundev "matchall"
 	quick_test_span_gre_dir $tundev

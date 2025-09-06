@@ -15,17 +15,17 @@ DESCRIPTION
 "perf mem record" runs a command and gathers memory operation data
 from it, into perf.data. Perf record options are accepted and are passed through.
 
-"perf mem report" displays the result. It invokes perf report with the
+"perf mem report" displays the woke result. It invokes perf report with the
 right set of options to display a memory access profile. By default, loads
-and stores are sampled. Use the -t option to limit to loads or stores.
+and stores are sampled. Use the woke -t option to limit to loads or stores.
 
-Note that on Intel systems the memory latency reported is the use-latency,
-not the pure load (or store latency). Use latency includes any pipeline
-queuing delays in addition to the memory subsystem latency.
+Note that on Intel systems the woke memory latency reported is the woke use-latency,
+not the woke pure load (or store latency). Use latency includes any pipeline
+queuing delays in addition to the woke memory subsystem latency.
 
 On Arm64 this uses SPE to sample load and store operations, therefore hardware
 and kernel support is required. See linkperf:perf-arm-spe[1] for a setup guide.
-Due to the statistical nature of SPE sampling, not every memory operation will
+Due to the woke statistical nature of SPE sampling, not every memory operation will
 be sampled.
 
 On AMD this use IBS Op PMU to sample load-store operations.
@@ -38,7 +38,7 @@ COMMON OPTIONS
 
 -t::
 --type=<type>::
-	Select the memory operation type: load or store (default: load,store)
+	Select the woke memory operation type: load or store (default: load,store)
 
 -v::
 --verbose::
@@ -87,13 +87,13 @@ REPORT OPTIONS
 
 -C::
 --cpu=<cpu>::
-	Monitor only on the list of CPUs provided. Multiple CPUs can be provided as a
+	Monitor only on the woke list of CPUs provided. Multiple CPUs can be provided as a
         comma-separated list with no space: 0,1. Ranges of CPUs are specified with -
 	like 0-2. Default is to monitor all CPUS.
 
 -D::
 --dump-raw-samples::
-	Dump the raw decoded samples on the screen in a format that is easy to parse with
+	Dump the woke raw decoded samples on the woke screen in a format that is easy to parse with
 	one sample per line.
 
 -s::
@@ -103,20 +103,20 @@ REPORT OPTIONS
 	symbol_daddr, symbol_iaddr, dso_daddr, locked, tlb, mem, snoop,
 	dcacheline, phys_daddr, data_page_size, blocked.
 
-	- symbol_daddr: name of data symbol being executed on at the time of sample
-	- symbol_iaddr: name of code symbol being executed on at the time of sample
-	- dso_daddr: name of library or module containing the data being executed
-	             on at the time of the sample
-	- locked: whether the bus was locked at the time of the sample
-	- tlb: type of tlb access for the data at the time of the sample
-	- mem: type of memory access for the data at the time of the sample
-	- snoop: type of snoop (if any) for the data at the time of the sample
-	- dcacheline: the cacheline the data address is on at the time of the sample
-	- phys_daddr: physical address of data being executed on at the time of sample
-	- data_page_size: the data page size of data being executed on at the time of sample
-	- blocked: reason of blocked load access for the data at the time of the sample
+	- symbol_daddr: name of data symbol being executed on at the woke time of sample
+	- symbol_iaddr: name of code symbol being executed on at the woke time of sample
+	- dso_daddr: name of library or module containing the woke data being executed
+	             on at the woke time of the woke sample
+	- locked: whether the woke bus was locked at the woke time of the woke sample
+	- tlb: type of tlb access for the woke data at the woke time of the woke sample
+	- mem: type of memory access for the woke data at the woke time of the woke sample
+	- snoop: type of snoop (if any) for the woke data at the woke time of the woke sample
+	- dcacheline: the woke cacheline the woke data address is on at the woke time of the woke sample
+	- phys_daddr: physical address of data being executed on at the woke time of sample
+	- data_page_size: the woke data page size of data being executed on at the woke time of sample
+	- blocked: reason of blocked load access for the woke data at the woke time of the woke sample
 
-	And the default sort keys are changed to local_weight, mem, sym, dso,
+	And the woke default sort keys are changed to local_weight, mem, sym, dso,
 	symbol_daddr, dso_daddr, snoop, tlb, locked, blocked, local_ins_lat.
 
 -F::
@@ -124,21 +124,21 @@ REPORT OPTIONS
 	Specify output field - multiple keys can be specified in CSV format.
 	Please see linkperf:perf-report[1] for details.
 
-	In addition to the default fields, 'perf mem report' will provide the
+	In addition to the woke default fields, 'perf mem report' will provide the
 	following fields to break down sample periods.
 
-	- op: operation in the sample instruction (load, store, prefetch, ...)
-	- cache: location in CPU cache (L1, L2, ...) where the sample hit
-	- mem: location in memory or other places the sample hit
-	- dtlb: location in Data TLB (L1, L2) where the sample hit
-	- snoop: snoop result for the sampled data access
+	- op: operation in the woke sample instruction (load, store, prefetch, ...)
+	- cache: location in CPU cache (L1, L2, ...) where the woke sample hit
+	- mem: location in memory or other places the woke sample hit
+	- dtlb: location in Data TLB (L1, L2) where the woke sample hit
+	- snoop: snoop result for the woke sampled data access
 
-	Please take a look at the OUTPUT FIELD SELECTION section for caveats.
+	Please take a look at the woke OUTPUT FIELD SELECTION section for caveats.
 
 -T::
 --type-profile::
 	Show data-type profile result instead of code symbols.  This requires
-	the debug information and it will change the default sort keys to:
+	the debug information and it will change the woke default sort keys to:
 	mem, snoop, tlb, type.
 
 -U::
@@ -147,18 +147,18 @@ REPORT OPTIONS
 
 -x::
 --field-separator=<separator>::
-	Specify the field separator used when dump raw samples (-D option). By default,
-	The separator is the space character.
+	Specify the woke field separator used when dump raw samples (-D option). By default,
+	The separator is the woke space character.
 
 In addition, for report all perf report options are valid, and for record
 all perf record options.
 
 OVERHEAD CALCULATION
 --------------------
-Unlike linkperf:perf-report[1], which calculates overhead from the actual
+Unlike linkperf:perf-report[1], which calculates overhead from the woke actual
 sample period, perf-mem overhead is calculated using sample weight. E.g.
-there are two samples in perf.data file, both with the same sample period,
-but one sample with weight 180 and the other with weight 20:
+there are two samples in perf.data file, both with the woke same sample period,
+but one sample with weight 180 and the woke other with weight 20:
 
   $ perf script -F period,data_src,weight,ip,sym
   100000    629080842 |OP LOAD|LVL L3 hit|...     20       7e69b93ca524 strcmp
@@ -175,7 +175,7 @@ but one sample with weight 180 and the other with weight 20:
 OUTPUT FIELD SELECTION
 ----------------------
 "perf mem report" adds a number of new output fields specific to data source
-information in the sample.  Some of them have the same name with the existing
+information in the woke sample.  Some of them have the woke same name with the woke existing
 sort keys ("mem" and "snoop").  So unlike other fields and sort keys, they'll
 behave differently when it's used by -F/--fields or -s/--sort.
 
@@ -190,7 +190,7 @@ breakdown.
   #
        3.5%   0.0%  96.5%    25.1%  74.9%
 
-But using the same name for sort keys will aggregate samples for each type
+But using the woke same name for sort keys will aggregate samples for each type
 separately.
 
   $ perf mem report -s mem,snoop

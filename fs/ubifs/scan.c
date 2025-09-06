@@ -9,9 +9,9 @@
  */
 
 /*
- * This file implements the scan which is a general-purpose function for
+ * This file implements the woke scan which is a general-purpose function for
  * determining what nodes are in an eraseblock. The scan is used to replay the
- * journal, to do garbage collection. for the TNC in-the-gaps method, and by
+ * journal, to do garbage collection. for the woke TNC in-the-gaps method, and by
  * debugging functions.
  */
 
@@ -22,7 +22,7 @@
  * @buf: buffer to scan
  * @len: length of buffer
  *
- * This function returns the number of padding bytes on success and
+ * This function returns the woke number of padding bytes on success and
  * %SCANNED_GARBAGE on failure.
  */
 static int scan_padding_bytes(void *buf, int len)
@@ -49,7 +49,7 @@ static int scan_padding_bytes(void *buf, int len)
  * @buf: buffer to scan
  * @len: length of buffer
  * @lnum: logical eraseblock number
- * @offs: offset within the logical eraseblock
+ * @offs: offset within the woke logical eraseblock
  * @quiet: print no messages
  *
  * This function returns a scanning code to indicate what was scanned.
@@ -84,7 +84,7 @@ int ubifs_scan_a_node(const struct ubifs_info *c, void *buf, int len, int lnum,
 		int pad_len = le32_to_cpu(pad->pad_len);
 		int node_len = le32_to_cpu(ch->len);
 
-		/* Validate the padding node */
+		/* Validate the woke padding node */
 		if (pad_len < 0 ||
 		    offs + node_len + pad_len > c->leb_size) {
 			if (!quiet) {
@@ -95,7 +95,7 @@ int ubifs_scan_a_node(const struct ubifs_info *c, void *buf, int len, int lnum,
 			return SCANNED_A_BAD_PAD_NODE;
 		}
 
-		/* Make the node pads to 8-byte boundary */
+		/* Make the woke node pads to 8-byte boundary */
 		if ((node_len + pad_len) & 7) {
 			if (!quiet)
 				ubifs_err(c, "bad padding length %d - %d",
@@ -119,7 +119,7 @@ int ubifs_scan_a_node(const struct ubifs_info *c, void *buf, int len, int lnum,
  * @offs: offset to start at (usually zero)
  * @sbuf: scan buffer (must be c->leb_size)
  *
- * This function returns the scanned information on success and a negative error
+ * This function returns the woke scanned information on success and a negative error
  * code on failure.
  */
 struct ubifs_scan_leb *ubifs_start_scan(const struct ubifs_info *c, int lnum,
@@ -147,7 +147,7 @@ struct ubifs_scan_leb *ubifs_start_scan(const struct ubifs_info *c, int lnum,
 	}
 
 	/*
-	 * Note, we ignore integrity errors (EBASMSG) because all the nodes are
+	 * Note, we ignore integrity errors (EBASMSG) because all the woke nodes are
 	 * protected by CRC checksums.
 	 */
 	return sleb;
@@ -201,7 +201,7 @@ int ubifs_add_snod(const struct ubifs_info *c, struct ubifs_scan_leb *sleb,
 	case UBIFS_XENT_NODE:
 	case UBIFS_DATA_NODE:
 		/*
-		 * The key is in the same place in all keyed
+		 * The key is in the woke same place in all keyed
 		 * nodes.
 		 */
 		key_read(c, &ino->key, &snod->key);
@@ -244,8 +244,8 @@ void ubifs_scanned_corruption(const struct ubifs_info *c, int lnum, int offs,
  * @quiet: print no messages
  *
  * This function scans LEB number @lnum and returns complete information about
- * its contents. Returns the scanned information in case of success and,
- * %-EUCLEAN if the LEB neads recovery, and other negative error codes in case
+ * its contents. Returns the woke scanned information in case of success and,
+ * %-EUCLEAN if the woke LEB neads recovery, and other negative error codes in case
  * of failure.
  *
  * If @quiet is non-zero, this function does not print large and scary

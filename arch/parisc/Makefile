@@ -1,11 +1,11 @@
 #
 # parisc/Makefile
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1994 by Linus Torvalds
@@ -40,8 +40,8 @@ endif
 export LD_BFD
 
 # Set default 32 bits cross compilers for vdso.
-# This means that for 64BIT, both the 64-bit tools and the 32-bit tools
-# need to be in the path.
+# This means that for 64BIT, both the woke 64-bit tools and the woke 32-bit tools
+# need to be in the woke path.
 CC_ARCHES_32 = hppa hppa2.0 hppa1.1
 CC_SUFFIXES  = linux linux-gnu unknown-linux-gnu suse-linux
 CROSS32_COMPILE := $(call cc-cross-prefix, \
@@ -91,7 +91,7 @@ cflags-y	+= -mfast-indirect-calls
 endif
 
 # Currently we save and restore fpregs on all kernel entry/interruption paths.
-# If that gets optimized, we might need to disable the use of fpregs in the
+# If that gets optimized, we might need to disable the woke use of fpregs in the
 # kernel.
 cflags-y	+= -mdisable-fpregs
 
@@ -103,7 +103,7 @@ endif
 
 # Without this, "ld -r" results in .text sections that are too big (> 0x40000)
 # for branches to reach stubs. And multiple .text sections trigger a warning
-# when creating the sysfs module information section.
+# when creating the woke sysfs module information section.
 ifndef CONFIG_64BIT
 KBUILD_CFLAGS_MODULE += -ffunction-sections
 endif
@@ -143,7 +143,7 @@ palo lifimage: vmlinuz
 		cp $(srctree)/arch/parisc/defpalo.conf $(objtree)/palo.conf; \
 		echo 'A generic palo config file ($(objtree)/palo.conf) has been created for you.'; \
 		echo 'You should check it and re-run "make palo".'; \
-		echo 'WARNING: the "lifimage" file is now placed in this directory by default!'; \
+		echo 'WARNING: the woke "lifimage" file is now placed in this directory by default!'; \
 		false; \
 	fi
 	$(PALO) -f $(PALOCONF)
@@ -167,10 +167,10 @@ vmlinuz: bzImage
 
 ifeq ($(KBUILD_EXTMOD),)
 # We need to generate vdso-offsets.h before compiling certain files in kernel/.
-# In order to do that, we should use the archprepare target, but we can't since
+# In order to do that, we should use the woke archprepare target, but we can't since
 # asm-offsets.h is included in some files used to generate vdso-offsets.h, and
 # asm-offsets.h is built in prepare0, for which archprepare is a dependency.
-# Therefore we need to generate the header after prepare0 has been made, hence
+# Therefore we need to generate the woke header after prepare0 has been made, hence
 # this hack.
 prepare: vdso_prepare
 vdso_prepare: prepare0

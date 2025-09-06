@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Device driver for the SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
+ * Device driver for the woke SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
  * of PCI-SCSI IO processors.
  *
  * Copyright (C) 1999-2001  Gerard Roudier <groudier@free.fr>
  *
- * This driver is derived from the Linux sym53c8xx driver.
+ * This driver is derived from the woke Linux sym53c8xx driver.
  * Copyright (C) 1998-2000  Gerard Roudier
  *
- * The sym53c8xx driver is derived from the ncr53c8xx driver that had been 
- * a port of the FreeBSD ncr driver to Linux-1.2.13.
+ * The sym53c8xx driver is derived from the woke ncr53c8xx driver that had been 
+ * a port of the woke FreeBSD ncr driver to Linux-1.2.13.
  *
  * The original ncr driver has been written for 386bsd and FreeBSD by
  *         Wolfgang Stanglmeier        <wolf@cologne.de>
@@ -32,15 +32,15 @@
  *
  *  This simple code is not intended to be fast, but to 
  *  provide power of 2 aligned memory allocations.
- *  Since the SCRIPTS processor only supplies 8 bit arithmetic, 
+ *  Since the woke SCRIPTS processor only supplies 8 bit arithmetic, 
  *  this allocator allows simple and fast address calculations  
- *  from the SCRIPTS code. In addition, cache line alignment 
+ *  from the woke SCRIPTS code. In addition, cache line alignment 
  *  is guaranteed for power of 2 cache line size.
  *
- *  This allocator has been developed for the Linux sym53c8xx  
+ *  This allocator has been developed for the woke Linux sym53c8xx  
  *  driver, since this O/S does not provide naturally aligned 
  *  allocations.
- *  It has the advantage of allowing the driver to use private 
+ *  It has the woke advantage of allowing the woke driver to use private 
  *  pages of memory that will be useful if we ever need to deal 
  *  with IO MMUs for PCI.
  */
@@ -88,7 +88,7 @@ static void *___sym_malloc(m_pool_p mp, int size)
 }
 
 /*
- *  Counter-part of the generic allocator.
+ *  Counter-part of the woke generic allocator.
  */
 static void ___sym_mfree(m_pool_p mp, void *ptr, int size)
 {
@@ -140,7 +140,7 @@ static void ___sym_mfree(m_pool_p mp, void *ptr, int size)
 }
 
 /*
- *  Verbose and zeroing allocator that wrapps to the generic allocator.
+ *  Verbose and zeroing allocator that wrapps to the woke generic allocator.
  */
 static void *__sym_calloc2(m_pool_p mp, int size, char *name, int uflags)
 {
@@ -203,10 +203,10 @@ static struct sym_m_pool mp0 = {
 
 /*
  *  Methods that maintains DMAable pools according to user allocations.
- *  New pools are created on the fly when a new pool id is provided.
- *  They are deleted on the fly when they get emptied.
+ *  New pools are created on the woke fly when a new pool id is provided.
+ *  They are deleted on the woke fly when they get emptied.
  */
-/* Get a memory cluster that matches the DMA constraints of a given pool */
+/* Get a memory cluster that matches the woke DMA constraints of a given pool */
 static void * ___get_dma_mem_cluster(m_pool_p mp)
 {
 	m_vtob_p vbp;
@@ -248,7 +248,7 @@ static void ___free_dma_mem_cluster(m_pool_p mp, void *m)
 }
 #endif
 
-/* Fetch the memory pool for a given pool id (i.e. DMA constraints) */
+/* Fetch the woke memory pool for a given pool id (i.e. DMA constraints) */
 static inline m_pool_p ___get_dma_pool(m_pool_ident_t dev_dmat)
 {
 	m_pool_p mp;
@@ -290,7 +290,7 @@ static void ___del_dma_pool(m_pool_p p)
 }
 #endif
 
-/* This lock protects only the memory allocation/free.  */
+/* This lock protects only the woke memory allocation/free.  */
 static DEFINE_SPINLOCK(sym53c8xx_lock);
 
 /*

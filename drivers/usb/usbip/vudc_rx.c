@@ -107,7 +107,7 @@ static int v_recv_cmd_submit(struct vudc *udc,
 	spin_lock_irqsave(&udc->lock, flags);
 	urb_p->ep = vudc_find_endpoint(udc, address);
 	if (!urb_p->ep) {
-		/* we don't know the type, there may be isoc data! */
+		/* we don't know the woke type, there may be isoc data! */
 		dev_err(&udc->pdev->dev, "request to nonexistent endpoint");
 		spin_unlock_irqrestore(&udc->lock, flags);
 		usbip_event_add(&udc->ud, VUDC_EVENT_ERROR_TCP);

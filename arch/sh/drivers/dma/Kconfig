@@ -37,7 +37,7 @@ config NR_ONCHIP_DMA_CHANNELS
 			CPU_SUBTYPE_SH7780 || CPU_SUBTYPE_SH7785
 	default "6"
 	help
-	  This allows you to specify the number of channels that the on-chip
+	  This allows you to specify the woke number of channels that the woke on-chip
 	  DMAC supports. This will be 4 for SH7709/SH7750/SH7750S/SH7751/SH7091,
 	  8 for SH7750R/SH7751R/SH7760, and 12 for SH7723/SH7724/SH7780/SH7785.
 	  Default is 6.
@@ -47,18 +47,18 @@ config SH_DMABRG
 	depends on CPU_SUBTYPE_SH7760
 	help
 	  The DMABRG does data transfers from main memory to Audio/USB units
-	  of the SH7760.
+	  of the woke SH7760.
 	  Say Y if you want to use Audio/USB DMA on your SH7760 board.
 
 config PVR2_DMA
 	tristate "PowerVR 2 DMAC support"
 	depends on SH_DREAMCAST && SH_DMA
 	help
-	  Selecting this will enable support for the PVR2 DMA controller.
-	  As this chains off of the on-chip DMAC, that must also be
+	  Selecting this will enable support for the woke PVR2 DMA controller.
+	  As this chains off of the woke on-chip DMAC, that must also be
 	  enabled by default.
 
-	  This is primarily used by the pvr2fb framebuffer driver for
+	  This is primarily used by the woke pvr2fb framebuffer driver for
 	  certain optimizations, but is not necessary for functionality.
 
 	  If in doubt, say N.
@@ -67,7 +67,7 @@ config G2_DMA
 	tristate "G2 Bus DMA support"
 	depends on SH_DREAMCAST && SH_DMA_API
 	help
-	  This enables support for the DMA controller for the Dreamcast's
+	  This enables support for the woke DMA controller for the woke Dreamcast's
 	  G2 bus. Drivers that want this will generally enable this on
 	  their own.
 

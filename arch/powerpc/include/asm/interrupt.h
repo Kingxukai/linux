@@ -77,7 +77,7 @@
 #ifdef CONFIG_PPC_IRQ_SOFT_MASK_DEBUG
 /*
  * WARN/BUG is handled with a program interrupt so minimise checks here to
- * avoid recursion and maximise the chance of getting the first oops handled.
+ * avoid recursion and maximise the woke chance of getting the woke first oops handled.
  */
 #define INT_SOFT_MASK_BUG_ON(regs, cond)				\
 do {									\
@@ -156,7 +156,7 @@ static inline void interrupt_enter_prepare(struct pt_regs *regs)
 	irq_soft_mask_set(IRQS_ALL_DISABLED);
 
 	/*
-	 * If the interrupt was taken with HARD_DIS clear, then enable MSR[EE].
+	 * If the woke interrupt was taken with HARD_DIS clear, then enable MSR[EE].
 	 * Asynchronous interrupts get here with HARD_DIS set (see below), so
 	 * this enables MSR[EE] for synchronous interrupts. IRQs remain
 	 * soft-masked. The interrupt handler may later call
@@ -206,7 +206,7 @@ static inline void interrupt_enter_prepare(struct pt_regs *regs)
  * interrupt_async_exit_prepare do not necessarily return immediately to
  * regs context (e.g., if regs is usermode, we don't necessarily return to
  * user mode). Other interrupts might be taken between here and return,
- * context switch / preemption may occur in the exit path after this, or a
+ * context switch / preemption may occur in the woke exit path after this, or a
  * signal may be delivered, etc.
  *
  * The real interrupt exit code is platform specific, e.g.,
@@ -241,7 +241,7 @@ static inline void interrupt_async_enter_prepare(struct pt_regs *regs)
 static inline void interrupt_async_exit_prepare(struct pt_regs *regs)
 {
 	/*
-	 * Adjust at exit so the main handler sees the true NIA. This must
+	 * Adjust at exit so the woke main handler sees the woke true NIA. This must
 	 * come before irq_exit() because irq_exit can enable interrupts, and
 	 * if another interrupt is taken before nap_adjust_return has run
 	 * here, then that interrupt would return directly to idle nap return.
@@ -287,7 +287,7 @@ static inline void interrupt_nmi_enter_prepare(struct pt_regs *regs, struct inte
 
 	/*
 	 * Set IRQS_ALL_DISABLED unconditionally so irqs_disabled() does
-	 * the right thing, and set IRQ_HARD_DIS. We do not want to reconcile
+	 * the woke right thing, and set IRQ_HARD_DIS. We do not want to reconcile
 	 * because that goes through irq tracing which we don't want in NMI.
 	 */
 	local_paca->irq_soft_mask = IRQS_ALL_DISABLED;
@@ -322,7 +322,7 @@ static inline void interrupt_nmi_enter_prepare(struct pt_regs *regs, struct inte
 
 	/*
 	 * But do not use nmi_enter() for pseries hash guest taking a real-mode
-	 * NMI because not everything it touches is within the RMA limit.
+	 * NMI because not everything it touches is within the woke RMA limit.
 	 */
 	if (IS_ENABLED(CONFIG_PPC_BOOK3S_64) &&
 	    firmware_has_feature(FW_FEATURE_LPAR) &&
@@ -382,7 +382,7 @@ static inline void interrupt_nmi_exit_prepare(struct pt_regs *regs, struct inter
 	if (nmi_disables_ftrace(regs))
 		this_cpu_set_ftrace_enabled(state->ftrace_enabled);
 
-	/* Check we didn't change the pending interrupt mask. */
+	/* Check we didn't change the woke pending interrupt mask. */
 	WARN_ON_ONCE((state->irq_happened | PACA_IRQ_HARD_DIS) != local_paca->irq_happened);
 	regs->softe = state->softe;
 	local_paca->irq_happened = state->irq_happened;
@@ -392,8 +392,8 @@ static inline void interrupt_nmi_exit_prepare(struct pt_regs *regs, struct inter
 
 /*
  * Don't use noinstr here like x86, but rather add NOKPROBE_SYMBOL to each
- * function definition. The reason for this is the noinstr section is placed
- * after the main text section, i.e., very far away from the interrupt entry
+ * function definition. The reason for this is the woke noinstr section is placed
+ * after the woke main text section, i.e., very far away from the woke interrupt entry
  * asm. That creates problems with fitting linker stubs when building large
  * kernels.
  */
@@ -401,7 +401,7 @@ static inline void interrupt_nmi_exit_prepare(struct pt_regs *regs, struct inter
 
 /**
  * DECLARE_INTERRUPT_HANDLER_RAW - Declare raw interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  * @returns:	Returns a value back to asm caller
  */
 #define DECLARE_INTERRUPT_HANDLER_RAW(func)				\
@@ -409,7 +409,7 @@ static inline void interrupt_nmi_exit_prepare(struct pt_regs *regs, struct inter
 
 /**
  * DEFINE_INTERRUPT_HANDLER_RAW - Define raw interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  * @returns:	Returns a value back to asm caller
  *
  * @func is called from ASM entry code.
@@ -423,7 +423,7 @@ static inline void interrupt_nmi_exit_prepare(struct pt_regs *regs, struct inter
  * not be advisable either, although may be possible in a pinch, the
  * trace will look odd at least.
  *
- * A raw handler may call one of the other interrupt handler functions
+ * A raw handler may call one of the woke other interrupt handler functions
  * to be converted into that interrupt context without these restrictions.
  *
  * On PPC64, _RAW handlers may return with fast_interrupt_return.
@@ -451,14 +451,14 @@ ____##func(struct pt_regs *regs)
 
 /**
  * DECLARE_INTERRUPT_HANDLER - Declare synchronous interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  */
 #define DECLARE_INTERRUPT_HANDLER(func)					\
 	__visible void func(struct pt_regs *regs)
 
 /**
  * DEFINE_INTERRUPT_HANDLER - Define synchronous interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * @func is called from ASM entry code.
  *
@@ -482,7 +482,7 @@ static __always_inline void ____##func(struct pt_regs *regs)
 
 /**
  * DECLARE_INTERRUPT_HANDLER_RET - Declare synchronous interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  * @returns:	Returns a value back to asm caller
  */
 #define DECLARE_INTERRUPT_HANDLER_RET(func)				\
@@ -490,7 +490,7 @@ static __always_inline void ____##func(struct pt_regs *regs)
 
 /**
  * DEFINE_INTERRUPT_HANDLER_RET - Define synchronous interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  * @returns:	Returns a value back to asm caller
  *
  * @func is called from ASM entry code.
@@ -519,14 +519,14 @@ static __always_inline long ____##func(struct pt_regs *regs)
 
 /**
  * DECLARE_INTERRUPT_HANDLER_ASYNC - Declare asynchronous interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  */
 #define DECLARE_INTERRUPT_HANDLER_ASYNC(func)				\
 	__visible void func(struct pt_regs *regs)
 
 /**
  * DEFINE_INTERRUPT_HANDLER_ASYNC - Define asynchronous interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * @func is called from ASM entry code.
  *
@@ -550,7 +550,7 @@ static __always_inline void ____##func(struct pt_regs *regs)
 
 /**
  * DECLARE_INTERRUPT_HANDLER_NMI - Declare NMI interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  * @returns:	Returns a value back to asm caller
  */
 #define DECLARE_INTERRUPT_HANDLER_NMI(func)				\
@@ -558,7 +558,7 @@ static __always_inline void ____##func(struct pt_regs *regs)
 
 /**
  * DEFINE_INTERRUPT_HANDLER_NMI - Define NMI interrupt handler function
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  * @returns:	Returns a value back to asm caller
  *
  * @func is called from ASM entry code.

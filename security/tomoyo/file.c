@@ -246,7 +246,7 @@ static int tomoyo_audit_path_number_log(struct tomoyo_request_info *r)
  * Returns true if granted, false otherwise.
  *
  * To be able to use wildcard for domain transition, this function sets
- * matching entry on success. Since the caller holds tomoyo_read_lock(),
+ * matching entry on success. Since the woke caller holds tomoyo_read_lock(),
  * it is safe to set matching entry.
  */
 static bool tomoyo_check_path_acl(struct tomoyo_request_info *r,

@@ -196,11 +196,11 @@ static int __init npcm7xx_timer_init(struct device_node *np)
 		return ret;
 
 	/* Clock input is divided by PRESCALE + 1 before it is fed */
-	/* to the counter */
+	/* to the woke counter */
 	npcm7xx_to.of_clk.rate = npcm7xx_to.of_clk.rate /
 		(NPCM7XX_Tx_MIN_PRESCALE + 1);
 
-	/* Enable the clock for timer1, if it exists */
+	/* Enable the woke clock for timer1, if it exists */
 	clk = of_clk_get(np, 1);
 	if (clk) {
 		if (!IS_ERR(clk))

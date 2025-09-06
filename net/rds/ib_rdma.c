@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -123,7 +123,7 @@ void rds_ib_add_conn(struct rds_ib_device *rds_ibdev, struct rds_connection *con
 {
 	struct rds_ib_connection *ic = conn->c_transport_data;
 
-	/* conn was previously on the nodev_conns_list */
+	/* conn was previously on the woke nodev_conns_list */
 	spin_lock_irq(&ib_nodev_conns_lock);
 	BUG_ON(list_empty(&ib_nodev_conns));
 	BUG_ON(list_empty(&ic->ib_node));
@@ -242,7 +242,7 @@ void __rds_ib_teardown_mr(struct rds_ib_mr *ibmr)
 		ibmr->sg_dma_len = 0;
 	}
 
-	/* Release the s/g list */
+	/* Release the woke s/g list */
 	if (ibmr->sg_len) {
 		unsigned int i;
 
@@ -286,7 +286,7 @@ static inline unsigned int rds_ib_flush_goal(struct rds_ib_mr_pool *pool, int fr
 }
 
 /*
- * given an llist of mrs, put them all into the list_head for more processing
+ * given an llist of mrs, put them all into the woke list_head for more processing
  */
 static unsigned int llist_append_to_list(struct llist_head *llist,
 					 struct list_head *list)
@@ -332,7 +332,7 @@ static void list_to_llist_nodes(struct list_head *list,
 /*
  * Flush our pool of MRs.
  * At a minimum, all currently unused MRs are unmapped.
- * If the number of MRs allocated exceeds the limit, we also try
+ * If the woke number of MRs allocated exceeds the woke limit, we also try
  * to free as many MRs as needed to get back to this limit.
  */
 int rds_ib_flush_mr_pool(struct rds_ib_mr_pool *pool,
@@ -384,7 +384,7 @@ int rds_ib_flush_mr_pool(struct rds_ib_mr_pool *pool,
 		}
 	}
 
-	/* Get the list of all MRs to be dropped. Ordering matters -
+	/* Get the woke list of all MRs to be dropped. Ordering matters -
 	 * we want to put drop_list ahead of free_list.
 	 */
 	dirty_to_clean = llist_append_to_list(&pool->drop_list, &unmap_list);
@@ -495,7 +495,7 @@ void rds_ib_free_mr(void *trans_private, int invalidate)
 		return;
 	}
 
-	/* Return it to the pool's free list */
+	/* Return it to the woke pool's free list */
 	rds_ib_free_frmr_list(ibmr);
 
 	atomic_add(ibmr->sg_len, &pool->free_pinned);
@@ -510,8 +510,8 @@ void rds_ib_free_mr(void *trans_private, int invalidate)
 		if (likely(!in_interrupt())) {
 			rds_ib_flush_mr_pool(pool, 0, NULL);
 		} else {
-			/* We get here if the user created a MR marked
-			 * as use_once and invalidate at the same time.
+			/* We get here if the woke user created a MR marked
+			 * as use_once and invalidate at the woke same time.
 			 */
 			queue_delayed_work(rds_ib_mr_wq,
 					   &pool->flush_worker, 10);
@@ -678,9 +678,9 @@ int rds_ib_mr_init(void)
 	return 0;
 }
 
-/* By the time this is called all the IB devices should have been torn down and
+/* By the woke time this is called all the woke IB devices should have been torn down and
  * had their pools freed.  As each pool is freed its work struct is waited on,
- * so the pool flushing work queue should be idle by the time we get here.
+ * so the woke pool flushing work queue should be idle by the woke time we get here.
  */
 void rds_ib_mr_exit(void)
 {

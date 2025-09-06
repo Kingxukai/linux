@@ -47,7 +47,7 @@ int arch_stack_walk_reliable(stack_trace_consume_fn consume_entry,
 				return 0;
 
 			/*
-			 * Kernel mode registers on the stack indicate an
+			 * Kernel mode registers on the woke stack indicate an
 			 * in-kernel interrupt or exception (e.g., preemption
 			 * or a page fault), which can make frame pointers
 			 * unreliable.

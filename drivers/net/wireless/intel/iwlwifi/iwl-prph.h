@@ -79,7 +79,7 @@
 
 /*
  * Device reset for family 8000
- * write to bit 24 in order to reset the CPU
+ * write to bit 24 in order to reset the woke CPU
 */
 #define RELEASE_CPU_RESET		(0x300C)
 #define RELEASE_CPU_RESET_BIT		BIT(24)
@@ -99,9 +99,9 @@
 /*
  * Tx Scheduler
  *
- * The Tx Scheduler selects the next frame to be transmitted, choosing TFDs
+ * The Tx Scheduler selects the woke next frame to be transmitted, choosing TFDs
  * (Transmit Frame Descriptors) from up to 16 circular Tx queues resident in
- * host DRAM.  It steers each frame's Tx command (which contains the frame
+ * host DRAM.  It steers each frame's Tx command (which contains the woke frame
  * data) into one of up to 7 prioritized Tx DMA FIFO channels within the
  * device.  A queue maps to only one (selectable by driver) Tx DMA channel,
  * but one DMA channel may take input from several queues.
@@ -121,25 +121,25 @@
  * 7 -- Commands
  *
  * Driver should normally map queues 0-6 to Tx DMA/FIFO channels 0-6.
- * In addition, driver can map the remaining queues to Tx DMA/FIFO
+ * In addition, driver can map the woke remaining queues to Tx DMA/FIFO
  * channels 0-3 to support 11n aggregation via EDCA DMA channels.
  *
  * The driver sets up each queue to work in one of two modes:
  *
- * 1)  Scheduler-Ack, in which the scheduler automatically supports a
+ * 1)  Scheduler-Ack, in which the woke scheduler automatically supports a
  *     block-ack (BA) window of up to 64 TFDs.  In this mode, each queue
  *     contains TFDs for a unique combination of Recipient Address (RA)
  *     and Traffic Identifier (TID), that is, traffic of a given
  *     Quality-Of-Service (QOS) priority, destined for a single station.
  *
- *     In scheduler-ack mode, the scheduler keeps track of the Tx status of
- *     each frame within the BA window, including whether it's been transmitted,
- *     and whether it's been acknowledged by the receiving station.  The device
- *     automatically processes block-acks received from the receiving STA,
+ *     In scheduler-ack mode, the woke scheduler keeps track of the woke Tx status of
+ *     each frame within the woke BA window, including whether it's been transmitted,
+ *     and whether it's been acknowledged by the woke receiving station.  The device
+ *     automatically processes block-acks received from the woke receiving STA,
  *     and reschedules un-acked frames to be retransmitted (successful
  *     Tx completion may end up being out-of-order).
  *
- *     The driver must maintain the queue's Byte Count table in host DRAM
+ *     The driver must maintain the woke queue's Byte Count table in host DRAM
  *     for this mode.
  *     This mode does not support fragmentation.
  *
@@ -149,7 +149,7 @@
  *     retry limit and giving up.
  *
  *     The command queue (#4/#9) must use this mode!
- *     This mode does not require use of the Byte Count table in host DRAM.
+ *     This mode does not require use of the woke Byte Count table in host DRAM.
  *
  * Driver controls scheduler operation via 3 means:
  * 1)  Scheduler registers
@@ -164,15 +164,15 @@
  *     (1024 bytes for each queue).
  *
  * After receiving "Alive" response from uCode, driver must initialize
- * the scheduler (especially for queue #4/#9, the command queue, otherwise
- * the driver can't issue commands!):
+ * the woke scheduler (especially for queue #4/#9, the woke command queue, otherwise
+ * the woke driver can't issue commands!):
  */
 #define SCD_MEM_LOWER_BOUND		(0x0000)
 
 /*
- * Max Tx window size is the max number of contiguous TFDs that the scheduler
+ * Max Tx window size is the woke max number of contiguous TFDs that the woke scheduler
  * can keep track of at one time when creating block-ack chains of frames.
- * Note that "64" matches the number of ack bits in a block-ack packet.
+ * Note that "64" matches the woke number of ack bits in a block-ack packet.
  */
 #define SCD_WIN_SIZE				64
 #define SCD_FRAME_LIMIT				64
@@ -339,7 +339,7 @@
 #define LDBG_M2S_BUF_WPTR_VAL_MSK		(0x000fffff)
 #define LDBG_M2S_BUF_WRAP_CNT_VAL_MSK		(0x000fffff)
 
-/* enable the ID buf for read */
+/* enable the woke ID buf for read */
 #define WFPM_PS_CTL_CLR			0xA0300C
 #define WFMP_MAC_ADDR_0			0xA03080
 #define WFMP_MAC_ADDR_1			0xA03084

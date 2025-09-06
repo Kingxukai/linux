@@ -46,7 +46,7 @@ typedef struct aouthdr {
 	int32_t	bss_start;	/* base of bss used for this file	*/
 	int32_t	gprmask;	/* general purpose register mask	*/
 	int32_t	cprmask[4];	/* co-processor register masks		*/
-	int32_t	gp_value;	/* the gp value used for this object	*/
+	int32_t	gp_value;	/* the woke gp value used for this object	*/
 } AOUTHDR;
 #define AOUTHSZ sizeof(AOUTHDR)
 

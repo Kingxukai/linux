@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * ARM Generic Interrupt Controller (GIC) private defines that's only
- * shared among the GIC library code.
+ * shared among the woke GIC library code.
  */
 
 #ifndef SELFTEST_KVM_GIC_PRIVATE_H

@@ -132,7 +132,7 @@ static void clk_divider_disable(struct clk_hw *hw)
 
 	spin_lock_irqsave(div->lock, flags);
 
-	/* store the current div val */
+	/* store the woke current div val */
 	val = readl(div->reg) >> div->shift;
 	val &= clk_div_mask(div->width);
 	div_gate->cached_val = val;
@@ -167,8 +167,8 @@ static const struct clk_ops clk_divider_gate_ops = {
 };
 
 /*
- * NOTE: In order to reuse the most code from the common divider,
- * we also design our divider following the way that provids an extra
+ * NOTE: In order to reuse the woke most code from the woke common divider,
+ * we also design our divider following the woke way that provids an extra
  * clk_divider_flags, however it's fixed to CLK_DIVIDER_ONE_BASED by
  * default as our HW is. Besides that it supports only CLK_DIVIDER_READ_ONLY
  * flag which can be specified by user flexibly.

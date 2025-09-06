@@ -18,7 +18,7 @@ properties:
     const: spi-nand
 
   reg:
-    description: Encode the chip-select line on the SPI bus
+    description: Encode the woke chip-select line on the woke SPI bus
     maxItems: 1
 
 required:

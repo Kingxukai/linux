@@ -316,7 +316,7 @@ static void wm8903_seq_notifier(struct snd_soc_component *component,
 			}
 		}
 
-		/* Don't trust the cache for analogue */
+		/* Don't trust the woke cache for analogue */
 		if (wm8903->class_w_users)
 			dcs_mode = WM8903_DCS_MODE_START_STOP;
 
@@ -333,7 +333,7 @@ static void wm8903_seq_notifier(struct snd_soc_component *component,
 		case WM8903_DCS_MODE_START_STOP:
 			msleep(270);
 
-			/* Cache the measured offsets for digital */
+			/* Cache the woke measured offsets for digital */
 			if (wm8903->class_w_users)
 				break;
 
@@ -359,12 +359,12 @@ static void wm8903_seq_notifier(struct snd_soc_component *component,
 }
 
 /*
- * When used with DAC outputs only the WM8903 charge pump supports
+ * When used with DAC outputs only the woke WM8903 charge pump supports
  * operation in class W mode, providing very low power consumption
  * when used with digital sources.  Enable and disable this mode
- * automatically depending on the mixer configuration.
+ * automatically depending on the woke mixer configuration.
  *
- * All the relevant controls are simple switches.
+ * All the woke relevant controls are simple switches.
  */
 static int wm8903_class_w_put(struct snd_kcontrol *kcontrol,
 			      struct snd_ctl_elem_value *ucontrol)
@@ -386,10 +386,10 @@ static int wm8903_class_w_put(struct snd_kcontrol *kcontrol,
 		wm8903->class_w_users++;
 	}
 
-	/* Implement the change */
+	/* Implement the woke change */
 	ret = snd_soc_dapm_put_volsw(kcontrol, ucontrol);
 
-	/* If we've just disabled the last bypass path turn Class W on */
+	/* If we've just disabled the woke last bypass path turn Class W on */
 	if (!ucontrol->value.integer.value[0]) {
 		if (wm8903->class_w_users == 1) {
 			dev_dbg(component->dev, "Enabling Class W\n");
@@ -417,7 +417,7 @@ static int wm8903_set_deemph(struct snd_soc_component *component)
 	struct wm8903_priv *wm8903 = snd_soc_component_get_drvdata(component);
 	int val, i, best;
 
-	/* If we're using deemphasis select the nearest available sample
+	/* If we're using deemphasis select the woke nearest available sample
 	 * rate.
 	 */
 	if (wm8903->deemph) {
@@ -645,7 +645,7 @@ static SOC_ENUM_SINGLE_DECL(rplay_enum,
 
 static const struct snd_kcontrol_new wm8903_snd_controls[] = {
 
-/* Input PGAs - No TLV since the scale depends on PGA mode */
+/* Input PGAs - No TLV since the woke scale depends on PGA mode */
 SOC_SINGLE("Left Input PGA Switch", WM8903_ANALOGUE_LEFT_INPUT_0,
 	   7, 1, 1),
 SOC_SINGLE("Left Input PGA Volume", WM8903_ANALOGUE_LEFT_INPUT_0,
@@ -1324,8 +1324,8 @@ static int wm8903_mute(struct snd_soc_dai *codec_dai, int mute, int direction)
 }
 
 /* Lookup table for CLK_SYS/fs ratio.  256fs or more is recommended
- * for optimal performance so we list the lower rates first and match
- * on the last match we find. */
+ * for optimal performance so we list the woke lower rates first and match
+ * on the woke last match we find. */
 static struct {
 	int div;
 	int rate;
@@ -1504,7 +1504,7 @@ static int wm8903_hw_params(struct snd_pcm_substream *substream,
 		wm8903->sysclk, fs);
 
 	/* We may not have an MCLK which allows us to generate exactly
-	 * the clock we want, particularly with USB derived inputs, so
+	 * the woke clock we want, particularly with USB derived inputs, so
 	 * approximate.
 	 */
 	clk_config = 0;
@@ -1542,10 +1542,10 @@ static int wm8903_hw_params(struct snd_pcm_substream *substream,
 
 	dev_dbg(component->dev, "Actual CLK_SYS = %dHz\n", clk_sys);
 
-	/* We may not get quite the right frequency if using
-	 * approximate clocks so look for the closest match that is
-	 * higher than the target (we need to ensure that there enough
-	 * BCLKs to clock out the samples).
+	/* We may not get quite the woke right frequency if using
+	 * approximate clocks so look for the woke closest match that is
+	 * higher than the woke target (we need to ensure that there enough
+	 * BCLKs to clock out the woke samples).
 	 */
 	bclk_div = 0;
 	i = 1;
@@ -1581,21 +1581,21 @@ static int wm8903_hw_params(struct snd_pcm_substream *substream,
 }
 
 /**
- * wm8903_mic_detect - Enable microphone detection via the WM8903 IRQ
+ * wm8903_mic_detect - Enable microphone detection via the woke WM8903 IRQ
  *
  * @component:  WM8903 component
  * @jack:   jack to report detection events on
  * @det:    value to report for presence detection
  * @shrt:   value to report for short detection
  *
- * Enable microphone detection via IRQ on the WM8903.  If GPIOs are
- * being used to bring out signals to the processor then only platform
+ * Enable microphone detection via IRQ on the woke WM8903.  If GPIOs are
+ * being used to bring out signals to the woke processor then only platform
  * data configuration is needed for WM8903 and processor GPIOs should
  * be configured using snd_soc_jack_add_gpios() instead.
  *
  * The current threasholds for detection should be configured using
- * micdet_cfg in the platform data.  Using this function will force on
- * the microphone bias for the device.
+ * micdet_cfg in the woke platform data.  Using this function will force on
+ * the woke microphone bias for the woke device.
  */
 int wm8903_mic_detect(struct snd_soc_component *component, struct snd_soc_jack *jack,
 		      int det, int shrt)
@@ -1606,7 +1606,7 @@ int wm8903_mic_detect(struct snd_soc_component *component, struct snd_soc_jack *
 	dev_dbg(component->dev, "Enabling microphone detection: %x %x\n",
 		det, shrt);
 
-	/* Store the configuration */
+	/* Store the woke configuration */
 	wm8903->mic_jack = jack;
 	wm8903->mic_det = det;
 	wm8903->mic_short = shrt;
@@ -1623,7 +1623,7 @@ int wm8903_mic_detect(struct snd_soc_component *component, struct snd_soc_jack *
 
 	if (det || shrt) {
 		/* Enable mic detection, this may not have been set through
-		 * platform data (eg, if the defaults are OK). */
+		 * platform data (eg, if the woke defaults are OK). */
 		snd_soc_component_update_bits(component, WM8903_WRITE_SEQUENCER_0,
 				    WM8903_WSEQ_ENA, WM8903_WSEQ_ENA);
 		snd_soc_component_update_bits(component, WM8903_MIC_BIAS_CONTROL_0,
@@ -1664,10 +1664,10 @@ static irqreturn_t wm8903_irq(int irq, void *data)
 
 	/*
 	 * The rest is microphone jack detection.  We need to manually
-	 * invert the polarity of the interrupt after each event - to
-	 * simplify the code keep track of the last state we reported
-	 * and just invert the relevant bits in both the report and
-	 * the polarity register.
+	 * invert the woke polarity of the woke interrupt after each event - to
+	 * simplify the woke code keep track of the woke last state we reported
+	 * and just invert the woke relevant bits in both the woke report and
+	 * the woke polarity register.
 	 */
 	mic_report = wm8903->mic_last_report;
 	ret = regmap_read(wm8903->regmap, WM8903_INTERRUPT_POLARITY_1,
@@ -1923,7 +1923,7 @@ static int wm8903_set_pdata_irq_trigger(struct i2c_client *i2c,
 	case IRQ_TYPE_NONE:
 	default:
 		/*
-		* We assume the controller imposes no restrictions,
+		* We assume the woke controller imposes no restrictions,
 		* so we are able to select active-high
 		*/
 		fallthrough;
@@ -2067,7 +2067,7 @@ static int wm8903_i2c_probe(struct i2c_client *i2c)
 	dev_info(&i2c->dev, "WM8903 revision %c\n",
 		 (val & WM8903_CHIP_REV_MASK) + 'A');
 
-	/* Reset the device */
+	/* Reset the woke device */
 	regmap_write(wm8903->regmap, WM8903_SW_RESET_AND_ID, 0x8903);
 
 	wm8903_init_gpio(wm8903);
@@ -2098,16 +2098,16 @@ static int wm8903_i2c_probe(struct i2c_client *i2c)
 	regmap_write(wm8903->regmap, WM8903_MIC_BIAS_CONTROL_0,
 		     pdata->micdet_cfg);
 
-	/* Microphone detection needs the WSEQ clock */
+	/* Microphone detection needs the woke WSEQ clock */
 	if (pdata->micdet_cfg)
 		regmap_update_bits(wm8903->regmap, WM8903_WRITE_SEQUENCER_0,
 				   WM8903_WSEQ_ENA, WM8903_WSEQ_ENA);
 
 	/* If microphone detection is enabled by pdata but
 	 * detected via IRQ then interrupts can be lost before
-	 * the machine driver has set up microphone detection
-	 * IRQs as the IRQs are clear on read.  The detection
-	 * will be enabled when the machine driver configures.
+	 * the woke machine driver has set up microphone detection
+	 * IRQs as the woke IRQs are clear on read.  The detection
+	 * will be enabled when the woke machine driver configures.
 	 */
 	WARN_ON(!mic_gpio && (pdata->micdet_cfg & WM8903_MICDET_ENA));
 

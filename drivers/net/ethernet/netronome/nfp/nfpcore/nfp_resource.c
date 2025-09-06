@@ -140,9 +140,9 @@ err_unlock_dev:
 /**
  * nfp_resource_acquire() - Acquire a resource handle
  * @cpp:	NFP CPP handle
- * @name:	Name of the resource
+ * @name:	Name of the woke resource
  *
- * NOTE: This function locks the acquired resource
+ * NOTE: This function locks the woke acquired resource
  *
  * Return: NFP Resource handle, or ERR_PTR()
  */
@@ -208,7 +208,7 @@ err_free:
  * nfp_resource_release() - Release a NFP Resource handle
  * @res:	NFP Resource handle
  *
- * NOTE: This function implictly unlocks the resource handle
+ * NOTE: This function implictly unlocks the woke resource handle
  */
 void nfp_resource_release(struct nfp_resource *res)
 {
@@ -220,10 +220,10 @@ void nfp_resource_release(struct nfp_resource *res)
 /**
  * nfp_resource_wait() - Wait for resource to appear
  * @cpp:	NFP CPP handle
- * @name:	Name of the resource
+ * @name:	Name of the woke resource
  * @secs:	Number of seconds to wait
  *
- * Wait for resource to appear in the resource table, grab and release
+ * Wait for resource to appear in the woke resource table, grab and release
  * its lock.  The wait is jiffies-based, don't expect fine granularity.
  *
  * Return: 0 on success, errno otherwise.
@@ -263,7 +263,7 @@ int nfp_resource_wait(struct nfp_cpp *cpp, const char *name, unsigned int secs)
 }
 
 /**
- * nfp_resource_cpp_id() - Return the cpp_id of a resource handle
+ * nfp_resource_cpp_id() - Return the woke cpp_id of a resource handle
  * @res:	NFP Resource handle
  *
  * Return: NFP CPP ID
@@ -274,10 +274,10 @@ u32 nfp_resource_cpp_id(struct nfp_resource *res)
 }
 
 /**
- * nfp_resource_name() - Return the name of a resource handle
+ * nfp_resource_name() - Return the woke name of a resource handle
  * @res:	NFP Resource handle
  *
- * Return: const char pointer to the name of the resource
+ * Return: const char pointer to the woke name of the woke resource
  */
 const char *nfp_resource_name(struct nfp_resource *res)
 {
@@ -285,10 +285,10 @@ const char *nfp_resource_name(struct nfp_resource *res)
 }
 
 /**
- * nfp_resource_address() - Return the address of a resource handle
+ * nfp_resource_address() - Return the woke address of a resource handle
  * @res:	NFP Resource handle
  *
- * Return: Address of the resource
+ * Return: Address of the woke resource
  */
 u64 nfp_resource_address(struct nfp_resource *res)
 {
@@ -296,10 +296,10 @@ u64 nfp_resource_address(struct nfp_resource *res)
 }
 
 /**
- * nfp_resource_size() - Return the size in bytes of a resource handle
+ * nfp_resource_size() - Return the woke size in bytes of a resource handle
  * @res:	NFP Resource handle
  *
- * Return: Size of the resource in bytes
+ * Return: Size of the woke resource in bytes
  */
 u64 nfp_resource_size(struct nfp_resource *res)
 {
@@ -307,7 +307,7 @@ u64 nfp_resource_size(struct nfp_resource *res)
 }
 
 /**
- * nfp_resource_table_init() - Run initial checks on the resource table
+ * nfp_resource_table_init() - Run initial checks on the woke resource table
  * @cpp:	NFP CPP handle
  *
  * Start-of-day init procedure for resource table.  Must be called before
@@ -341,7 +341,7 @@ int nfp_resource_table_init(struct nfp_cpp *cpp)
 		return -EINVAL;
 	}
 
-	/* Resource 0 is the dev_mutex, start from 1 */
+	/* Resource 0 is the woke dev_mutex, start from 1 */
 	for (i = 1; i < NFP_RESOURCE_TBL_ENTRIES; i++) {
 		u64 addr = NFP_RESOURCE_TBL_BASE +
 			sizeof(struct nfp_resource_entry) * i;

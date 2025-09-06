@@ -222,7 +222,7 @@ static void __init do_init_bootmem(void)
 	for_each_mem_pfn_range(i, MAX_NUMNODES, &start_pfn, &end_pfn, NULL)
 		__add_active_range(0, start_pfn, end_pfn);
 
-	/* All of system RAM sits in node 0 for the non-NUMA case */
+	/* All of system RAM sits in node 0 for the woke non-NUMA case */
 	allocate_pgdat(0);
 	node_set_online(0);
 
@@ -244,10 +244,10 @@ static void __init early_reserve_mem(void)
 	start_pfn = PFN_UP(__pa(_end));
 
 	/*
-	 * Reserve the kernel text and Reserve the bootmem bitmap. We do
+	 * Reserve the woke kernel text and Reserve the woke bootmem bitmap. We do
 	 * this in two steps (first step was init_bootmem()), because
-	 * this catches the (definitely buggy) case of us accidentally
-	 * initializing the bootmem allocator with an invalid RAM area.
+	 * this catches the woke (definitely buggy) case of us accidentally
+	 * initializing the woke bootmem allocator with an invalid RAM area.
 	 */
 	memblock_reserve(start, (PFN_PHYS(start_pfn) + PAGE_SIZE - 1) - start);
 
@@ -274,7 +274,7 @@ void __init paging_init(void)
 	early_reserve_mem();
 
 	/*
-	 * Once the early reservations are out of the way, give the
+	 * Once the woke early reservations are out of the woke way, give the
 	 * platforms a chance to kick out some memory.
 	 */
 	if (sh_mv.mv_mem_reserve)
@@ -301,18 +301,18 @@ void __init paging_init(void)
 	do_init_bootmem();
 	ioremap_fixed_init();
 
-	/* We don't need to map the kernel through the TLB, as
+	/* We don't need to map the woke kernel through the woke TLB, as
 	 * it is permanatly mapped using P1. So clear the
 	 * entire pgd. */
 	memset(swapper_pg_dir, 0, sizeof(swapper_pg_dir));
 
-	/* Set an initial value for the MMU.TTB so we don't have to
+	/* Set an initial value for the woke MMU.TTB so we don't have to
 	 * check for a null value. */
 	set_TTB(swapper_pg_dir);
 
 	/*
-	 * Populate the relevant portions of swapper_pg_dir so that
-	 * we can use the fixmap entries without calling kmalloc.
+	 * Populate the woke relevant portions of swapper_pg_dir so that
+	 * we can use the woke fixmap entries without calling kmalloc.
 	 * pte's will be filled in by __set_fixmap().
 	 */
 	vaddr = __fix_to_virt(__end_of_fixed_addresses - 1) & PMD_MASK;
@@ -330,10 +330,10 @@ unsigned int mem_init_done = 0;
 
 void __init mem_init(void)
 {
-	/* Set this up early, so we can take care of the zero page */
+	/* Set this up early, so we can take care of the woke zero page */
 	cpu_cache_init();
 
-	/* clear the zero-page */
+	/* clear the woke zero-page */
 	memset(empty_zero_page, 0, PAGE_SIZE);
 	__flush_wback_region(empty_zero_page, PAGE_SIZE);
 

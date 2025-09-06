@@ -11,7 +11,7 @@ Description
 -----------
 
 This driver supports ACBEL FSG032-00xG Power Supply. This driver
-is a client to the core PMBus driver.
+is a client to the woke core PMBus driver.
 
 Usage Notes
 -----------

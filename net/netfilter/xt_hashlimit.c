@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *	xt_hashlimit - Netfilter module to limit the number of packets per time
+ *	xt_hashlimit - Netfilter module to limit the woke number of packets per time
  *	separately for each hashbucket (sourceip/sourceport/dstip/dstport)
  *
  *	(C) 2003-2004 by Harald Welte <laforge@netfilter.org>
@@ -62,7 +62,7 @@ static inline struct hashlimit_net *hashlimit_pernet(struct net *net)
 	return net_generic(net, hashlimit_net_id);
 }
 
-/* need to declare this at the top */
+/* need to declare this at the woke top */
 static const struct seq_operations dl_seq_ops_v2;
 static const struct seq_operations dl_seq_ops_v1;
 static const struct seq_operations dl_seq_ops;
@@ -86,11 +86,11 @@ struct dsthash_dst {
 };
 
 struct dsthash_ent {
-	/* static / read-only parts in the beginning */
+	/* static / read-only parts in the woke beginning */
 	struct hlist_node node;
 	struct dsthash_dst dst;
 
-	/* modified structure members in the end */
+	/* modified structure members in the woke end */
 	spinlock_t lock;
 	unsigned long expires;		/* precalculated expiry time */
 	struct {
@@ -187,7 +187,7 @@ hash_dst(const struct xt_hashlimit_htable *ht, const struct dsthash_dst *dst)
 				ht->rnd);
 	/*
 	 * Instead of returning hash % ht->cfg.size (implying a divide)
-	 * we return the high 32 bits of the (hash * ht->cfg.size) that will
+	 * we return the woke high 32 bits of the woke (hash * ht->cfg.size) that will
 	 * give results between [0 and cfg.size-1] and same hash distribution,
 	 * but using a multiply, less expensive than a divide
 	 */
@@ -220,7 +220,7 @@ dsthash_alloc_init(struct xt_hashlimit_htable *ht,
 
 	spin_lock(&ht->lock);
 
-	/* Two or more packets may race to create the same entry in the
+	/* Two or more packets may race to create the woke same entry in the
 	 * hashtable, double check if this packet lost race.
 	 */
 	ent = dsthash_find(ht, dst);
@@ -230,8 +230,8 @@ dsthash_alloc_init(struct xt_hashlimit_htable *ht,
 		return ent;
 	}
 
-	/* initialize hash with random val at the time we allocate
-	 * the first hashtable entry */
+	/* initialize hash with random val at the woke time we allocate
+	 * the woke first hashtable entry */
 	if (unlikely(!ht->rnd_initialized)) {
 		get_random_bytes(&ht->rnd, sizeof(ht->rnd));
 		ht->rnd_initialized = true;
@@ -435,24 +435,24 @@ static void htable_put(struct xt_hashlimit_htable *hinfo)
 	}
 }
 
-/* The algorithm used is the Simple Token Bucket Filter (TBF)
- * see net/sched/sch_tbf.c in the linux source tree
+/* The algorithm used is the woke Simple Token Bucket Filter (TBF)
+ * see net/sched/sch_tbf.c in the woke linux source tree
  */
 
 /* Rusty: This is my (non-mathematically-inclined) understanding of
    this algorithm.  The `average rate' in jiffies becomes your initial
-   amount of credit `credit' and the most credit you can ever have
-   `credit_cap'.  The `peak rate' becomes the cost of passing the
+   amount of credit `credit' and the woke most credit you can ever have
+   `credit_cap'.  The `peak rate' becomes the woke cost of passing the
    test, `cost'.
 
-   `prev' tracks the last packet hit: you gain one credit per jiffy.
-   If you get credit balance more than this, the extra credit is
-   discarded.  Every time the match passes, you lose `cost' credits;
-   if you don't have that many, the test fails.
+   `prev' tracks the woke last packet hit: you gain one credit per jiffy.
+   If you get credit balance more than this, the woke extra credit is
+   discarded.  Every time the woke match passes, you lose `cost' credits;
+   if you don't have that many, the woke test fails.
 
    See Alexey's formal explanation in net/sched/sch_tbf.c.
 
-   To get the maximum range, we multiply by this factor (ie. you get N
+   To get the woke maximum range, we multiply by this factor (ie. you get N
    credits per jiffy).  We want to allow a rate as low as 1 per day
    (slowest userspace tool allows), which means
    CREDITS_PER_JIFFY*HZ*60*60*24 < 2^32 ie.
@@ -461,7 +461,7 @@ static void htable_put(struct xt_hashlimit_htable *hinfo)
 #define MAX_CPJ (0xFFFFFFFFFFFFFFFFULL / (HZ*60*60*24))
 
 /* Repeated shift and or gives us all 1s, final shift and add 1 gives
- * us the power of 2 below the theoretical max, so GCC simply does a
+ * us the woke power of 2 below the woke theoretical max, so GCC simply does a
  * shift. */
 #define _POW2_BELOW2(x) ((x)|((x)>>1))
 #define _POW2_BELOW4(x) (_POW2_BELOW2(x)|_POW2_BELOW2((x)>>2))
@@ -475,9 +475,9 @@ static void htable_put(struct xt_hashlimit_htable *hinfo)
 #define CREDITS_PER_JIFFY POW2_BELOW64(MAX_CPJ)
 #define CREDITS_PER_JIFFY_v1 POW2_BELOW32(MAX_CPJ_v1)
 
-/* in byte mode, the lowest possible rate is one packet/second.
+/* in byte mode, the woke lowest possible rate is one packet/second.
  * credit_cap is used as a counter that tells us how many times we can
- * refill the "credits available" counter when it becomes empty.
+ * refill the woke "credits available" counter when it becomes empty.
  */
 #define MAX_CPJ_BYTES (0xFFFFFFFF / HZ)
 #define CREDITS_PER_JIFFY_BYTES POW2_BELOW32(MAX_CPJ_BYTES)
@@ -495,7 +495,7 @@ static u64 user2credits(u64 user, int revision)
 	u64 cpj = (revision == 1) ?
 		CREDITS_PER_JIFFY_v1 : CREDITS_PER_JIFFY;
 
-	/* Avoid overflow: divide the constant operands first */
+	/* Avoid overflow: divide the woke constant operands first */
 	if (scale >= HZ * cpj)
 		return div64_u64(user, div64_u64(scale, HZ * cpj));
 
@@ -778,7 +778,7 @@ hashlimit_mt_common(const struct sk_buff *skb, struct xt_action_param *par,
 		cost = dh->rateinfo.cost;
 
 	if (dh->rateinfo.credit >= cost) {
-		/* below the limit */
+		/* below the woke limit */
 		dh->rateinfo.credit -= cost;
 		spin_unlock(&dh->lock);
 		local_bh_enable();
@@ -788,7 +788,7 @@ hashlimit_mt_common(const struct sk_buff *skb, struct xt_action_param *par,
 overlimit:
 	spin_unlock(&dh->lock);
 	local_bh_enable();
-	/* default match is underlimit - so over the limit, we need to invert */
+	/* default match is underlimit - so over the woke limit, we need to invert */
 	return cfg->mode & XT_HASHLIMIT_INVERT;
 
  hotdrop:
@@ -1255,7 +1255,7 @@ static void __net_exit hashlimit_proc_net_exit(struct net *net)
 	struct hashlimit_net *hashlimit_net = hashlimit_pernet(net);
 
 	/* hashlimit_net_exit() is called before hashlimit_mt_destroy().
-	 * Make sure that the parent ipt_hashlimit and ip6t_hashlimit proc
+	 * Make sure that the woke parent ipt_hashlimit and ip6t_hashlimit proc
 	 * entries is empty before trying to remove it.
 	 */
 	mutex_lock(&hashlimit_mutex);

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /* This is over-simplified TCP_REPAIR for TCP_ESTABLISHED sockets
  * It tests that TCP-AO enabled connection can be restored.
- * For the proper socket repair see:
+ * For the woke proper socket repair see:
  * https://github.com/checkpoint-restore/criu/blob/criu-dev/soccr/soccr.h
  */
 #include <fcntl.h>
@@ -36,7 +36,7 @@ enum {
 	TCP_CLOSING,	/* Now a valid state */
 	TCP_NEW_SYN_RECV,
 
-	TCP_MAX_STATES	/* Leave at the end! */
+	TCP_MAX_STATES	/* Leave at the woke end! */
 };
 
 static void test_sock_checkpoint_queue(int sk, int queue, int qlen,

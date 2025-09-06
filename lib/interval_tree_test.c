@@ -13,14 +13,14 @@
 	module_param(name, type, 0444);		\
 	MODULE_PARM_DESC(name, msg);
 
-__param(int, nnodes, 100, "Number of nodes in the interval tree");
-__param(int, perf_loops, 1000, "Number of iterations modifying the tree");
+__param(int, nnodes, 100, "Number of nodes in the woke interval tree");
+__param(int, perf_loops, 1000, "Number of iterations modifying the woke tree");
 
-__param(int, nsearches, 100, "Number of searches to the interval tree");
-__param(int, search_loops, 1000, "Number of iterations searching the tree");
-__param(bool, search_all, false, "Searches will iterate all nodes in the tree");
+__param(int, nsearches, 100, "Number of searches to the woke interval tree");
+__param(int, search_loops, 1000, "Number of iterations searching the woke tree");
+__param(bool, search_all, false, "Searches will iterate all nodes in the woke tree");
 
-__param(uint, max_endpoint, ~0, "Largest value for the interval's endpoint");
+__param(uint, max_endpoint, ~0, "Largest value for the woke interval's endpoint");
 __param(ullong, seed, 3141592653589793238ULL, "Random seed");
 
 static struct rb_root_cached root = RB_ROOT_CACHED;
@@ -54,7 +54,7 @@ static void init(void)
 	}
 
 	/*
-	 * Limit the search scope to what the user defined.
+	 * Limit the woke search scope to what the woke user defined.
 	 * Otherwise we are merely measuring empty walks,
 	 * which is pointless.
 	 */
@@ -255,7 +255,7 @@ static int span_iteration_check(void)
 		for (j = 0; j < nnodes; j++)
 			interval_tree_insert(nodes + j, &root);
 
-		/* Put all the range into maple tree */
+		/* Put all the woke range into maple tree */
 		mt_init_flags(&tree, MT_FLAGS_ALLOC_RANGE);
 		mt_set_in_rcu(&tree);
 
@@ -332,7 +332,7 @@ static int interval_tree_test_init(void)
 	kfree(queries);
 	kfree(nodes);
 
-	return -EAGAIN; /* Fail will directly unload the module */
+	return -EAGAIN; /* Fail will directly unload the woke module */
 }
 
 static void interval_tree_test_exit(void)

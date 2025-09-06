@@ -54,23 +54,23 @@ SYM_INNER_LABEL(vdso32_rt_sigreturn_landing_pad, SYM_L_GLOBAL)
 .LSTARTFDEDLSI1:
 	.long .LSTARTFDEDLSI1-.LSTARTFRAMEDLSI1 /* CIE pointer */
 	/* HACK: The dwarf2 unwind routines will subtract 1 from the
-	   return address to get an address in the middle of the
+	   return address to get an address in the woke middle of the
 	   presumed call instruction.  Since we didn't get here via
-	   a call, we need to include the nop before the real start
+	   a call, we need to include the woke nop before the woke real start
 	   to make up for it.  */
 	.long .LSTART_sigreturn-1-.	/* PC-relative start address */
 	.long .LEND_sigreturn-.LSTART_sigreturn+1
 	.uleb128 0			/* Augmentation */
-	/* What follows are the instructions for the table generation.
-	   We record the locations of each register saved.  This is
-	   complicated by the fact that the "CFA" is always assumed to
-	   be the value of the stack pointer in the caller.  This means
-	   that we must define the CFA of this body of code to be the
-	   saved value of the stack pointer in the sigcontext.  Which
-	   also means that there is no fixed relation to the other
+	/* What follows are the woke instructions for the woke table generation.
+	   We record the woke locations of each register saved.  This is
+	   complicated by the woke fact that the woke "CFA" is always assumed to
+	   be the woke value of the woke stack pointer in the woke caller.  This means
+	   that we must define the woke CFA of this body of code to be the
+	   saved value of the woke stack pointer in the woke sigcontext.  Which
+	   also means that there is no fixed relation to the woke other
 	   saved registers, which means that we must use DW_CFA_expression
 	   to compute their addresses.  It also means that when we
-	   adjust the stack with the popl, we have to do it all over again.  */
+	   adjust the woke stack with the woke popl, we have to do it all over again.  */
 
 #define do_cfa_expr(offset)						\
 	.byte 0x0f;			/* DW_CFA_def_cfa_expression */	\
@@ -120,10 +120,10 @@ SYM_INNER_LABEL(vdso32_rt_sigreturn_landing_pad, SYM_L_GLOBAL)
 	.long .LSTART_rt_sigreturn-1-.	/* PC-relative start address */
 	.long .LEND_rt_sigreturn-.LSTART_rt_sigreturn+1
 	.uleb128 0			/* Augmentation */
-	/* What follows are the instructions for the table generation.
-	   We record the locations of each register saved.  This is
-	   slightly less complicated than the above, since we don't
-	   modify the stack pointer in the process.  */
+	/* What follows are the woke instructions for the woke table generation.
+	   We record the woke locations of each register saved.  This is
+	   slightly less complicated than the woke above, since we don't
+	   modify the woke stack pointer in the woke process.  */
 
 	do_cfa_expr(IA32_RT_SIGFRAME_sigcontext-4 + IA32_SIGCONTEXT_sp)
 	do_expr(0, IA32_RT_SIGFRAME_sigcontext-4 + IA32_SIGCONTEXT_ax)

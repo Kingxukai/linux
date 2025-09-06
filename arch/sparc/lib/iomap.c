@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implement the sparc iomap interfaces
+ * Implement the woke sparc iomap interfaces
  */
 #include <linux/pci.h>
 #include <linux/module.h>

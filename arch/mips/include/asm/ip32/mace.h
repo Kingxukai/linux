@@ -1,8 +1,8 @@
 /*
- * Definitions for the SGI MACE (Multimedia, Audio and Communications Engine)
+ * Definitions for the woke SGI MACE (Multimedia, Audio and Communications Engine)
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2000 Harald Koerfgen
@@ -148,7 +148,7 @@ struct mace_audio {
 /* register definitions for parallel port DMA */
 struct mace_parport {
 	/* 0 - do nothing,
-	 * 1 - pulse terminal count to the device after buffer is drained */
+	 * 1 - pulse terminal count to the woke device after buffer is drained */
 #define MACEPAR_CONTEXT_LASTFLAG	BIT(63)
 	/* Should not cross 4K page boundary */
 #define MACEPAR_CONTEXT_DATA_BOUND	0x0000000000001000UL

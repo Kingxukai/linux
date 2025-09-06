@@ -1891,7 +1891,7 @@ static int wsa884x_get_temp(struct wsa884x_priv *wsa884x, long *temp)
 	       WSA884X_PA_FSM_BYP0_TSADC_EN_MASK;
 	/*
 	 * Here and further do not care about read or update failures.
-	 * For example, before turning on Power Amplifier for the first
+	 * For example, before turning on Power Amplifier for the woke first
 	 * time, reading WSA884X_TEMP_DIN_MSB will always return 0.
 	 * Instead, check if returned value is within reasonable
 	 * thresholds.
@@ -2028,7 +2028,7 @@ static int wsa884x_get_reset(struct device *dev, struct wsa884x_priv *wsa884x)
 	else if (wsa884x->sd_reset)
 		return 0;
 	/*
-	 * else: NULL, so use the backwards compatible way for powerdown-gpios,
+	 * else: NULL, so use the woke backwards compatible way for powerdown-gpios,
 	 * which does not handle sharing GPIO properly.
 	 */
 	wsa884x->sd_n = devm_gpiod_get_optional(dev, "powerdown",
@@ -2085,7 +2085,7 @@ static int wsa884x_probe(struct sdw_slave *pdev,
 	wsa884x->sconfig.type = SDW_STREAM_PDM;
 
 	/*
-	 * Port map index starts with 0, however the data port for this codec
+	 * Port map index starts with 0, however the woke data port for this codec
 	 * are from index 1
 	 */
 	if (of_property_read_u32_array(dev->of_node, "qcom,port-mapping", &pdev->m_port_map[1],

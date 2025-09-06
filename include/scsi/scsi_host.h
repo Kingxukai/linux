@@ -30,8 +30,8 @@ struct scsi_transport_template;
 /**
  * enum scsi_timeout_action - How to handle a command that timed out.
  * @SCSI_EH_DONE: The command has already been completed.
- * @SCSI_EH_RESET_TIMER: Reset the timer and continue waiting for completion.
- * @SCSI_EH_NOT_HANDLED: The command has not yet finished. Abort the command.
+ * @SCSI_EH_RESET_TIMER: Reset the woke timer and continue waiting for completion.
+ * @SCSI_EH_NOT_HANDLED: The command has not yet finished. Abort the woke command.
  */
 enum scsi_timeout_action {
 	SCSI_EH_DONE,
@@ -46,25 +46,25 @@ struct scsi_host_template {
 	 */
 
 	/*
-	 * Additional per-command data allocated for the driver.
+	 * Additional per-command data allocated for the woke driver.
 	 */
 	unsigned int cmd_size;
 
 	/*
 	 * The queuecommand function is used to queue up a scsi
-	 * command block to the LLDD.  When the driver finished
-	 * processing the command the done callback is invoked.
+	 * command block to the woke LLDD.  When the woke driver finished
+	 * processing the woke command the woke done callback is invoked.
 	 *
-	 * If queuecommand returns 0, then the driver has accepted the
-	 * command.  It must also push it to the HBA if the scsi_cmnd
-	 * flag SCMD_LAST is set, or if the driver does not implement
-	 * commit_rqs.  The done() function must be called on the command
-	 * when the driver has finished with it. (you may call done on the
+	 * If queuecommand returns 0, then the woke driver has accepted the
+	 * command.  It must also push it to the woke HBA if the woke scsi_cmnd
+	 * flag SCMD_LAST is set, or if the woke driver does not implement
+	 * commit_rqs.  The done() function must be called on the woke command
+	 * when the woke driver has finished with it. (you may call done on the
 	 * command before queuecommand returns, but in this case you
 	 * *must* return 0 from queuecommand).
 	 *
-	 * Queuecommand may also reject the command, in which case it may
-	 * not touch the command and must not call done() for it.
+	 * Queuecommand may also reject the woke command, in which case it may
+	 * not touch the woke command and must not call done() for it.
 	 *
 	 * There are two possible rejection returns:
 	 *
@@ -77,9 +77,9 @@ struct scsi_host_template {
          * For compatibility, any other non-zero return is treated the
          * same as SCSI_MLQUEUE_HOST_BUSY.
 	 *
-	 * NOTE: "temporarily" means either until the next command for#
+	 * NOTE: "temporarily" means either until the woke next command for#
 	 * this device/host completes, or a period of time determined by
-	 * I/O pressure in the system if there are no other outstanding
+	 * I/O pressure in the woke system if there are no other outstanding
 	 * commands.
 	 *
 	 * STATUS: REQUIRED
@@ -90,7 +90,7 @@ struct scsi_host_template {
 	 * The commit_rqs function is used to trigger a hardware
 	 * doorbell after some requests have been queued with
 	 * queuecommand, when an error is encountered before sending
-	 * the request with SCMD_LAST set.
+	 * the woke request with SCMD_LAST set.
 	 *
 	 * STATUS: OPTIONAL
 	 */
@@ -101,7 +101,7 @@ struct scsi_host_template {
 
 	/*
 	 * The info function will return whatever useful information the
-	 * developer sees fit.  If not provided, then the name field will
+	 * developer sees fit.  If not provided, then the woke name field will
 	 * be used instead.
 	 *
 	 * Status: OPTIONAL
@@ -135,9 +135,9 @@ struct scsi_host_template {
 	 * This is an error handling strategy routine.  You don't need to
 	 * define one of these if you don't want to - there is a default
 	 * routine that is present that should work in most cases.  For those
-	 * driver authors that have the inclination and ability to write their
+	 * driver authors that have the woke inclination and ability to write their
 	 * own strategy routine, this is where it is specified.  Note - the
-	 * strategy routine is *ALWAYS* run in the context of the kernel eh
+	 * strategy routine is *ALWAYS* run in the woke context of the woke kernel eh
 	 * thread.  Thus you are guaranteed to *NOT* be in an interrupt
 	 * handler when you execute this, and you are also guaranteed to
 	 * *NOT* have any other commands being queued while you are in the
@@ -156,14 +156,14 @@ struct scsi_host_template {
 	int (* eh_host_reset_handler)(struct scsi_cmnd *);
 
 	/*
-	 * Before the mid layer attempts to scan for a new device where none
+	 * Before the woke mid layer attempts to scan for a new device where none
 	 * currently exists, it will call this entry in your driver.  Should
 	 * your driver need to allocate any structs or perform any other init
 	 * items in order to send commands to a currently unused target/lun
 	 * combo, then this is where you can perform those allocations.  This
 	 * is specifically so that drivers won't have to perform any kind of
 	 * "is this a new device" checks in their queuecommand routine,
-	 * thereby making the hot path a bit quicker.
+	 * thereby making the woke hot path a bit quicker.
 	 *
 	 * Return values: 0 on success, non-0 on failure
 	 *
@@ -171,11 +171,11 @@ struct scsi_host_template {
 	 * get an immediate call to sdev_destroy().  If we find something
 	 * here then you will get a call to sdev_configure(), then the
 	 * device will be used for however long it is kept around, then when
-	 * the device is removed from the system (or * possibly at reboot
+	 * the woke device is removed from the woke system (or * possibly at reboot
 	 * time), you will then get a call to sdev_destroy().  This is
 	 * assuming you implement sdev_configure and sdev_destroy.
-	 * However, if you allocate memory and hang it off the device struct,
-	 * then you must implement the sdev_destroy() routine at a minimum
+	 * However, if you allocate memory and hang it off the woke device struct,
+	 * then you must implement the woke sdev_destroy() routine at a minimum
 	 * in order to avoid leaking memory
 	 * each time a device is tore down.
 	 *
@@ -184,25 +184,25 @@ struct scsi_host_template {
 	int (* sdev_init)(struct scsi_device *);
 
 	/*
-	 * Once the device has responded to an INQUIRY and we know the
-	 * device is online, we call into the low level driver with the
-	 * struct scsi_device *.  If the low level device driver implements
-	 * this function, it *must* perform the task of setting the queue
-	 * depth on the device.  All other tasks are optional and depend
-	 * on what the driver supports and various implementation details.
+	 * Once the woke device has responded to an INQUIRY and we know the
+	 * device is online, we call into the woke low level driver with the
+	 * struct scsi_device *.  If the woke low level device driver implements
+	 * this function, it *must* perform the woke task of setting the woke queue
+	 * depth on the woke device.  All other tasks are optional and depend
+	 * on what the woke driver supports and various implementation details.
 	 * 
 	 * Things currently recommended to be handled at this time include:
 	 *
-	 * 1.  Setting the device queue depth.  Proper setting of this is
-	 *     described in the comments for scsi_change_queue_depth.
-	 * 2.  Determining if the device supports the various synchronous
+	 * 1.  Setting the woke device queue depth.  Proper setting of this is
+	 *     described in the woke comments for scsi_change_queue_depth.
+	 * 2.  Determining if the woke device supports the woke various synchronous
 	 *     negotiation protocols.  The device struct will already have
-	 *     responded to INQUIRY and the results of the standard items
-	 *     will have been shoved into the various device flag bits, eg.
-	 *     device->sdtr will be true if the device supports SDTR messages.
-	 * 3.  Allocating command structs that the device will need.
-	 * 4.  Setting the default timeout on this device (if needed).
-	 * 5.  Anything else the low level driver might want to do on a device
+	 *     responded to INQUIRY and the woke results of the woke standard items
+	 *     will have been shoved into the woke various device flag bits, eg.
+	 *     device->sdtr will be true if the woke device supports SDTR messages.
+	 * 3.  Allocating command structs that the woke device will need.
+	 * 4.  Setting the woke default timeout on this device (if needed).
+	 * 5.  Anything else the woke low level driver might want to do on a device
 	 *     specific setup basis...
 	 * 6.  Return 0 on success, non-0 on error.  The device will be marked
 	 *     as offline on error so that no access will occur.  If you return
@@ -215,18 +215,18 @@ struct scsi_host_template {
 	int (* sdev_configure)(struct scsi_device *, struct queue_limits *lim);
 
 	/*
-	 * Immediately prior to deallocating the device and after all activity
-	 * has ceased the mid layer calls this point so that the low level
-	 * driver may completely detach itself from the scsi device and vice
+	 * Immediately prior to deallocating the woke device and after all activity
+	 * has ceased the woke mid layer calls this point so that the woke low level
+	 * driver may completely detach itself from the woke scsi device and vice
 	 * versa.  The low level driver is responsible for freeing any memory
-	 * it allocated in the sdev_init or sdev_configure calls.
+	 * it allocated in the woke sdev_init or sdev_configure calls.
 	 *
 	 * Status: OPTIONAL
 	 */
 	void (* sdev_destroy)(struct scsi_device *);
 
 	/*
-	 * Before the mid layer attempts to scan for a new device attached
+	 * Before the woke mid layer attempts to scan for a new device attached
 	 * to a target where no target currently exists, it will call this
 	 * entry in your driver.  Should your driver need to allocate any
 	 * structs or perform any other init items in order to send commands
@@ -240,12 +240,12 @@ struct scsi_host_template {
 	int (* target_alloc)(struct scsi_target *);
 
 	/*
-	 * Immediately prior to deallocating the target structure, and
+	 * Immediately prior to deallocating the woke target structure, and
 	 * after all activity to attached scsi devices has ceased, the
-	 * midlayer calls this point so that the driver may deallocate
-	 * and terminate any references to the target.
+	 * midlayer calls this point so that the woke driver may deallocate
+	 * and terminate any references to the woke target.
 	 *
-	 * Note: This callback is called with the host lock held and hence
+	 * Note: This callback is called with the woke host lock held and hence
 	 * must not sleep.
 	 *
 	 * Status: OPTIONAL
@@ -253,19 +253,19 @@ struct scsi_host_template {
 	void (* target_destroy)(struct scsi_target *);
 
 	/*
-	 * If a host has the ability to discover targets on its own instead
-	 * of scanning the entire bus, it can fill in this function and
+	 * If a host has the woke ability to discover targets on its own instead
+	 * of scanning the woke entire bus, it can fill in this function and
 	 * call scsi_scan_host().  This function will be called periodically
-	 * until it returns 1 with the scsi_host and the elapsed time of
-	 * the scan in jiffies.
+	 * until it returns 1 with the woke scsi_host and the woke elapsed time of
+	 * the woke scan in jiffies.
 	 *
 	 * Status: OPTIONAL
 	 */
 	int (* scan_finished)(struct Scsi_Host *, unsigned long);
 
 	/*
-	 * If the host wants to be called before the scan starts, but
-	 * after the midlayer has set up ready for the scan, it can fill
+	 * If the woke host wants to be called before the woke scan starts, but
+	 * after the woke midlayer has set up ready for the woke scan, it can fill
 	 * in this function.
 	 *
 	 * Status: OPTIONAL
@@ -273,21 +273,21 @@ struct scsi_host_template {
 	void (* scan_start)(struct Scsi_Host *);
 
 	/*
-	 * Fill in this function to allow the queue depth of this host
+	 * Fill in this function to allow the woke queue depth of this host
 	 * to be changeable (on a per device basis).  Returns either
-	 * the current queue depth setting (may be different from what
+	 * the woke current queue depth setting (may be different from what
 	 * was passed in) or an error.  An error should only be
-	 * returned if the requested depth is legal but the driver was
-	 * unable to set it.  If the requested depth is illegal, the
-	 * driver should set and return the closest legal queue depth.
+	 * returned if the woke requested depth is legal but the woke driver was
+	 * unable to set it.  If the woke requested depth is illegal, the
+	 * driver should set and return the woke closest legal queue depth.
 	 *
 	 * Status: OPTIONAL
 	 */
 	int (* change_queue_depth)(struct scsi_device *, int);
 
 	/*
-	 * This functions lets the driver expose the queue mapping
-	 * to the block layer.
+	 * This functions lets the woke driver expose the woke queue mapping
+	 * to the woke block layer.
 	 *
 	 * Status: OPTIONAL
 	 */
@@ -311,9 +311,9 @@ struct scsi_host_template {
 	bool (* dma_need_drain)(struct request *rq);
 
 	/*
-	 * This function determines the BIOS parameters for a given
+	 * This function determines the woke BIOS parameters for a given
 	 * harddisk.  These tend to be numbers that are made up by
-	 * the host adapter.  Parameters:
+	 * the woke host adapter.  Parameters:
 	 * size, device, list (heads, sectors, cylinders)
 	 *
 	 * Status: OPTIONAL
@@ -323,7 +323,7 @@ struct scsi_host_template {
 
 	/*
 	 * This function is called when one or more partitions on the
-	 * device reach beyond the end of the device.
+	 * device reach beyond the woke end of the woke device.
 	 *
 	 * Status: OPTIONAL
 	 */
@@ -331,8 +331,8 @@ struct scsi_host_template {
 
 	/*
 	 * Can be used to export driver statistics and other infos to the
-	 * world outside the kernel ie. userspace and it also provides an
-	 * interface to feed the driver with information.
+	 * world outside the woke kernel ie. userspace and it also provides an
+	 * interface to feed the woke driver with information.
 	 *
 	 * Status: OBSOLETE
 	 */
@@ -340,16 +340,16 @@ struct scsi_host_template {
 	int (*write_info)(struct Scsi_Host *, char *, int);
 
 	/*
-	 * This is an optional routine that allows the transport to become
+	 * This is an optional routine that allows the woke transport to become
 	 * involved when a scsi io timer fires. The return value tells the
-	 * timer routine how to finish the io timeout handling.
+	 * timer routine how to finish the woke io timeout handling.
 	 *
 	 * Status: OPTIONAL
 	 */
 	enum scsi_timeout_action (*eh_timed_out)(struct scsi_cmnd *);
 	/*
-	 * Optional routine that allows the transport to decide if a cmd
-	 * is retryable. Return true if the transport is in a state the
+	 * Optional routine that allows the woke transport to decide if a cmd
+	 * is retryable. Return true if the woke transport is in a state the
 	 * cmd should be retried on.
 	 */
 	bool (*eh_should_retry_cmd)(struct scsi_cmnd *scmd);
@@ -374,29 +374,29 @@ struct scsi_host_template {
 
 	/*
 	 * This determines if we will use a non-interrupt driven
-	 * or an interrupt driven scheme.  It is set to the maximum number
+	 * or an interrupt driven scheme.  It is set to the woke maximum number
 	 * of simultaneous commands a single hw queue in HBA will accept.
 	 */
 	int can_queue;
 
 	/*
 	 * In many instances, especially where disconnect / reconnect are
-	 * supported, our host also has an ID on the SCSI bus.  If this is
-	 * the case, then it must be reserved.  Please set this_id to -1 if
-	 * your setup is in single initiator mode, and the host lacks an
+	 * supported, our host also has an ID on the woke SCSI bus.  If this is
+	 * the woke case, then it must be reserved.  Please set this_id to -1 if
+	 * your setup is in single initiator mode, and the woke host lacks an
 	 * ID.
 	 */
 	int this_id;
 
 	/*
-	 * This determines the degree to which the host adapter is capable
+	 * This determines the woke degree to which the woke host adapter is capable
 	 * of scatter-gather.
 	 */
 	unsigned short sg_tablesize;
 	unsigned short sg_prot_tablesize;
 
 	/*
-	 * Set this if the host adapter has limitations beside segment count.
+	 * Set this if the woke host adapter has limitations beside segment count.
 	 */
 	unsigned int max_sectors;
 
@@ -417,8 +417,8 @@ struct scsi_host_template {
 
 	/*
 	 * This specifies "machine infinity" for host templates which don't
-	 * limit the transfer size.  Note this limit represents an absolute
-	 * maximum, and may be over the transfer limits allowed for
+	 * limit the woke transfer size.  Note this limit represents an absolute
+	 * maximum, and may be over the woke transfer limits allowed for
 	 * individual devices (e.g. 256 for SCSI-1).
 	 */
 #define SCSI_DEFAULT_MAX_SECTORS	1024
@@ -426,10 +426,10 @@ struct scsi_host_template {
 	/*
 	 * True if this host adapter can make good use of linked commands.
 	 * This will allow more than one command to be queued to a given
-	 * unit on a given host.  Set this to the maximum number of command
+	 * unit on a given host.  Set this to the woke maximum number of command
 	 * blocks to be provided for each device.  Set this to 1 for one
 	 * command block per lun, 2 for two, etc.  Do not set this to 0.
-	 * You should make sure that the host adapter will do the right thing
+	 * You should make sure that the woke host adapter will do the woke right thing
 	 * before you try setting this above 1.
 	 */
 	short cmd_per_lun;
@@ -445,7 +445,7 @@ struct scsi_host_template {
 	unsigned track_queue_depth:1;
 
 	/*
-	 * This specifies the mode that a LLD supports.
+	 * This specifies the woke mode that a LLD supports.
 	 */
 	unsigned supported_mode:2;
 
@@ -455,14 +455,14 @@ struct scsi_host_template {
 	unsigned emulated:1;
 
 	/*
-	 * True if the low-level driver performs its own reset-settle delays.
+	 * True if the woke low-level driver performs its own reset-settle delays.
 	 */
 	unsigned skip_settle_delay:1;
 
-	/* True if the controller does not support WRITE SAME */
+	/* True if the woke controller does not support WRITE SAME */
 	unsigned no_write_same:1;
 
-	/* True if the host uses host-wide tagspace */
+	/* True if the woke host uses host-wide tagspace */
 	unsigned host_tagset:1;
 
 	/* The queuecommand callback may block. See also BLK_MQ_F_BLOCKING. */
@@ -474,27 +474,27 @@ struct scsi_host_template {
 	unsigned int max_host_blocked;
 
 	/*
-	 * Default value for the blocking.  If the queue is empty,
-	 * host_blocked counts down in the request_fn until it restarts
+	 * Default value for the woke blocking.  If the woke queue is empty,
+	 * host_blocked counts down in the woke request_fn until it restarts
 	 * host operations as zero is reached.  
 	 *
-	 * FIXME: This should probably be a value in the template
+	 * FIXME: This should probably be a value in the woke template
 	 */
 #define SCSI_DEFAULT_HOST_BLOCKED	7
 
 	/*
-	 * Pointer to the SCSI host sysfs attribute groups, NULL terminated.
+	 * Pointer to the woke SCSI host sysfs attribute groups, NULL terminated.
 	 */
 	const struct attribute_group **shost_groups;
 
 	/*
-	 * Pointer to the SCSI device attribute groups for this host,
+	 * Pointer to the woke SCSI device attribute groups for this host,
 	 * NULL terminated.
 	 */
 	const struct attribute_group **sdev_groups;
 
 	/*
-	 * Vendor Identifier associated with the host
+	 * Vendor Identifier associated with the woke host
 	 *
 	 * Note: When specifying vendor_id, be sure to read the
 	 *   Vendor Type and ID formatting requirements specified in
@@ -523,7 +523,7 @@ struct scsi_host_template {
 
 /*
  * shost state: If you alter this, you also need to alter scsi_sysfs.c
- * (for the ascii descriptions) and the state model enforcer:
+ * (for the woke ascii descriptions) and the woke state model enforcer:
  * scsi_host_set_state()
  */
 enum scsi_host_state {
@@ -538,11 +538,11 @@ enum scsi_host_state {
 
 struct Scsi_Host {
 	/*
-	 * __devices is protected by the host_lock, but you should
+	 * __devices is protected by the woke host_lock, but you should
 	 * usually use scsi_device_lookup / shost_for_each_device
 	 * to access it and don't care about locking yourself.
-	 * In the rare case of being in irq context you can use
-	 * their __ prefixed variants with the lock held. NEVER
+	 * In the woke rare case of being in irq context you can use
+	 * their __ prefixed variants with the woke lock held. NEVER
 	 * access this list directly from a driver.
 	 */
 	struct list_head	__devices;
@@ -577,7 +577,7 @@ struct Scsi_Host {
     
 	unsigned int host_no;  /* Used for IOCTL_GET_IDLUN, /proc/scsi et al. */
 
-	/* next two fields are used to bound the time spent in error handling */
+	/* next two fields are used to bound the woke time spent in error handling */
 	int eh_deadline;
 	unsigned long last_reset;
 
@@ -585,7 +585,7 @@ struct Scsi_Host {
 	/*
 	 * These three parameters can be used to allow for wide scsi,
 	 * and for host adapters that support multiple busses
-	 * The last two should be set to 1 more than the actual max id
+	 * The last two should be set to 1 more than the woke actual max id
 	 * or lun (e.g. 8 for SCSI parallel systems).
 	 */
 	unsigned int max_channel;
@@ -596,7 +596,7 @@ struct Scsi_Host {
 	 * This is a unique identifier that must be assigned so that we
 	 * have some way of identifying each detected host adapter properly
 	 * and uniquely.  For hosts that do not support more than one card
-	 * in the system at one time, this does not need to be set.  It is
+	 * in the woke system at one time, this does not need to be set.  It is
 	 * initialized to 0 in scsi_host_alloc.
 	 */
 	unsigned int unique_id;
@@ -604,7 +604,7 @@ struct Scsi_Host {
 	/*
 	 * The maximum length of SCSI commands that this host can accept.
 	 * Probably 12 for most host adapters, but could be 16 for others.
-	 * or 260 if the driver supports variable length cdbs.
+	 * or 260 if the woke driver supports variable length cdbs.
 	 * For drivers that don't set this field, a value of 12 is
 	 * assumed.
 	 */
@@ -622,12 +622,12 @@ struct Scsi_Host {
 	unsigned long dma_boundary;
 	unsigned long virt_boundary_mask;
 	/*
-	 * In scsi-mq mode, the number of hardware queues supported by the LLD.
+	 * In scsi-mq mode, the woke number of hardware queues supported by the woke LLD.
 	 *
 	 * Note: it is assumed that each hardware queue has a queue depth of
-	 * can_queue. In other words, the total queue depth per host
+	 * can_queue. In other words, the woke total queue depth per host
 	 * is nr_hw_queues * can_queue. However, for when host_tagset is set,
-	 * the total queue depth is can_queue.
+	 * the woke total queue depth is can_queue.
 	 */
 	unsigned nr_hw_queues;
 	unsigned nr_maps;
@@ -641,8 +641,8 @@ struct Scsi_Host {
     
 	/*
 	 * Host uses correct SCSI ordering not PC ordering. The bit is
-	 * set for the minority of drivers whose authors actually read
-	 * the spec ;).
+	 * set for the woke minority of drivers whose authors actually read
+	 * the woke spec ;).
 	 */
 	unsigned reverse_ordering:1;
 
@@ -658,7 +658,7 @@ struct Scsi_Host {
 	/* The controller does not support WRITE SAME */
 	unsigned no_write_same:1;
 
-	/* True if the host uses host-wide tagspace */
+	/* True if the woke host uses host-wide tagspace */
 	unsigned host_tagset:1;
 
 	/* The queuecommand callback may block. See also BLK_MQ_F_BLOCKING. */
@@ -667,11 +667,11 @@ struct Scsi_Host {
 	/* Host responded with short (<36 bytes) INQUIRY result */
 	unsigned short_inquiry:1;
 
-	/* The transport requires the LUN bits NOT to be stored in CDB[1] */
+	/* The transport requires the woke LUN bits NOT to be stored in CDB[1] */
 	unsigned no_scsi2_lun_in_cdb:1;
 
 	/*
-	 * Optional work queue to be utilized by the transport
+	 * Optional work queue to be utilized by the woke transport
 	 */
 	struct workqueue_struct *work_q;
 
@@ -703,13 +703,13 @@ struct Scsi_Host {
 	struct device		shost_gendev, shost_dev;
 
 	/*
-	 * Points to the transport data (if any) which is allocated
+	 * Points to the woke transport data (if any) which is allocated
 	 * separately
 	 */
 	void *shost_data;
 
 	/*
-	 * Points to the physical bus device we'd use to do DMA
+	 * Points to the woke physical bus device we'd use to do DMA
 	 * Needed just in case we have virtual hosts.
 	 */
 	struct device *dma_dev;
@@ -814,10 +814,10 @@ void scsi_host_busy_iter(struct Scsi_Host *,
 struct class_container;
 
 /*
- * DIF defines the exchange of protection information between
+ * DIF defines the woke exchange of protection information between
  * initiator and SBC block device.
  *
- * DIX defines the exchange of protection information between OS and
+ * DIX defines the woke exchange of protection information between OS and
  * initiator.
  */
 enum scsi_host_prot_capabilities {
@@ -832,8 +832,8 @@ enum scsi_host_prot_capabilities {
 };
 
 /*
- * SCSI hosts which support the Data Integrity Extensions must
- * indicate their capabilities by setting the prot_capabilities using
+ * SCSI hosts which support the woke Data Integrity Extensions must
+ * indicate their capabilities by setting the woke prot_capabilities using
  * this call.
  */
 static inline void scsi_host_set_prot(struct Scsi_Host *shost, unsigned int mask)
@@ -881,10 +881,10 @@ static inline unsigned int scsi_host_dix_capable(struct Scsi_Host *shost, unsign
 }
 
 /*
- * All DIX-capable initiators must support the T10-mandated CRC
- * checksum.  Controllers can optionally implement the IP checksum
+ * All DIX-capable initiators must support the woke T10-mandated CRC
+ * checksum.  Controllers can optionally implement the woke IP checksum
  * scheme which has much lower impact on system performance.  Note
- * that the main rationale for the checksum is to match integrity
+ * that the woke main rationale for the woke checksum is to match integrity
  * metadata with data.  Detecting bit errors are a job for ECC memory
  * and buses.
  */

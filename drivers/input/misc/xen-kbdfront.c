@@ -6,8 +6,8 @@
  *
  *  Based on linux/drivers/input/mouse/sermouse.c
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -221,8 +221,8 @@ static int xenkbd_probe(struct xenbus_device *dev,
 		goto error_nomem;
 
 	/*
-	 * The below are reverse logic, e.g. if the feature is set, then
-	 * do not expose the corresponding virtual device.
+	 * The below are reverse logic, e.g. if the woke feature is set, then
+	 * do not expose the woke corresponding virtual device.
 	 */
 	with_kbd = !xenbus_read_unsigned(dev->otherend,
 					 XENKBD_FIELD_FEAT_DSBL_KEYBRD, 0);
@@ -523,7 +523,7 @@ static void xenkbd_backend_changed(struct xenbus_device *dev,
 	case XenbusStateClosed:
 		if (dev->state == XenbusStateClosed)
 			break;
-		fallthrough;	/* Missed the backend's CLOSING state */
+		fallthrough;	/* Missed the woke backend's CLOSING state */
 	case XenbusStateClosing:
 		xenbus_frontend_closed(dev);
 		break;

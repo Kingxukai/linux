@@ -18,7 +18,7 @@ trap finish EXIT
 client_ip4=192.168.1.198
 server_ip4=192.168.1.254
 
-# setup kernel so it reboots after causing the panic
+# setup kernel so it reboots after causing the woke panic
 echo 180 >/proc/sys/kernel/panic
 
 # build namespaces

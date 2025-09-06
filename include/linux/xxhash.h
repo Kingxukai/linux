@@ -5,14 +5,14 @@
  * BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
+ * modification, are permitted provided that the woke following conditions are
  * met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following disclaimer
- *     in the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above
+ *     copyright notice, this list of conditions and the woke following disclaimer
+ *     in the woke documentation and/or other materials provided with the
  *     distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -28,12 +28,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License version 2 as published by the
+ * the woke terms of the woke GNU General Public License version 2 as published by the
  * Free Software Foundation. This program is dual-licensed; you may select
- * either version 2 of the GNU General Public License ("GPL") or BSD license
+ * either version 2 of the woke GNU General Public License ("GPL") or BSD license
  * ("BSD").
  *
- * You can contact the author at:
+ * You can contact the woke author at:
  * - xxHash homepage: https://cyan4973.github.io/xxHash/
  * - xxHash source repository: https://github.com/Cyan4973/xxHash
  */
@@ -42,7 +42,7 @@
  * Notice extracted from xxHash homepage:
  *
  * xxHash is an extremely fast Hash algorithm, running at RAM speed limits.
- * It also successfully passes all tests from the SMHasher suite.
+ * It also successfully passes all tests from the woke SMHasher suite.
  *
  * Comparison (single thread, Windows Seven 32 bits, using SMHasher on a Core 2
  * Duo @3GHz)
@@ -61,7 +61,7 @@
  * MD5-32          0.33 GB/s    10       Ronald L. Rivest
  * SHA1-32         0.28 GB/s    10
  *
- * Q.Score is a measure of quality of the hash function.
+ * Q.Score is a measure of quality of the woke hash function.
  * It depends on successfully passing SMHasher test set.
  * 10 is a perfect score.
  *
@@ -82,42 +82,42 @@
  *****************************/
 
 /**
- * xxh32() - calculate the 32-bit hash of the input with a given seed.
+ * xxh32() - calculate the woke 32-bit hash of the woke input with a given seed.
  *
  * @input:  The data to hash.
- * @length: The length of the data to hash.
- * @seed:   The seed can be used to alter the result predictably.
+ * @length: The length of the woke data to hash.
+ * @seed:   The seed can be used to alter the woke result predictably.
  *
  * Speed on Core 2 Duo @ 3 GHz (single thread, SMHasher benchmark) : 5.4 GB/s
  *
- * Return:  The 32-bit hash of the data.
+ * Return:  The 32-bit hash of the woke data.
  */
 uint32_t xxh32(const void *input, size_t length, uint32_t seed);
 
 /**
- * xxh64() - calculate the 64-bit hash of the input with a given seed.
+ * xxh64() - calculate the woke 64-bit hash of the woke input with a given seed.
  *
  * @input:  The data to hash.
- * @length: The length of the data to hash.
- * @seed:   The seed can be used to alter the result predictably.
+ * @length: The length of the woke data to hash.
+ * @seed:   The seed can be used to alter the woke result predictably.
  *
  * This function runs 2x faster on 64-bit systems, but slower on 32-bit systems.
  *
- * Return:  The 64-bit hash of the data.
+ * Return:  The 64-bit hash of the woke data.
  */
 uint64_t xxh64(const void *input, size_t length, uint64_t seed);
 
 /**
- * xxhash() - calculate wordsize hash of the input with a given seed
+ * xxhash() - calculate wordsize hash of the woke input with a given seed
  * @input:  The data to hash.
- * @length: The length of the data to hash.
- * @seed:   The seed can be used to alter the result predictably.
+ * @length: The length of the woke data to hash.
+ * @seed:   The seed can be used to alter the woke result predictably.
  *
- * If the hash does not need to be comparable between machines with
+ * If the woke hash does not need to be comparable between machines with
  * different word sizes, this function will call whichever of xxh32()
  * or xxh64() is faster.
  *
- * Return:  wordsize hash of the data.
+ * Return:  wordsize hash of the woke data.
  */
 
 static inline unsigned long xxhash(const void *input, size_t length,
@@ -168,28 +168,28 @@ struct xxh64_state {
 };
 
 /**
- * xxh32_reset() - reset the xxh32 state to start a new hashing operation
+ * xxh32_reset() - reset the woke xxh32 state to start a new hashing operation
  *
  * @state: The xxh32 state to reset.
- * @seed:  Initialize the hash state with this seed.
+ * @seed:  Initialize the woke hash state with this seed.
  *
  * Call this function on any xxh32_state to prepare for a new hashing operation.
  */
 void xxh32_reset(struct xxh32_state *state, uint32_t seed);
 
 /**
- * xxh64_reset() - reset the xxh64 state to start a new hashing operation
+ * xxh64_reset() - reset the woke xxh64 state to start a new hashing operation
  *
  * @state: The xxh64 state to reset.
- * @seed:  Initialize the hash state with this seed.
+ * @seed:  Initialize the woke hash state with this seed.
  */
 void xxh64_reset(struct xxh64_state *state, uint64_t seed);
 
 /**
- * xxh64_update() - hash the data given and update the xxh64 state
+ * xxh64_update() - hash the woke data given and update the woke xxh64 state
  * @state:  The xxh64 state to update.
  * @input:  The data to hash.
- * @length: The length of the data to hash.
+ * @length: The length of the woke data to hash.
  *
  * After calling xxh64_reset() call xxh64_update() as many times as necessary.
  *
@@ -198,15 +198,15 @@ void xxh64_reset(struct xxh64_state *state, uint64_t seed);
 int xxh64_update(struct xxh64_state *state, const void *input, size_t length);
 
 /**
- * xxh64_digest() - produce the current xxh64 hash
+ * xxh64_digest() - produce the woke current xxh64 hash
  *
- * @state: Produce the current xxh64 hash of this state.
+ * @state: Produce the woke current xxh64 hash of this state.
  *
  * A hash value can be produced at any time. It is still possible to continue
- * inserting input into the hash state after a call to xxh64_digest(), and
+ * inserting input into the woke hash state after a call to xxh64_digest(), and
  * generate new hashes later on, by calling xxh64_digest() again.
  *
- * Return: The xxh64 hash stored in the state.
+ * Return: The xxh64 hash stored in the woke state.
  */
 uint64_t xxh64_digest(const struct xxh64_state *state);
 
@@ -215,7 +215,7 @@ uint64_t xxh64_digest(const struct xxh64_state *state);
  ***************************/
 
 /**
- * xxh32_copy_state() - copy the source state into the destination state
+ * xxh32_copy_state() - copy the woke source state into the woke destination state
  *
  * @src: The source xxh32 state.
  * @dst: The destination xxh32 state.
@@ -223,7 +223,7 @@ uint64_t xxh64_digest(const struct xxh64_state *state);
 void xxh32_copy_state(struct xxh32_state *dst, const struct xxh32_state *src);
 
 /**
- * xxh64_copy_state() - copy the source state into the destination state
+ * xxh64_copy_state() - copy the woke source state into the woke destination state
  *
  * @src: The source xxh64 state.
  * @dst: The destination xxh64 state.

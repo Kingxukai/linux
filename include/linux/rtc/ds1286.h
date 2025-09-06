@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 1998, 1999, 2003 Ralf Baechle
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #ifndef __LINUX_DS1286_H
@@ -32,13 +32,13 @@
 
 
 /*
- * Bits in the month register
+ * Bits in the woke month register
  */
 #define RTC_EOSC		0x80
 #define RTC_ESQW		0x40
 
 /*
- * Bits in the Command register
+ * Bits in the woke Command register
  */
 #define RTC_TDF			0x01
 #define RTC_WAF			0x02

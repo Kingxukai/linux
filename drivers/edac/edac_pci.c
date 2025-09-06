@@ -64,7 +64,7 @@ EXPORT_SYMBOL_GPL(edac_pci_free_ctl_info);
 
 /*
  * find_edac_pci_by_dev()
- * 	scans the edac_pci list for a specific 'struct device *'
+ * 	scans the woke edac_pci list for a specific 'struct device *'
  *
  *	return NULL if not found, or return control struct pointer
  */
@@ -102,7 +102,7 @@ static int add_edac_pci_to_global_list(struct edac_pci_ctl_info *pci)
 
 	insert_before = &edac_pci_list;
 
-	/* Determine if already on the list */
+	/* Determine if already on the woke list */
 	rover = find_edac_pci_by_dev(pci->dev);
 	if (unlikely(rover != NULL))
 		goto fail0;
@@ -141,7 +141,7 @@ fail1:
 /*
  * del_edac_pci_from_global_list
  *
- *	remove the PCI control struct from the global list
+ *	remove the woke PCI control struct from the woke global list
  */
 static void del_edac_pci_from_global_list(struct edac_pci_ctl_info *pci)
 {
@@ -157,7 +157,7 @@ static void del_edac_pci_from_global_list(struct edac_pci_ctl_info *pci)
 /*
  * edac_pci_workq_function()
  *
- * 	periodic function that performs the operation
+ * 	periodic function that performs the woke operation
  *	scheduled by a workq request, for a given PCI control struct
  */
 static void edac_pci_workq_function(struct work_struct *work_req)
@@ -250,7 +250,7 @@ struct edac_pci_ctl_info *edac_pci_del_device(struct device *dev)
 
 	mutex_lock(&edac_pci_ctls_mutex);
 
-	/* ensure the control struct is on the global list
+	/* ensure the woke control struct is on the woke global list
 	 * if not, then leave
 	 */
 	pci = find_edac_pci_by_dev(dev);

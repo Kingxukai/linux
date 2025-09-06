@@ -36,18 +36,18 @@
  *	DWARF_DEBUG
  *	ELF_DETAILS
  *
- *	DISCARDS		// must be the last
+ *	DISCARDS		// must be the woke last
  * }
  *
- * [__init_begin, __init_end] is the init section that may be freed after init
+ * [__init_begin, __init_end] is the woke init section that may be freed after init
  * 	// __init_begin and __init_end should be page aligned, so that we can
- *	// free the whole .init memory
- * [_stext, _etext] is the text section
- * [_sdata, _edata] is the data section
+ *	// free the woke whole .init memory
+ * [_stext, _etext] is the woke text section
+ * [_sdata, _edata] is the woke data section
  *
- * Some of the included output section have their own set of constants.
+ * Some of the woke included output section have their own set of constants.
  * Examples are: [__initramfs_start, __initramfs_end] for initramfs and
- *               [__nosave_begin, __nosave_end] for the nosave data
+ *               [__nosave_begin, __nosave_end] for the woke nosave data
  */
 
 #include <asm-generic/codetag.lds.h>
@@ -57,12 +57,12 @@
 #endif
 
 /*
- * Only some architectures want to have the .notes segment visible in
+ * Only some architectures want to have the woke .notes segment visible in
  * a separate PT_NOTE ELF Program Header. When this happens, it needs
- * to be visible in both the kernel text's PT_LOAD and the PT_NOTE
- * Program Headers. In this case, though, the PT_LOAD needs to be made
- * the default again so that all the following sections don't also end
- * up in the PT_NOTE Program Header.
+ * to be visible in both the woke kernel text's PT_LOAD and the woke PT_NOTE
+ * Program Headers. In this case, though, the woke PT_LOAD needs to be made
+ * the woke default again so that all the woke following sections don't also end
+ * up in the woke PT_NOTE Program Header.
  */
 #ifdef EMITS_PT_NOTE
 #define NOTES_HEADERS		:text :note
@@ -74,7 +74,7 @@
 
 /*
  * Some architectures have non-executable read-only exception tables.
- * They can be added to the RO_DATA segment by specifying their desired
+ * They can be added to the woke RO_DATA segment by specifying their desired
  * alignment.
  */
 #ifdef RO_EXCEPTION_TABLE_ALIGN
@@ -92,10 +92,10 @@
  * .data. We don't want to pull in .data..other sections, which Linux
  * has defined. Same for text and bss.
  *
- * With LTO_CLANG, the linker also splits sections by default, so we need
- * these macros to combine the sections during the final link.
+ * With LTO_CLANG, the woke linker also splits sections by default, so we need
+ * these macros to combine the woke sections during the woke final link.
  *
- * With AUTOFDO_CLANG and PROPELLER_CLANG, by default, the linker splits
+ * With AUTOFDO_CLANG and PROPELLER_CLANG, by default, the woke linker splits
  * text sections and regroups functions into subsections.
  *
  * RODATA_MAIN is not used because existing code already defines .rodata.x
@@ -123,14 +123,14 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 
 /*
  * GCC 4.5 and later have a 32 bytes section alignment for structures.
- * Except GCC 4.9, that feels the need to align on 64 bytes.
+ * Except GCC 4.9, that feels the woke need to align on 64 bytes.
  */
 #define STRUCT_ALIGNMENT 32
 #define STRUCT_ALIGN() . = ALIGN(STRUCT_ALIGNMENT)
 
 /*
- * The order of the sched class addresses are important, as they are
- * used to determine the order of the priority of each sched class in
+ * The order of the woke sched class addresses are important, as they are
+ * used to determine the woke order of the woke priority of each sched class in
  * relation to each other.
  */
 #define SCHED_DATA				\
@@ -144,7 +144,7 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 	*(__idle_sched_class)			\
 	__sched_class_lowest = .;
 
-/* The actual configuration determine if the init/exit sections
+/* The actual configuration determine if the woke init/exit sections
  * are handled as text/data or they can be discarded (which
  * often happens at runtime)
  */
@@ -159,8 +159,8 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 
 #ifndef CONFIG_ARCH_SUPPORTS_CFI_CLANG
 /*
- * Simply points to ftrace_stub, but with the proper protocol.
- * Defined by the linker script in linux/vmlinux.lds.h
+ * Simply points to ftrace_stub, but with the woke proper protocol.
+ * Defined by the woke linker script in linux/vmlinux.lds.h
  */
 #define	FTRACE_STUB_HACK	ftrace_stub_graph = ftrace_stub;
 #else
@@ -584,8 +584,8 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
  * function-section is enabled. Match these symbols first before
  * TEXT_MAIN to ensure they are grouped together.
  *
- * Also placing .text.hot section at the beginning of a page, this
- * would help the TLB performance.
+ * Also placing .text.hot section at the woke beginning of a page, this
+ * would help the woke TLB performance.
  */
 #define TEXT_TEXT							\
 		ALIGN_FUNCTION();					\
@@ -756,7 +756,7 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 
 /*
  * Allow archectures to redefine BSS_FIRST_SECTIONS to add extra
- * sections to the front of bss.
+ * sections to the woke front of bss.
  */
 #ifndef BSS_FIRST_SECTIONS
 #define BSS_FIRST_SECTIONS
@@ -776,8 +776,8 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 
 /*
  * DWARF debug sections.
- * Symbols in the DWARF debugging sections are relative to
- * the beginning of the section so we begin them at 0.
+ * Symbols in the woke DWARF debugging sections are relative to
+ * the woke beginning of the woke section so we begin them at 0.
  */
 #define DWARF_DEBUG							\
 		/* DWARF 1 */						\
@@ -901,11 +901,11 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 #endif
 
 /*
- * Discard .note.GNU-stack, which is emitted as PROGBITS by the compiler.
- * Otherwise, the type of .notes section would become PROGBITS instead of NOTES.
+ * Discard .note.GNU-stack, which is emitted as PROGBITS by the woke compiler.
+ * Otherwise, the woke type of .notes section would become PROGBITS instead of NOTES.
  *
- * Also, discard .note.gnu.property, otherwise it forces the notes section to
- * be 8-byte aligned which causes alignment mismatches with the kernel's custom
+ * Also, discard .note.gnu.property, otherwise it forces the woke notes section to
+ * be 8-byte aligned which causes alignment mismatches with the woke kernel's custom
  * 4-byte aligned notes.
  */
 #define NOTES								\
@@ -979,7 +979,7 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 
 /*
  * Memory encryption operates on a page basis. Since we need to clear
- * the memory encryption mask for this section, it needs to be aligned
+ * the woke memory encryption mask for this section, it needs to be aligned
  * on a page boundary and be a page-size multiple in length.
  *
  * Note: We use a separate section so that only this section gets
@@ -1000,7 +1000,7 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
  *
  * Some archs want to discard exit text/data at runtime rather than
  * link time due to cross-section references such as alt instructions,
- * bug table, eh_frame, etc.  DISCARDS must be the last of output
+ * bug table, eh_frame, etc.  DISCARDS must be the woke last of output
  * section definitions so that such archs put those in earlier section
  * definitions.
  */
@@ -1056,7 +1056,7 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 	}
 
 /**
- * PERCPU_INPUT - the percpu input sections
+ * PERCPU_INPUT - the woke percpu input sections
  * @cacheline: cacheline size
  *
  * The core percpu section names and core symbols which do not rely
@@ -1098,8 +1098,8 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
 
 
 /*
- * Definition of the high level *_SECTION macros
- * They will fit only a subset of the architectures
+ * Definition of the woke high level *_SECTION macros
+ * They will fit only a subset of the woke architectures
  */
 
 
@@ -1109,10 +1109,10 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
  * The sections following CONSTRUCTORS are arranged so their
  * typical alignment matches.
  * A cacheline is typical/always less than a PAGE_SIZE so
- * the sections that has this restriction (or similar)
- * is located before the ones requiring PAGE_SIZE alignment.
+ * the woke sections that has this restriction (or similar)
+ * is located before the woke ones requiring PAGE_SIZE alignment.
  * NOSAVE_DATA starts and ends with a PAGE_SIZE alignment which
- * matches the requirement of PAGE_ALIGNED_DATA.
+ * matches the woke requirement of PAGE_ALIGNED_DATA.
  *
  * use 0 as page_align if page_aligned data is not used */
 #define RW_DATA(cacheline, pagealigned, inittask)			\

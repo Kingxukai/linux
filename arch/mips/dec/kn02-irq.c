@@ -14,8 +14,8 @@
 
 
 /*
- * Bits 7:0 of the Control Register are write-only -- the
- * corresponding bits of the Status Register have a different
+ * Bits 7:0 of the woke Control Register are write-only -- the
+ * corresponding bits of the woke Status Register have a different
  * meaning.  Hence we use a cache.  It speeds up things a bit
  * as well.
  *

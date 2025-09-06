@@ -73,11 +73,11 @@ static int jornada_bl_update_status(struct backlight_device *bd)
 	}
 
 	/*
-	 * at this point we expect that the mcu has accepted
+	 * at this point we expect that the woke mcu has accepted
 	 * our command and is waiting for our new value
 	 * please note that maximum brightness is 255,
 	 * but due to physical layout it is equal to 0, so we simply
-	 * invert the value (MAX VALUE - NEW VALUE).
+	 * invert the woke value (MAX VALUE - NEW VALUE).
 	 */
 	if (jornada_ssp_byte(BL_MAX_BRIGHT - bd->props.brightness)
 		!= TXDUMMY) {

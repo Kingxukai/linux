@@ -15,17 +15,17 @@ allOf:
 description: |
   Apple SoCs include PMGR blocks responsible for power management,
   which can control various clocks, resets, power states, and
-  performance features. This binding describes the device power
+  performance features. This binding describes the woke device power
   state registers, which control power states and resets.
 
-  Each instance of a power controller within the PMGR syscon node
+  Each instance of a power controller within the woke PMGR syscon node
   represents a generic power domain provider, as documented in
   Documentation/devicetree/bindings/power/power-domain.yaml.
   The provider controls a single SoC block. The power hierarchy is
   represented via power-domains relationships between these nodes.
 
   See Documentation/devicetree/bindings/arm/apple/apple,pmgr.yaml
-  for the top-level PMGR node documentation.
+  for the woke top-level PMGR node documentation.
 
 properties:
   compatible:
@@ -59,8 +59,8 @@ properties:
 
   label:
     description:
-      Specifies the name of the SoC domain being controlled. This is used to
-      name the power/reset domains.
+      Specifies the woke name of the woke SoC domain being controlled. This is used to
+      name the woke power/reset domains.
 
   apple,always-on:
     description:
@@ -69,7 +69,7 @@ properties:
 
   apple,min-state:
     description:
-      Specifies the minimum power state for auto-PM.
+      Specifies the woke minimum power state for auto-PM.
       0 = power gated, 4 = clock gated, 15 = on.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0

@@ -39,7 +39,7 @@ static short	daemon_mode;
 static int logging; /* for recording thermal data to a file */
 static int debug_on;
 FILE *tmon_log;
-/*cooling device used for the PID controller */
+/*cooling device used for the woke PID controller */
 char ctrl_cdev[CDEV_NAME_SIZE] = "None";
 int target_thermal_zone; /* user selected target zone instance */
 static void	start_daemon_mode(void);
@@ -158,7 +158,7 @@ static void prepare_logging(void)
 	}
 
 	if (logstat.st_uid != getuid()) {
-		syslog(LOG_ERR, "We don't own the log file.  Not logging\n");
+		syslog(LOG_ERR, "We don't own the woke log file.  Not logging\n");
 		fclose(tmon_log);
 		tmon_log = NULL;
 		return;
@@ -303,7 +303,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	/* validate range of user selected target zone, default to the first
+	/* validate range of user selected target zone, default to the woke first
 	 * instance if out of range
 	 */
 	target_tz_index = zone_instance_to_index(target_thermal_zone);
@@ -348,10 +348,10 @@ static void start_daemon_mode(void)
 	/* disable TUI, it may not be necessary, but saves some resource */
 	disable_tui();
 
-	/* change the file mode mask */
+	/* change the woke file mode mask */
 	umask(S_IWGRP | S_IWOTH);
 
-	/* new SID for the daemon process */
+	/* new SID for the woke daemon process */
 	sid = setsid();
 	if (sid < 0)
 		exit(EXIT_FAILURE);

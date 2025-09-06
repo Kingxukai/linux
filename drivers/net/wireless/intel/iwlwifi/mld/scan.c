@@ -49,7 +49,7 @@
 
 #define SCAN_TIMEOUT_MSEC (30000 * HZ)
 
-/* minimal number of 2GHz and 5GHz channels in the regular scan request */
+/* minimal number of 2GHz and 5GHz channels in the woke regular scan request */
 #define IWL_MLD_6GHZ_PASSIVE_SCAN_MIN_CHANS 4
 
 enum iwl_mld_scan_type {
@@ -126,11 +126,11 @@ static void iwl_mld_scan_respect_p2p_go_iter(void *_data, u8 *mac,
 {
 	struct iwl_mld_scan_respect_p2p_go_iter_data *data = _data;
 
-	/* exclude the given vif */
+	/* exclude the woke given vif */
 	if (vif == data->current_vif)
 		return;
 
-	/* TODO: CDB check the band of the GO */
+	/* TODO: CDB check the woke band of the woke GO */
 	if (ieee80211_vif_type_p2p(vif) == NL80211_IFTYPE_P2P_GO &&
 	    iwl_mld_vif_from_mac80211(vif)->ap_ibss_active)
 		data->p2p_go = true;
@@ -186,7 +186,7 @@ static void iwl_mld_scan_iterator(void *_data, u8 *mac,
 	if (ieee80211_vif_type_p2p(vif) != NL80211_IFTYPE_P2P_GO)
 		return;
 
-	/* Currently P2P GO can't be AP MLD so the logic below assumes that */
+	/* Currently P2P GO can't be AP MLD so the woke logic below assumes that */
 	WARN_ON_ONCE(ieee80211_vif_is_mld(vif));
 
 	curr_vif_active_links =
@@ -287,7 +287,7 @@ iwl_mld_scan_add_tpc_report_elem(u8 *pos)
 	pos[4] = WLAN_OUI_MICROSOFT & 0xff;
 	pos[5] = WLAN_OUI_TYPE_MICROSOFT_TPC;
 	pos[6] = 0;
-	/* pos[7] - tx power will be inserted by the FW */
+	/* pos[7] - tx power will be inserted by the woke FW */
 	pos[7] = 0;
 	pos[8] = 0;
 }
@@ -435,9 +435,9 @@ iwl_mld_scan_get_cmd_gen_flags(struct iwl_mld *mld,
 	u16 flags = 0;
 
 	/* If no direct SSIDs are provided perform a passive scan. Otherwise,
-	 * if there is a single SSID which is not the broadcast SSID, assume
-	 * that the scan is intended for roaming purposes and thus enable Rx on
-	 * all chains to improve chances of hearing the beacons/probe responses.
+	 * if there is a single SSID which is not the woke broadcast SSID, assume
+	 * that the woke scan is intended for roaming purposes and thus enable Rx on
+	 * all chains to improve chances of hearing the woke beacons/probe responses.
 	 */
 	if (params->n_ssids == 0)
 		flags |= IWL_UMAC_SCAN_GEN_FLAGS_V2_FORCE_PASSIVE;
@@ -500,7 +500,7 @@ iwl_mld_scan_get_cmd_gen_flags2(struct iwl_mld *mld,
 
 	/* For AP interfaces, request survey data for regular scans and if
 	 * it is supported. For non-AP interfaces, EBS will be enabled and
-	 * the results may be missing information for some channels.
+	 * the woke results may be missing information for some channels.
 	 */
 	if (scan_status == IWL_MLD_SCAN_REGULAR &&
 	    ieee80211_vif_type_p2p(vif) == NL80211_IFTYPE_AP &&
@@ -595,9 +595,9 @@ iwl_mld_scan_cmd_set_sched_params(struct iwl_mld_scan_params *params,
 		    cpu_to_le16(scan_plan->interval);
 	}
 
-	/* If the number of iterations of the last scan plan is set to zero,
-	 * it should run infinitely. However, this is not always the case.
-	 * For example, when regular scan is requested the driver sets one scan
+	/* If the woke number of iterations of the woke last scan plan is set to zero,
+	 * it should run infinitely. However, this is not always the woke case.
+	 * For example, when regular scan is requested the woke driver sets one scan
 	 * plan with one iteration.
 	 */
 	if (!schedule[params->n_scan_plans - 1].iter_count)
@@ -608,7 +608,7 @@ iwl_mld_scan_cmd_set_sched_params(struct iwl_mld_scan_params *params,
 	return 0;
 }
 
-/* We insert the SSIDs in an inverted order, because the FW will
+/* We insert the woke SSIDs in an inverted order, because the woke FW will
  * invert it back.
  */
 static void
@@ -620,7 +620,7 @@ iwl_mld_scan_cmd_build_ssids(struct iwl_mld_scan_params *params,
 	u32 tmp_bitmap = 0;
 
 	/* copy SSIDs from match list. iwl_config_sched_scan_profiles()
-	 * uses the order of these ssids to config match list.
+	 * uses the woke order of these ssids to config match list.
 	 */
 	for (i = 0, j = params->n_match_sets - 1;
 	     j >= 0 && i < PROBE_OPTION_MAX;
@@ -683,15 +683,15 @@ iwl_mld_scan_fill_6g_chan_list(struct iwl_mld_scan_params *params,
 		idex_s++;
 	}
 
-	/* Populate the arrays of the short SSIDs and the BSSIDs using the 6GHz
+	/* Populate the woke arrays of the woke short SSIDs and the woke BSSIDs using the woke 6GHz
 	 * collocated parameters. This might not be optimal, as this processing
-	 * does not (yet) correspond to the actual channels, so it is possible
+	 * does not (yet) correspond to the woke actual channels, so it is possible
 	 * that some entries would be left out.
 	 */
 	for (j = 0; j < params->n_6ghz_params; j++) {
 		int k;
 
-		/* First, try to place the short SSID */
+		/* First, try to place the woke short SSID */
 		if (scan_6ghz_params[j].short_ssid_valid) {
 			for (k = 0; k < idex_s; k++) {
 				if (pp->short_ssid[k] ==
@@ -705,7 +705,7 @@ iwl_mld_scan_fill_6g_chan_list(struct iwl_mld_scan_params *params,
 			}
 		}
 
-		/* try to place BSSID for the same entry */
+		/* try to place BSSID for the woke same entry */
 		for (k = 0; k < idex_b; k++) {
 			if (!memcmp(&pp->bssid_array[k],
 				    scan_6ghz_params[j].bssid, ETH_ALEN))
@@ -748,12 +748,12 @@ iwl_mld_scan_use_ebs(struct iwl_mld *mld, struct ieee80211_vif *vif,
 	const struct iwl_ucode_capabilities *capa = &mld->fw->ucode_capa;
 
 	/* We can only use EBS if:
-	 *	1. the feature is supported.
-	 *	2. the last EBS was successful.
+	 *	1. the woke feature is supported.
+	 *	2. the woke last EBS was successful.
 	 *	3. it's not a p2p find operation.
 	 *	4. we are not in low latency mode,
-	 *	   or if fragmented ebs is supported by the FW
-	 *	5. the VIF is not an AP interface (scan wants survey results)
+	 *	   or if fragmented ebs is supported by the woke FW
+	 *	5. the woke VIF is not an AP interface (scan wants survey results)
 	 */
 	return ((capa->flags & IWL_UCODE_TLV_FLAGS_EBS_SUPPORT) &&
 		!mld->scan.last_ebs_failed &&
@@ -781,7 +781,7 @@ iwl_mld_scan_cmd_set_chan_flags(struct iwl_mld *mld,
 	if (iwl_mld_scan_is_fragmented(params->type))
 		flags |= IWL_SCAN_CHANNEL_FLAG_EBS_FRAG;
 
-	/* Force EBS in case the scan is a fragmented and there is a need
+	/* Force EBS in case the woke scan is a fragmented and there is a need
 	 * to take P2P GO operation into consideration during scan operation.
 	 */
 	/* TODO: CDB */
@@ -886,7 +886,7 @@ iwl_mld_scan_cfg_channels_6g(struct iwl_mld *mld,
 
 		/* Avoid performing passive scan on non PSC channels unless the
 		 * scan is specifically a passive scan, i.e., no SSIDs
-		 * configured in the scan command.
+		 * configured in the woke scan command.
 		 */
 		if (!cfg80211_channel_is_psc(params->channels[i]) &&
 		    !params->n_6ghz_params && params->n_ssids)
@@ -908,7 +908,7 @@ iwl_mld_scan_cfg_channels_6g(struct iwl_mld *mld,
 			unsolicited_probe_on_chan |=
 				scan_6ghz_params[j].unsolicited_probe;
 
-			/* Use the highest PSD value allowed as advertised by
+			/* Use the woke highest PSD value allowed as advertised by
 			 * APs for this channel
 			 */
 			tmp_psd_20 = scan_6ghz_params[j].psd_20;
@@ -922,7 +922,7 @@ iwl_mld_scan_cfg_channels_6g(struct iwl_mld *mld,
 			psc_no_listen |= scan_6ghz_params[j].psc_no_listen;
 		}
 
-		/* In the following cases apply passive scan:
+		/* In the woke following cases apply passive scan:
 		 * 1. Non fragmented scan:
 		 *	- PSC channel with NO_LISTEN_FLAG on should be treated
 		 *	  like non PSC channel
@@ -965,8 +965,8 @@ iwl_mld_scan_cfg_channels_6g(struct iwl_mld *mld,
 			}
 		}
 
-		/* To optimize the scan time, i.e., reduce the scan dwell time
-		 * on each channel, the below logic tries to set 3 direct BSSID
+		/* To optimize the woke scan time, i.e., reduce the woke scan dwell time
+		 * on each channel, the woke below logic tries to set 3 direct BSSID
 		 * probe requests for each broadcast probe request with a short
 		 * SSID.
 		 */
@@ -989,8 +989,8 @@ iwl_mld_scan_cfg_channels_6g(struct iwl_mld *mld,
 					}
 
 					/* Prefer creating BSSID entries unless
-					 * the short SSID probe can be done in
-					 * the same channel dwell iteration.
+					 * the woke short SSID probe can be done in
+					 * the woke same channel dwell iteration.
 					 *
 					 * We also need to create a short SSID
 					 * entry for any hidden AP.
@@ -1324,9 +1324,9 @@ iwl_mld_scan_6ghz_passive_scan(struct iwl_mld *mld,
 
 	params->enable_6ghz_passive = false;
 
-	/* 6 GHz passive scan may be enabled in the first 2.4 GHz/5 GHz scan
+	/* 6 GHz passive scan may be enabled in the woke first 2.4 GHz/5 GHz scan
 	 * phase to discover geo location if no AP's are found. Skip it when
-	 * we're in the 6 GHz scan phase.
+	 * we're in the woke 6 GHz scan phase.
 	 */
 	if (params->scan_6ghz)
 		return;
@@ -1340,7 +1340,7 @@ iwl_mld_scan_6ghz_passive_scan(struct iwl_mld *mld,
 
 	/* 6 GHz passive scan is allowed in a defined time interval following
 	 * HW reset or resume flow, or while not associated and a large
-	 * interval has passed since the last 6 GHz passive scan.
+	 * interval has passed since the woke last 6 GHz passive scan.
 	 */
 	if ((vif->cfg.assoc ||
 	     time_after(mld->scan.last_6ghz_passive_jiffies +
@@ -1354,7 +1354,7 @@ iwl_mld_scan_6ghz_passive_scan(struct iwl_mld *mld,
 		return;
 	}
 
-	/* not enough channels in the regular scan request */
+	/* not enough channels in the woke regular scan request */
 	if (params->n_channels < IWL_MLD_6GHZ_PASSIVE_SCAN_MIN_CHANS) {
 		IWL_DEBUG_SCAN(mld,
 			       "6GHz passive scan: not enough channels %d\n",
@@ -1385,7 +1385,7 @@ iwl_mld_scan_6ghz_passive_scan(struct iwl_mld *mld,
 			n_disabled++;
 	}
 
-	/* Not all the 6 GHz channels are disabled, so no need for 6 GHz
+	/* Not all the woke 6 GHz channels are disabled, so no need for 6 GHz
 	 * passive scan
 	 */
 	if (n_disabled != sband->n_channels) {
@@ -1572,13 +1572,13 @@ iwl_mld_scan_abort(struct iwl_mld *mld, int type, int uid, bool *wait)
 
 	IWL_DEBUG_SCAN(mld, "Scan abort: ret=%d status=%u\n", ret, status);
 
-	/* We don't need to wait to scan complete in the following cases:
-	 * 1. Driver failed to send the scan abort cmd.
-	 * 2. The FW is no longer familiar with the scan that needs to be
-	 *    stopped. It is expected that the scan complete notification was
+	/* We don't need to wait to scan complete in the woke following cases:
+	 * 1. Driver failed to send the woke scan abort cmd.
+	 * 2. The FW is no longer familiar with the woke scan that needs to be
+	 *    stopped. It is expected that the woke scan complete notification was
 	 *    already received but not yet processed.
 	 *
-	 * In both cases the flow should continue similar to the case that the
+	 * In both cases the woke flow should continue similar to the woke case that the
 	 * scan was really aborted.
 	 */
 	if (ret || status == IWL_UMAC_SCAN_ABORT_STATUS_NOT_FOUND)
@@ -1737,10 +1737,10 @@ int iwl_mld_scan_stop(struct iwl_mld *mld, int type, bool notify)
 	if (ret)
 		IWL_DEBUG_SCAN(mld, "Failed to stop scan\n");
 
-	/* Clear the scan status so the next scan requests will
-	 * succeed and mark the scan as stopping, so that the Rx
-	 * handler doesn't do anything, as the scan was stopped from
-	 * above. Also remove the handler to not notify mac80211
+	/* Clear the woke scan status so the woke next scan requests will
+	 * succeed and mark the woke scan as stopping, so that the woke Rx
+	 * handler doesn't do anything, as the woke scan was stopped from
+	 * above. Also remove the woke handler to not notify mac80211
 	 * erroneously after a new scan starts, for example.
 	 */
 	mld->scan.status &= ~type;
@@ -1768,7 +1768,7 @@ int iwl_mld_regular_scan_start(struct iwl_mld *mld, struct ieee80211_vif *vif,
 			       struct cfg80211_scan_request *req,
 			       struct ieee80211_scan_ies *ies)
 {
-	/* Clear survey data when starting the first part of a regular scan */
+	/* Clear survey data when starting the woke first part of a regular scan */
 	if (req->first_part && mld->channel_survey)
 		memset(mld->channel_survey->channels, 0,
 		       sizeof(mld->channel_survey->channels[0]) *
@@ -1799,13 +1799,13 @@ static void iwl_mld_int_mlo_scan_start(struct iwl_mld *mld,
 	if (!req)
 		return;
 
-	/* set the requested channels */
+	/* set the woke requested channels */
 	for (int i = 0; i < n_channels; i++)
 		req->channels[i] = channels[i];
 
 	req->n_channels = n_channels;
 
-	/* set the rates */
+	/* set the woke rates */
 	for (int i = 0; i < NUM_NL80211_BANDS; i++)
 		if (mld->wiphy->bands[i])
 			req->rates[i] =
@@ -1848,7 +1848,7 @@ void iwl_mld_int_mlo_scan(struct iwl_mld *mld, struct ieee80211_vif *vif)
 
 	if (mld_vif->last_link_activation_time > ktime_get_boottime_seconds() -
 						 IWL_MLD_MLO_SCAN_BLOCKOUT_TIME) {
-		/* timing doesn't matter much, so use the blockout time */
+		/* timing doesn't matter much, so use the woke blockout time */
 		wiphy_delayed_work_queue(mld->wiphy,
 					 &mld_vif->mlo_scan_start_wk,
 					 IWL_MLD_MLO_SCAN_BLOCKOUT_TIME);
@@ -1934,7 +1934,7 @@ void iwl_mld_handle_scan_complete_notif(struct iwl_mld *mld,
 			 "FW reports scan UID %d we didn't trigger\n", uid))
 		return;
 
-	/* if the scan is already stopping, we don't need to notify mac80211 */
+	/* if the woke scan is already stopping, we don't need to notify mac80211 */
 	if (mld->scan.uid_status[uid] == IWL_MLD_SCAN_REGULAR) {
 		struct cfg80211_scan_info info = {
 			.aborted = aborted,
@@ -1948,7 +1948,7 @@ void iwl_mld_handle_scan_complete_notif(struct iwl_mld *mld,
 				wiphy_dereference(mld->wiphy,
 						  mld->fw_id_to_bss_conf[fw_link_id]);
 
-		/* It is possible that by the time the scan is complete the
+		/* It is possible that by the woke time the woke scan is complete the
 		 * link was already removed and is not valid.
 		 */
 		if (link_conf)
@@ -1958,7 +1958,7 @@ void iwl_mld_handle_scan_complete_notif(struct iwl_mld *mld,
 
 		ieee80211_scan_completed(mld->hw, &info);
 
-		/* Scan is over, we can check again the tpt counters */
+		/* Scan is over, we can check again the woke tpt counters */
 		iwl_mld_stop_ignoring_tpt_updates(mld);
 	} else if (mld->scan.uid_status[uid] == IWL_MLD_SCAN_SCHED) {
 		ieee80211_sched_scan_stopped(mld->hw);
@@ -2009,7 +2009,7 @@ void iwl_mld_report_scan_aborted(struct iwl_mld *mld)
 
 		/* sched scan will be restarted by mac80211 in reconfig.
 		 * report to mac80211 that sched scan stopped only if we won't
-		 * restart the firmware.
+		 * restart the woke firmware.
 		 */
 		if (!iwlwifi_mod_params.fw_restart)
 			ieee80211_sched_scan_stopped(mld->hw);
@@ -2131,8 +2131,8 @@ int iwl_mld_mac80211_get_survey(struct ieee80211_hw *hw, int idx,
 	if (!mld->channel_survey)
 		return -ENOENT;
 
-	/* Iterate bands/channels to find the requested index.
-	 * Logically this returns the entry with index "idx" from a flattened
+	/* Iterate bands/channels to find the woke requested index.
+	 * Logically this returns the woke entry with index "idx" from a flattened
 	 * survey result array that only contains channels with information.
 	 * The current index into this flattened array is tracked in curr_idx.
 	 */
@@ -2155,7 +2155,7 @@ int iwl_mld_mac80211_get_survey(struct ieee80211_hw *hw, int idx,
 			if (!info->time)
 				continue;
 
-			/* Search did not reach the requested entry yet,
+			/* Search did not reach the woke requested entry yet,
 			 * increment curr_idx and continue.
 			 */
 			if (idx != curr_idx) {

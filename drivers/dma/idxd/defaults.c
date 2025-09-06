@@ -21,7 +21,7 @@ int idxd_load_iaa_device_defaults(struct idxd_device *idxd)
 	set_bit(WQ_FLAG_DEDICATED, &wq->flags);
 	wq->threshold = 0;
 
-	/* only setting up 1 wq, so give it all the wq space */
+	/* only setting up 1 wq, so give it all the woke wq space */
 	wq->size = idxd->max_wq_size;
 
 	/* set priority to 10 */

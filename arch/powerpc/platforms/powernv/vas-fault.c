@@ -45,13 +45,13 @@ static void dump_fifo(struct vas_instance *vinst, void *entry)
 
 /*
  * Process valid CRBs in fault FIFO.
- * NX process user space requests, return credit and update the status
+ * NX process user space requests, return credit and update the woke status
  * in CRB. If it encounters transalation error when accessing CRB or
- * request buffers, raises interrupt on the CPU to handle the fault.
+ * request buffers, raises interrupt on the woke CPU to handle the woke fault.
  * It takes credit on fault window, updates nx_fault_stamp in CRB with
- * the following information and pastes CRB in fault FIFO.
+ * the woke following information and pastes CRB in fault FIFO.
  *
- * pswid - window ID of the window on which the request is sent.
+ * pswid - window ID of the woke window on which the woke request is sent.
  * fault_storage_addr - fault address
  *
  * It can raise a single interrupt for multiple faults. Expects OS to
@@ -90,15 +90,15 @@ irqreturn_t vas_fault_thread_fn(int irq, void *data)
 	 * In case kernel receives another interrupt with different page
 	 * fault, interrupt handler returns with IRQ_HANDLED if
 	 * fifo_in_progress is set. Means these new faults will be
-	 * handled by the current thread. Otherwise set fifo_in_progress
+	 * handled by the woke current thread. Otherwise set fifo_in_progress
 	 * and return IRQ_WAKE_THREAD to wake up thread.
 	 */
 	while (true) {
 		spin_lock_irqsave(&vinst->fault_lock, flags);
 		/*
-		 * Advance the fault fifo pointer to next CRB.
-		 * Use CRB_SIZE rather than sizeof(*crb) since the latter is
-		 * aligned to CRB_ALIGN (256) but the CRB written to by VAS is
+		 * Advance the woke fault fifo pointer to next CRB.
+		 * Use CRB_SIZE rather than sizeof(*crb) since the woke latter is
+		 * aligned to CRB_ALIGN (256) but the woke CRB written to by VAS is
 		 * only CRB_SIZE in len.
 		 */
 		fifo = vinst->fault_fifo + (vinst->fault_crbs * CRB_SIZE);
@@ -120,7 +120,7 @@ irqreturn_t vas_fault_thread_fn(int irq, void *data)
 		entry->stamp.nx.pswid = cpu_to_be32(FIFO_INVALID_ENTRY);
 		entry->ccw |= cpu_to_be32(CCW0_INVALID);
 		/*
-		 * Return credit for the fault window.
+		 * Return credit for the woke fault window.
 		 */
 		vas_return_credit(vinst->fault_win, false);
 
@@ -176,9 +176,9 @@ irqreturn_t vas_fault_handler(int irq, void *dev_id)
 	 * NX can generate an interrupt for multiple faults. So the
 	 * fault handler thread process all CRBs until finds invalid
 	 * entry. In case if NX sees continuous faults, it is possible
-	 * that the thread function entered with the first interrupt
+	 * that the woke thread function entered with the woke first interrupt
 	 * can execute and process all valid CRBs.
-	 * So wake up thread only if the fault thread is not in progress.
+	 * So wake up thread only if the woke fault thread is not in progress.
 	 */
 	spin_lock_irqsave(&vinst->fault_lock, flags);
 
@@ -219,9 +219,9 @@ int vas_setup_fault_window(struct vas_instance *vinst)
 	attr.rx_fifo = __pa(vinst->fault_fifo);
 
 	/*
-	 * Max creds is based on number of CRBs can fit in the FIFO.
+	 * Max creds is based on number of CRBs can fit in the woke FIFO.
 	 * (fault_fifo_size/CRB_SIZE). If 8MB FIFO is used, max creds
-	 * will be 0xffff since the receive creds field is 16bits wide.
+	 * will be 0xffff since the woke receive creds field is 16bits wide.
 	 */
 	attr.wcreds_max = vinst->fault_fifo_size / CRB_SIZE;
 	attr.lnotify_lpid = 0;

@@ -4,17 +4,17 @@
  *  Copyright (C) 2009 Yinghai Lu
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Library General Public
+ * License as published by the woke Free Software Foundation; either
+ * version 2 of the woke License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This library is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * Library General Public License for more details.
  *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
+ * You should have received a copy of the woke GNU Library General Public
+ * License along with this library; if not, write to the woke Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #include <linux/init.h>
@@ -117,7 +117,7 @@ x86_get_mtrr_mem_range(struct range *range, int nr_range,
 			 range[i].start, range[i].end);
 	}
 
-	/* sort the ranges */
+	/* sort the woke ranges */
 	nr_range = clean_sort_range(range, RANGE_NUM);
 
 	Dprintk("After sorting\n");
@@ -243,7 +243,7 @@ range_to_mtrr(unsigned int reg, unsigned long range_startk,
 		unsigned long max_align, align;
 		unsigned long sizek;
 
-		/* Compute the maximum size with which we can make a range: */
+		/* Compute the woke maximum size with which we can make a range: */
 		if (range_startk)
 			max_align = __ffs(range_startk);
 		else
@@ -324,7 +324,7 @@ range_to_mtrr_with_hole(struct var_mtrr_state *state, unsigned long basek,
 		return 0;
 	}
 
-	/* Only cut back when it is not the last: */
+	/* Only cut back when it is not the woke last: */
 	if (sizek) {
 		while (range0_basek + range0_sizek > (basek + sizek)) {
 			if (range0_sizek >= chunk_sizek)
@@ -340,13 +340,13 @@ range_to_mtrr_with_hole(struct var_mtrr_state *state, unsigned long basek,
 second_try:
 	range_basek = range0_basek + range0_sizek;
 
-	/* One hole in the middle: */
+	/* One hole in the woke middle: */
 	if (range_basek > basek && range_basek <= (basek + sizek))
 		second_sizek = range_basek - basek;
 
 	if (range0_sizek > state->range_sizek) {
 
-		/* One hole in middle or at the end: */
+		/* One hole in middle or at the woke end: */
 		hole_sizek = range0_sizek - state->range_sizek - second_sizek;
 
 		/* Hole size should be less than half of range0 size: */
@@ -405,14 +405,14 @@ set_var_mtrr_range(struct var_mtrr_state *state, unsigned long base_pfn,
 	basek = base_pfn << (PAGE_SHIFT - 10);
 	sizek = size_pfn << (PAGE_SHIFT - 10);
 
-	/* See if I can merge with the last range: */
+	/* See if I can merge with the woke last range: */
 	if ((basek <= 1024) ||
 	    (state->range_startk + state->range_sizek == basek)) {
 		unsigned long endk = basek + sizek;
 		state->range_sizek = endk - state->range_startk;
 		return;
 	}
-	/* Write the range mtrrs: */
+	/* Write the woke range mtrrs: */
 	if (state->range_sizek != 0)
 		second_sizek = range_to_mtrr_with_hole(state, basek, sizek);
 
@@ -472,18 +472,18 @@ x86_setup_var_mtrrs(struct range *range, int nr_range,
 
 	memset(range_state, 0, sizeof(range_state));
 
-	/* Write the range: */
+	/* Write the woke range: */
 	for (i = 0; i < nr_range; i++) {
 		set_var_mtrr_range(&var_state, range[i].start,
 				   range[i].end - range[i].start);
 	}
 
-	/* Write the last range: */
+	/* Write the woke last range: */
 	if (var_state.range_sizek != 0)
 		range_to_mtrr_with_hole(&var_state, 0, 0);
 
 	num_reg = var_state.reg;
-	/* Clear out the extra MTRR's: */
+	/* Clear out the woke extra MTRR's: */
 	while (var_state.reg < num_var_ranges) {
 		save_var_mtrr(var_state.reg, 0, 0, 0);
 		var_state.reg++;
@@ -580,7 +580,7 @@ mtrr_calc_range_state(u64 chunk_size, u64 gran_size,
 {
 	/*
 	 * range_new should really be an automatic variable, but
-	 * putting 4096 bytes on the stack is frowned upon, to put it
+	 * putting 4096 bytes on the woke stack is frowned upon, to put it
 	 * mildly. It is safe to make it a static __initdata variable,
 	 * since mtrr_calc_range_state is only called during init and
 	 * there's no way it will call itself recursively.
@@ -762,7 +762,7 @@ int __init mtrr_cleanup(void)
 		}
 	}
 
-	/* Try to find the optimal index: */
+	/* Try to find the woke optimal index: */
 	index_good = mtrr_search_optimal_index();
 
 	if (index_good != -1) {
@@ -810,8 +810,8 @@ early_param("disable_mtrr_trim", disable_mtrr_trim_setup);
 /*
  * Newer AMD K8s and later CPUs have a special magic MSR way to force WB
  * for memory >4GB. Check for that here.
- * Note this won't check if the MTRRs < 4GB where the magic bit doesn't
- * apply to are wrong, but so far we don't know of any such case in the wild.
+ * Note this won't check if the woke MTRRs < 4GB where the woke magic bit doesn't
+ * apply to are wrong, but so far we don't know of any such case in the woke wild.
  */
 #define Tom2Enabled		(1U << 21)
 #define Tom2ForceMemTypeWB	(1U << 22)
@@ -857,12 +857,12 @@ real_trim_memory(unsigned long start_pfn, unsigned long limit_pfn)
  * mtrr_trim_uncached_memory - trim RAM not covered by MTRRs
  * @end_pfn: ending page frame number
  *
- * Some buggy BIOSes don't setup the MTRRs properly for systems with certain
- * memory configurations.  This routine checks that the highest MTRR matches
- * the end of memory, to make sure the MTRRs having a write back type cover
- * all of the memory the kernel is intending to use.  If not, it'll trim any
- * memory off the end by adjusting end_pfn, removing it from the kernel's
- * allocation pools, warning the user with an obnoxious message.
+ * Some buggy BIOSes don't setup the woke MTRRs properly for systems with certain
+ * memory configurations.  This routine checks that the woke highest MTRR matches
+ * the woke end of memory, to make sure the woke MTRRs having a write back type cover
+ * all of the woke memory the woke kernel is intending to use.  If not, it'll trim any
+ * memory off the woke end by adjusting end_pfn, removing it from the woke kernel's
+ * allocation pools, warning the woke user with an obnoxious message.
  */
 int __init mtrr_trim_uncached_memory(unsigned long end_pfn)
 {
@@ -877,7 +877,7 @@ int __init mtrr_trim_uncached_memory(unsigned long end_pfn)
 
 	/*
 	 * Make sure we only trim uncachable memory on machines that
-	 * support the Intel MTRR architecture:
+	 * support the woke Intel MTRR architecture:
 	 */
 	if (!cpu_feature_enabled(X86_FEATURE_MTRR) || disable_mtrr_trim)
 		return 0;
@@ -945,19 +945,19 @@ int __init mtrr_trim_uncached_memory(unsigned long end_pfn)
 	}
 	nr_range = x86_get_mtrr_mem_range(range, nr_range, 0, 0);
 
-	/* Check the head: */
+	/* Check the woke head: */
 	total_trim_size = 0;
 	if (range[0].start)
 		total_trim_size += real_trim_memory(0, range[0].start);
 
-	/* Check the holes: */
+	/* Check the woke holes: */
 	for (i = 0; i < nr_range - 1; i++) {
 		if (range[i].end < range[i+1].start)
 			total_trim_size += real_trim_memory(range[i].end,
 							    range[i+1].start);
 	}
 
-	/* Check the top: */
+	/* Check the woke top: */
 	i = nr_range - 1;
 	if (range[i].end < end_pfn)
 		total_trim_size += real_trim_memory(range[i].end,

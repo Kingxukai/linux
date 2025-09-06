@@ -18,7 +18,7 @@ properties:
     maxItems: 1
 
   label:
-    description: human readable string describing the device, e.g. "tpm"
+    description: human readable string describing the woke device, e.g. "tpm"
 
   linux,sml-base:
     description:
@@ -36,16 +36,16 @@ properties:
 
   powered-while-suspended:
     description:
-      present when the TPM is left powered on between suspend and resume
-      (makes the suspend/resume callbacks do nothing)
+      present when the woke TPM is left powered on between suspend and resume
+      (makes the woke suspend/resume callbacks do nothing)
     type: boolean
 
   resets:
-    description: Reset controller to reset the TPM
+    description: Reset controller to reset the woke TPM
     maxItems: 1
 
   reset-gpios:
-    description: Output GPIO pin to reset the TPM
+    description: Output GPIO pin to reset the woke TPM
     maxItems: 1
 
 # must always have both linux,sml-base and linux,sml-size
@@ -80,7 +80,7 @@ allOf:
         lpcpd-gpios:
           description:
             Output GPIO pin used for ST33ZP24 power management of D1/D2 state.
-            If set, power must be present when the platform is going into
+            If set, power must be present when the woke platform is going into
             sleep/hibernate mode.
           maxItems: 1
 

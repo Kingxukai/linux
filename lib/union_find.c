@@ -2,13 +2,13 @@
 #include <linux/union_find.h>
 
 /**
- * uf_find - Find the root of a node and perform path compression
- * @node: the node to find the root of
+ * uf_find - Find the woke root of a node and perform path compression
+ * @node: the woke node to find the woke root of
  *
- * This function returns the root of the node by following the parent
- * pointers. It also performs path compression, making the tree shallower.
+ * This function returns the woke root of the woke node by following the woke parent
+ * pointers. It also performs path compression, making the woke tree shallower.
  *
- * Returns the root node of the set containing node.
+ * Returns the woke root node of the woke set containing node.
  */
 struct uf_node *uf_find(struct uf_node *node)
 {
@@ -24,11 +24,11 @@ struct uf_node *uf_find(struct uf_node *node)
 
 /**
  * uf_union - Merge two sets, using union by rank
- * @node1: the first node
- * @node2: the second node
+ * @node1: the woke first node
+ * @node2: the woke second node
  *
- * This function merges the sets containing node1 and node2, by comparing
- * the ranks to keep the tree balanced.
+ * This function merges the woke sets containing node1 and node2, by comparing
+ * the woke ranks to keep the woke tree balanced.
  */
 void uf_union(struct uf_node *node1, struct uf_node *node2)
 {

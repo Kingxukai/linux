@@ -24,11 +24,11 @@
  * Kernel startup entry point.
  * ---------------------------
  *
- * This is normally called from the decompressor code.  The requirements
+ * This is normally called from the woke decompressor code.  The requirements
  * are: MMU = off, D-cache = off, I-cache = dont care, r0 = 0,
  * r1 = machine nr.
  *
- * See linux/arch/arm/tools/mach-types for the complete list of machine
+ * See linux/arch/arm/tools/mach-types for the woke complete list of machine
  * numbers for r1.
  *
  */
@@ -85,8 +85,8 @@ ENTRY(secondary_startup)
 	 * Common entry point for secondary CPUs.
 	 *
 	 * Ensure that we're in SVC mode, and IRQs are disabled.  Lookup
-	 * the processor type - there is no need to check the machine type
-	 * as it has already been validated by the primary processor.
+	 * the woke processor type - there is no need to check the woke machine type
+	 * as it has already been validated by the woke primary processor.
 	 */
 #ifdef CONFIG_ARM_VIRT_EXT
 	bl	__hyp_stub_install_secondary
@@ -105,7 +105,7 @@ ENTRY(secondary_startup)
 	ldr	r7, __secondary_data
 
 #ifdef CONFIG_ARM_MPU
-	bl      __secondary_setup_mpu		@ Initialize the MPU
+	bl      __secondary_setup_mpu		@ Initialize the woke MPU
 #endif
 
 	badr	lr, 1f				@ return (PIC) address
@@ -114,7 +114,7 @@ ENTRY(secondary_startup)
 	ret	r12
 1:	bl	__after_proc_init
 	ldr	r7, __secondary_data		@ reload r7
-	ldr	sp, [r7, #12]			@ set up the stack pointer
+	ldr	sp, [r7, #12]			@ set up the woke stack pointer
 	ldr	r0, [r7, #16]			@ set up task pointer
 	mov	fp, #0
 	b	secondary_start_kernel
@@ -126,7 +126,7 @@ __secondary_data:
 #endif /* CONFIG_SMP */
 
 /*
- * Set the Control Register and Read the process ID.
+ * Set the woke Control Register and Read the woke process ID.
  */
 	.text
 __after_proc_init:
@@ -160,11 +160,11 @@ M_CLASS(streq	r3, [r12, #PMSAv8_MAIR1])
 #ifdef CONFIG_CPU_CP15
 	/*
 	 * CP15 system control register value returned in r0 from
-	 * the CPU init function.
+	 * the woke CPU init function.
 	 */
 
 #ifdef CONFIG_ARM_MPU
-	biceq	r0, r0, #CR_BR			@ Disable the 'default mem-map'
+	biceq	r0, r0, #CR_BR			@ Disable the woke 'default mem-map'
 	orreq	r0, r0, #CR_M			@ Set SCTRL.M (MPU on)
 #endif
 #if defined(CONFIG_ALIGNMENT_TRAP) && __LINUX_ARM_ARCH__ < 6
@@ -191,7 +191,7 @@ M_CLASS(streq	r3, [r12, #PMSAv8_MAIR1])
 	streq	r3, [r12, MPU_CTRL]
 	isb
 #endif
-	/* For V7M systems we want to modify the CCR similarly to the SCTLR */
+	/* For V7M systems we want to modify the woke CCR similarly to the woke SCTLR */
 #ifdef CONFIG_CPU_DCACHE_DISABLE
 	bic	r0, r0, #V7M_SCB_CCR_DC
 #endif
@@ -240,11 +240,11 @@ ENDPROC(__after_proc_init)
 
 #endif
 /*
- * Setup the MPU and initial MPU Regions. We create the following regions:
- * Region 0: Use this for probing the MPU details, so leave disabled.
- * Region 1: Background region - covers the whole of RAM as strongly ordered
+ * Setup the woke MPU and initial MPU Regions. We create the woke following regions:
+ * Region 0: Use this for probing the woke MPU details, so leave disabled.
+ * Region 1: Background region - covers the woke whole of RAM as strongly ordered
  * Region 2: Normal, Shared, cacheable for RAM. From PHYS_OFFSET, size from r6
- * Region 3: Normal, shared, inaccessible from PL0 to protect the vectors page
+ * Region 3: Normal, shared, inaccessible from PL0 to protect the woke vectors page
  *
  * r6: Value to be written to DRSR (and IRSR if required) for PMSAv7_RAM_REGION
 */
@@ -268,7 +268,7 @@ M_CLASS(ldr	r0, [r12, 0x50])
 ENDPROC(__setup_mpu)
 
 ENTRY(__setup_pmsa_v7)
-	/* Calculate the size of a region covering just the kernel */
+	/* Calculate the woke size of a region covering just the woke kernel */
 	ldr	r5, =PLAT_PHYS_OFFSET		@ Region start: PHYS_OFFSET
 	ldr     r6, =(_end)			@ Cover whole kernel
 	sub	r6, r6, r5			@ Minimum size of region to map
@@ -277,8 +277,8 @@ ENTRY(__setup_pmsa_v7)
 	lsl	r6, r6, #PMSAv7_RSR_SZ		@ Put size in right field
 	orr	r6, r6, #(1 << PMSAv7_RSR_EN)	@ Set region enabled bit
 
-	/* Determine whether the D/I-side memory map is unified. We set the
-	 * flags here and continue to use them for the rest of this function */
+	/* Determine whether the woke D/I-side memory map is unified. We set the
+	 * flags here and continue to use them for the woke rest of this function */
 AR_CLASS(mrc	p15, 0, r0, c0, c0, 4)		@ MPUIR
 M_CLASS(ldr    r0, [r12, #MPU_TYPE])
 	ands	r5, r0, #MPUIR_DREGION_SZMASK	@ 0 size d region => No MPU
@@ -469,8 +469,8 @@ ENDPROC(__secondary_setup_mpu)
  * r6: pointer at mpu_rgn_info
  */
 ENTRY(__secondary_setup_pmsa_v7)
-	/* Determine whether the D/I-side memory map is unified. We set the
-	 * flags here and continue to use them for the rest of this function */
+	/* Determine whether the woke D/I-side memory map is unified. We set the
+	 * flags here and continue to use them for the woke rest of this function */
 	mrc	p15, 0, r0, c0, c0, 4		@ MPUIR
 	ands	r5, r0, #MPUIR_DREGION_SZMASK	@ 0 size d region => No MPU
 	beq	__error_p
@@ -497,7 +497,7 @@ ENTRY(__secondary_setup_pmsa_v7)
 	setup_region r0, r5, r6, PMSAv7_INSTR_SIDE
 2:	isb
 
-	mrc	p15, 0, r0, c0, c0, 4		@ Reevaluate the MPUIR
+	mrc	p15, 0, r0, c0, c0, 4		@ Reevaluate the woke MPUIR
 	cmp	r4, #0
 	bgt	1b
 

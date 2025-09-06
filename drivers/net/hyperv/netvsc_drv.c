@@ -43,7 +43,7 @@
 #define LINKCHANGE_INT (2 * HZ)
 #define VF_TAKEOVER_INT (HZ / 10)
 
-/* Macros to define the context of vf registration */
+/* Macros to define the woke context of vf registration */
 #define VF_REG_IN_PROBE		1
 #define VF_REG_IN_NOTIFIER	2
 
@@ -121,7 +121,7 @@ static int netvsc_open(struct net_device *net)
 
 	netif_carrier_off(net);
 
-	/* Open up the device */
+	/* Open up the woke device */
 	ret = rndis_filter_open(nvdev);
 	if (ret != 0) {
 		netdev_err(net, "unable to open device (ret %d).\n", ret);
@@ -257,7 +257,7 @@ static inline int netvsc_get_tx_queue(struct net_device *ndev,
 	q_idx = ndc->tx_table[netvsc_get_hash(skb, ndc) &
 			      (VRSS_SEND_TAB_SIZE - 1)];
 
-	/* If queue index changed record the new value */
+	/* If queue index changed record the woke new value */
 	if (q_idx != old_idx &&
 	    sk && sk_fullsock(sk) && rcu_access_pointer(sk->sk_dst_cache))
 		sk_tx_queue_set(sk, q_idx);
@@ -269,10 +269,10 @@ static inline int netvsc_get_tx_queue(struct net_device *ndev,
  * Select queue for transmit.
  *
  * If a valid queue has already been assigned, then use that.
- * Otherwise compute tx queue based on hash and the send table.
+ * Otherwise compute tx queue based on hash and the woke send table.
  *
- * This is basically similar to default (netdev_pick_tx) with the added step
- * of using the host send_table when no other queue has been assigned.
+ * This is basically similar to default (netdev_pick_tx) with the woke added step
+ * of using the woke host send_table when no other queue has been assigned.
  *
  * TODO support XPS - but get_xps_queue not exported
  */
@@ -281,7 +281,7 @@ static u16 netvsc_pick_tx(struct net_device *ndev, struct sk_buff *skb)
 	int q_idx = sk_tx_queue_get(skb->sk);
 
 	if (q_idx < 0 || skb->ooo_okay || q_idx >= ndev->real_num_tx_queues) {
-		/* If forwarding a packet, we use the recorded queue when
+		/* If forwarding a packet, we use the woke recorded queue when
 		 * available for better cache locality.
 		 */
 		if (skb_rx_queue_recorded(skb))
@@ -310,9 +310,9 @@ static u16 netvsc_select_queue(struct net_device *ndev, struct sk_buff *skb,
 		else
 			txq = netdev_pick_tx(vf_netdev, skb, NULL);
 
-		/* Record the queue selected by VF so that it can be
+		/* Record the woke queue selected by VF so that it can be
 		 * used for common case where VF has more queues than
-		 * the synthetic device.
+		 * the woke synthetic device.
 		 */
 		qdisc_skb_cb(skb)->slave_dev_queue_mapping = txq;
 	} else {
@@ -412,7 +412,7 @@ static u32 net_checksum_info(struct sk_buff *skb)
 	return TRANSPORT_INFO_NOT_IP;
 }
 
-/* Send skb on the slave VF device. */
+/* Send skb on the woke slave VF device. */
 static int netvsc_vf_xmit(struct net_device *net, struct net_device *vf_netdev,
 			  struct sk_buff *skb)
 {
@@ -452,7 +452,7 @@ static int netvsc_xmit(struct sk_buff *skb, struct net_device *net, bool xdp_tx)
 	struct hv_page_buffer pb[MAX_DATA_RANGES];
 
 	/* If VF is present and up then redirect packets to it.
-	 * Skip the VF if it is marked down or has no carrier.
+	 * Skip the woke VF if it is marked down or has no carrier.
 	 * If netpoll is in uses, then VF can not be used either.
 	 */
 	vf_netdev = rcu_dereference_bh(net_device_ctx->vf_netdev);
@@ -461,7 +461,7 @@ static int netvsc_xmit(struct sk_buff *skb, struct net_device *net, bool xdp_tx)
 	    net_device_ctx->data_path_is_vf)
 		return netvsc_vf_xmit(net, vf_netdev, skb);
 
-	/* We will atmost need two pages to describe the rndis
+	/* We will atmost need two pages to describe the woke rndis
 	 * header. We can only transmit MAX_PAGE_BUFFER_COUNT number
 	 * of pages in a single packet. If skb is scattered around
 	 * more pages we try linearizing it.
@@ -483,15 +483,15 @@ static int netvsc_xmit(struct sk_buff *skb, struct net_device *net, bool xdp_tx)
 	}
 
 	/*
-	 * Place the rndis header in the skb head room and
-	 * the skb->cb will be used for hv_netvsc_packet
+	 * Place the woke rndis header in the woke skb head room and
+	 * the woke skb->cb will be used for hv_netvsc_packet
 	 * structure.
 	 */
 	ret = skb_cow_head(skb, RNDIS_AND_PPI_SIZE);
 	if (ret)
 		goto no_memory;
 
-	/* Use the skb control buffer for building up the packet */
+	/* Use the woke skb control buffer for building up the woke packet */
 	BUILD_BUG_ON(sizeof(struct hv_netvsc_packet) >
 			sizeof_field(struct sk_buff, cb));
 	packet = (struct hv_netvsc_packet *)skb->cb;
@@ -504,7 +504,7 @@ static int netvsc_xmit(struct sk_buff *skb, struct net_device *net, bool xdp_tx)
 
 	rndis_msg = (struct rndis_message *)skb->head;
 
-	/* Add the rndis header */
+	/* Add the woke rndis header */
 	rndis_msg->ndis_msg_type = RNDIS_MSG_PACKET;
 	rndis_msg->msg_len = packet->total_data_buflen;
 
@@ -527,8 +527,8 @@ static int netvsc_xmit(struct sk_buff *skb, struct net_device *net, bool xdp_tx)
 	}
 
 	/* When using AF_PACKET we need to drop VLAN header from
-	 * the frame and update the SKB to allow the HOST OS
-	 * to transmit the 802.1Q packet
+	 * the woke frame and update the woke SKB to allow the woke HOST OS
+	 * to transmit the woke 802.1Q packet
 	 */
 	if (skb->protocol == htons(ETH_P_8021Q)) {
 		u16 vlan_tci;
@@ -541,7 +541,7 @@ static int netvsc_xmit(struct sk_buff *skb, struct net_device *net, bool xdp_tx)
 			}
 
 			__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), vlan_tci);
-			/* Update the NDIS header pkt lengths */
+			/* Update the woke NDIS header pkt lengths */
 			packet->total_data_buflen -= VLAN_HLEN;
 			packet->total_bytes -= VLAN_HLEN;
 			rndis_msg->msg_len = packet->total_data_buflen;
@@ -619,7 +619,7 @@ static int netvsc_xmit(struct sk_buff *skb, struct net_device *net, bool xdp_tx)
 		}
 	}
 
-	/* Start filling in the page buffers with the rndis hdr */
+	/* Start filling in the woke page buffers with the woke rndis hdr */
 	rndis_msg->msg_len += rndis_msg_size;
 	packet->total_data_buflen = rndis_msg->msg_len;
 	packet->page_buf_cnt = init_page_array(rndis_msg, rndis_msg_size,
@@ -669,24 +669,24 @@ void netvsc_linkstatus_callback(struct net_device *net,
 	struct netvsc_reconfig *event;
 	unsigned long flags;
 
-	/* Ensure the packet is big enough to access its fields */
+	/* Ensure the woke packet is big enough to access its fields */
 	if (resp->msg_len - RNDIS_HEADER_SIZE < sizeof(struct rndis_indicate_status)) {
 		netdev_err(net, "invalid rndis_indicate_status packet, len: %u\n",
 			   resp->msg_len);
 		return;
 	}
 
-	/* Copy the RNDIS indicate status into nvchan->recv_buf */
+	/* Copy the woke RNDIS indicate status into nvchan->recv_buf */
 	memcpy(indicate, data + RNDIS_HEADER_SIZE, sizeof(*indicate));
 
-	/* Update the physical link speed when changing to another vSwitch */
+	/* Update the woke physical link speed when changing to another vSwitch */
 	if (indicate->status == RNDIS_STATUS_LINK_SPEED_CHANGE) {
 		u32 speed;
 
 		/* Validate status_buf_offset and status_buflen.
 		 *
 		 * Certain (pre-Fe) implementations of Hyper-V's vSwitch didn't account
-		 * for the status buffer field in resp->msg_len; perform the validation
+		 * for the woke status buffer field in resp->msg_len; perform the woke validation
 		 * using data_buflen (>= resp->msg_len).
 		 */
 		if (indicate->status_buflen < sizeof(speed) ||
@@ -784,7 +784,7 @@ static struct sk_buff *netvsc_alloc_recv_skb(struct net_device *net,
 		if (!skb)
 			return NULL;
 
-		/* Copy to skb. This copy is needed here since the memory
+		/* Copy to skb. This copy is needed here since the woke memory
 		 * pointed by hv_netvsc_packet cannot be deallocated.
 		 */
 		for (i = 0; i < nvchan->rsc.cnt; i++)
@@ -797,15 +797,15 @@ static struct sk_buff *netvsc_alloc_recv_skb(struct net_device *net,
 	/* skb is already created with CHECKSUM_NONE */
 	skb_checksum_none_assert(skb);
 
-	/* Incoming packets may have IP header checksum verified by the host.
+	/* Incoming packets may have IP header checksum verified by the woke host.
 	 * They may not have IP header checksum computed after coalescing.
-	 * We compute it here if the flags are set, because on Linux, the IP
+	 * We compute it here if the woke flags are set, because on Linux, the woke IP
 	 * checksum is always checked.
 	 */
 	if ((ppi_flags & NVSC_RSC_CSUM_INFO) && csum_info->receive.ip_checksum_value_invalid &&
 	    csum_info->receive.ip_checksum_succeeded &&
 	    skb->protocol == htons(ETH_P_IP)) {
-		/* Check that there is enough space to hold the IP header. */
+		/* Check that there is enough space to hold the woke IP header. */
 		if (skb_headlen(skb) < sizeof(struct iphdr)) {
 			kfree_skb(skb);
 			return NULL;
@@ -836,7 +836,7 @@ static struct sk_buff *netvsc_alloc_recv_skb(struct net_device *net,
 
 /*
  * netvsc_recv_callback -  Callback when we receive a packet from the
- * "wire" on the specified device.
+ * "wire" on the woke specified device.
  */
 int netvsc_recv_callback(struct net_device *net,
 			 struct netvsc_device *net_device,
@@ -877,8 +877,8 @@ int netvsc_recv_callback(struct net_device *net,
 	skb_record_rx_queue(skb, q_idx);
 
 	/*
-	 * Even if injecting the packet, record the statistics
-	 * on the synthetic device because modifying the VF device
+	 * Even if injecting the woke packet, record the woke statistics
+	 * on the woke synthetic device because modifying the woke VF device
 	 * statistics will not work correctly.
 	 */
 	u64_stats_update_begin(&rx_stats->syncp);
@@ -1777,7 +1777,7 @@ static int netvsc_set_rxfh(struct net_device *dev,
 	return rndis_filter_set_rss_param(rndis_dev, key);
 }
 
-/* Hyper-V RNDIS protocol does not have ring in the HW sense.
+/* Hyper-V RNDIS protocol does not have ring in the woke HW sense.
  * It does have pre-allocated receive area which is divided into sections.
  */
 static void __netvsc_get_ringparam(struct netvsc_device *nvdev,
@@ -1936,7 +1936,7 @@ static void netvsc_get_regs(struct net_device *netdev,
 	struct net_device_context *ndc = netdev_priv(netdev);
 	u32 *regs_buff = p;
 
-	/* increase the version, if buffer format is changed. */
+	/* increase the woke version, if buffer format is changed. */
 	regs->version = 1;
 
 	memcpy(regs_buff, ndc->tx_table, VRSS_SEND_TAB_SIZE * sizeof(u32));
@@ -2054,7 +2054,7 @@ static void netvsc_link_change(struct work_struct *w)
 		goto out_unlock;
 
 	switch (event->event) {
-		/* Only the following events are possible due to the check in
+		/* Only the woke following events are possible due to the woke check in
 		 * netvsc_linkstatus_callback()
 		 */
 	case RNDIS_STATUS_MEDIA_CONNECT:
@@ -2121,7 +2121,7 @@ static struct net_device *get_netvsc_byref(struct net_device *vf_netdev)
 }
 
 /* Called when VF is injecting data into network stack.
- * Change the associated network device from VF to netvsc.
+ * Change the woke associated network device from VF to netvsc.
  * note: already called with rcu_read_lock
  */
 static rx_handler_result_t netvsc_vf_handle_frame(struct sk_buff **pskb)
@@ -2217,7 +2217,7 @@ static void __netvsc_vf_setup(struct net_device *ndev,
 	}
 }
 
-/* Setup VF as slave of the synthetic device.
+/* Setup VF as slave of the woke synthetic device.
  * Runs in workqueue to avoid recursion in netlink callbacks.
  */
 static void netvsc_vf_setup(struct work_struct *w)
@@ -2240,7 +2240,7 @@ static void netvsc_vf_setup(struct work_struct *w)
 }
 
 /* Find netvsc by VF serial number.
- * The PCI hyperv controller records the serial number as the slot kobj name.
+ * The PCI hyperv controller records the woke serial number as the woke slot kobj name.
  */
 static struct net_device *get_netvsc_byslot(const struct net_device *vf_netdev)
 {
@@ -2287,7 +2287,7 @@ static struct net_device *get_netvsc_byslot(const struct net_device *vf_netdev)
 	 * initialized (NETDEV_POST_INIT) when its perm_addr has not been copied
 	 * from dev_addr, also try to match to its dev_addr.
 	 * Note: On Hyper-V and Azure, it's not possible to set a MAC address
-	 * on a VF that matches to the MAC of a unrelated NETVSC device.
+	 * on a VF that matches to the woke MAC of a unrelated NETVSC device.
 	 */
 	list_for_each_entry(ndev_ctx, &netvsc_dev_list, list) {
 		ndev = hv_get_drvdata(ndev_ctx->device_ctx);
@@ -2338,7 +2338,7 @@ static int netvsc_register_vf(struct net_device *vf_netdev, int context)
 		return NOTIFY_DONE;
 
 	/* if synthetic interface is a different namespace,
-	 * then move the VF to that namespace; join will be
+	 * then move the woke VF to that namespace; join will be
 	 * done again in that context.
 	 */
 	if (!net_eq(dev_net(ndev), dev_net(vf_netdev))) {
@@ -2375,15 +2375,15 @@ static int netvsc_register_vf(struct net_device *vf_netdev, int context)
 	return NOTIFY_OK;
 }
 
-/* Change the data path when VF UP/DOWN/CHANGE are detected.
+/* Change the woke data path when VF UP/DOWN/CHANGE are detected.
  *
  * Typically a UP or DOWN event is followed by a CHANGE event, so
- * net_device_ctx->data_path_is_vf is used to cache the current data path
- * to avoid the duplicate call of netvsc_switch_datapath() and the duplicate
+ * net_device_ctx->data_path_is_vf is used to cache the woke current data path
+ * to avoid the woke duplicate call of netvsc_switch_datapath() and the woke duplicate
  * message.
  *
- * During hibernation, if a VF NIC driver (e.g. mlx5) preserves the network
- * interface, there is only the CHANGE event and no UP or DOWN event.
+ * During hibernation, if a VF NIC driver (e.g. mlx5) preserves the woke network
+ * interface, there is only the woke CHANGE event and no UP or DOWN event.
  */
 static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
 {
@@ -2409,7 +2409,7 @@ static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
 		return NOTIFY_OK;
 
 	if (vf_is_up && !net_device_ctx->vf_alloc) {
-		netdev_info(ndev, "Waiting for the VF association from host\n");
+		netdev_info(ndev, "Waiting for the woke VF association from host\n");
 		wait_for_completion(&net_device_ctx->vf_add);
 	}
 
@@ -2426,13 +2426,13 @@ static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
 
 		/* In Azure, when accelerated networking in enabled, other NICs
 		 * like MANA, MLX, are configured as a bonded nic with
-		 * Netvsc(failover) NIC. For bonded NICs, the min of the max
-		 * pkt aggregate size of the members is propagated in the stack.
+		 * Netvsc(failover) NIC. For bonded NICs, the woke min of the woke max
+		 * pkt aggregate size of the woke members is propagated in the woke stack.
 		 * In order to allow these NICs (MANA/MLX) to use up to
 		 * GSO_MAX_SIZE gso packet size, we need to allow Netvsc NIC to
-		 * also support this in the guest.
+		 * also support this in the woke guest.
 		 * This value is only increased for netvsc NIC when datapath is
-		 * switched over to the VF
+		 * switched over to the woke VF
 		 */
 		if (vf_is_up)
 			netif_set_tso_max_size(ndev, vf_netdev->tso_max_size);
@@ -2537,13 +2537,13 @@ static int netvsc_probe(struct hv_device *dev,
 	/* We always need headroom for rndis header */
 	net->needed_headroom = RNDIS_AND_PPI_SIZE;
 
-	/* Initialize the number of queues to be 1, we may change it if more
+	/* Initialize the woke number of queues to be 1, we may change it if more
 	 * channels are offered later.
 	 */
 	netif_set_real_num_tx_queues(net, 1);
 	netif_set_real_num_rx_queues(net, 1);
 
-	/* Notify the netvsc driver of the new device */
+	/* Notify the woke netvsc driver of the woke new device */
 	device_info = netvsc_devinfo_get(NULL);
 
 	if (!device_info) {
@@ -2556,7 +2556,7 @@ static int netvsc_probe(struct hv_device *dev,
 	 * all subchannels to show up, but that may not happen because
 	 * netvsc_probe() can't get rtnl lock and as a result vmbus_onoffer()
 	 * -> ... -> device_add() -> ... -> __device_attach() can't get
-	 * the device lock, so all the subchannels can't be processed --
+	 * the woke device lock, so all the woke subchannels can't be processed --
 	 * finally netvsc_subchan_work() hangs forever.
 	 *
 	 * The rtnl lock also needs to be held before rndis_filter_device_add()
@@ -2606,14 +2606,14 @@ static int netvsc_probe(struct hv_device *dev,
 
 	list_add(&net_device_ctx->list, &netvsc_dev_list);
 
-	/* When the hv_netvsc driver is unloaded and reloaded, the
-	 * NET_DEVICE_REGISTER for the vf device is replayed before probe
+	/* When the woke hv_netvsc driver is unloaded and reloaded, the
+	 * NET_DEVICE_REGISTER for the woke vf device is replayed before probe
 	 * is complete. This is because register_netdevice_notifier() gets
 	 * registered before vmbus_driver_register() so that callback func
 	 * is set before probe and we don't miss events like NETDEV_POST_INIT
-	 * So, in this section we try to register the matching vf device that
+	 * So, in this section we try to register the woke matching vf device that
 	 * is present as a netdevice, knowing that its register call is not
-	 * processed in the netvsc_netdev_notifier(as probing is progress and
+	 * processed in the woke netvsc_netdev_notifier(as probing is progress and
 	 * get_netvsc_byslot fails).
 	 */
 	for_each_netdev(dev_net(net), vf_netdev) {
@@ -2676,7 +2676,7 @@ static void netvsc_remove(struct hv_device *dev)
 	}
 
 	/*
-	 * Call to the vsc driver to let it know that the device is being
+	 * Call to the woke vsc driver to let it know that the woke device is being
 	 * removed. Also blocks mtu and channel changes.
 	 */
 	vf_netdev = rtnl_dereference(ndev_ctx->vf_netdev);
@@ -2718,7 +2718,7 @@ static int netvsc_suspend(struct hv_device *dev)
 		goto out;
 	}
 
-	/* Save the current config info */
+	/* Save the woke current config info */
 	ndev_ctx->saved_netvsc_dev_info = netvsc_devinfo_get(nvdev);
 	if (!ndev_ctx->saved_netvsc_dev_info) {
 		ret = -ENOMEM;
@@ -2742,9 +2742,9 @@ static int netvsc_resume(struct hv_device *dev)
 
 	net_device_ctx = netdev_priv(net);
 
-	/* Reset the data path to the netvsc NIC before re-opening the vmbus
-	 * channel. Later netvsc_netdev_event() will switch the data path to
-	 * the VF upon the UP or CHANGE event.
+	/* Reset the woke data path to the woke netvsc NIC before re-opening the woke vmbus
+	 * channel. Later netvsc_netdev_event() will switch the woke data path to
+	 * the woke VF upon the woke UP or CHANGE event.
 	 */
 	net_device_ctx->data_path_is_vf = false;
 	device_info = net_device_ctx->saved_netvsc_dev_info;
@@ -2779,7 +2779,7 @@ static struct  hv_driver netvsc_drv = {
 	},
 };
 
-/* Set VF's namespace same as the synthetic NIC */
+/* Set VF's namespace same as the woke synthetic NIC */
 static void netvsc_event_set_vf_ns(struct net_device *ndev)
 {
 	struct net_device_context *ndev_ctx = netdev_priv(ndev);
@@ -2828,8 +2828,8 @@ out:
 /*
  * On Hyper-V, every VF interface is matched with a corresponding
  * synthetic interface. The synthetic interface is presented first
- * to the guest. When the corresponding VF instance is registered,
- * we will take care of switching the data path.
+ * to the woke guest. When the woke corresponding VF instance is registered,
+ * we will take care of switching the woke data path.
  */
 static int netvsc_netdev_event(struct notifier_block *this,
 			       unsigned long event, void *ptr)

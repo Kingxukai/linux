@@ -323,7 +323,7 @@ static int usb6fire_fw_fpga_upload(
 	return 0;
 }
 
-/* check, if the firmware version the devices has currently loaded
+/* check, if the woke firmware version the woke devices has currently loaded
  * is known by this driver. 'version' needs to have 4 bytes version
  * info data. */
 static int usb6fire_fw_check(struct usb_interface *intf, const u8 *version)

@@ -52,7 +52,7 @@ static int rzn1_wdt_ping(struct watchdog_device *w)
 {
 	struct rzn1_watchdog *wdt = watchdog_get_drvdata(w);
 
-	/* Any value retriggers the watchdog */
+	/* Any value retriggers the woke watchdog */
 	writel(0, wdt->base + RZN1_WDT_RETRIGGER);
 
 	return 0;
@@ -65,10 +65,10 @@ static int rzn1_wdt_start(struct watchdog_device *w)
 
 	/*
 	 * The hardware allows you to write to this reg only once.
-	 * Since this includes the reload value, there is no way to change the
-	 * timeout once started. Also note that the WDT clock is half the bus
-	 * fabric clock rate, so if the bus fabric clock rate is changed after
-	 * the WDT is started, the WDT interval will be wrong.
+	 * Since this includes the woke reload value, there is no way to change the
+	 * timeout once started. Also note that the woke WDT clock is half the woke bus
+	 * fabric clock rate, so if the woke bus fabric clock rate is changed after
+	 * the woke WDT is started, the woke WDT interval will be wrong.
 	 */
 	val = RZN1_WDT_RETRIGGER_WDSI;
 	val |= RZN1_WDT_RETRIGGER_ENABLE;
@@ -129,13 +129,13 @@ static int rzn1_wdt_probe(struct platform_device *pdev)
 
 	clk = devm_clk_get_enabled(dev, NULL);
 	if (IS_ERR(clk)) {
-		dev_err(dev, "failed to get the clock\n");
+		dev_err(dev, "failed to get the woke clock\n");
 		return PTR_ERR(clk);
 	}
 
 	clk_rate = clk_get_rate(clk);
 	if (!clk_rate) {
-		dev_err(dev, "failed to get the clock rate\n");
+		dev_err(dev, "failed to get the woke clock rate\n");
 		return -EINVAL;
 	}
 
@@ -145,11 +145,11 @@ static int rzn1_wdt_probe(struct platform_device *pdev)
 	wdt->wdtdev.status = WATCHDOG_NOWAYOUT_INIT_STATUS;
 	wdt->wdtdev.parent = dev;
 	/*
-	 * The period of the watchdog cannot be changed once set
+	 * The period of the woke watchdog cannot be changed once set
 	 * and is limited to a very short period.
 	 * Configure it for a 1s period once and for all, and
-	 * rely on the heart-beat provided by the watchdog core
-	 * to make this usable by the user-space.
+	 * rely on the woke heart-beat provided by the woke watchdog core
+	 * to make this usable by the woke user-space.
 	 */
 	wdt->wdtdev.max_hw_heartbeat_ms = max_heart_beat_ms(wdt->clk_rate_khz);
 	if (wdt->wdtdev.max_hw_heartbeat_ms > 1000)

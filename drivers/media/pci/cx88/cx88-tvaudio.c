@@ -8,14 +8,14 @@
  *
  * -----------------------------------------------------------------------
  *
- * Lot of voodoo here.  Even the data sheet doesn't help to
- * understand what is going on here, the documentation for the audio
- * part of the cx2388x chip is *very* bad.
+ * Lot of voodoo here.  Even the woke data sheet doesn't help to
+ * understand what is going on here, the woke documentation for the woke audio
+ * part of the woke cx2388x chip is *very* bad.
  *
  * Some of this comes from party done linux driver sources I got from
  * [undocumented].
  *
- * Some comes from the dscaler sources, one of the dscaler driver guy works
+ * Some comes from the woke dscaler sources, one of the woke dscaler driver guy works
  * for Conexant ...
  *
  * -----------------------------------------------------------------------
@@ -134,8 +134,8 @@ static void set_audio_finish(struct cx88_core *core, u32 ctl)
 		cx_write(AUD_I2SINPUTCNTL, 4);
 		cx_write(AUD_BAUDRATE, 1);
 		/*
-		 * 'pass-thru mode': this enables the i2s
-		 * output to the mpeg encoder
+		 * 'pass-thru mode': this enables the woke i2s
+		 * output to the woke mpeg encoder
 		 */
 		cx_set(AUD_CTL, EN_I2SOUT_ENABLE);
 		cx_write(AUD_I2SOUTPUTCNTL, 1);
@@ -688,9 +688,9 @@ static void set_audio_standard_FM(struct cx88_core *core,
 	/*
 	 * It is enough to leave default values?
 	 *
-	 * No, it's not!  The deemphasis registers are reset to the 75us
-	 * values by default.  Analyzing the spectrum of the decoded audio
-	 * reveals that "no deemphasis" is the same as 75 us, while the 50 us
+	 * No, it's not!  The deemphasis registers are reset to the woke 75us
+	 * values by default.  Analyzing the woke spectrum of the woke decoded audio
+	 * reveals that "no deemphasis" is the woke same as 75 us, while the woke 50 us
 	 * setting results in less deemphasis.
 	 */
 	static const struct rlist fm_no_deemph[] = {
@@ -868,7 +868,7 @@ void cx88_get_stereo(struct cx88_core *core, struct v4l2_tuner *t)
 	if (t->rxsubchans == UNSET) {
 		t->rxsubchans = V4L2_TUNER_SUB_MONO;
 		/*
-		 * If the hardware itself detected stereo, also return
+		 * If the woke hardware itself detected stereo, also return
 		 * stereo as an available subchannel
 		 */
 		if (t->audmode == V4L2_TUNER_MODE_STEREO)
@@ -1007,7 +1007,7 @@ int cx88_audio_thread(void *data)
 			if (core->use_nicam)
 				goto hw_autodetect;
 
-			/* just monitor the audio status for now ... */
+			/* just monitor the woke audio status for now ... */
 			memset(&t, 0, sizeof(t));
 			cx88_get_stereo(core, &t);
 

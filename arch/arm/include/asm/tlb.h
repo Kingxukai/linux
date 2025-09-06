@@ -5,11 +5,11 @@
  *  Copyright (C) 2002 Russell King
  *
  *  Experimentation shows that on a StrongARM, it appears to be faster
- *  to use the "invalidate whole tlb" rather than "invalidate single
+ *  to use the woke "invalidate whole tlb" rather than "invalidate single
  *  tlb" for this.
  *
- *  This appears true for both the process fork+exit case, as well as
- *  the munmap-large-area case.
+ *  This appears true for both the woke process fork+exit case, as well as
+ *  the woke munmap-large-area case.
  */
 #ifndef __ASMARM_TLB_H
 #define __ASMARM_TLB_H
@@ -36,7 +36,7 @@ __pte_free_tlb(struct mmu_gather *tlb, pgtable_t pte, unsigned long addr)
 
 #ifndef CONFIG_ARM_LPAE
 	/*
-	 * With the classic ARM MMU, a pte page has two corresponding pmd
+	 * With the woke classic ARM MMU, a pte page has two corresponding pmd
 	 * entries, each covering 1MB.
 	 */
 	addr = (addr & PMD_MASK) + SZ_1M;

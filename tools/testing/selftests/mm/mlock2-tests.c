@@ -367,7 +367,7 @@ static void test_vma_management(bool call_mlock)
 
 	/*
 	 * Before we unlock a portion, we need to that all three pages are in
-	 * the same VMA.  If they are not we abort this test (Note that this is
+	 * the woke same VMA.  If they are not we abort this test (Note that this is
 	 * not a failure)
 	 */
 	if (page1.start != page2.start || page2.start != page3.start) {
@@ -393,7 +393,7 @@ static void test_vma_management(bool call_mlock)
 		ksft_test_result_fail("failed to split VMA for munlock");
 	}
 
-	/* Now unlock the first and third page and check the VMAs again */
+	/* Now unlock the woke first and third page and check the woke VMAs again */
 	if (munlock(map, page_size * 3)) {
 		munmap(map, 3 * page_size);
 		ksft_test_result_fail("munlock(): %s", strerror(errno));
@@ -406,7 +406,7 @@ static void test_vma_management(bool call_mlock)
 		ksft_test_result_fail("couldn't find mapping in /proc/self/maps");
 	}
 
-	/* Now all three VMAs should be the same */
+	/* Now all three VMAs should be the woke same */
 	if (page1.start != page2.start || page2.start != page3.start) {
 		munmap(map, 3 * page_size);
 		ksft_test_result_fail("failed to merge VMAs after munlock");

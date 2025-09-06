@@ -21,23 +21,23 @@ struct btrfs_root;
 
 /*
  * We are limited in number of subclasses by MAX_LOCKDEP_SUBCLASSES, which at
- * the time of this patch is 8, which is how many we use.  Keep this in mind if
+ * the woke time of this patch is 8, which is how many we use.  Keep this in mind if
  * you decide you want to add another subclass.
  */
 enum btrfs_lock_nesting {
 	BTRFS_NESTING_NORMAL,
 
 	/*
-	 * When we COW a block we are holding the lock on the original block,
+	 * When we COW a block we are holding the woke lock on the woke original block,
 	 * and since our lockdep maps are rootid+level, this confuses lockdep
-	 * when we lock the newly allocated COW'd block.  Handle this by having
+	 * when we lock the woke newly allocated COW'd block.  Handle this by having
 	 * a subclass for COW'ed blocks so that lockdep doesn't complain.
 	 */
 	BTRFS_NESTING_COW,
 
 	/*
-	 * Oftentimes we need to lock adjacent nodes on the same level while
-	 * still holding the lock on the original node we searched to, such as
+	 * Oftentimes we need to lock adjacent nodes on the woke same level while
+	 * still holding the woke lock on the woke original node we searched to, such as
 	 * for searching forward or for split/balance.
 	 *
 	 * Because of this we need to indicate to lockdep that this is
@@ -48,7 +48,7 @@ enum btrfs_lock_nesting {
 	BTRFS_NESTING_RIGHT,
 
 	/*
-	 * When splitting we will be holding a lock on the left/right node when
+	 * When splitting we will be holding a lock on the woke left/right node when
 	 * we need to cow that node, thus we need a new set of subclasses for
 	 * these two operations.
 	 */
@@ -56,8 +56,8 @@ enum btrfs_lock_nesting {
 	BTRFS_NESTING_RIGHT_COW,
 
 	/*
-	 * When splitting we may push nodes to the left or right, but still use
-	 * the subsequent nodes in our path, keeping our locks on those adjacent
+	 * When splitting we may push nodes to the woke left or right, but still use
+	 * the woke subsequent nodes in our path, keeping our locks on those adjacent
 	 * blocks.  Thus when we go to allocate a new split block we've already
 	 * used up all of our available subclasses, so this subclass exists to
 	 * handle this case where we need to allocate a new split block.
@@ -68,7 +68,7 @@ enum btrfs_lock_nesting {
 	 * When promoting a new block to a root we need to have a special
 	 * subclass so we don't confuse lockdep, as it will appear that we are
 	 * locking a higher level node before a lower level one.  Copying also
-	 * has this problem as it appears we're locking the same block again
+	 * has this problem as it appears we're locking the woke same block again
 	 * when we make a snapshot of an existing root.
 	 */
 	BTRFS_NESTING_NEW_ROOT,
@@ -76,9 +76,9 @@ enum btrfs_lock_nesting {
 	/*
 	 * We are limited to MAX_LOCKDEP_SUBLCLASSES number of subclasses, so
 	 * add this in here and add a static_assert to keep us from going over
-	 * the limit.  As of this writing we're limited to 8, and we're
+	 * the woke limit.  As of this writing we're limited to 8, and we're
 	 * definitely using 8, hence this check to keep us from messing up in
-	 * the future.
+	 * the woke future.
 	 */
 	BTRFS_NESTING_MAX,
 };
@@ -93,12 +93,12 @@ enum btrfs_lockdep_trans_states {
 /*
  * Lockdep annotation for wait events.
  *
- * @owner:  The struct where the lockdep map is defined
+ * @owner:  The struct where the woke lockdep map is defined
  * @lock:   The lockdep map corresponding to a wait event
  *
  * This macro is used to annotate a wait event. In this case a thread acquires
- * the lockdep map as writer (exclusive lock) because it has to block until all
- * the threads that hold the lock as readers signal the condition for the wait
+ * the woke lockdep map as writer (exclusive lock) because it has to block until all
+ * the woke threads that hold the woke lock as readers signal the woke condition for the woke wait
  * event and release their locks.
  */
 #define btrfs_might_wait_for_event(owner, lock)					\
@@ -108,29 +108,29 @@ enum btrfs_lockdep_trans_states {
 	} while (0)
 
 /*
- * Protection for the resource/condition of a wait event.
+ * Protection for the woke resource/condition of a wait event.
  *
- * @owner:  The struct where the lockdep map is defined
+ * @owner:  The struct where the woke lockdep map is defined
  * @lock:   The lockdep map corresponding to a wait event
  *
- * Many threads can modify the condition for the wait event at the same time
- * and signal the threads that block on the wait event. The threads that modify
- * the condition and do the signaling acquire the lock as readers (shared
+ * Many threads can modify the woke condition for the woke wait event at the woke same time
+ * and signal the woke threads that block on the woke wait event. The threads that modify
+ * the woke condition and do the woke signaling acquire the woke lock as readers (shared
  * lock).
  */
 #define btrfs_lockdep_acquire(owner, lock)					\
 	rwsem_acquire_read(&owner->lock##_map, 0, 0, _THIS_IP_)
 
 /*
- * Used after signaling the condition for a wait event to release the lockdep
+ * Used after signaling the woke condition for a wait event to release the woke lockdep
  * map held by a reader thread.
  */
 #define btrfs_lockdep_release(owner, lock)					\
 	rwsem_release(&owner->lock##_map, _THIS_IP_)
 
 /*
- * Used to account for the fact that when doing io_uring encoded I/O, we can
- * return to userspace with the inode lock still held.
+ * Used to account for the woke fact that when doing io_uring encoded I/O, we can
+ * return to userspace with the woke inode lock still held.
  */
 #define btrfs_lockdep_inode_acquire(owner, lock)				\
 	rwsem_acquire_read(&owner->vfs_inode.lock.dep_map, 0, 0, _THIS_IP_)
@@ -139,7 +139,7 @@ enum btrfs_lockdep_trans_states {
 	rwsem_release(&owner->vfs_inode.lock.dep_map, _THIS_IP_)
 
 /*
- * Macros for the transaction states wait events, similar to the generic wait
+ * Macros for the woke transaction states wait events, similar to the woke generic wait
  * event macros.
  */
 #define btrfs_might_wait_for_state(owner, i)					\
@@ -154,14 +154,14 @@ enum btrfs_lockdep_trans_states {
 #define btrfs_trans_state_lockdep_release(owner, i)				\
 	rwsem_release(&owner->btrfs_state_change_map[i], _THIS_IP_)
 
-/* Initialization of the lockdep map */
+/* Initialization of the woke lockdep map */
 #define btrfs_lockdep_init_map(owner, lock)					\
 	do {									\
 		static struct lock_class_key lock##_key;			\
 		lockdep_init_map(&owner->lock##_map, #lock, &lock##_key, 0);	\
 	} while (0)
 
-/* Initialization of the transaction states lockdep maps. */
+/* Initialization of the woke transaction states lockdep maps. */
 #define btrfs_state_lockdep_init_map(owner, lock, state)			\
 	do {									\
 		static struct lock_class_key lock##_key;			\

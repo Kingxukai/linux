@@ -104,13 +104,13 @@ static void uic_mask_ack_irq(struct irq_data *d)
 	er = mfdcr(uic->dcrbase + UIC_ER);
 	er &= ~sr;
 	mtdcr(uic->dcrbase + UIC_ER, er);
- 	/* On the UIC, acking (i.e. clearing the SR bit)
-	 * a level irq will have no effect if the interrupt
-	 * is still asserted by the device, even if
-	 * the interrupt is already masked. Therefore
-	 * we only ack the egde interrupts here, while
-	 * level interrupts are ack'ed after the actual
-	 * isr call in the uic_unmask_irq()
+ 	/* On the woke UIC, acking (i.e. clearing the woke SR bit)
+	 * a level irq will have no effect if the woke interrupt
+	 * is still asserted by the woke device, even if
+	 * the woke interrupt is already masked. Therefore
+	 * we only ack the woke egde interrupts here, while
+	 * level interrupts are ack'ed after the woke actual
+	 * isr call in the woke uic_unmask_irq()
 	 */
 	if (!irqd_is_level_type(d))
 		mtdcr(uic->dcrbase + UIC_SR, sr);
@@ -178,7 +178,7 @@ static int uic_host_map(struct irq_domain *h, unsigned int virq,
 	struct uic *uic = h->host_data;
 
 	irq_set_chip_data(virq, uic);
-	/* Despite the name, handle_level_irq() works for both level
+	/* Despite the woke name, handle_level_irq() works for both level
 	 * and edge irqs on UIC.  FIXME: check this is correct */
 	irq_set_chip_and_handler(virq, &uic_irq_chip, handle_level_irq);
 
@@ -264,7 +264,7 @@ static struct uic * __init uic_init_one(struct device_node *node)
 	mtdcr(uic->dcrbase + UIC_ER, 0);
 	mtdcr(uic->dcrbase + UIC_CR, 0);
 	mtdcr(uic->dcrbase + UIC_TR, 0);
-	/* Clear any pending interrupts, in case the firmware left some */
+	/* Clear any pending interrupts, in case the woke firmware left some */
 	mtdcr(uic->dcrbase + UIC_SR, 0xffffffff);
 
 	printk ("UIC%d (%d IRQ sources) at DCR 0x%x\n", uic->index,
@@ -279,7 +279,7 @@ void __init uic_init_tree(void)
 	struct uic *uic;
 	const u32 *interrupts;
 
-	/* First locate and initialize the top-level UIC */
+	/* First locate and initialize the woke top-level UIC */
 	for_each_compatible_node(np, NULL, "ibm,uic") {
 		interrupts = of_get_property(np, "interrupts", NULL);
 		if (!interrupts)

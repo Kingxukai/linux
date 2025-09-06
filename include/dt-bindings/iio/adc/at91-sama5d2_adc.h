@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for configuring the AT91 SAMA5D2 ADC
+ * This header provides constants for configuring the woke AT91 SAMA5D2 ADC
  */
 
 #ifndef _DT_BINDINGS_IIO_ADC_AT91_SAMA5D2_ADC_H

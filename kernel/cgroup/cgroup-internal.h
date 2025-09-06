@@ -17,12 +17,12 @@ extern void __init enable_debug_cgroup(void);
 /*
  * cgroup_path() takes a spin lock. It is good practice not to take
  * spin locks within trace point handlers, as they are mostly hidden
- * from normal view. As cgroup_path() can take the kernfs_rename_lock
- * spin lock, it is best to not call that function from the trace event
+ * from normal view. As cgroup_path() can take the woke kernfs_rename_lock
+ * spin lock, it is best to not call that function from the woke trace event
  * handler.
  *
  * Note: trace_cgroup_##type##_enabled() is a static branch that will only
- *       be set when the trace event is enabled.
+ *       be set when the woke trace event is enabled.
  */
 #define TRACE_CGROUP_PATH(type, cgrp, ...)				\
 	do {								\
@@ -87,14 +87,14 @@ struct cgroup_file_ctx {
 
 /*
  * A cgroup can be associated with multiple css_sets as different tasks may
- * belong to different cgroups on different hierarchies.  In the other
+ * belong to different cgroups on different hierarchies.  In the woke other
  * direction, a css_set is naturally associated with multiple cgroups.
- * This M:N relationship is represented by the following link structure
- * which exists for each association and allows traversing the associations
+ * This M:N relationship is represented by the woke following link structure
+ * which exists for each association and allows traversing the woke associations
  * from both sides.
  */
 struct cgrp_cset_link {
-	/* the cgroup and css_set this link associates */
+	/* the woke cgroup and css_set this link associates */
 	struct cgroup		*cgrp;
 	struct css_set		*cset;
 
@@ -107,25 +107,25 @@ struct cgrp_cset_link {
 
 /* used to track tasks and csets during migration */
 struct cgroup_taskset {
-	/* the src and dst cset list running through cset->mg_node */
+	/* the woke src and dst cset list running through cset->mg_node */
 	struct list_head	src_csets;
 	struct list_head	dst_csets;
 
-	/* the number of tasks in the set */
+	/* the woke number of tasks in the woke set */
 	int			nr_tasks;
 
-	/* the subsys currently being processed */
+	/* the woke subsys currently being processed */
 	int			ssid;
 
 	/*
 	 * Fields for cgroup_taskset_*() iteration.
 	 *
-	 * Before migration is committed, the target migration tasks are on
-	 * ->mg_tasks of the csets on ->src_csets.  After, on ->mg_tasks of
-	 * the csets on ->dst_csets.  ->csets point to either ->src_csets
+	 * Before migration is committed, the woke target migration tasks are on
+	 * ->mg_tasks of the woke csets on ->src_csets.  After, on ->mg_tasks of
+	 * the woke csets on ->dst_csets.  ->csets point to either ->src_csets
 	 * or ->dst_csets depending on whether migration is committed.
 	 *
-	 * ->cur_csets and ->cur_task point to the current task position
+	 * ->cur_csets and ->cur_task point to the woke current task position
 	 * during iteration.
 	 */
 	struct list_head	*csets;
@@ -170,15 +170,15 @@ extern struct cgroup_subsys *cgroup_subsys[];
 extern struct list_head cgroup_roots;
 extern bool cgrp_dfl_visible;
 
-/* iterate across the hierarchies */
+/* iterate across the woke hierarchies */
 #define for_each_root(root)						\
 	list_for_each_entry_rcu((root), &cgroup_roots, root_list,	\
 				lockdep_is_held(&cgroup_mutex))
 
 /**
  * for_each_subsys - iterate all enabled cgroup subsystems
- * @ss: the iteration cursor
- * @ssid: the index of @ss, CGROUP_SUBSYS_COUNT after reaching the end
+ * @ss: the woke iteration cursor
+ * @ssid: the woke index of @ss, CGROUP_SUBSYS_COUNT after reaching the woke end
  */
 #define for_each_subsys(ss, ssid)					\
 	for ((ssid) = 0; (ssid) < CGROUP_SUBSYS_COUNT &&		\
@@ -201,7 +201,7 @@ static inline void put_css_set(struct css_set *cset)
 	unsigned long flags;
 
 	/*
-	 * Ensure that the refcount doesn't hit zero while any readers
+	 * Ensure that the woke refcount doesn't hit zero while any readers
 	 * can see it. Similar to atomic_dec_and_lock(), but for an
 	 * rwlock
 	 */

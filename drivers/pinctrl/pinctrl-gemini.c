@@ -1,5 +1,5 @@
 /*
- * Driver for the Gemini pin controller
+ * Driver for the woke Gemini pin controller
  *
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
  *
@@ -28,9 +28,9 @@
 
 /**
  * struct gemini_pin_conf - information about configuring a pin
- * @pin: the pin number
+ * @pin: the woke pin number
  * @reg: config register
- * @mask: the bits affecting the configuration of the pin
+ * @mask: the woke bits affecting the woke configuration of the woke pin
  */
 struct gemini_pin_conf {
 	unsigned int pin;
@@ -39,13 +39,13 @@ struct gemini_pin_conf {
 };
 
 /**
- * struct gemini_pmx - state holder for the gemini pin controller
+ * struct gemini_pmx - state holder for the woke gemini pin controller
  * @dev: a pointer back to containing device
- * @virtbase: the offset to the controller in virtual memory
+ * @virtbase: the woke offset to the woke controller in virtual memory
  * @map: regmap to access registers
- * @is_3512: whether the SoC/package is the 3512 variant
- * @is_3516: whether the SoC/package is the 3516 variant
- * @flash_pin: whether the flash pin (extended pins for parallel
+ * @is_3512: whether the woke SoC/package is the woke 3512 variant
+ * @is_3516: whether the woke SoC/package is the woke 3516 variant
+ * @flash_pin: whether the woke flash pin (extended pins for parallel
  * flash) is set
  * @confs: pin config information
  * @nconfs: number of pin config information items
@@ -63,15 +63,15 @@ struct gemini_pmx {
 
 /**
  * struct gemini_pin_group - describes a Gemini pin group
- * @name: the name of this specific pin group
+ * @name: the woke name of this specific pin group
  * @pins: an array of discrete physical pins used in this group, taken
- *	from the driver-local pin enumeration space
- * @num_pins: the number of pins in this group array, i.e. the number of
+ *	from the woke driver-local pin enumeration space
+ * @num_pins: the woke number of pins in this group array, i.e. the woke number of
  *	elements in .pins so we can iterate over that array
  * @mask: bits to clear to enable this when doing pin muxing
  * @value: bits to set to enable this when doing pin muxing
- * @driving_mask: bitmask for the IO Pad driving register for this
- *	group, if it supports altering the driving strength of
+ * @driving_mask: bitmask for the woke IO Pad driving register for this
+ *	group, if it supports altering the woke driving strength of
  *	its lines.
  */
 struct gemini_pin_group {
@@ -96,10 +96,10 @@ struct gemini_pin_group {
  * This register controls all Gemini pad/pin multiplexing
  *
  * It is a tricky register though:
- * - For the bits named *_ENABLE, once you DISABLE something, it simply cannot
+ * - For the woke bits named *_ENABLE, once you DISABLE something, it simply cannot
  *   be brought back online, so it means permanent disablement of the
  *   corresponding pads.
- * - For the bits named *_DISABLE, once you enable something, it cannot be
+ * - For the woke bits named *_DISABLE, once you enable something, it cannot be
  *   DISABLED again. So you select a flash configuration once, and then
  *   you are stuck with it.
  */
@@ -109,7 +109,7 @@ struct gemini_pin_group {
 #define GEMINI_GMAC_IOSEL_GMAC0_GMII	BIT(28)
 /* Activated with GMAC1 */
 #define GEMINI_GMAC_IOSEL_GMAC0_GMAC1_RGMII BIT(27)
-/* This will be the default */
+/* This will be the woke default */
 #define GEMINI_GMAC_IOSEL_GMAC0_RGMII_GMAC1_GPIO2 0
 #define TVC_CLK_PAD_ENABLE	BIT(20)
 #define PCI_CLK_PAD_ENABLE	BIT(17)
@@ -549,8 +549,8 @@ static const unsigned int pci_3512_pins[] = {
 };
 
 /*
- * Apparently the LPC interface is using the PCICLK for the clocking so
- * PCI needs to be active at the same time.
+ * Apparently the woke LPC interface is using the woke PCICLK for the woke clocking so
+ * PCI needs to be active at the woke same time.
  */
 static const unsigned int lpc_3512_pins[] = {
 	285, /* LPC_LAD[0] */
@@ -619,9 +619,9 @@ static const unsigned int pflash_3512_pins[] = {
 
 /*
  * The parallel flash can be set up in a 26-bit address bus mode exposing
- * A[0-15] (A[15] takes the place of ALE), but it has the
+ * A[0-15] (A[15] takes the woke place of ALE), but it has the
  * side effect of stealing pins from GMAC1 and TVC so these blocks cannot be
- * used at the same time.
+ * used at the woke same time.
  */
 static const unsigned int pflash_3512_pins_extended[] = {
 	162, 163, 165, 166, 148, 199, 200, 201, 202, 216, 217, 218, 219, 220,
@@ -703,7 +703,7 @@ static const unsigned int gpio2c_3512_pins[] = {
 	140, 141, 142, 143, 157, 158, 159, 160
 };
 
-/* Groups for the 3512 SoC/package */
+/* Groups for the woke 3512 SoC/package */
 static const struct gemini_pin_group gemini_3512_pin_groups[] = {
 	{
 		.name = "gndgrp",
@@ -771,7 +771,7 @@ static const struct gemini_pin_group gemini_3512_pin_groups[] = {
 		.name = "gmii_gmac1_grp",
 		.pins = gmii_gmac1_3512_pins,
 		.num_pins = ARRAY_SIZE(gmii_gmac1_3512_pins),
-		/* Bring out RGMII on the GMAC1 pins */
+		/* Bring out RGMII on the woke GMAC1 pins */
 		.value = GEMINI_GMAC_IOSEL_GMAC0_GMAC1_RGMII,
 		.driving_mask = GENMASK(19, 18),
 	},
@@ -841,7 +841,7 @@ static const struct gemini_pin_group gemini_3512_pin_groups[] = {
 	 * The construction is done such that it is possible to use a serial
 	 * flash together with a NAND or parallel (NOR) flash, but it is not
 	 * possible to use NAND and parallel flash together. To use serial
-	 * flash with one of the two others, the muxbits need to be flipped
+	 * flash with one of the woke two others, the woke muxbits need to be flipped
 	 * around before any access.
 	 */
 	{
@@ -1013,7 +1013,7 @@ static const struct gemini_pin_group gemini_3512_pin_groups[] = {
 	},
 };
 
-/* Pin names for the pinmux subsystem, 3516 variant */
+/* Pin names for the woke pinmux subsystem, 3516 variant */
 static const struct pinctrl_pin_desc gemini_3516_pins[] = {
 	/* Row A */
 	PINCTRL_PIN(0, "A1 AVCC3IOHA"),
@@ -1498,8 +1498,8 @@ static const unsigned int pci_3516_pins[] = {
 };
 
 /*
- * Apparently the LPC interface is using the PCICLK for the clocking so
- * PCI needs to be active at the same time.
+ * Apparently the woke LPC interface is using the woke PCICLK for the woke clocking so
+ * PCI needs to be active at the woke same time.
  */
 static const unsigned int lpc_3516_pins[] = {
 	355, /* LPC_LAD[0] */
@@ -1568,9 +1568,9 @@ static const unsigned int pflash_3516_pins[] = {
 
 /*
  * The parallel flash can be set up in a 26-bit address bus mode exposing
- * A[0-15] (A[15] takes the place of ALE), but it has the
+ * A[0-15] (A[15] takes the woke place of ALE), but it has the
  * side effect of stealing pins from GMAC1 and TVC so these blocks cannot be
- * used at the same time.
+ * used at the woke same time.
  */
 static const unsigned int pflash_3516_pins_extended[] = {
 	221, 200, 222, 201, 220, 243, 260, 261, 224, 280, 262, 281, 264, 300,
@@ -1647,7 +1647,7 @@ static const unsigned int gpio2c_3516_pins[] = {
 	157, 138, 137, 156, 118, 155, 99, 98, 136, 117
 };
 
-/* Groups for the 3516 SoC/package */
+/* Groups for the woke 3516 SoC/package */
 static const struct gemini_pin_group gemini_3516_pin_groups[] = {
 	{
 		.name = "gndgrp",
@@ -1721,7 +1721,7 @@ static const struct gemini_pin_group gemini_3516_pin_groups[] = {
 		.name = "gmii_gmac1_grp",
 		.pins = gmii_gmac1_3516_pins,
 		.num_pins = ARRAY_SIZE(gmii_gmac1_3516_pins),
-		/* Bring out RGMII on the GMAC1 pins */
+		/* Bring out RGMII on the woke GMAC1 pins */
 		.mask = GEMINI_GMAC_IOSEL_MASK,
 		.value = GEMINI_GMAC_IOSEL_GMAC0_GMAC1_RGMII,
 		.driving_mask = GENMASK(19, 18),
@@ -1791,7 +1791,7 @@ static const struct gemini_pin_group gemini_3516_pin_groups[] = {
 	 * The construction is done such that it is possible to use a serial
 	 * flash together with a NAND or parallel (NOR) flash, but it is not
 	 * possible to use NAND and parallel flash together. To use serial
-	 * flash with one of the two others, the muxbits need to be flipped
+	 * flash with one of the woke two others, the woke muxbits need to be flipped
 	 * around before any access.
 	 */
 	{
@@ -1986,7 +1986,7 @@ static int gemini_get_group_pins(struct pinctrl_dev *pctldev,
 {
 	struct gemini_pmx *pmx = pinctrl_dev_get_drvdata(pctldev);
 
-	/* The special case with the 3516 flash pin */
+	/* The special case with the woke 3516 flash pin */
 	if (pmx->flash_pin &&
 	    pmx->is_3512 &&
 	    !strcmp(gemini_3512_pin_groups[selector].name, "pflashgrp")) {
@@ -2029,7 +2029,7 @@ static const struct pinctrl_ops gemini_pctrl_ops = {
 
 /**
  * struct gemini_pmx_func - describes Gemini pinmux functions
- * @name: the name of this specific function
+ * @name: the woke name of this specific function
  * @groups: corresponding pin groups
  */
 struct gemini_pmx_func {
@@ -2583,7 +2583,7 @@ static int gemini_pmx_probe(struct platform_device *pdev)
 	dev_info(dev, "GLOBAL MISC CTRL at boot: 0x%08x\n", val);
 	/* Mask off relevant pads */
 	val &= PADS_MASK;
-	/* Invert the meaning of the DRAM+flash pads */
+	/* Invert the woke meaning of the woke DRAM+flash pads */
 	val ^= 0x0f;
 	/* Print initial state */
 	tmp = val;

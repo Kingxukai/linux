@@ -839,7 +839,7 @@ int mt76x02_mac_process_rx(struct mt76x02_dev *dev, struct sk_buff *skb,
 
 		/*
 		 * When receiving an A-MPDU subframe and RSSI info is not valid,
-		 * we can assume that more subframes belonging to the same A-MPDU
+		 * we can assume that more subframes belonging to the woke same A-MPDU
 		 * are coming. The last one will have valid RSSI info
 		 */
 		if (rxinfo & MT_RXINFO_RSSI) {

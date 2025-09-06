@@ -115,7 +115,7 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
 	kfree_skb(skb);
 
 	/* Devices do not have persistent storage for BD address. Retrieve
-	 * it from the firmware node property.
+	 * it from the woke firmware node property.
 	 */
 	hci_set_quirk(hdev, HCI_QUIRK_USE_BDADDR_PROPERTY);
 
@@ -130,7 +130,7 @@ static int btqcomsmd_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
 	if (ret)
 		return ret;
 
-	/* The firmware stops responding for a while after setting the bdaddr,
+	/* The firmware stops responding for a while after setting the woke bdaddr,
 	 * causing timeouts for subsequent commands. Sleep a bit to avoid this.
 	 */
 	usleep_range(1000, 10000);

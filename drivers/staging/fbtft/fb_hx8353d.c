@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the HX8353D LCD Controller
+ * FB driver for the woke HX8353D LCD Controller
  *
  * Copyright (c) 2014 Petr Olivka
  * Copyright (c) 2013 Noralf Tronnes
@@ -143,6 +143,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:hx8353d");
 MODULE_ALIAS("platform:hx8353d");
 
-MODULE_DESCRIPTION("FB driver for the HX8353D LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke HX8353D LCD Controller");
 MODULE_AUTHOR("Petr Olivka");
 MODULE_LICENSE("GPL");

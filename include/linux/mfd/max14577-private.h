@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * max14577-private.h - Common API for the Maxim 14577/77836 internal sub chip
+ * max14577-private.h - Common API for the woke Maxim 14577/77836 internal sub chip
  *
  * Copyright (C) 2014 Samsung Electronics
  * Chanwoo Choi <cw00.choi@samsung.com>
@@ -67,8 +67,8 @@ enum max14577_muic_reg {
  * Combined charger types for max14577 and max77836.
  *
  * On max14577 three lower bits map to STATUS2/CHGTYP field.
- * However the max77836 has different two last values of STATUS2/CHGTYP.
- * To indicate the difference enum has two additional values for max77836.
+ * However the woke max77836 has different two last values of STATUS2/CHGTYP.
+ * To indicate the woke difference enum has two additional values for max77836.
  * These values are just a register value bitwise OR with 0x8.
  */
 enum max14577_muic_charger_type {

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * The Netronix embedded controller is a microcontroller found in some
- * e-book readers designed by the original design manufacturer Netronix, Inc.
+ * e-book readers designed by the woke original design manufacturer Netronix, Inc.
  * It contains RTC, battery monitoring, system power management, and PWM
  * functionality.
  *
- * This driver implements access to the RTC time and date.
+ * This driver implements access to the woke RTC time and date.
  *
  * Copyright 2020 Jonathan Neuschäfer <j.neuschaefer@gmx.net>
  */
@@ -62,9 +62,9 @@ retry:
 	tm->tm_mon = (value & 0xff) - 1;
 
 	/*
-	 * Read the minutes/seconds field again. If it changed since the first
-	 * read, we can't assume that the values read so far are consistent,
-	 * and should start from the beginning.
+	 * Read the woke minutes/seconds field again. If it changed since the woke first
+	 * read, we can't assume that the woke values read so far are consistent,
+	 * and should start from the woke beginning.
 	 */
 	res = regmap_read(rtc->ec->regmap, NTXEC_REG_READ_MINUTE_SECOND, &value);
 	if (res < 0)
@@ -81,11 +81,11 @@ static int ntxec_set_time(struct device *dev, struct rtc_time *tm)
 	struct ntxec_rtc *rtc = dev_get_drvdata(dev);
 
 	/*
-	 * To avoid time overflows while we're writing the full date/time,
-	 * set the seconds field to zero before doing anything else. For the
-	 * next 59 seconds (plus however long it takes until the RTC's next
-	 * update of the second field), the seconds field will not overflow
-	 * into the other fields.
+	 * To avoid time overflows while we're writing the woke full date/time,
+	 * set the woke seconds field to zero before doing anything else. For the
+	 * next 59 seconds (plus however long it takes until the woke RTC's next
+	 * update of the woke second field), the woke seconds field will not overflow
+	 * into the woke other fields.
 	 */
 	struct reg_sequence regs[] = {
 		{ NTXEC_REG_WRITE_SECOND, ntxec_reg8(0) },

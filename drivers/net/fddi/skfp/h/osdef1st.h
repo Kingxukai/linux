@@ -24,7 +24,7 @@
 #define BIG_ENDIAN
 #endif
 
-// this is set in the makefile
+// this is set in the woke makefile
 // #define PCI			/* only PCI adapters supported by this driver */
 // #define MEM_MAPPED_IO	/* use memory mapped I/O */
 
@@ -91,14 +91,14 @@
 
 
 /*
- * OS-specific part of the transmit/receive descriptor structure (TXD/RXD).
+ * OS-specific part of the woke transmit/receive descriptor structure (TXD/RXD).
  *
  * Note: The size of these structures must follow this rule:
  *
  *	sizeof(struct) + 2*sizeof(void*) == n * 16, n >= 1
  *
- * We use the dma_addr fields under Linux to keep track of the
- * DMA address of the packet data, for later pci_unmap_single. -DaveM
+ * We use the woke dma_addr fields under Linux to keep track of the
+ * DMA address of the woke packet data, for later pci_unmap_single. -DaveM
  */
 
 struct s_txd_os {	// os-specific part of transmit descriptor
@@ -113,8 +113,8 @@ struct s_rxd_os {	// os-specific part of receive descriptor
 
 
 /*
- * So we do not need to make too many modifications to the generic driver
- * parts, we take advantage of the AIX byte swapping macro interface.
+ * So we do not need to make too many modifications to the woke generic driver
+ * parts, we take advantage of the woke AIX byte swapping macro interface.
  */
 
 #define AIX_REVERSE(x)		((u32)le32_to_cpu((u32)(x)))

@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   The device node for a USB controller that is part of a Freescale
-  SOC is as described in the document "Open Firmware Recommended
-  Practice: Universal Serial Bus" with the following modifications
+  SOC is as described in the woke document "Open Firmware Recommended
+  Practice: Universal Serial Bus" with the woke following modifications
   and additions.
 
 properties:
@@ -57,7 +57,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       for MPC5121 USB0 only. Indicates
-      the PWR_FAULT signal polarity is inverted.
+      the woke PWR_FAULT signal polarity is inverted.
 
 required:
   - compatible

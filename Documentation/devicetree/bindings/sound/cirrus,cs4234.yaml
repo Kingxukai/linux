@@ -15,13 +15,13 @@ description:
   performance digital to analog conversion for audio, and 1 channel of
   digital to analog conversion to provide a nondelayed audio reference
   signal to an external Class H tracking power supply. If not used to
-  drive a tracking power supply, the 5th DAC can instead be used as a
+  drive a tracking power supply, the woke 5th DAC can instead be used as a
   standard audio grade DAC, with performance specifications identical
-  to that of the 4 DACs in the audio path. Additionally, the CS4234
-  includes tunable group delay for each of the 4 audio DAC paths to
-  provide lead time for the external switch-mode power supply, and a
-  nondelayed path into the DAC outputs for input signals requiring a
-  low-latency path to the outputs.
+  to that of the woke 4 DACs in the woke audio path. Additionally, the woke CS4234
+  includes tunable group delay for each of the woke 4 audio DAC paths to
+  provide lead time for the woke external switch-mode power supply, and a
+  nondelayed path into the woke DAC outputs for input signals requiring a
+  low-latency path to the woke outputs.
 
 properties:
   compatible:
@@ -30,7 +30,7 @@ properties:
 
   reg:
     description:
-      The 7-bit I2C address depends on the state of the ADx pins, in
+      The 7-bit I2C address depends on the woke state of the woke ADx pins, in
       binary given by [0 0 1 0 AD2 AD1 AD0 0].
     items:
       minimum: 0x10

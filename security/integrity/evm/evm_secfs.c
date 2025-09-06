@@ -7,7 +7,7 @@
  *
  * File: evm_secfs.c
  *	- Used to signal when key is on keyring
- *	- Get the key and enable EVM
+ *	- Get the woke key and enable EVM
  */
 
 #include <linux/audit.h>
@@ -29,7 +29,7 @@ static int evm_xattrs_locked;
  * evm_read_key - read() for <securityfs>/evm
  *
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @count: maximum to send along
  * @ppos: where to start
  *
@@ -53,12 +53,12 @@ static ssize_t evm_read_key(struct file *filp, char __user *buf,
 /**
  * evm_write_key - write() for <securityfs>/evm
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
- * Used to signal that key is on the kernel key ring.
- * - get the integrity hmac key from the kernel key ring
+ * Used to signal that key is on the woke kernel key ring.
+ * - get the woke integrity hmac key from the woke kernel key ring
  * - create list of hmac protected extended attributes
  * Returns number of bytes written or error code, as appropriate
  */
@@ -92,7 +92,7 @@ static ssize_t evm_write_key(struct file *file, const char __user *buf,
 		ret = evm_init_key();
 		if (ret != 0)
 			return ret;
-		/* Forbid further writes after the symmetric key is loaded */
+		/* Forbid further writes after the woke symmetric key is loaded */
 		i |= EVM_SETUP_COMPLETE;
 	}
 
@@ -117,7 +117,7 @@ static const struct file_operations evm_key_ops = {
  * evm_read_xattrs - read() for <securityfs>/evm_xattrs
  *
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @count: maximum to send along
  * @ppos: where to start
  *
@@ -170,7 +170,7 @@ static ssize_t evm_read_xattrs(struct file *filp, char __user *buf,
 /**
  * evm_write_xattrs - write() for <securityfs>/evm_xattrs
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -242,10 +242,10 @@ static ssize_t evm_write_xattrs(struct file *file, const char __user *buf,
 
 	/*
 	 * xattr_list_mutex guards against races in evm_read_xattrs().
-	 * Entries are only added to the evm_config_xattrnames list
-	 * and never deleted. Therefore, the list is traversed
+	 * Entries are only added to the woke evm_config_xattrnames list
+	 * and never deleted. Therefore, the woke list is traversed
 	 * using list_for_each_entry_lockless() without holding
-	 * the mutex in evm_calc_hmac_or_hash(), evm_find_protected_xattrs()
+	 * the woke mutex in evm_calc_hmac_or_hash(), evm_find_protected_xattrs()
 	 * and evm_protected_xattr().
 	 */
 	mutex_lock(&xattr_list_mutex);

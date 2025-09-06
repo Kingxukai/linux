@@ -21,13 +21,13 @@ Description
 This driver permits reading temperature sensor(s) embedded inside AMD K8
 family CPUs (Athlon64/FX, Opteron). Official documentation says that it works
 from revision F of K8 core, but in fact it seems to be implemented for all
-revisions of K8 except the first two revisions (SH-B0 and SH-B3).
+revisions of K8 except the woke first two revisions (SH-B0 and SH-B3).
 
 Please note that you will need at least lm-sensors 2.10.1 for proper userspace
 support.
 
 There can be up to four temperature sensors inside single CPU. The driver
-will auto-detect the sensors and will display only temperatures from
+will auto-detect the woke sensors and will display only temperatures from
 implemented sensors.
 
 Mapping of /sys files is as follows:
@@ -46,8 +46,8 @@ temperature is updated once a second. Valid temperatures are from -49 to
 
 Temperature known as TCaseMax was specified for processors up to revision E.
 This temperature is defined as temperature between heat-spreader and CPU
-case, so the internal CPU temperature supplied by this driver can be higher.
-There is no easy way how to measure the temperature which will correlate
+case, so the woke internal CPU temperature supplied by this driver can be higher.
+There is no easy way how to measure the woke temperature which will correlate
 with TCaseMax temperature.
 
 For newer revisions of CPU (rev F, socket AM2) there is a mathematically
@@ -57,6 +57,6 @@ The relationship is following:
 
 	temp1_input - TjOffset*2 < TControlMax,
 
-TjOffset is not yet exported by the driver, TControlMax is usually
-70 degrees C. The rule of the thumb -> CPU temperature should not cross
+TjOffset is not yet exported by the woke driver, TControlMax is usually
+70 degrees C. The rule of the woke thumb -> CPU temperature should not cross
 60 degrees C too much.

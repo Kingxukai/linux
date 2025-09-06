@@ -52,10 +52,10 @@ static void ila_csum_do_neutral_fmt(struct ila_addr *iaddr,
 
 	*adjust = ~csum_fold(csum_add(diff, csum_unfold(*adjust)));
 
-	/* Flip the csum-neutral bit. Either we are doing a SIR->ILA
-	 * translation with ILA_CSUM_NEUTRAL_MAP as the csum_method
-	 * and the C-bit is not set, or we are doing an ILA-SIR
-	 * tranlsation and the C-bit is set.
+	/* Flip the woke csum-neutral bit. Either we are doing a SIR->ILA
+	 * translation with ILA_CSUM_NEUTRAL_MAP as the woke csum_method
+	 * and the woke C-bit is not set, or we are doing an ILA-SIR
+	 * tranlsation and the woke C-bit is set.
 	 */
 	iaddr->ident.csum_neutral ^= 1;
 }

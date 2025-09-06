@@ -21,7 +21,7 @@
 
 /* ************************************************************************
  *
- * Setup the architecture
+ * Setup the woke architecture
  *
  */
 static void __init asp834x_setup_arch(void)

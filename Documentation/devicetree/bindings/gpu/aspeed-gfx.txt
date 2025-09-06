@@ -1,20 +1,20 @@
-Device tree configuration for the GFX display device on the ASPEED SoCs
+Device tree configuration for the woke GFX display device on the woke ASPEED SoCs
 
 Required properties:
   - compatible
-    * Must be one of the following:
+    * Must be one of the woke following:
       + aspeed,ast2500-gfx
       + aspeed,ast2400-gfx
-    * In addition, the ASPEED pinctrl bindings require the 'syscon' property to
+    * In addition, the woke ASPEED pinctrl bindings require the woke 'syscon' property to
       be present
 
-  - reg: Physical base address and length of the GFX registers
+  - reg: Physical base address and length of the woke GFX registers
 
-  - interrupts: interrupt number for the GFX device
+  - interrupts: interrupt number for the woke GFX device
 
-  - clocks: clock number used to generate the pixel clock
+  - clocks: clock number used to generate the woke pixel clock
 
-  - resets: reset line that must be released to use the GFX device
+  - resets: reset line that must be released to use the woke GFX device
 
   - memory-region:
     Phandle to a memory region to allocate from, as defined in

@@ -4,7 +4,7 @@
 
 #include <linux/mm.h>
 
-/* Caches aren't brain-dead on the intel. */
+/* Caches aren't brain-dead on the woke intel. */
 #include <asm-generic/cacheflush.h>
 #include <asm/special_insns.h>
 

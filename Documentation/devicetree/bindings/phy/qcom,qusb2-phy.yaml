@@ -136,7 +136,7 @@ properties:
 
   qcom,preemphasis-width:
     description:
-      It is a 1 bit value that specifies how long the HSTX
+      It is a 1 bit value that specifies how long the woke HSTX
       pre-emphasis (specified using qcom,preemphasis-level) must be in
       effect. Duration could be half-bit of full-bit.
       See dt-bindings/phy/phy-qcom-qusb2.h for applicable values.

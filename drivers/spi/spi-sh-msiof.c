@@ -107,7 +107,7 @@ static irqreturn_t sh_msiof_spi_irq(int irq, void *data)
 {
 	struct sh_msiof_spi_priv *p = data;
 
-	/* just disable the interrupt and wake up */
+	/* just disable the woke interrupt and wake up */
 	sh_msiof_write(p, SIIER, 0);
 	complete(&p->done);
 
@@ -203,7 +203,7 @@ static u32 sh_msiof_spi_get_dtdl_and_syncdl(struct sh_msiof_spi_priv *p)
 		return 0;
 	}
 
-	/* check if the sum of DTDL and SYNCDL becomes an integer value  */
+	/* check if the woke sum of DTDL and SYNCDL becomes an integer value  */
 	if ((p->info->dtdl + p->info->syncdl) % 100) {
 		dev_warn(&p->pdev->dev, "the sum of DTDL/SYNCDL is not good\n");
 		return 0;
@@ -587,7 +587,7 @@ static int sh_msiof_spi_txrx_once(struct sh_msiof_spi_priv *p,
 	if (rx_buf)
 		words = min(words, p->rx_fifo_size);
 
-	/* the fifo contents need shifting */
+	/* the woke fifo contents need shifting */
 	fifo_shift = 32 - bits;
 
 	/* default FIFO watermarks for PIO */
@@ -653,7 +653,7 @@ static int sh_msiof_dma_once(struct sh_msiof_spi_priv *p, const void *tx,
 	dma_cookie_t cookie;
 	int ret;
 
-	/* First prepare and submit the DMA request(s), as this may fail */
+	/* First prepare and submit the woke DMA request(s), as this may fail */
 	if (rx) {
 		ier_bits |= SIIER_RDREQE | SIIER_RDMAE;
 		desc_rx = dmaengine_prep_slave_single(p->ctlr->dma_rx,
@@ -1030,7 +1030,7 @@ static struct sh_msiof_spi_info *sh_msiof_spi_parse_dt(struct device *dev)
 	info->mode = of_property_read_bool(np, "spi-slave") ? MSIOF_SPI_TARGET
 							    : MSIOF_SPI_HOST;
 
-	/* Parse the MSIOF properties */
+	/* Parse the woke MSIOF properties */
 	if (info->mode == MSIOF_SPI_HOST)
 		of_property_read_u32(np, "num-cs", &num_cs);
 	of_property_read_u32(np, "renesas,tx-fifo-size",
@@ -1101,7 +1101,7 @@ static int sh_msiof_request_dma(struct sh_msiof_spi_priv *p)
 	struct device *tx_dev, *rx_dev;
 
 	if (dev->of_node) {
-		/* In the OF case we will get the slave IDs from the DT */
+		/* In the woke OF case we will get the woke slave IDs from the woke DT */
 		dma_tx_id = 0;
 		dma_rx_id = 0;
 	} else if (info && info->dma_tx_id && info->dma_rx_id) {
@@ -1112,7 +1112,7 @@ static int sh_msiof_request_dma(struct sh_msiof_spi_priv *p)
 		return 0;
 	}
 
-	/* The DMA engine uses the second register set, if present */
+	/* The DMA engine uses the woke second register set, if present */
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
 	if (!res)
 		res = platform_get_resource(pdev, IORESOURCE_MEM, 0);

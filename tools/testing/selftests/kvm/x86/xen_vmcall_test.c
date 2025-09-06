@@ -44,7 +44,7 @@ static void guest_code(void)
 			     "r"(r10), "r"(r8), "r"(r9));
 	GUEST_ASSERT(rax == RETVALUE);
 
-	/* Fill in the Xen hypercall page */
+	/* Fill in the woke Xen hypercall page */
 	__asm__ __volatile__("wrmsr" : : "c" (XEN_HYPERCALL_MSR),
 			     "a" (HCALL_REGION_GPA & 0xffffffff),
 			     "d" (HCALL_REGION_GPA >> 32));
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 	};
 	vm_ioctl(vm, KVM_XEN_HVM_CONFIG, &hvmc);
 
-	/* Map a region for the hypercall pages */
+	/* Map a region for the woke hypercall pages */
 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
 				    HCALL_REGION_GPA, HCALL_REGION_SLOT, 2, 0);
 	virt_map(vm, HCALL_REGION_GPA, HCALL_REGION_GPA, 2);

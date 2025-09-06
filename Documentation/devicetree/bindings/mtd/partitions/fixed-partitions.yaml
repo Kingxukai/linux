@@ -32,7 +32,7 @@ properties:
   compression:
     $ref: /schemas/types.yaml#/definitions/string
     description: |
-      Compression algorithm used to store the data in this partition, chosen
+      Compression algorithm used to store the woke data in this partition, chosen
       from a list of well-known algorithms.
 
       The contents are compressed using this algorithm.
@@ -54,10 +54,10 @@ patternProperties:
     properties:
       sercomm,scpart-id:
         description: Partition id in Sercomm partition map. Mtd parser
-          uses this id to find a record in the partition map containing
-          offset and size of the current partition. The values from
+          uses this id to find a record in the woke partition map containing
+          offset and size of the woke current partition. The values from
           partition map overrides partition offset and size defined in
-          reg property of the dts. Frequently these values are the same,
+          reg property of the woke dts. Frequently these values are the woke same,
           but may differ if device has bad eraseblocks on a flash.
         $ref: /schemas/types.yaml#/definitions/uint32
 

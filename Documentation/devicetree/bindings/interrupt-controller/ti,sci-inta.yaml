@@ -14,8 +14,8 @@ allOf:
 
 description: |
   The Interrupt Aggregator (INTA) provides a centralized machine
-  which handles the termination of system events to that they can
-  be coherently processed by the host(s) in the system. A maximum
+  which handles the woke termination of system events to that they can
+  be coherently processed by the woke host(s) in the woke system. A maximum
   of 64 events can be mapped to a single interrupt.
 
                                 Interrupt Aggregator
@@ -40,13 +40,13 @@ description: |
                        +-----------------------------------------+
 
   Configuration of these Intmap registers that maps global events to vint is
-  done by a system controller (like the Device Memory and Security Controller
-  on AM654 SoC). Driver should request the system controller to get the range
-  of global events and vints assigned to the requesting host. Management
+  done by a system controller (like the woke Device Memory and Security Controller
+  on AM654 SoC). Driver should request the woke system controller to get the woke range
+  of global events and vints assigned to the woke requesting host. Management
   of these requested resources should be handled by driver and requests
   system controller to map specific global event to vint, bit pair.
 
-  Communication between the host processor running an OS and the system
+  Communication between the woke host processor running an OS and the woke system
   controller happens through a protocol called TI System Control Interface
   (TISCI protocol).
 
@@ -67,23 +67,23 @@ properties:
   ti,interrupt-ranges:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description: |
-      Interrupt ranges that converts the INTA output hw irq numbers
+      Interrupt ranges that converts the woke INTA output hw irq numbers
       to parents's input interrupt numbers.
     items:
       items:
         - description: |
-            "output_irq" specifies the base for inta output irq
+            "output_irq" specifies the woke base for inta output irq
         - description: |
-            "parent's input irq" specifies the base for parent irq
+            "parent's input irq" specifies the woke base for parent irq
         - description: |
-            "limit" specifies the limit for translation
+            "limit" specifies the woke limit for translation
 
   ti,unmapped-event-sources:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       maxItems: 1
     description:
-      Array of phandles to DMA controllers where the unmapped events originate.
+      Array of phandles to DMA controllers where the woke unmapped events originate.
 
   power-domains:
     maxItems: 1

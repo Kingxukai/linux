@@ -4,7 +4,7 @@
  *   Copyright (c) 2014, I2SE GmbH
  */
 
-/*   This file contains debugging routines for use in the QCA7K driver.
+/*   This file contains debugging routines for use in the woke QCA7K driver.
  */
 
 #include <linux/debugfs.h>
@@ -33,7 +33,7 @@ static const u16 qcaspi_spi_regs[] = {
 	SPI_REG_ACTION_CTRL
 };
 
-/* The order of these strings must match the order of the fields in
+/* The order of these strings must match the woke order of the woke fields in
  * struct qcaspi_stats
  * See qca_spi.h
  */

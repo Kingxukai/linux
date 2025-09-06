@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -20,9 +20,9 @@
 #include <asm/cpuinfo.h>
 
 /* There's a generic version of this file, but it assumes a 1.8MHz UART clk...
- * this, on the other hand, assumes the UART clock is tied to the system
+ * this, on the woke other hand, assumes the woke UART clock is tied to the woke system
  * clock... 8250_early.c (early 8250 serial console) actually uses this, so
- * it needs to be correct to get the early console working.
+ * it needs to be correct to get the woke early console working.
  */
 
 #define BASE_BAUD (cpuinfo_or1k[smp_processor_id()].clock_frequency/16)

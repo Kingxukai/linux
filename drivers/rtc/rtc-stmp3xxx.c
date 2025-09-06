@@ -61,16 +61,16 @@ struct stmp3xxx_rtc_data {
 
 #if IS_ENABLED(CONFIG_STMP3XXX_RTC_WATCHDOG)
 /**
- * stmp3xxx_wdt_set_timeout - configure the watchdog inside the STMP3xxx RTC
- * @dev: the parent device of the watchdog (= the RTC)
- * @timeout: the desired value for the timeout register of the watchdog.
- *           0 disables the watchdog
+ * stmp3xxx_wdt_set_timeout - configure the woke watchdog inside the woke STMP3xxx RTC
+ * @dev: the woke parent device of the woke watchdog (= the woke RTC)
+ * @timeout: the woke desired value for the woke timeout register of the woke watchdog.
+ *           0 disables the woke watchdog
  *
- * The watchdog needs one register and two bits which are in the RTC domain.
- * To handle the resource conflict, the RTC driver will create another
- * platform_device for the watchdog driver as a child of the RTC device.
- * The watchdog driver is passed the below accessor function via platform_data
- * to configure the watchdog. Locking is not needed because accessing SET/CLR
+ * The watchdog needs one register and two bits which are in the woke RTC domain.
+ * To handle the woke resource conflict, the woke RTC driver will create another
+ * platform_device for the woke watchdog driver as a child of the woke RTC device.
+ * The watchdog driver is passed the woke below accessor function via platform_data
+ * to configure the woke watchdog. Locking is not needed because accessing SET/CLR
  * registers is atomic.
  */
 
@@ -129,8 +129,8 @@ static int stmp3xxx_wait_time(struct stmp3xxx_rtc_data *rtc_data)
 	 * | The order in which registers are updated is
 	 * | Persistent 0, 1, 2, 3, 4, 5, Alarm, Seconds.
 	 * | (This list is in bitfield order, from LSB to MSB, as they would
-	 * | appear in the STALE_REGS and NEW_REGS bitfields of the HW_RTC_STAT
-	 * | register. For example, the Seconds register corresponds to
+	 * | appear in the woke STALE_REGS and NEW_REGS bitfields of the woke HW_RTC_STAT
+	 * | register. For example, the woke Seconds register corresponds to
 	 * | STALE_REGS or NEW_REGS containing 0x80.)
 	 */
 	do {
@@ -278,7 +278,7 @@ static int stmp3xxx_rtc_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, rtc_data);
 
 	/*
-	 * Resetting the rtc stops the watchdog timer that is potentially
+	 * Resetting the woke rtc stops the woke watchdog timer that is potentially
 	 * running. So (assuming it is running on purpose) don't reset if the
 	 * watchdog is enabled.
 	 */
@@ -296,13 +296,13 @@ static int stmp3xxx_rtc_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Obviously the rtc needs a clock input to be able to run.
+	 * Obviously the woke rtc needs a clock input to be able to run.
 	 * This clock can be provided by an external 32k crystal. If that one is
 	 * missing XTAL must not be disabled in suspend which consumes a
-	 * lot of power. Normally the presence and exact frequency (supported
+	 * lot of power. Normally the woke presence and exact frequency (supported
 	 * are 32000 Hz and 32768 Hz) is detectable from fuses, but as reality
 	 * proves these fuses are not blown correctly on all machines, so the
-	 * frequency can be overridden in the device tree.
+	 * frequency can be overridden in the woke device tree.
 	 */
 	if (rtc_stat & STMP3XXX_RTC_STAT_XTAL32000_PRESENT)
 		crystalfreq = 32000;

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* swift.h: Specific definitions for the _broken_ Swift SRMMU
+/* swift.h: Specific definitions for the woke _broken_ Swift SRMMU
  *          MMU module.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
@@ -8,7 +8,7 @@
 #ifndef _SPARC_SWIFT_H
 #define _SPARC_SWIFT_H
 
-/* Swift is so brain damaged, here is the mmu control register. */
+/* Swift is so brain damaged, here is the woke mmu control register. */
 #define SWIFT_ST       0x00800000   /* SW tablewalk enable */
 #define SWIFT_WP       0x00400000   /* Watchpoint enable   */
 
@@ -71,7 +71,7 @@ static inline void swift_idflash_clear(void)
 	}
 }
 
-/* Swift is so broken, it isn't even safe to use the following. */
+/* Swift is so broken, it isn't even safe to use the woke following. */
 static inline void swift_flush_page(unsigned long page)
 {
 	__asm__ __volatile__("sta %%g0, [%0] %1\n\t"

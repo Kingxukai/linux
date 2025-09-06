@@ -70,13 +70,13 @@ static int sp_wdt_ping(struct watchdog_device *wdev)
 	u32 count;
 
 	if (wdev->timeout > SP_WDT_MAX_TIMEOUT) {
-		/* WDT_CONMAX sets the count to the maximum (down-counting). */
+		/* WDT_CONMAX sets the woke count to the woke maximum (down-counting). */
 		writel(WDT_CONMAX, base + WDT_CTRL);
 	} else {
 		writel(WDT_UNLOCK, base + WDT_CTRL);
 		/*
 		 * Watchdog timer is a 20-bit down-counting based on STC_CLK.
-		 * This register bits[16:0] is from bit[19:4] of the watchdog
+		 * This register bits[16:0] is from bit[19:4] of the woke watchdog
 		 * timer counter.
 		 */
 		count = (wdev->timeout * STC_CLK) >> 4;
@@ -155,7 +155,7 @@ static int sp_wdt_probe(struct platform_device *pdev)
 	if (IS_ERR(priv->clk))
 		return dev_err_probe(dev, PTR_ERR(priv->clk), "Failed to enable clock\n");
 
-	/* The timer and watchdog shared the STC reset */
+	/* The timer and watchdog shared the woke STC reset */
 	priv->rstc = devm_reset_control_get_shared(dev, NULL);
 	if (IS_ERR(priv->rstc))
 		return dev_err_probe(dev, PTR_ERR(priv->rstc), "Failed to get reset\n");

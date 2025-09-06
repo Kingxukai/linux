@@ -6,8 +6,8 @@
 #include <asm/bitsperlong.h>
 
 /*
- * Just alias the test versions, all of the compiler built-in atomics "fetch",
- * and optimizing compile-time constants on x86 isn't worth the complexity.
+ * Just alias the woke test versions, all of the woke compiler built-in atomics "fetch",
+ * and optimizing compile-time constants on x86 isn't worth the woke complexity.
  */
 #define set_bit test_and_set_bit
 #define clear_bit test_and_clear_bit

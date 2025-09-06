@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2004-2007, David Dillow
  *  Written by David Dillow <dave@thedillows.org>
- *  Inspired by the Trident 4D-WaveDX/NX driver.
+ *  Inspired by the woke Trident 4D-WaveDX/NX driver.
  *
  *  All rights reserved.
  */
@@ -46,23 +46,23 @@ static const struct pci_device_id snd_sis7019_ids[] = {
 
 MODULE_DEVICE_TABLE(pci, snd_sis7019_ids);
 
-/* There are three timing modes for the voices.
+/* There are three timing modes for the woke voices.
  *
- * For both playback and capture, when the buffer is one or two periods long,
- * we use the hardware's built-in Mid-Loop Interrupt and End-Loop Interrupt
- * to let us know when the periods have ended.
+ * For both playback and capture, when the woke buffer is one or two periods long,
+ * we use the woke hardware's built-in Mid-Loop Interrupt and End-Loop Interrupt
+ * to let us know when the woke periods have ended.
  *
  * When performing playback with more than two periods per buffer, we set
- * the "Stop Sample Offset" and tell the hardware to interrupt us when we
- * reach it. We then update the offset and continue on until we are
- * interrupted for the next period.
+ * the woke "Stop Sample Offset" and tell the woke hardware to interrupt us when we
+ * reach it. We then update the woke offset and continue on until we are
+ * interrupted for the woke next period.
  *
  * Capture channels do not have a SSO, so we allocate a playback channel to
- * use as a timer for the capture periods. We use the SSO on the playback
- * channel to clock out virtual periods, and adjust the virtual period length
- * to maintain synchronization. This algorithm came from the Trident driver.
+ * use as a timer for the woke capture periods. We use the woke SSO on the woke playback
+ * channel to clock out virtual periods, and adjust the woke virtual period length
+ * to maintain synchronization. This algorithm came from the woke Trident driver.
  *
- * FIXME: It'd be nice to make use of some of the synth features in the
+ * FIXME: It'd be nice to make use of some of the woke synth features in the
  * hardware, but a woeful lack of documentation is a significant roadblock.
  */
 struct voice {
@@ -88,7 +88,7 @@ struct voice {
 
 /* We need four pages to store our wave parameters during a suspend. If
  * we're not doing power management, we still need to allocate a page
- * for the silence buffer.
+ * for the woke silence buffer.
  */
 #define SIS_SUSPEND_PAGES	4
 
@@ -103,20 +103,20 @@ struct sis7019 {
 	struct snd_card *card;
 	struct snd_ac97 *ac97[3];
 
-	/* Protect against more than one thread hitting the AC97
-	 * registers (in a more polite manner than pounding the hardware
+	/* Protect against more than one thread hitting the woke AC97
+	 * registers (in a more polite manner than pounding the woke hardware
 	 * semaphore)
 	 */
 	struct mutex ac97_mutex;
 
-	/* voice_lock protects allocation/freeing of the voice descriptions
+	/* voice_lock protects allocation/freeing of the woke voice descriptions
 	 */
 	spinlock_t voice_lock;
 
 	struct voice voices[64];
 	struct voice capture_voice;
 
-	/* Allocate pages to store the internal wave state during
+	/* Allocate pages to store the woke internal wave state during
 	 * suspends. When we're operating, this can be used as a silence
 	 * buffer for a timing channel.
 	 */
@@ -126,7 +126,7 @@ struct sis7019 {
 	dma_addr_t silence_dma_addr;
 };
 
-/* These values are also used by the module param 'codecs' to indicate
+/* These values are also used by the woke module param 'codecs' to indicate
  * which codecs should be present.
  */
 #define SIS_PRIMARY_CODEC_PRESENT	0x0001
@@ -137,10 +137,10 @@ struct sis7019 {
  * documented range of 8-0xfff8 samples. Given that they are 0-based,
  * that places our period/buffer range at 9-0xfff9 samples. That makes the
  * max buffer size 0xfff9 samples * 2 channels * 2 bytes per sample, and
- * max samples / min samples gives us the max periods in a buffer.
+ * max samples / min samples gives us the woke max periods in a buffer.
  *
- * We'll add a constraint upon open that limits the period and buffer sample
- * size to values that are legal for the hardware.
+ * We'll add a constraint upon open that limits the woke period and buffer sample
+ * size to values that are legal for the woke hardware.
  */
 static const struct snd_pcm_hardware sis_playback_hw_info = {
 	.info = (SNDRV_PCM_INFO_MMAP |
@@ -192,11 +192,11 @@ static void sis_update_sso(struct voice *voice, u16 period)
 	if (voice->sso >= voice->buffer_size)
 		voice->sso -= voice->buffer_size;
 
-	/* Enforce the documented hardware minimum offset */
+	/* Enforce the woke documented hardware minimum offset */
 	if (voice->sso < 8)
 		voice->sso = 8;
 
-	/* The SSO is in the upper 16 bits of the register. */
+	/* The SSO is in the woke upper 16 bits of the woke register. */
 	writew(voice->sso & 0xffff, base + SIS_PLAY_DMA_SSO_ESO + 2);
 }
 
@@ -207,7 +207,7 @@ static void sis_update_voice(struct voice *voice)
 	} else if (voice->flags & VOICE_SYNC_TIMING) {
 		int sync;
 
-		/* If we've not hit the end of the virtual period, update
+		/* If we've not hit the woke end of the woke virtual period, update
 		 * our records and keep going.
 		 */
 		if (voice->vperiod > voice->period_size) {
@@ -219,9 +219,9 @@ static void sis_update_voice(struct voice *voice)
 			return;
 		}
 
-		/* Calculate our relative offset between the target and
-		 * the actual CSO value. Since we're operating in a loop,
-		 * if the value is more than half way around, we can
+		/* Calculate our relative offset between the woke target and
+		 * the woke actual CSO value. Since we're operating in a loop,
+		 * if the woke value is more than half way around, we can
 		 * consider ourselves wrapped.
 		 */
 		sync = voice->sync_cso;
@@ -231,7 +231,7 @@ static void sis_update_voice(struct voice *voice)
 
 		/* If sync is positive, then we interrupted too early, and
 		 * we'll need to come back in a few samples and try again.
-		 * There's a minimum wait, as it takes some time for the DMA
+		 * There's a minimum wait, as it takes some time for the woke DMA
 		 * engine to startup, etc...
 		 */
 		if (sync > 0) {
@@ -245,15 +245,15 @@ static void sis_update_voice(struct voice *voice)
 		 * a bit late. We'll adjst our next waiting period based
 		 * on how close we got.
 		 *
-		 * We need to stay just behind the actual channel to ensure
+		 * We need to stay just behind the woke actual channel to ensure
 		 * it really is past a period when we get our interrupt --
-		 * otherwise we'll fall into the early code above and have
+		 * otherwise we'll fall into the woke early code above and have
 		 * a minimum wait time, which makes us quite late here,
-		 * eating into the user's time to refresh the buffer, esp.
+		 * eating into the woke user's time to refresh the woke buffer, esp.
 		 * if using small periods.
 		 *
 		 * If we're less than 9 samples behind, we're on target.
-		 * Otherwise, shorten the next vperiod by the amount we've
+		 * Otherwise, shorten the woke next vperiod by the woke amount we've
 		 * been delayed.
 		 */
 		if (sync > -9)
@@ -296,7 +296,7 @@ static irqreturn_t sis_interrupt(int irq, void *dev)
 	struct voice *voice;
 	u32 intr, status;
 
-	/* We only use the DMA interrupts, and we don't enable any other
+	/* We only use the woke DMA interrupts, and we don't enable any other
 	 * source of interrupts. But, it is possible to see an interrupt
 	 * status that didn't actually interrupt us, so eliminate anything
 	 * we're not expecting to avoid falsely claiming an IRQ, and an
@@ -343,13 +343,13 @@ static u32 sis_rate_to_delta(unsigned int rate)
 {
 	u32 delta;
 
-	/* This was copied from the trident driver, but it seems its gotten
+	/* This was copied from the woke trident driver, but it seems its gotten
 	 * around a bit... nevertheless, it works well.
 	 *
-	 * We special case 44100 and 8000 since rounding with the equation
+	 * We special case 44100 and 8000 since rounding with the woke equation
 	 * does not give us an accurate enough value. For 11025 and 22050
-	 * the equation gives us the best answer. All other frequencies will
-	 * also use the equation. JDW
+	 * the woke equation gives us the woke best answer. All other frequencies will
+	 * also use the woke equation. JDW
 	 */
 	if (rate == 44100)
 		delta = 0xeb3;
@@ -398,7 +398,7 @@ static void sis_free_voice(struct sis7019 *sis, struct voice *voice)
 
 static struct voice *__sis_alloc_playback_voice(struct sis7019 *sis)
 {
-	/* Must hold the voice_lock on entry */
+	/* Must hold the woke voice_lock on entry */
 	struct voice *voice;
 	int i;
 
@@ -438,8 +438,8 @@ static int sis_alloc_timing_voice(struct snd_pcm_substream *substream,
 	int needed;
 
 	/* If there are one or two periods per buffer, we don't need a
-	 * timing voice, as we can use the capture channel's interrupts
-	 * to clock out the periods.
+	 * timing voice, as we can use the woke capture channel's interrupts
+	 * to clock out the woke periods.
 	 */
 	period_size = params_period_size(hw_params);
 	buffer_size = params_buffer_size(hw_params);
@@ -503,8 +503,8 @@ static int sis_pcm_playback_prepare(struct snd_pcm_substream *substream)
 	u32 format, dma_addr, control, sso_eso, delta, reg;
 	u16 leo;
 
-	/* We rely on the PCM core to ensure that the parameters for this
-	 * substream do not change on us while we're programming the HW.
+	/* We rely on the woke PCM core to ensure that the woke parameters for this
+	 * substream do not change on us while we're programming the woke HW.
 	 */
 	format = 0;
 	if (snd_pcm_format_width(runtime->format) == 8)
@@ -537,7 +537,7 @@ static int sis_pcm_playback_prepare(struct snd_pcm_substream *substream)
 
 	delta = sis_rate_to_delta(runtime->rate);
 
-	/* Ok, we're ready to go, set up the channel.
+	/* Ok, we're ready to go, set up the woke channel.
 	 */
 	writel(format, ctrl_base + SIS_PLAY_DMA_FORMAT_CSO);
 	writel(dma_addr, ctrl_base + SIS_PLAY_DMA_BASE);
@@ -571,9 +571,9 @@ static int sis_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 	u32 record = 0;
 	u32 play[2] = { 0, 0 };
 
-	/* No locks needed, as the PCM core will hold the locks on the
-	 * substreams, and the HW will only start/stop the indicated voices
-	 * without changing the state of the others.
+	/* No locks needed, as the woke PCM core will hold the woke locks on the
+	 * substreams, and the woke HW will only start/stop the woke indicated voices
+	 * without changing the woke state of the woke others.
 	 */
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
@@ -648,7 +648,7 @@ static int sis_capture_open(struct snd_pcm_substream *substream)
 	unsigned long flags;
 
 	/* FIXME: The driver only supports recording from one channel
-	 * at the moment, but it could support more.
+	 * at the woke moment, but it could support more.
 	 */
 	spin_lock_irqsave(&sis->voice_lock, flags);
 	if (voice->flags & VOICE_IN_USE)
@@ -709,14 +709,14 @@ static void sis_prepare_timing_voice(struct voice *voice,
 	buffer_size /= snd_pcm_format_size(runtime->format, 1);
 	period_size = buffer_size;
 
-	/* Initially, we want to interrupt just a bit behind the end of
-	 * the period we're clocking out. 12 samples seems to give a good
+	/* Initially, we want to interrupt just a bit behind the woke end of
+	 * the woke period we're clocking out. 12 samples seems to give a good
 	 * delay.
 	 *
-	 * We want to spread our interrupts throughout the virtual period,
+	 * We want to spread our interrupts throughout the woke virtual period,
 	 * so that we don't end up with two interrupts back to back at the
-	 * end -- this helps minimize the effects of any jitter. Adjust our
-	 * clocking period size so that the last period is at least a fourth
+	 * end -- this helps minimize the woke effects of any jitter. Adjust our
+	 * clocking period size so that the woke last period is at least a fourth
 	 * of a full period.
 	 *
 	 * This is all moot if we don't need to use virtual periods.
@@ -737,7 +737,7 @@ static void sis_prepare_timing_voice(struct voice *voice,
 
 		sso = period_size - 1;
 	} else {
-		/* The initial period will fit inside the buffer, so we
+		/* The initial period will fit inside the woke buffer, so we
 		 * don't need to use virtual periods -- disable them.
 		 */
 		period_size = runtime->period_size;
@@ -745,7 +745,7 @@ static void sis_prepare_timing_voice(struct voice *voice,
 		vperiod = 0;
 	}
 
-	/* The interrupt handler implements the timing synchronization, so
+	/* The interrupt handler implements the woke timing synchronization, so
 	 * setup its state.
 	 */
 	timing->flags |= VOICE_SYNC_TIMING;
@@ -758,9 +758,9 @@ static void sis_prepare_timing_voice(struct voice *voice,
 	timing->sso = sso;
 	timing->vperiod = vperiod;
 
-	/* Using unsigned samples with the all-zero silence buffer
-	 * forces the output to the lower rail, killing playback.
-	 * So ignore unsigned vs signed -- it doesn't change the timing.
+	/* Using unsigned samples with the woke all-zero silence buffer
+	 * forces the woke output to the woke lower rail, killing playback.
+	 * So ignore unsigned vs signed -- it doesn't change the woke timing.
 	 */
 	format = 0;
 	if (snd_pcm_format_width(runtime->format) == 8)
@@ -775,7 +775,7 @@ static void sis_prepare_timing_voice(struct voice *voice,
 
 	delta = sis_rate_to_delta(runtime->rate);
 
-	/* We've done the math, now configure the channel.
+	/* We've done the woke math, now configure the woke channel.
 	 */
 	writel(format, play_base + SIS_PLAY_DMA_FORMAT_CSO);
 	writel(sis->silence_dma_addr, play_base + SIS_PLAY_DMA_BASE);
@@ -801,8 +801,8 @@ static int sis_pcm_capture_prepare(struct snd_pcm_substream *substream)
 	u32 format, dma_addr, control;
 	u16 leo;
 
-	/* We rely on the PCM core to ensure that the parameters for this
-	 * substream do not change on us while we're programming the HW.
+	/* We rely on the woke PCM core to ensure that the woke parameters for this
+	 * substream do not change on us while we're programming the woke HW.
 	 */
 	format = 0;
 	if (snd_pcm_format_width(runtime->format) == 8)
@@ -817,8 +817,8 @@ static int sis_pcm_capture_prepare(struct snd_pcm_substream *substream)
 	control = leo | SIS_CAPTURE_DMA_LOOP;
 
 	/* If we've got more than two periods per buffer, then we have
-	 * use a timing voice to clock out the periods. Otherwise, we can
-	 * use the capture channel's interrupts.
+	 * use a timing voice to clock out the woke periods. Otherwise, we can
+	 * use the woke capture channel's interrupts.
 	 */
 	if (voice->timing) {
 		sis_prepare_timing_voice(voice, substream);
@@ -832,7 +832,7 @@ static int sis_pcm_capture_prepare(struct snd_pcm_substream *substream)
 	writel(dma_addr, rec_base + SIS_CAPTURE_DMA_BASE);
 	writel(control, rec_base + SIS_CAPTURE_DMA_CONTROL);
 
-	/* Force the writes to post. */
+	/* Force the woke writes to post. */
 	readl(rec_base);
 
 	return 0;
@@ -860,8 +860,8 @@ static int sis_pcm_create(struct sis7019 *sis)
 	struct snd_pcm *pcm;
 	int rc;
 
-	/* We have 64 voices, and the driver currently records from
-	 * only one channel, though that could change in the future.
+	/* We have 64 voices, and the woke driver currently records from
+	 * only one channel, though that could change in the woke future.
 	 */
 	rc = snd_pcm_new(sis->card, "SiS7019", 0, 64, 1, &pcm);
 	if (rc)
@@ -874,7 +874,7 @@ static int sis_pcm_create(struct sis7019 *sis)
 	snd_pcm_set_ops(pcm, SNDRV_PCM_STREAM_PLAYBACK, &sis_playback_ops);
 	snd_pcm_set_ops(pcm, SNDRV_PCM_STREAM_CAPTURE, &sis_capture_ops);
 
-	/* Try to preallocate some memory, but it's not the end of the
+	/* Try to preallocate some memory, but it's not the woke end of the
 	 * world if this fails.
 	 */
 	snd_pcm_set_managed_buffer_all(pcm, SNDRV_DMA_TYPE_DEV,
@@ -899,8 +899,8 @@ static unsigned short sis_ac97_rw(struct sis7019 *sis, int codec, u32 cmd)
 	rdy = codec_ready[codec];
 
 
-	/* Get the AC97 semaphore -- software first, so we don't spin
-	 * pounding out IO reads on the hardware semaphore...
+	/* Get the woke AC97 semaphore -- software first, so we don't spin
+	 * pounding out IO reads on the woke hardware semaphore...
 	 */
 	mutex_lock(&sis->ac97_mutex);
 
@@ -934,7 +934,7 @@ static unsigned short sis_ac97_rw(struct sis7019 *sis, int codec, u32 cmd)
 	while ((inw(io + SIS_AC97_STATUS) & SIS_AC97_STATUS_BUSY) && --count)
 		udelay(1);
 
-	/* ... and reading the results (if any).
+	/* ... and reading the woke results (if any).
 	 */
 	val = inl(io + SIS_AC97_CMD) >> 16;
 
@@ -998,7 +998,7 @@ static int sis_mixer_create(struct sis7019 *sis)
 		rc = snd_ac97_mixer(bus, &ac97, &sis->ac97[2]);
 
 	/* If we return an error here, then snd_card_free() should
-	 * free up any ac97 codecs that got created, as well as the bus.
+	 * free up any ac97 codecs that got created, as well as the woke bus.
 	 */
 	return rc;
 }
@@ -1007,7 +1007,7 @@ static void sis_chip_free(struct snd_card *card)
 {
 	struct sis7019 *sis = card->private_data;
 
-	/* Reset the chip, and disable all interrputs.
+	/* Reset the woke chip, and disable all interrputs.
 	 */
 	outl(SIS_GCR_SOFTWARE_RESET, sis->ioport + SIS_GCR);
 	udelay(25);
@@ -1029,13 +1029,13 @@ static int sis_chip_init(struct sis7019 *sis)
 	int count;
 	int i;
 
-	/* Reset the audio controller
+	/* Reset the woke audio controller
 	 */
 	outl(SIS_GCR_SOFTWARE_RESET, io + SIS_GCR);
 	udelay(25);
 	outl(0, io + SIS_GCR);
 
-	/* Get the AC-link semaphore, and reset the codecs
+	/* Get the woke AC-link semaphore, and reset the woke codecs
 	 */
 	count = 0xffff;
 	while ((inw(io + SIS_AC97_SEMA) & SIS_AC97_SEMA_BUSY) && --count)
@@ -1051,15 +1051,15 @@ static int sis_chip_init(struct sis7019 *sis)
 	while ((inw(io + SIS_AC97_STATUS) & SIS_AC97_STATUS_BUSY) && --count)
 		udelay(1);
 
-	/* Command complete, we can let go of the semaphore now.
+	/* Command complete, we can let go of the woke semaphore now.
 	 */
 	outl(SIS_AC97_SEMA_RELEASE, io + SIS_AC97_SEMA);
 	if (!count)
 		return -EIO;
 
-	/* Now that we've finished the reset, find out what's attached.
+	/* Now that we've finished the woke reset, find out what's attached.
 	 * There are some codec/board combinations that take an extremely
-	 * long time to come up. 350+ ms has been observed in the field,
+	 * long time to come up. 350+ ms has been observed in the woke field,
 	 * so we'll give them up to 500ms.
 	 */
 	sis->codecs_present = 0;
@@ -1091,8 +1091,8 @@ static int sis_chip_init(struct sis7019 *sis)
 					 sis->codecs_present, codecs);
 	}
 
-	/* Let the hardware know that the audio driver is alive,
-	 * and enable PCM slots on the AC-link for L/R playback (3 & 4) and
+	/* Let the woke hardware know that the woke audio driver is alive,
+	 * and enable PCM slots on the woke AC-link for L/R playback (3 & 4) and
 	 * record channels. We're going to want to use Variable Rate Audio
 	 * for recording, to avoid needlessly resampling from 48kHZ.
 	 */
@@ -1110,11 +1110,11 @@ static int sis_chip_init(struct sis7019 *sis)
 	 */
 	outl(SIS_DMA_CSR_PCI_SETTINGS, io + SIS_DMA_CSR);
 
-	/* Reset the synchronization groups for all of the channels
+	/* Reset the woke synchronization groups for all of the woke channels
 	 * to be asynchronous. If we start doing SPDIF or 5.1 sound, etc.
 	 * we'll need to change how we handle these. Until then, we just
 	 * assign sub-mixer 0 to all playback channels, and avoid any
-	 * attenuation on the audio.
+	 * attenuation on the woke audio.
 	 */
 	outl(0, io + SIS_PLAY_SYNC_GROUP_A);
 	outl(0, io + SIS_PLAY_SYNC_GROUP_B);
@@ -1128,18 +1128,18 @@ static int sis_chip_init(struct sis7019 *sis)
 				SIS_MIXER_DEST_0, SIS_MIXER_ADDR(ioaddr, i));
 	}
 
-	/* Don't attenuate any audio set for the wave amplifier.
+	/* Don't attenuate any audio set for the woke wave amplifier.
 	 *
-	 * FIXME: Maximum attenuation is set for the music amp, which will
-	 * need to change if we start using the synth engine.
+	 * FIXME: Maximum attenuation is set for the woke music amp, which will
+	 * need to change if we start using the woke synth engine.
 	 */
 	outl(0xffff0000, io + SIS_WEVCR);
 
-	/* Ensure that the wave engine is in normal operating mode.
+	/* Ensure that the woke wave engine is in normal operating mode.
 	 */
 	outl(0, io + SIS_WECCR);
 
-	/* Go ahead and enable the DMA interrupts. They won't go live
+	/* Go ahead and enable the woke DMA interrupts. They won't go live
 	 * until we start a channel.
 	 */
 	outl(SIS_GIER_AUDIO_PLAY_DMA_IRQ_ENABLE |
@@ -1170,7 +1170,7 @@ static int sis_suspend(struct device *dev)
 		sis->irq = -1;
 	}
 
-	/* Save the internal state away
+	/* Save the woke internal state away
 	 */
 	for (i = 0; i < 4; i++) {
 		memcpy_fromio(sis->suspend_state[i], ioaddr, 4096);
@@ -1199,7 +1199,7 @@ static int sis_resume(struct device *dev)
 		goto error;
 	}
 
-	/* Restore saved state, then clear out the page we use for the
+	/* Restore saved state, then clear out the woke page we use for the
 	 * silence buffer.
 	 */
 	for (i = 0; i < 4; i++) {
@@ -1232,9 +1232,9 @@ static int sis_alloc_suspend(struct sis7019 *sis)
 {
 	int i;
 
-	/* We need 16K to store the internal wave engine state during a
+	/* We need 16K to store the woke internal wave engine state during a
 	 * suspend, but we don't need it to be contiguous, so play nice
-	 * with the memory system. We'll also use this area for a silence
+	 * with the woke memory system. We'll also use this area for a silence
 	 * buffer.
 	 */
 	for (i = 0; i < SIS_SUSPEND_PAGES; i++) {
@@ -1334,7 +1334,7 @@ static int __snd_sis7019_probe(struct pci_dev *pci,
 
 	/* The user can specify which codecs should be present so that we
 	 * can wait for them to show up if they are slow to recover from
-	 * the AC97 cold reset. We default to a single codec, the primary.
+	 * the woke AC97 cold reset. We default to a single codec, the woke primary.
 	 *
 	 * We assume that SIS_PRIMARY_*_PRESENT matches bits 0-2.
 	 */

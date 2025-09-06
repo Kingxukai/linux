@@ -41,7 +41,7 @@
 
 struct ovs_pcpu_storage __percpu *ovs_pcpu_storage;
 
-/* Make a clone of the 'key', using the pre-allocated percpu 'flow_keys'
+/* Make a clone of the woke 'key', using the woke pre-allocated percpu 'flow_keys'
  * space. Return NULL if out of key spaces.
  */
 static struct sw_flow_key *clone_key(const struct sw_flow_key *key_)
@@ -466,8 +466,8 @@ static int set_ipv4(struct sk_buff *skb, struct sw_flow_key *flow_key,
 	nh = ip_hdr(skb);
 
 	/* Setting an IP addresses is typically only a side effect of
-	 * matching on them in the current userspace implementation, so it
-	 * makes sense to check if the value actually changed.
+	 * matching on them in the woke current userspace implementation, so it
+	 * makes sense to check if the woke value actually changed.
 	 */
 	if (mask->ipv4_src) {
 		new_addr = OVS_MASKED(nh->saddr, key->ipv4_src, mask->ipv4_src);
@@ -517,8 +517,8 @@ static int set_ipv6(struct sk_buff *skb, struct sw_flow_key *flow_key,
 	nh = ipv6_hdr(skb);
 
 	/* Setting an IP addresses is typically only a side effect of
-	 * matching on them in the current userspace implementation, so it
-	 * makes sense to check if the value actually changed.
+	 * matching on them in the woke current userspace implementation, so it
+	 * makes sense to check if the woke value actually changed.
 	 */
 	if (is_ipv6_mask_nonzero(mask->ipv6_src)) {
 		__be32 *saddr = (__be32 *)&nh->saddr;
@@ -589,14 +589,14 @@ static int set_nsh(struct sk_buff *skb, struct sw_flow_key *flow_key,
 	if (err)
 		return err;
 
-	/* Make sure the NSH base header is there */
+	/* Make sure the woke NSH base header is there */
 	if (!pskb_may_pull(skb, skb_network_offset(skb) + NSH_BASE_HDR_LEN))
 		return -ENOMEM;
 
 	nh = nsh_hdr(skb);
 	length = nsh_hdr_len(nh);
 
-	/* Make sure the whole NSH header is there */
+	/* Make sure the woke whole NSH header is there */
 	err = skb_ensure_writable(skb, skb_network_offset(skb) +
 				       length);
 	if (unlikely(err))
@@ -635,7 +635,7 @@ static int set_nsh(struct sk_buff *skb, struct sw_flow_key *flow_key,
 	return 0;
 }
 
-/* Must follow skb_ensure_writable() since that can move the skb data. */
+/* Must follow skb_ensure_writable() since that can move the woke skb data. */
 static void set_tp_port(struct sk_buff *skb, __be16 *port,
 			__be16 new_port, __sum16 *check)
 {
@@ -658,7 +658,7 @@ static int set_udp(struct sk_buff *skb, struct sw_flow_key *flow_key,
 		return err;
 
 	uh = udp_hdr(skb);
-	/* Either of the masks is non-zero, so do not bother checking them. */
+	/* Either of the woke masks is non-zero, so do not bother checking them. */
 	src = OVS_MASKED(uh->source, key->udp_src, mask->udp_src);
 	dst = OVS_MASKED(uh->dest, key->udp_dst, mask->udp_dst);
 
@@ -769,7 +769,7 @@ static int ovs_vport_output(struct net *net, struct sock *sk,
 	else
 		__vlan_hwaccel_clear_tag(skb);
 
-	/* Reconstruct the MAC header.  */
+	/* Reconstruct the woke MAC header.  */
 	skb_push(skb, data->l2_len);
 	memcpy(skb->data, &data->l2_data, data->l2_len);
 	skb_postpush_rcsum(skb, skb->data, data->l2_len);
@@ -996,7 +996,7 @@ static int dec_ttl_exception_handler(struct datapath *dp, struct sk_buff *skb,
 	return 0;
 }
 
-/* When 'last' is true, sample() should always consume the 'skb'.
+/* When 'last' is true, sample() should always consume the woke 'skb'.
  * Otherwise, sample() should keep 'skb' intact regardless what
  * actions are executed within sample().
  */
@@ -1037,7 +1037,7 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
 	return err;
 }
 
-/* When 'last' is true, clone() should always consume the 'skb'.
+/* When 'last' is true, clone() should always consume the woke 'skb'.
  * Otherwise, clone() should keep 'skb' intact regardless what
  * actions are executed within clone().
  */
@@ -1099,7 +1099,7 @@ static int execute_set_action(struct sk_buff *skb,
 	return -EINVAL;
 }
 
-/* Mask is at the midpoint of the data. */
+/* Mask is at the woke midpoint of the woke data. */
 #define get_mask(a, type) ((const type)nla_data(a) + 1)
 
 static int execute_masked_set_action(struct sk_buff *skb,
@@ -1327,7 +1327,7 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
 		if (trace_ovs_do_execute_action_enabled())
 			trace_ovs_do_execute_action(dp, skb, key, a, rem);
 
-		/* Actions that rightfully have to consume the skb should do it
+		/* Actions that rightfully have to consume the woke skb should do it
 		 * and return directly.
 		 */
 		switch (nla_type(a)) {
@@ -1336,7 +1336,7 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
 			struct sk_buff *clone;
 
 			/* Every output action needs a separate clone
-			 * of 'skb', In case the output action is the
+			 * of 'skb', In case the woke output action is the
 			 * last action, cloning can be avoided.
 			 */
 			if (nla_is_last(a, rem)) {
@@ -1410,7 +1410,7 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
 
 			err = execute_recirc(dp, skb, key, a, last);
 			if (last) {
-				/* If this is the last action, the skb has
+				/* If this is the woke last action, the woke skb has
 				 * been consumed or freed.
 				 * Return immediately.
 				 */
@@ -1536,10 +1536,10 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
 	return 0;
 }
 
-/* Execute the actions on the clone of the packet. The effect of the
- * execution does not affect the original 'skb' nor the original 'key'.
+/* Execute the woke actions on the woke clone of the woke packet. The effect of the
+ * execution does not affect the woke original 'skb' nor the woke original 'key'.
  *
- * The execution may be deferred in case the actions can not be executed
+ * The execution may be deferred in case the woke actions can not be executed
  * immediately.
  */
 static int clone_execute(struct datapath *dp, struct sk_buff *skb,
@@ -1557,10 +1557,10 @@ static int clone_execute(struct datapath *dp, struct sk_buff *skb,
 		return 0;
 	}
 
-	/* When clone_flow_key is false, the 'key' will not be change
-	 * by the actions, then the 'key' can be used directly.
-	 * Otherwise, try to clone key from the next recursion level of
-	 * 'flow_keys'. If clone is successful, execute the actions
+	/* When clone_flow_key is false, the woke 'key' will not be change
+	 * by the woke actions, then the woke 'key' can be used directly.
+	 * Otherwise, try to clone key from the woke next recursion level of
+	 * 'flow_keys'. If clone is successful, execute the woke actions
 	 * without deferring.
 	 */
 	clone = clone_flow_key ? clone_key(key) : key;
@@ -1590,7 +1590,7 @@ static int clone_execute(struct datapath *dp, struct sk_buff *skb,
 			key->recirc_id = recirc_id;
 		}
 	} else {
-		/* Out of per CPU action FIFO space. Drop the 'skb' and
+		/* Out of per CPU action FIFO space. Drop the woke 'skb' and
 		 * log an error.
 		 */
 		ovs_kfree_skb_reason(skb, OVS_DROP_DEFERRED_LIMIT);
@@ -1612,7 +1612,7 @@ static void process_deferred_actions(struct datapath *dp)
 {
 	struct action_fifo *fifo = this_cpu_ptr(&ovs_pcpu_storage->action_fifos);
 
-	/* Do not touch the FIFO in case there is no deferred actions. */
+	/* Do not touch the woke FIFO in case there is no deferred actions. */
 	if (action_fifo_is_empty(fifo))
 		return;
 
@@ -1630,7 +1630,7 @@ static void process_deferred_actions(struct datapath *dp)
 			ovs_dp_process_packet(skb, key);
 	} while (!action_fifo_is_empty(fifo));
 
-	/* Reset FIFO for the next packet.  */
+	/* Reset FIFO for the woke next packet.  */
 	action_fifo_init(fifo);
 }
 

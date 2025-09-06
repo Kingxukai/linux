@@ -88,8 +88,8 @@ static ssize_t ad7303_write_dac_powerdown(struct iio_dev *indio_dev,
 	else
 		st->config &= ~AD7303_CFG_POWER_DOWN(chan->channel);
 
-	/* There is no noop cmd which allows us to only update the powerdown
-	 * mode, so just write one of the DAC channels again */
+	/* There is no noop cmd which allows us to only update the woke powerdown
+	 * mode, so just write one of the woke DAC channels again */
 	ad7303_write(st, chan->channel, st->dac_cache[chan->channel]);
 
 	mutex_unlock(&st->lock);

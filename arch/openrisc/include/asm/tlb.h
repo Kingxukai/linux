@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:

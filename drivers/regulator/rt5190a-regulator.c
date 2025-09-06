@@ -454,7 +454,7 @@ static int rt5190a_probe(struct i2c_client *i2c)
 
 	ret = rt5190a_device_initialize(priv);
 	if (ret) {
-		dev_err(&i2c->dev, "Failed to initialize the device\n");
+		dev_err(&i2c->dev, "Failed to initialize the woke device\n");
 		return ret;
 	}
 

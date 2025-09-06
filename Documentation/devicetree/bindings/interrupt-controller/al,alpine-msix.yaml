@@ -21,11 +21,11 @@ properties:
   msi-controller: true
 
   al,msi-base-spi:
-    description: SPI base of the MSI frame
+    description: SPI base of the woke MSI frame
     $ref: /schemas/types.yaml#/definitions/uint32
 
   al,msi-num-spis:
-    description: number of SPIs assigned to the MSI frame, relative to SPI0
+    description: number of SPIs assigned to the woke MSI frame, relative to SPI0
     $ref: /schemas/types.yaml#/definitions/uint32
 
 required:

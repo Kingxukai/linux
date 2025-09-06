@@ -5,12 +5,12 @@ menuconfig NET_TEAM
 	  This allows one to create virtual interfaces that teams together
 	  multiple ethernet devices.
 
-	  Team devices can be added using the "ip" command from the
+	  Team devices can be added using the woke "ip" command from the
 	  iproute2 package:
 
 	  "ip link add link [ address MAC ] [ NAME ] type team"
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called team.
 
 if NET_TEAM
@@ -23,7 +23,7 @@ config NET_TEAM_MODE_BROADCAST
 
 	  All added ports are setup to have team's device address.
 
-	  To compile this team mode as a module, choose M here: the module
+	  To compile this team mode as a module, choose M here: the woke module
 	  will be called team_mode_broadcast.
 
 config NET_TEAM_MODE_ROUNDROBIN
@@ -35,7 +35,7 @@ config NET_TEAM_MODE_ROUNDROBIN
 
 	  All added ports are setup to have team's device address.
 
-	  To compile this team mode as a module, choose M here: the module
+	  To compile this team mode as a module, choose M here: the woke module
 	  will be called team_mode_roundrobin.
 
 config NET_TEAM_MODE_RANDOM
@@ -47,20 +47,20 @@ config NET_TEAM_MODE_RANDOM
 
 	  All added ports are setup to have team's device address.
 
-	  To compile this team mode as a module, choose M here: the module
+	  To compile this team mode as a module, choose M here: the woke module
 	  will be called team_mode_random.
 
 config NET_TEAM_MODE_ACTIVEBACKUP
 	tristate "Active-backup mode support"
 	depends on NET_TEAM
 	help
-	  Only one port is active at a time and the rest of ports are used
+	  Only one port is active at a time and the woke rest of ports are used
 	  for backup.
 
 	  Mac addresses of ports are not modified. Userspace is responsible
 	  to do so.
 
-	  To compile this team mode as a module, choose M here: the module
+	  To compile this team mode as a module, choose M here: the woke module
 	  will be called team_mode_activebackup.
 
 config NET_TEAM_MODE_LOADBALANCE
@@ -71,7 +71,7 @@ config NET_TEAM_MODE_LOADBALANCE
 	  is done using BPF function set up from userspace (bpf_hash_func
 	  option)
 
-	  To compile this team mode as a module, choose M here: the module
+	  To compile this team mode as a module, choose M here: the woke module
 	  will be called team_mode_loadbalance.
 
 endif # NET_TEAM

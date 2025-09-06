@@ -18,7 +18,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	u8 pkt_seq;
 
@@ -72,7 +72,7 @@ static void reg_r(struct gspca_dev *gspca_dev,
 		pr_err("reg_r err %d\n", ret);
 		gspca_dev->usb_err = ret;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(gspca_dev->usb_buf, 0, USB_BUF_SZ);
@@ -242,23 +242,23 @@ static int sd_isoc_init(struct gspca_dev *gspca_dev)
 	return gspca_dev->usb_err;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* initialize the JPEG header */
+	/* initialize the woke JPEG header */
 	jpeg_define(sd->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x22);		/* JPEG 411 */
 
-	/* the JPEG quality shall be 85% */
+	/* the woke JPEG quality shall be 85% */
 	jpeg_set_qual(sd->jpeg_hdr, 85);
 
 	reg_r(gspca_dev, 0x00, 0x2520, 1);
 	msleep(8);
 
-	/* start the capture */
+	/* start the woke capture */
 	wait_status_0(gspca_dev);
 	reg_w(gspca_dev, 0x31, 0x0000, 0x0004);	/* start request */
 	wait_status_1(gspca_dev);
@@ -271,7 +271,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 
 static void sd_stopN(struct gspca_dev *gspca_dev)
 {
-	/* stop the capture */
+	/* stop the woke capture */
 	wait_status_0(gspca_dev);
 	reg_w(gspca_dev, 0x31, 0x0000, 0x0000);	/* stop request */
 	wait_status_1(gspca_dev);
@@ -415,7 +415,7 @@ MODULE_DEVICE_TABLE(usb, device_table);
 static int sd_probe(struct usb_interface *intf,
 			const struct usb_device_id *id)
 {
-	/* the video interface for isochronous transfer is 1 */
+	/* the woke video interface for isochronous transfer is 1 */
 	if (intf->cur_altsetting->desc.bInterfaceNumber != 1)
 		return -ENODEV;
 

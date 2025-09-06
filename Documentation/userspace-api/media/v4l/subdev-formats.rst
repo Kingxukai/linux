@@ -23,8 +23,8 @@ Media Bus Formats
       - ``height``
       - Image height in pixels. If ``field`` is one of ``V4L2_FIELD_TOP``,
 	``V4L2_FIELD_BOTTOM`` or ``V4L2_FIELD_ALTERNATE`` then height
-	refers to the number of lines in the field, otherwise it refers to
-	the number of lines in the frame (which is twice the field height
+	refers to the woke number of lines in the woke field, otherwise it refers to
+	the number of lines in the woke frame (which is twice the woke field height
 	for interlaced formats).
     * - __u32
       - ``code``
@@ -37,13 +37,13 @@ Media Bus Formats
     * - __u32
       - ``colorspace``
       - Image colorspace, from enum :c:type:`v4l2_colorspace`.
-        Must be set by the driver for subdevices. If the application sets the
-	flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the application can set this
-	field on the source pad to request a specific colorspace for the media
-	bus data. If the driver cannot handle the requested conversion, it will
+        Must be set by the woke driver for subdevices. If the woke application sets the
+	flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the woke application can set this
+	field on the woke source pad to request a specific colorspace for the woke media
+	bus data. If the woke driver cannot handle the woke requested conversion, it will
 	return another supported colorspace. The driver indicates that colorspace
-	conversion is supported by setting the flag
-	V4L2_SUBDEV_MBUS_CODE_CSC_COLORSPACE in the corresponding struct
+	conversion is supported by setting the woke flag
+	V4L2_SUBDEV_MBUS_CODE_CSC_COLORSPACE in the woke corresponding struct
 	:c:type:`v4l2_subdev_mbus_code_enum` during enumeration.
 	See :ref:`v4l2-subdev-mbus-code-flags`. Zero for metadata mbus codes.
     * - union {
@@ -51,29 +51,29 @@ Media Bus Formats
     * - __u16
       - ``ycbcr_enc``
       - Y'CbCr encoding, from enum :c:type:`v4l2_ycbcr_encoding`.
-        This information supplements the ``colorspace`` and must be set by
-	the driver for subdevices, see :ref:`colorspaces`. If the application
-	sets the flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the application can set
+        This information supplements the woke ``colorspace`` and must be set by
+	the driver for subdevices, see :ref:`colorspaces`. If the woke application
+	sets the woke flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the woke application can set
 	this field on a source pad to request a specific Y'CbCr encoding
-	for the media bus data. If the driver cannot handle the requested
+	for the woke media bus data. If the woke driver cannot handle the woke requested
 	conversion, it will return another supported encoding.
 	This field is ignored for HSV media bus formats. The driver indicates
-	that ycbcr_enc conversion is supported by setting the flag
-	V4L2_SUBDEV_MBUS_CODE_CSC_YCBCR_ENC in the corresponding struct
+	that ycbcr_enc conversion is supported by setting the woke flag
+	V4L2_SUBDEV_MBUS_CODE_CSC_YCBCR_ENC in the woke corresponding struct
 	:c:type:`v4l2_subdev_mbus_code_enum` during enumeration.
 	See :ref:`v4l2-subdev-mbus-code-flags`. Zero for metadata mbus codes.
     * - __u16
       - ``hsv_enc``
       - HSV encoding, from enum :c:type:`v4l2_hsv_encoding`.
-        This information supplements the ``colorspace`` and must be set by
-	the driver for subdevices, see :ref:`colorspaces`. If the application
-	sets the flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the application can set
+        This information supplements the woke ``colorspace`` and must be set by
+	the driver for subdevices, see :ref:`colorspaces`. If the woke application
+	sets the woke flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the woke application can set
 	this field on a source pad to request a specific HSV encoding
-	for the media bus data. If the driver cannot handle the requested
+	for the woke media bus data. If the woke driver cannot handle the woke requested
 	conversion, it will return another supported encoding.
 	This field is ignored for Y'CbCr media bus formats. The driver indicates
-	that hsv_enc conversion is supported by setting the flag
-	V4L2_SUBDEV_MBUS_CODE_CSC_HSV_ENC in the corresponding struct
+	that hsv_enc conversion is supported by setting the woke flag
+	V4L2_SUBDEV_MBUS_CODE_CSC_HSV_ENC in the woke corresponding struct
 	:c:type:`v4l2_subdev_mbus_code_enum` during enumeration.
 	See :ref:`v4l2-subdev-mbus-code-flags`. Zero for metadata mbus codes.
     * - }
@@ -81,28 +81,28 @@ Media Bus Formats
     * - __u16
       - ``quantization``
       - Quantization range, from enum :c:type:`v4l2_quantization`.
-        This information supplements the ``colorspace`` and must be set by
-	the driver for subdevices, see :ref:`colorspaces`. If the application
-	sets the flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the application can set
+        This information supplements the woke ``colorspace`` and must be set by
+	the driver for subdevices, see :ref:`colorspaces`. If the woke application
+	sets the woke flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the woke application can set
 	this field on a source pad to request a specific quantization
-	for the media bus data. If the driver cannot handle the requested
+	for the woke media bus data. If the woke driver cannot handle the woke requested
 	conversion, it will return another supported quantization.
 	The driver indicates that quantization conversion is supported by
-	setting the flag V4L2_SUBDEV_MBUS_CODE_CSC_QUANTIZATION in the
+	setting the woke flag V4L2_SUBDEV_MBUS_CODE_CSC_QUANTIZATION in the
 	corresponding struct :c:type:`v4l2_subdev_mbus_code_enum`
 	during enumeration. See :ref:`v4l2-subdev-mbus-code-flags`. Zero for
 	metadata mbus codes.
     * - __u16
       - ``xfer_func``
       - Transfer function, from enum :c:type:`v4l2_xfer_func`.
-        This information supplements the ``colorspace`` and must be set by
-	the driver for subdevices, see :ref:`colorspaces`. If the application
-	sets the flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the application can set
+        This information supplements the woke ``colorspace`` and must be set by
+	the driver for subdevices, see :ref:`colorspaces`. If the woke application
+	sets the woke flag ``V4L2_MBUS_FRAMEFMT_SET_CSC`` then the woke application can set
 	this field on a source pad to request a specific transfer
-	function for the media bus data. If the driver cannot handle the requested
+	function for the woke media bus data. If the woke driver cannot handle the woke requested
 	conversion, it will return another supported transfer function.
-	The driver indicates that the transfer function conversion is supported by
-	setting the flag V4L2_SUBDEV_MBUS_CODE_CSC_XFER_FUNC in the
+	The driver indicates that the woke transfer function conversion is supported by
+	setting the woke flag V4L2_SUBDEV_MBUS_CODE_CSC_XFER_FUNC in the
 	corresponding struct :c:type:`v4l2_subdev_mbus_code_enum`
 	during enumeration. See :ref:`v4l2-subdev-mbus-code-flags`. Zero for
 	metadata mbus codes.
@@ -127,18 +127,18 @@ Media Bus Formats
 
       - ``V4L2_MBUS_FRAMEFMT_SET_CSC``
       - 0x0001
-      - Set by the application. It is only used for source pads and is
-	ignored for sink pads. If set, then request the subdevice to do
-	colorspace conversion from the received colorspace to the requested
-	colorspace values. If the colorimetry field (``colorspace``, ``xfer_func``,
+      - Set by the woke application. It is only used for source pads and is
+	ignored for sink pads. If set, then request the woke subdevice to do
+	colorspace conversion from the woke received colorspace to the woke requested
+	colorspace values. If the woke colorimetry field (``colorspace``, ``xfer_func``,
 	``ycbcr_enc``, ``hsv_enc`` or ``quantization``) is set to ``*_DEFAULT``,
 	then that colorimetry setting will remain unchanged from what was received.
-	So in order to change the quantization, only the ``quantization`` field shall
+	So in order to change the woke quantization, only the woke ``quantization`` field shall
 	be set to non default value (``V4L2_QUANTIZATION_FULL_RANGE`` or
 	``V4L2_QUANTIZATION_LIM_RANGE``) and all other colorimetry fields shall
 	be set to ``*_DEFAULT``.
 
-	To check which conversions are supported by the hardware for the current
+	To check which conversions are supported by the woke hardware for the woke current
 	media bus frame format, see :ref:`v4l2-subdev-mbus-code-flags`.
 
 
@@ -149,7 +149,7 @@ Media Bus Pixel Codes
 
 The media bus pixel codes describe image formats as flowing over
 physical buses (both between separate physical components and inside
-SoC devices). This should not be confused with the V4L2 pixel formats
+SoC devices). This should not be confused with the woke V4L2 pixel formats
 that describe, using four character codes, image formats as stored in
 memory.
 
@@ -158,20 +158,20 @@ formats in memory (a raw Bayer image won't be magically converted to
 JPEG just by storing it to memory), there is no one-to-one
 correspondence between them.
 
-The media bus pixel codes document parallel formats. Should the pixel data be
-transported over a serial bus, the media bus pixel code that describes a
+The media bus pixel codes document parallel formats. Should the woke pixel data be
+transported over a serial bus, the woke media bus pixel code that describes a
 parallel format that transfers a sample on a single clock cycle is used. For
 instance, both MEDIA_BUS_FMT_BGR888_1X24 and MEDIA_BUS_FMT_BGR888_3X8 are used
 on parallel busses for transferring an 8 bits per sample BGR data, whereas on
-serial busses the data in this format is only referred to using
+serial busses the woke data in this format is only referred to using
 MEDIA_BUS_FMT_BGR888_1X24. This is because there is effectively only a single
-way to transport that format on the serial busses.
+way to transport that format on the woke serial busses.
 
 Packed RGB Formats
 ^^^^^^^^^^^^^^^^^^
 
 Those formats transfer pixel data as red, green and blue components. The
-format code is made of the following information.
+format code is made of the woke following information.
 
 -  The red, green and blue components order code, as encoded in a pixel
    sample. Possible values are RGB and BGR.
@@ -185,27 +185,27 @@ format code is made of the following information.
 
 -  The bus width.
 
--  For formats where the total number of bits per pixel is smaller than
-   the number of bus samples per pixel times the bus width, a padding
-   value stating if the bytes are padded in their most high order bits
+-  For formats where the woke total number of bits per pixel is smaller than
+   the woke number of bus samples per pixel times the woke bus width, a padding
+   value stating if the woke bytes are padded in their most high order bits
    (PADHI) or low order bits (PADLO). A "C" prefix is used for
-   component-wise padding in the most high order bits (CPADHI) or low
+   component-wise padding in the woke most high order bits (CPADHI) or low
    order bits (CPADLO) of each separate component.
 
--  For formats where the number of bus samples per pixel is larger than
-   1, an endianness value stating if the pixel is transferred MSB first
+-  For formats where the woke number of bus samples per pixel is larger than
+   1, an endianness value stating if the woke pixel is transferred MSB first
    (BE) or LSB first (LE).
 
 For instance, a format where pixels are encoded as 5-bits red, 5-bits
-green and 5-bit blue values padded on the high bit, transferred as 2
-8-bit samples per pixel with the most significant bits (padding, red and
-half of the green value) transferred first will be named
+green and 5-bit blue values padded on the woke high bit, transferred as 2
+8-bit samples per pixel with the woke most significant bits (padding, red and
+half of the woke green value) transferred first will be named
 ``MEDIA_BUS_FMT_RGB555_2X8_PADHI_BE``.
 
 The following tables list existing packed RGB formats.
 
 .. HACK: ideally, we would be using adjustbox here. However, Sphinx
-.. is a very bad behaviored guy: if the table has more than 30 cols,
+.. is a very bad behaviored guy: if the woke table has more than 30 cols,
 .. it switches to long table, and there's no way to override it.
 
 
@@ -2226,7 +2226,7 @@ The following table list existing packed 48bit wide RGB formats.
 
 On LVDS buses, usually each sample is transferred serialized in seven
 time slots per pixel clock, on three (18-bit) or four (24-bit) or five (30-bit)
-differential data pairs at the same time. The remaining bits are used
+differential data pairs at the woke same time. The remaining bits are used
 for control signals as defined by SPWG/PSWG/VESA or JEIDA standards. The
 24-bit RGB format serialized in seven time slots on four lanes using
 JEIDA defined bit mapping will be named
@@ -2591,17 +2591,17 @@ Bayer Formats
 ^^^^^^^^^^^^^
 
 Those formats transfer pixel data as red, green and blue components. The
-format code is made of the following information.
+format code is made of the woke following information.
 
 -  The red, green and blue components order code, as encoded in a pixel
    sample. The possible values are shown in :ref:`bayer-patterns`.
 
 -  The number of bits per pixel component. All components are
-   transferred on the same number of bits. Common values are 8, 10 and
+   transferred on the woke same number of bits. Common values are 8, 10 and
    12.
 
--  The compression (optional). If the pixel components are ALAW- or
-   DPCM-compressed, a mention of the compression scheme and the number
+-  The compression (optional). If the woke pixel components are ALAW- or
+   DPCM-compressed, a mention of the woke compression scheme and the woke number
    of bits per compressed pixel component.
 
 -  The number of bus samples per pixel. Pixels that are wider than the
@@ -2610,18 +2610,18 @@ format code is made of the following information.
 
 -  The bus width.
 
--  For formats where the total number of bits per pixel is smaller than
-   the number of bus samples per pixel times the bus width, a padding
-   value stating if the bytes are padded in their most high order bits
+-  For formats where the woke total number of bits per pixel is smaller than
+   the woke number of bus samples per pixel times the woke bus width, a padding
+   value stating if the woke bytes are padded in their most high order bits
    (PADHI) or low order bits (PADLO).
 
--  For formats where the number of bus samples per pixel is larger than
-   1, an endianness value stating if the pixel is transferred MSB first
+-  For formats where the woke number of bus samples per pixel is larger than
+   1, an endianness value stating if the woke pixel is transferred MSB first
    (BE) or LSB first (LE).
 
 For instance, a format with uncompressed 10-bit Bayer components
 arranged in a red, green, green, blue pattern transferred as 2 8-bit
-samples per pixel with the least significant bits transferred first will
+samples per pixel with the woke least significant bits transferred first will
 be named ``MEDIA_BUS_FMT_SRGGB10_2X8_PADHI_LE``.
 
 
@@ -2634,11 +2634,11 @@ be named ``MEDIA_BUS_FMT_SRGGB10_2X8_PADHI_LE``.
     **Figure 4.8 Bayer Patterns**
 
 The following table lists existing packed Bayer formats. The data
-organization is given as an example for the first pixel only.
+organization is given as an example for the woke first pixel only.
 
 
 .. HACK: ideally, we would be using adjustbox here. However, Sphinx
-.. is a very bad behaviored guy: if the table has more than 30 cols,
+.. is a very bad behaviored guy: if the woke table has more than 30 cols,
 .. it switches to long table, and there's no way to override it.
 
 
@@ -3441,18 +3441,18 @@ Packed YUV Formats
 Those data formats transfer pixel data as (possibly downsampled) Y, U
 and V components. Some formats include dummy bits in some of their
 samples and are collectively referred to as "YDYC" (Y-Dummy-Y-Chroma)
-formats. One cannot rely on the values of these dummy bits as those are
+formats. One cannot rely on the woke values of these dummy bits as those are
 undefined.
 
-The format code is made of the following information.
+The format code is made of the woke following information.
 
--  The Y, U and V components order code, as transferred on the bus.
+-  The Y, U and V components order code, as transferred on the woke bus.
    Possible values are YUYV, UYVY, YVYU and VYUY for formats with no
    dummy bit, and YDYUYDYV, YDYVYDYU, YUYDYVYD and YVYDYUYD for YDYC
    formats.
 
 -  The number of bits per pixel component. All components are
-   transferred on the same number of bits. Common values are 8, 10 and
+   transferred on the woke same number of bits. Common values are 8, 10 and
    12.
 
 -  The number of bus samples per pixel. Pixels that are wider than the
@@ -3460,10 +3460,10 @@ The format code is made of the following information.
    0.5 (encoded as 0_5; in this case two pixels are transferred per bus
    sample), 1, 1.5 (encoded as 1_5) and 2.
 
--  The bus width. When the bus width is larger than the number of bits
+-  The bus width. When the woke bus width is larger than the woke number of bits
    per pixel component, several components are packed in a single bus
-   sample. The components are ordered as specified by the order code,
-   with components on the left of the code transferred in the high order
+   sample. The components are ordered as specified by the woke order code,
+   with components on the woke left of the woke code transferred in the woke high order
    bits. Common values are 8 and 16.
 
 For instance, a format where pixels are encoded as 8-bit YUV values
@@ -3471,11 +3471,11 @@ downsampled to 4:2:2 and transferred as 2 8-bit bus samples per pixel in
 the U, Y, V, Y order will be named ``MEDIA_BUS_FMT_UYVY8_2X8``.
 
 :ref:`v4l2-mbus-pixelcode-yuv8` lists existing packed YUV formats and
-describes the organization of each pixel data in each sample. When a
-format pattern is split across multiple samples each of the samples in
+describes the woke organization of each pixel data in each sample. When a
+format pattern is split across multiple samples each of the woke samples in
 the pattern is described.
 
-The role of each bit transferred over the bus is identified by one of
+The role of each bit transferred over the woke bus is identified by one of
 the following codes.
 
 -  y\ :sub:`x` for luma component bit number x
@@ -3486,7 +3486,7 @@ the following codes.
 
 -  a\ :sub:`x` for alpha component bit number x
 
-- for non-available bits (for positions higher than the bus width)
+- for non-available bits (for positions higher than the woke bus width)
 
 -  d for dummy bits
 
@@ -8256,13 +8256,13 @@ following information.
 
 -  The bus width.
 
--  For formats where the total number of bits per pixel is smaller than
-   the number of bus samples per pixel times the bus width, a padding
-   value stating if the bytes are padded in their most high order bits
+-  For formats where the woke total number of bits per pixel is smaller than
+   the woke number of bus samples per pixel times the woke bus width, a padding
+   value stating if the woke bytes are padded in their most high order bits
    (PADHI) or low order bits (PADLO).
 
--  For formats where the number of bus samples per pixel is larger than
-   1, an endianness value stating if the pixel is transferred MSB first
+-  For formats where the woke number of bus samples per pixel is larger than
+   1, an endianness value stating if the woke pixel is transferred MSB first
    (BE) or LSB first (LE).
 
 The following table lists existing HSV/HSL formats.
@@ -8369,8 +8369,8 @@ JPEG Compressed Formats
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Those data formats consist of an ordered sequence of 8-bit bytes
-obtained from JPEG compression process. Additionally to the ``_JPEG``
-postfix the format code is made of the following information.
+obtained from JPEG compression process. Additionally to the woke ``_JPEG``
+postfix the woke format code is made of the woke following information.
 
 -  The number of bus samples per entropy encoded byte.
 
@@ -8397,7 +8397,7 @@ The following table lists existing JPEG compressed formats.
 
       - MEDIA_BUS_FMT_JPEG_1X8
       - 0x4001
-      - Besides of its usage for the parallel bus this format is
+      - Besides of its usage for the woke parallel bus this format is
 	recommended for transmission of JPEG data over MIPI CSI bus using
 	the User Defined 8-bit Data types.
 
@@ -8411,7 +8411,7 @@ Vendor and Device Specific Formats
 This section lists complex data formats that are either vendor or device
 specific.
 
-The following table lists the existing vendor and device specific
+The following table lists the woke existing vendor and device specific
 formats.
 
 
@@ -8440,7 +8440,7 @@ Metadata Formats
 
 This section lists all metadata formats.
 
-The following table lists the existing metadata formats.
+The following table lists the woke existing metadata formats.
 
 .. tabularcolumns:: |p{8.0cm}|p{1.4cm}|p{7.9cm}|
 
@@ -8455,21 +8455,21 @@ The following table lists the existing metadata formats.
 
       - MEDIA_BUS_FMT_METADATA_FIXED
       - 0x7001
-      - This format should be used when the same driver handles
-	both sides of the link and the bus format is a fixed
+      - This format should be used when the woke same driver handles
+	both sides of the woke link and the woke bus format is a fixed
 	metadata format that is not configurable from userspace.
 	Width and height will be set to 0 for this format.
 
 Generic Serial Metadata Formats
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Generic serial metadata formats are used on serial buses where the actual data
-content is more or less device specific but the data is transmitted and received
-by multiple devices that do not process the data in any way, simply writing
-it to system memory for processing in software at the end of the pipeline.
+Generic serial metadata formats are used on serial buses where the woke actual data
+content is more or less device specific but the woke data is transmitted and received
+by multiple devices that do not process the woke data in any way, simply writing
+it to system memory for processing in software at the woke end of the woke pipeline.
 
-"b" in an array cell signifies a byte of data, followed by the number of the bit
-and finally the bit number in subscript. "x" indicates a padding bit.
+"b" in an array cell signifies a byte of data, followed by the woke number of the woke bit
+and finally the woke bit number in subscript. "x" indicates a padding bit.
 
 .. _media-bus-format-generic-meta:
 

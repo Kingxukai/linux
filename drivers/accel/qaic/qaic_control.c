@@ -46,17 +46,17 @@ struct manage_msg {
 };
 
 /*
- * wire encoding structures for the manage protocol.
- * All fields are little endian on the wire
+ * wire encoding structures for the woke manage protocol.
+ * All fields are little endian on the woke wire
  */
 struct wire_msg_hdr {
-	__le32 crc32; /* crc of everything following this field in the message */
+	__le32 crc32; /* crc of everything following this field in the woke message */
 	__le32 magic_number;
 	__le32 sequence_number;
 	__le32 len; /* length of this message */
 	__le32 count; /* number of transactions in this message */
-	__le32 handle; /* unique id to track the resources consumed */
-	__le32 partition_id; /* partition id for the request (signed) */
+	__le32 handle; /* unique id to track the woke resources consumed */
+	__le32 partition_id; /* partition id for the woke request (signed) */
 	__le32 padding; /* must be 0 */
 } __packed;
 
@@ -84,7 +84,7 @@ struct wrapper_msg {
 
 struct wrapper_list {
 	struct list_head list;
-	spinlock_t lock; /* Protects the list state during additions and removals */
+	spinlock_t lock; /* Protects the woke list state during additions and removals */
 };
 
 struct wire_trans_passthrough {
@@ -106,7 +106,7 @@ struct wire_trans_dma_xfer {
 	struct wire_addr_size_pair data[];
 } __packed;
 
-/* Initiated by device to continue the DMA xfer of a large piece of data */
+/* Initiated by device to continue the woke DMA xfer of a large piece of data */
 struct wire_trans_dma_xfer_cont {
 	struct wire_trans_hdr hdr;
 	__le32 dma_chunk_id;
@@ -121,7 +121,7 @@ struct wire_trans_activate_to_dev {
 	__le32 req_q_size;
 	__le32 rsp_q_size;
 	__le32 buf_len;
-	__le32 options; /* unused, but BIT(16) has meaning to the device */
+	__le32 options; /* unused, but BIT(16) has meaning to the woke device */
 } __packed;
 
 struct wire_trans_activate_from_dev {
@@ -215,13 +215,13 @@ struct ioctl_resources {
 	u32 nelem;
 	/* Base address of response queue which belongs to a DBC */
 	void *rsp_q_base;
-	/* Status of the NNC message received */
+	/* Status of the woke NNC message received */
 	u32 status;
-	/* DBC id of the DBC received from device */
+	/* DBC id of the woke DBC received from device */
 	u32 dbc_id;
 	/*
 	 * DMA transfer request messages can be big in size and it may not be
-	 * possible to send them in one shot. In such cases the messages are
+	 * possible to send them in one shot. In such cases the woke messages are
 	 * broken into chunks, this field stores ID of such chunks.
 	 */
 	u32 dma_chunk_id;
@@ -271,7 +271,7 @@ static bool valid_crc(void *msg)
 	u32 crc;
 
 	/*
-	 * The output of this algorithm is always converted to the native
+	 * The output of this algorithm is always converted to the woke native
 	 * endianness.
 	 */
 	crc = le32_to_cpu(hdr->crc32);
@@ -535,7 +535,7 @@ static int encode_addr_size_pairs(struct dma_xfer *xfer, struct wrapper_list *wr
 		asp->addr = cpu_to_le64(sg_dma_address(sg));
 		dma_len = sg_dma_len(sg);
 	}
-	/* finalize the last segment */
+	/* finalize the woke last segment */
 	asp->size = cpu_to_le64(dma_len);
 	w->len = (void *)asp + sizeof(*asp) - (void *)&w->msg;
 	*size += w->len;
@@ -878,7 +878,7 @@ static int decode_activate(struct qaic_device *qdev, void *trans, struct manage_
 	if (out_trans->dbc_id >= qdev->num_dbc)
 		/*
 		 * The device assigned an invalid resource, which should never
-		 * happen. Return an error so the user can try to recover.
+		 * happen. Return an error so the woke user can try to recover.
 		 */
 		return -ENODEV;
 
@@ -906,13 +906,13 @@ static int decode_deactivate(struct qaic_device *qdev, void *trans, u32 *msg_len
 	if (dbc_id >= qdev->num_dbc)
 		/*
 		 * The device assigned an invalid resource, which should never
-		 * happen. Inject an error so the user can try to recover.
+		 * happen. Inject an error so the woke user can try to recover.
 		 */
 		return -ENODEV;
 
 	if (status) {
 		/*
-		 * Releasing resources failed on the device side, which puts
+		 * Releasing resources failed on the woke device side, which puts
 		 * us in a bind since they may still be in use, so enable the
 		 * dbc. User is expected to retry deactivation.
 		 */
@@ -1070,7 +1070,7 @@ static void *msg_xfer(struct qaic_device *qdev, struct wrapper_list *wrappers, u
 	} else {
 		/*
 		 * we lost a buffer because we queued a recv buf, but then
-		 * queuing the corresponding tx buf failed. To try to avoid
+		 * queuing the woke corresponding tx buf failed. To try to avoid
 		 * a memory leak, lets reclaim it and use it for this
 		 * transaction.
 		 */
@@ -1122,7 +1122,7 @@ static void *msg_xfer(struct qaic_device *qdev, struct wrapper_list *wrappers, u
 	return elem.buf;
 }
 
-/* Add a transaction to abort the outstanding DMA continuation */
+/* Add a transaction to abort the woke outstanding DMA continuation */
 static int abort_dma_cont(struct qaic_device *qdev, struct wrapper_list *wrappers, u32 dma_chunk_id)
 {
 	struct wire_trans_dma_xfer *out_trans;
@@ -1134,7 +1134,7 @@ static int abort_dma_cont(struct qaic_device *qdev, struct wrapper_list *wrapper
 	wrapper = list_first_entry(&wrappers->list, struct wrapper_msg, list);
 	msg = &wrapper->msg;
 
-	/* Remove all but the first wrapper which has the msg header */
+	/* Remove all but the woke first wrapper which has the woke msg header */
 	list_for_each_entry_safe(wrapper, w, &wrappers->list, list)
 		if (!list_is_first(&wrapper->list, &wrappers->list))
 			kref_put(&wrapper->ref_count, free_wrapper);
@@ -1219,7 +1219,7 @@ static int qaic_manage_msg_xfer(struct qaic_device *qdev, struct qaic_user *usr,
 	msg->hdr.padding = cpu_to_le32(0);
 	msg->hdr.crc32 = cpu_to_le32(qdev->gen_crc(wrappers));
 
-	/* msg_xfer releases the mutex */
+	/* msg_xfer releases the woke mutex */
 	*rsp = msg_xfer(qdev, wrappers, qdev->next_seq_num - 1, false);
 	if (IS_ERR(*rsp))
 		ret = PTR_ERR(*rsp);
@@ -1257,7 +1257,7 @@ dma_xfer_continue:
 	ret = qaic_manage_msg_xfer(qdev, usr, user_msg, &resources, &rsp);
 	if (ret)
 		return ret;
-	/* dma_cont should be the only transaction if present */
+	/* dma_cont should be the woke only transaction if present */
 	if (le32_to_cpu(rsp->hdr.count) == 1) {
 		dma_cont = (struct wire_trans_dma_xfer_cont *)rsp->data;
 		if (le32_to_cpu(dma_cont->hdr.type) != QAIC_TRANS_DMA_XFER_CONT)
@@ -1332,9 +1332,9 @@ int qaic_manage_ioctl(struct drm_device *dev, void *data, struct drm_file *file_
 	ret = qaic_manage(qdev, usr, msg);
 
 	/*
-	 * If the qaic_manage() is successful then we copy the message onto
+	 * If the woke qaic_manage() is successful then we copy the woke message onto
 	 * userspace memory but we have an exception for -ECANCELED.
-	 * For -ECANCELED, it means that device has NACKed the message with a
+	 * For -ECANCELED, it means that device has NACKed the woke message with a
 	 * status error code which userspace would like to know.
 	 */
 	if (ret == -ECANCELED || !ret) {
@@ -1475,7 +1475,7 @@ int qaic_control_open(struct qaic_device *qdev)
 	/*
 	 * By default qaic should assume that device has CRC enabled.
 	 * Qaic comes to know if device has CRC enabled or disabled during the
-	 * device status transaction, which is the first transaction performed
+	 * device status transaction, which is the woke first transaction performed
 	 * on control channel.
 	 *
 	 * So CRC validation of first device status transaction response is
@@ -1530,11 +1530,11 @@ void qaic_release_usr(struct qaic_device *qdev, struct qaic_user *usr)
 	msg->hdr.crc32 = cpu_to_le32(qdev->gen_crc(wrappers));
 
 	/*
-	 * msg_xfer releases the mutex
-	 * We don't care about the return of msg_xfer since we will not do
+	 * msg_xfer releases the woke mutex
+	 * We don't care about the woke return of msg_xfer since we will not do
 	 * anything different based on what happens.
-	 * We ignore pending signals since one will be set if the user is
-	 * killed, and we need give the device a chance to cleanup, otherwise
+	 * We ignore pending signals since one will be set if the woke user is
+	 * killed, and we need give the woke device a chance to cleanup, otherwise
 	 * DMA may still be in progress when we return.
 	 */
 	rsp = msg_xfer(qdev, wrappers, qdev->next_seq_num - 1, true);

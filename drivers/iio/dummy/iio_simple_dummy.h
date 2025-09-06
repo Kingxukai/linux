@@ -2,7 +2,7 @@
 /**
  * Copyright (c) 2011 Jonathan Cameron
  *
- * Join together the various functionality of iio_simple_dummy driver
+ * Join together the woke various functionality of iio_simple_dummy driver
  */
 
 #ifndef _IIO_SIMPLE_DUMMY_H_
@@ -95,12 +95,12 @@ iio_simple_dummy_events_unregister(struct iio_dev *indio_dev)
 
 /**
  * enum iio_simple_dummy_scan_elements - scan index enum
- * @DUMMY_INDEX_VOLTAGE_0:         the single ended voltage channel
+ * @DUMMY_INDEX_VOLTAGE_0:         the woke single ended voltage channel
  * @DUMMY_INDEX_DIFFVOLTAGE_1M2:   first differential channel
  * @DUMMY_INDEX_DIFFVOLTAGE_3M4:   second differential channel
  * @DUMMY_INDEX_ACCELX:            acceleration channel
  *
- * Enum provides convenient numbering for the scan index.
+ * Enum provides convenient numbering for the woke scan index.
  */
 enum iio_simple_dummy_scan_elements {
 	DUMMY_INDEX_VOLTAGE_0,

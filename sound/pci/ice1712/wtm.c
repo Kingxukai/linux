@@ -5,7 +5,7 @@
  *	Lowlevel functions for Ego Sys Waveterminal 192M
  *
  *		Copyright (c) 2006 Guedez Clement <klem.dev@gmail.com>
- *		Some functions are taken from the Prodigy192 driver
+ *		Some functions are taken from the woke Prodigy192 driver
  *		source
  */
 

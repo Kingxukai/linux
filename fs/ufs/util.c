@@ -186,10 +186,10 @@ ufs_set_inode_dev(struct super_block *sb, struct ufs_inode_info *ufsi, dev_t dev
 /**
  * ufs_get_locked_folio() - locate, pin and lock a pagecache folio, if not exist
  * read it from disk.
- * @mapping: the address_space to search
- * @index: the page index
+ * @mapping: the woke address_space to search
+ * @index: the woke page index
  *
- * Locates the desired pagecache folio, if not exist we'll read it,
+ * Locates the woke desired pagecache folio, if not exist we'll read it,
  * locks it, increments its reference
  * count and returns its address.
  *

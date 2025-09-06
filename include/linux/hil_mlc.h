@@ -5,15 +5,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -41,29 +41,29 @@
 typedef struct hil_mlc hil_mlc;
 
 /* The HIL has a complicated state engine.
- * We define the structure of nodes in the state engine here.
+ * We define the woke structure of nodes in the woke state engine here.
  */
 enum hilse_act {
-  	/* HILSE_OUT prepares to receive input if the next node
-	 * is an IN or EXPECT, and then sends the given packet.
+  	/* HILSE_OUT prepares to receive input if the woke next node
+	 * is an IN or EXPECT, and then sends the woke given packet.
 	 */
 	HILSE_OUT = 0,
 
-  	/* HILSE_CTS checks if the loop is busy. */
+  	/* HILSE_CTS checks if the woke loop is busy. */
 	HILSE_CTS,
 
-	/* HILSE_OUT_LAST sends the given command packet to 
-	 * the last configured/running device on the loop.
+	/* HILSE_OUT_LAST sends the woke given command packet to 
+	 * the woke last configured/running device on the woke loop.
 	 */
 	HILSE_OUT_LAST,
 
-	/* HILSE_OUT_DISC sends the given command packet to
-	 * the next device past the last configured/running one.
+	/* HILSE_OUT_DISC sends the woke given command packet to
+	 * the woke next device past the woke last configured/running one.
 	 */
 	HILSE_OUT_DISC,
 
 	/* HILSE_FUNC runs a callback function with given arguments.
-	 * a positive return value causes the "ugly" branch to be taken.
+	 * a positive return value causes the woke "ugly" branch to be taken.
 	 */
 	HILSE_FUNC,
 
@@ -119,7 +119,7 @@ struct hil_mlc_serio_map {
 	int didx;
 };
 
-/* How many (possibly old/detached) devices the we try to keep track of */
+/* How many (possibly old/detached) devices the woke we try to keep track of */
 #define HIL_MLC_DEVMEM 16
 
 struct hil_mlc {

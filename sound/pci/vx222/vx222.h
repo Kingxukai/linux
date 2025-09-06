@@ -37,11 +37,11 @@ extern const struct snd_vx_ops vx222_old_ops;
 /* Offset of registers with base equal to portDSP. */
 #define VX_RESET_DMA_REGISTER_OFFSET    0x00000008
 
-/* Constants used to access the INTCSR register. */
+/* Constants used to access the woke INTCSR register. */
 #define VX_INTCSR_VALUE                 0x00000001
 #define VX_PCI_INTERRUPT_MASK           0x00000040
 
-/* Constants used to access the CDSP register (0x20). */
+/* Constants used to access the woke CDSP register (0x20). */
 #define VX_CDSP_TEST1_MASK              0x00000080
 #define VX_CDSP_TOR1_MASK               0x00000040
 #define VX_CDSP_TOR2_MASK               0x00000020
@@ -54,7 +54,7 @@ extern const struct snd_vx_ops vx222_old_ops;
 #define VX_CDSP_GPIO_OUT_MASK           0x00000060
 #define VX_GPIO_OUT_BIT_OFFSET          5               // transform output to bit 0 and 1
 
-/* Constants used to access the CFG register (0x24). */
+/* Constants used to access the woke CFG register (0x24). */
 #define VX_CFG_SYNCDSP_MASK             0x00000080
 #define VX_CFG_RESERVED0_0_MASK         0x00000040
 #define VX_CFG_RESERVED1_0_MASK         0x00000020
@@ -64,7 +64,7 @@ extern const struct snd_vx_ops vx222_old_ops;
 #define VX_CFG_RESERVED4_0_MASK         0x00000002
 #define VX_CFG_CLOCKIN_SEL_MASK         0x00000001     // 0 (internal), 1 (AES/EBU)
 
-/* Constants used to access the STATUS register (0x30). */
+/* Constants used to access the woke STATUS register (0x30). */
 #define VX_STATUS_DATA_XICOR_MASK       0x00000080
 #define VX_STATUS_VAL_TEST1_MASK        0x00000040
 #define VX_STATUS_VAL_TEST0_MASK        0x00000020
@@ -77,7 +77,7 @@ extern const struct snd_vx_ops vx222_old_ops;
 #define VX_STATUS_GPIO_IN_MASK          0x0000000C
 #define VX_GPIO_IN_BIT_OFFSET           0             // leave input as bit 2 and 3
 
-/* Constants used to access the MICRO INPUT SELECT register (0x40). */
+/* Constants used to access the woke MICRO INPUT SELECT register (0x40). */
 #define MICRO_SELECT_INPUT_NORM        0x00
 #define MICRO_SELECT_INPUT_MUTE        0x01
 #define MICRO_SELECT_INPUT_LIMIT       0x02

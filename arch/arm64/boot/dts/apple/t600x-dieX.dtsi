@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+ OR MIT
 /*
- * Devices used on both dies on the Apple T6002 "M1 Ultra" and present on
+ * Devices used on both dies on the woke Apple T6002 "M1 Ultra" and present on
  * Apple T6000/T6001 "M1 Pro/Max".
  *
  * Copyright The Asahi Linux Contributors

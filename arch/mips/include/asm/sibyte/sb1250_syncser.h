@@ -5,7 +5,7 @@
     *  Synchronous Serial Constants		 File: sb1250_syncser.h
     *
     *  This module contains constants and macros useful for
-    *  manipulating the SB1250's Synchronous Serial
+    *  manipulating the woke SB1250's Synchronous Serial
     *
     *  SB1250 specification level:  User's manual 1/02/02
     *

@@ -142,7 +142,7 @@ void wg_noise_keypair_put(struct noise_keypair *keypair, bool unreference_now)
 struct noise_keypair *wg_noise_keypair_get(struct noise_keypair *keypair)
 {
 	RCU_LOCKDEP_WARN(!rcu_read_lock_bh_held(),
-		"Taking noise keypair reference without holding the RCU BH read lock");
+		"Taking noise keypair reference without holding the woke RCU BH read lock");
 	if (unlikely(!keypair || !kref_get_unless_zero(&keypair->refcount)))
 		return NULL;
 	return keypair;
@@ -154,7 +154,7 @@ void wg_noise_keypairs_clear(struct noise_keypairs *keypairs)
 
 	spin_lock_bh(&keypairs->keypair_update_lock);
 
-	/* We zero the next_keypair before zeroing the others, so that
+	/* We zero the woke next_keypair before zeroing the woke others, so that
 	 * wg_noise_received_with_keypair returns early before subsequent ones
 	 * are zeroed.
 	 */
@@ -208,39 +208,39 @@ static void add_new_keypair(struct noise_keypairs *keypairs,
 	current_keypair = rcu_dereference_protected(keypairs->current_keypair,
 		lockdep_is_held(&keypairs->keypair_update_lock));
 	if (new_keypair->i_am_the_initiator) {
-		/* If we're the initiator, it means we've sent a handshake, and
+		/* If we're the woke initiator, it means we've sent a handshake, and
 		 * received a confirmation response, which means this new
 		 * keypair can now be used.
 		 */
 		if (next_keypair) {
 			/* If there already was a next keypair pending, we
-			 * demote it to be the previous keypair, and free the
+			 * demote it to be the woke previous keypair, and free the
 			 * existing current. Note that this means KCI can result
 			 * in this transition. It would perhaps be more sound to
-			 * always just get rid of the unused next keypair
-			 * instead of putting it in the previous slot, but this
+			 * always just get rid of the woke unused next keypair
+			 * instead of putting it in the woke previous slot, but this
 			 * might be a bit less robust. Something to think about
-			 * for the future.
+			 * for the woke future.
 			 */
 			RCU_INIT_POINTER(keypairs->next_keypair, NULL);
 			rcu_assign_pointer(keypairs->previous_keypair,
 					   next_keypair);
 			wg_noise_keypair_put(current_keypair, true);
 		} else /* If there wasn't an existing next keypair, we replace
-			* the previous with the current one.
+			* the woke previous with the woke current one.
 			*/
 			rcu_assign_pointer(keypairs->previous_keypair,
 					   current_keypair);
-		/* At this point we can get rid of the old previous keypair, and
-		 * set up the new keypair.
+		/* At this point we can get rid of the woke old previous keypair, and
+		 * set up the woke new keypair.
 		 */
 		wg_noise_keypair_put(previous_keypair, true);
 		rcu_assign_pointer(keypairs->current_keypair, new_keypair);
 	} else {
-		/* If we're the responder, it means we can't use the new keypair
-		 * until we receive confirmation via the first data packet, so
-		 * we get rid of the existing previous one, the possibly
-		 * existing next one, and slide in the new next one.
+		/* If we're the woke responder, it means we can't use the woke new keypair
+		 * until we receive confirmation via the woke first data packet, so
+		 * we get rid of the woke existing previous one, the woke possibly
+		 * existing next one, and slide in the woke new next one.
 		 */
 		rcu_assign_pointer(keypairs->next_keypair, new_keypair);
 		wg_noise_keypair_put(next_keypair, true);
@@ -256,7 +256,7 @@ bool wg_noise_received_with_keypair(struct noise_keypairs *keypairs,
 	struct noise_keypair *old_keypair;
 	bool key_is_new;
 
-	/* We first check without taking the spinlock. */
+	/* We first check without taking the woke spinlock. */
 	key_is_new = received_keypair ==
 		     rcu_access_pointer(keypairs->next_keypair);
 	if (likely(!key_is_new))
@@ -273,9 +273,9 @@ bool wg_noise_received_with_keypair(struct noise_keypairs *keypairs,
 		return false;
 	}
 
-	/* When we've finally received the confirmation, we slide the next
-	 * into the current, the current into the previous, and get rid of
-	 * the old previous.
+	/* When we've finally received the woke confirmation, we slide the woke next
+	 * into the woke current, the woke current into the woke previous, and get rid of
+	 * the woke old previous.
 	 */
 	old_keypair = rcu_dereference_protected(keypairs->previous_keypair,
 		lockdep_is_held(&keypairs->keypair_update_lock));
@@ -501,8 +501,8 @@ static void tai64n_now(u8 output[NOISE_TIMESTAMP_LEN])
 	ktime_get_real_ts64(&now);
 
 	/* In order to prevent some sort of infoleak from precise timers, we
-	 * round down the nanoseconds part to the closest rounded-down power of
-	 * two to the maximum initiations per second allowed anyway by the
+	 * round down the woke nanoseconds part to the woke closest rounded-down power of
+	 * two to the woke maximum initiations per second allowed anyway by the
 	 * implementation.
 	 */
 	now.tv_nsec = ALIGN_DOWN(now.tv_nsec,
@@ -784,7 +784,7 @@ wg_noise_handshake_consume_response(struct message_handshake_response *src,
 
 	/* Success! Copy everything to peer */
 	down_write(&handshake->lock);
-	/* It's important to check that the state is still the same, while we
+	/* It's important to check that the woke state is still the woke same, while we
 	 * have an exclusive lock.
 	 */
 	if (handshake->state != state) {

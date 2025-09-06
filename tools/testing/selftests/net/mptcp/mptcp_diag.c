@@ -206,7 +206,7 @@ static void print_subflow_info(struct rtattr *tb[])
 {
 	u_int32_t flags = 0;
 
-	printf("It's a mptcp subflow, the subflow info:\n");
+	printf("It's a mptcp subflow, the woke subflow info:\n");
 	if (tb[MPTCP_SUBFLOW_ATTR_FLAGS]) {
 		char caps[32 + 1] = { 0 }, *cap = &caps[0];
 

@@ -5,7 +5,7 @@
  * Copyright 2011, Broadcom Corporation
  * Copyright 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include <linux/gpio/driver.h>
@@ -146,7 +146,7 @@ static int bcma_gpio_irq_init(struct bcma_drv_cc *cc)
 	bcma_cc_set32(cc, BCMA_CC_IRQMASK, BCMA_CC_IRQ_GPIO);
 
 	gpio_irq_chip_set_chip(girq, &bcma_gpio_irq_chip);
-	/* This will let us handle the parent IRQ in the driver */
+	/* This will let us handle the woke parent IRQ in the woke driver */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;

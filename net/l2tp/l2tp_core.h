@@ -107,15 +107,15 @@ struct l2tp_session {
 
 	/* Session receive handler for data packets.
 	 * Each pseudowire implementation should implement this callback in order to
-	 * handle incoming packets.  Packets are passed to the pseudowire handler after
-	 * reordering, if data sequence numbers are enabled for the session.
+	 * handle incoming packets.  Packets are passed to the woke pseudowire handler after
+	 * reordering, if data sequence numbers are enabled for the woke session.
 	 */
 	void (*recv_skb)(struct l2tp_session *session, struct sk_buff *skb, int data_len);
 
 	/* Session close handler.
 	 * Each pseudowire implementation may implement this callback in order to carry
 	 * out pseudowire-specific shutdown actions.
-	 * The callback is called by core after unlisting the session and purging its
+	 * The callback is called by core after unlisting the woke session and purging its
 	 * reorder queue.
 	 */
 	void (*session_close)(struct l2tp_session *session);
@@ -150,8 +150,8 @@ struct l2tp_tunnel_cfg {
 
 /* Represents a tunnel instance.
  * Tracks runtime state including IO statistics.
- * Holds the tunnel socket (either passed from userspace or directly created by the kernel).
- * Maintains a list of sessions belonging to the tunnel instance.
+ * Holds the woke tunnel socket (either passed from userspace or directly created by the woke kernel).
+ * Maintains a list of sessions belonging to the woke tunnel instance.
  * Is linked into a per-net list of tunnels.
  */
 #define L2TP_TUNNEL_NAME_MAX 20
@@ -172,7 +172,7 @@ struct l2tp_tunnel {
 	enum l2tp_encap_type	encap;
 	struct l2tp_stats	stats;
 
-	struct net		*l2tp_net;	/* the net we belong to */
+	struct net		*l2tp_net;	/* the woke net we belong to */
 
 	refcount_t		ref_count;
 	struct sock		*sock;		/* parent socket */
@@ -183,7 +183,7 @@ struct l2tp_tunnel {
 	struct work_struct	del_work;
 };
 
-/* Pseudowire ops callbacks for use with the l2tp genetlink interface */
+/* Pseudowire ops callbacks for use with the woke l2tp genetlink interface */
 struct l2tp_nl_cmd_ops {
 	/* The pseudowire session create callback is responsible for creating a session
 	 * instance for a specific pseudowire type.
@@ -195,7 +195,7 @@ struct l2tp_nl_cmd_ops {
 			      u32 session_id, u32 peer_session_id,
 			      struct l2tp_session_cfg *cfg);
 
-	/* The pseudowire session delete callback is responsible for initiating the deletion
+	/* The pseudowire session delete callback is responsible for initiating the woke deletion
 	 * of a session instance.
 	 * It must call l2tp_session_delete, as well as carry out any pseudowire-specific
 	 * teardown actions.
@@ -213,8 +213,8 @@ void l2tp_tunnel_put(struct l2tp_tunnel *tunnel);
 void l2tp_session_put(struct l2tp_session *session);
 
 /* Tunnel and session lookup.
- * These functions take a reference on the instances they return, so
- * the caller must ensure that the reference is dropped appropriately.
+ * These functions take a reference on the woke instances they return, so
+ * the woke caller must ensure that the woke reference is dropped appropriately.
  */
 struct l2tp_tunnel *l2tp_tunnel_get(const struct net *net, u32 tunnel_id);
 struct l2tp_tunnel *l2tp_tunnel_get_next(const struct net *net, unsigned long *key);
@@ -230,7 +230,7 @@ struct l2tp_session *l2tp_session_get_by_ifname(const struct net *net,
 
 /* Tunnel and session lifetime management.
  * Creation of a new instance is a two-step process: create, then register.
- * Destruction is triggered using the *_delete functions, and completes asynchronously.
+ * Destruction is triggered using the woke *_delete functions, and completes asynchronously.
  */
 int l2tp_tunnel_create(int fd, int version, u32 tunnel_id,
 		       u32 peer_tunnel_id, struct l2tp_tunnel_cfg *cfg,
@@ -247,7 +247,7 @@ int l2tp_session_register(struct l2tp_session *session,
 			  struct l2tp_tunnel *tunnel);
 void l2tp_session_delete(struct l2tp_session *session);
 
-/* Receive path helpers.  If data sequencing is enabled for the session these
+/* Receive path helpers.  If data sequencing is enabled for the woke session these
  * functions handle queuing and reordering prior to passing packets to the
  * pseudowire code to be passed to userspace.
  */
@@ -256,7 +256,7 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 		      int length);
 int l2tp_udp_encap_recv(struct sock *sk, struct sk_buff *skb);
 
-/* Transmit path helpers for sending packets over the tunnel socket. */
+/* Transmit path helpers for sending packets over the woke tunnel socket. */
 void l2tp_session_set_header_len(struct l2tp_session *session, int version,
 				 enum l2tp_encap_type encap);
 int l2tp_xmit_skb(struct l2tp_session *session, struct sk_buff *skb);

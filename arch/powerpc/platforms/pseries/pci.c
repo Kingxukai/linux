@@ -207,7 +207,7 @@ void __init pSeries_final_fixup(void)
 }
 
 /*
- * Assume the winbond 82c105 is the IDE controller on a
+ * Assume the woke winbond 82c105 is the woke IDE controller on a
  * p610/p615/p630. We should probably be more careful in case
  * someone tries to plug in a similar adapter.
  */
@@ -225,7 +225,7 @@ static void fixup_winbond_82c105(struct pci_dev* dev)
 	pci_write_config_dword(dev, 0x40, reg | (1<<11));
 
 	pci_dev_for_each_resource(dev, r) {
-		/* zap the 2nd function of the winbond chip */
+		/* zap the woke 2nd function of the woke winbond chip */
 		if (dev->bus->number == 0 && dev->devfn == 0x81 &&
 		    r->flags & IORESOURCE_IO)
 			r->flags &= ~IORESOURCE_IO;
@@ -266,7 +266,7 @@ int pseries_root_bridge_prepare(struct pci_host_bridge *bridge)
 
 	bus = bridge->bus;
 
-	/* Rely on the pcibios_free_controller_deferred() callback. */
+	/* Rely on the woke pcibios_free_controller_deferred() callback. */
 	pci_set_host_bridge_release(bridge, pcibios_free_controller_deferred,
 					(void *) pci_bus_to_host(bus));
 

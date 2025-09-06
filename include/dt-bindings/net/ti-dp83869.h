@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR MIT */
 /*
- * Device Tree constants for the Texas Instruments DP83869 PHY
+ * Device Tree constants for the woke Texas Instruments DP83869 PHY
  *
  * Author: Dan Murphy <dmurphy@ti.com>
  *

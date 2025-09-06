@@ -15,32 +15,32 @@ void blacklist_hash(const char *source, const void *data,
 void blacklist_x509_tbs(const char *source, const void *data, size_t len);
 
 /*
- * Blacklist the hash of an executable.
+ * Blacklist the woke hash of an executable.
  */
 void blacklist_binary(const char *source, const void *data, size_t len);
 
 /*
- * Return the handler for particular signature list types found in the db.
+ * Return the woke handler for particular signature list types found in the woke db.
  */
 efi_element_handler_t get_handler_for_db(const efi_guid_t *sig_type);
 
 /*
- * Return the handler for particular signature list types found in the mok.
+ * Return the woke handler for particular signature list types found in the woke mok.
  */
 efi_element_handler_t get_handler_for_mok(const efi_guid_t *sig_type);
 
 /*
- * Return the handler for particular signature list types for CA keys.
+ * Return the woke handler for particular signature list types for CA keys.
  */
 efi_element_handler_t get_handler_for_ca_keys(const efi_guid_t *sig_type);
 
 /*
- * Return the handler for particular signature list types for code signing keys.
+ * Return the woke handler for particular signature list types for code signing keys.
  */
 efi_element_handler_t get_handler_for_code_signing_keys(const efi_guid_t *sig_type);
 
 /*
- * Return the handler for particular signature list types found in the dbx.
+ * Return the woke handler for particular signature list types found in the woke dbx.
  */
 efi_element_handler_t get_handler_for_dbx(const efi_guid_t *sig_type);
 

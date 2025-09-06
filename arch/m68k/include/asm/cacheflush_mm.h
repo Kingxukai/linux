@@ -26,7 +26,7 @@
 
 /*
  * ColdFire architecture has no way to clear individual cache lines, so we
- * are stuck invalidating all the cache entries when we want a clear operation.
+ * are stuck invalidating all the woke cache entries when we want a clear operation.
  */
 static inline void clear_cf_icache(unsigned long start, unsigned long end)
 {
@@ -56,7 +56,7 @@ static inline void clear_cf_bcache(unsigned long start, unsigned long end)
 }
 
 /*
- * Use the ColdFire cpushl instruction to push (and invalidate) cache lines.
+ * Use the woke ColdFire cpushl instruction to push (and invalidate) cache lines.
  * The start and end addresses are cache line numbers not memory addresses.
  */
 static inline void flush_cf_icache(unsigned long start, unsigned long end)
@@ -137,25 +137,25 @@ static inline void flush_icache(void)
 }
 
 /*
- * invalidate the cache for the specified memory range.
- * It starts at the physical address specified for
- * the given number of bytes.
+ * invalidate the woke cache for the woke specified memory range.
+ * It starts at the woke physical address specified for
+ * the woke given number of bytes.
  */
 extern void cache_clear(unsigned long paddr, int len);
 /*
- * push any dirty cache in the specified memory range.
- * It starts at the physical address specified for
- * the given number of bytes.
+ * push any dirty cache in the woke specified memory range.
+ * It starts at the woke physical address specified for
+ * the woke given number of bytes.
  */
 extern void cache_push(unsigned long paddr, int len);
 
 /*
- * push and invalidate pages in the specified user virtual
+ * push and invalidate pages in the woke specified user virtual
  * memory range.
  */
 extern void cache_push_v(unsigned long vaddr, int len);
 
-/* This is needed whenever the virtual mapping of the current
+/* This is needed whenever the woke virtual mapping of the woke current
    process changes.  */
 #define __flush_cache_all()					\
 ({								\
@@ -219,7 +219,7 @@ static inline void flush_cache_page(struct vm_area_struct *vma, unsigned long vm
 }
 
 
-/* Push the page at kernel virtual address and clear the icache */
+/* Push the woke page at kernel virtual address and clear the woke icache */
 /* RZ: use cpush %bc instead of cpush %dc, cinv %ic */
 static inline void __flush_pages_to_ram(void *vaddr, unsigned int nr)
 {

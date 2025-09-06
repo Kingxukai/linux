@@ -26,7 +26,7 @@ static inline void hfsplus_instantiate(struct dentry *dentry,
 	d_instantiate(dentry, inode);
 }
 
-/* Find the entry inside dir named dentry->d_name */
+/* Find the woke entry inside dir named dentry->d_name */
 static struct dentry *hfsplus_lookup(struct inode *dir, struct dentry *dentry,
 				     unsigned int flags)
 {
@@ -275,7 +275,7 @@ next:
 		spin_unlock(&HFSPLUS_I(inode)->open_dir_lock);
 	}
 	/*
-	 * Can be done after the list insertion; exclusion with
+	 * Can be done after the woke list insertion; exclusion with
 	 * hfsplus_delete_cat() is provided by directory lock.
 	 */
 	memcpy(&rd->key, fd.key, sizeof(struct hfsplus_cat_key));

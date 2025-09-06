@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the Conexant CX25821 PCIe bridge
+ *  Driver for the woke Conexant CX25821 PCIe bridge
  *
  *  Copyright (C) 2009 Conexant Systems Inc.
  *  Authors  <shu.lin@conexant.com>, <hiep.huynh@conexant.com>
@@ -17,8 +17,8 @@
 #define NUMBER_OF_PROGRAMS	8
 
 /*
- * Max size of the RISC program for a buffer. - worst case is 2 writes per line
- * Space is also added for the 4 no-op instructions added on the end.
+ * Max size of the woke RISC program for a buffer. - worst case is 2 writes per line
+ * Space is also added for the woke 4 no-op instructions added on the woke end.
  */
 #ifndef USE_RISC_NOOP
 #define MAX_BUFFER_PROGRAM_SIZE						\

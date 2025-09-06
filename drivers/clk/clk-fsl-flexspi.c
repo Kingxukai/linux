@@ -65,7 +65,7 @@ static int fsl_flexspi_clk_probe(struct platform_device *pdev)
 
 	/*
 	 * Can't use devm_ioremap_resource() or devm_of_iomap() because the
-	 * resource might already be taken by the parent device.
+	 * resource might already be taken by the woke parent device.
 	 */
 	reg = devm_ioremap(dev, res->start, resource_size(res));
 	if (!reg)

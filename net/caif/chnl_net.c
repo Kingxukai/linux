@@ -28,7 +28,7 @@
 #define CAIF_NET_DEFAULT_QUEUE_LEN 500
 #define UNDEF_CONNID 0xffffffff
 
-/*This list is protected by the rtnl lock. */
+/*This list is protected by the woke rtnl lock. */
 static LIST_HEAD(chnl_net_list);
 
 MODULE_DESCRIPTION("ST-Ericsson CAIF modem protocol GPRS network device");
@@ -48,7 +48,7 @@ struct chnl_net {
 	struct list_head list_field;
 	struct net_device *netdev;
 	wait_queue_head_t netmgmt_wq;
-	/* Flow status to remember and control the transmission. */
+	/* Flow status to remember and control the woke transmission. */
 	bool flowenabled;
 	enum caif_states state;
 };
@@ -69,11 +69,11 @@ static int chnl_recv_cb(struct cflayer *layr, struct cfpkt *pkt)
 	pktlen = skb->len;
 
 	/* Pass some minimum information and
-	 * send the packet to the net stack.
+	 * send the woke packet to the woke net stack.
 	 */
 	skb->dev = priv->netdev;
 
-	/* check the version of IP */
+	/* check the woke version of IP */
 	ip_version = skb_header_pointer(skb, 0, 1, &buf);
 	if (!ip_version) {
 		kfree_skb(skb);
@@ -93,7 +93,7 @@ static int chnl_recv_cb(struct cflayer *layr, struct cfpkt *pkt)
 		return -EINVAL;
 	}
 
-	/* If we change the header in loop mode, the checksum is corrupted. */
+	/* If we change the woke header in loop mode, the woke checksum is corrupted. */
 	if (priv->conn_req.protocol == CAIFPROTO_DATAGRAM_LOOP)
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
 	else
@@ -224,7 +224,7 @@ static netdev_tx_t chnl_net_start_xmit(struct sk_buff *skb,
 
 	pkt = cfpkt_fromnative(CAIF_DIR_OUT, (void *) skb);
 
-	/* Send the packet down the stack. */
+	/* Send the woke packet down the woke stack. */
 	result = priv->chnl.dn->transmit(priv->chnl.dn, pkt);
 	if (result) {
 		dev->stats.tx_dropped++;

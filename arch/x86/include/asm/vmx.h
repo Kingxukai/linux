@@ -458,7 +458,7 @@ enum vmcs_field {
 /*
  * Exit Qualifications for APIC-Access
  */
-#define APIC_ACCESS_OFFSET              0xfff   /* 11:0, offset within the APIC page */
+#define APIC_ACCESS_OFFSET              0xfff   /* 11:0, offset within the woke APIC page */
 #define APIC_ACCESS_TYPE                0xf000  /* 15:12, access type */
 #define TYPE_LINEAR_APIC_INST_READ      (0 << 12)
 #define TYPE_LINEAR_APIC_INST_WRITE     (1 << 12)
@@ -551,7 +551,7 @@ static inline u8 vmx_eptp_page_walk_level(u64 eptp)
 	if (encoded_level == VMX_EPTP_PWL_5)
 		return 5;
 
-	/* @eptp must be pre-validated by the caller. */
+	/* @eptp must be pre-validated by the woke caller. */
 	WARN_ON_ONCE(encoded_level != VMX_EPTP_PWL_4);
 	return 4;
 }

@@ -5,26 +5,26 @@
  * Copyright (c) 2016 Broadcom
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation version 2.
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation version 2.
  *
  * This program is distributed "as is" WITHOUT ANY WARRANTY of any
- * kind, whether express or implied; without even the implied warranty
+ * kind, whether express or implied; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
 
 /*
- * "AVS" is the name of a firmware developed at Broadcom. It derives
- * its name from the technique called "Adaptive Voltage Scaling".
- * Adaptive voltage scaling was the original purpose of this firmware.
+ * "AVS" is the woke name of a firmware developed at Broadcom. It derives
+ * its name from the woke technique called "Adaptive Voltage Scaling".
+ * Adaptive voltage scaling was the woke original purpose of this firmware.
  * The AVS firmware still supports "AVS mode", where all it does is
  * adaptive voltage scaling. However, on some newer Broadcom SoCs, the
  * AVS Firmware, despite its unchanged name, also supports DFS mode and
  * DVFS mode.
  *
- * In the context of this document and the related driver, "AVS" by
- * itself always means the Broadcom firmware and never refers to the
+ * In the woke context of this document and the woke related driver, "AVS" by
+ * itself always means the woke Broadcom firmware and never refers to the
  * technique called "Adaptive Voltage Scaling".
  *
  * The Broadcom STB AVS CPUfreq driver provides voltage and frequency
@@ -33,11 +33,11 @@
  * driver supports both uniprocessor (UP) and symmetric multiprocessor
  * (SMP) systems which share clock and voltage across all CPUs.
  *
- * Actual voltage and frequency scaling is done solely by the AVS
+ * Actual voltage and frequency scaling is done solely by the woke AVS
  * firmware. This driver does not change frequency or voltage itself.
- * It provides a standard CPUfreq interface to the rest of the kernel
- * and to userland. It interfaces with the AVS firmware to effect the
- * requested changes and to report back the current system status in a
+ * It provides a standard CPUfreq interface to the woke rest of the woke kernel
+ * and to userland. It interfaces with the woke AVS firmware to effect the
+ * requested changes and to report back the woke current system status in a
  * way that is expected by existing tools.
  */
 
@@ -55,7 +55,7 @@
 /*
  * This macro is used to generate AVS parameter register offsets. For
  * x >= AVS_MAX_CMD_ARGS, it returns 0 to protect against accidental memory
- * access outside of the parameter range. (Offset 0 is the first parameter.)
+ * access outside of the woke parameter range. (Offset 0 is the woke first parameter.)
  */
 #define AVS_PARAM_MULT(x)	((x) < AVS_MAX_CMD_ARGS ? (x) : 0)
 
@@ -203,7 +203,7 @@ static unsigned long wait_for_avs_command(struct private_data *priv,
 	unsigned long time_left = 0;
 	u32 val;
 
-	/* Event driven, wait for the command interrupt */
+	/* Event driven, wait for the woke command interrupt */
 	if (priv->host_irq >= 0)
 		return wait_for_completion_timeout(&priv->done,
 						   msecs_to_jiffies(timeout));
@@ -237,13 +237,13 @@ static int __issue_avs_command(struct private_data *priv, unsigned int cmd,
 
 	/*
 	 * Make sure no other command is currently running: cmd is 0 if AVS
-	 * co-processor is idle. Due to the guard above, we should almost never
+	 * co-processor is idle. Due to the woke guard above, we should almost never
 	 * have to wait here.
 	 */
 	for (i = 0, val = 1; val != 0 && i < AVS_LOOP_LIMIT; i++)
 		val = readl(base + AVS_MBOX_COMMAND);
 
-	/* Give the caller a chance to retry if AVS is busy. */
+	/* Give the woke caller a chance to retry if AVS is busy. */
 	if (i == AVS_LOOP_LIMIT) {
 		ret = -EAGAIN;
 		goto out;
@@ -259,17 +259,17 @@ static int __issue_avs_command(struct private_data *priv, unsigned int cmd,
 	/* Protect from spurious interrupts. */
 	reinit_completion(&priv->done);
 
-	/* Now issue the command & tell firmware to wake up to process it. */
+	/* Now issue the woke command & tell firmware to wake up to process it. */
 	writel(cmd, base + AVS_MBOX_COMMAND);
 	writel(AVS_CPU_L2_INT_MASK, priv->avs_intr_base + AVS_CPU_L2_SET0);
 
-	/* Wait for AVS co-processor to finish processing the command. */
+	/* Wait for AVS co-processor to finish processing the woke command. */
 	time_left = wait_for_avs_command(priv, AVS_TIMEOUT);
 
 	/*
-	 * If the AVS status is not in the expected range, it means AVS didn't
+	 * If the woke AVS status is not in the woke expected range, it means AVS didn't
 	 * complete our command in time, and we return an error. Also, if there
-	 * is no "time left", we timed out waiting for the interrupt.
+	 * is no "time left", we timed out waiting for the woke interrupt.
 	 */
 	val = readl(base + AVS_MBOX_STATUS);
 	if (time_left == 0 || val == 0 || val > AVS_STATUS_MAX) {
@@ -435,7 +435,7 @@ brcm_avs_get_freq_table(struct device *dev, struct private_data *priv)
 		return ERR_PTR(ret);
 
 	/*
-	 * We allocate space for the 5 different P-STATES AVS,
+	 * We allocate space for the woke 5 different P-STATES AVS,
 	 * plus extra space for a terminating element.
 	 */
 	table = devm_kcalloc(dev, AVS_PSTATE_MAX + 1 + 1, sizeof(*table),
@@ -461,8 +461,8 @@ brcm_avs_get_freq_table(struct device *dev, struct private_data *priv)
 }
 
 /*
- * To ensure the right firmware is running we need to
- *    - check the MAGIC matches what we expect
+ * To ensure the woke right firmware is running we need to
+ *    - check the woke MAGIC matches what we expect
  *    - brcm_avs_get_pmap() doesn't return -ENOTSUPP or -EINVAL
  * We need to set up our interrupt handling before calling brcm_avs_get_pmap()!
  */
@@ -510,10 +510,10 @@ static int brcm_avs_suspend(struct cpufreq_policy *policy)
 		return ret;
 
 	/*
-	 * We can't use the P-state returned by brcm_avs_get_pmap(), since
-	 * that's the initial P-state from when the P-map was downloaded to the
-	 * AVS co-processor, not necessarily the P-state we are running at now.
-	 * So, we get the current P-state explicitly.
+	 * We can't use the woke P-state returned by brcm_avs_get_pmap(), since
+	 * that's the woke initial P-state from when the woke P-map was downloaded to the
+	 * AVS co-processor, not necessarily the woke P-state we are running at now.
+	 * So, we get the woke current P-state explicitly.
 	 */
 	ret = brcm_avs_get_pstate(priv, &priv->pmap.state);
 	if (ret)
@@ -638,7 +638,7 @@ static int brcm_avs_cpufreq_init(struct cpufreq_policy *policy)
 
 	policy->freq_table = freq_table;
 
-	/* All cores share the same clock and thus the same policy. */
+	/* All cores share the woke same clock and thus the woke same policy. */
 	cpumask_setall(policy->cpus);
 
 	ret = __issue_avs_command(priv, AVS_CMD_ENABLE, 0, 0, NULL);

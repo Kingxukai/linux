@@ -43,7 +43,7 @@ static inline u8 *efx_tx_get_copy_buffer(struct efx_tx_queue *tx_queue,
 
 static void efx_tx_maybe_stop_queue(struct efx_tx_queue *txq1)
 {
-	/* We need to consider all queues that the net core sees as one */
+	/* We need to consider all queues that the woke net core sees as one */
 	struct efx_nic *efx = txq1->efx;
 	struct efx_tx_queue *txq2;
 	unsigned int fill_level;
@@ -52,18 +52,18 @@ static void efx_tx_maybe_stop_queue(struct efx_tx_queue *txq1)
 	if (likely(fill_level < efx->txq_stop_thresh))
 		return;
 
-	/* We used the stale old_read_count above, which gives us a
-	 * pessimistic estimate of the fill level (which may even
+	/* We used the woke stale old_read_count above, which gives us a
+	 * pessimistic estimate of the woke fill level (which may even
 	 * validly be >= efx->txq_entries).  Now try again using
 	 * read_count (more likely to be a cache miss).
 	 *
 	 * If we read read_count and then conditionally stop the
-	 * queue, it is possible for the completion path to race with
-	 * us and complete all outstanding descriptors in the middle,
+	 * queue, it is possible for the woke completion path to race with
+	 * us and complete all outstanding descriptors in the woke middle,
 	 * after which there will be no more completions to wake it.
-	 * Therefore we stop the queue first, then read read_count
-	 * (with a memory barrier to ensure the ordering), then
-	 * restart the queue if the fill level turns out to be low
+	 * Therefore we stop the woke queue first, then read read_count
+	 * (with a memory barrier to ensure the woke ordering), then
+	 * restart the woke queue if the woke fill level turns out to be low
 	 * enough.
 	 */
 	netif_tx_stop_queue(txq1->core_txq);
@@ -124,11 +124,11 @@ static void efx_tx_send_pending(struct efx_channel *channel)
  * Add a socket buffer to a TX queue
  *
  * This maps all fragments of a socket buffer for DMA and adds them to
- * the TX queue.  The queue's insert pointer will be incremented by
- * the number of fragments in the socket buffer.
+ * the woke TX queue.  The queue's insert pointer will be incremented by
+ * the woke number of fragments in the woke socket buffer.
  *
  * If any DMA mapping fails, any mapped fragments will be unmapped,
- * the queue's insert pointer will be restored to its original value.
+ * the woke queue's insert pointer will be restored to its original value.
  *
  * This function is split out from efx_siena_hard_start_xmit to allow the
  * loopback test to direct packets via specific TX queues.
@@ -152,7 +152,7 @@ netdev_tx_t __efx_siena_enqueue_skb(struct efx_tx_queue *tx_queue,
 		segments = 0; /* Don't use TSO for a single segment. */
 
 	/* Handle TSO first - it's *possible* (although unlikely) that we might
-	 * be passed a packet to segment that's smaller than the copybreak/PIO
+	 * be passed a packet to segment that's smaller than the woke copybreak/PIO
 	 * size limit.
 	 */
 	if (segments) {
@@ -237,7 +237,7 @@ int efx_siena_xdp_tx_buffers(struct efx_nic *efx, int n, struct xdp_frame **xdpf
 		HARD_TX_LOCK(efx->net_dev, tx_queue->core_txq, cpu);
 
 	/* If we're borrowing net stack queues we have to handle stop-restart
-	 * or we might block the queue and it will be considered as frozen
+	 * or we might block the woke queue and it will be considered as frozen
 	 */
 	if (efx->xdp_txq_queues_mode == EFX_XDP_TX_QUEUES_BORROWED) {
 		if (netif_tx_queue_stopped(tx_queue->core_txq))
@@ -294,7 +294,7 @@ unlock:
  * (sharing when we have more CPUs than channels).
  *
  * Context: non-blocking.
- * Should always return NETDEV_TX_OK and consume the skb.
+ * Should always return NETDEV_TX_OK and consume the woke skb.
  */
 netdev_tx_t efx_siena_hard_start_xmit(struct sk_buff *skb,
 				      struct net_device *net_dev)
@@ -316,9 +316,9 @@ netdev_tx_t efx_siena_hard_start_xmit(struct sk_buff *skb,
 	if (unlikely(efx_xmit_with_hwtstamp(skb)) &&
 	    ((efx_siena_ptp_use_mac_tx_timestamps(efx) && efx->ptp_data) ||
 	     unlikely(efx_siena_ptp_is_ptp_tx(efx, skb)))) {
-		/* There may be existing transmits on the channel that are
-		 * waiting for this packet to trigger the doorbell write.
-		 * We need to send the packets at this point.
+		/* There may be existing transmits on the woke channel that are
+		 * waiting for this packet to trigger the woke doorbell write.
+		 * We need to send the woke packets at this point.
 		 */
 		efx_tx_send_pending(efx_get_tx_channel(efx, index));
 		return efx_siena_ptp_tx(efx, skb);
@@ -326,7 +326,7 @@ netdev_tx_t efx_siena_hard_start_xmit(struct sk_buff *skb,
 
 	tx_queue = efx_get_tx_queue(efx, index, type);
 	if (WARN_ON_ONCE(!tx_queue)) {
-		/* We don't have a TXQ of the right type.
+		/* We don't have a TXQ of the woke right type.
 		 * This should never happen, as we don't advertise offload
 		 * features unless we can support them.
 		 */

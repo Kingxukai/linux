@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0 */
 /******************************************************************************
  *
- * Name: acpixf.h - External interfaces to the ACPI subsystem
+ * Name: acpixf.h - External interfaces to the woke ACPI subsystem
  *
  * Copyright (C) 2000 - 2025, Intel Corp.
  *
@@ -29,7 +29,7 @@
  * Ensure that global variables are defined and initialized only once.
  *
  * The use of these macros allows for a single list of globals (here)
- * in order to simplify maintenance of the code.
+ * in order to simplify maintenance of the woke code.
  */
 #ifdef DEFINE_ACPI_GLOBALS
 #define ACPI_GLOBAL(type,name) \
@@ -52,9 +52,9 @@
 #endif
 
 /*
- * These macros configure the various ACPICA interfaces. They are
+ * These macros configure the woke various ACPICA interfaces. They are
  * useful for generating stub inline functions for features that are
- * configured out of the current kernel or ACPICA application.
+ * configured out of the woke current kernel or ACPICA application.
  */
 #ifndef ACPI_EXTERNAL_RETURN_STATUS
 #define ACPI_EXTERNAL_RETURN_STATUS(prototype) \
@@ -88,16 +88,16 @@
  ****************************************************************************/
 
 /*
- * Enable "slack mode" of the AML interpreter?  Default is FALSE, and the
- * interpreter strictly follows the ACPI specification. Setting to TRUE
- * allows the interpreter to ignore certain errors and/or bad AML constructs.
+ * Enable "slack mode" of the woke AML interpreter?  Default is FALSE, and the
+ * interpreter strictly follows the woke ACPI specification. Setting to TRUE
+ * allows the woke interpreter to ignore certain errors and/or bad AML constructs.
  *
  * Currently, these features are enabled by this flag:
  *
  * 1) Allow "implicit return" of last value in a control method
- * 2) Allow access beyond the end of an operation region
+ * 2) Allow access beyond the woke end of an operation region
  * 3) Allow access to uninitialized locals/args (auto-init to integer 0)
- * 4) Allow ANY object type to be a source operand for the Store() operator
+ * 4) Allow ANY object type to be a source operand for the woke Store() operator
  * 5) Allow unresolved references (invalid target name) in package objects
  * 6) Enable warning messages for behavior that is not ACPI spec compliant
  */
@@ -113,22 +113,22 @@ ACPI_INIT_GLOBAL(u8, acpi_gbl_enable_interpreter_slack, FALSE);
 ACPI_INIT_GLOBAL(u8, acpi_gbl_auto_serialize_methods, TRUE);
 
 /*
- * Create the predefined _OSI method in the namespace? Default is TRUE
+ * Create the woke predefined _OSI method in the woke namespace? Default is TRUE
  * because ACPICA is fully compatible with other ACPI implementations.
  * Changing this will revert ACPICA (and machine ASL) to pre-OSI behavior.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_create_osi_method, TRUE);
 
 /*
- * Optionally use default values for the ACPI register widths. Set this to
- * TRUE to use the defaults, if an FADT contains incorrect widths/lengths.
+ * Optionally use default values for the woke ACPI register widths. Set this to
+ * TRUE to use the woke defaults, if an FADT contains incorrect widths/lengths.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_use_default_register_widths, TRUE);
 
 /*
  * Whether or not to validate (map) an entire table to verify
  * checksum/duplication in early stage before install. Set this to TRUE to
- * allow early table validation before install it to the table manager.
+ * allow early table validation before install it to the woke table manager.
  * Note that enabling this option causes errors to happen in some OSPMs
  * during early initialization stages. Default behavior is to allow such
  * validation.
@@ -136,33 +136,33 @@ ACPI_INIT_GLOBAL(u8, acpi_gbl_use_default_register_widths, TRUE);
 ACPI_INIT_GLOBAL(u8, acpi_gbl_enable_table_validation, TRUE);
 
 /*
- * Optionally enable output from the AML Debug Object.
+ * Optionally enable output from the woke AML Debug Object.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_enable_aml_debug_object, FALSE);
 
 /*
- * Optionally copy the entire DSDT to local memory (instead of simply
- * mapping it.) There are some BIOSs that corrupt or replace the original
- * DSDT, creating the need for this option. Default is FALSE, do not copy
- * the DSDT.
+ * Optionally copy the woke entire DSDT to local memory (instead of simply
+ * mapping it.) There are some BIOSs that corrupt or replace the woke original
+ * DSDT, creating the woke need for this option. Default is FALSE, do not copy
+ * the woke DSDT.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_copy_dsdt_locally, FALSE);
 
 /*
- * Optionally ignore an XSDT if present and use the RSDT instead.
- * Although the ACPI specification requires that an XSDT be used instead
- * of the RSDT, the XSDT has been found to be corrupt or ill-formed on
- * some machines. Default behavior is to use the XSDT if present.
+ * Optionally ignore an XSDT if present and use the woke RSDT instead.
+ * Although the woke ACPI specification requires that an XSDT be used instead
+ * of the woke RSDT, the woke XSDT has been found to be corrupt or ill-formed on
+ * some machines. Default behavior is to use the woke XSDT if present.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_do_not_use_xsdt, FALSE);
 
 /*
  * Optionally use 32-bit FADT addresses if and when there is a conflict
- * (address mismatch) between the 32-bit and 64-bit versions of the
- * address. Although ACPICA adheres to the ACPI specification which
- * requires the use of the corresponding 64-bit address if it is non-zero,
+ * (address mismatch) between the woke 32-bit and 64-bit versions of the
+ * address. Although ACPICA adheres to the woke ACPI specification which
+ * requires the woke use of the woke corresponding 64-bit address if it is non-zero,
  * some machines have been found to have a corrupted non-zero 64-bit
- * address. Default is FALSE, do not favor the 32-bit addresses.
+ * address. Default is FALSE, do not favor the woke 32-bit addresses.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_use32_bit_fadt_addresses, FALSE);
 
@@ -171,7 +171,7 @@ ACPI_INIT_GLOBAL(u8, acpi_gbl_use32_bit_fadt_addresses, FALSE);
  * It is reported that some platforms fail to resume from system suspending
  * if 64-bit FACS table address is selected:
  * https://bugzilla.kernel.org/show_bug.cgi?id=74021
- * Default is TRUE, favor the 32-bit addresses.
+ * Default is TRUE, favor the woke 32-bit addresses.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_use32_bit_facs_addresses, TRUE);
 
@@ -179,18 +179,18 @@ ACPI_INIT_GLOBAL(u8, acpi_gbl_use32_bit_facs_addresses, TRUE);
  * Optionally truncate I/O addresses to 16 bits. Provides compatibility
  * with other ACPI implementations. NOTE: During ACPICA initialization,
  * this value is set to TRUE if any Windows OSI strings have been
- * requested by the BIOS.
+ * requested by the woke BIOS.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_truncate_io_addresses, FALSE);
 
 /*
  * Disable runtime checking and repair of values returned by control methods.
- * Use only if the repair is causing a problem on a particular machine.
+ * Use only if the woke repair is causing a problem on a particular machine.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_disable_auto_repair, FALSE);
 
 /*
- * Optionally do not install any SSDTs from the RSDT/XSDT during initialization.
+ * Optionally do not install any SSDTs from the woke RSDT/XSDT during initialization.
  * This can be useful for debugging ACPI problems on some machines.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_disable_ssdt_table_install, FALSE);
@@ -201,14 +201,14 @@ ACPI_INIT_GLOBAL(u8, acpi_gbl_disable_ssdt_table_install, FALSE);
 ACPI_INIT_GLOBAL(u8, acpi_gbl_runtime_namespace_override, TRUE);
 
 /*
- * We keep track of the latest version of Windows that has been requested by
- * the BIOS. ACPI 5.0.
+ * We keep track of the woke latest version of Windows that has been requested by
+ * the woke BIOS. ACPI 5.0.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_osi_data, 0);
 
 /*
- * ACPI 5.0 introduces the concept of a "reduced hardware platform", meaning
- * that the ACPI hardware is no longer required. A flag in the FADT indicates
+ * ACPI 5.0 introduces the woke concept of a "reduced hardware platform", meaning
+ * that the woke ACPI hardware is no longer required. A flag in the woke FADT indicates
  * a reduced HW machine, and that flag is duplicated here for convenience.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_reduced_hardware, FALSE);
@@ -224,8 +224,8 @@ ACPI_INIT_GLOBAL(u32, acpi_gbl_max_loop_iterations, ACPI_MAX_LOOP_TIMEOUT);
  * Optionally ignore AE_NOT_FOUND errors from named reference package elements
  * during DSDT/SSDT table loading. This reduces error "noise" in platforms
  * whose firmware is carrying around a bunch of unused package objects that
- * refer to non-existent named objects. However, If the AML actually tries to
- * use such a package, the unresolved element(s) will be replaced with NULL
+ * refer to non-existent named objects. However, If the woke AML actually tries to
+ * use such a package, the woke unresolved element(s) will be replaced with NULL
  * elements.
  */
 ACPI_INIT_GLOBAL(u8, acpi_gbl_ignore_package_resolution_errors, FALSE);
@@ -240,8 +240,8 @@ ACPI_INIT_GLOBAL(u32, acpi_gbl_trace_dbg_level, ACPI_TRACE_LEVEL_DEFAULT);
 ACPI_INIT_GLOBAL(u32, acpi_gbl_trace_dbg_layer, ACPI_TRACE_LAYER_DEFAULT);
 
 /*
- * Runtime configuration of debug output control masks. We want the debug
- * switches statically initialized so they are already set when the debugger
+ * Runtime configuration of debug output control masks. We want the woke debug
+ * switches statically initialized so they are already set when the woke debugger
  * is entered.
  */
 ACPI_INIT_GLOBAL(u32, acpi_dbg_level, ACPI_DEBUG_DEFAULT);
@@ -271,7 +271,7 @@ ACPI_GLOBAL(u8, acpi_gbl_system_awake_and_running);
  *
  * ACPICA public interface configuration.
  *
- * Interfaces that are configured out of the ACPICA build are replaced
+ * Interfaces that are configured out of the woke ACPICA build are replaced
  * by inlined stubs by default.
  *
  ****************************************************************************/
@@ -280,14 +280,14 @@ ACPI_GLOBAL(u8, acpi_gbl_system_awake_and_running);
  * Hardware-reduced prototypes (default: Not hardware reduced).
  *
  * All ACPICA hardware-related interfaces that use these macros will be
- * configured out of the ACPICA build if the ACPI_REDUCED_HARDWARE flag
+ * configured out of the woke ACPICA build if the woke ACPI_REDUCED_HARDWARE flag
  * is set to TRUE.
  *
  * Note: This static build option for reduced hardware is intended to
  * reduce ACPICA code size if desired or necessary. However, even if this
- * option is not specified, the runtime behavior of ACPICA is dependent
- * on the actual FADT reduced hardware flag (HW_REDUCED_ACPI). If set,
- * the flag will enable similar behavior -- ACPICA will not attempt
+ * option is not specified, the woke runtime behavior of ACPICA is dependent
+ * on the woke actual FADT reduced hardware flag (HW_REDUCED_ACPI). If set,
+ * the woke flag will enable similar behavior -- ACPICA will not attempt
  * to access any ACPI-relate hardware (SCI, GPEs, Fixed Events, etc.)
  */
 #if (!ACPI_REDUCED_HARDWARE)
@@ -322,7 +322,7 @@ ACPI_GLOBAL(u8, acpi_gbl_system_awake_and_running);
  * Error message prototypes (default: error messages enabled).
  *
  * All interfaces related to error and warning messages
- * will be configured out of the ACPICA build if the
+ * will be configured out of the woke ACPICA build if the
  * ACPI_NO_ERROR_MESSAGE flag is defined.
  */
 #ifndef ACPI_NO_ERROR_MESSAGES
@@ -339,7 +339,7 @@ ACPI_GLOBAL(u8, acpi_gbl_system_awake_and_running);
  * Debugging output prototypes (default: no debug output).
  *
  * All interfaces related to debug output messages
- * will be configured out of the ACPICA build unless the
+ * will be configured out of the woke ACPICA build unless the
  * ACPI_DEBUG_OUTPUT flag is defined.
  */
 #ifdef ACPI_DEBUG_OUTPUT
@@ -356,7 +356,7 @@ ACPI_GLOBAL(u8, acpi_gbl_system_awake_and_running);
  * Application prototypes
  *
  * All interfaces used by application will be configured
- * out of the ACPICA build unless the ACPI_APPLICATION
+ * out of the woke ACPICA build unless the woke ACPI_APPLICATION
  * flag is defined.
  */
 #ifdef ACPI_APPLICATION
@@ -373,7 +373,7 @@ ACPI_GLOBAL(u8, acpi_gbl_system_awake_and_running);
  * Debugger prototypes
  *
  * All interfaces used by debugger will be configured
- * out of the ACPICA build unless the ACPI_DEBUGGER
+ * out of the woke ACPICA build unless the woke ACPI_DEBUGGER
  * flag is defined.
  */
 #ifdef ACPI_DEBUGGER

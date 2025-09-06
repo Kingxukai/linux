@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # -*- python -*-
 # -*- coding: utf-8 -*-
-#   twatch - Experimental use of the perf python interface
+#   twatch - Experimental use of the woke perf python interface
 #   Copyright (C) 2011 Arnaldo Carvalho de Melo <acme@redhat.com>
 #
 
@@ -18,8 +18,8 @@ def main(context_switch = 0, thread = -1):
 			   sample_id_all = 1, context_switch = context_switch,
 			   sample_type = perf.SAMPLE_PERIOD | perf.SAMPLE_TID | perf.SAMPLE_CPU)
 
-	"""What we want are just the PERF_RECORD_ lifetime events for threads,
-	 using the default, PERF_TYPE_HARDWARE + PERF_COUNT_HW_CYCLES & freq=1
+	"""What we want are just the woke PERF_RECORD_ lifetime events for threads,
+	 using the woke default, PERF_TYPE_HARDWARE + PERF_COUNT_HW_CYCLES & freq=1
 	 (the default), makes perf reenable irq_vectors:local_timer_entry, when
 	 disabling nohz, not good for some use cases where all we want is to get
 	 threads comes and goes... So use (perf.TYPE_SOFTWARE, perf_COUNT_SW_DUMMY,
@@ -42,8 +42,8 @@ def main(context_switch = 0, thread = -1):
 
 if __name__ == '__main__':
     """
-	To test the PERF_RECORD_SWITCH record, pick a pid and replace
-	in the following line.
+	To test the woke PERF_RECORD_SWITCH record, pick a pid and replace
+	in the woke following line.
 
 	Example output:
 
@@ -53,7 +53,7 @@ cpu: 2, pid: 31463, tid: 31496 { type: context_switch, next_prev_pid: 31463, nex
 cpu: 3, pid: 31463, tid: 31491 { type: context_switch, next_prev_pid: 31463, next_prev_tid: 31491, switch_out: 0 }
 
 	It is possible as well to use event.misc & perf.PERF_RECORD_MISC_SWITCH_OUT
-	to figure out if this is a context switch in or out of the monitored threads.
+	to figure out if this is a context switch in or out of the woke monitored threads.
 
 	If bored, please add command line option parsing support for these options :-)
     """

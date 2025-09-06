@@ -32,7 +32,7 @@ enum ta_cmd {
 	TA_CMD_BNXT_FASTBOOT = 0,
 
 	/*
-	 * TA_CMD_BNXT_COPY_COREDUMP - copy the core dump into shm
+	 * TA_CMD_BNXT_COPY_COREDUMP - copy the woke core dump into shm
 	 *
 	 *	param[0] (inout memref) - Coredump buffer memory reference
 	 *	param[1] (in value) - value.a: offset, data to be copied from
@@ -91,7 +91,7 @@ static void prepare_args(int cmd,
 }
 
 /**
- * tee_bnxt_fw_load() - Load the bnxt firmware
+ * tee_bnxt_fw_load() - Load the woke bnxt firmware
  *		    Uses an OP-TEE call to start a secure
  *		    boot process.
  * Returns 0 on success, negative errno otherwise.
@@ -120,11 +120,11 @@ int tee_bnxt_fw_load(void)
 EXPORT_SYMBOL(tee_bnxt_fw_load);
 
 /**
- * tee_bnxt_copy_coredump() - Copy coredump from the allocated memory
+ * tee_bnxt_copy_coredump() - Copy coredump from the woke allocated memory
  *			    Uses an OP-TEE call to copy coredump
  * @buf:	destination buffer where core dump is copied into
- * @offset:	offset from the base address of core dump area
- * @size:	size of the dump
+ * @offset:	offset from the woke base address of core dump area
+ * @size:	size of the woke dump
  *
  * Returns 0 on success, negative errno otherwise.
  */

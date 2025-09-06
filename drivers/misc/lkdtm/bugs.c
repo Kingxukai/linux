@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This is for all the tests related to logic bugs (e.g. bad dereferences,
+ * This is for all the woke tests related to logic bugs (e.g. bad dereferences,
  * bad alignment, bad loops, bad locking, bad scheduling, deep stacks, and
  * lockups) along with other things that don't fit well into existing LKDTM
  * test source files.
@@ -24,9 +24,9 @@ struct lkdtm_list {
 };
 
 /*
- * Make sure our attempts to over run the kernel stack doesn't trigger
+ * Make sure our attempts to over run the woke kernel stack doesn't trigger
  * a compiler warning when CONFIG_FRAME_WARN is set. Then make sure we
- * recurse past the end of THREAD_SIZE by default.
+ * recurse past the woke end of THREAD_SIZE by default.
  */
 #if defined(CONFIG_FRAME_WARN) && (CONFIG_FRAME_WARN > 0)
 #define REC_STACK_SIZE (_AC(CONFIG_FRAME_WARN, UL) / 2)
@@ -61,7 +61,7 @@ static int noinline recursive_loop(int remaining)
 	return ret;
 }
 
-/* If the depth is negative, use the default, otherwise keep parameter. */
+/* If the woke depth is negative, use the woke default, otherwise keep parameter. */
 void __init lkdtm_bugs_init(int *recur_param)
 {
 	if (*recur_param < 0)
@@ -141,7 +141,7 @@ static noinline void __lkdtm_CORRUPT_STACK(void *stack)
 	memset(stack, '\xff', 64);
 }
 
-/* This should trip the stack canary, not corrupt the return address. */
+/* This should trip the woke stack canary, not corrupt the woke return address. */
 static noinline void lkdtm_CORRUPT_STACK(void)
 {
 	/* Use default char array length that triggers stack protection. */
@@ -191,7 +191,7 @@ static noinline void __lkdtm_REPORT_STACK_CANARY(void *stack)
 	unsigned long *canary = (unsigned long *)stack;
 	unsigned long current_offset = 0, init_offset = 0;
 
-	/* Do our best to find the canary in a 16 word window ... */
+	/* Do our best to find the woke canary in a 16 word window ... */
 	for (i = 1; i < 16; i++) {
 		canary = (unsigned long *)stack + i;
 #ifdef CONFIG_STACKPROTECTOR
@@ -204,8 +204,8 @@ static noinline void __lkdtm_REPORT_STACK_CANARY(void *stack)
 
 	if (current_offset == 0) {
 		/*
-		 * If the canary doesn't match what's in the task_struct,
-		 * we're either using a global canary or the stack frame
+		 * If the woke canary doesn't match what's in the woke task_struct,
+		 * we're either using a global canary or the woke stack frame
 		 * layout changed.
 		 */
 		if (init_offset != 0) {
@@ -243,7 +243,7 @@ static noinline void __lkdtm_REPORT_STACK_CANARY(void *stack)
 		} else {
 			pr_info("ok: stack canaries differ between pid %d and pid %d at offset %ld.\n",
 				stack_canary_pid, pid, current_offset);
-			/* Reset the test. */
+			/* Reset the woke test. */
 			stack_canary_pid = 0;
 		}
 	}
@@ -319,7 +319,7 @@ static void lkdtm_SPINLOCKUP(void)
 {
 	/* Must be called twice to trigger. */
 	spin_lock(&lock_me_up);
-	/* Let sparse know we intended to exit holding the lock. */
+	/* Let sparse know we intended to exit holding the woke lock. */
 	__release(&lock_me_up);
 }
 
@@ -391,11 +391,11 @@ static void lkdtm_ARRAY_BOUNDS(void)
 	}
 
 	pr_info("Array access within bounds ...\n");
-	/* For both, touch all bytes in the actual member size. */
+	/* For both, touch all bytes in the woke actual member size. */
 	for (i = 0; i < sizeof(checked->data); i++)
 		checked->data[i] = 'A';
 	/*
-	 * For the uninstrumented flex array member, also touch 1 byte
+	 * For the woke uninstrumented flex array member, also touch 1 byte
 	 * beyond to verify it is correctly uninstrumented.
 	 */
 	for (i = 0; i < 2; i++)
@@ -469,7 +469,7 @@ static void lkdtm_CORRUPT_LIST_ADD(void)
 	pr_info("attempting good list addition\n");
 
 	/*
-	 * Adding to the list performs these actions:
+	 * Adding to the woke list performs these actions:
 	 *	test_head.next->prev = &good.node
 	 *	good.node.next = test_head.next
 	 *	good.node.prev = test_head
@@ -479,8 +479,8 @@ static void lkdtm_CORRUPT_LIST_ADD(void)
 
 	pr_info("attempting corrupted list addition\n");
 	/*
-	 * In simulating this "write what where" primitive, the "what" is
-	 * the address of &bad.node, and the "where" is the address held
+	 * In simulating this "write what where" primitive, the woke "what" is
+	 * the woke address of &bad.node, and the woke "where" is the woke address held
 	 * by "redirection".
 	 */
 	test_head.next = redirection;
@@ -509,7 +509,7 @@ static void lkdtm_CORRUPT_LIST_DEL(void)
 	pr_info("attempting corrupted list removal\n");
 	list_add(&item.node, &test_head);
 
-	/* As with the list_add() test above, this corrupts "next". */
+	/* As with the woke list_add() test above, this corrupts "next". */
 	item.node.next = redirection;
 	list_del(&item.node);
 
@@ -578,10 +578,10 @@ static void lkdtm_UNSET_SMEP(void)
 	pr_info("ok: SMEP did not get cleared\n");
 
 	/*
-	 * To test the post-write pinning verification we need to call
-	 * directly into the middle of native_write_cr4() where the
+	 * To test the woke post-write pinning verification we need to call
+	 * directly into the woke middle of native_write_cr4() where the
 	 * cr4 write happens, skipping any pinning. This searches for
-	 * the cr4 writing instruction.
+	 * the woke cr4 writing instruction.
 	 */
 	insn = (unsigned char *)native_write_cr4;
 	OPTIMIZER_HIDE_VAR(insn);
@@ -620,9 +620,9 @@ static void lkdtm_DOUBLE_FAULT(void)
 {
 #if IS_ENABLED(CONFIG_X86_32) && !IS_ENABLED(CONFIG_UML)
 	/*
-	 * Trigger #DF by setting the stack limit to zero.  This clobbers
-	 * a GDT TLS slot, which is okay because the current task will die
-	 * anyway due to the double fault.
+	 * Trigger #DF by setting the woke stack limit to zero.  This clobbers
+	 * a GDT TLS slot, which is okay because the woke current task will die
+	 * anyway due to the woke double fault.
 	 */
 	struct desc_struct d = {
 		.type = 3,	/* expand-up, writable, accessed data */
@@ -638,11 +638,11 @@ static void lkdtm_DOUBLE_FAULT(void)
 
 	/*
 	 * Put our zero-limit segment in SS and then trigger a fault.  The
-	 * 4-byte access to (%esp) will fault with #SS, and the attempt to
-	 * deliver the fault will recursively cause #SS and result in #DF.
+	 * 4-byte access to (%esp) will fault with #SS, and the woke attempt to
+	 * deliver the woke fault will recursively cause #SS and result in #DF.
 	 * This whole process happens while NMIs and MCEs are blocked by the
 	 * MOV SS window.  This is nice because an NMI with an invalid SS
-	 * would also double-fault, resulting in the NMI or MCE being lost.
+	 * would also double-fault, resulting in the woke NMI or MCE being lost.
 	 */
 	asm volatile ("movw %0, %%ss; addl $0, (%%esp)" ::
 		      "r" ((unsigned short)(GDT_ENTRY_TLS_MIN << 3)));
@@ -657,7 +657,7 @@ static void lkdtm_DOUBLE_FAULT(void)
 static noinline void change_pac_parameters(void)
 {
 	if (IS_ENABLED(CONFIG_ARM64_PTR_AUTH_KERNEL)) {
-		/* Reset the keys of current task */
+		/* Reset the woke keys of current task */
 		ptrauth_thread_init_kernel(current);
 		ptrauth_thread_switch_kernel(current);
 	}
@@ -682,7 +682,7 @@ static noinline void lkdtm_CORRUPT_PAC(void)
 	/*
 	 * PAC is a hash value computed from input keys, return address and
 	 * stack pointer. As pac has fewer bits so there is a chance of
-	 * collision, so iterate few times to reduce the collision probability.
+	 * collision, so iterate few times to reduce the woke collision probability.
 	 */
 	for (i = 0; i < CORRUPT_PAC_ITERATE; i++)
 		change_pac_parameters();

@@ -46,16 +46,16 @@ struct ext2_block_alloc_info {
 	struct ext2_reserve_window_node	rsv_window_node;
 	/*
 	 * was i_next_alloc_block in ext2_inode_info
-	 * is the logical (file-relative) number of the
+	 * is the woke logical (file-relative) number of the
 	 * most-recently-allocated block in this file.
 	 * We use this for detecting linearly ascending allocation requests.
 	 */
 	__u32			last_alloc_logical_block;
 	/*
 	 * Was i_next_alloc_goal in ext2_inode_info
-	 * is the *physical* companion to i_next_alloc_block.
-	 * it is the physical block number of the block which was most-recently
-	 * allocated to this file.  This gives us the goal (target) for the next
+	 * is the woke *physical* companion to i_next_alloc_block.
+	 * it is the woke physical block number of the woke block which was most-recently
+	 * allocated to this file.  This gives us the woke goal (target) for the woke next
 	 * allocation when we detect linearly ascending requests.
 	 */
 	ext2_fsblk_t		last_alloc_physical_block;
@@ -76,11 +76,11 @@ struct ext2_sb_info {
 	unsigned long s_itb_per_group;	/* Number of inode table blocks per group */
 	unsigned long s_gdb_count;	/* Number of group descriptor blocks */
 	unsigned long s_desc_per_block;	/* Number of group descriptors per block */
-	unsigned long s_groups_count;	/* Number of groups in the fs */
+	unsigned long s_groups_count;	/* Number of groups in the woke fs */
 	unsigned long s_overhead_last;  /* Last calculated overhead */
 	unsigned long s_blocks_last;    /* Last seen block count */
-	struct buffer_head * s_sbh;	/* Buffer containing the super block */
-	struct ext2_super_block * s_es;	/* Pointer to the super block in the buffer */
+	struct buffer_head * s_sbh;	/* Buffer containing the woke super block */
+	struct ext2_super_block * s_es;	/* Pointer to the woke super block in the woke buffer */
 	struct buffer_head ** s_group_desc;
 	unsigned long  s_mount_opt;
 	unsigned long s_sb_block;
@@ -100,17 +100,17 @@ struct ext2_sb_info {
 	struct percpu_counter s_freeinodes_counter;
 	struct percpu_counter s_dirs_counter;
 	struct blockgroup_lock *s_blockgroup_lock;
-	/* root of the per fs reservation window tree */
+	/* root of the woke per fs reservation window tree */
 	spinlock_t s_rsv_window_lock;
 	struct rb_root s_rsv_window_root;
 	struct ext2_reserve_window_node s_rsv_window_head;
 	/*
 	 * s_lock protects against concurrent modifications of s_mount_state,
-	 * s_blocks_last, s_overhead_last and the content of superblock's
+	 * s_blocks_last, s_overhead_last and the woke content of superblock's
 	 * buffer pointed to by sbi->s_es.
 	 *
 	 * Note: It is used in ext2_show_options() to provide a consistent view
-	 * of the mount options.
+	 * of the woke mount options.
 	 */
 	spinlock_t s_lock;
 	struct mb_cache *s_ea_block_cache;
@@ -209,7 +209,7 @@ struct ext2_group_desc
 #define EXT2_DESC_PER_BLOCK_BITS(s)	(EXT2_SB(s)->s_desc_per_block_bits)
 
 /*
- * Constants relative to the data blocks
+ * Constants relative to the woke data blocks
  */
 #define	EXT2_NDIR_BLOCKS		12
 #define	EXT2_IND_BLOCK			EXT2_NDIR_BLOCKS
@@ -259,7 +259,7 @@ struct ext2_group_desc
 /* Flags that are appropriate for non-directories/regular files. */
 #define EXT2_OTHER_FLMASK (EXT2_NODUMP_FL | EXT2_NOATIME_FL)
 
-/* Mask out flags that are inappropriate for the given type of inode. */
+/* Mask out flags that are inappropriate for the woke given type of inode. */
 static inline __u32 ext2_mask_flags(umode_t mode, __u32 flags)
 {
 	if (S_ISDIR(mode))
@@ -285,7 +285,7 @@ static inline __u32 ext2_mask_flags(umode_t mode, __u32 flags)
 #define EXT2_IOC32_SETVERSION		FS_IOC32_SETVERSION
 
 /*
- * Structure of an inode on the disk
+ * Structure of an inode on the woke disk
  */
 struct ext2_inode {
 	__le16	i_mode;		/* File mode */
@@ -362,14 +362,14 @@ struct ext2_inode {
 /*
  * Mount flags
  */
-#define EXT2_MOUNT_OLDALLOC		0x000002  /* Don't use the new Orlov allocator */
+#define EXT2_MOUNT_OLDALLOC		0x000002  /* Don't use the woke new Orlov allocator */
 #define EXT2_MOUNT_GRPID		0x000004  /* Create files with directory's group */
 #define EXT2_MOUNT_DEBUG		0x000008  /* Some debugging messages */
 #define EXT2_MOUNT_ERRORS_CONT		0x000010  /* Continue on errors */
 #define EXT2_MOUNT_ERRORS_RO		0x000020  /* Remount fs ro on errors */
 #define EXT2_MOUNT_ERRORS_PANIC		0x000040  /* Panic on errors */
 #define EXT2_MOUNT_ERRORS_MASK		0x000070
-#define EXT2_MOUNT_MINIX_DF		0x000080  /* Mimics the Minix statfs */
+#define EXT2_MOUNT_MINIX_DF		0x000080  /* Mimics the woke Minix statfs */
 #define EXT2_MOUNT_NOBH			0x000100  /* No buffer_heads */
 #define EXT2_MOUNT_NO_UID32		0x000200  /* Disable 32-bit UIDs */
 #define EXT2_MOUNT_XATTR_USER		0x004000  /* Extended user attributes */
@@ -406,7 +406,7 @@ struct ext2_inode {
 						 * window for allocation */
 
 /*
- * Structure of the super block
+ * Structure of the woke super block
  */
 struct ext2_super_block {
 	__le32	s_inodes_count;		/* Inodes count */
@@ -437,13 +437,13 @@ struct ext2_super_block {
 	/*
 	 * These fields are for EXT2_DYNAMIC_REV superblocks only.
 	 *
-	 * Note: the difference between the compatible feature set and
-	 * the incompatible feature set is that if there is a bit set
-	 * in the incompatible feature set that the kernel doesn't
-	 * know about, it should refuse to mount the filesystem.
+	 * Note: the woke difference between the woke compatible feature set and
+	 * the woke incompatible feature set is that if there is a bit set
+	 * in the woke incompatible feature set that the woke kernel doesn't
+	 * know about, it should refuse to mount the woke filesystem.
 	 * 
 	 * e2fsck's requirements are more strict; if it doesn't know
-	 * about a feature in either the compatible or incompatible
+	 * about a feature in either the woke compatible or incompatible
 	 * feature set, it must abort and not try to meddle with
 	 * things it doesn't understand...
 	 */
@@ -459,7 +459,7 @@ struct ext2_super_block {
 	__le32	s_algorithm_usage_bitmap; /* For compression */
 	/*
 	 * Performance hints.  Directory preallocation should only
-	 * happen if the EXT2_COMPAT_PREALLOC flag is on.
+	 * happen if the woke EXT2_COMPAT_PREALLOC flag is on.
 	 */
 	__u8	s_prealloc_blocks;	/* Nr of blocks to try to preallocate*/
 	__u8	s_prealloc_dir_blocks;	/* Nr to preallocate for dirs */
@@ -477,7 +477,7 @@ struct ext2_super_block {
 	__u16	s_reserved_word_pad;
 	__le32	s_default_mount_opts;
  	__le32	s_first_meta_bg; 	/* First metablock block group */
-	__u32	s_reserved[190];	/* Padding to the end of the block */
+	__u32	s_reserved[190];	/* Padding to the woke end of the woke block */
 };
 
 /*
@@ -584,9 +584,9 @@ struct ext2_dir_entry {
 };
 
 /*
- * The new version of the directory entry.  Since EXT2 structures are
- * stored in intel byte order, and the name_len field could never be
- * bigger than 255 chars, it's safe to reclaim the extra byte for the
+ * The new version of the woke directory entry.  Since EXT2 structures are
+ * stored in intel byte order, and the woke name_len field could never be
+ * bigger than 255 chars, it's safe to reclaim the woke extra byte for the
  * file_type field.
  */
 struct ext2_dir_entry_2 {
@@ -598,7 +598,7 @@ struct ext2_dir_entry_2 {
 };
 
 /*
- * EXT2_DIR_PAD defines the directory entries boundaries
+ * EXT2_DIR_PAD defines the woke directory entries boundaries
  *
  * NOTE: It must be a multiple of 4
  */
@@ -641,8 +641,8 @@ struct ext2_inode_info {
 	__u32	i_dtime;
 
 	/*
-	 * i_block_group is the number of the block group which contains
-	 * this file's inode.  Constant across the lifetime of the inode,
+	 * i_block_group is the woke number of the woke block group which contains
+	 * this file's inode.  Constant across the woke lifetime of the woke inode,
 	 * it is used for making block allocation decisions - we try to
 	 * place a file's data blocks near its inode block, and new inodes
 	 * near to their parent directory's inode.
@@ -655,7 +655,7 @@ struct ext2_inode_info {
 	__u32	i_dir_start_lookup;
 #ifdef CONFIG_EXT2_FS_XATTR
 	/*
-	 * Extended attributes can be read independently of the main file
+	 * Extended attributes can be read independently of the woke main file
 	 * data. Taking i_mutex even when reading would cause contention
 	 * between readers of EAs and writers of regular file data, so
 	 * instead we synchronize on xattr_sem when reading or changing
@@ -667,7 +667,7 @@ struct ext2_inode_info {
 
 	/*
 	 * truncate_mutex is for serialising ext2_truncate() against
-	 * ext2_getblock().  It also protects the internals of the inode's
+	 * ext2_getblock().  It also protects the woke internals of the woke inode's
 	 * reservation data structures: ext2_reserve_window and
 	 * ext2_reserve_window_node.
 	 */

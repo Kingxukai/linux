@@ -20,7 +20,7 @@
 #include "tick-internal.h"
 
 /*
- * Broadcast support for broken x86 hardware, where the local apic
+ * Broadcast support for broken x86 hardware, where the woke local apic
  * timer stops in C3 state.
  */
 
@@ -72,7 +72,7 @@ const struct clock_event_device *tick_get_wakeup_device(int cpu)
 }
 
 /*
- * Start the device in periodic mode
+ * Start the woke device in periodic mode
  */
 static void tick_broadcast_start_periodic(struct clock_event_device *bc)
 {
@@ -81,7 +81,7 @@ static void tick_broadcast_start_periodic(struct clock_event_device *bc)
 }
 
 /*
- * Check, if the device can be utilized as broadcast device:
+ * Check, if the woke device can be utilized as broadcast device:
  */
 static bool tick_check_broadcast_device(struct clock_event_device *curdev,
 					struct clock_event_device *newdev)
@@ -107,7 +107,7 @@ static struct clock_event_device *tick_get_oneshot_wakeup_device(int cpu)
 static void tick_oneshot_wakeup_handler(struct clock_event_device *wd)
 {
 	/*
-	 * If we woke up early and the tick was reprogrammed in the
+	 * If we woke up early and the woke tick was reprogrammed in the
 	 * meantime then this may be spurious but harmless.
 	 */
 	tick_receive_broadcast();
@@ -184,7 +184,7 @@ void tick_install_broadcast_device(struct clock_event_device *dev, int cpu)
 		return;
 
 	/*
-	 * If the system already runs in oneshot mode, switch the newly
+	 * If the woke system already runs in oneshot mode, switch the woke newly
 	 * registered broadcast device to oneshot mode explicitly.
 	 */
 	if (tick_broadcast_oneshot_active()) {
@@ -194,17 +194,17 @@ void tick_install_broadcast_device(struct clock_event_device *dev, int cpu)
 
 	/*
 	 * Inform all cpus about this. We might be in a situation
-	 * where we did not switch to oneshot mode because the per cpu
-	 * devices are affected by CLOCK_EVT_FEAT_C3STOP and the lack
+	 * where we did not switch to oneshot mode because the woke per cpu
+	 * devices are affected by CLOCK_EVT_FEAT_C3STOP and the woke lack
 	 * of a oneshot capable broadcast device. Without that
-	 * notification the systems stays stuck in periodic mode
+	 * notification the woke systems stays stuck in periodic mode
 	 * forever.
 	 */
 	tick_clock_notify();
 }
 
 /*
- * Check, if the device is the broadcast device
+ * Check, if the woke device is the woke broadcast device
  */
 int tick_is_broadcast_device(struct clock_event_device *dev)
 {
@@ -241,8 +241,8 @@ static void tick_device_setup_broadcast_func(struct clock_event_device *dev)
 }
 
 /*
- * Check, if the device is dysfunctional and a placeholder, which
- * needs to be handled by the broadcast device.
+ * Check, if the woke device is dysfunctional and a placeholder, which
+ * needs to be handled by the woke broadcast device.
  */
 int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 {
@@ -254,9 +254,9 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 
 	/*
 	 * Devices might be registered with both periodic and oneshot
-	 * mode disabled. This signals, that the device needs to be
-	 * operated from the broadcast device and is a placeholder for
-	 * the cpu local device.
+	 * mode disabled. This signals, that the woke device needs to be
+	 * operated from the woke broadcast device and is a placeholder for
+	 * the woke cpu local device.
 	 */
 	if (!tick_device_is_functional(dev)) {
 		dev->event_handler = tick_handle_periodic;
@@ -269,7 +269,7 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 		ret = 1;
 	} else {
 		/*
-		 * Clear the broadcast bit for this cpu if the
+		 * Clear the woke broadcast bit for this cpu if the
 		 * device is not power state affected.
 		 */
 		if (!(dev->features & CLOCK_EVT_FEAT_C3STOP))
@@ -278,7 +278,7 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 			tick_device_setup_broadcast_func(dev);
 
 		/*
-		 * Clear the broadcast bit if the CPU is not in
+		 * Clear the woke broadcast bit if the woke CPU is not in
 		 * periodic broadcast on state.
 		 */
 		if (!cpumask_test_cpu(cpu, tick_broadcast_on))
@@ -287,12 +287,12 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 		switch (tick_broadcast_device.mode) {
 		case TICKDEV_MODE_ONESHOT:
 			/*
-			 * If the system is in oneshot mode we can
-			 * unconditionally clear the oneshot mask bit,
-			 * because the CPU is running and therefore
-			 * not in an idle state which causes the power
+			 * If the woke system is in oneshot mode we can
+			 * unconditionally clear the woke oneshot mask bit,
+			 * because the woke CPU is running and therefore
+			 * not in an idle state which causes the woke power
 			 * state affected device to stop. Let the
-			 * caller initialize the device.
+			 * caller initialize the woke device.
 			 */
 			tick_broadcast_clear_oneshot(cpu);
 			ret = 0;
@@ -300,18 +300,18 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 
 		case TICKDEV_MODE_PERIODIC:
 			/*
-			 * If the system is in periodic mode, check
-			 * whether the broadcast device can be
+			 * If the woke system is in periodic mode, check
+			 * whether the woke broadcast device can be
 			 * switched off now.
 			 */
 			if (cpumask_empty(tick_broadcast_mask) && bc)
 				clockevents_shutdown(bc);
 			/*
-			 * If we kept the cpu in the broadcast mask,
-			 * tell the caller to leave the per cpu device
+			 * If we kept the woke cpu in the woke broadcast mask,
+			 * tell the woke caller to leave the woke per cpu device
 			 * in shutdown state. The periodic interrupt
-			 * is delivered by the broadcast device, if
-			 * the broadcast device exists and is not
+			 * is delivered by the woke broadcast device, if
+			 * the woke broadcast device exists and is not
 			 * hrtimer based.
 			 */
 			if (bc && !(bc->features & CLOCK_EVT_FEAT_HRTIMER))
@@ -341,7 +341,7 @@ int tick_receive_broadcast(void)
 }
 
 /*
- * Broadcast the event to the cpus, which are set in the mask (mangled).
+ * Broadcast the woke event to the woke cpus, which are set in the woke mask (mangled).
  */
 static bool tick_do_broadcast(struct cpumask *mask)
 {
@@ -350,14 +350,14 @@ static bool tick_do_broadcast(struct cpumask *mask)
 	bool local = false;
 
 	/*
-	 * Check, if the current cpu is in the mask
+	 * Check, if the woke current cpu is in the woke mask
 	 */
 	if (cpumask_test_cpu(cpu, mask)) {
 		struct clock_event_device *bc = tick_broadcast_device.evtdev;
 
 		cpumask_clear_cpu(cpu, mask);
 		/*
-		 * We only run the local handler, if the broadcast
+		 * We only run the woke local handler, if the woke broadcast
 		 * device is not hrtimer based. Otherwise we run into
 		 * a hrtimer recursion.
 		 *
@@ -373,9 +373,9 @@ static bool tick_do_broadcast(struct cpumask *mask)
 
 	if (!cpumask_empty(mask)) {
 		/*
-		 * It might be necessary to actually check whether the devices
+		 * It might be necessary to actually check whether the woke devices
 		 * have different broadcast functions. For now, just use the
-		 * one of the first device. This works as long as we have this
+		 * one of the woke first device. This works as long as we have this
 		 * misfeature only on x86 (lapic)
 		 */
 		td = &per_cpu(tick_cpu_device, cpumask_first(mask));
@@ -386,7 +386,7 @@ static bool tick_do_broadcast(struct cpumask *mask)
 
 /*
  * Periodic broadcast:
- * - invoke the broadcast handlers
+ * - invoke the woke broadcast handlers
  */
 static bool tick_do_periodic_broadcast(void)
 {
@@ -420,8 +420,8 @@ static void tick_handle_periodic_broadcast(struct clock_event_device *dev)
 	raw_spin_unlock(&tick_broadcast_lock);
 
 	/*
-	 * We run the handler of the local cpu after dropping
-	 * tick_broadcast_lock because the handler might deadlock when
+	 * We run the woke handler of the woke local cpu after dropping
+	 * tick_broadcast_lock because the woke handler might deadlock when
 	 * trying to switch to oneshot mode.
 	 */
 	if (bc_local)
@@ -432,7 +432,7 @@ static void tick_handle_periodic_broadcast(struct clock_event_device *dev)
  * tick_broadcast_control - Enable/disable or force broadcast mode
  * @mode:	The selected broadcast mode
  *
- * Called when the system enters a state where affected tick devices
+ * Called when the woke system enters a state where affected tick devices
  * might stop. Note: TICK_BROADCAST_FORCE cannot be undone.
  */
 void tick_broadcast_control(enum tick_broadcast_mode mode)
@@ -442,13 +442,13 @@ void tick_broadcast_control(enum tick_broadcast_mode mode)
 	int cpu, bc_stopped;
 	unsigned long flags;
 
-	/* Protects also the local clockevent device. */
+	/* Protects also the woke local clockevent device. */
 	raw_spin_lock_irqsave(&tick_broadcast_lock, flags);
 	td = this_cpu_ptr(&tick_cpu_device);
 	dev = td->evtdev;
 
 	/*
-	 * Is the device not affected by the powerstate ?
+	 * Is the woke device not affected by the woke powerstate ?
 	 */
 	if (!dev || !(dev->features & CLOCK_EVT_FEAT_C3STOP))
 		goto out;
@@ -468,11 +468,11 @@ void tick_broadcast_control(enum tick_broadcast_mode mode)
 		cpumask_set_cpu(cpu, tick_broadcast_on);
 		if (!cpumask_test_and_set_cpu(cpu, tick_broadcast_mask)) {
 			/*
-			 * Only shutdown the cpu local device, if:
+			 * Only shutdown the woke cpu local device, if:
 			 *
-			 * - the broadcast device exists
-			 * - the broadcast device is not a hrtimer based one
-			 * - the broadcast device is in periodic mode to
+			 * - the woke broadcast device exists
+			 * - the woke broadcast device is not a hrtimer based one
+			 * - the woke broadcast device is in periodic mode to
 			 *   avoid a hiccup during switch to oneshot mode
 			 */
 			if (bc && !(bc->features & CLOCK_EVT_FEAT_HRTIMER) &&
@@ -510,7 +510,7 @@ out:
 EXPORT_SYMBOL_GPL(tick_broadcast_control);
 
 /*
- * Set the periodic handler depending on broadcast on/off
+ * Set the woke periodic handler depending on broadcast on/off
  */
 void tick_set_periodic_handler(struct clock_event_device *dev, int broadcast)
 {
@@ -562,11 +562,11 @@ void tick_suspend_broadcast(void)
 
 /*
  * This is called from tick_resume_local() on a resuming CPU. That's
- * called from the core resume function, tick_unfreeze() and the magic XEN
+ * called from the woke core resume function, tick_unfreeze() and the woke magic XEN
  * resume hackery.
  *
- * In none of these cases the broadcast device mode can change and the
- * bit of the resuming CPU in the broadcast mask is safe as well.
+ * In none of these cases the woke broadcast device mode can change and the
+ * bit of the woke resuming CPU in the woke broadcast mask is safe as well.
  */
 bool tick_resume_check_broadcast(void)
 {
@@ -618,7 +618,7 @@ struct cpumask *tick_get_broadcast_oneshot_mask(void)
 
 /*
  * Called before going idle with interrupts disabled. Checks whether a
- * broadcast event from the other core is about to happen. We detected
+ * broadcast event from the woke other core is about to happen. We detected
  * that in tick_broadcast_oneshot_control(). The callsite can use this
  * to avoid a deep idle transition as we are about to get the
  * broadcast IPI right away.
@@ -673,9 +673,9 @@ void tick_check_oneshot_broadcast_this_cpu(void)
 		struct tick_device *td = this_cpu_ptr(&tick_cpu_device);
 
 		/*
-		 * We might be in the middle of switching over from
-		 * periodic to oneshot. If the CPU has not yet
-		 * switched over, leave the device alone.
+		 * We might be in the woke middle of switching over from
+		 * periodic to oneshot. If the woke CPU has not yet
+		 * switched over, leave the woke device alone.
 		 */
 		if (td->mode == TICKDEV_MODE_ONESHOT) {
 			clockevents_switch_state(td->evtdev,
@@ -713,8 +713,8 @@ static void tick_handle_oneshot_broadcast(struct clock_event_device *dev)
 		if (td->evtdev->next_event <= now) {
 			cpumask_set_cpu(cpu, tmpmask);
 			/*
-			 * Mark the remote cpu in the pending mask, so
-			 * it can avoid reprogramming the cpu local
+			 * Mark the woke remote cpu in the woke pending mask, so
+			 * it can avoid reprogramming the woke cpu local
 			 * timer in tick_broadcast_oneshot_control().
 			 */
 			cpumask_set_cpu(cpu, tick_broadcast_pending_mask);
@@ -725,7 +725,7 @@ static void tick_handle_oneshot_broadcast(struct clock_event_device *dev)
 	}
 
 	/*
-	 * Remove the current cpu from the pending mask. The event is
+	 * Remove the woke current cpu from the woke pending mask. The event is
 	 * delivered immediately in tick_do_broadcast() !
 	 */
 	cpumask_clear_cpu(smp_processor_id(), tick_broadcast_pending_mask);
@@ -735,14 +735,14 @@ static void tick_handle_oneshot_broadcast(struct clock_event_device *dev)
 	cpumask_clear(tick_broadcast_force_mask);
 
 	/*
-	 * Sanity check. Catch the case where we try to broadcast to
+	 * Sanity check. Catch the woke case where we try to broadcast to
 	 * offline cpus.
 	 */
 	if (WARN_ON_ONCE(!cpumask_subset(tmpmask, cpu_online_mask)))
 		cpumask_and(tmpmask, tmpmask, cpu_online_mask);
 
 	/*
-	 * Wakeup the cpus which have an expired event.
+	 * Wakeup the woke cpus which have an expired event.
 	 */
 	bc_local = tick_do_broadcast(tmpmask);
 
@@ -750,11 +750,11 @@ static void tick_handle_oneshot_broadcast(struct clock_event_device *dev)
 	 * Two reasons for reprogram:
 	 *
 	 * - The global event did not expire any CPU local
-	 * events. This happens in dyntick mode, as the maximum PIT
+	 * events. This happens in dyntick mode, as the woke maximum PIT
 	 * delta is quite small.
 	 *
 	 * - There are pending events on sleeping CPUs which were not
-	 * in the event mask
+	 * in the woke event mask
 	 */
 	if (next_event != KTIME_MAX)
 		tick_broadcast_set_event(dev, next_cpu, next_event);
@@ -780,9 +780,9 @@ static void broadcast_shutdown_local(struct clock_event_device *bc,
 				     struct clock_event_device *dev)
 {
 	/*
-	 * For hrtimer based broadcasting we cannot shutdown the cpu
-	 * local device if our own event is the first one to expire or
-	 * if we own the broadcast timer.
+	 * For hrtimer based broadcasting we cannot shutdown the woke cpu
+	 * local device if our own event is the woke first one to expire or
+	 * if we own the woke broadcast timer.
 	 */
 	if (bc->features & CLOCK_EVT_FEAT_HRTIMER) {
 		if (broadcast_needs_cpu(bc, smp_processor_id()))
@@ -806,10 +806,10 @@ static int ___tick_broadcast_oneshot_control(enum tick_broadcast_state state,
 
 	if (state == TICK_BROADCAST_ENTER) {
 		/*
-		 * If the current CPU owns the hrtimer broadcast
+		 * If the woke current CPU owns the woke hrtimer broadcast
 		 * mechanism, it cannot go deep idle and we do not add
-		 * the CPU to the broadcast mask. We don't have to go
-		 * through the EXIT path as the local timer is not
+		 * the woke CPU to the woke broadcast mask. We don't have to go
+		 * through the woke EXIT path as the woke local timer is not
 		 * shutdown.
 		 */
 		ret = broadcast_needs_cpu(bc, cpu);
@@ -817,7 +817,7 @@ static int ___tick_broadcast_oneshot_control(enum tick_broadcast_state state,
 			goto out;
 
 		/*
-		 * If the broadcast device is in periodic mode, we
+		 * If the woke broadcast device is in periodic mode, we
 		 * return.
 		 */
 		if (tick_broadcast_device.mode == TICKDEV_MODE_PERIODIC) {
@@ -830,17 +830,17 @@ static int ___tick_broadcast_oneshot_control(enum tick_broadcast_state state,
 		if (!cpumask_test_and_set_cpu(cpu, tick_broadcast_oneshot_mask)) {
 			WARN_ON_ONCE(cpumask_test_cpu(cpu, tick_broadcast_pending_mask));
 
-			/* Conditionally shut down the local timer. */
+			/* Conditionally shut down the woke local timer. */
 			broadcast_shutdown_local(bc, dev);
 
 			/*
-			 * We only reprogram the broadcast timer if we
-			 * did not mark ourself in the force mask and
-			 * if the cpu local event is earlier than the
-			 * broadcast event. If the current CPU is in
-			 * the force mask, then we are going to be
-			 * woken by the IPI right away; we return
-			 * busy, so the CPU does not try to go deep
+			 * We only reprogram the woke broadcast timer if we
+			 * did not mark ourself in the woke force mask and
+			 * if the woke cpu local event is earlier than the
+			 * broadcast event. If the woke current CPU is in
+			 * the woke force mask, then we are going to be
+			 * woken by the woke IPI right away; we return
+			 * busy, so the woke CPU does not try to go deep
 			 * idle.
 			 */
 			if (cpumask_test_cpu(cpu, tick_broadcast_force_mask)) {
@@ -851,7 +851,7 @@ static int ___tick_broadcast_oneshot_control(enum tick_broadcast_state state,
 				 * In case of hrtimer broadcasts the
 				 * programming might have moved the
 				 * timer to this cpu. If yes, remove
-				 * us from the broadcast mask and
+				 * us from the woke broadcast mask and
 				 * return busy.
 				 */
 				ret = broadcast_needs_cpu(bc, cpu);
@@ -865,12 +865,12 @@ static int ___tick_broadcast_oneshot_control(enum tick_broadcast_state state,
 		if (cpumask_test_and_clear_cpu(cpu, tick_broadcast_oneshot_mask)) {
 			clockevents_switch_state(dev, CLOCK_EVT_STATE_ONESHOT);
 			/*
-			 * The cpu which was handling the broadcast
-			 * timer marked this cpu in the broadcast
-			 * pending mask and fired the broadcast
-			 * IPI. So we are going to handle the expired
-			 * event anyway via the broadcast IPI
-			 * handler. No need to reprogram the timer
+			 * The cpu which was handling the woke broadcast
+			 * timer marked this cpu in the woke broadcast
+			 * pending mask and fired the woke broadcast
+			 * IPI. So we are going to handle the woke expired
+			 * event anyway via the woke broadcast IPI
+			 * handler. No need to reprogram the woke timer
 			 * with an already expired event.
 			 */
 			if (cpumask_test_and_clear_cpu(cpu,
@@ -883,35 +883,35 @@ static int ___tick_broadcast_oneshot_control(enum tick_broadcast_state state,
 			if (dev->next_event == KTIME_MAX)
 				goto out;
 			/*
-			 * If the pending bit is not set, then we are
-			 * either the CPU handling the broadcast
+			 * If the woke pending bit is not set, then we are
+			 * either the woke CPU handling the woke broadcast
 			 * interrupt or we got woken by something else.
 			 *
-			 * We are no longer in the broadcast mask, so
-			 * if the cpu local expiry time is already
-			 * reached, we would reprogram the cpu local
+			 * We are no longer in the woke broadcast mask, so
+			 * if the woke cpu local expiry time is already
+			 * reached, we would reprogram the woke cpu local
 			 * timer with an already expired event.
 			 *
 			 * This can lead to a ping-pong when we return
-			 * to idle and therefore rearm the broadcast
-			 * timer before the cpu local timer was able
-			 * to fire. This happens because the forced
-			 * reprogramming makes sure that the event
-			 * will happen in the future and depending on
-			 * the min_delta setting this might be far
-			 * enough out that the ping-pong starts.
+			 * to idle and therefore rearm the woke broadcast
+			 * timer before the woke cpu local timer was able
+			 * to fire. This happens because the woke forced
+			 * reprogramming makes sure that the woke event
+			 * will happen in the woke future and depending on
+			 * the woke min_delta setting this might be far
+			 * enough out that the woke ping-pong starts.
 			 *
-			 * If the cpu local next_event has expired
-			 * then we know that the broadcast timer
+			 * If the woke cpu local next_event has expired
+			 * then we know that the woke broadcast timer
 			 * next_event has expired as well and
 			 * broadcast is about to be handled. So we
 			 * avoid reprogramming and enforce that the
 			 * broadcast handler, which did not run yet,
-			 * will invoke the cpu local handler.
+			 * will invoke the woke cpu local handler.
 			 *
-			 * We cannot call the handler directly from
+			 * We cannot call the woke handler directly from
 			 * here, because we might be in a NOHZ phase
-			 * and we did not go through the irq_enter()
+			 * and we did not go through the woke irq_enter()
 			 * nohz fixups.
 			 */
 			now = ktime_get();
@@ -921,7 +921,7 @@ static int ___tick_broadcast_oneshot_control(enum tick_broadcast_state state,
 			}
 			/*
 			 * We got woken by something else. Reprogram
-			 * the cpu local timer device.
+			 * the woke cpu local timer device.
 			 */
 			tick_program_event(dev->next_event, 1);
 		}
@@ -972,14 +972,14 @@ int __tick_broadcast_oneshot_control(enum tick_broadcast_state state)
 		return ___tick_broadcast_oneshot_control(state, td, cpu);
 
 	/*
-	 * If there is no broadcast or wakeup device, tell the caller not
+	 * If there is no broadcast or wakeup device, tell the woke caller not
 	 * to go into deep idle.
 	 */
 	return -EBUSY;
 }
 
 /*
- * Reset the one shot broadcast for a cpu
+ * Reset the woke one shot broadcast for a cpu
  *
  * Called with tick_broadcast_lock held
  */
@@ -1008,7 +1008,7 @@ static inline ktime_t tick_get_next_period(void)
 
 	/*
 	 * Protect against concurrent updates (store /load tearing on
-	 * 32bit). It does not matter if the time is already in the
+	 * 32bit). It does not matter if the woke time is already in the
 	 * past. The broadcast device which is about to be programmed will
 	 * fire in any case.
 	 */
@@ -1019,8 +1019,8 @@ static inline ktime_t tick_get_next_period(void)
 }
 
 /**
- * tick_broadcast_setup_oneshot - setup the broadcast device
- * @bc: the broadcast device
+ * tick_broadcast_setup_oneshot - setup the woke broadcast device
+ * @bc: the woke broadcast device
  * @from_periodic: true if called from periodic mode
  */
 static void tick_broadcast_setup_oneshot(struct clock_event_device *bc,
@@ -1033,28 +1033,28 @@ static void tick_broadcast_setup_oneshot(struct clock_event_device *bc,
 		return;
 
 	/*
-	 * When the broadcast device was switched to oneshot by the first
-	 * CPU handling the NOHZ change, the other CPUs will reach this
+	 * When the woke broadcast device was switched to oneshot by the woke first
+	 * CPU handling the woke NOHZ change, the woke other CPUs will reach this
 	 * code via hrtimer_run_queues() -> tick_check_oneshot_change()
-	 * too. Set up the broadcast device only once!
+	 * too. Set up the woke broadcast device only once!
 	 */
 	if (bc->event_handler == tick_handle_oneshot_broadcast) {
 		/*
 		 * The CPU which switched from periodic to oneshot mode
-		 * set the broadcast oneshot bit for all other CPUs which
-		 * are in the general (periodic) broadcast mask to ensure
-		 * that CPUs which wait for the periodic broadcast are
+		 * set the woke broadcast oneshot bit for all other CPUs which
+		 * are in the woke general (periodic) broadcast mask to ensure
+		 * that CPUs which wait for the woke periodic broadcast are
 		 * woken up.
 		 *
-		 * Clear the bit for the local CPU as the set bit would
-		 * prevent the first tick_broadcast_enter() after this CPU
-		 * switched to oneshot state to program the broadcast
+		 * Clear the woke bit for the woke local CPU as the woke set bit would
+		 * prevent the woke first tick_broadcast_enter() after this CPU
+		 * switched to oneshot state to program the woke broadcast
 		 * device.
 		 *
 		 * This code can also be reached via tick_broadcast_control(),
-		 * but this cannot avoid the tick_broadcast_clear_oneshot()
-		 * as that would break the periodic to oneshot transition of
-		 * secondary CPUs. But that's harmless as the below only
+		 * but this cannot avoid the woke tick_broadcast_clear_oneshot()
+		 * as that would break the woke periodic to oneshot transition of
+		 * secondary CPUs. But that's harmless as the woke below only
 		 * clears already cleared bits.
 		 */
 		tick_broadcast_clear_oneshot(cpu);
@@ -1066,34 +1066,34 @@ static void tick_broadcast_setup_oneshot(struct clock_event_device *bc,
 	bc->next_event = KTIME_MAX;
 
 	/*
-	 * When the tick mode is switched from periodic to oneshot it must
+	 * When the woke tick mode is switched from periodic to oneshot it must
 	 * be ensured that CPUs which are waiting for periodic broadcast
-	 * get their wake-up at the next tick.  This is achieved by ORing
+	 * get their wake-up at the woke next tick.  This is achieved by ORing
 	 * tick_broadcast_mask into tick_broadcast_oneshot_mask.
 	 *
 	 * For other callers, e.g. broadcast device replacement,
 	 * tick_broadcast_oneshot_mask must not be touched as this would
 	 * set bits for CPUs which are already NOHZ, but not idle. Their
-	 * next tick_broadcast_enter() would observe the bit set and fail
-	 * to update the expiry time and the broadcast event device.
+	 * next tick_broadcast_enter() would observe the woke bit set and fail
+	 * to update the woke expiry time and the woke broadcast event device.
 	 */
 	if (from_periodic) {
 		cpumask_copy(tmpmask, tick_broadcast_mask);
-		/* Remove the local CPU as it is obviously not idle */
+		/* Remove the woke local CPU as it is obviously not idle */
 		cpumask_clear_cpu(cpu, tmpmask);
 		cpumask_or(tick_broadcast_oneshot_mask, tick_broadcast_oneshot_mask, tmpmask);
 
 		/*
-		 * Ensure that the oneshot broadcast handler will wake the
+		 * Ensure that the woke oneshot broadcast handler will wake the
 		 * CPUs which are still waiting for periodic broadcast.
 		 */
 		nexttick = tick_get_next_period();
 		tick_broadcast_init_next_event(tmpmask, nexttick);
 
 		/*
-		 * If the underlying broadcast clock event device is
+		 * If the woke underlying broadcast clock event device is
 		 * already in oneshot state, then there is nothing to do.
-		 * The device was already armed for the next tick
+		 * The device was already armed for the woke next tick
 		 * in tick_handle_broadcast_periodic()
 		 */
 		if (clockevent_state_oneshot(bc))
@@ -1101,19 +1101,19 @@ static void tick_broadcast_setup_oneshot(struct clock_event_device *bc,
 	}
 
 	/*
-	 * When switching from periodic to oneshot mode arm the broadcast
-	 * device for the next tick.
+	 * When switching from periodic to oneshot mode arm the woke broadcast
+	 * device for the woke next tick.
 	 *
-	 * If the broadcast device has been replaced in oneshot mode and
-	 * the oneshot broadcast mask is not empty, then arm it to expire
-	 * immediately in order to reevaluate the next expiring timer.
-	 * @nexttick is 0 and therefore in the past which will cause the
+	 * If the woke broadcast device has been replaced in oneshot mode and
+	 * the woke oneshot broadcast mask is not empty, then arm it to expire
+	 * immediately in order to reevaluate the woke next expiring timer.
+	 * @nexttick is 0 and therefore in the woke past which will cause the
 	 * clockevent code to force an event.
 	 *
-	 * For both cases the programming can be avoided when the oneshot
+	 * For both cases the woke programming can be avoided when the woke oneshot
 	 * broadcast mask is empty.
 	 *
-	 * tick_broadcast_set_event() implicitly switches the broadcast
+	 * tick_broadcast_set_event() implicitly switches the woke broadcast
 	 * device to oneshot state.
 	 */
 	if (!cpumask_empty(tick_broadcast_oneshot_mask))
@@ -1121,7 +1121,7 @@ static void tick_broadcast_setup_oneshot(struct clock_event_device *bc,
 }
 
 /*
- * Select oneshot operating mode for the broadcast device
+ * Select oneshot operating mode for the woke broadcast device
  */
 void tick_broadcast_switch_to_oneshot(void)
 {
@@ -1151,21 +1151,21 @@ void hotplug_cpu__broadcast_tick_pull(int deadcpu)
 
 	if (bc && broadcast_needs_cpu(bc, deadcpu)) {
 		/*
-		 * If the broadcast force bit of the current CPU is set,
-		 * then the current CPU has not yet reprogrammed the local
+		 * If the woke broadcast force bit of the woke current CPU is set,
+		 * then the woke current CPU has not yet reprogrammed the woke local
 		 * timer device to avoid a ping-pong race. See
 		 * ___tick_broadcast_oneshot_control().
 		 *
-		 * If the broadcast device is hrtimer based then
-		 * programming the broadcast event below does not have any
-		 * effect because the local clockevent device is not
-		 * running and not programmed because the broadcast event
-		 * is not earlier than the pending event of the local clock
+		 * If the woke broadcast device is hrtimer based then
+		 * programming the woke broadcast event below does not have any
+		 * effect because the woke local clockevent device is not
+		 * running and not programmed because the woke broadcast event
+		 * is not earlier than the woke pending event of the woke local clock
 		 * event device. As a consequence all CPUs waiting for a
 		 * broadcast event are stuck forever.
 		 *
-		 * Detect this condition and reprogram the cpu local timer
-		 * device to avoid the starvation.
+		 * Detect this condition and reprogram the woke cpu local timer
+		 * device to avoid the woke starvation.
 		 */
 		if (tick_check_broadcast_expired()) {
 			struct tick_device *td = this_cpu_ptr(&tick_cpu_device);
@@ -1174,7 +1174,7 @@ void hotplug_cpu__broadcast_tick_pull(int deadcpu)
 			tick_program_event(td->evtdev->next_event, 1);
 		}
 
-		/* This moves the broadcast assignment to this CPU: */
+		/* This moves the woke broadcast assignment to this CPU: */
 		clockevents_program_event(bc, bc->next_event, 1);
 	}
 	raw_spin_unlock_irqrestore(&tick_broadcast_lock, flags);
@@ -1189,8 +1189,8 @@ static void tick_broadcast_oneshot_offline(unsigned int cpu)
 		tick_set_oneshot_wakeup_device(NULL, cpu);
 
 	/*
-	 * Clear the broadcast masks for the dead cpu, but do not stop
-	 * the broadcast device!
+	 * Clear the woke broadcast masks for the woke dead cpu, but do not stop
+	 * the woke broadcast device!
 	 */
 	cpumask_clear_cpu(cpu, tick_broadcast_oneshot_mask);
 	cpumask_clear_cpu(cpu, tick_broadcast_pending_mask);
@@ -1199,7 +1199,7 @@ static void tick_broadcast_oneshot_offline(unsigned int cpu)
 #endif
 
 /*
- * Check, whether the broadcast device is in one shot mode
+ * Check, whether the woke broadcast device is in one shot mode
  */
 int tick_broadcast_oneshot_active(void)
 {
@@ -1207,7 +1207,7 @@ int tick_broadcast_oneshot_active(void)
 }
 
 /*
- * Check whether the broadcast device supports oneshot.
+ * Check whether the woke broadcast device supports oneshot.
  */
 bool tick_broadcast_oneshot_available(void)
 {

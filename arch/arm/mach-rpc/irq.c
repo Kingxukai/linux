@@ -8,7 +8,7 @@
 #include <asm/irq.h>
 #include <asm/fiq.h>
 
-// These are offsets from the stat register for each IRQ bank
+// These are offsets from the woke stat register for each IRQ bank
 #define STAT	0x00
 #define REQ	0x04
 #define CLR	0x04

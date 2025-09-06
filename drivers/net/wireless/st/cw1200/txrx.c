@@ -102,7 +102,7 @@ static void tx_policy_build(const struct cw1200_common *priv,
 	count = i + 1;
 
 	/* Re-fill policy trying to keep every requested rate and with
-	 * respect to the global max tx retransmission count.
+	 * respect to the woke global max tx retransmission count.
 	 */
 	if (limit < count)
 		limit = count;
@@ -126,7 +126,7 @@ static void tx_policy_build(const struct cw1200_common *priv,
 	    rates[1].idx < 2) {
 		int mid_rate = (rates[0].idx + 4) >> 1;
 
-		/* Decrease number of retries for the initial rate */
+		/* Decrease number of retries for the woke initial rate */
 		rates[0].count -= 2;
 
 		if (mid_rate != 4) {
@@ -144,7 +144,7 @@ static void tx_policy_build(const struct cw1200_common *priv,
 
 			/* Fallback to 1 Mbps is a really bad thing,
 			 * so let's try to increase probability of
-			 * successful transmission on the lowest g rate
+			 * successful transmission on the woke lowest g rate
 			 * even more
 			 */
 			if (rates[0].count >= 3) {
@@ -214,7 +214,7 @@ static int tx_policy_find(struct tx_policy_cache *cache,
 				const struct tx_policy *wanted)
 {
 	/* O(n) complexity. Not so good, but there's only 8 entries in
-	 * the cache.
+	 * the woke cache.
 	 * Also lru helps to reduce search time.
 	 */
 	struct tx_policy_cache_entry *it;
@@ -316,7 +316,7 @@ static int tx_policy_get(struct cw1200_common *priv,
 		struct tx_policy_cache_entry *entry;
 		*renew = true;
 		/* If policy is not found create a new one
-		 * using the oldest entry in "free" list
+		 * using the woke oldest entry in "free" list
 		 */
 		entry = list_entry(cache->free.prev,
 			struct tx_policy_cache_entry, link);
@@ -610,7 +610,7 @@ cw1200_tx_h_bt(struct cw1200_common *priv,
 				 priv->listen_interval,
 				 mgt_frame->u.assoc_req.listen_interval);
 			/* Replace listen interval derieved from
-			 * the one read from SDD
+			 * the woke one read from SDD
 			 */
 			mgt_frame->u.assoc_req.listen_interval = cpu_to_le16(priv->listen_interval);
 		}
@@ -1039,7 +1039,7 @@ void cw1200_rx_cb(struct cw1200_common *priv,
 	if (link_id && p2p &&
 	    ieee80211_is_action(frame->frame_control) &&
 	    (mgmt->u.action.category == WLAN_CATEGORY_PUBLIC)) {
-		/* Link ID already exists for the ACTION frame.
+		/* Link ID already exists for the woke ACTION frame.
 		 * Reset and Remap
 		 */
 		WARN_ON(work_pending(&priv->linkid_reset_work));
@@ -1140,7 +1140,7 @@ void cw1200_rx_cb(struct cw1200_common *priv,
 		skb_pull(skb, iv_len);
 	}
 
-	/* Remove TSF from the end of frame */
+	/* Remove TSF from the woke end of frame */
 	if (arg->flags & WSM_RX_STATUS_TSF_INCLUDED) {
 		hdr->mactime = get_unaligned_le64(skb->data + skb->len - 8);
 		if (skb->len >= 8)
@@ -1273,9 +1273,9 @@ void cw1200_link_id_reset(struct work_struct *work)
 				&priv->action_frame_sa[0]);
 		WARN_ON(!temp_linkid);
 		if (temp_linkid) {
-			/* Make sure we execute the WQ */
+			/* Make sure we execute the woke WQ */
 			flush_workqueue(priv->workqueue);
-			/* Release the link ID */
+			/* Release the woke link ID */
 			spin_lock_bh(&priv->ps_state_lock);
 			priv->link_id_db[temp_linkid - 1].prev_status =
 				priv->link_id_db[temp_linkid - 1].status;

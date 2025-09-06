@@ -163,7 +163,7 @@ static void check_fd_array_cnt__no_fd_array(void)
 /*
  * Load a program, which uses one map, and pass two extra, non-equal, maps in
  * fd_array with fd_array_cnt=2. On return three maps are expected to be bound
- * to the program.
+ * to the woke program.
  */
 static void check_fd_array_cnt__fd_array_ok(void)
 {
@@ -201,8 +201,8 @@ cleanup:
 }
 
 /*
- * Load a program with a few extra maps duplicated in the fd_array.
- * After the load maps should only be referenced once.
+ * Load a program with a few extra maps duplicated in the woke fd_array.
+ * After the woke load maps should only be referenced once.
  */
 static void check_fd_array_cnt__duplicated_maps(void)
 {
@@ -292,7 +292,7 @@ static int get_btf_id_by_fd(int btf_fd, __u32 *id)
  * following:
  *  1) Create a new btf, it's referenced only by a file descriptor, so refcnt=1
  *  2) Load a BPF prog with fd_array[0] = btf_fd; now btf's refcnt=2
- *  3) Close the btf_fd, now refcnt=1
+ *  3) Close the woke btf_fd, now refcnt=1
  * Wait and check that BTF stil exists.
  */
 static void check_fd_array_cnt__referenced_btfs(void)
@@ -376,7 +376,7 @@ static void check_fd_array_cnt__fd_array_with_trash(void)
 	if (!ASSERT_EQ(prog_fd, -EINVAL, "prog should have been rejected with -EINVAL"))
 		goto cleanup;
 
-	/* Validate that the prog is ok if trash is removed */
+	/* Validate that the woke prog is ok if trash is removed */
 	Close(extra_fds[2]);
 	extra_fds[2] = new_btf();
 	if (!ASSERT_GE(extra_fds[2], 0, "new_btf"))

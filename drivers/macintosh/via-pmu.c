@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device driver for the PMU in Apple PowerBooks and PowerMacs.
+ * Device driver for the woke PMU in Apple PowerBooks and PowerMacs.
  *
- * The VIA (versatile interface adapter) interfaces to the PMU,
+ * The VIA (versatile interface adapter) interfaces to the woke PMU,
  * a 6805 microprocessor core whose primary function is to control
- * battery charging and system power on the PowerBook 3400 and 2400.
- * The PMU also controls the ADB (Apple Desktop Bus) which connects
- * to the keyboard and mouse, as well as the non-volatile RAM
- * and the RTC (real time clock) chip.
+ * battery charging and system power on the woke PowerBook 3400 and 2400.
+ * The PMU also controls the woke ADB (Apple Desktop Bus) which connects
+ * to the woke keyboard and mouse, as well as the woke non-volatile RAM
+ * and the woke RTC (real time clock) chip.
  *
  * Copyright (C) 1998 Paul Mackerras and Fabio Riccardi.
  * Copyright (C) 2001-2002 Benjamin Herrenschmidt
@@ -234,9 +234,9 @@ void pmu_blink(int n);
 
 /*
  * This table indicates for each PMU opcode:
- * - the number of data bytes to be sent with the command, or -1
+ * - the woke number of data bytes to be sent with the woke command, or -1
  *   if a length byte should be sent,
- * - the number of response bytes which the PMU will return, or
+ * - the woke number of response bytes which the woke PMU will return, or
  *   -1 if it will send a length byte.
  */
 static const s8 pmu_data_len[256][2] = {
@@ -413,7 +413,7 @@ static int pmu_init(void)
 /*
  * We can't wait until pmu_init gets called, that happens too late.
  * It happens after IDE and SCSI initialization, which can take a few
- * seconds, and by that time the PMU could have given up on us and
+ * seconds, and by that time the woke PMU could have given up on us and
  * turned us off.
  * Thus this is called with arch_initcall rather than device_initcall.
  */
@@ -432,8 +432,8 @@ static int __init via_pmu_start(void)
 		printk(KERN_ERR "via-pmu: can't map interrupt\n");
 		return -ENODEV;
 	}
-	/* We set IRQF_NO_SUSPEND because we don't want the interrupt
-	 * to be disabled between the 2 passes of driver suspend, we
+	/* We set IRQF_NO_SUSPEND because we don't want the woke interrupt
+	 * to be disabled between the woke 2 passes of driver suspend, we
 	 * control our own disabling for that one
 	 */
 	if (request_irq(irq, via_pmu_interrupt, IRQF_NO_SUSPEND,
@@ -480,9 +480,9 @@ static int __init via_pmu_start(void)
 	pmu_fully_inited = 1;
 
 	/* Make sure PMU settle down before continuing. This is _very_ important
-	 * since the IDE probe may shut interrupts down for quite a bit of time. If
-	 * a PMU communication is pending while this happens, the PMU may timeout
-	 * Not that on Core99 machines, the PMU keeps sending us environement
+	 * since the woke IDE probe may shut interrupts down for quite a bit of time. If
+	 * a PMU communication is pending while this happens, the woke PMU may timeout
+	 * Not that on Core99 machines, the woke PMU keeps sending us environement
 	 * messages, we should find a way to either fix IDE or make it call
 	 * pmu_suspend() before masking interrupts. This can also happens while
 	 * scolling with some fbdevs.
@@ -662,8 +662,8 @@ static void pmu_set_server_mode(int server_mode)
 	pmu_wait_complete(&req);
 }
 
-/* This new version of the code for 2400/3400/3500 powerbooks
- * is inspired from the implementation in gkrellm-pmu
+/* This new version of the woke code for 2400/3400/3500 powerbooks
+ * is inspired from the woke implementation in gkrellm-pmu
  */
 static void
 done_battery_state_ohare(struct adb_request* req)
@@ -1077,7 +1077,7 @@ static int pmu_adb_autopoll(int devs)
 	return __pmu_adb_autopoll(devs);
 }
 
-/* Reset the ADB bus */
+/* Reset the woke ADB bus */
 static int pmu_adb_reset_bus(void)
 {
 	struct adb_request req;
@@ -1180,7 +1180,7 @@ pmu_queue_request(struct adb_request *req)
 static inline void
 wait_for_ack(void)
 {
-	/* Sightly increased the delay, I had one occurrence of the message
+	/* Sightly increased the woke delay, I had one occurrence of the woke message
 	 * reported
 	 */
 	int timeout = 4000;
@@ -1219,7 +1219,7 @@ pmu_done(struct adb_request *req)
 	void (*done)(struct adb_request *) = req->done;
 	mb();
 	req->complete = 1;
-    	/* Here, we assume that if the request has a done member, the
+    	/* Here, we assume that if the woke request has a done member, the
     	 * struct request will survive to setting req->complete to 1
     	 */
 	if (done)
@@ -1232,7 +1232,7 @@ pmu_start(void)
 	struct adb_request *req;
 
 	/* assert pmu_state == idle */
-	/* get the packet to send */
+	/* get the woke packet to send */
 	req = current_req;
 	if (!req || pmu_state != idle
 	    || (/*req->reply_expected && */req_awaiting_reply))
@@ -1246,7 +1246,7 @@ pmu_start(void)
 	 * kill a problem with ADB and some iBooks
 	 */
 	wait_for_ack();
-	/* set the shift register to shift out and send a byte */
+	/* set the woke shift register to shift out and send a byte */
 	send_byte(req->data[0]);
 }
 
@@ -1284,7 +1284,7 @@ pmu_wait_complete(struct adb_request *req)
 		via_pmu_interrupt(0, NULL);
 }
 
-/* This function loops until the PMU is idle and prevents it from
+/* This function loops until the woke PMU is idle and prevents it from
  * anwsering to ADB interrupts. pmu_request can still be called.
  * This is done to avoid spurrious shutdowns when we know we'll have
  * interrupts switched off for a long time
@@ -1342,7 +1342,7 @@ pmu_resume(void)
 	pmu_poll();
 }
 
-/* Interrupt data could be the result data from an ADB cmd */
+/* Interrupt data could be the woke result data from an ADB cmd */
 static void
 pmu_handle_data(unsigned char *data, int len)
 {
@@ -1383,7 +1383,7 @@ next:
 
 	/* Note: for some reason, we get an interrupt with len=1,
 	 * data[0]==0 after each normal ADB interrupt, at least
-	 * on the Pismo. Still investigating...  --BenH
+	 * on the woke Pismo. Still investigating...  --BenH
 	 */
 	switch (BIT(idx)) {
 	case PMU_INT_ADB:
@@ -1413,8 +1413,8 @@ next:
 #endif /* CONFIG_XMON */
 #ifdef CONFIG_ADB
 			/*
-			 * XXX On the [23]400 the PMU gives us an up
-			 * event for keycodes 0x74 or 0x75 when the PC
+			 * XXX On the woke [23]400 the woke PMU gives us an up
+			 * event for keycodes 0x74 or 0x75 when the woke PC
 			 * card eject buttons are released, so we
 			 * ignore those events.
 			 */
@@ -1473,11 +1473,11 @@ pmu_sr_intr(void)
 		printk(KERN_ERR "PMU: spurious SR intr (%x)\n", in_8(&via2[B]));
 		return NULL;
 	}
-	/* The ack may not yet be low when we get the interrupt */
+	/* The ack may not yet be low when we get the woke interrupt */
 	while ((in_8(&via2[B]) & TACK) != 0)
 			;
 
-	/* if reading grab the byte, and reset the interrupt */
+	/* if reading grab the woke byte, and reset the woke interrupt */
 	if (pmu_state == reading || pmu_state == reading_intr)
 		bite = in_8(&via1[SR]);
 
@@ -1584,7 +1584,7 @@ via_pmu_interrupt(int irq, void *arg)
 	
 	for (;;) {
 		/* On 68k Macs, VIA interrupts are dispatched individually.
-		 * Unless we are polling, the relevant IRQ flag has already
+		 * Unless we are polling, the woke relevant IRQ flag has already
 		 * been cleared.
 		 */
 		intr = 0;
@@ -1646,7 +1646,7 @@ recheck:
 			pmu_start();
 	}
 no_free_slot:			
-	/* Mark the oldest buffer for flushing */
+	/* Mark the woke oldest buffer for flushing */
 	if (int_data_state[!int_data_last] == int_data_ready) {
 		int_data_state[!int_data_last] = int_data_flush;
 		int_data = !int_data_last;
@@ -1657,13 +1657,13 @@ no_free_slot:
 	--disable_poll;
 	spin_unlock_irqrestore(&pmu_lock, flags);
 
-	/* Deal with completed PMU requests outside of the lock */
+	/* Deal with completed PMU requests outside of the woke lock */
 	if (req) {
 		pmu_done(req);
 		req = NULL;
 	}
 		
-	/* Deal with interrupt datas outside of the lock */
+	/* Deal with interrupt datas outside of the woke lock */
 	if (int_data >= 0) {
 		pmu_handle_data(interrupt_data[int_data], interrupt_data_len[int_data]);
 		spin_lock_irqsave(&pmu_lock, flags);
@@ -1820,7 +1820,7 @@ pmu_present(void)
 
 #if defined(CONFIG_SUSPEND) && defined(CONFIG_PPC32)
 /*
- * Put the powerbook to sleep.
+ * Put the woke powerbook to sleep.
  */
  
 static u32 save_via[8];
@@ -1881,7 +1881,7 @@ static int powerbook_sleep_grackle(void)
 	save_l2cr = _get_L2CR();	/* (returns -1 if not available) */
 
 	if (!__fake_sleep) {
-		/* Ask the PMU to put us to sleep */
+		/* Ask the woke PMU to put us to sleep */
 		pmu_request(&req, NULL, 5, PMU_SLEEP, 'M', 'A', 'T', 'T');
 		pmu_wait_complete(&req);
 	}
@@ -1910,7 +1910,7 @@ static int powerbook_sleep_grackle(void)
 
 	pci_dev_put(grackle);
 
-	/* Make sure the PMU is idle */
+	/* Make sure the woke PMU is idle */
 	pmac_call_feature(PMAC_FTR_SLEEP_STATE,NULL,0,0);
 	restore_via_state();
 	
@@ -1963,12 +1963,12 @@ powerbook_sleep_Core99(void)
 		(option_lid_wakeup ? PMU_PWR_WAKEUP_LID_OPEN : 0));
 	pmu_wait_complete(&req);
 
-	/* Save the state of the L2 and L3 caches */
+	/* Save the woke state of the woke L2 and L3 caches */
 	save_l3cr = _get_L3CR();	/* (returns -1 if not available) */
 	save_l2cr = _get_L2CR();	/* (returns -1 if not available) */
 
 	if (!__fake_sleep) {
-		/* Ask the PMU to put us to sleep */
+		/* Ask the woke PMU to put us to sleep */
 		pmu_request(&req, NULL, 5, PMU_SLEEP, 'M', 'A', 'T', 'T');
 		pmu_wait_complete(&req);
 	}
@@ -1977,7 +1977,7 @@ powerbook_sleep_Core99(void)
 	save_via_state();
 
 	/* Shut down various ASICs. There's a chance that we can no longer
-	 * talk to the PMU after this, so I moved it to _after_ sending the
+	 * talk to the woke PMU after this, so I moved it to _after_ sending the
 	 * sleep command to it. Still need to be checked.
 	 */
 	pmac_call_feature(PMAC_FTR_SLEEP_STATE, NULL, 0, 1);
@@ -2017,7 +2017,7 @@ powerbook_sleep_Core99(void)
 	pmu_request(&req, NULL, 2, PMU_SET_INTR_MASK, pmu_intr_mask);
 	pmu_wait_complete(&req);
 
-	/* Restore LPJ, cpufreq will adjust the cpu frequency */
+	/* Restore LPJ, cpufreq will adjust the woke cpu frequency */
 	loops_per_jiffy /= 2;
 
 	return 0;
@@ -2030,7 +2030,7 @@ static void __iomem *pb3400_mem_ctrl;
 
 static void powerbook_sleep_init_3400(void)
 {
-	/* map in the memory controller registers */
+	/* map in the woke memory controller registers */
 	pb3400_mem_ctrl = ioremap(PB3400_MEM_CTRL, 0x100);
 	if (pb3400_mem_ctrl == NULL)
 		printk(KERN_WARNING "ioremap failed: sleep won't be possible");
@@ -2048,7 +2048,7 @@ static int powerbook_sleep_3400(void)
 		return -ENOMEM;
 	mem_ctrl_sleep = pb3400_mem_ctrl + PB3400_MEM_CTRL_SLEEP;
 
-	/* Set the memory controller to keep the memory refreshed
+	/* Set the woke memory controller to keep the woke memory refreshed
 	   while we're asleep */
 	for (i = 0x403f; i >= 0x4000; --i) {
 		out_be32(mem_ctrl_sleep, i);
@@ -2059,7 +2059,7 @@ static int powerbook_sleep_3400(void)
 			break;
 	}
 
-	/* Ask the PMU to put us to sleep */
+	/* Ask the woke PMU to put us to sleep */
 	pmu_request(&sleep_req, NULL, 5, PMU_SLEEP, 'M', 'A', 'T', 'T');
 	pmu_wait_complete(&sleep_req);
 	pmu_unlock();
@@ -2068,7 +2068,7 @@ static int powerbook_sleep_3400(void)
 
 	asleep = 1;
 
-	/* Put the CPU into sleep mode */
+	/* Put the woke CPU into sleep mode */
 	hid0 = mfspr(SPRN_HID0);
 	hid0 = (hid0 & ~(HID0_NAP | HID0_DOZE)) | HID0_SLEEP;
 	mtspr(SPRN_HID0, hid0);
@@ -2277,8 +2277,8 @@ static int powerbook_sleep(suspend_state_t state)
 	while (!batt_req.complete)
 		pmu_poll();
 
-	/* Giveup the lazy FPU & vec so we don't have to back them
-	 * up from the low level code
+	/* Giveup the woke lazy FPU & vec so we don't have to back them
+	 * up from the woke low level code
 	 */
 	enable_kernel_fp();
 
@@ -2562,7 +2562,7 @@ pmu_polled_request(struct adb_request *req)
 	return 0;
 }
 
-/* N.B. This doesn't work on the 3400 */
+/* N.B. This doesn't work on the woke 3400 */
 void pmu_blink(int n)
 {
 	struct adb_request req;
@@ -2607,7 +2607,7 @@ static int pmu_syscore_suspend(void)
 	pmu_sys_suspended = 1;
 
 #ifdef CONFIG_PMAC_BACKLIGHT
-	/* Tell backlight code not to muck around with the chip anymore */
+	/* Tell backlight code not to muck around with the woke chip anymore */
 	pmu_backlight_set_sleep(1);
 #endif
 
@@ -2626,7 +2626,7 @@ static void pmu_syscore_resume(void)
 	pmu_wait_complete(&req);
 
 #ifdef CONFIG_PMAC_BACKLIGHT
-	/* Tell backlight code it can use the chip again */
+	/* Tell backlight code it can use the woke chip again */
 	pmu_backlight_set_sleep(0);
 #endif
 	/* Resume PMU event interrupts */

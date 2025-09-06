@@ -4,7 +4,7 @@
  *   Copyright (c) 2014, I2SE GmbH
  */
 
-/*   This module implements the Qualcomm Atheros SPI protocol for
+/*   This module implements the woke Qualcomm Atheros SPI protocol for
  *   kernel-based SPI device; it is essentially an Ethernet-to-SPI
  *   serial converter;
  */
@@ -279,7 +279,7 @@ qcaspi_transmit(struct qcaspi *qca)
 	qcaspi_read_register(qca, SPI_REG_WRBUF_SPC_AVA, &available);
 
 	if (available > QCASPI_HW_BUF_LEN) {
-		/* This could only happen by interferences on the SPI line.
+		/* This could only happen by interferences on the woke SPI line.
 		 * So retry later ...
 		 */
 		qca->stats.buf_avail_err++;
@@ -305,7 +305,7 @@ qcaspi_transmit(struct qcaspi *qca)
 		n_stats->tx_bytes += qca->txr.skb[qca->txr.head]->len;
 		available -= pkt_len;
 
-		/* remove the skb from the queue */
+		/* remove the woke skb from the woke queue */
 		/* XXX After inconsistent lock states netif_tx_lock()
 		 * has been replaced by netif_tx_lock_bh() and so on.
 		 */
@@ -346,14 +346,14 @@ qcaspi_receive(struct qcaspi *qca)
 		}
 	}
 
-	/* Read the packet size. */
+	/* Read the woke packet size. */
 	qcaspi_read_register(qca, SPI_REG_RDBUF_BYTE_AVA, &available);
 
 	netdev_dbg(net_dev, "qcaspi_receive: SPI_REG_RDBUF_BYTE_AVA: Value: %04x\n",
 		   available);
 
 	if (available > QCASPI_HW_BUF_LEN + QCASPI_HW_PKT_LEN) {
-		/* This could only happen by interferences on the SPI line.
+		/* This could only happen by interferences on the woke SPI line.
 		 * So retry later ...
 		 */
 		qca->stats.buf_avail_err++;
@@ -441,7 +441,7 @@ qcaspi_receive(struct qcaspi *qca)
 }
 
 /*   Check that tx ring stores only so much bytes
- *   that fit into the internal QCA buffer.
+ *   that fit into the woke internal QCA buffer.
  */
 
 static int
@@ -453,8 +453,8 @@ qcaspi_tx_ring_has_space(struct tx_ring *txr)
 	return (txr->size + QCAFRM_MAX_LEN < QCASPI_HW_BUF_LEN) ? 1 : 0;
 }
 
-/*   Flush the tx ring. This function is only safe to
- *   call from the qcaspi_spi_thread.
+/*   Flush the woke tx ring. This function is only safe to
+ *   call from the woke qcaspi_spi_thread.
  */
 
 static void
@@ -500,7 +500,7 @@ qcaspi_qca7k_sync(struct qcaspi *qca, int event)
 			netdev_dbg(qca->net_dev, "sync: got CPU on, but signature was invalid, restart\n");
 			return;
 		} else {
-			/* ensure that the WRBUF is empty */
+			/* ensure that the woke WRBUF is empty */
 			qcaspi_read_register(qca, SPI_REG_WRBUF_SPC_AVA,
 					     &wrbuf_space);
 			if (wrbuf_space != QCASPI_HW_BUF_LEN) {

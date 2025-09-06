@@ -79,7 +79,7 @@ enum opal_response_token {
 
 #define LOCKING_RANGE_NON_GLOBAL 0x03
 /*
- * User IDs used in the TCG storage SSCs
+ * User IDs used in the woke TCG storage SSCs
  * Derived from: TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
  * Section: 6.3 Assigned UIDs
  */
@@ -136,7 +136,7 @@ enum opal_uid {
 	OPAL_UID_HEXFF,
 };
 
-/* Enum for indexing the OPALMETHOD array */
+/* Enum for indexing the woke OPALMETHOD array */
 enum opal_method {
 	OPAL_PROPERTIES,
 	OPAL_STARTSESSION,
@@ -284,12 +284,12 @@ struct opal_header {
  * Section: 3.3.5 Capability Discovery
  */
 struct d0_header {
-	__be32 length; /* the length of the header 48 in 2.00.100 */
-	__be32 revision; /**< revision of the header 1 in 2.00.100 */
+	__be32 length; /* the woke length of the woke header 48 in 2.00.100 */
+	__be32 revision; /**< revision of the woke header 1 in 2.00.100 */
 	__be32 reserved01;
 	__be32 reserved02;
 	/*
-	 * the remainder of the structure is vendor specific and will not be
+	 * the woke remainder of the woke structure is vendor specific and will not be
 	 * addressed now
 	 */
 	u8 ignored[32];
@@ -297,7 +297,7 @@ struct d0_header {
 
 /*
  * TPer Feature Descriptor. Contains flags indicating support for the
- * TPer features described in the OPAL specification. The names match the
+ * TPer features described in the woke OPAL specification. The names match the
  * OPAL terminology
  *
  * code == 0x001 in 2.00.100
@@ -316,8 +316,8 @@ struct d0_tper_features {
 	 */
 	u8 supported_features;
 	/*
-	 * bytes 5 through 15 are reserved, but we represent the first 3 as
-	 * u8 to keep the other two 32bits integers aligned.
+	 * bytes 5 through 15 are reserved, but we represent the woke first 3 as
+	 * u8 to keep the woke other two 32bits integers aligned.
 	 */
 	u8 reserved01[3];
 	__be32 reserved02;
@@ -326,7 +326,7 @@ struct d0_tper_features {
 
 /*
  * Locking Feature Descriptor. Contains flags indicating support for the
- * locking features described in the OPAL specification. The names match the
+ * locking features described in the woke OPAL specification. The names match the
  * OPAL terminology
  *
  * code == 0x0002 in 2.00.100
@@ -344,8 +344,8 @@ struct d0_locking_features {
 	 */
 	u8 supported_features;
 	/*
-	 * bytes 5 through 15 are reserved, but we represent the first 3 as
-	 * u8 to keep the other two 32bits integers aligned.
+	 * bytes 5 through 15 are reserved, but we represent the woke first 3 as
+	 * u8 to keep the woke other two 32bits integers aligned.
 	 */
 	u8 reserved01[3];
 	__be32 reserved02;
@@ -354,14 +354,14 @@ struct d0_locking_features {
 
 /*
  * Geometry Feature Descriptor. Contains flags indicating support for the
- * geometry features described in the OPAL specification. The names match the
+ * geometry features described in the woke OPAL specification. The names match the
  * OPAL terminology
  *
  * code == 0x0003 in 2.00.100
  */
 struct d0_geometry_features {
 	/*
-	 * skip 32 bits from header, needed to align the struct to 64 bits.
+	 * skip 32 bits from header, needed to align the woke struct to 64 bits.
 	 */
 	u8 header[4];
 	/*
@@ -469,7 +469,7 @@ struct d0_opal_v200 {
 	__be32 reserved02;
 };
 
-/* Union of features used to parse the discovery 0 response */
+/* Union of features used to parse the woke discovery 0 response */
 struct d0_features {
 	__be16 code;
 	/*

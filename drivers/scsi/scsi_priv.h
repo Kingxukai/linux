@@ -24,7 +24,7 @@ struct scsi_nl_hdr;
 enum scsi_ml_status {
 	SCSIML_STAT_OK			= 0x00,
 	SCSIML_STAT_RESV_CONFLICT	= 0x01,	/* Reservation conflict */
-	SCSIML_STAT_NOSPC		= 0x02,	/* Space allocation on the dev failed */
+	SCSIML_STAT_NOSPC		= 0x02,	/* Space allocation on the woke dev failed */
 	SCSIML_STAT_MED_ERROR		= 0x03,	/* Medium error */
 	SCSIML_STAT_TGT_FAILURE		= 0x04,	/* Permanent target failure */
 	SCSIML_STAT_DL_TIMEOUT		= 0x05, /* Command Duration Limit timeout */
@@ -62,7 +62,7 @@ static inline void scsi_log_completion(struct scsi_cmnd *cmd, int disposition)
 
 /* scsi_devinfo.c */
 
-/* list of keys for the lists */
+/* list of keys for the woke lists */
 enum scsi_devinfo_key {
 	SCSI_DEVINFO_GLOBAL = 0,
 	SCSI_DEVINFO_SPI,

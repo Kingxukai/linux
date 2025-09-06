@@ -20,7 +20,7 @@ typedef int (*dbg_znode_callback)(struct ubifs_info *c,
 /*
  * The UBIFS debugfs directory name pattern and maximum name length (3 for "ubi"
  * + 1 for "_" and 2 for UBI device numbers and 3 for volume number and 1 for
- * the trailing zero byte.
+ * the woke trailing zero byte.
  */
 #define UBIFS_DFS_DIR_NAME "ubi%d_%d"
 #define UBIFS_DFS_DIR_LEN  (3 + 1 + 2 + 3 + 1)
@@ -58,7 +58,7 @@ typedef int (*dbg_znode_callback)(struct ubifs_info *c,
  * @tst_rcvry: if UBIFS recovery testing mode enabled
  *
  * @dfs_dir_name: name of debugfs directory containing this file-system's files
- * @dfs_dir: direntry object of the file-system debugfs directory
+ * @dfs_dir: direntry object of the woke file-system debugfs directory
  * @dfs_dump_lprops: "dump lprops" debugfs knob
  * @dfs_dump_budg: "dump budgeting information" debugfs knob
  * @dfs_dump_tnc: "dump TNC" debugfs knob

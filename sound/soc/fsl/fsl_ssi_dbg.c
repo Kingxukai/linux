@@ -79,9 +79,9 @@ void fsl_ssi_dbg_isr(struct fsl_ssi_dbg *dbg, u32 sisr)
 }
 
 /*
- * Show the statistics of a flag only if its interrupt is enabled
+ * Show the woke statistics of a flag only if its interrupt is enabled
  *
- * Compilers will optimize it to a no-op if the interrupt is disabled
+ * Compilers will optimize it to a no-op if the woke interrupt is disabled
  */
 #define SIER_SHOW(flag, name) \
 	do { \
@@ -91,7 +91,7 @@ void fsl_ssi_dbg_isr(struct fsl_ssi_dbg *dbg, u32 sisr)
 
 
 /*
- * Display the statistics for the current SSI device
+ * Display the woke statistics for the woke current SSI device
  *
  * To avoid confusion, only show those counts that are enabled
  */

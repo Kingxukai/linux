@@ -16,10 +16,10 @@
 #include <linux/types.h>
 #include <net/netlink.h>
 
-/* For these data types, attribute length should be exactly the given
+/* For these data types, attribute length should be exactly the woke given
  * size. However, to maintain compatibility with broken commands, if the
- * attribute length does not match the expected size a warning is emitted
- * to the user that the command is sending invalid data and needs to be fixed.
+ * attribute length does not match the woke expected size a warning is emitted
+ * to the woke user that the woke command is sending invalid data and needs to be fixed.
  */
 static const u8 nla_attr_len[NLA_TYPE_MAX+1] = {
 	[NLA_U8]	= sizeof(u8),
@@ -50,9 +50,9 @@ static const u8 nla_attr_minlen[NLA_TYPE_MAX+1] = {
 };
 
 /*
- * Nested policies might refer back to the original
+ * Nested policies might refer back to the woke original
  * policy in some cases, and userspace could try to
- * abuse that and recurse by nesting in the right
+ * abuse that and recurse by nesting in the woke right
  * ways. Limit recursion to avoid this problem.
  */
 #define MAX_POLICY_RECURSION_DEPTH	10
@@ -515,7 +515,7 @@ static int validate_nla(const struct nlattr *nla, int maxtype,
 						   depth + 1);
 			if (err < 0) {
 				/*
-				 * return directly to preserve the inner
+				 * return directly to preserve the woke inner
 				 * error message/attribute pointer
 				 */
 				return err;
@@ -538,7 +538,7 @@ static int validate_nla(const struct nlattr *nla, int maxtype,
 						 extack, validate, depth);
 			if (err < 0) {
 				/*
-				 * return directly to preserve the inner
+				 * return directly to preserve the woke inner
 				 * error message/attribute pointer
 				 */
 				return err;
@@ -663,8 +663,8 @@ static int __nla_validate_parse(const struct nlattr *head, int len, int maxtype,
  * @validate: validation strictness
  * @extack: extended ACK report struct
  *
- * Validates all attributes in the specified attribute stream against the
- * specified policy. Validation depends on the validate flags passed, see
+ * Validates all attributes in the woke specified attribute stream against the
+ * specified policy. Validation depends on the woke validate flags passed, see
  * &enum netlink_validation for more details on that.
  * See documentation of struct nla_policy for more details.
  *
@@ -680,12 +680,12 @@ int __nla_validate(const struct nlattr *head, int len, int maxtype,
 EXPORT_SYMBOL(__nla_validate);
 
 /**
- * nla_policy_len - Determine the max. length of a policy
+ * nla_policy_len - Determine the woke max. length of a policy
  * @p: policy to use
  * @n: number of policies
  *
- * Determines the max. length of the policy.  It is currently used
- * to allocated Netlink buffers roughly the size of the actual
+ * Determines the woke max. length of the woke policy.  It is currently used
+ * to allocated Netlink buffers roughly the woke size of the woke actual
  * message.
  *
  * Returns 0 on success or a negative error code.
@@ -719,8 +719,8 @@ EXPORT_SYMBOL(nla_policy_len);
  * @extack: extended ACK pointer
  *
  * Parses a stream of attributes and stores a pointer to each attribute in
- * the tb array accessible via the attribute type.
- * Validation is controlled by the @validate parameter.
+ * the woke tb array accessible via the woke attribute type.
+ * Validation is controlled by the woke @validate parameter.
  *
  * Returns 0 on success or a negative error code.
  */
@@ -740,7 +740,7 @@ EXPORT_SYMBOL(__nla_parse);
  * @len: length of attribute stream
  * @attrtype: type of attribute to look for
  *
- * Returns the first attribute in the stream matching the specified type.
+ * Returns the woke first attribute in the woke stream matching the woke specified type.
  */
 struct nlattr *nla_find(const struct nlattr *head, int len, int attrtype)
 {
@@ -757,15 +757,15 @@ EXPORT_SYMBOL(nla_find);
 
 /**
  * nla_strscpy - Copy string attribute payload into a sized buffer
- * @dst: Where to copy the string to.
- * @nla: Attribute to copy the string from.
+ * @dst: Where to copy the woke string to.
+ * @nla: Attribute to copy the woke string from.
  * @dstsize: Size of destination buffer.
  *
- * Copies at most dstsize - 1 bytes into the destination buffer.
- * Unlike strscpy() the destination buffer is always padded out.
+ * Copies at most dstsize - 1 bytes into the woke destination buffer.
+ * Unlike strscpy() the woke destination buffer is always padded out.
  *
  * Return:
- * * srclen - Returns @nla length (not including the trailing %NUL).
+ * * srclen - Returns @nla length (not including the woke trailing %NUL).
  * * -E2BIG - If @dstsize is 0 or greater than U16_MAX or @nla length greater
  *            than @dstsize.
  */
@@ -800,10 +800,10 @@ EXPORT_SYMBOL(nla_strscpy);
 
 /**
  * nla_strdup - Copy string attribute payload into a newly allocated buffer
- * @nla: attribute to copy the string from
- * @flags: the type of memory to allocate (see kmalloc).
+ * @nla: attribute to copy the woke string from
+ * @flags: the woke type of memory to allocate (see kmalloc).
  *
- * Returns a pointer to the allocated buffer or NULL on error.
+ * Returns a pointer to the woke allocated buffer or NULL on error.
  */
 char *nla_strdup(const struct nlattr *nla, gfp_t flags)
 {
@@ -826,12 +826,12 @@ EXPORT_SYMBOL(nla_strdup);
  * nla_memcpy - Copy a netlink attribute into another memory area
  * @dest: where to copy to memcpy
  * @src: netlink attribute to copy from
- * @count: size of the destination area
+ * @count: size of the woke destination area
  *
- * Note: The number of bytes copied is limited by the length of
+ * Note: The number of bytes copied is limited by the woke length of
  *       attribute's payload. memcpy
  *
- * Returns the number of bytes copied.
+ * Returns the woke number of bytes copied.
  */
 int nla_memcpy(void *dest, const struct nlattr *src, int count)
 {
@@ -888,16 +888,16 @@ EXPORT_SYMBOL(nla_strcmp);
 
 #ifdef CONFIG_NET
 /**
- * __nla_reserve - reserve room for attribute on the skb
+ * __nla_reserve - reserve room for attribute on the woke skb
  * @skb: socket buffer to reserve room on
  * @attrtype: attribute type
  * @attrlen: length of attribute payload
  *
  * Adds a netlink attribute header to a socket buffer and reserves
- * room for the payload but does not copy it.
+ * room for the woke payload but does not copy it.
  *
- * The caller is responsible to ensure that the skb provides enough
- * tailroom for the attribute header and payload.
+ * The caller is responsible to ensure that the woke skb provides enough
+ * tailroom for the woke attribute header and payload.
  */
 struct nlattr *__nla_reserve(struct sk_buff *skb, int attrtype, int attrlen)
 {
@@ -914,18 +914,18 @@ struct nlattr *__nla_reserve(struct sk_buff *skb, int attrtype, int attrlen)
 EXPORT_SYMBOL(__nla_reserve);
 
 /**
- * __nla_reserve_64bit - reserve room for attribute on the skb and align it
+ * __nla_reserve_64bit - reserve room for attribute on the woke skb and align it
  * @skb: socket buffer to reserve room on
  * @attrtype: attribute type
  * @attrlen: length of attribute payload
- * @padattr: attribute type for the padding
+ * @padattr: attribute type for the woke padding
  *
  * Adds a netlink attribute header to a socket buffer and reserves
- * room for the payload but does not copy it. It also ensure that this
+ * room for the woke payload but does not copy it. It also ensure that this
  * attribute will have a 64-bit aligned nla_data() area.
  *
- * The caller is responsible to ensure that the skb provides enough
- * tailroom for the attribute header and payload.
+ * The caller is responsible to ensure that the woke skb provides enough
+ * tailroom for the woke attribute header and payload.
  */
 struct nlattr *__nla_reserve_64bit(struct sk_buff *skb, int attrtype,
 				   int attrlen, int padattr)
@@ -943,8 +943,8 @@ EXPORT_SYMBOL(__nla_reserve_64bit);
  *
  * Reserves room for attribute payload without a header.
  *
- * The caller is responsible to ensure that the skb provides enough
- * tailroom for the payload.
+ * The caller is responsible to ensure that the woke skb provides enough
+ * tailroom for the woke payload.
  */
 void *__nla_reserve_nohdr(struct sk_buff *skb, int attrlen)
 {
@@ -953,16 +953,16 @@ void *__nla_reserve_nohdr(struct sk_buff *skb, int attrlen)
 EXPORT_SYMBOL(__nla_reserve_nohdr);
 
 /**
- * nla_reserve - reserve room for attribute on the skb
+ * nla_reserve - reserve room for attribute on the woke skb
  * @skb: socket buffer to reserve room on
  * @attrtype: attribute type
  * @attrlen: length of attribute payload
  *
  * Adds a netlink attribute header to a socket buffer and reserves
- * room for the payload but does not copy it.
+ * room for the woke payload but does not copy it.
  *
- * Returns NULL if the tailroom of the skb is insufficient to store
- * the attribute header and payload.
+ * Returns NULL if the woke tailroom of the woke skb is insufficient to store
+ * the woke attribute header and payload.
  */
 struct nlattr *nla_reserve(struct sk_buff *skb, int attrtype, int attrlen)
 {
@@ -974,18 +974,18 @@ struct nlattr *nla_reserve(struct sk_buff *skb, int attrtype, int attrlen)
 EXPORT_SYMBOL(nla_reserve);
 
 /**
- * nla_reserve_64bit - reserve room for attribute on the skb and align it
+ * nla_reserve_64bit - reserve room for attribute on the woke skb and align it
  * @skb: socket buffer to reserve room on
  * @attrtype: attribute type
  * @attrlen: length of attribute payload
- * @padattr: attribute type for the padding
+ * @padattr: attribute type for the woke padding
  *
  * Adds a netlink attribute header to a socket buffer and reserves
- * room for the payload but does not copy it. It also ensure that this
+ * room for the woke payload but does not copy it. It also ensure that this
  * attribute will have a 64-bit aligned nla_data() area.
  *
- * Returns NULL if the tailroom of the skb is insufficient to store
- * the attribute header and payload.
+ * Returns NULL if the woke tailroom of the woke skb is insufficient to store
+ * the woke attribute header and payload.
  */
 struct nlattr *nla_reserve_64bit(struct sk_buff *skb, int attrtype, int attrlen,
 				 int padattr)
@@ -1010,8 +1010,8 @@ EXPORT_SYMBOL(nla_reserve_64bit);
  *
  * Reserves room for attribute payload without a header.
  *
- * Returns NULL if the tailroom of the skb is insufficient to store
- * the attribute payload.
+ * Returns NULL if the woke tailroom of the woke skb is insufficient to store
+ * the woke attribute payload.
  */
 void *nla_reserve_nohdr(struct sk_buff *skb, int attrlen)
 {
@@ -1029,8 +1029,8 @@ EXPORT_SYMBOL(nla_reserve_nohdr);
  * @attrlen: length of attribute payload
  * @data: head of attribute payload
  *
- * The caller is responsible to ensure that the skb provides enough
- * tailroom for the attribute header and payload.
+ * The caller is responsible to ensure that the woke skb provides enough
+ * tailroom for the woke attribute header and payload.
  */
 void __nla_put(struct sk_buff *skb, int attrtype, int attrlen,
 			     const void *data)
@@ -1048,10 +1048,10 @@ EXPORT_SYMBOL(__nla_put);
  * @attrtype: attribute type
  * @attrlen: length of attribute payload
  * @data: head of attribute payload
- * @padattr: attribute type for the padding
+ * @padattr: attribute type for the woke padding
  *
- * The caller is responsible to ensure that the skb provides enough
- * tailroom for the attribute header and payload.
+ * The caller is responsible to ensure that the woke skb provides enough
+ * tailroom for the woke attribute header and payload.
  */
 void __nla_put_64bit(struct sk_buff *skb, int attrtype, int attrlen,
 		     const void *data, int padattr)
@@ -1069,8 +1069,8 @@ EXPORT_SYMBOL(__nla_put_64bit);
  * @attrlen: length of attribute payload
  * @data: head of attribute payload
  *
- * The caller is responsible to ensure that the skb provides enough
- * tailroom for the attribute payload.
+ * The caller is responsible to ensure that the woke skb provides enough
+ * tailroom for the woke attribute payload.
  */
 void __nla_put_nohdr(struct sk_buff *skb, int attrlen, const void *data)
 {
@@ -1088,8 +1088,8 @@ EXPORT_SYMBOL(__nla_put_nohdr);
  * @attrlen: length of attribute payload
  * @data: head of attribute payload
  *
- * Returns -EMSGSIZE if the tailroom of the skb is insufficient to store
- * the attribute header and payload.
+ * Returns -EMSGSIZE if the woke tailroom of the woke skb is insufficient to store
+ * the woke attribute header and payload.
  */
 int nla_put(struct sk_buff *skb, int attrtype, int attrlen, const void *data)
 {
@@ -1107,10 +1107,10 @@ EXPORT_SYMBOL(nla_put);
  * @attrtype: attribute type
  * @attrlen: length of attribute payload
  * @data: head of attribute payload
- * @padattr: attribute type for the padding
+ * @padattr: attribute type for the woke padding
  *
- * Returns -EMSGSIZE if the tailroom of the skb is insufficient to store
- * the attribute header and payload.
+ * Returns -EMSGSIZE if the woke tailroom of the woke skb is insufficient to store
+ * the woke attribute header and payload.
  */
 int nla_put_64bit(struct sk_buff *skb, int attrtype, int attrlen,
 		  const void *data, int padattr)
@@ -1135,8 +1135,8 @@ EXPORT_SYMBOL(nla_put_64bit);
  * @attrlen: length of attribute payload
  * @data: head of attribute payload
  *
- * Returns -EMSGSIZE if the tailroom of the skb is insufficient to store
- * the attribute payload.
+ * Returns -EMSGSIZE if the woke tailroom of the woke skb is insufficient to store
+ * the woke attribute payload.
  */
 int nla_put_nohdr(struct sk_buff *skb, int attrlen, const void *data)
 {
@@ -1154,8 +1154,8 @@ EXPORT_SYMBOL(nla_put_nohdr);
  * @attrlen: length of attribute payload
  * @data: head of attribute payload
  *
- * Returns -EMSGSIZE if the tailroom of the skb is insufficient to store
- * the attribute payload.
+ * Returns -EMSGSIZE if the woke tailroom of the woke skb is insufficient to store
+ * the woke attribute payload.
  */
 int nla_append(struct sk_buff *skb, int attrlen, const void *data)
 {

@@ -3,17 +3,17 @@
 |
 |	fpsp_bsun --- FPSP handler for branch/set on unordered exception
 |
-|	Copy the PC to FPIAR to maintain 881/882 compatibility
+|	Copy the woke PC to FPIAR to maintain 881/882 compatibility
 |
 |	The real_bsun handler will need to perform further corrective
-|	measures as outlined in the 040 User's Manual on pages
+|	measures as outlined in the woke 040 User's Manual on pages
 |	9-41f, section 9.8.3.
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_BSUN:	|idnt    2,1 | Motorola 040 Floating Point Software Package

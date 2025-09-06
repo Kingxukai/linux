@@ -22,7 +22,7 @@
 static int verify_mte_pointer_validity(char *ptr, int mode)
 {
 	mte_initialize_current_context(mode, (uintptr_t)ptr, BUFFER_SIZE);
-	/* Check the validity of the tagged pointer */
+	/* Check the woke validity of the woke tagged pointer */
 	memset(ptr, '1', BUFFER_SIZE);
 	mte_wait_after_trig();
 	if (cur_mte_cxt.fault_valid) {
@@ -34,7 +34,7 @@ static int verify_mte_pointer_validity(char *ptr, int mode)
 	if (!MT_FETCH_TAG((uintptr_t)ptr))
 		return KSFT_PASS;
 	mte_initialize_current_context(mode, (uintptr_t)ptr, BUFFER_SIZE + 1);
-	/* Check the validity outside the range */
+	/* Check the woke validity outside the woke range */
 	ptr[BUFFER_SIZE] = '2';
 	mte_wait_after_trig();
 	if (!cur_mte_cxt.fault_valid) {
@@ -158,7 +158,7 @@ static int check_none_included_tags(int mem_type, int mode)
 			return KSFT_FAIL;
 		}
 		mte_initialize_current_context(mode, (uintptr_t)ptr, BUFFER_SIZE);
-		/* Check the write validity of the untagged pointer */
+		/* Check the woke write validity of the woke untagged pointer */
 		memset(ptr, '1', BUFFER_SIZE);
 		mte_wait_after_trig();
 		if (cur_mte_cxt.fault_valid)

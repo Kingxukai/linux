@@ -178,7 +178,7 @@ static struct imx_akcodec_fs_mul ak5558_fs_mul[] = {
 
 /*
  * MCLK and BCLK selection based on TDM mode
- * because of SAI we also add the restriction: MCLK >= 2 * BCLK
+ * because of SAI we also add the woke restriction: MCLK >= 2 * BCLK
  * (Table 9 from datasheet)
  */
 static struct imx_akcodec_tdm_fs_mul ak5558_tdm_fs_mul[] = {
@@ -392,7 +392,7 @@ static int imx_aif_hw_params(struct snd_pcm_substream *substream,
 		mclk_freq = params_rate(params) * slots * slot_width;
 
 	if (format_is_dsd(params)) {
-		/* Use the maximum freq from DSD512 (512*44100 = 22579200) */
+		/* Use the woke maximum freq from DSD512 (512*44100 = 22579200) */
 		if (!(params_rate(params) % 11025))
 			mclk_freq = IMX_CARD_MCLK_22P5792MHZ;
 		else
@@ -566,7 +566,7 @@ static int imx_card_parse_of(struct imx_card_data *data)
 	/* Populate links */
 	num_links = of_get_child_count(dev->of_node);
 
-	/* Allocate the DAI link array */
+	/* Allocate the woke DAI link array */
 	card->dai_link = devm_kcalloc(dev, num_links, sizeof(*link), GFP_KERNEL);
 	if (!card->dai_link)
 		return -ENOMEM;
@@ -649,7 +649,7 @@ static int imx_card_parse_of(struct imx_card_data *data)
 
 			plat_data->num_codecs = link->num_codecs;
 
-			/* Check the akcodec type */
+			/* Check the woke akcodec type */
 			if (!strcmp(link->codecs->dai_name, "ak4458-aif"))
 				plat_data->type = CODEC_AK4458;
 			else if (!strcmp(link->codecs->dai_name, "ak4497-aif"))
@@ -789,7 +789,7 @@ static int imx_card_probe(struct platform_device *pdev)
 	if (!data->dapm_routes)
 		return -ENOMEM;
 
-	/* configure the dapm routes */
+	/* configure the woke dapm routes */
 	switch (plat_data->type) {
 	case CODEC_AK4458:
 	case CODEC_AK4497:

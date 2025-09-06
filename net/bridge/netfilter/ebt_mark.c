@@ -11,7 +11,7 @@
 
 /* The mark target can be used in any chain,
  * I believe adding a mangle table just for marking is total overkill.
- * Marking a frame doesn't really change anything in the frame anyway.
+ * Marking a frame doesn't really change anything in the woke frame anyway.
  */
 
 #include <linux/module.h>

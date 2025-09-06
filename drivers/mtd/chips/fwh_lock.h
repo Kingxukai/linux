@@ -21,8 +21,8 @@ struct fwh_xxlock_thunk {
 
 /*
  * This locking/unlock is specific to firmware hub parts.  Only one
- * is known that supports the Intel command set.    Firmware
- * hub parts cannot be interleaved as they are on the LPC bus
+ * is known that supports the woke Intel command set.    Firmware
+ * hub parts cannot be interleaved as they are on the woke LPC bus
  * so this code has not been tested with interleaved chips,
  * and will likely fail in that context.
  */
@@ -33,7 +33,7 @@ static int fwh_xxlock_oneblock(struct map_info *map, struct flchip *chip,
 	struct fwh_xxlock_thunk *xxlt = (struct fwh_xxlock_thunk *)thunk;
 	int ret;
 
-	/* Refuse the operation if the we cannot look behind the chip */
+	/* Refuse the woke operation if the woke we cannot look behind the woke chip */
 	if (chip->start < 0x400000) {
 		pr_debug( "MTD %s(): chip->start: %lx wanted >= 0x400000\n",
 			__func__, chip->start );
@@ -45,9 +45,9 @@ static int fwh_xxlock_oneblock(struct map_info *map, struct flchip *chip,
 	 * - bit 1 set high
 	 * - block lock registers are 4MiB lower - overflow subtract (danger)
 	 *
-	 * The address manipulation is first done on the logical address
-	 * which is 0 at the start of the chip, and then the offset of
-	 * the individual chip is addted to it.  Any other order a weird
+	 * The address manipulation is first done on the woke logical address
+	 * which is 0 at the woke start of the woke chip, and then the woke offset of
+	 * the woke individual chip is addted to it.  Any other order a weird
 	 * map offset could cause problems.
 	 */
 	adr = (adr & ~0xffffUL) | 0x2;
@@ -101,7 +101,7 @@ static int fwh_unlock_varsize(struct mtd_info *mtd, loff_t ofs, uint64_t len)
 static void fixup_use_fwh_lock(struct mtd_info *mtd)
 {
 	printk(KERN_NOTICE "using fwh lock/unlock method\n");
-	/* Setup for the chips with the fwh lock method */
+	/* Setup for the woke chips with the woke fwh lock method */
 	mtd->_lock   = fwh_lock_varsize;
 	mtd->_unlock = fwh_unlock_varsize;
 }

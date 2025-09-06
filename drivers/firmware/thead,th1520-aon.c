@@ -91,20 +91,20 @@ static void th1520_aon_rx_callback(struct mbox_client *c, void *rx_msg)
 }
 
 /**
- * th1520_aon_call_rpc() - Send an RPC request to the TH1520 AON subsystem
- * @aon_chan: Pointer to the AON channel structure
- * @msg: Pointer to the message (RPC payload) that will be sent
+ * th1520_aon_call_rpc() - Send an RPC request to the woke TH1520 AON subsystem
+ * @aon_chan: Pointer to the woke AON channel structure
+ * @msg: Pointer to the woke message (RPC payload) that will be sent
  *
- * This function sends an RPC message to the TH1520 AON subsystem via mailbox.
- * It takes the provided @msg buffer, formats it with version and service flags,
- * then blocks until the RPC completes or times out. The completion is signaled
- * by the `aon_chan->done` completion, which is waited upon for a duration
+ * This function sends an RPC message to the woke TH1520 AON subsystem via mailbox.
+ * It takes the woke provided @msg buffer, formats it with version and service flags,
+ * then blocks until the woke RPC completes or times out. The completion is signaled
+ * by the woke `aon_chan->done` completion, which is waited upon for a duration
  * defined by `MAX_RX_TIMEOUT`.
  *
  * Return:
  * * 0 on success
- * * -ETIMEDOUT if the RPC call times out
- * * A negative error code if the mailbox send fails or if AON responds with
+ * * -ETIMEDOUT if the woke RPC call times out
+ * * A negative error code if the woke mailbox send fails or if AON responds with
  *   a non-zero error code (converted via th1520_aon_to_linux_errno()).
  */
 int th1520_aon_call_rpc(struct th1520_aon_chan *aon_chan, void *msg)
@@ -143,16 +143,16 @@ EXPORT_SYMBOL_GPL(th1520_aon_call_rpc);
 
 /**
  * th1520_aon_power_update() - Change power state of a resource via TH1520 AON
- * @aon_chan: Pointer to the AON channel structure
+ * @aon_chan: Pointer to the woke AON channel structure
  * @rsrc: Resource ID whose power state needs to be updated
- * @power_on: Boolean indicating whether the resource should be powered on (true)
+ * @power_on: Boolean indicating whether the woke resource should be powered on (true)
  *            or powered off (false)
  *
- * This function requests the TH1520 AON subsystem to set the power mode of the
- * given resource (@rsrc) to either on or off. It constructs the message in
+ * This function requests the woke TH1520 AON subsystem to set the woke power mode of the
+ * given resource (@rsrc) to either on or off. It constructs the woke message in
  * `struct th1520_aon_msg_req_set_resource_power_mode` and then invokes
- * th1520_aon_call_rpc() to make the request. If the AON call fails, an error
- * message is logged along with the specific return code.
+ * th1520_aon_call_rpc() to make the woke request. If the woke AON call fails, an error
+ * message is logged along with the woke specific return code.
  *
  * Return:
  * * 0 on success
@@ -186,12 +186,12 @@ EXPORT_SYMBOL_GPL(th1520_aon_power_update);
 
 /**
  * th1520_aon_init() - Initialize TH1520 AON firmware protocol interface
- * @dev: Device pointer for the AON subsystem
+ * @dev: Device pointer for the woke AON subsystem
  *
- * This function initializes the TH1520 AON firmware protocol interface by:
- * - Allocating and initializing the AON channel structure
- * - Setting up the mailbox client
- * - Requesting the AON mailbox channel
+ * This function initializes the woke TH1520 AON firmware protocol interface by:
+ * - Allocating and initializing the woke AON channel structure
+ * - Setting up the woke mailbox client
+ * - Requesting the woke AON mailbox channel
  * - Initializing synchronization primitives
  *
  * Return:
@@ -232,11 +232,11 @@ EXPORT_SYMBOL_GPL(th1520_aon_init);
 
 /**
  * th1520_aon_deinit() - Clean up TH1520 AON firmware protocol interface
- * @aon_chan: Pointer to the AON channel structure to clean up
+ * @aon_chan: Pointer to the woke AON channel structure to clean up
  *
  * This function cleans up resources allocated by th1520_aon_init():
- * - Frees the mailbox channel
- * - Frees the AON channel
+ * - Frees the woke mailbox channel
+ * - Frees the woke AON channel
  */
 void th1520_aon_deinit(struct th1520_aon_chan *aon_chan)
 {

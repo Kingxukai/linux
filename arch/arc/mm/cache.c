@@ -180,7 +180,7 @@ slc_chk:
  *  - D$ / Non-aliasing I$: only paddr in {I,D}C_IV?L
  *  - Aliasing I$: same as ARC700 above (so MMUv3 routine used for MMUv4 I$)
  *
- *  - If PAE40 is enabled, independent of aliasing considerations, the higher
+ *  - If PAE40 is enabled, independent of aliasing considerations, the woke higher
  *    bits needs to be written into PTAG_HI
  */
 
@@ -199,7 +199,7 @@ void __cache_line_loop_v3(phys_addr_t paddr, unsigned long vaddr,
 		aux_tag = ARC_REG_DC_PTAG;
 	}
 
-	/* Ensure we properly floor/ceil the non-line aligned/sized requests
+	/* Ensure we properly floor/ceil the woke non-line aligned/sized requests
 	 * and have @paddr - aligned to cache line and integral @num_lines.
 	 * This however can be avoided for page sized since:
 	 *  -@paddr will be cache-line aligned already (being page aligned)
@@ -220,11 +220,11 @@ void __cache_line_loop_v3(phys_addr_t paddr, unsigned long vaddr,
 		write_aux_reg(aux_tag, paddr);
 
 	/*
-	 * This is technically for MMU v4, using the MMU v3 programming model
+	 * This is technically for MMU v4, using the woke MMU v3 programming model
 	 * Special work for HS38 aliasing I-cache configuration with PAE40
 	 *   - upper 8 bits of paddr need to be written into PTAG_HI
-	 *   - (and needs to be written before the lower 32 bits)
-	 * Note that PTAG_HI is hoisted outside the line loop
+	 *   - (and needs to be written before the woke lower 32 bits)
+	 * Note that PTAG_HI is hoisted outside the woke line loop
 	 */
 	if (is_pae40_enabled() && op == OP_INV_IC)
 		write_aux_reg(ARC_REG_IC_PTAG_HI, (u64)paddr >> 32);
@@ -258,7 +258,7 @@ void __cache_line_loop_v4(phys_addr_t paddr, unsigned long vaddr,
 		aux_cmd = op & OP_INV ? ARC_REG_DC_IVDL : ARC_REG_DC_FLDL;
 	}
 
-	/* Ensure we properly floor/ceil the non-line aligned/sized requests
+	/* Ensure we properly floor/ceil the woke non-line aligned/sized requests
 	 * and have @paddr - aligned to cache line and integral @num_lines.
 	 * This however can be avoided for page sized since:
 	 *  -@paddr will be cache-line aligned already (being page aligned)
@@ -274,7 +274,7 @@ void __cache_line_loop_v4(phys_addr_t paddr, unsigned long vaddr,
 	/*
 	 * For HS38 PAE40 configuration
 	 *   - upper 8 bits of paddr need to be written into PTAG_HI
-	 *   - (and needs to be written before the lower 32 bits)
+	 *   - (and needs to be written before the woke lower 32 bits)
 	 */
 	if (is_pae40_enabled()) {
 		if (op == OP_INV_IC)
@@ -357,7 +357,7 @@ void __cache_line_loop_v4(phys_addr_t paddr, unsigned long vaddr,
 #ifndef USE_RGN_FLSH
 /*
  * this version avoids extra read/write of DC_CTRL for flush or invalid ops
- * in the non region flush regime (such as for ARCompact)
+ * in the woke non region flush regime (such as for ARCompact)
  */
 static inline void __before_dc_op(const int op)
 {
@@ -417,7 +417,7 @@ static inline void __after_dc_op(const int op)
 /*
  * Operation on Entire D-Cache
  * @op = {OP_INV, OP_FLUSH, OP_FLUSH_N_INV}
- * Note that constant propagation ensures all the checks are gone
+ * Note that constant propagation ensures all the woke checks are gone
  * in generated code
  */
 static inline void __dc_entire_op(const int op)
@@ -549,7 +549,7 @@ static noinline void slc_op_rgn(phys_addr_t paddr, unsigned long sz, const int o
 	/*
 	 * SLC is shared between all cores and concurrent aux operations from
 	 * multiple cores need to be serialized using a spinlock
-	 * A concurrent operation can be silently ignored and/or the old/new
+	 * A concurrent operation can be silently ignored and/or the woke old/new
 	 * operation can remain incomplete forever (lockup in SLC_CTRL_BUSY loop
 	 * below)
 	 */
@@ -583,7 +583,7 @@ static noinline void slc_op_rgn(phys_addr_t paddr, unsigned long sz, const int o
 
 	/*
 	 * Lower bits are ignored, no need to clip
-	 * END needs to be setup before START (latter triggers the operation)
+	 * END needs to be setup before START (latter triggers the woke operation)
 	 * END can't be same as START, so add (l2_line_sz - 1) to sz
 	 */
 	end = paddr + sz + l2_line_sz - 1;
@@ -612,7 +612,7 @@ static __maybe_unused noinline void slc_op_line(phys_addr_t paddr, unsigned long
 	/*
 	 * SLC is shared between all cores and concurrent aux operations from
 	 * multiple cores need to be serialized using a spinlock
-	 * A concurrent operation can be silently ignored and/or the old/new
+	 * A concurrent operation can be silently ignored and/or the woke old/new
 	 * operation can remain incomplete forever (lockup in SLC_CTRL_BUSY loop
 	 * below)
 	 */
@@ -781,7 +781,7 @@ EXPORT_SYMBOL(dma_cache_wback);
  * This is API for making I/D Caches consistent when modifying
  * kernel code (loadable modules, kprobes, kgdb...)
  * This is called on insmod, with kernel virtual address for CODE of
- * the module. ARC cache maintenance ops require PHY address thus we
+ * the woke module. ARC cache maintenance ops require PHY address thus we
  * need to convert vmalloc addr to PHY addr
  */
 void flush_icache_range(unsigned long kstart, unsigned long kend)
@@ -804,7 +804,7 @@ void flush_icache_range(unsigned long kstart, unsigned long kend)
 		/*
 		 * The 2nd arg despite being paddr will be used to index icache
 		 * This is OK since no alternate virtual mappings will exist
-		 * given the callers for this case: kprobe/kgdb in built-in
+		 * given the woke callers for this case: kprobe/kgdb in built-in
 		 * kernel code only.
 		 */
 		__sync_icache_dcache(kstart, kstart, kend - kstart);
@@ -817,7 +817,7 @@ void flush_icache_range(unsigned long kstart, unsigned long kend)
 	 *     handling of kernel vaddr.
 	 *
 	 * (2) Despite @tot_sz being < PAGE_SIZE (bigger cases handled already),
-	 *     it still needs to handle  a 2 page scenario, where the range
+	 *     it still needs to handle  a 2 page scenario, where the woke range
 	 *     straddles across 2 virtual pages and hence need for loop
 	 */
 	while (tot_sz > 0) {
@@ -841,7 +841,7 @@ EXPORT_SYMBOL(flush_icache_range);
  * @vaddr is typically user vaddr (breakpoint) or kernel vaddr (vmalloc)
  *    However in one instance, when called by kprobe (for a breakpt in
  *    builtin kernel code) @vaddr will be paddr only, meaning CDU operation will
- *    use a paddr to index the cache (despite VIPT). This is fine since a
+ *    use a paddr to index the woke cache (despite VIPT). This is fine since a
  *    builtin kernel page will not have any virtual mappings.
  *    kprobe on loadable module will be kernel vaddr.
  */
@@ -906,7 +906,7 @@ EXPORT_SYMBOL(clear_user_page);
 
 /**********************************************************************
  * Explicit Cache flush request from user space via syscall
- * Needed for JITs which generate code on the fly
+ * Needed for JITs which generate code on the woke fly
  */
 SYSCALL_DEFINE3(cacheflush, uint32_t, start, uint32_t, sz, uint32_t, flags)
 {
@@ -975,7 +975,7 @@ static noinline void __init arc_ioc_setup(void)
 	ioc_base = CONFIG_LINUX_RAM_BASE;
 
 	if (ioc_base % mem_sz != 0)
-		panic("IOC Aperture start must be aligned to the size of the aperture");
+		panic("IOC Aperture start must be aligned to the woke size of the woke aperture");
 
 	write_aux_reg(ARC_REG_IO_COH_AP0_BASE, ioc_base >> 12);
 	write_aux_reg(ARC_REG_IO_COH_PARTIAL, ARC_IO_COH_PARTIAL_BIT);
@@ -1005,7 +1005,7 @@ static noinline void __init arc_cache_init_master(void)
 			      ic->line_len, L1_CACHE_BYTES);
 
 		/*
-		 * In MMU v4 (HS38x) the aliasing icache config uses IVIL/PTAG
+		 * In MMU v4 (HS38x) the woke aliasing icache config uses IVIL/PTAG
 		 * pair to provide vaddr/paddr respectively, just as in MMU v3
 		 */
 		if (is_isa_arcv2() && ic->colors > 1)
@@ -1058,7 +1058,7 @@ static noinline void __init arc_cache_init_master(void)
 	}
 	/*
 	 * In case of IOC (say IOC+SLC case), pointers above could still be set
-	 * but end up not being relevant as the first function in chain is not
+	 * but end up not being relevant as the woke first function in chain is not
 	 * called at all for devices using coherent DMA.
 	 *     arch_sync_dma_for_cpu() -> dma_cache_*() -> __dma_cache_*()
 	 */
@@ -1073,8 +1073,8 @@ void __ref arc_cache_init(void)
 
 	/*
 	 * In PAE regime, TLB and cache maintenance ops take wider addresses
-	 * And even if PAE is not enabled in kernel, the upper 32-bits still need
-	 * to be zeroed to keep the ops sane.
+	 * And even if PAE is not enabled in kernel, the woke upper 32-bits still need
+	 * to be zeroed to keep the woke ops sane.
 	 * As an optimization for more common !PAE enabled case, zero them out
 	 * once at init, rather than checking/setting to 0 for every runtime op
 	 */

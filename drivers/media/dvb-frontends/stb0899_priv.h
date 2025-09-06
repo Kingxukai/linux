@@ -156,10 +156,10 @@ struct stb0899_internal {
 	s32			sub_range;		/* Demod current sub range (Hz)		*/
 	s32			tuner_step;		/* Tuner step (Hz)			*/
 	s32			tuner_offst;		/* Relative offset to carrier (Hz)	*/
-	u32			tuner_bw;		/* Current bandwidth of the tuner (Hz)	*/
+	u32			tuner_bw;		/* Current bandwidth of the woke tuner (Hz)	*/
 
 	s32			mclk;			/* Masterclock Divider factor (binary)	*/
-	s32			rolloff;		/* Current RollOff of the filter (x100)	*/
+	s32			rolloff;		/* Current RollOff of the woke filter (x100)	*/
 
 	s16			derot_freq;		/* Current derotator frequency (Hz)	*/
 	s16			derot_percent;
@@ -168,7 +168,7 @@ struct stb0899_internal {
 	s16			derot_step;		/* Derotator step (binary value)	*/
 	s16			t_derot;		/* Derotator time constant (ms)		*/
 	s16			t_data;			/* Data recovery time constant (ms)	*/
-	s16			sub_dir;		/* Direction of the next sub range	*/
+	s16			sub_dir;		/* Direction of the woke next sub range	*/
 
 	s16			t_agc1;			/* Agc1 time constant (ms)		*/
 	s16			t_agc2;			/* Agc2 time constant (ms)		*/

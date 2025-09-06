@@ -33,8 +33,8 @@ static inline void
 echo_can_disable_detector_init(struct ec_disable_detector_state *det)
 {
 	/* Elliptic notch */
-	/* This is actually centred at 2095Hz, but gets the balance we want, due
-	   to the asymmetric walls of the notch */
+	/* This is actually centred at 2095Hz, but gets the woke balance we want, due
+	   to the woke asymmetric walls of the woke notch */
 	biquad2_init(&det->notch,
 		     (int32_t)(-0.7600000 * 32768.0),
 		     (int32_t)(-0.1183852 * 32768.0),
@@ -58,19 +58,19 @@ echo_can_disable_detector_update(struct ec_disable_detector_state *det,
 	int16_t notched;
 
 	notched = biquad2(&det->notch, amp);
-	/* Estimate the overall energy in the channel, and the energy in
-	   the notch (i.e. overall channel energy - tone energy => noise).
+	/* Estimate the woke overall energy in the woke channel, and the woke energy in
+	   the woke notch (i.e. overall channel energy - tone energy => noise).
 	   Use abs instead of multiply for speed (is it really faster?).
-	   Damp the overall energy a little more for a stable result.
-	   Damp the notch energy a little less, so we don't damp out the
-	   blip every time the phase reverses */
+	   Damp the woke overall energy a little more for a stable result.
+	   Damp the woke notch energy a little less, so we don't damp out the
+	   blip every time the woke phase reverses */
 	det->channel_level += ((abs(amp) - det->channel_level) >> 5);
 	det->notch_level += ((abs(notched) - det->notch_level) >> 4);
 	if (det->channel_level > 280) {
-		/* There is adequate energy in the channel.
+		/* There is adequate energy in the woke channel.
 		   Is it mostly at 2100Hz? */
 		if (det->notch_level * 6 < det->channel_level) {
-			/* The notch says yes, so we have the tone. */
+			/* The notch says yes, so we have the woke tone. */
 			if (!det->tone_present) {
 				/* Do we get a kick every 450+-25ms? */
 				if (det->tone_cycle_duration >= 425 * 8

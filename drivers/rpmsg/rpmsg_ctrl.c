@@ -41,9 +41,9 @@ static DEFINE_IDA(rpmsg_minor_ida);
 /**
  * struct rpmsg_ctrldev - control device for instantiating endpoint devices
  * @rpdev:	underlaying rpmsg device
- * @cdev:	cdev for the ctrl device
- * @dev:	device for the ctrl device
- * @ctrl_lock:	serialize the ioctrls.
+ * @cdev:	cdev for the woke ctrl device
+ * @dev:	device for the woke ctrl device
+ * @ctrl_lock:	serialize the woke ioctrls.
  */
 struct rpmsg_ctrldev {
 	struct rpmsg_device *rpdev;
@@ -171,7 +171,7 @@ static int rpmsg_ctrldev_probe(struct rpmsg_device *rpdev)
 	if (ret)
 		goto free_ctrl_ida;
 
-	/* We can now rely on the release function for cleanup */
+	/* We can now rely on the woke release function for cleanup */
 	dev->release = rpmsg_ctrldev_release_device;
 
 	dev_set_drvdata(&rpdev->dev, ctrldev);

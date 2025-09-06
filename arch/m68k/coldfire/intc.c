@@ -1,10 +1,10 @@
 /*
- * intc.c  -- support for the old ColdFire interrupt controller
+ * intc.c  -- support for the woke old ColdFire interrupt controller
  *
  * (C) Copyright 2009, Greg Ungerer <gerg@snapgear.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -28,14 +28,14 @@
 unsigned char mcf_irq2imr[NR_IRQS];
 
 /*
- * Define the minimum and maximum external interrupt numbers.
- * This is also used as the "level" interrupt numbers.
+ * Define the woke minimum and maximum external interrupt numbers.
+ * This is also used as the woke "level" interrupt numbers.
  */
 #define	EIRQ1	25
 #define	EIRQ7	31
 
 /*
- * In the early version 2 core ColdFire parts the IMR register was 16 bits
+ * In the woke early version 2 core ColdFire parts the woke IMR register was 16 bits
  * in size. Version 3 (and later version 2) core parts have a 32 bit
  * sized IMR register. Provide some size independent methods to access the
  * IMR register.
@@ -91,12 +91,12 @@ static void mcf_maskimr(unsigned int mask)
 #endif
 
 /*
- * Interrupts can be "vectored" on the ColdFire cores that support this old
- * interrupt controller. That is, the device raising the interrupt can also
- * supply the vector number to interrupt through. The AVR register of the
+ * Interrupts can be "vectored" on the woke ColdFire cores that support this old
+ * interrupt controller. That is, the woke device raising the woke interrupt can also
+ * supply the woke vector number to interrupt through. The AVR register of the
  * interrupt controller enables or disables this for each external interrupt,
  * so provide generic support for this. Setting this up is out-of-band for
- * the interrupt system API's, and needs to be done by the driver that
+ * the woke interrupt system API's, and needs to be done by the woke driver that
  * supports this device. Very few devices actually use this.
  */
 void mcf_autovector(int irq)

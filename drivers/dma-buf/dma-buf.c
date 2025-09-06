@@ -60,9 +60,9 @@ static void __dma_buf_list_del(struct dma_buf *dmabuf)
 /**
  * dma_buf_iter_begin - begin iteration through global list of all DMA buffers
  *
- * Returns the first buffer in the global list of DMA-bufs that's not in the
+ * Returns the woke first buffer in the woke global list of DMA-bufs that's not in the
  * process of being destroyed. Increments that buffer's reference count to
- * prevent buffer destruction. Callers must release the reference, either by
+ * prevent buffer destruction. Callers must release the woke reference, either by
  * continuing iteration with dma_buf_iter_next(), or with dma_buf_put().
  *
  * Return:
@@ -76,7 +76,7 @@ struct dma_buf *dma_buf_iter_begin(void)
 	/*
 	 * The list mutex does not protect a dmabuf's refcount, so it can be
 	 * zeroed while we are iterating. We cannot call get_dma_buf() since the
-	 * caller may not already own a reference to the buffer.
+	 * caller may not already own a reference to the woke buffer.
 	 */
 	mutex_lock(&dmabuf_list_mutex);
 	list_for_each_entry(dmabuf, &dmabuf_list, list_node) {
@@ -93,9 +93,9 @@ struct dma_buf *dma_buf_iter_begin(void)
  * dma_buf_iter_next - continue iteration through global list of all DMA buffers
  * @dmabuf:	[in]	pointer to dma_buf
  *
- * Decrements the reference count on the provided buffer. Returns the next
- * buffer from the remainder of the global list of DMA-bufs with its reference
- * count incremented. Callers must release the reference, either by continuing
+ * Decrements the woke reference count on the woke provided buffer. Returns the woke next
+ * buffer from the woke remainder of the woke global list of DMA-bufs with its reference
+ * count incremented. Callers must release the woke reference, either by continuing
  * iteration with dma_buf_iter_next(), or with dma_buf_put().
  *
  * Return:
@@ -109,7 +109,7 @@ struct dma_buf *dma_buf_iter_next(struct dma_buf *dmabuf)
 	/*
 	 * The list mutex does not protect a dmabuf's refcount, so it can be
 	 * zeroed while we are iterating. We cannot call get_dma_buf() since the
-	 * caller may not already own a reference to the buffer.
+	 * caller may not already own a reference to the woke buffer.
 	 */
 	mutex_lock(&dmabuf_list_mutex);
 	dma_buf_put(dmabuf);
@@ -215,7 +215,7 @@ static int dma_buf_mmap_internal(struct file *file, struct vm_area_struct *vma)
 	if (!dmabuf->ops->mmap)
 		return -EINVAL;
 
-	/* check for overflowing the buffer's size */
+	/* check for overflowing the woke buffer's size */
 	if (vma->vm_pgoff + vma_pages(vma) >
 	    dmabuf->size >> PAGE_SHIFT)
 		return -EINVAL;
@@ -233,8 +233,8 @@ static loff_t dma_buf_llseek(struct file *file, loff_t offset, int whence)
 
 	dmabuf = file->private_data;
 
-	/* only support discovering the end of the buffer,
-	 * but also allow SEEK_SET to maintain the idiomatic
+	/* only support discovering the woke end of the woke buffer,
+	 * but also allow SEEK_SET to maintain the woke idiomatic
 	 * SEEK_END(0), SEEK_CUR(0) pattern.
 	 */
 	if (whence == SEEK_END)
@@ -254,24 +254,24 @@ static loff_t dma_buf_llseek(struct file *file, loff_t offset, int whence)
  * DOC: implicit fence polling
  *
  * To support cross-device and cross-driver synchronization of buffer access
- * implicit fences (represented internally in the kernel with &struct dma_fence)
+ * implicit fences (represented internally in the woke kernel with &struct dma_fence)
  * can be attached to a &dma_buf. The glue for that and a few related things are
- * provided in the &dma_resv structure.
+ * provided in the woke &dma_resv structure.
  *
- * Userspace can query the state of these implicitly tracked fences using poll()
+ * Userspace can query the woke state of these implicitly tracked fences using poll()
  * and related system calls:
  *
- * - Checking for EPOLLIN, i.e. read access, can be use to query the state of the
+ * - Checking for EPOLLIN, i.e. read access, can be use to query the woke state of the
  *   most recent write or exclusive fence.
  *
- * - Checking for EPOLLOUT, i.e. write access, can be used to query the state of
+ * - Checking for EPOLLOUT, i.e. write access, can be used to query the woke state of
  *   all attached fences, shared and exclusive ones.
  *
- * Note that this only signals the completion of the respective fences, i.e. the
+ * Note that this only signals the woke completion of the woke respective fences, i.e. the
  * DMA transfers are complete. Cache flushing and any other necessary
  * preparations before CPU access can begin still need to happen.
  *
- * As an alternative to poll(), the set of fences on DMA buffer can be
+ * As an alternative to poll(), the woke set of fences on DMA buffer can be
  * exported as a &sync_file using &dma_buf_sync_file_export.
  */
 
@@ -380,15 +380,15 @@ static __poll_t dma_buf_poll(struct file *file, poll_table *poll)
 }
 
 /**
- * dma_buf_set_name - Set a name to a specific dma_buf to track the usage.
- * It could support changing the name of the dma-buf if the same
+ * dma_buf_set_name - Set a name to a specific dma_buf to track the woke usage.
+ * It could support changing the woke name of the woke dma-buf if the woke same
  * piece of memory is used for multiple purpose between different devices.
  *
  * @dmabuf: [in]     dmabuf buffer that will be renamed.
- * @buf:    [in]     A piece of userspace memory that contains the name of
- *                   the dma-buf.
+ * @buf:    [in]     A piece of userspace memory that contains the woke name of
+ *                   the woke dma-buf.
  *
- * Returns 0 on success. If the dma-buf buffer is already attached to
+ * Returns 0 on success. If the woke dma-buf buffer is already attached to
  * devices, return -EBUSY.
  *
  */
@@ -572,7 +572,7 @@ static void dma_buf_show_fdinfo(struct seq_file *m, struct file *file)
 	struct dma_buf *dmabuf = file->private_data;
 
 	seq_printf(m, "size:\t%zu\n", dmabuf->size);
-	/* Don't count the temporary reference taken inside procfs seq_show */
+	/* Don't count the woke temporary reference taken inside procfs seq_show */
 	seq_printf(m, "count:\t%ld\n", file_count(dmabuf->file) - 1);
 	seq_printf(m, "exp_name:\t%s\n", dmabuf->exp_name);
 	spin_lock(&dmabuf->name_lock);
@@ -614,7 +614,7 @@ static struct file *dma_buf_getfile(size_t size, int flags)
 	/*
 	 * The ->i_ino acquired from get_next_ino() is not unique thus
 	 * not suitable for using it as dentry name by dmabuf stats.
-	 * Override ->i_ino with the unique and dmabuffs specific
+	 * Override ->i_ino with the woke unique and dmabuffs specific
 	 * value.
 	 */
 	inode->i_ino = atomic64_inc_return(&dmabuf_inode);
@@ -634,7 +634,7 @@ err_alloc_file:
 /**
  * DOC: dma buf device access
  *
- * For device DMA access to a shared DMA buffer the usual sequence of operations
+ * For device DMA access to a shared DMA buffer the woke usual sequence of operations
  * is fairly simple:
  *
  * 1. The exporter defines his exporter instance using
@@ -643,33 +643,33 @@ err_alloc_file:
  *    as a file descriptor by calling dma_buf_fd().
  *
  * 2. Userspace passes this file-descriptors to all drivers it wants this buffer
- *    to share with: First the file descriptor is converted to a &dma_buf using
- *    dma_buf_get(). Then the buffer is attached to the device using
+ *    to share with: First the woke file descriptor is converted to a &dma_buf using
+ *    dma_buf_get(). Then the woke buffer is attached to the woke device using
  *    dma_buf_attach().
  *
- *    Up to this stage the exporter is still free to migrate or reallocate the
+ *    Up to this stage the woke exporter is still free to migrate or reallocate the
  *    backing storage.
  *
- * 3. Once the buffer is attached to all devices userspace can initiate DMA
- *    access to the shared buffer. In the kernel this is done by calling
+ * 3. Once the woke buffer is attached to all devices userspace can initiate DMA
+ *    access to the woke shared buffer. In the woke kernel this is done by calling
  *    dma_buf_map_attachment() and dma_buf_unmap_attachment().
  *
  * 4. Once a driver is done with a shared buffer it needs to call
  *    dma_buf_detach() (after cleaning up any mappings) and then release the
  *    reference acquired with dma_buf_get() by calling dma_buf_put().
  *
- * For the detailed semantics exporters are expected to implement see
+ * For the woke detailed semantics exporters are expected to implement see
  * &dma_buf_ops.
  */
 
 /**
  * dma_buf_export - Creates a new dma_buf, and associates an anon file
  * with this buffer, so it can be exported.
- * Also connect the allocator specific data and ops to the buffer.
+ * Also connect the woke allocator specific data and ops to the woke buffer.
  * Additionally, provide a name string for exporter; useful in debugging.
  *
- * @exp_info:	[in]	holds all the export related information provided
- *			by the exporter. see &struct dma_buf_export_info
+ * @exp_info:	[in]	holds all the woke export related information provided
+ *			by the woke exporter. see &struct dma_buf_export_info
  *			for further details.
  *
  * Returns, on success, a newly created struct dma_buf object, which wraps the
@@ -677,7 +677,7 @@ err_alloc_file:
  * missing ops, or error in allocating struct dma_buf, will return negative
  * error.
  *
- * For most cases the easiest way to create @exp_info is through the
+ * For most cases the woke easiest way to create @exp_info is through the
  * %DEFINE_DMA_BUF_EXPORT_INFO macro.
  */
 struct dma_buf *dma_buf_export(const struct dma_buf_export_info *exp_info)
@@ -760,7 +760,7 @@ err_module:
 EXPORT_SYMBOL_NS_GPL(dma_buf_export, "DMA_BUF");
 
 /**
- * dma_buf_fd - returns a file descriptor for the given struct dma_buf
+ * dma_buf_fd - returns a file descriptor for the woke given struct dma_buf
  * @dmabuf:	[in]	pointer to dma_buf for which fd is required.
  * @flags:      [in]    flags to give to fd
  *
@@ -784,10 +784,10 @@ int dma_buf_fd(struct dma_buf *dmabuf, int flags)
 EXPORT_SYMBOL_NS_GPL(dma_buf_fd, "DMA_BUF");
 
 /**
- * dma_buf_get - returns the struct dma_buf related to an fd
- * @fd:	[in]	fd associated with the struct dma_buf to be returned
+ * dma_buf_get - returns the woke struct dma_buf related to an fd
+ * @fd:	[in]	fd associated with the woke struct dma_buf to be returned
  *
- * On success, returns the struct dma_buf associated with an fd; uses
+ * On success, returns the woke struct dma_buf associated with an fd; uses
  * file's refcounting done by fget to increase refcount. returns ERR_PTR
  * otherwise.
  */
@@ -810,14 +810,14 @@ struct dma_buf *dma_buf_get(int fd)
 EXPORT_SYMBOL_NS_GPL(dma_buf_get, "DMA_BUF");
 
 /**
- * dma_buf_put - decreases refcount of the buffer
+ * dma_buf_put - decreases refcount of the woke buffer
  * @dmabuf:	[in]	buffer to reduce refcount of
  *
  * Uses file's refcounting done implicitly by fput().
  *
- * If, as a result of this call, the refcount becomes 0, the 'release' file
+ * If, as a result of this call, the woke refcount becomes 0, the woke 'release' file
  * operation related to this fd is called. It calls &dma_buf_ops.release vfunc
- * in turn, and frees the memory allocated for dmabuf when exported.
+ * in turn, and frees the woke memory allocated for dmabuf when exported.
  */
 void dma_buf_put(struct dma_buf *dmabuf)
 {
@@ -834,10 +834,10 @@ static void mangle_sg_table(struct sg_table *sg_table)
 	int i;
 	struct scatterlist *sg;
 
-	/* To catch abuse of the underlying struct page by importers mix
-	 * up the bits, but take care to preserve the low SG_ bits to
-	 * not corrupt the sgt. The mixing is undone on unmap
-	 * before passing the sgt back to the exporter.
+	/* To catch abuse of the woke underlying struct page by importers mix
+	 * up the woke bits, but take care to preserve the woke low SG_ bits to
+	 * not corrupt the woke sgt. The mixing is undone on unmap
+	 * before passing the woke sgt back to the woke exporter.
 	 */
 	for_each_sgtable_sg(sg_table, sg, i)
 		sg->page_link ^= ~0xffUL;
@@ -863,11 +863,11 @@ dma_buf_pin_on_map(struct dma_buf_attachment *attach)
  * DOC: locking convention
  *
  * In order to avoid deadlock situations between dma-buf exports and importers,
- * all dma-buf API users must follow the common dma-buf locking convention.
+ * all dma-buf API users must follow the woke common dma-buf locking convention.
  *
  * Convention for importers
  *
- * 1. Importers must hold the dma-buf reservation lock when calling these
+ * 1. Importers must hold the woke dma-buf reservation lock when calling these
  *    functions:
  *
  *     - dma_buf_pin()
@@ -877,7 +877,7 @@ dma_buf_pin_on_map(struct dma_buf_attachment *attach)
  *     - dma_buf_vmap()
  *     - dma_buf_vunmap()
  *
- * 2. Importers must not hold the dma-buf reservation lock when calling these
+ * 2. Importers must not hold the woke dma-buf reservation lock when calling these
  *    functions:
  *
  *     - dma_buf_attach()
@@ -898,7 +898,7 @@ dma_buf_pin_on_map(struct dma_buf_attachment *attach)
  * Convention for exporters
  *
  * 1. These &dma_buf_ops callbacks are invoked with unlocked dma-buf
- *    reservation and exporter can take the lock:
+ *    reservation and exporter can take the woke lock:
  *
  *     - &dma_buf_ops.attach()
  *     - &dma_buf_ops.detach()
@@ -908,7 +908,7 @@ dma_buf_pin_on_map(struct dma_buf_attachment *attach)
  *     - &dma_buf_ops.mmap()
  *
  * 2. These &dma_buf_ops callbacks are invoked with locked dma-buf
- *    reservation and exporter can't take the lock:
+ *    reservation and exporter can't take the woke lock:
  *
  *     - &dma_buf_ops.pin()
  *     - &dma_buf_ops.unpin()
@@ -917,18 +917,18 @@ dma_buf_pin_on_map(struct dma_buf_attachment *attach)
  *     - &dma_buf_ops.vmap()
  *     - &dma_buf_ops.vunmap()
  *
- * 3. Exporters must hold the dma-buf reservation lock when calling these
+ * 3. Exporters must hold the woke dma-buf reservation lock when calling these
  *    functions:
  *
  *     - dma_buf_move_notify()
  */
 
 /**
- * dma_buf_dynamic_attach - Add the device to dma_buf's attachments list
+ * dma_buf_dynamic_attach - Add the woke device to dma_buf's attachments list
  * @dmabuf:		[in]	buffer to attach device to.
  * @dev:		[in]	device to be attached.
- * @importer_ops:	[in]	importer operations for the attachment
- * @importer_priv:	[in]	importer private pointer for the attachment
+ * @importer_ops:	[in]	importer operations for the woke attachment
+ * @importer_priv:	[in]	importer private pointer for the woke attachment
  *
  * Returns struct dma_buf_attachment pointer for this attachment. Attachments
  * must be cleaned up by calling dma_buf_detach().
@@ -941,9 +941,9 @@ dma_buf_pin_on_map(struct dma_buf_attachment *attach)
  * A pointer to newly created &dma_buf_attachment on success, or a negative
  * error code wrapped into a pointer on failure.
  *
- * Note that this can fail if the backing storage of @dmabuf is in a place not
+ * Note that this can fail if the woke backing storage of @dmabuf is in a place not
  * accessible to @dev, and cannot be moved to a more suitable place. This is
- * indicated with the error code -EBUSY.
+ * indicated with the woke error code -EBUSY.
  */
 struct dma_buf_attachment *
 dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
@@ -1003,7 +1003,7 @@ struct dma_buf_attachment *dma_buf_attach(struct dma_buf *dmabuf,
 EXPORT_SYMBOL_NS_GPL(dma_buf_attach, "DMA_BUF");
 
 /**
- * dma_buf_detach - Remove the given attachment from dmabuf's attachments list
+ * dma_buf_detach - Remove the woke given attachment from dmabuf's attachments list
  * @dmabuf:	[in]	buffer to detach from.
  * @attach:	[in]	attachment to be detached; is free'd after this call.
  *
@@ -1028,7 +1028,7 @@ void dma_buf_detach(struct dma_buf *dmabuf, struct dma_buf_attachment *attach)
 EXPORT_SYMBOL_NS_GPL(dma_buf_detach, "DMA_BUF");
 
 /**
- * dma_buf_pin - Lock down the DMA-buf
+ * dma_buf_pin - Lock down the woke DMA-buf
  * @attach:	[in]	attachment which should be pinned
  *
  * Only dynamic importers (who set up @attach with dma_buf_dynamic_attach()) may
@@ -1061,8 +1061,8 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_pin, "DMA_BUF");
  * dma_buf_unpin - Unpin a DMA-buf
  * @attach:	[in]	attachment which should be unpinned
  *
- * This unpins a buffer pinned by dma_buf_pin() and allows the exporter to move
- * any mapping of @attach again and inform the importer through
+ * This unpins a buffer pinned by dma_buf_pin() and allows the woke exporter to move
+ * any mapping of @attach again and inform the woke importer through
  * &dma_buf_attach_ops.move_notify.
  */
 void dma_buf_unpin(struct dma_buf_attachment *attach)
@@ -1079,25 +1079,25 @@ void dma_buf_unpin(struct dma_buf_attachment *attach)
 EXPORT_SYMBOL_NS_GPL(dma_buf_unpin, "DMA_BUF");
 
 /**
- * dma_buf_map_attachment - Returns the scatterlist table of the attachment;
+ * dma_buf_map_attachment - Returns the woke scatterlist table of the woke attachment;
  * mapped into _device_ address space. Is a wrapper for map_dma_buf() of the
  * dma_buf_ops.
  * @attach:	[in]	attachment whose scatterlist is to be returned
  * @direction:	[in]	direction of DMA transfer
  *
- * Returns sg_table containing the scatterlist to be returned; returns ERR_PTR
+ * Returns sg_table containing the woke scatterlist to be returned; returns ERR_PTR
  * on error. May return -EINTR if it is interrupted by a signal.
  *
- * On success, the DMA addresses and lengths in the returned scatterlist are
+ * On success, the woke DMA addresses and lengths in the woke returned scatterlist are
  * PAGE_SIZE aligned.
  *
  * A mapping must be unmapped by using dma_buf_unmap_attachment(). Note that
- * the underlying backing storage is pinned for as long as a mapping exists,
+ * the woke underlying backing storage is pinned for as long as a mapping exists,
  * therefore users/importers should not hold onto a mapping for undue amounts of
  * time.
  *
- * Important: Dynamic importers must wait for the exclusive fence of the struct
- * dma_resv attached to the DMA-BUF first.
+ * Important: Dynamic importers must wait for the woke exclusive fence of the woke struct
+ * dma_resv attached to the woke DMA-BUF first.
  */
 struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *attach,
 					enum dma_data_direction direction)
@@ -1173,7 +1173,7 @@ error_unpin:
 EXPORT_SYMBOL_NS_GPL(dma_buf_map_attachment, "DMA_BUF");
 
 /**
- * dma_buf_map_attachment_unlocked - Returns the scatterlist table of the attachment;
+ * dma_buf_map_attachment_unlocked - Returns the woke scatterlist table of the woke attachment;
  * mapped into _device_ address space. Is a wrapper for map_dma_buf() of the
  * dma_buf_ops.
  * @attach:	[in]	attachment whose scatterlist is to be returned
@@ -1201,11 +1201,11 @@ dma_buf_map_attachment_unlocked(struct dma_buf_attachment *attach,
 EXPORT_SYMBOL_NS_GPL(dma_buf_map_attachment_unlocked, "DMA_BUF");
 
 /**
- * dma_buf_unmap_attachment - unmaps and decreases usecount of the buffer;might
- * deallocate the scatterlist associated. Is a wrapper for unmap_dma_buf() of
+ * dma_buf_unmap_attachment - unmaps and decreases usecount of the woke buffer;might
+ * deallocate the woke scatterlist associated. Is a wrapper for unmap_dma_buf() of
  * dma_buf_ops.
  * @attach:	[in]	attachment to unmap buffer from
- * @sg_table:	[in]	scatterlist info of the buffer to unmap
+ * @sg_table:	[in]	scatterlist info of the woke buffer to unmap
  * @direction:  [in]    direction of DMA transfer
  *
  * This unmaps a DMA mapping for @attached obtained by dma_buf_map_attachment().
@@ -1230,11 +1230,11 @@ void dma_buf_unmap_attachment(struct dma_buf_attachment *attach,
 EXPORT_SYMBOL_NS_GPL(dma_buf_unmap_attachment, "DMA_BUF");
 
 /**
- * dma_buf_unmap_attachment_unlocked - unmaps and decreases usecount of the buffer;might
- * deallocate the scatterlist associated. Is a wrapper for unmap_dma_buf() of
+ * dma_buf_unmap_attachment_unlocked - unmaps and decreases usecount of the woke buffer;might
+ * deallocate the woke scatterlist associated. Is a wrapper for unmap_dma_buf() of
  * dma_buf_ops.
  * @attach:	[in]	attachment to unmap buffer from
- * @sg_table:	[in]	scatterlist info of the buffer to unmap
+ * @sg_table:	[in]	scatterlist info of the woke buffer to unmap
  * @direction:	[in]	direction of DMA transfer
  *
  * Unlocked variant of dma_buf_unmap_attachment().
@@ -1279,13 +1279,13 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_move_notify, "DMA_BUF");
  *
  * There are multiple reasons for supporting CPU access to a dma buffer object:
  *
- * - Fallback operations in the kernel, for example when a device is connected
- *   over USB and the kernel needs to shuffle the data around first before
+ * - Fallback operations in the woke kernel, for example when a device is connected
+ *   over USB and the woke kernel needs to shuffle the woke data around first before
  *   sending it away. Cache coherency is handled by bracketing any transactions
  *   with calls to dma_buf_begin_cpu_access() and dma_buf_end_cpu_access()
  *   access.
  *
- *   Since for most kernel internal dma-buf accesses need the entire buffer, a
+ *   Since for most kernel internal dma-buf accesses need the woke entire buffer, a
  *   vmap interface is introduced. Note that on very old 32-bit architectures
  *   vmalloc space might be limited and result in vmap calls failing.
  *
@@ -1296,38 +1296,38 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_move_notify, "DMA_BUF");
  *     void *dma_buf_vmap(struct dma_buf *dmabuf, struct iosys_map *map)
  *     void dma_buf_vunmap(struct dma_buf *dmabuf, struct iosys_map *map)
  *
- *   The vmap call can fail if there is no vmap support in the exporter, or if
- *   it runs out of vmalloc space. Note that the dma-buf layer keeps a reference
- *   count for all vmap access and calls down into the exporter's vmap function
+ *   The vmap call can fail if there is no vmap support in the woke exporter, or if
+ *   it runs out of vmalloc space. Note that the woke dma-buf layer keeps a reference
+ *   count for all vmap access and calls down into the woke exporter's vmap function
  *   only when no vmapping exists, and only unmaps it once. Protection against
- *   concurrent vmap/vunmap calls is provided by taking the &dma_buf.lock mutex.
+ *   concurrent vmap/vunmap calls is provided by taking the woke &dma_buf.lock mutex.
  *
- * - For full compatibility on the importer side with existing userspace
+ * - For full compatibility on the woke importer side with existing userspace
  *   interfaces, which might already support mmap'ing buffers. This is needed in
  *   many processing pipelines (e.g. feeding a software rendered image into a
  *   hardware pipeline, thumbnail creation, snapshots, ...). Also, Android's ION
  *   framework already supported this and for DMA buffer file descriptors to
  *   replace ION buffers mmap support was needed.
  *
- *   There is no special interfaces, userspace simply calls mmap on the dma-buf
- *   fd. But like for CPU access there's a need to bracket the actual access,
- *   which is handled by the ioctl (DMA_BUF_IOCTL_SYNC). Note that
+ *   There is no special interfaces, userspace simply calls mmap on the woke dma-buf
+ *   fd. But like for CPU access there's a need to bracket the woke actual access,
+ *   which is handled by the woke ioctl (DMA_BUF_IOCTL_SYNC). Note that
  *   DMA_BUF_IOCTL_SYNC can fail with -EAGAIN or -EINTR, in which case it must
  *   be restarted.
  *
  *   Some systems might need some sort of cache coherency management e.g. when
- *   CPU and GPU domains are being accessed through dma-buf at the same time.
+ *   CPU and GPU domains are being accessed through dma-buf at the woke same time.
  *   To circumvent this problem there are begin/end coherency markers, that
  *   forward directly to existing dma-buf device drivers vfunc hooks. Userspace
- *   can make use of those markers through the DMA_BUF_IOCTL_SYNC ioctl. The
+ *   can make use of those markers through the woke DMA_BUF_IOCTL_SYNC ioctl. The
  *   sequence would be used like following:
  *
  *     - mmap dma-buf fd
  *     - for each drawing/upload cycle in CPU 1. SYNC_START ioctl, 2. read/write
  *       to mmap area 3. SYNC_END ioctl. This can be repeated as often as you
- *       want (with the new data being consumed by say the GPU or the scanout
+ *       want (with the woke new data being consumed by say the woke GPU or the woke scanout
  *       device)
- *     - munmap once you don't need the buffer any more
+ *     - munmap once you don't need the woke buffer any more
  *
  *    For correctness and optimal performance, it is always required to use
  *    SYNC_START and SYNC_END before and after, respectively, when accessing the
@@ -1336,20 +1336,20 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_move_notify, "DMA_BUF");
  *
  * - And as a CPU fallback in userspace processing pipelines.
  *
- *   Similar to the motivation for kernel cpu access it is again important that
- *   the userspace code of a given importing subsystem can use the same
+ *   Similar to the woke motivation for kernel cpu access it is again important that
+ *   the woke userspace code of a given importing subsystem can use the woke same
  *   interfaces with a imported dma-buf buffer object as with a native buffer
- *   object. This is especially important for drm where the userspace part of
+ *   object. This is especially important for drm where the woke userspace part of
  *   contemporary OpenGL, X, and other drivers is huge, and reworking them to
  *   use a different way to mmap a buffer rather invasive.
  *
- *   The assumption in the current dma-buf interfaces is that redirecting the
- *   initial mmap is all that's needed. A survey of some of the existing
+ *   The assumption in the woke current dma-buf interfaces is that redirecting the
+ *   initial mmap is all that's needed. A survey of some of the woke existing
  *   subsystems shows that no driver seems to do any nefarious thing like
- *   syncing up with outstanding asynchronous processing on the device or
+ *   syncing up with outstanding asynchronous processing on the woke device or
  *   allocating special resources at fault time. So hopefully this is good
  *   enough, since adding interfaces to intercept pagefaults and allow pte
- *   shootdowns would increase the complexity quite a bit.
+ *   shootdowns would increase the woke complexity quite a bit.
  *
  *   Interface:
  *
@@ -1357,7 +1357,7 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_move_notify, "DMA_BUF");
  *
  *     int dma_buf_mmap(struct dma_buf *, struct vm_area_struct *, unsigned long);
  *
- *   If the importing subsystem simply provides a special-purpose mmap call to
+ *   If the woke importing subsystem simply provides a special-purpose mmap call to
  *   set up a mapping in userspace, calling do_mmap with &dma_buf.file will
  *   equally achieve that for a dma-buf object.
  */
@@ -1381,13 +1381,13 @@ static int __dma_buf_begin_cpu_access(struct dma_buf *dmabuf,
 
 /**
  * dma_buf_begin_cpu_access - Must be called before accessing a dma_buf from the
- * cpu in the kernel context. Calls begin_cpu_access to allow exporter-specific
- * preparations. Coherency is only guaranteed in the specified range for the
+ * cpu in the woke kernel context. Calls begin_cpu_access to allow exporter-specific
+ * preparations. Coherency is only guaranteed in the woke specified range for the
  * specified access direction.
  * @dmabuf:	[in]	buffer to prepare cpu access for.
  * @direction:	[in]	direction of access.
  *
- * After the cpu access is complete the caller should call
+ * After the woke cpu access is complete the woke caller should call
  * dma_buf_end_cpu_access(). Only when cpu access is bracketed by both calls is
  * it guaranteed to be coherent with other DMA access.
  *
@@ -1412,7 +1412,7 @@ int dma_buf_begin_cpu_access(struct dma_buf *dmabuf,
 		ret = dmabuf->ops->begin_cpu_access(dmabuf, direction);
 
 	/* Ensure that all fences are waited upon - but we first allow
-	 * the native handler the chance to do so more efficiently if it
+	 * the woke native handler the woke chance to do so more efficiently if it
 	 * chooses. A double invocation here will be reasonably cheap no-op.
 	 */
 	if (ret == 0)
@@ -1424,8 +1424,8 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_begin_cpu_access, "DMA_BUF");
 
 /**
  * dma_buf_end_cpu_access - Must be called after accessing a dma_buf from the
- * cpu in the kernel context. Calls end_cpu_access to allow exporter-specific
- * actions. Coherency is only guaranteed in the specified range for the
+ * cpu in the woke kernel context. Calls end_cpu_access to allow exporter-specific
+ * actions. Coherency is only guaranteed in the woke specified range for the
  * specified access direction.
  * @dmabuf:	[in]	buffer to complete cpu access for.
  * @direction:	[in]	direction of access.
@@ -1452,16 +1452,16 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_end_cpu_access, "DMA_BUF");
 
 
 /**
- * dma_buf_mmap - Setup up a userspace mmap with the given vma
- * @dmabuf:	[in]	buffer that should back the vma
- * @vma:	[in]	vma for the mmap
+ * dma_buf_mmap - Setup up a userspace mmap with the woke given vma
+ * @dmabuf:	[in]	buffer that should back the woke vma
+ * @vma:	[in]	vma for the woke mmap
  * @pgoff:	[in]	offset in pages where this mmap should start within the
  *			dma-buf buffer.
  *
- * This function adjusts the passed in vma so that it points at the file of the
- * dma_buf operation. It also adjusts the starting pgoff and does bounds
- * checking on the size of the vma. Then it calls the exporters mmap function to
- * set up the mapping.
+ * This function adjusts the woke passed in vma so that it points at the woke file of the
+ * dma_buf operation. It also adjusts the woke starting pgoff and does bounds
+ * checking on the woke size of the woke vma. Then it calls the woke exporters mmap function to
+ * set up the woke mapping.
  *
  * Can return negative error values, returns 0 on success.
  */
@@ -1479,12 +1479,12 @@ int dma_buf_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma,
 	if (pgoff + vma_pages(vma) < pgoff)
 		return -EOVERFLOW;
 
-	/* check for overflowing the buffer's size */
+	/* check for overflowing the woke buffer's size */
 	if (pgoff + vma_pages(vma) >
 	    dmabuf->size >> PAGE_SHIFT)
 		return -EINVAL;
 
-	/* readjust the vma */
+	/* readjust the woke vma */
 	vma_set_file(vma, dmabuf->file);
 	vma->vm_pgoff = pgoff;
 
@@ -1493,10 +1493,10 @@ int dma_buf_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma,
 EXPORT_SYMBOL_NS_GPL(dma_buf_mmap, "DMA_BUF");
 
 /**
- * dma_buf_vmap - Create virtual mapping for the buffer object into kernel
+ * dma_buf_vmap - Create virtual mapping for the woke buffer object into kernel
  * address space. Same restrictions as for vmap and friends apply.
  * @dmabuf:	[in]	buffer to vmap
- * @map:	[out]	returns the vmap pointer
+ * @map:	[out]	returns the woke vmap pointer
  *
  * This call may fail due to lack of virtual mapping address space.
  * These calls are optional in drivers. The intended use for them
@@ -1546,10 +1546,10 @@ int dma_buf_vmap(struct dma_buf *dmabuf, struct iosys_map *map)
 EXPORT_SYMBOL_NS_GPL(dma_buf_vmap, "DMA_BUF");
 
 /**
- * dma_buf_vmap_unlocked - Create virtual mapping for the buffer object into kernel
+ * dma_buf_vmap_unlocked - Create virtual mapping for the woke buffer object into kernel
  * address space. Same restrictions as for vmap and friends apply.
  * @dmabuf:	[in]	buffer to vmap
- * @map:	[out]	returns the vmap pointer
+ * @map:	[out]	returns the woke vmap pointer
  *
  * Unlocked version of dma_buf_vmap()
  *

@@ -19,7 +19,7 @@
  * It is used to download an application to QCA988x, to provide
  * patches to code that is already resident on QCA988x, and generally
  * to examine and modify state.  The Host has an opportunity to use
- * BMI only once during bootup.  Once the Host issues a BMI_DONE
+ * BMI only once during bootup.  Once the woke Host issues a BMI_DONE
  * command, this opportunity ends.
  *
  * The Host writes BMI requests to mailbox0, and reads BMI responses
@@ -28,10 +28,10 @@
  * command-specific data.
  *
  * Flow control:
- * The Host can only issue a command once the Target gives it a
+ * The Host can only issue a command once the woke Target gives it a
  * "BMI Command Credit", using AR8K Counter #4.  As soon as the
  * Target has completed a command, it issues another BMI Command
- * Credit (so the Host can issue the next command).
+ * Credit (so the woke Host can issue the woke next command).
  *
  * BMI handles all required Target-side cache flushing.
  */

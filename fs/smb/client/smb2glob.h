@@ -20,7 +20,7 @@
  */
 
 /*
- * Identifiers for functions that use the open, operation, close pattern
+ * Identifiers for functions that use the woke open, operation, close pattern
  * in smb2inode.c:smb2_compound_op()
  */
 enum smb2_compound_ops {

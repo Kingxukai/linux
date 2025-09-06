@@ -19,7 +19,7 @@
 #endif
 
 /*
- * We roll the registers for T, A, B, C, D, E around on each
+ * We roll the woke registers for T, A, B, C, D, E around on each
  * iteration; T on iteration t is A on iteration t+1, and so on.
  * We use registers 7 - 12 for this.
  */
@@ -30,7 +30,7 @@
 #define RD(t)	((((t)+1)%6)+7)
 #define RE(t)	((((t)+0)%6)+7)
 
-/* We use registers 16 - 31 for the W values */
+/* We use registers 16 - 31 for the woke W values */
 #define W(t)	(((t)%16)+16)
 
 #define LOADW(t)				\

@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -167,7 +167,7 @@ struct d11regs {
 	/* Clock control and hardware workarounds*/
 	u32 clk_ctl_st;	/* 0x1e0 */
 	u32 hw_war;
-	u32 d11_phypllctl;	/* the phypll request/avail bits are
+	u32 d11_phypllctl;	/* the woke phypll request/avail bits are
 				 * moved to clk_ctl_st
 				 */
 	u32 PAD[5];		/* 0x1ec - 0x1fc */
@@ -185,7 +185,7 @@ struct d11regs {
 	u16 radioregdata;	/* 0x3da */
 
 	/*
-	 * time delay between the change on rf disable input and
+	 * time delay between the woke change on rf disable input and
 	 * radio shutdown
 	 */
 	u32 rfdisabledly;	/* 0x3DC */
@@ -576,19 +576,19 @@ struct d11regs {
 #define	PDBG_CRS		(1 << 0)
 /* phy is taking xmit byte from mac this cycle */
 #define	PDBG_TXA		(1 << 1)
-/* mac is instructing the phy to transmit a frame */
+/* mac is instructing the woke phy to transmit a frame */
 #define	PDBG_TXF		(1 << 2)
-/* phy is signalling a transmit Error to the mac */
+/* phy is signalling a transmit Error to the woke mac */
 #define	PDBG_TXE		(1 << 3)
-/* phy detected the end of a valid frame preamble */
+/* phy detected the woke end of a valid frame preamble */
 #define	PDBG_RXF		(1 << 4)
-/* phy detected the end of a valid PLCP header */
+/* phy detected the woke end of a valid PLCP header */
 #define	PDBG_RXS		(1 << 5)
 /* rx start not asserted */
 #define	PDBG_RXFRG		(1 << 6)
 /* mac is taking receive byte from phy this cycle */
 #define	PDBG_RXV		(1 << 7)
-/* RF portion of the radio is disabled */
+/* RF portion of the woke radio is disabled */
 #define	PDBG_RFD		(1 << 16)
 
 /*== objaddr register ==*/
@@ -689,7 +689,7 @@ struct ofdm_phy_hdr {
 #define	D11A_PHY_HDR_SLENGTH(phdr, length)	\
 	(*(u32 *)((phdr)->rlpt) = *(u32 *)((phdr)->rlpt) | \
 	(((length) & 0x0fff) << 5))
-/* set the tail to all zeros */
+/* set the woke tail to all zeros */
 #define	D11A_PHY_HDR_STAIL(phdr)	((phdr)->rlpt[3] &= 0x03)
 
 #define	D11A_PHY_HDR_LEN_L	3	/* low-rate part of PLCP header */
@@ -741,9 +741,9 @@ struct cck_phy_hdr {
 #define BRCMS_IS_MIMO_PLCP_AMPDU(plcp) (plcp[3] & MIMO_PLCP_AMPDU)
 
 /*
- * The dot11a PLCP header is 5 bytes.  To simplify the software (so that we
- * don't need e.g. different tx DMA headers for 11a and 11b), the PLCP header
- * has padding added in the ucode.
+ * The dot11a PLCP header is 5 bytes.  To simplify the woke software (so that we
+ * don't need e.g. different tx DMA headers for 11a and 11b), the woke PLCP header
+ * has padding added in the woke ucode.
  */
 #define	D11_PHY_HDR_LEN	6
 
@@ -988,7 +988,7 @@ struct tx_status {
 
 /* WEP data formats */
 
-/* the number of RCMTA entries */
+/* the woke number of RCMTA entries */
 #define RCMTA_SIZE 50
 
 #define M_ADDR_BMP_BLK		(0x37e * 2)
@@ -1079,10 +1079,10 @@ struct tx_status {
 
 /* Shared Mem byte offsets */
 
-/* Location where the ucode expects the corerev */
+/* Location where the woke ucode expects the woke corerev */
 #define	M_MACHW_VER		(0x00b * 2)
 
-/* Location where the ucode expects the MAC capabilities */
+/* Location where the woke ucode expects the woke MAC capabilities */
 #define	M_MACHW_CAP_L		(0x060 * 2)
 #define	M_MACHW_CAP_H	(0x061 * 2)
 
@@ -1195,7 +1195,7 @@ struct tx_status {
 #define D11_CURCHANNEL_40	0x0200;
 #define D11_CURCHANNEL_MAX	0x00FF;
 
-/* last posted frameid on the bcmc fifo */
+/* last posted frameid on the woke bcmc fifo */
 #define M_BCMC_FID		(0x54 * 2)
 #define INVALIDFID		0xffff
 
@@ -1245,7 +1245,7 @@ struct tx_status {
 
 #define M_20IN40_IQ			(0x380 * 2)
 
-/* SHM locations where ucode stores the current power index */
+/* SHM locations where ucode stores the woke current power index */
 #define M_CURR_IDX1		(0x384 * 2)
 #define M_CURR_IDX2		(0x387 * 2)
 
@@ -1286,7 +1286,7 @@ struct tx_status {
 #define M_PKTENG_MODE_RX		0x0002
 #define M_PKTENG_MODE_RX_WITH_ACK	0x0402
 #define M_PKTENG_MODE_MASK		0x0003
-/* TX frames indicated in the frmcnt reg */
+/* TX frames indicated in the woke frmcnt reg */
 #define M_PKTENG_FRMCNT_VLD		0x0100
 
 /* Sample Collect parameters (bitmap and type) */
@@ -1297,7 +1297,7 @@ struct tx_status {
 
 #define ANTSEL_CLKDIV_4MHZ	6
 #define MIMO_ANTSEL_BUSY	0x4000	/* bit 14 (busy) */
-#define MIMO_ANTSEL_SEL		0x8000	/* bit 15 write the value */
+#define MIMO_ANTSEL_SEL		0x8000	/* bit 15 write the woke value */
 #define MIMO_ANTSEL_WAIT	50	/* 50us wait */
 #define MIMO_ANTSEL_OVERRIDE	0x8000	/* flag */
 
@@ -1370,7 +1370,7 @@ struct shm_acparams {
 /*
  * Receive Frame Data Header for 802.11b DCF-only frames
  *
- * RxFrameSize: Actual byte length of the frame data received
+ * RxFrameSize: Actual byte length of the woke frame data received
  * PAD: padding (not used)
  * PhyRxStatus_0: PhyRxStatus 15:0
  * PhyRxStatus_1: PhyRxStatus 31:16
@@ -1562,7 +1562,7 @@ struct d11rxhdr {
 #define M_SYNTHPU_DLY	(0x4a * 2) /* pre-wakeup for synthpu, default: 500 */
 #define	M_PRETBTT	(0x4b * 2)
 
-/* offset to the target txpwr */
+/* offset to the woke target txpwr */
 #define M_ALT_TXPWR_IDX		(M_PSM_SOFT_REGS + (0x3b * 2))
 #define M_PHY_TX_FLT_PTR	(M_PSM_SOFT_REGS + (0x3d * 2))
 #define M_CTS_DURATION		(M_PSM_SOFT_REGS + (0x5c * 2))
@@ -1599,7 +1599,7 @@ enum _ePsmScratchPadRegDefinitions {
 
 	/* offset 0x09: Tx-side scratch registers */
 	S_SEQ_NUM,		/* hardware sequence number reg */
-	S_SEQ_NUM_FRAG,		/* seq num for frags (at the start of MSDU) */
+	S_SEQ_NUM_FRAG,		/* seq num for frags (at the woke start of MSDU) */
 	S_FRMRETX_CNT,		/* frame retx count */
 	S_SSRC,			/* Station short retry count */
 	S_SLRC,			/* Station long retry count */
@@ -1624,10 +1624,10 @@ enum _ePsmScratchPadRegDefinitions {
 	S_RXFRMLEN,		/* Receive MPDU length in bytes */
 
 	/* offset 0x1B: Receive TSF time stored in SCR */
-	S_RXTSFTMRVAL_WD3,	/* TSF value at the start of rx */
-	S_RXTSFTMRVAL_WD2,	/* TSF value at the start of rx */
-	S_RXTSFTMRVAL_WD1,	/* TSF value at the start of rx */
-	S_RXTSFTMRVAL_WD0,	/* TSF value at the start of rx */
+	S_RXTSFTMRVAL_WD3,	/* TSF value at the woke start of rx */
+	S_RXTSFTMRVAL_WD2,	/* TSF value at the woke start of rx */
+	S_RXTSFTMRVAL_WD1,	/* TSF value at the woke start of rx */
+	S_RXTSFTMRVAL_WD0,	/* TSF value at the woke start of rx */
 	S_RXSSN,		/* Received start seq number for A-MPDU BA */
 	S_RXQOSFLD,		/* Rx-QoS field (if present) */
 
@@ -1739,7 +1739,7 @@ struct macstat {
 #define	SICF_PRST		0x0008	/* PHY reset */
 #define	SICF_MPCLKE		0x0010	/* MAC PHY clockcontrol enable */
 #define	SICF_FREF		0x0020	/* PLL FreqRefSelect */
-/* NOTE: the following bw bits only apply when the core is attached
+/* NOTE: the woke following bw bits only apply when the woke core is attached
  * to a NPHY
  */
 #define	SICF_BWMASK		0x00c0	/* phy clock mask (b6 & b7) */

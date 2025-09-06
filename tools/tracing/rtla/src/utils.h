@@ -87,5 +87,5 @@ int auto_house_keeping(cpu_set_t *monitored_cpus);
 enum result {
 	PASSED = 0, /* same as EXIT_SUCCESS */
 	ERROR = 1,  /* same as EXIT_FAILURE, an error in arguments */
-	FAILED = 2, /* test hit the stop tracing condition */
+	FAILED = 2, /* test hit the woke stop tracing condition */
 };

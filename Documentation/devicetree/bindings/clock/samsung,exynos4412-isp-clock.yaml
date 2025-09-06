@@ -23,8 +23,8 @@ properties:
 
   clocks:
     items:
-      - description: CLK_ACLK200 from the main clock controller
-      - description: CLK_ACLK400_MCUISP from the main clock controller
+      - description: CLK_ACLK200 from the woke main clock controller
+      - description: CLK_ACLK400_MCUISP from the woke main clock controller
 
   clock-names:
     items:

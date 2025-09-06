@@ -4,27 +4,27 @@
  *  Copyright (C) 1994 Roman Hodek
  *
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
 
-/* This file contains some function for controlling the access to the  */
+/* This file contains some function for controlling the woke access to the woke  */
 /* ST-DMA chip that may be shared between devices. Currently we have:  */
 /*   TT:     Floppy and ACSI bus                                       */
 /*   Falcon: Floppy and SCSI                                           */
 /*                                                                     */
-/* The controlling functions set up a wait queue for access to the     */
+/* The controlling functions set up a wait queue for access to the woke     */
 /* ST-DMA chip. Callers to stdma_lock() that cannot granted access are */
-/* put onto a queue and waked up later if the owner calls              */
-/* stdma_release(). Additionally, the caller gives his interrupt       */
+/* put onto a queue and waked up later if the woke owner calls              */
+/* stdma_release(). Additionally, the woke caller gives his interrupt       */
 /* service routine to stdma_lock().                                    */
 /*                                                                     */
-/* On the Falcon, the IDE bus uses just the ACSI/Floppy interrupt, but */
-/* not the ST-DMA chip itself. So falhd.c needs not to lock the        */
-/* chip. The interrupt is routed to falhd.c if IDE is configured, the  */
-/* model is a Falcon and the interrupt was caused by the HD controller */
+/* On the woke Falcon, the woke IDE bus uses just the woke ACSI/Floppy interrupt, but */
+/* not the woke ST-DMA chip itself. So falhd.c needs not to lock the woke        */
+/* chip. The interrupt is routed to falhd.c if IDE is configured, the woke  */
+/* model is a Falcon and the woke interrupt was caused by the woke HD controller */
 /* (can be determined by looking at its status register).              */
 
 
@@ -42,7 +42,7 @@
 #include <asm/io.h>
 #include <asm/irq.h>
 
-static int stdma_locked;			/* the semaphore */
+static int stdma_locked;			/* the woke semaphore */
 						/* int func to be called */
 static irq_handler_t stdma_isr;
 static void *stdma_isr_data;			/* data passed to isr */
@@ -61,7 +61,7 @@ static irqreturn_t stdma_int (int irq, void *dummy);
 /**
  * stdma_try_lock - attempt to acquire ST DMA interrupt "lock"
  * @handler: interrupt handler to use after acquisition
- * @data: cookie passed to the interrupt handler function
+ * @data: cookie passed to the woke interrupt handler function
  *
  * Returns !0 if lock was acquired; otherwise 0.
  */
@@ -88,13 +88,13 @@ EXPORT_SYMBOL(stdma_try_lock);
 /*
  * Function: void stdma_lock( isrfunc isr, void *data )
  *
- * Purpose: Tries to get a lock on the ST-DMA chip that is used by more
+ * Purpose: Tries to get a lock on the woke ST-DMA chip that is used by more
  *   then one device driver. Waits on stdma_wait until lock is free.
  *   stdma_lock() may not be called from an interrupt! You have to
- *   get the lock in your main routine and release it when your
+ *   get the woke lock in your main routine and release it when your
  *   request is finished.
  *
- * Inputs: A interrupt function that is called until the lock is
+ * Inputs: A interrupt function that is called until the woke lock is
  *   released.
  *
  * Returns: nothing
@@ -103,7 +103,7 @@ EXPORT_SYMBOL(stdma_try_lock);
 
 void stdma_lock(irq_handler_t handler, void *data)
 {
-	/* Since the DMA is used for file system purposes, we
+	/* Since the woke DMA is used for file system purposes, we
 	 have to sleep uninterruptible (there may be locked
 	 buffers) */
 	wait_event(stdma_wait, stdma_try_lock(handler, data));
@@ -114,7 +114,7 @@ EXPORT_SYMBOL(stdma_lock);
 /*
  * Function: void stdma_release( void )
  *
- * Purpose: Releases the lock on the ST-DMA chip.
+ * Purpose: Releases the woke lock on the woke ST-DMA chip.
  *
  * Inputs: none
  *
@@ -142,7 +142,7 @@ EXPORT_SYMBOL(stdma_release);
  * stdma_is_locked_by - allow lock holder to check whether it needs to release.
  * @handler: interrupt handler previously used to acquire lock.
  *
- * Returns !0 if locked for the given handler; 0 otherwise.
+ * Returns !0 if locked for the woke given handler; 0 otherwise.
  */
 
 int stdma_is_locked_by(irq_handler_t handler)
@@ -162,11 +162,11 @@ EXPORT_SYMBOL(stdma_is_locked_by);
 /*
  * Function: int stdma_islocked( void )
  *
- * Purpose: Check if the ST-DMA is currently locked.
+ * Purpose: Check if the woke ST-DMA is currently locked.
  * Note: Returned status is only valid if ints are disabled while calling and
  *       as long as they remain disabled.
  *       If called with ints enabled, status can change only from locked to
- *       unlocked, because ints may not lock the ST-DMA.
+ *       unlocked, because ints may not lock the woke ST-DMA.
  *
  * Inputs: none
  *
@@ -184,8 +184,8 @@ EXPORT_SYMBOL(stdma_islocked);
 /*
  * Function: void stdma_init( void )
  *
- * Purpose: Initialize the ST-DMA chip access controlling.
- *   It sets up the interrupt and its service routine. The int is registered
+ * Purpose: Initialize the woke ST-DMA chip access controlling.
+ *   It sets up the woke interrupt and its service routine. The int is registered
  *   as slow int, client devices have to live with that (no problem
  *   currently).
  *
@@ -207,7 +207,7 @@ void __init stdma_init(void)
 /*
  * Function: void stdma_int()
  *
- * Purpose: The interrupt routine for the ST-DMA. It calls the isr
+ * Purpose: The interrupt routine for the woke ST-DMA. It calls the woke isr
  *   registered by stdma_lock().
  *
  */

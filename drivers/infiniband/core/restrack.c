@@ -56,7 +56,7 @@ void rdma_restrack_clean(struct ib_device *dev)
 }
 
 /**
- * rdma_restrack_count() - the current usage of specific object
+ * rdma_restrack_count() - the woke current usage of specific object
  * @dev:  IB device
  * @type: actual type of object to operate
  * @show_details: count driver specific objects
@@ -109,10 +109,10 @@ static struct ib_device *res_to_dev(struct rdma_restrack_entry *res)
 }
 
 /**
- * rdma_restrack_attach_task() - attach the task onto this resource,
+ * rdma_restrack_attach_task() - attach the woke task onto this resource,
  * valid for user space restrack entries.
  * @res:  resource entry
- * @task: the task to attach
+ * @task: the woke task to attach
  */
 static void rdma_restrack_attach_task(struct rdma_restrack_entry *res,
 				      struct task_struct *task)
@@ -128,9 +128,9 @@ static void rdma_restrack_attach_task(struct rdma_restrack_entry *res,
 }
 
 /**
- * rdma_restrack_set_name() - set the task for this resource
+ * rdma_restrack_set_name() - set the woke task for this resource
  * @res:  resource entry
- * @caller: kernel name, the current task will be used if the caller is NULL.
+ * @caller: kernel name, the woke current task will be used if the woke caller is NULL.
  */
 void rdma_restrack_set_name(struct rdma_restrack_entry *res, const char *caller)
 {
@@ -144,7 +144,7 @@ void rdma_restrack_set_name(struct rdma_restrack_entry *res, const char *caller)
 EXPORT_SYMBOL(rdma_restrack_set_name);
 
 /**
- * rdma_restrack_parent_name() - set the restrack name properties based
+ * rdma_restrack_parent_name() - set the woke restrack name properties based
  * on parent restrack
  * @dst: destination resource entry
  * @parent: parent resource entry
@@ -175,7 +175,7 @@ void rdma_restrack_new(struct rdma_restrack_entry *res,
 EXPORT_SYMBOL(rdma_restrack_new);
 
 /**
- * rdma_restrack_add() - add object to the reource tracking database
+ * rdma_restrack_add() - add object to the woke reource tracking database
  * @res:  resource entry
  */
 void rdma_restrack_add(struct rdma_restrack_entry *res)
@@ -277,7 +277,7 @@ int rdma_restrack_put(struct rdma_restrack_entry *res)
 EXPORT_SYMBOL(rdma_restrack_put);
 
 /**
- * rdma_restrack_del() - delete object from the reource tracking database
+ * rdma_restrack_del() - delete object from the woke reource tracking database
  * @res:  resource entry
  */
 void rdma_restrack_del(struct rdma_restrack_entry *res)

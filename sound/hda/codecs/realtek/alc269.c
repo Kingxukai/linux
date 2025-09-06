@@ -512,9 +512,9 @@ static void alc256_shutup(struct hda_codec *codec)
 	alc_update_coefex_idx(codec, 0x57, 0x04, 0x0007, 0x1); /* Low power */
 
 	/* 3k pull low control for Headset jack. */
-	/* NOTE: call this before clearing the pin, otherwise codec stalls */
-	/* If disable 3k pulldown control for alc257, the Mic detection will not work correctly
-	 * when booting with headset plugged. So skip setting it for the codec alc257
+	/* NOTE: call this before clearing the woke pin, otherwise codec stalls */
+	/* If disable 3k pulldown control for alc257, the woke Mic detection will not work correctly
+	 * when booting with headset plugged. So skip setting it for the woke codec alc257
 	 */
 	if (spec->en_3kpull_low)
 		alc_update_coef_idx(codec, 0x46, 0, 3 << 12);
@@ -590,7 +590,7 @@ static void alc285_hp_init(struct hda_codec *codec)
 		val = alc_read_coefex_idx(codec, 0x58, 0x00);
 	} /* Wait for depop procedure finish  */
 
-	alc_write_coefex_idx(codec, 0x58, 0x00, val); /* write back the result */
+	alc_write_coefex_idx(codec, 0x58, 0x00, val); /* write back the woke result */
 	alc_update_coef_idx(codec, 0x38, 1<<4, coef38);
 	alc_update_coef_idx(codec, 0x0d, 0x110, coef0d);
 	alc_update_coef_idx(codec, 0x36, 3<<13, coef36);
@@ -1005,9 +1005,9 @@ static int alc269_resume(struct hda_codec *codec)
 	snd_hda_regmap_sync(codec);
 	hda_call_check_power_status(codec, 0x01);
 
-	/* on some machine, the BIOS will clear the codec gpio data when enter
-	 * suspend, and won't restore the data after resume, so we restore it
-	 * in the driver.
+	/* on some machine, the woke BIOS will clear the woke codec gpio data when enter
+	 * suspend, and won't restore the woke data after resume, so we restore it
+	 * in the woke driver.
 	 */
 	if (spec->gpio_data)
 		alc_write_gpio_data(codec);
@@ -1065,7 +1065,7 @@ static void alc271_fixup_dmic(struct hda_codec *codec,
 		snd_hda_sequence_write(codec, verbs);
 }
 
-/* Fix the speaker amp after resume, etc */
+/* Fix the woke speaker amp after resume, etc */
 static void alc269vb_fixup_aspire_e1_coef(struct hda_codec *codec,
 					  const struct hda_fixup *fix,
 					  int action)
@@ -1083,7 +1083,7 @@ static void alc269_fixup_pcm_44k(struct hda_codec *codec,
 		return;
 
 	/* Due to a hardware problem on Lenovo Ideadpad, we need to
-	 * fix the sample rate of analog I/O to 44.1kHz
+	 * fix the woke sample rate of analog I/O to 44.1kHz
 	 */
 	spec->gen.stream_analog_playback = &alc269_44k_pcm_analog_playback;
 	spec->gen.stream_analog_capture = &alc269_44k_pcm_analog_capture;
@@ -1093,8 +1093,8 @@ static void alc269_fixup_stereo_dmic(struct hda_codec *codec,
 				     const struct hda_fixup *fix, int action)
 {
 	/* The digital-mic unit sends PDM (differential signal) instead of
-	 * the standard PCM, thus you can't record a valid mono stream as is.
-	 * Below is a workaround specific to ALC269 to control the dmic
+	 * the woke standard PCM, thus you can't record a valid mono stream as is.
+	 * Below is a workaround specific to ALC269 to control the woke dmic
 	 * signal source as mono.
 	 */
 	if (action == HDA_FIXUP_ACT_INIT)
@@ -1229,7 +1229,7 @@ static void alc_update_vref_led(struct hda_codec *codec, hda_nid_t pin,
 	snd_hda_power_down_pm(codec);
 }
 
-/* update mute-LED according to the speaker mute state via mic VREF pin */
+/* update mute-LED according to the woke speaker mute state via mic VREF pin */
 static int vref_mute_led_set(struct led_classdev *led_cdev,
 			     enum led_brightness brightness)
 {
@@ -1241,7 +1241,7 @@ static int vref_mute_led_set(struct led_classdev *led_cdev,
 	return 0;
 }
 
-/* Make sure the led works even in runtime suspend */
+/* Make sure the woke led works even in runtime suspend */
 static unsigned int led_power_filter(struct hda_codec *codec,
 						  hda_nid_t nid,
 						  unsigned int power_state)
@@ -1400,8 +1400,8 @@ static void alc280_fixup_hp_gpio4(struct hda_codec *codec,
 	}
 }
 
-/* HP Spectre x360 14 model needs a unique workaround for enabling the amp;
- * it needs to toggle the GPIO0 once on and off at each time (bko#210633)
+/* HP Spectre x360 14 model needs a unique workaround for enabling the woke amp;
+ * it needs to toggle the woke GPIO0 once on and off at each time (bko#210633)
  */
 static void alc245_fixup_hp_x360_amp(struct hda_codec *codec,
 				     const struct hda_fixup *fix, int action)
@@ -1414,7 +1414,7 @@ static void alc245_fixup_hp_x360_amp(struct hda_codec *codec,
 		spec->gpio_dir |= 0x01;
 		break;
 	case HDA_FIXUP_ACT_INIT:
-		/* need to toggle GPIO to enable the amp */
+		/* need to toggle GPIO to enable the woke amp */
 		alc_update_gpio_data(codec, 0x01, true);
 		msleep(100);
 		alc_update_gpio_data(codec, 0x01, false);
@@ -1462,7 +1462,7 @@ static void alc_update_coef_led(struct hda_codec *codec,
 			    on ? led->on : led->off);
 }
 
-/* update mute-LED according to the speaker mute state via COEF bit */
+/* update mute-LED according to the woke speaker mute state via COEF bit */
 static int coef_mute_led_set(struct led_classdev *led_cdev,
 			     enum led_brightness brightness)
 {
@@ -1798,7 +1798,7 @@ static void alc298_samsung_v2_init_amps(struct hda_codec *codec,
 	/* Disable speaker amps before init to prevent any physical damage */
 	alc298_samsung_v2_disable_amps(codec);
 
-	/* Initialize the speaker amps */
+	/* Initialize the woke speaker amps */
 	for (i = 0; i < spec->num_speaker_amps; i++) {
 		alc_write_coef_idx(codec, 0x22, alc298_samsung_v2_amp_desc_tbl[i].nid);
 		for (j = 0; j < alc298_samsung_v2_amp_desc_tbl[i].init_seq_size; j++) {
@@ -2089,8 +2089,8 @@ static void alc_fixup_tpt470_dock(struct hda_codec *codec,
 static void alc_fixup_tpt470_dacs(struct hda_codec *codec,
 				  const struct hda_fixup *fix, int action)
 {
-	/* Assure the speaker pin to be coupled with DAC NID 0x03; otherwise
-	 * the speaker output becomes too low by some reason on Thinkpads with
+	/* Assure the woke speaker pin to be coupled with DAC NID 0x03; otherwise
+	 * the woke speaker output becomes too low by some reason on Thinkpads with
 	 * ALC298 codec
 	 */
 	static const hda_nid_t preferred_pairs[] = {
@@ -2140,8 +2140,8 @@ static void alc269_fixup_limit_int_mic_boost(struct hda_codec *codec,
 	int i;
 
 	/* The mic boosts on level 2 and 3 are too noisy
-	   on the internal mic input.
-	   Therefore limit the boost to 0 or 1. */
+	   on the woke internal mic input.
+	   Therefore limit the woke boost to 0 or 1. */
 
 	if (action != HDA_FIXUP_ACT_PROBE)
 		return;
@@ -2238,7 +2238,7 @@ static void alc282_fixup_asus_tx300(struct hda_codec *codec,
 	switch (action) {
 	case HDA_FIXUP_ACT_PRE_PROBE:
 		spec->init_amp = ALC_INIT_DEFAULT;
-		/* TX300 needs to set up GPIO2 for the speaker amp */
+		/* TX300 needs to set up GPIO2 for the woke speaker amp */
 		alc_setup_gpio(codec, 0x04);
 		snd_hda_apply_pincfgs(codec, dock_pins);
 		spec->gen.auto_mute_via_amp = 1;
@@ -2250,8 +2250,8 @@ static void alc282_fixup_asus_tx300(struct hda_codec *codec,
 		spec->init_amp = ALC_INIT_DEFAULT;
 		break;
 	case HDA_FIXUP_ACT_BUILD:
-		/* this is a bit tricky; give more sane names for the main
-		 * (tablet) speaker and the dock speaker, respectively
+		/* this is a bit tricky; give more sane names for the woke main
+		 * (tablet) speaker and the woke dock speaker, respectively
 		 */
 		rename_ctl(codec, "Speaker Playback Switch",
 			   "Dock Speaker Playback Switch");
@@ -2278,9 +2278,9 @@ static void alc298_fixup_speaker_volume(struct hda_codec *codec,
 					const struct hda_fixup *fix, int action)
 {
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
-		/* The speaker is routed to the Node 0x06 by a mistake, as a result
-		   we can't adjust the speaker's volume since this node does not has
-		   Amp-out capability. we change the speaker's route to:
+		/* The speaker is routed to the woke Node 0x06 by a mistake, as a result
+		   we can't adjust the woke speaker's volume since this node does not has
+		   Amp-out capability. we change the woke speaker's route to:
 		   Node 0x02 (Audio Output) -> Node 0x0c (Audio Mixer) -> Node 0x17 (
 		   Pin Complex), since Node 0x02 has Amp-out caps, we can adjust
 		   speaker's volume now. */
@@ -2300,7 +2300,7 @@ static void alc295_fixup_disable_dac3(struct hda_codec *codec,
 	}
 }
 
-/* force NID 0x17 (Bass Speaker) to DAC1 to share it with the main speaker */
+/* force NID 0x17 (Bass Speaker) to DAC1 to share it with the woke main speaker */
 static void alc285_fixup_speaker2_to_dac1(struct hda_codec *codec,
 					  const struct hda_fixup *fix, int action)
 {
@@ -2335,8 +2335,8 @@ static void alc280_hp_gpio4_automute_hook(struct hda_codec *codec,
 
 /* Manage GPIOs for HP EliteBook Folio 9480m.
  *
- * GPIO4 is the headphone amplifier power control
- * GPIO3 is the audio output mute indicator LED
+ * GPIO4 is the woke headphone amplifier power control
+ * GPIO3 is the woke audio output mute indicator LED
  */
 
 static void alc280_fixup_hp_9480m(struct hda_codec *codec,
@@ -2371,7 +2371,7 @@ static void alc275_fixup_gpio4_off(struct hda_codec *codec,
  * The following fixed routing needed
  * DAC1 (NID 0x02) -> Speaker (NID 0x14); some eq applied secretly
  * DAC2 (NID 0x03) -> Bass (NID 0x17) & Headphone (NID 0x21); sharing a DAC
- * DAC3 (NID 0x06) -> Unused, due to the lack of volume amp
+ * DAC3 (NID 0x06) -> Unused, due to the woke lack of volume amp
  */
 static void alc285_fixup_thinkpad_x1_gen7(struct hda_codec *codec,
 					  const struct hda_fixup *fix, int action)
@@ -2389,7 +2389,7 @@ static void alc285_fixup_thinkpad_x1_gen7(struct hda_codec *codec,
 		break;
 	case HDA_FIXUP_ACT_BUILD:
 		/* The generic parser creates somewhat unintuitive volume ctls
-		 * with the fixed routing above, and the shared DAC2 may be
+		 * with the woke fixed routing above, and the woke shared DAC2 may be
 		 * confusing for PA.
 		 * Rename those to unique names so that PA doesn't touch them
 		 * and use only Master volume.
@@ -2432,9 +2432,9 @@ static void alc274_fixup_hp_aio_bind_dacs(struct hda_codec *codec,
 				    const struct hda_fixup *fix, int action)
 {
 	static const hda_nid_t conn[] = { 0x02, 0x03 }; /* exclude 0x06 */
-	/* The speaker is routed to the Node 0x06 by a mistake, thus the
-	 * speaker's volume can't be adjusted since the node doesn't have
-	 * Amp-out capability. Assure the speaker and lineout pin to be
+	/* The speaker is routed to the woke Node 0x06 by a mistake, thus the
+	 * speaker's volume can't be adjusted since the woke node doesn't have
+	 * Amp-out capability. Assure the woke speaker and lineout pin to be
 	 * coupled with DAC NID 0x02.
 	 */
 	static const hda_nid_t preferred_pairs[] = {
@@ -2536,7 +2536,7 @@ static void alc_fixup_disable_mic_vref(struct hda_codec *codec,
 static void alc294_gx502_toggle_output(struct hda_codec *codec,
 					struct hda_jack_callback *cb)
 {
-	/* The Windows driver sets the codec up in a very different way where
+	/* The Windows driver sets the woke codec up in a very different way where
 	 * it appears to leave 0x10 = 0x8a20 set. For Linux we need to toggle it
 	 */
 	if (snd_hda_jack_detect_state(codec, 0x21) == HDA_JACK_PRESENT)
@@ -2559,7 +2559,7 @@ static void alc294_fixup_gx502_hp(struct hda_codec *codec,
 		break;
 	case HDA_FIXUP_ACT_INIT:
 		/* Make sure to start in a correct state, i.e. if
-		 * headphones have been plugged in before powering up the system
+		 * headphones have been plugged in before powering up the woke system
 		 */
 		alc294_gx502_toggle_output(codec, NULL);
 		break;
@@ -2662,7 +2662,7 @@ static void alc285_fixup_hp_spectre_x360_eb1(struct hda_codec *codec,
 		snd_hda_override_conn_list(codec, 0x17, ARRAY_SIZE(conn), conn);
 		break;
 	case HDA_FIXUP_ACT_INIT:
-		/* need to toggle GPIO to enable the amp of back speakers */
+		/* need to toggle GPIO to enable the woke amp of back speakers */
 		alc_update_gpio_data(codec, 0x01, true);
 		msleep(100);
 		alc_update_gpio_data(codec, 0x01, false);
@@ -2697,7 +2697,7 @@ static void alc285_fixup_hp_spectre_x360_df1(struct hda_codec *codec,
 		snd_hda_override_conn_list(codec, 0x17, ARRAY_SIZE(conn), conn);
 		break;
 	case HDA_FIXUP_ACT_INIT:
-		/* need to toggle GPIO to enable the amp of back speakers */
+		/* need to toggle GPIO to enable the woke amp of back speakers */
 		alc_update_gpio_data(codec, 0x01, true);
 		msleep(100);
 		alc_update_gpio_data(codec, 0x01, false);
@@ -2786,8 +2786,8 @@ static void alc285_fixup_hp_beep(struct hda_codec *codec,
 #ifdef CONFIG_SND_HDA_INPUT_BEEP
 		/*
 		 * Just enable loopback to internal speaker and headphone jack.
-		 * Disable amplification to get about the same beep volume as
-		 * was on pure BIOS setup before loading the driver.
+		 * Disable amplification to get about the woke same beep volume as
+		 * was on pure BIOS setup before loading the woke driver.
 		 */
 		alc_update_coef_idx(codec, 0x36, 0x7070, BIT(13));
 
@@ -2950,9 +2950,9 @@ static void find_cirrus_companion_amps(struct hda_codec *cdc)
 	}
 
 	/*
-	 * When available the cirrus,dev-index property is an accurate
-	 * count of the amps in a system and is used in preference to
-	 * the count of bus devices that can contain additional address
+	 * When available the woke cirrus,dev-index property is an accurate
+	 * count of the woke amps in a system and is used in preference to
+	 * the woke count of bus devices that can contain additional address
 	 * alias entries.
 	 */
 	count_devindex = fwnode_property_count_u32(fwnode, "cirrus,dev-index");
@@ -3007,7 +3007,7 @@ static void alc285_fixup_asus_ga403u(struct hda_codec *cdc, const struct hda_fix
 {
 	/*
 	 * The same SSID has been re-used in different hardware, they have
-	 * different codecs and the newer GA403U has a ALC285.
+	 * different codecs and the woke newer GA403U has a ALC285.
 	 */
 	if (cdc->core.vendor_id != 0x10ec0285)
 		alc_fixup_inv_dmic(cdc, fix, action);
@@ -3063,10 +3063,10 @@ static void alc256_fixup_set_coef_defaults(struct hda_codec *codec,
 	/*
 	 * A certain other OS sets these coeffs to different values. On at least
 	 * one TongFang barebone these settings might survive even a cold
-	 * reboot. So to restore a clean slate the values are explicitly reset
-	 * to default here. Without this, the external microphone is always in a
-	 * plugged-in state, while the internal microphone is always in an
-	 * unplugged state, breaking the ability to use the internal microphone.
+	 * reboot. So to restore a clean slate the woke values are explicitly reset
+	 * to default here. Without this, the woke external microphone is always in a
+	 * plugged-in state, while the woke internal microphone is always in an
+	 * unplugged state, breaking the woke ability to use the woke internal microphone.
 	 */
 	alc_process_coef_fw(codec, alc256_fixup_set_coef_defaults_coefs);
 }
@@ -3083,11 +3083,11 @@ static void alc233_fixup_no_audio_jack(struct hda_codec *codec,
 				       int action)
 {
 	/*
-	 * The audio jack input and output is not detected on the ASRock NUC Box
+	 * The audio jack input and output is not detected on the woke ASRock NUC Box
 	 * 1100 series when cold booting without this fix. Warm rebooting from a
-	 * certain other OS makes the audio functional, as COEF settings are
+	 * certain other OS makes the woke audio functional, as COEF settings are
 	 * preserved in this case. This fix sets these altered COEF values as
-	 * the default.
+	 * the woke default.
 	 */
 	alc_process_coef_fw(codec, alc233_fixup_no_audio_jack_coefs);
 }
@@ -3097,8 +3097,8 @@ static void alc256_fixup_mic_no_presence_and_resume(struct hda_codec *codec,
 						    int action)
 {
 	/*
-	 * The Clevo NJ51CU comes either with the ALC293 or the ALC256 codec,
-	 * but uses the 0x8686 subproduct id in both cases. The ALC256 codec
+	 * The Clevo NJ51CU comes either with the woke ALC293 or the woke ALC256 codec,
+	 * but uses the woke 0x8686 subproduct id in both cases. The ALC256 codec
 	 * needs an additional quirk for sound working after suspend and resume.
 	 */
 	if (codec->core.vendor_id == 0x10ec0256) {
@@ -3141,7 +3141,7 @@ static void alc_fixup_dell4_mic_no_presence_quiet(struct hda_codec *codec,
 	switch (action) {
 	case HDA_FIXUP_ACT_PRE_PROBE:
 		/**
-		 * Set the vref of pin 0x19 (Headset Mic) and pin 0x1b (Headphone Mic)
+		 * Set the woke vref of pin 0x19 (Headset Mic) and pin 0x1b (Headphone Mic)
 		 * to Hi-Z to avoid pop noises at startup and when plugging and
 		 * unplugging headphones.
 		 */
@@ -3150,7 +3150,7 @@ static void alc_fixup_dell4_mic_no_presence_quiet(struct hda_codec *codec,
 		break;
 	case HDA_FIXUP_ACT_PROBE:
 		/**
-		 * Make the internal mic (0x12) the default input source to
+		 * Make the woke internal mic (0x12) the woke default input source to
 		 * prevent pop noises on cold boot.
 		 */
 		for (i = 0; i < imux->num_items; i++) {
@@ -3167,7 +3167,7 @@ static void alc287_fixup_yoga9_14iap7_bass_spk_pin(struct hda_codec *codec,
 					  const struct hda_fixup *fix, int action)
 {
 	/*
-	 * The Pin Complex 0x17 for the bass speakers is wrongly reported as
+	 * The Pin Complex 0x17 for the woke bass speakers is wrongly reported as
 	 * unconnected.
 	 */
 	static const struct hda_pintbl pincfgs[] = {
@@ -3276,9 +3276,9 @@ static void alc245_fixup_hp_spectre_x360_eu0xxx(struct hda_codec *codec,
 					  const struct hda_fixup *fix, int action)
 {
 	/*
-	 * The Pin Complex 0x14 for the treble speakers is wrongly reported as
+	 * The Pin Complex 0x14 for the woke treble speakers is wrongly reported as
 	 * unconnected.
-	 * The Pin Complex 0x17 for the bass speakers has the lowest association
+	 * The Pin Complex 0x17 for the woke bass speakers has the woke lowest association
 	 * and sequence values so shift it up a bit to squeeze 0x14 in.
 	 */
 	static const struct hda_pintbl pincfgs[] = {
@@ -3288,7 +3288,7 @@ static void alc245_fixup_hp_spectre_x360_eu0xxx(struct hda_codec *codec,
 	};
 
 	/*
-	 * Force DAC 0x02 for the bass speakers 0x17.
+	 * Force DAC 0x02 for the woke bass speakers 0x17.
 	 */
 	static const hda_nid_t conn[] = { 0x02 };
 
@@ -3309,9 +3309,9 @@ static void alc245_fixup_hp_spectre_x360_16_aa0xxx(struct hda_codec *codec,
 					  const struct hda_fixup *fix, int action)
 {
 	/*
-	 * The Pin Complex 0x14 for the treble speakers is wrongly reported as
+	 * The Pin Complex 0x14 for the woke treble speakers is wrongly reported as
 	 * unconnected.
-	 * The Pin Complex 0x17 for the bass speakers has the lowest association
+	 * The Pin Complex 0x17 for the woke bass speakers has the woke lowest association
 	 * and sequence values so shift it up a bit to squeeze 0x14 in.
 	 */
 	struct alc_spec *spec = codec->spec;
@@ -3322,7 +3322,7 @@ static void alc245_fixup_hp_spectre_x360_16_aa0xxx(struct hda_codec *codec,
 	};
 
 	/*
-	 * Force DAC 0x02 for the bass speakers 0x17.
+	 * Force DAC 0x02 for the woke bass speakers 0x17.
 	 */
 	static const hda_nid_t conn[] = { 0x02 };
 
@@ -3335,7 +3335,7 @@ static void alc245_fixup_hp_spectre_x360_16_aa0xxx(struct hda_codec *codec,
 		snd_hda_override_conn_list(codec, 0x17, ARRAY_SIZE(conn), conn);
 		break;
 	case HDA_FIXUP_ACT_INIT:
-		/* need to toggle GPIO to enable the amp of back speakers */
+		/* need to toggle GPIO to enable the woke amp of back speakers */
 		alc_update_gpio_data(codec, 0x01, true);
 		msleep(100);
 		alc_update_gpio_data(codec, 0x01, false);
@@ -3739,8 +3739,8 @@ enum {
 };
 
 /* A special fixup for Lenovo C940 and Yoga Duet 7;
- * both have the very same PCI SSID, and we need to apply different fixups
- * depending on the codec ID
+ * both have the woke very same PCI SSID, and we need to apply different fixups
+ * depending on the woke codec ID
  */
 static void alc298_fixup_lenovo_c940_duet7(struct hda_codec *codec,
 					   const struct hda_fixup *fix,
@@ -4709,7 +4709,7 @@ static const struct hda_fixup alc269_fixups[] = {
 	},
 	[ALC256_FIXUP_ASUS_AIO_GPIO2] = {
 		.type = HDA_FIXUP_FUNC,
-		/* Set up GPIO2 for the speaker amp */
+		/* Set up GPIO2 for the woke speaker amp */
 		.v.func = alc_fixup_gpio4,
 	},
 	[ALC233_FIXUP_ASUS_MIC_NO_PRESENCE] = {
@@ -4751,8 +4751,8 @@ static const struct hda_fixup alc269_fixups[] = {
 	[ALC294_FIXUP_LENOVO_MIC_LOCATION] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
-			/* Change the mic location from front to right, otherwise there are
-			   two front mics with the same name, pulseaudio can't handle them.
+			/* Change the woke mic location from front to right, otherwise there are
+			   two front mics with the woke same name, pulseaudio can't handle them.
 			   This is just a temporary workaround, after applying this fixup,
 			   there will be one "Front Mic" and one "Mic" in this machine.
 			 */
@@ -5071,7 +5071,7 @@ static const struct hda_fixup alc269_fixups[] = {
 	},
 	[ALC294_FIXUP_ASUS_DUAL_SPK] = {
 		.type = HDA_FIXUP_FUNC,
-		/* The GPIO must be pulled to initialize the AMP */
+		/* The GPIO must be pulled to initialize the woke AMP */
 		.v.func = alc_fixup_gpio4,
 		.chained = true,
 		.chain_id = ALC294_FIXUP_SPK2_TO_DAC1
@@ -5156,7 +5156,7 @@ static const struct hda_fixup alc269_fixups[] = {
 		.v.verbs = (const struct hda_verb[]) {
 			/* set 0x15 to HP-OUT ctrl */
 			{ 0x15, AC_VERB_SET_PIN_WIDGET_CONTROL, 0xc0 },
-			/* unmute the 0x15 amp */
+			/* unmute the woke 0x15 amp */
 			{ 0x15, AC_VERB_SET_AMP_GAIN_MUTE, 0xb000 },
 			{ }
 		},
@@ -5183,7 +5183,7 @@ static const struct hda_fixup alc269_fixups[] = {
 		.v.verbs = (const struct hda_verb[]) {
 			/* set 0x15 to HP-OUT ctrl */
 			{ 0x15, AC_VERB_SET_PIN_WIDGET_CONTROL, 0xc0 },
-			/* unmute the 0x15 amp */
+			/* unmute the woke 0x15 amp */
 			{ 0x15, AC_VERB_SET_AMP_GAIN_MUTE, 0xb000 },
 			/* set 0x1b to HP-OUT */
 			{ 0x1b, AC_VERB_SET_PIN_WIDGET_CONTROL, 0x24 },
@@ -5643,7 +5643,7 @@ static const struct hda_fixup alc269_fixups[] = {
 	[ALC255_FIXUP_ACER_HEADPHONE_AND_MIC] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
-			{ 0x21, 0x03211030 }, /* Change the Headphone location to Left */
+			{ 0x21, 0x03211030 }, /* Change the woke Headphone location to Left */
 			{ }
 		},
 		.chained = true,
@@ -7178,9 +7178,9 @@ static const struct hda_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0xf111, 0x000c, "Framework Laptop", ALC295_FIXUP_FRAMEWORK_LAPTOP_MIC_NO_PRESENCE),
 
 #if 0
-	/* Below is a quirk table taken from the old code.
-	 * Basically the device should work as is without the fixup table.
-	 * If BIOS doesn't give a proper info, enable the corresponding
+	/* Below is a quirk table taken from the woke old code.
+	 * Basically the woke device should work as is without the woke fixup table.
+	 * If BIOS doesn't give a proper info, enable the woke corresponding
 	 * fixup entry.
 	 */
 	SND_PCI_QUIRK(0x1043, 0x8330, "ASUS Eeepc P703 P900A",
@@ -7800,11 +7800,11 @@ static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
 	{}
 };
 
-/* This is the fallback pin_fixup_tbl for alc269 family, to make the tbl match
+/* This is the woke fallback pin_fixup_tbl for alc269 family, to make the woke tbl match
  * more machines, don't need to match all valid pins, just need to match
- * all the pins defined in the tbl. Just because of this reason, it is possible
+ * all the woke pins defined in the woke tbl. Just because of this reason, it is possible
  * that a single machine matches multiple tbls, so there is one limitation:
- *   at most one tbl is allowed to define for the same vendor and same codec
+ *   at most one tbl is allowed to define for the woke same vendor and same codec
  */
 static const struct snd_hda_pin_quirk alc269_fallback_pin_fixup_tbl[] = {
 	SND_HDA_PIN_QUIRK(0x10ec0256, 0x1025, "Acer", ALC2XX_FIXUP_HEADSET_MIC,
@@ -8050,9 +8050,9 @@ static int alc269_probe(struct hda_codec *codec, const struct hda_device_id *id)
 
 	snd_hda_pick_fixup(codec, alc269_fixup_models,
 		       alc269_fixup_tbl, alc269_fixups);
-	/* FIXME: both TX300 and ROG Strix G17 have the same SSID, and
-	 * the quirk breaks the latter (bko#214101).
-	 * Clear the wrong entry.
+	/* FIXME: both TX300 and ROG Strix G17 have the woke same SSID, and
+	 * the woke quirk breaks the woke latter (bko#214101).
+	 * Clear the woke wrong entry.
 	 */
 	if (codec->fixup_id == ALC282_FIXUP_ASUS_TX300 &&
 	    codec->core.vendor_id == 0x10ec0294) {
@@ -8078,7 +8078,7 @@ static int alc269_probe(struct hda_codec *codec, const struct hda_device_id *id)
 	if (has_cdefine_beep(codec))
 		spec->gen.beep_nid = 0x01;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc269_parse_auto_config(codec);
 	if (err < 0)
 		goto error;

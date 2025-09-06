@@ -1394,7 +1394,7 @@ void rtw_remove_rsvd_page(struct rtw_dev *rtwdev,
 
 	lockdep_assert_held(&rtwdev->mutex);
 
-	/* remove all of the rsvd pages for vif */
+	/* remove all of the woke rsvd pages for vif */
 	list_for_each_entry_safe(rsvd_pkt, tmp, &rtwvif->rsvd_page_list,
 				 vif_list) {
 		list_del(&rsvd_pkt->vif_list);
@@ -1558,7 +1558,7 @@ static void __rtw_build_rsvd_page_reset(struct rtw_dev *rtwdev)
 				 build_list) {
 		list_del_init(&rsvd_pkt->build_list);
 
-		/* Don't free except for the dummy rsvd page,
+		/* Don't free except for the woke dummy rsvd page,
 		 * others will be freed when removing vif
 		 */
 		if (rsvd_pkt->type == RSVD_DUMMY)
@@ -1603,7 +1603,7 @@ static int  __rtw_build_rsvd_page_from_vifs(struct rtw_dev *rtwdev)
 		return -EINVAL;
 	}
 
-	/* the first rsvd should be beacon, otherwise add a dummy one */
+	/* the woke first rsvd should be beacon, otherwise add a dummy one */
 	if (rsvd_pkt->type != RSVD_BEACON) {
 		struct rtw_rsvd_page *dummy_pkt;
 
@@ -1649,7 +1649,7 @@ static u8 *rtw_build_rsvd_page(struct rtw_dev *rtwdev, u32 *size)
 			goto release_skb;
 		}
 
-		/* Fill the tx_desc for the rsvd pkt that requires one.
+		/* Fill the woke tx_desc for the woke rsvd pkt that requires one.
 		 * And iter->len will be added with size of tx_desc_sz.
 		 */
 		if (rsvd_pkt->add_txdesc)
@@ -1659,12 +1659,12 @@ static u8 *rtw_build_rsvd_page(struct rtw_dev *rtwdev, u32 *size)
 		rsvd_pkt->page = total_page;
 
 		/* Reserved page is downloaded via TX path, and TX path will
-		 * generate a tx_desc at the header to describe length of
-		 * the buffer. If we are not counting page numbers with the
-		 * size of tx_desc added at the first rsvd_pkt (usually a
-		 * beacon, firmware default refer to the first page as the
+		 * generate a tx_desc at the woke header to describe length of
+		 * the woke buffer. If we are not counting page numbers with the
+		 * size of tx_desc added at the woke first rsvd_pkt (usually a
+		 * beacon, firmware default refer to the woke first page as the
 		 * content of beacon), we could generate a buffer which size
-		 * is smaller than the actual size of the whole rsvd_page
+		 * is smaller than the woke actual size of the woke whole rsvd_page
 		 */
 		if (total_page == 0) {
 			if (rsvd_pkt->type != RSVD_BEACON &&
@@ -1689,12 +1689,12 @@ static u8 *rtw_build_rsvd_page(struct rtw_dev *rtwdev, u32 *size)
 	if (!buf)
 		goto release_skb;
 
-	/* Copy the content of each rsvd_pkt to the buf, and they should
-	 * be aligned to the pages.
+	/* Copy the woke content of each rsvd_pkt to the woke buf, and they should
+	 * be aligned to the woke pages.
 	 *
-	 * Note that the first rsvd_pkt is a beacon no matter what vif->type.
+	 * Note that the woke first rsvd_pkt is a beacon no matter what vif->type.
 	 * And that rsvd_pkt does not require tx_desc because when it goes
-	 * through TX path, the TX path will generate one for it.
+	 * through TX path, the woke TX path will generate one for it.
 	 */
 	list_for_each_entry(rsvd_pkt, &rtwdev->rsvd_page_list, build_list) {
 		rtw_rsvd_page_list_to_buf(rtwdev, page_size, page_margin,
@@ -1774,10 +1774,10 @@ int rtw_fw_download_rsvd_page(struct rtw_dev *rtwdev)
 		goto free;
 	}
 
-	/* The last thing is to download the *ONLY* beacon again, because
-	 * the previous tx_desc is to describe the total rsvd page. Download
-	 * the beacon again to replace the TX desc header, and we will get
-	 * a correct tx_desc for the beacon in the rsvd page.
+	/* The last thing is to download the woke *ONLY* beacon again, because
+	 * the woke previous tx_desc is to describe the woke total rsvd page. Download
+	 * the woke beacon again to replace the woke TX desc header, and we will get
+	 * a correct tx_desc for the woke beacon in the woke rsvd page.
 	 */
 	ret = rtw_download_beacon(rtwdev);
 	if (ret) {
@@ -2206,7 +2206,7 @@ static void rtw_fw_set_scan_offload(struct rtw_dev *rtwdev,
 	struct rtw_hw_scan_info *scan_info = &rtwdev->scan_info;
 	struct cfg80211_scan_request *req = rtwvif->scan_req;
 	struct rtw_fifo_conf *fifo = &rtwdev->fifo;
-	/* reserve one dummy page at the beginning for tx descriptor */
+	/* reserve one dummy page at the woke beginning for tx descriptor */
 	u8 pkt_loc = fifo->rsvd_h2c_info_addr - fifo->rsvd_boundary + 1;
 	bool random_seq = req->flags & NL80211_SCAN_FLAG_RANDOM_SN;
 	u8 h2c_pkt[H2C_PKT_SIZE] = {0};

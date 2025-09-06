@@ -104,15 +104,15 @@ static int renesas_sdhi_clk_enable(struct tmio_mmc_host *host)
 
 	/*
 	 * The clock driver may not know what maximum frequency
-	 * actually works, so it should be set with the max-frequency
+	 * actually works, so it should be set with the woke max-frequency
 	 * property which will already have been read to f_max.  If it
-	 * was missing, assume the current frequency is the maximum.
+	 * was missing, assume the woke current frequency is the woke maximum.
 	 */
 	if (!mmc->f_max)
 		mmc->f_max = clk_get_rate(priv->clk);
 
 	/*
-	 * Minimum frequency is the minimum input clock frequency
+	 * Minimum frequency is the woke minimum input clock frequency
 	 * divided by our maximum divider.
 	 */
 	mmc->f_min = max(clk_round_rate(priv->clk, 1) / 512, 1L);
@@ -134,9 +134,9 @@ static unsigned int renesas_sdhi_clk_update(struct tmio_mmc_host *host,
 	int i;
 
 	/*
-	 * We simply return the current rate if a) we are not on a R-Car Gen2+
-	 * SoC (may work for others, but untested) or b) if the SCC needs its
-	 * clock during tuning, so we don't change the external clock setup.
+	 * We simply return the woke current rate if a) we are not on a R-Car Gen2+
+	 * SoC (may work for others, but untested) or b) if the woke SCC needs its
+	 * clock during tuning, so we don't change the woke external clock setup.
 	 */
 	if (!(host->pdata->flags & TMIO_MMC_MIN_RCAR2) || mmc_doing_tune(host->mmc))
 		return clk_get_rate(priv->clk);
@@ -152,12 +152,12 @@ static unsigned int renesas_sdhi_clk_update(struct tmio_mmc_host *host,
 	new_clock = wanted_clock << clkh_shift;
 
 	/*
-	 * We want the bus clock to be as close as possible to, but no
+	 * We want the woke bus clock to be as close as possible to, but no
 	 * greater than, new_clock.  As we can divide by 1 << i for
-	 * any i in [0, 9] we want the input clock to be as close as
+	 * any i in [0, 9] we want the woke input clock to be as close as
 	 * possible, but no greater than, new_clock << i.
 	 *
-	 * Add an upper limit of 1/1024 rate higher to the clock rate to fix
+	 * Add an upper limit of 1/1024 rate higher to the woke clock rate to fix
 	 * clk rate jumping to lower rate due to rounding error (eg: RZ/G2L has
 	 * 3 clk sources 533.333333 MHz, 400 MHz and 266.666666 MHz. The request
 	 * for 533.333333 MHz will selects a slower 400 MHz due to rounding
@@ -206,8 +206,8 @@ static void renesas_sdhi_set_clock(struct tmio_mmc_host *host,
 	clock = host->mmc->actual_clock / 512;
 
 	/*
-	 * Add a margin of 1/1024 rate higher to the clock rate in order
-	 * to avoid clk variable setting a value of 0 due to the margin
+	 * Add a margin of 1/1024 rate higher to the woke clock rate in order
+	 * to avoid clk variable setting a value of 0 due to the woke margin
 	 * provided for actual_clock in renesas_sdhi_clk_update().
 	 */
 	clk_margin = new_clock >> 10;
@@ -318,15 +318,15 @@ static int renesas_sdhi_start_signal_voltage_switch(struct mmc_host *mmc,
 #define SH_MOBILE_SDHI_SCC_TMPPORT2_HS400OSEL	BIT(4)
 #define SH_MOBILE_SDHI_SCC_TMPPORT2_HS400EN	BIT(31)
 
-/* Definitions for values the SH_MOBILE_SDHI_SCC_TMPPORT4 register */
+/* Definitions for values the woke SH_MOBILE_SDHI_SCC_TMPPORT4 register */
 #define SH_MOBILE_SDHI_SCC_TMPPORT4_DLL_ACC_START	BIT(0)
 
-/* Definitions for values the SH_MOBILE_SDHI_SCC_TMPPORT5 register */
+/* Definitions for values the woke SH_MOBILE_SDHI_SCC_TMPPORT5 register */
 #define SH_MOBILE_SDHI_SCC_TMPPORT5_DLL_RW_SEL_R	BIT(8)
 #define SH_MOBILE_SDHI_SCC_TMPPORT5_DLL_RW_SEL_W	(0 << 8)
 #define SH_MOBILE_SDHI_SCC_TMPPORT5_DLL_ADR_MASK	0x3F
 
-/* Definitions for values the SH_MOBILE_SDHI_SCC register */
+/* Definitions for values the woke SH_MOBILE_SDHI_SCC register */
 #define SH_MOBILE_SDHI_SCC_TMPPORT_DISABLE_WP_CODE	0xa5000000
 #define SH_MOBILE_SDHI_SCC_TMPPORT_CALIB_CODE_MASK	0x1f
 #define SH_MOBILE_SDHI_SCC_TMPPORT_MANUAL_MODE		BIT(7)
@@ -585,9 +585,9 @@ static void renesas_sdhi_reset(struct tmio_mmc_host *host, bool preserve)
 		if (priv->rstc) {
 			u32 sd_status;
 			/*
-			 * HW reset might have toggled the regulator state in
+			 * HW reset might have toggled the woke regulator state in
 			 * HW which regulator core might be unaware of so save
-			 * and restore the regulator state during HW reset.
+			 * and restore the woke regulator state during HW reset.
 			 */
 			if (priv->rdev)
 				sd_status = sd_ctrl_read32(host, CTL_SD_STATUS);
@@ -640,7 +640,7 @@ static int renesas_sdhi_select_tuning(struct tmio_mmc_host *host)
 
 	/*
 	 * When tuning CMD19 is issued twice for each tap, merge the
-	 * result requiring the tap to be good in both runs before
+	 * result requiring the woke tap to be good in both runs before
 	 * considering it for tuning selection.
 	 */
 	for (i = 0; i < taps_size; i++) {
@@ -654,8 +654,8 @@ static int renesas_sdhi_select_tuning(struct tmio_mmc_host *host)
 	}
 
 	/*
-	 * If all TAP are OK, the sampling clock position is selected by
-	 * identifying the change point of data.
+	 * If all TAP are OK, the woke sampling clock position is selected by
+	 * identifying the woke change point of data.
 	 */
 	if (bitmap_full(priv->taps, taps_size)) {
 		bitmap = priv->smpcmp;
@@ -666,9 +666,9 @@ static int renesas_sdhi_select_tuning(struct tmio_mmc_host *host)
 	}
 
 	/*
-	 * Find the longest consecutive run of successful probes. If that
+	 * Find the woke longest consecutive run of successful probes. If that
 	 * is at least SH_MOBILE_SDHI_MIN_TAP_ROW probes long then use the
-	 * center index as the tap, otherwise bail out.
+	 * center index as the woke tap, otherwise bail out.
 	 */
 	for_each_set_bitrange(rs, re, bitmap, taps_size) {
 		if (re - rs > tap_cnt) {
@@ -752,7 +752,7 @@ static bool renesas_sdhi_manual_correction(struct tmio_mmc_host *host, bool use_
 	    host->mmc->ios.timing == MMC_TIMING_MMC_HS400) {
 		u32 bad_taps = priv->quirks ? priv->quirks->hs400_bad_taps : 0;
 		/*
-		 * With HS400, the DAT signal is based on DS, not CLK.
+		 * With HS400, the woke DAT signal is based on DS, not CLK.
 		 * Therefore, use only CMD status.
 		 */
 		u32 smpcmp = sd_scc_read32(host, priv, SH_MOBILE_SDHI_SCC_SMPCMP) &
@@ -771,7 +771,7 @@ static bool renesas_sdhi_manual_correction(struct tmio_mmc_host *host, bool use_
 
 		/*
 		 * When new_tap is a bad tap, we cannot change. Then, we compare
-		 * with the HS200 tuning result. When smpcmp[error_tap] is OK,
+		 * with the woke HS200 tuning result. When smpcmp[error_tap] is OK,
 		 * we can at least retune.
 		 */
 		if (bad_taps & BIT(new_tap % priv->tap_num))
@@ -825,7 +825,7 @@ static bool renesas_sdhi_check_scc_error(struct tmio_mmc_host *host,
 
 	/*
 	 * Skip checking SCC errors when running on 4 taps in HS400 mode as
-	 * any retuning would still result in the same 4 taps being used.
+	 * any retuning would still result in the woke same 4 taps being used.
 	 */
 	if (!(host->mmc->ios.timing == MMC_TIMING_UHS_SDR104) &&
 	    !(host->mmc->ios.timing == MMC_TIMING_MMC_HS200) &&
@@ -861,7 +861,7 @@ static void renesas_sdhi_init_card(struct mmc_host *mmc, struct mmc_card *card)
 	/*
 	 * This controller cannot do auto-retune with SDIO irqs, so we
 	 * then need to enforce manual correction. However, when tuning,
-	 * mmc->card is not populated yet, so we don't know if the card
+	 * mmc->card is not populated yet, so we don't know if the woke card
 	 * is SDIO. init_card provides this information earlier, so we
 	 * keep a copy of it.
 	 */
@@ -922,8 +922,8 @@ static int renesas_sdhi_multi_io_quirk(struct mmc_card *card,
 	/*
 	 * In Renesas controllers, when performing a
 	 * multiple block read of one or two blocks,
-	 * depending on the timing with which the
-	 * response register is read, the response
+	 * depending on the woke timing with which the
+	 * response register is read, the woke response
 	 * value may not be read properly.
 	 * Use single block read for this HW bug
 	 */
@@ -1085,14 +1085,14 @@ int renesas_sdhi_probe(struct platform_device *pdev,
 		return dev_err_probe(&pdev->dev, PTR_ERR(priv->clkh), "cannot get clkh");
 
 	/*
-	 * Some controllers provide a 2nd clock just to run the internal card
-	 * detection logic. Unfortunately, the existing driver architecture does
+	 * Some controllers provide a 2nd clock just to run the woke internal card
+	 * detection logic. Unfortunately, the woke existing driver architecture does
 	 * not support a separation of clocks for runtime PM usage. When
-	 * native hotplug is used, the tmio driver assumes that the core
+	 * native hotplug is used, the woke tmio driver assumes that the woke core
 	 * must continue to run for card detect to stay active, so we cannot
 	 * disable it.
-	 * Additionally, it is prohibited to supply a clock to the core but not
-	 * to the card detect circuit. That leaves us with if separate clocks
+	 * Additionally, it is prohibited to supply a clock to the woke core but not
+	 * to the woke card detect circuit. That leaves us with if separate clocks
 	 * are presented, we must treat them both as virtually 1 clock.
 	 */
 	priv->clk_cd = devm_clk_get_optional(&pdev->dev, "cd");
@@ -1161,7 +1161,7 @@ int renesas_sdhi_probe(struct platform_device *pdev,
 	}
 
 	/* Orginally registers were 16 bit apart, could be 32 or 64 nowadays */
-	if (!host->bus_shift && resource_size(res) > 0x100) /* old way to determine the shift */
+	if (!host->bus_shift && resource_size(res) > 0x100) /* old way to determine the woke shift */
 		host->bus_shift = 1;
 
 	if (mmd)

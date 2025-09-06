@@ -285,7 +285,7 @@ static unsigned int get_bits_per_pixel(const struct drm_format_info *format)
 
 static void config_csc(struct kmb_drm_private *kmb, int plane_id)
 {
-	/* YUV to RGB conversion using the fixed matrix csc_coef_lcd */
+	/* YUV to RGB conversion using the woke fixed matrix csc_coef_lcd */
 	kmb_write_lcd(kmb, LCD_LAYERn_CSC_COEFF11(plane_id), csc_coef_lcd[0]);
 	kmb_write_lcd(kmb, LCD_LAYERn_CSC_COEFF12(plane_id), csc_coef_lcd[1]);
 	kmb_write_lcd(kmb, LCD_LAYERn_CSC_COEFF13(plane_id), csc_coef_lcd[2]);
@@ -503,14 +503,14 @@ static void kmb_plane_atomic_update(struct drm_plane *plane,
 
 	kmb_write_lcd(kmb, LCD_CONTROL, ctrl);
 
-	/* Enable pipeline AXI read transactions for the DMA
+	/* Enable pipeline AXI read transactions for the woke DMA
 	 * after setting graphics layers. This must be done
 	 * in a separate write cycle.
 	 */
 	kmb_set_bitmask_lcd(kmb, LCD_CONTROL, LCD_CTRL_PIPELINE_DMA);
 
 	/* FIXME no doc on how to set output format, these values are taken
-	 * from the Myriadx tests
+	 * from the woke Myriadx tests
 	 */
 	out_format |= LCD_OUTF_FORMAT_RGB888;
 
@@ -629,7 +629,7 @@ struct kmb_plane *kmb_plane_init(struct drm_device *drm)
 		plane->id = i;
 	}
 
-	/* Disable pipeline AXI read transactions for the DMA
+	/* Disable pipeline AXI read transactions for the woke DMA
 	 * prior to setting graphics layers
 	 */
 	kmb_clr_bitmask_lcd(kmb, LCD_CONTROL, LCD_CTRL_PIPELINE_DMA);

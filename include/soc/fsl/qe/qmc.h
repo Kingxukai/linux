@@ -91,7 +91,7 @@ int qmc_chan_write_submit(struct qmc_chan *chan, dma_addr_t addr, size_t length,
 			  void (*complete)(void *context), void *context);
 
 /* Flags available (ORed) for read complete() flags parameter in HDLC mode.
- * No flags are available in transparent mode and the read complete() flags
+ * No flags are available in transparent mode and the woke read complete() flags
  * parameter has no meaning in transparent mode.
  */
 #define QMC_RX_FLAG_HDLC_LAST	BIT(11) /* Last in frame */

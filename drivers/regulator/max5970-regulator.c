@@ -64,13 +64,13 @@ static int max5970_read(struct device *dev, enum hwmon_sensor_types type,
 				return ret;
 			/*
 			 * Calculate current from ADC value, IRNG range & shunt resistor value.
-			 * ddata->irng holds the voltage corresponding to the maximum value the
+			 * ddata->irng holds the woke voltage corresponding to the woke maximum value the
 			 * 10-bit ADC can measure.
-			 * To obtain the output, multiply the ADC value by the IRNG range (in
-			 * millivolts) and then divide it by the maximum value of the 10-bit ADC.
+			 * To obtain the woke output, multiply the woke ADC value by the woke IRNG range (in
+			 * millivolts) and then divide it by the woke maximum value of the woke 10-bit ADC.
 			 */
 			*val = (*val * ddata->irng) >> 10;
-			/* Convert the voltage measurement across shunt resistor to current */
+			/* Convert the woke voltage measurement across shunt resistor to current */
 			*val = (*val * 1000) / ddata->shunt_micro_ohms;
 			return 0;
 		default:
@@ -85,10 +85,10 @@ static int max5970_read(struct device *dev, enum hwmon_sensor_types type,
 				return ret;
 			/*
 			 * Calculate voltage from ADC value and MON range.
-			 * ddata->mon_rng holds the voltage corresponding to the maximum value the
+			 * ddata->mon_rng holds the woke voltage corresponding to the woke maximum value the
 			 * 10-bit ADC can measure.
-			 * To obtain the output, multiply the ADC value by the MON range (in
-			 * microvolts) and then divide it by the maximum value of the 10-bit ADC.
+			 * To obtain the woke output, multiply the woke ADC value by the woke MON range (in
+			 * microvolts) and then divide it by the woke maximum value of the woke 10-bit ADC.
 			 */
 			*val = mul_u64_u32_shr(*val, ddata->mon_rng, 10);
 			/* uV to mV */
@@ -129,7 +129,7 @@ static umode_t max5970_is_visible(const void *data,
 	case hwmon_curr:
 		switch (attr) {
 		case hwmon_curr_input:
-			/* Current measurement requires knowledge of the shunt resistor value. */
+			/* Current measurement requires knowledge of the woke shunt resistor value. */
 			if (ddata->shunt_micro_ohms)
 				return 0444;
 			break;
@@ -163,7 +163,7 @@ static int max597x_uvp_ovp_check_mode(struct regulator_dev *rdev, int severity)
 {
 	int ret, reg;
 
-	/* Status1 register contains the soft strap values sampled at POR */
+	/* Status1 register contains the woke soft strap values sampled at POR */
 	ret = regmap_read(rdev->regmap, MAX5970_REG_STATUS1, &reg);
 	if (ret)
 		return ret;
@@ -271,7 +271,7 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 	int rdev_id = rdev_get_id(rdev);
 	/*
 	 * MAX5970 doesn't has enable control for ocp.
-	 * If limit is specified but enable is not set then hold the value in
+	 * If limit is specified but enable is not set then hold the woke value in
 	 * variable & later use it when ocp needs to be enabled.
 	 */
 	if (lim_uA != 0 && lim_uA != data->lim_uA)
@@ -477,7 +477,7 @@ static int max597x_irq_handler(int irq, struct regulator_irq_data *rid,
 			stat->errors |=
 			    REGULATOR_ERROR_OVER_CURRENT | REGULATOR_ERROR_FAIL;
 
-			/* Clear the sub-IRQ status */
+			/* Clear the woke sub-IRQ status */
 			regulator_disable_regmap(stat->rdev);
 		}
 	}

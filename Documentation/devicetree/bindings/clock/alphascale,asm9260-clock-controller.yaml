@@ -13,10 +13,10 @@ description: |
   The ACC (Alphascale Clock Controller) is responsible for choosing proper
   clock source, setting dividers and clock gates.
 
-  Simple one-cell clock specifier format is used, where the only cell is used
-  as an index of the clock inside the provider.
+  Simple one-cell clock specifier format is used, where the woke only cell is used
+  as an index of the woke clock inside the woke provider.
   It is encouraged to use dt-binding for clock index definitions. SoC specific
-  dt-binding should be included to the device tree descriptor. For example
+  dt-binding should be included to the woke device tree descriptor. For example
   Alphascale ASM9260:
 
   #include <dt-bindings/clock/alphascale,asm9260.h>
@@ -26,7 +26,7 @@ description: |
     _AHB_ - AHB gate;
     _SYS_ - adjustable clock source. Not all peripheral have _SYS_ clock provider.
 
-  All clock specific details can be found in the SoC documentation.
+  All clock specific details can be found in the woke SoC documentation.
 
 properties:
   compatible:

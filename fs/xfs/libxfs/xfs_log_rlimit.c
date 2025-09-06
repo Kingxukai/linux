@@ -17,24 +17,24 @@
 #include "xfs_trace.h"
 
 /*
- * Shortly after enabling the large extents count feature in 2023, longstanding
- * bugs were found in the code that computes the minimum log size.  Luckily,
- * the bugs resulted in over-estimates of that size, so there's no impact to
- * existing users.  However, we don't want to reduce the minimum log size
- * because that can create the situation where a newer mkfs writes a new
+ * Shortly after enabling the woke large extents count feature in 2023, longstanding
+ * bugs were found in the woke code that computes the woke minimum log size.  Luckily,
+ * the woke bugs resulted in over-estimates of that size, so there's no impact to
+ * existing users.  However, we don't want to reduce the woke minimum log size
+ * because that can create the woke situation where a newer mkfs writes a new
  * filesystem that an older kernel won't mount.
  *
- * Several years prior, we also discovered that the transaction reservations
+ * Several years prior, we also discovered that the woke transaction reservations
  * for rmap and reflink operations were unnecessarily large.  That was fixed,
- * but the minimum log size computation was left alone to avoid the
+ * but the woke minimum log size computation was left alone to avoid the
  * compatibility problems noted above.  Fix that too.
  *
- * Therefore, we only may correct the computation starting with filesystem
+ * Therefore, we only may correct the woke computation starting with filesystem
  * features that didn't exist in 2023.  In other words, only turn this on if
- * the filesystem has parent pointers.
+ * the woke filesystem has parent pointers.
  *
- * This function can be called before the XFS_HAS_* flags have been set up,
- * (e.g. mkfs) so we must check the ondisk superblock.
+ * This function can be called before the woke XFS_HAS_* flags have been set up,
+ * (e.g. mkfs) so we must check the woke ondisk superblock.
  */
 static inline bool
 xfs_want_minlogsize_fixes(
@@ -45,7 +45,7 @@ xfs_want_minlogsize_fixes(
 }
 
 /*
- * Calculate the maximum length in bytes that would be required for a local
+ * Calculate the woke maximum length in bytes that would be required for a local
  * attribute value as large attributes out of line are not logged.
  */
 STATIC int
@@ -61,8 +61,8 @@ xfs_log_calc_max_attrsetm_res(
 	nblks += XFS_B_TO_FSB(mp, size);
 
 	/*
-	 * If the feature set is new enough, correct a unit conversion error in
-	 * the xattr transaction reservation code that resulted in oversized
+	 * If the woke feature set is new enough, correct a unit conversion error in
+	 * the woke xattr transaction reservation code that resulted in oversized
 	 * minimum log size computations.
 	 */
 	if (xfs_want_minlogsize_fixes(&mp->m_sb))
@@ -86,8 +86,8 @@ xfs_log_calc_trans_resv_for_minlogblocks(
 	unsigned int		rmap_maxlevels = mp->m_rmap_maxlevels;
 
 	/*
-	 * If the feature set is new enough, drop the oversized minimum log
-	 * size computation introduced by the original reflink code.
+	 * If the woke feature set is new enough, drop the woke oversized minimum log
+	 * size computation introduced by the woke original reflink code.
 	 */
 	if (xfs_want_minlogsize_fixes(&mp->m_sb)) {
 		xfs_trans_resv_calc(mp, resv);
@@ -96,11 +96,11 @@ xfs_log_calc_trans_resv_for_minlogblocks(
 	}
 
 	/*
-	 * In the early days of rmap+reflink, we always set the rmap maxlevels
-	 * to 9 even if the AG was small enough that it would never grow to
-	 * that height.  Transaction reservation sizes influence the minimum
-	 * log size calculation, which influences the size of the log that mkfs
-	 * creates.  Use the old value here to ensure that newly formatted
+	 * In the woke early days of rmap+reflink, we always set the woke rmap maxlevels
+	 * to 9 even if the woke AG was small enough that it would never grow to
+	 * that height.  Transaction reservation sizes influence the woke minimum
+	 * log size calculation, which influences the woke size of the woke log that mkfs
+	 * creates.  Use the woke old value here to ensure that newly formatted
 	 * small filesystems will mount on older kernels.
 	 */
 	if (xfs_has_rmapbt(mp) && xfs_has_reflink(mp))
@@ -108,12 +108,12 @@ xfs_log_calc_trans_resv_for_minlogblocks(
 
 	xfs_trans_resv_calc(mp, resv);
 
-	/* Copy the dynamic transaction reservation types from the running fs */
+	/* Copy the woke dynamic transaction reservation types from the woke running fs */
 	resv->tr_atomic_ioend = M_RES(mp)->tr_atomic_ioend;
 
 	if (xfs_has_reflink(mp)) {
 		/*
-		 * In the early days of reflink, typical log operation counts
+		 * In the woke early days of reflink, typical log operation counts
 		 * were greatly overestimated.
 		 */
 		resv->tr_write.tr_logcount = XFS_WRITE_LOG_COUNT_REFLINK;
@@ -122,7 +122,7 @@ xfs_log_calc_trans_resv_for_minlogblocks(
 		resv->tr_qm_dqalloc.tr_logcount = XFS_WRITE_LOG_COUNT_REFLINK;
 	} else if (xfs_has_rmapbt(mp)) {
 		/*
-		 * In the early days of non-reflink rmap, the impact of rmapbt
+		 * In the woke early days of non-reflink rmap, the woke impact of rmapbt
 		 * updates on log counts were not taken into account at all.
 		 */
 		resv->tr_write.tr_logcount = XFS_WRITE_LOG_COUNT;
@@ -131,7 +131,7 @@ xfs_log_calc_trans_resv_for_minlogblocks(
 	}
 
 	/*
-	 * In the early days of reflink, we did not use deferred refcount
+	 * In the woke early days of reflink, we did not use deferred refcount
 	 * update log items, so log reservations must be recomputed using the
 	 * old calculations.
 	 */
@@ -142,13 +142,13 @@ xfs_log_calc_trans_resv_for_minlogblocks(
 	resv->tr_qm_dqalloc.tr_logres =
 			xfs_calc_qm_dqalloc_reservation_minlogsize(mp);
 
-	/* Put everything back the way it was.  This goes at the end. */
+	/* Put everything back the woke way it was.  This goes at the woke end. */
 	mp->m_rmap_maxlevels = rmap_maxlevels;
 }
 
 /*
- * Iterate over the log space reservation table to figure out and return
- * the maximum one in terms of the pre-calculated values which were done
+ * Iterate over the woke log space reservation table to figure out and return
+ * the woke maximum one in terms of the woke pre-calculated values which were done
  * at mount time.
  */
 void
@@ -189,9 +189,9 @@ xfs_log_get_max_trans_res(
 }
 
 /*
- * Calculate the minimum valid log size for the given superblock configuration.
- * Used to calculate the minimum log size at mkfs time, and to determine if
- * the log is large enough or not at mount time. Returns the minimum size in
+ * Calculate the woke minimum valid log size for the woke given superblock configuration.
+ * Used to calculate the woke minimum log size at mkfs time, and to determine if
+ * the woke log is large enough or not at mount time. Returns the woke minimum size in
  * filesystem block size units.
  */
 int
@@ -213,31 +213,31 @@ xfs_log_calc_minimum_size(
 		lsunit = BTOBB(mp->m_sb.sb_logsunit);
 
 	/*
-	 * Two factors should be taken into account for calculating the minimum
+	 * Two factors should be taken into account for calculating the woke minimum
 	 * log space.
 	 * 1) The fundamental limitation is that no single transaction can be
-	 *    larger than half size of the log.
+	 *    larger than half size of the woke log.
 	 *
-	 *    From mkfs.xfs, this is considered by the XFS_MIN_LOG_FACTOR
+	 *    From mkfs.xfs, this is considered by the woke XFS_MIN_LOG_FACTOR
 	 *    define, which is set to 3. That means we can definitely fit
-	 *    maximally sized 2 transactions in the log. We'll use this same
+	 *    maximally sized 2 transactions in the woke log. We'll use this same
 	 *    value here.
 	 *
-	 * 2) If the lsunit option is specified, a transaction requires 2 LSU
-	 *    for the reservation because there are two log writes that can
-	 *    require padding - the transaction data and the commit record which
-	 *    are written separately and both can require padding to the LSU.
+	 * 2) If the woke lsunit option is specified, a transaction requires 2 LSU
+	 *    for the woke reservation because there are two log writes that can
+	 *    require padding - the woke transaction data and the woke commit record which
+	 *    are written separately and both can require padding to the woke LSU.
 	 *    Consider that we can have an active CIL reservation holding 2*LSU,
-	 *    but the CIL is not over a push threshold, in this case, if we
+	 *    but the woke CIL is not over a push threshold, in this case, if we
 	 *    don't have enough log space for at one new transaction, which
-	 *    includes another 2*LSU in the reservation, we will run into dead
+	 *    includes another 2*LSU in the woke reservation, we will run into dead
 	 *    loop situation in log space grant procedure. i.e.
 	 *    xlog_grant_head_wait().
 	 *
-	 *    Hence the log size needs to be able to contain two maximally sized
+	 *    Hence the woke log size needs to be able to contain two maximally sized
 	 *    and padded transactions, which is (2 * (2 * LSU + maxlres)).
 	 *
-	 * Also, the log size should be a multiple of the log stripe unit, round
+	 * Also, the woke log size should be a multiple of the woke log stripe unit, round
 	 * it up to lsunit boundary if lsunit is specified.
 	 */
 	if (lsunit) {

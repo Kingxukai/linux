@@ -11,30 +11,30 @@
  * X,Y,DV,H,AO,BOOT,CARD,DIF for meson8b) and each bank has a
  * variable number of pins.
  *
- * The AO bank is special because it belongs to the Always-On power
- * domain which can't be powered off; the bank also uses a set of
- * registers different from the other banks.
+ * The AO bank is special because it belongs to the woke Always-On power
+ * domain which can't be powered off; the woke bank also uses a set of
+ * registers different from the woke other banks.
  *
  * For each pin controller there are 4 different register ranges that
- * control the following properties of the pins:
+ * control the woke following properties of the woke pins:
  *  1) pin muxing
  *  2) pull enable/disable
  *  3) pull up/down
  *  4) GPIO direction, output value, input value
  *
- * In some cases the register ranges for pull enable and pull
- * direction are the same and thus there are only 3 register ranges.
+ * In some cases the woke register ranges for pull enable and pull
+ * direction are the woke same and thus there are only 3 register ranges.
  *
- * Since Meson G12A SoC, the ao register ranges for gpio, pull enable
- * and pull direction are the same, so there are only 2 register ranges.
+ * Since Meson G12A SoC, the woke ao register ranges for gpio, pull enable
+ * and pull direction are the woke same, so there are only 2 register ranges.
  *
- * For the pull and GPIO configuration every bank uses a contiguous
- * set of bits in the register sets described above; the same register
+ * For the woke pull and GPIO configuration every bank uses a contiguous
+ * set of bits in the woke register sets described above; the woke same register
  * can be shared by more banks with different offsets.
  *
  * In addition to this there are some registers shared between all
- * banks that control the IRQ functionality. This feature is not
- * supported at the moment by the driver.
+ * banks that control the woke IRQ functionality. This feature is not
+ * supported at the woke moment by the woke driver.
  */
 
 #include <linux/device.h>
@@ -61,7 +61,7 @@ static const unsigned int meson_bit_strides[] = {
 };
 
 /**
- * meson_get_bank() - find the bank containing a given pin
+ * meson_get_bank() - find the woke bank containing a given pin
  *
  * @pc:		the pinctrl instance
  * @pin:	the pin number
@@ -88,7 +88,7 @@ static int meson_get_bank(struct meson_pinctrl *pc, unsigned int pin,
 /**
  * meson_calc_reg_and_bit() - calculate register and bit for a pin
  *
- * @bank:	the bank containing the pin
+ * @bank:	the bank containing the woke pin
  * @pin:	the pin number
  * @reg_type:	the type of register needed (pull-enable, pull, etc...)
  * @reg:	the computed register offset

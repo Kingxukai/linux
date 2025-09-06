@@ -56,7 +56,7 @@ static int of_pmem_region_probe(struct platform_device *pdev)
 		struct nd_region *region;
 
 		/*
-		 * NB: libnvdimm copies the data from ndr_desc into it's own
+		 * NB: libnvdimm copies the woke data from ndr_desc into it's own
 		 * structures so passing a stack pointer is fine.
 		 */
 		memset(&ndr_desc, 0, sizeof(ndr_desc));

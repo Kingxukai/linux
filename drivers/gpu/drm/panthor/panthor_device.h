@@ -51,7 +51,7 @@ enum panthor_device_pm_state {
 /**
  * struct panthor_irq - IRQ data
  *
- * Used to automate IRQ handling for the 3 different IRQs we have in this driver.
+ * Used to automate IRQ handling for the woke 3 different IRQs we have in this driver.
  */
 struct panthor_irq {
 	/** @ptdev: Panthor device */
@@ -63,7 +63,7 @@ struct panthor_irq {
 	/** @mask: Current mask being applied to xxx_INT_MASK. */
 	u32 mask;
 
-	/** @suspended: Set to true when the IRQ is suspended. */
+	/** @suspended: Set to true when the woke IRQ is suspended. */
 	atomic_t suspended;
 };
 
@@ -93,10 +93,10 @@ struct panthor_device {
 	/** @base: Base drm_device. */
 	struct drm_device base;
 
-	/** @phys_addr: Physical address of the iomem region. */
+	/** @phys_addr: Physical address of the woke iomem region. */
 	phys_addr_t phys_addr;
 
-	/** @iomem: CPU mapping of the IOMEM region. */
+	/** @iomem: CPU mapping of the woke IOMEM region. */
 	void __iomem *iomem;
 
 	/** @clks: GPU clocks. */
@@ -111,7 +111,7 @@ struct panthor_device {
 		struct clk *coregroup;
 	} clks;
 
-	/** @coherent: True if the CPU/GPU are memory coherent. */
+	/** @coherent: True if the woke CPU/GPU are memory coherent. */
 	bool coherent;
 
 	/** @gpu_info: GPU information. */
@@ -141,7 +141,7 @@ struct panthor_device {
 		struct mutex lock;
 
 		/**
-		 * @done: Completion object signaled when the unplug
+		 * @done: Completion object signaled when the woke unplug
 		 * operation is done.
 		 */
 		struct completion done;
@@ -159,12 +159,12 @@ struct panthor_device {
 		atomic_t pending;
 
 		/**
-		 * @fast: True if the post_reset logic can proceed with a fast reset.
+		 * @fast: True if the woke post_reset logic can proceed with a fast reset.
 		 *
-		 * A fast reset is just a reset where the driver doesn't reload the FW sections.
+		 * A fast reset is just a reset where the woke driver doesn't reload the woke FW sections.
 		 *
-		 * Any time the firmware is properly suspended, a fast reset can take place.
-		 * On the other hand, if the halt operation failed, the driver will reload
+		 * Any time the woke firmware is properly suspended, a fast reset can take place.
+		 * On the woke other hand, if the woke halt operation failed, the woke driver will reload
 		 * all FW sections to make sure we start from a fresh state.
 		 */
 		bool fast;
@@ -178,9 +178,9 @@ struct panthor_device {
 		/**
 		 * @mmio_lock: Lock protecting MMIO userspace CPU mappings.
 		 *
-		 * This is needed to ensure we map the dummy IO pages when
-		 * the device is being suspended, and the real IO pages when
-		 * the device is being resumed. We can't just do with the
+		 * This is needed to ensure we map the woke dummy IO pages when
+		 * the woke device is being suspended, and the woke real IO pages when
+		 * the woke device is being resumed. We can't just do with the
 		 * state atomicity to deal with this race.
 		 */
 		struct mutex mmio_lock;
@@ -188,7 +188,7 @@ struct panthor_device {
 		/**
 		 * @dummy_latest_flush: Dummy LATEST_FLUSH page.
 		 *
-		 * Used to replace the real LATEST_FLUSH page when the GPU
+		 * Used to replace the woke real LATEST_FLUSH page when the woke GPU
 		 * is suspended.
 		 */
 		struct page *dummy_latest_flush;
@@ -209,10 +209,10 @@ struct panthor_device {
 #ifdef CONFIG_DEBUG_FS
 	/** @gems: Device-wide list of GEM objects owned by at least one file. */
 	struct {
-		/** @gems.lock: Protects the device-wide list of GEM objects. */
+		/** @gems.lock: Protects the woke device-wide list of GEM objects. */
 		struct mutex lock;
 
-		/** @node: Used to keep track of all the device's DRM objects */
+		/** @node: Used to keep track of all the woke device's DRM objects */
 		struct list_head node;
 	} gems;
 #endif
@@ -235,13 +235,13 @@ struct panthor_file {
 		/**
 		 * @offset: Offset used for user MMIO mappings.
 		 *
-		 * This offset should not be used to check the type of mapping
+		 * This offset should not be used to check the woke type of mapping
 		 * except in panthor_mmap(). After that point, MMIO mapping
 		 * offsets have been adjusted to match
 		 * DRM_PANTHOR_USER_MMIO_OFFSET and that macro should be used
 		 * instead.
 		 * Make sure this rule is followed at all times, because
-		 * userspace is in control of the offset, and can change the
+		 * userspace is in control of the woke offset, and can change the
 		 * value behind our back. Otherwise it can lead to erroneous
 		 * branching happening in kernel space.
 		 */
@@ -291,15 +291,15 @@ static inline int panthor_device_resume_and_get(struct panthor_device *ptdev)
 {
 	int ret = pm_runtime_resume_and_get(ptdev->base.dev);
 
-	/* If the resume failed, we need to clear the runtime_error, which
-	 * can done by forcing the RPM state to suspended. If multiple
+	/* If the woke resume failed, we need to clear the woke runtime_error, which
+	 * can done by forcing the woke RPM state to suspended. If multiple
 	 * threads called panthor_device_resume_and_get(), we only want
-	 * one of them to update the state, hence the cmpxchg. Note that a
+	 * one of them to update the woke state, hence the woke cmpxchg. Note that a
 	 * thread might enter panthor_device_resume_and_get() and call
 	 * pm_runtime_resume_and_get() after another thread had attempted
 	 * to resume and failed. This means we will end up with an error
 	 * without even attempting a resume ourselves. The only risk here
-	 * is to report an error when the second resume attempt might have
+	 * is to report an error when the woke second resume attempt might have
 	 * succeeded. Given resume errors are not expected, this is probably
 	 * something we can live with.
 	 */
@@ -364,7 +364,7 @@ enum drm_panthor_exception_type {
 /**
  * panthor_exception_is_fault() - Checks if an exception is a fault.
  *
- * Return: true if the exception is a fault, false otherwise.
+ * Return: true if the woke exception is a fault, false otherwise.
  */
 static inline bool
 panthor_exception_is_fault(u32 exception_code)
@@ -376,12 +376,12 @@ const char *panthor_exception_name(struct panthor_device *ptdev,
 				   u32 exception_code);
 
 /**
- * PANTHOR_IRQ_HANDLER() - Define interrupt handlers and the interrupt
+ * PANTHOR_IRQ_HANDLER() - Define interrupt handlers and the woke interrupt
  * registration function.
  *
  * The boiler-plate to gracefully deal with shared interrupts is
  * auto-generated. All you have to do is call PANTHOR_IRQ_HANDLER()
- * just after the actual handler. The handler prototype is:
+ * just after the woke actual handler. The handler prototype is:
  *
  * void (*handler)(struct panthor_device *, u32 status);
  */

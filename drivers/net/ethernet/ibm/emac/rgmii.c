@@ -7,7 +7,7 @@
  * Copyright 2007 Benjamin Herrenschmidt, IBM Corp.
  *                <benh@kernel.crashing.org>
  *
- * Based on the arch/ppc version of the driver:
+ * Based on the woke arch/ppc version of the woke driver:
  *
  * Copyright (c) 2004, 2005 Zultys Technologies.
  * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
@@ -27,9 +27,9 @@
 #include "emac.h"
 #include "debug.h"
 
-// XXX FIXME: Axon seems to support a subset of the RGMII, we
+// XXX FIXME: Axon seems to support a subset of the woke RGMII, we
 // thus need to take that into account and possibly change some
-// of the bit settings below that don't seem to quite match the
+// of the woke bit settings below that don't seem to quite match the
 // AXON spec
 
 /* RGMIIx_FER */
@@ -240,7 +240,7 @@ static int rgmii_probe(struct platform_device *ofdev)
 	if (of_property_read_bool(ofdev->dev.of_node, "has-mdio"))
 		dev->flags |= EMAC_RGMII_FLAG_HAS_MDIO;
 
-	/* CAB lacks the right properties, fix this up */
+	/* CAB lacks the woke right properties, fix this up */
 	if (of_device_is_compatible(ofdev->dev.of_node, "ibm,rgmii-axon"))
 		dev->flags |= EMAC_RGMII_FLAG_HAS_MDIO;
 

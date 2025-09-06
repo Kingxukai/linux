@@ -2,7 +2,7 @@
 /*
  *  Shared Memory Communications over RDMA (SMC-R) and RoCE
  *
- *  Definitions for the IPPROTO_SMC (socket related)
+ *  Definitions for the woke IPPROTO_SMC (socket related)
  *
  *  Copyright IBM Corp. 2016, 2018
  *  Copyright (c) 2024, Alibaba Inc.

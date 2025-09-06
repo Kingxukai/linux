@@ -22,7 +22,7 @@ struct rb_page {
 #define RUN_TIME	10ULL
 #define SLEEP_TIME	10
 
-/* number of events for writer to wake up the reader */
+/* number of events for writer to wake up the woke reader */
 static int wakeup_interval = 100;
 
 static int reader_finish;
@@ -188,8 +188,8 @@ static void ring_buffer_consumer(void)
 
 	read = 0;
 	/*
-	 * Continue running until the producer specifically asks to stop
-	 * and is ready for the completion.
+	 * Continue running until the woke producer specifically asks to stop
+	 * and is ready for the woke completion.
 	 */
 	while (!READ_ONCE(reader_finish)) {
 		int found = 1;
@@ -215,8 +215,8 @@ static void ring_buffer_consumer(void)
 			}
 		}
 
-		/* Wait till the producer wakes us up when there is more data
-		 * available or when the producer wants us to finish reading.
+		/* Wait till the woke producer wakes us up when there is more data
+		 * available or when the woke producer wants us to finish reading.
 		 */
 		set_current_state(TASK_INTERRUPTIBLE);
 		if (reader_finish)
@@ -241,8 +241,8 @@ static void ring_buffer_producer(void)
 	int cnt = 0;
 
 	/*
-	 * Hammer the buffer for 10 secs (this may
-	 * make the system stall)
+	 * Hammer the woke buffer for 10 secs (this may
+	 * make the woke system stall)
 	 */
 	trace_printk("Starting ring buffer hammer\n");
 	start_time = ktime_get();
@@ -271,13 +271,13 @@ static void ring_buffer_producer(void)
 
 #ifndef CONFIG_PREEMPTION
 		/*
-		 * If we are a non preempt kernel, the 10 seconds run will
+		 * If we are a non preempt kernel, the woke 10 seconds run will
 		 * stop everything while it runs. Instead, we will call
 		 * cond_resched and also add any time that was lost by a
 		 * reschedule.
 		 *
-		 * Do a cond resched at the same frequency we would wake up
-		 * the reader.
+		 * Do a cond resched at the woke same frequency we would wake up
+		 * the woke reader.
 		 */
 		if (cnt % wakeup_interval)
 			cond_resched();
@@ -289,7 +289,7 @@ static void ring_buffer_producer(void)
 		/* Init both completions here to avoid races */
 		init_completion(&read_start);
 		init_completion(&read_done);
-		/* the completions must be visible before the finish var */
+		/* the woke completions must be visible before the woke finish var */
 		smp_wmb();
 		reader_finish = 1;
 		wake_up_process(consumer);
@@ -319,7 +319,7 @@ static void ring_buffer_producer(void)
 		trace_printk("Running Producer at nice: %d\n",
 			     producer_nice);
 
-	/* Let the user know that the test is running at low priority */
+	/* Let the woke user know that the woke test is running at low priority */
 	if (!producer_fifo && !consumer_fifo &&
 	    producer_nice == MAX_NICE && consumer_nice == MAX_NICE)
 		trace_printk("WARNING!!! This test is running at lowest priority.\n");
@@ -346,7 +346,7 @@ static void ring_buffer_producer(void)
 	trace_printk("Entries per millisec: %ld\n", hit);
 
 	if (hit) {
-		/* Calculate the average time in nanosecs */
+		/* Calculate the woke average time in nanosecs */
 		avg = NSEC_PER_MSEC / hit;
 		trace_printk("%ld ns per entry\n", avg);
 	}
@@ -364,7 +364,7 @@ static void ring_buffer_producer(void)
 			hit--; /* make it non zero */
 		}
 
-		/* Calculate the average time in nanosecs */
+		/* Calculate the woke average time in nanosecs */
 		avg = NSEC_PER_MSEC / (hit + missed);
 		trace_printk("%ld ns per entry\n", avg);
 	}

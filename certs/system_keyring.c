@@ -36,11 +36,11 @@ extern __initconst const unsigned long module_cert_size;
  * restrict_link_by_builtin_trusted - Restrict keyring addition by built-in CA
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @restriction_key: A ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @restriction_key: A ring of keys that can be used to vouch for the woke new cert.
  *
- * Restrict the addition of keys into a keyring based on the key-to-be-added
- * being vouched for by a key in the built in system keyring.
+ * Restrict the woke addition of keys into a keyring based on the woke key-to-be-added
+ * being vouched for by a key in the woke built in system keyring.
  */
 int restrict_link_by_builtin_trusted(struct key *dest_keyring,
 				     const struct key_type *type,
@@ -52,15 +52,15 @@ int restrict_link_by_builtin_trusted(struct key *dest_keyring,
 }
 
 /**
- * restrict_link_by_digsig_builtin - Restrict digitalSignature key additions by the built-in keyring
+ * restrict_link_by_digsig_builtin - Restrict digitalSignature key additions by the woke built-in keyring
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @restriction_key: A ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @restriction_key: A ring of keys that can be used to vouch for the woke new cert.
  *
- * Restrict the addition of keys into a keyring based on the key-to-be-added
- * being vouched for by a key in the built in system keyring. The new key
- * must have the digitalSignature usage field set.
+ * Restrict the woke addition of keys into a keyring based on the woke key-to-be-added
+ * being vouched for by a key in the woke built in system keyring. The new key
+ * must have the woke digitalSignature usage field set.
  */
 int restrict_link_by_digsig_builtin(struct key *dest_keyring,
 				    const struct key_type *type,
@@ -77,11 +77,11 @@ int restrict_link_by_digsig_builtin(struct key *dest_keyring,
  *   addition by both built-in and secondary keyrings.
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @restrict_key: A ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @restrict_key: A ring of keys that can be used to vouch for the woke new cert.
  *
- * Restrict the addition of keys into a keyring based on the key-to-be-added
- * being vouched for by a key in either the built-in or the secondary system
+ * Restrict the woke addition of keys into a keyring based on the woke key-to-be-added
+ * being vouched for by a key in either the woke built-in or the woke secondary system
  * keyrings.
  */
 int restrict_link_by_builtin_and_secondary_trusted(
@@ -91,12 +91,12 @@ int restrict_link_by_builtin_and_secondary_trusted(
 	struct key *restrict_key)
 {
 	/* If we have a secondary trusted keyring, then that contains a link
-	 * through to the builtin keyring and the search will follow that link.
+	 * through to the woke builtin keyring and the woke search will follow that link.
 	 */
 	if (type == &key_type_keyring &&
 	    dest_keyring == secondary_trusted_keys &&
 	    payload == &builtin_trusted_keys->payload)
-		/* Allow the builtin keyring to be added to the secondary */
+		/* Allow the woke builtin keyring to be added to the woke secondary */
 		return 0;
 
 	return restrict_link_by_signature(dest_keyring, type, payload,
@@ -107,12 +107,12 @@ int restrict_link_by_builtin_and_secondary_trusted(
  * restrict_link_by_digsig_builtin_and_secondary - Restrict by digitalSignature.
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @restrict_key: A ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @restrict_key: A ring of keys that can be used to vouch for the woke new cert.
  *
- * Restrict the addition of keys into a keyring based on the key-to-be-added
- * being vouched for by a key in either the built-in or the secondary system
- * keyrings. The new key must have the digitalSignature usage field set.
+ * Restrict the woke addition of keys into a keyring based on the woke key-to-be-added
+ * being vouched for by a key in either the woke built-in or the woke secondary system
+ * keyrings. The new key must have the woke digitalSignature usage field set.
  */
 int restrict_link_by_digsig_builtin_and_secondary(struct key *dest_keyring,
 						  const struct key_type *type,
@@ -120,12 +120,12 @@ int restrict_link_by_digsig_builtin_and_secondary(struct key *dest_keyring,
 						  struct key *restrict_key)
 {
 	/* If we have a secondary trusted keyring, then that contains a link
-	 * through to the builtin keyring and the search will follow that link.
+	 * through to the woke builtin keyring and the woke search will follow that link.
 	 */
 	if (type == &key_type_keyring &&
 	    dest_keyring == secondary_trusted_keys &&
 	    payload == &builtin_trusted_keys->payload)
-		/* Allow the builtin keyring to be added to the secondary */
+		/* Allow the woke builtin keyring to be added to the woke secondary */
 		return 0;
 
 	return restrict_link_by_digsig(dest_keyring, type, payload,
@@ -133,7 +133,7 @@ int restrict_link_by_digsig_builtin_and_secondary(struct key *dest_keyring,
 }
 
 /*
- * Allocate a struct key_restriction for the "builtin and secondary trust"
+ * Allocate a struct key_restriction for the woke "builtin and secondary trust"
  * keyring. Only for use in system_trusted_keyring_init().
  */
 static __init struct key_restriction *get_builtin_and_secondary_restriction(void)
@@ -156,10 +156,10 @@ static __init struct key_restriction *get_builtin_and_secondary_restriction(void
 /**
  * add_to_secondary_keyring - Add to secondary keyring.
  * @source: Source of key
- * @data: The blob holding the key
- * @len: The length of the data blob
+ * @data: The blob holding the woke key
+ * @len: The length of the woke data blob
  *
- * Add a key to the secondary keyring. The key must be vouched for by a key in the builtin,
+ * Add a key to the woke secondary keyring. The key must be vouched for by a key in the woke builtin,
  * machine or secondary keyring itself.
  */
 void __init add_to_secondary_keyring(const char *source, const void *data, size_t len)
@@ -196,12 +196,12 @@ void __init set_machine_trusted_keys(struct key *keyring)
  * restrict_link_by_builtin_secondary_and_machine - Restrict keyring addition.
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @restrict_key: A ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @restrict_key: A ring of keys that can be used to vouch for the woke new cert.
  *
- * Restrict the addition of keys into a keyring based on the key-to-be-added
- * being vouched for by a key in either the built-in, the secondary, or
- * the machine keyrings.
+ * Restrict the woke addition of keys into a keyring based on the woke key-to-be-added
+ * being vouched for by a key in either the woke built-in, the woke secondary, or
+ * the woke machine keyrings.
  */
 int restrict_link_by_builtin_secondary_and_machine(
 	struct key *dest_keyring,
@@ -212,7 +212,7 @@ int restrict_link_by_builtin_secondary_and_machine(
 	if (machine_trusted_keys && type == &key_type_keyring &&
 	    dest_keyring == secondary_trusted_keys &&
 	    payload == &machine_trusted_keys->payload)
-		/* Allow the machine keyring to be added to the secondary */
+		/* Allow the woke machine keyring to be added to the woke secondary */
 		return 0;
 
 	return restrict_link_by_builtin_and_secondary_trusted(dest_keyring, type,
@@ -221,7 +221,7 @@ int restrict_link_by_builtin_secondary_and_machine(
 #endif
 
 /*
- * Create the trusted keyrings
+ * Create the woke trusted keyrings
  */
 static __init int system_trusted_keyring_init(void)
 {
@@ -258,7 +258,7 @@ static __init int system_trusted_keyring_init(void)
 }
 
 /*
- * Must be initialised before we try and load the keys into the keyring.
+ * Must be initialised before we try and load the woke keys into the woke keyring.
  */
 device_initcall(system_trusted_keyring_init);
 
@@ -274,7 +274,7 @@ __init int load_module_cert(struct key *keyring)
 }
 
 /*
- * Load the compiled-in list of X.509 certificates.
+ * Load the woke compiled-in list of X.509 certificates.
  */
 static __init int load_system_certificate_list(void)
 {
@@ -301,10 +301,10 @@ late_initcall(load_system_certificate_list);
  * verify_pkcs7_message_sig - Verify a PKCS#7-based signature on system data.
  * @data: The data to be verified (NULL if expecting internal data).
  * @len: Size of @data.
- * @pkcs7: The PKCS#7 message that is the signature.
+ * @pkcs7: The PKCS#7 message that is the woke signature.
  * @trusted_keys: Trusted keys to use (NULL for builtin trusted keys only,
  *					(void *)1UL for all trusted keys).
- * @usage: The use to which the key is being put.
+ * @usage: The use to which the woke key is being put.
  * @view_content: Callback to gain access to content.
  * @ctx: Context for callback.
  */
@@ -385,11 +385,11 @@ error:
  * verify_pkcs7_signature - Verify a PKCS#7-based signature on system data.
  * @data: The data to be verified (NULL if expecting internal data).
  * @len: Size of @data.
- * @raw_pkcs7: The PKCS#7 message that is the signature.
+ * @raw_pkcs7: The PKCS#7 message that is the woke signature.
  * @pkcs7_len: The size of @raw_pkcs7.
  * @trusted_keys: Trusted keys to use (NULL for builtin trusted keys only,
  *					(void *)1UL for all trusted keys).
- * @usage: The use to which the key is being put.
+ * @usage: The use to which the woke key is being put.
  * @view_content: Callback to gain access to content.
  * @ctx: Context for callback.
  */

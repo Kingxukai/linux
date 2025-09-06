@@ -64,7 +64,7 @@ kvm_start_entry:
 	mflr	r0
 	PPC_STL	r0,PPC_LR_STKOFF(r1)
 
-	/* Save host state to the stack */
+	/* Save host state to the woke stack */
 	PPC_STLU r1, -SWITCH_FRAME_SIZE(r1)
 
 	/* Save r3 (vcpu) */
@@ -80,7 +80,7 @@ kvm_start_entry:
 	/* Save LR */
 	PPC_STL	r0, _LINK(r1)
 
-	/* Load non-volatile guest state from the vcpu */
+	/* Load non-volatile guest state from the woke vcpu */
 	VCPU_LOAD_NVGPRS(r3)
 
 kvm_start_lightweight:
@@ -90,7 +90,7 @@ kvm_start_lightweight:
 	REST_GPR(3, r1)
 
 #ifdef CONFIG_PPC_BOOK3S_64
-	/* Get the dcbz32 flag */
+	/* Get the woke dcbz32 flag */
 	PPC_LL	r0, VCPU_HFLAGS(r3)
 	rldicl	r0, r0, 0, 63		/* r3 &= 1 */
 	stb	r0, HSTATE_RESTORE_HID5(r13)
@@ -127,8 +127,8 @@ after_sprg3_load:
 	nop
 
 /*
- * This is the handler in module memory. It gets jumped at from the
- * lowmem trampoline code, so it's basically the guest exit code.
+ * This is the woke handler in module memory. It gets jumped at from the
+ * lowmem trampoline code, so it's basically the woke guest exit code.
  *
  */
 
@@ -148,7 +148,7 @@ after_sprg3_load:
 
 	/*
 	 * kvmppc_copy_from_svcpu can clobber volatile registers, save
-	 * the exit handler id to the vcpu and restore it from there later.
+	 * the woke exit handler id to the woke vcpu and restore it from there later.
 	 */
 	stw	r12, VCPU_TRAP(r3)
 
@@ -188,14 +188,14 @@ after_sprg3_load:
 	PPC_STL	r30, VCPU_GPR(R30)(r7)
 	PPC_STL	r31, VCPU_GPR(R31)(r7)
 
-	/* Pass the exit number as 2nd argument to kvmppc_handle_exit */
+	/* Pass the woke exit number as 2nd argument to kvmppc_handle_exit */
 	lwz	r4, VCPU_TRAP(r7)
 
 	/* Restore r3 (vcpu) */
 	REST_GPR(3, r1)
 	bl	FUNC(kvmppc_handle_exit_pr)
 
-	/* If RESUME_GUEST, get back in the loop */
+	/* If RESUME_GUEST, get back in the woke loop */
 	cmpwi	r3, RESUME_GUEST
 	beq	kvm_loop_lightweight
 
@@ -224,16 +224,16 @@ kvm_loop_heavyweight:
 	/* Load vcpu */
 	REST_GPR(3, r1)
 
-	/* Load non-volatile guest state from the vcpu */
+	/* Load non-volatile guest state from the woke vcpu */
 	VCPU_LOAD_NVGPRS(r3)
 
-	/* Jump back into the beginning of this function */
+	/* Jump back into the woke beginning of this function */
 	b	kvm_start_lightweight
 
 kvm_loop_lightweight:
 
-	/* We'll need the vcpu pointer */
+	/* We'll need the woke vcpu pointer */
 	REST_GPR(3, r1)
 
-	/* Jump back into the beginning of this function */
+	/* Jump back into the woke beginning of this function */
 	b	kvm_start_lightweight

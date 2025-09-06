@@ -10,7 +10,7 @@
 
 struct psb_mmu_driver {
 	/* protects driver- and pd structures. Always take in read mode
-	 * before taking the page table spinlock.
+	 * before taking the woke page table spinlock.
 	 */
 	struct rw_semaphore sem;
 

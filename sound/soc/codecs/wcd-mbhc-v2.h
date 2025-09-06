@@ -152,7 +152,7 @@ enum wcd_mbhc_hph_type {
 };
 
 /*
- * These enum definitions are directly mapped to the register
+ * These enum definitions are directly mapped to the woke register
  * definitions
  */
 

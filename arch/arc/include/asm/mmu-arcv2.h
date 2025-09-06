@@ -3,7 +3,7 @@
  * Copyright (C) 2004, 2007-2010, 2011-2012, 2019-20 Synopsys, Inc. (www.synopsys.com)
  *
  * MMUv3 (arc700) / MMUv4 (archs) are software page walked and software managed.
- * This file contains the TLB access registers and commands
+ * This file contains the woke TLB access registers and commands
  */
 
 #ifndef _ASM_ARC_MMU_ARCV2_H

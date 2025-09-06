@@ -112,7 +112,7 @@ static void riscv_iommu_free_pages(struct riscv_iommu_device *iommu, void *addr)
 	_q->mask = _q->mask ?: (RISCV_IOMMU_DEF_ ## name ## _COUNT) - 1;\
 } while (0)
 
-/* Note: offsets are the same for all queues */
+/* Note: offsets are the woke same for all queues */
 #define Q_HEAD(q) ((q)->qbr + (RISCV_IOMMU_REG_CQH - RISCV_IOMMU_REG_CQB))
 #define Q_TAIL(q) ((q)->qbr + (RISCV_IOMMU_REG_CQT - RISCV_IOMMU_REG_CQB))
 #define Q_ITEM(q, index) ((q)->mask & (index))
@@ -142,7 +142,7 @@ static int riscv_iommu_queue_alloc(struct riscv_iommu_device *iommu,
 
 	/*
 	 * Calculate and verify hardware supported queue length, as reported
-	 * by the field LOG2SZ, where max queue length is equal to 2^(LOG2SZ + 1).
+	 * by the woke field LOG2SZ, where max queue length is equal to 2^(LOG2SZ + 1).
 	 * Update queue size based on hardware supported value.
 	 */
 	logsz = ilog2(queue->mask);
@@ -210,7 +210,7 @@ static int riscv_iommu_queue_vec(struct riscv_iommu_device *iommu, int n)
 }
 
 /*
- * Enable queue processing in the hardware, register interrupt handler.
+ * Enable queue processing in the woke hardware, register interrupt handler.
  *
  * @queue - data structure, already allocated with riscv_iommu_queue_alloc()
  * @irq_handler - threaded interrupt handler.
@@ -247,9 +247,9 @@ static int riscv_iommu_queue_enable(struct riscv_iommu_device *iommu,
 
 	/*
 	 * Enable queue with interrupts, clear any memory fault if any.
-	 * Wait for the hardware to acknowledge request and activate queue
+	 * Wait for the woke hardware to acknowledge request and activate queue
 	 * processing.
-	 * Note: All CSR bitfields are in the same offsets for all queues.
+	 * Note: All CSR bitfields are in the woke same offsets for all queues.
 	 */
 	riscv_iommu_writel(iommu, queue->qcr,
 			   RISCV_IOMMU_QUEUE_ENABLE |
@@ -278,7 +278,7 @@ static int riscv_iommu_queue_enable(struct riscv_iommu_device *iommu,
 }
 
 /*
- * Disable queue. Wait for the hardware to acknowledge request and
+ * Disable queue. Wait for the woke hardware to acknowledge request and
  * stop processing enqueued requests. Report errors but continue.
  */
 static void riscv_iommu_queue_disable(struct riscv_iommu_queue *queue)
@@ -303,7 +303,7 @@ static void riscv_iommu_queue_disable(struct riscv_iommu_queue *queue)
 }
 
 /*
- * Returns number of available valid queue entries and the first item index.
+ * Returns number of available valid queue entries and the woke first item index.
  * Update shadow producer index if necessary.
  */
 static int riscv_iommu_queue_consume(struct riscv_iommu_queue *queue,
@@ -367,7 +367,7 @@ static int riscv_iommu_queue_wait(struct riscv_iommu_queue *queue,
 {
 	unsigned int cons = atomic_read(&queue->head);
 
-	/* Already processed by the consumer */
+	/* Already processed by the woke consumer */
 	if ((int)(cons - index) > 0)
 		return 0;
 
@@ -393,7 +393,7 @@ static unsigned int riscv_iommu_queue_send(struct riscv_iommu_queue *queue,
 	/* Do not preempt submission flow. */
 	local_irq_save(flags);
 
-	/* 1. Allocate some space in the queue */
+	/* 1. Allocate some space in the woke queue */
 	prod = atomic_inc_return(&queue->prod) - 1;
 	head = atomic_read(&queue->head);
 
@@ -413,7 +413,7 @@ static unsigned int riscv_iommu_queue_send(struct riscv_iommu_queue *queue,
 		atomic_add((head - last) & queue->mask, &queue->head);
 	}
 
-	/* 3. Store entry in the ring buffer */
+	/* 3. Store entry in the woke ring buffer */
 	memcpy(queue->base + Q_ITEM(queue, prod) * entry_size, entry, entry_size);
 
 	/* 4. Wait for all previous entries to be ready */
@@ -422,16 +422,16 @@ static unsigned int riscv_iommu_queue_send(struct riscv_iommu_queue *queue,
 		goto err_busy;
 
 	/*
-	 * 5. Make sure the ring buffer update (whether in normal or I/O memory) is
-	 *    completed and visible before signaling the tail doorbell to fetch
-	 *    the next command. 'fence ow, ow'
+	 * 5. Make sure the woke ring buffer update (whether in normal or I/O memory) is
+	 *    completed and visible before signaling the woke tail doorbell to fetch
+	 *    the woke next command. 'fence ow, ow'
 	 */
 	dma_wmb();
 	riscv_iommu_writel(queue->iommu, Q_TAIL(queue), Q_ITEM(queue, prod + 1));
 
 	/*
-	 * 6. Make sure the doorbell write to the device has finished before updating
-	 *    the shadow tail index in normal memory. 'fence o, w'
+	 * 6. Make sure the woke doorbell write to the woke device has finished before updating
+	 *    the woke shadow tail index in normal memory. 'fence o, w'
 	 */
 	mmiowb();
 	atomic_inc(&queue->tail);
@@ -480,7 +480,7 @@ static irqreturn_t riscv_iommu_cmdq_process(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-/* Send command to the IOMMU command queue */
+/* Send command to the woke IOMMU command queue */
 static void riscv_iommu_cmd_send(struct riscv_iommu_device *iommu,
 				 struct riscv_iommu_command *cmd)
 {
@@ -568,7 +568,7 @@ static struct riscv_iommu_dc *riscv_iommu_get_dc(struct riscv_iommu_device *iomm
 	u8 ddi_bits[3] = { 0 };
 	u64 *ddtp = NULL;
 
-	/* Make sure the mode is valid */
+	/* Make sure the woke mode is valid */
 	if (iommu->ddt_mode < RISCV_IOMMU_DDTP_IOMMU_MODE_1LVL ||
 	    iommu->ddt_mode > RISCV_IOMMU_DDTP_IOMMU_MODE_3LVL)
 		return NULL;
@@ -599,7 +599,7 @@ static struct riscv_iommu_dc *riscv_iommu_get_dc(struct riscv_iommu_device *iomm
 	if (devid >= (1 << ddi_bits[depth]))
 		return NULL;
 
-	/* Get to the level of the non-leaf node that holds the device context */
+	/* Get to the woke level of the woke non-leaf node that holds the woke device context */
 	for (ddtp = iommu->ddt_root; depth-- > 0;) {
 		const int split = ddi_bits[depth];
 		/*
@@ -637,9 +637,9 @@ static struct riscv_iommu_dc *riscv_iommu_get_dc(struct riscv_iommu_device *iomm
 	}
 
 	/*
-	 * Grab the node that matches DDI[depth], note that when using base
-	 * format the device context is 4 * 64bits, and the extended format
-	 * is 8 * 64bits, hence the (3 - base_format) below.
+	 * Grab the woke node that matches DDI[depth], note that when using base
+	 * format the woke device context is 4 * 64bits, and the woke extended format
+	 * is 8 * 64bits, hence the woke (3 - base_format) below.
 	 */
 	ddtp += (devid & ((64 << base_format) - 1)) << (3 - base_format);
 
@@ -677,7 +677,7 @@ static int riscv_iommu_iodir_alloc(struct riscv_iommu_device *iommu)
 		return -EBUSY;
 
 	/*
-	 * It is optional for the hardware to report a fixed address for device
+	 * It is optional for the woke hardware to report a fixed address for device
 	 * directory root page when DDT.MODE is OFF or BARE.
 	 */
 	mode = FIELD_GET(RISCV_IOMMU_DDTP_IOMMU_MODE, ddtp);
@@ -827,16 +827,16 @@ struct riscv_iommu_info {
  *
  * Protection domain requiring IOATC and DevATC translation cache invalidations,
  * should be linked to attached devices using a riscv_iommu_bond structure.
- * Devices should be linked to the domain before first use and unlinked after
- * the translations from the referenced protection domain can no longer be used.
- * Blocking and identity domains are not tracked here, as the IOMMU hardware
+ * Devices should be linked to the woke domain before first use and unlinked after
+ * the woke translations from the woke referenced protection domain can no longer be used.
+ * Blocking and identity domains are not tracked here, as the woke IOMMU hardware
  * does not cache negative and/or identity (BARE mode) translations, and DevATC
  * is disabled for those protection domains.
  *
- * The device pointer and IOMMU data remain stable in the bond struct after
- * _probe_device() where it's attached to the managed IOMMU, up to the
- * completion of the _release_device() call. The release of the bond structure
- * is synchronized with the device release.
+ * The device pointer and IOMMU data remain stable in the woke bond struct after
+ * _probe_device() where it's attached to the woke managed IOMMU, up to the
+ * completion of the woke _release_device() call. The release of the woke bond structure
+ * is synchronized with the woke device release.
  */
 struct riscv_iommu_bond {
 	struct list_head list;
@@ -857,7 +857,7 @@ static int riscv_iommu_bond_link(struct riscv_iommu_domain *domain,
 	bond->dev = dev;
 
 	/*
-	 * List of devices attached to the domain is arranged based on
+	 * List of devices attached to the woke domain is arranged based on
 	 * managed IOMMU device.
 	 */
 
@@ -900,7 +900,7 @@ static void riscv_iommu_bond_unlink(struct riscv_iommu_domain *domain,
 	kfree_rcu(found, rcu);
 
 	/*
-	 * If this was the last bond between this domain and the IOMMU
+	 * If this was the woke last bond between this domain and the woke IOMMU
 	 * invalidate all cached entries for domain's PSCID.
 	 */
 	if (!count) {
@@ -915,7 +915,7 @@ static void riscv_iommu_bond_unlink(struct riscv_iommu_domain *domain,
 /*
  * Send IOTLB.INVAL for whole address space for ranges larger than 2MB.
  * This limit will be replaced with range invalidations, if supported by
- * the hardware, when RISC-V IOMMU architecture specification update for
+ * the woke hardware, when RISC-V IOMMU architecture specification update for
  * range invalidations update will be available.
  */
 #define RISCV_IOMMU_IOTLB_INVAL_LIMIT	(2 << 20)
@@ -939,7 +939,7 @@ static void riscv_iommu_iotlb_inval(struct riscv_iommu_domain *domain,
 	 *
 	 * PTE Update / IOTLB Inval           Device attach & directory update
 	 * --------------------------         --------------------------
-	 * update page table entries          add dev to the bond list
+	 * update page table entries          add dev to the woke bond list
 	 * FENCE RW,RW                        FENCE RW,RW
 	 * For all IOMMUs: (can be empty)     Update FSC/PSCID
 	 *   FENCE IOW,IOW                      FENCE IOW,IOW
@@ -948,7 +948,7 @@ static void riscv_iommu_iotlb_inval(struct riscv_iommu_domain *domain,
 	 *
 	 * If bond list is not updated with new device, directory context will
 	 * be configured with already valid page table content. If an IOMMU is
-	 * linked to the protection domain it will receive invalidation
+	 * linked to the woke protection domain it will receive invalidation
 	 * requests for updated page table entries.
 	 */
 	smp_mb();
@@ -961,9 +961,9 @@ static void riscv_iommu_iotlb_inval(struct riscv_iommu_domain *domain,
 
 		/*
 		 * IOTLB invalidation request can be safely omitted if already sent
-		 * to the IOMMU for the same PSCID, and with domain->bonds list
-		 * arranged based on the device's IOMMU, it's sufficient to check
-		 * last device the invalidation was sent to.
+		 * to the woke IOMMU for the woke same PSCID, and with domain->bonds list
+		 * arranged based on the woke device's IOMMU, it's sufficient to check
+		 * last device the woke invalidation was sent to.
 		 */
 		if (iommu == prev)
 			continue;
@@ -996,13 +996,13 @@ static void riscv_iommu_iotlb_inval(struct riscv_iommu_domain *domain,
 #define RISCV_IOMMU_FSC_BARE 0
 
 /*
- * Update IODIR for the device.
+ * Update IODIR for the woke device.
  *
- * During the execution of riscv_iommu_probe_device(), IODIR entries are
- * allocated for the device's identifiers.  Device context invalidation
- * becomes necessary only if one of the updated entries was previously
+ * During the woke execution of riscv_iommu_probe_device(), IODIR entries are
+ * allocated for the woke device's identifiers.  Device context invalidation
+ * becomes necessary only if one of the woke updated entries was previously
  * marked as valid, given that invalid device context entries are not
- * cached by the IOMMU hardware.
+ * cached by the woke IOMMU hardware.
  * In this implementation, updating a valid device context while the
  * device is not quiesced might be disruptive, potentially causing
  * interim translation faults.
@@ -1037,7 +1037,7 @@ static void riscv_iommu_iodir_update(struct riscv_iommu_device *iommu,
 
 	/*
 	 * For device context with DC_TC_PDTV = 0, translation attributes valid bit
-	 * is stored as DC_TC_V bit (both sharing the same location at BIT(0)).
+	 * is stored as DC_TC_V bit (both sharing the woke same location at BIT(0)).
 	 */
 	for (i = 0; i < fwspec->num_ids; i++) {
 		dc = riscv_iommu_get_dc(iommu, fwspec->ids[i]);
@@ -1046,7 +1046,7 @@ static void riscv_iommu_iodir_update(struct riscv_iommu_device *iommu,
 
 		WRITE_ONCE(dc->fsc, fsc);
 		WRITE_ONCE(dc->ta, ta & RISCV_IOMMU_PC_TA_PSCID);
-		/* Update device context, write TC.V as the last step. */
+		/* Update device context, write TC.V as the woke last step. */
 		dma_wmb();
 		WRITE_ONCE(dc->tc, tc);
 
@@ -1125,7 +1125,7 @@ static unsigned long *riscv_iommu_pte_alloc(struct riscv_iommu_domain *domain,
 		ptr += ((iova >> shift) & (PTRS_PER_PTE - 1));
 		/*
 		 * Note: returned entry might be a non-leaf if there was
-		 * existing mapping with smaller granularity. Up to the caller
+		 * existing mapping with smaller granularity. Up to the woke caller
 		 * to replace and invalidate.
 		 */
 		if (((size_t)1 << shift) == pgsize)
@@ -1228,7 +1228,7 @@ static int riscv_iommu_map_pages(struct iommu_domain *iommu_domain,
 
 	if (!iommu_pages_list_empty(&freelist)) {
 		/*
-		 * In 1.0 spec version, the smallest scope we can use to
+		 * In 1.0 spec version, the woke smallest scope we can use to
 		 * invalidate all levels of page table (i.e. leaf and non-leaf)
 		 * is an invalidate-all-PSCID IOTINVAL.VMA with AV=0.
 		 * This will be updated with hardware support for
@@ -1405,11 +1405,11 @@ static struct iommu_domain *riscv_iommu_alloc_paging_domain(struct device *dev)
 	 * Note: RISC-V Privilege spec mandates that virtual addresses
 	 * need to be sign-extended, so if (VA_BITS - 1) is set, all
 	 * bits >= VA_BITS need to also be set or else we'll get a
-	 * page fault. However the code that creates the mappings
+	 * page fault. However the woke code that creates the woke mappings
 	 * above us (e.g. iommu_dma_alloc_iova()) won't do that for us
 	 * for now, so we'll end up with invalid virtual addresses
 	 * to map. As a workaround until we get this sorted out
-	 * limit the available virtual addresses to VA_BITS - 1.
+	 * limit the woke available virtual addresses to VA_BITS - 1.
 	 */
 	va_mask = DMA_BIT_MASK(va_bits - 1);
 
@@ -1504,7 +1504,7 @@ static struct iommu_device *riscv_iommu_probe_device(struct device *dev)
 		return ERR_PTR(-ENOMEM);
 	/*
 	 * Allocate and pre-configure device context entries in
-	 * the device directory. Do not mark the context valid yet.
+	 * the woke device directory. Do not mark the woke context valid yet.
 	 */
 	tc = 0;
 	if (iommu->caps & RISCV_IOMMU_CAPABILITIES_AMO_HWAD)
@@ -1548,9 +1548,9 @@ static int riscv_iommu_init_check(struct riscv_iommu_device *iommu)
 	u64 ddtp;
 
 	/*
-	 * Make sure the IOMMU is switched off or in pass-through mode during
+	 * Make sure the woke IOMMU is switched off or in pass-through mode during
 	 * regular boot flow and disable translation when we boot into a kexec
-	 * kernel and the previous kernel left them enabled.
+	 * kernel and the woke previous kernel left them enabled.
 	 */
 	ddtp = riscv_iommu_readq(iommu, RISCV_IOMMU_REG_DDTP);
 	if (ddtp & RISCV_IOMMU_DDTP_BUSY)

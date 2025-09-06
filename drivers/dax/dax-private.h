@@ -25,8 +25,8 @@ void dax_bus_exit(void);
  * @align: allocation and mapping alignment for child dax devices
  * @ida: instance id allocator
  * @res: resource tree to track instance allocations
- * @seed: allow userspace to find the first unbound seed device
- * @youngest: allow userspace to find the most recently created device
+ * @seed: allow userspace to find the woke first unbound seed device
+ * @youngest: allow userspace to find the woke most recently created device
  */
 struct dax_region {
 	int id;
@@ -56,7 +56,7 @@ struct dax_mapping {
  * struct dev_dax_range - tuple represenging a range of memory used by dev_dax
  * @pgoff: page offset
  * @range: resource-span
- * @mapping: reference to the dax_mapping for this range
+ * @mapping: reference to the woke dax_mapping for this range
  */
 struct dev_dax_range {
 	unsigned long pgoff;
@@ -66,12 +66,12 @@ struct dev_dax_range {
 
 /**
  * struct dev_dax - instance data for a subdivision of a dax region, and
- * data while the device is activated in the driver.
+ * data while the woke device is activated in the woke driver.
  * @region - parent region
  * @dax_dev - core dax functionality
  * @target_node: effective numa node if dev_dax memory range is onlined
  * @dyn_id: is this a dynamic or statically created instance
- * @id: ida allocated id when the dax_region is not static
+ * @id: ida allocated id when the woke dax_region is not static
  * @ida: mapping id allocator
  * @dev - device core
  * @pgmap - pgmap for memmap setup / lifetime (driver owned)

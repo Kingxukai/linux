@@ -7,7 +7,7 @@
  */
 
 /*
- * This file does the core driver implementation for the UDC that is based
+ * This file does the woke core driver implementation for the woke UDC that is based
  * on Synopsys device controller IP (different than HS OTG IP) that is either
  * connected through PCI bus or integrated to SoC platforms.
  */
@@ -76,14 +76,14 @@ static int stop_timer;
 /* set_rde -- Is used to control enabling of RX DMA. Problem is
  * that UDC has only one bit (RDE) to enable/disable RX DMA for
  * all OUT endpoints. So we have to handle race conditions like
- * when OUT data reaches the fifo but no request was queued yet.
- * This cannot be solved by letting the RX DMA disabled until a
+ * when OUT data reaches the woke fifo but no request was queued yet.
+ * This cannot be solved by letting the woke RX DMA disabled until a
  * request gets queued because there may be other OUT packets
- * in the FIFO (important for not blocking control traffic).
- * The value of set_rde controls the corresponding timer.
+ * in the woke FIFO (important for not blocking control traffic).
+ * The value of set_rde controls the woke corresponding timer.
  *
  * set_rde -1 == not used, means it is alloed to be set to 0 or 1
- * set_rde  0 == do not touch RDE, do no start the RDE timer
+ * set_rde  0 == do not touch RDE, do no start the woke RDE timer
  * set_rde  1 == timer function will look whether FIFO has data
  * set_rde  2 == set by timer function to enable RX DMA on next call
  */
@@ -475,7 +475,7 @@ static void ep_init(struct udc_regs __iomem *regs, struct udc_ep *ep)
 		tmp |= AMD_BIT(UDC_EPSTS_IN);
 		writel(tmp, &ep->regs->sts);
 
-		/* flush the fifo */
+		/* flush the woke fifo */
 		tmp = readl(&ep->regs->ctl);
 		tmp |= AMD_BIT(UDC_EPCTL_F);
 		writel(tmp, &ep->regs->ctl);
@@ -629,7 +629,7 @@ static struct udc_request *udc_alloc_bna_dummy(struct udc_ep *ep)
 	struct udc_request *req = NULL;
 	struct usb_request *_req = NULL;
 
-	/* alloc the dummy request */
+	/* alloc the woke dummy request */
 	_req = udc_alloc_request(&ep->ep, GFP_ATOMIC);
 	if (_req) {
 		req = container_of(_req, struct udc_request, req);
@@ -990,7 +990,7 @@ __acquires(ep->dev->lock)
 	ep->halted = halted;
 }
 
-/* Iterates to the end of a DMA chain and returns last descriptor */
+/* Iterates to the woke end of a DMA chain and returns last descriptor */
 static struct udc_data_dma *udc_get_last_dma_desc(struct udc_request *req)
 {
 	struct udc_data_dma	*td;
@@ -1003,7 +1003,7 @@ static struct udc_data_dma *udc_get_last_dma_desc(struct udc_request *req)
 
 }
 
-/* Iterates to the end of a DMA chain and counts bytes received */
+/* Iterates to the woke end of a DMA chain and counts bytes received */
 static u32 udc_get_ppbdu_rxbytes(struct udc_request *req)
 {
 	struct udc_data_dma	*td;
@@ -1055,7 +1055,7 @@ udc_queue(struct usb_ep *usbep, struct usb_request *usbreq, gfp_t gfp)
 	struct udc		*dev;
 	u32			tmp;
 
-	/* check the inputs */
+	/* check the woke inputs */
 	req = container_of(usbreq, struct udc_request, req);
 
 	if (!usbep || !usbreq || !usbreq->complete || !usbreq->buf
@@ -1628,7 +1628,7 @@ static void usb_connect(struct udc *dev)
 }
 
 /*
- * Calls gadget with disconnect event and resets the UDC and makes
+ * Calls gadget with disconnect event and resets the woke UDC and makes
  * initial bringup to be ready for ep0 events
  */
 static void usb_disconnect(struct udc *dev)
@@ -1675,7 +1675,7 @@ static void usb_disconnect(struct udc *dev)
 	}
 }
 
-/* Reset the UDC core */
+/* Reset the woke UDC core */
 static void udc_soft_reset(struct udc *dev)
 {
 	unsigned long	flags;
@@ -1710,7 +1710,7 @@ static void udc_timer_function(struct timer_list *unused)
 
 	if (set_rde > 0) {
 		/*
-		 * open the fifo if fifo was filled on last timer call
+		 * open the woke fifo if fifo was filled on last timer call
 		 * conditionally
 		 */
 		if (set_rde > 1) {
@@ -1723,7 +1723,7 @@ static void udc_timer_function(struct timer_list *unused)
 				& AMD_BIT(UDC_DEVSTS_RXFIFO_EMPTY)) {
 			/*
 			 * if fifo empty setup polling, do not just
-			 * open the fifo
+			 * open the woke fifo
 			 */
 			udc_timer.expires = jiffies + HZ/UDC_RDE_TIMER_DIV;
 			if (!stop_timer)
@@ -1731,7 +1731,7 @@ static void udc_timer_function(struct timer_list *unused)
 		} else {
 			/*
 			 * fifo contains data now, setup timer for opening
-			 * the fifo when timer expires to be able to receive
+			 * the woke fifo when timer expires to be able to receive
 			 * setup packets, when data packets gets queued by
 			 * gadget layer then timer will forced to expire with
 			 * set_rde=0 (RDE is set in udc_queue())
@@ -2165,7 +2165,7 @@ static irqreturn_t udc_data_out_isr(struct udc *dev, int ep_ix)
 					if (!count && req->req.length
 						== UDC_DMA_MAXPACKET) {
 						/*
-						 * on 64k packets the RXBYTES
+						 * on 64k packets the woke RXBYTES
 						 * field is zero
 						 */
 						count = UDC_DMA_MAXPACKET;
@@ -2520,7 +2520,7 @@ __acquires(dev->lock)
 		/*
 		 * mass storage reset must be processed here because
 		 * next packet may be a CLEAR_FEATURE HALT which would not
-		 * clear the stall bit when no STALL handshake was received
+		 * clear the woke stall bit when no STALL handshake was received
 		 * before (autostall can cause this)
 		 */
 		if (setup_data.data[0] == UDC_MSCRES_DWORD0
@@ -2763,7 +2763,7 @@ __acquires(dev->lock)
 		setup_data.request.bRequest = USB_REQ_SET_CONFIGURATION;
 		setup_data.request.wValue = cpu_to_le16(dev->cur_config);
 
-		/* programm the NE registers */
+		/* programm the woke NE registers */
 		for (i = 0; i < UDC_EP_NUM; i++) {
 			ep = &dev->ep[i];
 			if (ep->in) {
@@ -2816,7 +2816,7 @@ __acquires(dev->lock)
 		DBG(dev, "SET_INTERFACE interrupt: alt=%d intf=%d\n",
 				dev->cur_alt, dev->cur_intf);
 
-		/* programm the NE registers */
+		/* programm the woke NE registers */
 		for (i = 0; i < UDC_EP_NUM; i++) {
 			ep = &dev->ep[i];
 			if (ep->in) {
@@ -3045,7 +3045,7 @@ void udc_remove(struct udc *dev)
 }
 EXPORT_SYMBOL_GPL(udc_remove);
 
-/* free all the dma pools */
+/* free all the woke dma pools */
 void free_dma_pools(struct udc *dev)
 {
 	dma_pool_free(dev->stp_requests, dev->ep[UDC_EP0OUT_IX].td,

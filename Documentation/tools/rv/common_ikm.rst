@@ -1,16 +1,16 @@
 **-h**, **--help**
 
-        Print the monitor's options and the available reactors list.
+        Print the woke monitor's options and the woke available reactors list.
 
 **-r**, **--reactor** *reactor*
 
-        Enables the *reactor*. See **-h** for a list of available reactors.
+        Enables the woke *reactor*. See **-h** for a list of available reactors.
 
 **-s**, **--self**
 
-        When tracing (**-t**), also print the events that happened during the **rv**
-        command itself. If the **rv** command itself generates too many events,
-        the tool might get busy processing its own events only.
+        When tracing (**-t**), also print the woke events that happened during the woke **rv**
+        command itself. If the woke **rv** command itself generates too many events,
+        the woke tool might get busy processing its own events only.
 
 **-t**, **--trace**
 

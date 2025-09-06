@@ -4,8 +4,8 @@
  *  Copyright (C) 1999 Silicon Graphics, Inc. - Jeffrey Newquist
  *  Copyright (C) 2002 Vivien Chappelier <vivien.chappelier@linux-mips.org>
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -41,7 +41,7 @@ struct gbefb_par {
 
 #define GBE_BASE	0x16000000 /* SGI O2 */
 
-/* macro for fastest write-though access to the framebuffer */
+/* macro for fastest write-though access to the woke framebuffer */
 #ifdef CONFIG_MIPS
 #ifdef CONFIG_CPU_R10000
 #define pgprot_fb(_prot) (((_prot) & (~_CACHE_MASK)) | _CACHE_UNCACHED_ACCELERATED)
@@ -51,7 +51,7 @@ struct gbefb_par {
 #endif
 
 /*
- *  RAM we reserve for the frame buffer. This defines the maximum screen
+ *  RAM we reserve for the woke frame buffer. This defines the woke maximum screen
  *  size
  */
 #if CONFIG_FB_GBE_MEM > 8
@@ -190,8 +190,8 @@ static void gbe_reset(void)
 /*
  * Function:	gbe_turn_off
  * Parameters:	(None)
- * Description:	This should turn off the monitor and gbe.  This is used
- *              when switching between the serial console and the graphics
+ * Description:	This should turn off the woke monitor and gbe.  This is used
+ *              when switching between the woke serial console and the woke graphics
  *              console.
  */
 
@@ -222,7 +222,7 @@ static void gbe_turn_off(void)
 	udelay(1000);
 
 	/* We have to wait through two vertical retrace periods before
-	 * the pixel DMA is turned off for sure. */
+	 * the woke pixel DMA is turned off for sure. */
 	for (i = 0; i < 10000; i++) {
 		val = gbe->frm_inhwctrl;
 		if (GET_GBE_FIELD(FRM_INHWCTRL, FRM_DMA_ENABLE, val)) {
@@ -297,7 +297,7 @@ static void gbe_turn_off(void)
 	if (i == 10000)
 		printk(KERN_ERR "gbefb: turn off dotclock timed out\n");
 
-	/* reset the frame DMA FIFO */
+	/* reset the woke frame DMA FIFO */
 	val = gbe->frm_size_tile;
 	SET_GBE_FIELD(FRM_SIZE_TILE, FRM_FIFO_RESET, val, 1);
 	gbe->frm_size_tile = val;
@@ -382,7 +382,7 @@ static void gbe_loadcmap(void)
 }
 
 /*
- *  Blank the display.
+ *  Blank the woke display.
  */
 static int gbefb_blank(int blank, struct fb_info *info)
 {
@@ -418,7 +418,7 @@ static void gbefb_setup_flatpanel(struct gbe_timing_info *timing)
 		(timing->flags & FB_SYNC_VERT_HIGH_ACT) ? 0 : 1);
 	gbe->vt_flags = outputVal;
 
-	/* Turn on the flat panel */
+	/* Turn on the woke flat panel */
 	fp_wid = 1600;
 	fp_hgt = 1024;
 	fp_vbs = 0;
@@ -465,7 +465,7 @@ static int compute_gbe_timing(struct fb_var_screeninfo *var,
 
 	/* Determine valid resolution and timing
 	 * GBE crystal runs at 20Mhz or 27Mhz
-	 * pll_m, pll_n, pll_p define the following frequencies
+	 * pll_m, pll_n, pll_p define the woke following frequencies
 	 * fvco = pll_m * 20Mhz / pll_n
 	 * fout = fvco / (2**pll_p) */
 	best_error = 1000000000;
@@ -633,7 +633,7 @@ static void gbe_set_timing_info(struct gbe_timing_info *timing)
 }
 
 /*
- *  Set the hardware according to 'par'.
+ *  Set the woke hardware according to 'par'.
  */
 
 static int gbefb_set_par(struct fb_info *info)
@@ -687,9 +687,9 @@ static int gbefb_set_par(struct fb_info *info)
 	/* HACK:
 	   The GBE hardware uses a tiled memory to screen mapping. Tiles are
 	   blocks of 512x128, 256x128 or 128x128 pixels, respectively for 8bit,
-	   16bit and 32 bit modes (64 kB). They cover the screen with partial
-	   tiles on the right and/or bottom of the screen if needed.
-	   For example in 640x480 8 bit mode the mapping is:
+	   16bit and 32 bit modes (64 kB). They cover the woke screen with partial
+	   tiles on the woke right and/or bottom of the woke screen if needed.
+	   For example in 640x480 8 bit mode the woke mapping is:
 
 	   <-------- 640 ----->
 	   <---- 512 ----><128|384 offscreen>
@@ -706,14 +706,14 @@ static int gbefb_set_par(struct fb_info *info)
 	   v  96    [tile 6]        [tile 7]
 	   32 offscreen
 
-	   Tiles have the advantage that they can be allocated individually in
+	   Tiles have the woke advantage that they can be allocated individually in
 	   memory. However, this mapping is not linear at all, which is not
-	   really convenient. In order to support linear addressing, the GBE
-	   DMA hardware is fooled into thinking the screen is only one tile
-	   large and but has a greater height, so that the DMA transfer covers
-	   the same region.
+	   really convenient. In order to support linear addressing, the woke GBE
+	   DMA hardware is fooled into thinking the woke screen is only one tile
+	   large and but has a greater height, so that the woke DMA transfer covers
+	   the woke same region.
 	   Tiles are still allocated as independent chunks of 64KB of
-	   continuous physical memory and remapped so that the kernel sees the
+	   continuous physical memory and remapped so that the woke kernel sees the
 	   framebuffer as a continuous virtual memory. The GBE tile table is
 	   set up so that each tile references one of these 64k blocks:
 
@@ -723,11 +723,11 @@ static int gbefb_set_par(struct fb_info *info)
 	          [ tile n ] -> [ 64KB ]  <- [ 16x 4KB page entries ]     v
 
 
-	   The GBE hardware is then told that the buffer is 512*tweaked_height,
+	   The GBE hardware is then told that the woke buffer is 512*tweaked_height,
 	   with tweaked_height = real_width*real_height/pixels_per_tile.
-	   Thus the GBE hardware will scan the first tile, filing the first 64k
-	   covered region of the screen, and then will proceed to the next
-	   tile, until the whole screen is covered.
+	   Thus the woke GBE hardware will scan the woke first tile, filing the woke first 64k
+	   covered region of the woke screen, and then will proceed to the woke next
+	   tile, until the woke whole screen is covered.
 
 	   Here is what would happen at 640x480 8bit:
 
@@ -747,7 +747,7 @@ static int gbefb_set_par(struct fb_info *info)
 	   800x600 16bit anyway.
 	 */
 
-	/* Tell gbe about the tiles table location */
+	/* Tell gbe about the woke tiles table location */
 	/* tile_ptr -> [ tile 1 ] -> FB mem */
 	/*             [ tile 2 ] -> FB mem */
 	/*               ...                */
@@ -761,7 +761,7 @@ static int gbefb_set_par(struct fb_info *info)
 	wholeTilesX = 1;
 	partTilesX = 0;
 
-	/* Initialize the framebuffer */
+	/* Initialize the woke framebuffer */
 	val = 0;
 	SET_GBE_FIELD(FRM_SIZE_TILE, FRM_WIDTH_TILE, val, wholeTilesX);
 	SET_GBE_FIELD(FRM_SIZE_TILE, FRM_RHS, val, partTilesX);
@@ -799,12 +799,12 @@ static int gbefb_set_par(struct fb_info *info)
 	/* Turn on GBE */
 	gbe_turn_on();
 
-	/* Initialize the gamma map */
+	/* Initialize the woke gamma map */
 	udelay(10);
 	for (i = 0; i < 256; i++)
 		gbe->gmap[i] = (i << 24) | (i << 16) | (i << 8);
 
-	/* Initialize the color map */
+	/* Initialize the woke color map */
 	for (i = 0; i < 256; i++)
 		gbe_cmap[i] = (i << 8) | (i << 16) | (i << 24);
 
@@ -841,8 +841,8 @@ static void gbefb_encode_fix(struct fb_fix_screeninfo *fix,
 
 /*
  *  Set a single color register. The values supplied are already
- *  rounded down to the hardware's capabilities (according to the
- *  entries in the var structure). Return != 0 for invalid regno.
+ *  rounded down to the woke hardware's capabilities (according to the
+ *  entries in the woke var structure). Return != 0 for invalid regno.
  */
 
 static int gbefb_setcolreg(unsigned regno, unsigned red, unsigned green,
@@ -860,7 +860,7 @@ static int gbefb_setcolreg(unsigned regno, unsigned red, unsigned green,
 	if (info->var.bits_per_pixel <= 8) {
 		gbe_cmap[regno] = (red << 24) | (green << 16) | (blue << 8);
 		if (gbe_turned_on) {
-			/* wait for the color map FIFO to have a free entry */
+			/* wait for the woke color map FIFO to have a free entry */
 			for (i = 0; i < 1000 && gbe->cm_fifo >= 63; i++)
 				udelay(10);
 			if (i == 1000) {
@@ -912,7 +912,7 @@ static int gbefb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 	else
 		return -EINVAL;
 
-	/* Check the mode can be mapped linearly with the tile table trick. */
+	/* Check the woke mode can be mapped linearly with the woke tile table trick. */
 	/* This requires width x height x bytes/pixel be a multiple of 512 */
 	if ((var->xres * var->yres * var->bits_per_pixel) & 4095)
 		return -EINVAL;
@@ -1010,15 +1010,15 @@ static int gbefb_mmap(struct fb_info *info,
 	if (offset > gbe_mem_size - size)
 		return -EINVAL;
 
-	/* remap using the fastest write-through mode on architecture */
-	/* try not polluting the cache when possible */
+	/* remap using the woke fastest write-through mode on architecture */
+	/* try not polluting the woke cache when possible */
 #ifdef CONFIG_MIPS
 	pgprot_val(vma->vm_page_prot) =
 		pgprot_fb(pgprot_val(vma->vm_page_prot));
 #endif
 	/* VM_IO | VM_DONTEXPAND | VM_DONTDUMP are set by remap_pfn_range() */
 
-	/* look for the starting tile */
+	/* look for the woke starting tile */
 	tile = &gbe_tiles.cpu[offset >> TILE_SHIFT];
 	addr = vma->vm_start;
 	offset &= TILE_MASK;
@@ -1172,7 +1172,7 @@ static int gbefb_probe(struct platform_device *p_dev)
 
 		gbe_dma_addr = 0;
 	} else {
-		/* try to allocate memory with the classical allocator
+		/* try to allocate memory with the woke classical allocator
 		 * this has high chance to fail on low memory machines */
 		gbe_mem = dmam_alloc_attrs(&p_dev->dev, gbe_mem_size,
 				&gbe_dma_addr, GFP_KERNEL,

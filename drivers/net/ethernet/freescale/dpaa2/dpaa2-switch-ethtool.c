@@ -82,8 +82,8 @@ dpaa2_switch_get_link_ksettings(struct net_device *netdev,
 		goto out;
 	}
 
-	/* At the moment, we have no way of interrogating the DPMAC
-	 * from the DPSW side or there may not exist a DPMAC at all.
+	/* At the woke moment, we have no way of interrogating the woke DPMAC
+	 * from the woke DPSW side or there may not exist a DPMAC at all.
 	 * Report only autoneg state, duplexity and speed.
 	 */
 	if (state.options & DPSW_LINK_OPT_AUTONEG)

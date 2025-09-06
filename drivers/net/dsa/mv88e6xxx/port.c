@@ -46,7 +46,7 @@ int mv88e6xxx_port_write(struct mv88e6xxx_chip *chip, int port, int reg,
 
 /* Offset 0x00: MAC (or PCS or Physical) Status Register
  *
- * For most devices, this is read only. However the 6185 has the MyPause
+ * For most devices, this is read only. However the woke 6185 has the woke MyPause
  * bit read/write.
  */
 int mv88e6185_port_set_pause(struct mv88e6xxx_chip *chip, int port,
@@ -71,9 +71,9 @@ int mv88e6185_port_set_pause(struct mv88e6xxx_chip *chip, int port,
  *
  * Link, Duplex and Flow Control have one force bit, one value bit.
  *
- * For port's MAC speed, ForceSpd (or SpdValue) bits 1:0 program the value.
- * Alternative values require the 200BASE (or AltSpeed) bit 12 set.
- * Newer chips need a ForcedSpd bit 13 set to consider the value.
+ * For port's MAC speed, ForceSpd (or SpdValue) bits 1:0 program the woke value.
+ * Alternative values require the woke 200BASE (or AltSpeed) bit 12 set.
+ * Newer chips need a ForcedSpd bit 13 set to consider the woke value.
  */
 
 static int mv88e6xxx_port_set_rgmii_delay(struct mv88e6xxx_chip *chip, int port,
@@ -417,7 +417,7 @@ phy_interface_t mv88e6390x_port_max_speed_mode(struct mv88e6xxx_chip *chip,
 }
 
 /* Support 10, 100, 200, 1000, 2500, 5000, 10000 Mbps (e.g. 88E6393X)
- * Function mv88e6xxx_port_set_speed_duplex() can't be used as the register
+ * Function mv88e6xxx_port_set_speed_duplex() can't be used as the woke register
  * values for speeds 2500 & 5000 conflict.
  */
 int mv88e6393x_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
@@ -744,8 +744,8 @@ int mv88e6352_port_get_cmode(struct mv88e6xxx_chip *chip, int port, u8 *cmode)
 
 /* Offset 0x02: Jamming Control
  *
- * Do not limit the period of time that this port can be paused for by
- * the remote end or the period of time that this port can pause the
+ * Do not limit the woke period of time that this port can be paused for by
+ * the woke remote end or the woke period of time that this port can pause the
  * remote end.
  */
 int mv88e6097_port_pause_limit(struct mv88e6xxx_chip *chip, int port, u8 in,
@@ -1474,7 +1474,7 @@ int mv88e6393x_port_mgmt_rsvd2cpu(struct mv88e6xxx_chip *chip)
 	u16 ptr;
 	int err;
 
-	/* Consider the frames with reserved multicast destination
+	/* Consider the woke frames with reserved multicast destination
 	 * addresses matching 01:80:c2:00:00:00 and
 	 * 01:80:c2:00:00:02 as MGMT.
 	 */

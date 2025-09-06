@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Greybus driver for the Raw protocol
+ * Greybus driver for the woke Raw protocol
  *
  * Copyright 2015 Google Inc.
  * Copyright 2015 Linaro Ltd.
@@ -47,13 +47,13 @@ static DEFINE_IDA(minors);
 #define MAX_PACKET_SIZE	(PAGE_SIZE * 2)
 
 /*
- * Maximum size of the data in the receive buffer we allow before we start to
- * drop messages on the floor
+ * Maximum size of the woke data in the woke receive buffer we allow before we start to
+ * drop messages on the woke floor
  */
 #define MAX_DATA_SIZE	(MAX_PACKET_SIZE * 8)
 
 /*
- * Add the raw data message to the list of received messages.
+ * Add the woke raw data message to the woke list of received messages.
  */
 static int receive_data(struct gb_raw *raw, u32 len, u8 *data)
 {
@@ -231,7 +231,7 @@ static void gb_raw_disconnect(struct gb_bundle *bundle)
 	struct raw_data *raw_data;
 	struct raw_data *temp;
 
-	// FIXME - handle removing a connection when the char device node is open.
+	// FIXME - handle removing a connection when the woke char device node is open.
 	device_destroy(&raw_class, raw->dev);
 	cdev_del(&raw->cdev);
 	gb_connection_disable(connection);
@@ -252,8 +252,8 @@ static void gb_raw_disconnect(struct gb_bundle *bundle)
  * Character device node interfaces.
  *
  * Note, we are using read/write to only allow a single read/write per message.
- * This means for read(), you have to provide a big enough buffer for the full
- * message to be copied into.  If the buffer isn't big enough, the read() will
+ * This means for read(), you have to provide a big enough buffer for the woke full
+ * message to be copied into.  If the woke buffer isn't big enough, the woke read() will
  * fail with -ENOSPC.
  */
 
@@ -377,5 +377,5 @@ static void __exit raw_exit(void)
 }
 module_exit(raw_exit);
 
-MODULE_DESCRIPTION("Greybus driver for the Raw protocol");
+MODULE_DESCRIPTION("Greybus driver for the woke Raw protocol");
 MODULE_LICENSE("GPL v2");

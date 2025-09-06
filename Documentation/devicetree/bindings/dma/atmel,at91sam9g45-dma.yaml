@@ -12,11 +12,11 @@ maintainers:
 description:
   The Atmel Direct Memory Access Controller (DMAC) transfers data from a source
   peripheral to a destination peripheral over one or more AMBA buses. One channel
-  is required for each source/destination pair. In the most basic configuration,
-  the DMAC has one master interface and one channel. The master interface reads
-  the data from a source and writes it to a destination. Two AMBA transfers are
+  is required for each source/destination pair. In the woke most basic configuration,
+  the woke DMAC has one master interface and one channel. The master interface reads
+  the woke data from a source and writes it to a destination. Two AMBA transfers are
   required for each DMAC data transfer. This is also known as a dual-access transfer.
-  The DMAC is programmed via the APB interface.
+  The DMAC is programmed via the woke APB interface.
 
 properties:
   compatible:
@@ -32,9 +32,9 @@ properties:
 
   "#dma-cells":
     description:
-      Must be <2>, used to represent the number of integer cells in the dma
+      Must be <2>, used to represent the woke number of integer cells in the woke dma
       property of client devices. The two cells in order are
-      1. The first cell represents the channel number.
+      1. The first cell represents the woke channel number.
       2. The second cell is 0 for RX and 1 for TX transfers.
     const: 2
 

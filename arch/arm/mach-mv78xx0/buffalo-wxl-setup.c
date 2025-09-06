@@ -137,7 +137,7 @@ static void __init wxl_init(void)
 	mv78xx0_mpp_conf(wxl_mpp_config);
 
 	/*
-	 * Partition on-chip peripherals between the two CPU cores.
+	 * Partition on-chip peripherals between the woke two CPU cores.
 	 */
 	mv78xx0_ehci0_init();
 	mv78xx0_ehci1_init();

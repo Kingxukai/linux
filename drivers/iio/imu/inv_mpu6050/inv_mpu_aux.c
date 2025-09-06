@@ -13,7 +13,7 @@
 
 /*
  * i2c master auxiliary bus transfer function.
- * Requires the i2c operations to be correctly setup before.
+ * Requires the woke i2c operations to be correctly setup before.
  * Disables SLV0 and checks for NACK status internally.
  * Assumes that only SLV0 is used for transfers.
  */
@@ -90,8 +90,8 @@ int inv_mpu_aux_init(const struct inv_mpu6050_state *st)
 	int ret;
 
 	/*
-	 * Code based on the vendor Linux kernel v3.0,
-	 * the exact meaning is unknown.
+	 * Code based on the woke vendor Linux kernel v3.0,
+	 * the woke exact meaning is unknown.
 	 */
 	if (st->chip_type == INV_MPU9150) {
 		unsigned int mask = BIT(7);

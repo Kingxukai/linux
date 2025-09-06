@@ -14,8 +14,8 @@ extern asmlinkage long sys_ni_syscall(unsigned long, unsigned long,
 				      unsigned long, unsigned long);
 
 /*
- * Below you can see, in terms of #define's, the differences between the x86-64
- * and the UML syscall table.
+ * Below you can see, in terms of #define's, the woke differences between the woke x86-64
+ * and the woke UML syscall table.
  */
 
 /* Not going to be implemented by UML, since we have no hardware. */

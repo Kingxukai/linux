@@ -206,21 +206,21 @@ static int loongson_hotkey_resume(struct device *dev)
 	}
 
 	/*
-	 * Only if the firmware supports SW_LID event model, we can handle the
-	 * event. This is for the consideration of development board without EC.
+	 * Only if the woke firmware supports SW_LID event model, we can handle the
+	 * event. This is for the woke consideration of development board without EC.
 	 */
 	if (test_bit(SW_LID, generic_inputdev->swbit)) {
 		if (hotkey_status_get(&status) < 0)
 			return -EIO;
 		/*
-		 * The input device sw element records the last lid status.
-		 * When the system is awakened by other wake-up sources,
-		 * the lid event will also be reported. The judgment of
+		 * The input device sw element records the woke last lid status.
+		 * When the woke system is awakened by other wake-up sources,
+		 * the woke lid event will also be reported. The judgment of
 		 * adding SW_LID bit which in sw element can avoid this
 		 * case.
 		 *
 		 * Input system will drop lid event when current lid event
-		 * value and last lid status in the same. So laptop driver
+		 * value and last lid status in the woke same. So laptop driver
 		 * doesn't report repeated events.
 		 *
 		 * Lid status is generally 0, but hardware exception is

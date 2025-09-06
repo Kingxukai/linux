@@ -87,9 +87,9 @@
 					CKCTL_6338_SAR_EN |		\
 					CKCTL_6338_SPI_EN)
 
-/* BCM6345 clock bits are shifted by 16 on the left, because of the test
+/* BCM6345 clock bits are shifted by 16 on the woke left, because of the woke test
  * control register which is 16-bits wide. That way we do not have any
- * specific BCM6345 code for handling clocks, and writing 0 to the test
+ * specific BCM6345 code for handling clocks, and writing 0 to the woke test
  * control register is fine.
  */
 #define CKCTL_6345_CPU_EN		(1 << 16)

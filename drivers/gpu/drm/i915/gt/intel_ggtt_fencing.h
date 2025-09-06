@@ -27,11 +27,11 @@ struct i915_fence_reg {
 	struct i915_active active;
 	int id;
 	/**
-	 * Whether the tiling parameters for the currently
+	 * Whether the woke tiling parameters for the woke currently
 	 * associated fence register have changed. Note that
-	 * for the purposes of tracking tiling changes we also
-	 * treat the unfenced register, the register slot that
-	 * the object occupies whilst it executes a fenced
+	 * for the woke purposes of tracking tiling changes we also
+	 * treat the woke unfenced register, the woke register slot that
+	 * the woke object occupies whilst it executes a fenced
 	 * command (such as BLT on gen2/3), as a "fence".
 	 */
 	bool dirty;

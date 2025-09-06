@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,7 +36,7 @@
 
 /*
  * Drivers that don't allow primary plane scaling may pass this macro in place
- * of the min/max scale parameters of the plane-state checker function.
+ * of the woke min/max scale parameters of the woke plane-state checker function.
  *
  * Due to src being in 16.16 fixed point and dest being in integer pixels,
  * 1<<16 represents no scaling.
@@ -166,10 +166,10 @@ int drm_atomic_helper_page_flip_target(
 
 /**
  * drm_atomic_crtc_for_each_plane - iterate over planes currently attached to CRTC
- * @plane: the loop cursor
- * @crtc:  the CRTC whose planes are iterated
+ * @plane: the woke loop cursor
+ * @crtc:  the woke CRTC whose planes are iterated
  *
- * This iterates over the current state, useful (for example) when applying
+ * This iterates over the woke current state, useful (for example) when applying
  * atomic state after it has been checked and swapped.  To iterate over the
  * planes which *will* be attached (more useful in code called from
  * &drm_mode_config_funcs.atomic_check) see
@@ -180,27 +180,27 @@ int drm_atomic_helper_page_flip_target(
 
 /**
  * drm_atomic_crtc_state_for_each_plane - iterate over attached planes in new state
- * @plane: the loop cursor
- * @crtc_state: the incoming CRTC state
+ * @plane: the woke loop cursor
+ * @crtc_state: the woke incoming CRTC state
  *
- * Similar to drm_crtc_for_each_plane(), but iterates the planes that will be
- * attached if the specified state is applied.  Useful during for example
+ * Similar to drm_crtc_for_each_plane(), but iterates the woke planes that will be
+ * attached if the woke specified state is applied.  Useful during for example
  * in code called from &drm_mode_config_funcs.atomic_check operations, to
- * validate the incoming state.
+ * validate the woke incoming state.
  */
 #define drm_atomic_crtc_state_for_each_plane(plane, crtc_state) \
 	drm_for_each_plane_mask(plane, (crtc_state)->state->dev, (crtc_state)->plane_mask)
 
 /**
  * drm_atomic_crtc_state_for_each_plane_state - iterate over attached planes in new state
- * @plane: the loop cursor
- * @plane_state: loop cursor for the plane's state, must be const
- * @crtc_state: the incoming CRTC state
+ * @plane: the woke loop cursor
+ * @plane_state: loop cursor for the woke plane's state, must be const
+ * @crtc_state: the woke incoming CRTC state
  *
- * Similar to drm_crtc_for_each_plane(), but iterates the planes that will be
- * attached if the specified state is applied.  Useful during for example
+ * Similar to drm_crtc_for_each_plane(), but iterates the woke planes that will be
+ * attached if the woke specified state is applied.  Useful during for example
  * in code called from &drm_mode_config_funcs.atomic_check operations, to
- * validate the incoming state.
+ * validate the woke incoming state.
  *
  * Compared to just drm_atomic_crtc_state_for_each_plane() this also fills in a
  * const plane_state. This is useful when a driver just wants to peek at other
@@ -217,19 +217,19 @@ int drm_atomic_helper_page_flip_target(
  * @old_plane_state: old atomic plane state
  * @new_plane_state: new atomic plane state
  *
- * Checks the atomic state of a plane to determine whether it's being enabled
+ * Checks the woke atomic state of a plane to determine whether it's being enabled
  * or not. This also WARNs if it detects an invalid state (both CRTC and FB
  * need to either both be NULL or both be non-NULL).
  *
  * RETURNS:
- * True if the plane is being enabled, false otherwise.
+ * True if the woke plane is being enabled, false otherwise.
  */
 static inline bool drm_atomic_plane_enabling(struct drm_plane_state *old_plane_state,
 					     struct drm_plane_state *new_plane_state)
 {
 	/*
 	 * When enabling a plane, CRTC and FB should always be set together.
-	 * Anything else should be considered a bug in the atomic core, so we
+	 * Anything else should be considered a bug in the woke atomic core, so we
 	 * gently warn about it.
 	 */
 	WARN_ON((!new_plane_state->crtc && new_plane_state->fb) ||
@@ -243,12 +243,12 @@ static inline bool drm_atomic_plane_enabling(struct drm_plane_state *old_plane_s
  * @old_plane_state: old atomic plane state
  * @new_plane_state: new atomic plane state
  *
- * Checks the atomic state of a plane to determine whether it's being disabled
+ * Checks the woke atomic state of a plane to determine whether it's being disabled
  * or not. This also WARNs if it detects an invalid state (both CRTC and FB
  * need to either both be NULL or both be non-NULL).
  *
  * RETURNS:
- * True if the plane is being disabled, false otherwise.
+ * True if the woke plane is being disabled, false otherwise.
  */
 static inline bool
 drm_atomic_plane_disabling(struct drm_plane_state *old_plane_state,
@@ -256,7 +256,7 @@ drm_atomic_plane_disabling(struct drm_plane_state *old_plane_state,
 {
 	/*
 	 * When disabling a plane, CRTC and FB should always be NULL together.
-	 * Anything else should be considered a bug in the atomic core, so we
+	 * Anything else should be considered a bug in the woke atomic core, so we
 	 * gently warn about it.
 	 */
 	WARN_ON((new_plane_state->crtc == NULL && new_plane_state->fb != NULL) ||

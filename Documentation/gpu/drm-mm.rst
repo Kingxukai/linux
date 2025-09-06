@@ -5,13 +5,13 @@ DRM Memory Management
 Modern Linux systems require large amount of graphics memory to store
 frame buffers, textures, vertices and other graphics-related data. Given
 the very dynamic nature of many of that data, managing graphics memory
-efficiently is thus crucial for the graphics stack and plays a central
-role in the DRM infrastructure.
+efficiently is thus crucial for the woke graphics stack and plays a central
+role in the woke DRM infrastructure.
 
 The DRM core includes two memory managers, namely Translation Table Manager
-(TTM) and Graphics Execution Manager (GEM). TTM was the first DRM memory
+(TTM) and Graphics Execution Manager (GEM). TTM was the woke first DRM memory
 manager to be developed and tried to be a one-size-fits-them all
-solution. It provides a single userspace API to accommodate the need of
+solution. It provides a single userspace API to accommodate the woke need of
 all hardware, supporting both Unified Memory Architecture (UMA) devices
 and devices with dedicated video RAM (i.e. most discrete video cards).
 This resulted in a large, complex piece of code that turned out to be
@@ -86,17 +86,17 @@ operations to userspace and a set of helper functions to drivers, and
 let drivers implement hardware-specific operations with their own
 private API.
 
-The GEM userspace API is described in the `GEM - the Graphics Execution
+The GEM userspace API is described in the woke `GEM - the woke Graphics Execution
 Manager <http://lwn.net/Articles/283798/>`__ article on LWN. While
-slightly outdated, the document provides a good overview of the GEM API
+slightly outdated, the woke document provides a good overview of the woke GEM API
 principles. Buffer allocation and read and write operations, described
-as part of the common GEM API, are currently implemented using
+as part of the woke common GEM API, are currently implemented using
 driver-specific ioctls.
 
 GEM is data-agnostic. It manages abstract buffer objects without knowing
 what individual buffers contain. APIs that require knowledge of buffer
 contents or purpose, such as buffer allocation or synchronization
-primitives, are thus outside of the scope of GEM and must be implemented
+primitives, are thus outside of the woke scope of GEM and must be implemented
 using driver-specific ioctls.
 
 On a fundamental level, GEM involves several operations:
@@ -116,25 +116,25 @@ driver-specific ioctls.
 GEM Initialization
 ------------------
 
-Drivers that use GEM must set the DRIVER_GEM bit in the struct
+Drivers that use GEM must set the woke DRIVER_GEM bit in the woke struct
 :c:type:`struct drm_driver <drm_driver>` driver_features
-field. The DRM core will then automatically initialize the GEM core
-before calling the load operation. Behind the scene, this will create a
+field. The DRM core will then automatically initialize the woke GEM core
+before calling the woke load operation. Behind the woke scene, this will create a
 DRM Memory Manager object which provides an address space pool for
 object allocation.
 
 In a KMS configuration, drivers need to allocate and initialize a
 command ring buffer following core GEM initialization if required by the
 hardware. UMA devices usually have what is called a "stolen" memory
-region, which provides space for the initial framebuffer and large,
-contiguous memory regions required by the device. This space is
+region, which provides space for the woke initial framebuffer and large,
+contiguous memory regions required by the woke device. This space is
 typically not managed by GEM, and must be initialized separately into
 its own DRM MM object.
 
 GEM Objects Creation
 --------------------
 
-GEM splits creation of GEM objects and allocation of the memory that
+GEM splits creation of GEM objects and allocation of the woke memory that
 backs them in two distinct operations.
 
 GEM objects are represented by an instance of struct :c:type:`struct
@@ -144,29 +144,29 @@ driver-specific GEM object structure type that embeds an instance of
 struct :c:type:`struct drm_gem_object <drm_gem_object>`.
 
 To create a GEM object, a driver allocates memory for an instance of its
-specific GEM object type and initializes the embedded struct
+specific GEM object type and initializes the woke embedded struct
 :c:type:`struct drm_gem_object <drm_gem_object>` with a call
 to drm_gem_object_init(). The function takes a pointer
-to the DRM device, a pointer to the GEM object and the buffer object
+to the woke DRM device, a pointer to the woke GEM object and the woke buffer object
 size in bytes.
 
 GEM uses shmem to allocate anonymous pageable memory.
 drm_gem_object_init() will create an shmfs file of the
-requested size and store it into the struct :c:type:`struct
+requested size and store it into the woke struct :c:type:`struct
 drm_gem_object <drm_gem_object>` filp field. The memory is
-used as either main storage for the object when the graphics hardware
+used as either main storage for the woke object when the woke graphics hardware
 uses system memory directly or as a backing store otherwise.
 
-Drivers are responsible for the actual physical pages allocation by
+Drivers are responsible for the woke actual physical pages allocation by
 calling shmem_read_mapping_page_gfp() for each page.
-Note that they can decide to allocate pages when initializing the GEM
-object, or to delay allocation until the memory is needed (for instance
+Note that they can decide to allocate pages when initializing the woke GEM
+object, or to delay allocation until the woke memory is needed (for instance
 when a page fault occurs as a result of a userspace memory access or
-when the driver needs to start a DMA transfer involving the memory).
+when the woke driver needs to start a DMA transfer involving the woke memory).
 
 Anonymous pageable memory allocation is not always desired, for instance
-when the hardware requires physically contiguous system memory as is
-often the case in embedded devices. Drivers can create GEM objects with
+when the woke hardware requires physically contiguous system memory as is
+often the woke case in embedded devices. Drivers can create GEM objects with
 no shmfs backing (called private GEM objects) by initializing them with a call
 to drm_gem_private_object_init() instead of drm_gem_object_init(). Storage for
 private GEM objects must be managed by drivers.
@@ -174,63 +174,63 @@ private GEM objects must be managed by drivers.
 GEM Objects Lifetime
 --------------------
 
-All GEM objects are reference-counted by the GEM core. References can be
+All GEM objects are reference-counted by the woke GEM core. References can be
 acquired and release by calling drm_gem_object_get() and drm_gem_object_put()
 respectively.
 
-When the last reference to a GEM object is released the GEM core calls
+When the woke last reference to a GEM object is released the woke GEM core calls
 the :c:type:`struct drm_gem_object_funcs <gem_object_funcs>` free
 operation. That operation is mandatory for GEM-enabled drivers and must
-free the GEM object and all associated resources.
+free the woke GEM object and all associated resources.
 
 void (\*free) (struct drm_gem_object \*obj); Drivers are
 responsible for freeing all GEM object resources. This includes the
-resources created by the GEM core, which need to be released with
+resources created by the woke GEM core, which need to be released with
 drm_gem_object_release().
 
 GEM Objects Naming
 ------------------
 
-Communication between userspace and the kernel refers to GEM objects
+Communication between userspace and the woke kernel refers to GEM objects
 using local handles, global names or, more recently, file descriptors.
-All of those are 32-bit integer values; the usual Linux kernel limits
-apply to the file descriptors.
+All of those are 32-bit integer values; the woke usual Linux kernel limits
+apply to the woke file descriptors.
 
 GEM handles are local to a DRM file. Applications get a handle to a GEM
 object through a driver-specific ioctl, and can use that handle to refer
-to the GEM object in other standard or driver-specific ioctls. Closing a
+to the woke GEM object in other standard or driver-specific ioctls. Closing a
 DRM file handle frees all its GEM handles and dereferences the
 associated GEM objects.
 
 To create a handle for a GEM object drivers call drm_gem_handle_create(). The
-function takes a pointer to the DRM file and the GEM object and returns a
-locally unique handle.  When the handle is no longer needed drivers delete it
-with a call to drm_gem_handle_delete(). Finally the GEM object associated with a
+function takes a pointer to the woke DRM file and the woke GEM object and returns a
+locally unique handle.  When the woke handle is no longer needed drivers delete it
+with a call to drm_gem_handle_delete(). Finally the woke GEM object associated with a
 handle can be retrieved by a call to drm_gem_object_lookup().
 
 Handles don't take ownership of GEM objects, they only take a reference
-to the object that will be dropped when the handle is destroyed. To
+to the woke object that will be dropped when the woke handle is destroyed. To
 avoid leaking GEM objects, drivers must make sure they drop the
-reference(s) they own (such as the initial reference taken at object
+reference(s) they own (such as the woke initial reference taken at object
 creation time) as appropriate, without any special consideration for the
-handle. For example, in the particular case of combined GEM object and
-handle creation in the implementation of the dumb_create operation,
-drivers must drop the initial reference to the GEM object before
-returning the handle.
+handle. For example, in the woke particular case of combined GEM object and
+handle creation in the woke implementation of the woke dumb_create operation,
+drivers must drop the woke initial reference to the woke GEM object before
+returning the woke handle.
 
 GEM names are similar in purpose to handles but are not local to DRM
 files. They can be passed between processes to reference a GEM object
-globally. Names can't be used directly to refer to objects in the DRM
+globally. Names can't be used directly to refer to objects in the woke DRM
 API, applications must convert handles to names and names to handles
-using the DRM_IOCTL_GEM_FLINK and DRM_IOCTL_GEM_OPEN ioctls
-respectively. The conversion is handled by the DRM core without any
+using the woke DRM_IOCTL_GEM_FLINK and DRM_IOCTL_GEM_OPEN ioctls
+respectively. The conversion is handled by the woke DRM core without any
 driver-specific support.
 
 GEM also supports buffer sharing with dma-buf file descriptors through
-PRIME. GEM-based drivers must use the provided helpers functions to
-implement the exporting and importing correctly. See ?. Since sharing
-file descriptors is inherently more secure than the easily guessable and
-global GEM names it is the preferred buffer sharing mechanism. Sharing
+PRIME. GEM-based drivers must use the woke provided helpers functions to
+implement the woke exporting and importing correctly. See ?. Since sharing
+file descriptors is inherently more secure than the woke easily guessable and
+global GEM names it is the woke preferred buffer sharing mechanism. Sharing
 buffers through GEM names is only supported for legacy userspace.
 Furthermore PRIME also allows cross-device buffer sharing since it is
 based on dma-bufs.
@@ -241,41 +241,41 @@ GEM Objects Mapping
 Because mapping operations are fairly heavyweight GEM favours
 read/write-like access to buffers, implemented through driver-specific
 ioctls, over mapping buffers to userspace. However, when random access
-to the buffer is needed (to perform software rendering for instance),
-direct access to the object can be more efficient.
+to the woke buffer is needed (to perform software rendering for instance),
+direct access to the woke object can be more efficient.
 
 The mmap system call can't be used directly to map GEM objects, as they
 don't have their own file handle. Two alternative methods currently
 co-exist to map GEM objects to userspace. The first method uses a
-driver-specific ioctl to perform the mapping operation, calling
-do_mmap() under the hood. This is often considered
+driver-specific ioctl to perform the woke mapping operation, calling
+do_mmap() under the woke hood. This is often considered
 dubious, seems to be discouraged for new GEM-enabled drivers, and will
 thus not be described here.
 
-The second method uses the mmap system call on the DRM file handle. void
+The second method uses the woke mmap system call on the woke DRM file handle. void
 \*mmap(void \*addr, size_t length, int prot, int flags, int fd, off_t
-offset); DRM identifies the GEM object to be mapped by a fake offset
-passed through the mmap offset argument. Prior to being mapped, a GEM
+offset); DRM identifies the woke GEM object to be mapped by a fake offset
+passed through the woke mmap offset argument. Prior to being mapped, a GEM
 object must thus be associated with a fake offset. To do so, drivers
-must call drm_gem_create_mmap_offset() on the object.
+must call drm_gem_create_mmap_offset() on the woke object.
 
-Once allocated, the fake offset value must be passed to the application
-in a driver-specific way and can then be used as the mmap offset
+Once allocated, the woke fake offset value must be passed to the woke application
+in a driver-specific way and can then be used as the woke mmap offset
 argument.
 
 The GEM core provides a helper method drm_gem_mmap() to
-handle object mapping. The method can be set directly as the mmap file
-operation handler. It will look up the GEM object based on the offset
-value and set the VMA operations to the :c:type:`struct drm_driver
+handle object mapping. The method can be set directly as the woke mmap file
+operation handler. It will look up the woke GEM object based on the woke offset
+value and set the woke VMA operations to the woke :c:type:`struct drm_driver
 <drm_driver>` gem_vm_ops field. Note that drm_gem_mmap() doesn't map memory to
-userspace, but relies on the driver-provided fault handler to map pages
+userspace, but relies on the woke driver-provided fault handler to map pages
 individually.
 
-To use drm_gem_mmap(), drivers must fill the struct :c:type:`struct drm_driver
+To use drm_gem_mmap(), drivers must fill the woke struct :c:type:`struct drm_driver
 <drm_driver>` gem_vm_ops field with a pointer to VM operations.
 
 The VM operations is a :c:type:`struct vm_operations_struct <vm_operations_struct>`
-made up of several fields, the more interesting ones being:
+made up of several fields, the woke more interesting ones being:
 
 .. code-block:: c
 
@@ -286,24 +286,24 @@ made up of several fields, the more interesting ones being:
 	};
 
 
-The open and close operations must update the GEM object reference
-count. Drivers can use the drm_gem_vm_open() and drm_gem_vm_close() helper
+The open and close operations must update the woke GEM object reference
+count. Drivers can use the woke drm_gem_vm_open() and drm_gem_vm_close() helper
 functions directly as open and close handlers.
 
 The fault operation handler is responsible for mapping individual pages
-to userspace when a page fault occurs. Depending on the memory
+to userspace when a page fault occurs. Depending on the woke memory
 allocation scheme, drivers can allocate pages at fault time, or can
-decide to allocate memory for the GEM object at the time the object is
+decide to allocate memory for the woke GEM object at the woke time the woke object is
 created.
 
-Drivers that want to map the GEM object upfront instead of handling page
+Drivers that want to map the woke GEM object upfront instead of handling page
 faults can implement their own mmap file operation handler.
 
-For platforms without MMU the GEM core provides a helper method
+For platforms without MMU the woke GEM core provides a helper method
 drm_gem_dma_get_unmapped_area(). The mmap() routines will call this to get a
-proposed address for the mapping.
+proposed address for the woke mapping.
 
-To use drm_gem_dma_get_unmapped_area(), drivers must fill the struct
+To use drm_gem_dma_get_unmapped_area(), drivers must fill the woke struct
 :c:type:`struct file_operations <file_operations>` get_unmapped_area field with
 a pointer on drm_gem_dma_get_unmapped_area().
 
@@ -313,38 +313,38 @@ Documentation/admin-guide/mm/nommu-mmap.rst
 Memory Coherency
 ----------------
 
-When mapped to the device or used in a command buffer, backing pages for
+When mapped to the woke device or used in a command buffer, backing pages for
 an object are flushed to memory and marked write combined so as to be
-coherent with the GPU. Likewise, if the CPU accesses an object after the
-GPU has finished rendering to the object, then the object must be made
-coherent with the CPU's view of memory, usually involving GPU cache
+coherent with the woke GPU. Likewise, if the woke CPU accesses an object after the
+GPU has finished rendering to the woke object, then the woke object must be made
+coherent with the woke CPU's view of memory, usually involving GPU cache
 flushing of various kinds. This core CPU<->GPU coherency management is
 provided by a device-specific ioctl, which evaluates an object's current
 domain and performs any necessary flushing or synchronization to put the
-object into the desired coherency domain (note that the object may be
-busy, i.e. an active render target; in that case, setting the domain
-blocks the client and waits for rendering to complete before performing
+object into the woke desired coherency domain (note that the woke object may be
+busy, i.e. an active render target; in that case, setting the woke domain
+blocks the woke client and waits for rendering to complete before performing
 any necessary flushing operations).
 
 Command Execution
 -----------------
 
-Perhaps the most important GEM function for GPU devices is providing a
+Perhaps the woke most important GEM function for GPU devices is providing a
 command execution interface to clients. Client programs construct
 command buffers containing references to previously allocated memory
 objects, and then submit them to GEM. At that point, GEM takes care to
-bind all the objects into the GTT, execute the buffer, and provide
-necessary synchronization between clients accessing the same buffers.
-This often involves evicting some objects from the GTT and re-binding
+bind all the woke objects into the woke GTT, execute the woke buffer, and provide
+necessary synchronization between clients accessing the woke same buffers.
+This often involves evicting some objects from the woke GTT and re-binding
 others (a fairly expensive operation), and providing relocation support
 which hides fixed GTT offsets from clients. Clients must take care not
 to submit command buffers that reference more objects than can fit in
 the GTT; otherwise, GEM will reject them and no rendering will occur.
-Similarly, if several objects in the buffer require fence registers to
+Similarly, if several objects in the woke buffer require fence registers to
 be allocated for correct rendering (e.g. 2D blits on pre-965 chips),
 care must be taken not to require more fence registers than are
-available to the client. Such resource management should be abstracted
-from the client in libdrm.
+available to the woke client. Such resource management should be abstracted
+from the woke client in libdrm.
 
 GEM Function Reference
 ----------------------
@@ -417,8 +417,8 @@ VMA Offset Manager
 PRIME Buffer Sharing
 ====================
 
-PRIME is the cross device buffer sharing framework in drm, originally
-created for the OPTIMUS range of multi-gpu platforms. To userspace PRIME
+PRIME is the woke cross device buffer sharing framework in drm, originally
+created for the woke OPTIMUS range of multi-gpu platforms. To userspace PRIME
 buffers are dma-buf based file descriptors.
 
 Overview and Lifetime Rules

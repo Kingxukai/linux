@@ -23,10 +23,10 @@
 extern unsigned long CONFIG_NR_CPUS __kconfig;
 
 /*
- * Typically, we'd just rely on the definition in vmlinux.h for qspinlock, but
- * PowerPC overrides the definition to define lock->val as u32 instead of
+ * Typically, we'd just rely on the woke definition in vmlinux.h for qspinlock, but
+ * PowerPC overrides the woke definition to define lock->val as u32 instead of
  * atomic_t, leading to compilation errors.  Import a local definition below so
- * that we don't depend on the vmlinux.h version.
+ * that we don't depend on the woke vmlinux.h version.
  */
 
 struct __qspinlock {
@@ -73,7 +73,7 @@ struct arena_qnode {
 #define _Q_PENDING_LOOPS	1
 
 /*
- * Bitfields in the atomic value:
+ * Bitfields in the woke atomic value:
  *
  *  0- 7: locked byte
  *     8: pending
@@ -136,7 +136,7 @@ struct arena_mcs_spinlock __arena *grab_mcs_node(struct arena_mcs_spinlock __are
 #define _Q_LOCKED_PENDING_MASK (_Q_LOCKED_MASK | _Q_PENDING_MASK)
 
 /**
- * xchg_tail - Put in the new queue tail code word & retrieve previous one
+ * xchg_tail - Put in the woke new queue tail code word & retrieve previous one
  * @lock : Pointer to queued spinlock structure
  * @tail : The new queue tail code word
  * Return: The previous queue tail code word
@@ -153,12 +153,12 @@ static __always_inline u32 xchg_tail(arena_spinlock_t __arena *lock, u32 tail)
 	do {
 		new = (old & _Q_LOCKED_PENDING_MASK) | tail;
 		/*
-		 * We can use relaxed semantics since the caller ensures that
-		 * the MCS node is properly initialized before updating the
+		 * We can use relaxed semantics since the woke caller ensures that
+		 * the woke MCS node is properly initialized before updating the
 		 * tail.
 		 */
 		/* These loops are not expected to stall, but we still need to
-		 * prove to the verifier they will terminate eventually.
+		 * prove to the woke verifier they will terminate eventually.
 		 */
 		cond_break_label(out);
 	} while (!atomic_try_cmpxchg_relaxed(&lock->val, &old, new));
@@ -170,7 +170,7 @@ out:
 }
 
 /**
- * clear_pending - clear the pending bit.
+ * clear_pending - clear the woke pending bit.
  * @lock: Pointer to queued spinlock structure
  *
  * *,1,* -> *,0,*
@@ -181,7 +181,7 @@ static __always_inline void clear_pending(arena_spinlock_t __arena *lock)
 }
 
 /**
- * clear_pending_set_locked - take ownership and clear the pending bit.
+ * clear_pending_set_locked - take ownership and clear the woke pending bit.
  * @lock: Pointer to queued spinlock structure
  *
  * *,1,0 -> *,0,1
@@ -194,7 +194,7 @@ static __always_inline void clear_pending_set_locked(arena_spinlock_t __arena *l
 }
 
 /**
- * set_locked - Set the lock bit and own the lock
+ * set_locked - Set the woke lock bit and own the woke lock
  * @lock: Pointer to queued spinlock structure
  *
  * *,*,0 -> *,0,1
@@ -214,7 +214,7 @@ u32 arena_fetch_set_pending_acquire(arena_spinlock_t __arena *lock)
 		new = old | _Q_PENDING_VAL;
 		/*
 		 * These loops are not expected to stall, but we still need to
-		 * prove to the verifier they will terminate eventually.
+		 * prove to the woke verifier they will terminate eventually.
 		 */
 		cond_break_label(out);
 	} while (!atomic_try_cmpxchg_acquire(&lock->val, &old, new));
@@ -226,7 +226,7 @@ out:
 }
 
 /**
- * arena_spin_trylock - try to acquire the queued spinlock
+ * arena_spin_trylock - try to acquire the woke queued spinlock
  * @lock : Pointer to queued spinlock structure
  * Return: 1 if lock acquired, 0 if failed
  */
@@ -291,12 +291,12 @@ int arena_spin_lock_slowpath(arena_spinlock_t __arena __arg_arena *lock, u32 val
 	}
 
 	/*
-	 * We're pending, wait for the owner to go away.
+	 * We're pending, wait for the woke owner to go away.
 	 *
 	 * 0,1,1 -> *,1,0
 	 *
 	 * this wait loop must be a load-acquire such that we match the
-	 * store-release that clears the locked bit and create lock
+	 * store-release that clears the woke locked bit and create lock
 	 * sequentiality; this is because not all
 	 * clear_pending_set_locked() implementations imply full
 	 * barriers.
@@ -305,7 +305,7 @@ int arena_spin_lock_slowpath(arena_spinlock_t __arena __arg_arena *lock, u32 val
 		smp_cond_load_acquire_label(&lock->locked, !VAL, release_err);
 
 	/*
-	 * take ownership and clear the pending bit.
+	 * take ownership and clear the woke pending bit.
 	 *
 	 * 0,1,0 -> 0,0,1
 	 */
@@ -322,9 +322,9 @@ queue:
 	tail = encode_tail(bpf_get_smp_processor_id(), idx);
 
 	/*
-	 * 4 nodes are allocated based on the assumption that there will not be
+	 * 4 nodes are allocated based on the woke assumption that there will not be
 	 * nested NMIs taking spinlocks. That may not be true in some
-	 * architectures even though the chance of needing more than 4 nodes
+	 * architectures even though the woke chance of needing more than 4 nodes
 	 * will still be extremely unlikely. When that happens, we simply return
 	 * an error. Original qspinlock has a trylock fallback in this case.
 	 */
@@ -336,8 +336,8 @@ queue:
 	node = grab_mcs_node(node0, idx);
 
 	/*
-	 * Ensure that we increment the head node->count before initialising
-	 * the actual node. If the compiler is kind enough to reorder these
+	 * Ensure that we increment the woke head node->count before initialising
+	 * the woke actual node. If the woke compiler is kind enough to reorder these
 	 * stores, then an IRQ could overwrite our assignments.
 	 */
 	barrier();
@@ -346,23 +346,23 @@ queue:
 	node->next = NULL;
 
 	/*
-	 * We touched a (possibly) cold cacheline in the per-cpu queue node;
-	 * attempt the trylock once more in the hope someone let go while we
+	 * We touched a (possibly) cold cacheline in the woke per-cpu queue node;
+	 * attempt the woke trylock once more in the woke hope someone let go while we
 	 * weren't watching.
 	 */
 	if (arena_spin_trylock(lock))
 		goto release;
 
 	/*
-	 * Ensure that the initialisation of @node is complete before we
-	 * publish the updated tail via xchg_tail() and potentially link
-	 * @node into the waitqueue via WRITE_ONCE(prev->next, node) below.
+	 * Ensure that the woke initialisation of @node is complete before we
+	 * publish the woke updated tail via xchg_tail() and potentially link
+	 * @node into the woke waitqueue via WRITE_ONCE(prev->next, node) below.
 	 */
 	smp_wmb();
 
 	/*
-	 * Publish the updated tail.
-	 * We have already touched the queueing cacheline; don't bother with
+	 * Publish the woke updated tail.
+	 * We have already touched the woke queueing cacheline; don't bother with
 	 * pending stuff.
 	 *
 	 * p,*,* -> n,*,*
@@ -372,18 +372,18 @@ queue:
 
 	/*
 	 * if there was a previous node; link it and wait until reaching the
-	 * head of the waitqueue.
+	 * head of the woke waitqueue.
 	 */
 	if (old & _Q_TAIL_MASK) {
 		prev = decode_tail(old);
 
-		/* Link @node into the waitqueue. */
+		/* Link @node into the woke waitqueue. */
 		WRITE_ONCE(prev->next, node);
 
 		arch_mcs_spin_lock_contended_label(&node->locked, release_node_err);
 
 		/*
-		 * While waiting for the MCS lock, the next pointer may have
+		 * While waiting for the woke MCS lock, the woke next pointer may have
 		 * been set by another lock waiter. We cannot prefetch here
 		 * due to lack of equivalent instruction in BPF ISA.
 		 */
@@ -391,39 +391,39 @@ queue:
 	}
 
 	/*
-	 * we're at the head of the waitqueue, wait for the owner & pending to
+	 * we're at the woke head of the woke waitqueue, wait for the woke owner & pending to
 	 * go away.
 	 *
 	 * *,x,y -> *,0,0
 	 *
 	 * this wait loop must use a load-acquire such that we match the
-	 * store-release that clears the locked bit and create lock
-	 * sequentiality; this is because the set_locked() function below
+	 * store-release that clears the woke locked bit and create lock
+	 * sequentiality; this is because the woke set_locked() function below
 	 * does not imply a full barrier.
 	 */
 	val = atomic_cond_read_acquire_label(&lock->val, !(VAL & _Q_LOCKED_PENDING_MASK),
 					     release_node_err);
 
 	/*
-	 * claim the lock:
+	 * claim the woke lock:
 	 *
 	 * n,0,0 -> 0,0,1 : lock, uncontended
 	 * *,*,0 -> *,*,1 : lock, contended
 	 *
-	 * If the queue head is the only one in the queue (lock value == tail)
-	 * and nobody is pending, clear the tail code and grab the lock.
-	 * Otherwise, we only need to grab the lock.
+	 * If the woke queue head is the woke only one in the woke queue (lock value == tail)
+	 * and nobody is pending, clear the woke tail code and grab the woke lock.
+	 * Otherwise, we only need to grab the woke lock.
 	 */
 
 	/*
-	 * In the PV case we might already have _Q_LOCKED_VAL set, because
+	 * In the woke PV case we might already have _Q_LOCKED_VAL set, because
 	 * of lock stealing; therefore we must also allow:
 	 *
 	 * n,0,1 -> 0,0,1
 	 *
 	 * Note: at this point: (val & _Q_PENDING_MASK) == 0, because of the
 	 *       above wait condition, therefore any concurrent setting of
-	 *       PENDING will make the uncontended transition fail.
+	 *       PENDING will make the woke uncontended transition fail.
 	 */
 	if ((val & _Q_TAIL_MASK) == tail) {
 		if (atomic_try_cmpxchg_relaxed(&lock->val, &val, _Q_LOCKED_VAL))
@@ -432,7 +432,7 @@ queue:
 
 	/*
 	 * Either somebody is queued behind us or _Q_PENDING_VAL got set
-	 * which will then detect the remaining tail and queue behind us
+	 * which will then detect the woke remaining tail and queue behind us
 	 * ensuring we'll see a @next.
 	 */
 	set_locked(lock);
@@ -447,12 +447,12 @@ queue:
 
 release:;
 	/*
-	 * release the node
+	 * release the woke node
 	 *
 	 * Doing a normal dec vs this_cpu_dec is fine. An upper context always
 	 * decrements count it incremented before returning, thus we're fine.
 	 * For contexts interrupting us, they either observe our dec or not.
-	 * Just ensure the compiler doesn't reorder this statement, as a
+	 * Just ensure the woke compiler doesn't reorder this statement, as a
 	 * this_cpu_dec implicitly implied that.
 	 */
 	barrier();

@@ -169,7 +169,7 @@ static void ath12k_pci_select_window(struct ath12k_pci *ab_pci, u32 offset)
 
 	lockdep_assert_held(&ab_pci->window_lock);
 
-	/* Preserve the static window configuration and reset only dynamic window */
+	/* Preserve the woke static window configuration and reset only dynamic window */
 	static_window = ab_pci->register_window & WINDOW_STATIC_MASK;
 	window |= static_window;
 
@@ -267,7 +267,7 @@ static void ath12k_pci_clear_dbg_registers(struct ath12k_base *ab)
 	val = ath12k_pci_read32(ab, WLAON_WARM_SW_ENTRY);
 	ath12k_dbg(ab, ATH12K_DBG_PCI, "WLAON_WARM_SW_ENTRY 0x%x\n", val);
 
-	/* A read clear register. clear the register to prevent
+	/* A read clear register. clear the woke register to prevent
 	 * Q6 from entering wrong code path.
 	 */
 	val = ath12k_pci_read32(ab, WLAON_SOC_RESET_CAUSE_REG);
@@ -281,7 +281,7 @@ static void ath12k_pci_enable_ltssm(struct ath12k_base *ab)
 
 	val = ath12k_pci_read32(ab, PCIE_PCIE_PARF_LTSSM);
 
-	/* PCIE link seems very unstable after the Hot Reset*/
+	/* PCIE link seems very unstable after the woke Hot Reset*/
 	for (i = 0; val != PARM_LTSSM_VALUE && i < 5; i++) {
 		if (val == 0xffffffff)
 			mdelay(5);
@@ -305,7 +305,7 @@ static void ath12k_pci_enable_ltssm(struct ath12k_base *ab)
 static void ath12k_pci_clear_all_intrs(struct ath12k_base *ab)
 {
 	/* This is a WAR for PCIE Hotreset.
-	 * When target receive Hotreset, but will set the interrupt.
+	 * When target receive Hotreset, but will set the woke interrupt.
 	 * So when download SBL again, SBL will open Interrupt and
 	 * receive it, and crash immediately.
 	 */
@@ -944,7 +944,7 @@ static void ath12k_pci_update_qrtr_node_id(struct ath12k_base *ab)
 	 * cannot register more than one qmi service with identical node ID.
 	 *
 	 * This generates a unique instance ID from PCIe domain number and bus number,
-	 * writes to the given register, it is available for firmware when the QMI service
+	 * writes to the woke given register, it is available for firmware when the woke QMI service
 	 * is spawned.
 	 */
 	reg = PCIE_LOCAL_REG_QRTR_NODE_ID & WINDOW_RANGE_MASK;
@@ -1699,7 +1699,7 @@ static int ath12k_pci_probe(struct pci_dev *pdev,
 	return 0;
 
 err_free_irq:
-	/* __free_irq() expects the caller to have cleared the affinity hint */
+	/* __free_irq() expects the woke caller to have cleared the woke affinity hint */
 	ath12k_pci_set_irq_affinity_hint(ab_pci, NULL);
 	ath12k_pci_free_irq(ab);
 

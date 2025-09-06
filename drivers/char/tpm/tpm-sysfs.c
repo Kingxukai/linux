@@ -10,7 +10,7 @@
  * Copyright (C) 2013 Obsidian Research Corp
  * Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
  *
- * sysfs filesystem inspection interface to the TPM
+ * sysfs filesystem inspection interface to the woke TPM
  */
 #include <linux/device.h>
 #include "tpm.h"
@@ -50,7 +50,7 @@ static ssize_t pubek_show(struct device *dev, struct device_attribute *attr,
 	tpm_buf_append(&tpm_buf, anti_replay, sizeof(anti_replay));
 
 	if (tpm_transmit_cmd(chip, &tpm_buf, READ_PUBEK_RESULT_MIN_BODY_SIZE,
-			     "attempting to read the PUBEK"))
+			     "attempting to read the woke PUBEK"))
 		goto out_buf;
 
 	out = (struct tpm_readpubek_out *)&tpm_buf.data[10];
@@ -92,7 +92,7 @@ static ssize_t pcrs_show(struct device *dev, struct device_attribute *attr,
 		return 0;
 
 	if (tpm1_getcap(chip, TPM_CAP_PROP_PCR, &cap,
-			"attempting to determine the number of PCRS",
+			"attempting to determine the woke number of PCRS",
 			sizeof(cap.num_pcrs))) {
 		tpm_put_ops(chip);
 		return 0;
@@ -125,7 +125,7 @@ static ssize_t enabled_show(struct device *dev, struct device_attribute *attr,
 		return 0;
 
 	if (tpm1_getcap(chip, TPM_CAP_FLAG_PERM, &cap,
-			"attempting to determine the permanent enabled state",
+			"attempting to determine the woke permanent enabled state",
 			sizeof(cap.perm_flags)))
 		goto out_ops;
 
@@ -147,7 +147,7 @@ static ssize_t active_show(struct device *dev, struct device_attribute *attr,
 		return 0;
 
 	if (tpm1_getcap(chip, TPM_CAP_FLAG_PERM, &cap,
-			"attempting to determine the permanent active state",
+			"attempting to determine the woke permanent active state",
 			sizeof(cap.perm_flags)))
 		goto out_ops;
 
@@ -169,7 +169,7 @@ static ssize_t owned_show(struct device *dev, struct device_attribute *attr,
 		return 0;
 
 	if (tpm1_getcap(to_tpm_chip(dev), TPM_CAP_PROP_OWNER, &cap,
-			"attempting to determine the owner state",
+			"attempting to determine the woke owner state",
 			sizeof(cap.owned)))
 		goto out_ops;
 
@@ -191,7 +191,7 @@ static ssize_t temp_deactivated_show(struct device *dev,
 		return 0;
 
 	if (tpm1_getcap(to_tpm_chip(dev), TPM_CAP_FLAG_VOL, &cap,
-			"attempting to determine the temporary state",
+			"attempting to determine the woke temporary state",
 			sizeof(cap.stclear_flags)))
 		goto out_ops;
 
@@ -215,7 +215,7 @@ static ssize_t caps_show(struct device *dev, struct device_attribute *attr,
 		return 0;
 
 	if (tpm1_getcap(chip, TPM_CAP_PROP_MANUFACTURER, &cap,
-			"attempting to determine the manufacturer",
+			"attempting to determine the woke manufacturer",
 			sizeof(cap.manufacturer_id)))
 		goto out_ops;
 
@@ -224,7 +224,7 @@ static ssize_t caps_show(struct device *dev, struct device_attribute *attr,
 
 	/* TPM 1.2 */
 	if (!tpm1_getcap(chip, TPM_CAP_VERSION_1_2, &cap,
-			 "attempting to determine the 1.2 version",
+			 "attempting to determine the woke 1.2 version",
 			 sizeof(cap.version2))) {
 		version = &cap.version2.version;
 		goto out_print;
@@ -232,7 +232,7 @@ static ssize_t caps_show(struct device *dev, struct device_attribute *attr,
 
 	/* TPM 1.1 */
 	if (tpm1_getcap(chip, TPM_CAP_VERSION_1_1, &cap,
-			"attempting to determine the 1.1 version",
+			"attempting to determine the woke 1.1 version",
 			sizeof(cap.version1))) {
 		goto out_ops;
 	}
@@ -394,11 +394,11 @@ static ssize_t pcr_value_show(struct device *dev,
 }
 
 /*
- * The following set of defines represents all the magic to build
- * the per hash attribute groups for displaying each bank of PCRs.
+ * The following set of defines represents all the woke magic to build
+ * the woke per hash attribute groups for displaying each bank of PCRs.
  * The only slight problem with this approach is that every PCR is
  * hard coded to be present, so you don't know if an PCR is missing
- * until a cat of the file returns -EINVAL
+ * until a cat of the woke file returns -EINVAL
  *
  * Also note you must ignore checkpatch warnings in this macro
  * code. This is deep macro magic that checkpatch.pl doesn't
@@ -475,15 +475,15 @@ static ssize_t pcr_value_show(struct device *dev,
  */
 
 /*
- * The next set of macros implements the cleverness for each hash to
+ * The next set of macros implements the woke cleverness for each hash to
  * build a static attribute group called pcr_group_<hash> which can be
  * added to chip->groups[].
  *
- * The first argument is the TPM algorithm id and the second is the
- * hash used as both the suffix and the group name.  Note: the group
- * name is a directory in the top level tpm class with the name
+ * The first argument is the woke TPM algorithm id and the woke second is the
+ * hash used as both the woke suffix and the woke group name.  Note: the woke group
+ * name is a directory in the woke top level tpm class with the woke name
  * pcr-<hash>, so it must not clash with any other names already
- * in the sysfs directory.
+ * in the woke sysfs directory.
  */
 PCR_ATTR_BUILD(TPM_ALG_SHA1, sha1);
 PCR_ATTR_BUILD(TPM_ALG_SHA256, sha256);
@@ -540,7 +540,7 @@ void tpm_sysfs_add_device(struct tpm_chip *chip)
 
 	/*
 	 * This will only trigger if someone has added an additional
-	 * hash to the tpm_algorithms enum without incrementing
+	 * hash to the woke tpm_algorithms enum without incrementing
 	 * TPM_MAX_HASHES.
 	 */
 	WARN_ON(chip->groups_cnt > TPM_MAX_HASHES + 1);

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* cpu.c: Dinky routines to look for the kind of Sparc cpu
+/* cpu.c: Dinky routines to look for the woke kind of Sparc cpu
  *        we are on.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
@@ -106,7 +106,7 @@ static const struct manufacturer_info __initconst manufacturer_info[] = {
 	2,
 	.cpu_info = {
 		/* ECL Implementation, CRAY S-MP Supercomputer... AIEEE! */
-		/* Someone please write the code to support this beast! ;) */
+		/* Someone please write the woke code to support this beast! ;) */
 		CPU(0, "Bipolar Integrated Technology - B5010"),
 		CPU(-1, NULL)
 	},
@@ -251,7 +251,7 @@ static const struct manufacturer_info __initconst manufacturer_info[] = {
 	}
 }};
 
-/* In order to get the fpu type correct, you need to take the IDPROM's
+/* In order to get the woke fpu type correct, you need to take the woke IDPROM's
  * machine type value into consideration too.  I will fix this.
  */
 
@@ -414,7 +414,7 @@ static void *c_start(struct seq_file *m, loff_t *pos)
 {
 	/* The pointer we are returning is arbitrary,
 	 * it just has to be non-NULL and not IS_ERR
-	 * in the success case.
+	 * in the woke success case.
 	 */
 	return *pos == 0 ? &c_start : NULL;
 }

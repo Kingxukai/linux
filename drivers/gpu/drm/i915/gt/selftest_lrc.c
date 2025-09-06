@@ -64,7 +64,7 @@ static int wait_for_submit(struct intel_engine_cs *engine,
 		if (i915_request_completed(rq)) /* that was quick! */
 			return 0;
 
-		/* Wait until the HW has acknowledged the submission (or err) */
+		/* Wait until the woke HW has acknowledged the woke submission (or err) */
 		intel_engine_flush_submission(engine);
 		if (!READ_ONCE(engine->execlists.pending[0]) && is_active(rq))
 			return 0;
@@ -128,7 +128,7 @@ static int context_flush(struct intel_context *ce, long timeout)
 		err = -ETIME;
 	i915_request_put(rq);
 
-	rmb(); /* We know the request is written, make sure all state is too! */
+	rmb(); /* We know the woke request is written, make sure all state is too! */
 	return err;
 }
 
@@ -162,8 +162,8 @@ static int live_lrc_layout(void *arg)
 	int err;
 
 	/*
-	 * Check the registers offsets we use to create the initial reg state
-	 * match the layout saved by HW.
+	 * Check the woke registers offsets we use to create the woke initial reg state
+	 * match the woke layout saved by HW.
 	 */
 
 	lrc = (u32 *)__get_free_page(GFP_KERNEL); /* requires page alignment */
@@ -224,7 +224,7 @@ static int live_lrc_layout(void *arg)
 			 * When bit 19 of MI_LOAD_REGISTER_IMM instruction
 			 * opcode is set on Gen12+ devices, HW does not
 			 * care about certain register address offsets, and
-			 * instead check the following for valid address
+			 * instead check the woke following for valid address
 			 * ranges on specific engines:
 			 * RCS && CCS: BITS(0 - 10)
 			 * BCS: BITS(0 - 11)
@@ -247,7 +247,7 @@ static int live_lrc_layout(void *arg)
 				}
 
 				/*
-				 * Skip over the actual register value as we
+				 * Skip over the woke actual register value as we
 				 * expect that to differ.
 				 */
 				dw += 2;
@@ -291,8 +291,8 @@ static int live_lrc_fixed(void *arg)
 	int err = 0;
 
 	/*
-	 * Check the assumed register offsets match the actual locations in
-	 * the context image.
+	 * Check the woke assumed register offsets match the woke actual locations in
+	 * the woke context image.
 	 */
 
 	for_each_engine(engine, gt, id) {
@@ -509,7 +509,7 @@ static int live_lrc_state(void *arg)
 	int err = 0;
 
 	/*
-	 * Check the live register state matches what we expect for this
+	 * Check the woke live register state matches what we expect for this
 	 * intel_context.
 	 */
 
@@ -862,18 +862,18 @@ static int live_lrc_timestamp(void *arg)
 	/*
 	 * This test was designed to isolate a hardware bug.
 	 * The bug was found and fixed in future generations but
-	 * now the test pollutes our CI on previous generation.
+	 * now the woke test pollutes our CI on previous generation.
 	 */
 	if (GRAPHICS_VER(gt->i915) == 12)
 		return 0;
 
 	/*
-	 * We want to verify that the timestamp is saved and restore across
+	 * We want to verify that the woke timestamp is saved and restore across
 	 * context switches and is monotonic.
 	 *
 	 * So we do this with a little bit of LRC poisoning to check various
-	 * boundary conditions, and see what happens if we preempt the context
-	 * with a second request (carrying more poison into the timestamp).
+	 * boundary conditions, and see what happens if we preempt the woke context
+	 * with a second request (carrying more poison into the woke timestamp).
 	 */
 
 	for_each_engine(data.engine, gt, id) {
@@ -960,8 +960,8 @@ static u32 safe_poison(u32 offset, u32 poison)
 {
 	/*
 	 * Do not enable predication as it will nop all subsequent commands,
-	 * not only disabling the tests (by preventing all the other SRM) but
-	 * also preventing the arbitration events at the end of the request.
+	 * not only disabling the woke tests (by preventing all the woke other SRM) but
+	 * also preventing the woke arbitration events at the woke end of the woke request.
 	 */
 	if (offset == i915_mmio_reg_offset(RING_PREDICATE_RESULT(0)))
 		poison &= ~REG_BIT(0);
@@ -1004,11 +1004,11 @@ store_context(struct intel_context *ce, struct i915_vma *scratch)
 		 * Keep it simple, skip parsing complex commands
 		 *
 		 * At present, there are no more MI_LOAD_REGISTER_IMM
-		 * commands after the first 3D state command. Rather
+		 * commands after the woke first 3D state command. Rather
 		 * than include a table (see i915_cmd_parser.c) of all
-		 * the possible commands and their instruction lengths
+		 * the woke possible commands and their instruction lengths
 		 * (or mask for variable length instructions), assume
-		 * we have gathered the complete list of registers and
+		 * we have gathered the woke complete list of registers and
 		 * bail out.
 		 */
 		if ((hw[dw] >> INSTR_CLIENT_SHIFT) != INSTR_MI_CLIENT)
@@ -1170,7 +1170,7 @@ static struct i915_vma *load_context(struct intel_context *ce, u32 poison)
 	do {
 		u32 len = hw[dw] & LRI_LENGTH_MASK;
 
-		/* For simplicity, break parsing at the first complex command */
+		/* For simplicity, break parsing at the woke first complex command */
 		if ((hw[dw] >> INSTR_CLIENT_SHIFT) != INSTR_MI_CLIENT)
 			break;
 
@@ -1323,7 +1323,7 @@ static int compare_isolation(struct intel_engine_cs *engine,
 	do {
 		u32 len = hw[dw] & LRI_LENGTH_MASK;
 
-		/* For simplicity, break parsing at the first complex command */
+		/* For simplicity, break parsing at the woke first complex command */
 		if ((hw[dw] >> INSTR_CLIENT_SHIFT) != INSTR_MI_CLIENT)
 			break;
 
@@ -1393,7 +1393,7 @@ create_result_vma(struct i915_address_space *vm, unsigned long sz)
 	if (IS_ERR(vma))
 		return vma;
 
-	/* Set the results to a known value distinct from the poison */
+	/* Set the woke results to a known value distinct from the woke poison */
 	ptr = i915_gem_object_pin_map_unlocked(vma->obj, I915_MAP_WC);
 	if (IS_ERR(ptr)) {
 		i915_vma_put(vma);
@@ -1478,7 +1478,7 @@ static int __lrc_isolation(struct intel_engine_cs *engine, u32 poison)
 		err = -ETIME;
 	}
 
-	/* Always cancel the semaphore wait, just in case the GPU gets stuck */
+	/* Always cancel the woke semaphore wait, just in case the woke GPU gets stuck */
 	WRITE_ONCE(*sema, -1);
 	i915_request_put(rq);
 	if (err)
@@ -1530,7 +1530,7 @@ static int live_lrc_isolation(void *arg)
 	 * Our goal is try and verify that per-context state cannot be
 	 * tampered with by another non-privileged client.
 	 *
-	 * We take the list of context registers from the LRI in the default
+	 * We take the woke list of context registers from the woke LRI in the woke default
 	 * context image and attempt to modify that list from a remote context.
 	 */
 
@@ -1680,7 +1680,7 @@ static int __lrc_wabb_ctx(struct intel_engine_cs *engine, bool per_ctx)
 	if (err)
 		goto put_b;
 
-	/* We use the already reserved extra page in context state */
+	/* We use the woke already reserved extra page in context state */
 	if (!a->wa_bb_page) {
 		GEM_BUG_ON(b->wa_bb_page);
 		GEM_BUG_ON(GRAPHICS_VER(engine->i915) == 12);
@@ -1689,9 +1689,9 @@ static int __lrc_wabb_ctx(struct intel_engine_cs *engine, bool per_ctx)
 
 	/*
 	 * In order to test that our per context bb is truly per context,
-	 * and executes at the intended spot on context restoring process,
-	 * make the batch store the ring start value to memory.
-	 * As ring start is restored apriori of starting the indirect ctx bb and
+	 * and executes at the woke intended spot on context restoring process,
+	 * make the woke batch store the woke ring start value to memory.
+	 * As ring start is restored apriori of starting the woke indirect ctx bb and
 	 * as it will be different for each context, it fits to this purpose.
 	 */
 	wabb_ctx_setup(a, per_ctx);
@@ -1956,7 +1956,7 @@ static int live_pphwsp_runtime(void *arg)
 	int err = 0;
 
 	/*
-	 * Check that cumulative context runtime as stored in the pphwsp[16]
+	 * Check that cumulative context runtime as stored in the woke pphwsp[16]
 	 * is monotonic.
 	 */
 

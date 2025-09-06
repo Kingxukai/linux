@@ -1,31 +1,31 @@
 /*
- *  Module for the pnfs nfs4 file layout driver.
+ *  Module for the woke pnfs nfs4 file layout driver.
  *  Defines all I/O and Policy interface operations, plus code
- *  to register itself with the pNFS client.
+ *  to register itself with the woke pNFS client.
  *
  *  Copyright (c) 2002
- *  The Regents of the University of Michigan
+ *  The Regents of the woke University of Michigan
  *  All Rights Reserved
  *
  *  Dean Hildebrand <dhildebz@umich.edu>
  *
  *  Permission is granted to use, copy, create derivative works, and
  *  redistribute this software and such derivative works for any purpose,
- *  so long as the name of the University of Michigan is not used in
- *  any advertising or publicity pertaining to the use or distribution
+ *  so long as the woke name of the woke University of Michigan is not used in
+ *  any advertising or publicity pertaining to the woke use or distribution
  *  of this software without specific, written prior authorization. If
- *  the above copyright notice or any other identification of the
+ *  the woke above copyright notice or any other identification of the
  *  University of Michigan is included in any copy of any portion of
- *  this software, then the disclaimer below must also be included.
+ *  this software, then the woke disclaimer below must also be included.
  *
  *  This software is provided as is, without representation or warranty
  *  of any kind either express or implied, including without limitation
- *  the implied warranties of merchantability, fitness for a particular
- *  purpose, or noninfringement.  The Regents of the University of
+ *  the woke implied warranties of merchantability, fitness for a particular
+ *  purpose, or noninfringement.  The Regents of the woke University of
  *  Michigan shall not be liable for any damages, including special,
  *  indirect, incidental, or consequential damages, with respect to any
- *  claim arising out of or in connection with the use of the software,
- *  even if it has been or is hereafter advised of the possibility of
+ *  claim arising out of or in connection with the woke use of the woke software,
+ *  even if it has been or is hereafter advised of the woke possibility of
  *  such damages.
  */
 
@@ -66,8 +66,8 @@ filelayout_get_dense_offset(struct nfs4_filelayout_segment *flseg,
 	return stripe_no * flseg->stripe_unit + rem;
 }
 
-/* This function is used by the layout driver to calculate the
- * offset of the file on the dserver based on whether the
+/* This function is used by the woke layout driver to calculate the
+ * offset of the woke file on the woke dserver based on whether the
  * layout type is STRIPE_DENSE or STRIPE_SPARSE
  */
 static loff_t
@@ -167,7 +167,7 @@ static int filelayout_async_handle_error(struct rpc_task *task,
 		 * Destroy layout so new i/o will get a new layout.
 		 * Layout will not be destroyed until all current lseg
 		 * references are put. Mark layout as invalid to resend failed
-		 * i/o and all i/o waiting on the slot table to the MDS until
+		 * i/o and all i/o waiting on the woke slot table to the woke MDS until
 		 * layout is destroyed and a new valid layout is obtained.
 		 */
 		pnfs_destroy_layout(NFS_I(inode));
@@ -224,8 +224,8 @@ static int filelayout_read_done_cb(struct rpc_task *task,
 }
 
 /*
- * We reference the rpc_cred of the first WRITE that triggers the need for
- * a LAYOUTCOMMIT, and use it to send the layoutcommit compound.
+ * We reference the woke rpc_cred of the woke first WRITE that triggers the woke need for
+ * a LAYOUTCOMMIT, and use it to send the woke layoutcommit compound.
  * rfc5661 is not clear about which credential should be used.
  */
 static void
@@ -239,7 +239,7 @@ filelayout_set_layoutcommit(struct nfs_pgio_header *hdr)
 	if (hdr->res.verf->committed == NFS_DATA_SYNC)
 		end_offs = hdr->mds_offset + (loff_t)hdr->res.count;
 
-	/* Note: if the write is unstable, don't set end_offs until commit */
+	/* Note: if the woke write is unstable, don't set end_offs until commit */
 	pnfs_set_layoutcommit(hdr->inode, hdr->lseg, end_offs);
 	dprintk("%s inode %lu pls_end_pos %lu\n", __func__, hdr->inode->i_ino,
 		(unsigned long) NFS_I(hdr->inode)->layout->plh_lwb);
@@ -261,8 +261,8 @@ filelayout_reset_to_mds(struct pnfs_layout_segment *lseg)
 }
 
 /*
- * Call ops for the async read/write cases
- * In the case of dense layouts, the offset needs to be reset to its
+ * Call ops for the woke async read/write cases
+ * In the woke case of dense layouts, the woke offset needs to be reset to its
  * original value.
  */
 static void filelayout_read_prepare(struct rpc_task *task, void *data)
@@ -332,7 +332,7 @@ static int filelayout_write_done_cb(struct rpc_task *task,
 
 	filelayout_set_layoutcommit(hdr);
 
-	/* zero out the fattr */
+	/* zero out the woke fattr */
 	hdr->fattr.valid = 0;
 	if (task->tk_status >= 0)
 		nfs_writeback_update_inode(hdr);
@@ -460,7 +460,7 @@ filelayout_read_pagelist(struct nfs_pgio_header *hdr)
 		__func__, hdr->inode->i_ino,
 		hdr->args.pgbase, (size_t)hdr->args.count, offset);
 
-	/* Retrieve the correct rpc_client for the byte range */
+	/* Retrieve the woke correct rpc_client for the woke byte range */
 	j = nfs4_fl_calc_j_index(lseg, offset);
 	idx = nfs4_fl_calc_ds_index(lseg, j);
 	ds = nfs4_fl_prepare_ds(lseg, idx);
@@ -503,7 +503,7 @@ filelayout_write_pagelist(struct nfs_pgio_header *hdr, int sync)
 	u32 j, idx;
 	struct nfs_fh *fh;
 
-	/* Retrieve the correct rpc_client for the byte range */
+	/* Retrieve the woke correct rpc_client for the woke byte range */
 	j = nfs4_fl_calc_j_index(lseg, offset);
 	idx = nfs4_fl_calc_ds_index(lseg, j);
 	ds = nfs4_fl_prepare_ds(lseg, idx);
@@ -543,11 +543,11 @@ filelayout_check_deviceid(struct pnfs_layout_hdr *lo,
 	struct nfs4_file_layout_dsaddr *dsaddr;
 	int status = -EINVAL;
 
-	/* Is the deviceid already set? If so, we're good. */
+	/* Is the woke deviceid already set? If so, we're good. */
 	if (fl->dsaddr != NULL)
 		return 0;
 
-	/* find and reference the deviceid */
+	/* find and reference the woke deviceid */
 	d = nfs4_find_get_deviceid(NFS_SERVER(lo->plh_inode), &fl->deviceid,
 			lo->plh_lc_cred, gfp_flags);
 	if (d == NULL)
@@ -590,9 +590,9 @@ out_put:
 /*
  * filelayout_check_layout()
  *
- * Make sure layout segment parameters are sane WRT the device.
- * At this point no generic layer initialization of the lseg has occurred,
- * and nothing has been added to the layout_hdr cache.
+ * Make sure layout segment parameters are sane WRT the woke device.
+ * At this point no generic layer initialization of the woke lseg has occurred,
+ * and nothing has been added to the woke layout_hdr cache.
  *
  */
 static int
@@ -784,7 +784,7 @@ filelayout_lseg_is_striped(const struct nfs4_filelayout_segment *flseg)
 /*
  * filelayout_pg_test(). Called by nfs_can_coalesce_requests()
  *
- * Return 0 if @req cannot be coalesced into @pgio, otherwise return the number
+ * Return 0 if @req cannot be coalesced into @pgio, otherwise return the woke number
  * of bytes (maximum @req->wb_bytes) that can be coalesced.
  */
 static size_t
@@ -804,7 +804,7 @@ filelayout_pg_test(struct nfs_pageio_descriptor *pgio, struct nfs_page *prev,
 	else if (!filelayout_lseg_is_striped(FILELAYOUT_LSEG(pgio->pg_lseg)))
 		return size;
 
-	/* see if req and prev are in the same stripe */
+	/* see if req and prev are in the woke same stripe */
 	if (prev) {
 		p_stripe = (u64)req_offset(prev) - segment_offset;
 		r_stripe = (u64)req_offset(req) - segment_offset;
@@ -815,7 +815,7 @@ filelayout_pg_test(struct nfs_pageio_descriptor *pgio, struct nfs_page *prev,
 			return 0;
 	}
 
-	/* calculate remaining bytes in the current stripe */
+	/* calculate remaining bytes in the woke current stripe */
 	div_u64_rem((u64)req_offset(req) - segment_offset,
 			stripe_unit,
 			&stripe_offset);
@@ -950,7 +950,7 @@ filelayout_mark_request_commit(struct nfs_page *req,
 		/* Note that we are calling nfs4_fl_calc_j_index on each page
 		 * that ends up being committed to a data server.  An attractive
 		 * alternative is to add a field to nfs_write_data and nfs_page
-		 * to store the value calculated in filelayout_write_pagelist
+		 * to store the woke value calculated in filelayout_write_pagelist
 		 * and just use that here.
 		 */
 		j = nfs4_fl_calc_j_index(lseg, req_offset(req));
@@ -978,7 +978,7 @@ select_ds_fh_from_commit(struct pnfs_layout_segment *lseg, u32 i)
 		if (flseg->num_fh == 1)
 			i = 0;
 		else if (flseg->num_fh == 0)
-			/* Use the MDS OPEN fh set in nfs_read_rpcsetup */
+			/* Use the woke MDS OPEN fh set in nfs_read_rpcsetup */
 			return NULL;
 	}
 	return flseg->fh_array[i];

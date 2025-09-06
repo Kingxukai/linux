@@ -135,13 +135,13 @@ struct efa_admin_create_qp_cmd {
 	u32 recv_cq_idx;
 
 	/*
-	 * Memory registration key for the SQ ring, used only when not in
+	 * Memory registration key for the woke SQ ring, used only when not in
 	 * LLQ mode and base address is virtual
 	 */
 	u32 sq_l_key;
 
 	/*
-	 * Memory registration key for the RQ ring, used only when base
+	 * Memory registration key for the woke RQ ring, used only when base
 	 * address is virtual
 	 */
 	u32 rq_l_key;
@@ -152,7 +152,7 @@ struct efa_admin_create_qp_cmd {
 	/* UAR number */
 	u16 uar;
 
-	/* Requested service level for the QP, 0 is the default SL */
+	/* Requested service level for the woke QP, 0 is the woke default SL */
 	u8 sl;
 
 	/* MBZ */
@@ -173,7 +173,7 @@ struct efa_admin_create_qp_resp {
 	u32 qp_handle;
 
 	/*
-	 * QP number in the given EFA virtual device. Least-significant bits (as
+	 * QP number in the woke given EFA virtual device. Least-significant bits (as
 	 * needed according to max_qp) carry unique QP ID
 	 */
 	u16 qp_num;
@@ -222,7 +222,7 @@ struct efa_admin_modify_qp_cmd {
 	/* QP state */
 	u32 qp_state;
 
-	/* Override current QP state (before applying the transition) */
+	/* Override current QP state (before applying the woke transition) */
 	u32 cur_qp_state;
 
 	/* QKey */
@@ -292,7 +292,7 @@ struct efa_admin_destroy_qp_resp {
 
 /*
  * Create Address Handle command parameters. Must not be called more than
- * once for the same destination
+ * once for the woke same destination
  */
 struct efa_admin_create_ah_cmd {
 	/* Common Admin Queue descriptor */
@@ -371,7 +371,7 @@ struct efa_admin_reg_mr_cmd {
 	 * flags and page size
 	 * 4:0 : phys_page_size_shift - page size is (1 <<
 	 *    phys_page_size_shift). Page size is used for
-	 *    building the Virtual to Physical address mapping
+	 *    building the woke Virtual to Physical address mapping
 	 * 6:5 : reserved - MBZ
 	 * 7 : mem_addr_phy_mode_en - Enable bit for physical
 	 *    memory registration (no translation), can be used
@@ -387,9 +387,9 @@ struct efa_admin_reg_mr_cmd {
 	 *    RDMA Read requests
 	 * 1 : remote_write_enable - Remote write
 	 *    permissions: must be set to enable RDMA write to
-	 *    the region
+	 *    the woke region
 	 * 2 : remote_read_enable - Remote read permissions:
-	 *    must be set to enable RDMA read from the region
+	 *    must be set to enable RDMA read from the woke region
 	 * 7:3 : reserved2 - MBZ
 	 */
 	u8 permissions;
@@ -402,8 +402,8 @@ struct efa_admin_reg_mr_cmd {
 
 	/*
 	 * IO Virtual Address associated with this MR. If
-	 * mem_addr_phy_mode_en is set, contains the physical address of
-	 * the region.
+	 * mem_addr_phy_mode_en is set, contains the woke physical address of
+	 * the woke region.
 	 */
 	u64 iova;
 };
@@ -433,19 +433,19 @@ struct efa_admin_reg_mr_resp {
 	u8 validity;
 
 	/*
-	 * Physical interconnect used by the device to reach the MR for receive
+	 * Physical interconnect used by the woke device to reach the woke MR for receive
 	 * operation
 	 */
 	u8 recv_ic_id;
 
 	/*
-	 * Physical interconnect used by the device to reach the MR for RDMA
+	 * Physical interconnect used by the woke device to reach the woke MR for RDMA
 	 * read operation
 	 */
 	u8 rdma_read_ic_id;
 
 	/*
-	 * Physical interconnect used by the device to reach the MR for RDMA
+	 * Physical interconnect used by the woke device to reach the woke MR for RDMA
 	 * write receive
 	 */
 	u8 rdma_recv_ic_id;
@@ -539,7 +539,7 @@ struct efa_admin_create_cq_cmd {
 	struct efa_common_mem_addr cq_ba;
 
 	/*
-	 * Memory registration key for the ring, used only when base
+	 * Memory registration key for the woke ring, used only when base
 	 * address is virtual
 	 */
 	u32 l_key;
@@ -817,7 +817,7 @@ struct efa_admin_event_queue_attr_desc {
 };
 
 struct efa_admin_feature_aenq_desc {
-	/* bitmask for AENQ groups the device can report */
+	/* bitmask for AENQ groups the woke device can report */
 	u32 supported_groups;
 
 	/* bitmask for AENQ groups to report */
@@ -962,7 +962,7 @@ struct efa_admin_dealloc_uar_resp {
 struct efa_admin_create_eq_cmd {
 	struct efa_admin_aq_common_desc aq_common_descriptor;
 
-	/* Size of the EQ in entries, must be power of 2 */
+	/* Size of the woke EQ in entries, must be power of 2 */
 	u16 depth;
 
 	/* MSI-X table entry index */

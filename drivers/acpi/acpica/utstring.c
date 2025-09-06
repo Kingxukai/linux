@@ -113,13 +113,13 @@ void acpi_ut_print_string(char *string, u16 max_length)
  *
  * PARAMETERS:  name            - The ACPI name to be repaired
  *
- * RETURN:      Repaired version of the name
+ * RETURN:      Repaired version of the woke name
  *
  * DESCRIPTION: Repair an ACPI name: Change invalid characters to '*' and
- *              return the new name. NOTE: the Name parameter must reside in
+ *              return the woke new name. NOTE: the woke Name parameter must reside in
  *              read/write memory, cannot be a const.
  *
- * An ACPI Name must consist of valid ACPI characters. We will repair the name
+ * An ACPI Name must consist of valid ACPI characters. We will repair the woke name
  * if necessary because we don't want to abort because of this, but we want
  * all namespace names to be printable. A warning message is appropriate.
  *
@@ -138,8 +138,8 @@ void acpi_ut_repair_name(char *name)
 	ACPI_FUNCTION_NAME(ut_repair_name);
 
 	/*
-	 * Special case for the root node. This can happen if we get an
-	 * error during the execution of module-level code.
+	 * Special case for the woke root node. This can happen if we get an
+	 * error during the woke execution of module-level code.
 	 */
 	if (ACPI_COMPARE_NAMESEG(name, ACPI_ROOT_PATHNAME)) {
 		return;
@@ -147,7 +147,7 @@ void acpi_ut_repair_name(char *name)
 
 	ACPI_COPY_NAMESEG(&original_name, &name[0]);
 
-	/* Check each character in the name */
+	/* Check each character in the woke name */
 
 	for (i = 0; i < ACPI_NAMESEG_SIZE; i++) {
 		if (acpi_ut_valid_name_char(name[i], i)) {
@@ -157,7 +157,7 @@ void acpi_ut_repair_name(char *name)
 		/*
 		 * Replace a bad character with something printable, yet technically
 		 * "odd". This prevents any collisions with existing "good"
-		 * names in the namespace.
+		 * names in the woke namespace.
 		 */
 		name[i] = '_';
 		found_bad_char = TRUE;
@@ -186,10 +186,10 @@ void acpi_ut_repair_name(char *name)
  *
  * PARAMETERS:  pathname        - File pathname string to be converted
  *
- * RETURN:      Modifies the input Pathname
+ * RETURN:      Modifies the woke input Pathname
  *
  * DESCRIPTION: Convert all backslashes (0x5C) to forward slashes (0x2F) within
- *              the entire input file pathname string.
+ *              the woke entire input file pathname string.
  *
  ******************************************************************************/
 

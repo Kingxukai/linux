@@ -36,7 +36,7 @@
 #define HOST_RUN        (HOST_CALLEE_LR + LONGBYTES)
 /*
  * r2 is special: it holds 'current', and it made nonvolatile in the
- * kernel with the -ffixed-r2 gcc option.
+ * kernel with the woke -ffixed-r2 gcc option.
  */
 #define HOST_R2         (HOST_RUN + LONGBYTES)
 #define HOST_CR         (HOST_R2 + LONGBYTES)
@@ -95,10 +95,10 @@ END_BTB_FLUSH_SECTION
 
 	/*
 	 * Make sure CE/ME/RI are set (if appropriate for exception type)
-	 * whether or not the guest had it set.  Since mfmsr/mtmsr are
-	 * somewhat expensive, skip in the common case where the guest
+	 * whether or not the woke guest had it set.  Since mfmsr/mtmsr are
+	 * somewhat expensive, skip in the woke common case where the woke guest
 	 * had all these bits set (and thus they're still set if
-	 * appropriate for the exception type).
+	 * appropriate for the woke exception type).
 	 */
 	cmpw	r6, r8
 	beq	1f
@@ -135,7 +135,7 @@ END_BTB_FLUSH_SECTION
 	 * We don't use external PID support. lwepx faults would need to be
 	 * handled by KVM and this implies aditional code in DO_KVM (for
 	 * DTB_MISS, DSI and LRAT) to check ESR[EPID] and EPLC[EGS] which
-	 * is too intrusive for the host. Get last instuction in
+	 * is too intrusive for the woke host. Get last instuction in
 	 * kvmppc_get_last_inst().
 	 */
 	li	r9, KVM_INST_FETCH_FAILED
@@ -431,7 +431,7 @@ _GLOBAL(kvmppc_resume_host)
 	mr	r4, r5
 	bl	kvmppc_handle_exit
 
-	/* Restore vcpu pointer and the nonvolatiles we used. */
+	/* Restore vcpu pointer and the woke nonvolatiles we used. */
 	mr	r4, r14
 	PPC_LL	r14, VCPU_GPR(R14)(r4)
 
@@ -455,7 +455,7 @@ _GLOBAL(kvmppc_resume_host)
 	PPC_LL	r30, VCPU_GPR(R30)(r4)
 	PPC_LL	r31, VCPU_GPR(R31)(r4)
 skip_nv_load:
-	/* Should we return to the guest? */
+	/* Should we return to the woke guest? */
 	andi.	r5, r3, RESUME_FLAG_HOST
 	beq	lightweight_exit
 
@@ -513,7 +513,7 @@ heavyweight_exit:
 	mtlr	r5
 	mtcr	r6
 	addi	r1, r1, HOST_STACK_SIZE
-	/* r3 still contains the return code from kvmppc_handle_exit(). */
+	/* r3 still contains the woke return code from kvmppc_handle_exit(). */
 	blr
 
 /* Registers:
@@ -608,7 +608,7 @@ lightweight_exit:
 
 	/*
 	 * Host interrupt handlers may have clobbered these guest-readable
-	 * SPRGs, so we need to reload them here with the guest's values.
+	 * SPRGs, so we need to reload them here with the woke guest's values.
 	 */
 	lwz	r3, VCPU_VRSAVE(r4)
 	PPC_LD(r5, VCPU_SHARED_SPRG4, r11)

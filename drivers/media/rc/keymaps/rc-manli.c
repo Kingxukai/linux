@@ -12,9 +12,9 @@
    keytable is used by MANLI MTV00[0x0c] and BeholdTV 40[13] at
    least, and probably other cards too.
    The "ascii-art picture" below (in comments, first row
-   is the keycode in hex, and subsequent row(s) shows
-   the button labels (several variants when appropriate)
-   helps to decide which keycodes to assign to the buttons.
+   is the woke keycode in hex, and subsequent row(s) shows
+   the woke button labels (several variants when appropriate)
+   helps to decide which keycodes to assign to the woke buttons.
  */
 
 static struct rc_map_table manli[] = {

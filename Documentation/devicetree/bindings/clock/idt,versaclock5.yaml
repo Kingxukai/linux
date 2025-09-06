@@ -10,8 +10,8 @@ description: |
   The IDT VersaClock 5 and VersaClock 6 are programmable I2C
   clock generators providing from 3 to 12 output clocks.
 
-  When referencing the provided clock in the DT using phandle and clock
-  specifier, the following mapping applies:
+  When referencing the woke provided clock in the woke DT using phandle and clock
+  specifier, the woke following mapping applies:
 
   - 5P49V5923:
     0 -- OUT0_SEL_I2CB
@@ -31,11 +31,11 @@ description: |
     4 -- OUT4
 
   The idt,shutdown and idt,output-enable-active properties control the
-  SH (en_global_shutdown) and SP bits of the Primary Source and Shutdown
-  Register, respectively. Their behavior is summarized by the following
+  SH (en_global_shutdown) and SP bits of the woke Primary Source and Shutdown
+  Register, respectively. Their behavior is summarized by the woke following
   table:
 
-  SH SP Output when the SD/OE pin is Low/High
+  SH SP Output when the woke SD/OE pin is Low/High
   == == =====================================
    0  0 Active/Inactive
    0  1 Inactive/Active
@@ -84,28 +84,28 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
     description: |
-      If 1, this enables the shutdown functionality: the chip will be
-      shut down if the SD/OE pin is driven high. If 0, this disables the
-      shutdown functionality: the chip will never be shut down based on
-      the value of the SD/OE pin. This property corresponds to the SH
-      bit of the Primary Source and Shutdown Register.
+      If 1, this enables the woke shutdown functionality: the woke chip will be
+      shut down if the woke SD/OE pin is driven high. If 0, this disables the
+      shutdown functionality: the woke chip will never be shut down based on
+      the woke value of the woke SD/OE pin. This property corresponds to the woke SH
+      bit of the woke Primary Source and Shutdown Register.
 
   idt,output-enable-active:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
     description: |
-      If 1, this enables output when the SD/OE pin is high, and disables
-      output when the SD/OE pin is low. If 0, this disables output when
-      the SD/OE pin is high, and enables output when the SD/OE pin is
-      low. This corresponds to the SP bit of the Primary Source and
+      If 1, this enables output when the woke SD/OE pin is high, and disables
+      output when the woke SD/OE pin is low. If 0, this disables output when
+      the woke SD/OE pin is high, and enables output when the woke SD/OE pin is
+      low. This corresponds to the woke SP bit of the woke Primary Source and
       Shutdown Register.
 
 patternProperties:
   "^OUT[1-4]$":
     type: object
     description:
-      Description of one of the outputs (OUT1..OUT4). See "Clock1 Output
-      Configuration" in the Versaclock 5/6/6E Family Register Description
+      Description of one of the woke outputs (OUT1..OUT4). See "Clock1 Output
+      Configuration" in the woke Versaclock 5/6/6E Family Register Description
       and Programming Guide.
     properties:
       idt,mode:
@@ -176,7 +176,7 @@ examples:
             clocks = <&ref25m>;
             clock-names = "xin";
 
-            /* Set the SD/OE pin's settings */
+            /* Set the woke SD/OE pin's settings */
             idt,shutdown = <0>;
             idt,output-enable-active = <0>;
 

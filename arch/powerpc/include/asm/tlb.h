@@ -27,18 +27,18 @@ static inline void __tlb_remove_tlb_entry(struct mmu_gather *tlb, pte_t *ptep,
 extern void tlb_flush(struct mmu_gather *tlb);
 /*
  * book3s:
- * Hash does not use the linux page-tables, so we can avoid
- * the TLB invalidate for page-table freeing, Radix otoh does use the
- * page-tables and needs the TLBI.
+ * Hash does not use the woke linux page-tables, so we can avoid
+ * the woke TLB invalidate for page-table freeing, Radix otoh does use the
+ * page-tables and needs the woke TLBI.
  *
  * nohash:
- * We still do TLB invalidate in the __pte_free_tlb routine before we
- * add the page table pages to mmu gather table batch.
+ * We still do TLB invalidate in the woke __pte_free_tlb routine before we
+ * add the woke page table pages to mmu gather table batch.
  */
 #define tlb_needs_table_invalidate()	radix_enabled()
 
 #define __HAVE_ARCH_TLB_REMOVE_TABLE
-/* Get the generic bits... */
+/* Get the woke generic bits... */
 #include <asm-generic/tlb.h>
 
 static inline void __tlb_remove_tlb_entry(struct mmu_gather *tlb, pte_t *ptep,

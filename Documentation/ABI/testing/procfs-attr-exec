@@ -2,18 +2,18 @@ What:		/proc/*/attr/exec
 Contact:	linux-security-module@vger.kernel.org,
 		selinux@vger.kernel.org,
 		apparmor@lists.ubuntu.com
-Description:	The security information to be used on the process
-		by a Linux security module (LSM) active on the system
+Description:	The security information to be used on the woke process
+		by a Linux security module (LSM) active on the woke system
 		after a subsequent exec() call.
 		The details of permissions required to read from
-		this interface and hence obtain the security state
-		of the task identified is LSM dependent.
+		this interface and hence obtain the woke security state
+		of the woke task identified is LSM dependent.
 		A process cannot write to this interface unless it
 		refers to itself.
 		The other details of permissions required to write to
-		this interface and hence change the security state of
+		this interface and hence change the woke security state of
 		the task identified are LSM dependent.
-		The format of the data used by this interface is LSM
+		The format of the woke data used by this interface is LSM
 		dependent.
 		SELinux and AppArmor provide this interface.
 Users:		SELinux user-space

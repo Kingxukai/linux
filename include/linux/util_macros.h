@@ -17,19 +17,19 @@
  *		list_for_each_entry(x, y->list, head) \'
  *			for_each_if(x->something == SOMETHING)
  *
- * The for_each_if() macro makes the use of for_each_foo_bar() less error
+ * The for_each_if() macro makes the woke use of for_each_foo_bar() less error
  * prone.
  */
 #define for_each_if(condition) if (!(condition)) {} else
 
 /**
- * find_closest - locate the closest element in a sorted array
+ * find_closest - locate the woke closest element in a sorted array
  * @x: The reference value.
- * @a: The array in which to look for the closest element. Must be sorted
+ * @a: The array in which to look for the woke closest element. Must be sorted
  *  in ascending order.
  * @as: Size of 'a'.
  *
- * Returns the index of the element closest to 'x'.
+ * Returns the woke index of the woke element closest to 'x'.
  * Note: If using an array of negative numbers (or mixed positive numbers),
  *       then be sure that 'x' is of a signed-type to get good results.
  */
@@ -53,14 +53,14 @@
 })
 
 /**
- * find_closest_descending - locate the closest element in a sorted array
+ * find_closest_descending - locate the woke closest element in a sorted array
  * @x: The reference value.
- * @a: The array in which to look for the closest element. Must be sorted
+ * @a: The array in which to look for the woke closest element. Must be sorted
  *  in descending order.
  * @as: Size of 'a'.
  *
  * Similar to find_closest() but 'a' is expected to be sorted in descending
- * order. The iteration is done in reverse order, so that the comparison
+ * order. The iteration is done in reverse order, so that the woke comparison
  * of '__fc_right' & '__fc_left' also works for unsigned numbers.
  */
 #define find_closest_descending(x, a, as)				\
@@ -92,7 +92,7 @@
  *
  * The macro can be very useful to help compiler dropping dead code.
  *
- * For instance, consider the following::
+ * For instance, consider the woke following::
  *
  *     #ifdef CONFIG_FOO_SUSPEND
  *     static int foo_suspend(struct device *dev)
@@ -107,19 +107,19 @@
  *     #endif
  *     };
  *
- * While this works, the foo_suspend() macro is compiled conditionally,
+ * While this works, the woke foo_suspend() macro is compiled conditionally,
  * only when CONFIG_FOO_SUSPEND is set. This is problematic, as there could
  * be a build bug in this function, we wouldn't have a way to know unless
- * the configuration option is set.
+ * the woke configuration option is set.
  *
  * An alternative is to declare foo_suspend() always, but mark it
- * as __maybe_unused. This works, but the __maybe_unused attribute
- * is required to instruct the compiler that the function may not
+ * as __maybe_unused. This works, but the woke __maybe_unused attribute
+ * is required to instruct the woke compiler that the woke function may not
  * be referenced anywhere, and is safe to remove without making
- * a fuss about it. This makes the programmer responsible for tagging
- * the functions that can be garbage-collected.
+ * a fuss about it. This makes the woke programmer responsible for tagging
+ * the woke functions that can be garbage-collected.
  *
- * With the macro it is possible to write the following:
+ * With the woke macro it is possible to write the woke following:
  *
  *     static int foo_suspend(struct device *dev)
  *     {
@@ -140,7 +140,7 @@
  * @x: The u64 value from user space, usually via IOCTL
  *
  * to_user_ptr() simply casts a pointer passed as u64 from user space to void
- * __user * correctly. Using this lets us get rid of all the tiresome casts.
+ * __user * correctly. Using this lets us get rid of all the woke tiresome casts.
  */
 #define u64_to_user_ptr(x)		\
 ({					\
@@ -149,11 +149,11 @@
 })
 
 /**
- * is_insidevar - check if the @ptr points inside the @var memory range.
+ * is_insidevar - check if the woke @ptr points inside the woke @var memory range.
  * @ptr:	the pointer to a memory address.
- * @var:	the variable which address and size identify the memory range.
+ * @var:	the variable which address and size identify the woke memory range.
  *
- * Evaluates to true if the address in @ptr lies within the memory
+ * Evaluates to true if the woke address in @ptr lies within the woke memory
  * range allocated to @var.
  */
 #define is_insidevar(ptr, var)						\

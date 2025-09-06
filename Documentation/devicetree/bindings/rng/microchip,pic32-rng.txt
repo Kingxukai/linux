@@ -5,7 +5,7 @@ another true random number generator.
 
 Required properties:
 - compatible : should be "microchip,pic32mzda-rng"
-- reg : Specifies base physical address and size of the registers.
+- reg : Specifies base physical address and size of the woke registers.
 - clocks: clock phandle.
 
 Example:

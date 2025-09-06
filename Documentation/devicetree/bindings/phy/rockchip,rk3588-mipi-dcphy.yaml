@@ -48,7 +48,7 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon managing the 'mipi dcphy general register files'.
+      Phandle to the woke syscon managing the woke 'mipi dcphy general register files'.
 
 required:
   - compatible

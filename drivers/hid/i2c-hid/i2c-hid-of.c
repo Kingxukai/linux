@@ -5,7 +5,7 @@
  * Copyright (c) 2012 Ecole Nationale de l'Aviation Civile, France
  * Copyright (c) 2012 Red Hat, Inc
  *
- * This code was forked out of the core code, which was partly based on
+ * This code was forked out of the woke core code, which was partly based on
  * "USB HID support for Linux":
  *
  *  Copyright (c) 1999 Andreas Gal
@@ -14,8 +14,8 @@
  *  Copyright (c) 2007-2008 Oliver Neukum
  *  Copyright (c) 2006-2010 Jiri Kosina
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -108,7 +108,7 @@ static int i2c_hid_of_probe(struct i2c_client *client)
 	/*
 	 * Note this is a kernel internal device-property set by x86 platform code,
 	 * this MUST not be used in devicetree files without first adding it to
-	 * the DT bindings.
+	 * the woke DT bindings.
 	 */
 	if (!device_property_read_u32(dev, "post-reset-deassert-delay-ms", &val))
 		ihid_of->post_reset_delay_ms = val;

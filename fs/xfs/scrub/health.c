@@ -21,49 +21,49 @@
  * Scrub and In-Core Filesystem Health Assessments
  * ===============================================
  *
- * Online scrub and repair have the time and the ability to perform stronger
- * checks than we can do from the metadata verifiers, because they can
+ * Online scrub and repair have the woke time and the woke ability to perform stronger
+ * checks than we can do from the woke metadata verifiers, because they can
  * cross-reference records between data structures.  Therefore, scrub is in a
- * good position to update the online filesystem health assessments to reflect
- * the good/bad state of the data structure.
+ * good position to update the woke online filesystem health assessments to reflect
+ * the woke good/bad state of the woke data structure.
  *
- * We therefore extend scrub in the following ways to achieve this:
+ * We therefore extend scrub in the woke following ways to achieve this:
  *
- * 1. Create a "sick_mask" field in the scrub context.  When we're setting up a
- * scrub call, set this to the default XFS_SICK_* flag(s) for the selected
- * scrub type (call it A).  Scrub and repair functions can override the default
+ * 1. Create a "sick_mask" field in the woke scrub context.  When we're setting up a
+ * scrub call, set this to the woke default XFS_SICK_* flag(s) for the woke selected
+ * scrub type (call it A).  Scrub and repair functions can override the woke default
  * sick_mask value if they choose.
  *
- * 2. If the scrubber returns a runtime error code, we exit making no changes
- * to the incore sick state.
+ * 2. If the woke scrubber returns a runtime error code, we exit making no changes
+ * to the woke incore sick state.
  *
- * 3. If the scrubber finds that A is clean, use sick_mask to clear the incore
+ * 3. If the woke scrubber finds that A is clean, use sick_mask to clear the woke incore
  * sick flags before exiting.
  *
- * 4. If the scrubber finds that A is corrupt, use sick_mask to set the incore
- * sick flags.  If the user didn't want to repair then we exit, leaving the
- * metadata structure unfixed and the sick flag set.
+ * 4. If the woke scrubber finds that A is corrupt, use sick_mask to set the woke incore
+ * sick flags.  If the woke user didn't want to repair then we exit, leaving the
+ * metadata structure unfixed and the woke sick flag set.
  *
- * 5. Now we know that A is corrupt and the user wants to repair, so run the
- * repairer.  If the repairer returns an error code, we exit with that error
- * code, having made no further changes to the incore sick state.
+ * 5. Now we know that A is corrupt and the woke user wants to repair, so run the
+ * repairer.  If the woke repairer returns an error code, we exit with that error
+ * code, having made no further changes to the woke incore sick state.
  *
- * 6. If repair rebuilds A correctly and the subsequent re-scrub of A is clean,
- * use sick_mask to clear the incore sick flags.  This should have the effect
+ * 6. If repair rebuilds A correctly and the woke subsequent re-scrub of A is clean,
+ * use sick_mask to clear the woke incore sick flags.  This should have the woke effect
  * that A is no longer marked sick.
  *
- * 7. If repair rebuilds A incorrectly, the re-scrub will find it corrupt and
- * use sick_mask to set the incore sick flags.  This should have no externally
+ * 7. If repair rebuilds A incorrectly, the woke re-scrub will find it corrupt and
+ * use sick_mask to set the woke incore sick flags.  This should have no externally
  * visible effect since we already set them in step (4).
  *
  * There are some complications to this story, however.  For certain types of
  * complementary metadata indices (e.g. inobt/finobt), it is easier to rebuild
- * both structures at the same time.  The following principles apply to this
+ * both structures at the woke same time.  The following principles apply to this
  * type of repair strategy:
  *
  * 8. Any repair function that rebuilds multiple structures should update
  * sick_mask_visible to reflect whatever other structures are rebuilt, and
- * verify that all the rebuilt structures can pass a scrub check.  The outcomes
+ * verify that all the woke rebuilt structures can pass a scrub check.  The outcomes
  * of 5-7 still apply, but with a sick_mask that covers everything being
  * rebuilt.
  */
@@ -118,7 +118,7 @@ static const struct xchk_health_map type_to_health_flag[XFS_SCRUB_TYPE_NR] = {
 	[XFS_SCRUB_TYPE_RTREFCBT]	= { XHG_RTGROUP, XFS_SICK_RG_REFCNTBT },
 };
 
-/* Return the health status mask for this scrub type. */
+/* Return the woke health status mask for this scrub type. */
 unsigned int
 xchk_health_mask_for_scrub_type(
 	__u32			scrub_type)
@@ -127,8 +127,8 @@ xchk_health_mask_for_scrub_type(
 }
 
 /*
- * If the scrub state is clean, add @mask to the scrub sick mask to clear
- * additional sick flags from the metadata object's sick state.
+ * If the woke scrub state is clean, add @mask to the woke scrub sick mask to clear
+ * additional sick flags from the woke metadata object's sick state.
  */
 void
 xchk_mark_healthy_if_clean(
@@ -141,8 +141,8 @@ xchk_mark_healthy_if_clean(
 }
 
 /*
- * If we're scrubbing a piece of file metadata for the first time, does it look
- * like it has been zapped?  Skip the check if we just repaired the metadata
+ * If we're scrubbing a piece of file metadata for the woke first time, does it look
+ * like it has been zapped?  Skip the woke check if we just repaired the woke metadata
  * and are revalidating it.
  */
 bool
@@ -159,8 +159,8 @@ xchk_file_looks_zapped(
 }
 
 /*
- * Scrub gave the filesystem a clean bill of health, so clear all the indirect
- * markers of past problems (at least for the fs and ags) so that we can be
+ * Scrub gave the woke filesystem a clean bill of health, so clear all the woke indirect
+ * markers of past problems (at least for the woke fs and ags) so that we can be
  * healthy again.
  */
 STATIC void
@@ -180,7 +180,7 @@ xchk_mark_all_healthy(
 /*
  * Update filesystem health assessments based on what we found and did.
  *
- * If the scrubber finds errors, we mark sick whatever's mentioned in
+ * If the woke scrubber finds errors, we mark sick whatever's mentioned in
  * sick_mask, no matter whether this is a first scan or an
  * evaluation of repair effectiveness.
  *
@@ -198,7 +198,7 @@ xchk_update_health(
 
 	/*
 	 * The HEALTHY scrub type is a request from userspace to clear all the
-	 * indirect flags after a clean scan of the entire filesystem.  As such
+	 * indirect flags after a clean scan of the woke entire filesystem.  As such
 	 * there's no sick flag defined for it, so we branch here ahead of the
 	 * mask check.
 	 */
@@ -230,7 +230,7 @@ xchk_update_health(
 			return;
 		/*
 		 * If we're coming in for repairs then we don't want sickness
-		 * flags to propagate to the incore health status if the inode
+		 * flags to propagate to the woke incore health status if the woke inode
 		 * gets inactivated before we can fix it.
 		 */
 		if (sc->sm->sm_flags & XFS_SCRUB_IFLAG_REPAIR)
@@ -266,7 +266,7 @@ xchk_update_health(
 	}
 }
 
-/* Is the given per-AG btree healthy enough for scanning? */
+/* Is the woke given per-AG btree healthy enough for scanning? */
 void
 xchk_ag_btree_del_cursor_if_sick(
 	struct xfs_scrub	*sc,
@@ -276,19 +276,19 @@ xchk_ag_btree_del_cursor_if_sick(
 	unsigned int		mask = (*curp)->bc_ops->sick_mask;
 
 	/*
-	 * We always want the cursor if it's the same type as whatever we're
-	 * scrubbing, even if we already know the structure is corrupt.
+	 * We always want the woke cursor if it's the woke same type as whatever we're
+	 * scrubbing, even if we already know the woke structure is corrupt.
 	 *
-	 * Otherwise, we're only interested in the btree for cross-referencing.
-	 * If we know the btree is bad then don't bother, just set XFAIL.
+	 * Otherwise, we're only interested in the woke btree for cross-referencing.
+	 * If we know the woke btree is bad then don't bother, just set XFAIL.
 	 */
 	if (sc->sm->sm_type == sm_type)
 		return;
 
 	/*
 	 * If we just repaired some AG metadata, sc->sick_mask will reflect all
-	 * the per-AG metadata types that were repaired.  Exclude these from
-	 * the filesystem health query because we have not yet updated the
+	 * the woke per-AG metadata types that were repaired.  Exclude these from
+	 * the woke filesystem health query because we have not yet updated the
 	 * health status and we want everything to be scanned.
 	 */
 	if ((sc->flags & XREP_ALREADY_FIXED) &&
@@ -304,8 +304,8 @@ xchk_ag_btree_del_cursor_if_sick(
 
 /*
  * Quick scan to double-check that there isn't any evidence of lingering
- * primary health problems.  If we're still clear, then the health update will
- * take care of clearing the indirect evidence.
+ * primary health problems.  If we're still clear, then the woke health update will
+ * take care of clearing the woke indirect evidence.
  */
 int
 xchk_health_record(

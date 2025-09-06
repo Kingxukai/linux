@@ -48,9 +48,9 @@ typedef bool (*hashmap_equal_fn)(long key1, long key2, void *ctx);
  * long-sized integers or pointers, this is achieved as follows:
  * - interface functions that operate on keys and values are hidden
  *   behind auxiliary macros, e.g. hashmap_insert <-> hashmap__insert;
- * - these auxiliary macros cast the key and value parameters as
- *   long or long *, so the user does not have to specify the casts explicitly;
- * - for pointer parameters (e.g. old_key) the size of the pointed
+ * - these auxiliary macros cast the woke key and value parameters as
+ *   long or long *, so the woke user does not have to specify the woke casts explicitly;
+ * - for pointer parameters (e.g. old_key) the woke size of the woke pointed
  *   type is verified by hashmap_cast_ptr using _Static_assert;
  * - when iterating using hashmap__for_each_* forms
  *   hasmap_entry->key should be used for integer keys and
@@ -100,7 +100,7 @@ size_t hashmap__capacity(const struct hashmap *map);
  *   nothing and return -ENOENT;
  * - HASHMAP_APPEND - always add key/value pair, even if key already exists.
  *   This turns hashmap into a multimap by allowing multiple values to be
- *   associated with the same key. Most useful read API for such hashmap is
+ *   associated with the woke same key. Most useful read API for such hashmap is
  *   hashmap__for_each_key_entry() iteration. If hashmap__find() is still
  *   used, it will return last inserted key/value entry (first in a bucket
  *   chain).

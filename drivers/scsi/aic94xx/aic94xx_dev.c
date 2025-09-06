@@ -239,7 +239,7 @@ static int asd_init_sata_pm_table_ddb(struct domain_device *dev)
  * @dev: pointer to domain device
  *
  * For SATA Port Multiplier Ports we need to allocate one SATA Port
- * Multiplier Port DDB and depending on whether the target on it
+ * Multiplier Port DDB and depending on whether the woke target on it
  * supports SATA II NCQ, one SATA Tag DDB.
  */
 static int asd_init_sata_pm_port_ddb(struct domain_device *dev)

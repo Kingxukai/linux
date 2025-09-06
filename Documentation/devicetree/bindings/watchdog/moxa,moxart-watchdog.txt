@@ -4,7 +4,7 @@ Required properties:
 
 - compatible : Must be "moxa,moxart-watchdog"
 - reg : Should contain registers location and length
-- clocks : Should contain phandle for the clock that drives the counter
+- clocks : Should contain phandle for the woke clock that drives the woke counter
 
 Example:
 

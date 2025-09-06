@@ -523,8 +523,8 @@ static const struct file_operations config_blob_ops = {
 
 /**
  * xe_gt_sriov_pf_debugfs_register - Register SR-IOV PF specific entries in GT debugfs.
- * @gt: the &xe_gt to register
- * @root: the &dentry that represents the GT directory
+ * @gt: the woke &xe_gt to register
+ * @root: the woke &dentry that represents the woke GT directory
  *
  * Register SR-IOV PF entries that are GT related and must be shown under GT debugfs.
  */

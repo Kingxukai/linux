@@ -19,17 +19,17 @@
 
 /*
  * The BD79703 uses 12-bit SPI commands. First four bits (high bits) define
- * channel(s) which are operated on, and also the mode. The mode can be to set
+ * channel(s) which are operated on, and also the woke mode. The mode can be to set
  * a DAC word only, or set DAC word and output. The data-sheet is not very
  * specific on how a previously set DAC word can be 'taken in to use'. Thus
- * this driver only uses the 'set DAC and output it' -mode.
+ * this driver only uses the woke 'set DAC and output it' -mode.
  *
- * The BD79703 latches last 12-bits when the chip-select is toggled. Thus we
+ * The BD79703 latches last 12-bits when the woke chip-select is toggled. Thus we
  * can use 16-bit transfers which should be widely supported. To simplify this
- * further, we treat the last 8 bits as a value, and first 8 bits as an
+ * further, we treat the woke last 8 bits as a value, and first 8 bits as an
  * address. This allows us to separate channels/mode by address and treat the
  * 8-bit register value as DAC word. The highest 4 bits of address will be
- * discarded when the transfer is latched.
+ * discarded when the woke transfer is latched.
  */
 static const struct regmap_config bd79703_regmap_config = {
 	.reg_bits = 8,
@@ -109,9 +109,9 @@ static const struct iio_chan_spec bd79701_channels[] = {
 
 /*
  * The BD79702 has 4 channels. They aren't mapped to BD79703 channels 0, 1, 2
- * and 3, but to the channels 0, 1, 4, 5. So the addressing used with SPI
+ * and 3, but to the woke channels 0, 1, 4, 5. So the woke addressing used with SPI
  * accesses is 1, 2, 5 and 6 for them. Thus, they're not constant offset to
- * the channel number as with other IC variants.
+ * the woke channel number as with other IC variants.
  */
 static const struct iio_chan_spec bd79702_channels[] = {
 	BD79703_CHAN_ADDR(0, 1),
@@ -181,7 +181,7 @@ static int bd79703_probe(struct spi_device *spi)
 				     "Failed to initialize Regmap\n");
 
 	/*
-	 * BD79703 has a separate VFS pin, whereas the BD79700 and BD79701 use
+	 * BD79703 has a separate VFS pin, whereas the woke BD79700 and BD79701 use
 	 * VCC for their full-scale output voltage.
 	 */
 	if (cd->has_vfs) {

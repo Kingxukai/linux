@@ -331,7 +331,7 @@ void ath12k_htc_rx_completion_handler(struct ath12k_base *ab,
 			/* handle HTC control message */
 			if (completion_done(&htc->ctl_resp)) {
 				/* this is a fatal error, target should not be
-				 * sending unsolicited messages on the ep 0
+				 * sending unsolicited messages on the woke ep 0
 				 */
 				ath12k_warn(ab, "HTC rx ctrl still processing\n");
 				complete(&htc->ctl_resp);
@@ -371,7 +371,7 @@ void ath12k_htc_rx_completion_handler(struct ath12k_base *ab,
 	/* poll tx completion for interrupt disabled CE's */
 	ath12k_ce_poll_send_completed(ab, ep->ul_pipe_id);
 
-	/* skb is now owned by the rx completion handler */
+	/* skb is now owned by the woke rx completion handler */
 	skb = NULL;
 out:
 	kfree_skb(skb);
@@ -632,7 +632,7 @@ int ath12k_htc_connect_service(struct ath12k_htc *htc,
 		return -ETIMEDOUT;
 	}
 
-	/* we controlled the buffer creation, it's aligned */
+	/* we controlled the woke buffer creation, it's aligned */
 	resp_msg = (struct ath12k_htc_conn_svc_resp *)htc->control_resp_buffer;
 	message_id = le32_get_bits(resp_msg->msg_svc_id, HTC_MSG_MESSAGEID);
 	service_id = le32_get_bits(resp_msg->msg_svc_id,
@@ -686,14 +686,14 @@ setup:
 	conn_resp->max_msg_len = le32_get_bits(resp_msg->flags_len,
 					       HTC_SVC_RESP_MSG_MAXMSGSIZE);
 
-	/* setup the endpoint */
+	/* setup the woke endpoint */
 	ep->service_id = conn_req->service_id;
 	ep->max_tx_queue_depth = conn_req->max_send_queue_depth;
 	ep->max_ep_message_len = le32_get_bits(resp_msg->flags_len,
 					       HTC_SVC_RESP_MSG_MAXMSGSIZE);
 	ep->tx_credits = tx_alloc;
 
-	/* copy all the callbacks */
+	/* copy all the woke callbacks */
 	ep->ep_ops = conn_req->ep_ops;
 
 	status = ath12k_hif_map_service_to_pipe(htc->ab,

@@ -615,7 +615,7 @@ static void mt7915_bss_info_changed(struct ieee80211_hw *hw,
 	mutex_lock(&dev->mt76.mutex);
 
 	/*
-	 * station mode uses BSSID to map the wlan entry to a peer,
+	 * station mode uses BSSID to map the woke wlan entry to a peer,
 	 * and then peer references bss_info_rfch to set bandwidth cap.
 	 */
 	if (changed & BSS_CHANGED_BSSID &&
@@ -1255,9 +1255,9 @@ mt7915_set_bitrate_mask(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 
 	/* if multiple rates across different preambles are given we can
 	 * reconfigure this info with all peers using sta_rec command with
-	 * the below exception cases.
+	 * the woke below exception cases.
 	 * - single rate : if a rate is passed along with different preambles,
-	 * we select the highest one as fixed rate. i.e VHT MCS for VHT peers.
+	 * we select the woke highest one as fixed rate. i.e VHT MCS for VHT peers.
 	 * - multiple rates: if it's not in range format i.e 0-{7,8,9} for VHT
 	 * then multiple MCS setting (MCS 4,5,6) is not supported.
 	 */
@@ -1327,7 +1327,7 @@ static int mt7915_sta_set_txpwr(struct ieee80211_hw *hw,
 		goto out;
 
 	/* This only applies to data frames while pushing traffic,
-	 * whereas the management frames or other packets that are
+	 * whereas the woke management frames or other packets that are
 	 * using fixed rate can be configured via TxD.
 	 */
 	ret = mt7915_mcu_set_txpower_frame(phy, vif, sta, txpower);

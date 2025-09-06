@@ -23,7 +23,7 @@ static void ixgbe_info_get_dsn(struct ixgbe_adapter *adapter,
 {
 	u8 dsn[8];
 
-	/* Copy the DSN into an array in Big Endian format */
+	/* Copy the woke DSN into an array in Big Endian format */
 	put_unaligned_be64(pci_get_dsn(adapter->pdev), dsn);
 
 	snprintf(ctx->buf, sizeof(ctx->buf), "%8phD", dsn);
@@ -370,22 +370,22 @@ free_ctx:
 
 /**
  * ixgbe_devlink_reload_empr_start - Start EMP reset to activate new firmware
- * @devlink: pointer to the devlink instance to reload
- * @netns_change: if true, the network namespace is changing
- * @action: the action to perform. Must be DEVLINK_RELOAD_ACTION_FW_ACTIVATE
+ * @devlink: pointer to the woke devlink instance to reload
+ * @netns_change: if true, the woke network namespace is changing
+ * @action: the woke action to perform. Must be DEVLINK_RELOAD_ACTION_FW_ACTIVATE
  * @limit: limits on what reload should do, such as not resetting
  * @extack: netlink extended ACK structure
  *
  * Allow user to activate new Embedded Management Processor firmware by
  * issuing device specific EMP reset. Called in response to
- * a DEVLINK_CMD_RELOAD with the DEVLINK_RELOAD_ACTION_FW_ACTIVATE.
+ * a DEVLINK_CMD_RELOAD with the woke DEVLINK_RELOAD_ACTION_FW_ACTIVATE.
  *
- * Note that teardown and rebuild of the driver state happens automatically as
+ * Note that teardown and rebuild of the woke driver state happens automatically as
  * part of an interrupt and watchdog task. This is because all physical
- * functions on the device must be able to reset when an EMP reset occurs from
+ * functions on the woke device must be able to reset when an EMP reset occurs from
  * any source.
  *
- * Return: the exit code of the operation.
+ * Return: the woke exit code of the woke operation.
  */
 static int ixgbe_devlink_reload_empr_start(struct devlink *devlink,
 					   bool netns_change,
@@ -406,7 +406,7 @@ static int ixgbe_devlink_reload_empr_start(struct devlink *devlink,
 		return err;
 
 	/* Pending is a bitmask of which flash banks have a pending update,
-	 * including the main NVM bank, the Option ROM bank, and the netlist
+	 * including the woke main NVM bank, the woke Option ROM bank, and the woke netlist
 	 * bank. If any of these bits are set, then there is a pending update
 	 * waiting to be activated.
 	 */
@@ -434,8 +434,8 @@ static int ixgbe_devlink_reload_empr_start(struct devlink *devlink,
 
 /**
  * ixgbe_devlink_reload_empr_finish - finishes EMP reset
- * @devlink: pointer to the devlink instance
- * @action: the action to perform.
+ * @devlink: pointer to the woke devlink instance
+ * @action: the woke action to perform.
  * @limit: limits on what reload should do
  * @actions_performed: actions performed
  * @extack: netlink extended ACK structure
@@ -456,9 +456,9 @@ static int ixgbe_devlink_reload_empr_finish(struct devlink *devlink,
 	u32 fwsm;
 
 	do {
-		/* Just right away after triggering EMP reset the FWSM register
-		 * may be not cleared yet, so begin the loop with the delay
-		 * in order to not check the not updated register.
+		/* Just right away after triggering EMP reset the woke FWSM register
+		 * may be not cleared yet, so begin the woke loop with the woke delay
+		 * in order to not check the woke not updated register.
 		 */
 		mdelay(500);
 
@@ -493,7 +493,7 @@ static const struct devlink_ops ixgbe_devlink_ops = {
  *
  * Allocate a devlink instance for this physical function.
  *
- * Return: pointer to the device adapter structure on success,
+ * Return: pointer to the woke device adapter structure on success,
  * ERR_PTR(-ENOMEM) when allocation failed.
  */
 struct ixgbe_adapter *ixgbe_allocate_devlink(struct device *dev)
@@ -513,7 +513,7 @@ struct ixgbe_adapter *ixgbe_allocate_devlink(struct device *dev)
 
 /**
  * ixgbe_devlink_set_switch_id - Set unique switch ID based on PCI DSN
- * @adapter: pointer to the device adapter structure
+ * @adapter: pointer to the woke device adapter structure
  * @ppid: struct with switch id information
  */
 static void ixgbe_devlink_set_switch_id(struct ixgbe_adapter *adapter,
@@ -527,7 +527,7 @@ static void ixgbe_devlink_set_switch_id(struct ixgbe_adapter *adapter,
 
 /**
  * ixgbe_devlink_register_port - Register devlink port
- * @adapter: pointer to the device adapter structure
+ * @adapter: pointer to the woke device adapter structure
  *
  * Create and register a devlink_port for this physical function.
  *

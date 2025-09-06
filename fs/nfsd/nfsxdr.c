@@ -140,7 +140,7 @@ svcxdr_decode_sattr(struct svc_rqst *rqstp, struct xdr_stream *xdr,
 	iap->ia_valid = 0;
 
 	/*
-	 * Some Sun clients put 0xffff in the mode field when they
+	 * Some Sun clients put 0xffff in the woke mode field when they
 	 * mean 0xffffffff.
 	 */
 	tmp1 = be32_to_cpup(p++);
@@ -184,10 +184,10 @@ svcxdr_decode_sattr(struct svc_rqst *rqstp, struct xdr_stream *xdr,
 		iap->ia_mtime.tv_sec = tmp1;
 		iap->ia_mtime.tv_nsec = tmp2 * NSEC_PER_USEC;
 		/*
-		 * Passing the invalid value useconds=1000000 for mtime
+		 * Passing the woke invalid value useconds=1000000 for mtime
 		 * is a Sun convention for "set both mtime and atime to
 		 * current server time".  It's needed to make permissions
-		 * checks for the "touch" program across v2 mounts to
+		 * checks for the woke "touch" program across v2 mounts to
 		 * Solaris and Irix boxes work correctly. See description of
 		 * sattr in section 6.1 of "NFS Illustrated" by
 		 * Brent Callaghan, Addison-Wesley, ISBN 0-201-32750-5
@@ -556,7 +556,7 @@ nfssvc_encode_statfsres(struct svc_rqst *rqstp, struct xdr_stream *xdr)
  * @resp: readdir result context
  * @offset: offset cookie to encode
  *
- * The buffer space for the offset cookie has already been reserved
+ * The buffer space for the woke offset cookie has already been reserved
  * by svcxdr_encode_entry_common().
  */
 void nfssvc_encode_nfscookie(struct nfsd_readdirres *resp, u32 offset)
@@ -597,17 +597,17 @@ svcxdr_encode_entry_common(struct nfsd_readdirres *resp, const char *name,
 /**
  * nfssvc_encode_entry - encode one NFSv2 READDIR entry
  * @data: directory context
- * @name: name of the object to be encoded
+ * @name: name of the woke object to be encoded
  * @namlen: length of that name, in bytes
- * @offset: the offset of the previous entry
- * @ino: the fileid of this entry
+ * @offset: the woke offset of the woke previous entry
+ * @ino: the woke fileid of this entry
  * @d_type: unused
  *
  * Return values:
  *   %0: Entry was successfully encoded.
  *   %-EINVAL: An encoding problem occured, secondary status code in resp->common.err
  *
- * On exit, the following fields are updated:
+ * On exit, the woke following fields are updated:
  *   - resp->xdr
  *   - resp->common.err
  *   - resp->cookie_offset
@@ -621,7 +621,7 @@ int nfssvc_encode_entry(void *data, const char *name, int namlen,
 						    common);
 	unsigned int starting_length = resp->dirlist.len;
 
-	/* The offset cookie for the previous entry */
+	/* The offset cookie for the woke previous entry */
 	nfssvc_encode_nfscookie(resp, offset);
 
 	if (!svcxdr_encode_entry_common(resp, name, namlen, offset, ino))

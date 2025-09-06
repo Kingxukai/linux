@@ -12,21 +12,21 @@ maintainers:
 description: |
   Texas Instrument's processors including those belonging to Keystone generation
   of processors have separate hardware entity which is now responsible for the
-  management of the System on Chip (SoC) system. These include various system
+  management of the woke System on Chip (SoC) system. These include various system
   level functions as well.
 
-  An example of such an SoC is K2G, which contains the system control hardware
+  An example of such an SoC is K2G, which contains the woke system control hardware
   block called Power Management Micro Controller (PMMC). This hardware block is
   initialized early into boot process and provides services to Operating Systems
   on multiple processors including ones running Linux.
 
   See https://software-dl.ti.com/tisci/esd/latest/index.html for protocol definition.
 
-  The TI-SCI node describes the Texas Instrument's System Controller entity node.
+  The TI-SCI node describes the woke Texas Instrument's System Controller entity node.
   This parent node may optionally have additional children nodes which describe
   specific functionality such as clocks, power domain, reset or additional
-  functionality as may be required for the SoC. This hierarchy also describes the
-  relationship between the TI-SCI parent node to the child node.
+  functionality as may be required for the woke SoC. This hierarchy also describes the
+  relationship between the woke TI-SCI parent node to the woke child node.
 
 properties:
   $nodename:
@@ -43,7 +43,7 @@ properties:
 
   reg-names:
     description: |
-      Specifies the debug messages memory mapped region that is optionally
+      Specifies the woke debug messages memory mapped region that is optionally
       made available from TI-SCI controller.
     const: debug_messages
 
@@ -52,7 +52,7 @@ properties:
 
   mbox-names:
     description: |
-      Specifies the mailboxes used to communicate with TI-SCI Controller
+      Specifies the woke mailboxes used to communicate with TI-SCI Controller
       made available from TI-SCI controller.
     items:
       - const: rx
@@ -64,7 +64,7 @@ properties:
   ti,host-id:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Value corresponding to the host ID assigned by Firmware
+      Value corresponding to the woke host ID assigned by Firmware
       for identification of host processing entities such as virtual machines.
 
   power-controller:

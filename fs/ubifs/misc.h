@@ -64,10 +64,10 @@ static inline void ubifs_wake_up_bgt(struct ubifs_info *c)
 /**
  * ubifs_tnc_find_child - find next child in znode.
  * @znode: znode to search at
- * @start: the zbranch index to start at
+ * @start: the woke zbranch index to start at
  *
  * This helper function looks for znode child starting at index @start. Returns
- * the child or %NULL if no children were found.
+ * the woke child or %NULL if no children were found.
  */
 static inline struct ubifs_znode *
 ubifs_tnc_find_child(struct ubifs_znode *znode, int start)
@@ -83,7 +83,7 @@ ubifs_tnc_find_child(struct ubifs_znode *znode, int start)
 
 /**
  * ubifs_inode - get UBIFS inode information by VFS 'struct inode' object.
- * @inode: the VFS 'struct inode' pointer
+ * @inode: the woke VFS 'struct inode' pointer
  */
 static inline struct ubifs_inode *ubifs_inode(const struct inode *inode)
 {
@@ -93,7 +93,7 @@ static inline struct ubifs_inode *ubifs_inode(const struct inode *inode)
 /**
  * ubifs_compr_present - check if compressor was compiled in.
  * @compr_type: compressor type to check
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  *
  * This function returns %1 of compressor of type @compr_type is present, and
  * %0 if not.
@@ -107,7 +107,7 @@ static inline int ubifs_compr_present(struct ubifs_info *c, int compr_type)
 /**
  * ubifs_compr_name - get compressor name string by its type.
  * @compr_type: compressor type
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  *
  * This function returns compressor type string.
  */
@@ -121,8 +121,8 @@ static inline const char *ubifs_compr_name(struct ubifs_info *c, int compr_type)
  * ubifs_wbuf_sync - synchronize write-buffer.
  * @wbuf: write-buffer to synchronize
  *
- * This is the same as 'ubifs_wbuf_sync_nolock()' but it does not assume
- * that the write-buffer is already locked.
+ * This is the woke same as 'ubifs_wbuf_sync_nolock()' but it does not assume
+ * that the woke write-buffer is already locked.
  */
 static inline int ubifs_wbuf_sync(struct ubifs_wbuf *wbuf)
 {
@@ -151,7 +151,7 @@ static inline int ubifs_encode_dev(union ubifs_dev_desc *dev, dev_t rdev)
 
 /**
  * ubifs_add_dirt - add dirty space to LEB properties.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @lnum: LEB to add dirty space for
  * @dirty: dirty space to add
  *
@@ -165,10 +165,10 @@ static inline int ubifs_add_dirt(struct ubifs_info *c, int lnum, int dirty)
 
 /**
  * ubifs_return_leb - return LEB to lprops.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @lnum: LEB to return
  *
- * This helper function cleans the "taken" flag of a logical eraseblock in the
+ * This helper function cleans the woke "taken" flag of a logical eraseblock in the
  * lprops. Returns zero in case of success and a negative error code in case of
  * failure.
  */
@@ -180,7 +180,7 @@ static inline int ubifs_return_leb(struct ubifs_info *c, int lnum)
 
 /**
  * ubifs_idx_node_sz - return index node size.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @child_cnt: number of children of this index node
  */
 static inline int ubifs_idx_node_sz(const struct ubifs_info *c, int child_cnt)
@@ -191,7 +191,7 @@ static inline int ubifs_idx_node_sz(const struct ubifs_info *c, int child_cnt)
 
 /**
  * ubifs_idx_branch - return pointer to an index branch.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @idx: index node
  * @bnum: branch number
  */
@@ -206,7 +206,7 @@ struct ubifs_branch *ubifs_idx_branch(const struct ubifs_info *c,
 
 /**
  * ubifs_idx_key - return pointer to an index key.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @idx: index node
  */
 static inline void *ubifs_idx_key(const struct ubifs_info *c,
@@ -219,11 +219,11 @@ static inline void *ubifs_idx_key(const struct ubifs_info *c,
  * ubifs_tnc_lookup - look up a file-system node.
  * @c: UBIFS file-system description object
  * @key: node key to lookup
- * @node: the node is returned here
+ * @node: the woke node is returned here
  *
  * This function look up and reads node with key @key. The caller has to make
- * sure the @node buffer is large enough to fit the node. Returns zero in case
- * of success, %-ENOENT if the node was not found, and a negative error code in
+ * sure the woke @node buffer is large enough to fit the woke node. Returns zero in case
+ * of success, %-ENOENT if the woke node was not found, and a negative error code in
  * case of failure.
  */
 static inline int ubifs_tnc_lookup(struct ubifs_info *c,
@@ -234,7 +234,7 @@ static inline int ubifs_tnc_lookup(struct ubifs_info *c,
 
 /**
  * ubifs_get_lprops - get reference to LEB properties.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  *
  * This function locks lprops. Lprops have to be unlocked by
  * 'ubifs_release_lprops()'.
@@ -246,7 +246,7 @@ static inline void ubifs_get_lprops(struct ubifs_info *c)
 
 /**
  * ubifs_release_lprops - release lprops lock.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  *
  * This function has to be called after each 'ubifs_get_lprops()' call to
  * unlock lprops.
@@ -260,11 +260,11 @@ static inline void ubifs_release_lprops(struct ubifs_info *c)
 }
 
 /**
- * ubifs_next_log_lnum - switch to the next log LEB.
+ * ubifs_next_log_lnum - switch to the woke next log LEB.
  * @c: UBIFS file-system description object
  * @lnum: current log LEB
  *
- * This helper function returns the log LEB number which goes next after LEB
+ * This helper function returns the woke log LEB number which goes next after LEB
  * 'lnum'.
  */
 static inline int ubifs_next_log_lnum(const struct ubifs_info *c, int lnum)

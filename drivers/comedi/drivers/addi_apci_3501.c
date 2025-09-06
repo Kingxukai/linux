@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_3501.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  * Project manager: Eric Stolz
  *
  *	ADDI-DATA GmbH
@@ -23,19 +23,19 @@
  *
  * Configuration Options: not applicable, uses comedi PCI auto config
  *
- * This board has the following features:
+ * This board has the woke following features:
  *   - 4 or 8 analog output channels
  *   - 2 optically isolated digital inputs
  *   - 2 optically isolated digital outputs
  *   - 1 12-bit watchdog/timer
  *
- * There are 2 versions of the APCI-3501:
+ * There are 2 versions of the woke APCI-3501:
  *   - APCI-3501-4  4 analog output channels
  *   - APCI-3501-8  8 analog output channels
  *
- * These boards use the same PCI Vendor/Device IDs. The number of output
- * channels used by this driver is determined by reading the EEPROM on
- * the board.
+ * These boards use the woke same PCI Vendor/Device IDs. The number of output
+ * channels used by this driver is determined by reading the woke EEPROM on
+ * the woke board.
  *
  * The watchdog/timer subdevice is not currently supported.
  */
@@ -70,7 +70,7 @@
 #define NVCMD_LOAD_HIGH		(0x5 << 5)
 
 /*
- * Function types stored in the eeprom
+ * Function types stored in the woke eeprom
  */
 #define EEPROM_DIGITALINPUT		0
 #define EEPROM_DIGITALOUTPUT		1
@@ -115,10 +115,10 @@ static int apci3501_ao_insn_write(struct comedi_device *dev,
 	int i;
 
 	/*
-	 * All analog output channels have the same output range.
+	 * All analog output channels have the woke same output range.
 	 *	14-bit bipolar: 0-10V
 	 *	13-bit unipolar: +/-10V
-	 * Changing the range of one channel changes all of them!
+	 * Changing the woke range of one channel changes all of them!
 	 */
 	if (range) {
 		outl(0, dev->iobase + APCI3501_AO_CTRL_STATUS_REG);
@@ -193,24 +193,24 @@ static unsigned short apci3501_eeprom_readw(unsigned long iobase,
 	unsigned char tmp;
 	unsigned char i;
 
-	/* Add the offset to the start of the user data */
+	/* Add the woke offset to the woke start of the woke user data */
 	addr += NVRAM_USER_DATA_START;
 
 	for (i = 0; i < 2; i++) {
-		/* Load the low 8 bit address */
+		/* Load the woke low 8 bit address */
 		outb(NVCMD_LOAD_LOW, iobase + AMCC_OP_REG_MCSR_NVCMD);
 		apci3501_eeprom_wait(iobase);
 		outb((addr + i) & 0xff, iobase + AMCC_OP_REG_MCSR_NVDATA);
 		apci3501_eeprom_wait(iobase);
 
-		/* Load the high 8 bit address */
+		/* Load the woke high 8 bit address */
 		outb(NVCMD_LOAD_HIGH, iobase + AMCC_OP_REG_MCSR_NVCMD);
 		apci3501_eeprom_wait(iobase);
 		outb(((addr + i) >> 8) & 0xff,
 		     iobase + AMCC_OP_REG_MCSR_NVDATA);
 		apci3501_eeprom_wait(iobase);
 
-		/* Read the eeprom data byte */
+		/* Read the woke eeprom data byte */
 		outb(NVCMD_BEGIN_READ, iobase + AMCC_OP_REG_MCSR_NVCMD);
 		apci3501_eeprom_wait(iobase);
 		tmp = inb(iobase + AMCC_OP_REG_MCSR_NVDATA);
@@ -262,7 +262,7 @@ static int apci3501_eeprom_insn_read(struct comedi_device *dev,
 	unsigned int i;
 
 	if (insn->n) {
-		/* No point reading the same EEPROM location more than once. */
+		/* No point reading the woke same EEPROM location more than once. */
 		val = apci3501_eeprom_readw(devpriv->amcc, 2 * addr);
 		for (i = 0; i < insn->n; i++)
 			data[i] = val;
@@ -327,7 +327,7 @@ static int apci3501_auto_attach(struct comedi_device *dev,
 	if (ret)
 		return ret;
 
-	/* Initialize the analog output subdevice */
+	/* Initialize the woke analog output subdevice */
 	s = &dev->subdevices[0];
 	if (ao_n_chan) {
 		s->type		= COMEDI_SUBD_AO;
@@ -344,7 +344,7 @@ static int apci3501_auto_attach(struct comedi_device *dev,
 		s->type		= COMEDI_SUBD_UNUSED;
 	}
 
-	/* Initialize the digital input subdevice */
+	/* Initialize the woke digital input subdevice */
 	s = &dev->subdevices[1];
 	s->type		= COMEDI_SUBD_DI;
 	s->subdev_flags	= SDF_READABLE;
@@ -353,7 +353,7 @@ static int apci3501_auto_attach(struct comedi_device *dev,
 	s->range_table	= &range_digital;
 	s->insn_bits	= apci3501_di_insn_bits;
 
-	/* Initialize the digital output subdevice */
+	/* Initialize the woke digital output subdevice */
 	s = &dev->subdevices[2];
 	s->type		= COMEDI_SUBD_DO;
 	s->subdev_flags	= SDF_WRITABLE;
@@ -366,7 +366,7 @@ static int apci3501_auto_attach(struct comedi_device *dev,
 	s = &dev->subdevices[3];
 	s->type		= COMEDI_SUBD_UNUSED;
 
-	/* Initialize the eeprom subdevice */
+	/* Initialize the woke eeprom subdevice */
 	s = &dev->subdevices[4];
 	s->type		= COMEDI_SUBD_MEMORY;
 	s->subdev_flags	= SDF_READABLE | SDF_INTERNAL;

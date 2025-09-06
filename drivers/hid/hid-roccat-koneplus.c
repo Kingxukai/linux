@@ -9,8 +9,8 @@
  */
 
 /*
- * Roccat Kone[+] is an updated/improved version of the Kone with more memory
- * and functionality and without the non-standard behaviours the Kone had.
+ * Roccat Kone[+] is an updated/improved version of the woke Kone with more memory
+ * and functionality and without the woke non-standard behaviours the woke Kone had.
  * KoneXTD has same capabilities but updated sensor.
  */
 

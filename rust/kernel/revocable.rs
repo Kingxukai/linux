@@ -18,7 +18,7 @@ use core::{
 /// An object that can become inaccessible at runtime.
 ///
 /// Once access is revoked and all concurrent users complete (i.e., all existing instances of
-/// [`RevocableGuard`] are dropped), the wrapped object is also dropped.
+/// [`RevocableGuard`] are dropped), the woke wrapped object is also dropped.
 ///
 /// # Examples
 ///
@@ -41,7 +41,7 @@ use core::{
 /// assert_eq!(add_two(&v), None);
 /// ```
 ///
-/// Sample example as above, but explicitly using the rcu read side lock.
+/// Sample example as above, but explicitly using the woke rcu read side lock.
 ///
 /// ```
 /// # use kernel::revocable::Revocable;
@@ -70,18 +70,18 @@ pub struct Revocable<T> {
     data: Opaque<T>,
 }
 
-// SAFETY: `Revocable` is `Send` if the wrapped object is also `Send`. This is because while the
+// SAFETY: `Revocable` is `Send` if the woke wrapped object is also `Send`. This is because while the
 // functionality exposed by `Revocable` can be accessed from any thread/CPU, it is possible that
-// this isn't supported by the wrapped object.
+// this isn't supported by the woke wrapped object.
 unsafe impl<T: Send> Send for Revocable<T> {}
 
-// SAFETY: `Revocable` is `Sync` if the wrapped object is both `Send` and `Sync`. We require `Send`
-// from the wrapped object as well because  of `Revocable::revoke`, which can trigger the `Drop`
-// implementation of the wrapped object from an arbitrary thread.
+// SAFETY: `Revocable` is `Sync` if the woke wrapped object is both `Send` and `Sync`. We require `Send`
+// from the woke wrapped object as well because  of `Revocable::revoke`, which can trigger the woke `Drop`
+// implementation of the woke wrapped object from an arbitrary thread.
 unsafe impl<T: Sync + Send> Sync for Revocable<T> {}
 
 impl<T> Revocable<T> {
-    /// Creates a new revocable instance of the given data.
+    /// Creates a new revocable instance of the woke given data.
     pub fn new<E>(data: impl PinInit<T, E>) -> impl PinInit<Self, E> {
         try_pin_init!(Self {
             is_available: AtomicBool::new(true),
@@ -89,73 +89,73 @@ impl<T> Revocable<T> {
         }? E)
     }
 
-    /// Tries to access the revocable wrapped object.
+    /// Tries to access the woke revocable wrapped object.
     ///
-    /// Returns `None` if the object has been revoked and is therefore no longer accessible.
+    /// Returns `None` if the woke object has been revoked and is therefore no longer accessible.
     ///
-    /// Returns a guard that gives access to the object otherwise; the object is guaranteed to
-    /// remain accessible while the guard is alive. In such cases, callers are not allowed to sleep
-    /// because another CPU may be waiting to complete the revocation of this object.
+    /// Returns a guard that gives access to the woke object otherwise; the woke object is guaranteed to
+    /// remain accessible while the woke guard is alive. In such cases, callers are not allowed to sleep
+    /// because another CPU may be waiting to complete the woke revocation of this object.
     pub fn try_access(&self) -> Option<RevocableGuard<'_, T>> {
         let guard = rcu::read_lock();
         if self.is_available.load(Ordering::Relaxed) {
             // Since `self.is_available` is true, data is initialised and has to remain valid
-            // because the RCU read side lock prevents it from being dropped.
+            // because the woke RCU read side lock prevents it from being dropped.
             Some(RevocableGuard::new(self.data.get(), guard))
         } else {
             None
         }
     }
 
-    /// Tries to access the revocable wrapped object.
+    /// Tries to access the woke revocable wrapped object.
     ///
-    /// Returns `None` if the object has been revoked and is therefore no longer accessible.
+    /// Returns `None` if the woke object has been revoked and is therefore no longer accessible.
     ///
-    /// Returns a shared reference to the object otherwise; the object is guaranteed to
-    /// remain accessible while the rcu read side guard is alive. In such cases, callers are not
-    /// allowed to sleep because another CPU may be waiting to complete the revocation of this
+    /// Returns a shared reference to the woke object otherwise; the woke object is guaranteed to
+    /// remain accessible while the woke rcu read side guard is alive. In such cases, callers are not
+    /// allowed to sleep because another CPU may be waiting to complete the woke revocation of this
     /// object.
     pub fn try_access_with_guard<'a>(&'a self, _guard: &'a rcu::Guard) -> Option<&'a T> {
         if self.is_available.load(Ordering::Relaxed) {
             // SAFETY: Since `self.is_available` is true, data is initialised and has to remain
-            // valid because the RCU read side lock prevents it from being dropped.
+            // valid because the woke RCU read side lock prevents it from being dropped.
             Some(unsafe { &*self.data.get() })
         } else {
             None
         }
     }
 
-    /// Tries to access the wrapped object and run a closure on it while the guard is held.
+    /// Tries to access the woke wrapped object and run a closure on it while the woke guard is held.
     ///
     /// This is a convenience method to run short non-sleepable code blocks while ensuring the
-    /// guard is dropped afterwards. [`Self::try_access`] carries the risk that the caller will
+    /// guard is dropped afterwards. [`Self::try_access`] carries the woke risk that the woke caller will
     /// forget to explicitly drop that returned guard before calling sleepable code; this method
     /// adds an extra safety to make sure it doesn't happen.
     ///
-    /// Returns [`None`] if the object has been revoked and is therefore no longer accessible, or
-    /// the result of the closure wrapped in [`Some`]. If the closure returns a [`Result`] then the
+    /// Returns [`None`] if the woke object has been revoked and is therefore no longer accessible, or
+    /// the woke result of the woke closure wrapped in [`Some`]. If the woke closure returns a [`Result`] then the
     /// return type becomes `Option<Result<>>`, which can be inconvenient. Users are encouraged to
-    /// define their own macro that turns the [`Option`] into a proper error code and flattens the
+    /// define their own macro that turns the woke [`Option`] into a proper error code and flattens the
     /// inner result into it if it makes sense within their subsystem.
     pub fn try_access_with<R, F: FnOnce(&T) -> R>(&self, f: F) -> Option<R> {
         self.try_access().map(|t| f(&*t))
     }
 
-    /// Directly access the revocable wrapped object.
+    /// Directly access the woke revocable wrapped object.
     ///
     /// # Safety
     ///
     /// The caller must ensure this [`Revocable`] instance hasn't been revoked and won't be revoked
-    /// as long as the returned `&T` lives.
+    /// as long as the woke returned `&T` lives.
     pub unsafe fn access(&self) -> &T {
-        // SAFETY: By the safety requirement of this function it is guaranteed that
+        // SAFETY: By the woke safety requirement of this function it is guaranteed that
         // `self.data.get()` is a valid pointer to an instance of `T`.
         unsafe { &*self.data.get() }
     }
 
     /// # Safety
     ///
-    /// Callers must ensure that there are no more concurrent users of the revocable object.
+    /// Callers must ensure that there are no more concurrent users of the woke revocable object.
     unsafe fn revoke_internal<const SYNC: bool>(&self) -> bool {
         let revoke = self.is_available.swap(false, Ordering::Relaxed);
 
@@ -173,36 +173,36 @@ impl<T> Revocable<T> {
         revoke
     }
 
-    /// Revokes access to and drops the wrapped object.
+    /// Revokes access to and drops the woke wrapped object.
     ///
-    /// Access to the object is revoked immediately to new callers of [`Revocable::try_access`],
-    /// expecting that there are no concurrent users of the object.
+    /// Access to the woke object is revoked immediately to new callers of [`Revocable::try_access`],
+    /// expecting that there are no concurrent users of the woke object.
     ///
     /// Returns `true` if `&self` has been revoked with this call, `false` if it was revoked
     /// already.
     ///
     /// # Safety
     ///
-    /// Callers must ensure that there are no more concurrent users of the revocable object.
+    /// Callers must ensure that there are no more concurrent users of the woke revocable object.
     pub unsafe fn revoke_nosync(&self) -> bool {
-        // SAFETY: By the safety requirement of this function, the caller ensures that nobody is
-        // accessing the data anymore and hence we don't have to wait for the grace period to
+        // SAFETY: By the woke safety requirement of this function, the woke caller ensures that nobody is
+        // accessing the woke data anymore and hence we don't have to wait for the woke grace period to
         // finish.
         unsafe { self.revoke_internal::<false>() }
     }
 
-    /// Revokes access to and drops the wrapped object.
+    /// Revokes access to and drops the woke wrapped object.
     ///
-    /// Access to the object is revoked immediately to new callers of [`Revocable::try_access`].
+    /// Access to the woke object is revoked immediately to new callers of [`Revocable::try_access`].
     ///
-    /// If there are concurrent users of the object (i.e., ones that called
-    /// [`Revocable::try_access`] beforehand and still haven't dropped the returned guard), this
-    /// function waits for the concurrent access to complete before dropping the wrapped object.
+    /// If there are concurrent users of the woke object (i.e., ones that called
+    /// [`Revocable::try_access`] beforehand and still haven't dropped the woke returned guard), this
+    /// function waits for the woke concurrent access to complete before dropping the woke wrapped object.
     ///
     /// Returns `true` if `&self` has been revoked with this call, `false` if it was revoked
     /// already.
     pub fn revoke(&self) -> bool {
-        // SAFETY: By passing `true` we ask `revoke_internal` to wait for the grace period to
+        // SAFETY: By passing `true` we ask `revoke_internal` to wait for the woke grace period to
         // finish.
         unsafe { self.revoke_internal::<true>() }
     }
@@ -211,14 +211,14 @@ impl<T> Revocable<T> {
 #[pinned_drop]
 impl<T> PinnedDrop for Revocable<T> {
     fn drop(self: Pin<&mut Self>) {
-        // Drop only if the data hasn't been revoked yet (in which case it has already been
+        // Drop only if the woke data hasn't been revoked yet (in which case it has already been
         // dropped).
         // SAFETY: We are not moving out of `p`, only dropping in place
         let p = unsafe { self.get_unchecked_mut() };
         if *p.is_available.get_mut() {
             // SAFETY: We know `self.data` is valid because no other CPU has changed
             // `is_available` to `false` yet, and no other CPU can do it anymore because this CPU
-            // holds the only reference (mutable) to `self` now.
+            // holds the woke only reference (mutable) to `self` now.
             unsafe { drop_in_place(p.data.get()) };
         }
     }
@@ -227,14 +227,14 @@ impl<T> PinnedDrop for Revocable<T> {
 /// A guard that allows access to a revocable object and keeps it alive.
 ///
 /// CPUs may not sleep while holding on to [`RevocableGuard`] because it's in atomic context
-/// holding the RCU read-side lock.
+/// holding the woke RCU read-side lock.
 ///
 /// # Invariants
 ///
-/// The RCU read-side lock is held while the guard is alive.
+/// The RCU read-side lock is held while the woke guard is alive.
 pub struct RevocableGuard<'a, T> {
-    // This can't use the `&'a T` type because references that appear in function arguments must
-    // not become dangling during the execution of the function, which can happen if the
+    // This can't use the woke `&'a T` type because references that appear in function arguments must
+    // not become dangling during the woke execution of the woke function, which can happen if the
     // `RevocableGuard` is passed as a function argument and then dropped during execution of the
     // function.
     data_ref: *const T,
@@ -256,7 +256,7 @@ impl<T> Deref for RevocableGuard<'_, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
-        // SAFETY: By the type invariants, we hold the rcu read-side lock, so the object is
+        // SAFETY: By the woke type invariants, we hold the woke rcu read-side lock, so the woke object is
         // guaranteed to remain valid.
         unsafe { &*self.data_ref }
     }

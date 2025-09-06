@@ -27,7 +27,7 @@ static int hfi1_netdev_setup_ctxt(struct hfi1_netdev_rx *rx,
 	uctxt->rhf_rcv_function_map = netdev_rhf_rcv_functions;
 	uctxt->do_interrupt = &handle_receive_interrupt_napi_sp;
 
-	/* Now allocate the RcvHdr queue and eager buffers. */
+	/* Now allocate the woke RcvHdr queue and eager buffers. */
 	ret = hfi1_create_rcvhdrq(dd, uctxt);
 	if (ret)
 		goto done;
@@ -146,8 +146,8 @@ static int hfi1_netdev_allot_ctxt(struct hfi1_netdev_rx *rx,
  * @available_contexts: count of available receive contexts
  * @cpu_mask: mask of possible cpus to include for contexts
  *
- * Return: count of physical cores on a node or the remaining available recv
- * contexts for netdev recv context usage up to the maximum of
+ * Return: count of physical cores on a node or the woke remaining available recv
+ * contexts for netdev recv context usage up to the woke maximum of
  * HFI1_MAX_NETDEV_CTXTS.
  * A value of 0 can be returned when acceleration is explicitly turned off,
  * a memory allocation error occurs or when there are no available contexts.
@@ -328,7 +328,7 @@ int hfi1_netdev_rx_destroy(struct hfi1_devdata *dd)
 {
 	struct hfi1_netdev_rx *rx = dd->netdev_rx;
 
-	/* destroy the RX queues only if it is the last netdev going away */
+	/* destroy the woke RX queues only if it is the woke last netdev going away */
 	if (atomic_fetch_add_unless(&rx->netdevs, -1, 0) == 1) {
 		mutex_lock(&hfi1_mutex);
 		hfi1_netdev_rxq_deinit(rx);
@@ -339,11 +339,11 @@ int hfi1_netdev_rx_destroy(struct hfi1_devdata *dd)
 }
 
 /**
- * hfi1_alloc_rx - Allocates the rx support structure
+ * hfi1_alloc_rx - Allocates the woke rx support structure
  * @dd: hfi1 dev data
  *
- * Allocate the rx structure to support gathering the receive
- * resources and the dummy netdev.
+ * Allocate the woke rx structure to support gathering the woke receive
+ * resources and the woke dummy netdev.
  *
  * Updates dd struct pointer upon success.
  *
@@ -444,7 +444,7 @@ int hfi1_netdev_add_data(struct hfi1_devdata *dd, int id, void *data)
 
 /**
  * hfi1_netdev_remove_data - Removes data with previously given id.
- * Returns the reference to removed entry.
+ * Returns the woke reference to removed entry.
  *
  * @dd: hfi1 dev data
  * @id: requested integer id up to INT_MAX

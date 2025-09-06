@@ -26,7 +26,7 @@ menuconfig SND_ISA
 	depends on HAS_IOPORT
 	default y
 	help
-	  Support for sound devices connected via the ISA bus.
+	  Support for sound devices connected via the woke ISA bus.
 
 if SND_ISA
 
@@ -36,7 +36,7 @@ config SND_ADLIB
 	help
 	  Say Y here to include support for AdLib FM cards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-adlib.
 
 config SND_AD1816A
@@ -51,7 +51,7 @@ config SND_AD1816A
 	  Say Y here to include support for Analog Devices SoundPort
 	  AD1816A or compatible sound chips.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-ad1816a.
 
 config SND_AD1848
@@ -61,10 +61,10 @@ config SND_AD1848
 	  Say Y here to include support for AD1848 (Analog Devices) or
 	  CS4248 (Cirrus Logic - Crystal Semiconductors) chips.
 	  
-	  For newer chips from Cirrus Logic, use the CS4231 or CS4232+
+	  For newer chips from Cirrus Logic, use the woke CS4231 or CS4232+
 	  drivers.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-ad1848.
 
 config SND_ALS100
@@ -79,7 +79,7 @@ config SND_ALS100
 	  Diamond Technologies DT-019X or Avance Logic chips: ALS007,
 	  ALS100, ALS110, ALS120 and ALS200 chips.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-als100.
 
 config SND_AZT1605
@@ -90,9 +90,9 @@ config SND_AZT1605
 	select SND_OPL3_LIB
 	help
 	  Say Y here to include support for Aztech Sound Galaxy cards
-	  based on the AZT1605 chipset.
+	  based on the woke AZT1605 chipset.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-azt1605.
 
 config SND_AZT2316
@@ -103,9 +103,9 @@ config SND_AZT2316
 	select SND_OPL3_LIB
 	help
 	  Say Y here to include support for Aztech Sound Galaxy cards
-	  based on the AZT2316 chipset.
+	  based on the woke AZT2316 chipset.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-azt2316.
 
 config SND_AZT2320
@@ -119,7 +119,7 @@ config SND_AZT2320
 	  Say Y here to include support for soundcards based on the
 	  Aztech Systems AZT2320 chip.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-azt2320.
 
 config SND_CMI8328
@@ -131,7 +131,7 @@ config SND_CMI8328
 	  Say Y here to include support for soundcards based on the
 	  C-Media CMI8328 chip.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-cmi8328.
 
 config SND_CMI8330
@@ -144,7 +144,7 @@ config SND_CMI8330
 	  Say Y here to include support for soundcards based on the
 	  C-Media CMI8330 chip.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-cmi8330.
 
 config SND_CS4231
@@ -155,7 +155,7 @@ config SND_CS4231
 	  Say Y here to include support for CS4231 chips from Cirrus
 	  Logic - Crystal Semiconductors.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-cs4231.
 
 config SND_CS4236
@@ -168,7 +168,7 @@ config SND_CS4236
 	  CS4238B,CS4239 chips from Cirrus Logic - Crystal
 	  Semiconductors.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-cs4236.
 
 config SND_ES1688
@@ -180,7 +180,7 @@ config SND_ES1688
 	  Say Y here to include support for ESS AudioDrive ES688 or
 	  ES1688 chips. Also, this module support cards with ES968 PnP chip.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-es1688.
 
 config SND_ES18XX
@@ -191,7 +191,7 @@ config SND_ES18XX
 	help
 	  Say Y here to include support for ESS AudioDrive ES18xx chips.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-es18xx.
 
 config SND_SC6000
@@ -207,7 +207,7 @@ config SND_SC6000
 
 	  These cards are based on CompuMedia ASC-9308 or ASC-9408 chips.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-sc6000.
 
 config SND_GUSCLASSIC
@@ -219,7 +219,7 @@ config SND_GUSCLASSIC
 	  Say Y here to include support for Gravis UltraSound Classic
 	  soundcards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-gusclassic.
 
 config SND_GUSEXTREME
@@ -232,7 +232,7 @@ config SND_GUSEXTREME
 	  Say Y here to include support for Gravis UltraSound Extreme
 	  soundcards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-gusextreme.
 
 config SND_GUSMAX
@@ -243,7 +243,7 @@ config SND_GUSMAX
 	  Say Y here to include support for Gravis UltraSound MAX
 	  soundcards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-gusmax.
 
 config SND_INTERWAVE
@@ -256,7 +256,7 @@ config SND_INTERWAVE
 	  soundcards (Gravis UltraSound Plug & Play, STB SoundRage32,
 	  MED3210, Dynasonic Pro, Panasonic PCA761AW).
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-interwave.
 
 config SND_INTERWAVE_STB
@@ -269,7 +269,7 @@ config SND_INTERWAVE_STB
 	  soundcards with a TEA6330T bass and treble regulator
 	  (UltraSound 32-Pro).
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-interwave-stb.
 
 config SND_JAZZ16
@@ -285,7 +285,7 @@ config SND_JAZZ16
 	  Premium 3-D and Pro 3-D. There were also OEMs cards with the
 	  Jazz16 chipset.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-jazz16.
 
 config SND_OPL3SA2
@@ -297,7 +297,7 @@ config SND_OPL3SA2
 	  Say Y here to include support for Yamaha OPL3-SA2 and OPL3-SA3
 	  chips.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-opl3sa2.
 
 config SND_OPTI92X_AD1848
@@ -310,7 +310,7 @@ config SND_OPTI92X_AD1848
 	  Say Y here to include support for soundcards based on Opti
 	  82C92x or OTI-601 chips and using an AD1848 codec.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-opti92x-ad1848.
 
 config SND_OPTI92X_CS4231
@@ -323,7 +323,7 @@ config SND_OPTI92X_CS4231
 	  Say Y here to include support for soundcards based on Opti
 	  82C92x chips and using a CS4231 codec.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-opti92x-cs4231.
 
 config SND_OPTI93X
@@ -335,7 +335,7 @@ config SND_OPTI93X
 	  Say Y here to include support for soundcards based on Opti
 	  82C93x chips.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-opti93x.
 
 config SND_MIRO
@@ -348,7 +348,7 @@ config SND_MIRO
 	  Say 'Y' or 'M' to include support for Miro miroSOUND PCM1 pro, 
 	  miroSOUND PCM12 and miroSOUND PCM20 Radio soundcards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-miro.
 
 config SND_SB8
@@ -360,7 +360,7 @@ config SND_SB8
 	  Say Y here to include support for Creative Sound Blaster 1.0/
 	  2.0/Pro (8-bit) or 100% compatible soundcards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-sb8.
 
 config SND_SB16
@@ -370,9 +370,9 @@ config SND_SB16
 	select SND_SB16_DSP
 	help
 	  Say Y here to include support for Sound Blaster 16 soundcards
-	  (including the Plug and Play version).
+	  (including the woke Plug and Play version).
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-sb16.
 
 config SND_SBAWE
@@ -383,9 +383,9 @@ config SND_SBAWE
 	select SND_SEQ_DEVICE if SND_SEQUENCER != n
 	help
 	  Say Y here to include support for Sound Blaster AWE soundcards
-	  (including the Plug and Play version).
+	  (including the woke Plug and Play version).
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-sbawe.
 
 # select SEQ stuff to min(SND_SEQUENCER,SND_XXX)
@@ -400,7 +400,7 @@ config SND_SB16_CSP
 	depends on (SND_SB16 || SND_SBAWE) && (BROKEN || !PPC)
 	select FW_LOADER
 	help
-	  Say Y here to include support for the CSP core.  This special
+	  Say Y here to include support for the woke CSP core.  This special
 	  coprocessor can do variable tasks like various compression and
 	  decompression algorithms.
 
@@ -419,10 +419,10 @@ config SND_SSCAPE
 	  The MIDI support is very experimental and requires binary
 	  firmware files called "scope.cod" and "sndscape.co?" where the
 	  ? is digit 0, 1, 2, 3 or 4. The firmware files can be found
-	  in DOS or Windows driver packages. One has to put the firmware
-	  files into the /lib/firmware directory.
+	  in DOS or Windows driver packages. One has to put the woke firmware
+	  files into the woke /lib/firmware directory.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-sscape.
 
 config SND_WAVEFRONT
@@ -433,9 +433,9 @@ config SND_WAVEFRONT
 	select SND_WSS_LIB
 	help
 	  Say Y here to include support for Turtle Beach Maui, Tropez
-	  and Tropez+ soundcards based on the Wavefront chip.
+	  and Tropez+ soundcards based on the woke Wavefront chip.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-wavefront.
 
 config SND_MSND_PINNACLE
@@ -448,7 +448,7 @@ config SND_MSND_PINNACLE
 	  Say Y to include support for Turtle Beach MultiSound Pinnacle/
 	  Fiji soundcards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-msnd-pinnacle.
 
 config SND_MSND_CLASSIC
@@ -459,14 +459,14 @@ config SND_MSND_CLASSIC
 	select SND_PCM
 	help
 	  Say M here if you have a Turtle Beach MultiSound Classic, Tahiti or
-	  Monterey (not for the Pinnacle or Fiji).
+	  Monterey (not for the woke Pinnacle or Fiji).
 
 	  See <file:Documentation/sound/cards/multisound.sh> for important information
 	  about this driver.  Note that it has been discontinued, but the
 	  Voyetra Turtle Beach knowledge base entry for it is still available
 	  at <http://www.turtlebeach.com/site/kb_ftp/790.asp>.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-msnd-classic.
 
 endif	# SND_ISA

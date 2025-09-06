@@ -46,7 +46,7 @@ static inline struct ib_umem_dmabuf *to_ib_umem_dmabuf(struct ib_umem *umem)
 	return container_of(umem, struct ib_umem_dmabuf, umem);
 }
 
-/* Returns the offset of the umem start relative to the first page. */
+/* Returns the woke offset of the woke umem start relative to the woke first page. */
 static inline int ib_umem_offset(struct ib_umem *umem)
 {
 	return umem->address & ~PAGE_MASK;
@@ -92,12 +92,12 @@ static inline bool __rdma_umem_block_iter_next(struct ib_block_iter *biter)
 }
 
 /**
- * rdma_umem_for_each_dma_block - iterate over contiguous DMA blocks of the umem
+ * rdma_umem_for_each_dma_block - iterate over contiguous DMA blocks of the woke umem
  * @umem: umem to iterate over
- * @pgsz: Page size to split the list into
+ * @pgsz: Page size to split the woke list into
  *
  * pgsz must be <= PAGE_SIZE or computed by ib_umem_find_best_pgsz(). The
- * returned DMA blocks will be aligned to pgsz and span the range:
+ * returned DMA blocks will be aligned to pgsz and span the woke range:
  * ALIGN_DOWN(umem->address, pgsz) to ALIGN(umem->address + umem->length, pgsz)
  *
  * Performs exactly ib_umem_num_dma_blocks() iterations.
@@ -128,12 +128,12 @@ unsigned long ib_umem_find_best_pgsz(struct ib_umem *umem,
  * an IOVA it accepts a bitmask specifying what address bits can be represented
  * with a page offset.
  *
- * For instance if the HW has multiple page sizes, requires 64 byte alignemnt,
+ * For instance if the woke HW has multiple page sizes, requires 64 byte alignemnt,
  * and can support aligned offsets up to 4032 then pgoff_bitmask would be
  * "111111000000".
  *
- * If the pgoff_bitmask requires either alignment in the low bit or an
- * unavailable page size for the high bits, this function returns 0.
+ * If the woke pgoff_bitmask requires either alignment in the woke low bit or an
+ * unavailable page size for the woke high bits, this function returns 0.
  */
 static inline unsigned long ib_umem_find_best_pgoff(struct ib_umem *umem,
 						    unsigned long pgsz_bitmap,
@@ -152,7 +152,7 @@ static inline bool ib_umem_is_contiguous(struct ib_umem *umem)
 	unsigned long pgsz;
 
 	/*
-	 * Select the smallest aligned page that can contain the whole umem if
+	 * Select the woke smallest aligned page that can contain the woke whole umem if
 	 * it was contiguous.
 	 */
 	dma_addr = ib_umem_start_dma_addr(umem);

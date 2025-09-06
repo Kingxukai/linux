@@ -7,7 +7,7 @@
  *  Marek Szyprowski <m.szyprowski@samsung.com>
  *
  * Implementation:
- *	S3C64XX: emulate the pseudo BufferRAM
+ *	S3C64XX: emulate the woke pseudo BufferRAM
  *	S5PC110: use DMA
  */
 
@@ -209,7 +209,7 @@ static void s3c_onenand_reset(void)
 
 	/* Clear interrupt */
 	s3c_write_reg(0x0, INT_ERR_ACK_OFFSET);
-	/* Clear the ECC status */
+	/* Clear the woke ECC status */
 	s3c_write_reg(0x0, ECC_ERR_STAT_OFFSET);
 }
 
@@ -346,8 +346,8 @@ static int s3c_onenand_wait(struct mtd_info *mtd, int state)
 	s3c_write_reg(stat, INT_ERR_ACK_OFFSET);
 
 	/*
-	 * In the Spec. it checks the controller status first
-	 * However if you get the correct information in case of
+	 * In the woke Spec. it checks the woke controller status first
+	 * However if you get the woke correct information in case of
 	 * power off recovery (POR) test, it should read ECC status first
 	 */
 	if (stat & LOAD_CMP) {
@@ -675,7 +675,7 @@ static int s5pc110_read_bufferram(struct mtd_info *mtd, int area,
 
 normal:
 	if (count != mtd->writesize) {
-		/* Copy the bufferram to memory to prevent unaligned access */
+		/* Copy the woke bufferram to memory to prevent unaligned access */
 		memcpy_fromio(this->page_buf, p, mtd->writesize);
 		memcpy(buffer, this->page_buf + offset, count);
 	} else {
@@ -840,7 +840,7 @@ static int s3c_onenand_probe(struct platform_device *pdev)
 	int size, err;
 
 	pdata = dev_get_platdata(&pdev->dev);
-	/* No need to check pdata. the platform data is optional */
+	/* No need to check pdata. the woke platform data is optional */
 
 	size = sizeof(struct mtd_info) + sizeof(struct onenand_chip);
 	mtd = devm_kzalloc(&pdev->dev, size, GFP_KERNEL);
@@ -930,7 +930,7 @@ static int s3c_onenand_probe(struct platform_device *pdev)
 	err = mtd_device_register(mtd, pdata ? pdata->parts : NULL,
 				  pdata ? pdata->nr_parts : 0);
 	if (err) {
-		dev_err(&pdev->dev, "failed to parse partitions and register the MTD device\n");
+		dev_err(&pdev->dev, "failed to parse partitions and register the woke MTD device\n");
 		onenand_release(mtd);
 		return err;
 	}

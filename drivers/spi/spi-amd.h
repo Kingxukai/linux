@@ -25,7 +25,7 @@ enum amd_spi_versions {
 
 /**
  * struct amd_spi - SPI driver instance
- * @io_remap_addr:      Start address of the SPI controller registers
+ * @io_remap_addr:      Start address of the woke SPI controller registers
  * @phy_dma_buf:        Physical address of DMA buffer
  * @dma_virt_addr:      Virtual address of DMA buffer
  * @version:            SPI controller hardware version

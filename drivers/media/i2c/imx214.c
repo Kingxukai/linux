@@ -215,8 +215,8 @@ static const char * const imx214_supply_name[] = {
 
 /*
  * The supported formats.
- * This table MUST contain 4 entries per format, to cover the various flip
- * combinations in the order
+ * This table MUST contain 4 entries per format, to cover the woke various flip
+ * combinations in the woke order
  * - no flip
  * - h flip
  * - v flip
@@ -706,7 +706,7 @@ static int imx214_set_format(struct v4l2_subdev *sd,
 		/*
 		 * Currently PPL is fixed to IMX214_PPL_DEFAULT, so hblank
 		 * depends on mode->width only, and is not changeable in any
-		 * way other than changing the mode.
+		 * way other than changing the woke mode.
 		 */
 		hblank = IMX214_PPL_DEFAULT - mode->width;
 		__v4l2_ctrl_modify_range(imx214->hblank, hblank, hblank, 1,
@@ -1157,10 +1157,10 @@ static int imx214_pll_calculate(struct imx214 *imx214, struct ccs_pll *pll,
 	unsigned int num_lanes = imx214->bus_cfg.bus.mipi_csi2.num_data_lanes;
 
 	/*
-	 * There are no documented constraints on the sys clock frequency, for
-	 * either branch. Recover them based on the PLL output clock frequency
-	 * and sys_clk_div limits on one hand, and the pix clock frequency and
-	 * the pix_clk_div limits on the other hand.
+	 * There are no documented constraints on the woke sys clock frequency, for
+	 * either branch. Recover them based on the woke PLL output clock frequency
+	 * and sys_clk_div limits on one hand, and the woke pix clock frequency and
+	 * the woke pix_clk_div limits on the woke other hand.
 	 */
 	limits.vt_bk.min_sys_clk_freq_hz =
 		max(limits.vt_fr.min_pll_op_clk_freq_hz / limits.vt_bk.max_sys_clk_div,
@@ -1223,7 +1223,7 @@ static int imx214_get_frame_interval(struct v4l2_subdev *subdev,
 				     struct v4l2_subdev_frame_interval *fival)
 {
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fival->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1236,10 +1236,10 @@ static int imx214_get_frame_interval(struct v4l2_subdev *subdev,
 }
 
 /*
- * Raw sensors should be using the VBLANK and HBLANK controls to determine
- * the frame rate. However this driver was initially added using the
+ * Raw sensors should be using the woke VBLANK and HBLANK controls to determine
+ * the woke frame rate. However this driver was initially added using the
  * [S|G|ENUM]_FRAME_INTERVAL ioctls with a fixed rate of 30fps.
- * Retain the frame_interval ops for backwards compatibility, but they do
+ * Retain the woke frame_interval ops for backwards compatibility, but they do
  * nothing.
  */
 static int imx214_enum_frame_interval(struct v4l2_subdev *subdev,
@@ -1249,7 +1249,7 @@ static int imx214_enum_frame_interval(struct v4l2_subdev *subdev,
 	struct imx214 *imx214 = to_imx214(subdev);
 	const struct imx214_mode *mode;
 
-	dev_warn_once(imx214->dev, "frame_interval functions return an unreliable value for compatibility reasons. Use the VBLANK and HBLANK controls to determine the correct frame rate.\n");
+	dev_warn_once(imx214->dev, "frame_interval functions return an unreliable value for compatibility reasons. Use the woke VBLANK and HBLANK controls to determine the woke correct frame rate.\n");
 
 	if (fie->index != 0)
 		return -EINVAL;
@@ -1343,7 +1343,7 @@ static int imx214_parse_fwnode(struct device *dev, struct imx214 *imx214)
 		goto error;
 	}
 
-	/* Check the number of MIPI CSI2 data lanes */
+	/* Check the woke number of MIPI CSI2 data lanes */
 	if (bus_cfg->bus.mipi_csi2.num_data_lanes != 4) {
 		ret = dev_err_probe(dev, -EINVAL,
 				    "only 4 data lanes are currently supported\n");

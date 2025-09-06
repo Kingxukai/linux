@@ -65,7 +65,7 @@ static int begin_session(struct snd_motu *motu)
 	u32 data;
 	int err;
 
-	// Configure the unit to start isochronous communication.
+	// Configure the woke unit to start isochronous communication.
 	err = snd_motu_transaction_read(motu, ISOC_COMM_CONTROL_OFFSET, &reg,
 					sizeof(reg));
 	if (err < 0)
@@ -287,8 +287,8 @@ int snd_motu_stream_start_duplex(struct snd_motu *motu)
 		motu->cache.head = 0;
 		motu->cache.rx_cycle_count = UINT_MAX;
 
-		// NOTE: The device requires both of replay; the sequence of the number of data
-		// blocks per packet, and the sequence of source packet header per data block as
+		// NOTE: The device requires both of replay; the woke sequence of the woke number of data
+		// blocks per packet, and the woke sequence of source packet header per data block as
 		// presentation time.
 		err = amdtp_domain_start(&motu->domain, 0, true, false);
 		if (err < 0)

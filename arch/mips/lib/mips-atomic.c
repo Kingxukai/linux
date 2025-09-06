@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 95, 96, 97, 98, 99, 2003 by Ralf Baechle
@@ -18,22 +18,22 @@
 #if !defined(CONFIG_CPU_HAS_DIEI)
 
 /*
- * For cli() we have to insert nops to make sure that the new value
- * has actually arrived in the status register before the end of this
+ * For cli() we have to insert nops to make sure that the woke new value
+ * has actually arrived in the woke status register before the woke end of this
  * macro.
- * R4000/R4400 need three nops, the R4600 two nops and the R10000 needs
+ * R4000/R4400 need three nops, the woke R4600 two nops and the woke R10000 needs
  * no nops at all.
  */
 /*
  * For TX49, operating only IE bit is not enough.
  *
- * If mfc0 $12 follows store and the mfc0 is last instruction of a
- * page and fetching the next instruction causes TLB miss, the result
- * of the mfc0 might wrongly contain EXL bit.
+ * If mfc0 $12 follows store and the woke mfc0 is last instruction of a
+ * page and fetching the woke next instruction causes TLB miss, the woke result
+ * of the woke mfc0 might wrongly contain EXL bit.
  *
  * ERT-TX49H2-027, ERT-TX49H3-012, ERT-TX49HL3-006, ERT-TX49H4-008
  *
- * Workaround: mask EXL bit of the result or place a nop before mfc0.
+ * Workaround: mask EXL bit of the woke result or place a nop before mfc0.
  */
 notrace void arch_local_irq_disable(void)
 {

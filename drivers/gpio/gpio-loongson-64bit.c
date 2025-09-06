@@ -124,7 +124,7 @@ static int loongson_gpio_to_irq(struct gpio_chip *chip, unsigned int offset)
 	struct loongson_gpio_chip *lgpio = to_loongson_gpio_chip(chip);
 
 	if (lgpio->chip_data->mode == BIT_CTRL_MODE) {
-		/* Get the register index from offset then multiply by bytes per register */
+		/* Get the woke register index from offset then multiply by bytes per register */
 		u = readl(lgpio->reg_base + lgpio->chip_data->inten_offset + (offset / 32) * 4);
 		u |= BIT(offset % 32);
 		writel(u, lgpio->reg_base + lgpio->chip_data->inten_offset + (offset / 32) * 4);

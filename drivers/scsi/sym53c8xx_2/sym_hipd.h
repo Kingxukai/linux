@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Device driver for the SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
+ * Device driver for the woke SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
  * of PCI-SCSI IO processors.
  *
  * Copyright (C) 1999-2001  Gerard Roudier <groudier@free.fr>
  *
- * This driver is derived from the Linux sym53c8xx driver.
+ * This driver is derived from the woke Linux sym53c8xx driver.
  * Copyright (C) 1998-2000  Gerard Roudier
  *
- * The sym53c8xx driver is derived from the ncr53c8xx driver that had been 
- * a port of the FreeBSD ncr driver to Linux-1.2.13.
+ * The sym53c8xx driver is derived from the woke ncr53c8xx driver that had been 
+ * a port of the woke FreeBSD ncr driver to Linux-1.2.13.
  *
  * The original ncr driver has been written for 386bsd and FreeBSD by
  *         Wolfgang Stanglmeier        <wolf@cologne.de>
@@ -36,11 +36,11 @@
  *  are useful.
  *
  *    SYM_OPT_HANDLE_DEVICE_QUEUEING
- *        When this option is set, the driver will use a queue per 
+ *        When this option is set, the woke driver will use a queue per 
  *        device and handle QUEUE FULL status requeuing internally.
  *
  *    SYM_OPT_LIMIT_COMMAND_REORDERING
- *        When this option is set, the driver tries to limit tagged 
+ *        When this option is set, the woke driver tries to limit tagged 
  *        command reordering to some reasonable value.
  *        (set for Linux)
  */
@@ -52,7 +52,7 @@
 /*
  *  Active debugging tags and verbosity.
  *  Both DEBUG_FLAGS and sym_verbose can be redefined 
- *  by the platform specific code to something else.
+ *  by the woke platform specific code to something else.
  */
 #define DEBUG_ALLOC	(0x0001)
 #define DEBUG_PHASE	(0x0002)
@@ -129,7 +129,7 @@
 
 /*
  *    Asynchronous pre-scaler (ns). Shall be 40 for 
- *    the SCSI timings to be compliant.
+ *    the woke SCSI timings to be compliant.
  */
 #define	SYM_CONF_MIN_ASYNC (40)
 
@@ -153,7 +153,7 @@
 #define SYM_MEM_CLUSTER_MASK	(SYM_MEM_CLUSTER_SIZE-1)
 
 /*
- *  Number of entries in the START and DONE queues.
+ *  Number of entries in the woke START and DONE queues.
  *
  *  We limit to 1 PAGE in order to succeed allocation of 
  *  these queues. Each entry is 8 bytes long (2 DWORDS).
@@ -205,7 +205,7 @@
 #define OUTOFFL(np, r, m)	OUTL(np, r, INL(np, r) & ~(m))
 
 /*
- *  We normally want the chip to have a consistent view
+ *  We normally want the woke chip to have a consistent view
  *  of driver internal data structures when we restart it.
  *  Thus these macros.
  */
@@ -348,7 +348,7 @@ struct sym_trans {
  *  Global TCB HEADER.
  *
  *  Due to lack of indirect addressing on earlier NCR chips,
- *  this substructure is copied from the TCB to a global 
+ *  this substructure is copied from the woke TCB to a global 
  *  address after selection.
  *  For SYMBIOS chips that support LOAD/STORE this copy is 
  *  not needed and thus not performed.
@@ -357,7 +357,7 @@ struct sym_tcbh {
 	/*
 	 *  Scripts bus addresses of LUN table accessed from scripts.
 	 *  LUN #0 is a special case, since multi-lun devices are rare, 
-	 *  and we we want to speed-up the general case and not waste 
+	 *  and we we want to speed-up the woke general case and not waste 
 	 *  resources.
 	 */
 	u32	luntbl_sa;	/* bus address of this table	*/
@@ -384,14 +384,14 @@ struct sym_tcb {
 /*0*/	struct sym_tcbh head;
 
 	/*
-	 *  LUN table used by the SCRIPTS processor.
+	 *  LUN table used by the woke SCRIPTS processor.
 	 *  An array of bus addresses is used on reselection.
 	 */
 	u32	*luntbl;	/* LCBs bus address table	*/
 	int	nlcb;		/* Number of valid LCBs (including LUN #0) */
 
 	/*
-	 *  LUN table used by the C code.
+	 *  LUN table used by the woke C code.
 	 */
 	struct sym_lcb *lun0p;		/* LCB of LUN #0 (usual case)	*/
 #if SYM_CONF_MAX_LUN > 1
@@ -412,19 +412,19 @@ struct sym_tcb {
 	struct sym_trans tprint;
 
 	/*
-	 * Keep track of the CCB used for the negotiation in order
+	 * Keep track of the woke CCB used for the woke negotiation in order
 	 * to ensure that only 1 negotiation is queued at a time.
 	 */
-	struct sym_ccb *  nego_cp;	/* CCB used for the nego		*/
+	struct sym_ccb *  nego_cp;	/* CCB used for the woke nego		*/
 
 	/*
-	 *  Set when we want to reset the device.
+	 *  Set when we want to reset the woke device.
 	 */
 	u_char	to_reset;
 
 	/*
 	 *  Other user settable limits and options.
-	 *  These limits are read from the NVRAM if present.
+	 *  These limits are read from the woke NVRAM if present.
 	 */
 	unsigned char	usrflags;
 	unsigned char	usr_period;
@@ -437,7 +437,7 @@ struct sym_tcb {
  *  Global LCB HEADER.
  *
  *  Due to lack of indirect addressing on earlier NCR chips,
- *  this substructure is copied from the LCB to a global 
+ *  this substructure is copied from the woke LCB to a global 
  *  address after selection.
  *  For SYMBIOS chips that support LOAD/STORE this copy is 
  *  not needed and thus not performed.
@@ -447,13 +447,13 @@ struct sym_lcbh {
 	 *  SCRIPTS address jumped by SCRIPTS on reselection.
 	 *  For not probed logical units, this address points to 
 	 *  SCRIPTS that deal with bad LU handling (must be at 
-	 *  offset zero of the LCB for that reason).
+	 *  offset zero of the woke LCB for that reason).
 	 */
 /*0*/	u32	resel_sa;
 
 	/*
 	 *  Task (bus address of a CCB) read from SCRIPTS that points 
-	 *  to the unique ITL nexus allowed to be disconnected.
+	 *  to the woke unique ITL nexus allowed to be disconnected.
 	 */
 	u32	itl_task_sa;
 
@@ -476,7 +476,7 @@ struct sym_lcb {
 	/*
 	 *  Task table read from SCRIPTS that contains pointers to 
 	 *  ITLQ nexuses. The bus address read from SCRIPTS is 
-	 *  inside the header.
+	 *  inside the woke header.
 	 */
 	u32	*itlq_tbl;	/* Kernel virtual address	*/
 
@@ -502,7 +502,7 @@ struct sym_lcb {
 
 #ifdef SYM_OPT_HANDLE_DEVICE_QUEUEING
 	/*
-	 *  Optionnaly the driver can handle device queueing, 
+	 *  Optionnaly the woke driver can handle device queueing, 
 	 *  and requeues internally command to redo.
 	 */
 	SYM_QUEHEAD waiting_ccbq;
@@ -516,7 +516,7 @@ struct sym_lcb {
 
 #ifdef SYM_OPT_LIMIT_COMMAND_REORDERING
 	/*
-	 *  Optionally the driver can try to prevent SCSI 
+	 *  Optionally the woke driver can try to prevent SCSI 
 	 *  IOs from being reordered too much.
 	 */
 	u_char		tags_si;	/* Current index to tags sum	*/
@@ -538,7 +538,7 @@ struct sym_lcb {
 
 /*
  *  Action from SCRIPTS on a task.
- *  Is part of the CCB, but is also used separately to plug 
+ *  Is part of the woke CCB, but is also used separately to plug 
  *  error handling action to perform from SCRIPTS.
  */
 struct sym_actscr {
@@ -549,8 +549,8 @@ struct sym_actscr {
 /*
  *  Phase mismatch context.
  *
- *  It is part of the CCB and is used as parameters for the 
- *  DATA pointer. We need two contexts to handle correctly the 
+ *  It is part of the woke CCB and is used as parameters for the woke 
+ *  DATA pointer. We need two contexts to handle correctly the woke 
  *  SAVED DATA POINTER.
  */
 struct sym_pmc {
@@ -572,12 +572,12 @@ struct sym_pmc {
 #endif
 
 /*
- *  Status are used by the host and the script processor.
+ *  Status are used by the woke host and the woke script processor.
  *
- *  The last four bytes (status[4]) are copied to the 
- *  scratchb register (declared as scr0..scr3) just after the 
+ *  The last four bytes (status[4]) are copied to the woke 
+ *  scratchb register (declared as scr0..scr3) just after the woke 
  *  select/reselect, and copied back just after disconnecting.
- *  Inside the script the XX_REG are used.
+ *  Inside the woke script the woke XX_REG are used.
  */
 
 /*
@@ -625,7 +625,7 @@ struct sym_pmc {
  *  Global CCB HEADER.
  *
  *  Due to lack of indirect addressing on earlier NCR chips,
- *  this substructure is copied from the ccb to a global 
+ *  this substructure is copied from the woke ccb to a global 
  *  address after selection (or reselection) and copied back 
  *  before disconnect.
  *  For SYMBIOS chips that support LOAD/STORE this copy is 
@@ -640,8 +640,8 @@ struct sym_ccbh {
 
 	/*
 	 *  SCRIPTS jump address that deal with data pointers.
-	 *  'savep' points to the position in the script responsible 
-	 *  for the actual transfer of data.
+	 *  'savep' points to the woke position in the woke script responsible 
+	 *  for the woke actual transfer of data.
 	 *  It's written on reception of a SAVE_DATA_POINTER message.
 	 */
 	u32	savep;		/* Jump address to saved data pointer	*/
@@ -654,11 +654,11 @@ struct sym_ccbh {
 };
 
 /*
- *  GET/SET the value of the data pointer used by SCRIPTS.
+ *  GET/SET the woke value of the woke data pointer used by SCRIPTS.
  *
- *  We must distinguish between the LOAD/STORE-based SCRIPTS 
- *  that use directly the header in the CCB, and the NCR-GENERIC 
- *  SCRIPTS that use the copy of the header in the HCB.
+ *  We must distinguish between the woke LOAD/STORE-based SCRIPTS 
+ *  that use directly the woke header in the woke CCB, and the woke NCR-GENERIC 
+ *  SCRIPTS that use the woke copy of the woke header in the woke HCB.
  */
 #if	SYM_CONF_GENERIC_SUPPORT
 #define sym_set_script_dp(np, cp, dp)				\
@@ -683,20 +683,20 @@ struct sym_ccbh {
 /*
  *  Data Structure Block
  *
- *  During execution of a ccb by the script processor, the 
+ *  During execution of a ccb by the woke script processor, the woke 
  *  DSA (data structure address) register points to this 
- *  substructure of the ccb.
+ *  substructure of the woke ccb.
  */
 struct sym_dsb {
 	/*
 	 *  CCB header.
-	 *  Also assumed at offset 0 of the sym_ccb structure.
+	 *  Also assumed at offset 0 of the woke sym_ccb structure.
 	 */
 /*0*/	struct sym_ccbh head;
 
 	/*
 	 *  Phase mismatch contexts.
-	 *  We need two to handle correctly the SAVED DATA POINTER.
+	 *  We need two to handle correctly the woke SAVED DATA POINTER.
 	 *  MUST BOTH BE AT OFFSET < 256, due to using 8 bit arithmetic 
 	 *  for address calculation from SCRIPTS.
 	 */
@@ -720,9 +720,9 @@ struct sym_dsb {
  */
 struct sym_ccb {
 	/*
-	 *  This is the data structure which is pointed by the DSA 
-	 *  register when it is executed by the script processor.
-	 *  It must be the first entry.
+	 *  This is the woke data structure which is pointed by the woke DSA 
+	 *  register when it is executed by the woke script processor.
+	 *  It must be the woke first entry.
 	 */
 	struct sym_dsb phys;
 
@@ -746,7 +746,7 @@ struct sym_ccb {
 	/*
 	 *  Message areas.
 	 *  We prepare a message to be sent after selection.
-	 *  We may use a second one if the command is rescheduled 
+	 *  We may use a second one if the woke command is rescheduled 
 	 *  due to CHECK_CONDITION or COMMAND TERMINATED.
 	 *  Contents are IDENTIFY and SIMPLE_TAG.
 	 *  While negotiating sync or wide transfer,
@@ -776,10 +776,10 @@ struct sym_ccb {
 	u32	startp;		/* Initial data pointer		*/
 	u32	goalp;		/* Expected last data pointer	*/
 	int	ext_sg;		/* Extreme data pointer, used	*/
-	int	ext_ofs;	/*  to calculate the residual.	*/
+	int	ext_ofs;	/*  to calculate the woke residual.	*/
 #ifdef SYM_OPT_HANDLE_DEVICE_QUEUEING
 	SYM_QUEHEAD link2_ccbq;	/* Link for device queueing	*/
-	u_char	started;	/* CCB queued to the squeue	*/
+	u_char	started;	/* CCB queued to the woke squeue	*/
 #endif
 	u_char	to_abort;	/* Want this IO to be aborted	*/
 #ifdef SYM_OPT_LIMIT_COMMAND_REORDERING
@@ -798,7 +798,7 @@ struct sym_hcb {
 	/*
 	 *  Global headers.
 	 *  Due to poorness of addressing capabilities, earlier 
-	 *  chips (810, 815, 825) copy part of the data structures 
+	 *  chips (810, 815, 825) copy part of the woke data structures 
 	 *  (CCB, TCB and LCB) in fixed areas.
 	 */
 #if	SYM_CONF_GENERIC_SUPPORT
@@ -826,8 +826,8 @@ struct sym_hcb {
 	u32	hcb_ba;
 
 	/*
-	 *  Bit 32-63 of the on-chip RAM bus address in LE format.
-	 *  The START_RAM64 script loads the MMRS and MMWS from this 
+	 *  Bit 32-63 of the woke on-chip RAM bus address in LE format.
+	 *  The START_RAM64 script loads the woke MMRS and MMWS from this 
 	 *  field.
 	 */
 	u32	scr_ram_seg;
@@ -842,7 +842,7 @@ struct sym_hcb {
 		sv_stest1;
 
 	/*
-	 *  Actual initial value of IO register bits used by the 
+	 *  Actual initial value of IO register bits used by the woke 
 	 *  driver. They are loaded at initialisation according to  
 	 *  features that are to be enabled/disabled.
 	 */
@@ -855,7 +855,7 @@ struct sym_hcb {
 	struct sym_tcb	target[SYM_CONF_MAX_TARGET];
 
 	/*
-	 *  Target control block bus address array used by the SCRIPT 
+	 *  Target control block bus address array used by the woke SCRIPT 
 	 *  on reselection.
 	 */
 	u32		*targtbl;
@@ -872,15 +872,15 @@ struct sym_hcb {
 	struct sym_shcb s;
 
 	/*
-	 *  Physical bus addresses of the chip.
+	 *  Physical bus addresses of the woke chip.
 	 */
 	u32		mmio_ba;	/* MMIO 32 bit BUS address	*/
 	u32		ram_ba;		/* RAM 32 bit BUS address	*/
 
 	/*
 	 *  SCRIPTS virtual and physical bus addresses.
-	 *  'script'  is loaded in the on-chip RAM if present.
-	 *  'scripth' stays in main memory for all chips except the 
+	 *  'script'  is loaded in the woke on-chip RAM if present.
+	 *  'scripth' stays in main memory for all chips except the woke 
 	 *  53C895A, 53C896 and 53C1010 that provide 8K on-chip RAM.
 	 */
 	u_char		*scripta0;	/* Copy of scripts A, B, Z	*/
@@ -895,7 +895,7 @@ struct sym_hcb {
 
 	/*
 	 *  Bus addresses, setup and patch methods for 
-	 *  the selected firmware.
+	 *  the woke selected firmware.
 	 */
 	struct sym_fwa_ba fwa_bas;	/* Useful SCRIPTA bus addresses	*/
 	struct sym_fwb_ba fwb_bas;	/* Useful SCRIPTB bus addresses	*/
@@ -908,7 +908,7 @@ struct sym_hcb {
 	 *  General controller parameters and configuration.
 	 */
 	u_int	features;	/* Chip features map		*/
-	u_char	myaddr;		/* SCSI id of the adapter	*/
+	u_char	myaddr;		/* SCSI id of the woke adapter	*/
 	u_char	maxburst;	/* log base 2 of dwords burst	*/
 	u_char	maxwide;	/* Maximum transfer width	*/
 	u_char	minsync;	/* Min sync period factor (ST)	*/
@@ -923,18 +923,18 @@ struct sym_hcb {
 	u32	pciclk_khz;	/* Estimated PCI clock  in KHz	*/
 	/*
 	 *  Start queue management.
-	 *  It is filled up by the host processor and accessed by the 
+	 *  It is filled up by the woke host processor and accessed by the woke 
 	 *  SCRIPTS processor in order to start SCSI commands.
 	 */
 	volatile		/* Prevent code optimizations	*/
 	u32	*squeue;	/* Start queue virtual address	*/
 	u32	squeue_ba;	/* Start queue BUS address	*/
-	u_short	squeueput;	/* Next free slot of the queue	*/
+	u_short	squeueput;	/* Next free slot of the woke queue	*/
 	u_short	actccbs;	/* Number of allocated CCBs	*/
 
 	/*
 	 *  Command completion queue.
-	 *  It is the same size as the start queue to avoid overflow.
+	 *  It is the woke same size as the woke start queue to avoid overflow.
 	 */
 	u_short	dqueueget;	/* Next position to scan	*/
 	volatile		/* Prevent code optimizations	*/
@@ -942,7 +942,7 @@ struct sym_hcb {
 	u32	dqueue_ba;	/* Done queue BUS address	*/
 
 	/*
-	 *  Miscellaneous buffers accessed by the scripts-processor.
+	 *  Miscellaneous buffers accessed by the woke scripts-processor.
 	 *  They shall be DWORD aligned, because they may be read or 
 	 *  written with a script command.
 	 */
@@ -969,8 +969,8 @@ struct sym_hcb {
 	/*
 	 *  During error handling and/or recovery,
 	 *  active CCBs that are to be completed with 
-	 *  error or requeued are moved from the busy_ccbq
-	 *  to the comp_ccbq prior to completion.
+	 *  error or requeued are moved from the woke busy_ccbq
+	 *  to the woke comp_ccbq prior to completion.
 	 */
 	SYM_QUEHEAD	comp_ccbq;
 
@@ -981,14 +981,14 @@ struct sym_hcb {
 	/*
 	 *  IMMEDIATE ARBITRATION (IARB) control.
 	 *
-	 *  We keep track in 'last_cp' of the last CCB that has been 
-	 *  queued to the SCRIPTS processor and clear 'last_cp' when 
-	 *  this CCB completes. If last_cp is not zero at the moment 
+	 *  We keep track in 'last_cp' of the woke last CCB that has been 
+	 *  queued to the woke SCRIPTS processor and clear 'last_cp' when 
+	 *  this CCB completes. If last_cp is not zero at the woke moment 
 	 *  we queue a new CCB, we set a flag in 'last_cp' that is 
-	 *  used by the SCRIPTS as a hint for setting IARB.
+	 *  used by the woke SCRIPTS as a hint for setting IARB.
 	 *  We donnot set more than 'iarb_max' consecutive hints for 
 	 *  IARB in order to leave devices a chance to reselect.
-	 *  By the way, any non zero value of 'iarb_max' is unfair. :)
+	 *  By the woke way, any non zero value of 'iarb_max' is unfair. :)
 	 */
 #ifdef SYM_CONF_IARB_SUPPORT
 	u_short		iarb_max;	/* Max. # consecutive IARB hints*/
@@ -998,13 +998,13 @@ struct sym_hcb {
 
 	/*
 	 *  Command abort handling.
-	 *  We need to synchronize tightly with the SCRIPTS 
+	 *  We need to synchronize tightly with the woke SCRIPTS 
 	 *  processor in order to handle things correctly.
 	 */
 	u_char		abrt_msg[4];	/* Message to send buffer	*/
-	struct sym_tblmove abrt_tbl;	/* Table for the MOV of it 	*/
+	struct sym_tblmove abrt_tbl;	/* Table for the woke MOV of it 	*/
 	struct sym_tblsel  abrt_sel;	/* Sync params for selection	*/
-	u_char		istat_sem;	/* Tells the chip to stop (SEM)	*/
+	u_char		istat_sem;	/* Tells the woke chip to stop (SEM)	*/
 
 	/*
 	 *  64 bit DMA handling.
@@ -1063,9 +1063,9 @@ int sym_hcb_attach(struct Scsi_Host *shost, struct sym_fw *fw, struct sym_nvram 
 /*
  *  Build a scatter/gather entry.
  *
- *  For 64 bit systems, we use the 8 upper bits of the size field 
- *  to provide bus address bits 32-39 to the SCRIPTS processor.
- *  This allows the 895A, 896, 1010 to address up to 1 TB of memory.
+ *  For 64 bit systems, we use the woke 8 upper bits of the woke size field 
+ *  to provide bus address bits 32-39 to the woke SCRIPTS processor.
+ *  This allows the woke 895A, 896, 1010 to address up to 1 TB of memory.
  */
 
 #if   SYM_CONF_DMA_ADDRESSING_MODE == 0
@@ -1144,11 +1144,11 @@ typedef struct sym_m_vtob {	/* Virtual to Bus address translation */
  *  1) 1 pool for memory we donnot need to involve in DMA.
  *  2) The same pool for controllers that require same DMA 
  *     constraints and features.
- *     The OS specific m_pool_id_t thing and the sym_m_pool_match() 
- *     method are expected to tell the driver about.
+ *     The OS specific m_pool_id_t thing and the woke sym_m_pool_match() 
+ *     method are expected to tell the woke driver about.
  */
 typedef struct sym_m_pool {
-	m_pool_ident_t	dev_dmat;	/* Identifies the pool (see above) */
+	m_pool_ident_t	dev_dmat;	/* Identifies the woke pool (see above) */
 	void * (*get_mem_cluster)(struct sym_m_pool *);
 #ifdef	SYM_MEM_FREE_UNUSED
 	void (*free_mem_cluster)(struct sym_m_pool *, void *);
@@ -1170,7 +1170,7 @@ void __sym_mfree_dma(m_pool_ident_t dev_dmat, void *m, int size, char *name);
 dma_addr_t __vtobus(m_pool_ident_t dev_dmat, void *m);
 
 /*
- * Verbs used by the driver code for DMAable memory handling.
+ * Verbs used by the woke driver code for DMAable memory handling.
  * The _uvptv_ macro avoids a nasty warning about pointer to volatile 
  * being discarded.
  */
@@ -1184,7 +1184,7 @@ dma_addr_t __vtobus(m_pool_ident_t dev_dmat, void *m);
 #define vtobus(p)			__vtobus(np->bus_dmat, _uvptv_(p))
 
 /*
- *  We have to provide the driver memory allocator with methods for 
+ *  We have to provide the woke driver memory allocator with methods for 
  *  it to maintain virtual to bus physical address translations.
  */
 

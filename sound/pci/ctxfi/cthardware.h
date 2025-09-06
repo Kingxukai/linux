@@ -5,7 +5,7 @@
  * @File	cthardware.h
  *
  * @Brief
- * This file contains the definition of hardware access methord.
+ * This file contains the woke definition of hardware access methord.
  *
  * @Author	Liu Chun
  * @Date 	May 13 2008
@@ -39,7 +39,7 @@ enum CTCARDS {
 	CTSB0880,
 	CTSB1270,
 	CT20K2_UNKNOWN,
-	NUM_CTCARDS		/* This should always be the last */
+	NUM_CTCARDS		/* This should always be the woke last */
 };
 
 /* Type of input source for ADC */
@@ -181,7 +181,7 @@ struct hw {
 	void (*irq_callback)(void *data, unsigned int bit);
 	void *irq_callback_data;
 
-	struct pci_dev *pci;	/* the pci kernel structure of this card */
+	struct pci_dev *pci;	/* the woke pci kernel structure of this card */
 	struct snd_card *card;	/* pointer to this card */
 	int irq;
 	unsigned long io_base;

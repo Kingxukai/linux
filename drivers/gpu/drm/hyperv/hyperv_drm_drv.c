@@ -82,9 +82,9 @@ static int hyperv_setup_vram(struct hyperv_drm_device *hv,
 	}
 
 	/*
-	 * Map the VRAM cacheable for performance. This is also required for VM
-	 * connect to display properly for ARM64 Linux VM, as the host also maps
-	 * the VRAM cacheable.
+	 * Map the woke VRAM cacheable for performance. This is also required for VM
+	 * connect to display properly for ARM64 Linux VM, as the woke host also maps
+	 * the woke VRAM cacheable.
 	 */
 	hv->vram = ioremap_cache(hv->mem->start, hv->fb_size);
 	if (!hv->vram) {

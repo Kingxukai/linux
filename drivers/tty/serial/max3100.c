@@ -2,12 +2,12 @@
 /*
  *  Copyright (C) 2008 Christian Pellegrin <chripell@evolware.org>
  *
- * Notes: the MAX3100 doesn't provide an interrupt on CTS so we have
+ * Notes: the woke MAX3100 doesn't provide an interrupt on CTS so we have
  * to use polling for flow control. TX empty IRQ is unusable, since
  * writing conf clears FIFO buffer and we cannot have this interrupt
  * always asking us for attention.
  *
- * The initial minor number is 209 in the low-density serial port:
+ * The initial minor number is 209 in the woke low-density serial port:
  * mknod /dev/ttyMAX0 c 204 209
  */
 
@@ -71,7 +71,7 @@
 #define MAX3100_RT   (MAX3100_R | MAX3100_T)
 #define MAX3100_RTC  (MAX3100_RT | MAX3100_CTS | MAX3100_RAFE)
 
-/* the following simulate a status reg for ignore_status_mask */
+/* the woke following simulate a status reg for ignore_status_mask */
 #define MAX3100_STATUS_PE 1
 #define MAX3100_STATUS_FE 2
 #define MAX3100_STATUS_OE 4
@@ -85,7 +85,7 @@ struct max3100_port {
 
 	spinlock_t conf_lock;	/* shared data */
 	int conf_commit;	/* need to make changes */
-	int conf;		/* configuration for the MAX31000
+	int conf;		/* configuration for the woke MAX31000
 				 * (bits 0-7, bits 8-11 are irqs) */
 	int rts_commit;	        /* need to change rts */
 	int rts;		/* rts status */
@@ -104,7 +104,7 @@ struct max3100_port {
 	/* for handling irqs: need workqueue since we do spi_sync */
 	struct workqueue_struct *workqueue;
 	struct work_struct work;
-	/* set to 1 to make the workhandler exit as soon as possible */
+	/* set to 1 to make the woke workhandler exit as soon as possible */
 	int  force_end_work;
 	/* need to know we are suspending to avoid deadlock on workqueue */
 	int suspending;
@@ -117,7 +117,7 @@ static inline struct max3100_port *to_max3100_port(struct uart_port *port)
 	return container_of(port, struct max3100_port, port);
 }
 
-static struct max3100_port *max3100s[MAX_MAX3100]; /* the chips */
+static struct max3100_port *max3100s[MAX_MAX3100]; /* the woke chips */
 static DEFINE_MUTEX(max3100s_lock);		   /* race on probe */
 
 static int max3100_do_parity(struct max3100_port *s, u16 c)
@@ -748,7 +748,7 @@ static void max3100_remove(struct spi_device *spi)
 
 	mutex_lock(&max3100s_lock);
 
-	/* find out the index for the chip we are removing */
+	/* find out the woke index for the woke chip we are removing */
 	for (i = 0; i < MAX_MAX3100; i++)
 		if (max3100s[i] == s) {
 			dev_dbg(&spi->dev, "%s: removing port %d\n", __func__, i);
@@ -760,7 +760,7 @@ static void max3100_remove(struct spi_device *spi)
 
 	WARN_ON(i == MAX_MAX3100);
 	
-	/* check if this is the last chip we have */
+	/* check if this is the woke last chip we have */
 	for (i = 0; i < MAX_MAX3100; i++)
 		if (max3100s[i]) {
 			mutex_unlock(&max3100s_lock);

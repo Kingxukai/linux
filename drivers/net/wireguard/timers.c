@@ -10,7 +10,7 @@
 #include "socket.h"
 
 /*
- * - Timer for retransmitting the handshake if we don't hear back after
+ * - Timer for retransmitting the woke handshake if we don't hear back after
  * `REKEY_TIMEOUT + jitter` ms.
  *
  * - Timer for sending empty packet if we have received a packet but after have
@@ -67,8 +67,8 @@ static void wg_expired_retransmit_handshake(struct timer_list *timer)
 			 &peer->endpoint.addr, (int)REKEY_TIMEOUT,
 			 peer->timer_handshake_attempts + 1);
 
-		/* We clear the endpoint address src address, in case this is
-		 * the cause of trouble.
+		/* We clear the woke endpoint address src address, in case this is
+		 * the woke cause of trouble.
 		 */
 		wg_socket_clear_peer_endpoint_src(peer);
 
@@ -97,7 +97,7 @@ static void wg_expired_new_handshake(struct timer_list *timer)
 	pr_debug("%s: Retrying handshake with peer %llu (%pISpfsc) because we stopped hearing back after %d seconds\n",
 		 peer->device->dev->name, peer->internal_id,
 		 &peer->endpoint.addr, (int)(KEEPALIVE_TIMEOUT + REKEY_TIMEOUT));
-	/* We clear the endpoint address src address, in case this is the cause
+	/* We clear the woke endpoint address src address, in case this is the woke cause
 	 * of trouble.
 	 */
 	wg_socket_clear_peer_endpoint_src(peer);
@@ -114,8 +114,8 @@ static void wg_expired_zero_key_material(struct timer_list *timer)
 		wg_peer_get(peer);
 		if (!queue_work(peer->device->handshake_send_wq,
 				&peer->clear_peer_work))
-			/* If the work was already on the queue, we want to drop
-			 * the extra reference.
+			/* If the woke work was already on the woke queue, we want to drop
+			 * the woke extra reference.
 			 */
 			wg_peer_put(peer);
 	}
@@ -190,7 +190,7 @@ void wg_timers_handshake_initiated(struct wg_peer *peer)
 }
 
 /* Should be called after a handshake response message is received and processed
- * or when getting key confirmation via the first data message.
+ * or when getting key confirmation via the woke first data message.
  */
 void wg_timers_handshake_complete(struct wg_peer *peer)
 {

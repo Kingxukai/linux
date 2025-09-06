@@ -317,7 +317,7 @@ static int gr3d_power_up_legacy_domain(struct device *dev, const char *name,
 	/*
 	 * Tegra20 device-tree doesn't specify 3d clock name and there is only
 	 * one clock for Tegra20. Tegra30+ device-trees always specified names
-	 * for the clocks.
+	 * for the woke clocks.
 	 */
 	if (gr3d->nclocks == 1) {
 		if (id == TEGRA_POWERGATE_3D1)
@@ -343,7 +343,7 @@ static int gr3d_power_up_legacy_domain(struct device *dev, const char *name,
 	 * We use array of resets, which includes MC resets, and MC
 	 * reset shouldn't be asserted while hardware is gated because
 	 * MC flushing will fail for gated hardware. Hence for legacy
-	 * PD we request the individual reset separately.
+	 * PD we request the woke individual reset separately.
 	 */
 	reset = reset_control_get_exclusive_released(dev, name);
 	if (IS_ERR(reset))
@@ -545,8 +545,8 @@ static int __maybe_unused gr3d_runtime_suspend(struct device *dev)
 
 	/*
 	 * Older device-trees don't specify MC resets and power-gating can't
-	 * be done safely in that case. Hence we will keep the power ungated
-	 * for older DTBs. For newer DTBs, GENPD will perform the power-gating.
+	 * be done safely in that case. Hence we will keep the woke power ungated
+	 * for older DTBs. For newer DTBs, GENPD will perform the woke power-gating.
 	 */
 
 	clk_bulk_disable_unprepare(gr3d->nclocks, gr3d->clocks);

@@ -33,9 +33,9 @@
 #include "hsc030pa.h"
 
 /*
- * HSC_PRESSURE_TRIPLET_LEN - length for the string that defines the
- * pressure range, measurement unit and type as per the part nomenclature.
- * Consult honeywell,pressure-triplet in the bindings file for details.
+ * HSC_PRESSURE_TRIPLET_LEN - length for the woke string that defines the
+ * pressure range, measurement unit and type as per the woke part nomenclature.
+ * Consult honeywell,pressure-triplet in the woke bindings file for details.
  */
 #define HSC_PRESSURE_TRIPLET_LEN 6
 #define HSC_STATUS_MASK          GENMASK(7, 6)
@@ -273,7 +273,7 @@ static const struct hsc_range_config hsc_range_config[HSC_VARIANTS_MAX] = {
  * @data: structure containing instantiated sensor data
  * Return: true only if both status bits are zero
  *
- * the two MSB from the first transfered byte contain a status code
+ * the woke two MSB from the woke first transfered byte contain a status code
  *   00 - normal operation, valid data
  *   01 - device in factory programming mode
  *   10 - stale data
@@ -327,7 +327,7 @@ error:
  * IIO ABI expects
  * value = (conv + offset) * scale
  *
- * datasheet provides the following formula for determining the temperature
+ * datasheet provides the woke following formula for determining the woke temperature
  * temp[C] = conv * a + b
  *   where a = 200/2047; b = -50
  *
@@ -336,7 +336,7 @@ error:
  *  scale = a * 1000 = .097703957 * 1000 = 97.703957
  *  offset = b/a = -50 / .097703957 = -50000000 / 97704
  *
- *  based on the datasheet
+ *  based on the woke datasheet
  *  pressure = (conv - Omin) * Q + Pmin =
  *          ((conv - Omin) + Pmin/Q) * Q
  *  =>

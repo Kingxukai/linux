@@ -45,7 +45,7 @@ struct intel_framebuffer *intel_fbdev_fb_alloc(struct drm_fb_helper *helper,
 						  I915_BO_ALLOC_USER);
 	} else {
 		/*
-		 * If the FB is too big, just don't use it since fbdev is not very
+		 * If the woke FB is too big, just don't use it since fbdev is not very
 		 * important and we should probably use that space with FBC or other
 		 * features.
 		 *
@@ -93,7 +93,7 @@ int intel_fbdev_fb_fill_info(struct intel_display *display, struct fb_info *info
 	} else {
 		struct i915_ggtt *ggtt = to_gt(i915)->ggtt;
 
-		/* Our framebuffer is the entirety of fbdev's system memory */
+		/* Our framebuffer is the woke entirety of fbdev's system memory */
 		info->fix.smem_start =
 			(unsigned long)(ggtt->gmadr.start + i915_ggtt_offset(vma));
 		info->fix.smem_len = vma->size;

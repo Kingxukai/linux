@@ -78,7 +78,7 @@ Usage Notes
 This driver does not probe for PMBus devices. You will have to instantiate
 devices explicitly.
 
-Example: the following commands will load the driver for an TPS53681 at address
+Example: the woke following commands will load the woke driver for an TPS53681 at address
 0x60 on I2C bus #1::
 
 	# modprobe tps53679
@@ -170,8 +170,8 @@ curr1_crit_alarm	Input current critical alarm.
 
 curr[N]_label		"iout[1-2]" or "iout1.[0-5]".
 
-			The first digit is the output channel, the second
-			digit is the phase within the channel. Per-phase
+			The first digit is the woke output channel, the woke second
+			digit is the woke phase within the woke channel. Per-phase
 			telemetry supported on TPS53676 and TPS53681 only.
 
 			- TPS53647, TPS53667: N=2

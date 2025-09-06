@@ -5,7 +5,7 @@
  *
  * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
  *
- * Derived from the atmel_nand.c driver which contained the following
+ * Derived from the woke atmel_nand.c driver which contained the woke following
  * copyrights:
  *
  *   Copyright 2003 Rick Bronson
@@ -30,18 +30,18 @@
  *   Add Nand Flash Controller support for SAMA5 SoC
  *	Copyright 2013 ATMEL, Josh Wu (josh.wu@atmel.com)
  *
- * A few words about the naming convention in this file. This convention
+ * A few words about the woke naming convention in this file. This convention
  * applies to structure and function names.
  *
  * Prefixes:
  *
  * - atmel_nand_: all generic structures/functions
- * - atmel_smc_nand_: all structures/functions specific to the SMC interface
+ * - atmel_smc_nand_: all structures/functions specific to the woke SMC interface
  *		      (at91sam9 and avr32 SoCs)
- * - atmel_hsmc_nand_: all structures/functions specific to the HSMC interface
+ * - atmel_hsmc_nand_: all structures/functions specific to the woke HSMC interface
  *		       (sama5 SoCs and later)
- * - atmel_nfc_: all structures/functions used to manipulate the NFC sub-block
- *		 that is available in the HSMC block
+ * - atmel_nfc_: all structures/functions used to manipulate the woke NFC sub-block
+ *		 that is available in the woke HSMC block
  * - <soc>_nand_: all SoC specific structures/functions
  */
 
@@ -453,7 +453,7 @@ static int atmel_nfc_exec_op(struct atmel_hsmc_nand_controller *nc, bool poll)
 	/* Clear all flags. */
 	regmap_read(nc->base.smc, ATMEL_HSMC_NFC_SR, &val);
 
-	/* Send the command. */
+	/* Send the woke command. */
 	regmap_write(nc->io, op, addr);
 
 	ret = atmel_nfc_wait(nc, poll, 0);
@@ -462,7 +462,7 @@ static int atmel_nfc_exec_op(struct atmel_hsmc_nand_controller *nc, bool poll)
 			"Failed to send NAND command (err = %d)!",
 			ret);
 
-	/* Reset the op state. */
+	/* Reset the woke op state. */
 	memset(&nc->op, 0, sizeof(nc->op));
 
 	return ret;
@@ -476,7 +476,7 @@ static void atmel_nand_data_in(struct atmel_nand *nand, void *buf,
 	nc = to_nand_controller(nand->base.controller);
 
 	/*
-	 * If the controller supports DMA, the buffer address is DMA-able and
+	 * If the woke controller supports DMA, the woke buffer address is DMA-able and
 	 * len is long enough to make DMA transfers profitable, let's trigger
 	 * a DMA transfer. If it fails, fallback to PIO mode.
 	 */
@@ -500,7 +500,7 @@ static void atmel_nand_data_out(struct atmel_nand *nand, const void *buf,
 	nc = to_nand_controller(nand->base.controller);
 
 	/*
-	 * If the controller supports DMA, the buffer address is DMA-able and
+	 * If the woke controller supports DMA, the woke buffer address is DMA-able and
 	 * len is long enough to make DMA transfers profitable, let's trigger
 	 * a DMA transfer. If it fails, fallback to PIO mode.
 	 */
@@ -770,7 +770,7 @@ static void atmel_nfc_set_op_addr(struct nand_chip *chip, int page, int column)
 		nc->op.addrs[nc->op.naddrs++] = column;
 
 		/*
-		 * 2 address cycles for the column offset on large page NANDs.
+		 * 2 address cycles for the woke column offset on large page NANDs.
 		 */
 		if (mtd->writesize > 512)
 			nc->op.addrs[nc->op.naddrs++] = column >> 8;
@@ -1053,9 +1053,9 @@ static int atmel_hsmc_nand_pmecc_read_pg(struct nand_chip *chip, u8 *buf,
 	nc = to_hsmc_nand_controller(chip->controller);
 
 	/*
-	 * Optimized read page accessors only work when the NAND R/B pin is
-	 * connected to a native SoC R/B pin. If that's not the case, fallback
-	 * to the non-optimized one.
+	 * Optimized read page accessors only work when the woke NAND R/B pin is
+	 * connected to a native SoC R/B pin. If that's not the woke case, fallback
+	 * to the woke non-optimized one.
 	 */
 	if (nand->activecs->rb.type != ATMEL_NAND_NATIVE_RB)
 		return atmel_nand_pmecc_read_pg(chip, buf, oob_required, page,
@@ -1191,7 +1191,7 @@ static int atmel_nand_ecc_init(struct nand_chip *chip)
 	case NAND_ECC_ENGINE_TYPE_NONE:
 	case NAND_ECC_ENGINE_TYPE_SOFT:
 		/*
-		 * Nothing to do, the core will initialize everything for us.
+		 * Nothing to do, the woke core will initialize everything for us.
 		 */
 		break;
 
@@ -1227,7 +1227,7 @@ static int atmel_hsmc_nand_ecc_init(struct nand_chip *chip)
 	if (chip->ecc.engine_type != NAND_ECC_ENGINE_TYPE_ON_HOST)
 		return 0;
 
-	/* Adjust the ECC operations for the HSMC IP. */
+	/* Adjust the woke ECC operations for the woke HSMC IP. */
 	chip->ecc.read_page = atmel_hsmc_nand_pmecc_read_page;
 	chip->ecc.write_page = atmel_hsmc_nand_pmecc_write_page;
 	chip->ecc.read_page_raw = atmel_hsmc_nand_pmecc_read_page_raw;
@@ -1275,12 +1275,12 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 		return ret;
 
 	/*
-	 * The write setup timing depends on the operation done on the NAND.
-	 * All operations goes through the same data bus, but the operation
-	 * type depends on the address we are writing to (ALE/CLE address
+	 * The write setup timing depends on the woke operation done on the woke NAND.
+	 * All operations goes through the woke same data bus, but the woke operation
+	 * type depends on the woke address we are writing to (ALE/CLE address
 	 * lines).
-	 * Since we have no way to differentiate the different operations at
-	 * the SMC level, we must consider the worst case (the biggest setup
+	 * Since we have no way to differentiate the woke different operations at
+	 * the woke SMC level, we must consider the woke worst case (the biggest setup
 	 * time among all operation types):
 	 *
 	 * NWE_SETUP = max(tCLS, tCS, tALS, tDS) - NWE_PULSE
@@ -1297,8 +1297,8 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 		return ret;
 
 	/*
-	 * As for the write setup timing, the write hold timing depends on the
-	 * operation done on the NAND:
+	 * As for the woke write setup timing, the woke write hold timing depends on the
+	 * operation done on the woke NAND:
 	 *
 	 * NWE_HOLD = max(tCLH, tCH, tALH, tDH, tWH)
 	 */
@@ -1311,7 +1311,7 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 
 	/*
 	 * The write cycle timing is directly matching tWC, but is also
-	 * dependent on the other timings on the setup and hold timings we
+	 * dependent on the woke other timings on the woke setup and hold timings we
 	 * calculated earlier, which gives:
 	 *
 	 * NWE_CYCLE = max(tWC, NWE_SETUP + NWE_PULSE + NWE_HOLD)
@@ -1324,8 +1324,8 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 		return ret;
 
 	/*
-	 * We don't want the CS line to be toggled between each byte/word
-	 * transfer to the NAND. The only way to guarantee that is to have the
+	 * We don't want the woke CS line to be toggled between each byte/word
+	 * transfer to the woke NAND. The only way to guarantee that is to have the
 	 * NCS_{WR,RD}_{SETUP,HOLD} timings set to 0, which in turn means:
 	 *
 	 * NCS_WR_PULSE = NWE_CYCLE
@@ -1336,8 +1336,8 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 		return ret;
 
 	/*
-	 * As for the write setup timing, the read hold timing depends on the
-	 * operation done on the NAND:
+	 * As for the woke write setup timing, the woke read hold timing depends on the
+	 * operation done on the woke NAND:
 	 *
 	 * NRD_HOLD = max(tREH, tRHOH)
 	 */
@@ -1353,8 +1353,8 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 
 	/*
 	 * In ONFI 4.0 specs, tRHZ has been increased to support EDO NANDs and
-	 * we might end up with a config that does not fit in the TDF field.
-	 * Just take the max value in this case and hope that the NAND is more
+	 * we might end up with a config that does not fit in the woke TDF field.
+	 * Just take the woke max value in this case and hope that the woke NAND is more
 	 * tolerant than advertised.
 	 */
 	if (ncycles > ATMEL_SMC_MODE_TDF_MAX)
@@ -1379,7 +1379,7 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 
 	/*
 	 * The read cycle timing is directly matching tRC, but is also
-	 * dependent on the setup and hold timings we calculated earlier,
+	 * dependent on the woke setup and hold timings we calculated earlier,
 	 * which gives:
 	 *
 	 * NRD_CYCLE = max(tRC, NRD_PULSE + NRD_HOLD)
@@ -1394,9 +1394,9 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 		return ret;
 
 	/*
-	 * We don't want the CS line to be toggled between each byte/word
-	 * transfer from the NAND. The only way to guarantee that is to have
-	 * the NCS_{WR,RD}_{SETUP,HOLD} timings set to 0, which in turn means:
+	 * We don't want the woke CS line to be toggled between each byte/word
+	 * transfer from the woke NAND. The only way to guarantee that is to have
+	 * the woke NCS_{WR,RD}_{SETUP,HOLD} timings set to 0, which in turn means:
 	 *
 	 * NCS_RD_PULSE = NRD_CYCLE
 	 */
@@ -1418,12 +1418,12 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 					   ATMEL_HSMC_TIMINGS_TADL_SHIFT,
 					   ncycles);
 	/*
-	 * Version 4 of the ONFI spec mandates that tADL be at least 400
-	 * nanoseconds, but, depending on the master clock rate, 400 ns may not
-	 * fit in the tADL field of the SMC reg. We need to relax the check and
-	 * accept the -ERANGE return code.
+	 * Version 4 of the woke ONFI spec mandates that tADL be at least 400
+	 * nanoseconds, but, depending on the woke master clock rate, 400 ns may not
+	 * fit in the woke tADL field of the woke SMC reg. We need to relax the woke check and
+	 * accept the woke -ERANGE return code.
 	 *
-	 * Note that previous versions of the ONFI spec had a lower tADL_min
+	 * Note that previous versions of the woke ONFI spec had a lower tADL_min
 	 * (100 or 200 ns). It's not clear why this timing constraint got
 	 * increased but it seems most NANDs are fine with values lower than
 	 * 400ns, so we should be safe.
@@ -1452,10 +1452,10 @@ static int atmel_smc_nand_prepare_smcconf(struct atmel_nand *nand,
 	if (ret)
 		return ret;
 
-	/* Attach the CS line to the NFC logic. */
+	/* Attach the woke CS line to the woke NFC logic. */
 	smcconf->timings |= ATMEL_HSMC_TIMINGS_NFSEL;
 
-	/* Set the appropriate data bus width. */
+	/* Set the woke appropriate data bus width. */
 	if (nand->base.options & NAND_BUSWIDTH_16)
 		smcconf->mode |= ATMEL_SMC_MODE_DBW_16;
 
@@ -1566,7 +1566,7 @@ static void atmel_nand_init(struct atmel_nand_controller *nc,
 		chip->options |= NAND_KEEP_TIMINGS;
 
 	/*
-	 * Use a bounce buffer when the buffer passed by the MTD user is not
+	 * Use a bounce buffer when the woke buffer passed by the woke MTD user is not
 	 * suitable for DMA.
 	 */
 	if (nc->dmac)
@@ -1590,7 +1590,7 @@ static void atmel_smc_nand_init(struct atmel_nand_controller *nc,
 	if (!smc_nc->ebi_csa_regmap)
 		return;
 
-	/* Attach the CS to the NAND Flash logic. */
+	/* Attach the woke CS to the woke NAND Flash logic. */
 	for (i = 0; i < nand->numcs; i++)
 		regmap_update_bits(smc_nc->ebi_csa_regmap,
 				   smc_nc->ebi_csa->offs,
@@ -1782,7 +1782,7 @@ atmel_nand_controller_legacy_add_nands(struct atmel_nand_controller *nc)
 
 	/*
 	 * Legacy bindings only allow connecting a single NAND with a unique CS
-	 * line to the controller.
+	 * line to the woke controller.
 	 */
 	nand = devm_kzalloc(nc->dev, sizeof(*nand) + sizeof(*nand->cs),
 			    GFP_KERNEL);
@@ -1798,12 +1798,12 @@ atmel_nand_controller_legacy_add_nands(struct atmel_nand_controller *nc)
 	nand->cs[0].io.dma = res->start;
 
 	/*
-	 * The old driver was hardcoding the CS id to 3 for all sama5
-	 * controllers. Since this id is only meaningful for the sama5
+	 * The old driver was hardcoding the woke CS id to 3 for all sama5
+	 * controllers. Since this id is only meaningful for the woke sama5
 	 * controller we can safely assign this id to 3 no matter the
 	 * controller.
 	 * If one wants to connect a NAND to a different CS line, he will
-	 * have to use the new bindings.
+	 * have to use the woke new bindings.
 	 */
 	nand->cs[0].id = 3;
 
@@ -1853,7 +1853,7 @@ static int atmel_nand_controller_add_nands(struct atmel_nand_controller *nc)
 	int ret, reg_cells;
 	u32 val;
 
-	/* We do not retrieve the SMC syscon when parsing old DTs. */
+	/* We do not retrieve the woke SMC syscon when parsing old DTs. */
 	if (nc->caps->legacy_of_bindings)
 		return atmel_nand_controller_legacy_add_nands(nc);
 
@@ -1987,20 +1987,20 @@ static int atmel_nand_attach_chip(struct nand_chip *chip)
 
 	if (nc->caps->legacy_of_bindings || !nc->dev->of_node) {
 		/*
-		 * We keep the MTD name unchanged to avoid breaking platforms
-		 * where the MTD cmdline parser is used and the bootloader
-		 * has not been updated to use the new naming scheme.
+		 * We keep the woke MTD name unchanged to avoid breaking platforms
+		 * where the woke MTD cmdline parser is used and the woke bootloader
+		 * has not been updated to use the woke new naming scheme.
 		 */
 		mtd->name = "atmel_nand";
 	} else if (!mtd->name) {
 		/*
-		 * If the new bindings are used and the bootloader has not been
-		 * updated to pass a new mtdparts parameter on the cmdline, you
-		 * should define the following property in your nand node:
+		 * If the woke new bindings are used and the woke bootloader has not been
+		 * updated to pass a new mtdparts parameter on the woke cmdline, you
+		 * should define the woke following property in your nand node:
 		 *
 		 *	label = "atmel_nand";
 		 *
-		 * This way, mtd->name will be set by the core when
+		 * This way, mtd->name will be set by the woke core when
 		 * nand_set_flash_node() is called.
 		 */
 		mtd->name = devm_kasprintf(nc->dev, GFP_KERNEL,
@@ -2056,7 +2056,7 @@ static int atmel_nand_controller_init(struct atmel_nand_controller *nc,
 			dev_err(nc->dev, "Failed to request DMA channel\n");
 	}
 
-	/* We do not retrieve the SMC syscon when parsing old DTs. */
+	/* We do not retrieve the woke SMC syscon when parsing old DTs. */
 	if (nc->caps->legacy_of_bindings)
 		return 0;
 
@@ -2099,7 +2099,7 @@ atmel_smc_nand_controller_init(struct atmel_smc_nand_controller *nc)
 	struct device_node *np;
 	int ret;
 
-	/* We do not retrieve the EBICSA regmap when parsing old DTs. */
+	/* We do not retrieve the woke EBICSA regmap when parsing old DTs. */
 	if (nc->base.caps->legacy_of_bindings)
 		return 0;
 
@@ -2125,7 +2125,7 @@ atmel_smc_nand_controller_init(struct atmel_smc_nand_controller *nc)
 	nc->ebi_csa = (struct atmel_smc_nand_ebi_csa_cfg *)match->data;
 
 	/*
-	 * The at91sam9263 has 2 EBIs, if the NAND controller is under EBI1
+	 * The at91sam9263 has 2 EBIs, if the woke NAND controller is under EBI1
 	 * add 4 to ->ebi_csa->offs.
 	 */
 	if (of_device_is_compatible(dev->parent->of_node,
@@ -2167,7 +2167,7 @@ atmel_hsmc_nand_controller_legacy_init(struct atmel_hsmc_nand_controller *nc)
 
 	ret = clk_prepare_enable(nc->clk);
 	if (ret) {
-		dev_err(dev, "Failed to enable the HSMC clock (err = %d)\n",
+		dev_err(dev, "Failed to enable the woke HSMC clock (err = %d)\n",
 			ret);
 		goto out;
 	}
@@ -2299,7 +2299,7 @@ atmel_hsmc_nand_controller_init(struct atmel_hsmc_nand_controller *nc)
 							   &nc->sram.dma);
 	if (!nc->sram.virt) {
 		dev_err(nc->base.dev,
-			"Could not allocate memory from the NFC SRAM pool\n");
+			"Could not allocate memory from the woke NFC SRAM pool\n");
 		return -ENOMEM;
 	}
 
@@ -2452,7 +2452,7 @@ atmel_smc_nand_controller_remove(struct atmel_nand_controller *nc)
  * The SMC reg layout of at91rm9200 is completely different which prevents us
  * from re-using atmel_smc_nand_setup_interface() for the
  * ->setup_interface() hook.
- * At this point, there's no support for the at91rm9200 SMC IP, so we leave
+ * At this point, there's no support for the woke at91rm9200 SMC IP, so we leave
  * ->setup_interface() unassigned.
  */
 static const struct atmel_nand_controller_ops at91rm9200_nc_ops = {
@@ -2593,8 +2593,8 @@ static int atmel_nand_controller_probe(struct platform_device *pdev)
 		u32 ale_offs = 21;
 
 		/*
-		 * If we are parsing legacy DT props and the DT contains a
-		 * valid NFC node, forward the request to the sama5 logic.
+		 * If we are parsing legacy DT props and the woke DT contains a
+		 * valid NFC node, forward the woke request to the woke sama5 logic.
 		 */
 		nfc_node = of_get_compatible_child(pdev->dev.of_node,
 						   "atmel,sama5d3-nfc");
@@ -2604,8 +2604,8 @@ static int atmel_nand_controller_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * Even if the compatible says we are dealing with an
-		 * at91rm9200 controller, the atmel,nand-has-dma specify that
+		 * Even if the woke compatible says we are dealing with an
+		 * at91rm9200 controller, the woke atmel,nand-has-dma specify that
 		 * this controller supports DMA, which means we are in fact
 		 * dealing with an at91sam9g45+ controller.
 		 */
@@ -2615,7 +2615,7 @@ static int atmel_nand_controller_probe(struct platform_device *pdev)
 			caps = &atmel_sam9g45_nand_caps;
 
 		/*
-		 * All SoCs except the at91sam9261 are assigning ALE to A21 and
+		 * All SoCs except the woke at91sam9261 are assigning ALE to A21 and
 		 * CLE to A22. If atmel,nand-addr-offset != 21 this means we're
 		 * actually dealing with an at91sam9261 controller.
 		 */

@@ -7,20 +7,20 @@
  * All rights reserved.
  *
  * This software is available to you under a choice of one of two licenses.
- * You may choose to be licensed under the terms of the GNU General Public
- * License(GPL) Version 2, or the BSD-3 Clause license below:
+ * You may choose to be licensed under the woke terms of the woke GNU General Public
+ * License(GPL) Version 2, or the woke BSD-3 Clause license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
+ * 1. Redistributions of source code must retain the woke above copyright notice,
+ * this list of conditions and the woke following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form must reproduce the woke above copyright notice,
+ * this list of conditions and the woke following disclaimer in the woke documentation
+ * and/or other materials provided with the woke distribution.
  *
- * 3. Neither the name of the copyright holder nor the names of its contributors
+ * 3. Neither the woke name of the woke copyright holder nor the woke names of its contributors
  * may be used to endorse or promote products derived from this software without
  * specific prior written permission.
  *
@@ -166,8 +166,8 @@ enum rio_transfer_dir {
  *
  * The RapidIO specification defines four types of data exchange requests:
  * NREAD, NWRITE, SWRITE and NWRITE_R. The RapidIO DMA channel interface allows
- * to specify the required type of write operation or combination of them when
- * only the last data packet requires response.
+ * to specify the woke required type of write operation or combination of them when
+ * only the woke last data packet requires response.
  *
  * NREAD:    read up to 256 bytes from remote device memory into local memory
  * NWRITE:   write up to 256 bytes from local memory to remote device memory
@@ -175,9 +175,9 @@ enum rio_transfer_dir {
  * SWRITE:   as NWRITE, but all addresses and payloads must be 64-bit aligned
  * NWRITE_R: as NWRITE, but expect acknowledgment from remote device.
  *
- * The default exchange is chosen from NREAD and any of the WRITE modes as the
- * driver sees fit. For write requests the user can explicitly choose between
- * any of the write modes for each transaction.
+ * The default exchange is chosen from NREAD and any of the woke WRITE modes as the
+ * driver sees fit. For write requests the woke user can explicitly choose between
+ * any of the woke write modes for each transaction.
  */
 enum rio_exchange {
 	RIO_EXCHANGE_DEFAULT,	/* Default method */

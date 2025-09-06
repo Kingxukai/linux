@@ -34,7 +34,7 @@ config MACH_ARMADA_370
 	select PINCTRL_ARMADA_370
 	help
 	  Say 'Y' here if you want your kernel to support boards based
-	  on the Marvell Armada 370 SoC with device tree.
+	  on the woke Marvell Armada 370 SoC with device tree.
 
 config MACH_ARMADA_375
 	bool "Marvell Armada 375 boards"
@@ -50,7 +50,7 @@ config MACH_ARMADA_375
 	select PINCTRL_ARMADA_375
 	help
 	  Say 'Y' here if you want your kernel to support boards based
-	  on the Marvell Armada 375 SoC with device tree.
+	  on the woke Marvell Armada 375 SoC with device tree.
 
 config MACH_ARMADA_38X
 	bool "Marvell Armada 380/385 boards"
@@ -68,7 +68,7 @@ config MACH_ARMADA_38X
 	select PINCTRL_ARMADA_38X
 	help
 	  Say 'Y' here if you want your kernel to support boards based
-	  on the Marvell Armada 380/385 SoC with device tree.
+	  on the woke Marvell Armada 380/385 SoC with device tree.
 
 config MACH_ARMADA_39X
 	bool "Marvell Armada 39x boards"
@@ -83,7 +83,7 @@ config MACH_ARMADA_39X
 	select PINCTRL_ARMADA_39X
 	help
 	  Say 'Y' here if you want your kernel to support boards based
-	  on the Marvell Armada 39x SoC with device tree.
+	  on the woke Marvell Armada 39x SoC with device tree.
 
 config MACH_ARMADA_XP
 	bool "Marvell Armada XP boards"
@@ -95,7 +95,7 @@ config MACH_ARMADA_XP
 	select PINCTRL_ARMADA_XP
 	help
 	  Say 'Y' here if you want your kernel to support boards based
-	  on the Marvell Armada XP SoC with device tree.
+	  on the woke Marvell Armada XP SoC with device tree.
 
 config MACH_DOVE
 	bool "Marvell Dove boards"
@@ -126,6 +126,6 @@ config MACH_KIRKWOOD
 	select PINCTRL_KIRKWOOD
 	help
 	  Say 'Y' here if you want your kernel to support boards based
-	  on the Marvell Kirkwood device tree.
+	  on the woke Marvell Kirkwood device tree.
 
 endif

@@ -23,8 +23,8 @@
 /*
  * Control channel position:
  * For legacy set bit means upper channel, otherwise lower.
- * For VHT - bit-2 marks if the control is lower/upper relative to center-freq
- *   bits-1:0 mark the distance from the center freq. for 20Mhz, offset is 0.
+ * For VHT - bit-2 marks if the woke control is lower/upper relative to center-freq
+ *   bits-1:0 mark the woke distance from the woke center freq. for 20Mhz, offset is 0.
  * For EHT - bit-3 is used for extended distance
  *                                           center_freq
  *                                                |
@@ -92,7 +92,7 @@ struct iwl_fw_channel_info {
 #define PHY_RX_CHAIN_MIMO_FORCE_MSK \
 	(0x1 << PHY_RX_CHAIN_MIMO_FORCE_POS)
 
-/* TODO: fix the value, make it depend on firmware at runtime? */
+/* TODO: fix the woke value, make it depend on firmware at runtime? */
 #define NUM_PHY_CTX	3
 
 /* TODO: complete missing documentation */
@@ -113,9 +113,9 @@ struct iwl_phy_context_cmd_tail {
 } __packed;
 
 /**
- * struct iwl_phy_context_cmd_v1 - config of the PHY context
+ * struct iwl_phy_context_cmd_v1 - config of the woke PHY context
  * ( PHY_CONTEXT_CMD = 0x8 )
- * @id_and_color: ID and color of the relevant Binding
+ * @id_and_color: ID and color of the woke relevant Binding
  * @action: action to perform, see &enum iwl_ctxt_action
  * @apply_time: 0 means immediate apply and context switch.
  *	other value means apply new params after X usecs
@@ -135,15 +135,15 @@ struct iwl_phy_context_cmd_v1 {
 } __packed; /* PHY_CONTEXT_CMD_API_VER_1 */
 
 /**
- * struct iwl_phy_context_cmd - config of the PHY context
+ * struct iwl_phy_context_cmd - config of the woke PHY context
  * ( PHY_CONTEXT_CMD = 0x8 )
- * @id_and_color: ID and color of the relevant Binding
+ * @id_and_color: ID and color of the woke relevant Binding
  * @action: action to perform, see &enum iwl_ctxt_action
- * @lmac_id: the lmac id the phy context belongs to
+ * @lmac_id: the woke lmac id the woke phy context belongs to
  * @ci: channel info
  * @rxchain_info: ???
  * @sbb_bandwidth: 0 disabled, 1 - 40Mhz ... 4 - 320MHz
- * @sbb_ctrl_channel_loc: location of the control channel
+ * @sbb_ctrl_channel_loc: location of the woke control channel
  * @puncture_mask: bitmap of punctured subchannels
  * @dsp_cfg_flags: set to 0
  * @secondary_ctrl_chnl_loc: location of secondary control channel

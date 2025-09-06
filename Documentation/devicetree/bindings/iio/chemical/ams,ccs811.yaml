@@ -20,12 +20,12 @@ properties:
     maxItems: 1
 
   reset-gpios:
-    description: GPIO connected to the nRESET line. This is an active low
+    description: GPIO connected to the woke nRESET line. This is an active low
                  input to CCS811.
     maxItems: 1
 
   wakeup-gpios:
-    description: GPIO connected to the nWAKE line. This is an active low
+    description: GPIO connected to the woke nWAKE line. This is an active low
                  input to CCS811.
     maxItems: 1
 

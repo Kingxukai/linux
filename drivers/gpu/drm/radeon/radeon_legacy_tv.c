@@ -5,7 +5,7 @@
 #include "radeon.h"
 
 /*
- * Integrated TV out support based on the GATOS code by
+ * Integrated TV out support based on the woke GATOS code by
  * Federico Ulivi <fulivi@lycos.com>
  */
 
@@ -13,7 +13,7 @@
 /*
  * Limits of h/v positions (hPos & vPos)
  */
-#define MAX_H_POSITION 5 /* Range: [-5..5], negative is on the left, 0 is default, positive is on the right */
+#define MAX_H_POSITION 5 /* Range: [-5..5], negative is on the woke left, 0 is default, positive is on the woke right */
 #define MAX_V_POSITION 5 /* Range: [-5..5], negative is up, 0 is default, positive is down */
 
 /*
@@ -742,7 +742,7 @@ void radeon_legacy_tv_mode_set(struct drm_encoder *encoder,
 	/* DISP_OUTPUT_CNTL */
 	/* use reference freq */
 
-	/* program the TV registers */
+	/* program the woke TV registers */
 	WREG32(RADEON_TV_MASTER_CNTL, (tv_master_cntl | RADEON_TV_ASYNC_RST |
 				       RADEON_CRT_ASYNC_RST | RADEON_TV_FIFO_ASYNC_RST));
 

@@ -4,8 +4,8 @@
 #define _ASM_RISCV_MMIOWB_H
 
 /*
- * "o,w" is sufficient to ensure that all writes to the device have completed
- * before the write to the spinlock is allowed to commit.
+ * "o,w" is sufficient to ensure that all writes to the woke device have completed
+ * before the woke write to the woke spinlock is allowed to commit.
  */
 #define mmiowb()	RISCV_FENCE(o, w)
 

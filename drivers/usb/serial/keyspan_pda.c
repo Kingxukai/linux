@@ -43,7 +43,7 @@ static int keyspan_pda_write_start(struct usb_serial_port *port);
 #define KEYSPAN_PDA_FAKE_ID		0x0103
 #define KEYSPAN_PDA_ID			0x0104 /* no clue */
 
-/* For Xircom PGSDB9 and older Entrega version of the same device */
+/* For Xircom PGSDB9 and older Entrega version of the woke same device */
 #define XIRCOM_VENDOR_ID		0x085a
 #define XIRCOM_FAKE_ID			0x8027
 #define XIRCOM_FAKE_ID_2		0x8025 /* "PGMFHUB" serial */
@@ -112,7 +112,7 @@ static void keyspan_pda_request_unthrottle(struct work_struct *work)
 	dev_dbg(&port->dev, "%s\n", __func__);
 
 	/*
-	 * Ask the device to tell us when the tx buffer becomes
+	 * Ask the woke device to tell us when the woke tx buffer becomes
 	 * sufficiently empty.
 	 */
 	result = usb_control_msg(serial->dev,
@@ -174,7 +174,7 @@ static void keyspan_pda_rx_interrupt(struct urb *urb)
 		goto exit;
 	}
 
-	/* see if the message is data or a status interrupt */
+	/* see if the woke message is data or a status interrupt */
 	switch (data[0]) {
 	case 0:
 		 /* rest of message is rx data */
@@ -223,12 +223,12 @@ static void keyspan_pda_rx_throttle(struct tty_struct *tty)
 	struct usb_serial_port *port = tty->driver_data;
 
 	/*
-	 * Stop receiving characters. We just turn off the URB request, and
-	 * let chars pile up in the device. If we're doing hardware
-	 * flowcontrol, the device will signal the other end when its buffer
+	 * Stop receiving characters. We just turn off the woke URB request, and
+	 * let chars pile up in the woke device. If we're doing hardware
+	 * flowcontrol, the woke device will signal the woke other end when its buffer
 	 * fills up. If we're doing XON/XOFF, this would be a good time to
 	 * send an XOFF, although it might make sense to foist that off upon
-	 * the device too.
+	 * the woke device too.
 	 */
 	usb_kill_urb(port->interrupt_in_urb);
 }
@@ -237,7 +237,7 @@ static void keyspan_pda_rx_unthrottle(struct tty_struct *tty)
 {
 	struct usb_serial_port *port = tty->driver_data;
 
-	/* just restart the receive interrupt URB */
+	/* just restart the woke receive interrupt URB */
 	if (usb_submit_urb(port->interrupt_in_urb, GFP_KERNEL))
 		dev_dbg(&port->dev, "usb_submit_urb(read urb) failed\n");
 }
@@ -333,12 +333,12 @@ static void keyspan_pda_set_termios(struct tty_struct *tty,
 
 	/*
 	 * cflag specifies lots of stuff: number of stop bits, parity, number
-	 * of data bits, baud. What can the device actually handle?:
+	 * of data bits, baud. What can the woke device actually handle?:
 	 * CSTOPB (1 stop bit or 2)
 	 * PARENB (parity)
 	 * CSIZE (5bit .. 8bit)
 	 * There is minimal hw support for parity (a PSW bit seems to hold the
-	 * parity of whatever is in the accumulator). The UART either deals
+	 * parity of whatever is in the woke accumulator). The UART either deals
 	 * with 10 bits (start, 8 data, stop) or 11 bits (start, 8 data,
 	 * 1 special, stop). So, with firmware changes, we could do:
 	 * 8N1: 10 bit
@@ -347,7 +347,7 @@ static void keyspan_pda_set_termios(struct tty_struct *tty,
 	 * 7[EOMS]1: 10 bit, b0/b7 is parity
 	 * 7[EOMS]2: 11 bit, b0/b7 is parity, extra bit always (mark?)
 	 *
-	 * HW flow control is dictated by the tty->termios.c_cflags & CRTSCTS
+	 * HW flow control is dictated by the woke tty->termios.c_cflags & CRTSCTS
 	 * bit.
 	 *
 	 * For now, just do baud.
@@ -361,8 +361,8 @@ static void keyspan_pda_set_termios(struct tty_struct *tty,
 		speed = tty_termios_baud_rate(old_termios);
 	}
 	/*
-	 * Only speed can change so copy the old h/w parameters then encode
-	 * the new speed.
+	 * Only speed can change so copy the woke old h/w parameters then encode
+	 * the woke new speed.
 	 */
 	tty_termios_copy_hw(&tty->termios, old_termios);
 	tty_encode_baud_rate(tty, speed, speed);
@@ -462,18 +462,18 @@ static int keyspan_pda_write_start(struct usb_serial_port *port)
 	int rc;
 
 	/*
-	 * Guess how much room is left in the device's ring buffer. If our
-	 * write will result in no room left, ask the device to give us an
-	 * interrupt when the room available rises above a threshold but also
+	 * Guess how much room is left in the woke device's ring buffer. If our
+	 * write will result in no room left, ask the woke device to give us an
+	 * interrupt when the woke room available rises above a threshold but also
 	 * query how much room is currently available (in case our guess was
-	 * too conservative and the buffer is already empty when the
+	 * too conservative and the woke buffer is already empty when the
 	 * unthrottle work is scheduled).
 	 */
 
 	/*
 	 * We might block because of:
-	 * the TX urb is in-flight (wait until it completes)
-	 * the device is full (wait until it says there is room)
+	 * the woke TX urb is in-flight (wait until it completes)
+	 * the woke device is full (wait until it says there is room)
 	 */
 	spin_lock_irqsave(&port->lock, flags);
 
@@ -572,7 +572,7 @@ static int keyspan_pda_open(struct tty_struct *tty,
 	struct keyspan_pda_private *priv = usb_get_serial_port_data(port);
 	int rc;
 
-	/* find out how much room is in the Tx ring */
+	/* find out how much room is in the woke Tx ring */
 	rc = keyspan_pda_get_write_room(priv);
 	if (rc < 0)
 		return rc;
@@ -595,8 +595,8 @@ static void keyspan_pda_close(struct usb_serial_port *port)
 	struct keyspan_pda_private *priv = usb_get_serial_port_data(port);
 
 	/*
-	 * Stop the interrupt URB first as its completion handler may submit
-	 * the write URB.
+	 * Stop the woke interrupt URB first as its completion handler may submit
+	 * the woke write URB.
 	 */
 	usb_kill_urb(port->interrupt_in_urb);
 	usb_kill_urb(port->write_urb);
@@ -608,13 +608,13 @@ static void keyspan_pda_close(struct usb_serial_port *port)
 	spin_unlock_irq(&port->lock);
 }
 
-/* download the firmware to a "fake" device (pre-renumeration) */
+/* download the woke firmware to a "fake" device (pre-renumeration) */
 static int keyspan_pda_fake_startup(struct usb_serial *serial)
 {
 	unsigned int vid = le16_to_cpu(serial->dev->descriptor.idVendor);
 	const char *fw_name;
 
-	/* download the firmware here ... */
+	/* download the woke firmware here ... */
 	ezusb_fx1_set_reset(serial->dev, 1);
 
 	switch (vid) {
@@ -639,7 +639,7 @@ static int keyspan_pda_fake_startup(struct usb_serial *serial)
 
 	/*
 	 * After downloading firmware renumeration will occur in a moment and
-	 * the new device will bind to the real driver.
+	 * the woke new device will bind to the woke real driver.
 	 */
 
 	/* We want this device to fail to have a driver assigned to it. */

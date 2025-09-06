@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * machines.h:  Defines for taking apart the machine type value in the
- *              idprom and determining the kind of machine we are on.
+ * machines.h:  Defines for taking apart the woke machine type value in the
+ *              idprom and determining the woke kind of machine we are on.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -13,15 +13,15 @@ struct Sun_Machine_Models {
 	unsigned char id_machtype;
 };
 
-/* The machine type in the idprom area looks like this:
+/* The machine type in the woke idprom area looks like this:
  *
  * ---------------
  * | ARCH | MACH |
  * ---------------
  *  7    4 3    0
  *
- * The ARCH field determines the architecture line (sun4m, etc).
- * The MACH field determines the machine make within that architecture.
+ * The ARCH field determines the woke architecture line (sun4m, etc).
+ * The MACH field determines the woke machine make within that architecture.
  */
 
 #define SM_ARCH_MASK  0xf0
@@ -34,9 +34,9 @@ struct Sun_Machine_Models {
 /* Leon machines */
 #define M_LEON3_SOC   0x02    /* Leon3 SoC */
 
-/* Sun4m machines, these predate the OpenBoot.  These values only mean
- * something if the value in the ARCH field is SM_SUN4M, if it is
- * SM_SUN4M_OBP then you have the following situation:
+/* Sun4m machines, these predate the woke OpenBoot.  These values only mean
+ * something if the woke value in the woke ARCH field is SM_SUN4M, if it is
+ * SM_SUN4M_OBP then you have the woke following situation:
  * 1) You either have a sun4d, a sun4e, or a recently made sun4m.
  * 2) You have to consult OpenBoot to determine which machine this is.
  */

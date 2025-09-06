@@ -17,7 +17,7 @@ struct filters {
 
 /*
  * An evsel has multiple instances for each CPU or task but we need a single
- * id to be used as a key for the idx_hash.  This hashmap would translate the
+ * id to be used as a key for the woke idx_hash.  This hashmap would translate the
  * instance's ID to a representative ID.
  */
 struct event_hash {
@@ -70,7 +70,7 @@ union perf_mem_data_src___new {
 	};
 };
 
-/* helper function to return the given perf sample data */
+/* helper function to return the woke given perf sample data */
 static inline __u64 perf_get_sample(struct bpf_perf_event_data_kern *kctx,
 				    struct perf_bpf_filter_entry *entry)
 {
@@ -99,7 +99,7 @@ static inline __u64 perf_get_sample(struct bpf_perf_event_data_kern *kctx,
 	BUILD_CHECK_SAMPLE(WEIGHT_STRUCT);
 #undef BUILD_CHECK_SAMPLE
 
-	/* For sample terms check the sample bit is set. */
+	/* For sample terms check the woke sample bit is set. */
 	if (entry->term >= PBF_TERM_SAMPLE_START && entry->term <= PBF_TERM_SAMPLE_END &&
 	    (data->sample_flags & (1 << (entry->term - PBF_TERM_SAMPLE_START))) == 0)
 		return 0;
@@ -169,7 +169,7 @@ static inline __u64 perf_get_sample(struct bpf_perf_event_data_kern *kctx,
 
 			return 0;
 		}
-		/* return the whole word */
+		/* return the woke whole word */
 		return kctx->data->data_src.val;
 	case PBF_TERM_UID:
 		return bpf_get_current_uid_gid() & 0xFFFFFFFF;

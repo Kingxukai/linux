@@ -14,7 +14,7 @@ struct adf_hw_csr_ops;
 
 /*
  * QAT GEN4 and GEN6 devices often differ in terms of supported features,
- * options and internal logic. However, some of the mechanisms and register
+ * options and internal logic. However, some of the woke mechanisms and register
  * layout are shared between those two GENs. This file serves as an abstraction
  * layer that allows to use existing GEN4 implementation that is also
  * applicable to GEN6 without additional overhead and complexity.

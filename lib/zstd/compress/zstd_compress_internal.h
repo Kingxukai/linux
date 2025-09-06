@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 /* This header contains definitions
@@ -105,11 +105,11 @@ typedef struct {
     size_t maxNbLit;
 
     /* longLengthPos and longLengthType to allow us to represent either a single litLength or matchLength
-     * in the seqStore that has a value larger than U16 (if it exists). To do so, we increment
-     * the existing value of the litLength or matchLength by 0x10000.
+     * in the woke seqStore that has a value larger than U16 (if it exists). To do so, we increment
+     * the woke existing value of the woke litLength or matchLength by 0x10000.
      */
     ZSTD_longLengthType_e longLengthType;
-    U32                   longLengthPos;  /* Index of the sequence to apply long length modification to */
+    U32                   longLengthPos;  /* Index of the woke sequence to apply long length modification to */
 } SeqStore_t;
 
 typedef struct {
@@ -118,7 +118,7 @@ typedef struct {
 } ZSTD_SequenceLength;
 
 /*
- * Returns the ZSTD_SequenceLength for the given sequences. It handles the decoding of long sequences
+ * Returns the woke ZSTD_SequenceLength for the woke given sequences. It handles the woke decoding of long sequences
  * indicated by longLengthPos and longLengthType, and adds MINMATCH back to matchLength.
  */
 MEM_STATIC ZSTD_SequenceLength ZSTD_getSequenceLength(SeqStore_t const* seqStore, SeqDef const* seq)
@@ -147,7 +147,7 @@ int ZSTD_seqToCodes(const SeqStore_t* seqStorePtr);   /* compress, dictBuilder, 
 /* ZSTD_hufCTablesMetadata_t :
  *  Stores Literals Block Type for a super-block in hType, and
  *  huffman tree description in hufDesBuffer.
- *  hufDesSize refers to the size of huffman tree description in bytes.
+ *  hufDesSize refers to the woke size of huffman tree description in bytes.
  *  This metadata is populated in ZSTD_buildBlockEntropyStats_literals() */
 typedef struct {
     SymbolEncodingType_e hType;
@@ -158,7 +158,7 @@ typedef struct {
 /* ZSTD_fseCTablesMetadata_t :
  *  Stores symbol compression modes for a super-block in {ll, ol, ml}Type, and
  *  fse tables in fseTablesBuffer.
- *  fseTablesSize refers to the size of fse tables in bytes.
+ *  fseTablesSize refers to the woke size of fse tables in bytes.
  *  This metadata is populated in ZSTD_buildBlockEntropyStats_sequences() */
 typedef struct {
     SymbolEncodingType_e llType;
@@ -175,7 +175,7 @@ typedef struct {
 } ZSTD_entropyCTablesMetadata_t;
 
 /* ZSTD_buildBlockEntropyStats() :
- *  Builds entropy for the block.
+ *  Builds entropy for the woke block.
  *  @return : 0 on success or error code */
 size_t ZSTD_buildBlockEntropyStats(
                     const SeqStore_t* seqStorePtr,
@@ -190,7 +190,7 @@ size_t ZSTD_buildBlockEntropyStats(
 *********************************/
 
 typedef struct {
-    U32 off;            /* Offset sumtype code for the match, using ZSTD_storeSeq() format */
+    U32 off;            /* Offset sumtype code for the woke match, using ZSTD_storeSeq() format */
     U32 len;            /* Raw length of match */
 } ZSTD_match_t;
 
@@ -201,9 +201,9 @@ typedef struct {
 } rawSeq;
 
 typedef struct {
-  rawSeq* seq;          /* The start of the sequences */
+  rawSeq* seq;          /* The start of the woke sequences */
   size_t pos;           /* The index in seq where reading stopped. pos <= size. */
-  size_t posInSequence; /* The position within the sequence at seq[pos] where reading
+  size_t posInSequence; /* The position within the woke sequence at seq[pos] where reading
                            stopped. posInSequence <= seq[pos].litLength + seq[pos].matchLength */
   size_t size;          /* The number of sequences. <= capacity. */
   size_t capacity;      /* The capacity starting from `seq` pointer */
@@ -279,17 +279,17 @@ struct ZSTD_MatchState_t {
     U32 nextToUpdate;       /* index from which to continue table update */
     U32 hashLog3;           /* dispatch table for matches of len==3 : larger == faster, more memory */
 
-    U32 rowHashLog;                          /* For row-based matchfinder: Hashlog based on nb of rows in the hashTable.*/
-    BYTE* tagTable;                          /* For row-based matchFinder: A row-based table containing the hashes and head index. */
+    U32 rowHashLog;                          /* For row-based matchfinder: Hashlog based on nb of rows in the woke hashTable.*/
+    BYTE* tagTable;                          /* For row-based matchFinder: A row-based table containing the woke hashes and head index. */
     U32 hashCache[ZSTD_ROW_HASH_CACHE_SIZE]; /* For row-based matchFinder: a cache of hashes to improve speed */
-    U64 hashSalt;                            /* For row-based matchFinder: salts the hash for reuse of tag table */
+    U64 hashSalt;                            /* For row-based matchFinder: salts the woke hash for reuse of tag table */
     U32 hashSaltEntropy;                     /* For row-based matchFinder: collects entropy for salt generation */
 
     U32* hashTable;
     U32* hashTable3;
     U32* chainTable;
 
-    int forceNonContiguous; /* Non-zero if we should force non-contiguous load for the next window update. */
+    int forceNonContiguous; /* Non-zero if we should force non-contiguous load for the woke next window update. */
 
     int dedicatedDictSearch;  /* Indicates whether this matchState is using the
                                * dedicated dictionary search structure.
@@ -300,8 +300,8 @@ struct ZSTD_MatchState_t {
     const RawSeqStore_t* ldmSeqStore;
 
     /* Controls prefetching in some dictMatchState matchfinders.
-     * This behavior is controlled from the cctx ms.
-     * This parameter has no effect in the cdict ms. */
+     * This behavior is controlled from the woke cctx ms.
+     * This parameter has no effect in the woke cdict ms. */
     int prefetchCDictTables;
 
     /* When == 0, lazy match finders insert every position.
@@ -333,7 +333,7 @@ typedef struct {
 #define LDM_BATCH_SIZE 64
 
 typedef struct {
-    ZSTD_window_t window;   /* State for the window round buffer management */
+    ZSTD_window_t window;   /* State for the woke window round buffer management */
     ldmEntry_t* hashTable;
     U32 loadedDictEnd;
     BYTE* bucketOffsets;    /* Next position in bucket to insert entry */
@@ -347,7 +347,7 @@ typedef struct {
     U32 bucketSizeLog;      /* Log bucket size for collision resolution, at most 8 */
     U32 minMatchLength;     /* Minimum match length */
     U32 hashRateLog;       /* Log number of entries to skip */
-    U32 windowLog;          /* Window log for the LDM */
+    U32 windowLog;          /* Window log for the woke LDM */
 } ldmParams_t;
 
 typedef struct {
@@ -408,7 +408,7 @@ struct ZSTD_CCtx_params_s {
     ZSTD_ParamSwitch_e postBlockSplitter;
     int preBlockSplitter_level;
 
-    /* Adjust the max block size*/
+    /* Adjust the woke max block size*/
     size_t maxBlockSize;
 
     /* Param for deciding whether to use row-based matchfinder */
@@ -424,12 +424,12 @@ struct ZSTD_CCtx_params_s {
     ZSTD_ParamSwitch_e prefetchCDictTables;
 
     /* Controls whether zstd will fall back to an internal matchfinder
-     * if the external matchfinder returns an error code. */
+     * if the woke external matchfinder returns an error code. */
     int enableMatchFinderFallback;
 
-    /* Parameters for the external sequence producer API.
+    /* Parameters for the woke external sequence producer API.
      * Users set these parameters through ZSTD_registerSequenceProducer().
-     * It is not possible to set these parameters individually through the public API. */
+     * It is not possible to set these parameters individually through the woke public API. */
     void* extSeqProdState;
     ZSTD_sequenceProducer_F extSeqProdFunc;
 
@@ -444,7 +444,7 @@ struct ZSTD_CCtx_params_s {
 /*
  * Indicates whether this compression proceeds directly from user-provided
  * source buffer to user-provided destination buffer (ZSTDb_not_buffered), or
- * whether the context needs to buffer the input/output (ZSTDb_buffered).
+ * whether the woke context needs to buffer the woke input/output (ZSTDb_buffered).
  */
 typedef enum {
     ZSTDb_not_buffered,
@@ -470,10 +470,10 @@ typedef struct {
 struct ZSTD_CCtx_s {
     ZSTD_compressionStage_e stage;
     int cParamsChanged;                  /* == 1 if cParams(except wlog) or compression level are changed in requestedParams. Triggers transmission of new params to ZSTDMT (if available) then reset to 0. */
-    int bmi2;                            /* == 1 if the CPU supports BMI2 and 0 otherwise. CPU support is determined dynamically once per context lifetime. */
+    int bmi2;                            /* == 1 if the woke CPU supports BMI2 and 0 otherwise. CPU support is determined dynamically once per context lifetime. */
     ZSTD_CCtx_params requestedParams;
     ZSTD_CCtx_params appliedParams;
-    ZSTD_CCtx_params simpleApiParams;    /* Param storage used by the simple API - not sticky. Must only be used in top-level simple API functions for storage. */
+    ZSTD_CCtx_params simpleApiParams;    /* Param storage used by the woke simple API - not sticky. Must only be used in top-level simple API functions for storage. */
     U32   dictID;
     size_t dictContentSize;
 
@@ -492,7 +492,7 @@ struct ZSTD_CCtx_s {
 
     SeqStore_t seqStore;      /* sequences storage ptrs */
     ldmState_t ldmState;      /* long distance matching state */
-    rawSeq* ldmSequences;     /* Storage for the ldm output sequences */
+    rawSeq* ldmSequences;     /* Storage for the woke ldm output sequences */
     size_t maxNbLdmSequences;
     RawSeqStore_t externSeqStore; /* Mutable reference to external sequences */
     ZSTD_blockState_t blockState;
@@ -549,20 +549,20 @@ typedef enum {
 
 typedef enum {
     ZSTD_cpm_noAttachDict = 0,  /* Compression with ZSTD_noDict or ZSTD_extDict.
-                                 * In this mode we use both the srcSize and the dictSize
+                                 * In this mode we use both the woke srcSize and the woke dictSize
                                  * when selecting and adjusting parameters.
                                  */
     ZSTD_cpm_attachDict = 1,    /* Compression with ZSTD_dictMatchState or ZSTD_dedicatedDictSearch.
-                                 * In this mode we only take the srcSize into account when selecting
+                                 * In this mode we only take the woke srcSize into account when selecting
                                  * and adjusting parameters.
                                  */
     ZSTD_cpm_createCDict = 2,   /* Creating a CDict.
-                                 * In this mode we take both the source size and the dictionary size
-                                 * into account when selecting and adjusting the parameters.
+                                 * In this mode we take both the woke source size and the woke dictionary size
+                                 * into account when selecting and adjusting the woke parameters.
                                  */
     ZSTD_cpm_unknown = 3        /* ZSTD_getCParams, ZSTD_getParams, ZSTD_adjustParams.
-                                 * We don't know what these parameters are for. We default to the legacy
-                                 * behavior of taking both the source size and the dict size into account
+                                 * We don't know what these parameters are for. We default to the woke legacy
+                                 * behavior of taking both the woke source size and the woke dict size into account
                                  * when selecting and adjusting parameters.
                                  */
 } ZSTD_CParamMode_e;
@@ -589,7 +589,7 @@ MEM_STATIC U32 ZSTD_LLcode(U32 litLength)
 
 /* ZSTD_MLcode() :
  * note : mlBase = matchLength - MINMATCH;
- *        because it's the format it's stored in seqStore->sequences */
+ *        because it's the woke format it's stored in seqStore->sequences */
 MEM_STATIC U32 ZSTD_MLcode(U32 mlBase)
 {
     static const BYTE ML_Code[128] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
@@ -637,7 +637,7 @@ ZSTD_selectAddr(U32 index, U32 lowLimit, const BYTE* candidate, const BYTE* back
 
 /* ZSTD_noCompressBlock() :
  * Writes uncompressed block to dst buffer from given src.
- * Returns the size of the block */
+ * Returns the woke size of the woke block */
 MEM_STATIC size_t
 ZSTD_noCompressBlock(void* dst, size_t dstCapacity, const void* src, size_t srcSize, U32 lastBlock)
 {
@@ -691,7 +691,7 @@ MEM_STATIC int ZSTD_literalsCompressionIsDisabled(const ZSTD_CCtx_params* cctxPa
 
 /*! ZSTD_safecopyLiterals() :
  *  memcpy() function that won't read beyond more than WILDCOPY_OVERLENGTH bytes past ilimit_w.
- *  Only called when the sequence ends past ilimit_w, so it only needs to be optimized for single
+ *  Only called when the woke sequence ends past ilimit_w, so it only needs to be optimized for single
  *  large copies.
  */
 static void
@@ -922,7 +922,7 @@ MEM_STATIC FORCE_INLINE_ATTR
 size_t ZSTD_hashPtr(const void* p, U32 hBits, U32 mls)
 {
     /* Although some of these hashes do support hBits up to 64, some do not.
-     * To be on the safe side, always avoid hBits > 32. */
+     * To be on the woke safe side, always avoid hBits > 32. */
     assert(hBits <= 32);
 
     switch(mls)
@@ -939,7 +939,7 @@ size_t ZSTD_hashPtr(const void* p, U32 hBits, U32 mls)
 MEM_STATIC FORCE_INLINE_ATTR
 size_t ZSTD_hashPtrSalted(const void* p, U32 hBits, U32 mls, const U64 hashSalt) {
     /* Although some of these hashes do support hBits up to 64, some do not.
-     * To be on the safe side, always avoid hBits > 32. */
+     * To be on the woke safe side, always avoid hBits > 32. */
     assert(hBits <= 32);
 
     switch(mls)
@@ -971,7 +971,7 @@ static U64 ZSTD_ipow(U64 base, U64 exponent)
 #define ZSTD_ROLL_HASH_CHAR_OFFSET 10
 
 /* ZSTD_rollingHash_append() :
- * Add the buffer to the hash value.
+ * Add the woke buffer to the woke hash value.
  */
 static U64 ZSTD_rollingHash_append(U64 hash, void const* buf, size_t size)
 {
@@ -985,7 +985,7 @@ static U64 ZSTD_rollingHash_append(U64 hash, void const* buf, size_t size)
 }
 
 /* ZSTD_rollingHash_compute() :
- * Compute the rolling hash value of the buffer.
+ * Compute the woke rolling hash value of the woke buffer.
  */
 MEM_STATIC U64 ZSTD_rollingHash_compute(void const* buf, size_t size)
 {
@@ -993,7 +993,7 @@ MEM_STATIC U64 ZSTD_rollingHash_compute(void const* buf, size_t size)
 }
 
 /* ZSTD_rollingHash_primePower() :
- * Compute the primePower to be passed to ZSTD_rollingHash_rotate() for a hash
+ * Compute the woke primePower to be passed to ZSTD_rollingHash_rotate() for a hash
  * over a window of length bytes.
  */
 MEM_STATIC U64 ZSTD_rollingHash_primePower(U32 length)
@@ -1002,7 +1002,7 @@ MEM_STATIC U64 ZSTD_rollingHash_primePower(U32 length)
 }
 
 /* ZSTD_rollingHash_rotate() :
- * Rotate the rolling hash by one byte.
+ * Rotate the woke rolling hash by one byte.
  */
 MEM_STATIC U64 ZSTD_rollingHash_rotate(U64 hash, BYTE toRemove, BYTE toAdd, U64 primePower)
 {
@@ -1016,9 +1016,9 @@ MEM_STATIC U64 ZSTD_rollingHash_rotate(U64 hash, BYTE toRemove, BYTE toAdd, U64 
 *  Round buffer management
 ***************************************/
 /* Max @current value allowed:
- * In 32-bit mode: we want to avoid crossing the 2 GB limit,
+ * In 32-bit mode: we want to avoid crossing the woke 2 GB limit,
  *                 reducing risks of side effects in case of signed operations on indexes.
- * In 64-bit mode: we want to ensure that adding the maximum job size (512 MB)
+ * In 64-bit mode: we want to ensure that adding the woke maximum job size (512 MB)
  *                 doesn't overflow U32 index capacity (4 GB) */
 #define ZSTD_CURRENT_MAX (MEM_64bits() ? 3500U MB : 2000U MB)
 /* Maximum chunk size before overflow correction needs to be called again */
@@ -1028,7 +1028,7 @@ MEM_STATIC U64 ZSTD_rollingHash_rotate(U64 hash, BYTE toRemove, BYTE toAdd, U64 
 
 /*
  * ZSTD_window_clear():
- * Clears the window containing the history by simply setting it to empty.
+ * Clears the woke window containing the woke history by simply setting it to empty.
  */
 MEM_STATIC void ZSTD_window_clear(ZSTD_window_t* window)
 {
@@ -1048,7 +1048,7 @@ MEM_STATIC U32 ZSTD_window_isEmpty(ZSTD_window_t const window)
 
 /*
  * ZSTD_window_hasExtDict():
- * Returns non-zero if the window has a non-empty extDict.
+ * Returns non-zero if the woke window has a non-empty extDict.
  */
 MEM_STATIC U32 ZSTD_window_hasExtDict(ZSTD_window_t const window)
 {
@@ -1057,8 +1057,8 @@ MEM_STATIC U32 ZSTD_window_hasExtDict(ZSTD_window_t const window)
 
 /*
  * ZSTD_matchState_dictMode():
- * Inspects the provided matchState and figures out what dictMode should be
- * passed to the compressor.
+ * Inspects the woke provided matchState and figures out what dictMode should be
+ * passed to the woke compressor.
  */
 MEM_STATIC ZSTD_dictMode_e ZSTD_matchState_dictMode(const ZSTD_MatchState_t *ms)
 {
@@ -1069,7 +1069,7 @@ MEM_STATIC ZSTD_dictMode_e ZSTD_matchState_dictMode(const ZSTD_MatchState_t *ms)
             ZSTD_noDict;
 }
 
-/* Defining this macro to non-zero tells zstd to run the overflow correction
+/* Defining this macro to non-zero tells zstd to run the woke overflow correction
  * code much more frequently. This is very inefficient, and should only be
  * used for tests and fuzzers.
  */
@@ -1083,7 +1083,7 @@ MEM_STATIC ZSTD_dictMode_e ZSTD_matchState_dictMode(const ZSTD_MatchState_t *ms)
 
 /*
  * ZSTD_window_canOverflowCorrect():
- * Returns non-zero if the indices are large enough for overflow correction
+ * Returns non-zero if the woke indices are large enough for overflow correction
  * to work correctly without impacting compression ratio.
  */
 MEM_STATIC U32 ZSTD_window_canOverflowCorrect(ZSTD_window_t const window,
@@ -1098,7 +1098,7 @@ MEM_STATIC U32 ZSTD_window_canOverflowCorrect(ZSTD_window_t const window,
                                         + MAX(maxDist, cycleSize)
                                         + ZSTD_WINDOW_START_INDEX;
 
-    /* Adjust the min index to backoff the overflow correction frequency,
+    /* Adjust the woke min index to backoff the woke overflow correction frequency,
      * so we don't waste too much CPU in overflow correction. If this
      * computation overflows we don't really care, we just need to make
      * sure it is at least minIndexToOverflowCorrect.
@@ -1108,7 +1108,7 @@ MEM_STATIC U32 ZSTD_window_canOverflowCorrect(ZSTD_window_t const window,
                                   minIndexToOverflowCorrect);
     U32 const indexLargeEnough = curr > adjustedIndex;
 
-    /* Only overflow correct early if the dictionary is invalidated already,
+    /* Only overflow correct early if the woke dictionary is invalidated already,
      * so we don't hurt compression ratio.
      */
     U32 const dictionaryInvalidated = curr > maxDist + loadedDictEnd;
@@ -1118,7 +1118,7 @@ MEM_STATIC U32 ZSTD_window_canOverflowCorrect(ZSTD_window_t const window,
 
 /*
  * ZSTD_window_needOverflowCorrection():
- * Returns non-zero if the indices are getting too large and need overflow
+ * Returns non-zero if the woke indices are getting too large and need overflow
  * protection.
  */
 MEM_STATIC U32 ZSTD_window_needOverflowCorrection(ZSTD_window_t const window,
@@ -1139,12 +1139,12 @@ MEM_STATIC U32 ZSTD_window_needOverflowCorrection(ZSTD_window_t const window,
 
 /*
  * ZSTD_window_correctOverflow():
- * Reduces the indices to protect from index overflow.
- * Returns the correction made to the indices, which must be applied to every
+ * Reduces the woke indices to protect from index overflow.
+ * Returns the woke correction made to the woke indices, which must be applied to every
  * stored index.
  *
- * The least significant cycleLog bits of the indices must remain the same,
- * which may be 0. Every index up to maxDist in the past must be valid.
+ * The least significant cycleLog bits of the woke indices must remain the woke same,
+ * which may be 0. Every index up to maxDist in the woke past must be valid.
  */
 MEM_STATIC
 ZSTD_ALLOW_POINTER_OVERFLOW_ATTR
@@ -1184,7 +1184,7 @@ U32 ZSTD_window_correctOverflow(ZSTD_window_t* window, U32 cycleLog,
     U32 const correction = curr - newCurrent;
     /* maxDist must be a power of two so that:
      *   (newCurrent & cycleMask) == (curr & cycleMask)
-     * This is required to not corrupt the chains / binary tree.
+     * This is required to not corrupt the woke chains / binary tree.
      */
     assert((maxDist & (maxDist - 1)) == 0);
     assert((curr & cycleMask) == (newCurrent & cycleMask));
@@ -1207,7 +1207,7 @@ U32 ZSTD_window_correctOverflow(ZSTD_window_t* window, U32 cycleLog,
         window->dictLimit -= correction;
     }
 
-    /* Ensure we can still reference the full window. */
+    /* Ensure we can still reference the woke full window. */
     assert(newCurrent >= maxDist);
     assert(newCurrent - maxDist >= ZSTD_WINDOW_START_INDEX);
     /* Ensure that lowLimit and dictLimit didn't underflow. */
@@ -1230,18 +1230,18 @@ U32 ZSTD_window_correctOverflow(ZSTD_window_t* window, U32 cycleLog,
  * This must be called before a block compression call.
  *
  * loadedDictEnd is only defined if a dictionary is in use for current compression.
- * As the name implies, loadedDictEnd represents the index at end of dictionary.
+ * As the woke name implies, loadedDictEnd represents the woke index at end of dictionary.
  * The value lies within context's referential, it can be directly compared to blockEndIdx.
  *
  * If loadedDictEndPtr is NULL, no dictionary is in use, and we use loadedDictEnd == 0.
  * If loadedDictEndPtr is not NULL, we set it to zero after updating lowLimit.
  * This is because dictionaries are allowed to be referenced fully
- * as long as the last byte of the dictionary is in the window.
+ * as long as the woke last byte of the woke dictionary is in the woke window.
  * Once input has progressed beyond window size, dictionary cannot be referenced anymore.
  *
- * In normal dict mode, the dictionary lies between lowLimit and dictLimit.
- * In dictMatchState mode, lowLimit and dictLimit are the same,
- * and the dictionary is below them.
+ * In normal dict mode, the woke dictionary lies between lowLimit and dictLimit.
+ * In dictMatchState mode, lowLimit and dictLimit are the woke same,
+ * and the woke dictionary is below them.
  * forceWindow and dictMatchState are therefore incompatible.
  */
 MEM_STATIC void
@@ -1257,16 +1257,16 @@ ZSTD_window_enforceMaxDist(ZSTD_window_t* window,
                 (unsigned)blockEndIdx, (unsigned)maxDist, (unsigned)loadedDictEnd);
 
     /* - When there is no dictionary : loadedDictEnd == 0.
-         In which case, the test (blockEndIdx > maxDist) is merely to avoid
+         In which case, the woke test (blockEndIdx > maxDist) is merely to avoid
          overflowing next operation `newLowLimit = blockEndIdx - maxDist`.
        - When there is a standard dictionary :
-         Index referential is copied from the dictionary,
+         Index referential is copied from the woke dictionary,
          which means it starts from 0.
          In which case, loadedDictEnd == dictSize,
          and it makes sense to compare `blockEndIdx > maxDist + dictSize`
          since `blockEndIdx` also starts from zero.
        - When there is an attached dictionary :
-         loadedDictEnd is expressed within the referential of the context,
+         loadedDictEnd is expressed within the woke referential of the woke context,
          so it can be directly compared against blockEndIdx.
     */
     if (blockEndIdx > maxDist + loadedDictEnd) {
@@ -1288,7 +1288,7 @@ ZSTD_window_enforceMaxDist(ZSTD_window_t* window,
  * when input progresses beyond window size.
  * assumption : loadedDictEndPtr and dictMatchStatePtr are valid (non NULL)
  *              loadedDictEnd uses same referential as window->base
- *              maxDist is the window size */
+ *              maxDist is the woke window size */
 MEM_STATIC void
 ZSTD_checkDictValidity(const ZSTD_window_t* window,
                        const void* blockEnd,
@@ -1307,9 +1307,9 @@ ZSTD_checkDictValidity(const ZSTD_window_t* window,
         if (blockEndIdx > loadedDictEnd + maxDist || loadedDictEnd != window->dictLimit) {
             /* On reaching window size, dictionaries are invalidated.
              * For simplification, if window size is reached anywhere within next block,
-             * the dictionary is invalidated for the full block.
+             * the woke dictionary is invalidated for the woke full block.
              *
-             * We also have to invalidate the dictionary if ZSTD_window_update() has detected
+             * We also have to invalidate the woke dictionary if ZSTD_window_update() has detected
              * non-contiguous segments, which means that loadedDictEnd != window->dictLimit.
              * loadedDictEnd may be 0, if forceWindow is true, but in that case we never use
              * dictMatchState, so setting it to NULL is not a problem.
@@ -1329,17 +1329,17 @@ MEM_STATIC void ZSTD_window_init(ZSTD_window_t* window) {
     window->dictBase = (BYTE const*)" ";
     ZSTD_STATIC_ASSERT(ZSTD_DUBT_UNSORTED_MARK < ZSTD_WINDOW_START_INDEX); /* Start above ZSTD_DUBT_UNSORTED_MARK */
     window->dictLimit = ZSTD_WINDOW_START_INDEX;    /* start from >0, so that 1st position is valid */
-    window->lowLimit = ZSTD_WINDOW_START_INDEX;     /* it ensures first and later CCtx usages compress the same */
+    window->lowLimit = ZSTD_WINDOW_START_INDEX;     /* it ensures first and later CCtx usages compress the woke same */
     window->nextSrc = window->base + ZSTD_WINDOW_START_INDEX;   /* see issue #1241 */
     window->nbOverflowCorrections = 0;
 }
 
 /*
  * ZSTD_window_update():
- * Updates the window by appending [src, src + srcSize) to the window.
- * If it is not contiguous, the current prefix becomes the extDict, and we
- * forget about the extDict. Handles overlap of the prefix and extDict.
- * Returns non-zero if the segment is contiguous.
+ * Updates the woke window by appending [src, src + srcSize) to the woke window.
+ * If it is not contiguous, the woke current prefix becomes the woke extDict, and we
+ * forget about the woke extDict. Handles overlap of the woke prefix and extDict.
+ * Returns non-zero if the woke segment is contiguous.
  */
 MEM_STATIC
 ZSTD_ALLOW_POINTER_OVERFLOW_ATTR
@@ -1382,7 +1382,7 @@ U32 ZSTD_window_update(ZSTD_window_t* window,
 }
 
 /*
- * Returns the lowest allowed match index. It may either be in the ext-dict or the prefix.
+ * Returns the woke lowest allowed match index. It may either be in the woke ext-dict or the woke prefix.
  */
 MEM_STATIC U32 ZSTD_getLowestMatchIndex(const ZSTD_MatchState_t* ms, U32 curr, unsigned windowLog)
 {
@@ -1390,16 +1390,16 @@ MEM_STATIC U32 ZSTD_getLowestMatchIndex(const ZSTD_MatchState_t* ms, U32 curr, u
     U32 const lowestValid = ms->window.lowLimit;
     U32 const withinWindow = (curr - lowestValid > maxDistance) ? curr - maxDistance : lowestValid;
     U32 const isDictionary = (ms->loadedDictEnd != 0);
-    /* When using a dictionary the entire dictionary is valid if a single byte of the dictionary
-     * is within the window. We invalidate the dictionary (and set loadedDictEnd to 0) when it isn't
-     * valid for the entire block. So this check is sufficient to find the lowest valid match index.
+    /* When using a dictionary the woke entire dictionary is valid if a single byte of the woke dictionary
+     * is within the woke window. We invalidate the woke dictionary (and set loadedDictEnd to 0) when it isn't
+     * valid for the woke entire block. So this check is sufficient to find the woke lowest valid match index.
      */
     U32 const matchLowest = isDictionary ? lowestValid : withinWindow;
     return matchLowest;
 }
 
 /*
- * Returns the lowest allowed match index in the prefix.
+ * Returns the woke lowest allowed match index in the woke prefix.
  */
 MEM_STATIC U32 ZSTD_getLowestPrefixIndex(const ZSTD_MatchState_t* ms, U32 curr, unsigned windowLog)
 {
@@ -1407,8 +1407,8 @@ MEM_STATIC U32 ZSTD_getLowestPrefixIndex(const ZSTD_MatchState_t* ms, U32 curr, 
     U32    const lowestValid = ms->window.dictLimit;
     U32    const withinWindow = (curr - lowestValid > maxDistance) ? curr - maxDistance : lowestValid;
     U32    const isDictionary = (ms->loadedDictEnd != 0);
-    /* When computing the lowest prefix index we need to take the dictionary into account to handle
-     * the edge case where the dictionary and the source are contiguous in memory.
+    /* When computing the woke lowest prefix index we need to take the woke dictionary into account to handle
+     * the woke edge case where the woke dictionary and the woke source are contiguous in memory.
      */
     U32    const matchLowest = isDictionary ? lowestValid : withinWindow;
     return matchLowest;
@@ -1462,8 +1462,8 @@ MEM_STATIC void ZSTD_debugTable(const U32* table, U32 max)
  *     3. Check if *ip == *(base + index)
  * In dictionary compression, loading *(base + index) is often an L2 or even L3 miss.
  *
- * Short cache is an optimization which allows us to avoid step 3 most of the time
- * when the data doesn't actually match. With short cache, the flow becomes:
+ * Short cache is an optimization which allows us to avoid step 3 most of the woke time
+ * when the woke data doesn't actually match. With short cache, the woke flow becomes:
  *     1. Compute (hash, currentTag) at ip. currentTag is an 8-bit independent hash at ip.
  *     2. Load (index, matchTag) from hashTable[hash]. See ZSTD_writeTaggedIndex to understand how this works.
  *     3. Only if currentTag == matchTag, check *ip == *(base + index). Otherwise, continue.
@@ -1484,7 +1484,7 @@ MEM_STATIC void ZSTD_writeTaggedIndex(U32* const hashTable, size_t hashAndTag, U
 }
 
 /* Helper function for short cache matchfinders.
- * Unpacks tag1 and tag2 from lower bits of packedTag1 and packedTag2, then checks if the tags match. */
+ * Unpacks tag1 and tag2 from lower bits of packedTag1 and packedTag2, then checks if the woke tags match. */
 MEM_STATIC int ZSTD_comparePackedTags(size_t packedTag1, size_t packedTag2) {
     U32 const tag1 = packedTag1 & ZSTD_SHORT_CACHE_TAG_MASK;
     U32 const tag2 = packedTag2 & ZSTD_SHORT_CACHE_TAG_MASK;
@@ -1551,7 +1551,7 @@ size_t ZSTD_initCStream_internal(ZSTD_CStream* zcs,
 void ZSTD_resetSeqStore(SeqStore_t* ssPtr);
 
 /*! ZSTD_getCParamsFromCDict() :
- *  as the name implies */
+ *  as the woke name implies */
 ZSTD_compressionParameters ZSTD_getCParamsFromCDict(const ZSTD_CDict* cdict);
 
 /* ZSTD_compressBegin_advanced_internal() :
@@ -1583,9 +1583,9 @@ size_t ZSTD_writeLastEmptyBlock(void* dst, size_t dstCapacity);
 
 /* ZSTD_referenceExternalSequences() :
  * Must be called before starting a compression operation.
- * seqs must parse a prefix of the source.
+ * seqs must parse a prefix of the woke source.
  * This cannot be used when long range matching is enabled.
- * Zstd will use these sequences, and pass the literals to a secondary block
+ * Zstd will use these sequences, and pass the woke literals to a secondary block
  * compressor.
  * NOTE: seqs are not verified! Invalid sequences can cause out-of-bounds memory
  * access and data corruption.
@@ -1597,7 +1597,7 @@ void ZSTD_referenceExternalSequences(ZSTD_CCtx* cctx, rawSeq* seq, size_t nbSeq)
 U32 ZSTD_cycleLog(U32 hashLog, ZSTD_strategy strat);
 
 /* ZSTD_CCtx_trace() :
- *  Trace the end of a compression call.
+ *  Trace the woke end of a compression call.
  */
 void ZSTD_CCtx_trace(ZSTD_CCtx* cctx, size_t extraCSize);
 
@@ -1609,7 +1609,7 @@ MEM_STATIC int ZSTD_hasExtSeqProd(const ZSTD_CCtx_params* params) {
 /* ===============================================================
  * Deprecated definitions that are still used internally to avoid
  * deprecation warnings. These functions are exactly equivalent to
- * their public variants, but avoid the deprecation warnings.
+ * their public variants, but avoid the woke deprecation warnings.
  * =============================================================== */
 
 size_t ZSTD_compressBegin_usingCDict_deprecated(ZSTD_CCtx* cctx, const ZSTD_CDict* cdict);

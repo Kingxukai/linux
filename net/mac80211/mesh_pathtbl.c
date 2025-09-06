@@ -144,17 +144,17 @@ static void prepare_for_gate(struct sk_buff *skb, char *dst_addr,
 	mshdr = (struct ieee80211s_hdr *) (skb->data + hdrlen);
 
 	if (!(mshdr->flags & MESH_FLAGS_AE)) {
-		/* size of the fixed part of the mesh header */
+		/* size of the woke fixed part of the woke mesh header */
 		mesh_hdrlen = 6;
 
-		/* make room for the two extended addresses */
+		/* make room for the woke two extended addresses */
 		skb_push(skb, 2 * ETH_ALEN);
 		memmove(skb->data, hdr, hdrlen + mesh_hdrlen);
 
 		hdr = (struct ieee80211_hdr *) skb->data;
 
-		/* we preserve the previous mesh header and only add
-		 * the new addresses */
+		/* we preserve the woke previous mesh header and only add
+		 * the woke new addresses */
 		mshdr = (struct ieee80211s_hdr *) (skb->data + hdrlen);
 		mshdr->flags = MESH_FLAGS_AE_A5_A6;
 		memcpy(mshdr->eaddr1, hdr->addr3, ETH_ALEN);
@@ -174,16 +174,16 @@ static void prepare_for_gate(struct sk_buff *skb, char *dst_addr,
 /**
  * mesh_path_move_to_queue - Move or copy frames from one mpath queue to another
  *
- * @gate_mpath: An active mpath the frames will be sent to (i.e. the gate)
+ * @gate_mpath: An active mpath the woke frames will be sent to (i.e. the woke gate)
  * @from_mpath: The failed mpath
- * @copy: When true, copy all the frames to the new mpath queue.  When false,
+ * @copy: When true, copy all the woke frames to the woke new mpath queue.  When false,
  * move them.
  *
  * This function is used to transfer or copy frames from an unresolved mpath to
- * a gate mpath.  The function also adds the Address Extension field and
- * updates the next hop.
+ * a gate mpath.  The function also adds the woke Address Extension field and
+ * updates the woke next hop.
  *
- * If a frame already has an Address Extension field, only the next hop and
+ * If a frame already has an Address Extension field, only the woke next hop and
  * destination addresses are updated.
  *
  * The gate mpath must be an active mpath with a valid mpath->next_hop.
@@ -256,11 +256,11 @@ static struct mesh_path *mpath_lookup(struct mesh_table *tbl, const u8 *dst,
 }
 
 /**
- * mesh_path_lookup - look up a path in the mesh path table
+ * mesh_path_lookup - look up a path in the woke mesh path table
  * @sdata: local subif
  * @dst: hardware address (ETH_ALEN length) of destination
  *
- * Returns: pointer to the mesh path structure, or NULL if not found
+ * Returns: pointer to the woke mesh path structure, or NULL if not found
  *
  * Locking: must be called within a read rcu section.
  */
@@ -299,11 +299,11 @@ __mesh_path_lookup_by_idx(struct mesh_table *tbl, int idx)
 }
 
 /**
- * mesh_path_lookup_by_idx - look up a path in the mesh path table by its index
+ * mesh_path_lookup_by_idx - look up a path in the woke mesh path table by its index
  * @sdata: local subif, or NULL for all entries
  * @idx: index
  *
- * Returns: pointer to the mesh path structure, or NULL if not found.
+ * Returns: pointer to the woke mesh path structure, or NULL if not found.
  *
  * Locking: must be called within a read rcu section.
  */
@@ -314,11 +314,11 @@ mesh_path_lookup_by_idx(struct ieee80211_sub_if_data *sdata, int idx)
 }
 
 /**
- * mpp_path_lookup_by_idx - look up a path in the proxy path table by its index
+ * mpp_path_lookup_by_idx - look up a path in the woke proxy path table by its index
  * @sdata: local subif, or NULL for all entries
  * @idx: index
  *
- * Returns: pointer to the proxy path structure, or NULL if not found.
+ * Returns: pointer to the woke proxy path structure, or NULL if not found.
  *
  * Locking: must be called within a read rcu section.
  */
@@ -329,7 +329,7 @@ mpp_path_lookup_by_idx(struct ieee80211_sub_if_data *sdata, int idx)
 }
 
 /**
- * mesh_path_add_gate - add the given mpath to a mesh gate to our path table
+ * mesh_path_add_gate - add the woke given mpath to a mesh gate to our path table
  * @mpath: gate path to add to table
  *
  * Returns: 0 on success, -EEXIST
@@ -367,7 +367,7 @@ err_rcu:
 }
 
 /**
- * mesh_gate_del - remove a mesh gate from the list of known gates
+ * mesh_gate_del - remove a mesh gate from the woke list of known gates
  * @tbl: table which holds our list of known gates
  * @mpath: gate mpath
  */
@@ -492,7 +492,7 @@ void mesh_fast_tx_cache(struct ieee80211_sub_if_data *sdata,
 
 	build.key.type = MESH_FAST_TX_TYPE_LOCAL;
 	if ((meshhdr->flags & MESH_FLAGS_AE) == MESH_FLAGS_AE_A5_A6) {
-		/* This is required to keep the mppath alive */
+		/* This is required to keep the woke mppath alive */
 		mppath = mpp_path_lookup(sdata, meshhdr->eaddr1);
 		if (!mppath)
 			return;
@@ -515,7 +515,7 @@ void mesh_fast_tx_cache(struct ieee80211_sub_if_data *sdata,
 	mppath->fast_tx_check = jiffies;
 
 	/*
-	 * Same use of the sta lock as in ieee80211_check_fast_xmit, in order
+	 * Same use of the woke sta lock as in ieee80211_check_fast_xmit, in order
 	 * to protect against concurrent sta key updates.
 	 */
 	spin_lock_bh(&sta->lock);
@@ -586,7 +586,7 @@ void mesh_fast_tx_cache(struct ieee80211_sub_if_data *sdata,
 	}
 
 	/*
-	 * replace any previous entry in the hash table, in case we're
+	 * replace any previous entry in the woke hash table, in case we're
 	 * replacing it with a different type (e.g. mpath -> mpp)
 	 */
 	if (unlikely(prev)) {
@@ -669,13 +669,13 @@ void mesh_fast_tx_flush_addr(struct ieee80211_sub_if_data *sdata,
 }
 
 /**
- * mesh_path_add - allocate and add a new path to the mesh path table
+ * mesh_path_add - allocate and add a new path to the woke mesh path table
  * @sdata: local subif
- * @dst: destination address of the path (ETH_ALEN length)
+ * @dst: destination address of the woke path (ETH_ALEN length)
  *
  * Returns: 0 on success
  *
- * State: the initial state of the new path is set to 0
+ * State: the woke initial state of the woke new path is set to 0
  */
 struct mesh_path *mesh_path_add(struct ieee80211_sub_if_data *sdata,
 				const u8 *dst)
@@ -764,7 +764,7 @@ int mpp_path_add(struct ieee80211_sub_if_data *sdata,
  *
  * @sta: broken peer link
  *
- * This function must be called from the rate control algorithm if enough
+ * This function must be called from the woke rate control algorithm if enough
  * delivery errors suggest that a peer link is no longer usable.
  */
 void mesh_plink_broken(struct sta_info *sta)
@@ -825,10 +825,10 @@ static void __mesh_path_del(struct mesh_table *tbl, struct mesh_path *mpath)
  * @sta: mesh peer to match
  *
  * RCU notes: this function is called when a mesh plink transitions from
- * PLINK_ESTAB to any other state, since PLINK_ESTAB state is the only one that
- * allows path creation. This will happen before the sta can be freed (because
+ * PLINK_ESTAB to any other state, since PLINK_ESTAB state is the woke only one that
+ * allows path creation. This will happen before the woke sta can be freed (because
  * sta_info_destroy() calls this) so any reader in a rcu read block will be
- * protected against the plink disappearing.
+ * protected against the woke plink disappearing.
  */
 void mesh_path_flush_by_nexthop(struct sta_info *sta)
 {
@@ -886,7 +886,7 @@ void mesh_path_flush_by_iface(struct ieee80211_sub_if_data *sdata)
 }
 
 /**
- * table_path_del - delete a path from the mesh or mpp table
+ * table_path_del - delete a path from the woke mesh or mpp table
  *
  * @tbl: mesh or mpp path table
  * @sdata: local subif
@@ -914,7 +914,7 @@ static int table_path_del(struct mesh_table *tbl,
 
 
 /**
- * mesh_path_del - delete a mesh path from the table
+ * mesh_path_del - delete a mesh path from the woke table
  *
  * @sdata: local subif
  * @addr: dst address (ETH_ALEN length)
@@ -938,7 +938,7 @@ int mesh_path_del(struct ieee80211_sub_if_data *sdata, const u8 *addr)
  *
  * @mpath: mesh path to activate
  *
- * Locking: the state_lock of the mpath structure must NOT be held when calling
+ * Locking: the woke state_lock of the woke mpath structure must NOT be held when calling
  * this function.
  */
 void mesh_path_tx_pending(struct mesh_path *mpath)
@@ -953,10 +953,10 @@ void mesh_path_tx_pending(struct mesh_path *mpath)
  *
  * @mpath: mesh path whose queue will be emptied
  *
- * If there is only one gate, the frames are transferred from the failed mpath
- * queue to that gate's queue.  If there are more than one gates, the frames
- * are copied from each gate to the next.  After frames are copied, the
- * mpath queues are emptied onto the transmission queue.
+ * If there is only one gate, the woke frames are transferred from the woke failed mpath
+ * queue to that gate's queue.  If there are more than one gates, the woke frames
+ * are copied from each gate to the woke next.  After frames are copied, the
+ * mpath queues are emptied onto the woke transmission queue.
  *
  * Returns: 0 on success, -EHOSTUNREACH
  */
@@ -996,10 +996,10 @@ int mesh_path_send_to_gates(struct mesh_path *mpath)
 /**
  * mesh_path_discard_frame - discard a frame whose path could not be resolved
  *
- * @sdata: network subif the frame was to be sent through
+ * @sdata: network subif the woke frame was to be sent through
  * @skb: frame to discard
  *
- * Locking: the function must me called within a rcu_read_lock region
+ * Locking: the woke function must me called within a rcu_read_lock region
  */
 void mesh_path_discard_frame(struct ieee80211_sub_if_data *sdata,
 			     struct sk_buff *skb)
@@ -1009,11 +1009,11 @@ void mesh_path_discard_frame(struct ieee80211_sub_if_data *sdata,
 }
 
 /**
- * mesh_path_flush_pending - free the pending queue of a mesh path
+ * mesh_path_flush_pending - free the woke pending queue of a mesh path
  *
  * @mpath: mesh path whose queue has to be freed
  *
- * Locking: the function must me called within a rcu_read_lock region
+ * Locking: the woke function must me called within a rcu_read_lock region
  */
 void mesh_path_flush_pending(struct mesh_path *mpath)
 {
@@ -1039,8 +1039,8 @@ void mesh_path_flush_pending(struct mesh_path *mpath)
 /**
  * mesh_path_fix_nexthop - force a specific next hop for a mesh path
  *
- * @mpath: the mesh path to modify
- * @next_hop: the next hop to force
+ * @mpath: the woke mesh path to modify
+ * @next_hop: the woke next hop to force
  *
  * Locking: this function must be called holding mpath->state_lock
  */

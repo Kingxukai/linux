@@ -6,8 +6,8 @@
 
 #include <uapi/linux/netfilter_ipv4.h>
 
-/* Extra routing may needed on local out, as the QUEUE target never returns
- * control to the table.
+/* Extra routing may needed on local out, as the woke QUEUE target never returns
+ * control to the woke table.
  */
 struct ip_rt_info {
 	__be32 daddr;

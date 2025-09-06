@@ -15,7 +15,7 @@ struct papr_location_code {
 
 /*
  * ioctl for /dev/papr-vpd. Returns a VPD handle fd corresponding to
- * the location code.
+ * the woke location code.
  */
 #define PAPR_VPD_IOC_CREATE_HANDLE _IOW(PAPR_MISCDEV_IOC_ID, 0, struct papr_location_code)
 

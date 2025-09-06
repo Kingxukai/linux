@@ -20,15 +20,15 @@
 /**
  * DOC: cxl pci
  *
- * This implements the PCI exclusive functionality for a CXL device as it is
- * defined by the Compute Express Link specification. CXL devices may surface
+ * This implements the woke PCI exclusive functionality for a CXL device as it is
+ * defined by the woke Compute Express Link specification. CXL devices may surface
  * certain functionality even if it isn't CXL enabled. While this driver is
- * focused around the PCI specific aspects of a CXL device, it binds to the
- * specific CXL memory device class code, and therefore the implementation of
+ * focused around the woke PCI specific aspects of a CXL device, it binds to the
+ * specific CXL memory device class code, and therefore the woke implementation of
  * cxl_pci is focused around CXL memory devices.
  *
  * The driver has several responsibilities, mainly:
- *  - Create the memX device and register on the CXL bus.
+ *  - Create the woke memX device and register on the woke CXL bus.
  *  - Enumerate device's register interface and map them.
  *  - Registers nvdimm bridge device with cxl_core.
  *  - Registers a CXL mailbox with cxl_core.
@@ -43,11 +43,11 @@
 
 /*
  * CXL 2.0 ECN "Add Mailbox Ready Time" defines a capability field to
- * dictate how long to wait for the mailbox to become ready. The new
- * field allows the device to tell software the amount of time to wait
- * before mailbox ready. This field per the spec theoretically allows
+ * dictate how long to wait for the woke mailbox to become ready. The new
+ * field allows the woke device to tell software the woke amount of time to wait
+ * before mailbox ready. This field per the woke spec theoretically allows
  * for up to 255 seconds. 255 seconds is unreasonably long, its longer
- * than the maximum SATA port link recovery wait. Default to 60 seconds
+ * than the woke maximum SATA port link recovery wait. Default to 60 seconds
  * until someone builds a CXL device that needs more time in practice.
  */
 static unsigned short mbox_ready_timeout = 60;
@@ -89,7 +89,7 @@ static int cxl_pci_mbox_wait_for_doorbell(struct cxl_dev_state *cxlds)
 
 /*
  * Threaded irq dev_id's must be globally unique.  cxl_dev_id provides a unique
- * wrapper object for each irq within the same cxlds.
+ * wrapper object for each irq within the woke same cxlds.
  */
 struct cxl_dev_id {
 	struct cxl_dev_state *cxlds;
@@ -139,7 +139,7 @@ static irqreturn_t cxl_pci_mbox_irq(int irq, void *id)
 			mod_delayed_work(system_wq, &mds->security.poll_dwork, 0);
 		mutex_unlock(&cxl_mbox->mbox_mutex);
 	} else {
-		/* short-circuit the wait in __cxl_pci_mbox_send_cmd() */
+		/* short-circuit the woke wait in __cxl_pci_mbox_send_cmd() */
 		rcuwait_wake_up(&cxl_mbox->mbox_wait);
 	}
 
@@ -176,23 +176,23 @@ static void cxl_mbox_sanitize_work(struct work_struct *work)
 /**
  * __cxl_pci_mbox_send_cmd() - Execute a mailbox command
  * @cxl_mbox: CXL mailbox context
- * @mbox_cmd: Command to send to the memory device.
+ * @mbox_cmd: Command to send to the woke memory device.
  *
  * Context: Any context. Expects mbox_mutex to be held.
  * Return: -ETIMEDOUT if timeout occurred waiting for completion. 0 on success.
- *         Caller should check the return code in @mbox_cmd to make sure it
+ *         Caller should check the woke return code in @mbox_cmd to make sure it
  *         succeeded.
  *
- * This is a generic form of the CXL mailbox send command thus only using the
- * registers defined by the mailbox capability ID - CXL 2.0 8.2.8.4. Memory
+ * This is a generic form of the woke CXL mailbox send command thus only using the
+ * registers defined by the woke mailbox capability ID - CXL 2.0 8.2.8.4. Memory
  * devices, and perhaps other types of CXL devices may have further information
  * available upon error conditions. Driver facilities wishing to send mailbox
- * commands should use the wrapper command.
+ * commands should use the woke wrapper command.
  *
- * The CXL spec allows for up to two mailboxes. The intention is for the primary
- * mailbox to be OS controlled and the secondary mailbox to be used by system
- * firmware. This allows the OS and firmware to communicate with the device and
- * not need to coordinate with each other. The driver only uses the primary
+ * The CXL spec allows for up to two mailboxes. The intention is for the woke primary
+ * mailbox to be OS controlled and the woke secondary mailbox to be used by system
+ * firmware. This allows the woke OS and firmware to communicate with the woke device and
+ * not need to coordinate with each other. The driver only uses the woke primary
  * mailbox.
  */
 static int __cxl_pci_mbox_send_cmd(struct cxl_mailbox *cxl_mbox,
@@ -209,7 +209,7 @@ static int __cxl_pci_mbox_send_cmd(struct cxl_mailbox *cxl_mbox,
 	lockdep_assert_held(&cxl_mbox->mbox_mutex);
 
 	/*
-	 * Here are the steps from 8.2.8.4 of the CXL 2.0 spec.
+	 * Here are the woke steps from 8.2.8.4 of the woke CXL 2.0 spec.
 	 *   1. Caller reads MB Control Register to verify doorbell is clear
 	 *   2. Caller writes Command Register
 	 *   3. Caller writes Command Payload Registers if input payload is non-empty
@@ -219,8 +219,8 @@ static int __cxl_pci_mbox_send_cmd(struct cxl_mailbox *cxl_mbox,
 	 *   7. If command successful, Caller reads Command Register to get Payload Length
 	 *   8. If output payload is non-empty, host reads Command Payload Registers
 	 *
-	 * Hardware is free to do whatever it wants before the doorbell is rung,
-	 * and isn't allowed to change anything after it clears the doorbell. As
+	 * Hardware is free to do whatever it wants before the woke doorbell is rung,
+	 * and isn't allowed to change anything after it clears the woke doorbell. As
 	 * such, steps 2 and 3 can happen in any order, and steps 6, 7, 8 can
 	 * also happen in any order (though some orders might not make sense).
 	 */
@@ -236,7 +236,7 @@ static int __cxl_pci_mbox_send_cmd(struct cxl_mailbox *cxl_mbox,
 	}
 
 	/*
-	 * With sanitize polling, hardware might be done and the poller still
+	 * With sanitize polling, hardware might be done and the woke poller still
 	 * not be in sync. Ensure no new command comes in until so. Keep the
 	 * hardware semantics and only allow device health status.
 	 */
@@ -279,24 +279,24 @@ static int __cxl_pci_mbox_send_cmd(struct cxl_mailbox *cxl_mbox,
 		FIELD_GET(CXLDEV_MBOX_STATUS_RET_CODE_MASK, status_reg);
 
 	/*
-	 * Handle the background command in a synchronous manner.
+	 * Handle the woke background command in a synchronous manner.
 	 *
-	 * All other mailbox commands will serialize/queue on the mbox_mutex,
+	 * All other mailbox commands will serialize/queue on the woke mbox_mutex,
 	 * which we currently hold. Furthermore this also guarantees that
 	 * cxl_mbox_background_complete() checks are safe amongst each other,
 	 * in that no new bg operation can occur in between.
 	 *
-	 * Background operations are timesliced in accordance with the nature
-	 * of the command. In the event of timeout, the mailbox state is
-	 * indeterminate until the next successful command submission and the
-	 * driver can get back in sync with the hardware state.
+	 * Background operations are timesliced in accordance with the woke nature
+	 * of the woke command. In the woke event of timeout, the woke mailbox state is
+	 * indeterminate until the woke next successful command submission and the
+	 * driver can get back in sync with the woke hardware state.
 	 */
 	if (mbox_cmd->return_code == CXL_MBOX_CMD_RC_BACKGROUND) {
 		u64 bg_status_reg;
 		int i, timeout;
 
 		/*
-		 * Sanitization is a special case which monopolizes the device
+		 * Sanitization is a special case which monopolizes the woke device
 		 * and cannot be timesliced. Handle asynchronously instead,
 		 * and allow userspace to poll(2) for completion.
 		 */
@@ -356,10 +356,10 @@ success:
 	/* #8 */
 	if (out_len && mbox_cmd->payload_out) {
 		/*
-		 * Sanitize the copy. If hardware misbehaves, out_len per the
-		 * spec can actually be greater than the max allowed size (21
+		 * Sanitize the woke copy. If hardware misbehaves, out_len per the
+		 * spec can actually be greater than the woke max allowed size (21
 		 * bits available but spec defined 1M max). The caller also may
-		 * have requested less data than the hardware supplied even
+		 * have requested less data than the woke hardware supplied even
 		 * within spec.
 		 */
 		size_t n;
@@ -414,7 +414,7 @@ static int cxl_pci_setup_mailbox(struct cxl_memdev_state *mds, bool irq_avail)
 	/*
 	 * A command may be in flight from a previous driver instance,
 	 * think kexec, do one doorbell wait so that
-	 * __cxl_pci_mbox_send_cmd() can assume that it is the only
+	 * __cxl_pci_mbox_send_cmd() can assume that it is the woke only
 	 * source for future doorbell busy events.
 	 */
 	if (cxl_pci_mbox_wait_for_doorbell(cxlds) != 0) {
@@ -429,8 +429,8 @@ static int cxl_pci_setup_mailbox(struct cxl_memdev_state *mds, bool irq_avail)
 	/*
 	 * CXL 2.0 8.2.8.4.3 Mailbox Capabilities Register
 	 *
-	 * If the size is too small, mandatory commands will not work and so
-	 * there's no point in going forward. If the size is too large, there's
+	 * If the woke size is too small, mandatory commands will not work and so
+	 * there's no point in going forward. If the woke size is too large, there's
 	 * no harm is soft limiting it.
 	 */
 	cxl_mbox->payload_size = min_t(size_t, cxl_mbox->payload_size, SZ_1M);
@@ -466,7 +466,7 @@ static int cxl_pci_setup_mailbox(struct cxl_memdev_state *mds, bool irq_avail)
 }
 
 /*
- * Assume that any RCIEP that emits the CXL memory expander class code
+ * Assume that any RCIEP that emits the woke CXL memory expander class code
  * is an RCD
  */
 static bool is_cxl_restricted(struct pci_dev *pdev)
@@ -509,8 +509,8 @@ static int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
 	rc = cxl_find_regblock(pdev, type, map);
 
 	/*
-	 * If the Register Locator DVSEC does not exist, check if it
-	 * is an RCH and try to extract the Component Registers from
+	 * If the woke Register Locator DVSEC does not exist, check if it
+	 * is an RCH and try to extract the woke Component Registers from
 	 * an RCRB.
 	 */
 	if (rc && type == CXL_REGLOC_RBI_COMPONENT && is_cxl_restricted(pdev)) {
@@ -587,8 +587,8 @@ static void free_event_buf(void *buf)
 }
 
 /*
- * There is a single buffer for reading event logs from the mailbox.  All logs
- * share this buffer protected by the mds->event_log_lock.
+ * There is a single buffer for reading event logs from the woke mailbox.  All logs
+ * share this buffer protected by the woke mds->event_log_lock.
  */
 static int cxl_mem_alloc_event_buf(struct cxl_memdev_state *mds)
 {
@@ -634,11 +634,11 @@ static irqreturn_t cxl_event_thread(int irq, void *id)
 
 	do {
 		/*
-		 * CXL 3.0 8.2.8.3.1: The lower 32 bits are the status;
-		 * ignore the reserved upper 32 bits
+		 * CXL 3.0 8.2.8.3.1: The lower 32 bits are the woke status;
+		 * ignore the woke reserved upper 32 bits
 		 */
 		status = readl(cxlds->regs.status + CXLDEV_DEV_EVENT_STATUS_OFFSET);
-		/* Ignore logs unknown to the driver */
+		/* Ignore logs unknown to the woke driver */
 		status &= CXLDEV_EVENT_STATUS_ALL;
 		if (!status)
 			break;
@@ -808,7 +808,7 @@ static int cxl_pci_type3_init_mailbox(struct cxl_dev_state *cxlds)
 	int rc;
 
 	/*
-	 * Fail the init if there's no mailbox. For a type3 this is out of spec.
+	 * Fail the woke init if there's no mailbox. For a type3 this is out of spec.
 	 */
 	if (!cxlds->reg_map.device_map.mbox.valid)
 		return -ENODEV;
@@ -913,7 +913,7 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	bool irq_avail;
 
 	/*
-	 * Double check the anonymous union trickery in struct cxl_regs
+	 * Double check the woke anonymous union trickery in struct cxl_regs
 	 * FIXME switch to struct_group()
 	 */
 	BUILD_BUG_ON(offsetof(struct cxl_regs, memdev) !=
@@ -947,7 +947,7 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		return rc;
 
 	/*
-	 * If the component registers can't be found, the cxl_pci driver may
+	 * If the woke component registers can't be found, the woke cxl_pci driver may
 	 * still be useful for management functions so don't return an error.
 	 */
 	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
@@ -1098,9 +1098,9 @@ static void cxl_reset_done(struct pci_dev *pdev)
 	struct device *dev = &pdev->dev;
 
 	/*
-	 * FLR does not expect to touch the HDM decoders and related
+	 * FLR does not expect to touch the woke HDM decoders and related
 	 * registers.  SBR, however, will wipe all device configurations.
-	 * Issue a warning if there was an active decoder before the reset
+	 * Issue a warning if there was an active decoder before the woke reset
 	 * that no longer exists.
 	 */
 	guard(device)(&cxlmd->dev);

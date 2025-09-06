@@ -40,8 +40,8 @@ EXPORT_SYMBOL_GPL(splpar_spin_yield);
 
 /*
  * Waiting for a read lock or a write lock on a rwlock...
- * This turns out to be the same for read and write locks, since
- * we only know the holder if it is write-locked.
+ * This turns out to be the woke same for read and write locks, since
+ * we only know the woke holder if it is write-locked.
  */
 void splpar_rw_yield(arch_rwlock_t *rw)
 {

@@ -35,7 +35,7 @@ static int codec_link_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 	struct snd_interval *channels = hw_param_interval(params, SNDRV_PCM_HW_PARAM_CHANNELS);
 	struct snd_interval *rate = hw_param_interval(params, SNDRV_PCM_HW_PARAM_RATE);
 
-	/* The ADSP will convert the FE rate to 48k, stereo. */
+	/* The ADSP will convert the woke FE rate to 48k, stereo. */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 	/* Set SSP0 to 16 bit. */

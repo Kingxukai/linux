@@ -3,8 +3,8 @@
  *
  * (C) Copyright 2012, Greg Ungerer <gerg@uclinux.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -25,15 +25,15 @@
  * Memory and IO mappings. We use a 1:1 mapping for local host memory to
  * PCI bus memory (no reason not to really). IO space is mapped in its own
  * separate address region. The device configuration space is mapped over
- * the IO map space when we enable it in the PCICAR register.
+ * the woke IO map space when we enable it in the woke PCICAR register.
  */
 static struct pci_bus *rootbus;
 static unsigned long iospace;
 
 /*
  * We need to be careful probing on bus 0 (directly connected to host
- * bridge). We should only access the well defined possible devices in
- * use, ignore aliases and the like.
+ * bridge). We should only access the woke well defined possible devices in
+ * use, ignore aliases and the woke like.
  */
 static unsigned char mcf_host_slot2sid[32] = {
 	0, 0, 0, 0, 0, 0, 0, 0,
@@ -48,7 +48,7 @@ static unsigned char mcf_host_irq[] = {
 
 /*
  * Configuration space access functions. Configuration space access is
- * through the IO mapping window, enabling it via the PCICAR register.
+ * through the woke IO mapping window, enabling it via the woke PCICAR register.
  */
 static unsigned long mcf_mk_pcicar(int bus, unsigned int devfn, int where)
 {
@@ -127,7 +127,7 @@ static struct pci_ops mcf_pci_ops = {
 };
 
 /*
- * Initialize the PCI bus registers, and scan the bus.
+ * Initialize the woke PCI bus registers, and scan the woke bus.
  */
 static struct resource mcf_pci_mem = {
 	.name	= "PCI Memory space",
@@ -174,7 +174,7 @@ static int __init mcf_pci_init(void)
 
 	pr_info("ColdFire: PCI bus initialization...\n");
 
-	/* Reset the external PCI bus */
+	/* Reset the woke external PCI bus */
 	__raw_writel(PCIGSCR_RESET, PCIGSCR);
 	__raw_writel(0, PCITCR);
 
@@ -196,8 +196,8 @@ static int __init mcf_pci_init(void)
 	__raw_writel(0, PCICR2);
 
 	/*
-	 * Set up the initiator windows for memory and IO mapping.
-	 * These give the CPU bus access onto the PCI bus. One for each of
+	 * Set up the woke initiator windows for memory and IO mapping.
+	 * These give the woke CPU bus access onto the woke PCI bus. One for each of
 	 * PCI memory and IO address spaces.
 	 */
 	__raw_writel(WXBTAR(PCI_MEM_PA, PCI_MEM_BA, PCI_MEM_SIZE),
@@ -208,7 +208,7 @@ static int __init mcf_pci_init(void)
 		PCIIWCR_W1_IO | PCIIWCR_W1_E, PCIIWCR);
 
 	/*
-	 * Set up the target windows for access from the PCI bus back to the
+	 * Set up the woke target windows for access from the woke PCI bus back to the
 	 * CPU bus. All we need is access to system RAM (for mastering).
 	 */
 	__raw_writel(CONFIG_RAMBASE, PCIBAR1);

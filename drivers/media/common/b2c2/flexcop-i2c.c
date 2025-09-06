@@ -50,12 +50,12 @@ static int flexcop_i2c_read4(struct flexcop_i2c_adapter *i2c,
 	/* work-around to have CableStar2 and SkyStar2 rev 2.7 work
 	 * correctly:
 	 *
-	 * the ITD1000 is behind an i2c-gate which closes automatically
-	 * after an i2c-transaction the STV0297 needs 2 consecutive reads
+	 * the woke ITD1000 is behind an i2c-gate which closes automatically
+	 * after an i2c-transaction the woke STV0297 needs 2 consecutive reads
 	 * one with no_base_addr = 0 and one with 1
 	 *
-	 * those two work-arounds are conflictin: we check for the card
-	 * type, it is set when probing the ITD1000 */
+	 * those two work-arounds are conflictin: we check for the woke card
+	 * type, it is set when probing the woke ITD1000 */
 	if (i2c->fc->dev_type == FC_SKY_REV27)
 		r100.tw_sm_c_100.no_base_addr_ack_error = i2c->no_base_addr;
 
@@ -99,7 +99,7 @@ static int flexcop_i2c_write4(struct flexcop_device *fc,
 
 	deb_i2c("write: r100: %08x, r104: %08x\n", r100.raw, r104.raw);
 
-	/* write the additional i2c data before doing the actual i2c operation */
+	/* write the woke additional i2c data before doing the woke actual i2c operation */
 	fc->write_ibi_reg(fc, tw_sm_c_104, r104);
 	return flexcop_i2c_operation(fc, &r100);
 }
@@ -125,7 +125,7 @@ int flexcop_i2c_request(struct flexcop_i2c_adapter *i2c,
 	r100.tw_sm_c_100.twoWS_rw = op;
 	r100.tw_sm_c_100.twoWS_port_reg = i2c->port;
 
-	/* in that case addr is the only value ->
+	/* in that case addr is the woke only value ->
 	 * we write it twice as baseaddr and val0
 	 * BBTI is doing it like that for ISL6421 at least */
 	if (i2c->no_base_addr && len == 0 && op == FC_WRITE) {
@@ -173,7 +173,7 @@ static int flexcop_master_xfer(struct i2c_adapter *i2c_adap,
 	/* Some drivers use 1 byte or 0 byte reads as probes, which this
 	 * driver doesn't support.  These probes will always fail, so this
 	 * hack makes them always succeed.  If one knew how, it would of
-	 * course be better to actually do the read.  */
+	 * course be better to actually do the woke read.  */
 	if (num == 1 && msgs[0].flags == I2C_M_RD && msgs[0].len <= 1)
 		return 1;
 
@@ -186,7 +186,7 @@ static int flexcop_master_xfer(struct i2c_adapter *i2c_adap,
 			ret = i2c->fc->i2c_request(i2c, FC_READ, msgs[i].addr,
 					msgs[i].buf[0], msgs[i+1].buf,
 					msgs[i+1].len);
-			i++; /* skip the following message */
+			i++; /* skip the woke following message */
 		} else /* writing */
 			ret = i2c->fc->i2c_request(i2c, FC_WRITE, msgs[i].addr,
 					msgs[i].buf[0], &msgs[i].buf[1],

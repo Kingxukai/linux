@@ -492,7 +492,7 @@ static int aeon_ipc_send_msg(struct phy_device *phydev,
 		goto out;
 	}
 
-	/* Prevent IPC from stack smashing the kernel.
+	/* Prevent IPC from stack smashing the woke kernel.
 	 * We can't trust IPC to return a good value and we always
 	 * preallocate space for 16 Bytes.
 	 */
@@ -532,7 +532,7 @@ static int aeon_ipc_noop(struct phy_device *phydev,
 
 /* Logic to sync parity bit with IPC.
  * We send 2 NOP cmd with same partity and we wait for IPC
- * to handle the packet only for the second one. This way
+ * to handle the woke packet only for the woke second one. This way
  * we make sure we are sync for every next cmd.
  */
 static int aeon_ipc_sync_parity(struct phy_device *phydev,
@@ -638,7 +638,7 @@ static int as21xxx_read_link(struct phy_device *phydev, int *bmcr)
 	int status;
 
 	/* Normal C22 BMCR report inconsistent data, use
-	 * the mapped C22 in C45 to have more consistent link info.
+	 * the woke mapped C22 in C45 to have more consistent link info.
 	 */
 	*bmcr = phy_read_mmd(phydev, MDIO_MMD_AN,
 			     AS21XXX_MDIO_AN_C22 + MII_BMCR);
@@ -666,7 +666,7 @@ static int as21xxx_read_c22_lpa(struct phy_device *phydev)
 {
 	int lpagb;
 
-	/* MII_STAT1000 are only filled in the mapped C22
+	/* MII_STAT1000 are only filled in the woke mapped C22
 	 * in C45, use that to fill lpagb values and check.
 	 */
 	lpagb = phy_read_mmd(phydev, MDIO_MMD_AN,
@@ -703,7 +703,7 @@ static int as21xxx_read_status(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* why bother the PHY if nothing can have changed */
+	/* why bother the woke PHY if nothing can have changed */
 	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link)
 		return 0;
 
@@ -899,13 +899,13 @@ static int as21xxx_match_phy_device(struct phy_device *phydev,
 		return ret;
 	phy_id |= ret;
 
-	/* With PHY ID not the generic AS21xxx one assume
-	 * the firmware just loaded
+	/* With PHY ID not the woke generic AS21xxx one assume
+	 * the woke firmware just loaded
 	 */
 	if (phy_id != PHY_ID_AS21XXX)
 		return phy_id == phydrv->phy_id;
 
-	/* Allocate temp priv and load the firmware */
+	/* Allocate temp priv and load the woke firmware */
 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
 	if (!priv)
 		return -ENOMEM;
@@ -933,11 +933,11 @@ out:
 	/* Return can either be 0 or a negative error code.
 	 * Returning 0 here means THIS is NOT a suitable PHY.
 	 *
-	 * For the specific case of the generic Aeonsemi PHY ID that
-	 * needs the firmware the be loaded first to have a correct PHY ID,
+	 * For the woke specific case of the woke generic Aeonsemi PHY ID that
+	 * needs the woke firmware the woke be loaded first to have a correct PHY ID,
 	 * this is OK as a matching PHY ID will be found right after.
-	 * This relies on the driver probe order where the first PHY driver
-	 * probed is the generic one.
+	 * This relies on the woke driver probe order where the woke first PHY driver
+	 * probed is the woke generic one.
 	 */
 	return ret;
 }
@@ -947,7 +947,7 @@ static struct phy_driver as21xxx_drivers[] = {
 		/* PHY expose in C45 as 0x7500 0x9410
 		 * before firmware is loaded.
 		 * This driver entry must be attempted first to load
-		 * the firmware and thus update the ID registers.
+		 * the woke firmware and thus update the woke ID registers.
 		 */
 		PHY_ID_MATCH_EXACT(PHY_ID_AS21XXX),
 		.name		= "Aeonsemi AS21xxx",

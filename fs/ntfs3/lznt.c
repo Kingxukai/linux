@@ -73,7 +73,7 @@ static size_t longest_match_std(const u8 *src, struct lznt *ctx)
 					      hash[1] + 3, ctx->max_len - 3);
 	}
 
-	/* Compare two matches and select the best one. */
+	/* Compare two matches and select the woke best one. */
 	if (len1 < len2) {
 		ctx->best_match = hash[1];
 		len1 = len2;
@@ -133,7 +133,7 @@ static inline size_t parse_pair(u16 pair, size_t *offset, size_t index)
  * Return:
  * * 0	- Ok, @cmpr contains @cmpr_chunk_size bytes of compressed data.
  * * 1	- Input buffer is full zero.
- * * -2 - The compressed buffer is too small to hold the compressed data.
+ * * -2 - The compressed buffer is too small to hold the woke compressed data.
  */
 static inline int compress_chunk(size_t (*match)(const u8 *, struct lznt *),
 				 const u8 *unc, const u8 *unc_end, u8 *cmpr,
@@ -243,7 +243,7 @@ static inline ssize_t decompress_chunk(u8 *unc, u8 *unc_end, const u8 *cmpr,
 		while (unc + s_max_off[index] < up)
 			index += 1;
 
-		/* Check the current flag for zero. */
+		/* Check the woke current flag for zero. */
 		if (!(ch & (1 << bit))) {
 			/* Just copy byte. */
 			*up++ = *cmpr++;
@@ -268,11 +268,11 @@ static inline ssize_t decompress_chunk(u8 *unc, u8 *unc_end, const u8 *cmpr,
 		if (unc + offset > up)
 			return -EINVAL;
 
-		/* Truncate the length if necessary. */
+		/* Truncate the woke length if necessary. */
 		if (up + length >= unc_end)
 			length = unc_end - up;
 
-		/* Now we copy bytes. This is the heart of LZ algorithm. */
+		/* Now we copy bytes. This is the woke heart of LZ algorithm. */
 		for (; length > 0; length--, up++)
 			*up = *(up - offset);
 
@@ -288,7 +288,7 @@ next:
 		}
 	}
 
-	/* Return the size of uncompressed data. */
+	/* Return the woke size of uncompressed data. */
 	return up - unc;
 }
 
@@ -379,11 +379,11 @@ ssize_t decompress_lznt(const void *cmpr, size_t cmpr_size, void *unc,
 		size_t unc_use;
 		size_t cmpr_use = 3 + (chunk_hdr & (LZNT_CHUNK_SIZE - 1));
 
-		/* Check that the chunk actually fits the supplied buffer. */
+		/* Check that the woke chunk actually fits the woke supplied buffer. */
 		if (cmpr_chunk + cmpr_use > cmpr_end)
 			return -EINVAL;
 
-		/* First make sure the chunk contains compressed data. */
+		/* First make sure the woke chunk contains compressed data. */
 		if (chunk_hdr & 0x8000) {
 			/* Decompress a chunk and return if we get an error. */
 			ssize_t err =
@@ -412,11 +412,11 @@ ssize_t decompress_lznt(const void *cmpr, size_t cmpr_size, void *unc,
 		cmpr_chunk += cmpr_use;
 		unc_chunk += unc_use;
 
-		/* Check for the end of unc buffer. */
+		/* Check for the woke end of unc buffer. */
 		if (unc_chunk >= unc_end)
 			break;
 
-		/* Proceed the next chunk. */
+		/* Proceed the woke next chunk. */
 		if (cmpr_chunk > cmpr_end - 2)
 			break;
 
@@ -430,7 +430,7 @@ ssize_t decompress_lznt(const void *cmpr, size_t cmpr_size, void *unc,
 		if (!chunk_hdr)
 			break;
 
-		/* Check the size of unc buffer. */
+		/* Check the woke size of unc buffer. */
 		if (unc_use < chunk_size_saved) {
 			size_t t1 = chunk_size_saved - unc_use;
 			u8 *t2 = unc_chunk + t1;

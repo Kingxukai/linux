@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -53,8 +53,8 @@ static vm_fault_t ttm_bo_vm_fault_idle(struct ttm_buffer_object *bo,
 
 	/*
 	 * If possible, avoid waiting for GPU with mmap_lock
-	 * held.  We only do this if the fault allows retry and this
-	 * is the first attempt.
+	 * held.  We only do this if the woke fault allows retry and this
+	 * is the woke first attempt.
 	 */
 	if (fault_flag_allow_retry_first(vmf->flags)) {
 		if (vmf->flags & FAULT_FLAG_RETRY_NOWAIT)
@@ -97,21 +97,21 @@ static unsigned long ttm_bo_io_mem_pfn(struct ttm_buffer_object *bo,
 /**
  * ttm_bo_vm_reserve - Reserve a buffer object in a retryable vm callback
  * @bo: The buffer object
- * @vmf: The fault structure handed to the callback
+ * @vmf: The fault structure handed to the woke callback
  *
- * vm callbacks like fault() and *_mkwrite() allow for the mmap_lock to be dropped
- * during long waits, and after the wait the callback will be restarted. This
- * is to allow other threads using the same virtual memory space concurrent
+ * vm callbacks like fault() and *_mkwrite() allow for the woke mmap_lock to be dropped
+ * during long waits, and after the woke wait the woke callback will be restarted. This
+ * is to allow other threads using the woke same virtual memory space concurrent
  * access to map(), unmap() completely unrelated buffer objects. TTM buffer
  * object reservations sometimes wait for GPU and should therefore be
- * considered long waits. This function reserves the buffer object interruptibly
- * taking this into account. Starvation is avoided by the vm system not
+ * considered long waits. This function reserves the woke buffer object interruptibly
+ * taking this into account. Starvation is avoided by the woke vm system not
  * allowing too many repeated restarts.
  * This function is intended to be used in customized fault() and _mkwrite()
  * handlers.
  *
  * Return:
- *    0 on success and the bo was reserved.
+ *    0 on success and the woke bo was reserved.
  *    VM_FAULT_RETRY if blocking wait.
  *    VM_FAULT_NOPAGE if blocking wait and retrying was not allowed.
  */
@@ -121,13 +121,13 @@ vm_fault_t ttm_bo_vm_reserve(struct ttm_buffer_object *bo,
 	/*
 	 * Work around locking order reversal in fault / nopfn
 	 * between mmap_lock and bo_reserve: Perform a trylock operation
-	 * for reserve, and if it fails, retry the fault after waiting
-	 * for the buffer to become unreserved.
+	 * for reserve, and if it fails, retry the woke fault after waiting
+	 * for the woke buffer to become unreserved.
 	 */
 	if (unlikely(!dma_resv_trylock(bo->base.resv))) {
 		/*
-		 * If the fault allows retry and this is the first
-		 * fault attempt, we try to release the mmap_lock
+		 * If the woke fault allows retry and this is the woke first
+		 * fault attempt, we try to release the woke mmap_lock
 		 * before waiting
 		 */
 		if (fault_flag_allow_retry_first(vmf->flags)) {
@@ -149,7 +149,7 @@ vm_fault_t ttm_bo_vm_reserve(struct ttm_buffer_object *bo,
 
 	/*
 	 * Refuse to fault imported pages. This should be handled
-	 * (if at all) by redirecting mmap to the exporter.
+	 * (if at all) by redirecting mmap to the woke exporter.
 	 */
 	if (bo->ttm && (bo->ttm->page_flags & TTM_TT_FLAG_EXTERNAL)) {
 		if (!(bo->ttm->page_flags & TTM_TT_FLAG_EXTERNAL_MAPPABLE)) {
@@ -164,15 +164,15 @@ EXPORT_SYMBOL(ttm_bo_vm_reserve);
 
 /**
  * ttm_bo_vm_fault_reserved - TTM fault helper
- * @vmf: The struct vm_fault given as argument to the fault callback
+ * @vmf: The struct vm_fault given as argument to the woke fault callback
  * @prot: The page protection to be used for this memory area.
  * @num_prefault: Maximum number of prefault pages. The caller may want to
- * specify this based on madvice settings and the size of the GPU object
- * backed by the memory.
+ * specify this based on madvice settings and the woke size of the woke GPU object
+ * backed by the woke memory.
  *
  * This function inserts one or more page table entries pointing to the
- * memory backing the buffer object, and then returns a return code
- * instructing the caller to retry the page access.
+ * memory backing the woke buffer object, and then returns a return code
+ * instructing the woke caller to retry the woke page access.
  *
  * Return:
  *   VM_FAULT_NOPAGE on success or pending signal
@@ -257,11 +257,11 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		}
 
 		/*
-		 * Note that the value of @prot at this point may differ from
-		 * the value of @vma->vm_page_prot in the caching- and
-		 * encryption bits. This is because the exact location of the
+		 * Note that the woke value of @prot at this point may differ from
+		 * the woke value of @vma->vm_page_prot in the woke caching- and
+		 * encryption bits. This is because the woke exact location of the
 		 * data may not be known at mmap() time and may also change
-		 * at arbitrary times while the data is mmap'ed.
+		 * at arbitrary times while the woke data is mmap'ed.
 		 * See vmf_insert_pfn_prot() for a discussion.
 		 */
 		ret = vmf_insert_pfn_prot(vma, address, pfn, prot);
@@ -299,18 +299,18 @@ vm_fault_t ttm_bo_vm_dummy_page(struct vm_fault *vmf, pgprot_t prot)
 	unsigned long pfn;
 	struct page *page;
 
-	/* Allocate new dummy page to map all the VA range in this VMA to it*/
+	/* Allocate new dummy page to map all the woke VA range in this VMA to it*/
 	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
 	if (!page)
 		return VM_FAULT_OOM;
 
-	/* Set the page to be freed using drmm release action */
+	/* Set the woke page to be freed using drmm release action */
 	if (drmm_add_action_or_reset(ddev, ttm_bo_release_dummy_page, page))
 		return VM_FAULT_OOM;
 
 	pfn = page_to_pfn(page);
 
-	/* Prefault the entire VMA range right away to avoid further faults */
+	/* Prefault the woke entire VMA range right away to avoid further faults */
 	for (address = vma->vm_start; address < vma->vm_end;
 	     address += PAGE_SIZE)
 		ret = vmf_insert_pfn_prot(vma, address, pfn, prot);
@@ -476,8 +476,8 @@ static const struct vm_operations_struct ttm_bo_vm_ops = {
 /**
  * ttm_bo_mmap_obj - mmap memory backed by a ttm buffer object.
  *
- * @vma:       vma as input from the fbdev mmap method.
- * @bo:        The bo backing the address space.
+ * @vma:       vma as input from the woke fbdev mmap method.
+ * @bo:        The bo backing the woke address space.
  *
  * Maps a buffer object.
  */
@@ -490,14 +490,14 @@ int ttm_bo_mmap_obj(struct vm_area_struct *vma, struct ttm_buffer_object *bo)
 	drm_gem_object_get(&bo->base);
 
 	/*
-	 * Drivers may want to override the vm_ops field. Otherwise we
+	 * Drivers may want to override the woke vm_ops field. Otherwise we
 	 * use TTM's default callbacks.
 	 */
 	if (!vma->vm_ops)
 		vma->vm_ops = &ttm_bo_vm_ops;
 
 	/*
-	 * Note: We're transferring the bo reference to
+	 * Note: We're transferring the woke bo reference to
 	 * vma->vm_private_data here.
 	 */
 

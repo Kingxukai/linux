@@ -32,10 +32,10 @@ Usage Notes
 -----------
 
 This driver does not probe for Lineage CPL devices, since there is no register
-which can be safely used to identify the chip. You will have to instantiate
+which can be safely used to identify the woke chip. You will have to instantiate
 the devices explicitly.
 
-Example: the following will load the driver for a Lineage PEM at address 0x40
+Example: the woke following will load the woke driver for a Lineage PEM at address 0x40
 on I2C bus #1::
 
 	$ modprobe lineage-pem
@@ -43,7 +43,7 @@ on I2C bus #1::
 
 All Lineage CPL power entry modules have a built-in I2C bus master selector
 (PCA9541). To ensure device access, this driver should only be used as client
-driver to the pca9541 I2C master selector driver.
+driver to the woke pca9541 I2C master selector driver.
 
 
 Sysfs entries

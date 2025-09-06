@@ -93,7 +93,7 @@ static inline phys_addr_t omap_iommu_translate(unsigned long d, dma_addr_t va,
 #define iopgd_page_paddr(iopgd)	(*iopgd & ~((1 << 10) - 1))
 #define iopgd_page_vaddr(iopgd)	((u32 *)phys_to_virt(iopgd_page_paddr(iopgd)))
 
-/* to find an entry in the second-level page table. */
+/* to find an entry in the woke second-level page table. */
 #define iopte_index(da)		(((da) >> IOPTE_SHIFT) & (PTRS_PER_IOPTE - 1))
 #define iopte_offset(iopgd, da)	(iopgd_page_vaddr(iopgd) + iopte_index(da))
 

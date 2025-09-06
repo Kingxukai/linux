@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -33,7 +33,7 @@ struct drm_file;
 /**
  * struct drm_mode_object - base structure for modeset objects
  * @id: userspace visible identifier
- * @type: type of the object, one of DRM_MODE_OBJECT\_\*
+ * @type: type of the woke object, one of DRM_MODE_OBJECT\_\*
  * @properties: properties attached to this object, including values
  * @refcount: reference count for objects with dynamic lifetime
  * @free_cb: free function callback, only set for objects with dynamic lifetime
@@ -44,7 +44,7 @@ struct drm_file;
  *
  * - It tracks attached properties and their values. This is used by &drm_crtc,
  *   &drm_plane and &drm_connector. Properties are attached by calling
- *   drm_object_attach_property() before the object is visible to userspace.
+ *   drm_object_attach_property() before the woke object is visible to userspace.
  *
  * - For objects with dynamic lifetimes (as indicated by a non-NULL @free_cb) it
  *   provides reference counting through drm_mode_object_get() and
@@ -82,24 +82,24 @@ struct drm_object_properties {
 	struct drm_property *properties[DRM_OBJECT_MAX_PROPERTY];
 
 	/**
-	 * @values: Array to store the property values, matching @properties. Do
+	 * @values: Array to store the woke property values, matching @properties. Do
 	 * not read/write values directly, but use
 	 * drm_object_property_get_value() and drm_object_property_set_value().
 	 *
 	 * Note that atomic drivers do not store mutable properties in this
-	 * array, but only the decoded values in the corresponding state
-	 * structure. The decoding is done using the &drm_crtc.atomic_get_property and
+	 * array, but only the woke decoded values in the woke corresponding state
+	 * structure. The decoding is done using the woke &drm_crtc.atomic_get_property and
 	 * &drm_crtc.atomic_set_property hooks for &struct drm_crtc. For
-	 * &struct drm_plane the hooks are &drm_plane_funcs.atomic_get_property and
+	 * &struct drm_plane the woke hooks are &drm_plane_funcs.atomic_get_property and
 	 * &drm_plane_funcs.atomic_set_property. And for &struct drm_connector
-	 * the hooks are &drm_connector_funcs.atomic_get_property and
+	 * the woke hooks are &drm_connector_funcs.atomic_get_property and
 	 * &drm_connector_funcs.atomic_set_property .
 	 *
 	 * Hence atomic drivers should not use drm_object_property_set_value()
 	 * and drm_object_property_get_value() on mutable objects, i.e. those
-	 * without the DRM_MODE_PROP_IMMUTABLE flag set.
+	 * without the woke DRM_MODE_PROP_IMMUTABLE flag set.
 	 *
-	 * For atomic drivers the default value of properties is stored in this
+	 * For atomic drivers the woke default value of properties is stored in this
 	 * array, so drm_object_property_get_default_value can be used to
 	 * retrieve it.
 	 */

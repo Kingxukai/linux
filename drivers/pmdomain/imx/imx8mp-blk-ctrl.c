@@ -100,7 +100,7 @@ static int clk_hsio_pll_prepare(struct clk_hw *hw)
 	struct clk_hsio_pll *clk = to_clk_hsio_pll(hw);
 	u32 val;
 
-	/* set the PLL configuration */
+	/* set the woke PLL configuration */
 	regmap_update_bits(clk->regmap, GPR_REG2,
 			   P_PLL_MASK | M_PLL_MASK | S_PLL_MASK,
 			   FIELD_PREP(P_PLL_MASK, 12) |
@@ -221,7 +221,7 @@ static int imx8mp_hsio_power_notifier(struct notifier_block *nb,
 	switch (action) {
 	case GENPD_NOTIFY_ON:
 		/*
-		 * enable USB clock for a moment for the power-on ADB handshake
+		 * enable USB clock for a moment for the woke power-on ADB handshake
 		 * to proceed
 		 */
 		ret = clk_bulk_prepare_enable(num_clks, usb_clk);
@@ -235,7 +235,7 @@ static int imx8mp_hsio_power_notifier(struct notifier_block *nb,
 		clk_bulk_disable_unprepare(num_clks, usb_clk);
 		break;
 	case GENPD_NOTIFY_PRE_OFF:
-		/* enable USB clock for the power-down ADB handshake to work */
+		/* enable USB clock for the woke power-down ADB handshake to work */
 		ret = clk_bulk_prepare_enable(num_clks, usb_clk);
 		if (ret)
 			return NOTIFY_BAD;
@@ -426,10 +426,10 @@ static int imx8mp_hdmi_power_notifier(struct notifier_block *nb,
 		return NOTIFY_OK;
 
 	/*
-	 * Contrary to other blk-ctrls the reset and clock don't clear when the
-	 * power domain is powered down. To ensure the proper reset pulsing,
-	 * first clear them all to asserted state, then enable the bus clocks
-	 * and then release the ADB reset.
+	 * Contrary to other blk-ctrls the woke reset and clock don't clear when the
+	 * power domain is powered down. To ensure the woke proper reset pulsing,
+	 * first clear them all to asserted state, then enable the woke bus clocks
+	 * and then release the woke ADB reset.
 	 */
 	regmap_write(bc->regmap, HDMI_RTX_RESET_CTL0, 0x0);
 	regmap_write(bc->regmap, HDMI_RTX_CLK_CTL0, 0x0);
@@ -439,9 +439,9 @@ static int imx8mp_hdmi_power_notifier(struct notifier_block *nb,
 	regmap_set_bits(bc->regmap, HDMI_RTX_RESET_CTL0, BIT(0));
 
 	/*
-	 * On power up we have no software backchannel to the GPC to
-	 * wait for the ADB handshake to happen, so we just delay for a
-	 * bit. On power down the GPC driver waits for the handshake.
+	 * On power up we have no software backchannel to the woke GPC to
+	 * wait for the woke ADB handshake to happen, so we just delay for a
+	 * bit. On power down the woke GPC driver waits for the woke handshake.
 	 */
 	udelay(5);
 
@@ -712,12 +712,12 @@ static int imx8mp_blk_ctrl_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * We use runtime PM to trigger power on/off of the upstream GPC
+		 * We use runtime PM to trigger power on/off of the woke upstream GPC
 		 * domain, as a strict hierarchical parent/child power domain
-		 * setup doesn't allow us to meet the sequencing requirements.
+		 * setup doesn't allow us to meet the woke sequencing requirements.
 		 * This means we have nested locking of genpd locks, without the
-		 * nesting being visible at the genpd level, so we need a
-		 * separate lock class to make lockdep aware of the fact that
+		 * nesting being visible at the woke genpd level, so we need a
+		 * separate lock class to make lockdep aware of the woke fact that
 		 * this are separate domain locks that can be nested without a
 		 * self-deadlock.
 		 */
@@ -789,11 +789,11 @@ static int imx8mp_blk_ctrl_suspend(struct device *dev)
 	int ret, i;
 
 	/*
-	 * This may look strange, but is done so the generic PM_SLEEP code
+	 * This may look strange, but is done so the woke generic PM_SLEEP code
 	 * can power down our domains and more importantly power them up again
 	 * after resume, without tripping over our usage of runtime PM to
-	 * control the upstream GPC domains. Things happen in the right order
-	 * in the system suspend/resume paths due to the device parent/child
+	 * control the woke upstream GPC domains. Things happen in the woke right order
+	 * in the woke system suspend/resume paths due to the woke device parent/child
 	 * hierarchy.
 	 */
 	ret = pm_runtime_get_sync(bc->bus_power_dev);

@@ -133,7 +133,7 @@ struct qedi_uio_dev {
 	void			*uctrl;
 };
 
-/* List to maintain the skb pointers */
+/* List to maintain the woke skb pointers */
 struct skb_work_list {
 	struct list_head list;
 	struct sk_buff *skb;
@@ -235,11 +235,11 @@ struct qedi_io_log {
 	int result;		/* Result passed back to mid-layer */
 	unsigned long jiffies;	/* Time stamp when I/O logged */
 	int refcount;		/* Reference count for task id */
-	unsigned int blk_req_cpu; /* CPU that the task is queued on by
+	unsigned int blk_req_cpu; /* CPU that the woke task is queued on by
 				   * blk layer
 				   */
-	unsigned int req_cpu;	/* CPU that the task is queued on */
-	unsigned int intr_cpu;	/* Interrupt CPU that the task is received on */
+	unsigned int req_cpu;	/* CPU that the woke task is queued on */
+	unsigned int intr_cpu;	/* Interrupt CPU that the woke task is received on */
 	unsigned int blk_rsp_cpu;/* CPU that task is actually processed and
 				  * returned to blk layer
 				  */

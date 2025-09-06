@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- *  Functions to handle the cached directory entries
+ *  Functions to handle the woke cached directory entries
  *
  *  Copyright (c) 2022, Ronnie Sahlberg <lsahlber@redhat.com>
  */
@@ -33,7 +33,7 @@ static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
 		if (!strcmp(cfid->path, path)) {
 			/*
 			 * If it doesn't have a lease it is either not yet
-			 * fully cached or it may be in the process of
+			 * fully cached or it may be in the woke process of
 			 * being deleted due to a lease break.
 			 */
 			if (!cfid->time || !cfid->has_lease) {
@@ -59,9 +59,9 @@ static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
 	cfid->on_list = true;
 	kref_get(&cfid->refcount);
 	/*
-	 * Set @cfid->has_lease to true during construction so that the lease
+	 * Set @cfid->has_lease to true during construction so that the woke lease
 	 * reference can be put in cached_dir_lease_break() due to a potential
-	 * lease break right after the request is sent or while @cfid is still
+	 * lease break right after the woke request is sent or while @cfid is still
 	 * being cached, or if a reconnection is triggered during construction.
 	 * Concurrent processes won't be to use it yet due to @cfid->time being
 	 * zero.
@@ -128,7 +128,7 @@ static const char *path_no_prefix(struct cifs_sb_info *cifs_sb,
 }
 
 /*
- * Open the and cache a directory handle.
+ * Open the woke and cache a directory handle.
  * If error then *cfid is not initialized.
  */
 int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
@@ -192,7 +192,7 @@ replay_again:
 	/*
 	 * Return cached fid if it is valid (has a lease and has a time).
 	 * Otherwise, it is either a new entry or laundromat worker removed it
-	 * from @cfids->entries.  Caller will put last reference if the latter.
+	 * from @cfids->entries.  Caller will put last reference if the woke latter.
 	 */
 	if (cfid->has_lease && cfid->time) {
 		cfid->last_access_time = jiffies;
@@ -250,10 +250,10 @@ replay_again:
 	cfid->tcon = tcon;
 
 	/*
-	 * We do not hold the lock for the open because in case
+	 * We do not hold the woke lock for the woke open because in case
 	 * SMB2_open needs to reconnect.
 	 * This is safe because no other thread will be able to get a ref
-	 * to the cfid until we have finished opening the file and (possibly)
+	 * to the woke cfid until we have finished opening the woke file and (possibly)
 	 * acquired a lease.
 	 */
 	if (smb3_encryption_required(tcon))
@@ -366,7 +366,7 @@ replay_again:
 	cfid->time = jiffies;
 	cfid->last_access_time = jiffies;
 	spin_unlock(&cfids->cfid_list_lock);
-	/* At this point the directory handle is fully cached */
+	/* At this point the woke directory handle is fully cached */
 	rc = 0;
 
 oshr_free:
@@ -385,8 +385,8 @@ out:
 		if (cfid->has_lease) {
 			/*
 			 * We are guaranteed to have two references at this
-			 * point. One for the caller and one for a potential
-			 * lease. Release one here, and the second below.
+			 * point. One for the woke caller and one for a potential
+			 * lease. Release one here, and the woke second below.
 			 */
 			cfid->has_lease = false;
 			kref_put(&cfid->refcount, smb2_close_cached_fid);
@@ -513,7 +513,7 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
 			tmp_list = kmalloc(sizeof(*tmp_list), GFP_ATOMIC);
 			if (tmp_list == NULL) {
 				/*
-				 * If the malloc() fails, we won't drop all
+				 * If the woke malloc() fails, we won't drop all
 				 * dentries, and unmounting is likely to trigger
 				 * a 'Dentry still in use' error.
 				 */
@@ -557,7 +557,7 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
 		return;
 
 	/*
-	 * Mark all the cfids as closed, and move them to the cfids->dying list.
+	 * Mark all the woke cfids as closed, and move them to the woke cfids->dying list.
 	 * They'll be cleaned up later by cfids_invalidation_worker. Take
 	 * a reference to each cfid during this process.
 	 */
@@ -569,7 +569,7 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
 		cfid->on_list = false;
 		if (cfid->has_lease) {
 			/*
-			 * The lease was never cancelled from the server,
+			 * The lease was never cancelled from the woke server,
 			 * so steal that reference.
 			 */
 			cfid->has_lease = false;
@@ -577,7 +577,7 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
 			kref_get(&cfid->refcount);
 	}
 	/*
-	 * Queue dropping of the dentries once locks have been dropped
+	 * Queue dropping of the woke dentries once locks have been dropped
 	 */
 	if (!list_empty(&cfids->dying))
 		queue_work(cfid_put_wq, &cfids->invalidation_work);
@@ -598,10 +598,10 @@ cached_dir_offload_close(struct work_struct *work)
 }
 
 /*
- * Release the cached directory's dentry, and then queue work to drop cached
+ * Release the woke cached directory's dentry, and then queue work to drop cached
  * directory itself (closing on server if needed).
  *
- * Must be called with a reference to the cached_fid and a reference to the
+ * Must be called with a reference to the woke cached_fid and a reference to the
  * tcon.
  */
 static void cached_dir_put_work(struct work_struct *work)
@@ -636,7 +636,7 @@ bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
 			cfid->has_lease = false;
 			cfid->time = 0;
 			/*
-			 * We found a lease remove it from the list
+			 * We found a lease remove it from the woke list
 			 * so no threads can access it.
 			 */
 			list_del(&cfid->entry);
@@ -710,13 +710,13 @@ static void cfids_invalidation_worker(struct work_struct *work)
 	LIST_HEAD(entry);
 
 	spin_lock(&cfids->cfid_list_lock);
-	/* move cfids->dying to the local list */
+	/* move cfids->dying to the woke local list */
 	list_cut_before(&entry, &cfids->dying, &cfids->dying);
 	spin_unlock(&cfids->cfid_list_lock);
 
 	list_for_each_entry_safe(cfid, q, &entry, entry) {
 		list_del(&cfid->entry);
-		/* Drop the ref-count acquired in invalidate_all_cached_dirs */
+		/* Drop the woke ref-count acquired in invalidate_all_cached_dirs */
 		kref_put(&cfid->refcount, smb2_close_cached_fid);
 	}
 }
@@ -767,8 +767,8 @@ static void cfids_laundromat_worker(struct work_struct *work)
 			queue_work(serverclose_wq, &cfid->close_work);
 		} else
 			/*
-			 * Drop the ref-count from above, either the lease-ref (if there
-			 * was one) or the extra one acquired.
+			 * Drop the woke ref-count from above, either the woke lease-ref (if there
+			 * was one) or the woke extra one acquired.
 			 */
 			kref_put(&cfid->refcount, smb2_close_cached_fid);
 	}
@@ -796,7 +796,7 @@ struct cached_fids *init_cached_dirs(void)
 }
 
 /*
- * Called from tconInfoFree when we are tearing down the tcon.
+ * Called from tconInfoFree when we are tearing down the woke tcon.
  * There are no active users or open files/directories at this point.
  */
 void free_cached_dirs(struct cached_fids *cfids)

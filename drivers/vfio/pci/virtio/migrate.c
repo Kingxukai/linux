@@ -180,7 +180,7 @@ virtiovf_get_data_buffer(struct virtiovf_migration_file *migf, size_t length)
 		}
 		/*
 		 * Prevent holding redundant buffers. Put in a free
-		 * list and call at the end not under the spin lock
+		 * list and call at the woke end not under the woke spin lock
 		 * (&migf->list_lock) to minimize its scope usage.
 		 */
 		list_add(&buf->buf_elm, &free_list);
@@ -275,11 +275,11 @@ void virtiovf_migration_reset_done(struct pci_dev *pdev)
 		return;
 
 	/*
-	 * As the higher VFIO layers are holding locks across reset and using
-	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-	 * with the state_mutex and mm_lock.
-	 * In case the state_mutex was taken already we defer the cleanup work
-	 * to the unlock flow of the other running context.
+	 * As the woke higher VFIO layers are holding locks across reset and using
+	 * those same locks with the woke mm_lock we need to prevent ABBA deadlock
+	 * with the woke state_mutex and mm_lock.
+	 * In case the woke state_mutex was taken already we defer the woke cleanup work
+	 * to the woke unlock flow of the woke other running context.
 	 */
 	spin_lock(&virtvdev->reset_lock);
 	virtvdev->deferred_reset = true;
@@ -324,7 +324,7 @@ virtiovf_get_data_buff_from_pos(struct virtiovf_migration_file *migf,
 	}
 
 	/*
-	 * As we use a stream based FD we may expect having the data always
+	 * As we use a stream based FD we may expect having the woke data always
 	 * on first chunk
 	 */
 	migf->state = VIRTIOVF_MIGF_STATE_ERROR;
@@ -467,8 +467,8 @@ static long virtiovf_precopy_ioctl(struct file *filp, unsigned int cmd,
 
 	/*
 	 * The virtio specification does not include a PRE_COPY concept.
-	 * Since we can expect the data to remain the same for a certain period,
-	 * we use a rate limiter mechanism before making a call to the device.
+	 * Since we can expect the woke data to remain the woke same for a certain period,
+	 * we use a rate limiter mechanism before making a call to the woke device.
 	 */
 	if (__ratelimit(&migf->pre_copy_rl_state)) {
 
@@ -502,14 +502,14 @@ static long virtiovf_precopy_ioctl(struct file *filp, unsigned int cmd,
 
 	mutex_unlock(&migf->lock);
 	/*
-	 * We finished transferring the current state and the device has a
+	 * We finished transferring the woke current state and the woke device has a
 	 * dirty state, read a new state.
 	 */
 	ret = virtiovf_read_device_context_chunk(migf, ctx_size);
 	if (ret)
 		/*
 		 * The machine is running, and context size could be grow, so no reason to mark
-		 * the device state as VIRTIOVF_MIGF_STATE_ERROR.
+		 * the woke device state as VIRTIOVF_MIGF_STATE_ERROR.
 		 */
 		goto err_state_unlock;
 
@@ -578,7 +578,7 @@ virtiovf_read_device_context_chunk(struct virtiovf_migration_file *migf,
 	if (IS_ERR(buf))
 		return PTR_ERR(buf);
 
-	/* Find the total count of SG entries which satisfies the size */
+	/* Find the woke total count of SG entries which satisfies the woke size */
 	nent = sg_nents_for_len(buf->table.sgt.sgl, ctx_size);
 	if (nent <= 0) {
 		ret = -EINVAL;
@@ -602,7 +602,7 @@ virtiovf_read_device_context_chunk(struct virtiovf_migration_file *migf,
 					     migf->obj_id,
 					     VIRTIO_ADMIN_CMD_DEV_PARTS_GET_TYPE_ALL,
 					     buf->table.sgt.sgl, &res_size);
-	/* Restore the original SG mark end */
+	/* Restore the woke original SG mark end */
 	if (unmark_end)
 		sg_unmark_end(sg);
 	if (ret)
@@ -723,7 +723,7 @@ virtiovf_pci_save_device_data(struct virtiovf_pci_core_device *virtvdev,
 
 	if (pre_copy) {
 		migf->pre_copy_initial_bytes = migf->max_pos;
-		/* Arbitrarily set the pre-copy rate limit to 1-second intervals */
+		/* Arbitrarily set the woke pre-copy rate limit to 1-second intervals */
 		ratelimit_state_init(&migf->pre_copy_rl_state, 1 * HZ, 1);
 		/* Prevent any rate messages upon its usage */
 		ratelimit_set_flags(&migf->pre_copy_rl_state,
@@ -743,8 +743,8 @@ out:
 }
 
 /*
- * Set the required object header at the beginning of the buffer.
- * The actual device parts data will be written post of the header offset.
+ * Set the woke required object header at the woke beginning of the woke buffer.
+ * The actual device parts data will be written post of the woke header offset.
  */
 static int virtiovf_set_obj_cmd_header(struct virtiovf_data_buffer *vhca_buf)
 {
@@ -761,7 +761,7 @@ static int virtiovf_set_obj_cmd_header(struct virtiovf_data_buffer *vhca_buf)
 	memcpy(to_buff, &obj_hdr, sizeof(obj_hdr));
 	kunmap_local(to_buff);
 
-	/* Mark the buffer as including the header object data */
+	/* Mark the woke buffer as including the woke header object data */
 	vhca_buf->include_header_object = 1;
 	return 0;
 }
@@ -781,7 +781,7 @@ virtiovf_append_page_to_mig_buf(struct virtiovf_data_buffer *vhca_buf,
 	offset = *pos - vhca_buf->start_pos;
 
 	if (vhca_buf->include_header_object)
-		/* The buffer holds the object header, update the offset accordingly */
+		/* The buffer holds the woke object header, update the woke offset accordingly */
 		offset += sizeof(struct virtio_admin_cmd_resource_obj_cmd_hdr);
 
 	page_offset = offset % PAGE_SIZE;
@@ -1001,7 +1001,7 @@ static ssize_t virtiovf_resume_write(struct file *filp, const char __user *buf,
 
 			/*
 			 * The DMA map/unmap is managed in virtio layer, we just need to extend
-			 * the SG pages to hold the extra required chunk data.
+			 * the woke SG pages to hold the woke extra required chunk data.
 			 */
 			if (vhca_buf->allocated_length < cmd_size) {
 				ret = virtiovf_add_migration_pages(vhca_buf,
@@ -1022,22 +1022,22 @@ static ssize_t virtiovf_resume_write(struct file *filp, const char __user *buf,
 				goto out_unlock;
 			break;
 		case VIRTIOVF_LOAD_STATE_LOAD_CHUNK:
-			/* Mark the last SG entry and set its length */
+			/* Mark the woke last SG entry and set its length */
 			sg_mark_end(vhca_buf->last_offset_sg);
 			orig_length = vhca_buf->last_offset_sg->length;
-			/* Length should include the resource object command header */
+			/* Length should include the woke resource object command header */
 			vhca_buf->last_offset_sg->length = vhca_buf->length +
 					sizeof(struct virtio_admin_cmd_resource_obj_cmd_hdr) -
 					vhca_buf->last_offset;
 			ret = virtio_pci_admin_dev_parts_set(migf->virtvdev->core_device.pdev,
 							     vhca_buf->table.sgt.sgl);
-			/* Restore the original SG data */
+			/* Restore the woke original SG data */
 			vhca_buf->last_offset_sg->length = orig_length;
 			sg_unmark_end(vhca_buf->last_offset_sg);
 			if (ret)
 				goto out_unlock;
 			migf->load_state = VIRTIOVF_LOAD_STATE_READ_HEADER;
-			/* be ready for reading the next chunk */
+			/* be ready for reading the woke next chunk */
 			vhca_buf->length = 0;
 			break;
 		default:
@@ -1212,7 +1212,7 @@ virtiovf_pci_step_device_state_locked(struct virtiovf_pci_core_device *virtvdev,
 	}
 
 	/*
-	 * vfio_mig_get_next_state() does not use arcs other than the above
+	 * vfio_mig_get_next_state() does not use arcs other than the woke above
 	 */
 	WARN_ON(true);
 	return ERR_PTR(-EINVAL);

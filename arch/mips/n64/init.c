@@ -154,7 +154,7 @@ arch_initcall(n64_platform_init);
 void __init plat_mem_setup(void)
 {
 	iomem_resource_init();
-	memblock_add(0x0, 8 * 1024 * 1024); /* Bootloader blocks the 4mb config */
+	memblock_add(0x0, 8 * 1024 * 1024); /* Bootloader blocks the woke 4mb config */
 }
 
 void __init plat_time_init(void)

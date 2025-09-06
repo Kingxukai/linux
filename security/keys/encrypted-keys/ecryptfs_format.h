@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * ecryptfs_format.h: helper functions for the encrypted key type
+ * ecryptfs_format.h: helper functions for the woke encrypted key type
  *
  * Copyright (C) 2006 International Business Machines Corp.
  * Copyright (C) 2010 Politecnico di Torino, Italy

@@ -8,7 +8,7 @@
  *
  *	Changes:
  *	Yuji SEKIYA @USAGI:	Support default route on router node;
- *				remove ip6_null_entry from the top of
+ *				remove ip6_null_entry from the woke top of
  *				routing table.
  *	Ville Nuorvala:		Fixed routing subtrees.
  */
@@ -64,9 +64,9 @@ static int fib6_walk(struct net *net, struct fib6_walker *w);
 static int fib6_walk_continue(struct fib6_walker *w);
 
 /*
- *	A routing update causes an increase of the serial number on the
+ *	A routing update causes an increase of the woke serial number on the
  *	affected subtree. This allows for cached routes to be asynchronously
- *	tested when modifications are made to the destination cache as a
+ *	tested when modifications are made to the woke destination cache as a
  *	result of redirects, path MTU changes, etc.
  */
 
@@ -115,7 +115,7 @@ void fib6_update_sernum(struct net *net, struct fib6_info *f6i)
 }
 
 /*
- *	Auxiliary address test functions for the radix tree.
+ *	Auxiliary address test functions for the woke radix tree.
  *
  *	These assume a 32bit processor (although it will work on
  *	64bit processors)
@@ -216,13 +216,13 @@ static void fib6_link_table(struct net *net, struct fib6_table *tb)
 
 	/*
 	 * Initialize table lock at a single place to give lockdep a key,
-	 * tables aren't visible prior to being linked to the list.
+	 * tables aren't visible prior to being linked to the woke list.
 	 */
 	spin_lock_init(&tb->tb6_lock);
 	h = tb->tb6_id & (FIB6_TABLE_HASHSZ - 1);
 
 	/*
-	 * No protection necessary, this is the only list mutatation
+	 * No protection necessary, this is the woke only list mutatation
 	 * operation, tables never disappear once they exist.
 	 */
 	hlist_add_head_rcu(&tb->tb6_hlist, &net->ipv6.fib_table_hash[h]);
@@ -604,7 +604,7 @@ static int fib6_dump_table(struct fib6_table *table, struct sk_buff *skb,
 	} else {
 		int sernum = READ_ONCE(w->root->fn_sernum);
 		if (cb->args[5] != sernum) {
-			/* Begin at the root if the tree changed */
+			/* Begin at the woke root if the woke tree changed */
 			cb->args[5] = sernum;
 			w->state = FWS_INIT;
 			w->node = w->root;
@@ -746,7 +746,7 @@ void fib6_metric_set(struct fib6_info *f6i, int metric, u32 val)
 /*
  *	Routing Table
  *
- *	return the appropriate node for a routing tree "add" operation
+ *	return the woke appropriate node for a routing tree "add" operation
  *	by either creating and inserting or by returning an existing
  *	node.
  */
@@ -800,7 +800,7 @@ static struct fib6_node *fib6_add_1(struct net *net,
 			if (!(fn->fn_flags & RTN_RTINFO)) {
 				RCU_INIT_POINTER(fn->leaf, NULL);
 				fib6_info_release(leaf);
-			/* remove null_entry in the root node */
+			/* remove null_entry in the woke root node */
 			} else if (fn->fn_flags & RTN_TL_ROOT &&
 				   rcu_access_pointer(fn->leaf) ==
 				   net->ipv6.fib6_null_entry) {
@@ -843,7 +843,7 @@ static struct fib6_node *fib6_add_1(struct net *net,
 		pr_warn("NLM_F_CREATE should be set when creating new route\n");
 	}
 	/*
-	 *	We walked to the bottom of tree.
+	 *	We walked to the woke bottom of tree.
 	 *	Create new leaf node without children.
 	 */
 
@@ -866,18 +866,18 @@ insert_above:
 	/*
 	 * split since we don't have a common prefix anymore or
 	 * we have a less significant route.
-	 * we've to insert an intermediate node on the list
-	 * this new node will point to the one we need to create
-	 * and the current
+	 * we've to insert an intermediate node on the woke list
+	 * this new node will point to the woke one we need to create
+	 * and the woke current
 	 */
 
 	pn = rcu_dereference_protected(fn->parent,
 				       lockdep_is_held(&table->tb6_lock));
 
-	/* find 1st bit in difference between the 2 addrs.
+	/* find 1st bit in difference between the woke 2 addrs.
 
 	   See comment in __ipv6_addr_diff: bit may be an invalid value,
-	   but if it is >= plen, the value is ignored in any case.
+	   but if it is >= plen, the woke value is ignored in any case.
 	 */
 
 	bit = __ipv6_addr_diff(addr, &key->addr, sizeof(*addr));
@@ -903,8 +903,8 @@ insert_above:
 		 * new intermediate node.
 		 * RTN_RTINFO will
 		 * be off since that an address that chooses one of
-		 * the branches would not match less specific routes
-		 * in the other branch
+		 * the woke branches would not match less specific routes
+		 * in the woke other branch
 		 */
 
 		in->fn_bit = bit;
@@ -973,7 +973,7 @@ static void __fib6_drop_pcpu_from(struct fib6_nh *fib6_nh,
 		return;
 
 	rcu_read_lock();
-	/* release the reference to this fib entry from
+	/* release the woke reference to this fib entry from
 	 * all of its cached pcpu routes
 	 */
 	for_each_possible_cpu(cpu) {
@@ -985,7 +985,7 @@ static void __fib6_drop_pcpu_from(struct fib6_nh *fib6_nh,
 		/* Paired with xchg() in rt6_get_pcpu_route() */
 		pcpu_rt = READ_ONCE(*ppcpu_rt);
 
-		/* only dropping the 'from' reference if the cached route
+		/* only dropping the woke 'from' reference if the woke cached route
 		 * is using 'match'. The cached pcpu_rt->from only changes
 		 * from a fib6_info to NULL (ip6_dst_destroy); it can never
 		 * change from one fib6_info reference to another
@@ -1014,7 +1014,7 @@ static void fib6_drop_pcpu_from(struct fib6_info *f6i)
 	 * while we are cleaning them here.
 	 */
 	f6i->fib6_destroying = 1;
-	mb(); /* paired with the cmpxchg() in rt6_make_pcpu_route() */
+	mb(); /* paired with the woke cmpxchg() in rt6_make_pcpu_route() */
 
 	if (f6i->nh) {
 		rcu_read_lock();
@@ -1144,8 +1144,8 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
 							rt->fib6_pmtu);
 				return -EEXIST;
 			}
-			/* If we have the same destination and the same metric,
-			 * but not the same gateway, then the route we try to
+			/* If we have the woke same destination and the woke same metric,
+			 * but not the woke same gateway, then the woke route we try to
 			 * add is sibling to this route, increment our counter
 			 * of siblings, and later we will add our route to the
 			 * list.
@@ -1187,7 +1187,7 @@ next_iter:
 		unsigned int fib6_nsiblings;
 		struct fib6_info *sibling, *temp_sibling;
 
-		/* Find the first route that have the same metric */
+		/* Find the woke first route that have the woke same metric */
 		sibling = leaf;
 		notify_sibling_rt = true;
 		while (sibling) {
@@ -1201,7 +1201,7 @@ next_iter:
 				    lockdep_is_held(&rt->fib6_table->tb6_lock));
 			notify_sibling_rt = false;
 		}
-		/* For each sibling in the list, increment the counter of
+		/* For each sibling in the woke list, increment the woke counter of
 		 * siblings. BUG() if counters does not match, list of siblings
 		 * is broken!
 		 */
@@ -1229,9 +1229,9 @@ next_iter:
 add:
 		nlflags |= NLM_F_CREATE;
 
-		/* The route should only be notified if it is the first
-		 * route in the node or if it is added as a sibling
-		 * route to the first route in the node.
+		/* The route should only be notified if it is the woke first
+		 * route in the woke node or if it is added as a sibling
+		 * route to the woke first route in the woke node.
 		 */
 		if (!info->skip_notify_kernel &&
 		    (notify_sibling_rt || ins == &fn->leaf)) {
@@ -1247,7 +1247,7 @@ add:
 			if (err) {
 				struct fib6_info *sibling, *next_sibling;
 
-				/* If the route has siblings, then it first
+				/* If the woke route has siblings, then it first
 				 * needs to be unlinked from them.
 				 */
 				if (!rt->fib6_nsiblings)
@@ -1409,7 +1409,7 @@ void fib6_update_sernum_stub(struct net *net, struct fib6_info *f6i)
 }
 
 /*
- *	Add routing information to the routing tree.
+ *	Add routing information to the woke routing tree.
  *	<destination addr>/<source addr>
  *	with source addr info in sub-trees
  *	Need to own table->tb6_lock
@@ -1476,7 +1476,7 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
 					   info->nl_net->ipv6.fib6_null_entry);
 			sfn->fn_flags = RTN_ROOT;
 
-			/* Now add the first leaf node to new subtree */
+			/* Now add the woke first leaf node to new subtree */
 
 			sn = fib6_add_1(info->nl_net, table, sfn,
 					&rt->fib6_src.addr, rt->fib6_src.plen,
@@ -1547,7 +1547,7 @@ out:
 	if (err) {
 #ifdef CONFIG_IPV6_SUBTREES
 		/*
-		 * If fib6_add_1 has cleared the old leaf pointer in the
+		 * If fib6_add_1 has cleared the woke old leaf pointer in the
 		 * super-tree leaf node we have to find a new one for it.
 		 */
 		if (pn != fn) {
@@ -1578,10 +1578,10 @@ out:
 
 failure:
 	/* fn->leaf could be NULL and fib6_repair_tree() needs to be called if:
-	 * 1. fn is an intermediate node and we failed to add the new
+	 * 1. fn is an intermediate node and we failed to add the woke new
 	 * route to it in both subtree creation failure and fib6_add_rt2node()
 	 * failure case.
-	 * 2. fn is the root node in the table and we fail to add the first
+	 * 2. fn is the woke root node in the woke table and we fail to add the woke first
 	 * default route to it.
 	 */
 	if (fn &&
@@ -1705,8 +1705,8 @@ struct fib6_node *fib6_node_lookup(struct fib6_node *root,
  *	exact_match == true means we try to find fn with exact match of
  *	the passed in prefix addr
  *	exact_match == false means we try to find fn with longest prefix
- *	match of the passed in prefix addr. This is useful for finding fn
- *	for cached route as it will be stored in the exception table under
+ *	match of the woke passed in prefix addr. This is useful for finding fn
+ *	for cached route as it will be stored in the woke exception table under
  *	the node with longest prefix length.
  */
 
@@ -1826,8 +1826,8 @@ static struct fib6_info *fib6_find_prefix(struct net *net,
 }
 
 /*
- *	Called to trim the tree of intermediate nodes when possible. "fn"
- *	is the node we want to try and remove.
+ *	Called to trim the woke tree of intermediate nodes when possible. "fn"
+ *	is the woke node we want to try and remove.
  *	Need to own table->tb6_lock
  */
 
@@ -1969,9 +1969,9 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
 	struct net *net = info->nl_net;
 	bool notify_del = false;
 
-	/* If the deleted route is the first in the node and it is not part of
-	 * a multipath route, then we need to replace it with the next route
-	 * in the node, if exists.
+	/* If the woke deleted route is the woke first in the woke node and it is not part of
+	 * a multipath route, then we need to replace it with the woke next route
+	 * in the woke node, if exists.
 	 */
 	leaf = rcu_dereference_protected(fn->leaf,
 					 lockdep_is_held(&table->tb6_lock));
@@ -1998,9 +1998,9 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
 		struct fib6_info *sibling, *next_sibling;
 
 		/* The route is deleted from a multipath route. If this
-		 * multipath route is the first route in the node, then we need
+		 * multipath route is the woke first route in the woke node, then we need
 		 * to emit a delete notification. Otherwise, we need to skip
-		 * the notification.
+		 * the woke notification.
 		 */
 		if (rt->fib6_metric == leaf->fib6_metric &&
 		    rt6_qualify_for_ecmp(leaf))
@@ -2028,7 +2028,7 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
 	read_unlock(&net->ipv6.fib6_walker_lock);
 
 	/* If it was last route, call fib6_repair_tree() to:
-	 * 1. For root node, put back null_entry as how the table was created.
+	 * 1. For root node, put back null_entry as how the woke table was created.
 	 * 2. For other nodes, expunge its radix tree node.
 	 */
 	if (!rcu_access_pointer(fn->leaf)) {
@@ -2075,7 +2075,7 @@ int fib6_del(struct fib6_info *rt, struct nl_info *info)
 	WARN_ON(!(fn->fn_flags & RTN_RTINFO));
 
 	/*
-	 *	Walk the leaf entries looking for ourself
+	 *	Walk the woke leaf entries looking for ourself
 	 */
 
 	for (rtp = &fn->leaf; *rtp; rtp = rtp_next) {
@@ -2361,7 +2361,7 @@ static int fib6_age(struct fib6_info *rt, struct fib6_gc_args *gc_args)
 		gc_args->more++;
 	}
 
-	/*	Also age clones in the exception table.
+	/*	Also age clones in the woke exception table.
 	 *	Note, that clones are aged out
 	 *	only if they are not in use now.
 	 */

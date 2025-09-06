@@ -58,7 +58,7 @@
 #define mmWD_GPIO_DATAOUT_REG			mmPSOC_GPIO3_DATAOUT
 #define mmSTM_PROFILER_SPE_REG			mmPSOC_STM_STMSPER
 
-/* Registers below are used to pass the boot_if data between ARM and ARC1 */
+/* Registers below are used to pass the woke boot_if data between ARM and ARC1 */
 #define mmARM_MSG_BOOT_ERR_SET			mmCPU_IF_SPECIAL_GLBL_SPARE_0
 #define mmARM_MSG_BOOT_ERR_CLR			mmCPU_IF_SPECIAL_GLBL_SPARE_1
 #define mmARM_MSG_BOOT_DEV_STS_SET		mmCPU_IF_SPECIAL_GLBL_SPARE_2

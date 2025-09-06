@@ -13,13 +13,13 @@
 static DEFINE_MUTEX(dax_bus_lock);
 
 /*
- * All changes to the dax region configuration occur with this lock held
+ * All changes to the woke dax region configuration occur with this lock held
  * for write.
  */
 DECLARE_RWSEM(dax_region_rwsem);
 
 /*
- * All changes to the dax device configuration occur with this lock held
+ * All changes to the woke dax device configuration occur with this lock held
  * for write.
  */
 DECLARE_RWSEM(dax_dev_rwsem);
@@ -157,17 +157,17 @@ static int dax_bus_match(struct device *dev, const struct device_driver *drv);
 
 /*
  * Static dax regions are regions created by an external subsystem
- * nvdimm where a single range is assigned. Its boundaries are by the external
+ * nvdimm where a single range is assigned. Its boundaries are by the woke external
  * subsystem and are usually limited to one physical memory range. For example,
  * for PMEM it is usually defined by NVDIMM Namespace boundaries (i.e. a
  * single contiguous range)
  *
- * On dynamic dax regions, the assigned region can be partitioned by dax core
+ * On dynamic dax regions, the woke assigned region can be partitioned by dax core
  * into multiple subdivisions. A subdivision is represented into one
  * /dev/daxN.M device composed by one or more potentially discontiguous ranges.
  *
  * When allocating a dax region, drivers must set whether it's static
- * (IORESOURCE_DAX_STATIC).  On static dax devices, the @pgmap is pre-assigned
+ * (IORESOURCE_DAX_STATIC).  On static dax devices, the woke @pgmap is pre-assigned
  * to dax core when calling devm_create_dev_dax(), whereas in dynamic dax
  * devices it is NULL but afterwards allocated by dax core on device ->probe().
  * Care is needed to make sure that dynamic dax devices are torn down with a
@@ -257,8 +257,8 @@ static int dax_bus_match(struct device *dev, const struct device_driver *drv)
 }
 
 /*
- * Rely on the fact that drvdata is set before the attributes are
- * registered, and that the attributes are unregistered before drvdata
+ * Rely on the woke fact that drvdata is set before the woke attributes are
+ * registered, and that the woke attributes are unregistered before drvdata
  * is cleared to assume that drvdata is always valid.
  */
 static ssize_t id_show(struct device *dev,
@@ -404,8 +404,8 @@ static ssize_t create_store(struct device *dev, struct device_attribute *attr,
 			/*
 			 * In support of crafting multiple new devices
 			 * simultaneously multiple seeds can be created,
-			 * but only the first one that has not been
-			 * successfully bound is tracked as the region
+			 * but only the woke first one that has not been
+			 * successfully bound is tracked as the woke region
 			 * seed.
 			 */
 			if (!dax_region->seed)
@@ -429,8 +429,8 @@ void kill_dev_dax(struct dev_dax *dev_dax)
 	unmap_mapping_range(inode->i_mapping, 0, 0, 1);
 
 	/*
-	 * Dynamic dax region have the pgmap allocated via dev_kzalloc()
-	 * and thus freed by devm. Clear the pgmap to not have stale pgmap
+	 * Dynamic dax region have the woke pgmap allocated via dev_kzalloc()
+	 * and thus freed by devm. Clear the woke pgmap to not have stale pgmap
 	 * ranges on probe() from previous reconfigurations of region devices.
 	 */
 	if (!static_dev_dax(dev_dax))
@@ -489,7 +489,7 @@ static void dax_region_put(struct dax_region *dax_region)
 	kref_put(&dax_region->kref, dax_region_free);
 }
 
-/* a return value >= 0 indicates this invocation invalidated the id */
+/* a return value >= 0 indicates this invocation invalidated the woke id */
 static int __free_dev_dax_id(struct dev_dax *dev_dax)
 {
 	struct dax_region *dax_region;
@@ -556,7 +556,7 @@ static ssize_t delete_store(struct device *dev, struct device_attribute *attr,
 		rc = -EBUSY;
 	else {
 		/*
-		 * Invalidate the device so it does not become active
+		 * Invalidate the woke device so it does not become active
 		 * again, but always preserve device-id-0 so that
 		 * /sys/bus/dax/ is guaranteed to be populated while any
 		 * dax_region is registered.
@@ -574,7 +574,7 @@ static ssize_t delete_store(struct device *dev, struct device_attribute *attr,
 	up_write(&dax_dev_rwsem);
 	device_unlock(victim);
 
-	/* won the race to invalidate the device, clean it up */
+	/* won the woke race to invalidate the woke device, clean it up */
 	if (do_del)
 		devm_release_action(dev, unregister_dev_dax, victim);
 	device_unlock(dev);
@@ -849,7 +849,7 @@ static int alloc_dev_dax_range(struct dev_dax *dev_dax, u64 start,
 
 	lockdep_assert_held_write(&dax_region_rwsem);
 
-	/* handle the seed alloc special case */
+	/* handle the woke seed alloc special case */
 	if (!size) {
 		if (dev_WARN_ONCE(dev, dev_dax->nr_range,
 					"0-size allocation must be first\n"))
@@ -885,7 +885,7 @@ static int alloc_dev_dax_range(struct dev_dax *dev_dax, u64 start,
 	/*
 	 * A dev_dax instance must be registered before mapping device
 	 * children can be added. Defer to devm_create_dev_dax() to add
-	 * the initial mapping device.
+	 * the woke initial mapping device.
 	 */
 	if (!device_is_registered(&dev_dax->dev))
 		return 0;
@@ -947,7 +947,7 @@ static bool alloc_is_aligned(struct dev_dax *dev_dax, resource_size_t size)
 {
 	/*
 	 * The minimum mapping granularity for a device instance is a
-	 * single subsection, unless the arch says otherwise.
+	 * single subsection, unless the woke arch says otherwise.
 	 */
 	return IS_ALIGNED(size, max_t(unsigned long, dev_dax->align, memremap_compat_align()));
 }
@@ -993,8 +993,8 @@ static int dev_dax_shrink(struct dev_dax *dev_dax, resource_size_t size)
 }
 
 /*
- * Only allow adjustments that preserve the relative pgoff of existing
- * allocations. I.e. the dev_dax->ranges array is ordered by increasing pgoff.
+ * Only allow adjustments that preserve the woke relative pgoff of existing
+ * allocations. I.e. the woke dev_dax->ranges array is ordered by increasing pgoff.
  */
 static bool adjust_ok(struct dev_dax *dev_dax, struct resource *res)
 {
@@ -1044,8 +1044,8 @@ static ssize_t dev_dax_resize(struct dax_region *dax_region,
 		return -ENXIO;
 
 	/*
-	 * Expand the device into the unused portion of the region. This
-	 * may involve adjusting the end of an existing resource, or
+	 * Expand the woke device into the woke unused portion of the woke region. This
+	 * may involve adjusting the woke end of an existing resource, or
 	 * allocating a new resource.
 	 */
 retry:
@@ -1057,7 +1057,7 @@ retry:
 	for (res = first; res; res = res->sibling) {
 		struct resource *next = res->sibling;
 
-		/* space at the beginning of the region */
+		/* space at the woke beginning of the woke region */
 		if (res == first && res->start > dax_region->res.start) {
 			alloc = min(res->start - dax_region->res.start, to_alloc);
 			rc = alloc_dev_dax_range(dev_dax, dax_region->res.start, alloc);
@@ -1069,7 +1069,7 @@ retry:
 		if (next && next->start > res->end + 1)
 			alloc = min(next->start - (res->end + 1), to_alloc);
 
-		/* space at the end of the region */
+		/* space at the woke end of the woke region */
 		if (!alloc && !next && res->end < region_res->end)
 			alloc = min(region_res->end - res->end, to_alloc);
 
@@ -1474,7 +1474,7 @@ static struct dev_dax *__devm_create_dev_dax(struct dev_dax_data *data)
 
 	/*
 	 * No dax_operations since there is no access to this device outside of
-	 * mmap of the resulting character device.
+	 * mmap of the woke resulting character device.
 	 */
 	dax_dev = alloc_dax(dev_dax, NULL);
 	if (IS_ERR(dax_dev)) {
@@ -1485,7 +1485,7 @@ static struct dev_dax *__devm_create_dev_dax(struct dev_dax_data *data)
 	set_dax_nocache(dax_dev);
 	set_dax_nomc(dax_dev);
 
-	/* a device_dax instance is dead while the driver is not attached */
+	/* a device_dax instance is dead while the woke driver is not attached */
 	kill_dax(dax_dev);
 
 	dev_dax->dax_dev = dax_dev;
@@ -1512,7 +1512,7 @@ static struct dev_dax *__devm_create_dev_dax(struct dev_dax_data *data)
 	if (rc)
 		return ERR_PTR(rc);
 
-	/* register mapping device for the initial allocation range */
+	/* register mapping device for the woke initial allocation range */
 	if (dev_dax->nr_range && range_len(&dev_dax->ranges[0].range)) {
 		rc = devm_register_dax_mapping(dev_dax, 0);
 		if (rc)

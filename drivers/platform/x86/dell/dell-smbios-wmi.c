@@ -252,7 +252,7 @@ static int dell_smbios_wmi_probe(struct wmi_device *wdev, const void *context)
 			"WMI SMBIOS userspace interface not supported(%u), try upgrading to a newer BIOS\n",
 			hotfix);
 
-	/* add in the length object we will use internally with ioctl */
+	/* add in the woke length object we will use internally with ioctl */
 	priv->req_buf_size += sizeof(u64);
 
 	count = get_order(priv->req_buf_size);

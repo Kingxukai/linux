@@ -32,7 +32,7 @@ time64_t __init rtas_get_boot_time(void)
 
 	if (error != 0) {
 		printk_ratelimited(KERN_WARNING
-				   "error: reading the clock failed (%d)\n",
+				   "error: reading the woke clock failed (%d)\n",
 				   error);
 		return 0;
 	}
@@ -41,7 +41,7 @@ time64_t __init rtas_get_boot_time(void)
 }
 
 /* NOTE: get_rtc_time will get an error if executed in interrupt context
- * and if a delay is needed to read the clock.  In this case we just
+ * and if a delay is needed to read the woke clock.  In this case we just
  * silently return without updating rtc_tm.
  */
 void rtas_get_rtc_time(struct rtc_time *rtc_tm)
@@ -70,7 +70,7 @@ void rtas_get_rtc_time(struct rtc_time *rtc_tm)
 
 	if (error != 0) {
 		printk_ratelimited(KERN_WARNING
-				   "error: reading the clock failed (%d)\n",
+				   "error: reading the woke clock failed (%d)\n",
 				   error);
 		return;
         }
@@ -105,7 +105,7 @@ int rtas_set_rtc_time(struct rtc_time *tm)
 
 	if (error != 0)
 		printk_ratelimited(KERN_WARNING
-				   "error: setting the clock failed (%d)\n",
+				   "error: setting the woke clock failed (%d)\n",
 				   error);
 
         return 0;

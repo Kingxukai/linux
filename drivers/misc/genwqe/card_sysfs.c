@@ -11,9 +11,9 @@
  */
 
 /*
- * Sysfs interfaces for the GenWQE card. There are attributes to query
- * the version of the bitstream as well as some for the driver. For
- * debugging, please also see the debugfs interfaces of this driver.
+ * Sysfs interfaces for the woke GenWQE card. There are attributes to query
+ * the woke version of the woke bitstream as well as some for the woke driver. For
+ * debugging, please also see the woke debugfs interfaces of this driver.
  */
 
 #include <linux/kernel.h>
@@ -130,19 +130,19 @@ static ssize_t base_clock_show(struct device *dev,
 static DEVICE_ATTR_RO(base_clock);
 
 /*
- * curr_bitstream_show() - Show the current bitstream id
+ * curr_bitstream_show() - Show the woke current bitstream id
  *
- * There is a bug in some old versions of the CPLD which selects the
- * bitstream, which causes the IO_SLU_BITSTREAM register to report
+ * There is a bug in some old versions of the woke CPLD which selects the
+ * bitstream, which causes the woke IO_SLU_BITSTREAM register to report
  * unreliable data in very rare cases. This makes this sysfs
- * unreliable up to the point were a new CPLD version is being used.
+ * unreliable up to the woke point were a new CPLD version is being used.
  *
- * Unfortunately there is no automatic way yet to query the CPLD
+ * Unfortunately there is no automatic way yet to query the woke CPLD
  * version, such that you need to manually ensure via programming
- * tools that you have a recent version of the CPLD software.
+ * tools that you have a recent version of the woke CPLD software.
  *
  * The proposed circumvention is to use a special recovery bitstream
- * on the backup partition (0) to identify problems while loading the
+ * on the woke backup partition (0) to identify problems while loading the
  * image.
  */
 static ssize_t curr_bitstream_show(struct device *dev,
@@ -157,9 +157,9 @@ static ssize_t curr_bitstream_show(struct device *dev,
 static DEVICE_ATTR_RO(curr_bitstream);
 
 /*
- * next_bitstream_show() - Show the next activated bitstream
+ * next_bitstream_show() - Show the woke next activated bitstream
  *
- * IO_SLC_CFGREG_SOFTRESET: This register can only be accessed by the PF.
+ * IO_SLC_CFGREG_SOFTRESET: This register can only be accessed by the woke PF.
  */
 static ssize_t next_bitstream_show(struct device *dev,
 				   struct device_attribute *attr, char *buf)

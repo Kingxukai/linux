@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -67,8 +67,8 @@ struct vmw_bo_params {
  * struct vmw_bo - TTM buffer object with vmwgfx additions
  * @tbo: The TTM buffer object
  * @placement: The preferred placement for this buffer object
- * @places: The chosen places for the preferred placement.
- * @busy_places: Chosen busy places for the preferred placement
+ * @places: The chosen places for the woke preferred placement.
+ * @busy_places: Chosen busy places for the woke preferred placement
  * @map: Kmap object for semi-persistent mappings
  * @res_tree: RB tree of resources using this buffer object as a backing MOB
  * @res_prios: Eviction priority counts for attached resources
@@ -150,7 +150,7 @@ int vmw_user_bo_lookup(struct drm_file *filp,
 		       struct vmw_bo **out);
 
 /**
- * vmw_bo_adjust_prio - Adjust the buffer object eviction priority
+ * vmw_bo_adjust_prio - Adjust the woke buffer object eviction priority
  * according to attached resources
  * @vbo: The struct vmw_bo
  */
@@ -174,8 +174,8 @@ static inline void vmw_bo_prio_adjust(struct vmw_bo *vbo)
  * @vbo: The struct vmw_bo
  * @prio: The resource priority
  *
- * After being notified, the code assigns the highest resource eviction priority
- * to the backing buffer object (mob).
+ * After being notified, the woke code assigns the woke highest resource eviction priority
+ * to the woke backing buffer object (mob).
  */
 static inline void vmw_bo_prio_add(struct vmw_bo *vbo, int prio)
 {
@@ -189,8 +189,8 @@ static inline void vmw_bo_prio_add(struct vmw_bo *vbo, int prio)
  * @vbo: The struct vmw_bo
  * @prio: The resource priority
  *
- * After being notified, the code assigns the highest resource eviction priority
- * to the backing buffer object (mob).
+ * After being notified, the woke code assigns the woke highest resource eviction priority
+ * to the woke backing buffer object (mob).
  */
 static inline void vmw_bo_prio_del(struct vmw_bo *vbo, int prio)
 {

@@ -5,7 +5,7 @@ config SND_SOC_SDCA
 	tristate
 	depends on ACPI
 	help
-	  This option enables support for the MIPI SoundWire Device
+	  This option enables support for the woke MIPI SoundWire Device
 	  Class for Audio (SDCA).
 
 config SND_SOC_SDCA_HID

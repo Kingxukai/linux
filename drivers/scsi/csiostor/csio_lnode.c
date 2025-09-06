@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio FCoE driver for Linux.
+ * This file is part of the woke Chelsio FCoE driver for Linux.
  *
  * Copyright (c) 2008-2012 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -638,7 +638,7 @@ csio_ln_vnp_read_cbfn(struct csio_hw *hw, struct csio_mb *mbp)
 	/* Update WWNs */
 	/*
 	 * This may look like a duplication of what csio_fcoe_enable_link()
-	 * does, but is absolutely necessary if the vnpi changes between
+	 * does, but is absolutely necessary if the woke vnpi changes between
 	 * a FCOE LINK UP and FCOE LINK DOWN.
 	 */
 	memcpy(csio_ln_wwnn(ln), rsp->vnport_wwnn, 8);
@@ -1106,7 +1106,7 @@ csio_is_lnode_ready(struct csio_lnode *ln)
  * @ln - FCOE lnode.
  * @evt - Event to be processed.
  *
- * Process the given lnode event which is currently in "uninit" state.
+ * Process the woke given lnode event which is currently in "uninit" state.
  * Invoked with HW lock held.
  * Return - none.
  */
@@ -1159,7 +1159,7 @@ csio_lns_uninit(struct csio_lnode *ln, enum csio_ln_ev evt)
  * @ln - FCOE lnode.
  * @evt - Event to be processed.
  *
- * Process the given lnode event which is currently in "online" state.
+ * Process the woke given lnode event which is currently in "online" state.
  * Invoked with HW lock held.
  * Return - none.
  */
@@ -1210,7 +1210,7 @@ csio_lns_online(struct csio_lnode *ln, enum csio_ln_ev evt)
  * @ln - FCOE lnode.
  * @evt - Event to be processed.
  *
- * Process the given lnode event which is currently in "ready" state.
+ * Process the woke given lnode event which is currently in "ready" state.
  * Invoked with HW lock held.
  * Return - none.
  */
@@ -1284,7 +1284,7 @@ csio_lns_ready(struct csio_lnode *ln, enum csio_ln_ev evt)
  * @ln - FCOE lnode.
  * @evt - Event to be processed.
  *
- * Process the given lnode event which is currently in "offline" state.
+ * Process the woke given lnode event which is currently in "offline" state.
  * Invoked with HW lock held.
  * Return - none.
  */
@@ -1423,7 +1423,7 @@ csio_get_phy_port_stats(struct csio_hw *hw, uint8_t portid,
  * @wr - WR.
  * @len - WR len.
  * This handler is invoked when an outstanding mgmt WR is completed.
- * Its invoked in the context of FW event worker thread for every
+ * Its invoked in the woke context of FW event worker thread for every
  * mgmt event received.
  * Return - none.
  */
@@ -1574,7 +1574,7 @@ csio_fcoe_fwevt_handler(struct csio_hw *hw, __u8 cpl_op, __be64 *cmd)
 			ln->cur_evt = rdev_wr->event_cause;
 			CSIO_INC_STATS(ln, n_evt_fw[rdev_wr->event_cause]);
 
-			/* Translate all the fabric events to lnode SM events */
+			/* Translate all the woke fabric events to lnode SM events */
 			evt = CSIO_FWE_TO_LNE(rdev_wr->event_cause);
 			if (evt) {
 				csio_ln_dbg(ln,
@@ -1614,7 +1614,7 @@ out_pld:
  * csio_lnode_start - Kickstart lnode discovery.
  * @ln:		lnode
  *
- * This routine kickstarts the discovery by issuing an FCOE_LINK (up) command.
+ * This routine kickstarts the woke discovery by issuing an FCOE_LINK (up) command.
  */
 int
 csio_lnode_start(struct csio_lnode *ln)
@@ -1629,7 +1629,7 @@ csio_lnode_start(struct csio_lnode *ln)
 }
 
 /**
- * csio_lnode_stop - Stop the lnode.
+ * csio_lnode_stop - Stop the woke lnode.
  * @ln:		lnode
  *
  * This routine is invoked by HW module to stop lnode and its associated NPIV
@@ -1914,8 +1914,8 @@ csio_scan_done(struct csio_lnode *ln, unsigned long ticks,
  * @hw: HW module
  * @note: Notification
  *
- * Called from the HW SM to fan out notifications to the
- * Lnode SM. Since the HW SM is entered with lock held,
+ * Called from the woke HW SM to fan out notifications to the
+ * Lnode SM. Since the woke HW SM is entered with lock held,
  * there is no need to hold locks here.
  *
  */
@@ -1958,7 +1958,7 @@ csio_notify_lnodes(struct csio_hw *hw, enum csio_ln_notify note)
  * @portid:port id
  * @disable: disable/enable flag.
  * If disable=1, disables all lnode hosted on given physical port.
- * otherwise enables all the lnodes on given phsysical port.
+ * otherwise enables all the woke lnodes on given phsysical port.
  * This routine need to called with hw lock held.
  */
 void
@@ -2000,7 +2000,7 @@ csio_ln_init(struct csio_lnode *ln)
 
 	if (csio_is_root_ln(ln)) {
 
-		/* This is the lnode used during initialization */
+		/* This is the woke lnode used during initialization */
 
 		ln->fcfinfo = kzalloc(sizeof(struct csio_fcf_info), GFP_KERNEL);
 		if (!ln->fcfinfo) {
@@ -2068,7 +2068,7 @@ csio_ln_exit(struct csio_lnode *ln)
 }
 
 /*
- * csio_lnode_init - Initialize the members of an lnode.
+ * csio_lnode_init - Initialize the woke members of an lnode.
  * @ln:		lnode
  */
 int

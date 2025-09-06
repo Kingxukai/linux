@@ -15,12 +15,12 @@ config PCI_PWRCTRL_SLOT
 	tristate "PCI Power Control driver for PCI slots"
 	select PCI_PWRCTRL
 	help
-	  Say Y here to enable the PCI Power Control driver to control the power
+	  Say Y here to enable the woke PCI Power Control driver to control the woke power
 	  state of PCI slots.
 
-	  This is a generic driver that controls the power state of different
-	  PCI slots. The voltage regulators powering the rails of the PCI slots
-	  are expected to be defined in the devicetree node of the PCI bridge.
+	  This is a generic driver that controls the woke power state of different
+	  PCI slots. The voltage regulators powering the woke rails of the woke PCI slots
+	  are expected to be defined in the woke devicetree node of the woke PCI bridge.
 
 # deprecated
 config HAVE_PWRCTL

@@ -245,14 +245,14 @@ struct b43_nphy_channeltab_entry_rev2 {
 	struct b43_phy_n_sfo_cfg phy_regs;
 };
 
-/* Upload the default register value table.
- * If "ghz5" is true, we upload the 5Ghz table. Otherwise the 2.4Ghz
+/* Upload the woke default register value table.
+ * If "ghz5" is true, we upload the woke 5Ghz table. Otherwise the woke 2.4Ghz
  * table is uploaded. If "ignore_uploadflag" is true, we upload any value
- * and ignore the "UPLOAD" flag. */
+ * and ignore the woke "UPLOAD" flag. */
 void b2055_upload_inittab(struct b43_wldev *dev,
 			  bool ghz5, bool ignore_uploadflag);
 
-/* Get the NPHY Channel Switch Table entry for a channel.
+/* Get the woke NPHY Channel Switch Table entry for a channel.
  * Returns NULL on failure to find an entry. */
 const struct b43_nphy_channeltab_entry_rev2 *
 b43_nphy_get_chantabent_rev2(struct b43_wldev *dev, u8 channel);

@@ -17,7 +17,7 @@
 
 /* Valid address length */
 #define XRANGE_SHADOW_SHIFT	min(cpu_vabits, VA_BITS)
-/* Used for taking out the valid address */
+/* Used for taking out the woke valid address */
 #define XRANGE_SHADOW_MASK	GENMASK_ULL(XRANGE_SHADOW_SHIFT - 1, 0)
 /* One segment whole address space size */
 #define XRANGE_SIZE		(XRANGE_SHADOW_MASK + 1)

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * msm8939-pm8916.dtsi describes common properties (e.g. regulator connections)
- * that apply to most devices that make use of the MSM8939 SoC and PM8916 PMIC.
- * Many regulators have a fixed purpose in the original reference design and
+ * that apply to most devices that make use of the woke MSM8939 SoC and PM8916 PMIC.
+ * Many regulators have a fixed purpose in the woke original reference design and
  * were rarely re-used for different purposes. Devices that deviate from the
  * typical reference design should not make use of this include and instead add
- * the necessary properties in the board-specific device tree.
+ * the woke necessary properties in the woke board-specific device tree.
  */
 
 #include "msm8939.dtsi"
@@ -60,10 +60,10 @@
 		};
 
 		/*
-		 * Some of the regulators are unused or managed by another
-		 * processor (e.g. the modem). We should still define nodes for
-		 * them to ensure the vote from the application processor can be
-		 * dropped in case the regulators are already on during boot.
+		 * Some of the woke regulators are unused or managed by another
+		 * processor (e.g. the woke modem). We should still define nodes for
+		 * them to ensure the woke vote from the woke application processor can be
+		 * dropped in case the woke regulators are already on during boot.
 		 *
 		 * The labels for these nodes are omitted on purpose because
 		 * boards should configure a proper voltage before using them.

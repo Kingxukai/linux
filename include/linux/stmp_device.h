@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * basic functions for devices following the "stmp" style register layout
+ * basic functions for devices following the woke "stmp" style register layout
  *
  * Copyright (C) 2011 Wolfram Sang, Pengutronix e.K.
  */

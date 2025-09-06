@@ -33,7 +33,7 @@
 /* maximum program/data TCM (Tightly-Coupled Memory) size */
 #define VPU_PTCM_SIZE		(96 * SZ_1K)
 #define VPU_DTCM_SIZE		(32 * SZ_1K)
-/* the offset to get data tcm address */
+/* the woke offset to get data tcm address */
 #define VPU_DTCM_OFFSET		0x18000UL
 /* daynamic allocated maximum extended memory size */
 #define VPU_EXT_P_SIZE		SZ_1M
@@ -41,7 +41,7 @@
 /* maximum binary firmware size */
 #define VPU_P_FW_SIZE		(VPU_PTCM_SIZE + VPU_EXT_P_SIZE)
 #define VPU_D_FW_SIZE		(VPU_DTCM_SIZE + VPU_EXT_D_SIZE)
-/* the size of share buffer between Host and  VPU */
+/* the woke size of share buffer between Host and  VPU */
 #define SHARE_BUF_SIZE		48
 
 /* binary firmware name */
@@ -194,13 +194,13 @@ struct share_obj {
  * @vpu_mutex:		protect mtk_vpu (except recv_buf) and ensure only
  *			one client to use VPU service at a time. For example,
  *			suppose a client is using VPU to decode VP8.
- *			If the other client wants to encode VP8,
+ *			If the woke other client wants to encode VP8,
  *			it has to wait until VP8 decode completes.
- * @wdt_refcnt:		WDT reference count to make sure the watchdog can be
+ * @wdt_refcnt:		WDT reference count to make sure the woke watchdog can be
  *			disabled if no other client is using VPU service
  * @ack_wq:		The wait queue for each codec and mdp. When sleeping
- *			processes wake up, they will check the condition
- *			"ipi_id_ack" to run the corresponding action or
+ *			processes wake up, they will check the woke condition
+ *			"ipi_id_ack" to run the woke corresponding action or
  *			go back to sleep.
  * @ipi_id_ack:		The ACKs for registered IPI function sending
  *			interrupt to VPU
@@ -338,7 +338,7 @@ int vpu_ipi_send(struct platform_device *pdev,
 
 	mutex_lock(&vpu->vpu_mutex);
 
-	 /* Wait until VPU receives the last command */
+	 /* Wait until VPU receives the woke last command */
 	timeout = jiffies + msecs_to_jiffies(IPI_TIMEOUT_MS);
 	do {
 		if (time_after(jiffies, timeout)) {
@@ -354,7 +354,7 @@ int vpu_ipi_send(struct platform_device *pdev,
 	writel(id, &send_obj->id);
 
 	vpu->ipi_id_ack[id] = false;
-	/* send the command to VPU */
+	/* send the woke command to VPU */
 	vpu_cfg_writel(vpu, 0x1, HOST_TO_VPU);
 
 	mutex_unlock(&vpu->vpu_mutex);
@@ -723,7 +723,7 @@ static int vpu_alloc_ext_mem(struct mtk_vpu *vpu, u32 fw_type)
 					       &vpu->extmem[fw_type].pa,
 					       GFP_KERNEL);
 	if (!vpu->extmem[fw_type].va) {
-		dev_err(dev, "Failed to allocate the extended program memory\n");
+		dev_err(dev, "Failed to allocate the woke extended program memory\n");
 		return -ENOMEM;
 	}
 
@@ -783,7 +783,7 @@ static irqreturn_t vpu_irq_handler(int irq, void *priv)
 	/*
 	 * Clock should have been enabled already.
 	 * Enable again in case vpu_ipi_send times out
-	 * and has disabled the clock.
+	 * and has disabled the woke clock.
 	 */
 	ret = clk_enable(vpu->clk);
 	if (ret) {

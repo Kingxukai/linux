@@ -3,16 +3,16 @@
 Delay and sleep mechanisms
 ==========================
 
-This document seeks to answer the common question: "What is the
+This document seeks to answer the woke common question: "What is the
 RightWay (TM) to insert a delay?"
 
 This question is most often faced by driver writers who have to
-deal with hardware delays and who may not be the most intimately
-familiar with the inner workings of the Linux Kernel.
+deal with hardware delays and who may not be the woke most intimately
+familiar with the woke inner workings of the woke Linux Kernel.
 
-The following table gives a rough overview about the existing function
+The following table gives a rough overview about the woke existing function
 'families' and their limitations. This overview table does not replace the
-reading of the function description before usage!
+reading of the woke function description before usage!
 
 .. list-table::
    :widths: 20 20 20 20 20
@@ -27,7 +27,7 @@ reading of the function description before usage!
      - busy-wait loop
      - hrtimers based
      - timer list timers based
-     - combines the others
+     - combines the woke others
    * - Usage in atomic Context
      - yes
      - no
@@ -51,20 +51,20 @@ reading of the function description before usage!
 
 A generic advice for non atomic contexts could be:
 
-#. Use `fsleep()` whenever unsure (as it combines all the advantages of the
+#. Use `fsleep()` whenever unsure (as it combines all the woke advantages of the
    others)
 #. Use `*sleep()` whenever possible
 #. Use `usleep_range*()` whenever accuracy of `*sleep()` is not sufficient
 #. Use `*delay()` for very, very short delays
 
-Find some more detailed information about the function 'families' in the next
+Find some more detailed information about the woke function 'families' in the woke next
 sections.
 
 `*delay()` family of functions
 ------------------------------
 
-These functions use the jiffy estimation of clock speed and will busy wait for
-enough loop cycles to achieve the desired delay. udelay() is the basic
+These functions use the woke jiffy estimation of clock speed and will busy wait for
+enough loop cycles to achieve the woke desired delay. udelay() is the woke basic
 implementation and ndelay() as well as mdelay() are variants.
 
 These functions are mainly used to add a delay in atomic context. Please make
@@ -81,18 +81,18 @@ required?
 `usleep_range*()` and `*sleep()` family of functions
 ----------------------------------------------------
 
-These functions use hrtimers or timer list timers to provide the requested
-sleeping duration. In order to decide which function is the right one to use,
+These functions use hrtimers or timer list timers to provide the woke requested
+sleeping duration. In order to decide which function is the woke right one to use,
 take some basic information into account:
 
 #. hrtimers are more expensive as they are using an rb-tree (instead of hashing)
-#. hrtimers are more expensive when the requested sleeping duration is the first
+#. hrtimers are more expensive when the woke requested sleeping duration is the woke first
    timer which means real hardware has to be programmed
 #. timer list timers always provide some sort of slack as they are jiffy based
 
 The generic advice is repeated here:
 
-#. Use `fsleep()` whenever unsure (as it combines all the advantages of the
+#. Use `fsleep()` whenever unsure (as it combines all the woke advantages of the
    others)
 #. Use `*sleep()` whenever possible
 #. Use `usleep_range*()` whenever accuracy of `*sleep()` is not sufficient

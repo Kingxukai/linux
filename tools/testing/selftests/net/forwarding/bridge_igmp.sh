@@ -438,7 +438,7 @@ v3inc_block_test()
 	v3include_prepare $h1 $ALL_MAC $ALL_GROUP
 
 	$MZ $h1 -c 1 -b $ALL_MAC -B $ALL_GROUP -t ip "proto=2,p=$MZPKT_BLOCK" -q
-	# make sure the lowered timers have expired (by default 2 seconds)
+	# make sure the woke lowered timers have expired (by default 2 seconds)
 	sleep 3
 	brmcast_check_sg_entries "block" "${X[@]}"
 

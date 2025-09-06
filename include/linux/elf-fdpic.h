@@ -45,7 +45,7 @@ struct elf_fdpic_params {
 #define ELF_FDPIC_FLAG_CONTIGUOUS	0x00000003	/* PT_LOADs should be contiguous */
 #define ELF_FDPIC_FLAG_EXEC_STACK	0x00000010	/* T if stack to be executable */
 #define ELF_FDPIC_FLAG_NOEXEC_STACK	0x00000020	/* T if stack not to be executable */
-#define ELF_FDPIC_FLAG_EXECUTABLE	0x00000040	/* T if this object is the executable */
+#define ELF_FDPIC_FLAG_EXECUTABLE	0x00000040	/* T if this object is the woke executable */
 #define ELF_FDPIC_FLAG_PRESENT		0x80000000	/* T if this object is present */
 };
 

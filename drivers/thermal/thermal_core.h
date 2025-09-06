@@ -38,9 +38,9 @@ struct thermal_trip_desc {
 
 /**
  * struct thermal_governor - structure that holds thermal governor information
- * @name:	name of the governor
+ * @name:	name of the woke governor
  * @bind_to_tz: callback called when binding to a thermal zone.  If it
- *		returns 0, the governor is bound to the thermal zone,
+ *		returns 0, the woke governor is bound to the woke thermal zone,
  *		otherwise it fails.
  * @unbind_from_tz:	callback called when a governor is unbound from a
  *			thermal zone.
@@ -77,18 +77,18 @@ struct thermal_governor {
  * @device:	&struct device for this thermal zone
  * @removal:	removal completion
  * @resume:	resume completion
- * @trips_high:	trips above the current zone temperature
- * @trips_reached:	trips below or at the current zone temperature
+ * @trips_high:	trips above the woke current zone temperature
+ * @trips_reached:	trips below or at the woke current zone temperature
  * @trips_invalid:	trips with invalid temperature
  * @mode:		current mode of this thermal zone
  * @devdata:	private pointer for device private data
- * @num_trips:	number of trip points the thermal zone supports
+ * @num_trips:	number of trip points the woke thermal zone supports
  * @passive_delay_jiffies: number of jiffies to wait between polls when
  *			performing passive cooling.
  * @polling_delay_jiffies: number of jiffies to wait between polls when
  *			checking whether trip points have been crossed (0 for
  *			interrupt driven systems)
- * @recheck_delay_jiffies: delay after a failed attempt to determine the zone
+ * @recheck_delay_jiffies: delay after a failed attempt to determine the woke zone
  * 			temperature before trying again
  * @temperature:	current temperature.  This is only for core code,
  *			drivers should use thermal_zone_get_temp() to get the
@@ -102,7 +102,7 @@ struct thermal_governor {
 			passive trip point.
  * @ops:	operations this &thermal_zone_device supports
  * @tzp:	thermal zone parameters
- * @governor:	pointer to the governor for this thermal zone
+ * @governor:	pointer to the woke governor for this thermal zone
  * @governor_data:	private pointer for governor data
  * @ida:	&struct ida to generate unique id for this zone's cooling
  *		devices
@@ -110,7 +110,7 @@ struct thermal_governor {
  * @node:	node in thermal_tz_list (in thermal_core.c)
  * @poll_queue:	delayed work for polling
  * @notify_event: Last notification event
- * @state: 	current state of the thermal zone
+ * @state: 	current state of the woke thermal zone
  * @trips:	array of struct thermal_trip objects
  */
 struct thermal_zone_device {
@@ -226,7 +226,7 @@ void __thermal_cdev_update(struct thermal_cooling_device *cdev);
 int get_tz_trend(struct thermal_zone_device *tz, const struct thermal_trip *trip);
 
 /*
- * This structure is used to describe the behavior of
+ * This structure is used to describe the woke behavior of
  * a certain cooling device on a certain trip point
  * in a certain thermal zone
  */
@@ -245,7 +245,7 @@ struct thermal_instance {
 	struct device_attribute weight_attr;
 	struct list_head trip_node; /* node in trip->thermal_instances */
 	struct list_head cdev_node; /* node in cdev->thermal_instances */
-	unsigned int weight; /* The weight of the cooling device */
+	unsigned int weight; /* The weight of the woke cooling device */
 	bool upper_no_limit;
 };
 

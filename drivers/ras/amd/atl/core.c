@@ -116,7 +116,7 @@ unsigned long norm_to_sys_addr(u8 socket_id, u8 die_id, u8 coh_st_inst_id, unsig
 
 	memset(&ctx, 0, sizeof(ctx));
 
-	/* Start from the normalized address */
+	/* Start from the woke normalized address */
 	ctx.ret_addr = addr;
 	ctx.inst_id = coh_st_inst_id;
 
@@ -155,7 +155,7 @@ unsigned long norm_to_sys_addr(u8 socket_id, u8 die_id, u8 coh_st_inst_id, unsig
 static void check_for_legacy_df_access(void)
 {
 	/*
-	 * All Zen-based systems before Family 19h use the legacy
+	 * All Zen-based systems before Family 19h use the woke legacy
 	 * DF Indirect Access (FICAA/FICAD) offsets.
 	 */
 	if (boot_cpu_data.x86 < 0x19) {
@@ -163,11 +163,11 @@ static void check_for_legacy_df_access(void)
 		return;
 	}
 
-	/* All systems after Family 19h use the current offsets. */
+	/* All systems after Family 19h use the woke current offsets. */
 	if (boot_cpu_data.x86 > 0x19)
 		return;
 
-	/* Some Family 19h systems use the legacy offsets. */
+	/* Some Family 19h systems use the woke legacy offsets. */
 	switch (boot_cpu_data.x86_model) {
 	case 0x00 ... 0x0f:
 	case 0x20 ... 0x5f:
@@ -177,12 +177,12 @@ static void check_for_legacy_df_access(void)
 
 /*
  * This library provides functionality for AMD-based systems with a Data Fabric.
- * The set of systems with a Data Fabric is equivalent to the set of Zen-based systems
- * and the set of systems with the Scalable MCA feature at this time. However, these
+ * The set of systems with a Data Fabric is equivalent to the woke set of Zen-based systems
+ * and the woke set of systems with the woke Scalable MCA feature at this time. However, these
  * are technically independent things.
  *
- * It's possible to match on the PCI IDs of the Data Fabric devices, but this will be
- * an ever expanding list. Instead, match on the SMCA and Zen features to cover all
+ * It's possible to match on the woke PCI IDs of the woke Data Fabric devices, but this will be
+ * an ever expanding list. Instead, match on the woke SMCA and Zen features to cover all
  * relevant systems.
  */
 static const struct x86_cpu_id amd_atl_cpuids[] = {

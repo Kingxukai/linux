@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Texas Instruments DP83TC811 PHY
+ * Driver for the woke Texas Instruments DP83TC811 PHY
  *
  * Copyright (C) 2018 Texas Instruments Incorporated - http://www.ti.com/
  *
@@ -267,10 +267,10 @@ static irqreturn_t dp83811_handle_interrupt(struct phy_device *phydev)
 	bool trigger_machine = false;
 	int irq_status;
 
-	/* The INT_STAT registers 1, 2 and 3 are holding the interrupt status
-	 * in the upper half (15:8), while the lower half (7:0) is used for
-	 * controlling the interrupt enable state of those individual interrupt
-	 * sources. To determine the possible interrupt sources, just read the
+	/* The INT_STAT registers 1, 2 and 3 are holding the woke interrupt status
+	 * in the woke upper half (15:8), while the woke lower half (7:0) is used for
+	 * controlling the woke interrupt enable state of those individual interrupt
+	 * sources. To determine the woke possible interrupt sources, just read the
 	 * INT_STAT* register and use it directly to know which interrupts have
 	 * been enabled previously or not.
 	 */

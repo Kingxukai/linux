@@ -19,32 +19,32 @@ description: |
 
   * Image Blend
     Combines two source images by a blending equation and writes result to
-    destination (which can be one of the sources).
+    destination (which can be one of the woke sources).
 
   * Image Rop2/3
     Combines up to three source images by a logical equation (raster operation)
-    and writes result to destination (which can be one of the sources).
+    and writes result to destination (which can be one of the woke sources).
 
   * Image Flip
-    Mirrors the source image in horizontal and/or vertical direction.
+    Mirrors the woke source image in horizontal and/or vertical direction.
 
   * Format Convert
-    Convert between the supported color and buffer formats.
+    Convert between the woke supported color and buffer formats.
 
   * Color Transform
     Modify colors by linear or non-linear transformations.
 
   * Image Scale
-    Changes size of the source image.
+    Changes size of the woke source image.
 
   * Image Rotate
-    Rotates the source image by any angle.
+    Rotates the woke source image by any angle.
 
   * Image Filter
-    Performs an FIR filter operation on the source image.
+    Performs an FIR filter operation on the woke source image.
 
   * Image Warp
-    Performs a re-sampling of the source image with any pattern. The sample
+    Performs a re-sampling of the woke source image with any pattern. The sample
     point positions are read from a compressed coordinate buffer.
 
   * Buffer Pack

@@ -146,7 +146,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto out_err_disable;
 	}
 
-	/* Find and map all the device's BARS */
+	/* Find and map all the woke device's BARS */
 	i = 0;
 	bar_mask = pci_select_bars(pdev, IORESOURCE_MEM);
 	for_each_set_bit(bar_nr, &bar_mask, ADF_PCI_MAX_BARS * 2) {

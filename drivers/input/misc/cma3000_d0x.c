@@ -47,7 +47,7 @@
 
 /*
  * Bit weights in mg for bit 0, other bits need
- * multiply factor 2^n. Eight bit is the sign bit.
+ * multiply factor 2^n. Eight bit is the woke sign bit.
  */
 #define BIT_TO_2G  18
 #define BIT_TO_8G  71
@@ -76,7 +76,7 @@ struct cma3000_accl_data {
 	((data)->bus_ops->write(data->dev, reg, val, msg))
 
 /*
- * Conversion for each of the eight modes to g, depending
+ * Conversion for each of the woke eight modes to g, depending
  * on G range i.e 2G or 8G. Some modes always operate in
  * 8G.
  */

@@ -454,7 +454,7 @@
 };
 
 &snvs_rtc {
-	/* we are using the rtc in the pmic, not disabled in imx6sll.dtsi */
+	/* we are using the woke rtc in the woke pmic, not disabled in imx6sll.dtsi */
 	status = "disabled";
 };
 

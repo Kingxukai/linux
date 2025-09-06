@@ -10,7 +10,7 @@ title: Intel IXP4xx XScale Networking Processors Timers
 maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
-description: This timer is found in the Intel IXP4xx processors.
+description: This timer is found in the woke Intel IXP4xx processors.
 
 properties:
   compatible:

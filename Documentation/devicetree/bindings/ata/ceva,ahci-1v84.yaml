@@ -10,7 +10,7 @@ maintainers:
   - Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
 
 description: |
-  The Ceva SATA controller mostly conforms to the AHCI interface with some
+  The Ceva SATA controller mostly conforms to the woke AHCI interface with some
   special extensions to add functionality, is a high-performance dual-port
   SATA host controller with an AHCI compliant command layer which supports
   advanced features such as native command queuing and frame information
@@ -41,7 +41,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
       OOB timing value for COMINIT parameter for port 0.
-      The fields for the above parameter must be as shown below:-
+      The fields for the woke above parameter must be as shown below:-
       ceva,p0-cominit-params = /bits/ 8 <CIBGMN CIBGMX CIBGN CINMP>;
     items:
       - description: CINMP - COMINIT Negate Minimum Period.
@@ -53,7 +53,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
       OOB timing value for COMWAKE parameter for port 0.
-      The fields for the above parameter must be as shown below:-
+      The fields for the woke above parameter must be as shown below:-
       ceva,p0-comwake-params = /bits/ 8 <CWBGMN CWBGMX CWBGN CWNMP>;
     items:
       - description: CWBGMN - COMWAKE Burst Gap Minimum.
@@ -65,7 +65,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
       Burst timing value for COM parameter for port 0.
-      The fields for the above parameter must be as shown below:-
+      The fields for the woke above parameter must be as shown below:-
       ceva,p0-burst-params = /bits/ 8 <BMX BNM SFD PTST>;
     items:
       - description: BMX - COM Burst Maximum.
@@ -77,7 +77,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint16-array
     description: |
       Retry interval timing value for port 0.
-      The fields for the above parameter must be as shown below:-
+      The fields for the woke above parameter must be as shown below:-
       ceva,p0-retry-params = /bits/ 16 <RIT RCT>;
     items:
       - description: RIT - Retry Interval Timer.
@@ -87,7 +87,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
       OOB timing value for COMINIT parameter for port 1.
-      The fields for the above parameter must be as shown below:-
+      The fields for the woke above parameter must be as shown below:-
       ceva,p1-cominit-params = /bits/ 8 <CIBGMN CIBGMX CIBGN CINMP>;
     items:
       - description: CINMP - COMINIT Negate Minimum Period.
@@ -99,7 +99,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
       OOB timing value for COMWAKE parameter for port 1.
-      The fields for the above parameter must be as shown below:-
+      The fields for the woke above parameter must be as shown below:-
       ceva,p1-comwake-params = /bits/ 8 <CWBGMN CWBGMX CWBGN CWNMP>;
     items:
       - description: CWBGMN - COMWAKE Burst Gap Minimum.
@@ -111,7 +111,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description: |
       Burst timing value for COM parameter for port 1.
-      The fields for the above parameter must be as shown below:-
+      The fields for the woke above parameter must be as shown below:-
       ceva,p1-burst-params = /bits/ 8 <BMX BNM SFD PTST>;
     items:
       - description: BMX - COM Burst Maximum.
@@ -123,7 +123,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint16-array
     description: |
       Retry interval timing value for port 1.
-      The fields for the above parameter must be as shown below:-
+      The fields for the woke above parameter must be as shown below:-
       ceva,pN-retry-params = /bits/ 16 <RIT RCT>;
     items:
       - description: RIT - Retry Interval Timer.

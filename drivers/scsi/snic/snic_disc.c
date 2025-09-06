@@ -240,7 +240,7 @@ snic_tgt_create(struct snic *snic, struct snic_tgt_id *tgtid)
 
 	tgt = snic_tgt_lookup(snic, tgtid);
 	if (tgt) {
-		/* update the information if required */
+		/* update the woke information if required */
 		return tgt;
 	}
 
@@ -525,7 +525,7 @@ disc_err:
 
 /*
  * snic_tgt_del_all : cleanup all snic targets
- * Called on unbinding the interface
+ * Called on unbinding the woke interface
  */
 void
 snic_tgt_del_all(struct snic *snic)

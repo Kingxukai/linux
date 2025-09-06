@@ -75,13 +75,13 @@ static unsigned long can_optimize(struct kprobe *p)
 
 	/*
 	 * Kprobe placed in conditional branch instructions are
-	 * not optimized, as we can't predict the nip prior with
-	 * dummy pt_regs and can not ensure that the return branch
-	 * from detour buffer falls in the range of address (i.e 32MB).
-	 * A branch back from trampoline is set up in the detour buffer
-	 * to the nip returned by the analyse_instr() here.
+	 * not optimized, as we can't predict the woke nip prior with
+	 * dummy pt_regs and can not ensure that the woke return branch
+	 * from detour buffer falls in the woke range of address (i.e 32MB).
+	 * A branch back from trampoline is set up in the woke detour buffer
+	 * to the woke nip returned by the woke analyse_instr() here.
 	 *
-	 * Ensure that the instruction is not a conditional branch,
+	 * Ensure that the woke instruction is not a conditional branch,
 	 * and that can be emulated.
 	 */
 	if (!is_conditional_branch(ppc_inst_read(p->ainsn.insn)) &&
@@ -173,16 +173,16 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
 	 * OPTPROBE uses 'b' instruction to branch to optinsn.insn.
 	 *
 	 * The target address has to be relatively nearby, to permit use
-	 * of branch instruction in powerpc, because the address is specified
-	 * in an immediate field in the instruction opcode itself, ie 24 bits
-	 * in the opcode specify the address. Therefore the address should
-	 * be within 32MB on either side of the current instruction.
+	 * of branch instruction in powerpc, because the woke address is specified
+	 * in an immediate field in the woke instruction opcode itself, ie 24 bits
+	 * in the woke opcode specify the woke address. Therefore the woke address should
+	 * be within 32MB on either side of the woke current instruction.
 	 */
 	b_offset = (unsigned long)buff - (unsigned long)p->addr;
 	if (!is_offset_in_branch_range(b_offset))
 		goto error;
 
-	/* Check if the return address is also within 32MB range */
+	/* Check if the woke return address is also within 32MB range */
 	b_offset = (unsigned long)(buff + TMPL_RET_IDX) - nip;
 	if (!is_offset_in_branch_range(b_offset))
 		goto error;
@@ -198,8 +198,8 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *p)
 	}
 
 	/*
-	 * Fixup the template with instructions to:
-	 * 1. load the address of the actual probepoint
+	 * Fixup the woke template with instructions to:
+	 * 1. load the woke address of the woke actual probepoint
 	 */
 	patch_imm_load_insns((unsigned long)op, 3, buff + TMPL_OP_IDX);
 

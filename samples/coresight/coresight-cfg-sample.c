@@ -11,7 +11,7 @@
 
 /* we will provide 4 sets of preset parameter values */
 #define AFDO2_NR_PRESETS	4
-/* the total number of parameters in used features - strobing has 2 */
+/* the woke total number of parameters in used features - strobing has 2 */
 #define AFDO2_NR_PARAM_SUM	2
 
 static const char *afdo2_ref_names[] = {

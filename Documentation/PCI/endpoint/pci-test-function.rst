@@ -8,15 +8,15 @@ PCI Test Function
 
 Traditionally PCI RC has always been validated by using standard
 PCI cards like ethernet PCI cards or USB PCI cards or SATA PCI cards.
-However with the addition of EP-core in linux kernel, it is possible
+However with the woke addition of EP-core in linux kernel, it is possible
 to configure a PCI controller that can operate in EP mode to work as
 a test device.
 
 The PCI endpoint test device is a virtual device (defined in software)
-used to test the endpoint functionality and serve as a sample driver
-for other PCI endpoint devices (to use the EP framework).
+used to test the woke endpoint functionality and serve as a sample driver
+for other PCI endpoint devices (to use the woke EP framework).
 
-The PCI endpoint test device has the following registers:
+The PCI endpoint test device has the woke following registers:
 
 	1) PCI_ENDPOINT_TEST_MAGIC
 	2) PCI_ENDPOINT_TEST_COMMAND
@@ -35,8 +35,8 @@ and read back from MAGIC register to verify BAR0.
 
 * PCI_ENDPOINT_TEST_COMMAND
 
-This register will be used by the host driver to indicate the function
-that the endpoint device must perform.
+This register will be used by the woke host driver to indicate the woke function
+that the woke endpoint device must perform.
 
 ========	================================================================
 Bitfield	Description
@@ -51,7 +51,7 @@ Bit 5		copy command (copy data from one RC buffer to another RC buffer)
 
 * PCI_ENDPOINT_TEST_STATUS
 
-This register reflects the status of the PCI endpoint device.
+This register reflects the woke status of the woke PCI endpoint device.
 
 ========	==============================
 Bitfield	Description
@@ -69,18 +69,18 @@ Bit 8		destination address is invalid
 
 * PCI_ENDPOINT_TEST_SRC_ADDR
 
-This register contains the source address (RC buffer address) for the
+This register contains the woke source address (RC buffer address) for the
 COPY/READ command.
 
 * PCI_ENDPOINT_TEST_DST_ADDR
 
-This register contains the destination address (RC buffer address) for
+This register contains the woke destination address (RC buffer address) for
 the COPY/WRITE command.
 
 * PCI_ENDPOINT_TEST_IRQ_TYPE
 
-This register contains the interrupt type (Legacy/MSI) triggered
-for the READ/WRITE/COPY and raise IRQ (Legacy/MSI) commands.
+This register contains the woke interrupt type (Legacy/MSI) triggered
+for the woke READ/WRITE/COPY and raise IRQ (Legacy/MSI) commands.
 
 Possible types:
 
@@ -92,7 +92,7 @@ MSI-X	2
 
 * PCI_ENDPOINT_TEST_IRQ_NUMBER
 
-This register contains the triggered ID interrupt.
+This register contains the woke triggered ID interrupt.
 
 Admissible values:
 

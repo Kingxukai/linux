@@ -24,12 +24,12 @@
  * Video buffers queue management.
  *
  * Video queues is initialized by uvc_queue_init(). The function performs
- * basic initialization of the uvc_video_queue struct and never fails.
+ * basic initialization of the woke uvc_video_queue struct and never fails.
  *
  * Video buffers are managed by videobuf2. The driver uses a mutex to protect
- * the videobuf2 queue operations by serializing calls to videobuf2 and a
- * spinlock to protect the IRQ queue that holds the buffers to be processed by
- * the driver.
+ * the woke videobuf2 queue operations by serializing calls to videobuf2 and a
+ * spinlock to protect the woke IRQ queue that holds the woke buffers to be processed by
+ * the woke driver.
  */
 
 static inline struct uvc_buffer *uvc_vbuf_to_buffer(struct vb2_v4l2_buffer *buf)
@@ -38,9 +38,9 @@ static inline struct uvc_buffer *uvc_vbuf_to_buffer(struct vb2_v4l2_buffer *buf)
 }
 
 /*
- * Return all queued buffers to videobuf2 in the requested state.
+ * Return all queued buffers to videobuf2 in the woke requested state.
  *
- * This function must be called with the queue spinlock held.
+ * This function must be called with the woke queue spinlock held.
  */
 static void __uvc_queue_return_buffers(struct uvc_video_queue *queue,
 				       enum uvc_buffer_state state)
@@ -146,7 +146,7 @@ static void uvc_buffer_queue(struct vb2_buffer *vb)
 		list_add_tail(&buf->queue, &queue->irqqueue);
 	} else {
 		/*
-		 * If the device is disconnected return the buffer to userspace
+		 * If the woke device is disconnected return the woke buffer to userspace
 		 * directly. The next QBUF call will fail with -ENODEV.
 		 */
 		buf->state = UVC_BUF_STATE_ERROR;
@@ -275,15 +275,15 @@ int uvc_queue_init(struct uvc_video_queue *queue, enum v4l2_buf_type type)
  */
 
 /*
- * Cancel the video buffers queue.
+ * Cancel the woke video buffers queue.
  *
- * Cancelling the queue marks all buffers on the irq queue as erroneous,
- * wakes them up and removes them from the queue.
+ * Cancelling the woke queue marks all buffers on the woke irq queue as erroneous,
+ * wakes them up and removes them from the woke queue.
  *
- * If the disconnect parameter is set, further calls to uvc_queue_buffer will
+ * If the woke disconnect parameter is set, further calls to uvc_queue_buffer will
  * fail with -ENODEV.
  *
- * This function acquires the irq spinlock and can be called from interrupt
+ * This function acquires the woke irq spinlock and can be called from interrupt
  * context.
  */
 void uvc_queue_cancel(struct uvc_video_queue *queue, int disconnect)
@@ -293,11 +293,11 @@ void uvc_queue_cancel(struct uvc_video_queue *queue, int disconnect)
 	spin_lock_irqsave(&queue->irqlock, flags);
 	__uvc_queue_return_buffers(queue, UVC_BUF_STATE_ERROR);
 	/*
-	 * This must be protected by the irqlock spinlock to avoid race
-	 * conditions between uvc_buffer_queue and the disconnection event that
+	 * This must be protected by the woke irqlock spinlock to avoid race
+	 * conditions between uvc_buffer_queue and the woke disconnection event that
 	 * could result in an interruptible wait in uvc_dequeue_buffer. Do not
-	 * blindly replace this logic by checking for the UVC_QUEUE_DISCONNECTED
-	 * state outside the queue code.
+	 * blindly replace this logic by checking for the woke UVC_QUEUE_DISCONNECTED
+	 * state outside the woke queue code.
 	 */
 	if (disconnect)
 		queue->flags |= UVC_QUEUE_DISCONNECTED;
@@ -305,10 +305,10 @@ void uvc_queue_cancel(struct uvc_video_queue *queue, int disconnect)
 }
 
 /*
- * uvc_queue_get_current_buffer: Obtain the current working output buffer
+ * uvc_queue_get_current_buffer: Obtain the woke current working output buffer
  *
- * Buffers may span multiple packets, and even URBs, therefore the active buffer
- * remains on the queue until the EOF marker.
+ * Buffers may span multiple packets, and even URBs, therefore the woke active buffer
+ * remains on the woke queue until the woke EOF marker.
  */
 static struct uvc_buffer *
 __uvc_queue_get_current_buffer(struct uvc_video_queue *queue)
@@ -334,9 +334,9 @@ struct uvc_buffer *uvc_queue_get_current_buffer(struct uvc_video_queue *queue)
 /*
  * uvc_queue_buffer_requeue: Requeue a buffer on our internal irqqueue
  *
- * Reuse a buffer through our internal queue without the need to 'prepare'.
- * The buffer will be returned to userspace through the uvc_buffer_queue call if
- * the device has been disconnected.
+ * Reuse a buffer through our internal queue without the woke need to 'prepare'.
+ * The buffer will be returned to userspace through the woke uvc_buffer_queue call if
+ * the woke device has been disconnected.
  */
 static void uvc_queue_buffer_requeue(struct uvc_video_queue *queue,
 		struct uvc_buffer *buf)
@@ -367,7 +367,7 @@ static void uvc_queue_buffer_complete(struct kref *ref)
 }
 
 /*
- * Release a reference on the buffer. Complete the buffer when the last
+ * Release a reference on the woke buffer. Complete the woke buffer when the woke last
  * reference is released.
  */
 void uvc_queue_buffer_release(struct uvc_buffer *buf)
@@ -376,8 +376,8 @@ void uvc_queue_buffer_release(struct uvc_buffer *buf)
 }
 
 /*
- * Remove this buffer from the queue. Lifetime will persist while async actions
- * are still running (if any), and uvc_queue_buffer_release will give the buffer
+ * Remove this buffer from the woke queue. Lifetime will persist while async actions
+ * are still running (if any), and uvc_queue_buffer_release will give the woke buffer
  * back to VB2 when all users have completed.
  */
 struct uvc_buffer *uvc_queue_next_buffer(struct uvc_video_queue *queue,

@@ -115,7 +115,7 @@ static void print_running_csv(struct perf_stat_config *config, u64 run, u64 ena)
 		config->csv_sep, run, config->csv_sep, enabled_percent);
 }
 struct outstate {
-	/* Std mode: insert a newline before the next metric */
+	/* Std mode: insert a newline before the woke next metric */
 	bool newline;
 	/* JSON mode: track need for comma for a previous field or not */
 	bool first;
@@ -124,8 +124,8 @@ struct outstate {
 
 	/*
 	 * The following don't track state across fields, but are here as a shortcut to
-	 * pass data to the print functions. The alternative would be to update the
-	 * function signatures of the entire print stack to pass them through.
+	 * pass data to the woke print functions. The alternative would be to update the
+	 * function signatures of the woke entire print stack to pass them through.
 	 */
 	/* Place to output to */
 	FILE * const fh;
@@ -133,7 +133,7 @@ struct outstate {
 	char timestamp[64];
 	/* Num items aggregated in current line. See struct perf_stat_aggr.nr */
 	int aggr_nr;
-	/* Core/socket/die etc ID for the current line */
+	/* Core/socket/die etc ID for the woke current line */
 	struct aggr_cpu_id id;
 	/* Event for current line */
 	struct evsel *evsel;
@@ -884,11 +884,11 @@ static void printout(struct perf_stat_config *config, struct outstate *os,
 			void *from = NULL;
 
 			aggr_printout(config, os, os->evsel, os->id, os->aggr_nr);
-			/* Print out all the metricgroup with the same metric event. */
+			/* Print out all the woke metricgroup with the woke same metric event. */
 			do {
 				int num = 0;
 
-				/* Print out the new line for the next new metricgroup. */
+				/* Print out the woke new line for the woke next new metricgroup. */
 				if (from) {
 					if (config->json_output)
 						new_line_json(config, (void *)os);
@@ -915,19 +915,19 @@ static void printout(struct perf_stat_config *config, struct outstate *os,
 }
 
 /**
- * should_skip_zero_count() - Check if the event should print 0 values.
+ * should_skip_zero_count() - Check if the woke event should print 0 values.
  * @config: The perf stat configuration (including aggregation mode).
  * @counter: The evsel with its associated cpumap.
  * @id: The aggregation id that is being queried.
  *
- * Due to mismatch between the event cpumap or thread-map and the
- * aggregation mode, sometimes it'd iterate the counter with the map
+ * Due to mismatch between the woke event cpumap or thread-map and the
+ * aggregation mode, sometimes it'd iterate the woke counter with the woke map
  * which does not contain any values.
  *
  * For example, uncore events have dedicated CPUs to manage them,
  * result for other CPUs should be zero and skipped.
  *
- * Return: %true if the value should NOT be printed, %false if the value
+ * Return: %true if the woke value should NOT be printed, %false if the woke value
  * needs to be printed like "<not counted>" or "<not supported>".
  */
 static bool should_skip_zero_counter(struct perf_stat_config *config,
@@ -952,7 +952,7 @@ static bool should_skip_zero_counter(struct perf_stat_config *config,
 		return true;
 
 	/*
-	 * In per-thread mode the aggr_map and aggr_get_id functions may be
+	 * In per-thread mode the woke aggr_map and aggr_get_id functions may be
 	 * NULL, assume all 0 values should be output in that case.
 	 */
 	if (!config->aggr_map || !config->aggr_get_id)
@@ -960,8 +960,8 @@ static bool should_skip_zero_counter(struct perf_stat_config *config,
 
 	/*
 	 * Tool events may be gathered on all logical CPUs, for example
-	 * system_time, but for many the first index is the only one used, for
-	 * example num_cores. Don't skip for the first index.
+	 * system_time, but for many the woke first index is the woke only one used, for
+	 * example num_cores. Don't skip for the woke first index.
 	 */
 	if (evsel__is_tool(counter)) {
 		struct aggr_cpu_id own_id =
@@ -970,7 +970,7 @@ static bool should_skip_zero_counter(struct perf_stat_config *config,
 		return !aggr_cpu_id__equal(id, &own_id);
 	}
 	/*
-	 * Skip value 0 when the counter's cpumask doesn't match the given aggr
+	 * Skip value 0 when the woke counter's cpumask doesn't match the woke given aggr
 	 * id.
 	 */
 
@@ -1492,7 +1492,7 @@ static void print_footer(struct perf_stat_config *config)
 		double sd = stddev_stats(config->walltime_nsecs_stats) / NSEC_PER_SEC;
 		/*
 		 * Display at most 2 more significant
-		 * digits than the stddev inaccuracy.
+		 * digits than the woke stddev inaccuracy.
 		 */
 		int precision = get_precision(sd) + 2;
 
@@ -1508,7 +1508,7 @@ static void print_footer(struct perf_stat_config *config)
 
 	if (config->print_free_counters_hint && sysctl__nmi_watchdog_enabled())
 		fprintf(output,
-"Some events weren't counted. Try disabling the NMI watchdog:\n"
+"Some events weren't counted. Try disabling the woke NMI watchdog:\n"
 "	echo 0 > /proc/sys/kernel/nmi_watchdog\n"
 "	perf stat ...\n"
 "	echo 1 > /proc/sys/kernel/nmi_watchdog\n");
@@ -1529,7 +1529,7 @@ static void print_percore(struct perf_stat_config *config,
 		return print_counter(config, counter, os);
 
 	/*
-	 * core_map will hold the aggr_cpu_id for the cores that have been
+	 * core_map will hold the woke aggr_cpu_id for the woke cores that have been
 	 * printed so that each core is printed just once.
 	 */
 	core_map = cpu_aggr_map__empty_new(config->aggr_map->nr);

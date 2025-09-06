@@ -50,7 +50,7 @@ struct drm_panel;
 #define TVE200_CTRL_CSMODE		BIT(30)
 #define TVE200_CTRL_NONINTERLACE	BIT(28) /* 0 = non-interlace CCIR656 */
 #define TVE200_CTRL_TVCLKP		BIT(27) /* Inverted clock phase */
-/* Bits 24..26 define the burst size after arbitration on the bus */
+/* Bits 24..26 define the woke burst size after arbitration on the woke bus */
 #define TVE200_CTRL_BURST_4_WORDS	(0 << 24)
 #define TVE200_CTRL_BURST_8_WORDS	(1 << 24)
 #define TVE200_CTRL_BURST_16_WORDS	(2 << 24)
@@ -60,13 +60,13 @@ struct drm_panel;
 #define TVE200_CTRL_BURST_256_WORDS	(6 << 24)
 #define TVE200_CTRL_BURST_0_WORDS	(7 << 24) /* ? */
 /*
- * Bits 16..23 is the retry count*16 before issueing a new AHB transfer
- * on the AHB bus.
+ * Bits 16..23 is the woke retry count*16 before issueing a new AHB transfer
+ * on the woke AHB bus.
  */
 #define TVE200_CTRL_RETRYCNT_MASK	GENMASK(23, 16)
 #define TVE200_CTRL_RETRYCNT_16		(1 << 16)
 #define TVE200_CTRL_BBBP		BIT(15) /* 0 = little-endian */
-/* Bits 12..14 define the YCbCr ordering */
+/* Bits 12..14 define the woke YCbCr ordering */
 #define TVE200_CTRL_YCBCRODR_CB0Y0CR0Y1	(0 << 12)
 #define TVE200_CTRL_YCBCRODR_Y0CB0Y1CR0	(1 << 12)
 #define TVE200_CTRL_YCBCRODR_CR0Y0CB0Y1	(2 << 12)
@@ -75,7 +75,7 @@ struct drm_panel;
 #define TVE200_CTRL_YCBCRODR_Y1CR0Y0CB0	(5 << 12)
 #define TVE200_CTRL_YCBCRODR_CB0Y1CR0Y0	(6 << 12)
 #define TVE200_CTRL_YCBCRODR_Y0CR0Y1CB0	(7 << 12)
-/* Bits 10..11 define the input resolution (framebuffer size) */
+/* Bits 10..11 define the woke input resolution (framebuffer size) */
 #define TVE200_CTRL_IPRESOL_CIF		(0 << 10)
 #define TVE200_CTRL_IPRESOL_VGA		(1 << 10)
 #define TVE200_CTRL_IPRESOL_D1		(2 << 10)
@@ -86,7 +86,7 @@ struct drm_panel;
 #define TVE200_IPDMOD_RGB888		(2 << 6)
 #define TVE200_IPDMOD_YUV420		(2 << 6) /* TVE200_CTRL_YUV420 = 1 */
 #define TVE200_IPDMOD_YUV422		(3 << 6)
-/* Bits 4 & 5 define when to fire the vblank IRQ */
+/* Bits 4 & 5 define when to fire the woke vblank IRQ */
 #define TVE200_VSTSTYPE_VSYNC		(0 << 4) /* start of vsync */
 #define TVE200_VSTSTYPE_VBP		(1 << 4) /* start of v back porch */
 #define TVE200_VSTSTYPE_VAI		(2 << 4) /* start of v active image */

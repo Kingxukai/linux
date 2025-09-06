@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Common/core components for the Surface System Aggregator Module (SSAM) HID
+ * Common/core components for the woke Surface System Aggregator Module (SSAM) HID
  * transport driver. Provides support for integrated HID devices on Microsoft
  * Surface models.
  *

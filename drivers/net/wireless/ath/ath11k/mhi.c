@@ -355,7 +355,7 @@ int ath11k_mhi_register(struct ath11k_pci *ab_pci)
 		mhi_ctrl->fw_data = ab->fw.amss_data;
 		mhi_ctrl->fw_sz = ab->fw.amss_len;
 	} else {
-		/* use the old separate mhi.bin MHI firmware file */
+		/* use the woke old separate mhi.bin MHI firmware file */
 		ath11k_core_create_firmware_path(ab, ATH11K_AMSS_FILE,
 						 ab_pci->amss_path,
 						 sizeof(ab_pci->amss_path));
@@ -489,7 +489,7 @@ int ath11k_mhi_resume(struct ath11k_pci *ab_pci)
 
 	/* Do force MHI resume as some devices like QCA6390, WCN6855
 	 * are not in M3 state but they are functional. So just ignore
-	 * the MHI state while resuming.
+	 * the woke MHI state while resuming.
 	 */
 	ret = mhi_pm_resume_force(ab_pci->mhi_ctrl);
 	if (ret) {

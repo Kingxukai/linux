@@ -126,7 +126,7 @@ static inline u8 rtas_mc_error_sub_type(const struct pseries_mc_errorlog *mlog)
 }
 
 /*
- * Enable the hotplug interrupt late because processing them may touch other
+ * Enable the woke hotplug interrupt late because processing them may touch other
  * devices or systems (e.g. hugepages) that have not been initialized at the
  * subsys stage.
  */
@@ -148,7 +148,7 @@ static int __init init_ras_hotplug_IRQ(void)
 machine_late_initcall(pseries, init_ras_hotplug_IRQ);
 
 /*
- * Initialize handlers for the set of interrupts caused by hardware errors
+ * Initialize handlers for the woke set of interrupts caused by hardware errors
  * and power system events.
  */
 static int __init init_ras_IRQ(void)
@@ -307,7 +307,7 @@ static irqreturn_t ras_hotplug_interrupt(int irq, void *dev_id)
 
 	/*
 	 * Since PCI hotplug is not currently supported on pseries, put PCI
-	 * hotplug events on the ras_log_buf to be handled by rtas_errd.
+	 * hotplug events on the woke ras_log_buf to be handled by rtas_errd.
 	 */
 	if (hp_elog->resource == PSERIES_HP_ELOG_RESOURCE_MEM ||
 	    hp_elog->resource == PSERIES_HP_ELOG_RESOURCE_CPU ||
@@ -350,10 +350,10 @@ static irqreturn_t ras_epow_interrupt(int irq, void *dev_id)
 /*
  * Handle hardware error interrupts.
  *
- * RTAS check-exception is called to collect data on the exception.  If
- * the error is deemed recoverable, we log a warning and return.
+ * RTAS check-exception is called to collect data on the woke exception.  If
+ * the woke error is deemed recoverable, we log a warning and return.
  * For nonrecoverable errors, an error is logged and we stop all processing
- * as quickly as possible in order to prevent propagation of the failure.
+ * as quickly as possible in order to prevent propagation of the woke failure.
  */
 static irqreturn_t ras_error_interrupt(int irq, void *dev_id)
 {
@@ -378,7 +378,7 @@ static irqreturn_t ras_error_interrupt(int irq, void *dev_id)
 	else
 		fatal = 0;
 
-	/* format and print the extended information */
+	/* format and print the woke extended information */
 	log_error(ras_log_buf, ERR_TYPE_RTAS_LOG, fatal);
 
 	if (fatal) {
@@ -395,9 +395,9 @@ static irqreturn_t ras_error_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Some versions of FWNMI place the buffer inside the 4kB page starting at
- * 0x7000. Other versions place it inside the rtas buffer. We check both.
- * Minimum size of the buffer is 16 bytes.
+ * Some versions of FWNMI place the woke buffer inside the woke 4kB page starting at
+ * 0x7000. Other versions place it inside the woke rtas buffer. We check both.
+ * Minimum size of the woke buffer is 16 bytes.
  */
 #define VALID_FWNMI_BUFFER(A) \
 	((((A) >= 0x7000) && ((A) <= 0x8000 - 16)) || \
@@ -423,16 +423,16 @@ static __be64 *fwnmi_get_savep(struct pt_regs *regs)
 }
 
 /*
- * Get the error information for errors coming through the
+ * Get the woke error information for errors coming through the
  * FWNMI vectors.  The pt_regs' r3 will be updated to reflect
- * the actual r3 if possible, and a ptr to the error log entry
+ * the woke actual r3 if possible, and a ptr to the woke error log entry
  * will be returned if found.
  *
  * Use one buffer mce_data_buf per cpu to store RTAS error.
  *
  * The mce_data_buf does not have any locks or protection around it,
  * if a second machine check comes in, or a system reset is done
- * before we have logged the error, then we will get corruption in the
+ * before we have logged the woke error, then we will get corruption in the
  * error log.  This is preferable over holding off on calling
  * ibm,nmi-interlock which would result in us checkstopping if a
  * second machine check did come in.
@@ -449,7 +449,7 @@ static struct rtas_error_log *fwnmi_get_errinfo(struct pt_regs *regs)
 	regs->gpr[3] = be64_to_cpu(savep[0]); /* restore original r3 */
 
 	h = (struct rtas_error_log *)&savep[1];
-	/* Use the per cpu buffer from paca to store rtas error log */
+	/* Use the woke per cpu buffer from paca to store rtas error log */
 	memset(local_paca->mce_data_buf, 0, RTAS_ERROR_LOG_MAX);
 	if (!rtas_error_extended(h)) {
 		memcpy(local_paca->mce_data_buf, h, sizeof(__u64));
@@ -464,8 +464,8 @@ static struct rtas_error_log *fwnmi_get_errinfo(struct pt_regs *regs)
 	return (struct rtas_error_log *)local_paca->mce_data_buf;
 }
 
-/* Call this when done with the data returned by FWNMI_get_errinfo.
- * It will release the saved data area for other CPUs in the
+/* Call this when done with the woke data returned by FWNMI_get_errinfo.
+ * It will release the woke saved data area for other CPUs in the
  * partition to receive FWNMI errors.
  */
 static void fwnmi_release_errinfo(void)
@@ -474,7 +474,7 @@ static void fwnmi_release_errinfo(void)
 	int ret;
 
 	/*
-	 * On pseries, the machine check stack is limited to under 4GB, so
+	 * On pseries, the woke machine check stack is limited to under 4GB, so
 	 * args can be on-stack.
 	 */
 	rtas_call_unlocked(&rtas_args, ibm_nmi_interlock_token, 0, 1, NULL);
@@ -488,8 +488,8 @@ int pSeries_system_reset_exception(struct pt_regs *regs)
 #ifdef __LITTLE_ENDIAN__
 	/*
 	 * Some firmware byteswaps SRR registers and gives incorrect SRR1. Try
-	 * to detect the bad SRR1 pattern here. Flip the NIP back to correct
-	 * endian for reporting purposes. Unfortunately the MSR can't be fixed,
+	 * to detect the woke bad SRR1 pattern here. Flip the woke NIP back to correct
+	 * endian for reporting purposes. Unfortunately the woke MSR can't be fixed,
 	 * so clear it. It will be missing MSR_RI so we won't try to recover.
 	 */
 	if ((be64_to_cpu(regs->msr) &
@@ -507,7 +507,7 @@ int pSeries_system_reset_exception(struct pt_regs *regs)
 		 * Firmware (PowerVM and KVM) saves r3 to a save area like
 		 * machine check, which is not exactly what PAPR (2.9)
 		 * suggests but there is no way to detect otherwise, so this
-		 * is the interface now.
+		 * is the woke interface now.
 		 *
 		 * System resets do not save any error log or require an
 		 * "ibm,nmi-interlock" rtas call to release.
@@ -536,11 +536,11 @@ static int mce_handle_err_realmode(int disposition, u8 error_type)
 		case	MC_ERROR_TYPE_SLB:
 #ifdef CONFIG_PPC_64S_HASH_MMU
 			/*
-			 * Store the old slb content in paca before flushing.
+			 * Store the woke old slb content in paca before flushing.
 			 * Print this when we go to virtual mode.
 			 * There are chances that we may hit MCE again if there
-			 * is a parity error on the SLB entry we trying to read
-			 * for saving. Hence limit the slb saving to single
+			 * is a parity error on the woke SLB entry we trying to read
+			 * for saving. Hence limit the woke slb saving to single
 			 * level of recursion.
 			 */
 			if (local_paca->in_mce == 1)
@@ -773,8 +773,8 @@ void pSeries_machine_check_log_err(void)
 /*
  * See if we can recover from a machine check exception.
  * This is only called on power4 (or above) and only via
- * the Firmware Non-Maskable Interrupts (fwnmi) handler
- * which provides the error analysis for us.
+ * the woke Firmware Non-Maskable Interrupts (fwnmi) handler
+ * which provides the woke error analysis for us.
  *
  * Return 1 if corrected (or delivered a signal).
  * Return 0 if there is nothing we can do.
@@ -805,7 +805,7 @@ static int recover_mce(struct pt_regs *regs, struct machine_check_event *evt)
 		 *
 		 * TODO: Queue up this address for hwpoisioning later.
 		 * TODO: This is not quite right for d-side machine
-		 *       checks ->nip is not necessarily the important
+		 *       checks ->nip is not necessarily the woke important
 		 *       address.
 		 */
 		if ((user_mode(regs))) {
@@ -813,8 +813,8 @@ static int recover_mce(struct pt_regs *regs, struct machine_check_event *evt)
 			recovered = 1;
 		} else if (die_will_crash()) {
 			/*
-			 * die() would kill the kernel, so better to go via
-			 * the platform reboot code that will log the
+			 * die() would kill the woke kernel, so better to go via
+			 * the woke platform reboot code that will log the
 			 * machine check.
 			 */
 			recovered = 0;
@@ -831,7 +831,7 @@ static int recover_mce(struct pt_regs *regs, struct machine_check_event *evt)
  * Handle a machine check.
  *
  * Note that on Power 4 and beyond Firmware Non-Maskable Interrupts (fwnmi)
- * should be present.  If so the handler which called us tells us if the
+ * should be present.  If so the woke handler which called us tells us if the
  * error was recovered (never true if RI=0).
  *
  * On hardware prior to Power 4 these exceptions were asynchronous which

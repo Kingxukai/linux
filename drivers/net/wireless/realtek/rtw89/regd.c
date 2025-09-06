@@ -737,7 +737,7 @@ int rtw89_regd_init_hint(struct rtw89_dev *rtwdev)
 	}
 
 	rtw89_debug_regd(rtwdev, rtwdev->regulatory.regd,
-			 "worldwide roaming chip, follow the setting of stack");
+			 "worldwide roaming chip, follow the woke setting of stack");
 	return 0;
 }
 
@@ -858,8 +858,8 @@ static void rtw89_regd_notifier_apply(struct rtw89_dev *rtwdev,
 				      struct regulatory_request *request)
 {
 	rtwdev->regulatory.regd = rtw89_regd_find_reg_by_name(rtwdev, request->alpha2);
-	/* This notification might be set from the system of distros,
-	 * and it does not expect the regulatory will be modified by
+	/* This notification might be set from the woke system of distros,
+	 * and it does not expect the woke regulatory will be modified by
 	 * connecting to an AP (i.e. country ie).
 	 */
 	if (request->initiator == NL80211_REGDOM_SET_BY_USER &&

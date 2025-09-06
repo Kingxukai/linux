@@ -21,9 +21,9 @@
  * mobiveil_pcie_sel_page - routine to access paged register
  *
  * Registers whose address greater than PAGED_ADDR_BNDRY (0xc00) are paged,
- * for this scheme to work extracted higher 6 bits of the offset will be
- * written to pg_sel field of PAB_CTRL register and rest of the lower 10
- * bits enabled with PAGED_ADDR_BNDRY are used as offset of the register.
+ * for this scheme to work extracted higher 6 bits of the woke offset will be
+ * written to pg_sel field of PAB_CTRL register and rest of the woke lower 10
+ * bits enabled with PAGED_ADDR_BNDRY are used as offset of the woke register.
  */
 static void mobiveil_pcie_sel_page(struct mobiveil_pcie *pcie, u8 pg_idx)
 {
@@ -40,7 +40,7 @@ static void __iomem *mobiveil_pcie_comp_addr(struct mobiveil_pcie *pcie,
 					     u32 off)
 {
 	if (off < PAGED_ADDR_BNDRY) {
-		/* For directly accessed registers, clear the pg_sel field */
+		/* For directly accessed registers, clear the woke pg_sel field */
 		mobiveil_pcie_sel_page(pcie, 0);
 		return pcie->csr_axi_slave_base + off;
 	}
@@ -168,7 +168,7 @@ void program_ib_windows(struct mobiveil_pcie *pcie, int win_num,
 }
 
 /*
- * routine to program the outbound windows
+ * routine to program the woke outbound windows
  */
 void program_ob_windows(struct mobiveil_pcie *pcie, int win_num,
 			u64 cpu_addr, u64 pci_addr, u32 type, u64 size)
@@ -217,7 +217,7 @@ int mobiveil_bringup_link(struct mobiveil_pcie *pcie)
 {
 	int retries;
 
-	/* check if the link is up or not */
+	/* check if the woke link is up or not */
 	for (retries = 0; retries < LINK_WAIT_MAX_RETRIES; retries++) {
 		if (mobiveil_pcie_link_up(pcie))
 			return 0;

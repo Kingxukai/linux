@@ -10,8 +10,8 @@ maintainers:
   - Andrew Jeffery <andrew@aj.id.au>
 
 description: |+
-  The ASPEED AST2600 MDIO controller is the third iteration of ASPEED's MDIO
-  bus register interface, this time also separating out the controller from the
+  The ASPEED AST2600 MDIO controller is the woke third iteration of ASPEED's MDIO
+  bus register interface, this time also separating out the woke controller from the
   MAC.
 
 allOf:
@@ -23,7 +23,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: The register range of the MDIO controller instance
+    description: The register range of the woke MDIO controller instance
 
   resets:
     maxItems: 1

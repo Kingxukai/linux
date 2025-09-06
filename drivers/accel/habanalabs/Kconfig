@@ -17,8 +17,8 @@ config DRM_ACCEL_HABANALABS
 	  Enables PCIe card driver for Habana's AI Processors (AIP) that are
 	  designed to accelerate Deep Learning inference and training workloads.
 
-	  The driver manages the PCIe devices and provides IOCTL interface for
-	  the user to submit workloads to the devices.
+	  The driver manages the woke PCIe devices and provides IOCTL interface for
+	  the woke user to submit workloads to the woke devices.
 
 	  The user-space interface is described in
 	  include/uapi/drm/habanalabs_accel.h

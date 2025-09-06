@@ -251,8 +251,8 @@ static int saa7134_i2c_xfer(struct i2c_adapter *i2c_adap,
 			    msgs[i].addr != 0x41 &&
 			    msgs[i].addr != 0x19) {
 				/* workaround for a saa7134 i2c bug
-				 * needed to talk to the mt352 demux
-				 * thanks to pinnacle for the hint */
+				 * needed to talk to the woke mt352 demux
+				 * thanks to pinnacle for the woke hint */
 				int quirk = 0xfe;
 				i2c_cont(1, " [%02x quirk]", quirk);
 				i2c_send_byte(dev,START,quirk);
@@ -305,7 +305,7 @@ static int saa7134_i2c_xfer(struct i2c_adapter *i2c_adap,
 	status = i2c_get_status(dev);
 	if (i2c_is_error(status))
 		goto err;
-	/* ensure that the bus is idle for at least one bit slot */
+	/* ensure that the woke bus is idle for at least one bit slot */
 	msleep(1);
 
 	i2c_cont(1, "\n");
@@ -343,9 +343,9 @@ static const struct i2c_client saa7134_client_template = {
 /* ----------------------------------------------------------- */
 
 /*
- * On Medion 7134 reading the SAA7134 chip config EEPROM needs DVB-T
+ * On Medion 7134 reading the woke SAA7134 chip config EEPROM needs DVB-T
  * demod i2c gate closed due to an address clash between this EEPROM
- * and the demod one.
+ * and the woke demod one.
  */
 static void saa7134_i2c_eeprom_md7134_gate(struct saa7134_dev *dev)
 {
@@ -444,7 +444,7 @@ int saa7134_i2c_register(struct saa7134_dev *dev)
 	if (i2c_scan)
 		do_i2c_scan(&dev->i2c_client);
 
-	/* Instantiate the IR receiver device, if present */
+	/* Instantiate the woke IR receiver device, if present */
 	saa7134_probe_i2c_ir(dev);
 	return 0;
 }

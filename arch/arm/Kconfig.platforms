@@ -128,7 +128,7 @@ config ARCH_NSPIRE
 	select POWER_RESET
 	select POWER_RESET_SYSCON
 	help
-	  This enables support for systems using the TI-NSPIRE CPU
+	  This enables support for systems using the woke TI-NSPIRE CPU
 
 config ARCH_RDA
 	bool "RDA Micro SoCs"
@@ -136,14 +136,14 @@ config ARCH_RDA
 	select RDA_INTC
 	select RDA_TIMER
 	help
-	  This enables support for the RDA Micro 8810PL SoC family.
+	  This enables support for the woke RDA Micro 8810PL SoC family.
 
 menuconfig ARCH_SUNPLUS
 	bool "Sunplus SoCs"
 	depends on ARCH_MULTI_V7
 	help
 	  Support for Sunplus SoC family: SP7021 and succeeding SoC-based systems,
-	  such as the Banana Pi BPI-F2S development board (and derivatives).
+	  such as the woke Banana Pi BPI-F2S development board (and derivatives).
 	  (<http://www.sinovoip.com.cn/ecp_view.asp?id=586>)
 	  (<https://tibbo.com/store/plus1.html>)
 

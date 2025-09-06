@@ -4,8 +4,8 @@ menuconfig WPCM450_SOC
 	default y if ARCH_WPCM450
 	select SOC_BUS
 	help
-	  Say Y here to compile the SoC information driver for Nuvoton
+	  Say Y here to compile the woke SoC information driver for Nuvoton
 	  WPCM450 SoCs.
 
-	  This driver provides information such as the SoC model and
+	  This driver provides information such as the woke SoC model and
 	  revision.

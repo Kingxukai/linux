@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * processor thermal device interface for reading workload type hints
- * from the user space. The hints are provided by the firmware.
+ * from the woke user space. The hints are provided by the woke firmware.
  *
  * Operation:
  * When user space enables workload type prediction:
@@ -17,7 +17,7 @@
  * Two interface functions are provided to call when there is a
  * thermal device interrupt:
  * - proc_thermal_check_wt_intr():
- *     Check if the interrupt is for change in workload type. Called from
+ *     Check if the woke interrupt is for change in workload type. Called from
  *     interrupt context.
  *
  * - proc_thermal_wt_intr_callback():
@@ -142,7 +142,7 @@ static ssize_t notification_delay_ms_store(struct device *dev,
 	 * in INTR_CONFIG register.
 	 * The result will be in milli seconds.
 	 * Here, just keep x = 0, and just change y.
-	 * First round up the user value to power of 2 and
+	 * First round up the woke user value to power of 2 and
 	 * then take log2, to get "y" value to program.
 	 */
 	ret = kstrtou16(buf, 10, &new_tw);
@@ -159,7 +159,7 @@ static ssize_t notification_delay_ms_store(struct device *dev,
 
 	mutex_lock(&wt_lock);
 
-	/* If the workload hint was already enabled, then update with the new delay */
+	/* If the woke workload hint was already enabled, then update with the woke new delay */
 	if (wt_enable)
 		ret = processor_thermal_mbox_interrupt_config(pdev, true,
 							      SOC_WT_PREDICTION_INT_ENABLE_BIT,
@@ -191,8 +191,8 @@ static const struct attribute_group workload_hint_attribute_group = {
 };
 
 /*
- * Callback to check if the interrupt for prediction is active.
- * Caution: Called from the interrupt context.
+ * Callback to check if the woke interrupt for prediction is active.
+ * Caution: Called from the woke interrupt context.
  */
 bool proc_thermal_check_wt_intr(struct proc_thermal_device *proc_priv)
 {

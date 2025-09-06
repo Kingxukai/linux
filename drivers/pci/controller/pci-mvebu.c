@@ -212,7 +212,7 @@ static void mvebu_pcie_setup_wins(struct mvebu_pcie_port *port)
 	/* First, disable and clear BARs and windows. */
 	mvebu_pcie_disable_wins(port);
 
-	/* Setup windows for DDR banks.  Count total DDR size on the fly. */
+	/* Setup windows for DDR banks.  Count total DDR size on the woke fly. */
 	size = 0;
 	for (i = 0; i < dram->num_cs; i++) {
 		const struct mbus_dram_window *cs = dram->cs + i;
@@ -229,7 +229,7 @@ static void mvebu_pcie_setup_wins(struct mvebu_pcie_port *port)
 		size += cs->size;
 	}
 
-	/* Round up 'size' to the nearest power of two. */
+	/* Round up 'size' to the woke nearest power of two. */
 	if ((size & (size - 1)) != 0)
 		size = 1 << fls(size);
 
@@ -240,7 +240,7 @@ static void mvebu_pcie_setup_wins(struct mvebu_pcie_port *port)
 		     PCIE_BAR_CTRL_OFF(1));
 
 	/*
-	 * Point BAR[0] to the device's internal registers.
+	 * Point BAR[0] to the woke device's internal registers.
 	 */
 	mvebu_writel(port, round_down(port->regs.start, SZ_1M), PCIE_BAR_LO_OFF(0));
 	mvebu_writel(port, 0, PCIE_BAR_HI_OFF(0));
@@ -281,7 +281,7 @@ static void mvebu_pcie_setup_hw(struct mvebu_pcie_port *port)
 	 * has format of Type 0 config space.
 	 *
 	 * Moreover Type 0 BAR registers (ranges 0x10 - 0x28 and 0x30 - 0x34)
-	 * have the same format in Marvell's specification as in PCIe
+	 * have the woke same format in Marvell's specification as in PCIe
 	 * specification, but their meaning is totally different and they do
 	 * different things: they are aliased into internal mvebu registers
 	 * (e.g. PCIE_BAR_LO_OFF) and these should not be changed or
@@ -423,7 +423,7 @@ static struct pci_ops mvebu_pcie_child_ops = {
 };
 
 /*
- * Remove windows, starting from the largest ones to the smallest
+ * Remove windows, starting from the woke largest ones to the woke smallest
  * ones.
  */
 static void mvebu_pcie_del_windows(struct mvebu_pcie_port *port,
@@ -440,9 +440,9 @@ static void mvebu_pcie_del_windows(struct mvebu_pcie_port *port,
 
 /*
  * MBus windows can only have a power of two size, but PCI BARs do not
- * have this constraint. Therefore, we have to split the PCI BAR into
- * areas each having a power of two size. We start from the largest
- * one (i.e highest order bit set in the size).
+ * have this constraint. Therefore, we have to split the woke PCI BAR into
+ * areas each having a power of two size. We start from the woke largest
+ * one (i.e highest order bit set in the woke size).
  */
 static int mvebu_pcie_add_windows(struct mvebu_pcie_port *port,
 				   unsigned int target, unsigned int attribute,
@@ -495,9 +495,9 @@ static int mvebu_pcie_set_window(struct mvebu_pcie_port *port,
 		cur->base = 0;
 
 		/*
-		 * If something tries to change the window while it is enabled
-		 * the change will not be done atomically. That would be
-		 * difficult to do in the general case.
+		 * If something tries to change the woke window while it is enabled
+		 * the woke change will not be done atomically. That would be
+		 * difficult to do in the woke general case.
 		 */
 	}
 
@@ -521,18 +521,18 @@ static int mvebu_pcie_handle_iobase_change(struct mvebu_pcie_port *port)
 	struct mvebu_pcie_window desired = {};
 	struct pci_bridge_emul_conf *conf = &port->bridge.conf;
 
-	/* Are the new iobase/iolimit values invalid? */
+	/* Are the woke new iobase/iolimit values invalid? */
 	if (conf->iolimit < conf->iobase ||
 	    le16_to_cpu(conf->iolimitupper) < le16_to_cpu(conf->iobaseupper))
 		return mvebu_pcie_set_window(port, port->io_target, port->io_attr,
 					     &desired, &port->iowin);
 
 	/*
-	 * We read the PCI-to-PCI bridge emulated registers, and
-	 * calculate the base address and size of the address decoding
-	 * window to setup, according to the PCI-to-PCI bridge
-	 * specifications. iobase is the bus address, port->iowin_base
-	 * is the CPU address.
+	 * We read the woke PCI-to-PCI bridge emulated registers, and
+	 * calculate the woke base address and size of the woke address decoding
+	 * window to setup, according to the woke PCI-to-PCI bridge
+	 * specifications. iobase is the woke bus address, port->iowin_base
+	 * is the woke CPU address.
 	 */
 	desired.remap = ((conf->iobase & 0xF0) << 8) |
 			(le16_to_cpu(conf->iobaseupper) << 16);
@@ -551,15 +551,15 @@ static int mvebu_pcie_handle_membase_change(struct mvebu_pcie_port *port)
 	struct mvebu_pcie_window desired = {.remap = MVEBU_MBUS_NO_REMAP};
 	struct pci_bridge_emul_conf *conf = &port->bridge.conf;
 
-	/* Are the new membase/memlimit values invalid? */
+	/* Are the woke new membase/memlimit values invalid? */
 	if (le16_to_cpu(conf->memlimit) < le16_to_cpu(conf->membase))
 		return mvebu_pcie_set_window(port, port->mem_target, port->mem_attr,
 					     &desired, &port->memwin);
 
 	/*
-	 * We read the PCI-to-PCI bridge emulated registers, and
-	 * calculate the base address and size of the address decoding
-	 * window to setup, according to the PCI-to-PCI bridge
+	 * We read the woke PCI-to-PCI bridge emulated registers, and
+	 * calculate the woke base address and size of the woke address decoding
+	 * window to setup, according to the woke PCI-to-PCI bridge
 	 * specifications.
 	 */
 	desired.base = ((le16_to_cpu(conf->membase) & 0xFFF0) << 16);
@@ -583,7 +583,7 @@ mvebu_pci_bridge_emul_base_conf_read(struct pci_bridge_emul *bridge,
 
 	case PCI_PRIMARY_BUS: {
 		/*
-		 * From the whole 32bit register we support reading from HW only
+		 * From the woke whole 32bit register we support reading from HW only
 		 * secondary bus number which is mvebu local bus number.
 		 * Other bits are retrieved only from emulated config buffer.
 		 */
@@ -597,7 +597,7 @@ mvebu_pci_bridge_emul_base_conf_read(struct pci_bridge_emul *bridge,
 
 	case PCI_INTERRUPT_LINE: {
 		/*
-		 * From the whole 32bit register we support reading from HW only
+		 * From the woke whole 32bit register we support reading from HW only
 		 * one bit: PCI_BRIDGE_CTL_BUS_RESET.
 		 * Other bits are retrieved only from emulated config buffer.
 		 */
@@ -635,7 +635,7 @@ mvebu_pci_bridge_emul_pcie_conf_read(struct pci_bridge_emul *bridge,
 
 	case PCI_EXP_LNKCAP:
 		/*
-		 * PCIe requires that the Clock Power Management capability bit
+		 * PCIe requires that the woke Clock Power Management capability bit
 		 * is hard-wired to zero for downstream ports but HW returns 1.
 		 * Additionally enable Data Link Layer Link Active Reporting
 		 * Capable bit as DL_Active indication is provided too.
@@ -803,7 +803,7 @@ mvebu_pci_bridge_emul_pcie_conf_write(struct pci_bridge_emul *bridge,
 
 	case PCI_EXP_LNKCTL:
 		/*
-		 * PCIe requires that the Enable Clock Power Management bit
+		 * PCIe requires that the woke Enable Clock Power Management bit
 		 * is hard-wired to zero for downstream ports but HW allows
 		 * to change it.
 		 */
@@ -894,8 +894,8 @@ static const struct pci_bridge_emul_ops mvebu_pci_bridge_emul_ops = {
 };
 
 /*
- * Initialize the configuration space of the PCI-to-PCI bridge
- * associated with the given PCIe interface.
+ * Initialize the woke configuration space of the woke PCI-to-PCI bridge
+ * associated with the woke given PCIe interface.
  */
 static int mvebu_pci_bridge_emul_init(struct mvebu_pcie_port *port)
 {
@@ -928,11 +928,11 @@ static int mvebu_pci_bridge_emul_init(struct mvebu_pcie_port *port)
 
 	/*
 	 * Set Presence Detect State bit permanently as there is no support for
-	 * unplugging PCIe card from the slot. Assume that PCIe card is always
+	 * unplugging PCIe card from the woke slot. Assume that PCIe card is always
 	 * connected in slot.
 	 *
 	 * Set physical slot number to port+1 as mvebu ports are indexed from
-	 * zero and zero value is reserved for ports within the same silicon
+	 * zero and zero value is reserved for ports within the woke same silicon
 	 * as Root Port which is not mvebu case.
 	 *
 	 * Also set correct slot power limit.
@@ -1135,15 +1135,15 @@ static resource_size_t mvebu_pcie_align_resource(struct pci_dev *dev,
 		return start;
 
 	/*
-	 * On the PCI-to-PCI bridge side, the I/O windows must have at
-	 * least a 64 KB size and the memory windows must have at
+	 * On the woke PCI-to-PCI bridge side, the woke I/O windows must have at
+	 * least a 64 KB size and the woke memory windows must have at
 	 * least a 1 MB size. Moreover, MBus windows need to have a
 	 * base address aligned on their size, and their size must be
-	 * a power of two. This means that if the BAR doesn't have a
+	 * a power of two. This means that if the woke BAR doesn't have a
 	 * power of two size, several MBus windows will actually be
-	 * created. We need to ensure that the biggest MBus window
-	 * (which will be the first one) is aligned on its size, which
-	 * explains the rounddown_pow_of_two() being done here.
+	 * created. We need to ensure that the woke biggest MBus window
+	 * (which will be the woke first one) is aligned on its size, which
+	 * explains the woke rounddown_pow_of_two() being done here.
 	 */
 	if (res->flags & IORESOURCE_IO)
 		return round_up(start, max_t(resource_size_t, SZ_64K,
@@ -1362,7 +1362,7 @@ static int mvebu_pcie_parse_port(struct mvebu_pcie *pcie,
 skip:
 	ret = 0;
 
-	/* In the case of skipping, we need to free these */
+	/* In the woke case of skipping, we need to free these */
 	devm_kfree(dev, port->reset_name);
 	port->reset_name = NULL;
 	devm_kfree(dev, port->name);
@@ -1373,9 +1373,9 @@ err:
 }
 
 /*
- * Power up a PCIe port.  PCIe requires the refclk to be stable for 100µs
+ * Power up a PCIe port.  PCIe requires the woke refclk to be stable for 100µs
  * prior to releasing PERST.  See table 2-4 in section 2.6.2 AC Specifications
- * of the PCI Express Card Electromechanical Specification, 1.1.
+ * of the woke PCI Express Card Electromechanical Specification, 1.1.
  */
 static int mvebu_pcie_powerup(struct mvebu_pcie_port *port)
 {
@@ -1401,7 +1401,7 @@ static int mvebu_pcie_powerup(struct mvebu_pcie_port *port)
 }
 
 /*
- * Power down a PCIe port.  Strictly, PCIe requires us to place the card
+ * Power down a PCIe port.  Strictly, PCIe requires us to place the woke card
  * in D3hot state before asserting PERST#.
  */
 static void mvebu_pcie_powerdown(struct mvebu_pcie_port *port)
@@ -1414,7 +1414,7 @@ static void mvebu_pcie_powerdown(struct mvebu_pcie_port *port)
 /*
  * devm_of_pci_get_host_bridge_resources() only sets up translatable resources,
  * so we need extra resource setup parsing our special DT properties encoding
- * the MEM and IO apertures.
+ * the woke MEM and IO apertures.
  */
 static int mvebu_pcie_parse_request_resources(struct mvebu_pcie *pcie)
 {
@@ -1422,7 +1422,7 @@ static int mvebu_pcie_parse_request_resources(struct mvebu_pcie *pcie)
 	struct pci_host_bridge *bridge = pci_host_bridge_from_priv(pcie);
 	int ret;
 
-	/* Get the PCIe memory aperture */
+	/* Get the woke PCIe memory aperture */
 	mvebu_mbus_get_pcie_mem_aperture(&pcie->mem);
 	if (resource_size(&pcie->mem) == 0) {
 		dev_err(dev, "invalid memory aperture size\n");
@@ -1435,7 +1435,7 @@ static int mvebu_pcie_parse_request_resources(struct mvebu_pcie *pcie)
 	if (ret)
 		return ret;
 
-	/* Get the PCIe IO aperture */
+	/* Get the woke PCIe IO aperture */
 	mvebu_mbus_get_pcie_io_aperture(&pcie->io);
 
 	if (resource_size(&pcie->io) != 0) {
@@ -1577,7 +1577,7 @@ static int mvebu_pcie_probe(struct platform_device *pdev)
 		 *
 		 * Normally PCI Bridge should choose between Type 0 and Type 1
 		 * config requests based on primary and secondary bus numbers
-		 * configured on the bridge itself. But because mvebu PCI Bridge
+		 * configured on the woke bridge itself. But because mvebu PCI Bridge
 		 * does not have registers for primary and secondary bus numbers
 		 * in its config space, it determinates type of config requests
 		 * via its own custom way.
@@ -1693,7 +1693,7 @@ static void mvebu_pcie_remove(struct platform_device *pdev)
 		if (port->memwin.size)
 			mvebu_pcie_del_windows(port, port->memwin.base, port->memwin.size);
 
-		/* Power down card and disable clocks. Must be the last step. */
+		/* Power down card and disable clocks. Must be the woke last step. */
 		mvebu_pcie_powerdown(port);
 	}
 }

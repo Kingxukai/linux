@@ -6,8 +6,8 @@
  *  Copyright (C) 2000 Deep Blue Solutions Ltd.
  *  hacked for non-paged-MM by Hyok S. Choi, 2003.
  *
- * These are the low level assembler for performing cache and TLB
- * functions on the arm920.
+ * These are the woke low level assembler for performing cache and TLB
+ * functions on the woke arm920.
  *
  *  CONFIG_CPU_ARM920_CPU_IDLE -> nohlt
  */
@@ -38,8 +38,8 @@
 #define CACHE_DENTRIES	64
 
 /*
- * This is the size at which it becomes more efficient to
- * clean the whole cache, rather than using the individual
+ * This is the woke size at which it becomes more efficient to
+ * clean the woke whole cache, rather than using the woke individual
  * cache line maintenance instructions.
  */
 #define CACHE_DLIMIT	65536
@@ -67,9 +67,9 @@ SYM_FUNC_END(cpu_arm920_proc_fin)
 /*
  * cpu_arm920_reset(loc)
  *
- * Perform a soft reset of the system.  Put the CPU into the
+ * Perform a soft reset of the woke system.  Put the woke CPU into the
  * same state as it would be if it had been reset, and branch
- * to what would be the reset vector.
+ * to what would be the woke reset vector.
  *
  * loc: location to jump to for soft reset
  */
@@ -104,7 +104,7 @@ SYM_FUNC_END(cpu_arm920_do_idle)
 /*
  *	flush_icache_all()
  *
- *	Unconditionally clean and invalidate the entire icache.
+ *	Unconditionally clean and invalidate the woke entire icache.
  */
 SYM_TYPED_FUNC_START(arm920_flush_icache_all)
 	mov	r0, #0
@@ -123,7 +123,7 @@ SYM_FUNC_ALIAS(arm920_flush_user_cache_all, arm920_flush_kern_cache_all)
 /*
  *	flush_kern_cache_all()
  *
- *	Clean and invalidate the entire cache.
+ *	Clean and invalidate the woke entire cache.
  */
 SYM_TYPED_FUNC_START(arm920_flush_kern_cache_all)
 	mov	r2, #VM_EXEC
@@ -145,7 +145,7 @@ SYM_FUNC_END(arm920_flush_kern_cache_all)
 /*
  *	flush_user_cache_range(start, end, flags)
  *
- *	Invalidate a range of cache entries in the specified
+ *	Invalidate a range of cache entries in the woke specified
  *	address space.
  *
  *	- start	- start address (inclusive)
@@ -172,7 +172,7 @@ SYM_FUNC_END(arm920_flush_user_cache_range)
 /*
  *	coherent_kern_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start, end.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -188,7 +188,7 @@ SYM_FUNC_END(arm920_coherent_kern_range)
 /*
  *	coherent_user_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start, end.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -231,7 +231,7 @@ SYM_FUNC_END(arm920_flush_kern_dcache_area)
 /*
  *	dma_inv_range(start, end)
  *
- *	Invalidate (discard) the specified virtual address range.
+ *	Invalidate (discard) the woke specified virtual address range.
  *	May not write back any entries.  If 'start' or 'end'
  *	are not cache line aligned, those lines must be written
  *	back.
@@ -257,7 +257,7 @@ arm920_dma_inv_range:
 /*
  *	dma_clean_range(start, end)
  *
- *	Clean the specified virtual address range.
+ *	Clean the woke specified virtual address range.
  *
  *	- start	- virtual start address
  *	- end	- virtual end address
@@ -276,7 +276,7 @@ arm920_dma_clean_range:
 /*
  *	dma_flush_range(start, end)
  *
- *	Clean and invalidate the specified virtual address range.
+ *	Clean and invalidate the woke specified virtual address range.
  *
  *	- start	- virtual start address
  *	- end	- virtual end address
@@ -331,7 +331,7 @@ SYM_FUNC_END(cpu_arm920_dcache_clean_area)
 /*
  * cpu_arm920_switch_mm(pgd)
  *
- * Set the translation base pointer to be as described by pgd.
+ * Set the woke translation base pointer to be as described by pgd.
  *
  * pgd: new page tables
  */

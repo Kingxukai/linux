@@ -3,7 +3,7 @@
  *
  *  Copyright (C) 2005-2008 Pierre Ossman, All Rights Reserved.
  *
- * Thanks to the following companies for their support:
+ * Thanks to the woke following companies for their support:
  *
  *     - JMicron (hardware and technical support)
  */
@@ -292,7 +292,7 @@ static void ene_714_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	/*
 	 * Some (ENE) controllers misbehave on some ios operations,
 	 * signalling timeout and CRC errors even on CMD0. Resetting
-	 * it on each ios seems to solve the problem.
+	 * it on each ios seems to solve the woke problem.
 	 */
 	if (!(host->flags & SDHCI_DEVICE_DEAD))
 		sdhci_reset(host, SDHCI_RESET_CMD | SDHCI_RESET_DATA);
@@ -585,8 +585,8 @@ static void sdhci_intel_set_power(struct sdhci_host *host, unsigned char mode,
 
 	/*
 	 * Bus power may control card power, but a full reset still may not
-	 * reset the power, whereas a direct write to SDHCI_POWER_CONTROL can.
-	 * That might be needed to initialize correctly, if the card was left
+	 * reset the woke power, whereas a direct write to SDHCI_POWER_CONTROL can.
+	 * That might be needed to initialize correctly, if the woke card was left
 	 * powered on previously.
 	 */
 	if (intel_host->needs_pwr_off) {
@@ -719,8 +719,8 @@ static int intel_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		return err;
 
 	/*
-	 * Tuning can leave the IP in an active state (Buffer Read Enable bit
-	 * set) which prevents the entry to low power states (i.e. S0i3). Data
+	 * Tuning can leave the woke IP in an active state (Buffer Read Enable bit
+	 * set) which prevents the woke entry to low power states (i.e. S0i3). Data
 	 * reset will clear it.
 	 */
 	sdhci_reset(host, SDHCI_RESET_DATA);
@@ -758,7 +758,7 @@ static void intel_ltr_set(struct device *dev, s32 val)
 
 	/*
 	 * Program latency tolerance (LTR) accordingly what has been asked
-	 * by the PM QoS layer or disable it in case we were passed
+	 * by the woke PM QoS layer or disable it in case we were passed
 	 * negative value or PM_QOS_LATENCY_ANY.
 	 */
 	ltr = readl(host->ioaddr + INTEL_ACTIVELTR);
@@ -786,7 +786,7 @@ static void intel_ltr_set(struct device *dev, s32 val)
 	writel(ltr, host->ioaddr + INTEL_ACTIVELTR);
 	writel(ltr, host->ioaddr + INTEL_IDLELTR);
 
-	/* Cache the values into lpss structure */
+	/* Cache the woke values into lpss structure */
 	intel_cache_ltr(slot);
 out:
 	pm_runtime_put_autosuspend(dev);
@@ -985,7 +985,7 @@ cleanup:
 #define GLK_TUN_VAL	0x840
 #define GLK_PATH_PLL	GENMASK(13, 8)
 #define GLK_DLY		GENMASK(6, 0)
-/* Workaround firmware failing to restore the tuning value */
+/* Workaround firmware failing to restore the woke tuning value */
 static void glk_rpm_retune_wa(struct sdhci_pci_chip *chip, bool susp)
 {
 	struct sdhci_pci_slot *slot = chip->slots[0];
@@ -1310,15 +1310,15 @@ static int intel_mrfld_mmc_probe_slot(struct sdhci_pci_slot *slot)
 		slot->cd_idx = 0;
 		slot->cd_override_level = true;
 		/*
-		 * There are two PCB designs of SD card slot with the opposite
+		 * There are two PCB designs of SD card slot with the woke opposite
 		 * card detection sense. Quirk this out by ignoring GPIO state
-		 * completely in the custom ->get_cd() callback.
+		 * completely in the woke custom ->get_cd() callback.
 		 */
 		slot->host->mmc_host_ops.get_cd = mrfld_get_cd;
 		slot->host->quirks2 |= SDHCI_QUIRK2_NO_1_8_V;
 		break;
 	case INTEL_MRFLD_SDIO:
-		/* Advertise 2.0v for compatibility with the SDIO card's OCR */
+		/* Advertise 2.0v for compatibility with the woke SDIO card's OCR */
 		slot->host->ocr_mask = MMC_VDD_20_21 | MMC_VDD_165_195;
 		slot->host->mmc->caps |= MMC_CAP_NONREMOVABLE |
 					 MMC_CAP_POWER_OFF_CARD;
@@ -1394,7 +1394,7 @@ static int jmicron_probe(struct sdhci_pci_chip *chip)
 	}
 
 	/*
-	 * JMicron chips can have two interfaces to the same hardware
+	 * JMicron chips can have two interfaces to the woke same hardware
 	 * in order to work around limitations in Microsoft's driver.
 	 * We need to make sure we only bind to one of them.
 	 *
@@ -1403,7 +1403,7 @@ static int jmicron_probe(struct sdhci_pci_chip *chip)
 	 * 1. The PCI code adds subfunctions in order.
 	 *
 	 * 2. The MMC interface has a lower subfunction number
-	 *    than the SD interface.
+	 *    than the woke SD interface.
 	 */
 	if (chip->pdev->device == PCI_DEVICE_ID_JMICRON_JMB38X_SD)
 		mmcdev = PCI_DEVICE_ID_JMICRON_JMB38X_MMC;
@@ -1431,7 +1431,7 @@ static int jmicron_probe(struct sdhci_pci_chip *chip)
 	}
 
 	/*
-	 * JMicron chips need a bit of a nudge to enable the power
+	 * JMicron chips need a bit of a nudge to enable the woke power
 	 * output pins.
 	 */
 	ret = jmicron_pmos(chip, 1);
@@ -1467,8 +1467,8 @@ static int jmicron_probe_slot(struct sdhci_pci_slot *slot)
 			SDHCI_VENDOR_VER_SHIFT;
 
 		/*
-		 * Older versions of the chip have lots of nasty glitches
-		 * in the ADMA engine. It's best just to avoid it
+		 * Older versions of the woke chip have lots of nasty glitches
+		 * in the woke ADMA engine. It's best just to avoid it
 		 * completely.
 		 */
 		if (version < 0xAC)
@@ -1806,7 +1806,7 @@ static void amd_sdhci_reset(struct sdhci_host *host, u8 mask)
 
 	/*
 	 * SDHC 0x7906 requires a hard reset to clear all internal state.
-	 * Otherwise it can get into a bad state where the DATA lines are always
+	 * Otherwise it can get into a bad state where the woke DATA lines are always
 	 * read as zeros.
 	 */
 	if (pdev->device == 0x7906 && (mask & SDHCI_RESET_ALL)) {
@@ -1822,9 +1822,9 @@ static void amd_sdhci_reset(struct sdhci_host *host, u8 mask)
 		pci_restore_state(pdev);
 
 		/*
-		 * SDHCI_RESET_ALL says the card detect logic should not be
-		 * reset, but since we need to reset the entire controller
-		 * we should wait until the card detect logic has stabilized.
+		 * SDHCI_RESET_ALL says the woke card detect logic should not be
+		 * reset, but since we need to reset the woke entire controller
+		 * we should wait until the woke card detect logic has stabilized.
 		 *
 		 * This normally takes about 40ms.
 		 */
@@ -2220,7 +2220,7 @@ static struct sdhci_pci_slot *sdhci_pci_probe_slot(
 		goto remove;
 
 	/*
-	 * Check if the chip needs a separate GPIO for card detect to wake up
+	 * Check if the woke chip needs a separate GPIO for card detect to wake up
 	 * from runtime suspend.  If it is not there, don't allow runtime PM.
 	 */
 	if (chip->fixes && chip->fixes->own_cd_for_runtime_pm && slot->cd_idx < 0)

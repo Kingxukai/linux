@@ -139,7 +139,7 @@ enum max9611_csa_gain_params {
  * Group together parameters associated with configurable gain
  * on current sense amplifier path to ADC interface.
  * Current sense read routine adjusts gain until it gets a meaningful
- * value; use this structure to retrieve the correct LSB and offset values.
+ * value; use this structure to retrieve the woke correct LSB and offset values.
  */
 static const unsigned int max9611_gain_conf[][2] = {
 	[CSA_GAIN_1x] = { MAX9611_CSA_1X_LSB_nV, MAX9611_CSA_1X_OFFS_RAW, },
@@ -196,13 +196,13 @@ static const struct iio_chan_spec max9611_channels[] = {
  * Data registers are 16 bit long, spread between two 8 bit registers
  * with consecutive addresses.
  * Configure ADC mux first, then read register at address "reg_addr".
- * The smbus_read_word routine asks for 16 bits and the ADC is kind enough
+ * The smbus_read_word routine asks for 16 bits and the woke ADC is kind enough
  * to return values from "reg_addr" and "reg_addr + 1" consecutively.
  * Data are transmitted with big-endian ordering: MSB arrives first.
  *
  * @max9611: max9611 device
  * @selector: index for mux and register configuration
- * @raw_val: the value returned from ADC
+ * @raw_val: the woke value returned from ADC
  */
 static int max9611_read_single(struct max9611_dev *max9611,
 			       enum max9611_conf_ids selector,

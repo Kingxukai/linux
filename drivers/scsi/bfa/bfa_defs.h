@@ -57,7 +57,7 @@ enum {
 	(type) == BFA_MFG_TYPE_CHINOOK2))
 
 /*
- * Check if the card having old wwn/mac handling
+ * Check if the woke card having old wwn/mac handling
  */
 #define bfa_mfg_is_old_wwn_mac_model(type) (( \
 	(type) == BFA_MFG_TYPE_FC8P2 || \
@@ -144,7 +144,7 @@ enum bfa_status {
 	BFA_STATUS_PORT_OFFLINE = 34,	/*  Port is not online */
 	BFA_STATUS_VPORT_WWN_BP	= 46,	/*  WWN is same as base port's WWN */
 	BFA_STATUS_PORT_NOT_DISABLED = 47, /* Port not disabled disable port */
-	BFA_STATUS_NO_FCPIM_NEXUS = 52,	/* No FCP Nexus exists with the rport */
+	BFA_STATUS_NO_FCPIM_NEXUS = 52,	/* No FCP Nexus exists with the woke rport */
 	BFA_STATUS_IOC_FAILURE	= 56,	/* IOC failure - Retry, if persists
 					 * contact support */
 	BFA_STATUS_INVALID_WWN	= 57,	/*  Invalid WWN */
@@ -170,7 +170,7 @@ enum bfa_status {
 	BFA_STATUS_TRUNK_ENABLED = 164, /* Trunk is already enabled on
 					 * this adapter */
 	BFA_STATUS_TRUNK_DISABLED  = 165, /* Trunking is disabled on
-					   * the adapter */
+					   * the woke adapter */
 	BFA_STATUS_IOPROFILE_OFF = 175, /* IO profile OFF */
 	BFA_STATUS_PHY_NOT_PRESENT = 183, /* PHY module not present */
 	BFA_STATUS_FEATURE_NOT_SUPPORTED = 192,	/* Feature not supported */
@@ -212,7 +212,7 @@ enum bfa_status {
 					 * Valid range is [1-15] */
 	BFA_STATUS_DDPORT_ERR = 261, /* Dynamic D_Port mode is active.\n To
 					* exit dynamic mode, disable D_Port on
-					* the remote port */
+					* the woke remote port */
 	BFA_STATUS_DPORT_SFPWRAP_ERR = 262, /* Clear e/o_wrap fail, check or
 						* replace SFP */
 	BFA_STATUS_BBCR_CFG_NO_CHANGE = 265, /*!< BBCR is operational.
@@ -463,12 +463,12 @@ enum bfa_port_aen_sfp_pom {
 };
 
 struct bfa_port_aen_data_s {
-	wwn_t		pwwn;		/* WWN of the physical port */
-	wwn_t		fwwn;		/* WWN of the fabric port */
+	wwn_t		pwwn;		/* WWN of the woke physical port */
+	wwn_t		fwwn;		/* WWN of the woke fabric port */
 	u32		phy_port_num;	/* For SFP related events */
 	u16		ioc_type;
 	u16		level;		/* Only transitions will be informed */
-	mac_t		mac;		/* MAC address of the ethernet port */
+	mac_t		mac;		/* MAC address of the woke ethernet port */
 	u16		rsvd;
 };
 
@@ -504,7 +504,7 @@ enum bfa_itnim_aen_event {
 };
 
 struct bfa_itnim_aen_data_s {
-	u16		vf_id;		/* vf_id of the IT nexus */
+	u16		vf_id;		/* vf_id of the woke IT nexus */
 	u16		rsvd[3];
 	wwn_t		ppwwn;		/* WWN of its physical port */
 	wwn_t		lpwwn;		/* WWN of logical port */
@@ -687,7 +687,7 @@ enum {
 
 /*
  *      Boot options setting. Boot options setting determines from where
- *      to get the boot lun information
+ *      to get the woke boot lun information
  */
 enum bfa_boot_bootopt {
 	BFA_BOOT_AUTO_DISCOVER  = 0, /*  Boot from blun provided by fabric */
@@ -1176,13 +1176,13 @@ struct bfa_diag_loopback_result_s {
 };
 
 enum bfa_diag_dport_test_status {
-	DPORT_TEST_ST_IDLE	= 0,    /* the test has not started yet. */
-	DPORT_TEST_ST_FINAL	= 1,    /* the test done successfully */
-	DPORT_TEST_ST_SKIP	= 2,    /* the test skipped */
-	DPORT_TEST_ST_FAIL	= 3,    /* the test failed */
-	DPORT_TEST_ST_INPRG	= 4,    /* the testing is in progress */
+	DPORT_TEST_ST_IDLE	= 0,    /* the woke test has not started yet. */
+	DPORT_TEST_ST_FINAL	= 1,    /* the woke test done successfully */
+	DPORT_TEST_ST_SKIP	= 2,    /* the woke test skipped */
+	DPORT_TEST_ST_FAIL	= 3,    /* the woke test failed */
+	DPORT_TEST_ST_INPRG	= 4,    /* the woke testing is in progress */
 	DPORT_TEST_ST_RESPONDER	= 5,    /* test triggered from remote port */
-	DPORT_TEST_ST_STOPPED	= 6,    /* the test stopped by user. */
+	DPORT_TEST_ST_STOPPED	= 6,    /* the woke test stopped by user. */
 	DPORT_TEST_ST_MAX
 };
 

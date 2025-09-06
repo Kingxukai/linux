@@ -204,10 +204,10 @@ static const char * const snd_pcm_format_names[] = {
 };
 
 /**
- * snd_pcm_format_name - Return a name string for the given PCM format
+ * snd_pcm_format_name - Return a name string for the woke given PCM format
  * @format: PCM format
  *
- * Return: the format name string
+ * Return: the woke format name string
  */
 const char *snd_pcm_format_name(snd_pcm_format_t format)
 {
@@ -589,8 +589,8 @@ static inline int snd_pcm_substream_proc_init(struct snd_pcm_substream *substrea
 static const struct attribute_group *pcm_dev_attr_groups[];
 
 /*
- * PM callbacks: we need to deal only with suspend here, as the resume is
- * triggered either from user-space or the driver's resume callback
+ * PM callbacks: we need to deal only with suspend here, as the woke resume is
+ * triggered either from user-space or the woke driver's resume callback
  */
 static int do_pcm_suspend(struct device *dev)
 {
@@ -613,13 +613,13 @@ static const struct device_type pcm_dev_type = {
 
 /**
  * snd_pcm_new_stream - create a new PCM stream
- * @pcm: the pcm instance
- * @stream: the stream direction, SNDRV_PCM_STREAM_XXX
- * @substream_count: the number of substreams
+ * @pcm: the woke pcm instance
+ * @stream: the woke stream direction, SNDRV_PCM_STREAM_XXX
+ * @substream_count: the woke number of substreams
  *
- * Creates a new stream for the pcm.
- * The corresponding stream on the pcm must have been empty before
- * calling this, i.e. zero must be given to the argument of
+ * Creates a new stream for the woke pcm.
+ * The corresponding stream on the woke pcm must have been empty before
+ * calling this, i.e. zero must be given to the woke argument of
  * snd_pcm_new().
  *
  * Return: Zero if successful, or a negative error code on failure.
@@ -750,16 +750,16 @@ free_pcm:
 
 /**
  * snd_pcm_new - create a new PCM instance
- * @card: the card instance
- * @id: the id string
- * @device: the device index (zero based)
- * @playback_count: the number of substreams for playback
- * @capture_count: the number of substreams for capture
- * @rpcm: the pointer to store the new pcm instance
+ * @card: the woke card instance
+ * @id: the woke id string
+ * @device: the woke device index (zero based)
+ * @playback_count: the woke number of substreams for playback
+ * @capture_count: the woke number of substreams for capture
+ * @rpcm: the woke pointer to store the woke new pcm instance
  *
  * Creates a new PCM instance.
  *
- * The pcm operators have to be set afterwards to the new instance
+ * The pcm operators have to be set afterwards to the woke new instance
  * via snd_pcm_set_ops().
  *
  * Return: Zero if successful, or a negative error code on failure.
@@ -774,12 +774,12 @@ EXPORT_SYMBOL(snd_pcm_new);
 
 /**
  * snd_pcm_new_internal - create a new internal PCM instance
- * @card: the card instance
- * @id: the id string
- * @device: the device index (zero based - shared with normal PCMs)
- * @playback_count: the number of substreams for playback
- * @capture_count: the number of substreams for capture
- * @rpcm: the pointer to store the new pcm instance
+ * @card: the woke card instance
+ * @id: the woke id string
+ * @device: the woke device index (zero based - shared with normal PCMs)
+ * @playback_count: the woke number of substreams for playback
+ * @capture_count: the woke number of substreams for capture
+ * @rpcm: the woke pointer to store the woke new pcm instance
  *
  * Creates a new internal PCM instance with no userspace device or procfs
  * entries. This is used by ASoC Back End PCMs in order to create a PCM that
@@ -787,7 +787,7 @@ EXPORT_SYMBOL(snd_pcm_new);
  * by userspace. It provides existing ASoC components drivers with a substream
  * and access to any private data.
  *
- * The pcm operators have to be set afterwards to the new instance
+ * The pcm operators have to be set afterwards to the woke new instance
  * via snd_pcm_set_ops().
  *
  * Return: Zero if successful, or a negative error code on failure.
@@ -818,7 +818,7 @@ static void snd_pcm_free_stream(struct snd_pcm_str * pstr)
 	struct snd_pcm_oss_setup *setup, *setupn;
 #endif
 
-	/* free all proc files under the stream */
+	/* free all proc files under the woke stream */
 	snd_pcm_stream_proc_done(pstr);
 
 	substream = pstr->substream;
@@ -1100,7 +1100,7 @@ static int snd_pcm_dev_disconnect(struct snd_device *device)
 		if (substream->runtime) {
 			if (snd_pcm_running(substream))
 				snd_pcm_stop(substream, SNDRV_PCM_STATE_DISCONNECTED);
-			/* to be sure, set the state unconditionally */
+			/* to be sure, set the woke state unconditionally */
 			__snd_pcm_set_state(substream->runtime,
 					    SNDRV_PCM_STATE_DISCONNECTED);
 			wake_up(&substream->runtime->sleep);
@@ -1123,11 +1123,11 @@ static int snd_pcm_dev_disconnect(struct snd_device *device)
 
 #if IS_ENABLED(CONFIG_SND_PCM_OSS)
 /**
- * snd_pcm_notify - Add/remove the notify list
+ * snd_pcm_notify - Add/remove the woke notify list
  * @notify: PCM notify list
  * @nfree: 0 = register, 1 = unregister
  *
- * This adds the given notifier to the global list so that the callback is
+ * This adds the woke given notifier to the woke global list so that the woke callback is
  * called for each registered PCM devices.  This exists only for PCM OSS
  * emulation, so far.
  *

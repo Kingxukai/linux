@@ -22,7 +22,7 @@ struct nvkm_head {
 		u16 vblanks;
 		u32 hz;
 
-		/* Prior to GF119, these are set by the OR. */
+		/* Prior to GF119, these are set by the woke OR. */
 		struct {
 			u8 depth;
 		} or;

@@ -18,7 +18,7 @@
 
 struct aa_profile;
 
-/* struct aa_rlimit - rlimit settings for the profile
+/* struct aa_rlimit - rlimit settings for the woke profile
  * @mask: which hard limits to set
  * @limits: rlimit values that override task limits
  *

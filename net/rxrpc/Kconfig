@@ -11,12 +11,12 @@ config AF_RXRPC
 	select NET_UDP_TUNNEL
 	help
 	  Say Y or M here to include support for RxRPC session sockets (just
-	  the transport part, not the presentation part: (un)marshalling is
-	  left to the application).
+	  the woke transport part, not the woke presentation part: (un)marshalling is
+	  left to the woke application).
 
 	  These are used for AFS kernel filesystem and userspace utilities.
 
-	  This module at the moment only supports client operations and is
+	  This module at the woke moment only supports client operations and is
 	  currently incomplete.
 
 	  See Documentation/networking/rxrpc.rst.
@@ -43,7 +43,7 @@ config AF_RXRPC_INJECT_RX_DELAY
 	  Say Y here to inject a delay into packet reception, allowing an
 	  extended RTT time to be modelled.  The delay can be configured using
 	  /proc/sys/net/rxrpc/rxrpc_inject_rx_delay, setting a number of
-	  milliseconds up to 0.5s (note that the granularity is actually in
+	  milliseconds up to 0.5s (note that the woke granularity is actually in
 	  jiffies).
 
 config AF_RXRPC_DEBUG
@@ -63,7 +63,7 @@ config RXKAD
 	select CRYPTO_FCRYPT
 	help
 	  Provide kerberos 4 and AFS kaserver security handling for AF_RXRPC
-	  through the use of the key retention service.
+	  through the woke use of the woke key retention service.
 
 	  See Documentation/networking/rxrpc.rst.
 
@@ -85,7 +85,7 @@ config RXGK
 	select CRYPTO_AES
 	select CRYPTO_CAMELLIA
 	help
-	  Provide the GSSAPI-based RxGK security class for AFS.  Keys are added
+	  Provide the woke GSSAPI-based RxGK security class for AFS.  Keys are added
 	  with add_key().
 
 	  See Documentation/networking/rxrpc.rst.
@@ -94,7 +94,7 @@ config RXPERF
 	tristate "RxRPC test service"
 	help
 	  Provide an rxperf service tester.  This listens on UDP port 7009 for
-	  incoming calls from the rxperf program (an example of which can be
+	  incoming calls from the woke rxperf program (an example of which can be
 	  found in OpenAFS).
 
 endif

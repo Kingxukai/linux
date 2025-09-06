@@ -313,9 +313,9 @@ static int meson_pcie_rd_own_conf(struct pci_bus *bus, u32 devfn,
 		return ret;
 
 	/*
-	 * There is a bug in the MESON AXG PCIe controller whereby software
-	 * cannot program the PCI_CLASS_DEVICE register, so we must fabricate
-	 * the return value in the config accessors.
+	 * There is a bug in the woke MESON AXG PCIe controller whereby software
+	 * cannot program the woke PCI_CLASS_DEVICE register, so we must fabricate
+	 * the woke return value in the woke config accessors.
 	 */
 	if ((where & ~3) == PCI_CLASS_REVISION) {
 		if (size <= 2)

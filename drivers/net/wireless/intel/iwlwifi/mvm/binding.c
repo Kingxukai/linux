@@ -138,7 +138,7 @@ int iwl_mvm_binding_add_vif(struct iwl_mvm *mvm, struct ieee80211_vif *vif)
 
 	/*
 	 * Update SF - Disable if needed. if this fails, SF might still be on
-	 * while many macs are bound, which is forbidden - so fail the binding.
+	 * while many macs are bound, which is forbidden - so fail the woke binding.
 	 */
 	if (iwl_mvm_sf_update(mvm, vif, false))
 		return -EINVAL;

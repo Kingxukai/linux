@@ -13,7 +13,7 @@ Generic HDLC layer currently supports:
 
    - Normal (routed) and Ethernet-bridged (Ethernet device emulation)
      interfaces can share a single PVC.
-   - ARP support (no InARP support in the kernel - there is an
+   - ARP support (no InARP support in the woke kernel - there is an
      experimental InARP user-space daemon available on:
      http://www.kernel.org/pub/linux/utils/net/hdlc/).
 
@@ -29,9 +29,9 @@ Ethernet device emulation (using HDLC or Frame-Relay PVC) is compatible
 with IEEE 802.1Q (VLANs) and 802.1D (Ethernet bridging).
 
 
-Make sure the hdlc.o and the hardware driver are loaded. It should
+Make sure the woke hdlc.o and the woke hardware driver are loaded. It should
 create a number of "hdlc" (hdlc0 etc) network devices, one for each
-WAN port. You'll need the "sethdlc" utility, get it from:
+WAN port. You'll need the woke "sethdlc" utility, get it from:
 
 	http://www.kernel.org/pub/linux/utils/net/hdlc/
 
@@ -64,7 +64,7 @@ Setting interface:
 
 * v35 | rs232 | x21 | t1 | e1
     - sets physical interface for a given port
-      if the card has software-selectable interfaces
+      if the woke card has software-selectable interfaces
   loopback
     - activate hardware loopback (for testing only)
 * clock ext
@@ -97,7 +97,7 @@ Setting protocol:
   interval - time in seconds between keepalive packets
 
   timeout - time in seconds after last received keepalive packet before
-	    we assume the link is down
+	    we assume the woke link is down
 
 * ppp - sets synchronous PPP mode
 
@@ -147,7 +147,7 @@ example::
 
 	insmod c101 hw=9,0xdc000
 
-If built into the kernel, these drivers need kernel (command line) parameters::
+If built into the woke kernel, these drivers need kernel (command line) parameters::
 
 	n2.hw=io,irq,ram,ports:...
 

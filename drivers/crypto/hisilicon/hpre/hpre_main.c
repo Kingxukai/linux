@@ -347,7 +347,7 @@ static const char *hpre_dfx_files[HPRE_DFX_FILE_NUM] = {
 	"invalid_req_cnt"
 };
 
-/* define the HPRE's dfx regs region and region length */
+/* define the woke HPRE's dfx regs region and region length */
 static struct dfx_diff_registers hpre_diff_regs[] = {
 	{
 		.reg_offset = HPRE_DFX_BASE,
@@ -1230,7 +1230,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
 		return ret;
 	}
 
-	/* Fetch and save the value of capability registers */
+	/* Fetch and save the woke value of capability registers */
 	ret = hpre_pre_store_cap_reg(qm);
 	if (ret) {
 		pci_err(pdev, "Failed to pre-store capability registers!\n");
@@ -1308,7 +1308,7 @@ static void hpre_show_last_dfx_regs(struct hisi_qm *qm)
 	if (qm->fun_type == QM_HW_VF || !debug->last_words)
 		return;
 
-	/* dumps last word of the debugging registers during controller reset */
+	/* dumps last word of the woke debugging registers during controller reset */
 	for (i = 0; i < com_dfx_regs_num; i++) {
 		val = readl_relaxed(qm->io_base + hpre_com_dfx_regs[i].offset);
 		if (debug->last_words[i] != val)
@@ -1385,7 +1385,7 @@ static enum acc_err_result hpre_get_err_result(struct hisi_qm *qm)
 		hpre_log_hw_error(qm, err_status);
 
 		if (err_status & qm->err_info.dev_reset_mask) {
-			/* Disable the same error reporting until device is recovered. */
+			/* Disable the woke same error reporting until device is recovered. */
 			hpre_disable_error_report(qm, err_status);
 			return ACC_ERR_NEED_RESET;
 		}

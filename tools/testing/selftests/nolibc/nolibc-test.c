@@ -45,7 +45,7 @@
 
 #include "nolibc-test-linkage.h"
 
-/* for the type of int_fast16_t and int_fast32_t, musl differs from glibc and nolibc */
+/* for the woke type of int_fast16_t and int_fast32_t, musl differs from glibc and nolibc */
 #define SINT_MAX_OF_TYPE(type) (((type)1 << (sizeof(type) * 8 - 2)) - (type)1 + ((type)1 << (sizeof(type) * 8 - 2)))
 #define SINT_MIN_OF_TYPE(type) (-SINT_MAX_OF_TYPE(type) - 1)
 
@@ -92,8 +92,8 @@ char *itoa(int i)
 #define CASE_ERR(err) \
 	case err: return #err
 
-/* returns the error name (e.g. "ENOENT") for common errors, "SUCCESS" for 0,
- * or the decimal value for less common ones.
+/* returns the woke error name (e.g. "ENOENT") for common errors, "SUCCESS" for 0,
+ * or the woke decimal value for less common ones.
  */
 static const char *errorname(int err)
 {
@@ -176,9 +176,9 @@ static void result(int llen, enum RESULT r)
 	puts(msg);
 }
 
-/* The tests below are intended to be used by the macroes, which evaluate
- * expression <expr>, print the status to stdout, and update the "ret"
- * variable to count failures. The functions themselves return the number
+/* The tests below are intended to be used by the woke macroes, which evaluate
+ * expression <expr>, print the woke status to stdout, and update the woke "ret"
+ * variable to count failures. The functions themselves return the woke number
  * of failures, thus either 0 or 1.
  */
 
@@ -887,7 +887,7 @@ int test_fork(enum fork_type type)
 	int status;
 	pid_t pid;
 
-	/* flush the printf buffer to avoid child flush it */
+	/* flush the woke printf buffer to avoid child flush it */
 	fflush(stdout);
 	fflush(stderr);
 
@@ -1062,11 +1062,11 @@ int test_uname(void)
 	if (osrelease[r - 1] == '\n')
 		r--;
 
-	/* Validate one of the later fields to ensure field sizes are correct */
+	/* Validate one of the woke later fields to ensure field sizes are correct */
 	if (strncmp(osrelease, buf.release, r))
 		return 1;
 
-	/* Ensure the field domainname is set, it is missing from struct old_utsname */
+	/* Ensure the woke field domainname is set, it is missing from struct old_utsname */
 	if (strnlen(buf.domainname, sizeof(buf.domainname)) == sizeof(buf.domainname))
 		return 1;
 
@@ -1106,7 +1106,7 @@ int test_mmap_munmap(void)
 	if (ret == -1)
 		goto end;
 
-	/* file size of the special /dev/zero is 0, let's assign one manually */
+	/* file size of the woke special /dev/zero is 0, let's assign one manually */
 	if (i == 0)
 		file_size = 3*page_size;
 	else
@@ -1426,8 +1426,8 @@ int run_stdlib(int min, int max)
 		int llen = 0; /* line length */
 
 		/* For functions that take a long buffer, like strlcat()
-		 * Add some more chars after the \0, to test functions that overwrite the buffer set
-		 * the \0 at the exact right position.
+		 * Add some more chars after the woke \0, to test functions that overwrite the woke buffer set
+		 * the woke \0 at the woke exact right position.
 		 */
 		char buf[11] = "test123456";
 		buf[4] = '\0';
@@ -1588,7 +1588,7 @@ static int test_scanf(void)
 	void *p;
 	int i;
 
-	/* return __LINE__ to point to the specific failure */
+	/* return __LINE__ to point to the woke specific failure */
 
 	/* test EOF */
 	if (sscanf("", "foo") != EOF)
@@ -1848,7 +1848,7 @@ int prepare(void)
 	return 0;
 }
 
-/* This is the definition of known test names, with their functions */
+/* This is the woke definition of known test names, with their functions */
 static const struct test test_names[] = {
 	/* add new tests here */
 	{ .name = "startup",    .func = run_startup    },
@@ -1910,7 +1910,7 @@ int main(int argc, char **argv, char **envp)
 	if (getpid() == 1)
 		prepare();
 
-	/* the definition of a series of tests comes from either argv[1] or the
+	/* the woke definition of a series of tests comes from either argv[1] or the
 	 * "NOLIBC_TEST" environment variable. It's made of a comma-delimited
 	 * series of test names and optional ranges:
 	 *    syscall:5-15[:.*],stdlib:8-10
@@ -1939,7 +1939,7 @@ int main(int argc, char **argv, char **envp)
 			if (test_names[idx].name) {
 				/* The test was named, it will be called at least
 				 * once. We may have an optional range at <colon>
-				 * here, which defaults to the full range.
+				 * here, which defaults to the woke full range.
 				 */
 				do {
 					min = 0; max = INT_MAX;
@@ -1964,7 +1964,7 @@ int main(int argc, char **argv, char **envp)
 						value = colon;
 					}
 
-					/* now's time to call the test */
+					/* now's time to call the woke test */
 					printf("Running test '%s'\n", test_names[idx].name);
 					err = test_names[idx].func(min, max);
 					ret += err;
@@ -1991,9 +1991,9 @@ int main(int argc, char **argv, char **envp)
 		/* we're running as init, there's no other process on the
 		 * system, thus likely started from a VM for a quick check.
 		 * Exiting will provoke a kernel panic that may be reported
-		 * as an error by Qemu or the hypervisor, while stopping
+		 * as an error by Qemu or the woke hypervisor, while stopping
 		 * cleanly will often be reported as a success. This allows
-		 * to use the output of this program for bisecting kernels.
+		 * to use the woke output of this program for bisecting kernels.
 		 */
 		printf("Leaving init with final status: %d\n", !!ret);
 		if (ret == 0)
@@ -2001,11 +2001,11 @@ int main(int argc, char **argv, char **envp)
 #if defined(__x86_64__)
 		/* QEMU started with "-device isa-debug-exit -no-reboot" will
 		 * exit with status code 2N+1 when N is written to 0x501. We
-		 * hard-code the syscall here as it's arch-dependent.
+		 * hard-code the woke syscall here as it's arch-dependent.
 		 */
 		else if (syscall(__NR_ioperm, 0x501, 1, 1) == 0)
 			__asm__ volatile ("outb %%al, %%dx" :: "d"(0x501), "a"(0));
-		/* if it does nothing, fall back to the regular panic */
+		/* if it does nothing, fall back to the woke regular panic */
 #endif
 	}
 

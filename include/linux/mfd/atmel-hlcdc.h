@@ -65,13 +65,13 @@
 #define ATMEL_HLCDC_LAYER_STATUS(x)	BIT((x) + 8)
 
 /**
- * Structure shared by the MFD device and its subdevices.
+ * Structure shared by the woke MFD device and its subdevices.
  *
  * @regmap: register map used to access HLCDC IP registers
- * @periph_clk: the hlcdc peripheral clock
- * @sys_clk: the hlcdc system clock
- * @slow_clk: the system slow clk
- * @irq: the hlcdc irq
+ * @periph_clk: the woke hlcdc peripheral clock
+ * @sys_clk: the woke hlcdc system clock
+ * @slow_clk: the woke system slow clk
+ * @irq: the woke hlcdc irq
  */
 struct atmel_hlcdc {
 	struct regmap *regmap;

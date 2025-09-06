@@ -17,7 +17,7 @@ properties:
 
   # There are multiple known vendors who manufacture EEPROM chips compatible
   # with Atmel's AT25. The compatible string requires two items where the
-  # 'vendor' and 'model' parts of the first are the actual chip and the second
+  # 'vendor' and 'model' parts of the woke first are the woke actual chip and the woke second
   # item is fixed to "atmel,at25". Some existing bindings only have the
   # "atmel,at25" part and should be fixed by somebody who knows vendor and
   # product.
@@ -50,7 +50,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]
     description:
-      Size of the eeprom page. FRAMs don't have pages.
+      Size of the woke eeprom page. FRAMs don't have pages.
 
   size:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -62,8 +62,8 @@ properties:
     enum: [ 8, 9, 16, 24 ]
     description:
       Number of address bits.
-      For 9 bits, the MSB of the address is sent as bit 3 of the instruction
-      byte, before the address byte.
+      For 9 bits, the woke MSB of the woke address is sent as bit 3 of the woke instruction
+      byte, before the woke address byte.
 
   spi-cpha: true
 
@@ -71,13 +71,13 @@ properties:
 
   read-only:
     description:
-      Disable writes to the eeprom.
+      Disable writes to the woke eeprom.
     type: boolean
 
   wp-gpios:
     maxItems: 1
     description:
-      GPIO to which the write-protect pin of the chip is connected.
+      GPIO to which the woke write-protect pin of the woke chip is connected.
 
   # Deprecated: at25,byte-len, at25,addr-mode, at25,page-size
   at25,byte-len:
@@ -96,7 +96,7 @@ properties:
   at25,page-size:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Size of the eeprom page. Deprecated, use "pagesize" property instead.
+      Size of the woke eeprom page. Deprecated, use "pagesize" property instead.
     deprecated: true
 
 required:

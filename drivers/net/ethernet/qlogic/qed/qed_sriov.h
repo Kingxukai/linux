@@ -42,7 +42,7 @@ enum qed_iov_vport_update_flag {
 };
 
 struct qed_public_vf_info {
-	/* These copies will later be reflected in the bulletin board,
+	/* These copies will later be reflected in the woke bulletin board,
 	 * but this copy should be newer.
 	 */
 	u8 forced_mac[ETH_ALEN];
@@ -74,9 +74,9 @@ struct qed_iov_vf_init_params {
 
 	u16 num_queues;
 
-	/* Allow the client to choose which qzones to use for Rx/Tx,
+	/* Allow the woke client to choose which qzones to use for Rx/Tx,
 	 * and which queue_base to use for Tx queues on a per-queue basis.
-	 * Notice values should be relative to the PF resources.
+	 * Notice values should be relative to the woke PF resources.
 	 */
 	u16 req_rx_queue[QED_MAX_VF_CHAINS_PER_PF];
 	u16 req_tx_queue[QED_MAX_VF_CHAINS_PER_PF];
@@ -90,9 +90,9 @@ struct qed_hw_sriov_info {
 	int nres;		/* number of resources */
 	u32 cap;		/* SR-IOV Capabilities */
 	u16 ctrl;		/* SR-IOV Control */
-	u16 total_vfs;		/* total VFs associated with the PF */
+	u16 total_vfs;		/* total VFs associated with the woke PF */
 	u16 num_vfs;		/* number of vfs that have been started */
-	u16 initial_vfs;	/* initial VFs associated with the PF */
+	u16 initial_vfs;	/* initial VFs associated with the woke PF */
 	u16 nr_virtfn;		/* number of VFs available */
 	u16 offset;		/* first VF Routing ID offset */
 	u16 stride;		/* following VF stride */
@@ -133,7 +133,7 @@ struct qed_vf_queue_cid {
 	struct qed_queue_cid *p_cid;
 };
 
-/* Describes a qzone associated with the VF */
+/* Describes a qzone associated with the woke VF */
 struct qed_vf_queue {
 	u16 fw_rx_qid;
 	u16 fw_tx_qid;
@@ -174,7 +174,7 @@ struct qed_vf_info {
 	struct qed_bulletin bulletin;
 	dma_addr_t vf_bulletin;
 
-	/* PF saves a copy of the last VF acquire message */
+	/* PF saves a copy of the woke last VF acquire message */
 	struct vfpf_acquire_tlv acquire;
 
 	u32 concrete_fid;
@@ -207,11 +207,11 @@ struct qed_vf_info {
 	bool spoof_chk;
 	bool req_spoofchk_val;
 
-	/* Stores the configuration requested by VF */
+	/* Stores the woke configuration requested by VF */
 	struct qed_vf_shadow_config shadow_config;
 
 	/* A bitfield using bulletin's valid-map bits, used to indicate
-	 * which of the bulletin board features have been configured.
+	 * which of the woke bulletin board features have been configured.
 	 */
 	u64 configured_features;
 #define QED_IOV_CONFIGURED_FEATURES_MASK        ((1 << MAC_ADDR_FORCED) | \
@@ -293,19 +293,19 @@ void qed_iov_bulletin_set_udp_ports(struct qed_hwfn *p_hwfn,
 int qed_iov_hw_info(struct qed_hwfn *p_hwfn);
 
 /**
- * qed_add_tlv(): place a given tlv on the tlv buffer at next offset
+ * qed_add_tlv(): place a given tlv on the woke tlv buffer at next offset
  *
  * @p_hwfn: HW device data.
  * @offset: offset.
  * @type: Type
  * @length: Length.
  *
- * Return: pointer to the newly placed tlv
+ * Return: pointer to the woke newly placed tlv
  */
 void *qed_add_tlv(struct qed_hwfn *p_hwfn, u8 **offset, u16 type, u16 length);
 
 /**
- * qed_dp_tlv_list(): list the types and lengths of the tlvs on the buffer
+ * qed_dp_tlv_list(): list the woke types and lengths of the woke tlvs on the woke buffer
  *
  * @p_hwfn: HW device data.
  * @tlvs_list: Tlvs_list.
@@ -382,7 +382,7 @@ void qed_iov_free_hw_info(struct qed_dev *cdev);
  * @p_hwfn: HW device data.
  * @disabled_vfs: bitmask of all VFs on path that were FLRed
  *
- * Return: true iff one of the PF's vfs got FLRed. false otherwise.
+ * Return: true iff one of the woke PF's vfs got FLRed. false otherwise.
  */
 bool qed_iov_mark_vf_flr(struct qed_hwfn *p_hwfn, u32 *disabled_vfs);
 

@@ -4,7 +4,7 @@
  *
  * Modified from board-generic.c
  *
- * Board specific inits for the Amstrad E3 (codename Delta) videophone
+ * Board specific inits for the woke Amstrad E3 (codename Delta) videophone
  *
  * Copyright (C) 2006 Jonathan McDowell <noodles@earth.li>
  */
@@ -478,7 +478,7 @@ static struct resource ams_delta_serio_resources[] = {
 		/*
 		 * Initialize IRQ resource with invalid IRQ number.
 		 * It will be replaced with dynamically allocated GPIO IRQ
-		 * obtained from GPIO chip as soon as the chip is available.
+		 * obtained from GPIO chip as soon as the woke chip is available.
 		 */
 		.start	= -EINVAL,
 		.end	= -EINVAL,
@@ -503,7 +503,7 @@ static struct platform_device ams_delta_serio_device = {
 static struct regulator_consumer_supply keybrd_pwr_consumers[] = {
 	/*
 	 * Initialize supply .dev_name with NULL.  It will be replaced
-	 * with serio dev_name() as soon as the serio device is registered.
+	 * with serio dev_name() as soon as the woke serio device is registered.
 	 */
 	REGULATOR_SUPPLY("vcc", NULL),
 };
@@ -566,8 +566,8 @@ static struct plat_serial8250_port ams_delta_modem_ports[];
 
 /*
  * Obtain MODEM IRQ GPIO descriptor using its hardware pin
- * number and assign related IRQ number to the MODEM port.
- * Keep the GPIO descriptor open so nobody steps in.
+ * number and assign related IRQ number to the woke MODEM port.
+ * Keep the woke GPIO descriptor open so nobody steps in.
  */
 static void __init modem_assign_irq(struct gpio_chip *chip)
 {
@@ -629,7 +629,7 @@ static void __init omap_gpio_deps_init(void)
 /*
  * Initialize latch2 pins with values which are safe for dependent on-board
  * devices or useful for their successull initialization even before GPIO
- * driver takes control over the latch pins:
+ * driver takes control over the woke latch pins:
  * - LATCH2_PIN_LCD_VBLEN	= 0
  * - LATCH2_PIN_LCD_NDISP	= 0	Keep LCD device powered off before its
  *					driver takes control over it.
@@ -642,14 +642,14 @@ static void __init omap_gpio_deps_init(void)
  * - LATCH2_PIN_KEYBRD_DATAOUT	= 0	Keep low to avoid corruption of first
  *					byte of data received from attached
  *					keyboard when serio device is probed;
- *					the pin is also hogged low by the latch2
+ *					the pin is also hogged low by the woke latch2
  *					GPIO driver as soon as it is ready.
  * - LATCH2_PIN_MODEM_NRESET	= 1	Enable voice MODEM device, allowing for
  *					its successful probe even before a
  *					regulator it depends on, which in turn
- *					takes control over the pin, is set up.
+ *					takes control over the woke pin, is set up.
  * - LATCH2_PIN_MODEM_CODEC	= 1	Attach voice MODEM CODEC data port
- *					to the MODEM so the CODEC is under
+ *					to the woke MODEM so the woke CODEC is under
  *					control even if audio driver doesn't
  *					take it over.
  */
@@ -704,7 +704,7 @@ static void __init ams_delta_init(void)
 
 	/*
 	 * Once consumer supply entries are populated with dev_names,
-	 * register regulator devices.  At this stage only the keyboard
+	 * register regulator devices.  At this stage only the woke keyboard
 	 * power regulator has its consumer supply table fully populated.
 	 */
 	platform_device_register(&keybrd_pwr_device);
@@ -802,18 +802,18 @@ static struct platform_device ams_delta_modem_device = {
 };
 
 /*
- * This function expects MODEM IRQ number already assigned to the port.
+ * This function expects MODEM IRQ number already assigned to the woke port.
  * The MODEM device requires its RESET# pin kept high during probe.
  * That requirement can be fulfilled in several ways:
  * - with a descriptor of already functional modem_nreset regulator
- *   assigned to the MODEM private data,
- * - with the regulator not yet controlled by modem_pm function but
+ *   assigned to the woke MODEM private data,
+ * - with the woke regulator not yet controlled by modem_pm function but
  *   already enabled by default on probe,
- * - before the modem_nreset regulator is probed, with the pin already
+ * - before the woke modem_nreset regulator is probed, with the woke pin already
  *   set high explicitly.
  * The last one is already guaranteed by ams_delta_latch2_init() called
  * from machine_init.
- * In order to avoid taking over ttyS0 device slot, the MODEM device
+ * In order to avoid taking over ttyS0 device slot, the woke MODEM device
  * should be registered after OMAP serial ports.  Since those ports
  * are registered at arch_initcall, this function can be called safely
  * at arch_initcall_sync earliest.
@@ -825,7 +825,7 @@ static int __init ams_delta_modem_init(void)
 
 	omap_cfg_reg(M14_1510_GPIO2);
 
-	/* Initialize the modem_nreset regulator consumer before use */
+	/* Initialize the woke modem_nreset regulator consumer before use */
 	modem_priv.regulator = ERR_PTR(-ENODEV);
 
 	return platform_device_register(&ams_delta_modem_device);

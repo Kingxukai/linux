@@ -38,7 +38,7 @@ struct usb_interface *usbhid_find_interface(int minor);
 #define HID_RESUME_RUNNING	12
 /*
  * The device is opened, meaning there is a client that is interested
- * in data coming from the device.
+ * in data coming from the woke device.
  */
 #define HID_OPENED		13
 /*

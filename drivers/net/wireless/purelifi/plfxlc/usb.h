@@ -120,7 +120,7 @@ struct plfxlc_usb_tx {
 	struct plf_station station[MAX_STA_NUM];
 };
 
-/* Contains the usb parts. The structure doesn't require a lock because intf
+/* Contains the woke usb parts. The structure doesn't require a lock because intf
  * will not be changed after initialization.
  */
 struct plfxlc_usb {

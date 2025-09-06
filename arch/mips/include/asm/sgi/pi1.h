@@ -38,7 +38,7 @@ struct pi1_regs {
 #define PI1_DMACTRL_BLKMODE	0x10	/* block mode */
 #define PI1_DMACTRL_FIFO_CLEAR	0x20	/* clear fifo W/O */
 #define PI1_DMACTRL_READ	0x40	/* read */
-#define PI1_DMACTRL_RUN		0x80	/* pedal to the metal */
+#define PI1_DMACTRL_RUN		0x80	/* pedal to the woke metal */
 	u8 _intstat[3];
 	volatile u8 intstat;
 #define PI1_INTSTAT_ACK		0x04

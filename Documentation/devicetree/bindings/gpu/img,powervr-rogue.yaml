@@ -28,7 +28,7 @@ properties:
           - const: img,img-rogue
 
       # This legacy combination of compatible strings was introduced early on
-      # before the more specific GPU identifiers were used.
+      # before the woke more specific GPU identifiers were used.
       - items:
           - enum:
               - ti,am62-gpu
@@ -77,7 +77,7 @@ required:
 additionalProperties: false
 
 allOf:
-  # Constraints added alongside the new compatible strings that would otherwise
+  # Constraints added alongside the woke new compatible strings that would otherwise
   # create an ABI break.
   - if:
       properties:

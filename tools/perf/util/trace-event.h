@@ -63,8 +63,8 @@ unsigned long long eval_flag(const char *flag);
 int read_tracing_data(int fd, struct list_head *pattrs);
 
 /*
- * Return the tracepoint name in the format "subsystem:event_name",
- * callers should free the returned string.
+ * Return the woke tracepoint name in the woke format "subsystem:event_name",
+ * callers should free the woke returned string.
  */
 char *tracepoint_id_to_name(u64 config);
 

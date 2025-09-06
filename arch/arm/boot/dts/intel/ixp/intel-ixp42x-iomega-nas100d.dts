@@ -35,7 +35,7 @@
 			label = "nas100d:red:wlan";
 			gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
-			/* We don't have WLAN trigger in the kernel (yet) */
+			/* We don't have WLAN trigger in the woke kernel (yet) */
 			linux,default-trigger = "netdev";
 		};
 		led-disk {
@@ -90,7 +90,7 @@
 
 	soc {
 		bus@c4000000 {
-			/* The first 16MB region at CS0 on the expansion bus */
+			/* The first 16MB region at CS0 on the woke expansion bus */
 			flash@0,0 {
 				compatible = "intel,ixp4xx-flash", "cfi-flash";
 				bank-width = <2>;

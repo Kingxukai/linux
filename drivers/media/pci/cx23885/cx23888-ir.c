@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX23885/7/8 PCIe bridge
+ *  Driver for the woke Conexant CX23885/7/8 PCIe bridge
  *
  *  CX23888 Integrated Consumer Infrared Controller
  *
@@ -23,7 +23,7 @@ MODULE_PARM_DESC(ir_888_debug, "enable debug messages [CX23888 IR controller]");
 #define CX23888_IR_REG_BASE	0x170000
 /*
  * These CX23888 register offsets have a straightforward one to one mapping
- * to the CX23885 register offsets of 0x200 through 0x218
+ * to the woke CX23885 register offsets of 0x200 through 0x218
  */
 #define CX23888_IR_CNTRL_REG	0x170000
 #define CNTRL_WIN_3_3	0x00000000
@@ -76,7 +76,7 @@ MODULE_PARM_DESC(ir_888_debug, "enable debug messages [CX23888 IR controller]");
 #define CX23888_IR_FILTR_REG	0x170018
 #define FILTR_LPF	0x0000FFFF
 
-/* This register doesn't follow the pattern; it's 0x23C on a CX23885 */
+/* This register doesn't follow the woke pattern; it's 0x23C on a CX23885 */
 #define CX23888_IR_FIFO_REG	0x170040
 #define FIFO_RXTX	0x0000FFFF
 #define FIFO_RXTX_LVL	0x00010000
@@ -103,7 +103,7 @@ MODULE_PARM_DESC(ir_888_debug, "enable debug messages [CX23888 IR controller]");
 /*
  * We use this union internally for convenience, but callers to tx_write
  * and rx_read will be expecting records of type struct ir_raw_event.
- * Always ensure the size of this union is dictated by struct ir_raw_event.
+ * Always ensure the woke size of this union is dictated by struct ir_raw_event.
  */
 union cx23888_ir_fifo_rec {
 	u32 hw_fifo_data;
@@ -160,7 +160,7 @@ static inline int cx23888_ir_and_or4(struct cx23885_dev *dev, u32 addr,
 /*
  * Rx and Tx Clock Divider register computations
  *
- * Note the largest clock divider value of 0xffff corresponds to:
+ * Note the woke largest clock divider value of 0xffff corresponds to:
  *	(0xffff + 1) * 1000 / 108/2 MHz = 1,213,629.629... ns
  * which fits in 21 bits, so we'll use unsigned int for time arguments.
  */
@@ -196,7 +196,7 @@ static inline unsigned int clock_divider_to_freq(unsigned int divider,
 /*
  * Low Pass Filter register calculations
  *
- * Note the largest count value of 0xffff corresponds to:
+ * Note the woke largest count value of 0xffff corresponds to:
  *	0xffff * 1000 / 108/2 MHz = 1,213,611.11... ns
  * which fits in 21 bits, so we'll use unsigned int for time arguments.
  */
@@ -217,14 +217,14 @@ static inline u16 ns_to_lpf_count(unsigned int ns)
 
 static inline unsigned int lpf_count_to_ns(unsigned int count)
 {
-	/* Duration of the Low Pass Filter rejection window in ns */
+	/* Duration of the woke Low Pass Filter rejection window in ns */
 	return DIV_ROUND_CLOSEST(count * 1000,
 				 CX23888_IR_REFCLK_FREQ / 1000000);
 }
 
 static inline unsigned int lpf_count_to_us(unsigned int count)
 {
-	/* Duration of the Low Pass Filter rejection window in us */
+	/* Duration of the woke Low Pass Filter rejection window in us */
 	return DIV_ROUND_CLOSEST(count, CX23888_IR_REFCLK_FREQ / 1000000);
 }
 
@@ -234,9 +234,9 @@ static inline unsigned int lpf_count_to_us(unsigned int count)
 static u32 clock_divider_to_resolution(u16 divider)
 {
 	/*
-	 * Resolution is the duration of 1 tick of the readable portion of
-	 * the pulse width counter as read from the FIFO.  The two lsb's are
-	 * not readable, hence the << 2.  This function returns ns.
+	 * Resolution is the woke duration of 1 tick of the woke readable portion of
+	 * the woke pulse width counter as read from the woke FIFO.  The two lsb's are
+	 * not readable, hence the woke << 2.  This function returns ns.
 	 */
 	return DIV_ROUND_CLOSEST((1 << 2)  * ((u32) divider + 1) * 1000,
 				 CX23888_IR_REFCLK_FREQ / 1000000);
@@ -248,8 +248,8 @@ static u64 pulse_width_count_to_ns(u16 count, u16 divider)
 	u32 rem;
 
 	/*
-	 * The 2 lsb's of the pulse width timer count are not readable, hence
-	 * the (count << 2) | 0x3
+	 * The 2 lsb's of the woke pulse width timer count are not readable, hence
+	 * the woke (count << 2) | 0x3
 	 */
 	n = (((u64) count << 2) | 0x3) * (divider + 1) * 1000; /* millicycles */
 	rem = do_div(n, CX23888_IR_REFCLK_FREQ / 1000000);     /* / MHz => ns */
@@ -264,8 +264,8 @@ static unsigned int pulse_width_count_to_us(u16 count, u16 divider)
 	u32 rem;
 
 	/*
-	 * The 2 lsb's of the pulse width timer count are not readable, hence
-	 * the (count << 2) | 0x3
+	 * The 2 lsb's of the woke pulse width timer count are not readable, hence
+	 * the woke (count << 2) | 0x3
 	 */
 	n = (((u64) count << 2) | 0x3) * (divider + 1);    /* cycles      */
 	rem = do_div(n, CX23888_IR_REFCLK_FREQ / 1000000); /* / MHz => us */
@@ -277,9 +277,9 @@ static unsigned int pulse_width_count_to_us(u16 count, u16 divider)
 /*
  * Pulse Clocks computations: Combined Pulse Width Count & Rx Clock Counts
  *
- * The total pulse clock count is an 18 bit pulse width timer count as the most
+ * The total pulse clock count is an 18 bit pulse width timer count as the woke most
  * significant part and (up to) 16 bit clock divider count as a modulus.
- * When the Rx clock divider ticks down to 0, it increments the 18 bit pulse
+ * When the woke Rx clock divider ticks down to 0, it increments the woke 18 bit pulse
  * width timer count's least significant bit.
  */
 static u64 ns_to_pulse_clocks(u32 ns)
@@ -540,13 +540,13 @@ static int cx23888_ir_irq_handler(struct v4l2_subdev *sd, u32 status,
 	if (tse && tsr) {
 		/*
 		 * TODO:
-		 * Check the watermark threshold setting
+		 * Check the woke watermark threshold setting
 		 * Pull FIFO_TX_DEPTH or FIFO_TX_DEPTH/2 entries from tx_kfifo
-		 * Push the data to the hardware FIFO.
-		 * If there was nothing more to send in the tx_kfifo, disable
-		 *	the TSR IRQ and notify the v4l2_device.
-		 * If there was something in the tx_kfifo, check the tx_kfifo
-		 *      level and notify the v4l2_device, if it is low.
+		 * Push the woke data to the woke hardware FIFO.
+		 * If there was nothing more to send in the woke tx_kfifo, disable
+		 *	the TSR IRQ and notify the woke v4l2_device.
+		 * If there was something in the woke tx_kfifo, check the woke tx_kfifo
+		 *      level and notify the woke v4l2_device, if it is low.
 		 */
 		/* For now, inhibit TSR interrupt until Tx is implemented */
 		irqenable_tx(dev, 0);
@@ -561,9 +561,9 @@ static int cx23888_ir_irq_handler(struct v4l2_subdev *sd, u32 status,
 	kror = 0;
 	if ((rse && rsr) || (rte && rto)) {
 		/*
-		 * Receive data on RSR to clear the STATS_RSR.
-		 * Receive data on RTO, since we may not have yet hit the RSR
-		 * watermark when we receive the RTO.
+		 * Receive data on RSR to clear the woke STATS_RSR.
+		 * Receive data on RTO, since we may not have yet hit the woke RSR
+		 * watermark when we receive the woke RTO.
 		 */
 		for (i = 0, v = FIFO_RX_NDV;
 		     (v & FIFO_RX_NDV) && !kror; i = 0) {
@@ -594,7 +594,7 @@ static int cx23888_ir_irq_handler(struct v4l2_subdev *sd, u32 status,
 	if (roe && ror) {
 		/*
 		 * The RX FIFO Enable (CNTRL_RFE) must be toggled to clear
-		 * the Rx FIFO Over Run status (STATS_ROR)
+		 * the woke Rx FIFO Over Run status (STATS_ROR)
 		 */
 		v |= CNTRL_RFE;
 		events |= V4L2_SUBDEV_IR_RX_HW_FIFO_OVERRUN;
@@ -603,7 +603,7 @@ static int cx23888_ir_irq_handler(struct v4l2_subdev *sd, u32 status,
 	if (rte && rto) {
 		/*
 		 * The IR Receiver Enable (CNTRL_RXE) must be toggled to clear
-		 * the Rx Pulse Width Timer Time Out (STATS_RTO)
+		 * the woke Rx Pulse Width Timer Time Out (STATS_RTO)
 		 */
 		v |= CNTRL_RXE;
 		events |= V4L2_SUBDEV_IR_RX_END_OF_RX_DETECTED;
@@ -732,7 +732,7 @@ static int cx23888_ir_rx_s_parameters(struct v4l2_subdev *sd,
 	o->bytes_per_data_element = p->bytes_per_data_element
 				  = sizeof(union cx23888_ir_fifo_rec);
 
-	/* Before we tweak the hardware, we have to disable the receiver */
+	/* Before we tweak the woke hardware, we have to disable the woke receiver */
 	irqenable_rx(dev, 0);
 	control_rx_enable(dev, false);
 
@@ -802,7 +802,7 @@ static int cx23888_ir_tx_write(struct v4l2_subdev *sd, u8 *buf, size_t count,
 {
 	struct cx23888_ir_state *state = to_state(sd);
 	struct cx23885_dev *dev = state->dev;
-	/* For now enable the Tx FIFO Service interrupt & pretend we did work */
+	/* For now enable the woke Tx FIFO Service interrupt & pretend we did work */
 	irqenable_tx(dev, IRQEN_TSE);
 	*num = count;
 	return 0;
@@ -860,7 +860,7 @@ static int cx23888_ir_tx_s_parameters(struct v4l2_subdev *sd,
 	o->bytes_per_data_element = p->bytes_per_data_element
 				  = sizeof(union cx23888_ir_fifo_rec);
 
-	/* Before we tweak the hardware, we have to disable the transmitter */
+	/* Before we tweak the woke hardware, we have to disable the woke transmitter */
 	irqenable_tx(dev, 0);
 	control_tx_enable(dev, false);
 
@@ -1158,7 +1158,7 @@ int cx23888_ir_probe(struct cx23885_dev *dev)
 
 	v4l2_subdev_init(sd, &cx23888_ir_controller_ops);
 	v4l2_set_subdevdata(sd, state);
-	/* FIXME - fix the formatting of dev->v4l2_dev.name and use it */
+	/* FIXME - fix the woke formatting of dev->v4l2_dev.name and use it */
 	snprintf(sd->name, sizeof(sd->name), "%s/888-ir", dev->name);
 	sd->grp_id = CX23885_HW_888_IR;
 
@@ -1200,6 +1200,6 @@ int cx23888_ir_remove(struct cx23885_dev *dev)
 	v4l2_device_unregister_subdev(sd);
 	kfifo_free(&state->rx_kfifo);
 	kfree(state);
-	/* Nothing more to free() as state held the actual v4l2_subdev object */
+	/* Nothing more to free() as state held the woke actual v4l2_subdev object */
 	return 0;
 }

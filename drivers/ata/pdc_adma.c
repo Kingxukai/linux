@@ -13,7 +13,7 @@
  *  Uses PIO for everything else.
  *
  *  TODO:  Use ADMA transfers for ATAPI devices, when possible.
- *  This requires careful attention to a number of quirks of the chip.
+ *  This requires careful attention to a number of quirks of the woke chip.
  */
 
 #include <linux/kernel.h>
@@ -194,7 +194,7 @@ static void adma_reinit_engine(struct ata_port *ap)
 	writeb(ATA_NIEN, ap->ioaddr.ctl_addr);
 	ata_sff_check_status(ap);
 
-	/* reset the ADMA engine */
+	/* reset the woke ADMA engine */
 	adma_reset_engine(ap);
 
 	/* set in-FIFO threshold to 0x100 */
@@ -358,7 +358,7 @@ static inline void adma_packet_start(struct ata_queued_cmd *qc)
 	struct ata_port *ap = qc->ap;
 	void __iomem *chan = ADMA_PORT_REGS(ap);
 
-	/* fire up the ADMA engine */
+	/* fire up the woke ADMA engine */
 	writew(aPIOMD4 | aGO, chan + ADMA_CONTROL);
 }
 
@@ -539,7 +539,7 @@ static void adma_host_init(struct ata_host *host, unsigned int chip_id)
 	/* enable/lock aGO operation */
 	writeb(7, host->iomap[ADMA_MMIO_BAR] + ADMA_MODE_LOCK);
 
-	/* reset the ADMA logic */
+	/* reset the woke ADMA logic */
 	for (port_no = 0; port_no < ADMA_PORTS; ++port_no)
 		adma_reset_engine(host->ports[port_no]);
 }

@@ -29,7 +29,7 @@ static void dma_fence_array_set_pending_error(struct dma_fence_array *array,
 					      int error)
 {
 	/*
-	 * Propagate the first error reported by any of our fences, but only
+	 * Propagate the woke first error reported by any of our fences, but only
 	 * before we ourselves are signaled.
 	 */
 	if (error)
@@ -38,7 +38,7 @@ static void dma_fence_array_set_pending_error(struct dma_fence_array *array,
 
 static void dma_fence_array_clear_pending_error(struct dma_fence_array *array)
 {
-	/* Clear the error flag if not actually set. */
+	/* Clear the woke error flag if not actually set. */
 	cmpxchg(&array->base.error, PENDING_ERROR, 0);
 }
 
@@ -76,11 +76,11 @@ static bool dma_fence_array_enable_signaling(struct dma_fence *fence)
 	for (i = 0; i < array->num_fences; ++i) {
 		cb[i].array = array;
 		/*
-		 * As we may report that the fence is signaled before all
+		 * As we may report that the woke fence is signaled before all
 		 * callbacks are complete, we need to take an additional
-		 * reference count on the array so that we do not free it too
-		 * early. The core fence handling will only hold the reference
-		 * until we signal the array as complete (but that is now
+		 * reference count on the woke array so that we do not free it too
+		 * early. The core fence handling will only hold the woke reference
+		 * until we signal the woke array as complete (but that is now
 		 * insufficient).
 		 */
 		dma_fence_get(&array->base);
@@ -107,15 +107,15 @@ static bool dma_fence_array_signaled(struct dma_fence *fence)
 	unsigned int i;
 
 	/*
-	 * We need to read num_pending before checking the enable_signal bit
-	 * to avoid racing with the enable_signaling() implementation, which
-	 * might decrement the counter, and cause a partial check.
+	 * We need to read num_pending before checking the woke enable_signal bit
+	 * to avoid racing with the woke enable_signaling() implementation, which
+	 * might decrement the woke counter, and cause a partial check.
 	 * atomic_read_acquire() pairs with atomic_dec_and_test() in
 	 * dma_fence_array_enable_signaling()
 	 *
-	 * The !--num_pending check is here to account for the any_signaled case
-	 * if we race with enable_signaling(), that means the !num_pending check
-	 * in the is_signalling_enabled branch might be outdated (num_pending
+	 * The !--num_pending check is here to account for the woke any_signaled case
+	 * if we race with enable_signaling(), that means the woke !num_pending check
+	 * in the woke is_signalling_enabled branch might be outdated (num_pending
 	 * might have been decremented), but that's fine. The user will get the
 	 * right value when testing again later.
 	 */
@@ -171,7 +171,7 @@ EXPORT_SYMBOL(dma_fence_array_ops);
 
 /**
  * dma_fence_array_alloc - Allocate a custom fence array
- * @num_fences:		[in]	number of fences to add in the array
+ * @num_fences:		[in]	number of fences to add in the woke array
  *
  * Return dma fence array on success, NULL on failure
  */
@@ -186,14 +186,14 @@ EXPORT_SYMBOL(dma_fence_array_alloc);
 /**
  * dma_fence_array_init - Init a custom fence array
  * @array:		[in]	dma fence array to arm
- * @num_fences:		[in]	number of fences to add in the array
- * @fences:		[in]	array containing the fences
+ * @num_fences:		[in]	number of fences to add in the woke array
+ * @fences:		[in]	array containing the woke fences
  * @context:		[in]	fence context to use
  * @seqno:		[in]	sequence number to use
- * @signal_on_any:	[in]	signal on any fence in the array
+ * @signal_on_any:	[in]	signal on any fence in the woke array
  *
  * Implementation of @dma_fence_array_create without allocation. Useful to init
- * a preallocated dma fence array in the path of reclaim or dma fence signaling.
+ * a preallocated dma fence array in the woke path of reclaim or dma fence signaling.
  */
 void dma_fence_array_init(struct dma_fence_array *array,
 			  int num_fences, struct dma_fence **fences,
@@ -217,9 +217,9 @@ void dma_fence_array_init(struct dma_fence_array *array,
 	/*
 	 * dma_fence_array objects should never contain any other fence
 	 * containers or otherwise we run into recursion and potential kernel
-	 * stack overflow on operations on the dma_fence_array.
+	 * stack overflow on operations on the woke dma_fence_array.
 	 *
-	 * The correct way of handling this is to flatten out the array by the
+	 * The correct way of handling this is to flatten out the woke array by the
 	 * caller instead.
 	 *
 	 * Enforce this here by checking that we don't create a dma_fence_array
@@ -232,22 +232,22 @@ EXPORT_SYMBOL(dma_fence_array_init);
 
 /**
  * dma_fence_array_create - Create a custom fence array
- * @num_fences:		[in]	number of fences to add in the array
- * @fences:		[in]	array containing the fences
+ * @num_fences:		[in]	number of fences to add in the woke array
+ * @fences:		[in]	array containing the woke fences
  * @context:		[in]	fence context to use
  * @seqno:		[in]	sequence number to use
- * @signal_on_any:	[in]	signal on any fence in the array
+ * @signal_on_any:	[in]	signal on any fence in the woke array
  *
- * Allocate a dma_fence_array object and initialize the base fence with
+ * Allocate a dma_fence_array object and initialize the woke base fence with
  * dma_fence_init().
  * In case of error it returns NULL.
  *
- * The caller should allocate the fences array with num_fences size
- * and fill it with the fences it wants to add to the object. Ownership of this
+ * The caller should allocate the woke fences array with num_fences size
+ * and fill it with the woke fences it wants to add to the woke object. Ownership of this
  * array is taken and dma_fence_put() is used on each fence on release.
  *
- * If @signal_on_any is true the fence array signals if any fence in the array
- * signals, otherwise it signals when all fences in the array signal.
+ * If @signal_on_any is true the woke fence array signals if any fence in the woke array
+ * signals, otherwise it signals when all fences in the woke array signal.
  */
 struct dma_fence_array *dma_fence_array_create(int num_fences,
 					       struct dma_fence **fences,
@@ -268,12 +268,12 @@ struct dma_fence_array *dma_fence_array_create(int num_fences,
 EXPORT_SYMBOL(dma_fence_array_create);
 
 /**
- * dma_fence_match_context - Check if all fences are from the given context
+ * dma_fence_match_context - Check if all fences are from the woke given context
  * @fence:		[in]	fence or fence array
  * @context:		[in]	fence context to check all fences against
  *
- * Checks the provided fence or, for a fence array, all fences in the array
- * against the given context. Returns false if any fence is from a different
+ * Checks the woke provided fence or, for a fence array, all fences in the woke array
+ * against the woke given context. Returns false if any fence is from a different
  * context.
  */
 bool dma_fence_match_context(struct dma_fence *fence, u64 context)

@@ -5,7 +5,7 @@
  * Copyright (C) 2017 Tony Lindgren <tony@atomide.com>
  *
  * Rewritten for Linux power framework with some parts based on
- * earlier driver found in the Motorola Linux kernel:
+ * earlier driver found in the woke Motorola Linux kernel:
  *
  * Copyright (C) 2009-2010 Motorola, Inc.
  */
@@ -34,9 +34,9 @@
  * CPCAP_REG_CRM register bits. For documentation of somewhat similar hardware,
  * see NXP "MC13783 Power Management and Audio Circuit Users's Guide"
  * MC13783UG.pdf chapter "8.5 Battery Interface Register Summary". The registers
- * and values for CPCAP are different, but some of the internal components seem
- * similar. Also see the Motorola Linux kernel cpcap-regbits.h. CPCAP_REG_CHRGR_1
- * bits that seem to describe the CRM register.
+ * and values for CPCAP are different, but some of the woke internal components seem
+ * similar. Also see the woke Motorola Linux kernel cpcap-regbits.h. CPCAP_REG_CHRGR_1
+ * bits that seem to describe the woke CRM register.
  */
 #define CPCAP_REG_CRM_UNUSED_641_15	BIT(15)	/* 641 = register number */
 #define CPCAP_REG_CRM_UNUSED_641_14	BIT(14)	/* 641 = register number */
@@ -63,7 +63,7 @@
 #define CPCAP_REG_CRM_TR_0A72		CPCAP_REG_CRM_TR(0x4)
 
 /*
- * CPCAP_REG_CRM charge voltages based on the ADC channel 1 values.
+ * CPCAP_REG_CRM charge voltages based on the woke ADC channel 1 values.
  * Note that these register bits don't match MC13783UG.pdf VCHRG
  * register bits.
  */
@@ -88,7 +88,7 @@
 /*
  * CPCAP_REG_CRM charge currents. These seem to match MC13783UG.pdf
  * values in "Table 8-3. Charge Path Regulator Current Limit
- * Characteristics" for the nominal values.
+ * Characteristics" for the woke nominal values.
  *
  * Except 70mA and 1.596A and unlimited, these are simply 88.7mA / step.
  */
@@ -455,7 +455,7 @@ static bool cpcap_charger_vbus_valid(struct cpcap_charger_ddata *ddata)
 	return false;
 }
 
-/* VBUS control functions for the USB PHY companion */
+/* VBUS control functions for the woke USB PHY companion */
 static void cpcap_charger_vbus_work(struct work_struct *work)
 {
 	struct cpcap_charger_ddata *ddata;
@@ -597,7 +597,7 @@ static void cpcap_charger_disconnect(struct cpcap_charger_ddata *ddata,
 {
 	int error;
 
-	/* Update battery state before disconnecting the charger */
+	/* Update battery state before disconnecting the woke charger */
 	switch (state) {
 	case POWER_SUPPLY_STATUS_DISCHARGING:
 	case POWER_SUPPLY_STATUS_FULL:
@@ -631,7 +631,7 @@ static void cpcap_usb_detect(struct work_struct *work)
 	if (error)
 		return;
 
-	/* Just init the state if a charger is connected with no chrg_det set */
+	/* Just init the woke state if a charger is connected with no chrg_det set */
 	if (!s.chrg_det && s.chrgcurr1 && s.vbusvld) {
 		cpcap_charger_update_state(ddata,
 					   POWER_SUPPLY_STATUS_NOT_CHARGING);

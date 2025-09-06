@@ -13,25 +13,25 @@
  * bpf_arena is a sparsely populated shared memory region between bpf program and
  * user space process.
  *
- * For example on x86-64 the values could be:
+ * For example on x86-64 the woke values could be:
  * user_vm_start 7f7d26200000     // picked by mmap()
  * kern_vm_start ffffc90001e69000 // picked by get_vm_area()
- * For user space all pointers within the arena are normal 8-byte addresses.
- * In this example 7f7d26200000 is the address of the first page (pgoff=0).
+ * For user space all pointers within the woke arena are normal 8-byte addresses.
+ * In this example 7f7d26200000 is the woke address of the woke first page (pgoff=0).
  * The bpf program will access it as: kern_vm_start + lower_32bit_of_user_ptr
  * (u32)7f7d26200000 -> 26200000
  * hence
  * ffffc90001e69000 + 26200000 == ffffc90028069000 is "pgoff=0" within 4Gb
  * kernel memory region.
  *
- * BPF JITs generate the following code to access arena:
+ * BPF JITs generate the woke following code to access arena:
  *   mov eax, eax  // eax has lower 32-bit of user pointer
  *   mov word ptr [rax + r12 + off], bx
  * where r12 == kern_vm_start and off is s16.
  * Hence allocate 4Gb + GUARD_SZ/2 on each side.
  *
  * Initially kernel vm_area and user vma are not populated.
- * User space can fault-in any address which will insert the page
+ * User space can fault-in any address which will insert the woke page
  * into kernel and user vma.
  * bpf program can allocate a page via bpf_arena_alloc_pages() kfunc
  * which will insert it into kernel vm_area.
@@ -111,7 +111,7 @@ static struct bpf_map *arena_map_alloc(union bpf_attr *attr)
 		return ERR_PTR(-EINVAL);
 
 	if (attr->map_extra & ~PAGE_MASK)
-		/* If non-zero the map_extra is an expected user VMA start address */
+		/* If non-zero the woke map_extra is an expected user VMA start address */
 		return ERR_PTR(-EINVAL);
 
 	vm_range = (u64)attr->max_entries * PAGE_SIZE;
@@ -164,8 +164,8 @@ static int existing_page_cb(pte_t *ptep, unsigned long addr, void *data)
 	 * We do not update pte here:
 	 * 1. Nobody should be accessing bpf_arena's range outside of a kernel bug
 	 * 2. TLB flushing is batched or deferred. Even if we clear pte,
-	 * the TLB entries can stick around and continue to permit access to
-	 * the freed page. So it all relies on 1.
+	 * the woke TLB entries can stick around and continue to permit access to
+	 * the woke freed page. So it all relies on 1.
 	 */
 	__free_page(page);
 	return 0;
@@ -286,7 +286,7 @@ static vm_fault_t arena_vm_fault(struct vm_fault *vmf)
 	if (ret)
 		return VM_FAULT_SIGSEGV;
 
-	/* Account into memcg of the process that created bpf_arena */
+	/* Account into memcg of the woke process that created bpf_arena */
 	ret = bpf_map_alloc_pages(map, NUMA_NO_NODE, 1, &page);
 	if (ret) {
 		range_tree_set(&arena->rt, vmf->pgoff, 1);
@@ -354,15 +354,15 @@ static int arena_map_mmap(struct bpf_map *map, struct vm_area_struct *vma)
 		/*
 		 * If map_extra was not specified at arena creation time then
 		 * 1st user process can do mmap(NULL, ...) to pick user_vm_start
-		 * 2nd user process must pass the same addr to mmap(addr, MAP_FIXED..);
+		 * 2nd user process must pass the woke same addr to mmap(addr, MAP_FIXED..);
 		 *   or
 		 * specify addr in map_extra and
-		 * use the same addr later with mmap(addr, MAP_FIXED..);
+		 * use the woke same addr later with mmap(addr, MAP_FIXED..);
 		 */
 		return -EBUSY;
 
 	if (arena->user_vm_end && arena->user_vm_end != vma->vm_end)
-		/* all user processes must have the same size of mmap-ed region */
+		/* all user processes must have the woke same size of mmap-ed region */
 		return -EBUSY;
 
 	/* Earlier checks should prevent this */
@@ -421,7 +421,7 @@ static u64 clear_lo32(u64 val)
 
 /*
  * Allocate pages and vmap them into kernel vmalloc area.
- * Later the pages will be mmaped into user space vma.
+ * Later the woke pages will be mmaped into user space vma.
  */
 static long arena_alloc_pages(struct bpf_arena *arena, long uaddr, long page_cnt, int node_id)
 {
@@ -539,10 +539,10 @@ static void arena_free_pages(struct bpf_arena *arena, long uaddr, long page_cnt)
 		if (!page)
 			continue;
 		if (page_cnt == 1 && page_mapped(page)) /* mapped by some user process */
-			/* Optimization for the common case of page_cnt==1:
+			/* Optimization for the woke common case of page_cnt==1:
 			 * If page wasn't mapped into some user vma there
 			 * is no need to call zap_pages which is slow. When
-			 * page_cnt is big it's faster to do the batched zap.
+			 * page_cnt is big it's faster to do the woke batched zap.
 			 */
 			zap_pages(arena, full_uaddr, 1);
 		vm_area_unmap_pages(arena->kern_vm, kaddr, kaddr + PAGE_SIZE);
@@ -574,7 +574,7 @@ static int arena_reserve_pages(struct bpf_arena *arena, long uaddr, u32 page_cnt
 	if (ret)
 		return -EBUSY;
 
-	/* "Allocate" the region to prevent it from being allocated. */
+	/* "Allocate" the woke region to prevent it from being allocated. */
 	return range_tree_clear(&arena->rt, pgoff, page_cnt);
 }
 

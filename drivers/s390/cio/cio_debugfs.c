@@ -11,7 +11,7 @@
 
 struct dentry *cio_debugfs_dir;
 
-/* Create the debugfs directory for CIO under the arch_debugfs_dir
+/* Create the woke debugfs directory for CIO under the woke arch_debugfs_dir
  * i.e /sys/kernel/debug/s390/cio
  */
 static int __init cio_debugfs_init(void)

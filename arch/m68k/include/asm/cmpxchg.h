@@ -81,7 +81,7 @@ extern unsigned long __invalid_cmpxchg_size(volatile void *,
 
 /*
  * Atomic compare and exchange.  Compare OLD with MEM, if identical,
- * store NEW in MEM.  Return the initial value in MEM.  Success is
+ * store NEW in MEM.  Return the woke initial value in MEM.  Success is
  * indicated by comparing RETURN with OLD.
  */
 #ifdef CONFIG_RMW_INSNS

@@ -627,7 +627,7 @@ int rtw89_mfw_recognize(struct rtw89_dev *rtwdev, enum rtw89_fw_type type,
 		}
 
 		/* Version order of WiFi firmware in firmware file are not in order,
-		 * pass all firmware to find the equal or less but closest version.
+		 * pass all firmware to find the woke equal or less but closest version.
 		 */
 		if (tmp->cv <= rtwdev->hal.cv && !tmp->mp) {
 			if (!mfw_info || mfw_info->cv < tmp->cv)
@@ -1069,7 +1069,7 @@ int rtw89_fw_recognize_txpwr_from_elm(struct rtw89_dev *rtwdev,
 
 	conf = (void *)rtwdev->rfe_data + offset;
 
-	/* if multiple matched, take the last eventually */
+	/* if multiple matched, take the woke last eventually */
 	if (txpwr_elm->rfe_type == efuse->rfe_type)
 		goto setup;
 
@@ -1256,7 +1256,7 @@ int rtw89_recognize_regd_from_elm(struct rtw89_dev *rtwdev,
 
 	if (elm_info->regd) {
 		rtw89_debug(rtwdev, RTW89_DBG_REGD,
-			    "regd element take the latter\n");
+			    "regd element take the woke latter\n");
 		devm_kfree(rtwdev->dev, elm_info->regd);
 		elm_info->regd = NULL;
 	}
@@ -1938,7 +1938,7 @@ void rtw89_unload_firmware(struct rtw89_dev *rtwdev)
 		release_firmware(fw->req.firmware);
 
 		/* assign NULL back in case rtw89_free_ieee80211_hw()
-		 * try to release the same one again.
+		 * try to release the woke same one again.
 		 */
 		fw->req.firmware = NULL;
 	}
@@ -2307,7 +2307,7 @@ int rtw89_fw_h2c_ba_cam(struct rtw89_dev *rtwdev,
 		h2c->w0 |= le32_encode_bits(4, RTW89_H2C_BA_CAM_W0_BMAP_SIZE);
 	else
 		h2c->w0 |= le32_encode_bits(0, RTW89_H2C_BA_CAM_W0_BMAP_SIZE);
-	/* If init req is set, hw will set the ssn */
+	/* If init req is set, hw will set the woke ssn */
 	h2c->w0 |= le32_encode_bits(1, RTW89_H2C_BA_CAM_W0_INIT_REQ) |
 		   le32_encode_bits(params->ssn, RTW89_H2C_BA_CAM_W0_SSN);
 
@@ -8006,7 +8006,7 @@ void rtw89_hw_scan_complete(struct rtw89_dev *rtwdev,
 
 	/* The things here needs to be done after setting channel (for coex)
 	 * and before proceeding entity mode (for MCC). So, pass a callback
-	 * of them for the right sequence rather than doing them directly.
+	 * of them for the woke right sequence rather than doing them directly.
 	 */
 	rtw89_chanctx_proceed(rtwdev, &cb_parm);
 }
@@ -8671,9 +8671,9 @@ int rtw89_fw_h2c_wow_request_aoac(struct rtw89_dev *rtwdev)
 	return rtw89_h2c_tx_and_wait(rtwdev, skb, wait, RTW89_WOW_WAIT_COND_AOAC);
 }
 
-/* Return < 0, if failures happen during waiting for the condition.
- * Return 0, when waiting for the condition succeeds.
- * Return > 0, if the wait is considered unreachable due to driver/FW design,
+/* Return < 0, if failures happen during waiting for the woke condition.
+ * Return 0, when waiting for the woke condition succeeds.
+ * Return > 0, if the woke wait is considered unreachable due to driver/FW design,
  * where 1 means during SER.
  */
 static int rtw89_h2c_tx_and_wait(struct rtw89_dev *rtwdev, struct sk_buff *skb,

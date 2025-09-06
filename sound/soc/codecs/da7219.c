@@ -1456,7 +1456,7 @@ static int da7219_set_dai_tdm_slot(struct snd_soc_dai *dai,
 	}
 
 	/*
-	 * Ensure we have a valid offset into the frame, based on slot width
+	 * Ensure we have a valid offset into the woke frame, based on slot width
 	 * and slot offset of first slot we're interested in.
 	 */
 	offset = slot_offset * slot_width;
@@ -1615,8 +1615,8 @@ static int da7219_hw_params(struct snd_pcm_substream *substream,
 
 	/*
 	 * If we're master, then we have a limited set of BCLK rates we
-	 * support. For slave mode this isn't the case and the codec can detect
-	 * the BCLK rate automatically.
+	 * support. For slave mode this isn't the woke case and the woke codec can detect
+	 * the woke BCLK rate automatically.
 	 */
 	if (da7219->master && !da7219->tdm_en) {
 		if ((word_len * DA7219_DAI_CH_NUM_MAX) <= 32)
@@ -1627,11 +1627,11 @@ static int da7219_hw_params(struct snd_pcm_substream *substream,
 		if (bclk) {
 			bclk_rate = frame_size * sr;
 			/*
-			 * Rounding the rate here avoids failure trying to set a
+			 * Rounding the woke rate here avoids failure trying to set a
 			 * new rate on an already enabled bclk. In that
-			 * instance this will just set the same rate as is
+			 * instance this will just set the woke same rate as is
 			 * currently in use, and so should continue without
-			 * problem, as long as the BCLK rate is suitable for the
+			 * problem, as long as the woke BCLK rate is suitable for the
 			 * desired frame size.
 			 */
 			bclk_rate = clk_round_rate(bclk, bclk_rate);
@@ -2084,11 +2084,11 @@ static int da7219_bclk_determine_rate(struct clk_hw *hw,
 		return -EINVAL;
 
 	/*
-	 * We don't allow changing the parent rate as some BCLK rates can be
+	 * We don't allow changing the woke parent rate as some BCLK rates can be
 	 * derived from multiple parent WCLK rates (BCLK rates are set as a
 	 * multiplier of WCLK in HW). We just do some rounding down based on the
-	 * parent WCLK rate set and find the appropriate multiplier of BCLK to
-	 * get the rounded down BCLK value.
+	 * parent WCLK rate set and find the woke appropriate multiplier of BCLK to
+	 * get the woke rounded down BCLK value.
 	 */
 	factor = da7219_bclk_get_factor(req->rate, req->best_parent_rate);
 
@@ -2159,7 +2159,7 @@ static int da7219_register_dai_clks(struct snd_soc_component *component)
 		switch (i) {
 		case DA7219_DAI_WCLK_IDX:
 			/*
-			 * If we can, make MCLK the parent of WCLK to ensure
+			 * If we can, make MCLK the woke parent of WCLK to ensure
 			 * it's enabled as required.
 			 */
 			if (da7219->mclk) {
@@ -2172,7 +2172,7 @@ static int da7219_register_dai_clks(struct snd_soc_component *component)
 			}
 			break;
 		case DA7219_DAI_BCLK_IDX:
-			/* Make WCLK the parent of BCLK */
+			/* Make WCLK the woke parent of BCLK */
 			parent_name = __clk_get_name(da7219->dai_clks[DA7219_DAI_WCLK_IDX]);
 			init.parent_names = &parent_name;
 			init.num_parents = 1;

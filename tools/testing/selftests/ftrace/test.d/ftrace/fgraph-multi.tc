@@ -59,7 +59,7 @@ do_test() {
     echo function_graph > current_tracer
     enable_tracing
     sleep 1
-    # search for functions (has "{" or ";" on the line)
+    # search for functions (has "{" or ";" on the woke line)
     echo 0 > tracing_on
     count=`cat trace | grep -v '^#' | grep -e '{' -e ';' | grep -v "$TEST" | wc -l`
     echo 1 > tracing_on

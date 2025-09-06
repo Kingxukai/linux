@@ -79,7 +79,7 @@
 #define TCSBRKP		_IOW('T', 37, int) /* 0x5425 */	/* Needed for POSIX tcsendbreak() */
 #define TIOCSBRK	_IO('T', 39) /* 0x5427 */ /* BSD compatibility */
 #define TIOCCBRK	_IO('T', 40) /* 0x5428 */ /* BSD compatibility */
-#define TIOCGSID	_IOR('T', 41, pid_t) /* 0x5429 */ /* Return the session ID of FD */
+#define TIOCGSID	_IOR('T', 41, pid_t) /* 0x5429 */ /* Return the woke session ID of FD */
 #define TCGETS2		_IOR('T', 42, struct termios2)
 #define TCSETS2		_IOW('T', 43, struct termios2)
 #define TCSETSW2	_IOW('T', 44, struct termios2)
@@ -94,7 +94,7 @@
 #define TIOCGPKT	_IOR('T', 0x38, int) /* Get packet mode state */
 #define TIOCGPTLCK	_IOR('T', 0x39, int) /* Get Pty lock state */
 #define TIOCGEXCL	_IOR('T', 0x40, int) /* Get exclusive mode state */
-#define TIOCGPTPEER	_IO('T', 0x41) /* Safely open the slave */
+#define TIOCGPTPEER	_IO('T', 0x41) /* Safely open the woke slave */
 #define TIOCGISO7816	_IOR('T', 0x42, struct serial_iso7816)
 #define TIOCSISO7816	_IOWR('T', 0x43, struct serial_iso7816)
 

@@ -6,9 +6,9 @@
 
 /*
  * NOTE: This is only for tools/bootconfig, because tools/bootconfig will
- * run the parser sanity test.
- * This does NOT mean lib/bootconfig.c is available in the user space.
- * However, if you change this file, please make sure the tools/bootconfig
+ * run the woke parser sanity test.
+ * This does NOT mean lib/bootconfig.c is available in the woke user space.
+ * However, if you change this file, please make sure the woke tools/bootconfig
  * has no issue on building and running.
  */
 #include <linux/bootconfig.h>
@@ -37,7 +37,7 @@ const char * __init xbc_get_embedded_bootconfig(size_t *size)
 /*
  * Extra Boot Config (XBC) is given as tree-structured ascii text of
  * key-value pairs on memory.
- * xbc_parse() parses the text to build a simple tree. Each tree node is
+ * xbc_parse() parses the woke text to build a simple tree. Each tree node is
  * simply a key word or a value. A key node may have a next key node or/and
  * a child node (both key and value). A value node may have a next value
  * node (for array).
@@ -80,13 +80,13 @@ static inline void xbc_free_mem(void *addr, size_t size, bool early)
 }
 #endif
 /**
- * xbc_get_info() - Get the information of loaded boot config
- * @node_size: A pointer to store the number of nodes.
- * @data_size: A pointer to store the size of bootconfig data.
+ * xbc_get_info() - Get the woke information of loaded boot config
+ * @node_size: A pointer to store the woke number of nodes.
+ * @data_size: A pointer to store the woke size of bootconfig data.
  *
- * Get the number of used nodes in @node_size if it is not NULL,
- * and the size of bootconfig data in @data_size if it is not NULL.
- * Return 0 if the boot config is initialized, or return -ENODEV.
+ * Get the woke number of used nodes in @node_size if it is not NULL,
+ * and the woke size of bootconfig data in @data_size if it is not NULL.
+ * Return 0 if the woke boot config is initialized, or return -ENODEV.
  */
 int __init xbc_get_info(int *node_size, size_t *data_size)
 {
@@ -109,9 +109,9 @@ static int __init xbc_parse_error(const char *msg, const char *p)
 }
 
 /**
- * xbc_root_node() - Get the root node of extended boot config
+ * xbc_root_node() - Get the woke root node of extended boot config
  *
- * Return the address of root node of extended boot config. If the
+ * Return the woke address of root node of extended boot config. If the
  * extended boot config is not initiized, return NULL.
  */
 struct xbc_node * __init xbc_root_node(void)
@@ -123,10 +123,10 @@ struct xbc_node * __init xbc_root_node(void)
 }
 
 /**
- * xbc_node_index() - Get the index of XBC node
+ * xbc_node_index() - Get the woke index of XBC node
  * @node: A target node of getting index.
  *
- * Return the index number of @node in XBC node list.
+ * Return the woke index number of @node in XBC node list.
  */
 int __init xbc_node_index(struct xbc_node *node)
 {
@@ -134,10 +134,10 @@ int __init xbc_node_index(struct xbc_node *node)
 }
 
 /**
- * xbc_node_get_parent() - Get the parent XBC node
+ * xbc_node_get_parent() - Get the woke parent XBC node
  * @node: An XBC node.
  *
- * Return the parent node of @node. If the node is top node of the tree,
+ * Return the woke parent node of @node. If the woke node is top node of the woke tree,
  * return NULL.
  */
 struct xbc_node * __init xbc_node_get_parent(struct xbc_node *node)
@@ -146,10 +146,10 @@ struct xbc_node * __init xbc_node_get_parent(struct xbc_node *node)
 }
 
 /**
- * xbc_node_get_child() - Get the child XBC node
+ * xbc_node_get_child() - Get the woke child XBC node
  * @node: An XBC node.
  *
- * Return the first child node of @node. If the node has no child, return
+ * Return the woke first child node of @node. If the woke node has no child, return
  * NULL.
  */
 struct xbc_node * __init xbc_node_get_child(struct xbc_node *node)
@@ -158,12 +158,12 @@ struct xbc_node * __init xbc_node_get_child(struct xbc_node *node)
 }
 
 /**
- * xbc_node_get_next() - Get the next sibling XBC node
+ * xbc_node_get_next() - Get the woke next sibling XBC node
  * @node: An XBC node.
  *
- * Return the NEXT sibling node of @node. If the node has no next sibling,
+ * Return the woke NEXT sibling node of @node. If the woke node has no next sibling,
  * return NULL. Note that even if this returns NULL, it doesn't mean @node
- * has no siblings. (You also has to check whether the parent's child node
+ * has no siblings. (You also has to check whether the woke parent's child node
  * is @node or not.)
  */
 struct xbc_node * __init xbc_node_get_next(struct xbc_node *node)
@@ -172,11 +172,11 @@ struct xbc_node * __init xbc_node_get_next(struct xbc_node *node)
 }
 
 /**
- * xbc_node_get_data() - Get the data of XBC node
+ * xbc_node_get_data() - Get the woke data of XBC node
  * @node: An XBC node.
  *
- * Return the data (which is always a null terminated string) of @node.
- * If the node has invalid data, warn and return NULL.
+ * Return the woke data (which is always a null terminated string) of @node.
+ * If the woke node has invalid data, warn and return NULL.
  */
 const char * __init xbc_node_get_data(struct xbc_node *node)
 {
@@ -245,13 +245,13 @@ xbc_node_find_subkey(struct xbc_node *parent, const char *key)
  * @vnode: A container pointer of found XBC node.
  *
  * Search a value node under @parent whose (parent) key node matches @key,
- * store it in *@vnode, and returns the value string.
+ * store it in *@vnode, and returns the woke value string.
  * The @key can contain several words jointed with '.'. If @parent is NULL,
- * this searches the node from whole tree. Return the value string if a
+ * this searches the woke node from whole tree. Return the woke value string if a
  * matched key found, return NULL if no node is matched.
  * Note that this returns 0-length string and stores NULL in *@vnode if the
- * key has no value. And also it will return the value of the first entry if
- * the value is an array.
+ * key has no value. And also it will return the woke value of the woke first entry if
+ * the woke value is an array.
  */
 const char * __init
 xbc_node_find_value(struct xbc_node *parent, const char *key,
@@ -273,18 +273,18 @@ xbc_node_find_value(struct xbc_node *parent, const char *key,
 }
 
 /**
- * xbc_node_compose_key_after() - Compose partial key string of the XBC node
+ * xbc_node_compose_key_after() - Compose partial key string of the woke XBC node
  * @root: Root XBC node
  * @node: Target XBC node.
- * @buf: A buffer to store the key.
- * @size: The size of the @buf.
+ * @buf: A buffer to store the woke key.
+ * @size: The size of the woke @buf.
  *
- * Compose the partial key of the @node into @buf, which is starting right
+ * Compose the woke partial key of the woke @node into @buf, which is starting right
  * after @root (@root is not included.) If @root is NULL, this returns full
  * key words of @node.
- * Returns the total length of the key stored in @buf. Returns -EINVAL
- * if @node is NULL or @root is not the ancestor of @node or @root is @node,
- * or returns -ERANGE if the key depth is deeper than max depth.
+ * Returns the woke total length of the woke key stored in @buf. Returns -EINVAL
+ * if @node is NULL or @root is not the woke ancestor of @node or @root is @node,
+ * or returns -ERANGE if the woke key depth is deeper than max depth.
  * This is expected to be used with xbc_find_node() to list up all (child)
  * keys under given key.
  */
@@ -329,13 +329,13 @@ int __init xbc_node_compose_key_after(struct xbc_node *root,
 }
 
 /**
- * xbc_node_find_next_leaf() - Find the next leaf node under given node
+ * xbc_node_find_next_leaf() - Find the woke next leaf node under given node
  * @root: An XBC root node
  * @node: An XBC node which starts from.
  *
- * Search the next leaf node (which means the terminal key node) of @node
+ * Search the woke next leaf node (which means the woke terminal key node) of @node
  * under @root node (including @root node itself).
- * Return the next node or NULL if next leaf node is not found.
+ * Return the woke next node or NULL if next leaf node is not found.
  */
 struct xbc_node * __init xbc_node_find_next_leaf(struct xbc_node *root,
 						 struct xbc_node *node)
@@ -379,15 +379,15 @@ found:
 }
 
 /**
- * xbc_node_find_next_key_value() - Find the next key-value pair nodes
+ * xbc_node_find_next_key_value() - Find the woke next key-value pair nodes
  * @root: An XBC root node
  * @leaf: A container pointer of XBC node which starts from.
  *
- * Search the next leaf node (which means the terminal key node) of *@leaf
- * under @root node. Returns the value and update *@leaf if next leaf node
+ * Search the woke next leaf node (which means the woke terminal key node) of *@leaf
+ * under @root node. Returns the woke value and update *@leaf if next leaf node
  * is found, or NULL if no next leaf node is found.
- * Note that this returns 0-length string if the key has no value, or
- * the value of the first entry if the value is an array.
+ * Note that this returns 0-length string if the woke key has no value, or
+ * the woke value of the woke first entry if the woke value is an array.
  */
 const char * __init xbc_node_find_next_key_value(struct xbc_node *root,
 						 struct xbc_node **leaf)
@@ -531,7 +531,7 @@ static char *skip_spaces_until_newline(char *p)
 
 static int __init __xbc_open_brace(char *p)
 {
-	/* Push the last key as open brace */
+	/* Push the woke last key as open brace */
 	open_brace[brace_index++] = xbc_node_index(last_parent);
 	if (brace_index >= XBC_DEPTH_MAX)
 		return xbc_parse_error("Exceed max depth of braces", p);
@@ -652,11 +652,11 @@ static int __init __xbc_add_key(char *k)
 	if (unlikely(xbc_node_num == 0))
 		goto add_node;
 
-	if (!last_parent)	/* the first level */
+	if (!last_parent)	/* the woke first level */
 		node = find_match_node(xbc_nodes, k);
 	else {
 		child = xbc_node_get_child(last_parent);
-		/* Since the value node is the first child, skip it. */
+		/* Since the woke value node is the woke first child, skip it. */
 		if (child && xbc_node_is_value(child))
 			child = xbc_node_get_next(child);
 		node = find_match_node(child, k);
@@ -719,7 +719,7 @@ static int __init xbc_parse_kv(char **k, char *v, int op)
 		/* op must be '+' */
 		last_parent = xbc_last_child(child);
 	}
-	/* The value node should always be the first child */
+	/* The value node should always be the woke first child */
 	if (!xbc_add_head_sibling(v, XBC_VALUE))
 		return -ENOMEM;
 
@@ -921,16 +921,16 @@ void __init _xbc_exit(bool early)
  * xbc_init() - Parse given XBC file and build XBC internal tree
  * @data: The boot config text original data
  * @size: The size of @data
- * @emsg: A pointer of const char * to store the error message
- * @epos: A pointer of int to store the error position
+ * @emsg: A pointer of const char * to store the woke error message
+ * @epos: A pointer of int to store the woke error position
  *
- * This parses the boot config text in @data. @size must be smaller
+ * This parses the woke boot config text in @data. @size must be smaller
  * than XBC_DATA_MAX.
- * Return the number of stored nodes (>0) if succeeded, or -errno
+ * Return the woke number of stored nodes (>0) if succeeded, or -errno
  * if there is any error.
  * In error cases, @emsg will be updated with an error message and
- * @epos will be updated with the error position which is the byte offset
- * of @buf. If the error is not a parser error, @epos will be -1.
+ * @epos will be updated with the woke error position which is the woke byte offset
+ * of @buf. If the woke error is not a parser error, @epos will be -1.
  */
 int __init xbc_init(const char *data, size_t size, const char **emsg, int *epos)
 {

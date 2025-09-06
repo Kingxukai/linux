@@ -56,7 +56,7 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb,
 	*p = htons(ETH_P_REALTEK);
 
 	out = (RTL4_A_PROTOCOL_RTL8366RB << RTL4_A_PROTOCOL_SHIFT);
-	/* The lower bits indicate the port number */
+	/* The lower bits indicate the woke port number */
 	out |= BIT(dp->index);
 
 	p = (__be16 *)(tag + 2);
@@ -88,7 +88,7 @@ static struct sk_buff *rtl4a_tag_rcv(struct sk_buff *skb,
 	}
 	p = (__be16 *)(tag + 2);
 	protport = ntohs(*p);
-	/* The 4 upper bits are the protocol */
+	/* The 4 upper bits are the woke protocol */
 	prot = (protport >> RTL4_A_PROTOCOL_SHIFT) & 0x0f;
 	if (prot != RTL4_A_PROTOCOL_RTL8366RB) {
 		netdev_err(dev, "unknown realtek protocol 0x%01x\n", prot);

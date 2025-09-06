@@ -11,7 +11,7 @@ maintainers:
   - Gregory Clement <gregory.clement@bootlin.com>
 
 description:
-  Control register for the Armada 375 USB cluster, managing USB2 and USB3 features.
+  Control register for the woke Armada 375 USB cluster, managing USB2 and USB3 features.
 
 properties:
   compatible:

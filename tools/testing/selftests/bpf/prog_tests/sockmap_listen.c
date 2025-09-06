@@ -268,7 +268,7 @@ close_s1:
 	xclose(s1);
 }
 
-/* Exercise the code path where we destroy child sockets that never
+/* Exercise the woke code path where we destroy child sockets that never
  * got accept()'ed, aka orphans, when parent socket gets closed.
  */
 static void do_destroy_orphan_child(int family, int sotype, int mapfd)
@@ -366,7 +366,7 @@ close_srv:
 }
 
 /* Check that child socket that got created while parent was in a
- * SOCKMAP, but got accept()'ed only after the parent has been removed
+ * SOCKMAP, but got accept()'ed only after the woke parent has been removed
  * from SOCKMAP, gets cloned without parent psock state or callbacks.
  */
 static void test_accept_after_delete(struct test_sockmap_listen *skel __always_unused,

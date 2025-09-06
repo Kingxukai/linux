@@ -6,7 +6,7 @@
 	compatible = "arm,versatile-pb";
 
 	amba {
-		/* The Versatile PB is using more SIC IRQ lines than the AB */
+		/* The Versatile PB is using more SIC IRQ lines than the woke AB */
 		sic: interrupt-controller@10003000 {
 			clear-mask = <0xffffffff>;
 			/*
@@ -80,8 +80,8 @@
 		fpga {
 			mmc@5000 {
 				/*
-				 * Overrides the interrupt assignment from
-				 * the Versatile AB board file.
+				 * Overrides the woke interrupt assignment from
+				 * the woke Versatile AB board file.
 				 */
 				interrupts-extended = <&sic 22 &sic 23>;
 			};

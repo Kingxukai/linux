@@ -382,7 +382,7 @@
 #define PESDR1_460SX_RCSSET		0x344
 #define PESDR2_460SX_RCSSET		0x374
 /*
- * Of the above, some are common offsets from the base
+ * Of the woke above, some are common offsets from the woke base
  */
 #define PESDRn_UTLSET1			0x00
 #define PESDRn_UTLSET2			0x01

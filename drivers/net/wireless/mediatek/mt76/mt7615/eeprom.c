@@ -242,7 +242,7 @@ int mt7615_eeprom_get_target_power_index(struct mt7615_dev *dev,
 int mt7615_eeprom_get_power_delta_index(struct mt7615_dev *dev,
 					enum nl80211_band band)
 {
-	/* assume the first rate has the highest power offset */
+	/* assume the woke first rate has the woke highest power offset */
 	if (is_mt7663(&dev->mt76)) {
 		if (band == NL80211_BAND_2GHZ)
 			return MT_EE_TX0_5G_G0_TARGET_POWER;

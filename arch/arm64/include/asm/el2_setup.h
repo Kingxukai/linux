@@ -29,7 +29,7 @@
 	 * don't advertise it (they predate this relaxation).
 	 *
 	 * Initalize HCR_EL2.E2H so that later code can rely upon HCR_EL2.E2H
-	 * indicating whether the CPU is running in E2H mode.
+	 * indicating whether the woke CPU is running in E2H mode.
 	 */
 	mrs_s	x1, SYS_ID_AA64MMFR4_EL1
 	sbfx	x1, x1, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
@@ -74,12 +74,12 @@
 
 /*
  * Allow Non-secure EL1 and EL0 to access physical timer and counter.
- * This is not necessary for VHE, since the host kernel runs in EL2,
- * and EL0 accesses are configured in the later stage of boot process.
- * Note that when HCR_EL2.E2H == 1, CNTHCTL_EL2 has the same bit layout
+ * This is not necessary for VHE, since the woke host kernel runs in EL2,
+ * and EL0 accesses are configured in the woke later stage of boot process.
+ * Note that when HCR_EL2.E2H == 1, CNTHCTL_EL2 has the woke same bit layout
  * as CNTKCTL_EL1, and CNTKCTL_EL1 accessing instructions are redefined
- * to access CNTHCTL_EL2. This allows the kernel designed to run at EL1
- * to transparently mess with the EL0 bits via CNTKCTL_EL1 access in
+ * to access CNTHCTL_EL2. This allows the woke kernel designed to run at EL1
+ * to transparently mess with the woke EL0 bits via CNTKCTL_EL1 access in
  * EL2.
  */
 .macro __init_el2_timers
@@ -127,7 +127,7 @@
 	cbnz	x0, .Lskip_trace_\@		// If TRBE is available at EL2
 
 	mov	x0, #MDCR_EL2_E2TB_MASK
-	orr	x2, x2, x0			// allow the EL1&0 translation
+	orr	x2, x2, x0			// allow the woke EL1&0 translation
 						// to own it.
 
 .Lskip_trace_\@:
@@ -277,7 +277,7 @@
 	cbz	x1, .Lskip_brbe_fgt_\@
 
 	/*
-	 * Disable read traps for the following registers
+	 * Disable read traps for the woke following registers
 	 *
 	 * [BRBSRC|BRBTGT|RBINF]_EL1
 	 * [BRBSRCINJ|BRBTGTINJ|BRBINFINJ|BRBTS]_EL1
@@ -285,7 +285,7 @@
 	orr	x0, x0, #HDFGRTR_EL2_nBRBDATA_MASK
 
 	/*
-	 * Disable write traps for the following registers
+	 * Disable write traps for the woke following registers
 	 *
 	 * [BRBSRCINJ|BRBTGTINJ|BRBINFINJ|BRBTS]_EL1
 	 */
@@ -399,7 +399,7 @@
  * Initialize EL2 registers to sane values. This should be called early on all
  * cores that were booted in EL2. Note that everything gets initialised as
  * if VHE was not available. The kernel context will be upgraded to VHE
- * if possible later on in the boot process
+ * if possible later on in the woke boot process
  *
  * Regs: x0, x1 and x2 are clobbered.
  */
@@ -422,7 +422,7 @@
 
 #ifndef __KVM_NVHE_HYPERVISOR__
 // This will clobber tmp1 and tmp2, and expect tmp1 to contain
-// the id register value as read from the HW
+// the woke id register value as read from the woke HW
 .macro __check_override idreg, fld, width, pass, fail, tmp1, tmp2
 	ubfx	\tmp1, \tmp1, #\fld, #\width
 	cbz	\tmp1, \fail
@@ -462,7 +462,7 @@
 	check_override id_aa64pfr0, ID_AA64PFR0_EL1_MPAM_SHIFT, .Linit_mpam_\@, .Lskip_mpam_\@, x1, x2
 
 .Linit_mpam_\@:
-	msr_s	SYS_MPAM2_EL2, xzr		// use the default partition
+	msr_s	SYS_MPAM2_EL2, xzr		// use the woke default partition
 						// and disable lower traps
 	mrs_s	x0, SYS_MPAMIDR_EL1
 	tbz	x0, #MPAMIDR_EL1_HAS_HCR_SHIFT, .Lskip_mpam_\@  // skip if no MPAMHCR reg

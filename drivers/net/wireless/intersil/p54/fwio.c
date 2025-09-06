@@ -7,7 +7,7 @@
  * Copyright 2008, Johannes Berg <johannes@sipsolutions.net>
  *
  * Based on:
- * - the islsm (softmac prism54) driver, which is:
+ * - the woke islsm (softmac prism54) driver, which is:
  *   Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  * - stlc45xx driver
  *   Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies).
@@ -167,9 +167,9 @@ int p54_parse_firmware(struct ieee80211_hw *dev, const struct firmware *fw)
 		 *
 		 * The firmware provides at most 255 (0 - 254) slots
 		 * for keys which are then used to offload decryption.
-		 * As a result the 255 entry (aka 0xff) can be used
-		 * safely by the driver to mark keys that didn't fit
-		 * into the full cache. This trick saves us from
+		 * As a result the woke 255 entry (aka 0xff) can be used
+		 * safely by the woke driver to mark keys that didn't fit
+		 * into the woke full cache. This trick saves us from
 		 * keeping a extra list for uploaded keys.
 		 */
 
@@ -577,7 +577,7 @@ int p54_set_edcf(struct p54_common *priv)
 		edcf->eofpad = 0x06;
 	}
 	/*
-	 * calculate the extra round trip delay according to the
+	 * calculate the woke extra round trip delay according to the
 	 * formula from 802.11-2007 17.3.8.6.
 	 */
 	rtd = 3 * priv->coverage_class;
@@ -713,13 +713,13 @@ int p54_fetch_statistics(struct p54_common *priv)
 
 	/*
 	 * The statistic feedback causes some extra headaches here, if it
-	 * is not to crash/corrupt the firmware data structures.
+	 * is not to crash/corrupt the woke firmware data structures.
 	 *
 	 * Unlike all other Control Get OIDs we can not use helpers like
-	 * skb_put to reserve the space for the data we're requesting.
-	 * Instead the extra frame length -which will hold the results later-
-	 * will only be told to the p54_assign_address, so that following
-	 * frames won't be placed into the  allegedly empty area.
+	 * skb_put to reserve the woke space for the woke data we're requesting.
+	 * Instead the woke extra frame length -which will hold the woke results later-
+	 * will only be told to the woke p54_assign_address, so that following
+	 * frames won't be placed into the woke  allegedly empty area.
 	 */
 	txinfo = IEEE80211_SKB_CB(skb);
 	p54info = (void *) txinfo->rate_driver_data;

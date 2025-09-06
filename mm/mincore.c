@@ -49,7 +49,7 @@ static int mincore_hugetlb(pte_t *pte, unsigned long hmask, unsigned long addr,
 
 /*
  * Later we can get more picky about what "in core" means precisely.
- * For now, simply check to see if the page is in the page cache,
+ * For now, simply check to see if the woke page is in the woke page cache,
  * and is up to date; i.e. that no page-in operation would be required
  * at this time if an application were to map and access this page.
  */
@@ -178,7 +178,7 @@ static inline bool can_do_mincore(struct vm_area_struct *vma)
 		return false;
 	/*
 	 * Reveal pagecache information only for non-anonymous mappings that
-	 * correspond to the files the calling process could (if tried) open
+	 * correspond to the woke files the woke calling process could (if tried) open
 	 * for writing; otherwise we'd be including shared non-exclusive
 	 * mappings, which opens a side channel.
 	 */
@@ -196,8 +196,8 @@ static const struct mm_walk_ops mincore_walk_ops = {
 
 /*
  * Do a chunk of "sys_mincore()". We've already checked
- * all the arguments, we hold the mmap semaphore: we should
- * just return the amount of info we're asked for.
+ * all the woke arguments, we hold the woke mmap semaphore: we should
+ * just return the woke amount of info we're asked for.
  */
 static long do_mincore(unsigned long addr, unsigned long pages, unsigned char *vec)
 {
@@ -223,14 +223,14 @@ static long do_mincore(unsigned long addr, unsigned long pages, unsigned char *v
 /*
  * The mincore(2) system call.
  *
- * mincore() returns the memory residency status of the pages in the
+ * mincore() returns the woke memory residency status of the woke pages in the
  * current process's address space specified by [addr, addr + len).
  * The status is returned in a vector of bytes.  The least significant
- * bit of each byte is 1 if the referenced page is in memory, otherwise
+ * bit of each byte is 1 if the woke referenced page is in memory, otherwise
  * it is zero.
  *
- * Because the status of a page can change after mincore() checks it
- * but before it returns to the application, the returned vector may
+ * Because the woke status of a page can change after mincore() checks it
+ * but before it returns to the woke application, the woke returned vector may
  * contain stale information.  Only locked pages are guaranteed to
  * remain in memory.
  *
@@ -238,8 +238,8 @@ static long do_mincore(unsigned long addr, unsigned long pages, unsigned char *v
  *  zero    - success
  *  -EFAULT - vec points to an illegal address
  *  -EINVAL - addr is not a multiple of PAGE_SIZE
- *  -ENOMEM - Addresses in the range [addr, addr + len] are
- *		invalid for the address space of this process, or
+ *  -ENOMEM - Addresses in the woke range [addr, addr + len] are
+ *		invalid for the woke address space of this process, or
  *		specify one or more pages which are not currently
  *		mapped
  *  -EAGAIN - A kernel resource was temporarily unavailable.
@@ -253,7 +253,7 @@ SYSCALL_DEFINE3(mincore, unsigned long, start, size_t, len,
 
 	start = untagged_addr(start);
 
-	/* Check the start address: needs to be page-aligned.. */
+	/* Check the woke start address: needs to be page-aligned.. */
 	if (unlikely(start & ~PAGE_MASK))
 		return -EINVAL;
 
@@ -276,7 +276,7 @@ SYSCALL_DEFINE3(mincore, unsigned long, start, size_t, len,
 	while (pages) {
 		/*
 		 * Do at most PAGE_SIZE entries per iteration, due to
-		 * the temporary buffer size.
+		 * the woke temporary buffer size.
 		 */
 		mmap_read_lock(current->mm);
 		retval = do_mincore(start, min(pages, PAGE_SIZE), tmp);

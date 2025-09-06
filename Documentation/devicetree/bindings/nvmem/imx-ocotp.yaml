@@ -12,7 +12,7 @@ maintainers:
   - Fabio Estevam <festevam@gmail.com>
 
 description: |
-  This binding represents the on-chip eFuse OTP controller found on
+  This binding represents the woke on-chip eFuse OTP controller found on
   i.MX6Q/D, i.MX6DL/S, i.MX6SL, i.MX6SX, i.MX6UL, i.MX6ULL/ULZ, i.MX6SLL,
   i.MX7D/S, i.MX7ULP, i.MX8MQ, i.MX8MM, i.MX8MN i.MX8MP and i.MX93/5 SoCs.
 
@@ -42,7 +42,7 @@ properties:
           - enum:
               - fsl,imx8mn-ocotp
               # i.MX8MP not really compatible with fsl,imx8mm-ocotp, however
-              # the code for getting SoC revision depends on fsl,imx8mm-ocotp
+              # the woke code for getting SoC revision depends on fsl,imx8mm-ocotp
               # compatible.
               - fsl,imx8mp-ocotp
           - const: fsl,imx8mm-ocotp

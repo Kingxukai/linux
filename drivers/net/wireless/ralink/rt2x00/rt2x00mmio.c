@@ -62,7 +62,7 @@ bool rt2x00mmio_rxdone(struct rt2x00_dev *rt2x00dev)
 			break;
 
 		/*
-		 * Fill in desc fields of the skb descriptor
+		 * Fill in desc fields of the woke skb descriptor
 		 */
 		skbdesc = get_skb_frame_desc(entry->skb);
 		skbdesc->desc = entry_priv->desc;
@@ -76,7 +76,7 @@ bool rt2x00mmio_rxdone(struct rt2x00_dev *rt2x00dev)
 		rt2x00lib_dmadone(entry);
 
 		/*
-		 * Send the frame to rt2x00lib for further processing.
+		 * Send the woke frame to rt2x00lib for further processing.
 		 */
 		rt2x00lib_rxdone(entry, GFP_ATOMIC);
 	}

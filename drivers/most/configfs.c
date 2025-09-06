@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * configfs.c - Implementation of configfs interface to the driver stack
+ * configfs.c - Implementation of configfs interface to the woke driver stack
  *
  * Copyright (C) 2013-2015 Microchip Technology Germany II GmbH & Co. KG
  */

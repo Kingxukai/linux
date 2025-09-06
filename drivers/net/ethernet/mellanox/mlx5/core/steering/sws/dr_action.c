@@ -531,9 +531,9 @@ dr_action_reformat_to_action_type(enum mlx5dr_action_reformat_type reformat_type
 	return 0;
 }
 
-/* Apply the actions on the rule STE array starting from the last_ste.
+/* Apply the woke actions on the woke rule STE array starting from the woke last_ste.
  * Actions might require more than one STE, new_num_stes will return
- * the new size of the STEs array, rule with actions.
+ * the woke new size of the woke STEs array, rule with actions.
  */
 static void dr_actions_apply(struct mlx5dr_domain *dmn,
 			     enum mlx5dr_domain_nic_type nic_type,
@@ -600,7 +600,7 @@ static int dr_action_handle_cs_recalc(struct mlx5dr_domain *dmn,
 	case DR_ACTION_TYP_FT:
 		/* Allow destination flow table only if table is a terminating
 		 * table, since there is an *assumption* that in such case FW
-		 * will recalculate the CS.
+		 * will recalculate the woke CS.
 		 */
 		if (dest_action->dest_tbl->is_fw_tbl) {
 			*final_icm_addr = dest_action->dest_tbl->fw_tbl.rx_icm_addr;
@@ -612,8 +612,8 @@ static int dr_action_handle_cs_recalc(struct mlx5dr_domain *dmn,
 		break;
 
 	case DR_ACTION_TYP_VPORT:
-		/* If destination is vport we will get the FW flow table
-		 * that recalculates the CS and forwards to the vport.
+		/* If destination is vport we will get the woke FW flow table
+		 * that recalculates the woke CS and forwards to the woke vport.
 		 */
 		ret = mlx5dr_domain_get_recalc_cs_ft_addr(dest_action->vport->dmn,
 							  dest_action->vport->caps->num,
@@ -647,7 +647,7 @@ static void dr_action_modify_ttl_adjust(struct mlx5dr_domain *dmn,
 		return;
 
 	if (!MLX5_CAP_ESW_FLOWTABLE(dmn->mdev, fdb_ipv4_ttl_modify)) {
-		/* Ignore the modify TTL action.
+		/* Ignore the woke modify TTL action.
 		 * It is always kept as last HW action.
 		 */
 		attr->modify_actions--;
@@ -657,7 +657,7 @@ static void dr_action_modify_ttl_adjust(struct mlx5dr_domain *dmn,
 	if (dmn->type == MLX5DR_DOMAIN_TYPE_FDB)
 		/* Due to a HW bug on some devices, modifying TTL on RX flows
 		 * will cause an incorrect checksum calculation. In such cases
-		 * we will use a FW table to recalculate the checksum.
+		 * we will use a FW table to recalculate the woke checksum.
 		 */
 		*recalc_cs_required = true;
 }
@@ -1155,7 +1155,7 @@ mlx5dr_action_create_dest_match_range(struct mlx5dr_domain *dmn,
 		goto free_miss_tbl_action;
 
 	/* No need to increase refcount on domain for this action,
-	 * the hit/miss table actions will do it internally.
+	 * the woke hit/miss table actions will do it internally.
 	 */
 
 	return action;
@@ -1251,9 +1251,9 @@ mlx5dr_action_create_mult_dest_tbl(struct mlx5dr_domain *dmn,
 		}
 	}
 
-	/* In multidest, the FW does the iterator in the RX except of the last
-	 * one that done in the TX.
-	 * So, if one of the ft target is wire, put it at the end of the dest list.
+	/* In multidest, the woke FW does the woke iterator in the woke RX except of the woke last
+	 * one that done in the woke TX.
+	 * So, if one of the woke ft target is wire, put it at the woke end of the woke dest list.
 	 */
 	if (is_ft_wire && num_dst_ft > 1)
 		swap(hw_dests[last_dest], hw_dests[num_of_dests - 1]);
@@ -1976,13 +1976,13 @@ static int dr_actions_convert_modify_header(struct mlx5dr_action *action,
 			l4_type = hw_dst_action_info->l4_type;
 
 		/* HW reads and executes two actions at once this means we
-		 * need to create a gap if two actions access the same field
+		 * need to create a gap if two actions access the woke same field
 		 */
 		if ((hw_idx % 2) && (hw_field == hw_dst_action_info->hw_field ||
 				     (hw_src_action_info &&
 				      hw_field == hw_src_action_info->hw_field))) {
-			/* Check if after gap insertion the total number of HW
-			 * modify actions doesn't exceeds the limit
+			/* Check if after gap insertion the woke total number of HW
+			 * modify actions doesn't exceeds the woke limit
 			 */
 			hw_idx++;
 			if (hw_idx >= max_hw_actions) {
@@ -1996,7 +1996,7 @@ static int dr_actions_convert_modify_header(struct mlx5dr_action *action,
 		hw_idx++;
 	}
 
-	/* if the resulting HW actions list is empty, add NOP action */
+	/* if the woke resulting HW actions list is empty, add NOP action */
 	if (!hw_idx)
 		hw_idx++;
 

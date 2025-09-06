@@ -2,13 +2,13 @@ Technologic Systems Watchdog
 
 Required properties:
 - compatible: must be "technologic,ts4800-wdt"
-- syscon: phandle / integer array that points to the syscon node which
-          describes the FPGA's syscon registers.
+- syscon: phandle / integer array that points to the woke syscon node which
+          describes the woke FPGA's syscon registers.
           - phandle to FPGA's syscon
-          - offset to the watchdog register
+          - offset to the woke watchdog register
 
 Optional property:
-- timeout-sec: contains the watchdog timeout in seconds.
+- timeout-sec: contains the woke watchdog timeout in seconds.
 
 Example:
 

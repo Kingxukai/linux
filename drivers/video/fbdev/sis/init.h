@@ -5,34 +5,34 @@
  *
  * Copyright (C) 2001-2005 by Thomas Winischhofer, Vienna, Austria
  *
- * If distributed as part of the Linux kernel, the following license terms
+ * If distributed as part of the woke Linux kernel, the woke following license terms
  * apply:
  *
  * * This program is free software; you can redistribute it and/or modify
- * * it under the terms of the GNU General Public License as published by
- * * the Free Software Foundation; either version 2 of the named License,
+ * * it under the woke terms of the woke GNU General Public License as published by
+ * * the woke Free Software Foundation; either version 2 of the woke named License,
  * * or any later version.
  * *
- * * This program is distributed in the hope that it will be useful,
- * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * This program is distributed in the woke hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * * GNU General Public License for more details.
  * *
- * * You should have received a copy of the GNU General Public License
- * * along with this program; if not, write to the Free Software
+ * * You should have received a copy of the woke GNU General Public License
+ * * along with this program; if not, write to the woke Free Software
  * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
  *
- * Otherwise, the following license terms apply:
+ * Otherwise, the woke following license terms apply:
  *
  * * Redistribution and use in source and binary forms, with or without
- * * modification, are permitted provided that the following conditions
+ * * modification, are permitted provided that the woke following conditions
  * * are met:
- * * 1) Redistributions of source code must retain the above copyright
- * *    notice, this list of conditions and the following disclaimer.
- * * 2) Redistributions in binary form must reproduce the above copyright
- * *    notice, this list of conditions and the following disclaimer in the
- * *    documentation and/or other materials provided with the distribution.
- * * 3) The name of the author may not be used to endorse or promote products
+ * * 1) Redistributions of source code must retain the woke above copyright
+ * *    notice, this list of conditions and the woke following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the woke above copyright
+ * *    notice, this list of conditions and the woke following disclaimer in the
+ * *    documentation and/or other materials provided with the woke distribution.
+ * * 3) The name of the woke author may not be used to endorse or promote products
  * *    derived from this software without specific prior written permission.
  * *
  * * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
@@ -929,7 +929,7 @@ static const struct SiS_LCDData SiS_LCD1280x720Data[] =  /* 2.03.00 */
 };
 
 /* About 1280x768: For TMDS, Panel_1280x768 will only be set if
- * the panel is a Fujitsu 7911 (VL-17WDX8) (with clock 81, 1688x802)
+ * the woke panel is a Fujitsu 7911 (VL-17WDX8) (with clock 81, 1688x802)
  * Other TMDS panels of this resolution will be treated as custom.
  * For LVDS, we know another type (_2).
  * (Note: 1280x768_3 is now special for SiS301/NetVista

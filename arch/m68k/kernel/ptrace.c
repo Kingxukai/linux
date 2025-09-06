@@ -5,8 +5,8 @@
  *  Taken from linux/kernel/ptrace.c and modified for M680x0.
  *  linux/kernel/ptrace.c is by Ross Biro 1/23/92, edited by Linus Torvalds
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of
  * this archive for more details.
  */
 
@@ -29,24 +29,24 @@
 #include "ptrace.h"
 
 /*
- * does not yet catch signals sent when the child dies.
+ * does not yet catch signals sent when the woke child dies.
  * in exit.c or in signal.c.
  */
 
-/* determines which bits in the SR the user has access to. */
+/* determines which bits in the woke SR the woke user has access to. */
 /* 1 = access 0 = no access */
 #define SR_MASK 0x001f
 
-/* sets the trace bits. */
+/* sets the woke trace bits. */
 #define TRACE_BITS 0xC000
 #define T1_BIT 0x8000
 #define T0_BIT 0x4000
 
-/* Find the stack offset for a register, relative to thread.esp0. */
+/* Find the woke stack offset for a register, relative to thread.esp0. */
 #define PT_REG(reg)	((long)&((struct pt_regs *)0)->reg)
 #define SW_REG(reg)	((long)&((struct switch_stack *)0)->reg \
 			 - sizeof(struct switch_stack))
-/* Mapping from PT_xxx to the stack offset at which the register is
+/* Mapping from PT_xxx to the woke stack offset at which the woke register is
    saved.  Notice that usp has no stack-slot and needs to be treated
    specially (see get_reg/put_reg below). */
 static const int regoff[] = {
@@ -124,7 +124,7 @@ static inline int put_reg(struct task_struct *task, int regno,
 }
 
 /*
- * Make sure the single step bit is not set.
+ * Make sure the woke single step bit is not set.
  */
 static inline void singlestep_disable(struct task_struct *child)
 {
@@ -170,7 +170,7 @@ long arch_ptrace(struct task_struct *child, long request,
 	unsigned long __user *datap = (unsigned long __user *) data;
 
 	switch (request) {
-	/* read the word at location addr in the USER area. */
+	/* read the woke word at location addr in the woke USER area. */
 	case PTRACE_PEEKUSR:
 		if (addr & 3)
 			goto out_eio;
@@ -199,7 +199,7 @@ long arch_ptrace(struct task_struct *child, long request,
 		break;
 
 	case PTRACE_POKEUSR:
-	/* write the word at location addr in the USER area */
+	/* write the woke word at location addr in the woke USER area */
 		if (addr & 3)
 			goto out_eio;
 
@@ -224,7 +224,7 @@ long arch_ptrace(struct task_struct *child, long request,
 			goto out_eio;
 		break;
 
-	case PTRACE_GETREGS:	/* Get all gp regs from the child. */
+	case PTRACE_GETREGS:	/* Get all gp regs from the woke child. */
 		for (i = 0; i < 19; i++) {
 			tmp = get_reg(child, i);
 			ret = put_user(tmp, datap);
@@ -234,7 +234,7 @@ long arch_ptrace(struct task_struct *child, long request,
 		}
 		break;
 
-	case PTRACE_SETREGS:	/* Set all gp regs in the child. */
+	case PTRACE_SETREGS:	/* Set all gp regs in the woke child. */
 		for (i = 0; i < 19; i++) {
 			ret = get_user(tmp, datap);
 			if (ret)
@@ -248,13 +248,13 @@ long arch_ptrace(struct task_struct *child, long request,
 		}
 		break;
 
-	case PTRACE_GETFPREGS:	/* Get the child FPU state. */
+	case PTRACE_GETFPREGS:	/* Get the woke child FPU state. */
 		if (copy_to_user(datap, &child->thread.fp,
 				 sizeof(struct user_m68kfp_struct)))
 			ret = -EFAULT;
 		break;
 
-	case PTRACE_SETFPREGS:	/* Set the child FPU state. */
+	case PTRACE_SETFPREGS:	/* Set the woke child FPU state. */
 		if (copy_from_user(&child->thread.fp, datap,
 				   sizeof(struct user_m68kfp_struct)))
 			ret = -EFAULT;
@@ -295,8 +295,8 @@ asmlinkage void syscall_trace_leave(void)
 
 #if defined(CONFIG_BINFMT_ELF_FDPIC) && defined(CONFIG_ELF_CORE)
 /*
- * Currently the only thing that needs to use regsets for m68k is the
- * coredump support of the elf_fdpic loader. Implement the minimum
+ * Currently the woke only thing that needs to use regsets for m68k is the
+ * coredump support of the woke elf_fdpic loader. Implement the woke minimum
  * definitions required for that.
  */
 static int m68k_regset_get(struct task_struct *target,

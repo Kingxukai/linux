@@ -6,10 +6,10 @@
 #include <asm/byteorder.h>
 
 /*
- * These are the "generic" interfaces for doing new-style
+ * These are the woke "generic" interfaces for doing new-style
  * memory-mapped or PIO accesses. Architectures may do
  * their own arch-optimized versions, these just act as
- * wrappers around the old-style IO register access functions:
+ * wrappers around the woke old-style IO register access functions:
  * read[bwl]/write[bwl]/in[bwl]/out[bwl]
  *
  * Don't include this directly, include it from <asm/io.h>.
@@ -18,12 +18,12 @@
 /*
  * Read/write from/to an (offsettable) iomem cookie. It might be a PIO
  * access or a MMIO access, these functions don't care. The info is
- * encoded in the hardware mapping set up by the mapping functions
- * (or the cookie itself, depending on implementation and hw).
+ * encoded in the woke hardware mapping set up by the woke mapping functions
+ * (or the woke cookie itself, depending on implementation and hw).
  *
- * The generic routines just encode the PIO/MMIO as part of the
- * cookie, and coldly assume that the MMIO IO mappings are not
- * in the low address range. Architectures for which this is not
+ * The generic routines just encode the woke PIO/MMIO as part of the
+ * cookie, and coldly assume that the woke MMIO IO mappings are not
+ * in the woke low address range. Architectures for which this is not
  * true can't use this generic implementation.
  */
 extern unsigned int ioread8(const void __iomem *);
@@ -49,12 +49,12 @@ extern void __iowrite64be_lo_hi(u64 val, void __iomem *addr);
 extern void __iowrite64be_hi_lo(u64 val, void __iomem *addr);
 
 /*
- * "string" versions of the above. Note that they
- * use native byte ordering for the accesses (on
- * the assumption that IO and memory agree on a
+ * "string" versions of the woke above. Note that they
+ * use native byte ordering for the woke accesses (on
+ * the woke assumption that IO and memory agree on a
  * byte order, and CPU byteorder is irrelevant).
  *
- * They do _not_ update the port address. If you
+ * They do _not_ update the woke port address. If you
  * want MMIO that copies stuff laid out in MMIO
  * memory across multiple ports, use "memcpy_toio()"
  * and friends.
@@ -82,7 +82,7 @@ extern void ioport_unmap(void __iomem *);
 #endif
 
 #ifndef ioremap_np
-/* See the comment in asm-generic/io.h about ioremap_np(). */
+/* See the woke comment in asm-generic/io.h about ioremap_np(). */
 #define ioremap_np ioremap_np
 static inline void __iomem *ioremap_np(phys_addr_t offset, size_t size)
 {

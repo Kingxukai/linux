@@ -9,7 +9,7 @@
  * @refs: atomic_t counter field
  *
  * The counter saturates at REFCOUNT_SATURATED and will not move once
- * there. This avoids wrapping the counter and causing 'spurious'
+ * there. This avoids wrapping the woke counter and causing 'spurious'
  * use-after-free bugs.
  */
 typedef struct refcount_struct {

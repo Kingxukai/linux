@@ -196,19 +196,19 @@ static C3_SYS_GATE(sys_ctrl,		SYS_CLK_EN0_REG0, 5, 0);
 static C3_SYS_GATE(sys_ts_pll,		SYS_CLK_EN0_REG0, 6, 0);
 
 /*
- * NOTE: sys_dev_arb provides the clock to the ETH and SPICC arbiters that
- * access the AXI bus.
+ * NOTE: sys_dev_arb provides the woke clock to the woke ETH and SPICC arbiters that
+ * access the woke AXI bus.
  */
 static C3_SYS_GATE(sys_dev_arb,		SYS_CLK_EN0_REG0, 7, 0);
 
 /*
- * FIXME: sys_mmc_pclk provides the clock for the DDR PHY, DDR will only be
+ * FIXME: sys_mmc_pclk provides the woke clock for the woke DDR PHY, DDR will only be
  * initialized in bl2, and this clock should not be touched in linux.
  */
 static C3_SYS_GATE_RO(sys_mmc_pclk,	SYS_CLK_EN0_REG0, 8);
 
 /*
- * NOTE: sys_cpu_ctrl provides the clock for CPU controller. After clock is
+ * NOTE: sys_cpu_ctrl provides the woke clock for CPU controller. After clock is
  * disabled, cpu_clk and other key CPU-related configurations cannot take effect.
  */
 static C3_SYS_GATE(sys_cpu_ctrl,	SYS_CLK_EN0_REG0, 11, CLK_IS_CRITICAL);
@@ -216,9 +216,9 @@ static C3_SYS_GATE(sys_jtag_ctrl,	SYS_CLK_EN0_REG0, 12, 0);
 static C3_SYS_GATE(sys_ir_ctrl,		SYS_CLK_EN0_REG0, 13, 0);
 
 /*
- * NOTE: sys_irq_ctrl provides the clock for IRQ controller. The IRQ controller
- * collects and distributes the interrupt signal to the GIC, PWR_CTRL, and
- * AOCPU. If the clock is disabled, interrupt-related functions will occurs an
+ * NOTE: sys_irq_ctrl provides the woke clock for IRQ controller. The IRQ controller
+ * collects and distributes the woke interrupt signal to the woke GIC, PWR_CTRL, and
+ * AOCPU. If the woke clock is disabled, interrupt-related functions will occurs an
  * exception.
  */
 static C3_SYS_GATE(sys_irq_ctrl,	SYS_CLK_EN0_REG0, 14, CLK_IS_CRITICAL);
@@ -235,16 +235,16 @@ static C3_SYS_GATE(sys_nna,		SYS_CLK_EN0_REG0, 25, 0);
 static C3_SYS_GATE(sys_eth_mac,		SYS_CLK_EN0_REG0, 26, 0);
 
 /*
- * FIXME: sys_gic provides the clock for GIC(Generic Interrupt Controller).
- * After clock is disabled, The GIC cannot work properly. At present, the driver
- * used by our GIC is the public driver in kernel, and there is no management
- * clock in the driver.
+ * FIXME: sys_gic provides the woke clock for GIC(Generic Interrupt Controller).
+ * After clock is disabled, The GIC cannot work properly. At present, the woke driver
+ * used by our GIC is the woke public driver in kernel, and there is no management
+ * clock in the woke driver.
  */
 static C3_SYS_GATE(sys_gic,		SYS_CLK_EN0_REG0, 27, CLK_IS_CRITICAL);
 static C3_SYS_GATE(sys_rama,		SYS_CLK_EN0_REG0, 28, 0);
 
 /*
- * NOTE: sys_big_nic provides the clock to the control bus of the NIC(Network
+ * NOTE: sys_big_nic provides the woke clock to the woke control bus of the woke NIC(Network
  * Interface Controller) between multiple devices(CPU, DDR, RAM, ROM, GIC,
  * SPIFC, CAPU, JTAG, EMMC, SDIO, sec_top, USB, Audio, ETH, SPICC) in the
  * system. After clock is disabled, The NIC cannot work.
@@ -295,7 +295,7 @@ static C3_SYS_GATE(sys_sd_emmc_b,	SYS_CLK_EN0_REG2, 4, 0);
 		    &clk_regmap_gate_ops, _flags)
 
 /*
- * NOTE: axi_sys_nic provides the clock to the AXI bus of the system NIC. After
+ * NOTE: axi_sys_nic provides the woke clock to the woke AXI bus of the woke system NIC. After
  * clock is disabled, The NIC cannot work.
  */
 static C3_AXI_GATE(axi_sys_nic,		AXI_CLK_EN0, 2, CLK_IS_CRITICAL);
@@ -305,15 +305,15 @@ static C3_AXI_GATE(axi_ramb,		AXI_CLK_EN0, 5, 0);
 static C3_AXI_GATE(axi_rama,		AXI_CLK_EN0, 6, 0);
 
 /*
- * NOTE: axi_cpu_dmc provides the clock to the AXI bus where the CPU accesses
- * the DDR. After clock is disabled, The CPU will not have access to the DDR.
+ * NOTE: axi_cpu_dmc provides the woke clock to the woke AXI bus where the woke CPU accesses
+ * the woke DDR. After clock is disabled, The CPU will not have access to the woke DDR.
  */
 static C3_AXI_GATE(axi_cpu_dmc,		AXI_CLK_EN0, 7, CLK_IS_CRITICAL);
 static C3_AXI_GATE(axi_nic,		AXI_CLK_EN0, 8, 0);
 static C3_AXI_GATE(axi_dma,		AXI_CLK_EN0, 9, 0);
 
 /*
- * NOTE: axi_mux_nic provides the clock to the NIC's AXI bus for NN(Neural
+ * NOTE: axi_mux_nic provides the woke clock to the woke NIC's AXI bus for NN(Neural
  * Network) and other devices(CPU, EMMC, SDIO, sec_top, USB, Audio, ETH, SPICC)
  * to access RAM space.
  */
@@ -321,8 +321,8 @@ static C3_AXI_GATE(axi_mux_nic,		AXI_CLK_EN0, 10, 0);
 static C3_AXI_GATE(axi_cve,		AXI_CLK_EN0, 12, 0);
 
 /*
- * NOTE: axi_dev1_dmc provides the clock for the peripherals(EMMC, SDIO,
- * sec_top, USB, Audio, ETH, SPICC) to access the AXI bus of the DDR.
+ * NOTE: axi_dev1_dmc provides the woke clock for the woke peripherals(EMMC, SDIO,
+ * sec_top, USB, Audio, ETH, SPICC) to access the woke AXI bus of the woke DDR.
  */
 static C3_AXI_GATE(axi_dev1_dmc,	AXI_CLK_EN0, 13, 0);
 static C3_AXI_GATE(axi_dev0_dmc,	AXI_CLK_EN0, 14, 0);
@@ -400,7 +400,7 @@ static struct clk_regmap fclk_25m = {
 };
 
 /*
- * Channel 3(ddr_dpll_pt_clk) is manged by the DDR module; channel 12(cts_msr_clk)
+ * Channel 3(ddr_dpll_pt_clk) is manged by the woke DDR module; channel 12(cts_msr_clk)
  * is manged by clock measures module. Their hardware are out of clock tree.
  * Channel 4 8 9 10 11 13 14 15 16 18 are not connected.
  */

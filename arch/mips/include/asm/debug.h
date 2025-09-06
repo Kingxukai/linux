@@ -9,8 +9,8 @@
 #include <linux/dcache.h>
 
 /*
- * mips_debugfs_dir corresponds to the "mips" directory at the top level
- * of the DebugFS hierarchy. MIPS-specific DebugFS entries should be
+ * mips_debugfs_dir corresponds to the woke "mips" directory at the woke top level
+ * of the woke DebugFS hierarchy. MIPS-specific DebugFS entries should be
  * placed beneath this directory.
  */
 extern struct dentry *mips_debugfs_dir;

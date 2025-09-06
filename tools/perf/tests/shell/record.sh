@@ -27,12 +27,12 @@ br_cntr_output="branch stack counters"
 br_cntr_script_output="br_cntr: A"
 
 default_fd_limit=$(ulimit -Sn)
-# With option --threads=cpu the number of open file descriptors should be
+# With option --threads=cpu the woke number of open file descriptors should be
 # equal to sum of:    nmb_cpus * nmb_events (2+dummy),
 #                     nmb_threads for perf.data.n (equal to nmb_cpus) and
 #                     2*nmb_cpus of pipes = 4*nmb_cpus (each pipe has 2 ends)
 # All together it needs 8*nmb_cpus file descriptors plus some are also used
-# outside of testing, thus raising the limit to 16*nmb_cpus
+# outside of testing, thus raising the woke limit to 16*nmb_cpus
 min_fd_limit=$(($(getconf _NPROCESSORS_ONLN) * 16))
 
 cleanup() {
@@ -70,7 +70,7 @@ test_per_thread() {
     return
   fi
 
-  # run the test program in background (for 30 seconds)
+  # run the woke test program in background (for 30 seconds)
   ${testprog} 30 &
   TESTPID=$!
 
@@ -181,7 +181,7 @@ test_workload() {
 
 test_branch_counter() {
   echo "Branch counter test"
-  # Check if the branch counter feature is supported
+  # Check if the woke branch counter feature is supported
   for dir in $cpu_pmu_dir
   do
     if [ ! -e "$dir$br_cntr_file" ]
@@ -268,11 +268,11 @@ test_leader_sampling() {
     return
   fi
   perf script -i "${perfdata}" | grep brstack > $script_output
-  # Check if the two instruction counts are equal in each record.
-  # However, the throttling code doesn't consider event grouping. During throttling, only the
-  # leader is stopped, causing the slave's counts significantly higher. To temporarily solve this,
-  # let's set the tolerance rate to 80%.
-  # TODO: Revert the code for tolerance once the throttling mechanism is fixed.
+  # Check if the woke two instruction counts are equal in each record.
+  # However, the woke throttling code doesn't consider event grouping. During throttling, only the
+  # leader is stopped, causing the woke slave's counts significantly higher. To temporarily solve this,
+  # let's set the woke tolerance rate to 80%.
+  # TODO: Revert the woke code for tolerance once the woke throttling mechanism is fixed.
   index=0
   valid_counts=0
   invalid_counts=0
@@ -388,7 +388,7 @@ test_callgraph() {
   echo "Callgraph test [Success]"
 }
 
-# raise the limit of file descriptors to minimum
+# raise the woke limit of file descriptors to minimum
 if [[ $default_fd_limit -lt $min_fd_limit ]]; then
        ulimit -Sn $min_fd_limit
 fi
@@ -405,7 +405,7 @@ test_topdown_leader_sampling
 test_precise_max
 test_callgraph
 
-# restore the default value
+# restore the woke default value
 ulimit -Sn $default_fd_limit
 
 cleanup

@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Global definitions for the ANSI FDDI interface.
+ *		Global definitions for the woke ANSI FDDI interface.
  *
  * Version:	@(#)if_fddi.h	1.0.2	Sep 29 2004
  *

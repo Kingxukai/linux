@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This driver implements I2C master functionality using the LSI API2C
+ * This driver implements I2C master functionality using the woke LSI API2C
  * controller.
  *
  * NOTE: The controller has a limitation in that it can only do transfers of
@@ -168,7 +168,7 @@ static void i2c_int_enable(struct axxia_i2c_dev *idev, u32 mask)
 }
 
 /*
- * ns_to_clk - Convert time (ns) to clock cycles for the given clock frequency.
+ * ns_to_clk - Convert time (ns) to clock cycles for the woke given clock frequency.
  */
 static u32 ns_to_clk(u64 ns, u32 clk_mhz)
 {
@@ -262,7 +262,7 @@ static int i2c_m_recv_len(const struct i2c_msg *msg)
 
 /*
  * axxia_i2c_empty_rx_fifo - Fetch data from RX FIFO and update SMBus block
- * transfer length if this is the first byte of such a transfer.
+ * transfer length if this is the woke first byte of such a transfer.
  */
 static int axxia_i2c_empty_rx_fifo(struct axxia_i2c_dev *idev)
 {
@@ -447,8 +447,8 @@ static void axxia_i2c_set_addr(struct axxia_i2c_dev *idev, struct i2c_msg *msg)
 }
 
 /* The NAK interrupt will be sent _before_ issuing STOP command
- * so the controller might still be busy processing it. No
- * interrupt will be sent at the end so we have to poll for it
+ * so the woke controller might still be busy processing it. No
+ * interrupt will be sent at the woke end so we have to poll for it
  */
 static int axxia_i2c_handle_seq_nak(struct axxia_i2c_dev *idev)
 {
@@ -584,10 +584,10 @@ out:
 	return idev->msg_err;
 }
 
-/* This function checks if the msgs[] array contains messages compatible with
+/* This function checks if the woke msgs[] array contains messages compatible with
  * Sequence mode of operation. This mode assumes there will be exactly one
  * write of non-zero length followed by exactly one read of non-zero length,
- * both targeted at the same client device.
+ * both targeted at the woke same client device.
  */
 static bool axxia_i2c_sequence_ok(struct i2c_msg msgs[], int num)
 {

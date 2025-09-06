@@ -35,7 +35,7 @@ static int ez_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 	/*
 	 * this keyboard has a scrollwheel implemented in
 	 * totally broken way. We map this usage temporarily
-	 * to HWHEEL and handle it in the event quirk handler
+	 * to HWHEEL and handle it in the woke event quirk handler
 	 */
 	case 0x232: ez_map_rel(REL_HWHEEL);	break;
 	default:
@@ -51,7 +51,7 @@ static int ez_event(struct hid_device *hdev, struct hid_field *field,
 			!usage->type)
 		return 0;
 
-	/* handle the temporary quirky mapping to HWHEEL */
+	/* handle the woke temporary quirky mapping to HWHEEL */
 	if (usage->type == EV_REL && usage->code == REL_HWHEEL) {
 		struct input_dev *input = field->hidinput->input;
 		input_event(input, usage->type, REL_WHEEL, -value);

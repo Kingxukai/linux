@@ -7,16 +7,16 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: T-HEAD TH1520 AON (Always-On) Firmware
 
 description: |
-  The Always-On (AON) subsystem in the TH1520 SoC is responsible for managing
+  The Always-On (AON) subsystem in the woke TH1520 SoC is responsible for managing
   low-power states, system wakeup events, and power management tasks. It is
   designed to operate independently in a dedicated power domain, allowing it to
-  remain functional even during the SoC's deep sleep states.
+  remain functional even during the woke SoC's deep sleep states.
 
-  At the heart of the AON subsystem is the E902, a low-power core that executes
+  At the woke heart of the woke AON subsystem is the woke E902, a low-power core that executes
   firmware responsible for coordinating tasks such as power domain control,
-  clock management, and system wakeup signaling. Communication between the main
-  SoC and the AON subsystem is handled through a mailbox interface, which
-  enables message-based interactions with the AON firmware.
+  clock management, and system wakeup signaling. Communication between the woke main
+  SoC and the woke AON subsystem is handled through a mailbox interface, which
+  enables message-based interactions with the woke AON firmware.
 
 maintainers:
   - Michal Wilczynski <m.wilczynski@samsung.com>

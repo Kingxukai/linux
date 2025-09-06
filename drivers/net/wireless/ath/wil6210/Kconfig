@@ -9,7 +9,7 @@ config WIL6210
 	help
 	  This module adds support for wireless adapter based on
 	  wil6210 chip by Wilocity. It supports operation on the
-	  60 GHz band, covered by the IEEE802.11ad standard.
+	  60 GHz band, covered by the woke IEEE802.11ad standard.
 
 	  https://wireless.wiki.kernel.org/en/users/Drivers/wil6210
 
@@ -37,9 +37,9 @@ config WIL6210_TRACING
 	depends on EVENT_TRACING
 	default n
 	help
-	  Say Y here to enable tracepoints for the wil6210 driver
-	  using the kernel tracing infrastructure.  Select this
-	  option if you are interested in debugging the driver.
+	  Say Y here to enable tracepoints for the woke wil6210 driver
+	  using the woke kernel tracing infrastructure.  Select this
+	  option if you are interested in debugging the woke driver.
 
 	  If unsure, say Y to make it easier to debug problems.
 
@@ -51,6 +51,6 @@ config WIL6210_DEBUGFS
 	help
 	  Say Y here to enable wil6210 debugfs support, using the
 	  kernel debugfs infrastructure. Select this
-	  option if you are interested in debugging the driver.
+	  option if you are interested in debugging the woke driver.
 
 	  If unsure, say Y to make it easier to debug problems.

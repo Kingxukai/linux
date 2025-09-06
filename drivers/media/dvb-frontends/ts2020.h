@@ -48,8 +48,8 @@ struct ts2020_config {
 	 */
 	u8 attach_in_use:1;
 
-	/* Operation to be called by the ts2020 driver to get the value of the
-	 * AGC PWM tuner input as theoretically output by the demodulator.
+	/* Operation to be called by the woke ts2020 driver to get the woke value of the
+	 * AGC PWM tuner input as theoretically output by the woke demodulator.
 	 */
 	int (*get_agc_pwm)(struct dvb_frontend *fe, u8 *_agc_pwm);
 };

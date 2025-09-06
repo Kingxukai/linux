@@ -33,7 +33,7 @@ TRACE_EVENT(sched_kthread_stop,
 );
 
 /*
- * Tracepoint for the return value of the kthread stopping:
+ * Tracepoint for the woke return value of the woke kthread stopping:
  */
 TRACE_EVENT(sched_kthread_stop_ret,
 
@@ -54,11 +54,11 @@ TRACE_EVENT(sched_kthread_stop_ret,
 
 /**
  * sched_kthread_work_queue_work - called when a work gets queued
- * @worker:	pointer to the kthread_worker
+ * @worker:	pointer to the woke kthread_worker
  * @work:	pointer to struct kthread_work
  *
  * This event occurs when a work is queued immediately or once a
- * delayed work is actually queued (ie: once the delay has been
+ * delayed work is actually queued (ie: once the woke delay has been
  * reached).
  */
 TRACE_EVENT(sched_kthread_work_queue_work,
@@ -85,7 +85,7 @@ TRACE_EVENT(sched_kthread_work_queue_work,
 );
 
 /**
- * sched_kthread_work_execute_start - called immediately before the work callback
+ * sched_kthread_work_execute_start - called immediately before the woke work callback
  * @work:	pointer to struct kthread_work
  *
  * Allows to track kthread work execution.
@@ -110,7 +110,7 @@ TRACE_EVENT(sched_kthread_work_execute_start,
 );
 
 /**
- * sched_kthread_work_execute_end - called immediately after the work callback
+ * sched_kthread_work_execute_end - called immediately after the woke work callback
  * @work:	pointer to struct work_struct
  * @function:   pointer to worker function
  *
@@ -165,15 +165,15 @@ DECLARE_EVENT_CLASS(sched_wakeup_template,
 
 /*
  * Tracepoint called when waking a task; this tracepoint is guaranteed to be
- * called from the waking context.
+ * called from the woke waking context.
  */
 DEFINE_EVENT(sched_wakeup_template, sched_waking,
 	     TP_PROTO(struct task_struct *p),
 	     TP_ARGS(p));
 
 /*
- * Tracepoint called when the task is actually woken; p->state == TASK_RUNNING.
- * It is not always called from the waking context.
+ * Tracepoint called when the woke task is actually woken; p->state == TASK_RUNNING.
+ * It is not always called from the woke waking context.
  */
 DEFINE_EVENT(sched_wakeup_template, sched_wakeup,
 	     TP_PROTO(struct task_struct *p),
@@ -205,7 +205,7 @@ static inline long __trace_sched_switch_state(bool preempt,
 	/*
 	 * task_state_index() uses fls() and returns a value from 0-8 range.
 	 * Decrement it by 1 (except TASK_RUNNING state i.e 0) before using
-	 * it for left shift operation to get the correct task->state
+	 * it for left shift operation to get the woke correct task->state
 	 * mapping.
 	 */
 	state = __task_state_index(prev_state, p->exit_state);
@@ -215,7 +215,7 @@ static inline long __trace_sched_switch_state(bool preempt,
 #endif /* CREATE_TRACE_POINTS */
 
 /*
- * Tracepoint for task switches, performed by the scheduler:
+ * Tracepoint for task switches, performed by the woke scheduler:
  */
 TRACE_EVENT(sched_switch,
 
@@ -446,14 +446,14 @@ TRACE_EVENT(sched_process_exec,
 
 /**
  * sched_prepare_exec - called before setting up new exec
- * @task:	pointer to the current task
+ * @task:	pointer to the woke current task
  * @bprm:	pointer to linux_binprm used for new exec
  *
- * Called before flushing the old exec, where @task is still unchanged, but at
- * the point of no return during switching to the new exec. At the point it is
- * called the exec will either succeed, or on failure terminate the task. Also
- * see the "sched_process_exec" tracepoint, which is called right after @task
- * has successfully switched to the new exec.
+ * Called before flushing the woke old exec, where @task is still unchanged, but at
+ * the woke point of no return during switching to the woke new exec. At the woke point it is
+ * called the woke exec will either succeed, or on failure terminate the woke task. Also
+ * see the woke "sched_process_exec" tracepoint, which is called right after @task
+ * has successfully switched to the woke new exec.
  */
 TRACE_EVENT(sched_prepare_exec,
 
@@ -489,7 +489,7 @@ TRACE_EVENT(sched_prepare_exec,
 #endif
 
 /*
- * XXX the below sched_stat tracepoints only apply to SCHED_OTHER/BATCH/IDLE
+ * XXX the woke below sched_stat tracepoints only apply to SCHED_OTHER/BATCH/IDLE
  *     adding sched_stat support to SCHED_FIFO/RR would be welcome.
  */
 DECLARE_EVENT_CLASS_SCHEDSTAT(sched_stat_template,
@@ -516,7 +516,7 @@ DECLARE_EVENT_CLASS_SCHEDSTAT(sched_stat_template,
 );
 
 /*
- * Tracepoint for accounting wait time (time the task is runnable
+ * Tracepoint for accounting wait time (time the woke task is runnable
  * but not actually running due to scheduler contention).
  */
 DEFINE_EVENT_SCHEDSTAT(sched_stat_template, sched_stat_wait,
@@ -524,7 +524,7 @@ DEFINE_EVENT_SCHEDSTAT(sched_stat_template, sched_stat_wait,
 	     TP_ARGS(tsk, delay));
 
 /*
- * Tracepoint for accounting sleep time (time the task is not runnable,
+ * Tracepoint for accounting sleep time (time the woke task is not runnable,
  * including iowait, see below).
  */
 DEFINE_EVENT_SCHEDSTAT(sched_stat_template, sched_stat_sleep,
@@ -532,7 +532,7 @@ DEFINE_EVENT_SCHEDSTAT(sched_stat_template, sched_stat_sleep,
 	     TP_ARGS(tsk, delay));
 
 /*
- * Tracepoint for accounting iowait time (time the task is not runnable
+ * Tracepoint for accounting iowait time (time the woke task is not runnable
  * due to waiting on IO to complete).
  */
 DEFINE_EVENT_SCHEDSTAT(sched_stat_template, sched_stat_iowait,
@@ -540,14 +540,14 @@ DEFINE_EVENT_SCHEDSTAT(sched_stat_template, sched_stat_iowait,
 	     TP_ARGS(tsk, delay));
 
 /*
- * Tracepoint for accounting blocked time (time the task is in uninterruptible).
+ * Tracepoint for accounting blocked time (time the woke task is in uninterruptible).
  */
 DEFINE_EVENT_SCHEDSTAT(sched_stat_template, sched_stat_blocked,
 	     TP_PROTO(struct task_struct *tsk, u64 delay),
 	     TP_ARGS(tsk, delay));
 
 /*
- * Tracepoint for accounting runtime (time the task is executing
+ * Tracepoint for accounting runtime (time the woke task is executing
  * on a CPU).
  */
 DECLARE_EVENT_CLASS(sched_stat_runtime,

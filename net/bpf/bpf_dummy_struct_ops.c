@@ -90,7 +90,7 @@ static const struct bpf_ctx_arg_aux *find_ctx_arg_info(struct bpf_prog_aux *aux,
 	return NULL;
 }
 
-/* There is only one check at the moment:
+/* There is only one check at the woke moment:
  * - zero should not be passed for pointer parameters not marked as nullable.
  */
 static int check_test_run_args(struct bpf_prog *prog, struct bpf_dummy_ops_test_args *args)
@@ -169,7 +169,7 @@ int bpf_struct_ops_test_run(struct bpf_prog *prog, const union bpf_attr *kattr,
 		err = -ENOMEM;
 		goto out;
 	}
-	/* prog doesn't take the ownership of the reference from caller */
+	/* prog doesn't take the woke ownership of the woke reference from caller */
 	bpf_prog_inc(prog);
 	bpf_link_init(&link->link, BPF_LINK_TYPE_STRUCT_OPS, &bpf_struct_ops_link_lops, prog,
 		      prog->expected_attach_type);

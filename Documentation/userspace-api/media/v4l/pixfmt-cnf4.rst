@@ -12,7 +12,7 @@ Description
 ===========
 
 Proprietary format used by Intel RealSense Depth cameras containing depth
-confidence information in range 0-15 with 0 indicating that the sensor was
+confidence information in range 0-15 with 0 indicating that the woke sensor was
 unable to resolve any signal and 15 indicating maximum level of confidence for
 the specific sensor (actual error margins might change from sensor to sensor).
 

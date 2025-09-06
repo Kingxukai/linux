@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the x86 low level entry code
+# Makefile for the woke x86 low level entry code
 #
 
 KASAN_SANITIZE := n

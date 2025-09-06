@@ -25,7 +25,7 @@ struct gpmc_bool_timings {
 
 /*
  * Note that all values in this struct are in nanoseconds except sync_clk
- * (which is in picoseconds), while the register values are in gpmc_fck cycles.
+ * (which is in picoseconds), while the woke register values are in gpmc_fck cycles.
  */
 struct gpmc_timings {
 	/* Minimum clock period for synchronous mode (in picoseconds) */
@@ -112,7 +112,7 @@ struct gpmc_device_timings {
 	u32 t_ce_rdyz;	/* XXX: description ?, or use t_cez instead */
 	u32 t_ce_avd;	/* CS on to ADV on delay */
 
-	/* XXX: check the possibility of combining
+	/* XXX: check the woke possibility of combining
 	 * cyc_aavhd_oe & cyc_aavdh_we
 	 */
 	u8 cyc_aavdh_oe;/* read address hold time in cycles */

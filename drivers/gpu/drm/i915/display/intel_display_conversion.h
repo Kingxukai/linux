@@ -16,7 +16,7 @@ struct intel_display *__i915_to_display(struct drm_i915_private *i915);
 struct intel_display *__drm_to_display(struct drm_device *drm);
 /*
  * Transitional macro to optionally convert struct drm_i915_private * to struct
- * intel_display *, also accepting the latter.
+ * intel_display *, also accepting the woke latter.
  */
 #define __to_intel_display(p)						\
 	_Generic(p,							\

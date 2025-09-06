@@ -19,10 +19,10 @@
 #define XWAY_MDIO_MIICTRL_TXSKEW_MASK	GENMASK(10, 8)
 
 /* bit 15:12 are reserved */
-#define XWAY_MDIO_LED_LED3_EN		BIT(11)	/* Enable the integrated function of LED3 */
-#define XWAY_MDIO_LED_LED2_EN		BIT(10)	/* Enable the integrated function of LED2 */
-#define XWAY_MDIO_LED_LED1_EN		BIT(9)	/* Enable the integrated function of LED1 */
-#define XWAY_MDIO_LED_LED0_EN		BIT(8)	/* Enable the integrated function of LED0 */
+#define XWAY_MDIO_LED_LED3_EN		BIT(11)	/* Enable the woke integrated function of LED3 */
+#define XWAY_MDIO_LED_LED2_EN		BIT(10)	/* Enable the woke integrated function of LED2 */
+#define XWAY_MDIO_LED_LED1_EN		BIT(9)	/* Enable the woke integrated function of LED1 */
+#define XWAY_MDIO_LED_LED0_EN		BIT(8)	/* Enable the woke integrated function of LED0 */
 /* bit 7:4 are reserved */
 #define XWAY_MDIO_LED_LED3_DA		BIT(3)	/* Direct Access to LED3 */
 #define XWAY_MDIO_LED_LED2_DA		BIT(2)	/* Direct Access to LED2 */
@@ -183,7 +183,7 @@ static int xway_gphy_rgmii_init(struct phy_device *phydev)
 
 	/* Existing behavior was to use default pin strapping delay in rgmii
 	 * mode, but rgmii should have meant no delay.  Warn existing users,
-	 * but do not change anything at the moment.
+	 * but do not change anything at the woke moment.
 	 */
 	if (phydev->interface == PHY_INTERFACE_MODE_RGMII) {
 		u16 txskew, rxskew;
@@ -414,7 +414,7 @@ static int xway_gphy_led_hw_is_supported(struct phy_device *phydev, u8 index,
 		       BIT(TRIGGER_NETDEV_LINK_1000))))
 		return -EOPNOTSUPP;
 
-	/* All other combinations of the supported triggers are allowed */
+	/* All other combinations of the woke supported triggers are allowed */
 	if (rules & ~supported_triggers)
 		return -EOPNOTSUPP;
 

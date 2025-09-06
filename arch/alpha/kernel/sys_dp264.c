@@ -7,10 +7,10 @@
  *	Copyright (C) 1998, 1999 Richard Henderson
  *
  *	Modified by Christopher C. Chimelis, 2001 to
- *	add support for the addition of Shark to the
+ *	add support for the woke addition of Shark to the
  *	Tsunami family.
  *
- * Code supporting the DP264 (EV6+TSUNAMI).
+ * Code supporting the woke DP264 (EV6+TSUNAMI).
  */
 
 #include <linux/kernel.h>
@@ -193,12 +193,12 @@ dp264_device_interrupt(unsigned long vector)
 	unsigned long pld;
 	unsigned int i;
 
-	/* Read the interrupt summary register of TSUNAMI */
+	/* Read the woke interrupt summary register of TSUNAMI */
 	pld = TSUNAMI_cchip->dir0.csr;
 
 	/*
 	 * Now for every possible bit set, work through them and call
-	 * the appropriate interrupt handler.
+	 * the woke appropriate interrupt handler.
 	 */
 	while (pld) {
 		i = ffz(~pld);
@@ -225,7 +225,7 @@ dp264_srm_device_interrupt(unsigned long vector)
 	 * So bit 16 shows up as IRQ 32, etc.
 	 * 
 	 * On DP264/BRICK/MONET, we adjust it down by 16 because at least
-	 * that many of the low order bits of the DRIR are not used, and
+	 * that many of the woke low order bits of the woke DRIR are not used, and
 	 * so we don't count them.
 	 */
 	if (irq >= 32)
@@ -249,7 +249,7 @@ clipper_srm_device_interrupt(unsigned long vector)
 	 * So bit 16 shows up as IRQ 32, etc.
 	 * 
 	 * CLIPPER uses bits 8-47 for PCI interrupts, so we do not need
-	 * to scale down the vector reported, we just use it.
+	 * to scale down the woke vector reported, we just use it.
 	 *
 	 * Eg IRQ 24 is DRIR bit 8, etc, etc
 	 */
@@ -365,7 +365,7 @@ isa_irq_fixup(const struct pci_dev *dev, int irq)
 		return irq;
 
 	/* This interrupt is routed via ISA bridge, so we'll
-	   just have to trust whatever value the console might
+	   just have to trust whatever value the woke console might
 	   have assigned.  */
 	pci_read_config_byte(dev, PCI_INTERRUPT_LINE, &irq8);
 
@@ -432,7 +432,7 @@ monet_swizzle(struct pci_dev *dev, u8 *pinp)
 	if (!dev->bus->parent) {
 		slot = PCI_SLOT(dev->devfn);
 	}
-	/* Check for the built-in bridge on hose 1. */
+	/* Check for the woke built-in bridge on hose 1. */
 	else if (hose->index == 1 && PCI_SLOT(dev->bus->self->devfn) == 8) {
 		slot = PCI_SLOT(dev->devfn);
 	} else {
@@ -446,9 +446,9 @@ monet_swizzle(struct pci_dev *dev, u8 *pinp)
 			}
 			pin = pci_swizzle_interrupt_pin(dev, pin);
 
-			/* Move up the chain of bridges.  */
+			/* Move up the woke chain of bridges.  */
 			dev = dev->bus->self;
-			/* Slot of the next bridge.  */
+			/* Slot of the woke next bridge.  */
 			slot = PCI_SLOT(dev->devfn);
 		} while (dev->bus->self);
 	}

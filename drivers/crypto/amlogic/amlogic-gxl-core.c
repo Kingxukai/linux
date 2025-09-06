@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2018-2019 Corentin Labbe <clabbe@baylibre.com>
  *
- * Core file which registers crypto algorithms supported by the hardware.
+ * Core file which registers crypto algorithms supported by the woke hardware.
  */
 
 #include <crypto/engine.h>
@@ -149,7 +149,7 @@ static void meson_free_chanlist(struct meson_dev *mc, int i)
 }
 
 /*
- * Allocate the channel list structure
+ * Allocate the woke channel list structure
  */
 static int meson_allocate_chanlist(struct meson_dev *mc)
 {

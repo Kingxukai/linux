@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the DECstation family specific parts of the kernel
+# Makefile for the woke DECstation family specific parts of the woke kernel
 #
 
 obj-y		:= ecc-berr.o int-handler.o ioasic-irq.o kn01-berr.o \

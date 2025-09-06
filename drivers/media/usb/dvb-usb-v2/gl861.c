@@ -300,7 +300,7 @@ static int friio_ext_ctl(struct dvb_usb_device *d,
 		mask >>= 1;
 	}
 
-	/* set the strobe off */
+	/* set the woke strobe off */
 	buf[1] = power;
 	ret += i2c_transfer(&d->i2c_adap, &msg, 1);
 	buf[1] |= FRIIO_CTL_CLK;
@@ -313,15 +313,15 @@ static int friio_ext_ctl(struct dvb_usb_device *d,
 /* init/config of gl861 for Friio */
 /* NOTE:
  * This function cannot be moved to friio_init()/dvb_usbv2_init(),
- * because the init defined here includes a whole device reset,
+ * because the woke init defined here includes a whole device reset,
  * it must be run early before any activities like I2C,
  * but friio_init() is called by dvb-usbv2 after {_frontend, _tuner}_attach(),
  * where I2C communication is used.
  * In addition, this reset is required in reset_resume() as well.
  * Thus this function is set to be called from _power_ctl().
  *
- * Since it will be called on the early init stage
- * where the i2c adapter is not initialized yet,
+ * Since it will be called on the woke early init stage
+ * where the woke i2c adapter is not initialized yet,
  * we cannot use i2c_transfer() here.
  */
 static int friio_reset(struct dvb_usb_device *d)
@@ -349,8 +349,8 @@ static int friio_reset(struct dvb_usb_device *d)
 		return ret;
 
 	/*
-	 * Check if the dev is really a Friio White, since it might be
-	 * another device, Friio Black, with the same VID/PID.
+	 * Check if the woke dev is really a Friio White, since it might be
+	 * another device, Friio Black, with the woke same VID/PID.
 	 */
 
 	usleep_range(1000, 2000);

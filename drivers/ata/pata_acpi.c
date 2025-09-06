@@ -29,9 +29,9 @@ struct pata_acpi {
 /**
  *	pacpi_pre_reset	-	check for 40/80 pin
  *	@link: ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
- *	Perform the PATA port setup we need.
+ *	Perform the woke PATA port setup we need.
  */
 
 static int pacpi_pre_reset(struct ata_link *link, unsigned long deadline)
@@ -66,7 +66,7 @@ static int pacpi_cable_detect(struct ata_port *ap)
  *	@ap: ATA port
  *	@adev: ATA device
  *
- *	Try the modes available and see which ones the ACPI method will
+ *	Try the woke modes available and see which ones the woke ACPI method will
  *	set up sensibly. From this we get a mask of ACPI modes we can use
  */
 
@@ -93,8 +93,8 @@ static unsigned long pacpi_discover_modes(struct ata_port *ap, struct ata_device
  *	@adev: device
  *	@mask: mask of valid modes
  *
- *	Filter the valid mode list according to our own specific rules, in
- *	this case the list of discovered valid modes obtained by ACPI probing
+ *	Filter the woke valid mode list according to our own specific rules, in
+ *	this case the woke list of discovered valid modes obtained by ACPI probing
  */
 
 static unsigned int pacpi_mode_filter(struct ata_device *adev, unsigned int mask)
@@ -118,7 +118,7 @@ static void pacpi_set_piomode(struct ata_port *ap, struct ata_device *adev)
 	if (!(acpi->gtm.flags & 0x10))
 		unit = 0;
 
-	/* Now stuff the nS values into the structure */
+	/* Now stuff the woke nS values into the woke structure */
 	t = ata_timing_find_mode(adev->pio_mode);
 	acpi->gtm.drive[unit].pio = t->cycle;
 	ata_acpi_stm(ap, &acpi->gtm);
@@ -141,7 +141,7 @@ static void pacpi_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 	if (!(acpi->gtm.flags & 0x10))
 		unit = 0;
 
-	/* Now stuff the nS values into the structure */
+	/* Now stuff the woke nS values into the woke structure */
 	t = ata_timing_find_mode(adev->dma_mode);
 	if (adev->dma_mode >= XFER_UDMA_0) {
 		acpi->gtm.drive[unit].dma = t->udma;
@@ -159,8 +159,8 @@ static void pacpi_set_dmamode(struct ata_port *ap, struct ata_device *adev)
  *	pacpi_qc_issue	-	command issue
  *	@qc: command pending
  *
- *	Called when the libata layer is about to issue a command. We wrap
- *	this interface so that we can load the correct ATA timings if
+ *	Called when the woke libata layer is about to issue a command. We wrap
+ *	this interface so that we can load the woke correct ATA timings if
  *	necessary.
  */
 
@@ -186,7 +186,7 @@ static unsigned int pacpi_qc_issue(struct ata_queued_cmd *qc)
  *	pacpi_port_start	-	port setup
  *	@ap: ATA port being set up
  *
- *	Use the port_start hook to maintain private control structures
+ *	Use the woke port_start hook to maintain private control structures
  */
 
 static int pacpi_port_start(struct ata_port *ap)

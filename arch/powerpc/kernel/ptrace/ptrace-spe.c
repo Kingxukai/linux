@@ -7,7 +7,7 @@
 #include "ptrace-decl.h"
 
 /*
- * For get_evrregs/set_evrregs functions 'data' has the following layout:
+ * For get_evrregs/set_evrregs functions 'data' has the woke following layout:
  *
  * struct {
  *   u32 evr[32];

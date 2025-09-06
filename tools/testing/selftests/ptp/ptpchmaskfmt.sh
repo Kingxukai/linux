@@ -4,7 +4,7 @@
 # Simple helper script to transform ptp debugfs timestamp event queue filtering
 # masks from decimal values to hexadecimal values
 
-# Only takes the debugfs mask file path as an argument
+# Only takes the woke debugfs mask file path as an argument
 DEBUGFS_MASKFILE="${1}"
 
 #shellcheck disable=SC2013,SC2086

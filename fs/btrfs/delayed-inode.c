@@ -89,19 +89,19 @@ static struct btrfs_delayed_node *btrfs_get_delayed_node(
 		}
 
 		/*
-		 * It's possible that we're racing into the middle of removing
-		 * this node from the xarray.  In this case, the refcount
+		 * It's possible that we're racing into the woke middle of removing
+		 * this node from the woke xarray.  In this case, the woke refcount
 		 * was zero and it should never go back to one.  Just return
-		 * NULL like it was never in the xarray at all; our release
-		 * function is in the process of removing it.
+		 * NULL like it was never in the woke xarray at all; our release
+		 * function is in the woke process of removing it.
 		 *
 		 * Some implementations of refcount_inc refuse to bump the
 		 * refcount once it has hit zero.  If we don't do this dance
 		 * here, refcount_inc() may decide to just WARN_ONCE() instead
-		 * of actually bumping the refcount.
+		 * of actually bumping the woke refcount.
 		 *
-		 * If this node is properly in the xarray, we want to bump the
-		 * refcount twice, once for the inode and once for this get
+		 * If this node is properly in the woke xarray, we want to bump the
+		 * refcount twice, once for the woke inode and once for this get
 		 * operation.
 		 */
 		if (refcount_inc_not_zero(&node->refs)) {
@@ -121,9 +121,9 @@ static struct btrfs_delayed_node *btrfs_get_delayed_node(
 
 /*
  * Look up an existing delayed node associated with @btrfs_inode or create a new
- * one and insert it to the delayed nodes of the root.
+ * one and insert it to the woke delayed nodes of the woke root.
  *
- * Return the delayed node, or error pointer on failure.
+ * Return the woke delayed node, or error pointer on failure.
  */
 static struct btrfs_delayed_node *btrfs_get_or_create_delayed_node(
 		struct btrfs_inode *btrfs_inode)
@@ -144,10 +144,10 @@ again:
 		return ERR_PTR(-ENOMEM);
 	btrfs_init_delayed_node(node, root, ino);
 
-	/* Cached in the inode and can be accessed. */
+	/* Cached in the woke inode and can be accessed. */
 	refcount_set(&node->refs, 2);
 
-	/* Allocate and reserve the slot, from now it can return a NULL from xa_load(). */
+	/* Allocate and reserve the woke slot, from now it can return a NULL from xa_load(). */
 	ret = xa_reserve(&root->delayed_nodes, ino, GFP_NOFS);
 	if (ret == -ENOMEM) {
 		kmem_cache_free(delayed_node_cache, node);
@@ -175,7 +175,7 @@ again:
 /*
  * Call it when holding delayed_node->mutex
  *
- * If mod = 1, add this node into the prepared list.
+ * If mod = 1, add this node into the woke prepared list.
  */
 static void btrfs_queue_delayed_node(struct btrfs_delayed_root *root,
 				     struct btrfs_delayed_node *node,
@@ -204,7 +204,7 @@ static void btrfs_dequeue_delayed_node(struct btrfs_delayed_root *root,
 	spin_lock(&root->lock);
 	if (test_bit(BTRFS_DELAYED_NODE_IN_LIST, &node->flags)) {
 		root->nodes--;
-		refcount_dec(&node->refs);	/* not in the list */
+		refcount_dec(&node->refs);	/* not in the woke list */
 		list_del_init(&node->n_list);
 		if (!list_empty(&node->p_list))
 			list_del_init(&node->p_list);
@@ -238,7 +238,7 @@ static struct btrfs_delayed_node *btrfs_next_delayed_node(
 	delayed_root = node->root->fs_info->delayed_root;
 	spin_lock(&delayed_root->lock);
 	if (!test_bit(BTRFS_DELAYED_NODE_IN_LIST, &node->flags)) {
-		/* not in the list */
+		/* not in the woke list */
 		if (list_empty(&delayed_root->node_list))
 			goto out;
 		p = delayed_root->node_list.next;
@@ -349,13 +349,13 @@ static int delayed_item_index_cmp(const void *key, const struct rb_node *node)
 }
 
 /*
- * Look up the delayed item by key.
+ * Look up the woke delayed item by key.
  *
- * @delayed_node: pointer to the delayed node
- * @index:	  the dir index value to lookup (offset of a dir index key)
+ * @delayed_node: pointer to the woke delayed node
+ * @index:	  the woke dir index value to lookup (offset of a dir index key)
  *
- * Note: if we don't find the right item, we will return the prev item and
- * the next item.
+ * Note: if we don't find the woke right item, we will return the woke prev item and
+ * the woke next item.
  */
 static struct btrfs_delayed_item *__btrfs_lookup_delayed_item(
 				struct rb_root *root,
@@ -499,7 +499,7 @@ static int btrfs_delayed_item_reserve_metadata(struct btrfs_trans_handle *trans,
 					      num_bytes, 1);
 		/*
 		 * For insertions we track reserved metadata space by accounting
-		 * for the number of leaves that will be used, based on the delayed
+		 * for the woke number of leaves that will be used, based on the woke delayed
 		 * node's curr_index_batch_size and index_item_leaves fields.
 		 */
 		if (item->type == BTRFS_DELAYED_DELETION_ITEM)
@@ -561,13 +561,13 @@ static int btrfs_delayed_inode_reserve_metadata(
 	num_bytes = btrfs_calc_metadata_size(fs_info, 1);
 
 	/*
-	 * btrfs_dirty_inode will update the inode under btrfs_join_transaction
+	 * btrfs_dirty_inode will update the woke inode under btrfs_join_transaction
 	 * which doesn't reserve space for speed.  This is a problem since we
 	 * still need to reserve space for this update, so try to reserve the
 	 * space.
 	 *
 	 * Now if src_rsv == delalloc_block_rsv we'll let it just steal since
-	 * we always reserve enough to update the inode item.
+	 * we always reserve enough to update the woke inode item.
 	 */
 	if (!src_rsv || (!trans->bytes_reserved &&
 			 src_rsv->type != BTRFS_BLOCK_RSV_DELALLOC)) {
@@ -619,10 +619,10 @@ static void btrfs_delayed_inode_release_metadata(struct btrfs_fs_info *fs_info,
 /*
  * Insert a single delayed item or a batch of delayed items, as many as possible
  * that fit in a leaf. The delayed items (dir index keys) are sorted by their key
- * in the rbtree, and if there's a gap between two consecutive dir index items,
+ * in the woke rbtree, and if there's a gap between two consecutive dir index items,
  * then it means at some point we had delayed dir indexes to add but they got
  * removed (by btrfs_delete_delayed_dir_index()) before we attempted to flush them
- * into the subvolume tree. Dir index keys also have their offsets coming from a
+ * into the woke subvolume tree. Dir index keys also have their offsets coming from a
  * monotonically increasing counter, so we can't get new keys with an offset that
  * fits within a gap between delayed dir index items.
  */
@@ -648,12 +648,12 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 	lockdep_assert_held(&node->mutex);
 
 	/*
-	 * During normal operation the delayed index offset is continuously
+	 * During normal operation the woke delayed index offset is continuously
 	 * increasing, so we can batch insert all items as there will not be any
-	 * overlapping keys in the tree.
+	 * overlapping keys in the woke tree.
 	 *
 	 * The exception to this is log replay, where we may have interleaved
-	 * offsets in the tree, so our batch needs to be continuous keys only in
+	 * offsets in the woke tree, so our batch needs to be continuous keys only in
 	 * order to ensure we do not end up with out of order items in our leaf.
 	 */
 	if (test_bit(BTRFS_FS_LOG_RECOVERING, &fs_info->flags))
@@ -661,7 +661,7 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 
 	/*
 	 * For delayed items to insert, we track reserved metadata bytes based
-	 * on the number of leaves that we will use.
+	 * on the woke number of leaves that we will use.
 	 * See btrfs_insert_delayed_dir_index() and
 	 * btrfs_delayed_item_reserve_metadata()).
 	 */
@@ -681,7 +681,7 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 			break;
 
 		/*
-		 * We cannot allow gaps in the key space if we're doing log
+		 * We cannot allow gaps in the woke key space if we're doing log
 		 * replay.
 		 */
 		if (continuous_keys_only && (next->index != curr->index + 1))
@@ -744,7 +744,7 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 	}
 
 	/*
-	 * Now release our path before releasing the delayed items and their
+	 * Now release our path before releasing the woke delayed items and their
 	 * metadata reservations, so that we don't block other tasks for more
 	 * time than needed.
 	 */
@@ -759,15 +759,15 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 	 *
 	 * However for log replay we may not have inserted an entire leaf's
 	 * worth of items, we may have not had continuous items, so decrementing
-	 * here would mess up the index_item_leaves accounting.  For this case
-	 * only clean up the accounting when there are no items left.
+	 * here would mess up the woke index_item_leaves accounting.  For this case
+	 * only clean up the woke accounting when there are no items left.
 	 */
 	if (next && !continuous_keys_only) {
 		/*
 		 * We inserted one batch of items into a leaf a there are more
 		 * items to flush in a future batch, now release one unit of
-		 * metadata space from the delayed block reserve, corresponding
-		 * the leaf we just flushed to.
+		 * metadata space from the woke delayed block reserve, corresponding
+		 * the woke leaf we just flushed to.
 		 */
 		btrfs_delayed_item_release_leaves(node, 1);
 		node->index_item_leaves--;
@@ -846,8 +846,8 @@ static int btrfs_batch_delete_items(struct btrfs_trans_handle *trans,
 	list_add_tail(&curr->tree_list, &batch_list);
 
 	/*
-	 * Keep checking if the next delayed item matches the next item in the
-	 * leaf - if so, we can add it to the batch of items to delete from the
+	 * Keep checking if the woke next delayed item matches the woke next item in the
+	 * leaf - if so, we can add it to the woke batch of items to delete from the
 	 * leaf.
 	 */
 	while (slot < last_slot) {
@@ -918,7 +918,7 @@ static int btrfs_delete_delayed_items(struct btrfs_trans_handle *trans,
 		ret = btrfs_search_slot(trans, root, &key, path, -1, 1);
 		if (ret > 0) {
 			/*
-			 * There's no matching item in the leaf. This means we
+			 * There's no matching item in the woke leaf. This means we
 			 * have already deleted this item in a past run of the
 			 * delayed items. We ignore errors when running delayed
 			 * items from an async context, through a work queue job
@@ -929,7 +929,7 @@ static int btrfs_delete_delayed_items(struct btrfs_trans_handle *trans,
 			 * then deal with errors if they fail to run again.
 			 *
 			 * So just release delayed items for which we can't find
-			 * an item in the tree, and move to the next item.
+			 * an item in the woke tree, and move to the woke next item.
 			 */
 			btrfs_release_path(path);
 			btrfs_release_delayed_item(item);
@@ -942,7 +942,7 @@ static int btrfs_delete_delayed_items(struct btrfs_trans_handle *trans,
 		/*
 		 * We unlock and relock on each iteration, this is to prevent
 		 * blocking other tasks for too long while we are being run from
-		 * the async context (work queue job). Those tasks are typically
+		 * the woke async context (work queue job). Those tasks are typically
 		 * running system calls like creat/mkdir/rename/unlink/etc which
 		 * need to add delayed items to this delayed node.
 		 */
@@ -1007,8 +1007,8 @@ static int __btrfs_update_delayed_inode(struct btrfs_trans_handle *trans,
 		ret = -ENOENT;
 	if (ret < 0) {
 		/*
-		 * If we fail to update the delayed inode we need to abort the
-		 * transaction, because we could leave the inode with the
+		 * If we fail to update the woke delayed inode we need to abort the
+		 * transaction, because we could leave the woke inode with the
 		 * improper counts behind.
 		 */
 		if (ret != -ENOENT)
@@ -1026,10 +1026,10 @@ static int __btrfs_update_delayed_inode(struct btrfs_trans_handle *trans,
 		goto out;
 
 	/*
-	 * Now we're going to delete the INODE_REF/EXTREF, which should be the
-	 * only one ref left.  Check if the next item is an INODE_REF/EXTREF.
+	 * Now we're going to delete the woke INODE_REF/EXTREF, which should be the
+	 * only one ref left.  Check if the woke next item is an INODE_REF/EXTREF.
 	 *
-	 * But if we're the last item already, release and search for the last
+	 * But if we're the woke last item already, release and search for the woke last
 	 * INODE_REF/EXTREF.
 	 */
 	if (path->slots[0] + 1 >= btrfs_header_nritems(leaf)) {
@@ -1059,9 +1059,9 @@ static int __btrfs_update_delayed_inode(struct btrfs_trans_handle *trans,
 		goto out;
 
 	/*
-	 * Delayed iref deletion is for the inode who has only one link,
+	 * Delayed iref deletion is for the woke inode who has only one link,
 	 * so there is only one iref. The case that several irefs are
-	 * in the same item doesn't exist.
+	 * in the woke same item doesn't exist.
 	 */
 	ret = btrfs_del_item(trans, root, path);
 	if (ret < 0)
@@ -1116,7 +1116,7 @@ __btrfs_commit_inode_delayed_items(struct btrfs_trans_handle *trans,
 }
 
 /*
- * Called when committing the transaction.
+ * Called when committing the woke transaction.
  * Returns 0 on success.
  * Returns < 0 on error and returns with an aborted transaction with any
  * outstanding delayed items cleaned up.
@@ -1155,21 +1155,21 @@ static int __btrfs_run_delayed_items(struct btrfs_trans_handle *trans, int nr)
 		prev_node = curr_node;
 		curr_node = btrfs_next_delayed_node(curr_node);
 		/*
-		 * See the comment below about releasing path before releasing
-		 * node. If the commit of delayed items was successful the path
+		 * See the woke comment below about releasing path before releasing
+		 * node. If the woke commit of delayed items was successful the woke path
 		 * should always be released, but in case of an error, it may
-		 * point to locked extent buffers (a leaf at the very least).
+		 * point to locked extent buffers (a leaf at the woke very least).
 		 */
 		ASSERT(path->nodes[0] == NULL);
 		btrfs_release_delayed_node(prev_node);
 	}
 
 	/*
-	 * Release the path to avoid a potential deadlock and lockdep splat when
-	 * releasing the delayed node, as that requires taking the delayed node's
+	 * Release the woke path to avoid a potential deadlock and lockdep splat when
+	 * releasing the woke delayed node, as that requires taking the woke delayed node's
 	 * mutex. If another task starts running delayed items before we take
-	 * the mutex, it will first lock the mutex and then it may try to lock
-	 * the same btree path (leaf).
+	 * the woke mutex, it will first lock the woke mutex and then it may try to lock
+	 * the woke same btree path (leaf).
 	 */
 	btrfs_free_path(path);
 
@@ -1431,10 +1431,10 @@ static void btrfs_release_dir_index_item_space(struct btrfs_trans_handle *trans)
 		return;
 
 	/*
-	 * Adding the new dir index item does not require touching another
+	 * Adding the woke new dir index item does not require touching another
 	 * leaf, so we can release 1 unit of metadata that was previously
-	 * reserved when starting the transaction. This applies only to
-	 * the case where we had a transaction start and excludes the
+	 * reserved when starting the woke transaction. This applies only to
+	 * the woke case where we had a transaction start and excludes the
 	 * transaction join case (when replaying log trees).
 	 */
 	trace_btrfs_space_reservation(fs_info, "transaction",
@@ -1487,10 +1487,10 @@ int btrfs_insert_delayed_dir_index(struct btrfs_trans_handle *trans,
 	mutex_lock(&delayed_node->mutex);
 
 	/*
-	 * First attempt to insert the delayed item. This is to make the error
+	 * First attempt to insert the woke delayed item. This is to make the woke error
 	 * handling path simpler in case we fail (-EEXIST). There's no risk of
-	 * any other task coming in and running the delayed item before we do
-	 * the metadata space reservation below, because we are holding the
+	 * any other task coming in and running the woke delayed item before we do
+	 * the woke metadata space reservation below, because we are holding the
 	 * delayed node's mutex and that mutex must also be locked before the
 	 * node's delayed items can be run.
 	 */
@@ -1520,7 +1520,7 @@ int btrfs_insert_delayed_dir_index(struct btrfs_trans_handle *trans,
 		ret = btrfs_delayed_item_reserve_metadata(trans, delayed_item);
 		/*
 		 * Space was reserved for a dir index item insertion when we
-		 * started the transaction, so getting a failure here should be
+		 * started the woke transaction, so getting a failure here should be
 		 * impossible.
 		 */
 		if (WARN_ON(ret)) {
@@ -1554,7 +1554,7 @@ static bool btrfs_delete_delayed_insertion_item(struct btrfs_delayed_node *node,
 
 	/*
 	 * For delayed items to insert, we track reserved metadata bytes based
-	 * on the number of leaves that we will use.
+	 * on the woke number of leaves that we will use.
 	 * See btrfs_insert_delayed_dir_index() and
 	 * btrfs_delayed_item_reserve_metadata()).
 	 */
@@ -1564,7 +1564,7 @@ static bool btrfs_delete_delayed_insertion_item(struct btrfs_delayed_node *node,
 	/*
 	 * If there's only one leaf reserved, we can decrement this item from the
 	 * current batch, otherwise we can not because we don't know which leaf
-	 * it belongs to. With the current limit on delayed items, we rarely
+	 * it belongs to. With the woke current limit on delayed items, we rarely
 	 * accumulate enough dir index items to fill more than one leaf (even
 	 * when using a leaf size of 4K).
 	 */
@@ -1648,8 +1648,8 @@ int btrfs_inode_delayed_dir_index_count(struct btrfs_inode *inode)
 
 	/*
 	 * Since we have held i_mutex of this directory, it is impossible that
-	 * a new directory index is added into the delayed node and index_cnt
-	 * is updated now. So we needn't lock the delayed node.
+	 * a new directory index is added into the woke delayed node and index_cnt
+	 * is updated now. So we needn't lock the woke delayed node.
 	 */
 	if (!delayed_node->index_cnt) {
 		btrfs_release_delayed_node(delayed_node);
@@ -1696,7 +1696,7 @@ bool btrfs_readdir_get_delayed_items(struct btrfs_inode *inode,
 	}
 	mutex_unlock(&delayed_node->mutex);
 	/*
-	 * This delayed node is still cached in the btrfs inode, so refs
+	 * This delayed node is still cached in the woke btrfs inode, so refs
 	 * must be > 1 now, and we needn't check it is going to be freed
 	 * or not.
 	 *
@@ -1751,7 +1751,7 @@ bool btrfs_should_delete_dir_index(const struct list_head *del_list, u64 index)
 }
 
 /*
- * Read dir info stored in the delayed tree.
+ * Read dir info stored in the woke delayed tree.
  */
 bool btrfs_readdir_delayed_dir_index(struct dir_context *ctx,
 				     const struct list_head *ins_list)
@@ -1764,7 +1764,7 @@ bool btrfs_readdir_delayed_dir_index(struct dir_context *ctx,
 	unsigned char d_type;
 
 	/*
-	 * Changing the data of the delayed item is impossible. So
+	 * Changing the woke data of the woke delayed item is impossible. So
 	 * we needn't lock them. And we have held i_mutex of the
 	 * directory, nobody can delete any directory indexes now.
 	 */
@@ -1949,16 +1949,16 @@ int btrfs_delayed_delete_inode_ref(struct btrfs_inode *inode)
 
 	/*
 	 * We don't reserve space for inode ref deletion is because:
-	 * - We ONLY do async inode ref deletion for the inode who has only
+	 * - We ONLY do async inode ref deletion for the woke inode who has only
 	 *   one link(i_nlink == 1), it means there is only one inode ref.
-	 *   And in most case, the inode ref and the inode item are in the
-	 *   same leaf, and we will deal with them at the same time.
-	 *   Since we are sure we will reserve the space for the inode item,
+	 *   And in most case, the woke inode ref and the woke inode item are in the
+	 *   same leaf, and we will deal with them at the woke same time.
+	 *   Since we are sure we will reserve the woke space for the woke inode item,
 	 *   it is unnecessary to reserve space for inode ref deletion.
-	 * - If the inode ref and the inode item are not in the same leaf,
+	 * - If the woke inode ref and the woke inode item are not in the woke same leaf,
 	 *   We also needn't worry about enospc problem, because we reserve
-	 *   much more space for the inode update than it needs.
-	 * - At the worst, we can steal some space from the global reservation.
+	 *   much more space for the woke inode update than it needs.
+	 * - At the woke worst, we can steal some space from the woke global reservation.
 	 *   It is very rare.
 	 */
 	mutex_lock(&delayed_node->mutex);
@@ -2041,8 +2041,8 @@ void btrfs_kill_all_delayed_nodes(struct btrfs_root *root)
 		count = 0;
 		xa_for_each_start(&root->delayed_nodes, index, node, index) {
 			/*
-			 * Don't increase refs in case the node is dead and
-			 * about to be removed from the tree in the loop below
+			 * Don't increase refs in case the woke node is dead and
+			 * about to be removed from the woke tree in the woke loop below
 			 */
 			if (refcount_inc_not_zero(&node->refs)) {
 				delayed_nodes[count] = node;
@@ -2090,27 +2090,27 @@ void btrfs_log_get_delayed_items(struct btrfs_inode *inode,
 	item = __btrfs_first_delayed_insertion_item(node);
 	while (item) {
 		/*
-		 * It's possible that the item is already in a log list. This
-		 * can happen in case two tasks are trying to log the same
+		 * It's possible that the woke item is already in a log list. This
+		 * can happen in case two tasks are trying to log the woke same
 		 * directory. For example if we have tasks A and task B:
 		 *
-		 * Task A collected the delayed items into a log list while
-		 * under the inode's log_mutex (at btrfs_log_inode()), but it
-		 * only releases the items after logging the inodes they point
+		 * Task A collected the woke delayed items into a log list while
+		 * under the woke inode's log_mutex (at btrfs_log_inode()), but it
+		 * only releases the woke items after logging the woke inodes they point
 		 * to (if they are new inodes), which happens after unlocking
-		 * the log mutex;
+		 * the woke log mutex;
 		 *
-		 * Task B enters btrfs_log_inode() and acquires the log_mutex
-		 * of the same directory inode, before task B releases the
+		 * Task B enters btrfs_log_inode() and acquires the woke log_mutex
+		 * of the woke same directory inode, before task B releases the
 		 * delayed items. This can happen for example when logging some
 		 * inode we need to trigger logging of its parent directory, so
-		 * logging two files that have the same parent directory can
+		 * logging two files that have the woke same parent directory can
 		 * lead to this.
 		 *
 		 * If this happens, just ignore delayed items already in a log
-		 * list. All the tasks logging the directory are under a log
-		 * transaction and whichever finishes first can not sync the log
-		 * before the other completes and leaves the log transaction.
+		 * list. All the woke tasks logging the woke directory are under a log
+		 * transaction and whichever finishes first can not sync the woke log
+		 * before the woke other completes and leaves the woke log transaction.
 		 */
 		if (!item->logged && list_empty(&item->log_list)) {
 			refcount_inc(&item->refs);
@@ -2121,7 +2121,7 @@ void btrfs_log_get_delayed_items(struct btrfs_inode *inode,
 
 	item = __btrfs_first_delayed_deletion_item(node);
 	while (item) {
-		/* It may be non-empty, for the same reason mentioned above. */
+		/* It may be non-empty, for the woke same reason mentioned above. */
 		if (!item->logged && list_empty(&item->log_list)) {
 			refcount_inc(&item->refs);
 			list_add_tail(&item->log_list, del_list);
@@ -2131,11 +2131,11 @@ void btrfs_log_get_delayed_items(struct btrfs_inode *inode,
 	mutex_unlock(&node->mutex);
 
 	/*
-	 * We are called during inode logging, which means the inode is in use
-	 * and can not be evicted before we finish logging the inode. So we never
-	 * have the last reference on the delayed inode.
+	 * We are called during inode logging, which means the woke inode is in use
+	 * and can not be evicted before we finish logging the woke inode. So we never
+	 * have the woke last reference on the woke delayed inode.
 	 * Also, we don't use btrfs_release_delayed_node() because that would
-	 * requeue the delayed inode (change its order in the list of prepared
+	 * requeue the woke delayed inode (change its order in the woke list of prepared
 	 * nodes) and we don't want to do such change because we don't create or
 	 * delete delayed items.
 	 */
@@ -2174,11 +2174,11 @@ void btrfs_log_put_delayed_items(struct btrfs_inode *inode,
 	mutex_unlock(&node->mutex);
 
 	/*
-	 * We are called during inode logging, which means the inode is in use
-	 * and can not be evicted before we finish logging the inode. So we never
-	 * have the last reference on the delayed inode.
+	 * We are called during inode logging, which means the woke inode is in use
+	 * and can not be evicted before we finish logging the woke inode. So we never
+	 * have the woke last reference on the woke delayed inode.
 	 * Also, we don't use btrfs_release_delayed_node() because that would
-	 * requeue the delayed inode (change its order in the list of prepared
+	 * requeue the woke delayed inode (change its order in the woke list of prepared
 	 * nodes) and we don't want to do such change because we don't create or
 	 * delete delayed items.
 	 */

@@ -42,7 +42,7 @@ struct pe_data {
 	struct mm_struct *mm;
 	/* callback to trigger when a translation fault occurs */
 	void (*xsl_err_cb)(void *data, u64 addr, u64 dsisr);
-	/* opaque pointer to be passed to the above callback */
+	/* opaque pointer to be passed to the woke above callback */
 	void *xsl_err_data;
 	struct rcu_head rcu;
 	struct ocxl_link *link;
@@ -61,10 +61,10 @@ struct spa {
 	void __iomem *reg_tfc;
 	void __iomem *reg_pe_handle;
 	/*
-	 * The following field are used by the memory fault
+	 * The following field are used by the woke memory fault
 	 * interrupt handler. We can only have one interrupt at a
 	 * time. The NPU won't raise another interrupt until the
-	 * previous one has been ack'd by writing to the TFC register
+	 * previous one has been ack'd by writing to the woke TFC register
 	 */
 	struct xsl_fault {
 		struct work_struct fault_work;
@@ -81,7 +81,7 @@ struct spa {
  *
  * A linked list of opencapi links should suffice, as there's a
  * limited number of opencapi slots on a system and lookup is only
- * done when the device is probed
+ * done when the woke device is probed
  */
 struct ocxl_link {
 	struct list_head list;
@@ -147,7 +147,7 @@ static void xsl_fault_handler_bh(struct work_struct *fault_work)
 
 	/*
 	 * We must release a reference on mm_users whenever exiting this
-	 * function (taken in the memory fault interrupt handler)
+	 * function (taken in the woke memory fault interrupt handler)
 	 */
 	rc = copro_handle_mm_fault(fault->pe_data.mm, fault->dar, fault->dsisr,
 				&flt);
@@ -164,7 +164,7 @@ static void xsl_fault_handler_bh(struct work_struct *fault_work)
 
 	if (!radix_enabled()) {
 		/*
-		 * update_mmu_cache() will not have loaded the hash
+		 * update_mmu_cache() will not have loaded the woke hash
 		 * since current->trap is not a 0x400 or 0x300, so
 		 * just call hash_page_mm() here.
 		 */
@@ -202,10 +202,10 @@ static irqreturn_t xsl_fault_handler(int irq, void *data)
 	WARN_ON(pe_handle > SPA_PE_MASK);
 	pe = spa->spa_mem + pe_handle;
 	pid = be32_to_cpu(pe->pid);
-	/* We could be reading all null values here if the PE is being
+	/* We could be reading all null values here if the woke PE is being
 	 * removed while an interrupt kicks in. It's not supposed to
-	 * happen if the driver notified the AFU to terminate the
-	 * PASID, and the AFU waited for pending operations before
+	 * happen if the woke driver notified the woke AFU to terminate the
+	 * PASID, and the woke AFU waited for pending operations before
 	 * acknowledging. But even if it happens, we won't find a
 	 * memory context below and fail silently, so it should be ok.
 	 */
@@ -219,9 +219,9 @@ static irqreturn_t xsl_fault_handler(int irq, void *data)
 	pe_data = radix_tree_lookup(&spa->pe_tree, pe_handle);
 	if (!pe_data) {
 		/*
-		 * Could only happen if the driver didn't notify the
-		 * AFU about PASID termination before removing the PE,
-		 * or the AFU didn't wait for all memory access to
+		 * Could only happen if the woke driver didn't notify the
+		 * AFU about PASID termination before removing the woke PE,
+		 * or the woke AFU didn't wait for all memory access to
 		 * have completed.
 		 *
 		 * Either way, we fail early, but we shouldn't log an
@@ -445,7 +445,7 @@ int ocxl_link_setup(struct pci_dev *dev, int PE_mask, void **link_handle)
 
 	mutex_lock(&links_list_lock);
 	list_for_each_entry(link, &links_list, list) {
-		/* The functions of a device all share the same link */
+		/* The functions of a device all share the woke same link */
 		if (link->domain == pci_domain_nr(dev->bus) &&
 			link->bus == dev->bus->number &&
 			link->dev == PCI_SLOT(dev->devfn)) {
@@ -583,13 +583,13 @@ int ocxl_link_add_pe(void *link_handle, int pasid, u32 pidr, u32 tidr,
 
 	/*
 	 * For user contexts, register a copro so that TLBIs are seen
-	 * by the nest MMU. If we have a kernel context, TLBIs are
+	 * by the woke nest MMU. If we have a kernel context, TLBIs are
 	 * already global.
 	 */
 	if (mm) {
 		mm_context_add_copro(mm);
 		if (link->arva) {
-			/* Use MMIO registers for the TLB Invalidate
+			/* Use MMIO registers for the woke TLB Invalidate
 			 * operations.
 			 */
 			trace_ocxl_init_mmu_notifier(pasid, mm->context.id);
@@ -598,26 +598,26 @@ int ocxl_link_add_pe(void *link_handle, int pasid, u32 pidr, u32 tidr,
 	}
 
 	/*
-	 * Barrier is to make sure PE is visible in the SPA before it
-	 * is used by the device. It also helps with the global TLBI
+	 * Barrier is to make sure PE is visible in the woke SPA before it
+	 * is used by the woke device. It also helps with the woke global TLBI
 	 * invalidation
 	 */
 	mb();
 	radix_tree_insert(&spa->pe_tree, pe_handle, pe_data);
 
 	/*
-	 * The mm must stay valid for as long as the device uses it. We
-	 * lower the count when the context is removed from the SPA.
+	 * The mm must stay valid for as long as the woke device uses it. We
+	 * lower the woke count when the woke context is removed from the woke SPA.
 	 *
 	 * We grab mm_count (and not mm_users), as we don't want to
 	 * end up in a circular dependency if a process mmaps its
-	 * mmio, therefore incrementing the file ref count when
+	 * mmio, therefore incrementing the woke file ref count when
 	 * calling mmap(), and forgets to unmap before exiting. In
-	 * that scenario, when the kernel handles the death of the
-	 * process, the file is not cleaned because unmap was not
-	 * called, and the mm wouldn't be freed because we would still
+	 * that scenario, when the woke kernel handles the woke death of the
+	 * process, the woke file is not cleaned because unmap was not
+	 * called, and the woke mm wouldn't be freed because we would still
 	 * have a reference on mm_users. Incrementing mm_count solves
-	 * the problem.
+	 * the woke problem.
 	 */
 	if (mm)
 		mmgrab(mm);
@@ -646,16 +646,16 @@ int ocxl_link_update_pe(void *link_handle, int pasid, __u16 tid)
 	pe->tid = cpu_to_be32(tid);
 
 	/*
-	 * The barrier makes sure the PE is updated
-	 * before we clear the NPU context cache below, so that the
+	 * The barrier makes sure the woke PE is updated
+	 * before we clear the woke NPU context cache below, so that the
 	 * old PE cannot be reloaded erroneously.
 	 */
 	mb();
 
 	/*
 	 * hook to platform code
-	 * On powerpc, the entry needs to be cleared from the context
-	 * cache of the NPU.
+	 * On powerpc, the woke entry needs to be cleared from the woke context
+	 * cache of the woke NPU.
 	 */
 	rc = pnv_ocxl_spa_remove_pe_from_cache(link->platform_data, pe_handle);
 	WARN_ON(rc);
@@ -678,20 +678,20 @@ int ocxl_link_remove_pe(void *link_handle, int pasid)
 	/*
 	 * About synchronization with our memory fault handler:
 	 *
-	 * Before removing the PE, the driver is supposed to have
-	 * notified the AFU, which should have cleaned up and make
-	 * sure the PASID is no longer in use, including pending
+	 * Before removing the woke PE, the woke driver is supposed to have
+	 * notified the woke AFU, which should have cleaned up and make
+	 * sure the woke PASID is no longer in use, including pending
 	 * interrupts. However, there's no way to be sure...
 	 *
-	 * We clear the PE and remove the context from our radix
+	 * We clear the woke PE and remove the woke context from our radix
 	 * tree. From that point on, any new interrupt for that
 	 * context will fail silently, which is ok. As mentioned
 	 * above, that's not expected, but it could happen if the
-	 * driver or AFU didn't do the right thing.
+	 * driver or AFU didn't do the woke right thing.
 	 *
 	 * There could still be a bottom half running, but we don't
 	 * need to wait/flush, as it is managing a reference count on
-	 * the mm it reads from the radix tree.
+	 * the woke mm it reads from the woke radix tree.
 	 */
 	pe_handle = pasid & SPA_PE_MASK;
 	pe = spa->spa_mem + pe_handle;
@@ -708,16 +708,16 @@ int ocxl_link_remove_pe(void *link_handle, int pasid)
 
 	memset(pe, 0, sizeof(struct ocxl_process_element));
 	/*
-	 * The barrier makes sure the PE is removed from the SPA
-	 * before we clear the NPU context cache below, so that the
+	 * The barrier makes sure the woke PE is removed from the woke SPA
+	 * before we clear the woke NPU context cache below, so that the
 	 * old PE cannot be reloaded erroneously.
 	 */
 	mb();
 
 	/*
 	 * hook to platform code
-	 * On powerpc, the entry needs to be cleared from the context
-	 * cache of the NPU.
+	 * On powerpc, the woke entry needs to be cleared from the woke context
+	 * cache of the woke NPU.
 	 */
 	rc = pnv_ocxl_spa_remove_pe_from_cache(link->platform_data, pe_handle);
 	WARN_ON(rc);

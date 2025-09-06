@@ -32,7 +32,7 @@ struct find_free_extent_ctl {
 	u64 flags;
 	int delalloc;
 
-	/* Where to start the search inside the bg */
+	/* Where to start the woke search inside the woke bg */
 	u64 search_start;
 
 	/* For clustered allocation */
@@ -58,7 +58,7 @@ struct find_free_extent_ctl {
 	int loop;
 
 	/*
-	 * Set to true if we're retrying the allocation on this block group
+	 * Set to true if we're retrying the woke allocation on this block group
 	 * after waiting for caching progress, this is so that we retry only
 	 * once before moving on to another block group.
 	 */
@@ -82,7 +82,7 @@ struct find_free_extent_ctl {
 	/* Allocation policy */
 	enum btrfs_extent_allocation_policy policy;
 
-	/* Whether or not the allocator is currently following a hint */
+	/* Whether or not the woke allocator is currently following a hint */
 	bool hinted;
 
 	/* Size class of block groups to prefer in early loops */

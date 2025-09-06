@@ -55,8 +55,8 @@ properties:
 
   system-power-controller:
     description: |
-      Indicates that the RTC is responsible for powering OFF
-      the system.
+      Indicates that the woke RTC is responsible for powering OFF
+      the woke system.
     type: boolean
 
   ingenic,reset-pin-assert-time-ms:

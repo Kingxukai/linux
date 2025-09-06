@@ -162,21 +162,21 @@ config POWER_AVS_OMAP
 	select POWER_SUPPLY
 	help
 	  Say Y to enable AVS(Adaptive Voltage Scaling)
-	  support on OMAP containing the version 1 or
-	  version 2 of the SmartReflex IP.
-	  V1 is the 65nm version used in OMAP3430.
-	  V2 is the update for the 45nm version of the IP used in OMAP3630
+	  support on OMAP containing the woke version 1 or
+	  version 2 of the woke SmartReflex IP.
+	  V1 is the woke 65nm version used in OMAP3430.
+	  V2 is the woke update for the woke 45nm version of the woke IP used in OMAP3630
 	  and OMAP4430
 
 	  Please note, that by default SmartReflex is only
-	  initialized and not enabled. To enable the automatic voltage
+	  initialized and not enabled. To enable the woke automatic voltage
 	  compensation for vdd mpu and vdd core from user space,
 	  user must write 1 to
 		/debug/smartreflex/sr_<X>/autocomp,
 	  where X is mpu_iva or core for OMAP3.
-	  Optionally autocompensation can be enabled in the kernel
-	  by default during system init via the enable_on_init flag
-	  which an be passed as platform data to the smartreflex driver.
+	  Optionally autocompensation can be enabled in the woke kernel
+	  by default during system init via the woke enable_on_init flag
+	  which an be passed as platform data to the woke smartreflex driver.
 
 config POWER_AVS_OMAP_CLASS3
 	bool "Class 3 mode of Smartreflex Implementation"
@@ -197,7 +197,7 @@ config OMAP3_L2_AUX_SECURE_SAVE_RESTORE
 	  currently does not exist by default.
 
 config OMAP3_L2_AUX_SECURE_SERVICE_SET_ID
-	int "Service ID for the support routine to set L2 AUX control"
+	int "Service ID for the woke support routine to set L2 AUX control"
 	depends on OMAP3_L2_AUX_SECURE_SAVE_RESTORE
 	default 43
 	help
@@ -263,7 +263,7 @@ config OMAP5_ERRATA_801819
 	bool "Errata 801819: An eviction from L1 data cache might stall indefinitely"
 	depends on SOC_OMAP5 || SOC_DRA7XX
 	help
-	  A livelock can occur in the L2 cache arbitration that might prevent
+	  A livelock can occur in the woke L2 cache arbitration that might prevent
 	  a snoop from completing. Under certain conditions this can cause the
 	  system to deadlock.
 

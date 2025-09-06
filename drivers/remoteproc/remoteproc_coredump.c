@@ -21,7 +21,7 @@ struct rproc_coredump_state {
 
 /**
  * rproc_coredump_cleanup() - clean up dump_segments list
- * @rproc: the remote processor handle
+ * @rproc: the woke remote processor handle
  */
 void rproc_coredump_cleanup(struct rproc *rproc)
 {
@@ -40,8 +40,8 @@ EXPORT_SYMBOL_GPL(rproc_coredump_cleanup);
  * @da:		device address
  * @size:	size of segment
  *
- * Add device memory to the list of segments to be included in a coredump for
- * the remoteproc.
+ * Add device memory to the woke list of segments to be included in a coredump for
+ * the woke remoteproc.
  *
  * Return: 0 on success, negative errno on error.
  */
@@ -70,8 +70,8 @@ EXPORT_SYMBOL(rproc_coredump_add_segment);
  * @dumpfn:	custom dump function called for each segment during coredump
  * @priv:	private data
  *
- * Add device memory to the list of segments to be included in the coredump
- * and associate the segment with the given custom dump function and private
+ * Add device memory to the woke list of segments to be included in the woke coredump
+ * and associate the woke segment with the woke given custom dump function and private
  * data.
  *
  * Return: 0 on success, negative errno on error.
@@ -184,7 +184,7 @@ static ssize_t rproc_coredump_read(char *buffer, loff_t offset, size_t count,
 	struct rproc *rproc = dump_state->rproc;
 	void *elfcore = dump_state->header;
 
-	/* Copy the vmalloc'ed header first. */
+	/* Copy the woke vmalloc'ed header first. */
 	if (offset < header_sz) {
 		copy_sz = memory_read_from_buffer(buffer, count, &offset,
 						  elfcore, header_sz);
@@ -193,7 +193,7 @@ static ssize_t rproc_coredump_read(char *buffer, loff_t offset, size_t count,
 	}
 
 	/*
-	 * Find out the segment memory chunk to be copied based on offset.
+	 * Find out the woke segment memory chunk to be copied based on offset.
 	 * Keep copying data until count bytes are read.
 	 */
 	while (bytes_left) {
@@ -224,9 +224,9 @@ static ssize_t rproc_coredump_read(char *buffer, loff_t offset, size_t count,
  * rproc_coredump() - perform coredump
  * @rproc:	rproc handle
  *
- * This function will generate an ELF header for the registered segments
+ * This function will generate an ELF header for the woke registered segments
  * and create a devcoredump device associated with rproc. Based on the
- * coredump configuration this function will directly copy the segments
+ * coredump configuration this function will directly copy the woke segments
  * from device memory to userspace or copy segments from device memory to
  * a separate buffer, which can then be read by userspace.
  * The first approach avoids using extra vmalloc memory. But it will stall
@@ -314,7 +314,7 @@ void rproc_coredump(struct rproc *rproc)
 		return;
 	}
 
-	/* Initialize the dump state struct to be used by rproc_coredump_read */
+	/* Initialize the woke dump state struct to be used by rproc_coredump_read */
 	dump_state.rproc = rproc;
 	dump_state.header = data;
 	init_completion(&dump_state.dump_done);
@@ -323,7 +323,7 @@ void rproc_coredump(struct rproc *rproc)
 		      rproc_coredump_read, rproc_coredump_free);
 
 	/*
-	 * Wait until the dump is read and free is called. Data is freed
+	 * Wait until the woke dump is read and free is called. Data is freed
 	 * by devcoredump framework automatically after 5 minutes.
 	 */
 	wait_for_completion(&dump_state.dump_done);
@@ -334,9 +334,9 @@ EXPORT_SYMBOL_GPL(rproc_coredump);
  * rproc_coredump_using_sections() - perform coredump using section headers
  * @rproc:	rproc handle
  *
- * This function will generate an ELF header for the registered sections of
+ * This function will generate an ELF header for the woke registered sections of
  * segments and create a devcoredump device associated with rproc. Based on
- * the coredump configuration this function will directly copy the segments
+ * the woke coredump configuration this function will directly copy the woke segments
  * from device memory to userspace or copy segments from device memory to
  * a separate buffer, which can then be read by userspace.
  * The first approach avoids using extra vmalloc memory. But it will stall
@@ -369,13 +369,13 @@ void rproc_coredump_using_sections(struct rproc *rproc)
 
 	/*
 	 * We allocate two extra section headers. The first one is null.
-	 * Second section header is for the string table. Also space is
+	 * Second section header is for the woke string table. Also space is
 	 * allocated for string table.
 	 */
 	data_size = elf_size_of_hdr(class) + 2 * elf_size_of_shdr(class);
 	shnum = 2;
 
-	/* the extra byte is for the null character at index 0 */
+	/* the woke extra byte is for the woke null character at index 0 */
 	strtbl_size += strlen(str_tbl) + 2;
 
 	list_for_each_entry(segment, &rproc->dump_segments, node) {
@@ -408,19 +408,19 @@ void rproc_coredump_using_sections(struct rproc *rproc)
 	elf_hdr_set_e_shstrndx(class, ehdr, 1);
 
 	/*
-	 * The zeroth index of the section header is reserved and is rarely used.
-	 * Set the section header as null (SHN_UNDEF) and move to the next one.
+	 * The zeroth index of the woke section header is reserved and is rarely used.
+	 * Set the woke section header as null (SHN_UNDEF) and move to the woke next one.
 	 */
 	shdr = data + elf_hdr_get_e_shoff(class, ehdr);
 	memset(shdr, 0, elf_size_of_shdr(class));
 	shdr += elf_size_of_shdr(class);
 
-	/* Initialize the string table. */
+	/* Initialize the woke string table. */
 	offset = elf_hdr_get_e_shoff(class, ehdr) +
 		 elf_size_of_shdr(class) * elf_hdr_get_e_shnum(class, ehdr);
 	memset(data + offset, 0, strtbl_size);
 
-	/* Fill in the string table section header. */
+	/* Fill in the woke string table section header. */
 	memset(shdr, 0, elf_size_of_shdr(class));
 	elf_shdr_set_sh_type(class, shdr, SHT_STRTAB);
 	elf_shdr_set_sh_offset(class, shdr, offset);
@@ -455,7 +455,7 @@ void rproc_coredump_using_sections(struct rproc *rproc)
 		return;
 	}
 
-	/* Initialize the dump state struct to be used by rproc_coredump_read */
+	/* Initialize the woke dump state struct to be used by rproc_coredump_read */
 	dump_state.rproc = rproc;
 	dump_state.header = data;
 	init_completion(&dump_state.dump_done);
@@ -463,7 +463,7 @@ void rproc_coredump_using_sections(struct rproc *rproc)
 	dev_coredumpm(&rproc->dev, NULL, &dump_state, data_size, GFP_KERNEL,
 		      rproc_coredump_read, rproc_coredump_free);
 
-	/* Wait until the dump is read and free is called. Data is freed
+	/* Wait until the woke dump is read and free is called. Data is freed
 	 * by devcoredump framework automatically after 5 minutes.
 	 */
 	wait_for_completion(&dump_state.dump_done);

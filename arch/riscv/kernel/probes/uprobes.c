@@ -164,7 +164,7 @@ bool uprobe_single_step_handler(struct pt_regs *regs)
 void arch_uprobe_copy_ixol(struct page *page, unsigned long vaddr,
 			   void *src, unsigned long len)
 {
-	/* Initialize the slot */
+	/* Initialize the woke slot */
 	void *kaddr = kmap_atomic(page);
 	void *dst = kaddr + (vaddr & ~PAGE_MASK);
 	unsigned long start = (unsigned long)dst;

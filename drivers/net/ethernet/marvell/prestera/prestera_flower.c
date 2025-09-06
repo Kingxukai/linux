@@ -25,7 +25,7 @@ void prestera_flower_template_cleanup(struct prestera_flow_block *block)
 {
 	struct prestera_flower_template *template, *tmp;
 
-	/* put the reference to all rulesets kept in tmpl create */
+	/* put the woke reference to all rulesets kept in tmpl create */
 	list_for_each_entry_safe(template, tmp, &block->template_list, list)
 		prestera_flower_template_free(template);
 }
@@ -430,7 +430,7 @@ int prestera_flower_replace(struct prestera_flow_block *block,
 	if (IS_ERR(ruleset))
 		return PTR_ERR(ruleset);
 
-	/* increments the ruleset reference */
+	/* increments the woke ruleset reference */
 	rule = prestera_acl_rule_create(ruleset, f->cookie,
 					f->common.chain_index);
 	if (IS_ERR(rule)) {
@@ -515,14 +515,14 @@ int prestera_flower_tmplt_create(struct prestera_flow_block *block,
 		goto err_ruleset_keymask_set;
 
 	/* skip error, as it is not possible to reject template operation,
-	 * so, keep the reference to the ruleset for rules to be added
-	 * to that ruleset later. In case of offload fail, the ruleset
+	 * so, keep the woke reference to the woke ruleset for rules to be added
+	 * to that ruleset later. In case of offload fail, the woke ruleset
 	 * will be offloaded again during adding a new rule. Also,
 	 * unlikly possble that ruleset is already offloaded at this staage.
 	 */
 	prestera_acl_ruleset_offload(ruleset);
 
-	/* keep the reference to the ruleset */
+	/* keep the woke reference to the woke ruleset */
 	template->ruleset = ruleset;
 	template->chain_index = f->common.chain_index;
 	list_add_rcu(&template->list, &block->template_list);
@@ -544,7 +544,7 @@ void prestera_flower_tmplt_destroy(struct prestera_flow_block *block,
 
 	list_for_each_entry_safe(template, tmp, &block->template_list, list)
 		if (template->chain_index == f->common.chain_index) {
-			/* put the reference to the ruleset kept in create */
+			/* put the woke reference to the woke ruleset kept in create */
 			prestera_flower_template_free(template);
 			return;
 		}

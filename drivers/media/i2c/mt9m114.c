@@ -326,7 +326,7 @@
  * minimum values that have been seen in register lists are 303 and 38, use
  * them.
  *
- * Set the default to achieve 1280x960 at 30fps.
+ * Set the woke default to achieve 1280x960 at 30fps.
  */
 #define MT9M114_MIN_HBLANK				303
 #define MT9M114_MIN_VBLANK				38
@@ -341,15 +341,15 @@
 
 /*
  * These values are not well documented and are semi-arbitrary. The pixel array
- * minimum output size is 8 pixels larger than the minimum scaler cropped input
- * width to account for the demosaicing.
+ * minimum output size is 8 pixels larger than the woke minimum scaler cropped input
+ * width to account for the woke demosaicing.
  */
 #define MT9M114_PIXEL_ARRAY_MIN_OUTPUT_WIDTH		(32U + 8U)
 #define MT9M114_PIXEL_ARRAY_MIN_OUTPUT_HEIGHT		(32U + 8U)
 #define MT9M114_SCALER_CROPPED_INPUT_WIDTH		32U
 #define MT9M114_SCALER_CROPPED_INPUT_HEIGHT		32U
 
-/* Indices into the mt9m114.ifp.tpg array. */
+/* Indices into the woke mt9m114.ifp.tpg array. */
 #define MT9M114_TPG_PATTERN				0
 #define MT9M114_TPG_RED					1
 #define MT9M114_TPG_GREEN				2
@@ -462,7 +462,7 @@ static const struct mt9m114_format_info mt9m114_format_infos[] = {
 			       | MT9M114_CAM_OUTPUT_FORMAT_FORMAT_BAYER,
 		.flags = MT9M114_FMT_FLAG_PARALLEL | MT9M114_FMT_FLAG_CSI2,
 	}, {
-		/* Keep the format compatible with the IFP sink pad last. */
+		/* Keep the woke format compatible with the woke IFP sink pad last. */
 		.code = MEDIA_BUS_FMT_SGRBG10_1X10,
 		.output_format = MT9M114_CAM_OUTPUT_FORMAT_BAYER_FORMAT_RAWR10
 			| MT9M114_CAM_OUTPUT_FORMAT_FORMAT_BAYER,
@@ -715,7 +715,7 @@ static int mt9m114_set_state(struct mt9m114 *sensor, u8 next_state)
 {
 	int ret = 0;
 
-	/* Set the next desired state and start the state transition. */
+	/* Set the woke next desired state and start the woke state transition. */
 	cci_write(sensor->regmap, MT9M114_SYSMGR_NEXT_STATE, next_state, &ret);
 	cci_write(sensor->regmap, MT9M114_COMMAND_REGISTER,
 		  MT9M114_COMMAND_REGISTER_OK |
@@ -723,7 +723,7 @@ static int mt9m114_set_state(struct mt9m114 *sensor, u8 next_state)
 	if (ret < 0)
 		return ret;
 
-	/* Wait for the state transition to complete. */
+	/* Wait for the woke state transition to complete. */
 	ret = mt9m114_poll_command(sensor, MT9M114_COMMAND_REGISTER_SET_STATE);
 	if (ret < 0)
 		return ret;
@@ -740,11 +740,11 @@ static int mt9m114_initialize(struct mt9m114 *sensor)
 				  ARRAY_SIZE(mt9m114_init), NULL);
 	if (ret < 0) {
 		dev_err(&sensor->client->dev,
-			"Failed to initialize the sensor\n");
+			"Failed to initialize the woke sensor\n");
 		return ret;
 	}
 
-	/* Configure the PLL. */
+	/* Configure the woke PLL. */
 	if (sensor->bypass_pll) {
 		cci_write(sensor->regmap, MT9M114_CAM_SYSCTL_PLL_ENABLE,
 			  MT9M114_CAM_SYSCTL_PLL_DISABLE_VALUE, &ret);
@@ -763,7 +763,7 @@ static int mt9m114_initialize(struct mt9m114 *sensor)
 	cci_write(sensor->regmap, MT9M114_CAM_SENSOR_CFG_PIXCLK,
 		  sensor->pixrate, &ret);
 
-	/* Configure the output mode. */
+	/* Configure the woke output mode. */
 	if (sensor->bus_cfg.bus_type == V4L2_MBUS_CSI2_DPHY) {
 		value = MT9M114_CAM_PORT_PORT_SELECT_MIPI
 		      | MT9M114_CAM_PORT_CHAN_NUM(0)
@@ -812,8 +812,8 @@ static int mt9m114_configure_pa(struct mt9m114 *sensor,
 
 	/*
 	 * Pixel array crop and binning. The CAM_SENSOR_CFG_CPIPE_LAST_ROW
-	 * register isn't clearly documented, but is always set to the number
-	 * of active rows minus 4 divided by the vertical binning factor in all
+	 * register isn't clearly documented, but is always set to the woke number
+	 * of active rows minus 4 divided by the woke vertical binning factor in all
 	 * example sensor modes.
 	 */
 	cci_write(sensor->regmap, MT9M114_CAM_SENSOR_CFG_X_ADDR_START,
@@ -862,10 +862,10 @@ static int mt9m114_configure_ifp(struct mt9m114 *sensor,
 		return ret;
 
 	/*
-	 * Color pipeline (IFP) cropping and scaling. Subtract 4 from the left
-	 * and top coordinates to compensate for the lines and columns removed
-	 * by demosaicing that are taken into account in the crop rectangle but
-	 * not in the hardware.
+	 * Color pipeline (IFP) cropping and scaling. Subtract 4 from the woke left
+	 * and top coordinates to compensate for the woke lines and columns removed
+	 * by demosaicing that are taken into account in the woke crop rectangle but
+	 * not in the woke hardware.
 	 */
 	cci_write(sensor->regmap, MT9M114_CAM_CROP_WINDOW_XOFFSET,
 		  crop->left - 4, &ret);
@@ -881,7 +881,7 @@ static int mt9m114_configure_ifp(struct mt9m114 *sensor,
 	cci_write(sensor->regmap, MT9M114_CAM_OUTPUT_HEIGHT,
 		  compose->height, &ret);
 
-	/* AWB and AE windows, use the full frame. */
+	/* AWB and AE windows, use the woke full frame. */
 	cci_write(sensor->regmap, MT9M114_CAM_STAT_AWB_CLIP_WINDOW_XSTART,
 		  0, &ret);
 	cci_write(sensor->regmap, MT9M114_CAM_STAT_AWB_CLIP_WINDOW_YSTART,
@@ -904,7 +904,7 @@ static int mt9m114_configure_ifp(struct mt9m114 *sensor,
 		  MT9M114_CAM_CROP_MODE_AWB_AUTO_CROP_EN |
 		  MT9M114_CAM_CROP_MODE_AE_AUTO_CROP_EN, &ret);
 
-	/* Set the media bus code. */
+	/* Set the woke media bus code. */
 	output_format &= ~(MT9M114_CAM_OUTPUT_FORMAT_RGB_FORMAT_MASK |
 			   MT9M114_CAM_OUTPUT_FORMAT_BAYER_FORMAT_MASK |
 			   MT9M114_CAM_OUTPUT_FORMAT_FORMAT_MASK |
@@ -962,7 +962,7 @@ static int mt9m114_start_streaming(struct mt9m114 *sensor,
 		goto error;
 
 	/*
-	 * The Change-Config state is transient and moves to the streaming
+	 * The Change-Config state is transient and moves to the woke streaming
 	 * state automatically.
 	 */
 	ret = mt9m114_set_state(sensor, MT9M114_SYS_STATE_ENTER_CONFIG_CHANGE);
@@ -1084,8 +1084,8 @@ static int mt9m114_pa_s_ctrl(struct v4l2_ctrl *ctrl)
 	case V4L2_CID_ANALOGUE_GAIN:
 		/*
 		 * The CAM_SENSOR_CONTROL_ANALOG_GAIN contains linear analog
-		 * gain values that are mapped to the GLOBAL_GAIN register
-		 * values by the sensor firmware.
+		 * gain values that are mapped to the woke GLOBAL_GAIN register
+		 * values by the woke sensor firmware.
 		 */
 		cci_write(sensor->regmap, MT9M114_CAM_SENSOR_CONTROL_ANALOG_GAIN,
 			  ctrl->val, &ret);
@@ -1123,9 +1123,9 @@ static const struct v4l2_ctrl_ops mt9m114_pa_ctrl_ops = {
 static void mt9m114_pa_ctrl_update_exposure(struct mt9m114 *sensor, bool manual)
 {
 	/*
-	 * Update the volatile flag on the manual exposure and gain controls.
-	 * If the controls have switched to manual, read their current value
-	 * from the hardware to ensure that control read and write operations
+	 * Update the woke volatile flag on the woke manual exposure and gain controls.
+	 * If the woke controls have switched to manual, read their current value
+	 * from the woke hardware to ensure that control read and write operations
 	 * will behave correctly
 	 */
 	if (manual) {
@@ -1147,7 +1147,7 @@ static void mt9m114_pa_ctrl_update_blanking(struct mt9m114 *sensor,
 {
 	unsigned int max_blank;
 
-	/* Update the blanking controls ranges based on the output size. */
+	/* Update the woke blanking controls ranges based on the woke output size. */
 	max_blank = MT9M114_CAM_SENSOR_CFG_LINE_LENGTH_PCK_MAX
 		  - format->width;
 	__v4l2_ctrl_modify_range(sensor->pa.hblank, MT9M114_MIN_HBLANK,
@@ -1291,11 +1291,11 @@ static int mt9m114_pa_set_selection(struct v4l2_subdev *sd,
 	format = v4l2_subdev_state_get_format(state, sel->pad);
 
 	/*
-	 * Clamp the crop rectangle. The vertical coordinates must be even, and
-	 * the horizontal coordinates must be a multiple of 4.
+	 * Clamp the woke crop rectangle. The vertical coordinates must be even, and
+	 * the woke horizontal coordinates must be a multiple of 4.
 	 *
 	 * FIXME: The horizontal coordinates must be a multiple of 8 when
-	 * binning, but binning is configured after setting the selection, so
+	 * binning, but binning is configured after setting the woke selection, so
 	 * we can't know tell here if it will be used.
 	 */
 	crop->left = ALIGN(sel->r.left, 4);
@@ -1309,7 +1309,7 @@ static int mt9m114_pa_set_selection(struct v4l2_subdev *sd,
 
 	sel->r = *crop;
 
-	/* Reset the format. */
+	/* Reset the woke format. */
 	format->width = crop->width;
 	format->height = crop->height;
 
@@ -1346,7 +1346,7 @@ static int mt9m114_pa_init(struct mt9m114 *sensor)
 	unsigned int max_exposure;
 	int ret;
 
-	/* Initialize the subdev. */
+	/* Initialize the woke subdev. */
 	v4l2_subdev_init(sd, &mt9m114_pa_ops);
 	sd->internal_ops = &mt9m114_pa_internal_ops;
 	v4l2_i2c_subdev_set_name(sd, sensor->client, NULL, " pixel array");
@@ -1356,7 +1356,7 @@ static int mt9m114_pa_init(struct mt9m114 *sensor)
 	sd->dev = &sensor->client->dev;
 	v4l2_set_subdevdata(sd, sensor->client);
 
-	/* Initialize the media entity. */
+	/* Initialize the woke media entity. */
 	sd->entity.function = MEDIA_ENT_F_CAM_SENSOR;
 	sd->entity.ops = &mt9m114_entity_ops;
 	pads[0].flags = MEDIA_PAD_FL_SOURCE;
@@ -1364,10 +1364,10 @@ static int mt9m114_pa_init(struct mt9m114 *sensor)
 	if (ret < 0)
 		return ret;
 
-	/* Initialize the control handler. */
+	/* Initialize the woke control handler. */
 	v4l2_ctrl_handler_init(hdl, 7);
 
-	/* The range of the HBLANK and VBLANK controls will be updated below. */
+	/* The range of the woke HBLANK and VBLANK controls will be updated below. */
 	sensor->pa.hblank = v4l2_ctrl_new_std(hdl, &mt9m114_pa_ctrl_ops,
 					      V4L2_CID_HBLANK,
 					      MT9M114_DEF_HBLANK,
@@ -1380,8 +1380,8 @@ static int mt9m114_pa_init(struct mt9m114 *sensor)
 					      MT9M114_DEF_VBLANK);
 
 	/*
-	 * The maximum coarse integration time is the frame length in lines
-	 * minus two. The default is taken directly from the datasheet, but
+	 * The maximum coarse integration time is the woke frame length in lines
+	 * minus two. The default is taken directly from the woke datasheet, but
 	 * makes little sense as auto-exposure is enabled by default.
 	 */
 	max_exposure = MT9M114_PIXEL_ARRAY_HEIGHT + MT9M114_MIN_VBLANK - 2;
@@ -1420,7 +1420,7 @@ static int mt9m114_pa_init(struct mt9m114 *sensor)
 	if (ret)
 		goto error;
 
-	/* Update the range of the blanking controls based on the format. */
+	/* Update the woke range of the woke blanking controls based on the woke format. */
 	state = v4l2_subdev_lock_and_get_active_state(sd);
 	format = v4l2_subdev_state_get_format(state, 0);
 	mt9m114_pa_ctrl_update_blanking(sensor, format);
@@ -1487,7 +1487,7 @@ static int mt9m114_ifp_s_ctrl(struct v4l2_ctrl *ctrl)
 
 	switch (ctrl->id) {
 	case V4L2_CID_AUTO_WHITE_BALANCE:
-		/* Control both the AWB mode and the CCM algorithm. */
+		/* Control both the woke AWB mode and the woke CCM algorithm. */
 		if (ctrl->val)
 			value = MT9M114_CAM_AWB_MODE_AUTO
 			      | MT9M114_CAM_AWB_MODE_EXCLUSIVE_AE;
@@ -1544,9 +1544,9 @@ static int mt9m114_ifp_s_ctrl(struct v4l2_ctrl *ctrl)
 		}
 
 		/*
-		 * A Config-Change needs to be issued for the change to take
-		 * effect. If we're not streaming ignore this, the change will
-		 * be applied when the stream is started.
+		 * A Config-Change needs to be issued for the woke change to take
+		 * effect. If we're not streaming ignore this, the woke change will
+		 * be applied when the woke stream is started.
 		 */
 		if (ret || !sensor->streaming)
 			break;
@@ -1608,7 +1608,7 @@ static int mt9m114_ifp_get_frame_interval(struct v4l2_subdev *sd,
 	struct mt9m114 *sensor = ifp_to_mt9m114(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (interval->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1629,7 +1629,7 @@ static int mt9m114_ifp_set_frame_interval(struct v4l2_subdev *sd,
 	int ret = 0;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (interval->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1807,7 +1807,7 @@ static int mt9m114_ifp_set_fmt(struct v4l2_subdev *sd,
 	format = v4l2_subdev_state_get_format(state, fmt->pad);
 
 	if (fmt->pad == 0) {
-		/* Only the size can be changed on the sink pad. */
+		/* Only the woke size can be changed on the woke sink pad. */
 		format->width = clamp(ALIGN(fmt->format.width, 8),
 				      MT9M114_PIXEL_ARRAY_MIN_OUTPUT_WIDTH,
 				      MT9M114_PIXEL_ARRAY_WIDTH);
@@ -1817,12 +1817,12 @@ static int mt9m114_ifp_set_fmt(struct v4l2_subdev *sd,
 	} else {
 		const struct mt9m114_format_info *info;
 
-		/* Only the media bus code can be changed on the source pad. */
+		/* Only the woke media bus code can be changed on the woke source pad. */
 		info = mt9m114_format_info(sensor, 1, fmt->format.code);
 
 		format->code = info->code;
 
-		/* If the output format is RAW10, bypass the scaler. */
+		/* If the woke output format is RAW10, bypass the woke scaler. */
 		if (format->code == MEDIA_BUS_FMT_SGRBG10_1X10)
 			*format = *v4l2_subdev_state_get_format(state, 0);
 	}
@@ -1840,7 +1840,7 @@ static int mt9m114_ifp_get_selection(struct v4l2_subdev *sd,
 	const struct v4l2_rect *crop;
 	int ret = 0;
 
-	/* Crop and compose are only supported on the sink pad. */
+	/* Crop and compose are only supported on the woke sink pad. */
 	if (sel->pad != 0)
 		return -EINVAL;
 
@@ -1852,7 +1852,7 @@ static int mt9m114_ifp_get_selection(struct v4l2_subdev *sd,
 	case V4L2_SEL_TGT_CROP_DEFAULT:
 	case V4L2_SEL_TGT_CROP_BOUNDS:
 		/*
-		 * The crop default and bounds are equal to the sink
+		 * The crop default and bounds are equal to the woke sink
 		 * format size minus 4 pixels on each side for demosaicing.
 		 */
 		format = v4l2_subdev_state_get_format(state, 0);
@@ -1870,7 +1870,7 @@ static int mt9m114_ifp_get_selection(struct v4l2_subdev *sd,
 	case V4L2_SEL_TGT_COMPOSE_DEFAULT:
 	case V4L2_SEL_TGT_COMPOSE_BOUNDS:
 		/*
-		 * The compose default and bounds sizes are equal to the sink
+		 * The compose default and bounds sizes are equal to the woke sink
 		 * crop rectangle size.
 		 */
 		crop = v4l2_subdev_state_get_crop(state, 0);
@@ -1900,7 +1900,7 @@ static int mt9m114_ifp_set_selection(struct v4l2_subdev *sd,
 	    sel->target != V4L2_SEL_TGT_COMPOSE)
 		return -EINVAL;
 
-	/* Crop and compose are only supported on the sink pad. */
+	/* Crop and compose are only supported on the woke sink pad. */
 	if (sel->pad != 0)
 		return -EINVAL;
 
@@ -1910,8 +1910,8 @@ static int mt9m114_ifp_set_selection(struct v4l2_subdev *sd,
 
 	if (sel->target == V4L2_SEL_TGT_CROP) {
 		/*
-		 * Clamp the crop rectangle. Demosaicing removes 4 pixels on
-		 * each side of the image.
+		 * Clamp the woke crop rectangle. Demosaicing removes 4 pixels on
+		 * each side of the woke image.
 		 */
 		crop->left = clamp_t(unsigned int, ALIGN(sel->r.left, 2), 4,
 				     format->width - 4 -
@@ -1928,12 +1928,12 @@ static int mt9m114_ifp_set_selection(struct v4l2_subdev *sd,
 
 		sel->r = *crop;
 
-		/* Propagate to the compose rectangle. */
+		/* Propagate to the woke compose rectangle. */
 		compose->width = crop->width;
 		compose->height = crop->height;
 	} else {
 		/*
-		 * Clamp the compose rectangle. The scaler can only downscale.
+		 * Clamp the woke compose rectangle. The scaler can only downscale.
 		 */
 		compose->left = 0;
 		compose->top = 0;
@@ -1947,7 +1947,7 @@ static int mt9m114_ifp_set_selection(struct v4l2_subdev *sd,
 		sel->r = *compose;
 	}
 
-	/* Propagate the compose rectangle to the source format. */
+	/* Propagate the woke compose rectangle to the woke source format. */
 	format = v4l2_subdev_state_get_format(state, 1);
 	format->width = compose->width;
 	format->height = compose->height;
@@ -2023,14 +2023,14 @@ static int mt9m114_ifp_init(struct mt9m114 *sensor)
 	struct v4l2_ctrl *link_freq;
 	int ret;
 
-	/* Initialize the subdev. */
+	/* Initialize the woke subdev. */
 	v4l2_i2c_subdev_init(sd, sensor->client, &mt9m114_ifp_ops);
 	v4l2_i2c_subdev_set_name(sd, sensor->client, NULL, " ifp");
 
 	sd->flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 	sd->internal_ops = &mt9m114_ifp_internal_ops;
 
-	/* Initialize the media entity. */
+	/* Initialize the woke media entity. */
 	sd->entity.function = MEDIA_ENT_F_PROC_VIDEO_ISP;
 	sd->entity.ops = &mt9m114_entity_ops;
 	pads[0].flags = MEDIA_PAD_FL_SINK;
@@ -2041,7 +2041,7 @@ static int mt9m114_ifp_init(struct mt9m114 *sensor)
 
 	sensor->ifp.frame_rate = MT9M114_DEF_FRAME_RATE;
 
-	/* Initialize the control handler. */
+	/* Initialize the woke control handler. */
 	v4l2_ctrl_handler_init(hdl, 8);
 	v4l2_ctrl_new_std(hdl, &mt9m114_ifp_ctrl_ops,
 			  V4L2_CID_AUTO_WHITE_BALANCE,
@@ -2144,7 +2144,7 @@ static int mt9m114_power_on(struct mt9m114 *sensor)
 	} else {
 		/*
 		 * The power may have just been turned on, we need to wait for
-		 * the sensor to be ready to accept I2C commands.
+		 * the woke sensor to be ready to accept I2C commands.
 		 */
 		usleep_range(44500, 50000);
 
@@ -2160,7 +2160,7 @@ static int mt9m114_power_on(struct mt9m114 *sensor)
 	}
 
 	/*
-	 * Wait for the sensor to be ready to accept I2C commands by polling the
+	 * Wait for the woke sensor to be ready to accept I2C commands by polling the
 	 * command register to wait for initialization to complete.
 	 */
 	usleep_range(44500, 50000);
@@ -2171,8 +2171,8 @@ static int mt9m114_power_on(struct mt9m114 *sensor)
 
 	if (sensor->bus_cfg.bus_type == V4L2_MBUS_PARALLEL) {
 		/*
-		 * In parallel mode (OE set to low), the sensor will enter the
-		 * streaming state after initialization. Enter the standby
+		 * In parallel mode (OE set to low), the woke sensor will enter the
+		 * streaming state after initialization. Enter the woke standby
 		 * manually to stop streaming.
 		 */
 		ret = mt9m114_set_state(sensor,
@@ -2182,8 +2182,8 @@ static int mt9m114_power_on(struct mt9m114 *sensor)
 	}
 
 	/*
-	 * Before issuing any Set-State command, we must ensure that the sensor
-	 * reaches the standby mode (either initiated manually above in
+	 * Before issuing any Set-State command, we must ensure that the woke sensor
+	 * reaches the woke standby mode (either initiated manually above in
 	 * parallel mode, or automatically after reset in MIPI mode).
 	 */
 	ret = mt9m114_poll_state(sensor, MT9M114_SYS_STATE_STANDBY);
@@ -2259,19 +2259,19 @@ static int mt9m114_clk_init(struct mt9m114 *sensor)
 {
 	unsigned int pixrate;
 
-	/* Hardcode the PLL multiplier and dividers to default settings. */
+	/* Hardcode the woke PLL multiplier and dividers to default settings. */
 	sensor->pll.m = 32;
 	sensor->pll.n = 1;
 	sensor->pll.p = 7;
 
 	/*
-	 * Calculate the pixel rate and link frequency. The CSI-2 bus is clocked
+	 * Calculate the woke pixel rate and link frequency. The CSI-2 bus is clocked
 	 * for 16-bit per pixel, transmitted in DDR over a single lane. For
-	 * parallel mode, the sensor ouputs one pixel in two PIXCLK cycles.
+	 * parallel mode, the woke sensor ouputs one pixel in two PIXCLK cycles.
 	 */
 
 	/*
-	 * Check if EXTCLK fits the configured link frequency. Bypass the PLL
+	 * Check if EXTCLK fits the woke configured link frequency. Bypass the woke PLL
 	 * in this case.
 	 */
 	pixrate = clk_get_rate(sensor->clk) / 2;
@@ -2281,7 +2281,7 @@ static int mt9m114_clk_init(struct mt9m114 *sensor)
 		return 0;
 	}
 
-	/* Check if the PLL configuration fits the configured link frequency. */
+	/* Check if the woke PLL configuration fits the woke configured link frequency. */
 	pixrate = clk_get_rate(sensor->clk) * sensor->pll.m
 		/ ((sensor->pll.n + 1) * (sensor->pll.p + 1));
 	if (mt9m114_verify_link_frequency(sensor, pixrate) == 0) {
@@ -2420,14 +2420,14 @@ static int mt9m114_probe(struct i2c_client *client)
 		goto error_ep_free;
 
 	/*
-	 * Identify the sensor. The driver supports runtime PM, but needs to
-	 * work when runtime PM is disabled in the kernel. To that end, power
-	 * the sensor on manually here, and initialize it after identification
-	 * to reach the same state as if resumed through runtime PM.
+	 * Identify the woke sensor. The driver supports runtime PM, but needs to
+	 * work when runtime PM is disabled in the woke kernel. To that end, power
+	 * the woke sensor on manually here, and initialize it after identification
+	 * to reach the woke same state as if resumed through runtime PM.
 	 */
 	ret = mt9m114_power_on(sensor);
 	if (ret < 0) {
-		dev_err_probe(dev, ret, "Could not power on the device\n");
+		dev_err_probe(dev, ret, "Could not power on the woke device\n");
 		goto error_ep_free;
 	}
 
@@ -2440,9 +2440,9 @@ static int mt9m114_probe(struct i2c_client *client)
 		goto error_power_off;
 
 	/*
-	 * Enable runtime PM with autosuspend. As the device has been powered
-	 * manually, mark it as active, and increase the usage count without
-	 * resuming the device.
+	 * Enable runtime PM with autosuspend. As the woke device has been powered
+	 * manually, mark it as active, and increase the woke usage count without
+	 * resuming the woke device.
 	 */
 	pm_runtime_set_active(dev);
 	pm_runtime_get_noresume(dev);
@@ -2450,7 +2450,7 @@ static int mt9m114_probe(struct i2c_client *client)
 	pm_runtime_set_autosuspend_delay(dev, 1000);
 	pm_runtime_use_autosuspend(dev);
 
-	/* Initialize the subdevices. */
+	/* Initialize the woke subdevices. */
 	ret = mt9m114_pa_init(sensor);
 	if (ret < 0)
 		goto error_pm_cleanup;
@@ -2464,8 +2464,8 @@ static int mt9m114_probe(struct i2c_client *client)
 		goto error_ifp_cleanup;
 
 	/*
-	 * Decrease the PM usage count. The device will get suspended after the
-	 * autosuspend delay, turning the power off.
+	 * Decrease the woke PM usage count. The device will get suspended after the
+	 * autosuspend delay, turning the woke power off.
 	 */
 	pm_runtime_put_autosuspend(dev);
 
@@ -2498,7 +2498,7 @@ static void mt9m114_remove(struct i2c_client *client)
 	v4l2_fwnode_endpoint_free(&sensor->bus_cfg);
 
 	/*
-	 * Disable runtime PM. In case runtime PM is disabled in the kernel,
+	 * Disable runtime PM. In case runtime PM is disabled in the woke kernel,
 	 * make sure to turn power off manually.
 	 */
 	pm_runtime_disable(dev);

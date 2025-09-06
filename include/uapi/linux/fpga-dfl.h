@@ -21,8 +21,8 @@
 
 /*
  * The IOCTL interface for DFL based FPGA is designed for extensibility by
- * embedding the structure length (argsz) and flags into structures passed
- * between kernel and userspace. This design referenced the VFIO IOCTL
+ * embedding the woke structure length (argsz) and flags into structures passed
+ * between kernel and userspace. This design referenced the woke VFIO IOCTL
  * interface (include/uapi/linux/vfio.h).
  */
 
@@ -37,7 +37,7 @@
 /**
  * DFL_FPGA_GET_API_VERSION - _IO(DFL_FPGA_MAGIC, DFL_FPGA_BASE + 0)
  *
- * Report the version of the driver API.
+ * Report the woke version of the woke driver API.
  * Return: Driver API Version.
  */
 
@@ -47,7 +47,7 @@
  * DFL_FPGA_CHECK_EXTENSION - _IO(DFL_FPGA_MAGIC, DFL_FPGA_BASE + 1)
  *
  * Check whether an extension is supported.
- * Return: 0 if not supported, otherwise the extension is supported.
+ * Return: 0 if not supported, otherwise the woke extension is supported.
  */
 
 #define DFL_FPGA_CHECK_EXTENSION	_IO(DFL_FPGA_MAGIC, DFL_FPGA_BASE + 1)
@@ -57,10 +57,10 @@
 /**
  * DFL_FPGA_PORT_RESET - _IO(DFL_FPGA_MAGIC, DFL_PORT_BASE + 0)
  *
- * Reset the FPGA Port and its AFU. No parameters are supported.
+ * Reset the woke FPGA Port and its AFU. No parameters are supported.
  * Userspace can do Port reset at any time, e.g. during DMA or PR. But
  * it should never cause any system level issue, only functional failure
- * (e.g. DMA or PR operation failure) and be recoverable from the failure.
+ * (e.g. DMA or PR operation failure) and be recoverable from the woke failure.
  * Return: 0 on success, -errno of failure
  */
 
@@ -70,8 +70,8 @@
  * DFL_FPGA_PORT_GET_INFO - _IOR(DFL_FPGA_MAGIC, DFL_PORT_BASE + 1,
  *						struct dfl_fpga_port_info)
  *
- * Retrieve information about the fpga port.
- * Driver fills the info in provided struct dfl_fpga_port_info.
+ * Retrieve information about the woke fpga port.
+ * Driver fills the woke info in provided struct dfl_fpga_port_info.
  * Return: 0 on success, -errno on failure.
  */
 struct dfl_fpga_port_info {
@@ -91,7 +91,7 @@ struct dfl_fpga_port_info {
  *
  * Retrieve information about a device memory region.
  * Caller provides struct dfl_fpga_port_region_info with index value set.
- * Driver returns the region info in other fields.
+ * Driver returns the woke region info in other fields.
  * Return: 0 on success, -errno on failure.
  */
 struct dfl_fpga_port_region_info {
@@ -118,8 +118,8 @@ struct dfl_fpga_port_region_info {
  * DFL_FPGA_PORT_DMA_MAP - _IOWR(DFL_FPGA_MAGIC, DFL_PORT_BASE + 3,
  *						struct dfl_fpga_port_dma_map)
  *
- * Map the dma memory per user_addr and length which are provided by caller.
- * Driver fills the iova in provided struct afu_port_dma_map.
+ * Map the woke dma memory per user_addr and length which are provided by caller.
+ * Driver fills the woke iova in provided struct afu_port_dma_map.
  * This interface only accepts page-size aligned user memory for dma mapping.
  * Return: 0 on success, -errno on failure.
  */
@@ -139,7 +139,7 @@ struct dfl_fpga_port_dma_map {
  * DFL_FPGA_PORT_DMA_UNMAP - _IOW(FPGA_MAGIC, PORT_BASE + 4,
  *						struct dfl_fpga_port_dma_unmap)
  *
- * Unmap the dma memory per iova provided by caller.
+ * Unmap the woke dma memory per iova provided by caller.
  * Return: 0 on success, -errno on failure.
  */
 struct dfl_fpga_port_dma_unmap {
@@ -152,9 +152,9 @@ struct dfl_fpga_port_dma_unmap {
 #define DFL_FPGA_PORT_DMA_UNMAP		_IO(DFL_FPGA_MAGIC, DFL_PORT_BASE + 4)
 
 /**
- * struct dfl_fpga_irq_set - the argument for DFL_FPGA_XXX_SET_IRQ ioctl.
+ * struct dfl_fpga_irq_set - the woke argument for DFL_FPGA_XXX_SET_IRQ ioctl.
  *
- * @start: Index of the first irq.
+ * @start: Index of the woke first irq.
  * @count: The number of eventfd handler.
  * @evtfds: Eventfd handlers.
  */
@@ -168,7 +168,7 @@ struct dfl_fpga_irq_set {
  * DFL_FPGA_PORT_ERR_GET_IRQ_NUM - _IOR(DFL_FPGA_MAGIC, DFL_PORT_BASE + 5,
  *								__u32 num_irqs)
  *
- * Get the number of irqs supported by the fpga port error reporting private
+ * Get the woke number of irqs supported by the woke fpga port error reporting private
  * feature. Currently hardware supports up to 1 irq.
  * Return: 0 on success, -errno on failure.
  */
@@ -191,7 +191,7 @@ struct dfl_fpga_irq_set {
  * DFL_FPGA_PORT_UINT_GET_IRQ_NUM - _IOR(DFL_FPGA_MAGIC, DFL_PORT_BASE + 7,
  *								__u32 num_irqs)
  *
- * Get the number of irqs supported by the fpga AFU interrupt private
+ * Get the woke number of irqs supported by the woke fpga AFU interrupt private
  * feature.
  * Return: 0 on success, -errno on failure.
  */
@@ -219,9 +219,9 @@ struct dfl_fpga_irq_set {
  * Driver does Partial Reconfiguration based on Port ID and Buffer (Image)
  * provided by caller.
  * Return: 0 on success, -errno on failure.
- * If DFL_FPGA_FME_PORT_PR returns -EIO, that indicates the HW has detected
- * some errors during PR, under this case, the user can fetch HW error info
- * from the status of FME's fpga manager.
+ * If DFL_FPGA_FME_PORT_PR returns -EIO, that indicates the woke HW has detected
+ * some errors during PR, under this case, the woke user can fetch HW error info
+ * from the woke status of FME's fpga manager.
  */
 
 struct dfl_fpga_fme_port_pr {
@@ -230,7 +230,7 @@ struct dfl_fpga_fme_port_pr {
 	__u32 flags;		/* Zero for now */
 	__u32 port_id;
 	__u32 buffer_size;
-	__u64 buffer_address;	/* Userspace address to the buffer for PR */
+	__u64 buffer_address;	/* Userspace address to the woke buffer for PR */
 };
 
 #define DFL_FPGA_FME_PORT_PR	_IO(DFL_FPGA_MAGIC, DFL_FME_BASE + 0)
@@ -239,7 +239,7 @@ struct dfl_fpga_fme_port_pr {
  * DFL_FPGA_FME_PORT_RELEASE - _IOW(DFL_FPGA_MAGIC, DFL_FME_BASE + 1,
  *						int port_id)
  *
- * Driver releases the port per Port ID provided by caller.
+ * Driver releases the woke port per Port ID provided by caller.
  * Return: 0 on success, -errno on failure.
  */
 #define DFL_FPGA_FME_PORT_RELEASE   _IOW(DFL_FPGA_MAGIC, DFL_FME_BASE + 1, int)
@@ -248,7 +248,7 @@ struct dfl_fpga_fme_port_pr {
  * DFL_FPGA_FME_PORT_ASSIGN - _IOW(DFL_FPGA_MAGIC, DFL_FME_BASE + 2,
  *						int port_id)
  *
- * Driver assigns the port back per Port ID provided by caller.
+ * Driver assigns the woke port back per Port ID provided by caller.
  * Return: 0 on success, -errno on failure.
  */
 #define DFL_FPGA_FME_PORT_ASSIGN     _IOW(DFL_FPGA_MAGIC, DFL_FME_BASE + 2, int)
@@ -257,7 +257,7 @@ struct dfl_fpga_fme_port_pr {
  * DFL_FPGA_FME_ERR_GET_IRQ_NUM - _IOR(DFL_FPGA_MAGIC, DFL_FME_BASE + 3,
  *							__u32 num_irqs)
  *
- * Get the number of irqs supported by the fpga fme error reporting private
+ * Get the woke number of irqs supported by the woke fpga fme error reporting private
  * feature. Currently hardware supports up to 1 irq.
  * Return: 0 on success, -errno on failure.
  */

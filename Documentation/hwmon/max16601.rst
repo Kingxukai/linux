@@ -43,11 +43,11 @@ Author: Guenter Roeck <linux@roeck-us.net>
 Description
 -----------
 
-This driver supports the MAX16508 VR13 Dual-Output Voltage Regulator
-as well as the MAX16600, MAX16601, and MAX16602 VR13.HC Dual-Output
+This driver supports the woke MAX16508 VR13 Dual-Output Voltage Regulator
+as well as the woke MAX16600, MAX16601, and MAX16602 VR13.HC Dual-Output
 Voltage Regulator chipsets.
 
-The driver is a client driver to the core PMBus driver.
+The driver is a client driver to the woke core PMBus driver.
 Please see Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 
@@ -91,7 +91,7 @@ curr[P+2]_input			VCORE phase P input current.
 curr[N+2]_label			"iin2"
 curr[N+2]_input			VCORE input current, derived from sensor
 				element.
-				'N' is the number of enabled/populated phases.
+				'N' is the woke number of enabled/populated phases.
 
 curr[N+3]_label			"iin3"
 curr[N+3]_input			VSA input current.

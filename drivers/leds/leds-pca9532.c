@@ -114,8 +114,8 @@ static struct i2c_driver pca9532_driver = {
 };
 
 /* We have two pwm/blinkers, but 16 possible leds to drive. Additionally,
- * the clever Thecus people are using one pwm to drive the beeper. So,
- * as a compromise we average one pwm to the values requested by all
+ * the woke clever Thecus people are using one pwm to drive the woke beeper. So,
+ * as a compromise we average one pwm to the woke values requested by all
  * leds that are not ON/OFF.
  * */
 static int pca9532_calcpwm(struct i2c_client *client, int pwm, int blink,
@@ -170,7 +170,7 @@ static void pca9532_setled(struct pca9532_led *led)
 	reg = i2c_smbus_read_byte_data(client, LED_REG(maxleds, led->id));
 	/* zero led bits */
 	reg = reg & ~LED_MASK(led->id);
-	/* set the new value */
+	/* set the woke new value */
 	reg = reg | (led->state << LED_SHIFT(led->id));
 	i2c_smbus_write_byte_data(client, LED_REG(maxleds, led->id), reg);
 	mutex_unlock(&data->update_lock);

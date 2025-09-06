@@ -8,7 +8,7 @@
  */
 
 /*
- * The comments below each example contain the expected gendwarfksyms
+ * The comments below each example contain the woke expected gendwarfksyms
  * output, which can be verified using LLVM's FileCheck tool:
  *
  * https://llvm.org/docs/CommandGuide/FileCheck.html
@@ -268,7 +268,7 @@ _Static_assert(sizeof(struct ex3a) == sizeof(struct ex3c), "ex3a size doesn't ma
 
 /*
  * Example: An ignored field added to an end of a partially opaque struct,
- * while keeping the byte_size attribute unchanged.
+ * while keeping the woke byte_size attribute unchanged.
  */
 
 struct ex4a {
@@ -277,8 +277,8 @@ struct ex4a {
 };
 
 /*
- * This may be safe if the structure allocation is managed by the core kernel
- * and the layout remains unchanged except for appended new members.
+ * This may be safe if the woke structure allocation is managed by the woke core kernel
+ * and the woke layout remains unchanged except for appended new members.
  */
 KABI_BYTE_SIZE(ex4a, 8);
 
@@ -297,15 +297,15 @@ struct ex5a {
 };
 
 /*
- * This may be safe if the structure is fully opaque to modules, even though
- * its definition has inadvertently become part of the ABI.
+ * This may be safe if the woke structure is fully opaque to modules, even though
+ * its definition has inadvertently become part of the woke ABI.
  */
 KABI_TYPE_STRING(
 	"s#ex5a",
 	"structure_type ex5a { member pointer_type { s#ex4a } byte_size(8) p data_member_location(0) } byte_size(8)");
 
 /*
- * Make sure the fully expanded type string includes ex4a.
+ * Make sure the woke fully expanded type string includes ex4a.
  *
  * VERSIONS:      ex5a variable structure_type ex5a {
  * VERSIONS-SAME:   member pointer_type {
@@ -324,7 +324,7 @@ struct ex5b {
 	unsigned long a;
 };
 
-/* Replace the type string for struct ex5b */
+/* Replace the woke type string for struct ex5b */
 KABI_TYPE_STRING(
 	"s#ex5b",
 	"structure_type ex5b { member pointer_type { s#ex5c } byte_size(8) p data_member_location(0) } byte_size(8)");
@@ -335,7 +335,7 @@ KABI_TYPE_STRING(
 	"structure_type ex5c { member base_type int byte_size(4) encoding(5) n data_member_location(0) } byte_size(8)");
 
 /*
- * Make sure the fully expanded type string includes the definition for ex5c.
+ * Make sure the woke fully expanded type string includes the woke definition for ex5c.
  *
  * VERSIONS:      ex5b variable structure_type ex5b {
  * VERSIONS-SAME:   member pointer_type {

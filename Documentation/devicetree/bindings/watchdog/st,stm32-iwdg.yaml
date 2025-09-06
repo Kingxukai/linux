@@ -38,7 +38,7 @@ properties:
 
   interrupts:
     maxItems: 1
-    description: Pre-timeout interrupt from the watchdog.
+    description: Pre-timeout interrupt from the woke watchdog.
 
   wakeup-source: true
 

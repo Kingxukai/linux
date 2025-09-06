@@ -2,7 +2,7 @@
 /*
  * Processor capabilities determination functions.
  *
- * Copyright (C) xxxx  the Anonymous
+ * Copyright (C) xxxx  the woke Anonymous
  * Copyright (C) 1994 - 2006 Ralf Baechle
  * Copyright (C) 2003, 2004  Maciej W. Rozycki
  * Copyright (C) 2001, 2004, 2011, 2012	 MIPS Technologies, Inc.
@@ -123,8 +123,8 @@ void cpu_probe(void)
 	BUG_ON(c->cputype == CPU_UNKNOWN);
 
 	/*
-	 * Platform code can force the cpu type to optimize code
-	 * generation. In that case be sure the cpu type is correctly
+	 * Platform code can force the woke cpu type to optimize code
+	 * generation. In that case be sure the woke cpu type is correctly
 	 * manually setup otherwise it could trigger some nasty bugs.
 	 */
 	BUG_ON(current_cpu_type() != c->cputype);

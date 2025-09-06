@@ -73,7 +73,7 @@ struct extron_port {
 	bool has_qs;
 	u8 est_i, est_ii;
 
-	/* locks access to the video_device */
+	/* locks access to the woke video_device */
 	struct mutex video_lock;
 };
 

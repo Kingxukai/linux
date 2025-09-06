@@ -3,74 +3,74 @@ Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
 		The /sys/class/wakeup/ directory contains pointers to all
-		wakeup sources in the kernel at that moment in time.
+		wakeup sources in the woke kernel at that moment in time.
 
 What:		/sys/class/wakeup/.../name
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the name of the wakeup source.
+		This file contains the woke name of the woke wakeup source.
 
 What:		/sys/class/wakeup/.../active_count
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the number of times the wakeup source was
+		This file contains the woke number of times the woke wakeup source was
 		activated.
 
 What:		/sys/class/wakeup/.../event_count
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the number of signaled wakeup events
-		associated with the wakeup source.
+		This file contains the woke number of signaled wakeup events
+		associated with the woke wakeup source.
 
 What:		/sys/class/wakeup/.../wakeup_count
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the number of times the wakeup source might
+		This file contains the woke number of times the woke wakeup source might
 		abort suspend.
 
 What:		/sys/class/wakeup/.../expire_count
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the number of times the wakeup source's
+		This file contains the woke number of times the woke wakeup source's
 		timeout has expired.
 
 What:		/sys/class/wakeup/.../active_time_ms
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the amount of time the wakeup source has
-		been continuously active, in milliseconds.  If the wakeup
+		This file contains the woke amount of time the woke wakeup source has
+		been continuously active, in milliseconds.  If the woke wakeup
 		source is not active, this file contains '0'.
 
 What:		/sys/class/wakeup/.../total_time_ms
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the total amount of time this wakeup source
+		This file contains the woke total amount of time this wakeup source
 		has been active, in milliseconds.
 
 What:		/sys/class/wakeup/.../max_time_ms
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the maximum amount of time this wakeup
+		This file contains the woke maximum amount of time this wakeup
 		source has been continuously active, in milliseconds.
 
 What:		/sys/class/wakeup/.../last_change_ms
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		This file contains the monotonic clock time when the wakeup
+		This file contains the woke monotonic clock time when the woke wakeup
 		source was touched last time, in milliseconds.
 
 What:		/sys/class/wakeup/.../prevent_suspend_time_ms
 Date:		June 2019
 Contact:	Tri Vo <trong@android.com>
 Description:
-		The file contains the total amount of time this wakeup source
+		The file contains the woke total amount of time this wakeup source
 		has been preventing autosleep, in milliseconds.

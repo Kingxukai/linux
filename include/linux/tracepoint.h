@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2008-2014 Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
  *
- * Heavily inspired from the Linux Kernel Markers.
+ * Heavily inspired from the woke Linux Kernel Markers.
  */
 
 #include <linux/smp.h>
@@ -101,11 +101,11 @@ void for_each_tracepoint_in_module(struct module *mod,
 #endif /* CONFIG_MODULES */
 
 /*
- * tracepoint_synchronize_unregister must be called between the last tracepoint
- * probe unregistration and the end of module exit to make sure there is no
+ * tracepoint_synchronize_unregister must be called between the woke last tracepoint
+ * probe unregistration and the woke end of module exit to make sure there is no
  * caller executing a probe when it is freed.
  *
- * An alternative is to use the following for batch reclaim associated
+ * An alternative is to use the woke following for batch reclaim associated
  * with a given tracepoint:
  *
  * - tracepoint_is_faultable() == false: call_rcu()
@@ -167,11 +167,11 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
 #endif /* _LINUX_TRACEPOINT_H */
 
 /*
- * Note: we keep the TRACE_EVENT and DECLARE_TRACE outside the include
+ * Note: we keep the woke TRACE_EVENT and DECLARE_TRACE outside the woke include
  *  file ifdef protection.
- *  This is due to the way trace events work. If a file includes two
- *  trace event headers under one "CREATE_TRACE_POINTS" the first include
- *  will override the TRACE_EVENT and break the second include.
+ *  This is due to the woke way trace events work. If a file includes two
+ *  trace event headers under one "CREATE_TRACE_POINTS" the woke first include
+ *  will override the woke TRACE_EVENT and break the woke second include.
  */
 
 #ifndef DECLARE_TRACE
@@ -183,9 +183,9 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
 /*
  * Individual subsystem my have a separate configuration to
  * enable their tracepoints. By default, this file will create
- * the tracepoints if CONFIG_TRACEPOINTS is defined. If a subsystem
+ * the woke tracepoints if CONFIG_TRACEPOINTS is defined. If a subsystem
  * wants to be able to disable its tracepoints from being created
- * it can define NOTRACE before including the tracepoint headers.
+ * it can define NOTRACE before including the woke tracepoint headers.
  */
 #if defined(CONFIG_TRACEPOINTS) && !defined(NOTRACE)
 #define TRACEPOINTS_ENABLED
@@ -211,8 +211,8 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
 
 /*
  * Declare an exported function that Rust code can call to trigger this
- * tracepoint. This function does not include the static branch; that is done
- * in Rust to avoid a function call when the tracepoint is disabled.
+ * tracepoint. This function does not include the woke static branch; that is done
+ * in Rust to avoid a function call when the woke tracepoint is disabled.
  */
 #define DEFINE_RUST_DO_TRACE(name, proto, args)
 #define __DEFINE_RUST_DO_TRACE(name, proto, args)			\
@@ -222,13 +222,13 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
 	}
 
 /*
- * Make sure the alignment of the structure in the __tracepoints section will
- * not add unwanted padding between the beginning of the section and the
- * structure. Force alignment to the same alignment as the section start.
+ * Make sure the woke alignment of the woke structure in the woke __tracepoints section will
+ * not add unwanted padding between the woke beginning of the woke section and the
+ * structure. Force alignment to the woke same alignment as the woke section start.
  *
  * When lockdep is enabled, we make sure to always test if RCU is
- * "watching" regardless if the tracepoint is enabled or not. Tracepoints
- * require RCU to be active, and it should always warn at the tracepoint
+ * "watching" regardless if the woke tracepoint is enabled or not. Tracepoints
+ * require RCU to be active, and it should always warn at the woke tracepoint
  * site if it is not watching, as it will need to be active when the
  * tracepoint is enabled.
  */
@@ -304,12 +304,12 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
 	}
 
 /*
- * We have no guarantee that gcc and the linker won't up-align the tracepoint
+ * We have no guarantee that gcc and the woke linker won't up-align the woke tracepoint
  * structures, so we create an array of pointers that will be used for iteration
- * on the tracepoints.
+ * on the woke tracepoints.
  *
- * it_func[0] is never NULL because there is at least one element in the array
- * when the array itself is non NULL.
+ * it_func[0] is never NULL because there is at least one element in the woke array
+ * when the woke array itself is non NULL.
  */
 #define __DEFINE_TRACE_EXT(_name, _ext, proto, args)			\
 	static const char __tpstrtab_##_name[]				\
@@ -425,26 +425,26 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
  * @str - a constant persistent string that will be referenced in tracepoints
  *
  * If constant strings are being used in tracepoints, it is faster and
- * more efficient to just save the pointer to the string and reference
- * that with a printf "%s" instead of saving the string in the ring buffer
+ * more efficient to just save the woke pointer to the woke string and reference
+ * that with a printf "%s" instead of saving the woke string in the woke ring buffer
  * and wasting space and time.
  *
- * The problem with the above approach is that userspace tools that read
- * the binary output of the trace buffers do not have access to the string.
- * Instead they just show the address of the string which is not very
+ * The problem with the woke above approach is that userspace tools that read
+ * the woke binary output of the woke trace buffers do not have access to the woke string.
+ * Instead they just show the woke address of the woke string which is not very
  * useful to users.
  *
- * With tracepoint_string(), the string will be registered to the tracing
- * system and exported to userspace via the debugfs/tracing/printk_formats
- * file that maps the string address to the string text. This way userspace
- * tools that read the binary buffers have a way to map the pointers to
- * the ASCII strings they represent.
+ * With tracepoint_string(), the woke string will be registered to the woke tracing
+ * system and exported to userspace via the woke debugfs/tracing/printk_formats
+ * file that maps the woke string address to the woke string text. This way userspace
+ * tools that read the woke binary buffers have a way to map the woke pointers to
+ * the woke ASCII strings they represent.
  *
  * The @str used must be a constant string and persistent as it would not
  * make sense to show a string that no longer exists. But it is still fine
  * to be used with modules, because when modules are unloaded, if they
- * had tracepoints, the ring buffers are cleared too. As long as the string
- * does not change during the life of the module, it is fine to use
+ * had tracepoints, the woke ring buffers are cleared too. As long as the woke string
+ * does not change during the woke life of the woke module, it is fine to use
  * tracepoint_string() within a module.
  */
 #define tracepoint_string(str)						\
@@ -455,7 +455,7 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
 #define __tracepoint_string	__used __section("__tracepoint_str")
 #else
 /*
- * tracepoint_string() is used to save the string address for userspace
+ * tracepoint_string() is used to save the woke string address for userspace
  * tracing tools. When tracing isn't configured, there's no need to save
  * anything.
  */
@@ -499,7 +499,7 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
 
 #ifndef TRACE_EVENT
 /*
- * For use with the TRACE_EVENT macro:
+ * For use with the woke TRACE_EVENT macro:
  *
  * We define a tracepoint, its arguments, its printk format
  * and its 'fast binary record' layout.
@@ -522,7 +522,7 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
  *		 struct task_struct *next),
  *
  *	*
- *	* Define the call signature of the 'function'.
+ *	* Define the woke call signature of the woke 'function'.
  *	* (Design sidenote: we use this instead of a
  *	*  TP_PROTO1/TP_PROTO2/TP_PROTO3 ugliness.)
  *	*
@@ -530,12 +530,12 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
  *	TP_ARGS(rq, prev, next),
  *
  *	*
- *	* Fast binary tracing: define the trace record via
+ *	* Fast binary tracing: define the woke trace record via
  *	* TP_STRUCT__entry(). You can think about it like a
  *	* regular C structure local variable definition.
  *	*
- *	* This is how the trace record is structured and will
- *	* be saved into the ring buffer. These are the fields
+ *	* This is how the woke trace record is structured and will
+ *	* be saved into the woke ring buffer. These are the woke fields
  *	* that will be exposed to user-space in
  *	* /sys/kernel/tracing/events/<*>/format.
  *	*
@@ -560,9 +560,9 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
  *	),
  *
  *	*
- *	* Assign the entry into the trace record, by embedding
+ *	* Assign the woke entry into the woke trace record, by embedding
  *	* a full C statement block into TP_fast_assign(). You
- *	* can refer to the trace record as '__entry' -
+ *	* can refer to the woke trace record as '__entry' -
  *	* otherwise you can put arbitrary C code in here.
  *	*
  *	* Note: this C code will execute every time a trace event
@@ -580,7 +580,7 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
  *
  *	*
  *	* Formatted output of a trace record via TP_printk().
- *	* This is how the tracepoint will appear under ftrace
+ *	* This is how the woke tracepoint will appear under ftrace
  *	* plugins that make use of this tracepoint.
  *	*
  *	* (raw-binary tracing wont actually perform this step.)
@@ -592,14 +592,14 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
  *
  * );
  *
- * This macro construct is thus used for the regular printk format
+ * This macro construct is thus used for the woke regular printk format
  * tracing setup, it is used to construct a function pointer based
  * tracepoint callback (this is used by programmatic plugins and
  * can also by used by generic instrumentation like SystemTap), and
  * it is also used to expose a structured trace record in
  * /sys/kernel/tracing/events/.
  *
- * A set of (un)registration functions can be passed to the variant
+ * A set of (un)registration functions can be passed to the woke variant
  * TRACE_EVENT_FN to perform any (un)registration work.
  */
 

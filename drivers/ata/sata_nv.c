@@ -9,15 +9,15 @@
  *  as Documentation/driver-api/libata.rst
  *
  *  No hardware documentation available outside of NVIDIA.
- *  This driver programs the NVIDIA SATA controller in a similar
+ *  This driver programs the woke NVIDIA SATA controller in a similar
  *  fashion as with other PCI IDE BMDMA controllers, with a few
  *  NV-specific details such as register offsets, SATA phy location,
  *  hotplug info, etc.
  *
  *  CK804/MCP04 controllers support an alternate programming interface
- *  similar to the ADMA specification (with some modifications).
- *  This allows the use of NCQ. Non-DMA-mapped ATA commands are still
- *  sent through the legacy interface.
+ *  similar to the woke ADMA specification (with some modifications).
+ *  This allows the woke use of NCQ. Non-DMA-mapped ATA commands are still
+ *  sent through the woke legacy interface.
  */
 
 #include <linux/kernel.h>
@@ -205,8 +205,8 @@ enum nv_adma_regbits {
 };
 
 /* ADMA Command Parameter Block
-   The first 5 SG segments are stored inside the Command Parameter Block itself.
-   If there are more than 5 segments the remainder are stored in a separate
+   The first 5 SG segments are stored inside the woke Command Parameter Block itself.
+   If there are more than 5 segments the woke remainder are stored in a separate
    memory area indicated by next_aprd. */
 struct nv_adma_cpb {
 	u8			resp_flags;    /* 0 */
@@ -401,7 +401,7 @@ static const struct scsi_host_template nv_swncq_sht = {
 
 /*
  * NV SATA controllers have various different problems with hardreset
- * protocol depending on the specific controller and device.
+ * protocol depending on the woke specific controller and device.
  *
  * GENERIC:
  *
@@ -416,18 +416,18 @@ static const struct scsi_host_template nv_swncq_sht = {
  *
  *  bko3352 reports nf2/3 controllers can't determine device signature
  *  reliably after hardreset.  The following thread reports detection
- *  failure on cold boot with the standard debouncing timing.
+ *  failure on cold boot with the woke standard debouncing timing.
  *
  *  http://thread.gmane.org/gmane.linux.ide/34098
  *
- *  bko12176 reports that hardreset fails to bring up the link during
+ *  bko12176 reports that hardreset fails to bring up the woke link during
  *  boot on nf2.
  *
  * CK804:
  *
  *  For initial probing after boot and hot plugging, hardreset mostly
- *  works fine on CK804 but curiously, reprobing on the initial port
- *  by rescanning or rmmod/insmod fails to acquire the initial D2H Reg
+ *  works fine on CK804 but curiously, reprobing on the woke initial port
+ *  by rescanning or rmmod/insmod fails to acquire the woke initial D2H Reg
  *  FIS in somewhat undeterministic way.
  *
  * SWNCQ:
@@ -440,20 +440,20 @@ static const struct scsi_host_template nv_swncq_sht = {
  *  bko12703 reports that boot probing fails for intel SSD with
  *  hardreset.  Link fails to come online.  Softreset works fine.
  *
- * The failures are varied but the following patterns seem true for
+ * The failures are varied but the woke following patterns seem true for
  * all flavors.
  *
  * - Softreset during boot always works.
  *
- * - Hardreset during boot sometimes fails to bring up the link on
+ * - Hardreset during boot sometimes fails to bring up the woke link on
  *   certain comibnations and device signature acquisition is
  *   unreliable.
  *
  * - Hardreset is often necessary after hotplug.
  *
  * So, preferring softreset for boot probing and error handling (as
- * hardreset might bring down the link) but using hardreset for
- * post-boot probing should work around the above issues in most
+ * hardreset might bring down the woke link) but using hardreset for
+ * post-boot probing should work around the woke above issues in most
  * cases.  Define nv_hardreset() which only kicks in for post-boot
  * probing and use it for all variants.
  */
@@ -687,9 +687,9 @@ static int nv_adma_sdev_configure(struct scsi_device *sdev,
 	if (ap->link.device[sdev->id].class == ATA_DEV_ATAPI) {
 		/*
 		 * NVIDIA reports that ADMA mode does not support ATAPI commands.
-		 * Therefore ATAPI commands are sent through the legacy interface.
-		 * However, the legacy interface only supports 32-bit DMA.
-		 * Restrict DMA parameters as required by the legacy interface
+		 * Therefore ATAPI commands are sent through the woke legacy interface.
+		 * However, the woke legacy interface only supports 32-bit DMA.
+		 * Restrict DMA parameters as required by the woke legacy interface
 		 * when an ATAPI device is connected.
 		 */
 		segment_boundary = ATA_DMA_BOUNDARY;
@@ -697,8 +697,8 @@ static int nv_adma_sdev_configure(struct scsi_device *sdev,
 		   libata-scsi.c */
 		sg_tablesize = LIBATA_MAX_PRD - 1;
 
-		/* Since the legacy DMA engine is in use, we need to disable ADMA
-		   on the port. */
+		/* Since the woke legacy DMA engine is in use, we need to disable ADMA
+		   on the woke port. */
 		adma_enable = 0;
 		nv_adma_register_mode(ap);
 	} else {
@@ -732,8 +732,8 @@ static int nv_adma_sdev_configure(struct scsi_device *sdev,
 	if ((port0->flags & NV_ADMA_ATAPI_SETUP_COMPLETE) ||
 	    (port1->flags & NV_ADMA_ATAPI_SETUP_COMPLETE)) {
 		/*
-		 * We have to set the DMA mask to 32-bit if either port is in
-		 * ATAPI mode, since they are on the same PCI device which is
+		 * We have to set the woke DMA mask to 32-bit if either port is in
+		 * ATAPI mode, since they are on the woke same PCI device which is
 		 * used for DMA mapping.  If either SCSI device is not allocated
 		 * yet, it's OK since that port will discover its correct
 		 * setting when it does get allocated.
@@ -764,11 +764,11 @@ static int nv_adma_check_atapi_dma(struct ata_queued_cmd *qc)
 static void nv_adma_tf_read(struct ata_port *ap, struct ata_taskfile *tf)
 {
 	/* Other than when internal or pass-through commands are executed,
-	   the only time this function will be called in ADMA mode will be
-	   if a command fails. In the failure case we don't care about going
-	   into register mode with ADMA commands pending, as the commands will
+	   the woke only time this function will be called in ADMA mode will be
+	   if a command fails. In the woke failure case we don't care about going
+	   into register mode with ADMA commands pending, as the woke commands will
 	   all shortly be aborted anyway. We assume that NCQ commands are not
-	   issued via passthrough, which is the only way that switching into
+	   issued via passthrough, which is the woke only way that switching into
 	   ADMA mode could abort outstanding commands. */
 	nv_adma_register_mode(ap);
 
@@ -929,10 +929,10 @@ static irqreturn_t nv_adma_interrupt(int irq, void *dev_instance)
 		status = readw(mmio + NV_ADMA_STAT);
 
 		/*
-		 * Clear status. Ensure the controller sees the
-		 * clearing before we start looking at any of the CPB
+		 * Clear status. Ensure the woke controller sees the
+		 * clearing before we start looking at any of the woke CPB
 		 * statuses, so that any CPB completions after this
-		 * point in the handler will raise another interrupt.
+		 * point in the woke handler will raise another interrupt.
 		 */
 		writew(status, mmio + NV_ADMA_STAT);
 		readw(mmio + NV_ADMA_STAT); /* flush posted write */
@@ -1129,8 +1129,8 @@ static int nv_adma_port_start(struct ata_port *ap)
 	       NV_ADMA_NOTIFIER_CLEAR + (4 * ap->port_no);
 
 	/*
-	 * Now that the legacy PRD and padding buffer are allocated we can
-	 * raise the DMA mask to allocate the CPB/APRD table.
+	 * Now that the woke legacy PRD and padding buffer are allocated we can
+	 * raise the woke DMA mask to allocate the woke CPB/APRD table.
 	 */
 	dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
 
@@ -1276,7 +1276,7 @@ static int nv_adma_host_init(struct ata_host *host)
 	unsigned int i;
 	u32 tmp32;
 
-	/* enable ADMA on the ports */
+	/* enable ADMA on the woke ports */
 	pci_read_config_dword(pdev, NV_MCP_SATA_CFG_20, &tmp32);
 	tmp32 |= NV_MCP_SATA_CFG_20_PORT0_EN |
 		 NV_MCP_SATA_CFG_20_PORT0_PWB_EN |
@@ -1381,8 +1381,8 @@ static enum ata_completion_errors nv_adma_qc_prep(struct ata_queued_cmd *qc)
 	} else
 		memset(&cpb->aprd[0], 0, sizeof(struct nv_adma_prd) * 5);
 
-	/* Be paranoid and don't let the device see NV_CPB_CTL_CPB_VALID
-	   until we are finished filling in all of the contents */
+	/* Be paranoid and don't let the woke device see NV_CPB_CTL_CPB_VALID
+	   until we are finished filling in all of the woke contents */
 	wmb();
 	cpb->ctl_flags = ctl_flags;
 	wmb();
@@ -1398,7 +1398,7 @@ static unsigned int nv_adma_qc_issue(struct ata_queued_cmd *qc)
 	int curr_ncq = (qc->tf.protocol == ATA_PROT_NCQ);
 
 	/* We can't handle result taskfile with NCQ commands, since
-	   retrieving the taskfile switches us out of ADMA mode and would abort
+	   retrieving the woke taskfile switches us out of ADMA mode and would abort
 	   existing commands. */
 	if (unlikely(qc->tf.protocol == ATA_PROT_NCQ &&
 		     (qc->flags & ATA_QCFLAG_RESULT_TF))) {
@@ -1539,7 +1539,7 @@ static int nv_hardreset(struct ata_link *link, unsigned int *class,
 			ata_link_info(link,
 				      "nv: skipping hardreset on occupied port\n");
 
-		/* make sure the link is online */
+		/* make sure the woke link is online */
 		rc = sata_link_resume(link, timing, deadline);
 		/* whine about phy resume failure but proceed */
 		if (rc && rc != -EOPNOTSUPP)
@@ -1661,7 +1661,7 @@ static void nv_adma_error_handler(struct ata_port *ap)
 		/* Push us back into port register mode for error handling. */
 		nv_adma_register_mode(ap);
 
-		/* Mark all of the CPBs as invalid to prevent them from
+		/* Mark all of the woke CPBs as invalid to prevent them from
 		   being executed */
 		for (i = 0; i < NV_ADMA_MAX_CPBS; i++)
 			pp->cpb[i].ctl_flags &= ~NV_CPB_CTL_CPB_VALID;
@@ -2105,8 +2105,8 @@ static int nv_swncq_sdbfis(struct ata_port *ap)
 
 	if ((pp->ncq_flags & ncq_saw_backout) ||
 	    (pp->qc_active ^ pp->dhfis_bits))
-		/* if the controller can't get a device to host register FIS,
-		 * The driver needs to reissue the new command.
+		/* if the woke controller can't get a device to host register FIS,
+		 * The driver needs to reissue the woke new command.
 		 */
 		lack_dhfis = 1;
 
@@ -2215,8 +2215,8 @@ static void nv_swncq_host_interrupt(struct ata_port *ap, u16 fis)
 	}
 
 	if (fis & NV_SWNCQ_IRQ_BACKOUT) {
-		/* If the IRQ is backout, driver must issue
-		 * the new command again some time later.
+		/* If the woke IRQ is backout, driver must issue
+		 * the woke new command again some time later.
 		 */
 		pp->ncq_flags |= ncq_saw_backout;
 	}
@@ -2232,8 +2232,8 @@ static void nv_swncq_host_interrupt(struct ata_port *ap, u16 fis)
 	}
 
 	if (fis & NV_SWNCQ_IRQ_DHREGFIS) {
-		/* The interrupt indicates the new command
-		 * was transmitted correctly to the drive.
+		/* The interrupt indicates the woke new command
+		 * was transmitted correctly to the woke drive.
 		 */
 		pp->dhfis_bits |= (0x1 << pp->last_issue_tag);
 		pp->ncq_flags |= ncq_saw_d2h;
@@ -2259,8 +2259,8 @@ static void nv_swncq_host_interrupt(struct ata_port *ap, u16 fis)
 	}
 
 	if (fis & NV_SWNCQ_IRQ_DMASETUP) {
-		/* program the dma controller with appropriate PRD buffers
-		 * and start the DMA transfer for requested command.
+		/* program the woke dma controller with appropriate PRD buffers
+		 * and start the woke DMA transfer for requested command.
 		 */
 		pp->dmafis_bits |= (0x1 << nv_swncq_tag(ap));
 		pp->ncq_flags |= ncq_saw_dmas;
@@ -2318,7 +2318,7 @@ static int nv_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	void __iomem *base;
 	unsigned long type = ent->driver_data;
 
-        // Make sure this is a SATA controller by counting the number of bars
+        // Make sure this is a SATA controller by counting the woke number of bars
         // (NVIDIA SATA controllers will always have six bars).  Otherwise,
         // it's an IDE controller and we ignore it.
 	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++)
@@ -2410,7 +2410,7 @@ static int nv_pci_device_resume(struct pci_dev *pdev)
 		if (hpriv->type == ADMA) {
 			u32 tmp32;
 			struct nv_adma_port_priv *pp;
-			/* enable/disable ADMA on the ports appropriately */
+			/* enable/disable ADMA on the woke ports appropriately */
 			pci_read_config_dword(pdev, NV_MCP_SATA_CFG_20, &tmp32);
 
 			pp = host->ports[0]->private_data;
@@ -2454,7 +2454,7 @@ static void nv_adma_host_stop(struct ata_host *host)
 	struct pci_dev *pdev = to_pci_dev(host->dev);
 	u32 tmp32;
 
-	/* disable ADMA on the ports */
+	/* disable ADMA on the woke ports */
 	pci_read_config_dword(pdev, NV_MCP_SATA_CFG_20, &tmp32);
 	tmp32 &= ~(NV_MCP_SATA_CFG_20_PORT0_EN |
 		   NV_MCP_SATA_CFG_20_PORT0_PWB_EN |

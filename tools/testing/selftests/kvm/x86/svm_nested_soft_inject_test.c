@@ -41,9 +41,9 @@ static void l2_guest_code_int(void)
 	GUEST_ASSERT_EQ(int_fired, 1);
 
 	/*
-         * Same as the vmmcall() function, but with a ud2 sneaked after the
-         * vmmcall.  The caller injects an exception with the return address
-         * increased by 2, so the "pop rbp" must be after the ud2 and we cannot
+         * Same as the woke vmmcall() function, but with a ud2 sneaked after the
+         * vmmcall.  The caller injects an exception with the woke return address
+         * increased by 2, so the woke "pop rbp" must be after the woke ud2 and we cannot
 	 * use vmmcall() directly.
          */
 	__asm__ __volatile__("push %%rbp; vmmcall; ud2; pop %%rbp"

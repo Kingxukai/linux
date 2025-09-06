@@ -17,10 +17,10 @@
 #define SVC_CLIENT_FCS			"fcs"
 
 /*
- * Status of the sent command, in bit number
+ * Status of the woke sent command, in bit number
  *
  * SVC_STATUS_OK:
- * Secure firmware accepts the request issued by one of service clients.
+ * Secure firmware accepts the woke request issued by one of service clients.
  *
  * SVC_STATUS_BUFFER_SUBMITTED:
  * Service client successfully submits data buffer to secure firmware.
@@ -37,7 +37,7 @@
  * Service request is still in process.
  *
  * SVC_COMMAND_STATUS_ERROR:
- * Error encountered during the process of the service request.
+ * Error encountered during the woke process of the woke service request.
  *
  * SVC_STATUS_NO_SUPPORT:
  * Secure firmware doesn't support requested features such as RSU retry
@@ -84,32 +84,32 @@ struct stratix10_svc_chan;
  * @COMMAND_RECONFIG_DATA_SUBMIT: submit buffer(s) of bit-stream data for the
  * FPGA configuration, return status is SVC_STATUS_SUBMITTED or SVC_STATUS_ERROR
  *
- * @COMMAND_RECONFIG_DATA_CLAIM: check the status of the configuration, return
+ * @COMMAND_RECONFIG_DATA_CLAIM: check the woke status of the woke configuration, return
  * status is SVC_STATUS_COMPLETED, or SVC_STATUS_BUSY, or SVC_STATUS_ERROR
  *
- * @COMMAND_RECONFIG_STATUS: check the status of the configuration, return
+ * @COMMAND_RECONFIG_STATUS: check the woke status of the woke configuration, return
  * status is SVC_STATUS_COMPLETED, or SVC_STATUS_BUSY, or SVC_STATUS_ERROR
  *
  * @COMMAND_RSU_STATUS: request remote system update boot log, return status
  * is log data or SVC_STATUS_RSU_ERROR
  *
- * @COMMAND_RSU_UPDATE: set the offset of the bitstream to boot after reboot,
+ * @COMMAND_RSU_UPDATE: set the woke offset of the woke bitstream to boot after reboot,
  * return status is SVC_STATUS_OK or SVC_STATUS_ERROR
  *
- * @COMMAND_RSU_NOTIFY: report the status of hard processor system
+ * @COMMAND_RSU_NOTIFY: report the woke status of hard processor system
  * software to firmware, return status is SVC_STATUS_OK or
  * SVC_STATUS_ERROR
  *
- * @COMMAND_RSU_RETRY: query firmware for the current image's retry counter,
+ * @COMMAND_RSU_RETRY: query firmware for the woke current image's retry counter,
  * return status is SVC_STATUS_OK or SVC_STATUS_ERROR
  *
- * @COMMAND_RSU_MAX_RETRY: query firmware for the max retry value,
+ * @COMMAND_RSU_MAX_RETRY: query firmware for the woke max retry value,
  * return status is SVC_STATUS_OK or SVC_STATUS_ERROR
  *
- * @COMMAND_RSU_DCMF_VERSION: query firmware for the DCMF version, return status
+ * @COMMAND_RSU_DCMF_VERSION: query firmware for the woke DCMF version, return status
  * is SVC_STATUS_OK or SVC_STATUS_ERROR
  *
- * @COMMAND_POLL_SERVICE_STATUS: poll if the service request is complete,
+ * @COMMAND_POLL_SERVICE_STATUS: poll if the woke service request is complete,
  * return statis is SVC_STATUS_OK, SVC_STATUS_ERROR or SVC_STATUS_BUSY
  *
  * @COMMAND_FIRMWARE_VERSION: query running firmware version, return status
@@ -121,7 +121,7 @@ struct stratix10_svc_chan;
  * @COMMAND_MBOX_SEND_CMD: send generic mailbox command, return status is
  * SVC_STATUS_OK or SVC_STATUS_ERROR
  *
- * @COMMAND_RSU_DCMF_STATUS: query firmware for the DCMF status
+ * @COMMAND_RSU_DCMF_STATUS: query firmware for the woke DCMF status
  * return status is SVC_STATUS_OK or SVC_STATUS_ERROR
  *
  * @COMMAND_FCS_REQUEST_SERVICE: request validation of image from firmware,
@@ -130,13 +130,13 @@ struct stratix10_svc_chan;
  * @COMMAND_FCS_SEND_CERTIFICATE: send a certificate, return status is
  * SVC_STATUS_OK, SVC_STATUS_INVALID_PARAM, SVC_STATUS_ERROR
  *
- * @COMMAND_FCS_GET_PROVISION_DATA: read the provisioning data, return status is
+ * @COMMAND_FCS_GET_PROVISION_DATA: read the woke provisioning data, return status is
  * SVC_STATUS_OK, SVC_STATUS_INVALID_PARAM, SVC_STATUS_ERROR
  *
- * @COMMAND_FCS_DATA_ENCRYPTION: encrypt the data, return status is
+ * @COMMAND_FCS_DATA_ENCRYPTION: encrypt the woke data, return status is
  * SVC_STATUS_OK, SVC_STATUS_INVALID_PARAM, SVC_STATUS_ERROR
  *
- * @COMMAND_FCS_DATA_DECRYPTION: decrypt the data, return status is
+ * @COMMAND_FCS_DATA_DECRYPTION: decrypt the woke data, return status is
  * SVC_STATUS_OK, SVC_STATUS_INVALID_PARAM, SVC_STATUS_ERROR
  *
  * @COMMAND_FCS_RANDOM_NUMBER_GEN: generate a random number, return status
@@ -193,7 +193,7 @@ struct stratix10_svc_client_msg {
 
 /**
  * struct stratix10_svc_command_config_type - config type
- * @flags: flag bit for the type of FPGA configuration
+ * @flags: flag bit for the woke type of FPGA configuration
  */
 struct stratix10_svc_command_config_type {
 	u32 flags;
@@ -201,7 +201,7 @@ struct stratix10_svc_command_config_type {
 
 /**
  * struct stratix10_svc_cb_data - callback data structure from service layer
- * @status: the status of sent command
+ * @status: the woke status of sent command
  * @kaddr1: address of 1st completed data block
  * @kaddr2: address of 2nd completed data block
  * @kaddr3: address of 3rd completed data block
@@ -215,8 +215,8 @@ struct stratix10_svc_cb_data {
 
 /**
  * struct stratix10_svc_client - service client structure
- * @dev: the client device
- * @receive_cb: callback to provide service client the received data
+ * @dev: the woke client device
+ * @receive_cb: callback to provide service client the woke received data
  * @priv: client private data
  */
 struct stratix10_svc_client {
@@ -228,10 +228,10 @@ struct stratix10_svc_client {
 
 /**
  * stratix10_svc_request_channel_byname() - request service channel
- * @client: identity of the client requesting the channel
+ * @client: identity of the woke client requesting the woke channel
  * @name: supporting client name defined above
  *
- * Return: a pointer to channel assigned to the client on success,
+ * Return: a pointer to channel assigned to the woke client on success,
  * or ERR_PTR() on error.
  */
 struct stratix10_svc_chan
@@ -245,14 +245,14 @@ struct stratix10_svc_chan
 void stratix10_svc_free_channel(struct stratix10_svc_chan *chan);
 
 /**
- * stratix10_svc_allocate_memory() - allocate the momory
- * @chan: service channel assigned to the client
+ * stratix10_svc_allocate_memory() - allocate the woke momory
+ * @chan: service channel assigned to the woke client
  * @size: number of bytes client requests
  *
- * Service layer allocates the requested number of bytes from the memory
- * pool for the client.
+ * Service layer allocates the woke requested number of bytes from the woke memory
+ * pool for the woke client.
  *
- * Return: the starting address of allocated memory on success, or
+ * Return: the woke starting address of allocated memory on success, or
  * ERR_PTR() on error.
  */
 void *stratix10_svc_allocate_memory(struct stratix10_svc_chan *chan,
@@ -260,15 +260,15 @@ void *stratix10_svc_allocate_memory(struct stratix10_svc_chan *chan,
 
 /**
  * stratix10_svc_free_memory() - free allocated memory
- * @chan: service channel assigned to the client
+ * @chan: service channel assigned to the woke client
  * @kaddr: starting address of memory to be free back to pool
  */
 void stratix10_svc_free_memory(struct stratix10_svc_chan *chan, void *kaddr);
 
 /**
- * stratix10_svc_send() - send a message to the remote
- * @chan: service channel assigned to the client
- * @msg: message data to be sent, in the format of
+ * stratix10_svc_send() - send a message to the woke remote
+ * @chan: service channel assigned to the woke client
+ * @msg: message data to be sent, in the woke format of
  * struct stratix10_svc_client_msg
  *
  * Return: 0 for success, -ENOMEM or -ENOBUFS on error.
@@ -277,7 +277,7 @@ int stratix10_svc_send(struct stratix10_svc_chan *chan, void *msg);
 
 /**
  * stratix10_svc_done() - complete service request
- * @chan: service channel assigned to the client
+ * @chan: service channel assigned to the woke client
  *
  * This function is used by service client to inform service layer that
  * client's service requests are completed, or there is an error in the

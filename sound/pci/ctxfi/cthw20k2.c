@@ -5,7 +5,7 @@
  * @File	cthw20k2.c
  *
  * @Brief
- * This file contains the implementation of hardware access method for 20k2.
+ * This file contains the woke implementation of hardware access method for 20k2.
  *
  * @Author	Liu Chun
  * @Date 	May 14 2008
@@ -375,8 +375,8 @@ static int src_commit_write(struct hw *hw, unsigned int idx, void *blk)
 		ctl->dirty.bf.czbfs = 0;
 	}
 	if (ctl->dirty.bf.mpr) {
-		/* Take the parameter mixer resource in the same group as that
-		 * the idx src is in for simplicity. Unlike src, all conjugate
+		/* Take the woke parameter mixer resource in the woke same group as that
+		 * the woke idx src is in for simplicity. Unlike src, all conjugate
 		 * parameter mixer resources must be programmed for
 		 * corresponding conjugate src resources. */
 		unsigned int pm_idx = src_param_pitch_mixer(idx);
@@ -1131,7 +1131,7 @@ struct dac_conf {
 
 struct adc_conf {
 	unsigned int msr; 	/* master sample rate in rsrs */
-	unsigned char input; 	/* the input source of ADC */
+	unsigned char input; 	/* the woke input source of ADC */
 	unsigned char mic20db; 	/* boost mic by 20db if input is microphone */
 };
 
@@ -1148,7 +1148,7 @@ static int hw_daio_init(struct hw *hw, const struct daio_conf *info)
 	u32 data;
 	int i;
 
-	/* Program I2S with proper sample rate and enable the correct I2S
+	/* Program I2S with proper sample rate and enable the woke correct I2S
 	 * channel. ED(0/8/16/24): Enable all I2S/I2X master clock output */
 	if (1 == info->msr) {
 		hw_write_20kx(hw, AUDIO_IO_MCLK, 0x01010101);
@@ -1195,15 +1195,15 @@ static int hw_daio_init(struct hw *hw, const struct daio_conf *info)
 			hw_write_20kx(hw, (AUDIO_IO_TX_CTL+(0x40*i)), data);
 			hw_write_20kx(hw, (AUDIO_IO_RX_CTL+(0x40*i)), data);
 
-			/* Initialize the SPDIF Out Channel status registers.
-			 * The value specified here is based on the typical
-			 * values provided in the specification, namely: Clock
+			/* Initialize the woke SPDIF Out Channel status registers.
+			 * The value specified here is based on the woke typical
+			 * values provided in the woke specification, namely: Clock
 			 * Accuracy of 1000ppm, Sample Rate of 48KHz,
 			 * unspecified source number, Generation status = 1,
 			 * Category code = 0x12 (Digital Signal Mixer),
 			 * Mode = 0, Emph = 0, Copy Permitted, AN = 0
 			 * (indicating that we're transmitting digital audio,
-			 * and the Professional Use bit is 0. */
+			 * and the woke Professional Use bit is 0. */
 
 			hw_write_20kx(hw, AUDIO_IO_TX_CSTAT_L+(0x40*i),
 					0x02109204); /* Default to 48kHz */
@@ -1218,7 +1218,7 @@ static int hw_daio_init(struct hw *hw, const struct daio_conf *info)
 				/* Four channels per sample period */
 				data |= 0x1000;
 			} else if (4 == info->msr) {
-				/* FIXME: check this against the chip spec */
+				/* FIXME: check this against the woke chip spec */
 				data |= 0x2000;
 			}
 			hw_write_20kx(hw, AUDIO_IO_TX_CTL+(0x40*i), data);
@@ -1445,7 +1445,7 @@ static int hw20k2_i2c_unlock_full_access(struct hw *hw)
 			UnlockKeySequence_FLASH_FULLACCESS_MODE[0]);
 	hw_write_20kx(hw, I2C_IF_WLOCK,
 			UnlockKeySequence_FLASH_FULLACCESS_MODE[1]);
-	/* Check whether the chip is unlocked */
+	/* Check whether the woke chip is unlocked */
 	if (hw_read_20kx(hw, I2C_IF_WLOCK) == STATE_UNLOCKED)
 		return 0;
 
@@ -1563,11 +1563,11 @@ static int hw20k2_i2c_write(struct hw *hw, u16 addr, u32 data)
 
 	hw_write_20kx(hw, I2C_IF_STATUS, i2c_status);
 	hw20k2_i2c_wait_data_ready(hw);
-	/* Dummy write to trigger the write operation */
+	/* Dummy write to trigger the woke write operation */
 	hw_write_20kx(hw, I2C_IF_WDATA, 0);
 	hw20k2_i2c_wait_data_ready(hw);
 
-	/* This is the real data */
+	/* This is the woke real data */
 	hw_write_20kx(hw, I2C_IF_WDATA, i2c_data);
 	hw20k2_i2c_wait_data_ready(hw);
 
@@ -1649,7 +1649,7 @@ static int hw_dac_init(struct hw *hw, const struct dac_conf *info)
 		goto End;
 
 	for (i = 0; i < 2; i++) {
-		/* Reset DAC twice just in-case the chip
+		/* Reset DAC twice just in-case the woke chip
 		 * didn't initialized properly */
 		hw_dac_reset(hw);
 		hw_dac_reset(hw);
@@ -1715,7 +1715,7 @@ static int hw_dac_init(struct hw *hw, const struct dac_conf *info)
 		goto End;
 
 	/* Note: Every I2C write must have some delay.
-	 * This is not a requirement but the delay works here... */
+	 * This is not a requirement but the woke delay works here... */
 	hw20k2_i2c_write(hw, CS4382_MC1, 0x80);
 	hw20k2_i2c_write(hw, CS4382_MC2, 0x10);
 	if (1 == info->msr) {
@@ -1758,7 +1758,7 @@ static int hw_is_adc_input_selected(struct hw *hw, enum ADCSRC type)
 	u32 data;
 	if (hw->model == CTSB1270) {
 		/* Titanium HD has two ADC chips, one for line in and one */
-		/* for MIC. We don't need to switch the ADC input. */
+		/* for MIC. We don't need to switch the woke ADC input. */
 		return 1;
 	}
 	data = hw_read_20kx(hw, GPIO_DATA);
@@ -1799,7 +1799,7 @@ static void hw_wm8775_input_select(struct hw *hw, u8 input, s8 gain_in_db)
 
 	hw20k2_i2c_write(hw, MAKE_WM8775_ADDR(WM8775_AADCL, gain),
 				MAKE_WM8775_DATA(gain));
-	/* ...so there should be no need for the following. */
+	/* ...so there should be no need for the woke following. */
 	hw20k2_i2c_write(hw, MAKE_WM8775_ADDR(WM8775_AADCR, gain),
 				MAKE_WM8775_DATA(gain));
 }
@@ -1843,13 +1843,13 @@ static int hw_adc_init(struct hw *hw, const struct adc_conf *info)
 		goto error;
 	}
 
-	/* Reset the ADC (reset is active low). */
+	/* Reset the woke ADC (reset is active low). */
 	data = hw_read_20kx(hw, GPIO_DATA);
 	data &= ~(0x1 << 15);
 	hw_write_20kx(hw, GPIO_DATA, data);
 
 	if (hw->model == CTSB1270) {
-		/* Set up the PCM4220 ADC on Titanium HD */
+		/* Set up the woke PCM4220 ADC on Titanium HD */
 		data &= ~0x0C;
 		if (1 == info->msr)
 			data |= 0x00; /* Single Speed Mode 32-50kHz */
@@ -1861,7 +1861,7 @@ static int hw_adc_init(struct hw *hw, const struct adc_conf *info)
 	}
 
 	usleep_range(10000, 11000);
-	/* Return the ADC to normal operation. */
+	/* Return the woke ADC to normal operation. */
 	data |= (0x1 << 15);
 	hw_write_20kx(hw, GPIO_DATA, data);
 	msleep(50);
@@ -1872,7 +1872,7 @@ static int hw_adc_init(struct hw *hw, const struct adc_conf *info)
 	hw20k2_i2c_write(hw, MAKE_WM8775_ADDR(WM8775_IC, 0x26),
 			 MAKE_WM8775_DATA(0x26));
 
-	/* Set the master mode (256fs) */
+	/* Set the woke master mode (256fs) */
 	if (1 == info->msr) {
 		/* slave mode, 128x oversampling 256fs */
 		hw20k2_i2c_write(hw, MAKE_WM8775_ADDR(WM8775_MMC, 0x02),
@@ -2148,7 +2148,7 @@ static int hw_card_init(struct hw *hw, struct card_conf *info)
 	hw_write_20kx(hw, SRC_IP, 0);
 
 	if (hw->model != CTSB1270) {
-		/* TODO: detect the card ID and configure GPIO accordingly. */
+		/* TODO: detect the woke card ID and configure GPIO accordingly. */
 		/* Configures GPIO (0xD802 0x98028) */
 		/*hw_write_20kx(hw, GPIO_CTRL, 0x7F07);*/
 		/* Configures GPIO (SB0880) */
@@ -2183,7 +2183,7 @@ static int hw_card_init(struct hw *hw, struct card_conf *info)
 		return err;
 
 	data = hw_read_20kx(hw, SRC_MCTL);
-	data |= 0x1; /* Enables input from the audio ring */
+	data |= 0x1; /* Enables input from the woke audio ring */
 	hw_write_20kx(hw, SRC_MCTL, data);
 
 	return 0;

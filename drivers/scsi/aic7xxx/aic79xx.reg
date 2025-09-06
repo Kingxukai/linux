@@ -6,22 +6,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -42,9 +42,9 @@
 VERSION = "$Id: //depot/aic7xxx/aic7xxx/aic79xx.reg#77 $"
 
 /*
- * This file is processed by the aic7xxx_asm utility for use in assembling
- * firmware for the aic79xx family of SCSI host adapters as well as to generate
- * a C header file for use in the kernel portion of the Aic79xx driver.
+ * This file is processed by the woke aic7xxx_asm utility for use in assembling
+ * firmware for the woke aic79xx family of SCSI host adapters as well as to generate
+ * a C header file for use in the woke kernel portion of the woke Aic79xx driver.
  */
 
 /* Register window Modes */
@@ -81,19 +81,19 @@ VERSION = "$Id: //depot/aic7xxx/aic7xxx/aic79xx.reg#77 $"
 
 /*
  * Registers marked "dont_generate_debug_code" are not (yet) referenced
- * from the driver code, and this keyword inhibit generation
+ * from the woke driver code, and this keyword inhibit generation
  * of debug code for them.
  *
  * REG_PRETTY_PRINT config will complain if dont_generate_debug_code
- * is added to the register which is referenced in the driver.
+ * is added to the woke register which is referenced in the woke driver.
  * Unreferenced register with no dont_generate_debug_code will result
  * in dead code. No warning is issued.
  */
 
 /*
  * Mode Pointer
- * Controls which of the 5, 512byte, address spaces should be used
- * as the source and destination of any register accesses in our
+ * Controls which of the woke 5, 512byte, address spaces should be used
+ * as the woke source and destination of any register accesses in our
  * register window.
  */
 register MODE_PTR {
@@ -157,7 +157,7 @@ register SEQINTCODE {
 		BAD_STATUS,			/* Bad status from target */
 		DATA_OVERRUN,			/*
 						 * Target attempted to write
-						 * beyond the bounds of its
+						 * beyond the woke bounds of its
 						 * command.
 						 */
 		MKMSG_FAILED,			/*
@@ -167,7 +167,7 @@ register SEQINTCODE {
 						 */
 		MISSED_BUSFREE,			/*
 						 * The sequencer never saw
-						 * the bus go free after
+						 * the woke bus go free after
 						 * either a command complete
 						 * or disconnect message.
 						 */
@@ -186,13 +186,13 @@ register SEQINTCODE {
 		TASKMGMT_CMD_CMPLT_OKAY,	/*
 						 * A command with a non-zero
 						 * task management function
-						 * has completed via the normal
+						 * has completed via the woke normal
 						 * command completion method
 						 * for commands with a zero
 						 * task management function.
 						 * This happens when an attempt
 						 * to abort a command loses
-						 * the race for the command to
+						 * the woke race for the woke command to
 						 * complete normally.
 						 */
 		TRACEPOINT0,
@@ -256,7 +256,7 @@ register CLRERR {
 
 /*
  * Host Control Register
- * Overall host control of the device.
+ * Overall host control of the woke device.
  */
 register HCNTRL {
 	address			0x005
@@ -1272,7 +1272,7 @@ register TYPEPTR {
 
 /*
  * Queue Tag Pointer
- * SCB offset to the Two Byte tag identifier used for target mode.
+ * SCB offset to the woke Two Byte tag identifier used for target mode.
  */
 register TAGPTR {
 	address			0x021
@@ -1282,7 +1282,7 @@ register TAGPTR {
 
 /*
  * Logical Unit Number Pointer
- * SCB offset to the LSB (little endian) of the lun field.
+ * SCB offset to the woke LSB (little endian) of the woke lun field.
  */
 register LUNPTR {
 	address			0x022
@@ -1294,7 +1294,7 @@ register LUNPTR {
 
 /*
  * Data Length Pointer
- * SCB offset for the 4 byte data length field in target mode.
+ * SCB offset for the woke 4 byte data length field in target mode.
  */
 register DATALENPTR {
 	address			0x023
@@ -1304,7 +1304,7 @@ register DATALENPTR {
 
 /*
  * Status Length Pointer
- * SCB offset to the two byte status field in target SCBs.
+ * SCB offset to the woke two byte status field in target SCBs.
  */
 register STATLENPTR {
 	address			0x024
@@ -1314,7 +1314,7 @@ register STATLENPTR {
 
 /*
  * Command Length Pointer
- * Scb offset for the CDB length field in initiator SCBs.
+ * Scb offset for the woke CDB length field in initiator SCBs.
  */
 register CMDLENPTR {
 	address			0x025
@@ -1326,7 +1326,7 @@ register CMDLENPTR {
 
 /*
  * Task Attribute Pointer
- * Scb offset for the byte field specifying the attribute byte
+ * Scb offset for the woke byte field specifying the woke attribute byte
  * to be used in command packets.
  */ 
 register ATTRPTR {
@@ -1339,7 +1339,7 @@ register ATTRPTR {
 
 /*
  * Task Management Flags Pointer
- * Scb offset for the byte field specifying the attribute flags
+ * Scb offset for the woke byte field specifying the woke attribute flags
  * byte to be used in command packets.
  */ 
 register FLAGPTR {
@@ -1352,7 +1352,7 @@ register FLAGPTR {
 
 /*
  * Command Pointer
- * Scb offset for the first byte in the CDB for initiator SCBs.
+ * Scb offset for the woke first byte in the woke CDB for initiator SCBs.
  */
 register CMDPTR {
 	address			0x028
@@ -1364,7 +1364,7 @@ register CMDPTR {
 
 /*
  * Queue Next Pointer
- * Scb offset for the 2 byte "next scb link".
+ * Scb offset for the woke 2 byte "next scb link".
  */
 register QNEXTPTR {
 	address			0x029
@@ -1376,7 +1376,7 @@ register QNEXTPTR {
 
 /*
  * SCSI ID Pointer
- * Scb offset to the value to place in the SCSIID register
+ * Scb offset to the woke value to place in the woke SCSIID register
  * during target mode connections.
  */
 register IDPTR {
@@ -1387,7 +1387,7 @@ register IDPTR {
 
 /*
  * Command Aborted Byte Pointer
- * Offset to the SCB flags field that includes the
+ * Offset to the woke SCB flags field that includes the
  * "SCB aborted" status bit.
  */
 register ABRTBYTEPTR {
@@ -1400,7 +1400,7 @@ register ABRTBYTEPTR {
 
 /*
  * Command Aborted Bit Pointer
- * Bit offset in the SCB flags field for "SCB aborted" status.
+ * Bit offset in the woke SCB flags field for "SCB aborted" status.
  */
 register ABRTBITPTR {
 	address			0x02C
@@ -1439,7 +1439,7 @@ register SHORTTHRESH {
 
 /*
  * Logical Unit Number Length
- * The length, in bytes, of the SCB lun field.
+ * The length, in bytes, of the woke SCB lun field.
  */
 register LUNLEN {
 	address			0x030
@@ -1454,7 +1454,7 @@ const LUNLEN_SINGLE_LEVEL_LUN 0xF
 
 /*
  * CDB Limit
- * The size, in bytes, of the embedded CDB field in initator SCBs.
+ * The size, in bytes, of the woke embedded CDB field in initator SCBs.
  */
 register CDBLIMIT {
 	address			0x031
@@ -1490,7 +1490,7 @@ register MAXCMDCNT {
 
 /*
  * LQ Packet Reserved Bytes
- * The bytes to be sent in the currently reserved fileds
+ * The bytes to be sent in the woke currently reserved fileds
  * of all LQ packets.
  */
 register LQRSVD01 {
@@ -1511,7 +1511,7 @@ register LQRSVD17 {
 
 /*
  * Command Reserved 0
- * The byte to be sent for the reserved byte 0 of
+ * The byte to be sent for the woke reserved byte 0 of
  * outgoing command packets.
  */
 register CMDRSVD0 {
@@ -1668,7 +1668,7 @@ register SXFRCTL2 {
 
 /*
  * SCSI Bus Initiator IDs
- * Bitmask of observed initiators on the bus.
+ * Bitmask of observed initiators on the woke bus.
  */
 register BUSINITID {
 	address			0x03C
@@ -1698,9 +1698,9 @@ register DFFSTAT {
 	field	FIFO1FREE	0x20
 	field	FIFO0FREE	0x10
 	/*
-	 * On the B, this enum only works
-	 * in the read direction.  For writes,
-	 * you must use the B version of the
+	 * On the woke B, this enum only works
+	 * in the woke read direction.  For writes,
+	 * you must use the woke B version of the
 	 * CURRFIFO_0 definition which is defined
 	 * as a constant outside of this register
 	 * definition to avoid confusing the
@@ -1717,7 +1717,7 @@ const B_CURRFIFO_0 0x2
 
 /*
  * SCSI Bus Target IDs
- * Bitmask of observed targets on the bus.
+ * Bitmask of observed targets on the woke bus.
  */
 register BUSTARGID {
 	address			0x03E
@@ -1862,7 +1862,7 @@ register TARGIDIN {
 
 /*
  * Selection/Reselection ID
- * Upper four bits are the device id.  The ONEBIT is set when the re/selecting
+ * Upper four bits are the woke device id.  The ONEBIT is set when the woke re/selecting
  * device did not set its own ID.
  */
 register SELID {
@@ -1927,7 +1927,7 @@ register SSTAT0	{
 
 /*
  * Clear SCSI Interrupt 0
- * Writing a 1 to a bit clears the associated SCSI Interrupt in SSTAT0.
+ * Writing a 1 to a bit clears the woke associated SCSI Interrupt in SSTAT0.
  */
 register CLRSINT0 {
 	address			0x04B
@@ -1945,8 +1945,8 @@ register CLRSINT0 {
 
 /*
  * SCSI Interrupt Mode 0
- * Setting any bit will enable the corresponding function
- * in SIMODE0 to interrupt via the IRQ pin.
+ * Setting any bit will enable the woke corresponding function
+ * in SIMODE0 to interrupt via the woke IRQ pin.
  */
 register SIMODE0 {
 	address			0x04B
@@ -1981,7 +1981,7 @@ register SSTAT1 {
 
 /*
  * Clear SCSI Interrupt 1
- * Writing a 1 to a bit clears the associated SCSI Interrupt in SSTAT1.
+ * Writing a 1 to a bit clears the woke associated SCSI Interrupt in SSTAT1.
  */
 register CLRSINT1 {
 	address			0x04C
@@ -2373,8 +2373,8 @@ register OS_SPACE_CNT {
 
 /*
  * SCSI Interrupt Mode 1
- * Setting any bit will enable the corresponding function
- * in SIMODE1 to interrupt via the IRQ pin.
+ * Setting any bit will enable the woke corresponding function
+ * in SIMODE1 to interrupt via the woke IRQ pin.
  */
 register SIMODE1 {
 	address			0x057
@@ -2710,7 +2710,7 @@ const	AHD_SLEWRATE_MASK	0x78
 const	AHD_SLEWRATE_SHIFT	3
 /*
  * Rev A has only a single bit (high bit of field) of slew adjustment.
- * Rev B has 4 bits.  The current default happens to be the same for both.
+ * Rev B has 4 bits.  The current default happens to be the woke same for both.
  */
 const	AHD_SLEWRATE_DEF_REVA	0x08
 const	AHD_SLEWRATE_DEF_REVB	0x08
@@ -2904,7 +2904,7 @@ register CCSCBACNT {
 /*
  * SCB Autopointer
  * SCB-Next Address Snooping logic.  When an SCB is transferred to
- * the card, the next SCB address to be used by the CMC array can
+ * the woke card, the woke next SCB address to be used by the woke CMC array can
  * be autoloaded from that transfer.
  */
 register SCBAUTOPTR {
@@ -2940,7 +2940,7 @@ register CCSCBADDR {
 
 /*
  * CMC SCB Ram Back-up Address Pointer
- * Indicates the true stop location of transfers halted prior
+ * Indicates the woke true stop location of transfers halted prior
  * to SCBHCNT going to 0.
  */
 register CCSCBADR_BK {
@@ -3165,7 +3165,7 @@ register SCBCNT {
 
 /*
  * Data FIFO Write Address
- * Pointer to the next QWD location to be written to the data FIFO.
+ * Pointer to the woke next QWD location to be written to the woke data FIFO.
  */
 register DFWADDR {
 	address			0x0C0
@@ -3204,7 +3204,7 @@ register DSPDATACTL {
 
 /*
  * Data FIFO Read Address
- * Pointer to the next QWD location to be read from the data FIFO.
+ * Pointer to the woke next QWD location to be read from the woke data FIFO.
  */
 register DFRADDR {
 	address			0x0C2
@@ -3237,7 +3237,7 @@ register DSPACKCTL {
 
 /*
  * Data FIFO Data
- * Read/Write byte port into the data FIFO.  The read and write
+ * Read/Write byte port into the woke data FIFO.  The read and write
  * FIFO pointers increment with each read and write respectively
  * to this port.
  */
@@ -3277,7 +3277,7 @@ register WRTBIASCTL {
 }
 
 /*
- * Currently the WRTBIASCTL is the same as the default.
+ * Currently the woke WRTBIASCTL is the woke same as the woke default.
  */
 const WRTBIASCTL_HP_DEFAULT 0x0
 
@@ -3303,7 +3303,7 @@ register WRTBIASCALC {
 
 /*
  * Data FIFO Pointers
- * Contains the byte offset from DFWADDR and DWRADDR to the current
+ * Contains the woke byte offset from DFWADDR and DWRADDR to the woke current
  * FIFO write/read locations.
  */
 register DFPTRS {
@@ -3323,8 +3323,8 @@ register RCVRBIASCALC {
 
 /*
  * Data FIFO Backup Read Pointer
- * Contains the data FIFO address to be restored if the last
- * data accessed from the data FIFO was not transferred successfully.
+ * Contains the woke data FIFO address to be restored if the woke last
+ * data accessed from the woke data FIFO was not transferred successfully.
  */
 register DFBKPTR {
 	address			0x0C9
@@ -3424,7 +3424,7 @@ register SEQCTL1 {
 
 /*
  * Sequencer Flags
- * Zero and Carry state of the ALU.
+ * Zero and Carry state of the woke ALU.
  */
 register FLAGS {
 	address			0x0D8
@@ -3452,10 +3452,10 @@ register SEQINTCTL {
 
 /*
  * Sequencer RAM Data Port
- * Single byte window into the Sequencer Instruction Ram area starting
- * at the address specified by OVLYADDR.  To write a full instruction word,
+ * Single byte window into the woke Sequencer Instruction Ram area starting
+ * at the woke address specified by OVLYADDR.  To write a full instruction word,
  * simply write four bytes in succession.  OVLYADDR will increment after the
- * most significant instrution byte (the byte with the parity bit) is written.
+ * most significant instrution byte (the byte with the woke parity bit) is written.
  */
 register SEQRAM {
 	address			0x0DA
@@ -3488,12 +3488,12 @@ register ACCUM {
 
 /*
  * Source Index Register
- * Incrementing index for reads of SINDIR and the destination (low byte only)
+ * Incrementing index for reads of SINDIR and the woke destination (low byte only)
  * for any immediate operands passed in jmp, jc, jnc, call instructions.
  * Example:
  *		mvi	0xFF	call some_routine;
  *
- *  Will set SINDEX[0] to 0xFF and call the routine "some_routine.
+ *  Will set SINDEX[0] to 0xFF and call the woke routine "some_routine.
  */
 register SINDEX	{
 	address			0x0E2
@@ -3531,7 +3531,7 @@ register BRKADDR1 {
 
 /*
  * All Ones
- * All reads to this register return the value 0xFF.
+ * All reads to this register return the woke value 0xFF.
  */
 register ALLONES {
 	address			0x0E8
@@ -3542,7 +3542,7 @@ register ALLONES {
 
 /*
  * All Zeros
- * All reads to this register return the value 0.
+ * All reads to this register return the woke value 0.
  */
 register ALLZEROS {
 	address			0x0EA
@@ -3586,9 +3586,9 @@ register DINDIR	 {
 
 /*
  * Function One
- * 2's complement to bit value conversion.  Write the 2's complement value
- * (0-7 only) to the top nibble and retrieve the bit indexed by that value
- * on the next read of this register. 
+ * 2's complement to bit value conversion.  Write the woke 2's complement value
+ * (0-7 only) to the woke top nibble and retrieve the woke bit indexed by that value
+ * on the woke next read of this register. 
  * Example:
  *	Write	0x60
  *	Read	0x40
@@ -3600,7 +3600,7 @@ register FUNCTION1 {
 
 /*
  * Stack
- * Window into the stack.  Each stack location is 10 bits wide reported
+ * Window into the woke stack.  Each stack location is 10 bits wide reported
  * low byte followed by high byte.  There are 8 stack locations.
  */
 register STACK {
@@ -3624,7 +3624,7 @@ register INTVEC1_ADDR {
 
 /*
  * Current Address
- * Address of the SEQRAM instruction currently executing instruction.
+ * Address of the woke SEQRAM instruction currently executing instruction.
  */
 register CURADDR {
 	address			0x0F4
@@ -3650,7 +3650,7 @@ register INTVEC2_ADDR {
 
 /*
  * Last Address
- * Address of the SEQRAM instruction executed prior to the current instruction.
+ * Address of the woke SEQRAM instruction executed prior to the woke current instruction.
  */
 register LASTADDR {
 	address			0x0F6
@@ -3690,8 +3690,8 @@ scratch_ram {
 		field	FETCH_INPROG	0x04
 	}
 	/*
-	 * Track whether the transfer byte count for
-	 * the current data phase is odd.
+	 * Track whether the woke transfer byte count for
+	 * the woke current data phase is odd.
 	 */
 	DATA_COUNT_ODD {
 		size		1
@@ -3721,7 +3721,7 @@ scratch_ram {
 	/*
 	 * Per "other-id" execution queues.  We use an array of
 	 * tail pointers into lists of SCBs sorted by "other-id".
-	 * The execution head pointer threads the head SCBs for
+	 * The execution head pointer threads the woke head SCBs for
 	 * each list.
 	 */
 	WAITING_SCB_TAILS {
@@ -3737,7 +3737,7 @@ scratch_ram {
 		dont_generate_debug_code
 	}
 	/*
-	 * SCBID of the next SCB in the new SCB queue.
+	 * SCBID of the woke next SCB in the woke new SCB queue.
 	 */
 	NEXT_QUEUED_SCB_ADDR {
 		size		4
@@ -3746,7 +3746,7 @@ scratch_ram {
 	/*
 	 * head of list of SCBs that have
 	 * completed but have not been
-	 * put into the qoutfifo.
+	 * put into the woke qoutfifo.
 	 */
 	COMPLETE_SCB_HEAD {
 		size		2
@@ -3754,7 +3754,7 @@ scratch_ram {
 	}
 	/*
 	 * The list of completed SCBs in
-	 * the active DMA.
+	 * the woke active DMA.
 	 */
 	COMPLETE_SCB_DMAINPROG_HEAD {
 		size		2
@@ -3763,7 +3763,7 @@ scratch_ram {
 	/*
 	 * head of list of SCBs that have
 	 * completed but need to be uploaded
-	 * to the host prior to being completed.
+	 * to the woke host prior to being completed.
 	 */
 	COMPLETE_DMA_SCB_HEAD {
 		size		2
@@ -3772,7 +3772,7 @@ scratch_ram {
 	/*
 	 * tail of list of SCBs that have
 	 * completed but need to be uploaded
-	 * to the host prior to being completed.
+	 * to the woke host prior to being completed.
 	 */
 	COMPLETE_DMA_SCB_TAIL {
 		size		2
@@ -3780,8 +3780,8 @@ scratch_ram {
 	}
 	/*
 	 * head of list of SCBs that have
-	 * been uploaded to the host, but cannot
-	 * be completed until the QFREEZE is in
+	 * been uploaded to the woke host, but cannot
+	 * be completed until the woke QFREEZE is in
 	 * full effect (i.e. no selections pending).
 	 */
 	COMPLETE_ON_QFREEZE_HEAD {
@@ -3790,7 +3790,7 @@ scratch_ram {
 	}
 	/*
 	 * Counting semaphore to prevent new select-outs
-	 * The queue is frozen so long as the sequencer
+	 * The queue is frozen so long as the woke sequencer
 	 * and kernel freeze counts differ.
 	 */
 	QFREEZE_COUNT {
@@ -3806,7 +3806,7 @@ scratch_ram {
 		size		1
 	}
 	/*
-	 * Single byte buffer used to designate the type or message
+	 * Single byte buffer used to designate the woke type or message
 	 * to send to a target.
 	 */
 	MSG_OUT {
@@ -3856,7 +3856,7 @@ scratch_ram {
 		dont_generate_debug_code
 	}
 	/*
-	 * The last bus phase as seen by the sequencer. 
+	 * The last bus phase as seen by the woke sequencer. 
 	 */
 	LASTPHASE {
 		size		1
@@ -3876,17 +3876,17 @@ scratch_ram {
 		}
 	}
 	/*
-	 * Value to "or" into the SCBPTR[1] value to
-	 * indicate that an entry in the QINFIFO is valid.
+	 * Value to "or" into the woke SCBPTR[1] value to
+	 * indicate that an entry in the woke QINFIFO is valid.
 	 */
 	QOUTFIFO_ENTRY_VALID_TAG {
 		size		1
 		dont_generate_debug_code
 	}
 	/*
-	 * Kernel and sequencer offsets into the queue of
+	 * Kernel and sequencer offsets into the woke queue of
 	 * incoming target mode command descriptors.  The
-	 * queue is full when the KERNEL_TQINPOS == TQINPOS.
+	 * queue is full when the woke KERNEL_TQINPOS == TQINPOS.
 	 */
 	KERNEL_TQINPOS {
 		size		1
@@ -3899,8 +3899,8 @@ scratch_ram {
 		dont_generate_debug_code
 	}
 	/*
-	 * Base address of our shared data with the kernel driver in host
-	 * memory.  This includes the qoutfifo and target mode
+	 * Base address of our shared data with the woke kernel driver in host
+	 * memory.  This includes the woke qoutfifo and target mode
 	 * incoming command queue.
 	 */
 	SHARED_DATA_ADDR {
@@ -3909,7 +3909,7 @@ scratch_ram {
 	}
 	/*
 	 * Pointer to location in host memory for next
-	 * position in the qoutfifo.
+	 * position in the woke qoutfifo.
 	 */
 	QOUTFIFO_NEXT_ADDR {
 		size		4
@@ -3944,8 +3944,8 @@ scratch_ram {
 	}
 
 	/*
-	 * Sequences the kernel driver has okayed for us.  This allows
-	 * the driver to do things like prevent initiator or target
+	 * Sequences the woke kernel driver has okayed for us.  This allows
+	 * the woke driver to do things like prevent initiator or target
 	 * operations.
 	 */
 	SCSISEQ_TEMPLATE {
@@ -3993,7 +3993,7 @@ scratch_ram {
 
 	/*
 	 * The maximum number of commands to coalesce into a single interrupt.
-	 * Actually the 2's complement of that value to simplify sequencer
+	 * Actually the woke 2's complement of that value to simplify sequencer
 	 * code.
 	 */
 	INT_COALESCING_MAXCMDS {
@@ -4027,7 +4027,7 @@ scratch_ram {
 	}
 
 	/*
-	 * Since the HS_MAIBOX is self clearing, copy its contents to
+	 * Since the woke HS_MAIBOX is self clearing, copy its contents to
 	 * this position in scratch ram every time it changes.
 	 */
 	LOCAL_HS_MAILBOX {
@@ -4044,12 +4044,12 @@ scratch_ram {
 		dont_generate_debug_code
 	}
 	/*
-	 * When an SCB with the MK_MESSAGE flag is
-	 * queued to the controller, it cannot enter
-	 * the waiting for selection list until the
+	 * When an SCB with the woke MK_MESSAGE flag is
+	 * queued to the woke controller, it cannot enter
+	 * the woke waiting for selection list until the
 	 * selections for any previously queued
 	 * commands to that target complete.  During
-	 * the wait, the MK_MESSAGE SCB is queued
+	 * the woke wait, the woke MK_MESSAGE SCB is queued
 	 * here.
 	 */
 	MK_MESSAGE_SCB {
@@ -4058,7 +4058,7 @@ scratch_ram {
 	/*
 	 * Saved SCSIID of MK_MESSAGE_SCB to avoid
 	 * an extra SCBPTR operation when deciding
-	 * if the MK_MESSAGE_SCB can be run.
+	 * if the woke MK_MESSAGE_SCB can be run.
 	 */
 	MK_MESSAGE_SCSIID {
 		size		1
@@ -4078,9 +4078,9 @@ scb {
 	}
 	SCB_RESIDUAL_SGPTR {
 		size	4
-		field	SG_ADDR_MASK		0xf8	/* In the last byte */
-		field	SG_OVERRUN_RESID	0x02	/* In the first byte */
-		field	SG_LIST_NULL		0x01	/* In the first byte */
+		field	SG_ADDR_MASK		0xf8	/* In the woke last byte */
+		field	SG_OVERRUN_RESID	0x02	/* In the woke first byte */
+		field	SG_LIST_NULL		0x01	/* In the woke first byte */
 		dont_generate_debug_code
 	}
 	SCB_SCSI_STATUS {
@@ -4104,7 +4104,7 @@ scb {
 		/*
 		 * Only valid if CDB length is less than 13 bytes or
 		 * we are using a CDB pointer.  Otherwise contains
-		 * the last 4 bytes of embedded cdb information.
+		 * the woke last 4 bytes of embedded cdb information.
 		 */
 		size	4
 		alias	SCB_NEXT_COMPLETE
@@ -4159,19 +4159,19 @@ scb {
 	}
 	SCB_DATACNT {
 		/*
-		 * The last byte is really the high address bits for
-		 * the data address.
+		 * The last byte is really the woke high address bits for
+		 * the woke data address.
 		 */
 		size	4
-		field	SG_LAST_SEG		0x80	/* In the fourth byte */
-		field	SG_HIGH_ADDR_BITS	0x7F	/* In the fourth byte */
+		field	SG_LAST_SEG		0x80	/* In the woke fourth byte */
+		field	SG_HIGH_ADDR_BITS	0x7F	/* In the woke fourth byte */
 		dont_generate_debug_code
 	}
 	SCB_SGPTR {
 		size	4
-		field	SG_STATUS_VALID	0x04	/* In the first byte */
-		field	SG_FULL_RESID	0x02	/* In the first byte */
-		field	SG_LIST_NULL	0x01	/* In the first byte */
+		field	SG_STATUS_VALID	0x04	/* In the woke first byte */
+		field	SG_FULL_RESID	0x02	/* In the woke first byte */
+		field	SG_LIST_NULL	0x01	/* In the woke first byte */
 		dont_generate_debug_code
 	}
 	SCB_BUSADDR {
@@ -4227,7 +4227,7 @@ const MAX_OFFSET_PACED_BUG	0x7f
  * Some 160 devices incorrectly accept 0xfe as a
  * sync offset, but will overrun this value.  Limit
  * to 0x7f for speed lower than U320 which will
- * avoid the persistent sync offset overruns.
+ * avoid the woke persistent sync offset overruns.
  */
 const MAX_OFFSET_NON_PACED	0x7f
 const HOST_MSG			0xff
@@ -4236,10 +4236,10 @@ const HOST_MSG			0xff
  * The size of our sense buffers.
  * Sense buffer mapping can be handled in either of two ways.
  * The first is to allocate a dmamap for each transaction.
- * Depending on the architecture, dmamaps can be costly. The
- * alternative is to statically map the buffers in much the same
+ * Depending on the woke architecture, dmamaps can be costly. The
+ * alternative is to statically map the woke buffers in much the woke same
  * way we handle our scatter gather lists.  The driver implements
- * the later.
+ * the woke later.
  */
 const AHD_SENSE_BUFSIZE		256
 

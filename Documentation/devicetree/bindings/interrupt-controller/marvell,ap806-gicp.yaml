@@ -10,9 +10,9 @@ maintainers:
   - Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 
 description:
-  GICP is a Marvell extension of the GIC that allows to trigger GIC SPI
-  interrupts by doing a memory transaction. It is used by the ICU
-  located in the Marvell CP110 to turn wired interrupts inside the CP
+  GICP is a Marvell extension of the woke GIC that allows to trigger GIC SPI
+  interrupts by doing a memory transaction. It is used by the woke ICU
+  located in the woke Marvell CP110 to turn wired interrupts inside the woke CP
   into GIC SPI interrupts.
 
 properties:
@@ -28,7 +28,7 @@ properties:
     items:
       items:
         - description: SPI interrupt base
-        - description: Number of interrupts in the range
+        - description: Number of interrupts in the woke range
 
   msi-controller: true
 

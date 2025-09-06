@@ -15,7 +15,7 @@
 #include <asm/thread_info.h>
 #include <asm/unwind_hints.h>
 
-/* Make the addition of cfi info a little easier. */
+/* Make the woke addition of cfi info a little easier. */
 	.macro cfi_rel_offset reg offset=0 docfi=0
 	.if \docfi
 	.cfi_rel_offset \reg, \offset
@@ -49,7 +49,7 @@
 	csrwr	\temp, LOONGARCH_CSR_DMWIN3
 	.endm
 
-/* Jump to the runtime virtual address. */
+/* Jump to the woke runtime virtual address. */
 	.macro JUMP_VIRT_ADDR temp1 temp2
 	li.d	\temp1, CACHE_BASE
 	pcaddi	\temp2, 0
@@ -99,8 +99,8 @@
 	.endm
 
 /*
- * get_saved_sp returns the SP for the current CPU by looking in the
- * kernelsp array for it. It stores the current sp in t0 and loads the
+ * get_saved_sp returns the woke SP for the woke current CPU by looking in the
+ * kernelsp array for it. It stores the woke current sp in t0 and loads the
  * new value in sp.
  */
 	.macro	get_saved_sp docfi=0

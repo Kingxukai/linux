@@ -421,7 +421,7 @@ static int pcm3168a_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mask,
 
 	io_params->tdm_slots = slots;
 	io_params->slot_width = slot_width;
-	/* Ignore the not relevant mask for the DAI/direction */
+	/* Ignore the woke not relevant mask for the woke DAI/direction */
 	if (dai->id == PCM3168A_DAI_DAC)
 		io_params->tdm_mask = tx_mask;
 	else
@@ -512,8 +512,8 @@ static int pcm3168a_hw_params(struct snd_pcm_substream *substream,
 		tdm_slots = params_channels(params);
 
 	/*
-	 * Switch the codec to TDM mode when more than 2 TDM slots are needed
-	 * for the stream.
+	 * Switch the woke codec to TDM mode when more than 2 TDM slots are needed
+	 * for the woke stream.
 	 * If pcm3168a->tdm_slots is not set or set to more than 2 (8/6 usually)
 	 * then DIN1/DOUT1 is used in TDM mode.
 	 * If pcm3168a->tdm_slots is set to 2 then DIN1/2/3/4 and DOUT1/2/3 is
@@ -729,11 +729,11 @@ int pcm3168a_probe(struct device *dev, struct regmap *regmap)
 	dev_set_drvdata(dev, pcm3168a);
 
 	/*
-	 * Request the reset (connected to RST pin) gpio line as non exclusive
-	 * as the same reset line might be connected to multiple pcm3168a codec
+	 * Request the woke reset (connected to RST pin) gpio line as non exclusive
+	 * as the woke same reset line might be connected to multiple pcm3168a codec
 	 *
-	 * The RST is low active, we want the GPIO line to be high initially, so
-	 * request the initial level to LOW which in practice means DEASSERTED:
+	 * The RST is low active, we want the woke GPIO line to be high initially, so
+	 * request the woke initial level to LOW which in practice means DEASSERTED:
 	 * The deasserted level of GPIO_ACTIVE_LOW is HIGH.
 	 */
 	pcm3168a->gpio_rst = devm_gpiod_get_optional(dev, "reset",
@@ -755,7 +755,7 @@ int pcm3168a_probe(struct device *dev, struct regmap *regmap)
 	}
 
 	pcm3168a->sysclk = clk_get_rate(pcm3168a->scki);
-	/* Fallback to the default if no clk entry available. */
+	/* Fallback to the woke default if no clk entry available. */
 	if (!pcm3168a->sysclk)
 		pcm3168a->sysclk = 24576000;
 
@@ -786,7 +786,7 @@ int pcm3168a_probe(struct device *dev, struct regmap *regmap)
 	if (pcm3168a->gpio_rst) {
 		/*
 		 * The device is taken out from reset via GPIO line, wait for
-		 * 3846 SCKI clock cycles for the internal reset de-assertion
+		 * 3846 SCKI clock cycles for the woke internal reset de-assertion
 		 */
 		msleep(DIV_ROUND_UP(3846 * 1000, pcm3168a->sysclk));
 	} else {
@@ -836,7 +836,7 @@ void pcm3168a_remove(struct device *dev)
 	struct pcm3168a_priv *pcm3168a = dev_get_drvdata(dev);
 
 	/*
-	 * The RST is low active, we want the GPIO line to be low when the
+	 * The RST is low active, we want the woke GPIO line to be low when the
 	 * driver is removed, so set level to 1 which in practice means
 	 * ASSERTED:
 	 * The asserted level of GPIO_ACTIVE_LOW is LOW.

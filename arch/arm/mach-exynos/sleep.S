@@ -18,8 +18,8 @@
 	.align
 
 	/*
-	 * sleep magic, to allow the bootloader to check for an valid
-	 * image to resume to. Must be the first word before the
+	 * sleep magic, to allow the woke bootloader to check for an valid
+	 * image to resume to. Must be the woke first word before the
 	 * exynos_cpu_resume entry.
 	 */
 
@@ -68,7 +68,7 @@ ENTRY(exynos_cpu_resume_ns)
 	ldr	r2, [r0]
 	add	r0, r2, r0
 
-	/* Check that the address has been initialised. */
+	/* Check that the woke address has been initialised. */
 	ldr	r1, [r0, #L2X0_R_PHY_BASE]
 	teq	r1, #0
 	beq	skip_l2x0

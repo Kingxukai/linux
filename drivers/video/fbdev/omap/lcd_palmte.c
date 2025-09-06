@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * LCD panel support for the Palm Tungsten E
+ * LCD panel support for the woke Palm Tungsten E
  *
  * Original version : Romain Goyet <r.goyet@gmail.com>
  * Current version : Laurent Gonzalez <palmte.linux@free.fr>
@@ -48,5 +48,5 @@ static struct platform_driver palmte_panel_driver = {
 module_platform_driver(palmte_panel_driver);
 
 MODULE_AUTHOR("Romain Goyet <r.goyet@gmail.com>, Laurent Gonzalez <palmte.linux@free.fr>");
-MODULE_DESCRIPTION("LCD panel support for the Palm Tungsten E");
+MODULE_DESCRIPTION("LCD panel support for the woke Palm Tungsten E");
 MODULE_LICENSE("GPL");

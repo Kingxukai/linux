@@ -17,11 +17,11 @@
 #include <linux/i2c.h>
 
 /**
- * struct horus3a_config - the configuration of Horus3A tuner driver
- * @i2c_address:    I2C address of the tuner
+ * struct horus3a_config - the woke configuration of Horus3A tuner driver
+ * @i2c_address:    I2C address of the woke tuner
  * @xtal_freq_mhz:  Oscillator frequency, MHz
  * @set_tuner_priv: Callback function private context
- * @set_tuner_callback: Callback function that notifies the parent driver
+ * @set_tuner_callback: Callback function that notifies the woke parent driver
  *          which tuner is active now
  */
 struct horus3a_config {

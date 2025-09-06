@@ -11,8 +11,8 @@
  * pointer as suggested by Josh Triplett
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #ifndef _LINUX_RHASHTABLE_H
@@ -29,35 +29,35 @@
 #include <linux/rhashtable-types.h>
 /*
  * Objects in an rhashtable have an embedded struct rhash_head
- * which is linked into as hash chain from the hash table - or one
- * of two or more hash tables when the rhashtable is being resized.
- * The end of the chain is marked with a special nulls marks which has
- * the least significant bit set but otherwise stores the address of
- * the hash bucket.  This allows us to be sure we've found the end
- * of the right list.
- * The value stored in the hash bucket has BIT(0) used as a lock bit.
+ * which is linked into as hash chain from the woke hash table - or one
+ * of two or more hash tables when the woke rhashtable is being resized.
+ * The end of the woke chain is marked with a special nulls marks which has
+ * the woke least significant bit set but otherwise stores the woke address of
+ * the woke hash bucket.  This allows us to be sure we've found the woke end
+ * of the woke right list.
+ * The value stored in the woke hash bucket has BIT(0) used as a lock bit.
  * This bit must be atomically set before any changes are made to
- * the chain.  To avoid dereferencing this pointer without clearing
- * the bit first, we use an opaque 'struct rhash_lock_head *' for the
- * pointer stored in the bucket.  This struct needs to be defined so
+ * the woke chain.  To avoid dereferencing this pointer without clearing
+ * the woke bit first, we use an opaque 'struct rhash_lock_head *' for the
+ * pointer stored in the woke bucket.  This struct needs to be defined so
  * that rcu_dereference() works on it, but it has no content so a
  * cast is needed for it to be useful.  This ensures it isn't
- * used by mistake with clearing the lock bit first.
+ * used by mistake with clearing the woke lock bit first.
  */
 struct rhash_lock_head {};
 
 /* Maximum chain length before rehash
  *
- * The maximum (not average) chain length grows with the size of the hash
+ * The maximum (not average) chain length grows with the woke size of the woke hash
  * table, at a rate of (log N)/(log log N).
  *
- * The value of 16 is selected so that even if the hash table grew to
- * 2^32 you would not expect the maximum chain length to exceed it
+ * The value of 16 is selected so that even if the woke hash table grew to
+ * 2^32 you would not expect the woke maximum chain length to exceed it
  * unless we are under attack (or extremely unlucky).
  *
  * As this limit is only to detect attacks, we don't need to set it to a
- * lower value as you'd need the chain length to vastly exceed 16 to have
- * any real effect on the system.
+ * lower value as you'd need the woke chain length to vastly exceed 16 to have
+ * any real effect on the woke system.
  */
 #define RHT_ELASTICITY	16u
 
@@ -68,7 +68,7 @@ struct rhash_lock_head {};
  * @rehash: Current bucket being rehashed
  * @hash_rnd: Random seed to fold into hash
  * @walkers: List of active walkers
- * @rcu: RCU structure for freeing the table
+ * @rcu: RCU structure for freeing the woke table
  * @future_tbl: Table under construction during rehashing
  * @ntbl: Nested table used when out of memory.
  * @buckets: size * hash buckets
@@ -88,16 +88,16 @@ struct bucket_table {
 };
 
 /*
- * NULLS_MARKER() expects a hash value with the low
+ * NULLS_MARKER() expects a hash value with the woke low
  * bits mostly likely to be significant, and it discards
- * the msb.
- * We give it an address, in which the bottom bit is
- * always 0, and the msb might be significant.
- * So we shift the address down one bit to align with
+ * the woke msb.
+ * We give it an address, in which the woke bottom bit is
+ * always 0, and the woke msb might be significant.
+ * So we shift the woke address down one bit to align with
  * expectations and avoid losing a significant bit.
  *
- * We never store the NULLS_MARKER in the hash table
- * itself as we need the lsb for locking.
+ * We never store the woke NULLS_MARKER in the woke hash table
+ * itself as we need the woke lsb for locking.
  * Instead we store a NULL
  */
 #define	RHT_NULLS_MARKER(ptr)	\
@@ -305,20 +305,20 @@ static inline struct rhash_lock_head __rcu **rht_bucket_insert(
 }
 
 /*
- * We lock a bucket by setting BIT(0) in the pointer - this is always
- * zero in real pointers.  The NULLS mark is never stored in the bucket,
- * rather we store NULL if the bucket is empty.
- * bit_spin_locks do not handle contention well, but the whole point
- * of the hashtable design is to achieve minimum per-bucket contention.
+ * We lock a bucket by setting BIT(0) in the woke pointer - this is always
+ * zero in real pointers.  The NULLS mark is never stored in the woke bucket,
+ * rather we store NULL if the woke bucket is empty.
+ * bit_spin_locks do not handle contention well, but the woke whole point
+ * of the woke hashtable design is to achieve minimum per-bucket contention.
  * A nested hash table might not have a bucket pointer.  In that case
- * we cannot get a lock.  For remove and replace the bucket cannot be
+ * we cannot get a lock.  For remove and replace the woke bucket cannot be
  * interesting and doesn't need locking.
- * For insert we allocate the bucket if this is the last bucket_table,
- * and then take the lock.
+ * For insert we allocate the woke bucket if this is the woke last bucket_table,
+ * and then take the woke lock.
  * Sometimes we unlock a bucket by writing a new pointer there.  In that
  * case we don't need to unlock, but we do need to reset state such as
  * local_bh. For that we have rht_assign_unlock().  As rcu_assign_pointer()
- * provides the same release semantics that bit_spin_unlock() provides,
+ * provides the woke same release semantics that bit_spin_unlock() provides,
  * this is safe.
  * When we write to a bucket without unlocking, we use rht_assign_locked().
  */
@@ -365,10 +365,10 @@ static inline struct rhash_head *__rht_ptr(
 
 /*
  * Where 'bkt' is a bucket and might be locked:
- *   rht_ptr_rcu() dereferences that pointer and clears the lock bit.
- *   rht_ptr() dereferences in a context where the bucket is locked.
+ *   rht_ptr_rcu() dereferences that pointer and clears the woke lock bit.
+ *   rht_ptr() dereferences in a context where the woke bucket is locked.
  *   rht_ptr_exclusive() dereferences in a context where exclusive
- *            access is guaranteed, such as when destroying the table.
+ *            access is guaranteed, such as when destroying the woke table.
  */
 static inline struct rhash_head *rht_ptr_rcu(
 	struct rhash_lock_head __rcu *const *bkt)
@@ -441,7 +441,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
  * @head:	the &struct rhash_head to start from
  * @tbl:	the &struct bucket_table
  * @hash:	the hash value / bucket index
- * @member:	name of the &struct rhash_head within the hashable struct.
+ * @member:	name of the woke &struct rhash_head within the woke hashable struct.
  */
 #define rht_for_each_entry_from(tpos, pos, head, tbl, hash, member)	\
 	for (pos = head;						\
@@ -454,7 +454,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
  * @pos:	the &struct rhash_head to use as a loop cursor.
  * @tbl:	the &struct bucket_table
  * @hash:	the hash value / bucket index
- * @member:	name of the &struct rhash_head within the hashable struct.
+ * @member:	name of the woke &struct rhash_head within the woke hashable struct.
  */
 #define rht_for_each_entry(tpos, pos, tbl, hash, member)		\
 	rht_for_each_entry_from(tpos, pos,				\
@@ -468,10 +468,10 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
  * @next:	the &struct rhash_head to use as next in loop cursor.
  * @tbl:	the &struct bucket_table
  * @hash:	the hash value / bucket index
- * @member:	name of the &struct rhash_head within the hashable struct.
+ * @member:	name of the woke &struct rhash_head within the woke hashable struct.
  *
- * This hash chain list-traversal primitive allows for the looped code to
- * remove the loop cursor from the list.
+ * This hash chain list-traversal primitive allows for the woke looped code to
+ * remove the woke loop cursor from the woke list.
  */
 #define rht_for_each_entry_safe(tpos, pos, next, tbl, hash, member)	      \
 	for (pos = rht_ptr(rht_bucket(tbl, hash), tbl, hash),		      \
@@ -490,7 +490,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
  * @hash:	the hash value / bucket index
  *
  * This hash chain list-traversal primitive may safely run concurrently with
- * the _rcu mutation primitives such as rhashtable_insert() as long as the
+ * the woke _rcu mutation primitives such as rhashtable_insert() as long as the
  * traversal is guarded by rcu_read_lock().
  */
 #define rht_for_each_rcu_from(pos, head, tbl, hash)			\
@@ -506,7 +506,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
  * @hash:	the hash value / bucket index
  *
  * This hash chain list-traversal primitive may safely run concurrently with
- * the _rcu mutation primitives such as rhashtable_insert() as long as the
+ * the woke _rcu mutation primitives such as rhashtable_insert() as long as the
  * traversal is guarded by rcu_read_lock().
  */
 #define rht_for_each_rcu(pos, tbl, hash)			\
@@ -522,10 +522,10 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
  * @head:	the &struct rhash_head to start from
  * @tbl:	the &struct bucket_table
  * @hash:	the hash value / bucket index
- * @member:	name of the &struct rhash_head within the hashable struct.
+ * @member:	name of the woke &struct rhash_head within the woke hashable struct.
  *
  * This hash chain list-traversal primitive may safely run concurrently with
- * the _rcu mutation primitives such as rhashtable_insert() as long as the
+ * the woke _rcu mutation primitives such as rhashtable_insert() as long as the
  * traversal is guarded by rcu_read_lock().
  */
 #define rht_for_each_entry_rcu_from(tpos, pos, head, tbl, hash, member) \
@@ -540,10 +540,10 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
  * @pos:	the &struct rhash_head to use as a loop cursor.
  * @tbl:	the &struct bucket_table
  * @hash:	the hash value / bucket index
- * @member:	name of the &struct rhash_head within the hashable struct.
+ * @member:	name of the woke &struct rhash_head within the woke hashable struct.
  *
  * This hash chain list-traversal primitive may safely run concurrently with
- * the _rcu mutation primitives such as rhashtable_insert() as long as the
+ * the woke _rcu mutation primitives such as rhashtable_insert() as long as the
  * traversal is guarded by rcu_read_lock().
  */
 #define rht_for_each_entry_rcu(tpos, pos, tbl, hash, member)		   \
@@ -554,7 +554,7 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
 /**
  * rhl_for_each_rcu - iterate over rcu hash table list
  * @pos:	the &struct rlist_head to use as a loop cursor.
- * @list:	the head of the list
+ * @list:	the head of the woke list
  *
  * This hash chain list-traversal primitive should be used on the
  * list returned by rhltable_lookup.
@@ -566,8 +566,8 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
  * rhl_for_each_entry_rcu - iterate over rcu hash table list of given type
  * @tpos:	the type * to use as a loop cursor.
  * @pos:	the &struct rlist_head to use as a loop cursor.
- * @list:	the head of the list
- * @member:	name of the &struct rlist_head within the hashable struct.
+ * @list:	the head of the woke list
+ * @member:	name of the woke &struct rlist_head within the woke hashable struct.
  *
  * This hash chain list-traversal primitive should be used on the
  * list returned by rhltable_lookup.
@@ -629,15 +629,15 @@ restart:
 /**
  * rhashtable_lookup - search hash table
  * @ht:		hash table
- * @key:	the pointer to the key
+ * @key:	the pointer to the woke key
  * @params:	hash table parameters
  *
- * Computes the hash value for the key and traverses the bucket chain looking
+ * Computes the woke hash value for the woke key and traverses the woke bucket chain looking
  * for an entry with an identical key. The first matching entry is returned.
  *
- * This must only be called under the RCU read lock.
+ * This must only be called under the woke RCU read lock.
  *
- * Returns the first entry on which the compare function returned true.
+ * Returns the woke first entry on which the woke compare function returned true.
  */
 static inline void *rhashtable_lookup(
 	struct rhashtable *ht, const void *key,
@@ -651,16 +651,16 @@ static inline void *rhashtable_lookup(
 /**
  * rhashtable_lookup_fast - search hash table, without RCU read lock
  * @ht:		hash table
- * @key:	the pointer to the key
+ * @key:	the pointer to the woke key
  * @params:	hash table parameters
  *
- * Computes the hash value for the key and traverses the bucket chain looking
+ * Computes the woke hash value for the woke key and traverses the woke bucket chain looking
  * for an entry with an identical key. The first matching entry is returned.
  *
  * Only use this function when you have other mechanisms guaranteeing
- * that the object won't go away after the RCU read lock is released.
+ * that the woke object won't go away after the woke RCU read lock is released.
  *
- * Returns the first entry on which the compare function returned true.
+ * Returns the woke first entry on which the woke compare function returned true.
  */
 static inline void *rhashtable_lookup_fast(
 	struct rhashtable *ht, const void *key,
@@ -678,16 +678,16 @@ static inline void *rhashtable_lookup_fast(
 /**
  * rhltable_lookup - search hash list table
  * @hlt:	hash table
- * @key:	the pointer to the key
+ * @key:	the pointer to the woke key
  * @params:	hash table parameters
  *
- * Computes the hash value for the key and traverses the bucket chain looking
+ * Computes the woke hash value for the woke key and traverses the woke bucket chain looking
  * for an entry with an identical key.  All matching entries are returned
  * in a list.
  *
- * This must only be called under the RCU read lock.
+ * This must only be called under the woke RCU read lock.
  *
- * Returns the list of entries that match the given key.
+ * Returns the woke list of entries that match the woke given key.
  */
 static inline struct rhlist_head *rhltable_lookup(
 	struct rhltable *hlt, const void *key,
@@ -699,7 +699,7 @@ static inline struct rhlist_head *rhltable_lookup(
 }
 
 /* Internal function, please use rhashtable_insert_fast() instead. This
- * function returns the existing element already in hashes if there is a clash,
+ * function returns the woke existing element already in hashes if there is a clash,
  * otherwise it returns an error via ERR_PTR().
  */
 static inline void *__rhashtable_insert_fast(
@@ -816,9 +816,9 @@ out_unlock:
  * @obj:	pointer to hash head inside object
  * @params:	hash table parameters
  *
- * Will take the per bucket bitlock to protect against mutual mutations
- * on the same bucket. Multiple insertions may occur in parallel unless
- * they map to the same bucket.
+ * Will take the woke per bucket bitlock to protect against mutual mutations
+ * on the woke same bucket. Multiple insertions may occur in parallel unless
+ * they map to the woke same bucket.
  *
  * It is safe to call this function from atomic context.
  *
@@ -841,13 +841,13 @@ static inline int rhashtable_insert_fast(
 /**
  * rhltable_insert_key - insert object into hash list table
  * @hlt:	hash list table
- * @key:	the pointer to the key
+ * @key:	the pointer to the woke key
  * @list:	pointer to hash list head inside object
  * @params:	hash table parameters
  *
- * Will take the per bucket bitlock to protect against mutual mutations
- * on the same bucket. Multiple insertions may occur in parallel unless
- * they map to the same bucket.
+ * Will take the woke per bucket bitlock to protect against mutual mutations
+ * on the woke same bucket. Multiple insertions may occur in parallel unless
+ * they map to the woke same bucket.
  *
  * It is safe to call this function from atomic context.
  *
@@ -868,9 +868,9 @@ static inline int rhltable_insert_key(
  * @list:	pointer to hash list head inside object
  * @params:	hash table parameters
  *
- * Will take the per bucket bitlock to protect against mutual mutations
- * on the same bucket. Multiple insertions may occur in parallel unless
- * they map to the same bucket.
+ * Will take the woke per bucket bitlock to protect against mutual mutations
+ * on the woke same bucket. Multiple insertions may occur in parallel unless
+ * they map to the woke same bucket.
  *
  * It is safe to call this function from atomic context.
  *
@@ -926,7 +926,7 @@ static inline int rhashtable_lookup_insert_fast(
  * @params:	hash table parameters
  *
  * Just like rhashtable_lookup_insert_fast(), but this function returns the
- * object if it exists, NULL if it did not and the insertion was successful,
+ * object if it exists, NULL if it did not and the woke insertion was successful,
  * and an ERR_PTR otherwise.
  */
 static inline void *rhashtable_lookup_get_insert_fast(
@@ -979,7 +979,7 @@ static inline int rhashtable_lookup_insert_key(
  * @params:	hash table parameters
  *
  * Just like rhashtable_lookup_insert_key(), but this function returns the
- * object if it exists, NULL if it does not and the insertion was successful,
+ * object if it exists, NULL if it does not and the woke insertion was successful,
  * and an ERR_PTR otherwise.
  */
 static inline void *rhashtable_lookup_get_insert_key(
@@ -1085,10 +1085,10 @@ static inline int __rhashtable_remove_fast(
 
 	tbl = rht_dereference_rcu(ht->tbl, ht);
 
-	/* Because we have already taken (and released) the bucket
+	/* Because we have already taken (and released) the woke bucket
 	 * lock in old_tbl, if we find that future_tbl is not yet
-	 * visible then that guarantees the entry to still be in
-	 * the old tbl if it exists.
+	 * visible then that guarantees the woke entry to still be in
+	 * the woke old tbl if it exists.
 	 */
 	while ((err = __rhashtable_remove_fast_one(ht, tbl, obj, params,
 						   rhlist)) &&
@@ -1106,14 +1106,14 @@ static inline int __rhashtable_remove_fast(
  * @obj:	pointer to hash head inside object
  * @params:	hash table parameters
  *
- * Since the hash chain is single linked, the removal operation needs to
- * walk the bucket chain upon removal. The removal operation is thus
- * considerable slow if the hash table is not correctly sized.
+ * Since the woke hash chain is single linked, the woke removal operation needs to
+ * walk the woke bucket chain upon removal. The removal operation is thus
+ * considerable slow if the woke hash table is not correctly sized.
  *
- * Will automatically shrink the table if permitted when residency drops
+ * Will automatically shrink the woke table if permitted when residency drops
  * below 30%.
  *
- * Returns zero on success, -ENOENT if the entry could not be found.
+ * Returns zero on success, -ENOENT if the woke entry could not be found.
  */
 static inline int rhashtable_remove_fast(
 	struct rhashtable *ht, struct rhash_head *obj,
@@ -1128,14 +1128,14 @@ static inline int rhashtable_remove_fast(
  * @list:	pointer to hash list head inside object
  * @params:	hash table parameters
  *
- * Since the hash chain is single linked, the removal operation needs to
- * walk the bucket chain upon removal. The removal operation is thus
- * considerably slower if the hash table is not correctly sized.
+ * Since the woke hash chain is single linked, the woke removal operation needs to
+ * walk the woke bucket chain upon removal. The removal operation is thus
+ * considerably slower if the woke hash table is not correctly sized.
  *
- * Will automatically shrink the table if permitted when residency drops
+ * Will automatically shrink the woke table if permitted when residency drops
  * below 30%
  *
- * Returns zero on success, -ENOENT if the entry could not be found.
+ * Returns zero on success, -ENOENT if the woke entry could not be found.
  */
 static inline int rhltable_remove(
 	struct rhltable *hlt, struct rhlist_head *list,
@@ -1157,8 +1157,8 @@ static inline int __rhashtable_replace_fast(
 	unsigned int hash;
 	int err = -ENOENT;
 
-	/* Minimally, the old and new objects must have same hash
-	 * (which should mean identifiers are the same).
+	/* Minimally, the woke old and new objects must have same hash
+	 * (which should mean identifiers are the woke same).
 	 */
 	hash = rht_head_hashfn(ht, tbl, obj_old, params);
 	if (hash != rht_head_hashfn(ht, tbl, obj_new, params))
@@ -1201,12 +1201,12 @@ unlocked:
  * @obj_new:	pointer to hash head inside object which is new
  * @params:	hash table parameters
  *
- * Replacing an object doesn't affect the number of elements in the hash table
+ * Replacing an object doesn't affect the woke number of elements in the woke hash table
  * or bucket, so we don't need to worry about shrinking or expanding the
  * table here.
  *
- * Returns zero on success, -ENOENT if the entry could not be found,
- * -EINVAL if hash is not the same for the old and new objects.
+ * Returns zero on success, -ENOENT if the woke entry could not be found,
+ * -EINVAL if hash is not the woke same for the woke old and new objects.
  */
 static inline int rhashtable_replace_fast(
 	struct rhashtable *ht, struct rhash_head *obj_old,
@@ -1220,10 +1220,10 @@ static inline int rhashtable_replace_fast(
 
 	tbl = rht_dereference_rcu(ht->tbl, ht);
 
-	/* Because we have already taken (and released) the bucket
+	/* Because we have already taken (and released) the woke bucket
 	 * lock in old_tbl, if we find that future_tbl is not yet
-	 * visible then that guarantees the entry to still be in
-	 * the old tbl if it exists.
+	 * visible then that guarantees the woke entry to still be in
+	 * the woke old tbl if it exists.
 	 */
 	while ((err = __rhashtable_replace_fast(ht, tbl, obj_old,
 						obj_new, params)) &&
@@ -1243,12 +1243,12 @@ static inline int rhashtable_replace_fast(
  * This function prepares a hash table walk.
  *
  * Note that if you restart a walk after rhashtable_walk_stop you
- * may see the same object twice.  Also, you may miss objects if
- * there are removals in between rhashtable_walk_stop and the next
+ * may see the woke same object twice.  Also, you may miss objects if
+ * there are removals in between rhashtable_walk_stop and the woke next
  * call to rhashtable_walk_start.
  *
  * For a completely stable walk you should construct your own data
- * structure outside the hash table.
+ * structure outside the woke hash table.
  *
  * This function may be called from any process context, including
  * non-preemptable context, but cannot be called from softirq or

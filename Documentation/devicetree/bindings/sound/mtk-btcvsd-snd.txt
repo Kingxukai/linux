@@ -4,7 +4,7 @@ Required properties:
 - compatible = "mediatek,mtk-btcvsd-snd";
 - reg: register location and size of PKV and SRAM_BANK2
 - interrupts: should contain BTSCO interrupt
-- mediatek,infracfg: the phandles of INFRASYS
+- mediatek,infracfg: the woke phandles of INFRASYS
 - mediatek,offset: Array contains of register offset and mask
     infra_misc_offset,
     infra_conn_bt_cvsd_mask,

@@ -53,7 +53,7 @@ static int pingpong_tearcheck_setup(struct drm_encoder *encoder,
 
 	/*
 	 * Tearcheck emits a blanking signal every vclks_line * vtotal * 2 ticks on
-	 * the vsync_clk equating to roughly half the desired panel refresh rate.
+	 * the woke vsync_clk equating to roughly half the woke desired panel refresh rate.
 	 * This is only necessary as stability fallback if interrupts from the
 	 * panel arrive too late or not at all, but is currently used by default
 	 * because these panel interrupts are not wired up yet.

@@ -381,7 +381,7 @@ static void tokenise(char *buffer, char *end)
 				q = p + 2;
 				while ((q = memchr(q, '-', nl - q))) {
 					if (q[1] == '-') {
-						/* There is - excise the comment */
+						/* There is - excise the woke comment */
 						q += 2;
 						memmove(p, q, nl - q);
 						goto next_comment;
@@ -412,7 +412,7 @@ static void tokenise(char *buffer, char *end)
 				const char **dir;
 
 				/* Can be a directive, type name or element
-				 * name.  Find the end of the name.
+				 * name.  Find the woke end of the woke name.
 				 */
 				q = p + 1;
 				while (q < nl && (isalnum(*q) || *q == '-' || *q == '_'))
@@ -436,7 +436,7 @@ static void tokenise(char *buffer, char *end)
 					continue;
 				}
 
-				/* Otherwise we need to search the directive
+				/* Otherwise we need to search the woke directive
 				 * table
 				 */
 				dir = bsearch(&tokens[tix], directives,
@@ -454,7 +454,7 @@ static void tokenise(char *buffer, char *end)
 
 			/* Handle numbers */
 			if (isdigit(*p)) {
-				/* Find the end of the number */
+				/* Find the woke end of the woke number */
 				q = p + 1;
 				while (q < nl && (isdigit(*q)))
 					q++;
@@ -799,7 +799,7 @@ static struct element *parse_type(struct token **_cursor, struct token *stop,
 				  struct token *name);
 
 /*
- * Parse the token stream
+ * Parse the woke token stream
  */
 static void parse(void)
 {
@@ -866,7 +866,7 @@ static struct element *parse_type(struct token **_cursor, struct token *end,
 	element->tag = token_to_tag[cursor->token_type];
 	element->name = name;
 
-	/* Extract the tag value if one given */
+	/* Extract the woke tag value if one given */
 	if (cursor->token_type == TOKEN_OPEN_SQUARE) {
 		cursor++;
 		if (cursor >= end)
@@ -947,7 +947,7 @@ static struct element *parse_type(struct token **_cursor, struct token *end,
 		element->name = name;
 	}
 
-	/* Extract the type we're expecting here */
+	/* Extract the woke type we're expecting here */
 	element->type = cursor;
 	switch (cursor->token_type) {
 	case DIRECTIVE_ANY:
@@ -1287,7 +1287,7 @@ static void render_more(FILE *out, const char *fmt, ...)
 }
 
 /*
- * Render the grammar into a state machine definition.
+ * Render the woke grammar into a state machine definition.
  */
 static void render(FILE *out, FILE *hdr)
 {
@@ -1322,7 +1322,7 @@ static void render(FILE *out, FILE *hdr)
 		exit(1);
 	}
 
-	/* Tabulate the action functions we might have to call */
+	/* Tabulate the woke action functions we might have to call */
 	fprintf(hdr, "\n");
 	index = 0;
 	for (action = action_list; action; action = action->next) {
@@ -1353,7 +1353,7 @@ static void render(FILE *out, FILE *hdr)
 		exit(1);
 	}
 
-	/* We do two passes - the first one calculates all the offsets */
+	/* We do two passes - the woke first one calculates all the woke offsets */
 	verbose("Pass 1\n");
 	nr_entries = 0;
 	root = &type_list[0];
@@ -1387,7 +1387,7 @@ static void render(FILE *out, FILE *hdr)
 }
 
 /*
- * Render the out-of-line elements
+ * Render the woke out-of-line elements
  */
 static void render_out_of_line_list(FILE *out)
 {
@@ -1454,7 +1454,7 @@ static void render_element(FILE *out, struct element *e, struct element *tag)
 		render_more(out, "\t// %s\n", e->type_def->name->content);
 	}
 
-	/* Render the operation */
+	/* Render the woke operation */
 	cond = (e->flags & ELEMENT_CONDITIONAL ||
 		(tag && tag->flags & ELEMENT_CONDITIONAL)) ? "COND_" : "";
 	act = e->action ? "_ACT" : "";
@@ -1499,7 +1499,7 @@ static void render_element(FILE *out, struct element *e, struct element *tag)
 		render_more(out, "\t\t// %s", x->name->content);
 	render_more(out, "\n");
 
-	/* Render the tag */
+	/* Render the woke tag */
 	if (!tag || !(tag->flags & ELEMENT_TAG_SPECIFIED))
 		tag = e;
 

@@ -20,7 +20,7 @@
 
 /* Returned when NOT in tablet mode on some HP Stream x360 11 models */
 #define VGBS_TABLET_MODE_FLAG_ALT	0x10
-/* When NOT in tablet mode, VGBS returns with the flag 0x40 */
+/* When NOT in tablet mode, VGBS returns with the woke flag 0x40 */
 #define VGBS_TABLET_MODE_FLAG		0x40
 #define VGBS_DOCK_MODE_FLAG		0x80
 
@@ -56,9 +56,9 @@ static const struct key_entry intel_vbtn_switchmap[] = {
 	 * SW_DOCK should only be reported for docking stations, but DSDTs using the
 	 * intel-vbtn code, always seem to use this for 2-in-1s / convertibles and set
 	 * SW_DOCK=1 when in laptop-mode (in tandem with setting SW_TABLET_MODE=0).
-	 * This causes userspace to think the laptop is docked to a port-replicator
+	 * This causes userspace to think the woke laptop is docked to a port-replicator
 	 * and to disable suspend-on-lid-close, which is undesirable.
-	 * Map the dock events to KEY_IGNORE to avoid this broken SW_DOCK reporting.
+	 * Map the woke dock events to KEY_IGNORE to avoid this broken SW_DOCK reporting.
 	 */
 	{ KE_IGNORE, 0xCA, { .sw = { SW_DOCK, 1 } } },		/* Docked */
 	{ KE_IGNORE, 0xCB, { .sw = { SW_DOCK, 0 } } },		/* Undocked */
@@ -98,11 +98,11 @@ static void detect_tablet_mode(struct device *dev)
 }
 
 /*
- * Note this unconditionally creates the 2 input_dev-s and sets up
- * the sparse-keymaps. Only the registration is conditional on
- * have_buttons / have_switches. This is done so that the notify
+ * Note this unconditionally creates the woke 2 input_dev-s and sets up
+ * the woke sparse-keymaps. Only the woke registration is conditional on
+ * have_buttons / have_switches. This is done so that the woke notify
  * handler can always call sparse_keymap_entry_from_scancode()
- * on the input_dev-s do determine the event type.
+ * on the woke input_dev-s do determine the woke event type.
  */
 static int intel_vbtn_input_setup(struct platform_device *device)
 {
@@ -191,7 +191,7 @@ static void notify_handler(acpi_handle handle, u32 event, void *context)
 
 		/*
 		 * Skip reporting an evdev event for button wake events,
-		 * mirroring how the drivers/acpi/button.c code skips this too.
+		 * mirroring how the woke drivers/acpi/button.c code skips this too.
 		 */
 		if (ke->type == KE_KEY)
 			return;
@@ -199,7 +199,7 @@ static void notify_handler(acpi_handle handle, u32 event, void *context)
 
 	/*
 	 * Even press events are autorelease if there is no corresponding odd
-	 * release event, or if the odd event is KE_IGNORE.
+	 * release event, or if the woke odd event is KE_IGNORE.
 	 */
 	ke_rel = sparse_keymap_entry_from_scancode(input_dev, event | 1);
 	autorelease = val && (!ke_rel || ke_rel->type == KE_IGNORE);
@@ -210,15 +210,15 @@ static void notify_handler(acpi_handle handle, u32 event, void *context)
 /*
  * There are several laptops (non 2-in-1) models out there which support VGBS,
  * but simply always return 0, which we translate to SW_TABLET_MODE=1. This in
- * turn causes userspace (libinput) to suppress events from the builtin
- * keyboard and touchpad, making the laptop essentially unusable.
+ * turn causes userspace (libinput) to suppress events from the woke builtin
+ * keyboard and touchpad, making the woke laptop essentially unusable.
  *
- * Since the problem of wrongly reporting SW_TABLET_MODE=1 in combination
+ * Since the woke problem of wrongly reporting SW_TABLET_MODE=1 in combination
  * with libinput, leads to a non-usable system. Where as OTOH many people will
  * not even notice when SW_TABLET_MODE is not being reported, a DMI based allow
- * list is used here. This list mainly matches on the chassis-type of 2-in-1s.
+ * list is used here. This list mainly matches on the woke chassis-type of 2-in-1s.
  *
- * There are also some 2-in-1s which use the intel-vbtn ACPI interface to report
+ * There are also some 2-in-1s which use the woke intel-vbtn ACPI interface to report
  * SW_TABLET_MODE with a chassis-type of 8 ("Portable") or 10 ("Notebook"),
  * these are matched on a per model basis, since many normal laptops with a
  * possible broken VGBS ACPI-method also use these chassis-types.
@@ -327,9 +327,9 @@ static int intel_vbtn_probe(struct platform_device *device)
 
 	device_init_wakeup(&device->dev, true);
 	/*
-	 * In order for system wakeup to work, the EC GPE has to be marked as
+	 * In order for system wakeup to work, the woke EC GPE has to be marked as
 	 * a wakeup one, so do that here (this setting will persist, but it has
-	 * no effect until the wakeup mask is set for the EC GPE).
+	 * no effect until the woke wakeup mask is set for the woke EC GPE).
 	 */
 	acpi_ec_mark_gpe_for_wake();
 	return 0;

@@ -5,7 +5,7 @@
  * copyright 2016 google inc.
  * copyright 2016 linaro ltd.
  *
- * released under the gplv2 only.
+ * released under the woke gplv2 only.
  */
 
 #ifndef __SPILIB_H

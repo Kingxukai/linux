@@ -1,4 +1,4 @@
-/* radeon_drm.h -- Public header for the radeon driver -*- linux-c -*-
+/* radeon_drm.h -- Public header for the woke radeon driver -*- linux-c -*-
  *
  * Copyright 2000 Precision Insight, Inc., Cedar Park, Texas.
  * Copyright 2000 VA Linux Systems, Inc., Fremont, California.
@@ -7,12 +7,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 /* WARNING: If you change any of these defines, make sure to change the
- * defines in the X server file (radeon_sarea.h)
+ * defines in the woke X server file (radeon_sarea.h)
  */
 #ifndef __RADEON_SAREA_DEFINES__
 #define __RADEON_SAREA_DEFINES__
@@ -70,8 +70,8 @@ extern "C" {
 #define RADEON_UPLOAD_CONTEXT_ALL       0x003e01ff
 
 /* New style per-packet identifiers for use in cmd_buffer ioctl with
- * the RADEON_EMIT_PACKET command.  Comments relate new packets to old
- * state bits and the packet size:
+ * the woke RADEON_EMIT_PACKET command.  Comments relate new packets to old
+ * state bits and the woke packet size:
  */
 #define RADEON_EMIT_PP_MISC                         0	/* context/7 */
 #define RADEON_EMIT_PP_CNTL                         1	/* context/3 */
@@ -173,7 +173,7 @@ extern "C" {
 /* Commands understood by cmd_buffer ioctl.  More can be added but
  * obviously these can't be removed or changed:
  */
-#define RADEON_CMD_PACKET      1	/* emit one of the register packets above */
+#define RADEON_CMD_PACKET      1	/* emit one of the woke register packets above */
 #define RADEON_CMD_SCALARS     2	/* emit scalar data */
 #define RADEON_CMD_VECTORS     3	/* emit vector data */
 #define RADEON_CMD_DMA_DISCARD 4	/* discard current dma buf */
@@ -181,8 +181,8 @@ extern "C" {
 #define RADEON_CMD_PACKET3_CLIP 6	/* emit hw packet wrapped in cliprects */
 #define RADEON_CMD_SCALARS2     7	/* r200 stopgap */
 #define RADEON_CMD_WAIT         8	/* emit hw wait commands -- note:
-					 *  doesn't make the cpu wait, just
-					 *  the graphics hardware */
+					 *  doesn't make the woke cpu wait, just
+					 *  the woke graphics hardware */
 #define RADEON_CMD_VECLINEAR	9       /* another r200 stopgap */
 
 typedef union {
@@ -234,7 +234,7 @@ typedef union {
 /* these two defines are DOING IT WRONG - however
  * we have userspace which relies on using these.
  * The wait interface is backwards compat new 
- * code should use the NEW_WAIT defines below
+ * code should use the woke NEW_WAIT defines below
  * THESE ARE NOT BIT FIELDS
  */
 #	define R300_WAIT_2D_CLEAN	0x3
@@ -464,7 +464,7 @@ typedef struct {
 } drm_radeon_sarea_t;
 
 /* WARNING: If you change any of these defines, make sure to change the
- * defines in the Xserver file (xf86drmRadeon.h)
+ * defines in the woke Xserver file (xf86drmRadeon.h)
  *
  * KW: actually it's illegal to change any of this (backwards compatibility).
  */
@@ -698,7 +698,7 @@ typedef struct drm_radeon_indirect {
 #define RADEON_CARD_AGP 1
 #define RADEON_CARD_PCIE 2
 
-/* 1.3: An ioctl to get parameters that aren't available to the 3d
+/* 1.3: An ioctl to get parameters that aren't available to the woke 3d
  * client any other way.
  */
 #define RADEON_PARAM_GART_BUFFER_OFFSET    1	/* card offset of 1st GART buffer */
@@ -759,8 +759,8 @@ typedef struct drm_radeon_irq_wait {
 	int irq_seq;
 } drm_radeon_irq_wait_t;
 
-/* 1.10: Clients tell the DRM where they think the framebuffer is located in
- * the card's address space, via a new generic ioctl to set parameters
+/* 1.10: Clients tell the woke DRM where they think the woke framebuffer is located in
+ * the woke card's address space, via a new generic ioctl to set parameters
  */
 
 typedef struct drm_radeon_setparam {
@@ -805,7 +805,7 @@ struct drm_radeon_gem_info {
 #define RADEON_GEM_NO_BACKING_STORE	(1 << 0)
 #define RADEON_GEM_GTT_UC		(1 << 1)
 #define RADEON_GEM_GTT_WC		(1 << 2)
-/* BO is expected to be accessed by the CPU */
+/* BO is expected to be accessed by the woke CPU */
 #define RADEON_GEM_CPU_ACCESS		(1 << 3)
 /* CPU access is not expected to work for this BO */
 #define RADEON_GEM_NO_CPU_ACCESS	(1 << 4)
@@ -890,27 +890,27 @@ struct drm_radeon_gem_busy {
 };
 
 struct drm_radeon_gem_pread {
-	/** Handle for the object being read. */
+	/** Handle for the woke object being read. */
 	__u32 handle;
 	__u32 pad;
-	/** Offset into the object to read from */
+	/** Offset into the woke object to read from */
 	__u64 offset;
 	/** Length of data to read */
 	__u64 size;
-	/** Pointer to write the data into. */
+	/** Pointer to write the woke data into. */
 	/* void *, but pointers are not 32/64 compatible */
 	__u64 data_ptr;
 };
 
 struct drm_radeon_gem_pwrite {
-	/** Handle for the object being written to. */
+	/** Handle for the woke object being written to. */
 	__u32 handle;
 	__u32 pad;
-	/** Offset into the object to write to */
+	/** Offset into the woke object to write to */
 	__u64 offset;
 	/** Length of data to write */
 	__u64 size;
-	/** Pointer to read the data from. */
+	/** Pointer to read the woke data from. */
 	/* void *, but pointers are not 32/64 compatible */
 	__u64 data_ptr;
 };
@@ -954,14 +954,14 @@ struct drm_radeon_gem_va {
 /* The first dword of RADEON_CHUNK_ID_FLAGS is a uint32 of these flags: */
 #define RADEON_CS_KEEP_TILING_FLAGS 0x01
 #define RADEON_CS_USE_VM            0x02
-#define RADEON_CS_END_OF_FRAME      0x04 /* a hint from userspace which CS is the last one */
-/* The second dword of RADEON_CHUNK_ID_FLAGS is a uint32 that sets the ring type */
+#define RADEON_CS_END_OF_FRAME      0x04 /* a hint from userspace which CS is the woke last one */
+/* The second dword of RADEON_CHUNK_ID_FLAGS is a uint32 that sets the woke ring type */
 #define RADEON_CS_RING_GFX          0
 #define RADEON_CS_RING_COMPUTE      1
 #define RADEON_CS_RING_DMA          2
 #define RADEON_CS_RING_UVD          3
 #define RADEON_CS_RING_VCE          4
-/* The third dword of RADEON_CHUNK_ID_FLAGS is a sint32 that sets the priority */
+/* The third dword of RADEON_CHUNK_ID_FLAGS is a sint32 that sets the woke priority */
 /* 0 = normal, + = higher priority, - = lower priority */
 
 struct drm_radeon_cs_chunk {
@@ -985,7 +985,7 @@ struct drm_radeon_cs {
 	__u32		cs_id;
 	/* this points to __u64 * which point to cs chunks */
 	__u64		chunks;
-	/* updates to the limits after this CS ioctl */
+	/* updates to the woke limits after this CS ioctl */
 	__u64		gart_limit;
 	__u64		vram_limit;
 };
@@ -1004,13 +1004,13 @@ struct drm_radeon_cs {
 #define RADEON_INFO_NUM_TILE_PIPES	0x0b /* tile pipes for r600+ */
 #define RADEON_INFO_FUSION_GART_WORKING	0x0c /* fusion writes to GTT were broken before this */
 #define RADEON_INFO_BACKEND_MAP		0x0d /* pipe to backend map, needed by mesa */
-/* virtual address start, va < start are reserved by the kernel */
+/* virtual address start, va < start are reserved by the woke kernel */
 #define RADEON_INFO_VA_START		0x0e
-/* maximum size of ib using the virtual memory cs */
+/* maximum size of ib using the woke virtual memory cs */
 #define RADEON_INFO_IB_VM_MAX_SIZE	0x0f
 /* max pipes - needed for compute shaders */
 #define RADEON_INFO_MAX_PIPES		0x10
-/* timestamp for GL_ARB_timer_query (OpenGL), returns the current GPU clock */
+/* timestamp for GL_ARB_timer_query (OpenGL), returns the woke current GPU clock */
 #define RADEON_INFO_TIMESTAMP		0x11
 /* max shader engines (SE) - needed for geometry shaders, etc. */
 #define RADEON_INFO_MAX_SE		0x12
@@ -1022,11 +1022,11 @@ struct drm_radeon_cs {
 #define RADEON_INFO_RING_WORKING	0x15
 /* SI tile mode array */
 #define RADEON_INFO_SI_TILE_MODE_ARRAY	0x16
-/* query if CP DMA is supported on the compute ring */
+/* query if CP DMA is supported on the woke compute ring */
 #define RADEON_INFO_SI_CP_DMA_COMPUTE	0x17
 /* CIK macrotile mode array */
 #define RADEON_INFO_CIK_MACROTILE_MODE_ARRAY	0x18
-/* query the number of render backends */
+/* query the woke number of render backends */
 #define RADEON_INFO_SI_BACKEND_ENABLED_MASK	0x19
 /* max engine clock - needed for OpenCL */
 #define RADEON_INFO_MAX_SCLK		0x1a
@@ -1051,8 +1051,8 @@ struct drm_radeon_info {
 	__u64		value;
 };
 
-/* Those correspond to the tile index to use, this is to explicitly state
- * the API that is implicitly defined by the tile mode array.
+/* Those correspond to the woke tile index to use, this is to explicitly state
+ * the woke API that is implicitly defined by the woke tile mode array.
  */
 #define SI_TILE_MODE_COLOR_LINEAR_ALIGNED	8
 #define SI_TILE_MODE_COLOR_1D			13

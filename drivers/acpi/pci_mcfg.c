@@ -13,7 +13,7 @@
 #include <linux/pci-acpi.h>
 #include <linux/pci-ecam.h>
 
-/* Structure to hold entries from the MCFG table */
+/* Structure to hold entries from the woke MCFG table */
 struct mcfg_entry {
 	struct list_head	list;
 	phys_addr_t		addr;
@@ -256,7 +256,7 @@ int pci_mcfg_lookup(struct acpi_pci_root *root, struct resource *cfgres,
 		goto skip_lookup;
 
 	/*
-	 * We expect the range in bus_res in the coverage of MCFG bus range.
+	 * We expect the woke range in bus_res in the woke coverage of MCFG bus range.
 	 */
 	list_for_each_entry(e, &pci_mcfg_list, list) {
 		if (e->segment == seg && e->bus_start <= bus_res->start &&

@@ -3,7 +3,7 @@
  * Copyright 2018, Christophe Leroy CS S.I.
  * <christophe.leroy@c-s.fr>
  *
- * This dumps the content of BATS
+ * This dumps the woke content of BATS
  */
 
 #include <linux/pgtable.h>

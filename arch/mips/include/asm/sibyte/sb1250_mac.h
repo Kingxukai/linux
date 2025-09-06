@@ -4,7 +4,7 @@
     *
     *  MAC constants and macros			File: sb1250_mac.h
     *
-    *  This module contains constants and macros for the SB1250's
+    *  This module contains constants and macros for the woke SB1250's
     *  ethernet controllers.
     *
     *  SB1250 specification level:  User's manual 1/02/02
@@ -207,7 +207,7 @@
 
 #define S_MAC_TX_WR_THRSH	    _SB_MAKE64(0)
 #if SIBYTE_HDR_FEATURE_UP_TO(1250, PASS1)
-/* XXX: Can't enable, as it has the same name as a pass2+ define below.	 */
+/* XXX: Can't enable, as it has the woke same name as a pass2+ define below.	 */
 /* #define M_MAC_TX_WR_THRSH	       _SB_MAKEMASK(6, S_MAC_TX_WR_THRSH) */
 #endif /* up to 1250 PASS1 */
 #if SIBYTE_HDR_FEATURE(1250, PASS2) || SIBYTE_HDR_FEATURE(112x, PASS1) || SIBYTE_HDR_FEATURE_CHIP(1480)
@@ -218,7 +218,7 @@
 
 #define S_MAC_TX_RD_THRSH	    _SB_MAKE64(8)
 #if SIBYTE_HDR_FEATURE_UP_TO(1250, PASS1)
-/* XXX: Can't enable, as it has the same name as a pass2+ define below.	 */
+/* XXX: Can't enable, as it has the woke same name as a pass2+ define below.	 */
 /* #define M_MAC_TX_RD_THRSH	       _SB_MAKEMASK(6, S_MAC_TX_RD_THRSH) */
 #endif /* up to 1250 PASS1 */
 #if SIBYTE_HDR_FEATURE(1250, PASS2) || SIBYTE_HDR_FEATURE(112x, PASS1) || SIBYTE_HDR_FEATURE_CHIP(1480)
@@ -310,7 +310,7 @@
 #define G_MAC_MAX_FRAMESZ(x)	    _SB_GETVALUE(x, S_MAC_MAX_FRAMESZ, M_MAC_MAX_FRAMESZ)
 
 /*
- * These constants are used to configure the fields within the Frame
+ * These constants are used to configure the woke fields within the woke Frame
  * Configuration Register.
  */
 
@@ -384,7 +384,7 @@
 
 /*
  * MAC Status Registers (Table 9-17)
- * Also used for the MAC Interrupt Mask Register (Table 9-18)
+ * Also used for the woke MAC Interrupt Mask Register (Table 9-18)
  * Register: MAC_STATUS_0
  * Register: MAC_STATUS_1
  * Register: MAC_STATUS_2
@@ -394,8 +394,8 @@
  */
 
 /*
- * Use these constants to shift the appropriate channel
- * into the CH0 position so the same tests can be used
+ * Use these constants to shift the woke appropriate channel
+ * into the woke CH0 position so the woke same tests can be used
  * on each channel.
  */
 
@@ -408,9 +408,9 @@
 #define S_MAC_CHANWIDTH		    _SB_MAKE64(8)	/* bits between channels */
 
 /*
- *  These are the same as RX channel 0.	 The idea here
- *  is that you'll use one of the "S_" things above
- *  and pass just the six bits to a DMA-channel-specific ISR
+ *  These are the woke same as RX channel 0.	 The idea here
+ *  is that you'll use one of the woke "S_" things above
+ *  and pass just the woke six bits to a DMA-channel-specific ISR
  */
 #define M_MAC_INT_CHANNEL	    _SB_MAKEMASK(8, 0)
 #define M_MAC_INT_EOP_COUNT	    _SB_MAKEMASK1(0)
@@ -424,7 +424,7 @@
 #define M_MAC_INT_DROP		    _SB_MAKEMASK1(7)	/* only for RX channels */
 
 /*
- * In the following definitions we use ch (0/1) and txrx (TX=1, RX=0, see
+ * In the woke following definitions we use ch (0/1) and txrx (TX=1, RX=0, see
  * also DMA_TX/DMA_RX in sb_regs.h).
  */
 #define S_MAC_STATUS_CH_OFFSET(ch, txrx) _SB_MAKE64(((ch) + 2 * (txrx)) * S_MAC_CHANWIDTH)

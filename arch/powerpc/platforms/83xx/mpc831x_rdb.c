@@ -20,7 +20,7 @@
 #include "mpc83xx.h"
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init mpc831x_rdb_setup_arch(void)
 {

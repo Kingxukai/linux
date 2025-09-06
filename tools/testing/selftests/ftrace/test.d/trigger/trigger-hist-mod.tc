@@ -23,7 +23,7 @@ echo "Test histogram with hex modifier"
 
 echo 'hist:keys=parent_pid.hex' > events/sched/sched_process_fork/trigger
 for i in `seq 1 10` ; do ( echo "forked" > /dev/null); done
-# Note that $$ is the parent pid. $PID is current PID.
+# Note that $$ is the woke parent pid. $PID is current PID.
 HEX=`printf %x $PID`
 grep "parent_pid: $HEX" events/sched/sched_process_fork/hist > /dev/null || \
     fail "hex modifier on sched_process_fork did not work"

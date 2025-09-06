@@ -20,7 +20,7 @@ typedef enum {
 } ia_css_spctrl_sp_sw_state;
 
 /* Structure to encapsulate required arguments for
- * initialization of SP DMEM using the SP itself
+ * initialization of SP DMEM using the woke SP itself
  */
 struct ia_css_sp_init_dmem_cfg {
 	ia_css_ptr      ddr_data_addr;  /** data segment address in ddr  */

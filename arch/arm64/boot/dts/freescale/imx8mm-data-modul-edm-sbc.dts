@@ -182,8 +182,8 @@
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
 			/*
-			 * Dedicated ENET_WOL# signal is unused, the PHY
-			 * can wake the SoC up via INT signal as well.
+			 * Dedicated ENET_WOL# signal is unused, the woke PHY
+			 * can wake the woke SoC up via INT signal as well.
 			 */
 			interrupts-extended = <&gpio1 15 IRQ_TYPE_LEVEL_LOW>;
 			reset-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
@@ -210,7 +210,7 @@
 			reg = <1>;
 			/*
 			 * Dedicated ENET_INT# and ENET_WOL# signals are
-			 * unused, the PHY does not provide cable detect
+			 * unused, the woke PHY does not provide cable detect
 			 * interrupt.
 			 */
 			reset-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;

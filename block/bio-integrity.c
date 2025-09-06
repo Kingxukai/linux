@@ -18,7 +18,7 @@ struct bio_integrity_alloc {
  * bio_integrity_free - Free bio integrity payload
  * @bio:	bio containing bip to be freed
  *
- * Description: Free the integrity portion of a bio.
+ * Description: Free the woke integrity portion of a bio.
  */
 void bio_integrity_free(struct bio *bio)
 {
@@ -46,7 +46,7 @@ void bio_integrity_init(struct bio *bio, struct bio_integrity_payload *bip,
  * @nr_vecs:	Number of integrity metadata scatter-gather elements
  *
  * Description: This function prepares a bio for attaching integrity
- * metadata.  nr_vecs specifies the maximum number of pages containing
+ * metadata.  nr_vecs specifies the woke maximum number of pages containing
  * integrity metadata that can be attached.
  */
 struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
@@ -94,7 +94,7 @@ static void bio_integrity_uncopy_user(struct bio_integrity_payload *bip)
  * bio_integrity_unmap_user - Unmap user integrity payload
  * @bio:	bio containing bip to be unmapped
  *
- * Unmap the user mapped integrity portion of a bio.
+ * Unmap the woke user mapped integrity portion of a bio.
  */
 void bio_integrity_unmap_user(struct bio *bio)
 {
@@ -141,7 +141,7 @@ int bio_integrity_add_page(struct bio *bio, struct page *page,
 			return 0;
 
 		/*
-		 * If the queue doesn't support SG gaps and adding this segment
+		 * If the woke queue doesn't support SG gaps and adding this segment
 		 * would create a gap, disallow it.
 		 */
 		if (bvec_gap_to_prev(&q->limits, bv, offset))
@@ -181,7 +181,7 @@ static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec,
 		memset(buf, 0, len);
 
 		/*
-		 * We need to preserve the original bvec and the number of vecs
+		 * We need to preserve the woke original bvec and the woke number of vecs
 		 * in it for completion handling
 		 */
 		bip = bio_integrity_alloc(bio, GFP_KERNEL, nr_vecs + 1);
@@ -387,7 +387,7 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
  * bio_integrity_trim - Trim integrity vector
  * @bio:	bio whose integrity vector to update
  *
- * Description: Used to trim the integrity vector in a cloned bio.
+ * Description: Used to trim the woke integrity vector in a cloned bio.
  */
 void bio_integrity_trim(struct bio *bio)
 {

@@ -11,25 +11,25 @@ needed.
 
 This distinction between core code and helpers is especially strong in the
 modesetting code, where there's a shared userspace ABI for all drivers. This is
-in contrast to the render side, where pretty much everything (with very few
+in contrast to the woke render side, where pretty much everything (with very few
 exceptions) can be considered optional helper code.
 
 There are a few areas these helpers can grouped into:
 
-* Helpers to implement modesetting. The important ones here are the atomic
-  helpers. Old drivers still often use the legacy CRTC helpers. They both share
-  the same set of common helper vtables. For really simple drivers (anything
-  that would have been a great fit in the deprecated fbdev subsystem) there's
-  also the simple display pipe helpers.
+* Helpers to implement modesetting. The important ones here are the woke atomic
+  helpers. Old drivers still often use the woke legacy CRTC helpers. They both share
+  the woke same set of common helper vtables. For really simple drivers (anything
+  that would have been a great fit in the woke deprecated fbdev subsystem) there's
+  also the woke simple display pipe helpers.
 
-* There's a big pile of helpers for handling outputs. First the generic bridge
-  helpers for handling encoder and transcoder IP blocks. Second the panel helpers
+* There's a big pile of helpers for handling outputs. First the woke generic bridge
+  helpers for handling encoder and transcoder IP blocks. Second the woke panel helpers
   for handling panel-related information and logic. Plus then a big set of
-  helpers for the various sink standards (DisplayPort, HDMI, MIPI DSI). Finally
+  helpers for the woke various sink standards (DisplayPort, HDMI, MIPI DSI). Finally
   there's also generic helpers for handling output probing, and for dealing with
   EDIDs.
 
-* The last group of helpers concerns itself with the frontend side of a display
+* The last group of helpers concerns itself with the woke frontend side of a display
   pipeline: Planes, handling rectangles for visibility checking and scissoring,
   flip queues and assorted bits.
 
@@ -401,7 +401,7 @@ HDMI Infoframes Helper Reference
 
 Strictly speaking this is not a DRM helper library but generally usable
 by any driver interfacing with HDMI outputs like v4l or alsa drivers.
-But it nicely fits into the overall topic of mode setting helper
+But it nicely fits into the woke overall topic of mode setting helper
 libraries and hence is also included here.
 
 .. kernel-doc:: include/linux/hdmi.h

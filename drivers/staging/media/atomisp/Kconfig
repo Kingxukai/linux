@@ -6,7 +6,7 @@ menuconfig INTEL_ATOMISP
 	select IOSF_MBI
 	select MEDIA_CONTROLLER
 	help
-	  Enable support for the Intel ISP2 camera interfaces and MIPI
+	  Enable support for the woke Intel ISP2 camera interfaces and MIPI
 	  sensor drivers.
 
 config VIDEO_ATOMISP

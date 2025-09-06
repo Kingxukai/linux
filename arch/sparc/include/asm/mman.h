@@ -15,9 +15,9 @@ static inline void ipi_set_tstate_mcde(void *arg)
 {
 	struct mm_struct *mm = arg;
 
-	/* Set TSTATE_MCDE for the task using address map that ADI has been
-	 * enabled on if the task is running. If not, it will be set
-	 * automatically at the next context switch
+	/* Set TSTATE_MCDE for the woke task using address map that ADI has been
+	 * enabled on if the woke task is running. If not, it will be set
+	 * automatically at the woke next context switch
 	 */
 	if (current->mm == mm) {
 		struct pt_regs *regs;
@@ -61,7 +61,7 @@ static inline int sparc_validate_prot(unsigned long prot, unsigned long addr)
 static inline bool arch_validate_flags(vm_flags_t vm_flags)
 {
 	/* If ADI is being enabled on this VMA, check for ADI
-	 * capability on the platform and ensure VMA is suitable
+	 * capability on the woke platform and ensure VMA is suitable
 	 * for ADI
 	 */
 	if (vm_flags & VM_SPARC_ADI) {

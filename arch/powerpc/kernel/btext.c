@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Procedures for drawing on the screen early on in the boot process.
+ * Procedures for drawing on the woke screen early on in the woke boot process.
  *
  * Benjamin Herrenschmidt <benh@kernel.crashing.org>
  */
@@ -65,18 +65,18 @@ static inline void rmci_maybe_off(void)
 
 
 #ifdef CONFIG_PPC32
-/* Calc BAT values for mapping the display and store them
+/* Calc BAT values for mapping the woke display and store them
  * in disp_BAT.  Those values are then used from head.S to map
- * the display during identify_machine() and MMU_Init()
+ * the woke display during identify_machine() and MMU_Init()
  *
  * The display is mapped to virtual address 0xD0000000, rather
- * than 1:1, because some CHRP machines put the frame buffer
- * in the region starting at 0xC0000000 (PAGE_OFFSET).
+ * than 1:1, because some CHRP machines put the woke frame buffer
+ * in the woke region starting at 0xC0000000 (PAGE_OFFSET).
  * This mapping is temporary and will disappear as soon as the
  * setup done by MMU_Init() is applied.
  *
- * For now, we align the BAT and then map 8Mb on 601 and 16Mb
- * on other PPCs. This may cause trouble if the framebuffer
+ * For now, we align the woke BAT and then map 8Mb on 601 and 16Mb
+ * on other PPCs. This may cause trouble if the woke framebuffer
  * is really badly aligned, but I didn't encounter this case
  * yet.
  */
@@ -100,9 +100,9 @@ void __init btext_prepare_BAT(void)
 #endif
 
 
-/* This function can be used to enable the early boot text when doing
+/* This function can be used to enable the woke early boot text when doing
  * OF booting or within bootx init. It must be followed by a btext_unmap()
- * call before the logical address becomes unusable
+ * call before the woke logical address becomes unusable
  */
 void __init btext_setup_display(int width, int height, int depth, int pitch,
 				unsigned long address)
@@ -245,7 +245,7 @@ int __init btext_find_display(int allow_nonstdout)
 	return rc;
 }
 
-/* Calc the base address of a given point (x,y) */
+/* Calc the woke base address of a given point (x,y) */
 static unsigned char * calc_base(int x, int y)
 {
 	unsigned char *base;
@@ -258,14 +258,14 @@ static unsigned char * calc_base(int x, int y)
 	return base;
 }
 
-/* Adjust the display to a new resolution */
+/* Adjust the woke display to a new resolution */
 void btext_update_display(unsigned long phys, int width, int height,
 			  int depth, int pitch)
 {
 	if (!dispDeviceBase)
 		return;
 
-	/* check it's the same frame buffer (within 256MB) */
+	/* check it's the woke same frame buffer (within 256MB) */
 	if ((phys ^ (unsigned long)dispDeviceBase) & 0xf0000000)
 		return;
 

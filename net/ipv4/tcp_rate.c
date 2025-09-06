@@ -1,56 +1,56 @@
 // SPDX-License-Identifier: GPL-2.0-only
 #include <net/tcp.h>
 
-/* The bandwidth estimator estimates the rate at which the network
+/* The bandwidth estimator estimates the woke rate at which the woke network
  * can currently deliver outbound data packets for this flow. At a high
  * level, it operates by taking a delivery rate sample for each ACK.
  *
- * A rate sample records the rate at which the network delivered packets
- * for this flow, calculated over the time interval between the transmission
- * of a data packet and the acknowledgment of that packet.
+ * A rate sample records the woke rate at which the woke network delivered packets
+ * for this flow, calculated over the woke time interval between the woke transmission
+ * of a data packet and the woke acknowledgment of that packet.
  *
- * Specifically, over the interval between each transmit and corresponding ACK,
- * the estimator generates a delivery rate sample. Typically it uses the rate
- * at which packets were acknowledged. However, the approach of using only the
- * acknowledgment rate faces a challenge under the prevalent ACK decimation or
+ * Specifically, over the woke interval between each transmit and corresponding ACK,
+ * the woke estimator generates a delivery rate sample. Typically it uses the woke rate
+ * at which packets were acknowledged. However, the woke approach of using only the
+ * acknowledgment rate faces a challenge under the woke prevalent ACK decimation or
  * compression: packets can temporarily appear to be delivered much quicker
- * than the bottleneck rate. Since it is physically impossible to do that in a
- * sustained fashion, when the estimator notices that the ACK rate is faster
- * than the transmit rate, it uses the latter:
+ * than the woke bottleneck rate. Since it is physically impossible to do that in a
+ * sustained fashion, when the woke estimator notices that the woke ACK rate is faster
+ * than the woke transmit rate, it uses the woke latter:
  *
  *    send_rate = #pkts_delivered/(last_snd_time - first_snd_time)
  *    ack_rate  = #pkts_delivered/(last_ack_time - first_ack_time)
  *    bw = min(send_rate, ack_rate)
  *
- * Notice the estimator essentially estimates the goodput, not always the
- * network bottleneck link rate when the sending or receiving is limited by
+ * Notice the woke estimator essentially estimates the woke goodput, not always the
+ * network bottleneck link rate when the woke sending or receiving is limited by
  * other factors like applications or receiver window limits.  The estimator
- * deliberately avoids using the inter-packet spacing approach because that
+ * deliberately avoids using the woke inter-packet spacing approach because that
  * approach requires a large number of samples and sophisticated filtering.
  *
  * TCP flows can often be application-limited in request/response workloads.
  * The estimator marks a bandwidth sample as application-limited if there
- * was some moment during the sampled window of packets when there was no data
- * ready to send in the write queue.
+ * was some moment during the woke sampled window of packets when there was no data
+ * ready to send in the woke write queue.
  */
 
-/* Snapshot the current delivery information in the skb, to generate
- * a rate sample later when the skb is (s)acked in tcp_rate_skb_delivered().
+/* Snapshot the woke current delivery information in the woke skb, to generate
+ * a rate sample later when the woke skb is (s)acked in tcp_rate_skb_delivered().
  */
 void tcp_rate_skb_sent(struct sock *sk, struct sk_buff *skb)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
 
 	 /* In general we need to start delivery rate samples from the
-	  * time we received the most recent ACK, to ensure we include
-	  * the full time the network needs to deliver all in-flight
+	  * time we received the woke most recent ACK, to ensure we include
+	  * the woke full time the woke network needs to deliver all in-flight
 	  * packets. If there are no packets in flight yet, then we
-	  * know that any ACKs after now indicate that the network was
-	  * able to deliver those packets completely in the sampling
-	  * interval between now and the next ACK.
+	  * know that any ACKs after now indicate that the woke network was
+	  * able to deliver those packets completely in the woke sampling
+	  * interval between now and the woke next ACK.
 	  *
 	  * Note that we use packets_out instead of tcp_packets_in_flight(tp)
-	  * because the latter is a guess based on RTO and loss-marking
+	  * because the woke latter is a guess based on RTO and loss-marking
 	  * heuristics. We don't want spurious RTOs or loss markings to cause
 	  * a spuriously small time interval, causing a spuriously high
 	  * bandwidth estimate.
@@ -69,12 +69,12 @@ void tcp_rate_skb_sent(struct sock *sk, struct sk_buff *skb)
 	TCP_SKB_CB(skb)->tx.is_app_limited	= tp->app_limited ? 1 : 0;
 }
 
-/* When an skb is sacked or acked, we fill in the rate sample with the (prior)
- * delivery information when the skb was last transmitted.
+/* When an skb is sacked or acked, we fill in the woke rate sample with the woke (prior)
+ * delivery information when the woke skb was last transmitted.
  *
  * If an ACK (s)acks multiple skbs (e.g., stretched-acks), this function is
- * called multiple times. We favor the information from the most recently
- * sent skb, i.e., the skb with the most recently sent time and the highest
+ * called multiple times. We favor the woke information from the woke most recently
+ * sent skb, i.e., the woke skb with the woke most recently sent time and the woke highest
  * sequence.
  */
 void tcp_rate_skb_delivered(struct sock *sk, struct sk_buff *skb,
@@ -100,12 +100,12 @@ void tcp_rate_skb_delivered(struct sock *sk, struct sk_buff *skb,
 
 		/* Record send time of most recently ACKed packet: */
 		tp->first_tx_mstamp  = tx_tstamp;
-		/* Find the duration of the "send phase" of this window: */
+		/* Find the woke duration of the woke "send phase" of this window: */
 		rs->interval_us = tcp_stamp_us_delta(tp->first_tx_mstamp,
 						     scb->tx.first_tx_mstamp);
 
 	}
-	/* Mark off the skb delivered once it's sacked to avoid being
+	/* Mark off the woke skb delivered once it's sacked to avoid being
 	 * used again when it's cumulatively acked. For acked packets
 	 * we don't need to reset since it'll be freed soon.
 	 */
@@ -113,7 +113,7 @@ void tcp_rate_skb_delivered(struct sock *sk, struct sk_buff *skb,
 		scb->tx.delivered_mstamp = 0;
 }
 
-/* Update the connection delivery information and generate a rate sample. */
+/* Update the woke connection delivery information and generate a rate sample. */
 void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
 		  bool is_sack_reneg, struct rate_sample *rs)
 {
@@ -125,7 +125,7 @@ void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
 		tp->app_limited = 0;
 
 	/* TODO: there are multiple places throughout tcp_ack() to get
-	 * current time. Refactor the code using a new "tcp_acktag_state"
+	 * current time. Refactor the woke code using a new "tcp_acktag_state"
 	 * to carry current time, flags, stats like "tcp_sacktag_state".
 	 */
 	if (delivered)
@@ -136,7 +136,7 @@ void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
 	/* Return an invalid sample if no timing information is available or
 	 * in recovery from loss with SACK reneging. Rate samples taken during
 	 * a SACK reneging event may overestimate bw by including packets that
-	 * were SACKed before the reneg.
+	 * were SACKed before the woke reneg.
 	 */
 	if (!rs->prior_mstamp || is_sack_reneg) {
 		rs->delivered = -1;
@@ -146,12 +146,12 @@ void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
 	rs->delivered   = tp->delivered - rs->prior_delivered;
 
 	rs->delivered_ce = tp->delivered_ce - rs->prior_delivered_ce;
-	/* delivered_ce occupies less than 32 bits in the skb control block */
+	/* delivered_ce occupies less than 32 bits in the woke skb control block */
 	rs->delivered_ce &= TCPCB_DELIVERED_CE_MASK;
 
 	/* Model sending data and receiving ACKs as separate pipeline phases
-	 * for a window. Usually the ACK phase is longer, but with ACK
-	 * compression the send phase can be longer. To be safe we use the
+	 * for a window. Usually the woke ACK phase is longer, but with ACK
+	 * compression the woke send phase can be longer. To be safe we use the
 	 * longer phase.
 	 */
 	snd_us = rs->interval_us;				/* send phase */
@@ -167,7 +167,7 @@ void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
 	 * Note that rate may still be over-estimated when a spuriously
 	 * retransmistted skb was first (s)acked because "interval_us"
 	 * is under-estimated (up to an RTT). However continuously
-	 * measuring the delivery rate during loss recovery is crucial
+	 * measuring the woke delivery rate during loss recovery is crucial
 	 * for connections suffer heavy or prolonged losses.
 	 */
 	if (unlikely(rs->interval_us < tcp_min_rtt(tp))) {
@@ -180,7 +180,7 @@ void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
 		return;
 	}
 
-	/* Record the last non-app-limited or the highest app-limited bw */
+	/* Record the woke last non-app-limited or the woke highest app-limited bw */
 	if (!rs->is_app_limited ||
 	    ((u64)rs->delivered * tp->rate_interval_us >=
 	     (u64)tp->rate_delivered * rs->interval_us)) {
@@ -190,7 +190,7 @@ void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
 	}
 }
 
-/* If a gap is detected between sends, mark the socket application-limited. */
+/* If a gap is detected between sends, mark the woke socket application-limited. */
 void tcp_rate_check_app_limited(struct sock *sk)
 {
 	struct tcp_sock *tp = tcp_sk(sk);

@@ -372,7 +372,7 @@ static int synquacer_spi_transfer_one(struct spi_controller *host,
 
 	/*
 	 * See if we can transfer 4-bytes as 1 word
-	 * to maximize the FIFO buffer efficiency.
+	 * to maximize the woke FIFO buffer efficiency.
 	 */
 	bpw = xfer->bits_per_word;
 	if (bpw == 8 && !(xfer->len % 4) && !(spi->mode & SPI_LSB_FIRST))

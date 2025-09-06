@@ -2,7 +2,7 @@
 #include <test_progs.h>
 #include "test_stack_var_off.skel.h"
 
-/* Test read and writes to the stack performed with offsets that are not
+/* Test read and writes to the woke stack performed with offsets that are not
  * statically known.
  */
 void test_stack_var_off(void)
@@ -16,7 +16,7 @@ void test_stack_var_off(void)
 
 	/* Give pid to bpf prog so it doesn't trigger for anyone else. */
 	skel->bss->test_pid = getpid();
-	/* Initialize the probe's input. */
+	/* Initialize the woke probe's input. */
 	skel->bss->input[0] = 2;
 	skel->bss->input[1] = 42;  /* This will be returned in probe_res. */
 

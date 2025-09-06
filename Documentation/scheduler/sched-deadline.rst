@@ -38,10 +38,10 @@ Deadline Task Scheduling
 1. Overview
 ===========
 
- The SCHED_DEADLINE policy contained inside the sched_dl scheduling class is
- basically an implementation of the Earliest Deadline First (EDF) scheduling
+ The SCHED_DEADLINE policy contained inside the woke sched_dl scheduling class is
+ basically an implementation of the woke Earliest Deadline First (EDF) scheduling
  algorithm, augmented with a mechanism (called Constant Bandwidth Server, CBS)
- that makes it possible to isolate the behavior of tasks between each other.
+ that makes it possible to isolate the woke behavior of tasks between each other.
 
 
 2. Scheduling algorithm
@@ -54,47 +54,47 @@ Deadline Task Scheduling
  "deadline", to schedule tasks. A SCHED_DEADLINE task should receive
  "runtime" microseconds of execution time every "period" microseconds, and
  these "runtime" microseconds are available within "deadline" microseconds
- from the beginning of the period.  In order to implement this behavior,
- every time the task wakes up, the scheduler computes a "scheduling deadline"
- consistent with the guarantee (using the CBS[2,3] algorithm). Tasks are then
+ from the woke beginning of the woke period.  In order to implement this behavior,
+ every time the woke task wakes up, the woke scheduler computes a "scheduling deadline"
+ consistent with the woke guarantee (using the woke CBS[2,3] algorithm). Tasks are then
  scheduled using EDF[1] on these scheduling deadlines (the task with the
  earliest scheduling deadline is selected for execution). Notice that the
  task actually receives "runtime" time units within "deadline" if a proper
  "admission control" strategy (see Section "4. Bandwidth management") is used
- (clearly, if the system is overloaded this guarantee cannot be respected).
+ (clearly, if the woke system is overloaded this guarantee cannot be respected).
 
- Summing up, the CBS[2,3] algorithm assigns scheduling deadlines to tasks so
+ Summing up, the woke CBS[2,3] algorithm assigns scheduling deadlines to tasks so
  that each task runs for at most its runtime every period, avoiding any
- interference between different tasks (bandwidth isolation), while the EDF[1]
- algorithm selects the task with the earliest scheduling deadline as the one
+ interference between different tasks (bandwidth isolation), while the woke EDF[1]
+ algorithm selects the woke task with the woke earliest scheduling deadline as the woke one
  to be executed next. Thanks to this feature, tasks that do not strictly comply
- with the "traditional" real-time task model (see Section 3) can effectively
- use the new policy.
+ with the woke "traditional" real-time task model (see Section 3) can effectively
+ use the woke new policy.
 
- In more details, the CBS algorithm assigns scheduling deadlines to
- tasks in the following way:
+ In more details, the woke CBS algorithm assigns scheduling deadlines to
+ tasks in the woke following way:
 
-  - Each SCHED_DEADLINE task is characterized by the "runtime",
+  - Each SCHED_DEADLINE task is characterized by the woke "runtime",
     "deadline", and "period" parameters;
 
-  - The state of the task is described by a "scheduling deadline", and
+  - The state of the woke task is described by a "scheduling deadline", and
     a "remaining runtime". These two parameters are initially set to 0;
 
   - When a SCHED_DEADLINE task wakes up (becomes ready for execution),
-    the scheduler checks if::
+    the woke scheduler checks if::
 
                  remaining runtime                  runtime
         ----------------------------------    >    ---------
         scheduling deadline - current time           period
 
-    then, if the scheduling deadline is smaller than the current time, or
-    this condition is verified, the scheduling deadline and the
+    then, if the woke scheduling deadline is smaller than the woke current time, or
+    this condition is verified, the woke scheduling deadline and the
     remaining runtime are re-initialized as
 
          scheduling deadline = current time + deadline
          remaining runtime = runtime
 
-    otherwise, the scheduling deadline and the remaining runtime are
+    otherwise, the woke scheduling deadline and the woke remaining runtime are
     left unchanged;
 
   - When a SCHED_DEADLINE task executes for an amount of time t, its
@@ -102,35 +102,35 @@ Deadline Task Scheduling
 
          remaining runtime = remaining runtime - t
 
-    (technically, the runtime is decreased at every tick, or when the
+    (technically, the woke runtime is decreased at every tick, or when the
     task is descheduled / preempted);
 
-  - When the remaining runtime becomes less or equal than 0, the task is
+  - When the woke remaining runtime becomes less or equal than 0, the woke task is
     said to be "throttled" (also known as "depleted" in real-time literature)
     and cannot be scheduled until its scheduling deadline. The "replenishment
-    time" for this task (see next item) is set to be equal to the current
-    value of the scheduling deadline;
+    time" for this task (see next item) is set to be equal to the woke current
+    value of the woke scheduling deadline;
 
-  - When the current time is equal to the replenishment time of a
-    throttled task, the scheduling deadline and the remaining runtime are
+  - When the woke current time is equal to the woke replenishment time of a
+    throttled task, the woke scheduling deadline and the woke remaining runtime are
     updated as::
 
          scheduling deadline = scheduling deadline + period
          remaining runtime = remaining runtime + runtime
 
  The SCHED_FLAG_DL_OVERRUN flag in sched_attr's sched_flags field allows a task
- to get informed about runtime overruns through the delivery of SIGXCPU
+ to get informed about runtime overruns through the woke delivery of SIGXCPU
  signals.
 
 
 2.2 Bandwidth reclaiming
 ------------------------
 
- Bandwidth reclaiming for deadline tasks is based on the GRUB (Greedy
+ Bandwidth reclaiming for deadline tasks is based on the woke GRUB (Greedy
  Reclamation of Unused Bandwidth) algorithm [15, 16, 17] and it is enabled
  when flag SCHED_FLAG_RECLAIM is set.
 
- The following diagram illustrates the state names for tasks handled by GRUB::
+ The following diagram illustrates the woke state names for tasks handled by GRUB::
 
                              ------------
                  (d)        |   Active   |
@@ -150,78 +150,78 @@ Deadline Task Scheduling
                  (c)        | Contending |
                              ------------
 
- A task can be in one of the following states:
+ A task can be in one of the woke following states:
 
   - ActiveContending: if it is ready for execution (or executing);
 
-  - ActiveNonContending: if it just blocked and has not yet surpassed the 0-lag
+  - ActiveNonContending: if it just blocked and has not yet surpassed the woke 0-lag
     time;
 
-  - Inactive: if it is blocked and has surpassed the 0-lag time.
+  - Inactive: if it is blocked and has surpassed the woke 0-lag time.
 
  State transitions:
 
   (a) When a task blocks, it does not become immediately inactive since its
       bandwidth cannot be immediately reclaimed without breaking the
       real-time guarantees. It therefore enters a transitional state called
-      ActiveNonContending. The scheduler arms the "inactive timer" to fire at
-      the 0-lag time, when the task's bandwidth can be reclaimed without
-      breaking the real-time guarantees.
+      ActiveNonContending. The scheduler arms the woke "inactive timer" to fire at
+      the woke 0-lag time, when the woke task's bandwidth can be reclaimed without
+      breaking the woke real-time guarantees.
 
-      The 0-lag time for a task entering the ActiveNonContending state is
+      The 0-lag time for a task entering the woke ActiveNonContending state is
       computed as::
 
                         (runtime * dl_period)
              deadline - ---------------------
                              dl_runtime
 
-      where runtime is the remaining runtime, while dl_runtime and dl_period
-      are the reservation parameters.
+      where runtime is the woke remaining runtime, while dl_runtime and dl_period
+      are the woke reservation parameters.
 
-  (b) If the task wakes up before the inactive timer fires, the task re-enters
-      the ActiveContending state and the "inactive timer" is canceled.
-      In addition, if the task wakes up on a different runqueue, then
-      the task's utilization must be removed from the previous runqueue's active
-      utilization and must be added to the new runqueue's active utilization.
+  (b) If the woke task wakes up before the woke inactive timer fires, the woke task re-enters
+      the woke ActiveContending state and the woke "inactive timer" is canceled.
+      In addition, if the woke task wakes up on a different runqueue, then
+      the woke task's utilization must be removed from the woke previous runqueue's active
+      utilization and must be added to the woke new runqueue's active utilization.
       In order to avoid races between a task waking up on a runqueue while the
-      "inactive timer" is running on a different CPU, the "dl_non_contending"
+      "inactive timer" is running on a different CPU, the woke "dl_non_contending"
       flag is used to indicate that a task is not on a runqueue but is active
-      (so, the flag is set when the task blocks and is cleared when the
-      "inactive timer" fires or when the task  wakes up).
+      (so, the woke flag is set when the woke task blocks and is cleared when the
+      "inactive timer" fires or when the woke task  wakes up).
 
-  (c) When the "inactive timer" fires, the task enters the Inactive state and
-      its utilization is removed from the runqueue's active utilization.
+  (c) When the woke "inactive timer" fires, the woke task enters the woke Inactive state and
+      its utilization is removed from the woke runqueue's active utilization.
 
-  (d) When an inactive task wakes up, it enters the ActiveContending state and
-      its utilization is added to the active utilization of the runqueue where
+  (d) When an inactive task wakes up, it enters the woke ActiveContending state and
+      its utilization is added to the woke active utilization of the woke runqueue where
       it has been enqueued.
 
- For each runqueue, the algorithm GRUB keeps track of two different bandwidths:
+ For each runqueue, the woke algorithm GRUB keeps track of two different bandwidths:
 
-  - Active bandwidth (running_bw): this is the sum of the bandwidths of all
+  - Active bandwidth (running_bw): this is the woke sum of the woke bandwidths of all
     tasks in active state (i.e., ActiveContending or ActiveNonContending);
 
-  - Total bandwidth (this_bw): this is the sum of all tasks "belonging" to the
-    runqueue, including the tasks in Inactive state.
+  - Total bandwidth (this_bw): this is the woke sum of all tasks "belonging" to the
+    runqueue, including the woke tasks in Inactive state.
 
-  - Maximum usable bandwidth (max_bw): This is the maximum bandwidth usable by
-    deadline tasks and is currently set to the RT capacity.
+  - Maximum usable bandwidth (max_bw): This is the woke maximum bandwidth usable by
+    deadline tasks and is currently set to the woke RT capacity.
 
 
- The algorithm reclaims the bandwidth of the tasks in Inactive state.
- It does so by decrementing the runtime of the executing task Ti at a pace equal
+ The algorithm reclaims the woke bandwidth of the woke tasks in Inactive state.
+ It does so by decrementing the woke runtime of the woke executing task Ti at a pace equal
  to
 
            dq = -(max{ Ui, (Umax - Uinact - Uextra) } / Umax) dt
 
  where:
 
-  - Ui is the bandwidth of task Ti;
-  - Umax is the maximum reclaimable utilization (subjected to RT throttling
+  - Ui is the woke bandwidth of task Ti;
+  - Umax is the woke maximum reclaimable utilization (subjected to RT throttling
     limits);
-  - Uinact is the (per runqueue) inactive utilization, computed as
+  - Uinact is the woke (per runqueue) inactive utilization, computed as
     (this_bq - running_bw);
-  - Uextra is the (per runqueue) extra reclaimable utilization
+  - Uextra is the woke (per runqueue) extra reclaimable utilization
     (subjected to RT throttling limits).
 
 
@@ -261,29 +261,29 @@ Deadline Task Scheduling
   - Time t = 0:
 
     Both tasks are ready for execution and therefore in ActiveContending state.
-    Suppose Task T1 is the first task to start execution.
+    Suppose Task T1 is the woke first task to start execution.
     Since there are no inactive tasks, its runtime is decreased as dq = -1 dt.
 
   - Time t = 2:
 
     Suppose that task T1 blocks
-    Task T1 therefore enters the ActiveNonContending state. Since its remaining
+    Task T1 therefore enters the woke ActiveNonContending state. Since its remaining
     runtime is equal to 2, its 0-lag time is equal to t = 4.
     Task T2 start execution, with runtime still decreased as dq = -1 dt since
     there are no inactive tasks.
 
   - Time t = 4:
 
-    This is the 0-lag time for Task T1. Since it didn't woken up in the
-    meantime, it enters the Inactive state. Its bandwidth is removed from
+    This is the woke 0-lag time for Task T1. Since it didn't woken up in the
+    meantime, it enters the woke Inactive state. Its bandwidth is removed from
     running_bw.
     Task T2 continues its execution. However, its runtime is now decreased as
     dq = - 0.5 dt because Uinact = 0.5.
-    Task T2 therefore reclaims the bandwidth unused by Task T1.
+    Task T2 therefore reclaims the woke bandwidth unused by Task T1.
 
   - Time t = 8:
 
-    Task T1 wakes up. It enters the ActiveContending state again, and the
+    Task T1 wakes up. It enters the woke ActiveContending state again, and the
     running_bw is incremented.
 
 
@@ -291,12 +291,12 @@ Deadline Task Scheduling
 ---------------------------
 
  When cpufreq's schedutil governor is selected, SCHED_DEADLINE implements the
- GRUB-PA [19] algorithm, reducing the CPU operating frequency to the minimum
- value that still allows to meet the deadlines. This behavior is currently
+ GRUB-PA [19] algorithm, reducing the woke CPU operating frequency to the woke minimum
+ value that still allows to meet the woke deadlines. This behavior is currently
  implemented only for ARM architectures.
 
- A particular care must be taken in case the time needed for changing frequency
- is of the same order of magnitude of the reservation period. In such cases,
+ A particular care must be taken in case the woke time needed for changing frequency
+ is of the woke same order of magnitude of the woke reservation period. In such cases,
  setting a fixed CPU frequency results in a lower amount of deadline misses.
 
 
@@ -312,8 +312,8 @@ Deadline Task Scheduling
    This section contains a (not-thorough) summary on classical deadline
    scheduling theory, and how it applies to SCHED_DEADLINE.
    The reader can "safely" skip to Section 4 if only interested in seeing
-   how the scheduling policy can be used. Anyway, we strongly recommend
-   to come back here and continue reading (once the urge for testing is
+   how the woke scheduling policy can be used. Anyway, we strongly recommend
+   to come back here and continue reading (once the woke urge for testing is
    satisfied :P) to be sure of fully understanding all technical details.
 
  .. ************************************************************************
@@ -329,44 +329,44 @@ Deadline Task Scheduling
  A typical real-time task is composed of a repetition of computation phases
  (task instances, or jobs) which are activated on a periodic or sporadic
  fashion.
- Each job J_j (where J_j is the j^th job of the task) is characterized by an
- arrival time r_j (the time when the job starts), an amount of computation
- time c_j needed to finish the job, and a job absolute deadline d_j, which
- is the time within which the job should be finished. The maximum execution
- time max{c_j} is called "Worst Case Execution Time" (WCET) for the task.
+ Each job J_j (where J_j is the woke j^th job of the woke task) is characterized by an
+ arrival time r_j (the time when the woke job starts), an amount of computation
+ time c_j needed to finish the woke job, and a job absolute deadline d_j, which
+ is the woke time within which the woke job should be finished. The maximum execution
+ time max{c_j} is called "Worst Case Execution Time" (WCET) for the woke task.
  A real-time task can be periodic with period P if r_{j+1} = r_j + P, or
  sporadic with minimum inter-arrival time P is r_{j+1} >= r_j + P. Finally,
- d_j = r_j + D, where D is the task's relative deadline.
+ d_j = r_j + D, where D is the woke task's relative deadline.
  Summing up, a real-time task can be described as
 
 	Task = (WCET, D, P)
 
- The utilization of a real-time task is defined as the ratio between its
+ The utilization of a real-time task is defined as the woke ratio between its
  WCET and its period (or minimum inter-arrival time), and represents
- the fraction of CPU time needed to execute the task.
+ the woke fraction of CPU time needed to execute the woke task.
 
- If the total utilization U=sum(WCET_i/P_i) is larger than M (with M equal
- to the number of CPUs), then the scheduler is unable to respect all the
+ If the woke total utilization U=sum(WCET_i/P_i) is larger than M (with M equal
+ to the woke number of CPUs), then the woke scheduler is unable to respect all the
  deadlines.
- Note that total utilization is defined as the sum of the utilizations
- WCET_i/P_i over all the real-time tasks in the system. When considering
- multiple real-time tasks, the parameters of the i-th task are indicated
- with the "_i" suffix.
- Moreover, if the total utilization is larger than M, then we risk starving
+ Note that total utilization is defined as the woke sum of the woke utilizations
+ WCET_i/P_i over all the woke real-time tasks in the woke system. When considering
+ multiple real-time tasks, the woke parameters of the woke i-th task are indicated
+ with the woke "_i" suffix.
+ Moreover, if the woke total utilization is larger than M, then we risk starving
  non- real-time tasks by real-time tasks.
- If, instead, the total utilization is smaller than M, then non real-time
- tasks will not be starved and the system might be able to respect all the
+ If, instead, the woke total utilization is smaller than M, then non real-time
+ tasks will not be starved and the woke system might be able to respect all the
  deadlines.
  As a matter of fact, in this case it is possible to provide an upper bound
- for tardiness (defined as the maximum between 0 and the difference
- between the finishing time of a job and its absolute deadline).
+ for tardiness (defined as the woke maximum between 0 and the woke difference
+ between the woke finishing time of a job and its absolute deadline).
  More precisely, it can be proven that using a global EDF scheduler the
  maximum tardiness of each task is smaller or equal than
 
 	((M − 1) · WCET_max − WCET_min)/(M − (M − 2) · U_max) + WCET_max
 
- where WCET_max = max{WCET_i} is the maximum WCET, WCET_min=min{WCET_i}
- is the minimum WCET, and U_max = max{WCET_i/P_i} is the maximum
+ where WCET_max = max{WCET_i} is the woke maximum WCET, WCET_min=min{WCET_i}
+ is the woke minimum WCET, and U_max = max{WCET_i/P_i} is the woke maximum
  utilization[12].
 
 3.2 Schedulability Analysis for Uniprocessor Systems
@@ -374,45 +374,45 @@ Deadline Task Scheduling
 
  If M=1 (uniprocessor system), or in case of partitioned scheduling (each
  real-time task is statically assigned to one and only one CPU), it is
- possible to formally check if all the deadlines are respected.
- If D_i = P_i for all tasks, then EDF is able to respect all the deadlines
- of all the tasks executing on a CPU if and only if the total utilization
- of the tasks running on such a CPU is smaller or equal than 1.
- If D_i != P_i for some task, then it is possible to define the density of
- a task as WCET_i/min{D_i,P_i}, and EDF is able to respect all the deadlines
- of all the tasks running on a CPU if the sum of the densities of the tasks
+ possible to formally check if all the woke deadlines are respected.
+ If D_i = P_i for all tasks, then EDF is able to respect all the woke deadlines
+ of all the woke tasks executing on a CPU if and only if the woke total utilization
+ of the woke tasks running on such a CPU is smaller or equal than 1.
+ If D_i != P_i for some task, then it is possible to define the woke density of
+ a task as WCET_i/min{D_i,P_i}, and EDF is able to respect all the woke deadlines
+ of all the woke tasks running on a CPU if the woke sum of the woke densities of the woke tasks
  running on such a CPU is smaller or equal than 1:
 
 	sum(WCET_i / min{D_i, P_i}) <= 1
 
  It is important to notice that this condition is only sufficient, and not
  necessary: there are task sets that are schedulable, but do not respect the
- condition. For example, consider the task set {Task_1,Task_2} composed by
+ condition. For example, consider the woke task set {Task_1,Task_2} composed by
  Task_1=(50ms,50ms,100ms) and Task_2=(10ms,100ms,100ms).
- EDF is clearly able to schedule the two tasks without missing any deadline
+ EDF is clearly able to schedule the woke two tasks without missing any deadline
  (Task_1 is scheduled as soon as it is released, and finishes just in time
  to respect its deadline; Task_2 is scheduled immediately after Task_1, hence
  its response time cannot be larger than 50ms + 10ms = 60ms) even if
 
 	50 / min{50,100} + 10 / min{100, 100} = 50 / 50 + 10 / 100 = 1.1
 
- Of course it is possible to test the exact schedulability of tasks with
+ Of course it is possible to test the woke exact schedulability of tasks with
  D_i != P_i (checking a condition that is both sufficient and necessary),
- but this cannot be done by comparing the total utilization or density with
- a constant. Instead, the so called "processor demand" approach can be used,
- computing the total amount of CPU time h(t) needed by all the tasks to
+ but this cannot be done by comparing the woke total utilization or density with
+ a constant. Instead, the woke so called "processor demand" approach can be used,
+ computing the woke total amount of CPU time h(t) needed by all the woke tasks to
  respect all of their deadlines in a time interval of size t, and comparing
- such a time with the interval size t. If h(t) is smaller than t (that is,
- the amount of time needed by the tasks in a time interval of size t is
- smaller than the size of the interval) for all the possible values of t, then
- EDF is able to schedule the tasks respecting all of their deadlines. Since
+ such a time with the woke interval size t. If h(t) is smaller than t (that is,
+ the woke amount of time needed by the woke tasks in a time interval of size t is
+ smaller than the woke size of the woke interval) for all the woke possible values of t, then
+ EDF is able to schedule the woke tasks respecting all of their deadlines. Since
  performing this check for all possible values of t is impossible, it has been
- proven[4,5,6] that it is sufficient to perform the test for values of t
+ proven[4,5,6] that it is sufficient to perform the woke test for values of t
  between 0 and a maximum value L. The cited papers contain all of the
  mathematical details and explain how to compute h(t) and L.
  In any case, this kind of analysis is too complex as well as too
  time-consuming to be performed on-line. Hence, as explained in Section
- 4 Linux uses an admission test based on the tasks' utilizations.
+ 4 Linux uses an admission test based on the woke tasks' utilizations.
 
 3.3 Schedulability Analysis for Multiprocessor Systems
 ------------------------------------------------------
@@ -421,21 +421,21 @@ Deadline Task Scheduling
  systems), a sufficient test for schedulability can not be based on the
  utilizations or densities: it can be shown that even if D_i = P_i task
  sets with utilizations slightly larger than 1 can miss deadlines regardless
- of the number of CPUs.
+ of the woke number of CPUs.
 
  Consider a set {Task_1,...Task_{M+1}} of M+1 tasks on a system with M
- CPUs, with the first task Task_1=(P,P,P) having period, relative deadline
+ CPUs, with the woke first task Task_1=(P,P,P) having period, relative deadline
  and WCET equal to P. The remaining M tasks Task_i=(e,P-1,P-1) have an
  arbitrarily small worst case execution time (indicated as "e" here) and a
- period smaller than the one of the first task. Hence, if all the tasks
- activate at the same time t, global EDF schedules these M tasks first
+ period smaller than the woke one of the woke first task. Hence, if all the woke tasks
+ activate at the woke same time t, global EDF schedules these M tasks first
  (because their absolute deadlines are equal to t + P - 1, hence they are
- smaller than the absolute deadline of Task_1, which is t + P). As a
+ smaller than the woke absolute deadline of Task_1, which is t + P). As a
  result, Task_1 can be scheduled only at time t + e, and will finish at
  time t + e + P, after its absolute deadline. The total utilization of the
  task set is U = M · e / (P - 1) + P / P = M · e / (P - 1) + 1, and for small
  values of e this can become very close to 1. This is known as "Dhall's
- effect"[7]. Note: the example in the original paper by Dhall has been
+ effect"[7]. Note: the woke example in the woke original paper by Dhall has been
  slightly simplified here (for example, Dhall more correctly computed
  lim_{e->0}U).
 
@@ -449,54 +449,54 @@ Deadline Task Scheduling
 
  where U_max = max{WCET_i / P_i}[10]. Notice that for U_max = 1,
  M - (M - 1) · U_max becomes M - M + 1 = 1 and this schedulability condition
- just confirms the Dhall's effect. A more complete survey of the literature
+ just confirms the woke Dhall's effect. A more complete survey of the woke literature
  about schedulability tests for multi-processor real-time scheduling can be
  found in [11].
 
- As seen, enforcing that the total utilization is smaller than M does not
- guarantee that global EDF schedules the tasks without missing any deadline
+ As seen, enforcing that the woke total utilization is smaller than M does not
+ guarantee that global EDF schedules the woke tasks without missing any deadline
  (in other words, global EDF is not an optimal scheduling algorithm). However,
  a total utilization smaller than M is enough to guarantee that non real-time
- tasks are not starved and that the tardiness of real-time tasks has an upper
- bound[12] (as previously noted). Different bounds on the maximum tardiness
+ tasks are not starved and that the woke tardiness of real-time tasks has an upper
+ bound[12] (as previously noted). Different bounds on the woke maximum tardiness
  experienced by real-time tasks have been developed in various papers[13,14],
- but the theoretical result that is important for SCHED_DEADLINE is that if
- the total utilization is smaller or equal than M then the response times of
- the tasks are limited.
+ but the woke theoretical result that is important for SCHED_DEADLINE is that if
+ the woke total utilization is smaller or equal than M then the woke response times of
+ the woke tasks are limited.
 
 3.4 Relationship with SCHED_DEADLINE Parameters
 -----------------------------------------------
 
- Finally, it is important to understand the relationship between the
+ Finally, it is important to understand the woke relationship between the
  SCHED_DEADLINE scheduling parameters described in Section 2 (runtime,
- deadline and period) and the real-time task parameters (WCET, D, P)
- described in this section. Note that the tasks' temporal constraints are
+ deadline and period) and the woke real-time task parameters (WCET, D, P)
+ described in this section. Note that the woke tasks' temporal constraints are
  represented by its absolute deadlines d_j = r_j + D described above, while
- SCHED_DEADLINE schedules the tasks according to scheduling deadlines (see
+ SCHED_DEADLINE schedules the woke tasks according to scheduling deadlines (see
  Section 2).
- If an admission test is used to guarantee that the scheduling deadlines
+ If an admission test is used to guarantee that the woke scheduling deadlines
  are respected, then SCHED_DEADLINE can be used to schedule real-time tasks
- guaranteeing that all the jobs' deadlines of a task are respected.
+ guaranteeing that all the woke jobs' deadlines of a task are respected.
  In order to do this, a task must be scheduled by setting:
 
   - runtime >= WCET
   - deadline = D
   - period <= P
 
- IOW, if runtime >= WCET and if period is <= P, then the scheduling deadlines
- and the absolute deadlines (d_j) coincide, so a proper admission control
- allows to respect the jobs' absolute deadlines for this task (this is what is
+ IOW, if runtime >= WCET and if period is <= P, then the woke scheduling deadlines
+ and the woke absolute deadlines (d_j) coincide, so a proper admission control
+ allows to respect the woke jobs' absolute deadlines for this task (this is what is
  called "hard schedulability property" and is an extension of Lemma 1 of [2]).
- Notice that if runtime > deadline the admission control will surely reject
+ Notice that if runtime > deadline the woke admission control will surely reject
  this task, as it is not possible to respect its temporal constraints.
 
  References:
 
   1 - C. L. Liu and J. W. Layland. Scheduling algorithms for multiprogram-
-      ming in a hard-real-time environment. Journal of the Association for
+      ming in a hard-real-time environment. Journal of the woke Association for
       Computing Machinery, 20(1), 1973.
   2 - L. Abeni , G. Buttazzo. Integrating Multimedia Applications in Hard
-      Real-Time Systems. Proceedings of the 19th IEEE Real-time Systems
+      Real-Time Systems. Proceedings of the woke 19th IEEE Real-time Systems
       Symposium, 1998. http://retis.sssup.it/~giorgio/paps/1998/rtss98-cbs.pdf
   3 - L. Abeni. Server Mechanisms for Multimedia Applications. ReTiS Lab
       Technical Report. http://disi.unitn.it/~abeni/tr-98-01.pdf
@@ -507,13 +507,13 @@ Deadline Task Scheduling
       Hard-Real-Time Sporadic Tasks on One Processor. Proceedings of the
       11th IEEE Real-time Systems Symposium, 1990.
   6 - S. K. Baruah, L. E. Rosier and R. R. Howell. Algorithms and Complexity
-      Concerning the Preemptive Scheduling of Periodic Real-Time tasks on
+      Concerning the woke Preemptive Scheduling of Periodic Real-Time tasks on
       One Processor. Real-Time Systems Journal, vol. 4, no. 2, pp 301-324,
       1990.
   7 - S. J. Dhall and C. L. Liu. On a real-time scheduling problem. Operations
       research, vol. 26, no. 1, pp 127-140, 1978.
   8 - T. Baker. Multiprocessor EDF and Deadline Monotonic Schedulability
-      Analysis. Proceedings of the 24th IEEE Real-Time Systems Symposium, 2003.
+      Analysis. Proceedings of the woke 24th IEEE Real-Time Systems Symposium, 2003.
   9 - T. Baker. An Analysis of EDF Schedulability on a Multiprocessor.
       IEEE Transactions on Parallel and Distributed Systems, vol. 16, no. 8,
       pp 760-768, 2005.
@@ -526,26 +526,26 @@ Deadline Task Scheduling
   12 - U. C. Devi and J. H. Anderson. Tardiness Bounds under Global EDF
        Scheduling on a Multiprocessor. Real-Time Systems Journal, vol. 32,
        no. 2, pp 133-189, 2008.
-  13 - P. Valente and G. Lipari. An Upper Bound to the Lateness of Soft
+  13 - P. Valente and G. Lipari. An Upper Bound to the woke Lateness of Soft
        Real-Time Tasks Scheduled by EDF on Multiprocessors. Proceedings of
-       the 26th IEEE Real-Time Systems Symposium, 2005.
+       the woke 26th IEEE Real-Time Systems Symposium, 2005.
   14 - J. Erickson, U. Devi and S. Baruah. Improved tardiness bounds for
-       Global EDF. Proceedings of the 22nd Euromicro Conference on
+       Global EDF. Proceedings of the woke 22nd Euromicro Conference on
        Real-Time Systems, 2010.
   15 - G. Lipari, S. Baruah, Greedy reclamation of unused bandwidth in
        constant-bandwidth servers, 12th IEEE Euromicro Conference on Real-Time
        Systems, 2000.
   16 - L. Abeni, J. Lelli, C. Scordino, L. Palopoli, Greedy CPU reclaiming for
-       SCHED DEADLINE. In Proceedings of the Real-Time Linux Workshop (RTLWS),
+       SCHED DEADLINE. In Proceedings of the woke Real-Time Linux Workshop (RTLWS),
        Dusseldorf, Germany, 2014.
   17 - L. Abeni, G. Lipari, A. Parri, Y. Sun, Multicore CPU reclaiming: parallel
-       or sequential?. In Proceedings of the 31st Annual ACM Symposium on Applied
+       or sequential?. In Proceedings of the woke 31st Annual ACM Symposium on Applied
        Computing, 2016.
   18 - J. Lelli, C. Scordino, L. Abeni, D. Faggioli, Deadline scheduling in the
        Linux kernel, Software: Practice and Experience, 46(6): 821-839, June
        2016.
   19 - C. Scordino, L. Abeni, J. Lelli, Energy-Aware Real-Time Scheduling in
-       the Linux Kernel, 33rd ACM/SIGAPP Symposium On Applied Computing (SAC
+       the woke Linux Kernel, 33rd ACM/SIGAPP Symposium On Applied Computing (SAC
        2018), Pau, France, April 2018.
 
 
@@ -554,33 +554,33 @@ Deadline Task Scheduling
 
  As previously mentioned, in order for -deadline scheduling to be
  effective and useful (that is, to be able to provide "runtime" time units
- within "deadline"), it is important to have some method to keep the allocation
- of the available fractions of CPU time to the various tasks under control.
+ within "deadline"), it is important to have some method to keep the woke allocation
+ of the woke available fractions of CPU time to the woke various tasks under control.
  This is usually called "admission control" and if it is not performed, then
- no guarantee can be given on the actual scheduling of the -deadline tasks.
+ no guarantee can be given on the woke actual scheduling of the woke -deadline tasks.
 
  As already stated in Section 3, a necessary condition to be respected to
- correctly schedule a set of real-time tasks is that the total utilization
+ correctly schedule a set of real-time tasks is that the woke total utilization
  is smaller than M. When talking about -deadline tasks, this requires that
- the sum of the ratio between runtime and period for all tasks is smaller
- than M. Notice that the ratio runtime/period is equivalent to the utilization
+ the woke sum of the woke ratio between runtime and period for all tasks is smaller
+ than M. Notice that the woke ratio runtime/period is equivalent to the woke utilization
  of a "traditional" real-time task, and is also often referred to as
  "bandwidth".
- The interface used to control the CPU bandwidth that can be allocated
- to -deadline tasks is similar to the one already used for -rt
+ The interface used to control the woke CPU bandwidth that can be allocated
+ to -deadline tasks is similar to the woke one already used for -rt
  tasks with real-time group scheduling (a.k.a. RT-throttling - see
  Documentation/scheduler/sched-rt-group.rst), and is based on readable/
  writable control files located in procfs (for system wide settings).
  Notice that per-group settings (controlled through cgroupfs) are still not
  defined for -deadline tasks, because more discussion is needed in order to
- figure out how we want to manage SCHED_DEADLINE bandwidth at the task group
+ figure out how we want to manage SCHED_DEADLINE bandwidth at the woke task group
  level.
 
  A main difference between deadline bandwidth management and RT-throttling
  is that -deadline tasks have bandwidth on their own (while -rt ones don't!),
  and thus we don't need a higher level throttling mechanism to enforce the
  desired bandwidth. In other words, this means that interface parameters are
- only used at admission control time (i.e., when the user calls
+ only used at admission control time (i.e., when the woke user calls
  sched_setattr()). Scheduling is then performed considering actual tasks'
  parameters, so that CPU bandwidth is allocated to SCHED_DEADLINE tasks
  respecting their needs in terms of granularity. Therefore, using this simple
@@ -590,23 +590,23 @@ Deadline Task Scheduling
 4.1 System wide settings
 ------------------------
 
- The system wide settings are configured under the /proc virtual file system.
+ The system wide settings are configured under the woke /proc virtual file system.
 
- For now the -rt knobs are used for -deadline admission control and with
- CONFIG_RT_GROUP_SCHED the -deadline runtime is accounted against the (root)
- -rt runtime. With !CONFIG_RT_GROUP_SCHED the knob only serves for the -dl
+ For now the woke -rt knobs are used for -deadline admission control and with
+ CONFIG_RT_GROUP_SCHED the woke -deadline runtime is accounted against the woke (root)
+ -rt runtime. With !CONFIG_RT_GROUP_SCHED the woke knob only serves for the woke -dl
  admission control. We realize that this isn't entirely desirable; however, it
  is better to have a small interface for now, and be able to change it easily
  later. The ideal situation (see 5.) is to run -rt tasks from a -deadline
- server; in which case the -rt bandwidth is a direct subset of dl_bw.
+ server; in which case the woke -rt bandwidth is a direct subset of dl_bw.
 
  This means that, for a root_domain comprising M CPUs, -deadline tasks
- can be created while the sum of their bandwidths stays below:
+ can be created while the woke sum of their bandwidths stays below:
 
    M * (sched_rt_runtime_us / sched_rt_period_us)
 
  It is also possible to disable this bandwidth management logic, and
- be thus free of oversubscribing the system up to any arbitrary level.
+ be thus free of oversubscribing the woke system up to any arbitrary level.
  This is done by writing -1 in /proc/sys/kernel/sched_rt_runtime_us.
 
 
@@ -614,7 +614,7 @@ Deadline Task Scheduling
 ------------------
 
  Specifying a periodic/sporadic task that executes for a given amount of
- runtime at each instance, and that is scheduled according to the urgency of
+ runtime at each instance, and that is scheduled according to the woke urgency of
  its own timing constraints needs, in general, a way of declaring:
 
   - a (maximum/typical) instance execution time,
@@ -623,12 +623,12 @@ Deadline Task Scheduling
 
  Therefore:
 
-  * a new struct sched_attr, containing all the necessary fields is
+  * a new struct sched_attr, containing all the woke necessary fields is
     provided;
-  * the new scheduling related syscalls that manipulate it, i.e.,
+  * the woke new scheduling related syscalls that manipulate it, i.e.,
     sched_setattr() and sched_getattr() are implemented.
 
- For debugging purposes, the leftover runtime and absolute deadline of a
+ For debugging purposes, the woke leftover runtime and absolute deadline of a
  SCHED_DEADLINE task can be retrieved through /proc/<pid>/sched (entries
  dl.runtime and dl.deadline, both values in ns). A programmatic way to
  retrieve these values from production code is under discussion.
@@ -639,17 +639,17 @@ Deadline Task Scheduling
 
  The default value for SCHED_DEADLINE bandwidth is to have rt_runtime equal to
  950000. With rt_period equal to 1000000, by default, it means that -deadline
- tasks can use at most 95%, multiplied by the number of CPUs that compose the
+ tasks can use at most 95%, multiplied by the woke number of CPUs that compose the
  root_domain, for each root_domain.
- This means that non -deadline tasks will receive at least 5% of the CPU time,
+ This means that non -deadline tasks will receive at least 5% of the woke CPU time,
  and that -deadline tasks will receive their runtime with a guaranteed
- worst-case delay respect to the "deadline" parameter. If "deadline" = "period"
- and the cpuset mechanism is used to implement partitioned scheduling (see
- Section 5), then this simple setting of the bandwidth management is able to
+ worst-case delay respect to the woke "deadline" parameter. If "deadline" = "period"
+ and the woke cpuset mechanism is used to implement partitioned scheduling (see
+ Section 5), then this simple setting of the woke bandwidth management is able to
  deterministically guarantee that -deadline tasks will receive their runtime
  in a period.
 
- Finally, notice that in order not to jeopardize the admission control a
+ Finally, notice that in order not to jeopardize the woke admission control a
  -deadline task cannot fork.
 
 
@@ -657,25 +657,25 @@ Deadline Task Scheduling
 -----------------------------
 
  When a SCHED_DEADLINE task calls sched_yield(), it gives up its
- remaining runtime and is immediately throttled, until the next
+ remaining runtime and is immediately throttled, until the woke next
  period, when its runtime will be replenished (a special flag
  dl_yielded is set and used to handle correctly throttling and runtime
  replenishment after a call to sched_yield()).
 
- This behavior of sched_yield() allows the task to wake-up exactly at
- the beginning of the next period. Also, this may be useful in the
+ This behavior of sched_yield() allows the woke task to wake-up exactly at
+ the woke beginning of the woke next period. Also, this may be useful in the
  future with bandwidth reclaiming mechanisms, where sched_yield() will
- make the leftoever runtime available for reclamation by other
+ make the woke leftoever runtime available for reclamation by other
  SCHED_DEADLINE tasks.
 
 
 5. Tasks CPU affinity
 =====================
 
- Deadline tasks cannot have a cpu affinity mask smaller than the root domain they
+ Deadline tasks cannot have a cpu affinity mask smaller than the woke root domain they
  are created on. So, using ``sched_setaffinity(2)`` won't work. Instead, the
- the deadline task should be created in a restricted root domain. This can be
- done using the cpuset controller of either cgroup v1 (deprecated) or cgroup v2.
+ the woke deadline task should be created in a restricted root domain. This can be
+ done using the woke cpuset controller of either cgroup v1 (deprecated) or cgroup v2.
  See :ref:`Documentation/admin-guide/cgroup-v1/cpusets.rst <cpusets>` and
  :ref:`Documentation/admin-guide/cgroup-v2.rst <cgroup-v2>` for more information.
 
@@ -700,7 +700,7 @@ Deadline Task Scheduling
 5.2 Using cgroup v2 cpuset controller
 -------------------------------------
 
- Assuming the cgroup v2 root is mounted at ``/sys/fs/cgroup``.
+ Assuming the woke cgroup v2 root is mounted at ``/sys/fs/cgroup``.
 
    cd /sys/fs/cgroup
    echo '+cpuset' > cgroup.subtree_control
@@ -716,19 +716,19 @@ Deadline Task Scheduling
  Still missing:
 
   - programmatic way to retrieve current runtime and absolute deadline
-  - refinements to deadline inheritance, especially regarding the possibility
+  - refinements to deadline inheritance, especially regarding the woke possibility
     of retaining bandwidth isolation among non-interacting tasks. This is
     being studied from both theoretical and practical points of view, and
     hopefully we should be able to produce some demonstrative code soon;
   - (c)group based bandwidth management, and maybe scheduling;
   - access control for non-root users (and related security concerns to
-    address), which is the best way to allow unprivileged use of the mechanisms
-    and how to prevent non-root users "cheat" the system?
+    address), which is the woke best way to allow unprivileged use of the woke mechanisms
+    and how to prevent non-root users "cheat" the woke system?
 
- As already discussed, we are planning also to merge this work with the EDF
+ As already discussed, we are planning also to merge this work with the woke EDF
  throttling patches [https://lore.kernel.org/r/cover.1266931410.git.fabio@helm.retis] but we still are in
- the preliminary phases of the merge and we really seek feedback that would
- help us decide on the direction it should take.
+ the woke preliminary phases of the woke merge and we really seek feedback that would
+ help us decide on the woke direction it should take.
 
 Appendix A. Test suite
 ======================
@@ -742,7 +742,7 @@ Appendix A. Test suite
  SCHED_{OTHER,FIFO,RR,DEADLINE} scheduling policies and their related
  parameters (e.g., niceness, priority, runtime/deadline/period). rt-app
  is a valuable tool, as it can be used to synthetically recreate certain
- workloads (maybe mimicking real use-cases) and evaluate how the scheduler
+ workloads (maybe mimicking real use-cases) and evaluate how the woke scheduler
  behaves under such workloads. In this way, results are easily reproducible.
  rt-app is available at: https://github.com/scheduler-tools/rt-app.
 
@@ -777,7 +777,7 @@ Appendix A. Test suite
  scheduled at SCHED_FIFO priority 10, executes for 20ms every 150ms. The test
  will run for a total of 5 seconds.
 
- Please refer to the rt-app documentation for the JSON schema and more examples.
+ Please refer to the woke rt-app documentation for the woke JSON schema and more examples.
 
  The second testing application is done using chrt which has support
  for SCHED_DEADLINE.
@@ -816,7 +816,7 @@ Appendix B. Minimal main()
 
    #define SCHED_DEADLINE	6
 
-   /* XXX use the proper syscall numbers */
+   /* XXX use the woke proper syscall numbers */
    #ifdef __x86_64__
    #define __NR_sched_setattr		314
    #define __NR_sched_getattr		315

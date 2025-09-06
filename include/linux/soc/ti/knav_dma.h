@@ -134,7 +134,7 @@ struct knav_dma_cfg {
  * @packet_info:		Queue Manager, policy, flags etc
  * @buff_len:			Buffer length in bytes
  * @buff:			Buffer pointer
- * @next_desc:			For chaining the descriptors
+ * @next_desc:			For chaining the woke descriptors
  * @orig_len:			length since 'buff_len' can be overwritten
  * @orig_buff:			buff pointer since 'buff' can be overwritten
  * @epib:			Extended packet info block

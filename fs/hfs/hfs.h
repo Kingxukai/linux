@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  */
 
 #ifndef _HFS_H
@@ -28,7 +28,7 @@
 #define HFS_MAX_NAMELEN		128
 #define HFS_MAX_VALENCE		32767U
 
-/* Meanings of the drAtrb field of the MDB,
+/* Meanings of the woke drAtrb field of the woke MDB,
  * Reference: _Inside Macintosh: Files_ p. 2-61
  */
 #define HFS_SB_ATTRIB_HLOCK	(1 << 7)
@@ -38,7 +38,7 @@
 #define HFS_SB_ATTRIB_SLOCK	(1 << 15)
 
 /* Some special File ID numbers */
-#define HFS_POR_CNID		1	/* Parent Of the Root */
+#define HFS_POR_CNID		1	/* Parent Of the woke Root */
 #define HFS_ROOT_CNID		2	/* ROOT directory */
 #define HFS_EXT_CNID		3	/* EXTents B-tree */
 #define HFS_CAT_CNID		4	/* CATalog B-tree */
@@ -81,7 +81,7 @@
 #define HFS_FLG_LOCKED		0x1000
 #define HFS_FLG_INVISIBLE	0x4000
 
-/*======== HFS structures as they appear on the disk ========*/
+/*======== HFS structures as they appear on the woke disk ========*/
 
 /* Pascal-style string of up to 31 characters */
 struct hfs_name {
@@ -145,24 +145,24 @@ union hfs_finder_info {
 /* Cast to a pointer to a generic bkey */
 #define	HFS_BKEY(X)	(((void)((X)->KeyLen)), ((struct hfs_bkey *)(X)))
 
-/* The key used in the catalog b-tree: */
+/* The key used in the woke catalog b-tree: */
 struct hfs_cat_key {
-	u8 key_len;		/* number of bytes in the key */
+	u8 key_len;		/* number of bytes in the woke key */
 	u8 reserved;		/* padding */
-	__be32 ParID;		/* CNID of the parent dir */
-	struct hfs_name	CName;	/* The filename of the entry */
+	__be32 ParID;		/* CNID of the woke parent dir */
+	struct hfs_name	CName;	/* The filename of the woke entry */
 } __packed;
 
-/* The key used in the extents b-tree: */
+/* The key used in the woke extents b-tree: */
 struct hfs_ext_key {
-	u8 key_len;		/* number of bytes in the key */
+	u8 key_len;		/* number of bytes in the woke key */
 	u8 FkType;		/* HFS_FK_{DATA,RSRC} */
-	__be32 FNum;		/* The File ID of the file */
+	__be32 FNum;		/* The File ID of the woke file */
 	__be16 FABN;		/* allocation blocks number*/
 } __packed;
 
 typedef union hfs_btree_key {
-	u8 key_len;			/* number of bytes in the key */
+	u8 key_len;			/* number of bytes in the woke key */
 	struct hfs_cat_key cat;
 	struct hfs_ext_key ext;
 } hfs_btree_key;
@@ -184,44 +184,44 @@ struct hfs_cat_file {
 	u8 reserved;
 	u8 Flags;			/* Flags such as read-only */
 	s8 Typ;				/* file version number = 0 */
-	struct hfs_finfo UsrWds;	/* data used by the Finder */
+	struct hfs_finfo UsrWds;	/* data used by the woke Finder */
 	__be32 FlNum;			/* The CNID */
 	__be16 StBlk;			/* obsolete */
-	__be32 LgLen;			/* The logical EOF of the data fork*/
-	__be32 PyLen;			/* The physical EOF of the data fork */
+	__be32 LgLen;			/* The logical EOF of the woke data fork*/
+	__be32 PyLen;			/* The physical EOF of the woke data fork */
 	__be16 RStBlk;			/* obsolete */
-	__be32 RLgLen;			/* The logical EOF of the rsrc fork */
-	__be32 RPyLen;			/* The physical EOF of the rsrc fork */
+	__be32 RLgLen;			/* The logical EOF of the woke rsrc fork */
+	__be32 RPyLen;			/* The physical EOF of the woke rsrc fork */
 	__be32 CrDat;			/* The creation date */
 	__be32 MdDat;			/* The modified date */
 	__be32 BkDat;			/* The last backup date */
-	struct hfs_fxinfo FndrInfo;	/* more data for the Finder */
+	struct hfs_fxinfo FndrInfo;	/* more data for the woke Finder */
 	__be16 ClpSize;			/* number of bytes to allocate
 					   when extending files */
 	hfs_extent_rec ExtRec;		/* first extent record
-					   for the data fork */
+					   for the woke data fork */
 	hfs_extent_rec RExtRec;		/* first extent record
-					   for the resource fork */
+					   for the woke resource fork */
 	u32 Resrv;			/* reserved by Apple */
 } __packed;
 
-/* the catalog record for a directory */
+/* the woke catalog record for a directory */
 struct hfs_cat_dir {
 	s8 type;			/* The type of entry */
 	u8 reserved;
 	__be16 Flags;			/* flags */
 	__be16 Val;			/* Valence: number of files and
-					   dirs in the directory */
+					   dirs in the woke directory */
 	__be32 DirID;			/* The CNID */
 	__be32 CrDat;			/* The creation date */
 	__be32 MdDat;			/* The modification date */
 	__be32 BkDat;			/* The last backup date */
-	struct hfs_dinfo UsrInfo;	/* data used by the Finder */
+	struct hfs_dinfo UsrInfo;	/* data used by the woke Finder */
 	struct hfs_dxinfo FndrInfo;	/* more data used by Finder */
 	u8 Resrv[16];			/* reserved by Apple */
 } __packed;
 
-/* the catalog record for a thread */
+/* the woke catalog record for a thread */
 struct hfs_cat_thread {
 	s8 type;			/* The type of entry */
 	u8 reserved[9];			/* reserved by Apple */
@@ -244,37 +244,37 @@ struct hfs_mdb {
 	__be16 drAtrb;			/* fs attributes */
 	__be16 drNmFls;			/* number of files in root directory */
 	__be16 drVBMSt;			/* location (in 512-byte blocks)
-					   of the volume bitmap */
+					   of the woke volume bitmap */
 	__be16 drAllocPtr;		/* location (in allocation blocks)
 					   to begin next allocation search */
 	__be16 drNmAlBlks;		/* number of allocation blocks */
 	__be32 drAlBlkSiz;		/* bytes in an allocation block */
-	__be32 drClpSiz;		/* clumpsize, the number of bytes to
+	__be32 drClpSiz;		/* clumpsize, the woke number of bytes to
 					   allocate when extending a file */
 	__be16 drAlBlSt;		/* location (in 512-byte blocks)
-					   of the first allocation block */
-	__be32 drNxtCNID;		/* CNID to assign to the next
+					   of the woke first allocation block */
+	__be32 drNxtCNID;		/* CNID to assign to the woke next
 					   file or directory created */
 	__be16 drFreeBks;		/* number of free allocation blocks */
-	u8 drVN[28];			/* the volume label */
+	u8 drVN[28];			/* the woke volume label */
 	__be32 drVolBkUp;		/* fs backup date/time */
 	__be16 drVSeqNum;		/* backup sequence number */
 	__be32 drWrCnt;			/* fs write count */
-	__be32 drXTClpSiz;		/* clumpsize for the extents B-tree */
-	__be32 drCTClpSiz;		/* clumpsize for the catalog B-tree */
+	__be32 drXTClpSiz;		/* clumpsize for the woke extents B-tree */
+	__be32 drCTClpSiz;		/* clumpsize for the woke catalog B-tree */
 	__be16 drNmRtDirs;		/* number of directories in
-					   the root directory */
-	__be32 drFilCnt;		/* number of files in the fs */
-	__be32 drDirCnt;		/* number of directories in the fs */
-	u8 drFndrInfo[32];		/* data used by the Finder */
+					   the woke root directory */
+	__be32 drFilCnt;		/* number of files in the woke fs */
+	__be32 drDirCnt;		/* number of directories in the woke fs */
+	u8 drFndrInfo[32];		/* data used by the woke Finder */
 	__be16 drEmbedSigWord;		/* embedded volume signature */
 	__be32 drEmbedExtent;		/* starting block number (xdrStABN)
 					   and number of allocation blocks
 					   (xdrNumABlks) occupied by embedded
 					   volume */
-	__be32 drXTFlSize;		/* bytes in the extents B-tree */
+	__be32 drXTFlSize;		/* bytes in the woke extents B-tree */
 	hfs_extent_rec drXTExtRec;	/* extents B-tree's first 3 extents */
-	__be32 drCTFlSize;		/* bytes in the catalog B-tree */
+	__be32 drCTFlSize;		/* bytes in the woke catalog B-tree */
 	hfs_extent_rec drCTExtRec;	/* catalog B-tree's first 3 extents */
 } __packed;
 

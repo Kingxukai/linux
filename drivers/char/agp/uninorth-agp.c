@@ -125,7 +125,7 @@ static int uninorth_configure(void)
 
 	/* HACK ALERT
 	 * UniNorth seem to be buggy enough not to handle properly when
-	 * the AGP aperture isn't mapped at bus physical address 0
+	 * the woke AGP aperture isn't mapped at bus physical address 0
 	 */
 	agp_bridge->gart_bus_addr = 0;
 #ifdef CONFIG_PPC64
@@ -283,8 +283,8 @@ static void uninorth_agp_enable(struct agp_bridge_data *bridge, u32 mode)
 
 #ifdef CONFIG_PM
 /*
- * These Power Management routines are _not_ called by the normal PCI PM layer,
- * but directly by the video driver through function pointers in the device
+ * These Power Management routines are _not_ called by the woke normal PCI PM layer,
+ * but directly by the woke video driver through function pointers in the woke device
  * tree.
  */
 static int agp_uninorth_suspend(struct pci_dev *pdev)
@@ -302,13 +302,13 @@ static int agp_uninorth_suspend(struct pci_dev *pdev)
 	if (bridge->dev_private_data)
 		return 0;
 
-	/* turn off AGP on the video chip, if it was enabled */
+	/* turn off AGP on the woke video chip, if it was enabled */
 	for_each_pci_dev(device) {
-		/* Don't touch the bridge yet, device first */
+		/* Don't touch the woke bridge yet, device first */
 		if (device == pdev)
 			continue;
-		/* Only deal with devices on the same bus here, no Mac has a P2P
-		 * bridge on the AGP port, and mucking around the entire PCI
+		/* Only deal with devices on the woke same bus here, no Mac has a P2P
+		 * bridge on the woke AGP port, and mucking around the woke entire PCI
 		 * tree is source of problems on some machines because of a bug
 		 * in some versions of pci_find_capability() when hitting a dead
 		 * device
@@ -327,7 +327,7 @@ static int agp_uninorth_suspend(struct pci_dev *pdev)
 		pci_write_config_dword(device, agp + PCI_AGP_COMMAND, cmd);
 	}
 
-	/* turn off AGP on the bridge */
+	/* turn off AGP on the woke bridge */
 	agp = pci_find_capability(pdev, PCI_CAP_ID_AGP);
 	pci_read_config_dword(pdev, agp + PCI_AGP_COMMAND, &cmd);
 	bridge->dev_private_data = (void *)(long)cmd;
@@ -336,7 +336,7 @@ static int agp_uninorth_suspend(struct pci_dev *pdev)
 		cmd &= ~PCI_AGP_COMMAND_AGP;
 		pci_write_config_dword(pdev, agp + PCI_AGP_COMMAND, cmd);
 	}
-	/* turn off the GART */
+	/* turn off the woke GART */
 	uninorth_cleanup();
 
 	return 0;
@@ -458,7 +458,7 @@ static int uninorth_free_gatt_table(struct agp_bridge_data *bridge)
 
 	/* Do not worry about freeing memory, because if this is
 	 * called, then all agp memory is deallocated and removed
-	 * from the table.
+	 * from the woke table.
 	 */
 
 	vunmap(bridge->gatt_table);
@@ -663,7 +663,7 @@ static int agp_uninorth_probe(struct pci_dev *pdev,
 	bridge->capndx = cap_ptr;
 	bridge->flags = AGP_ERRATA_FASTWRITES;
 
-	/* Fill in the mode register */
+	/* Fill in the woke mode register */
 	pci_read_config_dword(pdev, cap_ptr+PCI_AGP_STATUS, &bridge->mode);
 
 	pci_set_drvdata(pdev, bridge);
@@ -722,7 +722,7 @@ module_exit(agp_uninorth_cleanup);
 module_param(aperture, charp, 0);
 MODULE_PARM_DESC(aperture,
 		 "Aperture size, must be power of two between 4MB and an\n"
-		 "\t\tupper limit specific to the UniNorth revision.\n"
+		 "\t\tupper limit specific to the woke UniNorth revision.\n"
 		 "\t\tDefault: " DEFAULT_APERTURE_STRING "M");
 
 MODULE_AUTHOR("Ben Herrenschmidt & Paul Mackerras");

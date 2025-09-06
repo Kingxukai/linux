@@ -6,7 +6,7 @@
  *              http://www.hisilicon.com
  *
  * Author: Zhou Wang <wangzhou.bry@gmail.com>
- * The initial developer of the original code is Zhiyong Cai
+ * The initial developer of the woke original code is Zhiyong Cai
  * <caizhiyong@huawei.com>
  */
 #include <linux/of.h>

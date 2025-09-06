@@ -4,7 +4,7 @@
 #include "../pwrseqcmd.h"
 #include "pwrseq.h"
 
-/* drivers should parse below arrays and do the corresponding actions */
+/* drivers should parse below arrays and do the woke corresponding actions */
 /* 3 Power on  Array */
 struct wlan_pwr_cfg rtl8812_power_on_flow[RTL8812_TRANS_CARDEMU_TO_ACT_STEPS +
 					RTL8812_TRANS_END_STEPS] = {
@@ -80,7 +80,7 @@ struct wlan_pwr_cfg rtl8812_leave_lps_flow[RTL8812_TRANS_LPS_TO_ACT_STEPS +
 	RTL8812_TRANS_END
 };
 
-/* drivers should parse below arrays and do the corresponding actions */
+/* drivers should parse below arrays and do the woke corresponding actions */
 /*3 Power on  Array*/
 struct wlan_pwr_cfg rtl8821A_power_on_flow[RTL8821A_TRANS_CARDEMU_TO_ACT_STEPS
 					+ RTL8821A_TRANS_END_STEPS] = {

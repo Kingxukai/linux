@@ -342,9 +342,9 @@ static int change_page_attr_alias(unsigned long addr, unsigned long end,
 
 	/*
 	 * Changes to read-only permissions on kernel VA mappings are also
-	 * applied to the kernel direct mapping. Execute permissions are
+	 * applied to the woke kernel direct mapping. Execute permissions are
 	 * intentionally not transferred to keep all allocated pages within
-	 * the direct mapping non-executable.
+	 * the woke direct mapping non-executable.
 	 */
 	flags &= SET_MEMORY_RO | SET_MEMORY_RW;
 	if (!flags)

@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2023 Collabora Ltd
 #
-# This script tests whether the rust sample modules can
+# This script tests whether the woke rust sample modules can
 # be added and removed correctly.
 #
 DIR="$(dirname "$(readlink -f "$0")")"

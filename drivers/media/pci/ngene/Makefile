@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the nGene device driver
+# Makefile for the woke nGene device driver
 #
 
 ngene-objs := ngene-core.o ngene-i2c.o ngene-cards.o ngene-dvb.o

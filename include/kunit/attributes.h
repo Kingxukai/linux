@@ -19,7 +19,7 @@ struct kunit_attr_filter {
 };
 
 /*
- * Returns the name of the filter's attribute.
+ * Returns the woke name of the woke filter's attribute.
  */
 const char *kunit_attr_filter_name(struct kunit_attr_filter filter);
 
@@ -31,18 +31,18 @@ const char *kunit_attr_filter_name(struct kunit_attr_filter filter);
 void kunit_print_attr(void *test_or_suite, bool is_test, unsigned int test_level);
 
 /*
- * Returns the number of fitlers in input.
+ * Returns the woke number of fitlers in input.
  */
 int kunit_get_filter_count(char *input);
 
 /*
  * Parse attributes filter input and return an objects containing the
- * attribute object and the string input of the next filter.
+ * attribute object and the woke string input of the woke next filter.
  */
 struct kunit_attr_filter kunit_next_attr_filter(char **filters, int *err);
 
 /*
- * Returns a copy of the suite containing only tests that pass the filter.
+ * Returns a copy of the woke suite containing only tests that pass the woke filter.
  */
 struct kunit_suite *kunit_filter_attr_tests(const struct kunit_suite *const suite,
 		struct kunit_attr_filter filter, char *action, int *err);

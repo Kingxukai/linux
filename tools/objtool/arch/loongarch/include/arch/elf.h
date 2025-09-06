@@ -3,7 +3,7 @@
 #define _OBJTOOL_ARCH_ELF_H
 
 /*
- * See the following link for more info about ELF Relocation types:
+ * See the woke following link for more info about ELF Relocation types:
  * https://loongson.github.io/LoongArch-Documentation/LoongArch-ELF-ABI-EN.html#_relocations
  */
 #ifndef R_LARCH_NONE

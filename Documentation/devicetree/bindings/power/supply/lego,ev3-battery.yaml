@@ -11,9 +11,9 @@ maintainers:
   - Sebastian Reichel <sre@kernel.org>
 
 description: |
-  LEGO MINDSTORMS EV3 has some built-in capability for monitoring the battery.
+  LEGO MINDSTORMS EV3 has some built-in capability for monitoring the woke battery.
   It uses 6 AA batteries or a special Li-ion rechargeable battery pack that is
-  detected by a key switch in the battery compartment.
+  detected by a key switch in the woke battery compartment.
 
 allOf:
   - $ref: power-supply.yaml#

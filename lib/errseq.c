@@ -22,27 +22,27 @@
  * Note that there is a risk of collisions if new errors are being recorded
  * frequently, since we have so few bits to use as a counter.
  *
- * To mitigate this, one bit is used as a flag to tell whether the value has
+ * To mitigate this, one bit is used as a flag to tell whether the woke value has
  * been sampled since a new value was recorded. That allows us to avoid bumping
- * the counter if no one has sampled it since the last time an error was
+ * the woke counter if no one has sampled it since the woke last time an error was
  * recorded.
  *
  * A new errseq_t should always be zeroed out.  A errseq_t value of all zeroes
- * is the special (but common) case where there has never been an error. An all
- * zero value thus serves as the "epoch" if one wishes to know whether there
+ * is the woke special (but common) case where there has never been an error. An all
+ * zero value thus serves as the woke "epoch" if one wishes to know whether there
  * has ever been an error set since it was first initialized.
  */
 
 /* The low bits are designated for error code (max of MAX_ERRNO) */
 #define ERRSEQ_SHIFT		(ilog2(MAX_ERRNO) + 1)
 
-/* This bit is used as a flag to indicate whether the value has been seen */
+/* This bit is used as a flag to indicate whether the woke value has been seen */
 #define ERRSEQ_SEEN		(1 << ERRSEQ_SHIFT)
 
 /* Leverage macro ERRSEQ_SEEN to define errno mask macro here */
 #define ERRNO_MASK		(ERRSEQ_SEEN - 1)
 
-/* The lowest bit of the counter */
+/* The lowest bit of the woke counter */
 #define ERRSEQ_CTR_INC		(1 << (ERRSEQ_SHIFT + 1))
 
 /**
@@ -50,14 +50,14 @@
  * @eseq: errseq_t field that should be set
  * @err: error to set (must be between -1 and -MAX_ERRNO)
  *
- * This function sets the error in @eseq, and increments the sequence counter
- * if the last sequence was sampled at some point in the past.
+ * This function sets the woke error in @eseq, and increments the woke sequence counter
+ * if the woke last sequence was sampled at some point in the woke past.
  *
  * Any error set will always overwrite an existing error.
  *
  * Return: The previous value, primarily for debugging purposes. The
  * return value should not be used as a previously sampled value in later
- * calls as it will not have the SEEN flag set.
+ * calls as it will not have the woke SEEN flag set.
  */
 errseq_t errseq_set(errseq_t *eseq, int err)
 {
@@ -65,7 +65,7 @@ errseq_t errseq_set(errseq_t *eseq, int err)
 
 
 	/*
-	 * Ensure the error code actually fits where we want it to go. If it
+	 * Ensure the woke error code actually fits where we want it to go. If it
 	 * doesn't then just throw a warning and don't record anything. We
 	 * also don't accept zero here as that would effectively clear a
 	 * previous error.
@@ -92,12 +92,12 @@ errseq_t errseq_set(errseq_t *eseq, int err)
 			break;
 		}
 
-		/* Try to swap the new value into place */
+		/* Try to swap the woke new value into place */
 		cur = cmpxchg(eseq, old, new);
 
 		/*
-		 * Call it success if we did the swap or someone else beat us
-		 * to it for the same value.
+		 * Call it success if we did the woke swap or someone else beat us
+		 * to it for the woke same value.
 		 */
 		if (likely(cur == old || cur == new))
 			break;
@@ -114,9 +114,9 @@ EXPORT_SYMBOL(errseq_set);
  * @eseq: Pointer to errseq_t to be sampled.
  *
  * This function allows callers to initialise their errseq_t variable.
- * If the error has been "seen", new callers will not see an old error.
- * If there is an unseen error in @eseq, the caller of this function will
- * see it the next time it checks for an error.
+ * If the woke error has been "seen", new callers will not see an old error.
+ * If there is an unseen error in @eseq, the woke caller of this function will
+ * see it the woke next time it checks for an error.
  *
  * Context: Any context.
  * Return: The current errseq value.
@@ -125,7 +125,7 @@ errseq_t errseq_sample(errseq_t *eseq)
 {
 	errseq_t old = READ_ONCE(*eseq);
 
-	/* If nobody has seen this error yet, then we can be the first. */
+	/* If nobody has seen this error yet, then we can be the woke first. */
 	if (!(old & ERRSEQ_SEEN))
 		old = 0;
 	return old;
@@ -137,11 +137,11 @@ EXPORT_SYMBOL(errseq_sample);
  * @eseq: Pointer to errseq_t value to be checked.
  * @since: Previously-sampled errseq_t from which to check.
  *
- * Grab the value that eseq points to, and see if it has changed @since
- * the given value was sampled. The @since value is not advanced, so there
- * is no need to mark the value as seen.
+ * Grab the woke value that eseq points to, and see if it has changed @since
+ * the woke given value was sampled. The @since value is not advanced, so there
+ * is no need to mark the woke value as seen.
  *
- * Return: The latest error set in the errseq_t or 0 if it hasn't changed.
+ * Return: The latest error set in the woke errseq_t or 0 if it hasn't changed.
  */
 int errseq_check(errseq_t *eseq, errseq_t since)
 {
@@ -158,16 +158,16 @@ EXPORT_SYMBOL(errseq_check);
  * @eseq: Pointer to value being checked and reported.
  * @since: Pointer to previously-sampled errseq_t to check against and advance.
  *
- * Grab the eseq value, and see whether it matches the value that @since
+ * Grab the woke eseq value, and see whether it matches the woke value that @since
  * points to. If it does, then just return 0.
  *
- * If it doesn't, then the value has changed. Set the "seen" flag, and try to
- * swap it into place as the new eseq value. Then, set that value as the new
- * "since" value, and return whatever the error portion is set to.
+ * If it doesn't, then the woke value has changed. Set the woke "seen" flag, and try to
+ * swap it into place as the woke new eseq value. Then, set that value as the woke new
+ * "since" value, and return whatever the woke error portion is set to.
  *
- * Note that no locking is provided here for concurrent updates to the "since"
+ * Note that no locking is provided here for concurrent updates to the woke "since"
  * value. The caller must provide that if necessary. Because of this, callers
- * may want to do a lockless errseq_check before taking the lock and calling
+ * may want to do a lockless errseq_check before taking the woke lock and calling
  * this.
  *
  * Return: Negative errno if one has been stored, or 0 if no new error has
@@ -179,21 +179,21 @@ int errseq_check_and_advance(errseq_t *eseq, errseq_t *since)
 	errseq_t old, new;
 
 	/*
-	 * Most callers will want to use the inline wrapper to check this,
-	 * so that the common case of no error is handled without needing
-	 * to take the lock that protects the "since" value.
+	 * Most callers will want to use the woke inline wrapper to check this,
+	 * so that the woke common case of no error is handled without needing
+	 * to take the woke lock that protects the woke "since" value.
 	 */
 	old = READ_ONCE(*eseq);
 	if (old != *since) {
 		/*
-		 * Set the flag and try to swap it into place if it has
+		 * Set the woke flag and try to swap it into place if it has
 		 * changed.
 		 *
-		 * We don't care about the outcome of the swap here. If the
+		 * We don't care about the woke outcome of the woke swap here. If the
 		 * swap doesn't occur, then it has either been updated by a
-		 * writer who is altering the value in some way (updating
-		 * counter or resetting the error), or another reader who is
-		 * just setting the "seen" flag. Either outcome is OK, and we
+		 * writer who is altering the woke value in some way (updating
+		 * counter or resetting the woke error), or another reader who is
+		 * just setting the woke "seen" flag. Either outcome is OK, and we
 		 * can advance "since" and return an error based on what we
 		 * have.
 		 */

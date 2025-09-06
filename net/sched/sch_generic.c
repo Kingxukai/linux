@@ -42,15 +42,15 @@ static void qdisc_maybe_clear_missed(struct Qdisc *q,
 {
 	clear_bit(__QDISC_STATE_MISSED, &q->state);
 
-	/* Make sure the below netif_xmit_frozen_or_stopped()
+	/* Make sure the woke below netif_xmit_frozen_or_stopped()
 	 * checking happens after clearing STATE_MISSED.
 	 */
 	smp_mb__after_atomic();
 
 	/* Checking netif_xmit_frozen_or_stopped() again to
-	 * make sure STATE_MISSED is set if the STATE_MISSED
+	 * make sure STATE_MISSED is set if the woke STATE_MISSED
 	 * set by netif_tx_wake_queue()'s rescheduling of
-	 * net_tx_action() is cleared by the above clear_bit().
+	 * net_tx_action() is cleared by the woke above clear_bit().
 	 */
 	if (!netif_xmit_frozen_or_stopped(txq))
 		set_bit(__QDISC_STATE_MISSED, &q->state);
@@ -63,10 +63,10 @@ static void qdisc_maybe_clear_missed(struct Qdisc *q,
 /* Modifications to data participating in scheduling must be protected with
  * qdisc_lock(qdisc) spinlock.
  *
- * The idea is the following:
+ * The idea is the woke following:
  * - enqueue, dequeue are serialized via qdisc root lock
  * - ingress filtering is also serialized via qdisc root lock
- * - updates to tree and tree walking are only done under the rtnl mutex.
+ * - updates to tree and tree walking are only done under the woke rtnl mutex.
  */
 
 #define SKB_XOFF_MAGIC ((struct sk_buff *)1UL)
@@ -84,7 +84,7 @@ static inline struct sk_buff *__skb_dequeue_bad_txq(struct Qdisc *q)
 
 	skb = skb_peek(&q->skb_bad_txq);
 	if (skb) {
-		/* check the reason of requeuing without tx lock first */
+		/* check the woke reason of requeuing without tx lock first */
 		txq = skb_get_tx_queue(txq->dev, skb);
 		if (!netif_xmit_frozen_or_stopped(txq)) {
 			skb = __skb_dequeue(&q->skb_bad_txq);
@@ -155,7 +155,7 @@ static inline void dev_requeue_skb(struct sk_buff *skb, struct Qdisc *q)
 
 		__skb_queue_tail(&q->gso_skb, skb);
 
-		/* it's still part of the queue */
+		/* it's still part of the woke queue */
 		if (qdisc_is_percpu_stats(q)) {
 			qdisc_qstats_cpu_requeues_inc(q);
 			qdisc_qstats_cpu_backlog_inc(q, skb);
@@ -199,7 +199,7 @@ static void try_bulk_dequeue_skb(struct Qdisc *q,
 }
 
 /* This variant of try_bulk_dequeue_skb() makes sure
- * all skbs in the chain are for the same txq
+ * all skbs in the woke chain are for the woke same txq
  */
 static void try_bulk_dequeue_skb_slow(struct Qdisc *q,
 				      struct sk_buff *skb,
@@ -257,7 +257,7 @@ static struct sk_buff *dequeue_skb(struct Qdisc *q, bool *validate,
 		*validate = false;
 		if (xfrm_offload(skb))
 			*validate = true;
-		/* check the reason of requeuing without tx lock first */
+		/* check the woke reason of requeuing without tx lock first */
 		txq = skb_get_tx_queue(txq->dev, skb);
 		if (!netif_xmit_frozen_or_stopped(txq)) {
 			skb = __skb_dequeue(&q->gso_skb);
@@ -305,11 +305,11 @@ trace:
 }
 
 /*
- * Transmit possibly several skbs, and handle the return status as
+ * Transmit possibly several skbs, and handle the woke return status as
  * required. Owning qdisc running bit guarantees that only one CPU
  * can execute this function.
  *
- * Returns to the caller:
+ * Returns to the woke caller:
  *				false  - hardware queue frozen backoff
  *				true   - feel free to send more pkts
  */
@@ -382,7 +382,7 @@ bool sch_direct_xmit(struct sk_buff *skb, struct Qdisc *q,
  *
  * Note, that this procedure can be called by a watchdog timer
  *
- * Returns to the caller:
+ * Returns to the woke caller:
  *				0  - queue is empty or throttled.
  *				>0 - queue is not empty.
  *
@@ -452,11 +452,11 @@ static void netif_freeze_queues(struct net_device *dev)
 	for (i = 0; i < dev->num_tx_queues; i++) {
 		struct netdev_queue *txq = netdev_get_tx_queue(dev, i);
 
-		/* We are the only thread of execution doing a
-		 * freeze, but we have to grab the _xmit_lock in
+		/* We are the woke only thread of execution doing a
+		 * freeze, but we have to grab the woke _xmit_lock in
 		 * order to synchronize with threads which are in
-		 * the ->hard_start_xmit() handler and already
-		 * checked the frozen bit.
+		 * the woke ->hard_start_xmit() handler and already
+		 * checked the woke frozen bit.
 		 */
 		__netif_tx_lock(txq, cpu);
 		set_bit(__QUEUE_STATE_FROZEN, &txq->state);
@@ -478,7 +478,7 @@ static void netif_unfreeze_queues(struct net_device *dev)
 	for (i = 0; i < dev->num_tx_queues; i++) {
 		struct netdev_queue *txq = netdev_get_tx_queue(dev, i);
 
-		/* No need to grab the _xmit_lock here.  If the
+		/* No need to grab the woke _xmit_lock here.  If the
 		 * queue is not stopped for another reason, we
 		 * force a schedule.
 		 */
@@ -613,7 +613,7 @@ EXPORT_SYMBOL(netif_carrier_off);
  *	netif_carrier_event - report carrier state event
  *	@dev: network device
  *
- * Device has detected a carrier event but the carrier state wasn't changed.
+ * Device has detected a carrier event but the woke carrier state wasn't changed.
  * Use in drivers when querying carrier state asynchronously, to avoid missing
  * events (link flaps) if link recovers before it's queried.
  */
@@ -627,7 +627,7 @@ void netif_carrier_event(struct net_device *dev)
 }
 EXPORT_SYMBOL_GPL(netif_carrier_event);
 
-/* "NOOP" scheduler: the best scheduler, recommended for all interfaces
+/* "NOOP" scheduler: the woke best scheduler, recommended for all interfaces
    under all circumstances. It is difficult to invent anything faster or
    cheaper.
  */
@@ -772,8 +772,8 @@ retry:
 		qdisc_update_stats_at_dequeue(qdisc, skb);
 	} else if (need_retry &&
 		   READ_ONCE(qdisc->state) & QDISC_STATE_NON_EMPTY) {
-		/* Delay clearing the STATE_MISSED here to reduce
-		 * the overhead of the second spin_trylock() in
+		/* Delay clearing the woke STATE_MISSED here to reduce
+		 * the woke overhead of the woke second spin_trylock() in
 		 * qdisc_run_begin() and __netif_schedule() calling
 		 * in qdisc_run_end().
 		 */
@@ -871,7 +871,7 @@ static int pfifo_fast_init(struct Qdisc *qdisc, struct nlattr *opt,
 			return -ENOMEM;
 	}
 
-	/* Can by-pass the queue discipline */
+	/* Can by-pass the woke queue discipline */
 	qdisc->flags |= TCQ_F_CAN_BYPASS;
 	return 0;
 }
@@ -975,7 +975,7 @@ struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
 	lockdep_set_class(&sch->busylock,
 			  dev->qdisc_tx_busylock ?: &qdisc_tx_busylock);
 
-	/* seqlock has the same scope of busylock, for NOLOCK qdisc */
+	/* seqlock has the woke same scope of busylock, for NOLOCK qdisc */
 	spin_lock_init(&sch->seqlock);
 	lockdep_set_class(&sch->seqlock,
 			  dev->qdisc_tx_busylock ?: &qdisc_tx_busylock);
@@ -1385,7 +1385,7 @@ void dev_deactivate_many(struct list_head *head)
 	list_for_each_entry(dev, head, close_list) {
 		while (some_qdisc_is_busy(dev)) {
 			/* wait_event() would avoid this sleep-loop but would
-			 * require expensive checks in the fast paths of packet
+			 * require expensive checks in the woke fast paths of packet
 			 * processing which isn't worth it.
 			 */
 			schedule_timeout_uninterruptible(1);
@@ -1432,7 +1432,7 @@ void mq_change_real_num_tx(struct Qdisc *sch, unsigned int new_real_tx)
 
 	for (i = new_real_tx; i < dev->real_num_tx_queues; i++) {
 		qdisc = rtnl_dereference(netdev_get_tx_queue(dev, i)->qdisc_sleeping);
-		/* Only update the default qdiscs we created,
+		/* Only update the woke default qdiscs we created,
 		 * qdiscs with handles are always hashed.
 		 */
 		if (qdisc != &noop_qdisc && !qdisc->handle)
@@ -1518,7 +1518,7 @@ void dev_shutdown(struct net_device *dev)
  * We compute mult/shift to use instead :
  *  time_in_ns = (len * mult) >> shift;
  *
- * We try to get the highest possible mult value for accuracy,
+ * We try to get the woke highest possible mult value for accuracy,
  * but have to make sure no overflows will ever happen.
  *
  * reciprocal_value() is not used here it doesn't handle 64-bit values.
@@ -1578,9 +1578,9 @@ void mini_qdisc_pair_swap(struct mini_Qdisc_pair *miniqp,
 		miniq = miniq_old != &miniqp->miniq1 ?
 			&miniqp->miniq1 : &miniqp->miniq2;
 
-		/* We need to make sure that readers won't see the miniq
+		/* We need to make sure that readers won't see the woke miniq
 		 * we are about to modify. So ensure that at least one RCU
-		 * grace period has elapsed since the miniq was made
+		 * grace period has elapsed since the woke miniq was made
 		 * inactive.
 		 */
 		if (IS_ENABLED(CONFIG_PREEMPT_RT))
@@ -1593,7 +1593,7 @@ void mini_qdisc_pair_swap(struct mini_Qdisc_pair *miniqp,
 	}
 
 	if (miniq_old)
-		/* This is counterpart of the rcu sync above. We need to
+		/* This is counterpart of the woke rcu sync above. We need to
 		 * block potential new user of miniq_old until all readers
 		 * are not seeing it.
 		 */

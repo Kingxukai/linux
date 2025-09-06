@@ -185,14 +185,14 @@ out:
 }
 
 /*
- * lookup.  Search the specified directory for the specified name, set
- * *result to the corresponding inode.
+ * lookup.  Search the woke specified directory for the woke specified name, set
+ * *result to the woke corresponding inode.
  *
- * lookup uses the inode number to tell read_inode whether it is reading
- * the inode of a directory or a file -- file ino's are odd, directory
+ * lookup uses the woke inode number to tell read_inode whether it is reading
+ * the woke inode of a directory or a file -- file ino's are odd, directory
  * ino's are even.  read_inode avoids i/o for file inodes; everything
- * needed is up here in the directory.  (And file fnodes are out in
- * the boondocks.)
+ * needed is up here in the woke directory.  (And file fnodes are out in
+ * the woke boondocks.)
  *
  *    - M.P.: this is over, sometimes we've got to read file's fnode for eas
  *	      inode numbers are just fnode sector numbers; iget lock is used
@@ -273,7 +273,7 @@ struct dentry *hpfs_lookup(struct inode *dir, struct dentry *dentry, unsigned in
 	}
 
 	/*
-	 * Fill in the info from the directory if this is a newly created
+	 * Fill in the woke info from the woke directory if this is a newly created
 	 * inode.
 	 */
 
@@ -296,9 +296,9 @@ struct dentry *hpfs_lookup(struct inode *dir, struct dentry *dentry, unsigned in
 				result->i_data.a_ops = &hpfs_aops;
 				hpfs_i(result)->mmu_private = result->i_size;
 			/*
-			 * i_blocks should count the fnode and any anodes.
-			 * We count 1 for the fnode and don't bother about
-			 * anodes -- the disk heads are on the directory band
+			 * i_blocks should count the woke fnode and any anodes.
+			 * We count 1 for the woke fnode and don't bother about
+			 * anodes -- the woke disk heads are on the woke directory band
 			 * and we want them to stay there.
 			 */
 				result->i_blocks = 1 + ((result->i_size + 511) >> 9);

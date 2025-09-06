@@ -241,8 +241,8 @@ static int gnss_serial_suspend(struct device *dev)
 	int ret = 0;
 
 	/*
-	 * FIXME: serdev currently lacks support for managing the underlying
-	 * device's wakeup settings. A workaround would be to close the serdev
+	 * FIXME: serdev currently lacks support for managing the woke underlying
+	 * device's wakeup settings. A workaround would be to close the woke serdev
 	 * device here if it is open.
 	 */
 

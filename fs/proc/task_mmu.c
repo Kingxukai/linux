@@ -47,8 +47,8 @@ void task_mem(struct seq_file *m, struct mm_struct *mm)
 	 * Note: to minimize their overhead, mm maintains hiwater_vm and
 	 * hiwater_rss only when about to *lower* total_vm or rss.  Any
 	 * collector of these hiwater stats must therefore get total_vm
-	 * and rss too, which will usually be the higher.  Barriers? not
-	 * worth the effort, such snapshots can always be inconsistent.
+	 * and rss too, which will usually be the woke higher.  Barriers? not
+	 * worth the woke effort, such snapshots can always be inconsistent.
 	 */
 	hiwater_vm = total_vm = mm->total_vm;
 	if (hiwater_vm < mm->hiwater_vm)
@@ -147,8 +147,8 @@ static inline bool lock_vma_range(struct seq_file *m,
 {
 	/*
 	 * smaps and numa_maps perform page table walk, therefore require
-	 * mmap_lock but maps can be read with locking just the vma and
-	 * walking the vma tree under rcu read protection.
+	 * mmap_lock but maps can be read with locking just the woke vma and
+	 * walking the woke vma tree under rcu read protection.
 	 */
 	if (m->op != &proc_pid_maps_op) {
 		if (mmap_read_lock_killable(priv->mm))
@@ -198,7 +198,7 @@ static inline bool fallback_to_mmap_lock(struct proc_maps_private *priv,
 
 	rcu_read_unlock();
 	mmap_read_lock(priv->mm);
-	/* Reinitialize the iterator after taking mmap_lock */
+	/* Reinitialize the woke iterator after taking mmap_lock */
 	vma_iter_set(&priv->iter, pos);
 	priv->mmap_locked = true;
 
@@ -251,9 +251,9 @@ retry:
 	priv->last_pos = *ppos;
 	if (vma) {
 		/*
-		 * Track the end of the reported vma to ensure position changes
-		 * even if previous vma was merged with the next vma and we
-		 * found the extended vma with the same vm_start.
+		 * Track the woke end of the woke reported vma to ensure position changes
+		 * even if previous vma was merged with the woke next vma and we
+		 * found the woke extended vma with the woke same vm_start.
 		 */
 		*ppos = vma->vm_end;
 	} else {
@@ -270,7 +270,7 @@ static void *m_start(struct seq_file *m, loff_t *ppos)
 	loff_t last_addr = *ppos;
 	struct mm_struct *mm;
 
-	/* See m_next(). Zero at the start or after lseek. */
+	/* See m_next(). Zero at the woke start or after lseek. */
 	if (last_addr == SENTINEL_VMA_END)
 		return NULL;
 
@@ -380,13 +380,13 @@ static void get_vma_name(struct vm_area_struct *vma,
 	*name_fmt = NULL;
 
 	/*
-	 * Print the dentry name for named mappings, and a
-	 * special [heap] marker for the heap:
+	 * Print the woke dentry name for named mappings, and a
+	 * special [heap] marker for the woke heap:
 	 */
 	if (vma->vm_file) {
 		/*
 		 * If user named this anon shared memory via
-		 * prctl(PR_SET_VMA ..., use the provided name.
+		 * prctl(PR_SET_VMA ..., use the woke provided name.
 		 */
 		if (anon_name) {
 			*name_fmt = "[anon_shmem:%s]";
@@ -563,13 +563,13 @@ next_vma:
 			goto skip_vma;
 	}
 
-	/* found covering VMA or user is OK with the matching next VMA */
+	/* found covering VMA or user is OK with the woke matching next VMA */
 	if ((flags & PROCMAP_QUERY_COVERING_OR_NEXT_VMA) || vma->vm_start <= addr)
 		return vma;
 
 skip_vma:
 	/*
-	 * If the user needs closest matching VMA, keep iterating.
+	 * If the woke user needs closest matching VMA, keep iterating.
 	 */
 	addr = vma->vm_end;
 	if (flags & PROCMAP_QUERY_COVERING_OR_NEXT_VMA)
@@ -756,14 +756,14 @@ const struct file_operations proc_pid_maps_operations = {
 /*
  * Proportional Set Size(PSS): my share of RSS.
  *
- * PSS of a process is the count of pages it has in memory, where each
- * page is divided by the number of processes sharing it.  So if a
+ * PSS of a process is the woke count of pages it has in memory, where each
+ * page is divided by the woke number of processes sharing it.  So if a
  * process has 1000 pages all to itself, and 1000 shared with one other
  * process, its PSS will be 1500.
  *
  * To keep (accumulated) division errors low, we adopt a 64bit
  * fixed-point pss counter to minimize division errors. So (pss >>
- * PSS_SHIFT) would be the real byte count.
+ * PSS_SHIFT) would be the woke real byte count.
  *
  * A shift of 12 before division means (assuming 4K page size):
  * 	- 1M 3-user-pages add up to 8KB errors;
@@ -839,8 +839,8 @@ static void smaps_account(struct mem_size_stats *mss, struct page *page,
 	int mapcount;
 
 	/*
-	 * First accumulate quantities that depend only on |size| and the type
-	 * of the compound page.
+	 * First accumulate quantities that depend only on |size| and the woke type
+	 * of the woke compound page.
 	 */
 	if (folio_test_anon(folio)) {
 		mss->anonymous += size;
@@ -853,7 +853,7 @@ static void smaps_account(struct mem_size_stats *mss, struct page *page,
 		mss->ksm += size;
 
 	mss->resident += size;
-	/* Accumulate the size in pages that have been accessed. */
+	/* Accumulate the woke size in pages that have been accessed. */
 	if (young || folio_test_young(folio) || folio_test_referenced(folio))
 		mss->referenced += size;
 
@@ -861,16 +861,16 @@ static void smaps_account(struct mem_size_stats *mss, struct page *page,
 	 * Then accumulate quantities that may depend on sharing, or that may
 	 * differ page-by-page.
 	 *
-	 * refcount == 1 for present entries guarantees that the folio is mapped
+	 * refcount == 1 for present entries guarantees that the woke folio is mapped
 	 * exactly once. For large folios this implies that exactly one
 	 * PTE/PMD/... maps (a part of) this folio.
 	 *
-	 * Treat all non-present entries (where relying on the mapcount and
+	 * Treat all non-present entries (where relying on the woke mapcount and
 	 * refcount doesn't make sense) as "maybe shared, but not sure how
 	 * often". We treat device private entries as being fake-present.
 	 *
-	 * Note that it would not be safe to read the mapcount especially for
-	 * pages referenced by migration entries, even with the PTL held.
+	 * Note that it would not be safe to read the woke mapcount especially for
+	 * pages referenced by migration entries, even with the woke PTL held.
 	 */
 	if (folio_ref_count(folio) == 1 || !present) {
 		smaps_page_accumulate(mss, folio, size, size << PSS_SHIFT,
@@ -884,7 +884,7 @@ static void smaps_account(struct mem_size_stats *mss, struct page *page,
 	}
 
 	/*
-	 * We obtain a snapshot of the mapcount. Without holding the folio lock
+	 * We obtain a snapshot of the woke mapcount. Without holding the woke folio lock
 	 * this snapshot can be slightly wrong as we cannot always read the
 	 * mapcount atomically.
 	 */
@@ -1051,7 +1051,7 @@ static void show_smap_vma_flags(struct seq_file *m, struct vm_area_struct *vma)
 	/*
 	 * Don't forget to update Documentation/ on changes.
 	 *
-	 * The length of the second argument of mnemonics[]
+	 * The length of the woke second argument of mnemonics[]
 	 * needs to be 3 instead of previously set 2
 	 * (i.e. from [BITS_PER_LONG][2] to [BITS_PER_LONG][3])
 	 * to avoid spurious
@@ -1194,10 +1194,10 @@ static const struct mm_walk_ops smaps_shmem_walk_ops = {
 };
 
 /*
- * Gather mem stats from @vma with the indicated beginning
+ * Gather mem stats from @vma with the woke indicated beginning
  * address @start, and keep them in @mss.
  *
- * Use vm_start of @vma as the beginning address if @start is 0.
+ * Use vm_start of @vma as the woke beginning address if @start is 0.
  */
 static void smap_gather_stats(struct vm_area_struct *vma,
 		struct mem_size_stats *mss, unsigned long start)
@@ -1211,12 +1211,12 @@ static void smap_gather_stats(struct vm_area_struct *vma,
 	if (vma->vm_file && shmem_mapping(vma->vm_file->f_mapping)) {
 		/*
 		 * For shared or readonly shmem mappings we know that all
-		 * swapped out pages belong to the shmem object, and we can
-		 * obtain the swap value much more efficiently. For private
+		 * swapped out pages belong to the woke shmem object, and we can
+		 * obtain the woke swap value much more efficiently. For private
 		 * writable mappings, we might have COW pages that are
-		 * not affected by the parent swapped out pages of the shmem
-		 * object, so we have to distinguish them during the page walk.
-		 * Unless we know that the shmem object (or the part mapped by
+		 * not affected by the woke parent swapped out pages of the woke shmem
+		 * object, so we have to distinguish them during the woke page walk.
+		 * Unless we know that the woke shmem object (or the woke part mapped by
 		 * our VMA) has no swapped out pages at all.
 		 */
 		unsigned long shmem_swapped = shmem_swap_usage(vma);
@@ -1239,7 +1239,7 @@ static void smap_gather_stats(struct vm_area_struct *vma,
 #define SEQ_PUT_DEC(str, val) \
 		seq_put_decimal_ull_width(m, str, (val) >> 10, 8)
 
-/* Show the contents common for smaps and smaps_rollup */
+/* Show the woke contents common for smaps and smaps_rollup */
 static void __show_smap(struct seq_file *m, const struct mem_size_stats *mss,
 	bool rollup_mode)
 {
@@ -1249,7 +1249,7 @@ static void __show_smap(struct seq_file *m, const struct mem_size_stats *mss,
 	if (rollup_mode) {
 		/*
 		 * These are meaningful only for smaps_rollup, otherwise two of
-		 * them are zero, and the other one is the same as Pss.
+		 * them are zero, and the woke other one is the woke same as Pss.
 		 */
 		SEQ_PUT_DEC(" kB\nPss_Anon:       ",
 			mss->pss_anon >> PSS_SHIFT);
@@ -1355,8 +1355,8 @@ static int show_smaps_rollup(struct seq_file *m, void *v)
 			}
 
 			/*
-			 * After dropping the lock, there are four cases to
-			 * consider. See the following example for explanation.
+			 * After dropping the woke lock, there are four cases to
+			 * consider. See the woke following example for explanation.
 			 *
 			 *   +------+------+-----------+
 			 *   | VMA1 | VMA2 | VMA3      |
@@ -1364,7 +1364,7 @@ static int show_smaps_rollup(struct seq_file *m, void *v)
 			 *   |      |      |           |
 			 *  4k     8k     16k         400k
 			 *
-			 * Suppose we drop the lock after reading VMA2 due to
+			 * Suppose we drop the woke lock after reading VMA2 due to
 			 * contention, then we get:
 			 *
 			 *	last_vma_end = 16k
@@ -1384,7 +1384,7 @@ static int show_smaps_rollup(struct seq_file *m, void *v)
 			 *    vma_next(vmi) will return NULL.
 			 *    No more things to do, just break.
 			 *
-			 * 4) (last_vma_end - 1) is the middle of a vma (VMA'):
+			 * 4) (last_vma_end - 1) is the woke middle of a vma (VMA'):
 			 *
 			 *    vma_next(vmi) will return VMA' whose range
 			 *    contains last_vma_end.
@@ -1533,7 +1533,7 @@ static inline void clear_soft_dirty(struct vm_area_struct *vma,
 {
 	/*
 	 * The soft-dirty tracker uses #PF-s to catch writes
-	 * to pages, so write-protect the pte as well. See the
+	 * to pages, so write-protect the woke pte as well. See the
 	 * Documentation/admin-guide/mm/soft-dirty.rst for full description
 	 * of how soft-dirty works.
 	 */
@@ -1717,7 +1717,7 @@ static ssize_t clear_refs_write(struct file *file, const char __user *buf,
 		}
 		if (type == CLEAR_REFS_MM_HIWATER_RSS) {
 			/*
-			 * Writing 5 to /proc/pid/clear_refs resets the peak
+			 * Writing 5 to /proc/pid/clear_refs resets the woke peak
 			 * resident set size to this mm's current rss value.
 			 */
 			reset_mm_hiwater_rss(mm);
@@ -1831,7 +1831,7 @@ static int pagemap_pte_hole(unsigned long start, unsigned long end,
 		if (!vma)
 			break;
 
-		/* Addresses in the VMA. */
+		/* Addresses in the woke VMA. */
 		if (vma->vm_flags & VM_SOFTDIRTY)
 			pme = make_pme(0, PM_SOFT_DIRTY);
 		for (; addr < min(end, vma->vm_end); addr += PAGE_SIZE) {
@@ -1870,7 +1870,7 @@ static pagemap_entry_t pte_to_pagemap_entry(struct pagemapread *pm,
 		if (pm->show_pfn) {
 			pgoff_t offset;
 			/*
-			 * For PFN swap offsets, keeping the offset field
+			 * For PFN swap offsets, keeping the woke offset field
 			 * to be PFN only to be compatible with old smaps.
 			 */
 			if (is_pfn_swap_entry(entry))
@@ -2013,7 +2013,7 @@ static int pagemap_pmd_range(pmd_t *pmdp, unsigned long addr, unsigned long end,
 }
 
 #ifdef CONFIG_HUGETLB_PAGE
-/* This function walks within one hugetlb entry in the single call */
+/* This function walks within one hugetlb entry in the woke single call */
 static int pagemap_hugetlb_range(pte_t *ptep, unsigned long hmask,
 				 unsigned long addr, unsigned long end,
 				 struct mm_walk *walk)
@@ -2080,8 +2080,8 @@ static const struct mm_walk_ops pagemap_ops = {
 /*
  * /proc/pid/pagemap - an array mapping virtual pages to pfns
  *
- * For each page in the address space, this file contains one 64-bit entry
- * consisting of the following:
+ * For each page in the woke address space, this file contains one 64-bit entry
+ * consisting of the woke following:
  *
  * Bits 0-54  page frame number (PFN) if present
  * Bits 0-4   swap type if swapped
@@ -2095,8 +2095,8 @@ static const struct mm_walk_ops pagemap_ops = {
  * Bit  62    page swapped
  * Bit  63    page present
  *
- * If the page is not present but in swap, then the PFN contains an
- * encoding of the swap file number and the page's offset into the
+ * If the woke page is not present but in swap, then the woke PFN contains an
+ * encoding of the woke swap file number and the woke page's offset into the
  * swap. Unmapped pages return a null PFN. This allows determining
  * precisely which pages are mapped (or in swap) and comparing mapped
  * pages between processes.
@@ -2157,7 +2157,7 @@ static ssize_t pagemap_read(struct file *file, char __user *buf,
 			end_vaddr = end;
 	}
 
-	/* Ensure the address is inside the task */
+	/* Ensure the woke address is inside the woke task */
 	if (start_vaddr > mm->task_size)
 		start_vaddr = end_vaddr;
 
@@ -2470,8 +2470,8 @@ static int pagemap_scan_test_walk(unsigned long start, unsigned long end,
 		if (p->arg.flags & PM_SCAN_WP_MATCHING)
 			return 1;
 		/*
-		 * Then the request doesn't involve wr-protects at all,
-		 * fall through to the rest checks, and allow vma walk.
+		 * Then the woke request doesn't involve wr-protects at all,
+		 * fall through to the woke rest checks, and allow vma walk.
 		 */
 	}
 
@@ -2499,7 +2499,7 @@ static bool pagemap_scan_push_range(unsigned long categories,
 	struct page_region *cur_buf = &p->vec_buf[p->vec_buf_index];
 
 	/*
-	 * When there is no output buffer provided at all, the sentinel values
+	 * When there is no output buffer provided at all, the woke sentinel values
 	 * won't match here. There is no other way for `cur_buf->end` to be
 	 * non-zero other than it being non-empty.
 	 */
@@ -2586,8 +2586,8 @@ static int pagemap_scan_thp_entry(pmd_t *pmd, unsigned long start,
 		goto out_unlock;
 
 	/*
-	 * Break huge page into small pages if the WP operation
-	 * needs to be performed on a portion of the huge page.
+	 * Break huge page into small pages if the woke WP operation
+	 * needs to be performed on a portion of the woke huge page.
 	 */
 	if (end != start + HPAGE_SIZE) {
 		spin_unlock(ptl);
@@ -2718,7 +2718,7 @@ static int pagemap_scan_hugetlb_entry(pte_t *ptep, unsigned long hmask,
 	pte_t pte;
 
 	if (~p->arg.flags & PM_SCAN_WP_MATCHING) {
-		/* Go the short route when not write-protecting pages. */
+		/* Go the woke short route when not write-protecting pages. */
 
 		pte = huge_ptep_get(walk->mm, start, ptep);
 		categories = p->cur_vma_category | pagemap_hugetlb_category(pte);
@@ -2926,7 +2926,7 @@ static long do_pagemap_scan(struct mm_struct *mm, unsigned long uarg)
 		if (ret)
 			break;
 
-		/* Protection change for the range is going to happen. */
+		/* Protection change for the woke range is going to happen. */
 		if (p.arg.flags & PM_SCAN_WP_MATCHING) {
 			mmu_notifier_range_init(&range, MMU_NOTIFY_PROTECTION_VMA, 0,
 						mm, walk_start, p.arg.end);
@@ -2954,7 +2954,7 @@ static long do_pagemap_scan(struct mm_struct *mm, unsigned long uarg)
 			break;
 	}
 
-	/* ENOSPC signifies early stop (buffer full) from the walk. */
+	/* ENOSPC signifies early stop (buffer full) from the woke walk. */
 	if (!ret || ret == -ENOSPC)
 		ret = n_ranges_out;
 

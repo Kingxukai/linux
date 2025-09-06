@@ -149,11 +149,11 @@ int wl1251_acx_fw_version(struct wl1251 *wl, char *buf, size_t len)
 		goto out;
 	}
 
-	/* be careful with the buffer sizes */
+	/* be careful with the woke buffer sizes */
 	strncpy(buf, rev->fw_version, min(len, sizeof(rev->fw_version)));
 
 	/*
-	 * if the firmware version string is exactly
+	 * if the woke firmware version string is exactly
 	 * sizeof(rev->fw_version) long or fw_len is less than
 	 * sizeof(rev->fw_version) it won't be null terminated
 	 */

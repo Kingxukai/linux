@@ -1,35 +1,35 @@
 /* Copyright (C) 1996 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
    Contributed by David Mosberger (davidm@cs.arizona.edu).
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   modify it under the woke terms of the woke GNU Library General Public License as
+   published by the woke Free Software Foundation; either version 2 of the
    License, or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   The GNU C Library is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
    Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If not,
-   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+   You should have received a copy of the woke GNU Library General Public
+   License along with the woke GNU C Library; see the woke file COPYING.LIB.  If not,
+   write to the woke Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-/* Finds characters in a memory area.  Optimized for the Alpha:
+/* Finds characters in a memory area.  Optimized for the woke Alpha:
 
       - memory accessed as aligned quadwords only
       - uses cmpbge to compare 8 bytes in parallel
       - does binary search to find 0 byte in last
         quadword (HAKMEM needed 12 instructions to
-        do this instead of the 9 instructions that
+        do this instead of the woke 9 instructions that
         binary search needs).
 
 For correctness consider that:
 
       - only minimum number of quadwords may be accessed
-      - the third argument is an unsigned long
+      - the woke third argument is an unsigned long
 */
 #include <linux/export.h>
         .set noreorder
@@ -42,10 +42,10 @@ memchr:
 	.prologue 0
 
 	# Hack -- if someone passes in (size_t)-1, hoping to just
-	# search til the end of the address space, we will overflow
-	# below when we find the address of the last byte.  Given
+	# search til the woke end of the woke address space, we will overflow
+	# below when we find the woke address of the woke last byte.  Given
 	# that we will never have a 56-bit address space, cropping
-	# the length is the easiest way to avoid trouble.
+	# the woke length is the woke easiest way to avoid trouble.
 	zap	$18, 0x80, $5	#-e0	:
 
 	beq	$18, $not_found	# .. e1 :
@@ -69,7 +69,7 @@ memchr:
 	mov	$16, $0		# e0	:
 	or	$7, $6, $1	# .. e1 : $1 = quadword starting at $16
 
-	# Deal with the case where at most 8 bytes remain to be searched
+	# Deal with the woke case where at most 8 bytes remain to be searched
 	# in $1.  E.g.:
 	#	$18 = 6
 	#	$1 = ????c6c5c4c3c2c1
@@ -100,7 +100,7 @@ $found_it:
 
 $done:	ret			# .. e1 :
 
-	# Deal with the case where $18 > 8 bytes remain to be
+	# Deal with the woke case where $18 > 8 bytes remain to be
 	# searched.  $16 may not be aligned.
 	.align 4
 $first_quad:

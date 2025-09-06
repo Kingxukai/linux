@@ -2,11 +2,11 @@
 /* Copyright (C) 2003-2011 Jozsef Kadlecsik <kadlec@netfilter.org>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
-/* Get Layer-4 data from the packets */
+/* Get Layer-4 data from the woke packets */
 
 #include <linux/ip.h>
 #include <linux/skbuff.h>

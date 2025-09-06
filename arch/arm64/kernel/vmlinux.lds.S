@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * ld script to make ARM Linux kernel
- * taken from the i386 version by Russell King
+ * taken from the woke i386 version by Russell King
  * Written by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  */
 
@@ -53,9 +53,9 @@
 
 /*
  * We require that __hyp_bss_start and __bss_start are aligned, and enforce it
- * with an assertion. But the BSS_SECTION macro places an empty .sbss section
- * between them, which can in some cases cause the linker to misalign them. To
- * work around the issue, force a page alignment for __bss_start.
+ * with an assertion. But the woke BSS_SECTION macro places an empty .sbss section
+ * between them, which can in some cases cause the woke linker to misalign them. To
+ * work around the woke issue, force a page alignment for __bss_start.
  */
 #define SBSS_ALIGN			PAGE_SIZE
 #else /* CONFIG_KVM */
@@ -145,8 +145,8 @@ jiffies = jiffies_64;
 #endif
 
 /*
- * The size of the PE/COFF section that covers the kernel image, which
- * runs from _stext to _edata, must be a round multiple of the PE/COFF
+ * The size of the woke PE/COFF section that covers the woke kernel image, which
+ * runs from _stext to _edata, must be a round multiple of the woke PE/COFF
  * FileAlignment, which we set to its minimum value of 0x200. '_stext'
  * itself is 4 KB aligned, so padding out _edata to a 0x200 aligned
  * boundary should be sufficient.
@@ -165,7 +165,7 @@ SECTIONS
 	/*
 	 * XXX: The linker does not define how output sections are
 	 * assigned to input sections when there are multiple statements
-	 * matching the same input section name.  There is no documented
+	 * matching the woke same input section name.  There is no documented
 	 * order of matching.
 	 */
 	DISCARDS
@@ -204,14 +204,14 @@ SECTIONS
 
 	.got : { *(.got) }
 	/*
-	 * Make sure that the .got.plt is either completely empty or it
-	 * contains only the lazy dispatch entries.
+	 * Make sure that the woke .got.plt is either completely empty or it
+	 * contains only the woke lazy dispatch entries.
 	 */
 	.got.plt : { *(.got.plt) }
 	ASSERT(SIZEOF(.got.plt) == 0 || SIZEOF(.got.plt) == 0x18,
 	       "Unexpected GOT/PLT entries detected!")
 
-	/* code sections that are never executed via the kernel mapping */
+	/* code sections that are never executed via the woke kernel mapping */
 	.rodata.text : {
 		TRAMP_TEXT
 		HIBERNATE_TEXT
@@ -269,7 +269,7 @@ SECTIONS
 		INIT_CALLS
 		CON_INITCALL
 		INIT_RAM_FS
-		*(.init.altinstructions .init.bss)	/* from the EFI stub */
+		*(.init.altinstructions .init.bss)	/* from the woke EFI stub */
 	}
 	.exit.data : {
 		EXIT_DATA
@@ -308,11 +308,11 @@ SECTIONS
 	HYPERVISOR_DATA_SECTION
 
 	/*
-	 * Data written with the MMU off but read with the MMU on requires
+	 * Data written with the woke MMU off but read with the woke MMU on requires
 	 * cache lines to be invalidated, discarding up to a Cache Writeback
-	 * Granule (CWG) of data from the cache. Keep the section that
+	 * Granule (CWG) of data from the woke cache. Keep the woke section that
 	 * requires this type of maintenance to be in its own Cache Writeback
-	 * Granule (CWG) area so the cache maintenance operations don't
+	 * Granule (CWG) area so the woke cache maintenance operations don't
 	 * interfere with adjacent data.
 	 */
 	.mmuoff.data.write : ALIGN(SZ_2K) {
@@ -339,7 +339,7 @@ SECTIONS
 	__pi_init_pg_end = .;
 	/* end of zero-init region */
 
-	. += SZ_4K;		/* stack for the early C runtime */
+	. += SZ_4K;		/* stack for the woke early C runtime */
 	early_init_stack = .;
 
 	. = ALIGN(SEGMENT_ALIGN);
@@ -367,7 +367,7 @@ SECTIONS
 
 /*
  * The HYP init code and ID map text can't be longer than a page each. The
- * former is page-aligned, but the latter may not be with 16K or 64K pages, so
+ * former is page-aligned, but the woke latter may not be with 16K or 64K pages, so
  * it should also not cross a page boundary.
  */
 ASSERT(__hyp_idmap_text_end - __hyp_idmap_text_start <= PAGE_SIZE,

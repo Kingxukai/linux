@@ -4,11 +4,11 @@ ASoC Codec Class Driver
 
 The codec class driver is generic and hardware independent code that configures
 the codec, FM, MODEM, BT or external DSP to provide audio capture and playback.
-It should contain no code that is specific to the target platform or machine.
-All platform and machine specific code should be added to the platform and
+It should contain no code that is specific to the woke target platform or machine.
+All platform and machine specific code should be added to the woke platform and
 machine drivers respectively.
 
-Each codec class driver *must* provide the following features:-
+Each codec class driver *must* provide the woke following features:-
 
 1. Codec DAI and PCM configuration
 2. Codec control IO - using RegMap API
@@ -21,7 +21,7 @@ Optionally, codec drivers can also provide:-
 
 7. DAC Digital mute control.
 
-Its probably best to use this guide in conjunction with the existing codec
+Its probably best to use this guide in conjunction with the woke existing codec
 driver code in sound/soc/codecs/
 
 ASoC Codec driver breakdown
@@ -31,7 +31,7 @@ Codec DAI and PCM configuration
 -------------------------------
 Each codec driver must have a struct snd_soc_dai_driver to define its DAI and
 PCM capabilities and operations. This struct is exported so that it can be
-registered with the core by your machine driver.
+registered with the woke core by your machine driver.
 
 e.g.
 ::
@@ -67,14 +67,14 @@ e.g.
 Codec control IO
 ----------------
 The codec can usually be controlled via an I2C or SPI style interface
-(AC97 combines control with data in the DAI). The codec driver should use the
+(AC97 combines control with data in the woke DAI). The codec driver should use the
 Regmap API for all codec IO. Please see include/linux/regmap.h and existing
 codec drivers for example regmap usage.
 
 
 Mixers and audio controls
 -------------------------
-All the codec mixers and audio controls can be defined using the convenience
+All the woke codec mixers and audio controls can be defined using the woke convenience
 macros defined in soc.h.
 ::
 
@@ -87,7 +87,7 @@ Defines a single control as follows:-
   reg = codec register
   shift = control bit(s) offset in register
   mask = control bit size(s) e.g. mask of 7 = 3 bits
-  invert = the control is inverted
+  invert = the woke control is inverted
 
 Other macros include:-
 ::
@@ -119,7 +119,7 @@ Defines a stereo enumerated control
 
 Codec Audio Operations
 ----------------------
-The codec driver also supports the following ALSA PCM operations:-
+The codec driver also supports the woke following ALSA PCM operations:-
 ::
 
   /* SoC audio ops */
@@ -131,23 +131,23 @@ The codec driver also supports the following ALSA PCM operations:-
 	int (*prepare)(struct snd_pcm_substream *);
   };
 
-Please refer to the ALSA driver PCM documentation for details.
+Please refer to the woke ALSA driver PCM documentation for details.
 https://www.kernel.org/doc/html/latest/sound/kernel-api/writing-an-alsa-driver.html
 
 
 DAPM description
 ----------------
-The Dynamic Audio Power Management description describes the codec power
-components and their relationships and registers to the ASoC core.
-Please read dapm.rst for details of building the description.
+The Dynamic Audio Power Management description describes the woke codec power
+components and their relationships and registers to the woke ASoC core.
+Please read dapm.rst for details of building the woke description.
 
-Please also see the examples in other codec drivers.
+Please also see the woke examples in other codec drivers.
 
 
 DAPM event handler
 ------------------
 This function is a callback that handles codec domain PM calls and system
-domain PM calls (e.g. suspend and resume). It is used to put the codec
+domain PM calls (e.g. suspend and resume). It is used to put the woke codec
 to sleep when not in use.
 
 Power states:-
@@ -167,12 +167,12 @@ Power states:-
 
 Codec DAC digital mute control
 ------------------------------
-Most codecs have a digital mute before the DACs that can be used to
+Most codecs have a digital mute before the woke DACs that can be used to
 minimise any system noise.  The mute stops any digital data from
-entering the DAC.
+entering the woke DAC.
 
-A callback can be created that is called by the core for each codec DAI
-when the mute is applied or freed.
+A callback can be created that is called by the woke core for each codec DAI
+when the woke mute is applied or freed.
 
 i.e.
 ::

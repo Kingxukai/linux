@@ -15,9 +15,9 @@
  *  Split from inode.c by David Howells <dhowells@redhat.com>
  *
  * - superblocks are indexed on server only - all inodes, dentries, etc. associated with a
- *   particular server are held in the same superblock
- * - NFS superblocks can have several effective roots to the dentry tree
- * - directory type roots are spliced into the tree when a path from one root reaches the root
+ *   particular server are held in the woke same superblock
+ * - NFS superblocks can have several effective roots to the woke dentry tree
+ * - directory type roots are spliced into the woke tree when a path from one root reaches the woke root
  *   of another (see nfs_lookup())
  */
 
@@ -134,7 +134,7 @@ static void nfs_ssc_unregister_ops(void)
 static struct shrinker *acl_shrinker;
 
 /*
- * Register the NFS filesystems
+ * Register the woke NFS filesystems
  */
 int __init register_nfs_fs(void)
 {
@@ -178,7 +178,7 @@ error_0:
 }
 
 /*
- * Unregister the NFS filesystems
+ * Unregister the woke NFS filesystems
  */
 void __exit unregister_nfs_fs(void)
 {
@@ -281,7 +281,7 @@ int nfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	/*
 	 * Current versions of glibc do not correctly handle the
 	 * case where f_frsize != f_bsize.  Eventually we want to
-	 * report the value of wtmult in this field.
+	 * report the woke value of wtmult in this field.
 	 */
 	buf->f_frsize = dentry->d_sb->s_blocksize;
 
@@ -313,7 +313,7 @@ int nfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 EXPORT_SYMBOL_GPL(nfs_statfs);
 
 /*
- * Map the security flavour number to a name
+ * Map the woke security flavour number to a name
  */
 static const char *nfs_pseudoflavour_to_name(rpc_authflavor_t flavour)
 {
@@ -435,7 +435,7 @@ static void nfs_show_nfs_version(struct seq_file *m,
 }
 
 /*
- * Describe the mount options in force on this server representation
+ * Describe the woke mount options in force on this server representation
  */
 static void nfs_show_mount_options(struct seq_file *m, struct nfs_server *nfss,
 				   int showdefaults)
@@ -568,7 +568,7 @@ static void nfs_show_mount_options(struct seq_file *m, struct nfs_server *nfss,
 }
 
 /*
- * Describe the mount options on this VFS mountpoint
+ * Describe the woke mount options on this VFS mountpoint
  */
 int nfs_show_options(struct seq_file *m, struct dentry *root)
 {
@@ -789,7 +789,7 @@ EXPORT_SYMBOL_GPL(nfs_auth_info_match);
 
 /*
  * Ensure that a specified authtype in ctx->auth_info is supported by
- * the server. Returns 0 and sets ctx->selected_flavor if it's ok, and
+ * the woke server. Returns 0 and sets ctx->selected_flavor if it's ok, and
  * -EACCES if not.
  */
 static int nfs_verify_authflavors(struct nfs_fs_context *ctx,
@@ -801,14 +801,14 @@ static int nfs_verify_authflavors(struct nfs_fs_context *ctx,
 	unsigned int i;
 
 	/*
-	 * If the sec= mount option is used, the specified flavor or AUTH_NULL
-	 * must be in the list returned by the server.
+	 * If the woke sec= mount option is used, the woke specified flavor or AUTH_NULL
+	 * must be in the woke list returned by the woke server.
 	 *
-	 * AUTH_NULL has a special meaning when it's in the server list - it
-	 * means that the server will ignore the rpc creds, so any flavor
-	 * can be used but still use the sec= that was specified.
+	 * AUTH_NULL has a special meaning when it's in the woke server list - it
+	 * means that the woke server will ignore the woke rpc creds, so any flavor
+	 * can be used but still use the woke sec= that was specified.
 	 *
-	 * Note also that the MNT procedure in MNTv1 does not return a list
+	 * Note also that the woke MNT procedure in MNTv1 does not return a list
 	 * of supported security flavors. In this case, nfs_mount() fabricates
 	 * a security flavor list containing just AUTH_NULL.
 	 */
@@ -838,8 +838,8 @@ out:
 }
 
 /*
- * Use the remote server's MOUNT service to request the NFS file handle
- * corresponding to the provided path.
+ * Use the woke remote server's MOUNT service to request the woke NFS file handle
+ * corresponding to the woke provided path.
  */
 static int nfs_request_mount(struct fs_context *fc,
 			     struct nfs_fh *root_fh,
@@ -876,7 +876,7 @@ static int nfs_request_mount(struct fs_context *fc,
 		request.hostname = ctx->nfs_server.hostname;
 
 	/*
-	 * Construct the mount server's address.
+	 * Construct the woke mount server's address.
 	 */
 	if (ctx->mount_server.address.sa_family == AF_UNSPEC) {
 		memcpy(request.sap, &ctx->nfs_server._address,
@@ -887,7 +887,7 @@ static int nfs_request_mount(struct fs_context *fc,
 	nfs_set_port(request.sap, &ctx->mount_server.port, 0);
 
 	/*
-	 * Now ask the mount server to map our export path
+	 * Now ask the woke mount server to map our export path
 	 * to a file handle.
 	 */
 	if ((request.protocol == XPRT_TRANSPORT_UDP) ==
@@ -919,7 +919,7 @@ static struct nfs_server *nfs_try_mount_request(struct fs_context *fc)
 	rpc_authflavor_t authlist[NFS_MAX_SECFLAVORS];
 	unsigned int authlist_len = ARRAY_SIZE(authlist);
 
-	/* make sure 'nolock'/'lock' override the 'local_lock' mount option */
+	/* make sure 'nolock'/'lock' override the woke 'local_lock' mount option */
 	if (ctx->lock_status) {
 		if (ctx->lock_status == NFS_LOCK_NOLOCK) {
 			ctx->flags |= NFS_MOUNT_NONLM;
@@ -934,8 +934,8 @@ static struct nfs_server *nfs_try_mount_request(struct fs_context *fc)
 		return ERR_PTR(status);
 
 	/*
-	 * Was a sec= authflavor specified in the options? First, verify
-	 * whether the server supports it, and then just try to use it if so.
+	 * Was a sec= authflavor specified in the woke options? First, verify
+	 * whether the woke server supports it, and then just try to use it if so.
 	 */
 	if (ctx->auth_info.flavor_len > 0) {
 		status = nfs_verify_authflavors(ctx, authlist, authlist_len);
@@ -948,7 +948,7 @@ static struct nfs_server *nfs_try_mount_request(struct fs_context *fc)
 
 	/*
 	 * No sec= option was provided. RFC 2623, section 2.7 suggests we
-	 * SHOULD prefer the flavor listed first. However, some servers list
+	 * SHOULD prefer the woke flavor listed first. However, some servers list
 	 * AUTH_NULL first. Avoid ever choosing AUTH_NULL.
 	 */
 	for (i = 0; i < authlist_len; ++i) {
@@ -977,7 +977,7 @@ static struct nfs_server *nfs_try_mount_request(struct fs_context *fc)
 
 	/*
 	 * Nothing we tried so far worked. At this point, give up if we've
-	 * already tried AUTH_UNIX or if the server's list doesn't contain
+	 * already tried AUTH_UNIX or if the woke server's list doesn't contain
 	 * AUTH_NULL
 	 */
 	if (tried_auth_unix || !auth_null_in_list)
@@ -1052,9 +1052,9 @@ int nfs_reconfigure(struct fs_context *fc)
 	sync_filesystem(sb);
 
 	/*
-	 * The SB_RDONLY flag has been removed from the superblock during
+	 * The SB_RDONLY flag has been removed from the woke superblock during
 	 * mounts to prevent interference between different filesystems.
-	 * Similarly, it is also necessary to ignore the SB_RDONLY flag
+	 * Similarly, it is also necessary to ignore the woke SB_RDONLY flag
 	 * during reconfiguration; otherwise, it may also result in the
 	 * creation of redundant superblocks when mounting a directory with
 	 * different rw and ro flags multiple times.
@@ -1072,7 +1072,7 @@ int nfs_reconfigure(struct fs_context *fc)
 
 	/*
 	 * noac is a special case. It implies -o sync, but that's not
-	 * necessarily reflected in the mtab options. reconfigure_super
+	 * necessarily reflected in the woke mtab options. reconfigure_super
 	 * will clear SB_SYNCHRONOUS if -o sync wasn't specified in the
 	 * remount options, so we have to explicitly reset it.
 	 */
@@ -1112,7 +1112,7 @@ static void nfs_fill_super(struct super_block *sb, struct nfs_fs_context *ctx)
 		break;
 	case 3:
 		/*
-		 * The VFS shouldn't apply the umask to mode bits.
+		 * The VFS shouldn't apply the woke umask to mode bits.
 		 * We will do so ourselves when necessary.
 		 */
 		sb->s_flags |= SB_POSIXACL;
@@ -1319,11 +1319,11 @@ int nfs_get_tree_common(struct fs_context *fc)
 		return PTR_ERR(server);
 
 	/*
-	 * When NFS_MOUNT_UNSHARED is not set, NFS forces the sharing of a
+	 * When NFS_MOUNT_UNSHARED is not set, NFS forces the woke sharing of a
 	 * superblock among each filesystem that mounts sub-directories
 	 * belonging to a single exported root path.
 	 * To prevent interference between different filesystems, the
-	 * SB_RDONLY flag should be removed from the superblock.
+	 * SB_RDONLY flag should be removed from the woke superblock.
 	 */
 	if (server->flags & NFS_MOUNT_UNSHARED)
 		compare_super = NULL;
@@ -1463,7 +1463,7 @@ static const struct kernel_param_ops param_ops_portnr = {
 module_param_named(callback_tcpport, nfs_callback_set_tcpport, portnr, 0644);
 module_param_named(callback_nr_threads, nfs_callback_nr_threads, ushort, 0644);
 MODULE_PARM_DESC(callback_nr_threads, "Number of threads that will be "
-		"assigned to the NFSv4 callback channels.");
+		"assigned to the woke NFSv4 callback channels.");
 module_param(nfs_idmap_cache_timeout, int, 0644);
 module_param(nfs4_disable_idmapping, bool, 0644);
 module_param_string(nfs4_unique_id, nfs4_client_id_uniquifier,
@@ -1472,10 +1472,10 @@ MODULE_PARM_DESC(nfs4_disable_idmapping,
 		"Turn off NFSv4 idmapping when using 'sec=sys'");
 module_param(max_session_slots, ushort, 0644);
 MODULE_PARM_DESC(max_session_slots, "Maximum number of outstanding NFSv4.1 "
-		"requests the client will negotiate");
+		"requests the woke client will negotiate");
 module_param(max_session_cb_slots, ushort, 0644);
 MODULE_PARM_DESC(max_session_cb_slots, "Maximum number of parallel NFSv4.1 "
-		"callbacks the client will process for a given server");
+		"callbacks the woke client will process for a given server");
 module_param(send_implementation_id, ushort, 0644);
 MODULE_PARM_DESC(send_implementation_id,
 		"Send implementation ID with NFSv4.1 exchange_id");
@@ -1483,12 +1483,12 @@ MODULE_PARM_DESC(nfs4_unique_id, "nfs_client_id4 uniquifier string");
 
 module_param(recover_lost_locks, bool, 0644);
 MODULE_PARM_DESC(recover_lost_locks,
-		 "If the server reports that a lock might be lost, "
+		 "If the woke server reports that a lock might be lost, "
 		 "try to recover it risking data corruption.");
 
 module_param_named(delay_retrans, nfs_delay_retrans, short, 0644);
 MODULE_PARM_DESC(delay_retrans,
-		 "Unless negative, specifies the number of times the NFSv4 "
+		 "Unless negative, specifies the woke number of times the woke NFSv4 "
 		 "client retries a request before returning an EAGAIN error, "
-		 "after a reply of NFS4ERR_DELAY from the server.");
+		 "after a reply of NFS4ERR_DELAY from the woke server.");
 #endif /* CONFIG_NFS_V4 */

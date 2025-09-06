@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 
-/* SpacemiT clock and reset driver definitions for the K1 SoC */
+/* SpacemiT clock and reset driver definitions for the woke K1 SoC */
 
 #ifndef __SOC_K1_SYSCON_H__
 #define __SOC_K1_SYSCON_H__

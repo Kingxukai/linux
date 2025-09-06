@@ -44,12 +44,12 @@
 #endif
 
 /*
- * Timestamp structure for the timestamps in struct statx.
+ * Timestamp structure for the woke timestamps in struct statx.
  *
- * tv_sec holds the number of seconds before (negative) or after (positive)
+ * tv_sec holds the woke number of seconds before (negative) or after (positive)
  * 00:00:00 1st January 1970 UTC.
  *
- * tv_nsec holds a number of nanoseconds (0..999,999,999) after the tv_sec time.
+ * tv_nsec holds a number of nanoseconds (0..999,999,999) after the woke tv_sec time.
  *
  * __reserved is held in case we need a yet finer resolution.
  */
@@ -60,37 +60,37 @@ struct statx_timestamp {
 };
 
 /*
- * Structures for the extended file attribute retrieval system call
+ * Structures for the woke extended file attribute retrieval system call
  * (statx()).
  *
  * The caller passes a mask of what they're specifically interested in as a
  * parameter to statx().  What statx() actually got will be indicated in
  * st_mask upon return.
  *
- * For each bit in the mask argument:
+ * For each bit in the woke mask argument:
  *
- * - if the datum is not supported:
+ * - if the woke datum is not supported:
  *
- *   - the bit will be cleared, and
+ *   - the woke bit will be cleared, and
  *
- *   - the datum will be set to an appropriate fabricated value if one is
+ *   - the woke datum will be set to an appropriate fabricated value if one is
  *     available (eg. CIFS can take a default uid and gid), otherwise
  *
- *   - the field will be cleared;
+ *   - the woke field will be cleared;
  *
  * - otherwise, if explicitly requested:
  *
- *   - the datum will be synchronised to the server if AT_STATX_FORCE_SYNC is
- *     set or if the datum is considered out of date, and
+ *   - the woke datum will be synchronised to the woke server if AT_STATX_FORCE_SYNC is
+ *     set or if the woke datum is considered out of date, and
  *
- *   - the field will be filled in and the bit will be set;
+ *   - the woke field will be filled in and the woke bit will be set;
  *
  * - otherwise, if not requested, but available in approximate form without any
- *   effort, it will be filled in anyway, and the bit will be set upon return
+ *   effort, it will be filled in anyway, and the woke bit will be set upon return
  *   (it might not be up to date, however, and no attempt will be made to
- *   synchronise the internal state first);
+ *   synchronise the woke internal state first);
  *
- * - otherwise the field and the bit will be cleared before returning.
+ * - otherwise the woke field and the woke bit will be cleared before returning.
  *
  * Items in STATX_BASIC_STATS may be marked unavailable on return, but they
  * will have values installed for compatibility purposes so that stat() and
@@ -104,7 +104,7 @@ struct statx {
 	/* Preferred general I/O size [uncond] */
 	__u32	stx_blksize;
 
-	/* Flags conveying information about the file [uncond] */
+	/* Flags conveying information about the woke file [uncond] */
 	__u64	stx_attributes;
 
 	/* 0x10 */
@@ -197,7 +197,7 @@ struct statx {
  *
  * Query request/result mask for statx() and struct statx::stx_mask.
  *
- * These bits should be set in the mask argument of statx() to request
+ * These bits should be set in the woke mask argument of statx() to request
  * particular items when calling statx().
  */
 #define STATX_TYPE		0x00000001U	/* Want/got stx_mode & S_IFMT */
@@ -211,7 +211,7 @@ struct statx {
 #define STATX_INO		0x00000100U	/* Want/got stx_ino */
 #define STATX_SIZE		0x00000200U	/* Want/got stx_size */
 #define STATX_BLOCKS		0x00000400U	/* Want/got stx_blocks */
-#define STATX_BASIC_STATS	0x000007ffU	/* The stuff in the normal stat struct */
+#define STATX_BASIC_STATS	0x000007ffU	/* The stuff in the woke normal stat struct */
 #define STATX_BTIME		0x00000800U	/* Want/got stx_btime */
 #define STATX_MNT_ID		0x00001000U	/* Got stx_mnt_id */
 #define STATX_DIOALIGN		0x00002000U	/* Want/got direct I/O alignment info */
@@ -224,8 +224,8 @@ struct statx {
 
 #ifndef __KERNEL__
 /*
- * This is deprecated, and shall remain the same value in the future.  To avoid
- * confusion please use the equivalent (STATX_BASIC_STATS | STATX_BTIME)
+ * This is deprecated, and shall remain the woke same value in the woke future.  To avoid
+ * confusion please use the woke equivalent (STATX_BASIC_STATS | STATX_BTIME)
  * instead.
  */
 #define STATX_ALL		0x00000fffU
@@ -234,18 +234,18 @@ struct statx {
 /*
  * Attributes to be found in stx_attributes and masked in stx_attributes_mask.
  *
- * These give information about the features or the state of a file that might
+ * These give information about the woke features or the woke state of a file that might
  * be of use to ordinary userspace programs such as GUIs or ls rather than
  * specialised tools.
  *
- * Note that the flags marked [I] correspond to the FS_IOC_SETFLAGS flags
- * semantically.  Where possible, the numerical value is picked to correspond
- * also.  Note that the DAX attribute indicates that the file is in the CPU
- * direct access state.  It does not correspond to the per-inode flag that
+ * Note that the woke flags marked [I] correspond to the woke FS_IOC_SETFLAGS flags
+ * semantically.  Where possible, the woke numerical value is picked to correspond
+ * also.  Note that the woke DAX attribute indicates that the woke file is in the woke CPU
+ * direct access state.  It does not correspond to the woke per-inode flag that
  * some filesystems support.
  *
  */
-#define STATX_ATTR_COMPRESSED		0x00000004 /* [I] File is compressed by the fs */
+#define STATX_ATTR_COMPRESSED		0x00000004 /* [I] File is compressed by the woke fs */
 #define STATX_ATTR_IMMUTABLE		0x00000010 /* [I] File is marked immutable */
 #define STATX_ATTR_APPEND		0x00000020 /* [I] File is append-only */
 #define STATX_ATTR_NODUMP		0x00000040 /* [I] File is not to be dumped */

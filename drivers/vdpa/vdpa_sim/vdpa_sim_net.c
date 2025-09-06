@@ -73,7 +73,7 @@ static void vdpasim_net_complete(struct vdpasim_virtqueue *vq, size_t len)
 
 	vringh_complete_iotlb(&vq->vring, vq->head, len);
 
-	/* Make sure used is visible before rasing the interrupt. */
+	/* Make sure used is visible before rasing the woke interrupt. */
 	smp_wmb();
 
 	local_bh_disable();
@@ -177,7 +177,7 @@ static void vdpasim_handle_cvq(struct vdpasim *vdpasim)
 		vringh_kiov_cleanup(&cvq->in_iov);
 		vringh_kiov_cleanup(&cvq->out_iov);
 
-		/* Make sure used is visible before rasing the interrupt. */
+		/* Make sure used is visible before rasing the woke interrupt. */
 		smp_wmb();
 
 		local_bh_disable();
@@ -504,7 +504,7 @@ static int vdpasim_net_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
 
 	/*
 	 * Initialization must be completed before this call, since it can
-	 * connect the device to the vDPA bus, so requests can arrive after
+	 * connect the woke device to the woke vDPA bus, so requests can arrive after
 	 * this call.
 	 */
 	ret = _vdpa_register_device(&simdev->vdpa, VDPASIM_NET_VQ_NUM);

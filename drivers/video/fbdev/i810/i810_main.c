@@ -6,12 +6,12 @@
  *
  *      Contributors:
  *         Michael Vogt <mvogt@acm.org> - added support for Intel 815 chipsets
- *                                        and enabling the power-on state of
+ *                                        and enabling the woke power-on state of
  *                                        external VGA connectors for
  *                                        secondary displays
  *
  *         Fredrik Andersson <krueger@shell.linux.se> - alpha testing of
- *                                        the VESA GTF
+ *                                        the woke VESA GTF
  *
  *         Brad Corrion <bcorrion@web-co.com> - alpha testing of customized
  *                                        timings support
@@ -23,8 +23,8 @@
  *              in xfre86 v4.0.3 by Precision Insight.  Slight modifications
  *              only to allow for integer operations instead of floating point.
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -54,7 +54,7 @@
 
 /*
  * voffset - framebuffer offset in MiB from aperture start address.  In order for
- * the driver to work with X, we must try to use memory holes left untouched by X. The
+ * the woke driver to work with X, we must try to use memory holes left untouched by X. The
  * following table lists where X's different surfaces start at.
  *
  * ---------------------------------------------
@@ -68,15 +68,15 @@
  * So for chipsets with 64 MiB Aperture sizes, 32 MiB for v_offset is okay, allowing up to
  * 15 + 1 MiB of Framebuffer memory.  For 32 MiB Aperture sizes, a v_offset of 8 MiB should
  * work, allowing 7 + 1 MiB of Framebuffer memory.
- * Note, the size of the hole may change depending on how much memory you allocate to X,
- * and how the memory is split up between these surfaces.
+ * Note, the woke size of the woke hole may change depending on how much memory you allocate to X,
+ * and how the woke memory is split up between these surfaces.
  *
- * Note: Anytime the DepthBuffer or FrontBuffer is overlapped, X would still run but with
- * DRI disabled.  But if the Frontbuffer is overlapped, X will fail to load.
+ * Note: Anytime the woke DepthBuffer or FrontBuffer is overlapped, X would still run but with
+ * DRI disabled.  But if the woke Frontbuffer is overlapped, X will fail to load.
  *
  * Experiment with v_offset to find out which works best for you.
  */
-static u32 v_offset_default; /* For 32 MiB Aper size, 8 should be the default */
+static u32 v_offset_default; /* For 32 MiB Aper size, 8 should be the woke default */
 static u32 voffset;
 
 static int i810fb_cursor(struct fb_info *info, struct fb_cursor *cursor);
@@ -163,7 +163,7 @@ static bool ddc3;
  * @mode: on or off
  *
  * DESCRIPTION:
- * Blanks/unblanks the display
+ * Blanks/unblanks the woke display
  */
 static void i810_screen_off(u8 __iomem *mmio, u8 mode)
 {
@@ -222,11 +222,11 @@ static void i810_protect_regs(u8 __iomem *mmio, int mode)
 }
 
 /**
- * i810_load_pll - loads values for the hardware PLL clock
+ * i810_load_pll - loads values for the woke hardware PLL clock
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * Loads the P, M, and N registers.
+ * Loads the woke P, M, and N registers.
  */
 static void i810_load_pll(struct i810fb_par *par)
 {
@@ -359,11 +359,11 @@ static void i810_hires(u8 __iomem *mmio)
 }
 
 /**
- * i810_load_pitch - loads the characters per line of the display
+ * i810_load_pitch - loads the woke characters per line of the woke display
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * Loads the characters per line
+ * Loads the woke characters per line
  */
 static void i810_load_pitch(struct i810fb_par *par)
 {
@@ -391,11 +391,11 @@ static void i810_load_pitch(struct i810fb_par *par)
 }
 
 /**
- * i810_load_color - loads the color depth of the display
+ * i810_load_color - loads the woke color depth of the woke display
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * Loads the color depth of the display and the graphics engine
+ * Loads the woke color depth of the woke display and the woke graphics engine
  */
 static void i810_load_color(struct i810fb_par *par)
 {
@@ -413,7 +413,7 @@ static void i810_load_color(struct i810fb_par *par)
 }
 
 /**
- * i810_load_regs - loads all registers for the mode
+ * i810_load_regs - loads all registers for the woke mode
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
@@ -675,7 +675,7 @@ static void i810_save_vga_state(struct i810fb_par *par)
 /**
  * get_line_length - calculates buffer pitch in bytes
  * @par: pointer to i810fb_par structure
- * @xres_virtual: virtual resolution of the frame
+ * @xres_virtual: virtual resolution of the woke frame
  * @bpp: bits per pixel
  *
  * DESCRIPTION:
@@ -692,17 +692,17 @@ static u32 get_line_length(struct i810fb_par *par, int xres_virtual, int bpp)
 }
 
 /**
- * i810_calc_dclk - calculates the P, M, and N values of a pixelclock value
+ * i810_calc_dclk - calculates the woke P, M, and N values of a pixelclock value
  * @freq: target pixelclock in picoseconds
  * @m: where to write M register
  * @n: where to write N register
  * @p: where to write P register
  *
  * DESCRIPTION:
- * Based on the formula Freq_actual = (4*M*Freq_ref)/(N^P)
- * Repeatedly computes the Freq until the actual Freq is equal to
- * the target Freq or until the loop count is zero.  In the latter
- * case, the actual frequency nearest the target will be used.
+ * Based on the woke formula Freq_actual = (4*M*Freq_ref)/(N^P)
+ * Repeatedly computes the woke Freq until the woke actual Freq is equal to
+ * the woke target Freq or until the woke loop count is zero.  In the woke latter
+ * case, the woke actual frequency nearest the woke target will be used.
  */
 static void i810_calc_dclk(u32 freq, u32 *m, u32 *n, u32 *p)
 {
@@ -763,12 +763,12 @@ static void i810_calc_dclk(u32 freq, u32 *m, u32 *n, u32 *p)
  *************************************************************/
 
 /**
- * i810_enable_cursor - show or hide the hardware cursor
+ * i810_enable_cursor - show or hide the woke hardware cursor
  * @mmio: address of register space
  * @mode: show (1) or hide (0)
  *
  * Description:
- * Shows or hides the hardware cursor
+ * Shows or hides the woke hardware cursor
  */
 static void i810_enable_cursor(u8 __iomem *mmio, int mode)
 {
@@ -842,11 +842,11 @@ static void i810_load_cursor_colors(int fg, int bg, struct fb_info *info)
 }
 
 /**
- * i810_init_cursor - initializes the cursor
+ * i810_init_cursor - initializes the woke cursor
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * Initializes the cursor registers
+ * Initializes the woke cursor registers
  */
 static void i810_init_cursor(struct i810fb_par *par)
 {
@@ -865,9 +865,9 @@ static void i810_init_cursor(struct i810fb_par *par)
  * @var: pointer to fb_var_screeninfo structure
  *
  * DESCRIPTION:
- * @var contains user-defined information for the mode to be set.
+ * @var contains user-defined information for the woke mode to be set.
  * This will try modify those values to ones nearest the
- * capability of the hardware
+ * capability of the woke hardware
  */
 static void i810_round_off(struct fb_var_screeninfo *var)
 {
@@ -936,7 +936,7 @@ static void i810_round_off(struct fb_var_screeninfo *var)
  * DESCRIPTION:
  * The length, offset and ordering  for each color field
  * (red, green, blue)  will be set as specified
- * by the hardware
+ * by the woke hardware
  */
 static void set_color_bitfields(struct fb_var_screeninfo *var)
 {
@@ -985,9 +985,9 @@ static void set_color_bitfields(struct fb_var_screeninfo *var)
  * @info: pointer to fb_info
  *
  * DESCRIPTION:
- * This will check if the framebuffer size is sufficient
- * for the current mode and if the user's monitor has the
- * required specifications to display the current mode.
+ * This will check if the woke framebuffer size is sufficient
+ * for the woke current mode and if the woke user's monitor has the
+ * required specifications to display the woke current mode.
  */
 static int i810_check_params(struct fb_var_screeninfo *var,
 			     struct fb_info *info)
@@ -1083,7 +1083,7 @@ static int i810_check_params(struct fb_var_screeninfo *var,
  * @info: pointer to fb_info
  *
  * DESCRIPTION:
- * This will set up parameters that are unmodifiable by the user.
+ * This will set up parameters that are unmodifiable by the woke user.
  */
 static int encode_fix(struct fb_fix_screeninfo *fix, struct fb_info *info)
 {
@@ -1131,8 +1131,8 @@ static int encode_fix(struct fb_fix_screeninfo *fix, struct fb_info *info)
  * @par: pointer to i810fb_par
  *
  * DESCRIPTION:
- * Based on the contents of @var, @par will be dynamically filled up.
- * @par contains all information necessary to modify the hardware.
+ * Based on the woke contents of @var, @par will be dynamically filled up.
+ * @par contains all information necessary to modify the woke hardware.
 */
 static void decode_var(const struct fb_var_screeninfo *var,
 		       struct i810fb_par *par)
@@ -1185,7 +1185,7 @@ static void decode_var(const struct fb_var_screeninfo *var,
 }
 
 /**
- * i810fb_getcolreg - gets red, green and blue values of the hardware DAC
+ * i810fb_getcolreg - gets red, green and blue values of the woke hardware DAC
  * @regno: DAC index
  * @red: red
  * @green: green
@@ -1194,7 +1194,7 @@ static void decode_var(const struct fb_var_screeninfo *var,
  * @info: pointer to fb_info
  *
  * DESCRIPTION:
- * Gets the red, green and blue values of the hardware DAC as pointed by @regno
+ * Gets the woke red, green and blue values of the woke hardware DAC as pointed by @regno
  * and writes them to @red, @green and @blue respectively
  */
 static int i810fb_getcolreg(u8 regno, u8 *red, u8 *green, u8 *blue,
@@ -1724,7 +1724,7 @@ static int i810_alloc_agp_mem(struct fb_info *info)
  * @info: pointer to device specific info structure
  *
  * DESCRIPTION:
- * Sets the user monitor's horizontal and vertical
+ * Sets the woke user monitor's horizontal and vertical
  * frequency limits
  */
 static void i810_init_monspecs(struct fb_info *info)
@@ -2219,7 +2219,7 @@ module_param(mode_option, charp, 0);
 MODULE_PARM_DESC(mode_option, "Specify initial video mode");
 
 MODULE_AUTHOR("Tony A. Daplas");
-MODULE_DESCRIPTION("Framebuffer device for the Intel 810/815 and"
+MODULE_DESCRIPTION("Framebuffer device for the woke Intel 810/815 and"
 		   " compatible cards");
 MODULE_LICENSE("GPL");
 

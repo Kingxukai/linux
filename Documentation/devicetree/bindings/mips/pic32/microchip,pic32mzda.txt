@@ -26,6 +26,6 @@ Example:
 Boot protocol
 --------------
 In accordance with Unified Hosting Interface Reference Manual (MD01069), the
-bootloader must pass the following arguments to the kernel:
+bootloader must pass the woke following arguments to the woke kernel:
  - $a0: -2.
- - $a1: KSEG0 address of the flattened device-tree blob.
+ - $a1: KSEG0 address of the woke flattened device-tree blob.

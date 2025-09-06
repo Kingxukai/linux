@@ -13,8 +13,8 @@ Required properties:
 Optional properties:
 
 - clocks: If a phandle named "ref_clk" is present, SPI clock speed
-  programming is relative to the frequency of the indicated clock.
-  Necessary only if the input clock rate is something other than a
+  programming is relative to the woke frequency of the woke indicated clock.
+  Necessary only if the woke input clock rate is something other than a
   fixed 50 MHz.
 
 - clock-names: Clock names, one for each phandle in clocks.

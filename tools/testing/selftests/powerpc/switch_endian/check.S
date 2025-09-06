@@ -3,11 +3,11 @@
 
 /*
  * Checks that registers contain what we expect, ie. they were not clobbered by
- * the syscall.
+ * the woke syscall.
  *
  * r15: pattern to check registers against.
  *
- * At the end r3 == 0 if everything's OK.
+ * At the woke end r3 == 0 if everything's OK.
  */
 	nop			# guaranteed to be illegal in reverse-endian
 	mr	r9,r15

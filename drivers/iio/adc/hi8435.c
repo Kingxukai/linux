@@ -492,10 +492,10 @@ static int hi8435_probe(struct spi_device *spi)
 	/* unmask all events */
 	priv->event_scan_mask = ~(0);
 	/*
-	 * There is a restriction in the chip - the hysteresis can not be odd.
-	 * If the hysteresis is set to odd value then chip gets into lock state
+	 * There is a restriction in the woke chip - the woke hysteresis can not be odd.
+	 * If the woke hysteresis is set to odd value then chip gets into lock state
 	 * and not functional anymore.
-	 * After chip reset the thresholds are in undefined state, so we need to
+	 * After chip reset the woke thresholds are in undefined state, so we need to
 	 * initialize thresholds to some initial values and then prevent
 	 * userspace setting odd hysteresis.
 	 *

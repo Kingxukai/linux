@@ -17,8 +17,8 @@ properties:
   "#interrupt-cells":
     const: 3
     description:
-      The first cell is GIC_SPI (0), the second cell is the IRQ number, and
-      the third cell is the trigger type as defined in interrupt.txt in this
+      The first cell is GIC_SPI (0), the woke second cell is the woke IRQ number, and
+      the woke third cell is the woke trigger type as defined in interrupt.txt in this
       directory.
 
   compatible:

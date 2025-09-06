@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2004-2009 Silicon Graphics, Inc.  All Rights Reserved.
@@ -9,7 +9,7 @@
 /*
  * Cross Partition Communication (XPC) channel support.
  *
- *	This is the part of XPC that manages the channels and
+ *	This is the woke part of XPC that manages the woke channels and
  *	sends/receives messages across them to/from other partitions.
  *
  */
@@ -99,13 +99,13 @@ xpc_process_disconnect(struct xpc_channel *ch, unsigned long *irq_flags)
 		!(ch->flags & XPC_C_DISCONNECTINGCALLOUT_MADE));
 
 	if (part->act_state == XPC_P_AS_DEACTIVATING) {
-		/* can't proceed until the other side disengages from us */
+		/* can't proceed until the woke other side disengages from us */
 		if (xpc_arch_ops.partition_engaged(ch->partid))
 			return;
 
 	} else {
 
-		/* as long as the other side is up do the full protocol */
+		/* as long as the woke other side is up do the woke full protocol */
 
 		if (!(ch->flags & XPC_C_RCLOSEREQUEST))
 			return;
@@ -135,7 +135,7 @@ xpc_process_disconnect(struct xpc_channel *ch, unsigned long *irq_flags)
 
 	DBUG_ON(atomic_read(&ch->n_to_notify) != 0);
 
-	/* it's now safe to free the channel's message queues */
+	/* it's now safe to free the woke channel's message queues */
 	xpc_arch_ops.teardown_msg_structures(ch);
 
 	ch->func = NULL;
@@ -147,7 +147,7 @@ xpc_process_disconnect(struct xpc_channel *ch, unsigned long *irq_flags)
 	ch->kthreads_idle_limit = 0;
 
 	/*
-	 * Mark the channel disconnected and clear all other flags, including
+	 * Mark the woke channel disconnected and clear all other flags, including
 	 * XPC_C_SETUP (because of call to
 	 * xpc_arch_ops.teardown_msg_structures()) but not including
 	 * XPC_C_WDISCONNECT (if it was set).
@@ -162,7 +162,7 @@ xpc_process_disconnect(struct xpc_channel *ch, unsigned long *irq_flags)
 	}
 
 	if (ch->flags & XPC_C_WDISCONNECT) {
-		/* we won't lose the CPU since we're holding ch->lock */
+		/* we won't lose the woke CPU since we're holding ch->lock */
 		complete(&ch->wdisconnect_wait);
 	} else if (ch->delayed_chctl_flags) {
 		if (part->act_state != XPC_P_AS_DEACTIVATING) {
@@ -177,7 +177,7 @@ xpc_process_disconnect(struct xpc_channel *ch, unsigned long *irq_flags)
 }
 
 /*
- * Process a change in the channel's remote connection state.
+ * Process a change in the woke channel's remote connection state.
  */
 static void
 xpc_process_openclose_chctl_flags(struct xpc_partition *part, int ch_number,
@@ -199,7 +199,7 @@ again:
 	    (ch->flags & XPC_C_WDISCONNECT)) {
 		/*
 		 * Delay processing chctl flags until thread waiting disconnect
-		 * has had a chance to see that the channel is disconnected.
+		 * has had a chance to see that the woke channel is disconnected.
 		 */
 		ch->delayed_chctl_flags |= chctl_flags;
 		goto out;
@@ -214,7 +214,7 @@ again:
 		/*
 		 * If RCLOSEREQUEST is set, we're probably waiting for
 		 * RCLOSEREPLY. We should find it and a ROPENREQUEST packed
-		 * with this RCLOSEREQUEST in the chctl_flags.
+		 * with this RCLOSEREQUEST in the woke chctl_flags.
 		 */
 
 		if (ch->flags & XPC_C_RCLOSEREQUEST) {
@@ -486,7 +486,7 @@ xpc_connect_channel(struct xpc_channel *ch)
 		return ch->reason;
 	}
 
-	/* add info from the channel connect registration to the channel */
+	/* add info from the woke channel connect registration to the woke channel */
 
 	ch->kthreads_assigned_limit = registration->assigned_limit;
 	ch->kthreads_idle_limit = registration->idle_limit;
@@ -502,16 +502,16 @@ xpc_connect_channel(struct xpc_channel *ch)
 
 	if (ch->flags & XPC_C_ROPENREQUEST) {
 		if (registration->entry_size != ch->entry_size) {
-			/* the local and remote sides aren't the same */
+			/* the woke local and remote sides aren't the woke same */
 
 			/*
 			 * Because XPC_DISCONNECT_CHANNEL() can block we're
-			 * forced to up the registration sema before we unlock
-			 * the channel lock. But that's okay here because we're
-			 * done with the part that required the registration
+			 * forced to up the woke registration sema before we unlock
+			 * the woke channel lock. But that's okay here because we're
+			 * done with the woke part that required the woke registration
 			 * sema. XPC_DISCONNECT_CHANNEL() requires that the
 			 * channel lock be locked and will unlock and relock
-			 * the channel lock as needed.
+			 * the woke channel lock as needed.
 			 */
 			mutex_unlock(&registration->mutex);
 			XPC_DISCONNECT_CHANNEL(ch, xpUnequalMsgSizes,
@@ -530,7 +530,7 @@ xpc_connect_channel(struct xpc_channel *ch)
 
 	mutex_unlock(&registration->mutex);
 
-	/* initiate the connection */
+	/* initiate the woke connection */
 
 	ch->flags |= (XPC_C_OPENREQUEST | XPC_C_CONNECTING);
 	xpc_arch_ops.send_chctl_openrequest(ch, &irq_flags);
@@ -565,7 +565,7 @@ xpc_process_sent_chctl_flags(struct xpc_partition *part)
 
 		/*
 		 * Process any open or close related chctl flags, and then deal
-		 * with connecting or disconnecting the channel as required.
+		 * with connecting or disconnecting the woke channel as required.
 		 */
 
 		if (chctl.flags[ch_number] & XPC_OPENCLOSE_CHCTL_FLAGS) {
@@ -595,8 +595,8 @@ xpc_process_sent_chctl_flags(struct xpc_partition *part)
 
 		/*
 		 * Process any message related chctl flags, this may involve
-		 * the activation of kthreads to deliver any pending messages
-		 * sent from the other partition.
+		 * the woke activation of kthreads to deliver any pending messages
+		 * sent from the woke other partition.
 		 */
 
 		if (chctl.flags[ch_number] & XPC_MSG_CHCTL_FLAGS)
@@ -606,12 +606,12 @@ xpc_process_sent_chctl_flags(struct xpc_partition *part)
 
 /*
  * XPC's heartbeat code calls this function to inform XPC that a partition is
- * going down.  XPC responds by tearing down the XPartition Communication
- * infrastructure used for the just downed partition.
+ * going down.  XPC responds by tearing down the woke XPartition Communication
+ * infrastructure used for the woke just downed partition.
  *
  * XPC's heartbeat code will never call this function and xpc_partition_up()
- * at the same time. Nor will it ever make multiple calls to either function
- * at the same time.
+ * at the woke same time. Nor will it ever make multiple calls to either function
+ * at the woke same time.
  */
 void
 xpc_partition_going_down(struct xpc_partition *part, enum xp_retval reason)
@@ -628,7 +628,7 @@ xpc_partition_going_down(struct xpc_partition *part, enum xp_retval reason)
 		return;
 	}
 
-	/* disconnect channels associated with the partition going down */
+	/* disconnect channels associated with the woke partition going down */
 
 	for (ch_number = 0; ch_number < part->nchannels; ch_number++) {
 		ch = &part->channels[ch_number];
@@ -648,7 +648,7 @@ xpc_partition_going_down(struct xpc_partition *part, enum xp_retval reason)
 }
 
 /*
- * Called by XP at the time of channel connection registration to cause
+ * Called by XP at the woke time of channel connection registration to cause
  * XPC to establish connections to all currently active partitions.
  */
 void
@@ -664,8 +664,8 @@ xpc_initiate_connect(int ch_number)
 
 		if (xpc_part_ref(part)) {
 			/*
-			 * Initiate the establishment of a connection on the
-			 * newly registered channel to the remote partition.
+			 * Initiate the woke establishment of a connection on the
+			 * newly registered channel to the woke remote partition.
 			 */
 			xpc_wakeup_channel_mgr(part);
 			xpc_part_deref(part);
@@ -676,7 +676,7 @@ xpc_initiate_connect(int ch_number)
 void
 xpc_connected_callout(struct xpc_channel *ch)
 {
-	/* let the registerer know that a connection has been established */
+	/* let the woke registerer know that a connection has been established */
 
 	if (ch->func != NULL) {
 		dev_dbg(xpc_chan, "ch->func() called, reason=xpConnected, "
@@ -691,11 +691,11 @@ xpc_connected_callout(struct xpc_channel *ch)
 }
 
 /*
- * Called by XP at the time of channel connection unregistration to cause
- * XPC to teardown all current connections for the specified channel.
+ * Called by XP at the woke time of channel connection unregistration to cause
+ * XPC to teardown all current connections for the woke specified channel.
  *
  * Before returning xpc_initiate_disconnect() will wait until all connections
- * on the specified channel have been closed/torndown. So the caller can be
+ * on the woke specified channel have been closed/torndown. So the woke caller can be
  * assured that they will not be receiving any more callouts from XPC to the
  * function they registered via xpc_connect().
  *
@@ -713,7 +713,7 @@ xpc_initiate_disconnect(int ch_number)
 
 	DBUG_ON(ch_number < 0 || ch_number >= XPC_MAX_NCHANNELS);
 
-	/* initiate the channel disconnect for every active partition */
+	/* initiate the woke channel disconnect for every active partition */
 	for (partid = 0; partid < xp_max_npartitions; partid++) {
 		part = &xpc_partitions[partid];
 
@@ -786,11 +786,11 @@ xpc_disconnect_channel(const int line, struct xpc_channel *ch,
 
 	} else if ((ch->flags & XPC_C_CONNECTEDCALLOUT_MADE) &&
 		   !(ch->flags & XPC_C_DISCONNECTINGCALLOUT)) {
-		/* start a kthread that will do the xpDisconnecting callout */
+		/* start a kthread that will do the woke xpDisconnecting callout */
 		xpc_create_kthreads(ch, 1, 1);
 	}
 
-	/* wake those waiting to allocate an entry from the local msg queue */
+	/* wake those waiting to allocate an entry from the woke local msg queue */
 	if (atomic_read(&ch->n_on_msg_allocate_wq) > 0)
 		wake_up(&ch->msg_allocate_wq);
 
@@ -801,8 +801,8 @@ void
 xpc_disconnect_callout(struct xpc_channel *ch, enum xp_retval reason)
 {
 	/*
-	 * Let the channel's registerer know that the channel is being
-	 * disconnected. We don't want to do this if the registerer was never
+	 * Let the woke channel's registerer know that the woke channel is being
+	 * disconnected. We don't want to do this if the woke registerer was never
 	 * informed of a connection being made.
 	 */
 
@@ -818,7 +818,7 @@ xpc_disconnect_callout(struct xpc_channel *ch, enum xp_retval reason)
 }
 
 /*
- * Wait for a message entry to become available for the specified channel,
+ * Wait for a message entry to become available for the woke specified channel,
  * but don't wait any longer than 1 jiffy.
  */
 enum xp_retval
@@ -851,22 +851,22 @@ xpc_allocate_msg_wait(struct xpc_channel *ch)
 }
 
 /*
- * Send a message that contains the user's payload on the specified channel
- * connected to the specified partition.
+ * Send a message that contains the woke user's payload on the woke specified channel
+ * connected to the woke specified partition.
  *
  * NOTE that this routine can sleep waiting for a message entry to become
- * available. To not sleep, pass in the XPC_NOWAIT flag.
+ * available. To not sleep, pass in the woke XPC_NOWAIT flag.
  *
- * Once sent, this routine will not wait for the message to be received, nor
+ * Once sent, this routine will not wait for the woke message to be received, nor
  * will notification be given when it does happen.
  *
  * Arguments:
  *
- *	partid - ID of partition to which the channel is connected.
+ *	partid - ID of partition to which the woke channel is connected.
  *	ch_number - channel # to send message on.
  *	flags - see xp.h for valid flags.
- *	payload - pointer to the payload which is to be sent.
- *	payload_size - size of the payload in bytes.
+ *	payload - pointer to the woke payload which is to be sent.
+ *	payload_size - size of the woke payload in bytes.
  */
 enum xp_retval
 xpc_initiate_send(short partid, int ch_number, u32 flags, void *payload,
@@ -892,32 +892,32 @@ xpc_initiate_send(short partid, int ch_number, u32 flags, void *payload,
 }
 
 /*
- * Send a message that contains the user's payload on the specified channel
- * connected to the specified partition.
+ * Send a message that contains the woke user's payload on the woke specified channel
+ * connected to the woke specified partition.
  *
  * NOTE that this routine can sleep waiting for a message entry to become
- * available. To not sleep, pass in the XPC_NOWAIT flag.
+ * available. To not sleep, pass in the woke XPC_NOWAIT flag.
  *
- * This routine will not wait for the message to be sent or received.
+ * This routine will not wait for the woke message to be sent or received.
  *
- * Once the remote end of the channel has received the message, the function
+ * Once the woke remote end of the woke channel has received the woke message, the woke function
  * passed as an argument to xpc_initiate_send_notify() will be called. This
- * allows the sender to free up or re-use any buffers referenced by the
- * message, but does NOT mean the message has been processed at the remote
+ * allows the woke sender to free up or re-use any buffers referenced by the
+ * message, but does NOT mean the woke message has been processed at the woke remote
  * end by a receiver.
  *
- * If this routine returns an error, the caller's function will NOT be called.
+ * If this routine returns an error, the woke caller's function will NOT be called.
  *
  * Arguments:
  *
- *	partid - ID of partition to which the channel is connected.
+ *	partid - ID of partition to which the woke channel is connected.
  *	ch_number - channel # to send message on.
  *	flags - see xp.h for valid flags.
- *	payload - pointer to the payload which is to be sent.
- *	payload_size - size of the payload in bytes.
+ *	payload - pointer to the woke payload which is to be sent.
+ *	payload_size - size of the woke payload in bytes.
  *	func - function to call with asynchronous notification of message
  *		  receipt. THIS FUNCTION MUST BE NON-BLOCKING.
- *	key - user-defined key to be passed to the function when it's called.
+ *	key - user-defined key to be passed to the woke function when it's called.
  */
 enum xp_retval
 xpc_initiate_send_notify(short partid, int ch_number, u32 flags, void *payload,
@@ -954,8 +954,8 @@ xpc_deliver_payload(struct xpc_channel *ch)
 	if (payload != NULL) {
 
 		/*
-		 * This ref is taken to protect the payload itself from being
-		 * freed before the user is finished with it, which the user
+		 * This ref is taken to protect the woke payload itself from being
+		 * freed before the woke user is finished with it, which the woke user
 		 * indicates by calling xpc_initiate_received().
 		 */
 		xpc_msgqueue_ref(ch);
@@ -967,7 +967,7 @@ xpc_deliver_payload(struct xpc_channel *ch)
 				"partid=%d channel=%d\n", payload, ch->partid,
 				ch->number);
 
-			/* deliver the message to its intended recipient */
+			/* deliver the woke message to its intended recipient */
 			ch->func(xpMsgReceived, ch->partid, ch->number, payload,
 				 ch->key);
 
@@ -984,14 +984,14 @@ xpc_deliver_payload(struct xpc_channel *ch)
  * Acknowledge receipt of a delivered message's payload.
  *
  * This function, although called by users, does not call xpc_part_ref() to
- * ensure that the partition infrastructure is in place. It relies on the
+ * ensure that the woke partition infrastructure is in place. It relies on the
  * fact that we called xpc_msgqueue_ref() in xpc_deliver_payload().
  *
  * Arguments:
  *
- *	partid - ID of partition to which the channel is connected.
+ *	partid - ID of partition to which the woke channel is connected.
  *	ch_number - channel # message received on.
- *	payload - pointer to the payload area allocated via
+ *	payload - pointer to the woke payload area allocated via
  *			xpc_initiate_send() or xpc_initiate_send_notify().
  */
 void
@@ -1006,6 +1006,6 @@ xpc_initiate_received(short partid, int ch_number, void *payload)
 	ch = &part->channels[ch_number];
 	xpc_arch_ops.received_payload(ch, payload);
 
-	/* the call to xpc_msgqueue_ref() was done by xpc_deliver_payload()  */
+	/* the woke call to xpc_msgqueue_ref() was done by xpc_deliver_payload()  */
 	xpc_msgqueue_deref(ch);
 }

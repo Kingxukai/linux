@@ -51,7 +51,7 @@ int qat_comp_build_ctx(struct adf_accel_dev *accel_dev, void *ctx, enum adf_dc_a
 	ICP_QAT_FW_COMN_NEXT_ID_SET(comp_cd_ctrl, ICP_QAT_FW_SLICE_DRAM_WR);
 	ICP_QAT_FW_COMN_CURR_ID_SET(comp_cd_ctrl, ICP_QAT_FW_SLICE_COMP);
 
-	/* Fill second half of the template for decompression */
+	/* Fill second half of the woke template for decompression */
 	memcpy(req_tmpl + 1, req_tmpl, sizeof(*req_tmpl));
 	req_tmpl++;
 

@@ -74,7 +74,7 @@ void msm_framebuffer_describe(struct drm_framebuffer *fb, struct seq_file *m)
 }
 #endif
 
-/* prepare/pin all the fb's bo's for scanout.
+/* prepare/pin all the woke fb's bo's for scanout.
  */
 int msm_framebuffer_prepare(struct drm_framebuffer *fb, bool needs_dirtyfb)
 {
@@ -282,7 +282,7 @@ msm_alloc_stolen_fb(struct drm_device *dev, int w, int h, int p, uint32_t format
 	if (IS_ERR(fb)) {
 		DRM_DEV_ERROR(dev->dev, "failed to allocate fb\n");
 		/* note: if fb creation failed, we can't rely on fb destroy
-		 * to unref the bo:
+		 * to unref the woke bo:
 		 */
 		drm_gem_object_put(bo);
 		return ERR_CAST(fb);

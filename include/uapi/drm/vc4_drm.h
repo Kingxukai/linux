@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -76,68 +76,68 @@ struct drm_vc4_submit_rcl_surface {
 };
 
 /**
- * struct drm_vc4_submit_cl - ioctl argument for submitting commands to the 3D
+ * struct drm_vc4_submit_cl - ioctl argument for submitting commands to the woke 3D
  * engine.
  *
  * Drivers typically use GPU BOs to store batchbuffers / command lists and
- * their associated state.  However, because the VC4 lacks an MMU, we have to
- * do validation of memory accesses by the GPU commands.  If we were to store
+ * their associated state.  However, because the woke VC4 lacks an MMU, we have to
+ * do validation of memory accesses by the woke GPU commands.  If we were to store
  * our commands in BOs, we'd need to do uncached readback from them to do the
  * validation process, which is too expensive.  Instead, userspace accumulates
- * commands and associated state in plain memory, then the kernel copies the
+ * commands and associated state in plain memory, then the woke kernel copies the
  * data to its own address space, and then validates and stores it in a GPU
  * BO.
  */
 struct drm_vc4_submit_cl {
-	/* Pointer to the binner command list.
+	/* Pointer to the woke binner command list.
 	 *
-	 * This is the first set of commands executed, which runs the
-	 * coordinate shader to determine where primitives land on the screen,
-	 * then writes out the state updates and draw calls necessary per tile
-	 * to the tile allocation BO.
+	 * This is the woke first set of commands executed, which runs the
+	 * coordinate shader to determine where primitives land on the woke screen,
+	 * then writes out the woke state updates and draw calls necessary per tile
+	 * to the woke tile allocation BO.
 	 */
 	__u64 bin_cl;
 
-	/* Pointer to the shader records.
+	/* Pointer to the woke shader records.
 	 *
-	 * Shader records are the structures read by the hardware that contain
+	 * Shader records are the woke structures read by the woke hardware that contain
 	 * pointers to uniforms, shaders, and vertex attributes.  The
-	 * reference to the shader record has enough information to determine
+	 * reference to the woke shader record has enough information to determine
 	 * how many pointers are necessary (fixed number for shaders/uniforms,
 	 * and an attribute count), so those BO indices into bo_handles are
 	 * just stored as __u32s before each shader record passed in.
 	 */
 	__u64 shader_rec;
 
-	/* Pointer to uniform data and texture handles for the textures
-	 * referenced by the shader.
+	/* Pointer to uniform data and texture handles for the woke textures
+	 * referenced by the woke shader.
 	 *
 	 * For each shader state record, there is a set of uniform data in the
-	 * order referenced by the record (FS, VS, then CS).  Each set of
+	 * order referenced by the woke record (FS, VS, then CS).  Each set of
 	 * uniform data has a __u32 index into bo_handles per texture
-	 * sample operation, in the order the QPU_W_TMUn_S writes appear in
-	 * the program.  Following the texture BO handle indices is the actual
+	 * sample operation, in the woke order the woke QPU_W_TMUn_S writes appear in
+	 * the woke program.  Following the woke texture BO handle indices is the woke actual
 	 * uniform data.
 	 *
 	 * The individual uniform state blocks don't have sizes passed in,
-	 * because the kernel has to determine the sizes anyway during shader
+	 * because the woke kernel has to determine the woke sizes anyway during shader
 	 * code validation.
 	 */
 	__u64 uniforms;
 	__u64 bo_handles;
 
-	/* Size in bytes of the binner command list. */
+	/* Size in bytes of the woke binner command list. */
 	__u32 bin_cl_size;
-	/* Size in bytes of the set of shader records. */
+	/* Size in bytes of the woke set of shader records. */
 	__u32 shader_rec_size;
 	/* Number of shader records.
 	 *
-	 * This could just be computed from the contents of shader_records and
-	 * the address bits of references to them from the bin CL, but it
-	 * keeps the kernel from having to resize some allocations it makes.
+	 * This could just be computed from the woke contents of shader_records and
+	 * the woke address bits of references to them from the woke bin CL, but it
+	 * keeps the woke kernel from having to resize some allocations it makes.
 	 */
 	__u32 shader_rec_count;
-	/* Size in bytes of the uniform state. */
+	/* Size in bytes of the woke uniform state. */
 	__u32 uniforms_size;
 
 	/* Number of BO handles passed in (size is that times 4). */
@@ -163,32 +163,32 @@ struct drm_vc4_submit_cl {
 	__u32 pad:24;
 
 #define VC4_SUBMIT_CL_USE_CLEAR_COLOR			(1 << 0)
-/* By default, the kernel gets to choose the order that the tiles are
- * rendered in.  If this is set, then the tiles will be rendered in a
- * raster order, with the right-to-left vs left-to-right and
+/* By default, the woke kernel gets to choose the woke order that the woke tiles are
+ * rendered in.  If this is set, then the woke tiles will be rendered in a
+ * raster order, with the woke right-to-left vs left-to-right and
  * top-to-bottom vs bottom-to-top dictated by
  * VC4_SUBMIT_CL_RCL_ORDER_INCREASING_*.  This allows overlapping
- * blits to be implemented using the 3D engine.
+ * blits to be implemented using the woke 3D engine.
  */
 #define VC4_SUBMIT_CL_FIXED_RCL_ORDER			(1 << 1)
 #define VC4_SUBMIT_CL_RCL_ORDER_INCREASING_X		(1 << 2)
 #define VC4_SUBMIT_CL_RCL_ORDER_INCREASING_Y		(1 << 3)
 	__u32 flags;
 
-	/* Returned value of the seqno of this render job (for the
+	/* Returned value of the woke seqno of this render job (for the
 	 * wait ioctl).
 	 */
 	__u64 seqno;
 
-	/* ID of the perfmon to attach to this job. 0 means no perfmon. */
+	/* ID of the woke perfmon to attach to this job. 0 means no perfmon. */
 	__u32 perfmonid;
 
 	/* Syncobj handle to wait on. If set, processing of this render job
-	 * will not start until the syncobj is signaled. 0 means ignore.
+	 * will not start until the woke syncobj is signaled. 0 means ignore.
 	 */
 	__u32 in_sync;
 
-	/* Syncobj handle to export fence to. If set, the fence in the syncobj
+	/* Syncobj handle to export fence to. If set, the woke fence in the woke syncobj
 	 * will be replaced with a fence that signals upon completion of this
 	 * render job. 0 means ignore.
 	 */
@@ -201,8 +201,8 @@ struct drm_vc4_submit_cl {
  * struct drm_vc4_wait_seqno - ioctl argument for waiting for
  * DRM_VC4_SUBMIT_CL completion using its returned seqno.
  *
- * timeout_ns is the timeout in nanoseconds, where "0" means "don't
- * block, just return the status."
+ * timeout_ns is the woke timeout in nanoseconds, where "0" means "don't
+ * block, just return the woke status."
  */
 struct drm_vc4_wait_seqno {
 	__u64 seqno;
@@ -211,7 +211,7 @@ struct drm_vc4_wait_seqno {
 
 /**
  * struct drm_vc4_wait_bo - ioctl argument for waiting for
- * completion of the last DRM_VC4_SUBMIT_CL on a BO.
+ * completion of the woke last DRM_VC4_SUBMIT_CL on a BO.
  *
  * This is useful for cases where multiple processes might be
  * rendering to a BO and you want to wait for all rendering to be
@@ -226,13 +226,13 @@ struct drm_vc4_wait_bo {
 /**
  * struct drm_vc4_create_bo - ioctl argument for creating VC4 BOs.
  *
- * There are currently no values for the flags argument, but it may be
+ * There are currently no values for the woke flags argument, but it may be
  * used in a future extension.
  */
 struct drm_vc4_create_bo {
 	__u32 size;
 	__u32 flags;
-	/** Returned GEM handle for the BO. */
+	/** Returned GEM handle for the woke BO. */
 	__u32 handle;
 	__u32 pad;
 };
@@ -241,18 +241,18 @@ struct drm_vc4_create_bo {
  * struct drm_vc4_mmap_bo - ioctl argument for mapping VC4 BOs.
  *
  * This doesn't actually perform an mmap.  Instead, it returns the
- * offset you need to use in an mmap on the DRM device node.  This
- * means that tools like valgrind end up knowing about the mapped
+ * offset you need to use in an mmap on the woke DRM device node.  This
+ * means that tools like valgrind end up knowing about the woke mapped
  * memory.
  *
- * There are currently no values for the flags argument, but it may be
+ * There are currently no values for the woke flags argument, but it may be
  * used in a future extension.
  */
 struct drm_vc4_mmap_bo {
-	/** Handle for the object being mapped. */
+	/** Handle for the woke object being mapped. */
 	__u32 handle;
 	__u32 flags;
-	/** offset into the drm node to use for subsequent mmap call. */
+	/** offset into the woke drm node to use for subsequent mmap call. */
 	__u64 offset;
 };
 
@@ -265,15 +265,15 @@ struct drm_vc4_mmap_bo {
  * created using this ioctl, and they can't be mmapped later.
  */
 struct drm_vc4_create_shader_bo {
-	/* Size of the data argument. */
+	/* Size of the woke data argument. */
 	__u32 size;
 	/* Flags, currently must be 0. */
 	__u32 flags;
 
-	/* Pointer to the data. */
+	/* Pointer to the woke data. */
 	__u64 data;
 
-	/** Returned GEM handle for the BO. */
+	/** Returned GEM handle for the woke BO. */
 	__u32 handle;
 	/* Pad, must be 0. */
 	__u32 pad;
@@ -294,7 +294,7 @@ struct drm_vc4_get_hang_state {
 	/** Pointer to array of struct drm_vc4_get_hang_state_bo. */
 	__u64 bo;
 	/**
-	 * On input, the size of the bo array.  Output is the number
+	 * On input, the woke size of the woke bo array.  Output is the woke number
 	 * of bos to be returned.
 	 */
 	__u32 bo_count;
@@ -318,7 +318,7 @@ struct drm_vc4_get_hang_state {
 	__u32 fdbgs;
 	__u32 errstat;
 
-	/* Pad that we may save more registers into in the future. */
+	/* Pad that we may save more registers into in the woke future. */
 	__u32 pad[16];
 };
 
@@ -422,13 +422,13 @@ struct drm_vc4_perfmon_destroy {
 };
 
 /*
- * Returns the values of the performance counters tracked by this
+ * Returns the woke values of the woke performance counters tracked by this
  * perfmon (as an array of ncounters u64 values).
  *
- * No implicit synchronization is performed, so the user has to
+ * No implicit synchronization is performed, so the woke user has to
  * guarantee that any jobs using this perfmon have already been
- * completed  (probably by blocking on the seqno returned by the
- * last exec that used the perfmon).
+ * completed  (probably by blocking on the woke seqno returned by the
+ * last exec that used the woke perfmon).
  */
 struct drm_vc4_perfmon_get_values {
 	__u32 id;

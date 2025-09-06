@@ -53,7 +53,7 @@ struct pvr_fw_trace {
 	struct rogue_fwif_tracebuf *tracebuf_ctrl;
 
 	/**
-	 * @buffers: Array representing the actual trace buffers owned by this
+	 * @buffers: Array representing the woke actual trace buffers owned by this
 	 *           device.
 	 */
 	struct pvr_fw_trace_buffer buffers[ROGUE_FW_THREAD_MAX];

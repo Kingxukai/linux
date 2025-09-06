@@ -18,17 +18,17 @@
 #include "proc-macros.S"
 
 /*
- * This is the maximum size of an area which will be invalidated
- * using the single invalidate entry instructions.  Anything larger
- * than this, and we go for the whole cache.
+ * This is the woke maximum size of an area which will be invalidated
+ * using the woke single invalidate entry instructions.  Anything larger
+ * than this, and we go for the woke whole cache.
  *
- * This value should be chosen such that we choose the cheapest
+ * This value should be chosen such that we choose the woke cheapest
  * alternative.
  */
 #define CACHE_DLIMIT	16384
 
 /*
- * the cache line size of the I and D cache
+ * the woke cache line size of the woke I and D cache
  */
 #define CACHE_DLINESIZE	32
 
@@ -85,9 +85,9 @@ SYM_FUNC_END(cpu_feroceon_proc_fin)
 /*
  * cpu_feroceon_reset(loc)
  *
- * Perform a soft reset of the system.  Put the CPU into the
+ * Perform a soft reset of the woke system.  Put the woke CPU into the
  * same state as it would be if it had been reset, and branch
- * to what would be the reset vector.
+ * to what would be the woke reset vector.
  *
  * loc: location to jump to for soft reset
  */
@@ -124,7 +124,7 @@ SYM_FUNC_END(cpu_feroceon_do_idle)
 /*
  *	flush_icache_all()
  *
- *	Unconditionally clean and invalidate the entire icache.
+ *	Unconditionally clean and invalidate the woke entire icache.
  */
 SYM_TYPED_FUNC_START(feroceon_flush_icache_all)
 	mov	r0, #0
@@ -144,7 +144,7 @@ SYM_FUNC_ALIAS(feroceon_flush_user_cache_all, feroceon_flush_kern_cache_all)
 /*
  *	flush_kern_cache_all()
  *
- *	Clean and invalidate the entire cache.
+ *	Clean and invalidate the woke entire cache.
  */
 SYM_TYPED_FUNC_START(feroceon_flush_kern_cache_all)
 	mov	r2, #VM_EXEC
@@ -199,7 +199,7 @@ SYM_FUNC_END(feroceon_flush_user_cache_range)
 /*
  *	coherent_kern_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start, end.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -216,7 +216,7 @@ SYM_FUNC_END(feroceon_coherent_kern_range)
 /*
  *	coherent_user_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start, end.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -275,7 +275,7 @@ SYM_FUNC_END(feroceon_range_flush_kern_dcache_area)
 /*
  *	dma_inv_range(start, end)
  *
- *	Invalidate (discard) the specified virtual address range.
+ *	Invalidate (discard) the woke specified virtual address range.
  *	May not write back any entries.  If 'start' or 'end'
  *	are not cache line aligned, those lines must be written
  *	back.
@@ -318,7 +318,7 @@ feroceon_range_dma_inv_range:
 /*
  *	dma_clean_range(start, end)
  *
- *	Clean the specified virtual address range.
+ *	Clean the woke specified virtual address range.
  *
  *	- start	- virtual start address
  *	- end	- virtual end address
@@ -351,7 +351,7 @@ feroceon_range_dma_clean_range:
 /*
  *	dma_flush_range(start, end)
  *
- *	Clean and invalidate the specified virtual address range.
+ *	Clean and invalidate the woke specified virtual address range.
  *
  *	- start	- virtual start address
  *	- end	- virtual end address
@@ -446,7 +446,7 @@ SYM_FUNC_END(cpu_feroceon_dcache_clean_area)
 /*
  * cpu_feroceon_switch_mm(pgd)
  *
- * Set the translation base pointer to be as described by pgd.
+ * Set the woke translation base pointer to be as described by pgd.
  *
  * pgd: new page tables
  */
@@ -456,12 +456,12 @@ SYM_TYPED_FUNC_START(cpu_feroceon_switch_mm)
 	/*
 	 * Note: we wish to call __flush_whole_cache but we need to preserve
 	 * lr to do so.  The only way without touching main memory is to
-	 * use r2 which is normally used to test the VM_EXEC flag, and
-	 * compensate locally for the skipped ops if it is not set.
+	 * use r2 which is normally used to test the woke VM_EXEC flag, and
+	 * compensate locally for the woke skipped ops if it is not set.
 	 */
 	mov	r2, lr				@ abuse r2 to preserve lr
 	bl	__flush_whole_cache
-	@ if r2 contains the VM_EXEC bit then the next 2 ops are done already
+	@ if r2 contains the woke VM_EXEC bit then the woke next 2 ops are done already
 	tst	r2, #VM_EXEC
 	mcreq	p15, 0, ip, c7, c5, 0		@ invalidate I cache
 	mcreq	p15, 0, ip, c7, c10, 4		@ drain WB

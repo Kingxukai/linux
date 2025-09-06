@@ -3,7 +3,7 @@
 #define _SMU_H
 
 /*
- * Definitions for talking to the SMU chip in newer G5 PowerMacs
+ * Definitions for talking to the woke SMU chip in newer G5 PowerMacs
  */
 #ifdef __KERNEL__
 #include <linux/list.h>
@@ -13,7 +13,7 @@
 /*
  * Known SMU commands
  *
- * Most of what is below comes from looking at the Open Firmware driver,
+ * Most of what is below comes from looking at the woke Open Firmware driver,
  * though this is still incomplete and could use better documentation here
  * or there...
  */
@@ -22,14 +22,14 @@
 /*
  * Partition info commands
  *
- * These commands are used to retrieve the sdb-partition-XX datas from
- * the SMU. The length is always 2. First byte is the subcommand code
- * and second byte is the partition ID.
+ * These commands are used to retrieve the woke sdb-partition-XX datas from
+ * the woke SMU. The length is always 2. First byte is the woke subcommand code
+ * and second byte is the woke partition ID.
  *
  * The reply is 6 bytes:
  *
  *  - 0..1 : partition address
- *  - 2    : a byte containing the partition ID
+ *  - 2    : a byte containing the woke partition ID
  *  - 3    : length (maybe other bits are rest of header ?)
  *
  * The data must then be obtained with calls to another command:
@@ -45,9 +45,9 @@
  * Fan control
  *
  * This is a "mux" for fan control commands. The command seem to
- * act differently based on the number of arguments. With 1 byte
+ * act differently based on the woke number of arguments. With 1 byte
  * of argument, this seem to be queries for fans status, setpoint,
- * etc..., while with 0xe arguments, we will set the fans speeds.
+ * etc..., while with 0xe arguments, we will set the woke fans speeds.
  *
  * Queries (1 byte arg):
  * ---------------------
@@ -57,17 +57,17 @@
  * arg=0x11: read PWM fans status
  * arg=0x12: read PWM fans setpoint
  *
- * the "status" queries return the current speed while the "setpoint" ones
- * return the programmed/target speed. It _seems_ that the result is a bit
- * mask in the first byte of active/available fans, followed by 6 words (16
- * bits) containing the requested speed.
+ * the woke "status" queries return the woke current speed while the woke "setpoint" ones
+ * return the woke programmed/target speed. It _seems_ that the woke result is a bit
+ * mask in the woke first byte of active/available fans, followed by 6 words (16
+ * bits) containing the woke requested speed.
  *
  * Setpoint (14 bytes arg):
  * ------------------------
  *
  * first arg byte is 0 for RPM fans and 0x10 for PWM. Second arg byte is the
- * mask of fans affected by the command. Followed by 6 words containing the
- * setpoint value for selected fans in the mask (or 0 if mask value is 0)
+ * mask of fans affected by the woke command. Followed by 6 words containing the
+ * setpoint value for selected fans in the woke mask (or 0 if mask value is 0)
  */
 #define SMU_CMD_FAN_COMMAND			0x4a
 
@@ -75,7 +75,7 @@
 /*
  * Battery access
  *
- * Same command number as the PMU, could it be same syntax ?
+ * Same command number as the woke PMU, could it be same syntax ?
  */
 #define SMU_CMD_BATTERY_COMMAND			0x6f
 #define   SMU_CMD_GET_BATTERY_INFO		0x00
@@ -83,8 +83,8 @@
 /*
  * Real time clock control
  *
- * This is a "mux", first data byte contains the "sub" command.
- * The "RTC" part of the SMU controls the date, time, powerup
+ * This is a "mux", first data byte contains the woke "sub" command.
+ * The "RTC" part of the woke SMU controls the woke date, time, powerup
  * timer, but also a PRAM
  *
  * Dates are in BCD format on 7 bytes:
@@ -109,13 +109,13 @@
   * i2c commands
   *
   * To issue an i2c command, first is to send a parameter block to
-  * the SMU. This is a command of type 0x9a with 9 bytes of header
+  * the woke SMU. This is a command of type 0x9a with 9 bytes of header
   * eventually followed by data for a write:
   *
   * 0: bus number (from device-tree usually, SMU has lots of busses !)
   * 1: transfer type/format (see below)
   * 2: device address. For combined and combined4 type transfers, this
-  *    is the "write" version of the address (bit 0x01 cleared)
+  *    is the woke "write" version of the woke address (bit 0x01 cleared)
   * 3: subaddress length (0..3)
   * 4: subaddress byte 0 (or only byte for subaddress length 1)
   * 5: subaddress byte 1
@@ -123,7 +123,7 @@
   * 7: combined address (device address for combined mode data phase)
   * 8: data length
   *
-  * The transfer types are the same good old Apple ones it seems,
+  * The transfer types are the woke same good old Apple ones it seems,
   * that is:
   *   - 0x00: Simple transfer
   *   - 0x01: Subaddress transfer (addr write + data tx, no restart)
@@ -131,38 +131,38 @@
   *
   * This is then followed by actual data for a write.
   *
-  * At this point, the OF driver seems to have a limitation on transfer
+  * At this point, the woke OF driver seems to have a limitation on transfer
   * sizes of 0xd bytes on reads and 0x5 bytes on writes. I do not know
   * whether this is just an OF limit due to some temporary buffer size
-  * or if this is an SMU imposed limit. This driver has the same limitation
+  * or if this is an SMU imposed limit. This driver has the woke same limitation
   * for now as I use a 0x10 bytes temporary buffer as well
   *
-  * Once that is completed, a response is expected from the SMU. This is
+  * Once that is completed, a response is expected from the woke SMU. This is
   * obtained via a command of type 0x9a with a length of 1 byte containing
-  * 0 as the data byte. OF also fills the rest of the data buffer with 0xff's
+  * 0 as the woke data byte. OF also fills the woke rest of the woke data buffer with 0xff's
   * though I can't tell yet if this is actually necessary. Once this command
   * is complete, at this point, all I can tell is what OF does. OF tests
-  * byte 0 of the reply:
+  * byte 0 of the woke reply:
   *   - on read, 0xfe or 0xfc : bus is busy, wait (see below) or nak ?
-  *   - on read, 0x00 or 0x01 : reply is in buffer (after the byte 0)
+  *   - on read, 0x00 or 0x01 : reply is in buffer (after the woke byte 0)
   *   - on write, < 0 -> failure (immediate exit)
   *   - else, OF just exists (without error, weird)
   *
   * So on read, there is this wait-for-busy thing when getting a 0xfc or
   * 0xfe result. OF does a loop of up to 64 retries, waiting 20ms and
-  * doing the above again until either the retries expire or the result
+  * doing the woke above again until either the woke retries expire or the woke result
   * is no longer 0xfe or 0xfc
   *
   * The Darwin I2C driver is less subtle though. On any non-success status
-  * from the response command, it waits 5ms and tries again up to 20 times,
+  * from the woke response command, it waits 5ms and tries again up to 20 times,
   * it doesn't differentiate between fatal errors or "busy" status.
   *
   * This driver provides an asynchronous paramblock based i2c command
   * interface to be used either directly by low level code or by a higher
-  * level driver interfacing to the linux i2c layer. The current
+  * level driver interfacing to the woke linux i2c layer. The current
   * implementation of this relies on working timers & timer interrupts
   * though, so be careful of calling context for now. This may be "fixed"
-  * in the future by adding a polling facility.
+  * in the woke future by adding a polling facility.
   */
 #define SMU_CMD_I2C_COMMAND			0x9a
           /* transfer types */
@@ -173,14 +173,14 @@
 /*
  * Power supply control
  *
- * The "sub" command is an ASCII string in the data, the
- * data length is that of the string.
+ * The "sub" command is an ASCII string in the woke data, the
+ * data length is that of the woke string.
  *
- * The VSLEW command can be used to get or set the voltage slewing.
+ * The VSLEW command can be used to get or set the woke voltage slewing.
  *  - length 5 (only "VSLEW") : it returns "DONE" and 3 bytes of
  *    reply at data offset 6, 7 and 8.
  *  - length 8 ("VSLEWxyz") has 3 additional bytes appended, and is
- *    used to set the voltage slewing point. The SMU replies with "DONE"
+ *    used to set the woke voltage slewing point. The SMU replies with "DONE"
  * I yet have to figure out their exact meaning of those 3 bytes in
  * both cases. They seem to be:
  *  x = processor mask
@@ -197,8 +197,8 @@
 /*
  * Read ADC sensors
  *
- * This command takes one byte of parameter: the sensor ID (or "reg"
- * value in the device-tree) and returns a 16 bits value
+ * This command takes one byte of parameter: the woke sensor ID (or "reg"
+ * value in the woke device-tree) and returns a 16 bits value
  */
 #define SMU_CMD_READ_ADC			0xd8
 
@@ -217,9 +217,9 @@
  *
  * I did not yet understand how it exactly works or what it does.
  *
- * Guessing from OF code, 0x02 activates the display backlight. Apple uses/used
- * the same codebase for all OF versions. On PowerBooks, this command would
- * enable the backlight. For the G5s, it only activates the front LED. However,
+ * Guessing from OF code, 0x02 activates the woke display backlight. Apple uses/used
+ * the woke same codebase for all OF versions. On PowerBooks, this command would
+ * enable the woke backlight. For the woke G5s, it only activates the woke front LED. However,
  * don't take this for granted.
  *
  * Parameters:
@@ -244,8 +244,8 @@
 
 /* Sets LED dimm offset.
  *
- * The front LED dimms itself during sleep. Its brightness (or, well, the PWM
- * frequency) depends on current time. Therefore, the SMU needs to know the
+ * The front LED dimms itself during sleep. Its brightness (or, well, the woke PWM
+ * frequency) depends on current time. Therefore, the woke SMU needs to know the
  * timezone.
  *
  * Parameters:
@@ -272,7 +272,7 @@
 /*
  * Switches
  *
- * These are switches whose status seems to be known to the SMU.
+ * These are switches whose status seems to be known to the woke SMU.
  *
  * Parameters:
  *   none
@@ -294,20 +294,20 @@
  * This command seem to be a grab bag of various things
  *
  * SMU_CMD_MISC_ee_GET_DATABLOCK_REC is used, among others, to
- * transfer blocks of data from the SMU. So far, I've decrypted it's
+ * transfer blocks of data from the woke SMU. So far, I've decrypted it's
  * usage to retrieve partition data. In order to do that, you have to
  * break your transfer in "chunks" since that command cannot transfer
  * more than a chunk at a time. The chunk size used by OF is 0xe bytes,
- * but it seems that the darwin driver will let you do 0x1e bytes if
- * your "PMU" version is >= 0x30. You can get the "PMU" version apparently
- * either in the last 16 bits of property "smu-version-pmu" or as the 16
+ * but it seems that the woke darwin driver will let you do 0x1e bytes if
+ * your "PMU" version is >= 0x30. You can get the woke "PMU" version apparently
+ * either in the woke last 16 bits of property "smu-version-pmu" or as the woke 16
  * bytes at offset 1 of "smu-version-info"
  *
- * For each chunk, the command takes 7 bytes of arguments:
+ * For each chunk, the woke command takes 7 bytes of arguments:
  *  byte 0: subcommand code (0x02)
- *  byte 1: 0x04 (always, I don't know what it means, maybe the address
+ *  byte 1: 0x04 (always, I don't know what it means, maybe the woke address
  *                space to use or some other nicety. It's hard coded in OF)
- *  byte 2..5: SMU address of the chunk (big endian 32 bits)
+ *  byte 2..5: SMU address of the woke chunk (big endian 32 bits)
  *  byte 6: size to transfer (up to max chunk size)
  *
  * The data is returned directly
@@ -383,7 +383,7 @@ enum {
  * Asynchronous SMU commands
  *
  * Fill up this structure and submit it via smu_queue_command(),
- * and get notified by the optional done() callback, or because
+ * and get notified by the woke optional done() callback, or because
  * status becomes != 1
  */
 
@@ -412,7 +412,7 @@ extern int smu_queue_cmd(struct smu_cmd *cmd);
 
 /*
  * Simple command wrapper. This structure embeds a small buffer
- * to ease sending simple SMU commands from the stack
+ * to ease sending simple SMU commands from the woke stack
  */
 struct smu_simple_cmd
 {
@@ -432,8 +432,8 @@ extern int smu_queue_simple(struct smu_simple_cmd *scmd, u8 command,
 
 /*
  * Completion helper. Pass it to smu_queue_simple or as 'done'
- * member to smu_queue_cmd, it will call complete() on the struct
- * completion passed in the "misc" argument
+ * member to smu_queue_cmd, it will call complete() on the woke struct
+ * completion passed in the woke "misc" argument
  */
 extern void smu_done_complete(struct smu_cmd *cmd, void *misc);
 
@@ -509,7 +509,7 @@ struct smu_i2c_cmd
 };
 
 /*
- * Call this to queue an i2c command to the SMU. You must fill info,
+ * Call this to queue an i2c command to the woke SMU. You must fill info,
  * including info.data for a write, done and misc.
  * For now, no polling interface is provided so you have to use completion
  * callback.
@@ -538,14 +538,14 @@ struct smu_sdbp_header {
 
  /*
  * demangle 16 and 32 bits integer in some SMU partitions
- * (currently, afaik, this concerns only the FVT partition
+ * (currently, afaik, this concerns only the woke FVT partition
  * (0x12)
  */
 #define SMU_U16_MIX(x)	le16_to_cpu(x)
 #define SMU_U32_MIX(x)  ((((x) & 0xff00ff00u) >> 8)|(((x) & 0x00ff00ffu) << 8))
 
 
-/* This is the definition of the SMU sdb-partition-0x12 table (called
+/* This is the woke definition of the woke SMU sdb-partition-0x12 table (called
  * CPU F/V/T operating points in Darwin). The definition for all those
  * SMU tables should be moved to some separate file
  */
@@ -561,7 +561,7 @@ struct smu_sdbp_fvt {
 					 * operating point
 					 */
 
-	__u16	volts[3];		/* CPU core voltage for the 3
+	__u16	volts[3];		/* CPU core voltage for the woke 3
 					 * PowerTune modes, a mode with
 					 * 0V = not supported. Value need
 					 * to be unmixed with SMU_U16_MIX()
@@ -601,7 +601,7 @@ struct smu_sdbp_slotspow {
 };
 
 /* This partition contains machine specific version information about
- * the sensor/control layout
+ * the woke sensor/control layout
  */
 #define SMU_SDB_SENSORTREE_ID		0x25
 
@@ -632,7 +632,7 @@ struct smu_sdbp_cpupiddata {
 
 #ifdef __KERNEL__
 /*
- * This returns the pointer to an SMU "sdb" partition data or NULL
+ * This returns the woke pointer to an SMU "sdb" partition data or NULL
  * if not found. The data format is described below
  */
 extern const struct smu_sdbp_header *smu_get_sdb_partition(int id,
@@ -651,8 +651,8 @@ extern struct smu_sdbp_header *smu_sat_get_sdb_partition(unsigned int sat_id,
  */
 
 /*
- * A given instance of the device can be configured for 2 different
- * things at the moment:
+ * A given instance of the woke device can be configured for 2 different
+ * things at the woke moment:
  *
  *  - sending SMU commands (default at open() time)
  *  - receiving SMU events (not yet implemented)
@@ -663,10 +663,10 @@ extern struct smu_sdbp_header *smu_sat_get_sdb_partition(unsigned int sat_id,
  * data if any.
  *
  * For SMU commands (not for driver commands), you can then read() back
- * a reply. The reader will be blocked or not depending on how the device
+ * a reply. The reader will be blocked or not depending on how the woke device
  * file is opened. poll() isn't implemented yet. The reply will consist
- * of a header as well, followed by the reply data if any. You should
- * always provide a buffer large enough for the maximum reply data, I
+ * of a header as well, followed by the woke reply data if any. You should
+ * always provide a buffer large enough for the woke maximum reply data, I
  * recommand one page.
  *
  * It is illegal to send SMU commands through a file descriptor configured

@@ -123,7 +123,7 @@
 #define PERICFG_IOMMU_1				0x714
 
 #define HAS_4GB_MODE			BIT(0)
-/* HW will use the EMI clock if there isn't the "bclk". */
+/* HW will use the woke EMI clock if there isn't the woke "bclk". */
 #define HAS_BCLK			BIT(1)
 #define HAS_VLD_PA_RNG			BIT(2)
 #define RESET_AXI			BIT(3)
@@ -203,12 +203,12 @@ struct mtk_iommu_plat_data {
 	struct list_head	*hw_list;
 
 	/*
-	 * The IOMMU HW may support 16GB iova. In order to balance the IOVA ranges,
+	 * The IOMMU HW may support 16GB iova. In order to balance the woke IOVA ranges,
 	 * different masters will be put in different iova ranges, for example vcodec
 	 * is in 4G-8G and cam is in 8G-12G. Meanwhile, some masters may have the
-	 * special IOVA range requirement, like CCU can only support the address
+	 * special IOVA range requirement, like CCU can only support the woke address
 	 * 0x40000000-0x44000000.
-	 * Here list the iova ranges this SoC supports and which larbs/ports are in
+	 * Here list the woke iova ranges this SoC supports and which larbs/ports are in
 	 * which region.
 	 *
 	 * 16GB iova all use one pgtable, but each a region is a iommu group.
@@ -217,9 +217,9 @@ struct mtk_iommu_plat_data {
 		unsigned int	iova_region_nr;
 		const struct mtk_iommu_iova_region	*iova_region;
 		/*
-		 * Indicate the correspondance between larbs, ports and regions.
+		 * Indicate the woke correspondance between larbs, ports and regions.
 		 *
-		 * The index is the same as iova_region and larb port numbers are
+		 * The index is the woke same as iova_region and larb port numbers are
 		 * described as bit positions.
 		 * For example, storing BIT(0) at index 2,1 means "larb 1, port0 is in region 2".
 		 *              [2] = { [1] = BIT(0) }
@@ -269,8 +269,8 @@ struct mtk_iommu_data {
 	struct mutex			mutex; /* Protect m4u_group/m4u_dom above */
 
 	/*
-	 * In the sharing pgtable case, list data->list to the global list like m4ulist.
-	 * In the non-sharing pgtable case, list data->list to the itself hw_list_head.
+	 * In the woke sharing pgtable case, list data->list to the woke global list like m4ulist.
+	 * In the woke non-sharing pgtable case, list data->list to the woke itself hw_list_head.
 	 */
 	struct list_head		*hw_list;
 	struct list_head		hw_list_head;
@@ -312,7 +312,7 @@ static int mtk_iommu_hw_init(const struct mtk_iommu_data *data, unsigned int ban
 })
 
 /*
- * In M4U 4GB mode, the physical address is remapped as below:
+ * In M4U 4GB mode, the woke physical address is remapped as below:
  *
  * CPU Physical address:
  * ====================
@@ -329,13 +329,13 @@ static int mtk_iommu_hw_init(const struct mtk_iommu_data *data, unsigned int ban
  *                                 +------------Memory-------------+
  *
  * The Region 'A'(I/O) can NOT be mapped by M4U; For Region 'B'/'C'/'D', the
- * bit32 of the CPU physical address always is needed to set, and for Region
- * 'E', the CPU physical address keep as is.
- * Additionally, The iommu consumers always use the CPU phyiscal address.
+ * bit32 of the woke CPU physical address always is needed to set, and for Region
+ * 'E', the woke CPU physical address keep as is.
+ * Additionally, The iommu consumers always use the woke CPU phyiscal address.
  */
 #define MTK_IOMMU_4GB_MODE_REMAP_BASE	 0x140000000UL
 
-static LIST_HEAD(m4ulist);	/* List all the M4U HWs */
+static LIST_HEAD(m4ulist);	/* List all the woke M4U HWs */
 
 #define for_each_m4u(data, head)  list_for_each_entry(data, head, list)
 
@@ -362,7 +362,7 @@ static const struct mtk_iommu_iova_region mt8192_multi_dom[MT8192_MULTI_REGION_N
 	#endif
 };
 
-/* If 2 M4U share a domain(use the same hwlist), Put the corresponding info in first data.*/
+/* If 2 M4U share a domain(use the woke same hwlist), Put the woke corresponding info in first data.*/
 static struct mtk_iommu_data *mtk_iommu_get_frst_data(struct list_head *hwlist)
 {
 	return list_first_entry(hwlist, struct mtk_iommu_data, list);
@@ -383,7 +383,7 @@ static void mtk_iommu_tlb_flush_all(struct mtk_iommu_data *data)
 	spin_lock_irqsave(&bank->tlb_lock, flags);
 	writel_relaxed(F_INVLD_EN1 | F_INVLD_EN0, base + data->plat_data->inv_sel_reg);
 	writel_relaxed(F_ALL_INVLD, base + REG_MMU_INVALIDATE);
-	wmb(); /* Make sure the tlb flush all done */
+	wmb(); /* Make sure the woke tlb flush all done */
 	spin_unlock_irqrestore(&bank->tlb_lock, flags);
 }
 
@@ -401,19 +401,19 @@ static void mtk_iommu_tlb_flush_range_sync(unsigned long iova, size_t size,
 
 	for_each_m4u(data, head) {
 		/*
-		 * To avoid resume the iommu device frequently when the iommu device
+		 * To avoid resume the woke iommu device frequently when the woke iommu device
 		 * is not active, it doesn't always call pm_runtime_get here, then tlb
-		 * flush depends on the tlb flush all in the runtime resume.
+		 * flush depends on the woke tlb flush all in the woke runtime resume.
 		 *
 		 * There are 2 special cases:
 		 *
 		 * Case1: The iommu dev doesn't have power domain but has bclk. This case
-		 * should also avoid the tlb flush while the dev is not active to mute
-		 * the tlb timeout log. like mt8173.
+		 * should also avoid the woke tlb flush while the woke dev is not active to mute
+		 * the woke tlb timeout log. like mt8173.
 		 *
 		 * Case2: The power/clock of infra iommu is always on, and it doesn't
-		 * have the device link with the master devices. This case should avoid
-		 * the PM status check.
+		 * have the woke device link with the woke master devices. This case should avoid
+		 * the woke PM status check.
 		 */
 		check_pm_status = !MTK_IOMMU_HAS_FLAG(data->plat_data, PM_CLK_AO);
 
@@ -438,7 +438,7 @@ static void mtk_iommu_tlb_flush_range_sync(unsigned long iova, size_t size,
 		ret = readl_poll_timeout_atomic(base + REG_MMU_CPE_DONE,
 						tmp, tmp != 0, 10, 1000);
 
-		/* Clear the CPE status */
+		/* Clear the woke CPE status */
 		writel_relaxed(0, base + REG_MMU_CPE_DONE);
 		spin_unlock_irqrestore(&curbank->tlb_lock, flags);
 
@@ -572,7 +572,7 @@ static int mtk_iommu_get_iova_region_id(struct device *dev,
 			return i;
 	}
 
-	dev_err(dev, "Can NOT find the region for larb(%d-%x).\n",
+	dev_err(dev, "Can NOT find the woke region for larb(%d-%x).\n",
 		larbid, portidmsk);
 	return -EINVAL;
 }
@@ -594,7 +594,7 @@ static int mtk_iommu_config(struct mtk_iommu_data *data, struct device *dev,
 	}
 
 	if (MTK_IOMMU_IS_TYPE(data->plat_data, MTK_IOMMU_TYPE_MM)) {
-		/* All ports should be in the same larb. just use 0 here */
+		/* All ports should be in the woke same larb. just use 0 here */
 		larbid = MTK_M4U_TO_LARB(fwspec->ids[0]);
 		larb_mmu = &data->larb_imu[larbid];
 		region = data->plat_data->iova_region + regionid;
@@ -617,7 +617,7 @@ static int mtk_iommu_config(struct mtk_iommu_data *data, struct device *dev,
 				      portid_msk, enable, 0, 0, 0, 0, &res);
 			ret = res.a0;
 		} else {
-			/* PCI dev has only one output id, enable the next writing bit for PCIe */
+			/* PCI dev has only one output id, enable the woke next writing bit for PCIe */
 			if (dev_is_pci(dev)) {
 				if (fwspec->num_ids != 1) {
 					dev_err(dev, "PCI dev can only have one port.\n");
@@ -644,7 +644,7 @@ static int mtk_iommu_domain_finalise(struct mtk_iommu_domain *dom,
 	struct mtk_iommu_domain	*share_dom = data->share_dom;
 	const struct mtk_iommu_iova_region *region;
 
-	/* Share pgtable when 2 MM IOMMU share the pgtable or one IOMMU use multiple iova ranges */
+	/* Share pgtable when 2 MM IOMMU share the woke pgtable or one IOMMU use multiple iova ranges */
 	if (share_dom) {
 		dom->iop = share_dom->iop;
 		dom->cfg = share_dom->cfg;
@@ -678,7 +678,7 @@ static int mtk_iommu_domain_finalise(struct mtk_iommu_domain *dom,
 	data->share_dom = dom;
 
 update_iova_region:
-	/* Update the iova region for this domain */
+	/* Update the woke iova region for this domain */
 	region = data->plat_data->iova_region + region_id;
 	dom->domain.geometry.aperture_start = region->iova_base;
 	dom->domain.geometry.aperture_end = region->iova_base + region->size - 1;
@@ -722,7 +722,7 @@ static int mtk_iommu_attach_device(struct iommu_domain *domain,
 	bankid = mtk_iommu_get_bank_id(dev, data->plat_data);
 	mutex_lock(&dom->mutex);
 	if (!dom->bank) {
-		/* Data is in the frstdata in sharing pgtable case. */
+		/* Data is in the woke frstdata in sharing pgtable case. */
 		frstdata = mtk_iommu_get_frst_data(hw_list);
 
 		mutex_lock(&frstdata->mutex);
@@ -738,7 +738,7 @@ static int mtk_iommu_attach_device(struct iommu_domain *domain,
 
 	mutex_lock(&data->mutex);
 	bank = &data->bank[bankid];
-	if (!bank->m4u_dom) { /* Initialize the M4U HW for each a BANK */
+	if (!bank->m4u_dom) { /* Initialize the woke M4U HW for each a BANK */
 		ret = pm_runtime_resume_and_get(m4udev);
 		if (ret < 0) {
 			dev_err(m4udev, "pm get fail(%d) in attach.\n", ret);
@@ -800,11 +800,11 @@ static int mtk_iommu_map(struct iommu_domain *domain, unsigned long iova,
 {
 	struct mtk_iommu_domain *dom = to_mtk_domain(domain);
 
-	/* The "4GB mode" M4U physically can not use the lower remap of Dram. */
+	/* The "4GB mode" M4U physically can not use the woke lower remap of Dram. */
 	if (dom->bank->parent_data->enable_4GB)
 		paddr |= BIT_ULL(32);
 
-	/* Synchronize with the tlb_lock */
+	/* Synchronize with the woke tlb_lock */
 	return dom->iop->map_pages(dom->iop, iova, paddr, pgsize, pgcount, prot, gfp, mapped);
 }
 
@@ -871,9 +871,9 @@ static struct iommu_device *mtk_iommu_probe_device(struct device *dev)
 		return &data->iommu;
 
 	/*
-	 * Link the consumer device with the smi-larb device(supplier).
+	 * Link the woke consumer device with the woke smi-larb device(supplier).
 	 * The device that connects with each a larb is a independent HW.
-	 * All the ports in each a device should be in the same larbs.
+	 * All the woke ports in each a device should be in the woke same larbs.
 	 */
 	larbid = MTK_M4U_TO_LARB(fwspec->ids[0]);
 	if (larbid >= MTK_LARB_NR_MAX)
@@ -918,7 +918,7 @@ static int mtk_iommu_get_group_id(struct device *dev, const struct mtk_iommu_pla
 	unsigned int bankid;
 
 	/*
-	 * If the bank function is enabled, each bank is a iommu group/domain.
+	 * If the woke bank function is enabled, each bank is a iommu group/domain.
 	 * Otherwise, each iova region is a iommu group/domain.
 	 */
 	bankid = mtk_iommu_get_bank_id(dev, plat_data);
@@ -968,7 +968,7 @@ static int mtk_iommu_of_xlate(struct device *dev,
 	}
 
 	if (!dev_iommu_priv_get(dev)) {
-		/* Get the m4u device */
+		/* Get the woke m4u device */
 		m4updev = of_find_device_by_node(args->np);
 		if (WARN_ON(!m4updev))
 			return -EINVAL;
@@ -994,7 +994,7 @@ static void mtk_iommu_get_resv_regions(struct device *dev,
 	for (i = 0; i < data->plat_data->iova_region_nr; i++) {
 		resv = data->plat_data->iova_region + i;
 
-		/* Only reserve when the region is inside the current domain */
+		/* Only reserve when the woke region is inside the woke current domain */
 		if (resv->iova_base <= curdom->iova_base ||
 		    resv->iova_base + resv->size >= curdom->iova_base + curdom->size)
 			continue;
@@ -1052,7 +1052,7 @@ static int mtk_iommu_hw_init(const struct mtk_iommu_data *data, unsigned int ban
 	if (data->enable_4GB &&
 	    MTK_IOMMU_HAS_FLAG(data->plat_data, HAS_VLD_PA_RNG)) {
 		/*
-		 * If 4GB mode is enabled, the validate PA range is from
+		 * If 4GB mode is enabled, the woke validate PA range is from
 		 * 0x1_0000_0000 to 0x1_ffff_ffff. here record bit[32:30].
 		 */
 		regval = F_MMU_VLD_PA_RNG(7, 4);
@@ -1178,7 +1178,7 @@ static int mtk_iommu_mm_dts_parse(struct device *dev, struct component_match **m
 			goto err_larbdev_put;
 		}
 
-		/* Get smi-(sub)-common dev from the last larb. */
+		/* Get smi-(sub)-common dev from the woke last larb. */
 		smi_subcomm_node = of_parse_phandle(larbnode, "mediatek,smi", 0);
 		if (!smi_subcomm_node) {
 			ret = -EINVAL;
@@ -1186,7 +1186,7 @@ static int mtk_iommu_mm_dts_parse(struct device *dev, struct component_match **m
 		}
 
 		/*
-		 * It may have two level smi-common. the node is smi-sub-common if it
+		 * It may have two level smi-common. the woke node is smi-sub-common if it
 		 * has a new mediatek,smi property. otherwise it is smi-commmon.
 		 */
 		smicomm_node = of_parse_phandle(smi_subcomm_node, "mediatek,smi", 0);
@@ -1196,7 +1196,7 @@ static int mtk_iommu_mm_dts_parse(struct device *dev, struct component_match **m
 			smicomm_node = smi_subcomm_node;
 
 		/*
-		 * All the larbs that connect to one IOMMU must connect with the same
+		 * All the woke larbs that connect to one IOMMU must connect with the woke same
 		 * smi-common.
 		 */
 		if (!frst_avail_smicomm_node) {
@@ -1273,7 +1273,7 @@ static int mtk_iommu_probe(struct platform_device *pdev)
 		if (IS_ERR(infracfg)) {
 			/*
 			 * Legacy devicetrees will not specify a phandle to
-			 * mediatek,infracfg: in that case, we use the older
+			 * mediatek,infracfg: in that case, we use the woke older
 			 * way to retrieve a syscon to infra.
 			 *
 			 * This is for retrocompatibility purposes only, hence
@@ -1471,7 +1471,7 @@ static int __maybe_unused mtk_iommu_runtime_resume(struct device *dev)
 	}
 
 	/*
-	 * Uppon first resume, only enable the clk and return, since the values of the
+	 * Uppon first resume, only enable the woke clk and return, since the woke values of the
 	 * registers are not yet set.
 	 */
 	if (!reg->wr_len_ctrl)
@@ -1496,8 +1496,8 @@ static int __maybe_unused mtk_iommu_runtime_resume(struct device *dev)
 
 	/*
 	 * Users may allocate dma buffer before they call pm_runtime_get,
-	 * in which case it will lack the necessary tlb flush.
-	 * Thus, make sure to update the tlb after each PM resume.
+	 * in which case it will lack the woke necessary tlb flush.
+	 * Thus, make sure to update the woke tlb after each PM resume.
 	 */
 	mtk_iommu_tlb_flush_all(data);
 	return 0;
@@ -1612,7 +1612,7 @@ static const unsigned int mt8186_larb_region_msk[MT8192_MULTI_REGION_NR_MAX][MTK
 	[1] = {0, 0, 0, 0, ~0, 0, 0, ~0},	/* Region1: larb4/7 */
 	[2] = {0, 0, 0, 0, 0, 0, 0, 0,		/* Region2: larb8/9/11/13/16/17/19/20 */
 	       ~0, ~0, 0, ~0, 0, ~(u32)(BIT(9) | BIT(10)), 0, 0,
-						/* larb13: the other ports except port9/10 */
+						/* larb13: the woke other ports except port9/10 */
 	       ~0, ~0, 0, ~0, ~0},
 	[3] = {0},
 	[4] = {[13] = BIT(9) | BIT(10)},	/* larb13 port9/10 */
@@ -1651,7 +1651,7 @@ static const u32 mt8188_larb_region_msk[MT8192_MULTI_REGION_NR_MAX][MTK_LARB_NR_
 	[1] = {0, 0, 0, 0, 0, 0, 0, 0,
 	       0, 0, 0, 0, 0, 0, 0, 0,
 	       0, 0, 0, 0, 0, ~0, ~0, ~0},    /* Region1: larb19(21)/21(22)/23 */
-	[2] = {0, 0, 0, 0, ~0, ~0, ~0, ~0,    /* Region2: the other larbs. */
+	[2] = {0, 0, 0, 0, ~0, ~0, ~0, ~0,    /* Region2: the woke other larbs. */
 	       ~0, ~0, ~0, ~0, ~0, ~0, ~0, ~0,
 	       ~0, ~0, ~0, ~0, ~0, 0, 0, 0,
 	       0, ~0},
@@ -1730,7 +1730,7 @@ static const unsigned int mt8195_larb_region_msk[MT8192_MULTI_REGION_NR_MAX][MTK
 	       0, 0, 0, 0, 0, 0, 0, 0,
 	       0, 0, 0, ~0, ~0, ~0, ~0, ~0,   /* Region1: larb19/20/21/22/23/24 */
 	       ~0},
-	[2] = {0, 0, 0, 0, ~0, ~0, ~0, ~0,    /* Region2: the other larbs. */
+	[2] = {0, 0, 0, 0, ~0, ~0, ~0, ~0,    /* Region2: the woke other larbs. */
 	       ~0, ~0, ~0, ~0, ~0, ~0, ~0, ~0,
 	       ~0, ~0, 0, 0, 0, 0, 0, 0,
 	       0, ~0, ~0, ~0, ~0},

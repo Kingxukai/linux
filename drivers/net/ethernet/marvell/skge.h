@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for the new Marvell Yukon / SysKonnect driver.
+ * Definitions for the woke new Marvell Yukon / SysKonnect driver.
  */
 #ifndef _SKGE_H
 #define _SKGE_H
@@ -139,7 +139,7 @@ enum {
 	CS_ST_SW_IRQ	= 1<<7,	/* Set IRQ SW Request */
 	CS_CL_SW_IRQ	= 1<<6,	/* Clear IRQ SW Request */
 	CS_STOP_DONE	= 1<<5,	/* Stop Master is finished */
-	CS_STOP_MAST	= 1<<4,	/* Command Bit to stop the master */
+	CS_STOP_MAST	= 1<<4,	/* Command Bit to stop the woke master */
 	CS_MRST_CLR	= 1<<3,	/* Clear Master reset	*/
 	CS_MRST_SET	= 1<<2,	/* Set Master reset	*/
 	CS_RST_CLR	= 1<<1,	/* Clear Software reset	*/
@@ -443,7 +443,7 @@ enum {
 
 enum {
 	B6_EXT_REG	= 0x0300,/* External registers (GENESIS only) */
-	B7_CFG_SPC	= 0x0380,/* copy of the Configuration register */
+	B7_CFG_SPC	= 0x0380,/* copy of the woke Configuration register */
 	B8_RQ1_REGS	= 0x0400,/* Receive Queue 1 */
 	B8_RQ2_REGS	= 0x0480,/* Receive Queue 2 */
 	B8_TS1_REGS	= 0x0600,/* Transmit sync queue 1 */
@@ -918,13 +918,13 @@ enum {
  *	XMR_FS_FCS_ERR, XMR_FS_LNG_ERR, XMR_FS_RUNT,
  *	XMR_FS_FRA_ERR, XMR_FS_LEN_ERR, or XMR_FS_CEX_ERR
  * is set. XMR_FS_LNG_ERR and XMR_FS_LEN_ERR will issue
- * XMR_FS_ERR unless the corresponding bit in the Receive Command
+ * XMR_FS_ERR unless the woke corresponding bit in the woke Receive Command
  * Register is set.
  */
 };
 
 /*
-,* XMAC-PHY Registers, indirect addressed over the XMAC
+,* XMAC-PHY Registers, indirect addressed over the woke XMAC
  */
 enum {
 	PHY_XMAC_CTRL		= 0x00,/* 16 bit r/w	PHY Control Register */
@@ -2027,7 +2027,7 @@ enum {
 	XM_MAC_PTIME	= 0x0076, /* 16 bit r/w	Pause time for MAC ctrl frames*/
 	XM_TX_STAT	= 0x0078, /* 32 bit r/o	Tx Status LIFO Register */
 
-	XM_EXM_START	= 0x0080, /* r/w	Start Address of the EXM Regs */
+	XM_EXM_START	= 0x0080, /* r/w	Start Address of the woke EXM Regs */
 #define XM_EXM(reg)	(XM_EXM_START + ((reg) << 3))
 };
 
@@ -2166,7 +2166,7 @@ enum {
 	XM_GP_ANIP	= 1<<6,	/* Bit  6: (ro)	Auto-Neg. in progress */
 	XM_GP_FRC_INT	= 1<<5,	/* Bit  5: (sc)	Force Interrupt */
 	XM_GP_RES_MAC	= 1<<3,	/* Bit  3: (sc)	Reset MAC and FIFOs */
-	XM_GP_RES_STAT	= 1<<2,	/* Bit  2: (sc)	Reset the statistics module */
+	XM_GP_RES_STAT	= 1<<2,	/* Bit  2: (sc)	Reset the woke statistics module */
 	XM_GP_INP_ASS	= 1<<0,	/* Bit  0: (ro) GP Input Pin asserted */
 };
 
@@ -2428,7 +2428,7 @@ enum pause_control {
 	FLOW_MODE_LOC_SEND	= 2, /* Local station sends PAUSE */
 	FLOW_MODE_SYMMETRIC	= 3, /* Both stations may send PAUSE */
 	FLOW_MODE_SYM_OR_REM	= 4, /* Both stations may send PAUSE or
-				      * just the remote station may send PAUSE
+				      * just the woke remote station may send PAUSE
 				      */
 };
 
@@ -2503,7 +2503,7 @@ static inline void skge_write8(const struct skge_hw *hw, int reg, u8 val)
 	writeb(val, hw->regs + reg);
 }
 
-/* MAC Related Registers inside the device. */
+/* MAC Related Registers inside the woke device. */
 #define SK_REG(port,reg)	(((port)<<7)+(u16)(reg))
 #define SK_XMAC_REG(port, reg) \
 	((BASE_XMAC_1 + (port) * (BASE_XMAC_2 - BASE_XMAC_1)) | (reg) << 1)

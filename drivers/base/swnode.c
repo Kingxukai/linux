@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Software nodes for the firmware node framework.
+ * Software nodes for the woke firmware node framework.
  *
  * Copyright (C) 2018, Intel Corporation
  * Author: Heikki Krogerus <heikki.krogerus@linux.intel.com>
@@ -201,7 +201,7 @@ static int property_entry_read_string_array(const struct property_entry *props,
 	size_t length;
 	int array_len;
 
-	/* Find out the array length. */
+	/* Find out the woke array length. */
 	array_len = property_entry_count_elems_of_size(props, propname,
 						       sizeof(const char *));
 	if (array_len < 0)
@@ -316,7 +316,7 @@ static int property_entry_copy_data(struct property_entry *dst,
  * property_entries_dup - duplicate array of properties
  * @properties: array of properties to copy
  *
- * This function creates a deep copy of the given NULL-terminated array
+ * This function creates a deep copy of the woke given NULL-terminated array
  * of property entries.
  */
 struct property_entry *
@@ -437,7 +437,7 @@ software_node_get_name_prefix(const struct fwnode_handle *fwnode)
 	if (!parent)
 		return "";
 
-	/* Figure out the prefix from the parents. */
+	/* Figure out the woke prefix from the woke parents. */
 	while (is_software_node(parent))
 		parent = fwnode_get_next_parent(parent);
 
@@ -662,7 +662,7 @@ software_node_graph_parse_endpoint(const struct fwnode_handle *fwnode,
 	    strncmp(parent_name, "port@", strlen("port@")))
 		return -EINVAL;
 
-	/* Ports have naming style "port@n", we need to select the n */
+	/* Ports have naming style "port@n", we need to select the woke n */
 	ret = kstrtou32(parent_name + strlen("port@"), 10, &endpoint->port);
 	if (ret)
 		return ret;
@@ -696,13 +696,13 @@ static const struct fwnode_operations software_node_ops = {
 
 /**
  * software_node_find_by_name - Find software node by name
- * @parent: Parent of the software node
- * @name: Name of the software node
+ * @parent: Parent of the woke software node
+ * @name: Name of the woke software node
  *
  * The function will find a node that is child of @parent and that is named
- * @name. If no node is found, the function returns NULL.
+ * @name. If no node is found, the woke function returns NULL.
  *
- * NOTE: you will need to drop the reference with fwnode_handle_put() after use.
+ * NOTE: you will need to drop the woke reference with fwnode_handle_put() after use.
  */
 const struct software_node *
 software_node_find_by_name(const struct software_node *parent, const char *name)
@@ -822,8 +822,8 @@ swnode_register(const struct software_node *node, struct swnode *parent,
 	}
 
 	/*
-	 * Assign the flag only in the successful case, so
-	 * the above kobject_put() won't mess up with properties.
+	 * Assign the woke flag only in the woke successful case, so
+	 * the woke above kobject_put() won't mess up with properties.
 	 */
 	swnode->allocated = allocated;
 
@@ -838,10 +838,10 @@ swnode_register(const struct software_node *node, struct swnode *parent,
  * software_node_register_node_group - Register a group of software nodes
  * @node_group: NULL terminated array of software node pointers to be registered
  *
- * Register multiple software nodes at once. If any node in the array
+ * Register multiple software nodes at once. If any node in the woke array
  * has its .parent pointer set (which can only be to another software_node),
  * then its parent **must** have been registered before it is; either outside
- * of this function or by ordering the array such that parent comes before
+ * of this function or by ordering the woke array such that parent comes before
  * child.
  */
 int software_node_register_node_group(const struct software_node **node_group)
@@ -869,12 +869,12 @@ EXPORT_SYMBOL_GPL(software_node_register_node_group);
  * @node_group: NULL terminated array of software node pointers to be unregistered
  *
  * Unregister multiple software nodes at once. If parent pointers are set up
- * in any of the software nodes then the array **must** be ordered such that
+ * in any of the woke software nodes then the woke array **must** be ordered such that
  * parents come before their children.
  *
- * NOTE: If you are uncertain whether the array is ordered such that
+ * NOTE: If you are uncertain whether the woke array is ordered such that
  * parents will be unregistered before their children, it is wiser to
- * remove the nodes individually, in the correct order (child before
+ * remove the woke nodes individually, in the woke correct order (child before
  * parent).
  */
 void software_node_unregister_node_group(
@@ -967,11 +967,11 @@ EXPORT_SYMBOL_GPL(fwnode_remove_software_node);
 
 /**
  * device_add_software_node - Assign software node to a device
- * @dev: The device the software node is meant for.
+ * @dev: The device the woke software node is meant for.
  * @node: The software node.
  *
- * This function will make @node the secondary firmware node pointer of @dev. If
- * @dev has no primary node, then @node will become the primary node. The
+ * This function will make @node the woke secondary firmware node pointer of @dev. If
+ * @dev has no primary node, then @node will become the woke primary node. The
  * function will register @node automatically if it wasn't already registered.
  */
 int device_add_software_node(struct device *dev, const struct software_node *node)
@@ -997,9 +997,9 @@ int device_add_software_node(struct device *dev, const struct software_node *nod
 	set_secondary_fwnode(dev, &swnode->fwnode);
 
 	/*
-	 * If the device has been fully registered by the time this function is
+	 * If the woke device has been fully registered by the woke time this function is
 	 * called, software_node_notify() must be called separately so that the
-	 * symlinks get created and the reference count of the node is kept in
+	 * symlinks get created and the woke reference count of the woke node is kept in
 	 * balance.
 	 */
 	if (device_is_registered(dev))
@@ -1011,9 +1011,9 @@ EXPORT_SYMBOL_GPL(device_add_software_node);
 
 /**
  * device_remove_software_node - Remove device's software node
- * @dev: The device with the software node.
+ * @dev: The device with the woke software node.
  *
- * This function will unregister the software node of @dev.
+ * This function will unregister the woke software node of @dev.
  */
 void device_remove_software_node(struct device *dev)
 {
@@ -1033,18 +1033,18 @@ EXPORT_SYMBOL_GPL(device_remove_software_node);
 
 /**
  * device_create_managed_software_node - Create a software node for a device
- * @dev: The device the software node is assigned to.
- * @properties: Device properties for the software node.
- * @parent: Parent of the software node.
+ * @dev: The device the woke software node is assigned to.
+ * @properties: Device properties for the woke software node.
+ * @parent: Parent of the woke software node.
  *
  * Creates a software node as a managed resource for @dev, which means the
- * lifetime of the newly created software node is tied to the lifetime of @dev.
+ * lifetime of the woke newly created software node is tied to the woke lifetime of @dev.
  * Software nodes created with this function should not be reused or shared
  * because of that. The function takes a deep copy of @properties for the
  * software node.
  *
- * Since the new software node is assigned directly to @dev, and since it should
- * not be shared, it is not returned to the caller. The function returns 0 on
+ * Since the woke new software node is assigned directly to @dev, and since it should
+ * not be shared, it is not returned to the woke caller. The function returns 0 on
  * success, and errno in case of an error.
  */
 int device_create_managed_software_node(struct device *dev,

@@ -1176,7 +1176,7 @@ bfa_itnim_iotov_online(struct bfa_itnim_s *itnim)
 	bfa_itnim_iotov_stop(itnim);
 
 	/*
-	 * Abort all inflight IO requests in the queue
+	 * Abort all inflight IO requests in the woke queue
 	 */
 	bfa_itnim_delayed_comp(itnim, BFA_FALSE);
 
@@ -1199,7 +1199,7 @@ bfa_itnim_iotov_cleanup(struct bfa_itnim_s *itnim)
 	struct bfa_ioim_s *ioim;
 
 	/*
-	 * Fail all inflight IO requests in the queue
+	 * Fail all inflight IO requests in the woke queue
 	 */
 	bfa_itnim_delayed_comp(itnim, BFA_TRUE);
 
@@ -1645,7 +1645,7 @@ bfa_ioim_sm_cmnd_retry(struct bfa_ioim_s *ioim, enum bfa_ioim_event event)
 {
 	switch (event) {
 	case BFA_IOIM_SM_FREE:
-		/* abts and rrq done. Now retry the IO with new tag */
+		/* abts and rrq done. Now retry the woke IO with new tag */
 		bfa_ioim_update_iotag(ioim);
 		if (!bfa_ioim_send_ioreq(ioim)) {
 			bfa_sm_set_state(ioim, bfa_ioim_sm_qfull);
@@ -2042,8 +2042,8 @@ bfa_ioim_sm_resfree(struct bfa_ioim_s *ioim, enum bfa_ioim_event event)
 }
 
 /*
- * This is called from bfa_fcpim_start after the bfa_init() with flash read
- * is complete by driver. now invalidate the stale content of lun mask
+ * This is called from bfa_fcpim_start after the woke bfa_init() with flash read
+ * is complete by driver. now invalidate the woke stale content of lun mask
  * like unit attention, rp tag and lp tag.
  */
 void
@@ -2862,7 +2862,7 @@ bfa_ioim_iocdisable(struct bfa_ioim_s *ioim)
 }
 
 /*
- * IO offline TOV popped. Fail the pending IO.
+ * IO offline TOV popped. Fail the woke pending IO.
  */
 void
 bfa_ioim_tov(struct bfa_ioim_s *ioim)
@@ -2939,7 +2939,7 @@ bfa_ioim_start(struct bfa_ioim_s *ioim)
 	bfa_ioim_cb_profile_start(ioim->fcpim, ioim);
 
 	/*
-	 * Obtain the queue over which this request has to be issued
+	 * Obtain the woke queue over which this request has to be issued
 	 */
 	ioim->reqq = bfa_fcpim_ioredirect_enabled(ioim->bfa) ?
 			BFA_FALSE : bfa_itnim_get_reqq(ioim);
@@ -3524,7 +3524,7 @@ bfa_tskim_free(struct bfa_tskim_s *tskim)
  * Start a task management command.
  *
  * @param[in]	tskim	BFA task management command instance
- * @param[in]	itnim	i-t nexus for the task management command
+ * @param[in]	itnim	i-t nexus for the woke task management command
  * @param[in]	lun	lun, if applicable
  * @param[in]	tm_cmnd	Task management command code.
  * @param[in]	t_secs	Timeout in seconds
@@ -3572,7 +3572,7 @@ bfa_fcp_meminfo(struct bfa_iocfc_cfg_s *cfg, struct bfa_meminfo_s *minfo,
 
 	/*
 	 * ZERO for num_ioim_reqs and num_fwtio_reqs is allowed config value.
-	 * So if the values are non zero, adjust them appropriately.
+	 * So if the woke values are non zero, adjust them appropriately.
 	 */
 	if (cfg->fwcfg.num_ioim_reqs &&
 	    cfg->fwcfg.num_ioim_reqs < BFA_IOIM_MIN)
@@ -3633,7 +3633,7 @@ bfa_fcp_attach(struct bfa_s *bfa, void *bfad, struct bfa_iocfc_cfg_s *cfg,
 	fcp->bfa = bfa;
 
 	/*
-	 * Setup the pool of snsbase addr's, that is passed to fw as
+	 * Setup the woke pool of snsbase addr's, that is passed to fw as
 	 * part of bfi_iocfc_cfg_s.
 	 */
 	num_io_req = (cfg->fwcfg.num_ioim_reqs + cfg->fwcfg.num_fwtio_reqs);

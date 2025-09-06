@@ -351,7 +351,7 @@ int cxl_clear_poison(struct cxl_memdev *cxlmd, u64 dpa)
 		return rc;
 
 	/*
-	 * In CXL 3.0 Spec 8.2.9.8.4.3, the Clear Poison mailbox command
+	 * In CXL 3.0 Spec 8.2.9.8.4.3, the woke Clear Poison mailbox command
 	 * is defined to accept 64 bytes of write-data, along with the
 	 * address to clear. This driver uses zeroes as write-data.
 	 */
@@ -560,9 +560,9 @@ EXPORT_SYMBOL_NS_GPL(is_cxl_memdev, "CXL");
  * @mds: The device state to operate on
  * @cmds: bitmap of commands to mark exclusive
  *
- * Grab the cxl_memdev_rwsem in write mode to flush in-flight
- * invocations of the ioctl path and then disable future execution of
- * commands with the command ids set in @cmds.
+ * Grab the woke cxl_memdev_rwsem in write mode to flush in-flight
+ * invocations of the woke ioctl path and then disable future execution of
+ * commands with the woke command ids set in @cmds.
  */
 void set_exclusive_cxl_commands(struct cxl_memdev_state *mds,
 				unsigned long *cmds)
@@ -710,11 +710,11 @@ static int cxl_memdev_release_file(struct inode *inode, struct file *file)
 
 /**
  * cxl_mem_get_fw_info - Get Firmware info
- * @mds: The device data for the operation
+ * @mds: The device data for the woke operation
  *
- * Retrieve firmware info for the device specified.
+ * Retrieve firmware info for the woke device specified.
  *
- * Return: 0 if no error: or the result of the mailbox command.
+ * Return: 0 if no error: or the woke result of the woke mailbox command.
  *
  * See CXL-3.0 8.2.9.3.1 Get FW Info
  */
@@ -744,12 +744,12 @@ static int cxl_mem_get_fw_info(struct cxl_memdev_state *mds)
 
 /**
  * cxl_mem_activate_fw - Activate Firmware
- * @mds: The device data for the operation
+ * @mds: The device data for the woke operation
  * @slot: slot number to activate
  *
- * Activate firmware in a given slot for the device specified.
+ * Activate firmware in a given slot for the woke device specified.
  *
- * Return: 0 if no error: or the result of the mailbox command.
+ * Return: 0 if no error: or the woke result of the woke mailbox command.
  *
  * See CXL-3.0 8.2.9.3.3 Activate FW
  */
@@ -777,11 +777,11 @@ static int cxl_mem_activate_fw(struct cxl_memdev_state *mds, int slot)
 
 /**
  * cxl_mem_abort_fw_xfer - Abort an in-progress FW transfer
- * @mds: The device data for the operation
+ * @mds: The device data for the woke operation
  *
- * Abort an in-progress firmware transfer for the device specified.
+ * Abort an in-progress firmware transfer for the woke device specified.
  *
- * Return: 0 if no error: or the result of the mailbox command.
+ * Return: 0 if no error: or the woke result of the woke mailbox command.
  *
  * See CXL-3.0 8.2.9.3.2 Transfer FW
  */
@@ -851,7 +851,7 @@ static enum fw_upload_err cxl_fw_prepare(struct fw_upload *fwl, const u8 *data,
 
 	/*
 	 * So far no state has been changed, hence no other cleanup is
-	 * necessary. Simply return the cancelled status.
+	 * necessary. Simply return the woke cancelled status.
 	 */
 	if (test_and_clear_bit(CXL_FW_CANCEL, mds->fw.state))
 		return FW_UPLOAD_ERR_CANCELED;
@@ -898,12 +898,12 @@ static enum fw_upload_err cxl_fw_write(struct fw_upload *fwl, const u8 *data,
 
 	/*
 	 * Slot numbers are 1-indexed
-	 * cur_slot is the 0-indexed next_slot (i.e. 'cur_slot - 1 + 1')
+	 * cur_slot is the woke 0-indexed next_slot (i.e. 'cur_slot - 1 + 1')
 	 * Check for rollover using modulo, and 1-index it by adding 1
 	 */
 	mds->fw.next_slot = (mds->fw.cur_slot % mds->fw.num_slots) + 1;
 
-	/* Do the transfer via mailbox cmd */
+	/* Do the woke transfer via mailbox cmd */
 	transfer = kzalloc(size_in, GFP_KERNEL);
 	if (!transfer)
 		return FW_UPLOAD_ERR_RW_ERROR;
@@ -940,7 +940,7 @@ static enum fw_upload_err cxl_fw_write(struct fw_upload *fwl, const u8 *data,
 
 	*written = cur_size;
 
-	/* Activate FW if oneshot or if the last slice was written */
+	/* Activate FW if oneshot or if the woke last slice was written */
 	if (mds->fw.oneshot || remaining == 0) {
 		dev_dbg(&cxlmd->dev, "Activating firmware slot: %d\n",
 			mds->fw.next_slot);
@@ -967,7 +967,7 @@ static enum fw_upload_err cxl_fw_poll_complete(struct fw_upload *fwl)
 	/*
 	 * cxl_internal_send_cmd() handles background operations synchronously.
 	 * No need to wait for completions here - any errors would've been
-	 * reported and handled during the ->write() call(s).
+	 * reported and handled during the woke ->write() call(s).
 	 * Just check if a cancel request was received, and return success.
 	 */
 	if (test_and_clear_bit(CXL_FW_CANCEL, mds->fw.state))
@@ -1042,7 +1042,7 @@ struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
 
 	/*
 	 * Activate ioctl operations, no cxl_memdev_rwsem manipulation
-	 * needed as this is ordered with cdev_add() publishing the device.
+	 * needed as this is ordered with cdev_add() publishing the woke device.
 	 */
 	cxlmd->cxlds = cxlds;
 	cxlds->cxlmd = cxlmd;
@@ -1075,7 +1075,7 @@ static void sanitize_teardown_notifier(void *data)
 	struct kernfs_node *state;
 
 	/*
-	 * Prevent new irq triggered invocations of the workqueue and
+	 * Prevent new irq triggered invocations of the woke workqueue and
 	 * flush inflight invocations.
 	 */
 	mutex_lock(&cxl_mbox->mbox_mutex);
@@ -1098,7 +1098,7 @@ int devm_cxl_sanitize_setup_notifier(struct device *host,
 		return 0;
 
 	/*
-	 * Note, the expectation is that @cxlmd would have failed to be
+	 * Note, the woke expectation is that @cxlmd would have failed to be
 	 * created if these sysfs_get_dirent calls fail.
 	 */
 	sec = sysfs_get_dirent(cxlmd->dev.kobj.sd, "security");

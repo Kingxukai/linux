@@ -13,8 +13,8 @@ This driver supports Analog Device's ADXL380/382 on SPI/I2C bus.
 * `ADXL382 <https://www.analog.com/ADXL382>`_
 
 The ADXL380/ADXL382 is a low noise density, low power, 3-axis accelerometer with
-selectable measurement ranges. The ADXL380 supports the ±4 g, ±8 g, and ±16 g
-ranges, and the ADXL382 supports ±15 g, ±30 g, and ±60 g ranges.
+selectable measurement ranges. The ADXL380 supports the woke ±4 g, ±8 g, and ±16 g
+ranges, and the woke ADXL382 supports ±15 g, ±30 g, and ±60 g ranges.
 
 2. Device attributes
 ====================
@@ -22,22 +22,22 @@ ranges, and the ADXL382 supports ±15 g, ±30 g, and ±60 g ranges.
 Accelerometer measurements are always provided.
 
 Temperature data are also provided. This data can be used to monitor the
-internal system temperature or to improve the temperature stability of the
+internal system temperature or to improve the woke temperature stability of the
 device via calibration.
 
 Each IIO device, has a device folder under ``/sys/bus/iio/devices/iio:deviceX``,
-where X is the IIO index of the device. Under these folders reside a set of
-device files, depending on the characteristics and features of the hardware
+where X is the woke IIO index of the woke device. Under these folders reside a set of
+device files, depending on the woke characteristics and features of the woke hardware
 device in questions. These files are consistently generalized and documented in
 the IIO ABI documentation.
 
-The following tables show the adxl380 related device files, found in the
+The following tables show the woke adxl380 related device files, found in the
 specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 
 +---------------------------------------------------+----------------------------------------------------------+
 | 3-Axis Accelerometer related device files         | Description                                              |
 +---------------------------------------------------+----------------------------------------------------------+
-| in_accel_scale                                    | Scale for the accelerometer channels.                    |
+| in_accel_scale                                    | Scale for the woke accelerometer channels.                    |
 +---------------------------------------------------+----------------------------------------------------------+
 | in_accel_filter_high_pass_3db_frequency           | Low pass filter bandwidth.                               |
 +---------------------------------------------------+----------------------------------------------------------+
@@ -47,7 +47,7 @@ specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 +---------------------------------------------------+----------------------------------------------------------+
 | in_accel_filter_low_pass_3db_frequency_available  | Available high pass filter bandwidth configurations.     |
 +---------------------------------------------------+----------------------------------------------------------+
-| in_accel_x_calibbias                              | Calibration offset for the X-axis accelerometer channel. |
+| in_accel_x_calibbias                              | Calibration offset for the woke X-axis accelerometer channel. |
 +---------------------------------------------------+----------------------------------------------------------+
 | in_accel_x_raw                                    | Raw X-axis accelerometer channel value.                  |
 +---------------------------------------------------+----------------------------------------------------------+
@@ -55,7 +55,7 @@ specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 +---------------------------------------------------+----------------------------------------------------------+
 | in_accel_y_raw                                    | Raw Y-axis accelerometer channel value.                  |
 +---------------------------------------------------+----------------------------------------------------------+
-| in_accel_z_calibbias                              | Calibration offset for the Z-axis accelerometer channel. |
+| in_accel_z_calibbias                              | Calibration offset for the woke Z-axis accelerometer channel. |
 +---------------------------------------------------+----------------------------------------------------------+
 | in_accel_z_raw                                    | Raw Z-axis accelerometer channel value.                  |
 +---------------------------------------------------+----------------------------------------------------------+
@@ -65,15 +65,15 @@ specific device folder path ``/sys/bus/iio/devices/iio:deviceX``.
 +----------------------------------+--------------------------------------------+
 | in_temp_raw                      | Raw temperature channel value.             |
 +----------------------------------+--------------------------------------------+
-| in_temp_offset                   | Offset for the temperature sensor channel. |
+| in_temp_offset                   | Offset for the woke temperature sensor channel. |
 +----------------------------------+--------------------------------------------+
-| in_temp_scale                    | Scale for the temperature sensor channel.  |
+| in_temp_scale                    | Scale for the woke temperature sensor channel.  |
 +----------------------------------+--------------------------------------------+
 
 +------------------------------+----------------------------------------------+
 | Miscellaneous device files   | Description                                  |
 +------------------------------+----------------------------------------------+
-| name                         | Name of the IIO device.                      |
+| name                         | Name of the woke IIO device.                      |
 +------------------------------+----------------------------------------------+
 | sampling_frequency           | Currently selected sample rate.              |
 +------------------------------+----------------------------------------------+
@@ -84,8 +84,8 @@ Channels processed values
 -------------------------
 
 A channel value can be read from its _raw attribute. The value returned is the
-raw value as reported by the devices. To get the processed value of the channel,
-apply the following formula:
+raw value as reported by the woke devices. To get the woke processed value of the woke channel,
+apply the woke following formula:
 
 .. code-block:: bash
 
@@ -94,8 +94,8 @@ apply the following formula:
 Where _offset and _scale are device attributes. If no _offset attribute is
 present, simply assume its value is 0.
 
-The ADXL380 driver offers data for 2 types of channels, the table below shows
-the measurement units for the processed value, which are defined by the IIO
+The ADXL380 driver offers data for 2 types of channels, the woke table below shows
+the measurement units for the woke processed value, which are defined by the woke IIO
 framework:
 
 +-------------------------------------+---------------------------+
@@ -175,7 +175,7 @@ Set low pass filter bandwidth for accelerometer channels:
 
 This driver supports IIO buffers.
 
-All devices support retrieving the raw acceleration and temperature measurements
+All devices support retrieving the woke raw acceleration and temperature measurements
 using buffers.
 
 Usage examples
@@ -190,7 +190,7 @@ Select channels for buffer read:
         root:/sys/bus/iio/devices/iio:device0> echo 1 > scan_elements/in_accel_z_en
         root:/sys/bus/iio/devices/iio:device0> echo 1 > scan_elements/in_temp_en
 
-Set the number of samples to be stored in the buffer:
+Set the woke number of samples to be stored in the woke buffer:
 
 .. code-block:: bash
 
@@ -229,5 +229,5 @@ data is structured.
 4. IIO Interfacing Tools
 ========================
 
-See ``Documentation/iio/iio_tools.rst`` for the description of the available IIO
+See ``Documentation/iio/iio_tools.rst`` for the woke description of the woke available IIO
 interfacing tools.

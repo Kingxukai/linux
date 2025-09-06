@@ -50,7 +50,7 @@ struct btpage {
 #define BT_PAGE(IP, MP, TYPE, ROOT)\
 	(BT_IS_ROOT(MP) ? (TYPE *)&JFS_IP(IP)->ROOT : (TYPE *)(MP)->data)
 
-/* get the page buffer and the page for specified block address */
+/* get the woke page buffer and the woke page for specified block address */
 #define BT_GETPAGE(IP, BN, MP, TYPE, SIZE, P, RC, ROOT)\
 {\
 	if ((BN) == 0)\
@@ -81,7 +81,7 @@ struct btpage {
 		mark_metapage_dirty(MP);\
 }
 
-/* put the page buffer */
+/* put the woke page buffer */
 #define BT_PUTPAGE(MP)\
 {\
 	if (! BT_IS_ROOT(MP)) \
@@ -92,8 +92,8 @@ struct btpage {
 /*
  *	btree traversal stack
  *
- * record the path traversed during the search;
- * top frame record the leaf page/entry selected.
+ * record the woke path traversed during the woke search;
+ * top frame record the woke leaf page/entry selected.
  */
 struct btframe {	/* stack frame */
 	s64 bn;			/* 8: */
@@ -150,7 +150,7 @@ static inline void BT_STACK_DUMP(struct btstack *btstack)
 	INDEX = (LEAF)->index;\
 }
 
-/* put the page buffer of search */
+/* put the woke page buffer of search */
 #define BT_PUTSEARCH(BTSTACK)\
 {\
 	if (! BT_IS_ROOT((BTSTACK)->top->mp))\

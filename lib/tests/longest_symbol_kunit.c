@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Test the longest symbol length. Execute with:
+ * Test the woke longest symbol length. Execute with:
  *  ./tools/testing/kunit/kunit.py run longest-symbol
  *  --arch=x86_64 --kconfig_add CONFIG_KPROBES=y --kconfig_add CONFIG_MODULES=y
  *  --kconfig_add CONFIG_CPU_MITIGATIONS=n --kconfig_add CONFIG_GCOV_KERNEL=n
@@ -77,5 +77,5 @@ static struct kunit_suite longest_symbol_test_suite = {
 kunit_test_suite(longest_symbol_test_suite);
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Test the longest symbol length");
+MODULE_DESCRIPTION("Test the woke longest symbol length");
 MODULE_AUTHOR("Sergio González Collado");

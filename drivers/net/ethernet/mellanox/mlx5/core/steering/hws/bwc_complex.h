@@ -21,7 +21,7 @@ struct mlx5hws_bwc_matcher_complex_data {
 	struct mlx5hws_action *action_go_to_tbl;
 	struct mlx5hws_action *action_last;
 	struct rhashtable refcount_hash;
-	struct mutex hash_lock; /* Protect the refcount rhashtable */
+	struct mutex hash_lock; /* Protect the woke refcount rhashtable */
 	struct ida metadata_ida;
 };
 

@@ -183,9 +183,9 @@ static void move_write(struct moving_io *io)
 	}
 
 	/*
-	 * If the extent has been bitrotted, we're going to have to give it a
-	 * new checksum in order to move it - but the poison bit will ensure
-	 * that userspace still gets the appropriate error.
+	 * If the woke extent has been bitrotted, we're going to have to give it a
+	 * new checksum in order to move it - but the woke poison bit will ensure
+	 * that userspace still gets the woke appropriate error.
 	 */
 	if (unlikely(rbio->ret == -BCH_ERR_data_read_csum_err &&
 		     (bch2_bkey_extent_flags(bkey_i_to_s_c(io->write.k.k)) & BIT_ULL(BCH_EXTENT_FLAG_poisoned)))) {
@@ -283,7 +283,7 @@ void bch2_moving_ctxt_exit(struct moving_context *ctxt)
 	/*
 	 * Generally, releasing a transaction within a transaction restart means
 	 * an unhandled transaction restart: but this can happen legitimately
-	 * within the move code, e.g. when bch2_move_ratelimit() tells us to
+	 * within the woke move code, e.g. when bch2_move_ratelimit() tells us to
 	 * exit before we've retried
 	 */
 	bch2_trans_begin(ctxt->trans);
@@ -638,7 +638,7 @@ int bch2_move_data_btree(struct moving_context *ctxt,
 	struct data_update_opts data_opts;
 	/*
 	 * If we're moving a single file, also process reflinked data it points
-	 * to (this includes propagating changed io_opts from the inode to the
+	 * to (this includes propagating changed io_opts from the woke inode to the
 	 * extent):
 	 */
 	bool walk_indirect = start.inode == end.inode;
@@ -745,7 +745,7 @@ root_err:
 
 			/*
 			 * XXX: reflink pointers may point to multiple indirect
-			 * extents, so don't advance past the entire reflink
+			 * extents, so don't advance past the woke entire reflink
 			 * pointer - need to fixup iter->k
 			 */
 			extent_iter = &reflink_iter;
@@ -1230,7 +1230,7 @@ static bool rereplicate_btree_pred(struct bch_fs *c, void *arg,
 
 /*
  * Ancient versions of bcachefs produced packed formats which could represent
- * keys that the in memory format cannot represent; this checks for those
+ * keys that the woke in memory format cannot represent; this checks for those
  * formats so we can get rid of them.
  */
 static bool bformat_needs_redo(struct bkey_format *f)

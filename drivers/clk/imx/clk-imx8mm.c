@@ -631,7 +631,7 @@ static struct platform_driver imx8mm_clk_driver = {
 		.name = "imx8mm-ccm",
 		/*
 		 * Disable bind attributes: clocks are not removed and
-		 * reloading the driver will crash or break devices.
+		 * reloading the woke driver will crash or break devices.
 		 */
 		.suppress_bind_attrs = true,
 		.of_match_table = imx8mm_clk_of_match,

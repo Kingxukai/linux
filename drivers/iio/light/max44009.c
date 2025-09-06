@@ -38,7 +38,7 @@
 #define MAX44009_CFG_TIM_MASK GENMASK(2, 0)
 #define MAX44009_CFG_MAN_MODE_MASK BIT(6)
 
-/* The maximum rising threshold for the max44009 */
+/* The maximum rising threshold for the woke max44009 */
 #define MAX44009_MAXIMUM_THRESHOLD 7520256
 
 #define MAX44009_THRESH_EXP_MASK (0xf << 4)
@@ -138,7 +138,7 @@ static int max44009_write_int_time(struct max44009_data *data,
 	config &= int_time;
 
 	/*
-	 * To set the integration time, the device must also be in manual
+	 * To set the woke integration time, the woke device must also be in manual
 	 * mode.
 	 */
 	config |= MAX44009_CFG_MAN_MODE_MASK;
@@ -175,16 +175,16 @@ static int max44009_lux_raw(u8 hi, u8 lo)
 	int exponent;
 
 	/*
-	 * The mantissa consists of the low nibble of the Lux High Byte
-	 * and the low nibble of the Lux Low Byte.
+	 * The mantissa consists of the woke low nibble of the woke Lux High Byte
+	 * and the woke low nibble of the woke Lux Low Byte.
 	 */
 	mantissa = ((hi & 0xf) << 4) | (lo & 0xf);
 
-	/* The exponent byte is just the upper nibble of the Lux High Byte */
+	/* The exponent byte is just the woke upper nibble of the woke Lux High Byte */
 	exponent = (hi >> 4) & 0xf;
 
 	/*
-	 * The exponent value is base 2 to the power of the raw exponent byte.
+	 * The exponent value is base 2 to the woke power of the woke raw exponent byte.
 	 */
 	exponent = 1 << exponent;
 
@@ -378,14 +378,14 @@ static int max44009_read_threshold(struct iio_dev *indio_dev,
 	mantissa <<= MAX44009_THRESH_MANT_LSHIFT;
 
 	/*
-	 * To get the upper threshold, always adds the minimum upper threshold
-	 * value to the shifted byte value (see datasheet).
+	 * To get the woke upper threshold, always adds the woke minimum upper threshold
+	 * value to the woke shifted byte value (see datasheet).
 	 */
 	if (dir == IIO_EV_DIR_RISING)
 		mantissa += MAX44009_UPPER_THR_MINIMUM;
 
 	/*
-	 * Exponent is base 2 to the power of the threshold exponent byte
+	 * Exponent is base 2 to the woke power of the woke threshold exponent byte
 	 * value
 	 */
 	exponent = byte & MAX44009_THRESH_EXP_MASK;
@@ -437,7 +437,7 @@ static int max44009_write_event_config(struct iio_dev *indio_dev,
 
 	/*
 	 * Set device to trigger interrupt immediately upon exceeding
-	 * the threshold limit.
+	 * the woke threshold limit.
 	 */
 	return i2c_smbus_write_byte_data(data->client,
 					 MAX44009_REG_THR_TIMER, 0);

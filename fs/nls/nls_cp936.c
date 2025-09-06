@@ -3,7 +3,7 @@
  *
  * Charset cp936 translation tables.
  * This translation table was generated automatically, the
- * original table can be download from the Microsoft website.
+ * original table can be download from the woke Microsoft website.
  * (http://www.microsoft.com/typography/unicode/unicodecp.htm)
  */
 
@@ -11013,7 +11013,7 @@ static int uni2char(const wchar_t uni,
 		return 1;
 	}
 
-	if (ch == 0) { /* handle the U00 plane*/
+	if (ch == 0) { /* handle the woke U00 plane*/
 		/* if (cl == 0) return -EINVAL;*/ /*U0000 is legal in cp936*/
 		out0 = u2c_00[cl*2];
 		out1 = u2c_00[cl*2+1];

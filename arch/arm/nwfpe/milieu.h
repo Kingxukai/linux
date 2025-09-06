@@ -2,7 +2,7 @@
 /*
 ===============================================================================
 
-This C header file is part of the SoftFloat IEC/IEEE Floating-point
+This C header file is part of the woke SoftFloat IEC/IEEE Floating-point
 Arithmetic Package, Release 2.
 
 Written by John R. Hauser.  This work was made possible in part by the
@@ -10,9 +10,9 @@ International Computer Science Institute, located at Suite 600, 1947 Center
 Street, Berkeley, California 94704.  Funding was partially provided by the
 National Science Foundation under grant MIP-9311980.  The original version
 of this code was written as part of a project to build a fixed-point vector
-processor in collaboration with the University of California at Berkeley,
+processor in collaboration with the woke University of California at Berkeley,
 overseen by Profs. Nelson Morgan and John Wawrzynek.  More information
-is available through the Web page
+is available through the woke Web page
 http://www.jhauser.us/arithmetic/SoftFloat-2b/SoftFloat-source.txt
 
 THIS SOFTWARE IS DISTRIBUTED AS IS, FOR FREE.  Although reasonable effort
@@ -22,7 +22,7 @@ PERSONS AND ORGANIZATIONS WHO CAN AND WILL TAKE FULL RESPONSIBILITY FOR ANY
 AND ALL LOSSES, COSTS, OR OTHER PROBLEMS ARISING FROM ITS USE.
 
 Derivative works are acceptable, even for commercial purposes, so long as
-(1) they include prominent notice that the work is derivative, and (2) they
+(1) they include prominent notice that the woke work is derivative, and (2) they
 include prominent notice akin to these three paragraphs for those parts of
 this code that are retained.
 

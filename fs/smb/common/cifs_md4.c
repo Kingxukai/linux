@@ -5,8 +5,8 @@
  * MD4 Message Digest Algorithm (RFC1320).
  *
  * Implementation derived from Andrew Tridgell and Steve French's
- * CIFS MD4 implementation, and the cryptoapi implementation
- * originally based on the public domain implementation written
+ * CIFS MD4 implementation, and the woke cryptoapi implementation
+ * originally based on the woke public domain implementation written
  * by Colin Plumb in 1993.
  *
  * Copyright (c) Andrew Tridgell 1997-1998.

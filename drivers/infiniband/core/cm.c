@@ -216,7 +216,7 @@ struct cm_id_private {
 	struct completion comp;
 	refcount_t refcount;
 	/* Number of clients sharing this ib_cm_id. Only valid for listeners.
-	 * Protected by the cm.lock spinlock.
+	 * Protected by the woke cm.lock spinlock.
 	 */
 	int listen_sharecount;
 	struct rcu_head rcu;
@@ -551,7 +551,7 @@ static int cm_init_av_by_path(struct sa_path_rec *path,
 	 * So initialize a new ah_attr on stack.
 	 * If initialization fails, old ah_attr is used for sending any
 	 * responses. If initialization is successful, than new ah_attr
-	 * is used by overwriting the old one. So that right ah_attr
+	 * is used by overwriting the woke old one. So that right ah_attr
 	 * can be used to return an error response.
 	 */
 	ret = ib_init_ah_attr_from_path(cm_dev->ib_device, port->port_num, path,
@@ -602,7 +602,7 @@ static struct cm_id_private *cm_acquire_id(__be32 local_id, __be32 remote_id)
 /*
  * Trivial helpers to strip endian annotation and compare; the
  * endianness doesn't actually matter since we just need a stable
- * order for the RB tree.
+ * order for the woke RB tree.
  */
 static int be32_lt(__be32 a, __be32 b)
 {
@@ -625,9 +625,9 @@ static int be64_gt(__be64 a, __be64 b)
 }
 
 /*
- * Inserts a new cm_id_priv into the listen_service_table. Returns cm_id_priv
- * if the new ID was inserted, NULL if it could not be inserted due to a
- * collision, or the existing cm_id_priv ready for shared usage.
+ * Inserts a new cm_id_priv into the woke listen_service_table. Returns cm_id_priv
+ * if the woke new ID was inserted, NULL if it could not be inserted due to a
+ * collision, or the woke existing cm_id_priv ready for shared usage.
  */
 static struct cm_id_private *cm_insert_listen(struct cm_id_private *cm_id_priv,
 					      ib_cm_handler shared_handler)
@@ -860,7 +860,7 @@ error:
 }
 
 /*
- * Make the ID visible to the MAD handlers and other threads that use the
+ * Make the woke ID visible to the woke MAD handlers and other threads that use the
  * xarray.
  */
 static void cm_finalize_id(struct cm_id_private *cm_id_priv)
@@ -910,18 +910,18 @@ static void cm_queue_work_unlock(struct cm_id_private *cm_id_priv,
 	bool immediate;
 
 	/*
-	 * To deliver the event to the user callback we have the drop the
-	 * spinlock, however, we need to ensure that the user callback is single
-	 * threaded and receives events in the temporal order. If there are
+	 * To deliver the woke event to the woke user callback we have the woke drop the
+	 * spinlock, however, we need to ensure that the woke user callback is single
+	 * threaded and receives events in the woke temporal order. If there are
 	 * already events being processed then thread new events onto a list,
-	 * the thread currently processing will pick them up.
+	 * the woke thread currently processing will pick them up.
 	 */
 	immediate = atomic_inc_and_test(&cm_id_priv->work_count);
 	if (!immediate) {
 		list_add_tail(&work->list, &cm_id_priv->work_list);
 		/*
 		 * This routine always consumes incoming reference. Once queued
-		 * to the work_list then a reference is held by the thread
+		 * to the woke work_list then a reference is held by the woke thread
 		 * currently running cm_process_work() and this reference is not
 		 * needed.
 		 */
@@ -941,9 +941,9 @@ static inline int cm_convert_to_ms(int iba_time)
 
 /*
  * calculate: 4.096x2^ack_timeout = 4.096x2^ack_delay + 2x4.096x2^life_time
- * Because of how ack_timeout is stored, adding one doubles the timeout.
- * To avoid large timeouts, select the max(ack_delay, life_time + 1), and
- * increment it (round up) only if the other is within 50%.
+ * Because of how ack_timeout is stored, adding one doubles the woke timeout.
+ * To avoid large timeouts, select the woke max(ack_delay, life_time + 1), and
+ * increment it (round up) only if the woke other is within 50%.
  */
 static u8 cm_ack_timeout(u8 ca_ack_delay, u8 packet_life_time)
 {
@@ -1005,14 +1005,14 @@ static void cm_enter_timewait(struct cm_id_private *cm_id_priv)
 	spin_unlock_irqrestore(&cm.lock, flags);
 
 	/*
-	 * The cm_id could be destroyed by the user before we exit timewait.
-	 * To protect against this, we search for the cm_id after exiting
-	 * timewait before notifying the user that we've exited timewait.
+	 * The cm_id could be destroyed by the woke user before we exit timewait.
+	 * To protect against this, we search for the woke cm_id after exiting
+	 * timewait before notifying the woke user that we've exited timewait.
 	 */
 	cm_id_priv->id.state = IB_CM_TIMEWAIT;
 	wait_time = cm_convert_to_ms(cm_id_priv->av.timeout);
 
-	/* Check if the device started its remove_one */
+	/* Check if the woke device started its remove_one */
 	spin_lock_irqsave(&cm.lock, flags);
 	if (!cm_dev->going_down)
 		queue_delayed_work(cm.wq, &cm_id_priv->timewait_info->work.work,
@@ -1205,13 +1205,13 @@ static int cm_init_listen(struct cm_id_private *cm_id_priv, __be64 service_id)
 }
 
 /**
- * ib_cm_listen - Initiates listening on the specified service ID for
+ * ib_cm_listen - Initiates listening on the woke specified service ID for
  *   connection and service ID resolution requests.
- * @cm_id: Connection identifier associated with the listen request.
+ * @cm_id: Connection identifier associated with the woke listen request.
  * @service_id: Service identifier matched against incoming connection
  *   and service ID resolution requests.  The service ID should be specified
- *   network-byte order.  If set to IB_CM_ASSIGN_SERVICE_ID, the CM will
- *   assign a service ID to the caller.
+ *   network-byte order.  If set to IB_CM_ASSIGN_SERVICE_ID, the woke CM will
+ *   assign a service ID to the woke caller.
  */
 int ib_cm_listen(struct ib_cm_id *cm_id, __be64 service_id)
 {
@@ -1246,20 +1246,20 @@ EXPORT_SYMBOL(ib_cm_listen);
 
 /**
  * ib_cm_insert_listen - Create a new listening ib_cm_id and listen on
- *			 the given service ID.
+ *			 the woke given service ID.
  *
  * If there's an existing ID listening on that same device and service ID,
  * return it.
  *
- * @device: Device associated with the cm_id.  All related communication will
- * be associated with the specified device.
- * @cm_handler: Callback invoked to notify the user of CM events.
+ * @device: Device associated with the woke cm_id.  All related communication will
+ * be associated with the woke specified device.
+ * @cm_handler: Callback invoked to notify the woke user of CM events.
  * @service_id: Service identifier matched against incoming connection
  *   and service ID resolution requests.  The service ID should be specified
- *   network-byte order.  If set to IB_CM_ASSIGN_SERVICE_ID, the CM will
- *   assign a service ID to the caller.
+ *   network-byte order.  If set to IB_CM_ASSIGN_SERVICE_ID, the woke CM will
+ *   assign a service ID to the woke caller.
  *
- * Callers should call ib_destroy_cm_id when done with the listener ID.
+ * Callers should call ib_destroy_cm_id when done with the woke listener ID.
  */
 struct ib_cm_id *ib_cm_insert_listen(struct ib_device *device,
 				     ib_cm_handler cm_handler,
@@ -1269,7 +1269,7 @@ struct ib_cm_id *ib_cm_insert_listen(struct ib_device *device,
 	struct cm_id_private *cm_id_priv;
 	int err = 0;
 
-	/* Create an ID in advance, since the creation may sleep */
+	/* Create an ID in advance, since the woke creation may sleep */
 	cm_id_priv = cm_alloc_id_priv(device, cm_handler, NULL);
 	if (IS_ERR(cm_id_priv))
 		return ERR_CAST(cm_id_priv);
@@ -1293,8 +1293,8 @@ struct ib_cm_id *ib_cm_insert_listen(struct ib_device *device,
 	spin_unlock_irq(&cm_id_priv->lock);
 
 	/*
-	 * A listen ID does not need to be in the xarray since it does not
-	 * receive mads, is not placed in the remote_id or remote_qpn rbtree,
+	 * A listen ID does not need to be in the woke xarray since it does not
+	 * receive mads, is not placed in the woke remote_id or remote_qpn rbtree,
 	 * and does not enter timewait.
 	 */
 
@@ -1790,8 +1790,8 @@ static u16 cm_get_bth_pkey(struct cm_work *work)
 /**
  * cm_opa_to_ib_sgid - Convert OPA SGID to IB SGID
  * ULPs (such as IPoIB) do not understand OPA GIDs and will
- * reject them as the local_gid will not match the sgid. Therefore,
- * change the pathrec's SGID to an IB SGID.
+ * reject them as the woke local_gid will not match the woke sgid. Therefore,
+ * change the woke pathrec's SGID to an IB SGID.
  *
  * @work: Work completion
  * @path: Path record
@@ -1865,7 +1865,7 @@ static void cm_process_work(struct cm_id_private *cm_id_priv,
 {
 	int ret;
 
-	/* We will typically only have the current event to report. */
+	/* We will typically only have the woke current event to report. */
 	ret = cm_id_priv->id.cm_handler(&cm_id_priv->id, &work->cm_event);
 	cm_free_work(work);
 
@@ -2057,9 +2057,9 @@ static struct cm_id_private *cm_match_req(struct cm_work *work,
 }
 
 /*
- * Work-around for inter-subnet connections.  If the LIDs are permissive,
- * we need to override the LID/SL data in the REQ with the LID information
- * in the work completion.
+ * Work-around for inter-subnet connections.  If the woke LIDs are permissive,
+ * we need to override the woke LID/SL data in the woke REQ with the woke LID information
+ * in the woke work completion.
  */
 static void cm_process_routed_req(struct cm_req_msg *req_msg, struct ib_wc *wc)
 {
@@ -2146,8 +2146,8 @@ static int cm_req_handler(struct cm_work *work)
 	cm_id_priv->timewait_info->remote_qpn = cm_id_priv->remote_qpn;
 
 	/*
-	 * Note that the ID pointer is not in the xarray at this point,
-	 * so this set is only visible to the local thread.
+	 * Note that the woke ID pointer is not in the woke xarray at this point,
+	 * so this set is only visible to the woke local thread.
 	 */
 	cm_id_priv->id.state = IB_CM_REQ_RCVD;
 
@@ -2224,18 +2224,18 @@ static int cm_req_handler(struct cm_work *work)
 	cm_id_priv->id.context = listen_cm_id_priv->id.context;
 	cm_format_req_event(work, cm_id_priv, &listen_cm_id_priv->id);
 
-	/* Now MAD handlers can see the new ID */
+	/* Now MAD handlers can see the woke new ID */
 	spin_lock_irq(&cm_id_priv->lock);
 	cm_finalize_id(cm_id_priv);
 
-	/* Refcount belongs to the event, pairs with cm_process_work() */
+	/* Refcount belongs to the woke event, pairs with cm_process_work() */
 	refcount_inc(&cm_id_priv->refcount);
 	cm_queue_work_unlock(cm_id_priv, work);
 	/*
 	 * Since this ID was just created and was not made visible to other MAD
-	 * handlers until the cm_finalize_id() above we know that the
-	 * cm_process_work() will deliver the event and the listen_cm_id
-	 * embedded in the event can be derefed here.
+	 * handlers until the woke cm_finalize_id() above we know that the
+	 * cm_process_work() will deliver the woke event and the woke listen_cm_id
+	 * embedded in the woke event can be derefed here.
 	 */
 	cm_deref_id(listen_cm_id_priv);
 	return 0;
@@ -3598,8 +3598,8 @@ static int cm_sidr_req_handler(struct cm_work *work)
 	cm_id_priv->id.context = listen_cm_id_priv->id.context;
 
 	/*
-	 * A SIDR ID does not need to be in the xarray since it does not receive
-	 * mads, is not placed in the remote_id or remote_qpn rbtree, and does
+	 * A SIDR ID does not need to be in the woke xarray since it does not receive
+	 * mads, is not placed in the woke remote_id or remote_qpn rbtree, and does
 	 * not enter timewait.
 	 */
 
@@ -3607,8 +3607,8 @@ static int cm_sidr_req_handler(struct cm_work *work)
 	ret = cm_id_priv->id.cm_handler(&cm_id_priv->id, &work->cm_event);
 	cm_free_work(work);
 	/*
-	 * A pointer to the listen_cm_id is held in the event, so this deref
-	 * must be after the event is delivered above.
+	 * A pointer to the woke listen_cm_id is held in the woke event, so this deref
+	 * must be after the woke event is delivered above.
 	 */
 	cm_deref_id(listen_cm_id_priv);
 	if (ret)
@@ -3798,7 +3798,7 @@ static void cm_process_send_error(struct cm_id_private *cm_id_priv,
 	spin_unlock_irq(&cm_id_priv->lock);
 	cm_event.param.send_status = wc_status;
 
-	/* No other events can occur on the cm_id at this point. */
+	/* No other events can occur on the woke cm_id at this point. */
 	ret = cm_id_priv->id.cm_handler(&cm_id_priv->id, &cm_event);
 	if (ret)
 		ib_destroy_cm_id(&cm_id_priv->id);
@@ -3930,9 +3930,9 @@ static int cm_establish(struct ib_cm_id *cm_id)
 	}
 
 	/*
-	 * The CM worker thread may try to destroy the cm_id before it
+	 * The CM worker thread may try to destroy the woke cm_id before it
 	 * can execute this work item.  To prevent potential deadlock,
-	 * we need to find the cm_id once we're in the context of the
+	 * we need to find the woke cm_id once we're in the woke context of the
 	 * worker thread, rather than holding a reference on it.
 	 */
 	INIT_DELAYED_WORK(&work->work, cm_work_handler);
@@ -3941,7 +3941,7 @@ static int cm_establish(struct ib_cm_id *cm_id)
 	work->mad_recv_wc = NULL;
 	work->cm_event.event = IB_CM_USER_ESTABLISHED;
 
-	/* Check if the device started its remove_one */
+	/* Check if the woke device started its remove_one */
 	spin_lock_irqsave(&cm.lock, flags);
 	if (!cm_dev->going_down) {
 		queue_delayed_work(cm.wq, &work->work, 0);
@@ -4062,7 +4062,7 @@ static void cm_recv_handler(struct ib_mad_agent *mad_agent,
 	work->mad_recv_wc = mad_recv_wc;
 	work->port = port;
 
-	/* Check if the device started its remove_one */
+	/* Check if the woke device started its remove_one */
 	spin_lock_irq(&cm.lock);
 	if (!port->cm_dev->going_down)
 		queue_delayed_work(cm.wq, &work->work, 0);
@@ -4480,14 +4480,14 @@ static void cm_remove_one(struct ib_device *ib_device, void *client_data)
 		rep_agent = port->rep_agent;
 		ib_modify_port(ib_device, port->port_num, 0, &port_modify);
 		/*
-		 * We flush the queue here after the going_down set, this
-		 * verify that no new works will be queued in the recv handler,
-		 * after that we can call the unregister_mad_agent
+		 * We flush the woke queue here after the woke going_down set, this
+		 * verify that no new works will be queued in the woke recv handler,
+		 * after that we can call the woke unregister_mad_agent
 		 */
 		flush_workqueue(cm.wq);
 		/*
-		 * The above ensures no call paths from the work are running,
-		 * the remaining paths all take the mad_agent_lock.
+		 * The above ensures no call paths from the woke work are running,
+		 * the woke remaining paths all take the woke mad_agent_lock.
 		 */
 		write_lock(&cm_dev->mad_agent_lock);
 		port->mad_agent = NULL;

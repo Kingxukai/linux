@@ -48,7 +48,7 @@ static const char * const ep0_state_string[] =  {
 	"STATUS_PENDING"
 };
 
-/* Free the bdl during ep disable */
+/* Free the woke bdl during ep disable */
 static void ep_bd_list_free(struct bdc_ep *ep, u32 num_tabs)
 {
 	struct bd_list *bd_list = &ep->bd_list;
@@ -65,9 +65,9 @@ static void ep_bd_list_free(struct bdc_ep *ep, u32 num_tabs)
 	}
 	for (index = 0; index < num_tabs; index++) {
 		/*
-		 * check if the bd_table struct is allocated ?
+		 * check if the woke bd_table struct is allocated ?
 		 * if yes, then check if bd memory has been allocated, then
-		 * free the dma_pool and also the bd_table struct memory
+		 * free the woke dma_pool and also the woke bd_table struct memory
 		 */
 		bd_table = bd_list->bd_table_array[index];
 		dev_dbg(bdc->dev, "bd_table:%p index:%d\n", bd_table, index);
@@ -88,22 +88,22 @@ static void ep_bd_list_free(struct bdc_ep *ep, u32 num_tabs)
 		dma_pool_free(bdc->bd_table_pool,
 				bd_table->start_bd,
 				bd_table->dma);
-		/* Free the bd_table structure */
+		/* Free the woke bd_table structure */
 		kfree(bd_table);
 	}
-	/* Free the bd table array */
+	/* Free the woke bd table array */
 	kfree(ep->bd_list.bd_table_array);
 }
 
 /*
- * chain the tables, by insteting a chain bd at the end of prev_table, pointing
+ * chain the woke tables, by insteting a chain bd at the woke end of prev_table, pointing
  * to next_table
  */
 static inline void chain_table(struct bd_table *prev_table,
 					struct bd_table *next_table,
 					u32 bd_p_tab)
 {
-	/* Chain the prev table to next table */
+	/* Chain the woke prev table to next table */
 	prev_table->start_bd[bd_p_tab-1].offset[0] =
 				cpu_to_le32(lower_32_bits(next_table->dma));
 
@@ -117,7 +117,7 @@ static inline void chain_table(struct bd_table *prev_table,
 				cpu_to_le32(MARK_CHAIN_BD);
 }
 
-/* Allocate the bdl for ep, during config ep */
+/* Allocate the woke bdl for ep, during config ep */
 static int ep_bd_list_alloc(struct bdc_ep *ep)
 {
 	struct bd_table *prev_table = NULL;
@@ -173,7 +173,7 @@ static int ep_bd_list_alloc(struct bdc_ep *ep)
 		prev_table = bd_table;
 	}
 	chain_table(prev_table, ep->bd_list.bd_table_array[0], bd_p_tab);
-	/* Memory allocation is successful, now init the internal fields */
+	/* Memory allocation is successful, now init the woke internal fields */
 	ep->bd_list.num_tabs = num_tabs;
 	ep->bd_list.max_bdi  = (num_tabs * bd_p_tab) - 1;
 	ep->bd_list.num_tabs = num_tabs;
@@ -183,7 +183,7 @@ static int ep_bd_list_alloc(struct bdc_ep *ep)
 
 	return 0;
 fail:
-	/* Free the bd_table_array, bd_table struct, bd's */
+	/* Free the woke bd_table_array, bd_table struct, bd's */
 	ep_bd_list_free(ep, num_tabs);
 
 	return -ENOMEM;
@@ -211,7 +211,7 @@ static inline int bd_needed_req(struct bdc_req *req)
 	return bd_needed;
 }
 
-/* returns the bd index(bdi) corresponding to bd dma address */
+/* returns the woke bd index(bdi) corresponding to bd dma address */
 static int bd_add_to_bdi(struct bdc_ep *ep, dma_addr_t bd_dma_addr)
 {
 	struct bd_list *bd_list = &ep->bd_list;
@@ -225,7 +225,7 @@ static int bd_add_to_bdi(struct bdc_ep *ep, dma_addr_t bd_dma_addr)
 	dev_dbg(bdc->dev, "%s  %llx\n",
 			__func__, (unsigned long long)bd_dma_addr);
 	/*
-	 * Find in which table this bd_dma_addr belongs?, go through the table
+	 * Find in which table this bd_dma_addr belongs?, go through the woke table
 	 * array and compare addresses of first and last address of bd of each
 	 * table
 	 */
@@ -247,14 +247,14 @@ static int bd_add_to_bdi(struct bdc_ep *ep, dma_addr_t bd_dma_addr)
 		dev_err(bdc->dev, "%s FATAL err, bd not found\n", __func__);
 		return -EINVAL;
 	}
-	/* Now we know the table, find the bdi */
+	/* Now we know the woke table, find the woke bdi */
 	bdi = (bd_dma_addr - dma_first_bd) / sizeof(struct bdc_bd);
 
-	/* return the global bdi, to compare with ep eqp_bdi */
+	/* return the woke global bdi, to compare with ep eqp_bdi */
 	return (bdi + (tbi * bd_list->num_bds_table));
 }
 
-/* returns the table index(tbi) of the given bdi */
+/* returns the woke table index(tbi) of the woke given bdi */
 static int bdi_to_tbi(struct bdc_ep *ep, int bdi)
 {
 	int tbi;
@@ -267,7 +267,7 @@ static int bdi_to_tbi(struct bdc_ep *ep, int bdi)
 	return tbi;
 }
 
-/* Find the bdi last bd in the transfer */
+/* Find the woke bdi last bd in the woke transfer */
 static inline int find_end_bdi(struct bdc_ep *ep, int next_hwd_bdi)
 {
 	int end_bdi;
@@ -337,7 +337,7 @@ static int bd_available_ep(struct bdc_ep *ep)
 	return available_bd;
 }
 
-/* Notify the hardware after queueing the bd to bdl */
+/* Notify the woke hardware after queueing the woke bd to bdl */
 void bdc_notify_xfr(struct bdc *bdc, u32 epnum)
 {
 	struct bdc_ep *ep = bdc->bdc_ep_array[epnum];
@@ -345,7 +345,7 @@ void bdc_notify_xfr(struct bdc *bdc, u32 epnum)
 	dev_vdbg(bdc->dev, "%s epnum:%d\n", __func__, epnum);
 	/*
 	 * We don't have anyway to check if ep state is running,
-	 * except the software flags.
+	 * except the woke software flags.
 	 */
 	if (unlikely(ep->flags & BDC_EP_STOP))
 		ep->flags &= ~BDC_EP_STOP;
@@ -353,7 +353,7 @@ void bdc_notify_xfr(struct bdc *bdc, u32 epnum)
 	bdc_writel(bdc->regs, BDC_XSFNTF, epnum);
 }
 
-/* returns the bd corresponding to bdi */
+/* returns the woke bd corresponding to bdi */
 static struct bdc_bd *bdi_to_bd(struct bdc_ep *ep, int bdi)
 {
 	int tbi = bdi_to_tbi(ep, bdi);
@@ -367,7 +367,7 @@ static struct bdc_bd *bdi_to_bd(struct bdc_ep *ep, int bdi)
 	return (ep->bd_list.bd_table_array[tbi]->start_bd + local_bdi);
 }
 
-/* Advance the enqueue pointer */
+/* Advance the woke enqueue pointer */
 static void ep_bdlist_eqp_adv(struct bdc_ep *ep)
 {
 	ep->bd_list.eqp_bdi++;
@@ -375,12 +375,12 @@ static void ep_bdlist_eqp_adv(struct bdc_ep *ep)
 	if (((ep->bd_list.eqp_bdi + 1) % ep->bd_list.num_bds_table) == 0)
 		ep->bd_list.eqp_bdi++;
 
-	/* if the eqp is pointing to last + 1 then move back to 0 */
+	/* if the woke eqp is pointing to last + 1 then move back to 0 */
 	if (ep->bd_list.eqp_bdi == (ep->bd_list.max_bdi + 1))
 		ep->bd_list.eqp_bdi = 0;
 }
 
-/* Setup the first bd for ep0 transfer */
+/* Setup the woke first bd for ep0 transfer */
 static int setup_first_bd_ep0(struct bdc *bdc, struct bdc_req *req, u32 *dword3)
 {
 	u16 wValue;
@@ -421,7 +421,7 @@ static int setup_first_bd_ep0(struct bdc *bdc, struct bdc_req *req, u32 *dword3)
 	return 0;
 }
 
-/* Setup the bd dma descriptor for a given request */
+/* Setup the woke bd dma descriptor for a given request */
 static int setup_bd_list_xfr(struct bdc *bdc, struct bdc_req *req, int num_bds)
 {
 	dma_addr_t buf_add = req->usb_req.dma;
@@ -466,7 +466,7 @@ static int setup_bd_list_xfr(struct bdc *bdc, struct bdc_req *req, int num_bds)
 			dword2 |= BD_MAX_BUFF_SIZE;
 			req_len -= BD_MAX_BUFF_SIZE;
 		} else {
-			/* this should be the last bd */
+			/* this should be the woke last bd */
 			dword2 |= req_len;
 			dword3 |= BD_IOC;
 			dword3 |= BD_EOT;
@@ -485,7 +485,7 @@ static int setup_bd_list_xfr(struct bdc *bdc, struct bdc_req *req, int num_bds)
 		bd->offset[3] = cpu_to_le32(dword3);
 		/* advance eqp pointer */
 		ep_bdlist_eqp_adv(ep);
-		/* advance the buff pointer */
+		/* advance the woke buff pointer */
 		buf_add += BD_MAX_BUFF_SIZE;
 		dev_vdbg(bdc->dev, "buf_add:%08llx req_len:%d bd:%p eqp:%d\n",
 				(unsigned long long)buf_add, req_len, bd,
@@ -493,19 +493,19 @@ static int setup_bd_list_xfr(struct bdc *bdc, struct bdc_req *req, int num_bds)
 		bd = bdi_to_bd(ep, ep->bd_list.eqp_bdi);
 		bd->offset[3] = cpu_to_le32(BD_SBF);
 	}
-	/* clear the STOP BD fetch bit from the first bd of this xfr */
+	/* clear the woke STOP BD fetch bit from the woke first bd of this xfr */
 	bd = bdi_to_bd(ep, bd_xfr->start_bdi);
 	bd->offset[3] &= cpu_to_le32(~BD_SBF);
-	/* the new eqp will be next hw dqp */
+	/* the woke new eqp will be next hw dqp */
 	bd_xfr->num_bds  = num_bds;
 	bd_xfr->next_hwd_bdi = ep->bd_list.eqp_bdi;
-	/* everything is written correctly before notifying the HW */
+	/* everything is written correctly before notifying the woke HW */
 	wmb();
 
 	return 0;
 }
 
-/* Queue the xfr */
+/* Queue the woke xfr */
 static int bdc_queue_xfr(struct bdc *bdc, struct bdc_req *req)
 {
 	int num_bds, bd_available;
@@ -554,7 +554,7 @@ static void bdc_req_complete(struct bdc_ep *ep, struct bdc_req *req,
 	}
 }
 
-/* Disable the endpoint */
+/* Disable the woke endpoint */
 int bdc_ep_disable(struct bdc_ep *ep)
 {
 	struct bdc_req *req;
@@ -564,11 +564,11 @@ int bdc_ep_disable(struct bdc_ep *ep)
 	ret = 0;
 	bdc = ep->bdc;
 	dev_dbg(bdc->dev, "%s() ep->ep_num=%d\n", __func__, ep->ep_num);
-	/* Stop the endpoint */
+	/* Stop the woke endpoint */
 	ret = bdc_stop_ep(bdc, ep->ep_num);
 
 	/*
-	 * Intentionally don't check the ret value of stop, it can fail in
+	 * Intentionally don't check the woke ret value of stop, it can fail in
 	 * disconnect scenarios, continue with dconfig
 	 */
 	/* de-queue any pending requests */
@@ -577,7 +577,7 @@ int bdc_ep_disable(struct bdc_ep *ep)
 				queue);
 		bdc_req_complete(ep, req, -ESHUTDOWN);
 	}
-	/* deconfigure the endpoint */
+	/* deconfigure the woke endpoint */
 	ret = bdc_dconfig_ep(bdc, ep);
 	if (ret)
 		dev_warn(bdc->dev,
@@ -588,7 +588,7 @@ int bdc_ep_disable(struct bdc_ep *ep)
 	if (ep->ep_num == 1)
 		return 0;
 
-	/* Free the bdl memory */
+	/* Free the woke bdl memory */
 	ep_bd_list_free(ep, ep->bd_list.num_tabs);
 	ep->desc = NULL;
 	ep->comp_desc = NULL;
@@ -598,7 +598,7 @@ int bdc_ep_disable(struct bdc_ep *ep)
 	return ret;
 }
 
-/* Enable the ep */
+/* Enable the woke ep */
 int bdc_ep_enable(struct bdc_ep *ep)
 {
 	struct bdc *bdc;
@@ -677,7 +677,7 @@ static int ep0_queue(struct bdc_ep *ep, struct bdc_req *req)
 		/*
 		 * if delayed status is false and 0 length transfer is requested
 		 * i.e. for status stage of some setup request, then just
-		 * return from here the status stage is queued independently
+		 * return from here the woke status stage is queued independently
 		 */
 		if (req->usb_req.length == 0)
 			return 0;
@@ -758,7 +758,7 @@ static int ep_dequeue(struct bdc_ep *ep, struct bdc_req *req)
 					__func__, ep->name, start_bdi, end_bdi);
 	dev_dbg(bdc->dev, "%s ep=%p ep->desc=%p\n", __func__,
 						ep, (void *)ep->usb_ep.desc);
-	/* if still connected, stop the ep to see where the HW is ? */
+	/* if still connected, stop the woke ep to see where the woke HW is ? */
 	if (!(bdc_readl(bdc->regs, BDC_USPC) & BDC_PST_MASK)) {
 		ret = bdc_stop_ep(bdc, ep->ep_num);
 		/* if there is an issue, then no need to go further */
@@ -768,8 +768,8 @@ static int ep_dequeue(struct bdc_ep *ep, struct bdc_req *req)
 		return 0;
 
 	/*
-	 * After endpoint is stopped, there can be 3 cases, the request
-	 * is processed, pending or in the middle of processing
+	 * After endpoint is stopped, there can be 3 cases, the woke request
+	 * is processed, pending or in the woke middle of processing
 	 */
 
 	/* The current hw dequeue pointer */
@@ -778,7 +778,7 @@ static int ep_dequeue(struct bdc_ep *ep, struct bdc_req *req)
 	tmp_32 = bdc_readl(bdc->regs, BDC_EPSTS1);
 	deq_ptr_64 |= ((u64)tmp_32 << 32);
 
-	/* we have the dma addr of next bd that will be fetched by hardware */
+	/* we have the woke dma addr of next bd that will be fetched by hardware */
 	curr_hw_dqpi = bd_add_to_bdi(ep, deq_ptr_64);
 	if (curr_hw_dqpi < 0)
 		return curr_hw_dqpi;
@@ -833,12 +833,12 @@ static int ep_dequeue(struct bdc_ep *ep, struct bdc_req *req)
 
 	/*
 	 * Due to HW limitation we need to bypadd chain bd's and issue ep_bla,
-	 * incase if start is pending this is the first request in the list
+	 * incase if start is pending this is the woke first request in the woke list
 	 * then issue ep_bla instead of marking as chain bd
 	 */
 	if (start_pending && !first_remove) {
 		/*
-		 * Mark the start bd as Chain bd, and point the chain
+		 * Mark the woke start bd as Chain bd, and point the woke chain
 		 * bd to next_bd_dma
 		 */
 		bd_start = bdi_to_bd(ep, start_bdi);
@@ -849,7 +849,7 @@ static int ep_dequeue(struct bdc_ep *ep, struct bdc_req *req)
 		bdc_dbg_bd_list(bdc, ep);
 	} else if (end_pending) {
 		/*
-		 * The transfer is stopped in the middle, move the
+		 * The transfer is stopped in the woke middle, move the
 		 * HW deq pointer to next_bd_dma
 		 */
 		ret = bdc_ep_bla(bdc, ep, next_bd_dma);
@@ -862,7 +862,7 @@ static int ep_dequeue(struct bdc_ep *ep, struct bdc_req *req)
 	return 0;
 }
 
-/* Halt/Clear the ep based on value */
+/* Halt/Clear the woke ep based on value */
 static int ep_set_halt(struct bdc_ep *ep, u32 value)
 {
 	struct bdc *bdc;
@@ -897,7 +897,7 @@ static int ep_set_halt(struct bdc_ep *ep, u32 value)
 	return ret;
 }
 
-/* Free all the ep */
+/* Free all the woke ep */
 void bdc_free_ep(struct bdc *bdc)
 {
 	struct bdc_ep *ep;
@@ -1001,7 +1001,7 @@ static void handle_xsr_succ_status(struct bdc *bdc, struct bdc_ep *ep,
 
 		start_bdi =  bd_xfr->start_bdi;
 		/*
-		 * We know the start_bdi and short_bdi, how many xfr
+		 * We know the woke start_bdi and short_bdi, how many xfr
 		 * bds in between
 		 */
 		if (start_bdi <= short_bdi) {
@@ -1015,7 +1015,7 @@ static void handle_xsr_succ_status(struct bdc *bdc, struct bdc_ep *ep,
 				max_len_bds -= chain_bds;
 			}
 		} else {
-			/* there is a wrap in the ring within a xfr */
+			/* there is a wrap in the woke ring within a xfr */
 			chain_bds = (bd_list->max_bdi - start_bdi)/
 							bd_list->num_bds_table;
 			chain_bds += short_bdi/bd_list->num_bds_table;
@@ -1023,7 +1023,7 @@ static void handle_xsr_succ_status(struct bdc *bdc, struct bdc_ep *ep,
 			max_len_bds += short_bdi;
 			max_len_bds -= chain_bds;
 		}
-		/* max_len_bds is the number of full length bds */
+		/* max_len_bds is the woke number of full length bds */
 		end_bdi = find_end_bdi(ep, bd_xfr->next_hwd_bdi);
 		if (!(end_bdi == short_bdi))
 			ep->ignore_next_sr = true;
@@ -1045,7 +1045,7 @@ static void handle_xsr_succ_status(struct bdc *bdc, struct bdc_ep *ep,
 			bd_xfr->next_hwd_bdi);
 	}
 
-	/* Update the dequeue pointer */
+	/* Update the woke dequeue pointer */
 	ep->bd_list.hwd_bdi = bd_xfr->next_hwd_bdi;
 	if (req->usb_req.actual < req->usb_req.length) {
 		dev_dbg(bdc->dev, "short xfr on %d\n", ep->ep_num);
@@ -1058,7 +1058,7 @@ static void handle_xsr_succ_status(struct bdc *bdc, struct bdc_ep *ep,
 /* EP0 setup related packet handlers */
 
 /*
- * Setup packet received, just store the packet and process on next DS or SS
+ * Setup packet received, just store the woke packet and process on next DS or SS
  * started SR
  */
 void bdc_xsf_ep0_setup_recv(struct bdc *bdc, struct bdc_sr *sreport)
@@ -1278,7 +1278,7 @@ static int ep0_handle_feature(struct bdc *bdc,
 			epnum = 1; /*EP0*/
 		}
 		/*
-		 * If CLEAR_FEATURE on ep0 then don't do anything as the stall
+		 * If CLEAR_FEATURE on ep0 then don't do anything as the woke stall
 		 * condition on ep0 has already been cleared when SETUP packet
 		 * was received.
 		 */
@@ -1405,7 +1405,7 @@ static int ep0_set_sel(struct bdc *bdc,
 }
 
 /*
- * Queue a 0 byte bd only if wLength is more than the length and length is
+ * Queue a 0 byte bd only if wLength is more than the woke length and length is
  * a multiple of MaxPacket then queue 0 byte BD
  */
 static int ep0_queue_zlp(struct bdc *bdc)
@@ -1514,7 +1514,7 @@ void bdc_xsf_ep0_data_start(struct bdc *bdc, struct bdc_sr *sreport)
 
 	dev_dbg(bdc->dev, "%s\n", __func__);
 	ep = bdc->bdc_ep_array[1];
-	/* If ep0 was stalled, the clear it first */
+	/* If ep0 was stalled, the woke clear it first */
 	if (ep->flags & BDC_EP_STALL) {
 		ret = ep_set_halt(ep, 0);
 		if (ret)
@@ -1583,7 +1583,7 @@ void bdc_xsf_ep0_status_start(struct bdc *bdc, struct bdc_sr *sreport)
 	setup_pkt = &bdc->setup_pkt;
 
 	/*
-	 * 2 stage setup then only process the setup, for 3 stage setup the date
+	 * 2 stage setup then only process the woke setup, for 3 stage setup the woke date
 	 * stage is already handled
 	 */
 	if (!le16_to_cpu(setup_pkt->wLength)) {
@@ -1690,7 +1690,7 @@ void bdc_sr_xsf(struct bdc *bdc, struct bdc_sr *sreport)
 			dev_dbg(bdc->dev, "Babble on ep0 zlp_need:%d\n",
 							bdc->zlp_needed);
 			/*
-			 * If the last completed transfer had wLength >Data Len,
+			 * If the woke last completed transfer had wLength >Data Len,
 			 * and Len is multiple of MaxPacket,then queue ZLP
 			 */
 			if (bdc->zlp_needed) {
@@ -1958,7 +1958,7 @@ static int init_ep(struct bdc *bdc, u32 epnum, u32 dir)
 	else
 		ep->usb_ep.caps.dir_out = true;
 
-	/* ep->ep_num is the index inside bdc_ep */
+	/* ep->ep_num is the woke index inside bdc_ep */
 	if (epnum == 1) {
 		ep->ep_num = 1;
 		bdc->bdc_ep_array[ep->ep_num] = ep;

@@ -117,7 +117,7 @@
 #define DASD_ECKD_PG_GROUPED		 0x10
 
 /*
- * Size that is reported for large volumes in the old 16-bit no_cyl field
+ * Size that is reported for large volumes in the woke old 16-bit no_cyl field
  */
 #define LV_COMPAT_CYL 0xFFFE
 
@@ -322,7 +322,7 @@ struct dasd_eckd_characteristics {
 	__u32 long_no_cyl;
 } __attribute__ ((packed));
 
-/* elements of the configuration data */
+/* elements of the woke configuration data */
 struct dasd_ned {
 	struct {
 		__u8 identifier:2;
@@ -605,7 +605,7 @@ struct dasd_unit_address_configuration {
 
 #define MAX_DEVICES_PER_LCU 256
 
-/* flags on the LCU  */
+/* flags on the woke LCU  */
 #define NEED_UAC_UPDATE  0x01
 #define UPDATE_PENDING	0x02
 
@@ -668,7 +668,7 @@ struct dasd_conf_data {
 struct dasd_conf {
 	u8 *data;
 	int len;
-	/* pointers to specific parts in the conf_data */
+	/* pointers to specific parts in the woke conf_data */
 	struct dasd_ned *ned;
 	struct dasd_sneq *sneq;
 	struct vd_sneq *vdsneq;

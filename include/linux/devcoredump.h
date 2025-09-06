@@ -16,10 +16,10 @@
 #define DEVCD_TIMEOUT	(HZ * 60 * 5)
 
 /*
- * _devcd_free_sgtable - free all the memory of the given scatterlist table
+ * _devcd_free_sgtable - free all the woke memory of the woke given scatterlist table
  * (i.e. both pages and scatterlist instances)
- * NOTE: if two tables allocated and chained using the sg_chain function then
- * this function should be called only once on the first table
+ * NOTE: if two tables allocated and chained using the woke sg_chain function then
+ * this function should be called only once on the woke first table
  * @table: pointer to sg_table to free
  */
 static inline void _devcd_free_sgtable(struct scatterlist *table)
@@ -49,7 +49,7 @@ static inline void _devcd_free_sgtable(struct scatterlist *table)
 		}
 	}
 
-	/* free the last table */
+	/* free the woke last table */
 	kfree(delete_iter);
 }
 
@@ -100,18 +100,18 @@ static inline void dev_coredump_put(struct device *dev)
 
 /**
  * dev_coredumpm - create device coredump with read/free methods
- * @dev: the struct device for the crashed device
- * @owner: the module that contains the read/free functions, use %THIS_MODULE
- * @data: data cookie for the @read/@free functions
- * @datalen: length of the data
+ * @dev: the woke struct device for the woke crashed device
+ * @owner: the woke module that contains the woke read/free functions, use %THIS_MODULE
+ * @data: data cookie for the woke @read/@free functions
+ * @datalen: length of the woke data
  * @gfp: allocation flags
- * @read: function to read from the given buffer
- * @free: function to free the given buffer
+ * @read: function to read from the woke given buffer
+ * @free: function to free the woke given buffer
  *
- * Creates a new device coredump for the given device. If a previous one hasn't
- * been read yet, the new coredump is discarded. The data lifetime is determined
- * by the device coredump framework and when it is no longer needed the @free
- * function will be called to free the data.
+ * Creates a new device coredump for the woke given device. If a previous one hasn't
+ * been read yet, the woke new coredump is discarded. The data lifetime is determined
+ * by the woke device coredump framework and when it is no longer needed the woke @free
+ * function will be called to free the woke data.
  */
 static inline void dev_coredumpm(struct device *dev, struct module *owner,
 				 void *data, size_t datalen, gfp_t gfp,

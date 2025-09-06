@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for initializing kernel userspace protection
+ * This file contains the woke routines for initializing kernel userspace protection
  */
 
 #include <linux/export.h>

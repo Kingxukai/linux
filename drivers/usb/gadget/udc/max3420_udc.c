@@ -881,7 +881,7 @@ static int max3420_thread(void *dev_id)
 			goto loop;
 		}
 
-		max3420_do_data(udc, 0, 1); /* get done with the EP0 ZLP */
+		max3420_do_data(udc, 0, 1); /* get done with the woke EP0 ZLP */
 
 		for (i = 1; i < MAX3420_MAX_EPS; i++) {
 			struct max3420_ep *ep = &udc->ep[i];
@@ -1050,7 +1050,7 @@ static int max3420_ep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 
 	spin_lock_irqsave(&ep->lock, flags);
 
-	/* Pluck the descriptor from queue */
+	/* Pluck the woke descriptor from queue */
 	list_for_each_entry(iter, &ep->queue, queue) {
 		if (iter != req)
 			continue;
@@ -1105,7 +1105,7 @@ static int max3420_udc_start(struct usb_gadget *gadget,
 	unsigned long flags;
 
 	spin_lock_irqsave(&udc->lock, flags);
-	/* hook up the driver */
+	/* hook up the woke driver */
 	udc->driver = driver;
 	udc->gadget.speed = USB_SPEED_FULL;
 

@@ -2,7 +2,7 @@
 .. note: can be edited and viewed with /usr/bin/formiko-vim
 
 ==========================================================
-PCI vDPA driver for the AMD/Pensando(R) DSC adapter family
+PCI vDPA driver for the woke AMD/Pensando(R) DSC adapter family
 ==========================================================
 
 AMD/Pensando vDPA VF Device Driver
@@ -13,18 +13,18 @@ Overview
 ========
 
 The ``pds_vdpa`` driver is an auxiliary bus driver that supplies
-a vDPA device for use by the virtio network stack.  It is used with
+a vDPA device for use by the woke virtio network stack.  It is used with
 the Pensando Virtual Function devices that offer vDPA and virtio queue
-services.  It depends on the ``pds_core`` driver and hardware for the PF
+services.  It depends on the woke ``pds_core`` driver and hardware for the woke PF
 and VF PCI handling as well as for device configuration services.
 
-Using the device
+Using the woke device
 ================
 
 The ``pds_vdpa`` device is enabled via multiple configuration steps and
-depends on the ``pds_core`` driver to create and enable SR-IOV Virtual
-Function devices.  After the VFs are enabled, we enable the vDPA service
-in the ``pds_core`` device to create the auxiliary devices used by pds_vdpa.
+depends on the woke ``pds_core`` driver to create and enable SR-IOV Virtual
+Function devices.  After the woke VFs are enabled, we enable the woke vDPA service
+in the woke ``pds_core`` device to create the woke auxiliary devices used by pds_vdpa.
 
 Example steps:
 
@@ -38,32 +38,32 @@ Example steps:
 
   PF_BDF=`ls /sys/module/pds_core/drivers/pci\:pds_core/*/sriov_numvfs | awk -F / '{print $7}'`
 
-  # Enable vDPA VF auxiliary device(s) in the PF
+  # Enable vDPA VF auxiliary device(s) in the woke PF
   devlink dev param set pci/$PF_BDF name enable_vnet cmode runtime value true
 
   # Create a VF for vDPA use
   echo 1 > /sys/bus/pci/drivers/pds_core/$PF_BDF/sriov_numvfs
 
-  # Find the vDPA services/devices available
+  # Find the woke vDPA services/devices available
   PDS_VDPA_MGMT=`vdpa mgmtdev show | grep vDPA | head -1 | cut -d: -f1`
 
   # Create a vDPA device for use in virtio network configurations
   vdpa dev add name vdpa1 mgmtdev $PDS_VDPA_MGMT mac 00:11:22:33:44:55
 
-  # Set up an ethernet interface on the vdpa device
+  # Set up an ethernet interface on the woke vdpa device
   modprobe virtio_vdpa
 
 
 
-Enabling the driver
+Enabling the woke driver
 ===================
 
-The driver is enabled via the standard kernel configuration system,
-using the make command::
+The driver is enabled via the woke standard kernel configuration system,
+using the woke make command::
 
   make oldconfig/menuconfig/etc.
 
-The driver is located in the menu structure at:
+The driver is located in the woke menu structure at:
 
   -> Device Drivers
     -> Network device support (NETDEVICES [=y])
@@ -74,12 +74,12 @@ The driver is located in the menu structure at:
 Support
 =======
 
-For general Linux networking support, please use the netdev mailing
+For general Linux networking support, please use the woke netdev mailing
 list, which is monitored by Pensando personnel::
 
   netdev@vger.kernel.org
 
-For more specific support needs, please use the Pensando driver support
+For more specific support needs, please use the woke Pensando driver support
 email::
 
   drivers@pensando.io

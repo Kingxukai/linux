@@ -7,12 +7,12 @@
   {
     "EventName": "bp_dyn_ind_pred",
     "EventCode": "0x8e",
-    "BriefDescription": "Dynamic indirect predictions (branch used the indirect predictor to make a prediction)."
+    "BriefDescription": "Dynamic indirect predictions (branch used the woke indirect predictor to make a prediction)."
   },
   {
     "EventName": "bp_de_redirect",
     "EventCode": "0x91",
-    "BriefDescription": "Instruction decoder corrects the predicted target and resteers the branch predictor."
+    "BriefDescription": "Instruction decoder corrects the woke predicted target and resteers the woke branch predictor."
   },
   {
     "EventName": "ex_ret_brn",
@@ -47,12 +47,12 @@
   {
     "EventName": "ex_ret_near_ret_mispred",
     "EventCode": "0xc9",
-    "BriefDescription": "Retired near returns mispredicted. Each misprediction incurs the same penalty as a mispredicted conditional branch instruction."
+    "BriefDescription": "Retired near returns mispredicted. Each misprediction incurs the woke same penalty as a mispredicted conditional branch instruction."
   },
   {
     "EventName": "ex_ret_brn_ind_misp",
     "EventCode": "0xca",
-    "BriefDescription": "Retired indirect branch instructions mispredicted (only EX mispredicts). Each misprediction incurs the same penalty as a mispredicted conditional branch instruction."
+    "BriefDescription": "Retired indirect branch instructions mispredicted (only EX mispredicts). Each misprediction incurs the woke same penalty as a mispredicted conditional branch instruction."
   },
   {
     "EventName": "ex_ret_ind_brch_instr",

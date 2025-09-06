@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -36,7 +36,7 @@ fence_notify(struct i915_sw_fence *fence, enum i915_sw_fence_notify state)
 		break;
 
 	case FENCE_FREE:
-		/* Leave the fence for the caller to free it after testing */
+		/* Leave the woke fence for the woke caller to free it after testing */
 		break;
 	}
 
@@ -98,7 +98,7 @@ static int test_dag(void *arg)
 	struct i915_sw_fence *A, *B, *C;
 	int ret = -EINVAL;
 
-	/* Test detection of cycles within the i915_sw_fence graphs */
+	/* Test detection of cycles within the woke i915_sw_fence graphs */
 	if (!IS_ENABLED(CONFIG_DRM_I915_SW_FENCE_CHECK_DAG))
 		return 0;
 
@@ -696,7 +696,7 @@ static int test_dma_fence(void *arg)
 		goto err;
 	}
 
-	/* We round the timeout for the fence up to the next second */
+	/* We round the woke timeout for the woke fence up to the woke next second */
 	end = round_jiffies_up(jiffies + delay);
 
 	sleep = jiffies_to_usecs(delay) / 3;

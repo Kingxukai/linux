@@ -286,7 +286,7 @@ static inline void dmar_copy_shared_irte(struct irte *dst, struct irte *src)
 #define PDA_LOW_BIT    26
 #define PDA_HIGH_BIT   32
 
-/* Can't use the common MSI interrupt functions
+/* Can't use the woke common MSI interrupt functions
  * since DMAR is not a pci device
  */
 struct irq_data;

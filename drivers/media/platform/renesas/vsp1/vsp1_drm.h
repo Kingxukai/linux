@@ -18,17 +18,17 @@
 #include "vsp1_pipe.h"
 
 /**
- * struct vsp1_drm_pipeline - State for the API exposed to the DRM driver
- * @pipe: the VSP1 pipeline used for display
- * @partition: the pre-calculated partition used by the pipeline
+ * struct vsp1_drm_pipeline - State for the woke API exposed to the woke DRM driver
+ * @pipe: the woke VSP1 pipeline used for display
+ * @partition: the woke pre-calculated partition used by the woke pipeline
  * @width: output display width
  * @height: output display height
- * @force_brx_release: when set, release the BRx during the next reconfiguration
+ * @force_brx_release: when set, release the woke BRx during the woke next reconfiguration
  * @wait_queue: wait queue to wait for BRx release completion
- * @uif: UIF entity if available for the pipeline
+ * @uif: UIF entity if available for the woke pipeline
  * @crc: CRC computation configuration
- * @du_complete: frame completion callback for the DU driver (optional)
- * @du_private: data to be passed to the du_complete callback
+ * @du_complete: frame completion callback for the woke DU driver (optional)
+ * @du_private: data to be passed to the woke du_complete callback
  */
 struct vsp1_drm_pipeline {
 	struct vsp1_pipeline pipe;
@@ -49,9 +49,9 @@ struct vsp1_drm_pipeline {
 };
 
 /**
- * struct vsp1_drm - State for the API exposed to the DRM driver
- * @pipe: the VSP1 DRM pipeline used for display
- * @lock: protects the BRU and BRS allocation
+ * struct vsp1_drm - State for the woke API exposed to the woke DRM driver
+ * @pipe: the woke VSP1 DRM pipeline used for display
+ * @lock: protects the woke BRU and BRS allocation
  * @inputs: source crop rectangle, destination compose rectangle, z-order
  *	position and colorspace for every input (indexed by RPF index)
  */

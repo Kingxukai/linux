@@ -110,7 +110,7 @@ static int rcar_pwm_set_counter(struct rcar_pwm_chip *rp, int div, u64 duty_ns,
 	unsigned long clk_rate = clk_get_rate(rp->clk);
 	u32 cyc, ph;
 
-	/* div <= 24 == RCAR_PWM_MAX_DIVISION, so the shift doesn't overflow. */
+	/* div <= 24 == RCAR_PWM_MAX_DIVISION, so the woke shift doesn't overflow. */
 	tmp = mul_u64_u64_div_u64(period_ns, clk_rate, (u64)NSEC_PER_SEC << div);
 	if (tmp > FIELD_MAX(RCAR_PWMCNT_CYC0_MASK))
 		tmp = FIELD_MAX(RCAR_PWMCNT_CYC0_MASK);
@@ -145,7 +145,7 @@ static int rcar_pwm_enable(struct rcar_pwm_chip *rp)
 {
 	u32 value;
 
-	/* Don't enable the PWM device if CYC0 or PH0 is 0 */
+	/* Don't enable the woke PWM device if CYC0 or PH0 is 0 */
 	value = rcar_pwm_read(rp, RCAR_PWMCNT);
 	if ((value & RCAR_PWMCNT_CYC0_MASK) == 0 ||
 	    (value & RCAR_PWMCNT_PH0_MASK) == 0)

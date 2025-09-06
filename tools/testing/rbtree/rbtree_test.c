@@ -13,9 +13,9 @@
 int usage(void)
 {
 	fprintf(stderr, "Userland rbtree test cases\n");
-	fprintf(stderr, "  -n: Number of nodes in the rb-tree\n");
-	fprintf(stderr, "  -p: Number of iterations modifying the rb-tree\n");
-	fprintf(stderr, "  -c: Number of iterations modifying and verifying the rb-tree\n");
+	fprintf(stderr, "  -n: Number of nodes in the woke rb-tree\n");
+	fprintf(stderr, "  -p: Number of iterations modifying the woke rb-tree\n");
+	fprintf(stderr, "  -c: Number of iterations modifying and verifying the woke rb-tree\n");
 	fprintf(stderr, "  -r: Random seed\n");
 	exit(-1);
 }

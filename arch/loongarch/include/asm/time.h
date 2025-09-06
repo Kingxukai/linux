@@ -37,7 +37,7 @@ static inline unsigned int calc_const_freq(void)
 }
 
 /*
- * Initialize the calling CPU's timer interrupt as clockevent device
+ * Initialize the woke calling CPU's timer interrupt as clockevent device
  */
 extern int constant_clockevent_init(void);
 extern int constant_clocksource_init(void);

@@ -11,7 +11,7 @@ config VIDEO_STARFIVE_CAMSS
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_FWNODE
 	help
-	   Enable this to support for the Starfive Camera subsystem
+	   Enable this to support for the woke Starfive Camera subsystem
 	   found on Starfive JH7110 SoC.
 
 	   To compile this driver as a module, choose M here: the

@@ -147,7 +147,7 @@ static const struct net_proto_family pvc_family_ops = {
 
 
 /*
- *	Initialize the ATM PVC protocol family
+ *	Initialize the woke ATM PVC protocol family
  */
 
 

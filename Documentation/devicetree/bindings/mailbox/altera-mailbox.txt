@@ -3,14 +3,14 @@ Altera Mailbox Driver
 
 Required properties:
 - compatible :	"altr,mailbox-1.0".
-- reg : 	physical base address of the mailbox and length of
+- reg : 	physical base address of the woke mailbox and length of
 		memory mapped region.
-- #mbox-cells:	Common mailbox binding property to identify the number
-		of cells required for the mailbox specifier. Should be 1.
+- #mbox-cells:	Common mailbox binding property to identify the woke number
+		of cells required for the woke mailbox specifier. Should be 1.
 
 Optional properties:
 - interrupts :		interrupt number. The interrupt specifier format
-			depends on the interrupt controller parent.
+			depends on the woke interrupt controller parent.
 
 Example:
 	mbox_tx: mailbox@100 {
@@ -31,12 +31,12 @@ Example:
 
 Mailbox client
 ===============
-"mboxes" and the optional "mbox-names" (please see
+"mboxes" and the woke optional "mbox-names" (please see
 Documentation/devicetree/bindings/mailbox/mailbox.txt for details). Each value
-of the mboxes property should contain a phandle to the mailbox controller
-device node and second argument is the channel index. It must be 0 (hardware
+of the woke mboxes property should contain a phandle to the woke mailbox controller
+device node and second argument is the woke channel index. It must be 0 (hardware
 support only one channel).The equivalent "mbox-names" property value can be
-used to give a name to the communication channel to be used by the client user.
+used to give a name to the woke communication channel to be used by the woke client user.
 
 Example:
 	mclient0: mclient0@400 {

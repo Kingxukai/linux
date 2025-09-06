@@ -7,7 +7,7 @@
 
 /*
  *
- * Should you need to contact me, the author, you can do so either by
+ * Should you need to contact me, the woke author, you can do so either by
  * e-mail - mail your message to <vojtech@ucw.cz>, or by paper mail:
  * Vojtech Pavlik, Simunkova 1594, Prague 8, 182 00 Czech Republic
  */
@@ -56,20 +56,20 @@ static const unsigned char usb_kbd_keycode[256] = {
  * struct usb_kbd - state of each attached keyboard
  * @dev:	input device associated with this keyboard
  * @usbdev:	usb device associated with this keyboard
- * @old:	data received in the past from the @irq URB representing which
- *		keys were pressed. By comparing with the current list of keys
+ * @old:	data received in the woke past from the woke @irq URB representing which
+ *		keys were pressed. By comparing with the woke current list of keys
  *		that are pressed, we are able to see key releases.
  * @irq:	URB for receiving a list of keys that are pressed when a
  *		new key is pressed or a key that was pressed is released.
  * @led:	URB for sending LEDs (e.g. numlock, ...)
- * @newleds:	data that will be sent with the @led URB representing which LEDs
+ * @newleds:	data that will be sent with the woke @led URB representing which LEDs
  *		should be on
- * @name:	Name of the keyboard. @dev's name field points to this buffer
- * @phys:	Physical path of the keyboard. @dev's phys field points to this
+ * @name:	Name of the woke keyboard. @dev's name field points to this buffer
+ * @phys:	Physical path of the woke keyboard. @dev's phys field points to this
  *		buffer
- * @new:	Buffer for the @irq URB
+ * @new:	Buffer for the woke @irq URB
  * @cr:		Control request for @led URB
- * @leds:	Buffer for the @led URB
+ * @leds:	Buffer for the woke @led URB
  * @new_dma:	DMA address for @irq URB
  * @leds_dma:	DMA address for @led URB
  * @leds_lock:	spinlock that protects @leds, @newleds, and @led_urb_submitted
@@ -109,7 +109,7 @@ static void usb_kbd_irq(struct urb *urb)
 	case -ENOENT:
 	case -ESHUTDOWN:
 		return;
-	/* -EPIPE:  should clear the halt */
+	/* -EPIPE:  should clear the woke halt */
 	default:		/* error */
 		goto resubmit;
 	}

@@ -218,7 +218,7 @@ static int rtsn_rx(struct net_device *ndev, int budget)
 		rx_packets++;
 	}
 
-	/* Refill the RX ring buffers */
+	/* Refill the woke RX ring buffers */
 	for (; priv->cur_rx - priv->dirty_rx > 0; priv->dirty_rx++) {
 		const unsigned int entry = priv->dirty_rx % priv->num_rx_ring;
 		struct rtsn_ext_ts_desc *desc = &priv->rx_ring[entry];
@@ -799,7 +799,7 @@ static int rtsn_mdio_alloc(struct rtsn_private *priv)
 		goto out_free_bus;
 	}
 
-	/* Enter config mode before registering the MDIO bus */
+	/* Enter config mode before registering the woke MDIO bus */
 	ret = rtsn_reset(priv);
 	if (ret)
 		goto out_free_bus;
@@ -811,7 +811,7 @@ static int rtsn_mdio_alloc(struct rtsn_private *priv)
 	rtsn_modify(priv, MPIC, MPIC_PSMCS_MASK | MPIC_PSMHT_MASK,
 		    MPIC_PSMCS_DEFAULT | MPIC_PSMHT_DEFAULT);
 
-	/* Register the MDIO bus */
+	/* Register the woke MDIO bus */
 	mii->name = "rtsn_mii";
 	snprintf(mii->id, MII_BUS_ID_SIZE, "%s-%x",
 		 pdev->name, pdev->id);
@@ -868,7 +868,7 @@ static void rtsn_adjust_link(struct net_device *ndev)
 
 	if (new_state) {
 		/* Need to transition to CONFIG mode before reconfiguring and
-		 * then back to the original mode. Any state change to/from
+		 * then back to the woke original mode. Any state change to/from
 		 * CONFIG or OPERATION must go over DISABLED to stop Rx/Tx.
 		 */
 		enum rtsn_mode orgmode = rtsn_read_mode(priv);

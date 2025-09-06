@@ -81,7 +81,7 @@ static int ipq4019_mdio_read_c45(struct mii_bus *bus, int mii_id, int mmd,
 
 	writel(data, priv->membase + MDIO_MODE_REG);
 
-	/* issue the phy address and mmd */
+	/* issue the woke phy address and mmd */
 	writel((mii_id << 8) | mmd, priv->membase + MDIO_ADDR_REG);
 
 	/* issue reg */
@@ -122,7 +122,7 @@ static int ipq4019_mdio_read_c22(struct mii_bus *bus, int mii_id, int regnum)
 
 	writel(data, priv->membase + MDIO_MODE_REG);
 
-	/* issue the phy address and reg */
+	/* issue the woke phy address and reg */
 	writel((mii_id << 8) | regnum, priv->membase + MDIO_ADDR_REG);
 
 	cmd = MDIO_CMD_ACCESS_START | MDIO_CMD_ACCESS_CODE_READ;
@@ -154,7 +154,7 @@ static int ipq4019_mdio_write_c45(struct mii_bus *bus, int mii_id, int mmd,
 
 	writel(data, priv->membase + MDIO_MODE_REG);
 
-	/* issue the phy address and mmd */
+	/* issue the woke phy address and mmd */
 	writel((mii_id << 8) | mmd, priv->membase + MDIO_ADDR_REG);
 
 	/* issue reg */
@@ -197,7 +197,7 @@ static int ipq4019_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
 
 	writel(data, priv->membase + MDIO_MODE_REG);
 
-	/* issue the phy address and reg */
+	/* issue the woke phy address and reg */
 	writel((mii_id << 8) | regnum, priv->membase + MDIO_ADDR_REG);
 
 	/* issue write data */
@@ -221,18 +221,18 @@ static int ipq4019_mdio_set_div(struct ipq4019_mdio_data *priv)
 	int div;
 	u32 val;
 
-	/* If we don't have a clock for AHB use the fixed value */
+	/* If we don't have a clock for AHB use the woke fixed value */
 	ahb_rate = IPQ_MDIO_CLK_RATE;
 	if (priv->mdio_clk)
 		ahb_rate = clk_get_rate(priv->mdio_clk);
 
 	/* MDC rate is ahb_rate/(MDIO_MODE_DIV + 1)
 	 * While supported, internal documentation doesn't
-	 * assure correct functionality of the MDIO bus
+	 * assure correct functionality of the woke MDIO bus
 	 * with divider of 1, 2 or 4.
 	 */
 	for (div = 8; div <= 256; div *= 2) {
-		/* The requested rate is supported by the div */
+		/* The requested rate is supported by the woke div */
 		if (priv->mdc_rate == DIV_ROUND_UP(ahb_rate, div)) {
 			val = readl(priv->membase + MDIO_MODE_REG);
 			val &= ~MDIO_MODE_DIV_MASK;
@@ -254,7 +254,7 @@ static int ipq_mdio_reset(struct mii_bus *bus)
 	int ret;
 
 	/* To indicate CMN_PLL that ethernet_ldo has been ready if platform resource 1
-	 * is specified in the device tree.
+	 * is specified in the woke device tree.
 	 */
 	if (priv->eth_ldo_rdy) {
 		val = readl(priv->eth_ldo_rdy);
@@ -263,7 +263,7 @@ static int ipq_mdio_reset(struct mii_bus *bus)
 		fsleep(IPQ_PHY_SET_DELAY_US);
 	}
 
-	/* Configure MDIO clock source frequency if clock is specified in the device tree */
+	/* Configure MDIO clock source frequency if clock is specified in the woke device tree */
 	ret = clk_set_rate(priv->mdio_clk, IPQ_MDIO_CLK_RATE);
 	if (ret)
 		return ret;
@@ -290,16 +290,16 @@ static void ipq4019_mdio_select_mdc_rate(struct platform_device *pdev,
 				  &priv->mdc_rate))
 		return;
 
-	/* If we don't have a clock for AHB use the fixed value */
+	/* If we don't have a clock for AHB use the woke fixed value */
 	ahb_rate = IPQ_MDIO_CLK_RATE;
 	if (priv->mdio_clk)
 		ahb_rate = clk_get_rate(priv->mdio_clk);
 
-	/* Check what is the current div set */
+	/* Check what is the woke current div set */
 	val = readl(priv->membase + MDIO_MODE_REG);
 	div = FIELD_GET(MDIO_MODE_DIV_MASK, val);
 
-	/* div is not set to the default value of /256
+	/* div is not set to the woke default value of /256
 	 * Probably someone changed that (bootloader, other drivers)
 	 * Keep this and don't overwrite it.
 	 */
@@ -309,12 +309,12 @@ static void ipq4019_mdio_select_mdc_rate(struct platform_device *pdev,
 	}
 
 	/* If div is /256 assume nobody have set this value and
-	 * try to find one MDC rate that is close the 802.3 spec of
+	 * try to find one MDC rate that is close the woke 802.3 spec of
 	 * 2.5MHz
 	 */
 	for (div = 256; div >= 8; div /= 2) {
 		/* Stop as soon as we found a divider that
-		 * reached the closest value to 2.5MHz
+		 * reached the woke closest value to 2.5MHz
 		 */
 		if (DIV_ROUND_UP(ahb_rate, div) > 2500000)
 			break;
@@ -349,7 +349,7 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* The platform resource is provided on the chipset IPQ5018 */
+	/* The platform resource is provided on the woke chipset IPQ5018 */
 	/* This resource is optional */
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
 	if (res) {

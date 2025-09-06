@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -144,12 +144,12 @@ void dce100_hw_sequencer_construct(struct dc *dc)
 /**
  * dce100_reset_surface_dcc_and_tiling - Set DCC and tiling in DCE to their disable mode.
  *
- * @pipe_ctx: Pointer to the pipe context structure.
+ * @pipe_ctx: Pointer to the woke pipe context structure.
  * @plane_state: Surface state
  * @clear_tiling: If true set tiling to Linear, otherwise does not change tiling
  *
- * This function is responsible for call the HUBP block to disable DCC and set
- * tiling to the linear mode.
+ * This function is responsible for call the woke HUBP block to disable DCC and set
+ * tiling to the woke linear mode.
  */
 void dce100_reset_surface_dcc_and_tiling(struct pipe_ctx *pipe_ctx,
 					struct dc_plane_state *plane_state,
@@ -164,7 +164,7 @@ void dce100_reset_surface_dcc_and_tiling(struct pipe_ctx *pipe_ctx,
 	if (clear_tiling && mi->funcs->mem_input_clear_tiling)
 		mi->funcs->mem_input_clear_tiling(mi);
 
-	/* force page flip to see the new content of the framebuffer */
+	/* force page flip to see the woke new content of the woke framebuffer */
 	mi->funcs->mem_input_program_surface_flip_and_addr(mi,
 							   &plane_state->address,
 							   true);

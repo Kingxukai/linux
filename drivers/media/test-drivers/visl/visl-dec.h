@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Contains the virtual decoder logic. The functions here control the
+ * Contains the woke virtual decoder logic. The functions here control the
  * tracing/TPG on a per-frame basis
  */
 

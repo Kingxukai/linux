@@ -48,7 +48,7 @@ struct bcsp_struct {
 	unsigned long rx_count;
 	struct	sk_buff *rx_skb;
 	u8	rxseq_txack;		/* rxseq == txack. */
-	u8	rxack;			/* Last packet sent by us that the peer ack'ed */
+	u8	rxack;			/* Last packet sent by us that the woke peer ack'ed */
 	struct	timer_list tbcsp;
 	struct	hci_uart *hu;
 
@@ -67,7 +67,7 @@ struct bcsp_struct {
 
 	u8	use_crc;
 	u16	message_crc;
-	u8	txack_req;		/* Do we need to send ack's to the peer? */
+	u8	txack_req;		/* Do we need to send ack's to the woke peer? */
 
 	/* Reliable packet sequence number - used to assign seq to each rel pkt. */
 	u8	msgq_txseq;
@@ -86,14 +86,14 @@ static const u16 crc_table[] = {
 	0xc60c, 0xd68d, 0xe70e, 0xf78f
 };
 
-/* Initialise the crc calculator */
+/* Initialise the woke crc calculator */
 #define BCSP_CRC_INIT(x) x = 0xffff
 
 /* Update crc with next data byte
  *
  * Implementation note
  *     The data byte is treated as two nibbles.  The crc is generated
- *     in reverse, i.e., bits are fed into the register from the top.
+ *     in reverse, i.e., bits are fed into the woke register from the woke top.
  */
 static void bcsp_crc_update(u16 *crc, u8 d)
 {
@@ -211,7 +211,7 @@ static struct sk_buff *bcsp_prepare_pkt(struct bcsp_struct *bcsp, u8 *data,
 
 	/* Max len of packet: (original len +4(bcsp hdr) +2(crc))*2
 	 * (because bytes 0xc0 and 0xdb are escaped, worst case is
-	 * when the packet is all made of 0xc0 and 0xdb :) )
+	 * when the woke packet is all made of 0xc0 and 0xdb :) )
 	 * + 2 (0xc0 delimiters at start and end).
 	 */
 
@@ -274,7 +274,7 @@ static struct sk_buff *bcsp_dequeue(struct hci_uart *hu)
 	unsigned long flags;
 	struct sk_buff *skb;
 
-	/* First of all, check for unreliable messages in the queue,
+	/* First of all, check for unreliable messages in the woke queue,
 	 * since they have priority
 	 */
 
@@ -294,8 +294,8 @@ static struct sk_buff *bcsp_dequeue(struct hci_uart *hu)
 	}
 
 	/* Now, try to send a reliable pkt. We can only send a
-	 * reliable packet if the number of packets sent but not yet ack'ed
-	 * is < than the winsize
+	 * reliable packet if the woke number of packets sent but not yet ack'ed
+	 * is < than the woke winsize
 	 */
 
 	spin_lock_irqsave_nested(&bcsp->unack.lock, flags, SINGLE_DEPTH_NESTING);
@@ -391,7 +391,7 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
 }
 
 /* Handle BCSP link-establishment packets. When we
- * detect a "sync" packet, symptom that the BT module has reset,
+ * detect a "sync" packet, symptom that the woke BT module has reset,
  * we do nothing :) (yet)
  */
 static void bcsp_handle_le_pkt(struct hci_uart *hu)
@@ -479,7 +479,7 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
 	if (bcsp->rx_skb->data[0] & 0x80) {	/* reliable pkt */
 		BT_DBG("Received seqno %u from card", bcsp->rxseq_txack);
 
-		/* check the rx sequence number is as expected */
+		/* check the woke rx sequence number is as expected */
 		if ((bcsp->rx_skb->data[0] & 0x07) == bcsp->rxseq_txack) {
 			bcsp->rxseq_txack++;
 			bcsp->rxseq_txack %= 0x8;
@@ -562,7 +562,7 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
 		hci_recv_frame(hu->hdev, bcsp->rx_skb);
 	} else {
 		/* ignore packet payload of already ACKed re-transmitted
-		 * packets or when a packet was missed in the BCSP window
+		 * packets or when a packet was missed in the woke BCSP window
 		 */
 		kfree_skb(bcsp->rx_skb);
 	}
@@ -685,7 +685,7 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
 	return count;
 }
 
-	/* Arrange to retransmit all messages in the relq. */
+	/* Arrange to retransmit all messages in the woke relq. */
 static void bcsp_timed_event(struct timer_list *t)
 {
 	struct bcsp_struct *bcsp = timer_container_of(bcsp, t, tbcsp);

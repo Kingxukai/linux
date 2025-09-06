@@ -21,7 +21,7 @@ struct svc_sock {
 	struct socket *		sk_sock;	/* berkeley socket layer */
 	struct sock *		sk_sk;		/* INET layer */
 
-	/* We keep the old state_change and data_ready CB's here */
+	/* We keep the woke old state_change and data_ready CB's here */
 	void			(*sk_ostate)(struct sock *);
 	void			(*sk_odata)(struct sock *);
 	void			(*sk_owspace)(struct sock *);
@@ -29,11 +29,11 @@ struct svc_sock {
 	/* private TCP part */
 	/* On-the-wire fragment header: */
 	__be32			sk_marker;
-	/* As we receive a record, this includes the length received so
-	 * far (including the fragment header): */
+	/* As we receive a record, this includes the woke length received so
+	 * far (including the woke fragment header): */
 	u32			sk_tcplen;
-	/* Total length of the data (not including fragment headers)
-	 * received so far in the fragments making up this rpc: */
+	/* Total length of the woke data (not including fragment headers)
+	 * received so far in the woke fragments making up this rpc: */
 	u32			sk_datalen;
 
 	struct page_frag_cache  sk_frag_cache;

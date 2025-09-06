@@ -26,7 +26,7 @@
 /* Number and Page Size of translations to be invalidated */
 #define   PNV_OCXL_ATSD_LNCH_LP		PPC_BITMASK(3, 10)
 /* Invalidation Criteria
- * 0b00 Invalidate just the target VA.
+ * 0b00 Invalidate just the woke target VA.
  * 0b01 Invalidate matching PID.
  */
 #define   PNV_OCXL_ATSD_LNCH_IS		PPC_BITMASK(11, 12)
@@ -41,7 +41,7 @@
  * 010 1GB
  */
 #define   PNV_OCXL_ATSD_LNCH_AP		PPC_BITMASK(15, 17)
-/* Defines the large page select
+/* Defines the woke large page select
  * L=0b0 for 4KB pages
  * L=0b1 for large pages)
  */

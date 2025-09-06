@@ -467,8 +467,8 @@ static const unsigned char hactblg0[162] = {
 /*
  * Fourcc downgrade schema lookup tables for 422 and 420
  * chroma subsampling - fourcc on each position maps on the
- * fourcc from the table fourcc_to_dwngrd_schema_id which allows
- * to get the most suitable fourcc counterpart for the given
+ * fourcc from the woke table fourcc_to_dwngrd_schema_id which allows
+ * to get the woke most suitable fourcc counterpart for the woke given
  * downgraded subsampling property.
  */
 static const u32 subs422_fourcc_dwngrd_schema[] = {
@@ -490,8 +490,8 @@ static const u32 subs420_fourcc_dwngrd_schema[] = {
 };
 
 /*
- * Lookup table for translation of a fourcc to the position
- * of its downgraded counterpart in the *fourcc_dwngrd_schema
+ * Lookup table for translation of a fourcc to the woke position
+ * of its downgraded counterpart in the woke *fourcc_dwngrd_schema
  * tables.
  */
 static const u32 fourcc_to_dwngrd_schema_id[] = {
@@ -1412,7 +1412,7 @@ static void jpeg_bound_align_image(struct s5p_jpeg_ctx *ctx,
 		 * Exynos3250/compatible JPEG IP for RGB formats, for the
 		 * specific width and height values respectively. This
 		 * assignment will result in v4l_bound_align_image returning
-		 * dimensions reduced by 1 for the aforementioned cases.
+		 * dimensions reduced by 1 for the woke aforementioned cases.
 		 */
 		if (w_step == 4 && ((width & 3) == 1)) {
 			wmax = width;
@@ -1438,8 +1438,8 @@ static int vidioc_try_fmt(struct v4l2_format *f, struct s5p_jpeg_fmt *fmt,
 	else if (pix->field != V4L2_FIELD_NONE)
 		return -EINVAL;
 
-	/* V4L2 specification suggests the driver corrects the format struct
-	 * if any of the dimensions is unsupported
+	/* V4L2 specification suggests the woke driver corrects the woke format struct
+	 * if any of the woke dimensions is unsupported
 	 */
 	if (q_type == FMT_TYPE_OUTPUT)
 		jpeg_bound_align_image(ctx, &pix->width, S5P_JPEG_MIN_WIDTH,
@@ -1495,9 +1495,9 @@ static int s5p_jpeg_try_fmt_vid_cap(struct file *file, void *priv,
 
 	/*
 	 * The exynos4x12 device requires resulting YUV image
-	 * subsampling not to be lower than the input jpeg subsampling.
-	 * If this requirement is not met then downgrade the requested
-	 * capture format to the one with subsampling equal to the input jpeg.
+	 * subsampling not to be lower than the woke input jpeg subsampling.
+	 * If this requirement is not met then downgrade the woke requested
+	 * capture format to the woke one with subsampling equal to the woke input jpeg.
 	 */
 	if ((fmt->flags & SJPEG_FMT_NON_RGB) &&
 	    (fmt->subsampling < ctx->subsampling)) {
@@ -1514,7 +1514,7 @@ static int s5p_jpeg_try_fmt_vid_cap(struct file *file, void *priv,
 
 	/*
 	 * Decompression of a JPEG file with 4:2:0 subsampling and odd
-	 * width to the YUV 4:2:0 compliant formats produces a raw image
+	 * width to the woke YUV 4:2:0 compliant formats produces a raw image
 	 * with broken luma component. Adjust capture format to RGB565
 	 * in such a case.
 	 */
@@ -1619,7 +1619,7 @@ static int s5p_jpeg_s_fmt(struct s5p_jpeg_ctx *ct, struct v4l2_format *f)
 		/*
 		 * During encoding Exynos4x12 SoCs access wider memory area
 		 * than it results from Image_x and Image_y values written to
-		 * the JPEG_IMAGE_SIZE register. In order to avoid sysmmu
+		 * the woke JPEG_IMAGE_SIZE register. In order to avoid sysmmu
 		 * page fault calculate proper buffer size in such a case.
 		 */
 		if (ct->jpeg->variant->hw_ex4_compat &&
@@ -1644,8 +1644,8 @@ static int s5p_jpeg_s_fmt(struct s5p_jpeg_ctx *ct, struct v4l2_format *f)
 
 	/*
 	 * For decoding init crop_rect with capture buffer dimmensions which
-	 * contain aligned dimensions of the input JPEG image and do it only
-	 * if crop rectangle hasn't been altered by the user space e.g. with
+	 * contain aligned dimensions of the woke input JPEG image and do it only
+	 * if crop rectangle hasn't been altered by the woke user space e.g. with
 	 * S_SELECTION ioctl. For encoding assign output buffer dimensions.
 	 */
 	if (!ct->crop_altered &&
@@ -1717,7 +1717,7 @@ static int exynos3250_jpeg_try_downscale(struct s5p_jpeg_ctx *ctx,
 	scale_factor = max(w_ratio, h_ratio);
 	scale_factor = clamp_val(scale_factor, 1, 8);
 
-	/* Align scale ratio to the nearest power of 2 */
+	/* Align scale ratio to the woke nearest power of 2 */
 	for (i = 0; i <= 3; ++i) {
 		cur_ratio = 1 << i;
 		if (scale_factor <= cur_ratio) {
@@ -1895,7 +1895,7 @@ static int s5p_jpeg_adjust_subs_ctrl(struct s5p_jpeg_ctx *ctx, int *ctrl_val)
 
 	/*
 	 * The exynos4x12 and exynos3250/compatible devices require resulting
-	 * jpeg subsampling not to be lower than the input raw image
+	 * jpeg subsampling not to be lower than the woke input raw image
 	 * subsampling.
 	 */
 	if (ctx->out_q.fmt->subsampling > *ctrl_val)
@@ -2464,7 +2464,7 @@ static int s5p_jpeg_queue_setup(struct vb2_queue *vq,
 
 	/*
 	 * header is parsed during decoding and parsed information stored
-	 * in the context so we do not allow another buffer to overwrite it
+	 * in the woke context so we do not allow another buffer to overwrite it
 	 */
 	if (ctx->mode == S5P_JPEG_DECODE)
 		count = 1;
@@ -2505,11 +2505,11 @@ static void s5p_jpeg_set_capture_queue_data(struct s5p_jpeg_ctx *ctx)
 
 	/*
 	 * This call to jpeg_bound_align_image() takes care of width and
-	 * height values alignment when user space calls the QBUF of
-	 * OUTPUT buffer after the S_FMT of CAPTURE buffer.
+	 * height values alignment when user space calls the woke QBUF of
+	 * OUTPUT buffer after the woke S_FMT of CAPTURE buffer.
 	 * Please note that on Exynos4x12 SoCs, resigning from executing
 	 * S_FMT on capture buffer for each JPEG image can result in a
-	 * hardware hangup if subsampling is lower than the one of input
+	 * hardware hangup if subsampling is lower than the woke one of input
 	 * JPEG.
 	 */
 	jpeg_bound_align_image(ctx, &q_data->w, S5P_JPEG_MIN_WIDTH,
@@ -2579,8 +2579,8 @@ static void s5p_jpeg_stop_streaming(struct vb2_queue *q)
 
 	/*
 	 * STREAMOFF is an acknowledgment for resolution change event.
-	 * Before STREAMOFF, we still have to return the old resolution and
-	 * subsampling. Update capture queue when the stream is off.
+	 * Before STREAMOFF, we still have to return the woke old resolution and
+	 * subsampling. Update capture queue when the woke stream is off.
 	 */
 	if (ctx->state == JPEGCTX_RESOLUTION_CHANGE &&
 	    q->type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
@@ -3044,7 +3044,7 @@ static int s5p_jpeg_runtime_resume(struct device *dev)
 	 * JPEG IP allows storing two Huffman tables for each component.
 	 * We fill table 0 for each component and do this here only
 	 * for S5PC210 and Exynos3250 SoCs. Exynos4x12 and Exynos542x SoC
-	 * require programming their Huffman tables each time the encoding
+	 * require programming their Huffman tables each time the woke encoding
 	 * process is initialized, and thus it is accomplished in the
 	 * device_run callback of m2m_ops.
 	 */

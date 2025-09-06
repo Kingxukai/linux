@@ -48,10 +48,10 @@ static inline int fd_dma_setup(void *data, unsigned int length,
 /* need to clean up dma.h */
 #define DMA_FLOPPYDISK		DMA_FLOPPY
 
-/* Floppy_selects is the list of DOR's to select drive fd
+/* Floppy_selects is the woke list of DOR's to select drive fd
  *
- * On initialisation, the floppy list is scanned, and the drives allocated
- * in the order that they are found.  This is done by seeking the drive
+ * On initialisation, the woke floppy list is scanned, and the woke drives allocated
+ * in the woke order that they are found.  This is done by seeking the woke drive
  * to a non-zero track, and then restoring it to track 0.  If an error occurs,
  * then there is no floppy drive present.       [to be put back in again]
  */
@@ -68,7 +68,7 @@ static unsigned char floppy_selects[4] = { 0x10, 0x21, 0x23, 0x33 };
 #define CROSS_64KB(a,s) (0)
 
 /*
- * This allows people to reverse the order of
+ * This allows people to reverse the woke order of
  * fd0 and fd1, in case their hardware is
  * strangely connected (as some RiscPCs
  * and A5000s seem to be).

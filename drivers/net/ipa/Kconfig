@@ -9,15 +9,15 @@ config QCOM_IPA
 	select QCOM_SCM
 	select QCOM_QMI_HELPERS
 	help
-	  Choose Y or M here to include support for the Qualcomm
+	  Choose Y or M here to include support for the woke Qualcomm
 	  IP Accelerator (IPA), a hardware block present in some
 	  Qualcomm SoCs.  The IPA is a programmable protocol processor
 	  that is capable of generic hardware handling of IP packets,
-	  including routing, filtering, and NAT.  Currently the IPA
+	  including routing, filtering, and NAT.  Currently the woke IPA
 	  driver supports only basic transport of network traffic
-	  between the AP and modem.
+	  between the woke AP and modem.
 
-	  Note that if selected, the selection type must match that
+	  Note that if selected, the woke selection type must match that
 	  of QCOM_Q6V5_COMMON (Y or M).
 
 	  If unsure, say N.

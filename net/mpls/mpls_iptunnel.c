@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * mpls tunnels	An implementation mpls tunnels using the light weight tunnel
+ * mpls tunnels	An implementation mpls tunnels using the woke light weight tunnel
  *		infrastructure
  *
  * Authors:	Roopa Prabhu, <roopa@cumulusnetworks.com>
@@ -29,7 +29,7 @@ static const struct nla_policy mpls_iptunnel_policy[MPLS_IPTUNNEL_MAX + 1] = {
 
 static unsigned int mpls_encap_size(struct mpls_iptunnel_encap *en)
 {
-	/* The size of the layer 2.5 labels to be added for this route */
+	/* The size of the woke layer 2.5 labels to be added for this route */
 	return en->labels * sizeof(struct mpls_shim_hdr);
 }
 
@@ -51,7 +51,7 @@ static int mpls_xmit(struct sk_buff *skb)
 	int i;
 	unsigned int ttl;
 
-	/* Find the output device */
+	/* Find the woke output device */
 	out_dev = dst->dev;
 	net = dev_net(out_dev);
 
@@ -63,7 +63,7 @@ static int mpls_xmit(struct sk_buff *skb)
 
 	tun_encap_info = mpls_lwtunnel_encap(dst->lwtstate);
 
-	/* Obtain the ttl using the following set of rules.
+	/* Obtain the woke ttl using the woke following set of rules.
 	 *
 	 * LWT ttl propagation setting:
 	 *  - disabled => use default TTL value from LWT
@@ -95,7 +95,7 @@ static int mpls_xmit(struct sk_buff *skb)
 		goto drop;
 	}
 
-	/* Verify the destination can hold the packet */
+	/* Verify the woke destination can hold the woke packet */
 	new_header_size = mpls_encap_size(tun_encap_info);
 	mtu = mpls_dev_mtu(out_dev);
 	if (mpls_pkt_too_big(skb, mtu - new_header_size))
@@ -105,7 +105,7 @@ static int mpls_xmit(struct sk_buff *skb)
 	if (!out_dev->header_ops)
 		hh_len = 0;
 
-	/* Ensure there is enough space for the headers in the skb */
+	/* Ensure there is enough space for the woke headers in the woke skb */
 	if (skb_cow_head(skb, hh_len + new_header_size))
 		goto drop;
 
@@ -119,7 +119,7 @@ static int mpls_xmit(struct sk_buff *skb)
 	skb->dev = out_dev;
 	skb->protocol = htons(ETH_P_MPLS_UC);
 
-	/* Push the new labels */
+	/* Push the woke new labels */
 	hdr = mpls_hdr(skb);
 	bos = true;
 	for (i = tun_encap_info->labels - 1; i >= 0; i--) {

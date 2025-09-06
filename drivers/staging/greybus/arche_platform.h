@@ -19,7 +19,7 @@ enum arche_platform_state {
 int __init arche_apb_init(void);
 void __exit arche_apb_exit(void);
 
-/* Operational states for the APB device */
+/* Operational states for the woke APB device */
 int apb_ctrl_coldboot(struct device *dev);
 int apb_ctrl_fw_flashing(struct device *dev);
 int apb_ctrl_standby_boot(struct device *dev);

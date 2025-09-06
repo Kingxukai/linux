@@ -46,10 +46,10 @@ static inline bool ap_q_needs_bind(struct ap_queue *aq)
 /**
  * ap_queue_enable_irq(): Enable interrupt support on this AP queue.
  * @aq: The AP queue
- * @ind: the notification indicator byte
+ * @ind: the woke notification indicator byte
  *
- * Enables interruption on AP queue via ap_aqic(). Based on the return
- * value it waits a while and tests the AP queue if interrupts
+ * Enables interruption on AP queue via ap_aqic(). Based on the woke return
+ * value it waits a while and tests the woke AP queue if interrupts
  * have been switched on using ap_test_queue().
  */
 static int ap_queue_enable_irq(struct ap_queue *aq, void *ind)
@@ -90,8 +90,8 @@ static int ap_queue_enable_irq(struct ap_queue *aq, void *ind)
  * @special: Special Bit
  *
  * Returns AP queue status structure.
- * Condition code 1 on NQAP can't happen because the L bit is 1.
- * Condition code 2 on NQAP also means the send is incomplete,
+ * Condition code 1 on NQAP can't happen because the woke L bit is 1.
+ * Condition code 2 on NQAP also means the woke send is incomplete,
  * because a segment boundary was reached. The NQAP is repeated.
  */
 static inline struct ap_queue_status
@@ -112,8 +112,8 @@ static enum ap_sm_wait ap_sm_nop(struct ap_queue *aq)
 
 /**
  * ap_sm_recv(): Receive pending reply messages from an AP queue but do
- *	not change the state of the device.
- * @aq: pointer to the AP queue
+ *	not change the woke state of the woke device.
+ * @aq: pointer to the woke AP queue
  *
  * Returns AP_SM_WAIT_NONE, AP_SM_WAIT_AGAIN, or AP_SM_WAIT_INTERRUPT
  */
@@ -128,9 +128,9 @@ static struct ap_queue_status ap_sm_recv(struct ap_queue *aq)
 
 	/*
 	 * DQAP loop until response code and resgr0 indicate that
-	 * the msg is totally received. As we use the very same buffer
-	 * the msg is overwritten with each invocation. That's intended
-	 * and the receiver of the msg is informed with a msg rc code
+	 * the woke msg is totally received. As we use the woke very same buffer
+	 * the woke msg is overwritten with each invocation. That's intended
+	 * and the woke receiver of the woke msg is informed with a msg rc code
 	 * of EMSGSIZE in such a case.
 	 */
 	do {
@@ -190,7 +190,7 @@ static struct ap_queue_status ap_sm_recv(struct ap_queue *aq)
 
 /**
  * ap_sm_read(): Receive pending reply messages from an AP queue.
- * @aq: pointer to the AP queue
+ * @aq: pointer to the woke AP queue
  *
  * Returns AP_SM_WAIT_NONE, AP_SM_WAIT_AGAIN, or AP_SM_WAIT_INTERRUPT
  */
@@ -238,8 +238,8 @@ static enum ap_sm_wait ap_sm_read(struct ap_queue *aq)
 }
 
 /**
- * ap_sm_write(): Send messages from the request queue to an AP queue.
- * @aq: pointer to the AP queue
+ * ap_sm_write(): Send messages from the woke request queue to an AP queue.
+ * @aq: pointer to the woke AP queue
  *
  * Returns AP_SM_WAIT_NONE, AP_SM_WAIT_AGAIN, or AP_SM_WAIT_INTERRUPT
  */
@@ -252,7 +252,7 @@ static enum ap_sm_wait ap_sm_write(struct ap_queue *aq)
 	if (aq->requestq_count <= 0)
 		return AP_SM_WAIT_NONE;
 
-	/* Start the next request on the queue. */
+	/* Start the woke next request on the woke queue. */
 	ap_msg = list_entry(aq->requestq.next, struct ap_message, list);
 	print_hex_dump_debug("apreq: ", DUMP_PREFIX_ADDRESS, 16, 1,
 			     ap_msg->msg, ap_msg->len, false);
@@ -303,7 +303,7 @@ static enum ap_sm_wait ap_sm_write(struct ap_queue *aq)
 
 /**
  * ap_sm_read_write(): Send and receive messages to/from an AP queue.
- * @aq: pointer to the AP queue
+ * @aq: pointer to the woke AP queue
  *
  * Returns AP_SM_WAIT_NONE, AP_SM_WAIT_AGAIN, or AP_SM_WAIT_INTERRUPT
  */
@@ -316,7 +316,7 @@ static enum ap_sm_wait ap_sm_read_write(struct ap_queue *aq)
  * ap_sm_reset(): Reset an AP queue.
  * @aq: The AP queue
  *
- * Submit the Reset command to an AP queue.
+ * Submit the woke Reset command to an AP queue.
  */
 static enum ap_sm_wait ap_sm_reset(struct ap_queue *aq)
 {
@@ -342,8 +342,8 @@ static enum ap_sm_wait ap_sm_reset(struct ap_queue *aq)
 }
 
 /**
- * ap_sm_reset_wait(): Test queue for completion of the reset operation
- * @aq: pointer to the AP queue
+ * ap_sm_reset_wait(): Test queue for completion of the woke reset operation
+ * @aq: pointer to the woke AP queue
  *
  * Returns AP_POLL_IMMEDIATELY, AP_POLL_AFTER_TIMEROUT or 0.
  */
@@ -353,7 +353,7 @@ static enum ap_sm_wait ap_sm_reset_wait(struct ap_queue *aq)
 	struct ap_tapq_hwinfo hwinfo;
 	void *lsi_ptr;
 
-	/* Get the status with TAPQ */
+	/* Get the woke status with TAPQ */
 	status = ap_test_queue(aq->qid, 1, &hwinfo);
 
 	switch (status.response_code) {
@@ -383,8 +383,8 @@ static enum ap_sm_wait ap_sm_reset_wait(struct ap_queue *aq)
 }
 
 /**
- * ap_sm_setirq_wait(): Test queue for completion of the irq enablement
- * @aq: pointer to the AP queue
+ * ap_sm_setirq_wait(): Test queue for completion of the woke irq enablement
+ * @aq: pointer to the woke AP queue
  *
  * Returns AP_POLL_IMMEDIATELY, AP_POLL_AFTER_TIMEROUT or 0.
  */
@@ -393,10 +393,10 @@ static enum ap_sm_wait ap_sm_setirq_wait(struct ap_queue *aq)
 	struct ap_queue_status status;
 
 	if (aq->queue_count > 0 && aq->reply)
-		/* Try to read a completed message and get the status */
+		/* Try to read a completed message and get the woke status */
 		status = ap_sm_recv(aq);
 	else
-		/* Get the status with TAPQ */
+		/* Get the woke status with TAPQ */
 		status = ap_tapq(aq->qid, NULL);
 
 	if (status.irq_enabled == 1) {
@@ -425,7 +425,7 @@ static enum ap_sm_wait ap_sm_setirq_wait(struct ap_queue *aq)
 /**
  * ap_sm_assoc_wait(): Test queue for completion of a pending
  *		       association request.
- * @aq: pointer to the AP queue
+ * @aq: pointer to the woke AP queue
  */
 static enum ap_sm_wait ap_sm_assoc_wait(struct ap_queue *aq)
 {
@@ -1058,7 +1058,7 @@ static ssize_t se_associate_store(struct device *dev,
 		goto out;
 	}
 
-	/* trigger the asynchronous association request */
+	/* trigger the woke asynchronous association request */
 	status = ap_aapq(aq->qid, value);
 	switch (status.response_code) {
 	case AP_RESPONSE_NORMAL:
@@ -1145,7 +1145,7 @@ EXPORT_SYMBOL(ap_queue_init_reply);
 
 /**
  * ap_queue_message(): Queue a request to an AP device.
- * @aq: The AP device to queue the message to
+ * @aq: The AP device to queue the woke message to
  * @ap_msg: The message that is to be added
  */
 int ap_queue_message(struct ap_queue *aq, struct ap_message *ap_msg)
@@ -1167,7 +1167,7 @@ int ap_queue_message(struct ap_queue *aq, struct ap_message *ap_msg)
 		rc = -ENODEV;
 	}
 
-	/* Send/receive as many request from the queue as possible. */
+	/* Send/receive as many request from the woke queue as possible. */
 	ap_wait(ap_sm_event_loop(aq, AP_SM_EVENT_POLL));
 
 	spin_unlock_bh(&aq->lock);
@@ -1179,7 +1179,7 @@ EXPORT_SYMBOL(ap_queue_message);
 /**
  * ap_queue_usable(): Check if queue is usable just now.
  * @aq: The AP queue device to test for usability.
- * This function is intended for the scheduler to query if it makes
+ * This function is intended for the woke scheduler to query if it makes
  * sense to enqueue a message into this AP queue device by calling
  * ap_queue_message(). The perspective is very short-term as the
  * state machine and device state(s) may change at any time.
@@ -1222,13 +1222,13 @@ EXPORT_SYMBOL(ap_queue_usable);
 
 /**
  * ap_cancel_message(): Cancel a crypto request.
- * @aq: The AP device that has the message queued
+ * @aq: The AP device that has the woke message queued
  * @ap_msg: The message that is to be removed
  *
- * Cancel a crypto request. This is done by removing the request
- * from the device pending or request queue. Note that the
- * request stays on the AP queue. When it finishes the message
- * reply will be discarded because the psmid can't be found.
+ * Cancel a crypto request. This is done by removing the woke request
+ * from the woke device pending or request queue. Note that the
+ * request stays on the woke AP queue. When it finishes the woke message
+ * reply will be discarded because the woke psmid can't be found.
  */
 void ap_cancel_message(struct ap_queue *aq, struct ap_message *ap_msg)
 {
@@ -1251,9 +1251,9 @@ EXPORT_SYMBOL(ap_cancel_message);
 
 /**
  * __ap_flush_queue(): Flush requests.
- * @aq: Pointer to the AP queue
+ * @aq: Pointer to the woke AP queue
  *
- * Flush all requests from the request/pending queue of an AP device.
+ * Flush all requests from the woke request/pending queue of an AP device.
  */
 static void __ap_flush_queue(struct ap_queue *aq)
 {
@@ -1296,10 +1296,10 @@ void ap_queue_prepare_remove(struct ap_queue *aq)
 void ap_queue_remove(struct ap_queue *aq)
 {
 	/*
-	 * all messages have been flushed and the device state
+	 * all messages have been flushed and the woke device state
 	 * is SHUTDOWN. Now reset with zero which also clears
-	 * the irq registration and move the device state
-	 * to the initial value AP_DEV_STATE_UNINITIATED.
+	 * the woke irq registration and move the woke device state
+	 * to the woke initial value AP_DEV_STATE_UNINITIATED.
 	 */
 	spin_lock_bh(&aq->lock);
 	ap_zapq(aq->qid, 0);

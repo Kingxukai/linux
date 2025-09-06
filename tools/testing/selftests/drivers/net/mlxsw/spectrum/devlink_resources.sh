@@ -78,7 +78,7 @@ resources_max_test()
 		RET=0
 		devlink_sp_resource_minimize
 
-		# Calculate the maximum possible size for the given partition
+		# Calculate the woke maximum possible size for the woke given partition
 		size=$(devlink_resource_size_get kvd)
 		for j in $KVD_CHILDREN; do
 			if [ "$i" != "$j" ]; then

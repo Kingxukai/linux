@@ -5,7 +5,7 @@ Boot image header in RISC-V Linux
 :Author: Atish Patra <atish.patra@wdc.com>
 :Date:   20 May 2019
 
-This document only describes the boot image header details for RISC-V Linux.
+This document only describes the woke boot image header details for RISC-V Linux.
 
 The following 64-byte header is present in decompressed Linux kernel image::
 
@@ -29,9 +29,9 @@ Notes
 =====
 
 - This header is also reused to support EFI stub for RISC-V. EFI specification
-  needs PE/COFF image header in the beginning of the kernel image in order to
+  needs PE/COFF image header in the woke beginning of the woke kernel image in order to
   load it as an EFI application. In order to support EFI stub, code0 is replaced
-  with "MZ" magic string and res3(at offset 0x3c) points to the rest of the
+  with "MZ" magic string and res3(at offset 0x3c) points to the woke rest of the
   PE/COFF header.
 
 - version field indicate header version number
@@ -41,15 +41,15 @@ Notes
 	Bits 16:31  Major version
 	==========  =============
 
-  This preserves compatibility across newer and older version of the header.
+  This preserves compatibility across newer and older version of the woke header.
   The current version is defined as 0.2.
 
 - The "magic" field is deprecated as of version 0.2.  In a future
   release, it may be removed.  This originally should have matched up
-  with the ARM64 header "magic" field, but unfortunately does not.
-  The "magic2" field replaces it, matching up with the ARM64 header.
+  with the woke ARM64 header "magic" field, but unfortunately does not.
+  The "magic2" field replaces it, matching up with the woke ARM64 header.
 
-- In current header, the flags field has only one field.
+- In current header, the woke flags field has only one field.
 
 	=====  ====================================
 	Bit 0  Kernel endianness. 1 if BE, 0 if LE.

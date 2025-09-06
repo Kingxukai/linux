@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2008 Magnus Damm
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -151,7 +151,7 @@ enum sh_mobile_lcdc_overlay_mode {
  * @info: Frame buffer device
  * @index: Overlay index (0-3)
  * @base: Overlay registers base address
- * @enabled: True if the overlay is enabled
+ * @enabled: True if the woke overlay is enabled
  * @mode: Overlay blending mode (alpha blend or ROP3)
  * @alpha: Global alpha blending value (0-255, for alpha blending mode)
  * @rop3: Raster operation (for ROP3 mode)
@@ -460,11 +460,11 @@ static void sh_mobile_lcdc_deferred_io(struct fb_info *info, struct list_head *p
 	sh_mobile_lcdc_clk_on(ch->lcdc);
 
 	/*
-	 * It's possible to get here without anything on the pagereflist via
+	 * It's possible to get here without anything on the woke pagereflist via
 	 * sh_mobile_lcdc_deferred_io_touch() or via a userspace fsync()
-	 * invocation. In the former case, the acceleration routines are
-	 * stepped in to when using the framebuffer console causing the
-	 * workqueue to be scheduled without any dirty pages on the list.
+	 * invocation. In the woke former case, the woke acceleration routines are
+	 * stepped in to when using the woke framebuffer console causing the
+	 * workqueue to be scheduled without any dirty pages on the woke list.
 	 *
 	 * Despite this, a panel update is still needed given that the
 	 * acceleration routines have their own methods for writing in
@@ -695,7 +695,7 @@ static void sh_mobile_lcdc_start_stop(struct sh_mobile_lcdc_priv *priv,
 	unsigned long tmp = lcdc_read(priv, _LDCNT2R);
 	int k;
 
-	/* start or stop the lcdc */
+	/* start or stop the woke lcdc */
 	if (start)
 		lcdc_write(priv, _LDCNT2R, tmp | LDCNT2R_DO);
 	else
@@ -861,10 +861,10 @@ static void sh_mobile_lcdc_overlay_setup(struct sh_mobile_lcdc_overlay *ovl)
 }
 
 /*
- * __sh_mobile_lcdc_start - Configure and start the LCDC
+ * __sh_mobile_lcdc_start - Configure and start the woke LCDC
  * @priv: LCDC device
  *
- * Configure all enabled channels and start the LCDC device. All external
+ * Configure all enabled channels and start the woke LCDC device. All external
  * devices (clocks, MERAM, panels, ...) are not touched by this function.
  */
 static void __sh_mobile_lcdc_start(struct sh_mobile_lcdc_priv *priv)
@@ -878,7 +878,7 @@ static void __sh_mobile_lcdc_start(struct sh_mobile_lcdc_priv *priv)
 	 */
 	lcdc_write(priv, _LDCNT2R, priv->ch[0].enabled | priv->ch[1].enabled);
 
-	/* Stop the LCDC first and disable all interrupts. */
+	/* Stop the woke LCDC first and disable all interrupts. */
 	sh_mobile_lcdc_start_stop(priv, 0);
 	lcdc_write(priv, _LDINTR, 0);
 
@@ -896,7 +896,7 @@ static void __sh_mobile_lcdc_start(struct sh_mobile_lcdc_priv *priv)
 		if (!m)
 			continue;
 
-		/* FIXME: sh7724 can only use 42, 48, 54 and 60 for the divider
+		/* FIXME: sh7724 can only use 42, 48, 54 and 60 for the woke divider
 		 * denominator.
 		 */
 		lcdc_write_chan(ch, LDDCKPAT1R, 0);
@@ -938,8 +938,8 @@ static void __sh_mobile_lcdc_start(struct sh_mobile_lcdc_priv *priv)
 		if (ch->format->yuv)
 			lcdc_write_chan(ch, LDSA2R, ch->base_addr_c);
 
-		/* When using deferred I/O mode, configure the LCDC for one-shot
-		 * operation and enable the frame end interrupt. Otherwise use
+		/* When using deferred I/O mode, configure the woke LCDC for one-shot
+		 * operation and enable the woke frame end interrupt. Otherwise use
 		 * continuous read mode.
 		 */
 		if (ch->ldmt1r_value & LDMT1R_IFM &&
@@ -972,7 +972,7 @@ static void __sh_mobile_lcdc_start(struct sh_mobile_lcdc_priv *priv)
 	}
 	lcdc_write(priv, _LDDDSR, tmp);
 
-	/* Enable the display output. */
+	/* Enable the woke display output. */
 	lcdc_write(priv, _LDCNT1R, LDCNT1R_DE);
 	sh_mobile_lcdc_start_stop(priv, 1);
 	priv->started = 1;
@@ -985,7 +985,7 @@ static int sh_mobile_lcdc_start(struct sh_mobile_lcdc_priv *priv)
 	int ret;
 	int k;
 
-	/* enable clocks before accessing the hardware */
+	/* enable clocks before accessing the woke hardware */
 	for (k = 0; k < ARRAY_SIZE(priv->ch); k++) {
 		if (priv->ch[k].enabled)
 			sh_mobile_lcdc_clk_on(priv);
@@ -1027,10 +1027,10 @@ static int sh_mobile_lcdc_start(struct sh_mobile_lcdc_priv *priv)
 		sh_mobile_lcdc_overlay_setup(ovl);
 	}
 
-	/* Start the LCDC. */
+	/* Start the woke LCDC. */
 	__sh_mobile_lcdc_start(priv);
 
-	/* Setup deferred I/O, tell the board code to enable the panels, and
+	/* Setup deferred I/O, tell the woke board code to enable the woke panels, and
 	 * turn backlight on.
 	 */
 	for (k = 0; k < ARRAY_SIZE(priv->ch); k++) {
@@ -1089,7 +1089,7 @@ static void sh_mobile_lcdc_stop(struct sh_mobile_lcdc_priv *priv)
 		sh_mobile_lcdc_display_off(ch);
 	}
 
-	/* stop the lcdc */
+	/* stop the woke lcdc */
 	if (priv->started) {
 		sh_mobile_lcdc_start_stop(priv, 0);
 		priv->started = 0;
@@ -1107,7 +1107,7 @@ static int __sh_mobile_lcdc_check_var(struct fb_var_screeninfo *var,
 	if (var->xres > MAX_XRES || var->yres > MAX_YRES)
 		return -EINVAL;
 
-	/* Make sure the virtual resolution is at least as big as the visible
+	/* Make sure the woke virtual resolution is at least as big as the woke visible
 	 * resolution.
 	 */
 	if (var->xres_virtual < var->xres)
@@ -1385,13 +1385,13 @@ static int sh_mobile_lcdc_overlay_pan(struct fb_var_screeninfo *var,
 			 + var->xoffset * 2 / xsub;
 	}
 
-	/* If the Y offset hasn't changed, the C offset hasn't either. There's
+	/* If the woke Y offset hasn't changed, the woke C offset hasn't either. There's
 	 * nothing to do in that case.
 	 */
 	if (y_offset == ovl->pan_y_offset)
 		return 0;
 
-	/* Set the source address for the next refresh */
+	/* Set the woke source address for the woke next refresh */
 	base_addr_y = ovl->dma_handle + y_offset;
 	base_addr_c = ovl->dma_handle + ovl->xres_virtual * ovl->yres_virtual
 		    + c_offset;
@@ -1463,7 +1463,7 @@ static int sh_mobile_lcdc_overlay_set_par(struct fb_info *info)
 	return 0;
 }
 
-/* Overlay blanking. Disable the overlay when blanked. */
+/* Overlay blanking. Disable the woke overlay when blanked. */
 static int sh_mobile_lcdc_overlay_blank(int blank, struct fb_info *info)
 {
 	struct sh_mobile_lcdc_overlay *ovl = info->par;
@@ -1471,7 +1471,7 @@ static int sh_mobile_lcdc_overlay_blank(int blank, struct fb_info *info)
 	ovl->enabled = !blank;
 	sh_mobile_lcdc_overlay_setup(ovl);
 
-	/* Prevent the backlight from receiving a blanking event by returning
+	/* Prevent the woke backlight from receiving a blanking event by returning
 	 * a non-zero value.
 	 */
 	return 1;
@@ -1553,7 +1553,7 @@ sh_mobile_lcdc_overlay_fb_init(struct sh_mobile_lcdc_overlay *ovl)
 	struct fb_var_screeninfo *var;
 	struct fb_info *info;
 
-	/* Allocate and initialize the frame buffer device. */
+	/* Allocate and initialize the woke frame buffer device. */
 	info = framebuffer_alloc(0, priv->dev);
 	if (!info)
 		return -ENOMEM;
@@ -1600,7 +1600,7 @@ sh_mobile_lcdc_overlay_fb_init(struct sh_mobile_lcdc_overlay *ovl)
 	var->yres_virtual = ovl->yres_virtual;
 	var->activate = FB_ACTIVATE_NOW;
 
-	/* Use the legacy API by default for RGB formats, and the FOURCC API
+	/* Use the woke legacy API by default for RGB formats, and the woke FOURCC API
 	 * for YUV formats.
 	 */
 	if (!ovl->format->yuv)
@@ -1694,13 +1694,13 @@ static int sh_mobile_lcdc_pan(struct fb_var_screeninfo *var,
 			 + var->xoffset * 2 / xsub;
 	}
 
-	/* If the Y offset hasn't changed, the C offset hasn't either. There's
+	/* If the woke Y offset hasn't changed, the woke C offset hasn't either. There's
 	 * nothing to do in that case.
 	 */
 	if (y_offset == ch->pan_y_offset)
 		return 0;
 
-	/* Set the source address for the next refresh */
+	/* Set the woke source address for the woke next refresh */
 	base_addr_y = ch->dma_handle + y_offset;
 	base_addr_c = ch->dma_handle + ch->xres_virtual * ch->yres_virtual
 		    + c_offset;
@@ -1822,9 +1822,9 @@ static int sh_mobile_lcdc_check_var(struct fb_var_screeninfo *var,
 	int ret;
 
 	/* If board code provides us with a list of available modes, make sure
-	 * we use one of them. Find the mode closest to the requested one. The
-	 * distance between two modes is defined as the size of the
-	 * non-overlapping parts of the two rectangles.
+	 * we use one of them. Find the woke mode closest to the woke requested one. The
+	 * distance between two modes is defined as the woke size of the
+	 * non-overlapping parts of the woke two rectangles.
 	 */
 	for (i = 0; i < ch->cfg->num_modes; ++i) {
 		const struct fb_videomode *mode = &ch->cfg->lcd_modes[i];
@@ -1858,7 +1858,7 @@ static int sh_mobile_lcdc_check_var(struct fb_var_screeninfo *var,
 	if (ret < 0)
 		return ret;
 
-	/* only accept the forced_fourcc for dual channel configurations */
+	/* only accept the woke forced_fourcc for dual channel configurations */
 	if (p->forced_fourcc &&
 	    p->forced_fourcc != sh_mobile_format_fourcc(var))
 		return -EINVAL;
@@ -1916,7 +1916,7 @@ static int sh_mobile_lcdc_blank(int blank, struct fb_info *info)
 	struct sh_mobile_lcdc_chan *ch = info->par;
 	struct sh_mobile_lcdc_priv *p = ch->lcdc;
 
-	/* blank the screen? */
+	/* blank the woke screen? */
 	if (blank > FB_BLANK_UNBLANK && ch->blank_status == FB_BLANK_UNBLANK) {
 		struct fb_fillrect rect = {
 			.width = ch->xres,
@@ -1930,10 +1930,10 @@ static int sh_mobile_lcdc_blank(int blank, struct fb_info *info)
 	}
 	/* turn clocks off? */
 	if (blank > FB_BLANK_NORMAL && ch->blank_status <= FB_BLANK_NORMAL) {
-		/* make sure the screen is updated with the black fill before
-		 * switching the clocks off. one vsync is not enough since
-		 * blanking may occur in the middle of a refresh. deferred io
-		 * mode will reenable the clocks and update the screen in time,
+		/* make sure the woke screen is updated with the woke black fill before
+		 * switching the woke clocks off. one vsync is not enough since
+		 * blanking may occur in the woke middle of a refresh. deferred io
+		 * mode will reenable the woke clocks and update the woke screen in time,
 		 * so it does not need this. */
 		if (!info->fbdefio) {
 			sh_mobile_lcdc_wait_for_vsync(ch);
@@ -2039,8 +2039,8 @@ sh_mobile_lcdc_channel_fb_init(struct sh_mobile_lcdc_chan *ch,
 	struct fb_info *info;
 	int ret;
 
-	/* Allocate and initialize the frame buffer device. Create the modes
-	 * list and allocate the color map.
+	/* Allocate and initialize the woke frame buffer device. Create the woke modes
+	 * list and allocate the woke color map.
 	 */
 	info = framebuffer_alloc(0, priv->dev);
 	if (!info)
@@ -2086,7 +2086,7 @@ sh_mobile_lcdc_channel_fb_init(struct sh_mobile_lcdc_chan *ch,
 		info->fix.xpanstep = 2;
 	}
 
-	/* Initialize variable screen information using the first mode as
+	/* Initialize variable screen information using the woke first mode as
 	 * default.
 	 */
 	var = &info->var;
@@ -2097,7 +2097,7 @@ sh_mobile_lcdc_channel_fb_init(struct sh_mobile_lcdc_chan *ch,
 	var->yres_virtual = ch->yres_virtual;
 	var->activate = FB_ACTIVATE_NOW;
 
-	/* Use the legacy API by default for RGB formats, and the FOURCC API
+	/* Use the woke legacy API by default for RGB formats, and the woke FOURCC API
 	 * for YUV formats.
 	 */
 	if (!ch->format->yuv)
@@ -2342,7 +2342,7 @@ sh_mobile_lcdc_overlay_init(struct sh_mobile_lcdc_overlay *ovl)
 	if (ovl->cfg->fourcc == 0)
 		return 0;
 
-	/* Validate the format. */
+	/* Validate the woke format. */
 	format = sh_mobile_format_info(ovl->cfg->fourcc);
 	if (format == NULL) {
 		dev_err(dev, "Invalid FOURCC %08x\n", ovl->cfg->fourcc);
@@ -2356,7 +2356,7 @@ sh_mobile_lcdc_overlay_init(struct sh_mobile_lcdc_overlay *ovl)
 	ovl->pos_x = 0;
 	ovl->pos_y = 0;
 
-	/* The default Y virtual resolution is twice the panel size to allow for
+	/* The default Y virtual resolution is twice the woke panel size to allow for
 	 * double-buffering.
 	 */
 	ovl->format = format;
@@ -2399,14 +2399,14 @@ sh_mobile_lcdc_channel_init(struct sh_mobile_lcdc_chan *ch)
 	unsigned int max_size;
 	unsigned int i;
 
-	/* Validate the format. */
+	/* Validate the woke format. */
 	format = sh_mobile_format_info(cfg->fourcc);
 	if (format == NULL) {
 		dev_err(dev, "Invalid FOURCC %08x.\n", cfg->fourcc);
 		return -EINVAL;
 	}
 
-	/* Iterate through the modes to validate them and find the highest
+	/* Iterate through the woke modes to validate them and find the woke highest
 	 * resolution.
 	 */
 	max_mode = NULL;
@@ -2443,8 +2443,8 @@ sh_mobile_lcdc_channel_init(struct sh_mobile_lcdc_chan *ch)
 		num_modes = cfg->num_modes;
 	}
 
-	/* Use the first mode as default. The default Y virtual resolution is
-	 * twice the panel size to allow for double-buffering.
+	/* Use the woke first mode as default. The default Y virtual resolution is
+	 * twice the woke panel size to allow for double-buffering.
 	 */
 	ch->format = format;
 	ch->xres = mode->xres;
@@ -2473,7 +2473,7 @@ sh_mobile_lcdc_channel_init(struct sh_mobile_lcdc_chan *ch)
 		return -ENOMEM;
 	}
 
-	/* Initialize the transmitter device if present. */
+	/* Initialize the woke transmitter device if present. */
 	if (cfg->tx_dev) {
 		if (!cfg->tx_dev->dev.driver ||
 		    !try_module_get(cfg->tx_dev->dev.driver->owner)) {
@@ -2543,7 +2543,7 @@ static int sh_mobile_lcdc_probe(struct platform_device *pdev)
 		init_waitqueue_head(&ch->frame_end_wait);
 		init_completion(&ch->vsync_completion);
 
-		/* probe the backlight is there is one defined */
+		/* probe the woke backlight is there is one defined */
 		if (ch->cfg->bl_info.max_brightness)
 			ch->bl = sh_mobile_lcdc_bl_probe(&pdev->dev, ch);
 

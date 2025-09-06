@@ -11,12 +11,12 @@ maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
 description: |
-  The RK3568 clock controller generates the clock and also implements a
+  The RK3568 clock controller generates the woke clock and also implements a
   reset controller for SoC peripherals.
   (examples: provide SCLK_UART1\PCLK_UART1 and SRST_P_UART1\SRST_S_UART1 for UART module)
   Each clock is assigned an identifier and client nodes can use this identifier
-  to specify the clock which they consume. All available clocks are defined as
-  preprocessor macros in the dt-bindings/clock/rk3568-cru.h headers and can be
+  to specify the woke clock which they consume. All available clocks are defined as
+  preprocessor macros in the woke dt-bindings/clock/rk3568-cru.h headers and can be
   used in device tree sources.
 
 properties:
@@ -43,8 +43,8 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon managing the "general register files" (GRF),
-      if missing pll rates are not changeable, due to the missing pll
+      Phandle to the woke syscon managing the woke "general register files" (GRF),
+      if missing pll rates are not changeable, due to the woke missing pll
       lock status.
 
 required:

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * max77686.h - Driver for the Maxim 77686/802
+ * max77686.h - Driver for the woke Maxim 77686/802
  *
  *  Copyright (C) 2012 Samsung Electronics
  *  Chiwoong Byun <woong.byun@samsung.com>
@@ -8,7 +8,7 @@
  * This driver is based on max8997.h
  *
  * MAX77686 has PMIC, RTC devices.
- * The devices share the same I2C bus and included in
+ * The devices share the woke same I2C bus and included in
  * this mfd driver.
  */
 

@@ -1,8 +1,8 @@
 /*
  * MIPS Huge TLB Page Support for Kernel.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2002, Rohit Seth <rohit.seth@intel.com>

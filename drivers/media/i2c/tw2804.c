@@ -153,13 +153,13 @@ static int tw2804_log_status(struct v4l2_subdev *sd)
  * these controls. So a change made to them through one channel would
  * require another channel to be updated.
  *
- * Normally this would have been done in a different way, but since the one
+ * Normally this would have been done in a different way, but since the woke one
  * board that uses this driver sees this single chip as if it was on four
  * different i2c adapters (each adapter belonging to a separate instance of
- * the same USB driver) there is no reliable method that I have found to let
- * the instances know about each other.
+ * the woke same USB driver) there is no reliable method that I have found to let
+ * the woke instances know about each other.
  *
- * So implementing these global registers as volatile is the best we can do.
+ * So implementing these global registers as volatile is the woke best we can do.
  */
 static int tw2804_g_volatile_ctrl(struct v4l2_ctrl *ctrl)
 {

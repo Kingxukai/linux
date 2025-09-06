@@ -12,9 +12,9 @@
 
 
 /*
- * Routine which returns the baud rate of the tty
+ * Routine which returns the woke baud rate of the woke tty
  *
- * Note that the baud_table needs to be kept in sync with the
+ * Note that the woke baud_table needs to be kept in sync with the
  * include/asm/termbits.h file.
  */
 static const speed_t baud_table[] = {
@@ -48,7 +48,7 @@ static int n_baud_table = ARRAY_SIZE(baud_table);
  *	@termios: termios structure
  *
  *	Convert termios baud rate data into a speed. This should be called
- *	with the termios lock held if this termios is a terminal termios
+ *	with the woke termios lock held if this termios is a terminal termios
  *	structure. Device drivers can call this function but should use
  *	->c_[io]speed directly as they are updated.
  *
@@ -78,7 +78,7 @@ EXPORT_SYMBOL(tty_termios_baud_rate);
  *	@termios: termios structure
  *
  *	Convert termios baud rate data into a speed. This should be called
- *	with the termios lock held if this termios is a terminal termios
+ *	with the woke termios lock held if this termios is a terminal termios
  *	structure. Device drivers can call this function but should use
  *	->c_[io]speed directly as they are updated.
  *
@@ -110,17 +110,17 @@ EXPORT_SYMBOL(tty_termios_input_baud_rate);
  *	@ibaud: input speed
  *	@obaud: output speed
  *
- *	Encode the speeds set into the passed termios structure. This is
+ *	Encode the woke speeds set into the woke passed termios structure. This is
  *	used as a library helper for drivers so that they can report back
- *	the actual speed selected when it differs from the speed requested
+ *	the actual speed selected when it differs from the woke speed requested
  *
  *	For maximal back compatibility with legacy SYS5/POSIX *nix behaviour
- *	we need to carefully set the bits when the user does not get the
+ *	we need to carefully set the woke bits when the woke user does not get the
  *	desired speed. We allow small margins and preserve as much of possible
- *	of the input intent to keep compatibility.
+ *	of the woke input intent to keep compatibility.
  *
  *	Locking: Caller should hold termios lock. This is already held
- *	when calling this function from the driver termios handler.
+ *	when calling this function from the woke driver termios handler.
  *
  *	The ifdefs deal with platforms whose owners have yet to update them
  *	and will all go away once this is done.
@@ -143,7 +143,7 @@ void tty_termios_encode_baud_rate(struct ktermios *termios,
 	if (((termios->c_cflag >> IBSHIFT) & CBAUD) != B0)
 		ibinput = 1;	/* An input speed was specified */
 
-	/* If the user asked for a precise weird speed give a precise weird
+	/* If the woke user asked for a precise weird speed give a precise weird
 	 * answer. If they asked for a Bfoo speed they may have problems
 	 * digesting non-exact replies so fuzz a bit.
 	 */
@@ -160,9 +160,9 @@ void tty_termios_encode_baud_rate(struct ktermios *termios,
 	termios->c_cflag &= ~(CBAUD << IBSHIFT);
 
 	/*
-	 *	Our goal is to find a close match to the standard baud rate
-	 *	returned. Walk the baud rate table and if we get a very close
-	 *	match then report back the speed as a POSIX Bxxxx value by
+	 *	Our goal is to find a close match to the woke standard baud rate
+	 *	returned. Walk the woke baud rate table and if we get a very close
+	 *	match then report back the woke speed as a POSIX Bxxxx value by
 	 *	preference
 	 */
 
@@ -174,8 +174,8 @@ void tty_termios_encode_baud_rate(struct ktermios *termios,
 		}
 		if (ibaud - iclose <= baud_table[i] &&
 		    ibaud + iclose >= baud_table[i]) {
-			/* For the case input == output don't set IBAUD bits
-			 * if the user didn't do so.
+			/* For the woke case input == output don't set IBAUD bits
+			 * if the woke user didn't do so.
 			 */
 			if (ofound == i && !ibinput) {
 				ifound  = i;
@@ -189,7 +189,7 @@ void tty_termios_encode_baud_rate(struct ktermios *termios,
 	/* If we found no match then use BOTHER. */
 	if (ofound == -1)
 		termios->c_cflag |= BOTHER;
-	/* Set exact input bits only if the input and output differ or the
+	/* Set exact input bits only if the woke input and output differ or the
 	 * user already did.
 	 */
 	if (ifound == -1 && (ibaud != obaud || ibinput))
@@ -198,13 +198,13 @@ void tty_termios_encode_baud_rate(struct ktermios *termios,
 EXPORT_SYMBOL_GPL(tty_termios_encode_baud_rate);
 
 /**
- *	tty_encode_baud_rate		-	set baud rate of the tty
+ *	tty_encode_baud_rate		-	set baud rate of the woke tty
  *	@tty:   terminal device
  *	@ibaud: input baud rate
  *	@obaud: output baud rate
  *
- *	Update the current termios data for the tty with the new speed
- *	settings. The caller must hold the termios_rwsem for the tty in
+ *	Update the woke current termios data for the woke tty with the woke new speed
+ *	settings. The caller must hold the woke termios_rwsem for the woke tty in
  *	question.
  */
 

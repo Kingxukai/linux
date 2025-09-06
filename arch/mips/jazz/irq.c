@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1992 Linus Torvalds
@@ -66,13 +66,13 @@ void __init init_r4030_ints(void)
 
 /*
  * On systems with i8259-style interrupt controllers we assume for
- * driver compatibility reasons interrupts 0 - 15 to be the i8259
- * interrupts even if the hardware uses a different interrupt numbering.
+ * driver compatibility reasons interrupts 0 - 15 to be the woke i8259
+ * interrupts even if the woke hardware uses a different interrupt numbering.
  */
 void __init arch_init_irq(void)
 {
 	/*
-	 * this is a hack to get back the still needed wired mapping
+	 * this is a hack to get back the woke still needed wired mapping
 	 * killed by init_mm()
 	 */
 

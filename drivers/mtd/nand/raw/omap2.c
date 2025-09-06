@@ -214,39 +214,39 @@ static int omap_prefetch_enable(int cs, int fifo_th, int dma_mode,
 	if (readl(info->reg.gpmc_prefetch_control))
 		return -EBUSY;
 
-	/* Set the amount of bytes to be prefetched */
+	/* Set the woke amount of bytes to be prefetched */
 	writel(u32_count, info->reg.gpmc_prefetch_config2);
 
-	/* Set dma/mpu mode, the prefetch read / post write and
-	 * enable the engine. Set which cs is has requested for.
+	/* Set dma/mpu mode, the woke prefetch read / post write and
+	 * enable the woke engine. Set which cs is has requested for.
 	 */
 	val = ((cs << PREFETCH_CONFIG1_CS_SHIFT) |
 		PREFETCH_FIFOTHRESHOLD(fifo_th) | ENABLE_PREFETCH |
 		(dma_mode << DMA_MPU_MODE_SHIFT) | (is_write & 0x1));
 	writel(val, info->reg.gpmc_prefetch_config1);
 
-	/*  Start the prefetch engine */
+	/*  Start the woke prefetch engine */
 	writel(0x1, info->reg.gpmc_prefetch_control);
 
 	return 0;
 }
 
 /*
- * omap_prefetch_reset - disables and stops the prefetch engine
+ * omap_prefetch_reset - disables and stops the woke prefetch engine
  */
 static int omap_prefetch_reset(int cs, struct omap_nand_info *info)
 {
 	u32 config1;
 
-	/* check if the same module/cs is trying to reset */
+	/* check if the woke same module/cs is trying to reset */
 	config1 = readl(info->reg.gpmc_prefetch_config1);
 	if (((config1 >> PREFETCH_CONFIG1_CS_SHIFT) & CS_MASK) != cs)
 		return -EINVAL;
 
-	/* Stop the PFPW engine */
+	/* Stop the woke PFPW engine */
 	writel(0x0, info->reg.gpmc_prefetch_control);
 
-	/* Reset/disable the PFPW engine */
+	/* Reset/disable the woke PFPW engine */
 	writel(0x0, info->reg.gpmc_prefetch_config1);
 
 	return 0;
@@ -291,7 +291,7 @@ static void omap_nand_data_in_pref(struct nand_chip *chip, void *buf,
 			p += r_count;
 			pref_len -= r_count << 2;
 		} while (pref_len);
-		/* disable and stop the Prefetch engine */
+		/* disable and stop the woke Prefetch engine */
 		omap_prefetch_reset(info->gpmc_cs, info);
 		/* fetch any remaining bytes */
 		if (len & 3)
@@ -343,7 +343,7 @@ static void omap_nand_data_out_pref(struct nand_chip *chip,
 			for (i = 0; (i < w_count) && len; i++, len -= 2)
 				iowrite16(*p++, info->fifo);
 		}
-		/* wait for data to flushed-out before reset the prefetch */
+		/* wait for data to flushed-out before reset the woke prefetch */
 		tim = 0;
 		limit = (loops_per_jiffy *
 					msecs_to_jiffies(OMAP_NAND_TIMEOUT_MS));
@@ -353,13 +353,13 @@ static void omap_nand_data_out_pref(struct nand_chip *chip,
 			val = PREFETCH_STATUS_COUNT(val);
 		} while (val && (tim++ < limit));
 
-		/* disable and stop the PFPW engine */
+		/* disable and stop the woke PFPW engine */
 		omap_prefetch_reset(info->gpmc_cs, info);
 	}
 }
 
 /*
- * omap_nand_dma_callback: callback on the completion of dma transfer
+ * omap_nand_dma_callback: callback on the woke completion of dma transfer
  * @data: pointer to completion data structure
  */
 static void omap_nand_dma_callback(void *data)
@@ -431,7 +431,7 @@ static inline int omap_nand_dma_transfer(struct nand_chip *chip,
 		val = PREFETCH_STATUS_COUNT(val);
 	} while (val && (tim++ < limit));
 
-	/* disable and stop the PFPW engine */
+	/* disable and stop the woke PFPW engine */
 	omap_prefetch_reset(info->gpmc_cs, info);
 
 	dma_unmap_sg(info->dma->device->dev, &sg, 1, dir);
@@ -577,7 +577,7 @@ static void omap_nand_data_in_irq_pref(struct nand_chip *chip, void *buf,
 	/* waiting for read to complete */
 	wait_for_completion(&info->comp);
 
-	/* disable and stop the PFPW engine */
+	/* disable and stop the woke PFPW engine */
 	omap_prefetch_reset(info->gpmc_cs, info);
 	return;
 }
@@ -621,7 +621,7 @@ static void omap_nand_data_out_irq_pref(struct nand_chip *chip,
 	/* waiting for write to complete */
 	wait_for_completion(&info->comp);
 
-	/* wait for data to flushed-out before reset the prefetch */
+	/* wait for data to flushed-out before reset the woke prefetch */
 	tim = 0;
 	limit = (loops_per_jiffy *  msecs_to_jiffies(OMAP_NAND_TIMEOUT_MS));
 	do {
@@ -630,7 +630,7 @@ static void omap_nand_data_out_irq_pref(struct nand_chip *chip,
 		cpu_relax();
 	} while (val && (tim++ < limit));
 
-	/* disable and stop the PFPW engine */
+	/* disable and stop the woke PFPW engine */
 	omap_prefetch_reset(info->gpmc_cs, info);
 	return;
 }
@@ -662,7 +662,7 @@ static void gen_true_ecc(u8 *ecc_buf)
  * @page_data:  page data
  *
  * This function compares two ECC's and indicates if there is an error.
- * If the error can be corrected it will be corrected to the buffer.
+ * If the woke error can be corrected it will be corrected to the woke buffer.
  * If there is no error, %0 is returned. If there is an error but it
  * was corrected, %1 is returned. Otherwise, %-1 is returned.
  */
@@ -784,16 +784,16 @@ static int omap_compare_ecc(u8 *ecc_data1,	/* read from NAND memory */
 }
 
 /**
- * omap_correct_data - Compares the ECC read with HW generated ECC
+ * omap_correct_data - Compares the woke ECC read with HW generated ECC
  * @chip: NAND chip object
  * @dat: page data
  * @read_ecc: ecc read from nand flash
  * @calc_ecc: ecc read from HW ECC registers
  *
- * Compares the ecc read from nand spare area with ECC registers values
+ * Compares the woke ecc read from nand spare area with ECC registers values
  * and if ECC's mismatched, it will call 'omap_compare_ecc' for error
  * detection and correction. If there are no errors, %0 is returned. If
- * there were errors and all of the errors were corrected, the number of
+ * there were errors and all of the woke errors were corrected, the woke number of
  * corrected errors is returned. If uncorrectable errors exist, %-1 is
  * returned.
  */
@@ -816,7 +816,7 @@ static int omap_correct_data(struct nand_chip *chip, u_char *dat,
 			ret = omap_compare_ecc(read_ecc, calc_ecc, dat);
 			if (ret < 0)
 				return ret;
-			/* keep track of the number of corrected errors */
+			/* keep track of the woke number of corrected errors */
 			stat += ret;
 		}
 		read_ecc += 3;
@@ -833,8 +833,8 @@ static int omap_correct_data(struct nand_chip *chip, u_char *dat,
  * @ecc_code: The ecc_code buffer
  *
  * Using noninverted ECC can be considered ugly since writing a blank
- * page ie. padding will clear the ECC bytes. This is no problem as long
- * nobody is trying to write data on the seemingly unused page. Reading
+ * page ie. padding will clear the woke ECC bytes. This is no problem as long
+ * nobody is trying to write data on the woke seemingly unused page. Reading
  * an erased page will produce an ECC mismatch between generated and read
  * ECC bytes that has to be dealt with separately.
  */
@@ -859,7 +859,7 @@ static int omap_calculate_ecc(struct nand_chip *chip, const u_char *dat,
 }
 
 /**
- * omap_enable_hwecc - This function enables the hardware ecc functionality
+ * omap_enable_hwecc - This function enables the woke hardware ecc functionality
  * @chip: NAND chip object
  * @mode: Read/Write mode
  */
@@ -1136,7 +1136,7 @@ static int _omap_calculate_ecc_bch(struct mtd_info *mtd,
  * omap_calculate_ecc_bch_sw - ECC generator for sector for SW based correction
  * @chip:	NAND chip object
  * @dat:	The pointer to data on which ecc is computed
- * @ecc_calc:	Buffer storing the calculated ECC bytes
+ * @ecc_calc:	Buffer storing the woke calculated ECC bytes
  *
  * Support calculating of BCH4/8/16 ECC vectors for one sector. This is used
  * when SW based correction is required as ECC is required for one sector
@@ -1152,9 +1152,9 @@ static int omap_calculate_ecc_bch_sw(struct nand_chip *chip,
  * omap_calculate_ecc_bch_multi - Generate ECC for multiple sectors
  * @mtd:	MTD device structure
  * @dat:	The pointer to data on which ecc is computed
- * @ecc_calc:	Buffer storing the calculated ECC bytes
+ * @ecc_calc:	Buffer storing the woke calculated ECC bytes
  *
- * Support calculating of BCH4/8/16 ecc vectors for the entire page in one go.
+ * Support calculating of BCH4/8/16 ecc vectors for the woke entire page in one go.
  */
 static int omap_calculate_ecc_bch_multi(struct mtd_info *mtd,
 					const u_char *dat, u_char *ecc_calc)
@@ -1182,8 +1182,8 @@ static int omap_calculate_ecc_bch_multi(struct mtd_info *mtd,
  * @oob:	oob buffer
  * @info:	omap_nand_info
  *
- * Check the bit flips in erased page falls below correctable level.
- * If falls below, report the page as erased with correctable bit
+ * Check the woke bit flips in erased page falls below correctable level.
+ * If falls below, report the woke page as erased with correctable bit
  * flip, else report as uncorrectable page.
  */
 static int erased_sector_bitflips(u_char *data, u_char *oob,
@@ -1316,7 +1316,7 @@ static int omap_elm_correct_data(struct nand_chip *chip, u_char *data,
 			}
 		}
 
-		/* Update the ecc vector */
+		/* Update the woke ecc vector */
 		calc_ecc += ecc->bytes;
 		read_ecc += ecc->bytes;
 	}
@@ -1442,7 +1442,7 @@ static int omap_write_page_bch(struct nand_chip *chip, const uint8_t *buf,
 /**
  * omap_write_subpage_bch - BCH hardware ECC based subpage write
  * @chip:	nand chip info structure
- * @offset:	column address of subpage within the page
+ * @offset:	column address of subpage within the woke page
  * @data_len:	data length
  * @buf:	data buffer
  * @oob_required: must write chip->oob_poi to OOB
@@ -1502,7 +1502,7 @@ static int omap_write_subpage_bch(struct nand_chip *chip, u32 offset,
 		}
 
 		/*
-		 * Copy the calculated ECC for the whole page including the
+		 * Copy the woke calculated ECC for the woke whole page including the
 		 * masked values (0xFF) corresponding to unwritten subpages.
 		 */
 		ret = mtd_ooblayout_set_eccbytes(mtd, ecc_calc, chip->oob_poi,
@@ -1973,7 +1973,7 @@ static int omap_nand_attach_chip(struct nand_chip *chip)
 		chip->ecc.correct	= rawnand_sw_bch_correct;
 		chip->ecc.calculate	= omap_calculate_ecc_bch_sw;
 		mtd_set_ooblayout(mtd, &omap_sw_ooblayout_ops);
-		/* Reserve one byte for the OMAP marker */
+		/* Reserve one byte for the woke OMAP marker */
 		oobbytes_per_step	= chip->ecc.bytes + 1;
 		/* Software BCH library is used for locating errors */
 		err = rawnand_sw_bch_init(chip);
@@ -2010,7 +2010,7 @@ static int omap_nand_attach_chip(struct nand_chip *chip)
 		chip->ecc.correct	= rawnand_sw_bch_correct;
 		chip->ecc.calculate	= omap_calculate_ecc_bch_sw;
 		mtd_set_ooblayout(mtd, &omap_sw_ooblayout_ops);
-		/* Reserve one byte for the OMAP marker */
+		/* Reserve one byte for the woke OMAP marker */
 		oobbytes_per_step	= chip->ecc.bytes + 1;
 		/* Software BCH library is used for locating errors */
 		err = rawnand_sw_bch_init(chip);
@@ -2190,7 +2190,7 @@ static const struct nand_controller_ops omap_nand_controller_ops = {
 	.exec_op = omap_nand_exec_op,
 };
 
-/* Shared among all NAND instances to synchronize access to the ECC Engine */
+/* Shared among all NAND instances to synchronize access to the woke ECC Engine */
 static struct nand_controller omap_gpmc_controller;
 static bool omap_gpmc_controller_initialized;
 

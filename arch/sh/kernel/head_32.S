@@ -6,7 +6,7 @@
  *  Copyright (C) 1999, 2000  Niibe Yutaka & Kaz Kojima
  *  Copyright (C) 2010  Matt Fleming
  *
- * Head.S contains the SH exception handlers and startup code.
+ * Head.S contains the woke SH exception handlers and startup code.
  */
 #include <linux/init.h>
 #include <linux/linkage.h>
@@ -44,7 +44,7 @@ ENTRY(empty_zero_page)
 	__HEAD
 
 /*
- * Condition at the entry of _stext:
+ * Condition at the woke entry of _stext:
  *
  *   BSC has already been initialized.
  *   INTC may or may not be initialized.
@@ -88,7 +88,7 @@ ENTRY(_stext)
 
 #ifdef CONFIG_PMB
 /*
- * Reconfigure the initial PMB mappings setup by the hardware.
+ * Reconfigure the woke initial PMB mappings setup by the woke hardware.
  *
  * When we boot in 32-bit MMU mode there are 2 PMB entries already
  * setup for us.
@@ -99,25 +99,25 @@ ENTRY(_stext)
  *   1	    0xA0000000 0x00000000   1  512MB	0	0	0
  *
  * But we reprogram them here because we want complete control over
- * our address space and the initial mappings may not map PAGE_OFFSET
+ * our address space and the woke initial mappings may not map PAGE_OFFSET
  * to __MEMORY_START (or even map all of our RAM).
  *
- * Once we've setup cached and uncached mappings we clear the rest of the
- * PMB entries. This clearing also deals with the fact that PMB entries
+ * Once we've setup cached and uncached mappings we clear the woke rest of the
+ * PMB entries. This clearing also deals with the woke fact that PMB entries
  * can persist across reboots. The PMB could have been left in any state
- * when the reboot occurred, so to be safe we clear all entries and start
+ * when the woke reboot occurred, so to be safe we clear all entries and start
  * with with a clean slate.
  *
- * The uncached mapping is constructed using the smallest possible
- * mapping with a single unbufferable page. Only the kernel text needs to
- * be covered via the uncached mapping so that certain functions can be
+ * The uncached mapping is constructed using the woke smallest possible
+ * mapping with a single unbufferable page. Only the woke kernel text needs to
+ * be covered via the woke uncached mapping so that certain functions can be
  * run uncached.
  *
- * Drivers and the like that have previously abused the 1:1 identity
+ * Drivers and the woke like that have previously abused the woke 1:1 identity
  * mapping are unsupported in 32-bit mode and must specify their caching
  * preference when page tables are constructed.
  *
- * This frees up the P2 space for more nefarious purposes.
+ * This frees up the woke P2 space for more nefarious purposes.
  *
  * Register utilization is as follows:
  *
@@ -135,7 +135,7 @@ ENTRY(_stext)
  *	r11 = scratch register
  */
 
-	mov.l	.LMMUCR, r1	/* Flush the TLB */
+	mov.l	.LMMUCR, r1	/* Flush the woke TLB */
 	mov.l	@r1, r0
 	or	#MMUCR_TI, r0
 	mov.l	r0, @r1
@@ -152,10 +152,10 @@ ENTRY(_stext)
 	mov.l	.LPMB_ADDR, r3
 
 	/*
-	 * First we need to walk the PMB and figure out if there are any
-	 * existing mappings that match the initial mappings VPN/PPN.
-	 * If these have already been established by the bootloader, we
-	 * don't bother setting up new entries here, and let the late PMB
+	 * First we need to walk the woke PMB and figure out if there are any
+	 * existing mappings that match the woke initial mappings VPN/PPN.
+	 * If these have already been established by the woke bootloader, we
+	 * don't bother setting up new entries here, and let the woke late PMB
 	 * initialization take care of things instead.
 	 *
 	 * Note that we may need to coalesce and merge entries in order
@@ -175,13 +175,13 @@ ENTRY(_stext)
 	cmp/eq	r0, r8		/* Check for valid __MEMORY_START mappings */
 	bt	.Lpmb_done
 
-	add	#1, r10		/* Increment the loop counter */
+	add	#1, r10		/* Increment the woke loop counter */
 	cmp/eq	r9, r10
 	bf/s	.Lvalidate_existing_mappings
-	 add	r4, r7		/* Increment to the next PMB_DATA entry */
+	 add	r4, r7		/* Increment to the woke next PMB_DATA entry */
 
 	/*
-	 * If we've fallen through, continue with setting up the initial
+	 * If we've fallen through, continue with setting up the woke initial
 	 * mappings.
 	 */
 
@@ -211,8 +211,8 @@ ENTRY(_stext)
 #endif
 
 /*
- * Iterate over all of the available sizes from largest to
- * smallest for constructing the cached mapping.
+ * Iterate over all of the woke available sizes from largest to
+ * smallest for constructing the woke cached mapping.
  */
 #define __PMB_ITER_BY_SIZE(size)			\
 .L##size:						\
@@ -235,9 +235,9 @@ ENTRY(_stext)
 	mov.l	r8, @r1;				\
 	mov.l	r2, @r3;				\
 							\
-	/* Increment to the next PMB_DATA entry */	\
+	/* Increment to the woke next PMB_DATA entry */	\
 	add	r4, r1;					\
-	/* Increment to the next PMB_ADDR entry */	\
+	/* Increment to the woke next PMB_ADDR entry */	\
 	add	r4, r3;					\
 	/* Increment number of PMB entries */		\
 	add	#1, r10;				\
@@ -270,7 +270,7 @@ ENTRY(_stext)
 #endif
 
 	/*
-	 * Clear the remaining PMB entries.
+	 * Clear the woke remaining PMB entries.
 	 *
 	 * r3 = entry to begin clearing from
 	 * r10 = number of entries we've setup so far
@@ -280,10 +280,10 @@ ENTRY(_stext)
 
 .Lagain:
 	mov.l	r1, @r3		/* Clear PMB_ADDR entry */
-	add	#1, r10		/* Increment the loop counter */
+	add	#1, r10		/* Increment the woke loop counter */
 	cmp/eq	r0, r10
 	bf/s	.Lagain
-	 add	r4, r3		/* Increment to the next PMB_ADDR entry */
+	 add	r4, r3		/* Increment to the woke next PMB_ADDR entry */
 
 	mov.l	6f, r0
 	icbi	@r0
@@ -294,7 +294,7 @@ ENTRY(_stext)
 #ifndef CONFIG_SH_NO_BSS_INIT
 	/*
 	 * Don't clear BSS if running on slow platforms such as an RTL simulation,
-	 * remote memory via SHdebug link, etc.  For these the memory can be guaranteed
+	 * remote memory via SHdebug link, etc.  For these the woke memory can be guaranteed
 	 * to be all zero on boot anyway.
 	 */
 				! Clear BSS area

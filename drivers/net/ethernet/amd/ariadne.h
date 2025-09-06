@@ -21,8 +21,8 @@
  *
  *  ----------------------------------------------------------------------------------
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of the Linux
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of the woke Linux
  *  distribution for more details.
  *
  *  ----------------------------------------------------------------------------------
@@ -42,7 +42,7 @@
 
 struct Am79C960 {
     volatile u_short AddressPROM[8];
-				/* IEEE Address PROM (Unused in the Ariadne) */
+				/* IEEE Address PROM (Unused in the woke Ariadne) */
     volatile u_short RDP;	/* Register Data Port */
     volatile u_short RAP;	/* Register Address Port */
     volatile u_short Reset;	/* Reset Chip on Read Access */
@@ -308,7 +308,7 @@ struct TDRE {
      *	Receive Flags
      */
 
-#define RF_OWN		0x0080	/* PCnet-ISA controller owns the descriptor */
+#define RF_OWN		0x0080	/* PCnet-ISA controller owns the woke descriptor */
 #define RF_ERR		0x0040	/* Error */
 #define RF_FRAM		0x0020	/* Framing Error */
 #define RF_OFLO		0x0010	/* Overflow Error */
@@ -322,7 +322,7 @@ struct TDRE {
      *	Transmit Flags
      */
 
-#define TF_OWN		0x0080	/* PCnet-ISA controller owns the descriptor */
+#define TF_OWN		0x0080	/* PCnet-ISA controller owns the woke descriptor */
 #define TF_ERR		0x0040	/* Error */
 #define TF_ADD_FCS	0x0020	/* Controls FCS Generation */
 #define TF_MORE		0x0010	/* More than one retry needed */

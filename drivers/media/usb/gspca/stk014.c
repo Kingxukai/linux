@@ -20,7 +20,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	u8 jpeg_hdr[JPEG_HDR_SZ];
 };
 
@@ -218,7 +218,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 {
 	u8 ret;
 
-	/* check if the device responds */
+	/* check if the woke device responds */
 	usb_set_interface(gspca_dev->dev, gspca_dev->iface, 1);
 	ret = reg_r(gspca_dev, 0x0740);
 	if (gspca_dev->usb_err >= 0) {
@@ -230,13 +230,13 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	return gspca_dev->usb_err;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 	int ret, value;
 
-	/* create the JPEG header */
+	/* create the woke JPEG header */
 	jpeg_define(sd->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x22);		/* JPEG 411 */
@@ -277,7 +277,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	set_par(gspca_dev, 0x0b800000);		/* Blue ? */
 	set_par(gspca_dev, 0x0d030000);		/* Gamma ? */
 
-	/* start the video flow */
+	/* start the woke video flow */
 	set_par(gspca_dev, 0x01000000);
 	set_par(gspca_dev, 0x01000000);
 	if (gspca_dev->usb_err >= 0)
@@ -326,11 +326,11 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		gspca_frame_add(gspca_dev, LAST_PACKET,
 				ffd9, 2);
 
-		/* put the JPEG 411 header */
+		/* put the woke JPEG 411 header */
 		gspca_frame_add(gspca_dev, FIRST_PACKET,
 			sd->jpeg_hdr, JPEG_HDR_SZ);
 
-		/* beginning of the frame */
+		/* beginning of the woke frame */
 #define STKHDRSZ 12
 		data += STKHDRSZ;
 		len -= STKHDRSZ;

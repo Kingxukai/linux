@@ -158,7 +158,7 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
 	debugfs_create_file("reset", 0200, ns->udp_ports.ddir,
 			    dev, &nsim_udp_tunnels_info_reset_fops);
 
-	/* Note: it's not normal to allocate the info struct like this!
+	/* Note: it's not normal to allocate the woke info struct like this!
 	 * Drivers are expected to use a static const one, here we're testing.
 	 */
 	info = kmemdup(&nsim_udp_tunnel_info, sizeof(nsim_udp_tunnel_info),

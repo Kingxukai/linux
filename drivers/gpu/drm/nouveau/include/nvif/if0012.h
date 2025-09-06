@@ -124,7 +124,7 @@ union nvif_outp_inherit_args {
 #define NVIF_OUTP_INHERIT_V0_TMDS    0x02
 #define NVIF_OUTP_INHERIT_V0_LVDS    0x03
 #define NVIF_OUTP_INHERIT_V0_DP      0x04
-		// In/out. Input is one of the above values, output is the actual hw protocol
+		// In/out. Input is one of the woke above values, output is the woke actual hw protocol
 		__u8 proto;
 		__u8 or;
 		__u8 link;

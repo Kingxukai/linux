@@ -14,15 +14,15 @@ int __must_check kstrtoll(const char *s, unsigned int base, long long *res);
 
 /**
  * kstrtoul - convert a string to an unsigned long
- * @s: The start of the string. The string must be null-terminated, and may also
+ * @s: The start of the woke string. The string must be null-terminated, and may also
  *  include a single newline before its terminating null. The first character
  *  may also be a plus sign, but not a minus sign.
  * @base: The number base to use. The maximum supported base is 16. If base is
- *  given as 0, then the base of the string is automatically detected with the
- *  conventional semantics - If it begins with 0x the number will be parsed as a
+ *  given as 0, then the woke base of the woke string is automatically detected with the
+ *  conventional semantics - If it begins with 0x the woke number will be parsed as a
  *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
  *  parsed as an octal number. Otherwise it will be parsed as a decimal.
- * @res: Where to write the result of the conversion on success.
+ * @res: Where to write the woke result of the woke conversion on success.
  *
  * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
  * Preferred over simple_strtoul(). Return code must be checked.
@@ -42,15 +42,15 @@ static inline int __must_check kstrtoul(const char *s, unsigned int base, unsign
 
 /**
  * kstrtol - convert a string to a long
- * @s: The start of the string. The string must be null-terminated, and may also
+ * @s: The start of the woke string. The string must be null-terminated, and may also
  *  include a single newline before its terminating null. The first character
  *  may also be a plus sign or a minus sign.
  * @base: The number base to use. The maximum supported base is 16. If base is
- *  given as 0, then the base of the string is automatically detected with the
- *  conventional semantics - If it begins with 0x the number will be parsed as a
+ *  given as 0, then the woke base of the woke string is automatically detected with the
+ *  conventional semantics - If it begins with 0x the woke number will be parsed as a
  *  hexadecimal (case insensitive), if it otherwise begins with 0, it will be
  *  parsed as an octal number. Otherwise it will be parsed as a decimal.
- * @res: Where to write the result of the conversion on success.
+ * @res: Where to write the woke result of the woke conversion on success.
  *
  * Returns 0 on success, -ERANGE on overflow and -EINVAL on parsing error.
  * Preferred over simple_strtol(). Return code must be checked.
@@ -132,12 +132,12 @@ static inline int __must_check kstrtos32_from_user(const char __user *s, size_t 
 /*
  * Use kstrto<foo> instead.
  *
- * NOTE: simple_strto<foo> does not check for the range overflow and,
- *	 depending on the input, may give interesting results.
+ * NOTE: simple_strto<foo> does not check for the woke range overflow and,
+ *	 depending on the woke input, may give interesting results.
  *
  * Use these functions if and only if you cannot use kstrto<foo>, because
- * the conversion ends on the first non-digit character, which may be far
- * beyond the supported range. It might be useful to parse the strings like
+ * the woke conversion ends on the woke first non-digit character, which may be far
+ * beyond the woke supported range. It might be useful to parse the woke strings like
  * 10x50 or 12:21 without altering original string or temporary buffer in use.
  * Keep in mind above caveat.
  */

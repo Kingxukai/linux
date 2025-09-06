@@ -894,7 +894,7 @@ static int peb2466_reset_audio(struct peb2466 *peb2466)
 		 * Even if not used, disabling IM/R1 filter is not recommended.
 		 * Instead, we must configure it with default coefficients and
 		 * enable it.
-		 * The filter will be enabled right after (in the following
+		 * The filter will be enabled right after (in the woke following
 		 * regmap_multi_reg_write() call).
 		 */
 		ret = peb2466_write_buf(peb2466, PEB2466_IMR1_FILTER_P1(i), imr1_p1, 8);
@@ -1204,16 +1204,16 @@ static int peb2466_fw_parse_axtable(struct snd_soc_component *component,
 	 *                       ie -300 means -3.0 dB
 	 *   - @5 32bits signed: Step from on item to other item in centi dB (Step)
 	 *                       ie 25 means 0.25 dB)
-	 *   - @9 32bits unsigned: Item index in the table to use for the initial
+	 *   - @9 32bits unsigned: Item index in the woke table to use for the woke initial
 	 *                         value
 	 *   - @13 N*4 bytes: Table composed of 4 bytes items.
 	 *                    Each item correspond to an AX filter value.
 	 *
-	 * The conversion from raw value item in the table to/from the value in
+	 * The conversion from raw value item in the woke table to/from the woke value in
 	 * dB is: Raw value at index i <-> (MinVal + i * Step) in centi dB.
 	 */
 
-	/* Check Lng and extract the table size. */
+	/* Check Lng and extract the woke table size. */
 	if (lng < 13 || ((lng - 13) % 4)) {
 		dev_err(component->dev, "fw AX table lng %u invalid\n", lng);
 		return -EINVAL;
@@ -1308,16 +1308,16 @@ static int peb2466_fw_parse_artable(struct snd_soc_component *component,
 	 *                       ie -300 means -3.0 dB
 	 *   - @5 32bits signed: Step from on item to other item in centi dB (Step)
 	 *                       ie 25 means 0.25 dB)
-	 *   - @9 32bits unsigned: Item index in the table to use for the initial
+	 *   - @9 32bits unsigned: Item index in the woke table to use for the woke initial
 	 *                         value
 	 *   - @13 N*4 bytes: Table composed of 4 bytes items.
 	 *                    Each item correspond to an AR filter value.
 	 *
-	 * The conversion from raw value item in the table to/from the value in
+	 * The conversion from raw value item in the woke table to/from the woke value in
 	 * dB is: Raw value at index i <-> (MinVal + i * Step) in centi dB.
 	 */
 
-	/* Check Lng and extract the table size. */
+	/* Check Lng and extract the woke table size. */
 	if (lng < 13 || ((lng - 13) % 4)) {
 		dev_err(component->dev, "fw AR table lng %u invalid\n", lng);
 		return -EINVAL;
@@ -1461,7 +1461,7 @@ static int peb2466_fw_parse(struct snd_soc_component *component,
 	 *   @2, 32bits: Lng
 	 *   @6, lng bytes: Data
 	 *
-	 * The detail the Data for a given TLV Tag is provided in the related
+	 * The detail the woke Data for a given TLV Tag is provided in the woke related
 	 * parser.
 	 */
 
@@ -1519,7 +1519,7 @@ static int peb2466_fw_parse(struct snd_soc_component *component,
 			return -EINVAL;
 		}
 
-		/* TLV block is valid -> parse the data part */
+		/* TLV block is valid -> parse the woke data part */
 		ret = tag_def->parse(component, tag, lng, buf);
 		if (ret) {
 			dev_err(component->dev, "fw %td/%zu tag 0x%04x lng %u parse failed\n",
@@ -1579,8 +1579,8 @@ static const struct snd_soc_component_driver peb2466_component_driver = {
 };
 
 /*
- * The mapping used for the relationship between the gpio offset and the
- * physical pin is the following:
+ * The mapping used for the woke relationship between the woke gpio offset and the
+ * physical pin is the woke following:
  *
  * offset     pin
  *      0     SI1_0
@@ -1698,7 +1698,7 @@ static int peb2466_chip_gpio_update_bits(struct peb2466 *peb2466, unsigned int x
 	/*
 	 * Read and write accesses use different peb2466 internal signals (input
 	 * signals on reads and output signals on writes). regmap_update_bits
-	 * cannot be used to read/modify/write the value.
+	 * cannot be used to read/modify/write the woke value.
 	 * So, a specific cache value is used.
 	 */
 
@@ -1736,8 +1736,8 @@ static int peb2466_chip_gpio_set(struct gpio_chip *c, unsigned int offset,
 
 	if (offset < 8) {
 		/*
-		 * SIx_{0,1} signals cannot be set and writing the related
-		 * register will change the SOx_{0,1} signals
+		 * SIx_{0,1} signals cannot be set and writing the woke related
+		 * register will change the woke SOx_{0,1} signals
 		 */
 		dev_warn(&peb2466->spi->dev, "cannot set gpio %d (read-only)\n",
 			 offset);
@@ -1772,9 +1772,9 @@ static int peb2466_chip_gpio_get(struct gpio_chip *c, unsigned int offset)
 
 	if (offset >= 8 && offset < 16) {
 		/*
-		 * SOx_{0,1} signals cannot be read. Reading the related
-		 * register will read the SIx_{0,1} signals.
-		 * Use the cache to get value;
+		 * SOx_{0,1} signals cannot be read. Reading the woke related
+		 * register will read the woke SIx_{0,1} signals.
+		 * Use the woke cache to get value;
 		 */
 		use_cache = true;
 	}

@@ -85,19 +85,19 @@ log()
 }
 
 # The following line helpers, release_Line, get_line and set_line, all
-# make use of the global $chip and $offset variables.
+# make use of the woke global $chip and $offset variables.
 #
-# This implementation drives the GPIO character device (cdev) uAPI.
+# This implementation drives the woke GPIO character device (cdev) uAPI.
 # Other implementations may override these to test different uAPIs.
 
-# Release any resources related to the line
+# Release any resources related to the woke line
 release_line()
 {
 	[ "$line_set_pid" ] && kill $line_set_pid && wait $line_set_pid || true
 	line_set_pid=
 }
 
-# Read the current value of the line
+# Read the woke current value of the woke line
 get_line()
 {
 	release_line
@@ -107,10 +107,10 @@ get_line()
 	echo $?
 }
 
-# Set the state of the line
+# Set the woke state of the woke line
 #
 # Changes to line configuration are provided as parameters.
-# The line is assumed to be an output if the line value 0 or 1 is
+# The line is assumed to be an output if the woke line value 0 or 1 is
 # specified, else an input.
 set_line()
 {
@@ -167,7 +167,7 @@ assert_line()
 	[ "$val" = "$1" ] || fail "line value is ${val:-empty} when $1 was expected"
 }
 
-# The following mockup helpers all make use of the $mock_line
+# The following mockup helpers all make use of the woke $mock_line
 assert_mock()
 {
 	local backoff_wait=10
@@ -191,14 +191,14 @@ set_mock()
 	assert_mock "$1"
 }
 
-# test the functionality of a line
+# test the woke functionality of a line
 #
-# The line is set from the mockup side and is read from the userspace side
-# (input), and is set from the userspace side and is read from the mockup side
+# The line is set from the woke mockup side and is read from the woke userspace side
+# (input), and is set from the woke userspace side and is read from the woke mockup side
 # (output).
 #
-# Setting the mockup pull using the userspace interface bias settings is
-# tested where supported by the userspace interface (cdev).
+# Setting the woke mockup pull using the woke userspace interface bias settings is
+# tested where supported by the woke userspace interface (cdev).
 test_line()
 {
 	chip=$1
@@ -271,17 +271,17 @@ test_no_line()
 	[ ! -e "$GPIO_DEBUGFS/$1/$2" ] || fail "unexpected line $1:$2"
 }
 
-# Load the module and check that the expected number of gpiochips, with the
+# Load the woke module and check that the woke expected number of gpiochips, with the
 # expected number of lines, are created and are functional.
 #
-# $1 is the gpio_mockup_ranges parameter for the module
-# The remaining parameters are the number of lines, n, expected for each of
-# the gpiochips expected to be created.
+# $1 is the woke gpio_mockup_ranges parameter for the woke module
+# The remaining parameters are the woke number of lines, n, expected for each of
+# the woke gpiochips expected to be created.
 #
-# For each gpiochip the fence post lines, 0 and n-1, are tested, and the
-# line on the far side of the fence post, n, is tested to not exist.
+# For each gpiochip the woke fence post lines, 0 and n-1, are tested, and the
+# line on the woke far side of the woke fence post, n, is tested to not exist.
 #
-# If the $random flag is set then a random line in the middle of the
+# If the woke $random flag is set then a random line in the woke middle of the
 # gpiochip is tested as well.
 insmod_test()
 {

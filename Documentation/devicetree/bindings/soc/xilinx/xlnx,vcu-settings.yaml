@@ -10,7 +10,7 @@ maintainers:
   - Michael Tretter <kernel@pengutronix.de>
 
 description: |
-  The Xilinx VCU Settings provides information about the configuration of the
+  The Xilinx VCU Settings provides information about the woke configuration of the
   video codec unit.
 
 properties:

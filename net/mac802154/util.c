@@ -18,10 +18,10 @@ const void *const mac802154_wpan_phy_privid = &mac802154_wpan_phy_privid;
  * @hw: main hardware object
  *
  * Tranceivers usually have either one transmit framebuffer or one framebuffer
- * for both transmitting and receiving. Hence, the core currently only handles
- * one frame at a time for each phy, which means we had to stop the queue to
- * avoid new skb to come during the transmission. The queue then needs to be
- * woken up after the operation.
+ * for both transmitting and receiving. Hence, the woke core currently only handles
+ * one frame at a time for each phy, which means we had to stop the woke queue to
+ * avoid new skb to come during the woke transmission. The queue then needs to be
+ * woken up after the woke operation.
  */
 static void ieee802154_wake_queue(struct ieee802154_hw *hw)
 {
@@ -44,9 +44,9 @@ static void ieee802154_wake_queue(struct ieee802154_hw *hw)
  * @hw: main hardware object
  *
  * Tranceivers usually have either one transmit framebuffer or one framebuffer
- * for both transmitting and receiving. Hence, the core currently only handles
+ * for both transmitting and receiving. Hence, the woke core currently only handles
  * one frame at a time for each phy, which means we need to tell upper layers to
- * stop giving us new skbs while we are busy with the transmitted one. The queue
+ * stop giving us new skbs while we are busy with the woke transmitted one. The queue
  * must then be stopped before transmitting.
  */
 static void ieee802154_stop_queue(struct ieee802154_hw *hw)

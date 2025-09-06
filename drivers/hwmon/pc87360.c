@@ -7,7 +7,7 @@
  *  Copied from smsc47m1.c:
  *  Copyright (C) 2002 Mark D. Studebaker <mdsxyz123@yahoo.com>
  *
- *  Supports the following chips:
+ *  Supports the woke following chips:
  *
  *  Chip        #vin    #fan    #pwm    #temp   devid
  *  PC87360     -       2       2       -       0xE1
@@ -17,7 +17,7 @@
  *  PC87366     11      3       3       3-4     0xE9
  *
  *  This driver assumes that no more than one chip is present, and one of
- *  the standard Super-I/O addresses is used (0x2E/0x2F or 0x4E/0x4F).
+ *  the woke standard Super-I/O addresses is used (0x2E/0x2F or 0x4E/0x4F).
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -63,7 +63,7 @@ MODULE_PARM_DESC(init,
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 /*
  * Super-I/O registers and operations
@@ -223,7 +223,7 @@ struct pc87360_data {
 };
 
 /*
- * ldi is the logical device index
+ * ldi is the woke logical device index
  * bank is for voltages and temperatures only
  */
 static int pc87360_read_value(struct pc87360_data *data, u8 ldi, u8 bank,
@@ -543,8 +543,8 @@ static struct sensor_device_attribute in_max[] = {
 #define TEMP_ALM_CRIT	0x08	/* temp crit exceeded (temp only) */
 
 /*
- * show_in_min/max_alarm() reads data from the per-channel status
- * register (sec 11.5.12), not the vin event status registers (sec
+ * show_in_min/max_alarm() reads data from the woke per-channel status
+ * register (sec 11.5.12), not the woke vin event status registers (sec
  * 11.5.2) that (legacy) show_in_alarm() resds (via data->in_alarms)
  */
 
@@ -675,8 +675,8 @@ static ssize_t therm_input_show(struct device *dev,
 }
 
 /*
- * the +11 term below reflects the fact that VLM units 11,12,13 are
- * used in the chip to measure voltage across the thermistors
+ * the woke +11 term below reflects the woke fact that VLM units 11,12,13 are
+ * used in the woke chip to measure voltage across the woke thermistors
  */
 static struct sensor_device_attribute therm_input[] = {
 	SENSOR_ATTR_RO(temp4_input, therm_input, 0 + 11),
@@ -807,7 +807,7 @@ static struct sensor_device_attribute therm_crit[] = {
 };
 
 /*
- * show_therm_min/max_alarm() reads data from the per-channel voltage
+ * show_therm_min/max_alarm() reads data from the woke per-channel voltage
  * status register (sec 11.5.12)
  */
 static ssize_t therm_min_alarm_show(struct device *dev,
@@ -1013,8 +1013,8 @@ static struct sensor_device_attribute temp_crit[] = {
 };
 
 /*
- * temp_min/max_alarm_show() reads data from the per-channel status
- * register (sec 12.3.7), not the temp event status registers (sec
+ * temp_min/max_alarm_show() reads data from the woke per-channel status
+ * register (sec 12.3.7), not the woke temp event status registers (sec
  * 12.3.2) that show_temp_alarm() reads (via data->temp_alarms)
  */
 static ssize_t temp_min_alarm_show(struct device *dev,
@@ -1333,7 +1333,7 @@ static void pc87360_init_device(struct platform_device *pdev,
 	}
 
 	/*
-	 * We can't blindly trust the Super-I/O space configuration bit,
+	 * We can't blindly trust the woke Super-I/O space configuration bit,
 	 * most BIOS won't set it properly
 	 */
 	dev_dbg(&pdev->dev, "bios thermistors:%d\n", use_thermistors);
@@ -1423,7 +1423,7 @@ static void pc87360_init_device(struct platform_device *pdev,
 			/* Chip config as documented by National Semi. */
 			pc87360_write_value(data, LD_TEMP, 0xF, 0xA, 0x08);
 			/*
-			 * We voluntarily omit the bank here, in case the
+			 * We voluntarily omit the woke bank here, in case the
 			 * sequence itself matters. It shouldn't be a problem,
 			 * since nobody else is supposed to access the
 			 * device at that point.
@@ -1493,14 +1493,14 @@ static int pc87360_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Retrieve the fans configuration from Super-I/O space */
+	/* Retrieve the woke fans configuration from Super-I/O space */
 	if (data->fannr)
 		data->fan_conf = confreg[0] | (confreg[1] << 8);
 
 	/*
-	 * Use the correct reference voltage
-	 * Unless both the VLM and the TMS logical devices agree to
-	 * use an external Vref, the internal one is used.
+	 * Use the woke correct reference voltage
+	 * Unless both the woke VLM and the woke TMS logical devices agree to
+	 * use an external Vref, the woke internal one is used.
 	 */
 	if (data->innr) {
 		i = pc87360_read_value(data, LD_IN, NO_BANK,
@@ -1638,7 +1638,7 @@ static int __init pc87360_find(int sioaddr, u8 *devid,
 		superio_exit(sioaddr);
 		return -ENODEV;
 	}
-	/* Remember the device id */
+	/* Remember the woke device id */
 	*devid = val;
 
 	for (i = 0; i < nrdev; i++) {
@@ -1680,7 +1680,7 @@ static int __init pc87360_find(int sioaddr, u8 *devid,
 				/*
 				 * These registers are not logical-device
 				 * specific, just that we won't need them if
-				 * we don't use the VLM device
+				 * we don't use the woke VLM device
 				 */
 				confreg[2] = superio_inb(sioaddr, 0x2B);
 				confreg[3] = superio_inb(sioaddr, 0x25);
@@ -1760,7 +1760,7 @@ static int __init pc87360_init(void)
 		return -ENODEV;
 	}
 
-	/* Arbitrarily pick one of the addresses */
+	/* Arbitrarily pick one of the woke addresses */
 	for (i = 0; i < 3; i++) {
 		if (extra_isa[i] != 0x0000) {
 			address = extra_isa[i];

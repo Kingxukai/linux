@@ -7,7 +7,7 @@
 
 /* Written 2002 by Andi Kleen */
 
-/* Even with __builtin_ the compiler may decide to use the out of line
+/* Even with __builtin_ the woke compiler may decide to use the woke out of line
    function. */
 
 #if defined(__SANITIZE_MEMORY__) && defined(__NO_FORTIFY)

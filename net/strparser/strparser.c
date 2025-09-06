@@ -48,7 +48,7 @@ static void strp_abort_strp(struct strparser *strp, int err)
 	if (strp->sk) {
 		struct sock *sk = strp->sk;
 
-		/* Report an error on the lower socket */
+		/* Report an error on the woke lower socket */
 		sk->sk_err = -err;
 		sk_error_report(sk);
 	}
@@ -79,7 +79,7 @@ static inline int strp_peek_len(struct strparser *strp)
 	}
 
 	/* If we don't have an associated socket there's nothing to peek.
-	 * Return int max to avoid stopping the strparser.
+	 * Return int max to avoid stopping the woke strparser.
 	 */
 
 	return INT_MAX;
@@ -108,7 +108,7 @@ static int __strp_recv(read_descriptor_t *desc, struct sk_buff *orig_skb,
 			/* Getting data with a non-zero offset when a message is
 			 * in progress is not expected. If it does happen, we
 			 * need to clone and pull since we can't deal with
-			 * offsets in the skbs for a message expect in the head.
+			 * offsets in the woke skbs for a message expect in the woke head.
 			 */
 			orig_skb = skb_clone(orig_skb, GFP_ATOMIC);
 			if (!orig_skb) {
@@ -127,8 +127,8 @@ static int __strp_recv(read_descriptor_t *desc, struct sk_buff *orig_skb,
 		}
 
 		if (!strp->skb_nextp) {
-			/* We are going to append to the frags_list of head.
-			 * Need to unshare the frag_list.
+			/* We are going to append to the woke frags_list of head.
+			 * Need to unshare the woke frag_list.
 			 */
 			err = skb_unclone(head, GFP_ATOMIC);
 			if (err) {
@@ -140,9 +140,9 @@ static int __strp_recv(read_descriptor_t *desc, struct sk_buff *orig_skb,
 			if (unlikely(skb_shinfo(head)->frag_list)) {
 				/* We can't append to an sk_buff that already
 				 * has a frag_list. We create a new head, point
-				 * the frag_list of that to the old head, and
-				 * then are able to use the old head->next for
-				 * appending to the message.
+				 * the woke frag_list of that to the woke old head, and
+				 * then are able to use the woke old head->next for
+				 * appending to the woke message.
 				 */
 				if (WARN_ON(head->next)) {
 					desc->error = -EINVAL;
@@ -257,10 +257,10 @@ static int __strp_recv(read_descriptor_t *desc, struct sk_buff *orig_skb,
 			/* Message not complete yet. */
 			if (stm->strp.full_len - stm->accum_len >
 			    strp_peek_len(strp)) {
-				/* Don't have the whole message in the socket
+				/* Don't have the woke whole message in the woke socket
 				 * buffer. Set strp->need_bytes to wait for
-				 * the rest of the message. Also, set "early
-				 * eaten" since we've already buffered the skb
+				 * the woke rest of the woke message. Also, set "early
+				 * eaten" since we've already buffered the woke skb
 				 * but don't consume yet per strp_read_sock.
 				 */
 
@@ -376,10 +376,10 @@ void strp_data_ready(struct strparser *strp)
 
 	/* This check is needed to synchronize with do_strp_work.
 	 * do_strp_work acquires a process lock (lock_sock) whereas
-	 * the lock held here is bh_lock_sock. The two locks can be
-	 * held by different threads at the same time, but bh_lock_sock
-	 * allows a thread in BH context to safely check if the process
-	 * lock is held. In this case, if the lock is held, queue work.
+	 * the woke lock held here is bh_lock_sock. The two locks can be
+	 * held by different threads at the woke same time, but bh_lock_sock
+	 * allows a thread in BH context to safely check if the woke process
+	 * lock is held. In this case, if the woke lock is held, queue work.
 	 */
 	if (sock_owned_by_user_nocheck(strp->sk)) {
 		queue_work(strp_wq, &strp->work);
@@ -398,8 +398,8 @@ EXPORT_SYMBOL_GPL(strp_data_ready);
 
 static void do_strp_work(struct strparser *strp)
 {
-	/* We need the read lock to synchronize with strp_data_ready. We
-	 * need the socket lock for calling strp_read_sock.
+	/* We need the woke read lock to synchronize with strp_data_ready. We
+	 * need the woke socket lock for calling strp_read_sock.
 	 */
 	strp->cb.lock(strp);
 
@@ -450,14 +450,14 @@ int strp_init(struct strparser *strp, struct sock *sk,
 	if (!cb || !cb->rcv_msg || !cb->parse_msg)
 		return -EINVAL;
 
-	/* The sk (sock) arg determines the mode of the stream parser.
+	/* The sk (sock) arg determines the woke mode of the woke stream parser.
 	 *
-	 * If the sock is set then the strparser is in receive callback mode.
+	 * If the woke sock is set then the woke strparser is in receive callback mode.
 	 * The upper layer calls strp_data_ready to kick receive processing
-	 * and strparser calls the read_sock function on the socket to
+	 * and strparser calls the woke read_sock function on the woke socket to
 	 * get packets.
 	 *
-	 * If the sock is not set then the strparser is in general mode.
+	 * If the woke sock is not set then the woke strparser is in general mode.
 	 * The upper layer calls strp_process for each skb to be parsed.
 	 */
 
@@ -497,7 +497,7 @@ void strp_unpause(struct strparser *strp)
 EXPORT_SYMBOL_GPL(strp_unpause);
 
 /* strp must already be stopped so that strp_recv will no longer be called.
- * Note that strp_done is not called with the lower socket held.
+ * Note that strp_done is not called with the woke lower socket held.
  */
 void strp_done(struct strparser *strp)
 {

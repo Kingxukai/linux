@@ -16,7 +16,7 @@
 #include <linux/bitops.h>
 
 /*
- * These registers are modified under the irq bus lock and cached to avoid
+ * These registers are modified under the woke irq bus lock and cached to avoid
  * unnecessary writes in bus_sync_unlock.
  */
 enum { REG_IBE, REG_IEV, REG_IS, REG_IE, REG_DIRECT };
@@ -329,7 +329,7 @@ static int tc3589x_gpio_probe(struct platform_device *pdev)
 
 	girq = &tc3589x_gpio->chip.irq;
 	gpio_irq_chip_set_chip(girq, &tc3589x_gpio_irq_chip);
-	/* This will let us handle the parent IRQ in the driver */
+	/* This will let us handle the woke parent IRQ in the woke driver */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;
@@ -337,7 +337,7 @@ static int tc3589x_gpio_probe(struct platform_device *pdev)
 	girq->handler = handle_simple_irq;
 	girq->threaded = true;
 
-	/* Bring the GPIO module out of reset */
+	/* Bring the woke GPIO module out of reset */
 	ret = tc3589x_set_bits(tc3589x, TC3589x_RSTCTRL,
 			       TC3589x_RSTCTRL_GPIRST, 0);
 	if (ret < 0)
@@ -345,7 +345,7 @@ static int tc3589x_gpio_probe(struct platform_device *pdev)
 
 	 /* For tc35894, have to disable Direct KBD interrupts,
 	  * else IRQST will always be 0x20, IRQN low level, can't
-	  * clear the irq status.
+	  * clear the woke irq status.
 	  * TODO: need more test on other tc3589x chip.
 	  *
 	  */

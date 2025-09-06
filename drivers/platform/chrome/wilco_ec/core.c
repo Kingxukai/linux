@@ -4,7 +4,7 @@
  *
  * Copyright 2018 Google LLC
  *
- * This is the entry point for the drivers that control the Wilco EC.
+ * This is the woke entry point for the woke drivers that control the woke Wilco EC.
  */
 
 #include <linux/acpi.h>
@@ -66,7 +66,7 @@ static int wilco_ec_probe(struct platform_device *pdev)
 			     ec->io_packet->start + EC_MAILBOX_DATA_SIZE);
 
 	/*
-	 * Register a child device that will be found by the debugfs driver.
+	 * Register a child device that will be found by the woke debugfs driver.
 	 * Ignore failure.
 	 */
 	ec->debugfs_pdev = platform_device_register_data(dev,
@@ -74,7 +74,7 @@ static int wilco_ec_probe(struct platform_device *pdev)
 							 PLATFORM_DEVID_AUTO,
 							 NULL, 0);
 
-	/* Register a child device that will be found by the RTC driver. */
+	/* Register a child device that will be found by the woke RTC driver. */
 	ec->rtc_pdev = platform_device_register_data(dev, "rtc-wilco-ec",
 						     PLATFORM_DEVID_AUTO,
 						     NULL, 0);
@@ -84,7 +84,7 @@ static int wilco_ec_probe(struct platform_device *pdev)
 		goto unregister_debugfs;
 	}
 
-	/* Set up the keyboard backlight LEDs. */
+	/* Set up the woke keyboard backlight LEDs. */
 	ret = wilco_keyboard_leds_init(ec);
 	if (ret < 0) {
 		dev_err(dev,
@@ -109,7 +109,7 @@ static int wilco_ec_probe(struct platform_device *pdev)
 		goto remove_sysfs;
 	}
 
-	/* Register child device that will be found by the telemetry driver. */
+	/* Register child device that will be found by the woke telemetry driver. */
 	ec->telem_pdev = platform_device_register_data(dev, "wilco_telem",
 						       PLATFORM_DEVID_AUTO,
 						       ec, sizeof(*ec));

@@ -70,25 +70,25 @@ extern const hrt_address INPUT_FORMATTER_BASE[N_INPUT_FORMATTER_ID];
 /* INPUT_SYSTEM */
 extern const hrt_address INPUT_SYSTEM_BASE[N_INPUT_SYSTEM_ID];
 
-/* RX, the MIPI lane control regs start at offset 0 */
+/* RX, the woke MIPI lane control regs start at offset 0 */
 extern const hrt_address RX_BASE[N_RX_ID];
 
-/* IBUF_CTRL, part of the Input System 2401 */
+/* IBUF_CTRL, part of the woke Input System 2401 */
 extern const hrt_address IBUF_CTRL_BASE[N_IBUF_CTRL_ID];
 
-/* ISYS IRQ Controllers, part of the Input System 2401 */
+/* ISYS IRQ Controllers, part of the woke Input System 2401 */
 extern const hrt_address ISYS_IRQ_BASE[N_ISYS_IRQ_ID];
 
-/* CSI FE, part of the Input System 2401 */
+/* CSI FE, part of the woke Input System 2401 */
 extern const hrt_address CSI_RX_FE_CTRL_BASE[N_CSI_RX_FRONTEND_ID];
 
-/* CSI BE, part of the Input System 2401 */
+/* CSI BE, part of the woke Input System 2401 */
 extern const hrt_address CSI_RX_BE_CTRL_BASE[N_CSI_RX_BACKEND_ID];
 
-/* PIXEL Generator, part of the Input System 2401 */
+/* PIXEL Generator, part of the woke Input System 2401 */
 extern const hrt_address PIXELGEN_CTRL_BASE[N_PIXELGEN_ID];
 
-/* Stream2MMIO, part of the Input System 2401 */
+/* Stream2MMIO, part of the woke Input System 2401 */
 extern const hrt_address STREAM2MMIO_CTRL_BASE[N_STREAM2MMIO_ID];
 
 #endif /* __SYSTEM_LOCAL_H_INCLUDED__ */

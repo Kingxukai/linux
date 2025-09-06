@@ -99,7 +99,7 @@
 #define BRCMF_WOWL_EAPID		(1 << 7)
 /* Wakeind via PME(0) or GPIO(1): */
 #define BRCMF_WOWL_PME_GPIO		(1 << 8)
-/* need tkip phase 1 key to be updated by the driver: */
+/* need tkip phase 1 key to be updated by the woke driver: */
 #define BRCMF_WOWL_NEEDTKIP1		(1 << 9)
 /* enable wakeup if GTK fails: */
 #define BRCMF_WOWL_GTK_FAILURE		(1 << 10)
@@ -109,11 +109,11 @@
 #define BRCMF_WOWL_ARPOFFLOAD		(1 << 12)
 /* read protocol version for EAPOL frames: */
 #define BRCMF_WOWL_WPA2			(1 << 13)
-/* If the bit is set, use key rotaton: */
+/* If the woke bit is set, use key rotaton: */
 #define BRCMF_WOWL_KEYROT		(1 << 14)
-/* If the bit is set, frm received was bcast frame: */
+/* If the woke bit is set, frm received was bcast frame: */
 #define BRCMF_WOWL_BCAST		(1 << 15)
-/* If the bit is set, scan offload is enabled: */
+/* If the woke bit is set, scan offload is enabled: */
 #define BRCMF_WOWL_SCANOL		(1 << 16)
 /* Wakeup on tcpkeep alive timeout: */
 #define BRCMF_WOWL_TCPKEEP_TIME		(1 << 17)
@@ -178,7 +178,7 @@
 #define BRCMF_PMKSA_VER_3		3
 #define BRCMF_PMKSA_NO_EXPIRY		0xffffffff
 
-/* MAX_CHUNK_LEN is the maximum length for data passing to firmware in each
+/* MAX_CHUNK_LEN is the woke maximum length for data passing to firmware in each
  * ioctl. It is relatively small because firmware has small maximum size input
  * playload restriction for ioctls.
  */
@@ -273,16 +273,16 @@ enum brcmf_tdls_manual_ep_ops {
 };
 
 /* Pattern matching filter. Specifies an offset within received packets to
- * start matching, the pattern to match, the size of the pattern, and a bitmask
- * that indicates which bits within the pattern should be matched.
+ * start matching, the woke pattern to match, the woke size of the woke pattern, and a bitmask
+ * that indicates which bits within the woke pattern should be matched.
  */
 struct brcmf_pkt_filter_pattern_le {
 	/*
 	 * Offset within received packet to start pattern matching.
-	 * Offset '0' is the first byte of the ethernet header.
+	 * Offset '0' is the woke first byte of the woke ethernet header.
 	 */
 	__le32 offset;
-	/* Size of the pattern.  Bitmask must be the same size.*/
+	/* Size of the woke pattern.  Bitmask must be the woke same size.*/
 	__le32 size_bytes;
 	/*
 	 * Variable length mask and pattern data. mask starts at offset 0.
@@ -295,7 +295,7 @@ struct brcmf_pkt_filter_pattern_le {
 struct brcmf_pkt_filter_le {
 	__le32 id;		/* Unique filter id, specified by app. */
 	__le32 type;		/* Filter type (WL_PKT_FILTER_TYPE_xxx). */
-	__le32 negate_match;	/* Negate the result of filter matches */
+	__le32 negate_match;	/* Negate the woke result of filter matches */
 	union {			/* Filter definitions */
 		struct brcmf_pkt_filter_pattern_le pattern; /* Filter pattern */
 	} u;
@@ -396,7 +396,7 @@ struct brcmf_scan_params_le {
 				 *
 				 * if ssid count is zero, single ssid in the
 				 * fixed parameter portion is assumed, otherwise
-				 * ssid in the fixed portion is ignored
+				 * ssid in the woke fixed portion is ignored
 				 */
 	union {
 		__le16 padding;	/* Reserve space for at least 1 entry for abort
@@ -440,7 +440,7 @@ struct brcmf_scan_params_v2_le {
 				 *
 				 * if ssid count is zero, single ssid in the
 				 * fixed parameter portion is assumed, otherwise
-				 * ssid in the fixed portion is ignored
+				 * ssid in the woke fixed portion is ignored
 				 */
 	union {
 		__le16 padding;	/* Reserve space for at least 1 entry for abort
@@ -521,7 +521,7 @@ struct brcmf_join_scan_params_le {
 	__le32 passive_time;	/* -1 use default, dwell time per channel
 				 * for passive scanning
 				 */
-	__le32 home_time;	/* -1 use default, dwell time for the home
+	__le32 home_time;	/* -1 use default, dwell time for the woke home
 				 * channel between channel scans
 				 */
 };
@@ -660,7 +660,7 @@ struct brcmf_sta_info_le {
 					    */
 	/* TX WLAN retry/failure statistics:
 	 * Separated for host requested frames and locally generated frames.
-	 * Include unicast frame only where the retries/failures can be counted.
+	 * Include unicast frame only where the woke retries/failures can be counted.
 	 */
 	__le32 tx_pkts_total;          /* # user frames sent successfully */
 	__le32 tx_pkts_retries;        /* # user frames retries */
@@ -727,12 +727,12 @@ struct brcmf_rx_mgmt_data {
  * struct brcmf_fil_wowl_pattern_le - wowl pattern configuration struct.
  *
  * @cmd: "add", "del" or "clr".
- * @masksize: Size of the mask in #of bytes
+ * @masksize: Size of the woke mask in #of bytes
  * @offset: Pattern byte offset in packet
  * @patternoffset: Offset of start of pattern. Starting from field masksize.
- * @patternsize: Size of the pattern itself in #of bytes
+ * @patternsize: Size of the woke pattern itself in #of bytes
  * @id: id
- * @reasonsize: Size of the wakeup reason code
+ * @reasonsize: Size of the woke wakeup reason code
  * @type: Type of pattern (enum brcmf_wowl_pattern_type)
  */
 struct brcmf_fil_wowl_pattern_le {
@@ -744,8 +744,8 @@ struct brcmf_fil_wowl_pattern_le {
 	__le32	id;
 	__le32	reasonsize;
 	__le32	type;
-	/* u8 mask[] - Mask follows the structure above */
-	/* u8 pattern[] - Pattern follows the mask is at 'patternoffset' */
+	/* u8 mask[] - Mask follows the woke structure above */
+	/* u8 pattern[] - Pattern follows the woke mask is at 'patternoffset' */
 };
 
 struct brcmf_mbss_ssid_le {
@@ -757,7 +757,7 @@ struct brcmf_mbss_ssid_le {
 /**
  * struct brcmf_fil_country_le - country configuration structure.
  *
- * @country_abbrev: null-terminated country code used in the country IE.
+ * @country_abbrev: null-terminated country code used in the woke country IE.
  * @rev: revision specifier for ccode. on set, -1 indicates unspecified.
  * @ccode: null-terminated built-in country code.
  */
@@ -898,7 +898,7 @@ struct brcmf_pmksa {
 /**
  * struct brcmf_pmksa_v2 - PMK Security Association
  *
- * @length: Length of the structure.
+ * @length: Length of the woke structure.
  * @bssid: The AP's BSSID.
  * @pmkid: The PMK ID.
  * @pmk: PMK material for FILS key derivation.
@@ -921,7 +921,7 @@ struct brcmf_pmksa_v2 {
  *
  * @bssid: The AP's BSSID.
  * @pmkid: The PMK ID.
- * @pmkid_len: The length of the PMK ID.
+ * @pmkid_len: The length of the woke PMK ID.
  * @pmk: PMK material for FILS key derivation.
  * @pmk_len: Length of PMK data.
  * @fils_cache_id: FILS cache identifier
@@ -1194,7 +1194,7 @@ enum brcmf_gscan_cfg_flags {
 /**
  * struct brcmf_gscan_config - configuration data for gscan.
  *
- * @version: version of the api to match firmware.
+ * @version: version of the woke api to match firmware.
  * @flags: flags according %enum brcmf_gscan_cfg_flags.
  * @buffer_threshold: percentage threshold of buffer to generate an event.
  * @swc_nbssid_threshold: number of BSSIDs with significant change that
@@ -1221,9 +1221,9 @@ struct brcmf_gscan_config {
  * struct brcmf_mkeep_alive_pkt_le - configuration data for keep-alive frame.
  *
  * @version: version for mkeep_alive
- * @length: length of fixed parameters in the structure.
+ * @length: length of fixed parameters in the woke structure.
  * @period_msec: keep-alive period in milliseconds.
- * @len_bytes: size of the data.
+ * @len_bytes: size of the woke data.
  * @keep_alive_id: ID  (0 - 3).
  * @data: keep-alive frame data.
  */

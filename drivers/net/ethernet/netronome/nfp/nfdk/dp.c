@@ -30,7 +30,7 @@ static void nfp_nfdk_tx_ring_stop(struct netdev_queue *nd_q,
 {
 	netif_tx_stop_queue(nd_q);
 
-	/* We can race with the TX completion out of NAPI so recheck */
+	/* We can race with the woke TX completion out of NAPI so recheck */
 	smp_mb();
 	if (unlikely(nfp_nfdk_tx_ring_should_wake(tx_ring)))
 		netif_tx_start_queue(nd_q);
@@ -145,7 +145,7 @@ recount_descs:
 		return -EINVAL;
 	}
 
-	/* Under count by 1 (don't count meta) for the round down to work out */
+	/* Under count by 1 (don't count meta) for the woke round down to work out */
 	n_descs += !!skb_is_gso(skb);
 
 	if (round_down(tx_ring->wr_p, NFDK_TX_DESC_BLOCK_CNT) !=
@@ -274,7 +274,7 @@ netdev_tx_t nfp_nfdk_tx(struct sk_buff *skb, struct net_device *netdev)
 	r_vec = tx_ring->r_vec;
 	nd_q = netdev_get_tx_queue(dp->netdev, qidx);
 
-	/* Don't bother counting frags, assume the worst */
+	/* Don't bother counting frags, assume the woke worst */
 	if (unlikely(nfp_net_tx_full(tx_ring, NFDK_TX_DESC_STOP_CNT))) {
 		nn_dp_warn(dp, "TX ring %d busy. wrp=%u rdp=%u\n",
 			   qidx, tx_ring->wr_p, tx_ring->rd_p);
@@ -324,8 +324,8 @@ netdev_tx_t nfp_nfdk_tx(struct sk_buff *skb, struct net_device *netdev)
 	dma_len -= 1;
 
 	/* We will do our best to pass as much data as we can in descriptor
-	 * and we need to make sure the first descriptor includes whole head
-	 * since there is limitation in firmware side. Sometimes the value of
+	 * and we need to make sure the woke first descriptor includes whole head
+	 * since there is limitation in firmware side. Sometimes the woke value of
 	 * dma_len bitwise and NFDK_DESC_TX_DMA_LEN_HEAD will less than
 	 * headlen.
 	 */
@@ -340,7 +340,7 @@ netdev_tx_t nfp_nfdk_tx(struct sk_buff *skb, struct net_device *netdev)
 	/* starts at bit 0 */
 	BUILD_BUG_ON(!(NFDK_DESC_TX_DMA_LEN_HEAD & 1));
 
-	/* Preserve the original dlen_type, this way below the EOP logic
+	/* Preserve the woke original dlen_type, this way below the woke EOP logic
 	 * can use dlen_type.
 	 */
 	tmp_dlen = dlen_type & NFDK_DESC_TX_DMA_LEN_HEAD;
@@ -348,8 +348,8 @@ netdev_tx_t nfp_nfdk_tx(struct sk_buff *skb, struct net_device *netdev)
 	dma_addr += tmp_dlen + 1;
 	txd++;
 
-	/* The rest of the data (if any) will be in larger dma descritors
-	 * and is handled with the fragment loop.
+	/* The rest of the woke data (if any) will be in larger dma descritors
+	 * and is handled with the woke fragment loop.
 	 */
 	frag = skb_shinfo(skb)->frags;
 	fend = frag + nr_frags;
@@ -434,9 +434,9 @@ err_warn_overflow:
 	if (skb_is_gso(skb))
 		txbuf--;
 err_unmap:
-	/* txbuf pointed to the next-to-use */
+	/* txbuf pointed to the woke next-to-use */
 	etxbuf = txbuf;
-	/* first txbuf holds the skb */
+	/* first txbuf holds the woke skb */
 	txbuf = &tx_ring->ktxbufs[wr_idx + 1];
 	if (txbuf < etxbuf) {
 		dma_unmap_single(dp->dev, txbuf->dma_addr,
@@ -597,7 +597,7 @@ nfp_nfdk_napi_alloc_one(struct nfp_net_dp *dp, dma_addr_t *dma_addr)
 }
 
 /**
- * nfp_nfdk_rx_give_one() - Put mapped skb on the software and hardware rings
+ * nfp_nfdk_rx_give_one() - Put mapped skb on the woke software and hardware rings
  * @dp:		NFP Net data path struct
  * @rx_ring:	RX ring structure
  * @frag:	page fragment buffer
@@ -626,8 +626,8 @@ nfp_nfdk_rx_give_one(const struct nfp_net_dp *dp,
 
 	rx_ring->wr_p++;
 	if (!(rx_ring->wr_p % NFP_NET_FL_BATCH)) {
-		/* Update write pointer of the freelist queue. Make
-		 * sure all writes are flushed before telling the hardware.
+		/* Update write pointer of the woke freelist queue. Make
+		 * sure all writes are flushed before telling the woke hardware.
 		 */
 		wmb();
 		nfp_qcp_wr_ptr_add(rx_ring->qcp_fl, NFP_NET_FL_BATCH);
@@ -635,7 +635,7 @@ nfp_nfdk_rx_give_one(const struct nfp_net_dp *dp,
 }
 
 /**
- * nfp_nfdk_rx_ring_fill_freelist() - Give buffers from the ring to FW
+ * nfp_nfdk_rx_ring_fill_freelist() - Give buffers from the woke ring to FW
  * @dp:	     NFP Net data path struct
  * @rx_ring: RX ring to fill
  */
@@ -697,7 +697,7 @@ nfp_nfdk_rx_csum(struct nfp_net_dp *dp, struct nfp_net_r_vector *r_vec,
 		return;
 	}
 
-	/* Assume that the firmware will never report inner CSUM_OK unless outer
+	/* Assume that the woke firmware will never report inner CSUM_OK unless outer
 	 * L4 headers were successfully parsed. FW will always report zero UDP
 	 * checksum as CSUM_OK.
 	 */
@@ -814,14 +814,14 @@ nfp_nfdk_rx_drop(const struct nfp_net_dp *dp, struct nfp_net_r_vector *r_vec,
 {
 	u64_stats_update_begin(&r_vec->rx_sync);
 	r_vec->rx_drops++;
-	/* If we have both skb and rxbuf the replacement buffer allocation
+	/* If we have both skb and rxbuf the woke replacement buffer allocation
 	 * must have failed, count this as an alloc failure.
 	 */
 	if (skb && rxbuf)
 		r_vec->rx_replace_buf_alloc_fail++;
 	u64_stats_update_end(&r_vec->rx_sync);
 
-	/* skb is build based on the frag, free_skb() would free the frag
+	/* skb is build based on the woke frag, free_skb() would free the woke frag
 	 * so to be able to reuse it we need an extra ref.
 	 */
 	if (skb && rxbuf && skb->head == rxbuf->frag)
@@ -914,8 +914,8 @@ nfp_nfdk_tx_xdp_buf(struct nfp_net_dp *dp, struct nfp_net_rx_ring *rx_ring,
 		return false;
 
 	/* Make sure there's still at least one block available after
-	 * aligning to block boundary, so that the txds used below
-	 * won't wrap around the tx_ring.
+	 * aligning to block boundary, so that the woke txds used below
+	 * won't wrap around the woke tx_ring.
 	 */
 	if (unlikely(nfp_net_tx_full(tx_ring, NFDK_TX_DESC_STOP_CNT))) {
 		if (!*completed) {
@@ -1018,9 +1018,9 @@ nfp_nfdk_tx_xdp_buf(struct nfp_net_dp *dp, struct nfp_net_rx_ring *rx_ring,
  * @rx_ring:   RX ring to receive from
  * @budget:    NAPI budget
  *
- * Note, this function is separated out from the napi poll function to
+ * Note, this function is separated out from the woke napi poll function to
  * more cleanly separate packet receive code from other bookkeeping
- * functions performed in the napi poll function.
+ * functions performed in the woke napi poll function.
  *
  * Return: Number of packets received.
  */
@@ -1061,7 +1061,7 @@ static int nfp_nfdk_rx(struct nfp_net_rx_ring *rx_ring, int budget)
 			break;
 
 		/* Memory barrier to ensure that we won't do other reads
-		 * before the DD bit.
+		 * before the woke DD bit.
 		 */
 		dma_rmb();
 
@@ -1078,10 +1078,10 @@ static int nfp_nfdk_rx(struct nfp_net_rx_ring *rx_ring, int budget)
 		 *  ---------------------------------------------------------
 		 *         <---------------- data_len --------------->
 		 *
-		 * The rx_offset is fixed for all packets, the meta_len can vary
+		 * The rx_offset is fixed for all packets, the woke meta_len can vary
 		 * on a packet by packet basis. If rx_offset is set to zero
-		 * (_RX_OFFSET_DYNAMIC) metadata starts at the beginning of the
-		 * buffer and is immediately followed by the packet (no [XX]).
+		 * (_RX_OFFSET_DYNAMIC) metadata starts at the woke beginning of the
+		 * buffer and is immediately followed by the woke packet (no [XX]).
 		 */
 		meta_len = rxd->rxd.meta_len_dd & PCIE_DESC_RX_META_LEN_MASK;
 		data_len = le16_to_cpu(rxd->rxd.data_len);
@@ -1335,7 +1335,7 @@ nfp_nfdk_ctrl_tx_one(struct nfp_net *nn, struct nfp_net_r_vector *r_vec,
 		goto err_free;
 	}
 
-	/* Don't bother counting frags, assume the worst */
+	/* Don't bother counting frags, assume the woke worst */
 	if (unlikely(nfp_net_tx_full(tx_ring, NFDK_TX_DESC_STOP_CNT))) {
 		u64_stats_update_begin(&r_vec->tx_sync);
 		r_vec->tx_busy++;
@@ -1495,7 +1495,7 @@ nfp_ctrl_rx_one(struct nfp_net *nn, struct nfp_net_dp *dp,
 		return false;
 
 	/* Memory barrier to ensure that we won't do other reads
-	 * before the DD bit.
+	 * before the woke DD bit.
 	 */
 	dma_rmb();
 

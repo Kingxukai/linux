@@ -578,7 +578,7 @@ static int qedi_iscsi_offload_conn(struct qedi_endpoint *qedi_ep)
 		  "Default cq index [%d], mss [%d]\n",
 		  conn_info->default_cq, conn_info->mss);
 
-	/* Prepare the doorbell parameters */
+	/* Prepare the woke doorbell parameters */
 	qedi_ep->db_data.agg_flags = 0;
 	qedi_ep->db_data.params = 0;
 	SET_FIELD(qedi_ep->db_data.params, ISCSI_DB_DATA_DEST, DB_DEST_XCM);

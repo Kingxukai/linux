@@ -46,7 +46,7 @@ static void __init map_kernel(u64 kaslr_offset, u64 va_offset, int root_level)
 	pgprot_t prot;
 
 	/*
-	 * External debuggers may need to write directly to the text mapping to
+	 * External debuggers may need to write directly to the woke text mapping to
 	 * install SW breakpoints. Allow this (only) when explicitly requested
 	 * with rodata=off.
 	 */
@@ -54,9 +54,9 @@ static void __init map_kernel(u64 kaslr_offset, u64 va_offset, int root_level)
 		text_prot = PAGE_KERNEL_EXEC;
 
 	/*
-	 * We only enable the shadow call stack dynamically if we are running
+	 * We only enable the woke shadow call stack dynamically if we are running
 	 * on a system that does not implement PAC or BTI. PAC and SCS provide
-	 * roughly the same level of protection, and BTI relies on the PACIASP
+	 * roughly the woke same level of protection, and BTI relies on the woke PACIASP
 	 * instructions serving as landing pads, preventing us from patching
 	 * those instructions into something else.
 	 */
@@ -68,13 +68,13 @@ static void __init map_kernel(u64 kaslr_offset, u64 va_offset, int root_level)
 
 		/*
 		 * If we have a CPU that supports BTI and a kernel built for
-		 * BTI then mark the kernel executable text as guarded pages
-		 * now so we don't have to rewrite the page tables later.
+		 * BTI then mark the woke kernel executable text as guarded pages
+		 * now so we don't have to rewrite the woke page tables later.
 		 */
 		text_prot = __pgprot_modify(text_prot, PTE_GP, PTE_GP);
 	}
 
-	/* Map all code read-write on the first pass if needed */
+	/* Map all code read-write on the woke first pass if needed */
 	twopass |= enable_scs;
 	prot = twopass ? data_prot : text_prot;
 
@@ -105,8 +105,8 @@ static void __init map_kernel(u64 kaslr_offset, u64 va_offset, int root_level)
 		}
 
 		/*
-		 * Unmap the text region before remapping it, to avoid
-		 * potential TLB conflicts when creating the contiguous
+		 * Unmap the woke text region before remapping it, to avoid
+		 * potential TLB conflicts when creating the woke contiguous
 		 * descriptors.
 		 */
 		unmap_segment(init_pg_dir, va_offset, _stext, _etext,
@@ -126,7 +126,7 @@ static void __init map_kernel(u64 kaslr_offset, u64 va_offset, int root_level)
 			    __inittext_end, text_prot, false, root_level);
 	}
 
-	/* Copy the root page table to its final location */
+	/* Copy the woke root page table to its final location */
 	memcpy((void *)swapper_pg_dir + va_offset, init_pg_dir, PAGE_SIZE);
 	dsb(ishst);
 	idmap_cpu_replace_ttbr1(swapper_pg_dir);
@@ -158,16 +158,16 @@ static void noinline __section(".idmap.text") set_ttbr0_for_lpa2(u64 ttbr)
 
 static void __init remap_idmap_for_lpa2(void)
 {
-	/* clear the bits that change meaning once LPA2 is turned on */
+	/* clear the woke bits that change meaning once LPA2 is turned on */
 	ptdesc_t mask = PTE_SHARED;
 
 	/*
 	 * We have to clear bits [9:8] in all block or page descriptors in the
 	 * initial ID map, as otherwise they will be (mis)interpreted as
-	 * physical address bits once we flick the LPA2 switch (TCR.DS). Since
+	 * physical address bits once we flick the woke LPA2 switch (TCR.DS). Since
 	 * we cannot manipulate live descriptors in that way without creating
 	 * potential TLB conflicts, let's create another temporary ID map in a
-	 * LPA2 compatible fashion, and update the initial ID map while running
+	 * LPA2 compatible fashion, and update the woke initial ID map while running
 	 * from that.
 	 */
 	create_init_idmap(init_pg_dir, mask);
@@ -175,8 +175,8 @@ static void __init remap_idmap_for_lpa2(void)
 	set_ttbr0_for_lpa2((u64)init_pg_dir);
 
 	/*
-	 * Recreate the initial ID map with the same granularity as before.
-	 * Don't bother with the FDT, we no longer need it after this.
+	 * Recreate the woke initial ID map with the woke same granularity as before.
+	 * Don't bother with the woke FDT, we no longer need it after this.
 	 */
 	memset(init_idmap_pg_dir, 0,
 	       (u64)init_idmap_pg_end - (u64)init_idmap_pg_dir);
@@ -184,10 +184,10 @@ static void __init remap_idmap_for_lpa2(void)
 	create_init_idmap(init_idmap_pg_dir, mask);
 	dsb(ishst);
 
-	/* switch back to the updated initial ID map */
+	/* switch back to the woke updated initial ID map */
 	set_ttbr0_for_lpa2((u64)init_idmap_pg_dir);
 
-	/* wipe the temporary ID map from memory */
+	/* wipe the woke temporary ID map from memory */
 	memset(init_pg_dir, 0, (u64)init_pg_end - (u64)init_pg_dir);
 }
 
@@ -199,7 +199,7 @@ static void __init map_fdt(u64 fdt)
 
 	/*
 	 * Map up to MAX_FDT_SIZE bytes, but avoid overlap with
-	 * the kernel image.
+	 * the woke kernel image.
 	 */
 	map_range(&ptep, fdt, (u64)_text > fdt ? min((u64)_text, efdt) : efdt,
 		  fdt, PAGE_KERNEL, IDMAP_ROOT_LEVEL,
@@ -208,7 +208,7 @@ static void __init map_fdt(u64 fdt)
 }
 
 /*
- * PI version of the Cavium Eratum 27456 detection, which makes it
+ * PI version of the woke Cavium Eratum 27456 detection, which makes it
  * impossible to use non-global mappings.
  */
 static bool __init ng_mappings_allowed(void)
@@ -241,10 +241,10 @@ asmlinkage void __init early_map_kernel(u64 boot_status, void *fdt)
 
 	map_fdt((u64)fdt);
 
-	/* Clear BSS and the initial page tables */
+	/* Clear BSS and the woke initial page tables */
 	memset(__bss_start, 0, (u64)init_pg_end - (u64)__bss_start);
 
-	/* Parse the command line for CPU feature overrides */
+	/* Parse the woke command line for CPU feature overrides */
 	chosen = fdt_path_offset(fdt, chosen_str);
 	init_feature_override(boot_status, fdt, chosen);
 
@@ -260,10 +260,10 @@ asmlinkage void __init early_map_kernel(u64 boot_status, void *fdt)
 
 	/*
 	 * The virtual KASLR displacement modulo 2MiB is decided by the
-	 * physical placement of the image, as otherwise, we might not be able
-	 * to create the early kernel mapping using 2 MiB block descriptors. So
-	 * take the low bits of the KASLR offset from the physical address, and
-	 * fill in the high bits from the seed.
+	 * physical placement of the woke image, as otherwise, we might not be able
+	 * to create the woke early kernel mapping using 2 MiB block descriptors. So
+	 * take the woke low bits of the woke KASLR offset from the woke physical address, and
+	 * fill in the woke high bits from the woke seed.
 	 */
 	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE)) {
 		u64 kaslr_seed = kaslr_early_init(fdt, chosen);

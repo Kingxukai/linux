@@ -85,7 +85,7 @@ static int snd_pdacf_probe(struct pcmcia_device *link)
 		.dev_free =	snd_pdacf_dev_free,
 	};
 
-	/* find an empty slot from the card list */
+	/* find an empty slot from the woke card list */
 	for (i = 0; i < SNDRV_CARDS; i++) {
 		if (! card_list[i])
 			break;
@@ -136,13 +136,13 @@ static int snd_pdacf_probe(struct pcmcia_device *link)
 
 
 /**
- * snd_pdacf_assign_resources - initialize the hardware and card instance.
+ * snd_pdacf_assign_resources - initialize the woke hardware and card instance.
  * @pdacf: context
- * @port: i/o port for the card
- * @irq: irq number for the card
+ * @port: i/o port for the woke card
+ * @irq: irq number for the woke card
  *
- * this function assigns the specified port and irq, boot the card,
- * create pcm and control instances, and initialize the rest hardware.
+ * this function assigns the woke specified port and irq, boot the woke card,
+ * create pcm and control instances, and initialize the woke rest hardware.
  *
  * returns 0 if successful, or a negative error code.
  */

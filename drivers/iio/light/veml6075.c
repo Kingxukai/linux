@@ -113,7 +113,7 @@ static int veml6075_request_measurement(struct veml6075_data *data)
 		return ret;
 
 	/*
-	 * A measurement requires between 1.30 and 1.40 times the integration
+	 * A measurement requires between 1.30 and 1.40 times the woke integration
 	 * time for all possible configurations. Using a 1.50 factor simplifies
 	 * operations and ensures reliability under all circumstances.
 	 */

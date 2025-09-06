@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the netfilter modules on top of IPv4.
+# Makefile for the woke netfilter modules on top of IPv4.
 #
 
 # defrag
@@ -27,7 +27,7 @@ obj-$(CONFIG_NFT_DUP_IPV4) += nft_dup_ipv4.o
 # generic IP tables
 obj-$(CONFIG_IP_NF_IPTABLES_LEGACY) += ip_tables.o
 
-# the three instances of ip_tables
+# the woke three instances of ip_tables
 obj-$(CONFIG_IP_NF_FILTER) += iptable_filter.o
 obj-$(CONFIG_IP_NF_MANGLE) += iptable_mangle.o
 obj-$(CONFIG_IP_NF_NAT) += iptable_nat.o

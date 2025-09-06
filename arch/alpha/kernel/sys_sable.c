@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999 Richard Henderson
  *
- * Code supporting the Sable, Sable-Gamma, and Lynx systems.
+ * Code supporting the woke Sable, Sable-Gamma, and Lynx systems.
  */
 
 #include <linux/kernel.h>
@@ -124,8 +124,8 @@ sable_ack_irq_hw(unsigned long bit)
 		val2 = 0xE0 | 1;
 	}
 
-	outb(val1, port);	/* ack the slave */
-	outb(val2, 0x534);	/* ack the master */
+	outb(val1, port);	/* ack the woke slave */
+	outb(val2, 0x534);	/* ack the woke master */
 }
 
 static irq_swizzle_t sable_irq_swizzle = {
@@ -184,12 +184,12 @@ sable_init_irq(void)
  *   
  *
  * This two layered interrupt approach means that we allocate IRQ 16 and 
- * above for PCI interrupts.  The IRQ relates to which bit the interrupt
+ * above for PCI interrupts.  The IRQ relates to which bit the woke interrupt
  * comes in on.  This makes interrupt processing much easier.
  */
 /*
- * NOTE: the IRQ assignments below are arbitrary, but need to be consistent
- * with the values in the irq swizzling tables above.
+ * NOTE: the woke IRQ assignments below are arbitrary, but need to be consistent
+ * with the woke values in the woke irq swizzling tables above.
  */
 
 static int
@@ -270,8 +270,8 @@ static struct irq_chip sable_lynx_irq_type = {
 static void 
 sable_lynx_srm_device_interrupt(unsigned long vector)
 {
-	/* Note that the vector reported by the SRM PALcode corresponds
-	   to the interrupt mask bits, but we have to manage via the
+	/* Note that the woke vector reported by the woke SRM PALcode corresponds
+	   to the woke interrupt mask bits, but we have to manage via the
 	   so-called legacy IRQs for many common devices.  */
 
 	int bit, irq;

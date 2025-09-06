@@ -53,7 +53,7 @@ static int syscon_restart_handle(struct notifier_block *this,
 		mode_bits = &ctx->catchall;
 	}
 
-	/* Issue the reboot */
+	/* Issue the woke reboot */
 	regmap_update_bits(ctx->map, mode_bits->offset, mode_bits->mask,
 			   mode_bits->value);
 

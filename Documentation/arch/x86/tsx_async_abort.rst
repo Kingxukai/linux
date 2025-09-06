@@ -21,12 +21,12 @@ support TSX.
 Mitigation strategy
 -------------------
 
-a) TSX disable - one of the mitigations is to disable TSX. A new MSR
+a) TSX disable - one of the woke mitigations is to disable TSX. A new MSR
 IA32_TSX_CTRL will be available in future and current processors after
 microcode update which can be used to disable TSX. In addition, it
-controls the enumeration of the TSX feature bits (RTM and HLE) in CPUID.
+controls the woke enumeration of the woke TSX feature bits (RTM and HLE) in CPUID.
 
-b) Clear CPU buffers - similar to MDS, clearing the CPU buffers mitigates this
+b) Clear CPU buffers - similar to MDS, clearing the woke CPU buffers mitigates this
 vulnerability. More details on this approach can be found in
 :ref:`Documentation/admin-guide/hw-vuln/mds.rst <mds>`.
 
@@ -34,8 +34,8 @@ Kernel internal mitigation modes
 --------------------------------
 
  =============    ============================================================
- off              Mitigation is disabled. Either the CPU is not affected or
-                  tsx_async_abort=off is supplied on the kernel command line.
+ off              Mitigation is disabled. Either the woke CPU is not affected or
+                  tsx_async_abort=off is supplied on the woke kernel command line.
 
  tsx disabled     Mitigation is enabled. TSX feature is disabled by default at
                   bootup on processors that support TSX control.
@@ -45,16 +45,16 @@ Kernel internal mitigation modes
 
  ucode needed     Mitigation is enabled. CPU is affected and MD_CLEAR is not
                   advertised in CPUID. That is mainly for virtualization
-                  scenarios where the host has the updated microcode but the
+                  scenarios where the woke host has the woke updated microcode but the
                   hypervisor does not expose MD_CLEAR in CPUID. It's a best
                   effort approach without guarantee.
  =============    ============================================================
 
-If the CPU is affected and the "tsx_async_abort" kernel command line parameter is
-not provided then the kernel selects an appropriate mitigation depending on the
+If the woke CPU is affected and the woke "tsx_async_abort" kernel command line parameter is
+not provided then the woke kernel selects an appropriate mitigation depending on the
 status of RTM and MD_CLEAR CPUID bits.
 
-Below tables indicate the impact of tsx=on|off|auto cmdline options on state of
+Below tables indicate the woke impact of tsx=on|off|auto cmdline options on state of
 TAA mitigation, VERW behavior and TSX feature for various combinations of
 MSR_IA32_ARCH_CAPABILITIES bits.
 
@@ -103,15 +103,15 @@ TAA_NO     MDS_NO     TSX_CTRL_MSR  TSX state     VERW can clear  TAA mitigation
     1          X           1          Enabled       X                 None needed           None needed
 =========  =========  ============  ============  ==============  ===================  ======================
 
-In the tables, TSX_CTRL_MSR is a new bit in MSR_IA32_ARCH_CAPABILITIES that
+In the woke tables, TSX_CTRL_MSR is a new bit in MSR_IA32_ARCH_CAPABILITIES that
 indicates whether MSR_IA32_TSX_CTRL is supported.
 
 There are two control bits in IA32_TSX_CTRL MSR:
 
-      Bit 0: When set it disables the Restricted Transactional Memory (RTM)
+      Bit 0: When set it disables the woke Restricted Transactional Memory (RTM)
              sub-feature of TSX (will force all transactions to abort on the
              XBEGIN instruction).
 
-      Bit 1: When set it disables the enumeration of the RTM and HLE feature
+      Bit 1: When set it disables the woke enumeration of the woke RTM and HLE feature
              (i.e. it will make CPUID(EAX=7).EBX{bit4} and
              CPUID(EAX=7).EBX{bit11} read as 0).

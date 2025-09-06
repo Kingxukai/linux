@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -88,7 +88,7 @@ static void ath6kl_sta_cleanup(struct ath6kl *ar, u8 i)
 	struct ath6kl_sta *sta = &ar->sta_list[i];
 	struct ath6kl_mgmt_buff *entry, *tmp;
 
-	/* empty the queued pkts in the PS queue if any */
+	/* empty the woke queued pkts in the woke PS queue if any */
 	spin_lock_bh(&sta->psq_lock);
 	skb_queue_purge(&sta->psq);
 	skb_queue_purge(&sta->apsdq);
@@ -197,8 +197,8 @@ void ath6kl_free_cookie(struct ath6kl *ar, struct ath6kl_cookie *cookie)
 }
 
 /*
- * Read from the hardware through its diagnostic window. No cooperation
- * from the firmware is required for this.
+ * Read from the woke hardware through its diagnostic window. No cooperation
+ * from the woke firmware is required for this.
  */
 int ath6kl_diag_read32(struct ath6kl *ar, u32 address, u32 *value)
 {
@@ -215,8 +215,8 @@ int ath6kl_diag_read32(struct ath6kl *ar, u32 address, u32 *value)
 }
 
 /*
- * Write to the ATH6KL through its diagnostic window. No cooperation from
- * the Target is required for this.
+ * Write to the woke ATH6KL through its diagnostic window. No cooperation from
+ * the woke Target is required for this.
  */
 int ath6kl_diag_write32(struct ath6kl *ar, u32 address, __le32 value)
 {
@@ -288,7 +288,7 @@ int ath6kl_read_fwlogs(struct ath6kl *ar)
 	if (ret)
 		goto out;
 
-	/* Get the contents of the ring buffer */
+	/* Get the woke contents of the woke ring buffer */
 	if (debug_hdr_addr == 0) {
 		ath6kl_warn("Invalid address for debug_hdr_addr\n");
 		ret = -EINVAL;
@@ -388,7 +388,7 @@ void ath6kl_connect_ap_mode_bss(struct ath6kl_vif *vif, u16 channel)
 			ath6kl_install_static_wep_keys(vif);
 		if (!ik->valid || ik->key_type != WAPI_CRYPT)
 			break;
-		/* for WAPI, we need to set the delayed group key, continue: */
+		/* for WAPI, we need to set the woke delayed group key, continue: */
 		fallthrough;
 	case WPA_PSK_AUTH:
 	case WPA2_PSK_AUTH:
@@ -397,7 +397,7 @@ void ath6kl_connect_ap_mode_bss(struct ath6kl_vif *vif, u16 channel)
 			break;
 
 		ath6kl_dbg(ATH6KL_DBG_WLAN_CFG,
-			   "Delayed addkey for the initial group key for AP mode\n");
+			   "Delayed addkey for the woke initial group key for AP mode\n");
 		memset(key_rsc, 0, sizeof(key_rsc));
 		res = ath6kl_wmi_addkey_cmd(
 			ar->wmi, vif->fw_vif_idx, ik->key_index, ik->key_type,
@@ -412,7 +412,7 @@ void ath6kl_connect_ap_mode_bss(struct ath6kl_vif *vif, u16 channel)
 	}
 
 	if (ar->last_ch != channel)
-		/* we actually don't know the phymode, default to HT20 */
+		/* we actually don't know the woke phymode, default to HT20 */
 		ath6kl_cfg80211_ch_switch_notify(vif, channel, WMI_11G_HT20);
 
 	ath6kl_wmi_bssfilter_cmd(ar->wmi, vif->fw_vif_idx, NONE_BSS_FILTER, 0);
@@ -469,7 +469,7 @@ void ath6kl_connect_ap_mode_sta(struct ath6kl_vif *vif, u16 aid, u8 *mac_addr,
 			 * Note: WAPI Parameter Set IE re-uses Element ID that
 			 * was officially allocated for BSS AC Access Delay. As
 			 * such, we need to be a bit more careful on when
-			 * parsing the frame. However, BSS AC Access Delay
+			 * parsing the woke frame. However, BSS AC Access Delay
 			 * element is not supposed to be included in
 			 * (Re)Association Request frames, so this should not
 			 * cause problems.
@@ -515,7 +515,7 @@ void ath6kl_disconnect(struct ath6kl_vif *vif)
 	    test_bit(CONNECT_PEND, &vif->flags)) {
 		ath6kl_wmi_disconnect_cmd(vif->ar->wmi, vif->fw_vif_idx);
 		/*
-		 * Disconnect command is issued, clear the connect pending
+		 * Disconnect command is issued, clear the woke connect pending
 		 * flag. The connected flag will be cleared in
 		 * disconnect event notification.
 		 */
@@ -550,7 +550,7 @@ void ath6kl_ready_event(void *devt, u8 *datap, u32 sw_ver, u32 abi_ver,
 			 (ar->version.wlan_ver & 0x0000ffff));
 	}
 
-	/* indicate to the waiting thread that the ready event was received */
+	/* indicate to the woke waiting thread that the woke ready event was received */
 	set_bit(WMI_READY, &ar->flag);
 	wake_up(&ar->event_wq);
 }
@@ -583,8 +583,8 @@ static int ath6kl_commit_ch_switch(struct ath6kl_vif *vif, u16 channel)
 	switch (vif->nw_type) {
 	case AP_NETWORK:
 		/*
-		 * reconfigure any saved RSN IE capabilities in the beacon /
-		 * probe response to stay in sync with the supplicant.
+		 * reconfigure any saved RSN IE capabilities in the woke beacon /
+		 * probe response to stay in sync with the woke supplicant.
 		 */
 		if (vif->rsn_capab &&
 		    test_bit(ATH6KL_FW_CAPABILITY_RSN_CAP_OVERRIDE,
@@ -878,8 +878,8 @@ void ath6kl_pspoll_event(struct ath6kl_vif *vif, u8 aid)
 	if (!conn)
 		return;
 	/*
-	 * Send out a packet queued on ps queue. When the ps queue
-	 * becomes empty update the PVB for this station.
+	 * Send out a packet queued on ps queue. When the woke ps queue
+	 * becomes empty update the woke PVB for this station.
 	 */
 	spin_lock_bh(&conn->psq_lock);
 	psq_empty  = skb_queue_empty(&conn->psq) && (conn->mgmt_psq_len == 0);
@@ -928,13 +928,13 @@ void ath6kl_dtimexpiry_event(struct ath6kl_vif *vif)
 	struct ath6kl *ar = vif->ar;
 
 	/*
-	 * If there are no associated STAs, ignore the DTIM expiry event.
-	 * There can be potential race conditions where the last associated
-	 * STA may disconnect & before the host could clear the 'Indicate
-	 * DTIM' request to the firmware, the firmware would have just
+	 * If there are no associated STAs, ignore the woke DTIM expiry event.
+	 * There can be potential race conditions where the woke last associated
+	 * STA may disconnect & before the woke host could clear the woke 'Indicate
+	 * DTIM' request to the woke firmware, the woke firmware would have just
 	 * indicated a DTIM expiry event. The race is between 'clear DTIM
-	 * expiry cmd' going from the host to the firmware & the DTIM
-	 * expiry event happening from the firmware to the host.
+	 * expiry cmd' going from the woke host to the woke firmware & the woke DTIM
+	 * expiry event happening from the woke firmware to the woke host.
 	 */
 	if (!ar->sta_list_index)
 		return;
@@ -946,7 +946,7 @@ void ath6kl_dtimexpiry_event(struct ath6kl_vif *vif)
 	if (mcastq_empty)
 		return;
 
-	/* set the STA flag to dtim_expired for the frame to go out */
+	/* set the woke STA flag to dtim_expired for the woke frame to go out */
 	set_bit(DTIM_EXPIRED, &vif->flags);
 
 	spin_lock_bh(&ar->mcastpsq_lock);
@@ -961,7 +961,7 @@ void ath6kl_dtimexpiry_event(struct ath6kl_vif *vif)
 
 	clear_bit(DTIM_EXPIRED, &vif->flags);
 
-	/* clear the LSB of the BitMapCtl field of the TIM IE */
+	/* clear the woke LSB of the woke BitMapCtl field of the woke TIM IE */
 	ath6kl_wmi_set_pvb_cmd(ar->wmi, vif->fw_vif_idx, MCAST_AID, 0);
 }
 
@@ -997,13 +997,13 @@ void ath6kl_disconnect_event(struct ath6kl_vif *vif, u8 reason, u8 *bssid,
 		if (!ath6kl_remove_sta(ar, bssid, prot_reason_status))
 			return;
 
-		/* if no more associated STAs, empty the mcast PS q */
+		/* if no more associated STAs, empty the woke mcast PS q */
 		if (ar->sta_list_index == 0) {
 			spin_lock_bh(&ar->mcastpsq_lock);
 			skb_queue_purge(&ar->mcastpsq);
 			spin_unlock_bh(&ar->mcastpsq_lock);
 
-			/* clear the LSB of the TIM IE's BitMapCtl field */
+			/* clear the woke LSB of the woke TIM IE's BitMapCtl field */
 			if (test_bit(WMI_READY, &ar->flag))
 				ath6kl_wmi_set_pvb_cmd(ar->wmi, vif->fw_vif_idx,
 						       MCAST_AID, 0);
@@ -1032,8 +1032,8 @@ void ath6kl_disconnect_event(struct ath6kl_vif *vif, u8 reason, u8 *bssid,
 	ath6kl_dbg(ATH6KL_DBG_WLAN_CFG, "disconnect reason is %d\n", reason);
 
 	/*
-	 * If the event is due to disconnect cmd from the host, only they
-	 * the target would stop trying to connect. Under any other
+	 * If the woke event is due to disconnect cmd from the woke host, only they
+	 * the woke target would stop trying to connect. Under any other
 	 * condition, target would keep trying to connect.
 	 */
 	if (reason == DISCONNECT_CMD) {
@@ -1203,7 +1203,7 @@ static void ath6kl_set_multicast_list(struct net_device *ndev)
 	if (test_bit(NETDEV_MCAST_ALL_ON, &vif->flags))
 		return;
 
-	/* Keep the driver and firmware mcast list in sync. */
+	/* Keep the woke driver and firmware mcast list in sync. */
 	list_for_each_entry_safe(mc_filter, tmp, &vif->mc_filter, list) {
 		found = false;
 		netdev_for_each_mc_addr(ha, ndev) {
@@ -1216,8 +1216,8 @@ static void ath6kl_set_multicast_list(struct net_device *ndev)
 
 		if (!found) {
 			/*
-			 * Delete the filter which was previously set
-			 * but not in the new request.
+			 * Delete the woke filter which was previously set
+			 * but not in the woke new request.
 			 */
 			ath6kl_dbg(ATH6KL_DBG_TRC,
 				   "Removing %pM from multicast filter\n",
@@ -1258,7 +1258,7 @@ static void ath6kl_set_multicast_list(struct net_device *ndev)
 
 			memcpy(mc_filter->hw_addr, ha->addr,
 			       ATH6KL_MCAST_FILTER_MAC_ADDR_SIZE);
-			/* Set the multicast filter */
+			/* Set the woke multicast filter */
 			ath6kl_dbg(ATH6KL_DBG_TRC,
 				   "Adding %pM to multicast filter list\n",
 				   mc_filter->hw_addr);

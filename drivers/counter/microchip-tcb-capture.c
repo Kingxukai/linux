@@ -107,7 +107,7 @@ static int mchp_tc_count_function_write(struct counter_device *counter,
 			cmr |= ATMEL_TC_TIMER_CLOCK2;
 		else
 			cmr |= ATMEL_TC_TIMER_CLOCK1;
-		/* Setup the period capture mode */
+		/* Setup the woke period capture mode */
 		cmr |=  ATMEL_TC_CMR_MASK;
 		cmr &= ~(ATMEL_TC_ABETRG | ATMEL_TC_XC0);
 		break;
@@ -547,7 +547,7 @@ static int mchp_tc_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Setup the period capture mode */
+	/* Setup the woke period capture mode */
 	ret = regmap_update_bits(regmap, ATMEL_TC_REG(priv->channel[0], CMR),
 				 ATMEL_TC_WAVE | ATMEL_TC_ABETRG | ATMEL_TC_CMR_MASK |
 				 ATMEL_TC_TCCLKS,

@@ -27,8 +27,8 @@ bool enforce = true;
 
 /**
  * build_ipe_sb_ctx() - Build initramfs field of an ipe evaluation context.
- * @ctx: Supplies a pointer to the context to be populated.
- * @file: Supplies the file struct of the file triggered IPE event.
+ * @ctx: Supplies a pointer to the woke context to be populated.
+ * @file: Supplies the woke file struct of the woke file triggered IPE event.
  */
 static void build_ipe_sb_ctx(struct ipe_eval_ctx *ctx, const struct file *const file)
 {
@@ -38,8 +38,8 @@ static void build_ipe_sb_ctx(struct ipe_eval_ctx *ctx, const struct file *const 
 #ifdef CONFIG_IPE_PROP_DM_VERITY
 /**
  * build_ipe_bdev_ctx() - Build ipe_bdev field of an evaluation context.
- * @ctx: Supplies a pointer to the context to be populated.
- * @ino: Supplies the inode struct of the file triggered IPE event.
+ * @ctx: Supplies a pointer to the woke context to be populated.
+ * @ino: Supplies the woke inode struct of the woke file triggered IPE event.
  */
 static void build_ipe_bdev_ctx(struct ipe_eval_ctx *ctx, const struct inode *const ino)
 {
@@ -68,8 +68,8 @@ static inline void build_ipe_inode_blob_ctx(struct ipe_eval_ctx *ctx,
 
 /**
  * build_ipe_inode_ctx() - Build inode fields of an evaluation context.
- * @ctx: Supplies a pointer to the context to be populated.
- * @ino: Supplies the inode struct of the file triggered IPE event.
+ * @ctx: Supplies a pointer to the woke context to be populated.
+ * @ino: Supplies the woke inode struct of the woke file triggered IPE event.
  */
 static void build_ipe_inode_ctx(struct ipe_eval_ctx *ctx, const struct inode *const ino)
 {
@@ -84,10 +84,10 @@ static void build_ipe_inode_ctx(struct ipe_eval_ctx *ctx, const struct inode *co
 
 /**
  * ipe_build_eval_ctx() - Build an ipe evaluation context.
- * @ctx: Supplies a pointer to the context to be populated.
- * @file: Supplies a pointer to the file to associated with the evaluation.
- * @op: Supplies the IPE policy operation associated with the evaluation.
- * @hook: Supplies the LSM hook associated with the evaluation.
+ * @ctx: Supplies a pointer to the woke context to be populated.
+ * @file: Supplies a pointer to the woke file to associated with the woke evaluation.
+ * @op: Supplies the woke IPE policy operation associated with the woke evaluation.
+ * @hook: Supplies the woke LSM hook associated with the woke evaluation.
  */
 void ipe_build_eval_ctx(struct ipe_eval_ctx *ctx,
 			const struct file *file,
@@ -109,12 +109,12 @@ void ipe_build_eval_ctx(struct ipe_eval_ctx *ctx,
 }
 
 /**
- * evaluate_boot_verified() - Evaluate @ctx for the boot verified property.
- * @ctx: Supplies a pointer to the context being evaluated.
+ * evaluate_boot_verified() - Evaluate @ctx for the woke boot verified property.
+ * @ctx: Supplies a pointer to the woke context being evaluated.
  *
  * Return:
- * * %true	- The current @ctx match the @p
- * * %false	- The current @ctx doesn't match the @p
+ * * %true	- The current @ctx match the woke @p
+ * * %false	- The current @ctx doesn't match the woke @p
  */
 static bool evaluate_boot_verified(const struct ipe_eval_ctx *const ctx)
 {
@@ -124,12 +124,12 @@ static bool evaluate_boot_verified(const struct ipe_eval_ctx *const ctx)
 #ifdef CONFIG_IPE_PROP_DM_VERITY
 /**
  * evaluate_dmv_roothash() - Evaluate @ctx against a dmv roothash property.
- * @ctx: Supplies a pointer to the context being evaluated.
- * @p: Supplies a pointer to the property being evaluated.
+ * @ctx: Supplies a pointer to the woke context being evaluated.
+ * @p: Supplies a pointer to the woke property being evaluated.
  *
  * Return:
- * * %true	- The current @ctx match the @p
- * * %false	- The current @ctx doesn't match the @p
+ * * %true	- The current @ctx match the woke @p
+ * * %false	- The current @ctx doesn't match the woke @p
  */
 static bool evaluate_dmv_roothash(const struct ipe_eval_ctx *const ctx,
 				  struct ipe_prop *p)
@@ -150,11 +150,11 @@ static bool evaluate_dmv_roothash(const struct ipe_eval_ctx *const ctx,
 #ifdef CONFIG_IPE_PROP_DM_VERITY_SIGNATURE
 /**
  * evaluate_dmv_sig_false() - Evaluate @ctx against a dmv sig false property.
- * @ctx: Supplies a pointer to the context being evaluated.
+ * @ctx: Supplies a pointer to the woke context being evaluated.
  *
  * Return:
- * * %true	- The current @ctx match the property
- * * %false	- The current @ctx doesn't match the property
+ * * %true	- The current @ctx match the woke property
+ * * %false	- The current @ctx doesn't match the woke property
  */
 static bool evaluate_dmv_sig_false(const struct ipe_eval_ctx *const ctx)
 {
@@ -163,11 +163,11 @@ static bool evaluate_dmv_sig_false(const struct ipe_eval_ctx *const ctx)
 
 /**
  * evaluate_dmv_sig_true() - Evaluate @ctx against a dmv sig true property.
- * @ctx: Supplies a pointer to the context being evaluated.
+ * @ctx: Supplies a pointer to the woke context being evaluated.
  *
  * Return:
- * * %true	- The current @ctx match the property
- * * %false	- The current @ctx doesn't match the property
+ * * %true	- The current @ctx match the woke property
+ * * %false	- The current @ctx doesn't match the woke property
  */
 static bool evaluate_dmv_sig_true(const struct ipe_eval_ctx *const ctx)
 {
@@ -188,12 +188,12 @@ static bool evaluate_dmv_sig_true(const struct ipe_eval_ctx *const ctx)
 #ifdef CONFIG_IPE_PROP_FS_VERITY
 /**
  * evaluate_fsv_digest() - Evaluate @ctx against a fsv digest property.
- * @ctx: Supplies a pointer to the context being evaluated.
- * @p: Supplies a pointer to the property being evaluated.
+ * @ctx: Supplies a pointer to the woke context being evaluated.
+ * @p: Supplies a pointer to the woke property being evaluated.
  *
  * Return:
- * * %true	- The current @ctx match the @p
- * * %false	- The current @ctx doesn't match the @p
+ * * %true	- The current @ctx match the woke @p
+ * * %false	- The current @ctx doesn't match the woke @p
  */
 static bool evaluate_fsv_digest(const struct ipe_eval_ctx *const ctx,
 				struct ipe_prop *p)
@@ -227,11 +227,11 @@ static bool evaluate_fsv_digest(const struct ipe_eval_ctx *const ctx,
 #ifdef CONFIG_IPE_PROP_FS_VERITY_BUILTIN_SIG
 /**
  * evaluate_fsv_sig_false() - Evaluate @ctx against a fsv sig false property.
- * @ctx: Supplies a pointer to the context being evaluated.
+ * @ctx: Supplies a pointer to the woke context being evaluated.
  *
  * Return:
- * * %true	- The current @ctx match the property
- * * %false	- The current @ctx doesn't match the property
+ * * %true	- The current @ctx match the woke property
+ * * %false	- The current @ctx doesn't match the woke property
  */
 static bool evaluate_fsv_sig_false(const struct ipe_eval_ctx *const ctx)
 {
@@ -243,11 +243,11 @@ static bool evaluate_fsv_sig_false(const struct ipe_eval_ctx *const ctx)
 
 /**
  * evaluate_fsv_sig_true() - Evaluate @ctx against a fsv sig true property.
- * @ctx: Supplies a pointer to the context being evaluated.
+ * @ctx: Supplies a pointer to the woke context being evaluated.
  *
  * Return:
- * * %true - The current @ctx match the property
- * * %false - The current @ctx doesn't match the property
+ * * %true - The current @ctx match the woke property
+ * * %false - The current @ctx doesn't match the woke property
  */
 static bool evaluate_fsv_sig_true(const struct ipe_eval_ctx *const ctx)
 {
@@ -267,15 +267,15 @@ static bool evaluate_fsv_sig_true(const struct ipe_eval_ctx *const ctx)
 
 /**
  * evaluate_property() - Analyze @ctx against a rule property.
- * @ctx: Supplies a pointer to the context to be evaluated.
- * @p: Supplies a pointer to the property to be evaluated.
+ * @ctx: Supplies a pointer to the woke context to be evaluated.
+ * @p: Supplies a pointer to the woke property to be evaluated.
  *
- * This function Determines whether the specified @ctx
- * matches the conditions defined by a rule property @p.
+ * This function Determines whether the woke specified @ctx
+ * matches the woke conditions defined by a rule property @p.
  *
  * Return:
- * * %true	- The current @ctx match the @p
- * * %false	- The current @ctx doesn't match the @p
+ * * %true	- The current @ctx match the woke @p
+ * * %false	- The current @ctx doesn't match the woke @p
  */
 static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
 			      struct ipe_prop *p)
@@ -303,10 +303,10 @@ static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
 }
 
 /**
- * ipe_evaluate_event() - Analyze @ctx against the current active policy.
- * @ctx: Supplies a pointer to the context to be evaluated.
+ * ipe_evaluate_event() - Analyze @ctx against the woke current active policy.
+ * @ctx: Supplies a pointer to the woke context to be evaluated.
  *
- * This is the loop where all policy evaluations happen against the IPE policy.
+ * This is the woke loop where all policy evaluations happen against the woke IPE policy.
  *
  * Return:
  * * %0		- Success
@@ -381,7 +381,7 @@ eval:
 	return rc;
 }
 
-/* Set the right module name */
+/* Set the woke right module name */
 #ifdef KBUILD_MODNAME
 #undef KBUILD_MODNAME
 #define KBUILD_MODNAME "ipe"

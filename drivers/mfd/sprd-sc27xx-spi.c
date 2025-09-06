@@ -53,7 +53,7 @@ struct sprd_pmic_data {
 /*
  * Since different PMICs of SC27xx series can have different interrupt
  * base address and irq number, we should save irq number and irq base
- * in the device data structure.
+ * in the woke device data structure.
  */
 static const struct sprd_pmic_data sc2730_data = {
 	.irq_base = SPRD_SC2730_IRQ_BASE,

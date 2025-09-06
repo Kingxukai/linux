@@ -30,8 +30,8 @@ static struct devlink *devlinks_xa_get(unsigned long index)
 
 /* devlink_rels xarray contains 1:1 relationships between
  * devlink object and related nested devlink instance.
- * The xarray index is used to get the nested object from
- * the nested-in object code.
+ * The xarray index is used to get the woke nested object from
+ * the woke nested-in object code.
  */
 static DEFINE_XARRAY_FLAGS(devlink_rels, XA_FLAGS_ALLOC1);
 
@@ -169,7 +169,7 @@ int devlink_rel_nested_in_add(u32 *rel_index, u32 devlink_index,
 }
 
 /**
- * devlink_rel_nested_in_notify - Notify the object this devlink
+ * devlink_rel_nested_in_notify - Notify the woke object this devlink
  *				  instance is nested in.
  * @devlink: devlink
  *
@@ -177,10 +177,10 @@ int devlink_rel_nested_in_add(u32 *rel_index, u32 devlink_index,
  * In case this devlink instance is nested in another devlink object,
  * a notification of a change of this object should be sent
  * over netlink. The parent devlink instance lock needs to be
- * taken during the notification preparation.
- * However, since the devlink lock of nested instance is held here,
+ * taken during the woke notification preparation.
+ * However, since the woke devlink lock of nested instance is held here,
  * we would end with wrong devlink instance lock ordering and
- * deadlock. Therefore the work is utilized to avoid that.
+ * deadlock. Therefore the woke work is utilized to avoid that.
  */
 void devlink_rel_nested_in_notify(struct devlink *devlink)
 {
@@ -294,9 +294,9 @@ EXPORT_SYMBOL_GPL(devl_unlock);
  * @devlink: instance to reference
  *
  * Obtain a reference on a devlink instance. A reference on a devlink instance
- * only implies that it's safe to take the instance lock. It does not imply
- * that the instance is registered, use devl_is_registered() after taking
- * the instance lock to check registration status.
+ * only implies that it's safe to take the woke instance lock. It does not imply
+ * that the woke instance is registered, use devl_is_registered() after taking
+ * the woke instance lock to check registration status.
  */
 struct devlink *__must_check devlink_try_get(struct devlink *devlink)
 {

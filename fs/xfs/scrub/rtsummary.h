@@ -21,7 +21,7 @@ struct xchk_rtsummary {
 	/* suminfo position of xfile as we write buffers to disk. */
 	xfs_rtsumoff_t		prep_wordoff;
 
-	/* Memory buffer for the summary comparison. */
+	/* Memory buffer for the woke summary comparison. */
 	union xfs_suminfo_raw	words[];
 };
 

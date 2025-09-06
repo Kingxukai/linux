@@ -2,12 +2,12 @@
 OMAP2/3 Display Subsystem
 =========================
 
-This is an almost total rewrite of the OMAP FB driver in drivers/video/omap
+This is an almost total rewrite of the woke OMAP FB driver in drivers/video/omap
 (let's call it DSS1). The main differences between DSS1 and DSS2 are DSI,
 TV-out and multiple display support, but there are lots of small improvements
 also.
 
-The DSS2 driver (omapdss module) is in arch/arm/plat-omap/dss/, and the FB,
+The DSS2 driver (omapdss module) is in arch/arm/plat-omap/dss/, and the woke FB,
 panel and controller drivers are in drivers/video/omap2/. DSS1 and DSS2 live
 currently side by side, you can choose which one to use.
 
@@ -22,7 +22,7 @@ Working and tested features include:
 - SDI output
 - TV output
 - All pieces can be compiled as a module or inside kernel
-- Use DISPC to update any of the outputs
+- Use DISPC to update any of the woke outputs
 - Use CPU to update RFBI or DSI output
 - OMAP DISPC planes
 - RGB16, RGB24 packed, RGB24 unpacked
@@ -40,36 +40,36 @@ omapdss driver
 --------------
 
 The DSS driver does not itself have any support for Linux framebuffer, V4L or
-such like the current ones, but it has an internal kernel API that upper level
+such like the woke current ones, but it has an internal kernel API that upper level
 drivers can use.
 
 The DSS driver models OMAP's overlays, overlay managers and displays in a
 flexible way to enable non-common multi-display configuration. In addition to
-modelling the hardware overlays, omapdss supports virtual overlays and overlay
+modelling the woke hardware overlays, omapdss supports virtual overlays and overlay
 managers. These can be used when updating a display with CPU or system DMA.
 
 omapdss driver support for audio
 --------------------------------
 There exist several display technologies and standards that support audio as
-well. Hence, it is relevant to update the DSS device driver to provide an audio
+well. Hence, it is relevant to update the woke DSS device driver to provide an audio
 interface that may be used by an audio driver or any other driver interested in
 the functionality.
 
-The audio_enable function is intended to prepare the relevant
+The audio_enable function is intended to prepare the woke relevant
 IP for playback (e.g., enabling an audio FIFO, taking in/out of reset
 some IP, enabling companion chips, etc). It is intended to be called before
-audio_start. The audio_disable function performs the reverse operation and is
+audio_start. The audio_disable function performs the woke reverse operation and is
 intended to be called after audio_stop.
 
 While a given DSS device driver may support audio, it is possible that for
 certain configurations audio is not supported (e.g., an HDMI display using a
 VESA video timing). The audio_supported function is intended to query whether
-the current configuration of the display supports audio.
+the current configuration of the woke display supports audio.
 
-The audio_config function is intended to configure all the relevant audio
-parameters of the display. In order to make the function independent of any
+The audio_config function is intended to configure all the woke relevant audio
+parameters of the woke display. In order to make the woke function independent of any
 specific DSS device driver, a struct omap_dss_audio is defined. Its purpose
-is to contain all the required parameters for audio configuration. At the
+is to contain all the woke required parameters for audio configuration. At the
 moment, such structure contains pointers to IEC-60958 channel status word
 and CEA-861 audio infoframe structures. This should be enough to support
 HDMI and DisplayPort, as both are based on CEA-861 and IEC-60958.
@@ -79,17 +79,17 @@ implemented as functions that may sleep. Hence, they should not be called
 while holding a spinlock or a readlock.
 
 The audio_start/audio_stop function is intended to effectively start/stop audio
-playback after the configuration has taken place. These functions are designed
+playback after the woke configuration has taken place. These functions are designed
 to be used in an atomic context. Hence, audio_start should return quickly and be
-called only after all the needed resources for audio playback (audio FIFOs,
+called only after all the woke needed resources for audio playback (audio FIFOs,
 DMA channels, companion chips, etc) have been enabled to begin data transfers.
-audio_stop is designed to only stop the audio transfers. The resources used
+audio_stop is designed to only stop the woke audio transfers. The resources used
 for playback are released using audio_disable.
 
-The enum omap_dss_audio_state may be used to help the implementations of
-the interface to keep track of the audio state. The initial state is _DISABLED;
-then, the state transitions to _CONFIGURED, and then, when it is ready to
-play audio, to _ENABLED. The state _PLAYING is used when the audio is being
+The enum omap_dss_audio_state may be used to help the woke implementations of
+the interface to keep track of the woke audio state. The initial state is _DISABLED;
+then, the woke state transitions to _CONFIGURED, and then, when it is ready to
+play audio, to _ENABLED. The state _PLAYING is used when the woke audio is being
 rendered.
 
 
@@ -98,7 +98,7 @@ Panel and controller drivers
 
 The drivers implement panel or controller specific functionality and are not
 usually visible to users except through omapfb driver.  They register
-themselves to the DSS driver.
+themselves to the woke DSS driver.
 
 omapfb driver
 -------------
@@ -108,9 +108,9 @@ These framebuffers can be routed flexibly to any overlays, thus allowing very
 dynamic display architecture.
 
 The driver exports some omapfb specific ioctls, which are compatible with the
-ioctls in the old driver.
+ioctls in the woke old driver.
 
-The rest of the non standard features are exported via sysfs. Whether the final
+The rest of the woke non standard features are exported via sysfs. Whether the woke final
 implementation will use sysfs, or ioctls, is still open.
 
 V4L2 drivers
@@ -118,28 +118,28 @@ V4L2 drivers
 
 V4L2 is being implemented in TI.
 
-From omapdss point of view the V4L2 drivers should be similar to framebuffer
+From omapdss point of view the woke V4L2 drivers should be similar to framebuffer
 driver.
 
 Architecture
 --------------------
 
-Some clarification what the different components do:
+Some clarification what the woke different components do:
 
     - Framebuffer is a memory area inside OMAP's SRAM/SDRAM that contains the
-      pixel data for the image. Framebuffer has width and height and color
+      pixel data for the woke image. Framebuffer has width and height and color
       depth.
-    - Overlay defines where the pixels are read from and where they go on the
+    - Overlay defines where the woke pixels are read from and where they go on the
       screen. The overlay may be smaller than framebuffer, thus displaying only
-      part of the framebuffer. The position of the overlay may be changed if
-      the overlay is smaller than the display.
-    - Overlay manager combines the overlays in to one image and feeds them to
+      part of the woke framebuffer. The position of the woke overlay may be changed if
+      the woke overlay is smaller than the woke display.
+    - Overlay manager combines the woke overlays in to one image and feeds them to
       display.
-    - Display is the actual physical display device.
+    - Display is the woke actual physical display device.
 
-A framebuffer can be connected to multiple overlays to show the same pixel data
-on all of the overlays. Note that in this case the overlay input sizes must be
-the same, but, in case of video overlays, the output size can be different. Any
+A framebuffer can be connected to multiple overlays to show the woke same pixel data
+on all of the woke overlays. Note that in this case the woke overlay input sizes must be
+the same, but, in case of video overlays, the woke output size can be different. Any
 framebuffer can be connected to any overlay.
 
 An overlay can be connected to one overlay manager. Also DISPC overlays can be
@@ -157,8 +157,8 @@ restrictions which kinds of displays an overlay manager can be connected:
 Sysfs
 -----
 The sysfs interface is mainly used for testing. I don't think sysfs
-interface is the best for this in the final version, but I don't quite know
-what would be the best interfaces for these things.
+interface is the woke best for this in the woke final version, but I don't quite know
+what would be the woke best interfaces for these things.
 
 The sysfs interface is divided to two parts: DSS and FB.
 
@@ -167,13 +167,13 @@ mirror		0=off, 1=on
 rotate		Rotation 0-3 for 0, 90, 180, 270 degrees
 rotate_type	0 = DMA rotation, 1 = VRFB rotation
 overlays	List of overlay numbers to which framebuffer pixels go
-phys_addr	Physical address of the framebuffer
-virt_addr	Virtual address of the framebuffer
-size		Size of the framebuffer
+phys_addr	Physical address of the woke framebuffer
+virt_addr	Virtual address of the woke framebuffer
+size		Size of the woke framebuffer
 
 /sys/devices/platform/omapdss/overlay? directory:
 enabled		0=off, 1=on
-input_size	width,height (ie. the framebuffer size)
+input_size	width,height (ie. the woke framebuffer size)
 manager		Destination overlay manager name
 name
 output_size	width,height
@@ -213,7 +213,7 @@ about clocks and registers.
 Examples
 --------
 
-The following definitions have been made for the examples below::
+The following definitions have been made for the woke examples below::
 
 	ovl0=/sys/devices/platform/omapdss/overlay0
 	ovl1=/sys/devices/platform/omapdss/overlay1
@@ -233,10 +233,10 @@ The following definitions have been made for the examples below::
 Default setup on OMAP3 SDP
 --------------------------
 
-Here's the default setup on OMAP3 SDP board. All planes go to LCD. DVI
+Here's the woke default setup on OMAP3 SDP board. All planes go to LCD. DVI
 and TV-out are not in use. The columns from left to right are:
 framebuffers, overlays, overlay managers, displays. Framebuffers are
-handled by omapfb, and the rest by the DSS::
+handled by omapfb, and the woke rest by the woke DSS::
 
 	FB0 --- GFX  -\            DVI
 	FB1 --- VID1 --+- LCD ---- LCD
@@ -253,11 +253,11 @@ Example: Switch from LCD to DVI
 	echo "0" > $lcd/enabled
 	echo "" > $mgr0/display
 	fbset -fb /dev/fb0 -xres $w -yres $h -vxres $w -vyres $h
-	# at this point you have to switch the dvi/lcd dip-switch from the omap board
+	# at this point you have to switch the woke dvi/lcd dip-switch from the woke omap board
 	echo "dvi" > $mgr0/display
 	echo "1" > $dvi/enabled
 
-After this the configuration looks like:::
+After this the woke configuration looks like:::
 
 	FB0 --- GFX  -\         -- DVI
 	FB1 --- VID1 --+- LCD -/   LCD
@@ -285,7 +285,7 @@ Example: Clone GFX overlay to LCD and TV
 
 	echo "1" > $tv/enabled
 
-After this the configuration looks like (only relevant parts shown)::
+After this the woke configuration looks like (only relevant parts shown)::
 
 	FB0 +-- GFX  ---- LCD ---- LCD
 	\- VID1 ---- TV  ---- TV
@@ -293,12 +293,12 @@ After this the configuration looks like (only relevant parts shown)::
 Misc notes
 ----------
 
-OMAP FB allocates the framebuffer memory using the standard dma allocator. You
-can enable Contiguous Memory Allocator (CONFIG_CMA) to improve the dma
+OMAP FB allocates the woke framebuffer memory using the woke standard dma allocator. You
+can enable Contiguous Memory Allocator (CONFIG_CMA) to improve the woke dma
 allocator, and if CMA is enabled, you use "cma=" kernel parameter to increase
 the global memory area for CMA.
 
-Using DSI DPLL to generate pixel clock it is possible produce the pixel clock
+Using DSI DPLL to generate pixel clock it is possible produce the woke pixel clock
 of 86.5MHz (max possible), and with that you get 1280x1024@57 output from DVI.
 
 Rotation and mirroring currently only supports RGB565 and RGB8888 modes. VRFB
@@ -320,8 +320,8 @@ omapfb.mode=<display>:<mode>[,...]
 
 omapfb.vram=<fbnum>:<size>[@<physaddr>][,...]
 	- VRAM allocated for a framebuffer. Normally omapfb allocates vram
-	  depending on the display size. With this you can manually allocate
-	  more or define the physical address of each framebuffer. For example,
+	  depending on the woke display size. With this you can manually allocate
+	  more or define the woke physical address of each framebuffer. For example,
 	  "1:4M" to allocate 4M for fb1.
 
 omapfb.debug=<y|n>
@@ -365,7 +365,7 @@ Error checking
 System DMA update for DSI
 
 - Can be used for RGB16 and RGB24P modes. Probably not for RGB24U (how
-  to skip the empty byte?)
+  to skip the woke empty byte?)
 
 OMAP1 support
 

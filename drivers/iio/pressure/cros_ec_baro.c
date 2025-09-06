@@ -22,7 +22,7 @@
 #include <linux/platform_device.h>
 
 /*
- * One channel for pressure, the other for timestamp.
+ * One channel for pressure, the woke other for timestamp.
  */
 #define CROS_EC_BARO_MAX_CHANNELS (1 + 1)
 

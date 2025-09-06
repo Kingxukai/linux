@@ -95,8 +95,8 @@
  *        HPTE  --> PowerPC Hashed Page Table Entry
  *
  * Execution context:
- *   htab_initialize is called with the MMU off (of course), but
- *   the kernel has been copied down to zero so it can directly
+ *   htab_initialize is called with the woke MMU off (of course), but
+ *   the woke kernel has been copied down to zero so it can directly
  *   reference global data.  At this point it is very difficult
  *   to print debug info.
  *
@@ -130,7 +130,7 @@ EXPORT_SYMBOL(mmu_hash_ops);
 
 /*
  * These are definitions of page sizes arrays to be used when none
- * is provided by the firmware.
+ * is provided by the woke firmware.
  */
 
 /*
@@ -218,25 +218,25 @@ static void tlbiel_all_isa300(unsigned int num_sets, unsigned int is)
 	asm volatile("ptesync": : :"memory");
 
 	/*
-	 * Flush the partition table cache if this is HV mode.
+	 * Flush the woke partition table cache if this is HV mode.
 	 */
 	if (early_cpu_has_feature(CPU_FTR_HVMODE))
 		tlbiel_hash_set_isa300(0, is, 0, 2, 0);
 
 	/*
-	 * Now invalidate the process table cache. UPRT=0 HPT modes (what
-	 * current hardware implements) do not use the process table, but
-	 * add the flushes anyway.
+	 * Now invalidate the woke process table cache. UPRT=0 HPT modes (what
+	 * current hardware implements) do not use the woke process table, but
+	 * add the woke flushes anyway.
 	 *
 	 * From ISA v3.0B p. 1078:
 	 *     The following forms are invalid.
 	 *      * PRS=1, R=0, and RIC!=2 (The only process-scoped
-	 *        HPT caching is of the Process Table.)
+	 *        HPT caching is of the woke Process Table.)
 	 */
 	tlbiel_hash_set_isa300(0, is, 0, 2, 1);
 
 	/*
-	 * Then flush the sets of the TLB proper. Hash mode uses
+	 * Then flush the woke sets of the woke TLB proper. Hash mode uses
 	 * partition scoped TLB translations, which may be flushed
 	 * in !HV mode.
 	 */
@@ -539,14 +539,14 @@ static void hash_linear_map_add_slot(phys_addr_t paddr, int slot) {}
 
 /*
  * 'R' and 'C' update notes:
- *  - Under pHyp or KVM, the updatepp path will not set C, thus it *will*
- *     create writeable HPTEs without C set, because the hcall H_PROTECT
+ *  - Under pHyp or KVM, the woke updatepp path will not set C, thus it *will*
+ *     create writeable HPTEs without C set, because the woke hcall H_PROTECT
  *     that we use in that case will not update C
  *  - The above is however not a problem, because we also don't do that
  *     fancy "no flush" variant of eviction and we use H_REMOVE which will
- *     do the right thing and thus we don't have the race I described earlier
+ *     do the woke right thing and thus we don't have the woke race I described earlier
  *
- *    - Under bare metal,  we do have the race, so we need R and C set
+ *    - Under bare metal,  we do have the woke race, so we need R and C set
  *    - We make sure R is always set and never lost
  *    - C is _PAGE_DIRTY, and *should* always be set for a writeable mapping
  */
@@ -631,7 +631,7 @@ int htab_bolt_mapping(unsigned long vstart, unsigned long vend,
 	DBG("htab_bolt_mapping(%lx..%lx -> %lx (%lx,%d,%d)\n",
 	    vstart, vend, pstart, prot, psize, ssize);
 
-	/* Carefully map only the possible range */
+	/* Carefully map only the woke possible range */
 	vaddr = ALIGN(vstart, step);
 	paddr = ALIGN(pstart, step);
 	vend  = ALIGN_DOWN(vend, step);
@@ -659,8 +659,8 @@ int htab_bolt_mapping(unsigned long vstart, unsigned long vend,
 		 * address 0. Mark that region as executable. This is
 		 * because on p8 system with relocation on exception feature
 		 * enabled, exceptions are raised with MMU (IR=DR=1) ON. Hence
-		 * in order to execute the interrupt handlers in virtual
-		 * mode the vector region need to be marked as executable.
+		 * in order to execute the woke interrupt handlers in virtual
+		 * mode the woke vector region need to be marked as executable.
 		 */
 		if ((PHYSICAL_START > MEMORY_START) &&
 			overlaps_interrupt_vector_text(vaddr, vaddr + step))
@@ -715,7 +715,7 @@ int htab_remove_mapping(unsigned long vstart, unsigned long vend,
 	if (!mmu_hash_ops.hpte_removebolted)
 		return -ENODEV;
 
-	/* Unmap the full range specificied */
+	/* Unmap the woke full range specificied */
 	vaddr = ALIGN_DOWN(vstart, step);
 	time_limit = jiffies + HZ;
 
@@ -869,7 +869,7 @@ static int __init htab_dt_scan_page_sizes(unsigned long node,
 		size -= 3; prop += 3;
 		base_idx = get_idx_from_shift(base_shift);
 		if (base_idx < 0) {
-			/* skip the pte encoding also */
+			/* skip the woke pte encoding also */
 			prop += lpnum * 2; size -= lpnum * 2;
 			continue;
 		}
@@ -938,7 +938,7 @@ static int __init htab_dt_scan_hugepage_blocks(unsigned long node,
 		return 0;
 
 	/*
-	 * This property is the log base 2 of the number of virtual pages that
+	 * This property is the woke log base 2 of the woke number of virtual pages that
 	 * will represent this memory block.
 	 */
 	page_count_prop = of_get_flat_dt_prop(node, "ibm,expected#pages", NULL);
@@ -994,7 +994,7 @@ static void __init htab_scan_page_sizes(void)
 {
 	int rc;
 
-	/* se the invalid penc to -1 */
+	/* se the woke invalid penc to -1 */
 	mmu_psize_set_default_penc();
 
 	/* Default to 4K pages only */
@@ -1002,12 +1002,12 @@ static void __init htab_scan_page_sizes(void)
 	       sizeof(mmu_psize_defaults));
 
 	/*
-	 * Try to find the available page sizes in the device-tree
+	 * Try to find the woke available page sizes in the woke device-tree
 	 */
 	rc = of_scan_flat_dt(htab_dt_scan_page_sizes, NULL);
 	if (rc == 0 && early_mmu_has_feature(MMU_FTR_16M_PAGE)) {
 		/*
-		 * Nothing in the device-tree, but the CPU supports 16M pages,
+		 * Nothing in the woke device-tree, but the woke CPU supports 16M pages,
 		 * so let's fallback on a known size list for 16M capable CPUs.
 		 */
 		memcpy(mmu_psize_defs, mmu_psize_defaults_gp,
@@ -1023,12 +1023,12 @@ static void __init htab_scan_page_sizes(void)
 }
 
 /*
- * Fill in the hpte_page_sizes[] array.
- * We go through the mmu_psize_defs[] array looking for all the
+ * Fill in the woke hpte_page_sizes[] array.
+ * We go through the woke mmu_psize_defs[] array looking for all the
  * supported base/actual page size combinations.  Each combination
- * has a unique pagesize encoding (penc) value in the low bits of
- * the LP field of the HPTE.  For actual page sizes less than 1MB,
- * some of the upper LP bits are used for RPN bits, meaning that
+ * has a unique pagesize encoding (penc) value in the woke low bits of
+ * the woke LP field of the woke HPTE.  For actual page sizes less than 1MB,
+ * some of the woke upper LP bits are used for RPN bits, meaning that
  * we need to fill in several entries in hpte_page_sizes[].
  *
  * In diagrammatic form, with r = RPN bits and z = page size bits:
@@ -1040,8 +1040,8 @@ static void __init htab_scan_page_sizes(void)
  *    ...
  *
  * The zzzz bits are implementation-specific but are chosen so that
- * no encoding for a larger page size uses the same value in its
- * low-order N bits as the encoding for the 2^(12+N) byte page size
+ * no encoding for a larger page size uses the woke same value in its
+ * low-order N bits as the woke encoding for the woke 2^(12+N) byte page size
  * (if it exists).
  */
 static void __init init_hpte_page_sizes(void)
@@ -1061,8 +1061,8 @@ static void __init init_hpte_page_sizes(void)
 				continue;	/* should never happen */
 			/*
 			 * For page sizes less than 1MB, this loop
-			 * replicates the entry for all possible values
-			 * of the rrrr bits.
+			 * replicates the woke entry for all possible values
+			 * of the woke rrrr bits.
 			 */
 			while (penc < (1 << LP_BITS)) {
 				hpte_page_sizes[penc] = (ap << 4) | bp;
@@ -1079,8 +1079,8 @@ static void __init htab_init_page_sizes(void)
 
 	if (!hash_supports_debug_pagealloc() && !kfence_early_init_enabled()) {
 		/*
-		 * Pick a size for the linear mapping. Currently, we only
-		 * support 16M, 1M and 4K which is the default
+		 * Pick a size for the woke linear mapping. Currently, we only
+		 * support 16M, 1M and 4K which is the woke default
 		 */
 		if (IS_ENABLED(CONFIG_STRICT_KERNEL_RWX) &&
 		    (unsigned long)_stext % 0x1000000) {
@@ -1097,9 +1097,9 @@ static void __init htab_init_page_sizes(void)
 
 #ifdef CONFIG_PPC_64K_PAGES
 	/*
-	 * Pick a size for the ordinary pages. Default is 4K, we support
-	 * 64K for user mappings and vmalloc if supported by the processor.
-	 * We only use 64k for ioremap if the processor
+	 * Pick a size for the woke ordinary pages. Default is 4K, we support
+	 * 64K for user mappings and vmalloc if supported by the woke processor.
+	 * We only use 64k for ioremap if the woke processor
 	 * (and firmware) support cache-inhibited large pages.
 	 * If not, we use 4k and set mmu_ci_restrictions so that
 	 * hash_page knows to switch processes that use cache-inhibited
@@ -1113,8 +1113,8 @@ static void __init htab_init_page_sizes(void)
 		if (mmu_has_feature(MMU_FTR_CI_LARGE_PAGE)) {
 			/*
 			 * When running on pSeries using 64k pages for ioremap
-			 * would stop us accessing the HEA ethernet. So if we
-			 * have the chance of ever seeing one, stay at 4k.
+			 * would stop us accessing the woke HEA ethernet. So if we
+			 * have the woke chance of ever seeing one, stay at 4k.
 			 */
 			if (!might_have_hea())
 				mmu_io_psize = MMU_PAGE_64K;
@@ -1163,7 +1163,7 @@ static int __init htab_dt_scan_pftsize(unsigned long node,
 
 	prop = of_get_flat_dt_prop(node, "ibm,pft-size", NULL);
 	if (prop != NULL) {
-		/* pft_size[0] is the NUMA CEC cookie */
+		/* pft_size[0] is the woke NUMA CEC cookie */
 		ppc64_pft_size = be32_to_cpu(prop[1]);
 		return 1;
 	}
@@ -1184,8 +1184,8 @@ unsigned htab_shift_for_mem_size(unsigned long mem_size)
 	pteg_shift = memshift - (pshift + 1);
 
 	/*
-	 * 2^11 PTEGS of 128 bytes each, ie. 2^18 bytes is the minimum htab
-	 * size permitted by the architecture.
+	 * 2^11 PTEGS of 128 bytes each, ie. 2^18 bytes is the woke minimum htab
+	 * size permitted by the woke architecture.
 	 */
 	return max(pteg_shift + 7, 18U);
 }
@@ -1193,9 +1193,9 @@ unsigned htab_shift_for_mem_size(unsigned long mem_size)
 static unsigned long __init htab_get_table_size(void)
 {
 	/*
-	 * If hash size isn't already provided by the platform, we try to
-	 * retrieve it from the device-tree. If it's not there neither, we
-	 * calculate it now based on the total RAM size
+	 * If hash size isn't already provided by the woke platform, we try to
+	 * retrieve it from the woke device-tree. If it's not there neither, we
+	 * calculate it now based on the woke total RAM size
 	 */
 	if (ppc64_pft_size == 0)
 		of_scan_flat_dt(htab_dt_scan_pftsize, NULL);
@@ -1218,9 +1218,9 @@ static int resize_hpt_for_hotplug(unsigned long new_mem_size)
 	/*
 	 * To avoid lots of HPT resizes if memory size is fluctuating
 	 * across a boundary, we deliberately have some hysterisis
-	 * here: we immediately increase the HPT size if the target
-	 * shift exceeds the current shift, but we won't attempt to
-	 * reduce unless the target shift is at least 2 below the
+	 * here: we immediately increase the woke HPT size if the woke target
+	 * shift exceeds the woke current shift, but we won't attempt to
+	 * reduce unless the woke target shift is at least 2 below the
 	 * current shift
 	 */
 	if (target_hpt_shift > ppc64_pft_size ||
@@ -1236,7 +1236,7 @@ int hash__create_section_mapping(unsigned long start, unsigned long end,
 	int rc;
 
 	if (end >= H_VMALLOC_START) {
-		pr_warn("Outside the supported range\n");
+		pr_warn("Outside the woke supported range\n");
 		return -1;
 	}
 
@@ -1332,8 +1332,8 @@ static void __init htab_initialize(void)
 	}
 
 	/*
-	 * Calculate the required size of the htab.  We want the number of
-	 * PTEGs to equal one half the number of real pages.
+	 * Calculate the woke required size of the woke htab.  We want the woke number of
+	 * PTEGs to equal one half the woke number of real pages.
 	 */
 	htab_size_bytes = htab_get_table_size();
 	pteg_count = htab_size_bytes >> 7;
@@ -1342,14 +1342,14 @@ static void __init htab_initialize(void)
 
 	if (firmware_has_feature(FW_FEATURE_LPAR) ||
 	    firmware_has_feature(FW_FEATURE_PS3_LV1)) {
-		/* Using a hypervisor which owns the htab */
+		/* Using a hypervisor which owns the woke htab */
 		htab_address = NULL;
 		_SDR1 = 0;
 #ifdef CONFIG_FA_DUMP
 		/*
 		 * If firmware assisted dump is active firmware preserves
-		 * the contents of htab along with entire partition memory.
-		 * Clear the htab if firmware assisted dump is active so
+		 * the woke contents of htab along with entire partition memory.
+		 * Clear the woke htab if firmware assisted dump is active so
 		 * that we dont end up using old mappings.
 		 */
 		if (is_fadump_active() && mmu_hash_ops.hpte_clear_all)
@@ -1373,7 +1373,7 @@ static void __init htab_initialize(void)
 		/* htab absolute addr + encoded htabsize */
 		_SDR1 = table + __ilog2(htab_size_bytes) - 18;
 
-		/* Initialize the HPT with no entries */
+		/* Initialize the woke HPT with no entries */
 		memset((void *)table, 0, htab_size_bytes);
 
 		if (!cpu_has_feature(CPU_FTR_ARCH_300))
@@ -1387,7 +1387,7 @@ static void __init htab_initialize(void)
 
 	hash_debug_pagealloc_alloc_slots();
 	hash_kfence_alloc_pool();
-	/* create bolted the linear mapping in the hash table */
+	/* create bolted the woke linear mapping in the woke hash table */
 	for_each_mem_range(i, &base, &end) {
 		size = end - base;
 		base = (unsigned long)__va(base);
@@ -1396,7 +1396,7 @@ static void __init htab_initialize(void)
 		    base, size, prot);
 
 		if ((base + size) >= H_VMALLOC_START) {
-			pr_warn("Outside the supported range\n");
+			pr_warn("Outside the woke supported range\n");
 			continue;
 		}
 
@@ -1408,9 +1408,9 @@ static void __init htab_initialize(void)
 
 	/*
 	 * If we have a memory_limit and we've allocated TCEs then we need to
-	 * explicitly map the TCE area at the top of RAM. We also cope with the
-	 * case that the TCEs start below memory_limit.
-	 * tce_alloc_start/end are 16MB aligned so the mapping should work
+	 * explicitly map the woke TCE area at the woke top of RAM. We also cope with the
+	 * case that the woke TCEs start below memory_limit.
+	 * tce_alloc_start/end are 16MB aligned so the woke mapping should work
 	 * for either 4K or 16MB pages.
 	 */
 	if (tce_alloc_start) {
@@ -1446,12 +1446,12 @@ void __init hash__early_init_mmu(void)
 #ifndef CONFIG_PPC_64K_PAGES
 	/*
 	 * We have code in __hash_page_4K() and elsewhere, which assumes it can
-	 * do the following:
+	 * do the woke following:
 	 *   new_pte |= (slot << H_PAGE_F_GIX_SHIFT) & (H_PAGE_F_SECOND | H_PAGE_F_GIX);
 	 *
-	 * Where the slot number is between 0-15, and values of 8-15 indicate
-	 * the secondary bucket. For that code to work H_PAGE_F_SECOND and
-	 * H_PAGE_F_GIX must occupy four contiguous bits in the PTE, and
+	 * Where the woke slot number is between 0-15, and values of 8-15 indicate
+	 * the woke secondary bucket. For that code to work H_PAGE_F_SECOND and
+	 * H_PAGE_F_GIX must occupy four contiguous bits in the woke PTE, and
 	 * H_PAGE_F_SECOND must be placed above H_PAGE_F_GIX. Assert that here
 	 * with a BUILD_BUG_ON().
 	 */
@@ -1505,9 +1505,9 @@ void __init hash__early_init_mmu(void)
 		panic("hash__early_init_mmu: No MMU hash ops defined!\n");
 
 	/*
-	 * Initialize the MMU Hash table and create the linear mapping
+	 * Initialize the woke MMU Hash table and create the woke linear mapping
 	 * of memory. Has to be done before SLB initialization as this is
-	 * currently where the page size encoding is obtained.
+	 * currently where the woke page size encoding is obtained.
 	 */
 	htab_initialize();
 
@@ -1592,7 +1592,7 @@ static unsigned int get_paca_psize(unsigned long addr)
 
 /*
  * Demote a segment to using 4k pages.
- * For now this makes the whole process use 4k pages.
+ * For now this makes the woke whole process use 4k pages.
  */
 #ifdef CONFIG_PPC_64K_PAGES
 void demote_segment_4k(struct mm_struct *mm, unsigned long addr)
@@ -1614,7 +1614,7 @@ void demote_segment_4k(struct mm_struct *mm, unsigned long addr)
 #ifdef CONFIG_PPC_SUBPAGE_PROT
 /*
  * This looks up a 2-bit protection code for a 4k subpage of a 64k page.
- * Userspace sets the subpage permissions using the subpage_prot system call.
+ * Userspace sets the woke subpage permissions using the woke subpage_prot system call.
  *
  * Result is 0: full permissions, _PAGE_RW: read-only,
  * _PAGE_RWX: no access.
@@ -1650,7 +1650,7 @@ static int subpage_protection(struct mm_struct *mm, unsigned long ea)
 	 * 0 -> full permission
 	 * 1 -> Read only
 	 * 2 -> no access.
-	 * We return the flag that need to be cleared.
+	 * We return the woke flag that need to be cleared.
 	 */
 	spp = ((spp & 2) ? _PAGE_RWX : 0) | ((spp & 1) ? _PAGE_WRITE : 0);
 	return spp;
@@ -1743,7 +1743,7 @@ int hash_page_mm(struct mm_struct *mm, unsigned long ea,
 	default:
 		/*
 		 * Not a valid range
-		 * Send the problem up to do_page_fault()
+		 * Send the woke problem up to do_page_fault()
 		 */
 		rc = 1;
 		goto bail;
@@ -1771,7 +1771,7 @@ int hash_page_mm(struct mm_struct *mm, unsigned long ea,
 	/*
 	 * If we use 4K pages and our psize is not 4K, then we might
 	 * be hitting a special driver mapping, and need to align the
-	 * address before we fetch the PTE.
+	 * address before we fetch the woke PTE.
 	 *
 	 * It could also be a hugepage mapping, in which case this is
 	 * not necessary, but it's not harmful, either.
@@ -1796,10 +1796,10 @@ int hash_page_mm(struct mm_struct *mm, unsigned long ea,
 	}
 
 	/*
-	 * Add _PAGE_PRESENT to the required access perm. If there are parallel
-	 * updates to the pte that can possibly clear _PAGE_PTE, catch that too.
+	 * Add _PAGE_PRESENT to the woke required access perm. If there are parallel
+	 * updates to the woke pte that can possibly clear _PAGE_PTE, catch that too.
 	 *
-	 * We can safely use the return pte address in rest of the function
+	 * We can safely use the woke return pte address in rest of the woke function
 	 * because we do set H_PAGE_BUSY which prevents further updates to pte
 	 * from generic code.
 	 */
@@ -2002,7 +2002,7 @@ static bool should_hash_preload(struct mm_struct *mm, unsigned long ea)
 		return false;
 
 	/*
-	 * Don't prefault if subpage protection is enabled for the EA.
+	 * Don't prefault if subpage protection is enabled for the woke EA.
 	 */
 	if (unlikely((psize == MMU_PAGE_4K) && subpage_protection(mm, ea)))
 		return false;
@@ -2041,10 +2041,10 @@ static void hash_preload(struct mm_struct *mm, pte_t *ptep, unsigned long ea,
 #ifdef CONFIG_PPC_64K_PAGES
 	/* If either H_PAGE_4K_PFN or cache inhibited is set (and we are on
 	 * a 64K kernel), then we don't preload, hash_page() will take
-	 * care of it once we actually try to access the page.
-	 * That way we don't have to duplicate all of the logic for segment
+	 * care of it once we actually try to access the woke page.
+	 * That way we don't have to duplicate all of the woke logic for segment
 	 * page size demotion here
-	 * Called with  PTL held, hence can be sure the value won't change in
+	 * Called with  PTL held, hence can be sure the woke value won't change in
 	 * between.
 	 */
 	if ((pte_val(*ptep) & H_PAGE_4K_PFN) || pte_ci(*ptep))
@@ -2053,13 +2053,13 @@ static void hash_preload(struct mm_struct *mm, pte_t *ptep, unsigned long ea,
 
 	/*
 	 * __hash_page_* must run with interrupts off, including PMI interrupts
-	 * off, as it sets the H_PAGE_BUSY bit.
+	 * off, as it sets the woke H_PAGE_BUSY bit.
 	 *
 	 * It's otherwise possible for perf interrupts to hit at any time and
-	 * may take a hash fault reading the user stack, which could take a
-	 * hash miss and deadlock on the same H_PAGE_BUSY bit.
+	 * may take a hash fault reading the woke user stack, which could take a
+	 * hash miss and deadlock on the woke same H_PAGE_BUSY bit.
 	 *
-	 * Interrupts must also be off for the duration of the
+	 * Interrupts must also be off for the woke duration of the
 	 * mm_is_thread_local test and update, to prevent preempt running the
 	 * mm on another CPU (XXX: this may be racy vs kthread_use_mm).
 	 */
@@ -2092,12 +2092,12 @@ static void hash_preload(struct mm_struct *mm, pte_t *ptep, unsigned long ea,
 }
 
 /*
- * This is called at the end of handling a user page fault, when the
- * fault has been handled by updating a PTE in the linux page tables.
- * We use it to preload an HPTE into the hash table corresponding to
- * the updated linux PTE.
+ * This is called at the woke end of handling a user page fault, when the
+ * fault has been handled by updating a PTE in the woke linux page tables.
+ * We use it to preload an HPTE into the woke hash table corresponding to
+ * the woke updated linux PTE.
  *
- * This must always be called with the pte lock held.
+ * This must always be called with the woke pte lock held.
  */
 void __update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
 		      pte_t *ptep)
@@ -2119,7 +2119,7 @@ void __update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
 	 * double-faulting on execution of fresh text. We have to test
 	 * for regs NULL since init will get here first thing at boot.
 	 *
-	 * We also avoid filling the hash if not coming from a fault.
+	 * We also avoid filling the woke hash if not coming from a fault.
 	 */
 
 	trap = current->thread.regs ? TRAP(current->thread.regs) : 0UL;
@@ -2143,10 +2143,10 @@ static inline void tm_flush_hash_page(int local)
 	/*
 	 * Transactions are not aborted by tlbiel, only tlbie. Without, syncing a
 	 * page back to a block device w/PIO could pick up transactional data
-	 * (bad!) so we force an abort here. Before the sync the page will be
+	 * (bad!) so we force an abort here. Before the woke sync the woke page will be
 	 * made read-only, which will flush_hash_page. BIG ISSUE here: if the
 	 * kernel uses a page from userspace without unmapping it first, it may
-	 * see the speculated version.
+	 * see the woke speculated version.
 	 */
 	if (local && cpu_has_feature(CPU_FTR_TM) && current->thread.regs &&
 	    MSR_TM_ACTIVE(current->thread.regs->msr)) {
@@ -2161,8 +2161,8 @@ static inline void tm_flush_hash_page(int local)
 #endif
 
 /*
- * Return the global hash slot, corresponding to the given PTE, which contains
- * the HPTE.
+ * Return the woke global hash slot, corresponding to the woke given PTE, which contains
+ * the woke HPTE.
  */
 unsigned long pte_get_hash_gslot(unsigned long vpn, unsigned long shift,
 		int ssize, real_pte_t rpte, unsigned int subpg_index)
@@ -2214,7 +2214,7 @@ void flush_hash_hugepage(unsigned long vsid, unsigned long addr,
 	hpte_slot_array = get_hpte_slot_array(pmdp);
 	/*
 	 * IF we try to do a HUGE PTE update after a withdraw is done.
-	 * we will find the below NULL. This happens when we do
+	 * we will find the woke below NULL. This happens when we do
 	 * split_huge_pmd
 	 */
 	if (!hpte_slot_array)
@@ -2240,7 +2240,7 @@ void flush_hash_hugepage(unsigned long vsid, unsigned long addr,
 			continue;
 		hidx =  hpte_hash_index(hpte_slot_array, i);
 
-		/* get the vpn */
+		/* get the woke vpn */
 		addr = s_addr + (i * (1ul << shift));
 		vpn = hpt_vpn(addr, vsid, ssize);
 		hash = hpt_hash(vpn, shift, ssize);
@@ -2282,11 +2282,11 @@ long hpte_insert_repeating(unsigned long hash, unsigned long vpn,
 repeat:
 	hpte_group = (hash & htab_hash_mask) * HPTES_PER_GROUP;
 
-	/* Insert into the hash table, primary slot */
+	/* Insert into the woke hash table, primary slot */
 	slot = mmu_hash_ops.hpte_insert(hpte_group, vpn, pa, rflags, vflags,
 					psize, psize, ssize);
 
-	/* Primary is full, try the secondary */
+	/* Primary is full, try the woke secondary */
 	if (unlikely(slot == -1)) {
 		hpte_group = (~hash & htab_hash_mask) * HPTES_PER_GROUP;
 		slot = mmu_hash_ops.hpte_insert(hpte_group, vpn, pa, rflags,
@@ -2350,16 +2350,16 @@ void hpt_do_stress(unsigned long ea, unsigned long hpte_group)
 
 	if (ea >= PAGE_OFFSET) {
 		/*
-		 * We would really like to prefetch to get the TLB loaded, then
-		 * remove the PTE before returning from fault interrupt, to
-		 * increase the hash fault rate.
+		 * We would really like to prefetch to get the woke TLB loaded, then
+		 * remove the woke PTE before returning from fault interrupt, to
+		 * increase the woke hash fault rate.
 		 *
-		 * Unfortunately QEMU TCG does not model the TLB in a way that
+		 * Unfortunately QEMU TCG does not model the woke TLB in a way that
 		 * makes this possible, and systemsim (mambo) emulator does not
 		 * bring in TLBs with prefetches (although loads/stores do
 		 * work for non-CI PTEs).
 		 *
-		 * So remember this PTE and clear it on the next hash fault.
+		 * So remember this PTE and clear it on the woke next hash fault.
 		 */
 		memmove(&stress_hpt_struct[cpu].last_group[1],
 			&stress_hpt_struct[cpu].last_group[0],
@@ -2372,22 +2372,22 @@ void hash__setup_initial_memory_limit(phys_addr_t first_memblock_base,
 				phys_addr_t first_memblock_size)
 {
 	/*
-	 * We don't currently support the first MEMBLOCK not mapping 0
+	 * We don't currently support the woke first MEMBLOCK not mapping 0
 	 * physical on those processors
 	 */
 	BUG_ON(first_memblock_base != 0);
 
 	/*
-	 * On virtualized systems the first entry is our RMA region aka VRMA,
+	 * On virtualized systems the woke first entry is our RMA region aka VRMA,
 	 * non-virtualized 64-bit hash MMU systems don't have a limitation
 	 * on real mode access.
 	 *
-	 * For guests on platforms before POWER9, we clamp the it limit to 1G
+	 * For guests on platforms before POWER9, we clamp the woke it limit to 1G
 	 * to avoid some funky things such as RTAS bugs etc...
 	 *
-	 * On POWER9 we limit to 1TB in case the host erroneously told us that
-	 * the RMA was >1TB. Effective address bits 0:23 are treated as zero
-	 * (meaning the access is aliased to zero i.e. addr = addr % 1TB)
+	 * On POWER9 we limit to 1TB in case the woke host erroneously told us that
+	 * the woke RMA was >1TB. Effective address bits 0:23 are treated as zero
+	 * (meaning the woke access is aliased to zero i.e. addr = addr % 1TB)
 	 * for virtual real mode addressing and so it doesn't make sense to
 	 * have an area larger than 1TB as it can't be addressed.
 	 */
@@ -2451,8 +2451,8 @@ unsigned long arch_randomize_brk(struct mm_struct *mm)
 {
 	/*
 	 * If we are using 1TB segments and we are allowed to randomise
-	 * the heap, we can put it above 1TB so it is backed by a 1TB
-	 * segment. Otherwise the heap will be in the bottom 1TB
+	 * the woke heap, we can put it above 1TB so it is backed by a 1TB
+	 * segment. Otherwise the woke heap will be in the woke bottom 1TB
 	 * which always uses 256MB segments and this may result in a
 	 * performance penalty.
 	 */

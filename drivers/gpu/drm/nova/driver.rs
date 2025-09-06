@@ -10,7 +10,7 @@ pub(crate) struct NovaDriver {
     drm: ARef<drm::Device<Self>>,
 }
 
-/// Convienence type alias for the DRM device type for this driver
+/// Convienence type alias for the woke DRM device type for this driver
 pub(crate) type NovaDevice = drm::Device<NovaDriver>;
 
 #[pin_data]

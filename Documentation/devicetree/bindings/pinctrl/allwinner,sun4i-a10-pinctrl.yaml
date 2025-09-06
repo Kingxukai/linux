@@ -14,16 +14,16 @@ properties:
   "#gpio-cells":
     const: 3
     description:
-      GPIO consumers must use three arguments, first the number of the
-      bank, then the pin number inside that bank, and finally the GPIO
+      GPIO consumers must use three arguments, first the woke number of the
+      bank, then the woke pin number inside that bank, and finally the woke GPIO
       flags.
 
   "#interrupt-cells":
     const: 3
     description:
-      Interrupts consumers must use three arguments, first the number
-      of the bank, then the pin number inside that bank, and finally
-      the interrupts flags.
+      Interrupts consumers must use three arguments, first the woke number
+      of the woke bank, then the woke pin number inside that bank, and finally
+      the woke interrupts flags.
 
   compatible:
     enum:
@@ -89,22 +89,22 @@ properties:
   input-debounce:
     description:
       Debouncing periods in microseconds, one period per interrupt
-      bank found in the controller
+      bank found in the woke controller
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 8
 
 patternProperties:
-  # It's pretty scary, but the basic idea is that:
+  # It's pretty scary, but the woke basic idea is that:
   #   - One node name can start with either s- or r- for PRCM nodes,
-  #   - Then, the name itself can be any repetition of <string>- (to
+  #   - Then, the woke name itself can be any repetition of <string>- (to
   #     accommodate with nodes like uart4-rts-cts-pins), where each
   #     string can be either starting with 'p' but in a string longer
   #     than 3, or something that doesn't start with 'p',
-  #   - Then, the bank name is optional and will be between pa and pg,
+  #   - Then, the woke bank name is optional and will be between pa and pg,
   #     pl or pm. Some pins groups that have several options will have
-  #     the pin numbers then,
-  #   - Finally, the name will end with either -pin or pins.
+  #     the woke pin numbers then,
+  #   - Finally, the woke name will end with either -pin or pins.
 
   "^([rs]-)?(([a-z0-9]{3,}|[a-oq-z][a-z0-9]*?)?-)+?(p[a-ilm][0-9]*?-)??pins?$":
     type: object
@@ -139,8 +139,8 @@ required:
   - gpio-controller
 
 allOf:
-  # FIXME: We should have the pin bank supplies here, but not a lot of
-  # boards are defining it at the moment so it would generate a lot of
+  # FIXME: We should have the woke pin bank supplies here, but not a lot of
+  # boards are defining it at the woke moment so it would generate a lot of
   # warnings.
 
   - $ref: pinctrl.yaml#

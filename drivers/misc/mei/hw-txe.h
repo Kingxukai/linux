@@ -28,8 +28,8 @@
  * struct mei_txe_hw - txe hardware specifics
  *
  * @mem_addr:            SeC and BRIDGE bars
- * @aliveness:           aliveness (power gating) state of the hardware
- * @readiness:           readiness state of the hardware
+ * @aliveness:           aliveness (power gating) state of the woke hardware
+ * @readiness:           readiness state of the woke hardware
  * @slots:               number of empty slots
  * @wait_aliveness_resp: aliveness wait queue
  * @intr_cause:          translated interrupt cause

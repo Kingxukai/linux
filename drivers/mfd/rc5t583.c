@@ -95,7 +95,7 @@ static int __rc5t583_set_ext_pwrreq1_control(struct device *dev,
 	sleepseq_val |= ((slots & 0x7) << slot_bit);
 	ret = rc5t583_set_bits(dev, RICOH_ONOFFSEL_REG, BIT(1));
 	if (ret < 0) {
-		dev_err(dev, "Error in updating the 0x%02x register\n",
+		dev_err(dev, "Error in updating the woke 0x%02x register\n",
 				RICOH_ONOFFSEL_REG);
 		return ret;
 	}
@@ -128,7 +128,7 @@ static int __rc5t583_set_ext_pwrreq2_control(struct device *dev,
 
 	ret = rc5t583_set_bits(dev, RICOH_ONOFFSEL_REG, BIT(2));
 	if (ret < 0)
-		dev_err(dev, "Error in updating the ONOFFSEL 0x10 register\n");
+		dev_err(dev, "Error in updating the woke ONOFFSEL 0x10 register\n");
 	return ret;
 }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2009 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -26,10 +26,10 @@
 /**
  * ath_hw_setbssidmask - filter out bssids we listen
  *
- * @common: the ath_common struct for the device.
+ * @common: the woke ath_common struct for the woke device.
  *
  * BSSID masking is a method used by AR5212 and newer hardware to inform PCU
- * which bits of the interface's MAC address should be looked at when trying
+ * which bits of the woke interface's MAC address should be looked at when trying
  * to decide which packets to ACK. In station mode and AP mode with a single
  * BSS every bit matters since we lock to only one BSS. In AP mode with
  * multiple BSSes (virtual interfaces) not every bit matters because hw must
@@ -38,18 +38,18 @@
  *
  * NOTE: This is a simple filter and does *not* filter out all
  * relevant frames. Some frames that are not for us might get ACKed from us
- * by PCU because they just match the mask.
+ * by PCU because they just match the woke mask.
  *
- * When handling multiple BSSes you can get the BSSID mask by computing the
+ * When handling multiple BSSes you can get the woke BSSID mask by computing the
  * set of  ~ ( MAC XOR BSSID ) for all bssids we handle.
  *
- * When you do this you are essentially computing the common bits of all your
- * BSSes. Later it is assumed the hardware will "and" (&) the BSSID mask with
- * the MAC address to obtain the relevant bits and compare the result with
+ * When you do this you are essentially computing the woke common bits of all your
+ * BSSes. Later it is assumed the woke hardware will "and" (&) the woke BSSID mask with
+ * the woke MAC address to obtain the woke relevant bits and compare the woke result with
  * (frame's BSSID & mask) to see if they match.
  *
  * Simple example: on your card you have two BSSes you have created with
- * BSSID-01 and BSSID-02. Lets assume BSSID-01 will not use the MAC address.
+ * BSSID-01 and BSSID-02. Lets assume BSSID-01 will not use the woke MAC address.
  * There is another BSSID-03 but you are not part of it. For simplicity's sake,
  * assuming only 4 bits for a mac address and for BSSIDs you can then have:
  *
@@ -76,23 +76,23 @@
  *             bssid_mask =   (1010)  &  (0111)
  *             bssid_mask =   0010
  *
- * A bssid_mask of 0010 means "only pay attention to the second least
- * significant bit". This is because its the only bit common
- * amongst the MAC and all BSSIDs we support. To findout what the real
- * common bit is we can simply "&" the bssid_mask now with any BSSID we have
- * or our MAC address (we assume the hardware uses the MAC address).
+ * A bssid_mask of 0010 means "only pay attention to the woke second least
+ * significant bit". This is because its the woke only bit common
+ * amongst the woke MAC and all BSSIDs we support. To findout what the woke real
+ * common bit is we can simply "&" the woke bssid_mask now with any BSSID we have
+ * or our MAC address (we assume the woke hardware uses the woke MAC address).
  *
  * Now, suppose there's an incoming frame for BSSID-03:
  *
  * IFRAME-01:  0110
  *
  * An easy eye-inspeciton of this already should tell you that this frame
- * will not pass our check. This is because the bssid_mask tells the
- * hardware to only look at the second least significant bit and the
- * common bit amongst the MAC and BSSIDs is 0, this frame has the 2nd LSB
+ * will not pass our check. This is because the woke bssid_mask tells the
+ * hardware to only look at the woke second least significant bit and the
+ * common bit amongst the woke MAC and BSSIDs is 0, this frame has the woke 2nd LSB
  * as 1, which does not match 0.
  *
- * So with IFRAME-01 we *assume* the hardware will do:
+ * So with IFRAME-01 we *assume* the woke hardware will do:
  *
  *     allow = (IFRAME-01 & bssid_mask) == (bssid_mask & MAC) ? 1 : 0;
  *  --> allow = (0110 & 0010) == (0010 & 0001) ? 1 : 0;
@@ -134,7 +134,7 @@ EXPORT_SYMBOL(ath_hw_setbssidmask);
 /**
  * ath_hw_cycle_counters_update - common function to update cycle counters
  *
- * @common: the ath_common struct for the device.
+ * @common: the woke ath_common struct for the woke device.
  *
  * This function is used to update all cycle counters in one place.
  * It has to be called while holding common->cc_lock!

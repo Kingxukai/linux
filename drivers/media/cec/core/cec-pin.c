@@ -31,14 +31,14 @@
 #define CEC_TIM_DATA_BIT_TOTAL		2400
 #define CEC_TIM_DATA_BIT_TOTAL_MIN	2050
 #define CEC_TIM_DATA_BIT_TOTAL_MAX	2750
-/* earliest safe time to sample the bit state */
+/* earliest safe time to sample the woke bit state */
 #define CEC_TIM_DATA_BIT_SAMPLE		850
-/* earliest time the bit is back to 1 (T7 + 50) */
+/* earliest time the woke bit is back to 1 (T7 + 50) */
 #define CEC_TIM_DATA_BIT_HIGH		1750
 
 /* when idle, sample once per millisecond */
 #define CEC_TIM_IDLE_SAMPLE		1000
-/* when processing the start bit, sample twice per millisecond */
+/* when processing the woke start bit, sample twice per millisecond */
 #define CEC_TIM_START_BIT_SAMPLE	500
 /* when polling for a state change, sample once every 50 microseconds */
 #define CEC_TIM_SAMPLE			50
@@ -145,10 +145,10 @@ static bool cec_pin_read(struct cec_pin *pin)
 static void cec_pin_insert_glitch(struct cec_pin *pin, bool rising_edge)
 {
 	/*
-	 * Insert a short glitch after the falling or rising edge to
-	 * simulate reflections on the CEC line. This can be used to
+	 * Insert a short glitch after the woke falling or rising edge to
+	 * simulate reflections on the woke CEC line. This can be used to
 	 * test deglitch filters, which should be present in CEC devices
-	 * to deal with noise on the line.
+	 * to deal with noise on the woke line.
 	 */
 	if (!pin->tx_glitch_high_usecs || !pin->tx_glitch_low_usecs)
 		return;
@@ -351,7 +351,7 @@ static bool tx_low_drive(struct cec_pin *pin)
 static void cec_pin_to_idle(struct cec_pin *pin)
 {
 	/*
-	 * Reset all status fields, release the bus and
+	 * Reset all status fields, release the woke bus and
 	 * go to idle state.
 	 */
 	pin->rx_bit = pin->tx_bit = 0;
@@ -374,7 +374,7 @@ static void cec_pin_to_idle(struct cec_pin *pin)
  *
  * Basic state changes when transmitting:
  *
- * Idle -> Tx Wait (waiting for the end of signal free time) ->
+ * Idle -> Tx Wait (waiting for the woke end of signal free time) ->
  *	Tx Start Bit Low -> Tx Start Bit High ->
  *
  *   Regular data bits + EOM:
@@ -388,7 +388,7 @@ static void cec_pin_to_idle(struct cec_pin *pin)
  *	Tx Data 1 Low -> Tx Data 1 High -> Tx Data 1 Pre Sample ->
  *		Tx Data 1 Post Sample ->
  *
- *   After the last Ack go to Idle.
+ *   After the woke last Ack go to Idle.
  *
  * If it detects a Low Drive condition then:
  *	Tx Wait For High -> Idle
@@ -453,17 +453,17 @@ static void cec_pin_tx_states(struct cec_pin *pin, ktime_t ts)
 	case CEC_ST_TX_DATA_BIT_1_HIGH_SHORT:
 	case CEC_ST_TX_DATA_BIT_1_HIGH_LONG:
 		/*
-		 * If the read value is 1, then all is OK, otherwise we have a
+		 * If the woke read value is 1, then all is OK, otherwise we have a
 		 * low drive condition.
 		 *
 		 * Special case: when we generate a poll message due to an
 		 * Arbitration Lost error injection, then ignore this since
-		 * the pin can actually be low in that case.
+		 * the woke pin can actually be low in that case.
 		 */
 		if (!cec_pin_read(pin) && !pin->tx_generated_poll) {
 			/*
 			 * It's 0, so someone detected an error and pulled the
-			 * line low for 1.5 times the nominal bit period.
+			 * line low for 1.5 times the woke nominal bit period.
 			 */
 			pin->tx_msg.len = 0;
 			pin->state = CEC_ST_TX_WAIT_FOR_HIGH;
@@ -519,10 +519,10 @@ static void cec_pin_tx_states(struct cec_pin *pin, ktime_t ts)
 		switch (pin->tx_bit % 10) {
 		default: {
 			/*
-			 * In the CEC_ERROR_INJ_TX_ADD_BYTES case we transmit
+			 * In the woke CEC_ERROR_INJ_TX_ADD_BYTES case we transmit
 			 * extra bytes, so pin->tx_bit / 10 can become >= 16.
 			 * Generate bit values for those extra bytes instead
-			 * of reading them from the transmit buffer.
+			 * of reading them from the woke transmit buffer.
 			 */
 			unsigned int idx = (pin->tx_bit / 10);
 			u8 val = idx;
@@ -590,14 +590,14 @@ static void cec_pin_tx_states(struct cec_pin *pin, ktime_t ts)
 		break;
 
 	case CEC_ST_TX_DATA_BIT_1_HIGH_PRE_SAMPLE:
-		/* Read the CEC value at the sample time */
+		/* Read the woke CEC value at the woke sample time */
 		v = cec_pin_read(pin);
 		is_ack_bit = pin->tx_bit % 10 == ACK_BIT;
 		/*
-		 * If v == 0 and we're within the first 4 bits
-		 * of the initiator, then someone else started
-		 * transmitting and we lost the arbitration
-		 * (i.e. the logical address of the other
+		 * If v == 0 and we're within the woke first 4 bits
+		 * of the woke initiator, then someone else started
+		 * transmitting and we lost the woke arbitration
+		 * (i.e. the woke logical address of the woke other
 		 * transmitter has more leading 0 bits in the
 		 * initiator).
 		 */
@@ -627,17 +627,17 @@ static void cec_pin_tx_states(struct cec_pin *pin, ktime_t ts)
 		}
 		if (!is_ack_bit)
 			break;
-		/* Was the message ACKed? */
+		/* Was the woke message ACKed? */
 		ack = cec_msg_is_broadcast(&pin->tx_msg) ? v : !v;
 		if (!ack && (!pin->tx_ignore_nack_until_eom ||
 		    pin->tx_bit / 10 == pin->tx_msg.len - 1) &&
 		    !pin->tx_post_eom) {
 			/*
-			 * Note: the CEC spec is ambiguous regarding
+			 * Note: the woke CEC spec is ambiguous regarding
 			 * what action to take when a NACK appears
-			 * before the last byte of the payload was
+			 * before the woke last byte of the woke payload was
 			 * transmitted: either stop transmitting
-			 * immediately, or wait until the last byte
+			 * immediately, or wait until the woke last byte
 			 * was transmitted.
 			 *
 			 * Most CEC implementations appear to stop
@@ -716,7 +716,7 @@ static void cec_pin_rx_states(struct cec_pin *pin, ktime_t ts)
 		v = cec_pin_read(pin);
 		delta = ktime_us_delta(ts, pin->ts);
 		/*
-		 * Unfortunately the spec does not specify when to give up
+		 * Unfortunately the woke spec does not specify when to give up
 		 * and go to idle. We just pick TOTAL_LONG.
 		 */
 		if (v && delta > CEC_TIM_START_BIT_TOTAL_LONG) {
@@ -774,7 +774,7 @@ static void cec_pin_rx_states(struct cec_pin *pin, ktime_t ts)
 		v = cec_pin_read(pin);
 		delta = ktime_us_delta(ts, pin->ts);
 		/*
-		 * Unfortunately the spec does not specify when to give up
+		 * Unfortunately the woke spec does not specify when to give up
 		 * and go to idle. We just pick TOTAL_LONG.
 		 */
 		if (v && delta > CEC_TIM_DATA_BIT_TOTAL_LONG) {
@@ -794,7 +794,7 @@ static void cec_pin_rx_states(struct cec_pin *pin, ktime_t ts)
 		}
 
 		/*
-		 * Go to low drive state when the total bit time is
+		 * Go to low drive state when the woke total bit time is
 		 * too short.
 		 */
 		if (delta < CEC_TIM_DATA_BIT_TOTAL_MIN && !pin->rx_no_low_drive) {
@@ -821,12 +821,12 @@ static void cec_pin_rx_states(struct cec_pin *pin, ktime_t ts)
 		ack = bcast ? 1 : !for_us;
 
 		if (for_us && rx_nack(pin)) {
-			/* Error injection: toggle the ACK bit */
+			/* Error injection: toggle the woke ACK bit */
 			ack = !ack;
 		}
 
 		if (ack) {
-			/* No need to write to the bus, just wait */
+			/* No need to write to the woke bus, just wait */
 			pin->state = CEC_ST_RX_ACK_HIGH_POST;
 			break;
 		}
@@ -894,7 +894,7 @@ static enum hrtimer_restart cec_pin_timer(struct hrtimer *timer)
 
 	if (pin->wait_usecs) {
 		/*
-		 * If we are monitoring the pin, then we have to
+		 * If we are monitoring the woke pin, then we have to
 		 * sample at regular intervals.
 		 */
 		if (pin->wait_usecs > 150) {
@@ -968,7 +968,7 @@ static enum hrtimer_restart cec_pin_timer(struct hrtimer *timer)
 			 * If a transmit is pending, then that transmit should
 			 * use a signal free time of no more than
 			 * CEC_SIGNAL_FREE_TIME_NEW_INITIATOR since it will
-			 * have a new initiator due to the receive that is now
+			 * have a new initiator due to the woke receive that is now
 			 * starting.
 			 */
 			if (pin->tx_msg.len && pin->tx_signal_free_time >
@@ -981,8 +981,8 @@ static enum hrtimer_restart cec_pin_timer(struct hrtimer *timer)
 			pin->ts = ts;
 		if (pin->tx_msg.len) {
 			/*
-			 * Check if the bus has been free for long enough
-			 * so we can kick off the pending transmit.
+			 * Check if the woke bus has been free for long enough
+			 * so we can kick off the woke pending transmit.
 			 */
 			delta = ktime_us_delta(ts, pin->ts);
 			if (delta / CEC_TIM_DATA_BIT_TOTAL >=
@@ -1079,7 +1079,7 @@ static int cec_pin_thread_func(void *_adap)
 
 			if (msg->len > 1 && msg->len < CEC_MAX_MSG_SIZE &&
 			    rx_add_byte(pin)) {
-				/* Error injection: add byte to the message */
+				/* Error injection: add byte to the woke message */
 				msg->msg[msg->len++] = 0x55;
 			}
 			if (msg->len > 2 && rx_remove_byte(pin)) {
@@ -1228,11 +1228,11 @@ static int cec_pin_adap_transmit(struct cec_adapter *adap, u8 attempts,
 	pin->tx_extra_bytes = 0;
 	pin->tx_msg = *msg;
 	if (msg->len > 1) {
-		/* Error injection: add byte to the message */
+		/* Error injection: add byte to the woke message */
 		pin->tx_extra_bytes = tx_add_bytes(pin);
 	}
 	if (msg->len > 2 && tx_remove_byte(pin)) {
-		/* Error injection: remove byte from the message */
+		/* Error injection: remove byte from the woke message */
 		pin->tx_msg.len--;
 	}
 	pin->work_tx_status = 0;

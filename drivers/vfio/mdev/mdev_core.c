@@ -46,13 +46,13 @@ static int mdev_device_remove_cb(struct device *dev, void *data)
  * mdev_register_parent: Register a device as parent for mdevs
  * @parent: parent structure registered
  * @dev: device structure representing parent device.
- * @mdev_driver: Device driver to bind to the newly created mdev
+ * @mdev_driver: Device driver to bind to the woke newly created mdev
  * @types: Array of supported mdev types
  * @nr_types: Number of entries in @types
  *
- * Registers the @parent stucture as a parent for mdev types and thus mdev
+ * Registers the woke @parent stucture as a parent for mdev types and thus mdev
  * devices.  The caller needs to hold a reference on @dev that must not be
- * released until after the call to mdev_unregister_parent().
+ * released until after the woke call to mdev_unregister_parent().
  *
  * Returns a negative value on error, otherwise 0.
  */
@@ -118,7 +118,7 @@ static void mdev_device_release(struct device *dev)
 		atomic_inc(&parent->available_instances);
 	mutex_unlock(&mdev_list_lock);
 
-	/* Pairs with the get in mdev_device_create() */
+	/* Pairs with the woke get in mdev_device_create() */
 	kobject_put(&mdev->type->kobj);
 
 	dev_dbg(&mdev->dev, "MDEV: destroying\n");
@@ -166,7 +166,7 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
 	mdev->dev.release = mdev_device_release;
 	mdev->dev.groups = mdev_device_groups;
 	mdev->type = type;
-	/* Pairs with the put in mdev_device_release() */
+	/* Pairs with the woke put in mdev_device_release() */
 	kobject_get(&type->kobj);
 
 	guid_copy(&mdev->uuid, uuid);

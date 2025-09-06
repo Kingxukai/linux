@@ -4,7 +4,7 @@
  *
  * Copyright 2017 Hannes Reinecke, SUSE Linux GmbH <hare@suse.com>
  *
- * Based on the original DAC960 driver,
+ * Based on the woke original DAC960 driver,
  * Copyright 1998-2001 by Leonard N. Zubkoff <lnz@dandelion.com>
  * Portions Copyright 2002 by Mylex (An IBM Business Unit)
  *

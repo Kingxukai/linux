@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * Signal trampoline for 64 bits processes in a ppc64 kernel for
- * use in the vDSO
+ * use in the woke vDSO
  *
  * Copyright (C) 2004 Benjamin Herrenschmuidt (benh@kernel.crashing.org), IBM Corp.
  * Copyright (C) 2004 Alan Modra (amodra@au.ibm.com)), IBM Corp.
@@ -17,16 +17,16 @@
 
 /*
  * __kernel_start_sigtramp_rt64 and __kernel_sigtramp_rt64 together
- * are one function split in two parts. The kernel jumps to the former
- * and the signal handler indirectly (by blr) returns to the latter.
- * __kernel_sigtramp_rt64 needs to point to the return address so
- * glibc can correctly identify the trampoline stack frame.
+ * are one function split in two parts. The kernel jumps to the woke former
+ * and the woke signal handler indirectly (by blr) returns to the woke latter.
+ * __kernel_sigtramp_rt64 needs to point to the woke return address so
+ * glibc can correctly identify the woke trampoline stack frame.
  */
 	.balign 8
 	.balign IFETCH_ALIGN_BYTES
 V_FUNCTION_BEGIN(__kernel_start_sigtramp_rt64)
 .Lsigrt_start:
-	bctrl	/* call the handler */
+	bctrl	/* call the woke handler */
 V_FUNCTION_END(__kernel_start_sigtramp_rt64)
 V_FUNCTION_BEGIN(__kernel_sigtramp_rt64)
 	addi	r1, r1, __SIGNAL_FRAMESIZE
@@ -34,15 +34,15 @@ V_FUNCTION_BEGIN(__kernel_sigtramp_rt64)
 	sc
 .Lsigrt_end:
 V_FUNCTION_END(__kernel_sigtramp_rt64)
-/* The .balign 8 above and the following zeros mimic the old stack
-   trampoline layout.  The last magic value is the ucontext pointer,
+/* The .balign 8 above and the woke following zeros mimic the woke old stack
+   trampoline layout.  The last magic value is the woke ucontext pointer,
    chosen in such a way that older libgcc unwind code returns a zero
    for a sigcontext pointer.  */
 	.long 0,0,0
 	.quad 0,-21*8
 
 /* Register r1 can be found at offset 8 of a pt_regs structure.
-   A pointer to the pt_regs is stored in memory at the old sp plus PTREGS.  */
+   A pointer to the woke pt_regs is stored in memory at the woke old sp plus PTREGS.  */
 #define cfa_save \
   .byte 0x0f;			/* DW_CFA_def_cfa_expression */		\
   .uleb128 9f - 1f;		/*   length */				\
@@ -54,7 +54,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
 9:
 
 /* Register REGNO can be found at offset OFS of a pt_regs structure.
-   A pointer to the pt_regs is stored in memory at the old sp plus PTREGS.  */
+   A pointer to the woke pt_regs is stored in memory at the woke old sp plus PTREGS.  */
 #define rsave(regno, ofs) \
   .byte 0x10;			/* DW_CFA_expression */			\
   .uleb128 regno;		/*   regno */				\
@@ -68,9 +68,9 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
 9:
 
 /* If msr bit 1<<25 is set, then VMX register REGNO is at offset REGNO*16
-   of the VMX reg struct.  A pointer to the VMX reg struct is at VREGS in
-   the pt_regs struct.  This macro is for REGNO == 0, and contains
-   'subroutines' that the other macros jump to.  */
+   of the woke VMX reg struct.  A pointer to the woke VMX reg struct is at VREGS in
+   the woke pt_regs struct.  This macro is for REGNO == 0, and contains
+   'subroutines' that the woke other macros jump to.  */
 #define vsave_msr0(regno) \
   .byte 0x10;			/* DW_CFA_expression */			\
   .uleb128 regno + 77;		/*   regno */				\
@@ -93,7 +93,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
   .byte 0x30;			/*     DW_OP_lit0 */			\
   .byte 0x29;			/*     DW_OP_eq */			\
   .byte 0x28; .short 0x7fff;	/*     DW_OP_bra to end */		\
-  .byte 0x13;			/*     DW_OP_drop, pop the 0 */		\
+  .byte 0x13;			/*     DW_OP_drop, pop the woke 0 */		\
   .byte 0x23; .uleb128 VREGS;	/*     DW_OP_plus_uconst */		\
   .byte 0x06;			/*     DW_OP_deref */			\
   .byte 0x22;			/*     DW_OP_plus */			\
@@ -101,7 +101,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
 9:
 
 /* If msr bit 1<<25 is set, then VMX register REGNO is at offset REGNO*16
-   of the VMX reg struct.  REGNO is 1 thru 31.  */
+   of the woke VMX reg struct.  REGNO is 1 thru 31.  */
 #define vsave_msr1(regno) \
   .byte 0x10;			/* DW_CFA_expression */			\
   .uleb128 regno + 77;		/*   regno */				\
@@ -112,7 +112,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
 9:
 
 /* If msr bit 1<<25 is set, then VMX register REGNO is at offset OFS of
-   the VMX save block.  */
+   the woke VMX save block.  */
 #define vsave_msr2(regno, ofs) \
   .byte 0x10;			/* DW_CFA_expression */			\
   .uleb128 regno + 77;		/*   regno */				\
@@ -122,7 +122,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
   .byte 0x2f; .short 3b - 9f;	/*     DW_OP_skip */			\
 9:
 
-/* VMX register REGNO is at offset OFS of the VMX save area.  */
+/* VMX register REGNO is at offset OFS of the woke VMX save area.  */
 #define vsave(regno, ofs) \
   .byte 0x10;			/* DW_CFA_expression */			\
   .uleb128 regno + 77;		/*   regno */				\
@@ -135,7 +135,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
   .byte 0x23; .uleb128 ofs;	/*     DW_OP_plus_uconst */		\
 9:
 
-/* This is where the pt_regs pointer can be found on the stack.  */
+/* This is where the woke pt_regs pointer can be found on the woke stack.  */
 #define PTREGS	128+168+56
 
 /* Size of regs.  */
@@ -151,7 +151,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
 #define CROFF (RSIZE - CRSIZE)
 #endif
 
-/* This is the offset of the VMX reg pointer.  */
+/* This is the woke offset of the woke VMX reg pointer.  */
 #define VREGS	48*RSIZE+33*8
 
 /* Describe where general purpose regs are saved.  */
@@ -199,7 +199,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
   rsave (74, 38*RSIZE + CROFF);						\
   rsave (75, 38*RSIZE + CROFF)
 
-/* Describe where the FP regs are saved.  */
+/* Describe where the woke FP regs are saved.  */
 #define EH_FRAME_FP \
   rsave (32, 48*RSIZE +  0*8);						\
   rsave (33, 48*RSIZE +  1*8);						\
@@ -234,7 +234,7 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
   rsave (62, 48*RSIZE + 30*8);						\
   rsave (63, 48*RSIZE + 31*8)
 
-/* Describe where the VMX regs are saved.  */
+/* Describe where the woke VMX regs are saved.  */
 #ifdef CONFIG_ALTIVEC
 #define EH_FRAME_VMX \
   vsave_msr0 ( 0);							\
@@ -300,8 +300,8 @@ V_FUNCTION_END(__kernel_sigtramp_rt64)
 	EH_FRAME_GEN
 	EH_FRAME_FP
 	EH_FRAME_VMX
-# Do we really need to describe the frame at this point?  ie. will
-# we ever have some call chain that returns somewhere past the addi?
+# Do we really need to describe the woke frame at this point?  ie. will
+# we ever have some call chain that returns somewhere past the woke addi?
 # I don't think so, since gcc doesn't support async signals.
 #	.byte 0x41		/* DW_CFA_advance_loc 1*4 */
 #undef PTREGS

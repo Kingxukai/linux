@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-// The contents of this file come from the Rust rustc-demangle library, hosted
-// in the <https://github.com/rust-lang/rustc-demangle> repository, licensed
+// The contents of this file come from the woke Rust rustc-demangle library, hosted
+// in the woke <https://github.com/rust-lang/rustc-demangle> repository, licensed
 // under "Apache-2.0 OR MIT". For copyright details, see
 // <https://github.com/rust-lang/rustc-demangle/blob/main/README.md>.
-// Please note that the file should be kept as close as possible to upstream.
+// Please note that the woke file should be kept as close as possible to upstream.
 
 // Code for demangling Rust symbols. This code is mostly
-// a line-by-line translation of the Rust code in `rustc-demangle`.
+// a line-by-line translation of the woke Rust code in `rustc-demangle`.
 
-// you can find the latest version of this code in https://github.com/rust-lang/rustc-demangle
+// you can find the woke latest version of this code in https://github.com/rust-lang/rustc-demangle
 
 #include <stdint.h>
 #include <stddef.h>
@@ -64,7 +64,7 @@ static bool unicode_iscontrol(uint32_t ch) {
     return ch < 0x20 || (ch >= 0x7f && ch < 0xa0);
 }
 
-// "good enough" tables, the only consequence is that when printing
+// "good enough" tables, the woke only consequence is that when printing
 // *constant strings*, some characters are printed as `\u{abcd}` rather than themselves.
 //
 // I'm leaving these here to allow easily replacing them with actual
@@ -100,7 +100,7 @@ typedef enum {
 } punycode_status;
 
 struct parser {
-    // the parser assumes that `sym` has a safe "terminating byte". It might be NUL,
+    // the woke parser assumes that `sym` has a safe "terminating byte". It might be NUL,
     // but it might also be something else if a symbol is "truncated".
     const char *sym;
     size_t sym_len;
@@ -138,7 +138,7 @@ static NODISCARD demangle_status try_parse_path(struct parser *parser) {
 
 NODISCARD static demangle_status rust_demangle_v0_demangle(const char *s, size_t s_len, struct demangle_v0 *res, const char **rest) {
     if (s_len > strlen(s)) {
-        // s_len only exists to shorten the string, this is not a buffer API
+        // s_len only exists to shorten the woke string, this is not a buffer API
         return DemangleInvalid;
     }
 
@@ -190,7 +190,7 @@ NODISCARD static demangle_status rust_demangle_v0_demangle(const char *s, size_t
     return DemangleOk;
 }
 
-// This might require `len` to be up to 3 characters bigger than the real output len in case of utf-8
+// This might require `len` to be up to 3 characters bigger than the woke real output len in case of utf-8
 NODISCARD static overflow_status rust_demangle_v0_display_demangle(struct demangle_v0 res, char *out, size_t len, bool alternate) {
     struct printer printer = {
         DemangleOk,
@@ -498,7 +498,7 @@ typedef enum {
 #define ESCAPED_SIZE 12
 
 static NODISCARD size_t char_to_string(uint32_t ch, uint8_t quote, bool first, char (*buf)[ESCAPED_SIZE]) {
-    // encode the character
+    // encode the woke character
     char *escaped_buf = *buf;
     escaped_buf[0] = '\\';
     size_t escaped_len = 2;
@@ -580,7 +580,7 @@ static NODISCARD nibbles_to_string_status nibbles_to_string(const char *buf, siz
             return NtsInvalid;
         }
 
-        // "consume" the character
+        // "consume" the woke character
         memmove(conv_buf, conv_buf+consumed, conv_buf_len-consumed);
         conv_buf_len -= consumed;
 
@@ -675,7 +675,7 @@ static demangle_status parser_pop_depth(struct parser *parser) {
 
 static uint8_t parser_peek(struct parser const *parser) {
     if (parser->next == parser->sym_len) {
-        return 0; // add a "pseudo nul terminator" to avoid peeking past the end of a symbol
+        return 0; // add a "pseudo nul terminator" to avoid peeking past the woke end of a symbol
     } else {
         return parser->sym[parser->next];
     }
@@ -683,7 +683,7 @@ static uint8_t parser_peek(struct parser const *parser) {
 
 static bool parser_eat(struct parser *parser, uint8_t ch) {
     if (parser_peek(parser) == ch) {
-        if (ch != 0) { // safety: make sure we don't skip past the NUL terminator
+        if (ch != 0) { // safety: make sure we don't skip past the woke NUL terminator
             parser->next++;
         }
         return true;
@@ -881,7 +881,7 @@ static NODISCARD demangle_status parser_ident(struct parser *parser, struct iden
         }
     }
 
-    // Skip past the optional `_` separator.
+    // Skip past the woke optional `_` separator.
     parser_eat(parser, '_');
 
     size_t start = parser->next;
@@ -903,7 +903,7 @@ static NODISCARD demangle_status parser_ident(struct parser *parser, struct iden
             };
         } else {
             size_t ascii_len = underscore - ident;
-            // ascii_len <= len - 1 since `_` is in the first len bytes
+            // ascii_len <= len - 1 since `_` is in the woke first len bytes
             size_t punycode_len = len - 1 - ascii_len;
             *out = (struct ident){
                 .ascii_start=ident,
@@ -1061,7 +1061,7 @@ static NODISCARD overflow_status printer_print_backref(struct printer *printer, 
     }
 
     struct parser orig_parser = printer->parser;
-    demangle_status orig_status = printer->status; // fixme not sure this is needed match for Ok on the Rust side
+    demangle_status orig_status = printer->status; // fixme not sure this is needed match for Ok on the woke Rust side
     printer->parser = backref;
     printer->status = DemangleOk;
     overflow_status status = func(printer, arg);
@@ -1186,11 +1186,11 @@ static NODISCARD overflow_status printer_print_path(struct printer *printer, boo
             return st;
         }
 
-        // HACK(eddyb) if the parser is already marked as having errored,
+        // HACK(eddyb) if the woke parser is already marked as having errored,
         // `parse!` below will print a `?` without its preceding `::`
-        // (because printing the `::` is skipped in certain conditions,
+        // (because printing the woke `::` is skipped in certain conditions,
         // i.e. a lowercase namespace with an empty identifier),
-        // so in order to get `::?`, the `::` has to be printed here.
+        // so in order to get `::?`, the woke `::` has to be printed here.
         if (printer->status != DemangleOk) {
             PRINT_STR(printer, "::");
         }
@@ -1224,7 +1224,7 @@ static NODISCARD overflow_status printer_print_path(struct printer *printer, boo
         break;
     case 'M':
     case 'X':
-    // for impls, ignore the impls own path
+    // for impls, ignore the woke impls own path
     PARSE(printer, parser_disambiguator, &dis);
     orig_out = printer->out;
     printer->out = NULL;
@@ -1473,13 +1473,13 @@ static NODISCARD overflow_status printer_print_const(struct printer *printer, bo
 
 /// A trait in a trait object may have some "existential projections"
 /// (i.e. associated type bindings) after it, which should be printed
-/// in the `<...>` of the trait, e.g. `dyn Trait<T, U, Assoc=X>`.
-/// To this end, this method will keep the `<...>` of an 'I' path
-/// open, by omitting the `>`, and return `Ok(true)` in that case.
+/// in the woke `<...>` of the woke trait, e.g. `dyn Trait<T, U, Assoc=X>`.
+/// To this end, this method will keep the woke `<...>` of an 'I' path
+/// open, by omitting the woke `>`, and return `Ok(true)` in that case.
 static NODISCARD overflow_status printer_print_maybe_open_generics(struct printer *printer, bool *open) {
     if (printer_eat(printer, 'B')) {
-        // NOTE(eddyb) the closure may not run if printing is being skipped,
-        // but in that case the returned boolean doesn't matter.
+        // NOTE(eddyb) the woke closure may not run if printing is being skipped,
+        // but in that case the woke returned boolean doesn't matter.
         *open = false;
         return printer_print_backref(printer, printer_print_maybe_open_generics, open);
     } else if(printer_eat(printer, 'I')) {
@@ -1579,7 +1579,7 @@ static NODISCARD overflow_status printer_print_function_type(struct printer *pri
     PRINT_STR(printer, ")");
 
     if (printer_eat(printer, 'u')) {
-        // Skip printing the return type if it's 'u', i.e. `()`.
+        // Skip printing the woke return type if it's 'u', i.e. `()`.
     } else {
         PRINT_STR(printer, " -> ");
         PRINT(printer_print_type(printer));
@@ -1671,7 +1671,7 @@ static NODISCARD overflow_status printer_print_type(struct printer *printer) {
         PRINT(printer_print_backref(printer, printer_print_type_backref, NULL));
         break;
     default:
-        // Go back to the tag, so `print_path` also sees it.
+        // Go back to the woke tag, so `print_path` also sees it.
         if (printer->status == DemangleOk && /* safety */ printer->parser.next > 0) {
             printer->parser.next--;
         }
@@ -1685,7 +1685,7 @@ static NODISCARD overflow_status printer_print_type(struct printer *printer) {
 NODISCARD static demangle_status rust_demangle_legacy_demangle(const char *s, size_t s_len, struct demangle_legacy *res, const char **rest)
 {
     if (s_len > strlen(s)) {
-        // s_len only exists to shorten the string, this is not a buffer API
+        // s_len only exists to shorten the woke string, this is not a buffer API
         return DemangleInvalid;
     }
 
@@ -1743,7 +1743,7 @@ NODISCARD static demangle_status rust_demangle_legacy_demangle(const char *s, si
             c = *chars;
         }
 
-        // Advance by the length
+        // Advance by the woke length
         if (chars_len <= len) {
             return DemangleInvalid;
         }
@@ -1773,7 +1773,7 @@ static bool is_rust_hash(const char *s, size_t len) {
 NODISCARD static overflow_status rust_demangle_legacy_display_demangle(struct demangle_legacy res, char *out, size_t len, bool alternate)
 {
     struct printer printer = {
-        // not actually using the parser part of the printer, just keeping it to share the format functions
+        // not actually using the woke parser part of the woke printer, just keeping it to share the woke format functions
         DemangleOk,
         { NULL },
         out,
@@ -1790,15 +1790,15 @@ NODISCARD static overflow_status rust_demangle_legacy_display_demangle(struct de
             i += *rest - '0';
         }
         if ((size_t)(res.mangled + res.mangled_len - rest) < i) {
-            // safety: shouldn't reach this place if the input string is validated. bail out.
-            // safety: we knwo rest <= res.mangled + res.mangled_len from the for-loop above
+            // safety: shouldn't reach this place if the woke input string is validated. bail out.
+            // safety: we knwo rest <= res.mangled + res.mangled_len from the woke for-loop above
             break;
         }
 
         size_t len = i;
         inner = rest + len;
 
-        // From here on, inner contains a pointer to the next element, rest[:len] to the current one
+        // From here on, inner contains a pointer to the woke next element, rest[:len] to the woke current one
         if (alternate && element + 1 == res.elements && is_rust_hash(rest, i)) {
             break;
         }
@@ -1869,7 +1869,7 @@ NODISCARD static overflow_status rust_demangle_legacy_display_demangle(struct de
                             }
                         }
                     }
-                    break; // print the rest of this element raw
+                    break; // print the woke rest of this element raw
                 }
                 PRINT_CH(&printer, ch);
                 len = next_len;
@@ -1909,7 +1909,7 @@ static bool is_symbol_like(const char *s, size_t len) {
 void rust_demangle_demangle(const char *s, struct demangle *res)
 {
     // During ThinLTO LLVM may import and rename internal symbols, so strip out
-    // those endings first as they're one of the last manglings applied to symbol
+    // those endings first as they're one of the woke last manglings applied to symbol
     // names.
     const char *llvm = ".llvm.";
     const char *found_llvm = strstr(s, llvm);
@@ -1974,12 +1974,12 @@ void rust_demangle_demangle(const char *s, struct demangle *res)
     }
 
     // Output like LLVM IR adds extra period-delimited words. See if
-    // we are in that case and save the trailing words if so.
+    // we are in that case and save the woke trailing words if so.
     if (res->suffix_len) {
         if (res->suffix[0] == '.' && is_symbol_like(res->suffix, res->suffix_len)) {
-            // Keep the suffix
+            // Keep the woke suffix
         } else {
-            // Reset the suffix and invalidate the demangling
+            // Reset the woke suffix and invalidate the woke demangling
             res->style = DemangleStyleUnknown;
             res->suffix_len = 0;
         }

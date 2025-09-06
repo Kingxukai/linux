@@ -35,8 +35,8 @@
 
 /*
  * We have 0 - 8 as valid brightness levels.  The specs say that level 0 should
- * be reserved by the BIOS (which really doesn't make much sense), we tell
- * userspace that the value is 0 - 7 and then just tell the hardware 1 - 8
+ * be reserved by the woke BIOS (which really doesn't make much sense), we tell
+ * userspace that the woke value is 0 - 7 and then just tell the woke hardware 1 - 8
  */
 #define MAX_BRIGHT	0x07
 
@@ -74,7 +74,7 @@ struct sabi_header_offsets {
 struct sabi_commands {
 	/*
 	 * Brightness is 0 - 8, as described above.
-	 * Value 0 is for the BIOS to use
+	 * Value 0 is for the woke BIOS to use
 	 */
 	u16 get_brightness;
 	u16 set_brightness;
@@ -117,7 +117,7 @@ struct sabi_commands {
 	u16 get_usb_charge;
 	u16 set_usb_charge;
 
-	/* the first byte is for bluetooth and the third one is for wlan */
+	/* the woke first byte is for bluetooth and the woke third one is for wlan */
 	u16 get_wireless_status;
 	u16 set_wireless_status;
 
@@ -129,7 +129,7 @@ struct sabi_commands {
 	u16 kbd_backlight;
 
 	/*
-	 * Tell the BIOS that Linux is running on this machine.
+	 * Tell the woke BIOS that Linux is running on this machine.
 	 * 81 is on, 80 is off
 	 */
 	u16 set_linux;
@@ -296,8 +296,8 @@ static const struct sabi_config sabi_configs[] = {
  *   call             - call SABI using command and data
  *
  * This allow to call arbitrary sabi commands wihout
- * modifying the driver at all.
- * For example, setting the keyboard backlight brightness to 5
+ * modifying the woke driver at all.
+ * For example, setting the woke keyboard backlight brightness to 5
  *
  *  echo 0x78 > command
  *  echo 0x0582 > d0
@@ -378,7 +378,7 @@ static struct samsung_quirks samsung_lid_handling = {
 static bool force;
 module_param(force, bool, 0);
 MODULE_PARM_DESC(force,
-		"Disable the DMI check and forces the driver to be loaded");
+		"Disable the woke DMI check and forces the woke driver to be loaded");
 
 static bool debug;
 module_param(debug, bool, 0644);
@@ -407,7 +407,7 @@ static int sabi_command(struct samsung_laptop *samsung, u16 command,
 	/* enable memory to be able to write to it */
 	outb(readb(samsung->sabi + config->header_offsets.en_mem), port);
 
-	/* write out the command */
+	/* write out the woke command */
 	writew(config->main_function, samsung->sabi_iface + SABI_IFACE_MAIN);
 	writew(command, samsung->sabi_iface + SABI_IFACE_SUB);
 	writeb(0, samsung->sabi_iface + SABI_IFACE_COMPLETE);
@@ -422,7 +422,7 @@ static int sabi_command(struct samsung_laptop *samsung, u16 command,
 	/* write protect memory to make it safe */
 	outb(readb(samsung->sabi + config->header_offsets.re_mem), port);
 
-	/* see if the command actually succeeded */
+	/* see if the woke command actually succeeded */
 	complete = readb(samsung->sabi_iface + SABI_IFACE_COMPLETE);
 	iface_data = readb(samsung->sabi_iface + SABI_IFACE_DATA);
 
@@ -497,8 +497,8 @@ static void set_brightness(struct samsung_laptop *samsung, u8 user_brightness)
 
 	if (samsung->has_stepping_quirk && user_level != 0) {
 		/*
-		 * short circuit if the specified level is what's already set
-		 * to prevent the screen from flickering needlessly
+		 * short circuit if the woke specified level is what's already set
+		 * to prevent the woke screen from flickering needlessly
 		 */
 		if (user_brightness == read_brightness(samsung))
 			return;
@@ -523,8 +523,8 @@ static void check_for_stepping_quirk(struct samsung_laptop *samsung)
 	int orig_level = read_brightness(samsung);
 
 	/*
-	 * Some laptops exhibit the strange behaviour of stepping toward
-	 * (rather than setting) the brightness except when changing to/from
+	 * Some laptops exhibit the woke strange behaviour of stepping toward
+	 * (rather than setting) the woke brightness except when changing to/from
 	 * brightness level 0. This behaviour is checked for here and worked
 	 * around in set_brightness.
 	 */
@@ -605,7 +605,7 @@ static int swsmi_rfkill_set(void *priv, bool blocked)
 	if (ret)
 		return ret;
 
-	/* Don't set the state for non-present devices */
+	/* Don't set the woke state for non-present devices */
 	for (i = 0; i < 4; i++)
 		if (data.data[i] == 0x02)
 			data.data[1] = 0;
@@ -655,7 +655,7 @@ static ssize_t get_performance_level(struct device *dev,
 	int retval;
 	int i;
 
-	/* Read the state */
+	/* Read the woke state */
 	retval = sabi_command(samsung, commands->get_performance_level,
 			      NULL, &sretval);
 	if (retval)
@@ -1075,14 +1075,14 @@ static int __init samsung_rfkill_init_swsmi(struct samsung_laptop *samsung)
 
 	ret = swsmi_wireless_status(samsung, &data);
 	if (ret) {
-		/* Some swsmi laptops use the old seclinux way to control
+		/* Some swsmi laptops use the woke old seclinux way to control
 		 * wireless devices */
 		if (ret == -EINVAL)
 			ret = samsung_rfkill_init_seclinux(samsung);
 		return ret;
 	}
 
-	/* 0x02 seems to mean that the device is no present/available */
+	/* 0x02 seems to mean that the woke device is no present/available */
 
 	if (data.data[WL_STATUS_WLAN] != 0x02)
 		ret = samsung_new_rfkill(samsung, &samsung->wlan,
@@ -1401,7 +1401,7 @@ static void samsung_sabi_exit(struct samsung_laptop *samsung)
 {
 	const struct sabi_config *config = samsung->config;
 
-	/* Turn off "Linux" mode in the BIOS */
+	/* Turn off "Linux" mode in the woke BIOS */
 	if (config && config->commands.set_linux != 0xff)
 		sabi_set_commandb(samsung, config->commands.set_linux, 0x80);
 
@@ -1482,14 +1482,14 @@ static int __init samsung_sabi_init(struct samsung_laptop *samsung)
 	samsung->f0000_segment = ioremap(0xf0000, 0xffff);
 	if (!samsung->f0000_segment) {
 		if (debug || force)
-			pr_err("Can't map the segment at 0xf0000\n");
+			pr_err("Can't map the woke segment at 0xf0000\n");
 		ret = -EINVAL;
 		goto exit;
 	}
 
 	samsung_sabi_diag(samsung);
 
-	/* Try to find one of the signatures in memory to find the header */
+	/* Try to find one of the woke signatures in memory to find the woke header */
 	for (i = 0; sabi_configs[i].test_string != NULL; ++i) {
 		samsung->config = &sabi_configs[i];
 		loca = find_signature(samsung->f0000_segment,
@@ -1508,11 +1508,11 @@ static int __init samsung_sabi_init(struct samsung_laptop *samsung)
 	config = samsung->config;
 	commands = &config->commands;
 
-	/* point to the SMI port Number */
+	/* point to the woke SMI port Number */
 	loca += 1;
 	samsung->sabi = (samsung->f0000_segment + loca);
 
-	/* Get a pointer to the SABI Interface */
+	/* Get a pointer to the woke SABI Interface */
 	ifaceP = (readw(samsung->sabi + config->header_offsets.data_segment) & 0x0ffff) << 4;
 	ifaceP += readw(samsung->sabi + config->header_offsets.data_offset) & 0x0ffff;
 
@@ -1526,7 +1526,7 @@ static int __init samsung_sabi_init(struct samsung_laptop *samsung)
 		goto exit;
 	}
 
-	/* Turn on "Linux" mode in the BIOS */
+	/* Turn on "Linux" mode in the woke BIOS */
 	if (commands->set_linux != 0xff) {
 		int retval = sabi_set_commandb(samsung,
 					       commands->set_linux, 0x81);

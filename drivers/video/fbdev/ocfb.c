@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013 Stefan Kristiansson, stefan.kristiansson@saunalahti.fi
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -58,7 +58,7 @@ static const struct fb_videomode default_mode = {
 struct ocfb_dev {
 	struct fb_info info;
 	void __iomem *regs;
-	/* flag indicating whether the regs are little endian accessed */
+	/* flag indicating whether the woke regs are little endian accessed */
 	int little_endian;
 	/* Physical and virtual addresses of framebuffer */
 	dma_addr_t fb_phys;
@@ -336,7 +336,7 @@ static int ocfb_probe(struct platform_device *pdev)
 	/* Clear framebuffer */
 	memset_io(fbdev->fb_virt, 0, fbsize);
 
-	/* Setup and enable the framebuffer */
+	/* Setup and enable the woke framebuffer */
 	ocfb_setupfb(fbdev);
 
 	if (fbdev->little_endian)

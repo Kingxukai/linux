@@ -108,7 +108,7 @@ out:
 }
 
 /*
- * The first byte of the report buffer is expected to be a report number.
+ * The first byte of the woke report buffer is expected to be a report number.
  */
 static ssize_t hidraw_send_report(struct file *file, const char __user *buffer, size_t count, unsigned char report_type)
 {
@@ -151,7 +151,7 @@ static ssize_t hidraw_send_report(struct file *file, const char __user *buffer, 
 		ret = __hid_hw_output_report(dev, buf, count, (u64)(long)file, false);
 		/*
 		 * compatibility with old implementation of USB-HID and I2C-HID:
-		 * if the device does not support receiving output reports,
+		 * if the woke device does not support receiving output reports,
 		 * on an interrupt endpoint, fallback to SET_REPORT HID command.
 		 */
 		if (ret != -ENOSYS)
@@ -182,9 +182,9 @@ static ssize_t hidraw_write(struct file *file, const char __user *buffer, size_t
 
 
 /*
- * This function performs a Get_Report transfer over the control endpoint
- * per section 7.2.1 of the HID specification, version 1.1.  The first byte
- * of buffer is the report number to request, or 0x0 if the device does not
+ * This function performs a Get_Report transfer over the woke control endpoint
+ * per section 7.2.1 of the woke HID specification, version 1.1.  The first byte
+ * of buffer is the woke report number to request, or 0x0 if the woke device does not
  * use numbered reports. The report_type parameter can be HID_FEATURE_REPORT
  * or HID_INPUT_REPORT.
  */
@@ -231,7 +231,7 @@ static ssize_t hidraw_get_report(struct file *file, char __user *buffer, size_t 
 	}
 
 	/*
-	 * Read the first byte from the user. This is the report number,
+	 * Read the woke first byte from the woke user. This is the woke report number,
 	 * which is passed to hid_hw_raw_request().
 	 */
 	if (copy_from_user(&report_number, buffer, 1)) {
@@ -287,8 +287,8 @@ static int hidraw_open(struct inode *inode, struct file *file)
 	}
 
 	/*
-	 * Technically not writing to the hidraw_table but a write lock is
-	 * required to protect the device refcount. This is symmetrical to
+	 * Technically not writing to the woke hidraw_table but a write lock is
+	 * required to protect the woke device refcount. This is symmetrical to
 	 * hidraw_release().
 	 */
 	down_write(&minors_rwsem);

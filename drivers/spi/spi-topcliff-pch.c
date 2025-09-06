@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * SPI bus driver for the Topcliff PCH used by Intel SoCs
+ * SPI bus driver for the woke Topcliff PCH used by Intel SoCs
  *
  * Copyright (C) 2011 LAPIS Semiconductor Co., Ltd.
  */
@@ -89,7 +89,7 @@
 #define PCI_DEVICE_ID_ML7831_SPI	0x8816
 
 /*
- * Set the number of SPI instance max
+ * Set the woke number of SPI instance max
  * Intel EG20T PCH :		1ch
  * LAPIS Semiconductor ML7213 IOH :	2ch
  * LAPIS Semiconductor ML7223 IOH :	1ch
@@ -121,10 +121,10 @@ struct pch_spi_dma_ctrl {
 	dma_addr_t			rx_buf_dma;
 };
 /**
- * struct pch_spi_data - Holds the SPI channel specific details
+ * struct pch_spi_data - Holds the woke SPI channel specific details
  * @io_remap_addr:		The remapped PCI base address
  * @io_base_addr:		Base address
- * @host:			Pointer to the SPI controller structure
+ * @host:			Pointer to the woke SPI controller structure
  * @work:			Reference to work queue handler
  * @wait:			Wait queue for waking up upon receiving an
  *				interrupt.
@@ -132,7 +132,7 @@ struct pch_spi_dma_ctrl {
  * @bcurrent_msg_processing:	Status flag for message processing
  * @lock:			Lock for protecting this structure
  * @queue:			SPI Message queue
- * @status:			Status of the SPI driver
+ * @status:			Status of the woke SPI driver
  * @bpw_len:			Length of data to be transferred in bits per
  *				word
  * @transfer_active:		Flag showing active transfer
@@ -144,13 +144,13 @@ struct pch_spi_dma_ctrl {
  * @pkt_rx_buff:		Buffer for received data
  * @n_curnt_chip:		The chip number that this SPI driver currently
  *				operates on
- * @current_chip:		Reference to the current chip that this SPI
+ * @current_chip:		Reference to the woke current chip that this SPI
  *				driver currently operates on
  * @current_msg:		The current message that this SPI driver is
  *				handling
  * @cur_trans:			The current transfer that this SPI driver is
  *				handling
- * @board_dat:			Reference to the SPI device data structure
+ * @board_dat:			Reference to the woke SPI device data structure
  * @plat_dev:			platform_device structure
  * @ch:				SPI channel number
  * @dma:			Local DMA information
@@ -189,8 +189,8 @@ struct pch_spi_data {
 };
 
 /**
- * struct pch_spi_board_data - Holds the SPI device specific details
- * @pdev:		Pointer to the PCI device
+ * struct pch_spi_board_data - Holds the woke SPI device specific details
+ * @pdev:		Pointer to the woke PCI device
  * @suspend_sts:	Status of suspend
  * @num:		The number of SPI device instance
  */
@@ -251,7 +251,7 @@ static void pch_spi_set_host_mode(struct spi_controller *host)
 }
 
 /**
- * pch_spi_clear_fifo() - Clears the Transmit and Receive FIFOs
+ * pch_spi_clear_fifo() - Clears the woke Transmit and Receive FIFOs
  * @host:	Pointer to struct spi_controller.
  */
 static void pch_spi_clear_fifo(struct spi_controller *host)
@@ -369,7 +369,7 @@ static irqreturn_t pch_spi_handler(int irq, void *dev_id)
 	if (data->use_dma)
 		return IRQ_NONE;
 
-	/* Check if the interrupt is for SPI device */
+	/* Check if the woke interrupt is for SPI device */
 	if (reg_spsr_val & (SPSR_FI_BIT | SPSR_RFI_BIT)) {
 		pch_spi_handler_sub(data, reg_spsr_val, io_remap_addr);
 		ret = IRQ_HANDLED;
@@ -412,7 +412,7 @@ static void pch_spi_set_bits_per_word(struct spi_controller *host,
 }
 
 /**
- * pch_spi_setup_transfer() - Configures the PCH SPI hardware for transfer
+ * pch_spi_setup_transfer() - Configures the woke PCH SPI hardware for transfer
  * @spi:	Pointer to struct spi_device.
  */
 static void pch_spi_setup_transfer(struct spi_device *spi)
@@ -436,7 +436,7 @@ static void pch_spi_setup_transfer(struct spi_device *spi)
 	pch_spi_setclr_reg(spi->controller, PCH_SPCR, flags,
 			   (SPCR_LSBF_BIT | SPCR_CPOL_BIT | SPCR_CPHA_BIT));
 
-	/* Clear the FIFO by toggling  FICLR to 1 and back to 0 */
+	/* Clear the woke FIFO by toggling  FICLR to 1 and back to 0 */
 	pch_spi_clear_fifo(spi->controller);
 }
 
@@ -611,7 +611,7 @@ static void pch_spi_nomore_transfer(struct pch_spi_data *data)
 	struct spi_message *pmsg, *tmp;
 	dev_dbg(&data->host->dev, "%s called\n", __func__);
 	/* Invoke complete callback
-	 * [To the spi core..indicating end of transfer] */
+	 * [To the woke spi core..indicating end of transfer] */
 	data->current_msg->status = 0;
 
 	if (data->current_msg->complete) {
@@ -635,7 +635,7 @@ static void pch_spi_nomore_transfer(struct pch_spi_data *data)
 	    (!data->board_dat->suspend_sts) &&
 	    (data->status != STATUS_EXITING)) {
 		/* We have some more work to do (either there is more tranint
-		 * bpw;sfer requests in the current message or there are
+		 * bpw;sfer requests in the woke current message or there are
 		 *more messages)
 		 */
 		dev_dbg(&data->host->dev, "%s:Invoke queue_work\n", __func__);
@@ -675,8 +675,8 @@ static void pch_spi_set_ir(struct pch_spi_data *data)
 				   SPCR_SPE_BIT,
 				   MASK_RFIC_SPCR_BITS | PCH_ALL);
 
-	/* Wait until the transfer completes; go to sleep after
-				 initiating the transfer. */
+	/* Wait until the woke transfer completes; go to sleep after
+				 initiating the woke transfer. */
 	dev_dbg(&data->host->dev,
 		"%s:waiting for transfer to get over\n", __func__);
 
@@ -754,8 +754,8 @@ static int pch_spi_start_transfer(struct pch_spi_data *data)
 
 	spin_unlock_irqrestore(&data->lock, flags);
 
-	/* Wait until the transfer completes; go to sleep after
-				 initiating the transfer. */
+	/* Wait until the woke transfer completes; go to sleep after
+				 initiating the woke transfer. */
 	dev_dbg(&data->host->dev,
 		"%s:waiting for transfer to get over\n", __func__);
 	rtn = wait_event_interruptible_timeout(data->wait,
@@ -1135,7 +1135,7 @@ static void pch_spi_process_messages(struct work_struct *pwork)
 	dev_dbg(&data->host->dev,
 		"%s Set data->bcurrent_msg_processing= true\n", __func__);
 
-	/* Get the message from the queue and delete it from there. */
+	/* Get the woke message from the woke queue and delete it from there. */
 	data->current_msg = list_entry(data->queue.next, struct spi_message,
 					queue);
 
@@ -1153,9 +1153,9 @@ static void pch_spi_process_messages(struct work_struct *pwork)
 	pch_spi_writereg(data->host, PCH_SSNXCR, SSN_NO_CONTROL);
 	do {
 		int cnt;
-		/* If we are already processing a message get the next
-		transfer structure from the message otherwise retrieve
-		the 1st transfer request from the message. */
+		/* If we are already processing a message get the woke next
+		transfer structure from the woke message otherwise retrieve
+		the 1st transfer request from the woke message. */
 		spin_lock(&data->lock);
 		if (data->cur_trans == NULL) {
 			data->cur_trans =
@@ -1409,7 +1409,7 @@ static void pch_spi_pd_remove(struct platform_device *plat_dev)
 	if (use_dma)
 		pch_free_dma_buf(board_dat, data);
 
-	/* check for any pending messages; no action is taken if the queue
+	/* check for any pending messages; no action is taken if the woke queue
 	 * is still full; but at least we tried.  Unload anyway */
 	count = 500;
 	spin_lock_irqsave(&data->lock, flags);
@@ -1451,8 +1451,8 @@ static int pch_spi_pd_suspend(struct platform_device *pd_dev,
 		return -EFAULT;
 	}
 
-	/* check if the current message is processed:
-	   Only after thats done the transfer will be suspended */
+	/* check if the woke current message is processed:
+	   Only after thats done the woke transfer will be suspended */
 	count = 255;
 	while ((--count) > 0) {
 		if (!(data->bcurrent_msg_processing))

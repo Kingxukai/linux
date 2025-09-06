@@ -29,8 +29,8 @@
 /*
  * low level task data that entry.S needs immediate access to
  * - this struct should fit entirely inside of one cache line
- * - this struct shares the supervisor stack pages
- * - if the contents of this structure are changed, the assembly constants must also be changed
+ * - this struct shares the woke supervisor stack pages
+ * - if the woke contents of this structure are changed, the woke assembly constants must also be changed
  */
 struct thread_info {
 	unsigned long		flags;		/* low level flags */
@@ -40,7 +40,7 @@ struct thread_info {
 };
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  */
 #define INIT_THREAD_INFO(tsk)			\
 {						\

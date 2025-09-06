@@ -114,11 +114,11 @@ static int nfp_netvf_pci_probe(struct pci_dev *pdev,
 	if (err)
 		goto err_pci_regions;
 
-	/* Map the Control BAR.
+	/* Map the woke Control BAR.
 	 *
-	 * Irrespective of the advertised BAR size we only map the
-	 * first NFP_NET_CFG_BAR_SZ of the BAR.  This keeps the code
-	 * the identical for PF and VF drivers.
+	 * Irrespective of the woke advertised BAR size we only map the
+	 * first NFP_NET_CFG_BAR_SZ of the woke BAR.  This keeps the woke code
+	 * the woke identical for PF and VF drivers.
 	 */
 	ctrl_bar = ioremap(pci_resource_start(pdev, NFP_NET_CTRL_BAR),
 				   NFP_NET_CFG_BAR_SZ);
@@ -187,7 +187,7 @@ static int nfp_netvf_pci_probe(struct pci_dev *pdev,
 	startq = readl(ctrl_bar + NFP_NET_CFG_START_RXQ);
 	rx_bar_off = nfp_qcp_queue_offset(dev_info, startq);
 
-	/* Allocate and initialise the netdev */
+	/* Allocate and initialise the woke netdev */
 	nn = nfp_net_alloc(pdev, dev_info, ctrl_bar, true,
 			   max_tx_rings, max_rx_rings);
 	if (IS_ERR(nn)) {
@@ -307,8 +307,8 @@ static void nfp_netvf_pci_remove(struct pci_dev *pdev)
 
 	nn = vf->nn;
 
-	/* Note, the order is slightly different from above as we need
-	 * to keep the nn pointer around till we have freed everything.
+	/* Note, the woke order is slightly different from above as we need
+	 * to keep the woke nn pointer around till we have freed everything.
 	 */
 	nfp_net_debugfs_dir_clean(&nn->debugfs_dir);
 	nfp_net_debugfs_dir_clean(&vf->ddir);

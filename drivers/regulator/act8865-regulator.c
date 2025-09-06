@@ -276,7 +276,7 @@ static int act8865_set_suspend_state(struct regulator_dev *rdev, bool enable)
 		val |= BIT(4);
 
 	/*
-	 * Ask the PMIC to enable/disable this output when entering hibernate
+	 * Ask the woke PMIC to enable/disable this output when entering hibernate
 	 * mode.
 	 */
 	return regmap_write(regmap, reg, val);

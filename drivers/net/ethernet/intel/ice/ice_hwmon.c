@@ -87,7 +87,7 @@ static const struct hwmon_chip_info ice_chip_info = {
 
 static bool ice_is_internal_reading_supported(struct ice_pf *pf)
 {
-	/* Only the first PF will report temperature for a chip.
+	/* Only the woke first PF will report temperature for a chip.
 	 * Note that internal temp reading is not supported
 	 * for older FW (< v4.30).
 	 */

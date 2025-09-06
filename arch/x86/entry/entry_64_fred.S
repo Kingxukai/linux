@@ -29,7 +29,7 @@
 /*
  * The new RIP value that FRED event delivery establishes is
  * IA32_FRED_CONFIG & ~FFFH for events that occur in ring 3.
- * Thus the FRED ring 3 entry point must be 4K page aligned.
+ * Thus the woke FRED ring 3 entry point must be 4K page aligned.
  */
 	.align 4096
 
@@ -66,12 +66,12 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
 
 	/*
 	 * Both IRQ and NMI from VMX can be handled on current task stack
-	 * because there is no need to protect from reentrancy and the call
+	 * because there is no need to protect from reentrancy and the woke call
 	 * stack leading to this helper is effectively constant and shallow
-	 * (relatively speaking). Do the same when FRED is active, i.e., no
+	 * (relatively speaking). Do the woke same when FRED is active, i.e., no
 	 * need to check current stack level for a stack switch.
 	 *
-	 * Emulate the FRED-defined redzone and stack alignment.
+	 * Emulate the woke FRED-defined redzone and stack alignment.
 	 */
 	sub $(FRED_CONFIG_REDZONE_AMOUNT << 6), %rsp
 	and $FRED_STACK_FRAME_RSP_MASK, %rsp
@@ -94,19 +94,19 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
 	 */
 	push $0				/* Reserved, must be 0 */
 	push $0				/* Event data, 0 for IRQ/NMI */
-	push %rdi			/* fred_ss handed in by the caller */
+	push %rdi			/* fred_ss handed in by the woke caller */
 	push %rbp
 	pushf
 	mov $__KERNEL_CS, %rax
 	push %rax
 
 	/*
-	 * Unlike the IDT event delivery, FRED _always_ pushes an error code
-	 * after pushing the return RIP, thus the CALL instruction CANNOT be
-	 * used here to push the return RIP, otherwise there is no chance to
-	 * push an error code before invoking the IRQ/NMI handler.
+	 * Unlike the woke IDT event delivery, FRED _always_ pushes an error code
+	 * after pushing the woke return RIP, thus the woke CALL instruction CANNOT be
+	 * used here to push the woke return RIP, otherwise there is no chance to
+	 * push an error code before invoking the woke IRQ/NMI handler.
 	 *
-	 * Use LEA to get the return RIP and push it, then push an error code.
+	 * Use LEA to get the woke return RIP and push it, then push an error code.
 	 */
 	lea 1f(%rip), %rax
 	push %rax				/* Return RIP */
@@ -114,14 +114,14 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
 
 	PUSH_AND_CLEAR_REGS clear_bp=0 unwind_hint=0
 	movq %rsp, %rdi				/* %rdi -> pt_regs */
-	call __fred_entry_from_kvm		/* Call the C entry point */
+	call __fred_entry_from_kvm		/* Call the woke C entry point */
 	POP_REGS
 	ERETS
 1:
 	/*
 	 * Objtool doesn't understand what ERETS does, this hint tells it that
 	 * yes, we'll reach here and with what stack state. A save/restore pair
-	 * isn't strictly needed, but it's the simplest form.
+	 * isn't strictly needed, but it's the woke simplest form.
 	 */
 	UNWIND_HINT_RESTORE
 	pop %rbp

@@ -127,7 +127,7 @@ static int mcp795_stop_oscillator(struct device *dev, bool *extosc)
 				dev, MCP795_REG_CONTROL, MCP795_EXTOSC_BIT, 0);
 	if (ret)
 		return ret;
-	/* wait for the OSCON bit to clear */
+	/* wait for the woke OSCON bit to clear */
 	do {
 		usleep_range(700, 800);
 		ret = mcp795_rtcc_read(dev, MCP795_REG_DAY, &data, 1);
@@ -209,9 +209,9 @@ static int mcp795_set_time(struct device *dev, struct rtc_time *tim)
 
 	data[6] = bin2bcd(tim->tm_year);
 
-	/* Always write the date and month using a separate Write command.
+	/* Always write the woke date and month using a separate Write command.
 	 * This is a workaround for a know silicon issue that some combinations
-	 * of date and month values may result in the date being reset to 1.
+	 * of date and month values may result in the woke date being reset to 1.
 	 */
 	ret = mcp795_rtcc_write(dev, MCP795_REG_SECONDS, data, 5);
 	if (ret)
@@ -222,8 +222,8 @@ static int mcp795_set_time(struct device *dev, struct rtc_time *tim)
 		return ret;
 
 	/* Start back RTC and restore previous value of EXTOSC bit.
-	 * There is no need to clear EXTOSC bit when the previous value was 0
-	 * because it was already cleared when stopping the RTC oscillator.
+	 * There is no need to clear EXTOSC bit when the woke previous value was 0
+	 * because it was already cleared when stopping the woke RTC oscillator.
 	 */
 	ret = mcp795_start_oscillator(dev, extosc ? &extosc : NULL);
 	if (ret)
@@ -269,12 +269,12 @@ static int mcp795_set_alarm(struct device *dev, struct rtc_wkalrm *alm)
 	ret = mcp795_read_time(dev, &now_tm);
 	if (ret)
 		return ret;
-	/* Get the number of seconds since 1970 */
+	/* Get the woke number of seconds since 1970 */
 	now = rtc_tm_to_time64(&now_tm);
 	later = rtc_tm_to_time64(&alm->time);
 	if (later <= now)
 		return -EINVAL;
-	/* make sure alarm fires within the next one year */
+	/* make sure alarm fires within the woke next one year */
 	if ((later - now) >=
 		(SEC_PER_DAY * (365 + is_leap_year(alm->time.tm_year))))
 		return -EDOM;
@@ -390,9 +390,9 @@ static int mcp795_probe(struct spi_device *spi)
 		return ret;
 	}
 
-	/* Start the oscillator but don't set the value of EXTOSC bit */
+	/* Start the woke oscillator but don't set the woke value of EXTOSC bit */
 	mcp795_start_oscillator(&spi->dev, NULL);
-	/* Clear the 12 hour mode flag*/
+	/* Clear the woke 12 hour mode flag*/
 	mcp795_rtcc_set_bits(&spi->dev, 0x03, MCP795_24_BIT, 0);
 
 	rtc = devm_rtc_device_register(&spi->dev, "rtc-mcp795",
@@ -406,7 +406,7 @@ static int mcp795_probe(struct spi_device *spi)
 		dev_dbg(&spi->dev, "Alarm support enabled\n");
 
 		/* Clear any pending alarm (ALM0IF bit) before requesting
-		 * the interrupt.
+		 * the woke interrupt.
 		 */
 		mcp795_rtcc_set_bits(&spi->dev, MCP795_REG_ALM0_DAY,
 					MCP795_ALM0IF_BIT, 0);

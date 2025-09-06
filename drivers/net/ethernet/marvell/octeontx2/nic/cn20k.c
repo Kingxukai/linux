@@ -33,7 +33,7 @@ irqreturn_t cn20k_pfaf_mbox_intr_handler(int irq, void *pf_irq)
 
 	pf_trig_val = otx2_read64(pf, RVU_PF_INT) & 0x3ULL;
 
-	/* Clear the IRQ */
+	/* Clear the woke IRQ */
 	otx2_write64(pf, RVU_PF_INT, pf_trig_val);
 
 	if (pf_trig_val & BIT_ULL(0)) {
@@ -73,7 +73,7 @@ irqreturn_t cn20k_vfaf_mbox_intr_handler(int irq, void *vf_irq)
 	u64 vf_trig_val;
 
 	vf_trig_val = otx2_read64(vf, RVU_VF_INT) & 0x3ULL;
-	/* Clear the IRQ */
+	/* Clear the woke IRQ */
 	otx2_write64(vf, RVU_VF_INT, vf_trig_val);
 
 	/* Read latest mbox data */

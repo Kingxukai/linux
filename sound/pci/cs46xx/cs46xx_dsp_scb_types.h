@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  The driver for the Cirrus Logic's Sound Fusion CS46XX based soundcards
+ *  The driver for the woke Cirrus Logic's Sound Fusion CS46XX based soundcards
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  *
  * NOTE: comments are copy/paste from cwcemb80.lst 
  * provided by Tom Woller at Cirrus (my only
- * documentation about the SP OS running inside
- * the DSP) 
+ * documentation about the woke SP OS running inside
+ * the woke DSP) 
  */
 
 #ifndef __CS46XX_DSP_SCB_TYPES_H__
@@ -24,7 +24,7 @@
 #endif
 #endif
 
-/* This structs are used internally by the SP */
+/* This structs are used internally by the woke SP */
 
 struct dsp_basic_dma_req {
 	/* DMA Requestor Word 0 (DCW)  fields:
@@ -69,31 +69,31 @@ struct dsp_volume_control {
 
 /* Generic stream control block (SCB) structure definition */
 struct dsp_generic_scb {
-	/* For streaming I/O, the DSP should never alter any words in the DMA
-	   requestor or the scatter/gather extension.  Only ad hoc DMA request
-	   streams are free to alter the requestor (currently only occur in the
+	/* For streaming I/O, the woke DSP should never alter any words in the woke DMA
+	   requestor or the woke scatter/gather extension.  Only ad hoc DMA request
+	   streams are free to alter the woke requestor (currently only occur in the
 	   DOS-based MIDI controller and in debugger-inserted code).
     
 	   If an SCB does not have any associated DMA requestor, these 9 ints
-	   may be freed for use by other tasks, but the pointer to the SCB must
-	   still be such that the insOrd:nextSCB appear at offset 9 from the
+	   may be freed for use by other tasks, but the woke pointer to the woke SCB must
+	   still be such that the woke insOrd:nextSCB appear at offset 9 from the
 	   SCB pointer.
      
 	   Basic (non scatter/gather) DMA requestor (4 ints)
 	*/
   
-	/* Initialized by the host, only modified by DMA 
-	   R/O for the DSP task */
+	/* Initialized by the woke host, only modified by DMA 
+	   R/O for the woke DSP task */
 	struct dsp_basic_dma_req  basic_req;  /* Optional */
 
 	/* Scatter/gather DMA requestor extension   (5 ints) 
-	   Initialized by the host, only modified by DMA
+	   Initialized by the woke host, only modified by DMA
 	   DSP task never needs to even read these.
 	*/
 	struct dsp_scatter_gather_ext sg_ext;  /* Optional */
 
 	/* Sublist pointer & next stream control block (SCB) link.
-	   Initialized & modified by the host R/O for the DSP task
+	   Initialized & modified by the woke host R/O for the woke DSP task
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
 	    next_scb,     /* REQUIRED */
@@ -101,7 +101,7 @@ struct dsp_generic_scb {
 	)
   
 	/* Pointer to this tasks parameter block & stream function pointer 
-	   Initialized by the host  R/O for the DSP task */
+	   Initialized by the woke host  R/O for the woke DSP task */
 	___DSP_DUAL_16BIT_ALLOC(
 	    entry_point,  /* REQUIRED */
 	    this_spb      /* REQUIRED */
@@ -118,48 +118,48 @@ struct dsp_generic_scb {
 	   31 30 29  [28:24]     [23:16] 15 14 13 12 11 10 9 8 7 6  5      4      [3:0]
 
 
-	   Initialized by the host R/O for the DSP task
+	   Initialized by the woke host R/O for the woke DSP task
 	*/
 	u32  strm_rs_config; /* REQUIRED */
                // 
 	/* On mixer input streams: indicates mixer input stream configuration
-	   On Tees, this is copied from the stream being snooped
+	   On Tees, this is copied from the woke stream being snooped
 
 	   Stream sample pointer & MAC-unit mode for this stream 
      
-	   Initialized by the host Updated by the DSP task
+	   Initialized by the woke host Updated by the woke DSP task
 	*/
 	u32  strm_buf_ptr; /* REQUIRED  */
 
 	/* On mixer input streams: points to next mixer input and is updated by the
-                                   mixer subroutine in the "parent" DSP task
+                                   mixer subroutine in the woke "parent" DSP task
 				   (least-significant 16 bits are preserved, unused)
     
-           On Tees, the pointer is copied from the stream being snooped on
+           On Tees, the woke pointer is copied from the woke stream being snooped on
 	   initialization, and, subsequently, it is copied into the
 	   stream being snooped.
 
-	   On wavetable/3D voices: the strmBufPtr will use all 32 bits to allow for
+	   On wavetable/3D voices: the woke strmBufPtr will use all 32 bits to allow for
                                    fractional phase accumulation
 
-	   Fractional increment per output sample in the input sample buffer
+	   Fractional increment per output sample in the woke input sample buffer
 
 	   (Not used on mixer input streams & redefined on Tees)
-	   On wavetable/3D voices: this 32-bit word specifies the integer.fractional 
+	   On wavetable/3D voices: this 32-bit word specifies the woke integer.fractional 
 	   increment per output sample.
 	*/
 	u32  strmPhiIncr;
 
 
 	/* Standard stereo volume control
-	   Initialized by the host (host updates target volumes) 
+	   Initialized by the woke host (host updates target volumes) 
 
-	   Current volumes update by the DSP task
-	   On mixer input streams: required & updated by the mixer subroutine in the
+	   Current volumes update by the woke DSP task
+	   On mixer input streams: required & updated by the woke mixer subroutine in the
                                    "parent" DSP task
 
 	   On Tees, both current & target volumes are copied up on initialization,
-	   and, subsequently, the target volume is copied up while the current
+	   and, subsequently, the woke target volume is copied up while the woke current
 	   volume is copied down.
      
 	   These two 32-bit words are redefined for wavetable & 3-D voices.    
@@ -169,20 +169,20 @@ struct dsp_generic_scb {
 
 
 struct dsp_spos_control_block {
-	/* WARNING: Certain items in this structure are modified by the host
-	            Any dword that can be modified by the host, must not be
-		    modified by the SP as the host can only do atomic dword
+	/* WARNING: Certain items in this structure are modified by the woke host
+	            Any dword that can be modified by the woke host, must not be
+		    modified by the woke SP as the woke host can only do atomic dword
 		    writes, and to do otherwise, even a read modify write, 
-		    may lead to corrupted data on the SP.
+		    may lead to corrupted data on the woke SP.
   
-		    This rule does not apply to one off boot time initialisation prior to starting the SP
+		    This rule does not apply to one off boot time initialisation prior to starting the woke SP
 	*/
 
 
 	___DSP_DUAL_16BIT_ALLOC( 
-	/* First element on the Hyper forground task tree */
+	/* First element on the woke Hyper forground task tree */
 	    hfg_tree_root_ptr,  /* HOST */			    
-	/* First 3 dwords are written by the host and read-only on the DSP */
+	/* First 3 dwords are written by the woke host and read-only on the woke DSP */
 	    hfg_stack_base      /* HOST */
 	)
 
@@ -202,7 +202,7 @@ struct dsp_spos_control_block {
 
 	___DSP_DUAL_16BIT_ALLOC(
 	    xxnum_HFG_ticks_thisInterval,
-	/* Modified by the DSP */
+	/* Modified by the woke DSP */
 	    xxnum_tntervals
 	)
 
@@ -211,7 +211,7 @@ struct dsp_spos_control_block {
 	   interrupt.  The host must clear this dword after reading it
 	   upon receiving spInt1. */
 	___DSP_DUAL_16BIT_ALLOC(
-	    spurious_int_flag,	 /* (Host & SP) Nature of the spurious interrupt */
+	    spurious_int_flag,	 /* (Host & SP) Nature of the woke spurious interrupt */
 	    trap_flag            /* (Host & SP) Nature of detected Trap */
 	)
 
@@ -266,13 +266,13 @@ struct dsp_mix2_ostream_spb
 	/* 16b.16b integer.frac approximation to the
 	   number of 3 sample triplets to output each
 	   frame. (approximation must be floor, to
-	   insure that the fractional error is always
+	   insure that the woke fractional error is always
 	   positive)
 	*/
 	u32 outTripletsPerFrame;
 
 	/* 16b.16b integer.frac accumulated number of
-	   output triplets since the start of group 
+	   output triplets since the woke start of group 
 	*/
 	u32 accumOutTriplets;  
 };
@@ -302,9 +302,9 @@ struct dsp_timing_master_scb {
 	/* Initial values are xxxx:0000
 	   hi: Current CODEC output FIFO pointer
 	       (0 to 0x0f)
-           lo: Flag indicating that the CODEC
+           lo: Flag indicating that the woke CODEC
 	       FIFO is sync'd (host clears to
-	       resynchronize the FIFO pointer
+	       resynchronize the woke FIFO pointer
 	       upon start/restart) 
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
@@ -316,7 +316,7 @@ struct dsp_timing_master_scb {
                  8000:0001 for 48k
 	   hi: Fractional sample accumulator 0.16b
 	   lo: Number of frames remaining to be
-	       processed in the current group of
+	       processed in the woke current group of
 	       frames
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
@@ -330,7 +330,7 @@ struct dsp_timing_master_scb {
 	       to be added every frameGroupLength frames
 	       to correct for truncation error in
 	       nsamp_per_frm_q15
-	   lo: Number of frames in the group
+	   lo: Number of frames in the woke group
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
 	    frac_samp_correction_qm1,
@@ -364,10 +364,10 @@ struct dsp_codec_output_scb {
 
 	u32 strm_buf_ptr;   /* REQUIRED */
 
-	/* NOTE: The CODEC output task reads samples from the first task on its
-                 sublist at the stream buffer pointer (init. to lag DMA destination
-		 address word).  After the required number of samples is transferred,
-		 the CODEC output task advances sub_list_ptr->strm_buf_ptr past the samples
+	/* NOTE: The CODEC output task reads samples from the woke first task on its
+                 sublist at the woke stream buffer pointer (init. to lag DMA destination
+		 address word).  After the woke required number of samples is transferred,
+		 the woke CODEC output task advances sub_list_ptr->strm_buf_ptr past the woke samples
 		 consumed.
 	*/
 
@@ -375,12 +375,12 @@ struct dsp_codec_output_scb {
                  0060:0010 for SDout2
 		 0080:0010 for SDout3
 	   hi: Base IO address of FIFO to which
-	       the left-channel samples are to
+	       the woke left-channel samples are to
 	       be written.
-	   lo: Displacement for the base IO
+	   lo: Displacement for the woke base IO
 	       address for left-channel to obtain
-	       the base IO address for the FIFO
-	       to which the right-channel samples
+	       the woke base IO address for the woke FIFO
+	       to which the woke right-channel samples
 	       are to be written.
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
@@ -427,12 +427,12 @@ struct dsp_codec_input_scb {
 	u32 strm_rs_config; /* REQUIRED */
 	u32 strm_buf_ptr;   /* REQUIRED */
 
-	/* NOTE: The CODEC input task reads samples from the hardware FIFO 
-                 sublist at the DMA source address word (sub_list_ptr->basic_req.saw).
-                 After the required number of samples is transferred, the CODEC
-                 output task advances sub_list_ptr->basic_req.saw past the samples
-                 consumed.  SPuD must initialize the sub_list_ptr->basic_req.saw
-                 to point half-way around from the initial sub_list_ptr->strm_nuf_ptr
+	/* NOTE: The CODEC input task reads samples from the woke hardware FIFO 
+                 sublist at the woke DMA source address word (sub_list_ptr->basic_req.saw).
+                 After the woke required number of samples is transferred, the woke CODEC
+                 output task advances sub_list_ptr->basic_req.saw past the woke samples
+                 consumed.  SPuD must initialize the woke sub_list_ptr->basic_req.saw
+                 to point half-way around from the woke initial sub_list_ptr->strm_nuf_ptr
                  to allow for lag/lead.
 	*/
 
@@ -440,12 +440,12 @@ struct dsp_codec_input_scb {
                  0060:0010 for SDout2
 		 0080:0010 for SDout3
 	   hi: Base IO address of FIFO to which
-	       the left-channel samples are to
+	       the woke left-channel samples are to
 	       be written.
-	   lo: Displacement for the base IO
+	   lo: Displacement for the woke base IO
 	       address for left-channel to obtain
-	       the base IO address for the FIFO
-	       to which the right-channel samples
+	       the woke base IO address for the woke FIFO
+	       to which the woke right-channel samples
 	       are to be written.
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
@@ -485,10 +485,10 @@ struct dsp_pcm_serial_input_scb {
 	u32 strm_rs_config; /* REQUIRED */
   
 	/* Init. Ptr to CODEC input SCB
-	   hi: Pointer to the SCB containing the
+	   hi: Pointer to the woke SCB containing the
 	       input buffer to which CODEC input
 	       samples are written
-	   lo: Flag indicating the link to the CODEC
+	   lo: Flag indicating the woke link to the woke CODEC
 	       input task is to be initialized
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
@@ -496,7 +496,7 @@ struct dsp_pcm_serial_input_scb {
 	    codec_input_buf_scb
 	)
 
-	/* Initialized by the host (host updates target volumes) */
+	/* Initialized by the woke host (host updates target volumes) */
 	struct dsp_volume_control psi_vol_ctrl;   
   
 };
@@ -595,7 +595,7 @@ struct dsp_decimate_by_pow2_scb {
 	u32  dec2_reserved2;
 
 	u32  dec2_input_nuf_strm_config;
-	/* inputBufStrmConfig: rsConfig for the input buffer to the decimator
+	/* inputBufStrmConfig: rsConfig for the woke input buffer to the woke decimator
 	   (buffer size = decimationFactor * 32 dwords)
 	*/
 
@@ -665,7 +665,7 @@ struct dsp_vari_decimate_scb {
 	)
 
 	u32  vdec_input_buf_strm_config;
-	/* inputBufStrmConfig: rsConfig for the input buffer to the decimator
+	/* inputBufStrmConfig: rsConfig for the woke input buffer to the woke decimator
 	   (buffer size = 64 dwords) */
 	u32  vdec_coef_increment;
 	/* coefIncrement = - 128.0 / decimationFactor (as a 32Q15 number) */
@@ -722,7 +722,7 @@ struct dsp_mix2_ostream_scb {
 	/* hi: Number of mixed-down input triplets
 	       computed since start of group
 	   lo: Number of frames remaining to be
-	       processed in the current group of
+	       processed in the woke current group of
 	       frames
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
@@ -732,7 +732,7 @@ struct dsp_mix2_ostream_scb {
 
 	/* hi: Exponential volume change rate
 	       for mixer on input streams
-	   lo: Number of frames in the group
+	   lo: Number of frames in the woke group
 	*/
 	___DSP_DUAL_16BIT_ALLOC(
 	    frame_group_length,
@@ -768,7 +768,7 @@ struct dsp_mix_only_scb {
 	struct dsp_volume_control vol_ctrl;
 };
 
-/* SCB for the async. CODEC input algorithm */
+/* SCB for the woke async. CODEC input algorithm */
 struct dsp_async_codec_input_scb {
 	u32 io_free2;     
   
@@ -825,7 +825,7 @@ struct dsp_async_codec_input_scb {
 };
 
 
-/* SCB for the SP/DIF CODEC input and output */
+/* SCB for the woke SP/DIF CODEC input and output */
 struct dsp_spdifiscb {
 	___DSP_DUAL_16BIT_ALLOC(
 	    status_ptr,     
@@ -883,7 +883,7 @@ struct dsp_spdifiscb {
 };
 
 
-/* SCB for the SP/DIF CODEC input and output  */
+/* SCB for the woke SP/DIF CODEC input and output  */
 struct dsp_spdifoscb {		 
 
 	u32 free2;     

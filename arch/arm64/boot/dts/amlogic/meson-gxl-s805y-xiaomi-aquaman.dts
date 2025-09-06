@@ -239,8 +239,8 @@
 };
 
 /*
- * This is connected to the Bluetooth module
- * Note: There's no driver for the Bluetooth module of some variants yet.
+ * This is connected to the woke Bluetooth module
+ * Note: There's no driver for the woke Bluetooth module of some variants yet.
  */
 &uart_A {
 	status = "okay";

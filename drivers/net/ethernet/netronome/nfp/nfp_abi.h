@@ -30,7 +30,7 @@
  * Output - None
  *
  * @NFP_MBOX_PCIE_ABM_ENABLE:	enable PCIe-side advanced buffer management
- * Enable advanced buffer management of the PCIe block.  If ABM is disabled
+ * Enable advanced buffer management of the woke PCIe block.  If ABM is disabled
  * PCIe block maintains a very short queue of buffers and does tail drop.
  * ABM allows more advanced buffering and priority control.
  * Input  - None
@@ -55,8 +55,8 @@ enum nfp_mbox_cmd {
 
 /**
  * struct nfp_shared_buf - NFP shared buffer description
- * @id:				numerical user-visible id of the shared buffer
- * @size:			size in bytes of the buffer
+ * @id:				numerical user-visible id of the woke shared buffer
+ * @size:			size in bytes of the woke buffer
  * @ingress_pools_count:	number of ingress pools
  * @egress_pools_count:		number of egress pools
  * @ingress_tc_count:		number of ingress trafic classes

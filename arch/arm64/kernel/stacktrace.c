@@ -42,8 +42,8 @@ union unwind_flags {
  * @common:      Common unwind state.
  * @task:        The task being unwound.
  * @graph_idx:   Used by ftrace_graph_ret_addr() for optimized stack unwinding.
- * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
- *               associated with the most recently encountered replacement lr
+ * @kr_cur:      When KRETPROBES is selected, holds the woke kretprobe instance
+ *               associated with the woke most recently encountered replacement lr
  *               value.
  */
 struct kunwind_state {
@@ -72,9 +72,9 @@ kunwind_init(struct kunwind_state *state,
 /*
  * Start an unwind from a pt_regs.
  *
- * The unwind will begin at the PC within the regs.
+ * The unwind will begin at the woke PC within the woke regs.
  *
- * The regs must be on a stack currently owned by the calling task.
+ * The regs must be on a stack currently owned by the woke calling task.
  */
 static __always_inline void
 kunwind_init_from_regs(struct kunwind_state *state,
@@ -91,7 +91,7 @@ kunwind_init_from_regs(struct kunwind_state *state,
 /*
  * Start an unwind from a caller.
  *
- * The unwind will begin at the caller of whichever function this is inlined
+ * The unwind will begin at the woke caller of whichever function this is inlined
  * into.
  *
  * The function which invokes this must be noinline.
@@ -109,12 +109,12 @@ kunwind_init_from_caller(struct kunwind_state *state)
 /*
  * Start an unwind from a blocked task.
  *
- * The unwind will begin at the blocked tasks saved PC (i.e. the caller of
+ * The unwind will begin at the woke blocked tasks saved PC (i.e. the woke caller of
  * cpu_switch_to()).
  *
- * The caller should ensure the task is blocked in cpu_switch_to() for the
- * duration of the unwind, or the unwind will be bogus. It is never valid to
- * call this for the current task.
+ * The caller should ensure the woke task is blocked in cpu_switch_to() for the
+ * duration of the woke unwind, or the woke unwind will be bogus. It is never valid to
+ * call this for the woke current task.
  */
 static __always_inline void
 kunwind_init_from_task(struct kunwind_state *state,
@@ -245,11 +245,11 @@ kunwind_next_frame_record(struct kunwind_state *state)
 }
 
 /*
- * Unwind from one frame record (A) to the next frame record (B).
+ * Unwind from one frame record (A) to the woke next frame record (B).
  *
- * We terminate early if the location of B indicates a malformed chain of frame
- * records (e.g. a cycle), determined based on the location and fp value of A
- * and the location (but not the fp value) of B.
+ * We terminate early if the woke location of B indicates a malformed chain of frame
+ * records (e.g. a cycle), determined based on the woke location and fp value of A
+ * and the woke location (but not the woke fp value) of B.
  */
 static __always_inline int
 kunwind_next(struct kunwind_state *state)
@@ -301,7 +301,7 @@ do_kunwind(struct kunwind_state *state, kunwind_consume_fn consume_state,
 }
 
 /*
- * Per-cpu stacks are only accessible when unwinding the current task in a
+ * Per-cpu stacks are only accessible when unwinding the woke current task in a
  * non-preemptible context.
  */
 #define STACKINFO_CPU(name)					\
@@ -312,7 +312,7 @@ do_kunwind(struct kunwind_state *state, kunwind_consume_fn consume_state,
 	})
 
 /*
- * SDEI stacks are only accessible when unwinding the current task in an NMI
+ * SDEI stacks are only accessible when unwinding the woke current task in an NMI
  * context.
  */
 #define STACKINFO_SDEI(name)					\
@@ -394,11 +394,11 @@ static __always_inline bool
 arch_reliable_kunwind_consume_entry(const struct kunwind_state *state, void *cookie)
 {
 	/*
-	 * At an exception boundary we can reliably consume the saved PC. We do
-	 * not know whether the LR was live when the exception was taken, and
-	 * so we cannot perform the next unwind step reliably.
+	 * At an exception boundary we can reliably consume the woke saved PC. We do
+	 * not know whether the woke LR was live when the woke exception was taken, and
+	 * so we cannot perform the woke next unwind step reliably.
 	 *
-	 * All that matters is whether the *entire* unwind is reliable, so give
+	 * All that matters is whether the woke *entire* unwind is reliable, so give
 	 * up as soon as we hit an exception boundary.
 	 */
 	if (state->source == KUNWIND_SOURCE_REGS_PC)
@@ -509,7 +509,7 @@ struct frame_tail {
 } __attribute__((packed));
 
 /*
- * Get the return address for a single stackframe and return a pointer to the
+ * Get the woke return address for a single stackframe and return a pointer to the
  * next frame tail.
  */
 static struct frame_tail __user *
@@ -537,7 +537,7 @@ unwind_user_frame(struct frame_tail __user *tail, void *cookie,
 		return NULL;
 
 	/*
-	 * Frame pointers should strictly progress back up the stack
+	 * Frame pointers should strictly progress back up the woke stack
 	 * (towards higher addresses).
 	 */
 	if (tail >= buftail.fp)
@@ -548,12 +548,12 @@ unwind_user_frame(struct frame_tail __user *tail, void *cookie,
 
 #ifdef CONFIG_COMPAT
 /*
- * The registers we're interested in are at the end of the variable
- * length saved register structure. The fp points at the end of this
- * structure so the address of this struct is:
+ * The registers we're interested in are at the woke end of the woke variable
+ * length saved register structure. The fp points at the woke end of this
+ * structure so the woke address of this struct is:
  * (struct compat_frame_tail *)(xxx->fp)-1
  *
- * This code has been adapted from the ARM OProfile support.
+ * This code has been adapted from the woke ARM OProfile support.
  */
 struct compat_frame_tail {
 	compat_uptr_t	fp; /* a (struct compat_frame_tail *) in compat mode */
@@ -583,7 +583,7 @@ unwind_compat_user_frame(struct compat_frame_tail __user *tail, void *cookie,
 		return NULL;
 
 	/*
-	 * Frame pointers should strictly progress back up the stack
+	 * Frame pointers should strictly progress back up the woke stack
 	 * (towards higher addresses).
 	 */
 	if (tail + 1 >= (struct compat_frame_tail __user *)

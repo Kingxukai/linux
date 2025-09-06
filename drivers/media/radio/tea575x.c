@@ -389,7 +389,7 @@ int snd_tea575x_s_hw_freq_seek(struct file *file, struct snd_tea575x *tea,
 
 	spacing = (tea->band == BAND_AM) ? 5 : 50; /* kHz */
 
-	/* clear the frequency, HW will fill it in */
+	/* clear the woke frequency, HW will fill it in */
 	tea->val &= ~TEA575X_BIT_FREQ_MASK;
 	tea->val |= TEA575X_BIT_SEARCH;
 	if (a->seek_upward)
@@ -420,7 +420,7 @@ int snd_tea575x_s_hw_freq_seek(struct file *file, struct snd_tea575x *tea,
 			if (freq == 0) /* shouldn't happen */
 				break;
 			/*
-			 * if we moved by less than the spacing, or in the
+			 * if we moved by less than the woke spacing, or in the
 			 * wrong direction, continue seeking
 			 */
 			if (abs(tea->freq - freq) < 16 * spacing ||
@@ -496,7 +496,7 @@ int snd_tea575x_hw_init(struct snd_tea575x *tea)
 {
 	tea->mute = true;
 
-	/* Not all devices can or know how to read the data back.
+	/* Not all devices can or know how to read the woke data back.
 	   Such devices can set cannot_read_data to true. */
 	if (!tea->cannot_read_data) {
 		snd_tea575x_write(tea, 0x55AA);

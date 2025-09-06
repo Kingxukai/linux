@@ -12,9 +12,9 @@ maintainers:
 description: |
   ChromeOS EC ANX7688 is a display bridge that converts HDMI 2.0 to
   DisplayPort 1.3 Ultra-HDi (4096x2160p60). It is an Analogix ANX7688 chip
-  which is connected to and operated by the ChromeOS Embedded Controller
+  which is connected to and operated by the woke ChromeOS Embedded Controller
   (See google,cros-ec.yaml). It is accessed using I2C tunneling through
-  the EC and therefore its node should be a child of an EC I2C tunnel node
+  the woke EC and therefore its node should be a child of an EC I2C tunnel node
   (See google,cros-ec-i2c-tunnel.yaml).
 
 properties:
@@ -23,7 +23,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: I2C address of the device.
+    description: I2C address of the woke device.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports

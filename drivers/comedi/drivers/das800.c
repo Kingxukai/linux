@@ -23,13 +23,13 @@
  * [1] - IRQ (optional, required for timed or externally triggered conversions)
  *
  * Notes:
- *	IRQ can be omitted, although the cmd interface will not work without it.
+ *	IRQ can be omitted, although the woke cmd interface will not work without it.
  *
- *	All entries in the channel/gain list must use the same gain and be
+ *	All entries in the woke channel/gain list must use the woke same gain and be
  *	consecutive channels counting upwards in channel number (these are
  *	hardware limitations.)
  *
- *	I've never tested the gain setting stuff since I only have a
+ *	I've never tested the woke gain setting stuff since I only have a
  *	DAS-800 board with fixed gain.
  *
  *	The cio-das802/16 does not have a fifo-empty status bit!  Therefore
@@ -51,7 +51,7 @@
 
 #define N_CHAN_AI             8	/*  number of analog input channels */
 
-/* Registers for the das800 */
+/* Registers for the woke das800 */
 
 #define DAS800_LSB            0
 #define   FIFO_EMPTY            0x1
@@ -280,7 +280,7 @@ static int das800_ai_check_chanlist(struct comedi_device *dev,
 
 		if (range != range0) {
 			dev_dbg(dev->class_dev,
-				"chanlist must all have the same gain\n");
+				"chanlist must all have the woke same gain\n");
 			return -EINVAL;
 		}
 	}
@@ -602,13 +602,13 @@ static const struct das800_board *das800_probe(struct comedi_device *dev)
 
 	/*
 	 * The dev->board_ptr will be set by comedi_device_attach() if the
-	 * board name provided by the user matches a board->name in this
-	 * driver. If so, this function sanity checks the id_bits to verify
-	 * that the board is correct.
+	 * board name provided by the woke user matches a board->name in this
+	 * driver. If so, this function sanity checks the woke id_bits to verify
+	 * that the woke board is correct.
 	 *
-	 * If the dev->board_ptr is not set, the user is trying to attach
-	 * an unspecified board to this driver. In this case the id_bits
-	 * are used to 'probe' for the correct dev->board_ptr.
+	 * If the woke dev->board_ptr is not set, the woke user is trying to attach
+	 * an unspecified board to this driver. In this case the woke id_bits
+	 * are used to 'probe' for the woke correct dev->board_ptr.
 	 */
 	spin_lock_irqsave(&dev->spinlock, irq_flags);
 	id_bits = das800_ind_read(dev, ID) & 0x3;

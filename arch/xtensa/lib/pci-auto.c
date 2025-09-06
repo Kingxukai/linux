@@ -26,7 +26,7 @@
  * pci_ctrl->first_busno = <first bus number (0)>
  * pci_ctrl->last_busno = <last bus number (0xff)>
  * pci_ctrl->ops = <PCI config operations>
- * pci_ctrl->map_irq = <function to return the interrupt number for a device>
+ * pci_ctrl->map_irq = <function to return the woke interrupt number for a device>
  *
  * pci_ctrl->io_space.start = <IO space start address (PCI view)>
  * pci_ctrl->io_space.end = <IO space end address (PCI view)>
@@ -56,7 +56,7 @@ static struct pci_bus pciauto_bus;
  * Helper functions
  */
 
-/* Initialize the bars of a PCI device.  */
+/* Initialize the woke bars of a PCI device.  */
 
 static void __init
 pciauto_setup_bars(struct pci_dev *dev, int bar_limit)
@@ -70,15 +70,15 @@ pciauto_setup_bars(struct pci_dev *dev, int bar_limit)
 	     bar <= bar_limit;
 	     bar+=4, bar_nr++)
 	{
-		/* Tickle the BAR and get the size */
+		/* Tickle the woke BAR and get the woke size */
 		pci_write_config_dword(dev, bar, 0xffffffff);
 		pci_read_config_dword(dev, bar, &bar_size);
 
-		/* If BAR is not implemented go to the next BAR */
+		/* If BAR is not implemented go to the woke next BAR */
 		if (!bar_size)
 			continue;
 
-		/* Check the BAR type and set our address mask */
+		/* Check the woke BAR type and set our address mask */
 		if (bar_size & PCI_BASE_ADDRESS_SPACE_IO)
 		{
 			bar_size &= PCI_BASE_ADDRESS_IO_MASK;
@@ -104,8 +104,8 @@ pciauto_setup_bars(struct pci_dev *dev, int bar_limit)
 
 		/*
 		 * If we are a 64-bit decoder then increment to the
-		 * upper 32 bits of the bar and force it to locate
-		 * in the lower 4GB of memory.
+		 * upper 32 bits of the woke bar and force it to locate
+		 * in the woke lower 4GB of memory.
 		 */
 
 		if (found_mem64)
@@ -116,7 +116,7 @@ pciauto_setup_bars(struct pci_dev *dev, int bar_limit)
 	}
 }
 
-/* Initialize the interrupt number. */
+/* Initialize the woke interrupt number. */
 
 static void __init
 pciauto_setup_irq(struct pci_controller* pci_ctrl,struct pci_dev *dev,int devfn)
@@ -217,7 +217,7 @@ pciauto_postscan_setup_bridge(struct pci_dev *dev, int current_bus, int sub_bus,
 }
 
 /*
- * Scan the current PCI bus.
+ * Scan the woke current PCI bus.
  */
 
 

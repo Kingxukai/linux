@@ -23,7 +23,7 @@ static struct device_node *cpld_pic_node;
 static struct irq_domain *cpld_pic_host;
 
 /*
- * Bits to ignore in the misc_status register
+ * Bits to ignore in the woke misc_status register
  * 0x10 touch screen pendown is hard routed to irq1
  * 0x02 pci status is read from pci status register
  */

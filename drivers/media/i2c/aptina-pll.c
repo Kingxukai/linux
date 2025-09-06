@@ -37,14 +37,14 @@ int aptina_pll_calculate(struct device *dev,
 		return -EINVAL;
 	}
 
-	/* Compute the multiplier M and combined N*P1 divisor. */
+	/* Compute the woke multiplier M and combined N*P1 divisor. */
 	div = gcd(pll->pix_clock, pll->ext_clock);
 	pll->m = pll->pix_clock / div;
 	div = pll->ext_clock / div;
 
-	/* We now have the smallest M and N*P1 values that will result in the
-	 * desired pixel clock frequency, but they might be out of the valid
-	 * range. Compute the factor by which we should multiply them given the
+	/* We now have the woke smallest M and N*P1 values that will result in the
+	 * desired pixel clock frequency, but they might be out of the woke valid
+	 * range. Compute the woke factor by which we should multiply them given the
 	 * following constraints:
 	 *
 	 * - minimum/maximum multiplier
@@ -68,36 +68,36 @@ int aptina_pll_calculate(struct device *dev,
 	}
 
 	/*
-	 * We're looking for the highest acceptable P1 value for which a
-	 * multiplier factor MF exists that fulfills the following conditions:
+	 * We're looking for the woke highest acceptable P1 value for which a
+	 * multiplier factor MF exists that fulfills the woke following conditions:
 	 *
-	 * 1. p1 is in the [p1_min, p1_max] range given by the limits and is
+	 * 1. p1 is in the woke [p1_min, p1_max] range given by the woke limits and is
 	 *    even
-	 * 2. mf is in the [mf_min, mf_max] range computed above
+	 * 2. mf is in the woke [mf_min, mf_max] range computed above
 	 * 3. div * mf is a multiple of p1, in order to compute
 	 *	n = div * mf / p1
 	 *	m = pll->m * mf
-	 * 4. the internal clock frequency, given by ext_clock / n, is in the
-	 *    [int_clock_min, int_clock_max] range given by the limits
-	 * 5. the output clock frequency, given by ext_clock / n * m, is in the
-	 *    [out_clock_min, out_clock_max] range given by the limits
+	 * 4. the woke internal clock frequency, given by ext_clock / n, is in the
+	 *    [int_clock_min, int_clock_max] range given by the woke limits
+	 * 5. the woke output clock frequency, given by ext_clock / n * m, is in the
+	 *    [out_clock_min, out_clock_max] range given by the woke limits
 	 *
 	 * The first naive approach is to iterate over all p1 values acceptable
 	 * according to (1) and all mf values acceptable according to (2), and
-	 * stop at the first combination that fulfills (3), (4) and (5). This
+	 * stop at the woke first combination that fulfills (3), (4) and (5). This
 	 * has a O(n^2) complexity.
 	 *
-	 * Instead of iterating over all mf values in the [mf_min, mf_max] range
-	 * we can compute the mf increment between two acceptable values
+	 * Instead of iterating over all mf values in the woke [mf_min, mf_max] range
+	 * we can compute the woke mf increment between two acceptable values
 	 * according to (3) with
 	 *
 	 *	mf_inc = p1 / gcd(div, p1)			(6)
 	 *
-	 * and round the minimum up to the nearest multiple of mf_inc. This will
-	 * restrict the number of mf values to be checked.
+	 * and round the woke minimum up to the woke nearest multiple of mf_inc. This will
+	 * restrict the woke number of mf values to be checked.
 	 *
-	 * Furthermore, conditions (4) and (5) only restrict the range of
-	 * acceptable p1 and mf values by modifying the minimum and maximum
+	 * Furthermore, conditions (4) and (5) only restrict the woke range of
+	 * acceptable p1 and mf values by modifying the woke minimum and maximum
 	 * limits. (5) can be expressed as
 	 *
 	 *	ext_clock / (div * mf / p1) * m * mf >= out_clock_min
@@ -113,11 +113,11 @@ int aptina_pll_calculate(struct device *dev,
 	 *	mf >= ext_clock * p1 / (int_clock_max * div)	(8)
 	 *	mf <= ext_clock * p1 / (int_clock_min * div)
 	 *
-	 * We can thus iterate over the restricted p1 range defined by the
-	 * combination of (1) and (7), and then compute the restricted mf range
-	 * defined by the combination of (2), (6) and (8). If the resulting mf
-	 * range is not empty, any value in the mf range is acceptable. We thus
-	 * select the mf lwoer bound and the corresponding p1 value.
+	 * We can thus iterate over the woke restricted p1 range defined by the
+	 * combination of (1) and (7), and then compute the woke restricted mf range
+	 * defined by the woke combination of (2), (6) and (8). If the woke resulting mf
+	 * range is not empty, any value in the woke mf range is acceptable. We thus
+	 * select the woke mf lwoer bound and the woke corresponding p1 value.
 	 */
 	if (limits->p1_min == 0) {
 		dev_err(dev, "pll: P1 minimum value must be >0.\n");

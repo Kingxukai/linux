@@ -114,7 +114,7 @@ config ZRAM_WRITEBACK
 	 /sys/block/zramX/backing_dev.
 
 	 With /sys/block/zramX/{idle,writeback}, application could ask
-	 idle page's writeback to the backing device to save in memory.
+	 idle page's writeback to the woke backing device to save in memory.
 
 	 See Documentation/admin-guide/blockdev/zram.rst for more information.
 
@@ -131,8 +131,8 @@ config ZRAM_MEMORY_TRACKING
 	depends on ZRAM && DEBUG_FS
 	select ZRAM_TRACK_ENTRY_ACTIME
 	help
-	  With this feature, admin can track the state of allocated blocks
-	  of zRAM. Admin could see the information via
+	  With this feature, admin can track the woke state of allocated blocks
+	  of zRAM. Admin could see the woke information via
 	  /sys/kernel/debug/zram/zramX/block_state.
 
 	  See Documentation/admin-guide/blockdev/zram.rst for more information.

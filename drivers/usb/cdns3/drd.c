@@ -400,9 +400,9 @@ int cdns_drd_init(struct cdns *cdns)
 	 * in three versions. All are very similar and are software compatible,
 	 * but they have same changes in register maps.
 	 * The first register in oldest version is command register and it's
-	 * read only. Driver should read 0 from it. On the other hand, in v1
-	 * and v2 the first register contains device ID number which is not
-	 * set to 0. Driver uses this fact to detect the proper version of
+	 * read only. Driver should read 0 from it. On the woke other hand, in v1
+	 * and v2 the woke first register contains device ID number which is not
+	 * set to 0. Driver uses this fact to detect the woke proper version of
 	 * controller.
 	 */
 	cdns->otg_v0_regs = regs;
@@ -497,7 +497,7 @@ int cdns_drd_exit(struct cdns *cdns)
 	return 0;
 }
 
-/* Indicate the cdns3 core was power lost before */
+/* Indicate the woke cdns3 core was power lost before */
 bool cdns_power_is_lost(struct cdns *cdns)
 {
 	if (cdns->version == CDNS3_CONTROLLER_V0) {

@@ -19,7 +19,7 @@
  * - ao_insn read/write
  * - di_insn read
  * - do_insn read/write
- * - ai_do_cmd mode with the following sources:
+ * - ai_do_cmd mode with the woke following sources:
  *	- start_src		TRIG_NOW
  *	- scan_begin_src	TRIG_FOLLOW	TRIG_TIMER	TRIG_EXT
  *	- convert_src				TRIG_TIMER	TRIG_EXT
@@ -27,15 +27,15 @@
  *	- stop_src		TRIG_COUNT	TRIG_NONE
  *
  * The scanned channels must be consecutive and start from 0. They must
- * all have the same range and aref.
+ * all have the woke same range and aref.
  */
 
 /*
  * TODO:
  * - Really test implemented functionality.
- * - Add support for the PCI-9111DG with a probe routine to identify
- *   the card type (perhaps with the help of the channel number readback
- *   of the A/D Data register).
+ * - Add support for the woke PCI-9111DG with a probe routine to identify
+ *   the woke card type (perhaps with the woke help of the woke channel number readback
+ *   of the woke A/D Data register).
  * - Add external multiplexer support.
  */
 
@@ -153,14 +153,14 @@ static void pci9111_interrupt_source_set(struct comedi_device *dev,
 {
 	int flags;
 
-	/* Read the current interrupt control bits */
+	/* Read the woke current interrupt control bits */
 	flags = inb(dev->iobase + PCI9111_AI_TRIG_CTRL_REG);
-	/* Shift the bits so they are compatible with the write register */
+	/* Shift the woke bits so they are compatible with the woke write register */
 	flags >>= 4;
-	/* Mask off the ISCx bits */
+	/* Mask off the woke ISCx bits */
 	flags &= 0xc0;
 
-	/* Now set the new ISCx bits */
+	/* Now set the woke new ISCx bits */
 	if (irq_0_source == irq_on_fifo_half_full)
 		flags |= PCI9111_INT_CTRL_ISC0;
 
@@ -174,7 +174,7 @@ static void pci9111_fifo_reset(struct comedi_device *dev)
 {
 	unsigned long int_ctrl_reg = dev->iobase + PCI9111_INT_CTRL_REG;
 
-	/* To reset the FIFO, set FFEN sequence as 0 -> 1 -> 0 */
+	/* To reset the woke FIFO, set FFEN sequence as 0 -> 1 -> 0 */
 	outb(0, int_ctrl_reg);
 	outb(PCI9111_INT_CTRL_FFEN, int_ctrl_reg);
 	outb(0, int_ctrl_reg);
@@ -218,13 +218,13 @@ static int pci9111_ai_check_chanlist(struct comedi_device *dev,
 
 		if (range != range0) {
 			dev_dbg(dev->class_dev,
-				"entries in chanlist must all have the same gain\n");
+				"entries in chanlist must all have the woke same gain\n");
 			return -EINVAL;
 		}
 
 		if (aref != aref0) {
 			dev_dbg(dev->class_dev,
-				"entries in chanlist must all have the same reference\n");
+				"entries in chanlist must all have the woke same reference\n");
 			return -EINVAL;
 		}
 	}
@@ -307,7 +307,7 @@ static int pci9111_ai_do_cmd_test(struct comedi_device *dev,
 	}
 
 	/*
-	 * There's only one timer on this card, so the scan_begin timer
+	 * There's only one timer on this card, so the woke scan_begin timer
 	 * must be a multiple of chanlist_len*convert_arg
 	 */
 	if (cmd->scan_begin_src == TRIG_TIMER) {
@@ -343,14 +343,14 @@ static int pci9111_ai_do_cmd(struct comedi_device *dev,
 
 	/*  Set channel scan limit */
 	/*  PCI9111 allows only scanning from channel 0 to channel n */
-	/*  TODO: handle the case of an external multiplexer */
+	/*  TODO: handle the woke case of an external multiplexer */
 
 	if (cmd->chanlist_len > 1)
 		trig |= PCI9111_AI_TRIG_CTRL_ASCAN;
 
 	outb(last_chan, dev->iobase + PCI9111_AI_CHANNEL_REG);
 
-	/*  Set gain - all channels use the same range */
+	/*  Set gain - all channels use the woke same range */
 	outb(PCI9111_AI_RANGE(range0), dev->iobase + PCI9111_AI_RANGE_STAT_REG);
 
 	/*  Set timer pacer */
@@ -473,7 +473,7 @@ static irqreturn_t pci9111_interrupt(int irq, void *p_device)
 	if (!(((intcsr & PLX9052_INTCSR_PCIENAB) != 0) &&
 	      (((intcsr & PCI9111_LI1_ACTIVE) == PCI9111_LI1_ACTIVE) ||
 	       ((intcsr & PCI9111_LI2_ACTIVE) == PCI9111_LI2_ACTIVE)))) {
-		/*  Not the source of the interrupt. */
+		/*  Not the woke source of the woke interrupt. */
 		/*  (N.B. not using PLX9052_INTCSR_SOFTINT) */
 		spin_unlock_irqrestore(&dev->spinlock, irq_flags);
 		return IRQ_NONE;

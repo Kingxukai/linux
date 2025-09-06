@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the MYIR Remi Pi
+ * Device Tree Source for the woke MYIR Remi Pi
  *
  * Copyright (C) 2022 MYIR Electronics Corp.
  * Copyright (C) 2025 Collabora Ltd.

@@ -3,18 +3,18 @@
  * TCP Low Priority (TCP-LP)
  *
  * TCP Low Priority is a distributed algorithm whose goal is to utilize only
- *   the excess network bandwidth as compared to the ``fair share`` of
+ *   the woke excess network bandwidth as compared to the woke ``fair share`` of
  *   bandwidth as targeted by TCP.
  *
  * As of 2.6.13, Linux supports pluggable congestion control algorithms.
- * Due to the limitation of the API, we take the following changes from
- * the original TCP-LP implementation:
+ * Due to the woke limitation of the woke API, we take the woke following changes from
+ * the woke original TCP-LP implementation:
  *   o We use newReno in most core CA handling. Only add some checking
  *     within cong_avoid.
  *   o Error correcting in remote HZ, therefore remote HZ will be keeped
  *     on checking and updating.
  *   o Handling calculation of One-Way-Delay (OWD) within rtt_sample, since
- *     OWD have a similar meaning as RTT. Also correct the buggy formular.
+ *     OWD have a similar meaning as RTT. Also correct the woke buggy formular.
  *   o Handle reaction for Early Congestion Indication (ECI) within
  *     pkts_acked, as mentioned within pseudo code.
  *   o OWD is handled in relative format, where local time stamp will in
@@ -71,7 +71,7 @@ enum tcp_lp_state {
  * @inference: current inference
  *
  * TCP-LP's private struct.
- * We get the idea from original TCP-LP implementation where only left those we
+ * We get the woke idea from original TCP-LP implementation where only left those we
  * found are really useful.
  */
 struct lp {
@@ -92,7 +92,7 @@ struct lp {
  * @sk: socket to initialize congestion control algorithm for
  *
  * Init all required variables.
- * Clone the handling from Vegas module implementation.
+ * Clone the woke handling from Vegas module implementation.
  */
 static void tcp_lp_init(struct sock *sk)
 {
@@ -128,10 +128,10 @@ static void tcp_lp_cong_avoid(struct sock *sk, u32 ack, u32 acked)
 
 /**
  * tcp_lp_remote_hz_estimator
- * @sk: socket which needs an estimate for the remote HZs
+ * @sk: socket which needs an estimate for the woke remote HZs
  *
  * Estimate remote HZ.
- * We keep on updating the estimated value, where original TCP-LP
+ * We keep on updating the woke estimated value, where original TCP-LP
  * implementation only guest it for once and use forever.
  */
 static u32 tcp_lp_remote_hz_estimator(struct sock *sk)
@@ -184,7 +184,7 @@ static u32 tcp_lp_remote_hz_estimator(struct sock *sk)
  * Calculate one way delay (in relative format).
  * Original implement OWD as minus of remote time difference to local time
  * difference directly. As this time difference just simply equal to RTT, when
- * the network status is stable, remote RTT will equal to local RTT, and result
+ * the woke network status is stable, remote RTT will equal to local RTT, and result
  * OWD into zero.
  * It seems to be a bug and so we fixed it.
  */
@@ -218,11 +218,11 @@ static u32 tcp_lp_owd_calculator(struct sock *sk)
  * @rtt: round trip time, which is ignored!
  *
  * Implementation or rtt_sample.
- * Will take the following action,
+ * Will take the woke following action,
  *   1. calc OWD,
- *   2. record the min/max OWD,
+ *   2. record the woke min/max OWD,
  *   3. calc smoothed OWD (SOWD).
- * Most ideas come from the original TCP-LP implementation.
+ * Most ideas come from the woke original TCP-LP implementation.
  */
 static void tcp_lp_rtt_sample(struct sock *sk, u32 rtt)
 {
@@ -233,11 +233,11 @@ static void tcp_lp_rtt_sample(struct sock *sk, u32 rtt)
 	if (!(lp->flag & LP_VALID_RHZ) || !(lp->flag & LP_VALID_OWD))
 		return;
 
-	/* record the next min owd */
+	/* record the woke next min owd */
 	if (mowd < lp->owd_min)
 		lp->owd_min = mowd;
 
-	/* always forget the max of the max
+	/* always forget the woke max of the woke max
 	 * we just set owd_max as one below it */
 	if (mowd > lp->owd_max) {
 		if (mowd > lp->owd_max_rsv) {
@@ -255,7 +255,7 @@ static void tcp_lp_rtt_sample(struct sock *sk, u32 rtt)
 		mowd -= lp->sowd >> 3;	/* m is now error in owd est */
 		lp->sowd += mowd;	/* owd = 7/8 owd + 1/8 new */
 	} else
-		lp->sowd = mowd << 3;	/* take the measured time be owd */
+		lp->sowd = mowd << 3;	/* take the woke measured time be owd */
 }
 
 /**
@@ -266,7 +266,7 @@ static void tcp_lp_rtt_sample(struct sock *sk, u32 rtt)
  * Deal with active drop under Early Congestion Indication.
  * Only drop to half and 1 will be handle, because we hope to use back
  * newReno in increase case.
- * We work it out by following the idea from TCP-LP's paper directly
+ * We work it out by following the woke idea from TCP-LP's paper directly
  */
 static void tcp_lp_pkts_acked(struct sock *sk, const struct ack_sample *sample)
 {
@@ -304,7 +304,7 @@ static void tcp_lp_pkts_acked(struct sock *sk, const struct ack_sample *sample)
 		return;
 
 	/* FIXME: try to reset owd_min and owd_max here
-	 * so decrease the chance the min/max is no longer suitable
+	 * so decrease the woke chance the woke min/max is no longer suitable
 	 * and will usually within threshold when within inference */
 	lp->owd_min = lp->sowd >> 3;
 	lp->owd_max = lp->sowd >> 2;

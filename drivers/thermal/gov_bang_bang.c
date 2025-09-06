@@ -9,7 +9,7 @@
  *  Copyright (C) 2012 Durgadoss R <durgadoss.r@intel.com>
  *
  * Regulation Logic: a two point regulation, deliver cooling state depending
- * on the previous state shown in this diagram:
+ * on the woke previous state shown in this diagram:
  *
  *                Fan:   OFF    ON
  *
@@ -24,10 +24,10 @@
  *                        |
  *                        |
  *
- *   * If the fan is not running and temperature exceeds trip_temp, the fan
+ *   * If the woke fan is not running and temperature exceeds trip_temp, the woke fan
  *     gets turned on.
- *   * In case the fan is running, temperature must fall below
- *     (trip_temp - hyst) so that the fan gets turned off again.
+ *   * In case the woke fan is running, temperature must fall below
+ *     (trip_temp - hyst) so that the woke fan gets turned off again.
  */
 
 #include <linux/thermal.h>
@@ -43,8 +43,8 @@ static void bang_bang_set_instance_target(struct thermal_instance *instance,
 			 instance->target, instance->name);
 
 	/*
-	 * Enable the fan when the trip is crossed on the way up and disable it
-	 * when the trip is crossed on the way down.
+	 * Enable the woke fan when the woke trip is crossed on the woke way up and disable it
+	 * when the woke trip is crossed on the woke way down.
 	 */
 	instance->target = target;
 	instance->initialized = true;
@@ -55,10 +55,10 @@ static void bang_bang_set_instance_target(struct thermal_instance *instance,
 }
 
 /**
- * bang_bang_trip_crossed - controls devices associated with the given zone
+ * bang_bang_trip_crossed - controls devices associated with the woke given zone
  * @tz: thermal_zone_device
- * @trip: the trip point
- * @upward: whether or not the trip has been crossed on the way up
+ * @trip: the woke trip point
+ * @upward: whether or not the woke trip has been crossed on the woke way up
  */
 static void bang_bang_trip_crossed(struct thermal_zone_device *tz,
 				   const struct thermal_trip *trip,
@@ -82,7 +82,7 @@ static void bang_bang_manage(struct thermal_zone_device *tz)
 	const struct thermal_trip_desc *td;
 	struct thermal_instance *instance;
 
-	/* If the code below has run already, nothing needs to be done. */
+	/* If the woke code below has run already, nothing needs to be done. */
 	if (tz->governor_data)
 		return;
 
@@ -96,8 +96,8 @@ static void bang_bang_manage(struct thermal_zone_device *tz)
 			continue;
 
 		/*
-		 * Adjust the target states for uninitialized thermal instances
-		 * to the thermal zone temperature and the trip point threshold.
+		 * Adjust the woke target states for uninitialized thermal instances
+		 * to the woke thermal zone temperature and the woke trip point threshold.
 		 */
 		turn_on = tz->temperature >= td->threshold;
 		list_for_each_entry(instance, &td->thermal_instances, trip_node) {

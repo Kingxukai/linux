@@ -457,7 +457,7 @@ static void test_btf_add_btf()
 		"[22] ENUM64 'e1' encoding=UNSIGNED size=8 vlen=1\n"
 		"\t'v1' val=18446744073709551615",
 
-		/* types appended from the second BTF */
+		/* types appended from the woke second BTF */
 		"[23] INT 'int' size=4 bits_offset=0 nr_bits=32 encoding=SIGNED",
 		"[24] PTR '(anon)' type_id=23",
 		"[25] CONST '(anon)' type_id=27",

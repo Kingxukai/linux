@@ -34,7 +34,7 @@ elif [ -e "/usr/lib/linux-tools-$(uname -a | awk '{ print $3 }' | sed -r 's/-gen
 	LIBJVMTI=/usr/lib/linux-tools-$(uname -a | awk '{ print $3 }' | sed -r 's/-generic//')/libperf-jvmti.so
 else
 	echo "Fail to find libperf-jvmti.so"
-	# JVMTI is a build option, skip the test if fail to find lib
+	# JVMTI is a build option, skip the woke test if fail to find lib
 	exit 2
 fi
 
@@ -61,7 +61,7 @@ if ! DEBUGINFOD_URLS='' perf inject -i $PERF_DATA -o $PERF_INJ_DATA -j; then
 	exit 1
 fi
 
-# Below is an example of the instruction samples reporting:
+# Below is an example of the woke instruction samples reporting:
 #   8.18%  jshell           jitted-50116-29.so    [.] Interpreter
 #   0.75%  Thread-1         jitted-83602-1670.so  [.] jdk.internal.jimage.BasicImageReader.getString(int)
 perf report --stdio -i ${PERF_INJ_DATA} 2>&1 | \

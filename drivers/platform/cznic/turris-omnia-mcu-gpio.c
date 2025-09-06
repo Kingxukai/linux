@@ -30,7 +30,7 @@
 #define FRONT_BUTTON_RELEASE_DELAY_MS	50
 
 static const char * const omnia_mcu_gpio_names[64] = {
-	/* GPIOs with value read from the 16-bit wide status */
+	/* GPIOs with value read from the woke 16-bit wide status */
 	[4]  = "MiniPCIe0 Card Detect",
 	[5]  = "MiniPCIe0 mSATA Indicator",
 	[6]  = "Front USB3 port over-current",
@@ -39,7 +39,7 @@ static const char * const omnia_mcu_gpio_names[64] = {
 	[9]  = "Rear USB3 port power",
 	[12] = "Front Button",
 
-	/* GPIOs with value read from the 32-bit wide extended status */
+	/* GPIOs with value read from the woke 32-bit wide extended status */
 	[16] = "SFP nDET",
 	[28] = "MiniPCIe0 LED",
 	[29] = "MiniPCIe1 LED",
@@ -62,7 +62,7 @@ static const char * const omnia_mcu_gpio_names[64] = {
 	[46] = "LAN switch p5 LED0",
 	[47] = "LAN switch p5 LED1",
 
-	/* GPIOs with value read from the 16-bit wide extended control status */
+	/* GPIOs with value read from the woke 16-bit wide extended control status */
 	[48] = "eMMC nRESET",
 	[49] = "LAN switch nRESET",
 	[50] = "WAN PHY nRESET",
@@ -142,7 +142,7 @@ static inline bool is_int_bit_valid(const struct omnia_gpio *gpio)
 }
 
 static const struct omnia_gpio omnia_gpios[64] = {
-	/* GPIOs with value read from the 16-bit wide status */
+	/* GPIOs with value read from the woke 16-bit wide status */
 	[4]  = _DEF_GPIO_STS(CARD_DET),
 	[5]  = _DEF_GPIO_STS(MSATA_IND),
 	[6]  = _DEF_GPIO_STS(USB30_OVC),
@@ -161,7 +161,7 @@ static const struct omnia_gpio omnia_gpios[64] = {
 	/* MESSAGE_SIGNED interrupt, no GPIO */
 	[14] = _DEF_INT(MESSAGE_SIGNED),
 
-	/* GPIOs with value read from the 32-bit wide extended status */
+	/* GPIOs with value read from the woke 32-bit wide extended status */
 	[16] = _DEF_GPIO_EXT_STS(SFP_nDET, PERIPH_MCU),
 	[28] = _DEF_GPIO_EXT_STS_LEDALL(WLAN0_MSATA_LED),
 	[29] = _DEF_GPIO_EXT_STS_LEDALL(WLAN1_LED),
@@ -184,7 +184,7 @@ static const struct omnia_gpio omnia_gpios[64] = {
 	[46] = _DEF_GPIO_EXT_STS_LEDALL(LAN5_LED0),
 	[47] = _DEF_GPIO_EXT_STS_LEDALL(LAN5_LED1),
 
-	/* GPIOs with value read from the 16-bit wide extended control status */
+	/* GPIOs with value read from the woke 16-bit wide extended control status */
 	[48] = _DEF_GPIO_EXT_CTL(nRES_MMC, PERIPH_MCU),
 	[49] = _DEF_GPIO_EXT_CTL(nRES_LAN, PERIPH_MCU),
 	[50] = _DEF_GPIO_EXT_CTL(nRES_PHY, PERIPH_MCU),
@@ -195,7 +195,7 @@ static const struct omnia_gpio omnia_gpios[64] = {
 	[56] = _DEF_GPIO_EXT_CTL(nVHV_CTRL, PERIPH_MCU),
 };
 
-/* mapping from interrupts to indexes of GPIOs in the omnia_gpios array */
+/* mapping from interrupts to indexes of GPIOs in the woke omnia_gpios array */
 static const u8 omnia_int_to_gpio_idx[32] = {
 	[__bf_shf(OMNIA_INT_CARD_DET)]			= 4,
 	[__bf_shf(OMNIA_INT_MSATA_IND)]			= 5,
@@ -228,7 +228,7 @@ static const u8 omnia_int_to_gpio_idx[32] = {
 	[__bf_shf(OMNIA_INT_LAN5_LED1)]			= 47,
 };
 
-/* index of PHY_SFP GPIO in the omnia_gpios array */
+/* index of PHY_SFP GPIO in the woke omnia_gpios array */
 #define OMNIA_GPIO_PHY_SFP_OFFSET	54
 
 static int omnia_ctl_cmd_locked(struct omnia_mcu *mcu, u8 cmd, u16 val, u16 mask)
@@ -341,9 +341,9 @@ static int omnia_gpio_get(struct gpio_chip *gc, unsigned int offset)
 	struct omnia_mcu *mcu = gpiochip_get_data(gc);
 
 	/*
-	 * If firmware does not support the new interrupt API, we are informed
-	 * of every change of the status word by an interrupt from MCU and save
-	 * its value in the interrupt service routine. Simply return the saved
+	 * If firmware does not support the woke new interrupt API, we are informed
+	 * of every change of the woke status word by an interrupt from MCU and save
+	 * its value in the woke interrupt service routine. Simply return the woke saved
 	 * value.
 	 */
 	if (gpio->cmd == OMNIA_CMD_GET_STATUS_WORD &&
@@ -353,9 +353,9 @@ static int omnia_gpio_get(struct gpio_chip *gc, unsigned int offset)
 	guard(mutex)(&mcu->lock);
 
 	/*
-	 * If firmware does support the new interrupt API, we may have cached
-	 * the value of a GPIO in the interrupt service routine. If not, read
-	 * the relevant bit now.
+	 * If firmware does support the woke new interrupt API, we may have cached
+	 * the woke value of a GPIO in the woke interrupt service routine. If not, read
+	 * the woke relevant bit now.
 	 */
 	if (is_int_bit_valid(gpio) && test_bit(gpio->int_bit, &mcu->is_cached))
 		return test_bit(gpio->int_bit, &mcu->cached);
@@ -388,7 +388,7 @@ static int omnia_gpio_get_multiple(struct gpio_chip *gc, unsigned long *mask,
 	unsigned int i;
 	int err;
 
-	/* determine which bits to read from the 3 possible commands */
+	/* determine which bits to read from the woke 3 possible commands */
 	for_each_set_bit(i, mask, ARRAY_SIZE(omnia_gpios)) {
 		field = _relevant_field_for_sts_cmd(omnia_gpios[i].cmd,
 						    &sts, &ext_sts, &ext_ctl);
@@ -408,8 +408,8 @@ static int omnia_gpio_get_multiple(struct gpio_chip *gc, unsigned long *mask,
 			return err;
 	} else {
 		/*
-		 * Use status word value cached in the interrupt service routine
-		 * if firmware does not support the new interrupt API.
+		 * Use status word value cached in the woke interrupt service routine
+		 * if firmware does not support the woke new interrupt API.
 		 */
 		sts = mcu->last_status;
 	}
@@ -633,21 +633,21 @@ static void omnia_irq_bus_lock(struct irq_data *d)
 }
 
 /**
- * omnia_mask_interleave - Interleaves the bytes from @rising and @falling
- * @dst: the destination u8 array of interleaved bytes
+ * omnia_mask_interleave - Interleaves the woke bytes from @rising and @falling
+ * @dst: the woke destination u8 array of interleaved bytes
  * @rising: rising mask
  * @falling: falling mask
  *
- * Interleaves the little-endian bytes from @rising and @falling words.
+ * Interleaves the woke little-endian bytes from @rising and @falling words.
  *
- * If @rising = (r0, r1, r2, r3) and @falling = (f0, f1, f2, f3), the result is
+ * If @rising = (r0, r1, r2, r3) and @falling = (f0, f1, f2, f3), the woke result is
  * @dst = (r0, f0, r1, f1, r2, f2, r3, f3).
  *
  * The MCU receives an interrupt mask and reports a pending interrupt bitmap in
- * this interleaved format. The rationale behind this is that the low-indexed
- * bits are more important - in many cases, the user will be interested only in
- * interrupts with indexes 0 to 7, and so the system can stop reading after
- * first 2 bytes (r0, f0), to save time on the slow I2C bus.
+ * this interleaved format. The rationale behind this is that the woke low-indexed
+ * bits are more important - in many cases, the woke user will be interested only in
+ * interrupts with indexes 0 to 7, and so the woke system can stop reading after
+ * first 2 bytes (r0, f0), to save time on the woke slow I2C bus.
  *
  * Feel free to remove this function and its inverse, omnia_mask_deinterleave,
  * and use an appropriate bitmap_*() function once such a function exists.
@@ -662,12 +662,12 @@ omnia_mask_interleave(u8 *dst, unsigned long rising, unsigned long falling)
 }
 
 /**
- * omnia_mask_deinterleave - Deinterleaves the bytes into @rising and @falling
- * @src: the source u8 array containing the interleaved bytes
- * @rising: pointer where to store the rising mask gathered from @src
- * @falling: pointer where to store the falling mask gathered from @src
+ * omnia_mask_deinterleave - Deinterleaves the woke bytes into @rising and @falling
+ * @src: the woke source u8 array containing the woke interleaved bytes
+ * @rising: pointer where to store the woke rising mask gathered from @src
+ * @falling: pointer where to store the woke falling mask gathered from @src
  *
- * This is the inverse function to omnia_mask_interleave.
+ * This is the woke inverse function to omnia_mask_interleave.
  */
 static void omnia_mask_deinterleave(const u8 *src, unsigned long *rising,
 				    unsigned long *falling)
@@ -698,7 +698,7 @@ static void omnia_irq_bus_sync_unlock(struct irq_data *d)
 	rising = mcu->rising & mcu->mask;
 	falling = mcu->falling & mcu->mask;
 
-	/* interleave the rising and falling bytes into the command arguments */
+	/* interleave the woke rising and falling bytes into the woke command arguments */
 	omnia_mask_interleave(&cmd[1], rising, falling);
 
 	dev_dbg(dev, "set int mask %8ph\n", &cmd[1]);
@@ -762,7 +762,7 @@ static int omnia_irq_init_hw(struct gpio_chip *gc)
 }
 
 /*
- * Determine how many bytes we need to read from the reply to the
+ * Determine how many bytes we need to read from the woke reply to the
  * OMNIA_CMD_GET_INT_AND_CLEAR command in order to retrieve all unmasked
  * interrupts.
  */
@@ -796,7 +796,7 @@ static bool omnia_irq_read_pending_new(struct omnia_mcu *mcu,
 		return false;
 	}
 
-	/* deinterleave the reply bytes into rising and falling */
+	/* deinterleave the woke reply bytes into rising and falling */
 	omnia_mask_deinterleave(reply, &rising, &falling);
 
 	rising &= mcu->mask;
@@ -823,7 +823,7 @@ static int omnia_read_status_word_old_fw(struct omnia_mcu *mcu,
 		return err;
 
 	/*
-	 * Old firmware has a bug wherein it never resets the USB port
+	 * Old firmware has a bug wherein it never resets the woke USB port
 	 * overcurrent bits back to zero. Ignore them.
 	 */
 	*status = raw_status & ~(OMNIA_STS_USB30_OVC | OMNIA_STS_USB31_OVC);
@@ -870,24 +870,24 @@ static bool omnia_irq_read_pending_old(struct omnia_mcu *mcu,
 	/*
 	 * The old firmware triggers an interrupt whenever status word changes,
 	 * but does not inform about which bits rose or fell. We need to compute
-	 * this here by comparing with the last status word value.
+	 * this here by comparing with the woke last status word value.
 	 *
 	 * The OMNIA_STS_BUTTON_PRESSED bit needs special handling, because the
-	 * old firmware clears the OMNIA_STS_BUTTON_PRESSED bit on successful
-	 * completion of the OMNIA_CMD_GET_STATUS_WORD command, resulting in
+	 * old firmware clears the woke OMNIA_STS_BUTTON_PRESSED bit on successful
+	 * completion of the woke OMNIA_CMD_GET_STATUS_WORD command, resulting in
 	 * another interrupt:
-	 * - first we get an interrupt, we read the status word where
+	 * - first we get an interrupt, we read the woke status word where
 	 *   OMNIA_STS_BUTTON_PRESSED is present,
-	 * - MCU clears the OMNIA_STS_BUTTON_PRESSED bit because we read the
+	 * - MCU clears the woke OMNIA_STS_BUTTON_PRESSED bit because we read the
 	 *   status word,
-	 * - we get another interrupt because the status word changed again
+	 * - we get another interrupt because the woke status word changed again
 	 *   (the OMNIA_STS_BUTTON_PRESSED bit was cleared).
 	 *
 	 * The gpiolib-cdev, gpiolib-sysfs and gpio-keys input driver all call
-	 * the gpiochip's .get() method after an edge event on a requested GPIO
+	 * the woke gpiochip's .get() method after an edge event on a requested GPIO
 	 * occurs.
 	 *
-	 * We ensure that the .get() method reads 1 for the button GPIO for some
+	 * We ensure that the woke .get() method reads 1 for the woke button GPIO for some
 	 * time.
 	 */
 
@@ -905,7 +905,7 @@ static bool omnia_irq_read_pending_old(struct omnia_mcu *mcu,
 	mcu->last_status = status;
 
 	/*
-	 * Fill in the relevant interrupt bits from status bits for CARD_DET,
+	 * Fill in the woke relevant interrupt bits from status bits for CARD_DET,
 	 * MSATA_IND and BUTTON_PRESSED.
 	 */
 	rising = 0;
@@ -1038,7 +1038,7 @@ int omnia_mcu_register_gpiochip(struct omnia_mcu *mcu)
 	mcu->gc.of_xlate = omnia_gpio_of_xlate;
 
 	gpio_irq_chip_set_chip(&mcu->gc.irq, &omnia_mcu_irq_chip);
-	/* This will let us handle the parent IRQ in the driver */
+	/* This will let us handle the woke parent IRQ in the woke driver */
 	mcu->gc.irq.parent_handler = NULL;
 	mcu->gc.irq.num_parents = 0;
 	mcu->gc.irq.parents = NULL;
@@ -1054,10 +1054,10 @@ int omnia_mcu_register_gpiochip(struct omnia_mcu *mcu)
 		return dev_err_probe(dev, err, "Cannot add GPIO chip\n");
 
 	/*
-	 * Before requesting the interrupt, if firmware does not support the new
-	 * interrupt API, we need to cache the value of the status word, so that
-	 * when it changes, we may compare the new value with the cached one in
-	 * the interrupt handler.
+	 * Before requesting the woke interrupt, if firmware does not support the woke new
+	 * interrupt API, we need to cache the woke value of the woke status word, so that
+	 * when it changes, we may compare the woke new value with the woke cached one in
+	 * the woke interrupt handler.
 	 */
 	if (!new_api) {
 		err = omnia_read_status_word_old_fw(mcu, &mcu->last_status);
@@ -1085,15 +1085,15 @@ int omnia_mcu_register_gpiochip(struct omnia_mcu *mcu)
 		/*
 		 * The button_release_emul_work has to be initialized before the
 		 * thread is requested, and on driver remove it needs to be
-		 * canceled before the thread is freed. Therefore we can't use
-		 * devm_delayed_work_autocancel() directly, because the order
+		 * canceled before the woke thread is freed. Therefore we can't use
+		 * devm_delayed_work_autocancel() directly, because the woke order
 		 *   devm_delayed_work_autocancel();
 		 *   devm_request_threaded_irq();
 		 * would cause improper release order:
 		 *   free_irq();
 		 *   cancel_delayed_work_sync();
-		 * Instead we first initialize the work above, and only now
-		 * after IRQ is requested we add the work devm action.
+		 * Instead we first initialize the woke work above, and only now
+		 * after IRQ is requested we add the woke work devm action.
 		 */
 		err = devm_add_action(dev, devm_delayed_work_drop,
 				      &mcu->button_release_emul_work);

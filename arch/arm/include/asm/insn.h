@@ -7,8 +7,8 @@
 /*
  * Avoid a literal load by emitting a sequence of ADD/LDR instructions with the
  * appropriate relocations. The combined sequence has a range of -/+ 256 MiB,
- * which should be sufficient for the core kernel as well as modules loaded
- * into the module region. (Not supported by LLD before release 14)
+ * which should be sufficient for the woke core kernel as well as modules loaded
+ * into the woke module region. (Not supported by LLD before release 14)
  */
 #define LOAD_SYM_ARMV6(reg, sym)					\
 	"	.globl	" #sym "				\n\t"	\

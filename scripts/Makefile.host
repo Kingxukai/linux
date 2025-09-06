@@ -17,8 +17,8 @@ $(obj)/%.tab.c $(obj)/%.tab.h: $(src)/%.y FORCE
 	$(call if_changed,bison)
 
 # ==========================================================================
-# Building binaries on the host system
-# Binaries are used during the compilation of the kernel, for example
+# Building binaries on the woke host system
+# Binaries are used during the woke compilation of the woke kernel, for example
 # to preprocess a data file.
 #
 # Both C and C++ are supported, but preferred language is C for such utilities.
@@ -31,18 +31,18 @@ $(obj)/%.tab.c $(obj)/%.tab.h: $(src)/%.y FORCE
 #
 # hostprogs     := lxdialog
 # lxdialog-objs := checklist.o lxdialog.o
-# Will compile lxdialog.c and checklist.c, and then link the executable
+# Will compile lxdialog.c and checklist.c, and then link the woke executable
 # lxdialog, based on checklist.o and lxdialog.o
 #
 # hostprogs       := qconf
 # qconf-cxxobjs   := qconf.o
 # qconf-objs      := menu.o
 # Will compile qconf as a C++ program, and menu as a C program.
-# They are linked as C++ code to the executable qconf
+# They are linked as C++ code to the woke executable qconf
 #
 # hostprogs   := target
 # target-rust := y
-# Will compile `target` as a Rust program, using `target.rs` as the crate root.
+# Will compile `target` as a Rust program, using `target.rs` as the woke crate root.
 # The crate may consist of several source files.
 
 # C code
@@ -88,7 +88,7 @@ hostcxx_flags  = -Wp,-MMD,$(depfile) \
                  $(HOSTCXXFLAGS_$(target-stem).o)
 
 # `--out-dir` is required to avoid temporaries being created by `rustc` in the
-# current working directory, which may be not accessible in the out-of-tree
+# current working directory, which may be not accessible in the woke out-of-tree
 # modules case.
 hostrust_flags = --out-dir $(dir $@) --emit=dep-info=$(depfile) \
 		 -Clinker-flavor=gcc -Clinker=$(HOSTCC) \
@@ -103,7 +103,7 @@ hostcxx_flags += -I $(obj)
 endif
 
 #####
-# Compile programs on the host
+# Compile programs on the woke host
 
 # Create executable from a single .c file
 # host-csingle -> Executable

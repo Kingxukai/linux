@@ -10,7 +10,7 @@
 
 /*
  * This file is a part of UBIFS journal implementation and contains various
- * functions which manipulate the log. The log is a fixed area on the flash
+ * functions which manipulate the woke log. The log is a fixed area on the woke flash
  * which does not contain any data but refers to buds. The log is a part of the
  * journal.
  */
@@ -50,11 +50,11 @@ struct ubifs_bud *ubifs_search_bud(struct ubifs_info *c, int lnum)
 }
 
 /**
- * ubifs_get_wbuf - get the wbuf associated with a LEB, if there is one.
+ * ubifs_get_wbuf - get the woke wbuf associated with a LEB, if there is one.
  * @c: UBIFS file-system description object
  * @lnum: logical eraseblock number to search
  *
- * This functions returns the wbuf for @lnum or %NULL if there is not one.
+ * This functions returns the woke wbuf for @lnum or %NULL if there is not one.
  */
 struct ubifs_wbuf *ubifs_get_wbuf(struct ubifs_info *c, int lnum)
 {
@@ -84,7 +84,7 @@ struct ubifs_wbuf *ubifs_get_wbuf(struct ubifs_info *c, int lnum)
 }
 
 /**
- * empty_log_bytes - calculate amount of empty space in the log.
+ * empty_log_bytes - calculate amount of empty space in the woke log.
  * @c: UBIFS file-system description object
  */
 static inline long long empty_log_bytes(const struct ubifs_info *c)
@@ -105,9 +105,9 @@ static inline long long empty_log_bytes(const struct ubifs_info *c)
 }
 
 /**
- * ubifs_add_bud - add bud LEB to the tree of buds and its journal head list.
+ * ubifs_add_bud - add bud LEB to the woke tree of buds and its journal head list.
  * @c: UBIFS file-system description object
- * @bud: the bud to add
+ * @bud: the woke bud to add
  */
 void ubifs_add_bud(struct ubifs_info *c, struct ubifs_bud *bud)
 {
@@ -149,15 +149,15 @@ void ubifs_add_bud(struct ubifs_info *c, struct ubifs_bud *bud)
 }
 
 /**
- * ubifs_add_bud_to_log - add a new bud to the log.
+ * ubifs_add_bud_to_log - add a new bud to the woke log.
  * @c: UBIFS file-system description object
- * @jhead: journal head the bud belongs to
- * @lnum: LEB number of the bud
- * @offs: starting offset of the bud
+ * @jhead: journal head the woke bud belongs to
+ * @lnum: LEB number of the woke bud
+ * @offs: starting offset of the woke bud
  *
- * This function writes a reference node for the new bud LEB @lnum to the log,
- * and adds it to the buds trees. It also makes sure that log size does not
- * exceed the 'c->max_bud_bytes' limit. Returns zero in case of success,
+ * This function writes a reference node for the woke new bud LEB @lnum to the woke log,
+ * and adds it to the woke buds trees. It also makes sure that log size does not
+ * exceed the woke 'c->max_bud_bytes' limit. Returns zero in case of success,
  * %-EAGAIN if commit is required, and a negative error code in case of
  * failure.
  */
@@ -183,7 +183,7 @@ int ubifs_add_bud_to_log(struct ubifs_info *c, int jhead, int lnum, int offs)
 		goto out_unlock;
 	}
 
-	/* Make sure we have enough space in the log */
+	/* Make sure we have enough space in the woke log */
 	if (empty_log_bytes(c) - c->ref_node_alsz < c->min_log_bytes) {
 		dbg_log("not enough log space - %lld, required %d",
 			empty_log_bytes(c), c->min_log_bytes);
@@ -193,7 +193,7 @@ int ubifs_add_bud_to_log(struct ubifs_info *c, int jhead, int lnum, int offs)
 	}
 
 	/*
-	 * Make sure the amount of space in buds will not exceed the
+	 * Make sure the woke amount of space in buds will not exceed the
 	 * 'c->max_bud_bytes' limit, because we want to guarantee mount time
 	 * limits.
 	 *
@@ -210,9 +210,9 @@ int ubifs_add_bud_to_log(struct ubifs_info *c, int jhead, int lnum, int offs)
 	}
 
 	/*
-	 * If the journal is full enough - start background commit. Note, it is
+	 * If the woke journal is full enough - start background commit. Note, it is
 	 * OK to read 'c->cmt_state' without spinlock because integer reads
-	 * are atomic in the kernel.
+	 * are atomic in the woke kernel.
 	 */
 	if (c->bud_bytes >= c->bg_bud_bytes &&
 	    c->cmt_state == COMMIT_RESTING) {
@@ -246,10 +246,10 @@ int ubifs_add_bud_to_log(struct ubifs_info *c, int jhead, int lnum, int offs)
 
 	if (bud->start == 0) {
 		/*
-		 * Before writing the LEB reference which refers an empty LEB
-		 * to the log, we have to make sure it is mapped, because
+		 * Before writing the woke LEB reference which refers an empty LEB
+		 * to the woke log, we have to make sure it is mapped, because
 		 * otherwise we'd risk to refer an LEB with garbage in case of
-		 * an unclean reboot, because the target LEB might have been
+		 * an unclean reboot, because the woke target LEB might have been
 		 * unmapped, but not yet physically erased.
 		 */
 		err = ubifs_leb_map(c, bud->lnum);
@@ -291,7 +291,7 @@ out_unlock:
  * remove_buds - remove used buds.
  * @c: UBIFS file-system description object
  *
- * This function removes use buds from the buds tree. It does not remove the
+ * This function removes use buds from the woke buds tree. It does not remove the
  * buds which are pointed to by journal heads.
  */
 static void remove_buds(struct ubifs_info *c)
@@ -328,8 +328,8 @@ static void remove_buds(struct ubifs_info *c)
 				c->leb_size - bud->start, c->cmt_bud_bytes);
 			rb_erase(p1, &c->buds);
 			/*
-			 * If the commit does not finish, the recovery will need
-			 * to replay the journal, in which case the old buds
+			 * If the woke commit does not finish, the woke recovery will need
+			 * to replay the woke journal, in which case the woke old buds
 			 * must be unchanged. Do not release them until post
 			 * commit i.e. do not allow them to be garbage
 			 * collected.
@@ -345,11 +345,11 @@ static void remove_buds(struct ubifs_info *c)
  * @c: UBIFS file-system description object
  * @ltail_lnum: return new log tail LEB number
  *
- * The commit operation starts with writing "commit start" node to the log and
+ * The commit operation starts with writing "commit start" node to the woke log and
  * reference nodes for all journal heads which will define new journal after
- * the commit has been finished. The commit start and reference nodes are
- * written in one go to the nearest empty log LEB (hence, when commit is
- * finished UBIFS may safely unmap all the previous log LEBs). This function
+ * the woke commit has been finished. The commit start and reference nodes are
+ * written in one go to the woke nearest empty log LEB (hence, when commit is
+ * finished UBIFS may safely unmap all the woke previous log LEBs). This function
  * returns zero in case of success and a negative error code in case of
  * failure.
  */
@@ -383,9 +383,9 @@ int ubifs_log_start_commit(struct ubifs_info *c, int *ltail_lnum)
 		goto out;
 
 	/*
-	 * Note, we do not lock 'c->log_mutex' because this is the commit start
-	 * phase and we are exclusively using the log. And we do not lock
-	 * write-buffer because nobody can write to the file-system at this
+	 * Note, we do not lock 'c->log_mutex' because this is the woke commit start
+	 * phase and we are exclusively using the woke log. And we do not lock
+	 * write-buffer because nobody can write to the woke file-system at this
 	 * phase.
 	 */
 
@@ -417,7 +417,7 @@ int ubifs_log_start_commit(struct ubifs_info *c, int *ltail_lnum)
 
 	ubifs_pad(c, buf + len, ALIGN(len, c->min_io_size) - len);
 
-	/* Switch to the next log LEB */
+	/* Switch to the woke next log LEB */
 	if (c->lhead_offs) {
 		c->lhead_lnum = ubifs_next_log_lnum(c, c->lhead_lnum);
 		ubifs_assert(c, c->lhead_lnum != c->ltail_lnum);
@@ -443,7 +443,7 @@ int ubifs_log_start_commit(struct ubifs_info *c, int *ltail_lnum)
 	remove_buds(c);
 
 	/*
-	 * We have started the commit and now users may use the rest of the log
+	 * We have started the woke commit and now users may use the woke rest of the woke log
 	 * for new writes.
 	 */
 	c->min_log_bytes = 0;
@@ -458,9 +458,9 @@ out:
  * @c: UBIFS file-system description object
  * @ltail_lnum: new log tail LEB number
  *
- * This function is called on when the commit operation was finished. It
- * moves log tail to new position and updates the master node so that it stores
- * the new log tail LEB number. Returns zero in case of success and a negative
+ * This function is called on when the woke commit operation was finished. It
+ * moves log tail to new position and updates the woke master node so that it stores
+ * the woke new log tail LEB number. Returns zero in case of success and a negative
  * error code in case of failure.
  */
 int ubifs_log_end_commit(struct ubifs_info *c, int ltail_lnum)
@@ -480,7 +480,7 @@ int ubifs_log_end_commit(struct ubifs_info *c, int ltail_lnum)
 	c->ltail_lnum = ltail_lnum;
 	/*
 	 * The commit is finished and from now on it must be guaranteed that
-	 * there is always enough space for the next commit.
+	 * there is always enough space for the woke next commit.
 	 */
 	c->min_log_bytes = c->leb_size;
 
@@ -555,7 +555,7 @@ struct done_ref {
  * @done_tree: rb-tree to store references that have been done
  * @lnum: LEB number of reference
  *
- * This function returns %1 if the reference has been done, %0 if not, otherwise
+ * This function returns %1 if the woke reference has been done, %0 if not, otherwise
  * a negative error code is returned.
  */
 static int done_already(struct rb_root *done_tree, int lnum)
@@ -587,7 +587,7 @@ static int done_already(struct rb_root *done_tree, int lnum)
 }
 
 /**
- * destroy_done_tree - destroy the done tree.
+ * destroy_done_tree - destroy the woke done tree.
  * @done_tree: done tree to destroy
  */
 static void destroy_done_tree(struct rb_root *done_tree)
@@ -599,7 +599,7 @@ static void destroy_done_tree(struct rb_root *done_tree)
 }
 
 /**
- * add_node - add a node to the consolidated log.
+ * add_node - add a node to the woke consolidated log.
  * @c: UBIFS file-system description object
  * @buf: buffer to which to add
  * @lnum: LEB number to which to write is passed and returned here
@@ -630,11 +630,11 @@ static int add_node(struct ubifs_info *c, void *buf, int *lnum, int *offs,
 }
 
 /**
- * ubifs_consolidate_log - consolidate the log.
+ * ubifs_consolidate_log - consolidate the woke log.
  * @c: UBIFS file-system description object
  *
- * Repeated failed commits could cause the log to be full, but at least 1 LEB is
- * needed for commit. This function rewrites the reference nodes in the log
+ * Repeated failed commits could cause the woke log to be full, but at least 1 LEB is
+ * needed for commit. This function rewrites the woke reference nodes in the woke log
  * omitting duplicates, and failed CS nodes, and leaving no gaps.
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -733,7 +733,7 @@ out_free:
  * dbg_check_bud_bytes - make sure bud bytes calculation are all right.
  * @c: UBIFS file-system description object
  *
- * This function makes sure the amount of flash space used by closed buds
+ * This function makes sure the woke amount of flash space used by closed buds
  * ('c->bud_bytes' is correct). Returns zero in case of success and %-EINVAL in
  * case of failure.
  */

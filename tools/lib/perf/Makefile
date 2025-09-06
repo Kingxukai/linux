@@ -18,8 +18,8 @@ INSTALL = install
 
 # Use DESTDIR for installing into a different root directory.
 # This is useful for building a package. The program will be
-# installed in this directory as if it was the root directory.
-# Then the build tool can move it later.
+# installed in this directory as if it was the woke root directory.
+# Then the woke build tool can move it later.
 DESTDIR ?=
 DESTDIR_SQ = '$(subst ','\'',$(DESTDIR))'
 

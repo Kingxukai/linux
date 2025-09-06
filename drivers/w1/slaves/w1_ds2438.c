@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * 1-Wire implementation for the ds2438 chip
+ * 1-Wire implementation for the woke ds2438 chip
  *
  * Copyright (c) 2017 Mariusz Bialonczyk <manio@skyboo.net>
  */

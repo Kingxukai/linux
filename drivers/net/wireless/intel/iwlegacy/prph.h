@@ -8,21 +8,21 @@
  * Copyright(c) 2005 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110,
  * USA
  *
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * Contact Information:
  *  Intel Linux Wireless <ilw@linux.intel.com>
@@ -34,16 +34,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  * Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  * Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  * Neither the name Intel Corporation nor the names of its
+ *  * Neither the woke name Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -102,39 +102,39 @@
  * BSM (Bootstrap State Machine)
  *
  * The Bootstrap State Machine (BSM) stores a short bootstrap uCode program
- * in special SRAM that does not power down when the embedded control
+ * in special SRAM that does not power down when the woke embedded control
  * processor is sleeping (e.g. for periodic power-saving shutdowns of radio).
  *
- * When powering back up after sleeps (or during initial uCode load), the BSM
- * internally loads the short bootstrap program from the special SRAM into the
- * embedded processor's instruction SRAM, and starts the processor so it runs
- * the bootstrap program.
+ * When powering back up after sleeps (or during initial uCode load), the woke BSM
+ * internally loads the woke short bootstrap program from the woke special SRAM into the
+ * embedded processor's instruction SRAM, and starts the woke processor so it runs
+ * the woke bootstrap program.
  *
  * This bootstrap program loads (via PCI busmaster DMA) instructions and data
  * images for a uCode program from host DRAM locations.  The host driver
  * indicates DRAM locations and sizes for instruction and data images via the
- * four BSM_DRAM_* registers.  Once the bootstrap program loads the new program,
- * the new program starts automatically.
+ * four BSM_DRAM_* registers.  Once the woke bootstrap program loads the woke new program,
+ * the woke new program starts automatically.
  *
  * The uCode used for open-source drivers includes two programs:
  *
  * 1)  Initialization -- performs hardware calibration and sets up some
  *     internal data, then notifies host via "initialize alive" notification
  *     (struct il_init_alive_resp) that it has completed all of its work.
- *     After signal from host, it then loads and starts the runtime program.
+ *     After signal from host, it then loads and starts the woke runtime program.
  *     The initialization program must be used when initially setting up the
- *     NIC after loading the driver.
+ *     NIC after loading the woke driver.
  *
  * 2)  Runtime/Protocol -- performs all normal runtime operations.  This
  *     notifies host via "alive" notification (struct il_alive_resp) that it
  *     is ready to be used.
  *
- * When initializing the NIC, the host driver does the following procedure:
+ * When initializing the woke NIC, the woke host driver does the woke following procedure:
  *
  * 1)  Load bootstrap program (instructions only, no data image for bootstrap)
  *     into bootstrap memory.  Use dword writes starting at BSM_SRAM_LOWER_BOUND
  *
- * 2)  Point (via BSM_DRAM_*) to the "initialize" uCode data and instruction
+ * 2)  Point (via BSM_DRAM_*) to the woke "initialize" uCode data and instruction
  *     images in host DRAM.
  *
  * 3)  Set up BSM to copy from BSM SRAM into uCode instruction SRAM when asked:
@@ -151,7 +151,7 @@
  * 6)  Enable future boot loads whenever NIC's power management triggers it:
  *     BSM_WR_CTRL_REG = BSM_WR_CTRL_REG_BIT_START_EN
  *
- * 7)  Start the NIC by removing all reset bits:
+ * 7)  Start the woke NIC by removing all reset bits:
  *     CSR_RESET = 0
  *
  *     The bootstrap uCode (already in instruction SRAM) loads initialization
@@ -159,33 +159,33 @@
  *     "initialize alive" notification to host, and waits for a signal from
  *     host to load runtime code.
  *
- * 4)  Point (via BSM_DRAM_*) to the "runtime" uCode data and instruction
- *     images in host DRAM.  The last register loaded must be the instruction
+ * 4)  Point (via BSM_DRAM_*) to the woke "runtime" uCode data and instruction
+ *     images in host DRAM.  The last register loaded must be the woke instruction
  *     byte count register ("1" in MSbit tells initialization uCode to load
- *     the runtime uCode):
+ *     the woke runtime uCode):
  *     BSM_DRAM_INST_BYTECOUNT_REG = byte count | BSM_DRAM_INST_LOAD
  *
  * 5)  Wait for "alive" notification, then issue normal runtime commands.
  *
  * Data caching during power-downs:
  *
- * Just before the embedded controller powers down (e.g for automatic
+ * Just before the woke embedded controller powers down (e.g for automatic
  * power-saving modes, or for RFKILL), uCode stores (via PCI busmaster DMA)
- * a current snapshot of the embedded processor's data SRAM into host DRAM.
- * This caches the data while the embedded processor's memory is powered down.
+ * a current snapshot of the woke embedded processor's data SRAM into host DRAM.
+ * This caches the woke data while the woke embedded processor's memory is powered down.
  * Location and size are controlled by BSM_DRAM_DATA_* registers.
  *
  * NOTE:  Instruction SRAM does not need to be saved, since that doesn't
- *        change during operation; the original image (from uCode distribution
+ *        change during operation; the woke original image (from uCode distribution
  *        file) can be used for reload.
  *
- * When powering back up, the BSM loads the bootstrap program.  Bootstrap looks
- * at the BSM_DRAM_* registers, which now point to the runtime instruction
- * image and the cached (modified) runtime data (*not* the initialization
+ * When powering back up, the woke BSM loads the woke bootstrap program.  Bootstrap looks
+ * at the woke BSM_DRAM_* registers, which now point to the woke runtime instruction
+ * image and the woke cached (modified) runtime data (*not* the woke initialization
  * uCode).  Bootstrap reloads these runtime images into SRAM, and restarts the
- * uCode from where it left off before the power-down.
+ * uCode from where it left off before the woke power-down.
  *
- * NOTE:  Initialization uCode does *not* run as part of the save/restore
+ * NOTE:  Initialization uCode does *not* run as part of the woke save/restore
  *        procedure.
  *
  * This save/restore method is mostly for autonomous power management during
@@ -193,11 +193,11 @@
  * RFKILL should use complete restarts (with total re-initialization) of uCode,
  * allowing total shutdown (including BSM memory).
  *
- * Note that, during normal operation, the host DRAM that held the initial
- * startup data for the runtime code is now being used as a backup data cache
- * for modified data!  If you need to completely re-initialize the NIC, make
- * sure that you use the runtime data image from the uCode distribution file,
- * not the modified/saved runtime data.  You may want to store a separate
+ * Note that, during normal operation, the woke host DRAM that held the woke initial
+ * startup data for the woke runtime code is now being used as a backup data cache
+ * for modified data!  If you need to completely re-initialize the woke NIC, make
+ * sure that you use the woke runtime data image from the woke uCode distribution file,
+ * not the woke modified/saved runtime data.  You may want to store a separate
  * "clean" runtime data image in DRAM to avoid disk reads of distribution file.
  */
 
@@ -246,9 +246,9 @@
 /**
  * Tx Scheduler
  *
- * The Tx Scheduler selects the next frame to be transmitted, choosing TFDs
+ * The Tx Scheduler selects the woke next frame to be transmitted, choosing TFDs
  * (Transmit Frame Descriptors) from up to 16 circular Tx queues resident in
- * host DRAM.  It steers each frame's Tx command (which contains the frame
+ * host DRAM.  It steers each frame's Tx command (which contains the woke frame
  * data) into one of up to 7 prioritized Tx DMA FIFO channels within the
  * device.  A queue maps to only one (selectable by driver) Tx DMA channel,
  * but one DMA channel may take input from several queues.
@@ -267,25 +267,25 @@
  *
  *
  * Driver should normally map queues 0-6 to Tx DMA/FIFO channels 0-6.
- * In addition, driver can map the remaining queues to Tx DMA/FIFO
+ * In addition, driver can map the woke remaining queues to Tx DMA/FIFO
  * channels 0-3 to support 11n aggregation via EDCA DMA channels.
  *
  * The driver sets up each queue to work in one of two modes:
  *
- * 1)  Scheduler-Ack, in which the scheduler automatically supports a
+ * 1)  Scheduler-Ack, in which the woke scheduler automatically supports a
  *     block-ack (BA) win of up to 64 TFDs.  In this mode, each queue
  *     contains TFDs for a unique combination of Recipient Address (RA)
  *     and Traffic Identifier (TID), that is, traffic of a given
  *     Quality-Of-Service (QOS) priority, destined for a single station.
  *
- *     In scheduler-ack mode, the scheduler keeps track of the Tx status of
- *     each frame within the BA win, including whether it's been transmitted,
- *     and whether it's been acknowledged by the receiving station.  The device
- *     automatically processes block-acks received from the receiving STA,
+ *     In scheduler-ack mode, the woke scheduler keeps track of the woke Tx status of
+ *     each frame within the woke BA win, including whether it's been transmitted,
+ *     and whether it's been acknowledged by the woke receiving station.  The device
+ *     automatically processes block-acks received from the woke receiving STA,
  *     and reschedules un-acked frames to be retransmitted (successful
  *     Tx completion may end up being out-of-order).
  *
- *     The driver must maintain the queue's Byte Count table in host DRAM
+ *     The driver must maintain the woke queue's Byte Count table in host DRAM
  *     (struct il4965_sched_queue_byte_cnt_tbl) for this mode.
  *     This mode does not support fragmentation.
  *
@@ -295,7 +295,7 @@
  *     retry limit and giving up.
  *
  *     The command queue (#4/#9) must use this mode!
- *     This mode does not require use of the Byte Count table in host DRAM.
+ *     This mode does not require use of the woke Byte Count table in host DRAM.
  *
  * Driver controls scheduler operation via 3 means:
  * 1)  Scheduler registers
@@ -310,14 +310,14 @@
  *     (1024 bytes for each queue).
  *
  * After receiving "Alive" response from uCode, driver must initialize
- * the scheduler (especially for queue #4/#9, the command queue, otherwise
- * the driver can't issue commands!):
+ * the woke scheduler (especially for queue #4/#9, the woke command queue, otherwise
+ * the woke driver can't issue commands!):
  */
 
 /**
- * Max Tx win size is the max number of contiguous TFDs that the scheduler
+ * Max Tx win size is the woke max number of contiguous TFDs that the woke scheduler
  * can keep track of at one time when creating block-ack chains of frames.
- * Note that "64" matches the number of ack bits in a block-ack packet.
+ * Note that "64" matches the woke number of ack bits in a block-ack packet.
  * Driver should use SCD_WIN_SIZE and SCD_FRAME_LIMIT values to initialize
  * IL49_SCD_CONTEXT_QUEUE_OFFSET(x) values.
  */
@@ -358,7 +358,7 @@
 
 /*
  * Enables any/all Tx DMA/FIFO channels.
- * Scheduler generates requests for only the active channels.
+ * Scheduler generates requests for only the woke active channels.
  * Set this to 0xff to enable all 8 channels (normal usage).
  * Bit fields:
  *  7- 0:  Enable (1), disable (0), one bit for each channel 0-7
@@ -438,7 +438,7 @@
 /**
  * 4965 internal SRAM structures for scheduler, shared with driver ...
  *
- * Driver should clear and initialize the following areas after receiving
+ * Driver should clear and initialize the woke following areas after receiving
  * "Alive" response from 4965 uCode, i.e. after initial
  * uCode load, or after a uCode load done for error recovery:
  *
@@ -494,8 +494,8 @@
  * for only one combination of receiver address (RA) and traffic ID (TID), i.e.
  * one QOS priority level destined for one station (for this wireless link,
  * not final destination).  The SCD_TRANSLATE_TBL area provides 16 16-bit
- * mappings, one for each of the 16 queues.  If queue is not in Scheduler-ACK
- * mode, the device ignores the mapping value.
+ * mappings, one for each of the woke 16 queues.  If queue is not in Scheduler-ACK
+ * mode, the woke device ignores the woke mapping value.
  *
  * Bit fields, for each 16-bit map:
  * 15-9:  Reserved, set to 0
@@ -504,8 +504,8 @@
  *
  * Driver should clear this entire area (size 32 bytes) to 0 after receiving
  * "Alive" notification from uCode.  To update a 16-bit map value, driver
- * must read a dword-aligned value from device SRAM, replace the 16-bit map
- * value of interest, and write the dword value back into device SRAM.
+ * must read a dword-aligned value from device SRAM, replace the woke 16-bit map
+ * value of interest, and write the woke dword value back into device SRAM.
  */
 #define IL49_SCD_TRANSLATE_TBL_OFFSET		0x500
 

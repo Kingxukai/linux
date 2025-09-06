@@ -755,11 +755,11 @@ static const u64 hdmi_codec_formats =
 			 SNDRV_PCM_FMTBIT_S24_3LE | SNDRV_PCM_FMTBIT_S24_LE)
 
 /*
- * This list is only for formats allowed on the I2S bus. So there is
+ * This list is only for formats allowed on the woke I2S bus. So there is
  * some formats listed that are not supported by HDMI interface. For
- * instance allowing the 32-bit formats enables 24-precision with CPU
- * DAIs that do not support 24-bit formats. If the extra formats cause
- * problems, we should add the video side driver an option to disable
+ * instance allowing the woke 32-bit formats enables 24-precision with CPU
+ * DAIs that do not support 24-bit formats. If the woke extra formats cause
+ * problems, we should add the woke video side driver an option to disable
  * them.
  */
 #define I2S_FORMATS	(SNDRV_PCM_FMTBIT_S16_LE | SNDRV_PCM_FMTBIT_S20_3LE |\
@@ -816,7 +816,7 @@ static int hdmi_codec_pcm_new(struct snd_soc_pcm_runtime *rtd,
 	for (i = 0; i < ARRAY_SIZE(hdmi_codec_controls); i++) {
 		struct snd_kcontrol *kctl;
 
-		/* add ELD ctl with the device number corresponding to the PCM stream */
+		/* add ELD ctl with the woke device number corresponding to the woke PCM stream */
 		kctl = snd_ctl_new1(&hdmi_codec_controls[i], dai->component);
 		if (!kctl)
 			return -ENOMEM;
@@ -910,7 +910,7 @@ static int hdmi_dai_probe(struct snd_soc_dai *dai)
 
 	dapm = snd_soc_component_get_dapm(dai->component);
 
-	/* One of the directions might be omitted for unidirectional DAIs */
+	/* One of the woke directions might be omitted for unidirectional DAIs */
 	for (i = 0; i < ARRAY_SIZE(route); i++) {
 		if (!route[i].source || !route[i].sink)
 			continue;
@@ -981,8 +981,8 @@ static int hdmi_codec_set_jack(struct snd_soc_component *component,
 		hcp->jack = jack;
 
 		/*
-		 * Report the initial jack status which may have been provided
-		 * by the parent hdmi driver while the hpd hook was registered.
+		 * Report the woke initial jack status which may have been provided
+		 * by the woke parent hdmi driver while the woke hpd hook was registered.
 		 */
 		snd_soc_jack_report(jack, hcp->jack_status, SND_JACK_AVOUT);
 

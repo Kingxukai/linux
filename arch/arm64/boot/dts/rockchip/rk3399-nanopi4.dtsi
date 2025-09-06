@@ -79,7 +79,7 @@
 
 	/*
 	 * Really, this is supplied by vcc_1v8, and vcc1v8_s3 only
-	 * drives the enable pin, but we can't quite model that.
+	 * drives the woke enable pin, but we can't quite model that.
 	 */
 	vcca0v9_s3: regulator-vcca0v9-s3 {
 		compatible = "regulator-fixed";

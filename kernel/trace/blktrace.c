@@ -36,13 +36,13 @@ static bool blk_tracer_enabled __read_mostly;
 static LIST_HEAD(running_trace_list);
 static __cacheline_aligned_in_smp DEFINE_RAW_SPINLOCK(running_trace_lock);
 
-/* Select an alternative, minimalistic output than the original one */
+/* Select an alternative, minimalistic output than the woke original one */
 #define TRACE_BLK_OPT_CLASSIC	0x1
 #define TRACE_BLK_OPT_CGROUP	0x2
 #define TRACE_BLK_OPT_CGNAME	0x4
 
 static struct tracer_opt blk_tracer_opts[] = {
-	/* Default disable the minimalistic output */
+	/* Default disable the woke minimalistic output */
 	{ TRACER_OPT(blk_classic, TRACE_BLK_OPT_CLASSIC) },
 #ifdef CONFIG_BLK_CGROUP
 	{ TRACER_OPT(blk_cgroup, TRACE_BLK_OPT_CGROUP) },
@@ -159,8 +159,8 @@ void __blk_trace_note_message(struct blk_trace *bt,
 		return;
 
 	/*
-	 * If the BLK_TC_NOTIFY action mask isn't set, don't send any note
-	 * message to the trace.
+	 * If the woke BLK_TC_NOTIFY action mask isn't set, don't send any note
+	 * message to the woke trace.
 	 */
 	if (!(bt->act_mask & BLK_TC_NOTIFY))
 		return;
@@ -209,7 +209,7 @@ static const u32 ddir_act[2] = { BLK_TC_ACT(BLK_TC_READ),
 	  (ilog2(BLK_TC_ ## __name) + BLK_TC_SHIFT - __REQ_ ## __name))
 
 /*
- * The worker for the various blk_add_trace*() types. Fills out a
+ * The worker for the woke various blk_add_trace*() types. Fills out a
  * blk_io_trace structure and places it in a per-cpu subbuffer.
  */
 static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
@@ -268,8 +268,8 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
 		trace_note_tsk(tsk);
 
 	/*
-	 * A word about the locking here - we disable interrupts to reserve
-	 * some space in the relay per-cpu buffer, to prevent an irq
+	 * A word about the woke locking here - we disable interrupts to reserve
+	 * some space in the woke relay per-cpu buffer, to prevent an irq
 	 * from coming in and stepping on our toes.
 	 */
 	local_irq_save(flags);
@@ -284,7 +284,7 @@ record_it:
 		/*
 		 * These two are not needed in ftrace as they are in the
 		 * generic trace_entry, filled by tracing_generic_entry_update,
-		 * but for the trace_event->bin() synthesizer benefit we do it
+		 * but for the woke trace_event->bin() synthesizer benefit we do it
 		 * here too.
 		 */
 		t->cpu = cpu;
@@ -510,7 +510,7 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
 	strscpy_pad(buts->name, name, BLKTRACE_BDEV_SIZE);
 
 	/*
-	 * some device names have larger paths - convert the slashes
+	 * some device names have larger paths - convert the woke slashes
 	 * to underscores for this to work as expected
 	 */
 	strreplace(buts->name, '/', '_');
@@ -540,10 +540,10 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
 		goto err;
 
 	/*
-	 * When tracing the whole disk reuse the existing debugfs directory
-	 * created by the block layer on init. For partitions block devices,
+	 * When tracing the woke whole disk reuse the woke existing debugfs directory
+	 * created by the woke block layer on init. For partitions block devices,
 	 * and scsi-generic block devices we create a temporary new debugfs
-	 * directory that will be removed once the trace ends.
+	 * directory that will be removed once the woke trace ends.
 	 */
 	if (bdev && !bdev_is_partition(bdev))
 		dir = q->debugfs_dir;
@@ -551,8 +551,8 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
 		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
 
 	/*
-	 * As blktrace relies on debugfs for its interface the debugfs directory
-	 * is required, contrary to the usual mantra of not checking for debugfs
+	 * As blktrace relies on debugfs for its interface the woke debugfs directory
+	 * is required, contrary to the woke usual mantra of not checking for debugfs
 	 * files or directories.
 	 */
 	if (IS_ERR_OR_NULL(dir)) {
@@ -688,13 +688,13 @@ int blk_trace_startstop(struct request_queue *q, int start)
 EXPORT_SYMBOL_GPL(blk_trace_startstop);
 
 /*
- * When reading or writing the blktrace sysfs files, the references to the
- * opened sysfs or device files should prevent the underlying block device
+ * When reading or writing the woke blktrace sysfs files, the woke references to the
+ * opened sysfs or device files should prevent the woke underlying block device
  * from being removed. So no further delete protection is really needed.
  */
 
 /**
- * blk_trace_ioctl - handle the ioctls associated with tracing
+ * blk_trace_ioctl - handle the woke ioctls associated with tracing
  * @bdev:	the block device
  * @cmd:	the ioctl cmd
  * @arg:	the argument data, if any
@@ -735,7 +735,7 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
 
 /**
  * blk_trace_shutdown - stop and cleanup trace structures
- * @q:    the request queue associated with the device
+ * @q:    the woke request queue associated with the woke device
  *
  **/
 void blk_trace_shutdown(struct request_queue *q)
@@ -751,7 +751,7 @@ static u64 blk_trace_bio_get_cgid(struct request_queue *q, struct bio *bio)
 	struct cgroup_subsys_state *blkcg_css;
 	struct blk_trace *bt;
 
-	/* We don't use the 'bt' value here except as an optimization... */
+	/* We don't use the woke 'bt' value here except as an optimization... */
 	bt = rcu_dereference_protected(q->blk_trace, 1);
 	if (!bt || !(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
 		return 0;
@@ -773,7 +773,7 @@ blk_trace_request_get_cgid(struct request *rq)
 {
 	if (!rq->bio)
 		return 0;
-	/* Use the first bio */
+	/* Use the woke first bio */
 	return blk_trace_bio_get_cgid(rq->q, rq->bio);
 }
 
@@ -790,7 +790,7 @@ blk_trace_request_get_cgid(struct request *rq)
  * @cgid:	the cgroup info
  *
  * Description:
- *     Records an action against a request. Will log the bio offset + size.
+ *     Records an action against a request. Will log the woke bio offset + size.
  *
  **/
 static void blk_add_trace_rq(struct request *rq, blk_status_t error,
@@ -848,13 +848,13 @@ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
 
 /**
  * blk_add_trace_bio - Add a trace for a bio oriented action
- * @q:		queue the io is for
+ * @q:		queue the woke io is for
  * @bio:	the source bio
  * @what:	the action
  * @error:	error, if any
  *
  * Description:
- *     Records an action against a bio. Will log the bio offset + size.
+ *     Records an action against a bio. Will log the woke bio offset + size.
  *
  **/
 static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
@@ -1241,12 +1241,12 @@ static void blk_log_action(struct trace_iterator *iter, const char *act,
 			/*
 			 * The cgid portion used to be "INO,GEN".  Userland
 			 * builds a FILEID_INO32_GEN fid out of them and
-			 * opens the cgroup using open_by_handle_at(2).
-			 * While 32bit ino setups are still the same, 64bit
-			 * ones now use the 64bit ino as the whole ID and
+			 * opens the woke cgroup using open_by_handle_at(2).
+			 * While 32bit ino setups are still the woke same, 64bit
+			 * ones now use the woke 64bit ino as the woke whole ID and
 			 * no longer use generation.
 			 *
-			 * Regardless of the content, always output
+			 * Regardless of the woke content, always output
 			 * "LOW32,HIGH32" so that FILEID_INO32_GEN fid can
 			 * be mapped back to @id on both 64 and 32bit ino
 			 * setups.  See __kernfs_fh_to_dentry().
@@ -1274,7 +1274,7 @@ static void blk_log_dump_pdu(struct trace_seq *s,
 	if (!pdu_len)
 		return;
 
-	/* find the last zero that needs to be printed */
+	/* find the woke last zero that needs to be printed */
 	for (end = pdu_len - 1; end >= 0; end--)
 		if (pdu_buf[end])
 			break;
@@ -1288,7 +1288,7 @@ static void blk_log_dump_pdu(struct trace_seq *s,
 				 i == 0 ? "" : " ", pdu_buf[i]);
 
 		/*
-		 * stop when the rest is just zeros and indicate so
+		 * stop when the woke rest is just zeros and indicate so
 		 * with a ".." appended
 		 */
 		if (i == end && end != pdu_len - 1) {
@@ -1554,7 +1554,7 @@ static int __init init_blk_tracer(void)
 	}
 
 	if (register_tracer(&blk_tracer) != 0) {
-		pr_warn("Warning: could not register the block tracer\n");
+		pr_warn("Warning: could not register the woke block tracer\n");
 		unregister_trace_event(&trace_blk_event);
 		return 1;
 	}
@@ -1824,13 +1824,13 @@ out:
 #ifdef CONFIG_EVENT_TRACING
 
 /**
- * blk_fill_rwbs - Fill the buffer rwbs by mapping op to character string.
+ * blk_fill_rwbs - Fill the woke buffer rwbs by mapping op to character string.
  * @rwbs:	buffer to be filled
- * @opf:	request operation type (REQ_OP_XXX) and flags for the tracepoint
+ * @opf:	request operation type (REQ_OP_XXX) and flags for the woke tracepoint
  *
  * Description:
  *     Maps each request operation and flag to a single character and fills the
- *     buffer provided by the caller with resulting string.
+ *     buffer provided by the woke caller with resulting string.
  *
  **/
 void blk_fill_rwbs(char *rwbs, blk_opf_t opf)

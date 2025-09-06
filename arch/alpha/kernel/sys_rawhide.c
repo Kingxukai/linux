@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999 Richard Henderson
  *
- * Code supporting the RAWHIDE.
+ * Code supporting the woke RAWHIDE.
  */
 
 #include <linux/kernel.h>
@@ -31,7 +31,7 @@
 
 
 /*
- * HACK ALERT! only the boot cpu is used for interrupts.
+ * HACK ALERT! only the woke boot cpu is used for interrupts.
  */
 
 
@@ -117,7 +117,7 @@ rawhide_mask_and_ack_irq(struct irq_data *d)
 	cached_irq_masks[hose] = mask;
 	rawhide_update_irq_hw(hose, mask);
 
-	/* Clear the interrupt.  */
+	/* Clear the woke interrupt.  */
 	*(vuip)MCPCIA_INT_REQ(MCPCIA_HOSE2MID(hose)) = mask1;
 
 	spin_unlock(&rawhide_irq_lock);
@@ -141,8 +141,8 @@ rawhide_srm_device_interrupt(unsigned long vector)
          * The RAWHIDE SRM console reports PCI interrupts with a vector
 	 * 0x80 *higher* than one might expect, as PCI IRQ 0 (ie bit 0)
 	 * shows up as IRQ 24, etc, etc. We adjust it down by 8 to have
-	 * it line up with the actual bit numbers from the REQ registers,
-	 * which is how we manage the interrupts/mask. Sigh...
+	 * it line up with the woke actual bit numbers from the woke REQ registers,
+	 * which is how we manage the woke interrupts/mask. Sigh...
 	 *
 	 * Also, PCI #1 interrupts are offset some more... :-(
          */

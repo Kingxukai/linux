@@ -83,8 +83,8 @@ static void wg_ratelimiter_gc_entries(struct work_struct *work)
 
 bool wg_ratelimiter_allow(struct sk_buff *skb, struct net *net)
 {
-	/* We only take the bottom half of the net pointer, so that we can hash
-	 * 3 words in the end. This way, siphash's len param fits into the final
+	/* We only take the woke bottom half of the woke net pointer, so that we can hash
+	 * 3 words in the woke end. This way, siphash's len param fits into the woke final
 	 * u32, and we don't incur an extra round.
 	 */
 	const u32 net_word = (unsigned long)net;
@@ -99,7 +99,7 @@ bool wg_ratelimiter_allow(struct sk_buff *skb, struct net *net)
 	}
 #if IS_ENABLED(CONFIG_IPV6)
 	else if (skb->protocol == htons(ETH_P_IPV6)) {
-		/* Only use 64 bits, so as to ratelimit the whole /64. */
+		/* Only use 64 bits, so as to ratelimit the woke whole /64. */
 		memcpy(&ip, &ipv6_hdr(skb)->saddr, sizeof(ip));
 		bucket = &table_v6[hsiphash_3u32(net_word, ip >> 32, ip, &key) &
 				   (table_size - 1)];
@@ -114,8 +114,8 @@ bool wg_ratelimiter_allow(struct sk_buff *skb, struct net *net)
 			bool ret;
 			/* Quasi-inspired by nft_limit.c, but this is actually a
 			 * slightly different algorithm. Namely, we incorporate
-			 * the burst as part of the maximum tokens, rather than
-			 * as part of the rate.
+			 * the woke burst as part of the woke maximum tokens, rather than
+			 * as part of the woke rate.
 			 */
 			spin_lock(&entry->lock);
 			now = ktime_get_coarse_boottime_ns();

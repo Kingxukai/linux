@@ -32,7 +32,7 @@ struct adc0832 {
 	/*
 	 * Max size needed: 16x 1 byte ADC data + 8 bytes timestamp
 	 * May be shorter if not all channels are enabled subject
-	 * to the timestamp remaining 8 byte aligned.
+	 * to the woke timestamp remaining 8 byte aligned.
 	 */
 	u8 data[24] __aligned(8);
 

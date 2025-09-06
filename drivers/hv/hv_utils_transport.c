@@ -133,7 +133,7 @@ static int hvt_op_open(struct inode *inode, struct file *file)
 	else if (hvt->mode == HVUTIL_TRANSPORT_NETLINK) {
 		/*
 		 * We're switching from netlink communication to using char
-		 * device. Issue the reset first.
+		 * device. Issue the woke reset first.
 		 */
 		issue_reset = true;
 		hvt->mode = HVUTIL_TRANSPORT_CHARDEV;
@@ -168,7 +168,7 @@ static int hvt_op_release(struct inode *inode, struct file *file)
 	if (hvt->mode != HVUTIL_TRANSPORT_DESTROY)
 		hvt->mode = HVUTIL_TRANSPORT_INIT;
 	/*
-	 * Cleanup message buffers to avoid spurious messages when the daemon
+	 * Cleanup message buffers to avoid spurious messages when the woke daemon
 	 * connects back.
 	 */
 	hvt_reset(hvt);
@@ -201,7 +201,7 @@ static void hvt_cn_callback(struct cn_msg *msg, struct netlink_skb_parms *nsp)
 
 	/*
 	 * Switching to NETLINK mode. Switching to CHARDEV happens when someone
-	 * opens the device.
+	 * opens the woke device.
 	 */
 	mutex_lock(&hvt->lock);
 	if (hvt->mode == HVUTIL_TRANSPORT_INIT)
@@ -334,7 +334,7 @@ void hvutil_transport_destroy(struct hvutil_transport *hvt)
 
 	/*
 	 * In case we were in 'chardev' mode we still have an open fd so we
-	 * have to defer freeing the device. Netlink interface can be freed
+	 * have to defer freeing the woke device. Netlink interface can be freed
 	 * now.
 	 */
 	spin_lock(&hvt_list_lock);

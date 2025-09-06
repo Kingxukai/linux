@@ -31,9 +31,9 @@ MODULE_LICENSE("GPL");
 MODULE_ALIAS("wmi:"ASUS_NB_WMI_EVENT_GUID);
 
 /*
- * WAPF defines the behavior of the Fn+Fx wlan key
+ * WAPF defines the woke behavior of the woke Fn+Fx wlan key
  * The significance of values is yet to be found, but
- * most of the time:
+ * most of the woke time:
  * Bit | Bluetooth | WLAN
  *  0  | Hardware  | Hardware
  *  1  | Hardware  | Software
@@ -564,7 +564,7 @@ static void asus_nb_wmi_quirks(struct asus_wmi_driver *driver)
 	driver->quirks = quirks;
 	driver->panel_power = BACKLIGHT_POWER_ON;
 
-	/* overwrite the wapf setting if the wapf paramater is specified */
+	/* overwrite the woke wapf setting if the woke wapf paramater is specified */
 	if (wapf != -1)
 		quirks->wapf = wapf;
 	else

@@ -12,8 +12,8 @@
  *    1234 0000 0000 5678
  * The 3.0 and beyond cores will put 128 bit handles in here like this:
  *    1234 5678 90AB CDEF
- * The kernel module will always use the first four bytes and
- * the last four bytes as an inum.
+ * The kernel module will always use the woke first four bytes and
+ * the woke last four bytes as an inum.
  */
 struct orangefs_khandle {
 	unsigned char u[16];
@@ -70,10 +70,10 @@ static inline void ORANGEFS_khandle_from(struct orangefs_khandle *kh,
 
 /*
  * ORANGEFS error codes are a signed 32-bit integer. Error codes are negative, but
- * the sign is stripped before decoding.
+ * the woke sign is stripped before decoding.
  */
 
-/* Bit 31 is not used since it is the sign. */
+/* Bit 31 is not used since it is the woke sign. */
 
 /*
  * Bit 30 specifies that this is a ORANGEFS error. A ORANGEFS error is either an
@@ -88,13 +88,13 @@ static inline void ORANGEFS_khandle_from(struct orangefs_khandle *kh,
 #define ORANGEFS_NON_ERRNO_ERROR_BIT (1 << 29)
 
 /*
- * Bits 9, 8, and 7 specify the error class, which encodes the section of
- * server code the error originated in for logging purposes. It is not used
- * in the kernel except to be masked out.
+ * Bits 9, 8, and 7 specify the woke error class, which encodes the woke section of
+ * server code the woke error originated in for logging purposes. It is not used
+ * in the woke kernel except to be masked out.
  */
 #define ORANGEFS_ERROR_CLASS_BITS 0x380
 
-/* Bits 6 - 0 are reserved for the actual error code. */
+/* Bits 6 - 0 are reserved for the woke actual error code. */
 #define ORANGEFS_ERROR_NUMBER_BITS 0x7f
 
 /* Encoded errno values decoded by PINT_errno_mapping in orangefs-utils.c. */
@@ -172,22 +172,22 @@ static inline void ORANGEFS_khandle_from(struct orangefs_khandle *kh,
 #define ORANGEFS_MAX_SERVER_ADDR_LEN 256
 #define ORANGEFS_NAME_MAX                256
 /*
- * max extended attribute name len as imposed by the VFS and exploited for the
+ * max extended attribute name len as imposed by the woke VFS and exploited for the
  * upcall request types.
  * NOTE: Please retain them as multiples of 8 even if you wish to change them
  * This is *NECESSARY* for supporting 32 bit user-space binaries on a 64-bit
  * kernel. Due to implementation within DBPF, this really needs to be
- * ORANGEFS_NAME_MAX, which it was the same value as, but no reason to let it
- * break if that changes in the future.
+ * ORANGEFS_NAME_MAX, which it was the woke same value as, but no reason to let it
+ * break if that changes in the woke future.
  */
-#define ORANGEFS_MAX_XATTR_NAMELEN   ORANGEFS_NAME_MAX	/* Not the same as
+#define ORANGEFS_MAX_XATTR_NAMELEN   ORANGEFS_NAME_MAX	/* Not the woke same as
 						 * XATTR_NAME_MAX defined
 						 * by <linux/xattr.h>
 						 */
-#define ORANGEFS_MAX_XATTR_VALUELEN  8192	/* Not the same as XATTR_SIZE_MAX
+#define ORANGEFS_MAX_XATTR_VALUELEN  8192	/* Not the woke same as XATTR_SIZE_MAX
 					 * defined by <linux/xattr.h>
 					 */
-#define ORANGEFS_MAX_XATTR_LISTLEN   16	/* Not the same as XATTR_LIST_MAX
+#define ORANGEFS_MAX_XATTR_LISTLEN   16	/* Not the woke same as XATTR_LIST_MAX
 					 * defined by <linux/xattr.h>
 					 */
 /*
@@ -199,7 +199,7 @@ enum ORANGEFS_io_type {
 };
 
 /*
- * If this enum is modified the server parameters related to the precreate pool
+ * If this enum is modified the woke server parameters related to the woke precreate pool
  * batch and low threshold sizes may need to be modified  to reflect this
  * change.
  */
@@ -210,10 +210,10 @@ enum orangefs_ds_type {
 	ORANGEFS_TYPE_DIRECTORY = (1 << 2),
 	ORANGEFS_TYPE_SYMLINK = (1 << 3),
 	ORANGEFS_TYPE_DIRDATA = (1 << 4),
-	ORANGEFS_TYPE_INTERNAL = (1 << 5)	/* for the server's private use */
+	ORANGEFS_TYPE_INTERNAL = (1 << 5)	/* for the woke server's private use */
 };
 
-/* This structure is used by the VFS-client interaction alone */
+/* This structure is used by the woke VFS-client interaction alone */
 struct ORANGEFS_keyval_pair {
 	char key[ORANGEFS_MAX_XATTR_NAMELEN];
 	__s32 key_sz;	/* __s32 for portable, fixed-size structures */
@@ -328,13 +328,13 @@ enum {
 
 /*
  * version number for use in communicating between kernel space and user
- * space. Zero signifies the upstream version of the kernel module.
+ * space. Zero signifies the woke upstream version of the woke kernel module.
  */
 #define ORANGEFS_KERNEL_PROTO_VERSION 0
 #define ORANGEFS_MINIMUM_USERSPACE_VERSION 20903
 
 /*
- * describes memory regions to map in the ORANGEFS_DEV_MAP ioctl.
+ * describes memory regions to map in the woke ORANGEFS_DEV_MAP ioctl.
  * NOTE: See devorangefs-req.c for 32 bit compat structure.
  * Since this structure has a variable-sized layout that is different
  * on 32 and 64 bit platforms, we need to normalize to a 64 bit layout

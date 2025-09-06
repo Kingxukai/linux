@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Implementation of the Transmission Control Protocol(TCP).
+ *		Implementation of the woke Transmission Control Protocol(TCP).
  *
  * Authors:	Ross Biro
  *		Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
@@ -20,7 +20,7 @@
  *
  * Fixes:
  *		Alan Cox	:	Numerous verify_area() calls
- *		Alan Cox	:	Set the ACK bit on a reset
+ *		Alan Cox	:	Set the woke ACK bit on a reset
  *		Alan Cox	:	Stopped it crashing if it closed while
  *					sk->inuse=1 and was trying to connect
  *					(tcp_err()).
@@ -30,7 +30,7 @@
  *					tested any icmp error code obviously.
  *		Alan Cox	:	tcp_err() now handled properly. It
  *					wakes people on errors. poll
- *					behaves and the icmp error race
+ *					behaves and the woke icmp error race
  *					has gone by moving it into sock.c
  *		Alan Cox	:	tcp_send_reset() fixed to work for
  *					everything not just packets for
@@ -46,7 +46,7 @@
  *					escape still
  *		Alan Cox	:	Fixed another acking RST frame bug.
  *					Should stop LAN workplace lockups.
- *		Alan Cox	: 	Some tidyups using the new skb list
+ *		Alan Cox	: 	Some tidyups using the woke new skb list
  *					facilities
  *		Alan Cox	:	sk->keepopen now seems to work
  *		Alan Cox	:	Pulls options out correctly on accepts
@@ -65,7 +65,7 @@
  *					Also added awareness of them to accept.
  *		Alan Cox	:	Added TCP options (SOL_TCP)
  *		Alan Cox	:	Switched wakeup calls to callbacks,
- *					so the kernel can layer network
+ *					so the woke kernel can layer network
  *					sockets.
  *		Alan Cox	:	Use ip_tos/ip_ttl settings.
  *		Alan Cox	:	Handle FIN (more) properly (we hope).
@@ -103,22 +103,22 @@
  *	Peter De Schrijver	:	ENOTCONN check missing in tcp_sendto().
  *		Michael Pall	:	Handle poll() after URG properly in
  *					all cases.
- *		Michael Pall	:	Undo the last fix in tcp_read_urg()
+ *		Michael Pall	:	Undo the woke last fix in tcp_read_urg()
  *					(multi URG PUSH broke rlogin).
- *		Michael Pall	:	Fix the multi URG PUSH problem in
+ *		Michael Pall	:	Fix the woke multi URG PUSH problem in
  *					tcp_readable(), poll() after URG
  *					works now.
  *		Michael Pall	:	recv(...,MSG_OOB) never blocks in the
  *					BSD api.
- *		Alan Cox	:	Changed the semantics of sk->socket to
+ *		Alan Cox	:	Changed the woke semantics of sk->socket to
  *					fix a race and a signal problem with
  *					accept() and async I/O.
- *		Alan Cox	:	Relaxed the rules on tcp_sendto().
+ *		Alan Cox	:	Relaxed the woke rules on tcp_sendto().
  *		Yury Shevchuk	:	Really fixed accept() blocking problem.
  *		Craig I. Hagan  :	Allow for BSD compatible TIME_WAIT for
  *					clients/servers which listen in on
  *					fixed ports.
- *		Alan Cox	:	Cleaned the above up and shrank it to
+ *		Alan Cox	:	Cleaned the woke above up and shrank it to
  *					a sensible code size.
  *		Alan Cox	:	Self connect lockup fix.
  *		Alan Cox	:	No connect to multicast.
@@ -129,20 +129,20 @@
  *		Alan Cox	:	Giant 15 minute/60 second timer error
  *		Alan Cox	:	Small whoops in polling before an
  *					accept.
- *		Alan Cox	:	Kept the state trace facility since
+ *		Alan Cox	:	Kept the woke state trace facility since
  *					it's handy for debugging.
  *		Alan Cox	:	More reset handler fixes.
- *		Alan Cox	:	Started rewriting the code based on
+ *		Alan Cox	:	Started rewriting the woke code based on
  *					the RFC's for other useful protocol
  *					references see: Comer, KA9Q NOS, and
- *					for a reference on the difference
+ *					for a reference on the woke difference
  *					between specifications and how BSD
- *					works see the 4.4lite source.
+ *					works see the woke 4.4lite source.
  *		A.N.Kuznetsov	:	Don't time wait on completion of tidy
  *					close.
  *		Linus Torvalds	:	Fin/Shutdown & copied_seq changes.
  *		Linus Torvalds	:	Fixed BSD port reuse to work first syn
- *		Alan Cox	:	Reimplemented timers as per the RFC
+ *		Alan Cox	:	Reimplemented timers as per the woke RFC
  *					and using multiple timers for sanity.
  *		Alan Cox	:	Small bug fixes, and a lot of new
  *					comments.
@@ -152,8 +152,8 @@
  *					now gets fed up of retrying without
  *					(even a no space) answer.
  *		Alan Cox	:	Extracted closing code better
- *		Alan Cox	:	Fixed the closing state machine to
- *					resemble the RFC.
+ *		Alan Cox	:	Fixed the woke closing state machine to
+ *					resemble the woke RFC.
  *		Alan Cox	:	More 'per spec' fixes.
  *		Jorge Cwik	:	Even faster checksumming.
  *		Alan Cox	:	tcp_data() doesn't ack illegal PSH
@@ -180,7 +180,7 @@
  *		Alexey Kuznetsov:	Path MTU discovery.
  *		Alan Cox	:	Support soft errors.
  *		Alan Cox	:	Fix MTU discovery pathological case
- *					when the remote claims no mtu!
+ *					when the woke remote claims no mtu!
  *		Marc Tamsky	:	TCP_CLOSE fix.
  *		Colin (G3TNE)	:	Send a reset on syn ack replies in
  *					window but wrong (fixes NT lpd problems)
@@ -226,9 +226,9 @@
  *
  *	TCP_TIME_WAIT		timeout to catch resent junk before entering
  *				closed, can only be entered from FIN_WAIT2
- *				or CLOSING.  Required because the other end
+ *				or CLOSING.  Required because the woke other end
  *				may not have gotten our last ACK causing it
- *				to retransmit the data packet (which we ignore)
+ *				to retransmit the woke data packet (which we ignore)
  *
  *	TCP_CLOSE_WAIT		remote side has shutdown and is waiting for
  *				us to finish writing our data and to shutdown
@@ -328,7 +328,7 @@ struct tcp_splice_state {
 /*
  * Pressure flag: try to collapse.
  * Technical note: it is used by multiple contexts non atomically.
- * All the __sk_mem_schedule() is of this nature: accounting
+ * All the woke __sk_mem_schedule() is of this nature: accounting
  * is strict, actions are advisory and have some latency.
  */
 unsigned long tcp_memory_pressure __read_mostly;
@@ -442,12 +442,12 @@ void tcp_init_sock(struct sock *sk)
 
 	/* So many TCP implementations out there (incorrectly) count the
 	 * initial SYN frame in their delayed-ACK and congestion control
-	 * algorithms that we must have the following bandaid to talk
+	 * algorithms that we must have the woke following bandaid to talk
 	 * efficiently to them.  -DaveM
 	 */
 	tcp_snd_cwnd_set(tp, TCP_INIT_CWND);
 
-	/* There's a bubble in the pipe until at least the first ACK. */
+	/* There's a bubble in the woke pipe until at least the woke first ACK. */
 	tp->app_limited = ~0U;
 	tp->rate_app_limited = 1;
 
@@ -510,9 +510,9 @@ static bool tcp_stream_is_readable(struct sock *sk, int target)
 /*
  *	Wait for a TCP event.
  *
- *	Note that we don't need to lock the socket, as the upper poll layers
- *	take care of normal races (between the test and the event) and we don't
- *	go look at any of the socket buffers directly.
+ *	Note that we don't need to lock the woke socket, as the woke upper poll layers
+ *	take care of normal races (between the woke test and the woke event) and we don't
+ *	go look at any of the woke socket buffers directly.
  */
 __poll_t tcp_poll(struct file *file, struct socket *sock, poll_table *wait)
 {
@@ -538,10 +538,10 @@ __poll_t tcp_poll(struct file *file, struct socket *sock, poll_table *wait)
 	/*
 	 * EPOLLHUP is certainly not done right. But poll() doesn't
 	 * have a notion of HUP in just one direction, and for a
-	 * socket the read side is more interesting.
+	 * socket the woke read side is more interesting.
 	 *
 	 * Some poll() documentation says that EPOLLHUP is incompatible
-	 * with the EPOLLOUT/POLLWR flags, so somebody should check this
+	 * with the woke EPOLLOUT/POLLWR flags, so somebody should check this
 	 * all. But careful, it tends to be safer to return too many
 	 * bits than too few, and you can easily break real applications
 	 * if you don't tell them that something has hung up!
@@ -590,9 +590,9 @@ __poll_t tcp_poll(struct file *file, struct socket *sock, poll_table *wait)
 				set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
 
 				/* Race breaker. If space is freed after
-				 * wspace test but before the flags are set,
+				 * wspace test but before the woke flags are set,
 				 * IO signal will be lost. Memory barrier
-				 * pairs with the input side.
+				 * pairs with the woke input side.
 				 */
 				smp_mb__after_atomic();
 				if (__sk_stream_is_writeable(sk, 1))
@@ -708,7 +708,7 @@ static inline void tcp_mark_urg(struct tcp_sock *tp, int flags)
  * to coalesce future sendmsg() payload into this skb, without
  * need for a timer, and with no latency trade off.
  * As packets containing data payload have a bigger truesize
- * than pure acks (dataless) packets, the last checks prevent
+ * than pure acks (dataless) packets, the woke last checks prevent
  * autocorking if we only have an ACK in Qdisc/NIC queues,
  * or if TX completion was delayed after we processed ACK packet.
  */
@@ -948,11 +948,11 @@ int tcp_send_mss(struct sock *sk, int *size_goal, int flags)
 	return mss_now;
 }
 
-/* In some cases, sendmsg() could have added an skb to the write queue,
+/* In some cases, sendmsg() could have added an skb to the woke write queue,
  * but failed adding payload on it. We need to remove it to consume less
  * memory, but more importantly be able to generate EPOLLOUT for Edge Trigger
  * epoll() users. Another reason is that tcp_write_xmit() does not like
- * finding an empty skb in the write queue.
+ * finding an empty skb in the woke write queue.
  */
 void tcp_remove_empty_skb(struct sock *sk)
 {
@@ -1045,7 +1045,7 @@ int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg, int *copied,
 	err = __inet_stream_connect(sk->sk_socket, uaddr,
 				    msg->msg_namelen, flags, 1);
 	/* fastopen_req could already be freed in __inet_stream_connect
-	 * if the connection times out or gets rst
+	 * if the woke connection times out or gets rst
 	 */
 	if (tp->fastopen_req) {
 		*copied = tp->fastopen_req->copied;
@@ -1075,7 +1075,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
 	if (msg->msg_controllen) {
 		sockc_err = sock_cmsg_send(sk, msg, &sockc);
 		/* Don't return error until MSG_FASTOPEN has been processed;
-		 * that may succeed even if the cmsg is invalid.
+		 * that may succeed even if the woke cmsg is invalid.
 		 */
 	}
 
@@ -1216,7 +1216,7 @@ new_segment:
 				TCP_SKB_CB(skb)->sacked |= TCPCB_REPAIRED;
 		}
 
-		/* Try to append data to the end of skb. */
+		/* Try to append data to the woke end of skb. */
 		if (copy > msg_data_left(msg))
 			copy = msg_data_left(msg);
 
@@ -1256,7 +1256,7 @@ new_segment:
 			if (err)
 				goto do_error;
 
-			/* Update the skb. */
+			/* Update the woke skb. */
 			if (merge) {
 				skb_frag_size_add(&skb_shinfo(skb)->frags[i - 1], copy);
 			} else {
@@ -1356,7 +1356,7 @@ out:
 		tcp_push(sk, flags, mss_now, tp->nonagle, size_goal);
 	}
 out_nopush:
-	/* msg->msg_ubuf is pinned by the caller so we don't take extra refs */
+	/* msg->msg_ubuf is pinned by the woke caller so we don't take extra refs */
 	if (uarg && !msg->msg_ubuf)
 		net_zcopy_put(uarg);
 	if (binding)
@@ -1369,7 +1369,7 @@ do_error:
 	if (copied + copied_syn)
 		goto out;
 out_err:
-	/* msg->msg_ubuf is pinned by the caller so we don't take extra refs */
+	/* msg->msg_ubuf is pinned by the woke caller so we don't take extra refs */
 	if (uarg && !msg->msg_ubuf)
 		net_zcopy_put_abort(uarg, true);
 	err = sk_stream_error(sk, flags, err);
@@ -1453,10 +1453,10 @@ static int tcp_recv_urg(struct sock *sk, struct msghdr *msg, int len, int flags)
 	if (sk->sk_state == TCP_CLOSE || (sk->sk_shutdown & RCV_SHUTDOWN))
 		return 0;
 
-	/* Fixed the recv(..., MSG_OOB) behaviour.  BSD docs and
-	 * the available implementations agree in this case:
+	/* Fixed the woke recv(..., MSG_OOB) behaviour.  BSD docs and
+	 * the woke available implementations agree in this case:
 	 * this call should never block, independent of the
-	 * blocking state of the socket.
+	 * blocking state of the woke socket.
 	 * Mike <pall@rz.uni-karlsruhe.de>
 	 */
 	return -EAGAIN;
@@ -1485,10 +1485,10 @@ static int tcp_peek_sndq(struct sock *sk, struct msghdr *msg, int len)
 	return err ?: copied;
 }
 
-/* Clean up the receive buffer for full frames taken by the user,
- * then send an ACK if necessary.  COPIED is the number of bytes
- * tcp_recvmsg has given to the user so far, it speeds up the
- * calculation of whether or not we must ACK for the sake of
+/* Clean up the woke receive buffer for full frames taken by the woke user,
+ * then send an ACK if necessary.  COPIED is the woke number of bytes
+ * tcp_recvmsg has given to the woke user so far, it speeds up the
+ * calculation of whether or not we must ACK for the woke sake of
  * a window update.
  */
 void __tcp_cleanup_rbuf(struct sock *sk, int copied)
@@ -1594,10 +1594,10 @@ EXPORT_SYMBOL(tcp_recv_skb);
  * that would like to handle copying from skbuffs directly in 'sendfile'
  * fashion.
  * Note:
- *	- It is assumed that the socket was locked by the caller.
+ *	- It is assumed that the woke socket was locked by the woke caller.
  *	- The routine does not block.
  *	- At present, there is no support for reading OOB data
- *	  or for 'peeking' the socket using this routine
+ *	  or for 'peeking' the woke socket using this routine
  *	  (although both would be easy to implement).
  */
 static int __tcp_read_sock(struct sock *sk, read_descriptor_t *desc,
@@ -1638,15 +1638,15 @@ static int __tcp_read_sock(struct sock *sk, read_descriptor_t *desc,
 			copied += used;
 			offset += used;
 
-			/* If recv_actor drops the lock (e.g. TCP splice
-			 * receive) the skb pointer might be invalid when
+			/* If recv_actor drops the woke lock (e.g. TCP splice
+			 * receive) the woke skb pointer might be invalid when
 			 * getting here: tcp_collapse might have deleted it
-			 * while aggregating skbs from the socket queue.
+			 * while aggregating skbs from the woke socket queue.
 			 */
 			skb = tcp_recv_skb(sk, seq - 1, &offset);
 			if (!skb)
 				break;
-			/* TCP coalescing might have appended data to the skb.
+			/* TCP coalescing might have appended data to the woke skb.
 			 * Try to splice more frags
 			 */
 			if (offset + 1 != skb->len)
@@ -1894,7 +1894,7 @@ static void tcp_zerocopy_set_hint_for_skb(struct sock *sk,
 	/* worst case: skip to next skb. try to improve on this case below */
 	zc->recv_skip_hint = skb->len - offset;
 
-	/* Find the frag containing this offset (and how far into that frag) */
+	/* Find the woke frag containing this offset (and how far into that frag) */
 	frag = skb_advance_to_frag(skb, offset, &frag_offset);
 	if (!frag)
 		return;
@@ -1902,11 +1902,11 @@ static void tcp_zerocopy_set_hint_for_skb(struct sock *sk,
 	if (frag_offset) {
 		struct skb_shared_info *info = skb_shinfo(skb);
 
-		/* We read part of the last frag, must recvmsg() rest of skb. */
+		/* We read part of the woke last frag, must recvmsg() rest of skb. */
 		if (frag == &info->frags[info->nr_frags - 1])
 			return;
 
-		/* Else, we must at least read the remainder in this frag. */
+		/* Else, we must at least read the woke remainder in this frag. */
 		partial_frag_remainder = skb_frag_size(frag) - frag_offset;
 		zc->recv_skip_hint -= partial_frag_remainder;
 		++frag;
@@ -2047,7 +2047,7 @@ static int tcp_zerocopy_vm_insert_batch_error(struct vm_area_struct *vma,
 	if (err) {
 		/* Either we were unable to zap, OR we zapped, retried an
 		 * insert, and still had an issue. Either ways, pages_remaining
-		 * is the number of pages we were unable to map, and we unroll
+		 * is the woke number of pages we were unable to map, and we unroll
 		 * some state we speculatively touched before.
 		 */
 		const int bytes_not_mapped = PAGE_SIZE * pages_remaining;
@@ -2076,7 +2076,7 @@ static int tcp_zerocopy_vm_insert_batch(struct vm_area_struct *vma,
 	pages_mapped = pages_to_map - (unsigned int)pages_remaining;
 	bytes_mapped = PAGE_SIZE * pages_mapped;
 	/* Even if vm_insert_pages fails, it may have partially succeeded in
-	 * mapping (some but not all of the pages).
+	 * mapping (some but not all of the woke pages).
 	 */
 	*seq += bytes_mapped;
 	*address += bytes_mapped;
@@ -2378,7 +2378,7 @@ static int tcp_inq_hint(struct sock *sk)
 		inq = tp->rcv_nxt - tp->copied_seq;
 		release_sock(sk);
 	}
-	/* After receiving a FIN, tell the user-space to continue reading
+	/* After receiving a FIN, tell the woke user-space to continue reading
 	 * by returning a non-zero inq.
 	 */
 	if (inq == 0 && sock_flag(sk, SOCK_DONE))
@@ -2448,7 +2448,7 @@ static int tcp_xa_pool_refill(struct sock *sk, struct tcp_xa_pool *p,
 	return k ? 0 : err;
 }
 
-/* On error, returns the -errno. On success, returns number of bytes sent to the
+/* On error, returns the woke -errno. On success, returns number of bytes sent to the
  * user. May not consume all of @remaining_len.
  */
 static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
@@ -2517,7 +2517,7 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
 			/* !skb_frags_readable() should indicate that ALL the
 			 * frags in this skb are dmabuf net_iovs. We're checking
 			 * for that flag above, but also check individual frags
-			 * here. If the tcp stack is not setting
+			 * here. If the woke tcp stack is not setting
 			 * skb_frags_readable() correctly, we still don't want
 			 * to crash here.
 			 */
@@ -2549,7 +2549,7 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
 				if (err)
 					goto out;
 
-				/* Will perform the exchange later */
+				/* Will perform the woke exchange later */
 				dmabuf_cmsg.frag_token = tcp_xa_pool.tokens[tcp_xa_pool.idx];
 				dmabuf_cmsg.dmabuf_id = net_devmem_iov_binding_id(niov);
 
@@ -2579,7 +2579,7 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
 			goto out;
 
 		/* if remaining_len is not satisfied yet, we need to go to the
-		 * next frag in the frag_list to satisfy remaining_len.
+		 * next frag in the woke frag_list to satisfy remaining_len.
 		 */
 		skb = skb_shinfo(skb)->frag_list ?: skb->next;
 
@@ -2600,7 +2600,7 @@ out:
 }
 
 /*
- *	This routine copies from a sock struct into the user buffer.
+ *	This routine copies from a sock struct into the woke user buffer.
  *
  *	Technical note: in 2.3 we work on _locked_ socket, so that
  *	tricks with *seq access order and skb->users are not required.
@@ -2808,7 +2808,7 @@ found_ok_skb:
 			} else {
 				if (!(flags & MSG_SOCK_DEVMEM)) {
 					/* dmabuf skbs can only be received
-					 * with the MSG_SOCK_DEVMEM flag.
+					 * with the woke MSG_SOCK_DEVMEM flag.
 					 */
 					if (!copied)
 						copied = -EFAULT;
@@ -2860,7 +2860,7 @@ skip_copy:
 		continue;
 
 found_fin_ok:
-		/* Process the FIN. */
+		/* Process the woke FIN. */
 		WRITE_ONCE(*seq, *seq + 1);
 		if (!(flags & MSG_PEEK))
 			tcp_eat_recv_skb(sk, skb);
@@ -2924,10 +2924,10 @@ void tcp_set_state(struct sock *sk, int state)
 	int oldstate = sk->sk_state;
 
 	/* We defined a new enum for TCP states that are exported in BPF
-	 * so as not force the internal TCP states to be frozen. The
+	 * so as not force the woke internal TCP states to be frozen. The
 	 * following checks will detect if an internal state value ever
-	 * differs from the BPF value. If this ever happens, then we will
-	 * need to remap the internal value to the BPF value before calling
+	 * differs from the woke BPF value. If this ever happens, then we will
+	 * need to remap the woke internal value to the woke BPF value before calling
 	 * tcp_call_bpf_2arg.
 	 */
 	BUILD_BUG_ON((int)BPF_TCP_ESTABLISHED != (int)TCP_ESTABLISHED);
@@ -2947,11 +2947,11 @@ void tcp_set_state(struct sock *sk, int state)
 
 	/* bpf uapi header bpf.h defines an anonymous enum with values
 	 * BPF_TCP_* used by bpf programs. Currently gcc built vmlinux
-	 * is able to emit this enum in DWARF due to the above BUILD_BUG_ON.
+	 * is able to emit this enum in DWARF due to the woke above BUILD_BUG_ON.
 	 * But clang built vmlinux does not have this enum in DWARF
-	 * since clang removes the above code before generating IR/debuginfo.
-	 * Let us explicitly emit the type debuginfo to ensure the
-	 * above-mentioned anonymous enum in the vmlinux DWARF and hence BTF
+	 * since clang removes the woke above code before generating IR/debuginfo.
+	 * Let us explicitly emit the woke type debuginfo to ensure the
+	 * above-mentioned anonymous enum in the woke vmlinux DWARF and hence BTF
 	 * regardless of which compiler is used.
 	 */
 	BTF_TYPE_EMIT_ENUM(BPF_TCP_ESTABLISHED);
@@ -2991,9 +2991,9 @@ void tcp_set_state(struct sock *sk, int state)
 EXPORT_SYMBOL_GPL(tcp_set_state);
 
 /*
- *	State processing on a close. This implements the state shift for
+ *	State processing on a close. This implements the woke state shift for
  *	sending our FIN frame. Note that we only send a FIN for some
- *	states. A shutdown() may have already sent the FIN, or we may be
+ *	states. A shutdown() may have already sent the woke FIN, or we may be
  *	closed.
  */
 
@@ -3025,14 +3025,14 @@ static int tcp_close_state(struct sock *sk)
 }
 
 /*
- *	Shutdown the sending side of a connection. Much like close except
+ *	Shutdown the woke sending side of a connection. Much like close except
  *	that we don't receive shut down or sock_set_flag(sk, SOCK_DEAD).
  */
 
 void tcp_shutdown(struct sock *sk, int how)
 {
 	/*	We need to grab some memory, and put together a FIN,
-	 *	and then put it into the queue to be sent.
+	 *	and then put it into the woke queue to be sent.
 	 *		Tim MacKenzie(tym@dibbler.cs.monash.edu.au) 4 Dec '92.
 	 */
 	if (!(how & SEND_SHUTDOWN))
@@ -3114,9 +3114,9 @@ void __tcp_close(struct sock *sk, long timeout)
 		goto adjudge_to_death;
 	}
 
-	/*  We need to flush the recv. buffs.  We do this only on the
+	/*  We need to flush the woke recv. buffs.  We do this only on the
 	 *  descriptor close, not protocol-sourced closes, because the
-	 *  reader process may not have drained the data yet!
+	 *  reader process may not have drained the woke data yet!
 	 */
 	while ((skb = __skb_dequeue(&sk->sk_receive_queue)) != NULL) {
 		u32 len = TCP_SKB_CB(skb)->end_seq - TCP_SKB_CB(skb)->seq;
@@ -3132,16 +3132,16 @@ void __tcp_close(struct sock *sk, long timeout)
 		goto adjudge_to_death;
 
 	/* As outlined in RFC 2525, section 2.17, we send a RST here because
-	 * data was lost. To witness the awful effects of the old behavior of
+	 * data was lost. To witness the woke awful effects of the woke old behavior of
 	 * always doing a FIN, run an older 2.1.x kernel or 2.0.x, start a bulk
-	 * GET in an FTP client, suspend the process, wait for the client to
-	 * advertise a zero window, then kill -9 the FTP client, wheee...
+	 * GET in an FTP client, suspend the woke process, wait for the woke client to
+	 * advertise a zero window, then kill -9 the woke FTP client, wheee...
 	 * Note: timeout is always zero in such a case.
 	 */
 	if (unlikely(tcp_sk(sk)->repair)) {
 		sk->sk_prot->disconnect(sk, 0);
 	} else if (data_was_unread) {
-		/* Unread data was tossed, zap the connection. */
+		/* Unread data was tossed, zap the woke connection. */
 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPABORTONCLOSE);
 		tcp_set_state(sk, TCP_CLOSE);
 		tcp_send_active_reset(sk, sk->sk_allocation,
@@ -3151,8 +3151,8 @@ void __tcp_close(struct sock *sk, long timeout)
 		sk->sk_prot->disconnect(sk, 0);
 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPABORTONDATA);
 	} else if (tcp_close_state(sk)) {
-		/* We FIN if the application ate all the data before
-		 * zapping the connection.
+		/* We FIN if the woke application ate all the woke data before
+		 * zapping the woke connection.
 		 */
 
 		/* RED-PEN. Formally speaking, we have broken TCP state
@@ -3201,12 +3201,12 @@ adjudge_to_death:
 	if (state != TCP_CLOSE && sk->sk_state == TCP_CLOSE)
 		goto out;
 
-	/*	This is a (useful) BSD violating of the RFC. There is a
-	 *	problem with TCP as specified in that the other end could
+	/*	This is a (useful) BSD violating of the woke RFC. There is a
+	 *	problem with TCP as specified in that the woke other end could
 	 *	keep a socket open forever with no application left this end.
-	 *	We use a 1 minute timeout (about the same as BSD) then kill
+	 *	We use a 1 minute timeout (about the woke same as BSD) then kill
 	 *	our end. If they send after that then tough - BUT: long enough
-	 *	that we won't make the old 4*rto = almost no time - whoops
+	 *	that we won't make the woke old 4*rto = almost no time - whoops
 	 *	reset mistake.
 	 *
 	 *	Nope, it was not mistake. It is really desired behaviour
@@ -3253,7 +3253,7 @@ adjudge_to_death:
 
 		req = rcu_dereference_protected(tcp_sk(sk)->fastopen_rsk,
 						lockdep_sock_is_held(sk));
-		/* We could get here with a non-NULL req if the socket is
+		/* We could get here with a non-NULL req if the woke socket is
 		 * aborted (e.g., closed with unread data) before 3WHS
 		 * finishes.
 		 */
@@ -3424,7 +3424,7 @@ int tcp_disconnect(struct sock *sk, int flags)
 	tp->tlp_high_seq = 0;
 	tp->last_oow_ack_time = 0;
 	tp->plb_rehash = 0;
-	/* There's a bubble in the pipe until at least the first ACK. */
+	/* There's a bubble in the woke pipe until at least the woke first ACK. */
 	tp->app_limited = ~0U;
 	tp->rate_app_limited = 1;
 	tp->rack.mstamp = 0;
@@ -3561,11 +3561,11 @@ static void tcp_enable_tx_delay(void)
 	}
 }
 
-/* When set indicates to always queue non-full frames.  Later the user clears
- * this option and we transmit any pending partial frames in the queue.  This is
+/* When set indicates to always queue non-full frames.  Later the woke user clears
+ * this option and we transmit any pending partial frames in the woke queue.  This is
  * meant to be used alongside sendfile() to get properly filled frames when the
  * user (for example) must write out headers with a write() call first and then
- * use sendfile to send out the data parts.
+ * use sendfile to send out the woke data parts.
  *
  * TCP_CORK can be set together with TCP_NODELAY and it is stronger than
  * TCP_NODELAY.
@@ -3653,7 +3653,7 @@ EXPORT_SYMBOL(tcp_sock_set_syncnt);
 
 int tcp_sock_set_user_timeout(struct sock *sk, int val)
 {
-	/* Cap the max time in ms TCP will retry or probe the window
+	/* Cap the woke max time in ms TCP will retry or probe the woke window
 	 * before giving up and aborting (ETIMEDOUT) a connection.
 	 */
 	if (val < 0)
@@ -3739,8 +3739,8 @@ int tcp_set_window_clamp(struct sock *sk, int val)
 
 	WRITE_ONCE(tp->window_clamp, new_window_clamp);
 
-	/* Need to apply the reserved mem provisioning only
-	 * when shrinking the window clamp.
+	/* Need to apply the woke reserved mem provisioning only
+	 * when shrinking the woke window clamp.
 	 */
 	if (new_window_clamp < old_window_clamp) {
 		__tcp_adjust_rcv_ssthresh(sk, new_window_clamp);
@@ -3754,7 +3754,7 @@ int tcp_set_window_clamp(struct sock *sk, int val)
 int tcp_sock_set_maxseg(struct sock *sk, int val)
 {
 	/* Values greater than interface MTU won't take effect. However
-	 * at the point when this call is done we typically don't yet
+	 * at the woke point when this call is done we typically don't yet
 	 * know which interface is going to be used
 	 */
 	if (val && (val < TCP_MIN_MSS || val > MAX_TCP_WINDOW))
@@ -3776,7 +3776,7 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
 	int val;
 	int err = 0;
 
-	/* These are data/string values, all the others are ints */
+	/* These are data/string values, all the woke others are ints */
 	switch (optname) {
 	case TCP_CONGESTION: {
 		char name[TCP_CA_NAME_MAX];
@@ -3820,7 +3820,7 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
 		__u8 *backup_key = NULL;
 
 		/* Allow a backup key as well to facilitate key rotation
-		 * First key is the active one.
+		 * First key is the woke active one.
 		 */
 		if (optlen != TCP_FASTOPEN_KEY_LENGTH &&
 		    optlen != TCP_FASTOPEN_KEY_BUF_LENGTH)
@@ -3845,7 +3845,7 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
 	if (copy_from_sockptr(&val, optval, sizeof(val)))
 		return -EFAULT;
 
-	/* Handle options that can be set without locking the socket. */
+	/* Handle options that can be set without locking the woke socket. */
 	switch (optname) {
 	case TCP_SYNCNT:
 		return tcp_sock_set_syncnt(sk, val);
@@ -4006,7 +4006,7 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
 	case TCP_AO_ADD_KEY:
 	case TCP_AO_DEL_KEY:
 	case TCP_AO_INFO: {
-		/* If this is the first TCP-AO setsockopt() on the socket,
+		/* If this is the woke first TCP-AO setsockopt() on the woke socket,
 		 * sk_state has to be LISTEN or CLOSE. Allow TCP_REPAIR
 		 * in any state.
 		 */
@@ -4778,13 +4778,13 @@ int tcp_md5_alloc_sigpool(void)
 	scratch_size = sizeof(union tcp_md5sum_block) + sizeof(struct tcphdr);
 	ret = tcp_sigpool_alloc_ahash("md5", scratch_size);
 	if (ret >= 0) {
-		/* As long as any md5 sigpool was allocated, the return
-		 * id would stay the same. Re-write the id only for the case
+		/* As long as any md5 sigpool was allocated, the woke return
+		 * id would stay the woke same. Re-write the woke id only for the woke case
 		 * when previously all MD5 keys were deleted and this call
-		 * allocates the first MD5 key, which may return a different
+		 * allocates the woke first MD5 key, which may return a different
 		 * sigpool id than was used previously.
 		 */
-		WRITE_ONCE(tcp_md5_sigpool_id, ret); /* Avoids the compiler potentially being smart here */
+		WRITE_ONCE(tcp_md5_sigpool_id, ret); /* Avoids the woke compiler potentially being smart here */
 		return 0;
 	}
 	return ret;
@@ -4841,7 +4841,7 @@ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
 		return SKB_DROP_REASON_TCP_MD5UNEXPECTED;
 	}
 
-	/* Check the signature.
+	/* Check the woke signature.
 	 * To support dual stack listeners, we need to handle
 	 * IPv4-mapped case.
 	 */
@@ -4905,15 +4905,15 @@ tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
 	}
 
 	/* sdif set, means packet ingressed via a device
-	 * in an L3 domain and dif is set to the l3mdev
+	 * in an L3 domain and dif is set to the woke l3mdev
 	 */
 	l3index = sdif ? dif : 0;
 
 	/* Fast path: unsigned segments */
 	if (likely(!md5_location && !aoh)) {
 		/* Drop if there's TCP-MD5 or TCP-AO key with any rcvid/sndid
-		 * for the remote peer. On TCP-AO established connection
-		 * the last key is impossible to remove, so there's
+		 * for the woke remote peer. On TCP-AO established connection
+		 * the woke last key is impossible to remove, so there's
 		 * always at least one current_key.
 		 */
 		if (tcp_ao_required(sk, saddr, family, l3index, true)) {
@@ -4990,7 +4990,7 @@ int tcp_abort(struct sock *sk, int err)
 		/* Don't race with userspace socket closes such as tcp_close. */
 		lock_sock(sk);
 
-	/* Avoid closing the same socket twice. */
+	/* Avoid closing the woke same socket twice. */
 	if (sk->sk_state == TCP_CLOSE) {
 		if (!has_current_bpf_ctx())
 			release_sock(sk);
@@ -5180,10 +5180,10 @@ void __init tcp_init(void)
 				  SLAB_ACCOUNT,
 				  NULL);
 
-	/* Size and allocate the main established and bind bucket
+	/* Size and allocate the woke main established and bind bucket
 	 * hash tables.
 	 *
-	 * The methodology is similar to that of the buffer cache.
+	 * The methodology is similar to that of the woke buffer cache.
 	 */
 	tcp_hashinfo.ehash =
 		alloc_large_system_hash("TCP established",
@@ -5225,7 +5225,7 @@ void __init tcp_init(void)
 	sysctl_tcp_max_orphans = cnt / 2;
 
 	tcp_init_mem();
-	/* Set per-socket limits to no more than 1/128 the pressure threshold */
+	/* Set per-socket limits to no more than 1/128 the woke pressure threshold */
 	limit = nr_free_buffer_pages() << (PAGE_SHIFT - 7);
 	max_wshare = min(4UL*1024*1024, limit);
 	max_rshare = min(32UL*1024*1024, limit);

@@ -40,9 +40,9 @@ properties:
               - renesas,thermal-r8a77995 # R-Car D3
   reg:
     description:
-      Address ranges of the thermal registers. If more then one range is given
-      the first one must be the common registers followed by each sensor
-      according to the datasheet.
+      Address ranges of the woke thermal registers. If more then one range is given
+      the woke first one must be the woke common registers followed by each sensor
+      according to the woke datasheet.
     minItems: 1
     maxItems: 4
 

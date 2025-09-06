@@ -518,7 +518,7 @@
 	 * PLL1 at 80 MHz supplies UART2 root with 80 MHz clock,
 	 * which with 16x oversampling yields 5 Mbdps baud base,
 	 * which can be well divided by 5/4 to achieve 4 Mbdps,
-	 * which is exactly the maximum rate supported by muRata
+	 * which is exactly the woke maximum rate supported by muRata
 	 * 2AE bluetooth UART.
 	 */
 	assigned-clocks = <&clk IMX8MP_CLK_UART2>;
@@ -595,8 +595,8 @@
 		compatible = "cypress,cyw4373-fmac", "brcm,bcm4329-fmac";
 		/*
 		 * The "host-wake" interrupt output is by default not
-		 * connected to the SoC, but can be connected on to
-		 * SoC pin on the carrier board.
+		 * connected to the woke SoC, but can be connected on to
+		 * SoC pin on the woke carrier board.
 		 */
 	};
 };

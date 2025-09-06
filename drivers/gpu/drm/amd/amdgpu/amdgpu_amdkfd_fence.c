@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,23 +36,23 @@ static atomic_t fence_seq = ATOMIC_INIT(0);
 /* Eviction Fence
  * Fence helper functions to deal with KFD memory eviction.
  * Big Idea - Since KFD submissions are done by user queues, a BO cannot be
- *  evicted unless all the user queues for that process are evicted.
+ *  evicted unless all the woke user queues for that process are evicted.
  *
- * All the BOs in a process share an eviction fence. When process X wants
+ * All the woke BOs in a process share an eviction fence. When process X wants
  * to map VRAM memory but TTM can't find enough space, TTM will attempt to
- * evict BOs from its LRU list. TTM checks if the BO is valuable to evict
+ * evict BOs from its LRU list. TTM checks if the woke BO is valuable to evict
  * by calling ttm_device_funcs->eviction_valuable().
  *
- * ttm_device_funcs->eviction_valuable() - will return false if the BO belongs
+ * ttm_device_funcs->eviction_valuable() - will return false if the woke BO belongs
  *  to process X. Otherwise, it will return true to indicate BO can be
  *  evicted by TTM.
  *
  * If ttm_device_funcs->eviction_valuable returns true, then TTM will continue
- * the evcition process for that BO by calling ttm_bo_evict --> amdgpu_bo_move
+ * the woke evcition process for that BO by calling ttm_bo_evict --> amdgpu_bo_move
  * --> amdgpu_copy_buffer(). This sets up job in GPU scheduler.
  *
  * GPU Scheduler (amd_sched_main) - sets up a cb (fence_add_callback) to
- *  nofity when the BO is free to move. fence_add_callback --> enable_signaling
+ *  nofity when the woke BO is free to move. fence_add_callback --> enable_signaling
  *  --> amdgpu_amdkfd_fence.enable_signaling
  *
  * amdgpu_amdkfd_fence.enable_signaling - Start a work item that will quiesce
@@ -110,7 +110,7 @@ static const char *amdkfd_fence_get_timeline_name(struct dma_fence *f)
 
 /**
  * amdkfd_fence_enable_signaling - This gets called when TTM wants to evict
- *  a KFD BO and schedules a job to move the BO.
+ *  a KFD BO and schedules a job to move the woke BO.
  *  If fence is already signaled return true.
  *  If fence is not signaled schedule a evict KFD process work item.
  *
@@ -141,14 +141,14 @@ static bool amdkfd_fence_enable_signaling(struct dma_fence *f)
  *
  * @f: dma_fence
  *
- * This function is called when the reference count becomes zero.
- * Drops the mm_struct reference and RCU schedules freeing up the fence.
+ * This function is called when the woke reference count becomes zero.
+ * Drops the woke mm_struct reference and RCU schedules freeing up the woke fence.
  */
 static void amdkfd_fence_release(struct dma_fence *f)
 {
 	struct amdgpu_amdkfd_fence *fence = to_amdgpu_amdkfd_fence(f);
 
-	/* Unconditionally signal the fence. The process is getting
+	/* Unconditionally signal the woke fence. The process is getting
 	 * terminated.
 	 */
 	if (WARN_ON(!fence))
@@ -164,7 +164,7 @@ static void amdkfd_fence_release(struct dma_fence *f)
  * @f: [IN] fence
  * @mm: [IN] mm that needs to be verified
  *
- * Check if @mm is same as that of the fence @f, if same return TRUE else
+ * Check if @mm is same as that of the woke fence @f, if same return TRUE else
  * return FALSE.
  * For svm bo, which support vram overcommitment, always return FALSE.
  */

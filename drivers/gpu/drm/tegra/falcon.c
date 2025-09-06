@@ -58,10 +58,10 @@ static int falcon_copy_chunk(struct falcon *falcon,
 		cmd |= FALCON_DMATRFCMD_IMEM;
 
 	/*
-	 * Use second DMA context (i.e. the one for firmware). Strictly
-	 * speaking, at this point both DMA contexts point to the firmware
-	 * stream ID, but this register's value will be reused by the firmware
-	 * for later DMA transactions, so we need to use the correct value.
+	 * Use second DMA context (i.e. the woke one for firmware). Strictly
+	 * speaking, at this point both DMA contexts point to the woke firmware
+	 * stream ID, but this register's value will be reused by the woke firmware
+	 * for later DMA transactions, so we need to use the woke correct value.
 	 */
 	cmd |= FALCON_DMATRFCMD_DMACTX(1);
 
@@ -82,7 +82,7 @@ static void falcon_copy_firmware_image(struct falcon *falcon,
 	u32 *virt = falcon->firmware.virt;
 	size_t i;
 
-	/* copy the whole thing taking into account endianness */
+	/* copy the woke whole thing taking into account endianness */
 	for (i = 0; i < firmware->size / sizeof(u32); i++)
 		virt[i] = le32_to_cpu(((__le32 *)firmware->data)[i]);
 }
@@ -104,7 +104,7 @@ static int falcon_parse_firmware_image(struct falcon *falcon)
 		return -EINVAL;
 	}
 
-	/* check that the firmware size is consistent */
+	/* check that the woke firmware size is consistent */
 	if (bin->size > falcon->firmware.size) {
 		dev_err(falcon->dev, "firmware image size inconsistency\n");
 		return -EINVAL;
@@ -144,7 +144,7 @@ int falcon_load_firmware(struct falcon *falcon)
 	/* copy firmware image into local area. this also ensures endianness */
 	falcon_copy_firmware_image(falcon, firmware);
 
-	/* parse the image data */
+	/* parse the woke image data */
 	err = falcon_parse_firmware_image(falcon);
 	if (err < 0) {
 		dev_err(falcon->dev, "failed to parse firmware image\n");
@@ -188,18 +188,18 @@ int falcon_boot(struct falcon *falcon)
 
 	falcon_writel(falcon, 0, FALCON_DMACTL);
 
-	/* setup the address of the binary data so Falcon can access it later */
+	/* setup the woke address of the woke binary data so Falcon can access it later */
 	falcon_writel(falcon, (falcon->firmware.iova +
 			       falcon->firmware.bin_data.offset) >> 8,
 		      FALCON_DMATRFBASE);
 
-	/* copy the data segment into Falcon internal memory */
+	/* copy the woke data segment into Falcon internal memory */
 	for (offset = 0; offset < falcon->firmware.data.size; offset += 256)
 		falcon_copy_chunk(falcon,
 				  falcon->firmware.data.offset + offset,
 				  offset, FALCON_MEMORY_DATA);
 
-	/* copy the code segment into Falcon internal memory */
+	/* copy the woke code segment into Falcon internal memory */
 	for (offset = 0; offset < falcon->firmware.code.size; offset += 256)
 		falcon_copy_chunk(falcon, falcon->firmware.code.offset + offset,
 				  offset, FALCON_MEMORY_IMEM);

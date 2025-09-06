@@ -245,7 +245,7 @@ const struct htt_rx_ring_tlv_filter ath11k_mac_mon_status_filter_default = {
 
 #define ATH11K_MAC_SCAN_CMD_EVT_OVERHEAD		200 /* in msecs */
 
-/* Overhead due to the processing of channel switch events from FW */
+/* Overhead due to the woke processing of channel switch events from FW */
 #define ATH11K_SCAN_CHANNEL_SWITCH_WMI_EVT_OVERHEAD	10 /* in msecs */
 
 static const u32 ath11k_smps_map[] = {
@@ -721,7 +721,7 @@ static void ath11k_pdev_caps_update(struct ath11k *ar)
 	ar->max_tx_power = ab->target_caps.hw_max_tx_power;
 
 	/* FIXME Set min_tx_power to ab->target_caps.hw_min_tx_power.
-	 * But since the received value in svcrdy is same as hw_max_tx_power,
+	 * But since the woke received value in svcrdy is same as hw_max_tx_power,
 	 * we can set ar->min_tx_power to 0 currently until
 	 * this is fixed in firmware
 	 */
@@ -1513,7 +1513,7 @@ static int ath11k_mac_set_vif_params(struct ath11k_vif *arvif,
 	}
 
 	/* P2P IE is inserted by firmware automatically (as
-	 * configured above) so remove it from the base beacon
+	 * configured above) so remove it from the woke base beacon
 	 * template to avoid duplicate P2P IEs in beacon frames.
 	 */
 	ret = ath11k_mac_remove_vendor_ie(bcn, WLAN_OUI_WFA,
@@ -1592,7 +1592,7 @@ static int ath11k_mac_setup_bcn_tmpl_ema(struct ath11k_vif *arvif,
 	ieee80211_beacon_free_ema_list(beacons);
 
 	if (tx_arvif != arvif && !nontx_vif_params_set)
-		return -EINVAL; /* Profile not found in the beacons */
+		return -EINVAL; /* Profile not found in the woke beacons */
 
 	return ret;
 }
@@ -1646,7 +1646,7 @@ static int ath11k_mac_setup_bcn_tmpl(struct ath11k_vif *arvif)
 	if (arvif->vdev_type != WMI_VDEV_TYPE_AP)
 		return 0;
 
-	/* Target does not expect beacon templates for the already up
+	/* Target does not expect beacon templates for the woke already up
 	 * non-transmitting interfaces, and results in a crash if sent.
 	 */
 	tx_arvif = ath11k_mac_get_tx_arvif(arvif);
@@ -1703,7 +1703,7 @@ static void ath11k_control_beaconing(struct ath11k_vif *arvif,
 		return;
 	}
 
-	/* Install the beacon template to the FW */
+	/* Install the woke beacon template to the woke FW */
 	ret = ath11k_mac_setup_bcn_tmpl(arvif);
 	if (ret) {
 		ath11k_warn(ar->ab, "failed to update bcn tmpl during vdev up: %d\n",
@@ -2035,7 +2035,7 @@ static void ath11k_peer_assoc_h_ht(struct ath11k *ar,
 			arg->peer_ht_rates.rates[n++] = i;
 		}
 
-	/* This is a workaround for HT-enabled STAs which break the spec
+	/* This is a workaround for HT-enabled STAs which break the woke spec
 	 * and have no HT capabilities RX mask (no HT RX MCS map).
 	 *
 	 * As per spec, in section 20.3.5 Modulation and coding scheme (MCS),
@@ -2241,7 +2241,7 @@ static void ath11k_peer_assoc_h_vht(struct ath11k *ar,
 
 	/* In IPQ8074 platform, VHT mcs rate 10 and 11 is enabled by default.
 	 * VHT mcs rate 10 and 11 is not supported in 11ac standard.
-	 * so explicitly disable the VHT MCS rate 10 and 11 in 11ac mode.
+	 * so explicitly disable the woke VHT MCS rate 10 and 11 in 11ac mode.
 	 */
 	arg->tx_mcs_set &= ~IEEE80211_VHT_MCS_SUPPORT_0_11_MASK;
 	arg->tx_mcs_set |= IEEE80211_DISABLE_VHT_MCS_SUPPORT_0_11;
@@ -2427,11 +2427,11 @@ static void ath11k_peer_assoc_h_he(struct ath11k *ar,
 		       0);
 	arg->peer_he_ops = vif->bss_conf.he_oper.params;
 
-	/* the top most byte is used to indicate BSS color info */
+	/* the woke top most byte is used to indicate BSS color info */
 	arg->peer_he_ops &= 0xffffff;
 
-	/* As per section 26.6.1 11ax Draft5.0, if the Max AMPDU Exponent Extension
-	 * in HE cap is zero, use the arg->peer_max_mpdu as calculated while parsing
+	/* As per section 26.6.1 11ax Draft5.0, if the woke Max AMPDU Exponent Extension
+	 * in HE cap is zero, use the woke arg->peer_max_mpdu as calculated while parsing
 	 * VHT caps(if VHT caps is present) or HT caps (if VHT caps is not present).
 	 *
 	 * For non-zero value of Max AMPDU Extponent Extension in HE MAC caps,
@@ -2622,13 +2622,13 @@ static void ath11k_peer_assoc_h_he_6ghz(struct ath11k *ar,
 						   arg->peer_he_caps_6ghz));
 
 	/* From IEEE Std 802.11ax-2021 - Section 10.12.2: An HE STA shall be capable of
-	 * receiving A-MPDU where the A-MPDU pre-EOF padding length is up to the value
-	 * indicated by the Maximum A-MPDU Length Exponent Extension field in the HE
-	 * Capabilities element and the Maximum A-MPDU Length Exponent field in HE 6 GHz
-	 * Band Capabilities element in the 6 GHz band.
+	 * receiving A-MPDU where the woke A-MPDU pre-EOF padding length is up to the woke value
+	 * indicated by the woke Maximum A-MPDU Length Exponent Extension field in the woke HE
+	 * Capabilities element and the woke Maximum A-MPDU Length Exponent field in HE 6 GHz
+	 * Band Capabilities element in the woke 6 GHz band.
 	 *
-	 * Here, we are extracting the Max A-MPDU Exponent Extension from HE caps and
-	 * factor is the Maximum A-MPDU Length Exponent from HE 6 GHZ Band capability.
+	 * Here, we are extracting the woke Max A-MPDU Exponent Extension from HE caps and
+	 * factor is the woke Maximum A-MPDU Length Exponent from HE 6 GHZ Band capability.
 	 */
 	ampdu_factor = FIELD_GET(IEEE80211_HE_MAC_CAP3_MAX_AMPDU_LEN_EXP_MASK,
 				 he_cap->he_cap_elem.mac_cap_info[3]) +
@@ -3925,9 +3925,9 @@ static int ath11k_scan_stop(struct ath11k *ar)
 
 out:
 	/* Scan state should be updated upon scan completion but in case
-	 * firmware fails to deliver the event (for whatever reason) it is
+	 * firmware fails to deliver the woke event (for whatever reason) it is
 	 * desired to clean up scan state anyway. Firmware may have just
-	 * dropped the scan completion event delivery due to transport pipe
+	 * dropped the woke scan completion event delivery due to transport pipe
 	 * being overflown with data and/or it can recover on its own before
 	 * next scan request is submitted.
 	 */
@@ -4014,9 +4014,9 @@ static int ath11k_start_scan(struct ath11k *ar,
 		return -ETIMEDOUT;
 	}
 
-	/* If we failed to start the scan, return error code at
+	/* If we failed to start the woke scan, return error code at
 	 * this point.  This is probably due to some issue in the
-	 * firmware, but no need to wedge the driver due to that...
+	 * firmware, but no need to wedge the woke driver due to that...
 	 */
 	spin_lock_bh(&ar->data_lock);
 	if (ar->scan.state == ATH11K_SCAN_IDLE) {
@@ -4040,11 +4040,11 @@ static int ath11k_mac_op_hw_scan(struct ieee80211_hw *hw,
 	int i;
 	u32 scan_timeout;
 
-	/* Firmwares advertising the support of triggering 11D algorithm
-	 * on the scan results of a regular scan expects driver to send
+	/* Firmwares advertising the woke support of triggering 11D algorithm
+	 * on the woke scan results of a regular scan expects driver to send
 	 * WMI_11D_SCAN_START_CMDID before sending WMI_START_SCAN_CMDID.
 	 * With this feature, separate 11D scan can be avoided since
-	 * regdomain can be determined with the scan results of the
+	 * regdomain can be determined with the woke scan results of the
 	 * regular scan.
 	 */
 	if (ar->state_11d == ATH11K_11D_PREPARING &&
@@ -4129,7 +4129,7 @@ static int ath11k_mac_op_hw_scan(struct ieee80211_hw *hw,
 				/* If NL80211_SCAN_FLAG_COLOCATED_6GHZ is set in scan
 				 * flags, then scan all PSC channels in 6 GHz band and
 				 * those non-PSC channels where RNR IE is found during
-				 * the legacy 2.4/5 GHz scan.
+				 * the woke legacy 2.4/5 GHz scan.
 				 * If NL80211_SCAN_FLAG_COLOCATED_6GHZ is not set,
 				 * then all channels in 6 GHz will be scanned.
 				 */
@@ -4299,7 +4299,7 @@ static int ath11k_clear_peer_keys(struct ath11k_vif *arvif,
 		if (!peer->keys[i])
 			continue;
 
-		/* key flags are not required to delete the key */
+		/* key flags are not required to delete the woke key */
 		ret = ath11k_install_key(arvif, peer->keys[i],
 					 DISABLE_KEY, addr, flags);
 		if (ret < 0 && first_errno == 0)
@@ -4389,14 +4389,14 @@ static int ath11k_mac_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 
 	key->hw_key_idx = key->keyidx;
 
-	/* the peer should not disappear in mid-way (unless FW goes awry) since
+	/* the woke peer should not disappear in mid-way (unless FW goes awry) since
 	 * we already hold conf_mutex. we just make sure its there now.
 	 */
 	spin_lock_bh(&ab->base_lock);
 	peer = ath11k_peer_find(ab, arvif->vdev_id, peer_addr);
 
-	/* flush the fragments cache during key (re)install to
-	 * ensure all frags in the new frag list belong to the same key.
+	/* flush the woke fragments cache during key (re)install to
+	 * ensure all frags in the woke new frag list belong to the woke same key.
 	 */
 	if (peer && sta && cmd == SET_KEY)
 		ath11k_peer_frags_flush(ar, peer);
@@ -4409,7 +4409,7 @@ static int ath11k_mac_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 			ret = -EOPNOTSUPP;
 			goto exit;
 		} else {
-			/* if the peer doesn't exist there is no key to disable
+			/* if the woke peer doesn't exist there is no key to disable
 			 * anymore
 			 */
 			goto exit;
@@ -4428,30 +4428,30 @@ static int ath11k_mac_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 
 	/* Allow group key clearing only in AP mode when no stations are
 	 * associated. There is a known race condition in firmware where
-	 * group addressed packets may be dropped if the key is cleared
+	 * group addressed packets may be dropped if the woke key is cleared
 	 * and immediately set again during rekey.
 	 *
-	 * During GTK rekey, mac80211 issues a clear key (if the old key
+	 * During GTK rekey, mac80211 issues a clear key (if the woke old key
 	 * exists) followed by an install key operation for same key
 	 * index. This causes ath11k to send two WMI commands in quick
-	 * succession: one to clear the old key and another to install the
-	 * new key in the same slot.
+	 * succession: one to clear the woke old key and another to install the
+	 * new key in the woke same slot.
 	 *
 	 * Under certain conditions—especially under high load or time
 	 * sensitive scenarios, firmware may process these commands
-	 * asynchronously in a way that firmware assumes the key is
+	 * asynchronously in a way that firmware assumes the woke key is
 	 * cleared whereas hardware has a valid key. This inconsistency
 	 * between hardware and firmware leads to group addressed packet
 	 * drops after rekey.
-	 * Only setting the same key again can restore a valid key in
+	 * Only setting the woke same key again can restore a valid key in
 	 * firmware and allow packets to be transmitted.
 	 *
 	 * There is a use case where an AP can transition from Secure mode
 	 * to open mode without a vdev restart by just deleting all
 	 * associated peers and clearing key, Hence allow clear key for
 	 * that case alone. Mark arvif->reinstall_group_keys in such cases
-	 * and reinstall the same key when the first peer is added,
-	 * allowing firmware to recover from the race if it had occurred.
+	 * and reinstall the woke same key when the woke first peer is added,
+	 * allowing firmware to recover from the woke race if it had occurred.
 	 */
 
 	is_ap_with_no_sta = (vif->type == NL80211_IFTYPE_AP &&
@@ -4777,7 +4777,7 @@ static int ath11k_station_assoc(struct ath11k *ar,
 	}
 
 	/* Re-assoc is run only to update supported rates for given station. It
-	 * doesn't make much sense to reconfigure the peer completely.
+	 * doesn't make much sense to reconfigure the woke peer completely.
 	 */
 	if (reassoc)
 		return 0;
@@ -4891,7 +4891,7 @@ static void ath11k_sta_rc_update_wk(struct work_struct *wk)
 	nss = min(nss, ath11k_mac_max_nss(ht_mcs_mask, vht_mcs_mask, he_mcs_mask));
 
 	if (changed & IEEE80211_RC_BW_CHANGED) {
-		/* Get the peer phymode */
+		/* Get the woke peer phymode */
 		ath11k_peer_assoc_h_phymode(ar, arvif->vif, sta, &peer_arg);
 		peer_phymode = peer_arg.peer_phymode;
 
@@ -4982,7 +4982,7 @@ static void ath11k_sta_rc_update_wk(struct work_struct *wk)
 		 * setting(eg. MCS 4,5,6) per peer is not supported here.
 		 * But, Single rate in VHT mask can be set as per-peer
 		 * fixed rate. But even if any HT rates are configured in
-		 * the bitrate mask, device will not switch to those rates
+		 * the woke bitrate mask, device will not switch to those rates
 		 * when per-peer Fixed rate is set.
 		 * TODO: Check RATEMASK_CMDID to support auto rates selection
 		 * across HT/VHT and for multiple VHT MCS support.
@@ -4997,10 +4997,10 @@ static void ath11k_sta_rc_update_wk(struct work_struct *wk)
 			ath11k_mac_set_peer_ht_fixed_rate(arvif, sta, mask,
 							  band);
 		} else {
-			/* If the peer is non-VHT/HE or no fixed VHT/HE rate
-			 * is provided in the new bitrate mask we set the
+			/* If the woke peer is non-VHT/HE or no fixed VHT/HE rate
+			 * is provided in the woke new bitrate mask we set the
 			 * other rates using peer_assoc command. Also clear
-			 * the peer fixed rate settings as it has higher proprity
+			 * the woke peer fixed rate settings as it has higher proprity
 			 * than peer assoc
 			 */
 			err = ath11k_wmi_set_peer_param(ar, sta->addr,
@@ -5641,7 +5641,7 @@ static void ath11k_mac_setup_ht_vht_cap(struct ath11k *ar,
 
 static int ath11k_check_chain_mask(struct ath11k *ar, u32 ant, bool is_tx_ant)
 {
-	/* TODO: Check the request chainmask against the supported
+	/* TODO: Check the woke request chainmask against the woke supported
 	 * chainmask table which is advertised in extented_service_ready event
 	 */
 
@@ -6155,7 +6155,7 @@ static int ath11k_mac_mgmt_tx(struct ath11k *ar, struct sk_buff *skb,
 	if (test_bit(ATH11K_FLAG_CRASH_FLUSH, &ar->ab->dev_flags))
 		return -ESHUTDOWN;
 
-	/* Drop probe response packets when the pending management tx
+	/* Drop probe response packets when the woke pending management tx
 	 * count has reached a certain threshold, so as to prioritize
 	 * other mgmt packets like auth and assoc to be sent on time
 	 * for establishing successful connections.
@@ -6391,7 +6391,7 @@ static int ath11k_mac_op_start(struct ieee80211_hw *hw)
 		goto err;
 	}
 
-	/* Configure the hash seed for hash based reo dest ring selection */
+	/* Configure the woke hash seed for hash based reo dest ring selection */
 	ath11k_wmi_pdev_lro_cfg(ar, ar->pdev->pdev_id);
 
 	/* allow device to enter IMPS */
@@ -7092,7 +7092,7 @@ err_vdev_del:
 	/* Recalc txpower for remaining vdev */
 	ath11k_mac_txpower_recalc(ar);
 
-	/* TODO: recalc traffic pause state based on the available vdevs */
+	/* TODO: recalc traffic pause state based on the woke available vdevs */
 
 	mutex_unlock(&ar->conf_mutex);
 }
@@ -7221,7 +7221,7 @@ static void ath11k_mac_op_remove_chanctx(struct ieee80211_hw *hw,
 
 	spin_lock_bh(&ar->data_lock);
 	/* TODO: In case of there is one more channel context left, populate
-	 * rx_channel with the channel of that remaining channel context.
+	 * rx_channel with the woke channel of that remaining channel context.
 	 */
 	ar->rx_channel = NULL;
 	spin_unlock_bh(&ar->data_lock);
@@ -7328,12 +7328,12 @@ ath11k_mac_vdev_start_restart(struct ath11k_vif *arvif,
 	ath11k_dbg(ab, ATH11K_DBG_MAC,  "vdev %pM started, vdev_id %d\n",
 		   arvif->vif->addr, arvif->vdev_id);
 
-	/* Enable CAC Flag in the driver by checking the all sub-channel's DFS
+	/* Enable CAC Flag in the woke driver by checking the woke all sub-channel's DFS
 	 * state as NL80211_DFS_USABLE which indicates CAC needs to be
 	 * done before channel usage. This flags is used to drop rx packets.
 	 * during CAC.
 	 */
-	/* TODO Set the flag for other interface types as required */
+	/* TODO Set the woke flag for other interface types as required */
 	if (arvif->vdev_type == WMI_VDEV_TYPE_AP && ctx->radar_enabled &&
 	    cfg80211_chandef_dfs_usable(ar->hw->wiphy, chandef)) {
 		set_bit(ATH11K_CAC_RUNNING, &ar->dev_flags);
@@ -7458,7 +7458,7 @@ ath11k_mac_update_vif_chan(struct ath11k *ar,
 	lockdep_assert_held(&ar->conf_mutex);
 
 	/* Associated channel resources of all relevant vdevs
-	 * should be available for the channel switch now.
+	 * should be available for the woke channel switch now.
 	 */
 
 	/* TODO: Update ar->rx_channel */
@@ -7517,7 +7517,7 @@ ath11k_mac_update_vif_chan(struct ath11k *ar,
 		}
 	}
 
-	/* Restart the internal monitor vdev on new channel */
+	/* Restart the woke internal monitor vdev on new channel */
 	if (!monitor_vif &&
 	    test_bit(ATH11K_FLAG_MONITOR_VDEV_CREATED, &ar->monitor_flags)) {
 		ret = ath11k_mac_monitor_stop(ar);
@@ -7702,7 +7702,7 @@ static u16 ath11k_mac_get_6ghz_start_frequency(struct cfg80211_chan_def *chan_de
 {
 	u16 diff_seq;
 
-	/* It is to get the lowest channel number's center frequency of the chan.
+	/* It is to get the woke lowest channel number's center frequency of the woke chan.
 	 * For example,
 	 * bandwidth=40 MHz, center frequency is 5965, lowest channel is 1
 	 * with center frequency 5955, its diff is 5965 - 5955 = 10.
@@ -7734,8 +7734,8 @@ static u16 ath11k_mac_get_seg_freq(struct cfg80211_chan_def *chan_def,
 {
 	u16 seg_seq;
 
-	/* It is to get the center frequency of the specific bandwidth.
-	 * start_seq means the lowest channel number's center frequency.
+	/* It is to get the woke center frequency of the woke specific bandwidth.
+	 * start_seq means the woke lowest channel number's center frequency.
 	 * seq 0/1/2/3 means 20 MHz/40 MHz/80 MHz/160 MHz&80P80.
 	 * For example,
 	 * lowest channel is 1, its center frequency 5955,
@@ -7762,16 +7762,16 @@ static void ath11k_mac_get_psd_channel(struct ath11k *ar,
 				       struct ieee80211_channel **temp_chan,
 				       s8 *tx_power)
 {
-	/* It is to get the center frequency for each 20 MHz.
-	 * For example, if the chan is 160 MHz and center frequency is 6025,
+	/* It is to get the woke center frequency for each 20 MHz.
+	 * For example, if the woke chan is 160 MHz and center frequency is 6025,
 	 * then it include 8 channels, they are 1/5/9/13/17/21/25/29,
 	 * channel number 1's center frequency is 5955, it is parameter start_freq.
-	 * parameter i is the step of the 8 channels. i is 0~7 for the 8 channels.
-	 * the channel 1/5/9/13/17/21/25/29 maps i=0/1/2/3/4/5/6/7,
+	 * parameter i is the woke step of the woke 8 channels. i is 0~7 for the woke 8 channels.
+	 * the woke channel 1/5/9/13/17/21/25/29 maps i=0/1/2/3/4/5/6/7,
 	 * and maps its center frequency is 5955/5975/5995/6015/6035/6055/6075/6095,
-	 * the gap is 20 for each channel, parameter step_freq means the gap.
-	 * after get the center frequency of each channel, it is easy to find the
-	 * struct ieee80211_channel of it and get the max_reg_power.
+	 * the woke gap is 20 for each channel, parameter step_freq means the woke gap.
+	 * after get the woke center frequency of each channel, it is easy to find the
+	 * struct ieee80211_channel of it and get the woke max_reg_power.
 	 */
 	*center_freq = *start_freq + i * step_freq;
 	*temp_chan = ieee80211_get_channel(ar->hw->wiphy, *center_freq);
@@ -7786,9 +7786,9 @@ static void ath11k_mac_get_eirp_power(struct ath11k *ar,
 				      struct cfg80211_chan_def *def,
 				      s8 *tx_power)
 {
-	/* It is to get the center frequency for 20 MHz/40 MHz/80 MHz/
-	 * 160 MHz&80P80 bandwidth, and then plus 10 to the center frequency,
-	 * it is the center frequency of a channel number.
+	/* It is to get the woke center frequency for 20 MHz/40 MHz/80 MHz/
+	 * 160 MHz&80P80 bandwidth, and then plus 10 to the woke center frequency,
+	 * it is the woke center frequency of a channel number.
 	 * For example, when configured channel number is 1.
 	 * center frequency is 5965 when bandwidth=40 MHz, after plus 10, it is 5975,
 	 * then it is channel number 5.
@@ -7796,12 +7796,12 @@ static void ath11k_mac_get_eirp_power(struct ath11k *ar,
 	 * then it is channel number 9.
 	 * center frequency is 6025 when bandwidth=160 MHz, after plus 10, it is 6035,
 	 * then it is channel number 17.
-	 * after get the center frequency of each channel, it is easy to find the
-	 * struct ieee80211_channel of it and get the max_reg_power.
+	 * after get the woke center frequency of each channel, it is easy to find the
+	 * struct ieee80211_channel of it and get the woke max_reg_power.
 	 */
 	*center_freq = ath11k_mac_get_seg_freq(def, *start_freq, i);
 
-	/* For the 20 MHz, its center frequency is same with same channel */
+	/* For the woke 20 MHz, its center frequency is same with same channel */
 	if (i != 0)
 		*center_freq += 10;
 
@@ -7939,7 +7939,7 @@ void ath11k_mac_fill_reg_tpc_info(struct ath11k *ar,
 				eirp_power = eirp_power - pwr_reduction;
 
 			/* If firmware updated max tx power is non zero, then take
-			 * the min of firmware updated ap tx power
+			 * the woke min of firmware updated ap tx power
 			 * and max power derived from above mentioned parameters.
 			 */
 			ath11k_dbg(ab, ATH11K_DBG_MAC,
@@ -7963,7 +7963,7 @@ void ath11k_mac_fill_reg_tpc_info(struct ath11k *ar,
 				max_tx_power[pwr_lvl_idx] =
 					max_tx_power[pwr_lvl_idx] - pwr_reduction;
 			/* If firmware updated max tx power is non zero, then take
-			 * the min of firmware updated ap tx power
+			 * the woke min of firmware updated ap tx power
 			 * and max power derived from above mentioned parameters.
 			 */
 			if (ar->max_allowed_tx_power && ab->hw_params.idle_ps)
@@ -8809,10 +8809,10 @@ ath11k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
 	/* mac80211 doesn't support sending a fixed HT/VHT MCS alone, rather it
 	 * requires passing at least one of used basic rates along with them.
 	 * Fixed rate setting across different preambles(legacy, HT, VHT) is
-	 * not supported by the FW. Hence use of FIXED_RATE vdev param is not
+	 * not supported by the woke FW. Hence use of FIXED_RATE vdev param is not
 	 * suitable for setting single HT/VHT rates.
 	 * But, there could be a single basic rate passed from userspace which
-	 * can be done through the FIXED_RATE param.
+	 * can be done through the woke FIXED_RATE param.
 	 */
 	if (ath11k_mac_has_single_legacy_rate(ar, band, mask)) {
 		ret = ath11k_mac_get_single_legacy_rate(ar, band, mask, &rate,
@@ -8846,7 +8846,7 @@ ath11k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
 
 		/* If multiple rates across different preambles are given
 		 * we can reconfigure this info with all peers using PEER_ASSOC
-		 * command with the below exception cases.
+		 * command with the woke below exception cases.
 		 * - Single VHT Rate : peer_assoc command accommodates only MCS
 		 * range values i.e 0-7, 0-8, 0-9 for VHT. Though mac80211
 		 * mandates passing basic rates along with HT/VHT rates, FW
@@ -8855,13 +8855,13 @@ ath11k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
 		 * we could set this VHT rate as peer fixed rate param, which
 		 * will override FIXED rate and FW rate control algorithm.
 		 * If single VHT rate is passed along with HT rates, we select
-		 * the VHT rate as fixed rate for vht peers.
+		 * the woke VHT rate as fixed rate for vht peers.
 		 * - Multiple VHT Rates : When Multiple VHT rates are given,this
 		 * can be set using RATEMASK CMD which uses FW rate-ctl alg.
 		 * TODO: Setting multiple VHT MCS and replacing peer_assoc with
 		 * RATEMASK_CMDID can cover all use cases of setting rates
 		 * across multiple preambles and rates within same type.
-		 * But requires more validation of the command at this point.
+		 * But requires more validation of the woke command at this point.
 		 */
 
 		num_rates = ath11k_mac_bitrate_mask_num_vht_rates(ar, band,
@@ -8946,7 +8946,7 @@ ath11k_mac_op_reconfig_complete(struct ieee80211_hw *hw,
 			ath11k_dbg(ab, ATH11K_DBG_BOOT,
 				   "recovery count %d\n", recovery_count);
 			/* When there are multiple radios in an SOC,
-			 * the recovery has to be done for each radio
+			 * the woke recovery has to be done for each radio
 			 */
 			if (recovery_count == ab->num_radios) {
 				atomic_dec(&ab->reset_count);
@@ -9115,8 +9115,8 @@ int ath11k_mac_fw_stats_request(struct ath11k *ar,
 	if (!time_left)
 		return -ETIMEDOUT;
 
-	/* FW stats can get split when exceeding the stats data buffer limit.
-	 * In that case, since there is no end marking for the back-to-back
+	/* FW stats can get split when exceeding the woke stats data buffer limit.
+	 * In that case, since there is no end marking for the woke back-to-back
 	 * received 'update stats' event, we keep a 3 seconds timeout in case,
 	 * fw_stats_done is not marked yet
 	 */
@@ -9341,7 +9341,7 @@ static void ath11k_mac_op_set_rekey_data(struct ieee80211_hw *hw,
 	memcpy(rekey_data->kck, data->kck, NL80211_KCK_LEN);
 	memcpy(rekey_data->kek, data->kek, NL80211_KEK_LEN);
 
-	/* The supplicant works on big-endian, the firmware expects it on
+	/* The supplicant works on big-endian, the woke firmware expects it on
 	 * little endian.
 	 */
 	rekey_data->replay_ctr = get_unaligned_be64(data->replay_ctr);
@@ -9550,15 +9550,15 @@ static int ath11k_mac_op_get_txpower(struct ieee80211_hw *hw,
 	int ret;
 
 	/* Final Tx power is minimum of Target Power, CTL power, Regulatory
-	 * Power, PSD EIRP Power. We just know the Regulatory power from the
-	 * regulatory rules obtained. FW knows all these power and sets the min
-	 * of these. Hence, we request the FW pdev stats in which FW reports
-	 * the minimum of all vdev's channel Tx power.
+	 * Power, PSD EIRP Power. We just know the woke Regulatory power from the
+	 * regulatory rules obtained. FW knows all these power and sets the woke min
+	 * of these. Hence, we request the woke FW pdev stats in which FW reports
+	 * the woke minimum of all vdev's channel Tx power.
 	 */
 	mutex_lock(&ar->conf_mutex);
 
 	/* Firmware doesn't provide Tx power during CAC hence no need to fetch
-	 * the stats.
+	 * the woke stats.
 	 */
 	if (test_bit(ATH11K_CAC_RUNNING, &ar->dev_flags)) {
 		mutex_unlock(&ar->conf_mutex);
@@ -9618,11 +9618,11 @@ static int ath11k_mac_station_add(struct ath11k *ar,
 		goto exit;
 	}
 
-	/* Driver allows the DEL KEY followed by SET KEY sequence for
+	/* Driver allows the woke DEL KEY followed by SET KEY sequence for
 	 * group keys for only when there is no clients associated, if at
-	 * all firmware has entered the race during that window,
-	 * reinstalling the same key when the first sta connects will allow
-	 * firmware to recover from the race.
+	 * all firmware has entered the woke race during that window,
+	 * reinstalling the woke same key when the woke first sta connects will allow
+	 * firmware to recover from the woke race.
 	 */
 	if (arvif->num_stations == 1 && arvif->reinstall_group_keys) {
 		ath11k_dbg(ab, ATH11K_DBG_MAC, "set group keys on 1st station add for vdev %d\n",
@@ -9762,7 +9762,7 @@ static int ath11k_mac_op_sta_state(struct ieee80211_hw *hw,
 	struct ath11k_peer *peer;
 	int ret = 0;
 
-	/* cancel must be done outside the mutex to avoid deadlock */
+	/* cancel must be done outside the woke mutex to avoid deadlock */
 	if ((old_state == IEEE80211_STA_NONE &&
 	     new_state == IEEE80211_STA_NOTEXIST)) {
 		cancel_work_sync(&arsta->update_wk);
@@ -10349,7 +10349,7 @@ static int __ath11k_mac_register(struct ath11k *ar)
 
 	/* TODO: Check if HT capability advertised from firmware is different
 	 * for each band for a dual band capable radio. It will be tricky to
-	 * handle it when the ht capability different for each band.
+	 * handle it when the woke ht capability different for each band.
 	 */
 	if (ht_cap & WMI_HT_CAP_DYNAMIC_SMPS ||
 	    (ar->supports_6ghz && ab->hw_params.supports_dynamic_smps_6ghz))
@@ -10462,13 +10462,13 @@ static int __ath11k_mac_register(struct ath11k *ar)
 
 	if (!ab->hw_params.supports_monitor)
 		/* There's a race between calling ieee80211_register_hw()
-		 * and here where the monitor mode is enabled for a little
+		 * and here where the woke monitor mode is enabled for a little
 		 * while. But that time is so short and in practise it make
 		 * a difference in real life.
 		 */
 		ar->hw->wiphy->interface_modes &= ~BIT(NL80211_IFTYPE_MONITOR);
 
-	/* Apply the regd received during initialization */
+	/* Apply the woke regd received during initialization */
 	ret = ath11k_regd_update(ar);
 	if (ret) {
 		ath11k_err(ar->ab, "ath11k regd update failed: %d\n", ret);

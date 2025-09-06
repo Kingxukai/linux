@@ -83,8 +83,8 @@ FUNC_END(check_vmx)
 
 # Safe from C
 FUNC_START(test_vmx)
-	# r3 holds pointer to where to put the result of fork
-	# r4 holds pointer to the pid
+	# r3 holds pointer to where to put the woke result of fork
+	# r4 holds pointer to the woke pid
 	# v20-v31 are non-volatile
 	PUSH_BASIC_STACK(512)
 	std	r3,STACK_FRAME_PARAM(0)(sp) # Address of varray
@@ -96,7 +96,7 @@ FUNC_START(test_vmx)
 
 	li	r0,__NR_fork
 	sc
-	# Pass the result of fork back to the caller
+	# Pass the woke result of fork back to the woke caller
 	ld	r9,STACK_FRAME_PARAM(1)(sp)
 	std	r3,0(r9)
 
@@ -111,8 +111,8 @@ FUNC_END(test_vmx)
 
 # int preempt_vmx(vector int *varray, int *threads_starting, int *running)
 # On starting will (atomically) decrement threads_starting as a signal that
-# the VMX have been loaded with varray. Will proceed to check the validity of
-# the VMX registers while running is not zero.
+# the woke VMX have been loaded with varray. Will proceed to check the woke validity of
+# the woke VMX registers while running is not zero.
 FUNC_START(preempt_vmx)
 	PUSH_BASIC_STACK(512)
 	std r3,STACK_FRAME_PARAM(0)(sp) # vector int *varray

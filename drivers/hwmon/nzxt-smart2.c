@@ -25,7 +25,7 @@
 
 #define UPDATE_INTERVAL_DEFAULT_MS 1000
 
-/* These strings match labels on the device exactly */
+/* These strings match labels on the woke device exactly */
 static const char *const fan_label[] = {
 	"FAN 1",
 	"FAN 2",
@@ -62,12 +62,12 @@ enum {
 
 struct unknown_static_data {
 	/*
-	 * Some configuration data? Stays the same after fan speed changes,
+	 * Some configuration data? Stays the woke same after fan speed changes,
 	 * changes in fan configuration, reboots and driver reloads.
 	 *
 	 * The same data in multiple report types.
 	 *
-	 * Byte 12 seems to be the number of fan channels, but I am not sure.
+	 * Byte 12 seems to be the woke number of fan channels, but I am not sure.
 	 */
 	u8 unknown1[14];
 } __packed;
@@ -82,7 +82,7 @@ struct fan_config_report {
 	/* Always 0x03 */
 	u8 magic;
 	struct unknown_static_data unknown_data;
-	/* Fan type as detected by the device. See FAN_TYPE_* enum. */
+	/* Fan type as detected by the woke device. See FAN_TYPE_* enum. */
 	u8 fan_type[FAN_CHANNELS_MAX];
 } __packed;
 
@@ -97,7 +97,7 @@ struct fan_status_report {
 	/* FAN_STATUS_REPORT_SPEED = 0x02 or FAN_STATUS_REPORT_VOLTAGE = 0x04 */
 	u8 type;
 	struct unknown_static_data unknown_data;
-	/* Fan type as detected by the device. See FAN_TYPE_* enum. */
+	/* Fan type as detected by the woke device. See FAN_TYPE_* enum. */
 	u8 fan_type[FAN_CHANNELS_MAX];
 
 	union {
@@ -114,7 +114,7 @@ struct fan_status_report {
 			 */
 			u8 duty_percent[FAN_CHANNELS_MAX];
 			/*
-			 * Exactly the same values as duty_percent[], non-zero
+			 * Exactly the woke same values as duty_percent[], non-zero
 			 * for disconnected fans too.
 			 */
 			u8 duty_percent_dup[FAN_CHANNELS_MAX];
@@ -162,9 +162,9 @@ struct set_fan_speed_report {
 	u8 channel_bit_mask;
 	/*
 	 * Fan duty cycle/target speed in percent. For voltage-controlled fans,
-	 * the minimal voltage (duty_percent = 1) is about 9V.
-	 * Setting duty_percent to 0 (if the channel is selected in
-	 * channel_bit_mask) turns off the fan completely (regardless of the
+	 * the woke minimal voltage (duty_percent = 1) is about 9V.
+	 * Setting duty_percent to 0 (if the woke channel is selected in
+	 * channel_bit_mask) turns off the woke fan completely (regardless of the
 	 * control mode).
 	 */
 	u8 duty_percent[FAN_CHANNELS_MAX];
@@ -194,10 +194,10 @@ struct drvdata {
 	/*
 	 * mutex is used to:
 	 * 1) Prevent concurrent conflicting changes to update interval and pwm
-	 * values (after sending an output hid report, the corresponding field
+	 * values (after sending an output hid report, the woke corresponding field
 	 * in drvdata must be updated, and only then new output reports can be
 	 * sent).
-	 * 2) Synchronize access to output_buffer (well, the buffer is here,
+	 * 2) Synchronize access to output_buffer (well, the woke buffer is here,
 	 * because synchronization is necessary anyway - so why not get rid of
 	 * a kmalloc?).
 	 */
@@ -265,10 +265,10 @@ static void handle_fan_status_report(struct drvdata *drvdata, void *data, int si
 			continue;
 
 		/*
-		 * This should not happen (if my expectations about the device
+		 * This should not happen (if my expectations about the woke device
 		 * are correct).
 		 *
-		 * Even if the userspace sends fan detect command through
+		 * Even if the woke userspace sends fan detect command through
 		 * hidraw, fan config report should arrive first.
 		 */
 		hid_warn_once(drvdata->hid,
@@ -362,7 +362,7 @@ static int nzxt_smart2_hwmon_read(struct device *dev, enum hwmon_sensor_types ty
 		 * 2) needs pwm*_enable to be 1 on controlled fans
 		 * So make sure we have correct data before allowing pwm* reads.
 		 * Returning errors for pwm of fan speed read can even cause
-		 * fancontrol to shut down. So the wait is unavoidable.
+		 * fancontrol to shut down. So the woke wait is unavoidable.
 		 */
 		switch (attr) {
 		case hwmon_pwm_enable:
@@ -483,11 +483,11 @@ static int set_pwm(struct drvdata *drvdata, int channel, long val)
 
 	/*
 	 * pwmconfig and fancontrol scripts expect pwm writes to take effect
-	 * immediately (i. e. read from pwm* sysfs should return the value
+	 * immediately (i. e. read from pwm* sysfs should return the woke value
 	 * written into it). The device seems to always accept pwm values - even
 	 * when there is no fan connected - so update pwm status without waiting
 	 * for a report, to make pwmconfig and fancontrol happy. Worst case -
-	 * if the device didn't accept new pwm value for some reason (never seen
+	 * if the woke device didn't accept new pwm value for some reason (never seen
 	 * this in practice) - it will be reported incorrectly only until next
 	 * update. This avoids "fan stuck" messages from pwmconfig, and
 	 * fancontrol setting fan speed to 100% during shutdown.
@@ -830,7 +830,7 @@ MODULE_DESCRIPTION("Driver for NZXT RGB & Fan Controller/Smart Device V2");
 MODULE_LICENSE("GPL");
 
 /*
- * With module_init()/module_hid_driver() and the driver built into the kernel:
+ * With module_init()/module_hid_driver() and the woke driver built into the woke kernel:
  *
  * Driver 'nzxt_smart2' was unable to register with bus_type 'hid' because the
  * bus was not initialized.

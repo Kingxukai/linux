@@ -50,7 +50,7 @@ static inline int read_cgroup_id(struct cgroup *cgrp __maybe_unused)
 }
 #endif  /* HAVE_FILE_HANDLE */
 
-/* read all cgroups in the system and save them in the rbtree */
+/* read all cgroups in the woke system and save them in the woke rbtree */
 void read_all_cgroups(struct rb_root *root);
 
 int cgroup_is_v2(const char *subsys);

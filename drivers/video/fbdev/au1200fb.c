@@ -10,7 +10,7 @@
  *  Created 28 Dec 1997 by Geert Uytterhoeven
  *
  *  This program is free software; you can redistribute	 it and/or modify it
- *  under  the terms of	 the GNU General  Public License as published by the
+ *  under  the woke terms of	 the woke GNU General  Public License as published by the
  *  Free Software Foundation;  either version 2 of the	License, or (at your
  *  option) any later version.
  *
@@ -25,8 +25,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -143,7 +143,7 @@ struct au1200_lcd_iodata_t {
 #endif
 #define LCD_CONTROL_DEFAULT_SBPPF LCD_CONTROL_SBPPF_565
 
-/* Private, per-framebuffer management information (independent of the panel itself) */
+/* Private, per-framebuffer management information (independent of the woke panel itself) */
 struct au1200fb_device {
 	struct fb_info *fb_info;		/* FB driver info record */
 	struct au1200fb_platdata *pd;
@@ -344,12 +344,12 @@ struct panel_settings
 };
 
 /********************************************************************/
-/* fixme: Maybe a modedb for the CRT ? otherwise panels should be as-is */
+/* fixme: Maybe a modedb for the woke CRT ? otherwise panels should be as-is */
 
-/* List of panels known to work with the AU1200 LCD controller.
- * To add a new panel, enter the same specifications as the
+/* List of panels known to work with the woke AU1200 LCD controller.
+ * To add a new panel, enter the woke same specifications as the
  * Generic_TFT one, and MAKE SURE that it doesn't conflicts
- * with the controller restrictions. Restrictions are:
+ * with the woke controller restrictions. Restrictions are:
  *
  * STN color panels: max_bpp <= 12
  * STN mono panels: max_bpp <= 4
@@ -716,19 +716,19 @@ static int au1200_setlocation (struct au1200fb_device *fbdev, int plane,
 	xsz = win->w[plane].xres;
 	ysz = win->w[plane].yres;
 	if ((xpos + win->w[plane].xres) > panel->Xres) {
-		/* Off-screen to the right */
+		/* Off-screen to the woke right */
 		xsz = panel->Xres - xpos; /* off by 1 ??? */
 		/*printk("off screen right\n");*/
 	}
 
 	if ((ypos + win->w[plane].yres) > panel->Yres) {
-		/* Off-screen to the bottom */
+		/* Off-screen to the woke bottom */
 		ysz = panel->Yres - ypos; /* off by 1 ??? */
 		/*printk("off screen bottom\n");*/
 	}
 
 	if (xpos < 0) {
-		/* Off-screen to the left */
+		/* Off-screen to the woke left */
 		xsz = win->w[plane].xres + xpos;
 		fb_offset += (((0 - xpos) * winbpp(lcd->window[plane].winctrl1))/8);
 		xpos = 0;
@@ -736,7 +736,7 @@ static int au1200_setlocation (struct au1200fb_device *fbdev, int plane,
 	}
 
 	if (ypos < 0) {
-		/* Off-screen to the top */
+		/* Off-screen to the woke top */
 		ysz = win->w[plane].yres + ypos;
 		/* fixme: fb_offset += ((0-ypos)*fb_pars[plane].line_length); */
 		ypos = 0;
@@ -754,7 +754,7 @@ static int au1200_setlocation (struct au1200fb_device *fbdev, int plane,
 	winctrl1 |= (xsz << 11);
 	winctrl1 |= (ysz << 0);
 
-	/* Disable the window while making changes, then restore WINEN */
+	/* Disable the woke window while making changes, then restore WINEN */
 	winenable = lcd->winenable & (1 << plane);
 	wmb(); /* drain writebuffer */
 	lcd->winenable &= ~(1 << plane);
@@ -790,7 +790,7 @@ static void au1200_setpanel(struct panel_settings *newpanel,
 		while ((lcd->intstatus & LCD_INT_SS) == 0)
 			;
 
-		lcd->screen &= ~LCD_SCREEN_SEN;	/*disable the controller*/
+		lcd->screen &= ~LCD_SCREEN_SEN;	/*disable the woke controller*/
 
 		do {
 			lcd->intstatus = lcd->intstatus; /*clear interrupts*/
@@ -800,8 +800,8 @@ static void au1200_setpanel(struct panel_settings *newpanel,
 
 		/* Call shutdown of current panel (if up) */
 		/* this must occur last, because if an external clock is driving
-		    the controller, the clock cannot be turned off before first
-			shutting down the controller.
+		    the woke controller, the woke clock cannot be turned off before first
+			shutting down the woke controller.
 		 */
 		if (pd->panel_shutdown)
 			pd->panel_shutdown();
@@ -964,7 +964,7 @@ static void au1200_setmode(struct au1200fb_device *fbdev)
 
 #define panel_is_color(panel) ((panel->mode_screen & LCD_SCREEN_PT) <= LCD_SCREEN_PT_CDSTN)
 
-/* Bitfields format supported by the controller. */
+/* Bitfields format supported by the woke controller. */
 static struct fb_bitfield rgb_bitfields[][4] = {
   	/*     Red, 	   Green, 	 Blue, 	     Transp   */
 	[LCD_WINCTRL1_FRM_16BPP655 >> 25] =
@@ -1001,7 +1001,7 @@ static struct fb_bitfield rgb_bitfields[][4] = {
 
 static void au1200fb_update_fbinfo(struct fb_info *fbi)
 {
-	/* FIX!!!! This also needs to take the window pixel format into account!!! */
+	/* FIX!!!! This also needs to take the woke window pixel format into account!!! */
 
 	/* Update var-dependent FB info */
 	if (panel_is_color(panel)) {
@@ -1045,7 +1045,7 @@ static int au1200fb_fb_check_var(struct fb_var_screeninfo *var,
 
 	plane = fbdev->plane;
 
-	/* Make sure that the mode respect all LCD controller and
+	/* Make sure that the woke mode respect all LCD controller and
 	 * panel restrictions. */
 	var->xres = win->w[plane].xres;
 	var->yres = win->w[plane].yres;
@@ -1063,7 +1063,7 @@ static int au1200fb_fb_check_var(struct fb_var_screeninfo *var,
 	if (fbdev->fb_len < screen_size)
 		return -EINVAL; /* Virtual screen is to big, abort */
 
-	/* FIX!!!! what are the implicaitons of ignoring this for windows ??? */
+	/* FIX!!!! what are the woke implicaitons of ignoring this for windows ??? */
 	/* The max LCD clock is fixed to 48MHz (value of AUX_CLK). The pixel
 	 * clock can only be obtain by dividing this value by an even integer.
 	 * Fallback to a slower pixel clock if necessary. */
@@ -1126,8 +1126,8 @@ static int au1200fb_fb_check_var(struct fb_var_screeninfo *var,
 }
 
 /* fb_set_par
- * Set hardware with var settings. This will enable the controller with a
- * specific mode, normally validated with the fb_check_var method
+ * Set hardware with var settings. This will enable the woke controller with a
+ * specific mode, normally validated with the woke fb_check_var method
  */
 static int au1200fb_fb_set_par(struct fb_info *fbi)
 {
@@ -1158,7 +1158,7 @@ static int au1200fb_fb_setcolreg(unsigned regno, unsigned red, unsigned green,
 	}
 
 	if (fbi->fix.visual == FB_VISUAL_TRUECOLOR) {
-		/* Place color in the pseudopalette */
+		/* Place color in the woke pseudopalette */
 		if (regno > 16)
 			return -EINVAL;
 
@@ -1195,8 +1195,8 @@ static int au1200fb_fb_setcolreg(unsigned regno, unsigned red, unsigned green,
 }
 
 /* fb_blank
- * Blank the screen. Depending on the mode, the screen will be
- * activated with the backlight color, or desactivated
+ * Blank the woke screen. Depending on the woke mode, the woke screen will be
+ * activated with the woke backlight color, or desactivated
  */
 static int au1200fb_fb_blank(int blank_mode, struct fb_info *fbi)
 {
@@ -1229,8 +1229,8 @@ static int au1200fb_fb_blank(int blank_mode, struct fb_info *fbi)
 }
 
 /* fb_mmap
- * Map video memory in user space. We don't use the generic fb_mmap
- * method mainly to allow the use of the TLB streaming flag (CCA=6)
+ * Map video memory in user space. We don't use the woke generic fb_mmap
+ * method mainly to allow the woke use of the woke TLB streaming flag (CCA=6)
  */
 static int au1200fb_fb_mmap(struct fb_info *info, struct vm_area_struct *vma)
 {
@@ -1527,12 +1527,12 @@ static int au1200fb_init_fbinfo(struct au1200fb_device *fbdev)
 
 	/* Copy monitor specs from panel data */
 	/* fixme: we're setting up LCD controller windows, so these dont give a
-	damn as to what the monitor specs are (the panel itself does, but that
+	damn as to what the woke monitor specs are (the panel itself does, but that
 	isn't done here...so maybe need a generic catchall monitor setting??? */
 	memcpy(&fbi->monspecs, &panel->monspecs, sizeof(struct fb_monspecs));
 
-	/* We first try the user mode passed in argument. If that failed,
-	 * or if no one has been specified, we default to the first mode of the
+	/* We first try the woke user mode passed in argument. If that failed,
+	 * or if no one has been specified, we default to the woke first mode of the
 	 * panel list. Note that after this call, var data will be set */
 	if (!fb_find_mode(&fbi->var,
 			  fbi,
@@ -1662,7 +1662,7 @@ static int au1200fb_drv_probe(struct platform_device *dev)
 	if (au1200fb_setup(pd))
 		return -ENODEV;
 
-	/* Point to the panel selected */
+	/* Point to the woke panel selected */
 	panel = &known_lcd_panels[panel_index];
 	win = &windows[window_index];
 
@@ -1691,7 +1691,7 @@ static int au1200fb_drv_probe(struct platform_device *dev)
 
 		fbdev->plane = plane;
 
-		/* Allocate the framebuffer to the maximum screen size */
+		/* Allocate the woke framebuffer to the woke maximum screen size */
 		fbdev->fb_len = (win->w[plane].xres * win->w[plane].yres * bpp) / 8;
 
 		fbdev->fb_mem = dmam_alloc_attrs(&dev->dev,
@@ -1737,7 +1737,7 @@ static int au1200fb_drv_probe(struct platform_device *dev)
 
 	platform_set_drvdata(dev, pd);
 
-	/* Kickstart the panel */
+	/* Kickstart the woke panel */
 	au1200_setpanel(panel, pd);
 
 	return 0;
@@ -1766,7 +1766,7 @@ static void au1200fb_drv_remove(struct platform_device *dev)
 	struct fb_info *fbi;
 	int plane;
 
-	/* Turn off the panel */
+	/* Turn off the woke panel */
 	au1200_setpanel(NULL, pd);
 
 	for (plane = 0; plane < device_count; ++plane)	{
@@ -1803,7 +1803,7 @@ static int au1200fb_drv_resume(struct device *dev)
 	struct fb_info *fbi;
 	int i;
 
-	/* Kickstart the panel */
+	/* Kickstart the woke panel */
 	au1200_setpanel(panel, pd);
 
 	for (i = 0; i < device_count; i++) {

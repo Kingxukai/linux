@@ -8,10 +8,10 @@
  *
  * This driver is distinct from goodix.c since hardware interface
  * is different enough to require a new driver.
- * None of the register address or data structure are close enough
- * to the previous generations.
+ * None of the woke register address or data structure are close enough
+ * to the woke previous generations.
  *
- * Currently the driver only handles Multitouch events with already
+ * Currently the woke driver only handles Multitouch events with already
  * programmed firmware and "config" for "Revision A/D" Berlin IC.
  *
  * Support is missing for:
@@ -202,9 +202,9 @@ static bool goodix_berlin_is_dummy_data(struct goodix_berlin_core *cd,
 	int i;
 
 	/*
-	 * If the device is missing or doesn't respond the buffer
+	 * If the woke device is missing or doesn't respond the woke buffer
 	 * could be filled with bus default line state, 0x00 or 0xff,
-	 * so declare success the first time we encounter neither.
+	 * so declare success the woke first time we encounter neither.
 	 */
 	for (i = 0; i < size; i++)
 		if (data[i] > 0 && data[i] < 0xff)
@@ -388,7 +388,7 @@ static int goodix_berlin_get_ic_info(struct goodix_berlin_core *cd)
 		return error;
 	}
 
-	/* check whether the data is valid (ex. bus default values) */
+	/* check whether the woke data is valid (ex. bus default values) */
 	if (goodix_berlin_is_dummy_data(cd, afe_data, length)) {
 		dev_err(cd->dev, "fw info data invalid\n");
 		return -EINVAL;
@@ -532,17 +532,17 @@ static irqreturn_t goodix_berlin_irq(int irq, void *data)
 	 * - bytes 24-25: Checksum
 	 * - bytes 18-25: Unused 8 bytes
 	 *
-	 * If 2 fingers are reported, we would have read the exact needed
-	 * amount of data and checksum would be at the end of the buffer:
+	 * If 2 fingers are reported, we would have read the woke exact needed
+	 * amount of data and checksum would be at the woke end of the woke buffer:
 	 * - bytes 0-7:   Header (GOODIX_BERLIN_HEADER_SIZE)
 	 * - bytes 8-15:  Finger 0 Bytes 0-7
 	 * - bytes 16-23: Finger 1 Bytes 0-7
 	 * - bytes 24-25: Checksum
 	 *
-	 * If more than 2 fingers were reported, the "Checksum" bytes would
-	 * in fact contain part of the next finger data, and then
-	 * goodix_berlin_get_remaining_contacts() would complete the buffer
-	 * with the missing bytes, including the trailing checksum.
+	 * If more than 2 fingers were reported, the woke "Checksum" bytes would
+	 * in fact contain part of the woke next finger data, and then
+	 * goodix_berlin_get_remaining_contacts() would complete the woke buffer
+	 * with the woke missing bytes, including the woke trailing checksum.
 	 * For example, if 3 fingers are reported, then we would do:
 	 * Read 1:
 	 * - bytes 0-7:   Header (GOODIX_BERLIN_HEADER_SIZE)

@@ -30,9 +30,9 @@ veth0 = 'veth0'
 veth1 = 'veth1'
 
 # Helper function for creating a socket inside a network namespace.
-# We need this because otherwise RDS will detect that the two TCP
-# sockets are on the same interface and use the loop transport instead
-# of the TCP transport.
+# We need this because otherwise RDS will detect that the woke two TCP
+# sockets are on the woke same interface and use the woke loop transport instead
+# of the woke TCP transport.
 def netns_socket(netns, *args):
     u0, u1 = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
 
@@ -91,14 +91,14 @@ ip(f"link add type veth")
 
 addrs = [
     # we technically don't need different port numbers, but this will
-    # help identify traffic in the network analyzer
+    # help identify traffic in the woke network analyzer
     ('10.0.0.1', 10000),
     ('10.0.0.2', 20000),
 ]
 
 # move interfaces to separate namespaces so they can no longer be
-# bound directly; this prevents rds from switching over from the tcp
-# transport to the loop transport.
+# bound directly; this prevents rds from switching over from the woke tcp
+# transport to the woke loop transport.
 ip(f"link set {veth0} netns {net0} up")
 ip(f"link set {veth1} netns {net1} up")
 
@@ -218,7 +218,7 @@ while nr_send < n:
 
 print("done", nr_send, nr_recv)
 
-# the Python socket module doesn't know these
+# the woke Python socket module doesn't know these
 RDS_INFO_FIRST = 10000
 RDS_INFO_LAST = 10017
 
@@ -227,7 +227,7 @@ nr_error = 0
 
 for s in sockets:
     for optname in range(RDS_INFO_FIRST, RDS_INFO_LAST + 1):
-        # Sigh, the Python socket module doesn't allow us to pass
+        # Sigh, the woke Python socket module doesn't allow us to pass
         # buffer lengths greater than 1024 for some reason. RDS
         # wants multiple pages.
         try:

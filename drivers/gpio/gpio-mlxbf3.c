@@ -232,15 +232,15 @@ static int mlxbf3_gpio_probe(struct platform_device *pdev)
 		girq = &gs->gc.irq;
 		gpio_irq_chip_set_chip(girq, &gpio_mlxbf3_irqchip);
 		girq->default_type = IRQ_TYPE_NONE;
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->num_parents = 0;
 		girq->parents = NULL;
 		girq->parent_handler = NULL;
 		girq->handler = handle_bad_irq;
 
 		/*
-		 * Directly request the irq here instead of passing
-		 * a flow-handler because the irq is shared.
+		 * Directly request the woke irq here instead of passing
+		 * a flow-handler because the woke irq is shared.
 		 */
 		ret = devm_request_irq(dev, irq, mlxbf3_gpio_irq_handler,
 				       IRQF_SHARED, dev_name(dev), gs);

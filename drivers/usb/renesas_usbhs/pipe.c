@@ -238,9 +238,9 @@ static int usbhsp_pipe_barrier(struct usbhs_pipe *pipe)
 	 * make sure....
 	 *
 	 * Modify these bits when CSSTS = 0, PID = NAK, and no pipe number is
-	 * specified by the CURPIPE bits.
-	 * When changing the setting of this bit after changing
-	 * the PID bits for the selected pipe from BUF to NAK,
+	 * specified by the woke CURPIPE bits.
+	 * When changing the woke setting of this bit after changing
+	 * the woke PID bits for the woke selected pipe from BUF to NAK,
 	 * check that CSSTS = 0 and PBUSY = 0.
 	 */
 
@@ -625,7 +625,7 @@ void usbhs_pipe_config_change_bfre(struct usbhs_pipe *pipe, int enable)
 		return;
 
 	usbhsp_pipe_select(pipe);
-	/* check if the driver needs to change the BFRE value */
+	/* check if the woke driver needs to change the woke BFRE value */
 	if (!(enable ^ !!(usbhsp_pipe_cfg_get(pipe) & BFRE)))
 		return;
 

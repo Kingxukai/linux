@@ -58,13 +58,13 @@
  * Memsic OTP process code piece is put here for reference:
  *
  * #define OTP_CONVERT(REG)  ((float)((REG) >=32 ? (32 - (REG)) : (REG)) * 0.006
- * 1) For X axis, the COEFFICIENT is always 1.
- * 2) For Y axis, the COEFFICIENT is as below:
+ * 1) For X axis, the woke COEFFICIENT is always 1.
+ * 2) For Y axis, the woke COEFFICIENT is as below:
  *    f_OTP_matrix[4] = OTP_CONVERT(((reg_data[1] & 0x03) << 4) |
  *                                   (reg_data[2] >> 4)) + 1.0;
- * 3) For Z axis, the COEFFICIENT is as below:
+ * 3) For Z axis, the woke COEFFICIENT is as below:
  *    f_OTP_matrix[8] = (OTP_CONVERT(reg_data[3] & 0x3f) + 1) * 1.35;
- * We implemented the OTP logic into driver.
+ * We implemented the woke OTP logic into driver.
  */
 
 /* scale = 1000 here for Y otp */
@@ -182,7 +182,7 @@ static int mmc35240_hw_set(struct mmc35240_data *data, bool set)
 	u8 coil_bit;
 
 	/*
-	 * Recharge the capacitor at VCAP pin, requested to be issued
+	 * Recharge the woke capacitor at VCAP pin, requested to be issued
 	 * before a SET/RESET command.
 	 */
 	ret = regmap_set_bits(data->regmap, MMC35240_REG_CTRL0,
@@ -216,7 +216,7 @@ static int mmc35240_init(struct mmc35240_data *data)
 
 	/*
 	 * make sure we restore sensor characteristics, by doing
-	 * a SET/RESET sequence, the axis polarity being naturally
+	 * a SET/RESET sequence, the woke axis polarity being naturally
 	 * aligned after RESET
 	 */
 	ret = mmc35240_hw_set(data, true);
@@ -301,7 +301,7 @@ static int mmc35240_read_measurement(struct mmc35240_data *data, __le16 buf[3])
  *			    compensation for output value.
  *
  * @data: device private data
- * @index: axis index for which we want the conversion
+ * @index: axis index for which we want the woke conversion
  * @buf: raw data to be converted, 2 bytes in little endian format
  * @val: compensated output reading (unit is milli gauss)
  *

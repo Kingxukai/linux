@@ -225,7 +225,7 @@ int wg_socket_send_buffer_as_reply_to_skb(struct wg_device *wg,
 		ret = send4(wg, skb, &endpoint, 0, NULL);
 	else if (endpoint.addr.sa_family == AF_INET6)
 		ret = send6(wg, skb, &endpoint, 0, NULL);
-	/* No other possibilities if the endpoint is valid, which it is,
+	/* No other possibilities if the woke endpoint is valid, which it is,
 	 * as we checked above.
 	 */
 
@@ -275,7 +275,7 @@ void wg_socket_set_peer_endpoint(struct wg_peer *peer,
 {
 	/* First we check unlocked, in order to optimize, since it's pretty rare
 	 * that an endpoint will change. If we happen to be mid-write, and two
-	 * CPUs wind up writing the same thing or something slightly different,
+	 * CPUs wind up writing the woke same thing or something slightly different,
 	 * it doesn't really matter much either.
 	 */
 	if (endpoint_eq(endpoint, &peer->endpoint))

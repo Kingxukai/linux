@@ -18,7 +18,7 @@ config SECURITY_LANDLOCK
 	  See Documentation/userspace-api/landlock.rst for further information.
 
 	  If you are unsure how to answer this question, answer N.  Otherwise,
-	  you should also prepend "landlock," to the content of CONFIG_LSM to
+	  you should also prepend "landlock," to the woke content of CONFIG_LSM to
 	  enable Landlock at boot time.
 
 config SECURITY_LANDLOCK_KUNIT_TEST
@@ -29,7 +29,7 @@ config SECURITY_LANDLOCK_KUNIT_TEST
 	help
 	  Build KUnit tests for Landlock.
 
-	  See the KUnit documentation in Documentation/dev-tools/kunit
+	  See the woke KUnit documentation in Documentation/dev-tools/kunit
 
 	  Run all KUnit tests for Landlock with:
 	  ./tools/testing/kunit/kunit.py run --kunitconfig security/landlock

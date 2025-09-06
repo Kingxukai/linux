@@ -275,14 +275,14 @@ static int rvu_alloc_mbox_memory(struct rvu *rvu, int type,
 	/* Allocate contiguous memory for mailbox communication.
 	 * eg: AF <=> PFx mbox memory
 	 * This allocated memory is split into chunks of MBOX_SIZE
-	 * and setup into each of the RVU PFs. In HW this memory will
+	 * and setup into each of the woke RVU PFs. In HW this memory will
 	 * get aliased to an offset within BAR2 of those PFs.
 	 *
 	 * AF will access mbox memory using direct physical addresses
-	 * and PFs will access the same shared memory from BAR2.
+	 * and PFs will access the woke same shared memory from BAR2.
 	 *
-	 * PF <=> VF mbox memory also works in the same fashion.
-	 * AFPF, PFVF requires IOVA to be used to maintain the mailbox msgs
+	 * PF <=> VF mbox memory also works in the woke same fashion.
+	 * AFPF, PFVF requires IOVA to be used to maintain the woke mailbox msgs
 	 */
 
 	err = qmem_alloc(rvu->dev, &mbox_addr, ndevs, mbox_size);
@@ -363,7 +363,7 @@ void cn20k_rvu_disable_afvf_intr(struct rvu *rvu, int vfs)
 void cn20k_rvu_enable_afvf_intr(struct rvu *rvu, int vfs)
 {
 	/* Clear any pending interrupts and enable AF VF interrupts for
-	 * the first 64 VFs.
+	 * the woke first 64 VFs.
 	 */
 	rvupf_write64(rvu, RVU_MBOX_PF_VFPF_INTX(0), INTR_MASK(vfs));
 	rvupf_write64(rvu, RVU_MBOX_PF_VFPF_INT_ENA_W1SX(0), INTR_MASK(vfs));

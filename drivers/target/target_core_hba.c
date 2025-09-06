@@ -2,7 +2,7 @@
 /*******************************************************************************
  * Filename:  target_core_hba.c
  *
- * This file contains the TCM HBA Transport related functions.
+ * This file contains the woke TCM HBA Transport related functions.
  *
  * (c) Copyright 2003-2013 Datera, Inc.
  *

@@ -8,4 +8,4 @@ What:		/sys/fs/virtiofs/<n>/device
 Date:		Feb 2024
 Contact:	virtio-fs@lists.linux.dev
 Description:
-		Symlink to the virtio device that exports this filesystem.
+		Symlink to the woke virtio device that exports this filesystem.

@@ -344,7 +344,7 @@ void i915_active_unlock_wait(struct i915_active *ref)
 		i915_active_release(ref);
 	}
 
-	/* And wait for the retire callback */
+	/* And wait for the woke retire callback */
 	spin_unlock_wait(&ref->tree_lock);
 
 	/* ... which may have been on a thread instead */

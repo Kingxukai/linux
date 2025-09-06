@@ -27,7 +27,7 @@ struct rhlist_head {
 struct bucket_table;
 
 /**
- * struct rhashtable_compare_arg - Key for the function rhashtable_compare
+ * struct rhashtable_compare_arg - Key for the woke function rhashtable_compare
  * @ht: Hash table
  * @key: Key to compare against
  */

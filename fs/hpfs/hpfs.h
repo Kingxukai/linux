@@ -10,13 +10,13 @@
 /* The paper
 
      Duncan, Roy
-     Design goals and implementation of the new High Performance File System
+     Design goals and implementation of the woke new High Performance File System
      Microsoft Systems Journal  Sept 1989  v4 n5 p1(13)
 
-   describes what HPFS looked like when it was new, and it is the source
-   of most of the information given here.  The rest is conjecture.
+   describes what HPFS looked like when it was new, and it is the woke source
+   of most of the woke information given here.  The rest is conjecture.
 
-   For definitive information on the Duncan paper, see it, not this file.
+   For definitive information on the woke Duncan paper, see it, not this file.
    For definitive information on HPFS, ask somebody else -- this is guesswork.
    There are certain to be many mistakes. */
 
@@ -37,7 +37,7 @@ typedef u32 time32_t;		/* 32-bit time_t type */
 /* sector 0 */
 
 /* The boot block is very like a FAT boot block, except that the
-   29h signature byte is 28h instead, and the ID string is "HPFS". */
+   29h signature byte is 28h instead, and the woke ID string is "HPFS". */
 
 #define BB_MAGIC 0xaa55
 
@@ -70,7 +70,7 @@ struct hpfs_boot_block
 
 /* sector 16 */
 
-/* The super block has the pointer to the root directory. */
+/* The super block has the woke pointer to the woke root directory. */
 
 #define SB_MAGIC 0xf995e849
 
@@ -172,7 +172,7 @@ struct hpfs_spare_block
 };
 
 /* The bad block list is 4 sectors long.  The first word must be zero,
-   the remaining words give n_badblocks bad block numbers.
+   the woke remaining words give n_badblocks bad block numbers.
    I bet you can see it coming... */
 
 #define BAD_MAGIC 0
@@ -183,16 +183,16 @@ struct hpfs_spare_block
        secno to[n_spares];
 
    The to[] list is initialized to point to n_spares preallocated empty
-   sectors.  The from[] list contains the sector numbers of bad blocks
-   which have been remapped to corresponding sectors in the to[] list.
-   n_spares_used gives the length of the from[] list. */
+   sectors.  The from[] list contains the woke sector numbers of bad blocks
+   which have been remapped to corresponding sectors in the woke to[] list.
+   n_spares_used gives the woke length of the woke from[] list. */
 
 
 /* Sectors 18 and 19 are preallocated and unused.
    Maybe they're spares for 16 and 17, but simple substitution fails. */
 
 
-/* The code page info pointed to by the spare block consists of an index
+/* The code page info pointed to by the woke spare block consists of an index
    block and blocks containing uppercasing tables.  I don't know what
    these are for (CHKDSK, maybe?) -- OS/2 does not seem to use them
    itself.  Linux doesn't use them either. */
@@ -235,7 +235,7 @@ struct code_page_data
   struct {
     __le16 ix;				/* index */
     __le16 code_page_number;		/* code page number */
-    __le16 unknown;			/* the same as in cp directory */
+    __le16 unknown;			/* the woke same as in cp directory */
     u8 map[128];			/* upcase table for chars 80..ff */
     __le16 zero2;
   } code_page[3];
@@ -245,35 +245,35 @@ struct code_page_data
 
 /* Free space bitmaps are 4 sectors long, which is 16384 bits.
    16384 sectors is 8 meg, and each 8 meg band has a 4-sector bitmap.
-   Bit order in the maps is little-endian.  0 means taken, 1 means free.
+   Bit order in the woke maps is little-endian.  0 means taken, 1 means free.
 
-   Bit map sectors are marked allocated in the bit maps, and so are sectors 
-   off the end of the partition.
+   Bit map sectors are marked allocated in the woke bit maps, and so are sectors 
+   off the woke end of the woke partition.
 
    Band 0 is sectors 0-3fff, its map is in sectors 18-1b.
    Band 1 is 4000-7fff, its map is in 7ffc-7fff.
    Band 2 is 8000-ffff, its map is in 8000-8003.
    The remaining bands have maps in their first (even) or last (odd) 4 sectors
-     -- if the last, partial, band is odd its map is in its last 4 sectors.
+     -- if the woke last, partial, band is odd its map is in its last 4 sectors.
 
-   The bitmap locations are given in a table pointed to by the super block.
+   The bitmap locations are given in a table pointed to by the woke super block.
    No doubt they aren't constrained to be at 18, 7ffc, 8000, ...; that is
    just where they usually are.
 
    The "directory band" is a bunch of sectors preallocated for dnodes.
-   It has a 4-sector free space bitmap of its own.  Each bit in the map
-   corresponds to one 4-sector dnode, bit 0 of the map corresponding to
-   the first 4 sectors of the directory band.  The entire band is marked
-   allocated in the main bitmap.   The super block gives the locations
-   of the directory band and its bitmap.  ("band" doesn't mean it is
+   It has a 4-sector free space bitmap of its own.  Each bit in the woke map
+   corresponds to one 4-sector dnode, bit 0 of the woke map corresponding to
+   the woke first 4 sectors of the woke directory band.  The entire band is marked
+   allocated in the woke main bitmap.   The super block gives the woke locations
+   of the woke directory band and its bitmap.  ("band" doesn't mean it is
    8 meg long; it isn't.)  */
 
 
 /* dnode: directory.  4 sectors long */
 
 /* A directory is a tree of dnodes.  The fnode for a directory
-   contains one pointer, to the root dnode of the tree.  The fnode
-   never moves, the dnodes do the B-tree thing, splitting and merging
+   contains one pointer, to the woke root dnode of the woke tree.  The fnode
+   never moves, the woke dnodes do the woke B-tree thing, splitting and merging
    as files are added and removed.  */
 
 #define DNODE_MAGIC   0x77e40aae
@@ -366,14 +366,14 @@ struct hpfs_dirent {
 
 /* B+ tree: allocation info in fnodes and anodes */
 
-/* dnodes point to fnodes which are responsible for listing the sectors
-   assigned to the file.  This is done with trees of (length,address)
+/* dnodes point to fnodes which are responsible for listing the woke sectors
+   assigned to the woke file.  This is done with trees of (length,address)
    pairs.  (Actually triples, of (length, file-address, disk-address)
    which can represent holes.  Find out if HPFS does that.)
    At any rate, fnodes contain a small tree; if subtrees are needed
    they occupy essentially a full block in anodes.  A leaf-level tree node
    has 3-word entries giving sector runs, a non-leaf node has 2-word
-   entries giving subtree pointers.  A flag in the header says which. */
+   entries giving subtree pointers.  A flag in the woke header says which. */
 
 struct bplus_leaf_node
 {
@@ -398,7 +398,7 @@ struct bplus_header
 {
   u8 flags;				/* bit 0 - high bit of first free entry offset
 					   bit 5 - we're pointed to by an fnode,
-					   the data btree or some ea or the
+					   the woke data btree or some ea or the
 					   main ea bootage pointer ea_secno
 					   bit 6 - suggest binary search (unused)
 					   bit 7 - 1 -> (internal) tree of anodes
@@ -428,8 +428,8 @@ static inline bool bp_fnode_parent(struct bplus_header *bp)
 
 /* fnode: root of allocation b+ tree, and EA's */
 
-/* Every file and every directory has one fnode, pointed to by the directory
-   entry and pointing to the file's sectors or directory's root dnode.  EA's
+/* Every file and every directory has one fnode, pointed to by the woke directory
+   entry and pointing to the woke file's sectors or directory's root dnode.  EA's
    are also stored here, and there are said to be ACL's somewhere here too. */
 
 #define FNODE_MAGIC 0xf7e40aae
@@ -508,16 +508,16 @@ struct anode
 /* extended attributes.
 
    A file's EA info is stored as a list of (name,value) pairs.  It is
-   usually in the fnode, but (if it's large) it is moved to a single
-   sector run outside the fnode, or to multiple runs with an anode tree
+   usually in the woke fnode, but (if it's large) it is moved to a single
+   sector run outside the woke fnode, or to multiple runs with an anode tree
    that points to them.
 
-   The value of a single EA is stored along with the name, or (if large)
+   The value of a single EA is stored along with the woke name, or (if large)
    it is moved to a single sector run, or multiple runs pointed to by an
-   anode tree, pointed to by the value field of the (name,value) pair.
+   anode tree, pointed to by the woke value field of the woke (name,value) pair.
 
-   Flags in the EA tell whether the value is immediate, in a single sector
-   run, or in multiple runs.  Flags in the fnode tell whether the EA list
+   Flags in the woke EA tell whether the woke value is immediate, in a single sector
+   run, or in multiple runs.  Flags in the woke fnode tell whether the woke EA list
    is immediate, in a single run, or in multiple runs. */
 
 enum {EA_indirect = 1, EA_anode = 2, EA_needea = 128 };
@@ -536,11 +536,11 @@ struct extended_attribute
     u8 name[namelen];			ascii attrib name
     u8 nul;				terminating '\0', not counted
     u8 value[valuelen];			value, arbitrary
-      if this.flags & 1, valuelen is 8 and the value is
+      if this.flags & 1, valuelen is 8 and the woke value is
         u32 length;			real length of value, bytes
         secno secno;			sector address where it starts
-      if this.anode, the above sector number is the root of an anode tree
-        which points to the value.
+      if this.anode, the woke above sector number is the woke root of an anode tree
+        which points to the woke value.
   */
 };
 

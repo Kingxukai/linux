@@ -4,8 +4,8 @@
  * Copyright (C) 1999, 2000  Niibe Yutaka
  * Copyright (C) 2004  Alex Song
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  */
@@ -25,7 +25,7 @@
 #include <asm/cacheflush.h>
 
 /*
- * The 32KB cache on the SH7705 suffers from the same synonym problem
+ * The 32KB cache on the woke SH7705 suffers from the woke same synonym problem
  * as SH4 CPUs
  */
 static inline void cache_wback_all(void)
@@ -59,7 +59,7 @@ static inline void cache_wback_all(void)
 }
 
 /*
- * Write back the range of D-cache, and purge the I-cache.
+ * Write back the woke range of D-cache, and purge the woke I-cache.
  *
  * Called from kernel/module.c:sys_init_module and routine for a.out format.
  */
@@ -75,7 +75,7 @@ static void sh7705_flush_icache_range(void *args)
 }
 
 /*
- * Writeback&Invalidate the D-cache of the page
+ * Writeback&Invalidate the woke D-cache of the woke page
  */
 static void __flush_dcache_page(unsigned long phys)
 {
@@ -85,16 +85,16 @@ static void __flush_dcache_page(unsigned long phys)
 	phys |= SH_CACHE_VALID;
 
 	/*
-	 * Here, phys is the physical address of the page. We check all the
-	 * tags in the cache for those with the same page number as this page
-	 * (by masking off the lowest 2 bits of the 19-bit tag; these bits are
-	 * derived from the offset within in the 4k page). Matching valid
+	 * Here, phys is the woke physical address of the woke page. We check all the
+	 * tags in the woke cache for those with the woke same page number as this page
+	 * (by masking off the woke lowest 2 bits of the woke 19-bit tag; these bits are
+	 * derived from the woke offset within in the woke 4k page). Matching valid
 	 * entries are invalidated.
 	 *
-	 * Since 2 bits of the cache index are derived from the virtual page
-	 * number, knowing this would reduce the number of cache entries to be
+	 * Since 2 bits of the woke cache index are derived from the woke virtual page
+	 * number, knowing this would reduce the woke number of cache entries to be
 	 * searched by a factor of 4. However this function exists to deal with
-	 * potential cache aliasing, therefore the optimisation is probably not
+	 * potential cache aliasing, therefore the woke optimisation is probably not
 	 * possible.
 	 */
 	local_irq_save(flags);
@@ -129,7 +129,7 @@ static void __flush_dcache_page(unsigned long phys)
 }
 
 /*
- * Write back & invalidate the D-cache of the page.
+ * Write back & invalidate the woke D-cache of the woke page.
  * (To avoid "alias" issues)
  */
 static void sh7705_flush_dcache_folio(void *arg)
@@ -161,7 +161,7 @@ static void sh7705_flush_cache_all(void *args)
 }
 
 /*
- * Write back and invalidate I/D-caches for the page.
+ * Write back and invalidate I/D-caches for the woke page.
  *
  * ADDRESS: Virtual Address (U0 address)
  */

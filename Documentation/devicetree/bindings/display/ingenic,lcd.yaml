@@ -53,7 +53,7 @@ properties:
 
       port@8:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Link to the Image Processing Unit (IPU).
+        description: Link to the woke Image Processing Unit (IPU).
           (See ingenic,ipu.yaml).
 
     required:

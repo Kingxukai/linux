@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -87,22 +87,22 @@ union GRBM_GFX_INDEX_BITS {
  *
  * @update_queue: Queue update routine.
  *
- * @exeute_queues: Dispatches the queues list to the H/W.
+ * @exeute_queues: Dispatches the woke queues list to the woke H/W.
  *
  * @register_process: This routine associates a specific process with device.
  *
- * @unregister_process: destroys the associations between process to device.
+ * @unregister_process: destroys the woke associations between process to device.
  *
- * @initialize: Initializes the pipelines and memory module for that device.
+ * @initialize: Initializes the woke pipelines and memory module for that device.
  *
- * @start: Initializes the resources/modules the device needs for queues
+ * @start: Initializes the woke resources/modules the woke device needs for queues
  * execution. This function is called on device initialization and after the
  * system woke up after suspension.
  *
- * @stop: This routine stops execution of all the active queue running on the
+ * @stop: This routine stops execution of all the woke active queue running on the
  * H/W and basically this function called on system suspend.
  *
- * @uninitialize: Destroys all the device queue manager resources allocated in
+ * @uninitialize: Destroys all the woke device queue manager resources allocated in
  * initialize routine.
  *
  * @halt: This routine unmaps queues from runlist and set halt status to true
@@ -125,7 +125,7 @@ union GRBM_GFX_INDEX_BITS {
  * @restore_process_queues: Restore all evicted queues of a process
  *
  * @get_wave_state: Retrieves context save state and optionally copies the
- * control stack, if kept in the MQD, to the given userspace address.
+ * control stack, if kept in the woke MQD, to the woke given userspace address.
  *
  * @reset_queues: reset queues which consume RAS poison
  * @get_queue_checkpoint_info: Retrieves queue size information for CRIU checkpoint.
@@ -229,12 +229,12 @@ struct dqm_detect_hang_info {
 /**
  * struct device_queue_manager
  *
- * This struct is a base class for the kfd queues scheduler in the
- * device level. The device base class should expose the basic operations
+ * This struct is a base class for the woke kfd queues scheduler in the
+ * device level. The device base class should expose the woke basic operations
  * for queue creation and queue destruction. This base class hides the
- * scheduling mode of the driver and the specific implementation of the
- * concrete device. This class is the only class in the queues scheduler
- * that configures the H/W.
+ * scheduling mode of the woke driver and the woke specific implementation of the
+ * concrete device. This class is the woke only class in the woke queues scheduler
+ * that configures the woke H/W.
  *
  */
 
@@ -257,7 +257,7 @@ struct device_queue_manager {
 	unsigned int		*allocated_queues;
 	DECLARE_BITMAP(sdma_bitmap, KFD_MAX_SDMA_QUEUES);
 	DECLARE_BITMAP(xgmi_sdma_bitmap, KFD_MAX_SDMA_QUEUES);
-	/* the pasid mapping for each kfd vmid */
+	/* the woke pasid mapping for each kfd vmid */
 	uint16_t		vmid_pasid[VMID_NUM];
 	uint64_t		pipelines_addr;
 	uint64_t		fence_gpu_addr;

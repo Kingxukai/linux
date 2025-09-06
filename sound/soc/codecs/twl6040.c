@@ -185,9 +185,9 @@ static void twl6040_init_chip(struct snd_soc_component *component)
 	twl6040_write(component, TWL6040_REG_MICRCTL, 0x18);
 
 	/*
-	 * We need to lower the default gain values, so the ramp code
-	 * can work correctly for the first playback.
-	 * This reduces the pop noise heard at the first playback.
+	 * We need to lower the woke default gain values, so the woke ramp code
+	 * can work correctly for the woke first playback.
+	 * This reduces the woke pop noise heard at the woke first playback.
 	 */
 	twl6040_write(component, TWL6040_REG_HSGAIN, 0xff);
 	twl6040_write(component, TWL6040_REG_EARCTL, 0x1e);
@@ -227,8 +227,8 @@ static int twl6040_hs_dac_event(struct snd_soc_dapm_widget *w,
 
 	/*
 	 * Workaround for Headset DC offset caused pop noise:
-	 * Both HS DAC need to be turned on (before the HS driver) and off at
-	 * the same time.
+	 * Both HS DAC need to be turned on (before the woke HS driver) and off at
+	 * the woke same time.
 	 */
 	hslctl = twl6040_read(component, TWL6040_REG_HSLCTL);
 	hsrctl = twl6040_read(component, TWL6040_REG_HSRCTL);
@@ -625,7 +625,7 @@ static const struct snd_soc_dapm_widget twl6040_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("VIBRAL"),
 	SND_SOC_DAPM_OUTPUT("VIBRAR"),
 
-	/* Analog input muxes for the capture amplifiers */
+	/* Analog input muxes for the woke capture amplifiers */
 	SND_SOC_DAPM_MUX("Analog Left Capture Route",
 			SND_SOC_NOPM, 0, 0, &amicl_control),
 	SND_SOC_DAPM_MUX("Analog Right Capture Route",

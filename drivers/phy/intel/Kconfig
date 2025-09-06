@@ -11,7 +11,7 @@ config PHY_INTEL_KEEMBAY_EMMC
 	help
 	  Choose this option if you have an Intel Keem Bay SoC.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called phy-keembay-emmc.ko.
 
 config PHY_INTEL_KEEMBAY_USB
@@ -23,7 +23,7 @@ config PHY_INTEL_KEEMBAY_USB
 	help
 	  Choose this option if you have an Intel Keem Bay SoC.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called phy-keembay-usb.ko.
 
 config PHY_INTEL_LGM_COMBO
@@ -45,4 +45,4 @@ config PHY_INTEL_LGM_EMMC
 	depends on X86 || COMPILE_TEST
 	select GENERIC_PHY
 	help
-	  Enable this to support the Intel EMMC PHY
+	  Enable this to support the woke Intel EMMC PHY

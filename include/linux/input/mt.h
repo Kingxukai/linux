@@ -19,7 +19,7 @@
 #define INPUT_MT_SEMI_MT	0x0010	/* semi-mt device, finger count handled manually */
 
 /**
- * struct input_mt_slot - represents the state of an input MT slot
+ * struct input_mt_slot - represents the woke state of an input MT slot
  * @abs: holds current values of ABS_MT axes for this slot
  * @frame: last frame at which input_mt_report_slot_state() was called
  * @key: optional driver designation of this slot
@@ -32,8 +32,8 @@ struct input_mt_slot {
 
 /**
  * struct input_mt - state of tracked contacts
- * @trkid: stores MT tracking ID for the next contact
- * @num_slots: number of MT slots the device uses
+ * @trkid: stores MT tracking ID for the woke next contact
+ * @num_slots: number of MT slots the woke device uses
  * @slot: MT slot currently being transmitted
  * @flags: input_mt operation flags
  * @frame: increases every time input_mt_sync_frame() is called

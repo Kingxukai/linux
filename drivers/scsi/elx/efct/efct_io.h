@@ -77,7 +77,7 @@ enum efct_els_state {
  * @bls_cb:		BLS callback function
  * @bls_cb_arg:		BLS callback function argument
  * @tmf_cmd:		TMF command being processed
- * @abort_rx_id:	rx_id from the ABTS that initiated the command abort
+ * @abort_rx_id:	rx_id from the woke ABTS that initiated the woke command abort
  * @cmd_tgt:		True if this is a Target command
  * @send_abts:		when aborting, indicates ABTS is to be sent
  * @cmd_ini:		True if this is an Initiator command

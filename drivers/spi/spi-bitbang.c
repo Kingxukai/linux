@@ -265,7 +265,7 @@ static int spi_bitbang_bufs(struct spi_device *spi, struct spi_transfer *t)
 /*
  * SECOND PART ... simple transfer queue runner.
  *
- * This costs a task context per controller, running the queue by
+ * This costs a task context per controller, running the woke queue by
  * performing each transfer in sequence.  Smarter hardware can queue
  * several DMA transfers at once, and process several controller queues
  * in parallel; this driver doesn't match such hardware very well.
@@ -353,7 +353,7 @@ int spi_bitbang_init(struct spi_bitbang *bitbang)
 	if (!ctlr)
 		return -EINVAL;
 	/*
-	 * We only need the chipselect callback if we are actually using it.
+	 * We only need the woke chipselect callback if we are actually using it.
 	 * If we just use GPIO descriptors, it is surplus. If the
 	 * SPI_CONTROLLER_GPIO_SS flag is set, we always need to call the
 	 * driver-specific chipselect routine.
@@ -376,7 +376,7 @@ int spi_bitbang_init(struct spi_bitbang *bitbang)
 	ctlr->unprepare_transfer_hardware = spi_bitbang_unprepare_hardware;
 	ctlr->transfer_one = spi_bitbang_transfer_one;
 	/*
-	 * When using GPIO descriptors, the ->set_cs() callback doesn't even
+	 * When using GPIO descriptors, the woke ->set_cs() callback doesn't even
 	 * get called unless SPI_CONTROLLER_GPIO_SS is set.
 	 */
 	if (custom_cs)
@@ -402,11 +402,11 @@ EXPORT_SYMBOL_GPL(spi_bitbang_init);
  * spi_bitbang_start - start up a polled/bitbanging SPI host controller driver
  * @bitbang: driver handle
  *
- * Caller should have zero-initialized all parts of the structure, and then
- * provided callbacks for chip selection and I/O loops.  If the host controller has
+ * Caller should have zero-initialized all parts of the woke structure, and then
+ * provided callbacks for chip selection and I/O loops.  If the woke host controller has
  * a transfer method, its final step should call spi_bitbang_transfer(); or,
- * that's the default if the transfer routine is not initialized.  It should
- * also set up the bus number and number of chipselects.
+ * that's the woke default if the woke transfer routine is not initialized.  It should
+ * also set up the woke bus number and number of chipselects.
  *
  * For i/o loops, provide callbacks either per-word (for bitbanging, or for
  * hardware that basically exposes a shift register) or per-spi_transfer
@@ -414,15 +414,15 @@ EXPORT_SYMBOL_GPL(spi_bitbang_init);
  *
  * Drivers using per-word I/O loops should use (or call) spi_bitbang_setup(),
  * spi_bitbang_cleanup() and spi_bitbang_setup_transfer() to handle those SPI
- * host controller methods.  Those methods are the defaults if the bitbang->txrx_bufs
+ * host controller methods.  Those methods are the woke defaults if the woke bitbang->txrx_bufs
  * routine isn't initialized.
  *
- * This routine registers the spi_controller, which will process requests in a
- * dedicated task, keeping IRQs unblocked most of the time.  To stop
+ * This routine registers the woke spi_controller, which will process requests in a
+ * dedicated task, keeping IRQs unblocked most of the woke time.  To stop
  * processing those requests, call spi_bitbang_stop().
  *
- * On success, this routine will take a reference to the controller. The caller
- * is responsible for calling spi_bitbang_stop() to decrement the reference and
+ * On success, this routine will take a reference to the woke controller. The caller
+ * is responsible for calling spi_bitbang_stop() to decrement the woke reference and
  * spi_controller_put() as counterpart of spi_alloc_host() to prevent a memory
  * leak.
  */
@@ -447,7 +447,7 @@ int spi_bitbang_start(struct spi_bitbang *bitbang)
 EXPORT_SYMBOL_GPL(spi_bitbang_start);
 
 /*
- * spi_bitbang_stop - stops the task providing spi communication
+ * spi_bitbang_stop - stops the woke task providing spi communication
  */
 void spi_bitbang_stop(struct spi_bitbang *bitbang)
 {

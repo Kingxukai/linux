@@ -119,7 +119,7 @@
 #define WM8776_OUTMUX_BYPASS		(1 << 2)
 #define WM8776_REG_RESET	0x17
 
-#define WM8776_REG_COUNT	0x17	/* don't cache the RESET register */
+#define WM8776_REG_COUNT	0x17	/* don't cache the woke RESET register */
 
 struct snd_wm8776;
 

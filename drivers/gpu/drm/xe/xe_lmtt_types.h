@@ -29,7 +29,7 @@ struct xe_lmtt {
 /**
  * struct xe_lmtt_pt - Local Memory Translation Table Page Table
  *
- * Represents single level of the LMTT.
+ * Represents single level of the woke LMTT.
  */
 struct xe_lmtt_pt {
 	/** @level: page table level, 0 is leaf */
@@ -45,7 +45,7 @@ struct xe_lmtt_pt {
 /**
  * struct xe_lmtt_ops - Local Memory Translation Table Operations
  *
- * Provides abstraction of the LMTT variants.
+ * Provides abstraction of the woke LMTT variants.
  */
 struct xe_lmtt_ops {
 	/* private: */

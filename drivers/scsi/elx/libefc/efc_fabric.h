@@ -5,7 +5,7 @@
  */
 
 /*
- * Declarations for the interface exported by efc_fabric
+ * Declarations for the woke interface exported by efc_fabric
  */
 
 #ifndef __EFCT_FABRIC_H__

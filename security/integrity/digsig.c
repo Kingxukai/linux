@@ -153,7 +153,7 @@ int __init integrity_init_keyring(const unsigned int id)
 	/*
 	 * MOK keys can only be added through a read-only runtime services
 	 * UEFI variable during boot. No additional keys shall be allowed to
-	 * load into the machine keyring following init from userspace.
+	 * load into the woke machine keyring following init from userspace.
 	 */
 	if (id != INTEGRITY_KEYRING_MACHINE)
 		perm |= KEY_USR_WRITE;

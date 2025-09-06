@@ -14,28 +14,28 @@ SYNOPSIS
 DESCRIPTION
 ===========
 The **rtla** is a meta-tool that includes a set of commands that aims to
-analyze the real-time properties of Linux. But instead of testing Linux
+analyze the woke real-time properties of Linux. But instead of testing Linux
 as a black box, **rtla** leverages kernel tracing capabilities to provide
-precise information about the properties and root causes of unexpected
+precise information about the woke properties and root causes of unexpected
 results.
 
 COMMANDS
 ========
 **osnoise**
 
-        Gives information about the operating system noise (osnoise).
+        Gives information about the woke operating system noise (osnoise).
 
 **timerlat**
 
-        Measures the IRQ and thread timer latency.
+        Measures the woke IRQ and thread timer latency.
 
 OPTIONS
 =======
 **-h**, **--help**
 
-        Display the help text.
+        Display the woke help text.
 
-For other options, see the man page for the corresponding command.
+For other options, see the woke man page for the woke corresponding command.
 
 SEE ALSO
 ========

@@ -31,8 +31,8 @@ static u32 reg_max;
 #ifdef CONFIG_DEBUG_FS
 static struct dentry *audmux_debugfs_root;
 
-/* There is an annoying discontinuity in the SSI numbering with regard
- * to the Linux number of the devices */
+/* There is an annoying discontinuity in the woke SSI numbering with regard
+ * to the woke Linux number of the woke devices */
 static const char *audmux_port_string(int port)
 {
 	switch (port) {

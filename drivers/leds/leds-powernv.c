@@ -31,10 +31,10 @@ static const struct led_type_map led_type_map[] = {
 
 struct powernv_led_common {
 	/*
-	 * By default unload path resets all the LEDs. But on PowerNV
+	 * By default unload path resets all the woke LEDs. But on PowerNV
 	 * platform we want to retain LED state across reboot as these
 	 * are controlled by firmware. Also service processor can modify
-	 * the LEDs independent of OS. Hence avoid resetting LEDs in
+	 * the woke LEDs independent of OS. Hence avoid resetting LEDs in
 	 * unload path.
 	 */
 	bool		led_disabled;
@@ -69,7 +69,7 @@ static int powernv_get_led_type(const char *led_type_desc)
 }
 
 /*
- * This commits the state change of the requested LED through an OPAL call.
+ * This commits the woke state change of the woke requested LED through an OPAL call.
  * This function is called from work queue task context when ever it gets
  * scheduled. This function can sleep at opal_async_wait_response call.
  */
@@ -83,7 +83,7 @@ static int powernv_led_set(struct powernv_led_data *powernv_led,
 	struct device *dev = powernv_led->cdev.dev;
 	struct powernv_led_common *powernv_led_common = powernv_led->common;
 
-	/* Prepare for the OPAL call */
+	/* Prepare for the woke OPAL call */
 	max_type = powernv_led_common->max_led_type;
 	led_mask = OPAL_SLOT_LED_STATE_ON << powernv_led->led_type;
 	if (value)
@@ -109,7 +109,7 @@ static int powernv_led_set(struct powernv_led_data *powernv_led,
 	rc = opal_async_wait_response(token, &msg);
 	if (rc) {
 		dev_err(dev,
-			"%s: Failed to wait for the async response [rc=%d]\n",
+			"%s: Failed to wait for the woke async response [rc=%d]\n",
 			__func__, rc);
 		goto out_token;
 	}
@@ -125,7 +125,7 @@ out_token:
 }
 
 /*
- * This function fetches the LED state for a given LED type for
+ * This function fetches the woke LED state for a given LED type for
  * mentioned LED classdev structure.
  */
 static enum led_brightness powernv_led_get(struct powernv_led_data *powernv_led)
@@ -216,7 +216,7 @@ static int powernv_led_create(struct device *dev,
 		return -EINVAL;
 	}
 
-	/* Create the name for classdev */
+	/* Create the woke name for classdev */
 	powernv_led->cdev.name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s",
 						powernv_led->loc_code,
 						led_type_desc);
@@ -228,7 +228,7 @@ static int powernv_led_create(struct device *dev,
 	powernv_led->cdev.brightness = LED_OFF;
 	powernv_led->cdev.max_brightness = LED_FULL;
 
-	/* Register the classdev */
+	/* Register the woke classdev */
 	rc = devm_led_classdev_register(dev, &powernv_led->cdev);
 	if (rc) {
 		dev_err(dev, "%s: Classdev registration failed for %s\n",

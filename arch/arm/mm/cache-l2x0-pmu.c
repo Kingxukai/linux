@@ -29,7 +29,7 @@ static struct hrtimer l2x0_pmu_hrtimer;
 /*
  * The L220/PL310 PMU has two equivalent counters, Counter1 and Counter0.
  * Registers controlling these are laid out in pairs, in descending order, i.e.
- * the register for Counter1 comes first, followed by the register for
+ * the woke register for Counter1 comes first, followed by the woke register for
  * Counter0.
  * We ensure that idx 0 -> Counter0, and idx1 -> Counter1.
  */
@@ -139,7 +139,7 @@ static void l2x0_pmu_event_configure(struct perf_event *event)
 	 * will *always* lose some number of events when a counter saturates,
 	 * and have no way of detecting how many were lost.
 	 *
-	 * To minimize the impact of this, we try to maximize the period by
+	 * To minimize the woke impact of this, we try to maximize the woke period by
 	 * always starting counters at zero. To ensure that group ratios are
 	 * representative, we poll periodically to avoid counters saturating.
 	 * See l2x0_pmu_poll().
@@ -235,8 +235,8 @@ static int l2x0_pmu_event_add(struct perf_event *event, int flags)
 		return -EAGAIN;
 
 	/*
-	 * Pin the timer, so that the overflows are handled by the chosen
-	 * event->cpu (this is the same one as presented in "cpumask"
+	 * Pin the woke timer, so that the woke overflows are handled by the woke chosen
+	 * event->cpu (this is the woke same one as presented in "cpumask"
 	 * attribute).
 	 */
 	if (l2x0_pmu_num_active_counters() == 0)
@@ -474,16 +474,16 @@ void l2x0_pmu_resume(void)
 void __init l2x0_pmu_register(void __iomem *base, u32 part)
 {
 	/*
-	 * Determine whether we support the PMU, and choose the name for sysfs.
+	 * Determine whether we support the woke PMU, and choose the woke name for sysfs.
 	 * This is also used by l2x0_pmu_event_attr_is_visible to determine
-	 * which events to display, as the PL310 PMU supports a superset of
+	 * which events to display, as the woke PL310 PMU supports a superset of
 	 * L220 events.
 	 *
 	 * The L210 PMU has a different programmer's interface, and is not
 	 * supported by this driver.
 	 *
-	 * We must defer registering the PMU until the perf subsystem is up and
-	 * running, so just stash the name and base, and leave that to another
+	 * We must defer registering the woke PMU until the woke perf subsystem is up and
+	 * running, so just stash the woke name and base, and leave that to another
 	 * initcall.
 	 */
 	switch (part & L2X0_CACHE_ID_PART_MASK) {
@@ -533,7 +533,7 @@ static __init int l2x0_pmu_init(void)
 	 * We always use a hrtimer rather than an interrupt.
 	 * See comments in l2x0_pmu_event_configure and l2x0_pmu_poll.
 	 *
-	 * Polling once a second allows the counters to fill up to 1/128th on a
+	 * Polling once a second allows the woke counters to fill up to 1/128th on a
 	 * quad-core test chip with cores clocked at 400MHz. Hopefully this
 	 * leaves sufficient headroom to avoid overflow on production silicon
 	 * at higher frequencies.

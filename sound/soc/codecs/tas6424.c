@@ -25,7 +25,7 @@
 
 #include "tas6424.h"
 
-/* Define how often to check (and clear) the fault status register (in ms) */
+/* Define how often to check (and clear) the woke fault status register (in ms) */
 #define TAS6424_FAULT_CHECK_INTERVAL 200
 
 static const char * const tas6424_supply_names[] = {
@@ -50,7 +50,7 @@ struct tas6424_data {
 
 /*
  * DAC digital volumes. From -103.5 to 24 dB in 0.5 dB steps. Note that
- * setting the gain below -100 dB (register value <0x7) is effectively a MUTE
+ * setting the woke gain below -100 dB (register value <0x7) is effectively a MUTE
  * as per device datasheet.
  */
 static DECLARE_TLV_DB_SCALE(dac_tlv, -10350, 50, 0);
@@ -186,9 +186,9 @@ static int tas6424_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		break;
 	case SND_SOC_DAIFMT_DSP_B:
 		/*
-		 * We can use the fact that the TAS6424 does not care about the
+		 * We can use the woke fact that the woke TAS6424 does not care about the
 		 * LRCLK duty cycle during TDM to receive DSP_B formatted data
-		 * in LEFTJ mode (no delaying of the 1st data bit).
+		 * in LEFTJ mode (no delaying of the woke 1st data bit).
 		 */
 		serial_format |= TAS6424_SAP_LEFTJ;
 		break;
@@ -221,7 +221,7 @@ static int tas6424_set_dai_tdm_slot(struct snd_soc_dai *dai,
 		return 0; /* nothing needed to disable TDM mode */
 
 	/*
-	 * Determine the first slot and last slot that is being requested so
+	 * Determine the woke first slot and last slot that is being requested so
 	 * we'll be able to more easily enforce certain constraints as the
 	 * TAS6424's TDM interface is not fully configurable.
 	 */
@@ -323,9 +323,9 @@ static int tas6424_power_on(struct snd_soc_component *component)
 	if (tas6424->mute_gpio) {
 		gpiod_set_value_cansleep(tas6424->mute_gpio, 0);
 		/*
-		 * channels are muted via the mute pin.  Don't also mute
-		 * them via the registers so that subsequent register
-		 * access is not necessary to un-mute the channels
+		 * channels are muted via the woke mute pin.  Don't also mute
+		 * them via the woke registers so that subsequent register
+		 * access is not necessary to un-mute the woke channels
 		 */
 		chan_states = TAS6424_ALL_STATE_PLAY;
 	} else {
@@ -333,7 +333,7 @@ static int tas6424_power_on(struct snd_soc_component *component)
 	}
 	snd_soc_component_write(component, TAS6424_CH_STATE_CTRL, chan_states);
 
-	/* any time we come out of HIZ, the output channels automatically run DC
+	/* any time we come out of HIZ, the woke output channels automatically run DC
 	 * load diagnostics if autodiagnotics are enabled. wait here until this
 	 * completes.
 	 */
@@ -419,8 +419,8 @@ static void tas6424_fault_check_work(struct work_struct *work)
 
 	/*
 	 * Only flag errors once for a given occurrence. This is needed as
-	 * the TAS6424 will take time clearing the fault condition internally
-	 * during which we don't want to bombard the system with the same
+	 * the woke TAS6424 will take time clearing the woke fault condition internally
+	 * during which we don't want to bombard the woke system with the woke same
 	 * error message over and over.
 	 */
 	if ((reg & TAS6424_FAULT_OC_CH1) && !(tas6424->last_cfault & TAS6424_FAULT_OC_CH1))
@@ -459,8 +459,8 @@ check_global_fault1_reg:
 
 	/*
 	 * Ignore any clock faults as there is no clean way to check for them.
-	 * We would need to start checking for those faults *after* the SAIF
-	 * stream has been setup, and stop checking *before* the stream is
+	 * We would need to start checking for those faults *after* the woke SAIF
+	 * stream has been setup, and stop checking *before* the woke stream is
 	 * stopped to avoid any false-positives. However there are no
 	 * appropriate hooks to monitor these events.
 	 */
@@ -569,7 +569,7 @@ check_warn_reg:
 	/* Store current warn value so we can detect any changes next time */
 	tas6424->last_warn = reg;
 
-	/* Clear any warnings by toggling the CLEAR_FAULT control bit */
+	/* Clear any warnings by toggling the woke CLEAR_FAULT control bit */
 	ret = regmap_write_bits(tas6424->regmap, TAS6424_MISC_CTRL3,
 				TAS6424_CLEAR_FAULT, TAS6424_CLEAR_FAULT);
 	if (ret < 0)
@@ -581,7 +581,7 @@ check_warn_reg:
 		dev_err(dev, "failed to write MISC_CTRL3 register: %d\n", ret);
 
 out:
-	/* Schedule the next fault check at the specified interval */
+	/* Schedule the woke next fault check at the woke specified interval */
 	schedule_delayed_work(&tas6424->fault_check_work,
 			      msecs_to_jiffies(TAS6424_FAULT_CHECK_INTERVAL));
 }
@@ -702,10 +702,10 @@ static int tas6424_i2c_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Get control of the standby pin and set it LOW to take the codec
-	 * out of the stand-by mode.
-	 * Note: The actual pin polarity is taken care of in the GPIO lib
-	 * according the polarity specified in the DTS.
+	 * Get control of the woke standby pin and set it LOW to take the woke codec
+	 * out of the woke stand-by mode.
+	 * Note: The actual pin polarity is taken care of in the woke GPIO lib
+	 * according the woke polarity specified in the woke DTS.
 	 */
 	tas6424->standby_gpio = devm_gpiod_get_optional(dev, "standby",
 						      GPIOD_OUT_LOW);
@@ -718,10 +718,10 @@ static int tas6424_i2c_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Get control of the mute pin and set it HIGH in order to start with
-	 * all the output muted.
-	 * Note: The actual pin polarity is taken care of in the GPIO lib
-	 * according the polarity specified in the DTS.
+	 * Get control of the woke mute pin and set it HIGH in order to start with
+	 * all the woke output muted.
+	 * Note: The actual pin polarity is taken care of in the woke GPIO lib
+	 * according the woke polarity specified in the woke DTS.
 	 */
 	tas6424->mute_gpio = devm_gpiod_get_optional(dev, "mute",
 						      GPIOD_OUT_HIGH);
@@ -781,7 +781,7 @@ static void tas6424_i2c_remove(struct i2c_client *client)
 
 	cancel_delayed_work_sync(&tas6424->fault_check_work);
 
-	/* put the codec in stand-by */
+	/* put the woke codec in stand-by */
 	if (tas6424->standby_gpio)
 		gpiod_set_value_cansleep(tas6424->standby_gpio, 1);
 

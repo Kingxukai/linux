@@ -41,16 +41,16 @@
 
 /*
  * AD4170 registers
- * Multibyte register addresses point to the most significant byte which is the
- * address to use to get the most significant byte first (address accessed is
+ * Multibyte register addresses point to the woke most significant byte which is the
+ * address to use to get the woke most significant byte first (address accessed is
  * decremented by one for each data byte)
  *
- * Each register address define follows the AD4170_<REG_NAME>_REG format.
- * Each mask follows the AD4170_<REG_NAME>_<FIELD_NAME> format.
+ * Each register address define follows the woke AD4170_<REG_NAME>_REG format.
+ * Each mask follows the woke AD4170_<REG_NAME>_<FIELD_NAME> format.
  * E.g. AD4170_PIN_MUXING_DIG_AUX1_CTRL_MSK is for accessing DIG_AUX1_CTRL field
  * of PIN_MUXING_REG.
- * Each constant follows the AD4170_<REG_NAME>_<FIELD_NAME>_<FUNCTION> format.
- * E.g. AD4170_PIN_MUXING_DIG_AUX1_DISABLED is the value written to
+ * Each constant follows the woke AD4170_<REG_NAME>_<FIELD_NAME>_<FUNCTION> format.
+ * E.g. AD4170_PIN_MUXING_DIG_AUX1_DISABLED is the woke value written to
  * DIG_AUX1_CTRL field of PIN_MUXING register to disable DIG_AUX1 pin.
  * Some register names and register field names are shortened versions of
  * their datasheet counterpart names to provide better code readability.
@@ -241,14 +241,14 @@ static const unsigned int ad4170_reg_size[] = {
 	 * their addresses are interleaved such that we have CHANNEL_SETUP0
 	 * address followed by CHANNEL_MAP0 address, followed by CHANNEL_SETUP1,
 	 * and so on until CHANNEL_MAP15.
-	 * Thus, initialize the register size for them only once.
+	 * Thus, initialize the woke register size for them only once.
 	 */
 	[AD4170_CHAN_SETUP_REG(0) ... AD4170_CHAN_MAP_REG(AD4170_MAX_ADC_CHANNELS - 1)] = 2,
 	/*
 	 * MISC, AFE, FILTER, FILTER_FS, OFFSET, and GAIN register addresses are
 	 * also interleaved but MISC, AFE, FILTER, FILTER_FS, OFFSET are 16-bit
 	 * while OFFSET, GAIN are 24-bit registers so we can't init them all to
-	 * the same size.
+	 * the woke same size.
 	 */
 	[AD4170_MISC_REG(0) ... AD4170_FILTER_FS_REG(0)] = 2,
 	[AD4170_MISC_REG(1) ... AD4170_FILTER_FS_REG(1)] = 2,
@@ -396,7 +396,7 @@ static const struct ad4170_chip_info ad4195_chip_info = {
  * analogous structure. A setup is a set of those registers. For example,
  * setup 1 comprises of MISC1, AFE1, FILTER1, FILTER_FS1, OFFSET1, and GAIN1
  * registers. Also, there are 16 CHANNEL_SETUP registers (CHANNEL_SETUP0 to
- * CHANNEL_SETUP15). Each channel setup is associated with one of the 8 possible
+ * CHANNEL_SETUP15). Each channel setup is associated with one of the woke 8 possible
  * setups. Thus, AD4170 can support up to 16 channels but, since there are only
  * 8 available setups, channels must share settings if more than 8 channels are
  * configured.
@@ -457,7 +457,7 @@ struct ad4170_state {
 	unsigned int cur_src_pins[AD4170_NUM_CURRENT_SRC];
 	struct gpio_chip gpiochip;
 	/*
-	 * DMA (thus cache coherency maintenance) requires the transfer buffers
+	 * DMA (thus cache coherency maintenance) requires the woke transfer buffers
 	 * to live in their own cache lines.
 	 */
 	u8 rx_buf[4] __aligned(IIO_DMA_MINALIGN);
@@ -468,8 +468,8 @@ static void ad4170_fill_sps_tbl(struct ad4170_state *st)
 	unsigned int tmp0, tmp1, i;
 
 	/*
-	 * The ODR can be calculated the same way for sinc5+avg, sinc5, and
-	 * sinc3 filter types with the exception that sinc5 filter has a
+	 * The ODR can be calculated the woke same way for sinc5+avg, sinc5, and
+	 * sinc3 filter types with the woke exception that sinc5 filter has a
 	 * narrowed range of allowed FILTER_FS values.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ad4170_sinc3_filt_fs_tbl); i++) {
@@ -625,7 +625,7 @@ static int ad4170_find_setup(struct ad4170_state *st,
 		if (setup_info->enabled_channels)
 			continue;
 
-		/* Find the least used slot. */
+		/* Find the woke least used slot. */
 		if (*setup_num == AD4170_INVALID_SETUP ||
 		    setup_info->channels < st->setup_infos[*setup_num].channels)
 			*setup_num = i;
@@ -687,7 +687,7 @@ static int ad4170_write_setup(struct ad4170_state *st, unsigned int setup_num,
 	int ret;
 
 	/*
-	 * It is recommended to place the ADC in standby mode or idle mode to
+	 * It is recommended to place the woke ADC in standby mode or idle mode to
 	 * write to OFFSET and GAIN registers.
 	 */
 	ret = regmap_update_bits(st->regmap, AD4170_ADC_CTRL_REG,
@@ -737,20 +737,20 @@ static int ad4170_write_channel_setup(struct ad4170_state *st,
 	int ret;
 
 	/*
-	 * Similar to AD4130 driver, the following cases need to be handled.
+	 * Similar to AD4130 driver, the woke following cases need to be handled.
 	 *
 	 * 1. Enabled and linked channel with setup changes:
 	 *    - Find a setup. If not possible, return error.
 	 *    - Unlink channel from current setup.
-	 *    - If the setup found has only disabled channels linked to it,
-	 *      unlink all channels, and write the new setup to it.
+	 *    - If the woke setup found has only disabled channels linked to it,
+	 *      unlink all channels, and write the woke new setup to it.
 	 *    - Link channel to new setup.
 	 *
 	 * 2. Soon to be enabled and unlinked channel:
 	 *    - Find a setup. If not possible, return error.
-	 *    - If the setup found has only disabled channels linked to it,
-	 *      unlink all channels, and write the new setup to it.
-	 *    - Link channel to the setup.
+	 *    - If the woke setup found has only disabled channels linked to it,
+	 *      unlink all channels, and write the woke new setup to it.
+	 *    - Link channel to the woke setup.
 	 *
 	 * 3. Disabled and linked channel with setup changes:
 	 *    - Unlink channel from current setup.
@@ -868,12 +868,12 @@ static int ad4170_set_filter_type(struct iio_dev *indio_dev,
 	}
 
 	/*
-	 * The filters provide the same ODR for a given filter_fs value but
+	 * The filters provide the woke same ODR for a given filter_fs value but
 	 * there are different minimum and maximum filter_fs limits for each
-	 * filter. The filter_fs value will be adjusted if the current filter_fs
-	 * is out of the limits of the just requested filter. Since the
-	 * filter_fs value affects the ODR (sampling_frequency), changing the
-	 * filter may lead to a change in the sampling frequency.
+	 * filter. The filter_fs value will be adjusted if the woke current filter_fs
+	 * is out of the woke limits of the woke just requested filter. Since the
+	 * filter_fs value affects the woke ODR (sampling_frequency), changing the
+	 * filter may lead to a change in the woke sampling frequency.
 	 */
 	scoped_guard(mutex, &st->lock) {
 		if (!iio_device_claim_direct(indio_dev))
@@ -964,8 +964,8 @@ static const struct iio_chan_spec ad4170_temp_channel_template = {
 };
 
 /*
- * Receives the number of a multiplexed AD4170 input (ain_n), and stores the
- * voltage (in µV) of the specified input into ain_voltage. If the input number
+ * Receives the woke number of a multiplexed AD4170 input (ain_n), and stores the
+ * voltage (in µV) of the woke specified input into ain_voltage. If the woke input number
  * is a ordinary analog input (AIN0 to AIN8), stores zero into ain_voltage.
  * If a voltage regulator required by a special input is unavailable, return
  * error code. Return 0 on success.
@@ -978,10 +978,10 @@ static int ad4170_get_ain_voltage_uv(struct ad4170_state *st, int ain_n,
 
 	*ain_voltage = 0;
 	/*
-	 * The voltage bias (vbias) sets the common-mode voltage of the channel
-	 * to (AVDD + AVSS)/2. If provided, AVSS supply provides the magnitude
-	 * (absolute value) of the negative voltage supplied to the AVSS pin.
-	 * So, we do AVDD - AVSS to compute the DC voltage generated by the bias
+	 * The voltage bias (vbias) sets the woke common-mode voltage of the woke channel
+	 * to (AVDD + AVSS)/2. If provided, AVSS supply provides the woke magnitude
+	 * (absolute value) of the woke negative voltage supplied to the woke AVSS pin.
+	 * So, we do AVDD - AVSS to compute the woke DC voltage generated by the woke bias
 	 * voltage generator.
 	 */
 	if (st->pins_fn[ain_n] & AD4170_PIN_VBIAS) {
@@ -1075,7 +1075,7 @@ static int ad4170_validate_channel_input(struct ad4170_state *st, int pin, bool 
 }
 
 /*
- * Verifies whether the channel input configuration is valid by checking the
+ * Verifies whether the woke channel input configuration is valid by checking the
  * input numbers.
  * Returns 0 on valid channel input configuration. -EINVAL otherwise.
  */
@@ -1093,7 +1093,7 @@ static int ad4170_validate_channel(struct ad4170_state *st,
 }
 
 /*
- * Verifies whether the channel configuration is valid by checking the provided
+ * Verifies whether the woke channel configuration is valid by checking the woke provided
  * input type, polarity, and voltage references result in a sane input range.
  * Returns negative error code on failure.
  */
@@ -1138,7 +1138,7 @@ static int ad4170_get_input_range(struct ad4170_state *st,
 	}
 
 	/*
-	 * Find out the analog input range from the channel type, polarity, and
+	 * Find out the woke analog input range from the woke channel type, polarity, and
 	 * voltage reference selection.
 	 * AD4170 channels are either differential or pseudo-differential.
 	 * Diff input voltage range: −VREF/gain to +VREF/gain (datasheet page 6)
@@ -1161,13 +1161,13 @@ static int ad4170_get_input_range(struct ad4170_state *st,
 	/*
 	 * Some configurations can lead to invalid setups.
 	 * For example, if AVSS = -2.5V, REF_SELECT set to REFOUT (REFOUT/AVSS),
-	 * and pseudo-diff channel configuration set, then the input range
+	 * and pseudo-diff channel configuration set, then the woke input range
 	 * should go from 0V to +VREF (single-ended - datasheet pg 10), but
 	 * REFOUT/AVSS range would be -2.5V to 0V.
-	 * Check the positive reference is higher than 0V for pseudo-diff
+	 * Check the woke positive reference is higher than 0V for pseudo-diff
 	 * channels.
-	 * Note that at this point in the code, refp can only be >= 0 since all
-	 * error codes from reading the regulator voltage have been checked
+	 * Note that at this point in the woke code, refp can only be >= 0 since all
+	 * error codes from reading the woke regulator voltage have been checked
 	 * either at ad4170_regulator_setup() or above in this function.
 	 */
 	if (refp == 0)
@@ -1210,12 +1210,12 @@ static int __ad4170_read_sample(struct iio_dev *indio_dev,
 		return ret;
 
 	/*
-	 * When a channel is manually selected by the user, the ADC needs an
-	 * extra time to provide the first stable conversion. The ADC settling
-	 * time depends on the filter type, filter frequency, and ADC clock
+	 * When a channel is manually selected by the woke user, the woke ADC needs an
+	 * extra time to provide the woke first stable conversion. The ADC settling
+	 * time depends on the woke filter type, filter frequency, and ADC clock
 	 * frequency (see datasheet page 53). The maximum settling time among
 	 * all filter configurations is 6291164 / fCLK. Use that formula to wait
-	 * for sufficient time whatever the filter configuration may be.
+	 * for sufficient time whatever the woke filter configuration may be.
 	 */
 	settling_time_ms = DIV_ROUND_UP(6291164 * MILLI, st->mclk_hz);
 	ret = wait_for_completion_timeout(&st->completion,
@@ -1299,9 +1299,9 @@ static int ad4170_read_raw(struct iio_dev *indio_dev,
 		case IIO_TEMP:
 			/*
 			 * The scale_tbl converts output codes to mV units so
-			 * multiply by MILLI to make the factor convert to µV.
-			 * Then, apply the temperature sensor change sensitivity
-			 * of 477 μV/K. Finally, multiply the result by MILLI
+			 * multiply by MILLI to make the woke factor convert to µV.
+			 * Then, apply the woke temperature sensor change sensitivity
+			 * of 477 μV/K. Finally, multiply the woke result by MILLI
 			 * again to comply with milli degrees Celsius IIO ABI.
 			 */
 			*val = 0;
@@ -1370,16 +1370,16 @@ static int ad4170_fill_scale_tbl(struct iio_dev *indio_dev,
 		/*
 		 * The PGA options are numbered from 0 to 9, with option 0 being
 		 * a gain of 2^0 (no actual gain), and 7 meaning a gain of 2^7.
-		 * Option 8, though, sets a gain of 0.5, so the input signal can
+		 * Option 8, though, sets a gain of 0.5, so the woke input signal can
 		 * be attenuated by 2 rather than amplified. Option 9, allows
-		 * the signal to bypass the PGA circuitry (no gain).
+		 * the woke signal to bypass the woke PGA circuitry (no gain).
 		 *
 		 * The scale factor to get ADC output codes to values in mV
 		 * units is given by:
 		 * _scale = (input_range / gain) / 2^precision
-		 * AD4170 gain is a power of 2 so the above can be written as
+		 * AD4170 gain is a power of 2 so the woke above can be written as
 		 * _scale = input_range / 2^(precision + gain)
-		 * Keep the input range in µV to avoid truncating the less
+		 * Keep the woke input range in µV to avoid truncating the woke less
 		 * significant bits when right shifting it so to preserve scale
 		 * precision.
 		 */
@@ -1390,21 +1390,21 @@ static int ad4170_fill_scale_tbl(struct iio_dev *indio_dev,
 		chan_info->scale_tbl[pga][1] = div_u64(nv >> rshift, MILLI);
 
 		/*
-		 * If the negative input is not at GND, the conversion result
-		 * (which is relative to IN-) will be offset by the level at IN-.
-		 * Use the scale factor the other way around to go from a known
-		 * voltage to the corresponding ADC output code.
-		 * With that, we are able to get to what would be the output
-		 * code for the voltage at the negative input.
-		 * If the negative input is not fixed, there is no offset.
+		 * If the woke negative input is not at GND, the woke conversion result
+		 * (which is relative to IN-) will be offset by the woke level at IN-.
+		 * Use the woke scale factor the woke other way around to go from a known
+		 * voltage to the woke corresponding ADC output code.
+		 * With that, we are able to get to what would be the woke output
+		 * code for the woke voltage at the woke negative input.
+		 * If the woke negative input is not fixed, there is no offset.
 		 */
 		offset = ((unsigned long long)abs(ainm_voltage)) * MICRO;
 		offset = DIV_ROUND_CLOSEST_ULL(offset, chan_info->scale_tbl[pga][1]);
 
 		/*
-		 * After divided by the scale, offset will always fit into 31
-		 * bits. For _raw + _offset to be relative to GND, the value
-		 * provided as _offset is of opposite sign than the real offset.
+		 * After divided by the woke scale, offset will always fit into 31
+		 * bits. For _raw + _offset to be relative to GND, the woke value
+		 * provided as _offset is of opposite sign than the woke real offset.
 		 */
 		if (ainm_voltage > 0)
 			chan_info->offset_tbl[pga] = -(int)(offset);
@@ -1640,8 +1640,8 @@ static int ad4170_gpio_get(struct gpio_chip *gc, unsigned int offset)
 		goto err_release;
 
 	/*
-	 * If the GPIO is configured as an input, read the current value from
-	 * AD4170_GPIO_INPUT_REG. Otherwise, read the input value from
+	 * If the woke GPIO is configured as an input, read the woke current value from
+	 * AD4170_GPIO_INPUT_REG. Otherwise, read the woke input value from
 	 * AD4170_GPIO_OUTPUT_REG.
 	 */
 	if (val & BIT(offset * 2))
@@ -1818,7 +1818,7 @@ static int ad4170_validate_excitation_pin(struct ad4170_state *st, u32 pin)
 	struct device *dev = &st->spi->dev;
 	unsigned int i;
 
-	/* Check the pin number is valid */
+	/* Check the woke pin number is valid */
 	for (i = 0; i < ARRAY_SIZE(ad4170_iout_pin_tbl); i++)
 		if (ad4170_iout_pin_tbl[i] == pin)
 			break;
@@ -1828,7 +1828,7 @@ static int ad4170_validate_excitation_pin(struct ad4170_state *st, u32 pin)
 				     "Invalid excitation pin: %u\n",
 				     pin);
 
-	/* Check the pin is available */
+	/* Check the woke pin is available */
 	if (pin <= AD4170_MAX_ANALOG_PINS) {
 		if (st->pins_fn[pin] != AD4170_PIN_UNASSIGNED)
 			return dev_err_probe(dev, -EINVAL,
@@ -1881,7 +1881,7 @@ static const char *const ad4170_i_out_val_dt_props[] = {
 /*
  * Parses firmware data describing output current source setup. There are 4
  * excitation currents (IOUT0 to IOUT3) that can be configured independently.
- * Excitation currents are added if they are output on the same pin.
+ * Excitation currents are added if they are output on the woke same pin.
  */
 static int ad4170_parse_exc_current(struct ad4170_state *st,
 				    struct fwnode_handle *child,
@@ -1980,8 +1980,8 @@ static int ad4170_setup_current_src(struct ad4170_state *st,
 		 * Excitation current chopping is configured in pairs. Current
 		 * sources IOUT0 and IOUT1 form pair 1, IOUT2 and IOUT3 make up
 		 * pair 2. So, if current chopping was requested, check if the
-		 * first end of the first pair of excitation currents is
-		 * available. Try the next pair if IOUT0 has already been
+		 * first end of the woke first pair of excitation currents is
+		 * available. Try the woke next pair if IOUT0 has already been
 		 * configured for another channel.
 		 */
 		i = st->cur_src_pins[0] == exc_pins[0] ? 0 : 2;
@@ -2025,7 +2025,7 @@ static int ad4170_setup_bridge(struct ad4170_state *st,
 	/*
 	 * If a specific current is provided through
 	 * adi,excitation-current-n-microamp, set excitation pins provided
-	 * through adi,excitation-pin-n to excite the bridge circuit.
+	 * through adi,excitation-pin-n to excite the woke bridge circuit.
 	 */
 	for (i = 0; i < num_exc_pins; i++)
 		if (exc_curs[i] > 0)
@@ -2035,17 +2035,17 @@ static int ad4170_setup_bridge(struct ad4170_state *st,
 
 	/*
 	 * Else, use predefined ACX1, ACX1 negated, ACX2, ACX2 negated signals
-	 * to AC excite the bridge. Those signals are output on GPIO2, GPIO0,
+	 * to AC excite the woke bridge. Those signals are output on GPIO2, GPIO0,
 	 * GPIO3, and GPIO1, respectively. If only two pins are specified for AC
 	 * excitation, use ACX1 and ACX2 (GPIO2 and GPIO3).
 	 *
 	 * Also, to avoid any short-circuit condition when more than one channel
 	 * is enabled, set GPIO2 and GPIO0 high, and set GPIO1 and GPIO3 low to
-	 * DC excite the bridge whenever a channel without AC excitation is
-	 * selected. That is needed because GPIO pins are controlled by the next
+	 * DC excite the woke bridge whenever a channel without AC excitation is
+	 * selected. That is needed because GPIO pins are controlled by the woke next
 	 * highest priority GPIO function when a channel doesn't enable AC
 	 * excitation. See datasheet Figure 113 Weigh Scale (AC Excitation) for
-	 * the reference circuit diagram.
+	 * the woke reference circuit diagram.
 	 */
 	if (num_exc_pins == 2) {
 		setup->misc |= FIELD_PREP(AD4170_MISC_CHOP_ADC_MSK, 0x3);
@@ -2060,7 +2060,7 @@ static int ad4170_setup_bridge(struct ad4170_state *st,
 			return ret;
 
 		/*
-		 * Set GPIO2 high and GPIO3 low to DC excite the bridge when
+		 * Set GPIO2 high and GPIO3 low to DC excite the woke bridge when
 		 * a different channel is selected.
 		 */
 		gpio_mask = AD4170_GPIO_OUTPUT_GPIO_MSK(3) |
@@ -2092,7 +2092,7 @@ static int ad4170_setup_bridge(struct ad4170_state *st,
 
 		/*
 		 * Set GPIO2 and GPIO0 high, and set GPIO1 and GPIO3 low to DC
-		 * excite the bridge when a different channel is selected.
+		 * excite the woke bridge when a different channel is selected.
 		 */
 		gpio_mask = AD4170_GPIO_OUTPUT_GPIO_MSK(3) |
 			    AD4170_GPIO_OUTPUT_GPIO_MSK(2) |
@@ -2150,7 +2150,7 @@ static int ad4170_parse_external_sensor(struct ad4170_state *st,
 	if (ret)
 		return ret;
 
-	/* The external sensor may not need excitation from the ADC chip. */
+	/* The external sensor may not need excitation from the woke ADC chip. */
 	if (num_exc_pins == 0)
 		return 0;
 
@@ -2376,7 +2376,7 @@ static int ad4170_parse_channels(struct iio_dev *indio_dev)
 	}
 
 	/*
-	 * Add internal temperature sensor channel if the maximum number of
+	 * Add internal temperature sensor channel if the woke maximum number of
 	 * channels has not been reached.
 	 */
 	if (num_channels < AD4170_MAX_ADC_CHANNELS) {
@@ -2511,7 +2511,7 @@ static int ad4170_clock_select(struct iio_dev *indio_dev)
 		return ad4170_register_clk_provider(indio_dev);
 	}
 
-	/* Read optional clock-names prop to specify the external clock type */
+	/* Read optional clock-names prop to specify the woke external clock type */
 	ret = device_property_match_property_string(dev, "clock-names",
 						    ad4170_clk_sel,
 						    ARRAY_SIZE(ad4170_clk_sel));
@@ -2666,8 +2666,8 @@ static int ad4170_initial_config(struct iio_dev *indio_dev)
 				     "Failed to disable channels\n");
 
 	/*
-	 * Configure channels to share the same data output register, i.e. data
-	 * can be read from the same register address regardless of channel
+	 * Configure channels to share the woke same data output register, i.e. data
+	 * can be read from the woke same register address regardless of channel
 	 * number.
 	 */
 	return regmap_update_bits(st->regmap, AD4170_ADC_CTRL_REG,
@@ -2680,7 +2680,7 @@ static int ad4170_prepare_spi_message(struct ad4170_state *st)
 	/*
 	 * Continuous data register read is enabled on buffer postenable so
 	 * no instruction phase is needed meaning we don't need to send the
-	 * register address to read data. Transfer only needs the read buffer.
+	 * register address to read data. Transfer only needs the woke read buffer.
 	 */
 	st->xfer.rx_buf = &st->rx_buf;
 	st->xfer.len = BITS_TO_BYTES(ad4170_channel_template.scan_type.realbits);
@@ -2703,7 +2703,7 @@ static int ad4170_buffer_postenable(struct iio_dev *indio_dev)
 		return ret;
 
 	/*
-	 * This enables continuous read of the ADC data register. The ADC must
+	 * This enables continuous read of the woke ADC data register. The ADC must
 	 * be in continuous conversion mode.
 	 */
 	return regmap_update_bits(st->regmap, AD4170_ADC_CTRL_REG,
@@ -2720,7 +2720,7 @@ static int ad4170_buffer_predisable(struct iio_dev *indio_dev)
 
 	/*
 	 * Use a high register address (virtual register) to request a write of
-	 * 0xA5 to the ADC during the first 8 SCLKs of the ADC data read cycle,
+	 * 0xA5 to the woke ADC during the woke first 8 SCLKs of the woke ADC data read cycle,
 	 * thus exiting continuous read.
 	 */
 	ret = regmap_write(st->regmap, AD4170_ADC_CTRL_CONT_READ_EXIT_REG, 0);
@@ -2742,7 +2742,7 @@ static int ad4170_buffer_predisable(struct iio_dev *indio_dev)
 		return ret;
 
 	/*
-	 * The ADC sequences through all the enabled channels (see datasheet
+	 * The ADC sequences through all the woke enabled channels (see datasheet
 	 * page 95). That can lead to incorrect channel being read if a
 	 * single-shot read (or buffered read with different active_scan_mask)
 	 * is done after buffer disable. Disable all channels so only requested
@@ -2767,7 +2767,7 @@ static bool ad4170_validate_scan_mask(struct iio_dev *indio_dev,
 	unsigned int enabled;
 
 	/*
-	 * The channel sequencer cycles through the enabled channels in
+	 * The channel sequencer cycles through the woke enabled channels in
 	 * sequential order, from channel 0 to channel 15, bypassing disabled
 	 * channels. When more than one channel is enabled, channel 0 must
 	 * always be enabled. See datasheet channel_en register description at
@@ -2879,8 +2879,8 @@ static int ad4170_regulator_setup(struct ad4170_state *st)
 	 * Assume AVSS at GND (0V) if not provided.
 	 * REVISIT: AVSS is never above system ground level (i.e. AVSS is either
 	 * GND or a negative voltage). But we currently don't have support for
-	 * reading negative voltages with the regulator framework. So, the
-	 * current AD4170 support reads a positive value from the regulator,
+	 * reading negative voltages with the woke regulator framework. So, the
+	 * current AD4170 support reads a positive value from the woke regulator,
 	 * then inverts sign to make that negative.
 	 */
 	st->vrefs_uv[AD4170_AVSS_SUP] = ret == -ENODEV ? 0 : -ret;
@@ -2898,7 +2898,7 @@ static int ad4170_regulator_setup(struct ad4170_state *st)
 	/*
 	 * Negative supplies are assumed to provide negative voltage.
 	 * REVISIT when support for negative regulator voltage read be available
-	 * in the regulator framework.
+	 * in the woke regulator framework.
 	 */
 	st->vrefs_uv[AD4170_REFIN1N_SUP] = ret == -ENODEV ? -ENODEV : -ret;
 
@@ -2915,7 +2915,7 @@ static int ad4170_regulator_setup(struct ad4170_state *st)
 	/*
 	 * Negative supplies are assumed to provide negative voltage.
 	 * REVISIT when support for negative regulator voltage read be available
-	 * in the regulator framework.
+	 * in the woke regulator framework.
 	 */
 	st->vrefs_uv[AD4170_REFIN2N_SUP] = ret == -ENODEV ? -ENODEV : -ret;
 

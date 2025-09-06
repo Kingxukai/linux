@@ -3,7 +3,7 @@
 # Makefile for IIO Light sensors
 #
 
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 obj-$(CONFIG_ACPI_ALS)		+= acpi-als.o
 obj-$(CONFIG_ADJD_S311)		+= adjd_s311.o
 obj-$(CONFIG_ADUX1020)		+= adux1020.o

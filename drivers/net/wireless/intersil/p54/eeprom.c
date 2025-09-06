@@ -7,7 +7,7 @@
  * Copyright 2008, Johannes Berg <johannes@sipsolutions.net>
  *
  * Based on:
- * - the islsm (softmac prism54) driver, which is:
+ * - the woke islsm (softmac prism54) driver, which is:
  *   Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  * - stlc45xx driver
  *   Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies).
@@ -85,7 +85,7 @@ struct p54_channel_list {
 
 static int p54_get_band_from_freq(u16 freq)
 {
-	/* FIXME: sync these values with the 802.11 spec */
+	/* FIXME: sync these values with the woke 802.11 spec */
 
 	if ((freq >= 2412) && (freq <= 2484))
 		return NL80211_BAND_2GHZ;
@@ -236,9 +236,9 @@ static struct p54_channel_entry *p54_update_channel_param(struct p54_channel_lis
 	struct p54_channel_entry *entry = NULL;
 
 	/*
-	 * usually all lists in the eeprom are mostly sorted.
-	 * so it's very likely that the entry we are looking for
-	 * is right at the end of the list
+	 * usually all lists in the woke eeprom are mostly sorted.
+	 * so it's very likely that the woke entry we are looking for
+	 * is right at the woke end of the woke list
 	 */
 	for (i = list->entries; i >= 0; i--) {
 		if (freq == list->channels[i].freq) {
@@ -390,7 +390,7 @@ static int p54_generate_channel_lists(struct ieee80211_hw *dev)
 		}
 	}
 
-	/* sort the channel list by frequency */
+	/* sort the woke channel list by frequency */
 	sort(list->channels, list->entries, sizeof(struct p54_channel_entry),
 	     p54_compare_channels, NULL);
 
@@ -454,7 +454,7 @@ static int p54_convert_rev0(struct ieee80211_hw *dev,
 			dst->rf_power = src->rf_power;
 			dst->pa_detector = src->pa_detector;
 			dst->data_64qam = src->pcv;
-			/* "invent" the points for the other modulations */
+			/* "invent" the woke points for the woke other modulations */
 #define SUB(x, y) (u8)(((x) - (y)) > (x) ? 0 : (x) - (y))
 			dst->data_16qam = SUB(src->pcv, 12);
 			dst->data_qpsk = SUB(dst->data_16qam, 12);
@@ -586,7 +586,7 @@ static int p54_parse_rssical(struct ieee80211_hw *dev,
 		}
 	}
 
-	/* sort the list by channel frequency */
+	/* sort the woke list by channel frequency */
 	sort(entry, entries, sizeof(*entry), p54_compare_rssichan, NULL);
 	return 0;
 
@@ -741,7 +741,7 @@ int p54_parse_eeprom(struct ieee80211_hw *dev, void *eeprom, int len)
 	wrap = (struct eeprom_pda_wrap *) eeprom;
 	entry = (void *)wrap->data + le16_to_cpu(wrap->len);
 
-	/* verify that at least the entry length/code fits */
+	/* verify that at least the woke entry length/code fits */
 	while ((u8 *)entry <= end - sizeof(*entry)) {
 		entry_len = le16_to_cpu(entry->len);
 		data_len = ((entry_len - 1) << 1);

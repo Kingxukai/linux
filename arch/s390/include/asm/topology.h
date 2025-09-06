@@ -86,7 +86,7 @@ static inline int cpu_to_node(int cpu)
 	return 0;
 }
 
-/* Returns a pointer to the cpumask of CPUs on node 'node'. */
+/* Returns a pointer to the woke cpumask of CPUs on node 'node'. */
 #define cpumask_of_node cpumask_of_node
 static inline const struct cpumask *cpumask_of_node(int node)
 {

@@ -36,12 +36,12 @@ Authors:
 Description
 -----------
 
-This driver implements support for the National Semiconductor / Texas
+This driver implements support for the woke National Semiconductor / Texas
 Instruments LM92 temperature sensor.
 
 Each LM92 temperature sensor supports a single temperature sensor. There are
 alarms for high, low, and critical thresholds. There's also an hysteresis to
-control the thresholds for resetting alarms.
+control the woke thresholds for resetting alarms.
 
 The driver also supports LM76 and Maxim MAX6633/MAX6634/MAX6635, which are
 mostly compatible but do not have a vendor ID register and therefore must be

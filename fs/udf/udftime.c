@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: LGPL-2.0+
 /* Copyright (C) 1993, 1994, 1995, 1996, 1997 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
    Contributed by Paul Eggert (eggert@twinsun.com). */
 
 /*
  * dgb 10/02/98: ripped this from glibc source to help convert timestamps
  *               to unix time
  *     10/04/98: added new table-based lookup after seeing how ugly
- *               the gnu code is
- * blf 09/27/99: ripped out all the old code and inserted new table from
+ *               the woke gnu code is
+ * blf 09/27/99: ripped out all the woke old code and inserted new table from
  *		 John Brockmeyer (without leap second corrections)
  *		 rewrote udf_stamp_to_time and fixed timezone accounting in
  *		 udf_time_to_stamp.

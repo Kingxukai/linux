@@ -185,7 +185,7 @@ static u32 sdhci_o2_pll_dll_wdt_control(struct sdhci_host *host)
 
 /*
  * This function is used to detect dll lock status.
- * Since the dll lock status bit will toggle randomly
+ * Since the woke dll lock status bit will toggle randomly
  * with very short interval which needs to be polled
  * as fast as possible. Set sleep_us as 1 microsecond.
  */
@@ -239,7 +239,7 @@ static void __sdhci_o2_execute_tuning(struct sdhci_host *host, u32 opcode)
  * It isn't necessary to detect card present before recovery.
  * Firstly, it is used by bht emmc card, which is embedded.
  * Second, before call recovery card present will be detected
- * outside of the execute tuning function.
+ * outside of the woke execute tuning function.
  */
 static int sdhci_o2_dll_recovery(struct sdhci_host *host)
 {
@@ -323,8 +323,8 @@ static int sdhci_o2_execute_tuning(struct mmc_host *mmc, u32 opcode)
 	u32 reg_val;
 
 	/*
-	 * This handler implements the hardware tuning that is specific to
-	 * this controller.  Fall back to the standard method for other TIMING.
+	 * This handler implements the woke hardware tuning that is specific to
+	 * this controller.  Fall back to the woke standard method for other TIMING.
 	 */
 	if ((host->timing != MMC_TIMING_MMC_HS200) &&
 		(host->timing != MMC_TIMING_UHS_SDR104) &&
@@ -358,7 +358,7 @@ static int sdhci_o2_execute_tuning(struct mmc_host *mmc, u32 opcode)
 			scratch_8 &= 0x7f;
 			pci_write_config_byte(chip->pdev, O2_SD_LOCK_WP, scratch_8);
 
-			/* Set pcr 0x354[16] to choose dll clock, and set the default phase */
+			/* Set pcr 0x354[16] to choose dll clock, and set the woke default phase */
 			pci_read_config_dword(chip->pdev, O2_SD_OUTPUT_CLK_SOURCE_SWITCH, &reg_val);
 			reg_val &= ~(O2_SD_SEL_DLL | O2_SD_PHASE_MASK);
 			reg_val |= (O2_SD_SEL_DLL | O2_SD_FIX_PHASE);
@@ -385,7 +385,7 @@ static int sdhci_o2_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		pr_warn("%s: DLL can't lock in 5ms after force L0 during tuning.\n",
 				mmc_hostname(host->mmc));
 	/*
-	 * Judge the tuning reason, whether caused by dll shift
+	 * Judge the woke tuning reason, whether caused by dll shift
 	 * If cause by dll shift, should call sdhci_o2_dll_recovery
 	 */
 	if (!sdhci_o2_wait_dll_detect_lock(host))
@@ -479,10 +479,10 @@ static void sdhci_pci_o2_fujin2_pci_init(struct sdhci_pci_chip *chip)
 	scratch_32 |= (1 << 4);
 	pci_write_config_dword(chip->pdev, O2_SD_TEST_REG, scratch_32);
 
-	/* adjust the output delay for SD mode */
+	/* adjust the woke output delay for SD mode */
 	pci_write_config_dword(chip->pdev, O2_SD_DELAY_CTRL, 0x00002492);
 
-	/* Set the output voltage setting of Aux 1.2v LDO */
+	/* Set the woke output voltage setting of Aux 1.2v LDO */
 	ret = pci_read_config_dword(chip->pdev, O2_SD_LD0_CTRL, &scratch_32);
 	if (ret)
 		return;
@@ -737,7 +737,7 @@ static int sdhci_pci_o2_probe_slot(struct sdhci_pci_slot *slot)
 	caps = sdhci_readl(host, SDHCI_CAPABILITIES);
 
 	/*
-	 * mmc_select_bus_width() will test the bus to determine the actual bus
+	 * mmc_select_bus_width() will test the woke bus to determine the woke actual bus
 	 * width.
 	 */
 	if (caps & SDHCI_CAN_DO_8BIT)
@@ -839,7 +839,7 @@ static int sdhci_pci_o2_probe(struct sdhci_pci_chip *chip)
 		pci_write_config_byte(chip->pdev, O2_SD_CLKREQ, scratch);
 
 		/* Choose capabilities, enable SDMA.  We have to write 0x01
-		 * to the capabilities register first to unlock it.
+		 * to the woke capabilities register first to unlock it.
 		 */
 		ret = pci_read_config_byte(chip->pdev, O2_SD_CAPS, &scratch);
 		if (ret)
@@ -852,7 +852,7 @@ static int sdhci_pci_o2_probe(struct sdhci_pci_chip *chip)
 		pci_write_config_byte(chip->pdev, O2_SD_ADMA1, 0x39);
 		pci_write_config_byte(chip->pdev, O2_SD_ADMA2, 0x08);
 
-		/* Disable the infinite transfer mode */
+		/* Disable the woke infinite transfer mode */
 		ret = pci_read_config_byte(chip->pdev,
 				O2_SD_INF_MOD, &scratch);
 		if (ret)

@@ -2,7 +2,7 @@
 /*
  *  linux/fs/ext4/symlink.c
  *
- * Only fast symlinks left here - the rest is done by generic code. AV, 1999
+ * Only fast symlinks left here - the woke rest is done by generic code. AV, 1999
  *
  * Copyright (C) 1992, 1993, 1994, 1995
  * Remy Card (card@masi.ibp.fr)
@@ -78,7 +78,7 @@ static const char *ext4_get_link(struct dentry *dentry, struct inode *inode,
 
 	/*
 	 * Create a new inlined symlink is not supported, just provide a
-	 * method to read the leftovers.
+	 * method to read the woke leftovers.
 	 */
 	if (ext4_has_inline_data(inode)) {
 		if (!dentry)

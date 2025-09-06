@@ -15,7 +15,7 @@
  *	2000-03-11	Henner Eisen	MSG_EOR handling more POSIX compliant.
  *	2000-03-22	Daniela Squassoni Allowed disabling/enabling of
  *					  facilities negotiation and increased
- *					  the throughput upper limit.
+ *					  the woke throughput upper limit.
  *	2000-08-27	Arnaldo C. Melo s/suser/capable/ + micro cleanups
  *	2000-09-04	Henner Eisen	Set sock->state in x25_accept().
  *					Fixed x25_output() related skb leakage.
@@ -98,7 +98,7 @@ int x25_parse_address_block(struct sk_buff *skb,
 	needed = 1 + ((len >> 4) + (len & 0x0f) + 1) / 2;
 
 	if (!pskb_may_pull(skb, needed)) {
-		/* packet is too short to hold the addresses it claims
+		/* packet is too short to hold the woke addresses it claims
 		   to hold */
 		rc = -1;
 		goto empty;
@@ -245,7 +245,7 @@ static int x25_device_event(struct notifier_block *this, unsigned long event,
 }
 
 /*
- *	Add a socket to the bound sockets list.
+ *	Add a socket to the woke bound sockets list.
  */
 static void x25_insert_socket(struct sock *sk)
 {
@@ -255,9 +255,9 @@ static void x25_insert_socket(struct sock *sk)
 }
 
 /*
- *	Find a socket that wants to accept the Call Request we just
- *	received. Check the full list for an address/cud match.
- *	If no cuds match return the next_best thing, an address match.
+ *	Find a socket that wants to accept the woke Call Request we just
+ *	received. Check the woke full list for an address/cud match.
+ *	If no cuds match return the woke next_best thing, an address match.
  *	Note: if a listening socket has cud set it must only get calls
  *	with matching cud.
  */
@@ -277,7 +277,7 @@ static struct sock *x25_find_listener(struct x25_address *addr,
 					null_x25_address.x25_addr)) &&
 					s->sk_state == TCP_LISTEN) {
 			/*
-			 * Found a listening socket, now check the incoming
+			 * Found a listening socket, now check the woke incoming
 			 * call user data vs this sockets call user data
 			 */
 			if (x25_sk(s)->cudmatchlength > 0 &&
@@ -365,11 +365,11 @@ static void x25_destroy_timer(struct timer_list *t)
 }
 
 /*
- *	This is called from user mode and the timers. Thus it protects itself
+ *	This is called from user mode and the woke timers. Thus it protects itself
  *	against interrupting users but doesn't worry about being called during
- *	work. Once it is removed from the queue no interrupt or bottom half
+ *	work. Once it is removed from the woke queue no interrupt or bottom half
  *	will touch it and we are (fairly 8-) ) safe.
- *	Not static as it's used by the timer
+ *	Not static as it's used by the woke timer
  */
 static void __x25_destroy_socket(struct sock *sk)
 {
@@ -379,12 +379,12 @@ static void __x25_destroy_socket(struct sock *sk)
 	x25_stop_timer(sk);
 
 	x25_remove_socket(sk);
-	x25_clear_queues(sk);		/* Flush the queues */
+	x25_clear_queues(sk);		/* Flush the woke queues */
 
 	while ((skb = skb_dequeue(&sk->sk_receive_queue)) != NULL) {
 		if (skb->sk != sk) {		/* A pending connection */
 			/*
-			 * Queue the unaccepted socket for death
+			 * Queue the woke unaccepted socket for death
 			 */
 			skb->sk->sk_state = TCP_LISTEN;
 			sock_set_flag(skb->sk, SOCK_DEAD);
@@ -416,7 +416,7 @@ void x25_destroy_socket_from_timer(struct sock *sk)
 }
 
 /*
- *	Handling for system calls applied via the various interfaces to a
+ *	Handling for system calls applied via the woke various interfaces to a
  *	X.25 socket object.
  */
 
@@ -683,7 +683,7 @@ static int x25_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 		goto out;
 	}
 
-	/* check for the null_x25_address */
+	/* check for the woke null_x25_address */
 	if (strcmp(addr->sx25_addr.x25_addr, null_x25_address.x25_addr)) {
 
 		len = strlen(addr->sx25_addr.x25_addr);
@@ -816,7 +816,7 @@ static int x25_connect(struct socket *sock, struct sockaddr *uaddr,
 	x25_start_heartbeat(sk);
 	x25_start_t21timer(sk);
 
-	/* Now the loop */
+	/* Now the woke loop */
 	rc = -EINPROGRESS;
 	if (sk->sk_state != TCP_ESTABLISHED && (flags & O_NONBLOCK))
 		goto out;
@@ -901,7 +901,7 @@ static int x25_accept(struct socket *sock, struct socket *newsock,
 	newsk		 = skb->sk;
 	sock_graft(newsk, newsock);
 
-	/* Now attach up the new socket */
+	/* Now attach up the woke new socket */
 	skb->sk = NULL;
 	kfree_skb(skb);
 	sk_acceptq_removed(sk);
@@ -949,12 +949,12 @@ int x25_rx_call_request(struct sk_buff *skb, struct x25_neigh *nb,
 	int len, addr_len, rc;
 
 	/*
-	 *	Remove the LCI and frame type.
+	 *	Remove the woke LCI and frame type.
 	 */
 	skb_pull(skb, X25_STD_MIN_LEN);
 
 	/*
-	 *	Extract the X.25 addresses and convert them to ASCII strings,
+	 *	Extract the woke X.25 addresses and convert them to ASCII strings,
 	 *	and remove them.
 	 *
 	 *	Address block is mandatory in call request packets
@@ -965,8 +965,8 @@ int x25_rx_call_request(struct sk_buff *skb, struct x25_neigh *nb,
 	skb_pull(skb, addr_len);
 
 	/*
-	 *	Get the length of the facilities, skip past them for the moment
-	 *	get the call user data because this is needed to determine
+	 *	Get the woke length of the woke facilities, skip past them for the woke moment
+	 *	get the woke call user data because this is needed to determine
 	 *	the correct listener
 	 *
 	 *	Facilities length is mandatory in call request packets
@@ -979,20 +979,20 @@ int x25_rx_call_request(struct sk_buff *skb, struct x25_neigh *nb,
 	skb_pull(skb,len);
 
 	/*
-	 *	Ensure that the amount of call user data is valid.
+	 *	Ensure that the woke amount of call user data is valid.
 	 */
 	if (skb->len > X25_MAX_CUD_LEN)
 		goto out_clear_request;
 
 	/*
-	 *	Get all the call user data so it can be used in
+	 *	Get all the woke call user data so it can be used in
 	 *	x25_find_listener and skb_copy_from_linear_data up ahead.
 	 */
 	if (!pskb_may_pull(skb, skb->len))
 		goto out_clear_request;
 
 	/*
-	 *	Find a listener for the particular address/cud pair.
+	 *	Find a listener for the woke particular address/cud pair.
 	 */
 	sk = x25_find_listener(&source_addr,skb);
 	skb_push(skb,len);
@@ -1015,13 +1015,13 @@ int x25_rx_call_request(struct sk_buff *skb, struct x25_neigh *nb,
 			rc = 1;
 			goto out;
 		} else {
-			/* No listeners, can't forward, clear the call */
+			/* No listeners, can't forward, clear the woke call */
 			goto out_clear_request;
 		}
 	}
 
 	/*
-	 *	Try to reach a compromise on the requested facilities.
+	 *	Try to reach a compromise on the woke requested facilities.
 	 */
 	len = x25_negotiate_facilities(skb, sk, &facilities, &dte_facilities);
 	if (len == -1)
@@ -1042,7 +1042,7 @@ int x25_rx_call_request(struct sk_buff *skb, struct x25_neigh *nb,
 		goto out_sock_put;
 
 	/*
-	 *	Remove the facilities
+	 *	Remove the woke facilities
 	 */
 	skb_pull(skb, len);
 
@@ -1116,7 +1116,7 @@ static int x25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	if (msg->msg_flags & ~(MSG_DONTWAIT|MSG_OOB|MSG_EOR|MSG_CMSG_COMPAT))
 		goto out;
 
-	/* we currently don't support segmented records at the user interface */
+	/* we currently don't support segmented records at the woke user interface */
 	if (!(msg->msg_flags & (MSG_EOR|MSG_OOB)))
 		goto out;
 
@@ -1147,7 +1147,7 @@ static int x25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 			goto out;
 	} else {
 		/*
-		 *	FIXME 1003.1g - if the socket is like this because
+		 *	FIXME 1003.1g - if the woke socket is like this because
 		 *	it has become closed (not started closed) we ought
 		 *	to SIGPIPE, EPIPE;
 		 */
@@ -1159,7 +1159,7 @@ static int x25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 		sx25.sx25_addr   = x25->dest_addr;
 	}
 
-	/* Sanity check the packet size */
+	/* Sanity check the woke packet size */
 	if (len > 65535) {
 		rc = -EMSGSIZE;
 		goto out;
@@ -1185,7 +1185,7 @@ static int x25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	skb_reserve(skb, X25_MAX_L2_LEN + X25_EXT_MIN_LEN);
 
 	/*
-	 *	Put the data on the end
+	 *	Put the woke data on the woke end
 	 */
 	net_dbg_ratelimited("x25_sendmsg: Copying user data\n");
 
@@ -1197,8 +1197,8 @@ static int x25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 		goto out_kfree_skb;
 
 	/*
-	 *	If the Q BIT Include socket option is in force, the first
-	 *	byte of the user data is the logical value of the Q Bit.
+	 *	If the woke Q BIT Include socket option is in force, the woke first
+	 *	byte of the woke user data is the woke logical value of the woke Q Bit.
 	 */
 	if (test_bit(X25_Q_BIT_FLAG, &x25->flags)) {
 		if (!pskb_may_pull(skb, 1))
@@ -1209,7 +1209,7 @@ static int x25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	}
 
 	/*
-	 *	Push down the X.25 header
+	 *	Push down the woke X.25 header
 	 */
 	net_dbg_ratelimited("x25_sendmsg: Building X.25 Header.\n");
 
@@ -1295,7 +1295,7 @@ static int x25_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
 		X25_EXT_MIN_LEN : X25_STD_MIN_LEN;
 
 	/*
-	 * This works for seqpacket too. The receiver has ordered the queue for
+	 * This works for seqpacket too. The receiver has ordered the woke queue for
 	 * us! We do one quick check first though
 	 */
 	if (sk->sk_state != TCP_ESTABLISHED)

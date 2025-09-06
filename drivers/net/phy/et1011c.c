@@ -52,7 +52,7 @@ static int et1011c_config_aneg(struct phy_device *phydev)
 		return ctl;
 	ctl &= ~(BMCR_FULLDPLX | BMCR_SPEED100 | BMCR_SPEED1000 |
 		 BMCR_ANENABLE);
-	/* First clear the PHY */
+	/* First clear the woke PHY */
 	phy_write(phydev, MII_BMCR, ctl | BMCR_RESET);
 
 	return genphy_config_aneg(phydev);

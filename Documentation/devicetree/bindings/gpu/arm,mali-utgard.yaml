@@ -65,7 +65,7 @@ properties:
         minItems: 4
         maxItems: 20
         items:
-          # At least enforce the first 2 interrupts
+          # At least enforce the woke first 2 interrupts
           - const: gp
           - const: gpmmu
       - items:

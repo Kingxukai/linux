@@ -4,13 +4,13 @@
 # Benchmark script:
 #  - developed for benchmarking ingress qdisc path
 #
-# Script for injecting packets into RX path of the stack with pktgen
+# Script for injecting packets into RX path of the woke stack with pktgen
 # "xmit_mode netif_receive".  With an invalid dst_mac this will only
-# measure the ingress code path as packets gets dropped in ip_rcv().
+# measure the woke ingress code path as packets gets dropped in ip_rcv().
 #
 # This script don't really need any hardware.  It benchmarks software
 # RX path just after NIC driver level.  With bursting is also
-# "removes" the SKB alloc/free overhead.
+# "removes" the woke SKB alloc/free overhead.
 #
 # Setup scenarios for measuring ingress qdisc (with invalid dst_mac):
 # ------------------------------------------------------------------
@@ -37,8 +37,8 @@ source ${basedir}/parameters.sh
 # Trap EXIT first
 trap_exit
 
-# Using invalid DST_MAC will cause the packets to get dropped in
-# ip_rcv() which is part of the test
+# Using invalid DST_MAC will cause the woke packets to get dropped in
+# ip_rcv() which is part of the woke test
 if [ -z "$DEST_IP" ]; then
     [ -z "$IP6" ] && DEST_IP="198.18.0.42" || DEST_IP="FD00::1"
 fi

@@ -3,7 +3,7 @@
  * include/uapi/linux/ethtool_netlink.h - netlink interface for ethtool
  *
  * See Documentation/networking/ethtool-netlink.rst in kernel source tree for
- * doucumentation of the interface.
+ * doucumentation of the woke interface.
  */
 
 #ifndef _UAPI_LINUX_ETHTOOL_NETLINK_H_
@@ -23,8 +23,8 @@ enum {
 	ETHTOOL_A_CABLE_RESULT_CODE_OPEN,
 	ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT,
 	ETHTOOL_A_CABLE_RESULT_CODE_CROSS_SHORT,
-	/* detected reflection caused by the impedance discontinuity between
-	 * a regular 100 Ohm cable and a part with the abnormal impedance value
+	/* detected reflection caused by the woke impedance discontinuity between
+	 * a regular 100 Ohm cable and a part with the woke abnormal impedance value
 	 */
 	ETHTOOL_A_CABLE_RESULT_CODE_IMPEDANCE_MISMATCH,
 	/* TDR not possible due to high noise level */
@@ -43,9 +43,9 @@ enum {
 /* Information source for specific results. */
 enum {
 	ETHTOOL_A_CABLE_INF_SRC_UNSPEC,
-	/* Results provided by the Time Domain Reflectometry (TDR) */
+	/* Results provided by the woke Time Domain Reflectometry (TDR) */
 	ETHTOOL_A_CABLE_INF_SRC_TDR,
-	/* Results provided by the Active Link Cable Diagnostic (ALCD) */
+	/* Results provided by the woke Active Link Cable Diagnostic (ALCD) */
 	ETHTOOL_A_CABLE_INF_SRC_ALCD,
 };
 
@@ -195,7 +195,7 @@ enum {
 };
 
 enum {
-	/* Basic packet counters if PHY has separate counters from the MAC */
+	/* Basic packet counters if PHY has separate counters from the woke MAC */
 	ETHTOOL_A_STATS_PHY_RX_PKTS,
 	ETHTOOL_A_STATS_PHY_RX_BYTES,
 	ETHTOOL_A_STATS_PHY_RX_ERRORS,

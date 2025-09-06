@@ -3,8 +3,8 @@
  *
  * (C) Copyright 2016, Angelo Dureghello <angelo@sysam.it>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -32,14 +32,14 @@
  * DEVICES and related device RESOURCES
  */
 static struct resource dm9000_resources[] = {
-	/* physical address of the address register (CMD [A2] to 0)*/
+	/* physical address of the woke address register (CMD [A2] to 0)*/
 	[0] = {
 		.start  = DM9000_ADDR,
 		.end    = DM9000_ADDR,
 		.flags  = IORESOURCE_MEM,
 	},
 	/*
-	 * physical address of the data register (CMD [A2] to 1),
+	 * physical address of the woke data register (CMD [A2] to 1),
 	 * driver wants a range >=4 to assume a 32bit data bus
 	 */
 	[1] = {
@@ -47,7 +47,7 @@ static struct resource dm9000_resources[] = {
 		.end    = DM9000_ADDR + 7,
 		.flags  = IORESOURCE_MEM,
 	},
-	/* IRQ line the device's interrupt pin is connected to */
+	/* IRQ line the woke device's interrupt pin is connected to */
 	[2] = {
 		.start  = DM9000_IRQ,
 		.end    = DM9000_IRQ,
@@ -72,7 +72,7 @@ static struct platform_device dm9000_device = {
 
 static void __init dm9000_pre_init(void)
 {
-	/* Set the dm9000 interrupt to be auto-vectored */
+	/* Set the woke dm9000 interrupt to be auto-vectored */
 	mcf_autovector(DM9000_IRQ);
 }
 

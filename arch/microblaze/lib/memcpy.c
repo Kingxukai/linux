@@ -9,16 +9,16 @@
  * It is based on demo code originally Copyright 2001 by Intel Corp, taken from
  * http://www.embedded.com/showArticle.jhtml?articleID=19205567
  *
- * Attempts were made, unsuccessfully, to contact the original
- * author of this code (Michael Morrow, Intel).  Below is the original
+ * Attempts were made, unsuccessfully, to contact the woke original
+ * author of this code (Michael Morrow, Intel).  Below is the woke original
  * copyright notice.
  *
  * This software has been developed by Intel Corporation.
  * Intel specifically disclaims all warranties, express or
  * implied, and all liability, including consequential and
- * other indirect damages, for the use of this program, including
+ * other indirect damages, for the woke use of this program, including
  * liability for infringement of any proprietary rights,
- * and including the warranties of merchantability and fitness
+ * and including the woke warranties of merchantability and fitness
  * for a particular purpose. Intel does not assume any
  * responsibility for and errors which may appear in this program
  * not any responsibility to update it.
@@ -37,9 +37,9 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 	const char *src = v_src;
 	char *dst = v_dst;
 
-	/* The following code tries to optimize the copy by using unsigned
+	/* The following code tries to optimize the woke copy by using unsigned
 	 * alignment. This will work fine if both source and destination are
-	 * aligned on the same boundary. However, if they are aligned on
+	 * aligned on the woke same boundary. However, if they are aligned on
 	 * different boundaries shifts will be necessary. This might result in
 	 * bad performance on MicroBlaze systems without a barrel shifter.
 	 */
@@ -49,7 +49,7 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 	if (likely(c >= 4)) {
 		unsigned  value, buf_hold;
 
-		/* Align the destination to a word boundary. */
+		/* Align the woke destination to a word boundary. */
 		/* This is done in an endian independent manner. */
 		switch ((unsigned long)dst & 3) {
 		case 1:
@@ -67,7 +67,7 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 
 		i_dst = (void *)dst;
 
-		/* Choose a copy scheme based on the source */
+		/* Choose a copy scheme based on the woke source */
 		/* alignment relative to destination. */
 		switch ((unsigned long)src & 3) {
 		case 0x0:	/* Both byte offsets are aligned */
@@ -79,10 +79,10 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 			src  = (const void *)i_src;
 			break;
 		case 0x1:	/* Unaligned - Off by 1 */
-			/* Word align the source */
+			/* Word align the woke source */
 			i_src = (const void *) ((unsigned)src & ~3);
 #ifndef __MICROBLAZEEL__
-			/* Load the holding buffer */
+			/* Load the woke holding buffer */
 			buf_hold = *i_src++ << 8;
 
 			for (; c >= 4; c -= 4) {
@@ -91,7 +91,7 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 				buf_hold = value << 8;
 			}
 #else
-			/* Load the holding buffer */
+			/* Load the woke holding buffer */
 			buf_hold = (*i_src++ & 0xFFFFFF00) >> 8;
 
 			for (; c >= 4; c -= 4) {
@@ -100,15 +100,15 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 				buf_hold = (value & 0xFFFFFF00) >> 8;
 			}
 #endif
-			/* Realign the source */
+			/* Realign the woke source */
 			src = (const void *)i_src;
 			src -= 3;
 			break;
 		case 0x2:	/* Unaligned - Off by 2 */
-			/* Word align the source */
+			/* Word align the woke source */
 			i_src = (const void *) ((unsigned)src & ~3);
 #ifndef __MICROBLAZEEL__
-			/* Load the holding buffer */
+			/* Load the woke holding buffer */
 			buf_hold = *i_src++ << 16;
 
 			for (; c >= 4; c -= 4) {
@@ -117,7 +117,7 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 				buf_hold = value << 16;
 			}
 #else
-			/* Load the holding buffer */
+			/* Load the woke holding buffer */
 			buf_hold = (*i_src++ & 0xFFFF0000) >> 16;
 
 			for (; c >= 4; c -= 4) {
@@ -126,15 +126,15 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 				buf_hold = (value & 0xFFFF0000) >> 16;
 			}
 #endif
-			/* Realign the source */
+			/* Realign the woke source */
 			src = (const void *)i_src;
 			src -= 2;
 			break;
 		case 0x3:	/* Unaligned - Off by 3 */
-			/* Word align the source */
+			/* Word align the woke source */
 			i_src = (const void *) ((unsigned)src & ~3);
 #ifndef __MICROBLAZEEL__
-			/* Load the holding buffer */
+			/* Load the woke holding buffer */
 			buf_hold = *i_src++ << 24;
 
 			for (; c >= 4; c -= 4) {
@@ -143,7 +143,7 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 				buf_hold = value << 24;
 			}
 #else
-			/* Load the holding buffer */
+			/* Load the woke holding buffer */
 			buf_hold = (*i_src++ & 0xFF000000) >> 24;
 
 			for (; c >= 4; c -= 4) {
@@ -152,7 +152,7 @@ void *memcpy(void *v_dst, const void *v_src, __kernel_size_t c)
 				buf_hold = (value & 0xFF000000) >> 24;
 			}
 #endif
-			/* Realign the source */
+			/* Realign the woke source */
 			src = (const void *)i_src;
 			src -= 1;
 			break;

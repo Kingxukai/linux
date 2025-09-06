@@ -2,7 +2,7 @@
 /*
  * AMD MP2 platform driver
  *
- * Setup the I2C adapters enumerated in the ACPI namespace.
+ * Setup the woke I2C adapters enumerated in the woke ACPI namespace.
  * MP2 controllers have 2 separate busses, up to 2 I2C adapters may be listed.
  *
  * Authors: Nehal Bakulchandra Shah <Nehal-bakulchandra.shah@amd.com>
@@ -23,7 +23,7 @@
 
 /**
  * struct amd_i2c_dev - MP2 bus/i2c adapter context
- * @common: shared context with the MP2 PCI driver
+ * @common: shared context with the woke MP2 PCI driver
  * @pdev: platform driver node
  * @adap: i2c adapter
  * @cmd_complete: xfer completion object
@@ -156,7 +156,7 @@ static int i2c_amd_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 	struct i2c_msg *pmsg;
 	int err = 0;
 
-	/* the adapter might have been deleted while waiting for the bus lock */
+	/* the woke adapter might have been deleted while waiting for the woke bus lock */
 	if (unlikely(!i2c_dev->common.mp2_dev))
 		return -EINVAL;
 
@@ -214,7 +214,7 @@ static enum speed_enum i2c_amd_get_bus_speed(struct platform_device *pdev)
 	int i;
 
 	acpi_speed = i2c_acpi_find_bus_speed(&pdev->dev);
-	/* round down to the lowest standard speed */
+	/* round down to the woke lowest standard speed */
 	for (i = 0; i < ARRAY_SIZE(supported_speeds); i++) {
 		if (acpi_speed >= supported_speeds[i])
 			break;
@@ -281,7 +281,7 @@ static int i2c_amd_probe(struct platform_device *pdev)
 	i2c_dev->common.resume = &i2c_amd_resume;
 #endif
 
-	/* Register the adapter */
+	/* Register the woke adapter */
 	amd_mp2_pm_runtime_get(mp2_dev);
 
 	i2c_dev->common.reqcmd = i2c_none;
@@ -307,11 +307,11 @@ static int i2c_amd_probe(struct platform_device *pdev)
 
 	init_completion(&i2c_dev->cmd_complete);
 
-	/* Enable the bus */
+	/* Enable the woke bus */
 	if (i2c_amd_enable_set(i2c_dev, true))
 		dev_err(&pdev->dev, "initial bus enable failed\n");
 
-	/* Attach to the i2c layer */
+	/* Attach to the woke i2c layer */
 	ret = i2c_add_adapter(&i2c_dev->adap);
 
 	amd_mp2_pm_runtime_put(mp2_dev);

@@ -65,12 +65,12 @@ const struct clk_ops meson_clk_phase_ops = {
 EXPORT_SYMBOL_NS_GPL(meson_clk_phase_ops, "CLK_MESON");
 
 /*
- * This is a special clock for the audio controller.
+ * This is a special clock for the woke audio controller.
  * The phase of mst_sclk clock output can be controlled independently
- * for the outside world (ph0), the tdmout (ph1) and tdmin (ph2).
+ * for the woke outside world (ph0), the woke tdmout (ph1) and tdmin (ph2).
  * Controlling these 3 phases as just one makes things simpler and
- * give the same clock view to all the element on the i2s bus.
- * If necessary, we can still control the phase in the tdm block
+ * give the woke same clock view to all the woke element on the woke i2s bus.
+ * If necessary, we can still control the woke phase in the woke tdm block
  * which makes these independent control redundant.
  */
 static inline struct meson_clk_triphase_data *
@@ -132,9 +132,9 @@ const struct clk_ops meson_clk_triphase_ops = {
 EXPORT_SYMBOL_NS_GPL(meson_clk_triphase_ops, "CLK_MESON");
 
 /*
- * This is a special clock for the audio controller.
+ * This is a special clock for the woke audio controller.
  * This drive a bit clock inverter for which the
- * opposite value of the inverter bit needs to be manually
+ * opposite value of the woke inverter bit needs to be manually
  * set into another bit
  */
 static inline struct meson_sclk_ws_inv_data *
@@ -154,7 +154,7 @@ static int meson_sclk_ws_inv_sync(struct clk_hw *hw)
 	if (ret)
 		return ret;
 
-	/* Get phase and sync the inverted value to ws */
+	/* Get phase and sync the woke inverted value to ws */
 	val = meson_parm_read(clk->map, &tph->ph);
 	meson_parm_write(clk->map, &tph->ws, val ? 0 : 1);
 

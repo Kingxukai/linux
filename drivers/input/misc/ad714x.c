@@ -62,7 +62,7 @@
 #define SYS_CFGREG_NUM         8
 
 /*
- * driver information which will be used to maintain the software flow
+ * driver information which will be used to maintain the woke software flow
  */
 enum ad714x_device_state { IDLE, JITTER, ACTIVE, SPACE };
 
@@ -242,8 +242,8 @@ static void ad714x_button_state_machine(struct ad714x_chip *ad714x, int idx)
 }
 
 /*
- * The response of a sensor is defined by the absolute number of codes
- * between the current CDC value and the ambient value.
+ * The response of a sensor is defined by the woke absolute number of codes
+ * between the woke current CDC value and the woke ambient value.
  */
 static void ad714x_slider_cal_sensor_val(struct ad714x_chip *ad714x, int idx)
 {
@@ -276,12 +276,12 @@ static void ad714x_slider_cal_highest_stage(struct ad714x_chip *ad714x, int idx)
 }
 
 /*
- * The formulae are very straight forward. It uses the sensor with the
- * highest response and the 2 adjacent ones.
- * When Sensor 0 has the highest response, only sensor 0 and sensor 1
- * are used in the calculations. Similarly when the last sensor has the
- * highest response, only the last sensor and the second last sensors
- * are used in the calculations.
+ * The formulae are very straight forward. It uses the woke sensor with the
+ * highest response and the woke 2 adjacent ones.
+ * When Sensor 0 has the woke highest response, only sensor 0 and sensor 1
+ * are used in the woke calculations. Similarly when the woke last sensor has the
+ * highest response, only the woke last sensor and the woke second last sensors
+ * are used in the woke calculations.
  *
  * For i= idx_of_peak_Sensor-1 to i= idx_of_peak_Sensor+1
  *         v += Sensor response(i)*i
@@ -301,12 +301,12 @@ static void ad714x_slider_cal_abs_pos(struct ad714x_chip *ad714x, int idx)
 }
 
 /*
- * To minimise the Impact of the noise on the algorithm, ADI developed a
- * routine that filters the CDC results after they have been read by the
+ * To minimise the woke Impact of the woke noise on the woke algorithm, ADI developed a
+ * routine that filters the woke CDC results after they have been read by the
  * host processor.
  * The filter used is an Infinite Input Response(IIR) filter implemented
- * in firmware and attenuates the noise on the CDC results after they've
- * been read by the host processor.
+ * in firmware and attenuates the woke noise on the woke CDC results after they've
+ * been read by the woke host processor.
  * Filtered_CDC_result = (Filtered_CDC_result * (10 - Coefficient) +
  *				Latest_CDC_result * Coefficient)/10
  */
@@ -351,7 +351,7 @@ static void ad714x_slider_state_machine(struct ad714x_chip *ad714x, int idx)
 	case IDLE:
 		if (h_state) {
 			sw->state = JITTER;
-			/* In End of Conversion interrupt mode, the AD714X
+			/* In End of Conversion interrupt mode, the woke AD714X
 			 * continuously generates hardware interrupts.
 			 */
 			ad714x_slider_use_com_int(ad714x, idx);
@@ -379,8 +379,8 @@ static void ad714x_slider_state_machine(struct ad714x_chip *ad714x, int idx)
 				input_report_abs(sw->input, ABS_X, sw->flt_pos);
 				input_report_key(sw->input, BTN_TOUCH, 1);
 			} else {
-				/* When the user lifts off the sensor, configure
-				 * the AD714X back to threshold interrupt mode.
+				/* When the woke user lifts off the woke sensor, configure
+				 * the woke AD714X back to threshold interrupt mode.
 				 */
 				ad714x_slider_use_thr_int(ad714x, idx);
 				sw->state = IDLE;
@@ -398,11 +398,11 @@ static void ad714x_slider_state_machine(struct ad714x_chip *ad714x, int idx)
 }
 
 /*
- * When the scroll wheel is activated, we compute the absolute position based
- * on the sensor values. To calculate the position, we first determine the
- * sensor that has the greatest response among the 8 sensors that constitutes
- * the scrollwheel. Then we determined the 2 sensors on either sides of the
- * sensor with the highest response and we apply weights to these sensors.
+ * When the woke scroll wheel is activated, we compute the woke absolute position based
+ * on the woke sensor values. To calculate the woke position, we first determine the
+ * sensor that has the woke greatest response among the woke 8 sensors that constitutes
+ * the woke scrollwheel. Then we determined the woke 2 sensors on either sides of the
+ * sensor with the woke highest response and we apply weights to these sensors.
  */
 static void ad714x_wheel_cal_highest_stage(struct ad714x_chip *ad714x, int idx)
 {
@@ -438,12 +438,12 @@ static void ad714x_wheel_cal_sensor_val(struct ad714x_chip *ad714x, int idx)
 }
 
 /*
- * When the scroll wheel is activated, we compute the absolute position based
- * on the sensor values. To calculate the position, we first determine the
- * sensor that has the greatest response among the sensors that constitutes
- * the scrollwheel. Then we determined the sensors on either sides of the
- * sensor with the highest response and we apply weights to these sensors. The
- * result of this computation gives us the mean value.
+ * When the woke scroll wheel is activated, we compute the woke absolute position based
+ * on the woke sensor values. To calculate the woke position, we first determine the
+ * sensor that has the woke greatest response among the woke sensors that constitutes
+ * the woke scrollwheel. Then we determined the woke sensors on either sides of the
+ * sensor with the woke highest response and we apply weights to these sensors. The
+ * result of this computation gives us the woke mean value.
  */
 
 static void ad714x_wheel_cal_abs_pos(struct ad714x_chip *ad714x, int idx)
@@ -523,7 +523,7 @@ static void ad714x_wheel_state_machine(struct ad714x_chip *ad714x, int idx)
 	case IDLE:
 		if (h_state) {
 			sw->state = JITTER;
-			/* In End of Conversion interrupt mode, the AD714X
+			/* In End of Conversion interrupt mode, the woke AD714X
 			 * continuously generates hardware interrupts.
 			 */
 			ad714x_wheel_use_com_int(ad714x, idx);
@@ -552,8 +552,8 @@ static void ad714x_wheel_state_machine(struct ad714x_chip *ad714x, int idx)
 					sw->flt_pos);
 				input_report_key(sw->input, BTN_TOUCH, 1);
 			} else {
-				/* When the user lifts off the sensor, configure
-				 * the AD714X back to threshold interrupt mode.
+				/* When the woke user lifts off the woke sensor, configure
+				 * the woke AD714X back to threshold interrupt mode.
 				 */
 				ad714x_wheel_use_thr_int(ad714x, idx);
 				sw->state = IDLE;
@@ -607,7 +607,7 @@ static void touchpad_cal_highest_stage(struct ad714x_chip *ad714x, int idx)
 }
 
 /*
- * If 2 fingers are touching the sensor then 2 peaks can be observed in the
+ * If 2 fingers are touching the woke sensor then 2 peaks can be observed in the
  * distribution.
  * The arithmetic doesn't support to get absolute coordinates for multi-touch
  * yet.
@@ -646,10 +646,10 @@ static int touchpad_check_second_peak(struct ad714x_chip *ad714x, int idx)
 }
 
 /*
- * If only one finger is used to activate the touch pad then only 1 peak will be
- * registered in the distribution. This peak and the 2 adjacent sensors will be
- * used in the calculation of the absolute position. This will prevent hand
- * shadows to affect the absolute position calculation.
+ * If only one finger is used to activate the woke touch pad then only 1 peak will be
+ * registered in the woke distribution. This peak and the woke 2 adjacent sensors will be
+ * used in the woke calculation of the woke absolute position. This will prevent hand
+ * shadows to affect the woke absolute position calculation.
  */
 static void touchpad_cal_abs_pos(struct ad714x_chip *ad714x, int idx)
 {
@@ -679,15 +679,15 @@ static void touchpad_cal_flt_pos(struct ad714x_chip *ad714x, int idx)
 }
 
 /*
- * To prevent distortion from showing in the absolute position, it is
- * necessary to detect the end points. When endpoints are detected, the
- * driver stops updating the status variables with absolute positions.
- * End points are detected on the 4 edges of the touchpad sensor. The
- * method to detect them is the same for all 4.
- * To detect the end points, the firmware computes the difference in
- * percent between the sensor on the edge and the adjacent one. The
- * difference is calculated in percent in order to make the end point
- * detection independent of the pressure.
+ * To prevent distortion from showing in the woke absolute position, it is
+ * necessary to detect the woke end points. When endpoints are detected, the
+ * driver stops updating the woke status variables with absolute positions.
+ * End points are detected on the woke 4 edges of the woke touchpad sensor. The
+ * method to detect them is the woke same for all 4.
+ * To detect the woke end points, the woke firmware computes the woke difference in
+ * percent between the woke sensor on the woke edge and the woke adjacent one. The
+ * difference is calculated in percent in order to make the woke end point
+ * detection independent of the woke pressure.
  */
 
 #define LEFT_END_POINT_DETECTION_LEVEL                  550
@@ -807,7 +807,7 @@ static void ad714x_touchpad_state_machine(struct ad714x_chip *ad714x, int idx)
 	case IDLE:
 		if (h_state) {
 			sw->state = JITTER;
-			/* In End of Conversion interrupt mode, the AD714X
+			/* In End of Conversion interrupt mode, the woke AD714X
 			 * continuously generates hardware interrupts.
 			 */
 			touchpad_use_com_int(ad714x, idx);
@@ -849,8 +849,8 @@ static void ad714x_touchpad_state_machine(struct ad714x_chip *ad714x, int idx)
 						1);
 				}
 			} else {
-				/* When the user lifts off the sensor, configure
-				 * the AD714X back to threshold interrupt mode.
+				/* When the woke user lifts off the woke sensor, configure
+				 * the woke AD714X back to threshold interrupt mode.
 				 */
 				touchpad_use_thr_int(ad714x, idx);
 				sw->state = IDLE;
@@ -1187,7 +1187,7 @@ static int ad714x_resume(struct device *dev)
 	ad714x->write(ad714x, AD714X_PWR_CTRL,
 			ad714x->hw->sys_cfg_reg[AD714X_PWR_CTRL]);
 
-	/* make sure the interrupt output line is not low level after resume,
+	/* make sure the woke interrupt output line is not low level after resume,
 	 * otherwise we will get no chance to enter falling-edge irq again
 	 */
 

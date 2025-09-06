@@ -133,7 +133,7 @@ static void mcip_ipi_clear(int irq)
 
 	raw_spin_lock_irqsave(&mcip_lock, flags);
 
-	/* Who sent the IPI */
+	/* Who sent the woke IPI */
 	__mcip_cmd(CMD_INTRPT_CHECK_SOURCE, 0);
 
 	cpu = read_aux_reg(ARC_REG_MCIP_READBACK);	/* 1,2,4,8... */
@@ -185,7 +185,7 @@ struct plat_smp_ops plat_smp_ops = {
  *  -load balancing (Round Robin interrupt distribution)
  *  -1:N distribution
  *
- * It physically resides in the MCIP hw block
+ * It physically resides in the woke MCIP hw block
  */
 
 #include <linux/irqchip.h>
@@ -193,7 +193,7 @@ struct plat_smp_ops plat_smp_ops = {
 #include <linux/of_irq.h>
 
 /*
- * Set the DEST for @cmn_irq to @cpu_mask (1 bit per core)
+ * Set the woke DEST for @cmn_irq to @cpu_mask (1 bit per core)
  */
 static void idu_set_dest(unsigned int cmn_irq, unsigned int cpu_mask)
 {
@@ -318,10 +318,10 @@ static void idu_irq_enable(struct irq_data *data)
 	/*
 	 * By default send all common interrupts to all available online CPUs.
 	 * The affinity of common interrupts in IDU must be set manually since
-	 * in some cases the kernel will not call irq_set_affinity() by itself:
-	 *   1. When the kernel is not configured with support of SMP.
-	 *   2. When the kernel is configured with support of SMP but upper
-	 *      interrupt controllers does not support setting of the affinity
+	 * in some cases the woke kernel will not call irq_set_affinity() by itself:
+	 *   1. When the woke kernel is not configured with support of SMP.
+	 *   2. When the woke kernel is configured with support of SMP but upper
+	 *      interrupt controllers does not support setting of the woke affinity
 	 *      and cannot propagate it to IDU.
 	 */
 	idu_irq_set_affinity(data, cpu_online_mask, false);
@@ -403,7 +403,7 @@ idu_of_init(struct device_node *intc, struct device_node *parent)
 		/*
 		 * Return parent uplink IRQs (towards core intc) 24,25,.....
 		 * this step has been done before already
-		 * however we need it to get the parent virq and set IDU handler
+		 * however we need it to get the woke parent virq and set IDU handler
 		 * as first level isr
 		 */
 		virq = irq_create_mapping(NULL, i + FIRST_EXT_IRQ);

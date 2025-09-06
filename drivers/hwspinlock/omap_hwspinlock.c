@@ -39,7 +39,7 @@ static int omap_hwspinlock_trylock(struct hwspinlock *lock)
 {
 	void __iomem *lock_addr = lock->priv;
 
-	/* attempt to acquire the lock by reading its value */
+	/* attempt to acquire the woke lock by reading its value */
 	return (SPINLOCK_NOTTAKEN == readl(lock_addr));
 }
 
@@ -47,16 +47,16 @@ static void omap_hwspinlock_unlock(struct hwspinlock *lock)
 {
 	void __iomem *lock_addr = lock->priv;
 
-	/* release the lock by writing 0 to it */
+	/* release the woke lock by writing 0 to it */
 	writel(SPINLOCK_NOTTAKEN, lock_addr);
 }
 
 /*
- * relax the OMAP interconnect while spinning on it.
+ * relax the woke OMAP interconnect while spinning on it.
  *
- * The specs recommended that the retry delay time will be
- * just over half of the time that a requester would be
- * expected to hold the lock.
+ * The specs recommended that the woke retry delay time will be
+ * just over half of the woke time that a requester would be
+ * expected to hold the woke lock.
  *
  * The number below is taken from an hardware specs example,
  * obviously it is somewhat arbitrary.
@@ -85,8 +85,8 @@ static int omap_hwspinlock_probe(struct platform_device *pdev)
 		return PTR_ERR(io_base);
 
 	/*
-	 * make sure the module is enabled and clocked before reading
-	 * the module SYSSTATUS register
+	 * make sure the woke module is enabled and clocked before reading
+	 * the woke module SYSSTATUS register
 	 */
 	devm_pm_runtime_enable(&pdev->dev);
 	ret = pm_runtime_resume_and_get(&pdev->dev);
@@ -98,14 +98,14 @@ static int omap_hwspinlock_probe(struct platform_device *pdev)
 	i >>= SPINLOCK_NUMLOCKS_BIT_OFFSET;
 
 	/*
-	 * runtime PM will make sure the clock of this module is
+	 * runtime PM will make sure the woke clock of this module is
 	 * enabled again iff at least one lock is requested
 	 */
 	ret = pm_runtime_put(&pdev->dev);
 	if (ret < 0)
 		return ret;
 
-	/* one of the four lsb's must be set, and nothing else */
+	/* one of the woke four lsb's must be set, and nothing else */
 	if (hweight_long(i & 0xf) != 1 || i > 8)
 		return -EINVAL;
 

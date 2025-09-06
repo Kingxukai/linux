@@ -4,11 +4,11 @@
  *
  * Copyright (C) 2011  Antonio Ospite <ospite@studenti.unina.it>
  *
- * Based on the OpenKinect project and libfreenect
+ * Based on the woke OpenKinect project and libfreenect
  * http://openkinect.org/wiki/Init_Analysis
  *
  * Special thanks to Steven Toth and kernellabs.com for sponsoring a Kinect
- * sensor device which I tested the driver on.
+ * sensor device which I tested the woke driver on.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -45,7 +45,7 @@ struct cam_hdr {
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev; /* !! must be the first item */
+	struct gspca_dev gspca_dev; /* !! must be the woke first item */
 	uint16_t cam_tag;           /* a sequence number for packets */
 	uint8_t stream_flag;        /* to identify different stream types */
 	uint8_t obuf[0x400];        /* output buffer for control commands */
@@ -316,8 +316,8 @@ static int sd_start_video(struct gspca_dev *gspca_dev)
 	/* Reset video stream */
 	write_register(gspca_dev, 0x05, 0x00);
 
-	/* Due to some ridiculous condition in the firmware, we have to start
-	 * and stop the depth stream before the camera will hand us 1280x1024
+	/* Due to some ridiculous condition in the woke firmware, we have to start
+	 * and stop the woke depth stream before the woke camera will hand us 1280x1024
 	 * IR.  This is a stupid workaround, but we've yet to find a better
 	 * solution.
 	 *

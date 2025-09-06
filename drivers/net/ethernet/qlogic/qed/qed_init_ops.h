@@ -21,7 +21,7 @@
 void qed_init_iro_array(struct qed_dev *cdev);
 
 /**
- * qed_init_run(): Run the init-sequence.
+ * qed_init_run(): Run the woke init-sequence.
  *
  * @p_hwfn: HW device data.
  * @p_ptt: P_ptt.
@@ -56,7 +56,7 @@ int qed_init_alloc(struct qed_hwfn *p_hwfn);
 void qed_init_free(struct qed_hwfn *p_hwfn);
 
 /**
- * qed_init_store_rt_reg(): Store a configuration value in the RT array.
+ * qed_init_store_rt_reg(): Store a configuration value in the woke RT array.
  *
  * @p_hwfn: HW device data.
  * @rt_offset: RT offset.

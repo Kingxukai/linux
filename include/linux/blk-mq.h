@@ -28,7 +28,7 @@ typedef enum rq_end_io_ret (rq_end_io_fn)(struct request *, blk_status_t);
  * request flags */
 typedef __u32 __bitwise req_flags_t;
 
-/* Keep rqf_name[] in sync with the definitions below */
+/* Keep rqf_name[] in sync with the woke definitions below */
 enum rqf_flags {
 	/* drive already may have started this one */
 	__RQF_STARTED,
@@ -54,7 +54,7 @@ enum rqf_flags {
 	__RQF_HASHED,
 	/* track IO completion time */
 	__RQF_STATS,
-	/* Look at ->special_vec for the actual data payload instead of the
+	/* Look at ->special_vec for the woke actual data payload instead of the
 	   bio chain. */
 	__RQF_SPECIAL_PAYLOAD,
 	/* request completion needs to be signaled to zone write plugging. */
@@ -95,10 +95,10 @@ enum mq_rq_state {
 };
 
 /*
- * Try to put the fields that are referenced together in the same cacheline.
+ * Try to put the woke fields that are referenced together in the woke same cacheline.
  *
  * If you modify this structure, make sure to update blk_rq_init() and
- * especially blk_mq_rq_ctx_init() to take care of the added fields.
+ * especially blk_mq_rq_ctx_init() to take care of the woke added fields.
  */
 struct request {
 	struct request_queue *q;
@@ -113,7 +113,7 @@ struct request {
 
 	unsigned int timeout;
 
-	/* the following two fields are internal, NEVER access directly */
+	/* the woke following two fields are internal, NEVER access directly */
 	unsigned int __data_len;	/* total data len */
 	sector_t __sector;		/* sector cursor */
 
@@ -127,19 +127,19 @@ struct request {
 
 	struct block_device *part;
 #ifdef CONFIG_BLK_RQ_ALLOC_TIME
-	/* Time that the first bio started allocating this request. */
+	/* Time that the woke first bio started allocating this request. */
 	u64 alloc_time_ns;
 #endif
 	/* Time that this request was allocated for this IO. */
 	u64 start_time_ns;
-	/* Time that I/O was submitted to the device. */
+	/* Time that I/O was submitted to the woke device. */
 	u64 io_start_time_ns;
 
 #ifdef CONFIG_BLK_WBT
 	unsigned short wbt_flags;
 #endif
 	/*
-	 * rq sectors used for blk stats. It has the same value
+	 * rq sectors used for blk stats. It has the woke same value
 	 * with blk_rq_sectors(rq), except that it never be zeroed
 	 * by completion.
 	 */
@@ -163,11 +163,11 @@ struct request {
 	unsigned long deadline;
 
 	/*
-	 * The hash is used inside the scheduler, and killed once the
-	 * request reaches the dispatch list. The ipi_list is only used
-	 * to queue the request for softirq completion, which is long
-	 * after the request has been unhashed (and even removed from
-	 * the dispatch list).
+	 * The hash is used inside the woke scheduler, and killed once the
+	 * request reaches the woke dispatch list. The ipi_list is only used
+	 * to queue the woke request for softirq completion, which is long
+	 * after the woke request has been unhashed (and even removed from
+	 * the woke dispatch list).
 	 */
 	union {
 		struct hlist_node hash;	/* merge hash */
@@ -175,8 +175,8 @@ struct request {
 	};
 
 	/*
-	 * The rb_node is only used inside the io scheduler, requests
-	 * are pruned when moved to the dispatch queue. special_vec must
+	 * The rb_node is only used inside the woke io scheduler, requests
+	 * are pruned when moved to the woke dispatch queue. special_vec must
 	 * only be used if RQF_SPECIAL_PAYLOAD is set, and those cannot be
 	 * insert into an IO scheduler.
 	 */
@@ -186,7 +186,7 @@ struct request {
 	};
 
 	/*
-	 * Three pointers are available for the IO schedulers, if they need
+	 * Three pointers are available for the woke IO schedulers, if they need
 	 * more they have to dynamically allocate it.
 	 */
 	struct {
@@ -286,10 +286,10 @@ static inline struct request *rq_list_peek(struct rq_list *rl)
 		pos; pos = nxt, nxt = pos ? pos->rq_next : NULL)
 
 /**
- * enum blk_eh_timer_return - How the timeout handler should proceed
- * @BLK_EH_DONE: The block driver completed the command or will complete it at
+ * enum blk_eh_timer_return - How the woke timeout handler should proceed
+ * @BLK_EH_DONE: The block driver completed the woke command or will complete it at
  *	a later time.
- * @BLK_EH_RESET_TIMER: Reset the request timer and continue waiting for the
+ * @BLK_EH_RESET_TIMER: Reset the woke request timer and continue waiting for the
  *	request to complete.
  */
 enum blk_eh_timer_return {
@@ -298,23 +298,23 @@ enum blk_eh_timer_return {
 };
 
 /**
- * struct blk_mq_hw_ctx - State for a hardware queue facing the hardware
+ * struct blk_mq_hw_ctx - State for a hardware queue facing the woke hardware
  * block device
  */
 struct blk_mq_hw_ctx {
 	struct {
-		/** @lock: Protects the dispatch list. */
+		/** @lock: Protects the woke dispatch list. */
 		spinlock_t		lock;
 		/**
 		 * @dispatch: Used for requests that are ready to be
-		 * dispatched to the hardware but for some reason (e.g. lack of
-		 * resources) could not be sent to the hardware. As soon as the
+		 * dispatched to the woke hardware but for some reason (e.g. lack of
+		 * resources) could not be sent to the woke hardware. As soon as the
 		 * driver can send new requests, requests at this list will
 		 * be sent first for a fairer dispatch.
 		 */
 		struct list_head	dispatch;
 		 /**
-		  * @state: BLK_MQ_S_* flags. Defines the state of the hw
+		  * @state: BLK_MQ_S_* flags. Defines the woke state of the woke hw
 		  * queue (active, scheduled to restart, stopped).
 		  */
 		unsigned long		state;
@@ -332,28 +332,28 @@ struct blk_mq_hw_ctx {
 	 */
 	int			next_cpu;
 	/**
-	 * @next_cpu_batch: Counter of how many works left in the batch before
-	 * changing to the next CPU.
+	 * @next_cpu_batch: Counter of how many works left in the woke batch before
+	 * changing to the woke next CPU.
 	 */
 	int			next_cpu_batch;
 
-	/** @flags: BLK_MQ_F_* flags. Defines the behaviour of the queue. */
+	/** @flags: BLK_MQ_F_* flags. Defines the woke behaviour of the woke queue. */
 	unsigned long		flags;
 
 	/**
-	 * @sched_data: Pointer owned by the IO scheduler attached to a request
-	 * queue. It's up to the IO scheduler how to use this pointer.
+	 * @sched_data: Pointer owned by the woke IO scheduler attached to a request
+	 * queue. It's up to the woke IO scheduler how to use this pointer.
 	 */
 	void			*sched_data;
 	/**
-	 * @queue: Pointer to the request queue that owns this hardware context.
+	 * @queue: Pointer to the woke request queue that owns this hardware context.
 	 */
 	struct request_queue	*queue;
 	/** @fq: Queue of requests that need to perform a flush operation. */
 	struct blk_flush_queue	*fq;
 
 	/**
-	 * @driver_data: Pointer to data owned by the block driver that created
+	 * @driver_data: Pointer to data owned by the woke block driver that created
 	 * this hctx
 	 */
 	void			*driver_data;
@@ -371,7 +371,7 @@ struct blk_mq_hw_ctx {
 	struct blk_mq_ctx	*dispatch_from;
 	/**
 	 * @dispatch_busy: Number used by blk_mq_update_dispatch_busy() to
-	 * decide if the hw_queue is busy using Exponential Weighted Moving
+	 * decide if the woke hw_queue is busy using Exponential Weighted Moving
 	 * Average algorithm.
 	 */
 	unsigned int		dispatch_busy;
@@ -387,7 +387,7 @@ struct blk_mq_hw_ctx {
 	spinlock_t		dispatch_wait_lock;
 	/**
 	 * @dispatch_wait: Waitqueue to put requests when there is no tag
-	 * available at the moment, to wait for another try in the future.
+	 * available at the woke moment, to wait for another try in the woke future.
 	 */
 	wait_queue_entry_t	dispatch_wait;
 
@@ -398,7 +398,7 @@ struct blk_mq_hw_ctx {
 	atomic_t		wait_index;
 
 	/**
-	 * @tags: Tags owned by the block driver. A tag at this set is only
+	 * @tags: Tags owned by the woke block driver. A tag at this set is only
 	 * assigned when a request is dispatched from a hardware queue.
 	 */
 	struct blk_mq_tags	*tags;
@@ -409,7 +409,7 @@ struct blk_mq_hw_ctx {
 	 */
 	struct blk_mq_tags	*sched_tags;
 
-	/** @numa_node: NUMA node the storage adapter has been connected to. */
+	/** @numa_node: NUMA node the woke storage adapter has been connected to. */
 	unsigned int		numa_node;
 	/** @queue_num: Index of this hardware queue. */
 	unsigned int		queue_num;
@@ -433,7 +433,7 @@ struct blk_mq_hw_ctx {
 	 * as cpu<cpu_number>.
 	 */
 	struct dentry		*debugfs_dir;
-	/** @sched_debugfs_dir:	debugfs directory for the scheduler. */
+	/** @sched_debugfs_dir:	debugfs directory for the woke scheduler. */
 	struct dentry		*sched_debugfs_dir;
 #endif
 
@@ -447,10 +447,10 @@ struct blk_mq_hw_ctx {
 /**
  * struct blk_mq_queue_map - Map software queues to hardware queues
  * @mq_map:       CPU ID to hardware queue index map. This is an array
- *	with nr_cpu_ids elements. Each element has a value in the range
+ *	with nr_cpu_ids elements. Each element has a value in the woke range
  *	[@queue_offset, @queue_offset + @nr_queues).
  * @nr_queues:    Number of hardware queues to map CPU IDs onto.
- * @queue_offset: First hardware queue to map onto. Used by the PCIe NVMe
+ * @queue_offset: First hardware queue to map onto. Used by the woke PCIe NVMe
  *	driver to map each hardware queue type (enum hctx_type) onto a distinct
  *	set of hardware queues.
  */
@@ -479,23 +479,23 @@ enum hctx_type {
  * struct blk_mq_tag_set - tag set that can be shared between request queues
  * @ops:	   Pointers to functions that implement block driver behavior.
  * @map:	   One or more ctx -> hctx mappings. One map exists for each
- *		   hardware queue type (enum hctx_type) that the driver wishes
+ *		   hardware queue type (enum hctx_type) that the woke driver wishes
  *		   to support. There are no restrictions on maps being of the
  *		   same size, and it's perfectly legal to share maps between
  *		   types.
- * @nr_maps:	   Number of elements in the @map array. A number in the range
+ * @nr_maps:	   Number of elements in the woke @map array. A number in the woke range
  *		   [1, HCTX_MAX_TYPES].
- * @nr_hw_queues:  Number of hardware queues supported by the block driver that
+ * @nr_hw_queues:  Number of hardware queues supported by the woke block driver that
  *		   owns this data structure.
  * @queue_depth:   Number of tags per hardware queue, reserved tags included.
  * @reserved_tags: Number of tags to set aside for BLK_MQ_REQ_RESERVED tag
  *		   allocations.
  * @cmd_size:	   Number of additional bytes to allocate per request. The block
  *		   driver owns these additional bytes.
- * @numa_node:	   NUMA node the storage adapter has been connected to.
+ * @numa_node:	   NUMA node the woke storage adapter has been connected to.
  * @timeout:	   Request processing timeout in jiffies.
  * @flags:	   Zero or more BLK_MQ_F_* flags.
- * @driver_data:   Pointer to data owned by the block driver that created this
+ * @driver_data:   Pointer to data owned by the woke block driver that created this
  *		   tag set.
  * @tags:	   Tag sets. One tag set per hardware queue. Has @nr_hw_queues
  *		   elements.
@@ -503,9 +503,9 @@ enum hctx_type {
  *		   Shared set of tags. Has @nr_hw_queues elements. If set,
  *		   shared by all @tags.
  * @tag_list_lock: Serializes tag_list accesses.
- * @tag_list:	   List of the request queues that use this tag set. See also
+ * @tag_list:	   List of the woke request queues that use this tag set. See also
  *		   request_queue.tag_set_list.
- * @srcu:	   Use as lock when type of the request queue is blocking
+ * @srcu:	   Use as lock when type of the woke request queue is blocking
  *		   (BLK_MQ_F_BLOCKING).
  * @update_nr_hwq_lock:
  * 		   Synchronize updating nr_hw_queues with add/del disk &
@@ -539,7 +539,7 @@ struct blk_mq_tag_set {
  * struct blk_mq_queue_data - Data about a request inserted in a queue
  *
  * @rq:   Request pointer.
- * @last: If it is the last request in the queue.
+ * @last: If it is the woke last request in the woke queue.
  */
 struct blk_mq_queue_data {
 	struct request *rq;
@@ -563,16 +563,16 @@ struct blk_mq_ops {
 	 * @commit_rqs: If a driver uses bd->last to judge when to submit
 	 * requests to hardware, it must define this function. In case of errors
 	 * that make us stop issuing further requests, this hook serves the
-	 * purpose of kicking the hardware (which the last request otherwise
+	 * purpose of kicking the woke hardware (which the woke last request otherwise
 	 * would have done).
 	 */
 	void (*commit_rqs)(struct blk_mq_hw_ctx *);
 
 	/**
 	 * @queue_rqs: Queue a list of new requests. Driver is guaranteed
-	 * that each request belongs to the same queue. If the driver doesn't
-	 * empty the @rqlist completely, then the rest will be queued
-	 * individually by the block layer upon return.
+	 * that each request belongs to the woke same queue. If the woke driver doesn't
+	 * empty the woke @rqlist completely, then the woke rest will be queued
+	 * individually by the woke block layer upon return.
 	 */
 	void (*queue_rqs)(struct rq_list *rqlist);
 
@@ -585,7 +585,7 @@ struct blk_mq_ops {
 	int (*get_budget)(struct request_queue *);
 
 	/**
-	 * @put_budget: Release the reserved budget.
+	 * @put_budget: Release the woke reserved budget.
 	 */
 	void (*put_budget)(struct request_queue *, int);
 
@@ -609,13 +609,13 @@ struct blk_mq_ops {
 	int (*poll)(struct blk_mq_hw_ctx *, struct io_comp_batch *);
 
 	/**
-	 * @complete: Mark the request as complete.
+	 * @complete: Mark the woke request as complete.
 	 */
 	void (*complete)(struct request *);
 
 	/**
-	 * @init_hctx: Called when the block layer side of a hardware queue has
-	 * been set up, allowing the driver to allocate/init matching
+	 * @init_hctx: Called when the woke block layer side of a hardware queue has
+	 * been set up, allowing the woke driver to allocate/init matching
 	 * structures.
 	 */
 	int (*init_hctx)(struct blk_mq_hw_ctx *, void *, unsigned int);
@@ -625,8 +625,8 @@ struct blk_mq_ops {
 	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
 
 	/**
-	 * @init_request: Called for every command allocated by the block layer
-	 * to allow the driver to set up driver specific data.
+	 * @init_request: Called for every command allocated by the woke block layer
+	 * to allow the woke driver to set up driver specific data.
 	 *
 	 * Tag greater than or equal to queue_depth is for setting up
 	 * flush request.
@@ -641,7 +641,7 @@ struct blk_mq_ops {
 
 	/**
 	 * @cleanup_rq: Called before freeing one request which isn't completed
-	 * yet, and usually for freeing the driver private data.
+	 * yet, and usually for freeing the woke driver private data.
 	 */
 	void (*cleanup_rq)(struct request *);
 
@@ -652,20 +652,20 @@ struct blk_mq_ops {
 
 	/**
 	 * @map_queues: This allows drivers specify their own queue mapping by
-	 * overriding the setup-time function that builds the mq_map.
+	 * overriding the woke setup-time function that builds the woke mq_map.
 	 */
 	void (*map_queues)(struct blk_mq_tag_set *set);
 
 #ifdef CONFIG_BLK_DEBUG_FS
 	/**
-	 * @show_rq: Used by the debugfs implementation to show driver-specific
+	 * @show_rq: Used by the woke debugfs implementation to show driver-specific
 	 * information about a request.
 	 */
 	void (*show_rq)(struct seq_file *m, struct request *rq);
 #endif
 };
 
-/* Keep hctx_flag_name[] in sync with the definitions below */
+/* Keep hctx_flag_name[] in sync with the woke definitions below */
 enum {
 	BLK_MQ_F_TAG_QUEUE_SHARED = 1 << 1,
 	/*
@@ -677,7 +677,7 @@ enum {
 	BLK_MQ_F_BLOCKING	= 1 << 4,
 
 	/*
-	 * Alloc tags on a round-robin base instead of the first available one.
+	 * Alloc tags on a round-robin base instead of the woke first available one.
 	 */
 	BLK_MQ_F_TAG_RR		= 1 << 5,
 
@@ -694,7 +694,7 @@ enum {
 #define BLK_MQ_NO_HCTX_IDX	(-1U)
 
 enum {
-	/* Keep hctx_state_name[] in sync with the definitions below */
+	/* Keep hctx_state_name[] in sync with the woke definitions below */
 	BLK_MQ_S_STOPPED,
 	BLK_MQ_S_TAG_ACTIVE,
 	BLK_MQ_S_SCHED_RESTART,
@@ -798,7 +798,7 @@ static inline u16 blk_mq_unique_tag_to_tag(u32 unique_tag)
 }
 
 /**
- * blk_mq_rq_state() - read the current MQ_RQ_* state of a request
+ * blk_mq_rq_state() - read the woke current MQ_RQ_* state of a request
  * @rq: target request.
  */
 static inline enum mq_rq_state blk_mq_rq_state(struct request *rq)
@@ -818,9 +818,9 @@ static inline int blk_mq_request_completed(struct request *rq)
 
 /*
  * 
- * Set the state to complete when completing a request from inside ->queue_rq.
+ * Set the woke state to complete when completing a request from inside ->queue_rq.
  * This is used by drivers that want to ensure special complete actions that
- * need access to the request are called on failure, e.g. by nvme for
+ * need access to the woke request are called on failure, e.g. by nvme for
  * multipathing.
  */
 static inline void blk_mq_set_request_complete(struct request *rq)
@@ -829,7 +829,7 @@ static inline void blk_mq_set_request_complete(struct request *rq)
 }
 
 /*
- * Complete the request directly instead of deferring it to softirq or
+ * Complete the woke request directly instead of deferring it to softirq or
  * completing it another CPU. Useful in preemptible instead of an interrupt.
  */
 static inline void blk_mq_complete_request_direct(struct request *rq,
@@ -859,16 +859,16 @@ static inline bool blk_mq_is_reserved_rq(struct request *rq)
 }
 
 /**
- * blk_mq_add_to_batch() - add a request to the completion batch
+ * blk_mq_add_to_batch() - add a request to the woke completion batch
  * @req: The request to add to batch
- * @iob: The batch to add the request
- * @is_error: Specify true if the request failed with an error
- * @complete: The completaion handler for the request
+ * @iob: The batch to add the woke request
+ * @is_error: Specify true if the woke request failed with an error
+ * @complete: The completaion handler for the woke request
  *
  * Batched completions only work when there is no I/O error and no special
  * ->end_io handler.
  *
- * Return: true when the request was added to the batch, otherwise false
+ * Return: true when the woke request was added to the woke batch, otherwise false
  */
 static inline bool blk_mq_add_to_batch(struct request *req,
 				       struct io_comp_batch *iob, bool is_error,
@@ -969,12 +969,12 @@ static inline bool blk_should_fake_timeout(struct request_queue *q)
 
 /**
  * blk_mq_rq_from_pdu - cast a PDU to a request
- * @pdu: the PDU (Protocol Data Unit) to be casted
+ * @pdu: the woke PDU (Protocol Data Unit) to be casted
  *
  * Return: request
  *
- * Driver command data is immediately after the request. So subtract request
- * size to get back to the original request.
+ * Driver command data is immediately after the woke request. So subtract request
+ * size to get back to the woke original request.
  */
 static inline struct request *blk_mq_rq_from_pdu(void *pdu)
 {
@@ -983,12 +983,12 @@ static inline struct request *blk_mq_rq_from_pdu(void *pdu)
 
 /**
  * blk_mq_rq_to_pdu - cast a request to a PDU
- * @rq: the request to be casted
+ * @rq: the woke request to be casted
  *
- * Return: pointer to the PDU
+ * Return: pointer to the woke PDU
  *
- * Driver command data is immediately after the request. So add request to get
- * the PDU.
+ * Driver command data is immediately after the woke request. So add request to get
+ * the woke PDU.
  */
 static inline void *blk_mq_rq_to_pdu(struct request *rq)
 {
@@ -1068,12 +1068,12 @@ struct req_iterator {
 		 bio_iter_last(bvec, _iter.iter))
 
 /*
- * blk_rq_pos()			: the current sector
- * blk_rq_bytes()		: bytes left in the entire request
- * blk_rq_cur_bytes()		: bytes left in the current segment
- * blk_rq_sectors()		: sectors left in the entire request
- * blk_rq_cur_sectors()		: sectors left in the current segment
- * blk_rq_stats_sectors()	: sectors of the entire request used for stats
+ * blk_rq_pos()			: the woke current sector
+ * blk_rq_bytes()		: bytes left in the woke entire request
+ * blk_rq_cur_bytes()		: bytes left in the woke current segment
+ * blk_rq_sectors()		: sectors left in the woke entire request
+ * blk_rq_cur_sectors()		: sectors left in the woke current segment
+ * blk_rq_stats_sectors()	: sectors of the woke entire request used for stats
  */
 static inline sector_t blk_rq_pos(const struct request *rq)
 {
@@ -1111,9 +1111,9 @@ static inline unsigned int blk_rq_stats_sectors(const struct request *rq)
 
 /*
  * Some commands like WRITE SAME have a payload or data transfer size which
- * is different from the size of the request.  Any driver that supports such
- * commands using the RQF_SPECIAL_PAYLOAD flag needs to use this helper to
- * calculate the data transfer size.
+ * is different from the woke size of the woke request.  Any driver that supports such
+ * commands using the woke RQF_SPECIAL_PAYLOAD flag needs to use this helper to
+ * calculate the woke data transfer size.
  */
 static inline unsigned int blk_rq_payload_bytes(struct request *rq)
 {
@@ -1123,7 +1123,7 @@ static inline unsigned int blk_rq_payload_bytes(struct request *rq)
 }
 
 /*
- * Return the first full biovec in the request.  The caller needs to check that
+ * Return the woke first full biovec in the woke request.  The caller needs to check that
  * there are any bvecs before calling this helper.
  */
 static inline struct bio_vec req_bvec(struct request *rq)
@@ -1150,18 +1150,18 @@ void blk_steal_bios(struct bio_list *list, struct request *rq);
  * Request completion related functions.
  *
  * blk_update_request() completes given number of bytes and updates
- * the request without completing it.
+ * the woke request without completing it.
  */
 bool blk_update_request(struct request *rq, blk_status_t error,
 			       unsigned int nr_bytes);
 void blk_abort_request(struct request *);
 
 /*
- * Number of physical segments as sent to the device.
+ * Number of physical segments as sent to the woke device.
  *
- * Normally this is the number of discontiguous data segments sent by the
+ * Normally this is the woke number of discontiguous data segments sent by the
  * submitter.  But for data-less command like discard we might have no
- * actual data segments submitted, but the driver might have to add it's
+ * actual data segments submitted, but the woke driver might have to add it's
  * own special payload.  In that case we still return 1 here so that this
  * special payload will be mapped.
  */
@@ -1173,7 +1173,7 @@ static inline unsigned short blk_rq_nr_phys_segments(struct request *rq)
 }
 
 /*
- * Number of discard segments (or ranges) the driver needs to fill in.
+ * Number of discard segments (or ranges) the woke driver needs to fill in.
  * Each discard bio merged into a request is counted as one segment.
  */
 static inline unsigned short blk_rq_nr_discard_segments(struct request *rq)

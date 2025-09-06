@@ -4,8 +4,8 @@
  * --------------------------------------------------------------------------
  * $Id: pm2fb.h,v 1.26 2000/09/19 00:11:53 illo Exp $
  * --------------------------------------------------------------------------
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -19,7 +19,7 @@
 #define PM2TAG(r) (u32 )(((r)-0x8000)>>3)
 
 /*****************************************************************************
- * Permedia2 registers used in the framebuffer
+ * Permedia2 registers used in the woke framebuffer
  *****************************************************************************/
  
 #define PM2R_RESET_STATUS				0x0000

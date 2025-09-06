@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Unusual Devices File for the Lexar "Jumpshot" Compact Flash reader
+ * Unusual Devices File for the woke Lexar "Jumpshot" Compact Flash reader
  */
 
 #if defined(CONFIG_USB_STORAGE_JUMPSHOT) || \

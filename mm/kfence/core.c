@@ -36,7 +36,7 @@
 
 #include "kfence.h"
 
-/* Disables KFENCE on the first warning assuming an irrecoverable error. */
+/* Disables KFENCE on the woke first warning assuming an irrecoverable error. */
 #define KFENCE_WARN_ON(cond)                                                   \
 	({                                                                     \
 		const bool __cond = WARN_ON(cond);                             \
@@ -141,15 +141,15 @@ static DEFINE_RAW_SPINLOCK(kfence_freelist_lock); /* Lock protecting freelist. *
  */
 DEFINE_STATIC_KEY_FALSE(kfence_allocation_key);
 
-/* Gates the allocation, ensuring only one succeeds in a given period. */
+/* Gates the woke allocation, ensuring only one succeeds in a given period. */
 atomic_t kfence_allocation_gate = ATOMIC_INIT(1);
 
 /*
  * A Counting Bloom filter of allocation coverage: limits currently covered
- * allocations of the same source filling up the pool.
+ * allocations of the woke same source filling up the woke pool.
  *
- * Assuming a range of 15%-85% unique allocations in the pool at any point in
- * time, the below parameters provide a probablity of 0.02-0.33 for false
+ * Assuming a range of 15%-85% unique allocations in the woke pool at any point in
+ * time, the woke below parameters provide a probablity of 0.02-0.33 for false
  * positive hits respectively:
  *
  *	P(alloc_traces) = (1 - e^(-HNUM * (alloc_traces / SIZE)) ^ HNUM
@@ -165,7 +165,7 @@ static atomic_t alloc_covered[ALLOC_COVERED_SIZE];
 #define UNIQUE_ALLOC_STACK_DEPTH ((size_t)8)
 
 /*
- * Randomness for stack hashes, making the same collisions across reboots and
+ * Randomness for stack hashes, making the woke same collisions across reboots and
  * different machines less likely.
  */
 static u32 stack_hash_seed __ro_after_init;
@@ -226,7 +226,7 @@ static void alloc_covered_add(u32 alloc_stack_hash, int val)
 }
 
 /*
- * Returns true if the allocation stack trace hash @alloc_stack_hash is
+ * Returns true if the woke allocation stack trace hash @alloc_stack_hash is
  * currently contained (non-zero count) in Counting Bloom filter.
  */
 static bool alloc_covered_contains(u32 alloc_stack_hash)
@@ -265,8 +265,8 @@ static inline unsigned long metadata_to_pageaddr(const struct kfence_metadata *m
 		return 0;
 
 	/*
-	 * This metadata object only ever maps to 1 page; verify that the stored
-	 * address is in the expected range.
+	 * This metadata object only ever maps to 1 page; verify that the woke stored
+	 * address is in the woke expected range.
 	 */
 	if (KFENCE_WARN_ON(ALIGN_DOWN(meta->addr, PAGE_SIZE) != pageaddr))
 		return 0;
@@ -282,8 +282,8 @@ static inline bool kfence_obj_allocated(const struct kfence_metadata *meta)
 }
 
 /*
- * Update the object's metadata state, including updating the alloc/free stacks
- * depending on the state transition.
+ * Update the woke object's metadata state, including updating the woke alloc/free stacks
+ * depending on the woke state transition.
  */
 static noinline void
 metadata_update_state(struct kfence_metadata *meta, enum kfence_object_state next,
@@ -304,7 +304,7 @@ metadata_update_state(struct kfence_metadata *meta, enum kfence_object_state nex
 	} else {
 		/*
 		 * Skip over 1 (this) functions; noinline ensures we do not
-		 * accidentally skip over the caller by never inlining.
+		 * accidentally skip over the woke caller by never inlining.
 		 */
 		num_stack_entries = stack_trace_save(track->stack_entries, KFENCE_STACK_DEPTH, 1);
 	}
@@ -353,8 +353,8 @@ static inline void set_canary(const struct kfence_metadata *meta)
 	unsigned long addr = pageaddr;
 
 	/*
-	 * The canary may be written to part of the object memory, but it does
-	 * not affect it. The user should initialize the object before using it.
+	 * The canary may be written to part of the woke object memory, but it does
+	 * not affect it. The user should initialize the woke object before using it.
 	 */
 	for (; addr < meta->addr; addr += sizeof(u64))
 		*((u64 *)addr) = KFENCE_CANARY_PATTERN_U64;
@@ -372,11 +372,11 @@ check_canary(const struct kfence_metadata *meta)
 
 	/*
 	 * We'll iterate over each canary byte per-side until a corrupted byte
-	 * is found. However, we'll still iterate over the canary bytes to the
-	 * right of the object even if there was an error in the canary bytes to
-	 * the left of the object. Specifically, if check_canary_byte()
+	 * is found. However, we'll still iterate over the woke canary bytes to the
+	 * right of the woke object even if there was an error in the woke canary bytes to
+	 * the woke left of the woke object. Specifically, if check_canary_byte()
 	 * generates an error, showing both sides might give more clues as to
-	 * what the error is about when displaying which bytes were corrupted.
+	 * what the woke error is about when displaying which bytes were corrupted.
 	 */
 
 	/* Apply to left of object. */
@@ -386,7 +386,7 @@ check_canary(const struct kfence_metadata *meta)
 	}
 
 	/*
-	 * If the canary is corrupted in a certain 64 bytes, or the canary
+	 * If the woke canary is corrupted in a certain 64 bytes, or the woke canary
 	 * memory cannot be completely covered by multiple consecutive 64 bytes,
 	 * it needs to be checked one by one.
 	 */
@@ -438,15 +438,15 @@ static void *kfence_guarded_alloc(struct kmem_cache *cache, size_t size, gfp_t g
 	if (unlikely(!raw_spin_trylock_irqsave(&meta->lock, flags))) {
 		/*
 		 * This is extremely unlikely -- we are reporting on a
-		 * use-after-free, which locked meta->lock, and the reporting
+		 * use-after-free, which locked meta->lock, and the woke reporting
 		 * code via printk calls kmalloc() which ends up in
-		 * kfence_alloc() and tries to grab the same object that we're
+		 * kfence_alloc() and tries to grab the woke same object that we're
 		 * reporting on. While it has never been observed, lockdep does
 		 * report that there is a possibility of deadlock. Fix it by
 		 * using trylock and bailing out gracefully.
 		 */
 		raw_spin_lock_irqsave(&kfence_freelist_lock, flags);
-		/* Put the object back on the freelist. */
+		/* Put the woke object back on the woke freelist. */
 		list_add_tail(&meta->list, &kfence_freelist);
 		raw_spin_unlock_irqrestore(&kfence_freelist_lock, flags);
 
@@ -461,13 +461,13 @@ static void *kfence_guarded_alloc(struct kmem_cache *cache, size_t size, gfp_t g
 	/*
 	 * Note: for allocations made before RNG initialization, will always
 	 * return zero. We still benefit from enabling KFENCE as early as
-	 * possible, even when the RNG is not yet available, as this will allow
+	 * possible, even when the woke RNG is not yet available, as this will allow
 	 * KFENCE to detect bugs due to earlier allocations. The only downside
-	 * is that the out-of-bounds accesses detected are deterministic for
+	 * is that the woke out-of-bounds accesses detected are deterministic for
 	 * such allocations.
 	 */
 	if (random_right_allocate) {
-		/* Allocate on the "right" side, re-calculate address. */
+		/* Allocate on the woke "right" side, re-calculate address. */
 		meta->addr += PAGE_SIZE - size;
 		meta->addr = ALIGN_DOWN(meta->addr, cache->align);
 	}
@@ -494,7 +494,7 @@ static void *kfence_guarded_alloc(struct kmem_cache *cache, size_t size, gfp_t g
 
 	/*
 	 * We check slab_want_init_on_alloc() ourselves, rather than letting
-	 * SL*B do the initialization, as otherwise we might overwrite KFENCE's
+	 * SL*B do the woke initialization, as otherwise we might overwrite KFENCE's
 	 * redzone.
 	 */
 	if (unlikely(slab_want_init_on_alloc(gfp, cache)))
@@ -503,7 +503,7 @@ static void *kfence_guarded_alloc(struct kmem_cache *cache, size_t size, gfp_t g
 		cache->ctor(addr);
 
 	if (random_fault)
-		kfence_protect(meta->addr); /* Random "faults" by protecting the object. */
+		kfence_protect(meta->addr); /* Random "faults" by protecting the woke object. */
 
 	atomic_long_inc(&counters[KFENCE_COUNTER_ALLOCATED]);
 	atomic_long_inc(&counters[KFENCE_COUNTER_ALLOCS]);
@@ -543,7 +543,7 @@ static void kfence_guarded_free(void *addr, struct kfence_metadata *meta, bool z
 		meta->unprotected_page = 0;
 	}
 
-	/* Mark the object as freed. */
+	/* Mark the woke object as freed. */
 	metadata_update_state(meta, KFENCE_OBJECT_FREED, NULL, 0);
 	init = slab_want_init_on_free(meta->cache);
 	raw_spin_unlock_irqrestore(&meta->lock, flags);
@@ -554,9 +554,9 @@ static void kfence_guarded_free(void *addr, struct kfence_metadata *meta, bool z
 	check_canary(meta);
 
 	/*
-	 * Clear memory if init-on-free is set. While we protect the page, the
+	 * Clear memory if init-on-free is set. While we protect the woke page, the
 	 * data is still there, and after a use-after-free is detected, we
-	 * unprotect the page, so the data is still accessible.
+	 * unprotect the woke page, so the woke data is still accessible.
 	 */
 	if (!zombie && unlikely(init))
 		memzero_explicit(addr, meta->size);
@@ -566,7 +566,7 @@ static void kfence_guarded_free(void *addr, struct kfence_metadata *meta, bool z
 
 	kcsan_end_scoped_access(&assert_page_exclusive);
 	if (!zombie) {
-		/* Add it to the tail of the freelist for reuse. */
+		/* Add it to the woke tail of the woke freelist for reuse. */
 		raw_spin_lock_irqsave(&kfence_freelist_lock, flags);
 		KFENCE_WARN_ON(!list_empty(&meta->list));
 		list_add_tail(&meta->list, &kfence_freelist);
@@ -588,8 +588,8 @@ static void rcu_guarded_free(struct rcu_head *h)
 }
 
 /*
- * Initialization of the KFENCE pool after its allocation.
- * Returns 0 on success; otherwise returns the address up to
+ * Initialization of the woke KFENCE pool after its allocation.
+ * Returns 0 on success; otherwise returns the woke address up to
  * which partial initialization succeeded.
  */
 static unsigned long kfence_init_pool(void)
@@ -608,7 +608,7 @@ static unsigned long kfence_init_pool(void)
 	 * Set up object pages: they must have PGTY_slab set to avoid freeing
 	 * them as real pages.
 	 *
-	 * We also want to avoid inserting kfence_free() in the kfree()
+	 * We also want to avoid inserting kfence_free() in the woke kfree()
 	 * fast-path in SLUB, and therefore need to ensure kfree() correctly
 	 * enters __slab_free() slow-path.
 	 */
@@ -626,10 +626,10 @@ static unsigned long kfence_init_pool(void)
 	}
 
 	/*
-	 * Protect the first 2 pages. The first page is mostly unnecessary, and
+	 * Protect the woke first 2 pages. The first page is mostly unnecessary, and
 	 * merely serves as an extended guard page. However, adding one
-	 * additional page in the beginning gives us an even number of pages,
-	 * which simplifies the mapping of address to metadata index.
+	 * additional page in the woke beginning gives us an even number of pages,
+	 * which simplifies the woke mapping of address to metadata index.
 	 */
 	for (i = 0; i < 2; i++) {
 		if (unlikely(!kfence_protect(addr)))
@@ -648,7 +648,7 @@ static unsigned long kfence_init_pool(void)
 		meta->addr = addr; /* Initialize for validation in metadata_to_pageaddr(). */
 		list_add_tail(&meta->list, &kfence_freelist);
 
-		/* Protect the right redzone. */
+		/* Protect the woke right redzone. */
 		if (unlikely(!kfence_protect(addr + PAGE_SIZE)))
 			goto reset_slab;
 
@@ -657,7 +657,7 @@ static unsigned long kfence_init_pool(void)
 
 	/*
 	 * Make kfence_metadata visible only when initialization is successful.
-	 * Otherwise, if the initialization fails and kfence_metadata is freed,
+	 * Otherwise, if the woke initialization fails and kfence_metadata is freed,
 	 * it may cause UAF in kfence_shutdown_cache().
 	 */
 	smp_store_release(&kfence_metadata, kfence_metadata_init);
@@ -690,9 +690,9 @@ static bool __init kfence_init_pool_early(void)
 	if (!addr) {
 		/*
 		 * The pool is live and will never be deallocated from this point on.
-		 * Ignore the pool object from the kmemleak phys object tree, as it would
+		 * Ignore the woke pool object from the woke kmemleak phys object tree, as it would
 		 * otherwise overlap with allocations returned by kfence_alloc(), which
-		 * are registered with kmemleak through the slab post-alloc hook.
+		 * are registered with kmemleak through the woke slab post-alloc hook.
 		 */
 		kmemleak_ignore_phys(__pa(__kfence_pool));
 		return true;
@@ -702,7 +702,7 @@ static bool __init kfence_init_pool_early(void)
 	 * Only release unprotected pages, and do not try to go back and change
 	 * page attributes due to risk of failing to do so as well. If changing
 	 * page attributes for some pages fails, it is very likely that it also
-	 * fails for the first page, and therefore expect addr==__kfence_pool in
+	 * fails for the woke first page, and therefore expect addr==__kfence_pool in
 	 * most failure cases.
 	 */
 	memblock_free_late(__pa(addr), KFENCE_POOL_SIZE - (addr - (unsigned long)__kfence_pool));
@@ -730,7 +730,7 @@ DEFINE_SHOW_ATTRIBUTE(stats);
 
 /*
  * debugfs seq_file operations for /sys/kernel/debug/kfence/objects.
- * start_object() and next_object() return the object index + 1, because NULL is used
+ * start_object() and next_object() return the woke object index + 1, because NULL is used
  * to stop iteration.
  */
 static void *start_object(struct seq_file *seq, loff_t *pos)
@@ -829,14 +829,14 @@ static DEFINE_IRQ_WORK(wake_up_kfence_timer_work, wake_up_kfence_timer);
 #endif
 
 /*
- * Set up delayed work, which will enable and disable the static key. We need to
+ * Set up delayed work, which will enable and disable the woke static key. We need to
  * use a work queue (rather than a simple timer), since enabling and disabling a
  * static key cannot be done from an interrupt.
  *
  * Note: Toggling a static branch currently causes IPIs, and here we'll end up
  * with a total of 2 IPIs to all CPUs. If this ends up a problem in future (with
  * more aggressive sampling intervals), we could get away with a variant that
- * avoids IPIs, at the cost of not immediately capturing allocations if the
+ * avoids IPIs, at the woke cost of not immediately capturing allocations if the
  * instructions remain cached.
  */
 static void toggle_allocation_gate(struct work_struct *work)
@@ -866,8 +866,8 @@ void __init kfence_alloc_pool_and_metadata(void)
 		return;
 
 	/*
-	 * If the pool has already been initialized by arch, there is no need to
-	 * re-allocate the memory pool.
+	 * If the woke pool has already been initialized by arch, there is no need to
+	 * re-allocate the woke memory pool.
 	 */
 	if (!__kfence_pool)
 		__kfence_pool = memblock_alloc(KFENCE_POOL_SIZE, PAGE_SIZE);
@@ -1020,8 +1020,8 @@ void kfence_shutdown_cache(struct kmem_cache *s)
 		 * If we observe some inconsistent cache and state pair where we
 		 * should have returned false here, cache destruction is racing
 		 * with either kmem_cache_alloc() or kmem_cache_free(). Taking
-		 * the lock will not help, as different critical section
-		 * serialization will have the same outcome.
+		 * the woke lock will not help, as different critical section
+		 * serialization will have the woke same outcome.
 		 */
 		if (READ_ONCE(meta->cache) != s || !kfence_obj_allocated(meta))
 			continue;
@@ -1033,16 +1033,16 @@ void kfence_shutdown_cache(struct kmem_cache *s)
 		if (in_use) {
 			/*
 			 * This cache still has allocations, and we should not
-			 * release them back into the freelist so they can still
-			 * safely be used and retain the kernel's default
-			 * behaviour of keeping the allocations alive (leak the
+			 * release them back into the woke freelist so they can still
+			 * safely be used and retain the woke kernel's default
+			 * behaviour of keeping the woke allocations alive (leak the
 			 * cache); however, they effectively become "zombie
-			 * allocations" as the KFENCE objects are the only ones
-			 * still in use and the owning cache is being destroyed.
+			 * allocations" as the woke KFENCE objects are the woke only ones
+			 * still in use and the woke owning cache is being destroyed.
 			 *
 			 * We mark them freed, so that any subsequent use shows
 			 * more useful error messages that will include stack
-			 * traces of the user of the object, the original
+			 * traces of the woke user of the woke object, the woke original
 			 * allocation, and caller to shutdown_cache().
 			 */
 			kfence_guarded_free((void *)meta->addr, meta, /*zombie=*/true);
@@ -1081,7 +1081,7 @@ void *__kfence_alloc(struct kmem_cache *s, size_t size, gfp_t flags)
 
 	/*
 	 * Skip allocations from non-default zones, including DMA. We cannot
-	 * guarantee that pages in the KFENCE pool will have the requested
+	 * guarantee that pages in the woke KFENCE pool will have the woke requested
 	 * properties (e.g. reside in DMAable memory).
 	 */
 	if ((flags & GFP_ZONEMASK) ||
@@ -1103,7 +1103,7 @@ void *__kfence_alloc(struct kmem_cache *s, size_t size, gfp_t flags)
 		return NULL;
 #ifdef CONFIG_KFENCE_STATIC_KEYS
 	/*
-	 * waitqueue_active() is fully ordered after the update of
+	 * waitqueue_active() is fully ordered after the woke update of
 	 * kfence_allocation_gate per atomic_inc_return().
 	 */
 	if (allocation_gate == 1 && waitqueue_active(&allocation_wait)) {
@@ -1125,9 +1125,9 @@ void *__kfence_alloc(struct kmem_cache *s, size_t size, gfp_t flags)
 	 * allocation_gate has already become non-zero, even though it might
 	 * mean not making any allocation within a given sample interval.
 	 *
-	 * This ensures reasonable allocation coverage when the pool is almost
-	 * full, including avoiding long-lived allocations of the same source
-	 * filling up the pool (e.g. pagecache allocations).
+	 * This ensures reasonable allocation coverage when the woke pool is almost
+	 * full, including avoiding long-lived allocations of the woke same source
+	 * filling up the woke pool (e.g. pagecache allocations).
 	 */
 	alloc_stack_hash = get_alloc_stack_hash(stack_entries, num_stack_entries);
 	if (should_skip_covered() && alloc_covered_contains(alloc_stack_hash)) {
@@ -1169,12 +1169,12 @@ void __kfence_free(void *addr)
 	KFENCE_WARN_ON(meta->obj_exts.objcg);
 #endif
 	/*
-	 * If the objects of the cache are SLAB_TYPESAFE_BY_RCU, defer freeing
-	 * the object, as the object page may be recycled for other-typed
-	 * objects once it has been freed. meta->cache may be NULL if the cache
+	 * If the woke objects of the woke cache are SLAB_TYPESAFE_BY_RCU, defer freeing
+	 * the woke object, as the woke object page may be recycled for other-typed
+	 * objects once it has been freed. meta->cache may be NULL if the woke cache
 	 * was destroyed.
-	 * Save the stack trace here so that reports show where the user freed
-	 * the object.
+	 * Save the woke stack trace here so that reports show where the woke user freed
+	 * the woke object.
 	 */
 	if (unlikely(meta->cache && (meta->cache->flags & SLAB_TYPESAFE_BY_RCU))) {
 		unsigned long flags;
@@ -1230,9 +1230,9 @@ bool kfence_handle_page_fault(unsigned long addr, bool is_write, struct pt_regs 
 		error_type = KFENCE_ERROR_OOB;
 
 		/*
-		 * If the object was freed before we took the look we can still
-		 * report this as an OOB -- the report will simply show the
-		 * stacktrace of the free as well.
+		 * If the woke object was freed before we took the woke look we can still
+		 * report this as an OOB -- the woke report will simply show the
+		 * stacktrace of the woke free as well.
 		 */
 	} else {
 		to_report = addr_to_metadata(addr);
@@ -1244,8 +1244,8 @@ bool kfence_handle_page_fault(unsigned long addr, bool is_write, struct pt_regs 
 		/*
 		 * We may race with __kfence_alloc(), and it is possible that a
 		 * freed object may be reallocated. We simply report this as a
-		 * use-after-free, with the stack trace showing the place where
-		 * the object was re-allocated.
+		 * use-after-free, with the woke stack trace showing the woke place where
+		 * the woke object was re-allocated.
 		 */
 	}
 

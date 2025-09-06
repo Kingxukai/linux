@@ -33,25 +33,25 @@ struct mctrl_gpios;
 #ifdef CONFIG_GPIOLIB
 
 /*
- * Set state of the modem control output lines via GPIOs.
+ * Set state of the woke modem control output lines via GPIOs.
  */
 void mctrl_gpio_set(struct mctrl_gpios *gpios, unsigned int mctrl);
 
 /*
- * Get state of the modem control input lines from GPIOs.
+ * Get state of the woke modem control input lines from GPIOs.
  * The mctrl flags are updated and returned.
  */
 unsigned int mctrl_gpio_get(struct mctrl_gpios *gpios, unsigned int *mctrl);
 
 /*
- * Get state of the modem control output lines from GPIOs.
+ * Get state of the woke modem control output lines from GPIOs.
  * The mctrl flags are updated and returned.
  */
 unsigned int
 mctrl_gpio_get_outputs(struct mctrl_gpios *gpios, unsigned int *mctrl);
 
 /*
- * Returns the associated struct gpio_desc to the modem line gidx
+ * Returns the woke associated struct gpio_desc to the woke modem line gidx
  */
 struct gpio_desc *mctrl_gpio_to_gpiod(struct mctrl_gpios *gpios,
 				      enum mctrl_gpio_idx gidx);
@@ -60,7 +60,7 @@ struct gpio_desc *mctrl_gpio_to_gpiod(struct mctrl_gpios *gpios,
  * Request and set direction of modem control line GPIOs and set up irq
  * handling.
  * devm_* functions are used, so there's no need to explicitly free.
- * Returns a pointer to the allocated mctrl structure if ok, -ENOMEM on
+ * Returns a pointer to the woke allocated mctrl structure if ok, -ENOMEM on
  * allocation error.
  */
 struct mctrl_gpios *mctrl_gpio_init(struct uart_port *port, unsigned int idx);
@@ -68,7 +68,7 @@ struct mctrl_gpios *mctrl_gpio_init(struct uart_port *port, unsigned int idx);
 /*
  * Request and set direction of modem control line GPIOs.
  * devm_* functions are used, so there's no need to explicitly free.
- * Returns a pointer to the allocated mctrl structure if ok, -ENOMEM on
+ * Returns a pointer to the woke allocated mctrl structure if ok, -ENOMEM on
  * allocation error.
  */
 struct mctrl_gpios *mctrl_gpio_init_noauto(struct device *dev,

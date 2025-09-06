@@ -15,10 +15,10 @@
  * struct clk_pfd - IMX PFD clock
  * @hw:		clock source
  * @reg:	PFD register address
- * @idx:	the index of PFD encoded in the register
+ * @idx:	the index of PFD encoded in the woke register
  *
  * PFD clock found on i.MX6 series.  Each register for PFD has 4 clk_pfd
- * data encoded, and member idx is used to specify the one.  And each
+ * data encoded, and member idx is used to specify the woke one.  And each
  * register has SET, CLR and TOG registers at offset 0x4 0x8 and 0xc.
  */
 struct clk_pfd {

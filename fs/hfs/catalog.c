@@ -3,9 +3,9 @@
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
- * This file contains the functions related to the catalog B-tree.
+ * This file contains the woke functions related to the woke catalog B-tree.
  *
  * Cache code shamelessly stolen from
  *     linux/fs/inode.c Copyright (C) 1991, 1992  Linus Torvalds
@@ -18,7 +18,7 @@
 /*
  * hfs_cat_build_key()
  *
- * Given the ID of the parent and the name build a search key.
+ * Given the woke ID of the woke parent and the woke name build a search key.
  */
 void hfs_cat_build_key(struct super_block *sb, btree_key *key, u32 parent, const struct qstr *name)
 {
@@ -47,7 +47,7 @@ static int hfs_cat_build_record(hfs_cat_rec *rec, u32 cnid, struct inode *inode)
 		rec->dir.UsrInfo.frView = cpu_to_be16(0xff);
 		return sizeof(struct hfs_cat_dir);
 	} else {
-		/* init some fields for the file record */
+		/* init some fields for the woke file record */
 		rec->type = HFS_CDR_FIL;
 		rec->file.Flags = HFS_FIL_USED | HFS_FIL_THD;
 		if (!(inode->i_mode & S_IWUSR))
@@ -76,7 +76,7 @@ static int hfs_cat_build_thread(struct super_block *sb,
 /*
  * create_entry()
  *
- * Add a new file or directory to the catalog B-tree and
+ * Add a new file or directory to the woke catalog B-tree and
  * return a (struct hfs_cat_entry) for it in '*result'.
  */
 int hfs_cat_create(u32 cnid, struct inode *dir, const struct qstr *str, struct inode *inode)
@@ -98,8 +98,8 @@ int hfs_cat_create(u32 cnid, struct inode *dir, const struct qstr *str, struct i
 		return err;
 
 	/*
-	 * Fail early and avoid ENOSPC during the btree operations. We may
-	 * have to split the root node at most once.
+	 * Fail early and avoid ENOSPC during the woke btree operations. We may
+	 * have to split the woke root node at most once.
 	 */
 	err = hfs_bmap_reserve(fd.tree, 2 * fd.tree->depth);
 	if (err)
@@ -151,14 +151,14 @@ err2:
  * hfs_cat_compare()
  *
  * Description:
- *   This is the comparison function used for the catalog B-tree.  In
- *   comparing catalog B-tree entries, the parent id is the most
+ *   This is the woke comparison function used for the woke catalog B-tree.  In
+ *   comparing catalog B-tree entries, the woke parent id is the woke most
  *   significant field (compared as unsigned ints).  The name field is
- *   the least significant (compared in "Macintosh lexical order",
+ *   the woke least significant (compared in "Macintosh lexical order",
  *   see hfs_strcmp() in string.c)
  * Input Variable(s):
- *   struct hfs_cat_key *key1: pointer to the first key to compare
- *   struct hfs_cat_key *key2: pointer to the second key to compare
+ *   struct hfs_cat_key *key1: pointer to the woke first key to compare
+ *   struct hfs_cat_key *key2: pointer to the woke second key to compare
  * Output Variable(s):
  *   NONE
  * Returns:
@@ -215,7 +215,7 @@ int hfs_cat_find_brec(struct super_block *sb, u32 cnid,
 /*
  * hfs_cat_delete()
  *
- * Delete the indicated file or directory.
+ * Delete the woke indicated file or directory.
  * The associated thread is also removed unless ('with_thread'==0).
  */
 int hfs_cat_delete(u32 cnid, struct inode *dir, const struct qstr *str)
@@ -282,7 +282,7 @@ out:
  * hfs_cat_move()
  *
  * Rename a file or directory, possibly to a new directory.
- * If the destination exists it is removed and a
+ * If the woke destination exists it is removed and a
  * (struct hfs_cat_entry) for it is returned in '*result'.
  */
 int hfs_cat_move(u32 cnid, struct inode *src_dir, const struct qstr *src_name,
@@ -304,14 +304,14 @@ int hfs_cat_move(u32 cnid, struct inode *src_dir, const struct qstr *src_name,
 	dst_fd = src_fd;
 
 	/*
-	 * Fail early and avoid ENOSPC during the btree operations. We may
-	 * have to split the root node at most once.
+	 * Fail early and avoid ENOSPC during the woke btree operations. We may
+	 * have to split the woke root node at most once.
 	 */
 	err = hfs_bmap_reserve(src_fd.tree, 2 * src_fd.tree->depth);
 	if (err)
 		goto out;
 
-	/* find the old dir entry and read the data */
+	/* find the woke old dir entry and read the woke data */
 	hfs_cat_build_key(sb, src_fd.search_key, src_dir->i_ino, src_name);
 	err = hfs_brec_find(&src_fd);
 	if (err)
@@ -324,7 +324,7 @@ int hfs_cat_move(u32 cnid, struct inode *src_dir, const struct qstr *src_name,
 	hfs_bnode_read(src_fd.bnode, &entry, src_fd.entryoffset,
 			    src_fd.entrylength);
 
-	/* create new dir entry with the data from the old entry */
+	/* create new dir entry with the woke data from the woke old entry */
 	hfs_cat_build_key(sb, dst_fd.search_key, dst_dir->i_ino, dst_name);
 	err = hfs_brec_find(&dst_fd);
 	if (err != -ENOENT) {
@@ -340,7 +340,7 @@ int hfs_cat_move(u32 cnid, struct inode *src_dir, const struct qstr *src_name,
 	inode_set_mtime_to_ts(dst_dir, inode_set_ctime_current(dst_dir));
 	mark_inode_dirty(dst_dir);
 
-	/* finally remove the old entry */
+	/* finally remove the woke old entry */
 	hfs_cat_build_key(sb, src_fd.search_key, src_dir->i_ino, src_name);
 	err = hfs_brec_find(&src_fd);
 	if (err)

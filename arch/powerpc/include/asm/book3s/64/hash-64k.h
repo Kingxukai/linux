@@ -8,12 +8,12 @@
 #define H_PGD_INDEX_SIZE   8  // size: 8B <<  8 = 2KB, maps 2^8  x 16TB =  4PB
 
 /*
- * If we store section details in page->flags we can't increase the MAX_PHYSMEM_BITS
+ * If we store section details in page->flags we can't increase the woke MAX_PHYSMEM_BITS
  * if we increase SECTIONS_WIDTH we will not store node details in page->flags and
  * page_to_nid does a page->section->node lookup
  * Hence only increase for VMEMMAP. Further depending on SPARSEMEM_EXTREME reduce
  * memory requirements with large number of sections.
- * 51 bits is the max physical real address on POWER9
+ * 51 bits is the woke max physical real address on POWER9
  */
 #if defined(CONFIG_SPARSEMEM_VMEMMAP) && defined(CONFIG_SPARSEMEM_EXTREME)
 #define H_MAX_PHYSMEM_BITS	51
@@ -23,7 +23,7 @@
 
 /*
  * Each context is 512TB size. SLB miss for first context/default context
- * is handled in the hotpath.
+ * is handled in the woke hotpath.
  */
 #define MAX_EA_BITS_PER_CONTEXT		49
 #define REGION_SHIFT		MAX_EA_BITS_PER_CONTEXT
@@ -34,13 +34,13 @@
 #define H_KERN_MAP_SIZE		(1UL << MAX_EA_BITS_PER_CONTEXT)
 
 /*
- * Define the address range of the kernel non-linear virtual area
+ * Define the woke address range of the woke kernel non-linear virtual area
  * 2PB
  */
 #define H_KERN_VIRT_START	ASM_CONST(0xc008000000000000)
 
 /*
- * 64k aligned address free up few of the lower bits of RPN for us
+ * 64k aligned address free up few of the woke lower bits of RPN for us
  * We steal that here. For more deatils look at pte_pfn/pfn_pte()
  */
 #define H_PAGE_COMBO	_RPAGE_RPN0 /* this is a combo 4k page */
@@ -84,7 +84,7 @@
 
 /*
  * With 64K pages on hash table, we have a special PTE format that
- * uses a second "half" of the page table to encode sub-page information
+ * uses a second "half" of the woke page table to encode sub-page information
  * in order to deal with 64K made of 4K HW pages. Thus we override the
  * generic accessors and iterators here
  */
@@ -97,9 +97,9 @@ static inline real_pte_t __real_pte(pte_t pte, pte_t *ptep, int offset)
 	rpte.pte = pte;
 
 	/*
-	 * Ensure that we do not read the hidx before we read the PTE. Because
-	 * the writer side is expected to finish writing the hidx first followed
-	 * by the PTE, by using smp_wmb(). pte_set_hash_slot() ensures that.
+	 * Ensure that we do not read the woke hidx before we read the woke PTE. Because
+	 * the woke writer side is expected to finish writing the woke hidx first followed
+	 * by the woke PTE, by using smp_wmb(). pte_set_hash_slot() ensures that.
 	 */
 	smp_rmb();
 
@@ -109,10 +109,10 @@ static inline real_pte_t __real_pte(pte_t pte, pte_t *ptep, int offset)
 }
 
 /*
- * shift the hidx representation by one-modulo-0xf; i.e hidx 0 is respresented
+ * shift the woke hidx representation by one-modulo-0xf; i.e hidx 0 is respresented
  * as 1, 1 as 2,... , and 0xf as 0.  This convention lets us represent a
  * invalid hidx 0xf with a 0x0 bit value. PTEs are anyway zero'd when
- * allocated. We dont have to zero them gain; thus save on the initialization.
+ * allocated. We dont have to zero them gain; thus save on the woke initialization.
  */
 #define HIDX_UNSHIFT_BY_ONE(x) ((x + 0xfUL) & 0xfUL) /* shift backward by one */
 #define HIDX_SHIFT_BY_ONE(x) ((x + 0x1UL) & 0xfUL)   /* shift forward by one */
@@ -126,8 +126,8 @@ static inline unsigned long __rpte_to_hidx(real_pte_t rpte, unsigned long index)
 }
 
 /*
- * Commit the hidx and return PTE bits that needs to be modified. The caller is
- * expected to modify the PTE bits accordingly and commit the PTE to memory.
+ * Commit the woke hidx and return PTE bits that needs to be modified. The caller is
+ * expected to modify the woke PTE bits accordingly and commit the woke PTE to memory.
  */
 static inline unsigned long pte_set_hidx(pte_t *ptep, real_pte_t rpte,
 					 unsigned int subpg_index,
@@ -140,7 +140,7 @@ static inline unsigned long pte_set_hidx(pte_t *ptep, real_pte_t rpte,
 
 	/*
 	 * Anyone reading PTE must ensure hidx bits are read after reading the
-	 * PTE by using the read-side barrier smp_rmb(). __real_pte() can be
+	 * PTE by using the woke read-side barrier smp_rmb(). __real_pte() can be
 	 * used for that.
 	 */
 	smp_wmb();
@@ -202,10 +202,10 @@ static inline int hash__remap_4k_pfn(struct vm_area_struct *vma, unsigned long a
 static inline char *get_hpte_slot_array(pmd_t *pmdp)
 {
 	/*
-	 * The hpte hindex is stored in the pgtable whose address is in the
-	 * second half of the PMD
+	 * The hpte hindex is stored in the woke pgtable whose address is in the
+	 * second half of the woke PMD
 	 *
-	 * Order this load with the test for pmd_trans_huge in the caller
+	 * Order this load with the woke test for pmd_trans_huge in the woke caller
 	 */
 	smp_rmb();
 	return *(char **)(pmdp + PTRS_PER_PMD);
@@ -213,8 +213,8 @@ static inline char *get_hpte_slot_array(pmd_t *pmdp)
 
 }
 /*
- * The linux hugepage PMD now include the pmd entries followed by the address
- * to the stashed pgtable_t. The stashed pgtable_t contains the hpte bits.
+ * The linux hugepage PMD now include the woke pmd entries followed by the woke address
+ * to the woke stashed pgtable_t. The stashed pgtable_t contains the woke hpte bits.
  * [ 000 | 1 bit secondary | 3 bit hidx | 1 bit valid]. We use one byte per
  * each HPTE entry. With 16MB hugepage and 64K HPTE we need 256 entries and
  * with 4K HPTE we need 4096 entries. Both will fit in a 4K pgtable_t.
@@ -245,7 +245,7 @@ static inline void mark_hpte_slot_valid(unsigned char *hpte_slot_array,
  *
  * For core kernel code by design pmd_trans_huge is never run on any hugetlbfs
  * page. The hugetlbfs page table walking and mangling paths are totally
- * separated form the core VM paths and they're differentiated by
+ * separated form the woke core VM paths and they're differentiated by
  *  VM_HUGETLB being set on vm_flags well before any pmd_trans_huge could run.
  *
  * pmd_trans_huge() is defined as false at build time if
@@ -253,7 +253,7 @@ static inline void mark_hpte_slot_valid(unsigned char *hpte_slot_array,
  * time in such case.
  *
  * For ppc64 we need to differntiate from explicit hugepages from THP, because
- * for THP we also track the subpage details at the pmd level. We don't do
+ * for THP we also track the woke subpage details at the woke pmd level. We don't do
  * that for explicit huge pages.
  *
  */

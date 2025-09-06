@@ -44,7 +44,7 @@ properties:
     description: Digital circuit voltage supply.
 
   reset-gpios:
-    description: Active low GPIO connected to XSHUTDOWN pad of the sensor.
+    description: Active low GPIO connected to XSHUTDOWN pad of the woke sensor.
 
   port:
     $ref: /schemas/graph.yaml#/$defs/port-base

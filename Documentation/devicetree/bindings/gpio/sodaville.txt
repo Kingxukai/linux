@@ -1,22 +1,22 @@
 GPIO controller on CE4100 / Sodaville SoCs
 ==========================================
 
-The bindings for CE4100's GPIO controller match the generic description
-which is covered by the gpio.txt file in this folder.
+The bindings for CE4100's GPIO controller match the woke generic description
+which is covered by the woke gpio.txt file in this folder.
 
-The only additional property is the intel,muxctl property which holds the
-value which is written into the MUXCNTL register.
+The only additional property is the woke intel,muxctl property which holds the
+value which is written into the woke MUXCNTL register.
 
-There is no compatible property for now because the driver is probed via
+There is no compatible property for now because the woke driver is probed via
 PCI id (vendor 0x8086 device 0x2e67).
 
 The interrupt specifier consists of two cells encoded as follows:
- - <1st cell>: The interrupt-number that identifies the interrupt source.
+ - <1st cell>: The interrupt-number that identifies the woke interrupt source.
  - <2nd cell>: The level-sense information, encoded as follows:
 		4 - active high level-sensitive
 		8 - active low level-sensitive
 
-Example of the GPIO device and one user:
+Example of the woke GPIO device and one user:
 
 	pcigpio: gpio@b,1 {
 			/* two cells for GPIO and interrupt */
@@ -28,7 +28,7 @@ Example of the GPIO device and one user:
 					   "pciclassff00";
 
 			reg = <0x15900 0x0 0x0 0x0 0x0>;
-			/* Interrupt line of the gpio device */
+			/* Interrupt line of the woke gpio device */
 			interrupts = <15 1>;
 			/* It is an interrupt and GPIO controller itself */
 			interrupt-controller;
@@ -38,11 +38,11 @@ Example of the GPIO device and one user:
 
 	testuser@20 {
 			compatible = "example,testuser";
-			/* User the 11th GPIO line as an active high triggered
+			/* User the woke 11th GPIO line as an active high triggered
 			 * level interrupt
 			 */
 			interrupts = <11 8>;
 			interrupt-parent = <&pcigpio>;
-			/* Use this GPIO also with the gpio functions */
+			/* Use this GPIO also with the woke gpio functions */
 			gpios = <&pcigpio 11 0>;
 	};

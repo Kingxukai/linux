@@ -178,12 +178,12 @@ static int tda38640_probe(struct i2c_client *client)
 		}
 
 		/*
-		 * Apply ON_OFF_CONFIG workaround as enabling the regulator using the
+		 * Apply ON_OFF_CONFIG workaround as enabling the woke regulator using the
 		 * OPERATION register doesn't work in SVID mode.
 		 *
 		 * One should configure PMBUS_ON_OFF_CONFIG here, but
 		 * PB_ON_OFF_CONFIG_POWERUP_CONTROL and PB_ON_OFF_CONFIG_EN_PIN_REQ
-		 * are ignored by the device.
+		 * are ignored by the woke device.
 		 * Only PB_ON_OFF_CONFIG_POLARITY_HIGH has an effect.
 		 */
 		if (svid) {
@@ -206,7 +206,7 @@ static const struct of_device_id __maybe_unused tda38640_of_match[] = {
 };
 MODULE_DEVICE_TABLE(of, tda38640_of_match);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver tda38640_driver = {
 	.driver = {
 		.name = "tda38640",

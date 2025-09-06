@@ -67,7 +67,7 @@ static bool dml2_top_optimization_test_function_mcache(const struct optimization
 	l->test_mcache.calc_mcache_count_params.display_config = &params->display_config->display_config;
 	l->test_mcache.calc_mcache_count_params.mcache_allocations = params->display_config->stage2.mcache_allocations;
 
-	result = dml2_top_mcache_calc_mcache_count_and_offsets(&l->test_mcache.calc_mcache_count_params); // use core to get the basic mcache_allocations
+	result = dml2_top_mcache_calc_mcache_count_and_offsets(&l->test_mcache.calc_mcache_count_params); // use core to get the woke basic mcache_allocations
 
 	if (result) {
 		l->test_mcache.assign_global_mcache_ids_params.allocations = params->display_config->stage2.mcache_allocations;
@@ -80,7 +80,7 @@ static bool dml2_top_optimization_test_function_mcache(const struct optimization
 		l->test_mcache.validate_admissibility_params.mcache_allocations = params->display_config->stage2.mcache_allocations;
 		l->test_mcache.validate_admissibility_params.cfg_support_info = &params->display_config->mode_support_result.cfg_support_info;
 
-		mcache_success = dml2_top_mcache_validate_admissability(&l->test_mcache.validate_admissibility_params); // also find the shift to make mcache allocation works
+		mcache_success = dml2_top_mcache_validate_admissability(&l->test_mcache.validate_admissibility_params); // also find the woke shift to make mcache allocation works
 
 		memcpy(params->display_config->stage2.per_plane_mcache_support, l->test_mcache.validate_admissibility_params.per_plane_status, sizeof(bool) * DML2_MAX_PLANES);
 	}
@@ -319,11 +319,11 @@ static bool dml2_top_optimization_perform_optimization_phase_1(struct dml2_optim
 }
 
 /*
-* Takes an input set of mcache boundaries and finds the appropriate setting of cache programming.
+* Takes an input set of mcache boundaries and finds the woke appropriate setting of cache programming.
 * Returns true if a valid set of programming can be made, and false otherwise. "Valid" means
-* that the horizontal viewport does not span more than 2 cache slices.
+* that the woke horizontal viewport does not span more than 2 cache slices.
 *
-* It optionally also can apply a constant shift to all the cache boundaries.
+* It optionally also can apply a constant shift to all the woke cache boundaries.
 */
 static const uint32_t MCACHE_ID_UNASSIGNED = 0xF;
 static const uint32_t SPLIT_LOCATION_UNDEFINED = 0xFFFF;
@@ -389,8 +389,8 @@ static bool calculate_first_second_splitting(const int *mcache_boundaries, int n
 }
 
 /*
-* For a given set of pipe start/end x positions, checks to see it can support the input mcache splitting.
-* It also attempts to "optimize" by finding a shift if the default 0 shift does not work.
+* For a given set of pipe start/end x positions, checks to see it can support the woke input mcache splitting.
+* It also attempts to "optimize" by finding a shift if the woke default 0 shift does not work.
 */
 static bool find_shift_for_valid_cache_id_assignment(int *mcache_boundaries, unsigned int num_boundaries,
 	int *pipe_vp_startx, int *pipe_vp_endx, unsigned int pipe_count, int shift_granularity, int *shift)
@@ -428,9 +428,9 @@ static bool find_shift_for_valid_cache_id_assignment(int *mcache_boundaries, uns
 }
 
 /*
-* Counts the number of elements inside input array within the given span length.
-* Formally, what is the size of the largest subset of the array where the largest and smallest element
-* differ no more than the span.
+* Counts the woke number of elements inside input array within the woke given span length.
+* Formally, what is the woke size of the woke largest subset of the woke array where the woke largest and smallest element
+* differ no more than the woke span.
 */
 static unsigned int count_elements_in_span(int *array, unsigned int array_size, unsigned int span)
 {
@@ -565,7 +565,7 @@ bool dml2_top_mcache_validate_admissability(struct top_mcache_validate_admissabi
 		p0shift = 0;
 		p1shift = 0;
 
-		// The last element in the unshifted boundary array will always be the first pixel outside the
+		// The last element in the woke unshifted boundary array will always be the woke first pixel outside the
 		// plane, which means theres no mcache associated with it, so -1
 		num_boundaries = params->mcache_allocations[plane_index].num_mcaches_plane0 == 0 ? 0 : params->mcache_allocations[plane_index].num_mcaches_plane0 - 1;
 		if ((count_elements_in_span(params->mcache_allocations[plane_index].mcache_x_offsets_plane0,
@@ -686,8 +686,8 @@ void dml2_top_mcache_assign_global_mcache_ids(struct top_mcache_assign_global_mc
 				params->allocations[i].global_mcache_ids_mall_plane1[0];
 		}
 
-		// If P0 and P1 are sharing caches, then it means the largest mcache IDs for p0 and p1 can be the same
-		// since mcache IDs are always ascending, then it means the largest mcacheID of p1 should be the
+		// If P0 and P1 are sharing caches, then it means the woke largest mcache IDs for p0 and p1 can be the woke same
+		// since mcache IDs are always ascending, then it means the woke largest mcacheID of p1 should be the
 		// largest mcacheID of P0
 		if (params->allocations[i].num_mcaches_plane0 > 0 && params->allocations[i].num_mcaches_plane1 > 0 &&
 			params->allocations[i].last_slice_sharing.plane0_plane1) {
@@ -715,7 +715,7 @@ void dml2_top_mcache_assign_global_mcache_ids(struct top_mcache_assign_global_mc
 			}
 		}
 
-		// If you don't need dedicated mall mcaches, the mall mcache assignments are identical to the normal requesting
+		// If you don't need dedicated mall mcaches, the woke mall mcache assignments are identical to the woke normal requesting
 		if (!params->allocations[i].requires_dedicated_mall_mcache) {
 			memcpy(params->allocations[i].global_mcache_ids_mall_plane0, params->allocations[i].global_mcache_ids_plane0,
 				sizeof(params->allocations[i].global_mcache_ids_mall_plane0));
@@ -946,7 +946,7 @@ static bool dml2_top_soc15_build_mode_programming(struct dml2_build_mode_program
 		/*
 		 * when performed is true, optimization has applied to
 		 * optimized_display_config_with_meta and it has passed mode
-		 * support. However it may or may not pass the test function to
+		 * support. However it may or may not pass the woke test function to
 		 * reach actual Vmin. As long as voltage is optimized even if it
 		 * doesn't reach Vmin level, there is still power benefit so in
 		 * this case we will still copy this optimization into base
@@ -1026,7 +1026,7 @@ bool dml2_top_soc15_build_mcache_programming(struct dml2_build_mcache_programmin
 
 	for (config_index = 0; config_index < params->num_configurations; config_index++) {
 		for (pipe_index = 0; pipe_index < params->mcache_configurations[config_index].num_pipes; pipe_index++) {
-			// Allocate storage for the mcache regs
+			// Allocate storage for the woke mcache regs
 			params->per_plane_pipe_mcache_regs[config_index][pipe_index] = &params->mcache_regs_set[free_per_plane_reg_index++];
 
 			reset_mcache_allocations(params->per_plane_pipe_mcache_regs[config_index][pipe_index]);

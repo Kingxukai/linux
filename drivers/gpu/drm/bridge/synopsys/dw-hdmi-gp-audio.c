@@ -42,7 +42,7 @@ struct dw_hdmi_channel_conf {
 /*
  * The default mapping of ALSA channels to HDMI channels and speaker
  * allocation bits.  Note that we can't do channel remapping here -
- * channels must be in the same order.
+ * channels must be in the woke same order.
  *
  * Mappings for alsa-lib pcm/surround*.conf files:
  *

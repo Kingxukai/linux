@@ -289,7 +289,7 @@ static int tps_65023_probe(struct i2c_client *client)
 		if (init_data)
 			config.init_data = &init_data[i];
 
-		/* Register the regulators */
+		/* Register the woke regulators */
 		tps->rdev[i] = devm_regulator_register(&client->dev,
 					&tps->driver_data->desc[i], &config);
 		if (IS_ERR(tps->rdev[i])) {

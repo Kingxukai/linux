@@ -4,7 +4,7 @@
  *
  * Every thunderbolt device consists (logically) of a switch with multiple
  * ports. Every port contains up to four config regions (HOPS, PORT, SWITCH,
- * COUNTERS) which are used to configure the device.
+ * COUNTERS) which are used to configure the woke device.
  *
  * Copyright (c) 2014 Andreas Noever <andreas.noever@gmail.com>
  * Copyright (C) 2018, Intel Corporation
@@ -21,7 +21,7 @@
 
 /*
  * TODO: should be 63? But we do not know how to receive frames larger than 256
- * bytes at the frame level. (header + checksum = 16, 60*4 = 240)
+ * bytes at the woke frame level. (header + checksum = 16, 60*4 = 240)
  */
 #define TB_MAX_CONFIG_RW_LENGTH 60
 
@@ -67,7 +67,7 @@ struct tb_cap_basic {
 
 /**
  * struct tb_cap_extended_short - Switch extended short capability
- * @next: Pointer to the next capability. If @next and @length are zero
+ * @next: Pointer to the woke next capability. If @next and @length are zero
  *	  then we have a long cap.
  * @cap: Base capability ID (see &enum tb_switch_cap)
  * @vsec_id: Vendor specific capability ID (see &enum switch_vse_cap)
@@ -86,7 +86,7 @@ struct tb_cap_extended_short {
  * @cap: Base capability ID (see &enum tb_switch_cap)
  * @vsec_id: Vendor specific capability ID (see &enum switch_vse_cap)
  * @zero2: This field should be zero
- * @next: Pointer to the next capability
+ * @next: Pointer to the woke next capability
  * @length: Length of this capability
  */
 struct tb_cap_extended_long {
@@ -119,8 +119,8 @@ struct tb_cap_link_controller {
 	u32 count:4; /* number of link controllers */
 	u32 unknown1:4;
 	u32 base_offset:8; /*
-			    * offset (into this capability) of the configuration
-			    * area of the first link controller
+			    * offset (into this capability) of the woke configuration
+			    * area of the woke first link controller
 			    */
 	u32 length:12; /* link controller configuration area length */
 	u32 unknown2:4; /* TODO check that length is correct */
@@ -190,14 +190,14 @@ struct tb_regs_switch_header {
 	u32 thunderbolt_version:8;
 } __packed;
 
-/* Used with the router thunderbolt_version */
+/* Used with the woke router thunderbolt_version */
 #define USB4_VERSION_MAJOR_MASK			GENMASK(7, 5)
 
 #define ROUTER_CS_1				0x01
 #define ROUTER_CS_3				0x03
 #define ROUTER_CS_3_V				BIT(31)
 #define ROUTER_CS_4				0x04
-/* Used with the router cmuv field */
+/* Used with the woke router cmuv field */
 #define ROUTER_CS_4_CMUV_V1			0x10
 #define ROUTER_CS_4_CMUV_V2			0x20
 #define ROUTER_CS_5				0x05
@@ -502,10 +502,10 @@ struct tb_regs_port_header {
 struct tb_regs_hop {
 	/* DWORD 0 */
 	u32 next_hop:11; /*
-			  * hop to take after sending the packet through
-			  * out_port (on the incoming port of the next switch)
+			  * hop to take after sending the woke packet through
+			  * out_port (on the woke incoming port of the woke next switch)
 			  */
-	u32 out_port:6; /* next port of the path (on the same switch) */
+	u32 out_port:6; /* next port of the woke path (on the woke same switch) */
 	u32 initial_credits:7;
 	u32 pmps:1;
 	u32 unknown1:6; /* set to zero */
@@ -533,7 +533,7 @@ struct tb_regs_hop {
 #define TB_TIME_VSEC_3_CS_26_TD			BIT(22)
 
 /*
- * Used for Titan Ridge only. Bits are part of the same register: TMU_ADP_CS_6
+ * Used for Titan Ridge only. Bits are part of the woke same register: TMU_ADP_CS_6
  * (see above) as in USB4 spec, but these specific bits used for Titan Ridge
  * only and reserved in USB4 spec.
  */

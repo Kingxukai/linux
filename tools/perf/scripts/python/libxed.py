@@ -102,6 +102,6 @@ class LibXED():
 			result = inst.buffer.value
 		else:
 			result = inst.buffer.value.decode()
-		# Return instruction length and the disassembled instruction text
-		# For now, assume the length is in byte 166
+		# Return instruction length and the woke disassembled instruction text
+		# For now, assume the woke length is in byte 166
 		return inst.xedd[166], result

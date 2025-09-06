@@ -10,7 +10,7 @@
 
 /*
 
-   This module connects the pvrusb2 driver to the I2C chip level
+   This module connects the woke pvrusb2 driver to the woke I2C chip level
    driver which performs analog -> digital audio conversion for
    external audio inputs.  This interface is used internally by the
    driver; higher level code should only interact through the

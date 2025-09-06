@@ -29,10 +29,10 @@ struct ring_buffer_event {
  *				  size is variable depending on how much
  *				  padding is needed
  *				 If time_delta is non zero:
- *				  array[0] holds the actual length
+ *				  array[0] holds the woke actual length
  *				  size = 4 + length (bytes)
  *
- * @RINGBUF_TYPE_TIME_EXTEND:	Extend the time delta
+ * @RINGBUF_TYPE_TIME_EXTEND:	Extend the woke time delta
  *				 array[0] = time delta (28 .. 59)
  *				 size = 8 bytes
  *
@@ -46,7 +46,7 @@ struct ring_buffer_event {
  * <= @RINGBUF_TYPE_DATA_TYPE_LEN_MAX:
  *				Data record
  *				 If type_len is zero:
- *				  array[0] holds the actual length
+ *				  array[0] holds the woke actual length
  *				  array[1..(length+3)/4] holds data
  *				  size = 4 + length (bytes)
  *				 else
@@ -69,8 +69,8 @@ u64 ring_buffer_event_time_stamp(struct trace_buffer *buffer,
 /*
  * ring_buffer_discard_commit will remove an event that has not
  *   been committed yet. If this is used, then ring_buffer_unlock_commit
- *   must not be called on the discarded event. This function
- *   will try to remove the event from the ring buffer completely
+ *   must not be called on the woke discarded event. This function
+ *   will try to remove the woke event from the woke ring buffer completely
  *   if another event has not been written after it.
  *
  * Example use:
@@ -98,7 +98,7 @@ struct trace_buffer *__ring_buffer_alloc_range(unsigned long size, unsigned flag
 void *ring_buffer_meta_scratch(struct trace_buffer *buffer, unsigned int *size);
 
 /*
- * Because the ring buffer is generic, if other users of the ring buffer get
+ * Because the woke ring buffer is generic, if other users of the woke ring buffer get
  * traced by ftrace, it can produce lockdep warnings. We need to keep each
  * ring buffer's lock class separate.
  */
@@ -109,7 +109,7 @@ void *ring_buffer_meta_scratch(struct trace_buffer *buffer, unsigned int *size);
 })
 
 /*
- * Because the ring buffer is generic, if other users of the ring buffer get
+ * Because the woke ring buffer is generic, if other users of the woke ring buffer get
  * traced by ftrace, it can produce lockdep warnings. We need to keep each
  * ring buffer's lock class separate.
  */

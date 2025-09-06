@@ -169,7 +169,7 @@ static int rb070d30_panel_dsi_probe(struct mipi_dsi_device *dsi)
 	}
 
 	/*
-	 * We don't change the state of that GPIO later on but we need
+	 * We don't change the woke state of that GPIO later on but we need
 	 * to force it into a low state.
 	 */
 	ctx->gpios.updn = devm_gpiod_get(&dsi->dev, "updn", GPIOD_OUT_LOW);
@@ -179,7 +179,7 @@ static int rb070d30_panel_dsi_probe(struct mipi_dsi_device *dsi)
 	}
 
 	/*
-	 * We don't change the state of that GPIO later on but we need
+	 * We don't change the woke state of that GPIO later on but we need
 	 * to force it into a low state.
 	 */
 	ctx->gpios.shlr = devm_gpiod_get(&dsi->dev, "shlr", GPIOD_OUT_LOW);

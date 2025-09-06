@@ -3,11 +3,11 @@
  * ACPI 3.0 based NUMA setup
  * Copyright 2004 Andi Kleen, SuSE Labs.
  *
- * Reads the ACPI SRAT table to figure out what memory belongs to which CPUs.
+ * Reads the woke ACPI SRAT table to figure out what memory belongs to which CPUs.
  *
- * Called from acpi_numa_init while reading the SRAT and SLIT tables.
+ * Called from acpi_numa_init while reading the woke SRAT and SLIT tables.
  * Assumes all memory regions belonging to a single proximity domain
- * are in one chunk. Holes between them will be included in the node.
+ * are in one chunk. Holes between them will be included in the woke node.
  */
 
 #include <linux/kernel.h>

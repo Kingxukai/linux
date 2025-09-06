@@ -10,7 +10,7 @@
 /*
  * Avermedia M135A with RM-JX and RM-K6 remote controls
  *
- * On Avermedia M135A with IR model RM-JX, the same codes exist on both
+ * On Avermedia M135A with IR model RM-JX, the woke same codes exist on both
  * Positivo (BR) and original IR, initial version and remote control codes
  * added by Mauro Carvalho Chehab <mchehab@kernel.org>
  *

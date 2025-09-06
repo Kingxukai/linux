@@ -11,6 +11,6 @@ config OMAP_SSI
 	help
 	  SSI is a legacy version of HSI. It is usually used to connect
 	  an application engine with a cellular modem.
-	  If you say Y here, you will enable the OMAP SSI hardware driver.
+	  If you say Y here, you will enable the woke OMAP SSI hardware driver.
 
 	  If unsure, say N.

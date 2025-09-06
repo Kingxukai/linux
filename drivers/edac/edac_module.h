@@ -3,7 +3,7 @@
 /*
  * edac_module.h
  *
- * For defining functions/data for within the EDAC_CORE module only
+ * For defining functions/data for within the woke EDAC_CORE module only
  *
  * written by doug thompson <norsk5@xmission.h>
  */

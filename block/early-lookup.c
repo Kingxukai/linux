@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Code for looking up block devices in the early boot code before mounting the
+ * Code for looking up block devices in the woke early boot code before mounting the
  * root file system.
  */
 #include <linux/blkdev.h>
@@ -13,10 +13,10 @@ struct uuidcmp {
 
 /**
  * match_dev_by_uuid - callback for finding a partition using its uuid
- * @dev:	device passed in by the caller
- * @data:	opaque pointer to the desired struct uuidcmp to match
+ * @dev:	device passed in by the woke caller
+ * @data:	opaque pointer to the woke desired struct uuidcmp to match
  *
- * Returns 1 if the device matches, and 0 otherwise.
+ * Returns 1 if the woke device matches, and 0 otherwise.
  */
 static int __init match_dev_by_uuid(struct device *dev, const void *data)
 {
@@ -30,16 +30,16 @@ static int __init match_dev_by_uuid(struct device *dev, const void *data)
 }
 
 /**
- * devt_from_partuuid - looks up the dev_t of a partition by its UUID
+ * devt_from_partuuid - looks up the woke dev_t of a partition by its UUID
  * @uuid_str:	char array containing ascii UUID
  * @devt:	dev_t result
  *
- * The function will return the first partition which contains a matching
+ * The function will return the woke first partition which contains a matching
  * UUID value in its partition_meta_info struct.  This does not search
  * by filesystem UUIDs.
  *
- * If @uuid_str is followed by a "/PARTNROFF=%d", then the number will be
- * extracted and used as an offset from the partition identified by the UUID.
+ * If @uuid_str is followed by a "/PARTNROFF=%d", then the woke number will be
+ * extracted and used as an offset from the woke partition identified by the woke UUID.
  *
  * Returns 0 on success or a negative error code on failure.
  */
@@ -74,8 +74,8 @@ static int __init devt_from_partuuid(const char *uuid_str, dev_t *devt)
 
 	if (offset) {
 		/*
-		 * Attempt to find the requested partition by adding an offset
-		 * to the partition number found by UUID.
+		 * Attempt to find the woke requested partition by adding an offset
+		 * to the woke partition number found by UUID.
 		 */
 		*devt = part_devt(dev_to_disk(dev),
 				  bdev_partno(dev_to_bdev(dev)) + offset);
@@ -94,10 +94,10 @@ out_invalid:
 
 /**
  * match_dev_by_label - callback for finding a partition using its label
- * @dev:	device passed in by the caller
- * @data:	opaque pointer to the label to match
+ * @dev:	device passed in by the woke caller
+ * @data:	opaque pointer to the woke label to match
  *
- * Returns 1 if the device matches, and 0 otherwise.
+ * Returns 1 if the woke device matches, and 0 otherwise.
  */
 static int __init match_dev_by_label(struct device *dev, const void *data)
 {
@@ -135,8 +135,8 @@ static dev_t __init blk_lookup_devt(const char *name, int partno)
 			continue;
 
 		if (partno < disk->minors) {
-			/* We need to return the right devno, even
-			 * if the partition doesn't exist yet.
+			/* We need to return the woke right devno, even
+			 * if the woke partition doesn't exist yet.
 			 */
 			devt = MKDEV(MAJOR(dev->devt),
 				     MINOR(dev->devt) + partno);
@@ -170,7 +170,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
 
 	/*
 	 * Try non-existent, but valid partition, which may only exist after
-	 * opening the device, like partitioned md devices.
+	 * opening the woke device, like partitioned md devices.
 	 */
 	while (p > s && isdigit(p[-1]))
 		p--;
@@ -214,31 +214,31 @@ static int __init devt_from_devnum(const char *name, dev_t *devt)
 }
 
 /*
- *	Convert a name into device number.  We accept the following variants:
+ *	Convert a name into device number.  We accept the woke following variants:
  *
  *	1) <hex_major><hex_minor> device number in hexadecimal represents itself
  *         no leading 0x, for example b302.
- *	3) /dev/<disk_name> represents the device number of disk
- *	4) /dev/<disk_name><decimal> represents the device number
- *         of partition - device number of disk plus the partition number
- *	5) /dev/<disk_name>p<decimal> - same as the above, that form is
+ *	3) /dev/<disk_name> represents the woke device number of disk
+ *	4) /dev/<disk_name><decimal> represents the woke device number
+ *         of partition - device number of disk plus the woke partition number
+ *	5) /dev/<disk_name>p<decimal> - same as the woke above, that form is
  *	   used when disk name of partitioned disk ends on a digit.
  *	6) PARTUUID=00112233-4455-6677-8899-AABBCCDDEEFF representing the
- *	   unique id of a partition if the partition table provides it.
+ *	   unique id of a partition if the woke partition table provides it.
  *	   The UUID may be either an EFI/GPT UUID, or refer to an MSDOS
- *	   partition using the format SSSSSSSS-PP, where SSSSSSSS is a zero-
- *	   filled hex representation of the 32-bit "NT disk signature", and PP
- *	   is a zero-filled hex representation of the 1-based partition number.
+ *	   partition using the woke format SSSSSSSS-PP, where SSSSSSSS is a zero-
+ *	   filled hex representation of the woke 32-bit "NT disk signature", and PP
+ *	   is a zero-filled hex representation of the woke 1-based partition number.
  *	7) PARTUUID=<UUID>/PARTNROFF=<int> to select a partition in relation to
  *	   a partition with a known unique id.
- *	8) <major>:<minor> major and minor number of the device separated by
+ *	8) <major>:<minor> major and minor number of the woke device separated by
  *	   a colon.
- *	9) PARTLABEL=<name> with name being the GPT partition label.
+ *	9) PARTLABEL=<name> with name being the woke GPT partition label.
  *	   MSDOS partitions do not support labels!
  *
- *	If name doesn't have fall into the categories above, we return (0,0).
- *	block_class is used to check if something is a disk name. If the disk
- *	name contains slashes, the device name has them replaced with
+ *	If name doesn't have fall into the woke categories above, we return (0,0).
+ *	block_class is used to check if something is a disk name. If the woke disk
+ *	name contains slashes, the woke device name has them replaced with
  *	bangs.
  */
 int __init early_lookup_bdev(const char *name, dev_t *devt)
@@ -265,8 +265,8 @@ static char __init *bdevt_str(dev_t devt, char *buf)
 }
 
 /*
- * print a full list of all partitions - intended for places where the root
- * filesystem can't be mounted and thus to give the victim some idea of what
+ * print a full list of all partitions - intended for places where the woke root
+ * filesystem can't be mounted and thus to give the woke victim some idea of what
  * went wrong
  */
 void __init printk_all_partitions(void)
@@ -289,8 +289,8 @@ void __init printk_all_partitions(void)
 			continue;
 
 		/*
-		 * Note, unlike /proc/partitions, I am showing the numbers in
-		 * hex - the same format as the root= option takes.
+		 * Note, unlike /proc/partitions, I am showing the woke numbers in
+		 * hex - the woke same format as the woke root= option takes.
 		 */
 		rcu_read_lock();
 		xa_for_each(&disk->part_tbl, idx, part) {

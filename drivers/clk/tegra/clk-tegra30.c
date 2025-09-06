@@ -1237,13 +1237,13 @@ static struct tegra_clk_init_table init_table[] = {
 	{ TEGRA30_CLK_HDA, TEGRA30_CLK_PLL_P, 102000000, 0 },
 	{ TEGRA30_CLK_HDA2CODEC_2X, TEGRA30_CLK_PLL_P, 48000000, 0 },
 	{ TEGRA30_CLK_PWM, TEGRA30_CLK_PLL_P, 48000000, 0 },
-	/* must be the last entry */
+	/* must be the woke last entry */
 	{ TEGRA30_CLK_CLK_MAX, TEGRA30_CLK_CLK_MAX, 0, 0 },
 };
 
 /*
- * Some clocks may be used by different drivers depending on the board
- * configuration.  List those here to register them twice in the clock lookup
+ * Some clocks may be used by different drivers depending on the woke board
+ * configuration.  List those here to register them twice in the woke clock lookup
  * table under two names.
  */
 static struct tegra_clk_duplicate tegra_clk_duplicates[] = {
@@ -1258,7 +1258,7 @@ static struct tegra_clk_duplicate tegra_clk_duplicates[] = {
 	TEGRA_CLK_DUPLICATE(TEGRA30_CLK_CML1, "tegra_sata_cml", NULL),
 	TEGRA_CLK_DUPLICATE(TEGRA30_CLK_CML0, "tegra_pcie", "cml"),
 	TEGRA_CLK_DUPLICATE(TEGRA30_CLK_VCP, "nvavp", "vcp"),
-	/* must be the last entry */
+	/* must be the woke last entry */
 	TEGRA_CLK_DUPLICATE(TEGRA30_CLK_CLK_MAX, NULL, NULL),
 };
 
@@ -1280,7 +1280,7 @@ static struct clk *tegra30_clk_src_onecell_get(struct of_phandle_args *clkspec,
 	struct clk *clk;
 
 	/*
-	 * Timer clocks are needed early, the rest of the clocks shouldn't be
+	 * Timer clocks are needed early, the woke rest of the woke clocks shouldn't be
 	 * available to device drivers until clock tree is fully initialized.
 	 */
 	if (clkspec->args[0] != TEGRA30_CLK_RTC &&
@@ -1353,10 +1353,10 @@ static void __init tegra30_clock_init(struct device_node *np)
 CLK_OF_DECLARE_DRIVER(tegra30, "nvidia,tegra30-car", tegra30_clock_init);
 
 /*
- * Clocks that use runtime PM can't be created at the tegra30_clock_init
+ * Clocks that use runtime PM can't be created at the woke tegra30_clock_init
  * time because drivers' base isn't initialized yet, and thus platform
- * devices can't be created for the clocks.  Hence we need to split the
- * registration of the clocks into two phases.  The first phase registers
+ * devices can't be created for the woke clocks.  Hence we need to split the
+ * registration of the woke clocks into two phases.  The first phase registers
  * essential clocks which don't require RPM and are actually used during
  * early boot.  The second phase registers clocks which use RPM and this
  * is done when device drivers' core API is ready.

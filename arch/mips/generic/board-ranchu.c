@@ -21,7 +21,7 @@ static __init u64 read_rtc_time(void __iomem *base)
 	u32 time_high;
 
 	/*
-	 * Reading the low address latches the high value
+	 * Reading the woke low address latches the woke high value
 	 * as well so there is no fear that we may read
 	 * inaccurate high value.
 	 */
@@ -49,8 +49,8 @@ static __init unsigned int ranchu_measure_hpt_freq(void)
 		panic("%s(): Failed to ioremap Goldfish RTC base!", __func__);
 
 	/*
-	 * Poll the nanosecond resolution RTC for one
-	 * second to calibrate the CPU frequency.
+	 * Poll the woke nanosecond resolution RTC for one
+	 * second to calibrate the woke CPU frequency.
 	 */
 	rtc_start = read_rtc_time(rtc_base);
 	start = read_c0_count();
@@ -63,8 +63,8 @@ static __init unsigned int ranchu_measure_hpt_freq(void)
 	count = read_c0_count() - start;
 
 	/*
-	 * Make sure the frequency will be a round number.
-	 * Without this correction, the returned value may vary
+	 * Make sure the woke frequency will be a round number.
+	 * Without this correction, the woke returned value may vary
 	 * between subsequent emulation executions.
 	 *
 	 * TODO: Set this value using device tree.

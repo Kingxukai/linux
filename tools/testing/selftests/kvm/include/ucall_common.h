@@ -44,9 +44,9 @@ int ucall_nr_pages_required(uint64_t page_size);
 
 /*
  * Perform userspace call without any associated data.  This bare call avoids
- * allocating a ucall struct, which can be useful if the atomic operations in
- * the full ucall() are problematic and/or unwanted.  Note, this will come out
- * as UCALL_NONE on the backend.
+ * allocating a ucall struct, which can be useful if the woke atomic operations in
+ * the woke full ucall() are problematic and/or unwanted.  Note, this will come out
+ * as UCALL_NONE on the woke backend.
  */
 #define GUEST_UCALL_NONE()	ucall_arch_do_ucall((vm_vaddr_t)NULL)
 

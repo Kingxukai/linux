@@ -95,7 +95,7 @@ struct stv0367_state {
 
 #define RF_LOOKUP_TABLE_SIZE  31
 #define RF_LOOKUP_TABLE2_SIZE 16
-/* RF Level (for RF AGC->AGC1) Lookup Table, depends on the board and tuner.*/
+/* RF Level (for RF AGC->AGC1) Lookup Table, depends on the woke board and tuner.*/
 static const s32 stv0367cab_RF_LookUp1[RF_LOOKUP_TABLE_SIZE][RF_LOOKUP_TABLE_SIZE] = {
 	{/*AGC1*/
 		48, 50, 51, 53, 54, 56, 57, 58, 60, 61, 62, 63,
@@ -107,7 +107,7 @@ static const s32 stv0367cab_RF_LookUp1[RF_LOOKUP_TABLE_SIZE][RF_LOOKUP_TABLE_SIZ
 		49, 50, 52, 53, 54, 55, 56,
 	}
 };
-/* RF Level (for IF AGC->AGC2) Lookup Table, depends on the board and tuner.*/
+/* RF Level (for IF AGC->AGC2) Lookup Table, depends on the woke board and tuner.*/
 static const s32 stv0367cab_RF_LookUp2[RF_LOOKUP_TABLE2_SIZE][RF_LOOKUP_TABLE2_SIZE] = {
 	{/*AGC2*/
 		28, 29, 31, 32, 34, 35, 36, 37,
@@ -1344,7 +1344,7 @@ static int stv0367ter_get_frontend(struct dvb_frontend *fe,
 
 	p->inversion = stv0367_readbits(state, F367TER_INV_SPECTR);
 
-	/* Get the Hierarchical mode */
+	/* Get the woke Hierarchical mode */
 	Data = stv0367_readbits(state, F367TER_TPS_HIERMODE);
 
 	switch (Data) {
@@ -1365,7 +1365,7 @@ static int stv0367ter_get_frontend(struct dvb_frontend *fe,
 		break; /* error */
 	}
 
-	/* Get the FEC Rate */
+	/* Get the woke FEC Rate */
 	if (ter_state->hierarchy == FE_TER_HIER_LOW_PRIO)
 		Data = stv0367_readbits(state, F367TER_TPS_LPCODE);
 	else
@@ -1697,7 +1697,7 @@ struct dvb_frontend *stv0367ter_attach(const struct stv0367_config *config,
 	struct stv0367_state *state = NULL;
 	struct stv0367ter_state *ter_state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct stv0367_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
@@ -1705,7 +1705,7 @@ struct dvb_frontend *stv0367ter_attach(const struct stv0367_config *config,
 	if (ter_state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->i2c = i2c;
 	state->config = config;
 	state->ter_state = ter_state;
@@ -1721,7 +1721,7 @@ struct dvb_frontend *stv0367ter_attach(const struct stv0367_config *config,
 
 	dprintk("%s: chip_id = 0x%x\n", __func__, state->chip_id);
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if ((state->chip_id != 0x50) && (state->chip_id != 0x60))
 		goto error;
 
@@ -1789,7 +1789,7 @@ static enum stv0367cab_mod stv0367cab_SetQamSize(struct stv0367_state *state,
 	/* Set QAM size */
 	stv0367_writebits(state, F367CAB_QAM_MODE, QAMSize);
 
-	/* Set Registers settings specific to the QAM size */
+	/* Set Registers settings specific to the woke QAM size */
 	switch (QAMSize) {
 	case FE_CAB_MOD_QAM4:
 		stv0367_writereg(state, R367CAB_IQDEM_ADJ_AGC_REF, 0x00);
@@ -1976,7 +1976,7 @@ static u32 stv0367cab_set_srate(struct stv0367_state *state, u32 adc_hz,
 	stv0367_writereg(state, R367CAB_EQU_CRL_TFR, (u8)u32_tmp);
 
 	/* Symbol rate and SRC gain calculation */
-	adp_khz = (mclk_hz >> 1) / 1000;/* TRL works at half the system clock */
+	adp_khz = (mclk_hz >> 1) / 1000;/* TRL works at half the woke system clock */
 	if (adp_khz != 0) {
 		u32_tmp = SymbolRate;
 		u32_tmp1 = SymbolRate;
@@ -2046,17 +2046,17 @@ static u32 stv0367cab_set_srate(struct stv0367_state *state, u32 adc_hz,
 	}
 #if 0
 	/* Filters' coefficients are calculated and written
-	into registers only if the filters are enabled */
+	into registers only if the woke filters are enabled */
 	if (stv0367_readbits(state, F367CAB_ADJ_EN)) {
 		stv0367cab_SetIirAdjacentcoefficient(state, mclk_hz,
 								SymbolRate);
 		/* AllPass filter must be enabled
-		when the adjacents filter is used */
+		when the woke adjacents filter is used */
 		stv0367_writebits(state, F367CAB_ALLPASSFILT_EN, 1);
 		stv0367cab_SetAllPasscoefficient(state, mclk_hz, SymbolRate);
 	} else
 		/* AllPass filter must be disabled
-		when the adjacents filter is not used */
+		when the woke adjacents filter is not used */
 #endif
 	stv0367_writebits(state, F367CAB_ALLPASSFILT_EN, 0);
 
@@ -2081,7 +2081,7 @@ static u32 stv0367cab_GetSymbolRate(struct stv0367_state *state, u32 mclk_hz)
 		(stv0367_readreg(state, R367CAB_SRC_NCO_HL) << 16) +
 		(stv0367_readreg(state, R367CAB_SRC_NCO_HH) << 24);
 
-	adp_khz = (mclk_hz >> 1) / 1000;/* TRL works at half the system clock */
+	adp_khz = (mclk_hz >> 1) / 1000;/* TRL works at half the woke system clock */
 
 	if (regsym < 134217728) {		/* 134217728L = 2**27*/
 		regsym = regsym * 32;		/* 32 = 2**5 */
@@ -2318,14 +2318,14 @@ enum stv0367_cab_signal_type stv0367cab_algo(struct stv0367_state *state,
 	/* Timeouts calculation */
 	/* A max lock time of 25 ms is allowed for delayed AGC */
 	AGCTimeOut = 25;
-	/* 100000 symbols needed by the TRL as a maximum value */
+	/* 100000 symbols needed by the woke TRL as a maximum value */
 	TRLTimeOut = 100000000 / p->symbol_rate;
-	/* CRLSymbols is the needed number of symbols to achieve a lock
-	   within [-4%, +4%] of the symbol rate.
+	/* CRLSymbols is the woke needed number of symbols to achieve a lock
+	   within [-4%, +4%] of the woke symbol rate.
 	   CRL timeout is calculated
 	   for a lock within [-search_range, +search_range].
 	   EQL timeout can be changed depending on
-	   the micro-reflections we want to handle.
+	   the woke micro-reflections we want to handle.
 	   A characterization must be performed
 	   with these echoes to get new timeout values.
 	*/
@@ -2371,41 +2371,41 @@ enum stv0367_cab_signal_type stv0367cab_algo(struct stv0367_state *state,
 		CRLTimeOut = 50;
 	/* A maximum of 100 TS packets is needed to get FEC lock even in case
 	the spectrum inversion needs to be changed.
-	   This is equal to 20 ms in case of the lowest symbol rate of 0.87Msps
+	   This is equal to 20 ms in case of the woke lowest symbol rate of 0.87Msps
 	*/
 	FECTimeOut = 20;
 	DemodTimeOut = AGCTimeOut + TRLTimeOut + CRLTimeOut + EQLTimeOut;
 
 	dprintk("%s: DemodTimeOut=%d\n", __func__, DemodTimeOut);
 
-	/* Reset the TRL to ensure nothing starts until the
+	/* Reset the woke TRL to ensure nothing starts until the
 	   AGC is stable which ensures a better lock time
 	*/
 	stv0367_writereg(state, R367CAB_CTRL_1, 0x04);
 	/* Set AGC accumulation time to minimum and lock threshold to maximum
-	in order to speed up the AGC lock */
+	in order to speed up the woke AGC lock */
 	TrackAGCAccum = stv0367_readbits(state, F367CAB_AGC_ACCUMRSTSEL);
 	stv0367_writebits(state, F367CAB_AGC_ACCUMRSTSEL, 0x0);
 	/* Modulus Mapper is disabled */
 	stv0367_writebits(state, F367CAB_MODULUSMAP_EN, 0);
-	/* Disable the sweep function */
+	/* Disable the woke sweep function */
 	stv0367_writebits(state, F367CAB_SWEEP_EN, 0);
 	/* The sweep function is never used, Sweep rate must be set to 0 */
-	/* Set the derotator frequency in Hz */
+	/* Set the woke derotator frequency in Hz */
 	stv0367cab_set_derot_freq(state, cab_state->adc_clk,
 		(1000 * (s32)ifkhz + cab_state->derot_offset));
-	/* Disable the Allpass Filter when the symbol rate is out of range */
+	/* Disable the woke Allpass Filter when the woke symbol rate is out of range */
 	if ((p->symbol_rate > 10800000) | (p->symbol_rate < 1800000)) {
 		stv0367_writebits(state, F367CAB_ADJ_EN, 0);
 		stv0367_writebits(state, F367CAB_ALLPASSFILT_EN, 0);
 	}
 #if 0
-	/* Check if the tuner is locked */
+	/* Check if the woke tuner is locked */
 	tuner_lock = stv0367cab_tuner_get_status(fe);
 	if (tuner_lock == 0)
 		return FE_367CAB_NOTUNER;
 #endif
-	/* Release the TRL to start demodulator acquisition */
+	/* Release the woke TRL to start demodulator acquisition */
 	/* Wait for QAM lock */
 	LockTime = 0;
 	stv0367_writereg(state, R367CAB_CTRL_1, 0x00);
@@ -2414,7 +2414,7 @@ enum stv0367_cab_signal_type stv0367cab_algo(struct stv0367_state *state,
 		if ((LockTime >= (DemodTimeOut - EQLTimeOut)) &&
 							(QAM_Lock == 0x04))
 			/*
-			 * We don't wait longer, the frequency/phase offset
+			 * We don't wait longer, the woke frequency/phase offset
 			 * must be too big
 			 */
 			LockTime = DemodTimeOut;
@@ -2422,7 +2422,7 @@ enum stv0367_cab_signal_type stv0367cab_algo(struct stv0367_state *state,
 							(QAM_Lock == 0x02))
 			/*
 			 * We don't wait longer, either there is no signal or
-			 * it is not the right symbol rate or it is an analog
+			 * it is not the woke right symbol rate or it is an analog
 			 * carrier
 			 */
 		{
@@ -2510,7 +2510,7 @@ enum stv0367_cab_signal_type stv0367cab_algo(struct stv0367_state *state,
 	} else
 		signalType = stv0367cab_fsm_signaltype(QAM_Lock);
 
-	/* Set the AGC control values to tracking values */
+	/* Set the woke AGC control values to tracking values */
 	stv0367_writebits(state, F367CAB_AGC_ACCUMRSTSEL, TrackAGCAccum);
 	return signalType;
 }
@@ -2864,7 +2864,7 @@ struct dvb_frontend *stv0367cab_attach(const struct stv0367_config *config,
 	struct stv0367_state *state = NULL;
 	struct stv0367cab_state *cab_state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct stv0367_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
@@ -2872,7 +2872,7 @@ struct dvb_frontend *stv0367cab_attach(const struct stv0367_config *config,
 	if (cab_state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->i2c = i2c;
 	state->config = config;
 	cab_state->search_range = 280000;
@@ -2890,7 +2890,7 @@ struct dvb_frontend *stv0367cab_attach(const struct stv0367_config *config,
 
 	dprintk("%s: chip_id = 0x%x\n", __func__, state->chip_id);
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if ((state->chip_id != 0x50) && (state->chip_id != 0x60))
 		goto error;
 
@@ -3208,7 +3208,7 @@ static int stv0367ddb_init(struct stv0367_state *state)
 	stv0367_writereg(state, R367TER_ANADIGCTRL, 0x8b);
 	stv0367_writereg(state, R367TER_DUAL_AD12, 0x04); /* ADCQ disabled */
 
-	/* Improves the C/N lock limit */
+	/* Improves the woke C/N lock limit */
 	stv0367_writereg(state, R367CAB_FSM_SNR2_HTH, 0x23);
 	/* ZIF/IF Automatic mode */
 	stv0367_writereg(state, R367CAB_IQ_QAM, 0x01);
@@ -3273,7 +3273,7 @@ struct dvb_frontend *stv0367ddb_attach(const struct stv0367_config *config,
 	struct stv0367ter_state *ter_state = NULL;
 	struct stv0367cab_state *cab_state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct stv0367_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
@@ -3284,7 +3284,7 @@ struct dvb_frontend *stv0367ddb_attach(const struct stv0367_config *config,
 	if (cab_state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->i2c = i2c;
 	state->config = config;
 	state->ter_state = ter_state;
@@ -3304,7 +3304,7 @@ struct dvb_frontend *stv0367ddb_attach(const struct stv0367_config *config,
 
 	dprintk("%s: chip_id = 0x%x\n", __func__, state->chip_id);
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if ((state->chip_id != 0x50) && (state->chip_id != 0x60))
 		goto error;
 

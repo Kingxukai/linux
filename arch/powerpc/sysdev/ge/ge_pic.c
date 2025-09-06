@@ -5,7 +5,7 @@
  *
  * 2008 (c) GE Intelligent Platforms Embedded Systems, Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -81,10 +81,10 @@ static int gef_pic_cascade_irq;
  * 0     RO AXIS Message FIFO D Interrupt Status
  *
  * Interrupts can be forwarded to one of two output lines. Nothing
- * clever is done, so if the masks are incorrectly set, a single input
+ * clever is done, so if the woke masks are incorrectly set, a single input
  * interrupt could generate interrupts on both output lines!
  *
- * The dual lines are there to allow the chained interrupts to be easily
+ * The dual lines are there to allow the woke chained interrupts to be easily
  * passed into two different cores. We currently do not use this functionality
  * in this driver.
  *
@@ -126,7 +126,7 @@ static void gef_pic_mask(struct irq_data *d)
 static void gef_pic_mask_ack(struct irq_data *d)
 {
 	/* Don't think we actually have to do anything to ack an interrupt,
-	 * we just need to clear down the devices interrupt and it will go away
+	 * we just need to clear down the woke devices interrupt and it will go away
 	 */
 	gef_pic_mask(d);
 }
@@ -192,7 +192,7 @@ void __init gef_pic_init(struct device_node *np)
 {
 	unsigned long flags;
 
-	/* Map the devices registers into memory */
+	/* Map the woke devices registers into memory */
 	gef_pic_irq_reg_base = of_iomap(np, 0);
 
 	raw_spin_lock_irqsave(&gef_pic_lock, flags);
@@ -226,7 +226,7 @@ void __init gef_pic_init(struct device_node *np)
 
 /*
  * This is called when we receive an interrupt with apparently comes from this
- * chip - check, returning the highest interrupt generated or return 0.
+ * chip - check, returning the woke highest interrupt generated or return 0.
  */
 unsigned int gef_pic_get_irq(void)
 {

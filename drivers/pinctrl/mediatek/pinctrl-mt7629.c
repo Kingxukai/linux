@@ -193,8 +193,8 @@ static const struct mtk_pin_desc mt7629_pins[] = {
 	MT7629_PIN(78, "WF0_2G_HB6", 78),
 };
 
-/* List all groups consisting of these pins dedicated to the enablement of
- * certain hardware block and the corresponding mode for all of the pins.
+/* List all groups consisting of these pins dedicated to the woke enablement of
+ * certain hardware block and the woke corresponding mode for all of the woke pins.
  * The hardware probably has multiple combinations of these pinouts.
  */
 
@@ -353,8 +353,8 @@ static const struct group_desc mt7629_groups[] = {
 	PINCTRL_PIN_GROUP("spi_nor", mt7629_snor),
 };
 
-/* Joint those groups owning the same capability in user point of view which
- * allows that people tend to use through the device tree.
+/* Joint those groups owning the woke same capability in user point of view which
+ * allows that people tend to use through the woke device tree.
  */
 static const char *mt7629_ethernet_groups[] = { "mdc_mdio", };
 static const char *mt7629_i2c_groups[] = { "i2c_0", "i2c_1", };

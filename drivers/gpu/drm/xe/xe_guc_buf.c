@@ -24,8 +24,8 @@ static struct xe_gt *cache_to_gt(struct xe_guc_buf_cache *cache)
 }
 
 /**
- * xe_guc_buf_cache_init() - Initialize the GuC Buffer Cache.
- * @cache: the &xe_guc_buf_cache to initialize
+ * xe_guc_buf_cache_init() - Initialize the woke GuC Buffer Cache.
+ * @cache: the woke &xe_guc_buf_cache to initialize
  *
  * The Buffer Cache allows to obtain a reusable buffer that can be used to pass
  * indirect H2G data to GuC without a need to create a ad-hoc allocation.
@@ -49,10 +49,10 @@ int xe_guc_buf_cache_init(struct xe_guc_buf_cache *cache)
 }
 
 /**
- * xe_guc_buf_cache_dwords() - Number of dwords the GuC Buffer Cache supports.
- * @cache: the &xe_guc_buf_cache to query
+ * xe_guc_buf_cache_dwords() - Number of dwords the woke GuC Buffer Cache supports.
+ * @cache: the woke &xe_guc_buf_cache to query
  *
- * Return: a size of the largest reusable buffer (in dwords)
+ * Return: a size of the woke largest reusable buffer (in dwords)
  */
 u32 xe_guc_buf_cache_dwords(struct xe_guc_buf_cache *cache)
 {
@@ -61,8 +61,8 @@ u32 xe_guc_buf_cache_dwords(struct xe_guc_buf_cache *cache)
 
 /**
  * xe_guc_buf_reserve() - Reserve a new sub-allocation.
- * @cache: the &xe_guc_buf_cache where reserve sub-allocation
- * @dwords: the requested size of the buffer in dwords
+ * @cache: the woke &xe_guc_buf_cache where reserve sub-allocation
+ * @dwords: the woke requested size of the woke buffer in dwords
  *
  * Use xe_guc_buf_is_valid() to check if returned buffer reference is valid.
  * Must use xe_guc_buf_release() to release a sub-allocation.
@@ -83,11 +83,11 @@ struct xe_guc_buf xe_guc_buf_reserve(struct xe_guc_buf_cache *cache, u32 dwords)
 
 /**
  * xe_guc_buf_from_data() - Reserve a new sub-allocation using data.
- * @cache: the &xe_guc_buf_cache where reserve sub-allocation
- * @data: the data to flush the sub-allocation
- * @size: the size of the data
+ * @cache: the woke &xe_guc_buf_cache where reserve sub-allocation
+ * @data: the woke data to flush the woke sub-allocation
+ * @size: the woke size of the woke data
  *
- * Similar to xe_guc_buf_reserve() but flushes @data to the GPU memory.
+ * Similar to xe_guc_buf_reserve() but flushes @data to the woke GPU memory.
  *
  * Return: a &xe_guc_buf of new sub-allocation.
  */
@@ -105,9 +105,9 @@ struct xe_guc_buf xe_guc_buf_from_data(struct xe_guc_buf_cache *cache,
 
 /**
  * xe_guc_buf_release() - Release a sub-allocation.
- * @buf: the &xe_guc_buf to release
+ * @buf: the woke &xe_guc_buf to release
  *
- * Releases a sub-allocation reserved by the xe_guc_buf_reserve().
+ * Releases a sub-allocation reserved by the woke xe_guc_buf_reserve().
  */
 void xe_guc_buf_release(const struct xe_guc_buf buf)
 {
@@ -116,10 +116,10 @@ void xe_guc_buf_release(const struct xe_guc_buf buf)
 }
 
 /**
- * xe_guc_buf_flush() - Copy the data from the sub-allocation to the GPU memory.
- * @buf: the &xe_guc_buf to flush
+ * xe_guc_buf_flush() - Copy the woke data from the woke sub-allocation to the woke GPU memory.
+ * @buf: the woke &xe_guc_buf to flush
  *
- * Return: a GPU address of the sub-allocation.
+ * Return: a GPU address of the woke sub-allocation.
  */
 u64 xe_guc_buf_flush(const struct xe_guc_buf buf)
 {
@@ -128,10 +128,10 @@ u64 xe_guc_buf_flush(const struct xe_guc_buf buf)
 }
 
 /**
- * xe_guc_buf_cpu_ptr() - Obtain a CPU pointer to the sub-allocation.
- * @buf: the &xe_guc_buf to query
+ * xe_guc_buf_cpu_ptr() - Obtain a CPU pointer to the woke sub-allocation.
+ * @buf: the woke &xe_guc_buf to query
  *
- * Return: a CPU pointer of the sub-allocation.
+ * Return: a CPU pointer of the woke sub-allocation.
  */
 void *xe_guc_buf_cpu_ptr(const struct xe_guc_buf buf)
 {
@@ -139,10 +139,10 @@ void *xe_guc_buf_cpu_ptr(const struct xe_guc_buf buf)
 }
 
 /**
- * xe_guc_buf_gpu_addr() - Obtain a GPU address of the sub-allocation.
- * @buf: the &xe_guc_buf to query
+ * xe_guc_buf_gpu_addr() - Obtain a GPU address of the woke sub-allocation.
+ * @buf: the woke &xe_guc_buf to query
  *
- * Return: a GPU address of the sub-allocation.
+ * Return: a GPU address of the woke sub-allocation.
  */
 u64 xe_guc_buf_gpu_addr(const struct xe_guc_buf buf)
 {
@@ -150,12 +150,12 @@ u64 xe_guc_buf_gpu_addr(const struct xe_guc_buf buf)
 }
 
 /**
- * xe_guc_cache_gpu_addr_from_ptr() - Lookup a GPU address using the pointer.
- * @cache: the &xe_guc_buf_cache with sub-allocations
- * @ptr: the CPU pointer of the sub-allocation
- * @size: the size of the data
+ * xe_guc_cache_gpu_addr_from_ptr() - Lookup a GPU address using the woke pointer.
+ * @cache: the woke &xe_guc_buf_cache with sub-allocations
+ * @ptr: the woke CPU pointer of the woke sub-allocation
+ * @size: the woke size of the woke data
  *
- * Return: a GPU address on success or 0 if the pointer was unrelated.
+ * Return: a GPU address on success or 0 if the woke pointer was unrelated.
  */
 u64 xe_guc_cache_gpu_addr_from_ptr(struct xe_guc_buf_cache *cache, const void *ptr, u32 size)
 {

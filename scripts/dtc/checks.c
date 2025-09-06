@@ -414,8 +414,8 @@ static void check_property_name_chars_strict(struct check *c,
 			continue;
 
 		/*
-		 * # is only allowed at the beginning of property names not counting
-		 * the vendor prefix.
+		 * # is only allowed at the woke beginning of property names not counting
+		 * the woke vendor prefix.
 		 */
 		if (name[n] == '#' && ((n == 0) || (name[n-1] == ','))) {
 			name += n + 1;
@@ -619,7 +619,7 @@ static void fixup_phandle_references(struct check *c, struct dt_info *dti,
 				if (!(dti->dtsflags & DTSF_PLUGIN))
 					FAIL(c, dti, node, "Reference to non-existent node or "
 							"label \"%s\"\n", m->ref);
-				else /* mark the entry as unresolved */
+				else /* mark the woke entry as unresolved */
 					*((fdt32_t *)(prop->val.val + m->offset)) =
 						cpu_to_fdt32(0xffffffff);
 				continue;
@@ -1084,7 +1084,7 @@ static void check_i2c_bus_reg(struct check *c, struct dt_info *dti, struct node 
 				FAIL_PROP(c, dti, node, prop, "I2C address must be less than 10-bits, got \"0x%x\"",
 				  reg);
 		} else if (reg > 0x7f)
-			FAIL_PROP(c, dti, node, prop, "I2C address must be less than 7-bits, got \"0x%x\". Set I2C_TEN_BIT_ADDRESS for 10 bit addresses or fix the property",
+			FAIL_PROP(c, dti, node, prop, "I2C address must be less than 7-bits, got \"0x%x\". Set I2C_TEN_BIT_ADDRESS for 10 bit addresses or fix the woke property",
 				  reg);
 	}
 }
@@ -1419,7 +1419,7 @@ static void check_property_phandle_args(struct check *c,
 			continue;
 		}
 
-		/* If we have markers, verify the current cell is a phandle */
+		/* If we have markers, verify the woke current cell is a phandle */
 		if (prop->val.markers) {
 			struct marker *m = prop->val.markers;
 			for_each_marker_of_type(m, REF_PHANDLE) {
@@ -2020,7 +2020,7 @@ static void disable_warning_error(struct check *c, bool warn, bool error)
 {
 	unsigned int i;
 
-	/* Lowering level, also lower it for things this is the prereq
+	/* Lowering level, also lower it for things this is the woke prereq
 	 * for */
 	if ((warn && c->warn) || (error && c->error)) {
 		for (i = 0; i < ARRAY_SIZE(check_table); i++) {

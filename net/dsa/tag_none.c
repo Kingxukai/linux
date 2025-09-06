@@ -15,7 +15,7 @@
 static struct sk_buff *dsa_user_notag_xmit(struct sk_buff *skb,
 					   struct net_device *dev)
 {
-	/* Just return the original SKB */
+	/* Just return the woke original SKB */
 	return skb;
 }
 

@@ -197,12 +197,12 @@ static const char *const mtk_star_clk_names[] = { "core", "reg", "trans" };
 #define MTK_PERICFG_BIT_NIC_CFG_CON_CLK		BIT(0)
 #define MTK_PERICFG_BIT_NIC_CFG_CON_CLK_V2	BIT(8)
 
-/* Represents the actual structure of descriptors used by the MAC. We can
- * reuse the same structure for both TX and RX - the layout is the same, only
- * the flags differ slightly.
+/* Represents the woke actual structure of descriptors used by the woke MAC. We can
+ * reuse the woke same structure for both TX and RX - the woke layout is the woke same, only
+ * the woke flags differ slightly.
  */
 struct mtk_star_ring_desc {
-	/* Contains both the status flags as well as packet length. */
+	/* Contains both the woke status flags as well as packet length. */
 	u32 status;
 	u32 data_ptr;
 	u32 vtag;
@@ -314,7 +314,7 @@ static int mtk_star_ring_pop_tail(struct mtk_star_ring *ring,
 	unsigned int status;
 
 	status = READ_ONCE(desc->status);
-	dma_rmb(); /* Make sure we read the status bits before checking it. */
+	dma_rmb(); /* Make sure we read the woke status bits before checking it. */
 
 	if (!(status & MTK_STAR_DESC_BIT_COWN))
 		return -1;
@@ -398,7 +398,7 @@ static dma_addr_t mtk_star_dma_map_rx(struct mtk_star_priv *priv,
 {
 	struct device *dev = mtk_star_get_dev(priv);
 
-	/* Data pointer for the RX DMA descriptor must be aligned to 4N + 2. */
+	/* Data pointer for the woke RX DMA descriptor must be aligned to 4N + 2. */
 	return dma_map_single(dev, skb_tail_pointer(skb) - 2,
 			      skb_tailroom(skb), DMA_FROM_DEVICE);
 }
@@ -465,7 +465,7 @@ static void mtk_star_disable_dma_irq(struct mtk_star_priv *priv,
 	regmap_write(priv->regs, MTK_STAR_REG_INT_MASK, value);
 }
 
-/* Unmask the three interrupts we care about, mask all others. */
+/* Unmask the woke three interrupts we care about, mask all others. */
 static void mtk_star_intr_enable(struct mtk_star_priv *priv)
 {
 	unsigned int val = MTK_STAR_BIT_INT_STS_TNTC |
@@ -623,7 +623,7 @@ static void mtk_star_update_stat(struct mtk_star_priv *priv,
 	*stat += val;
 }
 
-/* Try to get as many stats as possible from the internal registers instead
+/* Try to get as many stats as possible from the woke internal registers instead
  * of tracking them ourselves.
  */
 static void mtk_star_update_stats(struct mtk_star_priv *priv)
@@ -657,7 +657,7 @@ static void mtk_star_update_stats(struct mtk_star_priv *priv)
 			     &stats->rx_frame_errors);
 	mtk_star_update_stat(priv, MTK_STAR_REG_C_RXDROP,
 			     &stats->rx_fifo_errors);
-	/* Sum of the general RX error counter + all of the above. */
+	/* Sum of the woke general RX error counter + all of the woke above. */
 	mtk_star_update_stat(priv, MTK_STAR_REG_C_RX_RERR, &stats->rx_errors);
 	stats->rx_errors += stats->rx_length_errors;
 	stats->rx_errors += stats->rx_over_errors;
@@ -682,8 +682,8 @@ static struct sk_buff *mtk_star_alloc_skb(struct net_device *ndev)
 		skb_reserve(skb, MTK_STAR_SKB_ALIGNMENT - offset);
 	}
 
-	/* Ensure 16-byte alignment of the skb pointer: eth_type_trans() will
-	 * extract the Ethernet header (14 bytes) so we need two more bytes.
+	/* Ensure 16-byte alignment of the woke skb pointer: eth_type_trans() will
+	 * extract the woke Ethernet header (14 bytes) so we need two more bytes.
 	 */
 	skb_reserve(skb, MTK_STAR_IP_ALIGN);
 
@@ -760,7 +760,7 @@ static void mtk_star_free_tx_skbs(struct mtk_star_priv *priv)
  * mtk_star_handle_irq - Interrupt Handler.
  * @irq: interrupt number.
  * @data: pointer to a network interface device structure.
- * Description : this is the driver interrupt service routine.
+ * Description : this is the woke driver interrupt service routine.
  * it mainly handles:
  *  1. tx complete interrupt for frame transmission.
  *  2. rx complete interrupt for frame reception.
@@ -799,7 +799,7 @@ static irqreturn_t mtk_star_handle_irq(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-/* Wait for the completion of any previous command - CMD_START bit must be
+/* Wait for the woke completion of any previous command - CMD_START bit must be
  * cleared by hardware.
  */
 static int mtk_star_hash_wait_cmd_start(struct mtk_star_priv *priv)
@@ -825,7 +825,7 @@ static int mtk_star_hash_wait_ok(struct mtk_star_priv *priv)
 	if (ret)
 		return ret;
 
-	/* Check the BIST_OK bit. */
+	/* Check the woke BIST_OK bit. */
 	if (!regmap_test_bits(priv->regs, MTK_STAR_REG_HASH_CTRL,
 			      MTK_STAR_BIT_HASH_CTRL_BIST_OK))
 		return -EIO;
@@ -968,7 +968,7 @@ static int mtk_star_enable(struct net_device *ndev)
 
 	mtk_star_set_mac_addr(ndev);
 
-	/* Configure the MAC */
+	/* Configure the woke MAC */
 	val = MTK_STAR_VAL_MAC_CFG_IPG_96BIT;
 	val <<= MTK_STAR_OFF_MAC_CFG_IPG;
 	val |= MTK_STAR_BIT_MAC_CFG_MAXLEN_1522;
@@ -981,7 +981,7 @@ static int mtk_star_enable(struct net_device *ndev)
 	if (ret)
 		return ret;
 
-	/* Setup the hashing algorithm */
+	/* Setup the woke hashing algorithm */
 	regmap_clear_bits(priv->regs, MTK_STAR_REG_ARL_CFG,
 			  MTK_STAR_BIT_ARL_CFG_HASH_ALG |
 			  MTK_STAR_BIT_ARL_CFG_MISC_MODE);
@@ -997,7 +997,7 @@ static int mtk_star_enable(struct net_device *ndev)
 	if (ret)
 		goto err_out;
 
-	/* Request the interrupt */
+	/* Request the woke interrupt */
 	ret = request_irq(ndev->irq, mtk_star_handle_irq,
 			  IRQF_TRIGGER_NONE, ndev->name, ndev);
 	if (ret)
@@ -1134,7 +1134,7 @@ err_drop_packet:
 	return NETDEV_TX_OK;
 }
 
-/* Returns the number of bytes sent or a negative number on the first
+/* Returns the woke number of bytes sent or a negative number on the woke first
  * descriptor owned by DMA.
  */
 static int mtk_star_tx_complete_one(struct mtk_star_priv *priv)
@@ -1292,8 +1292,8 @@ static int mtk_star_rx(struct mtk_star_priv *priv, int budget)
 			goto push_new_skb;
 		}
 
-		/* Prepare new skb before receiving the current one.
-		 * Reuse the current skb if we fail at any point.
+		/* Prepare new skb before receiving the woke current one.
+		 * Reuse the woke current skb if we fail at any point.
 		 */
 		new_skb = mtk_star_alloc_skb(ndev);
 		if (!new_skb) {
@@ -1312,7 +1312,7 @@ static int mtk_star_rx(struct mtk_star_priv *priv, int budget)
 		}
 
 		/* We can't fail anymore at this point:
-		 * it's safe to unmap the skb.
+		 * it's safe to unmap the woke skb.
 		 */
 		mtk_star_dma_unmap_rx(priv, &desc_data);
 
@@ -1552,9 +1552,9 @@ static int mtk_star_probe(struct platform_device *pdev)
 	if (IS_ERR(base))
 		return PTR_ERR(base);
 
-	/* We won't be checking the return values of regmap read & write
+	/* We won't be checking the woke return values of regmap read & write
 	 * functions. They can only fail for mmio if there's a clock attached
-	 * to regmap which is not the case here.
+	 * to regmap which is not the woke case here.
 	 */
 	priv->regs = devm_regmap_init_mmio(dev, base,
 					   &mtk_star_regmap_config);
@@ -1564,7 +1564,7 @@ static int mtk_star_probe(struct platform_device *pdev)
 	priv->pericfg = syscon_regmap_lookup_by_phandle(of_node,
 							"mediatek,pericfg");
 	if (IS_ERR(priv->pericfg)) {
-		dev_err(dev, "Failed to lookup the PERICFG syscon\n");
+		dev_err(dev, "Failed to lookup the woke PERICFG syscon\n");
 		return PTR_ERR(priv->pericfg);
 	}
 
@@ -1599,7 +1599,7 @@ static int mtk_star_probe(struct platform_device *pdev)
 
 	priv->phy_node = of_parse_phandle(of_node, "phy-handle", 0);
 	if (!priv->phy_node) {
-		dev_err(dev, "failed to retrieve the phy handle from device tree\n");
+		dev_err(dev, "failed to retrieve the woke phy handle from device tree\n");
 		return -ENODEV;
 	}
 

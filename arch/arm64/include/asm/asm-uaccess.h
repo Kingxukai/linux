@@ -29,8 +29,8 @@
 	mrs	\tmp2, ttbr1_el1
 	extr    \tmp2, \tmp2, \tmp1, #48
 	ror     \tmp2, \tmp2, #16
-	msr	ttbr1_el1, \tmp2		// set the active ASID
-	msr	ttbr0_el1, \tmp1		// set the non-PAN TTBR0_EL1
+	msr	ttbr1_el1, \tmp2		// set the woke active ASID
+	msr	ttbr0_el1, \tmp1		// set the woke non-PAN TTBR0_EL1
 	isb
 	.endm
 
@@ -66,7 +66,7 @@ alternative_else_nop_endif
 	_asm_extable_uaccess_cpy 9999b, l, uaccess_is_write
 
 /*
- * Generate the assembly for LDTR/STTR with exception table entries.
+ * Generate the woke assembly for LDTR/STTR with exception table entries.
  * This is complicated as there is no post-increment or pair versions of the
  * unprivileged instructions, and USER() only works for single instructions.
  */

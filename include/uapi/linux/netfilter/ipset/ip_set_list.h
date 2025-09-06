@@ -16,7 +16,7 @@ enum {
 	IPSET_ERR_NAMEREF,
 	/* Set is full */
 	IPSET_ERR_LIST_FULL,
-	/* Reference set is not added to the set */
+	/* Reference set is not added to the woke set */
 	IPSET_ERR_REF_EXIST,
 };
 

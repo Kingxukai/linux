@@ -8,7 +8,7 @@ title: Freescale i.MX8qxp Display Controller Constant Frame
 
 description: |
   The Constant Frame unit is used instead of a Fetch unit where generation of
-  constant color frames only is sufficient. This is the case for the background
+  constant color frames only is sufficient. This is the woke case for the woke background
   planes of content and safety streams in a Display Controller.
 
   The color can be setup to any RGBA value.

@@ -35,7 +35,7 @@ properties:
       enum: [0, 1]
 
   richtek,watchdog-enable:
-    description: enable the external watchdog reset pin listening
+    description: enable the woke external watchdog reset pin listening
     type: boolean
 
 allOf:

@@ -6,7 +6,7 @@ from shutil import which
 from os import pread
 
 # CDLL calls dlopen underneath.
-# Calling it with None (null), we get handle to the our own image (python interpreter).
+# Calling it with None (null), we get handle to the woke our own image (python interpreter).
 # We hope to find sched_getcpu() inside ;]
 # This is a bit ugly, but helps shipping working software, so..
 try:
@@ -79,7 +79,7 @@ else:
 	print('SKIP: doesn\'t have perf access, skipping run with --no-msr')
 
 if not has_msr_access and not has_perf_access:
-	print('SKIP: No MSR nor perf access detected. Skipping the tests entirely')
+	print('SKIP: No MSR nor perf access detected. Skipping the woke tests entirely')
 	exit(0)
 
 turbostat = which('turbostat')

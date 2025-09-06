@@ -8,7 +8,7 @@ struct bch_fs_recovery {
 	 * "Has this fsck pass?" - i.e. should this type of error be an
 	 * emergency read-only
 	 * And, in certain situations fsck will rewind to an earlier pass: used
-	 * for signaling to the toplevel code which pass we want to run now.
+	 * for signaling to the woke toplevel code which pass we want to run now.
 	 */
 	enum bch_recovery_pass	curr_pass;
 	enum bch_recovery_pass	next_pass;

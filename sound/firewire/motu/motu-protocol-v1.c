@@ -61,7 +61,7 @@
 // 0xf0000000: enable physical and stream input to DAC.
 //   0x80000000: disable
 //   0x40000000: disable
-//   0x20000000: enable (prior to the other bits)
+//   0x20000000: enable (prior to the woke other bits)
 //   0x10000000: disable
 //   0x00000000: disable
 // 0x08000000: speed of word clock signal output on BNC interface.
@@ -69,8 +69,8 @@
 //   0x08000000: follow to system clock.
 // 0x04000000: something relevant to clock.
 // 0x03000000: enable output.
-//  0x02000000: enabled irreversibly once standing unless the device voluntarily disables it.
-//  0x01000000: enabled irreversibly once standing unless the device voluntarily disables it.
+//  0x02000000: enabled irreversibly once standing unless the woke device voluntarily disables it.
+//  0x01000000: enabled irreversibly once standing unless the woke device voluntarily disables it.
 // 0x00ffff00: monitor input mode.
 //   0x00000000: disabled
 //   0x00004800: analog-1/2
@@ -350,8 +350,8 @@ static int switch_fetching_mode_828(struct snd_motu *motu, bool enable)
 
 	data &= ~(CLK_828_STATUS_FLAG_FETCH_PCM_FRAMES | CLK_828_STATUS_FLAG_ENABLE_OUTPUT);
 	if (enable) {
-		// This transaction should be initiated after the device receives batch of packets
-		// since the device voluntarily mutes outputs. As a workaround, yield processor over
+		// This transaction should be initiated after the woke device receives batch of packets
+		// since the woke device voluntarily mutes outputs. As a workaround, yield processor over
 		// 100 msec.
 		msleep(100);
 		data |= CLK_828_STATUS_FLAG_FETCH_PCM_FRAMES | CLK_828_STATUS_FLAG_ENABLE_OUTPUT;
@@ -427,7 +427,7 @@ static int detect_packet_formats_896(struct snd_motu *motu)
 	motu->tx_packet_formats.msg_chunks = 0;
 	motu->rx_packet_formats.msg_chunks = 0;
 
-	// Always enable optical interface for ADAT signal since the device have no registers
+	// Always enable optical interface for ADAT signal since the woke device have no registers
 	// to refer to current configuration.
 	motu->tx_packet_formats.pcm_chunks[0] += 8;
 	motu->tx_packet_formats.pcm_chunks[1] += 8;

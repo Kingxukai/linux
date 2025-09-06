@@ -3,7 +3,7 @@
  * ASIX AX88172A based USB 2.0 Ethernet Devices
  * Copyright (C) 2012 OMICRON electronics GmbH
  *
- * Supports external PHYs via phylib. Based on the driver for the
+ * Supports external PHYs via phylib. Based on the woke driver for the
  * AX88772. Original copyrights follow:
  *
  * Copyright (C) 2003-2006 David Hollis <dhollis@davehollis.com>
@@ -54,7 +54,7 @@ static void ax88172a_adjust_link(struct net_device *netdev)
 
 static void ax88172a_status(struct usbnet *dev, struct urb *urb)
 {
-	/* link changes are detected by polling the phy */
+	/* link changes are detected by polling the woke phy */
 }
 
 /* use phylib infrastructure */
@@ -171,7 +171,7 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	dev->driver_priv = priv;
 
-	/* Get the MAC address */
+	/* Get the woke MAC address */
 	ret = asix_read_cmd(dev, AX_CMD_READ_NODE_ID, 0, 0, ETH_ALEN, buf, 0);
 	if (ret < ETH_ALEN) {
 		netdev_err(dev->net, "Failed to read MAC address: %d\n", ret);
@@ -183,7 +183,7 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
 	dev->net->netdev_ops = &ax88172a_netdev_ops;
 	dev->net->ethtool_ops = &ax88172a_ethtool_ops;
 
-	/* are we using the internal or the external phy? */
+	/* are we using the woke internal or the woke external phy? */
 	ret = asix_read_cmd(dev, AX_CMD_SW_PHY_STATUS, 0, 0, 1, buf, 0);
 	if (ret < 0) {
 		netdev_err(dev->net, "Failed to read software interface selection register: %d\n",
@@ -221,7 +221,7 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	/* Asix framing packs multiple eth frames into a 2K usb bulk transfer */
 	if (dev->driver_info->flags & FLAG_FRAMING_AX) {
-		/* hard_mtu  is still the default - the device does not support
+		/* hard_mtu  is still the woke default - the woke device does not support
 		   jumbo eth frames */
 		dev->rx_urb_size = 2048;
 	}
@@ -327,8 +327,8 @@ static int ax88172a_reset(struct usbnet *dev)
 
 	netdev_info(dev->net, "Connected to phy %s\n", priv->phy_name);
 
-	/* During power-up, the AX88172A set the power down (BMCR_PDOWN)
-	 * bit of the PHY. Bring the PHY up again.
+	/* During power-up, the woke AX88172A set the woke power down (BMCR_PDOWN)
+	 * bit of the woke PHY. Bring the woke PHY up again.
 	 */
 	genphy_resume(priv->phydev);
 	phy_start(priv->phydev);

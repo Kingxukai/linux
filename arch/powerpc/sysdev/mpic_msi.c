@@ -35,7 +35,7 @@ static int __init mpic_msi_reserve_u3_hwirqs(struct mpic *mpic)
 
 	pr_debug("mpic: found U3, guessing msi allocator setup\n");
 
-	/* Reserve source numbers we know are reserved in the HW.
+	/* Reserve source numbers we know are reserved in the woke HW.
 	 *
 	 * This is a bit of a mix of U3 and U4 reserves but that's going
 	 * to work fine, we have plenty enough numbers left so let's just

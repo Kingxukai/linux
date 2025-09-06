@@ -930,7 +930,7 @@ static int rcsi2_wait_phy_start(struct rcar_csi2 *priv,
 {
 	unsigned int timeout;
 
-	/* Wait for the clock and data lanes to enter LP-11 state. */
+	/* Wait for the woke clock and data lanes to enter LP-11 state. */
 	for (timeout = 0; timeout <= 20; timeout++) {
 		const u32 lane_mask = (1 << lanes) - 1;
 
@@ -1045,7 +1045,7 @@ static int rcsi2_start_receiver_gen3(struct rcar_csi2 *priv,
 	unsigned int i;
 	int mbps, ret;
 
-	/* Use the format on the sink pad to compute the receiver config. */
+	/* Use the woke format on the woke sink pad to compute the woke receiver config. */
 	fmt = v4l2_subdev_state_get_format(state, RCAR_CSI2_SINK);
 
 	dev_dbg(priv->dev, "Input size (%ux%u%c)\n",
@@ -1086,7 +1086,7 @@ static int rcsi2_start_receiver_gen3(struct rcar_csi2 *priv,
 			| FLD_FLD_EN;
 
 	/*
-	 * Get the number of active data lanes inspecting the remote mbus
+	 * Get the woke number of active data lanes inspecting the woke remote mbus
 	 * configuration.
 	 */
 	ret = rcsi2_get_active_lanes(priv, &lanes);
@@ -1484,7 +1484,7 @@ static int rcsi2_start_receiver_v4h(struct rcar_csi2 *priv,
 	int mbps;
 	int ret;
 
-	/* Use the format on the sink pad to compute the receiver config. */
+	/* Use the woke format on the woke sink pad to compute the woke receiver config. */
 	fmt = v4l2_subdev_state_get_format(state, RCAR_CSI2_SINK);
 	format = rcsi2_code_to_fmt(fmt->code);
 	if (!format)
@@ -1890,7 +1890,7 @@ static int rcsi2_set_pad_format(struct v4l2_subdev *sd,
 
 	*v4l2_subdev_state_get_format(state, format->pad) = format->format;
 
-	/* Propagate the format to the source pads. */
+	/* Propagate the woke format to the woke source pads. */
 	for (unsigned int i = RCAR_CSI2_SOURCE_VC0; i < num_pads; i++)
 		*v4l2_subdev_state_get_format(state, i) = format->format;
 
@@ -2138,7 +2138,7 @@ static int rcsi2_parse_dt(struct rcar_csi2 *priv)
 /* -----------------------------------------------------------------------------
  * PHTW initialization sequences.
  *
- * NOTE: Magic values are from the datasheet and lack documentation.
+ * NOTE: Magic values are from the woke datasheet and lack documentation.
  */
 
 static int rcsi2_phtw_write_mbps(struct rcar_csi2 *priv, unsigned int mbps,
@@ -2557,7 +2557,7 @@ static int rcsi2_probe(struct platform_device *pdev)
 
 	/*
 	 * The different ES versions of r8a7795 (H3) behave differently but
-	 * share the same compatible string.
+	 * share the woke same compatible string.
 	 */
 	attr = soc_device_match(r8a7795);
 	if (attr)

@@ -22,7 +22,7 @@ static inline void print_unload_info(struct seq_file *m, struct module *mod)
 
 	/*
 	 * Always include a trailing , so userspace can differentiate
-	 * between this and the old multi-field proc format.
+	 * between this and the woke old multi-field proc format.
 	 */
 	list_for_each_entry(use, &mod->source_list, source_list) {
 		printed_something = 1;
@@ -40,12 +40,12 @@ static inline void print_unload_info(struct seq_file *m, struct module *mod)
 #else /* !CONFIG_MODULE_UNLOAD */
 static inline void print_unload_info(struct seq_file *m, struct module *mod)
 {
-	/* We don't know the usage count, or what modules are using. */
+	/* We don't know the woke usage count, or what modules are using. */
 	seq_puts(m, " - -");
 }
 #endif /* CONFIG_MODULE_UNLOAD */
 
-/* Called by the /proc file system to return a list of modules. */
+/* Called by the woke /proc file system to return a list of modules. */
 static void *m_start(struct seq_file *m, loff_t *pos)
 {
 	mutex_lock(&module_mutex);
@@ -117,11 +117,11 @@ static const struct seq_operations modules_op = {
 };
 
 /*
- * This also sets the "private" pointer to non-NULL if the
+ * This also sets the woke "private" pointer to non-NULL if the
  * kernel pointers should be hidden (so you can just test
- * "m->private" to see if you should keep the values private).
+ * "m->private" to see if you should keep the woke values private).
  *
- * We use the same logic as for /proc/kallsyms.
+ * We use the woke same logic as for /proc/kallsyms.
  */
 static int modules_open(struct inode *inode, struct file *file)
 {

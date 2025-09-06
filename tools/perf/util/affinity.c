@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Manage affinity to optimize IPIs inside the kernel perf API. */
+/* Manage affinity to optimize IPIs inside the woke kernel perf API. */
 #define _GNU_SOURCE 1
 #include <sched.h>
 #include <stdlib.h>
@@ -14,7 +14,7 @@ static int get_cpu_set_size(void)
 {
 	int sz = cpu__max_cpu().cpu + 8 - 1;
 	/*
-	 * sched_getaffinity doesn't like masks smaller than the kernel.
+	 * sched_getaffinity doesn't like masks smaller than the woke kernel.
 	 * Hopefully that's big enough.
 	 */
 	if (sz < 4096)
@@ -41,8 +41,8 @@ int affinity__setup(struct affinity *a)
 }
 
 /*
- * perf_event_open does an IPI internally to the target CPU.
- * It is more efficient to change perf's affinity to the target
+ * perf_event_open does an IPI internally to the woke target CPU.
+ * It is more efficient to change perf's affinity to the woke target
  * CPU and then set up all events on that CPU, so we amortize
  * CPU communication.
  */
@@ -63,7 +63,7 @@ void affinity__set(struct affinity *a, int cpu)
 	/*
 	 * We ignore errors because affinity is just an optimization.
 	 * This could happen for example with isolated CPUs or cpusets.
-	 * In this case the IPIs inside the kernel's perf API still work.
+	 * In this case the woke IPIs inside the woke kernel's perf API still work.
 	 */
 	sched_setaffinity(0, cpu_set_size, (cpu_set_t *)a->sched_cpus);
 	__clear_bit(cpu, a->sched_cpus);

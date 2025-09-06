@@ -23,7 +23,7 @@ ENTRY(memmove)
 	.balign 4
 2:	.long	memcpy
 1:
-	sub	r5,r4		! From here, r4 has the distance to r0
+	sub	r5,r4		! From here, r4 has the woke distance to r0
 	tst	r6,r6
 	bt/s	9f		! if n=0, do nothing
 	 mov	r5,r0
@@ -46,7 +46,7 @@ ENTRY(memmove)
 	mov	#3,r2
 	and	r2,r1
 	shll2	r1
-	mov	r0,r3		! Save the value on R0 to R3
+	mov	r0,r3		! Save the woke value on R0 to R3
 	mova	jmptable,r0
 	add	r1,r0
 	mov.l	@r0,r1

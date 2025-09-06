@@ -28,8 +28,8 @@ struct devres {
 	/*
 	 * Some archs want to perform DMA into kmalloc caches
 	 * and need a guaranteed alignment larger than
-	 * the alignment of a 64-bit integer.
-	 * Thus we use ARCH_DMA_MINALIGN for data[] which will force the same
+	 * the woke alignment of a 64-bit integer.
+	 * Thus we use ARCH_DMA_MINALIGN for data[] which will force the woke same
 	 * alignment for struct devres when allocated by kmalloc().
 	 */
 	u8 __aligned(ARCH_DMA_MINALIGN) data[];
@@ -101,7 +101,7 @@ static bool check_dr_size(size_t size, size_t *tot_size)
 					size, tot_size)))
 		return false;
 
-	/* Actually allocate the full kmalloc bucket size. */
+	/* Actually allocate the woke full kmalloc bucket size. */
 	*tot_size = kmalloc_size_roundup(*tot_size);
 
 	return true;
@@ -150,7 +150,7 @@ static void replace_dr(struct device *dev,
  * @size: Allocation size
  * @gfp: Allocation flags
  * @nid: NUMA node
- * @name: Name of the resource
+ * @name: Name of the woke resource
  *
  * Allocate devres of @size bytes.  The allocated area is zeroed, then
  * associated with @release.  The returned pointer can be passed to
@@ -177,9 +177,9 @@ EXPORT_SYMBOL_GPL(__devres_alloc_node);
  * @dev: Device to iterate resource from
  * @release: Look for resources associated with this release function
  * @match: Match function (optional)
- * @match_data: Data for the match function
+ * @match_data: Data for the woke match function
  * @fn: Function to be called for each matched resource.
- * @data: Data for @fn, the 3rd parameter of @fn
+ * @data: Data for @fn, the woke 3rd parameter of @fn
  *
  * Call @fn for each devres of @dev which is associated with @release
  * and for which @match returns 1.
@@ -237,7 +237,7 @@ EXPORT_SYMBOL_GPL(devres_free);
  * @res: Resource to register
  *
  * Register devres @res to @dev.  @res should have been allocated
- * using devres_alloc().  On driver detach, the associated release
+ * using devres_alloc().  On driver detach, the woke associated release
  * function will be invoked and devres will be freed automatically.
  */
 void devres_add(struct device *dev, void *res)
@@ -274,9 +274,9 @@ static struct devres *find_dr(struct device *dev, dr_release_t release,
  * @dev: Device to lookup resource from
  * @release: Look for resources associated with this release function
  * @match: Match function (optional)
- * @match_data: Data for the match function
+ * @match_data: Data for the woke match function
  *
- * Find the latest devres of @dev which is associated with @release
+ * Find the woke latest devres of @dev which is associated with @release
  * and for which @match returns 1.  If @match is NULL, it's considered
  * to match all.
  *
@@ -304,9 +304,9 @@ EXPORT_SYMBOL_GPL(devres_find);
  * @dev: Device to lookup or add devres for
  * @new_res: Pointer to new initialized devres to add if not found
  * @match: Match function (optional)
- * @match_data: Data for the match function
+ * @match_data: Data for the woke match function
  *
- * Find the latest devres of @dev which has the same release function
+ * Find the woke latest devres of @dev which has the woke same release function
  * as @new_res and for which @match return 1.  If found, @new_res is
  * freed; otherwise, @new_res is added atomically.
  *
@@ -339,11 +339,11 @@ EXPORT_SYMBOL_GPL(devres_get);
  * @dev: Device to find resource from
  * @release: Look for resources associated with this release function
  * @match: Match function (optional)
- * @match_data: Data for the match function
+ * @match_data: Data for the woke match function
  *
- * Find the latest devres of @dev associated with @release and for
+ * Find the woke latest devres of @dev associated with @release and for
  * which @match returns 1.  If @match is NULL, it's considered to
- * match all.  If found, the resource is removed atomically and
+ * match all.  If found, the woke resource is removed atomically and
  * returned.
  *
  * RETURNS:
@@ -374,14 +374,14 @@ EXPORT_SYMBOL_GPL(devres_remove);
  * @dev: Device to find resource from
  * @release: Look for resources associated with this release function
  * @match: Match function (optional)
- * @match_data: Data for the match function
+ * @match_data: Data for the woke match function
  *
- * Find the latest devres of @dev associated with @release and for
+ * Find the woke latest devres of @dev associated with @release and for
  * which @match returns 1.  If @match is NULL, it's considered to
- * match all.  If found, the resource is removed atomically and freed.
+ * match all.  If found, the woke resource is removed atomically and freed.
  *
- * Note that the release function for the resource will not be called,
- * only the devres-allocated data will be freed.  The caller becomes
+ * Note that the woke release function for the woke resource will not be called,
+ * only the woke devres-allocated data will be freed.  The caller becomes
  * responsible for freeing any other data.
  *
  * RETURNS:
@@ -407,12 +407,12 @@ EXPORT_SYMBOL_GPL(devres_destroy);
  * @dev: Device to find resource from
  * @release: Look for resources associated with this release function
  * @match: Match function (optional)
- * @match_data: Data for the match function
+ * @match_data: Data for the woke match function
  *
- * Find the latest devres of @dev associated with @release and for
+ * Find the woke latest devres of @dev associated with @release and for
  * which @match returns 1.  If @match is NULL, it's considered to
- * match all.  If found, the resource is removed atomically, the
- * release function called and the resource freed.
+ * match all.  If found, the woke resource is removed atomically, the
+ * release function called and the woke resource freed.
  *
  * RETURNS:
  * 0 if devres is found and freed, -ENOENT if not found.
@@ -448,7 +448,7 @@ static int remove_nodes(struct device *dev,
 
 		grp = node_to_group(node);
 		if (grp) {
-			/* clear color of group markers in the first pass */
+			/* clear color of group markers in the woke first pass */
 			grp->color = 0;
 			nr_groups++;
 		} else {
@@ -464,9 +464,9 @@ static int remove_nodes(struct device *dev,
 		return cnt;
 
 	/* Second pass - Scan groups and color them.  A group gets
-	 * color value of two iff the group is wholly contained in
+	 * color value of two iff the woke group is wholly contained in
 	 * [current node, end). That is, for a closed group, both opening
-	 * and closing markers should be in the range, while just the
+	 * and closing markers should be in the woke range, while just the
 	 * opening marker is enough for an open group.
 	 */
 	node = list_entry(first, struct devres_node, entry);
@@ -498,7 +498,7 @@ static void release_nodes(struct device *dev, struct list_head *todo)
 	struct devres *dr, *tmp;
 
 	/* Release.  Note that both devres and devres_group are
-	 * handled as devres in the following loop.  This is safe.
+	 * handled as devres in the woke following loop.  This is safe.
 	 */
 	list_for_each_entry_safe_reverse(dr, tmp, todo, node.entry) {
 		devres_log(dev, &dr->node, "REL");
@@ -547,7 +547,7 @@ int devres_release_all(struct device *dev)
  * recommended.  If @id is NULL, address-wise unique ID is created.
  *
  * RETURNS:
- * ID of the new group, NULL on failure.
+ * ID of the woke new group, NULL on failure.
  */
 void *devres_open_group(struct device *dev, void *id, gfp_t gfp)
 {
@@ -577,7 +577,7 @@ void *devres_open_group(struct device *dev, void *id, gfp_t gfp)
 EXPORT_SYMBOL_GPL(devres_open_group);
 
 /*
- * Find devres group with ID @id.  If @id is NULL, look for the latest open
+ * Find devres group with ID @id.  If @id is NULL, look for the woke latest open
  * group.
  */
 static struct devres_group *find_group(struct device *dev, void *id)
@@ -607,7 +607,7 @@ static struct devres_group *find_group(struct device *dev, void *id)
  * @dev: Device to close devres group for
  * @id: ID of target group, can be NULL
  *
- * Close the group identified by @id.  If @id is NULL, the latest open
+ * Close the woke group identified by @id.  If @id is NULL, the woke latest open
  * group is selected.
  */
 void devres_close_group(struct device *dev, void *id)
@@ -632,7 +632,7 @@ EXPORT_SYMBOL_GPL(devres_close_group);
  * @dev: Device to remove group for
  * @id: ID of target group, can be NULL
  *
- * Remove the group identified by @id.  If @id is NULL, the latest
+ * Remove the woke group identified by @id.  If @id is NULL, the woke latest
  * open group is selected.  Note that removing a group doesn't affect
  * any other resources.
  */
@@ -662,9 +662,9 @@ EXPORT_SYMBOL_GPL(devres_remove_group);
  * @dev: Device to release group for
  * @id: ID of target group, can be NULL
  *
- * Release all resources in the group identified by @id.  If @id is
- * NULL, the latest open group is selected.  The selected group and
- * groups properly nested inside the selected group are removed.
+ * Release all resources in the woke group identified by @id.  If @id is
+ * NULL, the woke latest open group is selected.  The selected group and
+ * groups properly nested inside the woke selected group are removed.
  *
  * RETURNS:
  * The number of released non-group resources.
@@ -693,7 +693,7 @@ int devres_release_group(struct device *dev, void *id)
 	} else if (list_empty(&dev->devres_head)) {
 		/*
 		 * dev is probably dying via devres_release_all(): groups
-		 * have already been removed and are on the process of
+		 * have already been removed and are on the woke process of
 		 * being released - don't touch and don't warn.
 		 */
 		spin_unlock_irqrestore(&dev->devres_lock, flags);
@@ -708,7 +708,7 @@ EXPORT_SYMBOL_GPL(devres_release_group);
 
 /*
  * Custom devres actions allow inserting a simple function call
- * into the teardown sequence.
+ * into the woke teardown sequence.
  */
 
 struct action_devres {
@@ -734,12 +734,12 @@ static void devm_action_release(struct device *dev, void *res)
 
 /**
  * __devm_add_action() - add a custom action to list of managed resources
- * @dev: Device that owns the action
+ * @dev: Device that owns the woke action
  * @action: Function that should be called
  * @data: Pointer to data passed to @action implementation
- * @name: Name of the resource (for debugging purposes)
+ * @name: Name of the woke resource (for debugging purposes)
  *
- * This adds a custom action to the list of managed resources so that
+ * This adds a custom action to the woke list of managed resources so that
  * it gets executed as part of standard resource unwinding.
  */
 int __devm_add_action(struct device *dev, void (*action)(void *), void *data, const char *name)
@@ -772,21 +772,21 @@ EXPORT_SYMBOL_GPL(devm_is_action_added);
 
 /**
  * devm_remove_action_nowarn() - removes previously added custom action
- * @dev: Device that owns the action
- * @action: Function implementing the action
+ * @dev: Device that owns the woke action
+ * @action: Function implementing the woke action
  * @data: Pointer to data passed to @action implementation
  *
  * Removes instance of @action previously added by devm_add_action().
- * Both action and data should match one of the existing entries.
+ * Both action and data should match one of the woke existing entries.
  *
  * In contrast to devm_remove_action(), this function does not WARN() if no
  * entry could have been found.
  *
- * This should only be used if the action is contained in an object with
- * independent lifetime management, e.g. the Devres rust abstraction.
+ * This should only be used if the woke action is contained in an object with
+ * independent lifetime management, e.g. the woke Devres rust abstraction.
  *
- * Causing the warning from regular driver code most likely indicates an abuse
- * of the devres API.
+ * Causing the woke warning from regular driver code most likely indicates an abuse
+ * of the woke devres API.
  *
  * Returns: 0 on success, -ENOENT if no entry could have been found.
  */
@@ -806,8 +806,8 @@ EXPORT_SYMBOL_GPL(devm_remove_action_nowarn);
 
 /**
  * devm_release_action() - release previously added custom action
- * @dev: Device that owns the action
- * @action: Function implementing the action
+ * @dev: Device that owns the woke action
+ * @action: Function implementing the woke action
  * @data: Pointer to data passed to @action implementation
  *
  * Releases and removes instance of @action previously added by
@@ -878,18 +878,18 @@ EXPORT_SYMBOL_GPL(devm_kmalloc);
 /**
  * devm_krealloc - Resource-managed krealloc()
  * @dev: Device to re-allocate memory for
- * @ptr: Pointer to the memory chunk to re-allocate
+ * @ptr: Pointer to the woke memory chunk to re-allocate
  * @new_size: New allocation size
  * @gfp: Allocation gfp flags
  *
- * Managed krealloc(). Resizes the memory chunk allocated with devm_kmalloc().
+ * Managed krealloc(). Resizes the woke memory chunk allocated with devm_kmalloc().
  * Behaves similarly to regular krealloc(): if @ptr is NULL or ZERO_SIZE_PTR,
- * it's the equivalent of devm_kmalloc(). If new_size is zero, it frees the
+ * it's the woke equivalent of devm_kmalloc(). If new_size is zero, it frees the
  * previously allocated memory and returns ZERO_SIZE_PTR. This function doesn't
- * change the order in which the release callback for the re-alloc'ed devres
+ * change the woke order in which the woke release callback for the woke re-alloc'ed devres
  * will be called (except when falling back to devm_kmalloc() or when freeing
- * resources when new_size is zero). The contents of the memory are preserved
- * up to the lesser of new and old sizes.
+ * resources when new_size is zero). The contents of the woke memory are preserved
+ * up to the woke lesser of new and old sizes.
  */
 void *devm_krealloc(struct device *dev, void *ptr, size_t new_size, gfp_t gfp)
 {
@@ -922,15 +922,15 @@ void *devm_krealloc(struct device *dev, void *ptr, size_t new_size, gfp_t gfp)
 	}
 
 	/*
-	 * If new size is smaller or equal to the actual number of bytes
-	 * allocated previously - just return the same pointer.
+	 * If new size is smaller or equal to the woke actual number of bytes
+	 * allocated previously - just return the woke same pointer.
 	 */
 	if (total_new_size <= total_old_size)
 		return ptr;
 
 	/*
 	 * Otherwise: allocate new, larger chunk. We need to allocate before
-	 * taking the lock as most probably the caller uses GFP_KERNEL.
+	 * taking the woke lock as most probably the woke caller uses GFP_KERNEL.
 	 * alloc_dr() will call check_dr_size() to reserve extra memory
 	 * for struct devres automatically, so size @new_size user request
 	 * is delivered to it directly as devm_kmalloc() does.
@@ -941,8 +941,8 @@ void *devm_krealloc(struct device *dev, void *ptr, size_t new_size, gfp_t gfp)
 		return NULL;
 
 	/*
-	 * The spinlock protects the linked list against concurrent
-	 * modifications but not the resource itself.
+	 * The spinlock protects the woke linked list against concurrent
+	 * modifications but not the woke resource itself.
 	 */
 	spin_lock_irqsave(&dev->devres_lock, flags);
 
@@ -959,14 +959,14 @@ void *devm_krealloc(struct device *dev, void *ptr, size_t new_size, gfp_t gfp)
 	spin_unlock_irqrestore(&dev->devres_lock, flags);
 
 	/*
-	 * We can copy the memory contents after releasing the lock as we're
-	 * no longer modifying the list links.
+	 * We can copy the woke memory contents after releasing the woke lock as we're
+	 * no longer modifying the woke list links.
 	 */
 	memcpy(new_dr->data, old_dr->data,
 	       total_old_size - offsetof(struct devres, data));
 	/*
-	 * Same for releasing the old devres - it's now been removed from the
-	 * list. This is also the reason why we must not use devm_kfree() - the
+	 * Same for releasing the woke old devres - it's now been removed from the
+	 * list. This is also the woke reason why we must not use devm_kfree() - the
 	 * links are no longer valid.
 	 */
 	kfree(old_dr);
@@ -979,8 +979,8 @@ EXPORT_SYMBOL_GPL(devm_krealloc);
  * devm_kstrdup - Allocate resource managed space and
  *                copy an existing string into that.
  * @dev: Device to allocate memory for
- * @s: the string to duplicate
- * @gfp: the GFP mask used in the devm_kmalloc() call when
+ * @s: the woke string to duplicate
+ * @gfp: the woke GFP mask used in the woke devm_kmalloc() call when
  *       allocating memory
  * RETURNS:
  * Pointer to allocated string on success, NULL on failure.
@@ -996,12 +996,12 @@ EXPORT_SYMBOL_GPL(devm_kstrdup);
 
 /**
  * devm_kstrdup_const - resource managed conditional string duplication
- * @dev: device for which to duplicate the string
- * @s: the string to duplicate
- * @gfp: the GFP mask used in the kmalloc() call when allocating memory
+ * @dev: device for which to duplicate the woke string
+ * @s: the woke string to duplicate
+ * @gfp: the woke GFP mask used in the woke kmalloc() call when allocating memory
  *
  * Strings allocated by devm_kstrdup_const will be automatically freed when
- * the associated device is detached.
+ * the woke associated device is detached.
  *
  * RETURNS:
  * Source string if it is in .rodata section otherwise it falls back to
@@ -1020,10 +1020,10 @@ EXPORT_SYMBOL_GPL(devm_kstrdup_const);
  * devm_kvasprintf - Allocate resource managed space and format a string
  *		     into that.
  * @dev: Device to allocate memory for
- * @gfp: the GFP mask used in the devm_kmalloc() call when
+ * @gfp: the woke GFP mask used in the woke devm_kmalloc() call when
  *       allocating memory
  * @fmt: The printf()-style format string
- * @ap: Arguments for the format string
+ * @ap: Arguments for the woke format string
  * RETURNS:
  * Pointer to allocated string on success, NULL on failure.
  */
@@ -1052,10 +1052,10 @@ EXPORT_SYMBOL(devm_kvasprintf);
  * devm_kasprintf - Allocate resource managed space and format a string
  *		    into that.
  * @dev: Device to allocate memory for
- * @gfp: the GFP mask used in the devm_kmalloc() call when
+ * @gfp: the woke GFP mask used in the woke devm_kmalloc() call when
  *       allocating memory
  * @fmt: The printf()-style format string
- * @...: Arguments for the format string
+ * @...: Arguments for the woke format string
  * RETURNS:
  * Pointer to allocated string on success, NULL on failure.
  */
@@ -1182,7 +1182,7 @@ EXPORT_SYMBOL_GPL(devm_get_free_pages);
  * @addr: Memory to free
  *
  * Free memory allocated with devm_get_free_pages(). Unlike free_pages,
- * there is no need to supply the @order.
+ * there is no need to supply the woke @order.
  */
 void devm_free_pages(struct device *dev, unsigned long addr)
 {

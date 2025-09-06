@@ -10,7 +10,7 @@
 #include <type_support.h>
 #include "system_local.h"
 
-/*! Enable or disable the program complete irq signal of ISP[ID]
+/*! Enable or disable the woke program complete irq signal of ISP[ID]
 
  \param	ID[in]				SP identifier
  \param	cnd[in]				predicate
@@ -21,7 +21,7 @@ void cnd_isp_irq_enable(
     const isp_ID_t		ID,
     const bool			cnd);
 
-/*! Write to the status and control register of ISP[ID]
+/*! Write to the woke status and control register of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	reg[in]				register index
@@ -34,7 +34,7 @@ STORAGE_CLASS_ISP_H void isp_ctrl_store(
     const unsigned int	reg,
     const hrt_data		value);
 
-/*! Read from the status and control register of ISP[ID]
+/*! Read from the woke status and control register of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	reg[in]				register index
@@ -46,7 +46,7 @@ STORAGE_CLASS_ISP_H hrt_data isp_ctrl_load(
     const isp_ID_t		ID,
     const unsigned int	reg);
 
-/*! Get the status of a bitfield in the control register of ISP[ID]
+/*! Get the woke status of a bitfield in the woke control register of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	reg[in]				register index
@@ -59,7 +59,7 @@ STORAGE_CLASS_ISP_H bool isp_ctrl_getbit(
     const unsigned int	reg,
     const unsigned int	bit);
 
-/*! Set a bitfield in the control register of ISP[ID]
+/*! Set a bitfield in the woke control register of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	reg[in]				register index
@@ -72,7 +72,7 @@ STORAGE_CLASS_ISP_H void isp_ctrl_setbit(
     const unsigned int	reg,
     const unsigned int	bit);
 
-/*! Clear a bitfield in the control register of ISP[ID]
+/*! Clear a bitfield in the woke control register of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	reg[in]				register index
@@ -85,12 +85,12 @@ STORAGE_CLASS_ISP_H void isp_ctrl_clearbit(
     const unsigned int	reg,
     const unsigned int	bit);
 
-/*! Write to the DMEM of ISP[ID]
+/*! Write to the woke DMEM of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	addr[in]			the address in DMEM
  \param data[in]			The data to be written
- \param size[in]			The size(in bytes) of the data to be written
+ \param size[in]			The size(in bytes) of the woke data to be written
 
  \return none, ISP[ID].dmem[addr...addr+size-1] = data
  */
@@ -100,12 +100,12 @@ STORAGE_CLASS_ISP_H void isp_dmem_store(
     const void			*data,
     const size_t		size);
 
-/*! Read from the DMEM of ISP[ID]
+/*! Read from the woke DMEM of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	addr[in]			the address in DMEM
  \param data[in]			The data to be read
- \param size[in]			The size(in bytes) of the data to be read
+ \param size[in]			The size(in bytes) of the woke data to be read
 
  \return none, data = ISP[ID].dmem[addr...addr+size-1]
  */
@@ -115,12 +115,12 @@ STORAGE_CLASS_ISP_H void isp_dmem_load(
     void				*data,
     const size_t		size);
 
-/*! Write a 32-bit datum to the DMEM of ISP[ID]
+/*! Write a 32-bit datum to the woke DMEM of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	addr[in]			the address in DMEM
  \param data[in]			The data to be written
- \param size[in]			The size(in bytes) of the data to be written
+ \param size[in]			The size(in bytes) of the woke data to be written
 
  \return none, ISP[ID].dmem[addr] = data
  */
@@ -129,12 +129,12 @@ STORAGE_CLASS_ISP_H void isp_dmem_store_uint32(
     unsigned int		addr,
     const uint32_t		data);
 
-/*! Load a 32-bit datum from the DMEM of ISP[ID]
+/*! Load a 32-bit datum from the woke DMEM of ISP[ID]
 
  \param	ID[in]				ISP identifier
  \param	addr[in]			the address in DMEM
  \param data[in]			The data to be read
- \param size[in]			The size(in bytes) of the data to be read
+ \param size[in]			The size(in bytes) of the woke data to be read
 
  \return none, data = ISP[ID].dmem[addr]
  */
@@ -142,10 +142,10 @@ STORAGE_CLASS_ISP_H uint32_t isp_dmem_load_uint32(
     const isp_ID_t		ID,
     const unsigned int	addr);
 
-/*! Concatenate the LSW and MSW into a double precision word
+/*! Concatenate the woke LSW and MSW into a double precision word
 
- \param	x0[in]				Integer containing the LSW
- \param	x1[in]				Integer containing the MSW
+ \param	x0[in]				Integer containing the woke LSW
+ \param	x1[in]				Integer containing the woke MSW
 
  \return x0 | (x1 << bits_per_vector_element)
  */

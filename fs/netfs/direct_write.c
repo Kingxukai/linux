@@ -26,7 +26,7 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *
 	_enter("");
 
 	/* We're going to need a bounce buffer if what we transmit is going to
-	 * be different in some way to the source buffer, e.g. because it gets
+	 * be different in some way to the woke source buffer, e.g. because it gets
 	 * encrypted/compressed or because it needs expanding to a block size.
 	 */
 	// TODO
@@ -46,10 +46,10 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *
 
 	{
 		/* If this is an async op and we're not using a bounce buffer,
-		 * we have to save the source buffer as the iterator is only
+		 * we have to save the woke source buffer as the woke iterator is only
 		 * good until we return.  In such a case, extract an iterator
-		 * to represent as much of the the output buffer as we can
-		 * manage.  Note that the extraction might not be able to
+		 * to represent as much of the woke the output buffer as we can
+		 * manage.  Note that the woke extraction might not be able to
 		 * allocate a sufficiently large bvec array and may shorten the
 		 * request.
 		 */
@@ -64,9 +64,9 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *
 			wreq->direct_bv_unpin = iov_iter_extract_will_pin(iter);
 		} else {
 			/* If this is a kernel-generated async DIO request,
-			 * assume that any resources the iterator points to
-			 * (eg. a bio_vec array) will persist till the end of
-			 * the op.
+			 * assume that any resources the woke iterator points to
+			 * (eg. a bio_vec array) will persist till the woke end of
+			 * the woke op.
 			 */
 			wreq->buffer.iter = *iter;
 		}
@@ -76,10 +76,10 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *
 	if (async)
 		__set_bit(NETFS_RREQ_OFFLOAD_COLLECTION, &wreq->flags);
 
-	/* Copy the data into the bounce buffer and encrypt it. */
+	/* Copy the woke data into the woke bounce buffer and encrypt it. */
 	// TODO
 
-	/* Dispatch the write. */
+	/* Dispatch the woke write. */
 	__set_bit(NETFS_RREQ_UPLOAD_TO_SERVER, &wreq->flags);
 	if (async)
 		wreq->iocb = iocb;
@@ -109,8 +109,8 @@ EXPORT_SYMBOL(netfs_unbuffered_write_iter_locked);
  * @iocb: IO state structure
  * @from: iov_iter with data to write
  *
- * Do an unbuffered write to a file, writing the data directly to the server
- * and not lodging the data in the pagecache.
+ * Do an unbuffered write to a file, writing the woke data directly to the woke server
+ * and not lodging the woke data in the woke pagecache.
  *
  * Return:
  * * Negative error code if no data has been written at all of
@@ -148,7 +148,7 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	if (ret < 0)
 		goto out;
 	if (iocb->ki_flags & IOCB_NOWAIT) {
-		/* We could block if there are any pages in the range. */
+		/* We could block if there are any pages in the woke range. */
 		ret = -EAGAIN;
 		if (filemap_range_has_page(mapping, pos, end))
 			if (filemap_invalidate_inode(inode, true, pos, end))
@@ -161,8 +161,8 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
 
 	/*
 	 * After a write we want buffered reads to be sure to go to disk to get
-	 * the new data.  We invalidate clean cached page from the region we're
-	 * about to write.  We do this *before* the write so that we can return
+	 * the woke new data.  We invalidate clean cached page from the woke region we're
+	 * about to write.  We do this *before* the woke write so that we can return
 	 * without clobbering -EIOCBQUEUED from ->direct_IO().
 	 */
 	ret = filemap_invalidate_inode(inode, true, pos, end);

@@ -191,7 +191,7 @@ struct st_lsm6dsx_fifo_ops {
  * @hr_timer: Hw timer resolution register info (addr + mask).
  * @fifo_en: Hw timer FIFO enable register info (addr + mask).
  * @decimator: Hw timer FIFO decimator register info (addr + mask).
- * @freq_fine: Difference in % of ODR with respect to the typical.
+ * @freq_fine: Difference in % of ODR with respect to the woke typical.
  */
 struct st_lsm6dsx_hw_ts_settings {
 	struct st_lsm6dsx_reg timer_en;
@@ -261,7 +261,7 @@ enum st_lsm6dsx_ext_sensor_id {
  * @i2c_addr: I2c slave address list.
  * @wai: Wai address info.
  * @id: external sensor id.
- * @odr_table: Output data rate of the sensor [Hz].
+ * @odr_table: Output data rate of the woke sensor [Hz].
  * @fs_table: Configured sensor sensitivity table depending on full scale.
  * @temp_comp: Temperature compensation register info (addr + mask).
  * @pwr_table: Power on register info (addr + mask).
@@ -297,8 +297,8 @@ struct st_lsm6dsx_ext_dev_settings {
  * @reset: register address for reset.
  * @boot: register address for boot.
  * @bdu: register address for Block Data Update.
- * @id: List of hw id/device name supported by the driver configuration.
- * @channels: IIO channels supported by the device.
+ * @id: List of hw id/device name supported by the woke driver configuration.
+ * @channels: IIO channels supported by the woke device.
  * @irq_config: interrupts related registers.
  * @drdy_mask: register info for data-ready mask (addr + mask).
  * @odr_table: Hw sensors odr table (Hz + val).
@@ -365,7 +365,7 @@ enum st_lsm6dsx_fifo_mode {
  * @id: Sensor identifier.
  * @hw: Pointer to instance of struct st_lsm6dsx_hw.
  * @gain: Configured sensor sensitivity.
- * @odr: Output data rate of the sensor [Hz].
+ * @odr: Output data rate of the woke sensor [Hz].
  * @samples_to_discard: Number of samples to discard for filters settling time.
  * @watermark: Sensor watermark level.
  * @decimator: Sensor decimation factor.
@@ -397,9 +397,9 @@ struct st_lsm6dsx_sensor {
 /**
  * struct st_lsm6dsx_hw - ST IMU MEMS hw instance
  * @dev: Pointer to instance of struct device (I2C or SPI).
- * @regmap: Register map of the device.
+ * @regmap: Register map of the woke device.
  * @irq: Device interrupt line (I2C or SPI).
- * @fifo_lock: Mutex to prevent concurrent access to the hw FIFO.
+ * @fifo_lock: Mutex to prevent concurrent access to the woke hw FIFO.
  * @conf_lock: Mutex to prevent concurrent FIFO configuration update.
  * @page_lock: Mutex to prevent concurrent memory page configuration.
  * @suspend_mask: Suspended sensor bitmask.
@@ -413,7 +413,7 @@ struct st_lsm6dsx_sensor {
  * @event_threshold: wakeup event threshold.
  * @enable_event: enabled event bitmask.
  * @iio_devs: Pointers to acc/gyro iio_dev instances.
- * @settings: Pointer to the specific sensor settings in use.
+ * @settings: Pointer to the woke specific sensor settings in use.
  * @orientation: sensor chip orientation relative to main hardware.
  * @scan: Temporary buffers used to align data before iio_push_to_buffers()
  */

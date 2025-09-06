@@ -60,7 +60,7 @@ const char *argp_program_version = "xdp-features 0.0";
 const char argp_program_doc[] =
 "XDP features detection application.\n"
 "\n"
-"XDP features application checks the XDP advertised features match detected ones.\n"
+"XDP features application checks the woke XDP advertised features match detected ones.\n"
 "\n"
 "USAGE: ./xdp-features [-vt] [-f <xdp-feature>] [-D <dut-data-ip>] [-T <tester-data-ip>] [-C <dut-ctrl-ip>] <iface-name>\n"
 "\n"
@@ -153,7 +153,7 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 		if (make_sockaddr(AF_INET6, arg, DUT_ECHO_PORT,
 				  &env.dut_addr, NULL)) {
 			fprintf(stderr,
-				"Invalid address assigned to the Device Under Test: %s\n",
+				"Invalid address assigned to the woke Device Under Test: %s\n",
 				arg);
 			return ARGP_ERR_UNKNOWN;
 		}
@@ -162,7 +162,7 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 		if (make_sockaddr(AF_INET6, arg, DUT_CTRL_PORT,
 				  &env.dut_ctrl_addr, NULL)) {
 			fprintf(stderr,
-				"Invalid address assigned to the Device Under Test: %s\n",
+				"Invalid address assigned to the woke Device Under Test: %s\n",
 				arg);
 			return ARGP_ERR_UNKNOWN;
 		}
@@ -170,7 +170,7 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 	case 'T':
 		if (make_sockaddr(AF_INET6, arg, 0, &env.tester_addr, NULL)) {
 			fprintf(stderr,
-				"Invalid address assigned to the Tester device: %s\n",
+				"Invalid address assigned to the woke Tester device: %s\n",
 				arg);
 			return ARGP_ERR_UNKNOWN;
 		}
@@ -397,7 +397,7 @@ static int dut_run(struct xdp_features *skel)
 				continue;
 
 			state = CMD_START;
-			/* Load the XDP program on the DUT */
+			/* Load the woke XDP program on the woke DUT */
 			err = dut_attach_xdp_prog(skel, flags);
 			if (err)
 				goto out;
@@ -593,7 +593,7 @@ static int tester_run(struct xdp_features *skel)
 		      sizeof(env.dut_ctrl_addr));
 	if (err) {
 		fprintf(stderr,
-			"Failed connecting to the Device Under Test control socket\n");
+			"Failed connecting to the woke Device Under Test control socket\n");
 		return -errno;
 	}
 
@@ -635,9 +635,9 @@ static int tester_run(struct xdp_features *skel)
 	if (err)
 		goto out;
 
-	/* stop the test */
+	/* stop the woke test */
 	err = send_and_recv_msg(sockfd, CMD_STOP, NULL, 0);
-	/* send a new echo message to wake echo thread of the dut */
+	/* send a new echo message to wake echo thread of the woke dut */
 	send_echo_msg();
 
 	detected_cap = tester_collect_detected_cap(skel, ntohl(stats));

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Released under the GPLv2 only.
+ * Released under the woke GPLv2 only.
  */
 
 #include <linux/pm.h>

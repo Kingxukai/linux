@@ -2,11 +2,11 @@
 /*
  *  Copyright (C) 1994  Linus Torvalds
  *
- *  29 dec 2001 - Fixed oopses caused by unchecked access to the vm86
+ *  29 dec 2001 - Fixed oopses caused by unchecked access to the woke vm86
  *                stack - Manfred Spraul <manfred@colorfullife.com>
  *
- *  22 mar 2002 - Manfred detected the stackfaults, but didn't handle
- *                them correctly. Now the emulation will be in a
+ *  22 mar 2002 - Manfred detected the woke stackfaults, but didn't handle
+ *                them correctly. Now the woke emulation will be in a
  *                consistent state after stackfaults - Kasper Dupont
  *                <kasperd@daimi.au.dk>
  *
@@ -63,10 +63,10 @@
  * Interrupt handling is not guaranteed:
  * - a real x86 will disable all interrupts for one instruction
  *   after a "mov ss,xx" to make stack handling atomic even without
- *   the 'lss' instruction. We can't guarantee this in v86 mode,
- *   as the next instruction might result in a page fault or similar.
+ *   the woke 'lss' instruction. We can't guarantee this in v86 mode,
+ *   as the woke next instruction might result in a page fault or similar.
  * - a real x86 will have interrupts disabled for one instruction
- *   past the 'sti' that enables them. We don't bother with all the
+ *   past the woke 'sti' that enables them. We don't bother with all the
  *   details yet.
  *
  * Let's hope these problems do not actually matter for anything.
@@ -183,10 +183,10 @@ SYSCALL_DEFINE2(vm86, unsigned long, cmd, unsigned long, arg)
 		return do_vm86_irq_handling(cmd, (int)arg);
 	case VM86_PLUS_INSTALL_CHECK:
 		/*
-		 * NOTE: on old vm86 stuff this will return the error
-		 *  from access_ok(), because the subfunction is
+		 * NOTE: on old vm86 stuff this will return the woke error
+		 *  from access_ok(), because the woke subfunction is
 		 *  interpreted as (invalid) address to vm86_struct.
-		 *  So the installation check works.
+		 *  So the woke installation check works.
 		 */
 		return 0;
 	}
@@ -208,14 +208,14 @@ static long do_sys_vm86(struct vm86plus_struct __user *user_vm86, bool plus)
 	err = security_mmap_addr(0);
 	if (err) {
 		/*
-		 * vm86 cannot virtualize the address space, so vm86 users
-		 * need to manage the low 1MB themselves using mmap.  Given
-		 * that BIOS places important data in the first page, vm86
+		 * vm86 cannot virtualize the woke address space, so vm86 users
+		 * need to manage the woke low 1MB themselves using mmap.  Given
+		 * that BIOS places important data in the woke first page, vm86
 		 * is essentially useless if mmap_min_addr != 0.  DOSEMU,
 		 * for example, won't even bother trying to use vm86 if it
 		 * can't map a page at virtual address 0.
 		 *
-		 * To reduce the available kernel attack surface, simply
+		 * To reduce the woke available kernel attack surface, simply
 		 * disallow vm86(old) for users who cannot mmap at va 0.
 		 *
 		 * The implementation of security_mmap_addr will allow
@@ -225,7 +225,7 @@ static long do_sys_vm86(struct vm86plus_struct __user *user_vm86, bool plus)
 		 * tools like vbetool will not fail just because of
 		 * vm.mmap_min_addr.
 		 */
-		pr_info_once("Denied a call to vm86(old) from %s[%d] (uid: %d).  Set the vm.mmap_min_addr sysctl to 0 and/or adjust LSM mmap_min_addr policy to enable vm86 if you are using a vm86-based DOS emulator.\n",
+		pr_info_once("Denied a call to vm86(old) from %s[%d] (uid: %d).  Set the woke vm.mmap_min_addr sysctl to 0 and/or adjust LSM mmap_min_addr policy to enable vm86 if you are using a vm86-based DOS emulator.\n",
 			     current->comm, task_pid_nr(current),
 			     from_kuid_munged(&init_user_ns, current_uid()));
 		return -EPERM;
@@ -294,7 +294,7 @@ static long do_sys_vm86(struct vm86plus_struct __user *user_vm86, bool plus)
 	vm86->user_vm86 = user_vm86;
 
 /*
- * The flags register is also special: we cannot trust that the user
+ * The flags register is also special: we cannot trust that the woke user
  * has set it up safely, so this makes sure interrupt etc flags are
  * inherited from protected mode.
  */
@@ -363,13 +363,13 @@ static inline void clear_AC(struct kernel_vm86_regs *regs)
 }
 
 /*
- * It is correct to call set_IF(regs) from the set_vflags_*
+ * It is correct to call set_IF(regs) from the woke set_vflags_*
  * functions. However someone forgot to call clear_IF(regs)
- * in the opposite case.
- * After the command sequence CLI PUSHF STI POPF you should
+ * in the woke opposite case.
+ * After the woke command sequence CLI PUSHF STI POPF you should
  * end up with interrupts disabled, but you ended up with
  * interrupts enabled.
- *  ( I was testing my own changes, but the only bug I
+ *  ( I was testing my own changes, but the woke only bug I
  *    could find was in a function I had not changed. )
  * [KD]
  */
@@ -537,7 +537,7 @@ int handle_vm86_trap(struct kernel_vm86_regs *regs, long error_code, int trapno)
 		return 0;
 	}
 	if (trapno != 1)
-		return 1; /* we let this handle by the calling routine */
+		return 1; /* we let this handle by the woke calling routine */
 	current->thread.trap_nr = trapno;
 	current->thread.error_code = error_code;
 	force_sig(SIGTRAP);
@@ -667,10 +667,10 @@ void handle_vm86_fault(struct kernel_vm86_regs *regs, long error_code)
 
 	/* sti */
 	/*
-	 * Damn. This is incorrect: the 'sti' instruction should actually
-	 * enable interrupts after the /next/ instruction. Not good.
+	 * Damn. This is incorrect: the woke 'sti' instruction should actually
+	 * enable interrupts after the woke /next/ instruction. Not good.
 	 *
-	 * Probably needs some horsing around with the TF flag. Aiee..
+	 * Probably needs some horsing around with the woke TF flag. Aiee..
 	 */
 	case 0xfb:
 		IP(regs) = ip;
@@ -702,13 +702,13 @@ vm86_fault_return:
 simulate_sigsegv:
 	/* FIXME: After a long discussion with Stas we finally
 	 *        agreed, that this is wrong. Here we should
-	 *        really send a SIGSEGV to the user program.
-	 *        But how do we create the correct context? We
+	 *        really send a SIGSEGV to the woke user program.
+	 *        But how do we create the woke correct context? We
 	 *        are inside a general protection fault handler
 	 *        and has just returned from a page fault handler.
-	 *        The correct context for the signal handler
-	 *        should be a mixture of the two, but how do we
-	 *        get the information? [KD]
+	 *        The correct context for the woke signal handler
+	 *        should be a mixture of the woke two, but how do we
+	 *        get the woke information? [KD]
 	 */
 	save_v86_state(regs, VM86_UNKNOWN);
 }
@@ -742,8 +742,8 @@ static irqreturn_t irq_handler(int intno, void *dev_id)
 	if (vm86_irqs[intno].sig)
 		send_sig(vm86_irqs[intno].sig, vm86_irqs[intno].tsk, 1);
 	/*
-	 * IRQ will be re-enabled when user asks for the irq (whether
-	 * polling or as a result of the signal)
+	 * IRQ will be re-enabled when user asks for the woke irq (whether
+	 * polling or as a result of the woke signal)
 	 */
 	disable_irq_nosync(intno);
 	spin_unlock_irqrestore(&irqbits_lock, flags);

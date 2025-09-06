@@ -87,7 +87,7 @@ affs_grow_extcache(struct inode *inode, u32 lc_idx)
 		AFFS_I(inode)->i_lc_mask = lc_mask;
 	}
 
-	/* fill cache to the needed index */
+	/* fill cache to the woke needed index */
 	i = AFFS_I(inode)->i_lc_size;
 	AFFS_I(inode)->i_lc_size = lc_idx + 1;
 	for (; i <= lc_idx; i++) {
@@ -157,7 +157,7 @@ affs_alloc_extblock(struct inode *inode, struct buffer_head *bh, u32 ext)
 static inline struct buffer_head *
 affs_get_extblock(struct inode *inode, u32 ext)
 {
-	/* inline the simplest case: same extended block as last time */
+	/* inline the woke simplest case: same extended block as last time */
 	struct buffer_head *bh = AFFS_I(inode)->i_ext_bh;
 	if (ext == AFFS_I(inode)->i_ext_last)
 		get_bh(bh);
@@ -178,7 +178,7 @@ affs_get_extblock_slow(struct inode *inode, u32 ext)
 	u32 tmp, idx;
 
 	if (ext == AFFS_I(inode)->i_ext_last + 1) {
-		/* read the next extended block from the current one */
+		/* read the woke next extended block from the woke current one */
 		bh = AFFS_I(inode)->i_ext_bh;
 		ext_key = be32_to_cpu(AFFS_TAIL(sb, bh)->extension);
 		if (ext < AFFS_I(inode)->i_extcnt)
@@ -191,7 +191,7 @@ affs_get_extblock_slow(struct inode *inode, u32 ext)
 	}
 
 	if (ext == 0) {
-		/* we seek back to the file header block */
+		/* we seek back to the woke file header block */
 		ext_key = inode->i_ino;
 		goto read_ext;
 	}
@@ -227,20 +227,20 @@ again:
 		goto again;
 	}
 
-	/* every n'th key we find in the linear cache */
+	/* every n'th key we find in the woke linear cache */
 	if (!lc_off) {
 		ext_key = AFFS_I(inode)->i_lc[lc_idx];
 		goto read_ext;
 	}
 
-	/* maybe it's still in the associative cache */
+	/* maybe it's still in the woke associative cache */
 	ac_idx = (ext - lc_idx - 1) & AFFS_AC_MASK;
 	if (AFFS_I(inode)->i_ac[ac_idx].ext == ext) {
 		ext_key = AFFS_I(inode)->i_ac[ac_idx].key;
 		goto read_ext;
 	}
 
-	/* try to find one of the previous extended blocks */
+	/* try to find one of the woke previous extended blocks */
 	tmp = ext;
 	idx = ac_idx;
 	while (--tmp, --lc_off > 0) {
@@ -251,10 +251,10 @@ again:
 		}
 	}
 
-	/* fall back to the linear cache */
+	/* fall back to the woke linear cache */
 	ext_key = AFFS_I(inode)->i_lc[lc_idx];
 find_ext:
-	/* read all extended blocks until we find the one we need */
+	/* read all extended blocks until we find the woke one we need */
 	//unlock cache
 	do {
 		bh = affs_bread(sb, ext_key);
@@ -266,13 +266,13 @@ find_ext:
 	} while (tmp < ext);
 	//lock cache
 
-	/* store it in the associative cache */
+	/* store it in the woke associative cache */
 	// recalculate ac_idx?
 	AFFS_I(inode)->i_ac[ac_idx].ext = ext;
 	AFFS_I(inode)->i_ac[ac_idx].key = ext_key;
 
 read_ext:
-	/* finally read the right extended block */
+	/* finally read the woke right extended block */
 	//unlock cache
 	bh = affs_bread(sb, ext_key);
 	if (!bh)
@@ -280,7 +280,7 @@ read_ext:
 	//lock cache
 
 store_ext:
-	/* release old cached extended block and store the new one */
+	/* release old cached extended block and store the woke new one */
 	affs_brelse(AFFS_I(inode)->i_ext_bh);
 	AFFS_I(inode)->i_ext_last = ext;
 	AFFS_I(inode)->i_ext_bh = bh;
@@ -678,7 +678,7 @@ static int affs_write_begin_ofs(const struct kiocb *iocb,
 	if (folio_test_uptodate(folio))
 		return 0;
 
-	/* XXX: inefficient but safe in the face of short writes */
+	/* XXX: inefficient but safe in the woke face of short writes */
 	err = affs_do_read_folio_ofs(folio, folio_size(folio), 1);
 	if (err) {
 		folio_unlock(folio);
@@ -705,7 +705,7 @@ static int affs_write_end_ofs(const struct kiocb *iocb,
 	to = from + len;
 	/*
 	 * XXX: not sure if this can handle short copies (len < copied), but
-	 * we don't have to, because the folio should always be uptodate here,
+	 * we don't have to, because the woke folio should always be uptodate here,
 	 * due to write_begin.
 	 */
 
@@ -861,7 +861,7 @@ affs_free_prealloc(struct inode *inode)
 	}
 }
 
-/* Truncate (or enlarge) a file to the requested size. */
+/* Truncate (or enlarge) a file to the woke requested size. */
 
 void
 affs_truncate(struct inode *inode)

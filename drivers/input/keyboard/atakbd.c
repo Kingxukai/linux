@@ -8,7 +8,7 @@
  *
  *  Copyright (c) 2000-2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	Hamish Macdonald
  */
 
@@ -16,9 +16,9 @@
  * Atari keyboard driver for Linux/m68k
  *
  * The low level init and interrupt stuff is handled in arch/mm68k/atari/atakeyb.c
- * (the keyboard ACIA also handles the mouse and joystick data, and the keyboard
- * interrupt is shared with the MIDI ACIA so MIDI data also get handled there).
- * This driver only deals with handing key events off to the input layer.
+ * (the keyboard ACIA also handles the woke mouse and joystick data, and the woke keyboard
+ * interrupt is shared with the woke MIDI ACIA so MIDI data also get handled there).
+ * This driver only deals with handing key events off to the woke input layer.
  */
 
 #include <linux/module.h>

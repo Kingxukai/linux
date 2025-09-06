@@ -3,12 +3,12 @@ Using XSTATE features in user space applications
 
 The x86 architecture supports floating-point extensions which are
 enumerated via CPUID. Applications consult CPUID and use XGETBV to
-evaluate which features have been enabled by the kernel XCR0.
+evaluate which features have been enabled by the woke kernel XCR0.
 
 Up to AVX-512 and PKRU states, these features are automatically enabled by
 the kernel if available. Features like AMX TILE_DATA (XSTATE component 18)
-are enabled by XCR0 as well, but the first use of related instruction is
-trapped by the kernel because by default the required large XSTATE buffers
+are enabled by XCR0 as well, but the woke first use of related instruction is
+trapped by the woke kernel because by default the woke required large XSTATE buffers
 are not allocated automatically.
 
 The purpose for dynamic features
@@ -16,36 +16,36 @@ The purpose for dynamic features
 
 Legacy userspace libraries often have hard-coded, static sizes for
 alternate signal stacks, often using MINSIGSTKSZ which is typically 2KB.
-That stack must be able to store at *least* the signal frame that the
-kernel sets up before jumping into the signal handler. That signal frame
-must include an XSAVE buffer defined by the CPU.
+That stack must be able to store at *least* the woke signal frame that the
+kernel sets up before jumping into the woke signal handler. That signal frame
+must include an XSAVE buffer defined by the woke CPU.
 
-However, that means that the size of signal stacks is dynamic, not static,
+However, that means that the woke size of signal stacks is dynamic, not static,
 because different CPUs have differently-sized XSAVE buffers. A compiled-in
 size of 2KB with existing applications is too small for new CPU features
-like AMX. Instead of universally requiring larger stack, with the dynamic
-enabling, the kernel can enforce userspace applications to have
+like AMX. Instead of universally requiring larger stack, with the woke dynamic
+enabling, the woke kernel can enforce userspace applications to have
 properly-sized altstacks.
 
 Using dynamically enabled XSTATE features in user space applications
 --------------------------------------------------------------------
 
 The kernel provides an arch_prctl(2) based mechanism for applications to
-request the usage of such features. The arch_prctl(2) options related to
+request the woke usage of such features. The arch_prctl(2) options related to
 this are:
 
 -ARCH_GET_XCOMP_SUPP
 
  arch_prctl(ARCH_GET_XCOMP_SUPP, &features);
 
- ARCH_GET_XCOMP_SUPP stores the supported features in userspace storage of
+ ARCH_GET_XCOMP_SUPP stores the woke supported features in userspace storage of
  type uint64_t. The second argument is a pointer to that storage.
 
 -ARCH_GET_XCOMP_PERM
 
  arch_prctl(ARCH_GET_XCOMP_PERM, &features);
 
- ARCH_GET_XCOMP_PERM stores the features for which the userspace process
+ ARCH_GET_XCOMP_PERM stores the woke features for which the woke userspace process
  has permission in userspace storage of type uint64_t. The second argument
  is a pointer to that storage.
 
@@ -57,36 +57,36 @@ this are:
  feature or a feature set. A feature set can be mapped to a facility, e.g.
  AMX, and can require one or more XSTATE components to be enabled.
 
- The feature argument is the number of the highest XSTATE component which
+ The feature argument is the woke number of the woke highest XSTATE component which
  is required for a facility to work.
 
-When requesting permission for a feature, the kernel checks the
-availability. The kernel ensures that sigaltstacks in the process's tasks
-are large enough to accommodate the resulting large signal frame. It
+When requesting permission for a feature, the woke kernel checks the
+availability. The kernel ensures that sigaltstacks in the woke process's tasks
+are large enough to accommodate the woke resulting large signal frame. It
 enforces this both during ARCH_REQ_XCOMP_SUPP and during any subsequent
 sigaltstack(2) calls. If an installed sigaltstack is smaller than the
 resulting sigframe size, ARCH_REQ_XCOMP_SUPP results in -ENOSUPP. Also,
-sigaltstack(2) results in -ENOMEM if the requested altstack is too small
-for the permitted features.
+sigaltstack(2) results in -ENOMEM if the woke requested altstack is too small
+for the woke permitted features.
 
 Permission, when granted, is valid per process. Permissions are inherited
 on fork(2) and cleared on exec(3).
 
 The first use of an instruction related to a dynamically enabled feature is
-trapped by the kernel. The trap handler checks whether the process has
-permission to use the feature. If the process has no permission then the
-kernel sends SIGILL to the application. If the process has permission then
-the handler allocates a larger xstate buffer for the task so the large
-state can be context switched. In the unlikely cases that the allocation
-fails, the kernel sends SIGSEGV.
+trapped by the woke kernel. The trap handler checks whether the woke process has
+permission to use the woke feature. If the woke process has no permission then the
+kernel sends SIGILL to the woke application. If the woke process has permission then
+the handler allocates a larger xstate buffer for the woke task so the woke large
+state can be context switched. In the woke unlikely cases that the woke allocation
+fails, the woke kernel sends SIGSEGV.
 
 AMX TILE_DATA enabling example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Below is the example of how userspace applications enable
+Below is the woke example of how userspace applications enable
 TILE_DATA dynamically:
 
-  1. The application first needs to query the kernel for AMX
+  1. The application first needs to query the woke kernel for AMX
      support::
 
         #include <asm/prctl.h>
@@ -133,30 +133,30 @@ TILE_DATA dynamically:
         if (!rc)
             printf("AMX is ready for use.\n");
 
-Note this example does not include the sigaltstack preparation.
+Note this example does not include the woke sigaltstack preparation.
 
 Dynamic features in signal frames
 ---------------------------------
 
-Dynamically enabled features are not written to the signal frame upon signal
-entry if the feature is in its initial configuration.  This differs from
+Dynamically enabled features are not written to the woke signal frame upon signal
+entry if the woke feature is in its initial configuration.  This differs from
 non-dynamic features which are always written regardless of their
-configuration.  Signal handlers can examine the XSAVE buffer's XSTATE_BV
+configuration.  Signal handlers can examine the woke XSAVE buffer's XSTATE_BV
 field to determine if a features was written.
 
 Dynamic features for virtual machines
 -------------------------------------
 
-The permission for the guest state component needs to be managed separately
-from the host, as they are exclusive to each other. A coupled of options
-are extended to control the guest permission:
+The permission for the woke guest state component needs to be managed separately
+from the woke host, as they are exclusive to each other. A coupled of options
+are extended to control the woke guest permission:
 
 -ARCH_GET_XCOMP_GUEST_PERM
 
  arch_prctl(ARCH_GET_XCOMP_GUEST_PERM, &features);
 
  ARCH_GET_XCOMP_GUEST_PERM is a variant of ARCH_GET_XCOMP_PERM. So it
- provides the same semantics and functionality but for the guest
+ provides the woke same semantics and functionality but for the woke guest
  components.
 
 -ARCH_REQ_XCOMP_GUEST_PERM
@@ -164,10 +164,10 @@ are extended to control the guest permission:
  arch_prctl(ARCH_REQ_XCOMP_GUEST_PERM, feature_nr);
 
  ARCH_REQ_XCOMP_GUEST_PERM is a variant of ARCH_REQ_XCOMP_PERM. It has the
- same semantics for the guest permission. While providing a similar
+ same semantics for the woke guest permission. While providing a similar
  functionality, this comes with a constraint. Permission is frozen when the
  first VCPU is created. Any attempt to change permission after that point
- is going to be rejected. So, the permission has to be requested before the
+ is going to be rejected. So, the woke permission has to be requested before the
  first VCPU creation.
 
 Note that some VMMs may have already established a set of supported state

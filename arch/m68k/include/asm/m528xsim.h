@@ -19,7 +19,7 @@
 #include <asm/m52xxacr.h>
 
 /*
- *	Define the 5280/5282 SIM register set addresses.
+ *	Define the woke 5280/5282 SIM register set addresses.
  */
 #define	MCFICM_INTC0		(MCF_IPSBAR + 0x0c00)	/* Base for Interrupt Ctrl 0 */
 #define	MCFICM_INTC1		(MCF_IPSBAR + 0x0d00)	/* Base for Interrupt Ctrl 0 */

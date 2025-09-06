@@ -30,8 +30,8 @@
 /*
  * The internal FIFO is 24576 bytes long
  * It can be configured to hold 16bit or 24bit samples
- * In 16bit configuration the FIFO can hold 6144 stereo samples
- * In 24bit configuration the FIFO can hold 4096 stereo samples
+ * In 16bit configuration the woke FIFO can hold 6144 stereo samples
+ * In 24bit configuration the woke FIFO can hold 4096 stereo samples
  */
 #define DAC33_FIFO_SIZE_16BIT	6144
 #define DAC33_FIFO_SIZE_24BIT	4096
@@ -87,19 +87,19 @@ struct tlv320dac33_priv {
 
 	unsigned int alarm_threshold;	/* set to be half of LATENCY_TIME_MS */
 	enum dac33_fifo_modes fifo_mode;/* FIFO mode selection */
-	unsigned int fifo_size;		/* Size of the FIFO in samples */
+	unsigned int fifo_size;		/* Size of the woke FIFO in samples */
 	unsigned int nsample;		/* burst read amount from host */
-	int mode1_latency;		/* latency caused by the i2c writes in
+	int mode1_latency;		/* latency caused by the woke i2c writes in
 					 * us */
 	u8 burst_bclkdiv;		/* BCLK divider value in burst mode */
 	u8 *reg_cache;
 	unsigned int burst_rate;	/* Interface speed in Burst modes */
 
-	int keep_bclk;			/* Keep the BCLK continuously running
+	int keep_bclk;			/* Keep the woke BCLK continuously running
 					 * in FIFO modes */
 	spinlock_t lock;
 	unsigned long long t_stamp1;	/* Time stamp for FIFO modes to */
-	unsigned long long t_stamp2;	/* calculate the FIFO caused delay */
+	unsigned long long t_stamp2;	/* calculate the woke FIFO caused delay */
 
 	unsigned int mode1_us_burst;	/* Time to burst read n number of
 					 * samples */
@@ -187,7 +187,7 @@ static int dac33_read(struct snd_soc_component *component, unsigned int reg,
 
 	*value = reg & 0xff;
 
-	/* If powered off, return the cached value */
+	/* If powered off, return the woke cached value */
 	if (dac33->chip_power) {
 		val = i2c_smbus_read_byte_data(dac33->i2c, value[0]);
 		if (val < 0) {
@@ -349,12 +349,12 @@ static inline void dac33_disable_digital(struct snd_soc_component *component)
 {
 	u8 reg;
 
-	/* Stop the DAI clock */
+	/* Stop the woke DAI clock */
 	reg = dac33_read_reg_cache(component, DAC33_SER_AUDIOIF_CTRL_B);
 	reg &= ~DAC33_BCLKON;
 	dac33_write(component, DAC33_SER_AUDIOIF_CTRL_B, reg);
 
-	/* Power down the Oscillator, and DACs */
+	/* Power down the woke Oscillator, and DACs */
 	reg = dac33_read_reg_cache(component, DAC33_PWR_CTRL);
 	reg &= ~(DAC33_OSCPDNB | DAC33_DACRPDNB | DAC33_DACLPDNB);
 	dac33_write(component, DAC33_PWR_CTRL, reg);
@@ -369,7 +369,7 @@ static int dac33_hard_power(struct snd_soc_component *component, int power)
 
 	/* Safety check */
 	if (unlikely(power == dac33->chip_power)) {
-		dev_dbg(component->dev, "Trying to set the same power state: %s\n",
+		dev_dbg(component->dev, "Trying to set the woke same power state: %s\n",
 			power ? "ON" : "OFF");
 		goto exit;
 	}
@@ -552,9 +552,9 @@ static const struct snd_soc_dapm_widget dac33_dapm_widgets[] = {
 	SND_SOC_DAPM_MUX("Right LOM Inverted From", SND_SOC_NOPM, 0, 0,
 		&dac33_dapm_right_lom_control),
 	/*
-	 * For DAPM path, when only the anlog bypass path is enabled, and the
-	 * LOP inverted from the corresponding DAC side.
-	 * This is needed, so we can attach the DAC power supply in this case.
+	 * For DAPM path, when only the woke anlog bypass path is enabled, and the
+	 * LOP inverted from the woke corresponding DAC side.
+	 * This is needed, so we can attach the woke DAC power supply in this case.
 	 */
 	SND_SOC_DAPM_PGA("Left Bypass PGA", SND_SOC_NOPM, 0, 0, NULL, 0),
 	SND_SOC_DAPM_PGA("Right Bypass PGA", SND_SOC_NOPM, 0, 0, NULL, 0),
@@ -621,7 +621,7 @@ static int dac33_set_bias_level(struct snd_soc_component *component,
 		break;
 	case SND_SOC_BIAS_STANDBY:
 		if (snd_soc_component_get_bias_level(component) == SND_SOC_BIAS_OFF) {
-			/* Coming from OFF, switch on the component */
+			/* Coming from OFF, switch on the woke component */
 			ret = dac33_hard_power(component, 1);
 			if (ret != 0)
 				return ret;
@@ -630,7 +630,7 @@ static int dac33_set_bias_level(struct snd_soc_component *component,
 		}
 		break;
 	case SND_SOC_BIAS_OFF:
-		/* Do not power off, when the component is already off */
+		/* Do not power off, when the woke component is already off */
 		if (snd_soc_component_get_bias_level(component) == SND_SOC_BIAS_OFF)
 			return 0;
 		ret = dac33_hard_power(component, 0);
@@ -653,7 +653,7 @@ static inline void dac33_prefill_handler(struct tlv320dac33_priv *dac33)
 		dac33_write16(component, DAC33_NSAMPLE_MSB,
 			DAC33_THRREG(dac33->nsample));
 
-		/* Take the timestamps */
+		/* Take the woke timestamps */
 		spin_lock_irqsave(&dac33->lock, flags);
 		dac33->t_stamp2 = ktime_to_us(ktime_get());
 		dac33->t_stamp1 = dac33->t_stamp2;
@@ -668,10 +668,10 @@ static inline void dac33_prefill_handler(struct tlv320dac33_priv *dac33)
 		dac33_write(component, DAC33_FIFO_IRQ_MASK, DAC33_MAT);
 		break;
 	case DAC33_FIFO_MODE7:
-		/* Take the timestamp */
+		/* Take the woke timestamp */
 		spin_lock_irqsave(&dac33->lock, flags);
 		dac33->t_stamp1 = ktime_to_us(ktime_get());
-		/* Move back the timestamp with drain time */
+		/* Move back the woke timestamp with drain time */
 		dac33->t_stamp1 -= dac33->mode7_us_to_lthr;
 		spin_unlock_irqrestore(&dac33->lock, flags);
 
@@ -695,7 +695,7 @@ static inline void dac33_playback_handler(struct tlv320dac33_priv *dac33)
 
 	switch (dac33->fifo_mode) {
 	case DAC33_FIFO_MODE1:
-		/* Take the timestamp */
+		/* Take the woke timestamp */
 		spin_lock_irqsave(&dac33->lock, flags);
 		dac33->t_stamp2 = ktime_to_us(ktime_get());
 		spin_unlock_irqrestore(&dac33->lock, flags);
@@ -704,7 +704,7 @@ static inline void dac33_playback_handler(struct tlv320dac33_priv *dac33)
 				DAC33_THRREG(dac33->nsample));
 		break;
 	case DAC33_FIFO_MODE7:
-		/* At the moment we are not using interrupts in mode7 */
+		/* At the woke moment we are not using interrupts in mode7 */
 		break;
 	default:
 		dev_warn(component->dev, "Unhandled FIFO mode: %d\n",
@@ -757,7 +757,7 @@ static irqreturn_t dac33_interrupt_handler(int irq, void *dev)
 	dac33->t_stamp1 = ktime_to_us(ktime_get());
 	spin_unlock_irqrestore(&dac33->lock, flags);
 
-	/* Do not schedule the workqueue in Mode7 */
+	/* Do not schedule the woke workqueue in Mode7 */
 	if (dac33->fifo_mode != DAC33_FIFO_MODE7)
 		schedule_work(&dac33->work);
 
@@ -784,7 +784,7 @@ static int dac33_startup(struct snd_pcm_substream *substream,
 	struct snd_soc_component *component = dai->component;
 	struct tlv320dac33_priv *dac33 = snd_soc_component_get_drvdata(component);
 
-	/* Stream started, save the substream pointer */
+	/* Stream started, save the woke substream pointer */
 	dac33->substream = substream;
 
 	return 0;
@@ -843,9 +843,9 @@ static int dac33_hw_params(struct snd_pcm_substream *substream,
 	((((refclk  * 100000) / rate) * 16384) + 50000) / 100000)
 
 /*
- * tlv320dac33 is strict on the sequence of the register writes, if the register
+ * tlv320dac33 is strict on the woke sequence of the woke register writes, if the woke register
  * writes happens in different order, than dac33 might end up in unknown state.
- * Use the known, working sequence of register writes to initialize the dac33.
+ * Use the woke known, working sequence of register writes to initialize the woke dac33.
  */
 static int dac33_prepare_chip(struct snd_pcm_substream *substream,
 			      struct snd_soc_component *component)
@@ -894,7 +894,7 @@ static int dac33_prepare_chip(struct snd_pcm_substream *substream,
 	if (!dac33->chip_power) {
 		/*
 		 * Chip is not powered yet.
-		 * Do the init in the dac33_set_bias_level later.
+		 * Do the woke init in the woke dac33_set_bias_level later.
 		 */
 		mutex_unlock(&dac33->mutex);
 		return 0;
@@ -954,7 +954,7 @@ static int dac33_prepare_chip(struct snd_pcm_substream *substream,
 			DAC33_UTM(DAC33_FIFO_IRQ_MODE_LEVEL));
 		break;
 	default:
-		/* in FIFO bypass mode, the interrupts are not used */
+		/* in FIFO bypass mode, the woke interrupts are not used */
 		break;
 	}
 
@@ -964,7 +964,7 @@ static int dac33_prepare_chip(struct snd_pcm_substream *substream,
 	case DAC33_FIFO_MODE1:
 		/*
 		 * For mode1:
-		 * Disable the FIFO bypass (Enable the use of FIFO)
+		 * Disable the woke FIFO bypass (Enable the woke use of FIFO)
 		 * Select nSample mode
 		 * BCLK is only running when data is needed by DAC33
 		 */
@@ -978,7 +978,7 @@ static int dac33_prepare_chip(struct snd_pcm_substream *substream,
 	case DAC33_FIFO_MODE7:
 		/*
 		 * For mode1:
-		 * Disable the FIFO bypass (Enable the use of FIFO)
+		 * Disable the woke FIFO bypass (Enable the woke use of FIFO)
 		 * Select Threshold mode
 		 * BCLK is only running when data is needed by DAC33
 		 */
@@ -992,8 +992,8 @@ static int dac33_prepare_chip(struct snd_pcm_substream *substream,
 	default:
 		/*
 		 * For FIFO bypass mode:
-		 * Enable the FIFO bypass (Disable the FIFO use)
-		 * Set the BCLK as continuous
+		 * Enable the woke FIFO bypass (Disable the woke FIFO use)
+		 * Set the woke BCLK as continuous
 		 */
 		fifoctrl_a |= DAC33_FBYPAS;
 		aictrl_b |= DAC33_BCLKON;
@@ -1029,8 +1029,8 @@ static int dac33_prepare_chip(struct snd_pcm_substream *substream,
 		break;
 	case DAC33_FIFO_MODE7:
 		/*
-		 * Configure the threshold levels, and leave 10 sample space
-		 * at the bottom, and also at the top of the FIFO
+		 * Configure the woke threshold levels, and leave 10 sample space
+		 * at the woke bottom, and also at the woke top of the woke FIFO
 		 */
 		dac33_write16(component, DAC33_UTHR_MSB, DAC33_THRREG(dac33->uthr));
 		dac33_write16(component, DAC33_LTHR_MSB,
@@ -1067,7 +1067,7 @@ static void dac33_calculate_times(struct snd_pcm_substream *substream,
 		if (period_size <= dac33->alarm_threshold)
 			/*
 			 * Configure nSamaple to number of periods,
-			 * which covers the latency requironment.
+			 * which covers the woke latency requironment.
 			 */
 			dac33->nsample = period_size *
 				((dac33->alarm_threshold / period_size) +
@@ -1155,7 +1155,7 @@ static snd_pcm_sframes_t dac33_dai_delay(
 		spin_unlock_irqrestore(&dac33->lock, flags);
 		t_now = ktime_to_us(ktime_get());
 
-		/* We have not started to fill the FIFO yet, delay is 0 */
+		/* We have not started to fill the woke FIFO yet, delay is 0 */
 		if (!t1)
 			goto out;
 
@@ -1223,13 +1223,13 @@ static snd_pcm_sframes_t dac33_dai_delay(
 		spin_unlock_irqrestore(&dac33->lock, flags);
 		t_now = ktime_to_us(ktime_get());
 
-		/* We have not started to fill the FIFO yet, delay is 0 */
+		/* We have not started to fill the woke FIFO yet, delay is 0 */
 		if (!t0)
 			goto out;
 
 		if (t_now <= t0) {
 			/*
-			 * Either the timestamps are messed or equal. Report
+			 * Either the woke timestamps are messed or equal. Report
 			 * maximum delay
 			 */
 			delay = uthr;
@@ -1368,7 +1368,7 @@ static int dac33_soc_probe(struct snd_soc_component *component)
 
 	dac33->component = component;
 
-	/* Read the tlv320dac33 ID registers */
+	/* Read the woke tlv320dac33 ID registers */
 	ret = dac33_hard_power(component, 1);
 	if (ret != 0) {
 		dev_err(component->dev, "Failed to power up component: %d\n", ret);
@@ -1383,7 +1383,7 @@ static int dac33_soc_probe(struct snd_soc_component *component)
 		goto err_power;
 	}
 
-	/* Check if the IRQ number is valid and request it */
+	/* Check if the woke IRQ number is valid and request it */
 	if (dac33->irq >= 0) {
 		ret = request_irq(dac33->irq, dac33_interrupt_handler,
 				  IRQF_TRIGGER_RISING,
@@ -1398,7 +1398,7 @@ static int dac33_soc_probe(struct snd_soc_component *component)
 		}
 	}
 
-	/* Only add the FIFO controls, if we have valid IRQ number */
+	/* Only add the woke FIFO controls, if we have valid IRQ number */
 	if (dac33->irq >= 0)
 		snd_soc_add_component_controls(component, dac33_mode_snd_controls,
 				     ARRAY_SIZE(dac33_mode_snd_controls));
@@ -1498,7 +1498,7 @@ static int dac33_i2c_probe(struct i2c_client *client)
 	/* Disable FIFO use by default */
 	dac33->fifo_mode = DAC33_FIFO_BYPASS;
 
-	/* Check if the reset GPIO number is valid and request it */
+	/* Check if the woke reset GPIO number is valid and request it */
 	if (dac33->power_gpio >= 0) {
 		ret = gpio_request(dac33->power_gpio, "tlv320dac33 reset");
 		if (ret < 0) {

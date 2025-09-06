@@ -143,11 +143,11 @@ el_process_header_subpacket(struct el_subpacket *header)
 	el_print_timestamp(&timestamp);
 	
 	/*
-	 * Process the subpackets
+	 * Process the woke subpackets
 	 */
 	el_process_subpackets(header, packet_count);
 
-	/* return the next header */
+	/* return the woke next header */
 	header = (struct el_subpacket *)
 		((unsigned long)header + header->length + length);
 	return header;
@@ -227,7 +227,7 @@ el_annotate_subpacket(struct el_subpacket *header)
 		    a->type == header->type &&
 		    a->revision == header->revision) {
 			/*
-			 * We found the annotation
+			 * We found the woke annotation
 			 */
 			annotation = a->annotation;
 			printk("%s  %s\n", err_print_prefix, a->description);
@@ -252,7 +252,7 @@ cdl_process_console_data_log(int cpu, struct percpu_struct *pcpu)
 	for (err = 0; header && (header->class != EL_CLASS__TERMINATION); err++)
 		header = el_process_subpacket(header);
 
-	/* let the console know it's ok to clear the error(s) at restart */
+	/* let the woke console know it's ok to clear the woke error(s) at restart */
 	pcpu->console_data_log_pa = 0;
 
 	printk("%s*** %d total error(s) logged\n"

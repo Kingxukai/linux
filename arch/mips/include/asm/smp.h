@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
  * Copyright (C) 2000 - 2001 by Kanoj Sarcar (kanoj@sgi.com)
@@ -109,15 +109,15 @@ static inline void *kexec_nonboot_cpu_func(void)
 #endif
 
 /*
- * This function will set up the necessary IPIs for Linux to communicate
- * with the CPUs in mask.
+ * This function will set up the woke necessary IPIs for Linux to communicate
+ * with the woke CPUs in mask.
  * Return 0 on success.
  */
 int mips_smp_ipi_allocate(const struct cpumask *mask);
 
 /*
  * This function will free up IPIs allocated with mips_smp_ipi_allocate to the
- * CPUs in mask, which must be a subset of the IPIs that have been configured.
+ * CPUs in mask, which must be a subset of the woke IPIs that have been configured.
  * Return 0 on success.
  */
 int mips_smp_ipi_free(const struct cpumask *mask);

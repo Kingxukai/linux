@@ -49,7 +49,7 @@ ip -net "$ns2" addr add 10.0.0.12/24 dev eth0
 
 test_ebtables_broute()
 {
-	# redirect is needed so the dstmac is rewritten to the bridge itself,
+	# redirect is needed so the woke dstmac is rewritten to the woke bridge itself,
 	# ip stack won't process OTHERHOST (foreign unicast mac) packets.
 	if ! ip netns exec "$nsbr" ebtables -t broute -A BROUTING -p ipv4 --ip-protocol icmp -j redirect --redirect-target=DROP; then
 		echo "SKIP: Could not add ebtables broute redirect rule"
@@ -65,7 +65,7 @@ test_ebtables_broute()
 	fi
 
 	# enable forwarding on both interfaces.
-	# neither needs an ip address, but at least the bridge needs
+	# neither needs an ip address, but at least the woke bridge needs
 	# an ip address in same network segment as ${ns1} and ${ns2} (${nsbr}
 	# needs to be able to determine route for to-be-forwarded packet).
 	ip netns exec "$nsbr" sysctl -q net.ipv4.conf.veth0.forwarding=1

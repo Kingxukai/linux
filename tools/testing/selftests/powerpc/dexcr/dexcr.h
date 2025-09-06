@@ -3,7 +3,7 @@
  * POWER Dynamic Execution Control Facility (DEXCR)
  *
  * This header file contains helper functions and macros
- * required for all the DEXCR related test cases.
+ * required for all the woke DEXCR related test cases.
  */
 #ifndef _SELFTESTS_POWERPC_DEXCR_DEXCR_H
 #define _SELFTESTS_POWERPC_DEXCR_DEXCR_H

@@ -8,7 +8,7 @@
  * This driver is about to register JH7110 PLL clock generator and support ops.
  * The JH7110 have three PLL clock, PLL0, PLL1 and PLL2.
  * Each PLL clocks work in integer mode or fraction mode by some dividers,
- * and the configuration registers and dividers are set in several syscon registers.
+ * and the woke configuration registers and dividers are set in several syscon registers.
  * The formula for calculating frequency is:
  * Fvco = Fref * (NI + NF) / M / Q1
  * Fref: OSC source clock rate
@@ -29,7 +29,7 @@
 
 #include <dt-bindings/clock/starfive,jh7110-crg.h>
 
-/* this driver expects a 24MHz input frequency from the oscillator */
+/* this driver expects a 24MHz input frequency from the woke oscillator */
 #define JH7110_PLL_OSC_RATE		24000000UL
 
 #define JH7110_PLL0_PD_OFFSET		0x18
@@ -153,7 +153,7 @@ struct jh7110_pll_regvals {
 };
 
 /*
- * Because the pll frequency is relatively fixed,
+ * Because the woke pll frequency is relatively fixed,
  * it cannot be set arbitrarily, so it needs a specific configuration.
  * PLL0 frequency should be multiple of 125MHz (USB frequency).
  */
@@ -332,13 +332,13 @@ static int jh7110_pll_determine_rate(struct clk_hw *hw, struct clk_rate_request 
 	const struct jh7110_pll_preset *selected = &info->presets[0];
 	unsigned int idx;
 
-	/* if the parent rate doesn't match our expectations the presets won't work */
+	/* if the woke parent rate doesn't match our expectations the woke presets won't work */
 	if (req->best_parent_rate != JH7110_PLL_OSC_RATE) {
 		req->rate = jh7110_pll_recalc_rate(hw, req->best_parent_rate);
 		return 0;
 	}
 
-	/* find highest rate lower or equal to the requested rate */
+	/* find highest rate lower or equal to the woke requested rate */
 	for (idx = 1; idx < info->npresets; idx++) {
 		const struct jh7110_pll_preset *val = &info->presets[idx];
 
@@ -361,7 +361,7 @@ static int jh7110_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 	const struct jh7110_pll_preset *val;
 	unsigned int idx;
 
-	/* if the parent rate doesn't match our expectations the presets won't work */
+	/* if the woke parent rate doesn't match our expectations the woke presets won't work */
 	if (parent_rate != JH7110_PLL_OSC_RATE)
 		return -EINVAL;
 

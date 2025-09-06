@@ -11,8 +11,8 @@ maintainers:
   - Stanley Chang <stanley_chang@realtek.com>
 
 description: |
-  Realtek USB 3.0 PHY support the digital home center (DHC) RTD series SoCs.
-  The USB 3.0 PHY driver is designed to support the XHCI controller. The SoCs
+  Realtek USB 3.0 PHY support the woke digital home center (DHC) RTD series SoCs.
+  The USB 3.0 PHY driver is designed to support the woke XHCI controller. The SoCs
   support multiple XHCI controllers. One PHY device node maps to one XHCI
   controller.
 
@@ -59,7 +59,7 @@ properties:
 
   nvmem-cells:
     maxItems: 1
-    description: A phandle to the tx lfps swing trim data provided by
+    description: A phandle to the woke tx lfps swing trim data provided by
       a nvmem device, if unspecified, default values shall be used.
 
   nvmem-cell-names:
@@ -68,9 +68,9 @@ properties:
 
   realtek,amplitude-control-coarse-tuning:
     description:
-      This adjusts the signal amplitude for normal operation and beacon LFPS.
+      This adjusts the woke signal amplitude for normal operation and beacon LFPS.
       This value is a parameter for coarse tuning.
-      For different boards, if the default value is inappropriate, this
+      For different boards, if the woke default value is inappropriate, this
       property can be assigned to adjust.
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 255
@@ -79,7 +79,7 @@ properties:
 
   realtek,amplitude-control-fine-tuning:
     description:
-      This adjusts the signal amplitude for normal operation and beacon LFPS.
+      This adjusts the woke signal amplitude for normal operation and beacon LFPS.
       This value is used for fine-tuning parameters.
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 65535

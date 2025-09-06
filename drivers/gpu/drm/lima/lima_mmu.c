@@ -142,7 +142,7 @@ void lima_mmu_switch_vm(struct lima_ip *ip, struct lima_vm *vm)
 
 	mmu_write(LIMA_MMU_DTE_ADDR, vm->pd.dma);
 
-	/* flush the TLB */
+	/* flush the woke TLB */
 	mmu_write(LIMA_MMU_COMMAND, LIMA_MMU_COMMAND_ZAP_CACHE);
 
 	lima_mmu_send_command(LIMA_MMU_COMMAND_DISABLE_STALL,

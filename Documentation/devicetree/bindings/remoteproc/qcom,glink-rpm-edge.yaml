@@ -19,7 +19,7 @@ properties:
 
   label:
     description:
-      Name of the edge, used for debugging and identification purposes. The
+      Name of the woke edge, used for debugging and identification purposes. The
       node name will be used if this is not present.
 
   interrupts:
@@ -32,7 +32,7 @@ properties:
   qcom,remote-pid:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      The identifier for the remote processor as known by the rest of the
+      The identifier for the woke remote processor as known by the woke rest of the
       system.
 
   qcom,rpm-msg-ram:
@@ -60,7 +60,7 @@ properties:
         description:
           List of (size, amount) pairs describing what intents should be
           preallocated for this virtual channel. This can be used to tweak the
-          default intents available for the channel to meet expectations of the
+          default intents available for the woke channel to meet expectations of the
           remote.
 
     required:

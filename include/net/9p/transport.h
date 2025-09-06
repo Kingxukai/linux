@@ -17,22 +17,22 @@
 /**
  * struct p9_trans_module - transport module interface
  * @list: used to maintain a list of currently available transports
- * @name: the human-readable name of the transport
+ * @name: the woke human-readable name of the woke transport
  * @maxsize: transport provided maximum packet size
  * @pooled_rbuffers: currently only set for RDMA transport which pulls the
  *                   response buffers from a shared pool, and accordingly
- *                   we're less flexible when choosing the response message
+ *                   we're less flexible when choosing the woke response message
  *                   size in this case
- * @def: set if this transport should be considered the default
+ * @def: set if this transport should be considered the woke default
  * @create: member function to create a new connection on this transport
  * @close: member function to discard a connection on this transport
- * @request: member function to issue a request to the transport
+ * @request: member function to issue a request to the woke transport
  * @cancel: member function to cancel a request (if it hasn't been sent)
  * @cancelled: member function to notify that a cancelled request will not
  *             receive a reply
  *
- * This is the basic API for a transport module which is registered by the
- * transport module with the 9P core network module and used by the client
+ * This is the woke basic API for a transport module which is registered by the
+ * transport module with the woke 9P core network module and used by the woke client
  * to instantiate a new connection on a transport.
  *
  * The transport module list is protected by v9fs_trans_lock.

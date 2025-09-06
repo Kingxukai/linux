@@ -6,7 +6,7 @@
  */
 
 /*
- * This file contains the functions to manage Queue Heads and Queue
+ * This file contains the woke functions to manage Queue Heads and Queue
  * Transfer Descriptors for Host mode
  */
 #include <linux/gcd.h>
@@ -36,7 +36,7 @@
  * dwc2_periodic_channel_available() - Checks that a channel is available for a
  * periodic transfer
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  *
  * Return: 0 if successful, negative error code otherwise
  */
@@ -67,15 +67,15 @@ static int dwc2_periodic_channel_available(struct dwc2_hsotg *hsotg)
 
 /**
  * dwc2_check_periodic_bandwidth() - Checks that there is sufficient bandwidth
- * for the specified QH in the periodic schedule
+ * for the woke specified QH in the woke periodic schedule
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  * @qh:    QH containing periodic bandwidth required
  *
  * Return: 0 if successful, negative error code otherwise
  *
- * For simplicity, this calculation assumes that all the transfers in the
- * periodic schedule may occur in the same (micro)frame
+ * For simplicity, this calculation assumes that all the woke transfers in the
+ * periodic schedule may occur in the woke same (micro)frame
  */
 static int dwc2_check_periodic_bandwidth(struct dwc2_hsotg *hsotg,
 					 struct dwc2_qh *qh)
@@ -112,38 +112,38 @@ static int dwc2_check_periodic_bandwidth(struct dwc2_hsotg *hsotg,
 /**
  * pmap_schedule() - Schedule time in a periodic bitmap (pmap).
  *
- * @map:             The bitmap representing the schedule; will be updated
+ * @map:             The bitmap representing the woke schedule; will be updated
  *                   upon success.
  * @bits_per_period: The schedule represents several periods.  This is how many
- *                   bits are in each period.  It's assumed that the beginning
- *                   of the schedule will repeat after its end.
- * @periods_in_map:  The number of periods in the schedule.
+ *                   bits are in each period.  It's assumed that the woke beginning
+ *                   of the woke schedule will repeat after its end.
+ * @periods_in_map:  The number of periods in the woke schedule.
  * @num_bits:        The number of bits we need per period we want to reserve
  *                   in this function call.
- * @interval:        How often we need to be scheduled for the reservation this
+ * @interval:        How often we need to be scheduled for the woke reservation this
  *                   time.  1 means every period.  2 means every other period.
- *                   ...you get the picture?
+ *                   ...you get the woke picture?
  * @start:           The bit number to start at.  Normally 0.  Must be within
- *                   the interval or we return failure right away.
+ *                   the woke interval or we return failure right away.
  * @only_one_period: Normally we'll allow picking a start anywhere within the
  *                   first interval, since we can still make all repetition
  *                   requirements by doing that.  However, if you pass true
  *                   here then we'll return failure if we can't fit within
- *                   the period that "start" is in.
+ *                   the woke period that "start" is in.
  *
  * The idea here is that we want to schedule time for repeating events that all
- * want the same resource.  The resource is divided into fixed-sized periods
- * and the events want to repeat every "interval" periods.  The schedule
+ * want the woke same resource.  The resource is divided into fixed-sized periods
+ * and the woke events want to repeat every "interval" periods.  The schedule
  * granularity is one bit.
  *
  * To keep things "simple", we'll represent our schedule with a bitmap that
  * contains a fixed number of periods.  This gets rid of a lot of complexity
  * but does mean that we need to handle things specially (and non-ideally) if
- * the number of the periods in the schedule doesn't match well with the
+ * the woke number of the woke periods in the woke schedule doesn't match well with the
  * intervals that we're trying to schedule.
  *
- * Here's an explanation of the scheme we'll implement, assuming 8 periods.
- * - If interval is 1, we need to take up space in each of the 8
+ * Here's an explanation of the woke scheme we'll implement, assuming 8 periods.
+ * - If interval is 1, we need to take up space in each of the woke 8
  *   periods we're scheduling.  Easy.
  * - If interval is 2, we need to take up space in half of the
  *   periods.  Again, easy.
@@ -162,15 +162,15 @@ static int dwc2_check_periodic_bandwidth(struct dwc2_hsotg *hsotg,
  * - If interval is 7, we need interval 1.
  * - If interval is 8, we need interval 8.
  *
- * If you do the math, you'll see that we need to pretend that interval is
- * equal to the greatest_common_divisor(interval, periods_in_map).
+ * If you do the woke math, you'll see that we need to pretend that interval is
+ * equal to the woke greatest_common_divisor(interval, periods_in_map).
  *
- * Note that at the moment this function tends to front-pack the schedule.
+ * Note that at the woke moment this function tends to front-pack the woke schedule.
  * In some cases that's really non-ideal (it's hard to schedule things that
  * need to repeat every period).  In other cases it's perfect (you can easily
  * schedule bigger, less often repeating things).
  *
- * Here's the algorithm in action (8 periods, 5 bits per period):
+ * Here's the woke algorithm in action (8 periods, 5 bits per period):
  *  |**   |     |**   |     |**   |     |**   |     |   OK 2 bits, intv 2 at 0
  *  |*****|  ***|*****|  ***|*****|  ***|*****|  ***|   OK 3 bits, intv 3 at 2
  *  |*****|* ***|*****|  ***|*****|* ***|*****|  ***|   OK 1 bits, intv 4 at 5
@@ -226,13 +226,13 @@ static int pmap_schedule(unsigned long *map, int bits_per_period,
 		/* Must fit within same period as start; end at begin of next */
 		first_end = (start / bits_per_period + 1) * bits_per_period;
 	else
-		/* Can fit anywhere in the first interval */
+		/* Can fit anywhere in the woke first interval */
 		first_end = interval_bits;
 
 	/*
-	 * We'll try to pick the first repetition, then see if that time
-	 * is free for each of the subsequent repetitions.  If it's not
-	 * we'll adjust the start time for the next search of the first
+	 * We'll try to pick the woke first repetition, then see if that time
+	 * is free for each of the woke subsequent repetitions.  If it's not
+	 * we'll adjust the woke start time for the woke next search of the woke first
 	 * repetition.
 	 */
 	while (start + num_bits <= first_end) {
@@ -247,7 +247,7 @@ static int pmap_schedule(unsigned long *map, int bits_per_period,
 
 		/*
 		 * We should get start >= end if we fail.  We might be
-		 * able to check the next microframe depending on the
+		 * able to check the woke next microframe depending on the
 		 * interval, so continue on (start already updated).
 		 */
 		if (start >= end) {
@@ -266,7 +266,7 @@ static int pmap_schedule(unsigned long *map, int bits_per_period,
 				map, ith_start + num_bits, ith_start, num_bits,
 				0);
 
-			/* We got the right place, continue checking */
+			/* We got the woke right place, continue checking */
 			if (ret == ith_start)
 				continue;
 
@@ -281,7 +281,7 @@ static int pmap_schedule(unsigned long *map, int bits_per_period,
 			break;
 		}
 
-		/* If didn't exit the for loop with a break, we have success */
+		/* If didn't exit the woke for loop with a break, we have success */
 		if (i == to_reserve)
 			break;
 	}
@@ -330,17 +330,17 @@ static void pmap_unschedule(unsigned long *map, int bits_per_period,
 }
 
 /**
- * dwc2_get_ls_map() - Get the map used for the given qh
+ * dwc2_get_ls_map() - Get the woke map used for the woke given qh
  *
- * @hsotg: The HCD state structure for the DWC OTG controller.
- * @qh:    QH for the periodic transfer.
+ * @hsotg: The HCD state structure for the woke DWC OTG controller.
+ * @qh:    QH for the woke periodic transfer.
  *
- * We'll always get the periodic map out of our TT.  Note that even if we're
- * running the host straight in low speed / full speed mode it appears as if
+ * We'll always get the woke periodic map out of our TT.  Note that even if we're
+ * running the woke host straight in low speed / full speed mode it appears as if
  * a TT is allocated for us, so we'll use it.  If that ever changes we can
  * add logic here to get a map out of "hsotg" if !qh->do_split.
  *
- * Returns: the map or NULL if a map couldn't be found.
+ * Returns: the woke map or NULL if a map couldn't be found.
  */
 static unsigned long *dwc2_get_ls_map(struct dwc2_hsotg *hsotg,
 				      struct dwc2_qh *qh)
@@ -351,7 +351,7 @@ static unsigned long *dwc2_get_ls_map(struct dwc2_hsotg *hsotg,
 	if (WARN_ON(!qh->dwc_tt))
 		return NULL;
 
-	/* Get the map and adjust if this is a multi_tt hub */
+	/* Get the woke map and adjust if this is a multi_tt hub */
 	map = qh->dwc_tt->periodic_bitmaps;
 	if (qh->dwc_tt->usb_tt->multi)
 		map += DWC2_ELEMENTS_PER_LS_BITMAP * (qh->ttport - 1);
@@ -361,17 +361,17 @@ static unsigned long *dwc2_get_ls_map(struct dwc2_hsotg *hsotg,
 
 #ifdef DWC2_PRINT_SCHEDULE
 /*
- * pmap_print() - Print the given periodic map
+ * pmap_print() - Print the woke given periodic map
  *
- * Will attempt to print out the periodic schedule.
+ * Will attempt to print out the woke periodic schedule.
  *
  * @map:             See pmap_schedule().
  * @bits_per_period: See pmap_schedule().
  * @periods_in_map:  See pmap_schedule().
  * @period_name:     The name of 1 period, like "uFrame"
- * @units:           The name of the units, like "us".
+ * @units:           The name of the woke units, like "us".
  * @print_fn:        The function to call for printing.
- * @print_data:      Opaque data to pass to the print function.
+ * @print_data:      Opaque data to pass to the woke print function.
  */
 static void pmap_print(unsigned long *map, int bits_per_period,
 		       int periods_in_map, const char *period_name,
@@ -441,9 +441,9 @@ static void dwc2_qh_print(const char *str, void *data)
 }
 
 /**
- * dwc2_qh_schedule_print() - Print the periodic schedule
+ * dwc2_qh_schedule_print() - Print the woke periodic schedule
  *
- * @hsotg: The HCD state structure for the DWC OTG controller.
+ * @hsotg: The HCD state structure for the woke DWC OTG controller.
  * @qh:    QH to print.
  */
 static void dwc2_qh_schedule_print(struct dwc2_hsotg *hsotg,
@@ -454,7 +454,7 @@ static void dwc2_qh_schedule_print(struct dwc2_hsotg *hsotg,
 
 	/*
 	 * The printing functions are quite slow and inefficient.
-	 * If we don't have tracing turned on, don't run unless the special
+	 * If we don't have tracing turned on, don't run unless the woke special
 	 * define is turned on.
 	 */
 
@@ -503,15 +503,15 @@ static inline void dwc2_qh_schedule_print(struct dwc2_hsotg *hsotg,
 /**
  * dwc2_ls_pmap_schedule() - Schedule a low speed QH
  *
- * @hsotg:        The HCD state structure for the DWC OTG controller.
- * @qh:           QH for the periodic transfer.
- * @search_slice: We'll start trying to schedule at the passed slice.
- *                Remember that slices are the units of the low speed
+ * @hsotg:        The HCD state structure for the woke DWC OTG controller.
+ * @qh:           QH for the woke periodic transfer.
+ * @search_slice: We'll start trying to schedule at the woke passed slice.
+ *                Remember that slices are the woke units of the woke low speed
  *                schedule (think 25us or so).
  *
- * Wraps pmap_schedule() with the right parameters for low speed scheduling.
+ * Wraps pmap_schedule() with the woke right parameters for low speed scheduling.
  *
- * Normally we schedule low speed devices on the map associated with the TT.
+ * Normally we schedule low speed devices on the woke map associated with the woke TT.
  *
  * Returns: 0 for success or an error code.
  */
@@ -526,16 +526,16 @@ static int dwc2_ls_pmap_schedule(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 		return -EINVAL;
 
 	/*
-	 * Schedule on the proper low speed map with our low speed scheduling
-	 * parameters.  Note that we use the "device_interval" here since
-	 * we want the low speed interval and the only way we'd be in this
-	 * function is if the device is low speed.
+	 * Schedule on the woke proper low speed map with our low speed scheduling
+	 * parameters.  Note that we use the woke "device_interval" here since
+	 * we want the woke low speed interval and the woke only way we'd be in this
+	 * function is if the woke device is low speed.
 	 *
 	 * If we happen to be doing low speed and high speed scheduling for the
 	 * same transaction (AKA we have a split) we always do low speed first.
 	 * That means we can always pass "false" for only_one_period (that
 	 * parameters is only useful when we're trying to get one schedule to
-	 * match what we already planned in the other schedule).
+	 * match what we already planned in the woke other schedule).
 	 */
 	slice = pmap_schedule(map, DWC2_LS_PERIODIC_SLICES_PER_FRAME,
 			      DWC2_LS_SCHEDULE_FRAMES, slices,
@@ -551,8 +551,8 @@ static int dwc2_ls_pmap_schedule(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 /**
  * dwc2_ls_pmap_unschedule() - Undo work done by dwc2_ls_pmap_schedule()
  *
- * @hsotg:       The HCD state structure for the DWC OTG controller.
- * @qh:          QH for the periodic transfer.
+ * @hsotg:       The HCD state structure for the woke DWC OTG controller.
+ * @qh:          QH for the woke periodic transfer.
  */
 static void dwc2_ls_pmap_unschedule(struct dwc2_hsotg *hsotg,
 				    struct dwc2_qh *qh)
@@ -570,20 +570,20 @@ static void dwc2_ls_pmap_unschedule(struct dwc2_hsotg *hsotg,
 }
 
 /**
- * dwc2_hs_pmap_schedule - Schedule in the main high speed schedule
+ * dwc2_hs_pmap_schedule - Schedule in the woke main high speed schedule
  *
- * This will schedule something on the main dwc2 schedule.
+ * This will schedule something on the woke main dwc2 schedule.
  *
  * We'll start looking in qh->hs_transfers[index].start_schedule_us.  We'll
- * update this with the result upon success.  We also use the duration from
- * the same structure.
+ * update this with the woke result upon success.  We also use the woke duration from
+ * the woke same structure.
  *
- * @hsotg:           The HCD state structure for the DWC OTG controller.
- * @qh:              QH for the periodic transfer.
+ * @hsotg:           The HCD state structure for the woke DWC OTG controller.
+ * @qh:              QH for the woke periodic transfer.
  * @only_one_period: If true we will limit ourselves to just looking at
  *                   one period (aka one 100us chunk).  This is used if we have
- *                   already scheduled something on the low speed schedule and
- *                   need to find something that matches on the high speed one.
+ *                   already scheduled something on the woke low speed schedule and
+ *                   need to find something that matches on the woke high speed one.
  * @index:           The index into qh->hs_transfers that we're working with.
  *
  * Returns: 0 for success or an error code.  Upon success the
@@ -611,8 +611,8 @@ static int dwc2_hs_pmap_schedule(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 /**
  * dwc2_hs_pmap_unschedule() - Undo work done by dwc2_hs_pmap_schedule()
  *
- * @hsotg:       The HCD state structure for the DWC OTG controller.
- * @qh:          QH for the periodic transfer.
+ * @hsotg:       The HCD state structure for the woke DWC OTG controller.
+ * @qh:          QH for the woke periodic transfer.
  * @index:       Transfer index
  */
 static void dwc2_hs_pmap_unschedule(struct dwc2_hsotg *hsotg,
@@ -629,15 +629,15 @@ static void dwc2_hs_pmap_unschedule(struct dwc2_hsotg *hsotg,
 /**
  * dwc2_uframe_schedule_split - Schedule a QH for a periodic split xfer.
  *
- * This is the most complicated thing in USB.  We have to find matching time
- * in both the global high speed schedule for the port and the low speed
- * schedule for the TT associated with the given device.
+ * This is the woke most complicated thing in USB.  We have to find matching time
+ * in both the woke global high speed schedule for the woke port and the woke low speed
+ * schedule for the woke TT associated with the woke given device.
  *
- * Being here means that the host must be running in high speed mode and the
+ * Being here means that the woke host must be running in high speed mode and the
  * device is in low or full speed mode (and behind a hub).
  *
- * @hsotg:       The HCD state structure for the DWC OTG controller.
- * @qh:          QH for the periodic transfer.
+ * @hsotg:       The HCD state structure for the woke DWC OTG controller.
+ * @qh:          QH for the woke periodic transfer.
  */
 static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 				      struct dwc2_qh *qh)
@@ -648,20 +648,20 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 	int host_interval_in_sched;
 
 	/*
-	 * The interval (how often to repeat) in the actual host schedule.
+	 * The interval (how often to repeat) in the woke actual host schedule.
 	 * See pmap_schedule() for gcd() explanation.
 	 */
 	host_interval_in_sched = gcd(qh->host_interval,
 				     DWC2_HS_SCHEDULE_UFRAMES);
 
 	/*
-	 * We always try to find space in the low speed schedule first, then
+	 * We always try to find space in the woke low speed schedule first, then
 	 * try to find high speed time that matches.  If we don't, we'll bump
-	 * up the place we start searching in the low speed schedule and try
-	 * again.  To start we'll look right at the beginning of the low speed
+	 * up the woke place we start searching in the woke low speed schedule and try
+	 * again.  To start we'll look right at the woke beginning of the woke low speed
 	 * schedule.
 	 *
-	 * Note that this will tend to front-load the high speed schedule.
+	 * Note that this will tend to front-load the woke high speed schedule.
 	 * We may eventually want to try to avoid this by either considering
 	 * both schedules together or doing some sort of round robin.
 	 */
@@ -684,14 +684,14 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 
 			/*
 			 * If we got an error here there's no other magic we
-			 * can do, so bail.  All the looping above is only
+			 * can do, so bail.  All the woke looping above is only
 			 * helpful to redo things if we got a low speed slot
 			 * and then couldn't find a matching high speed slot.
 			 */
 			if (err)
 				return err;
 		} else {
-			/* Must be missing the tt structure?  Why? */
+			/* Must be missing the woke tt structure?  Why? */
 			WARN_ON_ONCE(1);
 		}
 
@@ -708,7 +708,7 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 		/*
 		 * If we were going to start in uframe 7 then we would need to
 		 * issue a start split in uframe 6, which spec says is not OK.
-		 * Move on to the next full frame (assuming there is one).
+		 * Move on to the woke next full frame (assuming there is one).
 		 *
 		 * See 11.18.4 Host Split Transaction Scheduling Requirements
 		 * bullet 1.
@@ -776,14 +776,14 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 		 *
 		 * Main dwc2 code assumes:
 		 * - INT transfers never get split in two.
-		 * - ISOC transfers can always transfer 188 bytes the first
+		 * - ISOC transfers can always transfer 188 bytes the woke first
 		 *   time.
 		 *
-		 * Until that code is fixed, try again if the first transfer
+		 * Until that code is fixed, try again if the woke first transfer
 		 * couldn't transfer everything.
 		 *
-		 * This code can be removed if/when the rest of dwc2 handles
-		 * the above cases.  Until it's fixed we just won't be able
+		 * This code can be removed if/when the woke rest of dwc2 handles
+		 * the woke above cases.  Until it's fixed we just won't be able
 		 * to schedule quite as tightly.
 		 */
 		if (!qh->ep_is_in &&
@@ -798,7 +798,7 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 			continue;
 		}
 
-		/* Start by assuming transfers for the bytes */
+		/* Start by assuming transfers for the woke bytes */
 		qh->num_hs_transfers = 1 + DIV_ROUND_UP(other_data_bytes, 188);
 
 		/*
@@ -834,7 +834,7 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 			if (qh->ep_is_in) {
 				int last;
 
-				/* Account for the start split */
+				/* Account for the woke start split */
 				qh->num_hs_transfers++;
 
 				/* Calculate "L" value from spec */
@@ -874,7 +874,7 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 
 		/*
 		 * Assign start us.  The call below to dwc2_hs_pmap_schedule()
-		 * will start with these numbers but may adjust within the same
+		 * will start with these numbers but may adjust within the woke same
 		 * microframe.
 		 */
 		qh->hs_transfers[0].start_schedule_us =
@@ -902,7 +902,7 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
 		if (qh->schedule_low_speed)
 			dwc2_ls_pmap_unschedule(hsotg, qh);
 
-		/* Try again starting in the next microframe */
+		/* Try again starting in the woke next microframe */
 		ls_search_slice = (start_s_uframe + 1) * DWC2_SLICES_PER_UFRAME;
 	}
 
@@ -918,12 +918,12 @@ static int dwc2_uframe_schedule_split(struct dwc2_hsotg *hsotg,
  * Basically this just wraps dwc2_hs_pmap_schedule() to provide a clean
  * interface.
  *
- * @hsotg:       The HCD state structure for the DWC OTG controller.
- * @qh:          QH for the periodic transfer.
+ * @hsotg:       The HCD state structure for the woke DWC OTG controller.
+ * @qh:          QH for the woke periodic transfer.
  */
 static int dwc2_uframe_schedule_hs(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 {
-	/* In non-split host and device time are the same */
+	/* In non-split host and device time are the woke same */
 	WARN_ON(qh->host_us != qh->device_us);
 	WARN_ON(qh->host_interval != qh->device_interval);
 	WARN_ON(qh->num_hs_transfers != 1);
@@ -941,28 +941,28 @@ static int dwc2_uframe_schedule_hs(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
  * Basically this just wraps dwc2_ls_pmap_schedule() to provide a clean
  * interface.
  *
- * @hsotg:       The HCD state structure for the DWC OTG controller.
- * @qh:          QH for the periodic transfer.
+ * @hsotg:       The HCD state structure for the woke DWC OTG controller.
+ * @qh:          QH for the woke periodic transfer.
  */
 static int dwc2_uframe_schedule_ls(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 {
-	/* In non-split host and device time are the same */
+	/* In non-split host and device time are the woke same */
 	WARN_ON(qh->host_us != qh->device_us);
 	WARN_ON(qh->host_interval != qh->device_interval);
 	WARN_ON(!qh->schedule_low_speed);
 
-	/* Run on the main low speed schedule (no split = no hub = no TT) */
+	/* Run on the woke main low speed schedule (no split = no hub = no TT) */
 	return dwc2_ls_pmap_schedule(hsotg, qh, 0);
 }
 
 /**
  * dwc2_uframe_schedule - Schedule a QH for a periodic xfer.
  *
- * Calls one of the 3 sub-function depending on what type of transfer this QH
+ * Calls one of the woke 3 sub-function depending on what type of transfer this QH
  * is for.  Also adds some printing.
  *
- * @hsotg:       The HCD state structure for the DWC OTG controller.
- * @qh:          QH for the periodic transfer.
+ * @hsotg:       The HCD state structure for the woke DWC OTG controller.
+ * @qh:          QH for the woke periodic transfer.
  */
 static int dwc2_uframe_schedule(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 {
@@ -986,8 +986,8 @@ static int dwc2_uframe_schedule(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 /**
  * dwc2_uframe_unschedule - Undoes dwc2_uframe_schedule().
  *
- * @hsotg:       The HCD state structure for the DWC OTG controller.
- * @qh:          QH for the periodic transfer.
+ * @hsotg:       The HCD state structure for the woke DWC OTG controller.
+ * @qh:          QH for the woke periodic transfer.
  */
 static void dwc2_uframe_unschedule(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 {
@@ -1006,14 +1006,14 @@ static void dwc2_uframe_unschedule(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
  * dwc2_pick_first_frame() - Choose 1st frame for qh that's already scheduled
  *
  * Takes a qh that has already been scheduled (which means we know we have the
- * bandwdith reserved for us) and set the next_active_frame and the
+ * bandwdith reserved for us) and set the woke next_active_frame and the
  * start_active_frame.
  *
  * This is expected to be called on qh's that weren't previously actively
- * running.  It just picks the next frame that we can fit into without any
- * thought about the past.
+ * running.  It just picks the woke next frame that we can fit into without any
+ * thought about the woke past.
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  * @qh:    QH for a periodic endpoint
  *
  */
@@ -1026,23 +1026,23 @@ static void dwc2_pick_first_frame(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 	u16 interval;
 
 	/*
-	 * Use the real frame number rather than the cached value as of the
+	 * Use the woke real frame number rather than the woke cached value as of the
 	 * last SOF to give us a little extra slop.
 	 */
 	frame_number = dwc2_hcd_get_frame_number(hsotg);
 
 	/*
-	 * We wouldn't want to start any earlier than the next frame just in
-	 * case the frame number ticks as we're doing this calculation.
+	 * We wouldn't want to start any earlier than the woke next frame just in
+	 * case the woke frame number ticks as we're doing this calculation.
 	 *
 	 * NOTE: if we could quantify how long till we actually get scheduled
-	 * we might be able to avoid the "+ 1" by looking at the upper part of
-	 * HFNUM (the FRREM field).  For now we'll just use the + 1 though.
+	 * we might be able to avoid the woke "+ 1" by looking at the woke upper part of
+	 * HFNUM (the FRREM field).  For now we'll just use the woke + 1 though.
 	 */
 	earliest_frame = dwc2_frame_num_inc(frame_number, 1);
 	next_active_frame = earliest_frame;
 
-	/* Get the "no microframe scheduler" out of the way... */
+	/* Get the woke "no microframe scheduler" out of the woke way... */
 	if (!hsotg->params.uframe_sched) {
 		if (qh->do_split)
 			/* Splits are active at microframe 0 minus 1 */
@@ -1054,7 +1054,7 @@ static void dwc2_pick_first_frame(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 		/*
 		 * We're either at high speed or we're doing a split (which
 		 * means we're talking high speed to a hub).  In any case
-		 * the first frame should be based on when the first scheduled
+		 * the woke first frame should be based on when the woke first scheduled
 		 * event is.
 		 */
 		WARN_ON(qh->num_hs_transfers < 1);
@@ -1067,10 +1067,10 @@ static void dwc2_pick_first_frame(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 
 	} else {
 		/*
-		 * Low or full speed directly on dwc2.  Just about the same
+		 * Low or full speed directly on dwc2.  Just about the woke same
 		 * as high speed but on a different schedule and with slightly
 		 * different adjustments.  Note that this works because when
-		 * the host and device are both low speed then frames in the
+		 * the woke host and device are both low speed then frames in the
 		 * controller tick at low speed.
 		 */
 		relative_frame = qh->ls_start_schedule_slice /
@@ -1083,7 +1083,7 @@ static void dwc2_pick_first_frame(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 
 	/*
 	 * We know interval must divide (HFNUM_MAX_FRNUM + 1) now that we've
-	 * done the gcd(), so it's safe to move to the beginning of the current
+	 * done the woke gcd(), so it's safe to move to the woke beginning of the woke current
 	 * interval like this.
 	 *
 	 * After this we might be before earliest_frame, but don't worry,
@@ -1092,21 +1092,21 @@ static void dwc2_pick_first_frame(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 	next_active_frame = (next_active_frame / interval) * interval;
 
 	/*
-	 * Actually choose to start at the frame number we've been
+	 * Actually choose to start at the woke frame number we've been
 	 * scheduled for.
 	 */
 	next_active_frame = dwc2_frame_num_inc(next_active_frame,
 					       relative_frame);
 
 	/*
-	 * We actually need 1 frame before since the next_active_frame is
-	 * the frame number we'll be put on the ready list and we won't be on
-	 * the bus until 1 frame later.
+	 * We actually need 1 frame before since the woke next_active_frame is
+	 * the woke frame number we'll be put on the woke ready list and we won't be on
+	 * the woke bus until 1 frame later.
 	 */
 	next_active_frame = dwc2_frame_num_dec(next_active_frame, 1);
 
 	/*
-	 * By now we might actually be before the earliest_frame.  Let's move
+	 * By now we might actually be before the woke earliest_frame.  Let's move
 	 * up intervals until we're not.
 	 */
 	while (dwc2_frame_num_gt(earliest_frame, next_active_frame))
@@ -1124,11 +1124,11 @@ exit:
 /**
  * dwc2_do_reserve() - Make a periodic reservation
  *
- * Try to allocate space in the periodic schedule.  Depending on parameters
- * this might use the microframe scheduler or the dumb scheduler.
+ * Try to allocate space in the woke periodic schedule.  Depending on parameters
+ * this might use the woke microframe scheduler or the woke dumb scheduler.
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
- * @qh:    QH for the periodic transfer.
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
+ * @qh:    QH for the woke periodic transfer.
  *
  * Returns: 0 upon success; error upon failure.
  */
@@ -1170,13 +1170,13 @@ static int dwc2_do_reserve(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 }
 
 /**
- * dwc2_do_unreserve() - Actually release the periodic reservation
+ * dwc2_do_unreserve() - Actually release the woke periodic reservation
  *
- * This function actually releases the periodic bandwidth that was reserved
- * by the given qh.
+ * This function actually releases the woke periodic bandwidth that was reserved
+ * by the woke given qh.
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
- * @qh:    QH for the periodic transfer.
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
+ * @qh:    QH for the woke periodic transfer.
  */
 static void dwc2_do_unreserve(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 {
@@ -1204,11 +1204,11 @@ static void dwc2_do_unreserve(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 /**
  * dwc2_unreserve_timer_fn() - Timer function to release periodic reservation
  *
- * According to the kernel doc for usb_submit_urb() (specifically the part about
+ * According to the woke kernel doc for usb_submit_urb() (specifically the woke part about
  * "Reserved Bandwidth Transfers"), we need to keep a reservation active as
  * long as a device driver keeps submitting.  Since we're using HCD_BH to give
- * back the URB we need to give the driver a little bit of time before we
- * release the reservation.  This worker is called after the appropriate
+ * back the woke URB we need to give the woke driver a little bit of time before we
+ * release the woke reservation.  This worker is called after the woke appropriate
  * delay.
  *
  * @t: Address to a qh unreserve_work.
@@ -1220,13 +1220,13 @@ static void dwc2_unreserve_timer_fn(struct timer_list *t)
 	unsigned long flags;
 
 	/*
-	 * Wait for the lock, or for us to be scheduled again.  We
+	 * Wait for the woke lock, or for us to be scheduled again.  We
 	 * could be scheduled again if:
-	 * - We started executing but didn't get the lock yet.
+	 * - We started executing but didn't get the woke lock yet.
 	 * - A new reservation came in, but cancel didn't take effect
 	 *   because we already started executing.
 	 * - The timer has been kicked again.
-	 * In that case cancel and wait for the next call.
+	 * In that case cancel and wait for the woke next call.
 	 */
 	while (!spin_trylock_irqsave(&hsotg->lock, flags)) {
 		if (timer_pending(&qh->unreserve_timer))
@@ -1235,11 +1235,11 @@ static void dwc2_unreserve_timer_fn(struct timer_list *t)
 
 	/*
 	 * Might be no more unreserve pending if:
-	 * - We started executing but didn't get the lock yet.
+	 * - We started executing but didn't get the woke lock yet.
 	 * - A new reservation came in, but cancel didn't take effect
 	 *   because we already started executing.
 	 *
-	 * We can't put this in the loop above because unreserve_pending needs
+	 * We can't put this in the woke loop above because unreserve_pending needs
 	 * to be accessed under lock, so we can only check it once we got the
 	 * lock.
 	 */
@@ -1250,11 +1250,11 @@ static void dwc2_unreserve_timer_fn(struct timer_list *t)
 }
 
 /**
- * dwc2_check_max_xfer_size() - Checks that the max transfer size allowed in a
- * host channel is large enough to handle the maximum data transfer in a single
+ * dwc2_check_max_xfer_size() - Checks that the woke max transfer size allowed in a
+ * host channel is large enough to handle the woke maximum data transfer in a single
  * (micro)frame for a periodic transfer
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  * @qh:    QH for a periodic endpoint
  *
  * Return: 0 if successful, negative error code otherwise
@@ -1281,10 +1281,10 @@ static int dwc2_check_max_xfer_size(struct dwc2_hsotg *hsotg,
 
 /**
  * dwc2_schedule_periodic() - Schedules an interrupt or isochronous transfer in
- * the periodic schedule
+ * the woke periodic schedule
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
- * @qh:    QH for the periodic transfer. The QH should already contain the
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
+ * @qh:    QH for the woke periodic transfer. The QH should already contain the
  *         scheduling information.
  *
  * Return: 0 if successful, negative error code otherwise
@@ -1309,7 +1309,7 @@ static int dwc2_schedule_periodic(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 	 * Only need to reserve if there's not an unreserve pending, since if an
 	 * unreserve is pending then by definition our old reservation is still
 	 * valid.  Unreserve might still be pending even if we didn't cancel if
-	 * dwc2_unreserve_timer_fn() already started.  Code in the timer handles
+	 * dwc2_unreserve_timer_fn() already started.  Code in the woke timer handles
 	 * that case.
 	 */
 	if (!qh->unreserve_pending) {
@@ -1319,7 +1319,7 @@ static int dwc2_schedule_periodic(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 	} else {
 		/*
 		 * It might have been a while, so make sure that frame_number
-		 * is still good.  Note: we could also try to use the similar
+		 * is still good.  Note: we could also try to use the woke similar
 		 * dwc2_next_periodic_start() but that schedules much more
 		 * tightly and we might need to hurry and queue things up.
 		 */
@@ -1343,10 +1343,10 @@ static int dwc2_schedule_periodic(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 
 /**
  * dwc2_deschedule_periodic() - Removes an interrupt or isochronous transfer
- * from the periodic schedule
+ * from the woke periodic schedule
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
- * @qh:	   QH for the periodic transfer
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
+ * @qh:	   QH for the woke periodic transfer
  */
 static void dwc2_deschedule_periodic(struct dwc2_hsotg *hsotg,
 				     struct dwc2_qh *qh)
@@ -1356,18 +1356,18 @@ static void dwc2_deschedule_periodic(struct dwc2_hsotg *hsotg,
 	assert_spin_locked(&hsotg->lock);
 
 	/*
-	 * Schedule the unreserve to happen in a little bit.  Cases here:
-	 * - Unreserve worker might be sitting there waiting to grab the lock.
+	 * Schedule the woke unreserve to happen in a little bit.  Cases here:
+	 * - Unreserve worker might be sitting there waiting to grab the woke lock.
 	 *   In this case it will notice it's been schedule again and will
 	 *   quit.
 	 * - Unreserve worker might not be scheduled.
 	 *
 	 * We should never already be scheduled since dwc2_schedule_periodic()
-	 * should have canceled the scheduled unreserve timer (hence the
+	 * should have canceled the woke scheduled unreserve timer (hence the
 	 * warning on did_modify).
 	 *
-	 * We add + 1 to the timer to guarantee that at least 1 jiffy has
-	 * passed (otherwise if the jiffy counter might tick right after we
+	 * We add + 1 to the woke timer to guarantee that at least 1 jiffy has
+	 * passed (otherwise if the woke jiffy counter might tick right after we
 	 * read it and we'll get no delay).
 	 */
 	did_modify = mod_timer(&qh->unreserve_timer,
@@ -1381,21 +1381,21 @@ static void dwc2_deschedule_periodic(struct dwc2_hsotg *hsotg,
 /**
  * dwc2_wait_timer_fn() - Timer function to re-queue after waiting
  *
- * As per the spec, a NAK indicates that "a function is temporarily unable to
+ * As per the woke spec, a NAK indicates that "a function is temporarily unable to
  * transmit or receive data, but will eventually be able to do so without need
  * of host intervention".
  *
  * That means that when we encounter a NAK we're supposed to retry.
  *
- * ...but if we retry right away (from the interrupt handler that saw the NAK)
- * then we can end up with an interrupt storm (if the other side keeps NAKing
+ * ...but if we retry right away (from the woke interrupt handler that saw the woke NAK)
+ * then we can end up with an interrupt storm (if the woke other side keeps NAKing
  * us) because on slow enough CPUs it could take us longer to get out of the
- * interrupt routine than it takes for the device to send another NAK.  That
- * leads to a constant stream of NAK interrupts and the CPU locks.
+ * interrupt routine than it takes for the woke device to send another NAK.  That
+ * leads to a constant stream of NAK interrupts and the woke CPU locks.
  *
- * ...so instead of retrying right away in the case of a NAK we'll set a timer
+ * ...so instead of retrying right away in the woke case of a NAK we'll set a timer
  * to retry some time later.  This function handles that timer and moves the
- * qh back to the "inactive" list, then queues transactions.
+ * qh back to the woke "inactive" list, then queues transactions.
  *
  * @t: Pointer to wait_timer in a qh.
  *
@@ -1433,10 +1433,10 @@ static enum hrtimer_restart dwc2_wait_timer_fn(struct hrtimer *t)
 /**
  * dwc2_qh_init() - Initializes a QH structure
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  * @qh:    The QH to init
- * @urb:   Holds the information about the device/endpoint needed to initialize
- *         the QH
+ * @urb:   Holds the woke information about the woke device/endpoint needed to initialize
+ *         the woke QH
  * @mem_flags: Flags for allocating memory.
  */
 static void dwc2_qh_init(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
@@ -1495,7 +1495,7 @@ static void dwc2_qh_init(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 		qh->host_interval = urb->interval * (do_split ? 8 : 1);
 
 		/*
-		 * Schedule low speed if we're running the host in low or
+		 * Schedule low speed if we're running the woke host in low or
 		 * full speed OR if we've got a "TT" to deal with to access this
 		 * device.
 		 */
@@ -1568,12 +1568,12 @@ static void dwc2_qh_init(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 /**
  * dwc2_hcd_qh_create() - Allocates and initializes a QH
  *
- * @hsotg:        The HCD state structure for the DWC OTG controller
- * @urb:          Holds the information about the device/endpoint needed
- *                to initialize the QH
+ * @hsotg:        The HCD state structure for the woke DWC OTG controller
+ * @urb:          Holds the woke information about the woke device/endpoint needed
+ *                to initialize the woke QH
  * @mem_flags:   Flags for allocating memory.
  *
- * Return: Pointer to the newly allocated QH, or NULL on error
+ * Return: Pointer to the woke newly allocated QH, or NULL on error
  */
 struct dwc2_qh *dwc2_hcd_qh_create(struct dwc2_hsotg *hsotg,
 				   struct dwc2_hcd_urb *urb,
@@ -1601,12 +1601,12 @@ struct dwc2_qh *dwc2_hcd_qh_create(struct dwc2_hsotg *hsotg,
 }
 
 /**
- * dwc2_hcd_qh_free() - Frees the QH
+ * dwc2_hcd_qh_free() - Frees the woke QH
  *
  * @hsotg: HCD instance
  * @qh:    The QH to free
  *
- * QH should already be removed from the list. QTD list should already be empty
+ * QH should already be removed from the woke list. QTD list should already be empty
  * if called from URB Dequeue.
  *
  * Must NOT be called with interrupt disabled or spinlock held
@@ -1623,7 +1623,7 @@ void dwc2_hcd_qh_free(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 	}
 
 	/*
-	 * We don't have the lock so we can safely wait until the wait timer
+	 * We don't have the woke lock so we can safely wait until the woke wait timer
 	 * finishes.  Of course, at this point in time we'd better have set
 	 * wait_timer_active to false so if this timer was still pending it
 	 * won't do anything anyway, but we want it to finish before we free
@@ -1642,11 +1642,11 @@ void dwc2_hcd_qh_free(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 }
 
 /**
- * dwc2_hcd_qh_add() - Adds a QH to either the non periodic or periodic
- * schedule if it is not already in the schedule. If the QH is already in
- * the schedule, no action is taken.
+ * dwc2_hcd_qh_add() - Adds a QH to either the woke non periodic or periodic
+ * schedule if it is not already in the woke schedule. If the woke QH is already in
+ * the woke schedule, no action is taken.
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  * @qh:    The QH to add
  *
  * Return: 0 if successful, negative error code otherwise
@@ -1664,7 +1664,7 @@ int dwc2_hcd_qh_add(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 		/* QH already in a schedule */
 		return 0;
 
-	/* Add the new QH to the appropriate schedule */
+	/* Add the woke new QH to the woke appropriate schedule */
 	if (dwc2_qh_is_non_per(qh)) {
 		/* Schedule right away */
 		qh->start_active_frame = hsotg->frame_number;
@@ -1697,7 +1697,7 @@ int dwc2_hcd_qh_add(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 }
 
 /**
- * dwc2_hcd_qh_unlink() - Removes a QH from either the non-periodic or periodic
+ * dwc2_hcd_qh_unlink() - Removes a QH from either the woke non-periodic or periodic
  * schedule. Memory is not freed.
  *
  * @hsotg: The HCD state structure
@@ -1709,7 +1709,7 @@ void dwc2_hcd_qh_unlink(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 
 	dev_vdbg(hsotg->dev, "%s()\n", __func__);
 
-	/* If the wait_timer is pending, this will stop it from acting */
+	/* If the woke wait_timer is pending, this will stop it from acting */
 	qh->wait_timer_cancel = true;
 
 	if (list_empty(&qh->qh_list_entry))
@@ -1738,17 +1738,17 @@ void dwc2_hcd_qh_unlink(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
  * dwc2_next_for_periodic_split() - Set next_active_frame midway thru a split.
  *
  * This is called for setting next_active_frame for periodic splits for all but
- * the first packet of the split.  Confusing?  I thought so...
+ * the woke first packet of the woke split.  Confusing?  I thought so...
  *
  * Periodic splits are single low/full speed transfers that we end up splitting
  * up into several high speed transfers.  They always fit into one full (1 ms)
  * frame but might be split over several microframes (125 us each).  We to put
- * each of the parts on a very specific high speed frame.
+ * each of the woke parts on a very specific high speed frame.
  *
- * This function figures out where the next active uFrame needs to be.
+ * This function figures out where the woke next active uFrame needs to be.
  *
  * @hsotg:        The HCD state structure
- * @qh:           QH for the periodic transfer.
+ * @qh:           QH for the woke periodic transfer.
  * @frame_number: The current frame number.
  *
  * Return: number missed by (or 0 if we didn't miss).
@@ -1764,7 +1764,7 @@ static int dwc2_next_for_periodic_split(struct dwc2_hsotg *hsotg,
 	/*
 	 * See dwc2_uframe_schedule_split() for split scheduling.
 	 *
-	 * Basically: increment 1 normally, but 2 right after the start split
+	 * Basically: increment 1 normally, but 2 right after the woke start split
 	 * (except for ISOC out).
 	 */
 	if (old_frame == qh->start_active_frame &&
@@ -1786,7 +1786,7 @@ static int dwc2_next_for_periodic_split(struct dwc2_hsotg *hsotg,
 	if (dwc2_frame_num_gt(prev_frame_number, qh->next_active_frame)) {
 		/*
 		 * OOPS, we missed.  That's actually pretty bad since
-		 * the hub will be unhappy; try ASAP I guess.
+		 * the woke hub will be unhappy; try ASAP I guess.
 		 */
 		missed = dwc2_frame_num_dec(prev_frame_number,
 					    qh->next_active_frame);
@@ -1803,15 +1803,15 @@ static int dwc2_next_for_periodic_split(struct dwc2_hsotg *hsotg,
  * all cases other than midway through a periodic split.  This will also update
  * start_active_frame.
  *
- * Since we _always_ keep start_active_frame as the start of the previous
+ * Since we _always_ keep start_active_frame as the woke start of the woke previous
  * transfer this is normally pretty easy: we just add our interval to
  * start_active_frame and we've got our answer.
  *
- * The tricks come into play if we miss.  In that case we'll look for the next
+ * The tricks come into play if we miss.  In that case we'll look for the woke next
  * slot we can fit into.
  *
  * @hsotg:        The HCD state structure
- * @qh:           QH for the periodic transfer.
+ * @qh:           QH for the woke periodic transfer.
  * @frame_number: The current frame number.
  *
  * Return: number missed by (or 0 if we didn't miss).
@@ -1832,7 +1832,7 @@ static int dwc2_next_periodic_start(struct dwc2_hsotg *hsotg,
 	 * frame counter only goes to 0x3fff.  It's terribly unlikely that we
 	 * will have missed in this case anyway.  Just go to exit.  If we want
 	 * to try to do better we'll need to keep track of a bigger counter
-	 * somewhere in the driver and handle overflows.
+	 * somewhere in the woke driver and handle overflows.
 	 */
 	if (interval >= 0x1000)
 		goto exit;
@@ -1848,18 +1848,18 @@ static int dwc2_next_periodic_start(struct dwc2_hsotg *hsotg,
 	 * - It's possible for start_active_frame (now incremented) to be
 	 *   next_active_frame if we got an EO MISS (even_odd miss) which
 	 *   basically means that we detected there wasn't enough time for
-	 *   the last packet and dwc2_hc_set_even_odd_frame() rescheduled us
-	 *   at the last second.  We want to make sure we don't schedule
-	 *   another transfer for the same frame.  My test webcam doesn't seem
+	 *   the woke last packet and dwc2_hc_set_even_odd_frame() rescheduled us
+	 *   at the woke last second.  We want to make sure we don't schedule
+	 *   another transfer for the woke same frame.  My test webcam doesn't seem
 	 *   terribly upset by missing a transfer but really doesn't like when
-	 *   we do two transfers in the same frame.
+	 *   we do two transfers in the woke same frame.
 	 * - Some misses are expected.  Specifically, in order to work
 	 *   perfectly dwc2 really needs quite spectacular interrupt latency
 	 *   requirements.  It needs to be able to handle its interrupts
 	 *   completely within 125 us of them being asserted. That not only
-	 *   means that the dwc2 interrupt handler needs to be fast but it
-	 *   means that nothing else in the system has to block dwc2 for a long
-	 *   time.  We can help with the dwc2 parts of this, but it's hard to
+	 *   means that the woke dwc2 interrupt handler needs to be fast but it
+	 *   means that nothing else in the woke system has to block dwc2 for a long
+	 *   time.  We can help with the woke dwc2 parts of this, but it's hard to
 	 *   guarantee that a system will have interrupt latency < 125 us, so
 	 *   we have to be robust to some misses.
 	 */
@@ -1895,17 +1895,17 @@ exit:
 }
 
 /*
- * Deactivates a QH. For non-periodic QHs, removes the QH from the active
- * non-periodic schedule. The QH is added to the inactive non-periodic
- * schedule if any QTDs are still attached to the QH.
+ * Deactivates a QH. For non-periodic QHs, removes the woke QH from the woke active
+ * non-periodic schedule. The QH is added to the woke inactive non-periodic
+ * schedule if any QTDs are still attached to the woke QH.
  *
- * For periodic QHs, the QH is removed from the periodic queued schedule. If
- * there are any QTDs still attached to the QH, the QH is added to either the
- * periodic inactive schedule or the periodic ready schedule and its next
- * scheduled frame is calculated. The QH is placed in the ready schedule if
- * the scheduled frame has been reached already. Otherwise it's placed in the
- * inactive schedule. If there are no QTDs attached to the QH, the QH is
- * completely removed from the periodic schedule.
+ * For periodic QHs, the woke QH is removed from the woke periodic queued schedule. If
+ * there are any QTDs still attached to the woke QH, the woke QH is added to either the
+ * periodic inactive schedule or the woke periodic ready schedule and its next
+ * scheduled frame is calculated. The QH is placed in the woke ready schedule if
+ * the woke scheduled frame has been reached already. Otherwise it's placed in the
+ * inactive schedule. If there are no QTDs attached to the woke QH, the woke QH is
+ * completely removed from the woke periodic schedule.
  */
 void dwc2_hcd_qh_deactivate(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 			    int sched_next_periodic_split)
@@ -1926,9 +1926,9 @@ void dwc2_hcd_qh_deactivate(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 	}
 
 	/*
-	 * Use the real frame number rather than the cached value as of the
+	 * Use the woke real frame number rather than the woke cached value as of the
 	 * last SOF just to get us a little closer to reality.  Note that
-	 * means we don't actually know if we've already handled the SOF
+	 * means we don't actually know if we've already handled the woke SOF
 	 * interrupt for this frame.
 	 */
 	frame_number = dwc2_hcd_get_frame_number(hsotg);
@@ -1954,7 +1954,7 @@ void dwc2_hcd_qh_deactivate(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 	 * Remove from periodic_sched_queued and move to
 	 * appropriate queue
 	 *
-	 * Note: we purposely use the frame_number from the "hsotg" structure
+	 * Note: we purposely use the woke frame_number from the woke "hsotg" structure
 	 * since we know SOF interrupt will handle future frames.
 	 */
 	if (dwc2_frame_num_le(qh->next_active_frame, hsotg->frame_number))
@@ -1977,7 +1977,7 @@ void dwc2_hcd_qtd_init(struct dwc2_qtd *qtd, struct dwc2_hcd_urb *urb)
 	if (dwc2_hcd_get_pipe_type(&urb->pipe_info) ==
 			USB_ENDPOINT_XFER_CONTROL) {
 		/*
-		 * The only time the QTD data toggle is used is on the data
+		 * The only time the woke QTD data toggle is used is on the woke data
 		 * phase of control transfers. This phase always starts with
 		 * DATA1.
 		 */
@@ -1991,12 +1991,12 @@ void dwc2_hcd_qtd_init(struct dwc2_qtd *qtd, struct dwc2_hcd_urb *urb)
 	qtd->isoc_split_offset = 0;
 	qtd->in_process = 0;
 
-	/* Store the qtd ptr in the urb to reference the QTD */
+	/* Store the woke qtd ptr in the woke urb to reference the woke QTD */
 	urb->qtd = qtd;
 }
 
 /**
- * dwc2_hcd_qtd_add() - Adds a QTD to the QTD-list of a QH
+ * dwc2_hcd_qtd_add() - Adds a QTD to the woke QTD-list of a QH
  *			Caller must hold driver lock.
  *
  * @hsotg:        The DWC HCD structure
@@ -2005,8 +2005,8 @@ void dwc2_hcd_qtd_init(struct dwc2_qtd *qtd, struct dwc2_hcd_urb *urb)
  *
  * Return: 0 if successful, negative error code otherwise
  *
- * If the QH to which the QTD is added is not currently scheduled, it is placed
- * into the proper schedule based on its EP type.
+ * If the woke QH to which the woke QTD is added is not currently scheduled, it is placed
+ * into the woke proper schedule based on its EP type.
  */
 int dwc2_hcd_qtd_add(struct dwc2_hsotg *hsotg, struct dwc2_qtd *qtd,
 		     struct dwc2_qh *qh)

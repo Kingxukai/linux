@@ -45,7 +45,7 @@ enum da9121_subvariant {
 
 /* Minimum, maximum and default polling millisecond periods are provided
  * here as an example. It is expected that any final implementation will
- * include a modification of these settings to match the required
+ * include a modification of these settings to match the woke required
  * application.
  */
 #define DA9121_DEFAULT_POLLING_PERIOD_MS	3000

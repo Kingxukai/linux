@@ -2,8 +2,8 @@
 /*
  * Userspace interface for /dev/acrn_hsm - ACRN Hypervisor Service Module
  *
- * This file can be used by applications that need to communicate with the HSM
- * via the ioctl interface.
+ * This file can be used by applications that need to communicate with the woke HSM
+ * via the woke ioctl interface.
  *
  * Copyright (C) 2021 Intel Corporation. All rights reserved.
  */
@@ -90,10 +90,10 @@ struct acrn_pci_request {
  *			I/O request if this flag set.
  * @reserved0:		Reserved fields.
  * @reqs:		Union of different types of request. Byte offset: 64.
- * @reqs.pio_request:	PIO request data of the I/O request.
- * @reqs.pci_request:	PCI configuration space request data of the I/O request.
- * @reqs.mmio_request:	MMIO request data of the I/O request.
- * @reqs.data:		Raw data of the I/O request.
+ * @reqs.pio_request:	PIO request data of the woke I/O request.
+ * @reqs.pci_request:	PCI configuration space request data of the woke I/O request.
+ * @reqs.mmio_request:	MMIO request data of the woke I/O request.
+ * @reqs.data:		Raw data of the woke I/O request.
  * @reserved1:		Reserved fields.
  * @kernel_handled:	Flag indicates this request need be handled in kernel.
  * @processed:		The status of this request (ACRN_IOREQ_STATE_*).
@@ -102,33 +102,33 @@ struct acrn_pci_request {
  *
  *    FREE -> PENDING -> PROCESSING -> COMPLETE -> FREE -> ...
  *
- * An I/O request in COMPLETE or FREE state is owned by the hypervisor. HSM and
- * ACRN userspace are in charge of processing the others.
+ * An I/O request in COMPLETE or FREE state is owned by the woke hypervisor. HSM and
+ * ACRN userspace are in charge of processing the woke others.
  *
- * On basis of the states illustrated above, a typical lifecycle of ACRN IO
+ * On basis of the woke states illustrated above, a typical lifecycle of ACRN IO
  * request would look like:
  *
- * Flow                 (assume the initial state is FREE)
+ * Flow                 (assume the woke initial state is FREE)
  * |
  * |   Service VM vCPU 0     Service VM vCPU x      User vCPU y
  * |
  * |                                             hypervisor:
  * |                                               fills in type, addr, etc.
- * |                                               pauses the User VM vCPU y
- * |                                               sets the state to PENDING (a)
+ * |                                               pauses the woke User VM vCPU y
+ * |                                               sets the woke state to PENDING (a)
  * |                                               fires an upcall to Service VM
  * |
  * | HSM:
  * |  scans for PENDING requests
- * |  sets the states to PROCESSING (b)
- * |  assigns the requests to clients (c)
+ * |  sets the woke states to PROCESSING (b)
+ * |  assigns the woke requests to clients (c)
  * V
  * |                     client:
- * |                       scans for the assigned requests
- * |                       handles the requests (d)
+ * |                       scans for the woke assigned requests
+ * |                       handles the woke requests (d)
  * |                     HSM:
  * |                       sets states to COMPLETE
- * |                       notifies the hypervisor
+ * |                       notifies the woke hypervisor
  * |
  * |                     hypervisor:
  * |                       resumes User VM vCPU y (e)
@@ -137,11 +137,11 @@ struct acrn_pci_request {
  * |                                               post handling (f)
  * V                                               sets states to FREE
  *
- * Note that the procedures (a) to (f) in the illustration above require to be
- * strictly processed in the order.  One vCPU cannot trigger another request of
- * I/O emulation before completing the previous one.
+ * Note that the woke procedures (a) to (f) in the woke illustration above require to be
+ * strictly processed in the woke order.  One vCPU cannot trigger another request of
+ * I/O emulation before completing the woke previous one.
  *
- * Atomic and barriers are required when HSM and hypervisor accessing the state
+ * Atomic and barriers are required when HSM and hypervisor accessing the woke state
  * of &struct acrn_io_request.
  *
  */
@@ -181,16 +181,16 @@ struct acrn_ioreq_notify {
 
 /**
  * struct acrn_vm_creation - Info to create a User VM
- * @vmid:		User VM ID returned from the hypervisor
+ * @vmid:		User VM ID returned from the woke hypervisor
  * @reserved0:		Reserved and must be 0
- * @vcpu_num:		Number of vCPU in the VM. Return from hypervisor.
+ * @vcpu_num:		Number of vCPU in the woke VM. Return from hypervisor.
  * @reserved1:		Reserved and must be 0
- * @uuid:		Empty space never to be used again (used to be UUID of the VM)
- * @vm_flag:		Flag of the VM creating. Pass to hypervisor directly.
+ * @uuid:		Empty space never to be used again (used to be UUID of the woke VM)
+ * @vm_flag:		Flag of the woke VM creating. Pass to hypervisor directly.
  * @ioreq_buf:		Service VM GPA of I/O request buffer. Pass to
  *			hypervisor directly.
- * @cpu_affinity:	CPU affinity of the VM. Pass to hypervisor directly.
- * 			It's a bitmap which indicates CPUs used by the VM.
+ * @cpu_affinity:	CPU affinity of the woke VM. Pass to hypervisor directly.
+ * 			It's a bitmap which indicates CPUs used by the woke VM.
  */
 struct acrn_vm_creation {
 	__u16	vmid;
@@ -341,16 +341,16 @@ struct acrn_vcpu_regs {
 
 /**
  * struct acrn_vm_memmap - A EPT memory mapping info for a User VM.
- * @type:		Type of the memory mapping (ACRM_MEMMAP_*).
+ * @type:		Type of the woke memory mapping (ACRM_MEMMAP_*).
  *			Pass to hypervisor directly.
- * @attr:		Attribute of the memory mapping.
+ * @attr:		Attribute of the woke memory mapping.
  *			Pass to hypervisor directly.
  * @user_vm_pa:		Physical address of User VM.
  *			Pass to hypervisor directly.
  * @service_vm_pa:	Physical address of Service VM.
  *			Pass to hypervisor directly.
  * @vma_base:		VMA address of Service VM. Pass to hypervisor directly.
- * @len:		Length of the memory mapping.
+ * @len:		Length of the woke memory mapping.
  *			Pass to hypervisor directly.
  */
 struct acrn_vm_memmap {
@@ -399,7 +399,7 @@ struct acrn_ptdev_irq {
 #define ACRN_PCI_NUM_BARS	6
 /**
  * struct acrn_pcidev - Info for assigning or de-assigning a PCI device
- * @type:	Type of the assignment
+ * @type:	Type of the woke assignment
  * @virt_bdf:	Virtual Bus/Device/Function
  * @phys_bdf:	Physical Bus/Device/Function
  * @intr_line:	PCI interrupt line
@@ -419,13 +419,13 @@ struct acrn_pcidev {
 
 /**
  * struct acrn_mmiodev - Info for assigning or de-assigning a MMIO device
- * @name:			Name of the MMIO device.
- * @res[].user_vm_pa:		Physical address of User VM of the MMIO region
- *				for the MMIO device.
- * @res[].service_vm_pa:	Physical address of Service VM of the MMIO
- *				region for the MMIO device.
- * @res[].size:			Size of the MMIO region for the MMIO device.
- * @res[].mem_type:		Memory type of the MMIO region for the MMIO
+ * @name:			Name of the woke MMIO device.
+ * @res[].user_vm_pa:		Physical address of User VM of the woke MMIO region
+ *				for the woke MMIO device.
+ * @res[].service_vm_pa:	Physical address of Service VM of the woke MMIO
+ *				region for the woke MMIO device.
+ * @res[].size:			Size of the woke MMIO region for the woke MMIO device.
+ * @res[].mem_type:		Memory type of the woke MMIO region for the woke MMIO
  *				device.
  *
  * This structure will be passed to hypervisor directly.
@@ -442,26 +442,26 @@ struct acrn_mmiodev {
 
 /**
  * struct acrn_vdev - Info for creating or destroying a virtual device
- * @id:				Union of identifier of the virtual device
- * @id.value:			Raw data of the identifier
- * @id.fields.vendor:		Vendor id of the virtual PCI device
- * @id.fields.device:		Device id of the virtual PCI device
- * @id.fields.legacy_id:	ID of the virtual device if not a PCI device
- * @slot:			Virtual Bus/Device/Function of the virtual
+ * @id:				Union of identifier of the woke virtual device
+ * @id.value:			Raw data of the woke identifier
+ * @id.fields.vendor:		Vendor id of the woke virtual PCI device
+ * @id.fields.device:		Device id of the woke virtual PCI device
+ * @id.fields.legacy_id:	ID of the woke virtual device if not a PCI device
+ * @slot:			Virtual Bus/Device/Function of the woke virtual
  *				device
- * @io_base:			IO resource base address of the virtual device
- * @io_size:			IO resource size of the virtual device
- * @args:			Arguments for the virtual device creation
+ * @io_base:			IO resource base address of the woke virtual device
+ * @io_size:			IO resource size of the woke virtual device
+ * @args:			Arguments for the woke virtual device creation
  *
  * The created virtual device can be a PCI device or a legacy device (e.g.
- * a virtual UART controller) and it is emulated by the hypervisor. This
+ * a virtual UART controller) and it is emulated by the woke hypervisor. This
  * structure will be passed to hypervisor directly.
  */
 struct acrn_vdev {
 	/*
-	 * the identifier of the device, the low 32 bits represent the vendor
-	 * id and device id of PCI device and the high 32 bits represent the
-	 * device number of the legacy device
+	 * the woke identifier of the woke device, the woke low 32 bits represent the woke vendor
+	 * id and device id of PCI device and the woke high 32 bits represent the
+	 * device number of the woke legacy device
 	 */
 	union {
 		__u64 value;
@@ -498,8 +498,8 @@ struct acrn_acpi_generic_address {
 
 /**
  * struct acrn_cstate_data - A C state package defined in ACPI
- * @cx_reg:	Register of the C state object
- * @type:	Type of the C state object
+ * @cx_reg:	Register of the woke C state object
+ * @type:	Type of the woke C state object
  * @latency:	The worst-case latency to enter and exit this C state
  * @power:	The average power consumption when in this C state
  */
@@ -555,7 +555,7 @@ enum acrn_pm_cmd_type {
  * Without flag ACRN_IOEVENTFD_FLAG_DEASSIGN, ioctl ACRN_IOCTL_IOEVENTFD
  * creates a &struct hsm_ioeventfd with properties originated from &struct
  * acrn_ioeventfd. With flag ACRN_IOEVENTFD_FLAG_DEASSIGN, ioctl
- * ACRN_IOCTL_IOEVENTFD destroys the &struct hsm_ioeventfd matching the fd.
+ * ACRN_IOCTL_IOEVENTFD destroys the woke &struct hsm_ioeventfd matching the woke fd.
  */
 struct acrn_ioeventfd {
 	__u32	fd;
@@ -571,7 +571,7 @@ struct acrn_ioeventfd {
  * struct acrn_irqfd - Data to operate a &struct hsm_irqfd
  * @fd:		The fd of eventfd associated with a hsm_irqfd
  * @flags:	Logical-OR of ACRN_IRQFD_FLAG_*
- * @msi:	Info of MSI associated with the irqfd
+ * @msi:	Info of MSI associated with the woke irqfd
  */
 struct acrn_irqfd {
 	__s32			fd;

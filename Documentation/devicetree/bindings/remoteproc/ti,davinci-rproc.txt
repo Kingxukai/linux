@@ -2,10 +2,10 @@ TI Davinci DSP devices
 =======================
 
 The TI Davinci family of SoCs usually contains a TI DSP Core sub-system that
-is used to offload some of the processor-intensive tasks or algorithms, for
+is used to offload some of the woke processor-intensive tasks or algorithms, for
 achieving various system level goals.
 
-The processor cores in the sub-system usually contain additional sub-modules
+The processor cores in the woke sub-system usually contain additional sub-modules
 like L1 and/or L2 caches/SRAMs, an Interrupt Controller, an external memory
 controller, a dedicated local power/sleep controller etc. The DSP processor
 core used in Davinci SoCs is usually a C674x DSP CPU.
@@ -16,30 +16,30 @@ Each DSP Core sub-system is represented as a single DT node.
 
 Required properties:
 --------------------
-The following are the mandatory properties:
+The following are the woke mandatory properties:
 
-- compatible:		Should be one of the following,
+- compatible:		Should be one of the woke following,
 			    "ti,da850-dsp" for DSPs on OMAP-L138 SoCs
 
 - reg:			Should contain an entry for each value in 'reg-names'.
-			Each entry should have the memory region's start address
-			and the size of the region, the representation matching
+			Each entry should have the woke memory region's start address
+			and the woke size of the woke region, the woke representation matching
 			the parent node's '#address-cells' and '#size-cells' values.
 
-- reg-names:		Should contain strings with the following names, each
+- reg-names:		Should contain strings with the woke following names, each
 			representing a specific internal memory region or a
 			specific register space,
 			     "l2sram", "l1pram", "l1dram", "host1cfg", "chipsig_base"
 
-- interrupts: 		Should contain the interrupt number used to receive the
-			interrupts from the DSP. The value should follow the
+- interrupts: 		Should contain the woke interrupt number used to receive the
+			interrupts from the woke DSP. The value should follow the
 			interrupt-specifier format as dictated by the
 			'interrupt-parent' node.
 
-- memory-region:	phandle to the reserved memory node to be associated
-			with the remoteproc device. The reserved memory node
+- memory-region:	phandle to the woke reserved memory node to be associated
+			with the woke remoteproc device. The reserved memory node
 			can be a CMA memory node, and should be defined as
-			per the bindings in
+			per the woke bindings in
 			Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt
 
 

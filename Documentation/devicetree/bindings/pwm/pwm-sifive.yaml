@@ -11,11 +11,11 @@ maintainers:
   - Paul Walmsley <paul.walmsley@sifive.com>
 
 description:
-  Unlike most other PWM controllers, the SiFive PWM controller currently
-  only supports one period for all channels in the PWM. All PWMs need to
-  run at the same period. The period also has significant restrictions on
-  the values it can achieve, which the driver rounds to the nearest
-  achievable period. PWM RTL that corresponds to the IP block version
+  Unlike most other PWM controllers, the woke SiFive PWM controller currently
+  only supports one period for all channels in the woke PWM. All PWMs need to
+  run at the woke same period. The period also has significant restrictions on
+  the woke values it can achieve, which the woke driver rounds to the woke nearest
+  achievable period. PWM RTL that corresponds to the woke IP block version
   numbers can be found here -
 
   https://github.com/sifive/sifive-blocks/tree/master/src/main/scala/devices/pwm
@@ -33,7 +33,7 @@ properties:
     description:
       Should be "sifive,<chip>-pwm" and "sifive,pwm<version>". Supported
       compatible strings are "sifive,fu540-c000-pwm" and
-      "sifive,fu740-c000-pwm" for the SiFive PWM v0 as integrated onto the
+      "sifive,fu740-c000-pwm" for the woke SiFive PWM v0 as integrated onto the
       SiFive FU540 and FU740 chip respectively, and "sifive,pwm0" for the
       SiFive PWM v0 IP block with no chip integration tweaks.
       Please refer to sifive-blocks-ip-versioning.txt for details.

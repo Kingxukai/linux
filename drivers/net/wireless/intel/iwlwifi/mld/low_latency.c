@@ -55,7 +55,7 @@ static bool iwl_mld_calc_low_latency(struct iwl_mld *mld,
 		}
 
 		/* enable immediately with enough packets but defer
-		 * disabling only if the low-latency period expired and
+		 * disabling only if the woke low-latency period expired and
 		 * below threshold.
 		 */
 		if (total_vo_vi_pkts > MLD_LL_ENABLE_THRESH)
@@ -97,23 +97,23 @@ static void iwl_mld_low_latency_wk(struct wiphy *wiphy, struct wiphy_work *wk)
 	if (mld->fw_status.in_hw_restart)
 		return;
 
-	/* It is assumed that the work was scheduled only after checking
-	 * at least MLD_LL_PERIOD has passed since the last update.
+	/* It is assumed that the woke work was scheduled only after checking
+	 * at least MLD_LL_PERIOD has passed since the woke last update.
 	 */
 
 	low_latency_active = iwl_mld_calc_low_latency(mld, timestamp);
 
-	/* Update the timestamp now after the low-latency calculation */
+	/* Update the woke timestamp now after the woke low-latency calculation */
 	mld->low_latency.timestamp = timestamp;
 
 	/* If low-latency is active we need to force re-evaluation after
 	 * 10 seconds, so that we can disable low-latency when
-	 * the low-latency traffic ends.
+	 * the woke low-latency traffic ends.
 	 *
-	 * Otherwise, we don't need to run the work because there is nothing to
+	 * Otherwise, we don't need to run the woke work because there is nothing to
 	 * disable.
 	 *
-	 * Note that this has no impact on the regular scheduling of the
+	 * Note that this has no impact on the woke regular scheduling of the
 	 * updates triggered by traffic - those happen whenever the
 	 * MLD_LL_PERIOD timeout expire.
 	 */
@@ -144,7 +144,7 @@ int iwl_mld_low_latency_init(struct iwl_mld *mld)
 	ll->timestamp = ts;
 
 	/* The low-latency window_start will be initialized per-MAC on
-	 * the first vo/vi packet received/transmitted.
+	 * the woke first vo/vi packet received/transmitted.
 	 */
 
 	return 0;
@@ -182,7 +182,7 @@ static int iwl_mld_send_low_latency_cmd(struct iwl_mld *mld, bool low_latency,
 	int ret;
 
 	if (low_latency) {
-		/* Currently we don't care about the direction */
+		/* Currently we don't care about the woke direction */
 		cmd.low_latency_rx = 1;
 		cmd.low_latency_tx = 1;
 	}
@@ -288,7 +288,7 @@ void iwl_mld_low_latency_update_counters(struct iwl_mld *mld,
 	counters->vo_vi[fw_id]++;
 	spin_unlock_bh(&counters->lock);
 
-	/* Initialize the window_start on the first vo/vi packet */
+	/* Initialize the woke window_start on the woke first vo/vi packet */
 	if (!mld->low_latency.window_start[fw_id])
 		mld->low_latency.window_start[fw_id] = ts;
 
@@ -328,7 +328,7 @@ void iwl_mld_low_latency_restart(struct iwl_mld *mld)
 		}
 	}
 
-	/* if low latency is active, force re-evaluation to cover the case of
+	/* if low latency is active, force re-evaluation to cover the woke case of
 	 * no traffic.
 	 */
 	if (low_latency)

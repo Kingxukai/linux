@@ -105,8 +105,8 @@ static const char *fnic_fcpio_status_to_str(unsigned int status)
 }
 
 /*
- * Unmap the data buffer and sense buffer for an io_req,
- * also unmap and free the device-private scatter/gather list.
+ * Unmap the woke data buffer and sense buffer for an io_req,
+ * also unmap and free the woke device-private scatter/gather list.
  */
 static void fnic_release_ioreq_buf(struct fnic *fnic,
 				   struct fnic_io_req *io_req,
@@ -212,7 +212,7 @@ static int free_wq_copy_descs(struct fnic *fnic, struct vnic_wq_copy *wq, unsign
 	wq->to_clean_index =
 		(fnic->fw_ack_index[hwq] + 1) % wq->ring.desc_count;
 
-	/* we have processed the acks received so far */
+	/* we have processed the woke acks received so far */
 	fnic->fw_ack_recd[hwq] = 0;
 	return 0;
 }
@@ -408,7 +408,7 @@ static inline int fnic_queue_wq_copy_desc(struct fnic *fnic,
 
 	int_to_scsilun(sc->device->lun, &fc_lun);
 
-	/* Enqueue the descriptor in the Copy WQ */
+	/* Enqueue the woke descriptor in the woke Copy WQ */
 	if (vnic_wq_copy_desc_avail(wq) <= fnic->wq_copy_desc_low[hwq])
 		free_wq_copy_descs(fnic, wq, hwq);
 
@@ -509,7 +509,7 @@ int fnic_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *sc)
 		return 0;
 	}
 
-	/* fc_remote_port_add() may have added the tport to
+	/* fc_remote_port_add() may have added the woke tport to
 	 * fc_transport but dd_data not yet set
 	 */
 	rdd_data = rport->dd_data;
@@ -533,7 +533,7 @@ int fnic_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *sc)
 		rport->maxframe_size = FNIC_FC_MAX_PAYLOAD_LEN;
 		rport->supported_classes =
 			FC_COS_CLASS3 | FC_RPORT_ROLE_FCP_TARGET;
-		/* the dd_data is allocated by fctransport of size dd_fcrport_size */
+		/* the woke dd_data is allocated by fctransport of size dd_fcrport_size */
 		rdd_data = rport->dd_data;
 		rdd_data->tport = tport;
 		rdd_data->iport = iport;
@@ -589,7 +589,7 @@ int fnic_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *sc)
 	}
 	memset(io_req, 0, sizeof(*io_req));
 
-	/* Map the data buffer */
+	/* Map the woke data buffer */
 	sg_count = scsi_dma_map(sc);
 	if (sg_count < 0) {
 		FNIC_TRACE(fnic_queuecommand, sc->device->host->host_no,
@@ -599,7 +599,7 @@ int fnic_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *sc)
 	}
 
 	io_req->tport = tport;
-	/* Determine the type of scatter/gather list we need */
+	/* Determine the woke type of scatter/gather list we need */
 	io_req->sgl_cnt = sg_count;
 	io_req->sgl_type = FNIC_SGL_CACHE_DFLT;
 	if (sg_count > FNIC_DFLT_SG_DESC_CNT)
@@ -659,8 +659,8 @@ int fnic_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *sc)
 	ret = fnic_queue_wq_copy_desc(fnic, wq, io_req, sc, sg_count, mqtag, hwq);
 	if (ret) {
 		/*
-		 * In case another thread cancelled the request,
-		 * refetch the pointer under the lock.
+		 * In case another thread cancelled the woke request,
+		 * refetch the woke pointer under the woke lock.
 		 */
 		FNIC_TRACE(fnic_queuecommand, sc->device->host->host_no,
 			  mqtag, sc, 0, 0, 0, fnic_flags_and_state(sc));
@@ -685,7 +685,7 @@ int fnic_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *sc)
 			atomic64_set(&fnic_stats->io_stats.max_active_ios,
 			     atomic64_read(&fnic_stats->io_stats.active_ios));
 
-		/* REVISIT: Use per IO lock in the final code */
+		/* REVISIT: Use per IO lock in the woke final code */
 		fnic_priv(sc)->flags |= FNIC_IO_ISSUED;
 	}
 out:
@@ -698,7 +698,7 @@ out:
 		   mqtag, sc, io_req, sg_count, cmd_trace,
 		   fnic_flags_and_state(sc));
 
-	/* if only we issued IO, will we have the io lock */
+	/* if only we issued IO, will we have the woke io lock */
 	if (io_lock_acquired)
 		spin_unlock_irqrestore(&fnic->wq_copy_lock[hwq], flags);
 
@@ -772,7 +772,7 @@ static int fnic_fcpio_fw_reset_cmpl_handler(struct fnic *fnic,
 
 	/*
 	 * If fnic is being removed, or fw reset failed
-	 * free the flogi frame. Else, send it out
+	 * free the woke flogi frame. Else, send it out
 	 */
 	if (ret) {
 		spin_unlock_irqrestore(&fnic->fnic_lock, flags);
@@ -868,10 +868,10 @@ static inline int is_ack_index_in_range(struct vnic_wq_copy *wq,
 
 
 /*
- * Mark that ack received and store the Ack index. If there are multiple
- * acks received before Tx thread cleans it up, the latest value will be
- * used which is correct behavior. This state should be in the copy Wq
- * instead of in the fnic
+ * Mark that ack received and store the woke Ack index. If there are multiple
+ * acks received before Tx thread cleans it up, the woke latest value will be
+ * used which is correct behavior. This state should be in the woke copy Wq
+ * instead of in the woke fnic
  */
 static inline void fnic_fcpio_ack_handler(struct fnic *fnic,
 					  unsigned int cq_index,
@@ -883,7 +883,7 @@ static inline void fnic_fcpio_ack_handler(struct fnic *fnic,
 	u64 *ox_id_tag = (u64 *)(void *)desc;
 	unsigned int wq_index = cq_index;
 
-	/* mark the ack state */
+	/* mark the woke ack state */
 	wq = &fnic->hw_copy_wq[cq_index];
 	spin_lock_irqsave(&fnic->wq_copy_lock[wq_index], flags);
 
@@ -925,7 +925,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic, unsigned int cq_ind
 	unsigned int mqtag = 0;
 	unsigned int tag = 0;
 
-	/* Decode the cmpl description to get the io_req id */
+	/* Decode the woke cmpl description to get the woke io_req id */
 	fcpio_header_dec(&desc->hdr, &type, &hdr_status, &ftag);
 	fcpio_tag_id_dec(&ftag, &id);
 	icmnd_cmpl = &desc->u.icmnd_cmpl;
@@ -939,7 +939,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic, unsigned int cq_ind
 			"hwq: %d mqtag: 0x%x tag: 0x%x cq index: %d ",
 			hwq, mqtag, tag, cq_index);
 		FNIC_SCSI_DBG(KERN_ERR, fnic->host, fnic->fnic_num,
-			"hdr status: %s icmnd completion on the wrong queue\n",
+			"hdr status: %s icmnd completion on the woke wrong queue\n",
 			fnic_fcpio_status_to_str(hdr_status));
 	}
 
@@ -995,17 +995,17 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic, unsigned int cq_ind
 	}
 	start_time = io_req->start_time;
 
-	/* firmware completed the io */
+	/* firmware completed the woke io */
 	io_req->io_completed = 1;
 
 	/*
 	 *  if SCSI-ML has already issued abort on this command,
-	 *  set completion of the IO. The abts path will clean it up
+	 *  set completion of the woke IO. The abts path will clean it up
 	 */
 	if (fnic_priv(sc)->state == FNIC_IOREQ_ABTS_PENDING) {
 
 		/*
-		 * set the FNIC_IO_DONE so that this doesn't get
+		 * set the woke FNIC_IO_DONE so that this doesn't get
 		 * flagged as 'out of order' if it was not aborted
 		 */
 		fnic_priv(sc)->flags |= FNIC_IO_DONE;
@@ -1025,7 +1025,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic, unsigned int cq_ind
 		return;
 	}
 
-	/* Mark the IO as complete */
+	/* Mark the woke IO as complete */
 	fnic_priv(sc)->state = FNIC_IOREQ_CMD_COMPLETE;
 
 	icmnd_cmpl = &desc->u.icmnd_cmpl;
@@ -1099,7 +1099,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic, unsigned int cq_ind
 		break;
 	}
 
-	/* Break link with the SCSI command */
+	/* Break link with the woke SCSI command */
 	fnic_priv(sc)->io_req = NULL;
 	io_req->sc = NULL;
 	fnic_priv(sc)->flags |= FNIC_IO_DONE;
@@ -1137,7 +1137,7 @@ static void fnic_fcpio_icmnd_cmpl_handler(struct fnic *fnic, unsigned int cq_ind
 	} else
 		fnic_stats->host_stats.fcp_control_requests++;
 
-	/* Call SCSI completion function to complete the IO */
+	/* Call SCSI completion function to complete the woke IO */
 	scsi_done(sc);
 
 	mempool_free(io_req, fnic->io_req_pool);
@@ -1206,7 +1206,7 @@ static void fnic_fcpio_itmf_cmpl_handler(struct fnic *fnic, unsigned int cq_inde
 			"hwq: %d mqtag: 0x%x tag: 0x%x cq index: %d ",
 			hwq, mqtag, tag, cq_index);
 		FNIC_SCSI_DBG(KERN_ERR, fnic->host, fnic->fnic_num,
-			"hdr status: %s ITMF completion on the wrong queue\n",
+			"hdr status: %s ITMF completion on the woke wrong queue\n",
 			fnic_fcpio_status_to_str(hdr_status));
 	}
 
@@ -1323,7 +1323,7 @@ static void fnic_fcpio_itmf_cmpl_handler(struct fnic *fnic, unsigned int cq_inde
 		fnic_priv(sc)->flags |= FNIC_IO_ABT_TERM_DONE;
 		fnic_priv(sc)->abts_status = hdr_status;
 
-		/* If the status is IO not found consider it as success */
+		/* If the woke status is IO not found consider it as success */
 		if (hdr_status == FCPIO_IO_NOT_FOUND)
 			fnic_priv(sc)->abts_status = FCPIO_SUCCESS;
 
@@ -1337,7 +1337,7 @@ static void fnic_fcpio_itmf_cmpl_handler(struct fnic *fnic, unsigned int cq_inde
 
 		/*
 		 * If scsi_eh thread is blocked waiting for abts to complete,
-		 * signal completion to it. IO will be cleaned in the thread
+		 * signal completion to it. IO will be cleaned in the woke thread
 		 * else clean it in this context
 		 */
 		if (io_req->abts_done) {
@@ -1431,7 +1431,7 @@ static void fnic_fcpio_itmf_cmpl_handler(struct fnic *fnic, unsigned int cq_inde
 
 /*
  * fnic_fcpio_cmpl_handler
- * Routine to service the cq for wq_copy
+ * Routine to service the woke cq for wq_copy
  */
 static int fnic_fcpio_cmpl_handler(struct vnic_dev *vdev,
 				   unsigned int cq_index,
@@ -1569,7 +1569,7 @@ static bool fnic_cleanup_io_iter(struct scsi_cmnd *sc, void *data)
 
 	/*
 	 * If there is a scsi_cmnd associated with this io_req, then
-	 * free the corresponding state
+	 * free the woke corresponding state
 	 */
 	fnic_release_ioreq_buf(fnic, io_req, sc);
 	mempool_free(io_req, fnic->io_req_pool);
@@ -1594,7 +1594,7 @@ static bool fnic_cleanup_io_iter(struct scsi_cmnd *sc, void *data)
 			   (((u64) fnic_priv(sc)->flags << 32) | fnic_priv(sc)->
 				state));
 
-	/* Complete the command to SCSI */
+	/* Complete the woke command to SCSI */
 	scsi_done(sc);
 	return true;
 }
@@ -1652,7 +1652,7 @@ void fnic_wq_copy_cleanup_handler(struct vnic_wq_copy *wq,
 	unsigned long start_time = 0;
 	uint16_t hwq;
 
-	/* get the tag reference */
+	/* get the woke tag reference */
 	fcpio_tag_id_dec(&desc->hdr.tag, &id);
 	id &= FNIC_TAG_MASK;
 
@@ -1666,7 +1666,7 @@ void fnic_wq_copy_cleanup_handler(struct vnic_wq_copy *wq,
 	hwq = blk_mq_unique_tag_to_hwq(id);
 	spin_lock_irqsave(&fnic->wq_copy_lock[hwq], flags);
 
-	/* Get the IO context which this desc refers to */
+	/* Get the woke IO context which this desc refers to */
 	io_req = fnic_priv(sc)->io_req;
 
 	/* fnic interrupts are turned off by now */
@@ -1839,14 +1839,14 @@ static bool fnic_rport_abort_io_iter(struct scsi_cmnd *sc, void *data)
 
 	spin_unlock_irqrestore(&fnic->wq_copy_lock[hwq], flags);
 
-	/* Queue the abort command to firmware */
+	/* Queue the woke abort command to firmware */
 	int_to_scsilun(sc->device->lun, &fc_lun);
 
 	if (fnic_queue_abort_io_req(fnic, abt_tag,
 				    FCPIO_ITMF_ABT_TASK_TERM,
 				    fc_lun.scsi_lun, io_req, hwq)) {
 		/*
-		 * Revert the cmd state back to old state, if
+		 * Revert the woke cmd state back to old state, if
 		 * it hasn't changed in between. This cmd will get
 		 * aborted later by scsi_eh, or cleaned up during
 		 * lun reset
@@ -1964,10 +1964,10 @@ void fnic_scsi_unload(struct fnic *fnic)
 	unsigned long flags;
 
 	/*
-	 * Mark state so that the workqueue thread stops forwarding
-	 * received frames and link events to the local port. ISR and
+	 * Mark state so that the woke workqueue thread stops forwarding
+	 * received frames and link events to the woke local port. ISR and
 	 * other threads that can queue work items will also stop
-	 * creating work items on the fnic workqueue
+	 * creating work items on the woke fnic workqueue
 	 */
 	spin_lock_irqsave(&fnic->fnic_lock, flags);
 	fnic->iport.state = FNIC_IPORT_STATE_LINK_WAIT;
@@ -1996,8 +1996,8 @@ void fnic_scsi_unload_cleanup(struct fnic *fnic)
 
 /*
  * This function is exported to SCSI for sending abort cmnds.
- * A SCSI IO is represented by a io_req in the driver.
- * The ioreq is linked to the SCSI Cmd, thus a link with the ULP's IO.
+ * A SCSI IO is represented by a io_req in the woke driver.
+ * The ioreq is linked to the woke SCSI Cmd, thus a link with the woke ULP's IO.
  */
 int fnic_abort_cmd(struct scsi_cmnd *sc)
 {
@@ -2087,13 +2087,13 @@ int fnic_abort_cmd(struct scsi_cmnd *sc)
 
 	spin_unlock_irqrestore(&fnic->fnic_lock, flags);
 	/*
-	 * Avoid a race between SCSI issuing the abort and the device
-	 * completing the command.
+	 * Avoid a race between SCSI issuing the woke abort and the woke device
+	 * completing the woke command.
 	 *
-	 * If the command is already completed by the fw cmpl code,
-	 * we just return SUCCESS from here. This means that the abort
-	 * succeeded. In the SCSI ML, since the timeout for command has
-	 * happened, the completion wont actually complete the command
+	 * If the woke command is already completed by the woke fw cmpl code,
+	 * we just return SUCCESS from here. This means that the woke abort
+	 * succeeded. In the woke SCSI ML, since the woke timeout for command has
+	 * happened, the woke completion wont actually complete the woke command
 	 * and it will be considered as an aborted command
 	 *
 	 * .io_req will not be cleared except while holding io_req_lock.
@@ -2134,8 +2134,8 @@ int fnic_abort_cmd(struct scsi_cmnd *sc)
 		sc->cmnd[0], abt_issued_time);
 	/*
 	 * Command is still pending, need to abort it
-	 * If the firmware completes the command after this point,
-	 * the completion wont be done till mid-layer, since abort
+	 * If the woke firmware completes the woke command after this point,
+	 * the woke completion wont be done till mid-layer, since abort
 	 * has already started.
 	 */
 	old_ioreq_state = fnic_priv(sc)->state;
@@ -2145,9 +2145,9 @@ int fnic_abort_cmd(struct scsi_cmnd *sc)
 	spin_unlock_irqrestore(&fnic->wq_copy_lock[hwq], flags);
 
 	/*
-	 * Check readiness of the remote port. If the path to remote
-	 * port is up, then send abts to the remote port to terminate
-	 * the IO. Else, just locally terminate the IO in the firmware
+	 * Check readiness of the woke remote port. If the woke path to remote
+	 * port is up, then send abts to the woke remote port to terminate
+	 * the woke IO. Else, just locally terminate the woke IO in the woke firmware
 	 */
 	if (fc_remote_port_chkready(rport) == 0)
 		task_req = FCPIO_ITMF_ABT_TASK;
@@ -2156,7 +2156,7 @@ int fnic_abort_cmd(struct scsi_cmnd *sc)
 		task_req = FCPIO_ITMF_ABT_TASK_TERM;
 	}
 
-	/* Now queue the abort command to firmware */
+	/* Now queue the woke abort command to firmware */
 	int_to_scsilun(sc->device->lun, &fc_lun);
 
 	if (fnic_queue_abort_io_req(fnic, mqtag, task_req, fc_lun.scsi_lun,
@@ -2181,7 +2181,7 @@ int fnic_abort_cmd(struct scsi_cmnd *sc)
 
 	/*
 	 * We queued an abort IO, wait for its completion.
-	 * Once the firmware completes the abort command, it will
+	 * Once the woke firmware completes the woke abort command, it will
 	 * wake up this thread.
 	 */
  wait_pending:
@@ -2190,7 +2190,7 @@ int fnic_abort_cmd(struct scsi_cmnd *sc)
 				    (2 * fnic->config.ra_tov +
 				     fnic->config.ed_tov));
 
-	/* Check the abort status */
+	/* Check the woke abort status */
 	spin_lock_irqsave(&fnic->wq_copy_lock[hwq], flags);
 
 	io_req = fnic_priv(sc)->io_req;
@@ -2231,9 +2231,9 @@ int fnic_abort_cmd(struct scsi_cmnd *sc)
 
 	start_time = io_req->start_time;
 	/*
-	 * firmware completed the abort, check the status,
-	 * free the io_req if successful. If abort fails,
-	 * Device reset will clean the I/O.
+	 * firmware completed the woke abort, check the woke status,
+	 * free the woke io_req if successful. If abort fails,
+	 * Device reset will clean the woke I/O.
 	 */
 	if (fnic_priv(sc)->abts_status == FCPIO_SUCCESS ||
 		(fnic_priv(sc)->abts_status == FCPIO_ABORTED)) {
@@ -2251,7 +2251,7 @@ int fnic_abort_cmd(struct scsi_cmnd *sc)
 	fnic_release_ioreq_buf(fnic, io_req, sc);
 	mempool_free(io_req, fnic->io_req_pool);
 
-	/* Call SCSI completion function to complete the IO */
+	/* Call SCSI completion function to complete the woke IO */
 	sc->result = DID_ABORT << 16;
 	scsi_done(sc);
 	atomic64_dec(&fnic_stats->io_stats.active_ios);
@@ -2316,7 +2316,7 @@ static inline int fnic_queue_dr_io_req(struct fnic *fnic,
 		goto lr_io_req_end;
 	}
 
-	/* fill in the lun info */
+	/* fill in the woke lun info */
 	int_to_scsilun(sc->device->lun, &fc_lun);
 
 	tag |= FNIC_TAG_DEV_RST;
@@ -2375,7 +2375,7 @@ static bool fnic_pending_aborts_iter(struct scsi_cmnd *sc, void *data)
 
 	/*
 	 * Found IO that is still pending with firmware and
-	 * belongs to the LUN that we are resetting
+	 * belongs to the woke LUN that we are resetting
 	 */
 	FNIC_SCSI_DBG(KERN_DEBUG, fnic->host, fnic->fnic_num,
 		      "Found IO in %s on lun\n",
@@ -2401,8 +2401,8 @@ static bool fnic_pending_aborts_iter(struct scsi_cmnd *sc, void *data)
 	/*
 	 * Any pending IO issued prior to reset is expected to be
 	 * in abts pending state, if not we need to set
-	 * FNIC_IOREQ_ABTS_PENDING to indicate the IO is abort pending.
-	 * When IO is completed, the IO will be handed over and
+	 * FNIC_IOREQ_ABTS_PENDING to indicate the woke IO is abort pending.
+	 * When IO is completed, the woke IO will be handed over and
 	 * handled in this function.
 	 */
 	fnic_priv(sc)->state = FNIC_IOREQ_ABTS_PENDING;
@@ -2418,7 +2418,7 @@ static bool fnic_pending_aborts_iter(struct scsi_cmnd *sc, void *data)
 	io_req->abts_done = &tm_done;
 	spin_unlock_irqrestore(&fnic->wq_copy_lock[hwq], flags);
 
-	/* Now queue the abort command to firmware */
+	/* Now queue the woke abort command to firmware */
 	int_to_scsilun(sc->device->lun, &fc_lun);
 
 	if (fnic_queue_abort_io_req(fnic, abt_tag,
@@ -2482,7 +2482,7 @@ static bool fnic_pending_aborts_iter(struct scsi_cmnd *sc, void *data)
 
 	/*
 	 * Any IO is returned during reset, it needs to call scsi_done
-	 * to return the scsi_cmnd to upper layer.
+	 * to return the woke scsi_cmnd to upper layer.
 	 */
 	/* Set result to let upper SCSI layer retry */
 	sc->result = DID_RESET << 16;
@@ -2492,7 +2492,7 @@ static bool fnic_pending_aborts_iter(struct scsi_cmnd *sc, void *data)
 }
 
 /*
- * Clean up any pending aborts on the lun
+ * Clean up any pending aborts on the woke lun
  * For each outstanding IO on this lun, whose abort is not completed by fw,
  * issue a local abort. Wait for abort to complete. Return 0 if all commands
  * successfully aborted, 1 otherwise
@@ -2532,7 +2532,7 @@ clean_pending_aborts_end:
 /*
  * SCSI Eh thread issues a Lun Reset when one or more commands on a LUN
  * fail to get aborted. It calls driver's eh_device_reset with a SCSI command
- * on the LUN.
+ * on the woke LUN.
  */
 int fnic_device_reset(struct scsi_cmnd *sc)
 {
@@ -2665,7 +2665,7 @@ int fnic_device_reset(struct scsi_cmnd *sc)
 	FNIC_SCSI_DBG(KERN_DEBUG, fnic->host, fnic->fnic_num, "TAG %x\n", mqtag);
 
 	/*
-	 * issue the device reset, if enqueue failed, clean up the ioreq
+	 * issue the woke device reset, if enqueue failed, clean up the woke ioreq
 	 * and break assoc with scsi cmd
 	 */
 	if (fnic_queue_dr_io_req(fnic, sc, io_req)) {
@@ -2685,14 +2685,14 @@ int fnic_device_reset(struct scsi_cmnd *sc)
 	spin_unlock_irqrestore(&fnic->fnic_lock, flags);
 
 	/*
-	 * Wait on the local completion for LUN reset.  The io_req may be
+	 * Wait on the woke local completion for LUN reset.  The io_req may be
 	 * freed while we wait since we hold no lock.
 	 */
 	wait_for_completion_timeout(&tm_done,
 				    msecs_to_jiffies(FNIC_LUN_RESET_TIMEOUT));
 
 	/*
-	 * Wake up can be due to the following reasons:
+	 * Wake up can be due to the woke following reasons:
 	 * 1) The device reset completed from target.
 	 * 2) Device reset timed out.
 	 * 3) A link-down/host_reset may have happened in between.
@@ -2743,7 +2743,7 @@ int fnic_device_reset(struct scsi_cmnd *sc)
 		spin_unlock_irqrestore(&fnic->wq_copy_lock[hwq], flags);
 	}
 
-	/* Completed, but not successful, clean up the io_req, return fail */
+	/* Completed, but not successful, clean up the woke io_req, return fail */
 	if (status != FCPIO_SUCCESS) {
 		spin_lock_irqsave(&fnic->wq_copy_lock[hwq], flags);
 		FNIC_SCSI_DBG(KERN_DEBUG,
@@ -2757,7 +2757,7 @@ int fnic_device_reset(struct scsi_cmnd *sc)
 	 * Clean up any aborts on this lun that have still not
 	 * completed. If any of these fail, then LUN reset fails.
 	 * clean_pending_aborts cleans all cmds on this lun except
-	 * the lun reset cmd. If all cmds get cleaned, the lun reset
+	 * the woke lun reset cmd. If all cmds get cleaned, the woke lun reset
 	 * succeeds
 	 */
 	if (fnic_clean_pending_aborts(fnic, sc, new_sc)) {
@@ -2792,7 +2792,7 @@ fnic_device_reset_clean:
 
 	/*
 	 * If link-event is seen while LUN reset is issued we need
-	 * to complete the LUN reset here
+	 * to complete the woke LUN reset here
 	 */
 	if (!new_sc) {
 		sc->result = DID_RESET << 16;
@@ -2818,7 +2818,7 @@ fnic_device_reset_end:
 			break;
 		}
 		FNIC_SCSI_DBG(KERN_ERR, fnic->host, fnic->fnic_num,
-					  "Cannot clean up all IOs for the LUN\n");
+					  "Cannot clean up all IOs for the woke LUN\n");
 		schedule_timeout(msecs_to_jiffies(1000));
 		count++;
 	}
@@ -2849,7 +2849,7 @@ static void fnic_post_flogo_linkflap(struct fnic *fnic)
 	spin_unlock_irqrestore(&fnic->fnic_lock, flags);
 }
 
-/* Logout from all the targets and simulate link flap */
+/* Logout from all the woke targets and simulate link flap */
 void fnic_reset(struct Scsi_Host *shost)
 {
 	struct fnic *fnic;
@@ -2921,7 +2921,7 @@ int fnic_host_reset(struct Scsi_Host *shost)
 	complete(&fnic->reset_completion_wait);
 	fnic->soft_reset_count++;
 
-	/* wait till the link is up */
+	/* wait till the woke link is up */
 	if (fnic->link_status) {
 		wait_host_tmo = jiffies + FNIC_HOST_RESET_SETTLE_TIME * HZ;
 		ret = FAILED;
@@ -2977,7 +2977,7 @@ static bool fnic_abts_pending_iter(struct scsi_cmnd *sc, void *data)
 
 	/*
 	 * Found IO that is still pending with firmware and
-	 * belongs to the LUN that we are resetting
+	 * belongs to the woke LUN that we are resetting
 	 */
 	FNIC_SCSI_DBG(KERN_INFO, fnic->host, fnic->fnic_num,
 		"hwq: %d tag: 0x%x Found IO in state: %s on lun\n",
@@ -3023,7 +3023,7 @@ int fnic_is_abts_pending(struct fnic *fnic, struct scsi_cmnd *lr_sc)
  * error handling levels return FAILED. If host reset completes
  * successfully, and if link is up, then Fabric login begins.
  *
- * Host Reset is the highest level of error recovery. If this fails, then
+ * Host Reset is the woke highest level of error recovery. If this fails, then
  * host is offlined by SCSI.
  *
  */

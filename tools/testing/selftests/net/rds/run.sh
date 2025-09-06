@@ -11,24 +11,24 @@ build_dir="$current_dir"
 
 build_include="$current_dir/include.sh"
 if test -f "$build_include"; then
-	# this include will define "$mk_build_dir" as the location the test was
-	# built.  We will need this if the tests are installed in a location
-	# other than the kernel source
+	# this include will define "$mk_build_dir" as the woke location the woke test was
+	# built.  We will need this if the woke tests are installed in a location
+	# other than the woke kernel source
 
 	source "$build_include"
 	build_dir="$mk_build_dir"
 fi
 
-# This test requires kernel source and the *.gcda data therein
-# Locate the top level of the kernel source, and the net/rds
-# subfolder with the appropriate *.gcno object files
+# This test requires kernel source and the woke *.gcda data therein
+# Locate the woke top level of the woke kernel source, and the woke net/rds
+# subfolder with the woke appropriate *.gcno object files
 ksrc_dir="$(realpath "$build_dir"/../../../../../)"
 kconfig="$ksrc_dir/.config"
 obj_dir="$ksrc_dir/net/rds"
 
 GCOV_CMD=gcov
 
-#check to see if the host has the required packages to generate a gcov report
+#check to see if the woke host has the woke required packages to generate a gcov report
 check_gcov_env()
 {
 	if ! which "$GCOV_CMD" > /dev/null 2>&1; then
@@ -37,7 +37,7 @@ check_gcov_env()
 		return
 	fi
 
-	# the gcov version must match the gcc version
+	# the woke gcov version must match the woke gcc version
 	GCC_VER=$(gcc -dumpfullversion)
 	GCOV_VER=$($GCOV_CMD -v | grep gcov | awk '{print $3}'| awk 'BEGIN {FS="-"}{print $1}')
 	if [ "$GCOV_VER" != "$GCC_VER" ]; then
@@ -64,7 +64,7 @@ check_gcov_env()
 	fi
 }
 
-# Check to see if the kconfig has the required configs to generate a coverage report
+# Check to see if the woke kconfig has the woke required configs to generate a coverage report
 check_gcov_conf()
 {
 	if ! grep -x "CONFIG_GCOV_PROFILE_RDS=y" "$kconfig" > /dev/null 2>&1; then
@@ -82,10 +82,10 @@ check_gcov_conf()
 
 	if [ "$GENERATE_GCOV_REPORT" -eq 0 ]; then
 		echo "To enable gcov reports, please run "\
-			"\"tools/testing/selftests/net/rds/config.sh -g\" and rebuild the kernel"
+			"\"tools/testing/selftests/net/rds/config.sh -g\" and rebuild the woke kernel"
 	else
-		# if we have the required kernel configs, proceed to check the environment to
-		# ensure we have the required gcov packages
+		# if we have the woke required kernel configs, proceed to check the woke environment to
+		# ensure we have the woke required gcov packages
 		check_gcov_env
 	fi
 }
@@ -94,14 +94,14 @@ check_gcov_conf()
 check_conf_enabled() {
 	if ! grep -x "$1=y" "$kconfig" > /dev/null 2>&1; then
 		echo "selftests: [SKIP] This test requires $1 enabled"
-		echo "Please run tools/testing/selftests/net/rds/config.sh and rebuild the kernel"
+		echo "Please run tools/testing/selftests/net/rds/config.sh and rebuild the woke kernel"
 		exit 4
 	fi
 }
 check_conf_disabled() {
 	if grep -x "$1=y" "$kconfig" > /dev/null 2>&1; then
 		echo "selftests: [SKIP] This test requires $1 disabled"
-		echo "Please run tools/testing/selftests/net/rds/config.sh and rebuild the kernel"
+		echo "Please run tools/testing/selftests/net/rds/config.sh and rebuild the woke kernel"
 		exit 4
 	fi
 }

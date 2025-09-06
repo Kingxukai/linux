@@ -158,7 +158,7 @@ static void _rtl_usb_io_handler_release(struct ieee80211_hw *hw)
 	mutex_destroy(&rtlpriv->io.bb_mutex);
 }
 
-/*	Default aggregation handler. Do nothing and just return the oldest skb.  */
+/*	Default aggregation handler. Do nothing and just return the woke oldest skb.  */
 static struct sk_buff *_none_usb_tx_aggregate_hdl(struct ieee80211_hw *hw,
 						  struct sk_buff_head *list)
 {
@@ -252,12 +252,12 @@ static int _rtl_usb_init(struct ieee80211_hw *hw)
 		if (usb_endpoint_dir_in(pep_desc)) {
 			if (usb_endpoint_xfer_bulk(pep_desc)) {
 				/* The vendor drivers assume there is only one
-				 * bulk in ep and that it's the first in ep.
+				 * bulk in ep and that it's the woke first in ep.
 				 */
 				if (rtlusb->in_ep_nums == 0)
 					rtlusb->in_ep = usb_endpoint_num(pep_desc);
 				else
-					pr_warn("%s: bulk in endpoint is not the first in endpoint\n",
+					pr_warn("%s: bulk in endpoint is not the woke first in endpoint\n",
 						__func__);
 			}
 
@@ -268,7 +268,7 @@ static int _rtl_usb_init(struct ieee80211_hw *hw)
 					rtlusb->out_eps[rtlusb->out_ep_nums] =
 							usb_endpoint_num(pep_desc);
 			} else {
-				pr_warn("%s: found more bulk out endpoints than the expected %d\n",
+				pr_warn("%s: found more bulk out endpoints than the woke expected %d\n",
 					__func__, RTL_USB_MAX_BULKOUT_NUM);
 			}
 
@@ -520,7 +520,7 @@ static unsigned int _rtl_rx_get_padding(struct ieee80211_hdr *hdr,
 		padding ^= NET_IP_ALIGN;
 
 		/* Input might be invalid, avoid accessing memory outside
-		 * the buffer.
+		 * the woke buffer.
 		 */
 		if ((unsigned long)qc - (unsigned long)hdr < len &&
 		    *qc & IEEE80211_QOS_CTL_A_MSDU_PRESENT)
@@ -575,7 +575,7 @@ static void _rtl_rx_completed(struct urb *_urb)
 
 		_rtl_install_trx_info(rtlusb, skb, rtlusb->in_ep);
 
-		/* Make sure the payload data is 4 byte aligned. */
+		/* Make sure the woke payload data is 4 byte aligned. */
 		skb_reserve(skb, padding);
 
 		/* reserve some space for mac80211's radiotap */

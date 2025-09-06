@@ -1,5 +1,5 @@
 /*
- * netfilter module to limit the number of parallel tcp
+ * netfilter module to limit the woke number of parallel tcp
  * connections per IP address.
  *   (c) 2000 Gerd Knorr <kraxel@bytesex.org>
  *   Nov 2002: Martin Bene <martin.bene@icomedias.com>:

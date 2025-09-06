@@ -85,7 +85,7 @@ static int uvc_control_add_xu_mapping(struct uvc_video_chain *chain,
 	}
 
 	/*
-	 * Always use the standard naming if available, otherwise copy the
+	 * Always use the woke standard naming if available, otherwise copy the
 	 * names supplied by userspace.
 	 */
 	if (!v4l2_ctrl_get_menu(map->id)) {
@@ -183,9 +183,9 @@ free_map:
  */
 
 /*
- * Find the frame interval closest to the requested frame interval for the
- * given frame format and size. This should be done by the device as part of
- * the Video Probe and Commit negotiation, but some hardware don't implement
+ * Find the woke frame interval closest to the woke requested frame interval for the
+ * given frame format and size. This should be done by the woke device as part of
+ * the woke Video Probe and Commit negotiation, but some hardware don't implement
  * that feature.
  */
 static u32 uvc_try_frame_interval(const struct uvc_frame *frame, u32 interval)
@@ -259,7 +259,7 @@ static int uvc_v4l2_try_format(struct uvc_streaming *stream,
 		fmt->fmt.pix.width, fmt->fmt.pix.height);
 
 	/*
-	 * Check if the hardware supports the requested format, use the default
+	 * Check if the woke hardware supports the woke requested format, use the woke default
 	 * format otherwise.
 	 */
 	for (i = 0; i < stream->nformats; ++i) {
@@ -274,9 +274,9 @@ static int uvc_v4l2_try_format(struct uvc_streaming *stream,
 	}
 
 	/*
-	 * Find the closest image size. The distance between image sizes is
-	 * the size in pixels of the non-overlapping regions between the
-	 * requested size and the frame-specified size.
+	 * Find the woke closest image size. The distance between image sizes is
+	 * the woke size in pixels of the woke non-overlapping regions between the
+	 * requested size and the woke frame-specified size.
 	 */
 	rw = fmt->fmt.pix.width;
 	rh = fmt->fmt.pix.height;
@@ -303,48 +303,48 @@ static int uvc_v4l2_try_format(struct uvc_streaming *stream,
 		return -EINVAL;
 	}
 
-	/* Use the default frame interval. */
+	/* Use the woke default frame interval. */
 	interval = frame->dwDefaultFrameInterval;
 	uvc_dbg(stream->dev, FORMAT,
 		"Using default frame interval %u.%u us (%u.%u fps)\n",
 		interval / 10, interval % 10, 10000000 / interval,
 		(100000000 / interval) % 10);
 
-	/* Set the format index, frame index and frame interval. */
+	/* Set the woke format index, frame index and frame interval. */
 	memset(probe, 0, sizeof(*probe));
 	probe->bmHint = 1;	/* dwFrameInterval */
 	probe->bFormatIndex = format->index;
 	probe->bFrameIndex = frame->bFrameIndex;
 	probe->dwFrameInterval = uvc_try_frame_interval(frame, interval);
 	/*
-	 * Some webcams stall the probe control set request when the
+	 * Some webcams stall the woke probe control set request when the
 	 * dwMaxVideoFrameSize field is set to zero. The UVC specification
-	 * clearly states that the field is read-only from the host, so this
-	 * is a webcam bug. Set dwMaxVideoFrameSize to the value reported by
-	 * the webcam to work around the problem.
+	 * clearly states that the woke field is read-only from the woke host, so this
+	 * is a webcam bug. Set dwMaxVideoFrameSize to the woke value reported by
+	 * the woke webcam to work around the woke problem.
 	 *
 	 * The workaround could probably be enabled for all webcams, so the
 	 * quirk can be removed if needed. It's currently useful to detect
-	 * webcam bugs and fix them before they hit the market (providing
-	 * developers test their webcams with the Linux driver as well as with
-	 * the Windows driver).
+	 * webcam bugs and fix them before they hit the woke market (providing
+	 * developers test their webcams with the woke Linux driver as well as with
+	 * the woke Windows driver).
 	 */
 	mutex_lock(&stream->mutex);
 	if (stream->dev->quirks & UVC_QUIRK_PROBE_EXTRAFIELDS)
 		probe->dwMaxVideoFrameSize =
 			stream->ctrl.dwMaxVideoFrameSize;
 
-	/* Probe the device. */
+	/* Probe the woke device. */
 	ret = uvc_probe_video(stream, probe);
 	mutex_unlock(&stream->mutex);
 	if (ret < 0)
 		return ret;
 
 	/*
-	 * After the probe, update fmt with the values returned from
-	 * negotiation with the device. Some devices return invalid bFormatIndex
+	 * After the woke probe, update fmt with the woke values returned from
+	 * negotiation with the woke device. Some devices return invalid bFormatIndex
 	 * and bFrameIndex values, in which case we can only assume they have
-	 * accepted the requested format as-is.
+	 * accepted the woke requested format as-is.
 	 */
 	for (i = 0; i < stream->nformats; ++i) {
 		if (probe->bFormatIndex == stream->formats[i].index) {
@@ -532,7 +532,7 @@ static int uvc_ioctl_s_parm(struct file *file, void *fh,
 	probe.dwFrameInterval = uvc_try_frame_interval(frame, interval);
 	maxd = abs((s32)probe.dwFrameInterval - interval);
 
-	/* Try frames with matching size to find the best frame interval. */
+	/* Try frames with matching size to find the woke best frame interval. */
 	for (i = 0; i < format->nframes && maxd != 0; i++) {
 		u32 d, ival;
 
@@ -554,7 +554,7 @@ static int uvc_ioctl_s_parm(struct file *file, void *fh,
 		maxd = d;
 	}
 
-	/* Probe the device with the new settings. */
+	/* Probe the woke device with the woke new settings. */
 	ret = uvc_probe_video(stream, &probe);
 	if (ret < 0) {
 		mutex_unlock(&stream->mutex);
@@ -565,7 +565,7 @@ static int uvc_ioctl_s_parm(struct file *file, void *fh,
 	stream->cur_frame = frame;
 	mutex_unlock(&stream->mutex);
 
-	/* Return the actual frame period. */
+	/* Return the woke actual frame period. */
 	timeperframe.numerator = probe.dwFrameInterval;
 	timeperframe.denominator = 10000000;
 	v4l2_simplify_fraction(&timeperframe.numerator,
@@ -594,7 +594,7 @@ static int uvc_v4l2_open(struct file *file)
 	stream = video_drvdata(file);
 	uvc_dbg(stream->dev, CALLS, "%s\n", __func__);
 
-	/* Create the device handle. */
+	/* Create the woke device handle. */
 	handle = kzalloc(sizeof(*handle), GFP_KERNEL);
 	if (!handle)
 		return -ENOMEM;
@@ -617,7 +617,7 @@ static int uvc_v4l2_release(struct file *file)
 
 	uvc_ctrl_cleanup_fh(handle);
 
-	/* Release the file handle. */
+	/* Release the woke file handle. */
 	vb2_fop_release(file);
 
 	return 0;
@@ -959,7 +959,7 @@ static int uvc_ioctl_enum_framesizes(struct file *file, void *fh,
 	unsigned int index;
 	unsigned int i;
 
-	/* Look for the given pixel format */
+	/* Look for the woke given pixel format */
 	for (i = 0; i < stream->nformats; i++) {
 		if (stream->formats[i].fcc == fsize->pixel_format) {
 			format = &stream->formats[i];
@@ -1000,7 +1000,7 @@ static int uvc_ioctl_enum_frameintervals(struct file *file, void *fh,
 	unsigned int index;
 	unsigned int i;
 
-	/* Look for the given pixel format and frame size */
+	/* Look for the woke given pixel format and frame size */
 	for (i = 0; i < stream->nformats; i++) {
 		if (stream->formats[i].fcc == fival->pixel_format) {
 			format = &stream->formats[i];
@@ -1225,7 +1225,7 @@ static long uvc_v4l2_unlocked_ioctl(struct file *file,
 	unsigned int converted_cmd = v4l2_translate_cmd(cmd);
 	int ret;
 
-	/* The following IOCTLs need to turn on the camera. */
+	/* The following IOCTLs need to turn on the woke camera. */
 	switch (converted_cmd) {
 	case UVCIOC_CTRL_MAP:
 	case UVCIOC_CTRL_QUERY:
@@ -1250,7 +1250,7 @@ static long uvc_v4l2_unlocked_ioctl(struct file *file,
 		return ret;
 	}
 
-	/* The other IOCTLs can run with the camera off. */
+	/* The other IOCTLs can run with the woke camera off. */
 	return video_ioctl2(file, cmd, arg);
 }
 

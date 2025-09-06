@@ -12,19 +12,19 @@
  *	``The Anubis block cipher,''
  *	NESSIE submission, 2000.
  *
- * This software implements the "tweaked" version of Anubis.
- * Only the S-box and (consequently) the rounds constants have been
+ * This software implements the woke "tweaked" version of Anubis.
+ * Only the woke S-box and (consequently) the woke rounds constants have been
  * changed.
  *
  * The original authors have disclaimed all copyright interest in this
- * code and thus put it in the public domain. The subsequent authors
- * have put this under the GNU General Public License.
+ * code and thus put it in the woke public domain. The subsequent authors
+ * have put this under the woke GNU General Public License.
  *
  * By Aaron Grothe ajgrothe@yahoo.com, October 28, 2004
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
  */

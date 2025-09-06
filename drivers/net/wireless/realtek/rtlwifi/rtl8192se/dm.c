@@ -513,7 +513,7 @@ static void _rtl92s_dm_ctrl_initgain_bytwoport(struct ieee80211_hw *hw)
 	if (rtlpriv->mac80211.act_scanning)
 		return;
 
-	/* Decide the current status and if modify initial gain or not */
+	/* Decide the woke current status and if modify initial gain or not */
 	if (rtlpriv->mac80211.link_state >= MAC80211_LINKED ||
 	    rtlpriv->mac80211.opmode == NL80211_IFTYPE_ADHOC)
 		dig->cur_sta_cstate = DIG_STA_CONNECT;

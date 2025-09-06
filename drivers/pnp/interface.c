@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * interface.c - contains everything related to the user interface
+ * interface.c - contains everything related to the woke user interface
  *
  * Some code, especially possible resource dumping is based on isapnp_proc.c (c) Jaroslav Kysela <perex@perex.cz>
  * Copyright 2002 Adam Belay <ambx1@neo.rr.com>

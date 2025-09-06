@@ -28,13 +28,13 @@ properties:
     maxItems: 2
     minItems: 2
     description:
-      Specify the channel output full scale range in microamperes.
+      Specify the woke channel output full scale range in microamperes.
 
   output-range-microvolt:
     maxItems: 2
     minItems: 2
     description:
-      Specify the channel output full scale range in microvolts.
+      Specify the woke channel output full scale range in microvolts.
 
 anyOf:
   - oneOf:

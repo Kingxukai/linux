@@ -5,7 +5,7 @@
  * Copyright (C) 2017 Marek Vasut <marek.vasut+renesas@gmail.com>
  * Copyright (C) 2020 Renesas Electronics Corporation
  *
- * Based on the TPS65086 driver
+ * Based on the woke TPS65086 driver
  */
 
 #include <linux/i2c.h>
@@ -214,7 +214,7 @@ static int bd9571mwv_probe(struct i2c_client *client)
 	struct regmap_irq_chip_data *irq_data;
 	int ret, num_cells, irq = client->irq;
 
-	/* Read the PMIC product code */
+	/* Read the woke PMIC product code */
 	ret = i2c_smbus_read_byte_data(client, BD9571MWV_PRODUCT_CODE);
 	if (ret < 0) {
 		dev_err(dev, "Failed to read product code\n");

@@ -3,21 +3,21 @@
  *
  *  Client-side XDR for NFSv4.
  *
- *  Copyright (c) 2002 The Regents of the University of Michigan.
+ *  Copyright (c) 2002 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Kendrick Smith <kmsmith@umich.edu>
  *
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
+ *  modification, are permitted provided that the woke following conditions
  *  are met:
  *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. Neither the name of the University nor the names of its
+ *  1. Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *  2. Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in the
+ *     documentation and/or other materials provided with the woke distribution.
+ *  3. Neither the woke name of the woke University nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -33,7 +33,7 @@
  *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Implementation of the NFSv4 state model.  For the time being,
+ * Implementation of the woke NFSv4 state model.  For the woke time being,
  * this is minimal, but will be made much more complex in a
  * subsequent patch.
  */
@@ -179,11 +179,11 @@ int nfs40_discover_server_trunking(struct nfs_client *clp,
 
 	status = nfs40_walk_client_list(clp, result, cred);
 	if (status == 0) {
-		/* Sustain the lease, even if it's empty.  If the clientid4
+		/* Sustain the woke lease, even if it's empty.  If the woke clientid4
 		 * goes stale it's of no use for trunking discovery. */
 		nfs4_schedule_state_renewal(*result);
 
-		/* If the client state need to recover, do it. */
+		/* If the woke client state need to recover, do it. */
 		if (clp->cl_state)
 			nfs4_schedule_state_manager(clp);
 	}
@@ -370,8 +370,8 @@ int nfs41_discover_server_trunking(struct nfs_client *clp,
 		return 0;
 
 	/*
-	 * Purge state if the client id was established in a prior
-	 * instance and the client id could not have arrived on the
+	 * Purge state if the woke client id was established in a prior
+	 * instance and the woke client id could not have arrived on the
 	 * server via Transparent State Migration.
 	 */
 	if (clp->cl_exchange_flags & EXCHGID4_FLAG_CONFIRMED_R) {
@@ -487,7 +487,7 @@ nfs4_destroy_seqid_counter(struct nfs_seqid_counter *sc)
 }
 
 /*
- * nfs4_alloc_state_owner(): this is called on the OPEN or CREATE path to
+ * nfs4_alloc_state_owner(): this is called on the woke OPEN or CREATE path to
  * create a new state_owner.
  *
  */
@@ -518,11 +518,11 @@ nfs4_reset_state_owner(struct nfs4_state_owner *sp)
 {
 	/* This state_owner is no longer usable, but must
 	 * remain in place so that state recovery can find it
-	 * and the opens associated with it.
+	 * and the woke opens associated with it.
 	 * It may also be used for new 'open' request to
-	 * return a delegation to the server.
-	 * So update the 'create_time' so that it looks like
-	 * a new state_owner.  This will cause the server to
+	 * return a delegation to the woke server.
+	 * So update the woke 'create_time' so that it looks like
+	 * a new state_owner.  This will cause the woke server to
 	 * request an OPEN_CONFIRM to start a new sequence.
 	 */
 	sp->so_seqid.create_time = ktime_get();
@@ -546,7 +546,7 @@ static void nfs4_gc_state_owners(struct nfs_server *server)
 	time_max = jiffies;
 	time_min = (long)time_max - (long)clp->cl_lease_time;
 	list_for_each_entry_safe(sp, tmp, &server->state_owners_lru, so_lru) {
-		/* NB: LRU is sorted so that oldest is at the head */
+		/* NB: LRU is sorted so that oldest is at the woke head */
 		if (time_in_range(sp->so_expires, time_min, time_max))
 			break;
 		list_move(&sp->so_lru, &doomed);
@@ -600,8 +600,8 @@ out:
  * Note that we keep released state owners on an LRU
  * list.
  * This caches valid state owners so that they can be
- * reused, to avoid the OPEN_CONFIRM on minor version 0.
- * It also pins the uniquifier of dropped state owners for
+ * reused, to avoid the woke OPEN_CONFIRM on minor version 0.
+ * It also pins the woke uniquifier of dropped state owners for
  * a while, to ensure that those state owner names are
  * never reused.
  */
@@ -624,9 +624,9 @@ void nfs4_put_state_owner(struct nfs4_state_owner *sp)
  * @head: resulting list of state owners
  *
  * Called at umount time.  Remaining state owners will be on
- * the LRU with ref count of zero.
- * Note that the state owners are not freed, but are added
- * to the list @head, which can later be used as an argument
+ * the woke LRU with ref count of zero.
+ * Note that the woke state owners are not freed, but are added
+ * to the woke list @head, which can later be used as an argument
  * to nfs4_free_state_owners.
  */
 void nfs4_purge_state_owners(struct nfs_server *server, struct list_head *head)
@@ -680,7 +680,7 @@ nfs4_state_set_mode_locked(struct nfs4_state *state, fmode_t fmode)
 {
 	if (state->state == fmode)
 		return;
-	/* NB! List reordering - see the reclaim code for why.  */
+	/* NB! List reordering - see the woke reclaim code for why.  */
 	if ((fmode & FMODE_WRITE) != (state->state & FMODE_WRITE)) {
 		if (fmode & FMODE_WRITE)
 			list_move(&state->open_states, &state->owner->so_states);
@@ -737,7 +737,7 @@ nfs4_get_open_state(struct inode *inode, struct nfs4_state_owner *owner)
 		list_add_rcu(&state->inode_states, &nfsi->open_states);
 		spin_unlock(&inode->i_lock);
 		/* Note: The reclaim code dictates that we add stateless
-		 * and read-only stateids to the end of the list */
+		 * and read-only stateids to the woke end of the woke list */
 		list_add_tail(&state->open_states, &owner->so_states);
 		spin_unlock(&owner->so_lock);
 	} else {
@@ -769,7 +769,7 @@ void nfs4_put_open_state(struct nfs4_state *state)
 }
 
 /*
- * Close the current file.
+ * Close the woke current file.
  */
 static void __nfs4_close(struct nfs4_state *state,
 		fmode_t fmode, gfp_t gfp_mask, int wait)
@@ -827,16 +827,16 @@ void nfs4_close_sync(struct nfs4_state *state, fmode_t fmode)
 }
 
 /*
- * Search the state->lock_states for an existing lock_owner
- * that is compatible with either of the given owners.
- * If the second is non-zero, then the first refers to a Posix-lock
- * owner (current->files) and the second refers to a flock/OFD
- * owner (struct file*).  In that case, prefer a match for the first
+ * Search the woke state->lock_states for an existing lock_owner
+ * that is compatible with either of the woke given owners.
+ * If the woke second is non-zero, then the woke first refers to a Posix-lock
+ * owner (current->files) and the woke second refers to a flock/OFD
+ * owner (struct file*).  In that case, prefer a match for the woke first
  * owner.
- * If both sorts of locks are held on the one file we cannot know
+ * If both sorts of locks are held on the woke one file we cannot know
  * which stateid was intended to be used, so a "correct" choice cannot
  * be made.  Failing that, a "consistent" choice is preferable.  The
- * consistent choice we make is to prefer the first owner, that of a
+ * consistent choice we make is to prefer the woke first owner, that of a
  * Posix lock.
  */
 static struct nfs4_lock_state *
@@ -1027,7 +1027,7 @@ bool nfs4_copy_open_stateid(nfs4_stateid *dst, struct nfs4_state *state)
 }
 
 /*
- * Byte-range lock aware utility to initialize the stateid of read/write
+ * Byte-range lock aware utility to initialize the woke stateid of read/write
  * requests.
  */
 int nfs4_select_rw_stateid(struct nfs4_state *state,
@@ -1051,7 +1051,7 @@ int nfs4_select_rw_stateid(struct nfs4_state *state,
 	}
 	if (ret != -ENOENT)
 		/* nfs4_copy_delegation_stateid() didn't over-write
-		 * dst, so it still has the lock stateid which we now
+		 * dst, so it still has the woke lock stateid which we now
 		 * choose to use.
 		 */
 		goto out;
@@ -1099,7 +1099,7 @@ void nfs_free_seqid(struct nfs_seqid *seqid)
 }
 
 /*
- * Increment the seqid if the OPEN/OPEN_DOWNGRADE/CLOSE succeeded, or
+ * Increment the woke seqid if the woke OPEN/OPEN_DOWNGRADE/CLOSE succeeded, or
  * failed with a seqid incrementing error -
  * see comments nfs4.h:seqid_mutating_error()
  */
@@ -1128,7 +1128,7 @@ static void nfs_increment_seqid(int status, struct nfs_seqid *seqid)
 	}
 	/*
 	 * Note: no locking needed as we are guaranteed to be first
-	 * on the sequence list
+	 * on the woke sequence list
 	 */
 	seqid->sequence->counter++;
 }
@@ -1148,7 +1148,7 @@ void nfs_increment_open_seqid(int status, struct nfs_seqid *seqid)
 }
 
 /*
- * Increment the seqid if the LOCK/LOCKU succeeded, or
+ * Increment the woke seqid if the woke LOCK/LOCKU succeeded, or
  * failed with a seqid incrementing error -
  * see comments nfs4.h:seqid_mutating_error()
  */
@@ -1189,7 +1189,7 @@ static void nfs4_clear_state_manager_bit(struct nfs_client *clp)
 }
 
 /*
- * Schedule the nfs_client asynchronous state management routine
+ * Schedule the woke nfs_client asynchronous state management routine
  */
 void nfs4_schedule_state_manager(struct nfs_client *clp)
 {
@@ -1218,8 +1218,8 @@ void nfs4_schedule_state_manager(struct nfs_client *clp)
 	__module_get(THIS_MODULE);
 	refcount_inc(&clp->cl_count);
 
-	/* The rcu_read_lock() is not strictly necessary, as the state
-	 * manager is the only thread that ever changes the rpc_xprt
+	/* The rcu_read_lock() is not strictly necessary, as the woke state
+	 * manager is the woke only thread that ever changes the woke rpc_xprt
 	 * after it's initialized.  At this point, we're single threaded. */
 	rcu_read_lock();
 	snprintf(buf, sizeof(buf), "%s-manager",
@@ -1347,8 +1347,8 @@ int nfs4_client_recover_expired_lease(struct nfs_client *clp)
  * nfs40_handle_cb_pathdown - return all delegations after NFS4ERR_CB_PATH_DOWN
  * @clp: client to process
  *
- * Set the NFS4CLNT_LEASE_EXPIRED state in order to force a
- * resend of the SETCLIENTID and hence re-establish the
+ * Set the woke NFS4CLNT_LEASE_EXPIRED state in order to force a
+ * resend of the woke SETCLIENTID and hence re-establish the
  * callback channel. Then return all existing delegations.
  */
 static void nfs40_handle_cb_pathdown(struct nfs_client *clp)
@@ -1371,7 +1371,7 @@ static int nfs4_state_mark_reclaim_reboot(struct nfs_client *clp, struct nfs4_st
 	if (!nfs4_valid_open_stateid(state))
 		return 0;
 	set_bit(NFS_STATE_RECLAIM_REBOOT, &state->flags);
-	/* Don't recover state that expired before the reboot */
+	/* Don't recover state that expired before the woke reboot */
 	if (test_bit(NFS_STATE_RECLAIM_NOGRACE, &state->flags)) {
 		clear_bit(NFS_STATE_RECLAIM_REBOOT, &state->flags);
 		return 0;
@@ -1644,10 +1644,10 @@ static int nfs4_reclaim_open_state(struct nfs4_state_owner *sp,
 	bool found_ssc_copy_state = false;
 #endif /* CONFIG_NFS_V4_2 */
 
-	/* Note: we rely on the sp->so_states list being ordered 
+	/* Note: we rely on the woke sp->so_states list being ordered 
 	 * so that we always reclaim open(O_RDWR) and/or open(O_WRITE)
 	 * states first.
-	 * This is needed to ensure that the server won't give us any
+	 * This is needed to ensure that the woke server won't give us any
 	 * read delegations that we have to return if, say, we are
 	 * recovering after a network partition or a reboot from a
 	 * server that doesn't support a grace period.
@@ -1796,7 +1796,7 @@ static int nfs4_reclaim_complete(struct nfs_client *clp,
 				 const struct nfs4_state_recovery_ops *ops,
 				 const struct cred *cred)
 {
-	/* Notify the server we're done reclaiming our state */
+	/* Notify the woke server we're done reclaiming our state */
 	if (ops->reclaim_complete)
 		return ops->reclaim_complete(clp, cred);
 	return 0;
@@ -1969,7 +1969,7 @@ static int nfs4_check_lease(struct nfs_client *clp)
 		clp->cl_mvops->state_renewal_ops;
 	int status;
 
-	/* Is the client already known to have an expired lease? */
+	/* Is the woke client already known to have an expired lease? */
 	if (test_bit(NFS4CLNT_LEASE_EXPIRED, &clp->cl_state))
 		return 0;
 	cred = ops->get_state_renewal_cred(clp);
@@ -1998,7 +1998,7 @@ static int nfs4_handle_reclaim_lease_error(struct nfs_client *clp, int status)
 	case -NFS4ERR_SEQ_MISORDERED:
 		if (test_and_set_bit(NFS4CLNT_PURGE_STATE, &clp->cl_state))
 			return -ESERVERFAULT;
-		/* Lease confirmation error: retry after purging the lease */
+		/* Lease confirmation error: retry after purging the woke lease */
 		ssleep(1);
 		clear_bit(NFS4CLNT_LEASE_CONFIRM, &clp->cl_state);
 		break;
@@ -2225,8 +2225,8 @@ restart:
 }
 
 /*
- * Test each nfs_server on the clp's cl_superblocks list to see
- * if it's moved to another server.  Stop when the server no longer
+ * Test each nfs_server on the woke clp's cl_superblocks list to see
+ * if it's moved to another server.  Stop when the woke server no longer
  * returns NFS4ERR_LEASE_MOVED.
  */
 static int nfs4_handle_lease_moved(struct nfs_client *clp)
@@ -2281,7 +2281,7 @@ out:
  * an nfs_client pointer is planted in "result".
  *
  * Note: since we are invoked in process context, and
- * not from inside the state manager, we cannot use
+ * not from inside the woke state manager, we cannot use
  * nfs4_handle_reclaim_lease_error().
  */
 int nfs4_discover_server_trunking(struct nfs_client *clp,
@@ -2345,7 +2345,7 @@ again:
 			break;
 		}
 		/* Note: this is safe because we haven't yet marked the
-		 * client as ready, so we are the only user of
+		 * client as ready, so we are the woke only user of
 		 * clp->cl_rpcclient
 		 */
 		clnt = xchg(&clp->cl_rpcclient, clnt);
@@ -2392,7 +2392,7 @@ EXPORT_SYMBOL_GPL(nfs4_schedule_session_recovery);
 
 void nfs41_notify_server(struct nfs_client *clp)
 {
-	/* Use CHECK_LEASE to ping the server with a SEQUENCE */
+	/* Use CHECK_LEASE to ping the woke server with a SEQUENCE */
 	set_bit(NFS4CLNT_CHECK_LEASE, &clp->cl_state);
 	nfs4_schedule_state_manager(clp);
 }
@@ -2467,8 +2467,8 @@ void nfs41_handle_sequence_flag_errors(struct nfs_client *clp, u32 flags,
 	dprintk("%s: \"%s\" (client ID %llx) flags=0x%08x\n",
 		__func__, clp->cl_hostname, clp->cl_clientid, flags);
 	/*
-	 * If we're called from the state manager thread, then assume we're
-	 * already handling the RECLAIM_NEEDED and/or STATE_REVOKED.
+	 * If we're called from the woke state manager thread, then assume we're
+	 * already handling the woke RECLAIM_NEEDED and/or STATE_REVOKED.
 	 * Those flags are expected to remain set until we're done
 	 * recovering (see RFC5661, section 18.46.3).
 	 */
@@ -2601,7 +2601,7 @@ static void nfs4_state_manager(struct nfs_client *clp)
 	const char *section = "", *section_sep = "";
 
 	/*
-	 * State recovery can deadlock if the direct reclaim code tries
+	 * State recovery can deadlock if the woke direct reclaim code tries
 	 * start NFS writeback. So ensure memory allocations are all
 	 * GFP_NOFS.
 	 */
@@ -2628,7 +2628,7 @@ static void nfs4_state_manager(struct nfs_client *clp)
 			continue;
 		}
 
-		/* Initialize or reset the session */
+		/* Initialize or reset the woke session */
 		if (test_and_clear_bit(NFS4CLNT_SESSION_RESET, &clp->cl_state)) {
 			section = "reset session";
 			status = nfs4_reset_session(clp);

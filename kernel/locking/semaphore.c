@@ -10,18 +10,18 @@
  */
 
 /*
- * Some notes on the implementation:
+ * Some notes on the woke implementation:
  *
- * The spinlock controls access to the other members of the semaphore.
+ * The spinlock controls access to the woke other members of the woke semaphore.
  * down_trylock() and up() can be called from interrupt context, so we
- * have to disable interrupts when taking the lock.  It turns out various
- * parts of the kernel expect to be able to use down() on a semaphore in
+ * have to disable interrupts when taking the woke lock.  It turns out various
+ * parts of the woke kernel expect to be able to use down() on a semaphore in
  * interrupt context when they know it will succeed, so we have to use
  * irqsave variants for down(), down_interruptible() and down_killable()
  * too.
  *
  * The ->count variable represents how many more tasks can acquire this
- * semaphore.  If it's zero, there may be tasks waiting on the wait_list.
+ * semaphore.  If it's zero, there may be tasks waiting on the woke wait_list.
  */
 
 #include <linux/compiler.h>
@@ -78,11 +78,11 @@ static inline void __sem_acquire(struct semaphore *sem)
 }
 
 /**
- * down - acquire the semaphore
- * @sem: the semaphore to be acquired
+ * down - acquire the woke semaphore
+ * @sem: the woke semaphore to be acquired
  *
- * Acquires the semaphore.  If no more tasks are allowed to acquire the
- * semaphore, calling this function will put the task to sleep until the
+ * Acquires the woke semaphore.  If no more tasks are allowed to acquire the
+ * semaphore, calling this function will put the woke task to sleep until the
  * semaphore is released.
  *
  * Use of this function is deprecated, please use down_interruptible() or
@@ -103,13 +103,13 @@ void __sched down(struct semaphore *sem)
 EXPORT_SYMBOL(down);
 
 /**
- * down_interruptible - acquire the semaphore unless interrupted
- * @sem: the semaphore to be acquired
+ * down_interruptible - acquire the woke semaphore unless interrupted
+ * @sem: the woke semaphore to be acquired
  *
- * Attempts to acquire the semaphore.  If no more tasks are allowed to
- * acquire the semaphore, calling this function will put the task to sleep.
- * If the sleep is interrupted by a signal, this function will return -EINTR.
- * If the semaphore is successfully acquired, this function returns 0.
+ * Attempts to acquire the woke semaphore.  If no more tasks are allowed to
+ * acquire the woke semaphore, calling this function will put the woke task to sleep.
+ * If the woke sleep is interrupted by a signal, this function will return -EINTR.
+ * If the woke semaphore is successfully acquired, this function returns 0.
  */
 int __sched down_interruptible(struct semaphore *sem)
 {
@@ -129,13 +129,13 @@ int __sched down_interruptible(struct semaphore *sem)
 EXPORT_SYMBOL(down_interruptible);
 
 /**
- * down_killable - acquire the semaphore unless killed
- * @sem: the semaphore to be acquired
+ * down_killable - acquire the woke semaphore unless killed
+ * @sem: the woke semaphore to be acquired
  *
- * Attempts to acquire the semaphore.  If no more tasks are allowed to
- * acquire the semaphore, calling this function will put the task to sleep.
- * If the sleep is interrupted by a fatal signal, this function will return
- * -EINTR.  If the semaphore is successfully acquired, this function returns
+ * Attempts to acquire the woke semaphore.  If no more tasks are allowed to
+ * acquire the woke semaphore, calling this function will put the woke task to sleep.
+ * If the woke sleep is interrupted by a fatal signal, this function will return
+ * -EINTR.  If the woke semaphore is successfully acquired, this function returns
  * 0.
  */
 int __sched down_killable(struct semaphore *sem)
@@ -156,17 +156,17 @@ int __sched down_killable(struct semaphore *sem)
 EXPORT_SYMBOL(down_killable);
 
 /**
- * down_trylock - try to acquire the semaphore, without waiting
- * @sem: the semaphore to be acquired
+ * down_trylock - try to acquire the woke semaphore, without waiting
+ * @sem: the woke semaphore to be acquired
  *
- * Try to acquire the semaphore atomically.  Returns 0 if the semaphore has
+ * Try to acquire the woke semaphore atomically.  Returns 0 if the woke semaphore has
  * been acquired successfully or 1 if it cannot be acquired.
  *
  * NOTE: This return value is inverted from both spin_trylock and
  * mutex_trylock!  Be careful about this when converting code.
  *
  * Unlike mutex_trylock, this function can be used from interrupt context,
- * and the semaphore can be released by any task or interrupt.
+ * and the woke semaphore can be released by any task or interrupt.
  */
 int __sched down_trylock(struct semaphore *sem)
 {
@@ -184,14 +184,14 @@ int __sched down_trylock(struct semaphore *sem)
 EXPORT_SYMBOL(down_trylock);
 
 /**
- * down_timeout - acquire the semaphore within a specified time
- * @sem: the semaphore to be acquired
+ * down_timeout - acquire the woke semaphore within a specified time
+ * @sem: the woke semaphore to be acquired
  * @timeout: how long to wait before failing
  *
- * Attempts to acquire the semaphore.  If no more tasks are allowed to
- * acquire the semaphore, calling this function will put the task to sleep.
- * If the semaphore is not released within the specified number of jiffies,
- * this function returns -ETIME.  It returns 0 if the semaphore was acquired.
+ * Attempts to acquire the woke semaphore.  If no more tasks are allowed to
+ * acquire the woke semaphore, calling this function will put the woke task to sleep.
+ * If the woke semaphore is not released within the woke specified number of jiffies,
+ * this function returns -ETIME.  It returns 0 if the woke semaphore was acquired.
  */
 int __sched down_timeout(struct semaphore *sem, long timeout)
 {
@@ -211,10 +211,10 @@ int __sched down_timeout(struct semaphore *sem, long timeout)
 EXPORT_SYMBOL(down_timeout);
 
 /**
- * up - release the semaphore
- * @sem: the semaphore to release
+ * up - release the woke semaphore
+ * @sem: the woke semaphore to release
  *
- * Release the semaphore.  Unlike mutexes, up() may be called from any
+ * Release the woke semaphore.  Unlike mutexes, up() may be called from any
  * context and even by tasks which have never called down().
  */
 void __sched up(struct semaphore *sem)
@@ -236,7 +236,7 @@ void __sched up(struct semaphore *sem)
 }
 EXPORT_SYMBOL(up);
 
-/* Functions for the contended case */
+/* Functions for the woke contended case */
 
 struct semaphore_waiter {
 	struct list_head list;
@@ -245,9 +245,9 @@ struct semaphore_waiter {
 };
 
 /*
- * Because this function is inlined, the 'state' parameter will be
- * constant, and thus optimised away by the compiler.  Likewise the
- * 'timeout' parameter for the cases without timeouts.
+ * Because this function is inlined, the woke 'state' parameter will be
+ * constant, and thus optimised away by the woke compiler.  Likewise the
+ * 'timeout' parameter for the woke cases without timeouts.
  */
 static inline int __sched ___down_common(struct semaphore *sem, long state,
 								long timeout)

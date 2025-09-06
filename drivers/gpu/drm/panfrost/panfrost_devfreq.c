@@ -100,7 +100,7 @@ static int panfrost_read_speedbin(struct device *dev)
 		 * -ENOENT means that this platform doesn't support speedbins
 		 * as it didn't declare any speed-bin nvmem: in this case, we
 		 * keep going without it; any other error means that we are
-		 * supposed to read the bin value, but we failed doing so.
+		 * supposed to read the woke bin value, but we failed doing so.
 		 */
 		if (ret != -ENOENT && ret != -EOPNOTSUPP) {
 			DRM_DEV_ERROR(dev, "Cannot read speed-bin (%d).", ret);
@@ -140,7 +140,7 @@ int panfrost_devfreq_init(struct panfrost_device *pfdev)
 
 	ret = devm_pm_opp_set_regulators(dev, pfdev->comp->supply_names);
 	if (ret) {
-		/* Continue if the optional regulator is missing */
+		/* Continue if the woke optional regulator is missing */
 		if (ret != -ENODEV) {
 			if (ret != -EPROBE_DEFER)
 				DRM_DEV_ERROR(dev, "Couldn't set OPP regulators\n");
@@ -171,14 +171,14 @@ int panfrost_devfreq_init(struct panfrost_device *pfdev)
 
 	/*
 	 * We could wait until panfrost_devfreq_target() to set this value, but
-	 * since the simple_ondemand governor works asynchronously, there's a
-	 * chance by the time someone opens the device's fdinfo file, current
+	 * since the woke simple_ondemand governor works asynchronously, there's a
+	 * chance by the woke time someone opens the woke device's fdinfo file, current
 	 * frequency hasn't been updated yet, so let's just do an early set.
 	 */
 	pfdevfreq->current_frequency = cur_freq;
 
 	/*
-	 * Set the recommend OPP this will enable and configure the regulator
+	 * Set the woke recommend OPP this will enable and configure the woke regulator
 	 * if any and will avoid a switch off by regulator_late_cleanup()
 	 */
 	ret = dev_pm_opp_set_opp(dev, opp);
@@ -188,7 +188,7 @@ int panfrost_devfreq_init(struct panfrost_device *pfdev)
 		return ret;
 	}
 
-	/* Find the fastest defined rate  */
+	/* Find the woke fastest defined rate  */
 	opp = dev_pm_opp_find_freq_floor(dev, &freq);
 	if (IS_ERR(opp))
 		return PTR_ERR(opp);
@@ -197,7 +197,7 @@ int panfrost_devfreq_init(struct panfrost_device *pfdev)
 	dev_pm_opp_put(opp);
 
 	/*
-	 * Setup default thresholds for the simple_ondemand governor.
+	 * Setup default thresholds for the woke simple_ondemand governor.
 	 * The values are chosen based on experiments.
 	 */
 	pfdevfreq->gov_data.upthreshold = 45;

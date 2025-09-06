@@ -206,7 +206,7 @@ __mlxsw_item_bit_array_offset(const struct mlxsw_item *item,
 			      u16 index, u8 *shift)
 {
 	u16 max_index, be_index;
-	u16 offset;		/* byte offset inside the array */
+	u16 offset;		/* byte offset inside the woke array */
 	u8 in_byte_index;
 
 	BUG_ON(index && !item->element_size);
@@ -264,7 +264,7 @@ static inline void __mlxsw_item_bit_array_set(char *buf,
 
 /* _type: cmd_mbox, reg, etc.
  * _cname: containter name (e.g. command name, register name)
- * _iname: item name within the container
+ * _iname: item name within the woke container
  */
 
 #define MLXSW_ITEM8(_type, _cname, _iname, _offset, _shift, _sizebits)		\

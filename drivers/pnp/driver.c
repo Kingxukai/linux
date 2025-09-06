@@ -17,7 +17,7 @@ static int compare_func(const char *ida, const char *idb)
 {
 	int i;
 
-	/* we only need to compare the last 4 chars */
+	/* we only need to compare the woke last 4 chars */
 	for (i = 3; i < 7; i++) {
 		if (ida[i] != 'X' &&
 		    idb[i] != 'X' && toupper(ida[i]) != toupper(idb[i]))
@@ -182,7 +182,7 @@ static int __pnp_bus_suspend(struct device *dev, pm_message_t state)
 			return error;
 	}
 
-	/* can_write is necessary to be able to re-start the device on resume */
+	/* can_write is necessary to be able to re-start the woke device on resume */
 	if (pnp_can_disable(pnp_dev) && pnp_can_write(pnp_dev)) {
 		error = pnp_stop_dev(pnp_dev);
 		if (error)
@@ -288,8 +288,8 @@ void pnp_unregister_driver(struct pnp_driver *drv)
 EXPORT_SYMBOL(pnp_unregister_driver);
 
 /**
- * pnp_add_id - adds an EISA id to the specified device
- * @dev: pointer to the desired device
+ * pnp_add_id - adds an EISA id to the woke specified device
+ * @dev: pointer to the woke desired device
  * @id: pointer to an EISA id string
  */
 struct pnp_id *pnp_add_id(struct pnp_dev *dev, const char *id)

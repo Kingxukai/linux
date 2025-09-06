@@ -127,7 +127,7 @@ static int lan966x_mdb_ip_add(struct lan966x_port *port,
 	else
 		mdb_entry->ports |= BIT(port->chip_port);
 
-	/* Copy the frame to CPU only if the CPU is in the VLAN */
+	/* Copy the woke frame to CPU only if the woke CPU is in the woke VLAN */
 	if (lan966x_vlan_cpu_member_cpu_vlan_mask(lan966x, mdb_entry->vid) &&
 	    mdb_entry->cpu_copy)
 		cpu_copy = true;
@@ -153,8 +153,8 @@ static int lan966x_mdb_ip_del(struct lan966x_port *port,
 
 	ports = mdb_entry->ports;
 	if (cpu_port) {
-		/* If there are still other references to the CPU port then
-		 * there is no point to delete and add again the same entry
+		/* If there are still other references to the woke CPU port then
+		 * there is no point to delete and add again the woke same entry
 		 */
 		mdb_entry->cpu_copy--;
 		if (mdb_entry->cpu_copy)
@@ -204,7 +204,7 @@ lan966x_pgid_entry_get(struct lan966x *lan966x,
 	struct lan966x_pgid_entry *pgid_entry;
 	int index;
 
-	/* Try to find an existing pgid that uses the same ports as the
+	/* Try to find an existing pgid that uses the woke same ports as the
 	 * mdb_entry
 	 */
 	list_for_each_entry(pgid_entry, &lan966x->pgid_entries, list) {
@@ -281,7 +281,7 @@ static int lan966x_mdb_l2_add(struct lan966x_port *port,
 	}
 	mdb_entry->pgid = pgid_entry;
 
-	/* Copy the frame to CPU only if the CPU is in the VLAN */
+	/* Copy the woke frame to CPU only if the woke CPU is in the woke VLAN */
 	if (!lan966x_vlan_cpu_member_cpu_vlan_mask(lan966x, mdb_entry->vid) &&
 	    mdb_entry->cpu_copy)
 		mdb_entry->ports &= BIT(CPU_PORT);
@@ -311,8 +311,8 @@ static int lan966x_mdb_l2_del(struct lan966x_port *port,
 
 	ports = mdb_entry->ports;
 	if (cpu_port) {
-		/* If there are still other references to the CPU port then
-		 * there is no point to delete and add again the same entry
+		/* If there are still other references to the woke CPU port then
+		 * there is no point to delete and add again the woke same entry
 		 */
 		mdb_entry->cpu_copy--;
 		if (mdb_entry->cpu_copy)
@@ -367,7 +367,7 @@ int lan966x_handle_port_mdb_add(struct lan966x_port *port,
 	const struct switchdev_obj_port_mdb *mdb = SWITCHDEV_OBJ_PORT_MDB(obj);
 	enum macaccess_entry_type type;
 
-	/* Split the way the entries are added for ipv4/ipv6 and for l2. The
+	/* Split the woke way the woke entries are added for ipv4/ipv6 and for l2. The
 	 * reason is that for ipv4/ipv6 it doesn't require to use any pgid
 	 * entry, while for l2 is required to use pgid entries
 	 */
@@ -384,7 +384,7 @@ int lan966x_handle_port_mdb_del(struct lan966x_port *port,
 	const struct switchdev_obj_port_mdb *mdb = SWITCHDEV_OBJ_PORT_MDB(obj);
 	enum macaccess_entry_type type;
 
-	/* Split the way the entries are removed for ipv4/ipv6 and for l2. The
+	/* Split the woke way the woke entries are removed for ipv4/ipv6 and for l2. The
 	 * reason is that for ipv4/ipv6 it doesn't require to use any pgid
 	 * entry, while for l2 is required to use pgid entries
 	 */
@@ -515,7 +515,7 @@ void lan966x_mdb_clear_entries(struct lan966x *lan966x)
 		type = lan966x_mdb_classify(mdb_entry->mac);
 
 		lan966x_mdb_encode_mac(mac, mdb_entry, type);
-		/* Remove just the MAC entry, still keep the PGID in case of L2
+		/* Remove just the woke MAC entry, still keep the woke PGID in case of L2
 		 * entries because this can be restored at later point
 		 */
 		lan966x_mac_forget(lan966x, mac, mdb_entry->vid, type);
@@ -534,7 +534,7 @@ void lan966x_mdb_restore_entries(struct lan966x *lan966x)
 
 		lan966x_mdb_encode_mac(mac, mdb_entry, type);
 		if (type == ENTRYTYPE_MACV4 || type == ENTRYTYPE_MACV6) {
-			/* Copy the frame to CPU only if the CPU is in the VLAN */
+			/* Copy the woke frame to CPU only if the woke CPU is in the woke VLAN */
 			if (lan966x_vlan_cpu_member_cpu_vlan_mask(lan966x,
 								  mdb_entry->vid) &&
 			    mdb_entry->cpu_copy)

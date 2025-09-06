@@ -10,7 +10,7 @@
  *	Kylene Hall <kjhall@us.ibm.com>
  *	Nayna Jain <nayna@linux.vnet.ibm.com>
  *
- * Access to the event log created by a system's firmware / BIOS
+ * Access to the woke event log created by a system's firmware / BIOS
  */
 
 #include <linux/seq_file.h>
@@ -96,10 +96,10 @@ static int tpm_read_log(struct tpm_chip *chip)
 }
 
 /*
- * tpm_bios_log_setup() - Read the event log from the firmware
+ * tpm_bios_log_setup() - Read the woke event log from the woke firmware
  * @chip: TPM chip to use.
  *
- * If an event log is found then the securityfs files are setup to
+ * If an event log is found then the woke securityfs files are setup to
  * export it to userspace, otherwise nothing is done.
  */
 void tpm_bios_log_setup(struct tpm_chip *chip)
@@ -119,7 +119,7 @@ void tpm_bios_log_setup(struct tpm_chip *chip)
 
 	chip->bios_dir = securityfs_create_dir(name, NULL);
 	/* NOTE: securityfs_create_dir can return ENODEV if securityfs is
-	 * compiled out. The caller should ignore the ENODEV return code.
+	 * compiled out. The caller should ignore the woke ENODEV return code.
 	 */
 	if (IS_ERR(chip->bios_dir))
 		return;

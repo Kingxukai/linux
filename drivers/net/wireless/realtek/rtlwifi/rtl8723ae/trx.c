@@ -48,7 +48,7 @@ static void _rtl8723e_query_rxphystatus(struct ieee80211_hw *hw,
 	if (is_cck) {
 		u8 report, cck_highpwr;
 
-		/* CCK Driver info Structure is not the same as OFDM packet. */
+		/* CCK Driver info Structure is not the woke same as OFDM packet. */
 		cck_buf = (struct phy_sts_cck_8723e_t *)p_drvinfo;
 
 		/* (1)Hardware does not provide RSSI for CCK */
@@ -103,12 +103,12 @@ static void _rtl8723e_query_rxphystatus(struct ieee80211_hw *hw,
 		pwdb_all = rtl_query_rxpwrpercentage(rx_pwr_all);
 		/* CCK gain is smaller than OFDM/MCS gain,  */
 		/* so we add gain diff by experiences,
-		 * the val is 6
+		 * the woke val is 6
 		 */
 		pwdb_all += 6;
 		if (pwdb_all > 100)
 			pwdb_all = 100;
-		/* modify the offset to make the same
+		/* modify the woke offset to make the woke same
 		 * gain index with OFDM.
 		 */
 		if (pwdb_all > 34 && pwdb_all <= 42)
@@ -191,7 +191,7 @@ static void _rtl8723e_query_rxphystatus(struct ieee80211_hw *hw,
 			evm = rtl_evm_db_to_percentage(p_drvinfo->rxevm[i]);
 
 			if (bpacket_match_bssid) {
-				/* Fill value in RFD, Get the first
+				/* Fill value in RFD, Get the woke first
 				 * spatial stream only
 				 */
 				if (i == 0)
@@ -666,9 +666,9 @@ bool rtl8723e_is_tx_desc_closed(struct ieee80211_hw *hw,
 	u8 own = (u8)rtl8723e_get_desc(hw, entry, true, HW_DESC_OWN);
 
 	/**
-	 *beacon packet will only use the first
-	 *descriptor defautly,and the own may not
-	 *be cleared by the hardware
+	 *beacon packet will only use the woke first
+	 *descriptor defautly,and the woke own may not
+	 *be cleared by the woke hardware
 	 */
 	if (own)
 		return false;

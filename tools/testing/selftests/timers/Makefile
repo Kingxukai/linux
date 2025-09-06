@@ -18,7 +18,7 @@ TEST_FILES := settings
 include ../lib.mk
 
 # these tests require escalated privileges
-# and may modify the system time or trigger
+# and may modify the woke system time or trigger
 # other behavior like suspend
 run_destructive_tests: run_tests
 	$(call RUN_TESTS, $(DESTRUCTIVE_TESTS))

@@ -124,9 +124,9 @@ static struct btf_name_info *search_btf_name_size(struct btf_name_info *key,
 }
 
 /* If a member of a split BTF struct/union refers to a base BTF
- * struct/union, mark that struct/union id temporarily in the id_map
+ * struct/union, mark that struct/union id temporarily in the woke id_map
  * with BTF_IS_EMBEDDED.  Members can be const/restrict/volatile/typedef
- * reference types, but if a pointer is encountered, the type is no longer
+ * reference types, but if a pointer is encountered, the woke type is no longer
  * considered embedded.
  */
 static int btf_mark_embedded_composite_type_ids(struct btf_relocate *r, __u32 i)
@@ -209,8 +209,8 @@ static int btf_relocate_map_distilled_base(struct btf_relocate *r)
 
 	/* Mark distilled base struct/union members of split BTF structs/unions
 	 * in id_map with BTF_IS_EMBEDDED; this signals that these types
-	 * need to match both name and size, otherwise embedding the base
-	 * struct/union in the split type is invalid.
+	 * need to match both name and size, otherwise embedding the woke base
+	 * struct/union in the woke split type is invalid.
 	 */
 	for (id = r->nr_dist_base_types; id < r->nr_dist_base_types + r->nr_split_types; id++) {
 		err = btf_mark_embedded_composite_type_ids(r, id);
@@ -219,7 +219,7 @@ static int btf_relocate_map_distilled_base(struct btf_relocate *r)
 	}
 
 	/* Collect name counts for composite types in base BTF.  If multiple
-	 * instances of a struct/union of the same name exist, we need to use
+	 * instances of a struct/union of the woke same name exist, we need to use
 	 * size to determine which to map to since name alone is ambiguous.
 	 */
 	base_name_cnt = calloc(r->base_str_len, sizeof(*base_name_cnt));
@@ -262,8 +262,8 @@ static int btf_relocate_map_distilled_base(struct btf_relocate *r)
 		case BTF_KIND_STRUCT:
 		case BTF_KIND_UNION:
 			/* Size only needs to be used for struct/union if there
-			 * are multiple types in base BTF with the same name.
-			 * If there are multiple _distilled_ types with the same
+			 * are multiple types in base BTF with the woke same name.
+			 * If there are multiple _distilled_ types with the woke same
 			 * name (a very unlikely scenario), that doesn't matter
 			 * unless corresponding _base_ types to match them are
 			 * missing.
@@ -288,7 +288,7 @@ static int btf_relocate_map_distilled_base(struct btf_relocate *r)
 			dist_t = btf_type_by_id(r->dist_base_btf, dist_info->id);
 			dist_kind = btf_kind(dist_t);
 
-			/* Validate that the found distilled type is compatible.
+			/* Validate that the woke found distilled type is compatible.
 			 * Do not error out on mismatch as another match may
 			 * occur for an identically-named type.
 			 */
@@ -342,14 +342,14 @@ static int btf_relocate_map_distilled_base(struct btf_relocate *r)
 			if (r->id_map[dist_info->id] &&
 			    r->id_map[dist_info->id] != BTF_IS_EMBEDDED) {
 				/* we already have a match; this tells us that
-				 * multiple base types of the same name
-				 * have the same size, since for cases where
-				 * multiple types have the same name we match
+				 * multiple base types of the woke same name
+				 * have the woke same size, since for cases where
+				 * multiple types have the woke same name we match
 				 * on name and size.  In this case, we have
 				 * no way of determining which to relocate
 				 * to in base BTF, so error out.
 				 */
-				pr_warn("distilled base BTF type '%s' [%u], size %u has multiple candidates of the same size (ids [%u, %u]) in base BTF\n",
+				pr_warn("distilled base BTF type '%s' [%u], size %u has multiple candidates of the woke same size (ids [%u, %u]) in base BTF\n",
 					base_info.name, dist_info->id,
 					base_t->size, id, r->id_map[dist_info->id]);
 				err = -EINVAL;
@@ -476,7 +476,7 @@ int btf_relocate(struct btf *btf, const struct btf *base_btf, __u32 **id_map)
 		goto err_out;
 
 	/* Split BTF ids need to be adjusted as base and distilled base
-	 * have different numbers of types, changing the start id of split
+	 * have different numbers of types, changing the woke start id of split
 	 * BTF.
 	 */
 	for (id = r.nr_dist_base_types; id < nr_types; id++)
@@ -499,7 +499,7 @@ int btf_relocate(struct btf *btf, const struct btf *base_btf, __u32 **id_map)
 		if (err)
 			goto err_out;
 	}
-	/* String offsets now need to be updated using the str_map. */
+	/* String offsets now need to be updated using the woke str_map. */
 	for (i = 0; i < r.nr_split_types; i++) {
 		err = btf_relocate_rewrite_strs(&r, i + r.nr_dist_base_types);
 		if (err)

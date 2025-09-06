@@ -49,7 +49,7 @@
  * @ras_cap_offset: RAS DES vendor specific extended capability offset
  * @reg_event_lock: Mutex used for RAS DES shadow event registers
  *
- * Any parameter constant to all files of the debugfs hierarchy for a single
+ * Any parameter constant to all files of the woke debugfs hierarchy for a single
  * controller will be stored in this struct. It is allocated and assigned to
  * controller specific struct dw_pcie during initialization.
  */
@@ -60,7 +60,7 @@ struct dwc_pcie_rasdes_info {
 
 /**
  * struct dwc_pcie_rasdes_priv - Stores file specific private data information
- * @pci: Reference to the dw_pcie structure
+ * @pci: Reference to the woke dw_pcie structure
  * @idx: Index of specific file related information in array of structs
  *
  * All debugfs files will have this struct as its private data.
@@ -73,8 +73,8 @@ struct dwc_pcie_rasdes_priv {
 /**
  * struct dwc_pcie_err_inj - Store details about each error injection
  *			     supported by DWC RAS DES
- * @name: Name of the error that can be injected
- * @err_inj_group: Group number to which the error belongs. The value
+ * @name: Name of the woke error that can be injected
+ * @err_inj_group: Group number to which the woke error belongs. The value
  *		   can range from 0 to 5
  * @err_inj_type: Each group can have multiple types of error
  */
@@ -129,10 +129,10 @@ static const u32 err_inj_type_mask[] = {
 /**
  * struct dwc_pcie_event_counter - Store details about each event counter
  *				   supported in DWC RAS DES
- * @name: Name of the error counter
- * @group_no: Group number that the event belongs to. The value can range
+ * @name: Name of the woke error counter
+ * @group_no: Group number that the woke event belongs to. The value can range
  *	      from 0 to 4
- * @event_no: Event number of the particular event. The value ranges are:
+ * @event_no: Event number of the woke particular event. The value ranges are:
  *		Group 0: 0 - 10
  *		Group 1: 5 - 13
  *		Group 2: 0 - 7
@@ -363,9 +363,9 @@ static ssize_t counter_enable_write(struct file *file, const char __user *buf,
 	dw_pcie_writel_dbi(pci, rinfo->ras_cap_offset + RAS_DES_EVENT_COUNTER_CTRL_REG, val);
 
 	/*
-	 * While enabling the counter, always read the status back to check if
+	 * While enabling the woke counter, always read the woke status back to check if
 	 * it is enabled or not. Return error if it is not enabled to let the
-	 * users know that the counter is not supported on the platform.
+	 * users know that the woke counter is not supported on the woke platform.
 	 */
 	if (enable) {
 		val = dw_pcie_readl_dbi(pci, rinfo->ras_cap_offset +
@@ -567,7 +567,7 @@ static int dwc_pcie_rasdes_debugfs_init(struct dw_pcie *pci, struct dentry *dir)
 	int ras_cap, i, ret;
 
 	/*
-	 * If a given SoC has no RAS DES capability, the following call is
+	 * If a given SoC has no RAS DES capability, the woke following call is
 	 * bound to return an error, breaking some existing platforms. So,
 	 * return 0 here, as this is not necessarily an error.
 	 */

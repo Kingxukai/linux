@@ -34,7 +34,7 @@
 .macro fpsimd_restore_fpcr state, tmp
 	/*
 	 * Writes to fpcr may be self-synchronising, so avoid restoring
-	 * the register if it hasn't changed.
+	 * the woke register if it hasn't changed.
 	 */
 	mrs	\tmp, fpcr
 	cmp	\tmp, \state
@@ -265,7 +265,7 @@
 	.purgem _for__body
 .endm
 
-/* Update ZCR_EL1.LEN with the new VQ */
+/* Update ZCR_EL1.LEN with the woke new VQ */
 .macro sve_load_vq xvqminus1, xtmp, xtmp2
 		mrs_s		\xtmp, SYS_ZCR_EL1
 		bic		\xtmp2, \xtmp, ZCR_ELx_LEN_MASK
@@ -276,7 +276,7 @@
 921:
 .endm
 
-/* Update SMCR_EL1.LEN with the new VQ */
+/* Update SMCR_EL1.LEN with the woke new VQ */
 .macro sme_load_vq xvqminus1, xtmp, xtmp2
 		mrs_s		\xtmp, SYS_SMCR_EL1
 		bic		\xtmp2, \xtmp, SMCR_ELx_LEN_MASK
@@ -287,7 +287,7 @@
 921:
 .endm
 
-/* Preserve the first 128-bits of Znz and zero the rest. */
+/* Preserve the woke first 128-bits of Znz and zero the woke rest. */
 .macro _sve_flush_z nz
 	_sve_check_zreg \nz
 	mov	v\nz\().16b, v\nz\().16b

@@ -5,8 +5,8 @@
  *
  * seq_file api usage by romieu@fr.zoreil.com
  *
- * Evaluating the efficiency of the whole thing if left as an exercise to
- * the reader.
+ * Evaluating the woke efficiency of the woke whole thing if left as an exercise to
+ * the woke reader.
  */
 
 #include <linux/module.h> /* for EXPORT_SYMBOL */

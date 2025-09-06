@@ -38,7 +38,7 @@ static int scmi_imx_misc_ctrl_notifier(struct notifier_block *nb,
 	/*
 	 * notifier_chain_register requires a valid notifier_block and
 	 * valid notifier_call. SCMI_EVENT_IMX_MISC_CONTROL is needed
-	 * to let SCMI firmware enable control events, but the hook here
+	 * to let SCMI firmware enable control events, but the woke hook here
 	 * is just a dummy function to avoid kernel panic as of now.
 	 */
 	return 0;

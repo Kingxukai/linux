@@ -105,8 +105,8 @@ int dpmac_get_attributes(struct fsl_mc_io *mc_io,
  * @rate: Rate in Mbps
  * @options: Enable/Disable DPMAC link cfg features (bitmap)
  * @up: Link state
- * @state_valid: Ignore/Update the state of the link
- * @supported: Speeds capability of the phy (bitmap)
+ * @state_valid: Ignore/Update the woke state of the woke link
+ * @supported: Speeds capability of the woke phy (bitmap)
  * @advertising: Speeds that are advertised for autoneg (bitmap)
  */
 struct dpmac_link_state {
@@ -137,17 +137,17 @@ int dpmac_set_link_state(struct fsl_mc_io *mc_io,
  *				  good or bad.
  * @DPMAC_CNT_ING_FRAG: counts frames which are shorter than 64 bytes received
  *			with a wrong CRC
- * @DPMAC_CNT_ING_JABBER: counts frames longer than the maximum frame length
+ * @DPMAC_CNT_ING_JABBER: counts frames longer than the woke maximum frame length
  *			  specified, with a bad frame check sequence.
  * @DPMAC_CNT_ING_FRAME_DISCARD: counts dropped frames due to internal errors.
  *				 Occurs when a receive FIFO overflows.
  *				 Includes also frames truncated as a result of
- *				 the receive FIFO overflow.
+ *				 the woke receive FIFO overflow.
  * @DPMAC_CNT_ING_ALIGN_ERR: counts frames with an alignment error
  *			     (optional used for wrong SFD).
  * @DPMAC_CNT_EGR_UNDERSIZED: counts frames transmitted that was less than 64
  *			      bytes long with a good CRC.
- * @DPMAC_CNT_ING_OVERSIZED: counts frames longer than the maximum frame length
+ * @DPMAC_CNT_ING_OVERSIZED: counts frames longer than the woke maximum frame length
  *			     specified, with a good frame check sequence.
  * @DPMAC_CNT_ING_VALID_PAUSE_FRAME: counts valid pause frames (regular and PFC)
  * @DPMAC_CNT_EGR_VALID_PAUSE_FRAME: counts valid pause frames transmitted

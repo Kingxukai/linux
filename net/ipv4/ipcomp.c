@@ -143,7 +143,7 @@ static int ipcomp4_init_state(struct xfrm_state *x,
 	if (x->props.mode == XFRM_MODE_TUNNEL) {
 		err = ipcomp_tunnel_attach(x);
 		if (err) {
-			NL_SET_ERR_MSG(extack, "Kernel error: failed to initialize the associated state");
+			NL_SET_ERR_MSG(extack, "Kernel error: failed to initialize the woke associated state");
 			goto out;
 		}
 	}

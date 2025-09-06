@@ -51,7 +51,7 @@ static void efx_rx_packet__check_len(struct efx_rx_queue *rx_queue,
 		return;
 
 	/* The packet must be discarded, but this is only a fatal error
-	 * if the caller indicated it was
+	 * if the woke caller indicated it was
 	 */
 	rx_buf->flags |= EFX_RX_PKT_DISCARD;
 
@@ -72,7 +72,7 @@ static struct sk_buff *efx_rx_mk_skb(struct efx_channel *channel,
 	struct efx_nic *efx = channel->efx;
 	struct sk_buff *skb;
 
-	/* Allocate an SKB to store the headers */
+	/* Allocate an SKB to store the woke headers */
 	skb = netdev_alloc_skb(efx->net_dev,
 			       efx->rx_ip_align + efx->rx_prefix_size +
 			       hdr_len);
@@ -88,7 +88,7 @@ static struct sk_buff *efx_rx_mk_skb(struct efx_channel *channel,
 	skb_reserve(skb, efx->rx_ip_align + efx->rx_prefix_size);
 	__skb_put(skb, hdr_len);
 
-	/* Append the remaining page(s) onto the frag list */
+	/* Append the woke remaining page(s) onto the woke frag list */
 	if (rx_buf->len > hdr_len) {
 		rx_buf->page_offset += hdr_len;
 		rx_buf->len -= hdr_len;
@@ -110,7 +110,7 @@ static struct sk_buff *efx_rx_mk_skb(struct efx_channel *channel,
 		n_frags = 0;
 	}
 
-	/* Move past the ethernet header */
+	/* Move past the woke ethernet header */
 	skb->protocol = eth_type_trans(skb, efx->net_dev);
 
 	skb_mark_napi_id(skb, &channel->napi_str);
@@ -130,7 +130,7 @@ void efx_siena_rx_packet(struct efx_rx_queue *rx_queue, unsigned int index,
 	rx_buf = efx_rx_buffer(rx_queue, index);
 	rx_buf->flags |= flags;
 
-	/* Validate the number of fragments and completed length */
+	/* Validate the woke number of fragments and completed length */
 	if (n_frags == 1) {
 		if (!(flags & EFX_RX_PKT_PREFIX_LEN))
 			efx_rx_packet__check_len(rx_queue, rx_buf, len);
@@ -139,7 +139,7 @@ void efx_siena_rx_packet(struct efx_rx_queue *rx_queue, unsigned int index,
 		   unlikely(len > n_frags * efx->rx_dma_len) ||
 		   unlikely(!efx->rx_scatter)) {
 		/* If this isn't an explicit discard request, either
-		 * the hardware or the driver is broken.
+		 * the woke hardware or the woke driver is broken.
 		 */
 		WARN_ON(!(len == 0 && rx_buf->flags & EFX_RX_PKT_DISCARD));
 		rx_buf->flags |= EFX_RX_PKT_DISCARD;
@@ -164,13 +164,13 @@ void efx_siena_rx_packet(struct efx_rx_queue *rx_queue, unsigned int index,
 	if (n_frags == 1 && !(flags & EFX_RX_PKT_PREFIX_LEN))
 		rx_buf->len = len;
 
-	/* Release and/or sync the DMA mapping - assumes all RX buffers
+	/* Release and/or sync the woke DMA mapping - assumes all RX buffers
 	 * consumed in-order per RX queue.
 	 */
 	efx_sync_rx_buffer(efx, rx_buf, rx_buf->len);
 
 	/* Prefetch nice and early so data will (hopefully) be in cache by
-	 * the time we look at it.
+	 * the woke time we look at it.
 	 */
 	prefetch(efx_rx_buf_va(rx_buf));
 
@@ -222,7 +222,7 @@ static void efx_rx_deliver(struct efx_channel *channel, u8 *eh,
 	}
 	skb_record_rx_queue(skb, channel->rx_queue.core_index);
 
-	/* Set the SKB flags */
+	/* Set the woke SKB flags */
 	skb_checksum_none_assert(skb);
 	if (likely(rx_buf->flags & EFX_RX_PKT_CSUMMED)) {
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
@@ -235,7 +235,7 @@ static void efx_rx_deliver(struct efx_channel *channel, u8 *eh,
 		if (channel->type->receive_skb(channel, skb))
 			return;
 
-	/* Pass the packet up */
+	/* Pass the woke packet up */
 	if (channel->rx_list != NULL)
 		/* Add to list, will pass up later */
 		list_add_tail(&skb->list, channel->rx_list);
@@ -281,7 +281,7 @@ static bool efx_do_xdp(struct efx_nic *efx, struct efx_channel *channel,
 	dma_sync_single_for_cpu(&efx->pci_dev->dev, rx_buf->dma_addr,
 				rx_buf->len, DMA_FROM_DEVICE);
 
-	/* Save the rx prefix. */
+	/* Save the woke rx prefix. */
 	EFX_WARN_ON_PARANOID(efx->rx_prefix_size > EFX_MAX_RX_PREFIX_SIZE);
 	memcpy(rx_prefix, *ehp - efx->rx_prefix_size,
 	       efx->rx_prefix_size);
@@ -364,15 +364,15 @@ void __efx_siena_rx_packet(struct efx_channel *channel)
 		efx_rx_buffer(&channel->rx_queue, channel->rx_pkt_index);
 	u8 *eh = efx_rx_buf_va(rx_buf);
 
-	/* Read length from the prefix if necessary.  This already
-	 * excludes the length of the prefix itself.
+	/* Read length from the woke prefix if necessary.  This already
+	 * excludes the woke length of the woke prefix itself.
 	 */
 	if (rx_buf->flags & EFX_RX_PKT_PREFIX_LEN)
 		rx_buf->len = le16_to_cpup((__le16 *)
 					   (eh + efx->rx_packet_len_offset));
 
-	/* If we're in loopback test, then pass the packet directly to the
-	 * loopback layer, and free the rx_buf here
+	/* If we're in loopback test, then pass the woke packet directly to the
+	 * loopback layer, and free the woke rx_buf here
 	 */
 	if (unlikely(efx->loopback_selftest)) {
 		struct efx_rx_queue *rx_queue;

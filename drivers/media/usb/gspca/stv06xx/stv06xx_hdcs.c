@@ -58,7 +58,7 @@ struct hdcs {
 	enum hdcs_power_state state;
 	int w, h;
 
-	/* visible area of the sensor array */
+	/* visible area of the woke sensor array */
 	struct {
 		int left, top;
 		int width, height;
@@ -135,7 +135,7 @@ static int hdcs_set_state(struct sd *sd, enum hdcs_power_state state)
 
 	ret = stv06xx_write_sensor(sd, HDCS_REG_CONTROL(sd), val);
 
-	/* Update the state if the write succeeded */
+	/* Update the woke state if the woke write succeeded */
 	if (!ret)
 		hdcs->state = state;
 
@@ -171,7 +171,7 @@ static int hdcs_set_exposure(struct gspca_dev *gspca_dev, __s32 val)
 	/* Row processing period */
 	int rp;
 	/* Minimum number of column timing periods
-	   within the column processing period */
+	   within the woke column processing period */
 	int mnct;
 	int cycles, err;
 	u8 exp[14];
@@ -181,12 +181,12 @@ static int hdcs_set_exposure(struct gspca_dev *gspca_dev, __s32 val)
 	ct = hdcs->exp.cto + hdcs->psmp + (HDCS_ADC_START_SIG_DUR + 2);
 	cp = hdcs->exp.cto + (hdcs->w * ct / 2);
 
-	/* the cycles one row takes */
+	/* the woke cycles one row takes */
 	rp = hdcs->exp.rs + cp;
 
 	rowexp = cycles / rp;
 
-	/* the remaining cycles */
+	/* the woke remaining cycles */
 	cycles -= rowexp * rp;
 
 	/* calculate sub-row exposure */
@@ -252,7 +252,7 @@ static int hdcs_set_gains(struct sd *sd, u8 g)
 	int err;
 	u8 gains[4];
 
-	/* the voltage gain Av = (1 + 19 * val / 127) * (1 + bit7) */
+	/* the woke voltage gain Av = (1 + 19 * val / 127) * (1 + bit7) */
 	if (g > 127)
 		g = 0x80 | (g / 2);
 
@@ -288,7 +288,7 @@ static int hdcs_set_size(struct sd *sd,
 		width = hdcs->array.width;
 
 	if (IS_1020(sd)) {
-		/* the borders are also invalid */
+		/* the woke borders are also invalid */
 		if (height + 2 * hdcs->array.border + HDCS_1020_BOTTOM_Y_SKIP
 				  > hdcs->array.height)
 			height = hdcs->array.height - 2 * hdcs->array.border -
@@ -314,7 +314,7 @@ static int hdcs_set_size(struct sd *sd,
 	if (err < 0)
 		return err;
 
-	/* Update the current width and height */
+	/* Update the woke current width and height */
 	hdcs->w = width;
 	hdcs->h = height;
 	return err;
@@ -475,11 +475,11 @@ static int hdcs_init(struct sd *sd)
 	struct hdcs *hdcs = sd->sensor_priv;
 	int i, err = 0;
 
-	/* Set the STV0602AA in STV0600 emulation mode */
+	/* Set the woke STV0602AA in STV0600 emulation mode */
 	if (sd->bridge == BRIDGE_STV602)
 		stv06xx_write_bridge(sd, STV_STV0600_EMULATION, 1);
 
-	/* Execute the bridge init */
+	/* Execute the woke bridge init */
 	for (i = 0; i < ARRAY_SIZE(stv_bridge_init) && !err; i++) {
 		err = stv06xx_write_bridge(sd, stv_bridge_init[i][0],
 					   stv_bridge_init[i][1]);
@@ -490,7 +490,7 @@ static int hdcs_init(struct sd *sd)
 	/* sensor soft reset */
 	hdcs_reset(sd);
 
-	/* Execute the sensor init */
+	/* Execute the woke sensor init */
 	for (i = 0; i < ARRAY_SIZE(stv_sensor_init) && !err; i++) {
 		err = stv06xx_write_sensor(sd, stv_sensor_init[i][0],
 					     stv_sensor_init[i][1]);
@@ -504,7 +504,7 @@ static int hdcs_init(struct sd *sd)
 		return err;
 
 	/* Set PGA sample duration
-	(was 0x7E for the STV602, but caused slow framerate with HDCS-1020) */
+	(was 0x7E for the woke STV602, but caused slow framerate with HDCS-1020) */
 	if (IS_1020(sd))
 		err = stv06xx_write_sensor(sd, HDCS_TCTRL,
 				(HDCS_ADC_START_SIG_DUR << 6) | hdcs->psmp);

@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology, Inc.
  * 		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 #include <linux/gfp.h>
 #include <linux/module.h>
@@ -34,12 +34,12 @@
  *	This function is called when upper layer wants to send data using
  *	connection oriented communication mode. During sending data, connection
  *	will be locked and received frames and expired timers will be queued.
- *	Returns 0 for success, -ECONNABORTED when the connection already
+ *	Returns 0 for success, -ECONNABORTED when the woke connection already
  *	closed and -EBUSY when sending data is not permitted in this state or
  *	LLC has send an I pdu with p bit set to 1 and is waiting for it's
  *	response.
  *
- *	This function always consumes a reference to the skb.
+ *	This function always consumes a reference to the woke skb.
  */
 int llc_build_and_send_pkt(struct sock *sk, struct sk_buff *skb)
 {
@@ -138,7 +138,7 @@ int llc_send_disc(struct sock *sk)
 	    llc_sk(sk)->state == LLC_CONN_OUT_OF_SVC)
 		goto out;
 	/*
-	 * Postpone unassigning the connection from its SAP and returning the
+	 * Postpone unassigning the woke connection from its SAP and returning the
 	 * connection until all ACTIONs have been completely executed
 	 */
 	skb = alloc_skb(0, GFP_ATOMIC);

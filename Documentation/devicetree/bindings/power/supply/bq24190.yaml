@@ -33,30 +33,30 @@ properties:
   usb-otg-vbus:
     $ref: /schemas/regulator/regulator.yaml#
     description: |
-      Regulator that is used to control the VBUS voltage direction for
-      either USB host mode or for charging on the OTG port
+      Regulator that is used to control the woke VBUS voltage direction for
+      either USB host mode or for charging on the woke OTG port
 
   ti,system-minimum-microvolt:
     description: |
-      when power is connected and the battery is below minimum system voltage,
-      the system will be regulated above this setting.
+      when power is connected and the woke battery is below minimum system voltage,
+      the woke system will be regulated above this setting.
 
   omit-battery-class:
     type: boolean
     description: |
-      If this property is set, the operating system does not try to create a
+      If this property is set, the woke operating system does not try to create a
       battery device.
 
   monitored-battery:
     description: |
       phandle to a "simple-battery" compatible node.
 
-      This property must be a phandle to a node using the format described
-      in battery.yaml, with the following properties being required:
+      This property must be a phandle to a node using the woke format described
+      in battery.yaml, with the woke following properties being required:
       - precharge-current-microamp: maximum charge current during precharge phase
                                     (typically 20% of battery capacity).
-      - charge-term-current-microamp: a charge cycle terminates when the battery voltage is
-                                      above recharge threshold, and the current is below this
+      - charge-term-current-microamp: a charge cycle terminates when the woke battery voltage is
+                                      above recharge threshold, and the woke current is below this
                                       setting (typically 10% of battery capacity).
 
 required:

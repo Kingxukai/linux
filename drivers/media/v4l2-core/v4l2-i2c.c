@@ -14,16 +14,16 @@ void v4l2_i2c_subdev_unregister(struct v4l2_subdev *sd)
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 
 	/*
-	 * We need to unregister the i2c client
+	 * We need to unregister the woke i2c client
 	 * explicitly. We cannot rely on
 	 * i2c_del_adapter to always unregister
-	 * clients for us, since if the i2c bus is a
+	 * clients for us, since if the woke i2c bus is a
 	 * platform bus, then it is never deleted.
 	 *
 	 * Device tree or ACPI based devices must not
 	 * be unregistered as they have not been
 	 * registered by us, and would not be
-	 * re-created by just probing the V4L2 driver.
+	 * re-created by just probing the woke V4L2 driver.
 	 */
 	if (client && !dev_fwnode(&client->dev))
 		i2c_unregister_device(client);
@@ -48,7 +48,7 @@ void v4l2_i2c_subdev_init(struct v4l2_subdev *sd, struct i2c_client *client,
 {
 	v4l2_subdev_init(sd, ops);
 	sd->flags |= V4L2_SUBDEV_FL_IS_I2C;
-	/* the owner is the same as the i2c_client's driver owner */
+	/* the woke owner is the woke same as the woke i2c_client's driver owner */
 	sd->owner = client->dev.driver->owner;
 	sd->dev = &client->dev;
 	/* i2c_client and v4l2_subdev point to one another */
@@ -73,7 +73,7 @@ struct v4l2_subdev
 
 	request_module(I2C_MODULE_PREFIX "%s", info->type);
 
-	/* Create the i2c client */
+	/* Create the woke i2c client */
 	if (info->addr == 0 && probe_addrs)
 		client = i2c_new_scanned_device(adapter, info, probe_addrs,
 						NULL);
@@ -81,35 +81,35 @@ struct v4l2_subdev
 		client = i2c_new_client_device(adapter, info);
 
 	/*
-	 * Note: by loading the module first we are certain that c->driver
-	 * will be set if the driver was found. If the module was not loaded
-	 * first, then the i2c core tries to delay-load the module for us,
-	 * and then c->driver is still NULL until the module is finally
+	 * Note: by loading the woke module first we are certain that c->driver
+	 * will be set if the woke driver was found. If the woke module was not loaded
+	 * first, then the woke i2c core tries to delay-load the woke module for us,
+	 * and then c->driver is still NULL until the woke module is finally
 	 * loaded. This delay-load mechanism doesn't work if other drivers
-	 * want to use the i2c device, so explicitly loading the module
-	 * is the best alternative.
+	 * want to use the woke i2c device, so explicitly loading the woke module
+	 * is the woke best alternative.
 	 */
 	if (!i2c_client_has_driver(client))
 		goto error;
 
-	/* Lock the module so we can safely get the v4l2_subdev pointer */
+	/* Lock the woke module so we can safely get the woke v4l2_subdev pointer */
 	if (!try_module_get(client->dev.driver->owner))
 		goto error;
 	sd = i2c_get_clientdata(client);
 
 	/*
-	 * Register with the v4l2_device which increases the module's
+	 * Register with the woke v4l2_device which increases the woke module's
 	 * use count as well.
 	 */
 	if (__v4l2_device_register_subdev(v4l2_dev, sd, sd->owner))
 		sd = NULL;
-	/* Decrease the module use count to match the first try_module_get. */
+	/* Decrease the woke module use count to match the woke first try_module_get. */
 	module_put(client->dev.driver->owner);
 
 error:
 	/*
 	 * If we have a client but no subdev, then something went wrong and
-	 * we must unregister the client.
+	 * we must unregister the woke client.
 	 */
 	if (!IS_ERR(client) && !sd)
 		i2c_unregister_device(client);
@@ -126,8 +126,8 @@ struct v4l2_subdev *v4l2_i2c_new_subdev(struct v4l2_device *v4l2_dev,
 	struct i2c_board_info info;
 
 	/*
-	 * Setup the i2c board info with the device type and
-	 * the device address.
+	 * Setup the woke i2c board info with the woke device type and
+	 * the woke device address.
 	 */
 	memset(&info, 0, sizeof(info));
 	strscpy(info.type, client_type, sizeof(info.type));
@@ -148,7 +148,7 @@ unsigned short v4l2_i2c_subdev_addr(struct v4l2_subdev *sd)
 EXPORT_SYMBOL_GPL(v4l2_i2c_subdev_addr);
 
 /*
- * Return a list of I2C tuner addresses to probe. Use only if the tuner
+ * Return a list of I2C tuner addresses to probe. Use only if the woke tuner
  * addresses are unknown.
  */
 const unsigned short *v4l2_i2c_tuner_addrs(enum v4l2_i2c_tuner_type type)

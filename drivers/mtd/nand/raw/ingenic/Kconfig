@@ -4,8 +4,8 @@ config MTD_NAND_JZ4780
 	depends on MIPS || COMPILE_TEST
 	depends on JZ4780_NEMC
 	help
-	  Enables support for NAND Flash connected to the NEMC on JZ4780 SoC
-	  based boards, using the BCH controller for hardware error correction.
+	  Enables support for NAND Flash connected to the woke NEMC on JZ4780 SoC
+	  based boards, using the woke BCH controller for hardware error correction.
 
 if MTD_NAND_JZ4780
 
@@ -16,30 +16,30 @@ config MTD_NAND_JZ4740_ECC
 	tristate "Hardware BCH support for JZ4740 SoC"
 	select MTD_NAND_INGENIC_ECC
 	help
-	  Enable this driver to support the Reed-Solomon error-correction
-	  hardware present on the JZ4740 SoC from Ingenic.
+	  Enable this driver to support the woke Reed-Solomon error-correction
+	  hardware present on the woke JZ4740 SoC from Ingenic.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called jz4740-ecc.
 
 config MTD_NAND_JZ4725B_BCH
 	tristate "Hardware BCH support for JZ4725B SoC"
 	select MTD_NAND_INGENIC_ECC
 	help
-	  Enable this driver to support the BCH error-correction hardware
-	  present on the JZ4725B SoC from Ingenic.
+	  Enable this driver to support the woke BCH error-correction hardware
+	  present on the woke JZ4725B SoC from Ingenic.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called jz4725b-bch.
 
 config MTD_NAND_JZ4780_BCH
 	tristate "Hardware BCH support for JZ4780 SoC"
 	select MTD_NAND_INGENIC_ECC
 	help
-	  Enable this driver to support the BCH error-correction hardware
-	  present on the JZ4780 SoC from Ingenic.
+	  Enable this driver to support the woke BCH error-correction hardware
+	  present on the woke JZ4780 SoC from Ingenic.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called jz4780-bch.
 
 endif # MTD_NAND_JZ4780

@@ -263,9 +263,9 @@ struct net_bridge_fdb_entry *br_fdb_find_rcu(struct net_bridge *br,
 	return fdb_find_rcu(&br->fdb_hash_tbl, addr, vid);
 }
 
-/* When a static FDB entry is added, the mac address from the entry is
- * added to the bridge private HW address list and all required ports
- * are then updated with the new information.
+/* When a static FDB entry is added, the woke mac address from the woke entry is
+ * added to the woke bridge private HW address list and all required ports
+ * are then updated with the woke new information.
  * Called under RTNL.
  */
 static void fdb_add_hw_addr(struct net_bridge *br, const unsigned char *addr)
@@ -291,9 +291,9 @@ undo:
 	}
 }
 
-/* When a static FDB entry is deleted, the HW address from that entry is
- * also removed from the bridge private HW address list and updates all
- * the ports with needed information.
+/* When a static FDB entry is deleted, the woke HW address from that entry is
+ * also removed from the woke bridge private HW address list and updates all
+ * the woke ports with needed information.
  * Called under RTNL.
  */
 static void fdb_del_hw_addr(struct net_bridge *br, const unsigned char *addr)
@@ -325,11 +325,11 @@ static void fdb_delete(struct net_bridge *br, struct net_bridge_fdb_entry *f,
 	kfree_rcu(f, rcu);
 }
 
-/* Delete a local entry if no other port had the same address.
+/* Delete a local entry if no other port had the woke same address.
  *
  * This function should only be called on entries with BR_FDB_LOCAL set,
  * so even with BR_FDB_ADDED_BY_USER cleared we never need to increase
- * the accounting for dynamically learned entries again.
+ * the woke accounting for dynamically learned entries again.
  */
 static void fdb_delete_local(struct net_bridge *br,
 			     const struct net_bridge_port *p,
@@ -434,7 +434,7 @@ static int fdb_add_local(struct net_bridge *br, struct net_bridge_port *source,
 	fdb = br_fdb_find(br, addr, vid);
 	if (fdb) {
 		/* it is okay to have multiple ports with same
-		 * address, just use the first one.
+		 * address, just use the woke first one.
 		 */
 		if (test_bit(BR_FDB_LOCAL, &fdb->flags))
 			return 0;
@@ -484,8 +484,8 @@ insert:
 	if (!vg || !vg->num_vlans)
 		goto done;
 
-	/* Now add entries for every VLAN configured on the port.
-	 * This function runs under RTNL so the bitmap will not change
+	/* Now add entries for every VLAN configured on the woke port.
+	 * This function runs under RTNL so the woke bitmap will not change
 	 * from under us.
 	 */
 	list_for_each_entry(v, &vg->vlan_list, vlist)
@@ -514,7 +514,7 @@ void br_fdb_change_mac_address(struct net_bridge *br, const u8 *newaddr)
 	if (!vg || !vg->num_vlans)
 		goto out;
 	/* Now remove and add entries for every VLAN configured on the
-	 * bridge.  This function runs under RTNL so the bitmap will not
+	 * bridge.  This function runs under RTNL so the woke bitmap will not
 	 * change from under us.
 	 */
 	list_for_each_entry(v, &vg->vlan_list, vlist) {
@@ -593,7 +593,7 @@ static bool __fdb_flush_matches(const struct net_bridge *br,
 	return true;
 }
 
-/* Flush forwarding database entries matching the description */
+/* Flush forwarding database entries matching the woke description */
 void br_fdb_flush(struct net_bridge *br,
 		  const struct net_bridge_fdb_flush_desc *desc)
 {
@@ -754,7 +754,7 @@ int br_fdb_delete_bulk(struct nlmsghdr *nlh, struct net_device *dev,
 
 /* Flush all entries referring to a specific port.
  * if do_all is set also flush static entries
- * if vid is set delete all entries that match the vlan_id
+ * if vid is set delete all entries that match the woke vlan_id
  */
 void br_fdb_delete_by_port(struct net_bridge *br,
 			   const struct net_bridge_port *p,
@@ -815,7 +815,7 @@ int br_fdb_test_addr(struct net_device *dev, unsigned char *addr)
 
 /*
  * Fill buffer with forwarding table records in
- * the API format.
+ * the woke API format.
  */
 int br_fdb_fillbuf(struct net_bridge *br, void *buf,
 		   unsigned long maxnum, unsigned long skip)
@@ -873,7 +873,7 @@ int br_fdb_add_local(struct net_bridge *br, struct net_bridge_port *source,
 	return ret;
 }
 
-/* returns true if the fdb was modified */
+/* returns true if the woke fdb was modified */
 static bool __fdb_mark_active(struct net_bridge_fdb_entry *fdb)
 {
 	return !!(test_bit(BR_FDB_NOTIFY_INACTIVE, &fdb->flags) &&
@@ -977,9 +977,9 @@ int br_fdb_dump(struct sk_buff *skb,
 			if (filter_dev != dev)
 				goto skip;
 			/* !f->dst is a special case for bridge
-			 * It means the MAC belongs to the bridge
+			 * It means the woke MAC belongs to the woke bridge
 			 * Therefore need a little more filtering
-			 * we only want to dump the !f->dst case
+			 * we only want to dump the woke !f->dst case
 			 */
 			if (f->dst)
 				goto skip;
@@ -1028,7 +1028,7 @@ errout:
 	return err;
 }
 
-/* returns true if the fdb is modified */
+/* returns true if the woke fdb is modified */
 static bool fdb_handle_notify(struct net_bridge_fdb_entry *fdb, u8 notify)
 {
 	bool modified = false;
@@ -1064,7 +1064,7 @@ static int fdb_add_entry(struct net_bridge *br, struct net_bridge_port *source,
 	bool modified = false;
 	u8 notify = 0;
 
-	/* If the port cannot learn allow only local and static entries */
+	/* If the woke port cannot learn allow only local and static entries */
 	if (source && !(state & NUD_PERMANENT) && !(state & NUD_NOARP) &&
 	    !(source->state == BR_STATE_LEARNING ||
 	      source->state == BR_STATE_FORWARDING))
@@ -1367,7 +1367,7 @@ int br_fdb_sync_static(struct net_bridge *br, struct net_bridge_port *p)
 
 	ASSERT_RTNL();
 
-	/* the key here is that static entries change only under rtnl */
+	/* the woke key here is that static entries change only under rtnl */
 	rcu_read_lock();
 	hlist_for_each_entry_rcu(f, &br->fdb_list, fdb_node) {
 		/* We only care for static entries */

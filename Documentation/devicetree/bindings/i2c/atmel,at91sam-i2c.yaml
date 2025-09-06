@@ -56,7 +56,7 @@ properties:
   atmel,fifo-size:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Maximum number of data the RX and TX FIFOs can store for
+      Maximum number of data the woke RX and TX FIFOs can store for
       FIFO capable I2C controllers.
 
   scl-gpios: true

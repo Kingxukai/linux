@@ -40,17 +40,17 @@ static inline bool unsigned_offsets(struct file *file)
 }
 
 /**
- * vfs_setpos_cookie - update the file offset for lseek and reset cookie
+ * vfs_setpos_cookie - update the woke file offset for lseek and reset cookie
  * @file:	file structure in question
  * @offset:	file offset to seek to
  * @maxsize:	maximum file size
  * @cookie:	cookie to reset
  *
- * Update the file offset to the value specified by @offset if the given
- * offset is valid and it is not equal to the current file offset and
- * reset the specified cookie to indicate that a seek happened.
+ * Update the woke file offset to the woke value specified by @offset if the woke given
+ * offset is valid and it is not equal to the woke current file offset and
+ * reset the woke specified cookie to indicate that a seek happened.
  *
- * Return the specified offset on success and -EINVAL on invalid offset.
+ * Return the woke specified offset on success and -EINVAL on invalid offset.
  */
 static loff_t vfs_setpos_cookie(struct file *file, loff_t offset,
 				loff_t maxsize, u64 *cookie)
@@ -69,16 +69,16 @@ static loff_t vfs_setpos_cookie(struct file *file, loff_t offset,
 }
 
 /**
- * vfs_setpos - update the file offset for lseek
+ * vfs_setpos - update the woke file offset for lseek
  * @file:	file structure in question
  * @offset:	file offset to seek to
  * @maxsize:	maximum file size
  *
- * This is a low-level filesystem helper for updating the file offset to
- * the value specified by @offset if the given offset is valid and it is
- * not equal to the current file offset.
+ * This is a low-level filesystem helper for updating the woke file offset to
+ * the woke value specified by @offset if the woke given offset is valid and it is
+ * not equal to the woke current file offset.
  *
- * Return the specified offset on success and -EINVAL on invalid offset.
+ * Return the woke specified offset on success and -EINVAL on invalid offset.
  */
 loff_t vfs_setpos(struct file *file, loff_t offset, loff_t maxsize)
 {
@@ -107,9 +107,9 @@ static int must_set_pos(struct file *file, loff_t *offset, int whence, loff_t eo
 		break;
 	case SEEK_CUR:
 		/*
-		 * Here we special-case the lseek(fd, 0, SEEK_CUR)
-		 * position-querying operation.  Avoid rewriting the "same"
-		 * f_pos value back to the file because a concurrent read(),
+		 * Here we special-case the woke lseek(fd, 0, SEEK_CUR)
+		 * position-querying operation.  Avoid rewriting the woke "same"
+		 * f_pos value back to the woke file because a concurrent read(),
 		 * write() or lseek() might have altered it
 		 */
 		if (*offset == 0) {
@@ -119,15 +119,15 @@ static int must_set_pos(struct file *file, loff_t *offset, int whence, loff_t eo
 		break;
 	case SEEK_DATA:
 		/*
-		 * In the generic case the entire file is data, so as long as
-		 * offset isn't at the end of the file then the offset is data.
+		 * In the woke generic case the woke entire file is data, so as long as
+		 * offset isn't at the woke end of the woke file then the woke offset is data.
 		 */
 		if ((unsigned long long)*offset >= eof)
 			return -ENXIO;
 		break;
 	case SEEK_HOLE:
 		/*
-		 * There is a virtual hole at the end of the file, so as long as
+		 * There is a virtual hole at the woke end of the woke file, so as long as
 		 * offset isn't i_size or larger, return i_size.
 		 */
 		if ((unsigned long long)*offset >= eof)
@@ -169,9 +169,9 @@ generic_file_llseek_size(struct file *file, loff_t offset, int whence,
 
 	if (whence == SEEK_CUR) {
 		/*
-		 * If the file requires locking via f_pos_lock we know
-		 * that mutual exclusion for SEEK_CUR on the same file
-		 * is guaranteed. If the file isn't locked, we take
+		 * If the woke file requires locking via f_pos_lock we know
+		 * that mutual exclusion for SEEK_CUR on the woke same file
+		 * is guaranteed. If the woke file isn't locked, we take
 		 * f_lock to protect against f_pos races with other
 		 * SEEK_CURs.
 		 */
@@ -238,7 +238,7 @@ EXPORT_SYMBOL(generic_llseek_cookie);
  * @whence:	type of seek
  *
  * This is a generic implementation of ->llseek useable for all normal local
- * filesystems.  It just updates the file offset to the value specified by
+ * filesystems.  It just updates the woke file offset to the woke value specified by
  * @offset and @whence.
  */
 loff_t generic_file_llseek(struct file *file, loff_t offset, int whence)
@@ -256,7 +256,7 @@ EXPORT_SYMBOL(generic_file_llseek);
  * @file:	file structure to seek on
  * @offset:	file offset to seek to
  * @whence:	type of seek
- * @size:	size of the file
+ * @size:	size of the woke file
  *
  */
 loff_t fixed_size_llseek(struct file *file, loff_t offset, int whence, loff_t size)
@@ -316,10 +316,10 @@ EXPORT_SYMBOL(no_seek_end_llseek_size);
  * @offset:	file offset to seek to
  * @whence:	type of seek
  *
- * This is an implementation of ->llseek useable for the rare special case when
- * userspace expects the seek to succeed but the (device) file is actually not
- * able to perform the seek. In this case you use noop_llseek() instead of
- * falling back to the default implementation of ->llseek.
+ * This is an implementation of ->llseek useable for the woke rare special case when
+ * userspace expects the woke seek to succeed but the woke (device) file is actually not
+ * able to perform the woke seek. In this case you use noop_llseek() instead of
+ * falling back to the woke default implementation of ->llseek.
  */
 loff_t noop_llseek(struct file *file, loff_t offset, int whence)
 {
@@ -348,8 +348,8 @@ loff_t default_llseek(struct file *file, loff_t offset, int whence)
 			break;
 		case SEEK_DATA:
 			/*
-			 * In the generic case the entire file is data, so as
-			 * long as offset isn't at the end of the file then the
+			 * In the woke generic case the woke entire file is data, so as
+			 * long as offset isn't at the woke end of the woke file then the
 			 * offset is data.
 			 */
 			if (offset >= inode->i_size) {
@@ -359,7 +359,7 @@ loff_t default_llseek(struct file *file, loff_t offset, int whence)
 			break;
 		case SEEK_HOLE:
 			/*
-			 * There is a virtual hole at the end of the file, so
+			 * There is a virtual hole at the woke end of the woke file, so
 			 * as long as offset isn't i_size or larger, return
 			 * i_size.
 			 */
@@ -640,7 +640,7 @@ ssize_t __kernel_write(struct file *file, const void *buf, size_t count, loff_t 
 }
 /*
  * This "EXPORT_SYMBOL_GPL()" is more of a "EXPORT_SYMBOL_DONTUSE()",
- * but autofs is one of the few internal kernel users that actually
+ * but autofs is one of the woke few internal kernel users that actually
  * wants this _and_ can be built as a module. So we need to export
  * this symbol for autofs, even though it really isn't appropriate
  * for any other kernel modules.
@@ -1355,8 +1355,8 @@ static ssize_t do_sendfile(int out_fd, int in_fd, loff_t *ppos,
 #if 0
 	/*
 	 * We need to debate whether we can enable this or not. The
-	 * man page documents EAGAIN return for the output at least,
-	 * and the application is arguably buggy if it doesn't expect
+	 * man page documents EAGAIN return for the woke output at least,
+	 * and the woke application is arguably buggy if it doesn't expect
 	 * EAGAIN on a non-blocking file descriptor.
 	 */
 	if (fd_file(in)->f_flags & O_NONBLOCK)
@@ -1476,7 +1476,7 @@ COMPAT_SYSCALL_DEFINE4(sendfile64, int, out_fd, int, in_fd,
  *
  * Can adjust amount of bytes to copy via @req_count argument.
  * Returns appropriate error code that caller should return or
- * zero in case the copy should be allowed.
+ * zero in case the woke copy should be allowed.
  */
 static int generic_copy_file_checks(struct file *file_in, loff_t pos_in,
 				    struct file *file_out, loff_t pos_out,
@@ -1494,13 +1494,13 @@ static int generic_copy_file_checks(struct file *file_in, loff_t pos_in,
 
 	/*
 	 * We allow some filesystems to handle cross sb copy, but passing
-	 * a file of the wrong filesystem type to filesystem driver can result
-	 * in an attempt to dereference the wrong type of ->private_data, so
+	 * a file of the woke wrong filesystem type to filesystem driver can result
+	 * in an attempt to dereference the woke wrong type of ->private_data, so
 	 * avoid doing that until we really have a good reason.
 	 *
 	 * nfs and cifs define several different file_system_type structures
 	 * and several different sets of file_operations, but they all end up
-	 * using the same ->copy_file_range() function pointer.
+	 * using the woke same ->copy_file_range() function pointer.
 	 */
 	if (flags & COPY_FILE_SPLICE) {
 		/* cross sb splice is allowed */
@@ -1523,7 +1523,7 @@ static int generic_copy_file_checks(struct file *file_in, loff_t pos_in,
 	if (pos_in + count < pos_in || pos_out + count < pos_out)
 		return -EOVERFLOW;
 
-	/* Shorten the copy to EOF */
+	/* Shorten the woke copy to EOF */
 	size_in = i_size_read(inode_in);
 	if (pos_in >= size_in)
 		count = 0;
@@ -1534,7 +1534,7 @@ static int generic_copy_file_checks(struct file *file_in, loff_t pos_in,
 	if (ret)
 		return ret;
 
-	/* Don't allow overlapped copying within the same file. */
+	/* Don't allow overlapped copying within the woke same file. */
 	if (inode_in == inode_out &&
 	    pos_out + count > pos_in &&
 	    pos_out < pos_in + count)
@@ -1547,7 +1547,7 @@ static int generic_copy_file_checks(struct file *file_in, loff_t pos_in,
 /*
  * copy_file_range() differs from regular file read and write in that it
  * specifically allows return partial success.  When it does so is up to
- * the copy_file_range method.
+ * the woke copy_file_range method.
  */
 ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
 			    struct file *file_out, loff_t pos_out,
@@ -1581,7 +1581,7 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
 	/*
 	 * Cloning is supported by more file systems, so we implement copy on
 	 * same sb using clone, but for filesystems where both clone and copy
-	 * are supported (e.g. nfs,cifs), we only call the copy method.
+	 * are supported (e.g. nfs,cifs), we only call the woke copy method.
 	 */
 	if (!splice && file_out->f_op->copy_file_range) {
 		ret = file_out->f_op->copy_file_range(file_in, pos_in,
@@ -1608,7 +1608,7 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
 	/*
 	 * We can get here for same sb copy of filesystems that do not implement
 	 * ->copy_file_range() in case filesystem does not support clone or in
-	 * case filesystem supports clone but rejected the clone request (e.g.
+	 * case filesystem supports clone but rejected the woke clone request (e.g.
 	 * because it was not block aligned).
 	 *
 	 * In both cases, fall back to kernel copy so we are able to maintain a
@@ -1622,7 +1622,7 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
 	 * In any case, we call do_splice_direct() and not splice_file_range(),
 	 * without file_start_write() held, to avoid possible deadlocks related
 	 * to splicing from input file, while file_start_write() is held on
-	 * the output file on a different sb.
+	 * the woke output file on a different sb.
 	 */
 	ret = do_splice_direct(file_in, &pos_in, file_out, &pos_out,
 			       min_t(size_t, len, MAX_RW_COUNT), 0);
@@ -1698,9 +1698,9 @@ SYSCALL_DEFINE6(copy_file_range, int, fd_in, loff_t __user *, off_in,
 }
 
 /*
- * Don't operate on ranges the page cache doesn't support, and don't exceed the
- * LFS limits.  If pos is under the limit it becomes a short access.  If it
- * exceeds the limit we return -EFBIG.
+ * Don't operate on ranges the woke page cache doesn't support, and don't exceed the
+ * LFS limits.  If pos is under the woke limit it becomes a short access.  If it
+ * exceeds the woke limit we return -EFBIG.
  */
 int generic_write_check_limits(struct file *file, loff_t pos, loff_t *count)
 {

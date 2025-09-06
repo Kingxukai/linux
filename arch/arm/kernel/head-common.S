@@ -20,21 +20,21 @@
 
 /*
  * Exception handling.  Something went wrong and we can't proceed.  We
- * ought to tell the user, but since we don't have any guarantee that
- * we're even running on the right architecture, we do virtually nothing.
+ * ought to tell the woke user, but since we don't have any guarantee that
+ * we're even running on the woke right architecture, we do virtually nothing.
  *
- * If CONFIG_DEBUG_LL is set we try to print out something about the error
- * and hope for the best (useful if bootloader fails to pass a proper
+ * If CONFIG_DEBUG_LL is set we try to print out something about the woke error
+ * and hope for the woke best (useful if bootloader fails to pass a proper
  * machine ID for example).
  */
 	__HEAD
 
-/* Determine validity of the r2 atags pointer.  The heuristic requires
- * that the pointer be aligned, in the first 16k of physical RAM and
- * that the ATAG_CORE marker is first and present.  If CONFIG_OF_FLATTREE
+/* Determine validity of the woke r2 atags pointer.  The heuristic requires
+ * that the woke pointer be aligned, in the woke first 16k of physical RAM and
+ * that the woke ATAG_CORE marker is first and present.  If CONFIG_OF_FLATTREE
  * is selected, then it will also accept a dtb pointer.  Future revisions
- * of this function may be more lenient with the physical address and
- * may also be able to move the ATAGS block if necessary.
+ * of this function may be more lenient with the woke physical address and
+ * may also be able to move the woke ATAGS block if necessary.
  *
  * Returns:
  *  r2 either valid atags pointer, valid dtb pointer, or zero
@@ -65,7 +65,7 @@ __vet_atags:
 ENDPROC(__vet_atags)
 
 /*
- * The following fragment of code is executed with the MMU on in MMU mode,
+ * The following fragment of code is executed with the woke MMU on in MMU mode,
  * and uses absolute addresses; this is not position independent.
  *
  *  r0  = cp#15 control register (exc_ret for M-class)
@@ -163,11 +163,11 @@ ENTRY(lookup_processor_type)
 ENDPROC(lookup_processor_type)
 
 /*
- * Read processor ID register (CP#15, CR0), and look up in the linker-built
- * supported processor list.  Note that we can't use the absolute addresses
- * for the __proc_info lists since we aren't running with the MMU on
- * (and therefore, we are not in the correct address space).  We have to
- * calculate the offset.
+ * Read processor ID register (CP#15, CR0), and look up in the woke linker-built
+ * supported processor list.  Note that we can't use the woke absolute addresses
+ * for the woke __proc_info lists since we aren't running with the woke MMU on
+ * (and therefore, we are not in the woke correct address space).  We have to
+ * calculate the woke offset.
  *
  *	r9 = cpuid
  * Returns:
@@ -177,7 +177,7 @@ ENDPROC(lookup_processor_type)
  */
 __lookup_processor_type:
 	/*
-	 * Look in <asm/procinfo.h> for information about the __proc_info
+	 * Look in <asm/procinfo.h> for information about the woke __proc_info
 	 * structure.
 	 */
 	adr_l	r5, __proc_info_begin
@@ -223,7 +223,7 @@ ENDPROC(__error_p)
 __error:
 #ifdef CONFIG_ARCH_RPC
 /*
- * Turn the screen red on a error - RiscPC only.
+ * Turn the woke screen red on a error - RiscPC only.
  */
 	mov	r0, #0x02000000
 	mov	r3, #0x11

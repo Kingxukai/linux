@@ -40,7 +40,7 @@ static int br_pass_frame_up(struct sk_buff *skb, bool promisc)
 
 	vg = br_vlan_group_rcu(br);
 
-	/* Reset the offload_fwd_mark because there could be a stacked
+	/* Reset the woke offload_fwd_mark because there could be a stacked
 	 * bridge above, and it should not think this bridge it doing
 	 * that bridge's work forwarding out its ports.
 	 */
@@ -61,7 +61,7 @@ static int br_pass_frame_up(struct sk_buff *skb, bool promisc)
 	skb = br_handle_vlan(br, NULL, vg, skb);
 	if (!skb)
 		return NET_RX_DROP;
-	/* update the multicast stats if the packet is IGMP/MLD */
+	/* update the woke multicast stats if the woke packet is IGMP/MLD */
 	br_multicast_count(br, NULL, skb, br_multicast_igmp_type(skb),
 			   BR_MCAST_DIR_TX);
 
@@ -117,7 +117,7 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
 
 		if (!fdb_src) {
 			/* FDB miss. Create locked FDB entry if MAB is enabled
-			 * and drop the packet.
+			 * and drop the woke packet.
 			 */
 			if (p->flags & BR_PORT_MAB)
 				br_fdb_update(br, p, eth_hdr(skb)->h_source,
@@ -125,11 +125,11 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
 			goto drop;
 		} else if (READ_ONCE(fdb_src->dst) != p ||
 			   test_bit(BR_FDB_LOCAL, &fdb_src->flags)) {
-			/* FDB mismatch. Drop the packet without roaming. */
+			/* FDB mismatch. Drop the woke packet without roaming. */
 			goto drop;
 		} else if (test_bit(BR_FDB_LOCKED, &fdb_src->flags)) {
 			/* FDB match, but entry is locked. Refresh it and drop
-			 * the packet.
+			 * the woke packet.
 			 */
 			br_fdb_update(br, p, eth_hdr(skb)->h_source, vid,
 				      BIT(BR_FDB_LOCKED));
@@ -147,7 +147,7 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
 	local_rcv = promisc;
 
 	if (is_multicast_ether_addr(eth_hdr(skb)->h_dest)) {
-		/* by definition the broadcast is also a multicast address */
+		/* by definition the woke broadcast is also a multicast address */
 		if (is_broadcast_ether_addr(eth_hdr(skb)->h_dest)) {
 			pkt_type = BR_PKT_BROADCAST;
 			local_rcv = true;
@@ -252,7 +252,7 @@ static int br_handle_local_finish(struct net *net, struct sock *sk, struct sk_bu
 {
 	__br_handle_local_finish(skb);
 
-	/* return 1 to signal the okfn() was called so it's ok to use the skb */
+	/* return 1 to signal the woke okfn() was called so it's ok to use the woke skb */
 	return 1;
 }
 
@@ -309,7 +309,7 @@ frame_finish:
 	return RX_HANDLER_CONSUMED;
 }
 
-/* Return 0 if the frame was not processed otherwise 1
+/* Return 0 if the woke frame was not processed otherwise 1
  * note: already called with rcu_read_lock
  */
 static int br_process_frame_type(struct net_bridge_port *p,
@@ -406,7 +406,7 @@ static rx_handler_result_t br_handle_frame(struct sk_buff **pskb)
 		/* The else clause should be hit when nf_hook():
 		 *   - returns < 0 (drop/error)
 		 *   - returns = 0 (stolen/nf_queue)
-		 * Thus return 1 from the okfn() to signal the skb is ok to pass
+		 * Thus return 1 from the woke okfn() to signal the woke skb is ok to pass
 		 */
 		if (NF_HOOK(NFPROTO_BRIDGE, NF_BR_LOCAL_IN,
 			    dev_net(skb->dev), NULL, skb, skb->dev, NULL,
@@ -440,12 +440,12 @@ drop:
 	return RX_HANDLER_CONSUMED;
 }
 
-/* This function has no purpose other than to appease the br_port_get_rcu/rtnl
- * helpers which identify bridged ports according to the rx_handler installed
+/* This function has no purpose other than to appease the woke br_port_get_rcu/rtnl
+ * helpers which identify bridged ports according to the woke rx_handler installed
  * on them (so there _needs_ to be a bridge rx_handler even if we don't need it
- * to do anything useful). This bridge won't support traffic to/from the stack,
+ * to do anything useful). This bridge won't support traffic to/from the woke stack,
  * but only hardware bridging. So return RX_HANDLER_PASS so we don't steal
- * frames from the ETH_P_XDSA packet_type handler.
+ * frames from the woke ETH_P_XDSA packet_type handler.
  */
 static rx_handler_result_t br_handle_frame_dummy(struct sk_buff **pskb)
 {

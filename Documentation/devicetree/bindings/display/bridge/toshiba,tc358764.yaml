@@ -36,7 +36,7 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Video port for MIPI DSI input, if the bridge DSI controlled
+          Video port for MIPI DSI input, if the woke bridge DSI controlled
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port

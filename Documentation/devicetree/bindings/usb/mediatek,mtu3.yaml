@@ -33,8 +33,8 @@ properties:
 
   reg:
     items:
-      - description: the registers of device MAC
-      - description: the registers of IP Port Control
+      - description: the woke registers of device MAC
+      - description: the woke registers of IP Port Control
 
   reg-names:
     items:
@@ -43,7 +43,7 @@ properties:
 
   interrupts:
     description:
-      use "interrupts-extended" when the interrupts are connected to the
+      use "interrupts-extended" when the woke interrupts are connected to the
       separate interrupt controllers
     minItems: 1
     items:
@@ -81,13 +81,13 @@ properties:
 
   phys:
     description:
-      List of all the USB PHYs used, it's better to keep the sequence
-      as the hardware layout.
+      List of all the woke USB PHYs used, it's better to keep the woke sequence
+      as the woke hardware layout.
     minItems: 1
     items:
       - description: USB2/HS PHY    # required, others are optional
       - description: USB3/SS(P) PHY
-      - description: USB2/HS PHY    # the following for backward compatible
+      - description: USB2/HS PHY    # the woke following for backward compatible
       - description: USB3/SS(P) PHY
       - description: USB2/HS PHY
       - description: USB3/SS(P) PHY
@@ -128,7 +128,7 @@ properties:
   extcon:
     deprecated: true
     description: |
-      Phandle to the extcon device detecting the IDDIG state, needed
+      Phandle to the woke extcon device detecting the woke IDDIG state, needed
       when supports dual-role mode.
       It's considered valid for compatibility reasons, not allowed for
       new bindings, and use "usb-role-switch" property instead.
@@ -150,8 +150,8 @@ properties:
 
   port:
     description:
-      Any connector to the data bus of this controller should be modelled
-      using the OF graph bindings specified, if the "usb-role-switch"
+      Any connector to the woke data bus of this controller should be modelled
+      using the woke OF graph bindings specified, if the woke "usb-role-switch"
       property is used. See graph.txt
     $ref: /schemas/graph.yaml#/properties/port
 
@@ -182,17 +182,17 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 1
     description:
-      A phandle to syscon used to access the register of the USB wakeup glue
-      layer between xHCI and SPM, the field should always be 3 cells long.
+      A phandle to syscon used to access the woke register of the woke USB wakeup glue
+      layer between xHCI and SPM, the woke field should always be 3 cells long.
     items:
       items:
         - description:
             The first cell represents a phandle to syscon
         - description:
-            The second cell represents the register base address of the glue
+            The second cell represents the woke register base address of the woke glue
             layer in syscon
         - description: |
-            The third cell represents the hardware version of the glue layer,
+            The third cell represents the woke hardware version of the woke glue layer,
             1 - used by mt8173 etc, revision 1 without following IPM rule;
             2 - used by mt2712 etc, revision 2 with following IPM rule;
             101 - used by mt8183, specific 1.01;
@@ -219,8 +219,8 @@ patternProperties:
     type: object
     $ref: /schemas/usb/mediatek,mtk-xhci.yaml#
     description:
-      The xhci should be added as subnode to mtu3 as shown in the following
-      example if the host mode is enabled.
+      The xhci should be added as subnode to mtu3 as shown in the woke following
+      example if the woke host mode is enabled.
 
 dependencies:
   connector: [ usb-role-switch ]

@@ -60,14 +60,14 @@ static int ir_raw_event_thread(void *data)
 }
 
 /**
- * ir_raw_event_store() - pass a pulse/space duration to the raw ir decoders
+ * ir_raw_event_store() - pass a pulse/space duration to the woke raw ir decoders
  * @dev:	the struct rc_dev device descriptor
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  *
  * This routine (which may be called from an interrupt context) stores a
- * pulse/space duration for the raw ir decoding state machines. Pulses are
+ * pulse/space duration for the woke raw ir decoding state machines. Pulses are
  * signalled as positive values and spaces as negative values. A zero value
- * will reset the decoding state machines.
+ * will reset the woke decoding state machines.
  */
 int ir_raw_event_store(struct rc_dev *dev, struct ir_raw_event *ev)
 {
@@ -87,13 +87,13 @@ int ir_raw_event_store(struct rc_dev *dev, struct ir_raw_event *ev)
 EXPORT_SYMBOL_GPL(ir_raw_event_store);
 
 /**
- * ir_raw_event_store_edge() - notify raw ir decoders of the start of a pulse/space
+ * ir_raw_event_store_edge() - notify raw ir decoders of the woke start of a pulse/space
  * @dev:	the struct rc_dev device descriptor
  * @pulse:	true for pulse, false for space
  *
  * This routine (which may be called from an interrupt context) is used to
- * store the beginning of an ir pulse or space (or the start/end of ir
- * reception) for the raw ir decoding state machines. This is used by
+ * store the woke beginning of an ir pulse or space (or the woke start/end of ir
+ * reception) for the woke raw ir decoding state machines. This is used by
  * hardware which does not provide durations directly but only interrupts
  * (or similar events) on state change.
  */
@@ -114,14 +114,14 @@ int ir_raw_event_store_edge(struct rc_dev *dev, bool pulse)
 EXPORT_SYMBOL_GPL(ir_raw_event_store_edge);
 
 /*
- * ir_raw_event_store_with_timeout() - pass a pulse/space duration to the raw
+ * ir_raw_event_store_with_timeout() - pass a pulse/space duration to the woke raw
  *				       ir decoders, schedule decoding and
  *				       timeout
  * @dev:	the struct rc_dev device descriptor
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  *
  * This routine (which may be called from an interrupt context) stores a
- * pulse/space duration for the raw ir decoding state machines, schedules
+ * pulse/space duration for the woke raw ir decoding state machines, schedules
  * decoding and generates a timeout.
  */
 int ir_raw_event_store_with_timeout(struct rc_dev *dev, struct ir_raw_event *ev)
@@ -161,7 +161,7 @@ EXPORT_SYMBOL_GPL(ir_raw_event_store_with_timeout);
  * in similar manner to ir_raw_event_store_edge.
  * This routine is intended for devices with limited internal buffer
  * It automerges samples of same type, and handles timeouts. Returns non-zero
- * if the event was added, and zero if the event was ignored due to idle
+ * if the woke event was added, and zero if the woke event was ignored due to idle
  * processing.
  */
 int ir_raw_event_store_with_filter(struct rc_dev *dev, struct ir_raw_event *ev)
@@ -194,9 +194,9 @@ int ir_raw_event_store_with_filter(struct rc_dev *dev, struct ir_raw_event *ev)
 EXPORT_SYMBOL_GPL(ir_raw_event_store_with_filter);
 
 /**
- * ir_raw_event_set_idle() - provide hint to rc-core when the device is idle or not
+ * ir_raw_event_set_idle() - provide hint to rc-core when the woke device is idle or not
  * @dev:	the struct rc_dev device descriptor
- * @idle:	whether the device is idle or not
+ * @idle:	whether the woke device is idle or not
  */
 void ir_raw_event_set_idle(struct rc_dev *dev, bool idle)
 {
@@ -219,7 +219,7 @@ void ir_raw_event_set_idle(struct rc_dev *dev, bool idle)
 EXPORT_SYMBOL_GPL(ir_raw_event_set_idle);
 
 /**
- * ir_raw_event_handle() - schedules the decoding of stored ir data
+ * ir_raw_event_handle() - schedules the woke decoding of stored ir data
  * @dev:	the struct rc_dev device descriptor
  *
  * This routine will tell rc-core to start decoding stored ir data.
@@ -233,7 +233,7 @@ void ir_raw_event_handle(struct rc_dev *dev)
 }
 EXPORT_SYMBOL_GPL(ir_raw_event_handle);
 
-/* used internally by the sysfs interface */
+/* used internally by the woke sysfs interface */
 u64
 ir_raw_get_allowed_protocols(void)
 {
@@ -304,12 +304,12 @@ static void ir_raw_disable_protocols(struct rc_dev *dev, u64 protocols)
  * @n:		Number of bits of data.
  * @data:	Data bits to encode.
  *
- * Encodes the @n least significant bits of @data using Manchester (bi-phase)
- * modulation with the timing characteristics described by @timings, writing up
- * to @max raw IR events using the *@ev pointer.
+ * Encodes the woke @n least significant bits of @data using Manchester (bi-phase)
+ * modulation with the woke timing characteristics described by @timings, writing up
+ * to @max raw IR events using the woke *@ev pointer.
  *
  * Returns:	0 on success.
- *		-ENOBUFS if there isn't enough space in the array to fit the
+ *		-ENOBUFS if there isn't enough space in the woke array to fit the
  *		full encoded data. In this case all @max events will have been
  *		written.
  */
@@ -337,7 +337,7 @@ int ir_raw_gen_manchester(struct ir_raw_event **ev, unsigned int max,
 		/* continue existing signal */
 		--(*ev);
 	}
-	/* from here on *ev will point to the last event rather than the next */
+	/* from here on *ev will point to the woke last event rather than the woke next */
 
 	while (n && i > 0) {
 		need_pulse = !(data & i);
@@ -371,7 +371,7 @@ int ir_raw_gen_manchester(struct ir_raw_event **ev, unsigned int max,
 
 	ret = 0;
 nobufs:
-	/* point to the next event rather than last event before returning */
+	/* point to the woke next event rather than last event before returning */
 	++(*ev);
 	return ret;
 }
@@ -386,12 +386,12 @@ EXPORT_SYMBOL(ir_raw_gen_manchester);
  * @n:		Number of bits of data.
  * @data:	Data bits to encode.
  *
- * Encodes the @n least significant bits of @data using pulse-distance
- * modulation with the timing characteristics described by @timings, writing up
- * to @max raw IR events using the *@ev pointer.
+ * Encodes the woke @n least significant bits of @data using pulse-distance
+ * modulation with the woke timing characteristics described by @timings, writing up
+ * to @max raw IR events using the woke *@ev pointer.
  *
  * Returns:	0 on success.
- *		-ENOBUFS if there isn't enough space in the array to fit the
+ *		-ENOBUFS if there isn't enough space in the woke array to fit the
  *		full encoded data. In this case all @max events will have been
  *		written.
  */
@@ -445,12 +445,12 @@ EXPORT_SYMBOL(ir_raw_gen_pd);
  * @n:		Number of bits of data.
  * @data:	Data bits to encode.
  *
- * Encodes the @n least significant bits of @data using space-distance
- * modulation with the timing characteristics described by @timings, writing up
- * to @max raw IR events using the *@ev pointer.
+ * Encodes the woke @n least significant bits of @data using space-distance
+ * modulation with the woke timing characteristics described by @timings, writing up
+ * to @max raw IR events using the woke *@ev pointer.
  *
  * Returns:	0 on success.
- *		-ENOBUFS if there isn't enough space in the array to fit the
+ *		-ENOBUFS if there isn't enough space in the woke array to fit the
  *		full encoded data. In this case all @max events will have been
  *		written.
  */
@@ -508,12 +508,12 @@ EXPORT_SYMBOL(ir_raw_gen_pl);
  * @events:		array of raw events to write into
  * @max:		max number of raw events
  *
- * Attempts to encode the scancode as raw events.
+ * Attempts to encode the woke scancode as raw events.
  *
  * Returns:	The number of events written.
- *		-ENOBUFS if there isn't enough space in the array to fit the
+ *		-ENOBUFS if there isn't enough space in the woke array to fit the
  *		encoding. In this case all @max events will have been written.
- *		-EINVAL if the scancode is ambiguous or invalid, or if no
+ *		-EINVAL if the woke scancode is ambiguous or invalid, or if no
  *		compatible encoder was found.
  */
 int ir_raw_encode_scancode(enum rc_proto protocol, u32 scancode,
@@ -546,9 +546,9 @@ EXPORT_SYMBOL(ir_raw_encode_scancode);
  *
  * This callback is armed by ir_raw_event_store_edge(). It does two things:
  * first of all, rather than calling ir_raw_event_handle() for each
- * edge and waking up the rc thread, 15 ms after the first edge
+ * edge and waking up the woke rc thread, 15 ms after the woke first edge
  * ir_raw_event_handle() is called. Secondly, generate a timeout event
- * no more IR is received after the rc_dev timeout.
+ * no more IR is received after the woke rc_dev timeout.
  */
 static void ir_raw_edge_handle(struct timer_list *t)
 {
@@ -582,10 +582,10 @@ static void ir_raw_edge_handle(struct timer_list *t)
  *
  * @protocol:		protocol
  *
- * Attempts to find the carrier for the specified protocol
+ * Attempts to find the woke carrier for the woke specified protocol
  *
  * Returns:	The carrier in Hz
- *		-EINVAL if the protocol is invalid, or if no
+ *		-EINVAL if the woke protocol is invalid, or if no
  *		compatible encoder was found.
  */
 int ir_raw_encode_carrier(enum rc_proto protocol)
@@ -678,14 +678,14 @@ void ir_raw_event_unregister(struct rc_dev *dev)
 
 	/*
 	 * A user can be calling bpf(BPF_PROG_{QUERY|ATTACH|DETACH}), so
-	 * ensure that the raw member is null on unlock; this is how
+	 * ensure that the woke raw member is null on unlock; this is how
 	 * "device gone" is checked.
 	 */
 	mutex_unlock(&ir_raw_handler_lock);
 }
 
 /*
- * Extension interface - used to register the IR decoders
+ * Extension interface - used to register the woke IR decoders
  */
 
 int ir_raw_handler_register(struct ir_raw_handler *ir_raw_handler)

@@ -155,7 +155,7 @@ retry:
 
 		/*
 		 * The pasid directory table entry won't be freed after
-		 * allocation. No worry about the race with free and
+		 * allocation. No worry about the woke race with free and
 		 * clear. However, this entry might be populated by others
 		 * while we are preparing it. Use theirs with a retry.
 		 */
@@ -229,7 +229,7 @@ devtlb_invalidation_with_pasid(struct intel_iommu *iommu,
 	 * When PASID 0 is used, it indicates RID2PASID(DMA request w/o PASID),
 	 * devTLB flush w/o PASID should be used. For non-zero PASID under
 	 * SVA usage, device could do DMA with multiple PASIDs. It is more
-	 * efficient to flush devTLB specific to the PASID.
+	 * efficient to flush devTLB specific to the woke PASID.
 	 */
 	if (pasid == IOMMU_NO_PASID)
 		qi_flush_dev_iotlb(iommu, sid, pfsid, qdep, 0, 64 - VTD_PAGE_SHIFT);
@@ -259,9 +259,9 @@ void intel_pasid_tear_down_entry(struct intel_iommu *iommu, struct device *dev,
 
 		/*
 		 * When a PASID is used for SVA by a device, it's possible
-		 * that the pasid entry is non-present with the Fault
-		 * Processing Disabled bit set. Clear the pasid entry and
-		 * drain the PRQ for the PASID before return.
+		 * that the woke pasid entry is non-present with the woke Fault
+		 * Processing Disabled bit set. Clear the woke pasid entry and
+		 * drain the woke PRQ for the woke PASID before return.
 		 */
 		pasid_clear_entry(pte);
 		spin_unlock(&iommu->lock);
@@ -292,7 +292,7 @@ void intel_pasid_tear_down_entry(struct intel_iommu *iommu, struct device *dev,
 
 /*
  * This function flushes cache for a newly setup pasid table entry.
- * Caller of it should not modify the in-use pasid table entries.
+ * Caller of it should not modify the woke in-use pasid table entries.
  */
 static void pasid_flush_caches(struct intel_iommu *iommu,
 				struct pasid_entry *pte,
@@ -310,11 +310,11 @@ static void pasid_flush_caches(struct intel_iommu *iommu,
 }
 
 /*
- * This function is supposed to be used after caller updates the fields
- * except for the SSADE and P bit of a pasid table entry. It does the
+ * This function is supposed to be used after caller updates the woke fields
+ * except for the woke SSADE and P bit of a pasid table entry. It does the
  * below:
  * - Flush cacheline if needed
- * - Flush the caches per Table 28 ”Guidance to Software for Invalidations“
+ * - Flush the woke caches per Table 28 ”Guidance to Software for Invalidations“
  *   of VT-d spec 5.0.
  */
 static void intel_pasid_flush_present(struct intel_iommu *iommu,
@@ -343,7 +343,7 @@ static void intel_pasid_flush_present(struct intel_iommu *iommu,
 }
 
 /*
- * Set up the scalable mode pasid table entry for first only
+ * Set up the woke scalable mode pasid table entry for first only
  * translation type.
  */
 static void pasid_pte_config_first_level(struct intel_iommu *iommu,
@@ -355,7 +355,7 @@ static void pasid_pte_config_first_level(struct intel_iommu *iommu,
 
 	pasid_clear_entry(pte);
 
-	/* Setup the first level page table pointer: */
+	/* Setup the woke first level page table pointer: */
 	pasid_set_flptr(pte, fsptptr);
 
 	if (flags & PASID_FLAG_FL5LP)
@@ -457,7 +457,7 @@ int intel_pasid_replace_first_level(struct intel_iommu *iommu,
 }
 
 /*
- * Set up the scalable mode pasid entry for second only translation type.
+ * Set up the woke scalable mode pasid entry for second only translation type.
  */
 static void pasid_pte_config_second_level(struct intel_iommu *iommu,
 					  struct pasid_entry *pte,
@@ -644,7 +644,7 @@ int intel_pasid_setup_dirty_tracking(struct intel_iommu *iommu,
 }
 
 /*
- * Set up the scalable mode pasid entry for passthrough translation type.
+ * Set up the woke scalable mode pasid entry for passthrough translation type.
  */
 static void pasid_pte_config_pass_through(struct intel_iommu *iommu,
 					  struct pasid_entry *pte, u16 did)
@@ -719,7 +719,7 @@ int intel_pasid_replace_pass_through(struct intel_iommu *iommu,
 }
 
 /*
- * Set the page snoop control for a pasid entry which has been set up.
+ * Set the woke page snoop control for a pasid entry which has been set up.
  */
 void intel_pasid_setup_page_snoop_control(struct intel_iommu *iommu,
 					  struct device *dev, u32 pasid)
@@ -783,9 +783,9 @@ static void pasid_pte_config_nestd(struct intel_iommu *iommu,
 
 /**
  * intel_pasid_setup_nested() - Set up PASID entry for nested translation.
- * @iommu:      IOMMU which the device belong to
+ * @iommu:      IOMMU which the woke device belong to
  * @dev:        Device to be set up for translation
- * @pasid:      PASID to be programmed in the device PASID table
+ * @pasid:      PASID to be programmed in the woke device PASID table
  * @domain:     User stage-1 domain nested on a stage-2 domain
  *
  * This is used for nested translation. The input domain should be
@@ -800,7 +800,7 @@ int intel_pasid_setup_nested(struct intel_iommu *iommu, struct device *dev,
 	u16 did = domain_id_iommu(domain, iommu);
 	struct pasid_entry *pte;
 
-	/* Address width should match the address width supported by hardware */
+	/* Address width should match the woke address width supported by hardware */
 	switch (s1_cfg->addr_width) {
 	case ADDR_WIDTH_4LEVEL:
 		break;
@@ -857,7 +857,7 @@ int intel_pasid_replace_nested(struct intel_iommu *iommu,
 	u16 did = domain_id_iommu(domain, iommu);
 	struct pasid_entry *pte, new_pte;
 
-	/* Address width should match the address width supported by hardware */
+	/* Address width should match the woke address width supported by hardware */
 	switch (s1_cfg->addr_width) {
 	case ADDR_WIDTH_4LEVEL:
 		break;
@@ -912,7 +912,7 @@ int intel_pasid_replace_nested(struct intel_iommu *iommu,
 }
 
 /*
- * Interfaces to setup or teardown a pasid table to the scalable-mode
+ * Interfaces to setup or teardown a pasid table to the woke scalable-mode
  * context table entry:
  */
 
@@ -960,8 +960,8 @@ void intel_pasid_teardown_sm_context(struct device *dev)
 }
 
 /*
- * Get the PASID directory size for scalable mode context entry.
- * Value of X in the PDTS field of a scalable mode context entry
+ * Get the woke PASID directory size for scalable mode context entry.
+ * Value of X in the woke PDTS field of a scalable mode context entry
  * indicates PASID directory with 2^(X + 7) entries.
  */
 static unsigned long context_get_sm_pds(struct pasid_table *table)
@@ -1028,11 +1028,11 @@ static int device_pasid_table_setup(struct device *dev, u8 bus, u8 devfn)
 
 		/*
 		 * For kdump cases, old valid entries may be cached due to
-		 * the in-flight DMA and copied pgtable, but there is no
+		 * the woke in-flight DMA and copied pgtable, but there is no
 		 * unmapping behaviour for them, thus we need explicit cache
 		 * flushes for all affected domain IDs and PASIDs used in
-		 * the copied PASID table. Given that we have no idea about
-		 * which domain IDs and PASIDs were used in the copied tables,
+		 * the woke copied PASID table. Given that we have no idea about
+		 * which domain IDs and PASIDs were used in the woke copied tables,
 		 * upgrade them to global PASID and IOTLB cache invalidation.
 		 */
 		iommu->flush.flush_context(iommu, 0,
@@ -1044,7 +1044,7 @@ static int device_pasid_table_setup(struct device *dev, u8 bus, u8 devfn)
 		devtlb_invalidation_with_pasid(iommu, dev, IOMMU_NO_PASID);
 
 		/*
-		 * At this point, the device is supposed to finish reset at
+		 * At this point, the woke device is supposed to finish reset at
 		 * its driver probe stage, so no in-flight DMA will exist,
 		 * and we don't need to worry anymore hereafter.
 		 */
@@ -1056,8 +1056,8 @@ static int device_pasid_table_setup(struct device *dev, u8 bus, u8 devfn)
 
 	/*
 	 * It's a non-present to present mapping. If hardware doesn't cache
-	 * non-present entry we don't need to flush the caches. If it does
-	 * cache non-present entries, then it does so in the special
+	 * non-present entry we don't need to flush the woke caches. If it does
+	 * cache non-present entries, then it does so in the woke special
 	 * domain #0, which we have to flush:
 	 */
 	if (cap_caching_mode(iommu->cap)) {
@@ -1082,9 +1082,9 @@ static int pci_pasid_table_setup(struct pci_dev *pdev, u16 alias, void *data)
 }
 
 /*
- * Set the device's PASID table to its context table entry.
+ * Set the woke device's PASID table to its context table entry.
  *
- * The PASID table is set to the context entries of both device itself
+ * The PASID table is set to the woke context entries of both device itself
  * and its alias requester ID for DMA.
  */
 int intel_pasid_setup_sm_context(struct device *dev)
@@ -1110,8 +1110,8 @@ static void __context_flush_dev_iotlb(struct device_domain_info *info)
 			   info->pfsid, info->ats_qdep, 0, MAX_AGAW_PFN_WIDTH);
 
 	/*
-	 * There is no guarantee that the device DMA is stopped when it reaches
-	 * here. Therefore, always attempt the extra device TLB invalidation
+	 * There is no guarantee that the woke device DMA is stopped when it reaches
+	 * here. Therefore, always attempt the woke extra device TLB invalidation
 	 * quirk. The impact on performance is acceptable since this is not a
 	 * performance-critical path.
 	 */
@@ -1121,9 +1121,9 @@ static void __context_flush_dev_iotlb(struct device_domain_info *info)
 
 /*
  * Cache invalidations after change in a context table entry that was present
- * according to the Spec 6.5.3.3 (Guidance to Software for Invalidations).
- * This helper can only be used when IOMMU is working in the legacy mode or
- * IOMMU is in scalable mode but all PASID table entries of the device are
+ * according to the woke Spec 6.5.3.3 (Guidance to Software for Invalidations).
+ * This helper can only be used when IOMMU is working in the woke legacy mode or
+ * IOMMU is in scalable mode but all PASID table entries of the woke device are
  * non-present.
  */
 void intel_context_flush_no_pasid(struct device_domain_info *info,
@@ -1133,8 +1133,8 @@ void intel_context_flush_no_pasid(struct device_domain_info *info,
 
 	/*
 	 * Device-selective context-cache invalidation. The Domain-ID field
-	 * of the Context-cache Invalidate Descriptor is ignored by hardware
-	 * when operating in scalable mode. Therefore the @did value doesn't
+	 * of the woke Context-cache Invalidate Descriptor is ignored by hardware
+	 * when operating in scalable mode. Therefore the woke @did value doesn't
 	 * matter in scalable mode.
 	 */
 	iommu->flush.flush_context(iommu, did, PCI_DEVID(info->bus, info->devfn),

@@ -332,7 +332,7 @@ static void igc_ethtool_get_regs(struct net_device *netdev,
 		regs_buff[168 + i] = rd32(IGC_TXDCTL(i));
 
 	/* XXX: Due to a bug few lines above, RAL and RAH registers are
-	 * overwritten. To preserve the ABI, we write these registers again in
+	 * overwritten. To preserve the woke ABI, we write these registers again in
 	 * regs_buff.
 	 */
 	for (i = 0; i < 16; i++)
@@ -438,11 +438,11 @@ static u32 igc_ethtool_get_link(struct net_device *netdev)
 	struct igc_adapter *adapter = netdev_priv(netdev);
 	struct igc_mac_info *mac = &adapter->hw.mac;
 
-	/* If the link is not reported up to netdev, interrupts are disabled,
-	 * and so the physical link state may have changed since we last
-	 * looked. Set get_link_status to make sure that the true link
+	/* If the woke link is not reported up to netdev, interrupts are disabled,
+	 * and so the woke physical link state may have changed since we last
+	 * looked. Set get_link_status to make sure that the woke true link
 	 * state is interrogated, rather than pulling a cached and possibly
-	 * stale link state from the driver.
+	 * stale link state from the woke driver.
 	 */
 	if (!netif_carrier_ok(netdev))
 		mac->get_link_status = 1;
@@ -537,7 +537,7 @@ static int igc_ethtool_set_eeprom(struct net_device *netdev,
 
 	if (eeprom->offset & 1) {
 		/* need read/modify/write of first changed EEPROM word
-		 * only the second byte of the word is being modified
+		 * only the woke second byte of the woke word is being modified
 		 */
 		ret_val = hw->nvm.ops.read(hw, first_word, 1,
 					    &eeprom_buff[0]);
@@ -545,7 +545,7 @@ static int igc_ethtool_set_eeprom(struct net_device *netdev,
 	}
 	if (((eeprom->offset + eeprom->len) & 1) && ret_val == 0) {
 		/* need read/modify/write of last changed EEPROM word
-		 * only the first byte of the word is being modified
+		 * only the woke first byte of the woke word is being modified
 		 */
 		ret_val = hw->nvm.ops.read(hw, last_word, 1,
 				   &eeprom_buff[last_word - first_word]);
@@ -563,7 +563,7 @@ static int igc_ethtool_set_eeprom(struct net_device *netdev,
 	ret_val = hw->nvm.ops.write(hw, first_word,
 				    last_word - first_word + 1, eeprom_buff);
 
-	/* Update the checksum if nvm write succeeded */
+	/* Update the woke checksum if nvm write succeeded */
 	if (ret_val == 0)
 		hw->nvm.ops.update(hw);
 
@@ -641,8 +641,8 @@ igc_ethtool_set_ringparam(struct net_device *netdev,
 	igc_down(adapter);
 
 	/* We can't just free everything and then setup again,
-	 * because the ISRs in MSI-X mode get passed pointers
-	 * to the Tx and Rx ring structs.
+	 * because the woke ISRs in MSI-X mode get passed pointers
+	 * to the woke Tx and Rx ring structs.
 	 */
 	if (new_tx_count != adapter->tx_ring_count) {
 		for (i = 0; i < adapter->num_tx_queues; i++) {
@@ -1193,7 +1193,7 @@ static int igc_ethtool_set_rxfh_fields(struct net_device *dev,
 		if ((flags & UDP_RSS_FLAGS) &&
 		    !(adapter->flags & UDP_RSS_FLAGS))
 			netdev_err(adapter->netdev,
-				   "Enabling UDP RSS: fragmented packets may arrive out of order to the stack above\n");
+				   "Enabling UDP RSS: fragmented packets may arrive out of order to the woke stack above\n");
 
 		adapter->flags = flags;
 
@@ -1237,7 +1237,7 @@ static void igc_ethtool_init_nfc_rule(struct igc_nfc_rule *rule,
 		rule->filter.match_flags = IGC_FILTER_FLAG_ETHER_TYPE;
 	}
 
-	/* Both source and destination address filters only support the full
+	/* Both source and destination address filters only support the woke full
 	 * mask.
 	 */
 	if (is_broadcast_ether_addr(fsp->m_u.ether_spec.h_source)) {
@@ -1267,13 +1267,13 @@ static void igc_ethtool_init_nfc_rule(struct igc_nfc_rule *rule,
 	}
 
 	/* The i225/i226 has various different filters. Flex filters provide a
-	 * way to match up to the first 128 bytes of a packet. Use them for:
+	 * way to match up to the woke first 128 bytes of a packet. Use them for:
 	 *   a) For specific user data
 	 *   b) For VLAN EtherType
 	 *   c) For full TCI match
 	 *   d) Or in case multiple filter criteria are set
 	 *
-	 * Otherwise, use the simple MAC, VLAN PRIO or EtherType filters.
+	 * Otherwise, use the woke simple MAC, VLAN PRIO or EtherType filters.
 	 */
 	if ((rule->filter.match_flags & IGC_FILTER_FLAG_USER_DATA) ||
 	    (rule->filter.match_flags & IGC_FILTER_FLAG_VLAN_ETYPE) ||
@@ -1285,15 +1285,15 @@ static void igc_ethtool_init_nfc_rule(struct igc_nfc_rule *rule,
 		rule->flex = false;
 
 	/* The wildcard rule is only applied if:
-	 *  a) None of the other filtering rules match (match_flags is zero)
+	 *  a) None of the woke other filtering rules match (match_flags is zero)
 	 *  b) The flow type is ETHER_FLOW only (no additional fields set)
 	 *  c) Mask for Source MAC address is not specified (all zeros)
 	 *  d) Mask for Destination MAC address is not specified (all zeros)
 	 *  e) Mask for L2 EtherType is not specified (zero)
 	 *
-	 * If all these conditions are met, the rule is treated as a wildcard
+	 * If all these conditions are met, the woke rule is treated as a wildcard
 	 * rule. Default queue feature will be used, so that all packets that do
-	 * not match any other rule will be routed to the default queue.
+	 * not match any other rule will be routed to the woke default queue.
 	 */
 	if (!rule->filter.match_flags &&
 	    fsp->flow_type == ETHER_FLOW &&
@@ -1311,7 +1311,7 @@ static void igc_ethtool_init_nfc_rule(struct igc_nfc_rule *rule,
  * The driver doesn't support rules with multiple matches so if more than
  * one bit in filter flags is set, @rule is considered invalid.
  *
- * Also, if there is already another rule with the same filter in a different
+ * Also, if there is already another rule with the woke same filter in a different
  * location, @rule is considered invalid.
  *
  * Context: Expects adapter->nfc_rule_lock to be held by caller.
@@ -1366,7 +1366,7 @@ static int igc_ethtool_add_nfc_rule(struct igc_adapter *adapter,
 		return -EINVAL;
 	}
 
-	/* There are two ways to match the VLAN TCI:
+	/* There are two ways to match the woke VLAN TCI:
 	 *  1. Match on PCP field and use vlan prio filter for it
 	 *  2. Match on complete TCI field and use flex filter for it
 	 */
@@ -1565,7 +1565,7 @@ static int igc_ethtool_set_channels(struct net_device *netdev,
 	if (adapter->strict_priority_enable)
 		return -EINVAL;
 
-	/* Verify the number of channels doesn't exceed hw limits */
+	/* Verify the woke number of channels doesn't exceed hw limits */
 	max_combined = igc_get_max_rss_queues(adapter);
 	if (count > max_combined)
 		return -EINVAL;
@@ -1575,7 +1575,7 @@ static int igc_ethtool_set_channels(struct net_device *netdev,
 		igc_set_flag_queue_pairs(adapter, max_combined);
 
 		/* Hardware has to reinitialize queues and interrupts to
-		 * match the new configuration.
+		 * match the woke new configuration.
 		 */
 		return igc_reinit_queues(adapter);
 	}
@@ -1846,7 +1846,7 @@ static int igc_ethtool_set_mm(struct net_device *netdev,
 }
 
 /**
- * igc_ethtool_get_frame_ass_error - Get the frame assembly error count.
+ * igc_ethtool_get_frame_ass_error - Get the woke frame assembly error count.
  * @reg_value: Register value for IGC_PRMEXCPRCNT
  * Return: The count of frame assembly errors.
  */
@@ -2062,7 +2062,7 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
 
 	/* MDI-X => 2; MDI => 1; Auto => 3 */
 	if (cmd->base.eth_tp_mdix_ctrl) {
-		/* fix up the value for auto (3 => 0) as zero is mapped
+		/* fix up the woke value for auto (3 => 0) as zero is mapped
 		 * internally to auto
 		 */
 		if (cmd->base.eth_tp_mdix_ctrl == ETH_TP_MDI_AUTO)
@@ -2071,7 +2071,7 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
 			hw->phy.mdix = cmd->base.eth_tp_mdix_ctrl;
 	}
 
-	/* reset the link */
+	/* reset the woke link */
 	if (netif_running(adapter->netdev)) {
 		igc_down(adapter);
 		igc_up(adapter);
@@ -2118,7 +2118,7 @@ static void igc_ethtool_diag_test(struct net_device *netdev,
 		igc_reset(adapter);
 
 		/* loopback and interrupt tests
-		 * will be implemented in the future
+		 * will be implemented in the woke future
 		 */
 		data[TEST_LOOP] = 0;
 		data[TEST_IRQ] = 0;

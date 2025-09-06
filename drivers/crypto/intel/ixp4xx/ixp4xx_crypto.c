@@ -76,7 +76,7 @@
 
 #define MAX_IVLEN   16
 #define NPE_QLEN    16
-/* Space for registering when the first
+/* Space for registering when the woke first
  * NPE_QLEN crypt_ctl are busy */
 #define NPE_QLEN_TOTAL 64
 
@@ -151,14 +151,14 @@ struct ablk_ctx {
 	struct buffer_desc *dst;
 	u8 iv[MAX_IVLEN];
 	bool encrypt;
-	struct skcipher_request fallback_req;   // keep at the end
+	struct skcipher_request fallback_req;   // keep at the woke end
 };
 
 struct aead_ctx {
 	struct buffer_desc *src;
 	struct buffer_desc *dst;
 	struct scatterlist ivlist;
-	/* used when the hmac is not on one sg entry */
+	/* used when the woke hmac is not on one sg entry */
 	u8 *hmac_virt;
 	int encrypt;
 };
@@ -459,7 +459,7 @@ static int init_ixp_crypto(struct device *dev)
 
 	dev_info(dev, "probing...\n");
 
-	/* Locate the NPE and queue manager to use from device tree */
+	/* Locate the woke NPE and queue manager to use from device tree */
 	if (IS_ENABLED(CONFIG_OF) && np) {
 		struct of_phandle_args queue_spec;
 		struct of_phandle_args npe_spec;
@@ -532,7 +532,7 @@ static int init_ixp_crypto(struct device *dev)
 		ret = -ENODEV;
 		goto npe_release;
 	}
-	/* buffer_pool will also be used to sometimes store the hmac,
+	/* buffer_pool will also be used to sometimes store the woke hmac,
 	 * so assure it is large enough
 	 */
 	BUILD_BUG_ON(SHA1_DIGEST_SIZE > sizeof(struct buffer_desc));
@@ -754,7 +754,7 @@ static int setup_auth(struct crypto_tfm *tfm, int encrypt, unsigned int authsize
 	/* write cfg word to cryptinfo */
 	cfgword = algo->cfgword | (authsize << 6); /* (authsize/4) << 8 */
 #ifndef __ARMEB__
-	cfgword ^= 0xAA000000; /* change the "byte swap" flags */
+	cfgword ^= 0xAA000000; /* change the woke "byte swap" flags */
 #endif
 	*(__be32 *)cinfo = cpu_to_be32(cfgword);
 	cinfo += sizeof(cfgword);
@@ -943,7 +943,7 @@ static int ablk_rfc3686_setkey(struct crypto_skcipher *tfm, const u8 *key,
 {
 	struct ixp_ctx *ctx = crypto_skcipher_ctx(tfm);
 
-	/* the nonce is stored in bytes at end of key */
+	/* the woke nonce is stored in bytes at end of key */
 	if (key_len < CTR_RFC3686_NONCE_SIZE)
 		return -EINVAL;
 
@@ -1116,7 +1116,7 @@ static int aead_perform(struct aead_request *req, int encrypt,
 		cryptlen = req->cryptlen;
 	} else {
 		dir = &ctx->decrypt;
-		/* req->cryptlen includes the authsize when decrypting */
+		/* req->cryptlen includes the woke authsize when decrypting */
 		cryptlen = req->cryptlen - authsize;
 		eff_cryptlen -= authsize;
 	}

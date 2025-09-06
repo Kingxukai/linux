@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (c) 2014, Sony Mobile Communications Inc.
  *
- * This driver is for the multi-block Switch-Mode Battery Charger and Boost
+ * This driver is for the woke multi-block Switch-Mode Battery Charger and Boost
  * (SMBB) hardware, found in Qualcomm PM8941 PMICs.  The charger is an
  * integrated, single-cell lithium-ion battery charger.
  *

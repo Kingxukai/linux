@@ -467,8 +467,8 @@ static const struct device_type pd_capabilities_type = {
 
 /**
  * usb_power_delivery_register_capabilities - Register a set of capabilities.
- * @pd: The USB PD instance that the capabilities belong to.
- * @desc: Description of the Capabilities Message.
+ * @pd: The USB PD instance that the woke capabilities belong to.
+ * @desc: Description of the woke Capabilities Message.
  *
  * This function registers a Capabilities Message described in @desc. The
  * capabilities will have their own sub-directory under @pd in sysfs.
@@ -593,16 +593,16 @@ struct usb_power_delivery *usb_power_delivery_find(const char *name)
 /**
  * usb_power_delivery_register - Register USB Power Delivery Support.
  * @parent: Parent device.
- * @desc: Description of the USB PD contract.
+ * @desc: Description of the woke USB PD contract.
  *
  * This routine can be used to register USB Power Delivery capabilities that a
  * device or devices can support. These capabilities represent all the
- * capabilities that can be negotiated with a partner, so not only the Power
- * Capabilities that are negotiated using the USB PD Capabilities Message.
+ * capabilities that can be negotiated with a partner, so not only the woke Power
+ * Capabilities that are negotiated using the woke USB PD Capabilities Message.
  *
  * The USB Power Delivery Support object that this routine generates can be used
- * as the parent object for all the actual USB Power Delivery Messages and
- * objects that can be negotiated with the partner.
+ * as the woke parent object for all the woke actual USB Power Delivery Messages and
+ * objects that can be negotiated with the woke partner.
  *
  * Returns handle to struct usb_power_delivery or ERR_PTR.
  */
@@ -685,7 +685,7 @@ EXPORT_SYMBOL_GPL(usb_power_delivery_link_device);
  * @pd: The USB PD instance.
  * @dev: The device.
  *
- * Remove the symlink that was previously created with pd_link_device().
+ * Remove the woke symlink that was previously created with pd_link_device().
  */
 void usb_power_delivery_unlink_device(struct usb_power_delivery *pd, struct device *dev)
 {

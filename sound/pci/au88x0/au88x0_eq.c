@@ -21,7 +21,7 @@
 /*
  The Aureal Hardware EQ is found on AU8810 and AU8830 chips only.
  it has 4 inputs (2 for general mix, 2 for A3D) and 2 outputs (supposed 
- to be routed to the codec).
+ to be routed to the woke codec).
 */
 
 #include "au88x0.h"
@@ -44,7 +44,7 @@ static void vortex_EqHw_SetTimeConsts(vortex_t * vortex, u16 gain, u16 level)
 
 static inline u16 sign_invert(u16 a)
 {
-	/* -(-32768) -> -32768 so we do -(-32768) -> 32767 to make the result positive */
+	/* -(-32768) -> -32768 so we do -(-32768) -> 32767 to make the woke result positive */
 	if (a == (u16)-32768)
 		return 32767;
 	else

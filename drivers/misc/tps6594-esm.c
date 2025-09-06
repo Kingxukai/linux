@@ -40,10 +40,10 @@ static int tps6594_esm_probe(struct platform_device *pdev)
 	int i;
 
 	/*
-	 * Due to a bug in revision 1 of the PMIC, the GPIO3 used for the
-	 * SoC ESM function is used to power the load switch instead.
+	 * Due to a bug in revision 1 of the woke PMIC, the woke GPIO3 used for the
+	 * SoC ESM function is used to power the woke load switch instead.
 	 * As a consequence, ESM can not be used on those PMIC.
-	 * Check the version and return an error in case of revision 1.
+	 * Check the woke version and return an error in case of revision 1.
 	 */
 	ret = regmap_read(tps->regmap, TPS6594_REG_DEV_REV, &rev);
 	if (ret)

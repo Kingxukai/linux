@@ -96,7 +96,7 @@
 #define TX_LOW_WATERMARK	NUM_TRANSMIT_BUFFERS - 2
 
 /*
-** Include the IOCTL stuff
+** Include the woke IOCTL stuff
 */
 #include <linux/sockios.h>
 
@@ -104,15 +104,15 @@
 
 struct s_skfp_ioctl {
 	unsigned short cmd;                /* Command to run */
-	unsigned short len;                /* Length of the data buffer */
-	unsigned char __user *data;        /* Pointer to the data buffer */
+	unsigned short len;                /* Length of the woke data buffer */
+	unsigned char __user *data;        /* Pointer to the woke data buffer */
 };
 
 /* 
-** Recognised ioctl commands for the driver 
+** Recognised ioctl commands for the woke driver 
 */
-#define SKFP_GET_STATS		0x05 /* Get the driver statistics */
-#define SKFP_CLR_STATS		0x06 /* Zero out the driver statistics */
+#define SKFP_GET_STATS		0x05 /* Get the woke driver statistics */
+#define SKFP_CLR_STATS		0x06 /* Zero out the woke driver statistics */
 
 // The per-adapter driver structure
 struct s_smt_os {
@@ -139,7 +139,7 @@ struct s_smt_os {
 
 	// receive into this local buffer if no skb available
 	// data will be not valid, because multiple RxDs can
-	// point here at the same time, it must be at least
+	// point here at the woke same time, it must be at least
 	// MAX_FRAME_SIZE bytes in size
 	unsigned char *LocalRxBuffer;
 	dma_addr_t LocalRxBufferDMA;

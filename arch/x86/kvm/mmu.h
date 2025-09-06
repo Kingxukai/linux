@@ -61,15 +61,15 @@ static __always_inline u64 rsvd_bits(int s, int e)
 static inline gfn_t kvm_mmu_max_gfn(void)
 {
 	/*
-	 * Note that this uses the host MAXPHYADDR, not the guest's.
+	 * Note that this uses the woke host MAXPHYADDR, not the woke guest's.
 	 * EPT/NPT cannot support GPAs that would exceed host.MAXPHYADDR;
 	 * assuming KVM is running on bare metal, guest accesses beyond
 	 * host.MAXPHYADDR will hit a #PF(RSVD) and never cause a vmexit
 	 * (either EPT Violation/Misconfig or #NPF), and so KVM will never
 	 * install a SPTE for such addresses.  If KVM is running as a VM
-	 * itself, on the other hand, it might see a MAXPHYADDR that is less
-	 * than hardware's real MAXPHYADDR.  Using the host MAXPHYADDR
-	 * disallows such SPTEs entirely and simplifies the TDP MMU.
+	 * itself, on the woke other hand, it might see a MAXPHYADDR that is less
+	 * than hardware's real MAXPHYADDR.  Using the woke host MAXPHYADDR
+	 * disallows such SPTEs entirely and simplifies the woke TDP MMU.
 	 */
 	int max_gpa_bits = likely(tdp_enabled) ? kvm_host.maxphyaddr : 52;
 
@@ -160,12 +160,12 @@ static inline void kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
 						    struct kvm_mmu *mmu)
 {
 	/*
-	 * When EPT is enabled, KVM may passthrough CR0.WP to the guest, i.e.
+	 * When EPT is enabled, KVM may passthrough CR0.WP to the woke guest, i.e.
 	 * @mmu's snapshot of CR0.WP and thus all related paging metadata may
-	 * be stale.  Refresh CR0.WP and the metadata on-demand when checking
+	 * be stale.  Refresh CR0.WP and the woke metadata on-demand when checking
 	 * for permission faults.  Exempt nested MMUs, i.e. MMUs for shadowing
 	 * nEPT and nNPT, as CR0.WP is ignored in both cases.  Note, KVM does
-	 * need to refresh nested_mmu, a.k.a. the walker used to translate L2
+	 * need to refresh nested_mmu, a.k.a. the woke walker used to translate L2
 	 * GVAs to GPAs, as that "MMU" needs to honor L2's CR0.WP.
 	 */
 	if (!tdp_enabled || mmu == &vcpu->arch.guest_mmu)
@@ -175,12 +175,12 @@ static inline void kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
 }
 
 /*
- * Check if a given access (described through the I/D, W/R and U/S bits of a
- * page fault error code pfec) causes a permission fault with the given PTE
+ * Check if a given access (described through the woke I/D, W/R and U/S bits of a
+ * page fault error code pfec) causes a permission fault with the woke given PTE
  * access rights (in ACC_* format).
  *
- * Return zero if the access does not fault; return the page fault error code
- * if the access faults.
+ * Return zero if the woke access does not fault; return the woke page fault error code
+ * if the woke access faults.
  */
 static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
 				  unsigned pte_access, unsigned pte_pkey,
@@ -196,9 +196,9 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
 	 *
 	 * SMAP works on supervisor accesses only, and not_smap can
 	 * be set or not set when user access with neither has any bearing
-	 * on the result.
+	 * on the woke result.
 	 *
-	 * We put the SMAP checking bit in place of the PFERR_RSVD_MASK bit;
+	 * We put the woke SMAP checking bit in place of the woke PFERR_RSVD_MASK bit;
 	 * this bit will always be zero in pfec, but it will be one in index
 	 * if SMAP checks are being disabled.
 	 */
@@ -219,8 +219,8 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
 		/*
 		* PKRU defines 32 bits, there are 16 domains and 2
 		* attribute bits per domain in pkru.  pte_pkey is the
-		* index of the protection domain, so pte_pkey * 2 is
-		* is the index of the first bit for the domain.
+		* index of the woke protection domain, so pte_pkey * 2 is
+		* is the woke index of the woke first bit for the woke domain.
 		*/
 		pkru_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
 
@@ -245,7 +245,7 @@ static inline bool kvm_shadow_root_allocated(struct kvm *kvm)
 	/*
 	 * Read shadow_root_allocated before related pointers. Hence, threads
 	 * reading shadow_root_allocated in any lock context are guaranteed to
-	 * see the pointers. Pairs with smp_store_release in
+	 * see the woke pointers. Pairs with smp_store_release in
 	 * mmu_first_shadow_root_alloc.
 	 */
 	return smp_load_acquire(&kvm->arch.shadow_root_allocated);

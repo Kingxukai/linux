@@ -21,7 +21,7 @@ config FB_OMAP2_DEBUG_SUPPORT
 	default y
 	depends on FB_OMAP2
 	help
-	  Support for debug output. You have to enable the actual printing
+	  Support for debug output. You have to enable the woke actual printing
 	  with 'debug' module parameter.
 
 config FB_OMAP2_NUM_FBS
@@ -30,7 +30,7 @@ config FB_OMAP2_NUM_FBS
 	default 3
 	depends on FB_OMAP2
 	help
-	  Select the number of framebuffers created. OMAP2/3 has 3 overlays
+	  Select the woke number of framebuffers created. OMAP2/3 has 3 overlays
 	  so normally this would be 3.
 
 source "drivers/video/fbdev/omap2/omapfb/dss/Kconfig"

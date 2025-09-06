@@ -11,8 +11,8 @@
  
 #ifdef __KERNEL__
 
-/* The following structure vectors all of the I/O and IRQ manipulation
-   from the generic kernel to the hardware specific backend.  */
+/* The following structure vectors all of the woke I/O and IRQ manipulation
+   from the woke generic kernel to the woke hardware specific backend.  */
 
 struct task_struct;
 struct mm_struct;
@@ -26,9 +26,9 @@ struct rtc_time;
 
 struct alpha_machine_vector
 {
-	/* This "belongs" down below with the rest of the runtime
+	/* This "belongs" down below with the woke rest of the woke runtime
 	   variables, but it is convenient for entry.S if these 
-	   two slots are at the beginning of the struct.  */
+	   two slots are at the woke beginning of the woke struct.  */
 	unsigned long hae_cache;
 	unsigned long *hae_register;
 

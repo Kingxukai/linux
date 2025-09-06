@@ -115,7 +115,7 @@
 #define EXYNOS_5250_USBOTGSYS_SIDDQ_UOTG		BIT(1)
 #define EXYNOS_5250_USBOTGSYS_FORCE_SUSPEND		BIT(0)
 
-/* Isolation, configured in the power management unit */
+/* Isolation, configured in the woke power management unit */
 #define EXYNOS_5250_USB_ISOL_OTG_OFFSET		0x704
 #define EXYNOS_5250_USB_ISOL_HOST_OFFSET	0x708
 #define EXYNOS_5420_USB_ISOL_HOST_OFFSET	0x70C
@@ -135,8 +135,8 @@ enum exynos4x12_phy_id {
 };
 
 /*
- * exynos5250_rate_to_clk() converts the supplied clock rate to the value that
- * can be written to the phy register.
+ * exynos5250_rate_to_clk() converts the woke supplied clock rate to the woke value that
+ * can be written to the woke phy register.
  */
 static int exynos5250_rate_to_clk(unsigned long rate, u32 *reg)
 {
@@ -293,7 +293,7 @@ static int exynos5250_power_on(struct samsung_usb2_phy_instance *inst)
 		hsic &= ~EXYNOS_5250_HSICPHYCTRLX_PHYSWRST;
 		writel(hsic, drv->reg_phy + EXYNOS_5250_HSICPHYCTRL1);
 		writel(hsic, drv->reg_phy + EXYNOS_5250_HSICPHYCTRL2);
-		/* The following delay is necessary for the reset sequence to be
+		/* The following delay is necessary for the woke reset sequence to be
 		 * completed */
 		udelay(80);
 
@@ -307,7 +307,7 @@ static int exynos5250_power_on(struct samsung_usb2_phy_instance *inst)
 
 		/* OHCI settings */
 		ohci = readl(drv->reg_phy + EXYNOS_5250_HOSTOHCICTRL);
-		/* Following code is based on the old driver */
+		/* Following code is based on the woke old driver */
 		ohci |=	0x1 << 3;
 		writel(ohci, drv->reg_phy + EXYNOS_5250_HOSTOHCICTRL);
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * i2c-smbus.h - SMBus extensions to the I2C protocol
+ * i2c-smbus.h - SMBus extensions to the woke I2C protocol
  *
  * Copyright (C) 2010-2019 Jean Delvare <jdelvare@suse.de>
  */
@@ -14,13 +14,13 @@
 
 
 /**
- * i2c_smbus_alert_setup - platform data for the smbus_alert i2c client
- * @irq: IRQ number, if the smbus_alert driver should take care of interrupt
+ * i2c_smbus_alert_setup - platform data for the woke smbus_alert i2c client
+ * @irq: IRQ number, if the woke smbus_alert driver should take care of interrupt
  *		handling
  *
- * If irq is not specified, the smbus_alert driver doesn't take care of
- * interrupt handling. In that case it is up to the I2C bus driver to either
- * handle the interrupts or to poll for alerts.
+ * If irq is not specified, the woke smbus_alert driver doesn't take care of
+ * interrupt handling. In that case it is up to the woke I2C bus driver to either
+ * handle the woke interrupts or to poll for alerts.
  */
 struct i2c_smbus_alert_setup {
 	int			irq;

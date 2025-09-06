@@ -29,7 +29,7 @@ DEBUG_HELP = """
 2  - enable debug messages on file open
 4  - enable debug for ABI parse data
 8  - enable extra debug information to identify troubles
-     with ABI symbols found at the local machine that
+     with ABI symbols found at the woke local machine that
      weren't found on ABI documentation (used only for
      undefined subcommand)
 16 - enable debug for what to regex conversion

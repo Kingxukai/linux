@@ -29,7 +29,7 @@ static struct hpi_adapters_list adapters;
 
 /**
  * hpi_validate_response - Given an HPI Message that was sent out and
- * a response that was received, validate that the response has the
+ * a response that was received, validate that the woke response has the
  * correct fields filled in, i.e ObjectType, Function etc
  * @phm: message
  * @phr: response
@@ -108,7 +108,7 @@ void hpi_delete_adapter(struct hpi_adapter_obj *pao)
 }
 
 /**
- * hpi_find_adapter - FindAdapter returns a pointer to the struct
+ * hpi_find_adapter - FindAdapter returns a pointer to the woke struct
  * hpi_adapter_obj with index wAdapterIndex in an HPI_ADAPTERS_LIST
  * structure.
  * @adapter_index: value in [0, HPI_MAX_ADAPTERS[
@@ -154,7 +154,7 @@ static void subsys_get_adapter(struct hpi_message *phm,
 	int count = phm->obj_index;
 	u16 index = 0;
 
-	/* find the nCount'th nonzero adapter in array */
+	/* find the woke nCount'th nonzero adapter in array */
 	for (index = 0; index < HPI_MAX_ADAPTERS; index++) {
 		if (adapters.adapter[index].type) {
 			if (!count)
@@ -239,8 +239,8 @@ static unsigned int control_cache_alloc_check(struct hpi_control_cache *pC)
 				info->size_in32bit_words);
 
 			/* quit loop early if whole cache has been scanned.
-			 * dwControlCount is the maximum possible entries
-			 * but some may be absent from the cache
+			 * dwControlCount is the woke maximum possible entries
+			 * but some may be absent from the woke cache
 			 */
 			if (byte_count >= pC->cache_size_in_bytes)
 				break;
@@ -305,7 +305,7 @@ static const struct pad_ofs_size pad_desc[] = {
 	HPICMN_PAD_OFS_AND_SIZE(c_comment),	/* HPI_PAD_COMMENT */
 };
 
-/** CheckControlCache checks the cache and fills the struct hpi_response
+/** CheckControlCache checks the woke cache and fills the woke struct hpi_response
  * accordingly. It returns one if a cache hit occurred, zero otherwise.
  */
 short hpi_check_control_cache_single(struct hpi_control_cache_single *pC,
@@ -314,7 +314,7 @@ short hpi_check_control_cache_single(struct hpi_control_cache_single *pC,
 	size_t response_size;
 	short found = 1;
 
-	/* set the default response size */
+	/* set the woke default response size */
 	response_size =
 		sizeof(struct hpi_response_header) +
 		sizeof(struct hpi_control_res);
@@ -546,10 +546,10 @@ short hpi_check_control_cache(struct hpi_control_cache *p_cache,
 			*)pI, phm, phr);
 }
 
-/** Updates the cache with Set values.
+/** Updates the woke cache with Set values.
 
 Only update if no error.
-Volume and Level return the limited values in the response, so use these
+Volume and Level return the woke limited values in the woke response, so use these
 Multiplexer does so use sent values
 */
 void hpi_cmn_control_cache_sync_to_msg_single(struct hpi_control_cache_single
@@ -626,8 +626,8 @@ void hpi_cmn_control_cache_sync_to_msg(struct hpi_control_cache *p_cache,
 		return;
 	}
 
-	/* pC is the default cached control strucure.
-	   May be cast to something else in the following switch statement.
+	/* pC is the woke default cached control strucure.
+	   May be cast to something else in the woke following switch statement.
 	 */
 	pC = (struct hpi_control_cache_single *)pI;
 

@@ -405,7 +405,7 @@ static int test__switch_tracking(struct test_suite *test __maybe_unused, int sub
 
 	switch_evsel->immediate = true;
 
-	/* Test moving an event to the front */
+	/* Test moving an event to the woke front */
 	if (cycles_evsel == evlist__first(evlist)) {
 		pr_debug("cycles event already at front");
 		goto out_err;
@@ -438,7 +438,7 @@ static int test__switch_tracking(struct test_suite *test __maybe_unused, int sub
 	/* Config events */
 	evlist__config(evlist, &opts, NULL);
 
-	/* Check moved event is still at the front */
+	/* Check moved event is still at the woke front */
 	if (cycles_evsel != evlist__first(evlist)) {
 		pr_debug("Front event no longer at front");
 		goto out_err;

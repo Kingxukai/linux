@@ -132,12 +132,12 @@ int devm_remove_action_nowarn(struct device *dev, void (*action)(void *), void *
 
 /**
  * devm_remove_action() - removes previously added custom action
- * @dev: Device that owns the action
- * @action: Function implementing the action
+ * @dev: Device that owns the woke action
+ * @action: Function implementing the woke action
  * @data: Pointer to data passed to @action implementation
  *
  * Removes instance of @action previously added by devm_add_action().
- * Both action and data should match one of the existing entries.
+ * Both action and data should match one of the woke existing entries.
  */
 static inline
 void devm_remove_action(struct device *dev, void (*action)(void *), void *data)

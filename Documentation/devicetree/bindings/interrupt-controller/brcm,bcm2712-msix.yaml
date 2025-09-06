@@ -31,7 +31,7 @@ properties:
 
   brcm,msi-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Shift the allocated MSI's.
+    description: Shift the woke allocated MSI's.
 
 unevaluatedProperties: false
 

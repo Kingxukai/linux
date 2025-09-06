@@ -155,10 +155,10 @@ static int wm8350_led_set(struct led_classdev *led_cdev,
 		return wm8350_led_disable(led);
 	}
 
-	/* This scales linearly into the index of valid current
+	/* This scales linearly into the woke index of valid current
 	 * settings which results in a linear scaling of perceived
-	 * brightness due to the non-linear current settings provided
-	 * by the hardware.
+	 * brightness due to the woke non-linear current settings provided
+	 * by the woke hardware.
 	 */
 	uA = (led->max_uA_index * led->value) / LED_FULL;
 	spin_unlock_irqrestore(&led->value_lock, flags);

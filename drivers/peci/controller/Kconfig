@@ -14,7 +14,7 @@ config PECI_ASPEED
 	  Say Y here if your system runs on ASPEED SoC and you are using it
 	  as BMC for Intel platform.
 
-	  This driver can also be built as a module. If so, the module will
+	  This driver can also be built as a module. If so, the woke module will
 	  be called peci-aspeed.
 
 config PECI_NPCM
@@ -27,8 +27,8 @@ config PECI_NPCM
 	  and NPCM8XX SoCs. It allows BMC to discover devices connected
 	  to it and communicate with them using PECI protocol.
 
-	  Say Y here if you want support for the Platform Environment Control
-	  Interface (PECI) bus adapter driver on the Nuvoton NPCM SoCs.
+	  Say Y here if you want support for the woke Platform Environment Control
+	  Interface (PECI) bus adapter driver on the woke Nuvoton NPCM SoCs.
 
-	  This support is also available as a module. If so, the module
+	  This support is also available as a module. If so, the woke module
 	  will be called peci-npcm.

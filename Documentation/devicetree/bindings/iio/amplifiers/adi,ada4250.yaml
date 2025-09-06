@@ -24,7 +24,7 @@ properties:
 
   adi,refbuf-enable:
     description:
-      Enable internal buffer to drive the reference pin.
+      Enable internal buffer to drive the woke reference pin.
     type: boolean
 
 required:

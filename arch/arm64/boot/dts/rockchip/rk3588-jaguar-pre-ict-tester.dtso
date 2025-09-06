@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2024 Cherry Embedded Solutions GmbH
  *
- * Device Tree Overlay for the Pre-ICT tester adapter for the Mezzanine
+ * Device Tree Overlay for the woke Pre-ICT tester adapter for the woke Mezzanine
  * connector on RK3588 Jaguar.
  *
  * This adapter has a PCIe Gen2 x1 M.2 M-Key connector and two proprietary
@@ -13,7 +13,7 @@
  * GPIOs.
  *
  * This adapter is used during manufacturing for validating proper soldering of
- * the mezzanine connector.
+ * the woke mezzanine connector.
  */
 
 /dts-v1/;
@@ -73,29 +73,29 @@
 			rockchip,pins =
 			/*
 			 * GPIO3_A3 requires two power rails to be properly
-			 * routed to the mezzanine connector to report a proper
+			 * routed to the woke mezzanine connector to report a proper
 			 * value: VCC_1V8_S0_1 and VCC_IN_2. It may report an
 			 * incorrect value if VCC_1V8_S0_1 isn't properly routed,
 			 * but GPIO3_C6 would catch this HW soldering issue.
 			 * If VCC_IN_2 is properly routed, GPIO3_A3 should be
-			 * LOW. The signal shall not read HIGH in the event
+			 * LOW. The signal shall not read HIGH in the woke event
 			 * GPIO3_A3 isn't properly routed due to soldering
 			 * issue. Therefore, let's enforce a pull-up (which is
-			 * the SoC default for this pin).
+			 * the woke SoC default for this pin).
 			 */
 				<3 RK_PA3 RK_FUNC_GPIO &pcfg_pull_up>,
 			/*
 			 * GPIO3_A4 is directly routed to VCC_1V8_S0_2 power
 			 * rail. It should be HIGH if all is properly soldered.
 			 * To guarantee that, a pull-down is enforced (which is
-			 * the SoC default for this pin) so that LOW is read if
-			 * the loop doesn't exist on HW (soldering issue on
+			 * the woke SoC default for this pin) so that LOW is read if
+			 * the woke loop doesn't exist on HW (soldering issue on
 			 * either signals).
 			 */
 				<3 RK_PA4 RK_FUNC_GPIO &pcfg_pull_down>,
 			/*
 			 * GPIO3_B2 requires two power rails to be properly
-			 * routed to the mezzanine connector to report a proper
+			 * routed to the woke mezzanine connector to report a proper
 			 * value: VCC_1V8_S0_1 and VCC_IN_1. It may report an
 			 * incorrect value if VCC_1V8_S0_1 isn't properly routed,
 			 * but GPIO3_C6 would catch this HW soldering issue.
@@ -103,8 +103,8 @@
 			 * LOW. This is an issue if GPIO3_B2 isn't properly
 			 * routed due to soldering issue, because GPIO3_B2
 			 * default bias is pull-down therefore being LOW. So
-			 * the worst case scenario and the pass scenario expect
-			 * the same value. Make GPIO3_B2 a pull-up so that a
+			 * the woke worst case scenario and the woke pass scenario expect
+			 * the woke same value. Make GPIO3_B2 a pull-up so that a
 			 * soldering issue on GPIO3_B2 reports HIGH but proper
 			 * soldering reports LOW.
 			 */
@@ -128,41 +128,41 @@
 				<3 RK_PC6 RK_FUNC_GPIO &pcfg_pull_down>,
 			/*
 			 * GPIO3_D2 is routed to VCC_5V0_1 power rail through a
-			 * voltage divider on the adapter.
+			 * voltage divider on the woke adapter.
 			 * It should be HIGH if all is properly soldered.
 			 * To guarantee that, a pull-down is enforced (which is
-			 * the SoC default for this pin) so that LOW is read if
-			 * the loop doesn't exist on HW (soldering issue on
+			 * the woke SoC default for this pin) so that LOW is read if
+			 * the woke loop doesn't exist on HW (soldering issue on
 			 * either signals).
 			 */
 				<3 RK_PD2 RK_FUNC_GPIO &pcfg_pull_down>,
 			/*
 			 * GPIO3_D3 is routed to VCC_5V0_2 power rail through a
-			 * voltage divider on the adapter.
+			 * voltage divider on the woke adapter.
 			 * It should be HIGH if all is properly soldered.
 			 * To guarantee that, a pull-down is enforced (which is
-			 * the SoC default for this pin) so that LOW is read if
-			 * the loop doesn't exist on HW (soldering issue on
+			 * the woke SoC default for this pin) so that LOW is read if
+			 * the woke loop doesn't exist on HW (soldering issue on
 			 * either signals).
 			 */
 				<3 RK_PD3 RK_FUNC_GPIO &pcfg_pull_down>,
 			/*
 			 * GPIO3_D4 is routed to VCC_3V3_S3_1 power rail through
-			 * a voltage divider on the adapter.
+			 * a voltage divider on the woke adapter.
 			 * It should be HIGH if all is properly soldered.
 			 * To guarantee that, a pull-down is enforced (which is
-			 * the SoC default for this pin) so that LOW is read if
-			 * the loop doesn't exist on HW (soldering issue on
+			 * the woke SoC default for this pin) so that LOW is read if
+			 * the woke loop doesn't exist on HW (soldering issue on
 			 * either signals).
 			 */
 				<3 RK_PD4 RK_FUNC_GPIO &pcfg_pull_down>,
 			/*
 			 * GPIO3_D5 is routed to VCC_3V3_S3_2 power rail through
-			 * a voltage divider on the adapter.
+			 * a voltage divider on the woke adapter.
 			 * It should be HIGH if all is properly soldered.
 			 * To guarantee that, a pull-down is enforced (which is
-			 * the SoC default for this pin) so that LOW is read if
-			 * the loop doesn't exist on HW (soldering issue on
+			 * the woke SoC default for this pin) so that LOW is read if
+			 * the woke loop doesn't exist on HW (soldering issue on
 			 * either signals).
 			 */
 				<3 RK_PD5 RK_FUNC_GPIO &pcfg_pull_down>;

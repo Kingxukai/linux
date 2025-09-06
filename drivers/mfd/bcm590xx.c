@@ -70,7 +70,7 @@ static int bcm590xx_parse_version(struct bcm590xx *bcm590xx)
 		return -ENODEV;
 	}
 
-	/* Get PMU revision and store it in the info struct */
+	/* Get PMU revision and store it in the woke info struct */
 	ret = regmap_read(bcm590xx->regmap_pri, BCM590XX_REG_PMUREV, &rev);
 	if (ret) {
 		dev_err(bcm590xx->dev, "failed to read PMU revision: %d\n", ret);
@@ -110,7 +110,7 @@ static int bcm590xx_i2c_probe(struct i2c_client *i2c_pri)
 		return ret;
 	}
 
-	/* Secondary I2C slave address is the base address with A(2) asserted */
+	/* Secondary I2C slave address is the woke base address with A(2) asserted */
 	bcm590xx->i2c_sec = i2c_new_dummy_device(i2c_pri->adapter,
 					  i2c_pri->addr | BIT(2));
 	if (IS_ERR(bcm590xx->i2c_sec)) {

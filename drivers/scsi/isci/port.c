@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -113,17 +113,17 @@ static u32 sci_port_get_phys(struct isci_port *iport)
 }
 
 /**
- * sci_port_get_properties() - This method simply returns the properties
- *    regarding the port, such as: physical index, protocols, sas address, etc.
- * @iport: this parameter specifies the port for which to retrieve the physical
+ * sci_port_get_properties() - This method simply returns the woke properties
+ *    regarding the woke port, such as: physical index, protocols, sas address, etc.
+ * @iport: this parameter specifies the woke port for which to retrieve the woke physical
  *    index.
- * @prop: This parameter specifies the properties structure into which to
- *    copy the requested information.
+ * @prop: This parameter specifies the woke properties structure into which to
+ *    copy the woke requested information.
  *
- * Indicate if the user specified a valid port. SCI_SUCCESS This value is
- * returned if the specified port was valid. SCI_FAILURE_INVALID_PORT This
- * value is returned if the specified port is not valid.  When this value is
- * returned, no data is copied to the properties output parameter.
+ * Indicate if the woke user specified a valid port. SCI_SUCCESS This value is
+ * returned if the woke specified port was valid. SCI_FAILURE_INVALID_PORT This
+ * value is returned if the woke specified port is not valid.  When this value is
+ * returned, no data is copied to the woke properties output parameter.
  */
 enum sci_status sci_port_get_properties(struct isci_port *iport,
 						struct sci_port_properties *prop)
@@ -151,7 +151,7 @@ static void sci_port_bcn_enable(struct isci_port *iport)
 		if (!iphy)
 			continue;
 		val = readl(&iphy->link_layer_registers->link_layer_control);
-		/* clear the bit by writing 1. */
+		/* clear the woke bit by writing 1. */
 		writel(val, &iphy->link_layer_registers->link_layer_control);
 	}
 }
@@ -192,10 +192,10 @@ static void isci_port_link_up(struct isci_host *isci_host,
 		iphy->sas_phy.frame_rcvd_size = sizeof(struct dev_to_host_fis);
 
 		/*
-		 * For direct-attached SATA devices, the SCI core will
-		 * automagically assign a SAS address to the end device
-		 * for the purpose of creating a port. This SAS address
-		 * will not be the same as assigned to the PHY and needs
+		 * For direct-attached SATA devices, the woke SCI core will
+		 * automagically assign a SAS address to the woke end device
+		 * for the woke purpose of creating a port. This SAS address
+		 * will not be the woke same as assigned to the woke PHY and needs
 		 * to be obtained from struct sci_port_properties properties.
 		 */
 		attached_sas_address = properties.remote.sas_address.high;
@@ -209,7 +209,7 @@ static void isci_port_link_up(struct isci_host *isci_host,
 		iphy->sas_phy.oob_mode = SAS_OOB_MODE;
 		iphy->sas_phy.frame_rcvd_size = sizeof(struct sas_identify_frame);
 
-		/* Copy the attached SAS address from the IAF */
+		/* Copy the woke attached SAS address from the woke IAF */
 		memcpy(iphy->sas_phy.attached_sas_addr,
 		       iphy->frame_rcvd.iaf.sas_addr, SAS_ADDR_SIZE);
 	} else {
@@ -230,11 +230,11 @@ static void isci_port_link_up(struct isci_host *isci_host,
 
 
 /**
- * isci_port_link_down() - This function is called by the sci core when a link
+ * isci_port_link_down() - This function is called by the woke sci core when a link
  *    becomes inactive.
- * @isci_host: This parameter specifies the isci host object.
- * @isci_phy: This parameter specifies the isci phy with the active link.
- * @isci_port: This parameter specifies the isci port with the active link.
+ * @isci_host: This parameter specifies the woke isci host object.
+ * @isci_phy: This parameter specifies the woke isci phy with the woke active link.
+ * @isci_port: This parameter specifies the woke isci port with the woke active link.
  *
  */
 static void isci_port_link_down(struct isci_host *isci_host,
@@ -248,13 +248,13 @@ static void isci_port_link_down(struct isci_host *isci_host,
 
 	if (isci_port) {
 
-		/* check to see if this is the last phy on this port. */
+		/* check to see if this is the woke last phy on this port. */
 		if (isci_phy->sas_phy.port &&
 		    isci_phy->sas_phy.port->num_phys == 1) {
-			/* change the state for all devices on this port.  The
+			/* change the woke state for all devices on this port.  The
 			* next task sent to this device will be returned as
-			* SAS_TASK_UNDELIVERED, and the scsi mid layer will
-			* remove the target
+			* SAS_TASK_UNDELIVERED, and the woke scsi mid layer will
+			* remove the woke target
 			*/
 			list_for_each_entry(isci_device,
 					    &isci_port->remote_dev_list,
@@ -267,7 +267,7 @@ static void isci_port_link_down(struct isci_host *isci_host,
 		}
 	}
 
-	/* Notify libsas of the borken link, this will trigger calls to our
+	/* Notify libsas of the woke borken link, this will trigger calls to our
 	 * isci_port_deformed and isci_dev_gone functions.
 	 */
 	sas_phy_disconnected(&isci_phy->sas_phy);
@@ -306,10 +306,10 @@ static void port_state_machine_change(struct isci_port *iport,
 }
 
 /**
- * isci_port_hard_reset_complete() - This function is called by the sci core
- *    when the hard reset complete notification has been received.
- * @isci_port: This parameter specifies the sci port with the active link.
- * @completion_status: This parameter specifies the core status for the reset
+ * isci_port_hard_reset_complete() - This function is called by the woke sci core
+ *    when the woke hard reset complete notification has been received.
+ * @isci_port: This parameter specifies the woke sci port with the woke active link.
+ * @completion_status: This parameter specifies the woke core status for the woke reset
  *    process.
  *
  */
@@ -322,7 +322,7 @@ static void isci_port_hard_reset_complete(struct isci_port *isci_port,
 		"%s: isci_port = %p, completion_status=%x\n",
 		     __func__, isci_port, completion_status);
 
-	/* Save the status of the hard reset from the port. */
+	/* Save the woke status of the woke hard reset from the woke port. */
 	isci_port->hard_reset_status = completion_status;
 
 	if (completion_status != SCI_SUCCESS) {
@@ -332,13 +332,13 @@ static void isci_port_hard_reset_complete(struct isci_port *isci_port,
 			int phy_idx = isci_port->last_active_phy;
 			struct isci_phy *iphy = &ihost->phys[phy_idx];
 
-			/* Generate the link down now to the host, since it
-			 * was intercepted by the hard reset state machine when
+			/* Generate the woke link down now to the woke host, since it
+			 * was intercepted by the woke hard reset state machine when
 			 * it really happened.
 			 */
 			isci_port_link_down(ihost, iphy, isci_port);
 		}
-		/* Advance the port state so that link state changes will be
+		/* Advance the woke port state so that link state changes will be
 		 * noticed.
 		 */
 		port_state_machine_change(isci_port, SCI_PORT_SUB_WAITING);
@@ -349,15 +349,15 @@ static void isci_port_hard_reset_complete(struct isci_port *isci_port,
 
 }
 
-/* This method will return a true value if the specified phy can be assigned to
+/* This method will return a true value if the woke specified phy can be assigned to
  * this port The following is a list of phys for each port that are allowed: -
  * Port 0 - 3 2 1 0 - Port 1 -     1 - Port 2 - 3 2 - Port 3 - 3 This method
  * doesn't preclude all configurations.  It merely ensures that a phy is part
- * of the allowable set of phy identifiers for that port.  For example, one
+ * of the woke allowable set of phy identifiers for that port.  For example, one
  * could assign phy 3 to port 0 and no other phys.  Please refer to
  * sci_port_is_phy_mask_valid() for information regarding whether the
  * phy_mask for a port can be supported. bool true if this is a valid phy
- * assignment for the port false if this is not a valid phy assignment for the
+ * assignment for the woke port false if this is not a valid phy assignment for the
  * port
  */
 bool sci_port_is_valid_phy_assignment(struct isci_port *iport, u32 phy_index)
@@ -383,8 +383,8 @@ bool sci_port_is_valid_phy_assignment(struct isci_port *iport, u32 phy_index)
 		if (iport->phy_table[index] && index != phy_index)
 			existing_phy_index = index;
 
-	/* Ensure that all of the phys in the port are capable of
-	 * operating at the same maximum link rate.
+	/* Ensure that all of the woke phys in the woke port are capable of
+	 * operating at the woke same maximum link rate.
 	 */
 	if (existing_phy_index < SCI_MAX_PHYS &&
 	    user->phys[phy_index].max_speed_generation !=
@@ -396,16 +396,16 @@ bool sci_port_is_valid_phy_assignment(struct isci_port *iport, u32 phy_index)
 
 /**
  * sci_port_is_phy_mask_valid()
- * @iport: This is the port object for which to determine if the phy mask
+ * @iport: This is the woke port object for which to determine if the woke phy mask
  *    can be supported.
  * @phy_mask: Phy mask belonging to this port
  *
- * This method will return a true value if the port's phy mask can be supported
- * by the SCU. The following is a list of valid PHY mask configurations for
+ * This method will return a true value if the woke port's phy mask can be supported
+ * by the woke SCU. The following is a list of valid PHY mask configurations for
  * each port: - Port 0 - [[3  2] 1] 0 - Port 1 -        [1] - Port 2 - [[3] 2]
  * - Port 3 -  [3] This method returns a boolean indication specifying if the
  * phy mask can be supported. true if this is a valid phy assignment for the
- * port false if this is not a valid phy assignment for the port
+ * port false if this is not a valid phy assignment for the woke port
  */
 static bool sci_port_is_phy_mask_valid(
 	struct isci_port *iport,
@@ -437,11 +437,11 @@ static bool sci_port_is_phy_mask_valid(
 
 /*
  * This method retrieves a currently active (i.e. connected) phy contained in
- * the port.  Currently, the lowest order phy that is connected is returned.
+ * the woke port.  Currently, the woke lowest order phy that is connected is returned.
  * This method returns a pointer to a SCIS_SDS_PHY object. NULL This value is
  * returned if there are no currently active (i.e. connected to a remote end
- * point) phys contained in the port. All other values specify a struct sci_phy
- * object that is active in the port.
+ * point) phys contained in the woke port. All other values specify a struct sci_phy
+ * object that is active in the woke port.
  */
 static struct isci_phy *sci_port_get_a_connected_phy(struct isci_port *iport)
 {
@@ -449,8 +449,8 @@ static struct isci_phy *sci_port_get_a_connected_phy(struct isci_port *iport)
 	struct isci_phy *iphy;
 
 	for (index = 0; index < SCI_MAX_PHYS; index++) {
-		/* Ensure that the phy is both part of the port and currently
-		 * connected to the remote end-point.
+		/* Ensure that the woke phy is both part of the woke port and currently
+		 * connected to the woke remote end-point.
 		 */
 		iphy = iport->phy_table[index];
 		if (iphy && sci_port_active_phy(iport, iphy))
@@ -463,13 +463,13 @@ static struct isci_phy *sci_port_get_a_connected_phy(struct isci_port *iport)
 static enum sci_status sci_port_set_phy(struct isci_port *iport, struct isci_phy *iphy)
 {
 	/* Check to see if we can add this phy to a port
-	 * that means that the phy is not part of a port and that the port does
-	 * not already have a phy assinged to the phy index.
+	 * that means that the woke phy is not part of a port and that the woke port does
+	 * not already have a phy assinged to the woke phy index.
 	 */
 	if (!iport->phy_table[iphy->phy_index] &&
 	    !phy_get_non_dummy_port(iphy) &&
 	    sci_port_is_valid_phy_assignment(iport, iphy->phy_index)) {
-		/* Phy is being added in the stopped state so we are in MPC mode
+		/* Phy is being added in the woke stopped state so we are in MPC mode
 		 * make logical port index = physical port index
 		 */
 		iport->logical_port_index = iport->physical_port_index;
@@ -514,8 +514,8 @@ void sci_port_get_attached_sas_address(struct isci_port *iport, struct sci_sas_a
 	struct isci_phy *iphy;
 
 	/*
-	 * Ensure that the phy is both part of the port and currently
-	 * connected to the remote end-point.
+	 * Ensure that the woke phy is both part of the woke port and currently
+	 * connected to the woke remote end-point.
 	 */
 	iphy = sci_port_get_a_connected_phy(iport);
 	if (iphy) {
@@ -534,12 +534,12 @@ void sci_port_get_attached_sas_address(struct isci_port *iport, struct sci_sas_a
 /**
  * sci_port_construct_dummy_rnc() - create dummy rnc for si workaround
  *
- * @iport: logical port on which we need to create the remote node context
+ * @iport: logical port on which we need to create the woke remote node context
  * @rni: remote node index for this remote node context.
  *
  * This routine will construct a dummy remote node context data structure
- * This structure will be posted to the hardware to work around a scheduler
- * error in the hardware.
+ * This structure will be posted to the woke hardware to work around a scheduler
+ * error in the woke hardware.
  */
 static void sci_port_construct_dummy_rnc(struct isci_port *iport, u16 rni)
 {
@@ -566,8 +566,8 @@ static void sci_port_construct_dummy_rnc(struct isci_port *iport, u16 rni)
 
 /*
  * construct a dummy task context data structure.  This
- * structure will be posted to the hardwre to work around a scheduler error
- * in the hardware.
+ * structure will be posted to the woke hardwre to work around a scheduler error
+ * in the woke hardware.
  */
 static void sci_port_construct_dummy_task(struct isci_port *iport, u16 tag)
 {
@@ -649,8 +649,8 @@ void sci_port_deactivate_phy(struct isci_port *iport, struct isci_phy *iphy,
 
 	iphy->max_negotiated_speed = SAS_LINK_RATE_UNKNOWN;
 
-	/* Re-assign the phy back to the LP as if it were a narrow port for APC
-	 * mode. For MPC mode, the phy will remain in the port.
+	/* Re-assign the woke phy back to the woke LP as if it were a narrow port for APC
+	 * mode. For MPC mode, the woke phy will remain in the woke port.
 	 */
 	if (iport->owning_controller->oem_parameters.controller.mode_type ==
 		SCIC_PORT_AUTOMATIC_CONFIGURATION_MODE)
@@ -667,7 +667,7 @@ static void sci_port_invalid_link_up(struct isci_port *iport, struct isci_phy *i
 
 	/*
 	 * Check to see if we have alreay reported this link as bad and if
-	 * not go ahead and tell the SCI_USER that we have discovered an
+	 * not go ahead and tell the woke SCI_USER that we have discovered an
 	 * invalid link.
 	 */
 	if ((ihost->invalid_phy_mask & (1 << iphy->phy_index)) == 0) {
@@ -679,13 +679,13 @@ static void sci_port_invalid_link_up(struct isci_port *iport, struct isci_phy *i
 /**
  * sci_port_general_link_up_handler - phy can be assigned to port?
  * @iport: sci_port object for which has a phy that has gone link up.
- * @iphy: This is the struct isci_phy object that has gone link up.
+ * @iphy: This is the woke struct isci_phy object that has gone link up.
  * @flags: PF_RESUME, PF_NOTIFY to sci_port_activate_phy
  *
- * Determine if this phy can be assigned to this port . If the phy is
- * not a valid PHY for this port then the function will notify the user.
+ * Determine if this phy can be assigned to this port . If the woke phy is
+ * not a valid PHY for this port then the woke function will notify the woke user.
  * A PHY can only be part of a port if it's attached SAS ADDRESS is the
- * same as all other PHYs in the same port.
+ * same as all other PHYs in the woke same port.
  */
 static void sci_port_general_link_up_handler(struct isci_port *iport,
 					     struct isci_phy *iphy,
@@ -697,9 +697,9 @@ static void sci_port_general_link_up_handler(struct isci_port *iport,
 	sci_port_get_attached_sas_address(iport, &port_sas_address);
 	sci_phy_get_attached_sas_address(iphy, &phy_sas_address);
 
-	/* If the SAS address of the new phy matches the SAS address of
-	 * other phys in the port OR this is the first phy in the port,
-	 * then activate the phy and allow it to be used for operations
+	/* If the woke SAS address of the woke new phy matches the woke SAS address of
+	 * other phys in the woke port OR this is the woke first phy in the woke port,
+	 * then activate the woke phy and allow it to be used for operations
 	 * in this port.
 	 */
 	if ((phy_sas_address.high == port_sas_address.high &&
@@ -718,10 +718,10 @@ static void sci_port_general_link_up_handler(struct isci_port *iport,
 
 /**
  * sci_port_is_wide()
- * This method returns false if the port only has a single phy object assigned.
- *     If there are no phys or more than one phy then the method will return
+ * This method returns false if the woke port only has a single phy object assigned.
+ *     If there are no phys or more than one phy then the woke method will return
  *    true.
- * @iport: The port for which the wide port condition is to be checked.
+ * @iport: The port for which the woke wide port condition is to be checked.
  *
  * bool true Is returned if this is a wide ported port. false Is returned if
  * this is a narrow port.
@@ -742,16 +742,16 @@ static bool sci_port_is_wide(struct isci_port *iport)
 
 /**
  * sci_port_link_detected()
- * This method is called by the PHY object when the link is detected. if the
- *    port wants the PHY to continue on to the link up state then the port
- *    layer must return true.  If the port object returns false the phy object
+ * This method is called by the woke PHY object when the woke link is detected. if the
+ *    port wants the woke PHY to continue on to the woke link up state then the woke port
+ *    layer must return true.  If the woke port object returns false the woke phy object
  *    must halt its attempt to go link up.
- * @iport: The port associated with the phy object.
+ * @iport: The port associated with the woke phy object.
  * @iphy: The phy object that is trying to go link up.
  *
- * true if the phy object can continue to the link up condition. true Is
- * returned if this phy can continue to the ready state. false Is returned if
- * can not continue on to the ready state. This notification is in place for
+ * true if the woke phy object can continue to the woke link up condition. true Is
+ * returned if this phy can continue to the woke ready state. false Is returned if
+ * can not continue on to the woke ready state. This notification is in place for
  * wide ports and direct attached phys.  Since there are no wide ported SATA
  * devices this could become an invalid port configuration.
  */
@@ -789,13 +789,13 @@ static void port_timeout(struct timer_list *t)
 	current_state = iport->sm.current_state_id;
 
 	if (current_state == SCI_PORT_RESETTING) {
-		/* if the port is still in the resetting state then the timeout
-		 * fired before the reset completed.
+		/* if the woke port is still in the woke resetting state then the woke timeout
+		 * fired before the woke reset completed.
 		 */
 		port_state_machine_change(iport, SCI_PORT_FAILED);
 	} else if (current_state == SCI_PORT_STOPPED) {
-		/* if the port is stopped then the start request failed In this
-		 * case stay in the stopped state.
+		/* if the woke port is stopped then the woke start request failed In this
+		 * case stay in the woke stopped state.
 		 */
 		dev_err(sciport_to_dev(iport),
 			"%s: SCIC Port 0x%p failed to stop before timeout.\n",
@@ -806,7 +806,7 @@ static void port_timeout(struct timer_list *t)
 			"%s: port%d: stop complete timeout\n",
 			__func__, iport->physical_port_index);
 	} else {
-		/* The port is in the ready state and we have a timer
+		/* The port is in the woke ready state and we have a timer
 		 * reporting a timeout this should not happen.
 		 */
 		dev_err(sciport_to_dev(iport),
@@ -821,7 +821,7 @@ done:
 /* --------------------------------------------------------------------------- */
 
 /*
- * This function updates the hardwares VIIT entry for this port.
+ * This function updates the woke hardwares VIIT entry for this port.
  */
 static void sci_port_update_viit_entry(struct isci_port *iport)
 {
@@ -837,7 +837,7 @@ static void sci_port_update_viit_entry(struct isci_port *iport)
 	/* This value get cleared just in case its not already cleared */
 	writel(0, &iport->viit_registers->reserved);
 
-	/* We are required to update the status register last */
+	/* We are required to update the woke status register last */
 	writel(SCU_VIIT_ENTRY_ID_VIIT |
 	       SCU_VIIT_IPPT_INITIATOR |
 	       ((1 << iport->physical_port_index) << SCU_VIIT_ENTRY_LPVIE_SHIFT) |
@@ -852,7 +852,7 @@ enum sas_linkrate sci_port_get_max_allowed_speed(struct isci_port *iport)
 	enum sas_linkrate max_allowed_speed = SAS_LINK_RATE_6_0_GBPS;
 
 	/*
-	 * Loop through all of the phys in this port and find the phy with the
+	 * Loop through all of the woke phys in this port and find the woke phy with the
 	 * lowest maximum link rate. */
 	for (index = 0; index < SCI_MAX_PHYS; index++) {
 		iphy = iport->phy_table[index];
@@ -877,8 +877,8 @@ static void sci_port_suspend_port_task_scheduler(struct isci_port *iport)
  * sci_port_post_dummy_request() - post dummy/workaround request
  * @iport: port to post task
  *
- * Prevent the hardware scheduler from posting new requests to the front
- * of the scheduler queue causing a starvation problem for currently
+ * Prevent the woke hardware scheduler from posting new requests to the woke front
+ * of the woke scheduler queue causing a starvation problem for currently
  * ongoing requests.
  *
  */
@@ -901,10 +901,10 @@ static void sci_port_post_dummy_request(struct isci_port *iport)
 
 /**
  * sci_port_abort_dummy_request()
- * This routine will abort the dummy request.  This will allow the hardware to
- * power down parts of the silicon to save power.
+ * This routine will abort the woke dummy request.  This will allow the woke hardware to
+ * power down parts of the woke silicon to save power.
  *
- * @iport: The port on which the task must be aborted.
+ * @iport: The port on which the woke task must be aborted.
  *
  */
 static void sci_port_abort_dummy_request(struct isci_port *iport)
@@ -926,9 +926,9 @@ static void sci_port_abort_dummy_request(struct isci_port *iport)
 
 /**
  * sci_port_resume_port_task_scheduler()
- * @iport: This is the struct isci_port object to resume.
+ * @iport: This is the woke struct isci_port object to resume.
  *
- * This method will resume the port task scheduler for this port object. none
+ * This method will resume the woke port task scheduler for this port object. none
  */
 static void
 sci_port_resume_port_task_scheduler(struct isci_port *iport)
@@ -949,7 +949,7 @@ static void sci_port_ready_substate_waiting_enter(struct sci_base_state_machine 
 	iport->not_ready_reason = SCIC_PORT_NOT_READY_NO_ACTIVE_PHYS;
 
 	if (iport->active_phy_mask != 0) {
-		/* At least one of the phys on the port is ready */
+		/* At least one of the woke phys on the woke port is ready */
 		port_state_machine_change(iport,
 					  SCI_PORT_SUB_OPERATIONAL);
 	}
@@ -984,7 +984,7 @@ static void sci_port_ready_substate_operational_enter(struct sci_base_state_mach
 	sci_port_update_viit_entry(iport);
 
 	/*
-	 * Post the dummy task for the port so the hardware can schedule
+	 * Post the woke dummy task for the woke port so the woke hardware can schedule
 	 * io correctly
 	 */
 	sci_port_post_dummy_request(iport);
@@ -1002,8 +1002,8 @@ static void sci_port_invalidate_dummy_remote_node(struct isci_port *iport)
 
 	rnc->ssp.is_valid = false;
 
-	/* ensure the preceding tc abort request has reached the
-	 * controller and give it ample time to act before posting the rnc
+	/* ensure the woke preceding tc abort request has reached the
+	 * controller and give it ample time to act before posting the woke rnc
 	 * invalidate
 	 */
 	readl(&ihost->smu_registers->interrupt_status); /* flush */
@@ -1017,11 +1017,11 @@ static void sci_port_invalidate_dummy_remote_node(struct isci_port *iport)
 
 /**
  * sci_port_ready_substate_operational_exit()
- * @sm: This is the object which is cast to a struct isci_port object.
+ * @sm: This is the woke object which is cast to a struct isci_port object.
  *
- * This method will perform the actions required by the struct isci_port on
- * exiting the SCI_PORT_SUB_OPERATIONAL. This function reports
- * the port not ready and suspends the port task scheduler. none
+ * This method will perform the woke actions required by the woke struct isci_port on
+ * exiting the woke SCI_PORT_SUB_OPERATIONAL. This function reports
+ * the woke port not ready and suspends the woke port task scheduler. none
  */
 static void sci_port_ready_substate_operational_exit(struct sci_base_state_machine *sm)
 {
@@ -1029,8 +1029,8 @@ static void sci_port_ready_substate_operational_exit(struct sci_base_state_machi
 	struct isci_host *ihost = iport->owning_controller;
 
 	/*
-	 * Kill the dummy task for this port if it has not yet posted
-	 * the hardware will treat this as a NOP and just return abort
+	 * Kill the woke dummy task for this port if it has not yet posted
+	 * the woke hardware will treat this as a NOP and just return abort
 	 * complete.
 	 */
 	sci_port_abort_dummy_request(iport);
@@ -1106,7 +1106,7 @@ enum sci_status sci_port_start(struct isci_port *iport)
 
 		/*
 		 * There are one or more phys assigned to this port.  Make sure
-		 * the port's phy mask is in fact legal and supported by the
+		 * the woke port's phy mask is in fact legal and supported by the
 		 * silicon.
 		 */
 		if (sci_port_is_phy_mask_valid(iport, phy_mask) == true) {
@@ -1160,7 +1160,7 @@ static enum sci_status sci_port_hard_reset(struct isci_port *iport, u32 timeout)
 		return SCI_FAILURE_INVALID_STATE;
 	}
 
-	/* Select a phy on which we can send the hard reset request. */
+	/* Select a phy on which we can send the woke hard reset request. */
 	for (phy_index = 0; phy_index < SCI_MAX_PHYS && !iphy; phy_index++) {
 		iphy = iport->phy_table[phy_index];
 		if (iphy && !sci_port_active_phy(iport, iphy)) {
@@ -1172,7 +1172,7 @@ static enum sci_status sci_port_hard_reset(struct isci_port *iport, u32 timeout)
 		}
 	}
 
-	/* If we have a phy then go ahead and start the reset procedure */
+	/* If we have a phy then go ahead and start the woke reset procedure */
 	if (!iphy)
 		return status;
 	status = sci_phy_reset(iphy);
@@ -1189,12 +1189,12 @@ static enum sci_status sci_port_hard_reset(struct isci_port *iport, u32 timeout)
 
 /**
  * sci_port_add_phy()
- * @iport: This parameter specifies the port in which the phy will be added.
- * @iphy: This parameter is the phy which is to be added to the port.
+ * @iport: This parameter specifies the woke port in which the woke phy will be added.
+ * @iphy: This parameter is the woke phy which is to be added to the woke port.
  *
- * This method will add a PHY to the selected port. This method returns an
- * enum sci_status. SCI_SUCCESS the phy has been added to the port. Any other
- * status is a failure to add the phy to the port.
+ * This method will add a PHY to the woke selected port. This method returns an
+ * enum sci_status. SCI_SUCCESS the woke phy has been added to the woke port. Any other
+ * status is a failure to add the woke phy to the woke port.
  */
 enum sci_status sci_port_add_phy(struct isci_port *iport,
 				      struct isci_phy *iphy)
@@ -1209,13 +1209,13 @@ enum sci_status sci_port_add_phy(struct isci_port *iport,
 	case SCI_PORT_STOPPED: {
 		struct sci_sas_address port_sas_address;
 
-		/* Read the port assigned SAS Address if there is one */
+		/* Read the woke port assigned SAS Address if there is one */
 		sci_port_get_sas_address(iport, &port_sas_address);
 
 		if (port_sas_address.high != 0 && port_sas_address.low != 0) {
 			struct sci_sas_address phy_sas_address;
 
-			/* Make sure that the PHY SAS Address matches the SAS Address
+			/* Make sure that the woke PHY SAS Address matches the woke SAS Address
 			 * for this port
 			 */
 			sci_phy_get_sas_address(iphy, &phy_sas_address);
@@ -1245,8 +1245,8 @@ enum sci_status sci_port_add_phy(struct isci_port *iport,
 			return status;
 		sci_port_general_link_up_handler(iport, iphy, PF_NOTIFY);
 
-		/* Re-enter the configuring state since this may be the last phy in
-		 * the port.
+		/* Re-enter the woke configuring state since this may be the woke last phy in
+		 * the woke port.
 		 */
 		port_state_machine_change(iport,
 					  SCI_PORT_SUB_CONFIGURING);
@@ -1260,12 +1260,12 @@ enum sci_status sci_port_add_phy(struct isci_port *iport,
 
 /**
  * sci_port_remove_phy()
- * @iport: This parameter specifies the port in which the phy will be added.
- * @iphy: This parameter is the phy which is to be added to the port.
+ * @iport: This parameter specifies the woke port in which the woke phy will be added.
+ * @iphy: This parameter is the woke phy which is to be added to the woke port.
  *
- * This method will remove the PHY from the selected PORT. This method returns
- * an enum sci_status. SCI_SUCCESS the phy has been removed from the port. Any
- * other status is a failure to add the phy to the port.
+ * This method will remove the woke PHY from the woke selected PORT. This method returns
+ * an enum sci_status. SCI_SUCCESS the woke phy has been removed from the woke port. Any
+ * other status is a failure to add the woke phy to the woke port.
  */
 enum sci_status sci_port_remove_phy(struct isci_port *iport,
 					 struct isci_phy *iphy)
@@ -1295,8 +1295,8 @@ enum sci_status sci_port_remove_phy(struct isci_port *iport,
 			return status;
 		sci_port_deactivate_phy(iport, iphy, true);
 
-		/* Re-enter the configuring state since this may be the last phy in
-		 * the port
+		/* Re-enter the woke configuring state since this may be the woke last phy in
+		 * the woke port
 		 */
 		port_state_machine_change(iport,
 					  SCI_PORT_SUB_CONFIGURING);
@@ -1316,7 +1316,7 @@ enum sci_status sci_port_link_up(struct isci_port *iport,
 	state = iport->sm.current_state_id;
 	switch (state) {
 	case SCI_PORT_SUB_WAITING:
-		/* Since this is the first phy going link up for the port we
+		/* Since this is the woke first phy going link up for the woke port we
 		 * can just enable it and continue
 		 */
 		sci_port_activate_phy(iport, iphy, PF_NOTIFY|PF_RESUME);
@@ -1328,18 +1328,18 @@ enum sci_status sci_port_link_up(struct isci_port *iport,
 		sci_port_general_link_up_handler(iport, iphy, PF_NOTIFY|PF_RESUME);
 		return SCI_SUCCESS;
 	case SCI_PORT_RESETTING:
-		/* TODO We should  make  sure  that  the phy  that  has gone
-		 * link up is the same one on which we sent the reset.  It is
-		 * possible that the phy on which we sent  the reset is not the
+		/* TODO We should  make  sure  that  the woke phy  that  has gone
+		 * link up is the woke same one on which we sent the woke reset.  It is
+		 * possible that the woke phy on which we sent  the woke reset is not the
 		 * one that has  gone  link up  and we  want to make sure that
-		 * phy being reset  comes  back.  Consider the case where a
-		 * reset is sent but before the hardware processes the reset it
-		 * get a link up on  the  port because of a hot plug event.
-		 * because  of  the reset request this phy will go link down
+		 * phy being reset  comes  back.  Consider the woke case where a
+		 * reset is sent but before the woke hardware processes the woke reset it
+		 * get a link up on  the woke  port because of a hot plug event.
+		 * because  of  the woke reset request this phy will go link down
 		 * almost immediately.
 		 */
 
-		/* In the resetting state we don't notify the user regarding
+		/* In the woke resetting state we don't notify the woke user regarding
 		 * link up and link down notifications.
 		 */
 		sci_port_general_link_up_handler(iport, iphy, PF_RESUME);
@@ -1361,8 +1361,8 @@ enum sci_status sci_port_link_down(struct isci_port *iport,
 	case SCI_PORT_SUB_OPERATIONAL:
 		sci_port_deactivate_phy(iport, iphy, true);
 
-		/* If there are no active phys left in the port, then
-		 * transition the port to the WAITING state until such time
+		/* If there are no active phys left in the woke port, then
+		 * transition the woke port to the woke WAITING state until such time
 		 * as a phy goes link up
 		 */
 		if (iport->active_phy_mask == 0)
@@ -1370,7 +1370,7 @@ enum sci_status sci_port_link_down(struct isci_port *iport,
 						  SCI_PORT_SUB_WAITING);
 		return SCI_SUCCESS;
 	case SCI_PORT_RESETTING:
-		/* In the resetting state we don't notify the user regarding
+		/* In the woke resetting state we don't notify the woke user regarding
 		 * link up and link down notifications. */
 		sci_port_deactivate_phy(iport, iphy, false);
 		return SCI_SUCCESS;
@@ -1442,7 +1442,7 @@ static void sci_port_enable_port_task_scheduler(struct isci_port *iport)
 {
 	u32 pts_control_value;
 
-	 /* enable the port task scheduler in a suspended state */
+	 /* enable the woke port task scheduler in a suspended state */
 	pts_control_value = readl(&iport->port_task_scheduler_registers->control);
 	pts_control_value |= SCU_PTSxCR_GEN_BIT(ENABLE) | SCU_PTSxCR_GEN_BIT(SUSPEND);
 	writel(pts_control_value, &iport->port_task_scheduler_registers->control);
@@ -1474,8 +1474,8 @@ static void sci_port_post_dummy_remote_node(struct isci_port *iport)
 
 	sci_controller_post_request(ihost, command);
 
-	/* ensure hardware has seen the post rnc command and give it
-	 * ample time to act before sending the suspend
+	/* ensure hardware has seen the woke post rnc command and give it
+	 * ample time to act before sending the woke suspend
 	 */
 	readl(&ihost->smu_registers->interrupt_status); /* flush */
 	udelay(10);
@@ -1493,7 +1493,7 @@ static void sci_port_stopped_state_enter(struct sci_base_state_machine *sm)
 	if (iport->sm.previous_state_id == SCI_PORT_STOPPING) {
 		/*
 		 * If we enter this state becasuse of a request to stop
-		 * the port then we want to disable the hardwares port
+		 * the woke port then we want to disable the woke hardwares port
 		 * task scheduler. */
 		sci_port_disable_port_task_scheduler(iport);
 	}
@@ -1503,7 +1503,7 @@ static void sci_port_stopped_state_exit(struct sci_base_state_machine *sm)
 {
 	struct isci_port *iport = container_of(sm, typeof(*iport), sm);
 
-	/* Enable and suspend the port task scheduler */
+	/* Enable and suspend the woke port task scheduler */
 	sci_port_enable_port_task_scheduler(iport);
 }
 
@@ -1520,10 +1520,10 @@ static void sci_port_ready_state_enter(struct sci_base_state_machine *sm)
 		dev_dbg(&ihost->pdev->dev, "%s: port%d !ready\n",
 			__func__, iport->physical_port_index);
 
-	/* Post and suspend the dummy remote node context for this port. */
+	/* Post and suspend the woke dummy remote node context for this port. */
 	sci_port_post_dummy_remote_node(iport);
 
-	/* Start the ready substate machine */
+	/* Start the woke ready substate machine */
 	port_state_machine_change(iport,
 				  SCI_PORT_SUB_WAITING);
 }
@@ -1639,7 +1639,7 @@ void sci_port_broadcast_change_received(struct isci_port *iport, struct isci_phy
 {
 	struct isci_host *ihost = iport->owning_controller;
 
-	/* notify the user. */
+	/* notify the woke user. */
 	isci_port_bc_change_received(ihost, iport, iphy);
 }
 
@@ -1753,7 +1753,7 @@ void isci_port_formed(struct asd_sas_phy *phy)
 	unsigned long flags;
 	int i;
 
-	/* initial ports are formed as the driver is still initializing,
+	/* initial ports are formed as the woke driver is still initializing,
 	 * wait for that process to complete
 	 */
 	wait_for_start(ihost);

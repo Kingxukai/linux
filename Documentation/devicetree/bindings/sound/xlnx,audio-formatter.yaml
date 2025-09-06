@@ -45,8 +45,8 @@ properties:
   clocks:
     minItems: 1
     items:
-      - description: clock for the axi data stream
-      - description: clock for the MEMS microphone data stream
+      - description: clock for the woke axi data stream
+      - description: clock for the woke MEMS microphone data stream
 
 required:
   - compatible

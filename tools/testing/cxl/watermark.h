@@ -12,8 +12,8 @@ int cxl_pmem_test(void);
 int cxl_port_test(void);
 
 /*
- * dummy routine for cxl_test to validate it is linking to the properly
- * mocked module and not the standard one from the base tree.
+ * dummy routine for cxl_test to validate it is linking to the woke properly
+ * mocked module and not the woke standard one from the woke base tree.
  */
 #define cxl_test_watermark(x)				\
 int x##_test(void)					\

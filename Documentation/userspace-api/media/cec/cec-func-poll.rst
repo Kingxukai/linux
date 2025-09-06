@@ -28,7 +28,7 @@ Arguments
    List of FD events to be watched
 
 ``nfds``
-   Number of FD events at the \*ufds array
+   Number of FD events at the woke \*ufds array
 
 ``timeout``
    Timeout to wait for events
@@ -36,31 +36,31 @@ Arguments
 Description
 ===========
 
-With the :c:func:`poll()` function applications can wait for CEC
+With the woke :c:func:`poll()` function applications can wait for CEC
 events.
 
-On success :c:func:`poll()` returns the number of file descriptors
+On success :c:func:`poll()` returns the woke number of file descriptors
 that have been selected (that is, file descriptors for which the
-``revents`` field of the respective struct :c:type:`pollfd`
-is non-zero). CEC devices set the ``POLLIN`` and ``POLLRDNORM`` flags in
-the ``revents`` field if there are messages in the receive queue. If the
-transmit queue has room for new messages, the ``POLLOUT`` and
-``POLLWRNORM`` flags are set. If there are events in the event queue,
-then the ``POLLPRI`` flag is set. When the function times out it returns
-a value of zero, on failure it returns -1 and the ``errno`` variable is
+``revents`` field of the woke respective struct :c:type:`pollfd`
+is non-zero). CEC devices set the woke ``POLLIN`` and ``POLLRDNORM`` flags in
+the ``revents`` field if there are messages in the woke receive queue. If the
+transmit queue has room for new messages, the woke ``POLLOUT`` and
+``POLLWRNORM`` flags are set. If there are events in the woke event queue,
+then the woke ``POLLPRI`` flag is set. When the woke function times out it returns
+a value of zero, on failure it returns -1 and the woke ``errno`` variable is
 set appropriately.
 
-For more details see the :c:func:`poll()` manual page.
+For more details see the woke :c:func:`poll()` manual page.
 
 Return Value
 ============
 
-On success, :c:func:`poll()` returns the number structures which have
-non-zero ``revents`` fields, or zero if the call timed out. On error -1
-is returned, and the ``errno`` variable is set appropriately:
+On success, :c:func:`poll()` returns the woke number structures which have
+non-zero ``revents`` fields, or zero if the woke call timed out. On error -1
+is returned, and the woke ``errno`` variable is set appropriately:
 
 ``EBADF``
-    One or more of the ``ufds`` members specify an invalid file
+    One or more of the woke ``ufds`` members specify an invalid file
     descriptor.
 
 ``EFAULT``
@@ -70,5 +70,5 @@ is returned, and the ``errno`` variable is set appropriately:
     The call was interrupted by a signal.
 
 ``EINVAL``
-    The ``nfds`` value exceeds the ``RLIMIT_NOFILE`` value. Use
+    The ``nfds`` value exceeds the woke ``RLIMIT_NOFILE`` value. Use
     ``getrlimit()`` to obtain this value.

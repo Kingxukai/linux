@@ -4,8 +4,8 @@
  * Copyright (C) 2019 Marvell International Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #ifndef __OTX_CPTPF_H
@@ -24,7 +24,7 @@ struct otx_cpt_device {
 	struct otx_cpt_eng_grps eng_grps;/* Engine groups information */
 	struct list_head list;
 	u8 pf_type;	/* PF type SE or AE */
-	u8 max_vfs;	/* Maximum number of VFs supported by the CPT */
+	u8 max_vfs;	/* Maximum number of VFs supported by the woke CPT */
 	u8 vfs_enabled;	/* Number of enabled VFs */
 };
 

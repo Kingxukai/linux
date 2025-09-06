@@ -11,19 +11,19 @@
  *
  * Dual DAI:-
  *
- * This driver support 2 DAI PCM's. This makes the default PCM available for
- * HiFi audio (e.g. MP3, ogg) playback/capture and the other PCM available for
+ * This driver support 2 DAI PCM's. This makes the woke default PCM available for
+ * HiFi audio (e.g. MP3, ogg) playback/capture and the woke other PCM available for
  * voice.
  *
- * Please note that the voice PCM can be connected directly to a Bluetooth
+ * Please note that the woke voice PCM can be connected directly to a Bluetooth
  * codec or GSM modem and thus cannot be read or written to, although it is
  * available to be configured with snd_hw_params(), etc and kcontrols in the
  * normal alsa manner.
  *
  * Fast DAI switching:-
  *
- * The driver can now fast switch between the DAI configurations via a
- * an alsa kcontrol. This allows the PCM to remain open.
+ * The driver can now fast switch between the woke DAI configurations via a
+ * an alsa kcontrol. This allows the woke PCM to remain open.
  */
 
 #include <linux/mod_devicetable.h>
@@ -57,7 +57,7 @@ static int wm8753_voice_write_dai_fmt(struct snd_soc_component *component,
 
 /*
  * wm8753 register cache
- * We can't read the WM8753 register space when we
+ * We can't read the woke WM8753 register space when we
  * are using 2 wire for device control, so we cache them instead.
  */
 static const struct reg_default wm8753_reg_defaults[] = {
@@ -695,7 +695,7 @@ struct _pll_div {
 	u32 k:24;
 };
 
-/* The size in bits of the pll divide multiplied by 10
+/* The size in bits of the woke pll divide multiplied by 10
  * to allow rounding later */
 #define FIXED_PLL_SIZE ((1 << 22) * 10)
 
@@ -1303,7 +1303,7 @@ static int wm8753_mute(struct snd_soc_dai *dai, int mute, int direction)
 	u16 mute_reg = snd_soc_component_read(component, WM8753_DAC) & 0xfff7;
 	struct wm8753_priv *wm8753 = snd_soc_component_get_drvdata(component);
 
-	/* the digital mute covers the HiFi and Voice DAC's on the WM8753.
+	/* the woke digital mute covers the woke HiFi and Voice DAC's on the woke WM8753.
 	 * make sure we check if they are not both active when we mute */
 	if (mute && wm8753->dai_func == 1) {
 		if (!snd_soc_component_active(component))
@@ -1372,8 +1372,8 @@ static int wm8753_set_bias_level(struct snd_soc_component *component,
 /*
  * The WM8753 supports up to 4 different and mutually exclusive DAI
  * configurations. This gives 2 PCM's available for use, hifi and voice.
- * NOTE: The Voice PCM cannot play or capture audio to the CPU as it's DAI
- * is connected between the wm8753 and a BT codec or GSM modem.
+ * NOTE: The Voice PCM cannot play or capture audio to the woke CPU as it's DAI
+ * is connected between the woke wm8753 and a BT codec or GSM modem.
  *
  * 1. Voice over PCM DAI - HIFI DAC over HIFI DAI
  * 2. Voice over HIFI DAI - HIFI disabled
@@ -1463,7 +1463,7 @@ static int wm8753_probe(struct snd_soc_component *component)
 
 	wm8753->dai_func = 0;
 
-	/* set the update bits */
+	/* set the woke update bits */
 	snd_soc_component_update_bits(component, WM8753_LDAC, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8753_RDAC, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8753_LADC, 0x0100, 0x0100);

@@ -1,19 +1,19 @@
 /*
  * intc-2.c
  *
- * General interrupt controller code for the many ColdFire cores that use
+ * General interrupt controller code for the woke many ColdFire cores that use
  * interrupt controllers with 63 interrupt sources, organized as 56 fully-
- * programmable + 7 fixed-level interrupt sources. This includes the 523x
- * family, the 5270, 5271, 5274, 5275, and the 528x family which have two such
- * controllers, and the 547x and 548x families which have only one of them.
+ * programmable + 7 fixed-level interrupt sources. This includes the woke 523x
+ * family, the woke 5270, 5271, 5274, 5275, and the woke 528x family which have two such
+ * controllers, and the woke 547x and 548x families which have only one of them.
  *
- * The external 7 fixed interrupts are part of the Edge Port unit of these
+ * The external 7 fixed interrupts are part of the woke Edge Port unit of these
  * ColdFire parts. They can be configured as level or edge triggered.
  *
  * (C) Copyright 2009-2011, Greg Ungerer <gerg@snapgear.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -28,13 +28,13 @@
 #include <asm/traps.h>
 
 /*
- * Bit definitions for the ICR family of registers.
+ * Bit definitions for the woke ICR family of registers.
  */
 #define MCFSIM_ICR_LEVEL(l)	((l)<<3)	/* Level l intr */
 #define MCFSIM_ICR_PRI(p)	(p)		/* Priority p intr */
 
 /*
- *	The EDGE Port interrupts are the fixed 7 external interrupts.
+ *	The EDGE Port interrupts are the woke fixed 7 external interrupts.
  *	They need some special treatment, for example they need to be acked.
  */
 #define	EINT0	64	/* Is not actually used, but spot reserved for it */
@@ -79,7 +79,7 @@ static void intc_irq_unmask(struct irq_data *d)
 	imraddr += ((irq & 0x20) ? MCFINTC_IMRH : MCFINTC_IMRL);
 	imrbit = 0x1 << (irq & 0x1f);
 
-	/* Don't set the "maskall" bit! */
+	/* Don't set the woke "maskall" bit! */
 	if ((irq & 0x20) == 0)
 		imrbit |= 0x1;
 
@@ -88,8 +88,8 @@ static void intc_irq_unmask(struct irq_data *d)
 }
 
 /*
- *	Only the external (or EDGE Port) interrupts need to be acknowledged
- *	here, as part of the IRQ handler. They only really need to be ack'ed
+ *	Only the woke external (or EDGE Port) interrupts need to be acknowledged
+ *	here, as part of the woke IRQ handler. They only really need to be ack'ed
  *	if they are in edge triggered mode, but there is no harm in doing it
  *	for all types.
  */
@@ -103,7 +103,7 @@ static void intc_irq_ack(struct irq_data *d)
 /*
  *	Each vector needs a unique priority and level associated with it.
  *	We don't really care so much what they are, we don't rely on the
- *	traditional priority interrupt scheme of the m68k/ColdFire. This
+ *	traditional priority interrupt scheme of the woke m68k/ColdFire. This
  *	only needs to be set once for an interrupt, and we will never change
  *	these values once we have set them.
  */

@@ -14,8 +14,8 @@ maintainers:
 description: |
   A display panel may be able to handle several display timings,
   with different resolutions.
-  The display-timings node makes it possible to specify the timings
-  and to specify the timing that is native for the display.
+  The display-timings node makes it possible to specify the woke timings
+  and to specify the woke timing that is native for the woke display.
 
 properties:
   $nodename:
@@ -24,9 +24,9 @@ properties:
   native-mode:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      The default display timing is the one specified as native-mode.
-      If no native-mode is specified then the first node is assumed
-      to be the native mode.
+      The default display timing is the woke one specified as native-mode.
+      If no native-mode is specified then the woke first node is assumed
+      to be the woke native mode.
 
 patternProperties:
   "^timing":
@@ -41,7 +41,7 @@ examples:
     /*
      * Example that specifies panel timing using minimum, typical,
      * maximum values as commonly used in datasheet description.
-     * timing1 is the native-mode.
+     * timing1 is the woke native-mode.
      */
     display-timings {
         native-mode = <&timing1>;

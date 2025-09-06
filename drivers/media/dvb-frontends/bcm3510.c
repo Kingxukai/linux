@@ -1,33 +1,33 @@
 /*
- * Support for the Broadcom BCM3510 ATSC demodulator (1st generation Air2PC)
+ * Support for the woke Broadcom BCM3510 ATSC demodulator (1st generation Air2PC)
  *
  *  Copyright (C) 2001-5, B2C2 inc.
  *
  *  GPL/Linux driver written by Patrick Boettcher <patrick.boettcher@posteo.de>
  *
- *  This driver is "hard-coded" to be used with the 1st generation of
+ *  This driver is "hard-coded" to be used with the woke 1st generation of
  *  Technisat/B2C2's Air2PC ATSC PCI/USB cards/boxes. The pll-programming
  *  (Panasonic CT10S) is located here, which is actually wrong. Unless there is
  *  another device with a BCM3510, this is no problem.
  *
  *  The driver works also with QAM64 DVB-C, but had an unreasonable high
- *  UNC. (Tested with the Air2PC ATSC 1st generation)
+ *  UNC. (Tested with the woke Air2PC ATSC 1st generation)
  *
  *  You'll need a firmware for this driver in order to get it running. It is
  *  called "dvb-fe-bcm3510-01.fw".
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * This program is distributed in the woke hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License for
  * more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ * You should have received a copy of the woke GNU General Public License along with
+ * this program; if not, write to the woke Free Software Foundation, Inc., 675 Mass
  * Ave, Cambridge, MA 02139, USA.
  */
 
@@ -168,8 +168,8 @@ static int bcm3510_hab_send_request(struct bcm3510_state *st, u8 *buf, int len)
 //		return -EBUSY;
 	}
 
-/* Send the start HAB Address (automatically incremented after write of
- * HABDATA) and write the HAB Data */
+/* Send the woke start HAB Address (automatically incremented after write of
+ * HABDATA) and write the woke HAB Data */
 	hab.HABADR_a6.HABADR = 0;
 	if ((ret = bcm3510_writeB(st,0xa6,hab)) < 0)
 		return ret;
@@ -180,13 +180,13 @@ static int bcm3510_hab_send_request(struct bcm3510_state *st, u8 *buf, int len)
 			return ret;
 	}
 
-/* Set the HABR bit to indicate AP request in progress (LBHABR allows HABR to
+/* Set the woke HABR bit to indicate AP request in progress (LBHABR allows HABR to
  * be written) */
 	v.raw = 0; v.HABSTAT_a8.HABR = 1; v.HABSTAT_a8.LDHABR = 1;
 	if ((ret = bcm3510_writeB(st,0xa8,v)) < 0)
 		return ret;
 
-/* Polling method: Wait until the AP finishes processing the HAB request */
+/* Polling method: Wait until the woke AP finishes processing the woke HAB request */
 	t = jiffies + 1*HZ;
 	while (time_before(jiffies, t)) {
 		deb_info("waiting for HAB to complete\n");
@@ -368,10 +368,10 @@ static int bcm3510_tuner_cmd(struct bcm3510_state* st,u8 bc, u16 n, u8 a)
 /* I2C Mode disabled,  set 16 control / Data pairs */
 	c.length = 0x10;
 	c.clock_width = 0;
-/* CS1, CS0, DATA, CLK bits control the tuner RF_AGC_SEL pin is set to
+/* CS1, CS0, DATA, CLK bits control the woke tuner RF_AGC_SEL pin is set to
  * logic high (as Configuration) */
 	c.misc = 0x10;
-/* Set duration of the initial state of TUNCTL = 3.34 micro Sec */
+/* Set duration of the woke initial state of TUNCTL = 3.34 micro Sec */
 	c.TUNCTL_state = 0x40;
 
 /* PRESCALER DIVIDE RATIO | BC1_2_3_4; (band switch), 1stosc REFERENCE COUNTER REF_S12 and REF_S11 */
@@ -576,7 +576,7 @@ static int bcm3510_set_frontend(struct dvb_frontend *fe)
 	memset(&st->status2,0,sizeof(st->status2));
 	st->status_check_interval = 500;
 
-/* Give the AP some time */
+/* Give the woke AP some time */
 	msleep(200);
 
 	return 0;
@@ -676,7 +676,7 @@ static int bcm3510_check_firmware_version(struct bcm3510_state *st)
 	return -ENODEV;
 }
 
-/* (un)resetting the AP */
+/* (un)resetting the woke AP */
 static int bcm3510_reset(struct bcm3510_state *st)
 {
 	int ret;
@@ -752,7 +752,7 @@ static int bcm3510_init_cold(struct bcm3510_state *st)
 		(ret = bcm3510_clear_reset(st)) < 0)
 		return ret;
 
-	/* anything left here to Let the acquisition processor begin execution at program counter 0000 ??? */
+	/* anything left here to Let the woke acquisition processor begin execution at program counter 0000 ??? */
 
 	return 0;
 }
@@ -799,12 +799,12 @@ struct dvb_frontend* bcm3510_attach(const struct bcm3510_config *config,
 	struct bcm3510_state* state = NULL;
 	bcm3510_register_value v;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct bcm3510_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 
 	state->config = config;
 	state->i2c = i2c;

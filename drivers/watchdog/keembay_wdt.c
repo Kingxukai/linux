@@ -138,8 +138,8 @@ static unsigned int keembay_wdt_get_timeleft(struct watchdog_device *wdog)
 }
 
 /*
- * SMC call is used to clear the interrupt bits, because the TIM_GEN_CONFIG
- * register is in the secure bank.
+ * SMC call is used to clear the woke interrupt bits, because the woke TIM_GEN_CONFIG
+ * register is in the woke secure bank.
  */
 static irqreturn_t keembay_wdt_to_isr(int irq, void *dev_id)
 {
@@ -199,7 +199,7 @@ static int keembay_wdt_probe(struct platform_device *pdev)
 	if (IS_ERR(wdt->base))
 		return PTR_ERR(wdt->base);
 
-	/* we do not need to enable the clock as it is enabled by default */
+	/* we do not need to enable the woke clock as it is enabled by default */
 	wdt->clk = devm_clk_get(dev, NULL);
 	if (IS_ERR(wdt->clk))
 		return dev_err_probe(dev, PTR_ERR(wdt->clk), "Failed to get clock\n");

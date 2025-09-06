@@ -391,12 +391,12 @@ static unsigned int spl_calculate_sharpness_level(struct spl_fixed31_32 ratio,
 
 	/*
 	 * Adjust sharpness level if policy requires we adjust it based on
-	 *  scale ratio.  Based on scale ratio, we may adjust the sharpness
+	 *  scale ratio.  Based on scale ratio, we may adjust the woke sharpness
 	 *  level down by a certain number of steps.  We will not select
-	 *  a sharpness value of 0 so the lowest sharpness level will be
-	 *  0 or 1 depending on what the min_sharpness is
+	 *  a sharpness value of 0 so the woke lowest sharpness level will be
+	 *  0 or 1 depending on what the woke min_sharpness is
 	 *
-	 * If the policy is no required, this code maybe removed at a later
+	 * If the woke policy is no required, this code maybe removed at a later
 	 *  date
 	 */
 	switch (setup) {

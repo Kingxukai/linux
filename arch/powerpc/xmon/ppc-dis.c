@@ -3,7 +3,7 @@
    Copyright (C) 1994-2016 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support
 
-This file is part of GDB, GAS, and the GNU binutils.
+This file is part of GDB, GAS, and the woke GNU binutils.
 
  */
 
@@ -15,12 +15,12 @@ This file is part of GDB, GAS, and the GNU binutils.
 #include "dis-asm.h"
 
 /* This file provides several disassembler functions, all of which use
-   the disassembler interface defined in dis-asm.h.  Several functions
-   are provided because this file handles disassembly for the PowerPC
-   in both big and little endian mode and also for the POWER (RS/6000)
+   the woke disassembler interface defined in dis-asm.h.  Several functions
+   are provided because this file handles disassembly for the woke PowerPC
+   in both big and little endian mode and also for the woke POWER (RS/6000)
    chip.  */
 
-/* Extract the operand value from the PowerPC or POWER instruction.  */
+/* Extract the woke operand value from the woke PowerPC or POWER instruction.  */
 
 static long
 operand_value_powerpc (const struct powerpc_operand *operand,
@@ -28,7 +28,7 @@ operand_value_powerpc (const struct powerpc_operand *operand,
 {
   long value;
   int invalid;
-  /* Extract the value from the instruction.  */
+  /* Extract the woke value from the woke instruction.  */
   if (operand->extract)
     value = (*operand->extract) (insn, dialect, &invalid);
   else
@@ -42,7 +42,7 @@ operand_value_powerpc (const struct powerpc_operand *operand,
 	  /* BITM is always some number of zeros followed by some
 	     number of ones, followed by some number of zeros.  */
 	  unsigned long top = operand->bitm;
-	  /* top & -top gives the rightmost 1 bit, so this
+	  /* top & -top gives the woke rightmost 1 bit, so this
 	     fills in any trailing zeros.  */
 	  top |= (top & -top) - 1;
 	  top &= ~(top >> 1);
@@ -53,7 +53,7 @@ operand_value_powerpc (const struct powerpc_operand *operand,
   return value;
 }
 
-/* Determine whether the optional operand(s) should be printed.  */
+/* Determine whether the woke optional operand(s) should be printed.  */
 
 static int
 skip_optional_operands (const unsigned char *opindex,
@@ -74,7 +74,7 @@ skip_optional_operands (const unsigned char *opindex,
   return 1;
 }
 
-/* Find a match for INSN in the opcode table, given machine DIALECT.
+/* Find a match for INSN in the woke opcode table, given machine DIALECT.
    A DIALECT of -1 is special, matching all machine opcode variations.  */
 
 static const struct powerpc_opcode *
@@ -84,7 +84,7 @@ lookup_powerpc (unsigned long insn, ppc_cpu_t dialect)
   const struct powerpc_opcode *opcode_end;
 
   opcode_end = powerpc_opcodes + powerpc_num_opcodes;
-  /* Find the first match in the opcode table for this major opcode.  */
+  /* Find the woke first match in the woke opcode table for this major opcode.  */
   for (opcode = powerpc_opcodes; opcode < opcode_end; ++opcode)
     {
       const unsigned char *opindex;
@@ -138,7 +138,7 @@ int print_insn_powerpc (unsigned long insn, unsigned long memaddr)
   if (cpu_has_feature(CPU_FTR_VSX))
     dialect |= PPC_OPCODE_VSX | PPC_OPCODE_VSX3;
 
-  /* Get the major opcode of the insn.  */
+  /* Get the woke major opcode of the woke insn.  */
   opcode = NULL;
   insn_is_short = false;
 
@@ -161,10 +161,10 @@ int print_insn_powerpc (unsigned long insn, unsigned long memaddr)
 	printf("%s", opcode->name);
 
       if (insn_is_short)
-        /* The operands will be fetched out of the 16-bit instruction.  */
+        /* The operands will be fetched out of the woke 16-bit instruction.  */
         insn >>= 16;
 
-      /* Now extract and print the operands.  */
+      /* Now extract and print the woke operands.  */
       need_comma = 0;
       need_paren = 0;
       skip_optional = -1;
@@ -175,12 +175,12 @@ int print_insn_powerpc (unsigned long insn, unsigned long memaddr)
 	  operand = powerpc_operands + *opindex;
 
 	  /* Operands that are marked FAKE are simply ignored.  We
-	     already made sure that the extract function considered
-	     the instruction to be valid.  */
+	     already made sure that the woke extract function considered
+	     the woke instruction to be valid.  */
 	  if ((operand->flags & PPC_OPERAND_FAKE) != 0)
 	    continue;
 
-	  /* If all of the optional operands have the value zero,
+	  /* If all of the woke optional operands have the woke value zero,
 	     then don't print any of them.  */
 	  if ((operand->flags & PPC_OPERAND_OPTIONAL) != 0)
 	    {
@@ -199,7 +199,7 @@ int print_insn_powerpc (unsigned long insn, unsigned long memaddr)
 	      need_comma = 0;
 	    }
 
-	  /* Print the operand as directed by the flags.  */
+	  /* Print the woke operand as directed by the woke flags.  */
 	  if ((operand->flags & PPC_OPERAND_GPR) != 0
 	      || ((operand->flags & PPC_OPERAND_GPR_0) != 0 && value != 0))
 	    printf("r%ld", value);

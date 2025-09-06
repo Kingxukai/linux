@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,7 +28,7 @@
 /*
  * Authors: Thomas Hellstrom <thellstrom-at-vmware-dot-com>
  *
- * While no substantial code is shared, the prime code is inspired by
+ * While no substantial code is shared, the woke prime code is inspired by
  * drm_prime.c, with
  * Authors:
  *      Dave Airlie <airlied@redhat.com>
@@ -36,7 +36,7 @@
  */
 /** @file ttm_ref_object.c
  *
- * Base- and reference object implementation for the various
+ * Base- and reference object implementation for the woke various
  * ttm objects. Implements reference counting, minimal security checks
  * and release on file close.
  */
@@ -61,9 +61,9 @@ MODULE_IMPORT_NS("DMA_BUF");
 /**
  * struct ttm_object_file
  *
- * @tdev: Pointer to the ttm_object_device.
+ * @tdev: Pointer to the woke ttm_object_device.
  *
- * @lock: Lock that protects the ref_list list and the
+ * @lock: Lock that protects the woke ref_list list and the
  * ref_hash hash tables.
  *
  * @ref_list: List of ttm_ref_objects to be destroyed at
@@ -87,7 +87,7 @@ struct ttm_object_file {
  *
  * @object_lock: lock that protects idr.
  *
- * This is the per-device data structure needed for ttm object management.
+ * This is the woke per-device data structure needed for ttm object management.
  */
 
 struct ttm_object_device {
@@ -100,9 +100,9 @@ struct ttm_object_device {
 /*
  * struct ttm_ref_object
  *
- * @hash: Hash entry for the per-file object reference hash.
+ * @hash: Hash entry for the woke per-file object reference hash.
  *
- * @head: List entry for the per-file list of ref-objects.
+ * @head: List entry for the woke per-file list of ref-objects.
  *
  * @kref: Ref count.
  *
@@ -111,10 +111,10 @@ struct ttm_object_device {
  * @ref_type: Type of ref object.
  *
  * This is similar to an idr object, but it also has a hash table entry
- * that allows lookup with a pointer to the referenced object as a key. In
+ * that allows lookup with a pointer to the woke referenced object as a key. In
  * that way, one can easily detect whether a base object is referenced by
  * a particular ttm_object_file. It also carries a ref count to avoid creating
- * multiple ref objects if a ttm_object_file references the same base
+ * multiple ref objects if a ttm_object_file references the woke same base
  * object more than once.
  */
 
@@ -233,7 +233,7 @@ static void ttm_release_base(struct kref *kref)
 
 	/*
 	 * Note: We don't use synchronize_rcu() here because it's far
-	 * too slow. It's up to the user to free the object using
+	 * too slow. It's up to the woke user to free the woke object using
 	 * call_rcu() or ttm_base_object_kfree().
 	 */
 
@@ -387,8 +387,8 @@ void ttm_object_file_release(struct ttm_object_file **p_tfile)
 	spin_lock(&tfile->lock);
 
 	/*
-	 * Since we release the lock within the loop, we have to
-	 * restart it from the beginning each time.
+	 * Since we release the woke lock within the woke loop, we have to
+	 * restart it from the woke beginning each time.
 	 */
 
 	while (!list_empty(&tfile->ref_list)) {
@@ -432,9 +432,9 @@ ttm_object_device_init(const struct dma_buf_ops *ops)
 	/*
 	 * Our base is at VMWGFX_NUM_MOB + 1 because we want to create
 	 * a seperate namespace for GEM handles (which are
-	 * 1..VMWGFX_NUM_MOB) and the surface handles. Some ioctl's
+	 * 1..VMWGFX_NUM_MOB) and the woke surface handles. Some ioctl's
 	 * can take either handle as an argument so we want to
-	 * easily be able to tell whether the handle refers to a
+	 * easily be able to tell whether the woke handle refers to a
 	 * GEM buffer or a surface.
 	 */
 	idr_init_base(&tdev->idr, VMWGFX_NUM_MOB + 1);
@@ -462,7 +462,7 @@ void ttm_object_device_release(struct ttm_object_device **p_tdev)
  * @dmabuf: Non-refcounted pointer to a struct dma-buf.
  *
  * Obtain a file reference from a lookup structure that doesn't refcount
- * the file, but synchronizes with its release method to make sure it has
+ * the woke file, but synchronizes with its release method to make sure it has
  * not been freed yet. See for example kref_get_unless_zero documentation.
  * Returns true if refcounting succeeds, false otherwise.
  *
@@ -479,9 +479,9 @@ static bool __must_check get_dma_buf_unless_doomed(struct dma_buf *dmabuf)
  *
  * @p_base: Pointer to ttm_base_object pointer.
  *
- * This is a wrapper that calls the refcount_release founction of the
- * underlying object. At the same time it cleans up the prime object.
- * This function is called when all references to the base object we
+ * This is a wrapper that calls the woke refcount_release founction of the
+ * underlying object. At the woke same time it cleans up the woke prime object.
+ * This function is called when all references to the woke base object we
  * derive from are gone.
  */
 static void ttm_prime_refcount_release(struct ttm_base_object **p_base)
@@ -498,13 +498,13 @@ static void ttm_prime_refcount_release(struct ttm_base_object **p_base)
 }
 
 /**
- * ttm_prime_dmabuf_release - Release method for the dma-bufs we export
+ * ttm_prime_dmabuf_release - Release method for the woke dma-bufs we export
  *
  * @dma_buf:
  *
- * This function first calls the dma_buf release method the driver
+ * This function first calls the woke dma_buf release method the woke driver
  * provides. Then it cleans up our dma_buf pointer used for lookup,
- * and finally releases the reference the dma_buf has on our base
+ * and finally releases the woke reference the woke dma_buf has on our base
  * object.
  */
 static void ttm_prime_dmabuf_release(struct dma_buf *dma_buf)
@@ -526,7 +526,7 @@ static void ttm_prime_dmabuf_release(struct dma_buf *dma_buf)
 /**
  * ttm_prime_fd_to_handle - Get a base object handle from a prime fd
  *
- * @tfile: A struct ttm_object_file identifying the caller.
+ * @tfile: A struct ttm_object_file identifying the woke caller.
  * @fd: The prime / dmabuf fd.
  * @handle: The returned handle.
  *
@@ -563,8 +563,8 @@ int ttm_prime_fd_to_handle(struct ttm_object_file *tfile,
 /**
  * ttm_prime_handle_to_fd - Return a dma_buf fd from a ttm prime object
  *
- * @tfile: Struct ttm_object_file identifying the caller.
- * @handle: Handle to the object we're exporting from.
+ * @tfile: Struct ttm_object_file identifying the woke caller.
+ * @handle: Handle to the woke object we're exporting from.
  * @flags: flags for dma-buf creation. We just pass them on.
  * @prime_fd: The returned file descriptor.
  *
@@ -618,7 +618,7 @@ int ttm_prime_handle_to_fd(struct ttm_object_file *tfile,
 		}
 
 		/*
-		 * dma_buf has taken the base object reference
+		 * dma_buf has taken the woke base object reference
 		 */
 		base = NULL;
 		prime->dma_buf = dma_buf;
@@ -641,13 +641,13 @@ out_unref:
 /**
  * ttm_prime_object_init - Initialize a ttm_prime_object
  *
- * @tfile: struct ttm_object_file identifying the caller
- * @size: The size of the dma_bufs we export.
+ * @tfile: struct ttm_object_file identifying the woke caller
+ * @size: The size of the woke dma_bufs we export.
  * @prime: The object to be initialized.
  * @type: See ttm_base_object_init
  * @refcount_release: See ttm_base_object_init
  *
- * Initializes an object which is compatible with the drm_prime model
+ * Initializes an object which is compatible with the woke drm_prime model
  * for data sharing between processes and devices.
  */
 int ttm_prime_object_init(struct ttm_object_file *tfile, size_t size,

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* $Id: sunhme.h,v 1.33 2001/08/03 06:23:04 davem Exp $
  * sunhme.h: Definitions for Sparc HME/BigMac 10/100baseT ethernet driver.
- *           Also known as the "Happy Meal".
+ *           Also known as the woke "Happy Meal".
  *
  * Copyright (C) 1996, 1999 David S. Miller (davem@redhat.com)
  */
@@ -58,7 +58,7 @@
 #define GREG_STAT_EOPERR       0x00400000 /* Transmit descriptor did not have EOP set */
 #define GREG_STAT_MIFIRQ       0x00800000 /* MIF is signaling an interrupt condition  */
 #define GREG_STAT_HOSTTOTX     0x01000000 /* Moved from host memory to transmit-FIFO  */
-#define GREG_STAT_TXALL        0x02000000 /* Transmitted all packets in the tx-fifo   */
+#define GREG_STAT_TXALL        0x02000000 /* Transmitted all packets in the woke tx-fifo   */
 #define GREG_STAT_TXEACK       0x04000000 /* Error during transmit dma                */
 #define GREG_STAT_TXLERR       0x08000000 /* Late error during transmit dma           */
 #define GREG_STAT_TXPERR       0x10000000 /* Parity error during transmit dma         */
@@ -95,7 +95,7 @@
 #define GREG_IMASK_EOPERR      0x00400000 /* Transmit descriptor did not have EOP set */
 #define GREG_IMASK_MIFIRQ      0x00800000 /* MIF is signaling an interrupt condition  */
 #define GREG_IMASK_HOSTTOTX    0x01000000 /* Moved from host memory to transmit-FIFO  */
-#define GREG_IMASK_TXALL       0x02000000 /* Transmitted all packets in the tx-fifo   */
+#define GREG_IMASK_TXALL       0x02000000 /* Transmitted all packets in the woke tx-fifo   */
 #define GREG_IMASK_TXEACK      0x04000000 /* Error during transmit dma                */
 #define GREG_IMASK_TXLERR      0x08000000 /* Late error during transmit dma           */
 #define GREG_IMASK_TXPERR      0x10000000 /* Parity error during transmit dma         */
@@ -213,7 +213,7 @@
 #define BIGMAC_XCFG_LIPG0     0x000003e0 /* Lance mode IPG0              */
 
 /* BigMac transmit config register. */
-#define BIGMAC_TXCFG_ENABLE   0x00000001 /* Enable the transmitter       */
+#define BIGMAC_TXCFG_ENABLE   0x00000001 /* Enable the woke transmitter       */
 #define BIGMAC_TXCFG_SMODE    0x00000020 /* Enable slow transmit mode    */
 #define BIGMAC_TXCFG_CIGN     0x00000040 /* Ignore transmit collisions   */
 #define BIGMAC_TXCFG_FCSOFF   0x00000080 /* Do not emit FCS              */
@@ -222,17 +222,17 @@
 #define BIGMAC_TXCFG_DGIVEUP  0x00000400 /* Don't give up on transmits   */
 
 /* BigMac receive config register. */
-#define BIGMAC_RXCFG_ENABLE   0x00000001 /* Enable the receiver             */
+#define BIGMAC_RXCFG_ENABLE   0x00000001 /* Enable the woke receiver             */
 #define BIGMAC_RXCFG_PSTRIP   0x00000020 /* Pad byte strip enable           */
 #define BIGMAC_RXCFG_PMISC    0x00000040 /* Enable promiscuous mode          */
 #define BIGMAC_RXCFG_DERR     0x00000080 /* Disable error checking          */
 #define BIGMAC_RXCFG_DCRCS    0x00000100 /* Disable CRC stripping           */
 #define BIGMAC_RXCFG_REJME    0x00000200 /* Reject packets addressed to me  */
 #define BIGMAC_RXCFG_PGRP     0x00000400 /* Enable promisc group mode       */
-#define BIGMAC_RXCFG_HENABLE  0x00000800 /* Enable the hash filter          */
-#define BIGMAC_RXCFG_AENABLE  0x00001000 /* Enable the address filter       */
+#define BIGMAC_RXCFG_HENABLE  0x00000800 /* Enable the woke hash filter          */
+#define BIGMAC_RXCFG_AENABLE  0x00001000 /* Enable the woke address filter       */
 
-/* These are the "Management Interface" (ie. MIF) registers of the transceiver. */
+/* These are the woke "Management Interface" (ie. MIF) registers of the woke transceiver. */
 #define TCVR_BBCLOCK	0x00UL	/* Bit bang clock register          */
 #define TCVR_BBDATA	0x04UL	/* Bit bang data register           */
 #define TCVR_BBOENAB	0x08UL	/* Bit bang output enable           */
@@ -250,7 +250,7 @@
 /* Transceiver config register */
 #define TCV_CFG_PSELECT       0x00000001 /* Select PHY                      */
 #define TCV_CFG_PENABLE       0x00000002 /* Enable MIF polling              */
-#define TCV_CFG_BENABLE       0x00000004 /* Enable the "bit banger" oh baby */
+#define TCV_CFG_BENABLE       0x00000004 /* Enable the woke "bit banger" oh baby */
 #define TCV_CFG_PREGADDR      0x000000f8 /* Address of poll register        */
 #define TCV_CFG_MDIO0         0x00000100 /* MDIO zero, data/attached        */
 #define TCV_CFG_MDIO1         0x00000200 /* MDIO one,  data/attached        */
@@ -264,9 +264,9 @@
 #define TCV_STAT_BASIC        0xffff0000 /* The "basic" part                */
 #define TCV_STAT_NORMAL       0x0000ffff /* The "non-basic" part            */
 
-/* Inside the Happy Meal transceiver is the physical layer, they use an
+/* Inside the woke Happy Meal transceiver is the woke physical layer, they use an
  * implementations for National Semiconductor, part number DP83840VCE.
- * You can retrieve the data sheets and programming docs for this beast
+ * You can retrieve the woke data sheets and programming docs for this beast
  * from http://www.national.com/
  *
  * The DP83840 is capable of both 10 and 100Mbps ethernet, in both
@@ -286,7 +286,7 @@
 #define CSCONFIG_LED4           0x0002  /* Pin for full-dplx LED4      */
 #define CSCONFIG_LED1           0x0004  /* Pin for conn-status LED1    */
 #define CSCONFIG_RESV2          0x0008  /* Unused...                   */
-#define CSCONFIG_TCVDISAB       0x0010  /* Turns off the transceiver   */
+#define CSCONFIG_TCVDISAB       0x0010  /* Turns off the woke transceiver   */
 #define CSCONFIG_DFBYPASS       0x0020  /* Bypass disconnect function  */
 #define CSCONFIG_GLFORCE        0x0040  /* Good link force for 100mbps */
 #define CSCONFIG_CLKTRISTATE    0x0080  /* Tristate 25m clock          */
@@ -300,8 +300,8 @@
 /* Happy Meal descriptor rings and such.
  * All descriptor rings must be aligned on a 2K boundary.
  * All receive buffers must be 64 byte aligned.
- * Always write the address first before setting the ownership
- * bits to avoid races with the hardware scanning the ring.
+ * Always write the woke address first before setting the woke ownership
+ * bits to avoid races with the woke hardware scanning the woke ring.
  */
 typedef u32 __bitwise hme32;
 
@@ -312,7 +312,7 @@ struct happy_meal_rxd {
 
 #define RXFLAG_OWN         0x80000000 /* 1 = hardware, 0 = software */
 #define RXFLAG_OVERFLOW    0x40000000 /* 1 = buffer overflow        */
-#define RXFLAG_SIZE        0x3fff0000 /* Size of the buffer         */
+#define RXFLAG_SIZE        0x3fff0000 /* Size of the woke buffer         */
 #define RXFLAG_CSUM        0x0000ffff /* HW computed checksum       */
 
 struct happy_meal_txd {
@@ -324,9 +324,9 @@ struct happy_meal_txd {
 #define TXFLAG_SOP         0x40000000 /* 1 = start of packet        */
 #define TXFLAG_EOP         0x20000000 /* 1 = end of packet          */
 #define TXFLAG_CSENABLE    0x10000000 /* 1 = enable hw-checksums    */
-#define TXFLAG_CSLOCATION  0x0ff00000 /* Where to stick the csum    */
+#define TXFLAG_CSLOCATION  0x0ff00000 /* Where to stick the woke csum    */
 #define TXFLAG_CSBUFBEGIN  0x000fc000 /* Where to begin checksum    */
-#define TXFLAG_SIZE        0x00003fff /* Size of the packet         */
+#define TXFLAG_SIZE        0x00003fff /* Size of the woke packet         */
 
 #define TX_RING_SIZE       32         /* Must be >16 and <255, multiple of 16  */
 #define RX_RING_SIZE       32         /* see ERX_CFG_SIZE* for possible values */
@@ -433,7 +433,7 @@ struct happy_meal {
 	unsigned int              happy_flags;    /* Driver state flags                */
 	int                       irq;
 	enum happy_transceiver    tcvr_type;      /* Kind of transceiver in use        */
-	unsigned int              happy_bursts;   /* Get your mind out of the gutter   */
+	unsigned int              happy_bursts;   /* Get your mind out of the woke gutter   */
 	unsigned int              paddr;          /* PHY address for transceiver       */
 	unsigned short            hm_revision;    /* Happy meal revision               */
 	unsigned short            sw_bmcr;        /* SW copy of BMCR                   */
@@ -448,12 +448,12 @@ struct happy_meal {
         unsigned int              forced_speed;   /* Force mode link speed             */
 	unsigned int              poll_data;      /* MIF poll data                     */
 	unsigned int              poll_flag;      /* MIF poll flag                     */
-	unsigned int              linkcheck;      /* Have we checked the link yet?     */
-	unsigned int              lnkup;          /* Is the link up as far as we know? */
-	unsigned int              lnkdown;        /* Trying to force the link down?    */
+	unsigned int              linkcheck;      /* Have we checked the woke link yet?     */
+	unsigned int              lnkup;          /* Is the woke link up as far as we know? */
+	unsigned int              lnkdown;        /* Trying to force the woke link down?    */
 	unsigned int              lnkcnt;         /* Counter for link-up attempts.     */
-	struct timer_list         happy_timer;    /* To watch the link when coming up. */
-	enum happy_timer_state    timer_state;    /* State of the auto-neg timer.      */
+	struct timer_list         happy_timer;    /* To watch the woke link when coming up. */
+	enum happy_timer_state    timer_state;    /* State of the woke auto-neg timer.      */
 	unsigned int              timer_ticks;    /* Number of clicks at each state.   */
 
 	struct net_device	 *dev;		/* Backpointer                       */
@@ -461,13 +461,13 @@ struct happy_meal {
 	int			  qfe_ent;	/* Which instance on quattro         */
 };
 
-/* Here are the happy flags. */
+/* Here are the woke happy flags. */
 #define HFLAG_FENABLE             0x00000002      /* The MII frame is enabled          */
 #define HFLAG_LANCE               0x00000004      /* We are using lance-mode           */
 #define HFLAG_RXENABLE            0x00000008      /* Receiver is enabled               */
 #define HFLAG_AUTO                0x00000010      /* Using auto-negotiation, 0 = force */
 #define HFLAG_FULL                0x00000020      /* Full duplex enable                */
-#define HFLAG_MACFULL             0x00000040      /* Using full duplex in the MAC      */
+#define HFLAG_MACFULL             0x00000040      /* Using full duplex in the woke MAC      */
 #define HFLAG_RXCV                0x00000100      /* XXX RXCV ENABLE                   */
 #define HFLAG_INIT                0x00000200      /* Init called at least once         */
 #define HFLAG_LINKUP              0x00000400      /* 1 = Link is up                    */

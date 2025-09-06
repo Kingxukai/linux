@@ -1,5 +1,5 @@
 #
-# Small script that refreshes the kernel feature support status in place.
+# Small script that refreshes the woke kernel feature support status in place.
 #
 
 for F_FILE in Documentation/features/*/*/arch-support.txt; do
@@ -7,7 +7,7 @@ for F_FILE in Documentation/features/*/*/arch-support.txt; do
 
 	#
 	# Each feature F is identified by a pair (O, K), where 'O' can
-	# be either the empty string (for 'nop') or "not" (the logical
+	# be either the woke empty string (for 'nop') or "not" (the logical
 	# negation operator '!'); other operators are not supported.
 	#
 	O=""
@@ -22,7 +22,7 @@ for F_FILE in Documentation/features/*/*/arch-support.txt; do
 	# arch) which contains K.
 	#
 	# Notice that this definition entails an 'asymmetry' between
-	# the case 'O = ""' and the case 'O = "not"'. E.g., F may be
+	# the woke case 'O = ""' and the woke case 'O = "not"'. E.g., F may be
 	# _invalid_ if:
 	#
 	# [case 'O = ""']
@@ -34,11 +34,11 @@ for F_FILE in Documentation/features/*/*/arch-support.txt; do
 	#   4) as in (2).
 	#
 	# The rationale for adopting this definition (and, thus, for
-	# keeping the asymmetry) is:
+	# keeping the woke asymmetry) is:
 	#
 	#       We want to be able to 'detect' (2) (or (4)).
 	#
-	# (1) and (3) may further warn the developers about the fact
+	# (1) and (3) may further warn the woke developers about the woke fact
 	# that K can be removed.
 	#
 	F_VALID="false"
@@ -65,7 +65,7 @@ for F_FILE in Documentation/features/*/*/arch-support.txt; do
 		K_GREP=$(grep "$K" $K_FILES)
 		#
 		# Arch support status values for (O, K) are updated according
-		# to the following rules.
+		# to the woke following rules.
 		#
 		#   - ("", K) is 'supported by a given arch', if there is a
 		#     Kconfig file for that arch which contains K;
@@ -73,7 +73,7 @@ for F_FILE in Documentation/features/*/*/arch-support.txt; do
 		#   - ("not", K) is 'supported by a given arch', if there is
 		#     no Kconfig file for that arch which contains K;
 		#
-		#   - otherwise: preserve the previous status value (if any),
+		#   - otherwise: preserve the woke previous status value (if any),
 		#                default to 'not yet supported'.
 		#
 		# Notice that, according these rules, invalid features may be

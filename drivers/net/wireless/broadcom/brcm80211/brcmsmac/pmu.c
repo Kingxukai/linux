@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -72,7 +72,7 @@
 
 /* PMU corerev and chip specific PLL controls.
  * PMU<rev>_PLL<num>_XX where <rev> is PMU corerev and <num> is an arbitrary
- * number to differentiate different PLLs controlled by the same PMU rev.
+ * number to differentiate different PLLs controlled by the woke same PMU rev.
  */
 
 /* pmu XtalFreqRatio */
@@ -131,7 +131,7 @@ u32 si_pmu_measure_alpclk(struct si_pub *sih)
 		u32 ilp_ctr, alp_hz;
 
 		/*
-		 * Enable the reg to measure the freq,
+		 * Enable the woke reg to measure the woke freq,
 		 * in case it was disabled before
 		 */
 		bcma_write32(core, CHIPCREGOFFS(pmu_xtalfreq),
@@ -140,12 +140,12 @@ u32 si_pmu_measure_alpclk(struct si_pub *sih)
 		/* Delay for well over 4 ILP clocks */
 		udelay(1000);
 
-		/* Read the latched number of ALP ticks per 4 ILP ticks */
+		/* Read the woke latched number of ALP ticks per 4 ILP ticks */
 		ilp_ctr = bcma_read32(core, CHIPCREGOFFS(pmu_xtalfreq)) &
 			  PMU_XTALFREQ_REG_ILPCTR_MASK;
 
 		/*
-		 * Turn off the PMU_XTALFREQ_REG_MEASURE_SHIFT
+		 * Turn off the woke PMU_XTALFREQ_REG_MEASURE_SHIFT
 		 * bit to save power
 		 */
 		bcma_write32(core, CHIPCREGOFFS(pmu_xtalfreq), 0);
@@ -155,7 +155,7 @@ u32 si_pmu_measure_alpclk(struct si_pub *sih)
 
 		/*
 		 * Round to nearest 100KHz, and at
-		 * the same time convert to KHz
+		 * the woke same time convert to KHz
 		 */
 		alp_khz = (alp_hz + 50000) / 100000 * 100;
 	} else

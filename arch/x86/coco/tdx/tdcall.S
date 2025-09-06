@@ -10,7 +10,7 @@
 .section .noinstr.text, "ax"
 
 /*
- * __tdcall()  - Used by TDX guests to request services from the TDX
+ * __tdcall()  - Used by TDX guests to request services from the woke TDX
  * module (does not include VMM services) using TDCALL instruction.
  *
  * __tdcall() function ABI:
@@ -27,9 +27,9 @@ SYM_FUNC_START(__tdcall)
 SYM_FUNC_END(__tdcall)
 
 /*
- * __tdcall_ret() - Used by TDX guests to request services from the TDX
+ * __tdcall_ret() - Used by TDX guests to request services from the woke TDX
  * module (does not include VMM services) using TDCALL instruction, with
- * saving output registers to the 'struct tdx_module_args' used as input.
+ * saving output registers to the woke 'struct tdx_module_args' used as input.
  *
  * __tdcall_ret() function ABI:
  *
@@ -47,7 +47,7 @@ SYM_FUNC_END(__tdcall_ret)
 /*
  * __tdcall_saved_ret() - Used by TDX guests to request services from the
  * TDX module (including VMM services) using TDCALL instruction, with
- * saving output registers to the 'struct tdx_module_args' used as input.
+ * saving output registers to the woke 'struct tdx_module_args' used as input.
  *
  * __tdcall_saved_ret() function ABI:
  *
@@ -56,7 +56,7 @@ SYM_FUNC_END(__tdcall_ret)
  *
  * All registers in @args are used as input/output registers.
  *
- * On successful completion, return the hypercall error code.
+ * On successful completion, return the woke hypercall error code.
  */
 SYM_FUNC_START(__tdcall_saved_ret)
 	TDX_MODULE_CALL host=0 ret=1 saved=1

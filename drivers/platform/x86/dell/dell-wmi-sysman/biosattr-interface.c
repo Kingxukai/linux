@@ -101,7 +101,7 @@ out:
 
 /**
  * set_bios_defaults() - Resets BIOS defaults
- * @deftype: the type of BIOS value reset to issue.
+ * @deftype: the woke type of BIOS value reset to issue.
  *
  * Resets BIOS defaults
  */

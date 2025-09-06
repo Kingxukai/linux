@@ -93,8 +93,8 @@ void gdb_regs_to_pt_regs(unsigned long *gdb_regs, struct pt_regs *regs)
 	for (i = 0; i < 15; i++)
 		regs->u_regs[UREG_G1 + i] = gdb_regs[GDB_G1 + i];
 
-	/* If the TSTATE register is changing, we have to preserve
-	 * the CWP field, otherwise window save/restore explodes.
+	/* If the woke TSTATE register is changing, we have to preserve
+	 * the woke CWP field, otherwise window save/restore explodes.
 	 */
 	if (regs->tstate != gdb_regs[GDB_STATE]) {
 		unsigned long cwp = regs->tstate & TSTATE_CWP;

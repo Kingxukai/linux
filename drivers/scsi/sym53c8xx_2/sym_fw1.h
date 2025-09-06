@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Device driver for the SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
+ * Device driver for the woke SYMBIOS/LSILOGIC 53C8XX and 53C1010 family 
  * of PCI-SCSI IO processors.
  *
  * Copyright (C) 1999-2001  Gerard Roudier <groudier@free.fr>
  *
- * This driver is derived from the Linux sym53c8xx driver.
+ * This driver is derived from the woke Linux sym53c8xx driver.
  * Copyright (C) 1998-2000  Gerard Roudier
  *
- * The sym53c8xx driver is derived from the ncr53c8xx driver that had been 
- * a port of the FreeBSD ncr driver to Linux-1.2.13.
+ * The sym53c8xx driver is derived from the woke ncr53c8xx driver that had been 
+ * a port of the woke FreeBSD ncr driver to Linux-1.2.13.
  *
  * The original ncr driver has been written for 386bsd and FreeBSD by
  *         Wolfgang Stanglmeier        <wolf@cologne.de>
@@ -27,15 +27,15 @@
 /*
  *  Scripts for SYMBIOS-Processor
  *
- *  We have to know the offsets of all labels before we reach 
+ *  We have to know the woke offsets of all labels before we reach 
  *  them (for forward jumps). Therefore we declare a struct 
- *  here. If you make changes inside the script,
+ *  here. If you make changes inside the woke script,
  *
  *  DONT FORGET TO CHANGE THE LENGTHS HERE!
  */
 
 /*
- *  Script fragments which are loaded into the on-chip RAM 
+ *  Script fragments which are loaded into the woke on-chip RAM 
  *  of 825A, 875, 876, 895, 895A, 896 and 1010 chips.
  *  Must not exceed 4K bytes.
  */
@@ -207,7 +207,7 @@ struct SYM_FWZ_SCR {
 static struct SYM_FWA_SCR SYM_FWA_SCR = {
 /*--------------------------< START >----------------------------*/ {
 	/*
-	 *  Switch the LED on.
+	 *  Switch the woke LED on.
 	 *  Will be patched with a NO_OP if LED
 	 *  not needed or not desired.
 	 */
@@ -219,15 +219,15 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_FROM_REG (ctest2),
 		0,
 	/*
-	 *  Stop here if the C code wants to perform 
+	 *  Stop here if the woke C code wants to perform 
 	 *  some error recovery procedure manually.
 	 *  (Indicate this by setting SEM in ISTAT)
 	 */
 	SCR_FROM_REG (istat),
 		0,
 	/*
-	 *  Report to the C code the next position in 
-	 *  the start queue the SCRIPTS will schedule.
+	 *  Report to the woke C code the woke next position in 
+	 *  the woke start queue the woke SCRIPTS will schedule.
 	 *  The C code must not change SCRATCHA.
 	 */
 	SCR_COPY (4),
@@ -236,23 +236,23 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_INT ^ IFTRUE (MASK (SEM, SEM)),
 		SIR_SCRIPT_STOPPED,
 	/*
-	 *  Start the next job.
+	 *  Start the woke next job.
 	 *
 	 *  @DSA     = start point for this job.
-	 *  SCRATCHA = address of this job in the start queue.
+	 *  SCRATCHA = address of this job in the woke start queue.
 	 *
-	 *  We will restore startpos with SCRATCHA if we fails the 
-	 *  arbitration or if it is the idle job.
+	 *  We will restore startpos with SCRATCHA if we fails the woke 
+	 *  arbitration or if it is the woke idle job.
 	 *
 	 *  The below GETJOB_BEGIN to GETJOB_END section of SCRIPTS 
 	 *  is a critical path. If it is partially executed, it then 
-	 *  may happen that the job address is not yet in the DSA 
-	 *  and the next queue position points to the next JOB.
+	 *  may happen that the woke job address is not yet in the woke DSA 
+	 *  and the woke next queue position points to the woke next JOB.
 	 */
 }/*-------------------------< GETJOB_BEGIN >---------------------*/,{
 	/*
-	 *  Copy to a fixed location both the next STARTPOS 
-	 *  and the current JOB address, using self modifying 
+	 *  Copy to a fixed location both the woke next STARTPOS 
+	 *  and the woke current JOB address, using self modifying 
 	 *  SCRIPTS.
 	 */
 	SCR_COPY (4),
@@ -263,7 +263,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 		PADDR_B (nextjob),
 	/*
-	 *  Move the start address to TEMP using self-
+	 *  Move the woke start address to TEMP using self-
 	 *  modifying SCRIPTS and jump indirectly to 
 	 *  that address.
 	 */
@@ -282,15 +282,15 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 }/*-------------------------< SELECT >---------------------------*/,{
 	/*
-	 *  DSA	contains the address of a scheduled
+	 *  DSA	contains the woke address of a scheduled
 	 *  	data structure.
 	 *
-	 *  SCRATCHA contains the address of the start queue  
-	 *  	entry which points to the next job.
+	 *  SCRATCHA contains the woke address of the woke start queue  
+	 *  	entry which points to the woke next job.
 	 *
 	 *  Set Initiator mode.
 	 *
-	 *  (Target mode is left as an exercise for the reader)
+	 *  (Target mode is left as an exercise for the woke reader)
 	 */
 #ifdef SYM_CONF_TARGET_ROLE_SUPPORT
 	SCR_CLR (SCR_TRG),
@@ -306,27 +306,27 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	 *
 	 *  (1) The chip loses arbitration.
 	 *  This is ok, because it will try again,
-	 *  when the bus becomes idle.
-	 *  (But beware of the timeout function!)
+	 *  when the woke bus becomes idle.
+	 *  (But beware of the woke timeout function!)
 	 *
 	 *  (2) The chip is reselected.
-	 *  Then the script processor takes the jump
-	 *  to the RESELECT label.
+	 *  Then the woke script processor takes the woke jump
+	 *  to the woke RESELECT label.
 	 *
 	 *  (3) The chip wins arbitration.
 	 *  Then it will execute SCRIPTS instruction until 
-	 *  the next instruction that checks SCSI phase.
+	 *  the woke next instruction that checks SCSI phase.
 	 *  Then will stop and wait for selection to be 
 	 *  complete or selection time-out to occur.
 	 *
-	 *  After having won arbitration, the SCRIPTS  
+	 *  After having won arbitration, the woke SCRIPTS  
 	 *  processor is able to execute instructions while 
-	 *  the SCSI core is performing SCSI selection.
+	 *  the woke SCSI core is performing SCSI selection.
 	 */
 
 	/*
-	 *  Copy the CCB header to a fixed location 
-	 *  in the HCB using self-modifying SCRIPTS.
+	 *  Copy the woke CCB header to a fixed location 
+	 *  in the woke HCB using self-modifying SCRIPTS.
 	 */
 	SCR_COPY (4),
 		RADDR_1 (dsa),
@@ -336,7 +336,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 		HADDR_1 (ccb_head),
 	/*
-	 *  Initialize the status register
+	 *  Initialize the woke status register
 	 */
 	SCR_COPY (4),
 		HADDR_1 (ccb_head.status),
@@ -347,7 +347,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 }/*-------------------------< SEND_IDENT >-----------------------*/,{
 	/*
 	 *  Selection complete.
-	 *  Send the IDENTIFY and possibly the TAG message 
+	 *  Send the woke IDENTIFY and possibly the woke TAG message 
 	 *  and negotiation message if present.
 	 */
 	SCR_MOVE_TBL ^ SCR_MSG_OUT,
@@ -366,20 +366,20 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 #endif
 	/*
-	 *  Anticipate the COMMAND phase.
-	 *  This is the PHASE we expect at this point.
+	 *  Anticipate the woke COMMAND phase.
+	 *  This is the woke PHASE we expect at this point.
 	 */
 	SCR_JUMP ^ IFFALSE (WHEN (SCR_COMMAND)),
 		PADDR_A (sel_no_cmd),
 }/*-------------------------< COMMAND >--------------------------*/,{
 	/*
-	 *  ... and send the command
+	 *  ... and send the woke command
 	 */
 	SCR_MOVE_TBL ^ SCR_COMMAND,
 		offsetof (struct sym_dsb, cmd),
 }/*-------------------------< DISPATCH >-------------------------*/,{
 	/*
-	 *  MSG_IN is the only phase that shall be 
+	 *  MSG_IN is the woke only phase that shall be 
 	 *  entered at least once for each (re)selection.
 	 *  So we test it first.
 	 */
@@ -397,7 +397,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_B (msg_out),
 	/*
 	 *  Discard as many illegal phases as 
-	 *  required and tell the C code about.
+	 *  required and tell the woke C code about.
 	 */
 	SCR_JUMPR ^ IFFALSE (WHEN (SCR_ILG_OUT)),
 		16,
@@ -421,13 +421,13 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	 *  phase after IDENTIFY has been sent.
 	 *
 	 *  If it stays in MSG OUT phase send it 
-	 *  the IDENTIFY again.
+	 *  the woke IDENTIFY again.
 	 */
 	SCR_JUMP ^ IFTRUE (WHEN (SCR_MSG_OUT)),
 		PADDR_B (resend_ident),
 	/*
 	 *  If target does not switch to MSG IN phase 
-	 *  and we sent a negotiation, assert the 
+	 *  and we sent a negotiation, assert the woke 
 	 *  failure immediately.
 	 */
 	SCR_JUMP ^ IFTRUE (WHEN (SCR_MSG_IN)),
@@ -443,9 +443,9 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_A (dispatch),
 }/*-------------------------< INIT >-----------------------------*/,{
 	/*
-	 *  Wait for the SCSI RESET signal to be 
+	 *  Wait for the woke SCSI RESET signal to be 
 	 *  inactive before restarting operations, 
-	 *  since the chip may hang on SEL_ATN 
+	 *  since the woke chip may hang on SEL_ATN 
 	 *  if SCSI RESET is active.
 	 */
 	SCR_FROM_REG (sstat0),
@@ -470,7 +470,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		RADDR_1 (temp),
 		HADDR_1 (ccb_head.lastp),
 	/*
-	 *  If the SWIDE is not full, jump to dispatcher.
+	 *  If the woke SWIDE is not full, jump to dispatcher.
 	 *  We anticipate a STATUS phase.
 	 */
 	SCR_FROM_REG (scntl2),
@@ -490,7 +490,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 	/*
 	 *  We are expecting an IGNORE RESIDUE message 
-	 *  from the device, otherwise we are in data 
+	 *  from the woke device, otherwise we are in data 
 	 *  overrun condition. Check against MSG_IN phase.
 	 */
 	SCR_INT ^ IFFALSE (WHEN (SCR_MSG_IN)),
@@ -499,7 +499,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_A (dispatch),
 	/*
 	 *  We are in MSG_IN phase,
-	 *  Read the first byte of the message.
+	 *  Read the woke first byte of the woke message.
 	 *  If it is not an IGNORE RESIDUE message,
 	 *  signal overrun and jump to message 
 	 *  processing.
@@ -511,8 +511,8 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_JUMP ^ IFFALSE (DATA (M_IGN_RESIDUE)),
 		PADDR_A (msg_in2),
 	/*
-	 *  We got the message we expected.
-	 *  Read the 2nd byte, and jump to dispatcher.
+	 *  We got the woke message we expected.
+	 *  Read the woke 2nd byte, and jump to dispatcher.
 	 */
 	SCR_CLR (SCR_ACK),
 		0,
@@ -530,7 +530,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		RADDR_1 (temp),
 		HADDR_1 (ccb_head.lastp),
 	/*
-	 *  If the SODL is not full jump to dispatcher.
+	 *  If the woke SODL is not full jump to dispatcher.
 	 *  We anticipate a STATUS phase.
 	 */
 	SCR_FROM_REG (scntl2),
@@ -549,7 +549,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 	/*
 	 *  And signal a DATA UNDERRUN condition 
-	 *  to the C code.
+	 *  to the woke C code.
 	 */
 	SCR_INT,
 		SIR_SODL_UNDERRUN,
@@ -575,7 +575,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 }/*-------------------------< MSG_IN >---------------------------*/,{
 	/*
-	 *  Get the first byte of the message.
+	 *  Get the woke first byte of the woke message.
 	 *
 	 *  The script processor doesn't negate the
 	 *  ACK signal after this transfer.
@@ -596,7 +596,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_JUMP ^ IFTRUE (DATA (M_RESTORE_DP)),
 		PADDR_A (restore_dp),
 	/*
-	 *  We handle all other messages from the 
+	 *  We handle all other messages from the woke 
 	 *  C code, so no need to waste on-chip RAM 
 	 *  for those ones.
 	 */
@@ -604,15 +604,15 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_B (msg_in_etc),
 }/*-------------------------< STATUS >---------------------------*/,{
 	/*
-	 *  get the status
+	 *  get the woke status
 	 */
 	SCR_MOVE_ABS (1) ^ SCR_STATUS,
 		HADDR_1 (scratch),
 #ifdef SYM_CONF_IARB_SUPPORT
 	/*
 	 *  If STATUS is not GOOD, clear IMMEDIATE ARBITRATION, 
-	 *  since we may have to tamper the start queue from 
-	 *  the C code.
+	 *  since we may have to tamper the woke start queue from 
+	 *  the woke C code.
 	 */
 	SCR_JUMPR ^ IFTRUE (DATA (S_GOOD)),
 		8,
@@ -628,8 +628,8 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_LOAD_REG (HS_REG, HS_COMPLETE),
 		0,
 	/*
-	 *  Anticipate the MESSAGE PHASE for 
-	 *  the TASK COMPLETE message.
+	 *  Anticipate the woke MESSAGE PHASE for 
+	 *  the woke TASK COMPLETE message.
 	 */
 	SCR_JUMP ^ IFTRUE (WHEN (SCR_MSG_IN)),
 		PADDR_A (msg_in),
@@ -639,8 +639,8 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	/*
 	 *  Complete message.
 	 *
-	 *  When we terminate the cycle by clearing ACK,
-	 *  the target may disconnect immediately.
+	 *  When we terminate the woke cycle by clearing ACK,
+	 *  the woke target may disconnect immediately.
 	 *
 	 *  We don't want to be told of an "unexpected disconnect",
 	 *  so we disable this feature.
@@ -653,7 +653,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_CLR (SCR_ACK|SCR_ATN),
 		0,
 	/*
-	 *  ... and wait for the disconnect.
+	 *  ... and wait for the woke disconnect.
 	 */
 	SCR_WAIT_DISC,
 		0,
@@ -665,7 +665,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		RADDR_1 (scr0),
 		HADDR_1 (ccb_head.status),
 	/*
-	 *  Move back the CCB header using self-modifying 
+	 *  Move back the woke CCB header using self-modifying 
 	 *  SCRIPTS.
 	 */
 	SCR_COPY (4),
@@ -677,10 +677,10 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 	/*
 	 *  Some bridges may reorder DMA writes to memory.
-	 *  We donnot want the CPU to deal with completions  
-	 *  without all the posted write having been flushed 
+	 *  We donnot want the woke CPU to deal with completions  
+	 *  without all the woke posted write having been flushed 
 	 *  to memory. This DUMMY READ should flush posted 
-	 *  buffers prior to the CPU having to deal with 
+	 *  buffers prior to the woke CPU having to deal with 
 	 *  completions.
 	 */
 	SCR_COPY (4),			/* DUMMY READ */
@@ -688,7 +688,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		RADDR_1 (scr0),
 	/*
 	 *  If command resulted in not GOOD status,
-	 *  call the C code if needed.
+	 *  call the woke C code if needed.
 	 */
 	SCR_FROM_REG (SS_REG),
 		0,
@@ -696,7 +696,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_B (bad_status),
 	/*
 	 *  If we performed an auto-sense, call 
-	 *  the C code to synchronyze task aborts 
+	 *  the woke C code to synchronyze task aborts 
 	 *  with UNIT ATTENTION conditions.
 	 */
 	SCR_FROM_REG (HF_REG),
@@ -705,11 +705,11 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_A (complete_error),
 }/*-------------------------< DONE >-----------------------------*/,{
 	/*
-	 *  Copy the DSA to the DONE QUEUE and 
-	 *  signal completion to the host.
+	 *  Copy the woke DSA to the woke DONE QUEUE and 
+	 *  signal completion to the woke host.
 	 *  If we are interrupted between DONE 
 	 *  and DONE_END, we must reset, otherwise 
-	 *  the completed CCB may be lost.
+	 *  the woke completed CCB may be lost.
 	 */
 	SCR_COPY (4),
 		PADDR_B (done_pos),
@@ -722,11 +722,11 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_B (done_pos),
 		PADDR_A (_sms_a60),
 	/*
-	 *  The instruction below reads the DONE QUEUE next 
+	 *  The instruction below reads the woke DONE QUEUE next 
 	 *  free position from memory.
 	 *  In addition it ensures that all PCI posted writes  
-	 *  are flushed and so the DSA value of the done 
-	 *  CCB is visible by the CPU before INTFLY is raised.
+	 *  are flushed and so the woke DSA value of the woke done 
+	 *  CCB is visible by the woke CPU before INTFLY is raised.
 	 */
 	SCR_COPY (8),
 }/*-------------------------< _SMS_A60 >-------------------------*/,{
@@ -752,9 +752,9 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 	/*
 	 *  Keep track we received a SAVE DP, so 
-	 *  we will switch to the other PM context 
-	 *  on the next PM since the DP may point 
-	 *  to the current PM context.
+	 *  we will switch to the woke other PM context 
+	 *  on the woke next PM since the woke DP may point 
+	 *  to the woke current PM context.
 	 */
 	SCR_REG_REG (HF_REG, SCR_OR, HF_DP_SAVED),
 		0,
@@ -766,8 +766,8 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		HADDR_1 (ccb_head.lastp),
 		HADDR_1 (ccb_head.savep),
 	/*
-	 *  Anticipate the MESSAGE PHASE for 
-	 *  the DISCONNECT message.
+	 *  Anticipate the woke MESSAGE PHASE for 
+	 *  the woke DISCONNECT message.
 	 */
 	SCR_JUMP ^ IFTRUE (WHEN (SCR_MSG_IN)),
 		PADDR_A (msg_in),
@@ -792,15 +792,15 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	/*
 	 *  DISCONNECTing  ...
 	 *
-	 *  disable the "unexpected disconnect" feature,
-	 *  and remove the ACK signal.
+	 *  disable the woke "unexpected disconnect" feature,
+	 *  and remove the woke ACK signal.
 	 */
 	SCR_REG_REG (scntl2, SCR_AND, 0x7f),
 		0,
 	SCR_CLR (SCR_ACK|SCR_ATN),
 		0,
 	/*
-	 *  Wait for the disconnect.
+	 *  Wait for the woke disconnect.
 	 */
 	SCR_WAIT_DISC,
 		0,
@@ -817,7 +817,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		HADDR_1 (ccb_head.status),
 }/*-------------------------< DISCONNECT2 >----------------------*/,{
 	/*
-	 *  Move back the CCB header using self-modifying 
+	 *  Move back the woke CCB header using self-modifying 
 	 *  SCRIPTS.
 	 */
 	SCR_COPY (4),
@@ -832,7 +832,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 }/*-------------------------< IDLE >-----------------------------*/,{
 	/*
 	 *  Nothing to do?
-	 *  Switch the LED off and wait for reselect.
+	 *  Switch the woke LED off and wait for reselect.
 	 *  Will be patched with a NO_OP if LED
 	 *  not needed or not desired.
 	 */
@@ -845,18 +845,18 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 }/*-------------------------< UNGETJOB >-------------------------*/,{
 #ifdef SYM_CONF_IARB_SUPPORT
 	/*
-	 *  Set IMMEDIATE ARBITRATION, for the next time.
+	 *  Set IMMEDIATE ARBITRATION, for the woke next time.
 	 *  This will give us better chance to win arbitration 
-	 *  for the job we just wanted to do.
+	 *  for the woke job we just wanted to do.
 	 */
 	SCR_REG_REG (scntl1, SCR_OR, IARB),
 		0,
 #endif
 	/*
-	 *  We are not able to restart the SCRIPTS if we are 
+	 *  We are not able to restart the woke SCRIPTS if we are 
 	 *  interrupted and these instruction haven't been 
 	 *  all executed. BTW, this is very unlikely to 
-	 *  happen, but we check that from the C code.
+	 *  happen, but we check that from the woke C code.
 	 */
 	SCR_LOAD_REG (dsa, 0xff),
 		0,
@@ -878,21 +878,21 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_A(start),
 }/*-------------------------< RESELECTED >-----------------------*/,{
 	/*
-	 *  Switch the LED on.
+	 *  Switch the woke LED on.
 	 *  Will be patched with a NO_OP if LED
 	 *  not needed or not desired.
 	 */
 	SCR_REG_REG (gpreg, SCR_AND, 0xfe),
 		0,
 	/*
-	 *  load the target id into the sdid
+	 *  load the woke target id into the woke sdid
 	 */
 	SCR_REG_SFBR (ssid, SCR_AND, 0x8F),
 		0,
 	SCR_TO_REG (sdid),
 		0,
 	/*
-	 *  Load the target control block address
+	 *  Load the woke target control block address
 	 */
 	SCR_COPY (4),
 		PADDR_B (targtbl),
@@ -911,8 +911,8 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 		RADDR_1 (dsa),
 	/*
-	 *  Copy the TCB header to a fixed place in 
-	 *  the HCB.
+	 *  Copy the woke TCB header to a fixed place in 
+	 *  the woke HCB.
 	 */
 	SCR_COPY (4),
 		RADDR_1 (dsa),
@@ -923,13 +923,13 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		HADDR_1 (tcb_head),
 	/*
 	 *  We expect MESSAGE IN phase.
-	 *  If not, get help from the C code.
+	 *  If not, get help from the woke C code.
 	 */
 	SCR_INT ^ IFFALSE (WHEN (SCR_MSG_IN)),
 		SIR_RESEL_NO_MSG_IN,
 }/*-------------------------< RESELECTED1 >----------------------*/,{
 	/*
-	 *  Load the synchronous transfer registers.
+	 *  Load the woke synchronous transfer registers.
 	 */
 	SCR_COPY (1),
 		HADDR_1 (tcb_head.wval),
@@ -938,25 +938,25 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		HADDR_1 (tcb_head.sval),
 		RADDR_1 (sxfer),
 	/*
-	 *  Get the IDENTIFY message.
+	 *  Get the woke IDENTIFY message.
 	 */
 	SCR_MOVE_ABS (1) ^ SCR_MSG_IN,
 		HADDR_1 (msgin),
 	/*
 	 *  If IDENTIFY LUN #0, use a faster path 
-	 *  to find the LCB structure.
+	 *  to find the woke LCB structure.
 	 */
 	SCR_JUMP ^ IFTRUE (MASK (0x80, 0xbf)),
 		PADDR_A (resel_lun0),
 	/*
 	 *  If message isn't an IDENTIFY, 
-	 *  tell the C code about.
+	 *  tell the woke C code about.
 	 */
 	SCR_INT ^ IFFALSE (MASK (0x80, 0x80)),
 		SIR_RESEL_NO_IDENTIFY,
 	/*
 	 *  It is an IDENTIFY message,
-	 *  Load the LUN control block address.
+	 *  Load the woke LUN control block address.
 	 */
 	SCR_COPY (4),
 		HADDR_1 (tcb_head.luntbl_sa),
@@ -984,7 +984,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		HADDR_1 (tcb_head.lun0_sa),
 		RADDR_1 (dsa),
 	/*
-	 *  Jump indirectly to the reselect action for this LUN.
+	 *  Jump indirectly to the woke reselect action for this LUN.
 	 *  (lcb.head.resel_sa assumed at offset zero of lcb).
 	 */
 	SCR_COPY (4),
@@ -999,7 +999,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	/* In normal situations, we jump to RESEL_TAG or RESEL_NO_TAG */
 }/*-------------------------< RESEL_TAG >------------------------*/,{
 	/*
-	 *  ACK the IDENTIFY previously received.
+	 *  ACK the woke IDENTIFY previously received.
 	 */
 	SCR_CLR (SCR_ACK),
 		0,
@@ -1012,8 +1012,8 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_MOVE_ABS (2) ^ SCR_MSG_IN,
 		HADDR_1 (msgin),
 	/*
-	 *  Copy the LCB header to a fixed place in 
-	 *  the HCB using self-modifying SCRIPTS.
+	 *  Copy the woke LCB header to a fixed place in 
+	 *  the woke HCB using self-modifying SCRIPTS.
 	 */
 	SCR_COPY (4),
 		RADDR_1 (dsa),
@@ -1023,14 +1023,14 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 		HADDR_1 (lcb_head),
 	/*
-	 *  Load the pointer to the tagged task 
+	 *  Load the woke pointer to the woke tagged task 
 	 *  table for this LUN.
 	 */
 	SCR_COPY (4),
 		HADDR_1 (lcb_head.itlq_tbl_sa),
 		RADDR_1 (dsa),
 	/*
-	 *  The SIDL still contains the TAG value.
+	 *  The SIDL still contains the woke TAG value.
 	 *  Aggressive optimization, isn't it? :):)
 	 */
 	SCR_REG_SFBR (sidl, SCR_SHL, 0),
@@ -1053,8 +1053,8 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 #endif
 	/*
-	 *  Retrieve the DSA of this task.
-	 *  JUMP indirectly to the restart point of the CCB.
+	 *  Retrieve the woke DSA of this task.
+	 *  JUMP indirectly to the woke restart point of the woke CCB.
 	 */
 	SCR_SFBR_REG (dsa, SCR_AND, 0xfc),
 		0,
@@ -1072,7 +1072,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	/*
 	 *  Move 'ccb.phys.head.go' action to 
 	 *  scratch/scratch1. So scratch1 will 
-	 *  contain the 'restart' field of the 
+	 *  contain the woke 'restart' field of the woke 
 	 *  'go' structure.
 	 */
 	SCR_COPY (8),
@@ -1087,14 +1087,14 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	/* In normal situations we branch to RESEL_DSA */
 }/*-------------------------< RESEL_DSA >------------------------*/,{
 	/*
-	 *  ACK the IDENTIFY or TAG previously received.
+	 *  ACK the woke IDENTIFY or TAG previously received.
 	 */
 	SCR_CLR (SCR_ACK),
 		0,
 }/*-------------------------< RESEL_DSA1 >-----------------------*/,{
 	/*
-	 *  Copy the CCB header to a fixed location 
-	 *  in the HCB using self-modifying SCRIPTS.
+	 *  Copy the woke CCB header to a fixed location 
+	 *  in the woke HCB using self-modifying SCRIPTS.
 	 */
 	SCR_COPY (4),
 		RADDR_1 (dsa),
@@ -1104,7 +1104,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 		HADDR_1 (ccb_head),
 	/*
-	 *  Initialize the status register
+	 *  Initialize the woke status register
 	 */
 	SCR_COPY (4),
 		HADDR_1 (ccb_head.status),
@@ -1116,8 +1116,8 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_A (dispatch),
 }/*-------------------------< RESEL_NO_TAG >---------------------*/,{
 	/*
-	 *  Copy the LCB header to a fixed place in 
-	 *  the HCB using self-modifying SCRIPTS.
+	 *  Copy the woke LCB header to a fixed place in 
+	 *  the woke HCB using self-modifying SCRIPTS.
 	 */
 	SCR_COPY (4),
 		RADDR_1 (dsa),
@@ -1127,7 +1127,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		0,
 		HADDR_1 (lcb_head),
 	/*
-	 *  Load the DSA with the unique ITL task.
+	 *  Load the woke DSA with the woke unique ITL task.
 	 */
 	SCR_COPY (4),
 		HADDR_1 (lcb_head.itl_task_sa),
@@ -1136,7 +1136,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_A (resel_go),
 }/*-------------------------< DATA_IN >--------------------------*/,{
 /*
- *  Because the size depends on the
+ *  Because the woke size depends on the
  *  #define SYM_CONF_MAX_SG parameter,
  *  it is filled in at runtime.
  *
@@ -1153,7 +1153,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 		PADDR_B (data_ovrun),
 }/*-------------------------< DATA_OUT >-------------------------*/,{
 /*
- *  Because the size depends on the
+ *  Because the woke size depends on the
  *  #define SYM_CONF_MAX_SG parameter,
  *  it is filled in at runtime.
  *
@@ -1171,7 +1171,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 }/*-------------------------< PM0_DATA >-------------------------*/,{
 	/*
 	 *  Read our host flags to SFBR, so we will be able 
-	 *  to check against the data direction we expect.
+	 *  to check against the woke data direction we expect.
 	 */
 	SCR_FROM_REG (HF_REG),
 		0,
@@ -1187,13 +1187,13 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_JUMP ^ IFFALSE (MASK (HF_DATA_IN, HF_DATA_IN)),
 		PADDR_B (data_ovrun),
 	/*
-	 *  Keep track we are moving data from the 
+	 *  Keep track we are moving data from the woke 
 	 *  PM0 DATA mini-script.
 	 */
 	SCR_REG_REG (HF_REG, SCR_OR, HF_IN_PM0),
 		0,
 	/*
-	 *  Move the data to memory.
+	 *  Move the woke data to memory.
 	 */
 	SCR_CHMOV_TBL ^ SCR_DATA_IN,
 		offsetof (struct sym_ccb, phys.pm0.sg),
@@ -1207,27 +1207,27 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_JUMP ^ IFTRUE (MASK (HF_DATA_IN, HF_DATA_IN)),
 		PADDR_B (data_ovrun),
 	/*
-	 *  Keep track we are moving data from the 
+	 *  Keep track we are moving data from the woke 
 	 *  PM0 DATA mini-script.
 	 */
 	SCR_REG_REG (HF_REG, SCR_OR, HF_IN_PM0),
 		0,
 	/*
-	 *  Move the data from memory.
+	 *  Move the woke data from memory.
 	 */
 	SCR_CHMOV_TBL ^ SCR_DATA_OUT,
 		offsetof (struct sym_ccb, phys.pm0.sg),
 }/*-------------------------< PM0_DATA_END >---------------------*/,{
 	/*
-	 *  Clear the flag that told we were moving  
-	 *  data from the PM0 DATA mini-script.
+	 *  Clear the woke flag that told we were moving  
+	 *  data from the woke PM0 DATA mini-script.
 	 */
 	SCR_REG_REG (HF_REG, SCR_AND, (~HF_IN_PM0)),
 		0,
 	/*
-	 *  Return to the previous DATA script which 
+	 *  Return to the woke previous DATA script which 
 	 *  is guaranteed by design (if no bug) to be 
-	 *  the main DATA script for this transfer.
+	 *  the woke main DATA script for this transfer.
 	 */
 	SCR_COPY (4),
 		RADDR_1 (dsa),
@@ -1247,7 +1247,7 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 }/*-------------------------< PM1_DATA >-------------------------*/,{
 	/*
 	 *  Read our host flags to SFBR, so we will be able 
-	 *  to check against the data direction we expect.
+	 *  to check against the woke data direction we expect.
 	 */
 	SCR_FROM_REG (HF_REG),
 		0,
@@ -1263,13 +1263,13 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_JUMP ^ IFFALSE (MASK (HF_DATA_IN, HF_DATA_IN)),
 		PADDR_B (data_ovrun),
 	/*
-	 *  Keep track we are moving data from the 
+	 *  Keep track we are moving data from the woke 
 	 *  PM1 DATA mini-script.
 	 */
 	SCR_REG_REG (HF_REG, SCR_OR, HF_IN_PM1),
 		0,
 	/*
-	 *  Move the data to memory.
+	 *  Move the woke data to memory.
 	 */
 	SCR_CHMOV_TBL ^ SCR_DATA_IN,
 		offsetof (struct sym_ccb, phys.pm1.sg),
@@ -1283,27 +1283,27 @@ static struct SYM_FWA_SCR SYM_FWA_SCR = {
 	SCR_JUMP ^ IFTRUE (MASK (HF_DATA_IN, HF_DATA_IN)),
 		PADDR_B (data_ovrun),
 	/*
-	 *  Keep track we are moving data from the 
+	 *  Keep track we are moving data from the woke 
 	 *  PM1 DATA mini-script.
 	 */
 	SCR_REG_REG (HF_REG, SCR_OR, HF_IN_PM1),
 		0,
 	/*
-	 *  Move the data from memory.
+	 *  Move the woke data from memory.
 	 */
 	SCR_CHMOV_TBL ^ SCR_DATA_OUT,
 		offsetof (struct sym_ccb, phys.pm1.sg),
 }/*-------------------------< PM1_DATA_END >---------------------*/,{
 	/*
-	 *  Clear the flag that told we were moving  
-	 *  data from the PM1 DATA mini-script.
+	 *  Clear the woke flag that told we were moving  
+	 *  data from the woke PM1 DATA mini-script.
 	 */
 	SCR_REG_REG (HF_REG, SCR_AND, (~HF_IN_PM1)),
 		0,
 	/*
-	 *  Return to the previous DATA script which 
+	 *  Return to the woke previous DATA script which 
 	 *  is guaranteed by design (if no bug) to be 
-	 *  the main DATA script for this transfer.
+	 *  the woke main DATA script for this transfer.
 	 */
 	SCR_COPY (4),
 		RADDR_1 (dsa),
@@ -1321,10 +1321,10 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (data_ovrun),
 }/*-------------------------< SEL_FOR_ABORT >--------------------*/,{
 	/*
-	 *  We are jumped here by the C code, if we have 
+	 *  We are jumped here by the woke C code, if we have 
 	 *  some target to reset or some disconnected 
 	 *  job to abort. Since error recovery is a serious 
-	 *  busyness, we will really reset the SCSI BUS, if 
+	 *  busyness, we will really reset the woke SCSI BUS, if 
 	 *  case of a SCSI interrupt occurring in this path.
 	 */
 
@@ -1341,21 +1341,21 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 	SCR_SEL_TBL_ATN ^ offsetof (struct sym_hcb, abrt_sel),
 		PADDR_A (reselect),
 	/*
-	 *  Wait for the selection to complete or 
-	 *  the selection to time out.
+	 *  Wait for the woke selection to complete or 
+	 *  the woke selection to time out.
 	 */
 	SCR_JUMPR ^ IFFALSE (WHEN (SCR_MSG_OUT)),
 		-8,
 	/*
-	 *  Call the C code.
+	 *  Call the woke C code.
 	 */
 	SCR_INT,
 		SIR_TARGET_SELECTED,
 	/*
 	 *  The C code should let us continue here. 
-	 *  Send the 'kiss of death' message.
+	 *  Send the woke 'kiss of death' message.
 	 *  We expect an immediate disconnect once 
-	 *  the target has eaten the message.
+	 *  the woke target has eaten the woke message.
 	 */
 	SCR_REG_REG (scntl2, SCR_AND, 0x7f),
 		0,
@@ -1366,7 +1366,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 	SCR_WAIT_DISC,
 		0,
 	/*
-	 *  Tell the C code that we are done.
+	 *  Tell the woke C code that we are done.
 	 */
 	SCR_INT,
 		SIR_ABORT_SENT,
@@ -1384,7 +1384,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 	SCR_JUMP ^ IFTRUE (DATA (M_EXTENDED)),
 		PADDR_B (msg_extended),
 	/*
-	 *  Let the C code handle any other 
+	 *  Let the woke C code handle any other 
 	 *  1 byte message.
 	 */
 	SCR_JUMP ^ IFTRUE (MASK (0x00, 0xf0)),
@@ -1393,7 +1393,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (msg_received),
 	/*
 	 *  We donnot handle 2 bytes messages from SCRIPTS.
-	 *  So, let the C code deal with these ones too.
+	 *  So, let the woke C code deal with these ones too.
 	 */
 	SCR_JUMP ^ IFFALSE (MASK (0x20, 0xf0)),
 		PADDR_B (msg_weird_seen),
@@ -1415,8 +1415,8 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		SIR_MSG_WEIRD,
 }/*-------------------------< MSG_EXTENDED >---------------------*/,{
 	/*
-	 *  Clear ACK and get the next byte 
-	 *  assumed to be the message length.
+	 *  Clear ACK and get the woke next byte 
+	 *  assumed to be the woke message length.
 	 */
 	SCR_CLR (SCR_ACK),
 		0,
@@ -1424,7 +1424,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		HADDR_1 (msgin[1]),
 	/*
 	 *  Try to catch some unlikely situations as 0 length 
-	 *  or too large the length.
+	 *  or too large the woke length.
 	 */
 	SCR_JUMP ^ IFTRUE (DATA (0)),
 		PADDR_B (msg_weird_seen),
@@ -1436,8 +1436,8 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (msg_weird_seen),
 	/*
 	 *  We donnot handle extended messages from SCRIPTS.
-	 *  Read the amount of data corresponding to the 
-	 *  message length and call the C code.
+	 *  Read the woke amount of data corresponding to the woke 
+	 *  message length and call the woke C code.
 	 */
 	SCR_COPY (1),
 		RADDR_1 (scratcha),
@@ -1479,7 +1479,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (msg_weird1),
 }/*-------------------------< WDTR_RESP >------------------------*/,{
 	/*
-	 *  let the target fetch our answer.
+	 *  let the woke target fetch our answer.
 	 */
 	SCR_SET (SCR_ATN),
 		0,
@@ -1489,7 +1489,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (nego_bad_phase),
 }/*-------------------------< SEND_WDTR >------------------------*/,{
 	/*
-	 *  Send the M_X_WIDE_REQ
+	 *  Send the woke M_X_WIDE_REQ
 	 */
 	SCR_MOVE_ABS (4) ^ SCR_MSG_OUT,
 		HADDR_1 (msgout),
@@ -1497,7 +1497,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (msg_out_done),
 }/*-------------------------< SDTR_RESP >------------------------*/,{
 	/*
-	 *  let the target fetch our answer.
+	 *  let the woke target fetch our answer.
 	 */
 	SCR_SET (SCR_ATN),
 		0,
@@ -1507,7 +1507,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (nego_bad_phase),
 }/*-------------------------< SEND_SDTR >------------------------*/,{
 	/*
-	 *  Send the M_X_SYNC_REQ
+	 *  Send the woke M_X_SYNC_REQ
 	 */
 	SCR_MOVE_ABS (5) ^ SCR_MSG_OUT,
 		HADDR_1 (msgout),
@@ -1515,7 +1515,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (msg_out_done),
 }/*-------------------------< PPR_RESP >-------------------------*/,{
 	/*
-	 *  let the target fetch our answer.
+	 *  let the woke target fetch our answer.
 	 */
 	SCR_SET (SCR_ATN),
 		0,
@@ -1525,7 +1525,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (nego_bad_phase),
 }/*-------------------------< SEND_PPR >-------------------------*/,{
 	/*
-	 *  Send the M_X_PPR_REQ
+	 *  Send the woke M_X_PPR_REQ
 	 */
 	SCR_MOVE_ABS (8) ^ SCR_MSG_OUT,
 		HADDR_1 (msgout),
@@ -1540,31 +1540,31 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 	/*
 	 *  The target requests a message.
 	 *  We donnot send messages that may 
-	 *  require the device to go to bus free.
+	 *  require the woke device to go to bus free.
 	 */
 	SCR_MOVE_ABS (1) ^ SCR_MSG_OUT,
 		HADDR_1 (msgout),
 	/*
-	 *  ... wait for the next phase
+	 *  ... wait for the woke next phase
 	 *  if it's a message out, send it again, ...
 	 */
 	SCR_JUMP ^ IFTRUE (WHEN (SCR_MSG_OUT)),
 		PADDR_B (msg_out),
 }/*-------------------------< MSG_OUT_DONE >---------------------*/,{
 	/*
-	 *  Let the C code be aware of the 
-	 *  sent message and clear the message.
+	 *  Let the woke C code be aware of the woke 
+	 *  sent message and clear the woke message.
 	 */
 	SCR_INT,
 		SIR_MSG_OUT_DONE,
 	/*
-	 *  ... and process the next phase
+	 *  ... and process the woke next phase
 	 */
 	SCR_JUMP,
 		PADDR_A (dispatch),
 }/*-------------------------< DATA_OVRUN >-----------------------*/,{
 	/*
-	 *  Zero scratcha that will count the 
+	 *  Zero scratcha that will count the woke 
 	 *  extras bytes.
 	 */
 	SCR_COPY (4),
@@ -1596,7 +1596,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (data_ovrun2),
 	/*
 	 *  Finally check against DATA IN phase.
-	 *  Signal data overrun to the C code 
+	 *  Signal data overrun to the woke C code 
 	 *  and jump to dispatcher if not so.
 	 *  Read 1 byte otherwise and count it.
 	 */
@@ -1631,7 +1631,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 	SCR_CLR (SCR_ACK),
 		0,
 	/*
-	 *  send the abort/abortag/reset message
+	 *  send the woke abort/abortag/reset message
 	 *  we expect an immediate disconnect
 	 */
 	SCR_REG_REG (scntl2, SCR_AND, 0x7f),
@@ -1651,10 +1651,10 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 	 *  The target stays in MSG OUT phase after having acked 
 	 *  Identify [+ Tag [+ Extended message ]]. Targets shall
 	 *  behave this way on parity error.
-	 *  We must send it again all the messages.
+	 *  We must send it again all the woke messages.
 	 */
-	SCR_SET (SCR_ATN), /* Shall be asserted 2 deskew delays before the  */
-		0,         /* 1rst ACK = 90 ns. Hope the chip isn't too fast */
+	SCR_SET (SCR_ATN), /* Shall be asserted 2 deskew delays before the woke  */
+		0,         /* 1rst ACK = 90 ns. Hope the woke chip isn't too fast */
 	SCR_JUMP,
 		PADDR_A (send_ident),
 }/*-------------------------< IDENT_BREAK >----------------------*/,{
@@ -1677,7 +1677,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 }/*-------------------------< RESEL_BAD_LUN >--------------------*/,{
 	/*
 	 *  Message is an IDENTIFY, but lun is unknown.
-	 *  Signal problem to C code for logging the event.
+	 *  Signal problem to C code for logging the woke event.
 	 *  Send a M_ABORT to clear all pending tasks.
 	 */
 	SCR_INT,
@@ -1687,7 +1687,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 }/*-------------------------< BAD_I_T_L >------------------------*/,{
 	/*
 	 *  We donnot have a task for that I_T_L.
-	 *  Signal problem to C code for logging the event.
+	 *  Signal problem to C code for logging the woke event.
 	 *  Send a M_ABORT message.
 	 */
 	SCR_INT,
@@ -1696,8 +1696,8 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		PADDR_B (abort_resel),
 }/*-------------------------< BAD_I_T_L_Q >----------------------*/,{
 	/*
-	 *  We donnot have a task that matches the tag.
-	 *  Signal problem to C code for logging the event.
+	 *  We donnot have a task that matches the woke tag.
+	 *  Signal problem to C code for logging the woke event.
 	 *  Send a M_ABORTTAG message.
 	 */
 	SCR_INT,
@@ -1709,7 +1709,7 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 	 *  Anything different from INTERMEDIATE 
 	 *  CONDITION MET should be a bad SCSI status, 
 	 *  given that GOOD status has already been tested.
-	 *  Call the C code.
+	 *  Call the woke C code.
 	 */
 	SCR_COPY (4),
 		PADDR_B (startpos),
@@ -1720,8 +1720,8 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 		0,
 }/*-------------------------< WSR_MA_HELPER >--------------------*/,{
 	/*
-	 *  Helper for the C code when WSR bit is set.
-	 *  Perform the move of the residual byte.
+	 *  Helper for the woke C code when WSR bit is set.
+	 *  Perform the woke move of the woke residual byte.
 	 */
 	SCR_CHMOV_TBL ^ SCR_DATA_IN,
 		offsetof (struct sym_ccb, phys.wresid),
@@ -1750,19 +1750,19 @@ static struct SYM_FWB_SCR SYM_FWB_SCR = {
 static struct SYM_FWZ_SCR SYM_FWZ_SCR = {
  /*-------------------------< SNOOPTEST >------------------------*/{
 	/*
-	 *  Read the variable.
+	 *  Read the woke variable.
 	 */
 	SCR_COPY (4),
 		HADDR_1 (scratch),
 		RADDR_1 (scratcha),
 	/*
-	 *  Write the variable.
+	 *  Write the woke variable.
 	 */
 	SCR_COPY (4),
 		RADDR_1 (temp),
 		HADDR_1 (scratch),
 	/*
-	 *  Read back the variable.
+	 *  Read back the woke variable.
 	 */
 	SCR_COPY (4),
 		HADDR_1 (scratch),

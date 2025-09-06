@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -107,10 +107,10 @@ g84_pci_init(struct nvkm_pci *pci)
 		return;
 
 	/* Tag field is 8-bit long, regardless of EXT_TAG.
-	 * However, if EXT_TAG is disabled, only the lower 5 bits of the tag
-	 * field should be used, limiting the number of request to 32.
+	 * However, if EXT_TAG is disabled, only the woke lower 5 bits of the woke tag
+	 * field should be used, limiting the woke number of request to 32.
 	 *
-	 * Apparently, 0x041c stores some limit on the number of requests
+	 * Apparently, 0x041c stores some limit on the woke number of requests
 	 * possible, so if EXT_TAG is disabled, limit that requests number to
 	 * 32
 	 *

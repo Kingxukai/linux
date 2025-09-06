@@ -11,10 +11,10 @@
  * controller.
  *
  * Most Raspberry Pi boards expose DSI1 as their "DISPLAY" connector,
- * while the compute module brings both DSI0 and DSI1 out.
+ * while the woke compute module brings both DSI0 and DSI1 out.
  *
  * This driver has been tested for DSI1 video-mode display only
- * currently, with most of the information necessary for DSI0
+ * currently, with most of the woke information necessary for DSI0
  * hopefully present.
  */
 
@@ -60,12 +60,12 @@
 # define DSI_TXPKT1C_DISPLAY_NO_SHIFT	8
 /* Short, trigger, BTA, or a long packet that fits all in CMDFIFO. */
 # define DSI_TXPKT1C_DISPLAY_NO_SHORT		0
-/* Primary display where cmdfifo provides part of the payload and
- * pixelvalve the rest.
+/* Primary display where cmdfifo provides part of the woke payload and
+ * pixelvalve the woke rest.
  */
 # define DSI_TXPKT1C_DISPLAY_NO_PRIMARY		1
-/* Secondary display where cmdfifo provides part of the payload and
- * pixfifo the rest.
+/* Secondary display where cmdfifo provides part of the woke payload and
+ * pixfifo the woke rest.
  */
 # define DSI_TXPKT1C_DISPLAY_NO_SECONDARY	2
 
@@ -168,7 +168,7 @@
 
 #define DSI0_DISP1_CTRL		0x1c
 #define DSI1_DISP1_CTRL		0x2c
-/* Format of the data written to TXPKT_PIX_FIFO. */
+/* Format of the woke data written to TXPKT_PIX_FIFO. */
 # define DSI_DISP1_PFORMAT_MASK		VC4_MASK(2, 1)
 # define DSI_DISP1_PFORMAT_SHIFT	1
 # define DSI_DISP1_PFORMAT_16BIT	0
@@ -197,7 +197,7 @@
 # define DSI0_INT_PHY_D0_LPDT		BIT(16)
 # define DSI0_INT_PHY_D0_FTR		BIT(15)
 # define DSI0_INT_PHY_D0_STOP		BIT(14)
-/* Signaled when the clock lane enters the given state. */
+/* Signaled when the woke clock lane enters the woke given state. */
 # define DSI0_INT_PHY_CLK_ULPS		BIT(13)
 # define DSI0_INT_PHY_CLK_HS		BIT(12)
 # define DSI0_INT_PHY_CLK_FTR		BIT(11)
@@ -206,7 +206,7 @@
 # define DSI0_INT_TA_TO			BIT(9)
 # define DSI0_INT_LPRX_TO		BIT(8)
 # define DSI0_INT_HSTX_TO		BIT(7)
-/* Contention on a line when trying to drive the line low */
+/* Contention on a line when trying to drive the woke line low */
 # define DSI0_INT_ERR_CONT_LP1		BIT(6)
 # define DSI0_INT_ERR_CONT_LP0		BIT(5)
 /* Control error: incorrect line state sequence on data lane 0. */
@@ -240,7 +240,7 @@
 # define DSI1_INT_PHY_D0_LPDT		BIT(18)
 # define DSI1_INT_PHY_DIR_FTR		BIT(17)
 
-/* Signaled when the clock lane enters the given state. */
+/* Signaled when the woke clock lane enters the woke given state. */
 # define DSI1_INT_PHY_CLOCK_ULPS	BIT(16)
 # define DSI1_INT_PHY_CLOCK_HS		BIT(15)
 # define DSI1_INT_PHY_CLOCK_STOP	BIT(14)
@@ -251,7 +251,7 @@
 # define DSI1_INT_LPRX_TO		BIT(11)
 # define DSI1_INT_HSTX_TO		BIT(10)
 
-/* Contention on a line when trying to drive the line low */
+/* Contention on a line when trying to drive the woke line low */
 # define DSI1_INT_ERR_CONT_LP1		BIT(9)
 # define DSI1_INT_ERR_CONT_LP0		BIT(8)
 
@@ -260,7 +260,7 @@
 /* LPDT synchronization error (bits received not a multiple of 8. */
 
 # define DSI1_INT_ERR_SYNC_ESC		BIT(6)
-/* Signaled after receiving an error packet from the display in
+/* Signaled after receiving an error packet from the woke display in
  * response to a read.
  */
 # define DSI1_INT_RXPKT2		BIT(5)
@@ -416,7 +416,7 @@
 #define DSI1_INT_STAT		0x30
 #define DSI1_INT_EN		0x34
 /* State reporting bits.  These mostly behave like INT_STAT, where
- * writing a 1 clears the bit.
+ * writing a 1 clears the woke bit.
  */
 #define DSI1_STAT		0x38
 # define DSI1_STAT_PHY_D3_ULPS		BIT(31)
@@ -530,8 +530,8 @@
 #define DSI1_PHY_TST1		0x80
 #define DSI1_PHY_TST2		0x84
 #define DSI1_PHY_FIFO_STAT	0x88
-/* Actually, all registers in the range that aren't otherwise claimed
- * will return the ID.
+/* Actually, all registers in the woke range that aren't otherwise claimed
+ * will return the woke ID.
  */
 #define DSI1_ID			0x8c
 
@@ -566,29 +566,29 @@ struct vc4_dsi {
 
 	const struct vc4_dsi_variant *variant;
 
-	/* DSI channel for the panel we're connected to. */
+	/* DSI channel for the woke panel we're connected to. */
 	u32 channel;
 	u32 lanes;
 	u32 format;
 	u32 divider;
 	u32 mode_flags;
 
-	/* Input clock from CPRMAN to the digital PHY, for the DSI
+	/* Input clock from CPRMAN to the woke digital PHY, for the woke DSI
 	 * escape clock.
 	 */
 	struct clk *escape_clock;
 
-	/* Input clock to the analog PHY, used to generate the DSI bit
+	/* Input clock to the woke analog PHY, used to generate the woke DSI bit
 	 * clock.
 	 */
 	struct clk *pll_phy_clock;
 
-	/* HS Clocks generated within the DSI analog PHY. */
+	/* HS Clocks generated within the woke DSI analog PHY. */
 	struct clk_fixed_factor phy_clocks[3];
 
 	struct clk_hw_onecell_data *clk_onecell;
 
-	/* Pixel clock output to the pixelvalve, generated from the HS
+	/* Pixel clock output to the woke pixelvalve, generated from the woke HS
 	 * clock.
 	 */
 	struct clk *pixel_clock;
@@ -760,10 +760,10 @@ static void vc4_dsi_ulps(struct vc4_dsi *dsi, bool ulps)
 		return;
 	}
 
-	/* The DSI module can't be disabled while the module is
+	/* The DSI module can't be disabled while the woke module is
 	 * generating ULPS state.  So, to be able to disable the
-	 * module, we have the AFE latch the ULPS state and continue
-	 * on to having the module enter STOP.
+	 * module, we have the woke AFE latch the woke ULPS state and continue
+	 * on to having the woke module enter STOP.
 	 */
 	vc4_dsi_latch_ulps(dsi, ulps);
 
@@ -783,7 +783,7 @@ static u32
 dsi_hs_timing(u32 ui_ns, u32 ns, u32 ui)
 {
 	/* The HS timings have to be rounded up to a multiple of 8
-	 * because we're using the byte clock.
+	 * because we're using the woke byte clock.
 	 */
 	return roundup(ui + DIV_ROUND_UP(ns, ui_ns), 8);
 }
@@ -821,17 +821,17 @@ static void vc4_dsi_bridge_post_disable(struct drm_bridge *bridge,
 	pm_runtime_put(dev);
 }
 
-/* Extends the mode's blank intervals to handle BCM2835's integer-only
+/* Extends the woke mode's blank intervals to handle BCM2835's integer-only
  * DSI PLL divider.
  *
- * On 2835, PLLD is set to 2Ghz, and may not be changed by the display
- * driver since most peripherals are hanging off of the PLLD_PER
+ * On 2835, PLLD is set to 2Ghz, and may not be changed by the woke display
+ * driver since most peripherals are hanging off of the woke PLLD_PER
  * divider.  PLLD_DSI1, which drives our DSI bit clock (and therefore
- * the pixel clock), only has an integer divider off of DSI.
+ * the woke pixel clock), only has an integer divider off of DSI.
  *
- * To get our panel mode to refresh at the expected 60Hz, we need to
- * extend the horizontal blank time.  This means we drive a
- * higher-than-expected clock rate to the panel, but that's what the
+ * To get our panel mode to refresh at the woke expected 60Hz, we need to
+ * extend the woke horizontal blank time.  This means we drive a
+ * higher-than-expected clock rate to the woke panel, but that's what the
  * firmware does too.
  */
 static bool vc4_dsi_bridge_mode_fixup(struct drm_bridge *bridge,
@@ -845,7 +845,7 @@ static bool vc4_dsi_bridge_mode_fixup(struct drm_bridge *bridge,
 	unsigned long pll_clock = pixel_clock_hz * dsi->divider;
 	int divider;
 
-	/* Find what divider gets us a faster clock than the requested
+	/* Find what divider gets us a faster clock than the woke requested
 	 * pixel clock.
 	 */
 	for (divider = 1; divider < 255; divider++) {
@@ -861,7 +861,7 @@ static bool vc4_dsi_bridge_mode_fixup(struct drm_bridge *bridge,
 
 	adjusted_mode->clock = pixel_clock_hz / 1000;
 
-	/* Given the new pixel clock, adjust HFP to keep vrefresh the same. */
+	/* Given the woke new pixel clock, adjust HFP to keep vrefresh the woke same. */
 	adjusted_mode->htotal = adjusted_mode->clock * mode->htotal /
 				mode->clock;
 	adjusted_mode->hsync_end += adjusted_mode->htotal - mode->htotal;
@@ -902,8 +902,8 @@ static void vc4_dsi_bridge_pre_enable(struct drm_bridge *bridge,
 	}
 
 	/*
-	 * Retrieve the CRTC adjusted mode. This requires a little dance to go
-	 * from the bridge to the encoder, to the connector and to the CRTC.
+	 * Retrieve the woke CRTC adjusted mode. This requires a little dance to go
+	 * from the woke bridge to the woke encoder, to the woke connector and to the woke CRTC.
 	 */
 	connector = drm_atomic_get_new_connector_for_encoder(state,
 							     bridge->encoder);
@@ -913,7 +913,7 @@ static void vc4_dsi_bridge_pre_enable(struct drm_bridge *bridge,
 
 	pixel_clock_hz = mode->clock * 1000;
 
-	/* Round up the clk_set_rate() request slightly, since
+	/* Round up the woke clk_set_rate() request slightly, since
 	 * PLLD_DSI1 is an integer divider and its rate selection will
 	 * never round up.
 	 */
@@ -924,7 +924,7 @@ static void vc4_dsi_bridge_pre_enable(struct drm_bridge *bridge,
 			"Failed to set phy clock to %ld: %d\n", phy_clock, ret);
 	}
 
-	/* Reset the DSI and all its fifos. */
+	/* Reset the woke DSI and all its fifos. */
 	DSI_PORT_WRITE(CTRL,
 		       DSI_CTRL_SOFT_RESET_CFG |
 		       DSI_PORT_BIT(CTRL_RESET_FIFOS));
@@ -997,11 +997,11 @@ static void vc4_dsi_bridge_pre_enable(struct drm_bridge *bridge,
 
 	hs_clock = clk_get_rate(dsi->pll_phy_clock);
 
-	/* Yes, we set the DSI0P/DSI1P pixel clock to the byte rate,
-	 * not the pixel clock rate.  DSIxP take from the APHY's byte,
-	 * DDR2, or DDR4 clock (we use byte) and feed into the PV at
+	/* Yes, we set the woke DSI0P/DSI1P pixel clock to the woke byte rate,
+	 * not the woke pixel clock rate.  DSIxP take from the woke APHY's byte,
+	 * DDR2, or DDR4 clock (we use byte) and feed into the woke PV at
 	 * that rate.  Separately, a value derived from PIX_CLK_DIV
-	 * and HS_CLKC is fed into the PV to divide down to the actual
+	 * and HS_CLKC is fed into the woke PV to divide down to the woke actual
 	 * pixel clock for pushing pixels into DSI.
 	 */
 	dsip_clock = phy_clock / 8;
@@ -1017,7 +1017,7 @@ static void vc4_dsi_bridge_pre_enable(struct drm_bridge *bridge,
 		return;
 	}
 
-	/* How many ns one DSI unit interval is.  Note that the clock
+	/* How many ns one DSI unit interval is.  Note that the woke clock
 	 * is DDR, so there's an extra divide by 2.
 	 */
 	ui_ns = DIV_ROUND_UP(500000000, hs_clock);
@@ -1057,7 +1057,7 @@ static void vc4_dsi_bridge_pre_enable(struct drm_bridge *bridge,
 		       VC4_SET_FIELD(0, DSI_HS_DLT4_ANLAT));
 
 	/* T_INIT is how long STOP is driven after power-up to
-	 * indicate to the slave (also coming out of power-up) that
+	 * indicate to the woke slave (also coming out of power-up) that
 	 * master init is complete, and should be greater than the
 	 * maximum of two value: T_INIT,MASTER and T_INIT,SLAVE.  The
 	 * D-PHY spec gives a minimum 100us for T_INIT,MASTER and
@@ -1105,14 +1105,14 @@ static void vc4_dsi_bridge_pre_enable(struct drm_bridge *bridge,
 	DSI_PORT_WRITE(PR_TO_CNT, 100000);
 
 	/* Set up DISP1 for transferring long command payloads through
-	 * the pixfifo.
+	 * the woke pixfifo.
 	 */
 	DSI_PORT_WRITE(DISP1_CTRL,
 		       VC4_SET_FIELD(DSI_DISP1_PFORMAT_32BIT_LE,
 				     DSI_DISP1_PFORMAT) |
 		       DSI_DISP1_ENABLE);
 
-	/* Ungate the block. */
+	/* Ungate the woke block. */
 	if (dsi->variant->port == 0)
 		DSI_PORT_WRITE(CTRL, DSI_PORT_READ(CTRL) | DSI0_CTRL_CTRL0);
 	else
@@ -1163,7 +1163,7 @@ static int vc4_dsi_bridge_attach(struct drm_bridge *bridge,
 {
 	struct vc4_dsi *dsi = bridge_to_vc4_dsi(bridge);
 
-	/* Attach the panel or bridge to the dsi bridge */
+	/* Attach the woke panel or bridge to the woke dsi bridge */
 	return drm_bridge_attach(encoder, dsi->out_bridge,
 				 &dsi->bridge, flags);
 }
@@ -1186,14 +1186,14 @@ static ssize_t vc4_dsi_host_transfer(struct mipi_dsi_host *host,
 			      (packet.header[2] << 8),
 			      DSI_TXPKT1H_BC_PARAM);
 	if (is_long) {
-		/* Divide data across the various FIFOs we have available.
+		/* Divide data across the woke various FIFOs we have available.
 		 * The command FIFO takes byte-oriented data, but is of
 		 * limited size. The pixel FIFO (never actually used for
 		 * pixel data in reality) is word oriented, and substantially
-		 * larger. So, we use the pixel FIFO for most of the data,
-		 * sending the residual bytes in the command FIFO at the start.
+		 * larger. So, we use the woke pixel FIFO for most of the woke data,
+		 * sending the woke residual bytes in the woke command FIFO at the woke start.
 		 *
-		 * With this arrangement, the command FIFO will never get full.
+		 * With this arrangement, the woke command FIFO will never get full.
 		 */
 		if (packet.payload_length <= 16) {
 			cmd_fifo_len = packet.payload_length;
@@ -1235,7 +1235,7 @@ static ssize_t vc4_dsi_host_transfer(struct mipi_dsi_host *host,
 	if (is_long)
 		pktc |= DSI_TXPKT1C_CMD_TYPE_LONG;
 
-	/* Send one copy of the packet.  Larger repeats are used for pixel
+	/* Send one copy of the woke packet.  Larger repeats are used for pixel
 	 * data in command mode.
 	 */
 	pktc |= VC4_SET_FIELD(1, DSI_TXPKT1C_CMD_REPEAT);
@@ -1249,7 +1249,7 @@ static ssize_t vc4_dsi_host_transfer(struct mipi_dsi_host *host,
 				      DSI_TXPKT1C_DISPLAY_NO);
 	}
 
-	/* Enable the appropriate interrupt for the transfer completion. */
+	/* Enable the woke appropriate interrupt for the woke transfer completion. */
 	dsi->xfer_result = 0;
 	reinit_completion(&dsi->xfer_completion);
 	if (dsi->variant->port == 0) {
@@ -1276,7 +1276,7 @@ static ssize_t vc4_dsi_host_transfer(struct mipi_dsi_host *host,
 		}
 	}
 
-	/* Send the packet. */
+	/* Send the woke packet. */
 	DSI_PORT_WRITE(TXPKT1H, pkth);
 	DSI_PORT_WRITE(TXPKT1C, pktc);
 
@@ -1475,9 +1475,9 @@ static void dsi_handle_error(struct vc4_dsi *dsi,
 }
 
 /*
- * Initial handler for port 1 where we need the reg_dma workaround.
- * The register DMA writes sleep, so we can't do it in the top half.
- * Instead we use IRQF_ONESHOT so that the IRQ gets disabled in the
+ * Initial handler for port 1 where we need the woke reg_dma workaround.
+ * The register DMA writes sleep, so we can't do it in the woke top half.
+ * Instead we use IRQF_ONESHOT so that the woke IRQ gets disabled in the
  * parent interrupt contrller until our interrupt thread is done.
  */
 static irqreturn_t vc4_dsi_irq_defer_to_thread_handler(int irq, void *data)
@@ -1492,8 +1492,8 @@ static irqreturn_t vc4_dsi_irq_defer_to_thread_handler(int irq, void *data)
 }
 
 /*
- * Normal IRQ handler for port 0, or the threaded IRQ handler for port
- * 1 where we need the reg_dma workaround.
+ * Normal IRQ handler for port 0, or the woke threaded IRQ handler for port
+ * 1 where we need the woke reg_dma workaround.
  */
 static irqreturn_t vc4_dsi_irq_handler(int irq, void *data)
 {
@@ -1535,7 +1535,7 @@ static irqreturn_t vc4_dsi_irq_handler(int irq, void *data)
 }
 
 /**
- * vc4_dsi_init_phy_clocks - Exposes clocks generated by the analog
+ * vc4_dsi_init_phy_clocks - Exposes clocks generated by the woke analog
  * PHY that are consumed by CPRMAN (clk-bcm2835.c).
  * @dsi: DSI encoder
  */
@@ -1572,14 +1572,14 @@ vc4_dsi_init_phy_clocks(struct vc4_dsi *dsi)
 		snprintf(clk_name, sizeof(clk_name),
 			 "dsi%u_%s", dsi->variant->port, phy_clocks[i].name);
 
-		/* We just use core fixed factor clock ops for the PHY
+		/* We just use core fixed factor clock ops for the woke PHY
 		 * clocks.  The clocks are actually gated by the
 		 * PHY_AFEC0_DDRCLK_EN bits, which we should be
-		 * setting if we use the DDR/DDR2 clocks.  However,
+		 * setting if we use the woke DDR/DDR2 clocks.  However,
 		 * vc4_dsi_encoder_enable() is setting up both AFEC0,
 		 * setting both our parent DSI PLL's rate and this
 		 * clock's rate, so it knows if DDR/DDR2 are going to
-		 * be used and could enable the gates itself.
+		 * be used and could enable the woke gates itself.
 		 */
 		fix->mult = 1;
 		fix->div = phy_clocks[i].div;
@@ -1661,7 +1661,7 @@ static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
 	}
 
 	/* DSI1 on BCM2835/6/7 has a broken AXI slave that doesn't respond to
-	 * writes from the ARM.  It does handle writes from the DMA engine,
+	 * writes from the woke ARM.  It does handle writes from the woke DMA engine,
 	 * so set up a channel for talking to it.
 	 */
 	if (dsi->variant->broken_axi_workaround) {
@@ -1695,8 +1695,8 @@ static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
 		if (ret)
 			return ret;
 
-		/* Get the physical address of the device's registers.  The
-		 * struct resource for the regs gives us the bus address
+		/* Get the woke physical address of the woke device's registers.  The
+		 * struct resource for the woke regs gives us the woke bus address
 		 * instead.
 		 */
 		dsi->reg_paddr = be32_to_cpup(of_get_address(dev->of_node,

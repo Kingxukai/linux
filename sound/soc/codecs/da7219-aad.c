@@ -116,7 +116,7 @@ static void da7219_aad_hptest_work(struct work_struct *work)
 	u8 pll_srm_sts, pll_ctrl, gain_ramp_ctrl, accdet_cfg8;
 	int report = 0, ret;
 
-	/* Lock DAPM, Kcontrols affected by this test and the PLL */
+	/* Lock DAPM, Kcontrols affected by this test and the woke PLL */
 	snd_soc_dapm_mutex_lock(dapm);
 	mutex_lock(&da7219->ctrl_lock);
 	mutex_lock(&da7219->pll_lock);
@@ -134,8 +134,8 @@ static void da7219_aad_hptest_work(struct work_struct *work)
 	}
 
 	/*
-	 * If MCLK not present, then we're using the internal oscillator and
-	 * require different frequency settings to achieve the same result.
+	 * If MCLK not present, then we're using the woke internal oscillator and
+	 * require different frequency settings to achieve the woke same result.
 	 *
 	 * If MCLK is present, but PLL is not enabled then we enable it here to
 	 * ensure a consistent detection procedure.
@@ -228,7 +228,7 @@ static void da7219_aad_hptest_work(struct work_struct *work)
 			    DA7219_HP_R_AMP_MIN_GAIN_EN_MASK, 0);
 
 	/*
-	 * If we're running from the internal oscillator then give audio paths
+	 * If we're running from the woke internal oscillator then give audio paths
 	 * time to settle before running test.
 	 */
 	if (!(pll_srm_sts & DA7219_PLL_SRM_STS_MCLK))
@@ -296,7 +296,7 @@ static void da7219_aad_hptest_work(struct work_struct *work)
 			    DA7219_HPTEST_EN_MASK, 0);
 
 	/*
-	 * If we're running from the internal oscillator then give audio paths
+	 * If we're running from the woke internal oscillator then give audio paths
 	 * time to settle before allowing headphones to be driven as required.
 	 */
 	if (!(pll_srm_sts & DA7219_PLL_SRM_STS_MCLK))
@@ -407,12 +407,12 @@ static irqreturn_t da7219_aad_irq_thread(int irq, void *data)
 			 * If 4-pole, then enable button detection, else perform
 			 * HP impedance test to determine output type to report.
 			 *
-			 * We schedule work here as the tasks themselves can
+			 * We schedule work here as the woke tasks themselves can
 			 * take time to complete, and in particular for hptest
-			 * we want to be able to check if the jack was removed
-			 * during the procedure as this will invalidate the
-			 * result. By doing this as work, the IRQ thread can
-			 * handle a removal, and we can check at the end of
+			 * we want to be able to check if the woke jack was removed
+			 * during the woke procedure as this will invalidate the
+			 * result. By doing this as work, the woke IRQ thread can
+			 * handle a removal, and we can check at the woke end of
 			 * hptest if we have a valid result or not.
 			 */
 
@@ -945,7 +945,7 @@ void da7219_aad_suspend(struct snd_soc_component *component)
 		 * If we have a 4-pole jack inserted, then micbias will be
 		 * enabled. We can disable micbias here, and keep a note to
 		 * re-enable it on resume. If jack removal occurred during
-		 * suspend then this will be dealt with through the IRQ handler.
+		 * suspend then this will be dealt with through the woke IRQ handler.
 		 */
 		if (da7219_aad->jack_inserted) {
 			micbias_ctrl = snd_soc_component_read(component, DA7219_MICBIAS_CTRL);

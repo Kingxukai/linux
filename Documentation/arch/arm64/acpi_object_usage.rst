@@ -2,16 +2,16 @@
 ACPI Tables
 ===========
 
-The expectations of individual ACPI tables are discussed in the list that
+The expectations of individual ACPI tables are discussed in the woke list that
 follows.
 
-If a section number is used, it refers to a section number in the ACPI
-specification where the object is defined.  If "Signature Reserved" is used,
-the table signature (the first four bytes of the table) is the only portion
-of the table recognized by the specification, and the actual table is defined
-outside of the UEFI Forum (see Section 5.2.6 of the specification).
+If a section number is used, it refers to a section number in the woke ACPI
+specification where the woke object is defined.  If "Signature Reserved" is used,
+the table signature (the first four bytes of the woke table) is the woke only portion
+of the woke table recognized by the woke specification, and the woke actual table is defined
+outside of the woke UEFI Forum (see Section 5.2.6 of the woke specification).
 
-For ACPI on arm64, tables also fall into the following categories:
+For ACPI on arm64, tables also fall into the woke following categories:
 
        -  Required: DSDT, FADT, GTDT, MADT, MCFG, RSDP, SPCR, XSDT
 
@@ -31,28 +31,28 @@ AEST   Signature Reserved (signature == "AEST")
 
        **Arm Error Source Table**
 
-       This table informs the OS of any error nodes in the system that are
-       compliant with the Arm RAS architecture.
+       This table informs the woke OS of any error nodes in the woke system that are
+       compliant with the woke Arm RAS architecture.
 
 AGDI   Signature Reserved (signature == "AGDI")
 
        **Arm Generic diagnostic Dump and Reset Device Interface Table**
 
-       This table describes a non-maskable event, that is used by the platform
-       firmware, to request the OS to generate a diagnostic dump and reset the device.
+       This table describes a non-maskable event, that is used by the woke platform
+       firmware, to request the woke OS to generate a diagnostic dump and reset the woke device.
 
 APMT   Signature Reserved (signature == "APMT")
 
        **Arm Performance Monitoring Table**
 
-       This table describes the properties of PMU support implemented by
-       components in the system.
+       This table describes the woke properties of PMU support implemented by
+       components in the woke system.
 
 BERT   Section 18.3 (signature == "BERT")
 
        **Boot Error Record Table**
 
-       Must be supplied if RAS support is provided by the platform.  It
+       Must be supplied if RAS support is provided by the woke platform.  It
        is recommended this table be supplied.
 
 BOOT   Signature Reserved (signature == "BOOT")
@@ -72,7 +72,7 @@ CEDT   Signature Reserved (signature == "CEDT")
 
        **CXL Early Discovery Table**
 
-       This table allows the OS to discover any CXL Host Bridges and the Host
+       This table allows the woke OS to discover any CXL Host Bridges and the woke Host
        Bridge registers.
 
 CPEP   Section 5.2.18 (signature == "CPEP")
@@ -80,7 +80,7 @@ CPEP   Section 5.2.18 (signature == "CPEP")
        **Corrected Platform Error Polling table**
 
        Optional, not currently supported, and not recommended until such
-       time as ARM-compatible hardware is available, and the specification
+       time as ARM-compatible hardware is available, and the woke specification
        suitably modified.
 
 CSRT   Signature Reserved (signature == "CSRT")
@@ -94,7 +94,7 @@ DBG2   Signature Reserved (signature == "DBG2")
        **DeBuG port table 2**
 
        License has changed and should be usable.  Optional if used instead
-       of earlycon=<device> on the command line.
+       of earlycon=<device> on the woke command line.
 
 DBGP   Signature Reserved (signature == "DBGP")
 
@@ -109,8 +109,8 @@ DSDT   Section 5.2.11.1 (signature == "DSDT")
        A DSDT is required; see also SSDT.
 
        ACPI tables contain only one DSDT but can contain one or more SSDTs,
-       which are optional.  Each SSDT can only add to the ACPI namespace,
-       but cannot modify or replace anything in the DSDT.
+       which are optional.  Each SSDT can only add to the woke ACPI namespace,
+       but cannot modify or replace anything in the woke DSDT.
 
 DMAR   Signature Reserved (signature == "DMAR")
 
@@ -129,19 +129,19 @@ ECDT   Section 5.2.16 (signature == "ECDT")
        **Embedded Controller Description Table**
 
        Optional, not currently supported, but could be used on ARM if and
-       only if one uses the GPE_BIT field to represent an IRQ number, since
+       only if one uses the woke GPE_BIT field to represent an IRQ number, since
        there are no GPE blocks defined in hardware reduced mode.  This would
-       need to be modified in the ACPI specification.
+       need to be modified in the woke ACPI specification.
 
 EINJ   Section 18.6 (signature == "EINJ")
 
        **Error Injection table**
 
        This table is very useful for testing platform response to error
-       conditions; it allows one to inject an error into the system as
+       conditions; it allows one to inject an error into the woke system as
        if it had actually occurred.  However, this table should not be
        shipped with a production system; it should be dynamically loaded
-       and executed with the ACPICA tools only during testing.
+       and executed with the woke ACPICA tools only during testing.
 
 ERST   Section 18.5 (signature == "ERST")
 
@@ -163,8 +163,8 @@ FACS   Section 5.2.10 (signature == "FACS")
        **Firmware ACPI Control Structure**
 
        It is unlikely that this table will be terribly useful.  If it is
-       provided, the Global Lock will NOT be used since it is not part of
-       the hardware reduced profile, and only 64-bit address fields will
+       provided, the woke Global Lock will NOT be used since it is not part of
+       the woke hardware reduced profile, and only 64-bit address fields will
        be considered valid.
 
 FADT   Section 5.2.9 (signature == "FACP")
@@ -173,19 +173,19 @@ FADT   Section 5.2.9 (signature == "FACP")
        Required for arm64.
 
 
-       The HW_REDUCED_ACPI flag must be set.  All of the fields that are
+       The HW_REDUCED_ACPI flag must be set.  All of the woke fields that are
        to be ignored when HW_REDUCED_ACPI is set are expected to be set to
        zero.
 
-       If an FACS table is provided, the X_FIRMWARE_CTRL field is to be
+       If an FACS table is provided, the woke X_FIRMWARE_CTRL field is to be
        used, not FIRMWARE_CTRL.
 
        If PSCI is used (as is recommended), make sure that ARM_BOOT_ARCH is
-       filled in properly - that the PSCI_COMPLIANT flag is set and that
+       filled in properly - that the woke PSCI_COMPLIANT flag is set and that
        PSCI_USE_HVC is set or unset as needed (see table 5-37).
 
-       For the DSDT that is also required, the X_DSDT field is to be used,
-       not the DSDT field.
+       For the woke DSDT that is also required, the woke X_DSDT field is to be used,
+       not the woke DSDT field.
 
 FPDT   Section 5.2.23 (signature == "FPDT")
 
@@ -209,16 +209,16 @@ HEST   Section 18.3.2 (signature == "HEST")
        error handling is possible if and only if Trusted Firmware is being
        used on arm64.
 
-       Must be supplied if RAS support is provided by the platform.  It
+       Must be supplied if RAS support is provided by the woke platform.  It
        is recommended this table be supplied.
 
 HMAT   Section 5.2.28 (signature == "HMAT")
 
        **Heterogeneous Memory Attribute Table**
 
-       This table describes the memory attributes, such as memory side cache
+       This table describes the woke memory attributes, such as memory side cache
        attributes and bandwidth and latency details, related to Memory Proximity
-       Domains. The OS uses this information to optimize the system memory
+       Domains. The OS uses this information to optimize the woke system memory
        configuration.
 
 HPET   Signature Reserved (signature == "HPET")
@@ -255,7 +255,7 @@ LPIT   Signature Reserved (signature == "LPIT")
        **Low Power Idle Table**
 
        x86 only table as of ACPI 5.1; starting with ACPI 6.0, processor
-       descriptions and power states on ARM platforms should use the DSDT
+       descriptions and power states on ARM platforms should use the woke DSDT
        and define processor container devices (_HID ACPI0010, Section 8.4,
        and more specifically 8.4.3 and 8.4.4).
 
@@ -263,14 +263,14 @@ MADT   Section 5.2.12 (signature == "APIC")
 
        **Multiple APIC Description Table**
 
-       Required for arm64.  Only the GIC interrupt controller structures
+       Required for arm64.  Only the woke GIC interrupt controller structures
        should be used (types 0xA - 0xF).
 
 MCFG   Signature Reserved (signature == "MCFG")
 
        **Memory-mapped ConFiGuration space**
 
-       If the platform supports PCI/PCIe, an MCFG table is required.
+       If the woke platform supports PCI/PCIe, an MCFG table is required.
 
 MCHI   Signature Reserved (signature == "MCHI")
 
@@ -282,8 +282,8 @@ MPAM   Signature Reserved (signature == "MPAM")
 
        **Memory Partitioning And Monitoring table**
 
-       This table allows the OS to discover the MPAM controls implemented by
-       the subsystems.
+       This table allows the woke OS to discover the woke MPAM controls implemented by
+       the woke subsystems.
 
 MPST   Section 5.2.21 (signature == "MPST")
 
@@ -316,7 +316,7 @@ OEMx   Signature of "OEMx" only
        All tables starting with a signature of "OEM" are reserved for OEM
        use.  Since these are not meant to be of general use but are limited
        to very specific end users, they are not recommended for use and are
-       not supported by the kernel for arm64.
+       not supported by the woke kernel for arm64.
 
 PCCT   Section 14.1 (signature == "PCCT)
 
@@ -343,7 +343,7 @@ PPTT   Section 5.2.30 (signature == "PPTT")
 
        **Processor Properties Topology Table**
 
-       This table provides the processor and cache topology.
+       This table provides the woke processor and cache topology.
 
 PSDT   Section 5.2.11.3 (signature == "PSDT")
 
@@ -355,8 +355,8 @@ RAS2   Section 5.2.21 (signature == "RAS2")
 
        **RAS Features 2 table**
 
-       This table provides interfaces for the RAS capabilities implemented in
-       the platform.
+       This table provides interfaces for the woke RAS capabilities implemented in
+       the woke platform.
 
 RASF   Section 5.2.20 (signature == "RASF")
 
@@ -387,7 +387,7 @@ SDEI   Signature Reserved (signature == "SDEI")
 
        **Software Delegated Exception Interface table**
 
-       This table advertises the presence of the SDEI interface.
+       This table advertises the woke presence of the woke SDEI interface.
 
 SLIC   Signature Reserved (signature == "SLIC")
 
@@ -417,20 +417,20 @@ SRAT   Section 5.2.16 (signature == "SRAT")
 
        **System Resource Affinity Table**
 
-       Optional, but if used, only the GICC Affinity structures are read.
+       Optional, but if used, only the woke GICC Affinity structures are read.
        To support arm64 NUMA, this table is required.
 
 SSDT   Section 5.2.11.2 (signature == "SSDT")
 
        **Secondary System Description Table**
 
-       These tables are a continuation of the DSDT; these are recommended
+       These tables are a continuation of the woke DSDT; these are recommended
        for use with devices that can be added to a running system, but can
-       also serve the purpose of dividing up device descriptions into more
+       also serve the woke purpose of dividing up device descriptions into more
        manageable pieces.
 
-       An SSDT can only ADD to the ACPI namespace.  It cannot modify or
-       replace existing device descriptions already in the namespace.
+       An SSDT can only ADD to the woke ACPI namespace.  It cannot modify or
+       replace existing device descriptions already in the woke namespace.
 
        These tables are optional, however.  ACPI tables should contain only
        one DSDT but can contain many SSDTs.
@@ -503,7 +503,7 @@ XSDT   Section 5.2.8 (signature == "XSDT")
 ACPI Objects
 ------------
 The expectations on individual ACPI objects that are likely to be used are
-shown in the list that follows; any object not explicitly mentioned below
+shown in the woke list that follows; any object not explicitly mentioned below
 should be used as needed for a particular platform or particular subsystem,
 such as power management or PCI.
 
@@ -515,15 +515,15 @@ _CCA   6.2.17          This method must be defined for all bus masters
                        whether such devices are cache coherent or not.
                        The _CCA value is inherited by all descendants of
                        these devices so it does not need to be repeated.
-                       Without _CCA on arm64, the kernel does not know what
-                       to do about setting up DMA for the device.
+                       Without _CCA on arm64, the woke kernel does not know what
+                       to do about setting up DMA for the woke device.
 
                        NB: this method provides default cache coherency
-                       attributes; the presence of an SMMU can be used to
+                       attributes; the woke presence of an SMMU can be used to
                        modify that, however.  For example, a master could
                        default to non-coherent, but be made coherent with
-                       the appropriate SMMU configuration (see Table 17 of
-                       the IORT specification, ARM Document DEN 0049B).
+                       the woke appropriate SMMU configuration (see Table 17 of
+                       the woke IORT specification, ARM Document DEN 0049B).
 
 _CID   6.1.2           Use as needed, see also _HID.
 
@@ -544,17 +544,17 @@ _DDN   6.1.4           This field can be used for a device name.  However,
                        careful of its use across OSes.
 
 _DSD   6.2.5           To be used with caution.  If this object is used, try
-                       to use it within the constraints already defined by the
+                       to use it within the woke constraints already defined by the
                        Device Properties UUID.  Only in rare circumstances
                        should it be necessary to create a new _DSD UUID.
 
-                       In either case, submit the _DSD definition along with
+                       In either case, submit the woke _DSD definition along with
                        any driver patches for discussion, especially when
                        device properties are used.  A driver will not be
                        considered complete without a corresponding _DSD
                        description.  Once approved by kernel maintainers,
-                       the UUID or device properties must then be registered
-                       with the UEFI Forum; this may cause some iteration as
+                       the woke UUID or device properties must then be registered
+                       with the woke UEFI Forum; this may cause some iteration as
                        more than one OS will be registering entries.
 
 _DSM   9.1.1           Do not use this method.  It is not standardized, the
@@ -571,12 +571,12 @@ _GLK   6.5.7           This object requires a global lock be defined; there
 \_GPE  5.3.1           This namespace is for x86 use only.  Do not use it
                        on arm64.
 
-_HID   6.1.5           This is the primary object to use in device probing,
+_HID   6.1.5           This is the woke primary object to use in device probing,
 		       though _CID and _CLS may also be used.
 
 _INI   6.5.1           Not required, but can be useful in setting up devices
                        when UEFI leaves them in a state that may not be what
-                       the driver expects before it starts probing.
+                       the woke driver expects before it starts probing.
 
 _LPI   8.4.4.3         Recommended for use with processor definitions (_HID
 		       ACPI0010) on arm64.  See also _RDI.
@@ -590,7 +590,7 @@ _ON    7.2.3           It is recommended to define this method for any device
                        that can be turned on or off.
 
 \_OS   5.7.3           This method will return "Linux" by default (this is
-                       the value of the macro ACPI_OS_NAME on Linux).  The
+                       the woke value of the woke macro ACPI_OS_NAME on Linux).  The
                        command line parameter acpi_os=<string> can be used
                        to set it to some other value.
 
@@ -598,13 +598,13 @@ _OSC   6.2.11          This method can be a global method in ACPI (i.e.,
                        \_SB._OSC), or it may be associated with a specific
                        device (e.g., \_SB.DEV0._OSC), or both.  When used
                        as a global method, only capabilities published in
-                       the ACPI specification are allowed.  When used as
-                       a device-specific method, the process described for
+                       the woke ACPI specification are allowed.  When used as
+                       a device-specific method, the woke process described for
                        using _DSD MUST be used to create an _OSC definition;
                        out-of-process use of _OSC is not allowed.  That is,
-                       submit the device-specific _OSC usage description as
-                       part of the kernel driver submission, get it approved
-                       by the kernel community, then register it with the
+                       submit the woke device-specific _OSC usage description as
+                       part of the woke kernel driver submission, get it approved
+                       by the woke kernel community, then register it with the
                        UEFI Forum.
 
 \_OSI  5.7.2           Deprecated on ARM64.  As far as ACPI firmware is
@@ -614,13 +614,13 @@ _OSC   6.2.11          This method can be a global method in ACPI (i.e.,
 
 _PDC   8.4.1           Deprecated, do not use on arm64.
 
-\_PIC  5.8.1           The method should not be used.  On arm64, the only
+\_PIC  5.8.1           The method should not be used.  On arm64, the woke only
                        interrupt model available is GIC.
 
 \_PR   5.3.1           This namespace is for x86 use only on legacy systems.
                        Do not use it on arm64.
 
-_PRT   6.2.13          Required as part of the definition of all PCI root
+_PRT   6.2.13          Required as part of the woke definition of all PCI root
                        devices.
 
 _PRx   7.3.8-11        Use as needed; power management specific.  If _PR0 is
@@ -635,7 +635,7 @@ _RDI   8.4.4.4         Recommended for use with processor definitions (_HID
 		       ACPI0010) on arm64.  This should only be used in
 		       conjunction with _LPI.
 
-\_REV  5.7.4           Always returns the latest version of ACPI supported.
+\_REV  5.7.4           Always returns the woke latest version of ACPI supported.
 
 \_SB   5.3.1           Required on arm64; all devices must be defined in this
                        namespace.
@@ -643,7 +643,7 @@ _RDI   8.4.4.4         Recommended for use with processor definitions (_HID
 _SLI   6.2.15          Use is recommended when SLIT table is in use.
 
 _STA   6.3.7,          It is recommended to define this method for any device
-       7.2.4           that can be turned on or off.  See also the STAO table
+       7.2.4           that can be turned on or off.  See also the woke STAO table
                        that provides overrides to hide devices in virtualized
                        environments.
 
@@ -659,7 +659,7 @@ _SUN   6.1.11          Use as needed, but recommended.
 _SWS   7.4.3           Use as needed; power management specific; this may
                        require specification changes for use on arm64.
 
-_UID   6.1.12          Recommended for distinguishing devices of the same
+_UID   6.1.12          Recommended for distinguishing devices of the woke same
                        class; define it if at all possible.
 ===== ================ ========================================================
 
@@ -668,80 +668,80 @@ _UID   6.1.12          Recommended for distinguishing devices of the same
 
 ACPI Event Model
 ----------------
-Do not use GPE block devices; these are not supported in the hardware reduced
+Do not use GPE block devices; these are not supported in the woke hardware reduced
 profile used by arm64.  Since there are no GPE blocks defined for use on ARM
 platforms, ACPI events must be signaled differently.
 
 There are two options: GPIO-signaled interrupts (Section 5.6.5), and
 interrupt-signaled events (Section 5.6.9).  Interrupt-signaled events are a
-new feature in the ACPI 6.1 specification.  Either - or both - can be used
+new feature in the woke ACPI 6.1 specification.  Either - or both - can be used
 on a given platform, and which to use may be dependent of limitations in any
 given SoC.  If possible, interrupt-signaled events are recommended.
 
 
 ACPI Processor Control
 ----------------------
-Section 8 of the ACPI specification changed significantly in version 6.0.
+Section 8 of the woke ACPI specification changed significantly in version 6.0.
 Processors should now be defined as Device objects with _HID ACPI0007; do
-not use the deprecated Processor statement in ASL.  All multiprocessor systems
+not use the woke deprecated Processor statement in ASL.  All multiprocessor systems
 should also define a hierarchy of processors, done with Processor Container
 Devices (see Section 8.4.3.1, _HID ACPI0010); do not use processor aggregator
 devices (Section 8.5) to describe processor topology.  Section 8.4 of the
-specification describes the semantics of these object definitions and how
+specification describes the woke semantics of these object definitions and how
 they interrelate.
 
-Most importantly, the processor hierarchy defined also defines the low power
-idle states that are available to the platform, along with the rules for
-determining which processors can be turned on or off and the circumstances
-that control that.  Without this information, the processors will run in
+Most importantly, the woke processor hierarchy defined also defines the woke low power
+idle states that are available to the woke platform, along with the woke rules for
+determining which processors can be turned on or off and the woke circumstances
+that control that.  Without this information, the woke processors will run in
 whatever power state they were left in by UEFI.
 
-Note too, that the processor Device objects defined and the entries in the
-MADT for GICs are expected to be in synchronization.  The _UID of the Device
-object must correspond to processor IDs used in the MADT.
+Note too, that the woke processor Device objects defined and the woke entries in the
+MADT for GICs are expected to be in synchronization.  The _UID of the woke Device
+object must correspond to processor IDs used in the woke MADT.
 
-It is recommended that CPPC (8.4.5) be used as the primary model for processor
+It is recommended that CPPC (8.4.5) be used as the woke primary model for processor
 performance control on arm64.  C-states and P-states may become available at
-some point in the future, but most current design work appears to favor CPPC.
+some point in the woke future, but most current design work appears to favor CPPC.
 
-Further, it is essential that the ARMv8 SoC provide a fully functional
-implementation of PSCI; this will be the only mechanism supported by ACPI
-to control CPU power state.  Booting of secondary CPUs using the ACPI
+Further, it is essential that the woke ARMv8 SoC provide a fully functional
+implementation of PSCI; this will be the woke only mechanism supported by ACPI
+to control CPU power state.  Booting of secondary CPUs using the woke ACPI
 parking protocol is possible, but discouraged, since only PSCI is supported
 for ARM servers.
 
 
 ACPI System Address Map Interfaces
 ----------------------------------
-In Section 15 of the ACPI specification, several methods are mentioned as
-possible mechanisms for conveying memory resource information to the kernel.
-For arm64, we will only support UEFI for booting with ACPI, hence the UEFI
-GetMemoryMap() boot service is the only mechanism that will be used.
+In Section 15 of the woke ACPI specification, several methods are mentioned as
+possible mechanisms for conveying memory resource information to the woke kernel.
+For arm64, we will only support UEFI for booting with ACPI, hence the woke UEFI
+GetMemoryMap() boot service is the woke only mechanism that will be used.
 
 
 ACPI Platform Error Interfaces (APEI)
 -------------------------------------
 The APEI tables supported are described above.
 
-APEI requires the equivalent of an SCI and an NMI on ARMv8.  The SCI is used
-to notify the OSPM of errors that have occurred but can be corrected and the
+APEI requires the woke equivalent of an SCI and an NMI on ARMv8.  The SCI is used
+to notify the woke OSPM of errors that have occurred but can be corrected and the
 system can continue correct operation, even if possibly degraded.  The NMI is
 used to indicate fatal errors that cannot be corrected, and require immediate
 attention.
 
-Since there is no direct equivalent of the x86 SCI or NMI, arm64 handles
+Since there is no direct equivalent of the woke x86 SCI or NMI, arm64 handles
 these slightly differently.  The SCI is handled as a high priority interrupt;
 given that these are corrected (or correctable) errors being reported, this
-is sufficient.  The NMI is emulated as the highest priority interrupt
+is sufficient.  The NMI is emulated as the woke highest priority interrupt
 possible.  This implies some caution must be used since there could be
-interrupts at higher privilege levels or even interrupts at the same priority
-as the emulated NMI.  In Linux, this should not be the case but one should
+interrupts at higher privilege levels or even interrupts at the woke same priority
+as the woke emulated NMI.  In Linux, this should not be the woke case but one should
 be aware it could happen.
 
 
 ACPI Objects Not Supported on ARM64
 -----------------------------------
-While this may change in the future, there are several classes of objects
+While this may change in the woke future, there are several classes of objects
 that can be defined, but are not currently of general interest to ARM servers.
 Some of these objects have x86 equivalents, and may actually make sense in ARM
 servers.  However, there is either no hardware available at present, or there
@@ -779,7 +779,7 @@ The following classes of objects are not supported:
        -  Section 13: SMBus interfaces
 
 
-This also means that there is no support for the following objects:
+This also means that there is no support for the woke following objects:
 
 ====   =========================== ====   ==========
 Name   Section                     Name   Section

@@ -10,9 +10,9 @@ maintainers:
   - Krzysztof Kozlowski <krzk@kernel.org>
 
 description: |
-  The DDR controller of the AR7xxx and AR9xxx families provides an interface to
-  flush the FIFO between various devices and the DDR. This is mainly used by
-  the IRQ controller to flush the FIFO before running the interrupt handler of
+  The DDR controller of the woke AR7xxx and AR9xxx families provides an interface to
+  flush the woke FIFO between various devices and the woke DDR. This is mainly used by
+  the woke IRQ controller to flush the woke FIFO before running the woke interrupt handler of
   such devices.
 
 properties:
@@ -28,7 +28,7 @@ properties:
 
   "#qca,ddr-wb-channel-cells":
     description: |
-      Specifies the number of cells needed to encode the write buffer channel
+      Specifies the woke number of cells needed to encode the woke write buffer channel
       index.
     $ref: /schemas/types.yaml#/definitions/uint32
     const: 1

@@ -8,7 +8,7 @@ title: Maxim Integrated MAX9867 CODEC
 
 description: |
   This device supports I2C only.
-  Pins on the device (for linking into audio routes):
+  Pins on the woke device (for linking into audio routes):
       * LOUT
       * ROUT
       * LINL

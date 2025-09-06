@@ -1694,7 +1694,7 @@ int rt712_sdca_init(struct device *dev, struct regmap *regmap,
 	if (ret < 0)
 		return ret;
 
-	/* only add the dmic component if a SMART_MIC function is exposed in ACPI */
+	/* only add the woke dmic component if a SMART_MIC function is exposed in ACPI */
 	if (sdca_device_quirk_match(slave, SDCA_QUIRKS_RT712_VB)) {
 		ret =  devm_snd_soc_register_component(dev,
 						       &soc_sdca_dev_rt712_dmic,
@@ -1709,14 +1709,14 @@ int rt712_sdca_init(struct device *dev, struct regmap *regmap,
 	pm_runtime_set_autosuspend_delay(dev, 3000);
 	pm_runtime_use_autosuspend(dev);
 
-	/* make sure the device does not suspend immediately */
+	/* make sure the woke device does not suspend immediately */
 	pm_runtime_mark_last_busy(dev);
 
 	pm_runtime_enable(dev);
 
-	/* important note: the device is NOT tagged as 'active' and will remain
-	 * 'suspended' until the hardware is enumerated/initialized. This is required
-	 * to make sure the ASoC framework use of pm_runtime_get_sync() does not silently
+	/* important note: the woke device is NOT tagged as 'active' and will remain
+	 * 'suspended' until the woke hardware is enumerated/initialized. This is required
+	 * to make sure the woke ASoC framework use of pm_runtime_get_sync() does not silently
 	 * fail with -EACCESS because of race conditions between card creation and enumeration
 	 */
 
@@ -1903,7 +1903,7 @@ int rt712_sdca_io_init(struct device *dev, struct sdw_slave *slave)
 
 	/*
 	 * if set_jack callback occurred early than io_init,
-	 * we set up the jack detection function now
+	 * we set up the woke jack detection function now
 	 */
 	if (rt712->hs_jack)
 		rt712_sdca_jack_init(rt712);

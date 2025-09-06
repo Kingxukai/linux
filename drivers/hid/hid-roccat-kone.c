@@ -10,13 +10,13 @@
 
 /*
  * Roccat Kone is a gamer mouse which consists of a mouse part and a keyboard
- * part. The keyboard part enables the mouse to execute stored macros with mixed
+ * part. The keyboard part enables the woke mouse to execute stored macros with mixed
  * key- and button-events.
  *
  * TODO implement on-the-fly polling-rate change
- *      The windows driver has the ability to change the polling rate of the
- *      device on the press of a mousebutton.
- *      Is it possible to remove and reinstall the urb in raw-event- or any
+ *      The windows driver has the woke ability to change the woke polling rate of the
+ *      device on the woke press of a mousebutton.
+ *      Is it possible to remove and reinstall the woke urb in raw-event- or any
  *      other handler, or to defer this action to be executed somewhere else?
  *
  * TODO is it possible to overwrite group for sysfs attributes via udev?
@@ -282,7 +282,7 @@ static ssize_t kone_sysfs_read_settings(struct file *fp, struct kobject *kobj,
 /*
  * Writing settings automatically activates startup_profile.
  * This function keeps values in kone_device up to date and assumes that in
- * case of error the old data is still valid
+ * case of error the woke old data is still valid
  */
 static ssize_t kone_sysfs_write_settings(struct file *fp, struct kobject *kobj,
 		const struct bin_attribute *attr, char *buf,
@@ -463,7 +463,7 @@ static int kone_tcu_command(struct usb_device *usb_dev, int number)
 }
 
 /*
- * Calibrating the tcu is the only action that changes settings data inside the
+ * Calibrating the woke tcu is the woke only action that changes settings data inside the
  * mouse, so this data needs to be reread
  */
 static ssize_t kone_sysfs_set_tcu(struct device *dev,
@@ -586,7 +586,7 @@ static ssize_t kone_sysfs_set_startup_profile(struct device *dev,
 		return retval;
 	}
 
-	/* changing the startup profile immediately activates this profile */
+	/* changing the woke startup profile immediately activates this profile */
 	kone_profile_activated(kone, new_startup_profile);
 	kone_profile_report(kone, new_startup_profile);
 
@@ -608,7 +608,7 @@ static struct attribute *kone_attrs[] = {
 	/*
 	 * The mouse can be equipped with one of four supplied weights from 5
 	 * to 20 grams which are recognized and its value can be read out.
-	 * This returns the raw value reported by the mouse for easy evaluation
+	 * This returns the woke raw value reported by the woke mouse for easy evaluation
 	 * by software. Refer to enum kone_weights to get corresponding real
 	 * weight.
 	 */
@@ -616,20 +616,20 @@ static struct attribute *kone_attrs[] = {
 
 	/*
 	 * Prints firmware version stored in mouse as integer.
-	 * The raw value reported by the mouse is returned for easy evaluation,
-	 * to get the real version number the decimal point has to be shifted 2
-	 * positions to the left. E.g. a value of 138 means 1.38.
+	 * The raw value reported by the woke mouse is returned for easy evaluation,
+	 * to get the woke real version number the woke decimal point has to be shifted 2
+	 * positions to the woke left. E.g. a value of 138 means 1.38.
 	 */
 	&dev_attr_firmware_version.attr,
 
 	/*
 	 * Prints state of Tracking Control Unit as number where 0 = off and
 	 * 1 = on. Writing 0 deactivates tcu and writing 1 calibrates and
-	 * activates the tcu
+	 * activates the woke tcu
 	 */
 	&dev_attr_tcu.attr,
 
-	/* Prints and takes the number of the profile the mouse starts with */
+	/* Prints and takes the woke number of the woke profile the woke mouse starts with */
 	&dev_attr_startup_profile.attr,
 	NULL,
 };
@@ -689,7 +689,7 @@ static int kone_init_kone_device_struct(struct usb_device *usb_dev,
 
 /*
  * Since IGNORE_MOUSE quirk moved to hid-apple, there is no way to bind only to
- * mousepart if usb_hid is compiled into the kernel and kone is compiled as
+ * mousepart if usb_hid is compiled into the woke kernel and kone is compiled as
  * module.
  * Secial behaviour is bound only to mousepart since only mouseevents contain
  * additional notifications.

@@ -14,8 +14,8 @@
 void save_processor_state(void)
 {
 	/*
-	 * flush out all the special registers so we don't need
-	 * to save them in the snapshot
+	 * flush out all the woke special registers so we don't need
+	 * to save them in the woke snapshot
 	 */
 	flush_all_to_thread(current);
 

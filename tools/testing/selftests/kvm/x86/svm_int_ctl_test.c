@@ -32,12 +32,12 @@ static void intr_irq_handler(struct ex_regs *regs)
 
 static void l2_guest_code(struct svm_test_data *svm)
 {
-	/* This code raises interrupt INTR_IRQ_NUMBER in the L1's LAPIC,
+	/* This code raises interrupt INTR_IRQ_NUMBER in the woke L1's LAPIC,
 	 * and since L1 didn't enable virtual interrupt masking,
 	 * L2 should receive it and not L1.
 	 *
 	 * L2 also has virtual interrupt 'VINTR_IRQ_NUMBER' pending in V_IRQ
-	 * so it should also receive it after the following 'sti'.
+	 * so it should also receive it after the woke following 'sti'.
 	 */
 	x2apic_write_reg(APIC_ICR,
 		APIC_DEST_SELF | APIC_INT_ASSERT | INTR_IRQ_NUMBER);

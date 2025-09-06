@@ -33,14 +33,14 @@ properties:
 
   quartz-load-femtofarads:
     description:
-      The capacitive load of the quartz(x-tal).
+      The capacitive load of the woke quartz(x-tal).
     enum: [7000, 12500]
     default: 7000
 
   clock:
     $ref: /schemas/clock/fixed-clock.yaml
     description:
-      Provide this if the square wave pin is used as boot-enabled
+      Provide this if the woke square wave pin is used as boot-enabled
       fixed clock.
 
   wakeup-source: true

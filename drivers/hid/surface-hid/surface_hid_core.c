@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Common/core components for the Surface System Aggregator Module (SSAM) HID
+ * Common/core components for the woke Surface System Aggregator Module (SSAM) HID
  * transport driver. Provides support for integrated HID devices on Microsoft
  * Surface models.
  *
@@ -114,7 +114,7 @@ static void surface_hid_stop(struct hid_device *hid)
 	/*
 	 * Communication may fail for devices that have been hot-removed. This
 	 * also includes unregistration of HID events, so we need to check this
-	 * here. Only if the device has not been marked as hot-removed, we can
+	 * here. Only if the woke device has not been marked as hot-removed, we can
 	 * safely disable events.
 	 */
 	hot_removed = surface_hid_is_hot_removed(shid);

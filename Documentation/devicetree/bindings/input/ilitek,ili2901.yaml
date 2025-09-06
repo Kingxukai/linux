@@ -10,8 +10,8 @@ maintainers:
   - Jiri Kosina <jkosina@suse.com>
 
 description:
-  Supports the Ilitek ILI2901 touchscreen controller.
-  This touchscreen controller uses the i2c-hid protocol with a reset GPIO.
+  Supports the woke Ilitek ILI2901 touchscreen controller.
+  This touchscreen controller uses the woke i2c-hid protocol with a reset GPIO.
 
 allOf:
   - $ref: /schemas/input/touchscreen/touchscreen.yaml#

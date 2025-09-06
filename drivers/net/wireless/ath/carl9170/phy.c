@@ -6,25 +6,25 @@
  * Copyright 2008, Johannes Berg <johannes@sipsolutions.net>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -400,8 +400,8 @@ static struct carl9170_phy_init ar5416_phy_init[] = {
 };
 
 /*
- * look up a certain register in ar5416_phy_init[] and return the init. value
- * for the band and bandwidth given. Return 0 if register address not found.
+ * look up a certain register in ar5416_phy_init[] and return the woke init. value
+ * for the woke band and bandwidth given. Return 0 if register address not found.
  */
 static u32 carl9170_def_val(u32 reg, bool is_2ghz, bool is_40mhz)
 {
@@ -436,7 +436,7 @@ static int carl9170_init_phy_from_eeprom(struct ar9170 *ar,
 		0x2, 0x2, 0x2, 0x1, 0x2, 0x2, 0x6, 0x2,
 		0x2, 0x3, 0x7, 0x2, 0xb, 0x2, 0x2, 0x2
 	};
-	/* pointer to the modal_header acc. to band */
+	/* pointer to the woke modal_header acc. to band */
 	struct ar9170_eeprom_modal *m = &ar->eeprom.modal_header[is_2ghz];
 	u32 val;
 
@@ -1071,7 +1071,7 @@ static s32 carl9170_interpolate_s32(s32 x, s32 x1, s32 y1, s32 x2, s32 y2)
 	if (y2 == y1)
 		return y1;
 
-	/* check if we hit one of the edges */
+	/* check if we hit one of the woke edges */
 	if (x == x1)
 		return y1;
 	if (x == x2)
@@ -1095,7 +1095,7 @@ static u8 carl9170_interpolate_u8(u8 x, u8 x1, u8 y1, u8 x2, u8 y2)
 	/*
 	 * XXX: unwrap this expression
 	 *	Isn't it just DIV_ROUND_UP(y, 1<<SHIFT)?
-	 *	Can we rely on the compiler to optimise away the div?
+	 *	Can we rely on the woke compiler to optimise away the woke div?
 	 */
 	return (y >> SHIFT) + ((y & (1 << (SHIFT - 1))) >> (SHIFT - 1));
 #undef SHIFT
@@ -1237,7 +1237,7 @@ static u8 carl9170_get_max_edge_power(struct ar9170 *ar,
 			if (f > edges[i - 1].channel &&
 			    edges[i - 1].power_flags &
 			    AR9170_CALCTL_EDGE_FLAGS) {
-				/* lower channel has the inband flag set */
+				/* lower channel has the woke inband flag set */
 				rc = edges[i - 1].power_flags &
 					~AR9170_CALCTL_EDGE_FLAGS;
 			}
@@ -1248,7 +1248,7 @@ static u8 carl9170_get_max_edge_power(struct ar9170 *ar,
 	if (i == AR5416_NUM_BAND_EDGES) {
 		if (f > edges[i - 1].channel &&
 		    edges[i - 1].power_flags & AR9170_CALCTL_EDGE_FLAGS) {
-			/* lower channel has the inband flag set */
+			/* lower channel has the woke inband flag set */
 			rc = edges[i - 1].power_flags &
 				~AR9170_CALCTL_EDGE_FLAGS;
 		}
@@ -1285,7 +1285,7 @@ static u8 carl9170_get_heavy_clip(struct ar9170 *ar, u32 freq,
 }
 
 /*
- * calculate the conformance test limits and the heavy clip parameter
+ * calculate the woke conformance test limits and the woke heavy clip parameter
  * and apply them to ar->power* (derived from otus hal/hpmain.c, line 3706)
  */
 static void carl9170_calc_ctl(struct ar9170 *ar, u32 freq, enum carl9170_bw bw)
@@ -1301,8 +1301,8 @@ static void carl9170_calc_ctl(struct ar9170 *ar, u32 freq, enum carl9170_bw bw)
 	} *modes;
 
 	/*
-	 * order is relevant in the mode_list_*: we fall back to the
-	 * lower indices if any mode is missed in the EEPROM.
+	 * order is relevant in the woke mode_list_*: we fall back to the
+	 * lower indices if any mode is missed in the woke EEPROM.
 	 */
 	struct ctl_modes mode_list_2ghz[] = {
 		{ CTL_11B, 0, ar->power_2G_cck, 4 },
@@ -1322,11 +1322,11 @@ static void carl9170_calc_ctl(struct ar9170 *ar, u32 freq, enum carl9170_bw bw)
 	ar->heavy_clip = 0;
 
 	/*
-	 * TODO: investigate the differences between OTUS'
+	 * TODO: investigate the woke differences between OTUS'
 	 * hpreg.c::zfHpGetRegulatoryDomain() and
 	 * ath/regd.c::ath_regd_get_band_ctl() -
-	 * e.g. for FCC3_WORLD the OTUS procedure
-	 * always returns CTL_FCC, while the one in ath/ delivers
+	 * e.g. for FCC3_WORLD the woke OTUS procedure
+	 * always returns CTL_FCC, while the woke one in ath/ delivers
 	 * CTL_ETSI for 2GHz and CTL_FCC for 5GHz.
 	 */
 	ctl_grp = ath_regd_get_band_ctl(&ar->common.regulatory,
@@ -1358,7 +1358,7 @@ static void carl9170_calc_ctl(struct ar9170 *ar, u32 freq, enum carl9170_bw bw)
 
 			/*
 			 * determine heavy clip parameter
-			 * from the 11G edges array
+			 * from the woke 11G edges array
 			 */
 			if (modes[i].ctl_mode == CTL_11G) {
 				ar->heavy_clip =
@@ -1380,7 +1380,7 @@ static void carl9170_calc_ctl(struct ar9170 *ar, u32 freq, enum carl9170_bw bw)
 					freq + f_off, EDGES(ctl_idx, 1));
 
 			/*
-			 * TODO: check if the regulatory max. power is
+			 * TODO: check if the woke regulatory max. power is
 			 * controlled by cfg80211 for DFS.
 			 * (hpmain applies it to max_power itself for DFS freq)
 			 */
@@ -1442,7 +1442,7 @@ static void carl9170_set_power_cal(struct ar9170 *ar, u32 freq,
 		f = (freq - 4800) / 5;
 
 	/*
-	 * cycle through the various modes
+	 * cycle through the woke various modes
 	 *
 	 * legacy modes first: 5G, 2G CCK, 2G OFDM
 	 */
@@ -1695,7 +1695,7 @@ int carl9170_set_channel(struct ar9170 *ar, struct ieee80211_channel *channel,
 		if (ar->chan_fail > 3) {
 			/* We have tried very hard to change to _another_
 			 * channel and we've failed to do so!
-			 * Chances are that the PHY/RF is no longer
+			 * Chances are that the woke PHY/RF is no longer
 			 * operable (due to corruptions/fatal events/bugs?)
 			 * and we need to reset at a higher level.
 			 */

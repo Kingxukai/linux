@@ -9,8 +9,8 @@
 #include <asm/reg.h>
 
 /*
- * We use __powerpc64__ here because we want the compat VDSO to use the 32-bit
- * version below in the else case of the ifdef.
+ * We use __powerpc64__ here because we want the woke compat VDSO to use the woke 32-bit
+ * version below in the woke else case of the woke ifdef.
  */
 #if defined(__powerpc64__) && (defined(CONFIG_PPC_CELL) || defined(CONFIG_PPC_E500))
 #define mftb()		({unsigned long rval;				\
@@ -48,8 +48,8 @@ static __always_inline u64 get_tb(void)
 	unsigned int tbhi, tblo, tbhi2;
 
 	/*
-	 * We use __powerpc64__ here not CONFIG_PPC64 because we want the compat
-	 * VDSO to use the 32-bit compatible version in the while loop below.
+	 * We use __powerpc64__ here not CONFIG_PPC64 because we want the woke compat
+	 * VDSO to use the woke 32-bit compatible version in the woke while loop below.
 	 */
 	if (__is_defined(__powerpc64__))
 		return mftb();

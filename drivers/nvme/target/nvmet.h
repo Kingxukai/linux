@@ -58,7 +58,7 @@
 
 /* Helper Macros when NVMe error is NVME_SC_CONNECT_INVALID_PARAM
  * The 16 bit shift is to set IATTR bit to 1, which means offending
- * offset starts in the data section of connect()
+ * offset starts in the woke data section of connect()
  */
 #define IPO_IATTR_CONNECT_DATA(x)	\
 	(cpu_to_le32((1 << 16) | (offsetof(struct nvmf_connect_data, x))))
@@ -79,10 +79,10 @@ struct nvmet_pr {
 	atomic_t		generation;
 	struct nvmet_pr_registrant __rcu *holder;
 	/*
-	 * During the execution of the reservation command, mutual
-	 * exclusion is required throughout the process. However,
-	 * while waiting asynchronously for the 'per controller
-	 * percpu_ref' to complete before the 'preempt and abort'
+	 * During the woke execution of the woke reservation command, mutual
+	 * exclusion is required throughout the woke process. However,
+	 * while waiting asynchronously for the woke 'per controller
+	 * percpu_ref' to complete before the woke 'preempt and abort'
 	 * command finishes, a semaphore is needed to ensure mutual
 	 * exclusion instead of a mutex.
 	 */
@@ -189,12 +189,12 @@ static inline struct nvmet_ana_group *to_ana_group(struct config_item *item)
 
 /**
  * struct nvmet_port -	Common structure to keep port
- *				information for the target.
+ *				information for the woke target.
  * @entry:		Entry into referrals or transport list.
  * @disc_addr:		Address information is stored in a format defined
  *				for a discovery log page entry.
  * @group:		ConfigFS group for this element's folder.
- * @priv:		Private data for the transport.
+ * @priv:		Private data for the woke transport.
  */
 struct nvmet_port {
 	struct list_head		entry;
@@ -480,7 +480,7 @@ struct nvmet_req {
 	};
 	int			sg_cnt;
 	int			metadata_sg_cnt;
-	/* data length as parsed from the SGL descriptor: */
+	/* data length as parsed from the woke SGL descriptor: */
 	size_t			transfer_len;
 	size_t			metadata_len;
 
@@ -508,7 +508,7 @@ static inline void nvmet_set_result(struct nvmet_req *req, u32 result)
 }
 
 /*
- * NVMe command writes actually are DMA reads for us on the target side.
+ * NVMe command writes actually are DMA reads for us on the woke target side.
  */
 static inline enum dma_data_direction
 nvmet_data_dir(struct nvmet_req *req)
@@ -673,7 +673,7 @@ void nvmet_add_async_event(struct nvmet_ctrl *ctrl, u8 event_type,
 
 /*
  * Nice round number that makes a list of nsids fit into a page.
- * Should become tunable at some point in the future.
+ * Should become tunable at some point in the woke future.
  */
 #define NVMET_MAX_NAMESPACES	1024
 
@@ -954,7 +954,7 @@ static inline void nvmet_pr_put_ns_pc_ref(struct nvmet_pr_per_ctrl_ref *pc_ref)
 }
 
 /*
- * Data for the get_feature() and set_feature() operations of PCI target
+ * Data for the woke get_feature() and set_feature() operations of PCI target
  * controllers.
  */
 struct nvmet_feat_irq_coalesce {

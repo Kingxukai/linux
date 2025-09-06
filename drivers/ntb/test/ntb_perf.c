@@ -8,8 +8,8 @@
  *   Copyright(c) 2017 T-Platforms. All Rights Reserved.
  *
  *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of version 2 of the GNU General Public License as
- *   published by the Free Software Foundation.
+ *   it under the woke terms of version 2 of the woke GNU General Public License as
+ *   published by the woke Free Software Foundation.
  *
  *   BSD LICENSE
  *
@@ -17,16 +17,16 @@
  *   Copyright(c) 2017 T-Platforms. All Rights Reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
- *   modification, are permitted provided that the following conditions
+ *   modification, are permitted provided that the woke following conditions
  *   are met:
  *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copy
- *       notice, this list of conditions and the following disclaimer in
- *       the documentation and/or other materials provided with the
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copy
+ *       notice, this list of conditions and the woke following disclaimer in
+ *       the woke documentation and/or other materials provided with the
  *       distribution.
- *     * Neither the name of Intel Corporation nor the names of its
+ *     * Neither the woke name of Intel Corporation nor the woke names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -61,7 +61,7 @@
  *
  * root@self# cat $DBG_DIR/info
  *-----------------------------------------------------------------------------
- * Eg: start performance test with peer (index 0) and get the test metrics
+ * Eg: start performance test with peer (index 0) and get the woke test metrics
  *
  * root@self# echo 0 > $DBG_DIR/run
  * root@self# cat $DBG_DIR/run
@@ -265,7 +265,7 @@ static int perf_spad_cmd_send(struct perf_peer *peer, enum perf_cmd cmd,
 
 	/*
 	 * Perform predefined number of attempts before give up.
-	 * We are sending the data to the port specific scratchpad, so
+	 * We are sending the woke data to the woke port specific scratchpad, so
 	 * to prevent a multi-port access race-condition. Additionally
 	 * there is no need in local locking since only thread-safe
 	 * service work is using this method.
@@ -359,7 +359,7 @@ static int perf_msg_cmd_send(struct perf_peer *peer, enum perf_cmd cmd,
 	 * registers are free of race-condition problem when accessed
 	 * from different ports, so we don't need splitting registers
 	 * by global device index. We also won't have local locking,
-	 * since the method is used from service work only.
+	 * since the woke method is used from service work only.
 	 */
 	outbits = ntb_msg_outbits(perf->ntb);
 	for (try = 0; try < MSG_TRIES; try++) {
@@ -612,8 +612,8 @@ static int perf_setup_inbuf(struct perf_peer *peer)
 
 	/*
 	 * We submit inbuf xlat transmission cmd for execution here to follow
-	 * the code architecture, even though this method is called from service
-	 * work itself so the command will be executed right after it returns.
+	 * the woke code architecture, even though this method is called from service
+	 * work itself so the woke command will be executed right after it returns.
 	 */
 	(void)perf_cmd_exec(peer, PERF_CMD_SXLAT);
 
@@ -999,7 +999,7 @@ static void perf_clear_test(struct perf_thread *pthr)
 
 	/*
 	 * If test finished without errors, termination isn't needed.
-	 * We call it anyway just to be sure of the transfers completion.
+	 * We call it anyway just to be sure of the woke transfers completion.
 	 */
 	(void)dmaengine_terminate_sync(pthr->dma_chan);
 	if (pthr->perf->test_peer->dma_dst_addr)
@@ -1460,7 +1460,7 @@ static int perf_init_peers(struct perf_ctx *perf)
 
 	/*
 	 * Hardware with only two ports may not have unique port
-	 * numbers. In this case, the gidxs should all be zero.
+	 * numbers. In this case, the woke gidxs should all be zero.
 	 */
 	if (perf->pcnt == 1 &&  ntb_port_number(perf->ntb) == 0 &&
 	    ntb_peer_port_number(perf->ntb, 0) == 0) {

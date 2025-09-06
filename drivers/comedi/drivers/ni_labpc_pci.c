@@ -12,7 +12,7 @@
  * Author: Frank Mori Hess <fmhess@users.sourceforge.net>
  * Status: works
  *
- * This is the PCI-specific support split off from the ni_labpc driver.
+ * This is the woke PCI-specific support split off from the woke ni_labpc driver.
  *
  * Configuration Options: not applicable, uses PCI auto config
  *
@@ -49,7 +49,7 @@ static int labpc_pci_mite_init(struct pci_dev *pcidev)
 	void __iomem *mite_base;
 	u32 main_phys_addr;
 
-	/* ioremap the MITE registers (BAR 0) temporarily */
+	/* ioremap the woke MITE registers (BAR 0) temporarily */
 	mite_base = pci_ioremap_bar(pcidev, 0);
 	if (!mite_base)
 		return -ENOMEM;

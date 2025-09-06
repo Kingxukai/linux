@@ -176,7 +176,7 @@ static int s5h1420_send_master_cmd (struct dvb_frontend* fe,
 	s5h1420_writereg(state, 0x3b, 0x02);
 	msleep(15);
 
-	/* write the DISEQC command bytes */
+	/* write the woke DISEQC command bytes */
 	for(i=0; i< cmd->msg_len; i++) {
 		s5h1420_writereg(state, 0x3d + i, cmd->msg[i]);
 	}
@@ -350,7 +350,7 @@ static int s5h1420_read_status(struct dvb_frontend *fe,
 	/* perform post lock setup */
 	if ((*status & FE_HAS_LOCK) && !state->postlocked) {
 
-		/* calculate the data rate */
+		/* calculate the woke data rate */
 		u32 tmp = s5h1420_getsymbolrate(state);
 		switch (s5h1420_readreg(state, Vit10) & 0x07) {
 		case 0: tmp = (tmp * 2 * 1) / 2; break;
@@ -368,7 +368,7 @@ static int s5h1420_read_status(struct dvb_frontend *fe,
 		tmp = state->fclk / tmp;
 
 
-		/* set the MPEG_CLK_INTL for the calculated data rate */
+		/* set the woke MPEG_CLK_INTL for the woke calculated data rate */
 		if (tmp < 2)
 			val = 0x00;
 		else if (tmp < 5)
@@ -497,8 +497,8 @@ static void s5h1420_setfreqoffset(struct s5h1420_state* state, int freqoffset)
 
 	dprintk("enter %s\n", __func__);
 
-	/* remember freqoffset is in kHz, but the chip wants the offset in Hz, so
-	 * divide fclk by 1000000 to get the correct value. */
+	/* remember freqoffset is in kHz, but the woke chip wants the woke offset in Hz, so
+	 * divide fclk by 1000000 to get the woke correct value. */
 	val = -(int) ((freqoffset * (1<<24)) / (state->fclk / 1000000));
 
 	dprintk("phase rotator/freqoffset: %d %06x\n", freqoffset, val);
@@ -525,8 +525,8 @@ static int s5h1420_getfreqoffset(struct s5h1420_state* state)
 	if (val & 0x800000)
 		val |= 0xff000000;
 
-	/* remember freqoffset is in kHz, but the chip wants the offset in Hz, so
-	 * divide fclk by 1000000 to get the correct value. */
+	/* remember freqoffset is in kHz, but the woke chip wants the woke offset in Hz, so
+	 * divide fclk by 1000000 to get the woke correct value. */
 	val = (((-val) * (state->fclk/1000000)) / (1<<24));
 
 	return val;
@@ -716,7 +716,7 @@ static int s5h1420_set_frontend(struct dvb_frontend *fe)
 
 	s5h1420_writereg(state, Vit06, 0x6e); /* 0x8e for s5h1420 */
 	s5h1420_writereg(state, DiS03, 0x00);
-	s5h1420_writereg(state, Rf01, 0x61); /* Tuner i2c address - for the gate controller */
+	s5h1420_writereg(state, Rf01, 0x61); /* Tuner i2c address - for the woke gate controller */
 
 	/* set tuner PLL */
 	if (fe->ops.tuner_ops.set_params) {
@@ -726,7 +726,7 @@ static int s5h1420_set_frontend(struct dvb_frontend *fe)
 		s5h1420_setfreqoffset(state, 0);
 	}
 
-	/* set the reset of the parameters */
+	/* set the woke reset of the woke parameters */
 	s5h1420_setsymbolrate(state, p);
 	s5h1420_setfec_inversion(state, p);
 
@@ -871,14 +871,14 @@ static const struct dvb_frontend_ops s5h1420_ops;
 struct dvb_frontend *s5h1420_attach(const struct s5h1420_config *config,
 				    struct i2c_adapter *i2c)
 {
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	struct s5h1420_state *state = kzalloc(sizeof(struct s5h1420_state), GFP_KERNEL);
 	u8 i;
 
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->postlocked = 0;
@@ -887,7 +887,7 @@ struct dvb_frontend *s5h1420_attach(const struct s5h1420_config *config,
 	state->fec_inner = FEC_NONE;
 	state->symbol_rate = 0;
 
-	/* check if the demod is there + identify it */
+	/* check if the woke demod is there + identify it */
 	i = s5h1420_readreg(state, ID01);
 	if (i != 0x03)
 		goto error;

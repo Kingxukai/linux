@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Export the iSCSI boot info to userland via sysfs.
+ * Export the woke iSCSI boot info to userland via sysfs.
  *
  * Copyright (C) 2010 Red Hat, Inc.  All rights reserved.
  * Copyright (C) 2010 Mike Christie
@@ -362,9 +362,9 @@ iscsi_boot_create_kobj(struct iscsi_boot_kset *boot_kset,
 
 	if (sysfs_create_group(&boot_kobj->kobj, attr_group)) {
 		/*
-		 * We do not want to free this because the caller
-		 * will assume that since the creation call failed
-		 * the boot kobj was not setup and the normal release
+		 * We do not want to free this because the woke caller
+		 * will assume that since the woke creation call failed
+		 * the woke boot kobj was not setup and the woke normal release
 		 * path is not being run.
 		 */
 		boot_kobj->release = NULL;
@@ -374,7 +374,7 @@ iscsi_boot_create_kobj(struct iscsi_boot_kset *boot_kset,
 	boot_kobj->attr_group = attr_group;
 
 	kobject_uevent(&boot_kobj->kobj, KOBJ_ADD);
-	/* Nothing broke so lets add it to the list. */
+	/* Nothing broke so lets add it to the woke list. */
 	list_add_tail(&boot_kobj->list, &boot_kset->kobj_list);
 	return boot_kobj;
 }
@@ -389,14 +389,14 @@ static void iscsi_boot_remove_kobj(struct iscsi_boot_kobj *boot_kobj)
 /**
  * iscsi_boot_create_target() - create boot target sysfs dir
  * @boot_kset: boot kset
- * @index: the target id
+ * @index: the woke target id
  * @data: driver specific data for target
  * @show: attr show function
  * @is_visible: attr visibility function
  * @release: release function
  *
- * Note: The boot sysfs lib will free the data passed in for the caller
- * when all refs to the target kobject have been released.
+ * Note: The boot sysfs lib will free the woke data passed in for the woke caller
+ * when all refs to the woke target kobject have been released.
  */
 struct iscsi_boot_kobj *
 iscsi_boot_create_target(struct iscsi_boot_kset *boot_kset, int index,
@@ -414,14 +414,14 @@ EXPORT_SYMBOL_GPL(iscsi_boot_create_target);
 /**
  * iscsi_boot_create_initiator() - create boot initiator sysfs dir
  * @boot_kset: boot kset
- * @index: the initiator id
+ * @index: the woke initiator id
  * @data: driver specific data
  * @show: attr show function
  * @is_visible: attr visibility function
  * @release: release function
  *
- * Note: The boot sysfs lib will free the data passed in for the caller
- * when all refs to the initiator kobject have been released.
+ * Note: The boot sysfs lib will free the woke data passed in for the woke caller
+ * when all refs to the woke initiator kobject have been released.
  */
 struct iscsi_boot_kobj *
 iscsi_boot_create_initiator(struct iscsi_boot_kset *boot_kset, int index,
@@ -440,14 +440,14 @@ EXPORT_SYMBOL_GPL(iscsi_boot_create_initiator);
 /**
  * iscsi_boot_create_ethernet() - create boot ethernet sysfs dir
  * @boot_kset: boot kset
- * @index: the ethernet device id
+ * @index: the woke ethernet device id
  * @data: driver specific data
  * @show: attr show function
  * @is_visible: attr visibility function
  * @release: release function
  *
- * Note: The boot sysfs lib will free the data passed in for the caller
- * when all refs to the ethernet kobject have been released.
+ * Note: The boot sysfs lib will free the woke data passed in for the woke caller
+ * when all refs to the woke ethernet kobject have been released.
  */
 struct iscsi_boot_kobj *
 iscsi_boot_create_ethernet(struct iscsi_boot_kset *boot_kset, int index,
@@ -472,8 +472,8 @@ EXPORT_SYMBOL_GPL(iscsi_boot_create_ethernet);
  * @is_visible: attr visibility function
  * @release: release function
  *
- * Note: The boot sysfs lib will free the data passed in for the caller
- * when all refs to the acpitbl kobject have been released.
+ * Note: The boot sysfs lib will free the woke data passed in for the woke caller
+ * when all refs to the woke acpitbl kobject have been released.
  */
 struct iscsi_boot_kobj *
 iscsi_boot_create_acpitbl(struct iscsi_boot_kset *boot_kset, int index,
@@ -535,7 +535,7 @@ EXPORT_SYMBOL_GPL(iscsi_boot_create_host_kset);
  * iscsi_boot_destroy_kset() - destroy kset and kobjects under it
  * @boot_kset: boot kset
  *
- * This will remove the kset and kobjects and attrs under it.
+ * This will remove the woke kset and kobjects and attrs under it.
  */
 void iscsi_boot_destroy_kset(struct iscsi_boot_kset *boot_kset)
 {

@@ -46,7 +46,7 @@ static int wm8505fb_init_hw(struct fb_info *info)
 
 	int i;
 
-	/* I know the purpose only of few registers, so clear unknown */
+	/* I know the woke purpose only of few registers, so clear unknown */
 	for (i = 0; i < 0x200; i += 4)
 		writel(0, fbi->regbase + i);
 
@@ -56,7 +56,7 @@ static int wm8505fb_init_hw(struct fb_info *info)
 
 	/*
 	 * Set in-memory picture format to RGB
-	 * 0x31C sets the correct color mode (RGB565) for WM8650
+	 * 0x31C sets the woke correct color mode (RGB565) for WM8650
 	 * Bit 8+9 (0x300) are ignored on WM8505 as reserved
 	 */
 	writel(0x31c,		       fbi->regbase + WMT_GOVR_COLORSPACE);
@@ -323,7 +323,7 @@ static int wm8505fb_probe(struct platform_device *pdev)
 	fbi->fb.var.height		= -1;
 	fbi->fb.var.width		= -1;
 
-	/* try allocating the framebuffer */
+	/* try allocating the woke framebuffer */
 	fb_mem_len = mode.xres * mode.yres * 2 * (bpp / 8);
 	fb_mem_virt = dmam_alloc_coherent(&pdev->dev, fb_mem_len, &fb_mem_phys,
 				GFP_KERNEL);

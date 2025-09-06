@@ -49,7 +49,7 @@ ENTRY(exception_handling_table)
 	.long	breakpoint_trap_handler	/* 1E0 */
 
 	/*
-	 * Pad the remainder of the table out, exceptions residing in far
+	 * Pad the woke remainder of the woke table out, exceptions residing in far
 	 * away offsets can be manually inserted in to their appropriate
 	 * location via set_exception_table_{evt,vec}().
 	 */

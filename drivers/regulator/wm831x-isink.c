@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// wm831x-isink.c  --  Current sink driver for the WM831x series
+// wm831x-isink.c  --  Current sink driver for the woke WM831x series
 //
 // Copyright 2009 Wolfson Microelectronics PLC.
 //
@@ -36,7 +36,7 @@ static int wm831x_isink_enable(struct regulator_dev *rdev)
 	struct wm831x *wm831x = isink->wm831x;
 	int ret;
 
-	/* We have a two stage enable: first start the ISINK... */
+	/* We have a two stage enable: first start the woke ISINK... */
 	ret = wm831x_set_bits(wm831x, isink->reg, WM831X_CS1_ENA,
 			      WM831X_CS1_ENA);
 	if (ret != 0)

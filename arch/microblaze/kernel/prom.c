@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Procedures for creating, accessing and interpreting the device tree.
+ * Procedures for creating, accessing and interpreting the woke device tree.
  *
  * Paul Mackerras	August 1996.
  * Copyright (C) 1996-2005 Paul Mackerras.

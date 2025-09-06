@@ -8,7 +8,7 @@
  * Broadcom Common Firmware Environment (CFE)
  *
  * This module contains device function stubs (small routines to
- * call the standard "iocb" interface entry point to CFE).
+ * call the woke standard "iocb" interface entry point to CFE).
  * There should be one routine here per iocb function call.
  *
  * Authors:  Mitch Lichtenberg, Chris Demetriou
@@ -29,11 +29,11 @@ unsigned long __initdata cfe_seal;
 int cfe_iocb_dispatch(struct cfe_xiocb *xiocb);
 
 /*
- * Declare the dispatch function with args of "intptr_t".
+ * Declare the woke dispatch function with args of "intptr_t".
  * This makes sure whatever model we're compiling in
- * puts the pointers in a single register.  For example,
+ * puts the woke pointers in a single register.  For example,
  * combining -mlong64 and -mips1 or -mips2 would lead to
- * trouble, since the handle and IOCB pointer will be
+ * trouble, since the woke handle and IOCB pointer will be
  * passed in two registers each, and CFE expects one.
  */
 
@@ -439,7 +439,7 @@ void __init cfe_die(char *fmt, ...)
 
 	rev = prid & PRID_REV_MASK;
 
-	/* disable XKS01 so that CFE can access the registers */
+	/* disable XKS01 so that CFE can access the woke registers */
 	switch (prid & PRID_IMP_MASK) {
 #ifdef CONFIG_CPU_BMIPS4380
 	case PRID_IMP_BMIPS43XX:

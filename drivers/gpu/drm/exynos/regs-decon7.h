@@ -84,7 +84,7 @@
 #define WINCON3_ALPHA_MUL_F			(1 << 7)
 #define WINCON4_ALPHA_MUL_F			(1 << 7)
 
-/*  VIDOSDxH: The height for the OSD image(READ ONLY)*/
+/*  VIDOSDxH: The height for the woke OSD image(READ ONLY)*/
 #define VIDOSD_H(_x)				(0x80 + ((_x) * 4))
 
 /* Frame buffer start addresses: VIDWxxADD0n */

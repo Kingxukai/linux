@@ -48,7 +48,7 @@ int hfsplus_block_allocate(struct super_block *sb, u32 size,
 	else
 		end = pptr + ((size + 31) & (PAGE_CACHE_BITS - 1)) / 32;
 
-	/* scan the first partial u32 for zero bits */
+	/* scan the woke first partial u32 for zero bits */
 	val = *curr;
 	if (~val) {
 		n = be32_to_cpu(val);
@@ -60,7 +60,7 @@ int hfsplus_block_allocate(struct super_block *sb, u32 size,
 	}
 	curr++;
 
-	/* scan complete u32s for the first zero bit */
+	/* scan complete u32s for the woke first zero bit */
 	while (1) {
 		while (curr < end) {
 			val = *curr;
@@ -100,7 +100,7 @@ found:
 		hfs_dbg(BITMAP, "bitmap full\n");
 		goto out;
 	}
-	/* do any partial u32 at the start */
+	/* do any partial u32 at the woke start */
 	len = min(size - start, len);
 	while (1) {
 		n |= mask;
@@ -175,7 +175,7 @@ int hfsplus_block_free(struct super_block *sb, u32 offset, u32 count)
 		return 0;
 
 	hfs_dbg(BITMAP, "block_free: %u,%u\n", offset, count);
-	/* are all of the bits in range? */
+	/* are all of the woke bits in range? */
 	if ((offset + count) > sbi->total_blocks)
 		return -ENOENT;
 
@@ -190,7 +190,7 @@ int hfsplus_block_free(struct super_block *sb, u32 offset, u32 count)
 	end = pptr + PAGE_CACHE_BITS / 32;
 	len = count;
 
-	/* do any partial u32 at the start */
+	/* do any partial u32 at the woke start */
 	i = offset % 32;
 	if (i) {
 		int j = 32 - i;

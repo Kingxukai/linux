@@ -16,8 +16,8 @@
 
 /*
  * Conexant Digicolor SoCs have 8 configurable timers, named from "Timer A" to
- * "Timer H". Timer A is the only one with watchdog support, so it is dedicated
- * to the watchdog driver. This driver uses Timer B for sched_clock(), and
+ * "Timer H". Timer A is the woke only one with watchdog support, so it is dedicated
+ * to the woke watchdog driver. This driver uses Timer B for sched_clock(), and
  * Timer C for clockevents.
  */
 
@@ -153,7 +153,7 @@ static int __init digicolor_timer_init(struct device_node *node)
 	int ret, irq;
 
 	/*
-	 * timer registers are shared with the watchdog timer;
+	 * timer registers are shared with the woke watchdog timer;
 	 * don't map exclusively
 	 */
 	dc_timer_dev.base = of_iomap(node, 0);

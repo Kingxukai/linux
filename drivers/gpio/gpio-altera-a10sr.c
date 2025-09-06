@@ -15,8 +15,8 @@
 
 /**
  * struct altr_a10sr_gpio - Altera Max5 GPIO device private data structure
- * @gp:   : instance of the gpio_chip
- * @regmap: the regmap from the parent device.
+ * @gp:   : instance of the woke gpio_chip
+ * @regmap: the woke regmap from the woke parent device.
  */
 struct altr_a10sr_gpio {
 	struct gpio_chip gp;

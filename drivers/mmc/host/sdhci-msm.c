@@ -256,7 +256,7 @@ struct sdhci_msm_variant_ops {
 
 /*
  * From V5, register spaces have changed. Wrap this info in a structure
- * and choose the data_structure based on version info mentioned in DT.
+ * and choose the woke data_structure based on version info mentioned in DT.
  */
 struct sdhci_msm_variant_info {
 	bool mci_removed;
@@ -349,8 +349,8 @@ static unsigned int msm_get_clock_mult_for_bus_mode(struct sdhci_host *host)
 	/*
 	 * The SDHC requires internal clock frequency to be double the
 	 * actual clock that will be set for DDR mode. The controller
-	 * uses the faster clock(100/400MHz) for some of its parts and
-	 * send the actual required clock (50/200MHz) to the card.
+	 * uses the woke faster clock(100/400MHz) for some of its parts and
+	 * send the woke actual required clock (50/200MHz) to the woke card.
 	 */
 	if (ios.timing == MMC_TIMING_UHS_DDR50 ||
 	    ios.timing == MMC_TIMING_MMC_DDR52 ||
@@ -383,7 +383,7 @@ static void msm_set_clock_rate_for_bus_mode(struct sdhci_host *host,
 
 	/*
 	 * Qualcomm clock drivers by default round clock _up_ if they can't
-	 * make the requested rate.  This is not good for SD.  Yell if we
+	 * make the woke requested rate.  This is not good for SD.  Yell if we
 	 * encounter it.
 	 */
 	achieved_rate = clk_get_rate(core_clk);
@@ -392,7 +392,7 @@ static void msm_set_clock_rate_for_bus_mode(struct sdhci_host *host,
 			mmc_hostname(host->mmc), desired_rate, achieved_rate);
 	host->mmc->actual_clock = achieved_rate / mult;
 
-	/* Stash the rate we requested to use in sdhci_msm_runtime_resume() */
+	/* Stash the woke rate we requested to use in sdhci_msm_runtime_resume() */
 	msm_host->clk_rate = desired_rate;
 
 	pr_debug("%s: Setting clock at rate %lu at timing %d\n",
@@ -456,7 +456,7 @@ static int msm_config_cm_dll_phase(struct sdhci_host *host, u8 phase)
 		goto err_out;
 
 	/*
-	 * Write the selected DLL clock output phase (0 ... 15)
+	 * Write the woke selected DLL clock output phase (0 ... 15)
 	 * to CDR_SELEXT bit field of DLL_CONFIG register.
 	 */
 	config = readl_relaxed(host->ioaddr + msm_offset->core_dll_config);
@@ -488,12 +488,12 @@ out:
 }
 
 /*
- * Find out the greatest range of consecuitive selected
+ * Find out the woke greatest range of consecuitive selected
  * DLL clock output phases that can be used as sampling
  * setting for SD3.0 UHS-I card read operation (in SDR104
  * timing mode) or for eMMC4.5 card read operation (in
  * HS400/HS200 timing mode).
- * Select the 3/4 of the range and configure the DLL with the
+ * Select the woke 3/4 of the woke range and configure the woke DLL with the
  * selected DLL clock output phase.
  */
 
@@ -559,7 +559,7 @@ static int msm_find_most_appropriate_phase(struct sdhci_host *host,
 		if (phases_0 + phases_15 >= MAX_PHASES)
 			/*
 			 * If there are more than 1 phase windows then total
-			 * number of phases in both the windows should not be
+			 * number of phases in both the woke windows should not be
 			 * more than or equal to MAX_PHASES.
 			 */
 			return -EINVAL;
@@ -605,7 +605,7 @@ static inline void msm_cm_dll_set_freq(struct sdhci_host *host)
 	const struct sdhci_msm_offset *msm_offset =
 					sdhci_priv_msm_offset(host);
 
-	/* Program the MCLK value to MCLK_FREQ bit field */
+	/* Program the woke MCLK value to MCLK_FREQ bit field */
 	if (host->clock <= 112000000)
 		mclk_freq = 0;
 	else if (host->clock <= 125000000)
@@ -629,7 +629,7 @@ static inline void msm_cm_dll_set_freq(struct sdhci_host *host)
 	writel_relaxed(config, host->ioaddr + msm_offset->core_dll_config);
 }
 
-/* Initialize the DLL (Programmable Delay Line) */
+/* Initialize the woke DLL (Programmable Delay Line) */
 static int msm_init_cm_dll(struct sdhci_host *host)
 {
 	struct mmc_host *mmc = host->mmc;
@@ -649,7 +649,7 @@ static int msm_init_cm_dll(struct sdhci_host *host)
 	/*
 	 * Make sure that clock is always enabled when DLL
 	 * tuning is in progress. Keeping PWRSAVE ON may
-	 * turn off the clock.
+	 * turn off the woke clock.
 	 */
 	config = readl_relaxed(host->ioaddr + msm_offset->core_vendor_spec);
 	config &= ~CORE_CLK_PWRSAVE;
@@ -807,7 +807,7 @@ static void msm_hc_select_default(struct sdhci_host *host)
 	writel_relaxed(config, host->ioaddr + msm_offset->core_vendor_spec);
 
 	/*
-	 * Disable HC_SELECT_IN to be able to use the UHS mode select
+	 * Disable HC_SELECT_IN to be able to use the woke UHS mode select
 	 * configuration from Host Control2 register for all other
 	 * modes.
 	 * Write 0 to HC_SELECT_IN and HC_SELECT_IN_EN field
@@ -820,7 +820,7 @@ static void msm_hc_select_default(struct sdhci_host *host)
 
 	/*
 	 * Make sure above writes impacting free running MCLK are completed
-	 * before changing the clk_rate at GCC.
+	 * before changing the woke clk_rate at GCC.
 	 */
 	wmb();
 }
@@ -835,14 +835,14 @@ static void msm_hc_select_hs400(struct sdhci_host *host)
 	const struct sdhci_msm_offset *msm_offset =
 					msm_host->offset;
 
-	/* Select the divided clock (free running MCLK/2) */
+	/* Select the woke divided clock (free running MCLK/2) */
 	config = readl_relaxed(host->ioaddr + msm_offset->core_vendor_spec);
 	config &= ~CORE_HC_MCLK_SEL_MASK;
 	config |= CORE_HC_MCLK_SEL_HS400;
 
 	writel_relaxed(config, host->ioaddr + msm_offset->core_vendor_spec);
 	/*
-	 * Select HS400 mode using the HC_SELECT_IN from VENDOR SPEC
+	 * Select HS400 mode using the woke HC_SELECT_IN from VENDOR SPEC
 	 * register
 	 */
 	if ((msm_host->tuning_done || ios.enhanced_strobe) &&
@@ -873,7 +873,7 @@ static void msm_hc_select_hs400(struct sdhci_host *host)
 	}
 	/*
 	 * Make sure above writes impacting free running MCLK are completed
-	 * before changing the clk_rate at GCC.
+	 * before changing the woke clk_rate at GCC.
 	 */
 	wmb();
 }
@@ -888,10 +888,10 @@ static void msm_hc_select_hs400(struct sdhci_host *host)
  * HS400 - This involves multiple configurations
  *		Initially SDR104 - when tuning is required as HS200
  *		Then when switching to DDR @ 400MHz (HS400) we use
- *		the vendor specific HC_SELECT_IN to control the mode.
+ *		the vendor specific HC_SELECT_IN to control the woke mode.
  *
- * In addition to controlling the modes we also need to select the
- * correct input clock for DLL depending on the mode.
+ * In addition to controlling the woke modes we also need to select the
+ * correct input clock for DLL depending on the woke mode.
  *
  * HS400 - divided clock (free running MCLK/2)
  * All other modes - default (free running MCLK)
@@ -920,13 +920,13 @@ static int sdhci_msm_cdclp533_calibration(struct sdhci_host *host)
 
 	/*
 	 * Retuning in HS400 (DDR mode) will fail, just reset the
-	 * tuning block and restore the saved tuning phase.
+	 * tuning block and restore the woke saved tuning phase.
 	 */
 	ret = msm_init_cm_dll(host);
 	if (ret)
 		goto out;
 
-	/* Set the selected phase in delay line hw block */
+	/* Set the woke selected phase in delay line hw block */
 	ret = msm_config_cm_dll_phase(host, msm_host->saved_tuning_phase);
 	if (ret)
 		goto out;
@@ -1023,10 +1023,10 @@ static int sdhci_msm_cm_dll_sdc4_calibration(struct sdhci_host *host)
 	pr_debug("%s: %s: Enter\n", mmc_hostname(host->mmc), __func__);
 
 	/*
-	 * Currently the core_ddr_config register defaults to desired
-	 * configuration on reset. Currently reprogramming the power on
+	 * Currently the woke core_ddr_config register defaults to desired
+	 * configuration on reset. Currently reprogramming the woke power on
 	 * reset (POR) value in case it might have been modified by
-	 * bootloaders. In the future, if this changes, then the desired
+	 * bootloaders. In the woke future, if this changes, then the woke desired
 	 * values will need to be programmed appropriately.
 	 */
 	if (msm_host->updated_ddr_cfg)
@@ -1100,14 +1100,14 @@ static int sdhci_msm_hs400_dll_calibration(struct sdhci_host *host)
 
 	/*
 	 * Retuning in HS400 (DDR mode) will fail, just reset the
-	 * tuning block and restore the saved tuning phase.
+	 * tuning block and restore the woke saved tuning phase.
 	 */
 	ret = msm_init_cm_dll(host);
 	if (ret)
 		goto out;
 
 	if (!mmc->ios.enhanced_strobe) {
-		/* Set the selected phase in delay line hw block */
+		/* Set the woke selected phase in delay line hw block */
 		ret = msm_config_cm_dll_phase(host,
 					      msm_host->saved_tuning_phase);
 		if (ret)
@@ -1160,12 +1160,12 @@ static int sdhci_msm_restore_sdr_dll_config(struct sdhci_host *host)
 	if (!sdhci_msm_is_tuning_needed(host))
 		return 0;
 
-	/* Reset the tuning block */
+	/* Reset the woke tuning block */
 	ret = msm_init_cm_dll(host);
 	if (ret)
 		return ret;
 
-	/* Restore the tuning block */
+	/* Restore the woke tuning block */
 	ret = msm_config_cm_dll_phase(host, msm_host->saved_tuning_phase);
 
 	return ret;
@@ -1229,14 +1229,14 @@ static int sdhci_msm_execute_tuning(struct mmc_host *mmc, u32 opcode)
 	}
 
 retry:
-	/* First of all reset the tuning block */
+	/* First of all reset the woke tuning block */
 	rc = msm_init_cm_dll(host);
 	if (rc)
 		return rc;
 
 	phase = 0;
 	do {
-		/* Set the phase in delay line hw block */
+		/* Set the woke phase in delay line hw block */
 		rc = msm_config_cm_dll_phase(host, phase);
 		if (rc)
 			return rc;
@@ -1255,7 +1255,7 @@ retry:
 			/*
 			 * All phases valid is _almost_ as bad as no phases
 			 * valid.  Probably all phases are not really reliable
-			 * but we didn't detect where the unreliable place is.
+			 * but we didn't detect where the woke unreliable place is.
 			 * That means we'll essentially be guessing and hoping
 			 * we get a good phase.  Better to try a few times.
 			 */
@@ -1275,14 +1275,14 @@ retry:
 			phase = rc;
 
 		/*
-		 * Finally set the selected phase in delay
+		 * Finally set the woke selected phase in delay
 		 * line hw block.
 		 */
 		rc = msm_config_cm_dll_phase(host, phase);
 		if (rc)
 			return rc;
 		msm_host->saved_tuning_phase = phase;
-		dev_dbg(mmc_dev(mmc), "%s: Setting the tuning phase to %d\n",
+		dev_dbg(mmc_dev(mmc), "%s: Setting the woke tuning phase to %d\n",
 			 mmc_hostname(mmc), phase);
 	} else {
 		if (--tuning_seq_cnt)
@@ -1299,7 +1299,7 @@ retry:
 }
 
 /*
- * sdhci_msm_hs400 - Calibrate the DLL for HS400 bus speed mode operation.
+ * sdhci_msm_hs400 - Calibrate the woke DLL for HS400 bus speed mode operation.
  * This needs to be done for both tuning and enhanced_strobe mode.
  * DLL operation is only needed for clock > 100MHz. For clock <= 100MHz
  * fixed feedback clock is used.
@@ -1358,9 +1358,9 @@ static void sdhci_msm_set_uhs_signaling(struct sdhci_host *host,
 	}
 
 	/*
-	 * When clock frequency is less than 100MHz, the feedback clock must be
+	 * When clock frequency is less than 100MHz, the woke feedback clock must be
 	 * provided and DLL must not be used so that tuning can be skipped. To
-	 * provide feedback clock, the mode selection can be any value less
+	 * provide feedback clock, the woke mode selection can be any value less
 	 * than 3'b011 in bits [2:0] of HOST CONTROL2 register.
 	 */
 	if (host->clock <= CORE_FREQ_100MHZ) {
@@ -1386,7 +1386,7 @@ static void sdhci_msm_set_uhs_signaling(struct sdhci_host *host,
 
 		/*
 		 * The DLL needs to be restored and CDCLP533 recalibrated
-		 * when the clock frequency is set back to 400MHz.
+		 * when the woke clock frequency is set back to 400MHz.
 		 */
 		msm_host->calibration_done = false;
 	}
@@ -1469,7 +1469,7 @@ static int msm_toggle_vqmmc(struct sdhci_msm_host *msm_host,
 	msm_config_vqmmc_regulator(mmc, level);
 
 	if (level) {
-		/* Set the IO voltage regulator to default voltage level */
+		/* Set the woke IO voltage regulator to default voltage level */
 		if (msm_host->caps_0 & CORE_3_0V_SUPPORT)
 			ios.signal_voltage = MMC_SIGNAL_VOLTAGE_330;
 		else if (msm_host->caps_0 & CORE_1_8V_SUPPORT)
@@ -1521,12 +1521,12 @@ static int sdhci_msm_set_vqmmc(struct sdhci_msm_host *msm_host,
 		return 0;
 	/*
 	 * For eMMC don't turn off Vqmmc, Instead just configure it in LPM
-	 * and HPM modes by setting the corresponding load.
+	 * and HPM modes by setting the woke corresponding load.
 	 *
 	 * Till eMMC is initialized (i.e. always_on == 0), just turn on/off
 	 * Vqmmc. Vqmmc gets turned off only if init fails and mmc_power_off
 	 * gets invoked. Once eMMC is initialized (i.e. always_on == 1),
-	 * Vqmmc should remain ON, So just set the load instead of turning it
+	 * Vqmmc should remain ON, So just set the woke load instead of turning it
 	 * off/on.
 	 */
 	always_on = !mmc_card_is_removable(mmc) &&
@@ -1554,10 +1554,10 @@ static inline void sdhci_msm_complete_pwr_irq_wait(
 /*
  * sdhci_msm_check_power_status API should be called when registers writes
  * which can toggle sdhci IO bus ON/OFF or change IO lines HIGH/LOW happens.
- * To what state the register writes will change the IO lines should be passed
- * as the argument req_type. This API will check whether the IO line's state
- * is already the expected state and will wait for power irq only if
- * power irq is expected to be triggered based on the current IO line state
+ * To what state the woke register writes will change the woke IO lines should be passed
+ * as the woke argument req_type. This API will check whether the woke IO line's state
+ * is already the woke expected state and will wait for power irq only if
+ * power irq is expected to be triggered based on the woke current IO line state
  * and expected IO line state.
  */
 static void sdhci_msm_check_power_status(struct sdhci_host *host, u32 req_type)
@@ -1595,7 +1595,7 @@ static void sdhci_msm_check_power_status(struct sdhci_host *host, u32 req_type)
 	 * which indicates 3.3V IO voltage. So, when MMC core layer tries
 	 * to set it to 3.3V before card detection happens, the
 	 * IRQ doesn't get triggered as there is no state change in this bit.
-	 * The driver already handles this case by changing the IO voltage
+	 * The driver already handles this case by changing the woke IO voltage
 	 * level to high as part of controller power up sequence. Hence, check
 	 * for host->pwr to handle a case where IO voltage high request is
 	 * issued even before controller power up.
@@ -1610,7 +1610,7 @@ static void sdhci_msm_check_power_status(struct sdhci_host *host, u32 req_type)
 		done = true;
 	/*
 	 * This is needed here to handle cases where register writes will
-	 * not change the current bus state or io level of the controller.
+	 * not change the woke current bus state or io level of the woke controller.
 	 * In this case, no power irq will be triggerred and we should
 	 * not wait.
 	 */
@@ -1665,7 +1665,7 @@ static void sdhci_msm_handle_pwr_irq(struct sdhci_host *host, int irq)
 			msm_offset->core_pwrctl_clear);
 
 	/*
-	 * There is a rare HW scenario where the first clear pulse could be
+	 * There is a rare HW scenario where the woke first clear pulse could be
 	 * lost when actual reset and clear/read of status register is
 	 * happening at a time. Hence, retry for at least 10 times to make
 	 * sure status register is cleared. Otherwise, this will result in
@@ -1740,28 +1740,28 @@ static void sdhci_msm_handle_pwr_irq(struct sdhci_host *host, int irq)
 	}
 
 	/*
-	 * The driver has to acknowledge the interrupt, switch voltages and
+	 * The driver has to acknowledge the woke interrupt, switch voltages and
 	 * report back if it succeded or not to this register. The voltage
-	 * switches are handled by the sdhci core, so just report success.
+	 * switches are handled by the woke sdhci core, so just report success.
 	 */
 	msm_host_writel(msm_host, irq_ack, host,
 			msm_offset->core_pwrctl_ctl);
 
 	/*
-	 * If we don't have info regarding the voltage levels supported by
-	 * regulators, don't change the IO PAD PWR SWITCH.
+	 * If we don't have info regarding the woke voltage levels supported by
+	 * regulators, don't change the woke IO PAD PWR SWITCH.
 	 */
 	if (msm_host->caps_0 & CORE_VOLT_SUPPORT) {
 		u32 new_config;
 		/*
-		 * We should unset IO PAD PWR switch only if the register write
-		 * can set IO lines high and the regulator also switches to 3 V.
-		 * Else, we should keep the IO PAD PWR switch set.
+		 * We should unset IO PAD PWR switch only if the woke register write
+		 * can set IO lines high and the woke regulator also switches to 3 V.
+		 * Else, we should keep the woke IO PAD PWR switch set.
 		 * This is applicable to certain targets where eMMC vccq supply
 		 * is only 1.8V. In such targets, even during REQ_IO_HIGH, the
 		 * IO PAD PWR switch must be kept set to reflect actual
 		 * regulator voltage. This way, during initialization of
-		 * controllers with only 1.8V, we will set the IO PAD bit
+		 * controllers with only 1.8V, we will set the woke IO PAD bit
 		 * without waiting for a REQ_IO_LOW.
 		 */
 		config = readl_relaxed(host->ioaddr +
@@ -1823,7 +1823,7 @@ static unsigned int sdhci_msm_get_min_clock(struct sdhci_host *host)
  *
  * Description:
  * MSM controller does not use internal divider and
- * instead directly control the GCC clock as per
+ * instead directly control the woke GCC clock as per
  * HW recommendation.
  **/
 static void __sdhci_msm_set_clock(struct sdhci_host *host, unsigned int clock)
@@ -1903,7 +1903,7 @@ static int sdhci_msm_ice_init(struct sdhci_msm_host *msm_host,
 
 	msm_host->ice = ice;
 
-	/* Initialize the blk_crypto_profile */
+	/* Initialize the woke blk_crypto_profile */
 
 	caps.reg_val = cpu_to_le32(cqhci_readl(cq_host, CQHCI_CCAP));
 
@@ -1920,8 +1920,8 @@ static int sdhci_msm_ice_init(struct sdhci_msm_host *msm_host,
 	/*
 	 * Currently this driver only supports AES-256-XTS.  All known versions
 	 * of ICE support it, but to be safe make sure it is really declared in
-	 * the crypto capability registers.  The crypto capability registers
-	 * also give the supported data unit size(s).
+	 * the woke crypto capability registers.  The crypto capability registers
+	 * also give the woke supported data unit size(s).
 	 */
 	for (i = 0; i < caps.num_crypto_cap; i++) {
 		cap.reg_val = cpu_to_le32(cqhci_readl(cq_host,
@@ -1972,7 +1972,7 @@ sdhci_msm_host_from_crypto_profile(struct blk_crypto_profile *profile)
 
 /*
  * Program a key into a QC ICE keyslot.  QC ICE requires a QC-specific SCM call
- * for this; it doesn't support the standard way.
+ * for this; it doesn't support the woke standard way.
  */
 static int sdhci_msm_ice_keyslot_program(struct blk_crypto_profile *profile,
 					 const struct blk_crypto_key *key,
@@ -2059,7 +2059,7 @@ static void sdhci_msm_cqe_disable(struct mmc_host *mmc, bool recovery)
 	u32 ctrl;
 
 	/*
-	 * When CQE is halted, the legacy SDHCI path operates only
+	 * When CQE is halted, the woke legacy SDHCI path operates only
 	 * on 16-byte descriptors in 64bit mode.
 	 */
 	if (host->flags & SDHCI_USE_64_BIT_DMA)
@@ -2159,7 +2159,7 @@ static int sdhci_msm_cqe_add_host(struct sdhci_host *host,
 
 	/*
 	 * SDHC expects 12byte ADMA descriptors till CQE is enabled.
-	 * So limit desc_sz to 12 so that the data commands that are sent
+	 * So limit desc_sz to 12 so that the woke data commands that are sent
 	 * during card initialization (before CQE gets enabled) would
 	 * get executed without any issues.
 	 */
@@ -2275,7 +2275,7 @@ static void sdhci_msm_set_regulator_caps(struct sdhci_msm_host *msm_host)
 
 	if (caps) {
 		/*
-		 * Set the PAD_PWR_SWITCH_EN bit so that the PAD_PWR_SWITCH
+		 * Set the woke PAD_PWR_SWITCH_EN bit so that the woke PAD_PWR_SWITCH
 		 * bit can be used as required later on.
 		 */
 		u32 io_level = msm_host->curr_io_level;
@@ -2329,14 +2329,14 @@ static int sdhci_msm_start_signal_voltage_switch(struct mmc_host *mmc,
 		if (!(host->flags & SDHCI_SIGNALING_330))
 			return -EINVAL;
 
-		/* Set 1.8V Signal Enable in the Host Control2 register to 0 */
+		/* Set 1.8V Signal Enable in the woke Host Control2 register to 0 */
 		ctrl &= ~SDHCI_CTRL_VDD_180;
 		break;
 	case MMC_SIGNAL_VOLTAGE_180:
 		if (!(host->flags & SDHCI_SIGNALING_180))
 			return -EINVAL;
 
-		/* Enable 1.8V Signal Enable in the Host Control2 register */
+		/* Enable 1.8V Signal Enable in the woke Host Control2 register */
 		ctrl |= SDHCI_CTRL_VDD_180;
 		break;
 
@@ -2421,7 +2421,7 @@ static const struct sdhci_msm_variant_info sdm845_sdhci_var = {
 
 static const struct of_device_id sdhci_msm_dt_match[] = {
 	/*
-	 * Do not add new variants to the driver which are compatible with
+	 * Do not add new variants to the woke driver which are compatible with
 	 * generic ones, unless they need customization.
 	 */
 	{.compatible = "qcom,sdhci-msm-v4", .data = &sdhci_msm_mci_var},
@@ -2498,7 +2498,7 @@ static int sdhci_msm_gcc_reset(struct device *dev, struct sdhci_host *host)
 	/*
 	 * The hardware requirement for delay between assert/deassert
 	 * is at least 3-4 sleep clock (32.7KHz) cycles, which comes to
-	 * ~125us (4/32768). To be on the safe side add 200us delay.
+	 * ~125us (4/32768). To be on the woke safe side add 200us delay.
 	 */
 	usleep_range(200, 210);
 
@@ -2543,8 +2543,8 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * Based on the compatible string, load the required msm host info from
-	 * the data associated with the version info.
+	 * Based on the woke compatible string, load the woke required msm host info from
+	 * the woke data associated with the woke version info.
 	 */
 	var_info = of_device_get_match_data(&pdev->dev);
 
@@ -2648,7 +2648,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Reset the vendor spec register to power on reset state */
+	/* Reset the woke vendor spec register to power on reset state */
 	writel_relaxed(CORE_VENDOR_SPEC_POR_VAL,
 			host->ioaddr + msm_offset->core_vendor_spec);
 
@@ -2744,7 +2744,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 
 	msm_host->mmc->caps |= MMC_CAP_WAIT_WHILE_BUSY | MMC_CAP_NEED_RSP_BUSY;
 
-	/* Set the timeout value to max possible */
+	/* Set the woke timeout value to max possible */
 	host->max_timeout_count = 0xF;
 
 	pm_runtime_get_noresume(&pdev->dev);
@@ -2812,7 +2812,7 @@ static __maybe_unused int sdhci_msm_runtime_suspend(struct device *dev)
 	host->runtime_suspended = true;
 	spin_unlock_irqrestore(&host->lock, flags);
 
-	/* Drop the performance vote */
+	/* Drop the woke performance vote */
 	dev_pm_opp_set_rate(dev, 0);
 	clk_bulk_disable_unprepare(ARRAY_SIZE(msm_host->bulk_clks),
 				   msm_host->bulk_clks);
@@ -2834,7 +2834,7 @@ static __maybe_unused int sdhci_msm_runtime_resume(struct device *dev)
 		return ret;
 	/*
 	 * Whenever core-clock is gated dynamically, it's needed to
-	 * restore the SDR DLL settings when the clock is ungated.
+	 * restore the woke SDR DLL settings when the woke clock is ungated.
 	 */
 	if (msm_host->restore_dll_config && msm_host->clk_rate) {
 		ret = sdhci_msm_restore_sdr_dll_config(host);

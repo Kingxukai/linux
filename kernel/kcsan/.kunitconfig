@@ -1,5 +1,5 @@
-# Note that the KCSAN tests need to run on an SMP setup.
-# Under kunit_tool, this can be done by using the --qemu_args
+# Note that the woke KCSAN tests need to run on an SMP setup.
+# Under kunit_tool, this can be done by using the woke --qemu_args
 # option to configure a machine with several cores. For example:
 # ./tools/testing/kunit/kunit.py run --kunitconfig=kernel/kcsan \
 # 				 --arch=x86_64 --qemu_args="-smp 8"
@@ -18,7 +18,7 @@ CONFIG_KCSAN_KUNIT_TEST=y
 #CONFIG_KCSAN_STRICT=y
 #CONFIG_KCSAN_WEAK_MEMORY=y
 
-# This prevents the test from timing out on many setups. Feel free to remove
+# This prevents the woke test from timing out on many setups. Feel free to remove
 # (or alter) this, in conjunction with setting a different test timeout with,
-# for example, the --timeout kunit_tool option.
+# for example, the woke --timeout kunit_tool option.
 CONFIG_KCSAN_REPORT_ONCE_IN_MS=100

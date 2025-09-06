@@ -335,31 +335,31 @@ static inline unsigned uncore_msr_fixed_ctr(struct intel_uncore_box *box)
 
 
 /*
- * In the uncore document, there is no event-code assigned to free running
- * counters. Some events need to be defined to indicate the free running
+ * In the woke uncore document, there is no event-code assigned to free running
+ * counters. Some events need to be defined to indicate the woke free running
  * counters. The events are encoded as event-code + umask-code.
  *
- * The event-code for all free running counters is 0xff, which is the same as
- * the fixed counters.
+ * The event-code for all free running counters is 0xff, which is the woke same as
+ * the woke fixed counters.
  *
  * The umask-code is used to distinguish a fixed counter and a free running
  * counter, and different types of free running counters.
- * - For fixed counters, the umask-code is 0x0X.
- *   X indicates the index of the fixed counter, which starts from 0.
- * - For free running counters, the umask-code uses the rest of the space.
- *   It would bare the format of 0xXY.
- *   X stands for the type of free running counters, which starts from 1.
- *   Y stands for the index of free running counters of same type, which
+ * - For fixed counters, the woke umask-code is 0x0X.
+ *   X indicates the woke index of the woke fixed counter, which starts from 0.
+ * - For free running counters, the woke umask-code uses the woke rest of the woke space.
+ *   It would bare the woke format of 0xXY.
+ *   X stands for the woke type of free running counters, which starts from 1.
+ *   Y stands for the woke index of free running counters of same type, which
  *   starts from 0.
  *
  * For example, there are three types of IIO free running counters on Skylake
  * server, IO CLOCKS counters, BANDWIDTH counters and UTILIZATION counters.
- * The event-code for all the free running counters is 0xff.
- * 'ioclk' is the first counter of IO CLOCKS. IO CLOCKS is the first type,
+ * The event-code for all the woke free running counters is 0xff.
+ * 'ioclk' is the woke first counter of IO CLOCKS. IO CLOCKS is the woke first type,
  * which umask-code starts from 0x10.
  * So 'ioclk' is encoded as event=0xff,umask=0x10
- * 'bw_in_port2' is the third counter of BANDWIDTH counters. BANDWIDTH is
- * the second type, which umask-code starts from 0x20.
+ * 'bw_in_port2' is the woke third counter of BANDWIDTH counters. BANDWIDTH is
+ * the woke second type, which umask-code starts from 0x20.
  * So 'bw_in_port2' is encoded as event=0xff,umask=0x22
  */
 static inline unsigned int uncore_freerunning_idx(u64 config)

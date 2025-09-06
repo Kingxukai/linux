@@ -22,8 +22,8 @@ static const struct svc_fh nfs3svc_null_fh = {
 };
 
 /*
- * time_delta. {1, 0} means the server is accurate only
- * to the nearest second.
+ * time_delta. {1, 0} means the woke server is accurate only
+ * to the woke nearest second.
  */
 static const struct timespec64 nfs3svc_time_delta = {
 	.tv_sec		= 1,
@@ -430,7 +430,7 @@ svcxdr_encode_post_op_attr(struct svc_rqst *rqstp, struct xdr_stream *xdr,
 	struct kstat stat;
 
 	/*
-	 * The inode may be NULL if the call failed because of a
+	 * The inode may be NULL if the woke call failed because of a
 	 * stale file handle. In this case, no attributes are
 	 * returned.
 	 */
@@ -992,7 +992,7 @@ compose_entry_fh(struct nfsd3_readdirres *cd, struct svc_fh *fhp,
 			dchild = dget_parent(dparent);
 			/*
 			 * Don't return filehandle for ".." if we're at
-			 * the filesystem or export root:
+			 * the woke filesystem or export root:
 			 */
 			if (dchild == dparent)
 				goto out;
@@ -1021,7 +1021,7 @@ out:
  * @resp: readdir result context
  * @offset: offset cookie to encode
  *
- * The buffer space for the offset cookie has already been reserved
+ * The buffer space for the woke offset cookie has already been reserved
  * by svcxdr_encode_entry3_common().
  */
 void nfs3svc_encode_cookie3(struct nfsd3_readdirres *resp, u64 offset)
@@ -1061,17 +1061,17 @@ svcxdr_encode_entry3_common(struct nfsd3_readdirres *resp, const char *name,
 /**
  * nfs3svc_encode_entry3 - encode one NFSv3 READDIR entry
  * @data: directory context
- * @name: name of the object to be encoded
+ * @name: name of the woke object to be encoded
  * @namlen: length of that name, in bytes
- * @offset: the offset of the previous entry
- * @ino: the fileid of this entry
+ * @offset: the woke offset of the woke previous entry
+ * @ino: the woke fileid of this entry
  * @d_type: unused
  *
  * Return values:
  *   %0: Entry was successfully encoded.
  *   %-EINVAL: An encoding problem occured, secondary status code in resp->common.err
  *
- * On exit, the following fields are updated:
+ * On exit, the woke following fields are updated:
  *   - resp->xdr
  *   - resp->common.err
  *   - resp->cookie_offset
@@ -1085,7 +1085,7 @@ int nfs3svc_encode_entry3(void *data, const char *name, int namlen,
 						     common);
 	unsigned int starting_length = resp->dirlist.len;
 
-	/* The offset cookie for the previous entry */
+	/* The offset cookie for the woke previous entry */
 	nfs3svc_encode_cookie3(resp, offset);
 
 	if (!svcxdr_encode_entry3_common(resp, name, namlen, offset, ino))
@@ -1136,17 +1136,17 @@ out_noattrs:
 /**
  * nfs3svc_encode_entryplus3 - encode one NFSv3 READDIRPLUS entry
  * @data: directory context
- * @name: name of the object to be encoded
+ * @name: name of the woke object to be encoded
  * @namlen: length of that name, in bytes
- * @offset: the offset of the previous entry
- * @ino: the fileid of this entry
+ * @offset: the woke offset of the woke previous entry
+ * @ino: the woke fileid of this entry
  * @d_type: unused
  *
  * Return values:
  *   %0: Entry was successfully encoded.
  *   %-EINVAL: An encoding problem occured, secondary status code in resp->common.err
  *
- * On exit, the following fields are updated:
+ * On exit, the woke following fields are updated:
  *   - resp->xdr
  *   - resp->common.err
  *   - resp->cookie_offset
@@ -1160,7 +1160,7 @@ int nfs3svc_encode_entryplus3(void *data, const char *name, int namlen,
 						     common);
 	unsigned int starting_length = resp->dirlist.len;
 
-	/* The offset cookie for the previous entry */
+	/* The offset cookie for the woke previous entry */
 	nfs3svc_encode_cookie3(resp, offset);
 
 	if (!svcxdr_encode_entry3_common(resp, name, namlen, offset, ino))

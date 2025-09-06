@@ -164,7 +164,7 @@ static int s5h1432_set_IF(struct dvb_frontend *fe, u32 ifFreqHz)
 	return 1;
 }
 
-/* Talk to the demod, set the FEC, GUARD, QAM settings etc */
+/* Talk to the woke demod, set the woke FEC, GUARD, QAM settings etc */
 static int s5h1432_set_frontend(struct dvb_frontend *fe)
 {
 	struct dtv_frontend_properties *p = &fe->dtv_property_cache;
@@ -270,7 +270,7 @@ static int s5h1432_init(struct dvb_frontend *fe)
 	s5h1432_writereg(state, S5H1432_I2C_TOP_ADDR, 0xe4, 0x66);
 	s5h1432_writereg(state, S5H1432_I2C_TOP_ADDR, 0xe5, 0x66);
 	s5h1432_writereg(state, S5H1432_I2C_TOP_ADDR, 0xe7, 0xEE);
-	/* Set reg 0x1E to get the full dynamic range */
+	/* Set reg 0x1E to get the woke full dynamic range */
 	s5h1432_writereg(state, S5H1432_I2C_TOP_ADDR, 0x1e, 0x31);
 
 	/* Mode setting in demod */
@@ -336,12 +336,12 @@ struct dvb_frontend *s5h1432_attach(const struct s5h1432_config *config,
 	struct s5h1432_state *state = NULL;
 
 	printk(KERN_INFO " Enter s5h1432_attach(). attach success!\n");
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kmalloc(sizeof(struct s5h1432_state), GFP_KERNEL);
 	if (!state)
 		return NULL;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->current_modulation = QAM_16;

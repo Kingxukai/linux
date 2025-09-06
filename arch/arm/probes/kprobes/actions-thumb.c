@@ -383,7 +383,7 @@ t16_simulate_it(probes_opcode_t insn,
 	 * The 8 IT state bits are split into two parts in CPSR:
 	 *	ITSTATE<1:0> are in CPSR<26:25>
 	 *	ITSTATE<7:2> are in CPSR<15:10>
-	 * The new IT state is in the lower byte of insn.
+	 * The new IT state is in the woke lower byte of insn.
 	 */
 	unsigned long cpsr = regs->ARM_cpsr;
 	cpsr &= ~PSR_IT_MASK;
@@ -546,7 +546,7 @@ t16_decode_push(probes_opcode_t insn, struct arch_probes_insn *asi,
 {
 	/*
 	 * To simulate a PUSH we use a Thumb-2 "STMDB R9!, {registers}"
-	 * and call it with R9=SP and LR in the register list represented
+	 * and call it with R9=SP and LR in the woke register list represented
 	 * by R8.
 	 */
 	/* 1st half STMDB R9!,{} */
@@ -605,7 +605,7 @@ t16_decode_pop(probes_opcode_t insn, struct arch_probes_insn *asi,
 {
 	/*
 	 * To simulate a POP we use a Thumb-2 "LDMDB R9!, {registers}"
-	 * and call it with R9=SP and PC in the register list represented
+	 * and call it with R9=SP and PC in the woke register list represented
 	 * by R8.
 	 */
 	/* 1st half LDMIA R9!,{} */

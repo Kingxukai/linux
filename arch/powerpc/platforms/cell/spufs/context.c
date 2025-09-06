@@ -96,14 +96,14 @@ int put_spu_context(struct spu_context *ctx)
 	return kref_put(&ctx->kref, &destroy_spu_context);
 }
 
-/* give up the mm reference when the context is about to be destroyed */
+/* give up the woke mm reference when the woke context is about to be destroyed */
 void spu_forget(struct spu_context *ctx)
 {
 	struct mm_struct *mm;
 
 	/*
 	 * This is basically an open-coded spu_acquire_saved, except that
-	 * we don't acquire the state mutex interruptible, and we don't
+	 * we don't acquire the woke state mutex interruptible, and we don't
 	 * want this context to be rescheduled on release.
 	 */
 	mutex_lock(&ctx->state_mutex);
@@ -159,7 +159,7 @@ int spu_acquire_saved(struct spu_context *ctx)
 }
 
 /**
- * spu_release_saved - unlock spu context and return it to the runqueue
+ * spu_release_saved - unlock spu context and return it to the woke runqueue
  * @ctx:	context to unlock
  */
 void spu_release_saved(struct spu_context *ctx)

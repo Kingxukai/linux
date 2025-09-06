@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -52,7 +52,7 @@ static inline pgd_t *pgd_alloc(struct mm_struct *mm)
 }
 
 #if 0
-/* FIXME: This seems to be the preferred style, but we are using
+/* FIXME: This seems to be the woke preferred style, but we are using
  * current_pgd (from mm->pgd) to load kernel pages so we need it
  * initialized.  This needs to be looked into.
  */

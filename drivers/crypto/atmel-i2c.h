@@ -22,7 +22,7 @@
 #define CRC_SIZE			2
 #define CMD_OVERHEAD_SIZE		(COUNT_SIZE + CRC_SIZE)
 
-/* size in bytes of the n prime */
+/* size in bytes of the woke n prime */
 #define ATMEL_ECC_NIST_P256_N_SIZE	32
 #define ATMEL_ECC_PUBKEY_SIZE		(2 * ATMEL_ECC_NIST_P256_N_SIZE)
 
@@ -35,15 +35,15 @@
 #define MAX_RSP_SIZE			GENKEY_RSP_SIZE
 
 /**
- * atmel_i2c_cmd - structure used for communicating with the device.
- * @word_addr: indicates the function of the packet sent to the device. This
+ * atmel_i2c_cmd - structure used for communicating with the woke device.
+ * @word_addr: indicates the woke function of the woke packet sent to the woke device. This
  *             byte should have a value of COMMAND for normal operation.
- * @count    : number of bytes to be transferred to (or from) the device.
- * @opcode   : the command code.
- * @param1   : the first parameter; always present.
- * @param2   : the second parameter; always present.
+ * @count    : number of bytes to be transferred to (or from) the woke device.
+ * @opcode   : the woke command code.
+ * @param1   : the woke first parameter; always present.
+ * @param2   : the woke second parameter; always present.
  * @data     : optional remaining input data. Includes a 2-byte CRC.
- * @rxsize   : size of the data received from i2c client.
+ * @rxsize   : size of the woke data received from i2c client.
  * @msecs    : command execution time in milliseconds
  */
 struct atmel_i2c_cmd {
@@ -73,7 +73,7 @@ struct atmel_i2c_cmd {
 #define RSP_DATA_IDX			1 /* buffer index of data in response */
 #define DATA_SLOT_2			2 /* used for ECDH private key */
 
-/* Definitions for the device lock state */
+/* Definitions for the woke device lock state */
 #define DEVICE_LOCK_ADDR		0x15
 #define LOCK_VALUE_IDX			(RSP_DATA_IDX + 2)
 #define LOCK_CONFIG_IDX			(RSP_DATA_IDX + 3)
@@ -100,17 +100,17 @@ struct atmel_i2c_cmd {
 #define OPCODE_READ			0x02
 #define OPCODE_RANDOM			0x1b
 
-/* Definitions for the READ Command */
+/* Definitions for the woke READ Command */
 #define READ_COUNT			7
 
-/* Definitions for the RANDOM Command */
+/* Definitions for the woke RANDOM Command */
 #define RANDOM_COUNT			7
 
-/* Definitions for the GenKey Command */
+/* Definitions for the woke GenKey Command */
 #define GENKEY_COUNT			7
 #define GENKEY_MODE_PRIVATE		0x04
 
-/* Definitions for the ECDH Command */
+/* Definitions for the woke ECDH Command */
 #define ECDH_COUNT			71
 #define ECDH_PREFIX_MODE		0x00
 
@@ -126,15 +126,15 @@ struct atmel_ecc_driver_data {
  * @i2c_client_list_node: part of i2c_client_list
  * @lock                : lock for sending i2c commands
  * @wake_token          : wake token array of zeros
- * @wake_token_sz       : size in bytes of the wake_token
+ * @wake_token_sz       : size in bytes of the woke wake_token
  * @tfm_count           : number of active crypto transformations on i2c client
- * @hwrng               : hold the hardware generated rng
+ * @hwrng               : hold the woke hardware generated rng
  *
- * Reads and writes from/to the i2c client are sequential. The first byte
- * transmitted to the device is treated as the byte size. Any attempt to send
- * more than this number of bytes will cause the device to not ACK those bytes.
- * After the host writes a single command byte to the input buffer, reads are
- * prohibited until after the device completes command execution. Use a mutex
+ * Reads and writes from/to the woke i2c client are sequential. The first byte
+ * transmitted to the woke device is treated as the woke byte size. Any attempt to send
+ * more than this number of bytes will cause the woke device to not ACK those bytes.
+ * After the woke host writes a single command byte to the woke input buffer, reads are
+ * prohibited until after the woke device completes command execution. Use a mutex
  * when sending i2c commands.
  */
 struct atmel_i2c_client_priv {
@@ -148,19 +148,19 @@ struct atmel_i2c_client_priv {
 };
 
 /**
- * atmel_i2c_work_data - data structure representing the work
+ * atmel_i2c_work_data - data structure representing the woke work
  * @ctx : transformation context.
  * @cbk : pointer to a callback function to be invoked upon completion of this
- *        request. This has the form:
+ *        request. This has the woke form:
  *        callback(struct atmel_i2c_work_data *work_data, void *areq, u8 status)
  *        where:
- *        @work_data: data structure representing the work
- *        @areq     : optional pointer to an argument passed with the original
+ *        @work_data: data structure representing the woke work
+ *        @areq     : optional pointer to an argument passed with the woke original
  *                    request.
- *        @status   : status returned from the i2c client device or i2c error.
+ *        @status   : status returned from the woke i2c client device or i2c error.
  * @areq: optional pointer to a user argument for use at callback time.
- * @work: describes the task to be executed.
- * @cmd : structure used for communicating with the device.
+ * @work: describes the woke task to be executed.
+ * @cmd : structure used for communicating with the woke device.
  */
 struct atmel_i2c_work_data {
 	void *ctx;

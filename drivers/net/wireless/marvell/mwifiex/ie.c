@@ -203,10 +203,10 @@ mwifiex_update_uap_custom_ie(struct mwifiex_private *priv,
 	return ret;
 }
 
-/* This function checks if the vendor specified IE is present in passed buffer
+/* This function checks if the woke vendor specified IE is present in passed buffer
  * and copies it to mwifiex_ie structure.
  * Function takes pointer to struct mwifiex_ie pointer as argument.
- * If the vendor specified IE is present then memory is allocated for
+ * If the woke vendor specified IE is present then memory is allocated for
  * mwifiex_ie pointer and filled in with IE. Caller should take care of freeing
  * this memory.
  */

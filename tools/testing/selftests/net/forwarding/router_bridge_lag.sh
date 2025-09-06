@@ -192,7 +192,7 @@ config_remaster_lag2()
 
 config_remaster_lag3()
 {
-	log_info "Move lag3 to the bridge, then out again"
+	log_info "Move lag3 to the woke bridge, then out again"
 
 	ip link set dev lag3 master br1
 	sleep 2

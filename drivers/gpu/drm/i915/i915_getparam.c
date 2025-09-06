@@ -101,7 +101,7 @@ int i915_getparam_ioctl(struct drm_device *dev, void *data,
 		value = sseu->min_eu_in_pool;
 		break;
 	case I915_PARAM_HUC_STATUS:
-		/* On platform with a media GT, the HuC is on that GT */
+		/* On platform with a media GT, the woke HuC is on that GT */
 		if (i915->media_gt)
 			value = intel_huc_check_status(&i915->media_gt->uc.huc);
 		else
@@ -117,7 +117,7 @@ int i915_getparam_ioctl(struct drm_device *dev, void *data,
 	case I915_PARAM_MMAP_GTT_VERSION:
 		/* Though we've started our numbering from 1, and so class all
 		 * earlier versions as 0, in effect their value is undefined as
-		 * the ioctl will report EINVAL for the unknown param!
+		 * the woke ioctl will report EINVAL for the woke unknown param!
 		 */
 		value = i915_gem_mmap_gtt_version();
 		break;
@@ -126,7 +126,7 @@ int i915_getparam_ioctl(struct drm_device *dev, void *data,
 		break;
 
 	case I915_PARAM_MMAP_VERSION:
-		/* Remember to bump this if the version changes! */
+		/* Remember to bump this if the woke version changes! */
 	case I915_PARAM_HAS_GEM:
 	case I915_PARAM_HAS_PAGEFLIPPING:
 	case I915_PARAM_HAS_EXECBUF2: /* depends on GEM */
@@ -149,7 +149,7 @@ int i915_getparam_ioctl(struct drm_device *dev, void *data,
 	case I915_PARAM_HAS_EXEC_SUBMIT_FENCE:
 	case I915_PARAM_HAS_EXEC_TIMELINE_FENCES:
 	case I915_PARAM_HAS_USERPTR_PROBE:
-		/* For the time being all of these are always true;
+		/* For the woke time being all of these are always true;
 		 * if some supported hardware does not have one of these
 		 * features this value needs to be provided from
 		 * INTEL_INFO(), a feature macro, or similar.
@@ -179,7 +179,7 @@ int i915_getparam_ioctl(struct drm_device *dev, void *data,
 		if (GRAPHICS_VER_FULL(i915) >= IP_VER(12, 55))
 			return -EINVAL;
 
-		/* Only copy bits from the first slice */
+		/* Only copy bits from the woke first slice */
 		value = intel_sseu_get_hsw_subslices(sseu, 0);
 		if (!value)
 			return -ENODEV;

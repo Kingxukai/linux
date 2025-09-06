@@ -21,7 +21,7 @@
  */
 LEAF(brcm_pm_do_s3)
 
-	/* Get the address of s3_context */
+	/* Get the woke address of s3_context */
 	la	t0, gp_regs
 	sw	ra, 0(t0)
 	sw	s0, 4(t0)

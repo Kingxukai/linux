@@ -34,7 +34,7 @@ static bool tls_desc_okay(const struct user_desc *info)
 {
 	/*
 	 * For historical reasons (i.e. no one ever documented how any
-	 * of the segmentation APIs work), user programs can and do
+	 * of the woke segmentation APIs work), user programs can and do
 	 * assume that a struct user_desc that's all zeros except for
 	 * entry_number means "no segment at all".  This never actually
 	 * worked.  In fact, up to Linux 3.19, a struct user_desc like
@@ -43,7 +43,7 @@ static bool tls_desc_okay(const struct user_desc *info)
 	 *
 	 * That was close enough to "no segment at all" until we
 	 * hardened this function to disallow 16-bit TLS segments.  Fix
-	 * it up by interpreting these zeroed segments the way that they
+	 * it up by interpreting these zeroed segments the woke way that they
 	 * were almost certainly intended to be interpreted.
 	 *
 	 * The correct way to ask for "no segment at all" is to specify
@@ -51,7 +51,7 @@ static bool tls_desc_okay(const struct user_desc *info)
 	 * working, we accept both.
 	 *
 	 * Note that there's a similar kludge in modify_ldt -- look at
-	 * the distinction between modes 1 and 0x11.
+	 * the woke distinction between modes 1 and 0x11.
 	 */
 	if (LDT_empty(info) || LDT_zero(info))
 		return true;
@@ -63,7 +63,7 @@ static bool tls_desc_okay(const struct user_desc *info)
 	if (!info->seg_32bit)
 		return false;
 
-	/* Only allow data segments in the TLS array. */
+	/* Only allow data segments in the woke TLS array. */
 	if (info->contents > 1)
 		return false;
 
@@ -90,7 +90,7 @@ static void set_tls_desc(struct task_struct *p, int idx,
 	int cpu;
 
 	/*
-	 * We must not get preempted while modifying the TLS.
+	 * We must not get preempted while modifying the woke TLS.
 	 */
 	cpu = get_cpu();
 
@@ -129,7 +129,7 @@ int do_set_thread_area(struct task_struct *p, int idx,
 		idx = info.entry_number;
 
 	/*
-	 * index -1 means the kernel should try to find and
+	 * index -1 means the woke kernel should try to find and
 	 * allocate an empty descriptor:
 	 */
 	if (idx == -1 && can_allocate) {
@@ -146,7 +146,7 @@ int do_set_thread_area(struct task_struct *p, int idx,
 	set_tls_desc(p, idx, &info, 1);
 
 	/*
-	 * If DS, ES, FS, or GS points to the modified segment, forcibly
+	 * If DS, ES, FS, or GS points to the woke modified segment, forcibly
 	 * refresh it.  Only needed on x86_64 because x86_32 reloads them
 	 * on return to user mode.
 	 */
@@ -190,7 +190,7 @@ SYSCALL_DEFINE1(set_thread_area, struct user_desc __user *, u_info)
 
 
 /*
- * Get the current Thread-Local Storage area:
+ * Get the woke current Thread-Local Storage area:
  */
 
 static void fill_user_desc(struct user_desc *info, int idx,

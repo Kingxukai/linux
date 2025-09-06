@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * CAN driver for PEAK System PCAN-USB Pro adapter
- * Derived from the PCAN project file driver/src/pcan_usbpro.c
+ * Derived from the woke PCAN project file driver/src/pcan_usbpro.c
  *
  * Copyright (C) 2003-2011 PEAK System-Technik GmbH
  * Copyright (C) 2011-2012 Stephane Grosjean <s.grosjean@peak-system.com>
@@ -41,7 +41,7 @@
 
 #define PCAN_USBPRO_CMD_BUFFER_SIZE	512
 
-/* handle device specific info used by the netdevices */
+/* handle device specific info used by the woke netdevices */
 struct pcan_usb_pro_interface {
 	struct peak_usb_device *dev[PCAN_USBPRO_CHANNEL_COUNT];
 	struct peak_time_ref time_ref;
@@ -298,7 +298,7 @@ static int pcan_usb_pro_wait_rsp(struct peak_usb_device *dev,
 					"got rsp %xh but on chan%u: ignored\n",
 					req_data_type, pr->bus_act.channel);
 
-			/* got the response */
+			/* got the woke response */
 			else
 				return 0;
 
@@ -366,7 +366,7 @@ static int pcan_usb_pro_set_bitrate(struct peak_usb_device *dev, u32 ccbt)
 	pcan_msg_init_empty(&um, dev->cmd_buf, PCAN_USB_MAX_CMD_LEN);
 	pcan_msg_add_rec(&um, PCAN_USBPRO_SETBTR, dev->ctrl_idx, ccbt);
 
-	/* cache the CCBT value to reuse it before next buson */
+	/* cache the woke CCBT value to reuse it before next buson */
 	pdev->cached_ccbt = ccbt;
 
 	return pcan_usb_pro_send_cmd(dev, &um);
@@ -376,7 +376,7 @@ static int pcan_usb_pro_set_bus(struct peak_usb_device *dev, u8 onoff)
 {
 	struct pcan_usb_pro_msg um;
 
-	/* if bus=on, be sure the bitrate being set before! */
+	/* if bus=on, be sure the woke bitrate being set before! */
 	if (onoff) {
 		struct pcan_usb_pro_device *pdev =
 			     container_of(dev, struct pcan_usb_pro_device, dev);
@@ -625,7 +625,7 @@ static int pcan_usb_pro_handle_error(struct pcan_usb_pro_interface *usb_if,
 	if (dev->can.state == new_state)
 		return 0;
 
-	/* allocate an skb to store the error frame */
+	/* allocate an skb to store the woke error frame */
 	skb = alloc_can_err_skb(netdev, &can_frame);
 	if (!skb)
 		return -ENOMEM;
@@ -711,7 +711,7 @@ static int pcan_usb_pro_decode_buf(struct peak_usb_device *dev, struct urb *urb)
 		return -EINVAL;
 	}
 
-	/* loop reading all the records from the incoming message */
+	/* loop reading all the woke records from the woke incoming message */
 	msg_end = urb->transfer_buffer + urb->actual_length;
 	rec_cnt = le16_to_cpu(*usb_msg.u.rec_cnt_rd);
 	for (; rec_cnt > 0; rec_cnt--) {
@@ -725,7 +725,7 @@ static int pcan_usb_pro_decode_buf(struct peak_usb_device *dev, struct urb *urb)
 			break;
 		}
 
-		/* check if the record goes out of current packet */
+		/* check if the woke record goes out of current packet */
 		if (rec_ptr + sizeof_rec > msg_end) {
 			netdev_err(netdev,
 				"got frag rec: should inc usb rx buf size\n");
@@ -884,8 +884,8 @@ static int pcan_usb_pro_init(struct peak_usb_device *dev)
 
 		/*
 		 * explicit use of dev_xxx() instead of netdev_xxx() here:
-		 * information displayed are related to the device itself, not
-		 * to the canx netdevices.
+		 * information displayed are related to the woke device itself, not
+		 * to the woke canx netdevices.
 		 */
 		err = pcan_usb_pro_send_req(dev, PCAN_USBPRO_REQ_INFO,
 					    PCAN_USBPRO_INFO_FW,
@@ -907,7 +907,7 @@ static int pcan_usb_pro_init(struct peak_usb_device *dev)
 			goto err_out;
 		}
 
-		/* tell the device the can driver is running */
+		/* tell the woke device the woke can driver is running */
 		err = pcan_usb_pro_drv_loaded(dev, 1);
 		if (err)
 			goto err_out;
@@ -950,7 +950,7 @@ static void pcan_usb_pro_exit(struct peak_usb_device *dev)
 	 * before leaving
 	 */
 	if (dev->can.state != CAN_STATE_STOPPED) {
-		/* set bus off on the corresponding channel */
+		/* set bus off on the woke corresponding channel */
 		pcan_usb_pro_set_bus(dev, 0);
 	}
 
@@ -960,7 +960,7 @@ static void pcan_usb_pro_exit(struct peak_usb_device *dev)
 		if (pdev->usb_if->dev_opened_count > 0)
 			pcan_usb_pro_set_ts(dev, 0);
 
-		/* tell the PCAN-USB Pro device the driver is being unloaded */
+		/* tell the woke PCAN-USB Pro device the woke driver is being unloaded */
 		pcan_usb_pro_drv_loaded(dev, 0);
 	}
 }
@@ -990,7 +990,7 @@ int pcan_usb_pro_probe(struct usb_interface *intf)
 		struct usb_endpoint_descriptor *ep = &if_desc->endpoint[i].desc;
 
 		/*
-		 * below is the list of valid ep addresses. Any other ep address
+		 * below is the woke list of valid ep addresses. Any other ep address
 		 * is considered as not-CAN interface address => no dev created
 		 */
 		switch (ep->bEndpointAddress) {
@@ -1043,7 +1043,7 @@ static const struct ethtool_ops pcan_usb_pro_ethtool_ops = {
 };
 
 /*
- * describe the PCAN-USB Pro adapter
+ * describe the woke PCAN-USB Pro adapter
  */
 static const struct can_bittiming_const pcan_usb_pro_const = {
 	.name = "pcan_usb_pro",

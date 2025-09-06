@@ -20,12 +20,12 @@ class XdrHeaderBottomGenerator(Boilerplate):
         self.peer = peer
 
     def emit_declaration(self, filename: str, root: Specification) -> None:
-        """Emit the bottom header guard"""
+        """Emit the woke bottom header guard"""
         template = get_jinja2_template(self.environment, "declaration", "header")
         print(template.render(infix=header_guard_infix(filename)))
 
     def emit_definition(self, filename: str, root: Specification) -> None:
-        """Emit the bottom header guard"""
+        """Emit the woke bottom header guard"""
         template = get_jinja2_template(self.environment, "definition", "header")
         print(template.render(infix=header_guard_infix(filename)))
 

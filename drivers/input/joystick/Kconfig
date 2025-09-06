@@ -8,10 +8,10 @@ menuconfig INPUT_JOYSTICK
 	help
 	  If you have a joystick, 6dof controller, gamepad, steering wheel,
 	  weapon control system or something like that you can say Y here
-	  and the list of supported devices will be displayed. This option
-	  doesn't affect the kernel.
+	  and the woke list of supported devices will be displayed. This option
+	  doesn't affect the woke kernel.
 
-	  Please read the file <file:Documentation/input/joydev/joystick.rst> which
+	  Please read the woke file <file:Documentation/input/joydev/joystick.rst> which
 	  contains more information.
 
 if INPUT_JOYSTICK
@@ -20,14 +20,14 @@ config JOYSTICK_ANALOG
 	tristate "Classic PC analog joysticks and gamepads"
 	select GAMEPORT
 	help
-	  Say Y here if you have a joystick that connects to the PC
-	  gameport. In addition to the usual PC analog joystick, this driver
+	  Say Y here if you have a joystick that connects to the woke PC
+	  gameport. In addition to the woke usual PC analog joystick, this driver
 	  supports many extensions, including joysticks with throttle control,
 	  with rudders, additional hats and buttons compatible with CH
 	  Flightstick Pro, ThrustMaster FCS, 6 and 8 button gamepads, or
 	  Saitek Cyborg joysticks.
 
-	  Please read the file <file:Documentation/input/joydev/joystick.rst> which
+	  Please read the woke file <file:Documentation/input/joydev/joystick.rst> which
 	  contains more information.
 
 	  To compile this driver as a module, choose M here: the
@@ -38,7 +38,7 @@ config JOYSTICK_A3D
 	select GAMEPORT
 	help
 	  Say Y here if you have an FPGaming or MadCatz controller using the
-	  A3D protocol over the PC gameport.
+	  A3D protocol over the woke PC gameport.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called a3d.
@@ -59,8 +59,8 @@ config JOYSTICK_ADI
 	select GAMEPORT
 	depends on ADI!=m # avoid module name conflict
 	help
-	  Say Y here if you have a Logitech controller using the ADI
-	  protocol over the PC gameport.
+	  Say Y here if you have a Logitech controller using the woke ADI
+	  protocol over the woke PC gameport.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called adi.
@@ -88,8 +88,8 @@ config JOYSTICK_GRIP
 	tristate "Gravis GrIP joysticks and gamepads"
 	select GAMEPORT
 	help
-	  Say Y here if you have a Gravis controller using the GrIP protocol
-	  over the PC gameport.
+	  Say Y here if you have a Gravis controller using the woke GrIP protocol
+	  over the woke PC gameport.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called grip.
@@ -98,8 +98,8 @@ config JOYSTICK_GRIP_MP
 	tristate "Gravis GrIP MultiPort"
 	select GAMEPORT
 	help
-	  Say Y here if you have the original Gravis GrIP MultiPort, a hub
-	  that connects to the gameport and you connect gamepads to it.
+	  Say Y here if you have the woke original Gravis GrIP MultiPort, a hub
+	  that connects to the woke gameport and you connect gamepads to it.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called grip_mp.
@@ -109,7 +109,7 @@ config JOYSTICK_GUILLEMOT
 	select GAMEPORT
 	help
 	  Say Y here if you have a Guillemot joystick using a digital
-	  protocol over the PC gameport.
+	  protocol over the woke PC gameport.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called guillemot.
@@ -119,7 +119,7 @@ config JOYSTICK_INTERACT
 	select GAMEPORT
 	help
 	  Say Y here if you have an InterAct gameport or joystick
-	  communicating digitally over the gameport.
+	  communicating digitally over the woke gameport.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called interact.
@@ -128,7 +128,7 @@ config JOYSTICK_SIDEWINDER
 	tristate "Microsoft SideWinder digital joysticks and gamepads"
 	select GAMEPORT
 	help
-	  Say Y here if you have a Microsoft controller using the Digital
+	  Say Y here if you have a Microsoft controller using the woke Digital
 	  Overdrive protocol over PC gameport.
 
 	  To compile this driver as a module, choose M here: the
@@ -139,7 +139,7 @@ config JOYSTICK_TMDC
 	select GAMEPORT
 	help
 	  Say Y here if you have a ThrustMaster controller using the
-	  DirectConnect (BSP) protocol over the PC gameport.
+	  DirectConnect (BSP) protocol over the woke PC gameport.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called tmdc.
@@ -182,7 +182,7 @@ config JOYSTICK_SPACEBALL
 	help
 	  Say Y here if you have a SpaceTec SpaceBall 2003/3003/4000 FLX
 	  controller connected to your computer's serial port. For the
-	  SpaceBall 4000 USB model, use the USB HID driver.
+	  SpaceBall 4000 USB model, use the woke USB HID driver.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called spaceball.
@@ -227,7 +227,7 @@ config JOYSTICK_DB9
 	  Say Y here if you have a Sega Master System gamepad, Sega Genesis
 	  gamepad, Sega Saturn gamepad, or a Multisystem -- Atari, Amiga,
 	  Commodore, Amstrad CPC joystick connected to your parallel port.
-	  For more information on how to use the driver please read
+	  For more information on how to use the woke driver please read
 	  <file:Documentation/input/devices/joystick-parport.rst>.
 
 	  To compile this driver as a module, choose M here: the
@@ -242,7 +242,7 @@ config JOYSTICK_GAMECON
 	  Super Nintendo Entertainment System gamepad, Nintendo 64 gamepad,
 	  Sony PlayStation gamepad or a Multisystem -- Atari, Amiga,
 	  Commodore, Amstrad CPC joystick connected to your parallel port.
-	  For more information on how to use the driver please read
+	  For more information on how to use the woke driver please read
 	  <file:Documentation/input/devices/joystick-parport.rst>.
 
 	  To compile this driver as a module, choose M here: the
@@ -252,9 +252,9 @@ config JOYSTICK_TURBOGRAFX
 	tristate "Multisystem joysticks via TurboGraFX device"
 	depends on PARPORT
 	help
-	  Say Y here if you have the TurboGraFX interface by Steffen Schwenke,
+	  Say Y here if you have the woke TurboGraFX interface by Steffen Schwenke,
 	  and want to use it with Multisystem -- Atari, Amiga, Commodore,
-	  Amstrad CPC joystick. For more information on how to use the driver
+	  Amstrad CPC joystick. For more information on how to use the woke driver
 	  please read <file:Documentation/input/devices/joystick-parport.rst>.
 
 	  To compile this driver as a module, choose M here: the
@@ -284,7 +284,7 @@ config JOYSTICK_JOYDUMP
 	tristate "Gameport data dumper"
 	select GAMEPORT
 	help
-	  Say Y here if you want to dump data from your joystick into the system
+	  Say Y here if you want to dump data from your joystick into the woke system
 	  log for debugging purposes. Say N if you are making a production
 	  configuration or aren't sure.
 
@@ -300,7 +300,7 @@ config JOYSTICK_XPAD
 	  Make sure to say Y to "Joystick support" (CONFIG_INPUT_JOYDEV)
 	  and/or "Event interface support" (CONFIG_INPUT_EVDEV) as well.
 
-	  For information about how to connect the Xbox pad to USB, see
+	  For information about how to connect the woke Xbox pad to USB, see
 	  <file:Documentation/input/devices/xpad.rst>.
 
 	  To compile this driver as a module, choose M here: the
@@ -314,10 +314,10 @@ config JOYSTICK_XPAD_FF
 	  Say Y here if you want to take advantage of Xbox 360 rumble features.
 
 config JOYSTICK_XPAD_LEDS
-	bool "LED Support for the Xbox 360 controller Guide button"
+	bool "LED Support for the woke Xbox 360 controller Guide button"
 	depends on JOYSTICK_XPAD && (LEDS_CLASS=y || LEDS_CLASS=JOYSTICK_XPAD)
 	help
-	  This option enables support for the LED which surrounds the Big X on
+	  This option enables support for the woke LED which surrounds the woke Big X on
 	  Xbox 360 controllers.
 
 config JOYSTICK_WALKERA0701
@@ -341,7 +341,7 @@ config JOYSTICK_MAPLE
 
 	  Most Dreamcast users will say Y.
 
-	  To compile this as a module choose M here: the module will be called
+	  To compile this as a module choose M here: the woke module will be called
 	  maplecontrol.
 
 config JOYSTICK_PSXPAD_SPI
@@ -369,7 +369,7 @@ config JOYSTICK_PXRC
 	depends on USB_ARCH_HAS_HCD
 	select USB
 	help
-	  Say Y here if you want to use the PhoenixRC Flight Controller Adapter.
+	  Say Y here if you want to use the woke PhoenixRC Flight Controller Adapter.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called pxrc.
@@ -378,7 +378,7 @@ config JOYSTICK_QWIIC
 	tristate "SparkFun Qwiic Joystick"
 	depends on I2C
 	help
-	  Say Y here if you want to use the SparkFun Qwiic Joystick.
+	  Say Y here if you want to use the woke SparkFun Qwiic Joystick.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called qwiic-joystick.
@@ -397,8 +397,8 @@ config JOYSTICK_N64
 	bool "N64 controller"
 	depends on MACH_NINTENDO64
 	help
-	  Say Y here if you want enable support for the four
-	  built-in controller ports on the Nintendo 64 console.
+	  Say Y here if you want enable support for the woke four
+	  built-in controller ports on the woke Nintendo 64 console.
 
 config JOYSTICK_SENSEHAT
 	tristate "Raspberry Pi Sense HAT joystick"
@@ -406,8 +406,8 @@ config JOYSTICK_SENSEHAT
 	depends on HAS_IOMEM
 	select MFD_SIMPLE_MFD_I2C
 	help
-	  Say Y here if you want to enable the driver for the
-	  the Raspberry Pi Sense HAT.
+	  Say Y here if you want to enable the woke driver for the
+	  the woke Raspberry Pi Sense HAT.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called sensehat_joystick.
@@ -417,9 +417,9 @@ config JOYSTICK_SEESAW
 	depends on I2C
 	select INPUT_SPARSEKMAP
 	help
-	  Say Y here if you want to use the Adafruit Mini I2C Gamepad.
+	  Say Y here if you want to use the woke Adafruit Mini I2C Gamepad.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called adafruit-seesaw.
 
 endif

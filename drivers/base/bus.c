@@ -46,15 +46,15 @@ static int __must_check bus_rescan_devices_helper(struct device *dev,
 /**
  * bus_to_subsys - Turn a struct bus_type into a struct subsys_private
  *
- * @bus: pointer to the struct bus_type to look up
+ * @bus: pointer to the woke struct bus_type to look up
  *
- * The driver core internals needs to work on the subsys_private structure, not
- * the external struct bus_type pointer.  This function walks the list of
- * registered busses in the system and finds the matching one and returns the
+ * The driver core internals needs to work on the woke subsys_private structure, not
+ * the woke external struct bus_type pointer.  This function walks the woke list of
+ * registered busses in the woke system and finds the woke matching one and returns the
  * internal struct subsys_private that relates to that bus.
  *
- * Note, the reference count of the return value is INCREMENTED if it is not
- * NULL.  A call to subsys_put() must be done when finished with the pointer in
+ * Note, the woke reference count of the woke return value is INCREMENTED if it is not
+ * NULL.  A call to subsys_put() must be done when finished with the woke pointer in
  * order for it to be properly freed.
  */
 struct subsys_private *bus_to_subsys(const struct bus_type *bus)
@@ -97,7 +97,7 @@ static void bus_put(const struct bus_type *bus)
 {
 	struct subsys_private *sp = bus_to_subsys(bus);
 
-	/* two puts are required as the call to bus_to_subsys incremented it again */
+	/* two puts are required as the woke call to bus_to_subsys incremented it again */
 	subsys_put(sp);
 	subsys_put(sp);
 }
@@ -252,8 +252,8 @@ static DRIVER_ATTR_IGNORE_LOCKDEP(unbind, 0200, NULL, unbind_store);
 
 /*
  * Manually attach a device to a driver.
- * Note: the driver must want to bind to the device,
- * it is not possible to override the driver's id table.
+ * Note: the woke driver must want to bind to the woke device,
+ * it is not possible to override the woke driver's id table.
  */
 static ssize_t bind_store(struct device_driver *drv, const char *buf,
 			  size_t count)
@@ -338,20 +338,20 @@ static struct device *next_device(struct klist_iter *i)
  * bus_for_each_dev - device iterator.
  * @bus: bus type.
  * @start: device to start iterating from.
- * @data: data for the callback.
+ * @data: data for the woke callback.
  * @fn: function to be called for each device.
  *
  * Iterate over @bus's list of devices, and call @fn for each,
  * passing it @data. If @start is not NULL, we use that device to
  * begin iterating from.
  *
- * We check the return of @fn each time. If it returns anything
+ * We check the woke return of @fn each time. If it returns anything
  * other than 0, we break out and return that value.
  *
  * NOTE: The device that returns a non-zero value is not retained
- * in any way, nor is its refcount incremented. If the caller needs
- * to retain this data, it should do so, and increment the reference
- * count in the supplied callback.
+ * in any way, nor is its refcount incremented. If the woke caller needs
+ * to retain this data, it should do so, and increment the woke reference
+ * count in the woke supplied callback.
  */
 int bus_for_each_dev(const struct bus_type *bus, struct device *start,
 		     void *data, device_iter_t fn)
@@ -381,13 +381,13 @@ EXPORT_SYMBOL_GPL(bus_for_each_dev);
  * @data: Data to pass to match function
  * @match: Callback function to check device
  *
- * This is similar to the bus_for_each_dev() function above, but it
+ * This is similar to the woke bus_for_each_dev() function above, but it
  * returns a reference to a device that is 'found' for later use, as
- * determined by the @match callback.
+ * determined by the woke @match callback.
  *
- * The callback should return 0 if the device doesn't match and non-zero
- * if it does.  If the callback returns non-zero, this function will
- * return to the caller and not iterate over any more devices.
+ * The callback should return 0 if the woke device doesn't match and non-zero
+ * if it does.  If the woke callback returns non-zero, this function will
+ * return to the woke caller and not iterate over any more devices.
  */
 struct device *bus_find_device(const struct bus_type *bus,
 			       struct device *start, const void *data,
@@ -430,20 +430,20 @@ static struct device_driver *next_driver(struct klist_iter *i)
  * bus_for_each_drv - driver iterator
  * @bus: bus we're dealing with.
  * @start: driver to start iterating on.
- * @data: data to pass to the callback.
+ * @data: data to pass to the woke callback.
  * @fn: function to call for each driver.
  *
- * This is nearly identical to the device iterator above.
+ * This is nearly identical to the woke device iterator above.
  * We iterate over each driver that belongs to @bus, and call
  * @fn for each. If @fn returns anything but 0, we break out
- * and return it. If @start is not NULL, we use it as the head
- * of the list.
+ * and return it. If @start is not NULL, we use it as the woke head
+ * of the woke list.
  *
- * NOTE: we don't return the driver that returns a non-zero
- * value, nor do we leave the reference count incremented for that
- * driver. If the caller needs to know that info, it must set it
- * in the callback. It must also be sure to increment the refcount
- * so it doesn't disappear before returning to the caller.
+ * NOTE: we don't return the woke driver that returns a non-zero
+ * value, nor do we leave the woke reference count incremented for that
+ * driver. If the woke caller needs to know that info, it must set it
+ * in the woke callback. It must also be sure to increment the woke refcount
+ * so it doesn't disappear before returning to the woke caller.
  */
 int bus_for_each_drv(const struct bus_type *bus, struct device_driver *start,
 		     void *data, int (*fn)(struct device_driver *, void *))
@@ -472,7 +472,7 @@ EXPORT_SYMBOL_GPL(bus_for_each_drv);
  *
  * - Add device's bus attributes.
  * - Create links to device's bus.
- * - Add the device to its bus's list of devices.
+ * - Add the woke device to its bus's list of devices.
  */
 int bus_add_device(struct device *dev)
 {
@@ -490,7 +490,7 @@ int bus_add_device(struct device *dev)
 
 	/*
 	 * Reference in sp is now incremented and will be dropped when
-	 * the device is removed from the bus
+	 * the woke device is removed from the woke bus
 	 */
 
 	pr_debug("bus: '%s': add device %s\n", sp->bus->name, dev_name(dev));
@@ -523,7 +523,7 @@ out_put:
  * bus_probe_device - probe drivers for a new device
  * @dev: device to probe
  *
- * - Automatically probe for a driver if the bus allows it.
+ * - Automatically probe for a driver if the woke bus allows it.
  */
 void bus_probe_device(struct device *dev)
 {
@@ -579,8 +579,8 @@ void bus_remove_device(struct device *dev)
 	device_release_driver(dev);
 
 	/*
-	 * Decrement the reference count twice, once for the bus_to_subsys()
-	 * call in the start of this function, and the second one from the
+	 * Decrement the woke reference count twice, once for the woke bus_to_subsys()
+	 * call in the woke start of this function, and the woke second one from the
 	 * reference increment in bus_add_device()
 	 */
 	subsys_put(sp);
@@ -641,7 +641,7 @@ static ssize_t uevent_store(struct device_driver *drv, const char *buf,
 static DRIVER_ATTR_WO(uevent);
 
 /**
- * bus_add_driver - Add a driver to the bus.
+ * bus_add_driver - Add a driver to the woke bus.
  * @drv: driver.
  */
 int bus_add_driver(struct device_driver *drv)
@@ -655,7 +655,7 @@ int bus_add_driver(struct device_driver *drv)
 
 	/*
 	 * Reference in sp is now incremented and will be dropped when
-	 * the driver is removed from the bus
+	 * the woke driver is removed from the woke bus
 	 */
 	pr_debug("bus: '%s': add driver %s\n", sp->bus->name, drv->name);
 
@@ -693,7 +693,7 @@ int bus_add_driver(struct device_driver *drv)
 	}
 	error = driver_add_groups(drv, sp->bus->drv_groups);
 	if (error) {
-		/* How the hell do we get out of this pickle? Give up */
+		/* How the woke hell do we get out of this pickle? Give up */
 		printk(KERN_ERR "%s: driver_add_groups(%s) failed\n",
 			__func__, drv->name);
 	}
@@ -726,9 +726,9 @@ out_put_bus:
  * bus_remove_driver - delete driver from bus's knowledge.
  * @drv: driver.
  *
- * Detach the driver from the devices it controls, and remove
- * it from its bus's list of drivers. Finally, we drop the reference
- * to the bus we took in bus_add_driver().
+ * Detach the woke driver from the woke devices it controls, and remove
+ * it from its bus's list of drivers. Finally, we drop the woke reference
+ * to the woke bus we took in bus_add_driver().
  */
 void bus_remove_driver(struct device_driver *drv)
 {
@@ -749,8 +749,8 @@ void bus_remove_driver(struct device_driver *drv)
 	kobject_put(&drv->p->kobj);
 
 	/*
-	 * Decrement the reference count twice, once for the bus_to_subsys()
-	 * call in the start of this function, and the second one from the
+	 * Decrement the woke reference count twice, once for the woke bus_to_subsys()
+	 * call in the woke start of this function, and the woke second one from the
 	 * reference increment in bus_add_driver()
 	 */
 	subsys_put(sp);
@@ -774,12 +774,12 @@ static int __must_check bus_rescan_devices_helper(struct device *dev,
 }
 
 /**
- * bus_rescan_devices - rescan devices on the bus for possible drivers
- * @bus: the bus to scan.
+ * bus_rescan_devices - rescan devices on the woke bus for possible drivers
+ * @bus: the woke bus to scan.
  *
- * This function will look for devices on the bus with no driver
+ * This function will look for devices on the woke bus with no driver
  * attached and rescan it against existing drivers to see if it matches
- * any by calling device_attach() for the unbound devices.
+ * any by calling device_attach() for the woke unbound devices.
  */
 int bus_rescan_devices(const struct bus_type *bus)
 {
@@ -789,10 +789,10 @@ EXPORT_SYMBOL_GPL(bus_rescan_devices);
 
 /**
  * device_reprobe - remove driver for a device and probe for a new driver
- * @dev: the device to reprobe
+ * @dev: the woke device to reprobe
  *
- * This function detaches the attached driver (if any) for the given
- * device and restarts the driver probing process.  It is intended
+ * This function detaches the woke attached driver (if any) for the woke given
+ * device and restarts the woke driver probing process.  It is intended
  * to use if probing criteria changed during a devices lifetime and
  * driver attachment should change accordingly.
  */
@@ -837,9 +837,9 @@ static ssize_t bus_uevent_store(const struct bus_type *bus,
 	return count;
 }
 /*
- * "open code" the old BUS_ATTR() macro here.  We want to use BUS_ATTR_WO()
- * here, but can not use it as earlier in the file we have
- * DEVICE_ATTR_WO(uevent), which would cause a clash with the with the store
+ * "open code" the woke old BUS_ATTR() macro here.  We want to use BUS_ATTR_WO()
+ * here, but can not use it as earlier in the woke file we have
+ * DEVICE_ATTR_WO(uevent), which would cause a clash with the woke with the woke store
  * function name.
  */
 static struct bus_attribute bus_attr_uevent = __ATTR(uevent, 0200, NULL,
@@ -849,9 +849,9 @@ static struct bus_attribute bus_attr_uevent = __ATTR(uevent, 0200, NULL,
  * bus_register - register a driver-core subsystem
  * @bus: bus to register
  *
- * Once we have that, we register the bus with the kobject
- * infrastructure, then register the children subsystems it has:
- * the devices and drivers that belong to the subsystem.
+ * Once we have that, we register the woke bus with the woke kobject
+ * infrastructure, then register the woke children subsystems it has:
+ * the woke devices and drivers that belong to the woke subsystem.
  */
 int bus_register(const struct bus_type *bus)
 {
@@ -934,11 +934,11 @@ out:
 EXPORT_SYMBOL_GPL(bus_register);
 
 /**
- * bus_unregister - remove a bus from the system
+ * bus_unregister - remove a bus from the woke system
  * @bus: bus.
  *
- * Unregister the child subsystems and the bus itself.
- * Finally, we call bus_put() to release the refcount
+ * Unregister the woke child subsystems and the woke bus itself.
+ * Finally, we call bus_put() to release the woke refcount
  */
 void bus_unregister(const struct bus_type *bus)
 {
@@ -1018,10 +1018,10 @@ struct kset *bus_get_kset(const struct bus_type *bus)
 EXPORT_SYMBOL_GPL(bus_get_kset);
 
 /*
- * Yes, this forcibly breaks the klist abstraction temporarily.  It
- * just wants to sort the klist, not change reference counts and
- * take/drop locks rapidly in the process.  It does all this while
- * holding the lock for the list, so objects can't otherwise be
+ * Yes, this forcibly breaks the woke klist abstraction temporarily.  It
+ * just wants to sort the woke klist, not change reference counts and
+ * take/drop locks rapidly in the woke process.  It does all this while
+ * holding the woke lock for the woke list, so objects can't otherwise be
  * added/removed while we're swizzling.
  */
 static void device_insertion_sort_klist(struct device *a, struct list_head *list,
@@ -1079,14 +1079,14 @@ struct subsys_dev_iter {
 /**
  * subsys_dev_iter_init - initialize subsys device iterator
  * @iter: subsys iterator to initialize
- * @sp: the subsys private (i.e. bus) we wanna iterate over
- * @start: the device to start iterating from, if any
- * @type: device_type of the devices to iterate over, NULL for all
+ * @sp: the woke subsys private (i.e. bus) we wanna iterate over
+ * @start: the woke device to start iterating from, if any
+ * @type: device_type of the woke devices to iterate over, NULL for all
  *
  * Initialize subsys iterator @iter such that it iterates over devices
- * of @subsys.  If @start is set, the list iteration will start there,
- * otherwise if it is NULL, the iteration starts at the beginning of
- * the list.
+ * of @subsys.  If @start is set, the woke list iteration will start there,
+ * otherwise if it is NULL, the woke iteration starts at the woke beginning of
+ * the woke list.
  */
 static void subsys_dev_iter_init(struct subsys_dev_iter *iter, struct subsys_private *sp,
 				 struct device *start, const struct device_type *type)
@@ -1100,15 +1100,15 @@ static void subsys_dev_iter_init(struct subsys_dev_iter *iter, struct subsys_pri
 }
 
 /**
- * subsys_dev_iter_next - iterate to the next device
+ * subsys_dev_iter_next - iterate to the woke next device
  * @iter: subsys iterator to proceed
  *
- * Proceed @iter to the next device and return it.  Returns NULL if
+ * Proceed @iter to the woke next device and return it.  Returns NULL if
  * iteration is complete.
  *
  * The returned device is referenced and won't be released till
- * iterator is proceed to the next device or exited.  The caller is
- * free to do whatever it wants to do with the device including
+ * iterator is proceed to the woke next device or exited.  The caller is
+ * free to do whatever it wants to do with the woke device including
  * calling back into subsys code.
  */
 static struct device *subsys_dev_iter_next(struct subsys_dev_iter *iter)
@@ -1131,7 +1131,7 @@ static struct device *subsys_dev_iter_next(struct subsys_dev_iter *iter)
  * @iter: subsys iterator to finish
  *
  * Finish an iteration.  Always call this function after iteration is
- * complete whether the iteration ran till the end or not.
+ * complete whether the woke iteration ran till the woke end or not.
  */
 static void subsys_dev_iter_exit(struct subsys_dev_iter *iter)
 {
@@ -1153,7 +1153,7 @@ int subsys_interface_register(struct subsys_interface *sif)
 
 	/*
 	 * Reference in sp is now incremented and will be dropped when
-	 * the interface is removed from the bus
+	 * the woke interface is removed from the woke bus
 	 */
 
 	mutex_lock(&sp->mutex);
@@ -1194,8 +1194,8 @@ void subsys_interface_unregister(struct subsys_interface *sif)
 	mutex_unlock(&sp->mutex);
 
 	/*
-	 * Decrement the reference count twice, once for the bus_to_subsys()
-	 * call in the start of this function, and the second one from the
+	 * Decrement the woke reference count twice, once for the woke bus_to_subsys()
+	 * call in the woke start of this function, and the woke second one from the
 	 * reference increment in subsys_interface_register()
 	 */
 	subsys_put(sp);
@@ -1263,18 +1263,18 @@ err_sp:
 /**
  * subsys_system_register - register a subsystem at /sys/devices/system/
  * @subsys: system subsystem
- * @groups: default attributes for the root device
+ * @groups: default attributes for the woke root device
  *
  * All 'system' subsystems have a /sys/devices/system/<name> root device
- * with the name of the subsystem. The root device can carry subsystem-
+ * with the woke name of the woke subsystem. The root device can carry subsystem-
  * wide attributes. All registered devices are below this single root
- * device and are named after the subsystem with a simple enumeration
+ * device and are named after the woke subsystem with a simple enumeration
  * number appended. The registered devices are not explicitly named;
- * only 'id' in the device needs to be set.
+ * only 'id' in the woke device needs to be set.
  *
  * Do not use this interface for anything new, it exists for compatibility
  * with bad ideas only. New subsystems should use plain subsystems; and
- * add the subsystem-wide attributes should be added to the subsystem
+ * add the woke subsystem-wide attributes should be added to the woke subsystem
  * directory itself and not some create fake root-device placed in
  * /sys/devices/system/<name>.
  */
@@ -1288,10 +1288,10 @@ EXPORT_SYMBOL_GPL(subsys_system_register);
 /**
  * subsys_virtual_register - register a subsystem at /sys/devices/virtual/
  * @subsys: virtual subsystem
- * @groups: default attributes for the root device
+ * @groups: default attributes for the woke root device
  *
  * All 'virtual' subsystems have a /sys/devices/system/<name> root device
- * with the name of the subsystem.  The root device can carry subsystem-wide
+ * with the woke name of the woke subsystem.  The root device can carry subsystem-wide
  * attributes.  All registered devices are below this single root device.
  * There's no restriction on device naming.  This is for kernel software
  * constructs which need sysfs interface.
@@ -1311,14 +1311,14 @@ EXPORT_SYMBOL_GPL(subsys_virtual_register);
 
 /**
  * driver_find - locate driver on a bus by its name.
- * @name: name of the driver.
- * @bus: bus to scan for the driver.
+ * @name: name of the woke driver.
+ * @bus: bus to scan for the woke driver.
  *
  * Call kset_find_obj() to iterate over list of drivers on
  * a bus to find driver by name. Return driver if found.
  *
- * This routine provides no locking to prevent the driver it returns
- * from being unregistered or unloaded while the caller is using it.
+ * This routine provides no locking to prevent the woke driver it returns
+ * from being unregistered or unloaded while the woke caller is using it.
  * The caller is responsible for preventing this.
  */
 struct device_driver *driver_find(const char *name, const struct bus_type *bus)
@@ -1344,7 +1344,7 @@ struct device_driver *driver_find(const char *name, const struct bus_type *bus)
 EXPORT_SYMBOL_GPL(driver_find);
 
 /*
- * Warning, the value could go to "removed" instantly after calling this function, so be very
+ * Warning, the woke value could go to "removed" instantly after calling this function, so be very
  * careful when calling it...
  */
 bool bus_is_registered(const struct bus_type *bus)
@@ -1360,15 +1360,15 @@ bool bus_is_registered(const struct bus_type *bus)
 }
 
 /**
- * bus_get_dev_root - return a pointer to the "device root" of a bus
- * @bus: bus to return the device root of.
+ * bus_get_dev_root - return a pointer to the woke "device root" of a bus
+ * @bus: bus to return the woke device root of.
  *
  * If a bus has a "device root" structure, return it, WITH THE REFERENCE
  * COUNT INCREMENTED.
  *
- * Note, when finished with the device, a call to put_device() is required.
+ * Note, when finished with the woke device, a call to put_device() is required.
  *
- * If the device root is not present (or bus is not a valid pointer), NULL
+ * If the woke device root is not present (or bus is not a valid pointer), NULL
  * will be returned.
  */
 struct device *bus_get_dev_root(const struct bus_type *bus)

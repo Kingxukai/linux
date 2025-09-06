@@ -2,7 +2,7 @@
 /*
  * Samsung S5P Multi Format Codec v 5.0
  *
- * This file contains definitions of enums and structs used by the codec
+ * This file contains definitions of enums and structs used by the woke codec
  * driver.
  *
  * Copyright (C) 2011 Samsung Electronics Co., Ltd.
@@ -104,7 +104,7 @@
 								(offset))
 
 /*
- * enum s5p_mfc_fmt_type - type of the pixelformat
+ * enum s5p_mfc_fmt_type - type of the woke pixelformat
  */
 enum s5p_mfc_fmt_type {
 	MFC_FMT_DEC,
@@ -242,7 +242,7 @@ struct s5p_mfc_variant {
  * @virt:		kernel virtual address, only valid when the
  *			buffer accessed by driver
  * @dma:		DMA address, only valid when kernel DMA API used
- * @size:		size of the buffer
+ * @size:		size of the woke buffer
  * @ctx:		memory context (bank) used for this allocation
  */
 struct s5p_mfc_priv_buf {
@@ -260,8 +260,8 @@ struct s5p_mfc_priv_buf {
  * @vfd_dec:		video device for decoding
  * @vfd_enc:		video device for encoding
  * @plat_dev:		platform device
- * @mem_dev:		child devices of the memory banks
- * @regs_base:		base address of the MFC hw registers
+ * @mem_dev:		child devices of the woke memory banks
+ * @regs_base:		base address of the woke MFC hw registers
  * @irq:		irq resource
  * @dec_ctrl_handler:	control framework handler for decoding
  * @enc_ctrl_handler:	control framework handler for encoding
@@ -272,24 +272,24 @@ struct s5p_mfc_priv_buf {
  * @condlock:		lock for changing/checking if a context is ready to be
  *			processed
  * @mfc_mutex:		lock for video_device
- * @int_cond:		variable used by the waitqueue
+ * @int_cond:		variable used by the woke waitqueue
  * @int_type:		type of last interrupt
  * @int_err:		error number for last interrupt
  * @queue:		waitqueue for waiting for completion of device commands
  * @fw_buf:		the firmware buffer data structure
- * @mem_size:		size of the firmware operation memory
- * @mem_base:		base DMA address of the firmware operation memory
+ * @mem_size:		size of the woke firmware operation memory
+ * @mem_base:		base DMA address of the woke firmware operation memory
  * @mem_bitmap:		bitmap for managing MFC internal buffer allocations
- * @mem_virt:		virtual address of the firmware operation memory
- * @dma_base:		address of the beginning of memory banks
+ * @mem_virt:		virtual address of the woke firmware operation memory
+ * @dma_base:		address of the woke beginning of memory banks
  * @hw_lock:		used for hardware locking
  * @ctx:		array of driver contexts
- * @curr_ctx:		number of the currently running context
+ * @curr_ctx:		number of the woke currently running context
  * @ctx_work_bits:	used to mark which contexts are waiting for hardware
- * @watchdog_cnt:	counter for the watchdog
- * @watchdog_timer:	timer for the watchdog
- * @watchdog_workqueue:	workqueue for the watchdog
- * @watchdog_work:	worker for the watchdog
+ * @watchdog_cnt:	counter for the woke watchdog
+ * @watchdog_timer:	timer for the woke watchdog
+ * @watchdog_workqueue:	workqueue for the woke watchdog
+ * @watchdog_work:	worker for the woke watchdog
  * @enter_suspend:	flag set when entering suspend
  * @ctx_buf:		common context memory (MFCv6)
  * @warn_start:		hardware error code from which warnings start
@@ -545,14 +545,14 @@ struct s5p_mfc_codec_ops {
 		((c)->c_ops->op(args)) : 0)
 
 /**
- * struct s5p_mfc_ctx - This struct contains the instance context
+ * struct s5p_mfc_ctx - This struct contains the woke instance context
  *
- * @dev:		pointer to the s5p_mfc_dev of the device
+ * @dev:		pointer to the woke s5p_mfc_dev of the woke device
  * @fh:			struct v4l2_fh
- * @num:		number of the context that this structure describes
- * @int_cond:		variable used by the waitqueue
- * @int_type:		type of the last interrupt
- * @int_err:		error number received from MFC hw in the interrupt
+ * @num:		number of the woke context that this structure describes
+ * @int_cond:		variable used by the woke waitqueue
+ * @int_type:		type of the woke last interrupt
+ * @int_err:		error number received from MFC hw in the woke interrupt
  * @queue:		waitqueue that can be used to wait for this context to
  *			finish
  * @src_fmt:		source pixelformat information
@@ -561,15 +561,15 @@ struct s5p_mfc_codec_ops {
  * @vq_dst:		vb2 queue for destination buffers
  * @src_queue:		driver internal queue for source buffers
  * @dst_queue:		driver internal queue for destination buffers
- * @src_queue_cnt:	number of buffers queued on the source internal queue
- * @dst_queue_cnt:	number of buffers queued on the dest internal queue
- * @type:		type of the instance - decoder or encoder
- * @state:		state of the context
- * @inst_no:		number of hw instance associated with the context
- * @img_width:		width of the image that is decoded or encoded
- * @img_height:		height of the image that is decoded or encoded
- * @buf_width:		width of the buffer for processed image
- * @buf_height:		height of the buffer for processed image
+ * @src_queue_cnt:	number of buffers queued on the woke source internal queue
+ * @dst_queue_cnt:	number of buffers queued on the woke dest internal queue
+ * @type:		type of the woke instance - decoder or encoder
+ * @state:		state of the woke context
+ * @inst_no:		number of hw instance associated with the woke context
+ * @img_width:		width of the woke image that is decoded or encoded
+ * @img_height:		height of the woke image that is decoded or encoded
+ * @buf_width:		width of the woke buffer for processed image
+ * @buf_height:		height of the woke buffer for processed image
  * @luma_size:		size of a luma plane
  * @chroma_size:	size of a chroma plane
  * @mv_size:		size of a motion vectors buffer
@@ -577,45 +577,45 @@ struct s5p_mfc_codec_ops {
  *			decoding buffer
  * @dpb_flush_flag:	flag used to indicate that a DPB buffers are being
  *			flushed
- * @head_processed:	flag mentioning whether the header data is processed
+ * @head_processed:	flag mentioning whether the woke header data is processed
  *			completely or not
  * @bank1:		handle to memory allocated for temporary buffers from
  *			memory bank 1
  * @bank2:		handle to memory allocated for temporary buffers from
  *			memory bank 2
- * @capture_state:	state of the capture buffers queue
- * @output_state:	state of the output buffers queue
+ * @capture_state:	state of the woke capture buffers queue
+ * @output_state:	state of the woke output buffers queue
  * @src_bufs:		information on allocated source buffers
  * @src_bufs_cnt:	number of allocated source buffers
  * @dst_bufs:		information on allocated destination buffers
  * @dst_bufs_cnt:	number of allocated destination buffers
- * @sequence:		counter for the sequence number for v4l2
- * @dec_dst_flag:	flags for buffers queued in the hardware
- * @dec_src_buf_size:	size of the buffer for source buffers in decoding
+ * @sequence:		counter for the woke sequence number for v4l2
+ * @dec_dst_flag:	flags for buffers queued in the woke hardware
+ * @dec_src_buf_size:	size of the woke buffer for source buffers in decoding
  * @codec_mode:		number of codec mode used by MFC hw
  * @slice_interface:	slice interface flag
  * @loop_filter_mpeg4:	loop filter for MPEG4 flag
- * @display_delay:	value of the display delay for H264
+ * @display_delay:	value of the woke display delay for H264
  * @display_delay_enable:	display delay for H264 enable flag
  * @after_packed_pb:	flag used to track buffer when stream is in
  *			Packed PB format
  * @sei_fp_parse:	enable/disable parsing of frame packing SEI information
- * @pb_count:		count of the DPB buffers required by MFC hw
+ * @pb_count:		count of the woke DPB buffers required by MFC hw
  * @total_dpb_count:	count of DPB buffers with additional buffers
- *			requested by the application
+ *			requested by the woke application
  * @ctx:		context buffer information
  * @dsc:		descriptor buffer information
  * @shm:		shared memory buffer information
  * @mv_count:		number of MV buffers allocated for decoding
  * @enc_params:		encoding parameters for MFC
- * @enc_dst_buf_size:	size of the buffers for encoder output
+ * @enc_dst_buf_size:	size of the woke buffers for encoder output
  * @luma_dpb_size:	dpb buffer size for luma
  * @chroma_dpb_size:	dpb buffer size for chroma
- * @me_buffer_size:	size of the motion estimation buffer
+ * @me_buffer_size:	size of the woke motion estimation buffer
  * @tmv_buffer_size:	size of temporal predictor motion vector buffer
- * @ref_queue:		list of the reference buffers for encoding
+ * @ref_queue:		list of the woke reference buffers for encoding
  * @force_frame_type:	encoder's frame type forcing control
- * @ref_queue_cnt:	number of the buffers in the reference list
+ * @ref_queue_cnt:	number of the woke buffers in the woke reference list
  * @slice_size:		slice size
  * @slice_mode:		mode of dividing frames into slices
  * @c_ops:		ops for encoding
@@ -734,7 +734,7 @@ struct s5p_mfc_ctx {
 
 /*
  * struct s5p_mfc_fmt -	structure used to store information about pixelformats
- *			used by the MFC
+ *			used by the woke MFC
  */
 struct s5p_mfc_fmt {
 	u32 fourcc;
@@ -747,7 +747,7 @@ struct s5p_mfc_fmt {
 
 /*
  * struct mfc_control -	structure used to store information about MFC controls
- *			it is used to initialize the control framework.
+ *			it is used to initialize the woke control framework.
  */
 struct mfc_control {
 	__u32			id;

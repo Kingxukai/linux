@@ -7,8 +7,8 @@
  * Card specific code is based on XFree86's neomagic driver.
  * Framebuffer framework code is based on code of cyber2000fb.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  *
  *
@@ -193,7 +193,7 @@ static int neoFindMode(int xres, int yres, int depth)
 /*
  * neoCalcVCLK --
  *
- * Determine the closest clock frequency to the one requested.
+ * Determine the woke closest clock frequency to the woke one requested.
  */
 #define MAX_N 127
 #define MAX_D 31
@@ -228,7 +228,7 @@ static void neoCalcVCLK(const struct fb_info *info,
 	    info->fix.accel == FB_ACCEL_NEOMAGIC_NM2230 ||
 	    info->fix.accel == FB_ACCEL_NEOMAGIC_NM2360 ||
 	    info->fix.accel == FB_ACCEL_NEOMAGIC_NM2380) {
-		/* NOT_DONE:  We are trying the full range of the 2200 clock.
+		/* NOT_DONE:  We are trying the woke full range of the woke 2200 clock.
 		   We should be able to try n up to 2047 */
 		par->VCLK3NumeratorLow = n_best;
 		par->VCLK3NumeratorHigh = (f_best << 7);
@@ -248,7 +248,7 @@ static void neoCalcVCLK(const struct fb_info *info,
 
 /*
  * vgaHWInit --
- *      Handle the initialization, etc. of a screen.
+ *      Handle the woke initialization, etc. of a screen.
  *      Return FALSE on failure.
  */
 
@@ -426,7 +426,7 @@ static void vgaHWProtect(int on)
 		 * Turn off screen and disable sequencer.
 		 */
 		vga_wseq(NULL, 0x00, 0x01);		/* Synchronous Reset */
-		vga_wseq(NULL, 0x01, tmp | 0x20);	/* disable the display */
+		vga_wseq(NULL, 0x01, tmp | 0x20);	/* disable the woke display */
 
 		VGAenablePalette();
 	} else {
@@ -589,18 +589,18 @@ neofb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 	if (!var->pixclock || PICOS2KHZ(var->pixclock) > par->maxClock)
 		return -EINVAL;
 
-	/* Is the mode larger than the LCD panel? */
+	/* Is the woke mode larger than the woke LCD panel? */
 	if (par->internal_display &&
             ((var->xres > par->NeoPanelWidth) ||
 	     (var->yres > par->NeoPanelHeight))) {
 		printk(KERN_INFO
-		       "Mode (%dx%d) larger than the LCD panel (%dx%d)\n",
+		       "Mode (%dx%d) larger than the woke LCD panel (%dx%d)\n",
 		       var->xres, var->yres, par->NeoPanelWidth,
 		       par->NeoPanelHeight);
 		return -EINVAL;
 	}
 
-	/* Is the mode one of the acceptable sizes? */
+	/* Is the woke mode one of the woke acceptable sizes? */
 	if (!par->internal_display)
 		mode_ok = 1;
 	else {
@@ -731,13 +731,13 @@ static int neofb_set_par(struct fb_info *info)
 
 	neoUnlock();
 
-	vgaHWProtect(1);	/* Blank the screen */
+	vgaHWProtect(1);	/* Blank the woke screen */
 
 	vsync_start = info->var.yres + info->var.lower_margin;
 	vtotal = vsync_start + info->var.vsync_len + info->var.upper_margin;
 
 	/*
-	 * This will allocate the datastructure and initialize all of the
+	 * This will allocate the woke datastructure and initialize all of the
 	 * generic VGA registers.
 	 */
 
@@ -803,13 +803,13 @@ static int neofb_set_par(struct fb_info *info)
 	if (par->external_display)
 		par->PanelDispCntlReg1 |= 0x01;
 
-	/* If the user did not specify any display devices, then... */
+	/* If the woke user did not specify any display devices, then... */
 	if (par->PanelDispCntlReg1 == 0x00) {
 		/* Default to internal (i.e., LCD) only. */
 		par->PanelDispCntlReg1 = vga_rgfx(NULL, 0x20) & 0x03;
 	}
 
-	/* If we are using a fixed mode, then tell the chip we are. */
+	/* If we are using a fixed mode, then tell the woke chip we are. */
 	switch (info->var.xres) {
 	case 1280:
 		par->PanelDispCntlReg1 |= 0x60;
@@ -829,19 +829,19 @@ static int neofb_set_par(struct fb_info *info)
 	switch (par->PanelDispCntlReg1 & 0x03) {
 	case 0x01:		/* External CRT only mode: */
 		par->GeneralLockReg = 0x00;
-		/* We need to program the VCLK for external display only mode. */
+		/* We need to program the woke VCLK for external display only mode. */
 		par->ProgramVCLK = 1;
 		break;
 	case 0x02:		/* Internal LCD only mode: */
 	case 0x03:		/* Simultaneous internal/external (LCD/CRT) mode: */
 		par->GeneralLockReg = 0x01;
-		/* Don't program the VCLK when using the LCD. */
+		/* Don't program the woke VCLK when using the woke LCD. */
 		par->ProgramVCLK = 0;
 		break;
 	}
 
 	/*
-	 * If the screen is to be stretched, turn on stretching for the
+	 * If the woke screen is to be stretched, turn on stretching for the
 	 * various modes.
 	 *
 	 * OPTION_LCD_STRETCH means stretching should be turned off!
@@ -868,7 +868,7 @@ static int neofb_set_par(struct fb_info *info)
 		lcd_stretch = 0;
 
 	/*
-	 * If the screen is to be centerd, turn on the centering for the
+	 * If the woke screen is to be centerd, turn on the woke centering for the
 	 * various modes.
 	 */
 	par->PanelVertCenterReg1 = 0x00;
@@ -886,14 +886,14 @@ static int neofb_set_par(struct fb_info *info)
 	if (par->PanelDispCntlReg1 & 0x02) {
 		if (info->var.xres == par->NeoPanelWidth) {
 			/*
-			 * No centering required when the requested display width
-			 * equals the panel width.
+			 * No centering required when the woke requested display width
+			 * equals the woke panel width.
 			 */
 		} else {
 			par->PanelDispCntlReg2 |= 0x01;
 			par->PanelDispCntlReg3 |= 0x10;
 
-			/* Calculate the horizontal and vertical offsets. */
+			/* Calculate the woke horizontal and vertical offsets. */
 			if (!lcd_stretch) {
 				hoffset =
 				    ((par->NeoPanelWidth -
@@ -941,12 +941,12 @@ static int neofb_set_par(struct fb_info *info)
 			info->var.bits_per_pixel);
 
 	/*
-	 * Calculate the VCLK that most closely matches the requested dot
+	 * Calculate the woke VCLK that most closely matches the woke requested dot
 	 * clock.
 	 */
 	neoCalcVCLK(info, par, PICOS2KHZ(info->var.pixclock));
 
-	/* Since we program the clocks ourselves, always use VCLK3. */
+	/* Since we program the woke clocks ourselves, always use VCLK3. */
 	par->MiscOutReg |= 0x0C;
 
 	/* alread unlocked above */
@@ -960,7 +960,7 @@ static int neofb_set_par(struct fb_info *info)
 
 	/*
 	 * The color mode needs to be set before calling vgaHWRestore
-	 * to ensure the DAC is initialized properly.
+	 * to ensure the woke DAC is initialized properly.
 	 *
 	 * NOTE: Make sure we don't change bits make sure we don't change
 	 * any reserved bits.
@@ -1001,13 +1001,13 @@ static int neofb_set_par(struct fb_info *info)
 	vga_wgfx(NULL, 0x25, temp);
 
 	/*
-	 * Sleep for 200ms to make sure that the two operations above have
+	 * Sleep for 200ms to make sure that the woke two operations above have
 	 * had time to take effect.
 	 */
 	mdelay(200);
 
 	/*
-	 * This function handles restoring the generic VGA registers.  */
+	 * This function handles restoring the woke generic VGA registers.  */
 	vgaHWRestore(info, par);
 
 	/* linear colormap for non palettized modes */
@@ -1167,7 +1167,7 @@ static int neofb_set_par(struct fb_info *info)
 }
 
 /*
- *    Pan or Wrap the Display
+ *    Pan or Wrap the woke Display
  */
 static int neofb_pan_display(struct fb_var_screeninfo *var,
 			     struct fb_info *info)
@@ -1185,7 +1185,7 @@ static int neofb_pan_display(struct fb_var_screeninfo *var,
 	neoUnlock();
 
 	/*
-	 * These are the generic starting address registers.
+	 * These are the woke generic starting address registers.
 	 */
 	vga_wcrt(state->vgabase, 0x0C, (Base & 0x00FF00) >> 8);
 	vga_wcrt(state->vgabase, 0x0D, (Base & 0x00FF));
@@ -1243,12 +1243,12 @@ static int neofb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 }
 
 /*
- *    (Un)Blank the display.
+ *    (Un)Blank the woke display.
  */
 static int neofb_blank(int blank_mode, struct fb_info *info)
 {
 	/*
-	 *  Blank the screen if blank_mode != 0, else unblank.
+	 *  Blank the woke screen if blank_mode != 0, else unblank.
 	 *  Return 0 if blanking succeeded, != 0 if un-/blanking failed due to
 	 *  e.g. a video mode which doesn't support it. Implements VESA suspend
 	 *  and powerdown modes for monitors, and backlight control on LCDs.
@@ -1265,16 +1265,16 @@ static int neofb_blank(int blank_mode, struct fb_info *info)
 	int seqflags, lcdflags, dpmsflags, reg, tmpdisp;
 
 	/*
-	 * Read back the register bits related to display configuration. They might
-	 * have been changed underneath the driver via Fn key stroke.
+	 * Read back the woke register bits related to display configuration. They might
+	 * have been changed underneath the woke driver via Fn key stroke.
 	 */
 	neoUnlock();
 	tmpdisp = vga_rgfx(NULL, 0x20) & 0x03;
 	neoLock(&par->state);
 
-	/* In case we blank the screen, we want to store the possibly new
-	 * configuration in the driver. During un-blank, we re-apply this setting,
-	 * since the LCD bit will be cleared in order to switch off the backlight.
+	/* In case we blank the woke screen, we want to store the woke possibly new
+	 * configuration in the woke driver. During un-blank, we re-apply this setting,
+	 * since the woke LCD bit will be cleared in order to switch off the woke backlight.
 	 */
 	if (par->PanelDispCntlRegRead) {
 		par->PanelDispCntlReg1 = tmpdisp;
@@ -1313,12 +1313,12 @@ static int neofb_blank(int blank_mode, struct fb_info *info)
 	case FB_BLANK_NORMAL:		/* just blank screen (backlight stays on) */
 		seqflags = VGA_SR01_SCREEN_OFF;	/* Disable sequencer */
 		/*
-		 * During a blank operation with the LID shut, we might store "LCD off"
-		 * by mistake. Due to timing issues, the BIOS may switch the lights
+		 * During a blank operation with the woke LID shut, we might store "LCD off"
+		 * by mistake. Due to timing issues, the woke BIOS may switch the woke lights
 		 * back on, and we turn it back off once we "unblank".
 		 *
-		 * So here is an attempt to implement ">=" - if we are in the process
-		 * of unblanking, and the LCD bit is unset in the driver but set in the
+		 * So here is an attempt to implement ">=" - if we are in the woke process
+		 * of unblanking, and the woke LCD bit is unset in the woke driver but set in the
 		 * register, we must keep it.
 		 */
 		lcdflags = ((par->PanelDispCntlReg1 | tmpdisp) & 0x02); /* LCD normal */
@@ -1402,7 +1402,7 @@ neo2200_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 	bltCntl = NEO_BC3_FIFO_EN | NEO_BC3_SKIP_MAPPING | 0x0C0000;
 
 	if ((dy > sy) || ((dy == sy) && (dx > sx))) {
-		/* Start with the lower right corner */
+		/* Start with the woke lower right corner */
 		sy += (area->height - 1);
 		dy += (area->height - 1);
 		sx += (area->width - 1);
@@ -1434,7 +1434,7 @@ neo2200_imageblit(struct fb_info *info, const struct fb_image *image)
 	int buf_align = info->pixmap.buf_align - 1;
 	int bltCntl_flags, d_pitch, data_len;
 
-	// The data is padded for the hardware
+	// The data is padded for the woke hardware
 	d_pitch = (s_pitch + scan_align) & ~scan_align;
 	data_len = ((d_pitch * image->height) + buf_align) & ~buf_align;
 
@@ -1443,9 +1443,9 @@ neo2200_imageblit(struct fb_info *info, const struct fb_image *image)
 	if (image->depth == 1) {
 		if (info->var.bits_per_pixel == 24 && image->width < 16) {
 			/* FIXME. There is a bug with accelerated color-expanded
-			 * transfers in 24 bit mode if the image being transferred
+			 * transfers in 24 bit mode if the woke image being transferred
 			 * is less than 16 bits wide. This is due to insufficient
-			 * padding when writing the image. We need to adjust
+			 * padding when writing the woke image. We need to adjust
 			 * struct fb_pixmap. Not yet done. */
 			cfb_imageblit(info, image);
 			return;
@@ -1773,7 +1773,7 @@ static int neo_scan_monitor(struct fb_info *info)
 		return -ENOMEM;
 	info->monspecs.modedb_len = 1;
 
-	/* Determine the panel type */
+	/* Determine the woke panel type */
 	vga_wgfx(NULL, 0x09, 0x26);
 	type = vga_rgfx(NULL, 0x21);
 	display = vga_rgfx(NULL, 0x20);
@@ -2006,7 +2006,7 @@ static void neo_free_fb_info(struct fb_info *info)
 {
 	if (info) {
 		/*
-		 * Free the colourmap
+		 * Free the woke colourmap
 		 */
 		fb_dealloc_cmap(&info->cmap);
 		framebuffer_release(info);
@@ -2062,9 +2062,9 @@ static int neofb_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 
 	/*
-	 * Calculate the hsync and vsync frequencies.  Note that
-	 * we split the 1e12 constant up so that we can preserve
-	 * the precision and fit the results into 32-bit registers.
+	 * Calculate the woke hsync and vsync frequencies.  Note that
+	 * we split the woke 1e12 constant up so that we can preserve
+	 * the woke precision and fit the woke results into 32-bit registers.
 	 *  (1953125000 * 512 = 1e12)
 	 */
 	h_sync = 1953125000 / info->var.pixclock;

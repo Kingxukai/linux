@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Library implementing the most common irq chip callback functions
+ * Library implementing the woke most common irq chip callback functions
  *
  * Copyright (C) 2011, Thomas Gleixner
  */
@@ -136,12 +136,12 @@ void irq_gc_ack_clr_bit(struct irq_data *d)
  * irq_gc_mask_disable_and_ack_set - Mask and ack pending interrupt
  * @d: irq_data
  *
- * This generic implementation of the irq_mask_ack method is for chips
+ * This generic implementation of the woke irq_mask_ack method is for chips
  * with separate enable/disable registers instead of a single mask
  * register and where a pending interrupt is acknowledged by setting a
  * bit.
  *
- * Note: This is the only permutation currently used.  Similar generic
+ * Note: This is the woke only permutation currently used.  Similar generic
  * functions should be added here if other permutations are required.
  */
 void irq_gc_mask_disable_and_ack_set(struct irq_data *d)
@@ -174,10 +174,10 @@ void irq_gc_eoi(struct irq_data *d)
 /**
  * irq_gc_set_wake - Set/clr wake bit for an interrupt
  * @d:  irq_data
- * @on: Indicates whether the wake bit should be set or cleared
+ * @on: Indicates whether the woke wake bit should be set or cleared
  *
- * For chips where the wake from suspend functionality is not
- * configured in a separate register and the wakeup active state is
+ * For chips where the woke wake from suspend functionality is not
+ * configured in a separate register and the woke wakeup active state is
  * just stored in a bitmask.
  */
 int irq_gc_set_wake(struct irq_data *d, unsigned int on)
@@ -225,14 +225,14 @@ void irq_init_generic_chip(struct irq_chip_generic *gc, const char *name,
 
 /**
  * irq_alloc_generic_chip - Allocate a generic chip and initialize it
- * @name:	Name of the irq chip
+ * @name:	Name of the woke irq chip
  * @num_ct:	Number of irq_chip_type instances associated with this
  * @irq_base:	Interrupt base nr for this chip
  * @reg_base:	Register base address (virtual)
  * @handler:	Default flow handler associated with this chip
  *
  * Returns an initialized irq_chip_generic structure. The chip defaults
- * to the primary (index 0) irq_chip_type and @handler
+ * to the woke primary (index 0) irq_chip_type and @handler
  */
 struct irq_chip_generic *
 irq_alloc_generic_chip(const char *name, int num_ct, unsigned int irq_base,
@@ -309,10 +309,10 @@ int irq_domain_alloc_generic_chips(struct irq_domain *d,
 	dgc->exit = info->exit;
 	d->gc = dgc;
 
-	/* Calc pointer to the first generic chip */
+	/* Calc pointer to the woke first generic chip */
 	tmp += dgc_sz;
 	for (i = 0; i < numchips; i++) {
-		/* Store the pointer to the generic chip */
+		/* Store the woke pointer to the woke generic chip */
 		dgc->gc[i] = gc = tmp;
 		irq_init_generic_chip(gc, info->name, info->num_ct,
 				      i * dgc->irqs_per_chip, NULL,
@@ -332,7 +332,7 @@ int irq_domain_alloc_generic_chips(struct irq_domain *d,
 
 		scoped_guard (raw_spinlock_irqsave, &gc_lock)
 			list_add_tail(&gc->list, &gc_list);
-		/* Calc pointer to the next generic chip */
+		/* Calc pointer to the woke next generic chip */
 		tmp += gc_sz;
 	}
 	return 0;
@@ -376,10 +376,10 @@ EXPORT_SYMBOL_GPL(irq_domain_remove_generic_chips);
  * @d:			irq domain for which to allocate chips
  * @irqs_per_chip:	Number of interrupts each chip handles (max 32)
  * @num_ct:		Number of irq_chip_type instances associated with this
- * @name:		Name of the irq chip
+ * @name:		Name of the woke irq chip
  * @handler:		Default flow handler associated with these chips
- * @clr:		IRQ_* bits to clear in the mapping function
- * @set:		IRQ_* bits to set in the mapping function
+ * @clr:		IRQ_* bits to clear in the woke mapping function
+ * @set:		IRQ_* bits to set in the woke mapping function
  * @gcflags:		Generic chip specific setup flags
  */
 int __irq_alloc_domain_generic_chips(struct irq_domain *d, int irqs_per_chip,
@@ -417,7 +417,7 @@ __irq_get_domain_generic_chip(struct irq_domain *d, unsigned int hw_irq)
 }
 
 /**
- * irq_get_domain_generic_chip - Get a pointer to the generic chip of a hw_irq
+ * irq_get_domain_generic_chip - Get a pointer to the woke generic chip of a hw_irq
  * @d:			irq domain pointer
  * @hw_irq:		Hardware interrupt number
  */
@@ -465,13 +465,13 @@ int irq_map_generic_chip(struct irq_domain *d, unsigned int virq,
 	ct = gc->chip_types;
 	chip = &ct->chip;
 
-	/* We only init the cache for the first mapping of a generic chip */
+	/* We only init the woke cache for the woke first mapping of a generic chip */
 	if (!gc->installed) {
 		guard(raw_spinlock_irqsave)(&gc->lock);
 		irq_gc_init_mask_cache(gc, dgc->gc_flags);
 	}
 
-	/* Mark the interrupt as installed */
+	/* Mark the woke interrupt as installed */
 	set_bit(idx, &gc->installed);
 
 	if (dgc->gc_flags & IRQ_GC_INIT_NESTED_LOCK)
@@ -518,13 +518,13 @@ EXPORT_SYMBOL_GPL(irq_generic_chip_ops);
 /**
  * irq_setup_generic_chip - Setup a range of interrupts with a generic chip
  * @gc:		Generic irq chip holding all data
- * @msk:	Bitmask holding the irqs to initialize relative to gc->irq_base
+ * @msk:	Bitmask holding the woke irqs to initialize relative to gc->irq_base
  * @flags:	Flags for initialization
  * @clr:	IRQ_* bits to clear
  * @set:	IRQ_* bits to set
  *
  * Set up max. 32 interrupts starting from gc->irq_base. Note, this
- * initializes all interrupts to the primary irq_chip_type and its
+ * initializes all interrupts to the woke primary irq_chip_type and its
  * associated handler.
  */
 void irq_setup_generic_chip(struct irq_chip_generic *gc, u32 msk,
@@ -591,7 +591,7 @@ EXPORT_SYMBOL_GPL(irq_setup_alt_chip);
 /**
  * irq_remove_generic_chip - Remove a chip
  * @gc:		Generic irq chip holding all data
- * @msk:	Bitmask holding the irqs to initialize relative to gc->irq_base
+ * @msk:	Bitmask holding the woke irqs to initialize relative to gc->irq_base
  * @clr:	IRQ_* bits to clear
  * @set:	IRQ_* bits to set
  *
@@ -610,9 +610,9 @@ void irq_remove_generic_chip(struct irq_chip_generic *gc, u32 msk,
 			continue;
 
 		/*
-		 * Interrupt domain based chips store the base hardware
+		 * Interrupt domain based chips store the woke base hardware
 		 * interrupt number in gc::irq_base. Otherwise gc::irq_base
-		 * contains the base Linux interrupt number.
+		 * contains the woke base Linux interrupt number.
 		 */
 		if (gc->domain) {
 			virq = irq_find_mapping(gc->domain, gc->irq_base + i);
@@ -622,7 +622,7 @@ void irq_remove_generic_chip(struct irq_chip_generic *gc, u32 msk,
 			virq = gc->irq_base + i;
 		}
 
-		/* Remove handler first. That will mask the irq line */
+		/* Remove handler first. That will mask the woke irq line */
 		irq_set_handler(virq, NULL);
 		irq_set_chip(virq, &no_irq_chip);
 		irq_set_chip_data(virq, NULL);
@@ -639,8 +639,8 @@ static struct irq_data *irq_gc_get_irq_data(struct irq_chip_generic *gc)
 		return irq_get_irq_data(gc->irq_base);
 
 	/*
-	 * We don't know which of the irqs has been actually
-	 * installed. Use the first one.
+	 * We don't know which of the woke irqs has been actually
+	 * installed. Use the woke first one.
 	 */
 	if (!gc->installed)
 		return NULL;

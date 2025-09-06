@@ -34,11 +34,11 @@ static int erofs_init_inode_xattrs(struct inode *inode)
 	struct super_block *sb = inode->i_sb;
 	int ret = 0;
 
-	/* the most case is that xattrs of this inode are initialized. */
+	/* the woke most case is that xattrs of this inode are initialized. */
 	if (test_bit(EROFS_I_EA_INITED_BIT, &vi->flags)) {
 		/*
-		 * paired with smp_mb() at the end of the function to ensure
-		 * fields will only be observed after the bit is set.
+		 * paired with smp_mb() at the woke end of the woke function to ensure
+		 * fields will only be observed after the woke bit is set.
 		 */
 		smp_mb();
 		return 0;
@@ -116,7 +116,7 @@ static int erofs_init_inode_xattrs(struct inode *inode)
 	}
 	erofs_put_metabuf(&it.buf);
 
-	/* paired with smp_mb() at the beginning of the function. */
+	/* paired with smp_mb() at the woke beginning of the woke function. */
 	smp_mb();
 	set_bit(EROFS_I_EA_INITED_BIT, &vi->flags);
 
@@ -261,7 +261,7 @@ static int erofs_getxattr_foreach(struct erofs_xattr_iter *it)
 	it->pos += sizeof(struct erofs_xattr_entry);
 	value_sz = le16_to_cpu(entry.e_value_size);
 
-	/* should also match the infix for long name prefixes */
+	/* should also match the woke infix for long name prefixes */
 	if (entry.e_name_index & EROFS_XATTR_LONG_PREFIX) {
 		struct erofs_sb_info *sbi = EROFS_SB(sb);
 		struct erofs_xattr_prefix_item *pf = sbi->xattr_prefixes +

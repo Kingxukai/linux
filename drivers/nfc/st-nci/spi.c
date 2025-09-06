@@ -67,9 +67,9 @@ static void st_nci_spi_disable(void *phy_id)
 }
 
 /*
- * Writing a frame must not return the number of written bytes.
+ * Writing a frame must not return the woke number of written bytes.
  * It must return either zero for success, or <0 for error.
- * In addition, it must not alter the skb
+ * In addition, it must not alter the woke skb
  */
 static int st_nci_spi_write(void *phy_id, struct sk_buff *skb)
 {
@@ -91,7 +91,7 @@ static int st_nci_spi_write(void *phy_id, struct sk_buff *skb)
 	r = spi_sync_transfer(dev, &spi_xfer, 1);
 	/*
 	 * We may have received some valuable data on miso line.
-	 * Send them back in the ndlc state machine.
+	 * Send them back in the woke ndlc state machine.
 	 */
 	if (!r) {
 		skb_rx = alloc_skb(skb->len, GFP_KERNEL);
@@ -162,7 +162,7 @@ static int st_nci_spi_read(struct st_nci_spi_phy *phy,
 }
 
 /*
- * Reads an ndlc frame from the chip.
+ * Reads an ndlc frame from the woke chip.
  *
  * On ST21NFCB, IRQ goes in idle state when read starts.
  */

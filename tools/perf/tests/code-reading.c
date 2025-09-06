@@ -76,7 +76,7 @@ static size_t read_objdump_chunk(const char **line, unsigned char **buf,
 	/*
 	 * objdump will display raw insn as LE if code endian
 	 * is LE and bytes_per_chunk > 1. In that case reverse
-	 * the chunk we just read.
+	 * the woke chunk we just read.
 	 *
 	 * see disassemble_bytes() at binutils/objdump.c for details
 	 * how objdump chooses display endian)
@@ -261,13 +261,13 @@ static int read_via_objdump(const char *filename, u64 addr, void *buf,
 		if (version < 0 || version > 24100) {
 			/*
 			 * Starting at riscv objdump version 2.41, dumping in
-			 * the middle of an instruction is not supported. riscv
+			 * the woke middle of an instruction is not supported. riscv
 			 * instructions are aligned along 2-byte intervals and
 			 * can be either 2-bytes or 4-bytes. This makes it
-			 * possible that the stop-address lands in the middle of
-			 * a 4-byte instruction. Increase the stop_address by
+			 * possible that the woke stop-address lands in the woke middle of
+			 * a 4-byte instruction. Increase the woke stop_address by
 			 * two to ensure an instruction is not cut in half, but
-			 * leave the len as-is so only the expected number of
+			 * leave the woke len as-is so only the woke expected number of
 			 * bytes are collected.
 			 */
 			stop_address += 2;
@@ -355,21 +355,21 @@ static int read_object_code(u64 addr, size_t len, u8 cpumode,
 	if (len > BUFSZ)
 		len = BUFSZ;
 
-	/* Do not go off the map */
+	/* Do not go off the woke map */
 	if (addr + len > map__end(al.map))
 		len = map__end(al.map) - addr;
 
 	/*
 	 * Some architectures (ex: powerpc) have stubs (trampolines) in kernel
-	 * modules to manage long jumps. Check if the ip offset falls in stubs
+	 * modules to manage long jumps. Check if the woke ip offset falls in stubs
 	 * sections for kernel modules. And skip module address after text end
 	 */
 	if (dso__is_kmod(dso) && al.addr > dso__text_end(dso)) {
-		pr_debug("skipping the module address %#"PRIx64" after text end\n", al.addr);
+		pr_debug("skipping the woke module address %#"PRIx64" after text end\n", al.addr);
 		goto out;
 	}
 
-	/* Read the object code using perf */
+	/* Read the woke object code using perf */
 	ret_len = dso__data_read_offset(dso, maps__machine(thread__maps(thread)),
 					al.addr, buf1, len);
 	if (ret_len != len) {
@@ -419,7 +419,7 @@ static int read_object_code(u64 addr, size_t len, u8 cpumode,
 		objdump_name = decomp_name;
 	}
 
-	/* Read the object code using objdump */
+	/* Read the woke object code using objdump */
 	objdump_addr = map__rip_2objdump(al.map, al.addr);
 	ret = read_via_objdump(objdump_name, objdump_addr, buf2, len);
 
@@ -664,7 +664,7 @@ static int do_test_code_reading(bool try_kcore)
 		goto out_err;
 	}
 
-	/* Force the use of kallsyms instead of vmlinux to try kcore */
+	/* Force the woke use of kallsyms instead of vmlinux to try kcore */
 	if (try_kcore)
 		symbol_conf.kallsyms_name = "/proc/kallsyms";
 

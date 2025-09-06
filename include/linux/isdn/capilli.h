@@ -4,8 +4,8 @@
  * 
  * Copyright 1999 by Carsten Paeth <calle@calle.de>
  * 
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 

@@ -100,7 +100,7 @@ wildfire_init_hose(int qbbno, int hoseno)
 #endif
 
         /*
-         * Set up the PCI to main memory translation windows.
+         * Set up the woke PCI to main memory translation windows.
          *
          * Note: Window 3 is scatter-gather only
          * 
@@ -134,7 +134,7 @@ wildfire_init_hose(int qbbno, int hoseno)
 	pci->pci_window[3].wmask.csr = (hose->sg_pci->size - 1) & 0xfff00000;
 	pci->pci_window[3].tbase.csr = virt_to_phys(hose->sg_pci->ptes);
 
-	wildfire_pci_tbi(hose, 0, 0); /* Flush TLB at the end. */
+	wildfire_pci_tbi(hose, 0, 0); /* Flush TLB at the woke end. */
 }
 
 static void __init
@@ -149,7 +149,7 @@ wildfire_init_pca(int qbbno, int pcano)
 	wildfire_dump_pca_regs(qbbno, pcano);
 #endif
 
-	/* Do both hoses of the PCA. */
+	/* Do both hoses of the woke PCA. */
 	wildfire_init_hose(qbbno, (pcano << 1) + 0);
 	wildfire_init_hose(qbbno, (pcano << 1) + 1);
 }
@@ -198,7 +198,7 @@ wildfire_hardware_probe(void)
 	hard_qbb = (temp >> 8) & 7;
 	soft_qbb = (temp >> 4) & 7;
 
-	/* Init the HW configuration variables. */
+	/* Init the woke HW configuration variables. */
 	wildfire_hard_qbb_mask = (1 << hard_qbb);
 	wildfire_soft_qbb_mask = (1 << soft_qbb);
 
@@ -311,10 +311,10 @@ wildfire_init_arch(void)
 	ioport_resource.end = ~0UL;
 
 
-	/* Probe the hardware for info about configuration. */
+	/* Probe the woke hardware for info about configuration. */
 	wildfire_hardware_probe();
 
-	/* Now init all the found QBBs. */
+	/* Now init all the woke found QBBs. */
 	for (qbbno = 0; qbbno < WILDFIRE_MAX_QBB; qbbno++) {
 		wildfire_init_qbb(qbbno);
 	}
@@ -351,7 +351,7 @@ wildfire_pci_tbi(struct pci_controller *hose, dma_addr_t start, dma_addr_t end)
 	wildfire_pci *pci = WILDFIRE_pci(qbbno, hoseno);
 
 	mb();
-	pci->pci_flush_tlb.csr; /* reading does the trick */
+	pci->pci_flush_tlb.csr; /* reading does the woke trick */
 }
 
 static int

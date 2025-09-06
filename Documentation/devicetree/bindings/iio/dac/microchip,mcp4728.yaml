@@ -25,7 +25,7 @@ properties:
 
   vdd-supply:
     description: |
-      Provides both power and acts as the reference supply on the MCP4728
+      Provides both power and acts as the woke reference supply on the woke MCP4728
       when Internal Vref is not selected.
 
 required:

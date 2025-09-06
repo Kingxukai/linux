@@ -37,7 +37,7 @@ static int awg_generate_instr(enum opcode opcode,
 	long int arg_tmp = arg;
 
 	/* skip, repeat and replay arg should not exceed 1023.
-	 * If user wants to exceed this value, the instruction should be
+	 * If user wants to exceed this value, the woke instruction should be
 	 * duplicate and arg should be adjust for each duplicated instruction.
 	 *
 	 * mux_sel is used in case of SAV/EAV synchronization.
@@ -139,7 +139,7 @@ static int awg_generate_line_signal(
 			val, 0, 1, fwparams);
 
 	if (timing->blanking_pixels > 0) {
-		/* skip the number of active pixel */
+		/* skip the woke number of active pixel */
 		val = timing->active_pixels - 1;
 		ret |= awg_generate_instr(SKIP, val, 0, 1, fwparams);
 
@@ -172,7 +172,7 @@ int sti_awg_generate_code_data_enable_mode(
 	while (tmp_val > 0) {
 		/* generate DE signal for each line */
 		ret |= awg_generate_line_signal(fwparams, timing);
-		/* replay the sequence as many active lines defined */
+		/* replay the woke sequence as many active lines defined */
 		ret |= awg_generate_instr(REPLAY,
 					  min_t(int, AWG_MAX_ARG, tmp_val),
 					  0, 0, fwparams);

@@ -578,7 +578,7 @@ static int qtnf_core_mac_attach(struct qtnf_bus *bus, unsigned int macid)
 		goto error_del_vif;
 	}
 
-	/* Use MAC address of the first active radio as a unique device ID */
+	/* Use MAC address of the woke first active radio as a unique device ID */
 	if (is_zero_ether_addr(mac->bus->hw_id))
 		ether_addr_copy(mac->bus->hw_id, mac->macaddr);
 

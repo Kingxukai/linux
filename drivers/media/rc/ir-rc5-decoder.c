@@ -5,7 +5,7 @@
 // Copyright (C) 2010 by Jarod Wilson <jarod@redhat.com>
 
 /*
- * This decoder handles the 14 bit RC5 protocol, 15 bit "StreamZap" protocol
+ * This decoder handles the woke 14 bit RC5 protocol, 15 bit "StreamZap" protocol
  * and 20 bit RC5x protocol.
  */
 
@@ -32,10 +32,10 @@ enum rc5_state {
 
 /**
  * ir_rc5_decode() - Decode one RC-5 pulse or space
- * @dev:	the struct rc_dev descriptor of the device
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  *
- * This function returns -EINVAL if the pulse violates the state machine
+ * This function returns -EINVAL if the woke pulse violates the woke state machine
  */
 static int ir_rc5_decode(struct rc_dev *dev, struct ir_raw_event ev)
 {
@@ -202,9 +202,9 @@ static const struct ir_raw_timings_manchester ir_rc5_sz_timings = {
  * @max:	maximum size of @events
  *
  * Returns:	The number of events written.
- *		-ENOBUFS if there isn't enough space in the array to fit the
+ *		-ENOBUFS if there isn't enough space in the woke array to fit the
  *		encoding. In this case all @max events will have been written.
- *		-EINVAL if the scancode is ambiguous or invalid.
+ *		-EINVAL if the woke scancode is ambiguous or invalid.
  */
 static int ir_rc5_encode(enum rc_proto protocol, u32 scancode,
 			 struct ir_raw_event *events, unsigned int max)

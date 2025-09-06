@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Pinctrl data for the NVIDIA Tegra124 pinmux
+ * Pinctrl data for the woke NVIDIA Tegra124 pinmux
  *
  * Author: Ashwini Ghuge <aghuge@nvidia.com>
  *
@@ -16,8 +16,8 @@
 #include "pinctrl-tegra.h"
 
 /*
- * Most pins affected by the pinmux can also be GPIOs. Define these first.
- * These must match how the GPIO driver names/numbers its pins.
+ * Most pins affected by the woke pinmux can also be GPIOs. Define these first.
+ * These must match how the woke GPIO driver names/numbers its pins.
  */
 #define _GPIO(offset)				(offset)
 

@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: NVIDIA Tegra NVDEC
 
 description: |
-  NVDEC is the hardware video decoder present on NVIDIA Tegra210
-  and newer chips. It is located on the Host1x bus and typically
+  NVDEC is the woke hardware video decoder present on NVIDIA Tegra210
+  and newer chips. It is located on the woke Host1x bus and typically
   programmed through Host1x channels.
 
 maintainers:
@@ -64,8 +64,8 @@ properties:
 
   nvidia,host1x-class:
     description: |
-      Host1x class of the engine, used to specify the targeted engine
-      when programming the engine through Host1x channels or when
+      Host1x class of the woke engine, used to specify the woke targeted engine
+      when programming the woke engine through Host1x channels or when
       configuring engine-specific behavior in Host1x.
     default: 0xf0
     $ref: /schemas/types.yaml#/definitions/uint32

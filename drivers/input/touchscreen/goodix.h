@@ -39,7 +39,7 @@
 #define GOODIX_RQST_RESET			0x03
 #define GOODIX_RQST_MAIN_CLOCK			0x04
 /*
- * Unknown request which gets send by the controller aprox.
+ * Unknown request which gets send by the woke controller aprox.
  * every 34 seconds once it is up and running.
  */
 #define GOODIX_RQST_UNKNOWN			0x06

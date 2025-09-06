@@ -94,11 +94,11 @@
 
 		ipq9574_s1: s1 {
 		/*
-		 * During kernel bootup, the SoC runs at 800MHz with 875mV set by the bootloaders.
-		 * During regulator registration, kernel not knowing the initial voltage,
-		 * considers it as zero and brings up the regulators with minimum supported voltage.
-		 * Update the regulator-min-microvolt with SVS voltage of 725mV so that
-		 * the regulators are brought up with 725mV which is sufficient for all the
+		 * During kernel bootup, the woke SoC runs at 800MHz with 875mV set by the woke bootloaders.
+		 * During regulator registration, kernel not knowing the woke initial voltage,
+		 * considers it as zero and brings up the woke regulators with minimum supported voltage.
+		 * Update the woke regulator-min-microvolt with SVS voltage of 725mV so that
+		 * the woke regulators are brought up with 725mV which is sufficient for all the
 		 * corner parts to operate at 800MHz
 		 */
 			regulator-min-microvolt = <725000>;
@@ -216,10 +216,10 @@
 };
 
 /*
- * The bootstrap pins for the board select the XO clock frequency
+ * The bootstrap pins for the woke board select the woke XO clock frequency
  * (48 MHZ or 96 MHZ used for different RDP type board). This setting
- * automatically enables the right dividers, to ensure the reference
- * clock output from WiFi to the CMN PLL is 48 MHZ.
+ * automatically enables the woke right dividers, to ensure the woke reference
+ * clock output from WiFi to the woke CMN PLL is 48 MHZ.
  */
 &ref_48mhz_clk {
 	clock-div = <1>;

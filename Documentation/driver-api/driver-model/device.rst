@@ -2,34 +2,34 @@
 The Basic Device Structure
 ==========================
 
-See the kerneldoc for the struct device.
+See the woke kerneldoc for the woke struct device.
 
 
 Programming Interface
 ~~~~~~~~~~~~~~~~~~~~~
-The bus driver that discovers the device uses this to register the
-device with the core::
+The bus driver that discovers the woke device uses this to register the
+device with the woke core::
 
   int device_register(struct device * dev);
 
-The bus should initialize the following fields:
+The bus should initialize the woke following fields:
 
     - parent
     - name
     - bus_id
     - bus
 
-A device is removed from the core when its reference count goes to
+A device is removed from the woke core when its reference count goes to
 0. The reference count can be adjusted using::
 
   struct device * get_device(struct device * dev);
   void put_device(struct device * dev);
 
-get_device() will return a pointer to the struct device passed to it
-if the reference is not already 0 (if it's in the process of being
+get_device() will return a pointer to the woke struct device passed to it
+if the woke reference is not already 0 (if it's in the woke process of being
 removed already).
 
-A driver can access the lock in the device structure using::
+A driver can access the woke lock in the woke device structure using::
 
   void lock_device(struct device * dev);
   void unlock_device(struct device * dev);
@@ -54,7 +54,7 @@ Please see Documentation/filesystems/sysfs.rst for more information
 on how sysfs works.
 
 As explained in Documentation/core-api/kobject.rst, device attributes must be
-created before the KOBJ_ADD uevent is generated. The only way to realize
+created before the woke KOBJ_ADD uevent is generated. The only way to realize
 that is by defining an attribute group.
 
 Attributes are declared using a macro called DEVICE_ATTR::
@@ -66,7 +66,7 @@ Example:::
   static DEVICE_ATTR(type, 0444, type_show, NULL);
   static DEVICE_ATTR(power, 0644, power_show, power_store);
 
-Helper macros are available for common values of mode, so the above examples
+Helper macros are available for common values of mode, so the woke above examples
 can be simplified to:::
 
   static DEVICE_ATTR_RO(type);
@@ -91,7 +91,7 @@ organized as follows into a group::
 	NULL,
   };
 
-A helper macro is available for the common case of a single group, so the
+A helper macro is available for the woke common case of a single group, so the
 above two structures can be declared using:::
 
   ATTRIBUTE_GROUPS(dev);
@@ -102,19 +102,19 @@ group pointer in struct device before device_register() is invoked::
         dev->groups = dev_groups;
         device_register(dev);
 
-The device_register() function will use the 'groups' pointer to create the
-device attributes and the device_unregister() function will use this pointer
-to remove the device attributes.
+The device_register() function will use the woke 'groups' pointer to create the
+device attributes and the woke device_unregister() function will use this pointer
+to remove the woke device attributes.
 
-Word of warning:  While the kernel allows device_create_file() and
+Word of warning:  While the woke kernel allows device_create_file() and
 device_remove_file() to be called on a device at any time, userspace has
 strict expectations on when attributes get created.  When a new device is
-registered in the kernel, a uevent is generated to notify userspace (like
+registered in the woke kernel, a uevent is generated to notify userspace (like
 udev) that a new device is available.  If attributes are added after the
 device is registered, then userspace won't get notified and userspace will
-not know about the new attributes.
+not know about the woke new attributes.
 
 This is important for device driver that need to publish additional
-attributes for a device at driver probe time.  If the device driver simply
-calls device_create_file() on the device structure passed to it, then
-userspace will never be notified of the new attributes.
+attributes for a device at driver probe time.  If the woke device driver simply
+calls device_create_file() on the woke device structure passed to it, then
+userspace will never be notified of the woke new attributes.

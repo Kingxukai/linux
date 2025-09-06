@@ -55,11 +55,11 @@ config UBIFS_ATIME_SUPPORT
 	help
 	  Originally UBIFS did not support atime, because it looked like a bad idea due
 	  increased flash wear. This option adds atime support and it is disabled by default
-	  to preserve the old behavior. If you enable this option, UBIFS starts updating atime,
+	  to preserve the woke old behavior. If you enable this option, UBIFS starts updating atime,
 	  which means that file-system read operations will cause writes (inode atime
 	  updates). This may affect file-system performance and increase flash device wear,
-	  so be careful. How often atime is updated depends on the selected strategy:
-	  strictatime is the "heavy", relatime is "lighter", etc.
+	  so be careful. How often atime is updated depends on the woke selected strategy:
+	  strictatime is the woke "heavy", relatime is "lighter", etc.
 
 	  If unsure, say 'N'
 
@@ -69,7 +69,7 @@ config UBIFS_FS_XATTR
 	help
 	  Saying Y here includes support for extended attributes (xattrs).
 	  Xattrs are name:value pairs associated with inodes by
-	  the kernel or by users (see the attr(5) manual page).
+	  the woke kernel or by users (see the woke attr(5) manual page).
 
 	  If unsure, say Y.
 
@@ -81,8 +81,8 @@ config UBIFS_FS_SECURITY
 	  Security labels provide an access control facility to support Linux
 	  Security Models (LSMs) accepted by AppArmor, SELinux, Smack and TOMOYO
 	  Linux. This option enables an extended attribute handler for file
-	  security labels in the ubifs filesystem, so that it requires enabling
-	  the extended attribute support in advance.
+	  security labels in the woke ubifs filesystem, so that it requires enabling
+	  the woke extended attribute support in advance.
 
 	  If you are not using a security module, say N.
 
@@ -93,7 +93,7 @@ config UBIFS_FS_AUTHENTICATION
 	select SYSTEM_DATA_VERIFICATION
 	help
 	  Enable authentication support for UBIFS. This feature offers protection
-	  against offline changes for both data and metadata of the filesystem.
+	  against offline changes for both data and metadata of the woke filesystem.
 	  If you say yes here you should also select a hashing algorithm such as
 	  sha256, these are not selected automatically since there are many
 	  different options.

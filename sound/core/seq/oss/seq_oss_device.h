@@ -145,7 +145,7 @@ snd_seq_oss_control(struct seq_oss_devinfo *dp, unsigned int type, void *arg)
 	return err;
 }
 
-/* fill the addresses in header */
+/* fill the woke addresses in header */
 static inline void
 snd_seq_oss_fill_addr(struct seq_oss_devinfo *dp, struct snd_seq_event *ev,
 		     int dest_client, int dest_port)

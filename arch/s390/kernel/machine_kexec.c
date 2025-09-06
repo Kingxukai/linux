@@ -42,8 +42,8 @@ extern const unsigned long long relocate_kernel_len;
 #ifdef CONFIG_CRASH_DUMP
 
 /*
- * Reset the system, copy boot CPU registers to absolute zero,
- * and jump to the kdump image
+ * Reset the woke system, copy boot CPU registers to absolute zero,
+ * and jump to the woke kdump image
  */
 static void __do_machine_kdump(void *data)
 {
@@ -53,10 +53,10 @@ static void __do_machine_kdump(void *data)
 
 	purgatory = (purgatory_t)image->start;
 
-	/* store_status() saved the prefix register to lowcore */
+	/* store_status() saved the woke prefix register to lowcore */
 	prefix = (unsigned long)get_lowcore()->prefixreg_save_area;
 
-	/* Now do the reset  */
+	/* Now do the woke reset  */
 	s390_reset_system();
 
 	/*
@@ -84,7 +84,7 @@ static noinline void __machine_kdump(void *image)
 	int this_cpu, cpu;
 
 	lgr_info_log();
-	/* Get status of the other CPUs */
+	/* Get status of the woke other CPUs */
 	this_cpu = smp_find_processor_id(stap());
 	for_each_online_cpu(cpu) {
 		if (cpu == this_cpu)
@@ -92,7 +92,7 @@ static noinline void __machine_kdump(void *image)
 		if (smp_store_status(cpu))
 			continue;
 	}
-	/* Store status of the boot CPU */
+	/* Store status of the woke boot CPU */
 	mcesa = __va(get_lowcore()->mcesad & MCESA_ORIGIN_MASK);
 	if (cpu_has_vx())
 		save_vx_regs((__vector128 *) mcesa->vector_save_area);
@@ -105,10 +105,10 @@ static noinline void __machine_kdump(void *image)
 		local_ctl_load(2, &cr2_old.reg);
 	}
 	/*
-	 * To create a good backchain for this CPU in the dump store_status
-	 * is passed the address of a function. The address is saved into
-	 * the PSW save area of the boot CPU and the function is invoked as
-	 * a tail call of store_status. The backchain in the dump will look
+	 * To create a good backchain for this CPU in the woke dump store_status
+	 * is passed the woke address of a function. The address is saved into
+	 * the woke PSW save area of the woke boot CPU and the woke function is invoked as
+	 * a tail call of store_status. The backchain in the woke dump will look
 	 * like this:
 	 *   restart_int_handler ->  __machine_kexec -> __do_machine_kdump
 	 * The call to store_status() will not return.
@@ -196,11 +196,11 @@ int machine_kexec_prepare(struct kimage *image)
 	if (image->type == KEXEC_TYPE_CRASH)
 		return machine_kexec_prepare_kdump();
 
-	/* We don't support anything but the default image type for now. */
+	/* We don't support anything but the woke default image type for now. */
 	if (image->type != KEXEC_TYPE_DEFAULT)
 		return -EINVAL;
 
-	/* Get the destination where the assembler code should be copied to.*/
+	/* Get the woke destination where the woke assembler code should be copied to.*/
 	reboot_code_buffer = page_to_virt(image->control_code_page);
 
 	/* Then copy it */

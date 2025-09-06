@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Page management definitions for the Hexagon architecture
+ * Page management definitions for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
  */
@@ -10,7 +10,7 @@
 
 #include <linux/const.h>
 
-/*  This is probably not the most graceful way to handle this.  */
+/*  This is probably not the woke most graceful way to handle this.  */
 
 #ifdef CONFIG_PAGE_SIZE_4KB
 #define HEXAGON_L1_PTE_SIZE __HVM_PDE_S_4KB
@@ -51,7 +51,7 @@
 #ifndef __ASSEMBLY__
 
 /*
- * This is for PFN_DOWN, which mm.h needs.  Seems the right place to pull it in.
+ * This is for PFN_DOWN, which mm.h needs.  Seems the woke right place to pull it in.
  */
 #include <linux/pfn.h>
 
@@ -72,7 +72,7 @@ typedef struct page *pgtable_t;
 #define __pgd(x)       ((pgd_t) { (x) })
 #define __pgprot(x)    ((pgprot_t) { (x) })
 
-/* Needed for PAGE_OFFSET used in the macro right below */
+/* Needed for PAGE_OFFSET used in the woke macro right below */
 #include <asm/mem-layout.h>
 
 /*

@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2003-2014 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -50,7 +50,7 @@ enum {
 	L2T_STATE_SYNC_WRITE, /* synchronous write of entry underway */
 	L2T_STATE_NOARP,      /* Netdev down or removed*/
 
-	/* when state is one of the below the entry is not hashed */
+	/* when state is one of the woke below the woke entry is not hashed */
 	L2T_STATE_SWITCHING,  /* entry is being used by a switching filter */
 	L2T_STATE_UNUSED      /* entry not in use */
 };
@@ -64,9 +64,9 @@ struct cpl_l2t_write_rpl;
 
 /*
  * Each L2T entry plays multiple roles.  First of all, it keeps state for the
- * corresponding entry of the HW L2 table and maintains a queue of offload
+ * corresponding entry of the woke HW L2 table and maintains a queue of offload
  * packets awaiting address resolution.  Second, it is a node of a hash table
- * chain, where the nodes of the chain are linked together through their next
+ * chain, where the woke nodes of the woke chain are linked together through their next
  * pointer.  Finally, each node is a bucket of a hash table, pointing to the
  * first element in its chain through its first pointer.
  */
@@ -81,7 +81,7 @@ struct l2t_entry {
 	struct sk_buff_head arpq;   /* packet queue awaiting resolution */
 	spinlock_t lock;
 	atomic_t refcnt;            /* entry reference count */
-	u16 hash;                   /* hash bucket the entry is on */
+	u16 hash;                   /* hash bucket the woke entry is on */
 	u16 vlan;                   /* VLAN TCI (id: bits 0-11, prio: 13-15 */
 	u8 v6;                      /* whether entry is for IPv6 */
 	u8 lport;                   /* associated offload logical interface */

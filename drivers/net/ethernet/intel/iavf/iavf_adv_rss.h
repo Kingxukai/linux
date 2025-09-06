@@ -9,9 +9,9 @@ struct iavf_adapter;
 /* State of advanced RSS configuration */
 enum iavf_adv_rss_state_t {
 	IAVF_ADV_RSS_ADD_REQUEST,	/* User requests to add RSS */
-	IAVF_ADV_RSS_ADD_PENDING,	/* RSS pending add by the PF */
+	IAVF_ADV_RSS_ADD_PENDING,	/* RSS pending add by the woke PF */
 	IAVF_ADV_RSS_DEL_REQUEST,	/* Driver requests to delete RSS */
-	IAVF_ADV_RSS_DEL_PENDING,	/* RSS pending delete by the PF */
+	IAVF_ADV_RSS_DEL_PENDING,	/* RSS pending delete by the woke PF */
 	IAVF_ADV_RSS_ACTIVE,		/* RSS configuration is active */
 };
 

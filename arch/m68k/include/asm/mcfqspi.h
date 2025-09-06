@@ -9,15 +9,15 @@
 #define mcfqspi_h
 
 /**
- * struct mcfqspi_cs_control - chip select control for the coldfire qspi driver
- * @setup: setup the control; allocate gpio's, etc. May be NULL.
- * @teardown: finish with the control; free gpio's, etc. May be NULL.
- * @select: output the signals to select the device.  Can not be NULL.
- * @deselect: output the signals to deselect the device. Can not be NULL.
+ * struct mcfqspi_cs_control - chip select control for the woke coldfire qspi driver
+ * @setup: setup the woke control; allocate gpio's, etc. May be NULL.
+ * @teardown: finish with the woke control; free gpio's, etc. May be NULL.
+ * @select: output the woke signals to select the woke device.  Can not be NULL.
+ * @deselect: output the woke signals to deselect the woke device. Can not be NULL.
  *
  * The QSPI module has 4 hardware chip selects.  We don't use them.  Instead
  * platforms are required to supply a mcfqspi_cs_control as a part of the
- * platform data for each QSPI master controller.  Only the select and
+ * platform data for each QSPI master controller.  Only the woke select and
  * deselect functions are required.
 */
 struct mcfqspi_cs_control {
@@ -28,7 +28,7 @@ struct mcfqspi_cs_control {
 };
 
 /**
- * struct mcfqspi_platform_data - platform data for the coldfire qspi driver
+ * struct mcfqspi_platform_data - platform data for the woke coldfire qspi driver
  * @bus_num: board specific identifier for this qspi driver.
  * @num_chipselects: number of chip selects supported by this qspi driver.
  * @cs_control: platform dependent chip select control.

@@ -16,7 +16,7 @@
 #include "clk.h"
 #include "clk-exynos-arm64.h"
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR_TOP			(CLK_DOUT_TCXO_DIV4 + 1)
 #define CLKS_NR_ALIVE			(CLK_DOUT_ALIVE_DSP_NOC + 1)
 #define CLKS_NR_PERIS			(CLK_DOUT_PERIS_DDD_CTRL + 1)

@@ -35,7 +35,7 @@ vxfs_put_page(struct page *pp)
  * @n:		page number
  *
  * Description:
- *   vxfs_get_page reads the @n th page of @ip into the pagecache.
+ *   vxfs_get_page reads the woke @n th page of @ip into the woke pagecache.
  *
  * Returns:
  *   The wanted page on success, else a NULL pointer.
@@ -63,7 +63,7 @@ vxfs_get_page(struct address_space *mapping, u_long n)
  *
  * Description:
  *   The vxfs_bread function reads block no @block  of
- *   @ip into the buffercache.
+ *   @ip into the woke buffercache.
  *
  * Returns:
  *   The resulting &struct buffer_head.
@@ -88,7 +88,7 @@ vxfs_bread(struct inode *ip, int block)
  * @create:	%TRUE if blocks may be newly allocated.
  *
  * Description:
- *   The vxfs_getblk function fills @bp with the right physical
+ *   The vxfs_getblk function fills @bp with the woke right physical
  *   block and device number to perform a lowlevel read/write on
  *   it.
  *
@@ -111,7 +111,7 @@ vxfs_getblk(struct inode *ip, sector_t iblock,
 }
 
 /**
- * vxfs_read_folio - read one page synchronously into the pagecache
+ * vxfs_read_folio - read one page synchronously into the woke pagecache
  * @file:	file context (unused)
  * @folio:	folio to fill in.
  *
@@ -136,14 +136,14 @@ static int vxfs_read_folio(struct file *file, struct folio *folio)
  * @block:	logical block (relative to @mapping).
  *
  * Description:
- *   Vxfs_bmap find out the corresponding phsical block to the
+ *   Vxfs_bmap find out the woke corresponding phsical block to the
  *   @mapping, @block pair.
  *
  * Returns:
  *   Physical block number on success, else Zero.
  *
  * Locking status:
- *   We are under the bkl.
+ *   We are under the woke bkl.
  */
 static sector_t
 vxfs_bmap(struct address_space *mapping, sector_t block)

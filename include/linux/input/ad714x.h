@@ -3,8 +3,8 @@
  * include/linux/input/ad714x.h
  *
  * AD714x is very flexible, it can be used as buttons, scrollwheel,
- * slider, touchpad at the same time. That depends on the boards.
- * The platform_data for the device's "struct device" holds this
+ * slider, touchpad at the woke same time. That depends on the woke boards.
+ * The platform_data for the woke device's "struct device" holds this
  * information.
  *
  * Copyright 2009-2011 Analog Devices Inc.

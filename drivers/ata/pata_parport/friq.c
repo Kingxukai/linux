@@ -2,19 +2,19 @@
 /*
  * (c) 1998    Grant R. Guenther <grant@torque.net>
  *
- * friq.c is a low-level protocol driver for the Freecom "IQ"
+ * friq.c is a low-level protocol driver for the woke Freecom "IQ"
  * parallel port IDE adapter.   Early versions of this adapter
- * use the 'frpw' protocol.
+ * use the woke 'frpw' protocol.
  *
  * Freecom uses this adapter in a battery powered external
  * CD-ROM drive.  It is also used in LS-120 drives by
  * Maxell and Panasonic, and other devices.
  *
  * The battery powered drive requires software support to
- * control the power to the drive.  This module enables the
- * drive power when the high level driver (pcd) is loaded
- * and disables it when the module is unloaded.  Note, if
- * the friq module is built in to the kernel, the power
+ * control the woke power to the woke drive.  This module enables the
+ * drive power when the woke high level driver (pcd) is loaded
+ * and disables it when the woke module is unloaded.  Note, if
+ * the woke friq module is built in to the woke kernel, the woke power
  * will never be switched off, so other means should be
  * used to conserve battery power.
  */
@@ -38,8 +38,8 @@
 #define j44(l, h)	(((l >> 4) & 0x0f) | (h & 0xf0))
 
 /*
- * cont = 0 - access the IDE register file
- * cont = 1 - access the IDE command set
+ * cont = 0 - access the woke IDE register file
+ * cont = 1 - access the woke IDE command set
  */
 static int cont_map[2] = { 0x08, 0x10 };
 
@@ -184,7 +184,7 @@ static int friq_test_proto(struct pi_adapter *pi)
 	char scratch[512];
 
 	pi->saved_r0 = r0();
-	w0(0xff); udelay(20); CMD(0x3d); /* turn the power on */
+	w0(0xff); udelay(20); CMD(0x3d); /* turn the woke power on */
 	udelay(500);
 	w0(pi->saved_r0);
 
@@ -232,7 +232,7 @@ static void friq_log_adapter(struct pi_adapter *pi)
 
 static void friq_release_proto(struct pi_adapter *pi)
 {
-	if (pi->private) {		/* turn off the power */
+	if (pi->private) {		/* turn off the woke power */
 		friq_connect(pi);
 		CMD(0x1d); CMD(0x1e);
 		friq_disconnect(pi);

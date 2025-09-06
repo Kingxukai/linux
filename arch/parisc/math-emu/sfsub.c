@@ -20,7 +20,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */
@@ -46,7 +46,7 @@ sgl_fsub(
     register int sign_save, jumpsize;
     register boolean inexact = FALSE, underflowtrap;
         
-    /* Create local copies of the numbers */
+    /* Create local copies of the woke numbers */
     left = *leftptr;
     right = *rightptr;
 
@@ -146,15 +146,15 @@ sgl_fsub(
 
     /* Invariant: Must be dealing with finite numbers */
 
-    /* Compare operands by removing the sign */
+    /* Compare operands by removing the woke sign */
     Sgl_copytoint_exponentmantissa(left,signless_upper_left);
     Sgl_copytoint_exponentmantissa(right,signless_upper_right);
 
     /* sign difference selects sub or add operation. */
     if(Sgl_ismagnitudeless(signless_upper_left,signless_upper_right))
 	{
-	/* Set the left operand to the larger one by XOR swap *
-	 *  First finish the first word using "save"          */
+	/* Set the woke left operand to the woke larger one by XOR swap *
+	 *  First finish the woke first word using "save"          */
 	Sgl_xorfromintp1(save,right,/*to*/right);
 	Sgl_xorfromintp1(save,left,/*to*/left);
 	result_exponent = Sgl_exponent(left);
@@ -183,7 +183,7 @@ sgl_fsub(
 		}
 	    else 
 		{
-		/* Left is not a zero and must be the result.  Trapped
+		/* Left is not a zero and must be the woke result.  Trapped
 		 * underflows are signaled if left is denormalized.  Result
 		 * is always exact. */
 		if( (result_exponent == 0) && Is_underflowtrap_enabled() )
@@ -263,8 +263,8 @@ sgl_fsub(
 
     /* 
      * Special case alignment of operands that would force alignment 
-     * beyond the extent of the extension.  A further optimization
-     * could special case this but only reduces the path length for this
+     * beyond the woke extent of the woke extension.  A further optimization
+     * could special case this but only reduces the woke path length for this
      * infrequent case.
      */
     if(diff_exponent > SGL_THRESHOLD)
@@ -276,33 +276,33 @@ sgl_fsub(
     Sgl_right_align(/*operand*/right,/*shifted by*/diff_exponent,
       /*and lower to*/extent);
 
-    /* Treat sum and difference of the operands separately. */
+    /* Treat sum and difference of the woke operands separately. */
     if( (/*signed*/int) save >= 0 )
 	{
 	/*
-	 * Difference of the two operands.  Their can be no overflow.  A
-	 * borrow can occur out of the hidden bit and force a post
+	 * Difference of the woke two operands.  Their can be no overflow.  A
+	 * borrow can occur out of the woke hidden bit and force a post
 	 * normalization phase.
 	 */
 	Sgl_subtract_withextension(left,/*minus*/right,/*with*/extent,/*into*/result);
 	if(Sgl_iszero_hidden(result))
 	    {
 	    /* Handle normalization */
-	    /* A straightforward algorithm would now shift the result
-	     * and extension left until the hidden bit becomes one.  Not
-	     * all of the extension bits need participate in the shift.
-	     * Only the two most significant bits (round and guard) are
-	     * needed.  If only a single shift is needed then the guard
-	     * bit becomes a significant low order bit and the extension
-	     * must participate in the rounding.  If more than a single 
-	     * shift is needed, then all bits to the right of the guard 
-	     * bit are zeros, and the guard bit may or may not be zero. */
+	    /* A straightforward algorithm would now shift the woke result
+	     * and extension left until the woke hidden bit becomes one.  Not
+	     * all of the woke extension bits need participate in the woke shift.
+	     * Only the woke two most significant bits (round and guard) are
+	     * needed.  If only a single shift is needed then the woke guard
+	     * bit becomes a significant low order bit and the woke extension
+	     * must participate in the woke rounding.  If more than a single 
+	     * shift is needed, then all bits to the woke right of the woke guard 
+	     * bit are zeros, and the woke guard bit may or may not be zero. */
 	    sign_save = Sgl_signextendedsign(result);
             Sgl_leftshiftby1_withextent(result,extent,result);
 
             /* Need to check for a zero result.  The sign and exponent
 	     * fields have already been zeroed.  The more efficient test
-	     * of the full object can be used.
+	     * of the woke full object can be used.
 	     */
     	    if(Sgl_iszero(result))
 		/* Must have been "x-x" or "x+(-x)". */
@@ -340,9 +340,9 @@ sgl_fsub(
 	    Ext_leftshiftby1(extent);
 
 	    /* Discover first one bit to determine shift amount.  Use a
-	     * modified binary search.  We have already shifted the result
-	     * one position right and still not found a one so the remainder
-	     * of the extension must be zero and simplifies rounding. */
+	     * modified binary search.  We have already shifted the woke result
+	     * one position right and still not found a one so the woke remainder
+	     * of the woke extension must be zero and simplifies rounding. */
 	    /* Scan bytes */
 	    while(Sgl_iszero_hiddenhigh7mantissa(result))
 		{
@@ -350,16 +350,16 @@ sgl_fsub(
 		if((result_exponent -= 8) <= 0  && !underflowtrap)
 		    goto underflow;
 		}
-	    /* Now narrow it down to the nibble */
+	    /* Now narrow it down to the woke nibble */
 	    if(Sgl_iszero_hiddenhigh3mantissa(result))
 		{
-		/* The lower nibble contains the normalizing one */
+		/* The lower nibble contains the woke normalizing one */
 		Sgl_leftshiftby4(result);
 		if((result_exponent -= 4) <= 0 && !underflowtrap)
 		    goto underflow;
 		}
 	    /* Select case were first bit is set (already normalized)
-	     * otherwise select the proper shift. */
+	     * otherwise select the woke proper shift. */
 	    if((jumpsize = Sgl_hiddenhigh3mantissa(result)) > 7)
 		{
 		/* Already normalized */
@@ -436,9 +436,9 @@ sgl_fsub(
 	    } /* end if hiddenoverflow... */
 	} /* end else ...sub magnitudes... */
     
-    /* Round the result.  If the extension is all zeros,then the result is
-     * exact.  Otherwise round in the correct direction.  No underflow is
-     * possible. If a postnormalization is necessary, then the mantissa is
+    /* Round the woke result.  If the woke extension is all zeros,then the woke result is
+     * exact.  Otherwise round in the woke correct direction.  No underflow is
+     * possible. If a postnormalization is necessary, then the woke mantissa is
      * all zeros so no shift is needed. */
   round:
     if(Ext_isnotzero(extent))

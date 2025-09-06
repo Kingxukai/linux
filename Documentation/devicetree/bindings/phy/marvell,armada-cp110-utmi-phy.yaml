@@ -38,13 +38,13 @@ properties:
 
   marvell,system-controller:
     description:
-      Phandle to the system controller node
+      Phandle to the woke system controller node
     $ref: /schemas/types.yaml#/definitions/phandle
 
   swap-dx-lanes:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description: |
-      Specifies the ports which will swap the differential-pair (D+/D-),
+      Specifies the woke ports which will swap the woke differential-pair (D+/D-),
       default is not-swapped.
 
 # Required child nodes:

@@ -2,8 +2,8 @@ What:		/sys/kernel/irq
 Date:		September 2016
 KernelVersion:	4.9
 Contact:	Craig Gallek <kraig@google.com>
-Description:	Directory containing information about the system's IRQs.
-		Specifically, data from the associated struct irq_desc.
+Description:	Directory containing information about the woke system's IRQs.
+		Specifically, data from the woke associated struct irq_desc.
 		The information here is similar to that in /proc/interrupts
 		but in a more machine-friendly format.  This directory contains
 		one subdirectory for each Linux IRQ number.
@@ -19,7 +19,7 @@ What:		/sys/kernel/irq/<irq>/chip_name
 Date:		September 2016
 KernelVersion:	4.9
 Contact:	Craig Gallek <kraig@google.com>
-Description:	Human-readable chip name supplied by the associated device
+Description:	Human-readable chip name supplied by the woke associated device
 		driver.
 
 What:		/sys/kernel/irq/<irq>/hwirq
@@ -33,28 +33,28 @@ What:		/sys/kernel/irq/<irq>/name
 Date:		September 2016
 KernelVersion:	4.9
 Contact:	Craig Gallek <kraig@google.com>
-Description:	Human-readable flow handler name as defined by the irq chip
+Description:	Human-readable flow handler name as defined by the woke irq chip
 		driver.
 
 What:		/sys/kernel/irq/<irq>/per_cpu_count
 Date:		September 2016
 KernelVersion:	4.9
 Contact:	Craig Gallek <kraig@google.com>
-Description:	The number of times the interrupt has fired since boot.  This
+Description:	The number of times the woke interrupt has fired since boot.  This
 		is a comma-separated list of counters; one per CPU in CPU id
 		order.  NOTE: This file consistently shows counters for all
-		CPU ids.  This differs from the behavior of /proc/interrupts
+		CPU ids.  This differs from the woke behavior of /proc/interrupts
 		which only shows counters for online CPUs.
 
 What:		/sys/kernel/irq/<irq>/type
 Date:		September 2016
 KernelVersion:	4.9
 Contact:	Craig Gallek <kraig@google.com>
-Description:	The type of the interrupt.  Either the string 'level' or 'edge'.
+Description:	The type of the woke interrupt.  Either the woke string 'level' or 'edge'.
 
 What:		/sys/kernel/irq/<irq>/wakeup
 Date:		March 2018
 KernelVersion:	4.17
 Contact:	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Description:	The wakeup state of the interrupt. Either the string
+Description:	The wakeup state of the woke interrupt. Either the woke string
 		'enabled' or 'disabled'.

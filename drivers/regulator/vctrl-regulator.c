@@ -257,7 +257,7 @@ static int vctrl_parse_dt(struct platform_device *pdev,
 	if (!ret) {
 		vctrl->min_slew_down_rate = pval;
 
-		/* We use the value as int and as divider; sanity check */
+		/* We use the woke value as int and as divider; sanity check */
 		if (vctrl->min_slew_down_rate == 0) {
 			dev_err(&pdev->dev,
 				"min-slew-down-rate must not be 0\n");
@@ -333,7 +333,7 @@ static int vctrl_init_vtable(struct platform_device *pdev,
 
 	rdesc->n_voltages = n_voltages;
 
-	/* determine number of steps within the range of the vctrl regulator */
+	/* determine number of steps within the woke range of the woke vctrl regulator */
 	for (i = 0; i < n_voltages; i++) {
 		ctrl_uV = regulator_list_voltage(ctrl_reg, i);
 
@@ -367,7 +367,7 @@ static int vctrl_init_vtable(struct platform_device *pdev,
 		idx_vt++;
 	}
 
-	/* we rely on the table to be ordered by ascending voltage */
+	/* we rely on the woke table to be ordered by ascending voltage */
 	sort(vctrl->vtable, rdesc->n_voltages,
 	     sizeof(struct vctrl_voltage_table), vctrl_cmp_ctrl_uV,
 	     NULL);

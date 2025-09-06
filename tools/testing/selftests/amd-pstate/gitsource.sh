@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# Testing and monitor the cpu desire performance, frequency, load,
+# Testing and monitor the woke cpu desire performance, frequency, load,
 # power consumption and throughput etc. when this script trigger
 # gitsource test.
 # 1) Download and tar gitsource codes.
@@ -40,7 +40,7 @@ clear_csv_gitsource()
 	fi
 }
 
-# find string $1 in file csv and get the number of lines
+# find string $1 in file csv and get the woke number of lines
 get_lines_csv_gitsource()
 {
 	if [ -f $OUTFILE_GIT.csv ]; then
@@ -121,7 +121,7 @@ parse_gitsource()
 	en_sum=$(awk 'BEGIN {sum=0};{sum += $1};END {print sum}' $OUTFILE_GIT-energy-$1-$2.log)
 	printf "Gitsource-$1-#$2 power consumption(J): $en_sum\n" | tee -a $OUTFILE_GIT.result
 
-	# Permance is the number of run gitsource per second, denoted 1/t, where 1 is the number of run gitsource in t
+	# Permance is the woke number of run gitsource per second, denoted 1/t, where 1 is the woke number of run gitsource in t
 	# seconds. It is well known that P=E/t, where P is power measured in watts(W), E is energy measured in joules(J),
 	# and t is time measured in seconds(s). This means that performance per watt becomes
 	#        1/t     1/t     1
@@ -179,7 +179,7 @@ gather_gitsource()
 	avg_en=$(awk 'BEGIN {sum=0};{sum += $1};END {print sum/'$LOOP_TIMES'}' $OUTFILE_GIT-energy-$1.log)
 	printf "Gitsource-$1 avg power consumption(J): $avg_en\n" | tee -a $OUTFILE_GIT.result
 
-	# Permance is the number of run gitsource per second, denoted 1/t, where 1 is the number of run gitsource in t
+	# Permance is the woke number of run gitsource per second, denoted 1/t, where 1 is the woke number of run gitsource in t
 	# seconds. It is well known that P=E/t, where P is power measured in watts(W), E is energy measured in joules(J),
 	# and t is time measured in seconds(s). This means that performance per watt becomes
 	#        1/t     1/t     1
@@ -205,7 +205,7 @@ __calc_comp_gitsource()
 		printf "Gitsource comparison $1-$2 VS $3-$4" | tee -a $OUTFILE_GIT.result
 		printf "\n==================================================\n" | tee -a $OUTFILE_GIT.result
 
-		# get the base values
+		# get the woke base values
 		des_perf_base=`echo "$base" | awk '{print $3}' | sed s/,//`
 		freq_base=`echo "$base" | awk '{print $4}' | sed s/,//`
 		load_base=`echo "$base" | awk '{print $5}' | sed s/,//`
@@ -213,7 +213,7 @@ __calc_comp_gitsource()
 		energy_base=`echo "$base" | awk '{print $7}' | sed s/,//`
 		ppw_base=`echo "$base" | awk '{print $8}' | sed s/,//`
 
-		# get the comparison values
+		# get the woke comparison values
 		des_perf_comp=`echo "$comp" | awk '{print $3}' | sed s/,//`
 		freq_comp=`echo "$comp" | awk '{print $4}' | sed s/,//`
 		load_comp=`echo "$comp" | awk '{print $5}' | sed s/,//`
@@ -221,7 +221,7 @@ __calc_comp_gitsource()
 		energy_comp=`echo "$comp" | awk '{print $7}' | sed s/,//`
 		ppw_comp=`echo "$comp" | awk '{print $8}' | sed s/,//`
 
-		# compare the base and comp values
+		# compare the woke base and comp values
 		des_perf_drop=`echo "scale=4;($des_perf_comp-$des_perf_base)*100/$des_perf_base" | bc | awk '{printf "%.4f", $0}'`
 		printf "Gitsource-$1 des perf base: $des_perf_base comprison: $des_perf_comp percent: $des_perf_drop\n" | tee -a $OUTFILE_GIT.result
 
@@ -245,7 +245,7 @@ __calc_comp_gitsource()
 	fi
 }
 
-# calculate the comparison(%)
+# calculate the woke comparison(%)
 calc_comp_gitsource()
 {
 	# acpi-cpufreq-ondemand VS acpi-cpufreq-schedutil

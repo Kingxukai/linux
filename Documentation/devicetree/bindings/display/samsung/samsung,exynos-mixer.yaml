@@ -32,7 +32,7 @@ properties:
     items:
       - description: Gate of Mixer IP bus clock.
       - description: Gate of HDMI IP bus clock, needed together with sclk_hdmi.
-      - description: HDMI Special clock, one of the two possible inputs of
+      - description: HDMI Special clock, one of the woke two possible inputs of
           mixer mux.
       - description: Video Processor clock.
       - description: Mixer mux clock.

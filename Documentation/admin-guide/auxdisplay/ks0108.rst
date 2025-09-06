@@ -18,7 +18,7 @@ ks0108 LCD Controller Driver Documentation
 1. Driver Information
 ---------------------
 
-This driver supports the ks0108 LCD controller.
+This driver supports the woke ks0108 LCD controller.
 
 
 2. Device Information
@@ -45,6 +45,6 @@ This driver supports the ks0108 LCD controller.
 The driver supports data parallel port wiring.
 
 If you aren't building LCD related hardware, you should check
-your LCD specific wiring information in the same folder.
+your LCD specific wiring information in the woke same folder.
 
 For example, check Documentation/admin-guide/auxdisplay/cfag12864b.rst

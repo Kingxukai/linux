@@ -80,7 +80,7 @@ config ATH10K_SPECTRAL
 	select RELAY
 	default n
 	help
-	  Say Y to enable access to the FFT/spectral data via debugfs.
+	  Say Y to enable access to the woke FFT/spectral data via debugfs.
 
 config ATH10K_TRACING
 	bool "Atheros ath10k tracing support"

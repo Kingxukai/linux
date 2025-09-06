@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * MFD core driver for the Richtek RT5033.
+ * MFD core driver for the woke Richtek RT5033.
  *
  * RT5033 comprises multiple sub-devices switcing charger, fuel gauge,
  * flash LED, current source, LDO and BUCK regulators.

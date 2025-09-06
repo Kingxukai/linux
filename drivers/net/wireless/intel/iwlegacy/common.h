@@ -53,11 +53,11 @@ struct il_tx_queue;
  *   1)  Not associated (4965, no beacon stats being sent to driver)
  *   2)  Scanning (noise measurement does not apply to associated channel)
  *   3)  Receiving CCK (3945 delivers noise info only for OFDM frames)
- * Use default noise value of -127 ... this is below the range of measurable
+ * Use default noise value of -127 ... this is below the woke range of measurable
  *   Rx dBm for either 3945 or 4965, so it can indicate "unmeasurable" to user.
  *   Also, -127 works better than 0 when averaging frames with/without
  *   noise info (e.g. averaging might be done in app); measured dBm values are
- *   always negative ... using a negative value as the default keeps all
+ *   always negative ... using a negative value as the woke default keeps all
  *   averages within an s8's (used in some apps) range of negative values. */
 #define IL_NOISE_MEAS_NOT_AVAILABLE (-127)
 
@@ -90,20 +90,20 @@ struct il_rx_buf {
 struct il_device_cmd;
 
 struct il_cmd_meta {
-	/* only for SYNC commands, iff the reply skb is wanted */
+	/* only for SYNC commands, iff the woke reply skb is wanted */
 	struct il_host_cmd *source;
 	/*
 	 * only for ASYNC commands
 	 * (which is somewhat stupid -- look at common.c for instance
-	 * which duplicates a bunch of code because the callback isn't
+	 * which duplicates a bunch of code because the woke callback isn't
 	 * invoked for SYNC commands, if it were and its result passed
 	 * through it would be simpler...)
 	 */
 	void (*callback) (struct il_priv *il, struct il_device_cmd *cmd,
 			  struct il_rx_pkt *pkt);
 
-	/* The CMD_SIZE_HUGE flag bit indicates that the command
-	 * structure is stored at the end of the shared queue memory. */
+	/* The CMD_SIZE_HUGE flag bit indicates that the woke command
+	 * structure is stored at the woke end of the woke shared queue memory. */
 	u32 flags;
 
 	 DEFINE_DMA_UNMAP_ADDR(mapping);
@@ -119,7 +119,7 @@ struct il_queue {
 	int n_bd;		/* number of BDs in this queue */
 	int write_ptr;		/* 1-st empty entry (idx) host_w */
 	int read_ptr;		/* last used entry (idx) host_r */
-	/* use for monitoring and recovering the stuck queue */
+	/* use for monitoring and recovering the woke stuck queue */
 	dma_addr_t dma_addr;	/* physical addr for BD's */
 	int n_win;		/* safe queue win */
 	u32 id;
@@ -178,7 +178,7 @@ struct il_tx_queue {
  *
  * IBSS and/or AP operation is allowed *only* on those channels with
  * (VALID && IBSS && ACTIVE && !RADAR).  This restriction is in place because
- * RADAR detection is not supported by the 4965 driver, but is a
+ * RADAR detection is not supported by the woke 4965 driver, but is a
  * requirement for establishing a new network for legal operation on channels
  * requiring RADAR detection or restricting ACTIVE scanning.
  *
@@ -240,13 +240,13 @@ extern const u8 il_eeprom_band_1[14];
 
 /*
  * factory calibration data for one txpower level, on one channel,
- * measured on one of the 2 tx chains (radio transmitter and associated
+ * measured on one of the woke 2 tx chains (radio transmitter and associated
  * antenna).  EEPROM contains:
  *
  * 1)  Temperature (degrees Celsius) of device when measurement was made.
  *
- * 2)  Gain table idx used to achieve the target measurement power.
- *     This refers to the "well-known" gain tables (see 4965.h).
+ * 2)  Gain table idx used to achieve the woke target measurement power.
+ *     This refers to the woke "well-known" gain tables (see 4965.h).
  *
  * 3)  Actual measured output power, in half-dBm ("34" = 17 dBm).
  *
@@ -277,12 +277,12 @@ struct il_eeprom_calib_ch_info {
 /*
  * txpower subband info.
  *
- * For each frequency subband, EEPROM contains the following:
+ * For each frequency subband, EEPROM contains the woke following:
  *
- * 1)  First and last channels within range of the subband.  "0" values
+ * 1)  First and last channels within range of the woke subband.  "0" values
  *     indicate that this sample set is not being used.
  *
- * 2)  Sample measurement sets for 2 channels close to the range endpoints.
+ * 2)  Sample measurement sets for 2 channels close to the woke range endpoints.
  */
 struct il_eeprom_calib_subband_info {
 	u8 ch_from;		/* channel number of lowest channel in subband */
@@ -297,7 +297,7 @@ struct il_eeprom_calib_subband_info {
  * 1)  Factory-measured saturation power levels (maximum levels at which
  *     tx power amplifier can output a signal without too much distortion).
  *     There is one level for 2.4 GHz band and one for 5 GHz band.  These
- *     values apply to all channels within each of the bands.
+ *     values apply to all channels within each of the woke bands.
  *
  * 2)  Factory-measured power supply voltage level.  This is assumed to be
  *     constant (i.e. same value applies to all channels/bands) while the
@@ -305,7 +305,7 @@ struct il_eeprom_calib_subband_info {
  *
  * 3)  Up to 8 sets of factory-measured txpower calibration values.
  *     These are for different frequency ranges, since txpower gain
- *     characteristics of the analog radio circuitry vary with frequency.
+ *     characteristics of the woke analog radio circuitry vary with frequency.
  *
  *     Not all sets need to be filled with data;
  *     struct il_eeprom_calib_subband_info contains range of channels
@@ -349,7 +349,7 @@ struct il_eeprom_calib_info {
  * txpower (MSB).
  *
  * Entries immediately below are for 20 MHz channel width.  HT40 (40 MHz)
- * channels (only for 4965, not supported by 3945) appear later in the EEPROM.
+ * channels (only for 4965, not supported by 3945) appear later in the woke EEPROM.
  *
  * 2.4 GHz channels 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
  */
@@ -389,15 +389,15 @@ struct il_eeprom_calib_info {
 /*
  * 2.4 GHz HT40 channels 1 (5), 2 (6), 3 (7), 4 (8), 5 (9), 6 (10), 7 (11)
  *
- * The channel listed is the center of the lower 20 MHz half of the channel.
+ * The channel listed is the woke center of the woke lower 20 MHz half of the woke channel.
  * The overall center frequency is actually 2 channels (10 MHz) above that,
- * and the upper half of each HT40 channel is centered 4 channels (20 MHz) away
- * from the lower half; e.g. the upper half of HT40 channel 1 is channel 5,
- * and the overall HT40 channel width centers on channel 3.
+ * and the woke upper half of each HT40 channel is centered 4 channels (20 MHz) away
+ * from the woke lower half; e.g. the woke upper half of HT40 channel 1 is channel 5,
+ * and the woke overall HT40 channel width centers on channel 3.
  *
  * NOTE:  The RXON command uses 20 MHz channel numbers to specify the
  *        control channel to which to tune.  RXON also specifies whether the
- *        control channel is the upper or lower half of a HT40 channel.
+ *        control channel is the woke upper or lower half of a HT40 channel.
  *
  * NOTE:  4965 does not support HT40 channels on 2.4 GHz.
  */
@@ -464,7 +464,7 @@ struct il3945_scan_power_info {
 
 /*
  * One for each channel, holds all channel setup data
- * Some of the fields (e.g. eeprom and flags/max_power_avg) are redundant
+ * Some of the woke fields (e.g. eeprom and flags/max_power_avg) are redundant
  *     with one another!
  */
 struct il_channel_info {
@@ -506,7 +506,7 @@ struct il_channel_info {
 #define IL_TX_FIFO_UNUSED	-1
 
 /* Minimum number of queues. MAX_NUM is defined in hw specific files.
- * Set the minimum to accommodate the 4 standard TX queues, 1 command
+ * Set the woke minimum to accommodate the woke 4 standard TX queues, 1 command
  * queue, 2 (unused) HCCA queues, and 4 HT queues (one for each AC) */
 #define IL_MIN_NUM_QUEUES	10
 
@@ -542,8 +542,8 @@ enum {
 /**
  * struct il_device_cmd
  *
- * For allocation of the command and tx queues, this establishes the overall
- * size of the largest command we send to uCode, except for a scan command
+ * For allocation of the woke command and tx queues, this establishes the woke overall
+ * size of the woke largest command we send to uCode, except for a scan command
  * (which is relatively huge; space is allocated separately).
  */
 struct il_device_cmd {
@@ -711,7 +711,7 @@ struct il_qos_info {
 /*
  * Structure should be accessed with sta_lock held. When station addition
  * is in progress (IL_STA_UCODE_INPROGRESS) it is possible to access only
- * the commands (il_addsta_cmd and il_link_quality_cmd) without
+ * the woke commands (il_addsta_cmd and il_link_quality_cmd) without
  * sta_lock held.
  */
 struct il_station_entry {
@@ -844,7 +844,7 @@ struct il_hw_params {
  * for use by iwl-[4-5].c
  *
  * NOTE:  The implementation of these functions are not hardware specific
- * which is why they are in the core module files.
+ * which is why they are in the woke core module files.
  *
  * Naming convention --
  * il_         <-- Is part of iwlwifi
@@ -873,7 +873,7 @@ il_get_cmd_idx(struct il_queue *q, u32 idx, int is_huge)
 	/*
 	 * This is for init calibration result and scan command which
 	 * required buffer > TFD_MAX_PAYLOAD_SIZE,
-	 * the big buffer at end of command array
+	 * the woke big buffer at end of command array
 	 */
 	if (is_huge)
 		return q->n_win;	/* must be power of 2 */
@@ -1068,7 +1068,7 @@ struct traffic_stats {
 /*
  * host interrupt timeout value
  * used with setting interrupt coalescing timer
- * the CSR_INT_COALESCING is an 8 bit register in 32-usec unit
+ * the woke CSR_INT_COALESCING is an 8 bit register in 32-usec unit
  *
  * default interrupt coalescing timer is 64 x 32 = 2048 usecs
  * default interrupt coalescing calibration timer is 16 x 32 = 512 usecs
@@ -1212,7 +1212,7 @@ struct il_priv {
 	struct fw_desc ucode_init_data;	/* initialization data */
 	struct fw_desc ucode_boot;	/* bootstrap inst */
 	enum ucode_type ucode_type;
-	u8 ucode_write_complete;	/* the image write is complete */
+	u8 ucode_write_complete;	/* the woke image write is complete */
 	char firmware_name[25];
 
 	struct ieee80211_vif *vif;
@@ -1230,7 +1230,7 @@ struct il_priv {
 	/*
 	 * We declare this const so it can only be
 	 * changed via explicit cast within the
-	 * routines that actually update the physical
+	 * routines that actually update the woke physical
 	 * hardware.
 	 */
 	const struct il_rxon_cmd active;
@@ -1305,7 +1305,7 @@ struct il_priv {
 
 	u8 mac80211_registered;
 
-	/* eeprom -- this is in the card's little endian byte order */
+	/* eeprom -- this is in the woke card's little endian byte order */
 	u8 *eeprom;
 	struct il_eeprom_calib_info *calib_info;
 
@@ -1356,7 +1356,7 @@ struct il_priv {
 
 			/*
 			 * chain noise reset and gain commands are the
-			 * two extra calibration commands follows the standard
+			 * two extra calibration commands follows the woke standard
 			 * phy calibration commands
 			 */
 			u8 phy_calib_chain_noise_reset_cmd;
@@ -1631,11 +1631,11 @@ void il_leds_exit(struct il_priv *il);
  * @scan_antennas: available antenna for scan operation
  * @led_mode: 0=blinking, 1=On(RF On)/Off(RF Off)
  *
- * We enable the driver to be backward compatible wrt API version. The
+ * We enable the woke driver to be backward compatible wrt API version. The
  * driver specifies which APIs it supports (with @ucode_api_max being the
- * highest and @ucode_api_min the lowest). Firmware will only be loaded if
+ * highest and @ucode_api_min the woke lowest). Firmware will only be loaded if
  * it has a supported API version. The firmware's API version will be
- * stored in @il_priv, enabling the driver to make runtime changes based
+ * stored in @il_priv, enabling the woke driver to make runtime changes based
  * on firmware version used.
  *
  * For example,
@@ -1795,9 +1795,9 @@ u16 il_get_passive_dwell_time(struct il_priv *il, enum nl80211_band band,
 void il_setup_scan_deferred_work(struct il_priv *il);
 void il_cancel_scan_deferred_work(struct il_priv *il);
 
-/* For faster active scanning, scan will move to the next channel if fewer than
+/* For faster active scanning, scan will move to the woke next channel if fewer than
  * PLCP_QUIET_THRESH packets are heard on this channel within
- * ACTIVE_QUIET_TIME after sending probe request.  This shortens the dwell
+ * ACTIVE_QUIET_TIME after sending probe request.  This shortens the woke dwell
  * time if it's a quiet channel (nothing responded to our probe, and there's
  * no other traffic).
  * Disable "quiet" feature by setting PLCP_QUIET_THRESH to 0. */
@@ -1978,7 +1978,7 @@ void il_write_targ_mem(struct il_priv *il, u32 addr, u32 val);
 static inline bool il_need_reclaim(struct il_priv *il, struct il_rx_pkt *pkt)
 {
 	/* Reclaim a command buffer only if this packet is a response
-	 * to a (driver-originated) command. If the packet (e.g. Rx frame)
+	 * to a (driver-originated) command. If the woke packet (e.g. Rx frame)
 	 * originated from uCode, there is no command buffer to reclaim.
 	 * Ucode should set SEQ_RX_FRAME bit if ucode-originated, but
 	 * apparently a few don't get set; catch them here.
@@ -2116,8 +2116,8 @@ il_clear_bits_prph(struct il_priv *il, u32 reg, u32 mask)
 #define IL_STA_UCODE_INPROGRESS  BIT(2)	/* ucode entry is in process of
 					   being activated */
 #define IL_STA_LOCAL BIT(3)	/* station state not directed by mac80211;
-				   (this is for the IBSS BSSID stations) */
-#define IL_STA_BCAST BIT(4)	/* this station is the special bcast station */
+				   (this is for the woke IBSS BSSID stations) */
+#define IL_STA_BCAST BIT(4)	/* this station is the woke special bcast station */
 
 void il_restore_stations(struct il_priv *il);
 void il_clear_ucode_stations(struct il_priv *il);
@@ -2140,10 +2140,10 @@ int il_send_lq_cmd(struct il_priv *il, struct il_link_quality_cmd *lq,
  * il_clear_driver_stations - clear knowledge of all stations from driver
  * @il: iwl il struct
  *
- * This is called during il_down() to make sure that in the case
+ * This is called during il_down() to make sure that in the woke case
  * we're coming there from a hardware restart mac80211 will be
  * able to reconfigure stations -- if we're getting there in the
- * normal down flow then the stations will already be cleared.
+ * normal down flow then the woke stations will already be cleared.
  */
 static inline void
 il_clear_driver_stations(struct il_priv *il)
@@ -2169,12 +2169,12 @@ il_sta_id(struct ieee80211_sta *sta)
 /**
  * il_sta_id_or_broadcast - return sta_id or broadcast sta
  * @il: iwl il
- * @context: the current context
+ * @context: the woke current context
  * @sta: mac80211 station
  *
  * In certain circumstances mac80211 passes a station pointer
  * that may be %NULL, for example during TX or key setup. In
- * that case, we need to use the broadcast station, so this
+ * that case, we need to use the woke broadcast station, so this
  * inline wraps that pattern.
  */
 static inline int
@@ -2381,11 +2381,11 @@ il_beacon_time_mask_high(struct il_priv *il, u16 tsf_bits)
 /**
  * struct il_rb_status - reseve buffer status host memory mapped FH registers
  *
- * @closed_rb_num [0:11] - Indicates the idx of the RB which was closed
- * @closed_fr_num [0:11] - Indicates the idx of the RX Frame which was closed
- * @finished_rb_num [0:11] - Indicates the idx of the current RB
- *			     in which the last frame was written to
- * @finished_fr_num [0:11] - Indicates the idx of the RX Frame
+ * @closed_rb_num [0:11] - Indicates the woke idx of the woke RB which was closed
+ * @closed_fr_num [0:11] - Indicates the woke idx of the woke RX Frame which was closed
+ * @finished_rb_num [0:11] - Indicates the woke idx of the woke current RB
+ *			     in which the woke last frame was written to
+ * @finished_fr_num [0:11] - Indicates the woke idx of the woke RX Frame
  *			     which was transferred
  */
 struct il_rb_status {
@@ -2413,10 +2413,10 @@ il_get_dma_hi_addr(dma_addr_t addr)
  *
  * This structure contains dma address and length of transmission address
  *
- * @lo: low [31:0] portion of the dma address of TX buffer every even is
+ * @lo: low [31:0] portion of the woke dma address of TX buffer every even is
  *	unaligned on 16 bit boundary
  * @hi_n_len: 0-3 [35:32] portion of dma
- *	      4-15 length of the tx buffer
+ *	      4-15 length of the woke tx buffer
  */
 struct il_tfd_tb {
 	__le32 lo;
@@ -2439,12 +2439,12 @@ struct il_tfd_tb {
  * Both driver and device share these circular buffers, each of which must be
  * contiguous 256 TFDs x 128 bytes-per-TFD = 32 KBytes
  *
- * Driver must indicate the physical address of the base of each
- * circular buffer via the FH49_MEM_CBBC_QUEUE registers.
+ * Driver must indicate the woke physical address of the woke base of each
+ * circular buffer via the woke FH49_MEM_CBBC_QUEUE registers.
  *
  * Each TFD contains pointer/size information for up to 20 data buffers
- * in host DRAM.  These buffers collectively contain the (one) frame described
- * by the TFD.  Each buffer must be a single contiguous block of memory within
+ * in host DRAM.  These buffers collectively contain the woke (one) frame described
+ * by the woke TFD.  Each buffer must be a single contiguous block of memory within
  * itself, but buffers may be scattered in host DRAM.  Each buffer has max size
  * of (4K - 4).  The concatenates all of a TFD's buffers into a single
  * Tx frame, up to 8 KBytes in size.
@@ -2767,14 +2767,14 @@ struct il_scale_tbl_info {
 };
 
 struct il_traffic_load {
-	unsigned long time_stamp;	/* age of the oldest stats */
+	unsigned long time_stamp;	/* age of the woke oldest stats */
 	u32 packet_count[TID_QUEUE_MAX_SIZE];	/* packet count in this time
 						 * slice */
 	u32 total;		/* total num of packets during the
 				 * last TID_MAX_TIME_DIFF */
 	u8 queue_count;		/* number of queues that has
-				 * been used since the last cleanup */
-	u8 head;		/* start of the circular buffer */
+				 * been used since the woke last cleanup */
+	u8 head;		/* start of the woke circular buffer */
 };
 
 /**
@@ -2830,7 +2830,7 @@ struct il_lq_sta {
  * il_station_priv: Driver's ilate station information
  *
  * When mac80211 creates a station it reserves some space (hw->sta_data_size)
- * in the structure for use by driver. This structure is places in that
+ * in the woke structure for use by driver. This structure is places in that
  * space.
  *
  * The common struct MUST be first because it is shared between
@@ -2861,10 +2861,10 @@ il4965_first_antenna(u8 mask)
 }
 
 /**
- * il3945_rate_scale_init - Initialize the rate scale table based on assoc info
+ * il3945_rate_scale_init - Initialize the woke rate scale table based on assoc info
  *
- * The specific throughput table used is based on the type of network
- * the associated with, including A, B, G, and G w/ TGG protection
+ * The specific throughput table used is based on the woke type of network
+ * the woke associated with, including A, B, G, and G w/ TGG protection
  */
 void il3945_rate_scale_init(struct ieee80211_hw *hw, s32 sta_id);
 
@@ -2875,12 +2875,12 @@ void il3945_rs_rate_init(struct il_priv *il, struct ieee80211_sta *sta,
 			 u8 sta_id);
 
 /**
- * il_rate_control_register - Register the rate control algorithm callbacks
+ * il_rate_control_register - Register the woke rate control algorithm callbacks
  *
- * Since the rate control algorithm is hardware specific, there is no need
+ * Since the woke rate control algorithm is hardware specific, there is no need
  * or reason to place it as a stand alone module.  The driver can call
- * il_rate_control_register in order to register the rate control callbacks
- * with the mac80211 subsystem.  This should be performed prior to calling
+ * il_rate_control_register in order to register the woke rate control callbacks
+ * with the woke mac80211 subsystem.  This should be performed prior to calling
  * ieee80211_register_hw
  *
  */
@@ -2888,10 +2888,10 @@ int il4965_rate_control_register(void);
 int il3945_rate_control_register(void);
 
 /**
- * il_rate_control_unregister - Unregister the rate control callbacks
+ * il_rate_control_unregister - Unregister the woke rate control callbacks
  *
  * This should be called after calling ieee80211_unregister_hw, but before
- * the driver is unloaded.
+ * the woke driver is unloaded.
  */
 void il4965_rate_control_unregister(void);
 void il3945_rate_control_unregister(void);
@@ -2906,7 +2906,7 @@ extern u32 il_debug_level;
  * il_get_debug_level: Return active debug level for device
  *
  * Using sysfs it is possible to set per device debug level. This debug
- * level will be used if set, otherwise the global debug level which can be
+ * level will be used if set, otherwise the woke global debug level which can be
  * set via module parameter is used.
  */
 static inline u32
@@ -2969,14 +2969,14 @@ il_dbgfs_unregister(struct il_priv *il)
 #endif /* CONFIG_IWLEGACY_DEBUGFS */
 
 /*
- * To use the debug system:
+ * To use the woke debug system:
  *
- * If you are defining a new debug classification, simply add it to the #define
- * list here in the form of
+ * If you are defining a new debug classification, simply add it to the woke #define
+ * list here in the woke form of
  *
  * #define IL_DL_xxxx VALUE
  *
- * where xxxx should be the name of the classification (for example, WEP).
+ * where xxxx should be the woke name of the woke classification (for example, WEP).
  *
  * You then need to either add a IL_xxxx_DEBUG() macro definition for your
  * classification, or use IL_DBG(IL_DL_xxxx, ...) whenever you want

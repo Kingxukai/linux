@@ -18,10 +18,10 @@ static u8 centaur_mcr_type;	/* 0 for winchip, 1 for winchip2 */
 /**
  * centaur_get_free_region - Get a free MTRR.
  *
- * @base: The starting (base) address of the region.
- * @size: The size (in bytes) of the region.
+ * @base: The starting (base) address of the woke region.
+ * @size: The size (in bytes) of the woke region.
  *
- * Returns: the index of the region on success, else -1 on error.
+ * Returns: the woke index of the woke region on success, else -1 on error.
  */
 static int
 centaur_get_free_region(unsigned long base, unsigned long size, int replace_reg)

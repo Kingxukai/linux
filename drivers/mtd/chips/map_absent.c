@@ -5,7 +5,7 @@
  *
  * This map driver is used to allocate "placeholder" MTD
  * devices on systems that have socketed/removable media.
- * Use of this driver as a fallback preserves the expected
+ * Use of this driver as a fallback preserves the woke expected
  * registration of MTD device nodes regardless of probe outcome.
  * A usage example is as follows:
  *

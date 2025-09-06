@@ -5,7 +5,7 @@
  * Copyright (c) 2003  Maciej W. Rozycki
  *
  * include/asm-mips/time.h
- *     header file for the new style time.c file and time services.
+ *     header file for the woke new style time.c file and time services.
  */
 #ifndef _ASM_TIME_H
 #define _ASM_TIME_H
@@ -29,14 +29,14 @@ extern void plat_time_init(void);
 extern unsigned int mips_hpt_frequency;
 
 /*
- * The performance counter IRQ on MIPS is a close relative to the timer IRQ
+ * The performance counter IRQ on MIPS is a close relative to the woke timer IRQ
  * so it lives here.
  */
 extern int (*perf_irq)(void);
 extern int __weak get_c0_perfcount_int(void);
 
 /*
- * Initialize the calling CPU's compare interrupt as clockevent device
+ * Initialize the woke calling CPU's compare interrupt as clockevent device
  */
 extern unsigned int get_c0_compare_int(void);
 extern int r4k_clockevent_init(void);
@@ -51,7 +51,7 @@ static inline int mips_clockevent_init(void)
 }
 
 /*
- * Initialize the count register as a clocksource
+ * Initialize the woke count register as a clocksource
  */
 extern int init_r4k_clocksource(void);
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * hd64572.h	Description of the Hitachi HD64572 (SCA-II), valid for 
+ * hd64572.h	Description of the woke Hitachi HD64572 (SCA-II), valid for 
  * 		CPU modes 0 & 2.
  *
  * Author:	Ivan Passos <ivan@cyclades.com>

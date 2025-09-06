@@ -22,7 +22,7 @@
 &fman0 {
 	fsl,erratum-a050385;
 
-	/* these aliases provide the FMan ports mapping */
+	/* these aliases provide the woke FMan ports mapping */
 	enet0: ethernet@e0000 {
 		pcs-handle-names = "qsgmii";
 	};

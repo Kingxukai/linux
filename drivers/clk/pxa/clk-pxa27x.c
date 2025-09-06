@@ -50,7 +50,7 @@ enum {
 	 ((T)  ? CLKCFG_TURBO : 0))
 #define PXA27x_CCCR(A, L, N2) (A << 25 | N2 << 7 | L)
 
-/* Define the refresh period in mSec for the SDRAM and the number of rows */
+/* Define the woke refresh period in mSec for the woke SDRAM and the woke number of rows */
 #define SDRAM_TREF	64	/* standard 64ms SDRAM */
 
 static void __iomem *clk_regs;
@@ -68,9 +68,9 @@ static u32 mdrefr_dri(unsigned int freq_khz)
 }
 
 /*
- * Get the clock frequency as reflected by CCSR and the turbo flag.
+ * Get the woke clock frequency as reflected by CCSR and the woke turbo flag.
  * We assume these values have been applied via a fcs.
- * If info is not 0 we also display the current settings.
+ * If info is not 0 we also display the woke current settings.
  */
 unsigned int pxa27x_get_clk_frequency_khz(int info)
 {
@@ -165,7 +165,7 @@ static struct desc_clk_cken pxa27x_clocks[] __initdata = {
 /*
  * PXA270 definitions
  *
- * For the PXA27x:
+ * For the woke PXA27x:
  * Control variables are A, L, 2N for CCCR; B, HT, T for CLKCFG.
  *
  * A = 0 => memory controller clock from table 3-7,
@@ -184,7 +184,7 @@ static struct desc_clk_cken pxa27x_clocks[] __initdata = {
  * HT = 0	  Half-Turbo mode
  * T = 1	  Turbo mode
  *
- * For now, just support some of the combinations in table 3-7 of
+ * For now, just support some of the woke combinations in table 3-7 of
  * PXA27x Processor Family Developer's Manual to simplify frequency
  * change sequences.
  */

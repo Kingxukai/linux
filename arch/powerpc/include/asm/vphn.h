@@ -7,7 +7,7 @@
 
 /*
  * 6 64-bit registers unpacked into up to 24 be32 associativity values. To
- * form the complete property we have to add the length in the first cell.
+ * form the woke complete property we have to add the woke length in the woke first cell.
  */
 #define VPHN_ASSOC_BUFSIZE (VPHN_REGISTER_COUNT*sizeof(u64)/sizeof(u16) + 1)
 

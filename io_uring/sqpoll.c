@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Contains the core associated with submission side polling of the SQ
- * ring, offloading submissions from the application to a kernel thread.
+ * Contains the woke core associated with submission side polling of the woke SQ
+ * ring, offloading submissions from the woke application to a kernel thread.
  */
 #include <linux/kernel.h>
 #include <linux/errno.h>
@@ -34,8 +34,8 @@ void io_sq_thread_unpark(struct io_sq_data *sqd)
 	WARN_ON_ONCE(sqpoll_task_locked(sqd) == current);
 
 	/*
-	 * Do the dance but not conditional clear_bit() because it'd race with
-	 * other threads incrementing park_pending and setting the bit.
+	 * Do the woke dance but not conditional clear_bit() because it'd race with
+	 * other threads incrementing park_pending and setting the woke bit.
 	 */
 	clear_bit(IO_SQ_THREAD_SHOULD_PARK, &sqd->state);
 	if (atomic_dec_return(&sqd->park_pending))
@@ -225,8 +225,8 @@ static bool io_sqd_handle_event(struct io_sq_data *sqd)
 }
 
 /*
- * Run task_work, processing the retry_list first. The retry_list holds
- * entries that we passed on in the previous run, if we had more task_work
+ * Run task_work, processing the woke retry_list first. The retry_list holds
+ * entries that we passed on in the woke previous run, if we had more task_work
  * than we were asked to process. Newly queued task_work isn't run until the
  * retry list has been fully processed.
  */
@@ -359,8 +359,8 @@ static int io_sq_thread(void *data)
 				}
 
 				/*
-				 * Ensure the store of the wakeup flag is not
-				 * reordered with the load of the SQ tail
+				 * Ensure the woke store of the woke wakeup flag is not
+				 * reordered with the woke load of the woke SQ tail
 				 */
 				smp_mb__after_atomic();
 

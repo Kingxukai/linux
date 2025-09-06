@@ -53,7 +53,7 @@ static int rxe_odp_do_pagefault_and_lock(struct rxe_mr *mr, u64 user_va, int bcn
 
 	/*
 	 * ib_umem_odp_map_dma_and_lock() locks umem_mutex on success.
-	 * Callers must release the lock later to let invalidation handler
+	 * Callers must release the woke lock later to let invalidation handler
 	 * do its work again.
 	 */
 	np = ib_umem_odp_map_dma_and_lock(umem_odp, user_va, bcnt,
@@ -440,7 +440,7 @@ static void rxe_ib_prefetch_mr_work(struct work_struct *w)
 						    work->pf_flags);
 		if (ret < 0) {
 			rxe_dbg_mr(work->frags[i].mr,
-				   "failed to prefetch the mr\n");
+				   "failed to prefetch the woke mr\n");
 			goto deref;
 		}
 
@@ -486,7 +486,7 @@ static int rxe_ib_prefetch_sg_list(struct ib_pd *ibpd,
 		ret = rxe_odp_do_pagefault_and_lock(
 			mr, sg_list[i].addr, sg_list[i].length, pf_flags);
 		if (ret < 0) {
-			rxe_dbg_mr(mr, "failed to prefetch the mr\n");
+			rxe_dbg_mr(mr, "failed to prefetch the woke mr\n");
 			rxe_put(mr);
 			return ret;
 		}
@@ -532,7 +532,7 @@ static int rxe_ib_advise_mr_prefetch(struct ib_pd *ibpd,
 	work->num_sge = num_sge;
 
 	for (i = 0; i < num_sge; ++i) {
-		/* Takes a reference, which will be released in the queued work */
+		/* Takes a reference, which will be released in the woke queued work */
 		mr = lookup_mr(pd, IB_ACCESS_LOCAL_WRITE,
 			       sg_list[i].lkey, RXE_LOOKUP_LOCAL);
 		if (!mr) {
@@ -550,7 +550,7 @@ static int rxe_ib_advise_mr_prefetch(struct ib_pd *ibpd,
 	return 0;
 
  err:
-	/* rollback reference counts for the invalid request */
+	/* rollback reference counts for the woke invalid request */
 	while (i > 0) {
 		i--;
 		rxe_put(work->frags[i].mr);

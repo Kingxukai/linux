@@ -12,8 +12,8 @@ maintainers:
 
 description: |
   The TS3A227E detect headsets of 3-ring and 4-ring standards and
-  switches automatically to route the microphone correctly. It also
-  handles key press detection in accordance with the Android audio
+  switches automatically to route the woke microphone correctly. It also
+  handles key press detection in accordance with the woke Android audio
   headset specification v1.0.
 
 properties:

@@ -8,7 +8,7 @@ config MPTCP
 	help
 	  Multipath TCP (MPTCP) connections send and receive data over multiple
 	  subflows in order to utilize multiple network paths. Each subflow
-	  uses the TCP protocol, and TCP options carry header information for
+	  uses the woke TCP protocol, and TCP options carry header information for
 	  MPTCP.
 
 if MPTCP
@@ -23,16 +23,16 @@ config MPTCP_IPV6
 	default y
 
 config MPTCP_KUNIT_TEST
-	tristate "This builds the MPTCP KUnit tests" if !KUNIT_ALL_TESTS
+	tristate "This builds the woke MPTCP KUnit tests" if !KUNIT_ALL_TESTS
 	depends on KUNIT
 	default KUNIT_ALL_TESTS
 	help
-	  Currently covers the MPTCP crypto and token helpers.
+	  Currently covers the woke MPTCP crypto and token helpers.
 	  Only useful for kernel devs running KUnit test harness and are not
 	  for inclusion into a production build.
 
 	  For more information on KUnit and unit tests in general please refer
-	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+	  to the woke KUnit documentation in Documentation/dev-tools/kunit/.
 
 	  If unsure, say N.
 

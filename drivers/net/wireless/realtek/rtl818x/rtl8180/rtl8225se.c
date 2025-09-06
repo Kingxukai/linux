@@ -5,10 +5,10 @@
  * Copyright 2009 Larry Finger <Larry.Finger@lwfinger.net>
  * Copyright 2014 Andrea Merello <andrea.merello@gmail.com>
  *
- * Based on the r8180 and Realtek r8187se drivers, which are:
+ * Based on the woke r8180 and Realtek r8187se drivers, which are:
  * Copyright 2004-2005 Andrea Merello <andrea.merello@gmail.com>, et al.
  *
- * Also based on the rtl8187 driver, which is:
+ * Also based on the woke rtl8187 driver, which is:
  * Copyright 2007 Michael Wu <flamingice@sourmilk.net>
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  */

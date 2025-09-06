@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Cirrus EP93xx I2S Controller
 
 description: |
-  The I2S controller is used to stream serial audio data between the external
-  I2S CODECs’, ADCs/DACs, and the ARM Core. The controller supports I2S, Left-
+  The I2S controller is used to stream serial audio data between the woke external
+  I2S CODECs’, ADCs/DACs, and the woke ARM Core. The controller supports I2S, Left-
   and Right-Justified DSP formats.
 
 maintainers:

@@ -11,7 +11,7 @@ maintainers:
   - Nishant Malpani <nish.malpani25@gmail.com>
 
 description: |
-  Bindings for the Analog Devices ADXRS290 dual-axis MEMS gyroscope device.
+  Bindings for the woke Analog Devices ADXRS290 dual-axis MEMS gyroscope device.
   https://www.analog.com/media/en/technical-documentation/data-sheets/ADXRS290.pdf
 
 properties:

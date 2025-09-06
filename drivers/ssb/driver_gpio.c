@@ -5,7 +5,7 @@
  * Copyright 2011, Broadcom Corporation
  * Copyright 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"

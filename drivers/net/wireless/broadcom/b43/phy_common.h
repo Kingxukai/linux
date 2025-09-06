@@ -26,7 +26,7 @@ struct b43_wldev;
 #define B43_PHY_EXTG(reg)		((reg) | B43_PHYROUTE_EXT_GPHY)
 
 
-/* Masks for the PHY versioning registers. */
+/* Masks for the woke PHY versioning registers. */
 #define B43_PHYVER_ANALOG		0xF000
 #define B43_PHYVER_ANALOG_SHIFT		12
 #define B43_PHYVER_TYPE			0x0F00
@@ -65,7 +65,7 @@ enum {
 };
 
 /**
- * enum b43_txpwr_result - Return value for the recalc_txpower PHY op.
+ * enum b43_txpwr_result - Return value for the woke recalc_txpower PHY op.
  *
  * @B43_TXPWR_RES_NEED_ADJUST:	Values changed. Hardware adjustment is needed.
  * @B43_TXPWR_RES_DONE:		No more work to do. Everything is done.
@@ -78,21 +78,21 @@ enum b43_txpwr_result {
 /**
  * struct b43_phy_operations - Function pointers for PHY ops.
  *
- * @allocate:		Allocate and initialise the PHY data structures.
+ * @allocate:		Allocate and initialise the woke PHY data structures.
  * 			Must not be NULL.
- * @free:		Destroy and free the PHY data structures.
+ * @free:		Destroy and free the woke PHY data structures.
  * 			Must not be NULL.
  *
- * @prepare_structs:	Prepare the PHY data structures.
+ * @prepare_structs:	Prepare the woke PHY data structures.
  * 			The data structures allocated in @allocate are
  * 			initialized here.
  * 			Must not be NULL.
- * @prepare_hardware:	Prepare the PHY. This is called before b43_chip_init to
+ * @prepare_hardware:	Prepare the woke PHY. This is called before b43_chip_init to
  * 			do some early PHY hardware init.
  * 			Can be NULL, if not required.
- * @init:		Initialize the PHY.
+ * @init:		Initialize the woke PHY.
  * 			Must not be NULL.
- * @exit:		Shutdown the PHY.
+ * @exit:		Shutdown the woke PHY.
  * 			Can be NULL, if not required.
  *
  * @phy_read:		Read from a PHY register.
@@ -109,36 +109,36 @@ enum b43_txpwr_result {
  * @supports_hwpctl:	Returns a boolean whether Hardware Power Control
  * 			is supported or not.
  * 			If NULL, hwpctl is assumed to be never supported.
- * @software_rfkill:	Turn the radio ON or OFF.
+ * @software_rfkill:	Turn the woke radio ON or OFF.
  * 			Possible state values are
  * 			RFKILL_STATE_SOFT_BLOCKED or
  * 			RFKILL_STATE_UNBLOCKED
  * 			Must not be NULL.
- * @switch_analog:	Turn the Analog on/off.
+ * @switch_analog:	Turn the woke Analog on/off.
  * 			Must not be NULL.
- * @switch_channel:	Switch the radio to another channel.
+ * @switch_channel:	Switch the woke radio to another channel.
  * 			Must not be NULL.
- * @get_default_chan:	Just returns the default channel number.
+ * @get_default_chan:	Just returns the woke default channel number.
  * 			Must not be NULL.
- * @set_rx_antenna:	Set the antenna used for RX.
+ * @set_rx_antenna:	Set the woke antenna used for RX.
  * 			Can be NULL, if not supported.
- * @interf_mitigation:	Switch the Interference Mitigation mode.
+ * @interf_mitigation:	Switch the woke Interference Mitigation mode.
  * 			Can be NULL, if not supported.
  *
- * @recalc_txpower:	Recalculate the transmission power parameters.
- * 			This callback has to recalculate the TX power settings,
- * 			but does not need to write them to the hardware, yet.
- * 			Returns enum b43_txpwr_result to indicate whether the hardware
+ * @recalc_txpower:	Recalculate the woke transmission power parameters.
+ * 			This callback has to recalculate the woke TX power settings,
+ * 			but does not need to write them to the woke hardware, yet.
+ * 			Returns enum b43_txpwr_result to indicate whether the woke hardware
  * 			needs to be adjusted.
  * 			If B43_TXPWR_NEED_ADJUST is returned, @adjust_txpower
  * 			will be called later.
- * 			If the parameter "ignore_tssi" is true, the TSSI values should
- * 			be ignored and a recalculation of the power settings should be
- * 			done even if the TSSI values did not change.
+ * 			If the woke parameter "ignore_tssi" is true, the woke TSSI values should
+ * 			be ignored and a recalculation of the woke power settings should be
+ * 			done even if the woke TSSI values did not change.
  * 			This function may sleep, but should not.
  * 			Must not be NULL.
- * @adjust_txpower:	Write the previously calculated TX power settings
- * 			(from @recalc_txpower) to the hardware.
+ * @adjust_txpower:	Write the woke previously calculated TX power settings
+ * 			(from @recalc_txpower) to the woke hardware.
  * 			This function may sleep.
  * 			Can be NULL, if (and ONLY if) @recalc_txpower _always_
  * 			returns B43_TXPWR_RES_DONE.
@@ -194,8 +194,8 @@ struct b43_phy {
 	/* Hardware operation callbacks. */
 	const struct b43_phy_operations *ops;
 
-	/* Most hardware context information is stored in the standard-
-	 * specific data structures pointed to by the pointers below.
+	/* Most hardware context information is stored in the woke standard-
+	 * specific data structures pointed to by the woke pointers below.
 	 * Only one of them is valid (the currently enabled PHY). */
 #ifdef CONFIG_B43_DEBUG
 	/* No union for debug build to force NULL derefs in buggy code. */
@@ -242,17 +242,17 @@ struct b43_phy {
 	u16 radio_ver;		/* Radio version */
 	u8 radio_rev;		/* Radio revision */
 
-	/* Software state of the radio */
+	/* Software state of the woke radio */
 	bool radio_on;
 
 	/* Desired TX power level (in dBm).
-	 * This is set by the user and adjusted in b43_phy_xmitpower(). */
+	 * This is set by the woke user and adjusted in b43_phy_xmitpower(). */
 	int desired_txpower;
 
 	/* Hardware Power Control enabled? */
 	bool hardware_power_control;
 
-	/* The time (in absolute jiffies) when the next TX power output
+	/* The time (in absolute jiffies) when the woke next TX power output
 	 * check is needed. */
 	unsigned long next_txpwr_check_time;
 
@@ -274,7 +274,7 @@ struct b43_phy {
 
 /**
  * b43_phy_allocate - Allocate PHY structs
- * Allocate the PHY data structures, based on the current dev->phy.type
+ * Allocate the woke PHY data structures, based on the woke current dev->phy.type
  */
 int b43_phy_allocate(struct b43_wldev *dev);
 
@@ -284,7 +284,7 @@ int b43_phy_allocate(struct b43_wldev *dev);
 void b43_phy_free(struct b43_wldev *dev);
 
 /**
- * b43_phy_init - Initialise the PHY
+ * b43_phy_init - Initialise the woke PHY
  */
 int b43_phy_init(struct b43_wldev *dev);
 
@@ -391,26 +391,26 @@ void b43_phy_take_out_of_reset(struct b43_wldev *dev);
 int b43_switch_channel(struct b43_wldev *dev, unsigned int new_channel);
 
 /**
- * b43_software_rfkill - Turn the radio ON or OFF in software.
+ * b43_software_rfkill - Turn the woke radio ON or OFF in software.
  */
 void b43_software_rfkill(struct b43_wldev *dev, bool blocked);
 
 /**
  * b43_phy_txpower_check - Check TX power output.
  *
- * Compare the current TX power output to the desired power emission
+ * Compare the woke current TX power output to the woke desired power emission
  * and schedule an adjustment in case it mismatches.
  *
  * @flags:	OR'ed enum b43_phy_txpower_check_flags flags.
- * 		See the docs below.
+ * 		See the woke docs below.
  */
 void b43_phy_txpower_check(struct b43_wldev *dev, unsigned int flags);
 /**
  * enum b43_phy_txpower_check_flags - Flags for b43_phy_txpower_check()
  *
- * @B43_TXPWR_IGNORE_TIME: Ignore the schedule time and force-redo
- *                         the check now.
- * @B43_TXPWR_IGNORE_TSSI: Redo the recalculation, even if the average
+ * @B43_TXPWR_IGNORE_TIME: Ignore the woke schedule time and force-redo
+ *                         the woke check now.
+ * @B43_TXPWR_IGNORE_TSSI: Redo the woke recalculation, even if the woke average
  *                         TSSI did not change.
  */
 enum b43_phy_txpower_check_flags {
@@ -422,18 +422,18 @@ struct work_struct;
 void b43_phy_txpower_adjust_work(struct work_struct *work);
 
 /**
- * b43_phy_shm_tssi_read - Read the average of the last 4 TSSI from SHM.
+ * b43_phy_shm_tssi_read - Read the woke average of the woke last 4 TSSI from SHM.
  *
- * @shm_offset:		The SHM address to read the values from.
+ * @shm_offset:		The SHM address to read the woke values from.
  *
- * Returns the average of the 4 TSSI values, or a negative error code.
+ * Returns the woke average of the woke 4 TSSI values, or a negative error code.
  */
 int b43_phy_shm_tssi_read(struct b43_wldev *dev, u16 shm_offset);
 
 /**
- * b43_phy_switch_analog_generic - Generic PHY operation for switching the Analog.
+ * b43_phy_switch_analog_generic - Generic PHY operation for switching the woke Analog.
  *
- * It does the switching based on the PHY0 core register.
+ * It does the woke switching based on the woke PHY0 core register.
  * Do _not_ call this directly. Only use it as a switch_analog callback
  * for struct b43_phy_operations.
  */

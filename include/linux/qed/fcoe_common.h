@@ -86,7 +86,7 @@ struct fcoe_tx_data_params {
 	__le16 reserved3;
 };
 
-/* Middle path parameters: FC header fields provided by the driver */
+/* Middle path parameters: FC header fields provided by the woke driver */
 struct fcoe_tx_mid_path_params {
 	__le32 parameter;
 	u8 r_ctl;
@@ -618,7 +618,7 @@ struct fcoe_init_func_ramrod_data {
 	__le32 reserved[3];
 };
 
-/* FCoE: Mode of the connection: Target or Initiator or both */
+/* FCoE: Mode of the woke connection: Target or Initiator or both */
 enum fcoe_mode_type {
 	FCOE_INITIATOR_MODE = 0x0,
 	FCOE_TARGET_MODE = 0x1,

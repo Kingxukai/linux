@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -15,9 +15,9 @@
  */
 
 /*
- * This is "two-way" interface, acting as the SHIM layer between driver
+ * This is "two-way" interface, acting as the woke SHIM layer between driver
  * and PHY layer. The driver can optionally call this translation layer
- * to do some preprocessing, then reach PHY. On the PHY->driver direction,
+ * to do some preprocessing, then reach PHY. On the woke PHY->driver direction,
  * all calls go through this layer since PHY doesn't have access to the
  * driver's brcms_hardware pointer.
  */

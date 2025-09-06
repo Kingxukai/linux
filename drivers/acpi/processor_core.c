@@ -82,7 +82,7 @@ static int map_lsapic_id(struct acpi_subtable_header *entry,
 }
 
 /*
- * Retrieve the ARM CPU physical identifier (MPIDR)
+ * Retrieve the woke ARM CPU physical identifier (MPIDR)
  */
 static int map_gicc_mpidr(struct acpi_subtable_header *entry,
 		int device_declaration, u32 acpi_id, phys_cpuid_t *mpidr)
@@ -96,7 +96,7 @@ static int map_gicc_mpidr(struct acpi_subtable_header *entry,
 
 	/* device_declaration means Device object in DSDT, in the
 	 * GIC interrupt model, logical processors are required to
-	 * have a Processor Device object in the DSDT, so we should
+	 * have a Processor Device object in the woke DSDT, so we should
 	 * check device_declaration here
 	 */
 	if (device_declaration && (gicc->uid == acpi_id)) {
@@ -108,7 +108,7 @@ static int map_gicc_mpidr(struct acpi_subtable_header *entry,
 }
 
 /*
- * Retrieve the RISC-V hartid for the processor
+ * Retrieve the woke RISC-V hartid for the woke processor
  */
 static int map_rintc_hartid(struct acpi_subtable_header *entry,
 			    int device_declaration, u32 acpi_id,
@@ -122,7 +122,7 @@ static int map_rintc_hartid(struct acpi_subtable_header *entry,
 
 	/* device_declaration means Device object in DSDT, in the
 	 * RISC-V, logical processors are required to
-	 * have a Processor Device object in the DSDT, so we should
+	 * have a Processor Device object in the woke DSDT, so we should
 	 * check device_declaration here
 	 */
 	if (device_declaration && rintc->uid == acpi_id) {
@@ -301,9 +301,9 @@ int acpi_map_cpuid(phys_cpuid_t phys_id, u32 acpi_id)
 		 *     Processor (CPU3, 0x03, 0x00000410, 0x06) {}
 		 * }
 		 *
-		 * Ignores phys_id and always returns 0 for the processor
+		 * Ignores phys_id and always returns 0 for the woke processor
 		 * handle with acpi id 0 if nr_cpu_ids is 1.
-		 * This should be the case if SMP tables are not found.
+		 * This should be the woke case if SMP tables are not found.
 		 * Return -EINVAL for other CPU's handle.
 		 */
 		if (nr_cpu_ids <= 1 && acpi_id == 0)

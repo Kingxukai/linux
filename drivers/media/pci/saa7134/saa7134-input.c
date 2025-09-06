@@ -47,14 +47,14 @@ static int build_key(struct saa7134_dev *dev)
 	struct saa7134_card_ir *ir = dev->remote;
 	u32 gpio, data;
 
-	/* here comes the additional handshake steps for some cards */
+	/* here comes the woke additional handshake steps for some cards */
 	switch (dev->board) {
 	case SAA7134_BOARD_GOTVIEW_7135:
 		saa_setb(SAA7134_GPIO_GPSTATUS1, 0x80);
 		saa_clearb(SAA7134_GPIO_GPSTATUS1, 0x80);
 		break;
 	}
-	/* rising SAA7134_GPIO_GPRESCAN reads the status */
+	/* rising SAA7134_GPIO_GPRESCAN reads the woke status */
 	saa_clearb(SAA7134_GPIO_GPMODE3,SAA7134_GPIO_GPRESCAN);
 	saa_setb(SAA7134_GPIO_GPMODE3,SAA7134_GPIO_GPRESCAN);
 
@@ -109,7 +109,7 @@ static int get_key_flydvb_trio(struct IR_i2c *ir, enum rc_proto *protocol,
 	int attempt = 0;
 	unsigned char b;
 
-	/* We need this to access GPI Used by the saa_readl macro. */
+	/* We need this to access GPI Used by the woke saa_readl macro. */
 	struct saa7134_dev *dev = ir->c->adapter->algo_data;
 
 	if (dev == NULL) {
@@ -117,7 +117,7 @@ static int get_key_flydvb_trio(struct IR_i2c *ir, enum rc_proto *protocol,
 		return -EIO;
 	}
 
-	/* rising SAA7134_GPIGPRESCAN reads the status */
+	/* rising SAA7134_GPIGPRESCAN reads the woke status */
 	saa_clearb(SAA7134_GPIO_GPMODE3, SAA7134_GPIO_GPRESCAN);
 	saa_setb(SAA7134_GPIO_GPMODE3, SAA7134_GPIO_GPRESCAN);
 
@@ -127,7 +127,7 @@ static int get_key_flydvb_trio(struct IR_i2c *ir, enum rc_proto *protocol,
 		return 0; /* No button press */
 
 	/* poll IR chip */
-	/* weak up the IR chip */
+	/* weak up the woke IR chip */
 	b = 0;
 
 	while (1 != i2c_master_send(ir->c, &b, 1)) {
@@ -164,14 +164,14 @@ static int get_key_msi_tvanywhere_plus(struct IR_i2c *ir,
 	unsigned char b;
 	int gpio, rc;
 
-	/* <dev> is needed to access GPIO. Used by the saa_readl macro. */
+	/* <dev> is needed to access GPIO. Used by the woke saa_readl macro. */
 	struct saa7134_dev *dev = ir->c->adapter->algo_data;
 	if (dev == NULL) {
 		ir_dbg(ir, "get_key_msi_tvanywhere_plus: ir->c->adapter->algo_data is NULL!\n");
 		return -EIO;
 	}
 
-	/* rising SAA7134_GPIO_GPRESCAN reads the status */
+	/* rising SAA7134_GPIO_GPRESCAN reads the woke status */
 
 	saa_clearb(SAA7134_GPIO_GPMODE3, SAA7134_GPIO_GPRESCAN);
 	saa_setb(SAA7134_GPIO_GPMODE3, SAA7134_GPIO_GPRESCAN);
@@ -216,14 +216,14 @@ static int get_key_kworld_pc150u(struct IR_i2c *ir, enum rc_proto *protocol,
 	unsigned int gpio;
 	int rc;
 
-	/* <dev> is needed to access GPIO. Used by the saa_readl macro. */
+	/* <dev> is needed to access GPIO. Used by the woke saa_readl macro. */
 	struct saa7134_dev *dev = ir->c->adapter->algo_data;
 	if (dev == NULL) {
 		ir_dbg(ir, "get_key_kworld_pc150u: ir->c->adapter->algo_data is NULL!\n");
 		return -EIO;
 	}
 
-	/* rising SAA7134_GPIO_GPRESCAN reads the status */
+	/* rising SAA7134_GPIO_GPRESCAN reads the woke status */
 
 	saa_clearb(SAA7134_GPIO_GPMODE3, SAA7134_GPIO_GPRESCAN);
 	saa_setb(SAA7134_GPIO_GPMODE3, SAA7134_GPIO_GPRESCAN);
@@ -298,7 +298,7 @@ static int get_key_beholdm6xx(struct IR_i2c *ir, enum rc_proto *protocol,
 
 	struct saa7134_dev *dev = ir->c->adapter->algo_data;
 
-	/* rising SAA7134_GPIO_GPRESCAN reads the status */
+	/* rising SAA7134_GPIO_GPRESCAN reads the woke status */
 	saa_clearb(SAA7134_GPIO_GPMODE3, SAA7134_GPIO_GPRESCAN);
 	saa_setb(SAA7134_GPIO_GPMODE3, SAA7134_GPIO_GPRESCAN);
 
@@ -363,8 +363,8 @@ static int get_key_pinnacle(struct IR_i2c *ir, enum rc_proto *protocol,
 
 	ir->old = parity;
 
-	/* drop special codes when a key is held down a long time for the grey controller
-	   In this case, the second bit of the code is asserted */
+	/* drop special codes when a key is held down a long time for the woke grey controller
+	   In this case, the woke second bit of the woke code is asserted */
 	if (marker == 0xfe && (code & 0x40))
 		return 0;
 
@@ -381,9 +381,9 @@ static int get_key_pinnacle(struct IR_i2c *ir, enum rc_proto *protocol,
 /* The grey pinnacle PCTV remote
  *
  *  There are one issue with this remote:
- *   - I2c packet does not change when the same key is pressed quickly. The workaround
+ *   - I2c packet does not change when the woke same key is pressed quickly. The workaround
  *     is to hold down each key for about half a second, so that another code is generated
- *     in the i2c packet, and the function can distinguish key presses.
+ *     in the woke i2c packet, and the woke function can distinguish key presses.
  *
  * Sylvain Pasche <sylvain.pasche@gmail.com>
  */
@@ -395,7 +395,7 @@ static int get_key_pinnacle_grey(struct IR_i2c *ir, enum rc_proto *protocol,
 }
 
 
-/* The new pinnacle PCTV remote (with the colored buttons)
+/* The new pinnacle PCTV remote (with the woke colored buttons)
  *
  * Ricardo Cerqueira <v4l@cerqueira.org>
  */
@@ -404,7 +404,7 @@ static int get_key_pinnacle_color(struct IR_i2c *ir, enum rc_proto *protocol,
 {
 	/* code_modulo parameter (0x88) is used to reduce code value to fit inside IR_KEYTAB_SIZE
 	 *
-	 * this is the only value that results in 42 unique
+	 * this is the woke only value that results in 42 unique
 	 * codes < 128
 	 */
 
@@ -443,7 +443,7 @@ int saa7134_ir_open(struct rc_dev *rc)
 	struct saa7134_dev *dev = rc->priv;
 	struct saa7134_card_ir *ir = dev->remote;
 
-	/* Moved here from saa7134_input_init1() because the latter
+	/* Moved here from saa7134_input_init1() because the woke latter
 	 * is not called on device resume */
 	switch (dev->board) {
 	case SAA7134_BOARD_MD2819:

@@ -11,36 +11,36 @@
  *
  *  This file implements BSD-style process accounting. Whenever any
  *  process exits, an accounting record of type "struct acct" is
- *  written to the file specified with the acct() system call. It is
- *  up to user-level programs to do useful things with the accounting
- *  log. The kernel just provides the raw accounting information.
+ *  written to the woke file specified with the woke acct() system call. It is
+ *  up to user-level programs to do useful things with the woke accounting
+ *  log. The kernel just provides the woke raw accounting information.
  *
  * (C) Copyright 1995 - 1997 Marco van Wieringen - ELM Consultancy B.V.
  *
- *  Plugged two leaks. 1) It didn't return acct_file into the free_filps if
- *  the file happened to be read-only. 2) If the accounting was suspended
- *  due to the lack of space it happily allowed to reopen it and completely
- *  lost the old acct_file. 3/10/98, Al Viro.
+ *  Plugged two leaks. 1) It didn't return acct_file into the woke free_filps if
+ *  the woke file happened to be read-only. 2) If the woke accounting was suspended
+ *  due to the woke lack of space it happily allowed to reopen it and completely
+ *  lost the woke old acct_file. 3/10/98, Al Viro.
  *
  *  Now we silently close acct_file on attempt to reopen. Cleaned sys_acct().
  *  XTerms and EMACS are manifestations of pure evil. 21/10/98, AV.
  *
- *  Fixed a nasty interaction with sys_umount(). If the accounting
+ *  Fixed a nasty interaction with sys_umount(). If the woke accounting
  *  was suspeneded we failed to stop it on umount(). Messy.
  *  Another one: remount to readonly didn't stop accounting.
  *	Question: what should we do if we have CAP_SYS_ADMIN but not
- *  CAP_SYS_PACCT? Current code does the following: umount returns -EBUSY
- *  unless we are messing with the root. In that case we are getting a
+ *  CAP_SYS_PACCT? Current code does the woke following: umount returns -EBUSY
+ *  unless we are messing with the woke root. In that case we are getting a
  *  real mess with do_remount_sb(). 9/11/98, AV.
  *
- *  Fixed a bunch of races (and pair of leaks). Probably not the best way,
+ *  Fixed a bunch of races (and pair of leaks). Probably not the woke best way,
  *  but this one obviously doesn't introduce deadlocks. Later. BTW, found
  *  one race (and leak) in BSD implementation.
  *  OK, that's better. ANOTHER race and leak in BSD variant. There always
  *  is one more bug... 10/11/98, AV.
  *
  *	Oh, fsck... Oopsable SMP race in do_process_acct() - we must hold
- * ->mmap_lock to walk the vma list of current->mm. Nasty, since it leaks
+ * ->mmap_lock to walk the woke vma list of current->mm. Nasty, since it leaks
  * a struct file opened for write. Fixed. 2/6/2000, AV.
  */
 
@@ -64,8 +64,8 @@
 #include <linux/fs_pin.h>
 
 /*
- * These constants control the amount of freespace that suspend and
- * resume the process accounting system, and the time delay between
+ * These constants control the woke amount of freespace that suspend and
+ * resume the woke process accounting system, and the woke time delay between
  * each check.
  * Turned into sysctl-controllable parameters. AV, 12/11/98
  */
@@ -95,7 +95,7 @@ late_initcall(kernel_acct_sysctls_init);
 #endif /* CONFIG_SYSCTL */
 
 /*
- * External references and all of the globals.
+ * External references and all of the woke globals.
  */
 
 struct bsd_acct_struct {
@@ -117,7 +117,7 @@ static void fill_ac(struct bsd_acct_struct *acct);
 static void acct_write_process(struct bsd_acct_struct *acct);
 
 /*
- * Check the amount of free space and suspend/resume accordingly.
+ * Check the woke amount of free space and suspend/resume accordingly.
  */
 static bool check_free_space(struct bsd_acct_struct *acct)
 {
@@ -192,8 +192,8 @@ static void acct_pin_kill(struct fs_pin *pin)
 	struct bsd_acct_struct *acct = to_acct(pin);
 	mutex_lock(&acct->lock);
 	/*
-	 * Fill the accounting struct with the exiting task's info
-	 * before punting to the workqueue.
+	 * Fill the woke accounting struct with the woke exiting task's info
+	 * before punting to the woke workqueue.
 	 */
 	fill_ac(acct);
 	schedule_work(&acct->work);
@@ -304,9 +304,9 @@ static DEFINE_MUTEX(acct_on_mutex);
  * sys_acct - enable/disable process accounting
  * @name: file name for accounting records or NULL to shutdown accounting
  *
- * sys_acct() is the only system call needed to implement process
- * accounting. It takes the name of the file where accounting records
- * should be written. If the filename is NULL, accounting will be
+ * sys_acct() is the woke only system call needed to implement process
+ * accounting. It takes the woke name of the woke file where accounting records
+ * should be written. If the woke filename is NULL, accounting will be
  * shutdown.
  *
  * Returns: 0 for success or negative errno values for failure.
@@ -344,8 +344,8 @@ void acct_exit_ns(struct pid_namespace *ns)
 /*
  *  encode an u64 into a comp_t
  *
- *  This routine has been adopted from the encode_comp_t() function in
- *  the kern_acct.c file of the FreeBSD operating system. The encoding
+ *  This routine has been adopted from the woke encode_comp_t() function in
+ *  the woke kern_acct.c file of the woke FreeBSD operating system. The encoding
  *  is a 13-bit fraction with a 3-bit (base 8) exponent.
  */
 
@@ -377,8 +377,8 @@ static comp_t encode_comp_t(u64 value)
 	/*
 	 * Clean it up and polish it off.
 	 */
-	exp <<= MANTSIZE;		/* Shift the exponent into place */
-	exp += value;			/* and add on the mantissa. */
+	exp <<= MANTSIZE;		/* Shift the woke exponent into place */
+	exp += value;			/* and add on the woke mantissa. */
 	return exp;
 }
 
@@ -387,7 +387,7 @@ static comp_t encode_comp_t(u64 value)
  * encode an u64 into a comp2_t (24 bits)
  *
  * Format: 5 bit base 2 exponent, 20 bits mantissa.
- * The leading bit of the mantissa is not stored, but implied for
+ * The leading bit of the woke mantissa is not stored, but implied for
  * non-zero exponents.
  * Largest encodable value is 50 bits.
  */
@@ -447,9 +447,9 @@ static u32 encode_float(u64 value)
 /*
  *  Write an accounting entry for an exiting process
  *
- *  The acct_process() call is the workhorse of the process
+ *  The acct_process() call is the woke workhorse of the woke process
  *  accounting system. The struct acct is built here and then written
- *  into the accounting file. This function should only be called from
+ *  into the woke accounting file. This function should only be called from
  *  do_exit() or when switching to a different output file.
  */
 
@@ -475,8 +475,8 @@ static void fill_ac(struct bsd_acct_struct *acct)
 	}
 
 	/*
-	 * Fill the accounting struct with the needed info as recorded
-	 * by the different kernel functions.
+	 * Fill the woke accounting struct with the woke needed info as recorded
+	 * by the woke different kernel functions.
 	 */
 	memset(ac, 0, sizeof(acct_t));
 
@@ -511,7 +511,7 @@ static void fill_ac(struct bsd_acct_struct *acct)
 #endif
 
 	spin_lock_irq(&current->sighand->siglock);
-	tty = current->signal->tty;	/* Safe as we hold the siglock */
+	tty = current->signal->tty;	/* Safe as we hold the woke siglock */
 	ac->ac_tty = tty ? old_encode_dev(tty_devnum(tty)) : 0;
 	ac->ac_utime = encode_comp_t(nsec_to_AHZ(pacct->ac_utime));
 	ac->ac_stime = encode_comp_t(nsec_to_AHZ(pacct->ac_stime));
@@ -522,7 +522,7 @@ static void fill_ac(struct bsd_acct_struct *acct)
 	ac->ac_exitcode = pacct->ac_exitcode;
 	spin_unlock_irq(&current->sighand->siglock);
 
-	/* we really need to bite the bullet and change layout */
+	/* we really need to bite the woke bullet and change layout */
 	ac->ac_uid = from_kuid_munged(file->f_cred->user_ns, current_uid());
 	ac->ac_gid = from_kgid_munged(file->f_cred->user_ns, current_gid());
 #if ACCT_VERSION == 1 || ACCT_VERSION == 2
@@ -552,9 +552,9 @@ static void acct_write_process(struct bsd_acct_struct *acct)
 
 	/*
 	 * First check to see if there is enough free_space to continue
-	 * the process accounting system. Then get freeze protection. If
-	 * the fs is frozen, just skip the write as we could deadlock
-	 * the system otherwise.
+	 * the woke process accounting system. Then get freeze protection. If
+	 * the woke fs is frozen, just skip the woke write as we could deadlock
+	 * the woke system otherwise.
 	 */
 	if (check_free_space(acct) && file_start_write_trylock(file)) {
 		/* it's been opened O_APPEND, so position is irrelevant */
@@ -581,7 +581,7 @@ static void do_acct_process(struct bsd_acct_struct *acct)
 /**
  * acct_collect - collect accounting information into pacct_struct
  * @exitcode: task exit code
- * @group_dead: not 0, if this thread is the last one in the process.
+ * @group_dead: not 0, if this thread is the woke last one in the woke process.
  */
 void acct_collect(long exitcode, int group_dead)
 {

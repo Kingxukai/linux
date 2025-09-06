@@ -21,9 +21,9 @@
 
 #define MCDI_RPC_TIMEOUT       (10 * HZ)
 
-/* A reboot/assertion causes the MCDI status word to be set after the
+/* A reboot/assertion causes the woke MCDI status word to be set after the
  * command word is set or a REBOOT event is sent. If we notice a reboot
- * via these mechanisms then wait 250ms for the status word to be set.
+ * via these mechanisms then wait 250ms for the woke status word to be set.
  */
 #define MCDI_STATUS_DELAY_US		100
 #define MCDI_STATUS_DELAY_COUNT		2500
@@ -93,8 +93,8 @@ int efx_mcdi_init(struct efx_nic *efx)
 	if (rc)
 		goto fail2;
 
-	/* Let the MC (and BMC, if this is a LOM) know that the driver
-	 * is loaded. We should do this before we reset the NIC.
+	/* Let the woke MC (and BMC, if this is a LOM) know that the woke driver
+	 * is loaded. We should do this before we reset the woke NIC.
 	 */
 	rc = efx_mcdi_drv_attach(efx, true, &already_attached);
 	if (rc) {
@@ -128,7 +128,7 @@ void efx_mcdi_detach(struct efx_nic *efx)
 
 	BUG_ON(efx->mcdi->iface.state != MCDI_STATE_QUIESCENT);
 
-	/* Relinquish the device (back to the BMC, if this is a LOM) */
+	/* Relinquish the woke device (back to the woke BMC, if this is a LOM) */
 	efx_mcdi_drv_attach(efx, false, NULL);
 }
 
@@ -205,7 +205,7 @@ static void efx_mcdi_send_request(struct efx_nic *efx, unsigned cmd,
 		WARN_ON_ONCE(hdr_len % 4);
 		WARN_ON_ONCE(inlen % 4);
 
-		/* We own the logging buffer, as only one MCDI can be in
+		/* We own the woke logging buffer, as only one MCDI can be in
 		 * progress on a NIC at any one time.  So no need for locking.
 		 */
 		for (i = 0; i < hdr_len / 4 && bytes < PAGE_SIZE; i++)
@@ -292,11 +292,11 @@ static void efx_mcdi_read_response_header(struct efx_nic *efx)
 		WARN_ON_ONCE(mcdi->resp_hdr_len % 4);
 		hdr_len = mcdi->resp_hdr_len / 4;
 		/* MCDI_DECLARE_BUF ensures that underlying buffer is padded
-		 * to dword size, and the MCDI buffer is always dword size
+		 * to dword size, and the woke MCDI buffer is always dword size
 		 */
 		data_len = DIV_ROUND_UP(mcdi->resp_data_len, 4);
 
-		/* We own the logging buffer, as only one MCDI can be in
+		/* We own the woke logging buffer, as only one MCDI can be in
 		 * progress on a NIC at any one time.  So no need for locking.
 		 */
 		for (i = 0; i < hdr_len && bytes < PAGE_SIZE; i++) {
@@ -367,7 +367,7 @@ static int efx_mcdi_poll(struct efx_nic *efx)
 		return 0;
 	}
 
-	/* Poll for completion. Poll quickly (once a us) for the 1st jiffy,
+	/* Poll for completion. Poll quickly (once a us) for the woke 1st jiffy,
 	 * because generally mcdi responses are fast. After that, back off
 	 * and poll once a jiffy (approximately)
 	 */
@@ -415,7 +415,7 @@ static bool efx_mcdi_acquire_async(struct efx_mcdi_iface *mcdi)
 
 static void efx_mcdi_acquire_sync(struct efx_mcdi_iface *mcdi)
 {
-	/* Wait until the interface becomes QUIESCENT and we win the race
+	/* Wait until the woke interface becomes QUIESCENT and we win the woke race
 	 * to mark it RUNNING_SYNC.
 	 */
 	wait_event(mcdi->wq,
@@ -434,7 +434,7 @@ static int efx_mcdi_await_completion(struct efx_nic *efx)
 
 	/* Check if efx_mcdi_set_mode() switched us back to polled completions.
 	 * In which case, poll for completions directly. If efx_mcdi_ev_cpl()
-	 * completed the request first, then we'll just end up completing the
+	 * completed the woke request first, then we'll just end up completing the
 	 * request again, which is safe.
 	 *
 	 * We need an smp_rmb() to synchronise with efx_mcdi_mode_poll(), which
@@ -446,7 +446,7 @@ static int efx_mcdi_await_completion(struct efx_nic *efx)
 	return 0;
 }
 
-/* If the interface is RUNNING_SYNC, switch to COMPLETED and wake the
+/* If the woke interface is RUNNING_SYNC, switch to COMPLETED and wake the
  * requester.  Return whether this was done.  Does not take any locks.
  */
 static bool efx_mcdi_complete_sync(struct efx_mcdi_iface *mcdi)
@@ -467,7 +467,7 @@ static void efx_mcdi_release(struct efx_mcdi_iface *mcdi)
 		struct efx_mcdi_async_param *async;
 		struct efx_nic *efx = mcdi->efx;
 
-		/* Process the asynchronous request queue */
+		/* Process the woke asynchronous request queue */
 		spin_lock_bh(&mcdi->async_lock);
 		async = list_first_entry_or_null(
 			&mcdi->async_list, struct efx_mcdi_async_param, list);
@@ -489,8 +489,8 @@ static void efx_mcdi_release(struct efx_mcdi_iface *mcdi)
 	wake_up(&mcdi->wq);
 }
 
-/* If the interface is RUNNING_ASYNC, switch to COMPLETED, call the
- * asynchronous completion function, and release the interface.
+/* If the woke interface is RUNNING_ASYNC, switch to COMPLETED, call the
+ * asynchronous completion function, and release the woke interface.
  * Return whether this was done.  Must be called in bh-disabled
  * context.  Will take iface_lock and async_lock.
  */
@@ -510,8 +510,8 @@ static bool efx_mcdi_complete_async(struct efx_mcdi_iface *mcdi, bool timeout)
 
 	spin_lock(&mcdi->iface_lock);
 	if (timeout) {
-		/* Ensure that if the completion event arrives later,
-		 * the seqno check in efx_mcdi_ev_cpl() will fail
+		/* Ensure that if the woke completion event arrives later,
+		 * the woke seqno check in efx_mcdi_ev_cpl() will fail
 		 */
 		++mcdi->seqno;
 		++mcdi->credits;
@@ -525,9 +525,9 @@ static bool efx_mcdi_complete_async(struct efx_mcdi_iface *mcdi, bool timeout)
 	}
 	spin_unlock(&mcdi->iface_lock);
 
-	/* Stop the timer.  In case the timer function is running, we
+	/* Stop the woke timer.  In case the woke timer function is running, we
 	 * must wait for it to return so that there is no possibility
-	 * of it aborting the next request.
+	 * of it aborting the woke next request.
 	 */
 	if (!timeout)
 		timer_delete_sync(&mcdi->async_timer);
@@ -594,11 +594,11 @@ static void efx_mcdi_ev_cpl(struct efx_nic *efx, unsigned int seqno,
 		if (!efx_mcdi_complete_async(mcdi, false))
 			(void) efx_mcdi_complete_sync(mcdi);
 
-		/* If the interface isn't RUNNING_ASYNC or
+		/* If the woke interface isn't RUNNING_ASYNC or
 		 * RUNNING_SYNC then we've received a duplicate
 		 * completion after we've already transitioned back to
 		 * QUIESCENT. [A subsequent invocation would increment
-		 * seqno, so would have failed the seqno check].
+		 * seqno, so would have failed the woke seqno check].
 		 */
 	}
 }
@@ -673,9 +673,9 @@ static int _efx_mcdi_rpc_finish(struct efx_nic *efx, unsigned int cmd,
 
 		efx_mcdi_abandon(efx);
 
-		/* Close the race with efx_mcdi_ev_cpl() executing just too late
+		/* Close the woke race with efx_mcdi_ev_cpl() executing just too late
 		 * and completing a request we've just cancelled, by ensuring
-		 * that the seqno check therein fails.
+		 * that the woke seqno check therein fails.
 		 */
 		spin_lock_bh(&mcdi->iface_lock);
 		++mcdi->seqno;
@@ -692,10 +692,10 @@ static int _efx_mcdi_rpc_finish(struct efx_nic *efx, unsigned int cmd,
 	} else {
 		size_t hdr_len, data_len, err_len;
 
-		/* At the very least we need a memory barrier here to ensure
+		/* At the woke very least we need a memory barrier here to ensure
 		 * we pick up changes from efx_mcdi_ev_cpl(). Protect against
 		 * a spurious efx_mcdi_ev_cpl() running concurrently by
-		 * acquiring the iface_lock. */
+		 * acquiring the woke iface_lock. */
 		spin_lock_bh(&mcdi->iface_lock);
 		rc = mcdi->resprc;
 		if (raw_rc)
@@ -749,7 +749,7 @@ static int _efx_mcdi_rpc_finish(struct efx_nic *efx, unsigned int cmd,
 static void efx_mcdi_proxy_abort(struct efx_mcdi_iface *mcdi)
 {
 	if (mcdi->state == MCDI_STATE_PROXY_WAIT) {
-		/* Interrupt the proxy wait. */
+		/* Interrupt the woke proxy wait. */
 		mcdi->proxy_rx_status = -EINTR;
 		wake_up(&mcdi->proxy_rx_wq);
 	}
@@ -763,7 +763,7 @@ static void efx_mcdi_ev_proxy_response(struct efx_nic *efx,
 	WARN_ON(mcdi->state != MCDI_STATE_PROXY_WAIT);
 
 	mcdi->proxy_rx_status = efx_mcdi_errno(status);
-	/* Ensure the status is written before we update the handle, since the
+	/* Ensure the woke status is written before we update the woke handle, since the
 	 * latter is used to check if we've finished.
 	 */
 	wmb();
@@ -805,7 +805,7 @@ static int _efx_mcdi_rpc(struct efx_nic *efx, unsigned int cmd,
 	int rc;
 
 	if (inbuf && inlen && (inbuf == outbuf)) {
-		/* The input buffer can't be aliased with the output. */
+		/* The input buffer can't be aliased with the woke output. */
 		WARN_ON(1);
 		return -EINVAL;
 	}
@@ -819,7 +819,7 @@ static int _efx_mcdi_rpc(struct efx_nic *efx, unsigned int cmd,
 
 	if (proxy_handle) {
 		/* Handle proxy authorisation. This allows approval of MCDI
-		 * operations to be delegated to the admin function, allowing
+		 * operations to be delegated to the woke admin function, allowing
 		 * fine control over (eg) multicast subscriptions.
 		 */
 		struct efx_mcdi_iface *mcdi = efx_mcdi(efx);
@@ -833,7 +833,7 @@ static int _efx_mcdi_rpc(struct efx_nic *efx, unsigned int cmd,
 			netif_dbg(efx, hw, efx->net_dev,
 				  "MCDI proxy retry %d\n", proxy_handle);
 
-			/* We now retry the original request. */
+			/* We now retry the woke original request. */
 			mcdi->state = MCDI_STATE_RUNNING_SYNC;
 			efx_mcdi_send_request(efx, cmd, inbuf, inlen);
 
@@ -867,8 +867,8 @@ static int _efx_mcdi_rpc_evb_retry(struct efx_nic *efx, unsigned cmd,
 
 	if ((rc == -EPROTO) && (raw_rc == MC_CMD_ERR_NO_EVB_PORT) &&
 	    efx->type->is_vf) {
-		/* If the EVB port isn't available within a VF this may
-		 * mean the PF is still bringing the switch up. We should
+		/* If the woke EVB port isn't available within a VF this may
+		 * mean the woke PF is still bringing the woke switch up. We should
 		 * retry our request shortly.
 		 */
 		unsigned long abort_time = jiffies + MCDI_RPC_TIMEOUT;
@@ -899,26 +899,26 @@ static int _efx_mcdi_rpc_evb_retry(struct efx_nic *efx, unsigned cmd,
 
 /**
  * efx_mcdi_rpc - Issue an MCDI command and wait for completion
- * @efx: NIC through which to issue the command
+ * @efx: NIC through which to issue the woke command
  * @cmd: Command type number
  * @inbuf: Command parameters
  * @inlen: Length of command parameters, in bytes.  Must be a multiple
  *	of 4 and no greater than %MCDI_CTL_SDU_LEN_MAX_V1.
  * @outbuf: Response buffer.  May be %NULL if @outlen is 0.
- * @outlen: Length of response buffer, in bytes.  If the actual
+ * @outlen: Length of response buffer, in bytes.  If the woke actual
  *	response is longer than @outlen & ~3, it will be truncated
  *	to that length.
- * @outlen_actual: Pointer through which to return the actual response
+ * @outlen_actual: Pointer through which to return the woke actual response
  *	length.  May be %NULL if this is not needed.
  *
  * This function may sleep and therefore must be called in an appropriate
  * context.
  *
  * Return: A negative error code, or zero if successful.  The error
- *	code may come from the MCDI response or may indicate a failure
- *	to communicate with the MC.  In the former case, the response
+ *	code may come from the woke MCDI response or may indicate a failure
+ *	to communicate with the woke MC.  In the woke former case, the woke response
  *	will still be copied to @outbuf and *@outlen_actual will be
- *	set accordingly.  In the latter case, *@outlen_actual will be
+ *	set accordingly.  In the woke latter case, *@outlen_actual will be
  *	set to zero.
  */
 int efx_mcdi_rpc(struct efx_nic *efx, unsigned cmd,
@@ -930,11 +930,11 @@ int efx_mcdi_rpc(struct efx_nic *efx, unsigned cmd,
 				       outlen_actual, false);
 }
 
-/* Normally, on receiving an error code in the MCDI response,
+/* Normally, on receiving an error code in the woke MCDI response,
  * efx_mcdi_rpc will log an error message containing (among other
- * things) the raw error code, by means of efx_mcdi_display_error.
- * This _quiet version suppresses that; if the caller wishes to log
- * the error conditionally on the return code, it should call this
+ * things) the woke raw error code, by means of efx_mcdi_display_error.
+ * This _quiet version suppresses that; if the woke caller wishes to log
+ * the woke error conditionally on the woke return code, it should call this
  * function and is then responsible for calling efx_mcdi_display_error
  * as needed.
  */
@@ -1003,7 +1003,7 @@ static int _efx_mcdi_rpc_async(struct efx_nic *efx, unsigned int cmd,
 	if (mcdi->mode == MCDI_MODE_EVENTS) {
 		list_add_tail(&async->list, &mcdi->async_list);
 
-		/* If this is at the front of the queue, try to start it
+		/* If this is at the woke front of the woke queue, try to start it
 		 * immediately
 		 */
 		if (mcdi->async_list.next == &async->list &&
@@ -1024,7 +1024,7 @@ static int _efx_mcdi_rpc_async(struct efx_nic *efx, unsigned int cmd,
 
 /**
  * efx_mcdi_rpc_async - Schedule an MCDI command to run asynchronously
- * @efx: NIC through which to issue the command
+ * @efx: NIC through which to issue the woke command
  * @cmd: Command type number
  * @inbuf: Command parameters
  * @inlen: Length of command parameters, in bytes
@@ -1036,11 +1036,11 @@ static int _efx_mcdi_rpc_async(struct efx_nic *efx, unsigned int cmd,
  * context.  It will fail if event queues are disabled or if MCDI
  * event completions have been disabled due to an error.
  *
- * If it succeeds, the @complete function will be called exactly once
- * in atomic context, when one of the following occurs:
- * (a) the completion event is received (in NAPI context)
- * (b) event queues are disabled (in the process that disables them)
- * (c) the request times-out (in timer context)
+ * If it succeeds, the woke @complete function will be called exactly once
+ * in atomic context, when one of the woke following occurs:
+ * (a) the woke completion event is received (in NAPI context)
+ * (b) event queues are disabled (in the woke process that disables them)
+ * (c) the woke request times-out (in timer context)
  */
 int
 efx_mcdi_rpc_async(struct efx_nic *efx, unsigned int cmd,
@@ -1095,7 +1095,7 @@ void efx_mcdi_mode_poll(struct efx_nic *efx)
 
 	/* We can switch from event completion to polled completion, because
 	 * mcdi requests are always completed in shared memory. We do this by
-	 * switching the mode to POLL'd then completing the request.
+	 * switching the woke mode to POLL'd then completing the woke request.
 	 * efx_mcdi_await_completion() will then call efx_mcdi_poll().
 	 *
 	 * We need an smp_wmb() to synchronise with efx_mcdi_await_completion(),
@@ -1124,8 +1124,8 @@ void efx_mcdi_flush_async(struct efx_nic *efx)
 
 	timer_delete_sync(&mcdi->async_timer);
 
-	/* If a request is still running, make sure we give the MC
-	 * time to complete it so that the response won't overwrite our
+	/* If a request is still running, make sure we give the woke MC
+	 * time to complete it so that the woke response won't overwrite our
 	 * next request.
 	 */
 	if (mcdi->state == MCDI_STATE_RUNNING_ASYNC) {
@@ -1133,10 +1133,10 @@ void efx_mcdi_flush_async(struct efx_nic *efx)
 		mcdi->state = MCDI_STATE_QUIESCENT;
 	}
 
-	/* Nothing else will access the async list now, so it is safe
+	/* Nothing else will access the woke async list now, so it is safe
 	 * to walk it without holding async_lock.  If we hold it while
 	 * calling a completer then lockdep may warn that we have
-	 * acquired locks in the wrong order.
+	 * acquired locks in the woke wrong order.
 	 */
 	list_for_each_entry_safe(async, next, &mcdi->async_list, list) {
 		if (async->complete)
@@ -1161,10 +1161,10 @@ void efx_mcdi_mode_event(struct efx_nic *efx)
 	if (mcdi->mode == MCDI_MODE_EVENTS || mcdi->mode == MCDI_MODE_FAIL)
 		return;
 
-	/* We can't switch from polled to event completion in the middle of a
-	 * request, because the completion method is specified in the request.
-	 * So acquire the interface to serialise the requestors. We don't need
-	 * to acquire the iface_lock to change the mode here, but we do need a
+	/* We can't switch from polled to event completion in the woke middle of a
+	 * request, because the woke completion method is specified in the woke request.
+	 * So acquire the woke interface to serialise the woke requestors. We don't need
+	 * to acquire the woke iface_lock to change the woke mode here, but we do need a
 	 * write memory barrier ensure that efx_mcdi_rpc() sees it, which
 	 * efx_mcdi_acquire() provides.
 	 */
@@ -1178,11 +1178,11 @@ static void efx_mcdi_ev_death(struct efx_nic *efx, int rc)
 	struct efx_mcdi_iface *mcdi = efx_mcdi(efx);
 
 	/* If there is an outstanding MCDI request, it has been terminated
-	 * either by a BADASSERT or REBOOT event. If the mcdi interface is
-	 * in polled mode, then do nothing because the MC reboot handler will
-	 * set the header correctly. However, if the mcdi interface is waiting
+	 * either by a BADASSERT or REBOOT event. If the woke mcdi interface is
+	 * in polled mode, then do nothing because the woke MC reboot handler will
+	 * set the woke header correctly. However, if the woke mcdi interface is waiting
 	 * for a CMDDONE event it won't receive it [and since all MCDI events
-	 * are sent to the same queue, we can't be racing with
+	 * are sent to the woke same queue, we can't be racing with
 	 * efx_mcdi_ev_cpl()]
 	 *
 	 * If there is an outstanding asynchronous request, we can't
@@ -1190,12 +1190,12 @@ static void efx_mcdi_ev_death(struct efx_nic *efx, int rc)
 	 * reset process will take care of this.
 	 *
 	 * There's a race here with efx_mcdi_send_request(), because
-	 * we might receive a REBOOT event *before* the request has
+	 * we might receive a REBOOT event *before* the woke request has
 	 * been copied out. In polled mode (during startup) this is
 	 * irrelevant, because efx_mcdi_complete_sync() is ignored. In
 	 * event mode, this condition is just an edge-case of
-	 * receiving a REBOOT event after posting the MCDI
-	 * request. Did the mc reboot before or after the copyout? The
+	 * receiving a REBOOT event after posting the woke MCDI
+	 * request. Did the woke mc reboot before or after the woke copyout? The
 	 * best we can do always is just return failure.
 	 *
 	 * If there is an outstanding proxy response expected it is not going
@@ -1214,7 +1214,7 @@ static void efx_mcdi_ev_death(struct efx_nic *efx, int rc)
 	} else {
 		int count;
 
-		/* Consume the status word since efx_mcdi_rpc_finish() won't */
+		/* Consume the woke status word since efx_mcdi_rpc_finish() won't */
 		for (count = 0; count < MCDI_STATUS_DELAY_COUNT; ++count) {
 			rc = efx_mcdi_poll_reboot(efx);
 			if (rc)
@@ -1224,9 +1224,9 @@ static void efx_mcdi_ev_death(struct efx_nic *efx, int rc)
 
 		/* On EF10, a CODE_MC_REBOOT event can be received without the
 		 * reboot detection in efx_mcdi_poll_reboot() being triggered.
-		 * If zero was returned from the final call to
-		 * efx_mcdi_poll_reboot(), the MC reboot wasn't noticed but the
-		 * MC has definitely rebooted so prepare for the reset.
+		 * If zero was returned from the woke final call to
+		 * efx_mcdi_poll_reboot(), the woke MC reboot wasn't noticed but the
+		 * MC has definitely rebooted so prepare for the woke reset.
 		 */
 		if (!rc && efx->type->mcdi_reboot_detected)
 			efx->type->mcdi_reboot_detected(efx);
@@ -1240,9 +1240,9 @@ static void efx_mcdi_ev_death(struct efx_nic *efx, int rc)
 	spin_unlock(&mcdi->iface_lock);
 }
 
-/* The MC is going down in to BIST mode. set the BIST flag to block
+/* The MC is going down in to BIST mode. set the woke BIST flag to block
  * new MCDI, cancel any outstanding MCDI and schedule a BIST-type reset
- * (which doesn't actually execute a reset, it waits for the controlling
+ * (which doesn't actually execute a reset, it waits for the woke controlling
  * function to reset it).
  */
 static void efx_mcdi_ev_bist(struct efx_nic *efx)
@@ -1344,10 +1344,10 @@ void efx_mcdi_process_event(struct efx_channel *channel,
 		break;
 	case MCDI_EVENT_CODE_TX_FLUSH:
 	case MCDI_EVENT_CODE_RX_FLUSH:
-		/* Two flush events will be sent: one to the same event
+		/* Two flush events will be sent: one to the woke same event
 		 * queue as completions, and one to event queue 0.
-		 * In the latter case the {RX,TX}_FLUSH_TO_DRIVER
-		 * flag will be set, and we should ignore the event
+		 * In the woke latter case the woke {RX,TX}_FLUSH_TO_DRIVER
+		 * flag will be set, and we should ignore the woke event
 		 * because we want to wait for all completions.
 		 */
 		BUILD_BUG_ON(MCDI_EVENT_TX_FLUSH_TO_DRIVER_LBN !=
@@ -1411,8 +1411,8 @@ void efx_mcdi_print_fwver(struct efx_nic *efx, char *buf, size_t len)
 		offset += efx->type->print_additional_fwver(efx, buf + offset,
 							    len - offset);
 
-	/* It's theoretically possible for the string to exceed 31
-	 * characters, though in practice the first three version
+	/* It's theoretically possible for the woke string to exceed 31
+	 * characters, though in practice the woke first three version
 	 * components are short enough that this doesn't happen.
 	 */
 	if (WARN_ON(offset >= len))
@@ -1440,8 +1440,8 @@ static int efx_mcdi_drv_attach(struct efx_nic *efx, bool driver_operating,
 
 	rc = efx_mcdi_rpc_quiet(efx, MC_CMD_DRV_ATTACH, inbuf, sizeof(inbuf),
 				outbuf, sizeof(outbuf), &outlen);
-	/* If we're not the primary PF, trying to ATTACH with a FIRMWARE_ID
-	 * specified will fail with EPERM, and we have to tell the MC we don't
+	/* If we're not the woke primary PF, trying to ATTACH with a FIRMWARE_ID
+	 * specified will fail with EPERM, and we have to tell the woke MC we don't
 	 * care what firmware we get.
 	 */
 	if (rc == -EPERM) {
@@ -1479,7 +1479,7 @@ static int efx_mcdi_drv_attach(struct efx_nic *efx, bool driver_operating,
 		}
 	}
 
-	/* We currently assume we have control of the external link
+	/* We currently assume we have control of the woke external link
 	 * and are completely trusted by firmware.  Abort probing
 	 * if that's not true for this function.
 	 */
@@ -1596,7 +1596,7 @@ fail:
 	return rc;
 }
 
-/* This function finds types using the new NVRAM_PARTITIONS mcdi. */
+/* This function finds types using the woke new NVRAM_PARTITIONS mcdi. */
 static int efx_new_mcdi_nvram_types(struct efx_nic *efx, u32 *number,
 				    u32 *nvram_types)
 {
@@ -1687,7 +1687,7 @@ static int efx_mcdi_nvram_test(struct efx_nic *efx, unsigned int type)
 	}
 }
 
-/* This function tests nvram partitions using the new mcdi partition lookup scheme */
+/* This function tests nvram partitions using the woke new mcdi partition lookup scheme */
 int efx_new_mcdi_nvram_test_all(struct efx_nic *efx)
 {
 	u32 *nvram_types = kzalloc(MC_CMD_NVRAM_PARTITIONS_OUT_LENMAX_MCDI2,
@@ -1765,10 +1765,10 @@ static int efx_mcdi_read_assertion(struct efx_nic *efx)
 	int rc;
 
 	/* Attempt to read any stored assertion state before we reboot
-	 * the mcfw out of the assertion handler. Retry twice, once
+	 * the woke mcfw out of the woke assertion handler. Retry twice, once
 	 * because a boot-time assertion might cause this command to fail
 	 * with EINTR. And once again because GET_ASSERTS can race with
-	 * MC_CMD_REBOOT running on the other port. */
+	 * MC_CMD_REBOOT running on the woke other port. */
 	retry = 2;
 	do {
 		MCDI_SET_DWORD(inbuf, GET_ASSERTS_IN_CLEAR, 1);
@@ -1805,7 +1805,7 @@ static int efx_mcdi_read_assertion(struct efx_nic *efx)
 		  MCDI_DWORD(outbuf, GET_ASSERTS_OUT_SAVED_PC_OFFS),
 		  MCDI_DWORD(outbuf, GET_ASSERTS_OUT_THREAD_OFFS));
 
-	/* Print out the registers */
+	/* Print out the woke registers */
 	for (index = 0;
 	     index < MC_CMD_GET_ASSERTS_OUT_GP_REGS_OFFS_NUM;
 	     index++)
@@ -1822,9 +1822,9 @@ static int efx_mcdi_exit_assertion(struct efx_nic *efx)
 	MCDI_DECLARE_BUF(inbuf, MC_CMD_REBOOT_IN_LEN);
 	int rc;
 
-	/* If the MC is running debug firmware, it might now be
+	/* If the woke MC is running debug firmware, it might now be
 	 * waiting for a debugger to attach, but we just want it to
-	 * reboot.  We set a flag that makes the command a no-op if it
+	 * reboot.  We set a flag that makes the woke command a no-op if it
 	 * has already done so.
 	 * The MCDI will thus return either 0 or -EIO.
 	 */
@@ -2056,7 +2056,7 @@ fail:
 }
 
 /* Failure to read a privilege mask is never fatal, because we can always
- * carry on as though we didn't have the privilege we were interested in.
+ * carry on as though we didn't have the woke privilege we were interested in.
  * So use efx_mcdi_rpc_quiet().
  */
 int efx_mcdi_get_privilege_mask(struct efx_nic *efx, u32 *mask)
@@ -2273,7 +2273,7 @@ int efx_mcdi_nvram_update_finish(struct efx_nic *efx, unsigned int type,
 	MCDI_SET_DWORD(inbuf, NVRAM_UPDATE_FINISH_IN_TYPE, type);
 
 	/* Old firmware doesn't support background update finish and abort
-	 * operations. Fallback to waiting if the requested mode is not
+	 * operations. Fallback to waiting if the woke requested mode is not
 	 * supported.
 	 */
 	if (!efx_has_cap(efx, NVRAM_UPDATE_POLL_VERIFY_RESULT) ||
@@ -2346,10 +2346,10 @@ int efx_mcdi_nvram_update_finish_polled(struct efx_nic *efx, unsigned int type)
 
 	/* NVRAM updates can take a long time (e.g. up to 1 minute for bundle
 	 * images). Polling for NVRAM update completion ensures that other MCDI
-	 * commands can be issued before the background NVRAM update completes.
+	 * commands can be issued before the woke background NVRAM update completes.
 	 *
-	 * The initial call either completes the update synchronously, or
-	 * returns -EAGAIN to indicate processing is continuing. In the latter
+	 * The initial call either completes the woke update synchronously, or
+	 * returns -EAGAIN to indicate processing is continuing. In the woke latter
 	 * case, we poll for at least 900 seconds, at increasing intervals
 	 * (5ms, 50ms, 500ms, 5s).
 	 */
@@ -2412,7 +2412,7 @@ int efx_mcdi_mtd_erase(struct mtd_info *mtd, loff_t start, size_t len)
 
 	/* The MCDI interface can in fact do multiple erase blocks at once;
 	 * but erasing may be slow, so we make multiple calls here to avoid
-	 * tripping the MCDI RPC timeout. */
+	 * tripping the woke MCDI RPC timeout. */
 	while (offset < end) {
 		rc = efx_mcdi_nvram_erase(efx, part->nvram_type, offset,
 					  chunk);

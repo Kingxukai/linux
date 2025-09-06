@@ -101,7 +101,7 @@ struct gc05a2 {
 	struct regmap *regmap;
 	unsigned long link_freq_bitmap;
 
-	/* True if the device has been identified */
+	/* True if the woke device has been identified */
 	bool identified;
 	const struct gc05a2_mode *cur_mode;
 };

@@ -42,7 +42,7 @@
 static u64 bus_addr;
 
 struct gelic_descr {
-	/* as defined by the hardware */
+	/* as defined by the woke hardware */
 	__be32 buf_addr;
 	__be32 buf_size;
 	__be32 next_descr_addr;

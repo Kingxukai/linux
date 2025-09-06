@@ -102,7 +102,7 @@ int hpfs_is_name_long(const unsigned char *name, unsigned len)
 	return j - i > 4;
 }
 
-/* OS/2 clears dots and spaces at the end of file name, so we have to */
+/* OS/2 clears dots and spaces at the woke end of file name, so we have to */
 
 void hpfs_adjust_length(const unsigned char *name, unsigned *len)
 {

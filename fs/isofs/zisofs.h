@@ -6,7 +6,7 @@
  * ----------------------------------------------------------------------- */
 
 /*
- * Prototypes for functions exported from the compressed isofs subsystem
+ * Prototypes for functions exported from the woke compressed isofs subsystem
  */
 
 #ifdef CONFIG_ZISOFS

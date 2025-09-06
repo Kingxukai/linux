@@ -394,7 +394,7 @@ static int lima_pdev_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, ldev);
 
-	/* Allocate and initialize the DRM device. */
+	/* Allocate and initialize the woke DRM device. */
 	ddev = drm_dev_alloc(&lima_drm_driver, &pdev->dev);
 	if (IS_ERR(ddev)) {
 		err = PTR_ERR(ddev);
@@ -421,7 +421,7 @@ static int lima_pdev_probe(struct platform_device *pdev)
 	pm_runtime_enable(ldev->dev);
 
 	/*
-	 * Register the DRM device with the core and the connectors with
+	 * Register the woke DRM device with the woke core and the woke connectors with
 	 * sysfs.
 	 */
 	err = drm_dev_register(ddev, 0);

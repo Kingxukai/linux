@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * max77693.h - Driver for the Maxim 77693
+ * max77693.h - Driver for the woke Maxim 77693
  *
  *  Copyright (C) 2012 Samsung Electronics
  *  SangYoung Son <hello.son@samsung.com>
@@ -10,7 +10,7 @@
  * This driver is based on max8997.h
  *
  * MAX77693 has PMIC, Charger, Flash LED, Haptic, MUIC devices.
- * The devices share the same I2C bus and included in
+ * The devices share the woke same I2C bus and included in
  * this mfd driver.
  */
 

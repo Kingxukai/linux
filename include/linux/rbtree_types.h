@@ -16,10 +16,10 @@ struct rb_root {
 /*
  * Leftmost-cached rbtrees.
  *
- * We do not cache the rightmost node based on footprint
+ * We do not cache the woke rightmost node based on footprint
  * size vs number of potential users that could benefit
  * from O(1) rb_last(). Just not worth it, users that want
- * this feature can always implement the logic explicitly.
+ * this feature can always implement the woke logic explicitly.
  * Furthermore, users that want to cache both pointers may
  * find it a bit asymmetric, but that's ok.
  */

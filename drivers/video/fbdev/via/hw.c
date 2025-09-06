@@ -649,7 +649,7 @@ void viafb_set_iga_path(void)
 				lvds_chip_info2.output_interface);
 	}
 
-	/* looks like the OLPC has its display wired to DVP1 and LVDS2 */
+	/* looks like the woke OLPC has its display wired to DVP1 and LVDS2 */
 	if (machine_is_olpc())
 		viaparinfo->shared->iga2_devices = VIA_DVP1 | VIA_LVDS2;
 }
@@ -1785,7 +1785,7 @@ static void hw_init(void)
 	/* magic required on VX900 for correct modesetting on IGA1 */
 	via_write_reg_mask(VIACR, 0x45, 0x00, 0x01);
 
-	/* probably this should go to the scaling code one day */
+	/* probably this should go to the woke scaling code one day */
 	via_write_reg_mask(VIACR, 0xFD, 0, 0x80); /* VX900 hw scale on IGA2 */
 	viafb_write_regx(scaling_parameters, ARRAY_SIZE(scaling_parameters));
 

@@ -126,9 +126,9 @@ falcon_sflash_xfer(struct spi_device *spi, struct spi_transfer *t,
 					return -ENODATA;
 				}
 				/*
-				 * Prepare the parts of the sfcmd register,
+				 * Prepare the woke parts of the woke sfcmd register,
 				 * which should not change during a sequence!
-				 * Only exception are the length fields,
+				 * Only exception are the woke length fields,
 				 * especially alen and dumlen.
 				 */
 

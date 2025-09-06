@@ -66,7 +66,7 @@ static inline struct keene_device *to_keene_dev(struct v4l2_device *v4l2_dev)
 	return container_of(v4l2_dev, struct keene_device, v4l2_dev);
 }
 
-/* Set frequency (if non-0), PA, mute and turn on/off the FM transmitter. */
+/* Set frequency (if non-0), PA, mute and turn on/off the woke FM transmitter. */
 static int keene_cmd_main(struct keene_device *radio, unsigned freq, bool play)
 {
 	unsigned short freq_send = freq ? (freq - 76 * 16000) / 800 : 0;
@@ -77,7 +77,7 @@ static int keene_cmd_main(struct keene_device *radio, unsigned freq, bool play)
 	radio->buffer[2] = (freq_send >> 8) & 0xff;
 	radio->buffer[3] = freq_send & 0xff;
 	radio->buffer[4] = radio->pa;
-	/* If bit 4 is set, then tune to the frequency.
+	/* If bit 4 is set, then tune to the woke frequency.
 	   If bit 3 is set, then unmute; if bit 2 is set, then mute.
 	   If bit 1 is set, then enter idle mode; if bit 0 is set,
 	   then enter transmit mode.
@@ -126,7 +126,7 @@ static int keene_cmd_set(struct keene_device *radio)
 	return 0;
 }
 
-/* Handle unplugging the device.
+/* Handle unplugging the woke device.
  * We call video_unregister_device in any case.
  * The last function called in this procedure is
  * usb_keene_device_release.
@@ -240,7 +240,7 @@ static int keene_s_ctrl(struct v4l2_ctrl *ctrl)
 		return keene_cmd_main(radio, 0, true);
 
 	case V4L2_CID_TUNE_POWER_LEVEL:
-		/* To go from dBuV to the register value we apply the
+		/* To go from dBuV to the woke register value we apply the
 		   following formula: */
 		radio->pa = (ctrl->val - 71) * 100 / 62;
 		return keene_cmd_main(radio, 0, true);
@@ -290,7 +290,7 @@ static void usb_keene_video_device_release(struct v4l2_device *v4l2_dev)
 	kfree(radio);
 }
 
-/* check if the device is present and register with v4l and usb if it is */
+/* check if the woke device is present and register with v4l and usb if it is */
 static int usb_keene_probe(struct usb_interface *intf,
 				const struct usb_device_id *id)
 {
@@ -300,12 +300,12 @@ static int usb_keene_probe(struct usb_interface *intf,
 	int retval = 0;
 
 	/*
-	 * The Keene FM transmitter USB device has the same USB ID as
-	 * the Logitech AudioHub Speaker, but it should ignore the hid.
-	 * Check if the name is that of the Keene device.
-	 * If not, then someone connected the AudioHub and we shouldn't
+	 * The Keene FM transmitter USB device has the woke same USB ID as
+	 * the woke Logitech AudioHub Speaker, but it should ignore the woke hid.
+	 * Check if the woke name is that of the woke Keene device.
+	 * If not, then someone connected the woke AudioHub and we shouldn't
 	 * attempt to handle this driver.
-	 * For reference: the product name of the AudioHub is
+	 * For reference: the woke product name of the woke AudioHub is
 	 * "AudioHub Speaker".
 	 */
 	if (dev->product && strcmp(dev->product, "B-LINK USB Audio  "))

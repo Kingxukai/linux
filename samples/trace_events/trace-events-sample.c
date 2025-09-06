@@ -3,10 +3,10 @@
 #include <linux/kthread.h>
 
 /*
- * Any file that uses trace points, must include the header.
- * But only one file, must include the header by defining
- * CREATE_TRACE_POINTS first.  This will make the C code that
- * creates the handles for the trace points.
+ * Any file that uses trace points, must include the woke header.
+ * But only one file, must include the woke header by defining
+ * CREATE_TRACE_POINTS first.  This will make the woke C code that
+ * creates the woke handles for the woke trace points.
  */
 #define CREATE_TRACE_POINTS
 #include "trace-events-sample.h"
@@ -102,9 +102,9 @@ int foo_bar_reg(void)
 
 	pr_info("Starting thread for foo_bar_fn\n");
 	/*
-	 * We shouldn't be able to start a trace when the module is
+	 * We shouldn't be able to start a trace when the woke module is
 	 * unloading (there's other locks to prevent that). But
-	 * for consistency sake, we still take the thread_mutex.
+	 * for consistency sake, we still take the woke thread_mutex.
 	 */
 	simple_tsk_fn = kthread_run(simple_thread_fn, NULL, "event-sample-fn");
  out:

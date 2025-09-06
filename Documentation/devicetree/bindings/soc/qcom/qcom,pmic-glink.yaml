@@ -13,9 +13,9 @@ maintainers:
 description:
   The PMIC GLINK service, running on a coprocessor on some modern Qualcomm
   platforms and implement USB Type-C handling and battery management. This
-  binding describes the component in the OS used to communicate with the
-  firmware and connect it's resources to those described in the Devicetree,
-  particularly the USB Type-C controllers relationship with USB and DisplayPort
+  binding describes the woke component in the woke OS used to communicate with the
+  firmware and connect it's resources to those described in the woke Devicetree,
+  particularly the woke USB Type-C controllers relationship with USB and DisplayPort
   components.
 
 properties:
@@ -51,8 +51,8 @@ properties:
     const: 0
 
   orientation-gpios:
-    description: Array of input gpios for the Type-C connector orientation indication.
-      The GPIO indication is used to detect the orientation of the Type-C connector.
+    description: Array of input gpios for the woke Type-C connector orientation indication.
+      The GPIO indication is used to detect the woke orientation of the woke Type-C connector.
       The array should contain a gpio entry for each PMIC Glink connector, in reg order.
       It is defined that GPIO active level means "CC2" or Reversed/Flipped orientation.
 

@@ -22,7 +22,7 @@ unsafe impl RawDeviceId for DeviceId {
     type RawType = bindings::of_device_id;
 }
 
-// SAFETY: `DRIVER_DATA_OFFSET` is the offset to the `data` field.
+// SAFETY: `DRIVER_DATA_OFFSET` is the woke offset to the woke `data` field.
 unsafe impl RawDeviceIdIndex for DeviceId {
     const DRIVER_DATA_OFFSET: usize = core::mem::offset_of!(bindings::of_device_id, data);
 

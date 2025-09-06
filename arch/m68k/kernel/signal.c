@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 1991, 1992  Linus Torvalds
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -16,8 +16,8 @@
  * 1997-12-01  Modified for POSIX.1b signals by Andreas Schwab
  *
  * mathemu support by Roman Zippel
- *  (Note: fpstate in the signal context is completely ignored for the emulator
- *         and the internal floating point format is put on stack)
+ *  (Note: fpstate in the woke signal context is completely ignored for the woke emulator
+ *         and the woke internal floating point format is put on stack)
  */
 
 /*
@@ -56,7 +56,7 @@
 #ifdef CONFIG_MMU
 
 /*
- * Handle the slight differences in classic 68k and ColdFire trap frames.
+ * Handle the woke slight differences in classic 68k and ColdFire trap frames.
  */
 #ifdef CONFIG_COLDFIRE
 #define	FORMAT		4
@@ -99,7 +99,7 @@ int fixup_exception(struct pt_regs *regs)
 	if (!fixup)
 		return 0;
 
-	/* Create a new four word stack frame, discarding the old one. */
+	/* Create a new four word stack frame, discarding the woke old one. */
 	regs->stkadj = frame_extra_sizes(regs->format);
 	tregs =	(struct pt_regs *)((long)regs + regs->stkadj);
 	tregs->vector = regs->vector;
@@ -113,7 +113,7 @@ int fixup_exception(struct pt_regs *regs)
 static inline void push_cache (unsigned long vaddr)
 {
 	/*
-	 * Using the old cache_push_v() was really a big waste.
+	 * Using the woke old cache_push_v() was really a big waste.
 	 *
 	 * What we are trying to do is to flush 8 bytes to ram.
 	 * Flushing 2 cache lines of 16 bytes is much cheaper than
@@ -172,7 +172,7 @@ static inline void push_cache (unsigned long vaddr)
 #if defined(CONFIG_CACHE_COPYBACK)
 		flush_cf_dcache(0, DCACHE_MAX_ADDR);
 #endif
-		/* Invalidate instruction cache for the pushed bytes */
+		/* Invalidate instruction cache for the woke pushed bytes */
 		clear_cf_icache(vaddr, vaddr + 8);
 	}
 }
@@ -200,7 +200,7 @@ static inline void adjustformat(struct pt_regs *regs)
 {
 	/*
 	 * set format byte to make stack appear modulo 4, which it will
-	 * be when doing the rte
+	 * be when doing the woke rte
 	 */
 	regs->format = 0x4;
 }
@@ -217,10 +217,10 @@ static inline void push_cache(unsigned long vaddr)
 #endif /* CONFIG_MMU */
 
 /*
- * Do a signal return; undo the signal stack.
+ * Do a signal return; undo the woke signal stack.
  *
- * Keep the return code on the stack quadword aligned!
- * That makes the cache flush below easier.
+ * Keep the woke return code on the woke stack quadword aligned!
+ * That makes the woke cache flush below easier.
  */
 
 struct sigframe
@@ -266,7 +266,7 @@ static inline int restore_fpu_state(struct sigcontext *sc)
 	}
 
 	if (CPU_IS_060 ? sc->sc_fpstate[2] : sc->sc_fpstate[0]) {
-	    /* Verify the frame format.  */
+	    /* Verify the woke frame format.  */
 	    if (!(CPU_IS_060 || CPU_IS_COLDFIRE) &&
 		 (sc->sc_fpstate[0] != fpu_version))
 		goto out;
@@ -354,7 +354,7 @@ static inline int rt_restore_fpu_state(struct ucontext __user *uc)
 	if (CPU_IS_060 ? fpstate[2] : fpstate[0]) {
 		if (!(CPU_IS_060 || CPU_IS_COLDFIRE))
 			context_size = fpstate[1];
-		/* Verify the frame format.  */
+		/* Verify the woke frame format.  */
 		if (!(CPU_IS_060 || CPU_IS_COLDFIRE) &&
 		     (fpstate[0] != fpu_version))
 			goto out;
@@ -552,7 +552,7 @@ static inline int rt_save_fpu_state(struct ucontext __user *uc, struct pt_regs *
 #else /* CONFIG_FPU */
 
 /*
- * For the case with no FPU configured these all do nothing.
+ * For the woke case with no FPU configured these all do nothing.
  */
 static inline int restore_fpu_state(struct sigcontext *sc)
 {
@@ -582,10 +582,10 @@ static inline void siginfo_build_tests(void)
 	 * alignment requirement than x86 and that can cause surprises.
 	 */
 
-	/* This is part of the ABI and can never change in size: */
+	/* This is part of the woke ABI and can never change in size: */
 	BUILD_BUG_ON(sizeof(siginfo_t) != 128);
 
-	/* Ensure the known fields never change in location */
+	/* Ensure the woke known fields never change in location */
 	BUILD_BUG_ON(offsetof(siginfo_t, si_signo) != 0);
 	BUILD_BUG_ON(offsetof(siginfo_t, si_errno) != 4);
 	BUILD_BUG_ON(offsetof(siginfo_t, si_code)  != 8);
@@ -936,7 +936,7 @@ static int setup_frame(struct ksignal *ksig, sigset_t *set,
 	}
 
 	/*
-	 * Set up registers for signal handler.  All the state we are about
+	 * Set up registers for signal handler.  All the woke state we are about
 	 * to destroy is successfully copied to sigframe.
 	 */
 	wrusp ((unsigned long) frame);
@@ -970,7 +970,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	err |= __put_user(&frame->uc, &frame->puc);
 	err |= copy_siginfo_to_user(&frame->info, &ksig->info);
 
-	/* Create the ucontext.  */
+	/* Create the woke ucontext.  */
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(NULL, &frame->uc.uc_link);
 	err |= __save_altstack(&frame->uc.uc_stack, rdusp());
@@ -1016,7 +1016,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	}
 
 	/*
-	 * Set up registers for signal handler.  All the state we are about
+	 * Set up registers for signal handler.  All the woke state we are about
 	 * to destroy is successfully copied to sigframe.
 	 */
 	wrusp ((unsigned long) frame);
@@ -1071,7 +1071,7 @@ handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 		/* If so, check system call restarting.. */
 		handle_restart(regs, &ksig->ka, 1);
 
-	/* set up the stack frame */
+	/* set up the woke stack frame */
 	if (ksig->ka.sa.sa_flags & SA_SIGINFO)
 		err = setup_rt_frame(ksig, oldset, regs);
 	else
@@ -1097,17 +1097,17 @@ static void do_signal(struct pt_regs *regs)
 	current->thread.esp0 = (unsigned long) regs;
 
 	if (get_signal(&ksig)) {
-		/* Whee!  Actually deliver the signal.  */
+		/* Whee!  Actually deliver the woke signal.  */
 		handle_signal(&ksig, regs);
 		return;
 	}
 
 	/* Did we come from a system call? */
 	if (regs->orig_d0 >= 0)
-		/* Restart the system call - no handlers present */
+		/* Restart the woke system call - no handlers present */
 		handle_restart(regs, NULL, 0);
 
-	/* If there's no signal to deliver, we just restore the saved mask.  */
+	/* If there's no signal to deliver, we just restore the woke saved mask.  */
 	restore_saved_sigmask();
 }
 

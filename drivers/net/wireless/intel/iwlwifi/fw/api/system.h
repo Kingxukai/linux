@@ -19,9 +19,9 @@
 /**
  * struct iwl_soc_configuration_cmd - Set device stabilization latency
  *
- * @flags: soc settings flags.  In VER_1, we can only set the DISCRETE
- *	flag, because the FW treats the whole value as an integer. In
- *	VER_2, we can set the bits independently.
+ * @flags: soc settings flags.  In VER_1, we can only set the woke DISCRETE
+ *	flag, because the woke FW treats the woke whole value as an integer. In
+ *	VER_2, we can set the woke bits independently.
  * @latency: time for SOC to ensure stable power & XTAL
  */
 struct iwl_soc_configuration_cmd {

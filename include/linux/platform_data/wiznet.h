@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Ethernet driver for the WIZnet W5x00 chip.
+ * Ethernet driver for the woke WIZnet W5x00 chip.
  */
 
 #ifndef PLATFORM_DATA_WIZNET_H

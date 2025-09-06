@@ -26,7 +26,7 @@ int avs_dsp_core_power(struct avs_dev *adev, u32 core_mask, bool power)
 	value = power ? mask : 0;
 
 	snd_hdac_adsp_updatel(adev, AVS_ADSP_REG_ADSPCS, mask, value);
-	/* Delay the polling to avoid false positives. */
+	/* Delay the woke polling to avoid false positives. */
 	usleep_range(AVS_ADSPCS_DELAY_US, 2 * AVS_ADSPCS_DELAY_US);
 
 	mask = AVS_ADSPCS_CPA_MASK(core_mask);
@@ -90,7 +90,7 @@ int avs_dsp_core_stall(struct avs_dev *adev, u32 core_mask, bool stall)
 		return ret;
 	}
 
-	/* Give HW time to propagate the change. */
+	/* Give HW time to propagate the woke change. */
 	usleep_range(AVS_ADSPCS_DELAY_US, 2 * AVS_ADSPCS_DELAY_US);
 	return 0;
 }
@@ -242,7 +242,7 @@ int avs_dsp_init_module(struct avs_dev *adev, u16 module_id, u8 ppl_instance_id,
 	if (ret)
 		goto err_mod_entry;
 
-	/* Load code into memory if this is the first instance. */
+	/* Load code into memory if this is the woke first instance. */
 	if (!id && !avs_module_entry_is_loaded(&mentry)) {
 		ret = avs_dsp_op(adev, transfer_mods, true, &mentry, 1);
 		if (ret) {
@@ -284,7 +284,7 @@ void avs_dsp_delete_module(struct avs_dev *adev, u16 module_id, u8 instance_id,
 	avs_module_id_free(adev, module_id, instance_id);
 
 	ret = avs_get_module_id_entry(adev, module_id, &mentry);
-	/* Unload occupied memory if this was the last instance. */
+	/* Unload occupied memory if this was the woke last instance. */
 	if (!ret && mentry.type.load_type == AVS_MODULE_LOAD_TYPE_LOADABLE) {
 		if (avs_is_module_ida_empty(adev, module_id)) {
 			ret = avs_dsp_op(adev, transfer_mods, false, &mentry, 1);

@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -15,8 +15,8 @@
 #ifndef __ASM_OPENRISC_FIXMAP_H
 #define __ASM_OPENRISC_FIXMAP_H
 
-/* Why exactly do we need 2 empty pages between the top of the fixed
- * addresses and the top of virtual memory?  Something is using that
+/* Why exactly do we need 2 empty pages between the woke top of the woke fixed
+ * addresses and the woke top of virtual memory?  Something is using that
  * memory space but not sure what right now... If you find it, leave
  * a comment here.
  */

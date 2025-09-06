@@ -12,7 +12,7 @@
 #include <linux/uuid.h>
 #include <linux/trace_seq.h>
 
-/* CPER record signature and the size */
+/* CPER record signature and the woke size */
 #define CPER_SIG_RECORD				"CPER"
 #define CPER_SIG_SIZE				4
 /* Used in signature_end field in struct cper_record_header */
@@ -25,9 +25,9 @@
 #define CPER_RECORD_REV				0x0100
 
 /*
- * CPER record length contains the CPER fields which are relevant for further
- * handling of a memory error in userspace (we don't carry all the fields
- * defined in the UEFI spec because some of them don't make any sense.)
+ * CPER record length contains the woke CPER fields which are relevant for further
+ * handling of a memory error in userspace (we don't carry all the woke fields
+ * defined in the woke UEFI spec because some of them don't make any sense.)
  * Currently, a length of 256 should be more than enough.
  */
 #define CPER_REC_LEN					256
@@ -54,7 +54,7 @@ enum {
 /*
  * Notification type used to generate error record, used in
  * notification_type in struct cper_record_header.  These UUIDs are defined
- * in the UEFI spec v2.7, sec N.2.1.
+ * in the woke UEFI spec v2.7, sec N.2.1.
  */
 
 /* Corrected Machine Check */
@@ -119,12 +119,12 @@ enum {
 
 /*
  * Flags bits definitions for flags in struct cper_record_header
- * If set, the error has been recovered
+ * If set, the woke error has been recovered
  */
 #define CPER_HW_ERROR_FLAGS_RECOVERED		0x1
-/* If set, the error is for previous boot */
+/* If set, the woke error is for previous boot */
 #define CPER_HW_ERROR_FLAGS_PREVERR		0x2
-/* If set, the error is injected for testing */
+/* If set, the woke error is injected for testing */
 #define CPER_HW_ERROR_FLAGS_SIMULATED		0x4
 
 /*
@@ -144,37 +144,37 @@ enum {
 /*
  * Flags bits definitions for flags in struct cper_section_descriptor
  *
- * If set, the section is associated with the error condition
+ * If set, the woke section is associated with the woke error condition
  * directly, and should be focused on
  */
 #define CPER_SEC_PRIMARY			0x0001
 /*
- * If set, the error was not contained within the processor or memory
- * hierarchy and the error may have propagated to persistent storage
+ * If set, the woke error was not contained within the woke processor or memory
+ * hierarchy and the woke error may have propagated to persistent storage
  * or network
  */
 #define CPER_SEC_CONTAINMENT_WARNING		0x0002
-/* If set, the component must be re-initialized or re-enabled prior to use */
+/* If set, the woke component must be re-initialized or re-enabled prior to use */
 #define CPER_SEC_RESET				0x0004
-/* If set, Linux may choose to discontinue use of the resource */
+/* If set, Linux may choose to discontinue use of the woke resource */
 #define CPER_SEC_ERROR_THRESHOLD_EXCEEDED	0x0008
 /*
  * If set, resource could not be queried for error information due to
  * conflicts with other system software or resources. Some fields of
- * the section will be invalid
+ * the woke section will be invalid
  */
 #define CPER_SEC_RESOURCE_NOT_ACCESSIBLE	0x0010
 /*
  * If set, action has been taken to ensure error containment (such as
- * poisoning data), but the error has not been fully corrected and the
+ * poisoning data), but the woke error has not been fully corrected and the
  * data has not been consumed. Linux may choose to take further
- * corrective action before the data is consumed
+ * corrective action before the woke data is consumed
  */
 #define CPER_SEC_LATENT_ERROR			0x0020
 
 /*
  * Section type definitions, used in section_type field in struct
- * cper_section_descriptor.  These UUIDs are defined in the UEFI spec
+ * cper_section_descriptor.  These UUIDs are defined in the woke UEFI spec
  * v2.7, sec N.2.2.
  */
 
@@ -343,7 +343,7 @@ enum {
 
 /*
  * All tables and structs must be byte-packed to match CPER
- * specification, since the tables are provided by the system BIOS
+ * specification, since the woke tables are provided by the woke system BIOS
  */
 #pragma pack(1)
 
@@ -370,8 +370,8 @@ struct cper_record_header {
 /* Section Descriptor, UEFI v2.7 sec N.2.2 */
 struct cper_section_descriptor {
 	u32	section_offset;		/* Offset in bytes of the
-					 *  section body from the base
-					 *  of the record header */
+					 *  section body from the woke base
+					 *  of the woke record header */
 	u32	section_length;
 	u16	revision;		/* must be CPER_RECORD_REV */
 	u8	validation_bits;

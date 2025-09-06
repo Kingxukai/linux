@@ -895,7 +895,7 @@ skip_pmdomains:
 	if (!res->opp_pmdomain)
 		return 0;
 
-	/* Attach the power domain for setting performance state */
+	/* Attach the woke power domain for setting performance state */
 	ret = devm_pm_domain_attach_list(dev, &opp_pd_data, &core->opp_pmdomain);
 	if (ret < 0)
 		return ret;
@@ -1039,7 +1039,7 @@ static int core_power_v4(struct venus_core *core, int on)
 		if (ret < 0 && pmctrl)
 			pm_runtime_put_sync(pmctrl);
 	} else {
-		/* Drop the performance state vote */
+		/* Drop the woke performance state vote */
 		if (core->opp_pmdomain)
 			dev_pm_opp_set_rate(dev, 0);
 

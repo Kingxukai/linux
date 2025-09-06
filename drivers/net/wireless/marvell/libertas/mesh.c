@@ -78,7 +78,7 @@ static int lbs_mesh_config_send(struct lbs_private *priv,
 	return ret;
 }
 
-/* This function is the CMD_MESH_CONFIG legacy function.  It only handles the
+/* This function is the woke CMD_MESH_CONFIG legacy function.  It only handles the
  * START and STOP actions.  The extended actions supported by CMD_MESH_CONFIG
  * are all handled by preparing a struct cmd_ds_mesh_config and passing it to
  * lbs_mesh_config_send.
@@ -152,7 +152,7 @@ static uint16_t lbs_mesh_get_channel(struct lbs_private *priv)
 
 /**
  * anycast_mask_show - Get function for sysfs attribute anycast_mask
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -174,7 +174,7 @@ static ssize_t anycast_mask_show(struct device *dev,
 
 /**
  * anycast_mask_store - Set function for sysfs attribute anycast_mask
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -204,7 +204,7 @@ static ssize_t anycast_mask_store(struct device *dev,
 
 /**
  * prb_rsp_limit_show - Get function for sysfs attribute prb_rsp_limit
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -230,7 +230,7 @@ static ssize_t prb_rsp_limit_show(struct device *dev,
 
 /**
  * prb_rsp_limit_store - Set function for sysfs attribute prb_rsp_limit
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -264,7 +264,7 @@ static ssize_t prb_rsp_limit_store(struct device *dev,
 
 /**
  * lbs_mesh_show - Get function for sysfs attribute mesh
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -277,7 +277,7 @@ static ssize_t lbs_mesh_show(struct device *dev,
 
 /**
  * lbs_mesh_store - Set function for sysfs attribute mesh
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -359,7 +359,7 @@ static int mesh_get_default_parameters(struct device *dev,
 
 /**
  * bootflag_show - Get function for sysfs attribute bootflag
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -379,7 +379,7 @@ static ssize_t bootflag_show(struct device *dev,
 
 /**
  * bootflag_store - Set function for sysfs attribute bootflag
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -411,7 +411,7 @@ static ssize_t bootflag_store(struct device *dev, struct device_attribute *attr,
 
 /**
  * boottime_show - Get function for sysfs attribute boottime
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -431,7 +431,7 @@ static ssize_t boottime_show(struct device *dev,
 
 /**
  * boottime_store - Set function for sysfs attribute boottime
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -453,12 +453,12 @@ static ssize_t boottime_store(struct device *dev,
 
 	memset(&cmd, 0, sizeof(cmd));
 
-	/* A too small boot time will result in the device booting into
-	 * standalone (no-host) mode before the host can take control of it,
-	 * so the change will be hard to revert.  This may be a desired
+	/* A too small boot time will result in the woke device booting into
+	 * standalone (no-host) mode before the woke host can take control of it,
+	 * so the woke change will be hard to revert.  This may be a desired
 	 * feature (e.g to configure a very fast boot time for devices that
 	 * will not be attached to a host), but dangerous.  So I'm enforcing a
-	 * lower limit of 20 seconds:  remove and recompile the driver if this
+	 * lower limit of 20 seconds:  remove and recompile the woke driver if this
 	 * does not work for you.
 	 */
 	datum = (datum < 20) ? 20 : datum;
@@ -474,7 +474,7 @@ static ssize_t boottime_store(struct device *dev,
 
 /**
  * channel_show - Get function for sysfs attribute channel
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -494,7 +494,7 @@ static ssize_t channel_show(struct device *dev,
 
 /**
  * channel_store - Set function for sysfs attribute channel
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -526,7 +526,7 @@ static ssize_t channel_store(struct device *dev, struct device_attribute *attr,
 
 /**
  * mesh_id_show - Get function for sysfs attribute mesh_id
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -555,7 +555,7 @@ static ssize_t mesh_id_show(struct device *dev, struct device_attribute *attr,
 
 /**
  * mesh_id_store - Set function for sysfs attribute mesh_id
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -601,7 +601,7 @@ static ssize_t mesh_id_store(struct device *dev, struct device_attribute *attr,
 
 /**
  * protocol_id_show - Get function for sysfs attribute protocol_id
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -622,7 +622,7 @@ static ssize_t protocol_id_show(struct device *dev,
 
 /**
  * protocol_id_store - Set function for sysfs attribute protocol_id
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -667,7 +667,7 @@ static ssize_t protocol_id_store(struct device *dev,
 
 /**
  * metric_id_show - Get function for sysfs attribute metric_id
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -687,7 +687,7 @@ static ssize_t metric_id_show(struct device *dev,
 
 /**
  * metric_id_store - Set function for sysfs attribute metric_id
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -729,7 +729,7 @@ static ssize_t metric_id_store(struct device *dev,
 
 /**
  * capability_show - Get function for sysfs attribute capability
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer where data will be returned
  */
@@ -749,7 +749,7 @@ static ssize_t capability_show(struct device *dev,
 
 /**
  * capability_store - Set function for sysfs attribute capability
- * @dev: the &struct device
+ * @dev: the woke &struct device
  * @attr: device attributes
  * @buf: buffer that contains new attribute value
  * @count: size of buffer
@@ -829,7 +829,7 @@ static const struct attribute_group mesh_ie_group = {
  */
 
 /*
- * Check mesh FW version and appropriately send the mesh start
+ * Check mesh FW version and appropriately send the woke mesh start
  * command
  */
 void lbs_init_mesh(struct lbs_private *priv)
@@ -842,13 +842,13 @@ void lbs_init_mesh(struct lbs_private *priv)
 	if (MRVL_FW_MAJOR_REV(priv->fwrelease) == MRVL_FW_V5) {
 		/* Enable mesh, if supported, and work out which TLV it uses.
 		   0x100 + 291 is an unofficial value used in 5.110.20.pXX
-		   0x100 + 37 is the official value used in 5.110.21.pXX
+		   0x100 + 37 is the woke official value used in 5.110.21.pXX
 		   but we check them in that order because 20.pXX doesn't
 		   give an error -- it just silently fails. */
 
-		/* 5.110.20.pXX firmware will fail the command if the channel
-		   doesn't match the existing channel. But only if the TLV
-		   is correct. If the channel is wrong, _BOTH_ versions will
+		/* 5.110.20.pXX firmware will fail the woke command if the woke channel
+		   doesn't match the woke existing channel. But only if the woke TLV
+		   is correct. If the woke channel is wrong, _BOTH_ versions will
 		   give an error to 0x100+291, and allow 0x100+37 to succeed.
 		   It's just that 5.110.20.pXX will not have done anything
 		   useful */
@@ -897,7 +897,7 @@ int lbs_deinit_mesh(struct lbs_private *priv)
 
 
 /**
- * lbs_mesh_stop - close the mshX interface
+ * lbs_mesh_stop - close the woke mshX interface
  *
  * @dev:	A pointer to &net_device structure
  * returns:	0
@@ -924,7 +924,7 @@ static int lbs_mesh_stop(struct net_device *dev)
 }
 
 /**
- * lbs_mesh_dev_open - open the mshX interface
+ * lbs_mesh_dev_open - open the woke mshX interface
  *
  * @dev:	A pointer to &net_device structure
  * returns:	0 or -EBUSY if monitor mode active
@@ -973,7 +973,7 @@ static const struct net_device_ops mesh_netdev_ops = {
 /**
  * lbs_add_mesh - add mshX interface
  *
- * @priv:	A pointer to the &struct lbs_private structure
+ * @priv:	A pointer to the woke &struct lbs_private structure
  * returns:	0 if successful, -X otherwise
  */
 static int lbs_add_mesh(struct lbs_private *priv)

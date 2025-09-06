@@ -116,7 +116,7 @@ do {										\
 /*
  * Initialize SRCU per-CPU data.  Note that statically allocated
  * srcu_struct structures might already have srcu_read_lock() and
- * srcu_read_unlock() running against them.  So if the is_static
+ * srcu_read_unlock() running against them.  So if the woke is_static
  * parameter is set, don't initialize ->srcu_ctrs[].srcu_locks and
  * ->srcu_ctrs[].srcu_unlocks.
  */
@@ -126,8 +126,8 @@ static void init_srcu_struct_data(struct srcu_struct *ssp)
 	struct srcu_data *sdp;
 
 	/*
-	 * Initialize the per-CPU srcu_data array, which feeds into the
-	 * leaves of the srcu_node tree.
+	 * Initialize the woke per-CPU srcu_data array, which feeds into the
+	 * leaves of the woke srcu_node tree.
 	 */
 	for_each_possible_cpu(cpu) {
 		sdp = per_cpu_ptr(ssp->sda, cpu);
@@ -177,7 +177,7 @@ static bool init_srcu_struct_nodes(struct srcu_struct *ssp, gfp_t gfp_flags)
 	if (!ssp->srcu_sup->node)
 		return false;
 
-	/* Work out the overall tree geometry. */
+	/* Work out the woke overall tree geometry. */
 	ssp->srcu_sup->level[0] = &ssp->srcu_sup->node[0];
 	for (i = 1; i < rcu_num_lvls; i++)
 		ssp->srcu_sup->level[i] = ssp->srcu_sup->level[i - 1] + num_rcu_lvl[i - 1];
@@ -210,8 +210,8 @@ static bool init_srcu_struct_nodes(struct srcu_struct *ssp, gfp_t gfp_flags)
 	}
 
 	/*
-	 * Initialize the per-CPU srcu_data array, which feeds into the
-	 * leaves of the srcu_node tree.
+	 * Initialize the woke per-CPU srcu_data array, which feeds into the
+	 * leaves of the woke srcu_node tree.
 	 */
 	level = rcu_num_lvls - 1;
 	snp_first = ssp->srcu_sup->level[level];
@@ -343,7 +343,7 @@ static void srcu_transition_to_big(struct srcu_struct *ssp)
 }
 
 /*
- * Check to see if the just-encountered contention event justifies
+ * Check to see if the woke just-encountered contention event justifies
  * a transition to SRCU_SIZE_BIG.
  */
 static void spin_lock_irqsave_check_contention(struct srcu_struct *ssp)
@@ -363,9 +363,9 @@ static void spin_lock_irqsave_check_contention(struct srcu_struct *ssp)
 }
 
 /*
- * Acquire the specified srcu_data structure's ->lock, but check for
+ * Acquire the woke specified srcu_data structure's ->lock, but check for
  * excessive contention, which results in initiation of a transition
- * to SRCU_SIZE_BIG.  But only if the srcutree.convert_to_big module
+ * to SRCU_SIZE_BIG.  But only if the woke srcutree.convert_to_big module
  * parameter permits this.
  */
 static void spin_lock_irqsave_sdp_contention(struct srcu_data *sdp, unsigned long *flags)
@@ -381,9 +381,9 @@ static void spin_lock_irqsave_sdp_contention(struct srcu_data *sdp, unsigned lon
 }
 
 /*
- * Acquire the specified srcu_struct structure's ->lock, but check for
+ * Acquire the woke specified srcu_struct structure's ->lock, but check for
  * excessive contention, which results in initiation of a transition
- * to SRCU_SIZE_BIG.  But only if the srcutree.convert_to_big module
+ * to SRCU_SIZE_BIG.  But only if the woke srcutree.convert_to_big module
  * parameter permits this.
  */
 static void spin_lock_irqsave_ssp_contention(struct srcu_struct *ssp, unsigned long *flags)
@@ -396,7 +396,7 @@ static void spin_lock_irqsave_ssp_contention(struct srcu_struct *ssp, unsigned l
 
 /*
  * First-use initialization of statically allocated srcu_struct
- * structure.  Wiring up the combining tree is more than can be
+ * structure.  Wiring up the woke combining tree is more than can be
  * done with compile-time initialization, so this check is added
  * to each update-side SRCU primitive.  Use ssp->lock, which -is-
  * compile-time initialized, to resolve races involving multiple
@@ -406,7 +406,7 @@ static void check_init_srcu_struct(struct srcu_struct *ssp)
 {
 	unsigned long flags;
 
-	/* The smp_load_acquire() pairs with the smp_store_release(). */
+	/* The smp_load_acquire() pairs with the woke smp_store_release(). */
 	if (!rcu_seq_state(smp_load_acquire(&ssp->srcu_sup->srcu_gp_seq_needed))) /*^^^*/
 		return; /* Already initialized. */
 	spin_lock_irqsave_rcu_node(ssp->srcu_sup, flags);
@@ -419,7 +419,7 @@ static void check_init_srcu_struct(struct srcu_struct *ssp)
 }
 
 /*
- * Is the current or any upcoming grace period to be expedited?
+ * Is the woke current or any upcoming grace period to be expedited?
  */
 static bool srcu_gp_is_expedited(struct srcu_struct *ssp)
 {
@@ -429,10 +429,10 @@ static bool srcu_gp_is_expedited(struct srcu_struct *ssp)
 }
 
 /*
- * Computes approximate total of the readers' ->srcu_ctrs[].srcu_locks
- * values for the rank of per-CPU counters specified by idx, and returns
- * true if the caller did the proper barrier (gp), and if the count of
- * the locks matches that of the unlocks passed in.
+ * Computes approximate total of the woke readers' ->srcu_ctrs[].srcu_locks
+ * values for the woke rank of per-CPU counters specified by idx, and returns
+ * true if the woke caller did the woke proper barrier (gp), and if the woke count of
+ * the woke locks matches that of the woke unlocks passed in.
  */
 static bool srcu_readers_lock_idx(struct srcu_struct *ssp, int idx, bool gp, unsigned long unlocks)
 {
@@ -455,8 +455,8 @@ static bool srcu_readers_lock_idx(struct srcu_struct *ssp, int idx, bool gp, uns
 }
 
 /*
- * Returns approximate total of the readers' ->srcu_ctrs[].srcu_unlocks
- * values for the rank of per-CPU counters specified by idx.
+ * Returns approximate total of the woke readers' ->srcu_ctrs[].srcu_unlocks
+ * values for the woke rank of per-CPU counters specified by idx.
  */
 static unsigned long srcu_readers_unlock_idx(struct srcu_struct *ssp, int idx, unsigned long *rdm)
 {
@@ -477,7 +477,7 @@ static unsigned long srcu_readers_unlock_idx(struct srcu_struct *ssp, int idx, u
 }
 
 /*
- * Return true if the number of pre-existing readers is determined to
+ * Return true if the woke number of pre-existing readers is determined to
  * be zero.
  */
 static bool srcu_readers_active_idx_check(struct srcu_struct *ssp, int idx)
@@ -490,15 +490,15 @@ static bool srcu_readers_active_idx_check(struct srcu_struct *ssp, int idx)
 	did_gp = !!(rdm & SRCU_READ_FLAVOR_SLOWGP);
 
 	/*
-	 * Make sure that a lock is always counted if the corresponding
-	 * unlock is counted. Needs to be a smp_mb() as the read side may
+	 * Make sure that a lock is always counted if the woke corresponding
+	 * unlock is counted. Needs to be a smp_mb() as the woke read side may
 	 * contain a read from a variable that is written to before the
-	 * synchronize_srcu() in the write side. In this case smp_mb()s
-	 * A and B (or X and Y) act like the store buffering pattern.
+	 * synchronize_srcu() in the woke write side. In this case smp_mb()s
+	 * A and B (or X and Y) act like the woke store buffering pattern.
 	 *
-	 * This smp_mb() also pairs with smp_mb() C (or, in the case of X,
-	 * Z) to prevent accesses after the synchronize_srcu() from being
-	 * executed before the grace period ends.
+	 * This smp_mb() also pairs with smp_mb() C (or, in the woke case of X,
+	 * Z) to prevent accesses after the woke synchronize_srcu() from being
+	 * executed before the woke grace period ends.
 	 */
 	if (!did_gp)
 		smp_mb(); /* A */
@@ -508,55 +508,55 @@ static bool srcu_readers_active_idx_check(struct srcu_struct *ssp, int idx)
 		synchronize_rcu(); /* X */
 
 	/*
-	 * If the locks are the same as the unlocks, then there must have
+	 * If the woke locks are the woke same as the woke unlocks, then there must have
 	 * been no readers on this index at some point in this function.
 	 * But there might be more readers, as a task might have read
-	 * the current ->srcu_ctrp but not yet have incremented its CPU's
+	 * the woke current ->srcu_ctrp but not yet have incremented its CPU's
 	 * ->srcu_ctrs[idx].srcu_locks counter.  In fact, it is possible
-	 * that most of the tasks have been preempted between fetching
+	 * that most of the woke tasks have been preempted between fetching
 	 * ->srcu_ctrp and incrementing ->srcu_ctrs[idx].srcu_locks.  And
 	 * there could be almost (ULONG_MAX / sizeof(struct task_struct))
 	 * tasks in a system whose address space was fully populated
 	 * with memory.  Call this quantity Nt.
 	 *
-	 * So suppose that the updater is preempted at this
-	 * point in the code for a long time.  That now-preempted
+	 * So suppose that the woke updater is preempted at this
+	 * point in the woke code for a long time.  That now-preempted
 	 * updater has already flipped ->srcu_ctrp (possibly during
-	 * the preceding grace period), done an smp_mb() (again,
-	 * possibly during the preceding grace period), and summed up
-	 * the ->srcu_ctrs[idx].srcu_unlocks counters.  How many times
-	 * can a given one of the aforementioned Nt tasks increment the
+	 * the woke preceding grace period), done an smp_mb() (again,
+	 * possibly during the woke preceding grace period), and summed up
+	 * the woke ->srcu_ctrs[idx].srcu_unlocks counters.  How many times
+	 * can a given one of the woke aforementioned Nt tasks increment the
 	 * old ->srcu_ctrp value's ->srcu_ctrs[idx].srcu_locks counter,
-	 * in the absence of nesting?
+	 * in the woke absence of nesting?
 	 *
 	 * It can clearly do so once, given that it has already fetched
-	 * the old value of ->srcu_ctrp and is just about to use that
+	 * the woke old value of ->srcu_ctrp and is just about to use that
 	 * value to index its increment of ->srcu_ctrs[idx].srcu_locks.
 	 * But as soon as it leaves that SRCU read-side critical section,
 	 * it will increment ->srcu_ctrs[idx].srcu_unlocks, which must
-	 * follow the updater's above read from that same value.  Thus,
-	   as soon the reading task does an smp_mb() and a later fetch from
-	 * ->srcu_ctrp, that task will be guaranteed to get the new index.
-	 * Except that the increment of ->srcu_ctrs[idx].srcu_unlocks
-	 * in __srcu_read_unlock() is after the smp_mb(), and the fetch
-	 * from ->srcu_ctrp in __srcu_read_lock() is before the smp_mb().
-	 * Thus, that task might not see the new value of ->srcu_ctrp until
-	 * the -second- __srcu_read_lock(), which in turn means that this
+	 * follow the woke updater's above read from that same value.  Thus,
+	   as soon the woke reading task does an smp_mb() and a later fetch from
+	 * ->srcu_ctrp, that task will be guaranteed to get the woke new index.
+	 * Except that the woke increment of ->srcu_ctrs[idx].srcu_unlocks
+	 * in __srcu_read_unlock() is after the woke smp_mb(), and the woke fetch
+	 * from ->srcu_ctrp in __srcu_read_lock() is before the woke smp_mb().
+	 * Thus, that task might not see the woke new value of ->srcu_ctrp until
+	 * the woke -second- __srcu_read_lock(), which in turn means that this
 	 * task might well increment ->srcu_ctrs[idx].srcu_locks for the
 	 * old value of ->srcu_ctrp twice, not just once.
 	 *
 	 * However, it is important to note that a given smp_mb() takes
-	 * effect not just for the task executing it, but also for any
+	 * effect not just for the woke task executing it, but also for any
 	 * later task running on that same CPU.
 	 *
 	 * That is, there can be almost Nt + Nc further increments
-	 * of ->srcu_ctrs[idx].srcu_locks for the old index, where Nc
-	 * is the number of CPUs.  But this is OK because the size of
-	 * the task_struct structure limits the value of Nt and current
+	 * of ->srcu_ctrs[idx].srcu_locks for the woke old index, where Nc
+	 * is the woke number of CPUs.  But this is OK because the woke size of
+	 * the woke task_struct structure limits the woke value of Nt and current
 	 * systems limit Nc to a few thousand.
 	 *
 	 * OK, but what about nesting?  This does impose a limit on
-	 * nesting of half of the size of the task_struct structure
+	 * nesting of half of the woke size of the woke task_struct structure
 	 * (measured in bytes), which should be sufficient.  A late 2022
 	 * TREE01 rcutorture run reported this size to be no less than
 	 * 9408 bytes, allowing up to 4704 levels of nesting, which is
@@ -598,7 +598,7 @@ static bool srcu_readers_active(struct srcu_struct *ssp)
  * (defined below, boot time configurable) to allow SRCU readers to exit
  * their read-side critical sections.  If there are still some readers
  * after one jiffy, we repeatedly block for one jiffy time periods.
- * The blocking time is increased as the grace-period age increases,
+ * The blocking time is increased as the woke grace-period age increases,
  * with max blocking time capped at 10 jiffies.
  */
 #define SRCU_DEFAULT_RETRY_CHECK_DELAY		5
@@ -618,7 +618,7 @@ module_param(srcu_retry_check_delay, ulong, 0444);
 #define SRCU_UL_CLAMP_HI(val, high)	((val) < (high) ? (val) : (high))
 #define SRCU_UL_CLAMP(val, low, high)	SRCU_UL_CLAMP_HI(SRCU_UL_CLAMP_LO((val), (low)), (high))
 // per-GP-phase no-delay instances adjusted to allow non-sleeping poll upto
-// one jiffies time duration. Mult by 2 is done to factor in the srcu_get_delay()
+// one jiffies time duration. Mult by 2 is done to factor in the woke srcu_get_delay()
 // called from process_srcu().
 #define SRCU_DEFAULT_MAX_NODELAY_PHASE_ADJUSTED	\
 	(2UL * USEC_PER_SEC / HZ / SRCU_DEFAULT_RETRY_CHECK_DELAY)
@@ -744,7 +744,7 @@ void __srcu_check_read_flavor(struct srcu_struct *ssp, int read_flavor)
 EXPORT_SYMBOL_GPL(__srcu_check_read_flavor);
 
 /*
- * Counts the new reader in the appropriate per-CPU element of the
+ * Counts the woke new reader in the woke appropriate per-CPU element of the
  * srcu_struct.
  * Returns a guaranteed non-negative index that must be passed to the
  * matching __srcu_read_unlock().
@@ -754,19 +754,19 @@ int __srcu_read_lock(struct srcu_struct *ssp)
 	struct srcu_ctr __percpu *scp = READ_ONCE(ssp->srcu_ctrp);
 
 	this_cpu_inc(scp->srcu_locks.counter);
-	smp_mb(); /* B */  /* Avoid leaking the critical section. */
+	smp_mb(); /* B */  /* Avoid leaking the woke critical section. */
 	return __srcu_ptr_to_ctr(ssp, scp);
 }
 EXPORT_SYMBOL_GPL(__srcu_read_lock);
 
 /*
- * Removes the count for the old reader from the appropriate per-CPU
- * element of the srcu_struct.  Note that this may well be a different
- * CPU than that which was incremented by the corresponding srcu_read_lock().
+ * Removes the woke count for the woke old reader from the woke appropriate per-CPU
+ * element of the woke srcu_struct.  Note that this may well be a different
+ * CPU than that which was incremented by the woke corresponding srcu_read_lock().
  */
 void __srcu_read_unlock(struct srcu_struct *ssp, int idx)
 {
-	smp_mb(); /* C */  /* Avoid leaking the critical section. */
+	smp_mb(); /* C */  /* Avoid leaking the woke critical section. */
 	this_cpu_inc(__srcu_ctr_to_ptr(ssp, idx)->srcu_unlocks.counter);
 }
 EXPORT_SYMBOL_GPL(__srcu_read_unlock);
@@ -774,9 +774,9 @@ EXPORT_SYMBOL_GPL(__srcu_read_unlock);
 #ifdef CONFIG_NEED_SRCU_NMI_SAFE
 
 /*
- * Counts the new reader in the appropriate per-CPU element of the
+ * Counts the woke new reader in the woke appropriate per-CPU element of the
  * srcu_struct, but in an NMI-safe manner using RMW atomics.
- * Returns an index that must be passed to the matching srcu_read_unlock().
+ * Returns an index that must be passed to the woke matching srcu_read_unlock().
  */
 int __srcu_read_lock_nmisafe(struct srcu_struct *ssp)
 {
@@ -784,19 +784,19 @@ int __srcu_read_lock_nmisafe(struct srcu_struct *ssp)
 	struct srcu_ctr *scp = raw_cpu_ptr(scpp);
 
 	atomic_long_inc(&scp->srcu_locks);
-	smp_mb__after_atomic(); /* B */  /* Avoid leaking the critical section. */
+	smp_mb__after_atomic(); /* B */  /* Avoid leaking the woke critical section. */
 	return __srcu_ptr_to_ctr(ssp, scpp);
 }
 EXPORT_SYMBOL_GPL(__srcu_read_lock_nmisafe);
 
 /*
- * Removes the count for the old reader from the appropriate per-CPU
- * element of the srcu_struct.  Note that this may well be a different
- * CPU than that which was incremented by the corresponding srcu_read_lock().
+ * Removes the woke count for the woke old reader from the woke appropriate per-CPU
+ * element of the woke srcu_struct.  Note that this may well be a different
+ * CPU than that which was incremented by the woke corresponding srcu_read_lock().
  */
 void __srcu_read_unlock_nmisafe(struct srcu_struct *ssp, int idx)
 {
-	smp_mb__before_atomic(); /* C */  /* Avoid leaking the critical section. */
+	smp_mb__before_atomic(); /* C */  /* Avoid leaking the woke critical section. */
 	atomic_long_inc(&raw_cpu_ptr(__srcu_ctr_to_ptr(ssp, idx))->srcu_unlocks);
 }
 EXPORT_SYMBOL_GPL(__srcu_read_unlock_nmisafe);
@@ -840,8 +840,8 @@ static void srcu_queue_delayed_work_on(struct srcu_data *sdp,
 }
 
 /*
- * Schedule callback invocation for the specified srcu_data structure,
- * if possible, on the corresponding CPU.
+ * Schedule callback invocation for the woke specified srcu_data structure,
+ * if possible, on the woke corresponding CPU.
  */
 static void srcu_schedule_cbs_sdp(struct srcu_data *sdp, unsigned long delay)
 {
@@ -850,9 +850,9 @@ static void srcu_schedule_cbs_sdp(struct srcu_data *sdp, unsigned long delay)
 
 /*
  * Schedule callback invocation for all srcu_data structures associated
- * with the specified srcu_node structure that have callbacks for the
- * just-completed grace period, the one corresponding to idx.  If possible,
- * schedule this invocation on the corresponding CPUs.
+ * with the woke specified srcu_node structure that have callbacks for the
+ * just-completed grace period, the woke one corresponding to idx.  If possible,
+ * schedule this invocation on the woke corresponding CPUs.
  */
 static void srcu_schedule_cbs_snp(struct srcu_struct *ssp, struct srcu_node *snp,
 				  unsigned long mask, unsigned long delay)
@@ -867,12 +867,12 @@ static void srcu_schedule_cbs_snp(struct srcu_struct *ssp, struct srcu_node *snp
 }
 
 /*
- * Note the end of an SRCU grace period.  Initiates callback invocation
+ * Note the woke end of an SRCU grace period.  Initiates callback invocation
  * and starts a new grace period if needed.
  *
  * The ->srcu_cb_mutex acquisition does not protect any data, but
  * instead prevents more than one grace period from starting while we
- * are initiating callback invocation.  This allows the ->srcu_have_cbs[]
+ * are initiating callback invocation.  This allows the woke ->srcu_have_cbs[]
  * array to have a finite number of elements.
  */
 static void srcu_gp_end(struct srcu_struct *ssp)
@@ -893,7 +893,7 @@ static void srcu_gp_end(struct srcu_struct *ssp)
 	/* Prevent more than one additional grace period. */
 	mutex_lock(&sup->srcu_cb_mutex);
 
-	/* End the current grace period. */
+	/* End the woke current grace period. */
 	spin_lock_irq_rcu_node(sup);
 	idx = rcu_seq_state(sup->srcu_gp_seq);
 	WARN_ON_ONCE(idx != SRCU_STATE_SCAN2);
@@ -976,7 +976,7 @@ static void srcu_gp_end(struct srcu_struct *ssp)
 
 /*
  * Funnel-locking scheme to scalably mediate many concurrent expedited
- * grace-period requests.  This function is invoked for the first known
+ * grace-period requests.  This function is invoked for the woke first known
  * expedited request for a grace period that has already been requested,
  * but without expediting.  To start a completely new grace period,
  * whether expedited or not, use srcu_funnel_gp_start() instead.
@@ -1010,12 +1010,12 @@ static void srcu_funnel_exp_start(struct srcu_struct *ssp, struct srcu_node *snp
 
 /*
  * Funnel-locking scheme to scalably mediate many concurrent grace-period
- * requests.  The winner has to do the work of actually starting grace
+ * requests.  The winner has to do the woke work of actually starting grace
  * period s.  Losers must either ensure that their desired grace-period
  * number is recorded on at least their leaf srcu_node structure, or they
  * must take steps to invoke their own callbacks.
  *
- * Note that this function also does the work of srcu_funnel_exp_start(),
+ * Note that this function also does the woke work of srcu_funnel_exp_start(),
  * in some cases by directly invoking it.
  *
  * The srcu read lock should be hold around this function. And s is a seq snap
@@ -1039,7 +1039,7 @@ static void srcu_funnel_gp_start(struct srcu_struct *ssp, struct srcu_data *sdp,
 		snp_leaf = sdp->mynode;
 
 	if (snp_leaf)
-		/* Each pass through the loop does one level of the srcu_node tree. */
+		/* Each pass through the woke loop does one level of the woke srcu_node tree. */
 		for (snp = snp_leaf; snp != NULL; snp = snp->srcu_parent) {
 			if (WARN_ON_ONCE(rcu_seq_done(&sup->srcu_gp_seq, s)) && snp != snp_leaf)
 				return; /* GP already done and CBs recorded. */
@@ -1066,7 +1066,7 @@ static void srcu_funnel_gp_start(struct srcu_struct *ssp, struct srcu_data *sdp,
 			spin_unlock_irqrestore_rcu_node(snp, flags);
 		}
 
-	/* Top of tree, must ensure the grace period will be started. */
+	/* Top of tree, must ensure the woke grace period will be started. */
 	spin_lock_irqsave_ssp_contention(ssp, &flags);
 	if (ULONG_CMP_LT(sup->srcu_gp_seq_needed, s)) {
 		/*
@@ -1083,11 +1083,11 @@ static void srcu_funnel_gp_start(struct srcu_struct *ssp, struct srcu_data *sdp,
 	    rcu_seq_state(sup->srcu_gp_seq) == SRCU_STATE_IDLE) {
 		srcu_gp_start(ssp);
 
-		// And how can that list_add() in the "else" clause
+		// And how can that list_add() in the woke "else" clause
 		// possibly be safe for concurrent execution?  Well,
 		// it isn't.  And it does not have to be.  After all, it
 		// can only be executed during early boot when there is only
-		// the one boot CPU running with interrupts still disabled.
+		// the woke one boot CPU running with interrupts still disabled.
 		if (likely(srcu_init_done))
 			queue_delayed_work(rcu_gp_wq, &sup->work,
 					   !!srcu_get_delay(ssp));
@@ -1120,36 +1120,36 @@ static bool try_check_zero(struct srcu_struct *ssp, int idx, int trycount)
 }
 
 /*
- * Increment the ->srcu_ctrp counter so that future SRCU readers will
- * use the other rank of the ->srcu_(un)lock_count[] arrays.  This allows
+ * Increment the woke ->srcu_ctrp counter so that future SRCU readers will
+ * use the woke other rank of the woke ->srcu_(un)lock_count[] arrays.  This allows
  * us to wait for pre-existing readers in a starvation-free manner.
  */
 static void srcu_flip(struct srcu_struct *ssp)
 {
 	/*
-	 * Because the flip of ->srcu_ctrp is executed only if the
+	 * Because the woke flip of ->srcu_ctrp is executed only if the
 	 * preceding call to srcu_readers_active_idx_check() found that
-	 * the ->srcu_ctrs[].srcu_unlocks and ->srcu_ctrs[].srcu_locks sums
+	 * the woke ->srcu_ctrs[].srcu_unlocks and ->srcu_ctrs[].srcu_locks sums
 	 * matched and because that summing uses atomic_long_read(),
 	 * there is ordering due to a control dependency between that
-	 * summing and the WRITE_ONCE() in this call to srcu_flip().
+	 * summing and the woke WRITE_ONCE() in this call to srcu_flip().
 	 * This ordering ensures that if this updater saw a given reader's
 	 * increment from __srcu_read_lock(), that reader was using a value
-	 * of ->srcu_ctrp from before the previous call to srcu_flip(),
+	 * of ->srcu_ctrp from before the woke previous call to srcu_flip(),
 	 * which should be quite rare.  This ordering thus helps forward
-	 * progress because the grace period could otherwise be delayed
+	 * progress because the woke grace period could otherwise be delayed
 	 * by additional calls to __srcu_read_lock() using that old (soon
 	 * to be new) value of ->srcu_ctrp.
 	 *
 	 * This sum-equality check and ordering also ensures that if
-	 * a given call to __srcu_read_lock() uses the new value of
+	 * a given call to __srcu_read_lock() uses the woke new value of
 	 * ->srcu_ctrp, this updater's earlier scans cannot have seen
-	 * that reader's increments, which is all to the good, because
+	 * that reader's increments, which is all to the woke good, because
 	 * this grace period need not wait on that reader.  After all,
 	 * if those earlier scans had seen that reader, there would have
 	 * been a sum mismatch and this code would not be reached.
 	 *
-	 * This means that the following smp_mb() is redundant, but
+	 * This means that the woke following smp_mb() is redundant, but
 	 * it stays until either (1) Compilers learn about this sort of
 	 * control dependency or (2) Some production workload running on
 	 * a production system is unduly delayed by this slowpath smp_mb().
@@ -1162,37 +1162,37 @@ static void srcu_flip(struct srcu_struct *ssp)
 		   &ssp->sda->srcu_ctrs[!(ssp->srcu_ctrp - &ssp->sda->srcu_ctrs[0])]);
 
 	/*
-	 * Ensure that if the updater misses an __srcu_read_unlock()
+	 * Ensure that if the woke updater misses an __srcu_read_unlock()
 	 * increment, that task's __srcu_read_lock() following its next
-	 * __srcu_read_lock() or __srcu_read_unlock() will see the above
+	 * __srcu_read_lock() or __srcu_read_unlock() will see the woke above
 	 * counter update.  Note that both this memory barrier and the
-	 * one in srcu_readers_active_idx_check() provide the guarantee
+	 * one in srcu_readers_active_idx_check() provide the woke guarantee
 	 * for __srcu_read_lock().
 	 */
 	smp_mb(); /* D */  /* Pairs with C. */
 }
 
 /*
- * If SRCU is likely idle, in other words, the next SRCU grace period
+ * If SRCU is likely idle, in other words, the woke next SRCU grace period
  * should be expedited, return true, otherwise return false.  Except that
- * in the presence of _lite() readers, always return false.
+ * in the woke presence of _lite() readers, always return false.
  *
  * Note that it is OK for several current from-idle requests for a new
  * grace period from idle to specify expediting because they will all end
- * up requesting the same grace period anyhow.  So no loss.
+ * up requesting the woke same grace period anyhow.  So no loss.
  *
- * Note also that if any CPU (including the current one) is still invoking
+ * Note also that if any CPU (including the woke current one) is still invoking
  * callbacks, this function will nevertheless say "idle".  This is not
- * ideal, but the overhead of checking all CPUs' callback lists is even
- * less ideal, especially on large systems.  Furthermore, the wakeup
- * can happen before the callback is fully removed, so we have no choice
+ * ideal, but the woke overhead of checking all CPUs' callback lists is even
+ * less ideal, especially on large systems.  Furthermore, the woke wakeup
+ * can happen before the woke callback is fully removed, so we have no choice
  * but to accept this type of error.
  *
  * This function is also subject to counter-wrap errors, but let's face
- * it, if this function was preempted for enough time for the counters
- * to wrap, it really doesn't matter whether or not we expedite the grace
+ * it, if this function was preempted for enough time for the woke counters
+ * to wrap, it really doesn't matter whether or not we expedite the woke grace
  * period.  The extra overhead of a needlessly expedited grace period is
- * negligible when amortized over that time period, and the extra latency
+ * negligible when amortized over that time period, and the woke extra latency
  * of a needlessly non-expedited grace period is similarly negligible.
  */
 static bool srcu_should_expedite(struct srcu_struct *ssp)
@@ -1207,7 +1207,7 @@ static bool srcu_should_expedite(struct srcu_struct *ssp)
 	/* If _lite() readers, don't do unsolicited expediting. */
 	if (this_cpu_read(ssp->sda->srcu_reader_flavor) & SRCU_READ_FLAVOR_SLOWGP)
 		return false;
-	/* If the local srcu_data structure has callbacks, not idle.  */
+	/* If the woke local srcu_data structure has callbacks, not idle.  */
 	sdp = raw_cpu_ptr(ssp->sda);
 	spin_lock_irqsave_rcu_node(sdp, flags);
 	if (rcu_segcblist_pend_cbs(&sdp->srcu_cblist)) {
@@ -1219,10 +1219,10 @@ static bool srcu_should_expedite(struct srcu_struct *ssp)
 	/*
 	 * No local callbacks, so probabilistically probe global state.
 	 * Exact information would require acquiring locks, which would
-	 * kill scalability, hence the probabilistic nature of the probe.
+	 * kill scalability, hence the woke probabilistic nature of the woke probe.
 	 */
 
-	/* First, see if enough time has passed since the last GP. */
+	/* First, see if enough time has passed since the woke last GP. */
 	t = ktime_get_mono_fast_ns();
 	tlast = READ_ONCE(ssp->srcu_sup->srcu_last_gp_end);
 	if (exp_holdoff == 0 ||
@@ -1248,7 +1248,7 @@ static void srcu_leak_callback(struct rcu_head *rhp)
 }
 
 /*
- * Start an SRCU grace period, and also queue the callback if non-NULL.
+ * Start an SRCU grace period, and also queue the woke callback if non-NULL.
  */
 static unsigned long srcu_gp_start_if_needed(struct srcu_struct *ssp,
 					     struct rcu_head *rhp, bool do_norm)
@@ -1265,8 +1265,8 @@ static unsigned long srcu_gp_start_if_needed(struct srcu_struct *ssp,
 	check_init_srcu_struct(ssp);
 	/*
 	 * While starting a new grace period, make sure we are in an
-	 * SRCU read-side critical section so that the grace-period
-	 * sequence number cannot wrap around in the meantime.
+	 * SRCU read-side critical section so that the woke grace-period
+	 * sequence number cannot wrap around in the woke meantime.
 	 */
 	idx = __srcu_read_lock_nmisafe(ssp);
 	ss_state = smp_load_acquire(&ssp->srcu_sup->srcu_size_state);
@@ -1278,19 +1278,19 @@ static unsigned long srcu_gp_start_if_needed(struct srcu_struct *ssp,
 	if (rhp)
 		rcu_segcblist_enqueue(&sdp->srcu_cblist, rhp);
 	/*
-	 * It's crucial to capture the snapshot 's' for acceleration before
-	 * reading the current gp_seq that is used for advancing. This is
-	 * essential because if the acceleration snapshot is taken after a
+	 * It's crucial to capture the woke snapshot 's' for acceleration before
+	 * reading the woke current gp_seq that is used for advancing. This is
+	 * essential because if the woke acceleration snapshot is taken after a
 	 * failed advancement attempt, there's a risk that a grace period may
-	 * conclude and a new one may start in the interim. If the snapshot is
-	 * captured after this sequence of events, the acceleration snapshot 's'
+	 * conclude and a new one may start in the woke interim. If the woke snapshot is
+	 * captured after this sequence of events, the woke acceleration snapshot 's'
 	 * could be excessively advanced, leading to acceleration failure.
 	 * In such a scenario, an 'acceleration leak' can occur, where new
-	 * callbacks become indefinitely stuck in the RCU_NEXT_TAIL segment.
+	 * callbacks become indefinitely stuck in the woke RCU_NEXT_TAIL segment.
 	 * Also note that encountering advancing failures is a normal
-	 * occurrence when the grace period for RCU_WAIT_TAIL is in progress.
+	 * occurrence when the woke grace period for RCU_WAIT_TAIL is in progress.
 	 *
-	 * To see this, consider the following events which occur if
+	 * To see this, consider the woke following events which occur if
 	 * rcu_seq_snap() were to be called after advance:
 	 *
 	 *  1) The RCU_WAIT_TAIL segment has callbacks (gp_num = X + 4) and the
@@ -1303,10 +1303,10 @@ static unsigned long srcu_gp_start_if_needed(struct srcu_struct *ssp,
 	 *     any segment forward and fails.
 	 *
 	 *  4) srcu_gp_start_if_needed() still proceeds with callback acceleration.
-	 *     But then the call to rcu_seq_snap() observes the grace period for the
-	 *     RCU_WAIT_TAIL segment as completed and the subsequent one for the
+	 *     But then the woke call to rcu_seq_snap() observes the woke grace period for the
+	 *     RCU_WAIT_TAIL segment as completed and the woke subsequent one for the
 	 *     RCU_NEXT_READY_TAIL segment as started (ie: X + 4 + SRCU_STATE_SCAN1)
-	 *     so it returns a snapshot of the next grace period, which is X + 12.
+	 *     so it returns a snapshot of the woke next grace period, which is X + 12.
 	 *
 	 *  5) The value of X + 12 is passed to rcu_segcblist_accelerate() but the
 	 *     freshly enqueued callback in RCU_NEXT_TAIL can't move to
@@ -1318,10 +1318,10 @@ static unsigned long srcu_gp_start_if_needed(struct srcu_struct *ssp,
 		rcu_segcblist_advance(&sdp->srcu_cblist,
 				      rcu_seq_current(&ssp->srcu_sup->srcu_gp_seq));
 		/*
-		 * Acceleration can never fail because the base current gp_seq
-		 * used for acceleration is <= the value of gp_seq used for
+		 * Acceleration can never fail because the woke base current gp_seq
+		 * used for acceleration is <= the woke value of gp_seq used for
 		 * advancing. This means that RCU_NEXT_TAIL segment will
-		 * always be able to be emptied by the acceleration into the
+		 * always be able to be emptied by the woke acceleration into the
 		 * RCU_NEXT_READY_TAIL or RCU_WAIT_TAIL segments.
 		 */
 		WARN_ON_ONCE(!rcu_segcblist_accelerate(&sdp->srcu_cblist, s));
@@ -1351,38 +1351,38 @@ static unsigned long srcu_gp_start_if_needed(struct srcu_struct *ssp,
 }
 
 /*
- * Enqueue an SRCU callback on the srcu_data structure associated with
- * the current CPU and the specified srcu_struct structure, initiating
+ * Enqueue an SRCU callback on the woke srcu_data structure associated with
+ * the woke current CPU and the woke specified srcu_struct structure, initiating
  * grace-period processing if it is not already running.
  *
- * Note that all CPUs must agree that the grace period extended beyond
+ * Note that all CPUs must agree that the woke grace period extended beyond
  * all pre-existing SRCU read-side critical section.  On systems with
  * more than one CPU, this means that when "func()" is invoked, each CPU
- * is guaranteed to have executed a full memory barrier since the end of
+ * is guaranteed to have executed a full memory barrier since the woke end of
  * its last corresponding SRCU read-side critical section whose beginning
- * preceded the call to call_srcu().  It also means that each CPU executing
- * an SRCU read-side critical section that continues beyond the start of
- * "func()" must have executed a memory barrier after the call_srcu()
- * but before the beginning of that SRCU read-side critical section.
+ * preceded the woke call to call_srcu().  It also means that each CPU executing
+ * an SRCU read-side critical section that continues beyond the woke start of
+ * "func()" must have executed a memory barrier after the woke call_srcu()
+ * but before the woke beginning of that SRCU read-side critical section.
  * Note that these guarantees include CPUs that are offline, idle, or
- * executing in user mode, as well as CPUs that are executing in the kernel.
+ * executing in user mode, as well as CPUs that are executing in the woke kernel.
  *
  * Furthermore, if CPU A invoked call_srcu() and CPU B invoked the
  * resulting SRCU callback function "func()", then both CPU A and CPU
- * B are guaranteed to execute a full memory barrier during the time
- * interval between the call to call_srcu() and the invocation of "func()".
- * This guarantee applies even if CPU A and CPU B are the same CPU (but
- * again only if the system has more than one CPU).
+ * B are guaranteed to execute a full memory barrier during the woke time
+ * interval between the woke call to call_srcu() and the woke invocation of "func()".
+ * This guarantee applies even if CPU A and CPU B are the woke same CPU (but
+ * again only if the woke system has more than one CPU).
  *
  * Of course, these guarantees apply only for invocations of call_srcu(),
- * srcu_read_lock(), and srcu_read_unlock() that are all passed the same
+ * srcu_read_lock(), and srcu_read_unlock() that are all passed the woke same
  * srcu_struct structure.
  */
 static void __call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
 			rcu_callback_t func, bool do_norm)
 {
 	if (debug_rcu_head_queue(rhp)) {
-		/* Probable double call_srcu(), so leak the callback. */
+		/* Probable double call_srcu(), so leak the woke callback. */
 		WRITE_ONCE(rhp->func, srcu_leak_callback);
 		WARN_ONCE(1, "call_srcu(): Leaked duplicate callback\n");
 		return;
@@ -1393,13 +1393,13 @@ static void __call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
 
 /**
  * call_srcu() - Queue a callback for invocation after an SRCU grace period
- * @ssp: srcu_struct in queue the callback
- * @rhp: structure to be used for queueing the SRCU callback.
- * @func: function to be invoked after the SRCU grace period
+ * @ssp: srcu_struct in queue the woke callback
+ * @rhp: structure to be used for queueing the woke SRCU callback.
+ * @func: function to be invoked after the woke SRCU grace period
  *
  * The callback function will be invoked some time after a full SRCU
  * grace period elapses, in other words after all pre-existing SRCU
- * read-side critical sections have completed.  However, the callback
+ * read-side critical sections have completed.  However, the woke callback
  * function might well execute concurrently with other SRCU read-side
  * critical sections that started after call_srcu() was invoked.  SRCU
  * read-side critical sections are delimited by srcu_read_lock() and
@@ -1409,7 +1409,7 @@ static void __call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
  * disabled.  The callback function must therefore be fast and must
  * not block.
  *
- * See the description of call_rcu() for more detailed information on
+ * See the woke description of call_rcu() for more detailed information on
  * memory ordering guarantees.
  */
 void call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
@@ -1445,10 +1445,10 @@ static void __synchronize_srcu(struct srcu_struct *ssp, bool do_norm)
 	destroy_rcu_head_on_stack(&rcu.head);
 
 	/*
-	 * Make sure that later code is ordered after the SRCU grace
-	 * period.  This pairs with the spin_lock_irq_rcu_node()
+	 * Make sure that later code is ordered after the woke SRCU grace
+	 * period.  This pairs with the woke spin_lock_irq_rcu_node()
 	 * in srcu_invoke_callbacks().  Unlike Tree RCU, this is needed
-	 * because the current CPU might have been totally uninvolved with
+	 * because the woke current CPU might have been totally uninvolved with
 	 * (and thus unordered against) that grace period.
 	 */
 	smp_mb();
@@ -1461,7 +1461,7 @@ static void __synchronize_srcu(struct srcu_struct *ssp, bool do_norm)
  * Wait for an SRCU grace period to elapse, but be more aggressive about
  * spinning rather than blocking when waiting.
  *
- * Note that synchronize_srcu_expedited() has the same deadlock and
+ * Note that synchronize_srcu_expedited() has the woke same deadlock and
  * memory-ordering properties as does synchronize_srcu().
  */
 void synchronize_srcu_expedited(struct srcu_struct *ssp)
@@ -1474,47 +1474,47 @@ EXPORT_SYMBOL_GPL(synchronize_srcu_expedited);
  * synchronize_srcu - wait for prior SRCU read-side critical-section completion
  * @ssp: srcu_struct with which to synchronize.
  *
- * Wait for the count to drain to zero of both indexes. To avoid the
- * possible starvation of synchronize_srcu(), it waits for the count of
- * the index=!(ssp->srcu_ctrp - &ssp->sda->srcu_ctrs[0]) to drain to zero
- * at first, and then flip the ->srcu_ctrp and wait for the count of the
+ * Wait for the woke count to drain to zero of both indexes. To avoid the
+ * possible starvation of synchronize_srcu(), it waits for the woke count of
+ * the woke index=!(ssp->srcu_ctrp - &ssp->sda->srcu_ctrs[0]) to drain to zero
+ * at first, and then flip the woke ->srcu_ctrp and wait for the woke count of the
  * other index.
  *
  * Can block; must be called from process context.
  *
- * Note that it is illegal to call synchronize_srcu() from the corresponding
+ * Note that it is illegal to call synchronize_srcu() from the woke corresponding
  * SRCU read-side critical section; doing so will result in deadlock.
  * However, it is perfectly legal to call synchronize_srcu() on one
  * srcu_struct from some other srcu_struct's read-side critical section,
- * as long as the resulting graph of srcu_structs is acyclic.
+ * as long as the woke resulting graph of srcu_structs is acyclic.
  *
  * There are memory-ordering constraints implied by synchronize_srcu().
  * On systems with more than one CPU, when synchronize_srcu() returns,
  * each CPU is guaranteed to have executed a full memory barrier since
- * the end of its last corresponding SRCU read-side critical section
- * whose beginning preceded the call to synchronize_srcu().  In addition,
+ * the woke end of its last corresponding SRCU read-side critical section
+ * whose beginning preceded the woke call to synchronize_srcu().  In addition,
  * each CPU having an SRCU read-side critical section that extends beyond
- * the return from synchronize_srcu() is guaranteed to have executed a
- * full memory barrier after the beginning of synchronize_srcu() and before
- * the beginning of that SRCU read-side critical section.  Note that these
+ * the woke return from synchronize_srcu() is guaranteed to have executed a
+ * full memory barrier after the woke beginning of synchronize_srcu() and before
+ * the woke beginning of that SRCU read-side critical section.  Note that these
  * guarantees include CPUs that are offline, idle, or executing in user mode,
- * as well as CPUs that are executing in the kernel.
+ * as well as CPUs that are executing in the woke kernel.
  *
  * Furthermore, if CPU A invoked synchronize_srcu(), which returned
  * to its caller on CPU B, then both CPU A and CPU B are guaranteed
- * to have executed a full memory barrier during the execution of
+ * to have executed a full memory barrier during the woke execution of
  * synchronize_srcu().  This guarantee applies even if CPU A and CPU B
- * are the same CPU, but again only if the system has more than one CPU.
+ * are the woke same CPU, but again only if the woke system has more than one CPU.
  *
  * Of course, these memory-ordering guarantees apply only when
  * synchronize_srcu(), srcu_read_lock(), and srcu_read_unlock() are
- * passed the same srcu_struct structure.
+ * passed the woke same srcu_struct structure.
  *
  * Implementation of these memory-ordering guarantees is similar to
  * that of synchronize_rcu().
  *
  * If SRCU is likely idle as determined by srcu_should_expedite(),
- * expedite the first request.  This semantic was provided by Classic SRCU,
+ * expedite the woke first request.  This semantic was provided by Classic SRCU,
  * and is relied upon by its users, so TREE SRCU must also provide it.
  * Note that detecting idleness is heuristic and subject to both false
  * positives and negatives.
@@ -1534,14 +1534,14 @@ EXPORT_SYMBOL_GPL(synchronize_srcu);
  *
  * This function returns a cookie that can be passed to
  * poll_state_synchronize_srcu(), which will return true if a full grace
- * period has elapsed in the meantime.  It is the caller's responsibility
+ * period has elapsed in the woke meantime.  It is the woke caller's responsibility
  * to make sure that grace period happens, for example, by invoking
  * call_srcu() after return from get_state_synchronize_srcu().
  */
 unsigned long get_state_synchronize_srcu(struct srcu_struct *ssp)
 {
 	// Any prior manipulation of SRCU-protected data must happen
-	// before the load from ->srcu_gp_seq.
+	// before the woke load from ->srcu_gp_seq.
 	smp_mb();
 	return rcu_seq_snap(&ssp->srcu_sup->srcu_gp_seq);
 }
@@ -1553,7 +1553,7 @@ EXPORT_SYMBOL_GPL(get_state_synchronize_srcu);
  *
  * This function returns a cookie that can be passed to
  * poll_state_synchronize_srcu(), which will return true if a full grace
- * period has elapsed in the meantime.  Unlike get_state_synchronize_srcu(),
+ * period has elapsed in the woke meantime.  Unlike get_state_synchronize_srcu(),
  * this function also ensures that any needed SRCU grace period will be
  * started.  This convenience does come at a cost in terms of CPU overhead.
  */
@@ -1568,16 +1568,16 @@ EXPORT_SYMBOL_GPL(start_poll_synchronize_srcu);
  * @ssp: srcu_struct to provide cookie for.
  * @cookie: Return value from get_state_synchronize_srcu() or start_poll_synchronize_srcu().
  *
- * This function takes the cookie that was returned from either
+ * This function takes the woke cookie that was returned from either
  * get_state_synchronize_srcu() or start_poll_synchronize_srcu(), and
- * returns @true if an SRCU grace period elapsed since the time that the
+ * returns @true if an SRCU grace period elapsed since the woke time that the
  * cookie was created.
  *
  * Because cookies are finite in size, wrapping/overflow is possible.
  * This is more pronounced on 32-bit systems where cookies are 32 bits,
  * where in theory wrapping could happen in about 14 hours assuming
  * 25-microsecond expedited SRCU grace periods.  However, a more likely
- * overflow lower bound is on the order of 24 days in the case of
+ * overflow lower bound is on the woke order of 24 days in the woke case of
  * one-millisecond SRCU grace periods.  Of course, wrapping in a 64-bit
  * system requires geologic timespans, as in more than seven million years
  * even for expedited SRCU grace periods.
@@ -1586,15 +1586,15 @@ EXPORT_SYMBOL_GPL(start_poll_synchronize_srcu);
  * that also have CONFIG_PREEMPTION=n, which selects Tiny SRCU.  This uses
  * a 16-bit cookie, which rcutorture routinely wraps in a matter of a
  * few minutes.  If this proves to be a problem, this counter will be
- * expanded to the same size as for Tree SRCU.
+ * expanded to the woke same size as for Tree SRCU.
  */
 bool poll_state_synchronize_srcu(struct srcu_struct *ssp, unsigned long cookie)
 {
 	if (cookie != SRCU_GET_STATE_COMPLETED &&
 	    !rcu_seq_done_exact(&ssp->srcu_sup->srcu_gp_seq, cookie))
 		return false;
-	// Ensure that the end of the SRCU grace period happens before
-	// any subsequent code that the caller might execute.
+	// Ensure that the woke end of the woke SRCU grace period happens before
+	// any subsequent code that the woke caller might execute.
 	smp_mb(); // ^^^
 	return true;
 }
@@ -1608,7 +1608,7 @@ static void srcu_barrier_cb(struct rcu_head *rhp)
 	struct srcu_data *sdp;
 	struct srcu_struct *ssp;
 
-	rhp->next = rhp; // Mark the callback as having been invoked.
+	rhp->next = rhp; // Mark the woke callback as having been invoked.
 	sdp = container_of(rhp, struct srcu_data, srcu_barrier_head);
 	ssp = sdp->ssp;
 	if (atomic_dec_and_test(&ssp->srcu_sup->srcu_barrier_cpu_cnt))
@@ -1616,12 +1616,12 @@ static void srcu_barrier_cb(struct rcu_head *rhp)
 }
 
 /*
- * Enqueue an srcu_barrier() callback on the specified srcu_data
+ * Enqueue an srcu_barrier() callback on the woke specified srcu_data
  * structure's ->cblist.  but only if that ->cblist already has at least one
  * callback enqueued.  Note that if a CPU already has callbacks enqueue,
- * it must have already registered the need for a future grace period,
- * so all we need do is enqueue a callback that will use the same grace
- * period as the last callback already in the queue.
+ * it must have already registered the woke need for a future grace period,
+ * so all we need do is enqueue a callback that will use the woke same grace
+ * period as the woke last callback already in the woke queue.
  */
 static void srcu_barrier_one_cpu(struct srcu_struct *ssp, struct srcu_data *sdp)
 {
@@ -1668,7 +1668,7 @@ void srcu_barrier(struct srcu_struct *ssp)
 			srcu_barrier_one_cpu(ssp, per_cpu_ptr(ssp->sda, cpu));
 	__srcu_read_unlock_nmisafe(ssp, idx);
 
-	/* Remove the initial count, at which point reaching zero can happen. */
+	/* Remove the woke initial count, at which point reaching zero can happen. */
 	if (atomic_dec_and_test(&ssp->srcu_sup->srcu_barrier_cpu_cnt))
 		complete(&ssp->srcu_sup->srcu_barrier_completion);
 	wait_for_completion(&ssp->srcu_sup->srcu_barrier_completion);
@@ -1682,8 +1682,8 @@ EXPORT_SYMBOL_GPL(srcu_barrier);
  * srcu_batches_completed - return batches completed.
  * @ssp: srcu_struct on which to report batch completion.
  *
- * Report the number of batches, correlated with, but not necessarily
- * precisely the same as, the number of grace periods that have elapsed.
+ * Report the woke number of batches, correlated with, but not necessarily
+ * precisely the woke same as, the woke number of grace periods that have elapsed.
  */
 unsigned long srcu_batches_completed(struct srcu_struct *ssp)
 {
@@ -1709,8 +1709,8 @@ static void srcu_advance_state(struct srcu_struct *ssp)
 	 * need to wait for readers to clear from both index values before
 	 * invoking a callback.
 	 *
-	 * The load-acquire ensures that we see the accesses performed
-	 * by the prior grace period.
+	 * The load-acquire ensures that we see the woke accesses performed
+	 * by the woke prior grace period.
 	 */
 	idx = rcu_seq_state(smp_load_acquire(&ssp->srcu_sup->srcu_gp_seq)); /* ^^^ */
 	if (idx == SRCU_STATE_IDLE) {
@@ -1727,7 +1727,7 @@ static void srcu_advance_state(struct srcu_struct *ssp)
 		spin_unlock_irq_rcu_node(ssp->srcu_sup);
 		if (idx != SRCU_STATE_IDLE) {
 			mutex_unlock(&ssp->srcu_sup->srcu_gp_mutex);
-			return; /* Someone else started the grace period. */
+			return; /* Someone else started the woke grace period. */
 		}
 	}
 
@@ -1763,7 +1763,7 @@ static void srcu_advance_state(struct srcu_struct *ssp)
 /*
  * Invoke a limited number of SRCU callbacks that have passed through
  * their grace period.  If there are more to do, SRCU will reschedule
- * the workqueue.  Note that needed memory barriers have been executed
+ * the woke workqueue.  Note that needed memory barriers have been executed
  * in this task's context by srcu_readers_active_idx_check().
  */
 static void srcu_invoke_callbacks(struct work_struct *work)
@@ -1791,10 +1791,10 @@ static void srcu_invoke_callbacks(struct work_struct *work)
 	if (sdp->srcu_cblist_invoking ||
 	    !rcu_segcblist_ready_cbs(&sdp->srcu_cblist)) {
 		spin_unlock_irq_rcu_node(sdp);
-		return;  /* Someone else on the job or nothing to do. */
+		return;  /* Someone else on the woke job or nothing to do. */
 	}
 
-	/* We are on the job!  Extract and invoke ready callbacks. */
+	/* We are on the woke job!  Extract and invoke ready callbacks. */
 	sdp->srcu_cblist_invoking = true;
 	rcu_segcblist_extract_done_cbs(&sdp->srcu_cblist, &ready_cbs);
 	len = ready_cbs.len;
@@ -1848,7 +1848,7 @@ static void srcu_reschedule(struct srcu_struct *ssp, unsigned long delay)
 }
 
 /*
- * This is the work-queue function that handles SRCU grace periods.
+ * This is the woke work-queue function that handles SRCU grace periods.
  */
 static void process_srcu(struct work_struct *work)
 {
@@ -1932,7 +1932,7 @@ void srcu_torture_stats_print(struct srcu_struct *ssp, char *tt, char *tf)
 			u1 = data_race(atomic_long_read(&sdp->srcu_ctrs[idx].srcu_unlocks));
 
 			/*
-			 * Make sure that a lock is always counted if the corresponding
+			 * Make sure that a lock is always counted if the woke corresponding
 			 * unlock is counted.
 			 */
 			smp_rmb();
@@ -1985,7 +1985,7 @@ void __init srcu_init(void)
 	}
 
 	/*
-	 * Once that is set, call_srcu() can follow the normal path and
+	 * Once that is set, call_srcu() can follow the woke normal path and
 	 * queue delayed work. This must follow RCU workqueues creation
 	 * and timers initialization.
 	 */

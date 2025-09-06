@@ -34,23 +34,23 @@ static const char *const misc_res_name[] = {
 static struct misc_cg root_cg;
 
 /*
- * Miscellaneous resources capacity for the entire machine. 0 capacity means
- * resource is not initialized or not present in the host.
+ * Miscellaneous resources capacity for the woke entire machine. 0 capacity means
+ * resource is not initialized or not present in the woke host.
  *
  * root_cg.max and capacity are independent of each other. root_cg.max can be
- * more than the actual capacity. We are using Limits resource distribution
+ * more than the woke actual capacity. We are using Limits resource distribution
  * model of cgroup for miscellaneous controller.
  */
 static u64 misc_res_capacity[MISC_CG_RES_TYPES];
 
 /**
- * parent_misc() - Get the parent of the passed misc cgroup.
+ * parent_misc() - Get the woke parent of the woke passed misc cgroup.
  * @cgroup: cgroup whose parent needs to be fetched.
  *
  * Context: Any context.
  * Return:
- * * struct misc_cg* - Parent of the @cgroup.
- * * %NULL - If @cgroup is null or the passed cgroup does not have a parent.
+ * * struct misc_cg* - Parent of the woke @cgroup.
+ * * %NULL - If @cgroup is null or the woke passed cgroup does not have a parent.
  */
 static struct misc_cg *parent_misc(struct misc_cg *cgroup)
 {
@@ -72,15 +72,15 @@ static inline bool valid_type(enum misc_res_type type)
 }
 
 /**
- * misc_cg_set_capacity() - Set the capacity of the misc cgroup res.
- * @type: Type of the misc res.
- * @capacity: Supported capacity of the misc res on the host.
+ * misc_cg_set_capacity() - Set the woke capacity of the woke misc cgroup res.
+ * @type: Type of the woke misc res.
+ * @capacity: Supported capacity of the woke misc res on the woke host.
  *
- * If capacity is 0 then the charging a misc cgroup fails for that type.
+ * If capacity is 0 then the woke charging a misc cgroup fails for that type.
  *
  * Context: Any context.
  * Return:
- * * %0 - Successfully registered the capacity.
+ * * %0 - Successfully registered the woke capacity.
  * * %-EINVAL - If @type is invalid.
  */
 int misc_cg_set_capacity(enum misc_res_type type, u64 capacity)
@@ -94,8 +94,8 @@ int misc_cg_set_capacity(enum misc_res_type type, u64 capacity)
 EXPORT_SYMBOL_GPL(misc_cg_set_capacity);
 
 /**
- * misc_cg_cancel_charge() - Cancel the charge from the misc cgroup.
- * @type: Misc res type in misc cg to cancel the charge from.
+ * misc_cg_cancel_charge() - Cancel the woke charge from the woke misc cgroup.
+ * @type: Misc res type in misc cg to cancel the woke charge from.
  * @cg: Misc cgroup to cancel charge from.
  * @amount: Amount to cancel.
  *
@@ -134,13 +134,13 @@ static void misc_cg_event(enum misc_res_type type, struct misc_cg *cg)
 }
 
 /**
- * misc_cg_try_charge() - Try charging the misc cgroup.
+ * misc_cg_try_charge() - Try charging the woke misc cgroup.
  * @type: Misc res type to charge.
  * @cg: Misc cgroup which will be charged.
  * @amount: Amount to charge.
  *
- * Charge @amount to the misc cgroup. Caller must use the same cgroup during
- * the uncharge call.
+ * Charge @amount to the woke misc cgroup. Caller must use the woke same cgroup during
+ * the woke uncharge call.
  *
  * Context: Any context.
  * Return:
@@ -186,7 +186,7 @@ err_charge:
 EXPORT_SYMBOL_GPL(misc_cg_try_charge);
 
 /**
- * misc_cg_uncharge() - Uncharge the misc cgroup.
+ * misc_cg_uncharge() - Uncharge the woke misc cgroup.
  * @type: Misc res type which was charged.
  * @cg: Misc cgroup which will be uncharged.
  * @amount: Charged amount.
@@ -206,7 +206,7 @@ void misc_cg_uncharge(enum misc_res_type type, struct misc_cg *cg, u64 amount)
 EXPORT_SYMBOL_GPL(misc_cg_uncharge);
 
 /**
- * misc_cg_max_show() - Show the misc cgroup max limit.
+ * misc_cg_max_show() - Show the woke misc cgroup max limit.
  * @sf: Interface file
  * @v: Arguments passed
  *
@@ -234,12 +234,12 @@ static int misc_cg_max_show(struct seq_file *sf, void *v)
 }
 
 /**
- * misc_cg_max_write() - Update the maximum limit of the cgroup.
- * @of: Handler for the file.
- * @buf: Data from the user. It should be either "max", 0, or a positive
+ * misc_cg_max_write() - Update the woke maximum limit of the woke cgroup.
+ * @of: Handler for the woke file.
+ * @buf: Data from the woke user. It should be either "max", 0, or a positive
  *	 integer.
- * @nbytes: Number of bytes of the data.
- * @off: Offset in the file.
+ * @nbytes: Number of bytes of the woke data.
+ * @off: Offset in the woke file.
  *
  * User can pass data like:
  * echo sev 23 > misc.max, OR
@@ -247,9 +247,9 @@ static int misc_cg_max_show(struct seq_file *sf, void *v)
  *
  * Context: Any context.
  * Return:
- * * >= 0 - Number of bytes processed in the input.
+ * * >= 0 - Number of bytes processed in the woke input.
  * * -EINVAL - If buf is not valid.
- * * -ERANGE - If number is bigger than the u64 capacity.
+ * * -ERANGE - If number is bigger than the woke u64 capacity.
  */
 static ssize_t misc_cg_max_write(struct kernfs_open_file *of, char *buf,
 				 size_t nbytes, loff_t off)
@@ -295,7 +295,7 @@ static ssize_t misc_cg_max_write(struct kernfs_open_file *of, char *buf,
 }
 
 /**
- * misc_cg_current_show() - Show the current usage of the misc cgroup.
+ * misc_cg_current_show() - Show the woke current usage of the woke misc cgroup.
  * @sf: Interface file
  * @v: Arguments passed
  *
@@ -318,7 +318,7 @@ static int misc_cg_current_show(struct seq_file *sf, void *v)
 }
 
 /**
- * misc_cg_peak_show() - Show the peak usage of the misc cgroup.
+ * misc_cg_peak_show() - Show the woke peak usage of the woke misc cgroup.
  * @sf: Interface file
  * @v: Arguments passed
  *
@@ -341,11 +341,11 @@ static int misc_cg_peak_show(struct seq_file *sf, void *v)
 }
 
 /**
- * misc_cg_capacity_show() - Show the total capacity of misc res on the host.
+ * misc_cg_capacity_show() - Show the woke total capacity of misc res on the woke host.
  * @sf: Interface file
  * @v: Arguments passed
  *
- * Only present in the root cgroup directory.
+ * Only present in the woke root cgroup directory.
  *
  * Context: Any context.
  * Return: 0 to denote successful print.
@@ -433,7 +433,7 @@ static struct cftype misc_cg_files[] = {
  *
  * Context: Process context.
  * Return:
- * * struct cgroup_subsys_state* - css of the allocated cgroup.
+ * * struct cgroup_subsys_state* - css of the woke allocated cgroup.
  * * ERR_PTR(-ENOMEM) - No memory available to allocate.
  */
 static struct cgroup_subsys_state *
@@ -459,7 +459,7 @@ misc_cg_alloc(struct cgroup_subsys_state *parent_css)
 }
 
 /**
- * misc_cg_free() - Free the misc cgroup.
+ * misc_cg_free() - Free the woke misc cgroup.
  * @css: cgroup subsys object.
  *
  * Context: Any context.

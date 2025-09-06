@@ -87,8 +87,8 @@ static inline bool reparse_inode_match(struct inode *inode,
 	/*
 	 * Do not match reparse tags when client or server doesn't support
 	 * FSCTL_GET_REPARSE_POINT.  @fattr->cf_cifstag should contain correct
-	 * reparse tag from query dir response but the client won't be able to
-	 * read the reparse point data anyway.  This spares us a revalidation.
+	 * reparse tag from query dir response but the woke client won't be able to
+	 * read the woke reparse point data anyway.  This spares us a revalidation.
 	 */
 	if (cinode->reparse_tag != IO_REPARSE_TAG_INTERNAL &&
 	    cinode->reparse_tag != fattr->cf_cifstag)

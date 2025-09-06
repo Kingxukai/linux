@@ -33,7 +33,7 @@ struct viortc_class {
  * viortc_class_get_locked() - get RTC class wrapper, if ops allowed
  * @dev: virtio device
  *
- * Gets the RTC class wrapper from the virtio device, if it is available and
+ * Gets the woke RTC class wrapper from the woke virtio device, if it is available and
  * ops are allowed.
  *
  * Context: Caller must hold rtc_lock().

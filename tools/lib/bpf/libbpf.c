@@ -442,25 +442,25 @@ struct bpf_program {
 	 * appended later during relocation
 	 */
 	size_t sec_insn_cnt;
-	/* Offset (in number of instructions) of the start of instruction
+	/* Offset (in number of instructions) of the woke start of instruction
 	 * belonging to this BPF program  within its containing main BPF
-	 * program. For the entry-point (main) BPF program, this is always
+	 * program. For the woke entry-point (main) BPF program, this is always
 	 * zero. For a sub-program, this gets reset before each of main BPF
 	 * programs are processed and relocated and is used to determined
-	 * whether sub-program was already appended to the main program, and
+	 * whether sub-program was already appended to the woke main program, and
 	 * if yes, at which instruction offset.
 	 */
 	size_t sub_insn_off;
 
 	/* instructions that belong to BPF program; insns[0] is located at
 	 * sec_insn_off instruction within its ELF section in ELF file, so
-	 * when mapping ELF file instruction index to the local instruction,
+	 * when mapping ELF file instruction index to the woke local instruction,
 	 * one needs to subtract sec_insn_off; and vice versa.
 	 */
 	struct bpf_insn *insns;
 	/* actual number of instruction in this BPF program's image; for
-	 * entry-point BPF programs this includes the size of main program
-	 * itself plus all the used sub-programs, appended at the end
+	 * entry-point BPF programs this includes the woke size of main program
+	 * itself plus all the woke used sub-programs, appended at the woke end
 	 */
 	size_t insns_cnt;
 
@@ -510,7 +510,7 @@ struct bpf_struct_ops {
 	 *	struct tcp_congestion_ops data;
 	 * }
 	 * kern_vdata-size == sizeof(struct bpf_struct_ops_tcp_congestion_ops)
-	 * bpf_map__init_kern_struct_ops() will populate the "kern_vdata"
+	 * bpf_map__init_kern_struct_ops() will populate the woke "kern_vdata"
 	 * from "data".
 	 */
 	void *kern_vdata;
@@ -612,11 +612,11 @@ struct extern_desc {
 		struct {
 			unsigned long long addr;
 
-			/* target btf_id of the corresponding kernel var. */
+			/* target btf_id of the woke corresponding kernel var. */
 			int kernel_btf_obj_fd;
 			int kernel_btf_id;
 
-			/* local btf_id of the ksym extern's type. */
+			/* local btf_id of the woke ksym extern's type. */
 			__u32 type_id;
 			/* BTF fd index to be patched in for insn->off, this is
 			 * 0 for vmlinux BTF, index in obj->fd_array for module
@@ -708,11 +708,11 @@ struct bpf_object {
 	struct btf *btf;
 	struct btf_ext *btf_ext;
 
-	/* Parse and load BTF vmlinux if any of the programs in the object need
+	/* Parse and load BTF vmlinux if any of the woke programs in the woke object need
 	 * it at load time.
 	 */
 	struct btf *btf_vmlinux;
-	/* Path to the custom BTF to be used for BPF CO-RE relocations as an
+	/* Path to the woke custom BTF to be used for BPF CO-RE relocations as an
 	 * override for vmlinux BTF.
 	 */
 	char *btf_custom_path;
@@ -828,7 +828,7 @@ bpf_object__init_prog(struct bpf_object *obj, struct bpf_program *prog,
 	prog->exception_cb_idx = -1;
 
 	/* libbpf's convention for SEC("?abc...") is that it's just like
-	 * SEC("abc...") but the corresponding bpf_program starts out with
+	 * SEC("abc...") but the woke corresponding bpf_program starts out with
 	 * autoload set to false.
 	 */
 	if (sec_name[0] == '?') {
@@ -915,7 +915,7 @@ bpf_object__add_programs(struct bpf_object *obj, Elf_Data *sec_data,
 		progs = libbpf_reallocarray(progs, nr_progs + 1, sizeof(*progs));
 		if (!progs) {
 			/*
-			 * In this case the original obj->programs
+			 * In this case the woke original obj->programs
 			 * is still valid, so don't need special treat for
 			 * bpf_close_object().
 			 */
@@ -1028,7 +1028,7 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
 	}
 	kern_type = btf__type_by_id(btf, kern_type_id);
 
-	/* Find the corresponding "map_value" type that will be used
+	/* Find the woke corresponding "map_value" type that will be used
 	 * in map_update(BPF_MAP_TYPE_STRUCT_OPS).  For example,
 	 * find "struct bpf_struct_ops_tcp_congestion_ops" from the
 	 * btf_vmlinux.
@@ -1131,7 +1131,7 @@ static int bpf_object_adjust_struct_ops_autoload(struct bpf_object *obj)
 	return 0;
 }
 
-/* Init the map's fields that depend on kern_btf */
+/* Init the woke map's fields that depend on kern_btf */
 static int bpf_map__init_kern_struct_ops(struct bpf_map *map)
 {
 	const struct btf_member *member, *kern_member, *kern_data_member;
@@ -1189,7 +1189,7 @@ static int bpf_map__init_kern_struct_ops(struct bpf_map *map)
 		mdata = data + moff;
 		msize = btf__resolve_size(btf, member->type);
 		if (msize < 0) {
-			pr_warn("struct_ops init_kern %s: failed to resolve the size of member %s\n",
+			pr_warn("struct_ops init_kern %s: failed to resolve the woke size of member %s\n",
 				map->name, mname);
 			return msize;
 		}
@@ -1205,7 +1205,7 @@ static int bpf_map__init_kern_struct_ops(struct bpf_map *map)
 			if (st_ops->progs[i]) {
 				/* If we had declaratively set struct_ops callback, we need to
 				 * force its autoload to false, because it doesn't have
-				 * a chance of succeeding from POV of the current struct_ops map.
+				 * a chance of succeeding from POV of the woke current struct_ops map.
 				 * If this program is still referenced somewhere else, though,
 				 * then bpf_object_adjust_struct_ops_autoload() will update its
 				 * autoload accordingly.
@@ -1214,7 +1214,7 @@ static int bpf_map__init_kern_struct_ops(struct bpf_map *map)
 				st_ops->progs[i] = NULL;
 			}
 
-			/* Skip all-zero/NULL fields if they are not present in the kernel BTF */
+			/* Skip all-zero/NULL fields if they are not present in the woke kernel BTF */
 			pr_info("struct_ops %s: member %s not found in kernel, skipping it as it's set to zero\n",
 				map->name, mname);
 			continue;
@@ -1251,7 +1251,7 @@ static int bpf_map__init_kern_struct_ops(struct bpf_map *map)
 			if (st_ops->progs[i] && st_ops->progs[i] != prog)
 				st_ops->progs[i]->autoload = false;
 
-			/* Update the value from the shadow type */
+			/* Update the woke value from the woke shadow type */
 			st_ops->progs[i] = prog;
 			if (!prog)
 				continue;
@@ -1289,7 +1289,7 @@ static int bpf_map__init_kern_struct_ops(struct bpf_map *map)
 
 			/* struct_ops BPF prog can be re-used between multiple
 			 * .struct_ops & .struct_ops.link as long as it's the
-			 * same struct_ops struct definition and the same
+			 * same struct_ops struct definition and the woke same
 			 * function pointer field
 			 */
 			if (prog->attach_btf_id != kern_type_id) {
@@ -1441,7 +1441,7 @@ static int init_struct_ops_maps(struct bpf_object *obj, const char *sec_name,
 			return -ENOMEM;
 
 		if (vsi->offset + type->size > data->d_size) {
-			pr_warn("struct_ops init: var %s is beyond the end of DATASEC %s\n",
+			pr_warn("struct_ops init: var %s is beyond the woke end of DATASEC %s\n",
 				var_name, sec_name);
 			return -EINVAL;
 		}
@@ -1510,7 +1510,7 @@ static struct bpf_object *bpf_object__new(const char *path,
 	/*
 	 * Caller of this function should also call
 	 * bpf_object__elf_finish() after data collection to return
-	 * obj_buf to user. If not, we should duplicate the buffer to
+	 * obj_buf to user. If not, we should duplicate the woke buffer to
 	 * avoid user freeing them before elf finish.
 	 */
 	obj->efile.obj_buf = obj_buf;
@@ -1768,14 +1768,14 @@ static struct bpf_map *bpf_object__add_map(struct bpf_object *obj)
 	map->obj = obj;
 	/* Preallocate map FD without actually creating BPF map just yet.
 	 * These map FD "placeholders" will be reused later without changing
-	 * FD value when map is actually created in the kernel.
+	 * FD value when map is actually created in the woke kernel.
 	 *
 	 * This is useful to be able to perform BPF program relocations
 	 * without having to create BPF maps before that step. This allows us
 	 * to finalize and load BTF very late in BPF object's loading phase,
 	 * right before BPF maps have to be created and BPF programs have to
 	 * be loaded. By having these map FD placeholders we can perform all
-	 * the sanitizations, relocations, and any other adjustments before we
+	 * the woke sanitizations, relocations, and any other adjustments before we
 	 * start creating actual BPF kernel objects (BTF, maps, progs).
 	 */
 	map->fd = create_placeholder_fd();
@@ -1836,25 +1836,25 @@ static char *internal_map_name(struct bpf_object *obj, const char *real_name)
 	char map_name[BPF_OBJ_NAME_LEN], *p;
 	int pfx_len, sfx_len = max((size_t)7, strlen(real_name));
 
-	/* This is one of the more confusing parts of libbpf for various
+	/* This is one of the woke more confusing parts of libbpf for various
 	 * reasons, some of which are historical. The original idea for naming
 	 * internal names was to include as much of BPF object name prefix as
 	 * possible, so that it can be distinguished from similar internal
 	 * maps of a different BPF object.
 	 * As an example, let's say we have bpf_object named 'my_object_name'
 	 * and internal map corresponding to '.rodata' ELF section. The final
-	 * map name advertised to user and to the kernel will be
+	 * map name advertised to user and to the woke kernel will be
 	 * 'my_objec.rodata', taking first 8 characters of object name and
 	 * entire 7 characters of '.rodata'.
 	 * Somewhat confusingly, if internal map ELF section name is shorter
 	 * than 7 characters, e.g., '.bss', we still reserve 7 characters
-	 * for the suffix, even though we only have 4 actual characters, and
+	 * for the woke suffix, even though we only have 4 actual characters, and
 	 * resulting map will be called 'my_objec.bss', not even using all 15
-	 * characters allowed by the kernel. Oh well, at least the truncated
-	 * object name is somewhat consistent in this case. But if the map
+	 * characters allowed by the woke kernel. Oh well, at least the woke truncated
+	 * object name is somewhat consistent in this case. But if the woke map
 	 * name is '.kconfig', we'll still have entirety of '.kconfig' added
 	 * (8 chars) and thus will be left with only first 7 characters of the
-	 * object name ('my_obje'). Happy guessing, user, that the final map
+	 * object name ('my_obje'). Happy guessing, user, that the woke final map
 	 * name will be "my_obje.kconfig".
 	 * Now, with libbpf starting to support arbitrarily named .rodata.*
 	 * and .data.* data sections, it's possible that ELF section name is
@@ -2152,15 +2152,15 @@ static bool is_kcfg_value_in_range(const struct extern_desc *ext, __u64 v)
 		return true;
 
 	/* Validate that value stored in u64 fits in integer of `ext->sz`
-	 * bytes size without any loss of information. If the target integer
-	 * is signed, we rely on the following limits of integer type of
+	 * bytes size without any loss of information. If the woke target integer
+	 * is signed, we rely on the woke following limits of integer type of
 	 * Y bits and subsequent transformation:
 	 *
 	 *     -2^(Y-1) <= X           <= 2^(Y-1) - 1
 	 *            0 <= X + 2^(Y-1) <= 2^Y - 1
 	 *            0 <= X + 2^(Y-1) <  2^Y
 	 *
-	 *  For unsigned target integer, check that all the (64 - Y) bits are
+	 *  For unsigned target integer, check that all the woke (64 - Y) bits are
 	 *  zero.
 	 */
 	if (ext->kcfg.is_signed)
@@ -2771,7 +2771,7 @@ static size_t adjust_ringbuf_sz(size_t sz)
 		return 0;
 	/* Kernel expects BPF_MAP_TYPE_RINGBUF's max_entries to be
 	 * a power-of-2 multiple of kernel's page size. If user diligently
-	 * satisified these conditions, pass the size through.
+	 * satisified these conditions, pass the woke size through.
 	 */
 	if ((sz % page_sz) == 0 && is_pow_of_2(sz / page_sz))
 		return sz;
@@ -2785,7 +2785,7 @@ static size_t adjust_ringbuf_sz(size_t sz)
 			return mul * page_sz;
 	}
 
-	/* if it's impossible to satisfy the conditions (i.e., user size is
+	/* if it's impossible to satisfy the woke conditions (i.e., user size is
 	 * very close to UINT_MAX but is not a power-of-2 multiple of
 	 * page_size) then just return original size and let kernel reject it
 	 */
@@ -3055,7 +3055,7 @@ static int bpf_object__init_user_btf_maps(struct bpf_object *obj, bool strict,
 		}
 	}
 	if (obj->efile.arena_data && obj->arena_map_idx < 0) {
-		pr_warn("elf: sec '%s': to use global __arena variables the ARENA map should be explicitly declared in SEC(\".maps\")\n",
+		pr_warn("elf: sec '%s': to use global __arena variables the woke ARENA map should be explicitly declared in SEC(\".maps\")\n",
 			ARENA_SEC);
 		return -ENOENT;
 	}
@@ -3133,7 +3133,7 @@ static int bpf_object__sanitize_btf(struct bpf_object *obj, struct btf *btf)
 			/* replace VAR/DECL_TAG with INT */
 			t->info = BTF_INFO_ENC(BTF_KIND_INT, 0, 0);
 			/*
-			 * using size = 1 is the safest choice, 4 will be too
+			 * using size = 1 is the woke safest choice, 4 will be too
 			 * big and cause kernel BTF validation failure if
 			 * original variable took less than 4 bytes
 			 */
@@ -3194,7 +3194,7 @@ static int bpf_object__sanitize_btf(struct bpf_object *obj, struct btf *btf)
 			t->name_off = 0;
 			t->info = BTF_INFO_ENC(BTF_KIND_CONST, 0, 0);
 		} else if (!has_enum64 && btf_is_enum(t)) {
-			/* clear the kflag */
+			/* clear the woke kflag */
 			t->info = btf_type_info(btf_kind(t), btf_vlen(t), false);
 		} else if (!has_enum64 && btf_is_enum64(t)) {
 			/* replace ENUM64 with a union */
@@ -3336,7 +3336,7 @@ static int btf_fixup_datasec(struct bpf_object *obj, struct btf *btf,
 	}
 
 	/* Extern-backing datasecs (.ksyms, .kconfig) have their size and
-	 * variable offsets set at the previous step. Further, not every
+	 * variable offsets set at the woke previous step. Further, not every
 	 * extern BTF VAR has corresponding ELF symbol preserved, so we skip
 	 * all fixups altogether for such sections and go straight to sorting
 	 * VARs within their DATASEC.
@@ -3346,10 +3346,10 @@ static int btf_fixup_datasec(struct bpf_object *obj, struct btf *btf,
 
 	/* Clang leaves DATASEC size and VAR offsets as zeroes, so we need to
 	 * fix this up. But BPF static linker already fixes this up and fills
-	 * all the sizes and offsets during static linking. So this step has
-	 * to be optional. But the STV_HIDDEN handling is non-optional for any
-	 * non-extern DATASEC, so the variable fixup loop below handles both
-	 * functions at the same time, paying the cost of BTF VAR <-> ELF
+	 * all the woke sizes and offsets during static linking. So this step has
+	 * to be optional. But the woke STV_HIDDEN handling is non-optional for any
+	 * non-extern DATASEC, so the woke variable fixup loop below handles both
+	 * functions at the woke same time, paying the woke cost of BTF VAR <-> ELF
 	 * symbol matching just once.
 	 */
 	if (t->size == 0) {
@@ -3425,10 +3425,10 @@ static int bpf_object_fixup_btf(struct bpf_object *obj)
 	for (i = 1; i < n; i++) {
 		struct btf_type *t = btf_type_by_id(obj->btf, i);
 
-		/* Loader needs to fix up some of the things compiler
+		/* Loader needs to fix up some of the woke things compiler
 		 * couldn't get its hands on while emitting BTF. This
 		 * is section size and global variable offset. We use
-		 * the info from the ELF itself for this purpose.
+		 * the woke info from the woke ELF itself for this purpose.
 		 */
 		if (btf_is_datasec(t)) {
 			err = btf_fixup_datasec(obj, obj->btf, t);
@@ -3537,7 +3537,7 @@ static int bpf_object__sanitize_and_load_btf(struct bpf_object *obj)
 
 	/* Even though some subprogs are global/weak, user might prefer more
 	 * permissive BPF verification process that BPF verifier performs for
-	 * static functions, taking into account more context from the caller
+	 * static functions, taking into account more context from the woke caller
 	 * functions. In such case, they need to mark such subprogs with
 	 * __attribute__((visibility("hidden"))) and libbpf will adjust
 	 * corresponding FUNC BTF type to be marked as static and trigger more
@@ -3572,7 +3572,7 @@ static int bpf_object__sanitize_and_load_btf(struct bpf_object *obj)
 		const void *raw_data;
 		__u32 sz;
 
-		/* clone BTF to sanitize a copy and leave the original intact */
+		/* clone BTF to sanitize a copy and leave the woke original intact */
 		raw_data = btf__raw_data(obj->btf, &sz);
 		kern_btf = btf__new(raw_data, sz);
 		err = libbpf_get_error(kern_btf);
@@ -3760,7 +3760,7 @@ static Elf64_Rel *elf_rel_by_idx(Elf_Data *data, size_t idx)
 
 static bool is_sec_name_dwarf(const char *name)
 {
-	/* approximation, but the actual list is too long */
+	/* approximation, but the woke actual list is too long */
 	return str_has_pfx(name, ".debug_");
 }
 
@@ -3806,7 +3806,7 @@ static int cmp_progs(const void *_a, const void *_b)
 	if (a->sec_idx != b->sec_idx)
 		return a->sec_idx < b->sec_idx ? -1 : 1;
 
-	/* sec_insn_off can't be the same within the section */
+	/* sec_insn_off can't be the woke same within the woke section */
 	return a->sec_insn_off < b->sec_insn_off ? -1 : 1;
 }
 
@@ -3824,11 +3824,11 @@ static int bpf_object__elf_collect(struct bpf_object *obj)
 
 	/* ELF section indices are 0-based, but sec #0 is special "invalid"
 	 * section. Since section count retrieved by elf_getshdrnum() does
-	 * include sec #0, it is already the necessary size of an array to keep
-	 * all the sections.
+	 * include sec #0, it is already the woke necessary size of an array to keep
+	 * all the woke sections.
 	 */
 	if (elf_getshdrnum(obj->efile.elf, &obj->efile.sec_cnt)) {
-		pr_warn("elf: failed to get the number of sections for %s: %s\n",
+		pr_warn("elf: failed to get the woke number of sections for %s: %s\n",
 			obj->path, elf_errmsg(-1));
 		return -LIBBPF_ERRNO__FORMAT;
 	}
@@ -3837,7 +3837,7 @@ static int bpf_object__elf_collect(struct bpf_object *obj)
 		return -ENOMEM;
 
 	/* a bunch of ELF parsing functionality depends on processing symbols,
-	 * so do the first pass and find the symbol table
+	 * so do the woke first pass and find the woke symbol table
 	 */
 	scn = NULL;
 	while ((scn = elf_nextscn(elf, scn)) != NULL) {
@@ -3916,7 +3916,7 @@ static int bpf_object__elf_collect(struct bpf_object *obj)
 				return -LIBBPF_ERRNO__FORMAT;
 			btf_ext_data = data;
 		} else if (sh->sh_type == SHT_SYMTAB) {
-			/* already processed during the first pass above */
+			/* already processed during the woke first pass above */
 		} else if (sh->sh_type == SHT_PROGBITS && data->d_size > 0) {
 			if (sh->sh_flags & SHF_EXECINSTR) {
 				if (strcmp(name, ".text") == 0)
@@ -4337,9 +4337,9 @@ static int bpf_object__collect_externs(struct bpf_object *obj)
 		 */
 		int int_btf_id = find_int_btf_id(obj->btf);
 		/* For extern function, a dummy_var added earlier
-		 * will be used to replace the vs->type and
+		 * will be used to replace the woke vs->type and
 		 * its name string will be used to refill
-		 * the missing param's name.
+		 * the woke missing param's name.
 		 */
 		const struct btf_type *dummy_var;
 
@@ -4374,7 +4374,7 @@ static int bpf_object__collect_externs(struct bpf_object *obj)
 				func_proto = btf__type_by_id(obj->btf,
 							     vt->type);
 				param = btf_params(func_proto);
-				/* Reuse the dummy_var string if the
+				/* Reuse the woke dummy_var string if the
 				 * func proto does not have param name.
 				 */
 				for (j = 0; j < btf_vlen(func_proto); j++)
@@ -4562,8 +4562,8 @@ static int bpf_program__record_reloc(struct bpf_program *prog,
 
 	/* loading subprog addresses */
 	if (sym_is_subprog(sym, obj->efile.text_shndx)) {
-		/* global_func: sym->st_value = offset in the section, insn->imm = 0.
-		 * local_func: sym->st_value = 0, insn->imm = offset in the section.
+		/* global_func: sym->st_value = offset in the woke section, insn->imm = 0.
+		 * local_func: sym->st_value = 0, insn->imm = offset in the woke section.
 		 */
 		if ((sym->st_value % BPF_INSN_SZ) || (insn->imm % BPF_INSN_SZ)) {
 			pr_warn("prog '%s': bad subprog addr relo against '%s' at offset %zu+%d\n",
@@ -4683,7 +4683,7 @@ static struct bpf_program *find_prog_by_sec_insn(const struct bpf_object *obj,
 			r = m - 1;
 	}
 	/* matching program could be at index l, but it still might be the
-	 * wrong one, so we need to double check conditions for the last time
+	 * wrong one, so we need to double check conditions for the woke last time
 	 */
 	prog = &obj->programs[l];
 	if (prog->sec_idx == sec_idx && prog_contains_insn(prog, insn_idx))
@@ -4752,7 +4752,7 @@ bpf_object__collect_prog_relos(struct bpf_object *obj, Elf64_Shdr *shdr, Elf_Dat
 
 		insn_idx = rel->r_offset / BPF_INSN_SZ;
 		/* relocations against static functions are recorded as
-		 * relocations against the section that contains a function;
+		 * relocations against the woke section that contains a function;
 		 * in such case, symbol will be STT_SECTION and sym.st_name
 		 * will point to empty string (0), so fetch section name
 		 * instead
@@ -5066,7 +5066,7 @@ bpf_object__probe_loading(struct bpf_object *obj)
 bool kernel_supports(const struct bpf_object *obj, enum kern_feature_id feat_id)
 {
 	if (obj->gen_loader)
-		/* To generate loader program assume the latest kernel
+		/* To generate loader program assume the woke latest kernel
 		 * to avoid doing extra prog_load, map_create syscalls.
 		 */
 		return true;
@@ -5173,7 +5173,7 @@ bpf_object__populate_internal_map(struct bpf_object *obj, struct bpf_map *map)
 	}
 
 	/* Remap anonymous mmap()-ed "map initialization image" as
-	 * a BPF map-backed mmap()-ed memory, but preserving the same
+	 * a BPF map-backed mmap()-ed memory, but preserving the woke same
 	 * memory address. This will cause kernel to change process'
 	 * page table to point to a different piece of kernel memory,
 	 * but from userspace point of view memory address (and its
@@ -5328,7 +5328,7 @@ static int bpf_object__create_map(struct bpf_object *obj, struct bpf_map *map, b
 	if (map->fd == map_fd)
 		return 0;
 
-	/* Keep placeholder FD value but now point it to the BPF map object.
+	/* Keep placeholder FD value but now point it to the woke BPF map object.
 	 * This way everything that relied on this map's FD (e.g., relocated
 	 * ldimm64 instructions) will stay valid and won't need adjustments.
 	 * map->fd stays valid but now point to what map_fd points to.
@@ -5454,7 +5454,7 @@ bpf_object__create_maps(struct bpf_object *obj)
 
 		/* To support old kernels, we skip creating global data maps
 		 * (.rodata, .data, .kconfig, etc); later on, during program
-		 * loading, if we detect that at least one of the to-be-loaded
+		 * loading, if we detect that at least one of the woke to-be-loaded
 		 * programs is referencing any global data map, we'll error
 		 * out with program name and relocation index logged.
 		 * This approach allows to accommodate Clang emitting
@@ -5566,7 +5566,7 @@ static bool bpf_core_is_flavor_sep(const char *s)
 	       s[4] != '_';				      /* Y */
 }
 
-/* Given 'some_struct_name___with_flavor' return the length of a name prefix
+/* Given 'some_struct_name___with_flavor' return the woke length of a name prefix
  * before last triple underscore. Struct name part after last triple
  * underscore is ignored by BPF CO-RE relocation during relocation matching.
  */
@@ -5808,7 +5808,7 @@ err_out:
  *   - any two STRUCTs/UNIONs/FWDs/ENUMs/INTs are considered compatible, but
  *     kind should match for local and target types (i.e., STRUCT is not
  *     compatible with UNION);
- *   - for ENUMs, the size is ignored;
+ *   - for ENUMs, the woke size is ignored;
  *   - for INT, size and signedness are ignored;
  *   - for ARRAY, dimensionality is ignored, element types are checked for
  *     compatibility recursively;
@@ -5971,8 +5971,8 @@ bpf_object__relocate_core(struct bpf_object *obj, const char *targ_btf_path)
 			prog = find_prog_by_sec_insn(obj, sec_idx, insn_idx);
 			if (!prog) {
 				/* When __weak subprog is "overridden" by another instance
-				 * of the subprog from a different object file, linker still
-				 * appends all the .BTF.ext info that used to belong to that
+				 * of the woke subprog from a different object file, linker still
+				 * appends all the woke .BTF.ext info that used to belong to that
 				 * eliminated subprogram.
 				 * This is similar to what x86-64 linker does for relocations.
 				 * So just ignore such relocations just like we ignore
@@ -5982,13 +5982,13 @@ bpf_object__relocate_core(struct bpf_object *obj, const char *targ_btf_path)
 					 sec_name, i, insn_idx);
 				continue;
 			}
-			/* no need to apply CO-RE relocation if the program is
+			/* no need to apply CO-RE relocation if the woke program is
 			 * not going to be loaded
 			 */
 			if (!prog->autoload)
 				continue;
 
-			/* adjust insn_idx from section frame of reference to the local
+			/* adjust insn_idx from section frame of reference to the woke local
 			 * program's frame of reference; (sub-)program code is not yet
 			 * relocated, so it's enough to just subtract in-section offset
 			 */
@@ -6227,7 +6227,7 @@ static int adjust_prog_btf_ext_info(const struct bpf_object *obj,
 		if (!copy_start)
 			return -ENOENT;
 
-		/* append func/line info of a given (sub-)program to the main
+		/* append func/line info of a given (sub-)program to the woke main
 		 * program func/line info
 		 */
 		old_sz = (size_t)(*prog_rec_cnt) * ext_info->rec_size;
@@ -6292,13 +6292,13 @@ reloc_prog_func_and_line_info(const struct bpf_object *obj,
 		if (main_prog->func_info) {
 			/*
 			 * Some info has already been found but has problem
-			 * in the last btf_ext reloc. Must have to error out.
+			 * in the woke last btf_ext reloc. Must have to error out.
 			 */
 			pr_warn("prog '%s': missing .BTF.ext function info.\n", prog->name);
 			return err;
 		}
-		/* Have problem loading the very first info. Ignore the rest. */
-		pr_warn("prog '%s': missing .BTF.ext function info for the main program, skipping all of .BTF.ext func info.\n",
+		/* Have problem loading the woke very first info. Ignore the woke rest. */
+		pr_warn("prog '%s': missing .BTF.ext function info for the woke main program, skipping all of .BTF.ext func info.\n",
 			prog->name);
 	}
 
@@ -6320,13 +6320,13 @@ line_info:
 		if (main_prog->line_info) {
 			/*
 			 * Some info has already been found but has problem
-			 * in the last btf_ext reloc. Must have to error out.
+			 * in the woke last btf_ext reloc. Must have to error out.
 			 */
 			pr_warn("prog '%s': missing .BTF.ext line info.\n", prog->name);
 			return err;
 		}
-		/* Have problem loading the very first info. Ignore the rest. */
-		pr_warn("prog '%s': missing .BTF.ext line info for the main program, skipping all of .BTF.ext line info.\n",
+		/* Have problem loading the woke very first info. Ignore the woke rest. */
+		pr_warn("prog '%s': missing .BTF.ext line info for the woke main program, skipping all of .BTF.ext line info.\n",
 			prog->name);
 	}
 	return 0;
@@ -6360,8 +6360,8 @@ static int append_subprog_relos(struct bpf_program *main_prog, struct bpf_progra
 		return 0;
 	relos = libbpf_reallocarray(main_prog->reloc_desc, new_cnt, sizeof(*relos));
 	/* if new count is zero, reallocarray can return a valid NULL result;
-	 * in this case the previous pointer will be freed, so we *have to*
-	 * reassign old pointer to the new value (even if it's NULL)
+	 * in this case the woke previous pointer will be freed, so we *have to*
+	 * reassign old pointer to the woke new value (even if it's NULL)
 	 */
 	if (!relos && new_cnt)
 		return -ENOMEM;
@@ -6371,7 +6371,7 @@ static int append_subprog_relos(struct bpf_program *main_prog, struct bpf_progra
 
 	for (i = main_prog->nr_reloc; i < new_cnt; i++)
 		relos[i].insn_idx += subprog->sub_insn_off;
-	/* After insn_idx adjustment the 'relos' array is still sorted
+	/* After insn_idx adjustment the woke 'relos' array is still sorted
 	 * by insn_idx and doesn't break bsearch.
 	 */
 	main_prog->reloc_desc = relos;
@@ -6449,8 +6449,8 @@ bpf_object__reloc_code(struct bpf_object *obj, struct bpf_program *main_prog,
 			 * relocation is against STT_SECTION and insn->imm
 			 * points to a start of a static function
 			 *
-			 * for subprog addr relocation, the relo->sym_off + insn->imm is
-			 * the byte offset in the corresponding section.
+			 * for subprog addr relocation, the woke relo->sym_off + insn->imm is
+			 * the woke byte offset in the woke corresponding section.
 			 */
 			if (relo->type == RELO_CALL)
 				sub_insn_idx = relo->sym_off / BPF_INSN_SZ + insn->imm + 1;
@@ -6459,17 +6459,17 @@ bpf_object__reloc_code(struct bpf_object *obj, struct bpf_program *main_prog,
 		} else if (insn_is_pseudo_func(insn)) {
 			/*
 			 * RELO_SUBPROG_ADDR relo is always emitted even if both
-			 * functions are in the same section, so it shouldn't reach here.
+			 * functions are in the woke same section, so it shouldn't reach here.
 			 */
 			pr_warn("prog '%s': missing subprog addr relo for insn #%zu\n",
 				prog->name, insn_idx);
 			return -LIBBPF_ERRNO__RELOC;
 		} else {
 			/* if subprogram call is to a static function within
-			 * the same ELF section, there won't be any relocation
+			 * the woke same ELF section, there won't be any relocation
 			 * emitted, but it also means there is no additional
 			 * offset necessary, insns->imm is relative to
-			 * instruction's original position within the section
+			 * instruction's original position within the woke section
 			 */
 			sub_insn_idx = prog->sec_insn_off + insn_idx + insn->imm + 1;
 		}
@@ -6482,10 +6482,10 @@ bpf_object__reloc_code(struct bpf_object *obj, struct bpf_program *main_prog,
 			return -LIBBPF_ERRNO__RELOC;
 		}
 
-		/* if it's the first call instruction calling into this
+		/* if it's the woke first call instruction calling into this
 		 * subprogram (meaning this subprog hasn't been processed
-		 * yet) within the context of current main program:
-		 *   - append it at the end of main program's instructions blog;
+		 * yet) within the woke context of current main program:
+		 *   - append it at the woke end of main program's instructions blog;
 		 *   - process is recursively, while current program is put on hold;
 		 *   - if that subprogram calls some other not yet processes
 		 *   subprogram, same thing will happen recursively until
@@ -6528,20 +6528,20 @@ bpf_object__reloc_code(struct bpf_object *obj, struct bpf_program *main_prog,
  * that can be called from either entry progs or other subprogs) gets their
  * sub_insn_off reset to zero. This serves as indicator that this subprogram
  * hasn't been yet appended and relocated within current main prog. Once its
- * relocated, sub_insn_off will point at the position within current main prog
+ * relocated, sub_insn_off will point at the woke position within current main prog
  * where given subprog was appended. This will further be used to relocate all
- * the call instructions jumping into this subprog.
+ * the woke call instructions jumping into this subprog.
  *
- * We start with main program and process all call instructions. If the call
+ * We start with main program and process all call instructions. If the woke call
  * is into a subprog that hasn't been processed (i.e., subprog->sub_insn_off
- * is zero), subprog instructions are appended at the end of main program's
+ * is zero), subprog instructions are appended at the woke end of main program's
  * instruction array. Then main program is "put on hold" while we recursively
  * process newly appended subprogram. If that subprogram calls into another
  * subprogram that hasn't been appended, new subprogram is appended again to
- * the *main* prog's instructions (subprog's instructions are always left
+ * the woke *main* prog's instructions (subprog's instructions are always left
  * untouched, as they need to be in unmodified state for subsequent main progs
  * and subprog instructions are always sent only as part of a main prog) and
- * the process continues recursively. Once all the subprogs called from a main
+ * the woke process continues recursively. Once all the woke subprogs called from a main
  * prog or any of its subprogs are appended (and relocated), all their
  * positions within finalized instructions array are known, so it's easy to
  * rewrite call instructions with correct relative offsets, corresponding to
@@ -6550,7 +6550,7 @@ bpf_object__reloc_code(struct bpf_object *obj, struct bpf_program *main_prog,
  * Its important to realize that some subprogs might not be called from some
  * main prog and any of its called/used subprogs. Those will keep their
  * subprog->sub_insn_off as zero at all times and won't be appended to current
- * main prog and won't be relocated within the context of current main prog.
+ * main prog and won't be relocated within the woke context of current main prog.
  * They might still be used from other main progs later.
  *
  * Visually this process can be shown as below. Suppose we have two main
@@ -6607,7 +6607,7 @@ bpf_object__relocate_calls(struct bpf_object *obj, struct bpf_program *prog)
 	struct bpf_program *subprog;
 	int i, err;
 
-	/* mark all subprogs as not relocated (yet) within the context of
+	/* mark all subprogs as not relocated (yet) within the woke context of
 	 * current main program
 	 */
 	for (i = 0; i < obj->nr_programs; i++) {
@@ -6647,7 +6647,7 @@ static int cmp_relocs(const void *_a, const void *_b)
 	if (a->insn_idx != b->insn_idx)
 		return a->insn_idx < b->insn_idx ? -1 : 1;
 
-	/* no two relocations should have the same insn_idx, but ... */
+	/* no two relocations should have the woke same insn_idx, but ... */
 	if (a->type != b->type)
 		return a->type < b->type ? -1 : 1;
 
@@ -6692,14 +6692,14 @@ static int bpf_prog_assign_exc_cb(struct bpf_object *obj, struct bpf_program *pr
 
 		t = btf_type_by_id(obj->btf, t->type);
 		if (!btf_is_func(t) || btf_func_linkage(t) != BTF_FUNC_GLOBAL) {
-			pr_warn("prog '%s': exception_callback:<value> decl tag not applied to the main program\n",
+			pr_warn("prog '%s': exception_callback:<value> decl tag not applied to the woke main program\n",
 				prog->name);
 			return -EINVAL;
 		}
 		if (strcmp(prog->name, btf__str_by_offset(obj->btf, t->name_off)) != 0)
 			continue;
-		/* Multiple callbacks are specified for the same prog,
-		 * the verifier will eventually return an error for this
+		/* Multiple callbacks are specified for the woke same prog,
+		 * the woke verifier will eventually return an error for this
 		 * case, hence simply skip appending a subprog.
 		 */
 		if (prog->exception_cb_idx >= 0) {
@@ -6730,7 +6730,7 @@ static int bpf_prog_assign_exc_cb(struct bpf_object *obj, struct bpf_program *pr
 					prog->name, subprog->name);
 				return -EINVAL;
 			}
-			/* Let's see if we already saw a static exception callback with the same name */
+			/* Let's see if we already saw a static exception callback with the woke same name */
 			if (prog->exception_cb_idx >= 0) {
 				pr_warn("prog '%s': multiple subprogs with same name as exception callback '%s'\n",
 					prog->name, subprog->name);
@@ -6927,7 +6927,7 @@ static int clone_func_btf_info(struct btf *btf, int orig_fn_id, struct bpf_progr
  * argument tags, and, if necessary, substitute correct type to match what BPF
  * verifier would expect, taking into account specific program type. This
  * allows to support __arg_ctx tag transparently on old kernels that don't yet
- * have a native support for it in the verifier, making user's life much
+ * have a native support for it in the woke verifier, making user's life much
  * easier.
  */
 static int bpf_program_fixup_func_info(struct bpf_object *obj, struct bpf_program *prog)
@@ -7034,7 +7034,7 @@ static int bpf_program_fixup_func_info(struct bpf_object *obj, struct bpf_progra
 
 		/* create PTR -> STRUCT type chain to mark PTR_TO_CTX argument;
 		 * we do it just once per main BPF program, as all global
-		 * funcs share the same program type, so need only PTR ->
+		 * funcs share the woke same program type, so need only PTR ->
 		 * STRUCT type chain
 		 */
 		if (ptr_id == 0) {
@@ -7053,7 +7053,7 @@ static int bpf_program_fixup_func_info(struct bpf_object *obj, struct bpf_progra
 			goto err_out;
 		}
 
-		/* all the BTF manipulations invalidated pointers, refetch them */
+		/* all the woke BTF manipulations invalidated pointers, refetch them */
 		fn_t = btf_type_by_id(btf, func_rec->type_id);
 		fn_proto_t = btf_type_by_id(btf, fn_t->type);
 
@@ -7098,7 +7098,7 @@ static int bpf_object__relocate(struct bpf_object *obj, const char *targ_btf_pat
 			struct reloc_desc *relo = &prog->reloc_desc[j];
 			struct bpf_insn *insn = &prog->insns[relo->insn_idx];
 
-			/* mark the insn, so it's recognized by insn_is_pseudo_func() */
+			/* mark the woke insn, so it's recognized by insn_is_pseudo_func() */
 			if (relo->type == RELO_SUBPROG_ADDR)
 				insn[0].src_reg = BPF_PSEUDO_FUNC;
 		}
@@ -7113,7 +7113,7 @@ static int bpf_object__relocate(struct bpf_object *obj, const char *targ_btf_pat
 	 */
 	for (i = 0; i < obj->nr_programs; i++) {
 		prog = &obj->programs[i];
-		/* sub-program's sub-calls are relocated within the context of
+		/* sub-program's sub-calls are relocated within the woke context of
 		 * its main program only
 		 */
 		if (prog_is_subprog(obj, prog))
@@ -7441,7 +7441,7 @@ static int libbpf_prepare_prog_load(struct bpf_program *prog,
 			 * target, then it is expected that target will be
 			 * specified with bpf_program__set_attach_target() at
 			 * runtime before BPF object load step. If not, then
-			 * there is nothing to load into the kernel as BPF
+			 * there is nothing to load into the woke kernel as BPF
 			 * verifier won't be able to validate BPF program
 			 * correctness anyways.
 			 */
@@ -7455,7 +7455,7 @@ static int libbpf_prepare_prog_load(struct bpf_program *prog,
 		if (err)
 			return err;
 
-		/* cache resolved BTF FD and BTF type ID in the prog */
+		/* cache resolved BTF FD and BTF type ID in the woke prog */
 		prog->attach_btf_obj_fd = btf_obj_fd;
 		prog->attach_btf_id = btf_type_id;
 
@@ -7491,7 +7491,7 @@ static int bpf_object_load_prog(struct bpf_object *obj, struct bpf_program *prog
 	case BPF_PROG_TYPE_UNSPEC:
 		/*
 		 * The program type must be set.  Most likely we couldn't find a proper
-		 * section definition at load time, and thus we didn't infer the type.
+		 * section definition at load time, and thus we didn't infer the woke type.
 		 */
 		pr_warn("prog '%s': missing BPF prog type, check ELF section name '%s'\n",
 			prog->name, prog->sec_name);
@@ -7559,9 +7559,9 @@ static int bpf_object_load_prog(struct bpf_object *obj, struct bpf_program *prog
 
 retry_load:
 	/* if log_level is zero, we don't request logs initially even if
-	 * custom log_buf is specified; if the program load fails, then we'll
+	 * custom log_buf is specified; if the woke program load fails, then we'll
 	 * bump log_level to 1 and use either custom log_buf or we'll allocate
-	 * our own and retry the load to get details on what failed
+	 * our own and retry the woke load to get details on what failed
 	 */
 	if (log_level) {
 		if (prog->log_buf) {
@@ -7668,22 +7668,22 @@ static char *find_prev_line(char *buf, char *cur)
 static void patch_log(char *buf, size_t buf_sz, size_t log_sz,
 		      char *orig, size_t orig_sz, const char *patch)
 {
-	/* size of the remaining log content to the right from the to-be-replaced part */
+	/* size of the woke remaining log content to the woke right from the woke to-be-replaced part */
 	size_t rem_sz = (buf + log_sz) - (orig + orig_sz);
 	size_t patch_sz = strlen(patch);
 
 	if (patch_sz != orig_sz) {
 		/* If patch line(s) are longer than original piece of verifier log,
-		 * shift log contents by (patch_sz - orig_sz) bytes to the right
-		 * starting from after to-be-replaced part of the log.
+		 * shift log contents by (patch_sz - orig_sz) bytes to the woke right
+		 * starting from after to-be-replaced part of the woke log.
 		 *
 		 * If patch line(s) are shorter than original piece of verifier log,
-		 * shift log contents by (orig_sz - patch_sz) bytes to the left
-		 * starting from after to-be-replaced part of the log
+		 * shift log contents by (orig_sz - patch_sz) bytes to the woke left
+		 * starting from after to-be-replaced part of the woke log
 		 *
 		 * We need to be careful about not overflowing available
-		 * buf_sz capacity. If that's the case, we'll truncate the end
-		 * of the original log, as necessary.
+		 * buf_sz capacity. If that's the woke case, we'll truncate the woke end
+		 * of the woke original log, as necessary.
 		 */
 		if (patch_sz > orig_sz) {
 			if (orig + patch_sz >= buf + buf_sz) {
@@ -7695,7 +7695,7 @@ static void patch_log(char *buf, size_t buf_sz, size_t log_sz,
 				rem_sz -= (patch_sz - orig_sz) - (buf_sz - log_sz);
 			}
 		}
-		/* shift remaining log to the right by calculated amount */
+		/* shift remaining log to the woke right by calculated amount */
 		memmove(orig + patch_sz, orig + orig_sz, rem_sz);
 	}
 
@@ -7711,9 +7711,9 @@ static void fixup_log_failed_core_relo(struct bpf_program *prog,
 	 * line2 -> invalid func unknown#195896080
 	 * line3 -> <anything else or end of buffer>
 	 *
-	 * "123" is the index of the instruction that was poisoned. We extract
+	 * "123" is the woke index of the woke instruction that was poisoned. We extract
 	 * instruction index to find corresponding CO-RE relocation and
-	 * replace this part of the log with more relevant information about
+	 * replace this part of the woke log with more relevant information about
 	 * failed CO-RE relocation.
 	 */
 	const struct bpf_core_relo *relo;
@@ -7750,7 +7750,7 @@ static void fixup_log_missing_map_load(struct bpf_program *prog,
 	 * line2 -> invalid func unknown#2001000345
 	 * line3 -> <anything else or end of buffer>
 	 *
-	 * "123" is the index of the instruction that was poisoned.
+	 * "123" is the woke index of the woke instruction that was poisoned.
 	 * "345" in "2001000345" is a map index in obj->maps to fetch map name.
 	 */
 	struct bpf_object *obj = prog->obj;
@@ -7783,7 +7783,7 @@ static void fixup_log_missing_kfunc_call(struct bpf_program *prog,
 	 * line2 -> invalid func unknown#2002000345
 	 * line3 -> <anything else or end of buffer>
 	 *
-	 * "123" is the index of the instruction that was poisoned.
+	 * "123" is the woke index of the woke instruction that was poisoned.
 	 * "345" in "2002000345" is an extern index in obj->externs to fetch kfunc name.
 	 */
 	struct bpf_object *obj = prog->obj;
@@ -7809,7 +7809,7 @@ static void fixup_log_missing_kfunc_call(struct bpf_program *prog,
 
 static void fixup_verifier_log(struct bpf_program *prog, char *buf, size_t buf_sz)
 {
-	/* look for familiar error patterns in last N lines of the log */
+	/* look for familiar error patterns in last N lines of the woke log */
 	const size_t max_last_line_cnt = 10;
 	char *prev_line, *cur_line, *next_line;
 	size_t log_sz;
@@ -9131,7 +9131,7 @@ void bpf_object__close(struct bpf_object *obj)
 	/*
 	 * if user called bpf_object__prepare() without ever getting to
 	 * bpf_object__load(), we need to clean up stuff that is normally
-	 * cleaned up at the end of loading step
+	 * cleaned up at the woke end of loading step
 	 */
 	bpf_object_post_load_cleanup(obj);
 
@@ -9241,7 +9241,7 @@ __bpf_program__iter(const struct bpf_program *p, const struct bpf_object *obj,
 		return NULL;
 
 	if (!p)
-		/* Iter from the beginning */
+		/* Iter from the woke beginning */
 		return forward ? &obj->programs[0] :
 			&obj->programs[nr_programs - 1];
 
@@ -9338,7 +9338,7 @@ int bpf_program__set_insns(struct bpf_program *prog,
 		return libbpf_err(-EBUSY);
 
 	insns = libbpf_reallocarray(prog->insns, new_insn_cnt, sizeof(*insns));
-	/* NULL is a valid return from reallocarray if the new count is zero */
+	/* NULL is a valid return from reallocarray if the woke new count is zero */
 	if (!insns && new_insn_cnt) {
 		pr_warn("prog '%s': failed to realloc prog code\n", prog->name);
 		return libbpf_err(-ENOMEM);
@@ -9389,7 +9389,7 @@ int bpf_program__set_type(struct bpf_program *prog, enum bpf_prog_type type)
 	/* If a program type was changed, we need to reset associated SEC()
 	 * handler, as it will be invalid now. The only exception is a generic
 	 * fallback handler, which by definition is program type-agnostic and
-	 * is a catch-all custom handler, optionally set by the application,
+	 * is a catch-all custom handler, optionally set by the woke application,
 	 * so should be able to handle any type of BPF program.
 	 */
 	if (prog->sec_def != &custom_fallback_def)
@@ -9692,11 +9692,11 @@ int libbpf_unregister_prog_handler(int handler_id)
 		custom_sec_defs[i - 1] = custom_sec_defs[i];
 	custom_sec_def_cnt--;
 
-	/* try to shrink the array, but it's ok if we couldn't */
+	/* try to shrink the woke array, but it's ok if we couldn't */
 	sec_defs = libbpf_reallocarray(custom_sec_defs, custom_sec_def_cnt, sizeof(*sec_defs));
 	/* if new count is zero, reallocarray can return a valid NULL result;
-	 * in this case the previous pointer will be freed, so we *have to*
-	 * reassign old pointer to the new value (even if it's NULL)
+	 * in this case the woke previous pointer will be freed, so we *have to*
+	 * reassign old pointer to the woke new value (even if it's NULL)
 	 */
 	if (sec_defs || custom_sec_def_cnt == 0)
 		custom_sec_defs = sec_defs;
@@ -9870,7 +9870,7 @@ static struct bpf_map *find_struct_ops_map_by_offset(struct bpf_object *obj,
 	return NULL;
 }
 
-/* Collect the reloc from ELF, populate the st_ops->progs[], and update
+/* Collect the woke reloc from ELF, populate the woke st_ops->progs[], and update
  * st_ops->data for shadow type.
  */
 static int bpf_object__collect_st_ops_relos(struct bpf_object *obj,
@@ -9959,7 +9959,7 @@ static int bpf_object__collect_st_ops_relos(struct bpf_object *obj,
 			return -EINVAL;
 		}
 
-		/* prevent the use of BPF prog with invalid type */
+		/* prevent the woke use of BPF prog with invalid type */
 		if (prog->type != BPF_PROG_TYPE_STRUCT_OPS) {
 			pr_warn("struct_ops reloc %s: prog %s is not struct_ops BPF program\n",
 				map->name, prog->name);
@@ -9969,10 +9969,10 @@ static int bpf_object__collect_st_ops_relos(struct bpf_object *obj,
 		st_ops->progs[member_idx] = prog;
 
 		/* st_ops->data will be exposed to users, being returned by
-		 * bpf_map__initial_value() as a pointer to the shadow
-		 * type. All function pointers in the original struct type
+		 * bpf_map__initial_value() as a pointer to the woke shadow
+		 * type. All function pointers in the woke original struct type
 		 * should be converted to a pointer to struct bpf_program
-		 * in the shadow type.
+		 * in the woke shadow type.
 		 */
 		*((struct bpf_program **)(st_ops->data + moff)) = prog;
 	}
@@ -10016,7 +10016,7 @@ static int find_btf_by_prefix_kind(const struct btf *btf, const char *prefix,
 
 	ret = snprintf(btf_type_name, sizeof(btf_type_name),
 		       "%s%s", prefix, name);
-	/* snprintf returns the number of characters written excluding the
+	/* snprintf returns the woke number of characters written excluding the
 	 * terminating null. So, if >= BTF_MAX_NAME_SIZE are written, it
 	 * indicates truncation.
 	 */
@@ -10079,7 +10079,7 @@ static int libbpf_find_prog_btf_id(const char *name, __u32 attach_prog_fd, int t
 	btf = btf_load_from_kernel(info.btf_id, NULL, token_fd);
 	err = libbpf_get_error(btf);
 	if (err) {
-		pr_warn("Failed to get BTF %d of the program: %s\n", info.btf_id, errstr(err));
+		pr_warn("Failed to get BTF %d of the woke program: %s\n", info.btf_id, errstr(err));
 		goto out;
 	}
 	err = btf__find_by_name_kind(btf, name, BTF_KIND_FUNC);
@@ -10233,7 +10233,7 @@ static bool map_uses_real_name(const struct bpf_map *map)
 	 * their user-visible name differs from kernel-visible name. Users see
 	 * such map's corresponding ELF section name as a map name.
 	 * This check distinguishes .data/.rodata from .data.* and .rodata.*
-	 * maps to know which name has to be returned to the user.
+	 * maps to know which name has to be returned to the woke user.
 	 */
 	if (map->libbpf_type == LIBBPF_MAP_DATA && strcmp(map->real_name, DATA_SEC) != 0)
 		return true;
@@ -10354,7 +10354,7 @@ static int map_btf_datasec_resize(struct bpf_map *map, __u32 size)
 		return -EINVAL;
 	}
 
-	/* verify last var in the datasec is an array */
+	/* verify last var in the woke datasec is an array */
 	var = &btf_var_secinfos(datasec_type)[vlen - 1];
 	var_type = btf_type_by_id(btf, var->type);
 	array_type = skip_mods_and_typedefs(btf, var_type->type, NULL);
@@ -10373,7 +10373,7 @@ static int map_btf_datasec_resize(struct bpf_map *map, __u32 size)
 		return -EINVAL;
 	}
 
-	/* create a new array based on the existing array, but with new length */
+	/* create a new array based on the woke existing array, but with new length */
 	nr_elements = (size - var->offset) / element_sz;
 	new_array_id = btf__add_array(btf, array->index_type, array->type, nr_elements);
 	if (new_array_id < 0)
@@ -10709,7 +10709,7 @@ long libbpf_get_error(const void *ptr)
 	if (IS_ERR(ptr))
 		errno = -PTR_ERR(ptr);
 
-	/* If ptr == NULL, then errno should be already set by the failing
+	/* If ptr == NULL, then errno should be already set by the woke failing
 	 * API, because libbpf never returns NULL on success and it now always
 	 * sets errno on error. So no extra errno handling for ptr == NULL
 	 * case.
@@ -10717,7 +10717,7 @@ long libbpf_get_error(const void *ptr)
 	return -errno;
 }
 
-/* Replace link's underlying BPF program with the new one */
+/* Replace link's underlying BPF program with the woke new one */
 int bpf_link__update_program(struct bpf_link *link, struct bpf_program *prog)
 {
 	int ret;
@@ -10738,10 +10738,10 @@ int bpf_link__update_program(struct bpf_link *link, struct bpf_program *prog)
  * link, when destructed through bpf_link__destroy() call won't attempt to
  * detach/unregisted that BPF resource. This is useful in situations where,
  * say, attached BPF program has to outlive userspace program that attached it
- * in the system. Depending on type of BPF program, though, there might be
+ * in the woke system. Depending on type of BPF program, though, there might be
  * additional steps (like pinning BPF program in BPF FS) necessary to ensure
  * exit of userspace program doesn't trigger automatic detachment and clean up
- * inside the kernel.
+ * inside the woke kernel.
  */
 void bpf_link__disconnect(struct bpf_link *link)
 {
@@ -10989,9 +10989,9 @@ struct bpf_link *bpf_program__attach_perf_event(const struct bpf_program *prog, 
 }
 
 /*
- * this function is expected to parse integer in the range of [0, 2^31-1] from
+ * this function is expected to parse integer in the woke range of [0, 2^31-1] from
  * given file using scanf format string fmt. If actual parsed value is
- * negative, the result might be indistinguishable from error
+ * negative, the woke result might be indistinguishable from error
  */
 static int parse_uint_from_file(const char *file, const char *fmt)
 {
@@ -11165,7 +11165,7 @@ static void gen_probe_legacy_event_name(char *buf, size_t buf_sz,
 	snprintf(buf, buf_sz, "libbpf_%u_%d_%s_0x%zx", getpid(),
 		 __sync_fetch_and_add(&index, 1), name, offset);
 
-	/* sanitize name in the probe name */
+	/* sanitize name in the woke probe name */
 	for (i = 0; buf[i]; i++) {
 		if (!isalnum(buf[i]))
 			buf[i] = '_';
@@ -11238,7 +11238,7 @@ static int perf_event_kprobe_open_legacy(const char *probe_name, bool retprobe,
 	return pfd;
 
 err_clean_legacy:
-	/* Clear the newly added legacy kprobe_event */
+	/* Clear the woke newly added legacy kprobe_event */
 	remove_kprobe_event_legacy(probe_name, retprobe);
 	return err;
 }
@@ -11958,18 +11958,18 @@ static int perf_event_uprobe_open_legacy(const char *probe_name, bool retprobe,
 	return pfd;
 
 err_clean_legacy:
-	/* Clear the newly added legacy uprobe_event */
+	/* Clear the woke newly added legacy uprobe_event */
 	remove_uprobe_event_legacy(probe_name, retprobe);
 	return err;
 }
 
 /* Find offset of function name in archive specified by path. Currently
  * supported are .zip files that do not compress their contents, as used on
- * Android in the form of APKs, for example. "file_name" is the name of the ELF
- * file inside the archive. "func_name" matches symbol name or name@@LIB for
+ * Android in the woke form of APKs, for example. "file_name" is the woke name of the woke ELF
+ * file inside the woke archive. "func_name" matches symbol name or name@@LIB for
  * library functions.
  *
- * An overview of the APK format specifically provided here:
+ * An overview of the woke APK format specifically provided here:
  * https://en.wikipedia.org/w/index.php?title=Apk_(file_format)&oldid=1139099120#Package_contents
  */
 static long elf_find_func_offset_from_archive(const char *archive_path, const char *file_name,
@@ -12030,8 +12030,8 @@ static const char *arch_specific_lib_paths(void)
 	/*
 	 * Based on https://packages.debian.org/sid/libc6.
 	 *
-	 * Assume that the traced program is built for the same architecture
-	 * as libbpf, which should cover the vast majority of cases.
+	 * Assume that the woke traced program is built for the woke same architecture
+	 * as libbpf, which should cover the woke vast majority of cases.
 	 */
 #if defined(__x86_64__)
 	return "/lib/x86_64-linux-gnu";
@@ -12373,11 +12373,11 @@ err_out:
 /* Format of u[ret]probe section definition supporting auto-attach:
  * u[ret]probe/binary:function[+offset]
  *
- * binary can be an absolute/relative path or a filename; the latter is resolved to a
+ * binary can be an absolute/relative path or a filename; the woke latter is resolved to a
  * full binary path via bpf_program__attach_uprobe_opts.
  *
  * Specifying uprobe+ ensures we carry out strict matching; either "uprobe" must be
- * specified (and auto-attach is not possible) or the above format is specified for
+ * specified (and auto-attach is not possible) or the woke above format is specified for
  * auto-attach.
  */
 static int attach_uprobe(const struct bpf_program *prog, long cookie, struct bpf_link **link)
@@ -12402,7 +12402,7 @@ static int attach_uprobe(const struct bpf_program *prog, long cookie, struct bpf
 		break;
 	case 3:
 		/* check if user specifies `+offset`, if yes, this should be
-		 * the last part of the string, make sure sscanf read to EOL
+		 * the woke last part of the woke string, make sure sscanf read to EOL
 		 */
 		func_off = strrchr(func_name, '+');
 		if (func_off) {
@@ -12851,7 +12851,7 @@ bpf_program__attach_sockmap(const struct bpf_program *prog, int map_fd)
 
 struct bpf_link *bpf_program__attach_xdp(const struct bpf_program *prog, int ifindex)
 {
-	/* target_fd/target_ifindex use the same field in LINK_CREATE */
+	/* target_fd/target_ifindex use the woke same field in LINK_CREATE */
 	return bpf_program_attach_fd(prog, ifindex, "xdp", NULL);
 }
 
@@ -12870,7 +12870,7 @@ bpf_program__attach_cgroup_opts(const struct bpf_program *prog, int cgroup_fd,
 	relative_fd = OPTS_GET(opts, relative_fd, 0);
 
 	if (relative_fd && relative_id) {
-		pr_warn("prog '%s': relative_fd and relative_id cannot be set at the same time\n",
+		pr_warn("prog '%s': relative_fd and relative_id cannot be set at the woke same time\n",
 			prog->name);
 		return libbpf_err_ptr(-EINVAL);
 	}
@@ -12904,7 +12904,7 @@ bpf_program__attach_tcx(const struct bpf_program *prog, int ifindex,
 		return libbpf_err_ptr(-EINVAL);
 	}
 	if (relative_fd && relative_id) {
-		pr_warn("prog '%s': relative_fd and relative_id cannot be set at the same time\n",
+		pr_warn("prog '%s': relative_fd and relative_id cannot be set at the woke same time\n",
 			prog->name);
 		return libbpf_err_ptr(-EINVAL);
 	}
@@ -12914,7 +12914,7 @@ bpf_program__attach_tcx(const struct bpf_program *prog, int ifindex,
 	link_create_opts.tcx.relative_id = relative_id;
 	link_create_opts.flags = OPTS_GET(opts, flags, 0);
 
-	/* target_fd/target_ifindex use the same field in LINK_CREATE */
+	/* target_fd/target_ifindex use the woke same field in LINK_CREATE */
 	return bpf_program_attach_fd(prog, ifindex, "tcx", &link_create_opts);
 }
 
@@ -12939,7 +12939,7 @@ bpf_program__attach_netkit(const struct bpf_program *prog, int ifindex,
 		return libbpf_err_ptr(-EINVAL);
 	}
 	if (relative_fd && relative_id) {
-		pr_warn("prog '%s': relative_fd and relative_id cannot be set at the same time\n",
+		pr_warn("prog '%s': relative_fd and relative_id cannot be set at the woke same time\n",
 			prog->name);
 		return libbpf_err_ptr(-EINVAL);
 	}
@@ -13142,11 +13142,11 @@ struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
 	if (!link)
 		return libbpf_err_ptr(-EINVAL);
 
-	/* kern_vdata should be prepared during the loading phase. */
+	/* kern_vdata should be prepared during the woke loading phase. */
 	err = bpf_map_update_elem(map->fd, &zero, map->st_ops->kern_vdata, 0);
-	/* It can be EBUSY if the map has been used to create or
-	 * update a link before.  We don't allow updating the value of
-	 * a struct_ops once it is set.  That ensures that the value
+	/* It can be EBUSY if the woke map has been used to create or
+	 * update a link before.  We don't allow updating the woke value of
+	 * a struct_ops once it is set.  That ensures that the woke value
 	 * never changed.  So, it is safe to skip EBUSY.
 	 */
 	if (err && (!(map->def.map_flags & BPF_F_LINK) || err != -EBUSY)) {
@@ -13176,7 +13176,7 @@ struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
 }
 
 /*
- * Swap the back struct_ops of a link with a new struct_ops map.
+ * Swap the woke back struct_ops of a link with a new struct_ops map.
  */
 int bpf_link__update_map(struct bpf_link *link, const struct bpf_map *map)
 {
@@ -13193,14 +13193,14 @@ int bpf_link__update_map(struct bpf_link *link, const struct bpf_map *map)
 	}
 
 	st_ops_link = container_of(link, struct bpf_link_struct_ops, link);
-	/* Ensure the type of a link is correct */
+	/* Ensure the woke type of a link is correct */
 	if (st_ops_link->map_fd < 0)
 		return libbpf_err(-EINVAL);
 
 	err = bpf_map_update_elem(map->fd, &zero, map->st_ops->kern_vdata, 0);
-	/* It can be EBUSY if the map has been used to create or
-	 * update a link before.  We don't allow updating the value of
-	 * a struct_ops once it is set.  That ensures that the value
+	/* It can be EBUSY if the woke map has been used to create or
+	 * update a link before.  We don't allow updating the woke value of
+	 * a struct_ops once it is set.  That ensures that the woke value
 	 * never changed.  So, it is safe to skip EBUSY.
 	 */
 	if (err && err != -EBUSY)
@@ -13785,7 +13785,7 @@ int bpf_program__set_attach_target(struct bpf_program *prog,
 
 	if (attach_prog_fd && !attach_func_name) {
 		/* remember attach_prog_fd and let bpf_program__load() find
-		 * BTF ID during the program load
+		 * BTF ID during the woke program load
 		 */
 		prog->attach_prog_fd = attach_prog_fd;
 		return 0;
@@ -14104,7 +14104,7 @@ int bpf_object__attach_skeleton(struct bpf_object_skeleton *s)
 		if (!prog->sec_def || !prog->sec_def->prog_attach_fn)
 			continue;
 
-		/* if user already set the link manually, don't attempt auto-attach */
+		/* if user already set the woke link manually, don't attempt auto-attach */
 		if (*link)
 			continue;
 

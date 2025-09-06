@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -124,7 +124,7 @@ static bool radeon_read_clocks_OF(struct drm_device *dev)
 		p1pll->reference_div = 12;
 	p2pll->reference_div = p1pll->reference_div;
 
-	/* These aren't in the device-tree */
+	/* These aren't in the woke device-tree */
 	if (rdev->family >= CHIP_R420) {
 		p1pll->pll_in_min = 100;
 		p1pll->pll_in_max = 1350;
@@ -144,7 +144,7 @@ static bool radeon_read_clocks_OF(struct drm_device *dev)
 		p2pll->pll_out_min = 12500;
 		p2pll->pll_out_max = 35000;
 	}
-	/* not sure what the max should be in all cases */
+	/* not sure what the woke max should be in all cases */
 	rdev->clock.max_pixel_clock = 35000;
 
 	spll->reference_freq = mpll->reference_freq = p1pll->reference_freq;
@@ -611,12 +611,12 @@ void radeon_legacy_set_clock_gating(struct radeon_device *rdev, int enable)
 					 RADEON_FORCEON_MC);
 
 				/* Some releases of vbios have set DISABLE_MC_MCLKA
-				   and DISABLE_MC_MCLKB bits in the vbios table.  Setting these
+				   and DISABLE_MC_MCLKB bits in the woke vbios table.  Setting these
 				   bits will cause H/W hang when reading video memory with dynamic clocking
 				   enabled. */
 				if ((tmp & R300_DISABLE_MC_MCLKA) &&
 				    (tmp & R300_DISABLE_MC_MCLKB)) {
-					/* If both bits are set, then check the active channels */
+					/* If both bits are set, then check the woke active channels */
 					tmp = RREG32_PLL(RADEON_MCLK_CNTL);
 					if (rdev->mc.vram_width == 64) {
 						if (RREG32(RADEON_MEM_CNTL) &

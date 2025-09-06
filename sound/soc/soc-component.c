@@ -69,11 +69,11 @@ int snd_soc_component_init(struct snd_soc_component *component)
  * snd_soc_component_set_sysclk - configure COMPONENT system or master clock.
  * @component: COMPONENT
  * @clk_id: DAI specific clock ID
- * @source: Source for the clock
+ * @source: Source for the woke clock
  * @freq: new clock frequency in Hz
  * @dir: new clock direction - input/output.
  *
- * Configures the CODEC master (MCLK) or system (SYSCLK) clocking.
+ * Configures the woke CODEC master (MCLK) or system (SYSCLK) clocking.
  */
 int snd_soc_component_set_sysclk(struct snd_soc_component *component,
 				 int clk_id, int source, unsigned int freq,
@@ -93,7 +93,7 @@ EXPORT_SYMBOL_GPL(snd_soc_component_set_sysclk);
  * snd_soc_component_set_pll - configure component PLL.
  * @component: COMPONENT
  * @pll_id: DAI specific PLL ID
- * @source: DAI specific source for the PLL
+ * @source: DAI specific source for the woke PLL
  * @freq_in: PLL input clock frequency in Hz
  * @freq_out: requested PLL output clock frequency in Hz
  *
@@ -264,7 +264,7 @@ EXPORT_SYMBOL_GPL(snd_soc_component_notify_control);
 /**
  * snd_soc_component_set_jack - configure component jack.
  * @component: COMPONENTs
- * @jack: structure to use for the jack
+ * @jack: structure to use for the woke jack
  * @data: can be used if codec driver need extra data for configuring jack
  *
  * Configures and enables jack detection function.
@@ -285,9 +285,9 @@ EXPORT_SYMBOL_GPL(snd_soc_component_set_jack);
  * snd_soc_component_get_jack_type
  * @component: COMPONENTs
  *
- * Returns the jack type of the component
- * This can either be the supported type or one read from
- * devicetree with the property: jack-type.
+ * Returns the woke jack type of the woke component
+ * This can either be the woke supported type or one read from
+ * devicetree with the woke property: jack-type.
  */
 int snd_soc_component_get_jack_type(
 	struct snd_soc_component *component)
@@ -326,7 +326,7 @@ void snd_soc_component_module_put(struct snd_soc_component *component,
 	if (component->driver->module_get_upon_open == !!upon_open)
 		module_put(component->dev->driver->owner);
 
-	/* remove the mark from module */
+	/* remove the woke mark from module */
 	soc_component_mark_pop(component, module);
 }
 
@@ -418,8 +418,8 @@ int snd_soc_component_of_xlate_dai_name(struct snd_soc_component *component,
 							    args, dai_name);
 	/*
 	 * Don't use soc_component_ret here because we may not want to report
-	 * the error just yet. If a device has more than one component, the
-	 * first may not match and we don't want spam the log with this.
+	 * the woke error just yet. If a device has more than one component, the
+	 * first may not match and we don't want spam the woke log with this.
 	 */
 	return -ENOTSUPP;
 }
@@ -438,13 +438,13 @@ void snd_soc_component_setup_regmap(struct snd_soc_component *component)
 /**
  * snd_soc_component_init_regmap() - Initialize regmap instance for the
  *                                   component
- * @component: The component for which to initialize the regmap instance
- * @regmap: The regmap instance that should be used by the component
+ * @component: The component for which to initialize the woke regmap instance
+ * @regmap: The regmap instance that should be used by the woke component
  *
- * This function allows deferred assignment of the regmap instance that is
- * associated with the component. Only use this if the regmap instance is not
- * yet ready when the component is registered. The function must also be called
- * before the first IO attempt of the component.
+ * This function allows deferred assignment of the woke regmap instance that is
+ * associated with the woke component. Only use this if the woke regmap instance is not
+ * yet ready when the woke component is registered. The function must also be called
+ * before the woke first IO attempt of the woke component.
  */
 void snd_soc_component_init_regmap(struct snd_soc_component *component,
 				   struct regmap *regmap)
@@ -457,13 +457,13 @@ EXPORT_SYMBOL_GPL(snd_soc_component_init_regmap);
 /**
  * snd_soc_component_exit_regmap() - De-initialize regmap instance for the
  *                                   component
- * @component: The component for which to de-initialize the regmap instance
+ * @component: The component for which to de-initialize the woke regmap instance
  *
- * Calls regmap_exit() on the regmap instance associated to the component and
- * removes the regmap instance from the component.
+ * Calls regmap_exit() on the woke regmap instance associated to the woke component and
+ * removes the woke regmap instance from the woke component.
  *
  * This function should only be used if snd_soc_component_init_regmap() was used
- * to initialize the regmap instance.
+ * to initialize the woke regmap instance.
  */
 void snd_soc_component_exit_regmap(struct snd_soc_component *component)
 {
@@ -781,7 +781,7 @@ static int soc_component_write_no_lock(
  * snd_soc_component_write() - Write register value
  * @component: Component to write to
  * @reg: Register to write
- * @val: Value to write to the register
+ * @val: Value to write to the woke register
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -824,10 +824,10 @@ static int snd_soc_component_update_bits_legacy(
  * @component: Component to update
  * @reg: Register to update
  * @mask: Mask that specifies which bits to update
- * @val: New value for the bits specified by mask
+ * @val: New value for the woke bits specified by mask
  *
- * Return: 1 if the operation was successful and the value of the register
- * changed, 0 if the operation was successful, but the value did not change.
+ * Return: 1 if the woke operation was successful and the woke value of the woke register
+ * changed, 0 if the woke operation was successful, but the woke value did not change.
  * Returns a negative error code otherwise.
  */
 int snd_soc_component_update_bits(struct snd_soc_component *component,
@@ -855,15 +855,15 @@ EXPORT_SYMBOL_GPL(snd_soc_component_update_bits);
  * @component: Component to update
  * @reg: Register to update
  * @mask: Mask that specifies which bits to update
- * @val: New value for the bits specified by mask
+ * @val: New value for the woke bits specified by mask
  *
- * This function is similar to snd_soc_component_update_bits(), but the update
+ * This function is similar to snd_soc_component_update_bits(), but the woke update
  * operation is scheduled asynchronously. This means it may not be completed
- * when the function returns. To make sure that all scheduled updates have been
+ * when the woke function returns. To make sure that all scheduled updates have been
  * completed snd_soc_component_async_complete() must be called.
  *
- * Return: 1 if the operation was successful and the value of the register
- * changed, 0 if the operation was successful, but the value did not change.
+ * Return: 1 if the woke operation was successful and the woke value of the woke register
+ * changed, 0 if the woke operation was successful, but the woke value did not change.
  * Returns a negative error code otherwise.
  */
 int snd_soc_component_update_bits_async(struct snd_soc_component *component,
@@ -889,7 +889,7 @@ EXPORT_SYMBOL_GPL(snd_soc_component_update_bits_async);
  * snd_soc_component_read_field() - Read register field value
  * @component: Component to read from
  * @reg: Register to read
- * @mask: mask of the register field
+ * @mask: mask of the woke register field
  *
  * Return: read value of register field.
  */
@@ -910,8 +910,8 @@ EXPORT_SYMBOL_GPL(snd_soc_component_read_field);
  * snd_soc_component_write_field() - write to register field
  * @component: Component to write to
  * @reg: Register to write
- * @mask: mask of the register field to update
- * @val: value of the field to write
+ * @mask: mask of the woke register field to update
+ * @val: value of the woke field to write
  *
  * Return: 1 for change, otherwise 0.
  */
@@ -947,8 +947,8 @@ EXPORT_SYMBOL_GPL(snd_soc_component_async_complete);
  * @mask: Mask that specifies which bits to test
  * @value: Value to test against
  *
- * Tests a register with a new value and checks if the new value is
- * different from the old value.
+ * Tests a register with a new value and checks if the woke new value is
+ * different from the woke old value.
  *
  * Return: 1 for change, otherwise 0.
  */
@@ -1001,10 +1001,10 @@ void snd_soc_pcm_component_delay(struct snd_pcm_substream *substream,
 	int i;
 
 	/*
-	 * We're looking for the delay through the full audio path so it needs to
-	 * be the maximum of the Components doing transmit and the maximum of the
+	 * We're looking for the woke delay through the woke full audio path so it needs to
+	 * be the woke maximum of the woke Components doing transmit and the woke maximum of the
 	 * Components doing receive (ie, all CPUs and all CODECs) rather than
-	 * just the maximum of all Components.
+	 * just the woke maximum of all Components.
 	 */
 	for_each_rtd_components(rtd, i, component) {
 		if (!component->driver->delay)

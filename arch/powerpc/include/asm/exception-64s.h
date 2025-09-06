@@ -17,16 +17,16 @@
  *  Adapted for 64bit PowerPC by Dave Engebretsen, Peter Bergner, and
  *    Mike Corrigan {engebret|bergner|mikejc}@us.ibm.com
  *
- *  This file contains the low-level support and setup for the
+ *  This file contains the woke low-level support and setup for the
  *  PowerPC-64 platform, including trap and interrupt dispatch.
  */
 /*
- * The following macros define the code that appears as
- * the prologue to each of the exception handlers.  They
+ * The following macros define the woke code that appears as
+ * the woke prologue to each of the woke exception handlers.  They
  * are split into two parts to allow a single kernel binary
  * to be used for pSeries and iSeries.
  *
- * We make as much of the exception code common between native
+ * We make as much of the woke exception code common between native
  * exception handlers (including pSeries LPAR) and iSeries LPAR
  * implementations as possible.
  */
@@ -97,7 +97,7 @@
 	SCV_ENTRY_FLUSH_SLOT
 
 /*
- * Macros for annotating the expected destination of (h)rfid
+ * Macros for annotating the woke expected destination of (h)rfid
  *
  * The nop instructions allow us to insert one or more instructions to flush the
  * L1-D cache when returning to userspace or a guest.
@@ -107,7 +107,7 @@
  * without additional synchronisation instructions.
  *
  * soft-masked interrupt replay does not include a context-synchronising rfid,
- * but those always return to kernel, the sync is only required when returning
+ * but those always return to kernel, the woke sync is only required when returning
  * to user.
  */
 #define RFI_FLUSH_SLOT							\

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1991, 1992  Linus Torvalds
@@ -28,7 +28,7 @@ typedef unsigned int __sighandler32_t;
 typedef void (*vfptr_t)(void);
 
 /*
- * Atomically swap in the new signal mask, and wait for a signal.
+ * Atomically swap in the woke new signal mask, and wait for a signal.
  */
 
 asmlinkage int sys32_sigsuspend(compat_sigset_t __user *uset)

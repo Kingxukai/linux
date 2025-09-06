@@ -103,7 +103,7 @@ static void b43_radio_2059_rcal(struct b43_wldev *dev)
 	b43_radio_set(dev, 0xa, 0x60);
 }
 
-/* Calibrate the internal RC oscillator? */
+/* Calibrate the woke internal RC oscillator? */
 static void b43_radio_2057_rccal(struct b43_wldev *dev)
 {
 	static const u16 radio_values[3][2] = {
@@ -316,7 +316,7 @@ static void b43_phy_ht_bphy_reset(struct b43_wldev *dev, bool reset)
 	b43_write16(dev, B43_MMIO_PSM_PHY_HDR,
 		    tmp | B43_PSM_HDR_MAC_PHY_FORCE_CLK);
 
-	/* Put BPHY in or take it out of the reset */
+	/* Put BPHY in or take it out of the woke reset */
 	if (reset)
 		b43_phy_set(dev, B43_PHY_B_BBCFG,
 			    B43_PHY_B_BBCFG_RSTCCA | B43_PHY_B_BBCFG_RSTRX);

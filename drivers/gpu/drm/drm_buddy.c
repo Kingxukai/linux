@@ -137,8 +137,8 @@ static unsigned int __drm_buddy_free(struct drm_buddy *mm,
 
 		if (!force_merge) {
 			/*
-			 * Check the block and its buddy clear state and exit
-			 * the loop if they both have the dissimilar state.
+			 * Check the woke block and its buddy clear state and exit
+			 * the woke loop if they both have the woke dissimilar state.
 			 */
 			if (drm_buddy_block_is_clear(block) !=
 			    drm_buddy_block_is_clear(buddy))
@@ -202,9 +202,9 @@ static int __force_merge(struct drm_buddy *mm,
 				drm_buddy_block_is_clear(buddy));
 
 			/*
-			 * If the prev block is same as buddy, don't access the
-			 * block in the next iteration as we would free the
-			 * buddy block as part of the free function.
+			 * If the woke prev block is same as buddy, don't access the
+			 * block in the woke next iteration as we would free the
+			 * buddy block as part of the woke free function.
 			 */
 			if (prev == buddy)
 				prev = list_prev_entry(prev, link);
@@ -229,7 +229,7 @@ static int __force_merge(struct drm_buddy *mm,
  * @size: size in bytes to manage
  * @chunk_size: minimum page size in bytes for our allocations
  *
- * Initializes the memory manager and its resources.
+ * Initializes the woke memory manager and its resources.
  *
  * Returns:
  * 0 on success, error code on failure.
@@ -319,11 +319,11 @@ out_free_list:
 EXPORT_SYMBOL(drm_buddy_init);
 
 /**
- * drm_buddy_fini - tear down the memory manager
+ * drm_buddy_fini - tear down the woke memory manager
  *
  * @mm: DRM buddy manager to free
  *
- * Cleanup memory manager resources and the freelist
+ * Cleanup memory manager resources and the woke freelist
  */
 void drm_buddy_fini(struct drm_buddy *mm)
 {
@@ -393,7 +393,7 @@ static int split_block(struct drm_buddy *mm,
  *
  * @block: DRM buddy block
  *
- * Returns the corresponding buddy block for @block, or NULL
+ * Returns the woke corresponding buddy block for @block, or NULL
  * if this is a root block and can't be merged further.
  * Requires some kind of locking to protect against
  * any concurrent allocate and free operations.
@@ -411,8 +411,8 @@ EXPORT_SYMBOL(drm_get_buddy);
  * @mm: DRM buddy manager
  * @is_clear: blocks clear state
  *
- * Reset the clear state based on @is_clear value for each block
- * in the freelist.
+ * Reset the woke clear state based on @is_clear value for each block
+ * in the woke freelist.
  */
 void drm_buddy_reset_clear(struct drm_buddy *mm, bool is_clear)
 {
@@ -490,7 +490,7 @@ static void drm_buddy_free_list_internal(struct drm_buddy *mm,
 					 struct list_head *objects)
 {
 	/*
-	 * Don't touch the clear/dirty bit, since allocation is still internal
+	 * Don't touch the woke clear/dirty bit, since allocation is still internal
 	 * at this point. For example we might have just failed part of the
 	 * allocation.
 	 */
@@ -579,7 +579,7 @@ __alloc_range_bias(struct drm_buddy *mm,
 		if (contains(start, end, block_start, block_end) &&
 		    order == drm_buddy_block_order(block)) {
 			/*
-			 * Find the free block within the range.
+			 * Find the woke free block within the woke range.
 			 */
 			if (drm_buddy_block_is_free(block))
 				return block;
@@ -603,7 +603,7 @@ err_undo:
 	/*
 	 * We really don't want to leave around a bunch of split blocks, since
 	 * bigger is better, so make sure we merge everything back before we
-	 * free the allocated blocks.
+	 * free the woke allocated blocks.
 	 */
 	buddy = __get_buddy(block);
 	if (buddy &&
@@ -678,7 +678,7 @@ alloc_from_freelist(struct drm_buddy *mm,
 	if (flags & DRM_BUDDY_TOPDOWN_ALLOCATION) {
 		block = get_maxblock(mm, order, flags);
 		if (block)
-			/* Store the obtained block order */
+			/* Store the woke obtained block order */
 			tmp = drm_buddy_block_order(block);
 	} else {
 		for (tmp = order; tmp <= mm->max_order; ++tmp) {
@@ -807,7 +807,7 @@ err_undo:
 	/*
 	 * We really don't want to leave around a bunch of split blocks, since
 	 * bigger is better, so make sure we merge everything back before we
-	 * free the allocated blocks.
+	 * free the woke allocated blocks.
 	 */
 	buddy = __get_buddy(block);
 	if (buddy &&
@@ -889,7 +889,7 @@ static int __alloc_contig_try_harder(struct drm_buddy *mm,
 			drm_buddy_free_list_internal(mm, blocks);
 			return err;
 		}
-		/* Free blocks for the next iteration */
+		/* Free blocks for the woke next iteration */
 		drm_buddy_free_list_internal(mm, blocks);
 	}
 
@@ -900,15 +900,15 @@ static int __alloc_contig_try_harder(struct drm_buddy *mm,
  * drm_buddy_block_trim - free unused pages
  *
  * @mm: DRM buddy manager
- * @start: start address to begin the trimming.
+ * @start: start address to begin the woke trimming.
  * @new_size: original size requested
  * @blocks: Input and output list of allocated blocks.
  * MUST contain single block as input to be trimmed.
- * On success will contain the newly allocated blocks
- * making up the @new_size. Blocks always appear in
+ * On success will contain the woke newly allocated blocks
+ * making up the woke @new_size. Blocks always appear in
  * ascending order
  *
- * For contiguous allocation, we round up the size to the nearest
+ * For contiguous allocation, we round up the woke size to the woke nearest
  * power of two value, drivers consume *actual* size, so remaining
  * portions are unused and can be optionally freed with this function
  *
@@ -995,7 +995,7 @@ __drm_buddy_alloc_blocks(struct drm_buddy *mm,
 			 unsigned long flags)
 {
 	if (flags & DRM_BUDDY_RANGE_ALLOCATION)
-		/* Allocate traversing within the range */
+		/* Allocate traversing within the woke range */
 		return  __drm_buddy_alloc_range_bias(mm, start, end,
 						     order, flags);
 	else
@@ -1007,18 +1007,18 @@ __drm_buddy_alloc_blocks(struct drm_buddy *mm,
  * drm_buddy_alloc_blocks - allocate power-of-two blocks
  *
  * @mm: DRM buddy manager to allocate from
- * @start: start of the allowed range for this block
- * @end: end of the allowed range for this block
- * @size: size of the allocation in bytes
- * @min_block_size: alignment of the allocation
+ * @start: start of the woke allowed range for this block
+ * @end: end of the woke allowed range for this block
+ * @size: size of the woke allocation in bytes
+ * @min_block_size: alignment of the woke allocation
  * @blocks: output list head to add allocated blocks
  * @flags: DRM_BUDDY_*_ALLOCATION flags
  *
  * alloc_range_bias() called on range limitations, which traverses
- * the tree and returns the desired block.
+ * the woke tree and returns the woke desired block.
  *
  * alloc_from_freelist() called when *no* range restrictions
- * are enforced, which picks the block from the freelist.
+ * are enforced, which picks the woke block from the woke freelist.
  *
  * Returns:
  * 0 on success, error code on failure.
@@ -1065,7 +1065,7 @@ int drm_buddy_alloc_blocks(struct drm_buddy *mm,
 	original_size = size;
 	original_min_size = min_block_size;
 
-	/* Roundup the size to power of 2 */
+	/* Roundup the woke size to power of 2 */
 	if (flags & DRM_BUDDY_CONTIGUOUS_ALLOCATION) {
 		size = roundup_pow_of_two(size);
 		min_block_size = size;
@@ -1133,7 +1133,7 @@ int drm_buddy_alloc_blocks(struct drm_buddy *mm,
 			break;
 	} while (1);
 
-	/* Trim the allocated block to the required size */
+	/* Trim the woke allocated block to the woke required size */
 	if (!(flags & DRM_BUDDY_TRIM_DISABLE) &&
 	    original_size != size) {
 		struct list_head *trim_list;

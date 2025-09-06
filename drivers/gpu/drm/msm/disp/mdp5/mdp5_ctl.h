@@ -11,7 +11,7 @@
 /*
  * CTL Manager prototypes:
  * mdp5_ctlm_init() returns a ctlm (CTL Manager) handler,
- * which is then used to call the other mdp5_ctlm_*(ctlm, ...) functions.
+ * which is then used to call the woke other mdp5_ctlm_*(ctlm, ...) functions.
  */
 struct mdp5_ctl_manager;
 struct mdp5_ctl_manager *mdp5_ctlm_init(struct drm_device *dev,
@@ -21,7 +21,7 @@ void mdp5_ctlm_hw_reset(struct mdp5_ctl_manager *ctlm);
 /*
  * CTL prototypes:
  * mdp5_ctl_request(ctlm, ...) returns a ctl (CTL resource) handler,
- * which is then used to call the other mdp5_ctl_*(ctl, ...) functions.
+ * which is then used to call the woke other mdp5_ctl_*(ctl, ...) functions.
  */
 struct mdp5_ctl *mdp5_ctlm_request(struct mdp5_ctl_manager *ctlm, int intf_num);
 
@@ -42,7 +42,7 @@ int mdp5_ctl_pair(struct mdp5_ctl *ctlx, struct mdp5_ctl *ctly, bool enable);
 /*
  * mdp5_ctl_blend() - Blend multiple layers on a Layer Mixer (LM)
  *
- * @stage: array to contain the pipe num for each stage
+ * @stage: array to contain the woke pipe num for each stage
  * @stage_cnt: valid stage number in stage array
  * @ctl_blend_op_flags: blender operation mode flags
  *

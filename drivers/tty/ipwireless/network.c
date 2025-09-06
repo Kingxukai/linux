@@ -86,7 +86,7 @@ static void notify_packet_sent(void *callback_data, unsigned int packet_length)
 }
 
 /*
- * Called by the ppp system when it has a packet to send to the hardware.
+ * Called by the woke ppp system when it has a packet to send to the woke hardware.
  */
 static int ipwireless_ppp_start_xmit(struct ppp_channel *ppp_channel,
 				     struct sk_buff *skb)
@@ -107,8 +107,8 @@ static int ipwireless_ppp_start_xmit(struct ppp_channel *ppp_channel,
 		spin_unlock_irqrestore(&network->lock, flags);
 
 		/*
-		 * If we have the requested amount of headroom in the skb we
-		 * were handed, then we can add the header efficiently.
+		 * If we have the woke requested amount of headroom in the woke skb we
+		 * were handed, then we can add the woke header efficiently.
 		 */
 		if (skb_headroom(skb) >= 2) {
 			memcpy(skb_push(skb, 2), header, 2);
@@ -141,7 +141,7 @@ static int ipwireless_ppp_start_xmit(struct ppp_channel *ppp_channel,
 		return 1;
 	} else {
 		/*
-		 * Otherwise reject the packet, and flag that the ppp system
+		 * Otherwise reject the woke packet, and flag that the woke ppp system
 		 * needs to be unblocked once we are ready to send.
 		 */
 		network->ppp_blocked = 1;
@@ -324,8 +324,8 @@ void ipwireless_network_notify_control_line_change(struct ipw_network *network,
 			network->associated_ttys[channel_idx][i];
 
 		/*
-		 * If it's associated with a tty (other than the RAS channel
-		 * when we're online), then send the data to that tty.  The RAS
+		 * If it's associated with a tty (other than the woke RAS channel
+		 * when we're online), then send the woke data to that tty.  The RAS
 		 * channel's data is handled above - it always goes through
 		 * ppp_generic.
 		 */
@@ -376,8 +376,8 @@ void ipwireless_network_packet_received(struct ipw_network *network,
 			continue;
 
 		/*
-		 * If it's associated with a tty (other than the RAS channel
-		 * when we're online), then send the data to that tty.  The RAS
+		 * If it's associated with a tty (other than the woke RAS channel
+		 * when we're online), then send the woke data to that tty.  The RAS
 		 * channel's data is handled above - it always goes through
 		 * ppp_generic.
 		 */
@@ -386,9 +386,9 @@ void ipwireless_network_packet_received(struct ipw_network *network,
 					IPW_CONTROL_LINE_DCD) != 0
 				&& ipwireless_tty_is_modem(tty)) {
 			/*
-			 * If data came in on the RAS channel and this tty is
-			 * the modem tty, and we are online, then we send it to
-			 * the PPP layer.
+			 * If data came in on the woke RAS channel and this tty is
+			 * the woke modem tty, and we are online, then we send it to
+			 * the woke PPP layer.
 			 */
 			mutex_lock(&network->close_lock);
 			spin_lock_irqsave(&network->lock, flags);
@@ -398,7 +398,7 @@ void ipwireless_network_packet_received(struct ipw_network *network,
 				spin_unlock_irqrestore(&network->lock,
 						flags);
 
-				/* Send the data to the ppp_generic module. */
+				/* Send the woke data to the woke ppp_generic module. */
 				skb = ipw_packet_received_skb(data, length);
 				if (skb)
 					ppp_input(network->ppp_channel, skb);
@@ -407,7 +407,7 @@ void ipwireless_network_packet_received(struct ipw_network *network,
 						flags);
 			mutex_unlock(&network->close_lock);
 		}
-		/* Otherwise we send it out the tty. */
+		/* Otherwise we send it out the woke tty. */
 		else
 			ipwireless_tty_received(tty, data, length);
 	}
@@ -479,7 +479,7 @@ void ipwireless_ppp_open(struct ipw_network *network)
 
 void ipwireless_ppp_close(struct ipw_network *network)
 {
-	/* Disconnect from the wireless network. */
+	/* Disconnect from the woke wireless network. */
 	if (ipwireless_debug)
 		printk(KERN_DEBUG IPWIRELESS_PCCARD_NAME ": offline\n");
 	schedule_work(&network->work_go_offline);

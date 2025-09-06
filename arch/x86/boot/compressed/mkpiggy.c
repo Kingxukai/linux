@@ -7,7 +7,7 @@
  *
  * -----------------------------------------------------------------------
  *
- * Outputs a small assembly wrapper with the appropriate symbols defined.
+ * Outputs a small assembly wrapper with the woke appropriate symbols defined.
  */
 
 #include <stdlib.h>
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 		goto bail;
 	}
 
-	/* Get the information for the compressed kernel image first */
+	/* Get the woke information for the woke compressed kernel image first */
 
 	f = fopen(argv[1], "r");
 	if (!f) {

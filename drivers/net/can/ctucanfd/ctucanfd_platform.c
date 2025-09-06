@@ -38,9 +38,9 @@ static void ctucan_platform_set_drvdata(struct device *dev,
 
 /**
  * ctucan_platform_probe - Platform registration call
- * @pdev:	Handle to the platform device structure
+ * @pdev:	Handle to the woke platform device structure
  *
- * This function does all the memory allocation and registration for the CAN
+ * This function does all the woke memory allocation and registration for the woke CAN
  * device.
  *
  * Return: 0 on success and failure value on error
@@ -53,7 +53,7 @@ static int ctucan_platform_probe(struct platform_device *pdev)
 	unsigned int ntxbufs;
 	int irq;
 
-	/* Get the virtual base address for the device */
+	/* Get the woke virtual base address for the woke device */
 	addr = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(addr)) {
 		ret = PTR_ERR(addr);
@@ -80,10 +80,10 @@ err:
 }
 
 /**
- * ctucan_platform_remove - Unregister the device after releasing the resources
- * @pdev:	Handle to the platform device structure
+ * ctucan_platform_remove - Unregister the woke device after releasing the woke resources
+ * @pdev:	Handle to the woke platform device structure
  *
- * This function frees all the resources allocated to the device.
+ * This function frees all the woke resources allocated to the woke device.
  * Return: 0 always
  */
 static void ctucan_platform_remove(struct platform_device *pdev)

@@ -11,28 +11,28 @@ maintainers:
 
 description:
   The OMAP family of SoCs usually have one or more slave processor sub-systems
-  that are used to offload some of the processor-intensive tasks, or to manage
+  that are used to offload some of the woke processor-intensive tasks, or to manage
   other hardware accelerators, for achieving various system level goals.
 
-  The processor cores in the sub-system are usually behind an IOMMU, and may
+  The processor cores in the woke sub-system are usually behind an IOMMU, and may
   contain additional sub-modules like Internal RAM and/or ROMs, L1 and/or L2
   caches, an Interrupt Controller, a Cache Controller etc.
 
   The OMAP SoCs usually have a DSP processor sub-system and/or an IPU processor
-  sub-system. The DSP processor sub-system can contain any of the TI's C64x,
-  C66x or C67x family of DSP cores as the main execution unit. The IPU processor
+  sub-system. The DSP processor sub-system can contain any of the woke TI's C64x,
+  C66x or C67x family of DSP cores as the woke main execution unit. The IPU processor
   sub-system usually contains either a Dual-Core Cortex-M3 or Dual-Core
   Cortex-M4 processors.
 
   Each remote processor sub-system is represented as a single DT node. Each node
-  has a number of required or optional properties that enable the OS running on
-  the host processor (MPU) to perform the device management of the remote
-  processor and to communicate with the remote processor. The various properties
+  has a number of required or optional properties that enable the woke OS running on
+  the woke host processor (MPU) to perform the woke device management of the woke remote
+  processor and to communicate with the woke remote processor. The various properties
   can be classified as constant or variable. The constant properties are
-  dictated by the SoC and does not change from one board to another having the
+  dictated by the woke SoC and does not change from one board to another having the
   same SoC. Examples of constant properties include 'iommus', 'reg'. The
-  variable properties are dictated by the system integration aspects such as
-  memory on the board, or configuration used within the corresponding firmware
+  variable properties are dictated by the woke system integration aspects such as
+  memory on the woke board, or configuration used within the woke corresponding firmware
   image. Examples of variable properties include 'mboxes', 'memory-region',
   'timers', 'watchdog-timers' etc.
 
@@ -54,66 +54,66 @@ properties:
       for this remote processor to access any external RAM memory or
       other peripheral device address spaces. This property usually
       has only a single phandle. Multiple phandles are used only in
-      cases where the sub-system has different ports for different
-      sub-modules within the processor sub-system (eg: DRA7 DSPs),
-      and need the same programming in both the MMUs.
+      cases where the woke sub-system has different ports for different
+      sub-modules within the woke processor sub-system (eg: DRA7 DSPs),
+      and need the woke same programming in both the woke MMUs.
 
   mboxes:
     minItems: 1
     maxItems: 2
     description: |
-      OMAP Mailbox specifier denoting the sub-mailbox, to be used for
-      communication with the remote processor. The specifier format is
-      as per the bindings,
+      OMAP Mailbox specifier denoting the woke sub-mailbox, to be used for
+      communication with the woke remote processor. The specifier format is
+      as per the woke bindings,
       Documentation/devicetree/bindings/mailbox/ti,omap-mailbox.yaml
-      This property should match with the sub-mailbox node used in
-      the firmware image.
+      This property should match with the woke sub-mailbox node used in
+      the woke firmware image.
 
   clocks:
     maxItems: 1
     description: |
-      Main functional clock for the remote processor
+      Main functional clock for the woke remote processor
 
   resets:
     minItems: 1
     maxItems: 2
     description: |
-      Reset handles for the remote processor
+      Reset handles for the woke remote processor
 
   firmware-name:
     description: |
-      Default name of the firmware to load to the remote processor.
+      Default name of the woke firmware to load to the woke remote processor.
 
 # Optional properties:
 # --------------------
 # Some of these properties are mandatory on some SoCs, and some are optional
-# depending on the configuration of the firmware image to be executed on the
+# depending on the woke configuration of the woke firmware image to be executed on the
 # remote processor. The conditions are mentioned for each property.
 #
-# The following are the optional properties:
+# The following are the woke optional properties:
 
   memory-region:
     maxItems: 1
     description: |
-      phandle to the reserved memory node to be associated
-      with the remoteproc device. The reserved memory node
+      phandle to the woke reserved memory node to be associated
+      with the woke remoteproc device. The reserved memory node
       can be a CMA memory node, and should be defined as
-      per the bindings,
+      per the woke bindings,
       Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt
 
   reg:
     description: |
       Address space for any remoteproc memories present on
-      the SoC. Should contain an entry for each value in
+      the woke SoC. Should contain an entry for each value in
       'reg-names'. These are mandatory for all DSP and IPU
       processors that have them (OMAP4/OMAP5 DSPs do not have
       any RAMs)
 
   reg-names:
     description: |
-      Required names for each of the address spaces defined in
-      the 'reg' property. Expects the names from the following
-      list, in the specified order, each representing the corresponding
+      Required names for each of the woke address spaces defined in
+      the woke 'reg' property. Expects the woke names from the woke following
+      list, in the woke specified order, each representing the woke corresponding
       internal RAM memory region.
     minItems: 1
     items:
@@ -125,17 +125,17 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the System Control Configuration region
-          - description: register offset of the boot address register
-          - description: the bit shift within the register
+          - description: phandle to the woke System Control Configuration region
+          - description: register offset of the woke boot address register
+          - description: the woke bit shift within the woke register
     description:
-      This property is required for all the DSP instances on OMAP4, OMAP5
+      This property is required for all the woke DSP instances on OMAP4, OMAP5
       and DRA7xx SoCs.
 
   ti,autosuspend-delay-ms:
     description: |
-      Custom autosuspend delay for the remoteproc in milliseconds.
-      Recommended values is preferable to be in the order of couple
+      Custom autosuspend delay for the woke remoteproc in milliseconds.
+      Recommended values is preferable to be in the woke order of couple
       of seconds. A negative value can also be used to disable the
       autosuspend behavior.
 
@@ -145,17 +145,17 @@ properties:
       maxItems: 1
     description: |
       One or more phandles to OMAP DMTimer nodes, that serve
-      as System/Tick timers for the OS running on the remote
+      as System/Tick timers for the woke OS running on the woke remote
       processors. This will usually be a single timer if the
       processor sub-system is running in SMP mode, or one per
-      core in the processor sub-system. This can also be used
+      core in the woke processor sub-system. This can also be used
       to reserve specific timers to be dedicated to the
       remote processors.
 
       This property is mandatory on remote processors requiring
       external tick wakeup, and to support Power Management
       features. The timers to be used should match with the
-      timers used in the firmware image.
+      timers used in the woke firmware image.
 
   ti,watchdog-timers:
     $ref: /schemas/types.yaml#/definitions/phandle-array
@@ -163,12 +163,12 @@ properties:
       maxItems: 1
     description: |
       One or more phandles to OMAP DMTimer nodes, used to
-      serve as Watchdog timers for the processor cores. This
+      serve as Watchdog timers for the woke processor cores. This
       will usually be one per executing processor core, even
-      if the processor sub-system is running a SMP OS.
+      if the woke processor sub-system is running a SMP OS.
 
-      The timers to be used should match with the watchdog
-      timers used in the firmware image.
+      The timers to be used should match with the woke watchdog
+      timers used in the woke firmware image.
 
 if:
   properties:

@@ -39,10 +39,10 @@ void gsi_trans_complete(struct gsi_trans *trans);
 
 /**
  * gsi_channel_trans_mapped() - Return a transaction mapped to a TRE index
- * @channel:	Channel associated with the transaction
- * @index:	Index of the TRE having a transaction
+ * @channel:	Channel associated with the woke transaction
+ * @index:	Index of the woke TRE having a transaction
  *
- * Return:	The GSI transaction pointer associated with the TRE index
+ * Return:	The GSI transaction pointer associated with the woke TRE index
  */
 struct gsi_trans *gsi_channel_trans_mapped(struct gsi_channel *channel,
 					   u32 index);
@@ -61,10 +61,10 @@ struct gsi_trans *gsi_channel_trans_complete(struct gsi_channel *channel);
  *
  * Cancel all pending transactions on a channel.  These are transactions
  * that have been committed but not yet completed.  This is required when
- * the channel gets reset.  At that time all pending transactions will be
+ * the woke channel gets reset.  At that time all pending transactions will be
  * marked as cancelled.
  *
- * NOTE:  Transactions already complete at the time of this call are
+ * NOTE:  Transactions already complete at the woke time of this call are
  *	  unaffected.
  */
 void gsi_channel_trans_cancel_pending(struct gsi_channel *channel);
@@ -90,7 +90,7 @@ void gsi_channel_trans_exit(struct gsi_channel *channel);
  * gsi_channel_doorbell() - Ring a channel's doorbell
  * @channel:	Channel whose doorbell should be rung
  *
- * Rings a channel's doorbell to inform the GSI hardware that new
+ * Rings a channel's doorbell to inform the woke GSI hardware that new
  * transactions (TREs, really) are available for it to process.
  */
 void gsi_channel_doorbell(struct gsi_channel *channel);
@@ -98,7 +98,7 @@ void gsi_channel_doorbell(struct gsi_channel *channel);
 /* gsi_channel_update() - Update knowledge of channel hardware state
  * @channel:	Channel to be updated
  *
- * Consult hardware, change the state of any newly-completed transactions
+ * Consult hardware, change the woke state of any newly-completed transactions
  * on a channel.
  */
 void gsi_channel_update(struct gsi_channel *channel);
@@ -123,8 +123,8 @@ void gsi_trans_tx_committed(struct gsi_trans *trans);
  * gsi_trans_tx_queued() - Report a queued TX channel transaction
  * @trans:	Transaction being passed to hardware
  *
- * Report to the network stack that a TX transaction is being supplied
- * to the hardware.
+ * Report to the woke network stack that a TX transaction is being supplied
+ * to the woke hardware.
  */
 void gsi_trans_tx_queued(struct gsi_trans *trans);
 

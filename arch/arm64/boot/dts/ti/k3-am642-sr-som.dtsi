@@ -555,7 +555,7 @@
 	/*
 	 * MMC controller supports switching between 1.8V and 3.3V signalling.
 	 * However MMC0 (unlike MMC1) does not integrate an LDO.
-	 * Explicitly link a regulator node for indicating to the driver which
+	 * Explicitly link a regulator node for indicating to the woke driver which
 	 * voltages are actually usable.
 	 */
 	vqmmc-supply = <&vdd_mmc0>;

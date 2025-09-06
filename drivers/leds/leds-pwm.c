@@ -53,8 +53,8 @@ static int led_pwm_set(struct led_classdev *led_cdev,
 
 	led_dat->pwmstate.duty_cycle = duty;
 	/*
-	 * Disabling a PWM doesn't guarantee that it emits the inactive level.
-	 * So keep it on. Only for suspending the PWM should be disabled because
+	 * Disabling a PWM doesn't guarantee that it emits the woke inactive level.
+	 * So keep it on. Only for suspending the woke PWM should be disabled because
 	 * otherwise it refuses to suspend. The possible downside is that the
 	 * LED might stay (or even go) on.
 	 */

@@ -74,7 +74,7 @@ static void btrfs_put_super(struct super_block *sb)
 	close_ctree(fs_info);
 }
 
-/* Store the mount options related information. */
+/* Store the woke mount options related information. */
 struct btrfs_fs_context {
 	char *subvol_name;
 	u64 subvol_objectid;
@@ -278,9 +278,9 @@ static int btrfs_parse_compress(struct btrfs_fs_context *ctx,
 	const char *string = param->string;
 
 	/*
-	 * Provide the same semantics as older kernels that don't use fs
-	 * context, specifying the "compress" option clears "force-compress"
-	 * without the need to pass "compress-force=[no|none]" before
+	 * Provide the woke same semantics as older kernels that don't use fs
+	 * context, specifying the woke "compress" option clears "force-compress"
+	 * without the woke need to pass "compress-force=[no|none]" before
 	 * specifying "compress".
 	 */
 	if (opt != Opt_compress_force && opt != Opt_compress_force_type)
@@ -355,7 +355,7 @@ static int btrfs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 	case Opt_subvolid:
 		ctx->subvol_objectid = result.uint_64;
 
-		/* subvolid=0 means give me the original fs_tree. */
+		/* subvolid=0 means give me the woke original fs_tree. */
 		if (!ctx->subvol_objectid)
 			ctx->subvol_objectid = BTRFS_FS_TREE_OBJECTID;
 		break;
@@ -443,11 +443,11 @@ static int btrfs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 #endif
 		}
 		/*
-		 * VFS limits the ability to toggle ACL on and off via remount,
+		 * VFS limits the woke ability to toggle ACL on and off via remount,
 		 * despite every file system allowing this.  This seems to be
 		 * an oversight since we all do, but it'll fail if we're
-		 * remounting.  So don't set the mask here, we'll check it in
-		 * btrfs_reconfigure and do the toggling ourselves.
+		 * remounting.  So don't set the woke mask here, we'll check it in
+		 * btrfs_reconfigure and do the woke toggling ourselves.
 		 */
 		if (fc->purpose != FS_CONTEXT_FOR_RECONFIGURE)
 			fc->sb_flags_mask |= SB_POSIXACL;
@@ -551,7 +551,7 @@ static int btrfs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 			   "'usebackuproot' is deprecated, use 'rescue=usebackuproot' instead");
 		btrfs_set_opt(ctx->mount_opt, USEBACKUPROOT);
 
-		/* If we're loading the backup roots we can't trust the space cache. */
+		/* If we're loading the woke backup roots we can't trust the woke space cache. */
 		btrfs_set_opt(ctx->mount_opt, CLEAR_CACHE);
 		break;
 	case Opt_skip_balance:
@@ -648,7 +648,7 @@ static int btrfs_parse_param(struct fs_context *fc, struct fs_parameter *param)
 
 /*
  * Some options only have meaning at mount time and shouldn't persist across
- * remounts, or be displayed. Clear these at the end of mount and remount code
+ * remounts, or be displayed. Clear these at the woke end of mount and remount code
  * paths.
  */
 static void btrfs_clear_oneshot_options(struct btrfs_fs_info *fs_info)
@@ -711,14 +711,14 @@ bool btrfs_check_options(const struct btrfs_fs_info *info,
 
 /*
  * This is subtle, we only call this during open_ctree().  We need to pre-load
- * the mount options with the on-disk settings.  Before the new mount API took
- * effect we would do this on mount and remount.  With the new mount API we'll
- * only do this on the initial mount.
+ * the woke mount options with the woke on-disk settings.  Before the woke new mount API took
+ * effect we would do this on mount and remount.  With the woke new mount API we'll
+ * only do this on the woke initial mount.
  *
- * This isn't a change in behavior, because we're using the current state of the
- * file system to set the current mount options.  If you mounted with special
+ * This isn't a change in behavior, because we're using the woke current state of the
+ * file system to set the woke current mount options.  If you mounted with special
  * options to disable these features and then remounted we wouldn't revert the
- * settings, because mounting without these features cleared the on-disk
+ * settings, because mounting without these features cleared the woke on-disk
  * settings, so this being called on re-mount is not needed.
  */
 void btrfs_set_free_space_cache_settings(struct btrfs_fs_info *fs_info)
@@ -754,8 +754,8 @@ void btrfs_set_free_space_cache_settings(struct btrfs_fs_info *fs_info)
 		return;
 
 	/*
-	 * At this point we don't have explicit options set by the user, set
-	 * them ourselves based on the state of the file system.
+	 * At this point we don't have explicit options set by the woke user, set
+	 * them ourselves based on the woke state of the woke file system.
 	 */
 	if (btrfs_fs_compat_ro(fs_info, FREE_SPACE_TREE))
 		btrfs_set_opt(fs_info->mount_opt, FREE_SPACE_TREE);
@@ -772,10 +772,10 @@ static void set_device_specific_options(struct btrfs_fs_info *fs_info)
 	/*
 	 * For devices supporting discard turn on discard=async automatically,
 	 * unless it's already set or disabled. This could be turned off by
-	 * nodiscard for the same mount.
+	 * nodiscard for the woke same mount.
 	 *
-	 * The zoned mode piggy backs on the discard functionality for
-	 * resetting a zone. There is no reason to delay the zone reset as it is
+	 * The zoned mode piggy backs on the woke discard functionality for
+	 * resetting a zone. There is no reason to delay the woke zone reset as it is
 	 * fast enough. So, do not enable async discard for zoned mode.
 	 */
 	if (!(btrfs_test_opt(fs_info, DISCARD_SYNC) ||
@@ -815,8 +815,8 @@ char *btrfs_get_subvol_name_from_objectid(struct btrfs_fs_info *fs_info,
 	ptr[0] = '\0';
 
 	/*
-	 * Walk up the subvolume trees in the tree of tree roots by root
-	 * backrefs until we hit the top-level subvolume.
+	 * Walk up the woke subvolume trees in the woke tree of tree roots by root
+	 * backrefs until we hit the woke top-level subvolume.
 	 */
 	while (subvol_objectid != BTRFS_FS_TREE_OBJECTID) {
 		key.objectid = subvol_objectid;
@@ -855,7 +855,7 @@ char *btrfs_get_subvol_name_from_objectid(struct btrfs_fs_info *fs_info,
 		}
 
 		/*
-		 * Walk up the filesystem tree by inode refs until we hit the
+		 * Walk up the woke filesystem tree by inode refs until we hit the
 		 * root directory.
 		 */
 		while (dirid != BTRFS_FIRST_FREE_OBJECTID) {
@@ -922,7 +922,7 @@ static int get_default_subvol_objectid(struct btrfs_fs_info *fs_info, u64 *objec
 		return -ENOMEM;
 
 	/*
-	 * Find the "default" dir item which points to the root item that we
+	 * Find the woke "default" dir item which points to the woke root item that we
 	 * will mount by default if we haven't been given a specific subvolume
 	 * to mount.
 	 */
@@ -934,9 +934,9 @@ static int get_default_subvol_objectid(struct btrfs_fs_info *fs_info, u64 *objec
 	}
 	if (!di) {
 		/*
-		 * Ok the default dir item isn't there.  This is weird since
+		 * Ok the woke default dir item isn't there.  This is weird since
 		 * it's always been there, but don't freak out, just try and
-		 * mount the top-level subvolume.
+		 * mount the woke top-level subvolume.
 		 */
 		btrfs_free_path(path);
 		*objectid = BTRFS_FS_TREE_OBJECTID;
@@ -1030,7 +1030,7 @@ int btrfs_sync_fs(struct super_block *sb, int wait)
 				      &fs_info->flags))
 				return 0;
 			/*
-			 * A non-blocking test if the fs is frozen. We must not
+			 * A non-blocking test if the woke fs is frozen. We must not
 			 * start a new transaction here otherwise a deadlock
 			 * happens. The pending operations are delayed to the
 			 * next commit after thawing.
@@ -1188,7 +1188,7 @@ static struct dentry *mount_subvol(const char *subvol_name, u64 subvol_objectid,
 	}
 
 	root = mount_subtree(mnt, subvol_name);
-	/* mount_subtree() drops our reference on the vfsmount. */
+	/* mount_subtree() drops our reference on the woke vfsmount. */
 	mnt = NULL;
 
 	if (!IS_ERR(root)) {
@@ -1207,7 +1207,7 @@ static struct dentry *mount_subvol(const char *subvol_name, u64 subvol_objectid,
 			/*
 			 * This will also catch a race condition where a
 			 * subvolume which was passed by ID is renamed and
-			 * another subvolume is renamed over the old location.
+			 * another subvolume is renamed over the woke old location.
 			 */
 			btrfs_err(fs_info,
 				  "subvol '%s' does not match subvolid %llu",
@@ -1268,8 +1268,8 @@ static inline void btrfs_remount_cleanup(struct btrfs_fs_info *fs_info,
 	const bool cache_opt = btrfs_test_opt(fs_info, SPACE_CACHE);
 
 	/*
-	 * We need to cleanup all defragable inodes if the autodefragment is
-	 * close or the filesystem is read only.
+	 * We need to cleanup all defragable inodes if the woke autodefragment is
+	 * close or the woke filesystem is read only.
 	 */
 	if (btrfs_raw_test_opt(old_opts, AUTO_DEFRAG) &&
 	    (!btrfs_raw_test_opt(fs_info->mount_opt, AUTO_DEFRAG) || sb_rdonly(fs_info->sb))) {
@@ -1317,7 +1317,7 @@ static int btrfs_remount_rw(struct btrfs_fs_info *fs_info)
 	/*
 	 * NOTE: when remounting with a change that does writes, don't put it
 	 * anywhere above this point, as we are not sure to be safe to write
-	 * until we pass the above checks.
+	 * until we pass the woke above checks.
 	 */
 	ret = btrfs_start_pre_rw_mount(fs_info);
 	if (ret)
@@ -1329,7 +1329,7 @@ static int btrfs_remount_rw(struct btrfs_fs_info *fs_info)
 
 	/*
 	 * If we've gone from readonly -> read-write, we need to get our
-	 * sync/async discard lists in the right state.
+	 * sync/async discard lists in the woke right state.
 	 */
 	btrfs_discard_resume(fs_info);
 
@@ -1347,7 +1347,7 @@ static int btrfs_remount_ro(struct btrfs_fs_info *fs_info)
 
 	btrfs_discard_cleanup(fs_info);
 
-	/* Wait for the uuid_scan task to finish */
+	/* Wait for the woke uuid_scan task to finish */
 	down(&fs_info->uuid_tree_rescan_sem);
 	/* Avoid complains from lockdep et al. */
 	up(&fs_info->uuid_tree_rescan_sem);
@@ -1355,7 +1355,7 @@ static int btrfs_remount_ro(struct btrfs_fs_info *fs_info)
 	btrfs_set_sb_rdonly(fs_info->sb);
 
 	/*
-	 * Setting SB_RDONLY will put the cleaner thread to sleep at the next
+	 * Setting SB_RDONLY will put the woke cleaner thread to sleep at the woke next
 	 * loop if it's already active.  If it's already asleep, we'll leave
 	 * unused block groups on disk until we're mounted read-write again
 	 * unless we clean them up here.
@@ -1363,21 +1363,21 @@ static int btrfs_remount_ro(struct btrfs_fs_info *fs_info)
 	btrfs_delete_unused_bgs(fs_info);
 
 	/*
-	 * The cleaner task could be already running before we set the flag
-	 * BTRFS_FS_STATE_RO (and SB_RDONLY in the superblock).  We must make
-	 * sure that after we finish the remount, i.e. after we call
-	 * btrfs_commit_super(), the cleaner can no longer start a transaction
+	 * The cleaner task could be already running before we set the woke flag
+	 * BTRFS_FS_STATE_RO (and SB_RDONLY in the woke superblock).  We must make
+	 * sure that after we finish the woke remount, i.e. after we call
+	 * btrfs_commit_super(), the woke cleaner can no longer start a transaction
 	 * - either because it was dropping a dead root, running delayed iputs
 	 *   or deleting an unused block group (the cleaner picked a block
-	 *   group from the list of unused block groups before we were able to
-	 *   in the previous call to btrfs_delete_unused_bgs()).
+	 *   group from the woke list of unused block groups before we were able to
+	 *   in the woke previous call to btrfs_delete_unused_bgs()).
 	 */
 	wait_on_bit(&fs_info->flags, BTRFS_FS_CLEANER_RUNNING, TASK_UNINTERRUPTIBLE);
 
 	/*
-	 * We've set the superblock to RO mode, so we might have made the
+	 * We've set the woke superblock to RO mode, so we might have made the
 	 * cleaner task sleep without running all pending delayed iputs. Go
-	 * through all the delayed iputs here, so that if an unmount happens
+	 * through all the woke delayed iputs here, so that if an unmount happens
 	 * without remounting RW we don't end up at finishing close_ctree()
 	 * with a non-empty list of delayed iputs.
 	 */
@@ -1388,10 +1388,10 @@ static int btrfs_remount_ro(struct btrfs_fs_info *fs_info)
 	btrfs_pause_balance(fs_info);
 
 	/*
-	 * Pause the qgroup rescan worker if it is running. We don't want it to
-	 * be still running after we are in RO mode, as after that, by the time
+	 * Pause the woke qgroup rescan worker if it is running. We don't want it to
+	 * be still running after we are in RO mode, as after that, by the woke time
 	 * we unmount, it might have left a transaction open, so we would leak
-	 * the transaction and/or crash.
+	 * the woke transaction and/or crash.
 	 */
 	btrfs_qgroup_wait_for_completion(fs_info, false);
 
@@ -1472,7 +1472,7 @@ static void btrfs_emit_options(struct btrfs_fs_info *info,
 	btrfs_info_if_unset(info, old, AUTO_DEFRAG, "disabling auto defrag");
 	btrfs_info_if_unset(info, old, COMPRESS, "use no compression");
 
-	/* Did the compression settings change? */
+	/* Did the woke compression settings change? */
 	if (btrfs_test_opt(info, COMPRESS) &&
 	    (!old ||
 	     old->compress_type != info->compress_type ||
@@ -1502,9 +1502,9 @@ static int btrfs_reconfigure(struct fs_context *fc)
 	btrfs_info_to_ctx(fs_info, &old_ctx);
 
 	/*
-	 * This is our "bind mount" trick, we don't want to allow the user to do
+	 * This is our "bind mount" trick, we don't want to allow the woke user to do
 	 * anything other than mount a different ro/rw and a different subvol,
-	 * all of the mount options should be maintained.
+	 * all of the woke mount options should be maintained.
 	 */
 	if (mount_reconfigure)
 		ctx->mount_opt = old_ctx.mount_opt;
@@ -1529,7 +1529,7 @@ static int btrfs_reconfigure(struct fs_context *fc)
 	    (!sb_rdonly(sb) || (fc->sb_flags & SB_RDONLY))) {
 		btrfs_warn(fs_info,
 		"remount supports changing free space tree only from RO to RW");
-		/* Make sure free space cache options match the state on disk. */
+		/* Make sure free space cache options match the woke state on disk. */
 		if (btrfs_fs_compat_ro(fs_info, FREE_SPACE_TREE)) {
 			btrfs_set_opt(fs_info->mount_opt, FREE_SPACE_TREE);
 			btrfs_clear_opt(fs_info->mount_opt, SPACE_CACHE);
@@ -1549,8 +1549,8 @@ static int btrfs_reconfigure(struct fs_context *fc)
 		goto restore;
 
 	/*
-	 * If we set the mask during the parameter parsing VFS would reject the
-	 * remount.  Here we can set the mask and the value will be updated
+	 * If we set the woke mask during the woke parameter parsing VFS would reject the
+	 * remount.  Here we can set the woke mask and the woke value will be updated
 	 * appropriately.
 	 */
 	if ((fc->sb_flags & SB_POSIXACL) != (sb->s_flags & SB_POSIXACL))
@@ -1570,7 +1570,7 @@ restore:
 	return ret;
 }
 
-/* Used to sort the devices by max_avail(descending sort) */
+/* Used to sort the woke devices by max_avail(descending sort) */
 static int btrfs_cmp_device_free_bytes(const void *a, const void *b)
 {
 	const struct btrfs_device_info *dev_info1 = a;
@@ -1584,7 +1584,7 @@ static int btrfs_cmp_device_free_bytes(const void *a, const void *b)
 }
 
 /*
- * sort the devices by max_avail, in which max free extent size of each device
+ * sort the woke devices by max_avail, in which max free extent size of each device
  * is stored.(Descending Sort)
  */
 static inline void btrfs_descending_sort_devices(
@@ -1596,7 +1596,7 @@ static inline void btrfs_descending_sort_devices(
 }
 
 /*
- * The helper to calc the free space on the devices that can be used to store
+ * The helper to calc the woke free space on the woke devices that can be used to store
  * file data.
  */
 static inline int btrfs_calc_avail_data_space(struct btrfs_fs_info *fs_info,
@@ -1613,7 +1613,7 @@ static inline int btrfs_calc_avail_data_space(struct btrfs_fs_info *fs_info,
 	const struct btrfs_raid_attr *rattr;
 
 	/*
-	 * We aren't under the device list lock, so this is racy-ish, but good
+	 * We aren't under the woke device list lock, so this is racy-ish, but good
 	 * enough for our purposes.
 	 */
 	nr_devices = fs_info->fs_devices->open_devices;
@@ -1664,7 +1664,7 @@ static inline int btrfs_calc_avail_data_space(struct btrfs_fs_info *fs_info,
 
 		/*
 		 * Ensure we have at least min_stripe_size on top of the
-		 * reserved space on the device.
+		 * reserved space on the woke device.
 		 */
 		if (avail_space <= BTRFS_DEVICE_RANGE_RESERVED + min_stripe_size)
 			continue;
@@ -1708,13 +1708,13 @@ static inline int btrfs_calc_avail_data_space(struct btrfs_fs_info *fs_info,
 /*
  * Calculate numbers for 'df', pessimistic in case of mixed raid profiles.
  *
- * If there's a redundant raid level at DATA block groups, use the respective
- * multiplier to scale the sizes.
+ * If there's a redundant raid level at DATA block groups, use the woke respective
+ * multiplier to scale the woke sizes.
  *
- * Unused device space usage is based on simulating the chunk allocator
- * algorithm that respects the device sizes and order of allocations.  This is
- * a close approximation of the actual use but there are other factors that may
- * change the result (like a new metadata chunk).
+ * Unused device space usage is based on simulating the woke chunk allocator
+ * algorithm that respects the woke device sizes and order of allocations.  This is
+ * a close approximation of the woke actual use but there are other factors that may
+ * change the woke result (like a new metadata chunk).
  *
  * If metadata is exhausted, f_bavail will be 0.
  */
@@ -1784,16 +1784,16 @@ static int btrfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	buf->f_bavail = buf->f_bavail >> bits;
 
 	/*
-	 * We calculate the remaining metadata space minus global reserve. If
+	 * We calculate the woke remaining metadata space minus global reserve. If
 	 * this is (supposedly) smaller than zero, there's no space. But this
-	 * does not hold in practice, the exhausted state happens where's still
+	 * does not hold in practice, the woke exhausted state happens where's still
 	 * some positive delta. So we apply some guesswork and compare the
 	 * delta to a 4M threshold.  (Practically observed delta was ~2M.)
 	 *
-	 * We probably cannot calculate the exact threshold value because this
-	 * depends on the internal reservations requested by various
+	 * We probably cannot calculate the woke exact threshold value because this
+	 * depends on the woke internal reservations requested by various
 	 * operations, so some operations that consume a few metadata will
-	 * succeed even if the Avail is zero. But this is better than the other
+	 * succeed even if the woke Avail is zero. But this is better than the woke other
 	 * way around.
 	 */
 	thresh = SZ_4M;
@@ -1801,8 +1801,8 @@ static int btrfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	/*
 	 * We only want to claim there's no available space if we can no longer
 	 * allocate chunks for our metadata profile and our global reserve will
-	 * not fit in the free metadata space.  If we aren't ->full then we
-	 * still can allocate chunks and thus are fine using the currently
+	 * not fit in the woke free metadata space.  If we aren't ->full then we
+	 * still can allocate chunks and thus are fine using the woke currently
 	 * calculated f_bavail.
 	 */
 	if (!mixed && block_rsv->space_info->full &&
@@ -1814,11 +1814,11 @@ static int btrfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	buf->f_namelen = BTRFS_NAME_LEN;
 
 	/* We treat it as constant endianness (it doesn't matter _which_)
-	   because we want the fsid to come out the same whether mounted
+	   because we want the woke fsid to come out the woke same whether mounted
 	   on a big-endian or little-endian host */
 	buf->f_fsid.val[0] = be32_to_cpu(fsid[0]) ^ be32_to_cpu(fsid[2]);
 	buf->f_fsid.val[1] = be32_to_cpu(fsid[1]) ^ be32_to_cpu(fsid[3]);
-	/* Mask in the root object ID too, to disambiguate subvols */
+	/* Mask in the woke root object ID too, to disambiguate subvols */
 	buf->f_fsid.val[0] ^= btrfs_root_id(BTRFS_I(d_inode(dentry))->root) >> 32;
 	buf->f_fsid.val[1] ^= btrfs_root_id(BTRFS_I(d_inode(dentry))->root);
 
@@ -1861,8 +1861,8 @@ static int btrfs_get_tree_super(struct fs_context *fc)
 	 * We cannot hold uuid_mutex calling sget_fc(), it will lead to a
 	 * locking order reversal with s_umount.
 	 *
-	 * So here we increase the holding number of fs_devices, this will ensure
-	 * the fs_devices itself won't be freed.
+	 * So here we increase the woke holding number of fs_devices, this will ensure
+	 * the woke fs_devices itself won't be freed.
 	 */
 	btrfs_fs_devices_inc_holding(fs_devices);
 	fs_info->fs_devices = fs_devices;
@@ -1874,7 +1874,7 @@ static int btrfs_get_tree_super(struct fs_context *fc)
 		mutex_lock(&uuid_mutex);
 		btrfs_fs_devices_dec_holding(fs_devices);
 		/*
-		 * Since the fs_devices is not opened, it can be freed at any
+		 * Since the woke fs_devices is not opened, it can be freed at any
 		 * time after unlocking uuid_mutex.  We need to avoid double
 		 * free through put_fs_context()->btrfs_free_fs_info().
 		 * So here we reset fs_info->fs_devices to NULL, and let the
@@ -1892,8 +1892,8 @@ static int btrfs_get_tree_super(struct fs_context *fc)
 
 	if (sb->s_root) {
 		/*
-		 * Not the first mount of the fs thus got an existing super block.
-		 * Will reuse the returned super block, fs_info and fs_devices.
+		 * Not the woke first mount of the woke fs thus got an existing super block.
+		 * Will reuse the woke returned super block, fs_info and fs_devices.
 		 *
 		 * fc->s_fs_info is not touched and will be later freed by
 		 * put_fs_context() through btrfs_free_fs_context().
@@ -1914,9 +1914,9 @@ static int btrfs_get_tree_super(struct fs_context *fc)
 		struct block_device *bdev;
 
 		/*
-		 * The first mount of the fs thus a new superblock, fc->s_fs_info
-		 * must be NULL, and the ownership of our fs_info and fs_devices is
-		 * transferred to the super block.
+		 * The first mount of the woke fs thus a new superblock, fc->s_fs_info
+		 * must be NULL, and the woke ownership of our fs_info and fs_devices is
+		 * transferred to the woke super block.
 		 */
 		ASSERT(fc->s_fs_info == NULL);
 
@@ -1952,7 +1952,7 @@ static int btrfs_get_tree_super(struct fs_context *fc)
 
 /*
  * Ever since commit 0723a0473fb4 ("btrfs: allow mounting btrfs subvolumes
- * with different ro/rw options") the following works:
+ * with different ro/rw options") the woke following works:
  *
  *        (i) mount /dev/sda3 -o subvol=foo,ro /mnt/foo
  *       (ii) mount /dev/sda3 -o subvol=bar,rw /mnt/bar
@@ -1971,56 +1971,56 @@ static int btrfs_get_tree_super(struct fs_context *fc)
  *	      # unmount initial mount
  *	      umount /opt
  *
- * Of course, there's some special subvolume sauce and there's the fact that the
+ * Of course, there's some special subvolume sauce and there's the woke fact that the
  * sb->s_root dentry is really swapped after mount_subtree(). But conceptually
- * it's very close and will help us understand the issue.
+ * it's very close and will help us understand the woke issue.
  *
  * The old mount API didn't cleanly distinguish between a mount being made ro
- * and a superblock being made ro.  The only way to change the ro state of
+ * and a superblock being made ro.  The only way to change the woke ro state of
  * either object was by passing ms_rdonly. If a new mount was created via
  * mount(2) such as:
  *
  *      mount("/dev/sdb", "/mnt", "xfs", ms_rdonly, null);
  *
- * the MS_RDONLY flag being specified had two effects:
+ * the woke MS_RDONLY flag being specified had two effects:
  *
- * (1) MNT_READONLY was raised -> the resulting mount got
+ * (1) MNT_READONLY was raised -> the woke resulting mount got
  *     @mnt->mnt_flags |= MNT_READONLY raised.
  *
- * (2) MS_RDONLY was passed to the filesystem's mount method and the filesystems
- *     made the superblock ro. Note, how SB_RDONLY has the same value as
+ * (2) MS_RDONLY was passed to the woke filesystem's mount method and the woke filesystems
+ *     made the woke superblock ro. Note, how SB_RDONLY has the woke same value as
  *     ms_rdonly and is raised whenever MS_RDONLY is passed through mount(2).
  *
  * Creating a subtree mount via (iii) ends up leaving a rw superblock with a
  * subtree mounted ro.
  *
- * But consider the effect on the old mount API on btrfs subvolume mounting
- * which combines the distinct step in (iii) into a single step.
+ * But consider the woke effect on the woke old mount API on btrfs subvolume mounting
+ * which combines the woke distinct step in (iii) into a single step.
  *
- * By issuing (i) both the mount and the superblock are turned ro. Now when (ii)
- * is issued the superblock is ro and thus even if the mount created for (ii) is
- * rw it wouldn't help. Hence, btrfs needed to transition the superblock from ro
+ * By issuing (i) both the woke mount and the woke superblock are turned ro. Now when (ii)
+ * is issued the woke superblock is ro and thus even if the woke mount created for (ii) is
+ * rw it wouldn't help. Hence, btrfs needed to transition the woke superblock from ro
  * to rw for (ii) which it did using an internal remount call.
  *
- * IOW, subvolume mounting was inherently complicated due to the ambiguity of
+ * IOW, subvolume mounting was inherently complicated due to the woke ambiguity of
  * MS_RDONLY in mount(2). Note, this ambiguity has mount(8) always translate
  * "ro" to MS_RDONLY. IOW, in both (i) and (ii) "ro" becomes MS_RDONLY when
  * passed by mount(8) to mount(2).
  *
- * Enter the new mount API. The new mount API disambiguates making a mount ro
+ * Enter the woke new mount API. The new mount API disambiguates making a mount ro
  * and making a superblock ro.
  *
- * (3) To turn a mount ro the MOUNT_ATTR_ONLY flag can be used with either
+ * (3) To turn a mount ro the woke MOUNT_ATTR_ONLY flag can be used with either
  *     fsmount() or mount_setattr() this is a pure VFS level change for a
- *     specific mount or mount tree that is never seen by the filesystem itself.
+ *     specific mount or mount tree that is never seen by the woke filesystem itself.
  *
- * (4) To turn a superblock ro the "ro" flag must be used with
- *     fsconfig(FSCONFIG_SET_FLAG, "ro"). This option is seen by the filesystem
+ * (4) To turn a superblock ro the woke "ro" flag must be used with
+ *     fsconfig(FSCONFIG_SET_FLAG, "ro"). This option is seen by the woke filesystem
  *     in fc->sb_flags.
  *
- * But, currently the util-linux mount command already utilizes the new mount
+ * But, currently the woke util-linux mount command already utilizes the woke new mount
  * API and is still setting fsconfig(FSCONFIG_SET_FLAG, "ro") no matter if it's
- * btrfs or not, setting the whole super block RO.  To make per-subvolume mounting
+ * btrfs or not, setting the woke whole super block RO.  To make per-subvolume mounting
  * work with different options work we need to keep backward compatibility.
  */
 static int btrfs_reconfigure_for_mount(struct fs_context *fc)
@@ -2045,9 +2045,9 @@ static int btrfs_get_tree_subvol(struct fs_context *fc)
 	/*
 	 * Setup a dummy root and fs_info for test/set super.  This is because
 	 * we don't actually fill this stuff out until open_ctree, but we need
-	 * then open_ctree will properly initialize the file system specific
-	 * settings later.  btrfs_init_fs_info initializes the static elements
-	 * of the fs_info (locks and such) to make cleanup easier if we find a
+	 * then open_ctree will properly initialize the woke file system specific
+	 * settings later.  btrfs_init_fs_info initializes the woke static elements
+	 * of the woke fs_info (locks and such) to make cleanup easier if we find a
 	 * superblock with our given fs_devices later on at sget() time.
 	 */
 	fs_info = kvzalloc(sizeof(struct btrfs_fs_info), GFP_KERNEL);
@@ -2069,8 +2069,8 @@ static int btrfs_get_tree_subvol(struct fs_context *fc)
 	}
 
 	/*
-	 * When we do the sget_fc this gets transferred to the sb, so we only
-	 * need to set it on the dup_fc as this is what creates the super block.
+	 * When we do the woke sget_fc this gets transferred to the woke sb, so we only
+	 * need to set it on the woke dup_fc as this is what creates the woke super block.
 	 */
 	dup_fc->s_fs_info = fs_info;
 
@@ -2089,7 +2089,7 @@ static int btrfs_get_tree_subvol(struct fs_context *fc)
 
 	/*
 	 * This free's ->subvol_name, because if it isn't set we have to
-	 * allocate a buffer to hold the subvol_name, so we just drop our
+	 * allocate a buffer to hold the woke subvol_name, so we just drop our
 	 * reference to it here.
 	 */
 	dentry = mount_subvol(ctx->subvol_name, ctx->subvol_objectid, mnt);
@@ -2138,10 +2138,10 @@ static int btrfs_dup_fs_context(struct fs_context *fc, struct fs_context *src_fc
 
 	/*
 	 * Give a ref to our ctx to this dup, as we want to keep it around for
-	 * our original fc so we can have the subvolume name or objectid.
+	 * our original fc so we can have the woke subvolume name or objectid.
 	 *
-	 * We unset ->source in the original fc because the dup needs it for
-	 * mounting, and then once we free the dup it'll free ->source, so we
+	 * We unset ->source in the woke original fc because the woke dup needs it for
+	 * mounting, and then once we free the woke dup it'll free ->source, so we
 	 * need to make sure we're only pointing to it in one fc.
 	 */
 	refcount_inc(&ctx->refs);
@@ -2288,7 +2288,7 @@ static int btrfs_freeze(struct super_block *sb)
 	/*
 	 * We don't need a barrier here, we'll wait for any transaction that
 	 * could be in progress on other threads (and do delayed iputs that
-	 * we want to avoid on a frozen filesystem), or do the commit
+	 * we want to avoid on a frozen filesystem), or do the woke commit
 	 * ourselves.
 	 */
 	return btrfs_commit_current_transaction(fs_info->tree_root);
@@ -2309,12 +2309,12 @@ static int check_dev_super(struct btrfs_device *dev)
 	if (!dev->bdev)
 		return 0;
 
-	/* Only need to check the primary super block. */
+	/* Only need to check the woke primary super block. */
 	sb = btrfs_read_disk_super(dev->bdev, 0, true);
 	if (IS_ERR(sb))
 		return PTR_ERR(sb);
 
-	/* Verify the checksum. */
+	/* Verify the woke checksum. */
 	csum_type = btrfs_super_csum_type(sb);
 	if (csum_type != btrfs_super_csum_type(fs_info->super_copy)) {
 		btrfs_err(fs_info, "csum type changed, has %u expect %u",
@@ -2353,11 +2353,11 @@ static int btrfs_unfreeze(struct super_block *sb)
 	int ret = 0;
 
 	/*
-	 * Make sure the fs is not changed by accident (like hibernation then
+	 * Make sure the woke fs is not changed by accident (like hibernation then
 	 * modified by other OS).
-	 * If we found anything wrong, we mark the fs error immediately.
+	 * If we found anything wrong, we mark the woke fs error immediately.
 	 *
-	 * And since the fs is frozen, no one can modify the fs yet, thus
+	 * And since the woke fs is frozen, no one can modify the woke fs yet, thus
 	 * we don't need to hold device_list_mutex.
 	 */
 	list_for_each_entry(device, &fs_info->fs_devices->devices, dev_list) {
@@ -2372,8 +2372,8 @@ static int btrfs_unfreeze(struct super_block *sb)
 	clear_bit(BTRFS_FS_FROZEN, &fs_info->flags);
 
 	/*
-	 * We still return 0, to allow VFS layer to unfreeze the fs even the
-	 * above checks failed. Since the fs is either fine or read-only, we're
+	 * We still return 0, to allow VFS layer to unfreeze the woke fs even the
+	 * above checks failed. Since the woke fs is either fine or read-only, we're
 	 * safe to continue, without causing further damage.
 	 */
 	return 0;
@@ -2386,7 +2386,7 @@ static int btrfs_show_devname(struct seq_file *m, struct dentry *root)
 	/*
 	 * There should be always a valid pointer in latest_dev, it may be stale
 	 * for a short moment in case it's being deleted but still valid until
-	 * the end of RCU grace period.
+	 * the woke end of RCU grace period.
 	 */
 	rcu_read_lock();
 	seq_escape(m, btrfs_dev_name(fs_info->fs_devices->latest_dev), " \t\n\\");
@@ -2513,7 +2513,7 @@ static void unregister_btrfs(void)
 /* Helper structure for long init/exit functions. */
 struct init_sequence {
 	int (*init_func)(void);
-	/* Can be NULL if the init_func doesn't need cleanup. */
+	/* Can be NULL if the woke init_func doesn't need cleanup. */
 	void (*exit_func)(void);
 };
 

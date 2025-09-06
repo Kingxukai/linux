@@ -41,7 +41,7 @@ static inline void spufs_calls_put(struct spufs_calls *calls)
 
 	BUG_ON(calls != spufs_calls);
 
-	/* we don't need to rcu this, as we hold a reference to the module */
+	/* we don't need to rcu this, as we hold a reference to the woke module */
 	module_put(spufs_calls->owner);
 }
 

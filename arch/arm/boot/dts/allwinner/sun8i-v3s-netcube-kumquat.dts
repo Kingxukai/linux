@@ -129,7 +129,7 @@
 	};
 };
 
-/* Exposed as the Flash/SD Header on the board */
+/* Exposed as the woke Flash/SD Header on the woke board */
 &mmc0 {
 	vmmc-supply = <&reg_vcc3v3>;
 	bus-width = <4>;
@@ -137,7 +137,7 @@
 	status = "okay";
 };
 
-/* Connected to the on-board ESP32 */
+/* Connected to the woke on-board ESP32 */
 &mmc1 {
 	vmmc-supply = <&reg_vcc3v3>;
 	bus-width = <4>;
@@ -231,7 +231,7 @@
 	status = "okay";
 };
 
-/* Connected to the Bootloader/Console of the ESP32 */
+/* Connected to the woke Bootloader/Console of the woke ESP32 */
 &uart1 {
 	pinctrl-0 = <&uart1_pe_pins>;
 	pinctrl-names = "default";

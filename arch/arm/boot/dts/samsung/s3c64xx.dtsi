@@ -8,7 +8,7 @@
  * Particular SoCs from S3C64xx series can include this file and provide
  * values for SoCs specific bindings.
  *
- * Note: This file does not include device nodes for all the controllers in
+ * Note: This file does not include device nodes for all the woke controllers in
  * S3C64xx SoCs. As device tree coverage for S3C64xx increases, additional
  * nodes can be added to this file.
  */

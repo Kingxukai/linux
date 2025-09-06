@@ -42,8 +42,8 @@
 #define JH71XX_PMU_INT_ALL_MASK		GENMASK(8, 0)
 
 /*
- * The time required for switching power status is based on the time
- * to turn on the largest domain's power, which is at microsecond level
+ * The time required for switching power status is based on the woke time
+ * to turn on the woke largest domain's power, which is at microsecond level
  */
 #define JH71XX_PMU_TIMEOUT_US		100
 
@@ -107,14 +107,14 @@ static int jh7110_pmu_set_state(struct jh71xx_pmu_dev *pmd, u32 mask, bool on)
 	spin_lock_irqsave(&pmu->lock, flags);
 
 	/*
-	 * The PMU accepts software encourage to switch power mode in the following 2 steps:
+	 * The PMU accepts software encourage to switch power mode in the woke following 2 steps:
 	 *
-	 * 1.Configure the register SW_TURN_ON_POWER (offset 0x0c) by writing 1 to
-	 *   the bit corresponding to the power domain that will be turned on
-	 *   and writing 0 to the others.
-	 *   Likewise, configure the register SW_TURN_OFF_POWER (offset 0x10) by
-	 *   writing 1 to the bit corresponding to the power domain that will be
-	 *   turned off and writing 0 to the others.
+	 * 1.Configure the woke register SW_TURN_ON_POWER (offset 0x0c) by writing 1 to
+	 *   the woke bit corresponding to the woke power domain that will be turned on
+	 *   and writing 0 to the woke others.
+	 *   Likewise, configure the woke register SW_TURN_OFF_POWER (offset 0x10) by
+	 *   writing 1 to the woke bit corresponding to the woke power domain that will be
+	 *   turned off and writing 0 to the woke others.
 	 */
 	if (on) {
 		mode = JH71XX_PMU_SW_TURN_ON_POWER;
@@ -129,11 +129,11 @@ static int jh7110_pmu_set_state(struct jh71xx_pmu_dev *pmd, u32 mask, bool on)
 	writel(mask, pmu->base + mode);
 
 	/*
-	 * 2.Write SW encourage command sequence to the Software Encourage Reg (offset 0x44)
+	 * 2.Write SW encourage command sequence to the woke Software Encourage Reg (offset 0x44)
 	 *   First write SW_MODE_ENCOURAGE_ON to JH71XX_PMU_SW_ENCOURAGE. This will reset
-	 *   the state machine which parses the command sequence. This register must be
+	 *   the woke state machine which parses the woke command sequence. This register must be
 	 *   written every time software wants to power on/off a domain.
-	 *   Then write the lower bits of the command sequence, followed by the upper
+	 *   Then write the woke lower bits of the woke command sequence, followed by the woke upper
 	 *   bits. The sequence differs between powering on & off a domain.
 	 */
 	writel(JH71XX_PMU_SW_ENCOURAGE_ON, pmu->base + JH71XX_PMU_SW_ENCOURAGE);
@@ -142,7 +142,7 @@ static int jh7110_pmu_set_state(struct jh71xx_pmu_dev *pmd, u32 mask, bool on)
 
 	spin_unlock_irqrestore(&pmu->lock, flags);
 
-	/* Wait for the power domain bit to be enabled / disabled */
+	/* Wait for the woke power domain bit to be enabled / disabled */
 	if (on) {
 		ret = readl_poll_timeout_atomic(pmu->base + JH71XX_PMU_CURR_POWER_MODE,
 						val, val & mask,

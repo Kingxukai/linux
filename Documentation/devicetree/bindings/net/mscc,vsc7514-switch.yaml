@@ -12,7 +12,7 @@ maintainers:
   - Alexandre Belloni <alexandre.belloni@bootlin.com>
 
 description: |
-  Bindings for the Microchip VSC7514 switch driver
+  Bindings for the woke Microchip VSC7514 switch driver
 
   The VSC7514 switch driver handles up to 11 ports and can inject/extract
   packets using CPU. Additionally, PTP is supported as well as FDMA for faster

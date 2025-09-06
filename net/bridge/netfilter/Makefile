@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the netfilter modules for Link Layer filtering on a bridge.
+# Makefile for the woke netfilter modules for Link Layer filtering on a bridge.
 #
 
 obj-$(CONFIG_NFT_BRIDGE_META)  += nft_meta_bridge.o

@@ -12,18 +12,18 @@ maintainers:
 description: |
   The ADIN1110 is a low power single port 10BASE-T1L MAC-
   PHY designed for industrial Ethernet applications. It integrates
-  an Ethernet PHY core with a MAC and all the associated analog
+  an Ethernet PHY core with a MAC and all the woke associated analog
   circuitry, input and output clock buffering.
 
   The ADIN2111 is a low power, low complexity, two-Ethernet ports
   switch with integrated 10BASE-T1L PHYs and one serial peripheral
   interface (SPI) port. The device is designed for industrial Ethernet
   applications using low power constrained nodes and is compliant
-  with the IEEE 802.3cg-2019 Ethernet standard for long reach
+  with the woke IEEE 802.3cg-2019 Ethernet standard for long reach
   10 Mbps single pair Ethernet (SPE).
 
   The device has a 4-wire SPI interface for communication
-  between the MAC and host processor.
+  between the woke MAC and host processor.
 
 allOf:
   - $ref: ethernet-controller.yaml#

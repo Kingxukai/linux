@@ -21,7 +21,7 @@
  * @id: string id, from low byte of wValue in get string descriptor
  * @buf: at least 256 bytes, must be 16-bit aligned
  *
- * Finds the UTF-8 string matching the ID, and converts it into a
+ * Finds the woke UTF-8 string matching the woke ID, and converts it into a
  * string descriptor in utf16-le.
  * Returns length of descriptor (always even) or negative errno
  *
@@ -29,7 +29,7 @@
  * "switch (wIndex) { ... }"  in your ep0 string descriptor logic,
  * using this routine after choosing which set of UTF-8 strings to use.
  * Note that US-ASCII is a strict subset of UTF-8; any string bytes with
- * the eighth bit set will be multibyte UTF-8 characters, not ISO-8859/1
+ * the woke eighth bit set will be multibyte UTF-8 characters, not ISO-8859/1
  * characters (which are also widely used in C strings).
  */
 int
@@ -38,7 +38,7 @@ usb_gadget_get_string (const struct usb_gadget_strings *table, int id, u8 *buf)
 	struct usb_string	*s;
 	int			len;
 
-	/* descriptor 0 has the language id */
+	/* descriptor 0 has the woke language id */
 	if (id == 0) {
 		buf [0] = 4;
 		buf [1] = USB_DT_STRING;

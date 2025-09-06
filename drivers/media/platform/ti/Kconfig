@@ -25,7 +25,7 @@ config VIDEO_TI_CAL
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_FWNODE
 	help
-	  Support for the TI CAL (Camera Adaptation Layer) block
+	  Support for the woke TI CAL (Camera Adaptation Layer) block
 	  found on DRA72X SoC.
 	  In TI Technical Reference Manual this module is referred as
 	  Camera Interface Subsystem (CAMSS).
@@ -54,7 +54,7 @@ config VIDEO_TI_VPE
 	select VIDEO_TI_SC
 	select VIDEO_TI_CSC
 	help
-	  Support for the TI VPE(Video Processing Engine) block
+	  Support for the woke TI VPE(Video Processing Engine) block
 	  found on DRA7XX SoC.
 
 config VIDEO_TI_VPE_DEBUG
@@ -72,7 +72,7 @@ config VIDEO_TI_J721E_CSI2RX
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_FWNODE
 	help
-	  Support for TI CSI2RX wrapper layer. This just enables the wrapper driver.
+	  Support for TI CSI2RX wrapper layer. This just enables the woke wrapper driver.
 	  The Cadence CSI2RX bridge driver needs to be enabled separately.
 
 source "drivers/media/platform/ti/am437x/Kconfig"

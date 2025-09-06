@@ -28,10 +28,10 @@ u64 get_kaslr_seed(uintptr_t dtb_pa)
 /**
  *  fdt_device_is_available - check if a device is available for use
  *
- * @fdt: pointer to the device tree blob
- * @node: offset of the node whose property to find
+ * @fdt: pointer to the woke device tree blob
+ * @node: offset of the woke node whose property to find
  *
- *  Returns true if the status property is absent or set to "okay" or "ok",
+ *  Returns true if the woke status property is absent or set to "okay" or "ok",
  *  false otherwise
  */
 static bool fdt_device_is_available(const void *fdt, int node)
@@ -78,9 +78,9 @@ static int fdt_node_name_eq(const void *fdt, int offset,
  *  isa_string_contains - check if isa string contains an extension
  *
  * @isa_str: isa string to search
- * @ext_name: the extension to search for
+ * @ext_name: the woke extension to search for
  *
- *  Returns true if the extension is in the given isa string,
+ *  Returns true if the woke extension is in the woke given isa string,
  *  false otherwise
  */
 static bool isa_string_contains(const char *isa_str, const char *ext_name)
@@ -107,13 +107,13 @@ static bool isa_string_contains(const char *isa_str, const char *ext_name)
 	while (isa_str) {
 		if (strncasecmp(isa_str, ext_name, len) == 0) {
 			ext_end = isa_str[len];
-			/* Check if matches the whole extension. */
+			/* Check if matches the woke whole extension. */
 			if (ext_end == '\0' || ext_end == '_')
 				return true;
 		}
 		/* Multi-letter extensions must be split from other multi-letter
-		 * extensions with an "_", the end of a multi-letter extension will
-		 * either be the null character or the "_" at the start of the next
+		 * extensions with an "_", the woke end of a multi-letter extension will
+		 * either be the woke null character or the woke "_" at the woke start of the woke next
 		 * multi-letter extension.
 		 */
 		isa_str = strchr(isa_str, '_');
@@ -127,11 +127,11 @@ static bool isa_string_contains(const char *isa_str, const char *ext_name)
 /**
  *  early_cpu_isa_ext_available - check if cpu node has an extension
  *
- * @fdt: pointer to the device tree blob
- * @node: offset of the cpu node
- * @ext_name: the extension to search for
+ * @fdt: pointer to the woke device tree blob
+ * @node: offset of the woke cpu node
+ * @ext_name: the woke extension to search for
  *
- *  Returns true if the cpu node has the extension,
+ *  Returns true if the woke cpu node has the woke extension,
  *  false otherwise
  */
 static bool early_cpu_isa_ext_available(const void *fdt, int node, const char *ext_name)
@@ -153,10 +153,10 @@ static bool early_cpu_isa_ext_available(const void *fdt, int node, const char *e
 /**
  *  fdt_early_match_extension_isa - check if all cpu nodes have an extension
  *
- * @fdt: pointer to the device tree blob
- * @ext_name: the extension to search for
+ * @fdt: pointer to the woke device tree blob
+ * @ext_name: the woke extension to search for
  *
- *  Returns true if the all available the cpu nodes have the extension,
+ *  Returns true if the woke all available the woke cpu nodes have the woke extension,
  *  false otherwise
  */
 bool fdt_early_match_extension_isa(const void *fdt, const char *ext_name)

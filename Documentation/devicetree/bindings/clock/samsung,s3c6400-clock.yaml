@@ -10,7 +10,7 @@ maintainers:
   - Krzysztof Kozlowski <krzk@kernel.org>
 
 description: |
-  There are several clocks that are generated outside the SoC. It is expected
+  There are several clocks that are generated outside the woke SoC. It is expected
   that they are defined using standard clock bindings with following
   clock-output-names and/or provided as clock inputs to this clock controller:
    - "fin_pll" - PLL input clock (xtal/extclk) - required,

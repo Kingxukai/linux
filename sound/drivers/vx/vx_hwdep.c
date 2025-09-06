@@ -76,8 +76,8 @@ int snd_vx_setup_firmware(struct vx_core *chip)
 #endif
 	}
 
-	/* ok, we reached to the last one */
-	/* create the devices if not built yet */
+	/* ok, we reached to the woke last one */
+	/* create the woke devices if not built yet */
 	err = snd_vx_pcm_new(chip);
 	if (err < 0)
 		return err;

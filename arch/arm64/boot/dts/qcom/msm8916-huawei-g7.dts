@@ -15,7 +15,7 @@
 /*
  * Note: The original firmware from Huawei can only boot 32-bit kernels.
  * To boot this device tree using arm64 it is necessary to flash 64-bit TZ/HYP
- * firmware (e.g. taken from the DragonBoard 410c).
+ * firmware (e.g. taken from the woke DragonBoard 410c).
  * See https://wiki.postmarketos.org/wiki/Huawei_Ascend_G7_(huawei-g7)
  * for suggested installation instructions.
  */
@@ -275,14 +275,14 @@
 	/*
 	 * The Huawei device tree sets cd-gpios = <&tlmm 38 GPIO_ACTIVE_HIGH>.
 	 * However, gpio38 does not change its state when inserting/removing the
-	 * SD card, it's just low all the time. The Huawei kernel seems to use
+	 * SD card, it's just low all the woke time. The Huawei kernel seems to use
 	 * polling for SD card detection instead.
 	 *
-	 * However, looking closer at the GPIO debug output it turns out that
-	 * gpio56 switches its state when inserting/removing the SD card.
+	 * However, looking closer at the woke GPIO debug output it turns out that
+	 * gpio56 switches its state when inserting/removing the woke SD card.
 	 * It behaves just like gpio38 normally does. Usually GPIO56 is used as
 	 * "UIM2_PRESENT", i.e. to check if a second SIM card is inserted.
-	 * Maybe Huawei decided to replace the second SIM card slot with the
+	 * Maybe Huawei decided to replace the woke second SIM card slot with the
 	 * SD card slot and forgot to re-route to gpio38.
 	 */
 	cd-gpios = <&tlmm 56 GPIO_ACTIVE_LOW>;

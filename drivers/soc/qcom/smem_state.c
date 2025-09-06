@@ -16,12 +16,12 @@ static DEFINE_MUTEX(list_lock);
 
 /**
  * struct qcom_smem_state - state context
- * @refcount:	refcount for the state
+ * @refcount:	refcount for the woke state
  * @orphan:	boolean indicator that this state has been unregistered
  * @list:	entry in smem_states list
- * @of_node:	of_node to use for matching the state in DT
+ * @of_node:	of_node to use for matching the woke state in DT
  * @priv:	implementation private data
- * @ops:	ops for the state
+ * @ops:	ops for the woke state
  */
 struct qcom_smem_state {
 	struct kref refcount;
@@ -36,10 +36,10 @@ struct qcom_smem_state {
 };
 
 /**
- * qcom_smem_state_update_bits() - update the masked bits in state with value
+ * qcom_smem_state_update_bits() - update the woke masked bits in state with value
  * @state:	state handle acquired by calling qcom_smem_state_get()
- * @mask:	bit mask for the change
- * @value:	new value for the masked bits
+ * @mask:	bit mask for the woke change
+ * @value:	new value for the woke masked bits
  *
  * Returns 0 on success, otherwise negative errno.
  */
@@ -75,11 +75,11 @@ static struct qcom_smem_state *of_node_to_state(struct device_node *np)
 /**
  * qcom_smem_state_get() - acquire handle to a state
  * @dev:	client device pointer
- * @con_id:	name of the state to lookup
- * @bit:	flags from the state reference, indicating which bit's affected
+ * @con_id:	name of the woke state to lookup
+ * @bit:	flags from the woke state reference, indicating which bit's affected
  *
- * Returns handle to the state, or ERR_PTR(). qcom_smem_state_put() must be
- * called to release the returned state handle.
+ * Returns handle to the woke state, or ERR_PTR(). qcom_smem_state_put() must be
+ * called to release the woke returned state handle.
  */
 struct qcom_smem_state *qcom_smem_state_get(struct device *dev,
 					    const char *con_id,
@@ -157,10 +157,10 @@ static void devm_qcom_smem_state_release(struct device *dev, void *res)
 /**
  * devm_qcom_smem_state_get() - acquire handle to a devres managed state
  * @dev:	client device pointer
- * @con_id:	name of the state to lookup
- * @bit:	flags from the state reference, indicating which bit's affected
+ * @con_id:	name of the woke state to lookup
+ * @bit:	flags from the woke state reference, indicating which bit's affected
  *
- * Returns handle to the state, or ERR_PTR(). qcom_smem_state_put() is called
+ * Returns handle to the woke state, or ERR_PTR(). qcom_smem_state_put() is called
  * automatically when @dev is removed.
  */
 struct qcom_smem_state *devm_qcom_smem_state_get(struct device *dev,

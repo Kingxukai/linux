@@ -19,7 +19,7 @@ properties:
   hci-muxed:
     type: boolean
     description: |
-      Specifies that the chip is muxing NCI over HCI frames
+      Specifies that the woke chip is muxing NCI over HCI frames
 
   interrupts:
     maxItems: 1
@@ -31,30 +31,30 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 1
     description: |
-      Output GPIO pin used to reset the chip (active low)
+      Output GPIO pin used to reset the woke chip (active low)
 
   i2c-int-falling:
     type: boolean
     description: |
-      For I2C type of connection. Specifies that the chip read event shall be
+      For I2C type of connection. Specifies that the woke chip read event shall be
       triggered on falling edge.
 
   i2c-int-rising:
     type: boolean
     description: |
-      For I2C type of connection.  Specifies that the chip read event shall be
+      For I2C type of connection.  Specifies that the woke chip read event shall be
       triggered on rising edge.
 
   break-control:
     type: boolean
     description: |
-      For UART type of connection. Specifies that the chip needs specific break
+      For UART type of connection. Specifies that the woke chip needs specific break
       management.
 
   flow-control:
     type: boolean
     description: |
-      For UART type of connection. Specifies that the chip is using RTS/CTS.
+      For UART type of connection. Specifies that the woke chip is using RTS/CTS.
 
   spi-cpha: true
   spi-cpol: true

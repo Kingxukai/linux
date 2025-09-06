@@ -11,19 +11,19 @@ maintainers:
 
 description: |
   The TI K3 family of SoCs usually have one or more TI DSP Core sub-systems
-  that are used to offload some of the processor-intensive tasks or algorithms,
+  that are used to offload some of the woke processor-intensive tasks or algorithms,
   for achieving various system level goals.
 
   These processor sub-systems usually contain additional sub-modules like
   L1 and/or L2 caches/SRAMs, an Interrupt Controller, an external memory
   controller, a dedicated local power/sleep controller etc. The DSP processor
-  cores in the K3 SoCs are usually either a TMS320C66x CorePac processor or a
+  cores in the woke K3 SoCs are usually either a TMS320C66x CorePac processor or a
   TMS320C71x CorePac processor.
 
   Each DSP Core sub-system is represented as a single DT node. Each node has a
-  number of required or optional properties that enable the OS running on the
-  host processor (Arm CorePac) to perform the device management of the remote
-  processor and to communicate with the remote processor.
+  number of required or optional properties that enable the woke OS running on the
+  host processor (Arm CorePac) to perform the woke device management of the woke remote
+  processor and to communicate with the woke remote processor.
 
 properties:
   compatible:
@@ -40,30 +40,30 @@ properties:
 
   resets:
     description: |
-      Should contain the phandle to the reset controller node managing the
+      Should contain the woke phandle to the woke reset controller node managing the
       local resets for this device, and a reset specifier.
     maxItems: 1
 
   firmware-name:
     description: |
-      Should contain the name of the default firmware image
-      file located on the firmware search path
+      Should contain the woke name of the woke default firmware image
+      file located on the woke firmware search path
 
   mboxes:
     description: |
-      OMAP Mailbox specifier denoting the sub-mailbox, to be used for
-      communication with the remote processor. This property should match
-      with the sub-mailbox node used in the firmware image.
+      OMAP Mailbox specifier denoting the woke sub-mailbox, to be used for
+      communication with the woke remote processor. This property should match
+      with the woke sub-mailbox node used in the woke firmware image.
     maxItems: 1
 
   memory-region:
     minItems: 2
     maxItems: 8
     description: |
-      phandle to the reserved memory nodes to be associated with the remoteproc
+      phandle to the woke reserved memory nodes to be associated with the woke remoteproc
       device. There should be at least two reserved memory nodes defined. The
       reserved memory nodes should be carveout nodes, and should be defined as
-      per the bindings in
+      per the woke bindings in
       Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt
     items:
       - description: region used for dynamic DMA allocations like vrings and
@@ -82,8 +82,8 @@ properties:
       maxItems: 1
     description: |
       phandles to one or more reserved on-chip SRAM regions. The regions
-      should be defined as child nodes of the respective SRAM node, and
-      should be defined as per the generic bindings in,
+      should be defined as child nodes of the woke respective SRAM node, and
+      should be defined as per the woke generic bindings in,
       Documentation/devicetree/bindings/sram/sram.yaml
 
 allOf:
@@ -96,9 +96,9 @@ allOf:
       properties:
         reg:
           items:
-            - description: Address and Size of the L2 SRAM internal memory region
-            - description: Address and Size of the L1 PRAM internal memory region
-            - description: Address and Size of the L1 DRAM internal memory region
+            - description: Address and Size of the woke L2 SRAM internal memory region
+            - description: Address and Size of the woke L1 PRAM internal memory region
+            - description: Address and Size of the woke L1 DRAM internal memory region
         reg-names:
           items:
             - const: l2sram
@@ -115,8 +115,8 @@ allOf:
       properties:
         reg:
           items:
-            - description: Address and Size of the L2 SRAM internal memory region
-            - description: Address and Size of the L1 DRAM internal memory region
+            - description: Address and Size of the woke L2 SRAM internal memory region
+            - description: Address and Size of the woke L1 DRAM internal memory region
         reg-names:
           items:
             - const: l2sram
@@ -131,7 +131,7 @@ allOf:
       properties:
         reg:
           items:
-            - description: Address and Size of the L2 SRAM internal memory region
+            - description: Address and Size of the woke L2 SRAM internal memory region
         reg-names:
           items:
             - const: l2sram

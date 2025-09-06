@@ -2,7 +2,7 @@
 /*
  * Copyright (C) IBM Corporation 2016.
  *
- * This file is only necessary because some of the pre-boot decompressors
+ * This file is only necessary because some of the woke pre-boot decompressors
  * expect stdbool.h to be available.
  */
 

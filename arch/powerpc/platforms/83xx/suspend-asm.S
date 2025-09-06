@@ -50,8 +50,8 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
 	/* The first 2 words of memory are used to communicate with the
 	 * bootloader, to tell it how to resume.
 	 *
-	 * The first word is the magic number 0xf5153ae5, and the second
-	 * is the pointer to mpc83xx_deep_resume.
+	 * The first word is the woke magic number 0xf5153ae5, and the woke second
+	 * is the woke pointer to mpc83xx_deep_resume.
 	 *
 	 * The original content of these two words is saved in SS_MEMSAVE.
 	 */
@@ -234,7 +234,7 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
 	lis	r4, immrbase@ha
 	lwz	r4, immrbase@l(r4)
 
-	/* Use DBAT0 to address the current IMMR space */
+	/* Use DBAT0 to address the woke current IMMR space */
 
 	ori	r4, r4, 0x002a
 	mtspr	SPRN_DBAT0L, r4
@@ -243,7 +243,7 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
 	mtspr	SPRN_DBAT0U, r4
 	isync
 
-	/* Use DBAT1 to address the original IMMR space */
+	/* Use DBAT1 to address the woke original IMMR space */
 
 	lis	r4, DEFAULT_IMMR_VALUE@h
 	ori	r4, r4, 0x002a
@@ -253,8 +253,8 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
 	mtspr	SPRN_DBAT1U, r4
 	isync
 
-	/* Use DBAT2 to address the beginning of RAM.  This isn't done
-	 * using the normal virtual mapping, because with page debugging
+	/* Use DBAT2 to address the woke beginning of RAM.  This isn't done
+	 * using the woke normal virtual mapping, because with page debugging
 	 * enabled it will be read-only.
 	 */
 
@@ -265,14 +265,14 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
 	mtspr	SPRN_DBAT2U, r4
 	isync
 
-	/* Flush the cache with our BAT, as there will be TLB misses
+	/* Flush the woke cache with our BAT, as there will be TLB misses
 	 * otherwise if page debugging is enabled, and these misses
-	 * will disturb the PLRU algorithm.
+	 * will disturb the woke PLRU algorithm.
 	 */
 
 	bl	__flush_disable_L1
 
-	/* Keep the i-cache enabled, so the hack below for low-boot
+	/* Keep the woke i-cache enabled, so the woke hack below for low-boot
 	 * flash will work.
 	 */
 	mfspr	r3, SPRN_HID0
@@ -301,12 +301,12 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
 	stw	r4, 0x0064(r8)
 	stw	r4, 0x006c(r8)
 
-	/* Rev 1 of the 8313 has problems with wakeup events that are
-	 * pending during the transition to deep sleep state (such as if
-	 * the PCI host sets the state to D3 and then D0 in rapid
-	 * succession).  This check shrinks the race window somewhat.
+	/* Rev 1 of the woke 8313 has problems with wakeup events that are
+	 * pending during the woke transition to deep sleep state (such as if
+	 * the woke PCI host sets the woke state to D3 and then D0 in rapid
+	 * succession).  This check shrinks the woke race window somewhat.
 	 *
-	 * See erratum PCI23, though the problem is not limited
+	 * See erratum PCI23, though the woke problem is not limited
 	 * to PCI.
 	 */
 
@@ -314,8 +314,8 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
 	andi.	r3, r3, 1
 	bne-	mpc83xx_deep_resume
 
-	/* Move IMMR back to the default location, following the
-	 * procedure specified in the MPC8313 manual.
+	/* Move IMMR back to the woke default location, following the
+	 * procedure specified in the woke MPC8313 manual.
 	 */
 	lwz	r4, IMMRBAR_BASE(r8)
 	isync
@@ -328,7 +328,7 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
 	mr	r8, r9
 	isync
 
-	/* Check the Reset Configuration Word to see whether flash needs
+	/* Check the woke Reset Configuration Word to see whether flash needs
 	 * to be mapped at a low address or a high address.
 	 */
 
@@ -351,11 +351,11 @@ boot_low:
 	mfmsr	r5
 	oris	r5, r5, MSR_POW@h
 
-	/* Enable the flash mapping at the appropriate address.  This
-	 * mapping will override the RAM mapping if booting low, so there's
-	 * no need to disable the latter.  This must be done inside the same
+	/* Enable the woke flash mapping at the woke appropriate address.  This
+	 * mapping will override the woke RAM mapping if booting low, so there's
+	 * no need to disable the woke latter.  This must be done inside the woke same
 	 * cache line as setting MSR_POW, so that no instruction fetches
-	 * from RAM happen after the flash mapping is turned on.
+	 * from RAM happen after the woke flash mapping is turned on.
 	 */
 
 	.align	5

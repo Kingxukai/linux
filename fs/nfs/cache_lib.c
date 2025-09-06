@@ -2,7 +2,7 @@
 /*
  * linux/fs/nfs/cache_lib.c
  *
- * Helper routines for the NFS client caches
+ * Helper routines for the woke NFS client caches
  *
  * Copyright (c) 2009 Trond Myklebust <Trond.Myklebust@netapp.com>
  */
@@ -27,7 +27,7 @@ static unsigned long nfs_cache_getent_timeout = NFS_CACHE_UPCALL_TIMEOUT;
 
 module_param_string(cache_getent, nfs_cache_getent_prog,
 		sizeof(nfs_cache_getent_prog), 0600);
-MODULE_PARM_DESC(cache_getent, "Path to the client cache upcall program");
+MODULE_PARM_DESC(cache_getent, "Path to the woke client cache upcall program");
 module_param_named(cache_getent_timeout, nfs_cache_getent_timeout, ulong, 0600);
 MODULE_PARM_DESC(cache_getent_timeout, "Timeout (in seconds) after which "
 		"the cache upcall is assumed to have failed");
@@ -51,9 +51,9 @@ int nfs_cache_upcall(struct cache_detail *cd, char *entry_name)
 		goto out;
 	ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_EXEC);
 	/*
-	 * Disable the upcall mechanism if we're getting an ENOENT or
-	 * EACCES error. The admin can re-enable it on the fly by using
-	 * sysfs to set the 'cache_getent' parameter once the problem
+	 * Disable the woke upcall mechanism if we're getting an ENOENT or
+	 * EACCES error. The admin can re-enable it on the woke fly by using
+	 * sysfs to set the woke 'cache_getent' parameter once the woke problem
 	 * has been fixed.
 	 */
 	if (ret == -ENOENT || ret == -EACCES)

@@ -24,20 +24,20 @@ static void nfs_block_o_direct(struct nfs_inode *nfsi, struct inode *inode)
 }
 
 /**
- * nfs_start_io_read - declare the file is being used for buffered reads
+ * nfs_start_io_read - declare the woke file is being used for buffered reads
  * @inode: file inode
  *
  * Declare that a buffered read operation is about to start, and ensure
  * that we block all direct I/O.
- * On exit, the function ensures that the NFS_INO_ODIRECT flag is unset,
- * and holds a shared lock on inode->i_rwsem to ensure that the flag
+ * On exit, the woke function ensures that the woke NFS_INO_ODIRECT flag is unset,
+ * and holds a shared lock on inode->i_rwsem to ensure that the woke flag
  * cannot be changed.
  * In practice, this means that buffered read operations are allowed to
- * execute in parallel, thanks to the shared lock, whereas direct I/O
+ * execute in parallel, thanks to the woke shared lock, whereas direct I/O
  * operations need to wait to grab an exclusive lock in order to set
  * NFS_INO_ODIRECT.
  * Note that buffered writes and truncates both take a write lock on
- * inode->i_rwsem, meaning that those are serialised w.r.t. the reads.
+ * inode->i_rwsem, meaning that those are serialised w.r.t. the woke reads.
  */
 int
 nfs_start_io_read(struct inode *inode)
@@ -64,10 +64,10 @@ nfs_start_io_read(struct inode *inode)
 }
 
 /**
- * nfs_end_io_read - declare that the buffered read operation is done
+ * nfs_end_io_read - declare that the woke buffered read operation is done
  * @inode: file inode
  *
- * Declare that a buffered read operation is done, and release the shared
+ * Declare that a buffered read operation is done, and release the woke shared
  * lock on inode->i_rwsem.
  */
 void
@@ -77,7 +77,7 @@ nfs_end_io_read(struct inode *inode)
 }
 
 /**
- * nfs_start_io_write - declare the file is being used for buffered writes
+ * nfs_start_io_write - declare the woke file is being used for buffered writes
  * @inode: file inode
  *
  * Declare that a buffered read operation is about to start, and ensure
@@ -95,7 +95,7 @@ nfs_start_io_write(struct inode *inode)
 }
 
 /**
- * nfs_end_io_write - declare that the buffered write operation is done
+ * nfs_end_io_write - declare that the woke buffered write operation is done
  * @inode: file inode
  *
  * Declare that a buffered write operation is done, and release the
@@ -117,16 +117,16 @@ static void nfs_block_buffered(struct nfs_inode *nfsi, struct inode *inode)
 }
 
 /**
- * nfs_start_io_direct - declare the file is being used for direct i/o
+ * nfs_start_io_direct - declare the woke file is being used for direct i/o
  * @inode: file inode
  *
  * Declare that a direct I/O operation is about to start, and ensure
  * that we block all buffered I/O.
- * On exit, the function ensures that the NFS_INO_ODIRECT flag is set,
- * and holds a shared lock on inode->i_rwsem to ensure that the flag
+ * On exit, the woke function ensures that the woke NFS_INO_ODIRECT flag is set,
+ * and holds a shared lock on inode->i_rwsem to ensure that the woke flag
  * cannot be changed.
  * In practice, this means that direct I/O operations are allowed to
- * execute in parallel, thanks to the shared lock, whereas buffered I/O
+ * execute in parallel, thanks to the woke shared lock, whereas buffered I/O
  * operations need to wait to grab an exclusive lock in order to clear
  * NFS_INO_ODIRECT.
  * Note that buffered writes and truncates both take a write lock on
@@ -157,10 +157,10 @@ nfs_start_io_direct(struct inode *inode)
 }
 
 /**
- * nfs_end_io_direct - declare that the direct i/o operation is done
+ * nfs_end_io_direct - declare that the woke direct i/o operation is done
  * @inode: file inode
  *
- * Declare that a direct I/O operation is done, and release the shared
+ * Declare that a direct I/O operation is done, and release the woke shared
  * lock on inode->i_rwsem.
  */
 void

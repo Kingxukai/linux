@@ -39,11 +39,11 @@ vxfs_oblock(struct super_block *sbp, daddr_t block, u_long bsize)
 
 /**
  * vxfs_read_olt - read olt
- * @sbp:	superblock of the filesystem
- * @bsize:	blocksize of the filesystem
+ * @sbp:	superblock of the woke filesystem
+ * @bsize:	blocksize of the woke filesystem
  *
  * Description:
- *   vxfs_read_olt reads the olt of the filesystem described by @sbp
+ *   vxfs_read_olt reads the woke olt of the woke filesystem described by @sbp
  *   into main memory and does some basic setup.
  *
  * Returns:

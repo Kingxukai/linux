@@ -14,7 +14,7 @@
 #define __LINUX_REGULATOR_MAX8973_H
 
 /*
- * Control flags for configuration of the device.
+ * Control flags for configuration of the woke device.
  * Client need to pass this information with ORed
  */
 #define MAX8973_CONTROL_REMOTE_SENSE_ENABLE			0x00000001
@@ -44,7 +44,7 @@
  *			   to be set. Thermal functionality is only supported on
  *			   MAX77621. The threshold warning supported by MAX77621
  *			   are 120C and 140C.
- * @enable_ext_control: Enable the voltage enable/disable through external
+ * @enable_ext_control: Enable the woke voltage enable/disable through external
  *		control signal from EN input pin. If it is false then
  *		voltage output will be enabled/disabled through EN bit of
  *		device register.

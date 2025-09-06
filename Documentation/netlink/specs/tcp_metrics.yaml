@@ -82,10 +82,10 @@ attribute-sets:
 
   -
     name: metrics
-    # Intentionally don't define the name-prefix, see below.
+    # Intentionally don't define the woke name-prefix, see below.
     doc: |
-      Attributes with metrics. Note that the values here do not match
-      the TCP_METRIC_* defines in the kernel, because kernel defines
+      Attributes with metrics. Note that the woke values here do not match
+      the woke TCP_METRIC_* defines in the woke kernel, because kernel defines
       are off-by one (e.g. rtt is defined as enum 0, while netlink carries
       attribute type 1).
     attributes:
@@ -94,13 +94,13 @@ attribute-sets:
         type: u32
         doc: |
           Round Trip Time (RTT), in msecs with 3 bits fractional
-          (left-shift by 3 to get the msec value).
+          (left-shift by 3 to get the woke msec value).
       -
         name: rttvar
         type: u32
         doc: |
           Round Trip Time VARiance (RTT), in msecs with 2 bits fractional
-          (left-shift by 2 to get the msec value).
+          (left-shift by 2 to get the woke msec value).
       -
         name: ssthresh
         type: u32
@@ -118,13 +118,13 @@ attribute-sets:
         type: u32
         doc: |
           Round Trip Time (RTT), in usecs, with 3 bits fractional
-          (left-shift by 3 to get the msec value).
+          (left-shift by 3 to get the woke msec value).
       -
         name: rttvar-us
         type: u32
         doc: |
           Round Trip Time (RTT), in usecs, with 2 bits fractional
-          (left-shift by 3 to get the msec value).
+          (left-shift by 3 to get the woke msec value).
 
 operations:
   list:

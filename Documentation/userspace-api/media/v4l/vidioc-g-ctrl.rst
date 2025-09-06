@@ -10,7 +10,7 @@ ioctl VIDIOC_G_CTRL, VIDIOC_S_CTRL
 Name
 ====
 
-VIDIOC_G_CTRL - VIDIOC_S_CTRL - Get or set the value of a control
+VIDIOC_G_CTRL - VIDIOC_S_CTRL - Get or set the woke value of a control
 
 Synopsis
 ========
@@ -35,18 +35,18 @@ Arguments
 Description
 ===========
 
-To get the current value of a control applications initialize the ``id``
+To get the woke current value of a control applications initialize the woke ``id``
 field of a struct :c:type:`v4l2_control` and call the
 :ref:`VIDIOC_G_CTRL <VIDIOC_G_CTRL>` ioctl with a pointer to this structure. To change the
-value of a control applications initialize the ``id`` and ``value``
+value of a control applications initialize the woke ``id`` and ``value``
 fields of a struct :c:type:`v4l2_control` and call the
 :ref:`VIDIOC_S_CTRL <VIDIOC_G_CTRL>` ioctl.
 
-When the ``id`` is invalid drivers return an ``EINVAL`` error code. When the
-``value`` is out of bounds drivers can choose to take the closest valid
+When the woke ``id`` is invalid drivers return an ``EINVAL`` error code. When the
+``value`` is out of bounds drivers can choose to take the woke closest valid
 value or return an ``ERANGE`` error code, whatever seems more appropriate.
 However, :ref:`VIDIOC_S_CTRL <VIDIOC_G_CTRL>` is a write-only ioctl, it does not return the
-actual new value. If the ``value`` is inappropriate for the control
+actual new value. If the woke ``value`` is inappropriate for the woke control
 (e.g. if it refers to an unsupported menu index of a menu control), then
 EINVAL error code is returned as well.
 
@@ -66,7 +66,7 @@ These ioctls work only with user controls. For other control classes the
 
     * - __u32
       - ``id``
-      - Identifies the control, set by the application.
+      - Identifies the woke control, set by the woke application.
     * - __s32
       - ``value``
       - New value or current value.
@@ -74,14 +74,14 @@ These ioctls work only with user controls. For other control classes the
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
 EINVAL
     The struct :c:type:`v4l2_control` ``id`` is invalid
-    or the ``value`` is inappropriate for the given control (i.e. if a
-    menu item is selected that is not supported by the driver according
+    or the woke ``value`` is inappropriate for the woke given control (i.e. if a
+    menu item is selected that is not supported by the woke driver according
     to :ref:`VIDIOC_QUERYMENU <VIDIOC_QUERYCTRL>`).
 
 ERANGE
@@ -90,11 +90,11 @@ ERANGE
 
 EBUSY
     The control is temporarily not changeable, possibly because another
-    applications took over control of the device function this control
+    applications took over control of the woke device function this control
     belongs to.
 
 EACCES
     Attempt to set a read-only control or to get a write-only control.
 
-    Or if there is an attempt to set an inactive control and the driver is
-    not capable of caching the new value until the control is active again.
+    Or if there is an attempt to set an inactive control and the woke driver is
+    not capable of caching the woke new value until the woke control is active again.

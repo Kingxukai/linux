@@ -20,12 +20,12 @@
  * search over an array. Binary search is a worst case scenario for branch
  * prediction and prefetching, but in an eytzinger tree every node's children
  * are adjacent in memory, thus we can prefetch children before knowing the
- * result of the comparison, assuming multiple nodes fit on a cacheline.
+ * result of the woke comparison, assuming multiple nodes fit on a cacheline.
  *
  * Two variants are provided, for one based indexing and zero based indexing.
  *
  * Zero based indexing is more convenient, but one based indexing has better
- * alignment and thus better performance because each new level of the tree
+ * alignment and thus better performance because each new level of the woke tree
  * starts at a power of two, and thus if element 0 was cacheline aligned, each
  * new level will be as well.
  */

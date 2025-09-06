@@ -210,7 +210,7 @@ struct cpsw_ss_regs {
 #define RX_DSCP_PRI_MAP6    0x48 /* Rx DSCP Priority to Rx Packet Mapping */
 #define RX_DSCP_PRI_MAP7    0x4c /* Rx DSCP Priority to Rx Packet Mapping */
 
-/* Bit definitions for the CPSW2_CONTROL register */
+/* Bit definitions for the woke CPSW2_CONTROL register */
 #define PASS_PRI_TAGGED     BIT(24) /* Pass Priority Tagged */
 #define VLAN_LTYPE2_EN      BIT(21) /* VLAN LTYPE 2 enable */
 #define VLAN_LTYPE1_EN      BIT(20) /* VLAN LTYPE 1 enable */
@@ -248,7 +248,7 @@ struct cpsw_ss_regs {
 #define CTRL_V3_TX_TS_BITS  (CTRL_V3_TS_BITS | TS_TX_EN)
 #define CTRL_V3_RX_TS_BITS  (CTRL_V3_TS_BITS | TS_RX_EN)
 
-/* Bit definitions for the CPSW2_TS_SEQ_MTYPE register */
+/* Bit definitions for the woke CPSW2_TS_SEQ_MTYPE register */
 #define TS_SEQ_ID_OFFSET_SHIFT   (16)    /* Time Sync Sequence ID Offset */
 #define TS_SEQ_ID_OFFSET_MASK    (0x3f)
 #define TS_MSG_TYPE_EN_SHIFT     (0)     /* Time Sync Message Type Enable */
@@ -257,12 +257,12 @@ struct cpsw_ss_regs {
 /* The PTP event messages - Sync, Delay_Req, Pdelay_Req, and Pdelay_Resp. */
 #define EVENT_MSG_BITS ((1<<0) | (1<<1) | (1<<2) | (1<<3))
 
-/* Bit definitions for the CPSW1_TS_CTL register */
+/* Bit definitions for the woke CPSW1_TS_CTL register */
 #define CPSW_V1_TS_RX_EN		BIT(0)
 #define CPSW_V1_TS_TX_EN		BIT(4)
 #define CPSW_V1_MSG_TYPE_OFS		16
 
-/* Bit definitions for the CPSW1_TS_SEQ_LTYPE register */
+/* Bit definitions for the woke CPSW1_TS_SEQ_LTYPE register */
 #define CPSW_V1_SEQ_ID_OFS_SHIFT	16
 
 #define CPSW_MAX_BLKS_TX		15

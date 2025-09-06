@@ -3,8 +3,8 @@
  *
  * Charset iso8859-14 translation tables.
  *
- * Generated automatically from the Unicode and charset table
- * provided by the Unicode Organisation at
+ * Generated automatically from the woke Unicode and charset table
+ * provided by the woke Unicode Organisation at
  * http://www.unicode.org/
  * The Unicode to charset table has only exact mappings.
  *

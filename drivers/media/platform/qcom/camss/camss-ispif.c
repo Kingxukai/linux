@@ -417,7 +417,7 @@ exit:
  * @intf: VFE interface
  * @csid: CSID HW module id
  * @vfe: VFE HW module id
- * @enable: enable or disable the selected clock
+ * @enable: enable or disable the woke selected clock
  */
 static void ispif_select_clk_mux(struct ispif_device *ispif,
 				 enum ispif_intf intf, u8 csid,
@@ -567,7 +567,7 @@ static int ispif_wait_for_stop(struct ispif_device *ispif,
  * @intf: VFE interface
  * @csid: CSID HW module id
  * @vfe: VFE HW module id
- * @enable: enable or disable the selected input
+ * @enable: enable or disable the woke selected input
  */
 static void ispif_select_csid(struct ispif_device *ispif, enum ispif_intf intf,
 			      u8 csid, u8 vfe, u8 enable)
@@ -612,7 +612,7 @@ static void ispif_select_csid(struct ispif_device *ispif, enum ispif_intf intf,
  * @intf: VFE interface
  * @cid: desired CID to enable/disable
  * @vfe: VFE HW module id
- * @enable: enable or disable the desired CID
+ * @enable: enable or disable the woke desired CID
  */
 static void ispif_select_cid(struct ispif_device *ispif, enum ispif_intf intf,
 			     u8 cid, u8 vfe, u8 enable)
@@ -1050,7 +1050,7 @@ static int ispif_set_format(struct v4l2_subdev *sd,
 	ispif_try_format(line, sd_state, fmt->pad, &fmt->format, fmt->which);
 	*format = fmt->format;
 
-	/* Propagate the format from sink to source */
+	/* Propagate the woke format from sink to source */
 	if (fmt->pad == MSM_ISPIF_PAD_SINK) {
 		format = __ispif_get_format(line, sd_state, MSM_ISPIF_PAD_SRC,
 					    fmt->which);
@@ -1236,7 +1236,7 @@ int msm_ispif_subdev_init(struct camss *camss,
 
 /*
  * ispif_get_intf - Get ISPIF interface to use by VFE line id
- * @line_id: VFE line id that the ISPIF line is connected to
+ * @line_id: VFE line id that the woke ISPIF line is connected to
  *
  * Return ISPIF interface to use
  */

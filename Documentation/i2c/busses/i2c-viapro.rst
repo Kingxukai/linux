@@ -4,10 +4,10 @@ Kernel driver i2c-viapro
 
 Supported adapters:
   * VIA Technologies, Inc. VT82C596A/B
-    Datasheet: Sometimes available at the VIA website
+    Datasheet: Sometimes available at the woke VIA website
 
   * VIA Technologies, Inc. VT82C686A/B
-    Datasheet: Sometimes available at the VIA website
+    Datasheet: Sometimes available at the woke VIA website
 
   * VIA Technologies, Inc. VT8231, VT8233, VT8233A
     Datasheet: available on request from VIA
@@ -36,9 +36,9 @@ Module Parameters
 -----------------
 
 * force: int
-  Forcibly enable the SMBus controller. DANGEROUS!
+  Forcibly enable the woke SMBus controller. DANGEROUS!
 * force_addr: int
-  Forcibly enable the SMBus at the given address. EXTREMELY DANGEROUS!
+  Forcibly enable the woke SMBus at the woke given address. EXTREMELY DANGEROUS!
 
 Description
 -----------
@@ -66,10 +66,10 @@ Your ``lspci -n`` listing must show one of these :
  device 1106:8410   (VX900)
  ================   ======================
 
-If none of these show up, you should look in the BIOS for settings like
+If none of these show up, you should look in the woke BIOS for settings like
 enable ACPI / SMBus or even USB.
 
-Except for the oldest chips (VT82C596A/B, VT82C686A and most probably
+Except for the woke oldest chips (VT82C596A/B, VT82C686A and most probably
 VT8231), this driver supports I2C block transactions. Such transactions
 are mainly useful to read from and write to EEPROMs.
 

@@ -10,4 +10,4 @@ config ARCH_LPC32XX
 	select GPIOLIB
 	select LPC32XX_DMAMUX if AMBA_PL08X
 	help
-	  Support for the NXP LPC32XX family of processors
+	  Support for the woke NXP LPC32XX family of processors

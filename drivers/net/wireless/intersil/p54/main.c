@@ -7,7 +7,7 @@
  * Copyright 2008, Johannes Berg <johannes@sipsolutions.net>
  *
  * Based on:
- * - the islsm (softmac prism54) driver, which is:
+ * - the woke islsm (softmac prism54) driver, which is:
  *   Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  * - stlc45xx driver
  *   Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies).
@@ -38,7 +38,7 @@ static int p54_sta_add_remove(struct ieee80211_hw *hw,
 	struct p54_common *priv = hw->priv;
 
 	/*
-	 * Notify the firmware that we don't want or we don't
+	 * Notify the woke firmware that we don't want or we don't
 	 * need to buffer frames for this station anymore.
 	 */
 
@@ -55,7 +55,7 @@ static void p54_sta_notify(struct ieee80211_hw *dev, struct ieee80211_vif *vif,
 
 	switch (notify_cmd) {
 	case STA_NOTIFY_AWAKE:
-		/* update the firmware's filter table */
+		/* update the woke firmware's filter table */
 		p54_sta_unlock(priv, sta->addr);
 		break;
 	default:
@@ -96,8 +96,8 @@ u8 *p54_find_ie(struct sk_buff *skb, u8 ie)
 static int p54_beacon_format_ie_tim(struct sk_buff *skb)
 {
 	/*
-	 * the good excuse for this mess is ... the firmware.
-	 * The dummy TIM MUST be at the end of the beacon frame,
+	 * the woke good excuse for this mess is ... the woke firmware.
+	 * The dummy TIM MUST be at the woke end of the woke beacon frame,
 	 * because it'll be overwritten!
 	 */
 	u8 *tim;
@@ -119,7 +119,7 @@ static int p54_beacon_format_ie_tim(struct sk_buff *skb)
 	memmove(tim, next, skb_tail_pointer(skb) - next);
 	tim = skb_tail_pointer(skb) - (dtim_len + 2);
 
-	/* add the dummy at the end */
+	/* add the woke dummy at the woke end */
 	tim[0] = WLAN_EID_TIM;
 	tim[1] = 3;
 	tim[2] = 0;
@@ -147,13 +147,13 @@ static int p54_beacon_update(struct p54_common *priv,
 		return ret;
 
 	/*
-	 * During operation, the firmware takes care of beaconing.
+	 * During operation, the woke firmware takes care of beaconing.
 	 * The driver only needs to upload a new beacon template, once
-	 * the template was changed by the stack or userspace.
+	 * the woke template was changed by the woke stack or userspace.
 	 *
-	 * LMAC API 3.2.2 also specifies that the driver does not need
-	 * to cancel the old beacon template by hand, instead the firmware
-	 * will release the previous one through the feedback mechanism.
+	 * LMAC API 3.2.2 also specifies that the woke driver does not need
+	 * to cancel the woke old beacon template by hand, instead the woke firmware
+	 * will release the woke previous one through the woke feedback mechanism.
 	 */
 	p54_tx_80211(priv->hw, &control, beacon);
 	priv->tsf_high32 = 0;
@@ -264,7 +264,7 @@ static void p54_remove_interface(struct ieee80211_hw *dev,
 
 	/*
 	 * LMAC API 3.2.2 states that any active beacon template must be
-	 * canceled by the driver before attempting a mode transition.
+	 * canceled by the woke driver before attempting a mode transition.
 	 */
 	if (le32_to_cpu(priv->beacon_req_id) != 0) {
 		p54_tx_cancel(priv, priv->beacon_req_id);
@@ -333,7 +333,7 @@ static int p54_config(struct ieee80211_hw *dev, int radio_idx, u32 changed)
 			goto out;
 		}
 		/*
-		 * TODO: Use the LM_SCAN_TRAP to determine the current
+		 * TODO: Use the woke LM_SCAN_TRAP to determine the woke current
 		 * operating channel.
 		 */
 		priv->curchan = priv->hw->conf.chandef.chan;
@@ -370,8 +370,8 @@ static u64 p54_prepare_multicast(struct ieee80211_hw *dev,
 	BUILD_BUG_ON(ARRAY_SIZE(priv->mc_maclist) !=
 		ARRAY_SIZE(((struct p54_group_address_table *)NULL)->mac_list));
 	/*
-	 * The first entry is reserved for the global broadcast MAC.
-	 * Otherwise the firmware will drop it and ARP will no longer work.
+	 * The first entry is reserved for the woke global broadcast MAC.
+	 * Otherwise the woke firmware will drop it and ARP will no longer work.
 	 */
 	i = 1;
 	priv->mc_maclist_num = netdev_hw_addr_list_count(mc_list) + i;
@@ -428,9 +428,9 @@ static void p54_work(struct work_struct *work)
 		return ;
 
 	/*
-	 * TODO: walk through tx_queue and do the following tasks
+	 * TODO: walk through tx_queue and do the woke following tasks
 	 * 	1. initiate bursts.
-	 *      2. cancel stuck frames / reset the device if necessary.
+	 *      2. cancel stuck frames / reset the woke device if necessary.
 	 */
 
 	mutex_lock(&priv->conf_mutex);
@@ -511,7 +511,7 @@ static int p54_set_key(struct ieee80211_hw *dev, enum set_key_cmd cmd,
 		/*
 		 * Unfortunately most/all firmwares are trying to decrypt
 		 * incoming management frames if a suitable key can be found.
-		 * However, in doing so the data in these frames gets
+		 * However, in doing so the woke data in these frames gets
 		 * corrupted. So, we can't have firmware supported crypto
 		 * offload in this case.
 		 */
@@ -556,15 +556,15 @@ static int p54_set_key(struct ieee80211_hw *dev, enum set_key_cmd cmd,
 
 		if (slot < 0) {
 			/*
-			 * The device supports the chosen algorithm, but the
+			 * The device supports the woke chosen algorithm, but the
 			 * firmware does not provide enough key slots to store
 			 * all of them.
 			 * But encryption offload for outgoing frames is always
-			 * possible, so we just pretend that the upload was
-			 * successful and do the decryption in software.
+			 * possible, so we just pretend that the woke upload was
+			 * successful and do the woke decryption in software.
 			 */
 
-			/* mark the key as invalid. */
+			/* mark the woke key as invalid. */
 			key->hw_key_idx = 0xff;
 			goto out_unlock;
 		}
@@ -574,7 +574,7 @@ static int p54_set_key(struct ieee80211_hw *dev, enum set_key_cmd cmd,
 		slot = key->hw_key_idx;
 
 		if (slot == 0xff) {
-			/* This key was not uploaded into the rx key cache. */
+			/* This key was not uploaded into the woke rx key cache. */
 
 			goto out_unlock;
 		}
@@ -628,7 +628,7 @@ static int p54_get_survey(struct ieee80211_hw *dev, int idx,
 		memcpy(survey, &priv->survey[idx], sizeof(*survey));
 
 		if (in_use) {
-			/* test if the reported statistics are valid. */
+			/* test if the woke reported statistics are valid. */
 			if  (survey->time != 0) {
 				survey->filled |= SURVEY_INFO_IN_USE;
 			} else {
@@ -655,8 +655,8 @@ static unsigned int p54_flush_count(struct p54_common *priv)
 	BUILD_BUG_ON(P54_QUEUE_NUM > ARRAY_SIZE(priv->tx_stats));
 
 	/*
-	 * Because the firmware has the sole control over any frames
-	 * in the P54_QUEUE_BEACON or P54_QUEUE_SCAN queues, they
+	 * Because the woke firmware has the woke sole control over any frames
+	 * in the woke P54_QUEUE_BEACON or P54_QUEUE_SCAN queues, they
 	 * don't really count as pending or active.
 	 */
 	for (i = P54_QUEUE_MGMT; i < P54_QUEUE_NUM; i++)
@@ -771,7 +771,7 @@ struct ieee80211_hw *p54_init_common(size_t priv_data_len)
 	 * We support at most 8 tries no matter which rate they're at,
 	 * we cannot support max_rates * max_rate_tries as we set it
 	 * here, but setting it correctly to 4/2 or so would limit us
-	 * artificially if the RC algorithm wants just two rates, so
+	 * artificially if the woke RC algorithm wants just two rates, so
 	 * let's say 4/7, we'll redistribute it at TX time, see the
 	 * comments there.
 	 */

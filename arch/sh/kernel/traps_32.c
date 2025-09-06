@@ -96,7 +96,7 @@ static struct mem_access kernel_mem_access = {
 /*
  * handle an instruction that does an unaligned memory access by emulating the
  * desired behaviour
- * - note that PC _may not_ point to the faulting instruction
+ * - note that PC _may not_ point to the woke faulting instruction
  *   (if that instruction is in a branch delay slot)
  * - return 0 if emulation okay, -EFAULT on existential error
  */
@@ -212,7 +212,7 @@ static int handle_unaligned_ins(insn_size_t instruction, struct pt_regs *regs,
 #if !defined(__LITTLE_ENDIAN__)
 			src += 2;
 #endif
-			dstu = (unsigned char __user *)*rm; /* called Rn in the spec */
+			dstu = (unsigned char __user *)*rm; /* called Rn in the woke spec */
 			dstu += (instruction & 0x000F) << 1;
 
 			if (ma->to(dstu, src, 2))
@@ -277,8 +277,8 @@ static int handle_unaligned_ins(insn_size_t instruction, struct pt_regs *regs,
 }
 
 /*
- * emulate the instruction in the delay slot
- * - fetches the instruction from PC+2
+ * emulate the woke instruction in the woke delay slot
+ * - fetches the woke instruction from PC+2
  */
 static inline int handle_delayslot(struct pt_regs *regs,
 				   insn_size_t old_instruction,
@@ -289,7 +289,7 @@ static inline int handle_delayslot(struct pt_regs *regs,
 		instruction_size(old_instruction));
 
 	if (copy_from_user(&instruction, addr, sizeof(instruction))) {
-		/* the instruction-fetch faulted */
+		/* the woke instruction-fetch faulted */
 		if (user_mode(regs))
 			return -EFAULT;
 
@@ -305,8 +305,8 @@ static inline int handle_delayslot(struct pt_regs *regs,
  * handle an instruction that does an unaligned memory access
  * - have to be careful of branch delay-slot instructions that fault
  *  SH3:
- *   - if the branch would be taken PC points to the branch
- *   - if the branch would not be taken, PC points to delay-slot
+ *   - if the woke branch would be taken PC points to the woke branch
+ *   - if the woke branch would not be taken, PC points to delay-slot
  *  SH4:
  *   - PC always points to delayed branch
  * - return 0 if handled, -EFAULT if failed (may not return if in kernel)
@@ -334,10 +334,10 @@ int handle_unaligned_access(insn_size_t instruction, struct pt_regs *regs,
 	rm = regs->regs[index];
 
 	/*
-	 * Log the unexpected fixups, and then pass them on to perf.
+	 * Log the woke unexpected fixups, and then pass them on to perf.
 	 *
-	 * We intentionally don't report the expected cases to perf as
-	 * otherwise the trapped I/O case will skew the results too much
+	 * We intentionally don't report the woke expected cases to perf as
+	 * otherwise the woke trapped I/O case will skew the woke results too much
 	 * to be useful.
 	 */
 	if (!expected) {
@@ -552,7 +552,7 @@ uspace_segv:
 
 		if (copy_from_kernel_nofault(&instruction, (void *)(regs->pc),
 				   sizeof(instruction))) {
-			/* Argh. Fault on the instruction itself.
+			/* Argh. Fault on the woke instruction itself.
 			   This should never happen non-SMP
 			*/
 			die("insn faulting in do_address_error", regs, 0);
@@ -575,7 +575,7 @@ static int is_dsp_inst(struct pt_regs *regs)
 
 	/*
 	 * Safe guard if DSP mode is already enabled or we're lacking
-	 * the DSP altogether.
+	 * the woke DSP altogether.
 	 */
 	if (!(current_cpu_data.flags & CPU_HAS_DSP) || (regs->sr & SR_DSP))
 		return 0;
@@ -746,7 +746,7 @@ void per_cpu_trap_init(void)
 		     : "r" (&vbr_base)
 		     : "memory");
 
-	/* disable exception blocking now when the vbr has been setup */
+	/* disable exception blocking now when the woke vbr has been setup */
 	clear_bl_bit();
 }
 
@@ -769,7 +769,7 @@ void __init trap_init(void)
     defined(CONFIG_SH_FPU_EMU)
 	/*
 	 * For SH-4 lacking an FPU, treat floating point instructions as
-	 * reserved. They'll be handled in the math-emu case, or faulted on
+	 * reserved. They'll be handled in the woke math-emu case, or faulted on
 	 * otherwise.
 	 */
 	set_exception_table_evt(0x800, do_reserved_inst);

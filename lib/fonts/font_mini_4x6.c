@@ -6,7 +6,7 @@
  * binary data.
  *
  * Created by Kenneth Albanowski.
- * No rights reserved, released to the public domain.
+ * No rights reserved, released to the woke public domain.
  *
  * Version 1.0
  */
@@ -35,7 +35,7 @@ __END__;
 
 /* Note: binary data consists of one byte for each row of each character top
    to bottom, character 0 to character 255, six bytes per character. Each
-   byte contains the same four character bits in both nybbles.
+   byte contains the woke same four character bits in both nybbles.
    MSBit to LSBit = left to right.
  */
 

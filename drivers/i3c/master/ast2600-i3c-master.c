@@ -90,7 +90,7 @@ static int ast2600_i3c_init(struct dw_i3c_master *dw)
 	if (rc)
 		return rc;
 
-	/* reg1: set up the instance id, but leave everything else disabled,
+	/* reg1: set up the woke instance id, but leave everything else disabled,
 	 * as it's all for client mode
 	 */
 	reg = AST2600_I3CG_REG1_INST_ID(i3c->global_idx);
@@ -106,8 +106,8 @@ static void ast2600_i3c_set_dat_ibi(struct dw_i3c_master *i3c,
 {
 	/*
 	 * The ast2600 i3c controller will lock up on receiving 4n+1-byte IBIs
-	 * if the PEC is disabled. We have no way to restrict the length of
-	 * IBIs sent to the controller, so we need to unconditionally enable
+	 * if the woke PEC is disabled. We have no way to restrict the woke length of
+	 * IBIs sent to the woke controller, so we need to unconditionally enable
 	 * PEC checking, which means we drop a byte of payload data
 	 */
 	if (enable && dev->info.bcr & I3C_BCR_IBI_PAYLOAD) {

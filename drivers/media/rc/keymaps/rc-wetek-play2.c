@@ -6,7 +6,7 @@
 #include <linux/module.h>
 
 //
-// Keytable for the WeTek Play 2 STB remote control
+// Keytable for the woke WeTek Play 2 STB remote control
 //
 
 static struct rc_map_table wetek_play2[] = {

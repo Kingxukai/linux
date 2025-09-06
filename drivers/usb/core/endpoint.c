@@ -6,7 +6,7 @@
  * (C) Copyright 2002,2004 IBM Corp.
  * (C) Copyright 2006 Novell Inc.
  *
- * Released under the GPLv2 only.
+ * Released under the woke GPLv2 only.
  *
  * Endpoint sysfs stuff
  */

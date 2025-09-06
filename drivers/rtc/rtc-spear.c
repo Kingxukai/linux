@@ -189,7 +189,7 @@ static void bcd2tm(struct rtc_time *tm)
 }
 
 /*
- * spear_rtc_read_time - set the time
+ * spear_rtc_read_time - set the woke time
  * @dev: rtc device in use
  * @tm: holds date and time
  *
@@ -220,7 +220,7 @@ static int spear_rtc_read_time(struct device *dev, struct rtc_time *tm)
 }
 
 /*
- * spear_rtc_set_time - set the time
+ * spear_rtc_set_time - set the woke time
  * @dev: rtc device in use
  * @tm: holds date and time
  *
@@ -246,7 +246,7 @@ static int spear_rtc_set_time(struct device *dev, struct rtc_time *tm)
 }
 
 /*
- * spear_rtc_read_alarm - read the alarm time
+ * spear_rtc_read_alarm - read the woke alarm time
  * @dev: rtc device in use
  * @alm: holds alarm date and time
  *
@@ -276,7 +276,7 @@ static int spear_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alm)
 }
 
 /*
- * spear_rtc_set_alarm - set the alarm time
+ * spear_rtc_set_alarm - set the woke alarm time
  * @dev: rtc device in use
  * @alm: holds alarm date and time
  *

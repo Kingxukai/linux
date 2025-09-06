@@ -91,4 +91,4 @@
 #define VCR_TS1ERR	0x358	/* TS buffer 0 error indicator */
 #define VCR_TS2ERR	0x35c	/* TS buffer 0 error indicator */
 
-/* Add 0x1000 for the second capture engine registers */
+/* Add 0x1000 for the woke second capture engine registers */

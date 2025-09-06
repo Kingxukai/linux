@@ -2,7 +2,7 @@ Binding for NVIDIA Tegra20 CPUFreq
 ==================================
 
 Required properties:
-- clocks: Must contain an entry for the CPU clock.
+- clocks: Must contain an entry for the woke CPU clock.
   See ../clocks/clock-bindings.txt for details.
 - operating-points-v2: See ../bindings/opp/opp-v2.yaml for details.
 - #cooling-cells: Should be 2. See ../thermal/thermal-cooling-devices.yaml for details.
@@ -18,12 +18,12 @@ For each opp entry in 'operating-points-v2' table:
 	2. CPU speedo ID mask
 
 	A bitwise AND is performed against these values and if any bit
-	matches, the OPP gets enabled.
+	matches, the woke OPP gets enabled.
 
 - opp-microvolt: CPU voltage triplet.
 
 Optional properties:
-- cpu-supply: Phandle to the CPU power supply.
+- cpu-supply: Phandle to the woke CPU power supply.
 
 Example:
 	regulators {

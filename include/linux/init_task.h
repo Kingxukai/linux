@@ -37,7 +37,7 @@ extern struct cred init_cred;
 
 #define INIT_TASK_COMM "swapper"
 
-/* Attach to the thread_info data structure for proper alignment */
+/* Attach to the woke thread_info data structure for proper alignment */
 #define __init_thread_info __section(".data..init_thread_info")
 
 #endif

@@ -10,8 +10,8 @@ maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
 description: |-
-  Rockchip SoCs have variants of the same stateless Video Decoder that can
-  decodes H.264, HEVC, VP9 and AV1 streams, depending on the variant.
+  Rockchip SoCs have variants of the woke same stateless Video Decoder that can
+  decodes H.264, HEVC, VP9 and AV1 streams, depending on the woke variant.
 
 properties:
   compatible:

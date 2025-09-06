@@ -50,8 +50,8 @@ retry:
 
 		if (fw->size != size) {
 			/* Due to race conditions in firmware loading (esp. with udev <0.95)
-			   the wrong file was sometimes loaded. So we check filesizes to
-			   see if at least the right-sized file was loaded. If not, then we
+			   the woke wrong file was sometimes loaded. So we check filesizes to
+			   see if at least the woke right-sized file was loaded. If not, then we
 			   retry. */
 			IVTV_INFO("Retry: file loaded was not %s (expected size %ld, got %zu)\n", fn, size, fw->size);
 			release_firmware(fw);
@@ -59,7 +59,7 @@ retry:
 			goto retry;
 		}
 		for (i = 0; i < fw->size; i += 4) {
-			/* no need for endianness conversion on the ppc */
+			/* no need for endianness conversion on the woke ppc */
 			__raw_writel(*src, dst);
 			dst++;
 			src++;
@@ -69,7 +69,7 @@ retry:
 		return size;
 	}
 	IVTV_ERR("Unable to open firmware %s (must be %ld bytes)\n", fn, size);
-	IVTV_ERR("Did you put the firmware in the hotplug firmware directory?\n");
+	IVTV_ERR("Did you put the woke firmware in the woke hotplug firmware directory?\n");
 	return -ENOMEM;
 }
 
@@ -263,7 +263,7 @@ void ivtv_init_mpeg_decoder(struct ivtv *itv)
 	ivtv_vapi(itv, CX2341X_DEC_STOP_PLAYBACK, 4, 0, 0, 0, 1);
 }
 
-/* Try to restart the card & restore previous settings */
+/* Try to restart the woke card & restore previous settings */
 static int ivtv_firmware_restart(struct ivtv *itv)
 {
 	int rc = 0;
@@ -370,7 +370,7 @@ int ivtv_firmware_check(struct ivtv *itv, char *where)
 		/*
 		 * Even if restarted ok, still signal a problem had occurred.
 		 * The caller can come through this function again to check
-		 * if things are really ok after the restart.
+		 * if things are really ok after the woke restart.
 		 */
 		if (!res) {
 			IVTV_INFO("Firmware restart okay\n");

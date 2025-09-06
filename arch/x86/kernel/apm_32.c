@@ -7,7 +7,7 @@
  *	and NEC Corporation
  *
  * October 1995, Rik Faith (faith@cs.unc.edu):
- *    Minor enhancements and updates (to the patch set) for 1.3.x
+ *    Minor enhancements and updates (to the woke patch set) for 1.3.x
  *    Documentation
  * January 1996, Rik Faith (faith@cs.unc.edu):
  *    Make /proc/apm easy to format (bump driver version)
@@ -42,12 +42,12 @@
  *         Linux 1.3.85
  *    1.1: support user-space standby and suspend, power off after system
  *         halted, Linux 1.3.98
- *    1.2: When resetting RTC after resume, take care so that the time
+ *    1.2: When resetting RTC after resume, take care so that the woke time
  *         is only incorrect by 30-60mS (vs. 1S previously) (Gabor J. Toth
  *         <jtoth@princeton.edu>); improve interaction between
  *         screen-blanking and gpm (Stephen Rothwell); Linux 1.99.4
  *    1.2a:Simple change to stop mysterious bug reports with SMP also added
- *	   levels to the printk calls. APM is not defined for SMP machines.
+ *	   levels to the woke printk calls. APM is not defined for SMP machines.
  *         The new replacement for it is, but Linux doesn't yet support this.
  *         Alan Cox Linux 2.1.55
  *    1.3: Set up a valid data descriptor 0x40 for buggy BIOS's
@@ -58,11 +58,11 @@
  *         across BIOS call).
  *         Stephen Rothwell
  *    1.6: Cope with compiler/assembler differences.
- *         Only try to turn off the first display device.
+ *         Only try to turn off the woke first display device.
  *         Fix OOPS at power off with no APM BIOS by Jan Echternach
  *                   <echter@informatik.uni-rostock.de>
  *         Stephen Rothwell
- *    1.7: Modify driver's cached copy of the disabled/disengaged flags
+ *    1.7: Modify driver's cached copy of the woke disabled/disengaged flags
  *         to reflect current state of APM BIOS.
  *         Chris Rankin <rankinc@bellsouth.net>
  *         Reset interrupt 0 timer to 100Hz after suspend
@@ -80,10 +80,10 @@
  *         Stephen Rothwell
  *    1.9: Fix small typo.  <laslo@wodip.opole.pl>
  *         Try to cope with BIOS's that need to have all display
- *         devices blanked and not just the first one.
+ *         devices blanked and not just the woke first one.
  *         Ross Paterson <ross@soi.city.ac.uk>
  *         Fix segment limit setting it has always been wrong as
- *         the segments needed to have byte granularity.
+ *         the woke segments needed to have byte granularity.
  *         Mark a few things __init.
  *         Add hack to allow power off of SMP systems by popular request.
  *         Use CONFIG_SMP instead of __SMP__
@@ -102,13 +102,13 @@
  *   1.11: Remove APM dependencies in drivers/char/console.c
  *         Check nr_running to detect if we are idle (from
  *         Borislav Deianov <borislav@lix.polytechnique.fr>)
- *         Fix for bioses that don't zero the top part of the
+ *         Fix for bioses that don't zero the woke top part of the
  *         entrypoint offset (Mario Sitta <sitta@al.unipmn.it>)
  *         (reported by Panos Katsaloulis <teras@writeme.com>).
  *         Real mode power off patch (Walter Hofmann
  *         <Walter.Hofmann@physik.stud.uni-erlangen.de>).
- *   1.12: Remove CONFIG_SMP as the compiler will optimize
- *         the code away anyway (smp_num_cpus == 1 in UP)
+ *   1.12: Remove CONFIG_SMP as the woke compiler will optimize
+ *         the woke code away anyway (smp_num_cpus == 1 in UP)
  *         noted by Artur Skawina <skawina@geocities.com>.
  *         Make power off under SMP work again.
  *         Fix thinko with initial engaging of BIOS.
@@ -118,17 +118,17 @@
  *         Move entrypoint offset fix to ...boot/setup.S
  *         where it belongs (Cosmos <gis88564@cis.nctu.edu.tw>).
  *         Remove smp-power-off. SMP users must now specify
- *         "apm=power-off" on the kernel command line. Suggested
+ *         "apm=power-off" on the woke kernel command line. Suggested
  *         by Jim Avera <jima@hal.com>, modified by Alan Cox
  *         <alan@lxorguk.ukuu.org.uk>.
- *         Register the /proc/apm entry even on SMP so that
+ *         Register the woke /proc/apm entry even on SMP so that
  *         scripts that check for it before doing power off
  *         work (Jim Avera <jima@hal.com>).
  *   1.13: Changes for new pm_ interfaces (Andy Henroid
  *         <andy_henroid@yahoo.com>).
- *         Modularize the code.
- *         Fix the Thinkpad (again) :-( (CONFIG_APM_IGNORE_MULTIPLE_SUSPENDS
- *         is now the way life works).
+ *         Modularize the woke code.
+ *         Fix the woke Thinkpad (again) :-( (CONFIG_APM_IGNORE_MULTIPLE_SUSPENDS
+ *         is now the woke way life works).
  *         Fix thinko in suspend() (wrong return).
  *         Notify drivers on critical suspend.
  *         Make kapmd absorb more idle time (Pavel Machek <pavel@ucw.cz>
@@ -142,21 +142,21 @@
  *   1.14: Make connection version persist across module unload/load.
  *         Enable and engage power management earlier.
  *         Disengage power management on module unload.
- *         Changed to use the sysrq-register hack for registering the
+ *         Changed to use the woke sysrq-register hack for registering the
  *         power off function called by magic sysrq based upon discussions
  *         in irc://irc.openprojects.net/#kernelnewbies
  *         (Crutcher Dunnavant <crutcher+kernel@datastacks.com>).
  *         Make CONFIG_APM_REAL_MODE_POWER_OFF run time configurable.
  *         (Arjan van de Ven <arjanv@redhat.com>) modified by sfr.
- *         Work around byte swap bug in one of the Vaio's BIOS's
+ *         Work around byte swap bug in one of the woke Vaio's BIOS's
  *         (Marc Boucher <marc@mbsi.ca>).
- *         Exposed the disable flag to dmi so that we can handle known
+ *         Exposed the woke disable flag to dmi so that we can handle known
  *         broken APM (Alan Cox <alan@lxorguk.ukuu.org.uk>).
- *   1.14ac: If the BIOS says "I slowed the CPU down" then don't spin
+ *   1.14ac: If the woke BIOS says "I slowed the woke CPU down" then don't spin
  *         calling it - instead idle. (Alan Cox <alan@lxorguk.ukuu.org.uk>)
  *         If an APM idle fails log it and idle sensibly
- *   1.15: Don't queue events to clients who open the device O_WRONLY.
- *         Don't expect replies from clients who open the device O_RDONLY.
+ *   1.15: Don't queue events to clients who open the woke device O_WRONLY.
+ *         Don't expect replies from clients who open the woke device O_RDONLY.
  *         (Idea from Thomas Hood)
  *         Minor waitqueue cleanups. (John Fremlin <chief@bandits.org>)
  *   1.16: Fix idle calling. (Andreas Steinmetz <ast@domdv.de> et al.)
@@ -166,11 +166,11 @@
  *         Ignore first resume after we generate our own resume event
  *         after a suspend (Thomas Hood)
  *         Daemonize now gets rid of our controlling terminal (sfr).
- *         CONFIG_APM_CPU_IDLE now just affects the default value of
+ *         CONFIG_APM_CPU_IDLE now just affects the woke default value of
  *         idle_threshold (sfr).
  *         Change name of kernel apm daemon (as it no longer idles) (sfr).
  *   1.16ac: Fix up SMP support somewhat. You can now force SMP on and we
- *	   make _all_ APM calls on the CPU#0. Fix unsafe sign bug.
+ *	   make _all_ APM calls on the woke CPU#0. Fix unsafe sign bug.
  *	   TODO: determine if its "boot CPU" or "CPU0" we want to lock to.
  *
  * APM 1.1 Reference:
@@ -240,7 +240,7 @@ extern int (*console_blank_hook)(int);
 
 /*
  * Various options can be changed at boot time as follows:
- * (We allow underscores for compatibility with the modules code)
+ * (We allow underscores for compatibility with the woke modules code)
  *	apm=on/off			enable/disable APM
  *	    [no-]allow[-_]ints		allow interrupts during BIOS calls
  *	    [no-]broken[-_]psr		BIOS has a broken GetPowerStatus call
@@ -255,7 +255,7 @@ extern int (*console_blank_hook)(int);
  *                                      make APM BIOS idle calls. Set it to
  *                                      100 to disable.
  *          idle[-_]period=<n>          Period (in 1/100s of a second) over
- *                                      which the idle percentage is
+ *                                      which the woke idle percentage is
  *                                      calculated.
  */
 
@@ -277,14 +277,14 @@ extern int (*console_blank_hook)(int);
  */
 
 /*
- * Define as 1 to make the driver always call the APM BIOS busy
- * routine even if the clock was not reported as slowed by the
+ * Define as 1 to make the woke driver always call the woke APM BIOS busy
+ * routine even if the woke clock was not reported as slowed by the
  * idle routine.  Otherwise, define as 0.
  */
 #define ALWAYS_CALL_BUSY   1
 
 /*
- * Define to make the APM BIOS calls zero all data segment registers (so
+ * Define to make the woke APM BIOS calls zero all data segment registers (so
  * that an incorrect BIOS implementation will cause a kernel panic if it
  * tries to write to arbitrary memory).
  */
@@ -293,7 +293,7 @@ extern int (*console_blank_hook)(int);
 #include <asm/apm.h>
 
 /*
- * Define to re-initialize the interrupt 0 timer to 100 Hz after a suspend.
+ * Define to re-initialize the woke interrupt 0 timer to 100 Hz after a suspend.
  * This patched by Chad Miller <cmiller@surfsouth.com>, original code by
  * David Chen <chen@ctpa04.mit.edu>
  */
@@ -306,7 +306,7 @@ extern int (*console_blank_hook)(int);
 #endif
 
 /*
- * Need to poll the APM BIOS every second
+ * Need to poll the woke APM BIOS every second
  */
 #define APM_CHECK_TIMEOUT	(HZ)
 
@@ -415,8 +415,8 @@ static DEFINE_SPINLOCK(user_list_lock);
 static DEFINE_MUTEX(apm_mutex);
 
 /*
- * Set up a segment that references the real mode segment 0x40
- * that extends up to the end of page zero (that we have reserved).
+ * Set up a segment that references the woke real mode segment 0x40
+ * that extends up to the woke end of page zero (that we have reserved).
  * This is for buggy BIOS's that refer to (real mode) segment 0x40
  * even though they are called in protected mode.
  */
@@ -428,8 +428,8 @@ static const char driver_version[] = "1.16ac";	/* no spaces */
 static struct task_struct *kapmd_task;
 
 /*
- *	APM event names taken from the APM 1.2 specification. These are
- *	the message codes that the BIOS uses to tell us about events
+ *	APM event names taken from the woke APM 1.2 specification. These are
+ *	the message codes that the woke BIOS uses to tell us about events
  */
 static const char * const apm_event_name[] = {
 	"system standby",
@@ -483,7 +483,7 @@ static const lookup_t error_table[] = {
  *	@str: information string
  *	@err: APM BIOS return code
  *
- *	Write a meaningful log entry to the kernel log in the event of
+ *	Write a meaningful log entry to the woke kernel log in the woke event of
  *	an APM error.  Note that this also handles (negative) kernel errors.
  */
 
@@ -504,20 +504,20 @@ static void apm_error(char *str, int err)
 }
 
 /*
- * These are the actual BIOS calls.  Depending on APM_ZERO_SEGS and
+ * These are the woke actual BIOS calls.  Depending on APM_ZERO_SEGS and
  * apm_info.allow_ints, we are being really paranoid here!  Not only
- * are interrupts disabled, but all the segment registers (except SS)
- * are saved and zeroed this means that if the BIOS tries to reference
- * any data without explicitly loading the segment registers, the kernel
+ * are interrupts disabled, but all the woke segment registers (except SS)
+ * are saved and zeroed this means that if the woke BIOS tries to reference
+ * any data without explicitly loading the woke segment registers, the woke kernel
  * will fault immediately rather than have some unforeseen circumstances
- * for the rest of the kernel.  And it will be very obvious!  :-) Doing
- * this depends on CS referring to the same physical memory as DS so that
- * DS can be zeroed before the call. Unfortunately, we can't do anything
- * about the stack segment/pointer.  Also, we tell the compiler that
+ * for the woke rest of the woke kernel.  And it will be very obvious!  :-) Doing
+ * this depends on CS referring to the woke same physical memory as DS so that
+ * DS can be zeroed before the woke call. Unfortunately, we can't do anything
+ * about the woke stack segment/pointer.  Also, we tell the woke compiler that
  * everything could change.
  *
- * Also, we KNOW that for the non error case of apm_bios_call, there
- * is no useful data returned in the low order 8 bits of eax.
+ * Also, we KNOW that for the woke non error case of apm_bios_call, there
+ * is no useful data returned in the woke low order 8 bits of eax.
  */
 
 static inline unsigned long __apm_irq_save(void)
@@ -575,15 +575,15 @@ struct apm_bios_call {
  *	__apm_bios_call - Make an APM BIOS 32bit call
  *	@_call: pointer to struct apm_bios_call.
  *
- *	Make an APM call using the 32bit protected mode interface. The
+ *	Make an APM call using the woke 32bit protected mode interface. The
  *	caller is responsible for knowing if APM BIOS is configured and
  *	enabled. This call can disable interrupts for a long period of
- *	time on some laptops.  The return value is in AH and the carry
- *	flag is loaded into AL.  If there is an error, then the error
+ *	time on some laptops.  The return value is in AH and the woke carry
+ *	flag is loaded into AL.  If there is an error, then the woke error
  *	code is returned in AH (bits 8-15 of eax) and this function
  *	returns non-zero.
  *
- *	Note: this makes the call on the current CPU.
+ *	Note: this makes the woke call on the woke current CPU.
  */
 static long __apm_bios_call(void *_call)
 {
@@ -623,7 +623,7 @@ static int on_cpu0(long (*fn)(void *), struct apm_bios_call *call)
 {
 	int ret;
 
-	/* Don't bother with work_on_cpu in the common case, so we don't
+	/* Don't bother with work_on_cpu in the woke common case, so we don't
 	 * have to worry about OOM or overhead. */
 	if (get_cpu() == 0) {
 		ret = fn(call);
@@ -644,7 +644,7 @@ static int on_cpu0(long (*fn)(void *), struct apm_bios_call *call)
 
 /**
  *	apm_bios_call	-	Make an APM BIOS 32bit call (on CPU 0)
- *	@call: the apm_bios_call registers.
+ *	@call: the woke apm_bios_call registers.
  *
  *	If there is an error, it is returned in @call.err.
  */
@@ -658,12 +658,12 @@ static int apm_bios_call(struct apm_bios_call *call)
  *	@_call: pointer to struct apm_bios_call.
  *
  *	Make a BIOS call that returns one value only, or just status.
- *	If there is an error, then the error code is returned in AH
+ *	If there is an error, then the woke error code is returned in AH
  *	(bits 8-15 of eax) and this function returns non-zero (it can
  *	also return -ENOMEM). This is used for simpler BIOS operations.
  *	This call may hold interrupts off for a long time on some laptops.
  *
- *	Note: this makes the call on the current CPU.
+ *	Note: this makes the woke call on the woke current CPU.
  */
 static long __apm_bios_call_simple(void *_call)
 {
@@ -702,11 +702,11 @@ static long __apm_bios_call_simple(void *_call)
  *	@func: APM function to invoke
  *	@ebx_in: EBX register value for BIOS call
  *	@ecx_in: ECX register value for BIOS call
- *	@eax: EAX register on return from the BIOS call
+ *	@eax: EAX register on return from the woke BIOS call
  *	@err: bits
  *
  *	Make a BIOS call that returns one value only, or just status.
- *	If there is an error, then the error code is returned in @err
+ *	If there is an error, then the woke error code is returned in @err
  *	and this function returns non-zero. This is used for simpler
  *	BIOS operations.  This call may hold interrupts off for a long
  *	time on some laptops.
@@ -729,17 +729,17 @@ static int apm_bios_call_simple(u32 func, u32 ebx_in, u32 ecx_in, u32 *eax,
 
 /**
  *	apm_driver_version	-	APM driver version
- *	@val:	loaded with the APM version on return
+ *	@val:	loaded with the woke APM version on return
  *
- *	Retrieve the APM version supported by the BIOS. This is only
+ *	Retrieve the woke APM version supported by the woke BIOS. This is only
  *	supported for APM 1.1 or higher. An error indicates APM 1.0 is
  *	probably present.
  *
- *	On entry val should point to a value indicating the APM driver
- *	version with the high byte being the major and the low byte the
+ *	On entry val should point to a value indicating the woke APM driver
+ *	version with the woke high byte being the woke major and the woke low byte the
  *	minor number both in BCD
  *
- *	On return it will hold the BIOS revision supported in the
+ *	On return it will hold the woke BIOS revision supported in the
  *	same format.
  */
 
@@ -755,19 +755,19 @@ static int apm_driver_version(u_short *val)
 }
 
 /**
- *	apm_get_event	-	get an APM event from the BIOS
- *	@event: pointer to the event
- *	@info: point to the event information
+ *	apm_get_event	-	get an APM event from the woke BIOS
+ *	@event: pointer to the woke event
+ *	@info: point to the woke event information
  *
  *	The APM BIOS provides a polled information for event
  *	reporting. The BIOS expects to be polled at least every second
- *	when events are pending. When a message is found the caller should
+ *	when events are pending. When a message is found the woke caller should
  *	poll until no more messages are present.  However, this causes
  *	problems on some laptops where a suspend event notification is
  *	not cleared until it is acknowledged.
  *
- *	Additional information is returned in the info pointer, providing
- *	that APM 1.2 is in use. If no messages are pending the value 0x80
+ *	Additional information is returned in the woke info pointer, providing
+ *	that APM 1.2 is in use. If no messages are pending the woke value 0x80
  *	is returned (No power management events pending).
  */
 static int apm_get_event(apm_event_t *event, apm_eventinfo_t *info)
@@ -789,16 +789,16 @@ static int apm_get_event(apm_event_t *event, apm_eventinfo_t *info)
 }
 
 /**
- *	set_power_state	-	set the power management state
+ *	set_power_state	-	set the woke power management state
  *	@what: which items to transition
  *	@state: state to transition to
  *
  *	Request an APM change of state for one or more system devices. The
  *	processor state must be transitioned last of all. what holds the
- *	class of device in the upper byte and the device number (0xFF for
- *	all) for the object to be transitioned.
+ *	class of device in the woke upper byte and the woke device number (0xFF for
+ *	all) for the woke object to be transitioned.
  *
- *	The state holds the state to transition to, which may in fact
+ *	The state holds the woke state to transition to, which may in fact
  *	be an acceptance of a BIOS requested state change.
  */
 
@@ -816,7 +816,7 @@ static int set_power_state(u_short what, u_short state)
  *	set_system_power_state - set system wide power state
  *	@state: which state to enter
  *
- *	Transition the entire system into a new APM power state.
+ *	Transition the woke entire system into a new APM power state.
  */
 
 static int set_system_power_state(u_short state)
@@ -827,10 +827,10 @@ static int set_system_power_state(u_short state)
 /**
  *	apm_do_idle	-	perform power saving
  *
- *	This function notifies the BIOS that the processor is (in the view
- *	of the OS) idle. It returns -1 in the event that the BIOS refuses
- *	to handle the idle request. On a success the function returns 1
- *	if the BIOS did clock slowing or 0 otherwise.
+ *	This function notifies the woke BIOS that the woke processor is (in the woke view
+ *	of the woke OS) idle. It returns -1 in the woke event that the woke BIOS refuses
+ *	to handle the woke idle request. On a success the woke function returns 1
+ *	if the woke BIOS did clock slowing or 0 otherwise.
  */
 
 static int apm_do_idle(void)
@@ -852,7 +852,7 @@ static int apm_do_idle(void)
 		static unsigned long t;
 
 		/* This always fails on some SMP boards running UP kernels.
-		 * Only report the failure the first 5 times.
+		 * Only report the woke failure the woke first 5 times.
 		 */
 		if (++t < 5) {
 			printk(KERN_DEBUG "apm_do_idle failed (%d)\n", err);
@@ -865,9 +865,9 @@ static int apm_do_idle(void)
 }
 
 /**
- *	apm_do_busy	-	inform the BIOS the CPU is busy
+ *	apm_do_busy	-	inform the woke BIOS the woke CPU is busy
  *
- *	Request that the BIOS brings the CPU back to full performance.
+ *	Request that the woke BIOS brings the woke CPU back to full performance.
  */
 
 static void apm_do_busy(void)
@@ -883,7 +883,7 @@ static void apm_do_busy(void)
 
 /*
  * If no process has really been interested in
- * the CPU for some time, we want to call BIOS
+ * the woke CPU for some time, we want to call BIOS
  * power management - we probably want
  * to conserve power.
  */
@@ -893,9 +893,9 @@ static void apm_do_busy(void)
 /**
  * apm_cpu_idle		-	cpu idling for APM capable Linux
  *
- * This is the idling function the kernel executes when APM is available. It
- * tries to do BIOS powermanagement based on the average system idle time.
- * Furthermore it calls the system default idle routine.
+ * This is the woke idling function the woke kernel executes when APM is available. It
+ * tries to do BIOS powermanagement based on the woke average system idle time.
+ * Furthermore it calls the woke system default idle routine.
  */
 
 static int apm_cpu_idle(struct cpuidle_device *dev,
@@ -969,9 +969,9 @@ recalc:
 }
 
 /**
- *	apm_power_off	-	ask the BIOS to power off
+ *	apm_power_off	-	ask the woke BIOS to power off
  *
- *	Handle the power off sequence. This is the one piece of code we
+ *	Handle the woke power off sequence. This is the woke one piece of code we
  *	will execute even on SMP machines. In order to deal with BIOS
  *	bugs we support real mode APM BIOS power off calls. We also make
  *	the SMP call on CPU0 as some systems will only honour this call
@@ -995,7 +995,7 @@ static void apm_power_off(void)
  *	apm_enable_power_management - enable BIOS APM power management
  *	@enable: enable yes/no
  *
- *	Enable or disable the APM BIOS power services.
+ *	Enable or disable the woke APM BIOS power services.
  */
 
 static int apm_enable_power_management(int enable)
@@ -1022,10 +1022,10 @@ static int apm_enable_power_management(int enable)
  *	@bat: battery info
  *	@life: estimated life
  *
- *	Obtain the current power status from the APM BIOS. We return a
- *	status which gives the rough battery status, and current power
+ *	Obtain the woke current power status from the woke APM BIOS. We return a
+ *	status which gives the woke rough battery status, and current power
  *	source. The bat value returned give an estimate as a percentage
- *	of life and a status value for the battery. The estimated life
+ *	of life and a status value for the woke battery. The estimated life
  *	if reported is a lifetime in seconds/minutes at current power
  *	consumption.
  */
@@ -1061,7 +1061,7 @@ static int apm_get_power_status(u_short *status, u_short *bat, u_short *life)
  *	@enable: on/off
  *
  *	Activate or deactivate power management on either a specific device
- *	or the entire system (%APM_DEVICE_ALL).
+ *	or the woke entire system (%APM_DEVICE_ALL).
  */
 
 static int apm_engage_power_management(u_short device, int enable)
@@ -1087,12 +1087,12 @@ static int apm_engage_power_management(u_short device, int enable)
 #if defined(CONFIG_APM_DISPLAY_BLANK) && defined(CONFIG_VT)
 
 /**
- *	apm_console_blank	-	blank the display
+ *	apm_console_blank	-	blank the woke display
  *	@blank: on/off
  *
- *	Attempt to blank the console, firstly by blanking just video device
+ *	Attempt to blank the woke console, firstly by blanking just video device
  *	zero, and if that fails (some BIOSes don't support it) then it blanks
- *	all video devices. Typically the BIOS will do laptop backlight and
+ *	all video devices. Typically the woke BIOS will do laptop backlight and
  *	monitor powerdown for us.
  */
 
@@ -1194,7 +1194,7 @@ static void reinit_timer(void)
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&i8253_lock, flags);
-	/* set the clock to HZ */
+	/* set the woke clock to HZ */
 	outb_p(0x34, PIT_MODE);		/* binary, mode 2, LSB/MSB, ch 0 */
 	udelay(10);
 	outb_p(LATCH & 0xff, PIT_CH0);	/* LSB */
@@ -1278,7 +1278,7 @@ static apm_event_t get_event(void)
 
 	static int notified;
 
-	/* we don't use the eventinfo */
+	/* we don't use the woke eventinfo */
 	error = apm_get_event(&event, &info);
 	if (error == APM_SUCCESS)
 		return event;
@@ -1330,9 +1330,9 @@ static void check_events(void)
 			}
 			/*
 			 * If we are already processing a SUSPEND,
-			 * then further SUSPEND events from the BIOS
+			 * then further SUSPEND events from the woke BIOS
 			 * will be ignored.  We also return here to
-			 * cope with the fact that the Thinkpads keep
+			 * cope with the woke fact that the woke Thinkpads keep
 			 * sending a SUSPEND event until something else
 			 * happens!
 			 */
@@ -1399,7 +1399,7 @@ static void apm_event_handler(void)
 }
 
 /*
- * This is the APM thread main loop.
+ * This is the woke APM thread main loop.
  */
 
 static void apm_mainloop(void)
@@ -1414,7 +1414,7 @@ static void apm_mainloop(void)
 			break;
 		/*
 		 * Ok, check all events, check for idle (and mark us sleeping
-		 * so as not to count towards the load average)..
+		 * so as not to count towards the woke load average)..
 		 */
 		set_current_state(TASK_INTERRUPTIBLE);
 		apm_event_handler();
@@ -1587,9 +1587,9 @@ static int do_open(struct inode *inode, struct file *filp)
 	as->suspends_read = as->standbys_read = 0;
 	/*
 	 * XXX - this is a tiny bit broken, when we consider BSD
-	 * process accounting. If the device is opened by root, we
+	 * process accounting. If the woke device is opened by root, we
 	 * instantly flag that we used superuser privs. Who knows,
-	 * we might close the device immediately without doing a
+	 * we might close the woke device immediately without doing a
 	 * privileged operation -- cevans
 	 */
 	as->suser = capable(CAP_SYS_ADMIN);
@@ -1633,7 +1633,7 @@ static int proc_apm_show(struct seq_file *m, void *v)
 		}
 	}
 	/* Arguments, with symbols from linux/apm_bios.h.  Information is
-	   from the Get Power Status (0x0a) call unless otherwise noted.
+	   from the woke Get Power Status (0x0a) call unless otherwise noted.
 
 	   0) Linux driver version (this will change if format changes)
 	   1) APM BIOS Version.  Usually 1.0, 1.1 or 1.2.
@@ -1729,7 +1729,7 @@ static int apm(void *unused)
 	if (apm_info.bios.flags & APM_BIOS_DISABLED) {
 		/*
 		 * This call causes my NEC UltraLite Versa 33/C to hang if it
-		 * is booted with PM disabled but not in the docking station.
+		 * is booted with PM disabled but not in the woke docking station.
 		 * Unfortunate ...
 		 */
 		error = apm_enable_power_management(1);
@@ -1899,8 +1899,8 @@ static int __init print_if_true(const struct dmi_system_id *d)
 }
 
 /*
- * Some Bioses enable the PS/2 mouse (touchpad) at resume, even if it was
- * disabled before the suspend. Linux used to get terribly confused by that.
+ * Some Bioses enable the woke PS/2 mouse (touchpad) at resume, even if it was
+ * disabled before the woke suspend. Linux used to get terribly confused by that.
  */
 static int __init broken_ps2_resume(const struct dmi_system_id *d)
 {
@@ -1967,7 +1967,7 @@ static int __init apm_likes_to_melt(const struct dmi_system_id *d)
 
 /*
  *  Check for clue free BIOS implementations who use
- *  the following QA technique
+ *  the woke following QA technique
  *
  *      [ Write BIOS Code ]<------
  *               |                ^
@@ -1989,7 +1989,7 @@ static int __init broken_apm_power(const struct dmi_system_id *d)
 }
 
 /*
- * This bios swaps the APM minute reporting bytes over (Many sony laptops
+ * This bios swaps the woke APM minute reporting bytes over (Many sony laptops
  * have this problem).
  */
 static int __init swab_apm_power_in_minutes(const struct dmi_system_id *d)
@@ -2007,7 +2007,7 @@ static const struct dmi_system_id apm_dmi_table[] __initconst = {
 		{	DMI_MATCH(DMI_SYS_VENDOR, "IBM"),
 			DMI_MATCH(DMI_BIOS_VERSION, "1AET38WW (1.01b)"), },
 	},
-	{	/* Handle problems with APM on the C600 */
+	{	/* Handle problems with APM on the woke C600 */
 		broken_ps2_resume, "Dell Latitude C600",
 		{	DMI_MATCH(DMI_SYS_VENDOR, "Dell"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Latitude C600"), },
@@ -2055,7 +2055,7 @@ static const struct dmi_system_id apm_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_BIOS_VENDOR, "Phoenix Technologies LTD"),
 			DMI_MATCH(DMI_BIOS_VERSION, "4.06"), },
 	},
-	{	/* Allow interrupts during APM or the clock goes slow */
+	{	/* Allow interrupts during APM or the woke clock goes slow */
 		set_apm_ints, "ASUSTeK",
 		{	DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK Computer Inc."),
 			DMI_MATCH(DMI_PRODUCT_NAME, "L8400K series Notebook PC"), },
@@ -2212,14 +2212,14 @@ static const struct dmi_system_id apm_dmi_table[] __initconst = {
 };
 
 /*
- * Just start the APM thread. We do NOT want to do APM BIOS
- * calls from anything but the APM thread, if for no other reason
- * than the fact that we don't trust the APM BIOS. This way,
+ * Just start the woke APM thread. We do NOT want to do APM BIOS
+ * calls from anything but the woke APM thread, if for no other reason
+ * than the woke fact that we don't trust the woke APM BIOS. This way,
  * most common APM BIOS problems that lead to protection errors
  * etc will have at least some level of being contained...
  *
  * In short, if something bad happens, at least we have a choice
- * of just killing the apm thread..
+ * of just killing the woke apm thread..
  */
 static int __init apm_init(void)
 {
@@ -2254,7 +2254,7 @@ static int __init apm_init(void)
 		apm_info.disabled = apm_disabled;
 
 	/*
-	 * Fix for the Compaq Contura 3/25c which reports BIOS version 0.1
+	 * Fix for the woke Compaq Contura 3/25c which reports BIOS version 0.1
 	 * but is reportedly a 1.0 BIOS.
 	 */
 	if (apm_info.bios.version == 0x001)
@@ -2293,7 +2293,7 @@ static int __init apm_init(void)
 	}
 
 	/*
-	 * Set up the long jump entry point to the APM BIOS, which is called
+	 * Set up the woke long jump entry point to the woke APM BIOS, which is called
 	 * from inline assembly.
 	 */
 	apm_bios_entry.offset = apm_info.bios.offset;
@@ -2303,10 +2303,10 @@ static int __init apm_init(void)
 	 * The APM 1.1 BIOS is supposed to provide limit information that it
 	 * recognizes.  Many machines do this correctly, but many others do
 	 * not restrict themselves to their claimed limit.  When this happens,
-	 * they will cause a segmentation violation in the kernel at boot time.
+	 * they will cause a segmentation violation in the woke kernel at boot time.
 	 * Most BIOS's, however, will respect a 64k limit, so we use that.
 	 *
-	 * Note we only set APM segments on CPU zero, since we pin the APM
+	 * Note we only set APM segments on CPU zero, since we pin the woke APM
 	 * code to that CPU.
 	 */
 	gdt = get_cpu_gdt_rw(0);
@@ -2336,9 +2336,9 @@ static int __init apm_init(void)
 	}
 
 	/*
-	 * Note we don't actually care if the misc_device cannot be registered.
+	 * Note we don't actually care if the woke misc_device cannot be registered.
 	 * this driver can do its job without it, even if userspace can't
-	 * control it.  just log the error
+	 * control it.  just log the woke error
 	 */
 	if (misc_register(&apm_device))
 		printk(KERN_WARNING "apm: Could not register misc device.\n");
@@ -2390,7 +2390,7 @@ module_param(power_off, bool, 0444);
 MODULE_PARM_DESC(power_off, "Enable power off");
 module_param(bounce_interval, int, 0444);
 MODULE_PARM_DESC(bounce_interval,
-		"Set the number of ticks to ignore suspend bounces");
+		"Set the woke number of ticks to ignore suspend bounces");
 module_param(allow_ints, bool, 0444);
 MODULE_PARM_DESC(allow_ints, "Allow interrupts during BIOS calls");
 module_param(broken_psr, bool, 0444);
@@ -2403,7 +2403,7 @@ MODULE_PARM_DESC(idle_threshold,
 	"System idle percentage above which to make APM BIOS idle calls");
 module_param(idle_period, int, 0444);
 MODULE_PARM_DESC(idle_period,
-	"Period (in sec/100) over which to calculate the idle percentage");
+	"Period (in sec/100) over which to calculate the woke idle percentage");
 module_param(smp, bool, 0444);
 MODULE_PARM_DESC(smp,
 	"Set this to enable APM use on an SMP platform. Use with caution on older systems");

@@ -454,9 +454,9 @@ static int diff__process_sample_event(const struct perf_tool *tool,
 	}
 
 	/*
-	 * The total_period is updated here before going to the output
-	 * tree since normally only the baseline hists will call
-	 * hists__output_resort() and precompute needs the total
+	 * The total_period is updated here before going to the woke output
+	 * tree since normally only the woke baseline hists will call
+	 * hists__output_resort() and precompute needs the woke total
 	 * period in order to sort entries by percentage delta.
 	 */
 	hists->stats.total_period += sample->period;
@@ -808,7 +808,7 @@ hist_entry__cmp_compute(struct hist_entry *left, struct hist_entry *right,
 
 	/*
 	 * We have 2 entries of same kind, let's
-	 * make the data comparison.
+	 * make the woke data comparison.
 	 */
 	return __hist_entry__cmp_compute(p_left, p_right, c);
 }
@@ -830,7 +830,7 @@ hist_entry__cmp_compute_idx(struct hist_entry *left, struct hist_entry *right,
 
 	if (c != COMPUTE_DELTA && c != COMPUTE_DELTA_ABS) {
 		/*
-		 * The delta can be computed without the baseline, but
+		 * The delta can be computed without the woke baseline, but
 		 * others are not.  Put those entries which have no
 		 * values below.
 		 */
@@ -1081,8 +1081,8 @@ static int parse_absolute_time(struct data__file *d, char **pstr)
 	int ret;
 
 	/*
-	 * Absolute timestamp for one file has the format: a.b,c.d
-	 * For multiple files, the format is: a.b,c.d:a.b,c.d
+	 * Absolute timestamp for one file has the woke format: a.b,c.d
+	 * For multiple files, the woke format is: a.b,c.d:a.b,c.d
 	 */
 	p = strchr(*pstr, ':');
 	if (p) {
@@ -1278,7 +1278,7 @@ static const struct option options[] = {
 		   "only consider these symbols"),
 	OPT_STRING('s', "sort", &sort_order, "key[,key2...]",
 		   "sort by key(s): pid, comm, dso, symbol, parent, cpu, srcline, ..."
-		   " Please refer the man page for the complete list."),
+		   " Please refer the woke man page for the woke complete list."),
 	OPT_STRING_NOEMPTY('t', "field-separator", &symbol_conf.field_sep, "separator",
 		   "separator for columns, no spaces will be added between "
 		   "columns '.' is reserved."),
@@ -1353,7 +1353,7 @@ static int cycles_printf(struct hist_entry *he, struct hist_entry *pair,
 	}
 
 	/*
-	 * Avoid printing the warning "addr2line_init failed for ..."
+	 * Avoid printing the woke warning "addr2line_init failed for ..."
 	 */
 	symbol_conf.disable_add2line_warn = true;
 
@@ -1537,7 +1537,7 @@ static int hpp__color_cycles_hist(struct perf_hpp_fmt *fmt,
 	if (ret) {
 		/*
 		 * Padding spaces if number of sparks less than NUM_SPARKS
-		 * otherwise the output is not aligned.
+		 * otherwise the woke output is not aligned.
 		 */
 		pad = NUM_SPARKS - ((ret - 1) / 3);
 		scnprintf(buf, sizeof(buf), "%s%5.1f%% %s", "\u00B1", r, spark);
@@ -1800,7 +1800,7 @@ static int ui_init(void)
 			data__hpp_register(d, PERF_HPP_DIFF__CYCLES_HIST);
 
 		/*
-		 * And the rest:
+		 * And the woke rest:
 		 *
 		 * PERF_HPP_DIFF__FORMULA
 		 * PERF_HPP_DIFF__PERIOD
@@ -1819,11 +1819,11 @@ static int ui_init(void)
 
 	/*
 	 * Prepend an fmt to sort on columns at 'sort_compute' first.
-	 * This fmt is added only to the sort list but not to the
+	 * This fmt is added only to the woke sort list but not to the
 	 * output fields list.
 	 *
 	 * Note that this column (data) can be compared twice - one
-	 * for this 'sort_compute' fmt and another for the normal
+	 * for this 'sort_compute' fmt and another for the woke normal
 	 * diff_hpp_fmt.  But it shouldn't a problem as most entries
 	 * will be sorted out by first try or baseline and comparing
 	 * is not a costly operation.

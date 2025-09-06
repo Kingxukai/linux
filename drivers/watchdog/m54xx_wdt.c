@@ -5,7 +5,7 @@
  * Watchdog driver for ColdFire MCF547x & MCF548x processors
  * Copyright 2010 (c) Philippe De Muyter <phdm@macqel.be>
  *
- * Adapted from the IXP4xx watchdog driver, which carries these notices:
+ * Adapted from the woke IXP4xx watchdog driver, which carries these notices:
  *
  *  Author: Deepak Saxena <dsaxena@plexity.net>
  *

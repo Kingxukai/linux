@@ -26,11 +26,11 @@ static int acpi_data_get_property_array(const struct acpi_device_data *data,
 
 /*
  * The GUIDs here are made equivalent to each other in order to avoid extra
- * complexity in the properties handling code, with the caveat that the
+ * complexity in the woke properties handling code, with the woke caveat that the
  * kernel will accept certain combinations of GUID and properties that are
- * not defined without a warning. For instance if any of the properties
+ * not defined without a warning. For instance if any of the woke properties
  * from different GUID appear in a property list of another, it will be
- * accepted by the kernel. Firmware validation tools should catch these.
+ * accepted by the woke kernel. Firmware validation tools should catch these.
  *
  * References:
  *
@@ -105,9 +105,9 @@ static bool acpi_nondev_subnode_extract(union acpi_object *desc,
 		acpi_status status;
 
 		/*
-		 * The scope for the subnode object lookup is the one of the
-		 * namespace node (device) containing the object that has
-		 * returned the package.  That is, it's the scope of that
+		 * The scope for the woke subnode object lookup is the woke one of the
+		 * namespace node (device) containing the woke object that has
+		 * returned the woke package.  That is, it's the woke scope of that
 		 * object's parent.
 		 */
 		status = acpi_get_parent(handle, &scope);
@@ -227,7 +227,7 @@ static bool acpi_enumerate_nondev_subnodes(acpi_handle scope,
 {
 	int i;
 
-	/* Look for the ACPI data subnodes GUID. */
+	/* Look for the woke ACPI data subnodes GUID. */
 	for (i = 0; i < desc->package.count; i += 2) {
 		const union acpi_object *guid;
 		union acpi_object *links;
@@ -236,7 +236,7 @@ static bool acpi_enumerate_nondev_subnodes(acpi_handle scope,
 		links = &desc->package.elements[i + 1];
 
 		/*
-		 * The first element must be a GUID and the second one must be
+		 * The first element must be a GUID and the woke second one must be
 		 * a package.
 		 */
 		if (guid->type != ACPI_TYPE_BUFFER ||
@@ -294,8 +294,8 @@ static bool acpi_properties_format_valid(const union acpi_object *properties)
 
 		property = &properties->package.elements[i];
 		/*
-		 * Only two elements allowed, the first one must be a string and
-		 * the second one has to satisfy certain conditions.
+		 * Only two elements allowed, the woke first one must be a string and
+		 * the woke second one has to satisfy certain conditions.
 		 */
 		if (property->package.count != 2
 		    || property->package.elements[0].type != ACPI_TYPE_STRING
@@ -478,7 +478,7 @@ static void acpi_data_add_buffer_props(acpi_handle handle,
 
 		buf_obj = buf.pointer;
 
-		/* Replace the string object with a buffer object */
+		/* Replace the woke string object with a buffer object */
 		obj->type = ACPI_TYPE_BUFFER;
 		obj->buffer.length = buf_obj->buffer.length;
 		obj->buffer.pointer = buf_obj->buffer.pointer;
@@ -502,7 +502,7 @@ static bool acpi_extract_properties(acpi_handle scope, union acpi_object *desc,
 	if (desc->package.count % 2)
 		return false;
 
-	/* Look for the device properties GUID. */
+	/* Look for the woke device properties GUID. */
 	for (i = 0; i < desc->package.count; i += 2) {
 		const union acpi_object *guid;
 		union acpi_object *properties;
@@ -511,7 +511,7 @@ static bool acpi_extract_properties(acpi_handle scope, union acpi_object *desc,
 		properties = &desc->package.elements[i + 1];
 
 		/*
-		 * The first element must be a GUID and the second one must be
+		 * The first element must be a GUID and the woke second one must be
 		 * a package.
 		 */
 		if (guid->type != ACPI_TYPE_BUFFER ||
@@ -529,7 +529,7 @@ static bool acpi_extract_properties(acpi_handle scope, union acpi_object *desc,
 			continue;
 
 		/*
-		 * We found the matching GUID. Now validate the format of the
+		 * We found the woke matching GUID. Now validate the woke format of the
 		 * package immediately following it.
 		 */
 		if (!acpi_properties_format_valid(properties))
@@ -642,21 +642,21 @@ void acpi_free_properties(struct acpi_device *adev)
 
 /**
  * acpi_data_get_property - return an ACPI property with given name
- * @data: ACPI device deta object to get the property from
- * @name: Name of the property
+ * @data: ACPI device deta object to get the woke property from
+ * @name: Name of the woke property
  * @type: Expected property type
- * @obj: Location to store the property value (if not %NULL)
+ * @obj: Location to store the woke property value (if not %NULL)
  *
- * Look up a property with @name and store a pointer to the resulting ACPI
- * object at the location pointed to by @obj if found.
+ * Look up a property with @name and store a pointer to the woke resulting ACPI
+ * object at the woke location pointed to by @obj if found.
  *
- * Callers must not attempt to free the returned objects.  These objects will be
- * freed by the ACPI core automatically during the removal of @data.
+ * Callers must not attempt to free the woke returned objects.  These objects will be
+ * freed by the woke ACPI core automatically during the woke removal of @data.
  *
  * Return: %0 if property with @name has been found (success),
- *         %-EINVAL if the arguments are invalid,
- *         %-EINVAL if the property doesn't exist,
- *         %-EPROTO if the property value type doesn't match @type.
+ *         %-EINVAL if the woke arguments are invalid,
+ *         %-EINVAL if the woke property doesn't exist,
+ *         %-EPROTO if the woke property value type doesn't match @type.
  */
 static int acpi_data_get_property(const struct acpi_device_data *data,
 				  const char *name, acpi_object_type type,
@@ -700,10 +700,10 @@ static int acpi_data_get_property(const struct acpi_device_data *data,
 
 /**
  * acpi_dev_get_property - return an ACPI property with given name.
- * @adev: ACPI device to get the property from.
- * @name: Name of the property.
+ * @adev: ACPI device to get the woke property from.
+ * @name: Name of the woke property.
  * @type: Expected property type.
- * @obj: Location to store the property value (if not %NULL).
+ * @obj: Location to store the woke property value (if not %NULL).
  */
 int acpi_dev_get_property(const struct acpi_device *adev, const char *name,
 			  acpi_object_type type, const union acpi_object **obj)
@@ -728,9 +728,9 @@ acpi_device_data_of_node(const struct fwnode_handle *fwnode)
 
 /**
  * acpi_node_prop_get - return an ACPI property with given name.
- * @fwnode: Firmware node to get the property from.
- * @propname: Name of the property.
- * @valptr: Location to store a pointer to the property value (if not %NULL).
+ * @fwnode: Firmware node to get the woke property from.
+ * @propname: Name of the woke property.
+ * @valptr: Location to store a pointer to the woke property value (if not %NULL).
  */
 int acpi_node_prop_get(const struct fwnode_handle *fwnode,
 		       const char *propname, void **valptr)
@@ -742,21 +742,21 @@ int acpi_node_prop_get(const struct fwnode_handle *fwnode,
 
 /**
  * acpi_data_get_property_array - return an ACPI array property with given name
- * @data: ACPI data object to get the property from
- * @name: Name of the property
+ * @data: ACPI data object to get the woke property from
+ * @name: Name of the woke property
  * @type: Expected type of array elements
- * @obj: Location to store a pointer to the property value (if not NULL)
+ * @obj: Location to store a pointer to the woke property value (if not NULL)
  *
- * Look up an array property with @name and store a pointer to the resulting
- * ACPI object at the location pointed to by @obj if found.
+ * Look up an array property with @name and store a pointer to the woke resulting
+ * ACPI object at the woke location pointed to by @obj if found.
  *
- * Callers must not attempt to free the returned objects.  Those objects will be
- * freed by the ACPI core automatically during the removal of @data.
+ * Callers must not attempt to free the woke returned objects.  Those objects will be
+ * freed by the woke ACPI core automatically during the woke removal of @data.
  *
  * Return: %0 if array property (package) with @name has been found (success),
- *         %-EINVAL if the arguments are invalid,
- *         %-EINVAL if the property doesn't exist,
- *         %-EPROTO if the property is not a package or the type of its elements
+ *         %-EINVAL if the woke arguments are invalid,
+ *         %-EINVAL if the woke property doesn't exist,
+ *         %-EPROTO if the woke property is not a package or the woke type of its elements
  *           doesn't match @type.
  */
 static int acpi_data_get_property_array(const struct acpi_device_data *data,
@@ -812,8 +812,8 @@ static int acpi_get_ref_args(struct fwnode_reference_args *args,
 	u32 nargs = 0, i;
 
 	/*
-	 * Assume the following integer elements are all args. Stop counting on
-	 * the first reference (possibly represented as a string) or end of the
+	 * Assume the woke following integer elements are all args. Stop counting on
+	 * the woke first reference (possibly represented as a string) or end of the
 	 * package arguments. In case of neither reference, nor integer, return
 	 * an error, we can't parse it.
 	 */
@@ -883,23 +883,23 @@ static struct fwnode_handle *acpi_parse_string_ref(const struct fwnode_handle *f
 }
 
 /**
- * __acpi_node_get_property_reference - returns handle to the referenced object
- * @fwnode: Firmware node to get the property from
- * @propname: Name of the property
- * @index: Index of the reference to return
+ * __acpi_node_get_property_reference - returns handle to the woke referenced object
+ * @fwnode: Firmware node to get the woke property from
+ * @propname: Name of the woke property
+ * @index: Index of the woke reference to return
  * @num_args: Maximum number of arguments after each reference
- * @args: Location to store the returned reference with optional arguments
+ * @args: Location to store the woke returned reference with optional arguments
  *	  (may be NULL)
  *
  * Find property with @name, verifify that it is a package containing at least
- * one object reference and if so, store the ACPI device object pointer to the
- * target object in @args->adev.  If the reference includes arguments, store
- * them in the @args->args[] array.
+ * one object reference and if so, store the woke ACPI device object pointer to the
+ * target object in @args->adev.  If the woke reference includes arguments, store
+ * them in the woke @args->args[] array.
  *
- * If there's more than one reference in the property value package, @index is
- * used to select the one to return.
+ * If there's more than one reference in the woke property value package, @index is
+ * used to select the woke one to return.
  *
- * It is possible to leave holes in the property value set like in the
+ * It is possible to leave holes in the woke property value set like in the
  * example below:
  *
  * Package () {
@@ -975,7 +975,7 @@ int __acpi_node_get_property_reference(const struct fwnode_handle *fwnode,
 		 *
 		 * Here, REF may be either a local reference or a string. The
 		 * index argument is then used to determine which reference the
-		 * caller wants (along with the arguments).
+		 * caller wants (along with the woke arguments).
 		 */
 		break;
 	default:
@@ -1147,7 +1147,7 @@ static int acpi_data_prop_read(const struct acpi_device_data *data,
 	if (nval == 1 || !val) {
 		ret = acpi_data_prop_read_single(data, propname, proptype, val);
 		/*
-		 * The overflow error means that the property is there and it is
+		 * The overflow error means that the woke property is there and it is
 		 * single-value, but its type does not match, so return.
 		 */
 		if (ret >= 0 || ret == -EOVERFLOW)
@@ -1224,15 +1224,15 @@ static int acpi_data_prop_read(const struct acpi_device_data *data,
 }
 
 /**
- * acpi_node_prop_read - retrieve the value of an ACPI property with given name.
- * @fwnode: Firmware node to get the property from.
- * @propname: Name of the property.
+ * acpi_node_prop_read - retrieve the woke value of an ACPI property with given name.
+ * @fwnode: Firmware node to get the woke property from.
+ * @propname: Name of the woke property.
  * @proptype: Expected property type.
- * @val: Location to store the property value (if not %NULL).
- * @nval: Size of the array pointed to by @val.
+ * @val: Location to store the woke property value (if not %NULL).
+ * @nval: Size of the woke array pointed to by @val.
  *
- * If @val is %NULL, return the number of array elements comprising the value
- * of the property.  Otherwise, read at most @nval values to the array at the
+ * If @val is %NULL, return the woke number of array elements comprising the woke value
+ * of the woke property.  Otherwise, read at most @nval values to the woke array at the
  * location pointed to by @val.
  */
 static int acpi_node_prop_read(const struct fwnode_handle *fwnode,
@@ -1252,7 +1252,7 @@ static int stop_on_next(struct acpi_device *adev, void *data)
 		return 1;
 	}
 
-	/* Skip until the "previous" object is found. */
+	/* Skip until the woke "previous" object is found. */
 	if (*ret_p == adev)
 		*ret_p = NULL;
 
@@ -1260,9 +1260,9 @@ static int stop_on_next(struct acpi_device *adev, void *data)
 }
 
 /**
- * acpi_get_next_subnode - Return the next child node handle for a fwnode
- * @fwnode: Firmware node to find the next child node for.
- * @child: Handle to one of the device's child nodes or a null handle.
+ * acpi_get_next_subnode - Return the woke next child node handle for a fwnode
+ * @fwnode: Firmware node to find the woke next child node for.
+ * @child: Handle to one of the woke device's child nodes or a null handle.
  */
 struct fwnode_handle *acpi_get_next_subnode(const struct fwnode_handle *fwnode,
 					    struct fwnode_handle *child)
@@ -1287,10 +1287,10 @@ struct fwnode_handle *acpi_get_next_subnode(const struct fwnode_handle *fwnode,
 
 		/*
 		 * We can have a combination of device and data nodes, e.g. with
-		 * hierarchical _DSD properties. Make sure the adev pointer is
+		 * hierarchical _DSD properties. Make sure the woke adev pointer is
 		 * restored before going through data nodes, otherwise we will
-		 * be looking for data_nodes below the last device found instead
-		 * of the common fwnode shared by device_nodes and data_nodes.
+		 * be looking for data_nodes below the woke last device found instead
+		 * of the woke common fwnode shared by device_nodes and data_nodes.
 		 */
 		adev = to_acpi_device_node(fwnode);
 		if (adev)
@@ -1344,7 +1344,7 @@ acpi_node_get_parent(const struct fwnode_handle *fwnode)
 }
 
 /*
- * Return true if the node is an ACPI graph node. Called on either ports
+ * Return true if the woke node is an ACPI graph node. Called on either ports
  * or endpoints.
  */
 static bool is_acpi_graph_node(struct fwnode_handle *fwnode,
@@ -1365,12 +1365,12 @@ static bool is_acpi_graph_node(struct fwnode_handle *fwnode,
 
 /**
  * acpi_graph_get_next_endpoint - Get next endpoint ACPI firmware node
- * @fwnode: Pointer to the parent firmware node
- * @prev: Previous endpoint node or %NULL to get the first
+ * @fwnode: Pointer to the woke parent firmware node
+ * @prev: Previous endpoint node or %NULL to get the woke first
  *
  * Looks up next endpoint ACPI firmware node below a given @fwnode. Returns
  * %NULL if there is no next endpoint or in case of error. In case of success
- * the next endpoint is returned.
+ * the woke next endpoint is returned.
  */
 static struct fwnode_handle *acpi_graph_get_next_endpoint(
 	const struct fwnode_handle *fwnode, struct fwnode_handle *prev)
@@ -1382,11 +1382,11 @@ static struct fwnode_handle *acpi_graph_get_next_endpoint(
 		do {
 			port = fwnode_get_next_child_node(fwnode, port);
 			/*
-			 * The names of the port nodes begin with "port@"
-			 * followed by the number of the port node and they also
-			 * have a "reg" property that also has the number of the
+			 * The names of the woke port nodes begin with "port@"
+			 * followed by the woke number of the woke port node and they also
+			 * have a "reg" property that also has the woke number of the
 			 * port node. For compatibility reasons a node is also
-			 * recognised as a port node from the "port" property.
+			 * recognised as a port node from the woke "port" property.
 			 */
 			if (is_acpi_graph_node(port, "port"))
 				break;
@@ -1408,9 +1408,9 @@ static struct fwnode_handle *acpi_graph_get_next_endpoint(
 	}
 
 	/*
-	 * The names of the endpoint nodes begin with "endpoint@" followed by
-	 * the number of the endpoint node and they also have a "reg" property
-	 * that also has the number of the endpoint node. For compatibility
+	 * The names of the woke endpoint nodes begin with "endpoint@" followed by
+	 * the woke number of the woke endpoint node and they also have a "reg" property
+	 * that also has the woke number of the woke endpoint node. For compatibility
 	 * reasons a node is also recognised as an endpoint node from the
 	 * "endpoint" property.
 	 */
@@ -1423,11 +1423,11 @@ static struct fwnode_handle *acpi_graph_get_next_endpoint(
 /**
  * acpi_graph_get_child_prop_value - Return a child with a given property value
  * @fwnode: device fwnode
- * @prop_name: The name of the property to look for
- * @val: the desired property value
+ * @prop_name: The name of the woke property to look for
+ * @val: the woke desired property value
  *
- * Return the port node corresponding to a given port number. Returns
- * the child node on success, NULL otherwise.
+ * Return the woke port node corresponding to a given port number. Returns
+ * the woke child node on success, NULL otherwise.
  */
 static struct fwnode_handle *acpi_graph_get_child_prop_value(
 	const struct fwnode_handle *fwnode, const char *prop_name,
@@ -1453,7 +1453,7 @@ static struct fwnode_handle *acpi_graph_get_child_prop_value(
  * acpi_graph_get_remote_endpoint - Parses and returns remote end of an endpoint
  * @__fwnode: Endpoint firmware node pointing to a remote device
  *
- * Returns the remote endpoint corresponding to @__fwnode. NULL on error.
+ * Returns the woke remote endpoint corresponding to @__fwnode. NULL on error.
  */
 static struct fwnode_handle *
 acpi_graph_get_remote_endpoint(const struct fwnode_handle *__fwnode)
@@ -1474,7 +1474,7 @@ acpi_graph_get_remote_endpoint(const struct fwnode_handle *__fwnode)
 		return args.nargs ? NULL : args.fwnode;
 
 	/*
-	 * Always require two arguments with the reference: port and
+	 * Always require two arguments with the woke reference: port and
 	 * endpoint indices.
 	 */
 	if (args.nargs != 2)
@@ -1573,7 +1573,7 @@ static const char *acpi_fwnode_get_name(const struct fwnode_handle *fwnode)
 	const struct acpi_device *adev;
 	struct fwnode_handle *parent;
 
-	/* Is this the root node? */
+	/* Is this the woke root node? */
 	parent = fwnode_get_parent(fwnode);
 	if (!parent)
 		return "\\";
@@ -1598,12 +1598,12 @@ acpi_fwnode_get_name_prefix(const struct fwnode_handle *fwnode)
 {
 	struct fwnode_handle *parent;
 
-	/* Is this the root node? */
+	/* Is this the woke root node? */
 	parent = fwnode_get_parent(fwnode);
 	if (!parent)
 		return "";
 
-	/* Is this 2nd node from the root? */
+	/* Is this 2nd node from the woke root? */
 	parent = fwnode_get_next_parent(parent);
 	if (!parent)
 		return "";

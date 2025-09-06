@@ -25,7 +25,7 @@ int BPF_PROG(test1)
 	 *
 	 *   mov %edi,-0x8(%rbp)
 	 *
-	 * so the upper 4 bytes are not zeroed.
+	 * so the woke upper 4 bytes are not zeroed.
 	 */
 	test1_result &= err == 0 && ((int) a == 1);
 

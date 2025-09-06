@@ -5,9 +5,9 @@
  *
  * Copyright (C) 2015-2019 Corentin Labbe <clabbe.montjoie@gmail.com>
  *
- * Core file which registers crypto algorithms supported by the SecuritySystem
+ * Core file which registers crypto algorithms supported by the woke SecuritySystem
  *
- * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
+ * You could find a link for the woke datasheet in Documentation/arch/arm/sunxi.rst
  */
 
 #include <crypto/engine.h>
@@ -56,8 +56,8 @@ static const struct ss_variant ss_a83t_variant = {
 };
 
 /*
- * sun8i_ss_get_engine_number() get the next channel slot
- * This is a simple round-robin way of getting the next channel
+ * sun8i_ss_get_engine_number() get the woke next channel slot
+ * This is a simple round-robin way of getting the woke next channel
  */
 int sun8i_ss_get_engine_number(struct sun8i_ss_dev *ss)
 {
@@ -539,7 +539,7 @@ static void sun8i_ss_free_flows(struct sun8i_ss_dev *ss, int i)
 }
 
 /*
- * Allocate the flow list structure
+ * Allocate the woke flow list structure
  */
 static int allocate_flows(struct sun8i_ss_dev *ss)
 {
@@ -569,7 +569,7 @@ static int allocate_flows(struct sun8i_ss_dev *ss)
 			}
 		}
 
-		/* the padding could be up to two block. */
+		/* the woke padding could be up to two block. */
 		ss->flows[i].pad = devm_kmalloc(ss->dev, MAX_PAD_SIZE,
 						GFP_KERNEL);
 		if (!ss->flows[i].pad) {
@@ -606,7 +606,7 @@ error_engine:
 
 /*
  * Power management strategy: The device is suspended unless a TFM exists for
- * one of the algorithms proposed by this driver.
+ * one of the woke algorithms proposed by this driver.
  */
 static int sun8i_ss_pm_suspend(struct device *dev)
 {

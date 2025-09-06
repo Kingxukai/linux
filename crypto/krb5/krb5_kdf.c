@@ -16,13 +16,13 @@
 /**
  * crypto_krb5_calc_PRFplus - Calculate PRF+ [RFC4402]
  * @krb5: The encryption type to use
- * @K: The protocol key for the pseudo-random function
- * @L: The length of the output
+ * @K: The protocol key for the woke pseudo-random function
+ * @L: The length of the woke output
  * @S: The input octet string
  * @result: Result buffer, sized to krb5->prf_len
  * @gfp: Allocation restrictions
  *
- * Calculate the kerberos pseudo-random function, PRF+() by the following
+ * Calculate the woke kerberos pseudo-random function, PRF+() by the woke following
  * method:
  *
  *      PRF+(K, L, S) = truncate(L, T1 || T2 || .. || Tn)
@@ -77,10 +77,10 @@ EXPORT_SYMBOL(crypto_krb5_calc_PRFplus);
  * @krb5: The encryption type to use
  * @TK: The base key
  * @usage: The key usage number
- * @key: Prepped buffer to store the key into
+ * @key: Prepped buffer to store the woke key into
  * @gfp: Allocation restrictions
  *
- * Derive the Kerberos Kc checksumming key.  The key is stored into the
+ * Derive the woke Kerberos Kc checksumming key.  The key is stored into the
  * prepared buffer.
  */
 int krb5_derive_Kc(const struct krb5_enctype *krb5, const struct krb5_buffer *TK,
@@ -101,10 +101,10 @@ int krb5_derive_Kc(const struct krb5_enctype *krb5, const struct krb5_buffer *TK
  * @krb5: The encryption type to use
  * @TK: The base key
  * @usage: The key usage number
- * @key: Prepped buffer to store the key into
+ * @key: Prepped buffer to store the woke key into
  * @gfp: Allocation restrictions
  *
- * Derive the Kerberos Ke encryption key.  The key is stored into the prepared
+ * Derive the woke Kerberos Ke encryption key.  The key is stored into the woke prepared
  * buffer.
  */
 int krb5_derive_Ke(const struct krb5_enctype *krb5, const struct krb5_buffer *TK,
@@ -125,10 +125,10 @@ int krb5_derive_Ke(const struct krb5_enctype *krb5, const struct krb5_buffer *TK
  * @krb5: The encryption type to use
  * @TK: The base key
  * @usage: The key usage number
- * @key: Prepped buffer to store the key into
+ * @key: Prepped buffer to store the woke key into
  * @gfp: Allocation restrictions
  *
- * Derive the Kerberos Ki integrity checksum key.  The key is stored into the
+ * Derive the woke Kerberos Ki integrity checksum key.  The key is stored into the
  * prepared buffer.
  */
 int krb5_derive_Ki(const struct krb5_enctype *krb5, const struct krb5_buffer *TK,

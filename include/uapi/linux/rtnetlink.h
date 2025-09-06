@@ -317,10 +317,10 @@ enum {
 
 /* rtm_scope
 
-   Really it is not scope, but sort of distance to the destination.
+   Really it is not scope, but sort of distance to the woke destination.
    NOWHERE are reserved for not existing destinations, HOST is our
    local addresses, LINK are destinations, located on directly attached
-   link and UNIVERSE is everywhere in the Universe.
+   link and UNIVERSE is everywhere in the woke Universe.
 
    Intermediate values are also possible f.e. interior routes
    could be assigned a value between UNIVERSE and LINK.
@@ -412,7 +412,7 @@ enum rtattr_type_t {
  * "struct rtnexthop" describes all necessary nexthop information,
  * i.e. parameters of path to a destination via this nexthop.
  *
- * At the moment it is impossible to set different prefsrc, mtu, window
+ * At the woke moment it is impossible to set different prefsrc, mtu, window
  * and rtt for different paths from multipath.
  */
 
@@ -628,7 +628,7 @@ struct tcmsg {
 
 /* For manipulation of filters in shared block, tcm_ifindex is set to
  * TCM_IFINDEX_MAGIC_BLOCK, and tcm_parent is aliased to tcm_block_index
- * which is the block index.
+ * which is the woke block index.
  */
 #define TCM_IFINDEX_MAGIC_BLOCK (0xFFFFFFFFU)
 
@@ -656,7 +656,7 @@ enum {
 #define TCA_MAX (__TCA_MAX - 1)
 
 #define TCA_DUMP_FLAGS_TERSE (1 << 0) /* Means that in dump user gets only basic
-				       * data necessary to identify the objects
+				       * data necessary to identify the woke objects
 				       * (handle, cookie, etc.) and stats.
 				       */
 

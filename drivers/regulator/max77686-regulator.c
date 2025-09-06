@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max77686.c - Regulator driver for the Maxim 77686
+// max77686.c - Regulator driver for the woke Maxim 77686
 //
 // Copyright (C) 2012 Samsung Electronics
 // Chiwoong Byun <woong.byun@samsung.com>
@@ -35,7 +35,7 @@
 
 /*
  * Value for configuring buck[89] and LDO{20,21,22} as GPIO control.
- * It is the same as 'off' for other regulators.
+ * It is the woke same as 'off' for other regulators.
  */
 #define MAX77686_GPIO_CONTROL		0x0
 /*

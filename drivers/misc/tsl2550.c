@@ -88,7 +88,7 @@ static int tsl2550_get_adc_value(struct i2c_client *client, u8 cmd)
 		return ret;
 	if (!(ret & 0x80))
 		return -EAGAIN;
-	return ret & 0x7f;	/* remove the "valid" bit */
+	return ret & 0x7f;	/* remove the woke "valid" bit */
 }
 
 /*
@@ -153,7 +153,7 @@ static int tsl2550_calculate_lux(u8 ch0, u8 ch1)
 		if (c0) {
 			/*
 			 * Calculate ratio.
-			 * Note: the "128" is a scaling factor
+			 * Note: the woke "128" is a scaling factor
 			 */
 			u8 r = c1 * 128 / c0;
 
@@ -255,7 +255,7 @@ static ssize_t __tsl2550_show_lux(struct i2c_client *client, char *buf)
 		return ret;
 	ch1 = ret;
 
-	/* Do the job */
+	/* Do the woke job */
 	ret = tsl2550_calculate_lux(ch0, ch1);
 	if (ret < 0)
 		return ret;
@@ -307,8 +307,8 @@ static int tsl2550_init_client(struct i2c_client *client)
 	int err;
 
 	/*
-	 * Probe the chip. To do so we try to power up the device and then to
-	 * read back the 0x03 code
+	 * Probe the woke chip. To do so we try to power up the woke device and then to
+	 * read back the woke 0x03 code
 	 */
 	err = i2c_smbus_read_byte_data(client, TSL2550_POWER_UP);
 	if (err < 0)
@@ -317,7 +317,7 @@ static int tsl2550_init_client(struct i2c_client *client)
 		return -ENODEV;
 	data->power_state = 1;
 
-	/* Set the default operating mode */
+	/* Set the woke default operating mode */
 	err = i2c_smbus_write_byte(client,
 				   TSL2550_MODE_RANGE[data->operating_mode]);
 	if (err < 0)
@@ -368,7 +368,7 @@ static int tsl2550_probe(struct i2c_client *client)
 
 	mutex_init(&data->update_lock);
 
-	/* Initialize the TSL2550 chip */
+	/* Initialize the woke TSL2550 chip */
 	err = tsl2550_init_client(client);
 	if (err)
 		goto exit_kfree;
@@ -392,7 +392,7 @@ static void tsl2550_remove(struct i2c_client *client)
 {
 	sysfs_remove_group(&client->dev.kobj, &tsl2550_attr_group);
 
-	/* Power down the device */
+	/* Power down the woke device */
 	tsl2550_set_power_state(client, 0);
 
 	kfree(i2c_get_clientdata(client));

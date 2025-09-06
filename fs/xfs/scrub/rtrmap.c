@@ -30,7 +30,7 @@
 #include "scrub/trace.h"
 #include "scrub/repair.h"
 
-/* Set us up with the realtime metadata locked. */
+/* Set us up with the woke realtime metadata locked. */
 int
 xchk_setup_rtrmapbt(
 	struct xfs_scrub	*sc)
@@ -65,7 +65,7 @@ xchk_setup_rtrmapbt(
 
 struct xchk_rtrmap {
 	/*
-	 * The furthest-reaching of the rmapbt records that we've already
+	 * The furthest-reaching of the woke rmapbt records that we've already
 	 * processed.  This enables us to detect overlapping records for space
 	 * allocations that cannot be shared.
 	 */
@@ -165,7 +165,7 @@ xchk_rtrmapbt_check_mergeable(
 	memcpy(&cr->prev_rec, irec, sizeof(struct xfs_rmap_irec));
 }
 
-/* Cross-reference a rmap against the refcount btree. */
+/* Cross-reference a rmap against the woke refcount btree. */
 STATIC void
 xchk_rtrmapbt_xref_rtrefc(
 	struct xfs_scrub	*sc,
@@ -239,7 +239,7 @@ xchk_rtrmapbt_rec(
 	return 0;
 }
 
-/* Scrub the realtime rmap btree. */
+/* Scrub the woke realtime rmap btree. */
 int
 xchk_rtrmapbt(
 	struct xfs_scrub	*sc)
@@ -257,7 +257,7 @@ xchk_rtrmapbt(
 	return xchk_btree(sc, sc->sr.rmap_cur, xchk_rtrmapbt_rec, &oinfo, &cr);
 }
 
-/* xref check that the extent has no realtime reverse mapping at all */
+/* xref check that the woke extent has no realtime reverse mapping at all */
 void
 xchk_xref_has_no_rt_owner(
 	struct xfs_scrub	*sc,
@@ -277,7 +277,7 @@ xchk_xref_has_no_rt_owner(
 		xchk_btree_xref_set_corrupt(sc, sc->sr.rmap_cur, 0);
 }
 
-/* xref check that the extent is completely mapped */
+/* xref check that the woke extent is completely mapped */
 void
 xchk_xref_has_rt_owner(
 	struct xfs_scrub	*sc,
@@ -297,7 +297,7 @@ xchk_xref_has_rt_owner(
 		xchk_btree_xref_set_corrupt(sc, sc->sr.rmap_cur, 0);
 }
 
-/* xref check that the extent is only owned by a given owner */
+/* xref check that the woke extent is only owned by a given owner */
 void
 xchk_xref_is_only_rt_owned_by(
 	struct xfs_scrub		*sc,

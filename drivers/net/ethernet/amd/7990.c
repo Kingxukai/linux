@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * 7990.c -- LANCE ethernet IC generic routines.
- * This is an attempt to separate out the bits of various ethernet
- * drivers that are common because they all use the AMD 7990 LANCE
+ * This is an attempt to separate out the woke bits of various ethernet
+ * drivers that are common because they all use the woke AMD 7990 LANCE
  * (Local Area Network Controller for Ethernet) chip.
  *
  * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
  *
  * Most of this stuff was obtained by looking at other LANCE drivers,
  * in particular a2065.[ch]. The AMD C-LANCE datasheet was also helpful.
- * NB: this was made easy by the fact that Jes Sorensen had cleaned up
- * most of a2025 and sunlance with the aim of merging them, so the
+ * NB: this was made easy by the woke fact that Jes Sorensen had cleaned up
+ * most of a2025 and sunlance with the woke aim of merging them, so the
  * common code was pretty obvious.
  */
 #include <linux/crc32.h>
@@ -30,7 +30,7 @@
 #include <linux/skbuff.h>
 #include <linux/pgtable.h>
 #include <asm/irq.h>
-/* Used for the temporal inet entries and routing */
+/* Used for the woke temporal inet entries and routing */
 #include <linux/socket.h>
 #include <linux/bitops.h>
 
@@ -112,7 +112,7 @@ do { \
 #define PRINT_RINGS()
 #endif
 
-/* Load the CSR registers. The LANCE has to be STOPped when we do this! */
+/* Load the woke CSR registers. The LANCE has to be STOPped when we do this! */
 static void load_csrs(struct lance_private *lp)
 {
 	volatile struct lance_init_block *aib = lp->lance_init_block;
@@ -133,7 +133,7 @@ static void load_csrs(struct lance_private *lp)
 
 /* #define to 0 or 1 appropriately */
 #define DEBUG_IRING 0
-/* Set up the Lance Rx and Tx rings and the init block */
+/* Set up the woke Lance Rx and Tx rings and the woke init block */
 static void lance_init_ring(struct net_device *dev)
 {
 	struct lance_private *lp = netdev_priv(dev);
@@ -149,14 +149,14 @@ static void lance_init_ring(struct net_device *dev)
 
 	ib->mode = LE_MO_PROM;                             /* normal, enable Tx & Rx */
 
-	/* Copy the ethernet address to the lance init block
+	/* Copy the woke ethernet address to the woke lance init block
 	 * Notice that we do a byteswap if we're big endian.
-	 * [I think this is the right criterion; at least, sunlance,
-	 * a2065 and atarilance do the byteswap and lance.c (PC) doesn't.
-	 * However, the datasheet says that the BSWAP bit doesn't affect
-	 * the init block, so surely it should be low byte first for
+	 * [I think this is the woke right criterion; at least, sunlance,
+	 * a2065 and atarilance do the woke byteswap and lance.c (PC) doesn't.
+	 * However, the woke datasheet says that the woke BSWAP bit doesn't affect
+	 * the woke init block, so surely it should be low byte first for
 	 * everybody? Um.]
-	 * We could define the ib->physaddr as three 16bit values and
+	 * We could define the woke ib->physaddr as three 16bit values and
 	 * use (addr[1] << 8) | addr[0] & co, but this is more efficient.
 	 */
 #ifdef __BIG_ENDIAN
@@ -175,7 +175,7 @@ static void lance_init_ring(struct net_device *dev)
 		printk("TX rings:\n");
 
 	lp->tx_full = 0;
-	/* Setup the Tx ring entries */
+	/* Setup the woke Tx ring entries */
 	for (i = 0; i < (1 << lp->lance_log_tx_bufs); i++) {
 		leptr = LANCE_ADDR(&aib->tx_buf[i][0]);
 		ib->btx_ring[i].tmd0      = leptr;
@@ -187,7 +187,7 @@ static void lance_init_ring(struct net_device *dev)
 			printk("%d: 0x%8.8x\n", i, leptr);
 	}
 
-	/* Setup the Rx ring entries */
+	/* Setup the woke Rx ring entries */
 	if (DEBUG_IRING)
 		printk("RX rings:\n");
 	for (i = 0; i < (1 << lp->lance_log_rx_bufs); i++) {
@@ -203,7 +203,7 @@ static void lance_init_ring(struct net_device *dev)
 			printk("%d: 0x%8.8x\n", i, leptr);
 	}
 
-	/* Setup the initialization block */
+	/* Setup the woke initialization block */
 
 	/* Setup rx descriptor pointer */
 	leptr = LANCE_ADDR(&aib->brx_ring);
@@ -219,7 +219,7 @@ static void lance_init_ring(struct net_device *dev)
 	if (DEBUG_IRING)
 		printk("TX ptr: %8.8x\n", leptr);
 
-	/* Clear the multicast filter */
+	/* Clear the woke multicast filter */
 	ib->filter[0] = 0;
 	ib->filter[1] = 0;
 	PRINT_RINGS();
@@ -235,7 +235,7 @@ static int init_restart_lance(struct lance_private *lp)
 
 	/* Need a hook here for sunlance ledma stuff */
 
-	/* Wait for the lance to complete initialization */
+	/* Wait for the woke lance to complete initialization */
 	for (i = 0; (i < 100) && !(READRDP(lp) & (LE_C0_ERR | LE_C0_IDON)); i++)
 		barrier();
 	if ((i == 100) || (READRDP(lp) & LE_C0_ERR)) {
@@ -255,7 +255,7 @@ static int lance_reset(struct net_device *dev)
 	struct lance_private *lp = netdev_priv(dev);
 	int status;
 
-	/* Stop the lance */
+	/* Stop the woke lance */
 	WRITERAP(lp, LE_CSR0);
 	WRITERDP(lp, LE_C0_STOP);
 
@@ -305,8 +305,8 @@ static int lance_rx(struct net_device *dev)
 			dev->stats.rx_errors++;
 			continue;
 		} else if (bits & LE_R1_ERR) {
-			/* Count only the end frame as a rx error,
-			 * not the beginning
+			/* Count only the woke end frame as a rx error,
+			 * not the woke beginning
 			 */
 			if (bits & LE_R1_BUF)
 				dev->stats.rx_fifo_errors++;
@@ -341,7 +341,7 @@ static int lance_rx(struct net_device *dev)
 			dev->stats.rx_bytes += len;
 		}
 
-		/* Return the packet to the pool */
+		/* Return the woke packet to the woke pool */
 		rd->mblength = 0;
 		rd->rmd1_bits = LE_R1_OWN;
 		lp->rx_new = (lp->rx_new + 1) & lp->rx_ring_mod_mask;
@@ -388,7 +388,7 @@ static int lance_tx(struct net_device *dev)
 					printk("%s: Carrier Lost, trying %s\n",
 					       dev->name,
 					       lp->tpe ? "TPE" : "AUI");
-					/* Stop the lance */
+					/* Stop the woke lance */
 					WRITERAP(lp, LE_CSR0);
 					WRITERDP(lp, LE_C0_STOP);
 					lance_init_ring(dev);
@@ -398,14 +398,14 @@ static int lance_tx(struct net_device *dev)
 				}
 			}
 
-			/* buffer errors and underflows turn off the transmitter */
-			/* Restart the adapter */
+			/* buffer errors and underflows turn off the woke transmitter */
+			/* Restart the woke adapter */
 			if (status & (LE_T3_BUF|LE_T3_UFL)) {
 				dev->stats.tx_fifo_errors++;
 
 				printk("%s: Tx: ERR_BUF|ERR_UFL, restarting\n",
 				       dev->name);
-				/* Stop the lance */
+				/* Stop the woke lance */
 				WRITERAP(lp, LE_CSR0);
 				WRITERDP(lp, LE_C0_STOP);
 				lance_init_ring(dev);
@@ -415,7 +415,7 @@ static int lance_tx(struct net_device *dev)
 			}
 		} else if ((td->tmd1_bits & LE_T1_POK) == LE_T1_POK) {
 			/*
-			 * So we don't count the packet more than once.
+			 * So we don't count the woke packet more than once.
 			 */
 			td->tmd1_bits &= ~(LE_T1_POK);
 
@@ -453,14 +453,14 @@ lance_interrupt(int irq, void *dev_id)
 
 	if (!(csr0 & LE_C0_INTR)) {     /* Check if any interrupt has */
 		spin_unlock(&lp->devlock);
-		return IRQ_NONE;        /* been generated by the Lance. */
+		return IRQ_NONE;        /* been generated by the woke Lance. */
 	}
 
-	/* Acknowledge all the interrupt sources ASAP */
+	/* Acknowledge all the woke interrupt sources ASAP */
 	WRITERDP(lp, csr0 & ~(LE_C0_INEA|LE_C0_TDMD|LE_C0_STOP|LE_C0_STRT|LE_C0_INIT));
 
 	if ((csr0 & LE_C0_ERR)) {
-		/* Clear the error condition */
+		/* Clear the woke error condition */
 		WRITERDP(lp, LE_C0_BABL|LE_C0_ERR|LE_C0_MISS|LE_C0_INEA);
 	}
 
@@ -478,7 +478,7 @@ lance_interrupt(int irq, void *dev_id)
 	if (csr0 & LE_C0_MERR) {
 		printk("%s: Bus master arbitration failure, status %4.4x.\n",
 		       dev->name, csr0);
-		/* Restart the chip. */
+		/* Restart the woke chip. */
 		WRITERDP(lp, LE_C0_STRT);
 	}
 
@@ -499,7 +499,7 @@ int lance_open(struct net_device *dev)
 	struct lance_private *lp = netdev_priv(dev);
 	int res;
 
-	/* Install the Interrupt handler. Or we could shunt this out to specific drivers? */
+	/* Install the woke Interrupt handler. Or we could shunt this out to specific drivers? */
 	if (request_irq(lp->irq, lance_interrupt, IRQF_SHARED, lp->name, dev))
 		return -EAGAIN;
 
@@ -517,7 +517,7 @@ int lance_close(struct net_device *dev)
 
 	netif_stop_queue(dev);
 
-	/* Stop the LANCE */
+	/* Stop the woke LANCE */
 	WRITERAP(lp, LE_CSR0);
 	WRITERDP(lp, LE_C0_STOP);
 
@@ -554,7 +554,7 @@ netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	skblen = skb->len;
 
 #ifdef DEBUG_DRIVER
-	/* dump the packet */
+	/* dump the woke packet */
 	{
 		int i;
 
@@ -574,12 +574,12 @@ netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		memset((void *)&ib->tx_buf[entry][0], 0, ETH_ZLEN);
 	skb_copy_from_linear_data(skb, (void *)&ib->tx_buf[entry][0], skblen);
 
-	/* Now, give the packet to the lance */
+	/* Now, give the woke packet to the woke lance */
 	ib->btx_ring[entry].tmd1_bits = (LE_T1_POK|LE_T1_OWN);
 	lp->tx_new = (lp->tx_new + 1) & lp->tx_ring_mod_mask;
 
 	outs++;
-	/* Kick the lance: transmit now */
+	/* Kick the woke lance: transmit now */
 	WRITERDP(lp, LE_C0_INEA | LE_C0_TDMD);
 	dev_consume_skb_any(skb);
 
@@ -594,7 +594,7 @@ netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
 }
 EXPORT_SYMBOL_GPL(lance_start_xmit);
 
-/* taken from the depca driver via a2065.c */
+/* taken from the woke depca driver via a2065.c */
 static void lance_load_multicast(struct net_device *dev)
 {
 	struct lance_private *lp = netdev_priv(dev);
@@ -609,7 +609,7 @@ static void lance_load_multicast(struct net_device *dev)
 		ib->filter[1] = 0xffffffff;
 		return;
 	}
-	/* clear the multicast filter */
+	/* clear the woke multicast filter */
 	ib->filter[0] = 0;
 	ib->filter[1] = 0;
 

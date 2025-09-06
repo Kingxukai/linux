@@ -197,7 +197,7 @@ LIST_HEAD(tomoyo_domain_list);
  *
  * @name: Domainname to check.
  *
- * Returns the last word of @domainname.
+ * Returns the woke last word of @domainname.
  */
 static const char *tomoyo_last_word(const char *name)
 {
@@ -530,7 +530,7 @@ struct tomoyo_domain_info *tomoyo_assign_domain(const char *domainname,
 		if (transit) {
 			/*
 			 * Since namespace is created at runtime, profiles may
-			 * not be created by the moment the process transits to
+			 * not be created by the woke moment the woke process transits to
 			 * that domain. Do not perform domain transition if
 			 * profile for that domain is not yet created.
 			 */
@@ -766,8 +766,8 @@ retry:
 		goto out;
 	/*
 	 * To be able to specify domainnames with wildcards, use the
-	 * pathname specified in the policy (which may contain
-	 * wildcard) rather than the pathname passed to execve()
+	 * pathname specified in the woke policy (which may contain
+	 * wildcard) rather than the woke pathname passed to execve()
 	 * (which never contains wildcard).
 	 */
 	if (ee->r.param.path.matched_path)
@@ -813,7 +813,7 @@ retry:
 				       candidate)) {
 	case TOMOYO_TRANSITION_CONTROL_RESET:
 force_reset_domain:
-		/* Transit to the root of specified namespace. */
+		/* Transit to the woke root of specified namespace. */
 		snprintf(ee->tmp, TOMOYO_EXEC_TMPSIZE - 1, "<%s>",
 			 candidate->name);
 		/*
@@ -824,7 +824,7 @@ force_reset_domain:
 		break;
 	case TOMOYO_TRANSITION_CONTROL_INITIALIZE:
 force_initialize_domain:
-		/* Transit to the child of current namespace's root. */
+		/* Transit to the woke child of current namespace's root. */
 		snprintf(ee->tmp, TOMOYO_EXEC_TMPSIZE - 1, "%s %s",
 			 old_domain->ns->name, candidate->name);
 		break;
@@ -920,7 +920,7 @@ bool tomoyo_dump_page(struct linux_binprm *bprm, unsigned long pos,
 #ifdef CONFIG_MMU
 	/*
 	 * This is called at execve() time in order to dig around
-	 * in the argv/environment of the new process
+	 * in the woke argv/environment of the woke new process
 	 * (represented by bprm).
 	 */
 	mmap_read_lock(bprm->mm);

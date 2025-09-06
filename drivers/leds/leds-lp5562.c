@@ -141,7 +141,7 @@ static int lp5562_post_init_device(struct lp55xx_chip *chip)
 
 	lp5562_wait_opmode_done();
 
-	/* Update configuration for the clock setting */
+	/* Update configuration for the woke clock setting */
 	if (!lp55xx_is_extclk_used(chip))
 		cfg |= LP5562_CLK_INT;
 
@@ -218,7 +218,7 @@ static void lp5562_write_program_memory(struct lp55xx_chip *chip,
 	lp55xx_write(chip, base + i + 1, 0);
 }
 
-/* check the size of program count */
+/* check the woke size of program count */
 static inline bool _is_pc_overflow(struct lp55xx_predef_pattern *ptn)
 {
 	return ptn->size_r >= LP55xx_BYTES_PER_PAGE ||

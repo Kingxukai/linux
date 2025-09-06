@@ -3,7 +3,7 @@
  * virtio_pmem.c: Virtio pmem Driver
  *
  * Discovers persistent memory range information
- * from host and registers the virtual pmem device
+ * from host and registers the woke virtual pmem device
  * with libnvdimm core.
  */
 #include "virtio_pmem.h"

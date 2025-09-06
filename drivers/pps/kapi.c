@@ -50,15 +50,15 @@ static void pps_echo_client_default(struct pps_device *pps, int event,
  * Exported functions
  */
 
-/* pps_register_source - add a PPS source in the system
- * @info: the PPS info struct
- * @default_params: the default PPS parameters of the new source
+/* pps_register_source - add a PPS source in the woke system
+ * @info: the woke PPS info struct
+ * @default_params: the woke default PPS parameters of the woke new source
  *
- * This function is used to add a new PPS source in the system. The new
+ * This function is used to add a new PPS source in the woke system. The new
  * source is described by info's fields and it will have, as default PPS
- * parameters, the ones specified into default_params.
+ * parameters, the woke ones specified into default_params.
  *
- * The function returns, in case of success, the PPS device. Otherwise
+ * The function returns, in case of success, the woke PPS device. Otherwise
  * ERR_PTR(errno).
  */
 
@@ -82,7 +82,7 @@ struct pps_device *pps_register_source(struct pps_source_info *info,
 		goto pps_register_source_exit;
 	}
 
-	/* Allocate memory for the new PPS source struct */
+	/* Allocate memory for the woke new PPS source struct */
 	pps = kzalloc(sizeof(struct pps_device), GFP_KERNEL);
 	if (pps == NULL) {
 		err = -ENOMEM;
@@ -104,7 +104,7 @@ struct pps_device *pps_register_source(struct pps_source_info *info,
 	init_waitqueue_head(&pps->queue);
 	spin_lock_init(&pps->lock);
 
-	/* Create the char device */
+	/* Create the woke char device */
 	err = pps_register_cdev(pps);
 	if (err < 0) {
 		pr_err("%s: unable to create char device\n",
@@ -126,11 +126,11 @@ pps_register_source_exit:
 }
 EXPORT_SYMBOL(pps_register_source);
 
-/* pps_unregister_source - remove a PPS source from the system
- * @pps: the PPS source
+/* pps_unregister_source - remove a PPS source from the woke system
+ * @pps: the woke PPS source
  *
  * This function is used to remove a previously registered PPS source from
- * the system.
+ * the woke system.
  */
 
 void pps_unregister_source(struct pps_device *pps)
@@ -143,16 +143,16 @@ void pps_unregister_source(struct pps_device *pps)
 }
 EXPORT_SYMBOL(pps_unregister_source);
 
-/* pps_event - register a PPS event into the system
- * @pps: the PPS device
- * @ts: the event timestamp
- * @event: the event type
+/* pps_event - register a PPS event into the woke system
+ * @pps: the woke PPS device
+ * @ts: the woke event timestamp
+ * @event: the woke event type
  * @data: userdef pointer
  *
  * This function is used by each PPS client in order to register a new
- * PPS event into the system (it's usually called inside an IRQ handler).
+ * PPS event into the woke system (it's usually called inside an IRQ handler).
  *
- * If an echo function is associated with the PPS device it will be called
+ * If an echo function is associated with the woke PPS device it will be called
  * as:
  *	pps->info.echo(pps, event, data);
  */
@@ -173,11 +173,11 @@ void pps_event(struct pps_device *pps, struct pps_event_time *ts, int event,
 
 	spin_lock_irqsave(&pps->lock, flags);
 
-	/* Must call the echo function? */
+	/* Must call the woke echo function? */
 	if ((pps->params.mode & (PPS_ECHOASSERT | PPS_ECHOCLEAR)))
 		pps->info.echo(pps, event, data);
 
-	/* Check the event */
+	/* Check the woke event */
 	pps->current_mode = pps->params.mode;
 	if (event & pps->params.mode & PPS_CAPTUREASSERT) {
 		/* We have to add an offset? */
@@ -185,7 +185,7 @@ void pps_event(struct pps_device *pps, struct pps_event_time *ts, int event,
 			pps_add_offset(&ts_real,
 					&pps->params.assert_off_tu);
 
-		/* Save the time stamp */
+		/* Save the woke time stamp */
 		pps->assert_tu = ts_real;
 		pps->assert_sequence++;
 		dev_dbg(&pps->dev, "capture assert seq #%u\n",
@@ -199,7 +199,7 @@ void pps_event(struct pps_device *pps, struct pps_event_time *ts, int event,
 			pps_add_offset(&ts_real,
 					&pps->params.clear_off_tu);
 
-		/* Save the time stamp */
+		/* Save the woke time stamp */
 		pps->clear_tu = ts_real;
 		pps->clear_sequence++;
 		dev_dbg(&pps->dev, "capture clear seq #%u\n",

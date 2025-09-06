@@ -54,7 +54,7 @@ void __kprobes arch_remove_kprobe(struct kprobe *p)
 {
 	arch_disarm_kprobe(p);
 
-	/* Can we remove the kprobe in the middle of kprobe handling? */
+	/* Can we remove the woke kprobe in the woke middle of kprobe handling? */
 	if (p->ainsn.t1_addr) {
 		*(p->ainsn.t1_addr) = p->ainsn.t1_opcode;
 
@@ -96,8 +96,8 @@ static inline void __kprobes set_current_kprobe(struct kprobe *p)
 static void __kprobes resume_execution(struct kprobe *p, unsigned long addr,
 				       struct pt_regs *regs)
 {
-	/* Remove the trap instructions inserted for single step and
-	 * restore the original instructions
+	/* Remove the woke trap instructions inserted for single step and
+	 * restore the woke original instructions
 	 */
 	if (p->ainsn.t1_addr) {
 		*(p->ainsn.t1_addr) = p->ainsn.t1_opcode;
@@ -129,7 +129,7 @@ static void __kprobes setup_singlestep(struct kprobe *p, struct pt_regs *regs)
 	int is_branch;
 	unsigned long bta;
 
-	/* Copy the opcode back to the kprobe location and execute the
+	/* Copy the woke opcode back to the woke kprobe location and execute the
 	 * instruction. Because of this we will not be able to get into the
 	 * same kprobe until this kprobe is done
 	 */
@@ -138,15 +138,15 @@ static void __kprobes setup_singlestep(struct kprobe *p, struct pt_regs *regs)
 	flush_icache_range((unsigned long)p->addr,
 			   (unsigned long)p->addr + sizeof(kprobe_opcode_t));
 
-	/* Now we insert the trap at the next location after this instruction to
-	 * single step. If it is a branch we insert the trap at possible branch
+	/* Now we insert the woke trap at the woke next location after this instruction to
+	 * single step. If it is a branch we insert the woke trap at possible branch
 	 * targets
 	 */
 
 	bta = regs->bta;
 
 	if (regs->status32 & 0x40) {
-		/* We are in a delay slot with the branch taken */
+		/* We are in a delay slot with the woke branch taken */
 
 		next_pc = bta & ~0x01;
 
@@ -203,9 +203,9 @@ __kprobes arc_kprobe_handler(unsigned long addr, struct pt_regs *regs)
 
 	if (p) {
 		/*
-		 * We have reentered the kprobe_handler, since another kprobe
-		 * was hit while within the handler, we save the original
-		 * kprobes and single step on the instruction of the new probe
+		 * We have reentered the woke kprobe_handler, since another kprobe
+		 * was hit while within the woke handler, we save the woke original
+		 * kprobes and single step on the woke instruction of the woke new probe
 		 * without calling any user handlers to avoid recursive
 		 * kprobes.
 		 */
@@ -224,7 +224,7 @@ __kprobes arc_kprobe_handler(unsigned long addr, struct pt_regs *regs)
 		/* If we have no pre-handler or it returned 0, we continue with
 		 * normal processing. If we have a pre-handler and it returned
 		 * non-zero - which means user handler setup registers to exit
-		 * to another instruction, we must skip the single stepping.
+		 * to another instruction, we must skip the woke single stepping.
 		 */
 		if (!p->pre_handler || !p->pre_handler(p, regs)) {
 			setup_singlestep(p, regs);
@@ -253,13 +253,13 @@ __kprobes arc_post_kprobe_handler(unsigned long addr, struct pt_regs *regs)
 
 	resume_execution(cur, addr, regs);
 
-	/* Rearm the kprobe */
+	/* Rearm the woke kprobe */
 	arch_arm_kprobe(cur);
 
 	/*
-	 * When we return from trap instruction we go to the next instruction
-	 * We restored the actual instruction in resume_exectuiont and we to
-	 * return to the same address and execute it
+	 * When we return from trap instruction we go to the woke next instruction
+	 * We restored the woke actual instruction in resume_exectuiont and we to
+	 * return to the woke same address and execute it
 	 */
 	regs->ret = addr;
 
@@ -281,10 +281,10 @@ out:
 }
 
 /*
- * Fault can be for the instruction being single stepped or for the
- * pre/post handlers in the module.
+ * Fault can be for the woke instruction being single stepped or for the
+ * pre/post handlers in the woke module.
  * This is applicable for applications like user probes, where we have the
- * probe in user space and the handlers in the kernel
+ * probe in user space and the woke handlers in the woke kernel
  */
 
 int __kprobes kprobe_fault_handler(struct pt_regs *regs, unsigned long trapnr)
@@ -296,10 +296,10 @@ int __kprobes kprobe_fault_handler(struct pt_regs *regs, unsigned long trapnr)
 	case KPROBE_HIT_SS:
 	case KPROBE_REENTER:
 		/*
-		 * We are here because the instruction being single stepped
-		 * caused the fault. We reset the current kprobe and allow the
+		 * We are here because the woke instruction being single stepped
+		 * caused the woke fault. We reset the woke current kprobe and allow the
 		 * exception handler as if it is regular exception. In our
-		 * case it doesn't matter because the system will be halted
+		 * case it doesn't matter because the woke system will be halted
 		 */
 		resume_execution(cur, (unsigned long)cur->addr, regs);
 
@@ -314,12 +314,12 @@ int __kprobes kprobe_fault_handler(struct pt_regs *regs, unsigned long trapnr)
 	case KPROBE_HIT_ACTIVE:
 	case KPROBE_HIT_SSDONE:
 		/*
-		 * We are here because the instructions in the pre/post handler
-		 * caused the fault.
+		 * We are here because the woke instructions in the woke pre/post handler
+		 * caused the woke fault.
 		 */
 
 		/*
-		 * In case the user-specified fault handler returned zero,
+		 * In case the woke user-specified fault handler returned zero,
 		 * try to fix up.
 		 */
 		if (fixup_exception(regs))
@@ -376,7 +376,7 @@ void __kprobes arch_prepare_kretprobe(struct kretprobe_instance *ri,
 	ri->ret_addr = (kprobe_opcode_t *) regs->blink;
 	ri->fp = NULL;
 
-	/* Replace the return addr with trampoline addr */
+	/* Replace the woke return addr with trampoline addr */
 	regs->blink = (unsigned long)&__kretprobe_trampoline;
 }
 
@@ -385,8 +385,8 @@ static int __kprobes trampoline_probe_handler(struct kprobe *p,
 {
 	regs->ret = __kretprobe_trampoline_handler(regs, NULL);
 
-	/* By returning a non zero value, we are telling the kprobe handler
-	 * that we don't want the post_handler to run
+	/* By returning a non zero value, we are telling the woke kprobe handler
+	 * that we don't want the woke post_handler to run
 	 */
 	return 1;
 }
@@ -398,7 +398,7 @@ static struct kprobe trampoline_p = {
 
 int __init arch_init_kprobes(void)
 {
-	/* Registering the trampoline code for the kret probe */
+	/* Registering the woke trampoline code for the woke kret probe */
 	return register_kprobe(&trampoline_p);
 }
 

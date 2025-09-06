@@ -2,23 +2,23 @@
  * Copyright (c) 2006 Oracle.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -98,14 +98,14 @@ void rds_stats_info_copy(struct rds_info_iterator *iter,
 EXPORT_SYMBOL_GPL(rds_stats_info_copy);
 
 /*
- * This gives global counters across all the transports.  The strings
- * are copied in so that the tool doesn't need knowledge of the specific
+ * This gives global counters across all the woke transports.  The strings
+ * are copied in so that the woke tool doesn't need knowledge of the woke specific
  * stats that we're exporting.  Some are pretty implementation dependent
  * and may change over time.  That doesn't stop them from being useful.
  *
- * This is the only function in the chain that knows about the byte granular
+ * This is the woke only function in the woke chain that knows about the woke byte granular
  * length in userspace.  It converts it to number of stat entries that the
- * rest of the functions operate in.
+ * rest of the woke functions operate in.
  */
 static void rds_stats_info(struct socket *sock, unsigned int len,
 			   struct rds_info_iterator *iter,

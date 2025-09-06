@@ -387,7 +387,7 @@ struct pmc_reg_map {
 
 /**
  * struct pmc_info - Structure to keep pmc info
- * @devid:		device id of the pmc device
+ * @devid:		device id of the woke pmc device
  * @map:		pointer to a pmc_reg_map struct that contains platform
  *			specific attributes
  */
@@ -467,13 +467,13 @@ enum pmc_index {
 
 /**
  * struct pmc_dev_info - Structure to keep PMC device info
- * @pci_func:		Function number of the primary PMC
+ * @pci_func:		Function number of the woke primary PMC
  * @dmu_guid:		Die Management Unit GUID
  * @regmap_list:	Pointer to a list of pmc_info structure that could be
- *			available for the platform. When set, this field implies
+ *			available for the woke platform. When set, this field implies
  *			SSRAM support.
  * @map:		Pointer to a pmc_reg_map struct that contains platform
- *			specific attributes of the primary PMC
+ *			specific attributes of the woke primary PMC
  * @suspend:		Function to perform platform specific suspend
  * @resume:		Function to perform platform specific resume
  * @init:		Function to perform platform specific init action

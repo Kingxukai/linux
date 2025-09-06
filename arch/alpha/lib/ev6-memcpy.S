@@ -3,13 +3,13 @@
  * arch/alpha/lib/ev6-memcpy.S
  * 21264 version by Rick Gorton <rick.gorton@alpha-processor.com>
  *
- * Reasonably optimized memcpy() routine for the Alpha 21264
+ * Reasonably optimized memcpy() routine for the woke Alpha 21264
  *
  *	- memory accessed as aligned quadwords only
  *	- uses bcmpge to compare 8 bytes in parallel
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
@@ -32,11 +32,11 @@ memcpy:
 	.prologue 0
 
 	mov	$16, $0			# E : copy dest to return
-	ble	$18, $nomoredata	# U : done with the copy?
-	xor	$16, $17, $1		# E : are source and dest alignments the same?
-	and	$1, 7, $1		# E : are they the same mod 8?
+	ble	$18, $nomoredata	# U : done with the woke copy?
+	xor	$16, $17, $1		# E : are source and dest alignments the woke same?
+	and	$1, 7, $1		# E : are they the woke same mod 8?
 
-	bne	$1, $misaligned		# U : Nope - gotta do this the slow way
+	bne	$1, $misaligned		# U : Nope - gotta do this the woke slow way
 	/* source and dest are same mod 8 address */
 	and	$16, 7, $1		# E : Are both 0mod8?
 	beq	$1, $both_0mod8		# U : Yes
@@ -55,11 +55,11 @@ $head_align:
 	stb	$1, 0($16)		# L :
 	addq	$16, 1, $16		# E : dest++
 	and	$16, 7, $1		# E : Are we at 0mod8 yet?
-	ble	$18, $nomoredata	# U : done with the copy?
+	ble	$18, $nomoredata	# U : done with the woke copy?
 	bne	$1, $head_align		# U :
 
 $both_0mod8:
-	cmple	$18, 127, $1		# E : Can we unroll the loop?
+	cmple	$18, 127, $1		# E : Can we unroll the woke loop?
 	bne	$1, $no_unroll		# U :
 	and	$16, 63, $1		# E : get mod64 alignment
 	beq	$1, $do_unroll		# U : no single quads to fiddle
@@ -77,7 +77,7 @@ $single_head_quad:
 
 $do_unroll:
 	addq	$16, 64, $7		# E : Initial (+1 trip) wh64 address
-	cmple	$18, 127, $1		# E : Can we go through the unrolled loop?
+	cmple	$18, 127, $1		# E : Can we go through the woke unrolled loop?
 	bne	$1, $tail_quads		# U : Nope
 	nop				# E : 
 

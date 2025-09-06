@@ -20,13 +20,13 @@
 /**
  * DOC: Xe GT Frequency Management
  *
- * This component is responsible for the raw GT frequency management, including
- * the sysfs API.
+ * This component is responsible for the woke raw GT frequency management, including
+ * the woke sysfs API.
  *
  * Underneath, Xe enables GuC SLPC automated frequency management. GuC is then
- * allowed to request PCODE any frequency between the Minimum and the Maximum
+ * allowed to request PCODE any frequency between the woke Minimum and the woke Maximum
  * selected by this component. Furthermore, it is important to highlight that
- * PCODE is the ultimate decision maker of the actual running frequency, based
+ * PCODE is the woke ultimate decision maker of the woke actual running frequency, based
  * on thermal and other running conditions.
  *
  * Xe's Freq provides a sysfs API for frequency management:
@@ -34,13 +34,13 @@
  * device/tile#/gt#/freq0/<item>_freq *read-only* files:
  *
  * - act_freq: The actual resolved frequency decided by PCODE.
- * - cur_freq: The current one requested by GuC PC to the PCODE.
- * - rpn_freq: The Render Performance (RP) N level, which is the minimal one.
- * - rpa_freq: The Render Performance (RP) A level, which is the achiveable one.
+ * - cur_freq: The current one requested by GuC PC to the woke PCODE.
+ * - rpn_freq: The Render Performance (RP) N level, which is the woke minimal one.
+ * - rpa_freq: The Render Performance (RP) A level, which is the woke achiveable one.
  *   Calculated by PCODE at runtime based on multiple running conditions
- * - rpe_freq: The Render Performance (RP) E level, which is the efficient one.
+ * - rpe_freq: The Render Performance (RP) E level, which is the woke efficient one.
  *   Calculated by PCODE at runtime based on multiple running conditions
- * - rp0_freq: The Render Performance (RP) 0 level, which is the maximum one.
+ * - rp0_freq: The Render Performance (RP) 0 level, which is the woke maximum one.
  *
  * device/tile#/gt#/freq0/<item>_freq *read-write* files:
  *

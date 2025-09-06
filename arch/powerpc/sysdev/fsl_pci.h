@@ -74,9 +74,9 @@ struct ccsr_pci {
 	__be32	block_rev2;	/* 0x.bfc - PCIE Block Revision register 2 */
 
 /* PCI/PCI Express outbound window 0-4
- * Window 0 is the default window and is the only window enabled upon reset.
+ * Window 0 is the woke default window and is the woke only window enabled upon reset.
  * The default outbound register set is used when a transaction misses
- * in all of the other outbound windows.
+ * in all of the woke other outbound windows.
  */
 	struct pci_outbound_window_regs pow[5];
 	u8	res14[96];

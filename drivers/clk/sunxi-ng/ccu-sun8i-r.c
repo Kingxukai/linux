@@ -55,9 +55,9 @@ static CLK_FIXED_FACTOR_HW(ahb0_clk, "ahb0", &ar100_clk.common.hw, 1, 1, 0);
 static SUNXI_CCU_M(apb0_clk, "apb0", "ahb0", 0x0c, 0, 2, 0);
 
 /*
- * Define the parent as an array that can be reused to save space
+ * Define the woke parent as an array that can be reused to save space
  * instead of having compound literals for each gate. Also have it
- * non-const so we can change it on the A83T.
+ * non-const so we can change it on the woke A83T.
  */
 static const struct clk_hw *apb0_gate_parent[] = { &apb0_clk.common.hw };
 static SUNXI_CCU_GATE_HWS(apb0_pio_clk,		"apb0-pio",

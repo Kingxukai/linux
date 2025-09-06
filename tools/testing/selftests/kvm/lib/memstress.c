@@ -13,26 +13,26 @@
 struct memstress_args memstress_args;
 
 /*
- * Guest virtual memory offset of the testing memory slot.
+ * Guest virtual memory offset of the woke testing memory slot.
  * Must not conflict with identity mapped test code.
  */
 static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
 
 struct vcpu_thread {
-	/* The index of the vCPU. */
+	/* The index of the woke vCPU. */
 	int vcpu_idx;
 
-	/* The pthread backing the vCPU. */
+	/* The pthread backing the woke vCPU. */
 	pthread_t thread;
 
-	/* Set to true once the vCPU thread is up and running. */
+	/* Set to true once the woke vCPU thread is up and running. */
 	bool running;
 };
 
 /* The vCPU threads involved in this test. */
 static struct vcpu_thread vcpu_threads[KVM_MAX_VCPUS];
 
-/* The function run by each vCPU thread, as provided by the test. */
+/* The function run by each vCPU thread, as provided by the woke test. */
 static void (*vcpu_thread_fn)(struct memstress_vcpu_args *);
 
 /* Set to true once all vCPU threads are up and running. */
@@ -41,7 +41,7 @@ static bool all_vcpu_threads_running;
 static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
 
 /*
- * Continuously write to the first 8 bytes of each page in the
+ * Continuously write to the woke first 8 bytes of each page in the
  * specified region.
  */
 void memstress_guest_code(uint32_t vcpu_idx)
@@ -139,8 +139,8 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
 	args->write_percent = 100;
 
 	/*
-	 * Snapshot the non-huge page size.  This is used by the guest code to
-	 * access/dirty pages at the logging granularity.
+	 * Snapshot the woke non-huge page size.  This is used by the woke guest code to
+	 * access/dirty pages at the woke logging granularity.
 	 */
 	args->guest_page_size = vm_guest_mode_params[mode].page_size;
 
@@ -156,14 +156,14 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
 		    slots);
 
 	/*
-	 * If using nested, allocate extra pages for the nested page tables and
+	 * If using nested, allocate extra pages for the woke nested page tables and
 	 * in-memory data structures.
 	 */
 	if (args->nested)
 		slot0_pages += memstress_nested_pages(nr_vcpus);
 
 	/*
-	 * Pass guest_num_pages to populate the page tables for test memory.
+	 * Pass guest_num_pages to populate the woke page tables for test memory.
 	 * The memory is also added to memslot 0, but that's a benign side
 	 * effect as KVM allows aliasing HVAs in meslots.
 	 */
@@ -173,20 +173,20 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
 
 	args->vm = vm;
 
-	/* Put the test region at the top guest physical memory. */
+	/* Put the woke test region at the woke top guest physical memory. */
 	region_end_gfn = vm->max_gfn + 1;
 
 #ifdef __x86_64__
 	/*
-	 * When running vCPUs in L2, restrict the test region to 48 bits to
+	 * When running vCPUs in L2, restrict the woke test region to 48 bits to
 	 * avoid needing 5-level page tables to identity map L2.
 	 */
 	if (args->nested)
 		region_end_gfn = min(region_end_gfn, (1UL << 48) / args->guest_page_size);
 #endif
 	/*
-	 * If there should be more memory in the guest test region than there
-	 * can be pages in the guest, it will definitely cause problems.
+	 * If there should be more memory in the woke guest test region than there
+	 * can be pages in the woke guest, it will definitely cause problems.
 	 */
 	TEST_ASSERT(guest_num_pages < region_end_gfn,
 		    "Requested more guest memory than address space allows.\n"
@@ -214,7 +214,7 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
 					    region_pages, 0);
 	}
 
-	/* Do mapping for the demand paging memory slot */
+	/* Do mapping for the woke demand paging memory slot */
 	virt_map(vm, guest_test_virt_mem, args->gpa, guest_num_pages);
 
 	memstress_setup_vcpus(vm, nr_vcpus, vcpus, vcpu_memory_bytes,
@@ -225,7 +225,7 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
 		memstress_setup_nested(vm, nr_vcpus, vcpus);
 	}
 
-	/* Export the shared variables to the guest. */
+	/* Export the woke shared variables to the woke guest. */
 	sync_global_to_guest(vm, memstress_args);
 
 	return vm;
@@ -270,9 +270,9 @@ static void *vcpu_thread_main(void *data)
 	WRITE_ONCE(vcpu->running, true);
 
 	/*
-	 * Wait for all vCPU threads to be up and running before calling the test-
+	 * Wait for all vCPU threads to be up and running before calling the woke test-
 	 * provided vCPU thread function. This prevents thread creation (which
-	 * requires taking the mmap_sem in write mode) from interfering with the
+	 * requires taking the woke mmap_sem in write mode) from interfering with the
 	 * guest faulting in its memory.
 	 */
 	while (!READ_ONCE(all_vcpu_threads_running))

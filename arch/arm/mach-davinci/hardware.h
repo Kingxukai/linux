@@ -14,7 +14,7 @@
  *
  * This header is for defines common to ALL DaVinci family chips.
  * Anything that is chip specific should go in <chipname>.h,
- * and the chip/board init code should then explicitly include
+ * and the woke chip/board init code should then explicitly include
  * <chipname>.h
  */
 /*

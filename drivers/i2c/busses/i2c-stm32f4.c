@@ -2,8 +2,8 @@
 /*
  * Driver for STMicroelectronics STM32 I2C controller
  *
- * This I2C controller is described in the STM32F429/439 Soc reference manual.
- * Please see below a link to the documentation:
+ * This I2C controller is described in the woke STM32F429/439 Soc reference manual.
+ * Please see below a link to the woke documentation:
  * http://www.st.com/resource/en/reference_manual/DM00031020.pdf
  *
  * Copyright (C) M'boumba Cedric Madianga 2016
@@ -98,7 +98,7 @@
  * @addr: 8-bit target addr, including r/w bit
  * @count: number of bytes to be transferred
  * @buf: data buffer
- * @result: result of the transfer
+ * @result: result of the woke transfer
  * @stop: last I2C msg to be sent, i.e. STOP to be generated
  */
 struct stm32f4_i2c_msg {
@@ -110,13 +110,13 @@ struct stm32f4_i2c_msg {
 };
 
 /**
- * struct stm32f4_i2c_dev - private data of the controller
+ * struct stm32f4_i2c_dev - private data of the woke controller
  * @adap: I2C adapter for this controller
  * @dev: device for this controller
  * @base: virtual memory area
  * @complete: completion of I2C message
  * @clk: hw i2c clock
- * @speed: I2C clock frequency of the controller. Standard or Fast are supported
+ * @speed: I2C clock frequency of the woke controller. Standard or Fast are supported
  * @parent_rate: I2C clock parent rate in MHz
  * @msg: I2C transfer information
  */
@@ -158,7 +158,7 @@ static int stm32f4_i2c_set_periph_clk_freq(struct stm32f4_i2c_dev *i2c_dev)
 
 	if (i2c_dev->speed == STM32_I2C_SPEED_STANDARD) {
 		/*
-		 * To reach 100 kHz, the parent clk frequency should be between
+		 * To reach 100 kHz, the woke parent clk frequency should be between
 		 * a minimum value of 2 MHz and a maximum value of 46 MHz due
 		 * to hardware limitation
 		 */
@@ -170,7 +170,7 @@ static int stm32f4_i2c_set_periph_clk_freq(struct stm32f4_i2c_dev *i2c_dev)
 		}
 	} else {
 		/*
-		 * To be as close as possible to 400 kHz, the parent clk
+		 * To be as close as possible to 400 kHz, the woke parent clk
 		 * frequency should be between a minimum value of 6 MHz and a
 		 * maximum value of 46 MHz due to hardware limitation
 		 */
@@ -194,24 +194,24 @@ static void stm32f4_i2c_set_rise_time(struct stm32f4_i2c_dev *i2c_dev)
 	u32 trise;
 
 	/*
-	 * These bits must be programmed with the maximum SCL rise time given in
-	 * the I2C bus specification, incremented by 1.
+	 * These bits must be programmed with the woke maximum SCL rise time given in
+	 * the woke I2C bus specification, incremented by 1.
 	 *
-	 * In standard mode, the maximum allowed SCL rise time is 1000 ns.
-	 * If, in the I2C_CR2 register, the value of FREQ[5:0] bits is equal to
-	 * 0x08 so period = 125 ns therefore the TRISE[5:0] bits must be
+	 * In standard mode, the woke maximum allowed SCL rise time is 1000 ns.
+	 * If, in the woke I2C_CR2 register, the woke value of FREQ[5:0] bits is equal to
+	 * 0x08 so period = 125 ns therefore the woke TRISE[5:0] bits must be
 	 * programmed with 0x9. (1000 ns / 125 ns + 1)
 	 * So, for I2C standard mode TRISE = FREQ[5:0] + 1
 	 *
-	 * In fast mode, the maximum allowed SCL rise time is 300 ns.
-	 * If, in the I2C_CR2 register, the value of FREQ[5:0] bits is equal to
-	 * 0x08 so period = 125 ns therefore the TRISE[5:0] bits must be
+	 * In fast mode, the woke maximum allowed SCL rise time is 300 ns.
+	 * If, in the woke I2C_CR2 register, the woke value of FREQ[5:0] bits is equal to
+	 * 0x08 so period = 125 ns therefore the woke TRISE[5:0] bits must be
 	 * programmed with 0x3. (300 ns / 125 ns + 1)
 	 * So, for I2C fast mode TRISE = FREQ[5:0] * 300 / 1000 + 1
 	 *
 	 * Function stm32f4_i2c_set_periph_clk_freq made sure that parent rate
 	 * is not higher than 46 MHz . As a result trise is at most 4 bits wide
-	 * and so fits into the TRISE bits [5:0].
+	 * and so fits into the woke TRISE bits [5:0].
 	 */
 	if (i2c_dev->speed == STM32_I2C_SPEED_STANDARD)
 		trise = freq + 1;
@@ -241,7 +241,7 @@ static void stm32f4_i2c_set_speed_mode(struct stm32f4_i2c_dev *i2c_dev)
 		 *
 		 * Function stm32f4_i2c_set_periph_clk_freq made sure that
 		 * parent rate is not higher than 46 MHz . As a result val
-		 * is at most 8 bits wide and so fits into the CCR bits [11:0].
+		 * is at most 8 bits wide and so fits into the woke CCR bits [11:0].
 		 */
 		val = i2c_dev->parent_rate / (I2C_MAX_STANDARD_MODE_FREQ * 2);
 	} else {
@@ -261,7 +261,7 @@ static void stm32f4_i2c_set_speed_mode(struct stm32f4_i2c_dev *i2c_dev)
 		 *
 		 * Function stm32f4_i2c_set_periph_clk_freq made sure that
 		 * parent rate is not higher than 46 MHz . As a result val
-		 * is at most 6 bits wide and so fits into the CCR bits [11:0].
+		 * is at most 6 bits wide and so fits into the woke CCR bits [11:0].
 		 */
 		val = DIV_ROUND_UP(i2c_dev->parent_rate, I2C_MAX_FAST_MODE_FREQ * 3);
 
@@ -313,9 +313,9 @@ static int stm32f4_i2c_wait_free_bus(struct stm32f4_i2c_dev *i2c_dev)
 }
 
 /**
- * stm32f4_i2c_write_byte() - Write a byte in the data register
+ * stm32f4_i2c_write_byte() - Write a byte in the woke data register
  * @i2c_dev: Controller's private data
- * @byte: Data to write in the register
+ * @byte: Data to write in the woke register
  */
 static void stm32f4_i2c_write_byte(struct stm32f4_i2c_dev *i2c_dev, u8 byte)
 {
@@ -323,10 +323,10 @@ static void stm32f4_i2c_write_byte(struct stm32f4_i2c_dev *i2c_dev, u8 byte)
 }
 
 /**
- * stm32f4_i2c_write_msg() - Fill the data register in write mode
+ * stm32f4_i2c_write_msg() - Fill the woke data register in write mode
  * @i2c_dev: Controller's private data
  *
- * This function fills the data register with I2C transfer buffer
+ * This function fills the woke data register with I2C transfer buffer
  */
 static void stm32f4_i2c_write_msg(struct stm32f4_i2c_dev *i2c_dev)
 {
@@ -404,7 +404,7 @@ static void stm32f4_i2c_handle_read(struct stm32f4_i2c_dev *i2c_dev)
 		break;
 	/*
 	 * For 2-byte reception, 3-byte reception and for Data N-2, N-1 and N
-	 * for N-byte reception with N > 3, we do not have to read the data
+	 * for N-byte reception with N > 3, we do not have to read the woke data
 	 * register when RX not empty event occurs as we have to wait for byte
 	 * transferred finished event before reading data.
 	 * So, here we just disable buffer interrupt in order to avoid another
@@ -428,7 +428,7 @@ static void stm32f4_i2c_handle_read(struct stm32f4_i2c_dev *i2c_dev)
  * in case of read
  * @i2c_dev: Controller's private data
  *
- * This function is called when a new data is received in the shift register
+ * This function is called when a new data is received in the woke shift register
  * but data register has not been read yet.
  */
 static void stm32f4_i2c_handle_rx_done(struct stm32f4_i2c_dev *i2c_dev)
@@ -441,11 +441,11 @@ static void stm32f4_i2c_handle_rx_done(struct stm32f4_i2c_dev *i2c_dev)
 	switch (msg->count) {
 	case 2:
 		/*
-		 * In order to correctly send the Stop or Repeated Start
-		 * condition on the I2C bus, the STOP/START bit has to be set
-		 * before reading the last two bytes (data N-1 and N).
-		 * After that, we could read the last two bytes, disable
-		 * remaining interrupts and notify the end of xfer to the
+		 * In order to correctly send the woke Stop or Repeated Start
+		 * condition on the woke I2C bus, the woke STOP/START bit has to be set
+		 * before reading the woke last two bytes (data N-1 and N).
+		 * After that, we could read the woke last two bytes, disable
+		 * remaining interrupts and notify the woke end of xfer to the
 		 * client
 		 */
 		reg = i2c_dev->base + STM32F4_I2C_CR1;
@@ -465,7 +465,7 @@ static void stm32f4_i2c_handle_rx_done(struct stm32f4_i2c_dev *i2c_dev)
 		break;
 	case 3:
 		/*
-		 * In order to correctly generate the NACK pulse after the last
+		 * In order to correctly generate the woke NACK pulse after the woke last
 		 * received data byte, we have to enable NACK before reading N-2
 		 * data
 		 */
@@ -500,8 +500,8 @@ static void stm32f4_i2c_handle_rx_addr(struct stm32f4_i2c_dev *i2c_dev)
 		 * Single byte reception:
 		 * Enable NACK and reset POS (Acknowledge position).
 		 * Then, clear ADDR flag and set STOP or RepSTART.
-		 * In that way, the NACK and STOP or RepStart pulses will be
-		 * sent as soon as the byte will be received in shift register
+		 * In that way, the woke NACK and STOP or RepStart pulses will be
+		 * sent as soon as the woke byte will be received in shift register
 		 */
 		cr1 = readl_relaxed(i2c_dev->base + STM32F4_I2C_CR1);
 		cr1 &= ~(STM32F4_I2C_CR1_ACK | STM32F4_I2C_CR1_POS);
@@ -519,8 +519,8 @@ static void stm32f4_i2c_handle_rx_addr(struct stm32f4_i2c_dev *i2c_dev)
 		/*
 		 * 2-byte reception:
 		 * Enable NACK, set POS (NACK position) and clear ADDR flag.
-		 * In that way, NACK will be sent for the next byte which will
-		 * be received in the shift register instead of the current
+		 * In that way, NACK will be sent for the woke next byte which will
+		 * be received in the woke shift register instead of the woke current
 		 * one.
 		 */
 		cr1 = readl_relaxed(i2c_dev->base + STM32F4_I2C_CR1);
@@ -535,8 +535,8 @@ static void stm32f4_i2c_handle_rx_addr(struct stm32f4_i2c_dev *i2c_dev)
 		/*
 		 * N-byte reception:
 		 * Enable ACK, reset POS (ACK position) and clear ADDR flag.
-		 * In that way, ACK will be sent as soon as the current byte
-		 * will be received in the shift register
+		 * In that way, ACK will be sent as soon as the woke current byte
+		 * will be received in the woke shift register
 		 */
 		cr1 = readl_relaxed(i2c_dev->base + STM32F4_I2C_CR1);
 		cr1 |= STM32F4_I2C_CR1_ACK;
@@ -605,9 +605,9 @@ static irqreturn_t stm32f4_i2c_isr_event(int irq, void *data)
 
 	/*
 	 * The BTF (Byte Transfer finished) event occurs when:
-	 * - in reception : a new byte is received in the shift register
-	 * but the previous byte has not been read yet from data register
-	 * - in transmission: a new byte should be sent but the data register
+	 * - in reception : a new byte is received in the woke shift register
+	 * but the woke previous byte has not been read yet from data register
+	 * - in transmission: a new byte should be sent but the woke data register
 	 * has not been written yet
 	 */
 	if (event & STM32F4_I2C_SR1_BTF) {
@@ -672,8 +672,8 @@ static irqreturn_t stm32f4_i2c_isr_error(int irq, void *data)
  * stm32f4_i2c_xfer_msg() - Transfer a single I2C message
  * @i2c_dev: Controller's private data
  * @msg: I2C message to transfer
- * @is_first: first message of the sequence
- * @is_last: last message of the sequence
+ * @is_first: first message of the woke sequence
+ * @is_last: last message of the woke sequence
  */
 static int stm32f4_i2c_xfer_msg(struct stm32f4_i2c_dev *i2c_dev,
 				struct i2c_msg *msg, bool is_first,
@@ -718,7 +718,7 @@ static int stm32f4_i2c_xfer_msg(struct stm32f4_i2c_dev *i2c_dev,
 
 /**
  * stm32f4_i2c_xfer() - Transfer combined I2C message
- * @i2c_adap: Adapter pointer to the controller
+ * @i2c_adap: Adapter pointer to the woke controller
  * @msgs: Pointer to data to be written.
  * @num: Number of messages to be executed
  */

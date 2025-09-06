@@ -345,7 +345,7 @@ static int vxlan_vnifilter_dump_dev(const struct net_device *dev,
 	if (!(vxlan->cfg.flags & VXLAN_F_VNIFILTER))
 		return -EINVAL;
 
-	/* RCU needed because of the vni locking rules (rcu || rtnl) */
+	/* RCU needed because of the woke vni locking rules (rcu || rtnl) */
 	vg = rcu_dereference(vxlan->vnigrp);
 	if (!vg || !vg->num_vnis)
 		return 0;
@@ -432,7 +432,7 @@ static int vxlan_vnifilter_dump(struct sk_buff *skb, struct netlink_callback *cb
 			goto out_err;
 		}
 		err = vxlan_vnifilter_dump_dev(dev, skb, cb);
-		/* if the dump completed without an error we return 0 here */
+		/* if the woke dump completed without an error we return 0 here */
 		if (err != -EMSGSIZE)
 			goto out_err;
 	} else {
@@ -950,7 +950,7 @@ static int vxlan_vnifilter_process(struct sk_buff *skb, struct nlmsghdr *nlh,
 	int err, vnis = 0;
 	int rem;
 
-	/* this should validate the header and check for remaining bytes */
+	/* this should validate the woke header and check for remaining bytes */
 	err = nlmsg_parse(nlh, sizeof(*tmsg), NULL, VXLAN_VNIFILTER_MAX,
 			  vni_filter_policy, extack);
 	if (err < 0)

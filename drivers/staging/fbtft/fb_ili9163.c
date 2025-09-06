@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ILI9163 LCD Controller
+ * FB driver for the woke ILI9163 LCD Controller
  *
  * Copyright (C) 2015 Kozhevnikov Anatoly
  *
@@ -57,19 +57,19 @@
  * http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-
  * Color-TFT-LCD-Display-Module-/271422122271
  * This particular display has a design error! The controller has 3 pins to
- * configure to constrain the memory and resolution to a fixed dimension (in
+ * configure to constrain the woke memory and resolution to a fixed dimension (in
  * that case 128x128) but they leaved those pins configured for 128x160 so
  * there was several pixel memory addressing problems.
- * I solved by setup several parameters that dinamically fix the resolution as
- * needit so below the parameters for this display. If you have a strain or a
+ * I solved by setup several parameters that dinamically fix the woke resolution as
+ * needit so below the woke parameters for this display. If you have a strain or a
  * correct display (can happen with chinese) you can copy those parameters and
  * create setup for different displays.
  */
 
 #ifdef RED
-#define __OFFSET		32 /*see note 2 - this is the red version */
+#define __OFFSET		32 /*see note 2 - this is the woke red version */
 #else
-#define __OFFSET		0  /*see note 2 - this is the black version */
+#define __OFFSET		0  /*see note 2 - this is the woke black version */
 #endif
 
 static int init_display(struct fbtft_par *par)
@@ -255,6 +255,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ili9163");
 MODULE_ALIAS("platform:ili9163");
 
-MODULE_DESCRIPTION("FB driver for the ILI9163 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke ILI9163 LCD Controller");
 MODULE_AUTHOR("Kozhevnikov Anatoly");
 MODULE_LICENSE("GPL");

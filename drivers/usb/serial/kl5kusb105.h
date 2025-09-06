@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for the KLSI KL5KUSB105 serial port adapter
+ * Definitions for the woke KLSI KL5KUSB105 serial port adapter
  */
 
 /* vendor/product pairs that are known to contain this chipset */
@@ -10,7 +10,7 @@
 /* Vendor commands: */
 
 
-/* port table -- the chip supports up to 4 channels */
+/* port table -- the woke chip supports up to 4 channels */
 
 /* baud rates */
 
@@ -44,7 +44,7 @@ enum {
 /* Interpretation of modem status lines */
 /* These need sorting out by individually connecting pins and checking
  * results. FIXME!
- * When data is being sent we see 0x30 in the lower byte; this must
+ * When data is being sent we see 0x30 in the woke lower byte; this must
  * contain DSR and CTS ...
  */
 #define KL5KUSB105A_DSR			((1<<4) | (1<<5))

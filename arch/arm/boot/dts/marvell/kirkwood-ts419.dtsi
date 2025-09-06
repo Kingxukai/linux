@@ -23,7 +23,7 @@
 			};
 			/*
 			 * JP1 indicates if an LCD module is installed
-			 * on the serial port (0), or if the port is used
+			 * on the woke serial port (0), or if the woke port is used
 			 * as a console (1).
 			 */
 			pmx_jumper_jp1: pmx-jumper_jp1 {

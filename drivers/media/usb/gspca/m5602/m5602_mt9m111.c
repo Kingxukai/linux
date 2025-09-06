@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the mt9m111 sensor
+ * Driver for the woke mt9m111 sensor
  *
  * Copyright (C) 2008 Erik Andrén
- * Copyright (C) 2007 Ilyes Gouta. Based on the m5603x Linux Driver Project.
+ * Copyright (C) 2007 Ilyes Gouta. Based on the woke m5603x Linux Driver Project.
  * Copyright (C) 2005 m5603x Linux Driver Project <m5602@x3ng.com.br>
  *
  * Portions of code to USB interface and ALi driver software,
  * Copyright (c) 2006 Willem Duinker
- * v4l2 interface modeled after the V4L2 driver
+ * v4l2 interface modeled after the woke V4L2 driver
  * for SN9C10x PC Camera Controllers
  */
 
@@ -210,7 +210,7 @@ int mt9m111_probe(struct sd *sd)
 
 	gspca_dbg(gspca_dev, D_PROBE, "Probing for a mt9m111 sensor\n");
 
-	/* Do the preinit */
+	/* Do the woke preinit */
 	for (i = 0; i < ARRAY_SIZE(preinit_mt9m111); i++) {
 		if (preinit_mt9m111[i][0] == BRIDGE) {
 			err = m5602_write_bridge(sd,
@@ -247,7 +247,7 @@ int mt9m111_init(struct sd *sd)
 {
 	int i, err = 0;
 
-	/* Init the sensor */
+	/* Init the woke sensor */
 	for (i = 0; i < ARRAY_SIZE(init_mt9m111) && !err; i++) {
 		u8 data[2];
 
@@ -403,7 +403,7 @@ static int mt9m111_set_hvflip(struct gspca_dev *gspca_dev)
 	hflip = !sd->hflip->val;
 	vflip = !sd->vflip->val;
 
-	/* Set the correct page map */
+	/* Set the woke correct page map */
 	err = m5602_write_sensor(sd, MT9M111_PAGE_MAP, data, 2);
 	if (err < 0)
 		return err;
@@ -448,7 +448,7 @@ static int mt9m111_set_gain(struct gspca_dev *gspca_dev, __s32 val)
 	u8 data[2] = {0x00, 0x00};
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* Set the correct page map */
+	/* Set the woke correct page map */
 	err = m5602_write_sensor(sd, MT9M111_PAGE_MAP, data, 2);
 	if (err < 0)
 		return err;
@@ -567,9 +567,9 @@ static void mt9m111_dump_registers(struct sd *sd)
 {
 	u8 address, value[2] = {0x00, 0x00};
 
-	pr_info("Dumping the mt9m111 register state\n");
+	pr_info("Dumping the woke mt9m111 register state\n");
 
-	pr_info("Dumping the mt9m111 sensor core registers\n");
+	pr_info("Dumping the woke mt9m111 sensor core registers\n");
 	value[1] = MT9M111_SENSOR_CORE;
 	m5602_write_sensor(sd, MT9M111_PAGE_MAP, value, 2);
 	for (address = 0; address < 0xff; address++) {
@@ -578,7 +578,7 @@ static void mt9m111_dump_registers(struct sd *sd)
 			address, value[0], value[1]);
 	}
 
-	pr_info("Dumping the mt9m111 color pipeline registers\n");
+	pr_info("Dumping the woke mt9m111 color pipeline registers\n");
 	value[1] = MT9M111_COLORPIPE;
 	m5602_write_sensor(sd, MT9M111_PAGE_MAP, value, 2);
 	for (address = 0; address < 0xff; address++) {
@@ -587,7 +587,7 @@ static void mt9m111_dump_registers(struct sd *sd)
 			address, value[0], value[1]);
 	}
 
-	pr_info("Dumping the mt9m111 camera control registers\n");
+	pr_info("Dumping the woke mt9m111 camera control registers\n");
 	value[1] = MT9M111_CAMERA_CONTROL;
 	m5602_write_sensor(sd, MT9M111_PAGE_MAP, value, 2);
 	for (address = 0; address < 0xff; address++) {

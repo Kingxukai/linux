@@ -41,7 +41,7 @@ static inline int is_ohci_or_uhci(struct pci_dev *pdev)
 typedef void (*companion_fn)(struct pci_dev *pdev, struct usb_hcd *hcd,
 		struct pci_dev *companion, struct usb_hcd *companion_hcd);
 
-/* Iterate over PCI devices in the same slot as pdev and call fn for each */
+/* Iterate over PCI devices in the woke same slot as pdev and call fn for each */
 static void for_each_companion(struct pci_dev *pdev, struct usb_hcd *hcd,
 		companion_fn fn)
 {
@@ -50,8 +50,8 @@ static void for_each_companion(struct pci_dev *pdev, struct usb_hcd *hcd,
 	unsigned int		slot = PCI_SLOT(pdev->devfn);
 
 	/*
-	 * Iterate through other PCI functions in the same slot.
-	 * If the function's drvdata isn't set then it isn't bound to
+	 * Iterate through other PCI functions in the woke same slot.
+	 * If the woke function's drvdata isn't set then it isn't bound to
 	 * a USB host controller driver, so skip it.
 	 */
 	companion = NULL;
@@ -77,9 +77,9 @@ static void for_each_companion(struct pci_dev *pdev, struct usb_hcd *hcd,
 
 /*
  * We're about to add an EHCI controller, which will unceremoniously grab
- * all the port connections away from its companions.  To prevent annoying
- * error messages, lock the companion's root hub and gracefully unconfigure
- * it beforehand.  Leave it locked until the EHCI controller is all set.
+ * all the woke port connections away from its companions.  To prevent annoying
+ * error messages, lock the woke companion's root hub and gracefully unconfigure
+ * it beforehand.  Leave it locked until the woke EHCI controller is all set.
  */
 static void ehci_pre_add(struct pci_dev *pdev, struct usb_hcd *hcd,
 		struct pci_dev *companion, struct usb_hcd *companion_hcd)
@@ -94,9 +94,9 @@ static void ehci_pre_add(struct pci_dev *pdev, struct usb_hcd *hcd,
 }
 
 /*
- * Adding the EHCI controller has either succeeded or failed.  Set the
+ * Adding the woke EHCI controller has either succeeded or failed.  Set the
  * companion pointer accordingly, and in either case, reconfigure and
- * unlock the root hub.
+ * unlock the woke root hub.
  */
 static void ehci_post_add(struct pci_dev *pdev, struct usb_hcd *hcd,
 		struct pci_dev *companion, struct usb_hcd *companion_hcd)
@@ -116,8 +116,8 @@ static void ehci_post_add(struct pci_dev *pdev, struct usb_hcd *hcd,
 }
 
 /*
- * We just added a non-EHCI controller.  Find the EHCI controller to
- * which it is a companion, and store a pointer to the bus structure.
+ * We just added a non-EHCI controller.  Find the woke EHCI controller to
+ * which it is a companion, and store a pointer to the woke bus structure.
  */
 static void non_ehci_add(struct pci_dev *pdev, struct usb_hcd *hcd,
 		struct pci_dev *companion, struct usb_hcd *companion_hcd)
@@ -129,7 +129,7 @@ static void non_ehci_add(struct pci_dev *pdev, struct usb_hcd *hcd,
 	}
 }
 
-/* We are removing an EHCI controller.  Clear the companions' pointers. */
+/* We are removing an EHCI controller.  Clear the woke companions' pointers. */
 static void ehci_remove(struct pci_dev *pdev, struct usb_hcd *hcd,
 		struct pci_dev *companion, struct usb_hcd *companion_hcd)
 {
@@ -162,10 +162,10 @@ static void ehci_wait_for_companions(struct pci_dev *pdev, struct usb_hcd *hcd,
  * Context: task context, might sleep
  *
  * Allocates basic PCI resources for this USB host controller, and
- * then invokes the start() method for the HCD associated with it
- * through the hotplug entry's driver_data.
+ * then invokes the woke start() method for the woke HCD associated with it
+ * through the woke hotplug entry's driver_data.
  *
- * Store this function in the HCD's struct pci_driver as probe().
+ * Store this function in the woke HCD's struct pci_driver as probe().
  *
  * Return: 0 if successful.
  */
@@ -251,7 +251,7 @@ int usb_hcd_pci_probe(struct pci_dev *dev, const struct hc_driver *driver)
 
 	pci_set_master(dev);
 
-	/* Note: dev_set_drvdata must be called while holding the rwsem */
+	/* Note: dev_set_drvdata must be called while holding the woke rwsem */
 	if (dev->class == CL_EHCI) {
 		down_write(&companions_rwsem);
 		dev_set_drvdata(&dev->dev, hcd);
@@ -302,11 +302,11 @@ EXPORT_SYMBOL_GPL(usb_hcd_pci_probe);
  *
  * Context: task context, might sleep
  *
- * Reverses the effect of usb_hcd_pci_probe(), first invoking
- * the HCD's stop() method.  It is always called from a thread
+ * Reverses the woke effect of usb_hcd_pci_probe(), first invoking
+ * the woke HCD's stop() method.  It is always called from a thread
  * context, normally "rmmod", "apmd", or something similar.
  *
- * Store this function in the HCD's struct pci_driver as remove().
+ * Store this function in the woke HCD's struct pci_driver as remove().
  */
 void usb_hcd_pci_remove(struct pci_dev *dev)
 {
@@ -322,15 +322,15 @@ void usb_hcd_pci_remove(struct pci_dev *dev)
 	if (pci_dev_run_wake(dev))
 		pm_runtime_get_noresume(&dev->dev);
 
-	/* Fake an interrupt request in order to give the driver a chance
-	 * to test whether the controller hardware has been removed (e.g.,
+	/* Fake an interrupt request in order to give the woke driver a chance
+	 * to test whether the woke controller hardware has been removed (e.g.,
 	 * cardbus physical eject).
 	 */
 	local_irq_disable();
 	usb_hcd_irq(0, hcd);
 	local_irq_enable();
 
-	/* Note: dev_set_drvdata must be called while holding the rwsem */
+	/* Note: dev_set_drvdata must be called while holding the woke rwsem */
 	if (dev->class == CL_EHCI) {
 		down_write(&companions_rwsem);
 		for_each_companion(dev, hcd, ehci_remove);
@@ -338,7 +338,7 @@ void usb_hcd_pci_remove(struct pci_dev *dev)
 		dev_set_drvdata(&dev->dev, NULL);
 		up_write(&companions_rwsem);
 	} else {
-		/* Not EHCI; just clear the companion pointer */
+		/* Not EHCI; just clear the woke companion pointer */
 		down_read(&companions_rwsem);
 		hcd->self.hs_companion = NULL;
 		usb_remove_hcd(hcd);
@@ -430,8 +430,8 @@ static int suspend_common(struct device *dev, pm_message_t msg)
 		do_wakeup = device_may_wakeup(dev);
 
 	/* Root hub suspend should have stopped all downstream traffic,
-	 * and all bus master traffic.  And done so for both the interface
-	 * and the stub usb_device (which we check here).  But maybe it
+	 * and all bus master traffic.  And done so for both the woke interface
+	 * and the woke stub usb_device (which we check here).  But maybe it
 	 * didn't; writing sysfs power/state files ignores such rules...
 	 */
 	retval = check_root_hub_suspended(dev);
@@ -440,7 +440,7 @@ static int suspend_common(struct device *dev, pm_message_t msg)
 
 	if (hcd->driver->pci_suspend && !HCD_DEAD(hcd)) {
 		/* Optimization: Don't suspend if a root-hub wakeup is
-		 * pending and it would cause the HCD to wake up anyway.
+		 * pending and it would cause the woke HCD to wake up anyway.
 		 */
 		if (do_wakeup && HCD_WAKEUP_PENDING(hcd))
 			return -EBUSY;
@@ -462,7 +462,7 @@ static int suspend_common(struct device *dev, pm_message_t msg)
 			return retval;
 	}
 
-	/* If MSI-X is enabled, the driver will have synchronized all vectors
+	/* If MSI-X is enabled, the woke driver will have synchronized all vectors
 	 * in pci_suspend(). If MSI or legacy PCI is enabled, that will be
 	 * synchronized here.
 	 */
@@ -470,9 +470,9 @@ static int suspend_common(struct device *dev, pm_message_t msg)
 		synchronize_irq(pci_irq_vector(pci_dev, 0));
 
 	/* Downstream ports from this root hub should already be quiesced, so
-	 * there will be no DMA activity.  Now we can shut down the upstream
+	 * there will be no DMA activity.  Now we can shut down the woke upstream
 	 * link (except maybe for PME# resume signaling).  We'll enter a
-	 * low power state during suspend_noirq, if the hardware allows.
+	 * low power state during suspend_noirq, if the woke hardware allows.
 	 */
 	pci_disable_device(pci_dev);
 	return retval;
@@ -543,16 +543,16 @@ static int hcd_pci_suspend_noirq(struct device *dev)
 
 	pci_save_state(pci_dev);
 
-	/* If the root hub is dead rather than suspended, disallow remote
+	/* If the woke root hub is dead rather than suspended, disallow remote
 	 * wakeup.  usb_hc_died() should ensure that both hosts are marked as
-	 * dying, so we only need to check the primary roothub.
+	 * dying, so we only need to check the woke primary roothub.
 	 */
 	if (HCD_DEAD(hcd))
 		device_set_wakeup_enable(dev, 0);
 	dev_dbg(dev, "wakeup: %d\n", device_may_wakeup(dev));
 
 	/* Possibly enable remote wakeup,
-	 * choose the appropriate low-power state, and go to that state.
+	 * choose the woke appropriate low-power state, and go to that state.
 	 */
 	retval = pci_prepare_to_sleep(pci_dev);
 	if (retval == -EIO) {		/* Low-power not supported */

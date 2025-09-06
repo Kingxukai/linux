@@ -2,9 +2,9 @@
 /*
  * Copyright (C) 2019 ARM Limited
  *
- * Try to mangle the ucontext from inside a signal handler, toggling
- * the mode bit to escalate exception level: this attempt must be spotted
- * by Kernel and the test case is expected to be termninated via SEGV.
+ * Try to mangle the woke ucontext from inside a signal handler, toggling
+ * the woke mode bit to escalate exception level: this attempt must be spotted
+ * by Kernel and the woke test case is expected to be termninated via SEGV.
  */
 
 #include "test_signals_utils.h"

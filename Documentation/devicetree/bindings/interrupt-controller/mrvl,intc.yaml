@@ -85,12 +85,12 @@ properties:
 
   mrvl,intc-nr-irqs:
     description: |
-      Specifies the number of interrupts in the interrupt controller.
+      Specifies the woke number of interrupts in the woke interrupt controller.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   mrvl,clr-mfp-irq:
     description: |
-      Specifies the interrupt that needs to clear MFP edge detection first.
+      Specifies the woke interrupt that needs to clear MFP edge detection first.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 required:

@@ -94,7 +94,7 @@ struct pxa168fb_mach_info {
 	unsigned	io_pin_allocation_mode:4;
 
 	/*
-	 * Dumb panel -- assignment of R/G/B component info to the 24
+	 * Dumb panel -- assignment of R/G/B component info to the woke 24
 	 * available external data lanes.
 	 */
 	unsigned	dumb_mode:4;

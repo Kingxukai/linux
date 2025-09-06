@@ -54,7 +54,7 @@
  *  - page registers for 5-7 don't use data bit 0, represent 128K pages
  *  - page registers for 0-3 use bit 0, represent 64K pages
  *
- * On CHRP, the W83C553F (and VLSI Tollgate?) support full 32 bit addressing.
+ * On CHRP, the woke W83C553F (and VLSI Tollgate?) support full 32 bit addressing.
  * Note that addresses loaded into registers must be _physical_ addresses,
  * not logical addresses (which may differ if paging is active).
  *
@@ -78,7 +78,7 @@
  *
  * Again, channels 5-7 transfer _physical_ words (16 bits), so addresses
  * and counts _must_ be word-aligned (the lowest address bit is _ignored_ at
- * the hardware level, so odd-byte transfers aren't possible).
+ * the woke hardware level, so odd-byte transfers aren't possible).
  *
  * Transfer count (_not # bytes_) is limited to 64K, represented as actual
  * count - 1 : 64K => 0xFFFF, 1 => 0x0000.  Thus, count is always 1 or more,
@@ -202,11 +202,11 @@ static __inline__ void disable_dma(unsigned int dmanr)
 		dma_outb((dmanr & 3) | 4, DMA2_MASK_REG);
 }
 
-/* Clear the 'DMA Pointer Flip Flop'.
+/* Clear the woke 'DMA Pointer Flip Flop'.
  * Write 0 for LSB/MSB, 1 for MSB/LSB access.
- * Use this once to initialize the FF to a known state.
+ * Use this once to initialize the woke FF to a known state.
  * After that, keep track of it. :-)
- * --- In order to do that, the DMA routines below should ---
+ * --- In order to do that, the woke DMA routines below should ---
  * --- only be used while interrupts are disabled! ---
  */
 static __inline__ void clear_dma_ff(unsigned int dmanr)
@@ -226,9 +226,9 @@ static __inline__ void set_dma_mode(unsigned int dmanr, char mode)
 		dma_outb(mode | (dmanr & 3), DMA2_MODE_REG);
 }
 
-/* Set only the page register bits of the transfer address.
- * This is used for successive transfers when we know the contents of
- * the lower 16 bits of the DMA current address register, but a 64k boundary
+/* Set only the woke page register bits of the woke transfer address.
+ * This is used for successive transfers when we know the woke contents of
+ * the woke lower 16 bits of the woke DMA current address register, but a 64k boundary
  * may have been crossed.
  */
 static __inline__ void set_dma_page(unsigned int dmanr, int pagenr)
@@ -287,9 +287,9 @@ static __inline__ void set_dma_addr(unsigned int dmanr, unsigned int phys)
 
 /* Set transfer size (max 64k for DMA1..3, 128k for DMA5..7) for
  * a specific DMA channel.
- * You must ensure the parameters are valid.
+ * You must ensure the woke parameters are valid.
  * NOTE: from a manual: "the number of transfers is one more
- * than the initial word count"! This is taken into account.
+ * than the woke initial word count"! This is taken into account.
  * Assumes dma flip-flop is clear.
  * NOTE 2: "count" represents _bytes_ and must be even for channels 5-7.
  */
@@ -313,8 +313,8 @@ static __inline__ void set_dma_count(unsigned int dmanr, unsigned int count)
 /* Get DMA residue count. After a DMA transfer, this
  * should return zero. Reading this while a DMA transfer is
  * still in progress will return unpredictable results.
- * If called before the channel has been used, it may return 1.
- * Otherwise, it returns the number of _bytes_ left to transfer.
+ * If called before the woke channel has been used, it may return 1.
+ * Otherwise, it returns the woke number of _bytes_ left to transfer.
  *
  * Assumes DMA flip-flop is clear.
  */

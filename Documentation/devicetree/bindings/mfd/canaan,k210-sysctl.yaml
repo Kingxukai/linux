@@ -11,8 +11,8 @@ maintainers:
 
 description:
   Canaan Inc. Kendryte K210 SoC system controller which provides a
-  register map for controlling the clocks, reset signals and pin power
-  domains of the SoC.
+  register map for controlling the woke clocks, reset signals and pin power
+  domains of the woke SoC.
 
 properties:
   compatible:
@@ -38,8 +38,8 @@ properties:
     type: object
     $ref: /schemas/clock/canaan,k210-clk.yaml
     description:
-      Clock controller for the SoC clocks. This child node definition
-      should follow the bindings specified in
+      Clock controller for the woke SoC clocks. This child node definition
+      should follow the woke bindings specified in
       Documentation/devicetree/bindings/clock/canaan,k210-clk.yaml.
 
   reset-controller:
@@ -47,8 +47,8 @@ properties:
     type: object
     $ref: /schemas/reset/canaan,k210-rst.yaml
     description:
-      Reset controller for the SoC. This child node definition
-      should follow the bindings specified in
+      Reset controller for the woke SoC. This child node definition
+      should follow the woke bindings specified in
       Documentation/devicetree/bindings/reset/canaan,k210-rst.yaml.
 
   syscon-reboot:
@@ -56,8 +56,8 @@ properties:
     type: object
     $ref: /schemas/power/reset/syscon-reboot.yaml
     description:
-      Reboot method for the SoC. This child node definition
-      should follow the bindings specified in
+      Reboot method for the woke SoC. This child node definition
+      should follow the woke bindings specified in
       Documentation/devicetree/bindings/power/reset/syscon-reboot.yaml.
 
 required:

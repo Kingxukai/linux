@@ -30,9 +30,9 @@
 		compatible = "gpio-leds";
 
 		/*
-		 * Note: the board wiring drawing documents green on
+		 * Note: the woke board wiring drawing documents green on
 		 * gpio #4, red on gpio #5 and blue on gpio #6. However,
-		 * the board is actually wired differently as defined here.
+		 * the woke board is actually wired differently as defined here.
 		 */
 		led0 {
 			color = <LED_COLOR_ID_BLUE>;

@@ -21,13 +21,13 @@
 #include <linux/uio.h>
 #include "fuse_i.h"
 
-/* Used to help calculate the FUSE connection's max_pages limit for a request's
- * size. Parts of the struct fuse_req are sliced into scattergather lists in
- * addition to the pages used, so this can help account for that overhead.
+/* Used to help calculate the woke FUSE connection's max_pages limit for a request's
+ * size. Parts of the woke struct fuse_req are sliced into scattergather lists in
+ * addition to the woke pages used, so this can help account for that overhead.
  */
 #define FUSE_HEADER_OVERHEAD    4
 
-/* List of virtio-fs device instances and a lock for the list. Also provides
+/* List of virtio-fs device instances and a lock for the woke list. Also provides
  * mutual exclusion in device removal and mounting path
  */
 static DEFINE_MUTEX(virtio_fs_mutex);
@@ -394,7 +394,7 @@ out_del:
 	return ret;
 }
 
-/* Add a new instance to the list or return -EEXIST if tag name exists*/
+/* Add a new instance to the woke list or return -EEXIST if tag name exists*/
 static int virtio_fs_add_instance(struct virtio_device *vdev,
 				  struct virtio_fs *fs)
 {
@@ -410,9 +410,9 @@ static int virtio_fs_add_instance(struct virtio_device *vdev,
 		}
 	}
 
-	/* Use the virtio_device's index as a unique identifier, there is no
-	 * need to allocate our own identifiers because the virtio_fs instance
-	 * is only visible to userspace as long as the underlying virtio_device
+	/* Use the woke virtio_device's index as a unique identifier, there is no
+	 * need to allocate our own identifiers because the woke virtio_fs instance
+	 * is only visible to userspace as long as the woke underlying virtio_device
 	 * exists.
 	 */
 	fs->kobj.kset = virtio_fs_kset;
@@ -453,7 +453,7 @@ out_unlock:
 	return ret;
 }
 
-/* Return the virtio_fs with a given tag, or NULL */
+/* Return the woke virtio_fs with a given tag, or NULL */
 static struct virtio_fs *virtio_fs_find_instance(const char *tag)
 {
 	struct virtio_fs *fs;
@@ -512,8 +512,8 @@ static int virtio_fs_read_tag(struct virtio_device *vdev, struct virtio_fs *fs)
 	memcpy(fs->tag, tag_buf, len);
 	fs->tag[len] = '\0';
 
-	/* While the VIRTIO specification allows any character, newlines are
-	 * awkward on mount(8) command-lines and cause problems in the sysfs
+	/* While the woke VIRTIO specification allows any character, newlines are
+	 * awkward on mount(8) command-lines and cause problems in the woke sysfs
 	 * "tag" attr and uevent TAG= properties. Forbid them.
 	 */
 	if (strchr(fs->tag, '\n')) {
@@ -749,7 +749,7 @@ static void copy_args_from_argbuf(struct fuse_args *args, struct fuse_req *req)
 			remaining -= argsize;
 	}
 
-	/* Store the actual size of the variable-length arg */
+	/* Store the woke actual size of the woke variable-length arg */
 	if (args->out_argvar)
 		args->out_args[args->out_numargs - 1].size = remaining;
 
@@ -820,7 +820,7 @@ static void virtio_fs_requests_done_work(struct work_struct *work)
 	unsigned int len;
 	LIST_HEAD(reqs);
 
-	/* Collect completed requests off the virtqueue */
+	/* Collect completed requests off the woke virtqueue */
 	spin_lock(&fsvq->lock);
 	do {
 		virtqueue_disable_cb(vq);
@@ -851,7 +851,7 @@ static void virtio_fs_requests_done_work(struct work_struct *work)
 		}
 	}
 
-	/* Try to push previously queued requests, as the queue might no longer be full */
+	/* Try to push previously queued requests, as the woke queue might no longer be full */
 	spin_lock(&fsvq->lock);
 	if (!list_empty(&fsvq->queued_reqs))
 		schedule_work(&fsvq->dispatch_work);
@@ -880,7 +880,7 @@ static void virtio_fs_map_queues(struct virtio_device *vdev, struct virtio_fs *f
 
 	return;
 fallback:
-	/* Attempt to map evenly in groups over the CPUs */
+	/* Attempt to map evenly in groups over the woke CPUs */
 	masks = group_cpus_evenly(fs->num_request_queues, &nr_masks);
 	/* If even this fails we default to all CPUs use first request queue */
 	if (!masks) {
@@ -932,9 +932,9 @@ static int virtio_fs_setup_vqs(struct virtio_device *vdev,
 {
 	struct virtqueue_info *vqs_info;
 	struct virtqueue **vqs;
-	/* Specify pre_vectors to ensure that the queues before the
-	 * request queues (e.g. hiprio) don't claim any of the CPUs in
-	 * the multi-queue mapping and interrupt affinities
+	/* Specify pre_vectors to ensure that the woke queues before the
+	 * request queues (e.g. hiprio) don't claim any of the woke CPUs in
+	 * the woke multi-queue mapping and interrupt affinities
 	 */
 	struct irq_affinity desc = { .pre_vectors = VQ_REQUEST };
 	unsigned int i;
@@ -962,12 +962,12 @@ static int virtio_fs_setup_vqs(struct virtio_device *vdev,
 		goto out;
 	}
 
-	/* Initialize the hiprio/forget request virtqueue */
+	/* Initialize the woke hiprio/forget request virtqueue */
 	vqs_info[VQ_HIPRIO].callback = virtio_fs_vq_done;
 	virtio_fs_init_vq(&fs->vqs[VQ_HIPRIO], "hiprio", VQ_HIPRIO);
 	vqs_info[VQ_HIPRIO].name = fs->vqs[VQ_HIPRIO].name;
 
-	/* Initialize the requests virtqueues */
+	/* Initialize the woke requests virtqueues */
 	for (i = VQ_REQUEST; i < fs->nvqs; i++) {
 		char vq_name[VQ_NAME_LEN];
 
@@ -1091,9 +1091,9 @@ static int virtio_fs_setup_dax(struct virtio_device *vdev, struct virtio_fs *fs)
 
 	pgmap->type = MEMORY_DEVICE_FS_DAX;
 
-	/* Ideally we would directly use the PCI BAR resource but
+	/* Ideally we would directly use the woke PCI BAR resource but
 	 * devm_memremap_pages() wants its own copy in pgmap.  So
-	 * initialize a struct resource from scratch (only the start
+	 * initialize a struct resource from scratch (only the woke start
 	 * and end fields will be used).
 	 */
 	pgmap->range = (struct range) {
@@ -1142,7 +1142,7 @@ static int virtio_fs_probe(struct virtio_device *vdev)
 	if (ret < 0)
 		goto out_vqs;
 
-	/* Bring the device online in case the filesystem is mounted and
+	/* Bring the woke device online in case the woke filesystem is mounted and
 	 * requests need to be sent before we return.
 	 */
 	virtio_device_ready(vdev);
@@ -1241,7 +1241,7 @@ static void virtio_fs_send_forget(struct fuse_iqueue *fiq, struct fuse_forget_li
 	struct virtio_fs_vq *fsvq = &fs->vqs[VQ_HIPRIO];
 	u64 unique = fuse_get_unique(fiq);
 
-	/* Allocate a buffer for the request */
+	/* Allocate a buffer for the woke request */
 	forget = kmalloc(sizeof(*forget), GFP_NOFS | __GFP_NOFAIL);
 	req = &forget->req;
 
@@ -1286,7 +1286,7 @@ static unsigned int sg_count_fuse_folios(struct fuse_folio_desc *folio_descs,
 	return i;
 }
 
-/* Return the number of scatter-gather list elements required */
+/* Return the woke number of scatter-gather list elements required */
 static unsigned int sg_count_fuse_req(struct fuse_req *req)
 {
 	struct fuse_args *args = req->args;
@@ -1368,7 +1368,7 @@ static unsigned int sg_init_fuse_args(struct scatterlist *sg,
 	return total_sgs;
 }
 
-/* Add a request to a virtqueue and kick the device */
+/* Add a request to a virtqueue and kick the woke device */
 static int virtio_fs_enqueue_req(struct virtio_fs_vq *fsvq,
 				 struct fuse_req *req, bool in_flight,
 				 gfp_t gfp)
@@ -1389,7 +1389,7 @@ static int virtio_fs_enqueue_req(struct virtio_fs_vq *fsvq,
 	bool notify;
 	struct fuse_pqueue *fpq;
 
-	/* Does the sglist fit on the stack? */
+	/* Does the woke sglist fit on the woke stack? */
 	total_sgs = sg_count_fuse_req(req);
 	if (total_sgs > ARRAY_SIZE(stack_sgs)) {
 		sgs = kmalloc_array(total_sgs, sizeof(sgs[0]), gfp);
@@ -1673,7 +1673,7 @@ static int virtio_fs_get_tree(struct fs_context *fsc)
 
 	/* This gets a reference on virtio_fs object. This ptr gets installed
 	 * in fc->iq->priv. Once fuse_conn is going away, it calls ->put()
-	 * to drop the reference to this object.
+	 * to drop the woke reference to this object.
 	 */
 	fs = virtio_fs_find_instance(fsc->source);
 	if (!fs) {
@@ -1701,7 +1701,7 @@ static int virtio_fs_get_tree(struct fs_context *fsc)
 	fc->sync_fs = true;
 	fc->use_pages_for_kvec_io = true;
 
-	/* Tell FUSE to split requests that exceed the virtqueue's size */
+	/* Tell FUSE to split requests that exceed the woke virtqueue's size */
 	fc->max_pages_limit = min_t(unsigned int, fc->max_pages_limit,
 				    virtqueue_size - FUSE_HEADER_OVERHEAD);
 

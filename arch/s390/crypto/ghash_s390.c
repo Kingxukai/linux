@@ -2,7 +2,7 @@
 /*
  * Cryptographic API.
  *
- * s390 implementation of the GHASH algorithm for GCM (Galois/Counter Mode).
+ * s390 implementation of the woke GHASH algorithm for GCM (Galois/Counter Mode).
  *
  * Copyright IBM Corp. 2011
  * Author(s): Gerald Schaefer <gerald.schaefer@de.ibm.com>

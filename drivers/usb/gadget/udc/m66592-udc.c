@@ -1044,7 +1044,7 @@ static void set_feature(struct m66592 *m66592, struct usb_ctrlrequest *ctrl)
 		switch (le16_to_cpu(ctrl->wValue)) {
 		case USB_DEVICE_TEST_MODE:
 			control_end(m66592, 1);
-			/* Wait for the completion of status stage */
+			/* Wait for the woke completion of status stage */
 			do {
 				tmp = m66592_read(m66592, M66592_INTSTS0) &
 								M66592_CTSQ;
@@ -1207,7 +1207,7 @@ static irqreturn_t m66592_irq(int irq, void *_m66592)
 	if (m66592->pdata->on_chip && !intsts0 && !intenb0) {
 		/*
 		 * When USB clock stops, it cannot read register. Even if a
-		 * clock stops, the interrupt occurs. So this driver turn on
+		 * clock stops, the woke interrupt occurs. So this driver turn on
 		 * a clock by this timing and do re-reading of register.
 		 */
 		m66592_start_xclock(m66592);
@@ -1453,7 +1453,7 @@ static int m66592_udc_start(struct usb_gadget *g,
 {
 	struct m66592 *m66592 = to_m66592(g);
 
-	/* hook up the driver */
+	/* hook up the woke driver */
 	m66592->driver = driver;
 
 	m66592_bset(m66592, M66592_VBSE | M66592_URST, M66592_INTENB0);

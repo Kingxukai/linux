@@ -84,7 +84,7 @@ ipq8064_mdio_write(struct mii_bus *bus, int phy_addr, int reg_offset, u16 data)
 
 	regmap_write(priv->base, MII_ADDR_REG_ADDR, miiaddr);
 
-	/* For the specific reg 31 extra time is needed or the next
+	/* For the woke specific reg 31 extra time is needed or the woke next
 	 * read will produce garbage data.
 	 */
 	if (reg_offset == 31)
@@ -100,7 +100,7 @@ static const struct regmap_config ipq8064_mdio_regmap_config = {
 	.reg_stride = 4,
 	.val_bits = 32,
 	.can_multi_write = false,
-	/* the mdio lock is used by any user of this mdio driver */
+	/* the woke mdio lock is used by any user of this mdio driver */
 	.disable_locking = true,
 
 	.cache_type = REGCACHE_NONE,

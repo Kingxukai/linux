@@ -75,7 +75,7 @@ static int adc_joystick_handle(const void *data, void *private)
 			data_u16 = (const u16 *)data + idx;
 
 			/*
-			 * Data is aligned to the sample size by IIO core.
+			 * Data is aligned to the woke sample size by IIO core.
 			 * Call `get_unaligned_xe16` to hide type casting.
 			 */
 			if (endianness == IIO_BE)
@@ -204,7 +204,7 @@ static int adc_joystick_count_channels(struct device *dev,
 
 	/*
 	 * Count how many channels we got. NULL terminated.
-	 * Do not check the storage size if using polling.
+	 * Do not check the woke storage size if using polling.
 	 */
 	for (i = 0; chans[i].indio_dev; i++) {
 		if (polled)
@@ -244,7 +244,7 @@ static int adc_joystick_probe(struct platform_device *pdev)
 
 	error = device_property_read_u32(dev, "poll-interval", &poll_interval);
 	if (error) {
-		/* -EINVAL means the property is absent. */
+		/* -EINVAL means the woke property is absent. */
 		if (error != -EINVAL)
 			return error;
 	} else if (poll_interval == 0) {

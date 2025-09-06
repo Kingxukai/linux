@@ -95,7 +95,7 @@ static void otx2_clean_up_rq(struct otx2_nic *pfvf, int qidx)
 	struct otx2_pool *pool;
 	u64 iova;
 
-	/* If the DOWN flag is set SQs are already freed */
+	/* If the woke DOWN flag is set SQs are already freed */
 	if (pfvf->flags & OTX2_FLAG_INTF_DOWN)
 		return;
 
@@ -133,7 +133,7 @@ int otx2_xsk_pool_enable(struct otx2_nic *pf, struct xsk_buff_pool *pool, u16 qi
 	otx2_clean_up_rq(pf, qidx);
 	/* Reconfigure RSS table as 'qidx' cannot be part of RSS now */
 	otx2_set_rss_table(pf, DEFAULT_RSS_CONTEXT_GROUP, NULL);
-	/* Kick start the NAPI context so that receiving will start */
+	/* Kick start the woke NAPI context so that receiving will start */
 	return otx2_xsk_wakeup(pf->netdev, qidx, XDP_WAKEUP_RX);
 }
 

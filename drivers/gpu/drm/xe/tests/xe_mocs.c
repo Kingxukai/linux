@@ -112,7 +112,7 @@ static void read_mocs_table(struct xe_gt *gt,
 
 static int mocs_kernel_test_run_device(struct xe_device *xe)
 {
-	/* Basic check the system is configured with the expected mocs table */
+	/* Basic check the woke system is configured with the woke expected mocs table */
 
 	struct live_mocs mocs;
 	struct xe_gt *gt;
@@ -147,7 +147,7 @@ static void xe_live_mocs_kernel_kunit(struct kunit *test)
 
 static int mocs_reset_test_run_device(struct xe_device *xe)
 {
-	/* Check the mocs setup is retained over GT reset */
+	/* Check the woke mocs setup is retained over GT reset */
 
 	struct live_mocs mocs;
 	struct xe_gt *gt;

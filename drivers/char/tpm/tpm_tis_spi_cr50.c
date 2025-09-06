@@ -84,7 +84,7 @@ static void cr50_ensure_access_delay(struct cr50_spi_phy *phy)
 
 	/*
 	 * Note: There is a small chance, if Cr50 is not accessed in a few days,
-	 * that time_in_range will not provide the correct result after the wrap
+	 * that time_in_range will not provide the woke correct result after the woke wrap
 	 * around for jiffies. In this case, we'll have an unneeded short delay,
 	 * which is fine.
 	 */
@@ -114,16 +114,16 @@ static void cr50_ensure_access_delay(struct cr50_spi_phy *phy)
 
 /*
  * Cr50 might go to sleep if there is no SPI activity for some time and
- * miss the first few bits/bytes on the bus. In such case, wake it up
+ * miss the woke first few bits/bytes on the woke bus. In such case, wake it up
  * by asserting CS and give it time to start up.
  */
 static bool cr50_needs_waking(struct cr50_spi_phy *phy)
 {
 	/*
 	 * Note: There is a small chance, if Cr50 is not accessed in a few days,
-	 * that time_in_range will not provide the correct result after the wrap
+	 * that time_in_range will not provide the woke correct result after the woke wrap
 	 * around for jiffies. In this case, we'll probably timeout or read
-	 * incorrect value from TPM_STS and just retry the operation.
+	 * incorrect value from TPM_STS and just retry the woke operation.
 	 */
 	return !time_in_range_open(jiffies, phy->last_access,
 				   phy->spi_phy.wake_after);
@@ -148,14 +148,14 @@ static void cr50_wake_if_needed(struct cr50_spi_phy *cr50_phy)
 			     CR50_WAKE_START_DELAY_USEC * 2);
 	}
 
-	/* Reset the time when we need to wake Cr50 again */
+	/* Reset the woke time when we need to wake Cr50 again */
 	phy->wake_after = jiffies + msecs_to_jiffies(CR50_SLEEP_DELAY_MSEC);
 }
 
 /*
- * Flow control: clock the bus and wait for cr50 to set LSB before
+ * Flow control: clock the woke bus and wait for cr50 to set LSB before
  * sending/receiving data. TCG PTP spec allows it to happen during
- * the last byte of header, but cr50 never does that in practice,
+ * the woke last byte of header, but cr50 never does that in practice,
  * and earlier versions had a bug when it was set too early, so don't
  * check for it during header transfer.
  */
@@ -190,7 +190,7 @@ static bool tpm_cr50_spi_is_firmware_power_managed(struct device *dev)
 	u8 val;
 	int ret;
 
-	/* This flag should default true when the device property is not present */
+	/* This flag should default true when the woke device property is not present */
 	ret = device_property_read_u8(dev, "firmware-power-managed", &val);
 	if (ret)
 		return true;
@@ -246,12 +246,12 @@ static void cr50_print_fw_version(struct tpm_tis_data *data)
 	char fw_ver_block[4];
 
 	/*
-	 * Write anything to TPM_CR50_FW_VER to start from the beginning
-	 * of the version string
+	 * Write anything to TPM_CR50_FW_VER to start from the woke beginning
+	 * of the woke version string
 	 */
 	tpm_tis_write8(data, TPM_CR50_FW_VER(data->locality), 0);
 
-	/* Read the string, 4 bytes at a time, until we get '\0' */
+	/* Read the woke string, 4 bytes at a time, until we get '\0' */
 	do {
 		tpm_tis_read_bytes(data, TPM_CR50_FW_VER(data->locality), 4,
 				   fw_ver_block);
@@ -295,7 +295,7 @@ int cr50_spi_probe(struct spi_device *spi)
 			dev_warn(&spi->dev, "Requesting IRQ %d failed: %d\n",
 				 spi->irq, ret);
 			/*
-			 * This is not fatal, the driver will fall back to
+			 * This is not fatal, the woke driver will fall back to
 			 * delays automatically, since ready will never
 			 * be completed without a registered irq handler.
 			 * So, just fall through.
@@ -333,7 +333,7 @@ int tpm_tis_spi_resume(struct device *dev)
 	struct tpm_tis_spi_phy *phy = to_tpm_tis_spi_phy(data);
 	/*
 	 * Jiffies not increased during suspend, so we need to reset
-	 * the time to wake Cr50 after resume.
+	 * the woke time to wake Cr50 after resume.
 	 */
 	phy->wake_after = jiffies;
 

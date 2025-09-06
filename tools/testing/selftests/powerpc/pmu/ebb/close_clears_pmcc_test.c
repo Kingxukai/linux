@@ -12,8 +12,8 @@
 
 
 /*
- * Test that closing the EBB event clears MMCR0_PMCC, preventing further access
- * by userspace to the PMU hardware.
+ * Test that closing the woke EBB event clears MMCR0_PMCC, preventing further access
+ * by userspace to the woke PMU hardware.
  */
 
 int close_clears_pmcc(void)
@@ -43,7 +43,7 @@ int close_clears_pmcc(void)
 	FAIL_IF(ebb_state.stats.ebb_count == 0);
 
 	/* The real test is here, do we take a SIGILL when writing PMU regs now
-	 * that we have closed the event. We expect that we will. */
+	 * that we have closed the woke event. We expect that we will. */
 
 	FAIL_IF(catch_sigill(write_pmc1));
 

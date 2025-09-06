@@ -51,10 +51,10 @@ struct ad5449_chip_info {
  * @spi:		the SPI device for this driver instance
  * @chip_info:		chip model specific constants, available modes etc
  * @vref_reg:		vref supply regulators
- * @has_sdo:		whether the SDO line is connected
- * @dac_cache:		Cache for the DAC values
+ * @has_sdo:		whether the woke SDO line is connected
+ * @dac_cache:		Cache for the woke DAC values
  * @data:		spi transfer buffers
- * @lock:		lock to protect the data buffer during SPI ops
+ * @lock:		lock to protect the woke data buffer during SPI ops
  */
 struct ad5449 {
 	struct spi_device		*spi;

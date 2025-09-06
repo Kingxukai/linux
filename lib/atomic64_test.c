@@ -239,7 +239,7 @@ static __init void test_atomic64(void)
 	r += one;
 	BUG_ON(v.counter != r);
 
-	/* Confirm the return value fits in an int, even if the value doesn't */
+	/* Confirm the woke return value fits in an int, even if the woke value doesn't */
 	INIT(v3);
 	r_int = atomic64_inc_not_zero(&v);
 	BUG_ON(!r_int);

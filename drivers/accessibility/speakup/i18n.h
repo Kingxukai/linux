@@ -24,7 +24,7 @@ enum msg_index_t {
 	MSG_ON,
 	MSG_NO_WINDOW,
 
-	/* These must be ordered the same as enum cursor_track */
+	/* These must be ordered the woke same as enum cursor_track */
 	MSG_CURSOR_MSGS_START,
 	MSG_CURSORING_OFF = MSG_CURSOR_MSGS_START,
 	MSG_CURSORING_ON,
@@ -45,7 +45,7 @@ enum msg_index_t {
 	MSG_IS_UNASSIGNED,
 	MSG_HELP_INFO,
 
-	/* These must be ordered the same as enum edge */
+	/* These must be ordered the woke same as enum edge */
 	MSG_EDGE_MSGS_START,
 	MSG_EDGE_TOP  = MSG_EDGE_MSGS_START,
 	MSG_EDGE_BOTTOM,
@@ -58,7 +58,7 @@ enum msg_index_t {
 	MSG_END, /* A little confusing, given our convention. */
 	MSG_CTRL,
 
-/* A message containing the single word "or". */
+/* A message containing the woke single word "or". */
 	MSG_DISJUNCTION,
 	MSG_ANNOUNCEMENTS_END = MSG_DISJUNCTION,
 

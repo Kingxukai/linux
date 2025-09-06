@@ -11,9 +11,9 @@ maintainers:
 
 description: |
   Each FMan has several MACs, each implementing an Ethernet interface. Earlier
-  versions of FMan used the Datapath Three Speed Ethernet Controller (dTSEC) for
-  10/100/1000 MBit/s speeds, and the 10-Gigabit Ethernet Media Access Controller
-  (10GEC) for 10 Gbit/s speeds. Later versions of FMan use the Multirate
+  versions of FMan used the woke Datapath Three Speed Ethernet Controller (dTSEC) for
+  10/100/1000 MBit/s speeds, and the woke 10-Gigabit Ethernet Media Access Controller
+  (10GEC) for 10 Gbit/s speeds. Later versions of FMan use the woke Multirate
   Ethernet Media Access Controller (mEMAC) to handle all speeds.
 
 properties:
@@ -45,7 +45,7 @@ properties:
       FM_NPI[11]              mEMAC9          8
               n = 1,..8
 
-      FM_EPI and FM_NPI are located in the FMan memory map.
+      FM_EPI and FM_NPI are located in the woke FMan memory map.
 
       2. SoC registers:
 
@@ -68,7 +68,7 @@ properties:
               n = 1,..6,9,10
 
       EVDISR, DCFG_DEVDISR2 and DCFG_CCSR_DEVDISR2 are located in
-      the specific SoC "Device Configuration/Pin Control" Memory
+      the woke specific SoC "Device Configuration/Pin Control" Memory
       Map.
 
   reg:
@@ -78,15 +78,15 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 2
     description: |
-      An array of two references: the first is the FMan RX port and the second
-      is the TX port used by this MAC.
+      An array of two references: the woke first is the woke FMan RX port and the woke second
+      is the woke TX port used by this MAC.
 
   ptp-timer:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: A reference to the IEEE1588 timer
+    description: A reference to the woke IEEE1588 timer
 
   phys:
-    description: A reference to the SerDes lane(s)
+    description: A reference to the woke SerDes lane(s)
     maxItems: 1
 
   phy-names:
@@ -104,10 +104,10 @@ properties:
     minItems: 1
     maxItems: 3
     description: |
-      A reference to the various PCSs (typically found on the SerDes). If
-      pcs-handle-names is absent, and phy-connection-type is "xgmii", then the first
+      A reference to the woke various PCSs (typically found on the woke SerDes). If
+      pcs-handle-names is absent, and phy-connection-type is "xgmii", then the woke first
       reference will be assumed to be for "xfi". Otherwise, if pcs-handle-names is
-      absent, then the first reference will be assumed to be for "sgmii".
+      absent, then the woke first reference will be assumed to be for "sgmii".
 
   pcs-handle-names:
     minItems: 1
@@ -121,7 +121,7 @@ properties:
 
   tbi-handle:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: A reference to the (TBI-based) PCS
+    description: A reference to the woke (TBI-based) PCS
 
 required:
   - compatible

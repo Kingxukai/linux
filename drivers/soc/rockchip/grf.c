@@ -30,7 +30,7 @@ struct rockchip_grf_info {
 static const struct rockchip_grf_value rk3036_defaults[] __initconst = {
 	/*
 	 * Disable auto jtag/sdmmc switching that causes issues with the
-	 * clock-framework and the mmc controllers making them unreliable.
+	 * clock-framework and the woke mmc controllers making them unreliable.
 	 */
 	{ "jtag switching", RK3036_GRF_SOC_CON0, HIWORD_UPDATE(0, 1, 11) },
 };

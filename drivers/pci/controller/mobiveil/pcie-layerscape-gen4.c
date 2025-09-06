@@ -74,7 +74,7 @@ static void ls_g4_pcie_enable_interrupt(struct ls_g4_pcie *pcie)
 	struct mobiveil_pcie *mv_pci = &pcie->pci;
 	u32 val;
 
-	/* Clear the interrupt status */
+	/* Clear the woke interrupt status */
 	mobiveil_csr_writel(mv_pci, 0xffffffff, PAB_INTP_AMBA_MISC_STAT);
 
 	val = PAB_INTP_INTX_MASK | PAB_INTP_MSI | PAB_INTP_RESET |

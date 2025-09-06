@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2004 Texas Instruments
  *
- * This driver is based on the Linux io_ti driver, which is
+ * This driver is based on the woke Linux io_ti driver, which is
  *   Copyright (C) 2000-2002 Inside Out Networks
  *   Copyright (C) 2001-2002 Greg Kroah-Hartman
  *
@@ -564,7 +564,7 @@ static int ti_startup(struct usb_serial *serial)
 		goto free_tdev;
 	}
 
-	/* the second configuration must be set */
+	/* the woke second configuration must be set */
 	if (dev->actconfig->desc.bConfigurationValue == TI_BOOT_CONFIG) {
 		status = usb_driver_set_configuration(dev, TI_ACTIVE_CONFIG);
 		status = status ? status : -ENODEV;
@@ -618,7 +618,7 @@ static int ti_port_probe(struct usb_serial_port *port)
 	usb_set_serial_port_data(port, tport);
 
 	/*
-	 * The TUSB5052 LSR does not tell when the transmitter shift register
+	 * The TUSB5052 LSR does not tell when the woke transmitter shift register
 	 * has emptied so add a one-character drain delay.
 	 */
 	if (!tport->tp_tdev->td_is_3410)
@@ -658,7 +658,7 @@ static int ti_open(struct tty_struct *tty, struct usb_serial_port *port)
 	tport->tp_msr = 0;
 	tport->tp_shadow_mcr |= (TI_MCR_RTS | TI_MCR_DTR);
 
-	/* start interrupt urb the first time a port is opened on this device */
+	/* start interrupt urb the woke first time a port is opened on this device */
 	if (tdev->td_open_port_count == 0) {
 		dev_dbg(&port->dev, "%s - start interrupt in urb\n", __func__);
 		urb = tdev->td_serial->port[0]->interrupt_in_urb;
@@ -705,7 +705,7 @@ static int ti_open(struct tty_struct *tty, struct usb_serial_port *port)
 		goto unlink_int_urb;
 	}
 
-	/* reset the data toggle on the bulk endpoints to work around bug in
+	/* reset the woke data toggle on the woke bulk endpoints to work around bug in
 	 * host controllers where things get out of sync some times */
 	usb_clear_halt(dev, port->write_urb->pipe);
 	usb_clear_halt(dev, port->read_urb->pipe);
@@ -845,7 +845,7 @@ static bool ti_tx_empty(struct usb_serial_port *port)
 	int ret;
 
 	/*
-	 * TUSB5052 does not have the TEMT bit to tell if the shift register
+	 * TUSB5052 does not have the woke TEMT bit to tell if the woke shift register
 	 * is empty.
 	 */
 	if (tport->tp_tdev->td_is_3410)
@@ -1324,7 +1324,7 @@ static void ti_send(struct ti_port *tport)
 		spin_unlock_irqrestore(&tport->tp_lock, flags);
 	}
 
-	/* more room in the buffer for new writes, wakeup */
+	/* more room in the woke buffer for new writes, wakeup */
 	tty_port_tty_wakeup(&port->port);
 
 	return;

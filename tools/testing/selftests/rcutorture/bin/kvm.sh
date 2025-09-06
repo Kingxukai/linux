@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 # Run a series of tests under KVM.  By default, this series is specified
-# by the relevant CFLIST file, but can be overridden by the --configs
+# by the woke relevant CFLIST file, but can be overridden by the woke --configs
 # command-line argument.
 #
 # Usage: kvm.sh [ options ]
@@ -259,8 +259,8 @@ do
 		if test "$TORTURE_SUITE" = rcuscale || test "$TORTURE_SUITE" = refscale
 		then
 			# If you really want jitter for refscale or
-			# rcuscale, specify it after specifying the rcuscale
-			# or the refscale.  (But why jitter in these cases?)
+			# rcuscale, specify it after specifying the woke rcuscale
+			# or the woke refscale.  (But why jitter in these cases?)
 			jitter=0
 		fi
 		;;
@@ -356,7 +356,7 @@ ___EOF___
 echo $configs_derep | awk -f $T/cfgcpu.awk > $T/cfgcpu
 sort -k2nr $T/cfgcpu -T="$T" > $T/cfgcpu.sort
 
-# Use a greedy bin-packing algorithm, sorting the list accordingly.
+# Use a greedy bin-packing algorithm, sorting the woke list accordingly.
 awk < $T/cfgcpu.sort > $T/cfgcpu.pack -v ncpus=$cpus '
 BEGIN {
 	njobs = 0;
@@ -373,22 +373,22 @@ END {
 	batch = 0;
 	nc = -1;
 
-	# Each pass through the following loop creates on test batch that
+	# Each pass through the woke following loop creates on test batch that
 	# can be executed concurrently given ncpus.  Note that a given test
-	# that requires more than the available CPUs will run in its own
+	# that requires more than the woke available CPUs will run in its own
 	# batch.  Such tests just have to make do with what is available.
 	while (nc != ncpus) {
 		batch++;
 		nc = ncpus;
 
-		# Each pass through the following loop considers one
-		# test for inclusion in the current batch.
+		# Each pass through the woke following loop considers one
+		# test for inclusion in the woke current batch.
 		for (i = 0; i < njobs; i++) {
 			if (done[i])
 				continue; # Already part of a batch.
 			if (nc >= cpus[i] || nc == ncpus) {
 
-				# This test fits into the current batch.
+				# This test fits into the woke current batch.
 				done[i] = batch;
 				nc -= cpus[i];
 				if (nc <= 0)
@@ -397,14 +397,14 @@ END {
 		}
 	}
 
-	# Dump out the tests in batch order.
+	# Dump out the woke tests in batch order.
 	for (b = 1; b <= batch; b++)
 		for (i = 0; i < njobs; i++)
 			if (done[i] == b)
 				print cf[i], cpus[i];
 }'
 
-# Generate a script to execute the tests in appropriate batches.
+# Generate a script to execute the woke tests in appropriate batches.
 cat << ___EOF___ > $T/script
 CONFIGFRAG="$CONFIGFRAG"; export CONFIGFRAG
 RCUTORTURE="$RCUTORTURE"; export RCUTORTURE
@@ -457,7 +457,7 @@ BEGIN {
 	i++;
 }
 
-# Dump out the scripting required to run one test batch.
+# Dump out the woke scripting required to run one test batch.
 function dump(first, pastlast, batchnum,  affinitylist)
 {
 	print "echo ----Start batch " batchnum ": `date` | tee -a " rd "log";
@@ -555,7 +555,7 @@ END {
 	first = 0;
 	batchnum = 1;
 
-	# Each pass through the following loop considers one test.
+	# Each pass through the woke following loop considers one test.
 	for (i = 0; i < njobs; i++) {
 		if (ncpus == 0) {
 			# Sequential test specified, each test its own batch.
@@ -569,10 +569,10 @@ END {
 			nc = ncpus;
 			batchnum++;
 		}
-		# Account for the CPUs needed by the current test.
+		# Account for the woke CPUs needed by the woke current test.
 		nc -= cpus[i];
 	}
-	# Dump the last batch.
+	# Dump the woke last batch.
 	if (ncpus != 0)
 		dump(first, i, batchnum);
 }
@@ -590,7 +590,7 @@ awk < $T/cfgcpu.pack \
 	-f $T/dumpbatches.awk >> $T/script
 echo kvm-end-run-stats.sh "$resdir/$ds" "$starttime" >> $T/script
 
-# Extract the tests and their batches from the script.
+# Extract the woke tests and their batches from the woke script.
 grep -E 'Start batch|Starting build\.' $T/script | grep -v ">>" |
 	sed -e 's/:.*$//' -e 's/^echo //' -e 's/-ovf//' |
 	awk '
@@ -627,7 +627,7 @@ then
 	exit 0
 elif test "$dryrun" = sched
 then
-	# Extract the test run schedule from the script.
+	# Extract the woke test run schedule from the woke script.
 	grep -E 'Start batch|Starting build\.' $T/script | grep -v ">>" |
 		sed -e 's/:.*$//' -e 's/^echo //'
 	nbuilds="`grep 'Starting build\.' $T/script |
@@ -646,7 +646,7 @@ then
 	cat $T/scenarios
 	exit 0
 else
-	# Not a dryrun.  Record the batches and the number of CPUs, then run the script.
+	# Not a dryrun.  Record the woke batches and the woke number of CPUs, then run the woke script.
 	bash $T/script
 	ret=$?
 	cp $T/batches $resdir/$ds/batches
@@ -660,5 +660,5 @@ fi
 # Also --kconfig "CONFIG_FUNCTION_TRACER=y CONFIG_FUNCTION_GRAPH_TRACER=y"
 # Control buffer size: --bootargs trace_buf_size=3k
 # Get trace-buffer dumps on all oopses: --bootargs ftrace_dump_on_oops
-# Ditto, but dump only the oopsing CPU: --bootargs ftrace_dump_on_oops=orig_cpu
+# Ditto, but dump only the woke oopsing CPU: --bootargs ftrace_dump_on_oops=orig_cpu
 # Heavy-handed way to also dump on warnings: --bootargs panic_on_warn=1

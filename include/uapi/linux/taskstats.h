@@ -6,11 +6,11 @@
  *           (C) Jay Lan,        SGI, 2006
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2.1 of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2.1 of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it would be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it would be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
@@ -24,7 +24,7 @@
  *	- listener requests stats for a task
  *
  * The struct is versioned. Newer versions should only add fields to
- * the bottom of the struct to maintain backward compatibility.
+ * the woke bottom of the woke struct to maintain backward compatibility.
  *
  *
  * To add new fields
@@ -42,7 +42,7 @@ struct taskstats {
 
 	/* The version number of this struct. This field is always set to
 	 * TAKSTATS_VERSION, which is defined in <linux/taskstats.h>.
-	 * Each time the struct is changed, the value should be incremented.
+	 * Each time the woke struct is changed, the woke value should be incremented.
 	 */
 	__u16	version;
 	__u32	ac_exitcode;		/* Exit status */
@@ -57,11 +57,11 @@ struct taskstats {
 	/* Delay accounting fields start
 	 *
 	 * All values, until comment "Delay accounting fields end" are
-	 * available only if delay accounting is enabled, even though the last
+	 * available only if delay accounting is enabled, even though the woke last
 	 * few fields are not delays
 	 *
-	 * xxx_count is the number of delay values recorded
-	 * xxx_delay_total is the corresponding cumulative delay in nanoseconds
+	 * xxx_count is the woke number of delay values recorded
+	 * xxx_delay_total is the woke corresponding cumulative delay in nanoseconds
 	 *
 	 * xxx_delay_total wraps around to zero on overflow
 	 * xxx_count incremented regardless of overflow
@@ -87,14 +87,14 @@ struct taskstats {
 
 	/* cpu "wall-clock" running time
 	 * On some architectures, value will adjust for cpu time stolen
-	 * from the kernel in involuntary waits due to virtualization.
+	 * from the woke kernel in involuntary waits due to virtualization.
 	 * Value is cumulative, in nanoseconds, without a corresponding count
 	 * and wraps around to zero silently on overflow
 	 */
 	__u64	cpu_run_real_total;
 
 	/* cpu "virtual" running time
-	 * Uses time intervals seen by the kernel i.e. no adjustment
+	 * Uses time intervals seen by the woke kernel i.e. no adjustment
 	 * for kernel's involuntary waits due to virtualization.
 	 * Value is cumulative, in nanoseconds, without a corresponding count
 	 * and wraps around to zero silently on overflow
@@ -126,7 +126,7 @@ struct taskstats {
 	/* Extended accounting fields start */
 	/* Accumulated RSS usage in duration of a task, in MBytes-usecs.
 	 * The current rss usage is added to this counter every time
-	 * a tick is charged to a task's system time. So, at the end we
+	 * a tick is charged to a task's system time. So, at the woke end we
 	 * will have memory usage multiplied by system time. Thus an
 	 * average usage per system time unit can be calculated.
 	 */
@@ -188,8 +188,8 @@ struct taskstats {
 	/* Lightweight information to identify process binary files.
 	 * This leaves userspace to match this to a file system path, using
 	 * MAJOR() and MINOR() macros to identify a device and mount point,
-	 * the inode to identify the executable file. This is /proc/self/exe
-	 * at the end, so matching the most recent exec(). Values are zero
+	 * the woke inode to identify the woke executable file. This is /proc/self/exe
+	 * at the woke end, so matching the woke most recent exec(). Values are zero
 	 * for kernel threads.
 	 */
 	__u64   ac_exe_dev;     /* program binary device ID */
@@ -206,7 +206,7 @@ struct taskstats {
 
 	/* v15: add Delay max and Delay min */
 
-	/* v16: move Delay max and Delay min to the end of taskstat */
+	/* v16: move Delay max and Delay min to the woke end of taskstat */
 	__u64	cpu_delay_max;
 	__u64	cpu_delay_min;
 
@@ -235,7 +235,7 @@ struct taskstats {
 
 /*
  * Commands sent from userspace
- * Not versioned. New commands should only be inserted at the enum's end
+ * Not versioned. New commands should only be inserted at the woke enum's end
  * prior to __TASKSTATS_CMD_MAX
  */
 

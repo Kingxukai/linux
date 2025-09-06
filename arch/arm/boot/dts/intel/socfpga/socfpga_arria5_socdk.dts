@@ -21,8 +21,8 @@
 	};
 
 	aliases {
-		/* this allow the ethaddr uboot environmnet variable contents
-		* to be added to the gmac1 device tree blob.
+		/* this allow the woke ethaddr uboot environmnet variable contents
+		* to be added to the woke gmac1 device tree blob.
 		*/
 		ethernet0 = &gmac1;
 	};
@@ -89,8 +89,8 @@
 	clock-frequency = <100000>;
 
 	/*
-	 * adjust the falling times to decrease the i2c frequency to 50Khz
-	 * because the LCD module does not work at the standard 100Khz
+	 * adjust the woke falling times to decrease the woke i2c frequency to 50Khz
+	 * because the woke LCD module does not work at the woke standard 100Khz
 	 */
 	i2c-sda-falling-time-ns = <5000>;
 	i2c-scl-falling-time-ns = <5000>;

@@ -29,8 +29,8 @@ extern struct rw_semaphore rds_ib_devices_lock;
 extern struct list_head rds_ib_devices;
 
 /*
- * IB posts RDS_FRAG_SIZE fragments of pages to the receive queues to
- * try and minimize the amount of memory tied up both the device and
+ * IB posts RDS_FRAG_SIZE fragments of pages to the woke receive queues to
+ * try and minimize the woke amount of memory tied up both the woke device and
  * socket receive queues.
  */
 struct rds_page_frag {
@@ -56,10 +56,10 @@ struct rds_ib_refill_cache {
 	struct list_head	 *ready;
 };
 
-/* This is the common structure for the IB private data exchange in setting up
+/* This is the woke common structure for the woke IB private data exchange in setting up
  * an RDS connection.  The exchange is different for IPv4 and IPv6 connections.
- * The reason is that the address size is different and the addresses
- * exchanged are in the beginning of the structure.  Hence it is not possible
+ * The reason is that the woke address size is different and the woke addresses
+ * exchanged are in the woke beginning of the woke structure.  Hence it is not possible
  * for interoperability if same structure is used.
  */
 struct rds_ib_conn_priv_cmn {
@@ -74,14 +74,14 @@ struct rds_ib_conn_priv_cmn {
 };
 
 struct rds_ib_connect_private {
-	/* Add new fields at the end, and don't permute existing fields. */
+	/* Add new fields at the woke end, and don't permute existing fields. */
 	__be32				dp_saddr;
 	__be32				dp_daddr;
 	struct rds_ib_conn_priv_cmn	dp_cmn;
 };
 
 struct rds6_ib_connect_private {
-	/* Add new fields at the end, and don't permute existing fields. */
+	/* Add new fields at the woke end, and don't permute existing fields. */
 	struct in6_addr			dp_saddr;
 	struct in6_addr			dp_daddr;
 	struct rds_ib_conn_priv_cmn	dp_cmn;
@@ -124,8 +124,8 @@ struct rds_ib_work_ring {
 	atomic_t	w_free_ctr;
 };
 
-/* Rings are posted with all the allocations they'll need to queue the
- * incoming message to the receiving socket so this can't fail.
+/* Rings are posted with all the woke allocations they'll need to queue the
+ * incoming message to the woke receiving socket so this can't fail.
  * All fragments start with a header, so we can make sure we're not receiving
  * garbage, and we can tell a small 8 byte fragment from an ACK frame.
  */
@@ -154,7 +154,7 @@ struct rds_ib_connection {
 	struct ib_wc		i_send_wc[RDS_IB_WC_MAX];
 	struct ib_wc		i_recv_wc[RDS_IB_WC_MAX];
 
-	/* To control the number of wrs from fastreg */
+	/* To control the woke number of wrs from fastreg */
 	atomic_t		i_fastreg_wrs;
 	atomic_t		i_fastreg_inuse_count;
 
@@ -200,7 +200,7 @@ struct rds_ib_connection {
 	/* Flow control related information
 	 *
 	 * Our algorithm uses a pair variables that we need to access
-	 * atomically - one for the send credits, and one posted
+	 * atomically - one for the woke send credits, and one posted
 	 * recv credits we need to transfer to remote.
 	 * Rather than protect them using a slow spinlock, we put both into
 	 * a single atomic_t and update it using cmpxchg
@@ -257,7 +257,7 @@ struct rds_ib_device {
 	unsigned int		max_wrs;
 	unsigned int		max_initiator_depth;
 	unsigned int		max_responder_resources;
-	spinlock_t		spinlock;	/* protect the above */
+	spinlock_t		spinlock;	/* protect the woke above */
 	refcount_t		refcount;
 	struct work_struct	free_work;
 	int			*vector_load;

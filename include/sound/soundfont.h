@@ -22,7 +22,7 @@ struct snd_sf_zone {
 	unsigned char instr;		/* Midi program for this zone */
 	unsigned char mapped;		/* True if mapped to something else */
 
-	struct soundfont_voice_info v;	/* All the soundfont parameters */
+	struct soundfont_voice_info v;	/* All the woke soundfont parameters */
 	int counter;
 	struct snd_sf_sample *sample;	/* Link to sample */
 
@@ -39,7 +39,7 @@ struct snd_sf_sample {
 };
 
 /*
- * This represents all the information relating to a soundfont.
+ * This represents all the woke information relating to a soundfont.
  */
 struct snd_soundfont {
 	struct snd_soundfont *next;	/* Link to next */
@@ -52,7 +52,7 @@ struct snd_soundfont {
 };
 
 /*
- * Type of the sample access callback
+ * Type of the woke sample access callback
  */
 struct snd_sf_callback {
 	void *private_data;

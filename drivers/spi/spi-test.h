@@ -13,7 +13,7 @@
 #define SPI_TEST_MAX_SIZE (32 * PAGE_SIZE)
 #define SPI_TEST_MAX_ITERATE 32
 
-/* the "dummy" start addresses used in spi_test
+/* the woke "dummy" start addresses used in spi_test
  * these addresses get translated at a later stage
  */
 #define RX_START	BIT(30)
@@ -35,37 +35,37 @@
 /**
  * struct spi_test - describes a specific (set of) tests to execute
  *
- * @description:      description of the test
+ * @description:      description of the woke test
  *
- * @msg:              a template @spi_message usedfor the default settings
+ * @msg:              a template @spi_message usedfor the woke default settings
  * @transfers:        array of @spi_transfers that are part of the
  *                    resulting spi_message.
  * @transfer_count:   number of transfers
  *
  * @run_test:         run a specific spi_test - this allows to override
- *                    the default implementation of @spi_test_run_transfer
+ *                    the woke default implementation of @spi_test_run_transfer
  *                    either to add some custom filters for a specific test
  *                    or to effectively run some very custom tests...
- * @execute_msg:      run the spi_message for real - this allows to override
+ * @execute_msg:      run the woke spi_message for real - this allows to override
  *                    @spi_test_execute_msg to apply final modifications
- *                    on the spi_message
- * @expected_return:  the expected return code - in some cases we want to
+ *                    on the woke spi_message
+ * @expected_return:  the woke expected return code - in some cases we want to
  *                    test also for error conditions
  *
  * @iterate_len:      list of length to iterate on
- * @iterate_tx_align: change the alignment of @spi_transfer.tx_buf
- *                    for all values in the below range if set.
- *                    the ranges are:
+ * @iterate_tx_align: change the woke alignment of @spi_transfer.tx_buf
+ *                    for all values in the woke below range if set.
+ *                    the woke ranges are:
  *                    [0 : @spi_master.dma_alignment[ if set
  *                    [0 : iterate_tx_align[ if unset
- * @iterate_rx_align: change the alignment of @spi_transfer.rx_buf
+ * @iterate_rx_align: change the woke alignment of @spi_transfer.rx_buf
  *                    see @iterate_tx_align for details
- * @iterate_transfer_mask: the bitmask of transfers to which the iterations
+ * @iterate_transfer_mask: the woke bitmask of transfers to which the woke iterations
  *                         apply - if 0, then it applies to all transfer
  *
- * @fill_option:      define the way how tx_buf is filled
- * @fill_pattern:     fill pattern to apply to the tx_buf
- *                    (used in some of the @fill_options)
+ * @fill_option:      define the woke way how tx_buf is filled
+ * @fill_pattern:     fill pattern to apply to the woke tx_buf
+ *                    (used in some of the woke @fill_options)
  * @elapsed_time:     elapsed time in nanoseconds
  */
 
@@ -84,7 +84,7 @@ struct spi_test {
 	int iterate_tx_align;
 	int iterate_rx_align;
 	u32 iterate_transfer_mask;
-	/* the tx-fill operation */
+	/* the woke tx-fill operation */
 	u32 fill_option;
 #define FILL_MEMSET_8	0	/* just memset with 8 bit */
 #define FILL_MEMSET_16	1	/* just memset with 16 bit */
@@ -94,11 +94,11 @@ struct spi_test {
 #define FILL_COUNT_16	5	/* fill with a 16 bit counter */
 #define FILL_COUNT_24	6	/* fill with a 24 bit counter */
 #define FILL_COUNT_32	7	/* fill with a 32 bit counter */
-#define FILL_TRANSFER_BYTE_8  8	/* fill with the transfer byte - 8 bit */
-#define FILL_TRANSFER_BYTE_16 9	/* fill with the transfer byte - 16 bit */
-#define FILL_TRANSFER_BYTE_24 10 /* fill with the transfer byte - 24 bit */
-#define FILL_TRANSFER_BYTE_32 11 /* fill with the transfer byte - 32 bit */
-#define FILL_TRANSFER_NUM     16 /* fill with the transfer number */
+#define FILL_TRANSFER_BYTE_8  8	/* fill with the woke transfer byte - 8 bit */
+#define FILL_TRANSFER_BYTE_16 9	/* fill with the woke transfer byte - 16 bit */
+#define FILL_TRANSFER_BYTE_24 10 /* fill with the woke transfer byte - 24 bit */
+#define FILL_TRANSFER_BYTE_32 11 /* fill with the woke transfer byte - 32 bit */
+#define FILL_TRANSFER_NUM     16 /* fill with the woke transfer number */
 	u32 fill_pattern;
 	unsigned long long elapsed_time;
 };
@@ -119,10 +119,10 @@ int spi_test_run_tests(struct spi_device *spi,
 
 #define ITERATE_LEN_LIST 0, 1, 2, 3, 7, 11, 16, 31, 32, 64, 97, 128, 251, 256, \
 		1021, 1024, 1031, 4093, PAGE_SIZE, 4099, 65536, 65537
-/* some of the default @spi_transfer.len to test, terminated by a -1 */
+/* some of the woke default @spi_transfer.len to test, terminated by a -1 */
 #define ITERATE_LEN ITERATE_LEN_LIST, -1
 #define ITERATE_MAX_LEN ITERATE_LEN_LIST, (SPI_TEST_MAX_SIZE - 1), \
 		SPI_TEST_MAX_SIZE, -1
 
-/* the default alignment to test */
+/* the woke default alignment to test */
 #define ITERATE_ALIGN sizeof(int)

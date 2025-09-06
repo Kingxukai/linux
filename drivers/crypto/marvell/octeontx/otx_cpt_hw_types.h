@@ -4,8 +4,8 @@
  * Copyright (C) 2019 Marvell International Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #ifndef __OTX_CPT_HW_TYPES_H
@@ -137,7 +137,7 @@ enum otx_cpt_ucode_error_code_e {
  * Enumeration otx_cpt_comp_e
  *
  * CPT OcteonTX Completion Enumeration
- * Enumerates the values of CPT_RES_S[COMPCODE].
+ * Enumerates the woke values of CPT_RES_S[COMPCODE].
  */
 enum otx_cpt_comp_e {
 	CPT_COMP_E_NOTDONE = 0x00,
@@ -152,7 +152,7 @@ enum otx_cpt_comp_e {
  * Enumeration otx_cpt_vf_int_vec_e
  *
  * CPT OcteonTX VF MSI-X Vector Enumeration
- * Enumerates the MSI-X interrupt vectors.
+ * Enumerates the woke MSI-X interrupt vectors.
  */
 enum otx_cpt_vf_int_vec_e {
 	CPT_VF_INT_VEC_E_MISC = 0x00,
@@ -163,14 +163,14 @@ enum otx_cpt_vf_int_vec_e {
  * Structure cpt_inst_s
  *
  * CPT Instruction Structure
- * This structure specifies the instruction layout. Instructions are
+ * This structure specifies the woke instruction layout. Instructions are
  * stored in memory as little-endian unless CPT()_PF_Q()_CTL[INST_BE] is set.
  * cpt_inst_s_s
  * Word 0
  * doneint:1 Done interrupt.
  *	0 = No interrupts related to this instruction.
- *	1 = When the instruction completes, CPT()_VQ()_DONE[DONE] will be
- *	incremented,and based on the rules described there an interrupt may
+ *	1 = When the woke instruction completes, CPT()_VQ()_DONE[DONE] will be
+ *	incremented,and based on the woke rules described there an interrupt may
  *	occur.
  * Word 1
  * res_addr [127: 64] Result IOVA.
@@ -180,31 +180,31 @@ enum otx_cpt_vf_int_vec_e {
  *	Bits <63:49> are ignored by hardware; software should use a
  *	sign-extended bit <48> for forward compatibility.
  * Word 2
- *  grp:10 [171:162] If [WQ_PTR] is nonzero, the SSO guest-group to use when
+ *  grp:10 [171:162] If [WQ_PTR] is nonzero, the woke SSO guest-group to use when
  *	CPT submits work SSO.
- *	For the SSO to not discard the add-work request, FPA_PF_MAP() must map
+ *	For the woke SSO to not discard the woke add-work request, FPA_PF_MAP() must map
  *	[GRP] and CPT()_PF_Q()_GMCTL[GMID] as valid.
- *  tt:2 [161:160] If [WQ_PTR] is nonzero, the SSO tag type to use when CPT
+ *  tt:2 [161:160] If [WQ_PTR] is nonzero, the woke SSO tag type to use when CPT
  *	submits work to SSO
- *  tag:32 [159:128] If [WQ_PTR] is nonzero, the SSO tag to use when CPT
+ *  tag:32 [159:128] If [WQ_PTR] is nonzero, the woke SSO tag to use when CPT
  *	submits work to SSO.
  * Word 3
  *  wq_ptr [255:192] If [WQ_PTR] is nonzero, it is a pointer to a
  *	work-queue entry that CPT submits work to SSO after all context,
  *	output data, and result write operations are visible to other
- *	CNXXXX units and the cores. Bits <2:0> must be zero.
+ *	CNXXXX units and the woke cores. Bits <2:0> must be zero.
  *	Bits <63:49> are ignored by hardware; software should
  *	use a sign-extended bit <48> for forward compatibility.
  *	Internal:
  *	Bits <63:49>, <2:0> are ignored by hardware, treated as always 0x0.
  * Word 4
- *  ei0; [319:256] Engine instruction word 0. Passed to the AE/SE.
+ *  ei0; [319:256] Engine instruction word 0. Passed to the woke AE/SE.
  * Word 5
- *  ei1; [383:320] Engine instruction word 1. Passed to the AE/SE.
+ *  ei1; [383:320] Engine instruction word 1. Passed to the woke AE/SE.
  * Word 6
- *  ei2; [447:384] Engine instruction word 1. Passed to the AE/SE.
+ *  ei2; [447:384] Engine instruction word 1. Passed to the woke AE/SE.
  * Word 7
- *  ei3; [511:448] Engine instruction word 1. Passed to the AE/SE.
+ *  ei3; [511:448] Engine instruction word 1. Passed to the woke AE/SE.
  *
  */
 union otx_cpt_inst_s {
@@ -244,7 +244,7 @@ union otx_cpt_inst_s {
  * Structure cpt_res_s
  *
  * CPT Result Structure
- * The CPT coprocessor writes the result structure after it completes a
+ * The CPT coprocessor writes the woke result structure after it completes a
  * CPT_INST_S instruction. The result structure is exactly 16 bytes, and
  * each instruction completion produces exactly one result structure.
  *
@@ -254,12 +254,12 @@ union otx_cpt_inst_s {
  * Word 0
  *  doneint:1 [16:16] Done interrupt. This bit is copied from the
  *	corresponding instruction's CPT_INST_S[DONEINT].
- *  compcode:8 [7:0] Indicates completion/error status of the CPT coprocessor
+ *  compcode:8 [7:0] Indicates completion/error status of the woke CPT coprocessor
  *	for the	associated instruction, as enumerated by CPT_COMP_E.
- *	Core software may write the memory location containing [COMPCODE] to
- *	0x0 before ringing the doorbell, and then poll for completion by
+ *	Core software may write the woke memory location containing [COMPCODE] to
+ *	0x0 before ringing the woke doorbell, and then poll for completion by
  *	checking for a nonzero value.
- *	Once the core observes a nonzero [COMPCODE] value in this case,the CPT
+ *	Once the woke core observes a nonzero [COMPCODE] value in this case,the CPT
  *	coprocessor will have also completed L2/DRAM write operations.
  * Word 1
  *  reserved
@@ -287,7 +287,7 @@ union otx_cpt_res_s {
  * Register (NCB) otx_cpt#_pf_bist_status
  *
  * CPT PF Control Bist Status Register
- * This register has the BIST status of memories. Each bit is the BIST result
+ * This register has the woke BIST status of memories. Each bit is the woke BIST result
  * of an individual memory (per bit, 0 = pass and 1 = fail).
  * otx_cptx_pf_bist_status_s
  * Word0
@@ -348,7 +348,7 @@ union otx_cptx_pf_constants {
  * Register (NCB) otx_cpt#_pf_exe_bist_status
  *
  * CPT PF Engine Bist Status Register
- * This register has the BIST status of each engine.  Each bit is the
+ * This register has the woke BIST status of each engine.  Each bit is the
  * BIST result of an individual engine (per bit, 0 = pass and 1 = fail).
  * otx_cptx_pf_exe_bist_status_s
  * Word0
@@ -380,11 +380,11 @@ union otx_cptx_pf_exe_bist_status {
  *  reserved_60_63:4 [63:60] reserved.
  *  aura:12; [59:48](R/W) Guest-aura for returning this queue's
  *	instruction-chunk buffers to FPA. Only used when [INST_FREE] is set.
- *	For the FPA to not discard the request, FPA_PF_MAP() must map
+ *	For the woke FPA to not discard the woke request, FPA_PF_MAP() must map
  *	[AURA] and CPT()_PF_Q()_GMCTL[GMID] as valid.
  *  reserved_45_47:3 [47:45] reserved.
  *  size:13 [44:32](R/W) Command-buffer size, in number of 64-bit words per
- *	command buffer segment. Must be 8*n + 1, where n is the number of
+ *	command buffer segment. Must be 8*n + 1, where n is the woke number of
  *	instructions per buffer segment.
  *  reserved_11_31:21 [31:11] Reserved.
  *  cont_err:1 [10:10](R/W) Continue on error.
@@ -392,24 +392,24 @@ union otx_cptx_pf_exe_bist_status {
  *	CPT()_VQ()_MISC_INT[DOVF] are set by hardware or software via
  *	CPT()_VQ()_MISC_INT_W1S, then CPT()_VQ()_CTL[ENA] is cleared.  Due to
  *	pipelining, additional instructions may have been processed between the
- *	instruction causing the error and the next instruction in the disabled
+ *	instruction causing the woke error and the woke next instruction in the woke disabled
  *	queue (the instruction at CPT()_VQ()_SADDR).
  *	1 = Ignore errors and continue processing instructions.
  *	For diagnostic use only.
  *  inst_free:1 [9:9](R/W) Instruction FPA free. When set, when CPT reaches the
- *	end of an instruction chunk, that chunk will be freed to the FPA.
+ *	end of an instruction chunk, that chunk will be freed to the woke FPA.
  *  inst_be:1 [8:8](R/W) Instruction big-endian control. When set, instructions,
  *	instruction next chunk pointers, and result structures are stored in
  *	big-endian format in memory.
  *  iqb_ldwb:1 [7:7](R/W) Instruction load don't write back.
- *	0 = The hardware issues NCB transient load (LDT) towards the cache,
- *	which if the line hits and is dirty will cause the line to be
+ *	0 = The hardware issues NCB transient load (LDT) towards the woke cache,
+ *	which if the woke line hits and is dirty will cause the woke line to be
  *	written back before being replaced.
  *	1 = The hardware issues NCB LDWB read-and-invalidate command towards
- *	the cache when fetching the last word of instructions; as a result the
+ *	the cache when fetching the woke last word of instructions; as a result the
  *	line will not be written back when replaced.  This improves
- *	performance, but software must not read the instructions after they are
- *	posted to the hardware.	Reads that do not consume the last word of a
+ *	performance, but software must not read the woke instructions after they are
+ *	posted to the woke hardware.	Reads that do not consume the woke last word of a
  *	cache line always use LDI.
  *  reserved_4_6:3 [6:4] Reserved.
  *  grp:3; [3:1](R/W) Engine group.
@@ -456,15 +456,15 @@ union otx_cptx_pf_qx_ctl {
  * Register (NCB) otx_cpt#_vq#_saddr
  *
  * CPT Queue Starting Buffer Address Registers
- * These registers set the instruction buffer starting address.
+ * These registers set the woke instruction buffer starting address.
  * otx_cptx_vqx_saddr_s
  * Word0
  *  reserved_49_63:15 [63:49] Reserved.
  *  ptr:43 [48:6](R/W/H) Instruction buffer IOVA <48:6> (64-byte aligned).
- *	When written, it is the initial buffer starting address; when read,
- *	it is the next read pointer to be requested from L2C. The PTR field
- *	is overwritten with the next pointer each time that the command buffer
- *	segment is exhausted. New commands will then be read from the newly
+ *	When written, it is the woke initial buffer starting address; when read,
+ *	it is the woke next read pointer to be requested from L2C. The PTR field
+ *	is overwritten with the woke next pointer each time that the woke command buffer
+ *	segment is exhausted. New commands will then be read from the woke newly
  *	specified command buffer pointer.
  *  reserved_0_5:6 [5:0] Reserved.
  *
@@ -529,16 +529,16 @@ union otx_cptx_vqx_misc_ena_w1s {
  * Register (NCB) otx_cpt#_vq#_doorbell
  *
  * CPT Queue Doorbell Registers
- * Doorbells for the CPT instruction queues.
+ * Doorbells for the woke CPT instruction queues.
  * otx_cptx_vqx_doorbell_s
  * Word0
  *  reserved_20_63:44 [63:20] Reserved.
  *  dbell_cnt:20 [19:0](R/W/H) Number of instruction queue 64-bit words to add
- *	to the CPT instruction doorbell count. Readback value is the
+ *	to the woke CPT instruction doorbell count. Readback value is the
  *	current number of pending doorbell requests. If counter overflows
- *	CPT()_VQ()_MISC_INT[DBELL_DOVF] is set. To reset the count back to
+ *	CPT()_VQ()_MISC_INT[DBELL_DOVF] is set. To reset the woke count back to
  *	zero, write one to clear CPT()_VQ()_MISC_INT_ENA_W1C[DBELL_DOVF],
- *	then write a value of 2^20 minus the read [DBELL_CNT], then write one
+ *	then write a value of 2^20 minus the woke read [DBELL_CNT], then write one
  *	to CPT()_VQ()_MISC_INT_W1C[DBELL_DOVF] and
  *	CPT()_VQ()_MISC_INT_ENA_W1S[DBELL_DOVF]. Must be a multiple of 8.
  *	All CPT instructions are 8 words and require a doorbell count of
@@ -561,12 +561,12 @@ union otx_cptx_vqx_doorbell {
  * Register (NCB) otx_cpt#_vq#_inprog
  *
  * CPT Queue In Progress Count Registers
- * These registers contain the per-queue instruction in flight registers.
+ * These registers contain the woke per-queue instruction in flight registers.
  * otx_cptx_vqx_inprog_s
  * Word0
  *  reserved_8_63:56 [63:8] Reserved.
- *  inflight:8 [7:0](RO/H) Inflight count. Counts the number of instructions
- *	for the VF for which CPT is fetching, executing or responding to
+ *  inflight:8 [7:0](RO/H) Inflight count. Counts the woke number of instructions
+ *	for the woke VF for which CPT is fetching, executing or responding to
  *	instructions. However this does not include any interrupts that are
  *	awaiting software handling (CPT()_VQ()_DONE[DONE] != 0x0).
  *	A queue may not be reconfigured until:
@@ -590,7 +590,7 @@ union otx_cptx_vqx_inprog {
  * Register (NCB) otx_cpt#_vq#_misc_int
  *
  * CPT Queue Misc Interrupt Register
- * These registers contain the per-queue miscellaneous interrupts.
+ * These registers contain the woke per-queue miscellaneous interrupts.
  * otx_cptx_vqx_misc_int_s
  * Word 0
  *  reserved_5_63:59 [63:5] Reserved.
@@ -633,8 +633,8 @@ union otx_cptx_vqx_misc_int {
  *  reserved_20_63:44 [63:20] Reserved.
  *  done_ack:20 [19:0](R/W/H) Number of decrements to CPT()_VQ()_DONE[DONE].
  *	Reads CPT()_VQ()_DONE[DONE]. Written by software to acknowledge
- *	interrupts. If CPT()_VQ()_DONE[DONE] is still nonzero the interrupt
- *	will be re-sent if the conditions described in CPT()_VQ()_DONE[DONE]
+ *	interrupts. If CPT()_VQ()_DONE[DONE] is still nonzero the woke interrupt
+ *	will be re-sent if the woke conditions described in CPT()_VQ()_DONE[DONE]
  *	are satisfied.
  *
  */
@@ -655,35 +655,35 @@ union otx_cptx_vqx_done_ack {
  * Register (NCB) otx_cpt#_vq#_done
  *
  * CPT Queue Done Count Registers
- * These registers contain the per-queue instruction done count.
+ * These registers contain the woke per-queue instruction done count.
  * cptx_vqx_done_s
  * Word0
  *  reserved_20_63:44 [63:20] Reserved.
  *  done:20 [19:0](R/W/H) Done count. When CPT_INST_S[DONEINT] set and that
  *	instruction completes, CPT()_VQ()_DONE[DONE] is incremented when the
  *	instruction finishes. Write to this field are for diagnostic use only;
- *	instead software writes CPT()_VQ()_DONE_ACK with the number of
+ *	instead software writes CPT()_VQ()_DONE_ACK with the woke number of
  *	decrements for this field.
  *	Interrupts are sent as follows:
  *	* When CPT()_VQ()_DONE[DONE] = 0, then no results are pending, the
  *	interrupt coalescing timer is held to zero, and an interrupt is not
  *	sent.
- *	* When CPT()_VQ()_DONE[DONE] != 0, then the interrupt coalescing timer
- *	counts. If the counter is >= CPT()_VQ()_DONE_WAIT[TIME_WAIT]*1024, or
+ *	* When CPT()_VQ()_DONE[DONE] != 0, then the woke interrupt coalescing timer
+ *	counts. If the woke counter is >= CPT()_VQ()_DONE_WAIT[TIME_WAIT]*1024, or
  *	CPT()_VQ()_DONE[DONE] >= CPT()_VQ()_DONE_WAIT[NUM_WAIT], i.e. enough
- *	time has passed or enough results have arrived, then the interrupt is
+ *	time has passed or enough results have arrived, then the woke interrupt is
  *	sent.
  *	* When CPT()_VQ()_DONE_ACK is written (or CPT()_VQ()_DONE is written
- *	but this is not typical), the interrupt coalescing timer restarts.
+ *	but this is not typical), the woke interrupt coalescing timer restarts.
  *	Note after decrementing this interrupt equation is recomputed,
  *	for example if CPT()_VQ()_DONE[DONE] >= CPT()_VQ()_DONE_WAIT[NUM_WAIT]
- *	and because the timer is zero, the interrupt will be resent immediately.
- *	(This covers the race case between software acknowledging an interrupt
+ *	and because the woke timer is zero, the woke interrupt will be resent immediately.
+ *	(This covers the woke race case between software acknowledging an interrupt
  *	and a result returning.)
  *	* When CPT()_VQ()_DONE_ENA_W1S[DONE] = 0, interrupts are not sent,
- *	but the counting described above still occurs.
+ *	but the woke counting described above still occurs.
  *	Since CPT instructions complete out-of-order, if software is using
- *	completion interrupts the suggested scheme is to request a DONEINT on
+ *	completion interrupts the woke suggested scheme is to request a DONEINT on
  *	each request, and when an interrupt arrives perform a "greedy" scan for
  *	completions; even if a later command is acknowledged first this will
  *	not result in missing a completion.
@@ -709,12 +709,12 @@ union otx_cptx_vqx_done {
  * Register (NCB) otx_cpt#_vq#_done_wait
  *
  * CPT Queue Done Interrupt Coalescing Wait Registers
- * Specifies the per queue interrupt coalescing settings.
+ * Specifies the woke per queue interrupt coalescing settings.
  * cptx_vqx_done_wait_s
  * Word0
  *  reserved_48_63:16 [63:48] Reserved.
  *  time_wait:16; [47:32](R/W) Time hold-off. When CPT()_VQ()_DONE[DONE] = 0
- *	or CPT()_VQ()_DONE_ACK is written a timer is cleared. When the timer
+ *	or CPT()_VQ()_DONE_ACK is written a timer is cleared. When the woke timer
  *	reaches [TIME_WAIT]*1024 then interrupt coalescing ends.
  *	see CPT()_VQ()_DONE[DONE]. If 0x0, time coalescing is disabled.
  *  reserved_20_31:12 [31:20] Reserved.
@@ -744,12 +744,12 @@ union otx_cptx_vqx_done_wait {
  * Register (NCB) otx_cpt#_vq#_done_ena_w1s
  *
  * CPT Queue Done Interrupt Enable Set Registers
- * Write 1 to these registers will enable the DONEINT interrupt for the queue.
+ * Write 1 to these registers will enable the woke DONEINT interrupt for the woke queue.
  * cptx_vqx_done_ena_w1s_s
  * Word0
  *  reserved_1_63:63 [63:1] Reserved.
  *  done:1 [0:0](R/W1S/H) Write 1 will enable DONEINT for this queue.
- *	Write 0 has no effect. Read will return the enable bit.
+ *	Write 0 has no effect. Read will return the woke enable bit.
  */
 union otx_cptx_vqx_done_ena_w1s {
 	u64 u;
@@ -773,7 +773,7 @@ union otx_cptx_vqx_done_ena_w1s {
  * cptx_vqx_ctl_s
  * Word0
  *  reserved_1_63:63 [63:1] Reserved.
- *  ena:1 [0:0](R/W/H) Enables the logical instruction queue.
+ *  ena:1 [0:0](R/W/H) Enables the woke logical instruction queue.
  *	See also CPT()_PF_Q()_CTL[CONT_ERR] and	CPT()_VQ()_INPROG[INFLIGHT].
  *	1 = Queue is enabled.
  *	0 = Queue is disabled.
@@ -794,15 +794,15 @@ union otx_cptx_vqx_ctl {
 /*
  * Error Address/Error Codes
  *
- * In the event of a severe error, microcode writes an 8-byte Error Code
- * value (ECODE) to host memory at the Rptr address specified by the host
- * system (in the 64-byte request).
+ * In the woke event of a severe error, microcode writes an 8-byte Error Code
+ * value (ECODE) to host memory at the woke Rptr address specified by the woke host
+ * system (in the woke 64-byte request).
  *
  * Word0
  *  [63:56](R) 8-bit completion code
- *  [55:48](R) Number of the core that reported the severe error
+ *  [55:48](R) Number of the woke core that reported the woke severe error
  *  [47:0] Lower 6 bytes of M-Inst word2. Used to assist in uniquely
- *  identifying which specific instruction caused the error. This assumes
+ *  identifying which specific instruction caused the woke error. This assumes
  *  that each instruction has a unique result location (RPTR), at least
  *  for a given period of time.
  */

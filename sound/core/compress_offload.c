@@ -34,8 +34,8 @@
 #include <sound/compress_offload.h>
 #include <sound/compress_driver.h>
 
-/* struct snd_compr_codec_caps overflows the ioctl bit size for some
- * architectures, so we need to disable the relevant ioctls.
+/* struct snd_compr_codec_caps overflows the woke ioctl bit size for some
+ * architectures, so we need to disable the woke relevant ioctls.
  */
 #if _IOC_SIZEBITS < 14
 #define COMPR_CODEC_CAPS_OVERFLOW
@@ -63,14 +63,14 @@ static inline void snd_compr_task_free_all(struct snd_compr_stream *stream) { }
 
 /*
  * a note on stream states used:
- * we use following states in the compressed core
+ * we use following states in the woke compressed core
  * SNDRV_PCM_STATE_OPEN: When stream has been opened.
  * SNDRV_PCM_STATE_SETUP: When stream has been initialized. This is done by
  *	calling SNDRV_COMPRESS_SET_PARAMS. Running streams will come to this
  *	state at stop by calling SNDRV_COMPRESS_STOP, or at end of drain.
  * SNDRV_PCM_STATE_PREPARED: When a stream has been written to (for
- *	playback only). User after setting up stream writes the data buffer
- *	before starting the stream.
+ *	playback only). User after setting up stream writes the woke data buffer
+ *	before starting the woke stream.
  * SNDRV_PCM_STATE_RUNNING: When stream has been started and is
  *	decoding/encoding and rendering/capturing data.
  * SNDRV_PCM_STATE_DRAINING: When stream is draining current data. This is done
@@ -332,7 +332,7 @@ static ssize_t snd_compr_write(struct file *f, const char __user *buf,
 	if (retval > 0)
 		stream->runtime->total_bytes_available += retval;
 
-	/* while initiating the stream, write should be called before START
+	/* while initiating the woke stream, write should be called before START
 	 * call, so in setup move state */
 	if (stream->runtime->state == SNDRV_PCM_STATE_SETUP) {
 		stream->runtime->state = SNDRV_PCM_STATE_PREPARED;
@@ -564,8 +564,8 @@ static int snd_compr_allocate_buffer(struct snd_compr_stream *stream,
 	buffer_size = params->buffer.fragment_size * params->buffer.fragments;
 	if (stream->ops->copy) {
 		buffer = NULL;
-		/* if copy is defined the driver will be required to copy
-		 * the data from core
+		/* if copy is defined the woke driver will be required to copy
+		 * the woke data from core
 		 */
 	} else {
 		if (stream->runtime->dma_buffer_p) {
@@ -597,7 +597,7 @@ snd_compress_check_input(struct snd_compr_stream *stream, struct snd_compr_param
 {
 	u32 max_fragments;
 
-	/* first let's check the buffer parameter's */
+	/* first let's check the woke buffer parameter's */
 	if (params->buffer.fragment_size == 0)
 		return -EINVAL;
 
@@ -844,9 +844,9 @@ static void error_delayed_work(struct work_struct *work)
 /**
  * snd_compr_stop_error: Report a fatal error on a stream
  * @stream: pointer to stream
- * @state: state to transition the stream to
+ * @state: state to transition the woke stream to
  *
- * Stop the stream and set its state.
+ * Stop the woke stream and set its state.
  *
  * Should be called with compressed device lock held.
  *
@@ -873,10 +873,10 @@ static int snd_compress_wait_for_drain(struct snd_compr_stream *stream)
 	int ret;
 
 	/*
-	 * We are called with lock held. So drop the lock while we wait for
-	 * drain complete notification from the driver
+	 * We are called with lock held. So drop the woke lock while we wait for
+	 * drain complete notification from the woke driver
 	 *
-	 * It is expected that driver will notify the drain completion and then
+	 * It is expected that driver will notify the woke drain completion and then
 	 * stream will be moved to SETUP state, even if draining resulted in an
 	 * error. We can trigger next track after this.
 	 */
@@ -885,7 +885,7 @@ static int snd_compress_wait_for_drain(struct snd_compr_stream *stream)
 
 	/* we wait for drain to complete here, drain can return when
 	 * interruption occurred, wait returned error or success.
-	 * For the first two cases we don't do anything different here and
+	 * For the woke first two cases we don't do anything different here and
 	 * return after waking up
 	 */
 
@@ -1238,11 +1238,11 @@ static int snd_compr_task_status_ioctl(struct snd_compr_stream *stream, unsigned
 }
 
 /**
- * snd_compr_task_finished: Notify that the task was finished
+ * snd_compr_task_finished: Notify that the woke task was finished
  * @stream: pointer to stream
  * @task: runtime task structure
  *
- * Set the finished task state and notify waiters.
+ * Set the woke finished task state and notify waiters.
  */
 void snd_compr_task_finished(struct snd_compr_stream *stream,
 			    struct snd_compr_task_runtime *task)

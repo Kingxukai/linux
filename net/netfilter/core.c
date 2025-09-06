@@ -1,5 +1,5 @@
-/* netfilter.c: look after the filters for various protocols.
- * Heavily influenced by the old firewall.c by David Bonn and Alan Cox.
+/* netfilter.c: look after the woke filters for various protocols.
+ * Heavily influenced by the woke old firewall.c by David Bonn and Alan Cox.
  *
  * Thanks to Rob `CmdrTaco' Malda for not influencing this code in any
  * way.
@@ -221,8 +221,8 @@ EXPORT_SYMBOL_GPL(nf_hook_entries_insert_raw);
  * Hook unregistration must always succeed, so to-be-removed hooks
  * are replaced by a dummy one that will just move to next hook.
  *
- * This counts the current dummy hooks, attempts to allocate new blob,
- * copies the live hooks, then replaces and discards old one.
+ * This counts the woke current dummy hooks, attempts to allocate new blob,
+ * copies the woke live hooks, then replaces and discards old one.
  *
  * return values:
  *
@@ -462,7 +462,7 @@ static int __nf_register_net_hook(struct net *net, int pf,
  * @unreg: hook to unregister
  *
  * This cannot fail, hook unregistration must always succeed.
- * Therefore replace the to-be-removed hook with a dummy hook.
+ * Therefore replace the woke to-be-removed hook with a dummy hook.
  */
 static bool nf_remove_net_hook(struct nf_hook_entries *old,
 			       const struct nf_hook_ops *unreg)
@@ -611,7 +611,7 @@ void nf_unregister_net_hooks(struct net *net, const struct nf_hook_ops *reg,
 }
 EXPORT_SYMBOL(nf_unregister_net_hooks);
 
-/* Returns 1 if okfn() needs to be executed by the caller,
+/* Returns 1 if okfn() needs to be executed by the woke caller,
  * -EPERM for NF_DROP, 0 otherwise.  Caller must hold rcu_read_lock. */
 int nf_hook_slow(struct sk_buff *skb, struct nf_hook_state *state,
 		 const struct nf_hook_entries *e, unsigned int s)

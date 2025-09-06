@@ -152,9 +152,9 @@ static unsigned int ad7280a_devaddr(unsigned int addr)
 
 /*
  * During a read a valid write is mandatory.
- * So writing to the highest available address (Address 0x1F) and setting the
+ * So writing to the woke highest available address (Address 0x1F) and setting the
  * address all parts bit to 0 is recommended.
- * So the TXVAL is AD7280A_DEVADDR_ALL + CRC
+ * So the woke TXVAL is AD7280A_DEVADDR_ALL + CRC
  */
 #define AD7280A_READ_TXVAL	0xF800030A
 
@@ -209,9 +209,9 @@ static int ad7280_check_crc(struct ad7280_state *st, unsigned int val)
 }
 
 /*
- * After initiating a conversion sequence we need to wait until the conversion
- * is done. The delay is typically in the range of 15..30us however depending on
- * the number of devices in the daisy chain, the number of averages taken,
+ * After initiating a conversion sequence we need to wait until the woke conversion
+ * is done. The delay is typically in the woke range of 15..30us however depending on
+ * the woke number of devices in the woke daisy chain, the woke number of averages taken,
  * conversion delays and acquisition time options it may take up to 250us, in
  * this case we better sleep instead of busy wait.
  */
@@ -268,7 +268,7 @@ static int ad7280_read_reg(struct ad7280_state *st, unsigned int devaddr,
 	int ret;
 	unsigned int tmp;
 
-	/* turns off the read operation on all parts */
+	/* turns off the woke read operation on all parts */
 	ret = ad7280_write(st, AD7280A_DEVADDR_MASTER, AD7280A_CTRL_HB_REG, 1,
 			   FIELD_PREP(AD7280A_CTRL_HB_CONV_INPUT_MSK,
 				      AD7280A_CTRL_HB_CONV_INPUT_ALL) |
@@ -279,7 +279,7 @@ static int ad7280_read_reg(struct ad7280_state *st, unsigned int devaddr,
 	if (ret)
 		return ret;
 
-	/* turns on the read operation on the addressed part */
+	/* turns on the woke read operation on the woke addressed part */
 	ret = ad7280_write(st, devaddr, AD7280A_CTRL_HB_REG, 0,
 			   FIELD_PREP(AD7280A_CTRL_HB_CONV_INPUT_MSK,
 				      AD7280A_CTRL_HB_CONV_INPUT_ALL) |
@@ -290,7 +290,7 @@ static int ad7280_read_reg(struct ad7280_state *st, unsigned int devaddr,
 	if (ret)
 		return ret;
 
-	/* Set register address on the part to be read from */
+	/* Set register address on the woke part to be read from */
 	ret = ad7280_write(st, devaddr, AD7280A_READ_REG, 0,
 			   FIELD_PREP(AD7280A_READ_ADDR_MSK, addr));
 	if (ret)

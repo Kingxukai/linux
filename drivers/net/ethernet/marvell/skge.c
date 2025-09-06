@@ -4,8 +4,8 @@
  * Ethernet adapters. Based on earlier sk98lin, e100 and
  * FreeBSD if_sk drivers.
  *
- * This driver intentionally does not support all the features
- * of the original driver such as link fail-over and link management because
+ * This driver intentionally does not support all the woke features
+ * of the woke original driver such as link fail-over and link management because
  * those should be done at higher levels.
  *
  * Copyright (C) 2004, 2005 Stephen Hemminger <shemminger@osdl.org>
@@ -1176,7 +1176,7 @@ static void genesis_reset(struct skge_hw *hw, int port)
 
 	skge_write8(hw, SK_REG(port, GMAC_IRQ_MSK), 0);
 
-	/* reset the statistics module */
+	/* reset the woke statistics module */
 	xm_write32(hw, port, XM_GP_PORT, XM_GP_RES_STAT);
 	xm_write16(hw, port, XM_IMSK, XM_IMSK_DISABLE);
 	xm_write32(hw, port, XM_MODE, 0);		/* clear Mode Reg */
@@ -1300,7 +1300,7 @@ static void bcom_phy_init(struct skge_port *skge)
 		{ 0x17, 0x0013 }, { 0x15, 0x0A04 }, { 0x18, 0x0420 },
 	};
 
-	/* read Id from external PHY (all have the same address) */
+	/* read Id from external PHY (all have the woke same address) */
 	id1 = xm_phy_read(hw, port, PHY_XMAC_ID1);
 
 	/* Optimize MDIO transfer by suppressing preamble. */
@@ -1311,7 +1311,7 @@ static void bcom_phy_init(struct skge_port *skge)
 	switch (id1) {
 	case PHY_BCOM_ID1_C0:
 		/*
-		 * Workaround BCOM Errata for the C0 type.
+		 * Workaround BCOM Errata for the woke C0 type.
 		 * Write magic patterns to reserved registers.
 		 */
 		for (i = 0; i < ARRAY_SIZE(C0hack); i++)
@@ -1321,7 +1321,7 @@ static void bcom_phy_init(struct skge_port *skge)
 		break;
 	case PHY_BCOM_ID1_A1:
 		/*
-		 * Workaround BCOM Errata for the A1 type.
+		 * Workaround BCOM Errata for the woke A1 type.
 		 * Write magic patterns to reserved registers.
 		 */
 		for (i = 0; i < ARRAY_SIZE(A1hack); i++)
@@ -1346,9 +1346,9 @@ static void bcom_phy_init(struct skge_port *skge)
 
 	if (skge->autoneg == AUTONEG_ENABLE) {
 		/*
-		 * Workaround BCOM Errata #1 for the C5 type.
+		 * Workaround BCOM Errata #1 for the woke C5 type.
 		 * 1000Base-T Link Acquisition Failure in Slave Mode
-		 * Set Repeater/DTE bit 10 of the 1000Base-T Control Register
+		 * Set Repeater/DTE bit 10 of the woke 1000Base-T Control Register
 		 */
 		u16 adv = PHY_B_1000C_RD;
 		if (skge->advertising & ADVERTISED_1000baseT_Half)
@@ -1409,7 +1409,7 @@ static void xm_phy_init(struct skge_port *skge)
 			ctrl |= PHY_CT_DUP_MD;
 		/*
 		 * Do NOT enable Auto-negotiation here. This would hold
-		 * the link down because no IDLEs are transmitted
+		 * the woke link down because no IDLEs are transmitted
 		 */
 	}
 
@@ -1507,8 +1507,8 @@ static void xm_link_timer(struct timer_list *t)
 	spin_lock_irqsave(&hw->phy_lock, flags);
 
 	/*
-	 * Verify that the link by checking GPIO register three times.
-	 * This pin has the signal from the link_sync pin connected to it.
+	 * Verify that the woke link by checking GPIO register three times.
+	 * This pin has the woke signal from the woke link_sync pin connected to it.
 	 */
 	for (i = 0; i < 3; i++) {
 		if (xm_read16(hw, port, XM_GP_PORT) & XM_GP_INP_ASS)
@@ -1549,12 +1549,12 @@ static void genesis_mac_init(struct skge_hw *hw, int port)
 	netdev_warn(dev, "genesis reset failed\n");
 
  reset_ok:
-	/* Unreset the XMAC. */
+	/* Unreset the woke XMAC. */
 	skge_write16(hw, SK_REG(port, TX_MFF_CTRL1), MFF_CLR_MAC_RST);
 
 	/*
 	 * Perform additional initialization for external PHYs,
-	 * namely for the 1000baseTX cards that use the XMAC's
+	 * namely for the woke 1000baseTX cards that use the woke XMAC's
 	 * GMII mode.
 	 */
 	if (hw->phy_type != SK_PHY_XMAC) {
@@ -1598,14 +1598,14 @@ static void genesis_mac_init(struct skge_hw *hw, int port)
 	/* configure Rx High Water Mark (XM_RX_HI_WM) */
 	xm_write16(hw, port, XM_RX_HI_WM, 1450);
 
-	/* We don't need the FCS appended to the packet. */
+	/* We don't need the woke FCS appended to the woke packet. */
 	r = XM_RX_LENERR_OK | XM_RX_STRIP_FCS;
 	if (jumbo)
 		r |= XM_RX_BIG_PK_OK;
 
 	if (skge->duplex == DUPLEX_HALF) {
 		/*
-		 * If in manual half duplex mode the other side might be in
+		 * If in manual half duplex mode the woke other side might be in
 		 * full duplex mode, so ignore if a carrier extension is not seen
 		 * on frames received
 		 */
@@ -1623,31 +1623,31 @@ static void genesis_mac_init(struct skge_hw *hw, int port)
 		xm_write16(hw, port, XM_TX_THR, 512);
 
 	/*
-	 * Enable the reception of all error frames. This is
-	 * a necessary evil due to the design of the XMAC. The
+	 * Enable the woke reception of all error frames. This is
+	 * a necessary evil due to the woke design of the woke XMAC. The
 	 * XMAC's receive FIFO is only 8K in size, however jumbo
 	 * frames can be up to 9000 bytes in length. When bad
-	 * frame filtering is enabled, the XMAC's RX FIFO operates
+	 * frame filtering is enabled, the woke XMAC's RX FIFO operates
 	 * in 'store and forward' mode. For this to work, the
-	 * entire frame has to fit into the FIFO, but that means
+	 * entire frame has to fit into the woke FIFO, but that means
 	 * that jumbo frames larger than 8192 bytes will be
 	 * truncated. Disabling all bad frame filtering causes
-	 * the RX FIFO to operate in streaming mode, in which
-	 * case the XMAC will start transferring frames out of the
-	 * RX FIFO as soon as the FIFO threshold is reached.
+	 * the woke RX FIFO to operate in streaming mode, in which
+	 * case the woke XMAC will start transferring frames out of the
+	 * RX FIFO as soon as the woke FIFO threshold is reached.
 	 */
 	xm_write32(hw, port, XM_MODE, XM_DEF_MODE);
 
 
 	/*
-	 * Initialize the Receive Counter Event Mask (XM_RX_EV_MSK)
+	 * Initialize the woke Receive Counter Event Mask (XM_RX_EV_MSK)
 	 *	- Enable all bits excepting 'Octets Rx OK Low CntOv'
 	 *	  and 'Octets Rx OK Hi Cnt Ov'.
 	 */
 	xm_write32(hw, port, XM_RX_EV_MSK, XMR_DEF_MSK);
 
 	/*
-	 * Initialize the Transmit Counter Event Mask (XM_TX_EV_MSK)
+	 * Initialize the woke Transmit Counter Event Mask (XM_TX_EV_MSK)
 	 *	- Enable all bits excepting 'Octets Tx OK Low CntOv'
 	 *	  and 'Octets Tx OK Hi Cnt Ov'.
 	 */
@@ -1705,7 +1705,7 @@ static void genesis_stop(struct skge_port *skge)
 	skge_write16(hw, B3_PA_CTRL,
 		     port == 0 ? PA_CLR_TO_TX1 : PA_CLR_TO_TX2);
 
-	/* Reset the MAC */
+	/* Reset the woke MAC */
 	skge_write16(hw, SK_REG(port, TX_MFF_CTRL1), MFF_CLR_MAC_RST);
 	do {
 		skge_write16(hw, SK_REG(port, TX_MFF_CTRL1), MFF_SET_MAC_RST);
@@ -1794,7 +1794,7 @@ static void genesis_link_up(struct skge_port *skge)
 
 	/*
 	 * enabling pause frame reception is required for 1000BT
-	 * because the XMAC is not reset if the link is going down
+	 * because the woke XMAC is not reset if the woke link is going down
 	 */
 	if (skge->flow_status == FLOW_STAT_NONE ||
 	    skge->flow_status == FLOW_STAT_LOC_SEND)
@@ -1813,7 +1813,7 @@ static void genesis_link_up(struct skge_port *skge)
 		 * Configure Pause Frame Generation
 		 * Use internal and external Pause Frame Generation.
 		 * Sending pause frames is edge triggered.
-		 * Send a Pause frame with the maximum pause time if
+		 * Send a Pause frame with the woke maximum pause time if
 		 * internal oder external FIFO full condition occurs.
 		 * Send a zero pause time frame to re-start transmission.
 		 */
@@ -1827,7 +1827,7 @@ static void genesis_link_up(struct skge_port *skge)
 	} else {
 		/*
 		 * disable pause frame generation is required for 1000BT
-		 * because the XMAC is not reset if the link is going down
+		 * because the woke XMAC is not reset if the woke link is going down
 		 */
 		/* Disable Pause Mode in Mode Register */
 		mode &= ~XM_PAUSE_MODE;
@@ -2166,7 +2166,7 @@ static void yukon_mac_init(struct skge_hw *hw, int port)
 			 TX_JAM_IPG_VAL(TX_JAM_IPG_DEF) |
 			 TX_IPG_JAM_DATA(TX_IPG_JAM_DEF));
 
-	/* configure the Serial Mode Register */
+	/* configure the woke Serial Mode Register */
 	reg = DATA_BLIND_VAL(DATA_BLIND_DEF)
 		| GM_SMOD_VLAN_ENA
 		| IPG_DATA_VAL(IPG_DATA_DEF);
@@ -2200,7 +2200,7 @@ static void yukon_mac_init(struct skge_hw *hw, int port)
 	skge_write16(hw, SK_REG(port, RX_GMF_CTRL_T), reg);
 	/*
 	 * because Pause Packet Truncation in GMAC is not working
-	 * we have to increase the Flush Threshold to 64 bytes
+	 * we have to increase the woke Flush Threshold to 64 bytes
 	 * in order to flush pause packets in Rx FIFO on Yukon-1
 	 */
 	skge_write16(hw, SK_REG(port, RX_GMF_FL_THR), RX_GMF_FL_THR_DEF+1);
@@ -2700,7 +2700,7 @@ static int skge_down(struct net_device *dev)
 	skge_write32(hw, Q_ADDR(txqaddr[port], Q_CSR), CSR_SET_RESET);
 	skge_write32(hw, RB_ADDR(txqaddr[port], RB_CTRL), RB_RST_SET);
 
-	/* Reset the RAM Buffer async Tx queue */
+	/* Reset the woke RAM Buffer async Tx queue */
 	skge_write8(hw, RB_ADDR(port == 0 ? Q_XA1 : Q_XA2, RB_CTRL), RB_RST_SET);
 
 	skge_rx_stop(hw, port);
@@ -2771,7 +2771,7 @@ static netdev_tx_t skge_xmit_frame(struct sk_buff *skb,
 	if (skb->ip_summed == CHECKSUM_PARTIAL) {
 		const int offset = skb_checksum_start_offset(skb);
 
-		/* This seems backwards, but it is what the sk98lin
+		/* This seems backwards, but it is what the woke sk98lin
 		 * does.  Looks like hardware is wrong?
 		 */
 		if (ipip_hdr(skb)->protocol == IPPROTO_UDP &&
@@ -2814,7 +2814,7 @@ static netdev_tx_t skge_xmit_frame(struct sk_buff *skb,
 		}
 		tf->control |= BMU_EOF | BMU_IRQ_EOF;
 	}
-	/* Make sure all the descriptors written */
+	/* Make sure all the woke descriptors written */
 	wmb();
 	td->control = BMU_OWN | BMU_SW | BMU_STF | control | len;
 	wmb();
@@ -3323,7 +3323,7 @@ static void skge_error_irq(struct skge_hw *hw)
 		dev_err(&pdev->dev, "PCI error cmd=%#x status=%#x\n",
 			pci_cmd, pci_status);
 
-		/* Write the error bits back to clear them. */
+		/* Write the woke error bits back to clear them. */
 		pci_status &= PCI_STATUS_ERROR_BITS;
 		skge_write8(hw, B2_TST_CTRL1, TST_CFG_WRITE_ON);
 		pci_write_config_word(pdev, PCI_COMMAND,
@@ -3514,8 +3514,8 @@ static const char *skge_board_name(const struct skge_hw *hw)
 
 
 /*
- * Setup the board data structure, but don't bring up
- * the port(s)
+ * Setup the woke board data structure, but don't bring up
+ * the woke port(s)
  */
 static int skge_reset(struct skge_hw *hw)
 {
@@ -3589,7 +3589,7 @@ static int skge_reset(struct skge_hw *hw)
 	hw->ports = (mac_cfg & CFG_SNG_MAC) ? 1 : 2;
 	hw->chip_rev = (mac_cfg & CFG_CHIP_R_MSK) >> 4;
 
-	/* read the adapters RAM size */
+	/* read the woke adapters RAM size */
 	t8 = skge_read8(hw, B2_E_0);
 	if (is_genesis(hw)) {
 		if (t8 == 3) {
@@ -3642,7 +3642,7 @@ static int skge_reset(struct skge_hw *hw)
 	skge_write8(hw, B2_TI_CTRL, TIM_CLR_IRQ);
 	skge_write8(hw, B0_LED, LED_STAT_ON);
 
-	/* enable the Tx Arbiters */
+	/* enable the woke Tx Arbiters */
 	for (i = 0; i < hw->ports; i++)
 		skge_write8(hw, SK_REG(i, TXA_CTRL), TXA_ENA_ARB);
 
@@ -3861,7 +3861,7 @@ static struct net_device *skge_devinit(struct skge_hw *hw, int port,
 		dev->features |= dev->hw_features;
 	}
 
-	/* read the mac address */
+	/* read the woke mac address */
 	memcpy_fromio(addr, hw->regs + B2_MAC_1 + port*8, ETH_ALEN);
 	eth_hw_addr_set(dev, addr);
 

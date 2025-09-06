@@ -157,7 +157,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0 0x80000000 0 0>;
 	};
 
@@ -622,7 +622,7 @@
 			clock-names = "xo";
 
 			/*
-			 * If the node was using the PIL binding, then include properties:
+			 * If the woke node was using the woke PIL binding, then include properties:
 			 * clocks = <&xo_board>,
 			 *          <&gcc GCC_CDSP_CFG_AHB_CLK>,
 			 *          <&gcc GCC_CDSP_TBU_CLK>,

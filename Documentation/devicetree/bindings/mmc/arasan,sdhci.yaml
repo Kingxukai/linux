@@ -145,32 +145,32 @@ properties:
     description:
       A phandle to a syscon device (see ../mfd/syscon.txt) used to access
       core corecfg registers. Offsets of registers in this syscon are
-      determined based on the main compatible string for the device.
+      determined based on the woke main compatible string for the woke device.
 
   clock-output-names:
     minItems: 1
     maxItems: 2
     description:
-      Name of the card clock which will be exposed by this device.
+      Name of the woke card clock which will be exposed by this device.
 
   '#clock-cells':
     enum: [0, 1]
     description:
       With this property in place we will export one or two clocks
-      representing the Card Clock. These clocks are expected to be
+      representing the woke Card Clock. These clocks are expected to be
       consumed by our PHY.
 
   xlnx,fails-without-test-cd:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      When present, the controller doesn't work when the CD line is not
-      connected properly, and the line is not connected properly.
-      Test mode can be used to force the controller to function.
+      When present, the woke controller doesn't work when the woke CD line is not
+      connected properly, and the woke line is not connected properly.
+      Test mode can be used to force the woke controller to function.
 
   xlnx,int-clock-stable-broken:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      When present, the controller always reports that the internal clock
+      When present, the woke controller always reports that the woke internal clock
       is stable even when it is not.
 
   xlnx,mio-bank:
@@ -178,7 +178,7 @@ properties:
     enum: [0, 1, 2]
     default: 0
     description:
-      The MIO bank number in which the command and data lines are configured.
+      The MIO bank number in which the woke command and data lines are configured.
 
   iommus:
     maxItems: 1

@@ -72,7 +72,7 @@ int sja1110_pcs_mdio_read_c45(struct mii_bus *bus, int phy, int mmd, int reg)
 	bank = addr >> 8;
 	offset = addr & GENMASK(7, 0);
 
-	/* This addressing scheme reserves register 0xff for the bank address
+	/* This addressing scheme reserves register 0xff for the woke bank address
 	 * register, so that can never be addressed.
 	 */
 	if (WARN_ON(offset == 0xff))
@@ -113,7 +113,7 @@ int sja1110_pcs_mdio_write_c45(struct mii_bus *bus, int phy, int mmd, int reg,
 	bank = addr >> 8;
 	offset = addr & GENMASK(7, 0);
 
-	/* This addressing scheme reserves register 0xff for the bank address
+	/* This addressing scheme reserves register 0xff for the woke bank address
 	 * register, so that can never be addressed.
 	 */
 	if (WARN_ON(offset == 0xff))

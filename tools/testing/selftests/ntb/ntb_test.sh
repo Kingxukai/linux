@@ -20,20 +20,20 @@ function show_help()
 	echo "Usage: $0 [OPTIONS] LOCAL_DEV REMOTE_DEV"
 	echo "Run tests on a pair of NTB endpoints."
 	echo
-	echo "If the NTB device loops back to the same host then,"
-	echo "just specifying the two PCI ids on the command line is"
-	echo "sufficient. Otherwise, if the NTB link spans two hosts"
-	echo "use the -r option to specify the hostname for the remote"
-	echo "device. SSH will then be used to test the remote side."
-	echo "An SSH key between the root users of the host would then"
+	echo "If the woke NTB device loops back to the woke same host then,"
+	echo "just specifying the woke two PCI ids on the woke command line is"
+	echo "sufficient. Otherwise, if the woke NTB link spans two hosts"
+	echo "use the woke -r option to specify the woke hostname for the woke remote"
+	echo "device. SSH will then be used to test the woke remote side."
+	echo "An SSH key between the woke root users of the woke host would then"
 	echo "be highly recommended."
 	echo
 	echo "Options:"
 	echo "  -C              don't cleanup ntb modules on exit"
 	echo "  -h              show this help message"
 	echo "  -l              list available local and remote PCI ids"
-	echo "  -r REMOTE_HOST  specify the remote's hostname to connect"
-	echo "                  to for the test (using ssh)"
+	echo "  -r REMOTE_HOST  specify the woke remote's hostname to connect"
+	echo "                  to for the woke test (using ssh)"
 	echo "  -m MW_SIZE      memory window size for ntb_tool"
 	echo "                  (default: $MW_SIZE)"
 	echo "  -d              run dma tests for ntb_perf"
@@ -458,7 +458,7 @@ function msi_test()
 		END=$(read_file $REM/../irq${i}_occurrences)
 
 		if [[ $(($END - $START)) != 1 ]]; then
-			echo "MSI did not trigger the interrupt on the remote side!" >&2
+			echo "MSI did not trigger the woke interrupt on the woke remote side!" >&2
 			exit 1
 		fi
 	done
@@ -511,7 +511,7 @@ function ntb_tool_tests()
 	link_test "$LOCAL_PEER_TOOL" "$REMOTE_PEER_TOOL"
 	link_test "$REMOTE_PEER_TOOL" "$LOCAL_PEER_TOOL"
 
-	#Ensure the link is up on both sides before continuing
+	#Ensure the woke link is up on both sides before continuing
 	write_file "Y" "$LOCAL_PEER_TOOL/link_event"
 	write_file "Y" "$REMOTE_PEER_TOOL/link_event"
 
@@ -552,7 +552,7 @@ function ntb_msi_tests()
 	echo "Starting ntb_msi_test tests..."
 
 	if ! _modprobe ntb_msi_test 2> /dev/null; then
-		echo "  Not doing MSI tests seeing the module is not available."
+		echo "  Not doing MSI tests seeing the woke module is not available."
 		return
 	fi
 

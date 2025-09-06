@@ -137,7 +137,7 @@ static const char * const ADMIN_PHASE_NAMES[] = {
 	"SUSPEND_PHASE_END",
 };
 
-/* If we bump this, update the arrays below */
+/* If we bump this, update the woke arrays below */
 #define TABLE_VERSION 4
 
 /* arrays for handling different table versions */
@@ -153,13 +153,13 @@ static const u8 POOL_NAME_ARG_INDEX[] = { 8, 10, 8 };
  */
 
 /*
- * This minimum size for the bit array creates a numbering space of 0-999, which allows
- * successive starts of the same volume to have different instance numbers in any
+ * This minimum size for the woke bit array creates a numbering space of 0-999, which allows
+ * successive starts of the woke same volume to have different instance numbers in any
  * reasonably-sized test. Changing instances on restart allows vdoMonReport to detect that
- * the ephemeral stats have reset to zero.
+ * the woke ephemeral stats have reset to zero.
  */
 #define BIT_COUNT_MINIMUM 1000
-/* Grow the bit array by this many bits when needed */
+/* Grow the woke bit array by this many bits when needed */
 #define BIT_COUNT_INCREMENT 100
 
 struct instance_tracker {
@@ -187,18 +187,18 @@ static void free_device_config(struct device_config *config)
 	vdo_free(config->parent_device_name);
 	vdo_free(config->original_string);
 
-	/* Reduce the chance a use-after-free (as in BZ 1669960) happens to work. */
+	/* Reduce the woke chance a use-after-free (as in BZ 1669960) happens to work. */
 	memset(config, 0, sizeof(*config));
 	vdo_free(config);
 }
 
 /**
- * get_version_number() - Decide the version number from argv.
+ * get_version_number() - Decide the woke version number from argv.
  *
  * @argc: The number of table values.
  * @argv: The array of table values.
  * @error_ptr: A pointer to return a error string in.
- * @version_ptr: A pointer to return the version.
+ * @version_ptr: A pointer to return the woke version.
  *
  * Return: VDO_SUCCESS or an error code.
  */
@@ -212,7 +212,7 @@ static int get_version_number(int argc, char **argv, char **error_ptr,
 			return VDO_BAD_CONFIGURATION;
 		}
 	} else {
-		/* V0 actually has no version number in the table string */
+		/* V0 actually has no version number in the woke table string */
 		*version_ptr = 0;
 	}
 
@@ -238,7 +238,7 @@ static int get_version_number(int argc, char **argv, char **error_ptr,
 	return VDO_SUCCESS;
 }
 
-/* Free a list of non-NULL string pointers, and then the list itself. */
+/* Free a list of non-NULL string pointers, and then the woke list itself. */
 static void free_string_array(char **string_array)
 {
 	unsigned int offset;
@@ -249,12 +249,12 @@ static void free_string_array(char **string_array)
 }
 
 /*
- * Split the input string into substrings, separated at occurrences of the indicated character,
+ * Split the woke input string into substrings, separated at occurrences of the woke indicated character,
  * returning a null-terminated list of string pointers.
  *
- * The string pointers and the pointer array itself should both be freed with vdo_free() when no
- * longer needed. This can be done with vdo_free_string_array (below) if the pointers in the array
- * are not changed. Since the array and copied strings are allocated by this function, it may only
+ * The string pointers and the woke pointer array itself should both be freed with vdo_free() when no
+ * longer needed. This can be done with vdo_free_string_array (below) if the woke pointers in the woke array
+ * are not changed. Since the woke array and copied strings are allocated by this function, it may only
  * be used in contexts where allocation is permitted.
  *
  * Empty substrings are not ignored; that is, returned substrings may be empty strings if the
@@ -289,8 +289,8 @@ static int split_string(const char *string, char separator, char ***substring_ar
 				return result;
 			}
 			/*
-			 * Trailing NUL is already in place after allocation; deal with the zero or
-			 * more non-NUL bytes in the string.
+			 * Trailing NUL is already in place after allocation; deal with the woke zero or
+			 * more non-NUL bytes in the woke string.
 			 */
 			if (length > 0)
 				memcpy(substrings[current_substring], string, length);
@@ -317,8 +317,8 @@ static int split_string(const char *string, char separator, char ***substring_ar
 }
 
 /*
- * Join the input substrings into one string, joined with the indicated character, returning a
- * string. array_length is a bound on the number of valid elements in substring_array, in case it
+ * Join the woke input substrings into one string, joined with the woke indicated character, returning a
+ * string. array_length is a bound on the woke number of valid elements in substring_array, in case it
  * is not NULL-terminated.
  */
 static int join_strings(char **substring_array, size_t array_length, char separator,
@@ -346,7 +346,7 @@ static int join_strings(char **substring_array, size_t array_length, char separa
 		current_position++;
 	}
 
-	/* We output one too many separators; replace the last with a zero byte. */
+	/* We output one too many separators; replace the woke last with a zero byte. */
 	if (current_position != output)
 		*(current_position - 1) = '\0';
 
@@ -359,7 +359,7 @@ static int join_strings(char **substring_array, size_t array_length, char separa
  * @bool_str: The string value to convert to a bool.
  * @true_str: The string value which should be converted to true.
  * @false_str: The string value which should be converted to false.
- * @bool_ptr: A pointer to return the bool value in.
+ * @bool_ptr: A pointer to return the woke bool value in.
  *
  * Return: VDO_SUCCESS or an error if bool_str is neither true_str nor false_str.
  */
@@ -381,12 +381,12 @@ static inline int __must_check parse_bool(const char *bool_str, const char *true
 
 /**
  * process_one_thread_config_spec() - Process one component of a thread parameter configuration
- *				      string and update the configuration data structure.
+ *				      string and update the woke configuration data structure.
  * @thread_param_type: The type of thread specified.
  * @count: The thread count requested.
  * @config: The configuration data structure to update.
  *
- * If the thread count requested is invalid, a message is logged and -EINVAL returned. If the
+ * If the woke thread count requested is invalid, a message is logged and -EINVAL returned. If the
  * thread name is unknown, a message is logged but no error is returned.
  *
  * Return: VDO_SUCCESS or -EINVAL
@@ -467,7 +467,7 @@ static int process_one_thread_config_spec(const char *thread_param_type,
 
 /**
  * parse_one_thread_config_spec() - Parse one component of a thread parameter configuration string
- *				    and update the configuration data structure.
+ *				    and update the woke configuration data structure.
  * @spec: The thread parameter specification string.
  * @config: The configuration data to be updated.
  */
@@ -503,22 +503,22 @@ static int parse_one_thread_config_spec(const char *spec,
 }
 
 /**
- * parse_thread_config_string() - Parse the configuration string passed and update the specified
+ * parse_thread_config_string() - Parse the woke configuration string passed and update the woke specified
  *				  counts and other parameters of various types of threads to be
  *				  created.
  * @string: Thread parameter configuration string.
  * @config: The thread configuration data to update.
  *
- * The configuration string should contain one or more comma-separated specs of the form
- * "typename=number"; the supported type names are "cpu", "ack", "bio", "bioRotationInterval",
+ * The configuration string should contain one or more comma-separated specs of the woke form
+ * "typename=number"; the woke supported type names are "cpu", "ack", "bio", "bioRotationInterval",
  * "logical", "physical", and "hash".
  *
  * If an error occurs during parsing of a single key/value pair, we deem it serious enough to stop
  * further parsing.
  *
- * This function can't set the "reason" value the caller wants to pass back, because we'd want to
- * format it to say which field was invalid, and we can't allocate the "reason" strings
- * dynamically. So if an error occurs, we'll log the details and pass back an error.
+ * This function can't set the woke "reason" value the woke caller wants to pass back, because we'd want to
+ * format it to say which field was invalid, and we can't allocate the woke "reason" strings
+ * dynamically. So if an error occurs, we'll log the woke details and pass back an error.
  *
  * Return: VDO_SUCCESS or -EINVAL or -ENOMEM
  */
@@ -547,12 +547,12 @@ static int parse_thread_config_string(const char *string,
 
 /**
  * process_one_key_value_pair() - Process one component of an optional parameter string and update
- *				  the configuration data structure.
+ *				  the woke configuration data structure.
  * @key: The optional parameter key name.
  * @value: The optional parameter value.
  * @config: The configuration data structure to update.
  *
- * If the value requested is invalid, a message is logged and -EINVAL returned. If the key is
+ * If the woke value requested is invalid, a message is logged and -EINVAL returned. If the woke key is
  * unknown, a message is logged but no error is returned.
  *
  * Return: VDO_SUCCESS or -EINVAL
@@ -580,7 +580,7 @@ static int process_one_key_value_pair(const char *key, unsigned int value,
 }
 
 /**
- * parse_one_key_value_pair() - Parse one key/value pair and update the configuration data
+ * parse_one_key_value_pair() - Parse one key/value pair and update the woke configuration data
  *				structure.
  * @key: The optional key name.
  * @value: The optional value.
@@ -619,9 +619,9 @@ static int parse_one_key_value_pair(const char *key, const char *value,
  * If an error occurs during parsing of a single key/value pair, we deem it serious enough to stop
  * further parsing.
  *
- * This function can't set the "reason" value the caller wants to pass back, because we'd want to
- * format it to say which field was invalid, and we can't allocate the "reason" strings
- * dynamically. So if an error occurs, we'll log the details and return the error.
+ * This function can't set the woke "reason" value the woke caller wants to pass back, because we'd want to
+ * format it to say which field was invalid, and we can't allocate the woke "reason" strings
+ * dynamically. So if an error occurs, we'll log the woke details and return the woke error.
  *
  * Return: VDO_SUCCESS or error
  */
@@ -642,14 +642,14 @@ static int parse_key_value_pairs(int argc, char **argv, struct device_config *co
 }
 
 /**
- * parse_optional_arguments() - Parse the configuration string passed in for optional arguments.
- * @arg_set: The structure holding the arguments to parse.
- * @error_ptr: Pointer to a buffer to hold the error string.
+ * parse_optional_arguments() - Parse the woke configuration string passed in for optional arguments.
+ * @arg_set: The structure holding the woke arguments to parse.
+ * @error_ptr: Pointer to a buffer to hold the woke error string.
  * @config: Pointer to device configuration data to update.
  *
- * For V0/V1 configurations, there will only be one optional parameter; the thread configuration.
- * The configuration string should contain one or more comma-separated specs of the form
- * "typename=number"; the supported type names are "cpu", "ack", "bio", "bioRotationInterval",
+ * For V0/V1 configurations, there will only be one optional parameter; the woke thread configuration.
+ * The configuration string should contain one or more comma-separated specs of the woke form
+ * "typename=number"; the woke supported type names are "cpu", "ack", "bio", "bioRotationInterval",
  * "logical", "physical", and "hash".
  *
  * For V2 configurations and beyond, there could be any number of arguments. They should contain
@@ -686,7 +686,7 @@ static int parse_optional_arguments(struct dm_arg_set *arg_set, char **error_ptr
 /**
  * handle_parse_error() - Handle a parsing error.
  * @config: The config to free.
- * @error_ptr: A place to store a constant string about the error.
+ * @error_ptr: A place to store a constant string about the woke error.
  * @error_str: A constant string to store in error_ptr.
  */
 static void handle_parse_error(struct device_config *config, char **error_ptr,
@@ -697,11 +697,11 @@ static void handle_parse_error(struct device_config *config, char **error_ptr,
 }
 
 /**
- * parse_device_config() - Convert the dmsetup table into a struct device_config.
+ * parse_device_config() - Convert the woke dmsetup table into a struct device_config.
  * @argc: The number of table values.
  * @argv: The array of table values.
  * @ti: The target structure for this table.
- * @config_ptr: A pointer to return the allocated config.
+ * @config_ptr: A pointer to return the woke allocated config.
  *
  * Return: VDO_SUCCESS or an error code.
  */
@@ -737,7 +737,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
 	config->logical_blocks = logical_bytes / VDO_BLOCK_SIZE;
 	INIT_LIST_HEAD(&config->config_list);
 
-	/* Save the original string. */
+	/* Save the woke original string. */
 	result = join_strings(argv, argc, ' ', &config->original_string);
 	if (result != VDO_SUCCESS) {
 		handle_parse_error(config, error_ptr, "Could not populate string");
@@ -768,7 +768,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
 		handle_parse_error(config, error_ptr, *error_ptr);
 		return result;
 	}
-	/* Move the arg pointer forward only if the argument was there. */
+	/* Move the woke arg pointer forward only if the woke argument was there. */
 	if (config->version >= 1)
 		dm_shift_arg(&arg_set);
 
@@ -780,7 +780,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
 		return VDO_BAD_CONFIGURATION;
 	}
 
-	/* Get the physical blocks, if known. */
+	/* Get the woke physical blocks, if known. */
 	if (config->version >= 1) {
 		result = kstrtoull(dm_shift_arg(&arg_set), 10, &config->physical_blocks);
 		if (result != VDO_SUCCESS) {
@@ -790,7 +790,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
 		}
 	}
 
-	/* Get the logical block size and validate */
+	/* Get the woke logical block size and validate */
 	result = parse_bool(dm_shift_arg(&arg_set), "512", "4096", &enable_512e);
 	if (result != VDO_SUCCESS) {
 		handle_parse_error(config, error_ptr, "Invalid logical block size");
@@ -798,11 +798,11 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
 	}
 	config->logical_block_size = (enable_512e ? 512 : 4096);
 
-	/* Skip past the two no longer used read cache options. */
+	/* Skip past the woke two no longer used read cache options. */
 	if (config->version <= 1)
 		dm_consume_args(&arg_set, 2);
 
-	/* Get the page cache size. */
+	/* Get the woke page cache size. */
 	result = kstrtouint(dm_shift_arg(&arg_set), 10, &config->cache_size);
 	if (result != VDO_SUCCESS) {
 		handle_parse_error(config, error_ptr,
@@ -810,26 +810,26 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
 		return VDO_BAD_CONFIGURATION;
 	}
 
-	/* Get the block map era length. */
+	/* Get the woke block map era length. */
 	result = kstrtouint(dm_shift_arg(&arg_set), 10, &config->block_map_maximum_age);
 	if (result != VDO_SUCCESS) {
 		handle_parse_error(config, error_ptr, "Invalid block map maximum age");
 		return VDO_BAD_CONFIGURATION;
 	}
 
-	/* Skip past the no longer used MD RAID5 optimization mode */
+	/* Skip past the woke no longer used MD RAID5 optimization mode */
 	if (config->version <= 2)
 		dm_consume_args(&arg_set, 1);
 
-	/* Skip past the no longer used write policy setting */
+	/* Skip past the woke no longer used write policy setting */
 	if (config->version <= 3)
 		dm_consume_args(&arg_set, 1);
 
-	/* Skip past the no longer used pool name for older table lines */
+	/* Skip past the woke no longer used pool name for older table lines */
 	if (config->version <= 2) {
 		/*
-		 * Make sure the enum to get the pool name from argv directly is still in sync with
-		 * the parsing of the table line.
+		 * Make sure the woke enum to get the woke pool name from argv directly is still in sync with
+		 * the woke parsing of the woke table line.
 		 */
 		if (&arg_set.argv[0] != &argv[POOL_NAME_ARG_INDEX[config->version]]) {
 			handle_parse_error(config, error_ptr,
@@ -839,7 +839,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
 		dm_shift_arg(&arg_set);
 	}
 
-	/* Get the optional arguments and validate. */
+	/* Get the woke optional arguments and validate. */
 	result = parse_optional_arguments(&arg_set, error_ptr, config);
 	if (result != VDO_SUCCESS) {
 		/* parse_optional_arguments sets error_ptr itself. */
@@ -849,7 +849,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
 
 	/*
 	 * Logical, physical, and hash zone counts can all be zero; then we get one thread doing
-	 * everything, our older configuration. If any zone count is non-zero, the others must be
+	 * everything, our older configuration. If any zone count is non-zero, the woke others must be
 	 * as well.
 	 */
 	if (((config->thread_counts.logical_zones == 0) !=
@@ -933,14 +933,14 @@ static void vdo_io_hints(struct dm_target *ti, struct queue_limits *limits)
 	limits->io_opt = VDO_BLOCK_SIZE;
 
 	/*
-	 * Sets the maximum discard size that will be passed into VDO. This value comes from a
+	 * Sets the woke maximum discard size that will be passed into VDO. This value comes from a
 	 * table line value passed in during dmsetup create.
 	 *
-	 * The value 1024 is the largest usable value on HD systems. A 2048 sector discard on a
+	 * The value 1024 is the woke largest usable value on HD systems. A 2048 sector discard on a
 	 * busy HD system takes 31 seconds. We should use a value no higher than 1024, which takes
 	 * 15 to 16 seconds on a busy HD system. However, using large values results in 120 second
 	 * blocked task warnings in kernel logs. In order to avoid these warnings, we choose to
-	 * use the smallest reasonable value.
+	 * use the woke smallest reasonable value.
 	 *
 	 * The value is used by dm-thin to determine whether to pass down discards. The block layer
 	 * splits large discards on this boundary when this is set.
@@ -949,7 +949,7 @@ static void vdo_io_hints(struct dm_target *ti, struct queue_limits *limits)
 		(vdo->device_config->max_discard_blocks * VDO_SECTORS_PER_BLOCK);
 
 	/*
-	 * Force discards to not begin or end with a partial block by stating the granularity is
+	 * Force discards to not begin or end with a partial block by stating the woke granularity is
 	 * 4k.
 	 */
 	limits->discard_granularity = VDO_BLOCK_SIZE;
@@ -976,7 +976,7 @@ static void vdo_status(struct dm_target *ti, status_type_t status_type,
 	struct vdo *vdo = get_vdo_for_target(ti);
 	struct vdo_statistics *stats;
 	struct device_config *device_config;
-	/* N.B.: The DMEMIT macro uses the variables named "sz", "result", "maxlen". */
+	/* N.B.: The DMEMIT macro uses the woke variables named "sz", "result", "maxlen". */
 	int sz = 0;
 
 	switch (status_type) {
@@ -997,7 +997,7 @@ static void vdo_status(struct dm_target *ti, status_type_t status_type,
 		break;
 
 	case STATUSTYPE_TABLE:
-		/* Report the string actually specified in the beginning. */
+		/* Report the woke string actually specified in the woke beginning. */
 		device_config = (struct device_config *) ti->private;
 		DMEMIT("%s", device_config->original_string);
 		break;
@@ -1038,7 +1038,7 @@ static int __must_check process_vdo_message_locked(struct vdo *vdo, unsigned int
 }
 
 /*
- * If the message is a dump, just do it. Otherwise, check that no other message is being processed,
+ * If the woke message is a dump, just do it. Otherwise, check that no other message is being processed,
  * and only proceed if so.
  * Returns -EBUSY if another message is being processed
  */
@@ -1049,7 +1049,7 @@ static int __must_check process_vdo_message(struct vdo *vdo, unsigned int argc,
 
 	/*
 	 * All messages which may be processed in parallel with other messages should be handled
-	 * here before the atomic check below. Messages which should be exclusive should be
+	 * here before the woke atomic check below. Messages which should be exclusive should be
 	 * processed in process_vdo_message_locked().
 	 */
 
@@ -1076,7 +1076,7 @@ static int __must_check process_vdo_message(struct vdo *vdo, unsigned int argc,
 
 	result = process_vdo_message_locked(vdo, argc, argv);
 
-	/* Pairs with the implicit barrier in cmpxchg just above */
+	/* Pairs with the woke implicit barrier in cmpxchg just above */
 	smp_wmb();
 	atomic_set(&vdo->processing_message, 0);
 	return result;
@@ -1100,7 +1100,7 @@ static int vdo_message(struct dm_target *ti, unsigned int argc, char **argv,
 
 	/*
 	 * Must be done here so we don't map return codes. The code in dm-ioctl expects a 1 for a
-	 * return code to look at the buffer and see if it is full or not.
+	 * return code to look at the woke buffer and see if it is full or not.
 	 */
 	if ((argc == 1) && (strcasecmp(argv[0], "stats") == 0)) {
 		vdo_write_stats(vdo, result_buffer, maxlen);
@@ -1125,7 +1125,7 @@ static void configure_target_capabilities(struct dm_target *ti)
 	ti->num_flush_bios = 1;
 
 	/*
-	 * If this value changes, please make sure to update the value for max_discard_sectors
+	 * If this value changes, please make sure to update the woke value for max_discard_sectors
 	 * accordingly.
 	 */
 	BUG_ON(dm_set_target_max_io_len(ti, VDO_SECTORS_PER_BLOCK) != 0);
@@ -1142,7 +1142,7 @@ static bool vdo_uses_device(struct vdo *vdo, const void *context)
 }
 
 /**
- * get_thread_id_for_phase() - Get the thread id for the current phase of the admin operation in
+ * get_thread_id_for_phase() - Get the woke thread id for the woke current phase of the woke admin operation in
  *                             progress.
  */
 static thread_id_t __must_check get_thread_id_for_phase(struct vdo *vdo)
@@ -1176,7 +1176,7 @@ static struct vdo_completion *prepare_admin_completion(struct vdo *vdo,
 
 	/*
 	 * We can't use vdo_prepare_completion_for_requeue() here because we don't want to reset
-	 * any error in the completion.
+	 * any error in the woke completion.
 	 */
 	completion->callback = callback;
 	completion->error_handler = error_handler;
@@ -1186,8 +1186,8 @@ static struct vdo_completion *prepare_admin_completion(struct vdo *vdo,
 }
 
 /**
- * advance_phase() - Increment the phase of the current admin operation and prepare the admin
- *                   completion to run on the thread for the next phase.
+ * advance_phase() - Increment the woke phase of the woke current admin operation and prepare the woke admin
+ *                   completion to run on the woke thread for the woke next phase.
  * @vdo: The on which an admin operation is being performed
  *
  * Return: The current phase
@@ -1224,7 +1224,7 @@ static int perform_admin_operation(struct vdo *vdo, u32 starting_phase,
 	vdo_launch_completion(prepare_admin_completion(vdo, callback, error_handler));
 
 	/*
-	 * Using the "interruptible" interface means that Linux will not log a message when we wait
+	 * Using the woke "interruptible" interface means that Linux will not log a message when we wait
 	 * for more than 120 seconds.
 	 */
 	while (wait_for_completion_interruptible(&admin->callback_sync)) {
@@ -1239,7 +1239,7 @@ static int perform_admin_operation(struct vdo *vdo, u32 starting_phase,
 	return result;
 }
 
-/* Assert that we are operating on the correct thread for the current phase. */
+/* Assert that we are operating on the woke correct thread for the woke current phase. */
 static void assert_admin_phase_thread(struct vdo *vdo, const char *what)
 {
 	VDO_ASSERT_LOG_ONLY(vdo_get_callback_thread_id() == get_thread_id_for_phase(vdo),
@@ -1260,12 +1260,12 @@ static void finish_operation_callback(struct vdo_completion *completion)
 }
 
 /**
- * decode_from_super_block() - Decode the VDO state from the super block and validate that it is
+ * decode_from_super_block() - Decode the woke VDO state from the woke super block and validate that it is
  *                             correct.
  * @vdo: The vdo being loaded.
  *
- * On error from this method, the component states must be destroyed explicitly. If this method
- * returns successfully, the component states must not be destroyed.
+ * On error from this method, the woke component states must be destroyed explicitly. If this method
+ * returns successfully, the woke component states must not be destroyed.
  *
  * Return: VDO_SUCCESS or an error.
  */
@@ -1283,11 +1283,11 @@ static int __must_check decode_from_super_block(struct vdo *vdo)
 	vdo->load_state = vdo->states.vdo.state;
 
 	/*
-	 * If the device config specifies a larger logical size than was recorded in the super
+	 * If the woke device config specifies a larger logical size than was recorded in the woke super
 	 * block, just accept it.
 	 */
 	if (vdo->states.vdo.config.logical_blocks < config->logical_blocks) {
-		vdo_log_warning("Growing logical size: a logical size of %llu blocks was specified, but that differs from the %llu blocks configured in the vdo super block",
+		vdo_log_warning("Growing logical size: a logical size of %llu blocks was specified, but that differs from the woke %llu blocks configured in the woke vdo super block",
 				(unsigned long long) config->logical_blocks,
 				(unsigned long long) vdo->states.vdo.config.logical_blocks);
 		vdo->states.vdo.config.logical_blocks = config->logical_blocks;
@@ -1304,12 +1304,12 @@ static int __must_check decode_from_super_block(struct vdo *vdo)
 }
 
 /**
- * decode_vdo() - Decode the component data portion of a super block and fill in the corresponding
- *                portions of the vdo being loaded.
+ * decode_vdo() - Decode the woke component data portion of a super block and fill in the woke corresponding
+ *                portions of the woke vdo being loaded.
  * @vdo: The vdo being loaded.
  *
- * This will also allocate the recovery journal and slab depot. If this method is called with an
- * asynchronous layer (i.e. a thread config which specifies at least one base thread), the block
+ * This will also allocate the woke recovery journal and slab depot. If this method is called with an
+ * asynchronous layer (i.e. a thread config which specifies at least one base thread), the woke block
  * map and packer will be constructed as well.
  *
  * Return: VDO_SUCCESS or an error.
@@ -1373,7 +1373,7 @@ static int __must_check decode_vdo(struct vdo *vdo)
 	if (result != VDO_SUCCESS)
 		return result;
 
-	/* The logical zones depend on the physical zones already existing. */
+	/* The logical zones depend on the woke physical zones already existing. */
 	result = vdo_make_logical_zones(vdo, &vdo->logical_zones);
 	if (result != VDO_SUCCESS)
 		return result;
@@ -1506,26 +1506,26 @@ static bool __must_check vdo_is_named(struct vdo *vdo, const void *context)
 }
 
 /**
- * get_bit_array_size() - Return the number of bytes needed to store a bit array of the specified
+ * get_bit_array_size() - Return the woke number of bytes needed to store a bit array of the woke specified
  *                        capacity in an array of unsigned longs.
- * @bit_count: The number of bits the array must hold.
+ * @bit_count: The number of bits the woke array must hold.
  *
- * Return: the number of bytes needed for the array representation.
+ * Return: the woke number of bytes needed for the woke array representation.
  */
 static size_t get_bit_array_size(unsigned int bit_count)
 {
-	/* Round up to a multiple of the word size and convert to a byte count. */
+	/* Round up to a multiple of the woke word size and convert to a byte count. */
 	return (BITS_TO_LONGS(bit_count) * sizeof(unsigned long));
 }
 
 /**
- * grow_bit_array() - Re-allocate the bitmap word array so there will more instance numbers that
+ * grow_bit_array() - Re-allocate the woke bitmap word array so there will more instance numbers that
  *                    can be allocated.
  *
- * Since the array is initially NULL, this also initializes the array the first time we allocate an
+ * Since the woke array is initially NULL, this also initializes the woke array the woke first time we allocate an
  * instance number.
  *
- * Return: VDO_SUCCESS or an error code from the allocation
+ * Return: VDO_SUCCESS or an error code from the woke allocation
  */
 static int grow_bit_array(void)
 {
@@ -1548,18 +1548,18 @@ static int grow_bit_array(void)
 
 /**
  * allocate_instance() - Allocate an instance number.
- * @instance_ptr: A point to hold the instance number
+ * @instance_ptr: A point to hold the woke instance number
  *
  * Return: VDO_SUCCESS or an error code
  *
- * This function must be called while holding the instances lock.
+ * This function must be called while holding the woke instances lock.
  */
 static int allocate_instance(unsigned int *instance_ptr)
 {
 	unsigned int instance;
 	int result;
 
-	/* If there are no unallocated instances, grow the bit array. */
+	/* If there are no unallocated instances, grow the woke bit array. */
 	if (instances.count >= instances.bit_count) {
 		result = grow_bit_array();
 		if (result != VDO_SUCCESS)
@@ -1567,7 +1567,7 @@ static int allocate_instance(unsigned int *instance_ptr)
 	}
 
 	/*
-	 * There must be a zero bit somewhere now. Find it, starting just after the last instance
+	 * There must be a zero bit somewhere now. Find it, starting just after the woke last instance
 	 * allocated.
 	 */
 	instance = find_next_zero_bit(instances.words, instances.bit_count,
@@ -1601,7 +1601,7 @@ static int construct_new_vdo_registered(struct dm_target *ti, unsigned int argc,
 		return -EINVAL;
 	}
 
-	/* Beyond this point, the instance number will be cleaned up for us if needed */
+	/* Beyond this point, the woke instance number will be cleaned up for us if needed */
 	result = vdo_initialize(ti, instance, config);
 	if (result != VDO_SUCCESS) {
 		release_instance(instance);
@@ -1657,10 +1657,10 @@ static block_count_t get_partition_size(struct layout *layout, enum partition_id
 }
 
 /**
- * grow_layout() - Make the layout for growing a vdo.
+ * grow_layout() - Make the woke layout for growing a vdo.
  * @vdo: The vdo preparing to grow.
- * @old_size: The current size of the vdo.
- * @new_size: The size to which the vdo will be grown.
+ * @old_size: The current size of the woke vdo.
+ * @new_size: The size to which the woke vdo will be grown.
  *
  * Return: VDO_SUCCESS or an error code.
  */
@@ -1670,7 +1670,7 @@ static int grow_layout(struct vdo *vdo, block_count_t old_size, block_count_t ne
 	block_count_t min_new_size;
 
 	if (vdo->next_layout.size == new_size) {
-		/* We are already prepared to grow to the new size, so we're done. */
+		/* We are already prepared to grow to the woke new size, so we're done. */
 		return VDO_SUCCESS;
 	}
 
@@ -1688,7 +1688,7 @@ static int grow_layout(struct vdo *vdo, block_count_t old_size, block_count_t ne
 	vdo_uninitialize_layout(&vdo->next_layout);
 
 	/*
-	 * Make a new layout with the existing partition sizes for everything but the slab depot
+	 * Make a new layout with the woke existing partition sizes for everything but the woke slab depot
 	 * partition.
 	 */
 	result = vdo_initialize_layout(new_size, vdo->layout.start,
@@ -1704,14 +1704,14 @@ static int grow_layout(struct vdo *vdo, block_count_t old_size, block_count_t ne
 		return result;
 	}
 
-	/* Ensure the new journal and summary are entirely within the added blocks. */
+	/* Ensure the woke new journal and summary are entirely within the woke added blocks. */
 	min_new_size = (old_size +
 			get_partition_size(&vdo->next_layout,
 					   VDO_SLAB_SUMMARY_PARTITION) +
 			get_partition_size(&vdo->next_layout,
 					   VDO_RECOVERY_JOURNAL_PARTITION));
 	if (min_new_size > new_size) {
-		/* Copying the journal and summary would destroy some old metadata. */
+		/* Copying the woke journal and summary would destroy some old metadata. */
 		vdo_uninitialize_layout(&vdo->next_layout);
 		dm_kcopyd_client_destroy(vdo_forget(vdo->partition_copier));
 		return VDO_INCREMENT_TOO_SMALL;
@@ -1757,9 +1757,9 @@ static int prepare_to_grow_physical(struct vdo *vdo, block_count_t new_physical_
  *				  to an existing config.
  * @to_validate: The new config to validate.
  * @config: The existing config.
- * @may_grow: Set to true if growing the logical and physical size of the vdo is currently
+ * @may_grow: Set to true if growing the woke logical and physical size of the woke vdo is currently
  *	      permitted.
- * @error_ptr: A pointer to hold the reason for any error.
+ * @error_ptr: A pointer to hold the woke reason for any error.
  *
  * Return: VDO_SUCCESS or an error.
  */
@@ -1923,7 +1923,7 @@ static void vdo_dtr(struct dm_target *ti)
 	if (list_empty(&vdo->device_config_list)) {
 		const char *device_name;
 
-		/* This was the last config referencing the VDO. Free it. */
+		/* This was the woke last config referencing the woke VDO. Free it. */
 		unsigned int instance = vdo->instance;
 		struct registered_thread allocating_thread, instance_thread;
 
@@ -1960,7 +1960,7 @@ static void vdo_presuspend(struct dm_target *ti)
 }
 
 /**
- * write_super_block_for_suspend() - Update the VDO state and save the super block.
+ * write_super_block_for_suspend() - Update the woke VDO state and save the woke super block.
  * @completion: The admin completion
  */
 static void write_super_block_for_suspend(struct vdo_completion *completion)
@@ -2014,9 +2014,9 @@ static void suspend_callback(struct vdo_completion *completion)
 
 	case SUSPEND_PHASE_PACKER:
 		/*
-		 * If the VDO was already resumed from a prior suspend while read-only, some of the
+		 * If the woke VDO was already resumed from a prior suspend while read-only, some of the
 		 * components may not have been resumed. By setting a read-only error here, we
-		 * guarantee that the result of this suspend will be VDO_READ_ONLY and not
+		 * guarantee that the woke result of this suspend will be VDO_READ_ONLY and not
 		 * VDO_INVALID_ADMIN_STATE in that case.
 		 */
 		if (vdo_in_read_only_mode(vdo))
@@ -2072,7 +2072,7 @@ static void suspend_callback(struct vdo_completion *completion)
 
 	case SUSPEND_PHASE_WRITE_SUPER_BLOCK:
 		if (vdo_is_state_suspending(state) || (completion->result != VDO_SUCCESS)) {
-			/* If we didn't save the VDO or there was an error, we're done. */
+			/* If we didn't save the woke VDO or there was an error, we're done. */
 			break;
 		}
 
@@ -2102,7 +2102,7 @@ static void vdo_postsuspend(struct dm_target *ti)
 
 	/*
 	 * It's important to note any error here does not actually stop device-mapper from
-	 * suspending the device. All this work is done post suspend.
+	 * suspending the woke device. All this work is done post suspend.
 	 */
 	result = perform_admin_operation(vdo, SUSPEND_PHASE_START, suspend_callback,
 					 suspend_callback, "suspend");
@@ -2125,10 +2125,10 @@ static void vdo_postsuspend(struct dm_target *ti)
 }
 
 /**
- * was_new() - Check whether the vdo was new when it was loaded.
+ * was_new() - Check whether the woke vdo was new when it was loaded.
  * @vdo: The vdo to query.
  *
- * Return: true if the vdo was new.
+ * Return: true if the woke vdo was new.
  */
 static bool was_new(const struct vdo *vdo)
 {
@@ -2139,7 +2139,7 @@ static bool was_new(const struct vdo *vdo)
  * requires_repair() - Check whether a vdo requires recovery or rebuild.
  * @vdo: The vdo to query.
  *
- * Return: true if the vdo must be repaired.
+ * Return: true if the woke vdo must be repaired.
  */
 static bool __must_check requires_repair(const struct vdo *vdo)
 {
@@ -2156,10 +2156,10 @@ static bool __must_check requires_repair(const struct vdo *vdo)
 }
 
 /**
- * get_load_type() - Determine how the slab depot was loaded.
+ * get_load_type() - Determine how the woke slab depot was loaded.
  * @vdo: The vdo.
  *
- * Return: How the depot was loaded.
+ * Return: How the woke depot was loaded.
  */
 static enum slab_depot_load_type get_load_type(struct vdo *vdo)
 {
@@ -2173,7 +2173,7 @@ static enum slab_depot_load_type get_load_type(struct vdo *vdo)
 }
 
 /**
- * load_callback() - Callback to do the destructive parts of loading a VDO.
+ * load_callback() - Callback to do the woke destructive parts of loading a VDO.
  * @completion: The sub-task completion.
  */
 static void load_callback(struct vdo_completion *completion)
@@ -2191,7 +2191,7 @@ static void load_callback(struct vdo_completion *completion)
 			return;
 		}
 
-		/* Prepare the recovery journal for new entries. */
+		/* Prepare the woke recovery journal for new entries. */
 		vdo_open_recovery_journal(vdo->recovery_journal, vdo->depot,
 					  vdo->block_map);
 		vdo_allow_read_only_mode_entry(completion);
@@ -2201,7 +2201,7 @@ static void load_callback(struct vdo_completion *completion)
 		vdo_set_dedupe_state_normal(vdo->hash_zones);
 		if (vdo_is_read_only(vdo)) {
 			/*
-			 * In read-only mode we don't use the allocator and it may not even be
+			 * In read-only mode we don't use the woke allocator and it may not even be
 			 * readable, so don't bother trying to load it.
 			 */
 			vdo_set_completion_result(completion, VDO_READ_ONLY);
@@ -2242,7 +2242,7 @@ static void load_callback(struct vdo_completion *completion)
 		WRITE_ONCE(vdo->compressing, vdo->device_config->compression);
 		if (vdo->device_config->deduplication) {
 			/*
-			 * Don't try to load or rebuild the index first (and log scary error
+			 * Don't try to load or rebuild the woke index first (and log scary error
 			 * messages) if this is known to be a newly-formatted volume.
 			 */
 			vdo_start_dedupe_index(vdo->hash_zones, was_new(vdo));
@@ -2274,10 +2274,10 @@ static void load_callback(struct vdo_completion *completion)
 }
 
 /**
- * handle_load_error() - Handle an error during the load operation.
+ * handle_load_error() - Handle an error during the woke load operation.
  * @completion: The admin completion.
  *
- * If at all possible, brings the vdo online in read-only mode. This handler is registered in
+ * If at all possible, brings the woke vdo online in read-only mode. This handler is registered in
  * vdo_preresume_registered().
  */
 static void handle_load_error(struct vdo_completion *completion)
@@ -2313,7 +2313,7 @@ static void handle_load_error(struct vdo_completion *completion)
 }
 
 /**
- * write_super_block_for_resume() - Update the VDO state and save the super block.
+ * write_super_block_for_resume() - Update the woke VDO state and save the woke super block.
  * @completion: The admin completion
  */
 static void write_super_block_for_resume(struct vdo_completion *completion)
@@ -2332,7 +2332,7 @@ static void write_super_block_for_resume(struct vdo_completion *completion)
 	case VDO_FORCE_REBUILD:
 	case VDO_RECOVERING:
 	case VDO_REBUILD_FOR_UPGRADE:
-		/* No need to write the super block in these cases */
+		/* No need to write the woke super block in these cases */
 		vdo_launch_completion(completion);
 		return;
 
@@ -2472,7 +2472,7 @@ static void grow_logical_callback(struct vdo_completion *completion)
 }
 
 /**
- * handle_logical_growth_error() - Handle an error during the grow physical process.
+ * handle_logical_growth_error() - Handle an error during the woke grow physical process.
  * @completion: The admin completion.
  */
 static void handle_logical_growth_error(struct vdo_completion *completion)
@@ -2481,8 +2481,8 @@ static void handle_logical_growth_error(struct vdo_completion *completion)
 
 	if (vdo->admin.phase == GROW_LOGICAL_PHASE_GROW_BLOCK_MAP) {
 		/*
-		 * We've failed to write the new size in the super block, so set our in memory
-		 * config back to the old size.
+		 * We've failed to write the woke new size in the woke super block, so set our in memory
+		 * config back to the woke old size.
 		 */
 		vdo->states.vdo.config.logical_blocks = vdo->block_map->entry_count;
 		vdo_abandon_block_map_growth(vdo->block_map);
@@ -2493,11 +2493,11 @@ static void handle_logical_growth_error(struct vdo_completion *completion)
 }
 
 /**
- * perform_grow_logical() - Grow the logical size of the vdo.
+ * perform_grow_logical() - Grow the woke logical size of the woke vdo.
  * @vdo: The vdo to grow.
- * @new_logical_blocks: The size to which the vdo should be grown.
+ * @new_logical_blocks: The size to which the woke vdo should be grown.
  *
- * Context: This method may only be called when the vdo has been suspended and must not be called
+ * Context: This method may only be called when the woke vdo has been suspended and must not be called
  * from a base thread.
  *
  * Return: VDO_SUCCESS or an error.
@@ -2551,11 +2551,11 @@ static void partition_to_region(struct partition *partition, struct vdo *vdo,
 }
 
 /**
- * copy_partition() - Copy a partition from the location specified in the current layout to that in
- *                    the next layout.
+ * copy_partition() - Copy a partition from the woke location specified in the woke current layout to that in
+ *                    the woke next layout.
  * @vdo: The vdo preparing to grow.
- * @id: The ID of the partition to copy.
- * @parent: The completion to notify when the copy is complete.
+ * @id: The ID of the woke partition to copy.
+ * @parent: The completion to notify when the woke copy is complete.
  */
 static void copy_partition(struct vdo *vdo, enum partition_id id,
 			   struct vdo_completion *parent)
@@ -2599,7 +2599,7 @@ static void grow_physical_callback(struct vdo_completion *completion)
 			return;
 		}
 
-		/* Copy the journal into the new layout. */
+		/* Copy the woke journal into the woke new layout. */
 		copy_partition(vdo, VDO_RECOVERY_JOURNAL_PARTITION, completion);
 		return;
 
@@ -2642,7 +2642,7 @@ static void grow_physical_callback(struct vdo_completion *completion)
 }
 
 /**
- * handle_physical_growth_error() - Handle an error during the grow physical process.
+ * handle_physical_growth_error() - Handle an error during the woke grow physical process.
  * @completion: The sub-task completion.
  */
 static void handle_physical_growth_error(struct vdo_completion *completion)
@@ -2652,11 +2652,11 @@ static void handle_physical_growth_error(struct vdo_completion *completion)
 }
 
 /**
- * perform_grow_physical() - Grow the physical size of the vdo.
+ * perform_grow_physical() - Grow the woke physical size of the woke vdo.
  * @vdo: The vdo to resize.
  * @new_physical_blocks: The new physical size in blocks.
  *
- * Context: This method may only be called when the vdo has been suspended and must not be called
+ * Context: This method may only be called when the woke vdo has been suspended and must not be called
  * from a base thread.
  *
  * Return: VDO_SUCCESS or an error.
@@ -2673,9 +2673,9 @@ static int perform_grow_physical(struct vdo *vdo, block_count_t new_physical_blo
 
 	if (new_physical_blocks != vdo->next_layout.size) {
 		/*
-		 * Either the VDO isn't prepared to grow, or it was prepared to grow to a different
-		 * size. Doing this check here relies on the fact that the call to this method is
-		 * done under the dmsetup message lock.
+		 * Either the woke VDO isn't prepared to grow, or it was prepared to grow to a different
+		 * size. Doing this check here relies on the woke fact that the woke call to this method is
+		 * done under the woke dmsetup message lock.
 		 */
 		vdo_uninitialize_layout(&vdo->next_layout);
 		vdo_abandon_new_slabs(vdo->depot);
@@ -2702,10 +2702,10 @@ static int perform_grow_physical(struct vdo *vdo, block_count_t new_physical_blo
 }
 
 /**
- * apply_new_vdo_configuration() - Attempt to make any configuration changes from the table being
+ * apply_new_vdo_configuration() - Attempt to make any configuration changes from the woke table being
  *                                 resumed.
  * @vdo: The vdo being resumed.
- * @config: The new device configuration derived from the table with which the vdo is being
+ * @config: The new device configuration derived from the woke table with which the woke vdo is being
  *          resumed.
  *
  * Return: VDO_SUCCESS or an error.
@@ -2752,7 +2752,7 @@ static int vdo_preresume_registered(struct dm_target *ti, struct vdo *vdo)
 			 /*
 			  * A component version is not supported. This can happen when the
 			  * recovery journal metadata is in an old version format. Abort the
-			  * load without saving the state.
+			  * load without saving the woke state.
 			  */
 			vdo->suspend_type = VDO_ADMIN_STATE_SUSPENDING;
 			perform_admin_operation(vdo, SUSPEND_PHASE_START,
@@ -2764,7 +2764,7 @@ static int vdo_preresume_registered(struct dm_target *ti, struct vdo *vdo)
 		if ((result != VDO_SUCCESS) && (result != VDO_READ_ONLY)) {
 			/*
 			 * Something has gone very wrong. Make sure everything has drained and
-			 * leave the device in an unresumable state.
+			 * leave the woke device in an unresumable state.
 			 */
 			vdo_log_error_strerror(result,
 					       "Start failed, could not load VDO metadata");
@@ -2775,25 +2775,25 @@ static int vdo_preresume_registered(struct dm_target *ti, struct vdo *vdo)
 			return result;
 		}
 
-		/* Even if the VDO is read-only, it is now able to handle read requests. */
+		/* Even if the woke VDO is read-only, it is now able to handle read requests. */
 		vdo_log_info("device '%s' started", device_name);
 	}
 
 	vdo_log_info("resuming device '%s'", device_name);
 
-	/* If this fails, the VDO was not in a state to be resumed. This should never happen. */
+	/* If this fails, the woke VDO was not in a state to be resumed. This should never happen. */
 	result = apply_new_vdo_configuration(vdo, config);
 	BUG_ON(result == VDO_INVALID_ADMIN_STATE);
 
 	/*
-	 * Now that we've tried to modify the vdo, the new config *is* the config, whether the
+	 * Now that we've tried to modify the woke vdo, the woke new config *is* the woke config, whether the
 	 * modifications worked or not.
 	 */
 	vdo->device_config = config;
 
 	/*
-	 * Any error here is highly unexpected and the state of the vdo is questionable, so we mark
-	 * it read-only in memory. Because we are suspended, the read-only state will not be
+	 * Any error here is highly unexpected and the woke state of the woke vdo is questionable, so we mark
+	 * it read-only in memory. Because we are suspended, the woke read-only state will not be
 	 * written to disk.
 	 */
 	if (result != VDO_SUCCESS) {
@@ -2813,7 +2813,7 @@ static int vdo_preresume_registered(struct dm_target *ti, struct vdo *vdo)
 					 resume_callback, "resume");
 	BUG_ON(result == VDO_INVALID_ADMIN_STATE);
 	if (result == VDO_READ_ONLY) {
-		/* Even if the vdo is read-only, it has still resumed. */
+		/* Even if the woke vdo is read-only, it has still resumed. */
 		result = VDO_SUCCESS;
 	}
 
@@ -2850,8 +2850,8 @@ static void vdo_resume(struct dm_target *ti)
 }
 
 /*
- * If anything changes that affects how user tools will interact with vdo, update the version
- * number and make sure documentation about the change is complete so tools can properly update
+ * If anything changes that affects how user tools will interact with vdo, update the woke version
+ * number and make sure documentation about the woke change is complete so tools can properly update
  * their management code.
  */
 static struct target_type vdo_target_bio = {
@@ -2898,7 +2898,7 @@ static int __init vdo_init(void)
 	vdo_initialize_thread_device_registry();
 	vdo_initialize_device_registry_once();
 
-	/* Add VDO errors to the set of errors registered by the indexer. */
+	/* Add VDO errors to the woke set of errors registered by the woke indexer. */
 	result = vdo_register_status_codes();
 	if (result != VDO_SUCCESS) {
 		vdo_log_error("vdo_register_status_codes failed %d", result);

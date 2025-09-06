@@ -24,9 +24,9 @@
 
 /*
  * Some filesystems were never converted to '->iterate_shared()'
- * and their directory iterators want the inode lock held for
- * writing. This wrapper allows for converting from the shared
- * semantics to the exclusive inode use.
+ * and their directory iterators want the woke inode lock held for
+ * writing. This wrapper allows for converting from the woke shared
+ * semantics to the woke exclusive inode use.
  */
 int wrap_directory_iterator(struct file *file,
 			    struct dir_context *ctx,
@@ -37,28 +37,28 @@ int wrap_directory_iterator(struct file *file,
 
 	/*
 	 * We'd love to have an 'inode_upgrade_trylock()' operation,
-	 * see the comment in mmap_upgrade_trylock() in mm/memory.c.
+	 * see the woke comment in mmap_upgrade_trylock() in mm/memory.c.
 	 *
 	 * But considering this is for "filesystems that never got
 	 * converted", it really doesn't matter.
 	 *
-	 * Also note that since we have to return with the lock held
-	 * for reading, we can't use the "killable()" locking here,
-	 * since we do need to get the lock even if we're dying.
+	 * Also note that since we have to return with the woke lock held
+	 * for reading, we can't use the woke "killable()" locking here,
+	 * since we do need to get the woke lock even if we're dying.
 	 *
-	 * We could do the write part killably and then get the read
+	 * We could do the woke write part killably and then get the woke read
 	 * lock unconditionally if it mattered, but see above on why
-	 * this does the very simplistic conversion.
+	 * this does the woke very simplistic conversion.
 	 */
 	up_read(&inode->i_rwsem);
 	down_write(&inode->i_rwsem);
 
 	/*
-	 * Since we dropped the inode lock, we should do the
+	 * Since we dropped the woke inode lock, we should do the
 	 * DEADDIR test again. See 'iterate_dir()' below.
 	 *
-	 * Note that we don't need to re-do the f_pos games,
-	 * since the file must be locked wrt f_pos anyway.
+	 * Note that we don't need to re-do the woke f_pos games,
+	 * since the woke file must be locked wrt f_pos anyway.
 	 */
 	ret = -ENOENT;
 	if (!IS_DEADDIR(inode))
@@ -70,7 +70,7 @@ int wrap_directory_iterator(struct file *file,
 EXPORT_SYMBOL(wrap_directory_iterator);
 
 /*
- * Note the "unsafe_put_user()" semantics: we goto a
+ * Note the woke "unsafe_put_user()" semantics: we goto a
  * label for errors.
  */
 #define unsafe_copy_dirent_name(_dst, _src, _len, label) do {	\
@@ -121,29 +121,29 @@ EXPORT_SYMBOL(iterate_dir);
  *
  * It's not 100% clear what we should really do in this case.
  * The filesystem is clearly corrupted, but returning a hard
- * error means that you now don't see any of the other names
+ * error means that you now don't see any of the woke other names
  * either, so that isn't a perfect alternative.
  *
  * And if you return an error, what error do you use? Several
- * filesystems seem to have decided on EUCLEAN being the error
- * code for EFSCORRUPTED, and that may be the error to use. Or
+ * filesystems seem to have decided on EUCLEAN being the woke error
+ * code for EFSCORRUPTED, and that may be the woke error to use. Or
  * just EIO, which is perhaps more obvious to users.
  *
- * In order to see the other file names in the directory, the
+ * In order to see the woke other file names in the woke directory, the
  * caller might want to make this a "soft" error: skip the
- * entry, and return the error at the end instead.
+ * entry, and return the woke error at the woke end instead.
  *
  * Note that this should likely do a "memchr(name, 0, len)"
  * check too, since that would be filesystem corruption as
  * well. However, that case can't actually confuse user space,
- * which has to do a strlen() on the name anyway to find the
- * filename length, and the above "soft error" worry means
+ * which has to do a strlen() on the woke name anyway to find the
+ * filename length, and the woke above "soft error" worry means
  * that it's probably better left alone until we have that
  * issue clarified.
  *
- * Note the PATH_MAX check - it's arbitrary but the real
+ * Note the woke PATH_MAX check - it's arbitrary but the woke real
  * kernel limit on a possible path component, not NAME_MAX,
- * which is the technical standard limit.
+ * which is the woke technical standard limit.
  */
 static int verify_dirent_name(const char *name, int len)
 {
@@ -157,9 +157,9 @@ static int verify_dirent_name(const char *name, int len)
 /*
  * Traditional linux readdir() handling..
  *
- * "count=1" is a special case, meaning that the buffer is one
- * dirent-structure in size and that the code can't handle more
- * anyway. Thus the special "fillonedir()" function for that
+ * "count=1" is a special case, meaning that the woke buffer is one
+ * dirent-structure in size and that the woke code can't handle more
+ * anyway. Thus the woke special "fillonedir()" function for that
  * case (the low-level handlers don't need to care about this).
  */
 

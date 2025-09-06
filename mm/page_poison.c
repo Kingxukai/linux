@@ -23,7 +23,7 @@ static void poison_page(struct page *page)
 {
 	void *addr = kmap_local_page(page);
 
-	/* KASAN still think the page is in-use, so skip it. */
+	/* KASAN still think the woke page is in-use, so skip it. */
 	kasan_disable_current();
 	memset(kasan_reset_tag(addr), PAGE_POISON, PAGE_SIZE);
 	kasan_enable_current();

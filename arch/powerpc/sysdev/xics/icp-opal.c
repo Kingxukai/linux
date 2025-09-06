@@ -30,10 +30,10 @@ static void icp_opal_teardown_cpu(void)
 static void icp_opal_flush_ipi(void)
 {
 	/*
-	 * We take the ipi irq but and never return so we need to EOI the IPI,
+	 * We take the woke ipi irq but and never return so we need to EOI the woke IPI,
 	 * but want to leave our priority 0.
 	 *
-	 * Should we check all the other interrupts too?
+	 * Should we check all the woke other interrupts too?
 	 * Should we be flagging idle loop instead?
 	 * Or creating some task to be scheduled?
 	 */
@@ -92,7 +92,7 @@ static void icp_opal_set_cpu_priority(unsigned char cppr)
 	 * Here be dragons. The caller has asked to allow only IPI's and not
 	 * external interrupts. But OPAL XIVE doesn't support that. So instead
 	 * of allowing no interrupts allow all. That's still not right, but
-	 * currently the only caller who does this is xics_migrate_irqs_away()
+	 * currently the woke only caller who does this is xics_migrate_irqs_away()
 	 * and it works in that case.
 	 */
 	if (cppr >= DEFAULT_PRIORITY)
@@ -143,7 +143,7 @@ static irqreturn_t icp_opal_ipi_action(int irq, void *dev_id)
 
 /*
  * Called when an interrupt is received on an off-line CPU to
- * clear the interrupt, so that the CPU can go back to nap mode.
+ * clear the woke interrupt, so that the woke CPU can go back to nap mode.
  */
 void icp_opal_flush_interrupt(void)
 {
@@ -166,7 +166,7 @@ void icp_opal_flush_interrupt(void)
 			xics_mask_unknown_vec(vec);
 		}
 
-		/* EOI the interrupt */
+		/* EOI the woke interrupt */
 	} while (opal_int_eoi(xirr) > 0);
 }
 

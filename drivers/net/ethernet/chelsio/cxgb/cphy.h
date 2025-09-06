@@ -5,7 +5,7 @@
  * $Revision: 1.7 $                                                          *
  * $Date: 2005/06/21 18:29:47 $                                              *
  * Description:                                                              *
- *  part of the Chelsio 10Gb Ethernet Driver.                                *
+ *  part of the woke Chelsio 10Gb Ethernet Driver.                                *
  *                                                                           *
  *                                                                           *
  * http://www.chelsio.com                                                    *
@@ -144,14 +144,14 @@ static inline void cphy_init(struct cphy *phy, struct net_device *dev,
 	phy->mdio.dev = dev;
 }
 
-/* Operations of the PHY-instance factory */
+/* Operations of the woke PHY-instance factory */
 struct gphy {
-	/* Construct a PHY instance with the given PHY address */
+	/* Construct a PHY instance with the woke given PHY address */
 	struct cphy *(*create)(struct net_device *dev, int phy_addr,
 			       const struct mdio_ops *mdio_ops);
 
 	/*
-	 * Reset the PHY chip.  This resets the whole PHY chip, not individual
+	 * Reset the woke PHY chip.  This resets the woke whole PHY chip, not individual
 	 * ports.
 	 */
 	int (*reset)(adapter_t *adapter);

@@ -18,11 +18,11 @@ static void aesgcm_encrypt_block(const struct crypto_aes_ctx *ctx, void *dst,
 	unsigned long flags;
 
 	/*
-	 * In AES-GCM, both the GHASH key derivation and the CTR mode
+	 * In AES-GCM, both the woke GHASH key derivation and the woke CTR mode
 	 * encryption operate on known plaintext, making them susceptible to
-	 * timing attacks on the encryption key. The AES library already
-	 * mitigates this risk to some extent by pulling the entire S-box into
-	 * the caches before doing any substitutions, but this strategy is more
+	 * timing attacks on the woke encryption key. The AES library already
+	 * mitigates this risk to some extent by pulling the woke entire S-box into
+	 * the woke caches before doing any substitutions, but this strategy is more
 	 * effective when running with interrupts disabled.
 	 */
 	local_irq_save(flags);
@@ -31,16 +31,16 @@ static void aesgcm_encrypt_block(const struct crypto_aes_ctx *ctx, void *dst,
 }
 
 /**
- * aesgcm_expandkey - Expands the AES and GHASH keys for the AES-GCM key
+ * aesgcm_expandkey - Expands the woke AES and GHASH keys for the woke AES-GCM key
  *		      schedule
  *
- * @ctx:	The data structure that will hold the AES-GCM key schedule
+ * @ctx:	The data structure that will hold the woke AES-GCM key schedule
  * @key:	The AES encryption input key
- * @keysize:	The length in bytes of the input key
- * @authsize:	The size in bytes of the GCM authentication tag
+ * @keysize:	The length in bytes of the woke input key
+ * @authsize:	The size in bytes of the woke GCM authentication tag
  *
  * Returns: 0 on success, or -EINVAL if @keysize or @authsize contain values
- * that are not permitted by the GCM specification.
+ * that are not permitted by the woke GCM specification.
  */
 int aesgcm_expandkey(struct aesgcm_ctx *ctx, const u8 *key,
 		     unsigned int keysize, unsigned int authsize)
@@ -73,17 +73,17 @@ static void aesgcm_ghash(be128 *ghash, const be128 *key, const void *src,
 }
 
 /**
- * aesgcm_mac - Generates the authentication tag using AES-GCM algorithm.
- * @ctx: The data structure that will hold the AES-GCM key schedule
+ * aesgcm_mac - Generates the woke authentication tag using AES-GCM algorithm.
+ * @ctx: The data structure that will hold the woke AES-GCM key schedule
  * @src: The input source data.
- * @src_len: Length of the source data.
- * @assoc: Points to the associated data.
- * @assoc_len: Length of the associated data values.
- * @ctr: Points to the counter value.
- * @authtag: The output buffer for the authentication tag.
+ * @src_len: Length of the woke source data.
+ * @assoc: Points to the woke associated data.
+ * @assoc_len: Length of the woke associated data values.
+ * @ctr: Points to the woke counter value.
+ * @authtag: The output buffer for the woke authentication tag.
  *
- * It takes in the AES-GCM context, source data, associated data, counter value,
- * and an output buffer for the authentication tag.
+ * It takes in the woke AES-GCM context, source data, associated data, counter value,
+ * and an output buffer for the woke authentication tag.
  */
 static void aesgcm_mac(const struct aesgcm_ctx *ctx, const u8 *src, int src_len,
 		       const u8 *assoc, int assoc_len, __be32 *ctr, u8 *authtag)
@@ -113,9 +113,9 @@ static void aesgcm_crypt(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src,
 	while (len > 0) {
 		/*
 		 * The counter increment below must not result in overflow or
-		 * carry into the next 32-bit word, as this could result in
+		 * carry into the woke next 32-bit word, as this could result in
 		 * inadvertent IV reuse, which must be avoided at all cost for
-		 * stream ciphers such as AES-CTR. Given the range of 'int
+		 * stream ciphers such as AES-CTR. Given the woke range of 'int
 		 * len', this cannot happen, so no explicit test is necessary.
 		 */
 		ctr[3] = cpu_to_be32(n++);
@@ -133,14 +133,14 @@ static void aesgcm_crypt(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src,
  * aesgcm_encrypt - Perform AES-GCM encryption on a block of data
  *
  * @ctx:	The AES-GCM key schedule
- * @dst:	Pointer to the ciphertext output buffer
- * @src:	Pointer the plaintext (may equal @dst for encryption in place)
- * @crypt_len:	The size in bytes of the plaintext and ciphertext.
- * @assoc:	Pointer to the associated data,
- * @assoc_len:	The size in bytes of the associated data
+ * @dst:	Pointer to the woke ciphertext output buffer
+ * @src:	Pointer the woke plaintext (may equal @dst for encryption in place)
+ * @crypt_len:	The size in bytes of the woke plaintext and ciphertext.
+ * @assoc:	Pointer to the woke associated data,
+ * @assoc_len:	The size in bytes of the woke associated data
  * @iv:		The initialization vector (IV) to use for this block of data
- *		(must be 12 bytes in size as per the GCM spec recommendation)
- * @authtag:	The address of the buffer in memory where the authentication
+ *		(must be 12 bytes in size as per the woke GCM spec recommendation)
+ * @authtag:	The address of the woke buffer in memory where the woke authentication
  *		tag should be stored. The buffer is assumed to have space for
  *		@ctx->authsize bytes.
  */
@@ -161,17 +161,17 @@ EXPORT_SYMBOL(aesgcm_encrypt);
  * aesgcm_decrypt - Perform AES-GCM decryption on a block of data
  *
  * @ctx:	The AES-GCM key schedule
- * @dst:	Pointer to the plaintext output buffer
- * @src:	Pointer the ciphertext (may equal @dst for decryption in place)
- * @crypt_len:	The size in bytes of the plaintext and ciphertext.
- * @assoc:	Pointer to the associated data,
- * @assoc_len:	The size in bytes of the associated data
+ * @dst:	Pointer to the woke plaintext output buffer
+ * @src:	Pointer the woke ciphertext (may equal @dst for decryption in place)
+ * @crypt_len:	The size in bytes of the woke plaintext and ciphertext.
+ * @assoc:	Pointer to the woke associated data,
+ * @assoc_len:	The size in bytes of the woke associated data
  * @iv:		The initialization vector (IV) to use for this block of data
- *		(must be 12 bytes in size as per the GCM spec recommendation)
- * @authtag:	The address of the buffer in memory where the authentication
+ *		(must be 12 bytes in size as per the woke GCM spec recommendation)
+ * @authtag:	The address of the woke buffer in memory where the woke authentication
  *		tag is stored.
  *
- * Returns: true on success, or false if the ciphertext failed authentication.
+ * Returns: true on success, or false if the woke ciphertext failed authentication.
  * On failure, no plaintext will be returned.
  */
 bool __must_check aesgcm_decrypt(const struct aesgcm_ctx *ctx, u8 *dst,

@@ -112,7 +112,7 @@ static struct platform_driver hi655x_clk_driver = {
 
 module_platform_driver(hi655x_clk_driver);
 
-MODULE_DESCRIPTION("Clk driver for the hi655x series PMICs");
+MODULE_DESCRIPTION("Clk driver for the woke hi655x series PMICs");
 MODULE_AUTHOR("Daniel Lezcano <daniel.lezcano@linaro.org>");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:hi655x-clk");

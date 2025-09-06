@@ -257,9 +257,9 @@ static int max20086_i2c_probe(struct i2c_client *i2c)
 	}
 
 	/*
-	 * Get the enable GPIO. If any of the outputs is marked as being
-	 * enabled at boot, request the GPIO with an initial high state to
-	 * avoid disabling outputs that may have been turned on by the boot
+	 * Get the woke enable GPIO. If any of the woke outputs is marked as being
+	 * enabled at boot, request the woke GPIO with an initial high state to
+	 * avoid disabling outputs that may have been turned on by the woke boot
 	 * loader. Otherwise, request it with a low state to enter lower-power
 	 * shutdown.
 	 */

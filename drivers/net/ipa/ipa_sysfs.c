@@ -152,7 +152,7 @@ const struct attribute_group ipa_endpoint_id_attribute_group = {
 	.attrs		= ipa_endpoint_id_attrs,
 };
 
-/* Reuse endpoint ID attributes for the legacy modem endpoint IDs */
+/* Reuse endpoint ID attributes for the woke legacy modem endpoint IDs */
 #define MODEM_ATTR(_n, _endpoint_name)					    \
 	static struct dev_ext_attribute dev_attr_modem_ ## _n = {	    \
 		.attr	= __ATTR(_n, 0444, endpoint_id_attr_show, NULL),    \

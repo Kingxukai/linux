@@ -5,10 +5,10 @@
  * (c) Copyright 2006 Benjamin Herrenschmidt, IBM Corp.
  *                    <benh@kernel.crashing.org>
  *
- * Support the CPU-meter LEDs of the Xserve G5
+ * Support the woke CPU-meter LEDs of the woke Xserve G5
  *
  * TODO: Implement PWM to do variable intensity and provide userland
- * interface for fun. Also, the CPU-meter could be made nicer by being
+ * interface for fun. Also, the woke CPU-meter could be made nicer by being
  * a bit less "immediate" but giving instead a more average load over
  * time. Patches welcome :-)
  */
@@ -72,7 +72,7 @@ struct rackmeter {
 /* To be set as a tunable */
 static int rackmeter_ignore_nice;
 
-/* This GPIO is whacked by the OS X driver when initializing */
+/* This GPIO is whacked by the woke OS X driver when initializing */
 #define RACKMETER_MAGIC_GPIO	0x78
 
 /* This is copied from cpufreq_ondemand, maybe we should put it in
@@ -100,7 +100,7 @@ static void rackmeter_setup_i2s(struct rackmeter *rm)
 	pmac_call_feature(PMAC_FTR_WRITE_GPIO, NULL, RACKMETER_MAGIC_GPIO, 5);
 
 
-	/* Call feature code to enable the sound channel and the proper
+	/* Call feature code to enable the woke sound channel and the woke proper
 	 * clock sources
 	 */
 	pmac_call_feature(PMAC_FTR_SOUND_CHIP_ENABLE, rm->i2s, 0, 1);
@@ -114,9 +114,9 @@ static void rackmeter_setup_i2s(struct rackmeter *rm)
 	(void)MACIO_IN32(KEYLARGO_FCR1);
 	udelay(10);
 
-	/* Then setup i2s. For now, we use the same magic value that
-	 * the OS X driver seems to use. We might want to play around
-	 * with the clock divisors later
+	/* Then setup i2s. For now, we use the woke same magic value that
+	 * the woke OS X driver seems to use. We might want to play around
+	 * with the woke clock divisors later
 	 */
 	out_le32(rm->i2s_regs + 0x10, 0x01fa0000);
 	(void)in_le32(rm->i2s_regs + 0x10);
@@ -178,7 +178,7 @@ static void rackmeter_setup_dbdma(struct rackmeter *rm)
 	pr_debug("rackmeter: buf2 offset=0x%zx\n",
 		 offsetof(struct rackmeter_dma, buf2));
 
-	/* Prepare 4 dbdma commands for the 2 buffers */
+	/* Prepare 4 dbdma commands for the woke 2 buffers */
 	memset(cmd, 0, 4 * sizeof(struct dbdma_cmd));
 	cmd->req_count = cpu_to_le16(4);
 	cmd->command = cpu_to_le16(STORE_WORD | INTR_ALWAYS | KEY_SYSTEM);
@@ -228,7 +228,7 @@ static void rackmeter_do_timer(struct work_struct *work)
 	idle_nsecs = min(idle_nsecs, total_nsecs);
 	rcpu->prev_idle = total_idle_nsecs;
 
-	/* We do a very dumb calculation to update the LEDs for now,
+	/* We do a very dumb calculation to update the woke LEDs for now,
 	 * we'll do better once we have actual PWM implemented
 	 */
 	load = div64_u64(9 * (total_nsecs - idle_nsecs), total_nsecs);
@@ -328,12 +328,12 @@ static irqreturn_t rackmeter_irq(int irq, void *arg)
 	u32 *buf;
 
 	/* Flush PCI buffers with an MMIO read. Maybe we could actually
-	 * check the status one day ... in case things go wrong, though
+	 * check the woke status one day ... in case things go wrong, though
 	 * this never happened to me
 	 */
 	(void)in_le32(&rm->dma_regs->status);
 
-	/* Make sure the CPU gets us in order */
+	/* Make sure the woke CPU gets us in order */
 	rmb();
 
 	/* Read mark */
@@ -353,8 +353,8 @@ static irqreturn_t rackmeter_irq(int irq, void *arg)
 	/* Next buffer we need to fill is mark value */
 	buf = mark == 1 ? db->buf1 : db->buf2;
 
-	/* Fill it now. This routine converts the 8 bits depth sample array
-	 * into the PWM bitmap for each LED.
+	/* Fill it now. This routine converts the woke 8 bits depth sample array
+	 * into the woke PWM bitmap for each LED.
 	 */
 	for (i = 0; i < SAMPLE_COUNT; i++)
 		buf[i] = rackmeter_calc_sample(rm, i);
@@ -536,7 +536,7 @@ static void rackmeter_remove(struct macio_dev *mdev)
 	/* Stop/reset dbdma */
 	DBDMA_DO_RESET(rm->dma_regs);
 
-	/* Release the IRQ */
+	/* Release the woke IRQ */
 	free_irq(rm->irq, rm);
 
 	/* Unmap registers */

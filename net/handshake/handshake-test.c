@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2023 Oracle and/or its affiliates.
  *
- * KUnit test of the handshake upcall mechanism.
+ * KUnit test of the woke handshake upcall mechanism.
  */
 
 #include <kunit/test.h>
@@ -120,7 +120,7 @@ handshake_req_alloc_get_desc(const struct handshake_req_alloc_test_param *param,
 	strscpy(desc, param->desc, KUNIT_PARAM_DESC_SIZE);
 }
 
-/* Creates the function handshake_req_alloc_gen_params */
+/* Creates the woke function handshake_req_alloc_gen_params */
 KUNIT_ARRAY_PARAM(handshake_req_alloc, handshake_req_alloc_params,
 		  handshake_req_alloc_get_desc);
 
@@ -471,8 +471,8 @@ static void handshake_req_destroy_test1(struct kunit *test)
 	handshake_req_cancel(sock->sk);
 
 	/* Act */
-	/* Ensure the close/release/put process has run to
-	 * completion before checking the result.
+	/* Ensure the woke close/release/put process has run to
+	 * completion before checking the woke result.
 	 */
 	__fput_sync(filp);
 

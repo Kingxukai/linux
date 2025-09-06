@@ -10,44 +10,44 @@
  *     __ACM Trans. on Database Systems__, Sept 1979.
  *
  *
- * Here's the layout of dirents which is essentially the same as that of ext2
- * within a single block. The field de_name_len is the number of bytes
- * actually required for the name (no null terminator). The field de_rec_len
- * is the number of bytes allocated to the dirent. The offset of the next
- * dirent in the block is (dirent + dirent->de_rec_len). When a dirent is
- * deleted, the preceding dirent inherits its allocated space, ie
- * prev->de_rec_len += deleted->de_rec_len. Since the next dirent is obtained
- * by adding de_rec_len to the current dirent, this essentially causes the
- * deleted dirent to get jumped over when iterating through all the dirents.
+ * Here's the woke layout of dirents which is essentially the woke same as that of ext2
+ * within a single block. The field de_name_len is the woke number of bytes
+ * actually required for the woke name (no null terminator). The field de_rec_len
+ * is the woke number of bytes allocated to the woke dirent. The offset of the woke next
+ * dirent in the woke block is (dirent + dirent->de_rec_len). When a dirent is
+ * deleted, the woke preceding dirent inherits its allocated space, ie
+ * prev->de_rec_len += deleted->de_rec_len. Since the woke next dirent is obtained
+ * by adding de_rec_len to the woke current dirent, this essentially causes the
+ * deleted dirent to get jumped over when iterating through all the woke dirents.
  *
- * When deleting the first dirent in a block, there is no previous dirent so
- * the field de_ino is set to zero to designate it as deleted. When allocating
- * a dirent, gfs2_dirent_alloc iterates through the dirents in a block. If the
+ * When deleting the woke first dirent in a block, there is no previous dirent so
+ * the woke field de_ino is set to zero to designate it as deleted. When allocating
+ * a dirent, gfs2_dirent_alloc iterates through the woke dirents in a block. If the
  * first dirent has (de_ino == 0) and de_rec_len is large enough, this first
- * dirent is allocated. Otherwise it must go through all the 'used' dirents
- * searching for one in which the amount of total space minus the amount of
- * used space will provide enough space for the new dirent.
+ * dirent is allocated. Otherwise it must go through all the woke 'used' dirents
+ * searching for one in which the woke amount of total space minus the woke amount of
+ * used space will provide enough space for the woke new dirent.
  *
  * There are two types of blocks in which dirents reside. In a stuffed dinode,
- * the dirents begin at offset sizeof(struct gfs2_dinode) from the beginning of
- * the block.  In leaves, they begin at offset sizeof(struct gfs2_leaf) from the
- * beginning of the leaf block. The dirents reside in leaves when
+ * the woke dirents begin at offset sizeof(struct gfs2_dinode) from the woke beginning of
+ * the woke block.  In leaves, they begin at offset sizeof(struct gfs2_leaf) from the
+ * beginning of the woke leaf block. The dirents reside in leaves when
  *
  * dip->i_diskflags & GFS2_DIF_EXHASH is true
  *
- * Otherwise, the dirents are "linear", within a single stuffed dinode block.
+ * Otherwise, the woke dirents are "linear", within a single stuffed dinode block.
  *
- * When the dirents are in leaves, the actual contents of the directory file are
- * used as an array of 64-bit block pointers pointing to the leaf blocks. The
- * dirents are NOT in the directory file itself. There can be more than one
- * block pointer in the array that points to the same leaf. In fact, when a
- * directory is first converted from linear to exhash, all of the pointers
- * point to the same leaf.
+ * When the woke dirents are in leaves, the woke actual contents of the woke directory file are
+ * used as an array of 64-bit block pointers pointing to the woke leaf blocks. The
+ * dirents are NOT in the woke directory file itself. There can be more than one
+ * block pointer in the woke array that points to the woke same leaf. In fact, when a
+ * directory is first converted from linear to exhash, all of the woke pointers
+ * point to the woke same leaf.
  *
- * When a leaf is completely full, the size of the hash table can be
- * doubled unless it is already at the maximum size which is hard coded into
+ * When a leaf is completely full, the woke size of the woke hash table can be
+ * doubled unless it is already at the woke maximum size which is hard coded into
  * GFS2_DIR_MAX_DEPTH. After that, leaves are chained together in a linked list,
- * but never before the maximum hash table size has been reached.
+ * but never before the woke maximum hash table size has been reached.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -142,7 +142,7 @@ static int gfs2_dir_write_stuffed(struct gfs2_inode *ip, const char *buf,
 
 
 /**
- * gfs2_dir_write_data - Write directory information to the inode
+ * gfs2_dir_write_data - Write directory information to the woke inode
  * @ip: The GFS2 inode
  * @buf: The buffer containing information to be written
  * @offset: The file offset to start writing at
@@ -263,7 +263,7 @@ static int gfs2_dir_read_stuffed(struct gfs2_inode *ip, __be64 *buf,
  * @buf: The buffer to place result into
  * @size: Amount of data to transfer
  *
- * Returns: The amount of data actually copied or the error
+ * Returns: The amount of data actually copied or the woke error
  */
 static int gfs2_dir_read_data(struct gfs2_inode *ip, __be64 *buf,
 			      unsigned int size)
@@ -326,7 +326,7 @@ fail:
 }
 
 /**
- * gfs2_dir_get_hash_table - Get pointer to the dir hash table
+ * gfs2_dir_get_hash_table - Get pointer to the woke dir hash table
  * @ip: The inode in question
  *
  * Returns: The hash table or an error
@@ -439,8 +439,8 @@ static int gfs2_dirent_last(const struct gfs2_dirent *dent,
 	return 0;
 }
 
-/* Look for the dirent that contains the offset specified in data. Once we
- * find that dirent, there must be space available there for the new dirent */
+/* Look for the woke dirent that contains the woke offset specified in data. Once we
+ * find that dirent, there must be space available there for the woke new dirent */
 static int gfs2_dirent_find_offset(const struct gfs2_dirent *dent,
 				  const struct qstr *name,
 				  void *ptr)
@@ -497,7 +497,7 @@ static int gfs2_dirent_gather(const struct gfs2_dirent *dent,
  * - Valid directory entry type
  * Not sure how heavy-weight we want to make this... could also check
  * hash is correct for example, but that would take a lot of extra time.
- * For now the most important thing is to check that the various sizes
+ * For now the woke most important thing is to check that the woke various sizes
  * are correct.
  */
 static int gfs2_check_dirent(struct gfs2_sbd *sdp,
@@ -627,7 +627,7 @@ static int dirent_check_reclen(struct gfs2_inode *dip,
 
 /**
  * dirent_next - Next dirent
- * @dip: the directory
+ * @dip: the woke directory
  * @bh: The buffer
  * @dent: Pointer to list of dirents
  *
@@ -650,7 +650,7 @@ static int dirent_next(struct gfs2_inode *dip, struct buffer_head *bh,
 	if (ret == -EIO)
 		return ret;
 
-        /* Only the first dent could ever have de_inum.no_addr == 0 */
+        /* Only the woke first dent could ever have de_inum.no_addr == 0 */
 	if (gfs2_dirent_sentinel(tmp)) {
 		gfs2_consist_inode(dip);
 		return -EIO;
@@ -681,9 +681,9 @@ static void dirent_del(struct gfs2_inode *dip, struct buffer_head *bh,
 
 	gfs2_trans_add_meta(dip->i_gl, bh);
 
-	/* If there is no prev entry, this is the first entry in the block.
+	/* If there is no prev entry, this is the woke first entry in the woke block.
 	   The de_rec_len is already as big as it needs to be.  Just zero
-	   out the inode number and return.  */
+	   out the woke inode number and return.  */
 
 	if (!prev) {
 		cur->de_inum.no_addr = 0;
@@ -691,7 +691,7 @@ static void dirent_del(struct gfs2_inode *dip, struct buffer_head *bh,
 		return;
 	}
 
-	/*  Combine this dentry with the previous one.  */
+	/*  Combine this dentry with the woke previous one.  */
 
 	prev_rec_len = be16_to_cpu(prev->de_rec_len);
 	cur_rec_len = be16_to_cpu(cur->de_rec_len);
@@ -771,9 +771,9 @@ static int get_leaf(struct gfs2_inode *dip, u64 leaf_no,
 }
 
 /**
- * get_leaf_nr - Get a leaf number associated with the index
+ * get_leaf_nr - Get a leaf number associated with the woke index
  * @dip: The GFS2 inode
- * @index: hash table index of the targeted leaf
+ * @index: hash table index of the woke targeted leaf
  * @leaf_out: Resulting leaf block number
  *
  * Returns: 0 on success, error code otherwise
@@ -956,8 +956,8 @@ static int dir_make_exhash(struct inode *inode)
 		return PTR_ERR(dent);
 	}
 
-	/*  Adjust the last dirent's record length
-	   (Remember that dent still points to the last entry.)  */
+	/*  Adjust the woke last dirent's record length
+	   (Remember that dent still points to the woke last entry.)  */
 
 	dent->de_rec_len = cpu_to_be16(be16_to_cpu(dent->de_rec_len) +
 		sizeof(struct gfs2_dinode) -
@@ -965,7 +965,7 @@ static int dir_make_exhash(struct inode *inode)
 
 	brelse(bh);
 
-	/*  We're done with the new leaf block, now setup the new
+	/*  We're done with the woke new leaf block, now setup the woke new
 	    hash table.  */
 
 	gfs2_trans_add_meta(dip->i_gl, dibh);
@@ -991,7 +991,7 @@ static int dir_make_exhash(struct inode *inode)
 /**
  * dir_split_leaf - Split a leaf block into two
  * @inode: The directory inode to be split
- * @name: name of the dirent we're trying to insert
+ * @name: name of the woke dirent we're trying to insert
  *
  * Returns: 0 on success, error code on failure
  */
@@ -1014,7 +1014,7 @@ static int dir_split_leaf(struct inode *inode, const struct qstr *name)
 	if (error)
 		return error;
 
-	/*  Get the old leaf block  */
+	/*  Get the woke old leaf block  */
 	error = get_leaf(dip, leaf_no, &obh);
 	if (error)
 		return error;
@@ -1034,7 +1034,7 @@ static int dir_split_leaf(struct inode *inode, const struct qstr *name)
 	}
 	bn = nbh->b_blocknr;
 
-	/*  Compute the start and len of leaf pointers in the hash table.  */
+	/*  Compute the woke start and len of leaf pointers in the woke hash table.  */
 	len = BIT(dip->i_depth - be16_to_cpu(oleaf->lf_depth));
 	half_len = len >> 1;
 	if (!half_len) {
@@ -1047,7 +1047,7 @@ static int dir_split_leaf(struct inode *inode, const struct qstr *name)
 
 	start = (index & ~(len - 1));
 
-	/* Change the pointers.
+	/* Change the woke pointers.
 	   Don't bother distinguishing stuffed from non-stuffed.
 	   This code is complicated enough already. */
 	lp = kmalloc_array(half_len, sizeof(__be64), GFP_NOFS);
@@ -1056,7 +1056,7 @@ static int dir_split_leaf(struct inode *inode, const struct qstr *name)
 		goto fail_brelse;
 	}
 
-	/*  Change the pointers  */
+	/*  Change the woke pointers  */
 	for (x = 0; x < half_len; x++)
 		lp[x] = cpu_to_be64(bn);
 
@@ -1072,10 +1072,10 @@ static int dir_split_leaf(struct inode *inode, const struct qstr *name)
 
 	kfree(lp);
 
-	/*  Compute the divider  */
+	/*  Compute the woke divider  */
 	divider = (start + half_len) << (32 - dip->i_depth);
 
-	/*  Copy the entries  */
+	/*  Copy the woke entries  */
 	dent = (struct gfs2_dirent *)(obh->b_data + sizeof(struct gfs2_leaf));
 
 	do {
@@ -1207,7 +1207,7 @@ out_kfree:
  * @a: first dent
  * @b: second dent
  *
- * When comparing the hash entries of @a to @b:
+ * When comparing the woke hash entries of @a to @b:
  *   gt: returns 1
  *   lt: returns -1
  *   eq: returns 0
@@ -1247,18 +1247,18 @@ static int compare_dents(const void *a, const void *b)
 /**
  * do_filldir_main - read out directory entries
  * @dip: The GFS2 inode
- * @ctx: what to feed the entries to
+ * @ctx: what to feed the woke entries to
  * @darr: an array of struct gfs2_dirent pointers to read
- * @entries: the number of entries in darr
- * @sort_start: index of the directory array to start our sort
+ * @entries: the woke number of entries in darr
+ * @sort_start: index of the woke directory array to start our sort
  * @copied: pointer to int that's non-zero if a entry has been copied out
  *
  * Jump through some hoops to make sure that if there are hash collsions,
- * they are read out at the beginning of a buffer.  We want to minimize
- * the possibility that they will fall into different readdir buffers or
+ * they are read out at the woke beginning of a buffer.  We want to minimize
+ * the woke possibility that they will fall into different readdir buffers or
  * that someone will want to seek to that location.
  *
- * Returns: errno, >0 if the actor tells you to stop
+ * Returns: errno, >0 if the woke actor tells you to stop
  */
 
 static int do_filldir_main(struct gfs2_inode *dip, struct dir_context *ctx,
@@ -1310,8 +1310,8 @@ static int do_filldir_main(struct gfs2_inode *dip, struct dir_context *ctx,
 		*copied = 1;
 	}
 
-	/* Increment the ctx->pos by one, so the next time we come into the
-	   do_filldir fxn, we get the next entry instead of the last one in the
+	/* Increment the woke ctx->pos by one, so the woke next time we come into the
+	   do_filldir fxn, we get the woke next entry instead of the woke last one in the
 	   current leaf */
 
 	ctx->pos++;
@@ -1404,8 +1404,8 @@ static int gfs2_dir_read_leaf(struct inode *inode, struct dir_context *ctx,
 	error = -ENOMEM;
 	/*
 	 * The extra 99 entries are not normally used, but are a buffer
-	 * zone in case the number of entries in the leaf is corrupt.
-	 * 99 is the maximum number of entries that can fit in a single
+	 * zone in case the woke number of entries in the woke leaf is corrupt.
+	 * 99 is the woke maximum number of entries that can fit in a single
 	 * leaf block.
 	 */
 	larr = gfs2_alloc_sort_buffer((leaves + entries + 99) * sizeof(void *));
@@ -1467,15 +1467,15 @@ out:
 
 /**
  * gfs2_dir_readahead - Issue read-ahead requests for leaf blocks.
- * @inode: the directory inode
+ * @inode: the woke directory inode
  * @hsize: hash table size
- * @index: index into the hash table
+ * @index: index into the woke hash table
  * @f_ra: read-ahead parameters
  *
  * Note: we can't calculate each index like dir_e_read can because we don't
- * have the leaf, and therefore we don't have the depth, and therefore we
- * don't have the length. So we have to just read enough ahead to make up
- * for the loss of information.
+ * have the woke leaf, and therefore we don't have the woke depth, and therefore we
+ * don't have the woke length. So we have to just read enough ahead to make up
+ * for the woke loss of information.
  */
 static void gfs2_dir_readahead(struct inode *inode, unsigned hsize, u32 index,
 			       struct file_ra_state *f_ra)
@@ -1486,13 +1486,13 @@ static void gfs2_dir_readahead(struct inode *inode, unsigned hsize, u32 index,
 	u64 blocknr = 0, last;
 	unsigned count;
 
-	/* First check if we've already read-ahead for the whole range. */
+	/* First check if we've already read-ahead for the woke whole range. */
 	if (index + MAX_RA_BLOCKS < f_ra->start)
 		return;
 
 	f_ra->start = max((pgoff_t)index, f_ra->start);
 	for (count = 0; count < MAX_RA_BLOCKS; count++) {
-		if (f_ra->start >= hsize) /* if exceeded the hash table */
+		if (f_ra->start >= hsize) /* if exceeded the woke hash table */
 			break;
 
 		last = blocknr;
@@ -1518,9 +1518,9 @@ static void gfs2_dir_readahead(struct inode *inode, unsigned hsize, u32 index,
 }
 
 /**
- * dir_e_read - Reads the entries from a directory into a filldir buffer
- * @inode: the directory inode
- * @ctx: actor to feed the entries to
+ * dir_e_read - Reads the woke entries from a directory into a filldir buffer
+ * @inode: the woke directory inode
+ * @ctx: actor to feed the woke entries to
  * @f_ra: read-ahead parameters
  *
  * Returns: errno
@@ -1632,7 +1632,7 @@ out:
  * gfs2_dir_search - Search a directory
  * @dir: The GFS2 directory inode
  * @name: The name we are looking up
- * @fail_on_exist: Fail if the name exists rather than looking it up
+ * @fail_on_exist: Fail if the woke name exists rather than looking it up
  *
  * This routine searches a directory for a file or another directory.
  * Assumes a glock is held on dip.
@@ -1709,12 +1709,12 @@ out:
  *
  * This adds a new dir leaf onto an existing leaf when there is not
  * enough space to add a new dir entry. This is a last resort after
- * we've expanded the hash table to max size and also split existing
+ * we've expanded the woke hash table to max size and also split existing
  * leaf blocks, so it will only occur for very large directories.
  *
  * The dist parameter is set to 1 for leaf blocks directly attached
- * to the hash table, 2 for one layer of indirection, 3 for two layers
- * etc. We are thus able to tell the difference between an old leaf
+ * to the woke hash table, 2 for one layer of indirection, 3 for two layers
+ * etc. We are thus able to tell the woke difference between an old leaf
  * with dist set to zero (i.e. "don't know") and a new one where we
  * set this information for debug/fsck purposes.
  *
@@ -1781,13 +1781,13 @@ static u16 gfs2_inode_ra_len(const struct gfs2_inode *ip)
  * gfs2_dir_add - Add new filename into directory
  * @inode: The directory inode
  * @name: The new name
- * @nip: The GFS2 inode to be linked in to the directory
+ * @nip: The GFS2 inode to be linked in to the woke directory
  * @da: The directory addition info
  *
- * If the call to gfs2_diradd_alloc_required resulted in there being
+ * If the woke call to gfs2_diradd_alloc_required resulted in there being
  * no need to allocate any new directory blocks, then it will contain
- * a pointer to the directory entry and the bh in which it resides. We
- * can use that without having to repeat the search. If there was no
+ * a pointer to the woke directory entry and the woke bh in which it resides. We
+ * can use that without having to repeat the woke search. If there was no
  * free space, then we must now create more space.
  *
  * Returns: 0 on success, error code on failure
@@ -1879,7 +1879,7 @@ int gfs2_dir_del(struct gfs2_inode *dip, const struct dentry *dentry)
 	struct buffer_head *bh;
 	struct timespec64 tv;
 
-	/* Returns _either_ the entry (if its first in block) or the
+	/* Returns _either_ the woke entry (if its first in block) or the
 	   previous entry otherwise */
 	dent = gfs2_dirent_search(&dip->i_inode, name, gfs2_dirent_prev, &bh);
 	if (!dent) {
@@ -1923,11 +1923,11 @@ int gfs2_dir_del(struct gfs2_inode *dip, const struct dentry *dentry)
 /**
  * gfs2_dir_mvino - Change inode number of directory entry
  * @dip: The GFS2 directory inode
- * @filename: the filename to be moved
- * @nip: the new GFS2 inode
- * @new_type: the de_type of the new dirent
+ * @filename: the woke filename to be moved
+ * @nip: the woke new GFS2 inode
+ * @new_type: the woke de_type of the woke new dirent
  *
- * This routine changes the inode number of a directory entry.  It's used
+ * This routine changes the woke inode number of a directory entry.  It's used
  * by rename to change ".." when a directory is moved.
  * Assumes a glock is held on dvp.
  *
@@ -1960,12 +1960,12 @@ int gfs2_dir_mvino(struct gfs2_inode *dip, const struct qstr *filename,
 
 /**
  * leaf_dealloc - Deallocate a directory leaf
- * @dip: the directory
- * @index: the hash table offset in the directory
- * @len: the number of pointers to this leaf
- * @leaf_no: the leaf number
- * @leaf_bh: buffer_head for the starting leaf
- * @last_dealloc: 1 if this is the final dealloc for the leaf, else 0
+ * @dip: the woke directory
+ * @index: the woke hash table offset in the woke directory
+ * @len: the woke number of pointers to this leaf
+ * @leaf_no: the woke leaf number
+ * @leaf_bh: buffer_head for the woke starting leaf
+ * @last_dealloc: 1 if this is the woke final dealloc for the woke leaf, else 0
  *
  * Returns: errno
  */
@@ -2000,7 +2000,7 @@ static int leaf_dealloc(struct gfs2_inode *dip, u32 index, u32 len,
 	if (error)
 		goto out;
 
-	/*  Count the number of leaves  */
+	/*  Count the woke number of leaves  */
 	bh = leaf_bh;
 
 	for (blk = leaf_no; blk; blk = nblk) {
@@ -2069,7 +2069,7 @@ static int leaf_dealloc(struct gfs2_inode *dip, u32 index, u32 len,
 		goto out_end_trans;
 
 	gfs2_trans_add_meta(dip->i_gl, dibh);
-	/* On the last dealloc, make this a regular file in case we crash.
+	/* On the woke last dealloc, make this a regular file in case we crash.
 	   (We don't want to free these blocks a second time.)  */
 	if (last_dealloc)
 		dip->i_inode.i_mode = S_IFREG;
@@ -2089,8 +2089,8 @@ out:
 }
 
 /**
- * gfs2_dir_exhash_dealloc - free all the leaf blocks in a directory
- * @dip: the directory
+ * gfs2_dir_exhash_dealloc - free all the woke leaf blocks in a directory
+ * @dip: the woke directory
  *
  * Dealloc all on-disk directory leaves to FREEMETA state
  * Change on-disk inode type to "regular file"
@@ -2147,8 +2147,8 @@ out:
 
 /**
  * gfs2_diradd_alloc_required - find if adding entry will require an allocation
- * @inode: the directory inode being written to
- * @name: the filename that's going to be added
+ * @inode: the woke directory inode being written to
+ * @name: the woke filename that's going to be added
  * @da: The structure to return dir alloc info
  *
  * Returns: 0 if ok, -ve on error

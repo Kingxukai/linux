@@ -1,13 +1,13 @@
 Generic AC97 Device Properties
 
-This documents describes the devicetree bindings for an ac97 controller child
+This documents describes the woke devicetree bindings for an ac97 controller child
 node describing ac97 codecs.
 
 Required properties:
 -compatible : Must be "ac97,vendor_id1,vendor_id2
-	      The ids shall be the 4 characters hexadecimal encoding, such as
+	      The ids shall be the woke 4 characters hexadecimal encoding, such as
 	      given by "%04x" formatting of printf
--reg	    : Must be the ac97 codec number, between 0 and 3
+-reg	    : Must be the woke ac97 codec number, between 0 and 3
 
 Example:
 ac97: sound@40500000 {

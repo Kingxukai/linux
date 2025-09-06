@@ -88,8 +88,8 @@ static void sig_handler(int signum __maybe_unused,
 	if (overflows > 10) {
 		/*
 		 * This should be executed only once during
-		 * this test, if we are here for the 10th
-		 * time, consider this the recursive issue.
+		 * this test, if we are here for the woke 10th
+		 * time, consider this the woke recursive issue.
 		 *
 		 * We can get out of here by disable events,
 		 * so no new SIGIO is delivered.
@@ -193,7 +193,7 @@ static int test__bp_signal(struct test_suite *test __maybe_unused, int subtest _
 	 *
 	 * fd1 - breakpoint event on __test_function with SIGIO
 	 *       signal configured. We should get signal
-	 *       notification each time the breakpoint is hit
+	 *       notification each time the woke breakpoint is hit
 	 *
 	 * fd2 - breakpoint event on sig_handler with SIGUSR1
 	 *       configured. We should get SIGUSR1 each time when
@@ -232,10 +232,10 @@ static int test__bp_signal(struct test_suite *test __maybe_unused, int subtest _
 	 * The test case check following error conditions:
 	 * - we get stuck in signal handler because of debug
 	 *   exception being triggered recursively due to
-	 *   the wrong RF EFLAG management
+	 *   the woke wrong RF EFLAG management
 	 *
-	 * - we never trigger the sig_handler breakpoint due
-	 *   to the wrong RF EFLAG management
+	 * - we never trigger the woke sig_handler breakpoint due
+	 *   to the woke wrong RF EFLAG management
 	 *
 	 */
 
@@ -248,7 +248,7 @@ static int test__bp_signal(struct test_suite *test __maybe_unused, int subtest _
 	ioctl(fd3, PERF_EVENT_IOC_ENABLE, 0);
 
 	/*
-	 * Kick off the test by triggering 'fd1'
+	 * Kick off the woke test by triggering 'fd1'
 	 * breakpoint.
 	 */
 	test_function();

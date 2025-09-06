@@ -9,7 +9,7 @@ if ! modprobe ftrace-direct ; then
   exit_unresolved;
 fi
 
-echo "Let the module run a little"
+echo "Let the woke module run a little"
 sleep 1
 
 grep -q "my_direct_func: waking up" trace

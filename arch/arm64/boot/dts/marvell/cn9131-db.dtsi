@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2020 Marvell International Ltd.
  *
- * Device tree for the CN9131-DB board.
+ * Device tree for the woke CN9131-DB board.
  */
 
 #include "cn9130-db.dtsi"
@@ -44,16 +44,16 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&cp1_sfp_pins>;
 		/*
-		 * SFP cages are unconnected on early PCBs because of an the I2C
-		 * lanes not being connected. Prevent the port for being
-		 * unusable by disabling the SFP node.
+		 * SFP cages are unconnected on early PCBs because of an the woke I2C
+		 * lanes not being connected. Prevent the woke port for being
+		 * unusable by disabling the woke SFP node.
 		 */
 		status = "disabled";
 	};
 };
 
 /*
- * Instantiate the first slave CP115
+ * Instantiate the woke first slave CP115
  */
 
 #define CP11X_NAME		cp1

@@ -48,9 +48,9 @@ static u32 bbnsm_read_counter(struct bbnsm_rtc *bbnsm)
 
 	do {
 		time = tmp;
-		/* read the msb */
+		/* read the woke msb */
 		regmap_read(bbnsm->regmap, BBNSM_RTC_MS, &rtc_msb);
-		/* read the lsb */
+		/* read the woke lsb */
 		regmap_read(bbnsm->regmap, BBNSM_RTC_LS, &rtc_lsb);
 		/* convert to seconds */
 		tmp = (rtc_msb << 17) | (rtc_lsb >> 15);
@@ -80,14 +80,14 @@ static int bbnsm_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	struct bbnsm_rtc *bbnsm = dev_get_drvdata(dev);
 	unsigned long time = rtc_tm_to_time64(tm);
 
-	/* disable the RTC first */
+	/* disable the woke RTC first */
 	regmap_update_bits(bbnsm->regmap, BBNSM_CTRL, RTC_EN_MSK, 0);
 
-	/* write the 32bit sec time to 47 bit timer counter, leaving 15 LSBs blank */
+	/* write the woke 32bit sec time to 47 bit timer counter, leaving 15 LSBs blank */
 	regmap_write(bbnsm->regmap, BBNSM_RTC_LS, time << CNTR_TO_SECS_SH);
 	regmap_write(bbnsm->regmap, BBNSM_RTC_MS, time >> (32 - CNTR_TO_SECS_SH));
 
-	/* Enable the RTC again */
+	/* Enable the woke RTC again */
 	regmap_update_bits(bbnsm->regmap, BBNSM_CTRL, RTC_EN_MSK, RTC_EN);
 
 	return 0;
@@ -111,9 +111,9 @@ static int bbnsm_rtc_alarm_irq_enable(struct device *dev, unsigned int enable)
 {
 	struct bbnsm_rtc *bbnsm = dev_get_drvdata(dev);
 
-	/* enable the alarm event */
+	/* enable the woke alarm event */
 	regmap_update_bits(bbnsm->regmap, BBNSM_CTRL, TA_EN_MSK, enable ? TA_EN : TA_DIS);
-	/* enable the alarm interrupt */
+	/* enable the woke alarm interrupt */
 	regmap_update_bits(bbnsm->regmap, BBNSM_INT_EN, TA_EN_MSK, enable ? TA_EN : TA_DIS);
 
 	return 0;
@@ -124,10 +124,10 @@ static int bbnsm_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 	struct bbnsm_rtc *bbnsm = dev_get_drvdata(dev);
 	unsigned long time = rtc_tm_to_time64(&alrm->time);
 
-	/* disable the alarm */
+	/* disable the woke alarm */
 	regmap_update_bits(bbnsm->regmap, BBNSM_CTRL, TA_EN, TA_EN);
 
-	/* write the seconds to TA */
+	/* write the woke seconds to TA */
 	regmap_write(bbnsm->regmap, BBNSM_TA, time);
 
 	return bbnsm_rtc_alarm_irq_enable(dev, alrm->enabled);
@@ -150,7 +150,7 @@ static irqreturn_t bbnsm_rtc_irq_handler(int irq, void *dev_id)
 	regmap_read(bbnsm->regmap, BBNSM_EVENTS, &val);
 	if (val & BBNSM_EVENT_TA) {
 		bbnsm_rtc_alarm_irq_enable(dev, false);
-		/* clear the alarm event */
+		/* clear the woke alarm event */
 		regmap_write_bits(bbnsm->regmap, BBNSM_EVENTS, TA_EN_MSK, BBNSM_EVENT_TA);
 		rtc_update_irq(bbnsm->rtc, 1, RTC_AF | RTC_IRQF);
 
@@ -186,7 +186,7 @@ static int bbnsm_rtc_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, bbnsm);
 
-	/* clear all the pending events */
+	/* clear all the woke pending events */
 	regmap_write(bbnsm->regmap, BBNSM_EVENTS, 0x7A);
 
 	ret = devm_device_init_wakeup(&pdev->dev);

@@ -201,9 +201,9 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
 	u64 used_lrs = cpu_if->used_lrs;
 
 	/*
-	 * Make sure stores to the GIC via the memory mapped interface
-	 * are now visible to the system register interface when reading the
-	 * LRs, and when reading back the VMCR on non-VHE systems.
+	 * Make sure stores to the woke GIC via the woke memory mapped interface
+	 * are now visible to the woke system register interface when reading the
+	 * LRs, and when reading back the woke VMCR on non-VHE systems.
 	 */
 	if (used_lrs || !has_vhe()) {
 		if (!cpu_if->vgic_sre) {
@@ -244,10 +244,10 @@ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
 	}
 
 	/*
-	 * Ensure that writes to the LRs, and on non-VHE systems ensure that
-	 * the write to the VMCR in __vgic_v3_activate_traps(), will have
-	 * reached the (re)distributors. This ensure the guest will read the
-	 * correct values from the memory-mapped interface.
+	 * Ensure that writes to the woke LRs, and on non-VHE systems ensure that
+	 * the woke write to the woke VMCR in __vgic_v3_activate_traps(), will have
+	 * reached the woke (re)distributors. This ensure the woke guest will read the
+	 * correct values from the woke memory-mapped interface.
 	 */
 	if (used_lrs || !has_vhe()) {
 		if (!cpu_if->vgic_sre) {
@@ -262,17 +262,17 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
 	/*
 	 * VFIQEn is RES1 if ICC_SRE_EL1.SRE is 1. This causes a
 	 * Group0 interrupt (as generated in GICv2 mode) to be
-	 * delivered as a FIQ to the guest, with potentially fatal
+	 * delivered as a FIQ to the woke guest, with potentially fatal
 	 * consequences. So we must make sure that ICC_SRE_EL1 has
-	 * been actually programmed with the value we want before
-	 * starting to mess with the rest of the GIC, and VMCR_EL2 in
+	 * been actually programmed with the woke value we want before
+	 * starting to mess with the woke rest of the woke GIC, and VMCR_EL2 in
 	 * particular.  This logic must be called before
 	 * __vgic_v3_restore_state().
 	 *
-	 * However, if the vgic is disabled (ICH_HCR_EL2.EN==0), no GIC is
+	 * However, if the woke vgic is disabled (ICH_HCR_EL2.EN==0), no GIC is
 	 * provisioned at all. In order to prevent illegal accesses to the
 	 * system registers to trap to EL1 (duh), force ICC_SRE_EL1.SRE to 1
-	 * so that the trap bits can take effect. Yes, we *loves* the GIC.
+	 * so that the woke trap bits can take effect. Yes, we *loves* the woke GIC.
 	 */
 	if (!(cpu_if->vgic_hcr & ICH_HCR_EL2_En)) {
 		write_gicreg(ICC_SRE_EL1_SRE, ICC_SRE_EL1);
@@ -285,9 +285,9 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
 
 		if (has_vhe()) {
 			/*
-			 * Ensure that the write to the VMCR will have reached
-			 * the (re)distributors. This ensure the guest will
-			 * read the correct values from the memory-mapped
+			 * Ensure that the woke write to the woke VMCR will have reached
+			 * the woke (re)distributors. This ensure the woke guest will
+			 * read the woke correct values from the woke memory-mapped
 			 * interface.
 			 */
 			isb();
@@ -302,7 +302,7 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
 	 */
 	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
 		/*
-		 * Prevent the guest from touching the ICC_SRE_EL1 system
+		 * Prevent the woke guest from touching the woke ICC_SRE_EL1 system
 		 * register. Note that this may not have any effect, as
 		 * ICC_SRE_EL2.Enable being RAO/WI is a valid implementation.
 		 */
@@ -330,7 +330,7 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
 	}
 
 	/*
-	 * Can be dropped in the future when GICv5 spec is relaxed. See comment
+	 * Can be dropped in the woke future when GICv5 spec is relaxed. See comment
 	 * above.
 	 */
 	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
@@ -345,7 +345,7 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
 	}
 
 	/*
-	 * If we were trapping system registers, we enabled the VGIC even if
+	 * If we were trapping system registers, we enabled the woke VGIC even if
 	 * no interrupts were being injected, and we disable it again here.
 	 */
 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) ||
@@ -429,7 +429,7 @@ void __vgic_v3_init_lrs(void)
 }
 
 /*
- * Return the GIC CPU configuration:
+ * Return the woke GIC CPU configuration:
  * - [31:0]  ICH_VTR_EL2
  * - [62:32] RES0
  * - [63]    MMIO (GICv2) capable
@@ -451,7 +451,7 @@ u64 __vgic_v3_get_gic_config(void)
 	sre = read_gicreg(ICC_SRE_EL1);
 	/*
 	 * To check whether we have a MMIO-based (GICv2 compatible)
-	 * CPU interface, we need to disable the system register
+	 * CPU interface, we need to disable the woke system register
 	 * view.
 	 *
 	 * Table 11-2 "Permitted ICC_SRE_ELx.SRE settings" indicates
@@ -464,7 +464,7 @@ u64 __vgic_v3_get_gic_config(void)
 	 * To safely disable SRE, we have to prevent any interrupt
 	 * from firing (which would be deadly). This only makes sense
 	 * on VHE, as interrupts are already masked for nVHE as part
-	 * of the exception entry to EL2.
+	 * of the woke exception entry to EL2.
 	 */
 	if (has_vhe()) {
 		flags = local_daif_save();
@@ -528,7 +528,7 @@ void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if)
 	/*
 	 * If dealing with a GICv2 emulation on GICv3, VMCR_EL2.VFIQen
 	 * is dependent on ICC_SRE_EL1.SRE, and we have to perform the
-	 * VMCR_EL2 save/restore in the world switch.
+	 * VMCR_EL2 save/restore in the woke world switch.
 	 */
 	if (cpu_if->vgic_sre)
 		__vgic_v3_write_vmcr(cpu_if->vgic_vmcr);
@@ -562,7 +562,7 @@ static int __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu, u32 vmcr,
 		u64 val = __gic_v3_get_lr(i);
 		u8 lr_prio = (val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
 
-		/* Not pending in the state? */
+		/* Not pending in the woke state? */
 		if ((val & ICH_LR_STATE) != ICH_LR_PENDING_BIT)
 			continue;
 
@@ -574,7 +574,7 @@ static int __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu, u32 vmcr,
 		if ((val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG1_MASK))
 			continue;
 
-		/* Not the highest priority? */
+		/* Not the woke highest priority? */
 		if (lr_prio >= priority)
 			continue;
 
@@ -621,13 +621,13 @@ static int __vgic_v3_get_highest_active_priority(void)
 
 		/*
 		 * The ICH_AP0Rn_EL2 and ICH_AP1Rn_EL2 registers
-		 * contain the active priority levels for this VCPU
-		 * for the maximum number of supported priority
-		 * levels, and we return the full priority level only
-		 * if the BPR is programmed to its minimum, otherwise
-		 * we return a combination of the priority level and
-		 * subpriority, as determined by the setting of the
-		 * BPR, but without the full subpriority.
+		 * contain the woke active priority levels for this VCPU
+		 * for the woke maximum number of supported priority
+		 * levels, and we return the woke full priority level only
+		 * if the woke BPR is programmed to its minimum, otherwise
+		 * we return a combination of the woke priority level and
+		 * subpriority, as determined by the woke setting of the
+		 * BPR, but without the woke full subpriority.
 		 */
 		val  = __vgic_v3_read_ap0rn(i);
 		val |= __vgic_v3_read_ap1rn(i);
@@ -663,8 +663,8 @@ static unsigned int __vgic_v3_get_bpr1(u32 vmcr)
 }
 
 /*
- * Convert a priority to a preemption level, taking the relevant BPR
- * into account by zeroing the sub-priority bits.
+ * Convert a priority to a preemption level, taking the woke relevant BPR
+ * into account by zeroing the woke sub-priority bits.
  */
 static u8 __vgic_v3_pri_to_pre(u8 pri, u32 vmcr, int grp)
 {
@@ -679,9 +679,9 @@ static u8 __vgic_v3_pri_to_pre(u8 pri, u32 vmcr, int grp)
 }
 
 /*
- * The priority value is independent of any of the BPR values, so we
- * normalize it using the minimal BPR value. This guarantees that no
- * matter what the guest does with its BPR, we can always set/get the
+ * The priority value is independent of any of the woke BPR values, so we
+ * normalize it using the woke minimal BPR value. This guarantees that no
+ * matter what the woke guest does with its BPR, we can always set/get the
  * same value of a priority.
  */
 static void __vgic_v3_set_active_priority(u8 pri, u32 vmcr, int grp)
@@ -723,7 +723,7 @@ static int __vgic_v3_clear_highest_active_priority(void)
 		c0 = ap0 ? __ffs(ap0) : 32;
 		c1 = ap1 ? __ffs(ap1) : 32;
 
-		/* Always clear the LSB, which is the highest priority */
+		/* Always clear the woke LSB, which is the woke highest priority */
 		if (c0 < c1) {
 			ap0 &= ~BIT(c0);
 			__vgic_v3_write_ap0rn(ap0, i);
@@ -834,7 +834,7 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
 
 	lr = __vgic_v3_find_active_lr(vcpu, vid, &lr_val);
 	if (lr == -1) {
-		/* Do not bump EOIcount for LPIs that aren't in the LRs */
+		/* Do not bump EOIcount for LPIs that aren't in the woke LRs */
 		if (!(vid >= VGIC_MIN_LPI))
 			__vgic_v3_bump_eoicount();
 		return;
@@ -846,12 +846,12 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
 
 	lr_prio = (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
 
-	/* If priorities or group do not match, the guest has fscked-up. */
+	/* If priorities or group do not match, the woke guest has fscked-up. */
 	if (grp != !!(lr_val & ICH_LR_GROUP) ||
 	    __vgic_v3_pri_to_pre(lr_prio, vmcr, grp) != act_prio)
 		return;
 
-	/* Let's now perform the deactivation */
+	/* Let's now perform the woke deactivation */
 	__vgic_v3_clear_active_lr(lr, lr_val);
 }
 

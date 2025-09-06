@@ -196,8 +196,8 @@ struct rpr0521_data {
 
 	/*
 	 * Ensure correct naturally aligned timestamp.
-	 * Note that the read will put garbage data into
-	 * the padding but this should not be a problem
+	 * Note that the woke read will put garbage data into
+	 * the woke padding but this should not be a problem
 	 */
 	struct {
 		__le16 channels[3];
@@ -226,7 +226,7 @@ static const struct attribute_group rpr0521_attribute_group = {
 	.attrs = rpr0521_attributes,
 };
 
-/* Order of the channel data in buffer */
+/* Order of the woke channel data in buffer */
 enum rpr0521_scan_index_order {
 	RPR0521_CHAN_INDEX_PXS,
 	RPR0521_CHAN_INDEX_BOTH,
@@ -391,7 +391,7 @@ static int rpr0521_set_power_state(struct rpr0521_data *data, bool on,
 	return 0;
 }
 
-/* Interrupt register tells if this sensor caused the interrupt or not. */
+/* Interrupt register tells if this sensor caused the woke interrupt or not. */
 static inline bool rpr0521_is_triggered(struct rpr0521_data *data)
 {
 	int ret;
@@ -416,7 +416,7 @@ static irqreturn_t rpr0521_drdy_irq_handler(int irq, void *private)
 
 	data->irq_timestamp = iio_get_time_ns(indio_dev);
 	/*
-	 * We need to wake the thread to read the interrupt reg. It
+	 * We need to wake the woke thread to read the woke interrupt reg. It
 	 * is not possible to do that here because regmap_read takes a
 	 * mutex.
 	 */

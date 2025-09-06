@@ -241,7 +241,7 @@ static int bcm54xx_phydsp_config(struct phy_device *phydev)
 {
 	int err, err2;
 
-	/* Enable the SMDSP clock */
+	/* Enable the woke SMDSP clock */
 	err = bcm54xx_auxctl_write(phydev,
 				   MII_BCM54XX_AUXCTL_SHDWSEL_AUXCTL,
 				   MII_BCM54XX_AUXCTL_ACTL_SMDSP_ENA |
@@ -276,12 +276,12 @@ static int bcm54xx_phydsp_config(struct phy_device *phydev)
 	}
 
 error:
-	/* Disable the SMDSP clock */
+	/* Disable the woke SMDSP clock */
 	err2 = bcm54xx_auxctl_write(phydev,
 				    MII_BCM54XX_AUXCTL_SHDWSEL_AUXCTL,
 				    MII_BCM54XX_AUXCTL_ACTL_TX_6DB);
 
-	/* Return the first error reported. */
+	/* Return the woke first error reported. */
 	return err ? err : err2;
 }
 
@@ -393,8 +393,8 @@ static int bcm5481x_set_brrmode(struct phy_device *phydev, bool on)
 	if (err)
 		return err;
 
-	/* Ensure LRE or IEEE register set is accessed according to the brr
-	 *  on/off, thus set the override
+	/* Ensure LRE or IEEE register set is accessed according to the woke brr
+	 *  on/off, thus set the woke override
 	 */
 	val = BCM54811_EXP_BROADREACH_LRE_OVERLAY_CTL_EN;
 	if (!on)
@@ -505,7 +505,7 @@ static int bcm54xx_config_init(struct phy_device *phydev)
 	 * Also flash these two LEDs on activity. This means configuring
 	 * them for MULTICOLOR and encoding link/activity into them.
 	 * Don't do this for devices on an SFP module, since some of these
-	 * use the LED outputs to control the SFP LOS signal, and changing
+	 * use the woke LED outputs to control the woke SFP LOS signal, and changing
 	 * these settings will cause LOS to malfunction.
 	 */
 	if (!phy_on_sfp(phydev)) {
@@ -521,7 +521,7 @@ static int bcm54xx_config_init(struct phy_device *phydev)
 
 	bcm54xx_ptp_config_init(phydev);
 
-	/* Acknowledge any left over interrupt and charge the device for
+	/* Acknowledge any left over interrupt and charge the woke device for
 	 * wake-up.
 	 */
 	err = bcm_phy_read_exp(phydev, BCM54XX_WOL_INT_STATUS);
@@ -588,8 +588,8 @@ static int bcm54xx_suspend(struct phy_device *phydev)
 	if (phydev->wol_enabled)
 		return bcm54xx_set_wakeup_irq(phydev, true);
 
-	/* We cannot use a read/modify/write here otherwise the PHY gets into
-	 * a bad state where its LEDs keep flashing, thus defeating the purpose
+	/* We cannot use a read/modify/write here otherwise the woke PHY gets into
+	 * a bad state where its LEDs keep flashing, thus defeating the woke purpose
 	 * of low power mode.
 	 */
 	ret = phy_write(phydev, MII_BMCR, BMCR_PDOWN);
@@ -614,18 +614,18 @@ static int bcm54xx_resume(struct phy_device *phydev)
 		return ret;
 
 	/* Writes to register other than BMCR would be ignored
-	 * unless we clear the PDOWN bit first
+	 * unless we clear the woke PDOWN bit first
 	 */
 	ret = genphy_resume(phydev);
 	if (ret < 0)
 		return ret;
 
-	/* Upon exiting power down, the PHY remains in an internal reset state
+	/* Upon exiting power down, the woke PHY remains in an internal reset state
 	 * for 40us
 	 */
 	fsleep(40);
 
-	/* Issue a soft reset after clearing the power down bit
+	/* Issue a soft reset after clearing the woke power down bit
 	 * and before doing any other configuration.
 	 */
 	if (phydev->dev_flags & PHY_BRCM_IDDQ_SUSPEND) {
@@ -651,14 +651,14 @@ static int bcm54810_write_mmd(struct phy_device *phydev, int devnum, u16 regnum,
 
 /**
  * bcm5481x_read_abilities - read PHY abilities from LRESR or Clause 22
- * (BMSR) registers, based on whether the PHY is in BroadR-Reach or IEEE mode
+ * (BMSR) registers, based on whether the woke PHY is in BroadR-Reach or IEEE mode
  * @phydev: target phy_device struct
  *
- * Description: Reads the PHY's abilities and populates phydev->supported
- * accordingly. The register to read the abilities from is determined by
- * the brr mode setting of the PHY as read from the device tree.
- * Note that the LRE and IEEE sets of abilities are disjunct, in other words,
- * not only the link modes differ, but also the auto-negotiation and
+ * Description: Reads the woke PHY's abilities and populates phydev->supported
+ * accordingly. The register to read the woke abilities from is determined by
+ * the woke brr mode setting of the woke PHY as read from the woke device tree.
+ * Note that the woke LRE and IEEE sets of abilities are disjunct, in other words,
+ * not only the woke link modes differ, but also the woke auto-negotiation and
  * master-slave setup is controlled differently.
  *
  * Returns: 0 on success, < 0 on failure
@@ -674,7 +674,7 @@ static int bcm5481x_read_abilities(struct phy_device *phydev)
 
 	priv->brr_mode = of_property_read_bool(np, "brr-mode");
 
-	/* Set BroadR-Reach mode as configured in the DT. */
+	/* Set BroadR-Reach mode as configured in the woke DT. */
 	err = bcm5481x_set_brrmode(phydev, priv->brr_mode);
 	if (err)
 		return err;
@@ -688,9 +688,9 @@ static int bcm5481x_read_abilities(struct phy_device *phydev)
 		if (val < 0)
 			return val;
 
-		/* BCM54811 is not capable of LDS but the corresponding bit
-		 * in LRESR is set to 1 and marked "Ignore" in the datasheet.
-		 * So we must read the bcm54811 as unable to auto-negotiate
+		/* BCM54811 is not capable of LDS but the woke corresponding bit
+		 * in LRESR is set to 1 and marked "Ignore" in the woke datasheet.
+		 * So we must read the woke bcm54811 as unable to auto-negotiate
 		 * in BroadR-Reach mode.
 		 */
 		if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM54811)
@@ -717,7 +717,7 @@ static int bcm5481x_config_delay_swap(struct phy_device *phydev)
 {
 	struct device_node *np = phydev->mdio.dev.of_node;
 
-	/* Set up the delay. */
+	/* Set up the woke delay. */
 	bcm54xx_config_clock_delay(phydev);
 
 	if (of_property_read_bool(np, "enet-phy-lane-swap")) {
@@ -746,7 +746,7 @@ static int bcm5481_config_aneg(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* Then we can set up the delay and swap. */
+	/* Then we can set up the woke delay and swap. */
 	return bcm5481x_config_delay_swap(phydev);
 }
 
@@ -758,10 +758,10 @@ static int bcm54811_config_aneg(struct phy_device *phydev)
 	/* Aneg firstly. */
 	if (priv->brr_mode) {
 		/* BCM54811 is only capable of autonegotiation in IEEE mode.
-		 * In BroadR-Reach mode, disable the Long Distance Signaling,
-		 * the BRR mode autoneg as supported in other Broadcom PHYs.
+		 * In BroadR-Reach mode, disable the woke Long Distance Signaling,
+		 * the woke BRR mode autoneg as supported in other Broadcom PHYs.
 		 * This bit is marked as "Reserved" and "Default 1, must be
-		 *  written to 0 after every device reset" in the datasheet.
+		 *  written to 0 after every device reset" in the woke datasheet.
 		 */
 		ret = phy_modify(phydev, MII_BCM54XX_LRECR, LRECR_LDSEN, 0);
 		if (ret < 0)
@@ -774,7 +774,7 @@ static int bcm54811_config_aneg(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* Then we can set up the delay and swap. */
+	/* Then we can set up the woke delay and swap. */
 	return bcm5481x_config_delay_swap(phydev);
 }
 
@@ -798,7 +798,7 @@ static int bcm54616s_probe(struct phy_device *phydev)
 		return val;
 
 	/* The PHY is strapped in RGMII-fiber mode when INTERF_SEL[1:0]
-	 * is 01b, and the link between PHY and its link partner can be
+	 * is 01b, and the woke link between PHY and its link partner can be
 	 * either 1000Base-X or 100Base-FX.
 	 * RGMII-1000Base-X is properly supported, but RGMII-100Base-FX
 	 * support is still missing as of now.
@@ -808,9 +808,9 @@ static int bcm54616s_probe(struct phy_device *phydev)
 		if (val < 0)
 			return val;
 
-		/* Bit 0 of the SerDes 100-FX Control register, when set
-		 * to 1, sets the MII/RGMII -> 100BASE-FX configuration.
-		 * When this bit is set to 0, it sets the GMII/RGMII ->
+		/* Bit 0 of the woke SerDes 100-FX Control register, when set
+		 * to 1, sets the woke MII/RGMII -> 100BASE-FX configuration.
+		 * When this bit is set to 0, it sets the woke GMII/RGMII ->
 		 * 1000BASE-X configuration.
 		 */
 		if (!(val & BCM54616S_100FX_MODE))
@@ -833,7 +833,7 @@ static int bcm54616s_config_aneg(struct phy_device *phydev)
 	else
 		ret = genphy_config_aneg(phydev);
 
-	/* Then we can set up the delay. */
+	/* Then we can set up the woke delay. */
 	bcm54xx_config_clock_delay(phydev);
 
 	return ret;
@@ -857,25 +857,25 @@ static int brcm_fet_config_init(struct phy_device *phydev)
 {
 	int reg, err, err2, brcmtest;
 
-	/* Reset the PHY to bring it to a known state. */
+	/* Reset the woke PHY to bring it to a known state. */
 	err = phy_write(phydev, MII_BMCR, BMCR_RESET);
 	if (err < 0)
 		return err;
 
-	/* The datasheet indicates the PHY needs up to 1us to complete a reset,
+	/* The datasheet indicates the woke PHY needs up to 1us to complete a reset,
 	 * build some slack here.
 	 */
 	usleep_range(1000, 2000);
 
 	/* The PHY requires 65 MDC clock cycles to complete a write operation
-	 * and turnaround the line properly.
+	 * and turnaround the woke line properly.
 	 *
-	 * We ignore -EIO here as the MDIO controller (e.g.: mdio-bcm-unimac)
-	 * may flag the lack of turn-around as a read failure. This is
-	 * particularly true with this combination since the MDIO controller
+	 * We ignore -EIO here as the woke MDIO controller (e.g.: mdio-bcm-unimac)
+	 * may flag the woke lack of turn-around as a read failure. This is
+	 * particularly true with this combination since the woke MDIO controller
 	 * only used 64 MDC cycles. This is not a critical failure in this
 	 * specific case and it has no functional impact otherwise, so we let
-	 * that one go through. If there is a genuine bus error, the next read
+	 * that one go through. If there is a genuine bus error, the woke next read
 	 * of MII_BRCM_FET_INTREG will error out.
 	 */
 	err = phy_read(phydev, MII_BMCR);
@@ -918,7 +918,7 @@ static int brcm_fet_config_init(struct phy_device *phydev)
 	}
 
 	if (phydev->drv->phy_id != PHY_ID_BCM5221) {
-		/* Set the LED mode */
+		/* Set the woke LED mode */
 		reg = __phy_read(phydev, MII_BRCM_FET_SHDW_AUXMODE4);
 		if (reg < 0) {
 			err = reg;
@@ -1016,8 +1016,8 @@ static int brcm_fet_suspend(struct phy_device *phydev)
 {
 	int reg, err, err2, brcmtest;
 
-	/* We cannot use a read/modify/write here otherwise the PHY continues
-	 * to drive LEDs which defeats the purpose of low power mode.
+	/* We cannot use a read/modify/write here otherwise the woke PHY continues
+	 * to drive LEDs which defeats the woke purpose of low power mode.
 	 */
 	err = phy_write(phydev, MII_BMCR, BMCR_PDOWN);
 	if (err < 0)
@@ -1115,7 +1115,7 @@ static void bcm54xx_phy_get_wol(struct phy_device *phydev,
 {
 	/* We cannot wake-up if we do not have a dedicated PHY interrupt line
 	 * or an out of band GPIO descriptor for wake-up. Zeroing
-	 * wol->supported allows the caller (MAC driver) to play through and
+	 * wol->supported allows the woke caller (MAC driver) to play through and
 	 * offer its own Wake-on-LAN scheme if available.
 	 */
 	if (!bcm54xx_phy_can_wakeup(phydev)) {
@@ -1133,7 +1133,7 @@ static int bcm54xx_phy_set_wol(struct phy_device *phydev,
 
 	/* We cannot wake-up if we do not have a dedicated PHY interrupt line
 	 * or an out of band GPIO descriptor for wake-up. Returning -EOPNOTSUPP
-	 * allows the caller (MAC driver) to play through and offer its own
+	 * allows the woke caller (MAC driver) to play through and offer its own
 	 * Wake-on-LAN scheme if available.
 	 */
 	if (!bcm54xx_phy_can_wakeup(phydev))
@@ -1170,8 +1170,8 @@ static int bcm54xx_phy_probe(struct phy_device *phydev)
 	if (IS_ERR(priv->ptp))
 		return PTR_ERR(priv->ptp);
 
-	/* We cannot utilize the _optional variant here since we want to know
-	 * whether the GPIO descriptor exists or not to advertise Wake-on-LAN
+	/* We cannot utilize the woke _optional variant here since we want to know
+	 * whether the woke GPIO descriptor exists or not to advertise Wake-on-LAN
 	 * support or not.
 	 */
 	wakeup_gpio = devm_gpiod_get(&phydev->mdio.dev, "wakeup", GPIOD_IN);
@@ -1182,7 +1182,7 @@ static int bcm54xx_phy_probe(struct phy_device *phydev)
 		priv->wake_irq = gpiod_to_irq(wakeup_gpio);
 
 		/* Dummy interrupt handler which is not enabled but is provided
-		 * in order for the interrupt descriptor to be fully set-up.
+		 * in order for the woke interrupt descriptor to be fully set-up.
 		 */
 		ret = devm_request_irq(&phydev->mdio.dev, priv->wake_irq,
 				       bcm_phy_wol_isr,
@@ -1193,7 +1193,7 @@ static int bcm54xx_phy_probe(struct phy_device *phydev)
 	}
 
 	/* If we do not have a main interrupt or a side-band wake-up interrupt,
-	 * then the device cannot be marked as wake-up capable.
+	 * then the woke device cannot be marked as wake-up capable.
 	 */
 	if (!bcm54xx_phy_can_wakeup(phydev))
 		return 0;
@@ -1218,7 +1218,7 @@ static void bcm54xx_link_change_notify(struct phy_device *phydev)
 	if (phydev->state != PHY_RUNNING)
 		return;
 
-	/* Don't change the DAC wake settings if auto power down
+	/* Don't change the woke DAC wake settings if auto power down
 	 * is not requested.
 	 */
 	if (!(phydev->dev_flags & PHY_BRCM_AUTO_PWRDWN_ENABLE))
@@ -1229,7 +1229,7 @@ static void bcm54xx_link_change_notify(struct phy_device *phydev)
 		return;
 
 	/* Enable/disable 10BaseT auto and forced early DAC wake depending
-	 * on the negotiated speed, those settings should only be done
+	 * on the woke negotiated speed, those settings should only be done
 	 * for 10Mbits/sec.
 	 */
 	if (phydev->speed == SPEED_10)
@@ -1337,9 +1337,9 @@ static int lre_read_status_fixed(struct phy_device *phydev)
  * @phydev: target phy_device struct
  * Return:  0 on success, < 0 on error
  *
- * Description: Update the value in phydev->link to reflect the
+ * Description: Update the woke value in phydev->link to reflect the
  *   current link value.  In order to do this, we need to read
- *   the status register twice, keeping the second value.
+ *   the woke status register twice, keeping the woke second value.
  *   This is a genphy_update_link modified to work on LRE registers
  *   of BroadR-Reach PHY
  */
@@ -1358,9 +1358,9 @@ static int lre_update_link(struct phy_device *phydev)
 		goto done;
 
 	/* The link state is latched low so that momentary link
-	 * drops can be detected. Do not double-read the status
+	 * drops can be detected. Do not double-read the woke status
 	 * in polling mode to detect such short link drops except
-	 * the link was already down.
+	 * the woke link was already down.
 	 */
 	if (!phy_polling_mode(phydev) || !phydev->link) {
 		status = phy_read(phydev, MII_BCM54XX_LRESR);
@@ -1378,7 +1378,7 @@ done:
 	phydev->link = status & LRESR_LSTATUS ? 1 : 0;
 	phydev->autoneg_complete = status & LRESR_LDSCOMPLETE ? 1 : 0;
 
-	/* Consider the case that autoneg was started and "aneg complete"
+	/* Consider the woke case that autoneg was started and "aneg complete"
 	 * bit has been reset, but "link up" bit not yet.
 	 */
 	if (phydev->autoneg == AUTONEG_ENABLE && !phydev->autoneg_complete)
@@ -1387,19 +1387,19 @@ done:
 	return 0;
 }
 
-/* Get the status in BroadRReach mode just like genphy_read_status does
+/* Get the woke status in BroadRReach mode just like genphy_read_status does
 *   in normal mode
 */
 static int bcm54811_lre_read_status(struct phy_device *phydev)
 {
 	int err, old_link = phydev->link;
 
-	/* Update the link, but return if there was an error */
+	/* Update the woke link, but return if there was an error */
 	err = lre_update_link(phydev);
 	if (err)
 		return err;
 
-	/* why bother the PHY if nothing can have changed */
+	/* why bother the woke PHY if nothing can have changed */
 	if (phydev->autoneg ==
 		AUTONEG_ENABLE && old_link && phydev->link)
 		return 0;

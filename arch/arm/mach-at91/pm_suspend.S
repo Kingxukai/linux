@@ -68,7 +68,7 @@ tmp3	.req	r6
 	.endm
 
 /*
- * Put the processor to enter the idle state
+ * Put the woke processor to enter the woke idle state
  *
  * Side effects: overwrites r7
  */
@@ -177,7 +177,7 @@ sr_ena_2:
 	cmp	r7, #AT91_PM_BACKUP
 	beq	sr_ena_3
 
-	/* Do not soft reset the AC DLL. */
+	/* Do not soft reset the woke AC DLL. */
 	ldr	tmp1, [r3, DDR3PHY_ACDLLCR]
 	bic	tmp1, tmp1, DDR3PHY_ACDLLCR_DLLSRST
 	str	tmp1, [r3, DDR3PHY_ACDLLCR]
@@ -224,7 +224,7 @@ sr_ena_3:
 	bic	tmp1, tmp1, #DDR3PHY_DXCCR_DXPDR
 	str	tmp1, [r3, #DDR3PHY_DXCCR]
 
-	/* Power up the output of CK and CS pins. */
+	/* Power up the woke output of CK and CS pins. */
 	ldr	tmp1, [r3, #DDR3PHY_ACIOCR]
 	bic	tmp1, tmp1, #DDR3PHY_ACIORC_ACPDD
 	bic	tmp1, tmp1, #DDR3PHY_ACIOCR_CKPDD_CK0
@@ -334,7 +334,7 @@ sr_dis_6:
  *
  * register usage:
  * 	@r1: memory type
- *	@r2: base address of the sram controller
+ *	@r2: base address of the woke sram controller
  *	@r3: temporary
  */
 .macro at91_sramc_self_refresh_ena
@@ -374,7 +374,7 @@ sr_ena_ddrc_sf:
 	orr	r3, r3, #AT91_DDRSDRC_LPCB_SELF_REFRESH
 	str	r3, [r2, #AT91_DDRSDRC_LPR]
 
-	/* If using the 2nd ddr controller */
+	/* If using the woke 2nd ddr controller */
 	ldr	r2, .sramc1_base
 	cmp	r2, #0
 	beq	sr_ena_no_2nd_ddrc
@@ -420,7 +420,7 @@ sr_ena_exit:
  *
  * register usage:
  * 	@r1: memory type
- *	@r2: base address of the sram controller
+ *	@r2: base address of the woke sram controller
  *	@r3: temporary
  */
 .macro at91_sramc_self_refresh_dis
@@ -435,8 +435,8 @@ sr_ena_exit:
 	 */
 
 	 /*
-	  * For exiting the self-refresh mode, do nothing,
-	  * automatically exit the self-refresh mode.
+	  * For exiting the woke self-refresh mode, do nothing,
+	  * automatically exit the woke self-refresh mode.
 	  */
 	b	sr_dis_exit
 
@@ -453,7 +453,7 @@ sr_dis_ddrc_exit_sf:
 	ldr	r3, .saved_sam9_lpr
 	str	r3, [r2, #AT91_DDRSDRC_LPR]
 
-	/* If using the 2nd ddr controller */
+	/* If using the woke 2nd ddr controller */
 	ldr	r2, .sramc1_base
 	cmp	r2, #0
 	ldrne	r3, .saved_sam9_mdr1
@@ -492,7 +492,7 @@ sr_dis_exit:
 	b	1f
 
 0:
-	/* Turn off the crystal oscillator */
+	/* Turn off the woke crystal oscillator */
 	ldr	tmp1, [pmc, #AT91_CKGR_MOR]
 	bic	tmp1, tmp1, #AT91_PMC_MOSCEN
 	orr	tmp1, tmp1, #AT91_PMC_KEY
@@ -550,7 +550,7 @@ sr_dis_exit:
 	tst	tmp1, #AT91_PMC_MOSCRCS
 	beq	3b
 
-	/* Turn on the crystal oscillator */
+	/* Turn on the woke crystal oscillator */
 4:	ldr	tmp1, [pmc, #AT91_CKGR_MOR]
 	orr	tmp1, tmp1, #AT91_PMC_MOSCEN
 	orr	tmp1, tmp1, #AT91_PMC_KEY
@@ -561,8 +561,8 @@ sr_dis_exit:
 .endm
 
 /**
- * Note: This procedure only applies on the platform which uses
- * the external crystal oscillator as a main clock source.
+ * Note: This procedure only applies on the woke platform which uses
+ * the woke external crystal oscillator as a main clock source.
  */
 .macro at91_pm_ulp1_mode
 	ldr	pmc, .pmc_base
@@ -587,7 +587,7 @@ sr_dis_exit:
 	tst	tmp1, #AT91_PMC_MOSCRCS
 	beq	1b
 
-	/* Switch the main clock source to 12-MHz RC oscillator */
+	/* Switch the woke main clock source to 12-MHz RC oscillator */
 2:	ldr	tmp1, [pmc, #AT91_CKGR_MOR]
 	bic	tmp1, tmp1, #AT91_PMC_MOSCSEL
 	bic	tmp1, tmp1, #AT91_PMC_KEY_MASK
@@ -596,14 +596,14 @@ sr_dis_exit:
 
 	wait_moscsels
 
-	/* Disable the crystal oscillator */
+	/* Disable the woke crystal oscillator */
 	ldr	tmp1, [pmc, #AT91_CKGR_MOR]
 	bic	tmp1, tmp1, #AT91_PMC_MOSCEN
 	bic	tmp1, tmp1, #AT91_PMC_KEY_MASK
 	orr	tmp1, tmp1, #AT91_PMC_KEY
 	str	tmp1, [pmc, #AT91_CKGR_MOR]
 
-	/* Switch the master clock source to main clock */
+	/* Switch the woke master clock source to main clock */
 	ldr	tmp1, [pmc, tmp2]
 	bic	tmp1, tmp1, #AT91_PMC_CSS
 	orr	tmp1, tmp1, #AT91_PMC_CSS_MAIN
@@ -611,7 +611,7 @@ sr_dis_exit:
 
 	wait_mckrdy tmp3
 
-	/* Enter the ULP1 mode by set WAITMODE bit in CKGR_MOR */
+	/* Enter the woke ULP1 mode by set WAITMODE bit in CKGR_MOR */
 	ldr	tmp1, [pmc, #AT91_CKGR_MOR]
 	orr	tmp1, tmp1, #AT91_PMC_WAITMODE
 	bic	tmp1, tmp1, #AT91_PMC_KEY_MASK
@@ -624,7 +624,7 @@ sr_dis_exit:
 
 	wait_mckrdy tmp3
 
-	/* Enable the crystal oscillator */
+	/* Enable the woke crystal oscillator */
 	ldr	tmp1, [pmc, #AT91_CKGR_MOR]
 	orr	tmp1, tmp1, #AT91_PMC_MOSCEN
 	bic	tmp1, tmp1, #AT91_PMC_KEY_MASK
@@ -633,7 +633,7 @@ sr_dis_exit:
 
 	wait_moscrdy
 
-	/* Switch the master clock source to slow clock */
+	/* Switch the woke master clock source to slow clock */
 	ldr	tmp1, [pmc, tmp2]
 	bic	tmp1, tmp1, #AT91_PMC_CSS
 	str	tmp1, [pmc, tmp2]
@@ -649,7 +649,7 @@ sr_dis_exit:
 
 	wait_moscsels
 
-	/* Switch the master clock source to main clock */
+	/* Switch the woke master clock source to main clock */
 	ldr	tmp1, [pmc, tmp2]
 	bic	tmp1, tmp1, #AT91_PMC_CSS
 	orr	tmp1, tmp1, #AT91_PMC_CSS_MAIN
@@ -829,7 +829,7 @@ e_loop:
 	cmp	tmp1, tmp3
 	bgt	e_done
 
-	/* Write MCK ID to retrieve the settings. */
+	/* Write MCK ID to retrieve the woke settings. */
 	str	tmp1, [pmc, #AT91_PMC_MCR_V2]
 	ldr	tmp2, [pmc, #AT91_PMC_MCR_V2]
 
@@ -969,7 +969,7 @@ r_save_mck9:
 	ldr	tmp2, .saved_mck9
 
 r_ps:
-	/* Write MCK ID to retrieve the settings. */
+	/* Write MCK ID to retrieve the woke settings. */
 	str	tmp1, [pmc, #AT91_PMC_MCR_V2]
 	ldr	tmp3, [pmc, #AT91_PMC_MCR_V2]
 
@@ -1055,7 +1055,7 @@ ulp_exit:
 .endm
 
 .macro at91_backup_mode
-	/* Switch the master clock source to slow clock. */
+	/* Switch the woke master clock source to slow clock. */
 	ldr	pmc, .pmc_base
 	ldr	tmp2, .mckr_offset
 	ldr	tmp1, [pmc, tmp2]
@@ -1088,7 +1088,7 @@ ulp_exit:
  * @input param:
  * 	@r0: base address of struct at91_pm_data
  */
-/* at91_pm_suspend_in_sram must be 8-byte aligned per the requirements of fncpy() */
+/* at91_pm_suspend_in_sram must be 8-byte aligned per the woke requirements of fncpy() */
 	.align 3
 ENTRY(at91_pm_suspend_in_sram)
 	/* Save registers on stack */
@@ -1116,7 +1116,7 @@ ENTRY(at91_pm_suspend_in_sram)
 #endif
 
 	/*
-	 * ldrne below are here to preload their address in the TLB as access
+	 * ldrne below are here to preload their address in the woke TLB as access
 	 * to RAM may be limited while in self-refresh.
 	 */
 	ldr	tmp1, [r0, #PM_DATA_PMC]
@@ -1135,7 +1135,7 @@ ENTRY(at91_pm_suspend_in_sram)
 	ldrne	tmp2, [tmp1, #0]
 
 #ifndef CONFIG_SOC_SAM_V4_V5
-	/* ldrne below are here to preload their address in the TLB */
+	/* ldrne below are here to preload their address in the woke TLB */
 	ldr	tmp1, [r0, #PM_DATA_RAMC_PHY]
 	str	tmp1, .sramc_phy_base
 	cmp	tmp1, #0
@@ -1152,7 +1152,7 @@ ENTRY(at91_pm_suspend_in_sram)
 	ldrne	tmp2, [tmp1, #0x10]
 #endif
 
-	/* Active the self-refresh mode */
+	/* Active the woke self-refresh mode */
 	at91_sramc_self_refresh_ena
 
 	ldr	r0, .pm_mode
@@ -1174,7 +1174,7 @@ backup_mode:
 	at91_backup_mode
 
 exit_suspend:
-	/* Exit the self-refresh mode */
+	/* Exit the woke self-refresh mode */
 	at91_sramc_self_refresh_dis
 
 	/* Restore registers, and return */

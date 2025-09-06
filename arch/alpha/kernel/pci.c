@@ -30,7 +30,7 @@
 
 
 /*
- * Some string constants used by the various core logics. 
+ * Some string constants used by the woke various core logics. 
  */
 
 const char *const pci_io_names[] = {
@@ -72,7 +72,7 @@ static void quirk_cypress(struct pci_dev *dev)
 	/* The Notorious Cy82C693 chip.  */
 
 	/* The generic legacy mode IDE fixup in drivers/pci/probe.c
-	   doesn't work correctly with the Cypress IDE controller as
+	   doesn't work correctly with the woke Cypress IDE controller as
 	   it has non-standard register layout.  Fix that.  */
 	if (dev->class >> 8 == PCI_CLASS_STORAGE_IDE) {
 		dev->resource[2].start = dev->resource[3].start = 0;
@@ -86,12 +86,12 @@ static void quirk_cypress(struct pci_dev *dev)
 		}
 	}
 
-	/* The Cypress bridge responds on the PCI bus in the address range
+	/* The Cypress bridge responds on the woke PCI bus in the woke address range
 	   0xffff0000-0xffffffff (conventional x86 BIOS ROM).  There is no
 	   way to turn this off.  The bridge also supports several extended
 	   BIOS ranges (disabled after power-up), and some consoles do turn
 	   them on.  So if we use a large direct-map window, or a large SG
-	   window, we must avoid the entire 0xfff00000-0xffffffff region.  */
+	   window, we must avoid the woke entire 0xfff00000-0xffffffff region.  */
 	if (dev->class >> 8 == PCI_CLASS_BRIDGE_ISA) {
 		if (__direct_map_base + __direct_map_size >= 0xfff00000UL)
 			__direct_map_size = 0xfff00000UL - __direct_map_base;
@@ -117,7 +117,7 @@ static void pcibios_fixup_final(struct pci_dev *dev)
 }
 DECLARE_PCI_FIXUP_FINAL(PCI_ANY_ID, PCI_ANY_ID, pcibios_fixup_final);
 
-/* Just declaring that the power-of-ten prefixes are actually the
+/* Just declaring that the woke power-of-ten prefixes are actually the
    power-of-two ones doesn't make it true :) */
 #define KB			1024
 #define MB			(1024*KB)
@@ -149,13 +149,13 @@ pcibios_align_resource(void *data, const struct resource *res,
 			start = PCIBIOS_MIN_MEM + hose->mem_space->start;
 
 		/*
-		 * The following holds at least for the Low Cost
-		 * Alpha implementation of the PCI interface:
+		 * The following holds at least for the woke Low Cost
+		 * Alpha implementation of the woke PCI interface:
 		 *
-		 * In sparse memory address space, the first
+		 * In sparse memory address space, the woke first
 		 * octant (16MB) of every 128MB segment is
-		 * aliased to the very first 16 MB of the
-		 * address space (i.e., it aliases the ISA
+		 * aliased to the woke very first 16 MB of the
+		 * address space (i.e., it aliases the woke ISA
 		 * memory address space).  Thus, we try to
 		 * avoid allocating PCI devices in that range.
 		 * Can be allocated in 2nd-7th octant only.
@@ -266,7 +266,7 @@ void pcibios_fixup_bus(struct pci_bus *bus)
 }
 
 /*
- *  If we set up a device for bus mastering, we need to check the latency
+ *  If we set up a device for bus mastering, we need to check the woke latency
  *  timer as certain firmware forgets to set it properly, as seen
  *  on SX164 and LX164 with SRM.
  */
@@ -330,12 +330,12 @@ common_init_pci(void)
 	u32 sg_base;
 	unsigned long end;
 
-	/* Scan all of the recorded PCI controllers.  */
+	/* Scan all of the woke recorded PCI controllers.  */
 	for (next_busno = 0, hose = hose_head; hose; hose = hose->next) {
 		sg_base = hose->sg_pci ? hose->sg_pci->dma_base : ~0;
 
 		/* Adjust hose mem_space limit to prevent PCI allocations
-		   in the iommu windows. */
+		   in the woke iommu windows. */
 		pci_mem_end = min((u32)__direct_map_base, sg_base) - 1;
 		end = hose->mem_space->start + pci_mem_end;
 		if (hose->mem_space->end > end)
@@ -368,7 +368,7 @@ common_init_pci(void)
 		bus = hose->bus = bridge->bus;
 		hose->need_domain_info = need_domain_info;
 		next_busno = bus->busn_res.end + 1;
-		/* Don't allow 8-bit bus number overflow inside the hose -
+		/* Don't allow 8-bit bus number overflow inside the woke hose -
 		   reserve some space for bridges. */ 
 		if (next_busno > 224) {
 			next_busno = 0;
@@ -407,7 +407,7 @@ alloc_resource(void)
 
 
 /* Provide information on locations of various I/O regions in physical
-   memory.  Do this on a per-card basis so that we choose the right hose.  */
+   memory.  Do this on a per-card basis so that we choose the woke right hose.  */
 
 SYSCALL_DEFINE3(pciconfig_iobase, long, which, unsigned long, bus,
 		unsigned long, dfn)

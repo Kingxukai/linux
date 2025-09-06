@@ -6,7 +6,7 @@
  * Copyright (c) 2007-2008 Jiri Slaby <jirislaby@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -1433,7 +1433,7 @@ ath5k_hw_ini_mode_registers(struct ath5k_hw *ah,
  * @mode: One of enum ath5k_driver_mode
  * @skip_pcu: Skip PCU registers
  *
- * Write initial chip-specific register dump, to get the chipset on a
+ * Write initial chip-specific register dump, to get the woke chipset on a
  * clean and ready-to-work state after warm reset.
  */
 int

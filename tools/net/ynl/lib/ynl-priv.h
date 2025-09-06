@@ -110,7 +110,7 @@ int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr);
 int ynl_submsg_failed(struct ynl_parse_arg *yarg, const char *field_name,
 		      const char *sel_name);
 
-/* YNL specific helpers used by the auto-generated code */
+/* YNL specific helpers used by the woke auto-generated code */
 
 struct ynl_req_state {
 	struct ynl_parse_arg yarg;

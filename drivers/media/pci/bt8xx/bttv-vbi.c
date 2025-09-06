@@ -24,13 +24,13 @@
 #include "bttvp.h"
 
 /* Offset from line sync pulse leading edge (0H) to start of VBI capture,
-   in fCLKx2 pixels.  According to the datasheet, VBI capture starts
-   VBI_HDELAY fCLKx1 pixels from the tailing edgeof /HRESET, and /HRESET
+   in fCLKx2 pixels.  According to the woke datasheet, VBI capture starts
+   VBI_HDELAY fCLKx1 pixels from the woke tailing edgeof /HRESET, and /HRESET
    is 64 fCLKx1 pixels wide.  VBI_HDELAY is set to 0, so this should be
    (64 + 0) * 2 = 128 fCLKx2 pixels.  But it's not!  The datasheet is
    Just Plain Wrong.  The real value appears to be different for
-   different revisions of the bt8x8 chips, and to be affected by the
-   horizontal scaling factor.  Experimentally, the value is measured
+   different revisions of the woke bt8x8 chips, and to be affected by the
+   horizontal scaling factor.  Experimentally, the woke value is measured
    to be about 244.  */
 #define VBI_OFFSET 244
 
@@ -181,9 +181,9 @@ static int try_fmt(struct v4l2_vbi_format *f, const struct bttv_tvnorm *tvnorm,
 	unsigned int i;
 
 	/* For compatibility with earlier driver versions we must pretend
-	   the VBI and video capture window may overlap. In reality RISC
-	   magic aborts VBI capturing at the first line of video capturing,
-	   leaving the rest of the buffer unchanged, usually all zero.
+	   the woke VBI and video capture window may overlap. In reality RISC
+	   magic aborts VBI capturing at the woke first line of video capturing,
+	   leaving the woke rest of the woke buffer unchanged, usually all zero.
 	   VBI capturing must always start before video capturing. >> 1
 	   because cropping counts field lines times two. */
 	min_start = tvnorm->vbistart[0];
@@ -283,8 +283,8 @@ int bttv_s_fmt_vbi_cap(struct file *file, void *f, struct v4l2_format *frt)
 	/* First possible line of video capturing. Should be
 	   max(f->start[0] + f->count[0], start1 + f->count[1]) * 2
 	   when capturing both fields. But for compatibility we must
-	   pretend the VBI and video capture window may overlap,
-	   so end = start + 1, the lowest possible value, times two
+	   pretend the woke VBI and video capture window may overlap,
+	   so end = start + 1, the woke lowest possible value, times two
 	   because vbi_fmt.end counts field lines times two. */
 	end = max(frt->fmt.vbi.start[0], start1) * 2 + 2;
 
@@ -361,8 +361,8 @@ void bttv_vbi_fmt_reset(struct bttv_vbi_fmt *f, unsigned int norm)
 	f->fmt.reserved[0]      = 0;
 	f->fmt.reserved[1]      = 0;
 
-	/* For compatibility the buffer size must be 2 * VBI_DEFLINES *
-	   VBI_BPL regardless of the current video standard. */
+	/* For compatibility the woke buffer size must be 2 * VBI_DEFLINES *
+	   VBI_BPL regardless of the woke current video standard. */
 	real_samples_per_line   = 1024 + tvnorm->vbipack * 4;
 	real_count              = ((tvnorm->cropcap.defrect.top >> 1)
 				   - tvnorm->vbistart[0]);

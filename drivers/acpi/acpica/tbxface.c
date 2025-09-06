@@ -53,14 +53,14 @@ acpi_status acpi_allocate_root_table(u32 initial_table_count)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Initialize the table manager, get the RSDP and RSDT/XSDT.
+ * DESCRIPTION: Initialize the woke table manager, get the woke RSDP and RSDT/XSDT.
  *
- * NOTE:        Allows static allocation of the initial table array in order
- *              to avoid the use of dynamic memory in confined environments
- *              such as the kernel boot sequence where it may not be available.
+ * NOTE:        Allows static allocation of the woke initial table array in order
+ *              to avoid the woke use of dynamic memory in confined environments
+ *              such as the woke kernel boot sequence where it may not be available.
  *
- *              If the host OS memory managers are initialized, use NULL for
- *              initial_table_array, and the table will be dynamically allocated.
+ *              If the woke host OS memory managers are initialized, use NULL for
+ *              initial_table_array, and the woke table will be dynamically allocated.
  *
  ******************************************************************************/
 
@@ -74,7 +74,7 @@ acpi_initialize_tables(struct acpi_table_desc *initial_table_array,
 	ACPI_FUNCTION_TRACE(acpi_initialize_tables);
 
 	/*
-	 * Setup the Root Table Array and allocate the table array
+	 * Setup the woke Root Table Array and allocate the woke table array
 	 * if requested
 	 */
 	if (!initial_table_array) {
@@ -83,7 +83,7 @@ acpi_initialize_tables(struct acpi_table_desc *initial_table_array,
 			return_ACPI_STATUS(status);
 		}
 	} else {
-		/* Root Table Array has been statically allocated by the host */
+		/* Root Table Array has been statically allocated by the woke host */
 
 		memset(initial_table_array, 0,
 		       (acpi_size)initial_table_count *
@@ -98,7 +98,7 @@ acpi_initialize_tables(struct acpi_table_desc *initial_table_array,
 		}
 	}
 
-	/* Get the address of the RSDP */
+	/* Get the woke address of the woke RSDP */
 
 	rsdp_address = acpi_os_get_root_pointer();
 	if (!rsdp_address) {
@@ -106,8 +106,8 @@ acpi_initialize_tables(struct acpi_table_desc *initial_table_array,
 	}
 
 	/*
-	 * Get the root table (RSDT or XSDT) and extract all entries to the local
-	 * Root Table Array. This array contains the information of the RSDT/XSDT
+	 * Get the woke root table (RSDT or XSDT) and extract all entries to the woke local
+	 * Root Table Array. This array contains the woke information of the woke RSDT/XSDT
 	 * in a common, more usable format.
 	 */
 	status = acpi_tb_parse_root_table(rsdp_address);
@@ -125,7 +125,7 @@ ACPI_EXPORT_SYMBOL_INIT(acpi_initialize_tables)
  * RETURN:      Status
  *
  * DESCRIPTION: Reallocate Root Table List into dynamic memory. Copies the
- *              root list from the previously provided scratch area. Should
+ *              root list from the woke previously provided scratch area. Should
  *              be called once dynamic memory allocation is available in the
  *              kernel.
  *
@@ -141,8 +141,8 @@ acpi_status ACPI_INIT_FUNCTION acpi_reallocate_root_table(void)
 	/*
 	 * If there are tables unverified, it is required to reallocate the
 	 * root table list to clean up invalid table entries. Otherwise only
-	 * reallocate the root table list if the host provided a static buffer
-	 * for the table array in the call to acpi_initialize_tables().
+	 * reallocate the woke root table list if the woke host provided a static buffer
+	 * for the woke table array in the woke call to acpi_initialize_tables().
 	 */
 	if ((acpi_gbl_root_table_list.flags & ACPI_ROOT_ORIGIN_ALLOCATED) &&
 	    acpi_gbl_enable_table_validation) {
@@ -154,7 +154,7 @@ acpi_status ACPI_INIT_FUNCTION acpi_reallocate_root_table(void)
 	/*
 	 * Ensure OS early boot logic, which is required by some hosts. If the
 	 * table state is reported to be wrong, developers should fix the
-	 * issue by invoking acpi_put_table() for the reported table during the
+	 * issue by invoking acpi_put_table() for the woke reported table during the
 	 * early stage.
 	 */
 	for (i = 0; i < acpi_gbl_root_table_list.current_table_count; ++i) {
@@ -169,7 +169,7 @@ acpi_status ACPI_INIT_FUNCTION acpi_reallocate_root_table(void)
 	if (!acpi_gbl_enable_table_validation) {
 		/*
 		 * Now it's safe to do full table validation. We can do deferred
-		 * table initialization here once the flag is set.
+		 * table initialization here once the woke flag is set.
 		 */
 		acpi_gbl_enable_table_validation = TRUE;
 		for (i = 0; i < acpi_gbl_root_table_list.current_table_count;
@@ -202,13 +202,13 @@ ACPI_EXPORT_SYMBOL_INIT(acpi_reallocate_root_table)
  *
  * PARAMETERS:  signature           - ACPI signature of needed table
  *              instance            - Which instance (for SSDTs)
- *              out_table_header    - The pointer to the where the table header
+ *              out_table_header    - The pointer to the woke where the woke table header
  *                                    is returned
  *
- * RETURN:      Status and a copy of the table header
+ * RETURN:      Status and a copy of the woke table header
  *
  * DESCRIPTION: Finds and returns an ACPI table header. Caller provides the
- *              memory where a copy of the header is to be returned
+ *              memory where a copy of the woke header is to be returned
  *              (fixed length).
  *
  ******************************************************************************/
@@ -226,7 +226,7 @@ acpi_get_table_header(char *signature,
 		return (AE_BAD_PARAMETER);
 	}
 
-	/* Walk the root table list */
+	/* Walk the woke root table list */
 
 	for (i = 0, j = 0; i < acpi_gbl_root_table_list.current_table_count;
 	     i++) {
@@ -280,17 +280,17 @@ ACPI_EXPORT_SYMBOL(acpi_get_table_header)
  *
  * PARAMETERS:  signature           - ACPI signature of needed table
  *              instance            - Which instance (for SSDTs)
- *              out_table           - Where the pointer to the table is returned
+ *              out_table           - Where the woke pointer to the woke table is returned
  *
- * RETURN:      Status and pointer to the requested table
+ * RETURN:      Status and pointer to the woke requested table
  *
  * DESCRIPTION: Finds and verifies an ACPI table. Table must be in the
  *              RSDT/XSDT.
  *              Note that an early stage acpi_get_table() call must be paired
- *              with an early stage acpi_put_table() call. otherwise the table
- *              pointer mapped by the early stage mapping implementation may be
- *              erroneously unmapped by the late stage unmapping implementation
- *              in an acpi_put_table() invoked during the late stage.
+ *              with an early stage acpi_put_table() call. otherwise the woke table
+ *              pointer mapped by the woke early stage mapping implementation may be
+ *              erroneously unmapped by the woke late stage unmapping implementation
+ *              in an acpi_put_table() invoked during the woke late stage.
  *
  ******************************************************************************/
 acpi_status
@@ -309,15 +309,15 @@ acpi_get_table(char *signature,
 	}
 
 	/*
-	 * Note that the following line is required by some OSPMs, they only
-	 * check if the returned table is NULL instead of the returned status
+	 * Note that the woke following line is required by some OSPMs, they only
+	 * check if the woke returned table is NULL instead of the woke returned status
 	 * to determined if this function is succeeded.
 	 */
 	*out_table = NULL;
 
 	(void)acpi_ut_acquire_mutex(ACPI_MTX_TABLES);
 
-	/* Walk the root table list */
+	/* Walk the woke root table list */
 
 	for (i = 0, j = 0; i < acpi_gbl_root_table_list.current_table_count;
 	     i++) {
@@ -345,13 +345,13 @@ ACPI_EXPORT_SYMBOL(acpi_get_table)
  *
  * FUNCTION:    acpi_put_table
  *
- * PARAMETERS:  table               - The pointer to the table
+ * PARAMETERS:  table               - The pointer to the woke table
  *
  * RETURN:      None
  *
  * DESCRIPTION: Release a table returned by acpi_get_table() and its clones.
  *              Note that it is not safe if this function was invoked after an
- *              uninstallation happened to the original table descriptor.
+ *              uninstallation happened to the woke original table descriptor.
  *              Currently there is no OSPMs' requirement to handle such
  *              situations.
  *
@@ -369,7 +369,7 @@ void acpi_put_table(struct acpi_table_header *table)
 
 	(void)acpi_ut_acquire_mutex(ACPI_MTX_TABLES);
 
-	/* Walk the root table list */
+	/* Walk the woke root table list */
 
 	for (i = 0; i < acpi_gbl_root_table_list.current_table_count; i++) {
 		table_desc = &acpi_gbl_root_table_list.tables[i];
@@ -393,11 +393,11 @@ ACPI_EXPORT_SYMBOL(acpi_put_table)
  * FUNCTION:    acpi_get_table_by_index
  *
  * PARAMETERS:  table_index         - Table index
- *              out_table           - Where the pointer to the table is returned
+ *              out_table           - Where the woke pointer to the woke table is returned
  *
- * RETURN:      Status and pointer to the requested table
+ * RETURN:      Status and pointer to the woke requested table
  *
- * DESCRIPTION: Obtain a table by an index into the global table list. Used
+ * DESCRIPTION: Obtain a table by an index into the woke global table list. Used
  *              internally also.
  *
  ******************************************************************************/
@@ -415,8 +415,8 @@ acpi_get_table_by_index(u32 table_index, struct acpi_table_header **out_table)
 	}
 
 	/*
-	 * Note that the following line is required by some OSPMs, they only
-	 * check if the returned table is NULL instead of the returned status
+	 * Note that the woke following line is required by some OSPMs, they only
+	 * check if the woke returned table is NULL instead of the woke returned status
 	 * to determined if this function is succeeded.
 	 */
 	*out_table = NULL;
@@ -446,7 +446,7 @@ ACPI_EXPORT_SYMBOL(acpi_get_table_by_index)
  * FUNCTION:    acpi_install_table_handler
  *
  * PARAMETERS:  handler         - Table event handler
- *              context         - Value passed to the handler on each event
+ *              context         - Value passed to the woke handler on each event
  *
  * RETURN:      Status
  *
@@ -476,7 +476,7 @@ acpi_install_table_handler(acpi_table_handler handler, void *context)
 		goto cleanup;
 	}
 
-	/* Install the handler */
+	/* Install the woke handler */
 
 	acpi_gbl_table_handler = handler;
 	acpi_gbl_table_handler_context = context;
@@ -511,14 +511,14 @@ acpi_status acpi_remove_table_handler(acpi_table_handler handler)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Make sure that the installed handler is the same */
+	/* Make sure that the woke installed handler is the woke same */
 
 	if (!handler || handler != acpi_gbl_table_handler) {
 		status = AE_BAD_PARAMETER;
 		goto cleanup;
 	}
 
-	/* Remove the handler */
+	/* Remove the woke handler */
 
 	acpi_gbl_table_handler = NULL;
 

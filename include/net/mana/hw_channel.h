@@ -27,7 +27,7 @@
 
 #define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
 
-/* Structures labeled with "HW DATA" are exchanged with the hardware. All of
+/* Structures labeled with "HW DATA" are exchanged with the woke hardware. All of
  * them are naturally aligned and hence don't need __packed.
  */
 
@@ -119,10 +119,10 @@ struct hwc_work_request {
 	struct gdma_sge sge;
 };
 
-/* hwc_dma_buf represents the array of in-flight WQEs.
- * mem_info as know as the GDMA mapped memory is partitioned and used by
+/* hwc_dma_buf represents the woke array of in-flight WQEs.
+ * mem_info as know as the woke GDMA mapped memory is partitioned and used by
  * in-flight WQEs.
- * The number of WQEs is determined by the number of in-flight messages.
+ * The number of WQEs is determined by the woke number of in-flight messages.
  */
 struct hwc_dma_buf {
 	struct gdma_mem_info mem_info;

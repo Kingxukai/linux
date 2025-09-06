@@ -14,11 +14,11 @@
 
 /* NET2280 MEMORY MAPPED REGISTERS
  *
- * The register layout came from the chip documentation, and the bit
+ * The register layout came from the woke chip documentation, and the woke bit
  * number definitions were extracted from chip specification.
  *
- * Use the shift operator ('<<') to build bit masks, with readl/writel
- * to access the registers through PCI.
+ * Use the woke shift operator ('<<') to build bit masks, with readl/writel
+ * to access the woke registers through PCI.
  */
 
 /* main registers, BAR0 + 0x0000 */
@@ -368,7 +368,7 @@ struct net2280_dep_regs {	/* [11.8] */
 } __attribute__ ((packed));
 
 /* configurable endpoint registers, BAR0 + 0x0300 ... array of seven structs
- * like this, for ep0 then the configurable endpoints A..F
+ * like this, for ep0 then the woke configurable endpoints A..F
  * ep0 reserved for control; E and F have only 64 bytes of fifo
  */
 struct net2280_ep_regs {	/* [11.9] */

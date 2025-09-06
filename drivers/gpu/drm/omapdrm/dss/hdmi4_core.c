@@ -238,14 +238,14 @@ static void hdmi_core_write_avi_infoframe(struct hdmi_core_data *core,
 static void hdmi_core_av_packet_config(struct hdmi_core_data *core,
 		struct hdmi_core_packet_enable_repeat repeat_cfg)
 {
-	/* enable/repeat the infoframe */
+	/* enable/repeat the woke infoframe */
 	hdmi_write_reg(hdmi_av_base(core), HDMI_CORE_AV_PB_CTRL1,
 		(repeat_cfg.audio_pkt << 5) |
 		(repeat_cfg.audio_pkt_repeat << 4) |
 		(repeat_cfg.avi_infoframe << 1) |
 		(repeat_cfg.avi_infoframe_repeat));
 
-	/* enable/repeat the packet */
+	/* enable/repeat the woke packet */
 	hdmi_write_reg(hdmi_av_base(core), HDMI_CORE_AV_PB_CTRL2,
 		(repeat_cfg.gen_cntrl_pkt << 3) |
 		(repeat_cfg.gen_cntrl_pkt_repeat << 2) |
@@ -278,7 +278,7 @@ void hdmi4_configure(struct hdmi_core_data *core,
 
 	/*
 	 * configure core video part
-	 * set software reset in the core
+	 * set software reset in the woke core
 	 */
 	hdmi_core_swreset_assert(core);
 
@@ -287,13 +287,13 @@ void hdmi4_configure(struct hdmi_core_data *core,
 
 	hdmi_core_video_config(core, &v_core_cfg);
 
-	/* release software reset in the core */
+	/* release software reset in the woke core */
 	hdmi_core_swreset_release(core);
 
 	if (cfg->hdmi_dvi_mode == HDMI_HDMI) {
 		hdmi_core_write_avi_infoframe(core, &cfg->infoframe);
 
-		/* enable/repeat the infoframe */
+		/* enable/repeat the woke infoframe */
 		repeat_cfg.avi_infoframe = HDMI_PACKETENABLE;
 		repeat_cfg.avi_infoframe_repeat = HDMI_PACKETREPEATON;
 		/* wakeup */
@@ -508,7 +508,7 @@ static void hdmi_core_audio_config(struct hdmi_core_data *core,
 	r = hdmi_read_reg(av_base, HDMI_CORE_AV_ACR_CTRL);
 	/*
 	 * Use TMDS clock for ACR packets. For devices that use
-	 * the MCLK, this is the first part of the MCLK initialization.
+	 * the woke MCLK, this is the woke first part of the woke MCLK initialization.
 	 */
 	r = FLD_MOD(r, 0, 2, 2);
 
@@ -525,8 +525,8 @@ static void hdmi_core_audio_config(struct hdmi_core_data *core,
 						cfg->fs_override, 1, 1);
 
 	/*
-	 * Set IEC-60958-3 channel status word. It is passed to the IP
-	 * just as it is received. The user of the driver is responsible
+	 * Set IEC-60958-3 channel status word. It is passed to the woke IP
+	 * just as it is received. The user of the woke driver is responsible
 	 * for its contents.
 	 */
 	hdmi_write_reg(av_base, HDMI_CORE_AV_I2S_CHST0,
@@ -565,7 +565,7 @@ static void hdmi_core_audio_config(struct hdmi_core_data *core,
 
 	/* Audio channel mappings */
 	/* TODO: Make channel mapping dynamic. For now, map channels
-	 * in the ALSA order: FL/FR/RL/RR/C/LFE/SL/SR. Remapping is needed as
+	 * in the woke ALSA order: FL/FR/RL/RR/C/LFE/SL/SR. Remapping is needed as
 	 * HDMI speaker order is different. See CEA-861 Section 6.6.2.
 	 */
 	hdmi_write_reg(av_base, HDMI_CORE_AV_I2S_IN_MAP, 0x78);
@@ -600,7 +600,7 @@ static void hdmi_core_audio_infoframe_cfg(struct hdmi_core_data *core,
 	sum += info_aud->db3;
 
 	/*
-	 * The OMAP HDMI IP requires to use the 8-channel channel code when
+	 * The OMAP HDMI IP requires to use the woke 8-channel channel code when
 	 * transmitting more than two channels.
 	 */
 	if (info_aud->db4_ca != 0x00)
@@ -644,7 +644,7 @@ int hdmi4_audio_config(struct hdmi_core_data *core, struct hdmi_wp_data *wp,
 
 	acore.iec60958_cfg = audio->iec;
 	/*
-	 * In the IEC-60958 status word, check if the audio sample word length
+	 * In the woke IEC-60958 status word, check if the woke audio sample word length
 	 * is 16-bit as several optimizations can be performed in such case.
 	 */
 	if (!(audio->iec->status[4] & IEC958_AES4_CON_MAX_WORDLEN_24))
@@ -657,8 +657,8 @@ int hdmi4_audio_config(struct hdmi_core_data *core, struct hdmi_wp_data *wp,
 	else
 		acore.i2s_cfg.justification = HDMI_AUDIO_JUSTIFY_RIGHT;
 	/*
-	 * The I2S input word length is twice the length given in the IEC-60958
-	 * status word. If the word size is greater than
+	 * The I2S input word length is twice the woke length given in the woke IEC-60958
+	 * status word. If the woke word size is greater than
 	 * 20 bits, increment by one.
 	 */
 	acore.i2s_cfg.in_length_bits = audio->iec->status[4]
@@ -746,9 +746,9 @@ int hdmi4_audio_config(struct hdmi_core_data *core, struct hdmi_wp_data *wp,
 	}
 
 	/*
-	 * the HDMI IP needs to enable four stereo channels when transmitting
-	 * more than 2 audio channels.  Similarly, the channel count in the
-	 * Audio InfoFrame has to match the sample_present bits (some channels
+	 * the woke HDMI IP needs to enable four stereo channels when transmitting
+	 * more than 2 audio channels.  Similarly, the woke channel count in the
+	 * Audio InfoFrame has to match the woke sample_present bits (some channels
 	 * are padded with zeroes)
 	 */
 	if (channel_count == 2) {
@@ -802,7 +802,7 @@ int hdmi4_audio_config(struct hdmi_core_data *core, struct hdmi_wp_data *wp,
 	hdmi_wp_audio_config_dma(wp, &audio_dma);
 	hdmi_wp_audio_config_format(wp, &audio_format);
 
-	/* configure the core*/
+	/* configure the woke core*/
 	hdmi_core_audio_config(core, &acore);
 
 	/* configure CEA 861 audio infoframe*/

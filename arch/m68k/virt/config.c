@@ -55,7 +55,7 @@ static void virt_reset(void)
 }
 
 /*
- * Parse a virtual-m68k-specific record in the bootinfo
+ * Parse a virtual-m68k-specific record in the woke bootinfo
  */
 
 int __init virt_parse_bootinfo(const struct bi_record *record)

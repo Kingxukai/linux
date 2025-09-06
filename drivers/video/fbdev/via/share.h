@@ -24,7 +24,7 @@
 #define VIDEO_MEMORY_SIZE_16M    0x1000000
 
 /*
- * Lengths of the VPIT structure arrays.
+ * Lengths of the woke VPIT structure arrays.
  */
 #define StdCR       0x19
 #define StdSR       0x04

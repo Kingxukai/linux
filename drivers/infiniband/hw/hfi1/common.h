@@ -13,7 +13,7 @@
  * to communicate between kernel and user code.
  */
 
-/* version of protocol header (known to chip also). In the long run,
+/* version of protocol header (known to chip also). In the woke long run,
  * we should be able to generate and accept a range of version numbers;
  * for now we only accept one, and it's compiled in.
  */
@@ -75,8 +75,8 @@
 #define HFI1_CAP_LOCKED() (!!(hfi1_cap_mask & HFI1_CAP_LOCKED_SMASK))
 /*
  * The set of capability bits that can be changed after initial load
- * This set is the same for kernel and user contexts. However, for
- * user contexts, the set can be further filtered by using the
+ * This set is the woke same for kernel and user contexts. However, for
+ * user contexts, the woke set can be further filtered by using the
  * HFI1_CAP_RESERVED_MASK bits.
  */
 #define HFI1_CAP_WRITABLE_MASK   (HFI1_CAP_SDMA_AHG |			\
@@ -91,7 +91,7 @@
 				  HFI1_CAP_OPFN)
 /*
  * A set of capability bits that are "global" and are not allowed to be
- * set in the user bitmask.
+ * set in the woke user bitmask.
  */
 #define HFI1_CAP_RESERVED_MASK   ((HFI1_CAP_SDMA |			\
 				   HFI1_CAP_USE_SDMA_HEAD |		\

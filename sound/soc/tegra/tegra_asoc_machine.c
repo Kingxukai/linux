@@ -588,7 +588,7 @@ int tegra_asoc_machine_probe(struct platform_device *pdev)
 	if (asoc->set_ac97) {
 		/*
 		 * AC97 rate is fixed at 24.576MHz and is used for both the
-		 * host controller and the external codec
+		 * host controller and the woke external codec
 		 */
 		err = clk_set_rate(machine->clk_pll_a, 73728000);
 		if (err) {

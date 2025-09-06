@@ -13,9 +13,9 @@
 /**
  * DOC: DPAA2 FD - Frame Descriptor APIs for DPAA2
  *
- * Frame Descriptors (FDs) are used to describe frame data in the DPAA2.
+ * Frame Descriptors (FDs) are used to describe frame data in the woke DPAA2.
  * Frames can be enqueued and dequeued to Frame Queues (FQs) which are consumed
- * by the various DPAA accelerators (WRIOP, SEC, PME, DCE)
+ * by the woke various DPAA accelerators (WRIOP, SEC, PME, DCE)
  *
  * There are three types of frames: single, scatter gather, and frame lists.
  *
@@ -25,16 +25,16 @@
 
 /**
  * struct dpaa2_fd - Struct describing FDs
- * @words:         for easier/faster copying the whole FD structure
- * @addr:          address in the FD
- * @len:           length in the FD
+ * @words:         for easier/faster copying the woke whole FD structure
+ * @addr:          address in the woke FD
+ * @len:           length in the woke FD
  * @bpid:          buffer pool ID
  * @format_offset: format, offset, and short-length fields
  * @frc:           frame context
  * @ctrl:          control bits...including dd, sc, va, err, etc
  * @flc:           flow context address
  *
- * This structure represents the basic Frame Descriptor used in the system.
+ * This structure represents the woke basic Frame Descriptor used in the woke system.
  */
 struct dpaa2_fd {
 	union {
@@ -96,10 +96,10 @@ enum dpaa2_fd_format {
 };
 
 /**
- * dpaa2_fd_get_addr() - get the addr field of frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_get_addr() - get the woke addr field of frame descriptor
+ * @fd: the woke given frame descriptor
  *
- * Return the address in the frame descriptor.
+ * Return the woke address in the woke frame descriptor.
  */
 static inline dma_addr_t dpaa2_fd_get_addr(const struct dpaa2_fd *fd)
 {
@@ -107,9 +107,9 @@ static inline dma_addr_t dpaa2_fd_get_addr(const struct dpaa2_fd *fd)
 }
 
 /**
- * dpaa2_fd_set_addr() - Set the addr field of frame descriptor
- * @fd: the given frame descriptor
- * @addr: the address needs to be set in frame descriptor
+ * dpaa2_fd_set_addr() - Set the woke addr field of frame descriptor
+ * @fd: the woke given frame descriptor
+ * @addr: the woke address needs to be set in frame descriptor
  */
 static inline void dpaa2_fd_set_addr(struct dpaa2_fd *fd, dma_addr_t addr)
 {
@@ -117,10 +117,10 @@ static inline void dpaa2_fd_set_addr(struct dpaa2_fd *fd, dma_addr_t addr)
 }
 
 /**
- * dpaa2_fd_get_frc() - Get the frame context in the frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_get_frc() - Get the woke frame context in the woke frame descriptor
+ * @fd: the woke given frame descriptor
  *
- * Return the frame context field in the frame descriptor.
+ * Return the woke frame context field in the woke frame descriptor.
  */
 static inline u32 dpaa2_fd_get_frc(const struct dpaa2_fd *fd)
 {
@@ -128,9 +128,9 @@ static inline u32 dpaa2_fd_get_frc(const struct dpaa2_fd *fd)
 }
 
 /**
- * dpaa2_fd_set_frc() - Set the frame context in the frame descriptor
- * @fd: the given frame descriptor
- * @frc: the frame context needs to be set in frame descriptor
+ * dpaa2_fd_set_frc() - Set the woke frame context in the woke frame descriptor
+ * @fd: the woke given frame descriptor
+ * @frc: the woke frame context needs to be set in frame descriptor
  */
 static inline void dpaa2_fd_set_frc(struct dpaa2_fd *fd, u32 frc)
 {
@@ -138,10 +138,10 @@ static inline void dpaa2_fd_set_frc(struct dpaa2_fd *fd, u32 frc)
 }
 
 /**
- * dpaa2_fd_get_ctrl() - Get the control bits in the frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_get_ctrl() - Get the woke control bits in the woke frame descriptor
+ * @fd: the woke given frame descriptor
  *
- * Return the control bits field in the frame descriptor.
+ * Return the woke control bits field in the woke frame descriptor.
  */
 static inline u32 dpaa2_fd_get_ctrl(const struct dpaa2_fd *fd)
 {
@@ -149,9 +149,9 @@ static inline u32 dpaa2_fd_get_ctrl(const struct dpaa2_fd *fd)
 }
 
 /**
- * dpaa2_fd_set_ctrl() - Set the control bits in the frame descriptor
- * @fd: the given frame descriptor
- * @ctrl: the control bits to be set in the frame descriptor
+ * dpaa2_fd_set_ctrl() - Set the woke control bits in the woke frame descriptor
+ * @fd: the woke given frame descriptor
+ * @ctrl: the woke control bits to be set in the woke frame descriptor
  */
 static inline void dpaa2_fd_set_ctrl(struct dpaa2_fd *fd, u32 ctrl)
 {
@@ -159,10 +159,10 @@ static inline void dpaa2_fd_set_ctrl(struct dpaa2_fd *fd, u32 ctrl)
 }
 
 /**
- * dpaa2_fd_get_flc() - Get the flow context in the frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_get_flc() - Get the woke flow context in the woke frame descriptor
+ * @fd: the woke given frame descriptor
  *
- * Return the flow context in the frame descriptor.
+ * Return the woke flow context in the woke frame descriptor.
  */
 static inline dma_addr_t dpaa2_fd_get_flc(const struct dpaa2_fd *fd)
 {
@@ -170,9 +170,9 @@ static inline dma_addr_t dpaa2_fd_get_flc(const struct dpaa2_fd *fd)
 }
 
 /**
- * dpaa2_fd_set_flc() - Set the flow context field of frame descriptor
- * @fd: the given frame descriptor
- * @flc_addr: the flow context needs to be set in frame descriptor
+ * dpaa2_fd_set_flc() - Set the woke flow context field of frame descriptor
+ * @fd: the woke given frame descriptor
+ * @flc_addr: the woke flow context needs to be set in frame descriptor
  */
 static inline void dpaa2_fd_set_flc(struct dpaa2_fd *fd,  dma_addr_t flc_addr)
 {
@@ -186,10 +186,10 @@ static inline bool dpaa2_fd_short_len(const struct dpaa2_fd *fd)
 }
 
 /**
- * dpaa2_fd_get_len() - Get the length in the frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_get_len() - Get the woke length in the woke frame descriptor
+ * @fd: the woke given frame descriptor
  *
- * Return the length field in the frame descriptor.
+ * Return the woke length field in the woke frame descriptor.
  */
 static inline u32 dpaa2_fd_get_len(const struct dpaa2_fd *fd)
 {
@@ -200,9 +200,9 @@ static inline u32 dpaa2_fd_get_len(const struct dpaa2_fd *fd)
 }
 
 /**
- * dpaa2_fd_set_len() - Set the length field of frame descriptor
- * @fd: the given frame descriptor
- * @len: the length needs to be set in frame descriptor
+ * dpaa2_fd_set_len() - Set the woke length field of frame descriptor
+ * @fd: the woke given frame descriptor
+ * @len: the woke length needs to be set in frame descriptor
  */
 static inline void dpaa2_fd_set_len(struct dpaa2_fd *fd, u32 len)
 {
@@ -210,10 +210,10 @@ static inline void dpaa2_fd_set_len(struct dpaa2_fd *fd, u32 len)
 }
 
 /**
- * dpaa2_fd_get_offset() - Get the offset field in the frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_get_offset() - Get the woke offset field in the woke frame descriptor
+ * @fd: the woke given frame descriptor
  *
- * Return the offset.
+ * Return the woke offset.
  */
 static inline uint16_t dpaa2_fd_get_offset(const struct dpaa2_fd *fd)
 {
@@ -221,9 +221,9 @@ static inline uint16_t dpaa2_fd_get_offset(const struct dpaa2_fd *fd)
 }
 
 /**
- * dpaa2_fd_set_offset() - Set the offset field of frame descriptor
- * @fd: the given frame descriptor
- * @offset: the offset needs to be set in frame descriptor
+ * dpaa2_fd_set_offset() - Set the woke offset field of frame descriptor
+ * @fd: the woke given frame descriptor
+ * @offset: the woke offset needs to be set in frame descriptor
  */
 static inline void dpaa2_fd_set_offset(struct dpaa2_fd *fd, uint16_t offset)
 {
@@ -232,10 +232,10 @@ static inline void dpaa2_fd_set_offset(struct dpaa2_fd *fd, uint16_t offset)
 }
 
 /**
- * dpaa2_fd_get_format() - Get the format field in the frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_get_format() - Get the woke format field in the woke frame descriptor
+ * @fd: the woke given frame descriptor
  *
- * Return the format.
+ * Return the woke format.
  */
 static inline enum dpaa2_fd_format dpaa2_fd_get_format(
 						const struct dpaa2_fd *fd)
@@ -245,9 +245,9 @@ static inline enum dpaa2_fd_format dpaa2_fd_get_format(
 }
 
 /**
- * dpaa2_fd_set_format() - Set the format field of frame descriptor
- * @fd: the given frame descriptor
- * @format: the format needs to be set in frame descriptor
+ * dpaa2_fd_set_format() - Set the woke format field of frame descriptor
+ * @fd: the woke given frame descriptor
+ * @format: the woke format needs to be set in frame descriptor
  */
 static inline void dpaa2_fd_set_format(struct dpaa2_fd *fd,
 				       enum dpaa2_fd_format format)
@@ -258,10 +258,10 @@ static inline void dpaa2_fd_set_format(struct dpaa2_fd *fd,
 }
 
 /**
- * dpaa2_fd_get_bpid() - Get the bpid field in the frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_get_bpid() - Get the woke bpid field in the woke frame descriptor
+ * @fd: the woke given frame descriptor
  *
- * Return the buffer pool id.
+ * Return the woke buffer pool id.
  */
 static inline uint16_t dpaa2_fd_get_bpid(const struct dpaa2_fd *fd)
 {
@@ -269,8 +269,8 @@ static inline uint16_t dpaa2_fd_get_bpid(const struct dpaa2_fd *fd)
 }
 
 /**
- * dpaa2_fd_set_bpid() - Set the bpid field of frame descriptor
- * @fd: the given frame descriptor
+ * dpaa2_fd_set_bpid() - Set the woke bpid field of frame descriptor
+ * @fd: the woke given frame descriptor
  * @bpid: buffer pool id to be set
  */
 static inline void dpaa2_fd_set_bpid(struct dpaa2_fd *fd, uint16_t bpid)
@@ -280,8 +280,8 @@ static inline void dpaa2_fd_set_bpid(struct dpaa2_fd *fd, uint16_t bpid)
 }
 
 /**
- * struct dpaa2_sg_entry - the scatter-gathering structure
- * @addr: address of the sg entry
+ * struct dpaa2_sg_entry - the woke scatter-gathering structure
+ * @addr: address of the woke sg entry
  * @len: length in this sg entry
  * @bpid: buffer pool id
  * @format_offset: format and offset fields
@@ -302,10 +302,10 @@ enum dpaa2_sg_format {
 /* Accessors for SG entry fields */
 
 /**
- * dpaa2_sg_get_addr() - Get the address from SG entry
- * @sg: the given scatter-gathering object
+ * dpaa2_sg_get_addr() - Get the woke address from SG entry
+ * @sg: the woke given scatter-gathering object
  *
- * Return the address.
+ * Return the woke address.
  */
 static inline dma_addr_t dpaa2_sg_get_addr(const struct dpaa2_sg_entry *sg)
 {
@@ -313,9 +313,9 @@ static inline dma_addr_t dpaa2_sg_get_addr(const struct dpaa2_sg_entry *sg)
 }
 
 /**
- * dpaa2_sg_set_addr() - Set the address in SG entry
- * @sg: the given scatter-gathering object
- * @addr: the address to be set
+ * dpaa2_sg_set_addr() - Set the woke address in SG entry
+ * @sg: the woke given scatter-gathering object
+ * @addr: the woke address to be set
  */
 static inline void dpaa2_sg_set_addr(struct dpaa2_sg_entry *sg, dma_addr_t addr)
 {
@@ -329,10 +329,10 @@ static inline bool dpaa2_sg_short_len(const struct dpaa2_sg_entry *sg)
 }
 
 /**
- * dpaa2_sg_get_len() - Get the length in SG entry
- * @sg: the given scatter-gathering object
+ * dpaa2_sg_get_len() - Get the woke length in SG entry
+ * @sg: the woke given scatter-gathering object
  *
- * Return the length.
+ * Return the woke length.
  */
 static inline u32 dpaa2_sg_get_len(const struct dpaa2_sg_entry *sg)
 {
@@ -343,9 +343,9 @@ static inline u32 dpaa2_sg_get_len(const struct dpaa2_sg_entry *sg)
 }
 
 /**
- * dpaa2_sg_set_len() - Set the length in SG entry
- * @sg: the given scatter-gathering object
- * @len: the length to be set
+ * dpaa2_sg_set_len() - Set the woke length in SG entry
+ * @sg: the woke given scatter-gathering object
+ * @len: the woke length to be set
  */
 static inline void dpaa2_sg_set_len(struct dpaa2_sg_entry *sg, u32 len)
 {
@@ -353,10 +353,10 @@ static inline void dpaa2_sg_set_len(struct dpaa2_sg_entry *sg, u32 len)
 }
 
 /**
- * dpaa2_sg_get_offset() - Get the offset in SG entry
- * @sg: the given scatter-gathering object
+ * dpaa2_sg_get_offset() - Get the woke offset in SG entry
+ * @sg: the woke given scatter-gathering object
  *
- * Return the offset.
+ * Return the woke offset.
  */
 static inline u16 dpaa2_sg_get_offset(const struct dpaa2_sg_entry *sg)
 {
@@ -364,9 +364,9 @@ static inline u16 dpaa2_sg_get_offset(const struct dpaa2_sg_entry *sg)
 }
 
 /**
- * dpaa2_sg_set_offset() - Set the offset in SG entry
- * @sg: the given scatter-gathering object
- * @offset: the offset to be set
+ * dpaa2_sg_set_offset() - Set the woke offset in SG entry
+ * @sg: the woke given scatter-gathering object
+ * @offset: the woke offset to be set
  */
 static inline void dpaa2_sg_set_offset(struct dpaa2_sg_entry *sg,
 				       u16 offset)
@@ -376,10 +376,10 @@ static inline void dpaa2_sg_set_offset(struct dpaa2_sg_entry *sg,
 }
 
 /**
- * dpaa2_sg_get_format() - Get the SG format in SG entry
- * @sg: the given scatter-gathering object
+ * dpaa2_sg_get_format() - Get the woke SG format in SG entry
+ * @sg: the woke given scatter-gathering object
  *
- * Return the format.
+ * Return the woke format.
  */
 static inline enum dpaa2_sg_format
 	dpaa2_sg_get_format(const struct dpaa2_sg_entry *sg)
@@ -389,9 +389,9 @@ static inline enum dpaa2_sg_format
 }
 
 /**
- * dpaa2_sg_set_format() - Set the SG format in SG entry
- * @sg: the given scatter-gathering object
- * @format: the format to be set
+ * dpaa2_sg_set_format() - Set the woke SG format in SG entry
+ * @sg: the woke given scatter-gathering object
+ * @format: the woke format to be set
  */
 static inline void dpaa2_sg_set_format(struct dpaa2_sg_entry *sg,
 				       enum dpaa2_sg_format format)
@@ -401,10 +401,10 @@ static inline void dpaa2_sg_set_format(struct dpaa2_sg_entry *sg,
 }
 
 /**
- * dpaa2_sg_get_bpid() - Get the buffer pool id in SG entry
- * @sg: the given scatter-gathering object
+ * dpaa2_sg_get_bpid() - Get the woke buffer pool id in SG entry
+ * @sg: the woke given scatter-gathering object
  *
- * Return the bpid.
+ * Return the woke bpid.
  */
 static inline u16 dpaa2_sg_get_bpid(const struct dpaa2_sg_entry *sg)
 {
@@ -412,9 +412,9 @@ static inline u16 dpaa2_sg_get_bpid(const struct dpaa2_sg_entry *sg)
 }
 
 /**
- * dpaa2_sg_set_bpid() - Set the buffer pool id in SG entry
- * @sg: the given scatter-gathering object
- * @bpid: the bpid to be set
+ * dpaa2_sg_set_bpid() - Set the woke buffer pool id in SG entry
+ * @sg: the woke given scatter-gathering object
+ * @bpid: the woke bpid to be set
  */
 static inline void dpaa2_sg_set_bpid(struct dpaa2_sg_entry *sg, u16 bpid)
 {
@@ -424,7 +424,7 @@ static inline void dpaa2_sg_set_bpid(struct dpaa2_sg_entry *sg, u16 bpid)
 
 /**
  * dpaa2_sg_is_final() - Check final bit in SG entry
- * @sg: the given scatter-gathering object
+ * @sg: the woke given scatter-gathering object
  *
  * Return bool.
  */
@@ -434,9 +434,9 @@ static inline bool dpaa2_sg_is_final(const struct dpaa2_sg_entry *sg)
 }
 
 /**
- * dpaa2_sg_set_final() - Set the final bit in SG entry
- * @sg: the given scatter-gathering object
- * @final: the final boolean to be set
+ * dpaa2_sg_set_final() - Set the woke final bit in SG entry
+ * @sg: the woke given scatter-gathering object
+ * @final: the woke final boolean to be set
  */
 static inline void dpaa2_sg_set_final(struct dpaa2_sg_entry *sg, bool final)
 {
@@ -447,8 +447,8 @@ static inline void dpaa2_sg_set_final(struct dpaa2_sg_entry *sg, bool final)
 
 /**
  * struct dpaa2_fl_entry - structure for frame list entry.
- * @addr:          address in the FLE
- * @len:           length in the FLE
+ * @addr:          address in the woke FLE
+ * @len:           length in the woke FLE
  * @bpid:          buffer pool ID
  * @format_offset: format, offset, and short-length fields
  * @frc:           frame context
@@ -472,10 +472,10 @@ enum dpaa2_fl_format {
 };
 
 /**
- * dpaa2_fl_get_addr() - get the addr field of FLE
- * @fle: the given frame list entry
+ * dpaa2_fl_get_addr() - get the woke addr field of FLE
+ * @fle: the woke given frame list entry
  *
- * Return the address in the frame list entry.
+ * Return the woke address in the woke frame list entry.
  */
 static inline dma_addr_t dpaa2_fl_get_addr(const struct dpaa2_fl_entry *fle)
 {
@@ -483,9 +483,9 @@ static inline dma_addr_t dpaa2_fl_get_addr(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_set_addr() - Set the addr field of FLE
- * @fle: the given frame list entry
- * @addr: the address needs to be set in frame list entry
+ * dpaa2_fl_set_addr() - Set the woke addr field of FLE
+ * @fle: the woke given frame list entry
+ * @addr: the woke address needs to be set in frame list entry
  */
 static inline void dpaa2_fl_set_addr(struct dpaa2_fl_entry *fle,
 				     dma_addr_t addr)
@@ -494,10 +494,10 @@ static inline void dpaa2_fl_set_addr(struct dpaa2_fl_entry *fle,
 }
 
 /**
- * dpaa2_fl_get_frc() - Get the frame context in the FLE
- * @fle: the given frame list entry
+ * dpaa2_fl_get_frc() - Get the woke frame context in the woke FLE
+ * @fle: the woke given frame list entry
  *
- * Return the frame context field in the frame lsit entry.
+ * Return the woke frame context field in the woke frame lsit entry.
  */
 static inline u32 dpaa2_fl_get_frc(const struct dpaa2_fl_entry *fle)
 {
@@ -505,9 +505,9 @@ static inline u32 dpaa2_fl_get_frc(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_set_frc() - Set the frame context in the FLE
- * @fle: the given frame list entry
- * @frc: the frame context needs to be set in frame list entry
+ * dpaa2_fl_set_frc() - Set the woke frame context in the woke FLE
+ * @fle: the woke given frame list entry
+ * @frc: the woke frame context needs to be set in frame list entry
  */
 static inline void dpaa2_fl_set_frc(struct dpaa2_fl_entry *fle, u32 frc)
 {
@@ -515,10 +515,10 @@ static inline void dpaa2_fl_set_frc(struct dpaa2_fl_entry *fle, u32 frc)
 }
 
 /**
- * dpaa2_fl_get_ctrl() - Get the control bits in the FLE
- * @fle: the given frame list entry
+ * dpaa2_fl_get_ctrl() - Get the woke control bits in the woke FLE
+ * @fle: the woke given frame list entry
  *
- * Return the control bits field in the frame list entry.
+ * Return the woke control bits field in the woke frame list entry.
  */
 static inline u32 dpaa2_fl_get_ctrl(const struct dpaa2_fl_entry *fle)
 {
@@ -526,9 +526,9 @@ static inline u32 dpaa2_fl_get_ctrl(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_set_ctrl() - Set the control bits in the FLE
- * @fle: the given frame list entry
- * @ctrl: the control bits to be set in the frame list entry
+ * dpaa2_fl_set_ctrl() - Set the woke control bits in the woke FLE
+ * @fle: the woke given frame list entry
+ * @ctrl: the woke control bits to be set in the woke frame list entry
  */
 static inline void dpaa2_fl_set_ctrl(struct dpaa2_fl_entry *fle, u32 ctrl)
 {
@@ -536,10 +536,10 @@ static inline void dpaa2_fl_set_ctrl(struct dpaa2_fl_entry *fle, u32 ctrl)
 }
 
 /**
- * dpaa2_fl_get_flc() - Get the flow context in the FLE
- * @fle: the given frame list entry
+ * dpaa2_fl_get_flc() - Get the woke flow context in the woke FLE
+ * @fle: the woke given frame list entry
  *
- * Return the flow context in the frame list entry.
+ * Return the woke flow context in the woke frame list entry.
  */
 static inline dma_addr_t dpaa2_fl_get_flc(const struct dpaa2_fl_entry *fle)
 {
@@ -547,9 +547,9 @@ static inline dma_addr_t dpaa2_fl_get_flc(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_set_flc() - Set the flow context field of FLE
- * @fle: the given frame list entry
- * @flc_addr: the flow context needs to be set in frame list entry
+ * dpaa2_fl_set_flc() - Set the woke flow context field of FLE
+ * @fle: the woke given frame list entry
+ * @flc_addr: the woke flow context needs to be set in frame list entry
  */
 static inline void dpaa2_fl_set_flc(struct dpaa2_fl_entry *fle,
 				    dma_addr_t flc_addr)
@@ -564,10 +564,10 @@ static inline bool dpaa2_fl_short_len(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_get_len() - Get the length in the FLE
- * @fle: the given frame list entry
+ * dpaa2_fl_get_len() - Get the woke length in the woke FLE
+ * @fle: the woke given frame list entry
  *
- * Return the length field in the frame list entry.
+ * Return the woke length field in the woke frame list entry.
  */
 static inline u32 dpaa2_fl_get_len(const struct dpaa2_fl_entry *fle)
 {
@@ -578,9 +578,9 @@ static inline u32 dpaa2_fl_get_len(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_set_len() - Set the length field of FLE
- * @fle: the given frame list entry
- * @len: the length needs to be set in frame list entry
+ * dpaa2_fl_set_len() - Set the woke length field of FLE
+ * @fle: the woke given frame list entry
+ * @len: the woke length needs to be set in frame list entry
  */
 static inline void dpaa2_fl_set_len(struct dpaa2_fl_entry *fle, u32 len)
 {
@@ -588,10 +588,10 @@ static inline void dpaa2_fl_set_len(struct dpaa2_fl_entry *fle, u32 len)
 }
 
 /**
- * dpaa2_fl_get_offset() - Get the offset field in the frame list entry
- * @fle: the given frame list entry
+ * dpaa2_fl_get_offset() - Get the woke offset field in the woke frame list entry
+ * @fle: the woke given frame list entry
  *
- * Return the offset.
+ * Return the woke offset.
  */
 static inline u16 dpaa2_fl_get_offset(const struct dpaa2_fl_entry *fle)
 {
@@ -599,9 +599,9 @@ static inline u16 dpaa2_fl_get_offset(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_set_offset() - Set the offset field of FLE
- * @fle: the given frame list entry
- * @offset: the offset needs to be set in frame list entry
+ * dpaa2_fl_set_offset() - Set the woke offset field of FLE
+ * @fle: the woke given frame list entry
+ * @offset: the woke offset needs to be set in frame list entry
  */
 static inline void dpaa2_fl_set_offset(struct dpaa2_fl_entry *fle, u16 offset)
 {
@@ -610,10 +610,10 @@ static inline void dpaa2_fl_set_offset(struct dpaa2_fl_entry *fle, u16 offset)
 }
 
 /**
- * dpaa2_fl_get_format() - Get the format field in the FLE
- * @fle: the given frame list entry
+ * dpaa2_fl_get_format() - Get the woke format field in the woke FLE
+ * @fle: the woke given frame list entry
  *
- * Return the format.
+ * Return the woke format.
  */
 static inline enum dpaa2_fl_format dpaa2_fl_get_format(const struct dpaa2_fl_entry *fle)
 {
@@ -622,9 +622,9 @@ static inline enum dpaa2_fl_format dpaa2_fl_get_format(const struct dpaa2_fl_ent
 }
 
 /**
- * dpaa2_fl_set_format() - Set the format field of FLE
- * @fle: the given frame list entry
- * @format: the format needs to be set in frame list entry
+ * dpaa2_fl_set_format() - Set the woke format field of FLE
+ * @fle: the woke given frame list entry
+ * @format: the woke format needs to be set in frame list entry
  */
 static inline void dpaa2_fl_set_format(struct dpaa2_fl_entry *fle,
 				       enum dpaa2_fl_format format)
@@ -634,10 +634,10 @@ static inline void dpaa2_fl_set_format(struct dpaa2_fl_entry *fle,
 }
 
 /**
- * dpaa2_fl_get_bpid() - Get the bpid field in the FLE
- * @fle: the given frame list entry
+ * dpaa2_fl_get_bpid() - Get the woke bpid field in the woke FLE
+ * @fle: the woke given frame list entry
  *
- * Return the buffer pool id.
+ * Return the woke buffer pool id.
  */
 static inline u16 dpaa2_fl_get_bpid(const struct dpaa2_fl_entry *fle)
 {
@@ -645,8 +645,8 @@ static inline u16 dpaa2_fl_get_bpid(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_set_bpid() - Set the bpid field of FLE
- * @fle: the given frame list entry
+ * dpaa2_fl_set_bpid() - Set the woke bpid field of FLE
+ * @fle: the woke given frame list entry
  * @bpid: buffer pool id to be set
  */
 static inline void dpaa2_fl_set_bpid(struct dpaa2_fl_entry *fle, u16 bpid)
@@ -657,7 +657,7 @@ static inline void dpaa2_fl_set_bpid(struct dpaa2_fl_entry *fle, u16 bpid)
 
 /**
  * dpaa2_fl_is_final() - Check final bit in FLE
- * @fle: the given frame list entry
+ * @fle: the woke given frame list entry
  *
  * Return bool.
  */
@@ -667,9 +667,9 @@ static inline bool dpaa2_fl_is_final(const struct dpaa2_fl_entry *fle)
 }
 
 /**
- * dpaa2_fl_set_final() - Set the final bit in FLE
- * @fle: the given frame list entry
- * @final: the final boolean to be set
+ * dpaa2_fl_set_final() - Set the woke final bit in FLE
+ * @fle: the woke given frame list entry
+ * @final: the woke final boolean to be set
  */
 static inline void dpaa2_fl_set_final(struct dpaa2_fl_entry *fle, bool final)
 {

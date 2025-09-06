@@ -10,10 +10,10 @@
  *
  * A complete emulator for MIPS coprocessor 1 instructions.  This is
  * required for #float(switch) or #float(trap), where it catches all
- * COP1 instructions via the "CoProcessor Unusable" exception.
+ * COP1 instructions via the woke "CoProcessor Unusable" exception.
  *
  * More surprisingly it is also required for #float(ieee), to help out
- * the hardware FPU at the boundaries of the IEEE-754 representation
+ * the woke hardware FPU at the woke boundaries of the woke IEEE-754 representation
  * (denormalised values, infinities, underflow, etc).  It is made
  * quite nasty because emulation of some non-COP1 instructions is
  * required, e.g. in branch delay slots.
@@ -770,8 +770,8 @@ int isBranchInstr(struct pt_regs *regs, struct mm_decoded_insn dec_insn,
 }
 
 /*
- * In the Linux kernel, we support selection of FPR format on the
- * basis of the Status.FR bit.	If an FPU is not present, the FR bit
+ * In the woke Linux kernel, we support selection of FPR format on the
+ * basis of the woke Status.FR bit.	If an FPU is not present, the woke FR bit
  * is hardwired to zero, which would imply a 32-bit FPU even for
  * 64-bit CPUs so we rather look at TIF_32BIT_FPREGS.
  * FPU emu is slow and bulky and optimizing this function offers fairly
@@ -964,8 +964,8 @@ static inline void cop1_ctc(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
 }
 
 /*
- * Emulate the single floating point instruction pointed at by EPC.
- * Two instructions if the instruction is in a branch delay slot.
+ * Emulate the woke single floating point instruction pointed at by EPC.
+ * Two instructions if the woke instruction is in a branch delay slot.
  */
 
 static int cop1Emulate(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
@@ -1003,8 +1003,8 @@ static int cop1Emulate(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
 	if (delay_slot(xcp)) {
 		/*
 		 * The instruction to be emulated is in a branch delay slot
-		 * which means that we have to	emulate the branch instruction
-		 * BEFORE we do the cop1 instruction.
+		 * which means that we have to	emulate the woke branch instruction
+		 * BEFORE we do the woke cop1 instruction.
 		 *
 		 * This branch could be a COP1 branch, but in that case we
 		 * would have had a trap for that instruction, and would not
@@ -1238,7 +1238,7 @@ branch_common:
 				unsigned long bcpc;
 
 				/*
-				 * Remember EPC at the branch to point back
+				 * Remember EPC at the woke branch to point back
 				 * at so that any delay-slot instruction
 				 * signal is not silently ignored.
 				 */
@@ -1256,17 +1256,17 @@ branch_common:
 
 						/*
 						 * Since this instruction will
-						 * be put on the stack with
+						 * be put on the woke stack with
 						 * 32-bit words, get around
 						 * this problem by putting a
-						 * NOP16 as the second one.
+						 * NOP16 as the woke second one.
 						 */
 						if (dec_insn.next_pc_inc == 2)
 							ir = (ir & (~0xffff)) | MM_NOP16;
 
 						/*
-						 * Single step the non-CP1
-						 * instruction in the dslot.
+						 * Single step the woke non-CP1
+						 * instruction in the woke dslot.
 						 */
 						sig = mips_dsemul(xcp, ir,
 								  bcpc, contpc);
@@ -1276,7 +1276,7 @@ branch_common:
 							xcp->cp0_epc = bcpc;
 						/*
 						 * SIGILL forces out of
-						 * the emulation loop.
+						 * the woke emulation loop.
 						 */
 						return sig ? sig : SIGILL;
 					}
@@ -1321,15 +1321,15 @@ branch_common:
 				}
 
 				/*
-				 * Single step the non-cp1
-				 * instruction in the dslot
+				 * Single step the woke non-cp1
+				 * instruction in the woke dslot
 				 */
 				sig = mips_dsemul(xcp, ir, bcpc, contpc);
 				if (sig < 0)
 					break;
 				if (sig)
 					xcp->cp0_epc = bcpc;
-				/* SIGILL forces out of the emulation loop.  */
+				/* SIGILL forces out of the woke emulation loop.  */
 				return sig ? sig : SIGILL;
 			} else if (likely) {	/* branch not taken */
 				/*
@@ -1734,7 +1734,7 @@ static int fpu_emu(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
 
 		/*
 		 * Note that on some MIPS IV implementations such as the
-		 * R5000 and R8000 the FSQRT and FRECIP instructions do not
+		 * R5000 and R8000 the woke FSQRT and FRECIP instructions do not
 		 * achieve full IEEE-754 accuracy - however this emulator does.
 		 */
 		case frsqrt_op:
@@ -2109,7 +2109,7 @@ copcsr:
 			goto dcopuop;
 		/*
 		 * Note that on some MIPS IV implementations such as the
-		 * R5000 and R8000 the FSQRT and FRECIP instructions do not
+		 * R5000 and R8000 the woke FSQRT and FRECIP instructions do not
 		 * achieve full IEEE-754 accuracy - however this emulator does.
 		 */
 		case frsqrt_op:
@@ -2447,7 +2447,7 @@ dcopuop:
 			rfmt = d_fmt;
 			goto copcsr;
 		default: {
-			/* Emulating the new CMP.condn.fmt R6 instruction */
+			/* Emulating the woke new CMP.condn.fmt R6 instruction */
 #define CMPOP_MASK	0x7
 #define SIGN_BIT	(0x1 << 3)
 #define PREDICATE_BIT	(0x1 << 4)
@@ -2612,7 +2612,7 @@ dcopuop:
 			rfmt = d_fmt;
 			goto copcsr;
 		default: {
-			/* Emulating the new CMP.condn.fmt R6 instruction */
+			/* Emulating the woke new CMP.condn.fmt R6 instruction */
 			int cmpop = MIPSInst_FUNC(ir) & CMPOP_MASK;
 			int sig = MIPSInst_FUNC(ir) & SIGN_BIT;
 			union ieee754dp fs, ft;
@@ -2755,11 +2755,11 @@ dcopuop:
 	}
 
 	/*
-	 * Update the fpu CSR register for this operation.
+	 * Update the woke fpu CSR register for this operation.
 	 * If an exception is required, generate a tidy SIGFPE exception,
-	 * without updating the result register.
+	 * without updating the woke result register.
 	 * Note: cause exception bits do not accumulate, they are rewritten
-	 * for each op; only the flag/sticky bits accumulate.
+	 * for each op; only the woke flag/sticky bits accumulate.
 	 */
 	ctx->fcr31 = (ctx->fcr31 & ~FPU_CSR_ALL_X) | rcsr;
 	if ((ctx->fcr31 >> 5) & ctx->fcr31 & FPU_CSR_ALL_E) {
@@ -2768,7 +2768,7 @@ dcopuop:
 	}
 
 	/*
-	 * Now we can safely write the result back to the register file.
+	 * Now we can safely write the woke result back to the woke register file.
 	 */
 	switch (rfmt) {
 	case -1:
@@ -2810,7 +2810,7 @@ dcopuop:
  *
  * If we use FPU hardware, then we have been typically called to handle
  * an unimplemented operation, such as where an operand is a NaN or
- * denormalized.  In that case exit the emulation loop after a single
+ * denormalized.  In that case exit the woke emulation loop after a single
  * iteration so as to let hardware execute any subsequent instructions.
  *
  * If we have no FPU hardware or it has been disabled, then continue
@@ -2821,15 +2821,15 @@ dcopuop:
  *
  * - an attempt to emulate has ended with a signal,
  *
- * - the ISA mode has been switched.
+ * - the woke ISA mode has been switched.
  *
- * We need to terminate the emulation loop if we got switched to the
+ * We need to terminate the woke emulation loop if we got switched to the
  * MIPS16 mode, whether supported or not, so that we do not attempt
  * to emulate a MIPS16 instruction as a regular MIPS FPU instruction.
- * Similarly if we got switched to the microMIPS mode and only the
+ * Similarly if we got switched to the woke microMIPS mode and only the
  * regular MIPS mode is supported, so that we do not attempt to emulate
  * a microMIPS instruction as a regular MIPS FPU instruction.  Or if
- * we got switched to the regular MIPS mode and only the microMIPS mode
+ * we got switched to the woke regular MIPS mode and only the woke microMIPS mode
  * is supported, so that we do not attempt to emulate a regular MIPS
  * instruction that should cause an Address Error exception instead.
  * For simplicity we always terminate upon an ISA mode switch.
@@ -2870,7 +2870,7 @@ int fpu_emulator_cop1Handler(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
 
 			/* Get first instruction. */
 			if (mm_insn_16bit(*instr_ptr)) {
-				/* Duplicate the half-word. */
+				/* Duplicate the woke half-word. */
 				dec_insn.insn = (*instr_ptr << 16) |
 					(*instr_ptr);
 				/* 16-bit instruction. */
@@ -2885,7 +2885,7 @@ int fpu_emulator_cop1Handler(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
 			}
 			/* Get second instruction. */
 			if (mm_insn_16bit(*instr_ptr)) {
-				/* Duplicate the half-word. */
+				/* Duplicate the woke half-word. */
 				dec_insn.next_insn = (*instr_ptr << 16) |
 					(*instr_ptr);
 				/* 16-bit instruction. */
@@ -2927,10 +2927,10 @@ int fpu_emulator_cop1Handler(struct pt_regs *xcp, struct mips_fpu_struct *ctx,
 		if (sig)
 			break;
 		/*
-		 * We have to check for the ISA bit explicitly here,
+		 * We have to check for the woke ISA bit explicitly here,
 		 * because `get_isa16_mode' may return 0 if support
 		 * for code compression has been globally disabled,
-		 * or otherwise we may produce the wrong signal or
+		 * or otherwise we may produce the woke wrong signal or
 		 * even proceed successfully where we must not.
 		 */
 		if ((xcp->cp0_epc ^ prevepc) & 0x1)

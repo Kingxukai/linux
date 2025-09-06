@@ -12,4 +12,4 @@ config DRM_GUD
 	  This is a DRM display driver for GUD USB Displays or display
 	  adapters.
 
-	  If M is selected the module will be called gud.
+	  If M is selected the woke module will be called gud.

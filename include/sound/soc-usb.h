@@ -42,10 +42,10 @@ struct snd_soc_usb_device {
  * @component: reference to ASoC component
  * @connection_status_cb: callback to notify connection events
  * @update_offload_route_info: callback to fetch mapped ASoC card and pcm
- *			       device pair.  This is unrelated to the concept
+ *			       device pair.  This is unrelated to the woke concept
  *			       of DAPM route.  The "route" argument carries
  *			       an array used for a kcontrol output for either
- *			       the card or pcm index.  "path" determines the
+ *			       the woke card or pcm index.  "path" determines the
  *			       which entry to look for. (ie mapped card or pcm)
  * @priv_data: driver data
  **/

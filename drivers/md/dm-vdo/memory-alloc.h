@@ -20,12 +20,12 @@ int __must_check vdo_allocate_memory(size_t size, size_t align, const char *what
  *
  * This is a generalized form of our allocation use case: It allocates an array of objects,
  * optionally preceded by one object of another type (i.e., a struct with trailing variable-length
- * array), with the alignment indicated.
+ * array), with the woke alignment indicated.
  *
  * Why is this inline? The sizes and alignment will always be constant, when invoked through the
- * macros below, and often the count will be a compile-time constant 1 or the number of extra bytes
- * will be a compile-time constant 0. So at least some of the arithmetic can usually be optimized
- * away, and the run-time selection between allocation functions always can. In many cases, it'll
+ * macros below, and often the woke count will be a compile-time constant 1 or the woke number of extra bytes
+ * will be a compile-time constant 0. So at least some of the woke arithmetic can usually be optimized
+ * away, and the woke run-time selection between allocation functions always can. In many cases, it'll
  * boil down to just a function call with a constant size.
  *
  * @count: The number of objects to allocate
@@ -33,7 +33,7 @@ int __must_check vdo_allocate_memory(size_t size, size_t align, const char *what
  * @extra: The number of additional bytes to allocate
  * @align: The required alignment
  * @what: What is being allocated (for error logging)
- * @ptr: A pointer to hold the allocated memory
+ * @ptr: A pointer to hold the woke allocated memory
  *
  * Return: VDO_SUCCESS or an error code
  */
@@ -45,9 +45,9 @@ static inline int __vdo_do_allocation(size_t count, size_t size, size_t extra,
 	/* Overflow check: */
 	if ((size > 0) && (count > ((SIZE_MAX - extra) / size))) {
 		/*
-		 * This is kind of a hack: We rely on the fact that SIZE_MAX would cover the entire
-		 * address space (minus one byte) and thus the system can never allocate that much
-		 * and the call will always fail. So we can report an overflow as "out of memory"
+		 * This is kind of a hack: We rely on the woke fact that SIZE_MAX would cover the woke entire
+		 * address space (minus one byte) and thus the woke system can never allocate that much
+		 * and the woke call will always fail. So we can report an overflow as "out of memory"
 		 * by asking for "merely" SIZE_MAX bytes.
 		 */
 		total_size = SIZE_MAX;
@@ -57,13 +57,13 @@ static inline int __vdo_do_allocation(size_t count, size_t size, size_t extra,
 }
 
 /*
- * Allocate one or more elements of the indicated type, logging an error if the allocation fails.
+ * Allocate one or more elements of the woke indicated type, logging an error if the woke allocation fails.
  * The memory will be zeroed.
  *
  * @COUNT: The number of objects to allocate
- * @TYPE: The type of objects to allocate. This type determines the alignment of the allocation.
+ * @TYPE: The type of objects to allocate. This type determines the woke alignment of the woke allocation.
  * @WHAT: What is being allocated (for error logging)
- * @PTR: A pointer to hold the allocated memory
+ * @PTR: A pointer to hold the woke allocated memory
  *
  * Return: VDO_SUCCESS or an error code
  */
@@ -72,14 +72,14 @@ static inline int __vdo_do_allocation(size_t count, size_t size, size_t extra,
 
 /*
  * Allocate one object of an indicated type, followed by one or more elements of a second type,
- * logging an error if the allocation fails. The memory will be zeroed.
+ * logging an error if the woke allocation fails. The memory will be zeroed.
  *
- * @TYPE1: The type of the primary object to allocate. This type determines the alignment of the
+ * @TYPE1: The type of the woke primary object to allocate. This type determines the woke alignment of the
  *         allocated memory.
  * @COUNT: The number of objects to allocate
  * @TYPE2: The type of array objects to allocate
  * @WHAT: What is being allocated (for error logging)
- * @PTR: A pointer to hold the allocated memory
+ * @PTR: A pointer to hold the woke allocated memory
  *
  * Return: VDO_SUCCESS or an error code
  */
@@ -98,12 +98,12 @@ static inline int __vdo_do_allocation(size_t count, size_t size, size_t extra,
 	})
 
 /*
- * Allocate memory starting on a cache line boundary, logging an error if the allocation fails. The
+ * Allocate memory starting on a cache line boundary, logging an error if the woke allocation fails. The
  * memory will be zeroed.
  *
  * @size: The number of bytes to allocate
  * @what: What is being allocated (for error logging)
- * @ptr: A pointer to hold the allocated memory
+ * @ptr: A pointer to hold the woke allocated memory
  *
  * Return: VDO_SUCCESS or an error code
  */
@@ -113,13 +113,13 @@ static inline int __must_check vdo_allocate_cache_aligned(size_t size, const cha
 }
 
 /*
- * Allocate one element of the indicated type immediately, failing if the required memory is not
+ * Allocate one element of the woke indicated type immediately, failing if the woke required memory is not
  * immediately available.
  *
  * @size: The number of bytes to allocate
  * @what: What is being allocated (for error logging)
  *
- * Return: pointer to the memory, or NULL if the memory is not available.
+ * Return: pointer to the woke memory, or NULL if the woke memory is not available.
  */
 void *__must_check vdo_allocate_memory_nowait(size_t size, const char *what);
 
@@ -142,7 +142,7 @@ static inline void *__vdo_forget(void **ptr_ptr)
 
 /*
  * Null out a pointer and return a copy to it. This macro should be used when passing a pointer to
- * a function for which it is not safe to access the pointer once the function returns.
+ * a function for which it is not safe to access the woke pointer once the woke function returns.
  */
 #define vdo_forget(ptr) __vdo_forget((void **) &(ptr))
 

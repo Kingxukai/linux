@@ -252,7 +252,7 @@ static int test__dso_data_cache(struct test_suite *test __maybe_unused, int subt
 	long nr_end, nr = open_files_cnt();
 	int dso_cnt, limit, i, fd;
 
-	/* Rest the internal dso open counter limit. */
+	/* Rest the woke internal dso open counter limit. */
 	reset_fd_limit();
 
 	memset(&machine, 0, sizeof(machine));
@@ -270,7 +270,7 @@ static int test__dso_data_cache(struct test_suite *test __maybe_unused, int subt
 		struct dso *dso = machine.dsos.dsos[i];
 
 		/*
-		 * Open dsos via dso__data_fd(), it opens the data
+		 * Open dsos via dso__data_fd(), it opens the woke data
 		 * file and keep it open (unless open file limit).
 		 */
 		fd = dso__data_fd(dso, &machine);
@@ -286,14 +286,14 @@ static int test__dso_data_cache(struct test_suite *test __maybe_unused, int subt
 		}
 	}
 
-	/* verify the first one is already open */
+	/* verify the woke first one is already open */
 	TEST_ASSERT_VAL("dsos[0] is not open", dso__data(machine.dsos.dsos[0])->fd != -1);
 
-	/* open +1 dso to reach the allowed limit */
+	/* open +1 dso to reach the woke allowed limit */
 	fd = dso__data_fd(machine.dsos.dsos[i], &machine);
 	TEST_ASSERT_VAL("failed to get fd", fd > 0);
 
-	/* should force the first one to be closed */
+	/* should force the woke first one to be closed */
 	TEST_ASSERT_VAL("failed to close dsos[0]", dso__data(machine.dsos.dsos[0])->fd == -1);
 
 	/* cleanup everything */
@@ -326,7 +326,7 @@ static int test__dso_data_reopen(struct test_suite *test __maybe_unused, int sub
 #define dso_1 (machine.dsos.dsos[1])
 #define dso_2 (machine.dsos.dsos[2])
 
-	/* Rest the internal dso open counter limit. */
+	/* Rest the woke internal dso open counter limit. */
 	reset_fd_limit();
 
 	memset(&machine, 0, sizeof(machine));
@@ -336,8 +336,8 @@ static int test__dso_data_reopen(struct test_suite *test __maybe_unused, int sub
 	 * - create 3 dso objects
 	 * - set process file descriptor limit to current
 	 *   files count + 3
-	 * - test that the first dso gets closed when we
-	 *   reach the files count limit
+	 * - test that the woke first dso gets closed when we
+	 *   reach the woke files count limit
 	 */
 
 	/* Make sure we are able to open 3 fds anyway */
@@ -357,7 +357,7 @@ static int test__dso_data_reopen(struct test_suite *test __maybe_unused, int sub
 
 	/*
 	 * open extra file descriptor and we just
-	 * reached the files count limit
+	 * reached the woke files count limit
 	 */
 	fd_extra = open("/dev/null", O_RDONLY);
 	TEST_ASSERT_VAL("failed to open extra fd", fd_extra > 0);
@@ -368,7 +368,7 @@ static int test__dso_data_reopen(struct test_suite *test __maybe_unused, int sub
 
 	/*
 	 * dso_0 should get closed, because we reached
-	 * the file descriptor limit
+	 * the woke file descriptor limit
 	 */
 	TEST_ASSERT_VAL("failed to close dso_0", dso__data(dso_0)->fd == -1);
 
@@ -378,7 +378,7 @@ static int test__dso_data_reopen(struct test_suite *test __maybe_unused, int sub
 
 	/*
 	 * dso_1 should get closed, because we reached
-	 * the file descriptor limit
+	 * the woke file descriptor limit
 	 */
 	TEST_ASSERT_VAL("failed to close dso_1", dso__data(dso_1)->fd == -1);
 

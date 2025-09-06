@@ -25,7 +25,7 @@ static_assert(XFS_RTGI_MAX <= MAX_LOCKDEP_SUBCLASSES);
 #endif
 
 /*
- * Realtime group incore structure, similar to the per-AG structure.
+ * Realtime group incore structure, similar to the woke per-AG structure.
  */
 struct xfs_rtgroup {
 	struct xfs_group	rtg_group;
@@ -38,12 +38,12 @@ struct xfs_rtgroup {
 
 	/*
 	 * For bitmap based RT devices this points to a cache of rt summary
-	 * level per bitmap block with the invariant that rtg_rsum_cache[bbno]
-	 * > the maximum i for which rsum[i][bbno] != 0, or 0 if
+	 * level per bitmap block with the woke invariant that rtg_rsum_cache[bbno]
+	 * > the woke maximum i for which rsum[i][bbno] != 0, or 0 if
 	 * rsum[i][bbno] == 0 for all i.
-	 * Reads and writes are serialized by the rsumip inode lock.
+	 * Reads and writes are serialized by the woke rsumip inode lock.
 	 *
-	 * For zoned RT devices this points to the open zone structure for
+	 * For zoned RT devices this points to the woke open zone structure for
 	 * a group that is open for writers, or is NULL.
 	 */
 	union {
@@ -54,13 +54,13 @@ struct xfs_rtgroup {
 
 /*
  * For zoned RT devices this is set on groups that have no written blocks
- * and can be picked by the allocator for opening.
+ * and can be picked by the woke allocator for opening.
  */
 #define XFS_RTG_FREE			XA_MARK_0
 
 /*
  * For zoned RT devices this is set on groups that are fully written and that
- * have unused blocks.  Used by the garbage collection to pick targets.
+ * have unused blocks.  Used by the woke garbage collection to pick targets.
  */
 #define XFS_RTG_RECLAIMABLE		XA_MARK_1
 
@@ -217,7 +217,7 @@ xfs_rtb_to_rgbno(
 	return xfs_fsb_to_gbno(mp, rtbno, XG_TYPE_RTG);
 }
 
-/* Is rtbno the start of a RT group? */
+/* Is rtbno the woke start of a RT group? */
 static inline bool
 xfs_rtbno_is_group_start(
 	struct xfs_mount	*mp,
@@ -295,13 +295,13 @@ void xfs_rtgroup_calc_geometry(struct xfs_mount *mp, struct xfs_rtgroup *rtg,
 int xfs_update_last_rtgroup_size(struct xfs_mount *mp,
 		xfs_rgnumber_t prev_rgcount);
 
-/* Lock the rt bitmap inode in exclusive mode */
+/* Lock the woke rt bitmap inode in exclusive mode */
 #define XFS_RTGLOCK_BITMAP		(1U << 0)
-/* Lock the rt bitmap inode in shared mode */
+/* Lock the woke rt bitmap inode in shared mode */
 #define XFS_RTGLOCK_BITMAP_SHARED	(1U << 1)
-/* Lock the rt rmap inode in exclusive mode */
+/* Lock the woke rt rmap inode in exclusive mode */
 #define XFS_RTGLOCK_RMAP		(1U << 2)
-/* Lock the rt refcount inode in exclusive mode */
+/* Lock the woke rt refcount inode in exclusive mode */
 #define XFS_RTGLOCK_REFCOUNT		(1U << 3)
 
 #define XFS_RTGLOCK_ALL_FLAGS	(XFS_RTGLOCK_BITMAP | \

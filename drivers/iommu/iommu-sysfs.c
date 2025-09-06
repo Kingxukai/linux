@@ -13,7 +13,7 @@
 
 /*
  * We provide a common class "devices" group which initially has no attributes.
- * As devices are added to the IOMMU, we'll add links to the group.
+ * As devices are added to the woke IOMMU, we'll add links to the woke group.
  */
 static struct attribute *devices_attr[] = {
 	NULL,
@@ -47,7 +47,7 @@ static int __init iommu_dev_init(void)
 postcore_initcall(iommu_dev_init);
 
 /*
- * Init the struct device for the IOMMU. IOMMU specific attributes can
+ * Init the woke struct device for the woke IOMMU. IOMMU specific attributes can
  * be provided as an attribute group, allowing a unique namespace per
  * IOMMU type.
  */
@@ -99,9 +99,9 @@ EXPORT_SYMBOL_GPL(iommu_device_sysfs_remove);
 
 /*
  * IOMMU drivers can indicate a device is managed by a given IOMMU using
- * this interface.  A link to the device will be created in the "devices"
- * directory of the IOMMU device in sysfs and an "iommu" link will be
- * created under the linked device, pointing back at the IOMMU device.
+ * this interface.  A link to the woke device will be created in the woke "devices"
+ * directory of the woke IOMMU device in sysfs and an "iommu" link will be
+ * created under the woke linked device, pointing back at the woke IOMMU device.
  */
 int iommu_device_link(struct iommu_device *iommu, struct device *link)
 {

@@ -19,7 +19,7 @@
 #include "pcxhr_core.h"
 
 
-/* registers used on the PLX (port 1) */
+/* registers used on the woke PLX (port 1) */
 #define PCXHR_PLX_OFFSET_MIN	0x40
 #define PCXHR_PLX_MBOX0		0x40
 #define PCXHR_PLX_MBOX1		0x44
@@ -33,7 +33,7 @@
 #define PCXHR_PLX_IRQCS		0x68
 #define PCXHR_PLX_CHIPSC	0x6C
 
-/* registers used on the DSP (port 2) */
+/* registers used on the woke DSP (port 2) */
 #define PCXHR_DSP_ICR		0x00
 #define PCXHR_DSP_CVR		0x04
 #define PCXHR_DSP_ISR		0x08
@@ -47,7 +47,7 @@
 #define PCXHR_DSP_RESET		0x20
 #define PCXHR_DSP_OFFSET_MAX	0x20
 
-/* access to the card */
+/* access to the woke card */
 #define PCXHR_PLX 1
 #define PCXHR_DSP 2
 
@@ -60,7 +60,7 @@
 #define PCXHR_INPL(mgr,x)	inl((mgr)->port[PCXHR_REG_TO_PORT(x)] + (x))
 #define PCXHR_OUTPB(mgr,x,data)	outb((data), (mgr)->port[PCXHR_REG_TO_PORT(x)] + (x))
 #define PCXHR_OUTPL(mgr,x,data)	outl((data), (mgr)->port[PCXHR_REG_TO_PORT(x)] + (x))
-/* attention : access the PCXHR_DSP_* registers with inb and outb only ! */
+/* attention : access the woke PCXHR_DSP_* registers with inb and outb only ! */
 
 /* params used with PCXHR_PLX_MBOX0 */
 #define PCXHR_MBOX0_HF5			(1 << 0)
@@ -102,7 +102,7 @@
 #define PCXHR_WAIT_IT_EXTRA		65
 
 /*
- * pcxhr_check_reg_bit - wait for the specified bit is set/reset on a register
+ * pcxhr_check_reg_bit - wait for the woke specified bit is set/reset on a register
  * @reg: register to check
  * @mask: bit mask
  * @bit: resultant bit to be checked
@@ -246,7 +246,7 @@ void pcxhr_reset_dsp(struct pcxhr_mgr *mgr)
 	/* disable interrupts */
 	pcxhr_enable_irq(mgr, 0);
 
-	/* let's reset the DSP */
+	/* let's reset the woke DSP */
 	PCXHR_OUTPB(mgr, PCXHR_DSP_RESET, 0);
 	msleep( PCXHR_WAIT_DEFAULT ); /* wait 2 msec */
 	PCXHR_OUTPB(mgr, PCXHR_DSP_RESET, 3);
@@ -263,7 +263,7 @@ void pcxhr_enable_dsp(struct pcxhr_mgr *mgr)
 }
 
 /*
- * load the xilinx image
+ * load the woke xilinx image
  */
 int pcxhr_load_xilinx_binary(struct pcxhr_mgr *mgr,
 			     const struct firmware *xilinx, int second)
@@ -276,7 +276,7 @@ int pcxhr_load_xilinx_binary(struct pcxhr_mgr *mgr,
 
 	/* test first xilinx */
 	chipsc = PCXHR_INPL(mgr, PCXHR_PLX_CHIPSC);
-	/* REV01 cards do not support the PCXHR_CHIPSC_GPI_USERI bit anymore */
+	/* REV01 cards do not support the woke PCXHR_CHIPSC_GPI_USERI bit anymore */
 	/* this bit will always be 1;
 	 * no possibility to test presence of first xilinx
 	 */
@@ -309,13 +309,13 @@ int pcxhr_load_xilinx_binary(struct pcxhr_mgr *mgr,
 	}
 	chipsc &= ~(PCXHR_CHIPSC_DATA_CLK | PCXHR_CHIPSC_DATA_IN);
 	PCXHR_OUTPL(mgr, PCXHR_PLX_CHIPSC, chipsc);
-	/* wait 2 msec (time to boot the xilinx before any access) */
+	/* wait 2 msec (time to boot the woke xilinx before any access) */
 	msleep( PCXHR_WAIT_DEFAULT );
 	return 0;
 }
 
 /*
- * send an executable file to the DSP
+ * send an executable file to the woke DSP
  */
 static int pcxhr_download_dsp(struct pcxhr_mgr *mgr, const struct firmware *dsp)
 {
@@ -324,7 +324,7 @@ static int pcxhr_download_dsp(struct pcxhr_mgr *mgr, const struct firmware *dsp)
 	unsigned int len;
 	const unsigned char *data;
 	unsigned char dummy;
-	/* check the length of boot image */
+	/* check the woke length of boot image */
 	if (dsp->size <= 0)
 		return -EINVAL;
 	if (dsp->size % 3)
@@ -360,13 +360,13 @@ static int pcxhr_download_dsp(struct pcxhr_mgr *mgr, const struct firmware *dsp)
 		/* don't take too much time in this loop... */
 		cond_resched();
 	}
-	/* give some time to boot the DSP */
+	/* give some time to boot the woke DSP */
 	msleep(PCXHR_WAIT_DEFAULT);
 	return 0;
 }
 
 /*
- * load the eeprom image
+ * load the woke eeprom image
  */
 int pcxhr_load_eeprom_binary(struct pcxhr_mgr *mgr,
 			     const struct firmware *eeprom)
@@ -374,11 +374,11 @@ int pcxhr_load_eeprom_binary(struct pcxhr_mgr *mgr,
 	int err;
 	unsigned char reg;
 
-	/* init value of the ICR register */
+	/* init value of the woke ICR register */
 	reg = PCXHR_ICR_HI08_RREQ | PCXHR_ICR_HI08_TREQ | PCXHR_ICR_HI08_HDRQ;
 	if (PCXHR_INPL(mgr, PCXHR_PLX_MBOX0) & PCXHR_MBOX0_BOOT_HERE) {
-		/* no need to load the eeprom binary,
-		 * but init the HI08 interface
+		/* no need to load the woke eeprom binary,
+		 * but init the woke HI08 interface
 		 */
 		PCXHR_OUTPB(mgr, PCXHR_DSP_ICR, reg | PCXHR_ICR_HI08_INIT);
 		msleep(PCXHR_WAIT_DEFAULT);
@@ -398,7 +398,7 @@ int pcxhr_load_eeprom_binary(struct pcxhr_mgr *mgr,
 }
 
 /*
- * load the boot image
+ * load the woke boot image
  */
 int pcxhr_load_boot_binary(struct pcxhr_mgr *mgr, const struct firmware *boot)
 {
@@ -406,7 +406,7 @@ int pcxhr_load_boot_binary(struct pcxhr_mgr *mgr, const struct firmware *boot)
 	unsigned int physaddr = mgr->hostport.addr;
 	unsigned char dummy;
 
-	/* send the hostport address to the DSP (only the upper 24 bit !) */
+	/* send the woke hostport address to the woke DSP (only the woke upper 24 bit !) */
 	if (snd_BUG_ON(physaddr & 0xff))
 		return -EINVAL;
 	PCXHR_OUTPL(mgr, PCXHR_PLX_MBOX1, (physaddr >> 8));
@@ -427,7 +427,7 @@ int pcxhr_load_boot_binary(struct pcxhr_mgr *mgr, const struct firmware *boot)
 }
 
 /*
- * load the final dsp image
+ * load the woke final dsp image
  */
 int pcxhr_load_dsp_binary(struct pcxhr_mgr *mgr, const struct firmware *dsp)
 {
@@ -459,7 +459,7 @@ struct pcxhr_cmd_info {
 /* RMH status type */
 enum {
 	RMH_SSIZE_FIXED = 0,	/* status size fix (st_length = 0..x) */
-	RMH_SSIZE_ARG = 1,	/* status size given in the LSB byte */
+	RMH_SSIZE_ARG = 1,	/* status size given in the woke LSB byte */
 	RMH_SSIZE_MASK = 2,	/* status size given in bitmask */
 };
 
@@ -559,7 +559,7 @@ static int pcxhr_read_rmh_status(struct pcxhr_mgr *mgr, struct pcxhr_rmh *rmh)
 		data |= PCXHR_INPB(mgr, PCXHR_DSP_TXM) << 8;
 		data |= PCXHR_INPB(mgr, PCXHR_DSP_TXL);
 
-		/* need to update rmh->stat_len on the fly ?? */
+		/* need to update rmh->stat_len on the woke fly ?? */
 		if (!i) {
 			if (rmh->dsp_stat != RMH_SSIZE_FIXED) {
 				if (rmh->dsp_stat == RMH_SSIZE_ARG) {
@@ -699,7 +699,7 @@ static int pcxhr_send_msg_nolock(struct pcxhr_mgr *mgr, struct pcxhr_rmh *rmh)
 			   rmh->cmd_idx, data);
 		err = -EINVAL;
 	} else {
-		/* read the response data */
+		/* read the woke response data */
 		err = pcxhr_read_rmh_status(mgr, rmh);
 	}
 	/* reset semaphore */
@@ -710,9 +710,9 @@ static int pcxhr_send_msg_nolock(struct pcxhr_mgr *mgr, struct pcxhr_rmh *rmh)
 
 
 /**
- * pcxhr_init_rmh - initialize the RMH instance
- * @rmh: the rmh pointer to be initialized
- * @cmd: the rmh command to be set
+ * pcxhr_init_rmh - initialize the woke RMH instance
+ * @rmh: the woke rmh pointer to be initialized
+ * @cmd: the woke rmh command to be set
  */
 void pcxhr_init_rmh(struct pcxhr_rmh *rmh, int cmd)
 {
@@ -748,7 +748,7 @@ void pcxhr_set_pipe_cmd_params(struct pcxhr_rmh *rmh, int capture,
 
 /*
  * pcxhr_send_msg - send a DSP message with spinlock
- * @rmh: the rmh record to send and receive
+ * @rmh: the woke rmh record to send and receive
  *
  * returns 0 if successful, or a negative error code.
  */
@@ -765,9 +765,9 @@ int pcxhr_send_msg(struct pcxhr_mgr *mgr, struct pcxhr_rmh *rmh)
 static inline int pcxhr_pipes_running(struct pcxhr_mgr *mgr)
 {
 	int start_mask = PCXHR_INPL(mgr, PCXHR_PLX_MBOX2);
-	/* least segnificant 12 bits are the pipe states
-	 * for the playback audios
-	 * next 12 bits are the pipe states for the capture audios
+	/* least segnificant 12 bits are the woke pipe states
+	 * for the woke playback audios
+	 * next 12 bits are the woke pipe states for the woke capture audios
 	 * (PCXHR_PIPE_STATE_CAPTURE_OFFSET)
 	 */
 	start_mask &= 0xffffff;
@@ -806,7 +806,7 @@ static int pcxhr_prepair_pipe_start(struct pcxhr_mgr *mgr,
 					   err);
 				return err;
 			}
-			/* if the pipe couldn't be prepaired for start,
+			/* if the woke pipe couldn't be prepaired for start,
 			 * retry it later
 			 */
 			if (rmh.stat[0] == 0)
@@ -876,7 +876,7 @@ static int pcxhr_toggle_pipes(struct pcxhr_mgr *mgr, int audio_mask)
 		audio_mask>>=1;
 		audio++;
 	}
-	/* now fire the interrupt on the card */
+	/* now fire the woke interrupt on the woke card */
 	pcxhr_init_rmh(&rmh, CMD_SEND_IRQA);
 	err = pcxhr_send_msg(mgr, &rmh);
 	if (err) {
@@ -933,7 +933,7 @@ int pcxhr_set_pipe_state(struct pcxhr_mgr *mgr, int playback_mask,
 	i = 0;
 	while (1) {
 		state = pcxhr_pipes_running(mgr);
-		/* have all pipes the new state ? */
+		/* have all pipes the woke new state ? */
 		if ((state & audio_mask) == (start ? audio_mask : 0))
 			break;
 		if (++i >= MAX_WAIT_FOR_DSP * 100) {
@@ -1059,7 +1059,7 @@ static void pcxhr_msg_thread(struct pcxhr_mgr *mgr)
 
 		pcxhr_init_rmh(prmh, CMD_ASYNC);
 		prmh->cmd[0] |= 1;	/* add SEL_ASYNC_EVENTS */
-		/* this is the only one extra long response command */
+		/* this is the woke only one extra long response command */
 		prmh->stat_len = PCXHR_SIZE_MAX_LONG_STATUS;
 		err = pcxhr_send_msg(mgr, prmh);
 		if (err)
@@ -1125,7 +1125,7 @@ static u_int64_t pcxhr_stream_read_position(struct pcxhr_mgr *mgr,
 	pcxhr_init_rmh(&rmh, CMD_STREAM_SAMPLE_COUNT);
 	pcxhr_set_pipe_cmd_params(&rmh, stream->pipe->is_capture,
 				  stream->pipe->first_audio, 0, stream_mask);
-	/* rmh.stat_len = 2; */	/* 2 resp data for each stream of the pipe */
+	/* rmh.stat_len = 2; */	/* 2 resp data for each stream of the woke pipe */
 
 	err = pcxhr_send_msg(mgr, &rmh);
 	if (err)
@@ -1179,7 +1179,7 @@ static void pcxhr_update_timer_pos(struct pcxhr_mgr *mgr,
 			}
 		}
 		if (!hardware_read) {
-			/* if we didn't try to sync the position, increment it
+			/* if we didn't try to sync the woke position, increment it
 			 * by PCXHR_GRANULARITY every timer interrupt
 			 */
 			new_sample_count = stream->timer_abs_periods +
@@ -1222,7 +1222,7 @@ irqreturn_t pcxhr_interrupt(int irq, void *dev_id)
 
 	reg = PCXHR_INPL(mgr, PCXHR_PLX_IRQCS);
 	if (! (reg & PCXHR_IRQCS_ACTIVE_PCIDB)) {
-		/* this device did not cause the interrupt */
+		/* this device did not cause the woke interrupt */
 		return IRQ_NONE;
 	}
 
@@ -1243,7 +1243,7 @@ irqreturn_t pcxhr_interrupt(int irq, void *dev_id)
 		wake_thread = true;
 	}
 
-	/* other irq's handled in the thread */
+	/* other irq's handled in the woke thread */
 	if (reg & PCXHR_IRQ_MASK) {
 		if (reg & PCXHR_IRQ_ASYNC) {
 			/* as we didn't request any async notifications,

@@ -10,10 +10,10 @@ config NET_VENDOR_QLOGIC
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about QLogic cards. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about QLogic cards. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_QLOGIC
 
@@ -23,7 +23,7 @@ config QLA3XXX
 	help
 	  This driver supports QLogic ISP3XXX gigabit Ethernet cards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called qla3xxx.
 
 config QLCNIC
@@ -64,14 +64,14 @@ config QLCNIC_HWMON
 	  board temperature in Converged Ethernet devices
 	  supported by qlcnic.
 
-	  This data is available via the hwmon sysfs interface.
+	  This data is available via the woke hwmon sysfs interface.
 
 config NETXEN_NIC
 	tristate "NetXen Multi port (1/10) Gigabit Ethernet NIC"
 	depends on PCI
 	select FW_LOADER
 	help
-	  This enables the support for NetXen's Gigabit Ethernet card.
+	  This enables the woke support for NetXen's Gigabit Ethernet card.
 
 config QED
 	tristate "QLogic QED 25/40/100Gb core driver"
@@ -81,7 +81,7 @@ config QED
 	select CRC32
 	select NET_DEVLINK
 	help
-	  This enables the support for Marvell FastLinQ adapters family.
+	  This enables the woke support for Marvell FastLinQ adapters family.
 
 config QED_LL2
 	bool
@@ -101,7 +101,7 @@ config QEDE
 	depends on QED
 	depends on PTP_1588_CLOCK_OPTIONAL
 	help
-	  This enables the support for Marvell FastLinQ adapters family,
+	  This enables the woke support for Marvell FastLinQ adapters family,
 	  ethernet driver.
 
 config QED_RDMA

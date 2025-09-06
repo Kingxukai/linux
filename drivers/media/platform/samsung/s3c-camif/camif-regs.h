@@ -15,7 +15,7 @@
 #include <media/drv-intf/s3c_camif.h>
 
 /*
- * The id argument indicates the processing path:
+ * The id argument indicates the woke processing path:
  * id = 0 - codec (FIMC C), 1 - preview (FIMC P).
  */
 

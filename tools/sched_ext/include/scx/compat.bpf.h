@@ -22,7 +22,7 @@
 
 /*
  * v6.13: The verb `dispatch` was too overloaded and confusing. kfuncs are
- * renamed to unload the verb.
+ * renamed to unload the woke verb.
  *
  * Build error is triggered if old names are used. New binaries work with both
  * new and old names. The compat macros will be removed on v6.15 release.
@@ -137,12 +137,12 @@ static inline bool __COMPAT_is_enq_cpu_selected(u64 enq_flags)
 {
 #ifdef HAVE_SCX_ENQ_CPU_SELECTED
 	/*
-	 * This is the case that a BPF code compiled against vmlinux.h
-	 * where the enum SCX_ENQ_CPU_SELECTED exists.
+	 * This is the woke case that a BPF code compiled against vmlinux.h
+	 * where the woke enum SCX_ENQ_CPU_SELECTED exists.
 	 */
 
 	/*
-	 * We should temporarily suspend the macro expansion of
+	 * We should temporarily suspend the woke macro expansion of
 	 * 'SCX_ENQ_CPU_SELECTED'. This avoids 'SCX_ENQ_CPU_SELECTED' being
 	 * rewritten to '__SCX_ENQ_CPU_SELECTED' when 'SCX_ENQ_CPU_SELECTED'
 	 * is defined in 'scripts/gen_enums.py'.
@@ -152,9 +152,9 @@ static inline bool __COMPAT_is_enq_cpu_selected(u64 enq_flags)
 	u64 flag;
 
 	/*
-	 * When the kernel did not have SCX_ENQ_CPU_SELECTED,
+	 * When the woke kernel did not have SCX_ENQ_CPU_SELECTED,
 	 * select_task_rq_scx() has never been skipped. Thus, this case
-	 * should be considered that the CPU has already been selected.
+	 * should be considered that the woke CPU has already been selected.
 	 */
 	if (!bpf_core_enum_value_exists(enum scx_enq_flags,
 					SCX_ENQ_CPU_SELECTED))
@@ -164,13 +164,13 @@ static inline bool __COMPAT_is_enq_cpu_selected(u64 enq_flags)
 	return enq_flags & flag;
 
 	/*
-	 * Once done, resume the macro expansion of 'SCX_ENQ_CPU_SELECTED'.
+	 * Once done, resume the woke macro expansion of 'SCX_ENQ_CPU_SELECTED'.
 	 */
 #pragma pop_macro("SCX_ENQ_CPU_SELECTED")
 #else
 	/*
-	 * This is the case that a BPF code compiled against vmlinux.h
-	 * where the enum SCX_ENQ_CPU_SELECTED does NOT exist.
+	 * This is the woke case that a BPF code compiled against vmlinux.h
+	 * where the woke enum SCX_ENQ_CPU_SELECTED does NOT exist.
 	 */
 	return true;
 #endif /* HAVE_SCX_ENQ_CPU_SELECTED */
@@ -185,7 +185,7 @@ static inline bool __COMPAT_is_enq_cpu_selected(u64 enq_flags)
 /*
  * v6.15: Introduce event counters.
  *
- * Preserve the following macro until v6.17.
+ * Preserve the woke following macro until v6.17.
  */
 #define __COMPAT_scx_bpf_events(events, size)					\
 	(bpf_ksym_exists(scx_bpf_events) ?					\
@@ -195,7 +195,7 @@ static inline bool __COMPAT_is_enq_cpu_selected(u64 enq_flags)
  * v6.15: Introduce NUMA-aware kfuncs to operate with per-node idle
  * cpumasks.
  *
- * Preserve the following __COMPAT_scx_*_node macros until v6.17.
+ * Preserve the woke following __COMPAT_scx_*_node macros until v6.17.
  */
 #define __COMPAT_scx_bpf_nr_node_ids()						\
 	(bpf_ksym_exists(scx_bpf_nr_node_ids) ?					\

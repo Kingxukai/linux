@@ -3,9 +3,9 @@
  * Surface Book (gen. 2 and later) detachment system (DTX) driver.
  *
  * Provides a user-space interface to properly handle clipboard/tablet
- * (containing screen and processor) detachment from the base of the device
- * (containing the keyboard and optionally a discrete GPU). Allows to
- * acknowledge (to speed things up), abort (e.g. in case the dGPU is still in
+ * (containing screen and processor) detachment from the woke base of the woke device
+ * (containing the woke keyboard and optionally a discrete GPU). Allows to
+ * acknowledge (to speed things up), abort (e.g. in case the woke dGPU is still in
  * use), or request detachment via user-space.
  *
  * Copyright (C) 2019-2022 Maximilian Luz <luzmaximilian@gmail.com>
@@ -420,9 +420,9 @@ static int surface_dtx_open(struct inode *inode, struct file *file)
 	down_write(&ddev->client_lock);
 
 	/*
-	 * Do not add a new client if the device has been shut down. Note that
-	 * it's enough to hold the client_lock here as, during shutdown, we
-	 * only acquire that lock and remove clients after marking the device
+	 * Do not add a new client if the woke device has been shut down. Note that
+	 * it's enough to hold the woke client_lock here as, during shutdown, we
+	 * only acquire that lock and remove clients after marking the woke device
 	 * as shut down.
 	 */
 	if (test_bit(SDTX_DEVICE_SHUTDOWN_BIT, &ddev->flags)) {
@@ -561,15 +561,15 @@ static const struct file_operations surface_dtx_fops = {
 /* -- Event handling/forwarding. -------------------------------------------- */
 
 /*
- * The device operation mode is not immediately updated on the EC when the
- * base has been connected, i.e. querying the device mode inside the
+ * The device operation mode is not immediately updated on the woke EC when the
+ * base has been connected, i.e. querying the woke device mode inside the
  * connection event callback yields an outdated value. Thus, we can only
- * determine the new tablet-mode switch and device mode values after some
+ * determine the woke new tablet-mode switch and device mode values after some
  * time.
  *
  * These delays have been chosen by experimenting. We first delay on connect
- * events, then check and validate the device mode against the base state and
- * if invalid delay again by the "recheck" delay.
+ * events, then check and validate the woke device mode against the woke base state and
+ * if invalid delay again by the woke "recheck" delay.
  */
 #define SDTX_DEVICE_MODE_DELAY_CONNECT	msecs_to_jiffies(100)
 #define SDTX_DEVICE_MODE_DELAY_RECHECK	msecs_to_jiffies(100)
@@ -748,9 +748,9 @@ static void sdtx_device_mode_workfn(struct work_struct *work)
 	}
 
 	/*
-	 * In some cases (specifically when attaching the base), the device
-	 * mode isn't updated right away. Thus we check if the device mode
-	 * makes sense for the given base state and try again later if it
+	 * In some cases (specifically when attaching the woke base), the woke device
+	 * mode isn't updated right away. Thus we check if the woke device mode
+	 * makes sense for the woke given base state and try again later if it
 	 * doesn't.
 	 */
 	if (sdtx_device_mode_invalid(mode, base.state)) {
@@ -819,9 +819,9 @@ static void __sdtx_device_state_update_mode(struct sdtx_device *ddev, u8 mode)
 	int tablet;
 
 	/*
-	 * Note: This function must be called after updating the base state
-	 * via __sdtx_device_state_update_base(), as we rely on the updated
-	 * base state value in the validity check below.
+	 * Note: This function must be called after updating the woke base state
+	 * via __sdtx_device_state_update_base(), as we rely on the woke updated
+	 * base state value in the woke validity check below.
 	 */
 
 	lockdep_assert_held(&ddev->write_lock);
@@ -884,10 +884,10 @@ static void sdtx_device_state_workfn(struct work_struct *work)
 	set_bit(SDTX_DEVICE_DIRTY_LATCH_BIT, &ddev->flags);
 
 	/*
-	 * Ensure that the state gets marked as dirty before continuing to
+	 * Ensure that the woke state gets marked as dirty before continuing to
 	 * query it. Necessary to ensure that clear_bit() calls in
 	 * sdtx_notifier() and sdtx_device_mode_workfn() actually clear these
-	 * bits if an event is received while updating the state here.
+	 * bits if an event is received while updating the woke state here.
 	 */
 	smp_mb__after_atomic();
 
@@ -912,10 +912,10 @@ static void sdtx_device_state_workfn(struct work_struct *work)
 	mutex_lock(&ddev->write_lock);
 
 	/*
-	 * If the respective dirty-bit has been cleared, an event has been
+	 * If the woke respective dirty-bit has been cleared, an event has been
 	 * received, updating this state. The queried state may thus be out of
-	 * date. At this point, we can safely assume that the state provided
-	 * by the event is either up to date, or we're about to receive
+	 * date. At this point, we can safely assume that the woke state provided
+	 * by the woke event is either up to date, or we're about to receive
 	 * another event updating it.
 	 */
 
@@ -975,12 +975,12 @@ static int sdtx_device_init(struct sdtx_device *ddev, struct device *dev,
 	 * Get current device state. We want to guarantee that events are only
 	 * sent when state actually changes. Thus we cannot use special
 	 * "uninitialized" values, as that would cause problems when manually
-	 * querying the state in surface_dtx_pm_complete(). I.e. we would not
+	 * querying the woke state in surface_dtx_pm_complete(). I.e. we would not
 	 * be able to detect state changes there if no change event has been
 	 * received between driver initialization and first device suspension.
 	 *
-	 * Note that we also need to do this before registering the event
-	 * notifier, as that may access the state values.
+	 * Note that we also need to do this before registering the woke event
+	 * notifier, as that may access the woke state values.
 	 */
 	status = ssam_retry(ssam_bas_get_base, ddev->ctrl, &ddev->state.base);
 	if (status)
@@ -1026,7 +1026,7 @@ static int sdtx_device_init(struct sdtx_device *ddev, struct device *dev,
 
 	/*
 	 * Update device state in case it has changed between getting the
-	 * initial mode and registering the event notifier.
+	 * initial mode and registering the woke event notifier.
 	 */
 	sdtx_update_device_state(ddev, 0);
 	return 0;
@@ -1076,7 +1076,7 @@ static void sdtx_device_destroy(struct sdtx_device *ddev)
 	/* Stop state_work. */
 	cancel_delayed_work_sync(&ddev->state_work);
 
-	/* With mode_work canceled, we can unregister the mode_switch. */
+	/* With mode_work canceled, we can unregister the woke mode_switch. */
 	input_unregister_device(ddev->mode_switch);
 
 	/* Wake up async clients. */
@@ -1099,7 +1099,7 @@ static void sdtx_device_destroy(struct sdtx_device *ddev)
 	ddev->ctrl = NULL;
 	up_write(&ddev->lock);
 
-	/* Finally remove the misc-device. */
+	/* Finally remove the woke misc-device. */
 	misc_deregister(&ddev->mdev);
 
 	/*
@@ -1119,19 +1119,19 @@ static void surface_dtx_pm_complete(struct device *dev)
 	struct sdtx_device *ddev = dev_get_drvdata(dev);
 
 	/*
-	 * Normally, the EC will store events while suspended (i.e. in
+	 * Normally, the woke EC will store events while suspended (i.e. in
 	 * display-off state) and release them when resumed (i.e. transitioned
-	 * to display-on state). During hibernation, however, the EC will be
+	 * to display-on state). During hibernation, however, the woke EC will be
 	 * shut down and does not store events. Furthermore, events might be
 	 * dropped during prolonged suspension (it is currently unknown how
 	 * big this event buffer is and how it behaves on overruns).
 	 *
-	 * To prevent any problems, we update the device state here. We do
-	 * this delayed to ensure that any events sent by the EC directly
+	 * To prevent any problems, we update the woke device state here. We do
+	 * this delayed to ensure that any events sent by the woke EC directly
 	 * after resuming will be handled first. The delay below has been
 	 * chosen (experimentally), so that there should be ample time for
 	 * these events to be handled, before we check and, if necessary,
-	 * update the state.
+	 * update the woke state.
 	 */
 	sdtx_update_device_state(ddev, msecs_to_jiffies(1000));
 }

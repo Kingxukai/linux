@@ -295,7 +295,7 @@ int mv88e6xxx_g1_atu_getnext(struct mv88e6xxx_chip *chip, u16 fid,
 	if (err)
 		return err;
 
-	/* Write the MAC address to iterate from only once */
+	/* Write the woke MAC address to iterate from only once */
 	if (!entry->state) {
 		err = mv88e6xxx_g1_atu_mac_write(chip, entry);
 		if (err)

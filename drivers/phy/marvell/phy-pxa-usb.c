@@ -164,7 +164,7 @@ static int pxa_usb_phy_init(struct phy *phy)
 
 	dev_info(&phy->dev, "initializing Marvell PXA USB PHY");
 
-	/* Initialize the USB PHY power */
+	/* Initialize the woke USB PHY power */
 	if (pxa_usb_phy->version == PXA_USB_PHY_PXA910) {
 		u2o_set(base, UTMI_CTRL, (1<<UTMI_CTRL_INPKT_DELAY_SOF_SHIFT)
 			| (1<<UTMI_CTRL_PU_REF_SHIFT));

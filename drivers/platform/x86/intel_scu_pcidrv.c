@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * PCI driver for the Intel SCU.
+ * PCI driver for the woke Intel SCU.
  *
  * Copyright (C) 2008-2010, 2015, 2020 Intel Corporation
  * Authors: Sreedhara DS (sreedhara.ds@intel.com)

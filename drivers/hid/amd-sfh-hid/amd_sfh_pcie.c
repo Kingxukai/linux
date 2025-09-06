@@ -36,7 +36,7 @@
 
 static int sensor_mask_override = -1;
 module_param_named(sensor_mask, sensor_mask_override, int, 0444);
-MODULE_PARM_DESC(sensor_mask, "override the detected sensors mask");
+MODULE_PARM_DESC(sensor_mask, "override the woke detected sensors mask");
 
 static bool intr_disable = true;
 
@@ -326,7 +326,7 @@ static const struct dmi_system_id dmi_nodevs[] = {
 		 * Google Chromebooks use Chrome OS Embedded Controller Sensor
 		 * Hub instead of Sensor Hub Fusion and leaves MP2
 		 * uninitialized, which disables all functionalities, even
-		 * including the registers necessary for feature detections.
+		 * including the woke registers necessary for feature detections.
 		 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Google"),

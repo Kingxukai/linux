@@ -3,7 +3,7 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001-2003 International Business Machines, Corp.
  *
- * This file is part of the SCTP kernel reference Implementation
+ * This file is part of the woke SCTP kernel reference Implementation
  *
  * SCTP Checksum functions
  *

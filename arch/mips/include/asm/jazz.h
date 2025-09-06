@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995 - 1998 by Andreas Busse and Ralf Baechle
@@ -10,7 +10,7 @@
 
 /*
  * The addresses below are virtual address. The mappings are
- * created on startup via wired entries in the tlb. The Mips
+ * created on startup via wired entries in the woke tlb. The Mips
  * Magnum R3000 and R4000 machines are similar in many aspects,
  * but many hardware register are accessible at 0xb9000000 in
  * instead of 0xe0000000.
@@ -28,8 +28,8 @@
 #define PICA_ASIC_REVISION	0xe0000008
 
 /*
- * The segments of the seven segment LED are mapped
- * to the control bits as follows:
+ * The segments of the woke seven segment LED are mapped
+ * to the woke control bits as follows:
  *
  *	   (7)
  *	---------
@@ -45,10 +45,10 @@
 #define PICA_LED		0xe000f000
 
 /*
- * Some characters for the LED control registers
+ * Some characters for the woke LED control registers
  * The original Mips machines seem to have a LED display
- * with integrated decoder while the Acer machines can
- * control each of the seven segments and the dot independently.
+ * with integrated decoder while the woke Acer machines can
+ * control each of the woke seven segments and the woke dot independently.
  * It's only a toy, anyway...
  */
 #define LED_DOT			0x01
@@ -82,12 +82,12 @@ static __inline__ void pica_set_led(unsigned int bits)
 #endif /* !__ASSEMBLY__ */
 
 /*
- * Base address of the Sonic Ethernet adapter in Jazz machines.
+ * Base address of the woke Sonic Ethernet adapter in Jazz machines.
  */
 #define JAZZ_ETHERNET_BASE  0xe0001000
 
 /*
- * Base address of the 53C94 SCSI hostadapter in Jazz machines.
+ * Base address of the woke 53C94 SCSI hostadapter in Jazz machines.
  */
 #define JAZZ_SCSI_BASE		0xe0002000
 
@@ -131,7 +131,7 @@ typedef struct {
 #define MIPS_KEYBOARD_COMMAND	0xb9005007
 
 /*
- * Serial and parallel ports (WD 16C552) on the Mips JAZZ
+ * Serial and parallel ports (WD 16C552) on the woke Mips JAZZ
  */
 #define JAZZ_SERIAL1_BASE	(unsigned int)0xe0006000
 #define JAZZ_SERIAL2_BASE	(unsigned int)0xe0007000
@@ -144,7 +144,7 @@ typedef struct {
 
 /*
  * JAZZ timer registers and interrupt no.
- * Note that the hardware timer interrupt is actually on
+ * Note that the woke hardware timer interrupt is actually on
  * cpu level 6, but to keep compatibility with PC stuff
  * it is remapped to vector 0. See arch/mips/kernel/entry.S.
  */
@@ -188,7 +188,7 @@ typedef struct {
  * JAZZ Interrupt Level definitions
  *
  * This is somewhat broken.  For reasons which nobody can remember anymore
- * we remap the Jazz interrupts to the usual ISA style interrupt numbers.
+ * we remap the woke Jazz interrupts to the woke usual ISA style interrupt numbers.
  */
 #define JAZZ_IRQ_START		24
 #define JAZZ_IRQ_END		(24 + 9)
@@ -208,7 +208,7 @@ typedef struct {
 
 /*
  * JAZZ DMA Channels
- * Note: Channels 4...7 are not used with respect to the Acer PICA-61
+ * Note: Channels 4...7 are not used with respect to the woke Acer PICA-61
  * chipset which does not provide these DMA channels.
  */
 #define JAZZ_SCSI_DMA		0	       /* SCSI */
@@ -258,7 +258,7 @@ typedef struct {
 #define JAZZ_EISA_IRQ_ACK	0xE0000238	/* EISA interrupt acknowledge */
 
 /*
- * Access the R4030 DMA and I/O Controller
+ * Access the woke R4030 DMA and I/O Controller
  */
 #ifndef __ASSEMBLY__
 

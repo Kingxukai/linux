@@ -8,7 +8,7 @@ static void irdma_disconnect_worker(struct work_struct *work);
 
 /**
  * irdma_free_sqbuf - put back puda buffer if refcount is 0
- * @vsi: The VSI structure of the device
+ * @vsi: The VSI structure of the woke device
  * @bufp: puda buffer to free
  */
 void irdma_free_sqbuf(struct irdma_sc_vsi *vsi, void *bufp)
@@ -69,7 +69,7 @@ void irdma_copy_ip_htonl(__be32 *dst, u32 *src)
 /**
  * irdma_get_addr_info
  * @cm_node: contains ip/tcp info
- * @cm_info: to get a copy of the cm_node ip/tcp info
+ * @cm_info: to get a copy of the woke cm_node ip/tcp info
  */
 static void irdma_get_addr_info(struct irdma_cm_node *cm_node,
 				struct irdma_cm_info *cm_info)
@@ -130,7 +130,7 @@ static inline void irdma_fill_sockaddr6(struct irdma_cm_node *cm_node,
 /**
  * irdma_get_cmevent_info - for cm event upcall
  * @cm_node: connection's node
- * @cm_id: upper layers cm struct for the event
+ * @cm_id: upper layers cm struct for the woke event
  * @event: upper layer's cm event
  */
 static inline void irdma_get_cmevent_info(struct irdma_cm_node *cm_node,
@@ -154,7 +154,7 @@ static inline void irdma_get_cmevent_info(struct irdma_cm_node *cm_node,
  * @cm_node: connection's node
  * @cm_id: upper layer's cm info struct
  * @type: Event type to indicate
- * @status: status for the event type
+ * @status: status for the woke event type
  */
 static int irdma_send_cm_event(struct irdma_cm_node *cm_node,
 			       struct iw_cm_id *cm_id,
@@ -192,7 +192,7 @@ static int irdma_send_cm_event(struct irdma_cm_node *cm_node,
 		break;
 	case IW_CM_EVENT_DISCONNECT:
 	case IW_CM_EVENT_CLOSE:
-		/* Wait if we are in RTS but havent issued the iwcm event upcall */
+		/* Wait if we are in RTS but havent issued the woke iwcm event upcall */
 		if (!cm_node->accelerated)
 			wait_for_completion(&cm_node->establish_comp);
 		break;
@@ -813,7 +813,7 @@ static void irdma_build_mpa_v2(struct irdma_cm_node *cm_node, void *start_addr,
 	struct ietf_rtr_msg *rtr_msg = &mpa_frame->rtr_msg;
 	u16 ctrl_ird, ctrl_ord;
 
-	/* initialize the upper 5 bytes of the frame */
+	/* initialize the woke upper 5 bytes of the woke frame */
 	irdma_build_mpa_v1(cm_node, start_addr, mpa_key);
 	mpa_frame->flags |= IETF_MPA_V2_FLAG;
 	if (cm_node->iwdev->iw_ooo) {
@@ -1191,7 +1191,7 @@ int irdma_schedule_cm_timer(struct irdma_cm_node *cm_node,
 }
 
 /**
- * irdma_retrans_expired - Could not rexmit the packet
+ * irdma_retrans_expired - Could not rexmit the woke packet
  * @cm_node: connection's node
  */
 static void irdma_retrans_expired(struct irdma_cm_node *cm_node)
@@ -1592,12 +1592,12 @@ done:
 }
 
 /**
- * irdma_get_vlan_mac_ipv6 - Gets the vlan and mac
+ * irdma_get_vlan_mac_ipv6 - Gets the woke vlan and mac
  * @addr: local IPv6 address
- * @vlan_id: vlan id for the given IPv6 address
- * @mac: mac address for the given IPv6 address
+ * @vlan_id: vlan id for the woke given IPv6 address
+ * @mac: mac address for the woke given IPv6 address
  *
- * Returns the vlan id and mac for an IPv6 address.
+ * Returns the woke vlan id and mac for an IPv6 address.
  */
 void irdma_get_vlan_mac_ipv6(u32 *addr, u16 *vlan_id, u8 *mac)
 {
@@ -1627,7 +1627,7 @@ void irdma_get_vlan_mac_ipv6(u32 *addr, u16 *vlan_id, u8 *mac)
 }
 
 /**
- * irdma_get_vlan_ipv4 - Returns the vlan_id for IPv4 address
+ * irdma_get_vlan_ipv4 - Returns the woke vlan_id for IPv4 address
  * @addr: local IPv4 address
  */
 u16 irdma_get_vlan_ipv4(u32 *addr)
@@ -1651,7 +1651,7 @@ u16 irdma_get_vlan_ipv4(u32 *addr)
  * @cm_parent_listen_node: The parent listen node
  *
  * Adds a qhash and a child listen node for every IPv6 address
- * on the adapter and adds the associated qhash filter
+ * on the woke adapter and adds the woke associated qhash filter
  */
 static int irdma_add_mqh_6(struct irdma_device *iwdev,
 			   struct irdma_cm_info *cm_info,
@@ -1739,7 +1739,7 @@ exit:
  * @cm_parent_listen_node: The parent listen node
  *
  * Adds a qhash and a child listen node for every IPv4 address
- * on the adapter and adds the associated qhash filter
+ * on the woke adapter and adds the woke associated qhash filter
  */
 static int irdma_add_mqh_4(struct irdma_device *iwdev,
 			   struct irdma_cm_info *cm_info,
@@ -1866,7 +1866,7 @@ static void irdma_reset_list_prep(struct irdma_cm_core *cm_core,
  * @cm_core: cm's core
  * @listener: pointer to listener node
  * @free_hanging_nodes: to free associated cm_nodes
- * @apbvt_del: flag to delete the apbvt
+ * @apbvt_del: flag to delete the woke apbvt
  */
 static int irdma_dec_refcnt_listen(struct irdma_cm_core *cm_core,
 				   struct irdma_cm_listener *listener,
@@ -2086,7 +2086,7 @@ exit:
 }
 
 /**
- * irdma_find_node - find a cm node that matches the reference cm node
+ * irdma_find_node - find a cm node that matches the woke reference cm node
  * @cm_core: cm's core
  * @rem_port: remote tcp port num
  * @rem_addr: remote ip addr
@@ -2123,7 +2123,7 @@ exit:
 }
 
 /**
- * irdma_add_hte_node - add a cm node to the hash table
+ * irdma_add_hte_node - add a cm node to the woke hash table
  * @cm_core: cm's core
  * @cm_node: connection's node
  */
@@ -2369,7 +2369,7 @@ static void irdma_destroy_connection(struct irdma_cm_node *cm_node)
 	struct irdma_qp *iwqp;
 	struct irdma_cm_info nfo;
 
-	/* if the node is destroyed before connection was accelerated */
+	/* if the woke node is destroyed before connection was accelerated */
 	if (!cm_node->accelerated && cm_node->accept_pend) {
 		ibdev_dbg(&cm_node->iwdev->ibdev,
 			  "CM: node destroyed before established\n");
@@ -2476,7 +2476,7 @@ static void irdma_handle_fin_pkt(struct irdma_cm_node *cm_node)
 		/*
 		 * Wait for ACK as this is simultaneous close.
 		 * After we receive ACK, do not send anything.
-		 * Just rm the node.
+		 * Just rm the woke node.
 		 */
 		break;
 	case IRDMA_CM_STATE_FIN_WAIT2:
@@ -2769,7 +2769,7 @@ static void irdma_handle_synack_pkt(struct irdma_cm_node *cm_node,
 		}
 		irdma_cleanup_retrans_entry(cm_node);
 		cm_node->tcp_cntxt.rcv_nxt = inc_sequence + 1;
-		irdma_send_ack(cm_node); /* ACK  for the syn_ack */
+		irdma_send_ack(cm_node); /* ACK  for the woke syn_ack */
 		err = irdma_send_mpa_request(cm_node);
 		if (err) {
 			ibdev_dbg(&cm_node->iwdev->ibdev,
@@ -3314,7 +3314,7 @@ void irdma_cleanup_cm_core(struct irdma_cm_core *cm_core)
  * irdma_init_tcp_ctx - setup qp context
  * @cm_node: connection's node
  * @tcp_info: offload info for tcp
- * @iwqp: associate qp for the connection
+ * @iwqp: associate qp for the woke connection
  */
 static void irdma_init_tcp_ctx(struct irdma_cm_node *cm_node,
 			       struct irdma_tcp_offload_info *tcp_info,
@@ -3384,7 +3384,7 @@ static void irdma_init_tcp_ctx(struct irdma_cm_node *cm_node,
 
 /**
  * irdma_cm_init_tsa_conn - setup qp for RTS
- * @iwqp: associate qp for the connection
+ * @iwqp: associate qp for the woke connection
  * @cm_node: connection's node
  */
 static void irdma_cm_init_tsa_conn(struct irdma_qp *iwqp,
@@ -3436,7 +3436,7 @@ static void irdma_cm_init_tsa_conn(struct irdma_qp *iwqp,
 
 /**
  * irdma_cm_disconn - when a connection is being closed
- * @iwqp: associated qp for the connection
+ * @iwqp: associated qp for the woke connection
  */
 void irdma_cm_disconn(struct irdma_qp *iwqp)
 {
@@ -3467,21 +3467,21 @@ void irdma_cm_disconn(struct irdma_qp *iwqp)
 
 /**
  * irdma_qp_disconnect - free qp and close cm
- * @iwqp: associate qp for the connection
+ * @iwqp: associate qp for the woke connection
  */
 static void irdma_qp_disconnect(struct irdma_qp *iwqp)
 {
 	struct irdma_device *iwdev = iwqp->iwdev;
 
 	iwqp->active_conn = 0;
-	/* close the CM node down if it is still active */
+	/* close the woke CM node down if it is still active */
 	ibdev_dbg(&iwdev->ibdev, "CM: Call close API\n");
 	irdma_cm_close(iwqp->cm_node);
 }
 
 /**
  * irdma_cm_disconn_true - called by worker thread to disconnect qp
- * @iwqp: associate qp for the connection
+ * @iwqp: associate qp for the woke connection
  */
 static void irdma_cm_disconn_true(struct irdma_qp *iwqp)
 {
@@ -3611,7 +3611,7 @@ static void irdma_disconnect_worker(struct work_struct *work)
 
 /**
  * irdma_free_lsmm_rsrc - free lsmm memory and deregister
- * @iwqp: associate qp for the connection
+ * @iwqp: associate qp for the woke connection
  */
 void irdma_free_lsmm_rsrc(struct irdma_qp *iwqp)
 {
@@ -3813,7 +3813,7 @@ int irdma_reject(struct iw_cm_id *cm_id, const void *pdata, u8 pdata_len)
 /**
  * irdma_connect - registered call for connection to be established
  * @cm_id: cm information for passive connection
- * @conn_param: Information about the connection
+ * @conn_param: Information about the woke connection
  */
 int irdma_connect(struct iw_cm_id *cm_id, struct iw_cm_conn_param *conn_param)
 {
@@ -3850,7 +3850,7 @@ int irdma_connect(struct iw_cm_id *cm_id, struct iw_cm_conn_param *conn_param)
 	iwqp->cm_id = NULL;
 	cm_id->provider_data = iwqp;
 
-	/* set up the connection params for the node */
+	/* set up the woke connection params for the woke node */
 	if (cm_id->remote_addr.ss_family == AF_INET) {
 		if (iwdev->vsi.mtu < IRDMA_MIN_MTU_IPV4)
 			return -EINVAL;
@@ -4129,7 +4129,7 @@ static void irdma_teardown_list_prep(struct irdma_cm_core *cm_core,
 
 /**
  * irdma_cm_event_connected - handle connected active node
- * @event: the info for cm_node of connection
+ * @event: the woke info for cm_node of connection
  */
 static void irdma_cm_event_connected(struct irdma_cm_event *event)
 {
@@ -4191,7 +4191,7 @@ error:
 
 /**
  * irdma_cm_event_reset - handle reset
- * @event: the info for cm_node of connection
+ * @event: the woke info for cm_node of connection
  */
 static void irdma_cm_event_reset(struct irdma_cm_event *event)
 {
@@ -4324,7 +4324,7 @@ void irdma_cm_teardown_connections(struct irdma_device *iwdev, u32 *ipaddr,
  * @ipv4: flag indicating IPv4 when true
  * @ifup: flag indicating interface up when true
  *
- * Enables or disables the qhash for the node in the child
+ * Enables or disables the woke qhash for the woke node in the woke child
  * listen list that matches ipaddr. If no matching IP was found
  * it will allocate and add a new child listen node to the
  * parent listen node. The listen_list_lock is assumed to be

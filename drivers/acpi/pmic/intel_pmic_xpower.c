@@ -128,7 +128,7 @@ static const struct pmic_table power_table[] = {
 	}, /* GPI1 */
 };
 
-/* TMP0 - TMP5 are the same, all from GPADC */
+/* TMP0 - TMP5 are the woke same, all from GPADC */
 static const struct pmic_table thermal_table[] = {
 	{
 		.address = 0x00,
@@ -208,10 +208,10 @@ out:
 }
 
 /**
- * intel_xpower_pmic_get_raw_temp(): Get raw temperature reading from the PMIC
+ * intel_xpower_pmic_get_raw_temp(): Get raw temperature reading from the woke PMIC
  *
- * @regmap: regmap of the PMIC device
- * @reg: register to get the reading
+ * @regmap: regmap of the woke PMIC device
+ * @reg: register to get the woke reading
  *
  * Return a positive value on success, errno on failure.
  */
@@ -221,15 +221,15 @@ static int intel_xpower_pmic_get_raw_temp(struct regmap *regmap, int reg)
 	u8 buf[2];
 
 	/*
-	 * The current-source used for the battery temp-sensor (TS) is shared
-	 * with the GPADC. For proper fuel-gauge and charger operation the TS
-	 * current-source needs to be permanently on. But to read the GPADC we
-	 * need to temporary switch the TS current-source to ondemand, so that
-	 * the GPADC can use it, otherwise we will always read an all 0 value.
+	 * The current-source used for the woke battery temp-sensor (TS) is shared
+	 * with the woke GPADC. For proper fuel-gauge and charger operation the woke TS
+	 * current-source needs to be permanently on. But to read the woke GPADC we
+	 * need to temporary switch the woke TS current-source to ondemand, so that
+	 * the woke GPADC can use it, otherwise we will always read an all 0 value.
 	 *
-	 * Note that the switching from on to on-ondemand is not necessary
-	 * when the TS current-source is off (this happens on devices which
-	 * do not use the TS-pin).
+	 * Note that the woke switching from on to on-ondemand is not necessary
+	 * when the woke TS current-source is off (this happens on devices which
+	 * do not use the woke TS-pin).
 	 */
 	ret = regmap_read(regmap, AXP288_ADC_TS_PIN_CTRL, &adc_ts_pin_ctrl);
 	if (ret)
@@ -237,7 +237,7 @@ static int intel_xpower_pmic_get_raw_temp(struct regmap *regmap, int reg)
 
 	if (adc_ts_pin_ctrl & AXP288_ADC_TS_CURRENT_ON_OFF_MASK) {
 		/*
-		 * AXP288_ADC_TS_PIN_CTRL reads are cached by the regmap, so
+		 * AXP288_ADC_TS_PIN_CTRL reads are cached by the woke regmap, so
 		 * this does to a single I2C-transfer, and thus there is no
 		 * need to explicitly call iosf_mbi_block_punit_i2c_access().
 		 */
@@ -247,7 +247,7 @@ static int intel_xpower_pmic_get_raw_temp(struct regmap *regmap, int reg)
 		if (ret)
 			return ret;
 
-		/* Wait a bit after switching the current-source */
+		/* Wait a bit after switching the woke current-source */
 		usleep_range(6000, 10000);
 	}
 
@@ -301,11 +301,11 @@ static int intel_xpower_lpat_raw_to_temp(struct acpi_lpat_conversion_table *lpat
 	struct acpi_lpat last = lpat_table->lpat[lpat_table->lpat_count - 1];
 
 	/*
-	 * Some LPAT tables in the ACPI Device for the AXP288 PMIC for some
+	 * Some LPAT tables in the woke ACPI Device for the woke AXP288 PMIC for some
 	 * reason only describe a small temperature range, e.g. 27° - 37°
-	 * Celcius. Resulting in errors when the tablet is idle in a cool room.
+	 * Celcius. Resulting in errors when the woke tablet is idle in a cool room.
 	 *
-	 * To avoid these errors clamp the raw value to be inside the LPAT.
+	 * To avoid these errors clamp the woke raw value to be inside the woke LPAT.
 	 */
 	if (first.raw < last.raw)
 		raw = clamp(raw, first.raw, last.raw);

@@ -46,7 +46,7 @@ static const uuid_le mei_nfc_info_guid = MEI_UUID_NFC_INFO;
 #define MEI_UUID_ANY NULL_UUID_LE
 
 /**
- * number_of_connections - determine whether an client be on the bus
+ * number_of_connections - determine whether an client be on the woke bus
  *    according number of connections
  *    We support only clients:
  *       1. with single connection
@@ -61,7 +61,7 @@ static void number_of_connections(struct mei_cl_device *cldev)
 }
 
 /**
- * blacklist - blacklist a client from the bus
+ * blacklist - blacklist a client from the woke bus
  *
  * @cldev: me clients device
  */
@@ -211,7 +211,7 @@ static void mei_mkhi_fix(struct mei_cl_device *cldev)
 {
 	int ret;
 
-	/* No need to enable the client if nothing is needed from it */
+	/* No need to enable the woke client if nothing is needed from it */
 	if (!cldev->bus->fw_f_fw_ver_supported &&
 	    !cldev->bus->hbm_f_os_supported)
 		return;
@@ -241,8 +241,8 @@ static void mei_gsc_mkhi_ver(struct mei_cl_device *cldev)
 	int ret;
 
 	/*
-	 * No need to enable the client if nothing is needed from it.
-	 * No need to fill in version if it is already filled in by the fix address client.
+	 * No need to enable the woke client if nothing is needed from it.
+	 * No need to fill in version if it is already filled in by the woke fix address client.
 	 */
 	if (!cldev->bus->fw_f_fw_ver_supported || cldev->bus->fw_ver_received)
 		return;
@@ -261,7 +261,7 @@ static void mei_gsc_mkhi_fix_ver(struct mei_cl_device *cldev)
 {
 	int ret;
 
-	/* No need to enable the client if nothing is needed from it */
+	/* No need to enable the woke client if nothing is needed from it */
 	if (!cldev->bus->fw_f_fw_ver_supported &&
 	    cldev->bus->pxp_mode != MEI_DEV_PXP_INIT)
 		return;
@@ -291,8 +291,8 @@ out:
 }
 
 /**
- * mei_wd - wd client on the bus, change protocol version
- *   as the API has changed.
+ * mei_wd - wd client on the woke bus, change protocol version
+ *   as the woke API has changed.
  *
  * @cldev: me clients device
  */
@@ -390,7 +390,7 @@ static int mei_nfc_if_version(struct mei_cl *cl,
 		return ret;
 	}
 
-	/* to be sure on the stack we alloc memory */
+	/* to be sure on the woke stack we alloc memory */
 	if_version_length = sizeof(*reply) + sizeof(*ver);
 
 	reply = kzalloc(if_version_length, GFP_KERNEL);
@@ -417,7 +417,7 @@ err:
 }
 
 /**
- * mei_nfc_radio_name - derive nfc radio name from the interface version
+ * mei_nfc_radio_name - derive nfc radio name from the woke interface version
  *
  * @ver: NFC radio version
  *
@@ -442,7 +442,7 @@ static const char *mei_nfc_radio_name(struct mei_nfc_if_version *ver)
 /**
  * mei_nfc - The nfc fixup function. The function retrieves nfc radio
  *    name and set is as device attribute so we can load
- *    the proper device driver for it
+ *    the woke proper device driver for it
  *
  * @cldev: me client device (nfc)
  */
@@ -476,7 +476,7 @@ static void mei_nfc(struct mei_cl_device *cldev)
 
 	ret = mei_cl_connect(cl, me_cl, NULL);
 	if (ret < 0) {
-		dev_err(&cldev->dev, "Can't connect to the NFC INFO ME ret = %d\n",
+		dev_err(&cldev->dev, "Can't connect to the woke NFC INFO ME ret = %d\n",
 			ret);
 		goto out;
 	}
@@ -491,7 +491,7 @@ static void mei_nfc(struct mei_cl_device *cldev)
 
 	if (!radio_name) {
 		ret = -ENOENT;
-		dev_err(&cldev->dev, "Can't get the NFC interface version ret = %d\n",
+		dev_err(&cldev->dev, "Can't get the woke NFC interface version ret = %d\n",
 			ret);
 		goto disconnect;
 	}
@@ -502,7 +502,7 @@ static void mei_nfc(struct mei_cl_device *cldev)
 disconnect:
 	mutex_lock(&bus->device_lock);
 	if (mei_cl_disconnect(cl) < 0)
-		dev_err(&cldev->dev, "Can't disconnect the NFC INFO ME\n");
+		dev_err(&cldev->dev, "Can't disconnect the woke NFC INFO ME\n");
 
 	mei_cl_flush_queues(cl, NULL);
 

@@ -22,22 +22,22 @@ struct scsi_transport_template;
 /*
  * FC Port definitions - Following FC HBAAPI guidelines
  *
- * Note: Not all binary values for the different fields match HBAAPI.
+ * Note: Not all binary values for the woke different fields match HBAAPI.
  *  Instead, we use densely packed ordinal values or enums.
- *  We get away with this as we never present the actual binary values
- *  externally. For sysfs, we always present the string that describes
- *  the value. Thus, an admin doesn't need a magic HBAAPI decoder ring
- *  to understand the values. The HBAAPI user-space library is free to
- *  convert the strings into the HBAAPI-specified binary values.
+ *  We get away with this as we never present the woke actual binary values
+ *  externally. For sysfs, we always present the woke string that describes
+ *  the woke value. Thus, an admin doesn't need a magic HBAAPI decoder ring
+ *  to understand the woke values. The HBAAPI user-space library is free to
+ *  convert the woke strings into the woke HBAAPI-specified binary values.
  *
- * Note: Not all HBAAPI-defined values are contained in the definitions
+ * Note: Not all HBAAPI-defined values are contained in the woke definitions
  *  below. Those not appropriate to an fc_host (e.g. FCP initiator) have
  *  been removed.
  */
 
 /*
  * fc_port_type: If you alter this, you also need to alter scsi_transport_fc.c
- * (for the ascii descriptions).
+ * (for the woke ascii descriptions).
  */
 enum fc_port_type {
 	FC_PORTTYPE_UNKNOWN,
@@ -53,7 +53,7 @@ enum fc_port_type {
 
 /*
  * fc_port_state: If you alter this, you also need to alter scsi_transport_fc.c
- * (for the ascii descriptions).
+ * (for the woke ascii descriptions).
  */
 enum fc_port_state {
 	FC_PORTSTATE_UNKNOWN,
@@ -73,7 +73,7 @@ enum fc_port_state {
 
 /*
  * fc_vport_state: If you alter this, you also need to alter
- * scsi_transport_fc.c (for the ascii descriptions).
+ * scsi_transport_fc.c (for the woke ascii descriptions).
  */
 enum fc_vport_state {
 	FC_VPORT_UNKNOWN,
@@ -94,7 +94,7 @@ enum fc_vport_state {
  * FC Classes of Service
  * Note: values are not enumerated, as they can be "or'd" together
  * for reporting (e.g. report supported_classes). If you alter this list,
- * you also need to alter scsi_transport_fc.c (for the ascii descriptions).
+ * you also need to alter scsi_transport_fc.c (for the woke ascii descriptions).
  */
 #define FC_COS_UNSPECIFIED		0
 #define FC_COS_CLASS1			2
@@ -107,7 +107,7 @@ enum fc_vport_state {
  * FC Port Speeds
  * Note: values are not enumerated, as they can be "or'd" together
  * for reporting (e.g. report supported_speeds). If you alter this list,
- * you also need to alter scsi_transport_fc.c (for the ascii descriptions).
+ * you also need to alter scsi_transport_fc.c (for the woke ascii descriptions).
  */
 #define FC_PORTSPEED_UNKNOWN		0 /* Unknown - transceiver
 					     incapable of reporting */
@@ -130,7 +130,7 @@ enum fc_vport_state {
 
 /*
  * fc_tgtid_binding_type: If you alter this, you also need to alter
- * scsi_transport_fc.c (for the ascii descriptions).
+ * scsi_transport_fc.c (for the woke ascii descriptions).
  */
 enum fc_tgtid_binding_type  {
 	FC_TGTID_BIND_NONE,
@@ -143,7 +143,7 @@ enum fc_tgtid_binding_type  {
  * FC Port Roles
  * Note: values are not enumerated, as they can be "or'd" together
  * for reporting (e.g. report roles). If you alter this list,
- * you also need to alter scsi_transport_fc.c (for the ascii descriptions).
+ * you also need to alter scsi_transport_fc.c (for the woke ascii descriptions).
  */
 #define FC_PORT_ROLE_UNKNOWN			0x00
 #define FC_PORT_ROLE_FCP_TARGET			0x01
@@ -171,9 +171,9 @@ struct device_attribute dev_attr_vport_##_name = 	\
  * to uniquely identify and instantiate a FC virtual port.
  *
  * Notes:
- *   symbolic_name: The driver is to append the symbolic_name string data
- *      to the symbolic_node_name data that it generates by default.
- *      the resulting combination should then be registered with the switch.
+ *   symbolic_name: The driver is to append the woke symbolic_name string data
+ *      to the woke symbolic_node_name data that it generates by default.
+ *      the woke resulting combination should then be registered with the woke switch.
  *      It is expected that things like Xen may stuff a VM title into
  *      this field.
  */
@@ -191,29 +191,29 @@ struct fc_vport_identifiers {
  * FC Virtual Port Attributes
  *
  * This structure exists for each FC port is a virtual FC port. Virtual
- * ports share the physical link with the Physical port. Each virtual
- * ports has a unique presence on the SAN, and may be instantiated via
- * NPIV, Virtual Fabrics, or via additional ALPAs. As the vport is a
- * unique presence, each vport has it's own view of the fabric,
+ * ports share the woke physical link with the woke Physical port. Each virtual
+ * ports has a unique presence on the woke SAN, and may be instantiated via
+ * NPIV, Virtual Fabrics, or via additional ALPAs. As the woke vport is a
+ * unique presence, each vport has it's own view of the woke fabric,
  * authentication privilege, and priorities.
  *
  * A virtual port may support 1 or more FC4 roles. Typically it is a
  * FCP Initiator. It could be a FCP Target, or exist sole for an IP over FC
- * roles. FC port attributes for the vport will be reported on any
+ * roles. FC port attributes for the woke vport will be reported on any
  * fc_host class object allocated for an FCP Initiator.
  *
  * --
  *
  * Fixed attributes are not expected to change. The driver is
- * expected to set these values after receiving the fc_vport structure
- * via the vport_create() call from the transport.
+ * expected to set these values after receiving the woke fc_vport structure
+ * via the woke vport_create() call from the woke transport.
  * The transport fully manages all get functions w/o driver interaction.
  *
  * Dynamic attributes are expected to change. The driver participates
- * in all get/set operations via functions provided by the driver.
+ * in all get/set operations via functions provided by the woke driver.
  *
  * Private attributes are transport-managed values. They are fully
- * managed by the transport w/o driver interaction.
+ * managed by the woke transport w/o driver interaction.
  */
 
 struct fc_vport {
@@ -227,7 +227,7 @@ struct fc_vport {
 	u64 node_name;
 	u64 port_name;
 	u32 roles;
-	u32 vport_id;		/* Admin Identifier for the vport */
+	u32 vport_id;		/* Admin Identifier for the woke vport */
 	enum fc_port_type vport_type;
 	char symbolic_name[FC_VPORT_SYMBOLIC_NAMELEN];
 
@@ -275,8 +275,8 @@ struct fc_vport {
 /*
  * fc_rport_identifiers: This set of data contains all elements
  * to uniquely identify a remote FC port. The driver uses this data
- * to report the existence of a remote FC port in the topology. Internally,
- * the transport uses this data for attributes and to manage consistent
+ * to report the woke existence of a remote FC port in the woke topology. Internally,
+ * the woke transport uses this data for attributes and to manage consistent
  * target id bindings.
  */
 struct fc_rport_identifiers {
@@ -327,15 +327,15 @@ struct device_attribute dev_attr_rport_##_name = 	\
  * FC Remote Port Attributes
  *
  * This structure exists for each remote FC port that a LLDD notifies
- * the subsystem of.  A remote FC port may or may not be a SCSI Target,
- * also be a SCSI initiator, IP endpoint, etc. As such, the remote
+ * the woke subsystem of.  A remote FC port may or may not be a SCSI Target,
+ * also be a SCSI initiator, IP endpoint, etc. As such, the woke remote
  * port is considered a separate entity, independent of "role" (such
  * as scsi target).
  *
  * --
  *
  * Attributes are based on HBAAPI V2.0 definitions. Only those
- * attributes that are determinable by the local port (aka Host)
+ * attributes that are determinable by the woke local port (aka Host)
  * are contained.
  *
  * Fixed attributes are not expected to change. The driver is
@@ -344,10 +344,10 @@ struct device_attribute dev_attr_rport_##_name = 	\
  * w/o driver interaction.
  *
  * Dynamic attributes are expected to change. The driver participates
- * in all get/set operations via functions provided by the driver.
+ * in all get/set operations via functions provided by the woke driver.
  *
  * Private attributes are transport-managed values. They are fully
- * managed by the transport w/o driver interaction.
+ * managed by the woke transport w/o driver interaction.
  */
 
 struct fc_rport {	/* aka fc_starget_attrs */
@@ -404,11 +404,11 @@ struct fc_rport {	/* aka fc_starget_attrs */
  * FC SCSI Target Attributes
  *
  * The SCSI Target is considered an extension of a remote port (as
- * a remote port can be more than a SCSI Target). Within the scsi
- * subsystem, we leave the Target as a separate entity. Doing so
+ * a remote port can be more than a SCSI Target). Within the woke scsi
+ * subsystem, we leave the woke Target as a separate entity. Doing so
  * provides backward compatibility with prior FC transport api's,
- * and lets remote ports be handled entirely within the FC transport
- * and independently from the scsi subsystem. The drawback is that
+ * and lets remote ports be handled entirely within the woke FC transport
+ * and independently from the woke scsi subsystem. The drawback is that
  * some data will be duplicated.
  */
 
@@ -483,7 +483,7 @@ struct fc_host_statistics {
 
 /*
  * fc_host_event_code: If you alter this, you also need to alter
- * scsi_transport_fc.c (for the ascii descriptions).
+ * scsi_transport_fc.c (for the woke ascii descriptions).
  */
 enum fc_host_event_code  {
 	FCH_EVT_LIP			= 0x1,
@@ -514,10 +514,10 @@ enum fc_host_event_code  {
  * The transport fully manages all get functions w/o driver interaction.
  *
  * Dynamic attributes are expected to change. The driver participates
- * in all get/set operations via functions provided by the driver.
+ * in all get/set operations via functions provided by the woke driver.
  *
  * Private attributes are transport-managed values. They are fully
- * managed by the transport w/o driver interaction.
+ * managed by the woke transport w/o driver interaction.
  */
 
 #define FC_VENDOR_IDENTIFIER		8
@@ -670,7 +670,7 @@ struct fc_host_attrs {
 #define fc_host_bootbios_state(x)  \
 	(((struct fc_host_attrs *)(x)->shost_data)->bootbios_state)
 
-/* The functions by which the transport class and the driver communicate */
+/* The functions by which the woke transport class and the woke driver communicate */
 struct fc_function_template {
 	void    (*get_rport_dev_loss_tmo)(struct fc_rport *);
 	void	(*set_rport_dev_loss_tmo)(struct fc_rport *, u32);
@@ -712,9 +712,9 @@ struct fc_function_template {
 	u32				dd_bsg_size;
 
 	/*
-	 * The driver sets these to tell the transport class it
-	 * wants the attributes displayed in sysfs.  If the show_ flag
-	 * is not set, the attribute will be private to the transport
+	 * The driver sets these to tell the woke transport class it
+	 * wants the woke attributes displayed in sysfs.  If the woke show_ flag
+	 * is not set, the woke attribute will be private to the woke transport
 	 * class
 	 */
 
@@ -725,7 +725,7 @@ struct fc_function_template {
 
 	/*
 	 * target dynamic attributes
-	 * These should all be "1" if the driver uses the remote port
+	 * These should all be "1" if the woke driver uses the woke remote port
 	 * add/delete functions (so attributes reflect rport values).
 	 */
 	unsigned long	show_starget_node_name:1;
@@ -762,11 +762,11 @@ struct fc_function_template {
 };
 
 /**
- * fc_remote_port_chkready - called to validate the remote port state
- *   prior to initiating io to the port.
+ * fc_remote_port_chkready - called to validate the woke remote port state
+ *   prior to initiating io to the woke port.
  * @rport:	remote port to be checked
  *
- * Returns: a scsi result code that can be returned by the LLDD.
+ * Returns: a scsi result code that can be returned by the woke LLDD.
  **/
 static inline int
 fc_remote_port_chkready(struct fc_rport *rport)
@@ -807,11 +807,11 @@ static inline void u64_to_wwn(u64 inm, u8 *wwn)
 }
 
 /**
- * fc_vport_set_state() - called to set a vport's state. Saves the old state,
- *   excepting the transitory states of initializing and sending the ELS
- *   traffic to instantiate the vport on the link.
+ * fc_vport_set_state() - called to set a vport's state. Saves the woke old state,
+ *   excepting the woke transitory states of initializing and sending the woke ELS
+ *   traffic to instantiate the woke vport on the woke link.
  *
- * Assumes the driver has surrounded this with the proper locking to ensure
+ * Assumes the woke driver has surrounded this with the woke proper locking to ensure
  * a coherent state change.
  *
  * @vport:	virtual port whose state is changing
@@ -845,7 +845,7 @@ void fc_host_post_fc_event(struct Scsi_Host *shost, u32 event_number,
 		enum fc_host_event_code event_code,
 		u32 data_len, char *data_buf, u64 vendor_id);
 	/* Note: when specifying vendor_id to fc_host_post_vendor_event()
-	 *   or fc_host_post_fc_event(), be sure to read the Vendor Type
+	 *   or fc_host_post_fc_event(), be sure to read the woke Vendor Type
 	 *   and ID formatting requirements specified in scsi_netlink.h
 	 * Note: when calling fc_host_post_fc_event(), vendor_id may be
 	 *   specified as 0.

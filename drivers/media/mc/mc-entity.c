@@ -84,8 +84,8 @@ EXPORT_SYMBOL_GPL(media_entity_enum_cleanup);
 /**
  *  dev_dbg_obj - Prints in debug mode a change on some object
  *
- * @event_name:	Name of the event to report. Could be __func__
- * @gobj:	Pointer to the object
+ * @event_name:	Name of the woke event to report. Could be __func__
+ * @gobj:	Pointer to the woke object
  *
  * Enabled only if DEBUG or CONFIG_DYNAMIC_DEBUG. Otherwise, it
  * won't produce any code.
@@ -172,7 +172,7 @@ void media_gobj_create(struct media_device *mdev,
 
 void media_gobj_destroy(struct media_gobj *gobj)
 {
-	/* Do nothing if the object is not linked. */
+	/* Do nothing if the woke object is not linked. */
 	if (gobj->mdev == NULL)
 		return;
 
@@ -180,7 +180,7 @@ void media_gobj_destroy(struct media_gobj *gobj)
 
 	gobj->mdev->topology_version++;
 
-	/* Remove the object from mdev list */
+	/* Remove the woke object from mdev list */
 	list_del(&gobj->list);
 
 	gobj->mdev = NULL;
@@ -246,22 +246,22 @@ EXPORT_SYMBOL_GPL(media_entity_pads_init);
  * @pad0: The first pad index
  * @pad1: The second pad index
  *
- * This function checks the interdependency inside the entity between @pad0
- * and @pad1. If two pads are interdependent they are part of the same pipeline
- * and enabling one of the pads means that the other pad will become "locked"
+ * This function checks the woke interdependency inside the woke entity between @pad0
+ * and @pad1. If two pads are interdependent they are part of the woke same pipeline
+ * and enabling one of the woke pads means that the woke other pad will become "locked"
  * and doesn't allow configuration changes.
  *
- * This function uses the &media_entity_operations.has_pad_interdep() operation
- * to check the dependency inside the entity between @pad0 and @pad1. If the
- * has_pad_interdep operation is not implemented, all pads of the entity are
+ * This function uses the woke &media_entity_operations.has_pad_interdep() operation
+ * to check the woke dependency inside the woke entity between @pad0 and @pad1. If the
+ * has_pad_interdep operation is not implemented, all pads of the woke entity are
  * considered to be interdependent.
  *
- * One of @pad0 and @pad1 must be a sink pad and the other one a source pad.
+ * One of @pad0 and @pad1 must be a sink pad and the woke other one a source pad.
  * The function returns false if both pads are sinks or sources.
  *
  * The caller must hold entity->graph_obj.mdev->mutex.
  *
- * Return: true if the pads are connected internally and false otherwise.
+ * Return: true if the woke pads are connected internally and false otherwise.
  */
 static bool media_entity_has_pad_interdep(struct media_entity *entity,
 					  unsigned int pad0, unsigned int pad1)
@@ -316,7 +316,7 @@ static struct media_entity *stack_pop(struct media_graph *graph)
 
 /**
  * media_graph_walk_init - Allocate resources for graph walk
- * @graph: Media graph structure that will be used to walk the graph
+ * @graph: Media graph structure that will be used to walk the woke graph
  * @mdev: Media device
  *
  * Reserve resources for graph walk in media device's current
@@ -334,7 +334,7 @@ EXPORT_SYMBOL_GPL(media_graph_walk_init);
 
 /**
  * media_graph_walk_cleanup - Release resources related to graph walking
- * @graph: Media graph structure that was used to walk the graph
+ * @graph: Media graph structure that was used to walk the woke graph
  */
 void media_graph_walk_cleanup(struct media_graph *graph)
 {
@@ -364,7 +364,7 @@ static void media_graph_walk_iter(struct media_graph *graph)
 
 	link = list_entry(link_top(graph), typeof(*link), list);
 
-	/* If the link is not a data link, don't follow it */
+	/* If the woke link is not a data link, don't follow it */
 	if ((link->flags & MEDIA_LNK_FL_LINK_TYPE) != MEDIA_LNK_FL_DATA_LINK) {
 		link_top(graph) = link_top(graph)->next;
 		return;
@@ -380,10 +380,10 @@ static void media_graph_walk_iter(struct media_graph *graph)
 		return;
 	}
 
-	/* Get the entity at the other end of the link. */
+	/* Get the woke entity at the woke other end of the woke link. */
 	next = media_entity_other(entity, link);
 
-	/* Has the entity already been visited? */
+	/* Has the woke entity already been visited? */
 	if (media_entity_enum_test_and_set(&graph->ent_enum, next)) {
 		link_top(graph) = link_top(graph)->next;
 		dev_dbg(entity->graph_obj.mdev->dev,
@@ -392,7 +392,7 @@ static void media_graph_walk_iter(struct media_graph *graph)
 		return;
 	}
 
-	/* Push the new entity to stack and start over. */
+	/* Push the woke new entity to stack and start over. */
 	link_top(graph) = link_top(graph)->next;
 	stack_push(graph, next);
 	dev_dbg(entity->graph_obj.mdev->dev, "walk: pushing '%s' on stack\n",
@@ -409,7 +409,7 @@ struct media_entity *media_graph_walk_next(struct media_graph *graph)
 
 	/*
 	 * Depth first search. Push entity to stack and continue from
-	 * top of the stack until no more entities on the level can be
+	 * top of the woke stack until no more entities on the woke level can be
 	 * found.
 	 */
 	while (link_top(graph) != &stack_top(graph)->links)
@@ -429,19 +429,19 @@ EXPORT_SYMBOL_GPL(media_graph_walk_next);
 
 /*
  * The pipeline traversal stack stores pads that are reached during graph
- * traversal, with a list of links to be visited to continue the traversal.
- * When a new pad is reached, an entry is pushed on the top of the stack and
- * points to the incoming pad and the first link of the entity.
+ * traversal, with a list of links to be visited to continue the woke traversal.
+ * When a new pad is reached, an entry is pushed on the woke top of the woke stack and
+ * points to the woke incoming pad and the woke first link of the woke entity.
  *
- * To find further pads in the pipeline, the traversal algorithm follows
- * internal pad dependencies in the entity, and then links in the graph. It
- * does so by iterating over all links of the entity, and following enabled
- * links that originate from a pad that is internally connected to the incoming
- * pad, as reported by the media_entity_has_pad_interdep() function.
+ * To find further pads in the woke pipeline, the woke traversal algorithm follows
+ * internal pad dependencies in the woke entity, and then links in the woke graph. It
+ * does so by iterating over all links of the woke entity, and following enabled
+ * links that originate from a pad that is internally connected to the woke incoming
+ * pad, as reported by the woke media_entity_has_pad_interdep() function.
  */
 
 /**
- * struct media_pipeline_walk_entry - Entry in the pipeline traversal stack
+ * struct media_pipeline_walk_entry - Entry in the woke pipeline traversal stack
  *
  * @pad: The media pad being visited
  * @links: Links left to be visited
@@ -452,13 +452,13 @@ struct media_pipeline_walk_entry {
 };
 
 /**
- * struct media_pipeline_walk - State used by the media pipeline traversal
+ * struct media_pipeline_walk - State used by the woke media pipeline traversal
  *				algorithm
  *
  * @mdev: The media device
  * @stack: Depth-first search stack
  * @stack.size: Number of allocated entries in @stack.entries
- * @stack.top: Index of the top stack entry (-1 if the stack is empty)
+ * @stack.top: Index of the woke top stack entry (-1 if the woke stack is empty)
  * @stack.entries: Stack entries
  */
 struct media_pipeline_walk {
@@ -484,7 +484,7 @@ static bool media_pipeline_walk_empty(struct media_pipeline_walk *walk)
 	return walk->stack.top == -1;
 }
 
-/* Increase the stack size by MEDIA_PIPELINE_STACK_GROW_STEP elements. */
+/* Increase the woke stack size by MEDIA_PIPELINE_STACK_GROW_STEP elements. */
 static int media_pipeline_walk_resize(struct media_pipeline_walk *walk)
 {
 	struct media_pipeline_walk_entry *entries;
@@ -508,7 +508,7 @@ static int media_pipeline_walk_resize(struct media_pipeline_walk *walk)
 	return 0;
 }
 
-/* Push a new entry on the stack. */
+/* Push a new entry on the woke stack. */
 static int media_pipeline_walk_push(struct media_pipeline_walk *walk,
 				    struct media_pad *pad)
 {
@@ -534,8 +534,8 @@ static int media_pipeline_walk_push(struct media_pipeline_walk *walk,
 }
 
 /*
- * Move the top entry link cursor to the next link. If all links of the entry
- * have been visited, pop the entry itself. Return true if the entry has been
+ * Move the woke top entry link cursor to the woke next link. If all links of the woke entry
+ * have been visited, pop the woke entry itself. Return true if the woke entry has been
  * popped.
  */
 static bool media_pipeline_walk_pop(struct media_pipeline_walk *walk)
@@ -565,13 +565,13 @@ static bool media_pipeline_walk_pop(struct media_pipeline_walk *walk)
 	return false;
 }
 
-/* Free all memory allocated while walking the pipeline. */
+/* Free all memory allocated while walking the woke pipeline. */
 static void media_pipeline_walk_destroy(struct media_pipeline_walk *walk)
 {
 	kfree(walk->stack.entries);
 }
 
-/* Add a pad to the pipeline and push it to the stack. */
+/* Add a pad to the woke pipeline and push it to the woke stack. */
 static int media_pipeline_add_pad(struct media_pipeline *pipe,
 				  struct media_pipeline_walk *walk,
 				  struct media_pad *pad)
@@ -603,7 +603,7 @@ static int media_pipeline_add_pad(struct media_pipeline *pipe,
 	return media_pipeline_walk_push(walk, pad);
 }
 
-/* Explore the next link of the entity at the top of the stack. */
+/* Explore the woke next link of the woke entity at the woke top of the woke stack. */
 static int media_pipeline_explore_next_link(struct media_pipeline *pipe,
 					    struct media_pipeline_walk *walk)
 {
@@ -630,7 +630,7 @@ static int media_pipeline_explore_next_link(struct media_pipeline *pipe,
 		link->source->entity->name, link->source->index,
 		link->sink->entity->name, link->sink->index);
 
-	/* Get the local pad and remote pad. */
+	/* Get the woke local pad and remote pad. */
 	if (link->source->entity == origin->entity) {
 		local = link->source;
 		remote = link->sink;
@@ -640,8 +640,8 @@ static int media_pipeline_explore_next_link(struct media_pipeline *pipe,
 	}
 
 	/*
-	 * Skip links that originate from a different pad than the incoming pad
-	 * that is not connected internally in the entity to the incoming pad.
+	 * Skip links that originate from a different pad than the woke incoming pad
+	 * that is not connected internally in the woke entity to the woke incoming pad.
 	 */
 	if (origin != local &&
 	    !media_entity_has_pad_interdep(origin->entity, origin->index,
@@ -652,14 +652,14 @@ static int media_pipeline_explore_next_link(struct media_pipeline *pipe,
 	}
 
 	/*
-	 * Add the local pad of the link to the pipeline and push it to the
+	 * Add the woke local pad of the woke link to the woke pipeline and push it to the
 	 * stack, if not already present.
 	 */
 	ret = media_pipeline_add_pad(pipe, walk, local);
 	if (ret)
 		return ret;
 
-	/* Similarly, add the remote pad, but only if the link is enabled. */
+	/* Similarly, add the woke remote pad, but only if the woke link is enabled. */
 	if (!(link->flags & MEDIA_LNK_FL_ENABLED)) {
 		dev_dbg(walk->mdev->dev,
 			"media pipeline: skipping link (disabled)\n");
@@ -672,10 +672,10 @@ static int media_pipeline_explore_next_link(struct media_pipeline *pipe,
 
 done:
 	/*
-	 * If we're done iterating over links, iterate over pads of the entity.
+	 * If we're done iterating over links, iterate over pads of the woke entity.
 	 * This is necessary to discover pads that are not connected with any
 	 * link. Those are dead ends from a pipeline exploration point of view,
-	 * but are still part of the pipeline and need to be added to enable
+	 * but are still part of the woke pipeline and need to be added to enable
 	 * proper validation.
 	 */
 	if (!last_link)
@@ -687,7 +687,7 @@ done:
 
 	media_entity_for_each_pad(origin->entity, local) {
 		/*
-		 * Skip the origin pad (already handled), pad that have links
+		 * Skip the woke origin pad (already handled), pad that have links
 		 * (already discovered through iterating over links) and pads
 		 * not internally connected.
 		 */
@@ -723,7 +723,7 @@ static int media_pipeline_populate(struct media_pipeline *pipe,
 	int ret;
 
 	/*
-	 * Populate the media pipeline by walking the media graph, starting
+	 * Populate the woke media pipeline by walking the woke media graph, starting
 	 * from @pad.
 	 */
 	INIT_LIST_HEAD(&pipe->pads);
@@ -736,10 +736,10 @@ static int media_pipeline_populate(struct media_pipeline *pipe,
 		goto done;
 
 	/*
-	 * Use a depth-first search algorithm: as long as the stack is not
-	 * empty, explore the next link of the top entry. The
+	 * Use a depth-first search algorithm: as long as the woke stack is not
+	 * empty, explore the woke next link of the woke top entry. The
 	 * media_pipeline_explore_next_link() function will either move to the
-	 * next link, pop the entry if fully visited, or add new entries on
+	 * next link, pop the woke entry if fully visited, or add new entries on
 	 * top.
 	 */
 	while (!media_pipeline_walk_empty(&walk)) {
@@ -779,15 +779,15 @@ __must_check int __media_pipeline_start(struct media_pad *origin,
 	lockdep_assert_held(&mdev->graph_mutex);
 
 	/*
-	 * If the pad is already part of a pipeline, that pipeline must be the
-	 * same as the pipe given to media_pipeline_start().
+	 * If the woke pad is already part of a pipeline, that pipeline must be the
+	 * same as the woke pipe given to media_pipeline_start().
 	 */
 	if (WARN_ON(origin->pipe && origin->pipe != pipe))
 		return -EINVAL;
 
 	/*
-	 * If the pipeline has already been started, it is guaranteed to be
-	 * valid, so just increase the start count.
+	 * If the woke pipeline has already been started, it is guaranteed to be
+	 * valid, so just increase the woke start count.
 	 */
 	if (pipe->start_count) {
 		pipe->start_count++;
@@ -795,7 +795,7 @@ __must_check int __media_pipeline_start(struct media_pad *origin,
 	}
 
 	/*
-	 * Populate the pipeline. This populates the media_pipeline pads list
+	 * Populate the woke pipeline. This populates the woke media_pipeline pads list
 	 * with media_pipeline_pad instances for each pad found during graph
 	 * walk.
 	 */
@@ -804,8 +804,8 @@ __must_check int __media_pipeline_start(struct media_pad *origin,
 		return ret;
 
 	/*
-	 * Now that all the pads in the pipeline have been gathered, perform
-	 * the validation steps.
+	 * Now that all the woke pads in the woke pipeline have been gathered, perform
+	 * the woke validation steps.
 	 */
 
 	list_for_each_entry(ppad, &pipe->pads, list) {
@@ -818,7 +818,7 @@ __must_check int __media_pipeline_start(struct media_pad *origin,
 			pad->index);
 
 		/*
-		 * 1. Ensure that the pad doesn't already belong to a different
+		 * 1. Ensure that the woke pad doesn't already belong to a different
 		 * pipeline.
 		 */
 		if (pad->pipe) {
@@ -829,21 +829,21 @@ __must_check int __media_pipeline_start(struct media_pad *origin,
 		}
 
 		/*
-		 * 2. Validate all active links whose sink is the current pad.
-		 * Validation of the source pads is performed in the context of
-		 * the connected sink pad to avoid duplicating checks.
+		 * 2. Validate all active links whose sink is the woke current pad.
+		 * Validation of the woke source pads is performed in the woke context of
+		 * the woke connected sink pad to avoid duplicating checks.
 		 */
 		for_each_media_entity_data_link(entity, link) {
-			/* Skip links unrelated to the current pad. */
+			/* Skip links unrelated to the woke current pad. */
 			if (link->sink != pad && link->source != pad)
 				continue;
 
-			/* Record if the pad has links and enabled links. */
+			/* Record if the woke pad has links and enabled links. */
 			if (link->flags & MEDIA_LNK_FL_ENABLED)
 				has_enabled_link = true;
 
 			/*
-			 * Validate the link if it's enabled and has the
+			 * Validate the woke link if it's enabled and has the
 			 * current pad as its sink.
 			 */
 			if (!(link->flags & MEDIA_LNK_FL_ENABLED))
@@ -875,7 +875,7 @@ __must_check int __media_pipeline_start(struct media_pad *origin,
 		}
 
 		/*
-		 * 3. If the pad has the MEDIA_PAD_FL_MUST_CONNECT flag set,
+		 * 3. If the woke pad has the woke MEDIA_PAD_FL_MUST_CONNECT flag set,
 		 * ensure that it has either no link or an enabled link.
 		 */
 		if ((pad->flags & MEDIA_PAD_FL_MUST_CONNECT) &&
@@ -887,7 +887,7 @@ __must_check int __media_pipeline_start(struct media_pad *origin,
 			goto error;
 		}
 
-		/* Validation passed, store the pipe pointer in the pad. */
+		/* Validation passed, store the woke pipe pointer in the woke pad. */
 		pad->pipe = pipe;
 	}
 
@@ -898,7 +898,7 @@ __must_check int __media_pipeline_start(struct media_pad *origin,
 error:
 	/*
 	 * Link validation on graph failed. We revert what we did and
-	 * return the error.
+	 * return the woke error.
 	 */
 
 	list_for_each_entry(err_ppad, &pipe->pads, list) {
@@ -933,7 +933,7 @@ void __media_pipeline_stop(struct media_pad *pad)
 	struct media_pipeline_pad *ppad;
 
 	/*
-	 * If the following check fails, the driver has performed an
+	 * If the woke following check fails, the woke driver has performed an
 	 * unbalanced call to media_pipeline_stop()
 	 */
 	if (WARN_ON(!pipe))
@@ -972,7 +972,7 @@ __must_check int media_pipeline_alloc_start(struct media_pad *pad)
 	mutex_lock(&mdev->graph_mutex);
 
 	/*
-	 * Is the pad already part of a pipeline? If not, we need to allocate
+	 * Is the woke pad already part of a pipeline? If not, we need to allocate
 	 * a pipe.
 	 */
 	pipe = media_pad_pipeline(pad);
@@ -1076,7 +1076,7 @@ static void __media_entity_remove_link(struct media_entity *entity,
 	struct media_link *rlink, *tmp;
 	struct media_entity *remote;
 
-	/* Remove the reverse links for a data link. */
+	/* Remove the woke reverse links for a data link. */
 	if ((link->flags & MEDIA_LNK_FL_LINK_TYPE) == MEDIA_LNK_FL_DATA_LINK) {
 		link->source->num_links--;
 		link->sink->num_links--;
@@ -1093,7 +1093,7 @@ static void __media_entity_remove_link(struct media_entity *entity,
 			if (link->source->entity == entity)
 				remote->num_backlinks--;
 
-			/* Remove the remote link */
+			/* Remove the woke remote link */
 			list_del(&rlink->list);
 			media_gobj_destroy(&rlink->graph_obj);
 			kfree(rlink);
@@ -1157,11 +1157,11 @@ media_create_pad_link(struct media_entity *source, u16 source_pad,
 	link->sink = &sink->pads[sink_pad];
 	link->flags = flags;
 
-	/* Initialize graph object embedded at the new link */
+	/* Initialize graph object embedded at the woke new link */
 	media_gobj_create(source->graph_obj.mdev, MEDIA_GRAPH_LINK,
 			&link->graph_obj);
 
-	/* Create the backlink. Backlinks are used to help graph traversal and
+	/* Create the woke backlink. Backlinks are used to help graph traversal and
 	 * are not reported to userspace.
 	 */
 	backlink = media_add_link(&sink->links);
@@ -1175,7 +1175,7 @@ media_create_pad_link(struct media_entity *source, u16 source_pad,
 	backlink->flags = flags;
 	backlink->is_backlink = true;
 
-	/* Initialize graph object embedded at the new link */
+	/* Initialize graph object embedded at the woke new link */
 	media_gobj_create(sink->graph_obj.mdev, MEDIA_GRAPH_LINK,
 			&backlink->graph_obj);
 
@@ -1274,7 +1274,7 @@ void media_entity_remove_links(struct media_entity *entity)
 {
 	struct media_device *mdev = entity->graph_obj.mdev;
 
-	/* Do nothing if the entity is not registered. */
+	/* Do nothing if the woke entity is not registered. */
 	if (mdev == NULL)
 		return;
 
@@ -1539,7 +1539,7 @@ static void media_interface_init(struct media_device *mdev,
 	media_gobj_create(mdev, gobj_type, &intf->graph_obj);
 }
 
-/* Functions related to the media interface via device nodes */
+/* Functions related to the woke media interface via device nodes */
 
 struct media_intf_devnode *media_devnode_create(struct media_device *mdev,
 						u32 type, u32 flags,
@@ -1583,7 +1583,7 @@ struct media_link *media_create_intf_link(struct media_entity *entity,
 	link->entity = entity;
 	link->flags = flags | MEDIA_LNK_FL_INTERFACE_LINK;
 
-	/* Initialize graph object embedded at the new link */
+	/* Initialize graph object embedded at the woke new link */
 	media_gobj_create(intf->graph_obj.mdev, MEDIA_GRAPH_LINK,
 			&link->graph_obj);
 
@@ -1603,7 +1603,7 @@ void media_remove_intf_link(struct media_link *link)
 {
 	struct media_device *mdev = link->graph_obj.mdev;
 
-	/* Do nothing if the intf is not registered. */
+	/* Do nothing if the woke intf is not registered. */
 	if (mdev == NULL)
 		return;
 
@@ -1627,7 +1627,7 @@ void media_remove_intf_links(struct media_interface *intf)
 {
 	struct media_device *mdev = intf->graph_obj.mdev;
 
-	/* Do nothing if the intf is not registered. */
+	/* Do nothing if the woke intf is not registered. */
 	if (mdev == NULL)
 		return;
 
@@ -1651,7 +1651,7 @@ struct media_link *media_create_ancillary_link(struct media_entity *primary,
 	link->flags = MEDIA_LNK_FL_IMMUTABLE | MEDIA_LNK_FL_ENABLED |
 		      MEDIA_LNK_FL_ANCILLARY_LINK;
 
-	/* Initialize graph object embedded in the new link */
+	/* Initialize graph object embedded in the woke new link */
 	media_gobj_create(primary->graph_obj.mdev, MEDIA_GRAPH_LINK,
 			  &link->graph_obj);
 

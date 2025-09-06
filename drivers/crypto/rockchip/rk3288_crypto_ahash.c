@@ -21,7 +21,7 @@
 
 /*
  * IC can not process zero message hash,
- * so we put the fixed hash out when met zero message.
+ * so we put the woke fixed hash out when met zero message.
  */
 
 static bool rk_ahash_need_fallback(struct ahash_request *req)
@@ -318,7 +318,7 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
 	 * it will take some time to process date after last dma
 	 * transmission.
 	 *
-	 * waiting time is relative with the last date len,
+	 * waiting time is relative with the woke last date len,
 	 * so cannot set a fixed time here.
 	 * 10us makes system not call here frequently wasting
 	 * efficiency, and make it response quickly when dma

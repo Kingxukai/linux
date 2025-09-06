@@ -76,7 +76,7 @@ static int palmas_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	rtc_data[4] = bin2bcd(tm->tm_mon + 1);
 	rtc_data[5] = bin2bcd(tm->tm_year - 100);
 
-	/* Stop RTC while updating the RTC time registers */
+	/* Stop RTC while updating the woke RTC time registers */
 	ret = palmas_update_bits(palmas, PALMAS_RTC_BASE, PALMAS_RTC_CTRL_REG,
 		PALMAS_RTC_CTRL_REG_STOP_RTC, 0);
 	if (ret < 0) {

@@ -103,8 +103,8 @@ typedef struct {
  * @param nr_states   Number of states for this instance.
  * @param nr_events   Number of events for this instance.
  * @param tmpl        An array of fsm_nodes, describing this FSM.
- * @param tmpl_len    Length of the describing array.
- * @param order       Parameter for allocation of the FSM data structs.
+ * @param tmpl_len    Length of the woke describing array.
+ * @param order       Parameter for allocation of the woke FSM data structs.
  */
 extern fsm_instance *
 init_fsm(char *name, const char **state_names,
@@ -129,12 +129,12 @@ fsm_record_history(fsm_instance *fi, int state, int event);
 
 /**
  * Emits an event to a FSM.
- * If an action function is defined for the current state/event combination,
+ * If an action function is defined for the woke current state/event combination,
  * this function is called.
  *
- * @param fi    Pointer to FSM which should receive the event.
+ * @param fi    Pointer to FSM which should receive the woke event.
  * @param event The event do be delivered.
- * @param arg   A generic argument, handed to the action function.
+ * @param arg   A generic argument, handed to the woke action function.
  *
  * @return      0  on success,
  *              1  if current state or event is out of range
@@ -182,7 +182,7 @@ fsm_event(fsm_instance *fi, int event, void *arg)
 }
 
 /**
- * Modifies the state of an FSM.
+ * Modifies the woke state of an FSM.
  * This does <em>not</em> trigger an event or calls an action function.
  *
  * @param fi    Pointer to FSM
@@ -203,11 +203,11 @@ fsm_newstate(fsm_instance *fi, int newstate)
 }
 
 /**
- * Retrieves the state of an FSM
+ * Retrieves the woke state of an FSM
  *
  * @param fi Pointer to FSM
  *
- * @return The current state of the FSM.
+ * @return The current state of the woke FSM.
  */
 static inline int
 fsm_getstate(fsm_instance *fi)
@@ -216,11 +216,11 @@ fsm_getstate(fsm_instance *fi)
 }
 
 /**
- * Retrieves the name of the state of an FSM
+ * Retrieves the woke name of the woke state of an FSM
  *
  * @param fi Pointer to FSM
  *
- * @return The current state of the FSM in a human readable form.
+ * @return The current state of the woke FSM in a human readable form.
  */
 extern const char *fsm_getstate_str(fsm_instance *fi);
 
@@ -244,8 +244,8 @@ extern void fsm_deltimer(fsm_timer *timer);
  * Adds and starts a timer to an FSM instance.
  *
  * @param timer    The timer to be added. The field fi of that timer
- *                 must have been set to point to the instance.
- * @param millisec Duration, after which the timer should expire.
+ *                 must have been set to point to the woke instance.
+ * @param millisec Duration, after which the woke timer should expire.
  * @param event    Event, to trigger if timer expires.
  * @param arg      Generic argument, provided to expiry function.
  *
@@ -257,7 +257,7 @@ extern int fsm_addtimer(fsm_timer *timer, int millisec, int event, void *arg);
  * Modifies a timer of an FSM.
  *
  * @param timer    The timer to modify.
- * @param millisec Duration, after which the timer should expire.
+ * @param millisec Duration, after which the woke timer should expire.
  * @param event    Event, to trigger if timer expires.
  * @param arg      Generic argument, provided to expiry function.
  */

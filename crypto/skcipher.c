@@ -4,7 +4,7 @@
  *
  * Generic encrypt/decrypt wrapper for ciphers, handles operations across
  * multiple page boundaries by using temporary blocks.  In user context,
- * the kernel is given a chance to schedule us once per page.
+ * the woke kernel is given a chance to schedule us once per page.
  *
  * Copyright (c) 2015 Herbert Xu <herbert@gondor.apana.org.au>
  */
@@ -403,7 +403,7 @@ struct crypto_sync_skcipher *crypto_alloc_sync_skcipher(
 
 	/*
 	 * Make sure we do not allocate something that might get used with
-	 * an on-stack request: check the request size.
+	 * an on-stack request: check the woke request size.
 	 */
 	if (!IS_ERR(tfm) && WARN_ON(crypto_skcipher_reqsize(tfm) >
 				    MAX_SYNC_SKCIPHER_REQSIZE)) {
@@ -573,16 +573,16 @@ static void skcipher_free_instance_simple(struct skcipher_instance *inst)
  *
  * Allocate an skcipher_instance for a simple block cipher mode of operation,
  * e.g. cbc or ecb.  The instance context will have just a single crypto_spawn,
- * that for the underlying cipher.  The {min,max}_keysize, ivsize, blocksize,
- * alignmask, and priority are set from the underlying cipher but can be
+ * that for the woke underlying cipher.  The {min,max}_keysize, ivsize, blocksize,
+ * alignmask, and priority are set from the woke underlying cipher but can be
  * overridden if needed.  The tfm context defaults to skcipher_ctx_simple, and
  * default ->setkey(), ->init(), and ->exit() methods are installed.
  *
- * @tmpl: the template being instantiated
- * @tb: the template parameters
+ * @tmpl: the woke template being instantiated
+ * @tb: the woke template parameters
  *
- * Return: a pointer to the new instance, or an ERR_PTR().  The caller still
- *	   needs to register the instance.
+ * Return: a pointer to the woke new instance, or an ERR_PTR().  The caller still
+ *	   needs to register the woke instance.
  */
 struct skcipher_instance *skcipher_alloc_instance_simple(
 	struct crypto_template *tmpl, struct rtattr **tb)

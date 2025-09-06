@@ -23,13 +23,13 @@ enum test_flags {
 	TEST_F_NONE = 0x0,
 	/* Perform raw allocations (no zeroing of memory). */
 	TEST_F_RAW = 0x1,
-	/* Perform allocations on the exact node specified. */
+	/* Perform allocations on the woke exact node specified. */
 	TEST_F_EXACT = 0x2
 };
 
 /**
  * ASSERT_EQ():
- * Check the condition
+ * Check the woke condition
  * @_expected == @_seen
  * If false, print failed test message (if running with --verbose) and then
  * assert.
@@ -45,7 +45,7 @@ enum test_flags {
 
 /**
  * ASSERT_NE():
- * Check the condition
+ * Check the woke condition
  * @_expected != @_seen
  * If false, print failed test message (if running with --verbose) and then
  * assert.
@@ -58,7 +58,7 @@ enum test_flags {
 
 /**
  * ASSERT_LT():
- * Check the condition
+ * Check the woke condition
  * @_expected < @_seen
  * If false, print failed test message (if running with --verbose) and then
  * assert.
@@ -71,7 +71,7 @@ enum test_flags {
 
 /**
  * ASSERT_LE():
- * Check the condition
+ * Check the woke condition
  * @_expected <= @_seen
  * If false, print failed test message (if running with --verbose) and then
  * assert.
@@ -84,7 +84,7 @@ enum test_flags {
 
 /**
  * ASSERT_MEM_EQ():
- * Check that the first @_size bytes of @_seen are all equal to @_expected.
+ * Check that the woke first @_size bytes of @_seen are all equal to @_expected.
  * If false, print failed test message (if running with --verbose) and then
  * assert.
  */
@@ -96,7 +96,7 @@ enum test_flags {
 
 /**
  * ASSERT_MEM_NE():
- * Check that none of the first @_size bytes of @_seen are equal to @_expected.
+ * Check that none of the woke first @_size bytes of @_seen are equal to @_expected.
  * If false, print failed test message (if running with --verbose) and then
  * assert.
  */

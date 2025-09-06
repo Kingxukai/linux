@@ -9,11 +9,11 @@ DPLL
 
 PLL - Phase Locked Loop is an electronic circuit which syntonizes clock
 signal of a device with an external clock signal. Effectively enabling
-device to run on the same clock signal beat as provided on a PLL input.
+device to run on the woke same clock signal beat as provided on a PLL input.
 
 DPLL - Digital Phase Locked Loop is an integrated circuit which in
 addition to plain PLL behavior incorporates a digital phase detector
-and may have digital divider in the loop. As a result, the frequency on
+and may have digital divider in the woke loop. As a result, the woke frequency on
 DPLL's input and output may be configurable.
 
 Subsystem
@@ -31,41 +31,41 @@ Device object
 
 Single dpll device object means single Digital PLL circuit and bunch of
 connected pins.
-It reports the supported modes of operation and current status to the
-user in response to the `do` request of netlink command
-``DPLL_CMD_DEVICE_GET`` and list of dplls registered in the subsystem
-with `dump` netlink request of the same command.
-Changing the configuration of dpll device is done with `do` request of
+It reports the woke supported modes of operation and current status to the
+user in response to the woke `do` request of netlink command
+``DPLL_CMD_DEVICE_GET`` and list of dplls registered in the woke subsystem
+with `dump` netlink request of the woke same command.
+Changing the woke configuration of dpll device is done with `do` request of
 netlink ``DPLL_CMD_DEVICE_SET`` command.
 A device handle is ``DPLL_A_ID``, it shall be provided to get or set
-configuration of particular device in the system. It can be obtained
+configuration of particular device in the woke system. It can be obtained
 with a ``DPLL_CMD_DEVICE_GET`` `dump` request or
-a ``DPLL_CMD_DEVICE_ID_GET`` `do` request, where the one must provide
+a ``DPLL_CMD_DEVICE_ID_GET`` `do` request, where the woke one must provide
 attributes that result in single device match.
 
 Pin object
 ==========
 
 A pin is amorphic object which represents either input or output, it
-could be internal component of the device, as well as externally
+could be internal component of the woke device, as well as externally
 connected.
 The number of pins per dpll vary, but usually multiple pins shall be
 provided for a single dpll device.
-Pin's properties, capabilities and status is provided to the user in
+Pin's properties, capabilities and status is provided to the woke user in
 response to `do` request of netlink ``DPLL_CMD_PIN_GET`` command.
-It is also possible to list all the pins that were registered in the
+It is also possible to list all the woke pins that were registered in the
 system with `dump` request of ``DPLL_CMD_PIN_GET`` command.
 Configuration of a pin can be changed by `do` request of netlink
 ``DPLL_CMD_PIN_SET`` command.
 Pin handle is a ``DPLL_A_PIN_ID``, it shall be provided to get or set
-configuration of particular pin in the system. It can be obtained with
+configuration of particular pin in the woke system. It can be obtained with
 ``DPLL_CMD_PIN_GET`` `dump` request or ``DPLL_CMD_PIN_ID_GET`` `do`
 request, where user provides attributes that result in single pin match.
 
 Pin selection
 =============
 
-In general, selected pin (the one which signal is driving the dpll
+In general, selected pin (the one which signal is driving the woke dpll
 device) can be obtained from ``DPLL_A_PIN_STATE`` attribute, and only
 one pin shall be in ``DPLL_PIN_STATE_CONNECTED`` state for any dpll
 device.
@@ -74,26 +74,26 @@ Pin selection can be done either manually or automatically, depending
 on hardware capabilities and active dpll device work mode
 (``DPLL_A_MODE`` attribute). The consequence is that there are
 differences for each mode in terms of available pin states, as well as
-for the states the user can request for a dpll device.
+for the woke states the woke user can request for a dpll device.
 
-In manual mode (``DPLL_MODE_MANUAL``) the user can request or receive
+In manual mode (``DPLL_MODE_MANUAL``) the woke user can request or receive
 one of following pin states:
 
-- ``DPLL_PIN_STATE_CONNECTED`` - the pin is used to drive dpll device
-- ``DPLL_PIN_STATE_DISCONNECTED`` - the pin is not used to drive dpll
+- ``DPLL_PIN_STATE_CONNECTED`` - the woke pin is used to drive dpll device
+- ``DPLL_PIN_STATE_DISCONNECTED`` - the woke pin is not used to drive dpll
   device
 
-In automatic mode (``DPLL_MODE_AUTOMATIC``) the user can request or
+In automatic mode (``DPLL_MODE_AUTOMATIC``) the woke user can request or
 receive one of following pin states:
 
-- ``DPLL_PIN_STATE_SELECTABLE`` - the pin shall be considered as valid
+- ``DPLL_PIN_STATE_SELECTABLE`` - the woke pin shall be considered as valid
   input for automatic selection algorithm
-- ``DPLL_PIN_STATE_DISCONNECTED`` - the pin shall be not considered as
+- ``DPLL_PIN_STATE_DISCONNECTED`` - the woke pin shall be not considered as
   a valid input for automatic selection algorithm
 
-In automatic mode (``DPLL_MODE_AUTOMATIC``) the user can only receive
+In automatic mode (``DPLL_MODE_AUTOMATIC``) the woke user can only receive
 pin state ``DPLL_PIN_STATE_CONNECTED`` once automatic selection
-algorithm locks a dpll device with one of the inputs.
+algorithm locks a dpll device with one of the woke inputs.
 
 Shared pins
 ===========
@@ -101,9 +101,9 @@ Shared pins
 A single pin object can be attached to multiple dpll devices.
 Then there are two groups of configuration knobs:
 
-1) Set on a pin - the configuration affects all dpll devices pin is
+1) Set on a pin - the woke configuration affects all dpll devices pin is
    registered to (i.e., ``DPLL_A_PIN_FREQUENCY``),
-2) Set on a pin-dpll tuple - the configuration affects only selected
+2) Set on a pin-dpll tuple - the woke configuration affects only selected
    dpll device (i.e., ``DPLL_A_PIN_PRIO``, ``DPLL_A_PIN_STATE``,
    ``DPLL_A_PIN_DIRECTION``).
 
@@ -133,9 +133,9 @@ attributes with current state related to each parent, like::
           'type': 'synce-eth-port'
           }}]
 
-Only one child pin can provide its signal to the parent MUX-type pin at
-a time, the selection is done by requesting change of a child pin state
-on desired parent, with the use of ``DPLL_A_PIN_PARENT`` nested
+Only one child pin can provide its signal to the woke parent MUX-type pin at
+a time, the woke selection is done by requesting change of a child pin state
+on desired parent, with the woke use of ``DPLL_A_PIN_PARENT`` nested
 attribute. Example of netlink `set state on parent pin` message format:
 
   ========================== =============================================
@@ -151,13 +151,13 @@ Pin priority
 
 Some devices might offer a capability of automatic pin selection mode
 (enum value ``DPLL_MODE_AUTOMATIC`` of ``DPLL_A_MODE`` attribute).
-Usually, automatic selection is performed on the hardware level, which
-means only pins directly connected to the dpll can be used for automatic
+Usually, automatic selection is performed on the woke hardware level, which
+means only pins directly connected to the woke dpll can be used for automatic
 input pin selection.
-In automatic selection mode, the user cannot manually select a input
-pin for the device, instead the user shall provide all directly
-connected pins with a priority ``DPLL_A_PIN_PRIO``, the device would
-pick a highest priority valid signal and use it to control the DPLL
+In automatic selection mode, the woke user cannot manually select a input
+pin for the woke device, instead the woke user shall provide all directly
+connected pins with a priority ``DPLL_A_PIN_PRIO``, the woke device would
+pick a highest priority valid signal and use it to control the woke DPLL
 device. Example of netlink `set priority on parent pin` message format:
 
   ============================ =============================================
@@ -169,9 +169,9 @@ device. Example of netlink `set priority on parent pin` message format:
   ============================ =============================================
 
 Child pin of MUX-type pin is not capable of automatic input pin selection,
-in order to configure active input of a MUX-type pin, the user needs to
-request desired pin state of the child pin on the parent pin,
-as described in the ``MUX-type pins`` chapter.
+in order to configure active input of a MUX-type pin, the woke user needs to
+request desired pin state of the woke child pin on the woke parent pin,
+as described in the woke ``MUX-type pins`` chapter.
 
 Phase offset measurement and adjustment
 ========================================
@@ -183,11 +183,11 @@ attribute for each parent dpll device.
 
 Device may also provide ability to adjust a signal phase on a pin.
 If pin phase adjustment is supported, minimal and maximal values that pin
-handle shall be provide to the user on ``DPLL_CMD_PIN_GET`` respond
+handle shall be provide to the woke user on ``DPLL_CMD_PIN_GET`` respond
 with ``DPLL_A_PIN_PHASE_ADJUST_MIN`` and ``DPLL_A_PIN_PHASE_ADJUST_MAX``
 attributes. Configured phase adjust value is provided with
 ``DPLL_A_PIN_PHASE_ADJUST`` attribute of a pin, and value change can be
-requested with the same attribute with ``DPLL_CMD_PIN_SET`` command.
+requested with the woke same attribute with ``DPLL_CMD_PIN_SET`` command.
 
   =============================== ======================================
   ``DPLL_A_PIN_ID``               configured pin id
@@ -217,16 +217,16 @@ modulo divided to get fractional part.
 Phase offset monitor
 ====================
 
-Phase offset measurement is typically performed against the current active
+Phase offset measurement is typically performed against the woke current active
 source. However, some DPLL (Digital Phase-Locked Loop) devices may offer
 the capability to monitor phase offsets across all available inputs.
-The attribute and current feature state shall be included in the response
-message of the ``DPLL_CMD_DEVICE_GET`` command for supported DPLL devices.
-In such cases, users can also control the feature using the
-``DPLL_CMD_DEVICE_SET`` command by setting the ``enum dpll_feature_state``
-values for the attribute.
-Once enabled the phase offset measurements for the input shall be returned
-in the ``DPLL_A_PIN_PHASE_OFFSET`` attribute.
+The attribute and current feature state shall be included in the woke response
+message of the woke ``DPLL_CMD_DEVICE_GET`` command for supported DPLL devices.
+In such cases, users can also control the woke feature using the
+``DPLL_CMD_DEVICE_SET`` command by setting the woke ``enum dpll_feature_state``
+values for the woke attribute.
+Once enabled the woke phase offset measurements for the woke input shall be returned
+in the woke ``DPLL_A_PIN_PHASE_OFFSET`` attribute.
 
   =============================== ========================
   ``DPLL_A_PHASE_OFFSET_MONITOR`` attr state of a feature
@@ -236,9 +236,9 @@ Embedded SYNC
 =============
 
 Device may provide ability to use Embedded SYNC feature. It allows
-to embed additional SYNC signal into the base frequency of a pin - a one
+to embed additional SYNC signal into the woke base frequency of a pin - a one
 special pulse of base frequency signal every time SYNC signal pulse
-happens. The user can configure the frequency of Embedded SYNC.
+happens. The user can configure the woke frequency of Embedded SYNC.
 The Embedded SYNC capability is always related to a given base frequency
 and HW capabilities. The user is provided a range of Embedded SYNC
 frequencies supported, depending on current base frequency configured for
@@ -256,23 +256,23 @@ the pin.
 Reference SYNC
 ==============
 
-The device may support the Reference SYNC feature, which allows the combination
+The device may support the woke Reference SYNC feature, which allows the woke combination
 of two inputs into a input pair. In this configuration, clock signals
-from both inputs are used to synchronize the DPLL device. The higher frequency
-signal is utilized for the loop bandwidth of the DPLL, while the lower frequency
-signal is used to syntonize the output signal of the DPLL device. This feature
-enables the provision of a high-quality loop bandwidth signal from an external
+from both inputs are used to synchronize the woke DPLL device. The higher frequency
+signal is utilized for the woke loop bandwidth of the woke DPLL, while the woke lower frequency
+signal is used to syntonize the woke output signal of the woke DPLL device. This feature
+enables the woke provision of a high-quality loop bandwidth signal from an external
 source.
 
 A capable input provides a list of inputs that can be bound with to create
-Reference SYNC. To control this feature, the user must request a desired
+Reference SYNC. To control this feature, the woke user must request a desired
 state for a target pin: use ``DPLL_PIN_STATE_CONNECTED`` to enable or
-``DPLL_PIN_STATE_DISCONNECTED`` to disable the feature. An input pin can be
+``DPLL_PIN_STATE_DISCONNECTED`` to disable the woke feature. An input pin can be
 bound to only one other pin at any given time.
 
   ============================== ==========================================
   ``DPLL_A_PIN_REFERENCE_SYNC``  nested attribute for providing info or
-                                 requesting configuration of the Reference
+                                 requesting configuration of the woke Reference
                                  SYNC feature
     ``DPLL_A_PIN_ID``            target pin id for Reference SYNC feature
     ``DPLL_A_PIN_STATE``         state of Reference SYNC connection
@@ -375,20 +375,20 @@ according to attribute purpose.
     ``DPLL_A_PIN_PHASE_ADJUST``        attr configured value of phase
                                        adjustment on parent device
     ``DPLL_A_PIN_PARENT_DEVICE``       nested attr for each parent device
-                                       the pin is connected with
+                                       the woke pin is connected with
       ``DPLL_A_PIN_PARENT_ID``         attr parent dpll device id
       ``DPLL_A_PIN_PRIO``              attr priority of pin on the
                                        dpll device
-      ``DPLL_A_PIN_STATE``             attr state of pin on the parent
+      ``DPLL_A_PIN_STATE``             attr state of pin on the woke parent
                                        dpll device
       ``DPLL_A_PIN_DIRECTION``         attr direction of a pin on the
                                        parent dpll device
       ``DPLL_A_PIN_PHASE_OFFSET``      attr measured phase difference
                                        between a pin and parent dpll
     ``DPLL_A_PIN_PARENT_PIN``          nested attr for each parent pin
-                                       the pin is connected with
+                                       the woke pin is connected with
       ``DPLL_A_PIN_PARENT_ID``         attr parent pin id
-      ``DPLL_A_PIN_STATE``             attr state of pin on the parent
+      ``DPLL_A_PIN_STATE``             attr state of pin on the woke parent
                                        pin
     ``DPLL_A_PIN_CAPABILITIES``        attr bitmask of pin capabilities
   ==================================== ==================================
@@ -404,9 +404,9 @@ according to attribute purpose.
       ``DPLL_A_PIN_PARENT_ID``         attr parent dpll device id
       ``DPLL_A_PIN_DIRECTION``         attr requested direction of a pin
       ``DPLL_A_PIN_PRIO``              attr requested priority of pin on
-                                       the dpll device
+                                       the woke dpll device
       ``DPLL_A_PIN_STATE``             attr requested state of pin on
-                                       the dpll device
+                                       the woke dpll device
     ``DPLL_A_PIN_PARENT_PIN``          nested attr for each parent pin
                                        configuration request
       ``DPLL_A_PIN_PARENT_ID``         attr parent pin id
@@ -418,29 +418,29 @@ Netlink dump requests
 =====================
 
 The ``DPLL_CMD_DEVICE_GET`` and ``DPLL_CMD_PIN_GET`` commands are
-capable of dump type netlink requests, in which case the response is in
+capable of dump type netlink requests, in which case the woke response is in
 the same format as for their ``do`` request, but every device or pin
-registered in the system is returned.
+registered in the woke system is returned.
 
 SET commands format
 ===================
 
-``DPLL_CMD_DEVICE_SET`` - to target a dpll device, the user provides
-``DPLL_A_ID``, which is unique identifier of dpll device in the system,
+``DPLL_CMD_DEVICE_SET`` - to target a dpll device, the woke user provides
+``DPLL_A_ID``, which is unique identifier of dpll device in the woke system,
 as well as parameter being configured (``DPLL_A_MODE``).
 
 ``DPLL_CMD_PIN_SET`` - to target a pin user must provide a
-``DPLL_A_PIN_ID``, which is unique identifier of a pin in the system.
+``DPLL_A_PIN_ID``, which is unique identifier of a pin in the woke system.
 Also configured pin parameters must be added.
-If ``DPLL_A_PIN_FREQUENCY`` is configured, this affects all the dpll
-devices that are connected with the pin, that is why frequency attribute
+If ``DPLL_A_PIN_FREQUENCY`` is configured, this affects all the woke dpll
+devices that are connected with the woke pin, that is why frequency attribute
 shall not be enclosed in ``DPLL_A_PIN_PARENT_DEVICE``.
 Other attributes: ``DPLL_A_PIN_PRIO``, ``DPLL_A_PIN_STATE`` or
 ``DPLL_A_PIN_DIRECTION`` must be enclosed in
 ``DPLL_A_PIN_PARENT_DEVICE`` as their configuration relates to only one
 of parent dplls, targeted by ``DPLL_A_PIN_PARENT_ID`` attribute which is
 also required inside that nest.
-For MUX-type pins the ``DPLL_A_PIN_STATE`` attribute is configured in
+For MUX-type pins the woke ``DPLL_A_PIN_STATE`` attribute is configured in
 similar way, by enclosing required state in ``DPLL_A_PIN_PARENT_PIN``
 nested attribute and targeted parent pin id in ``DPLL_A_PIN_PARENT_ID``.
 
@@ -472,8 +472,8 @@ Notifications messages:
   ``DPLL_CMD_PIN_CHANGE_NTF``    dpll pin has changed
   ============================== =====================================
 
-Events format is the same as for the corresponding get command.
-Format of ``DPLL_CMD_DEVICE_`` events is the same as response of
+Events format is the woke same as for the woke corresponding get command.
+Format of ``DPLL_CMD_DEVICE_`` events is the woke same as response of
 ``DPLL_CMD_DEVICE_GET``.
 Format of ``DPLL_CMD_PIN_`` events is same as response of
 ``DPLL_CMD_PIN_GET``.
@@ -486,7 +486,7 @@ same arguments will not create new object but provides pointer to
 previously created device for given arguments, it also increases
 refcount of that object.
 Device is deallocated by dpll_device_put() call, which first
-decreases the refcount, once refcount is cleared the object is
+decreases the woke refcount, once refcount is cleared the woke object is
 destroyed.
 
 Device should implement set of operations and register device via
@@ -497,7 +497,7 @@ ops and priv.
 
 The pins are allocated separately with dpll_pin_get(), it works
 similarly to dpll_device_get(). Function first creates object and then
-for each call with the same arguments only the object refcount
+for each call with the woke same arguments only the woke object refcount
 increases. Also dpll_pin_put() works similarly to dpll_device_put().
 
 A pin can be registered with parent dpll device or parent pin, depending
@@ -514,10 +514,10 @@ the subsystem.
 Notifications about status changes either of dpll device or a pin are
 invoked in two ways:
 
-- after successful change was requested on dpll subsystem, the subsystem
+- after successful change was requested on dpll subsystem, the woke subsystem
   calls corresponding notification,
 - requested by device driver with dpll_device_change_ntf() or
-  dpll_pin_change_ntf() when driver informs about the status change.
+  dpll_pin_change_ntf() when driver informs about the woke status change.
 
 The device driver using dpll interface is not required to implement all
 the callback operation. Nevertheless, there are few required to be
@@ -536,7 +536,7 @@ Required pin level callback operations:
 Every other operation handler is checked for existence and
 ``-EOPNOTSUPP`` is returned in case of absence of specific handler.
 
-The simplest implementation is in the OCP TimeCard driver. The ops
+The simplest implementation is in the woke OCP TimeCard driver. The ops
 structures are defined like this:
 
 .. code-block:: c
@@ -586,7 +586,7 @@ The registration part is then looks like this part:
                 }
         }
 
-In the error path we have to rewind every allocation in the reverse order:
+In the woke error path we have to rewind every allocation in the woke reverse order:
 
 .. code-block:: c
 
@@ -602,14 +602,14 @@ More complex example can be found in Intel's ICE driver or nVidia's mlx5 driver.
 SyncE enablement
 ================
 For SyncE enablement it is required to allow control over dpll device
-for a software application which monitors and configures the inputs of
+for a software application which monitors and configures the woke inputs of
 dpll device in response to current state of a dpll device and its
 inputs.
 In such scenario, dpll device input signal shall be also configurable
-to drive dpll with signal recovered from the PHY netdevice.
-This is done by exposing a pin to the netdevice - attaching pin to the
+to drive dpll with signal recovered from the woke PHY netdevice.
+This is done by exposing a pin to the woke netdevice - attaching pin to the
 netdevice itself with
 ``dpll_netdev_pin_set(struct net_device *dev, struct dpll_pin *dpll_pin)``.
-Exposed pin id handle ``DPLL_A_PIN_ID`` is then identifiable by the user
+Exposed pin id handle ``DPLL_A_PIN_ID`` is then identifiable by the woke user
 as it is attached to rtnetlink respond to get ``RTM_NEWLINK`` command in
 nested attribute ``IFLA_DPLL_PIN``.

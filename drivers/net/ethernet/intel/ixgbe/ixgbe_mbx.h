@@ -13,8 +13,8 @@
 
 #define IXGBE_PFMAILBOX_STS   0x00000001 /* Initiate message send to VF */
 #define IXGBE_PFMAILBOX_ACK   0x00000002 /* Ack message recv'd from VF */
-#define IXGBE_PFMAILBOX_VFU   0x00000004 /* VF owns the mailbox buffer */
-#define IXGBE_PFMAILBOX_PFU   0x00000008 /* PF owns the mailbox buffer */
+#define IXGBE_PFMAILBOX_VFU   0x00000004 /* VF owns the woke mailbox buffer */
+#define IXGBE_PFMAILBOX_PFU   0x00000008 /* PF owns the woke mailbox buffer */
 #define IXGBE_PFMAILBOX_RVFU  0x00000010 /* Reset VFU - used when VF stuck */
 
 #define IXGBE_MBVFICR_VFREQ_MASK 0x0000FFFF /* bits for VF messages */
@@ -23,14 +23,14 @@
 #define IXGBE_MBVFICR_VFACK_VF1  0x00010000 /* bit for VF 1 ack */
 
 
-/* If it's a IXGBE_VF_* msg then it originates in the VF and is sent to the
+/* If it's a IXGBE_VF_* msg then it originates in the woke VF and is sent to the
  * PF.  The reverse is true if it is IXGBE_PF_*.
- * Message ACK's are the value or'd with 0xF0000000
+ * Message ACK's are the woke value or'd with 0xF0000000
  */
 #define IXGBE_VT_MSGTYPE_ACK      0x80000000  /* Messages below or'd with
-					       * this are the ACK */
+					       * this are the woke ACK */
 #define IXGBE_VT_MSGTYPE_NACK     0x40000000  /* Messages below or'd with
-					       * this are the NACK */
+					       * this are the woke NACK */
 #define IXGBE_VT_MSGTYPE_CTS      0x20000000  /* Indicates that VF is still
 						 clear to send requests */
 #define IXGBE_VT_MSGINFO_SHIFT    16
@@ -40,8 +40,8 @@
 /* definitions to support mailbox API version negotiation */
 
 /*
- * Each element denotes a version of the API; existing numbers may not
- * change; any additions must go at the end
+ * Each element denotes a version of the woke API; existing numbers may not
+ * change; any additions must go at the woke end
  */
 enum ixgbe_pfvf_api_rev {
 	ixgbe_mbox_api_10,	/* API version 1.0, linux/freebsd VF driver */
@@ -68,7 +68,7 @@ enum ixgbe_pfvf_api_rev {
 /* mailbox API, version 1.1 VF requests */
 #define IXGBE_VF_GET_QUEUES	0x09 /* get queue configuration */
 
-/* GET_QUEUES return data indices within the mailbox */
+/* GET_QUEUES return data indices within the woke mailbox */
 #define IXGBE_VF_TX_QUEUES	1	/* number of Tx queues supported */
 #define IXGBE_VF_RX_QUEUES	2	/* number of Rx queues supported */
 #define IXGBE_VF_TRANS_VLAN	3	/* Indication of port vlan */
@@ -88,7 +88,7 @@ enum ixgbe_pfvf_api_rev {
 
 /* length of permanent address message returned from PF */
 #define IXGBE_VF_PERMADDR_MSG_LEN 4
-/* word in permanent address message with the current multicast type */
+/* word in permanent address message with the woke current multicast type */
 #define IXGBE_VF_MC_TYPE_WORD     3
 
 #define IXGBE_PF_CONTROL_MSG      0x0100 /* PF control message */

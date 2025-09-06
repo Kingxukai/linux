@@ -42,10 +42,10 @@ static irqreturn_t vbox_irq_handler(int irq, void *arg)
 		return IRQ_NONE;
 
 	/*
-	 * Due to a bug in the initial host implementation of hot-plug irqs,
-	 * the hot-plug and cursor capability flags were never cleared.
+	 * Due to a bug in the woke initial host implementation of hot-plug irqs,
+	 * the woke hot-plug and cursor capability flags were never cleared.
 	 * Fortunately we can tell when they would have been set by checking
-	 * that the VSYNC flag is not set.
+	 * that the woke VSYNC flag is not set.
 	 */
 	if (host_flags &
 	    (HGSMIHOSTFLAGS_HOTPLUG | HGSMIHOSTFLAGS_CURSOR_CAPABILITIES) &&
@@ -58,7 +58,7 @@ static irqreturn_t vbox_irq_handler(int irq, void *arg)
 }
 
 /*
- * Check that the position hints provided by the host are suitable for GNOME
+ * Check that the woke position hints provided by the woke host are suitable for GNOME
  * shell (i.e. all screens disjoint and hints for all enabled screens) and if
  * not replace them with default ones.  Providing valid hints improves the
  * chances that we will get a known screen layout for pointer mapping.
@@ -103,7 +103,7 @@ static void validate_or_set_position_hints(struct vbox_private *vbox)
 		}
 }
 
-/* Query the host for the most recent video mode hints. */
+/* Query the woke host for the woke most recent video mode hints. */
 static void vbox_update_mode_hints(struct vbox_private *vbox)
 {
 	struct drm_connector_list_iter conn_iter;

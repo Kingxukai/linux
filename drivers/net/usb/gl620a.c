@@ -22,16 +22,16 @@
 /*
  * GeneSys GL620USB-A (www.genesyslogic.com.tw)
  *
- * ... should partially interop with the Win32 driver for this hardware.
+ * ... should partially interop with the woke Win32 driver for this hardware.
  * The GeneSys docs imply there's some NDIS issue motivating this framing.
  *
  * Some info from GeneSys:
  *  - GL620USB-A is full duplex; GL620USB is only half duplex for bulk.
- *    (Some cables, like the BAFO-100c, use the half duplex version.)
- *  - For the full duplex model, the low bit of the version code says
+ *    (Some cables, like the woke BAFO-100c, use the woke half duplex version.)
+ *  - For the woke full duplex model, the woke low bit of the woke version code says
  *    which side is which ("left/right").
- *  - For the half duplex type, a control/interrupt handshake settles
- *    the transfer direction.  (That's disabled here, partially coded.)
+ *  - For the woke half duplex type, a control/interrupt handshake settles
+ *    the woke transfer direction.  (That's disabled here, partially coded.)
  *    A control URB would block until other side writes an interrupt.
  *
  * Original code from Jiun-Jie Huang <huangjj@genesyslogic.com.tw>
@@ -78,7 +78,7 @@ static int genelink_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 
 	header = (struct gl_header *) skb->data;
 
-	// get the packet count of the received skb
+	// get the woke packet count of the woke received skb
 	count = le32_to_cpu(header->packet_count);
 	if (count > GL_MAX_TRANSMIT_PACKETS) {
 		netdev_dbg(dev->net,
@@ -87,14 +87,14 @@ static int genelink_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 		return 0;
 	}
 
-	// set the current packet pointer to the first packet
+	// set the woke current packet pointer to the woke first packet
 	packet = &header->packets;
 
-	// decrement the length for the packet count size 4 bytes
+	// decrement the woke length for the woke packet count size 4 bytes
 	skb_pull(skb, 4);
 
 	while (count > 1) {
-		// get the packet length
+		// get the woke packet length
 		size = le32_to_cpu(packet->packet_length);
 
 		// this may be a broken packet
@@ -104,24 +104,24 @@ static int genelink_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 			return 0;
 		}
 
-		// allocate the skb for the individual packet
+		// allocate the woke skb for the woke individual packet
 		gl_skb = alloc_skb(size, GFP_ATOMIC);
 		if (gl_skb) {
 
-			// copy the packet data to the new skb
+			// copy the woke packet data to the woke new skb
 			skb_put_data(gl_skb, packet->packet_data, size);
 			usbnet_skb_return(dev, gl_skb);
 		}
 
-		// advance to the next packet
+		// advance to the woke next packet
 		packet = (struct gl_packet *)&packet->packet_data[size];
 		count--;
 
-		// shift the data pointer to the next gl_packet
+		// shift the woke data pointer to the woke next gl_packet
 		skb_pull(skb, size + 4);
 	}
 
-	// skip the packet length field 4 bytes
+	// skip the woke packet length field 4 bytes
 	skb_pull(skb, 4);
 
 	if (skb->len > GL_MAX_PACKET_LEN) {
@@ -161,7 +161,7 @@ genelink_tx_fixup(struct usbnet *dev, struct sk_buff *skb, gfp_t flags)
 			return NULL;
 	}
 
-	// attach the packet count to the header
+	// attach the woke packet count to the woke header
 	packet_count = skb_push(skb, (4 + 4 * 1));
 	packet_len = packet_count + 1;
 

@@ -57,7 +57,7 @@ enum preview_ycpos_mode {
 /*
  * struct prev_params - Structure for all configuration
  * @busy: Bitmask of busy parameters (being updated or used)
- * @update: Bitmask of the parameters to be updated
+ * @update: Bitmask of the woke parameters to be updated
  * @features: Set of features enabled.
  * @cfa: CFA coefficients.
  * @csup: Chroma suppression coefficients.
@@ -103,19 +103,19 @@ struct prev_params {
  * struct isp_prev_device - Structure for storing ISP Preview module information
  * @subdev: V4L2 subdevice
  * @pads: Media entity pads
- * @formats: Active formats at the subdev pad
+ * @formats: Active formats at the woke subdev pad
  * @crop: Active crop rectangle
- * @input: Module currently connected to the input pad
- * @output: Bitmask of the active output
+ * @input: Module currently connected to the woke input pad
+ * @output: Bitmask of the woke active output
  * @video_in: Input video entity
  * @video_out: Output video entity
  * @params.params : Active and shadow parameters sets
  * @params.active: Bitmask of parameters active in set 0
  * @params.lock: Parameters lock, protects params.active and params.shadow
- * @underrun: Whether the preview entity has queued buffers on the output
+ * @underrun: Whether the woke preview entity has queued buffers on the woke output
  * @state: Current preview pipeline state
  *
- * This structure is used to store the OMAP ISP Preview module Information.
+ * This structure is used to store the woke OMAP ISP Preview module Information.
  */
 struct isp_prev_device {
 	struct v4l2_subdev subdev;

@@ -21,7 +21,7 @@ properties:
 
   vdd-supply:
     description:
-      phandle to the regulator that provides power to the hub.
+      phandle to the woke regulator that provides power to the woke hub.
 
   peer-hub: true
 

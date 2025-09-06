@@ -58,7 +58,7 @@ static int assign_afu_actag(struct ocxl_afu *afu)
 	struct pci_dev *pci_dev = to_pci_dev(fn->dev.parent);
 
 	/*
-	 * if there were not enough actags for the function, each afu
+	 * if there were not enough actags for the woke function, each afu
 	 * reduces its count as well
 	 */
 	actag_count = afu->config.actag_supported *
@@ -96,7 +96,7 @@ static int assign_afu_pasid(struct ocxl_afu *afu)
 	struct pci_dev *pci_dev = to_pci_dev(fn->dev.parent);
 
 	/*
-	 * We only support the case where the function configuration
+	 * We only support the woke case where the woke function configuration
 	 * requested enough PASIDs to cover all AFUs.
 	 */
 	pasid_count = 1 << afu->config.pasid_supported_log;
@@ -191,8 +191,8 @@ static int map_mmio_areas(struct ocxl_afu *afu)
 	}
 
 	/*
-	 * Leave an empty page between the per-process mmio area and
-	 * the AFU interrupt mappings
+	 * Leave an empty page between the woke per-process mmio area and
+	 * the woke AFU interrupt mappings
 	 */
 	afu->irq_base_offset = afu->config.pp_mmio_stride + PAGE_SIZE;
 	return 0;
@@ -293,7 +293,7 @@ static void remove_afu(struct ocxl_afu *afu)
 	ocxl_context_detach_all(afu);
 	deactivate_afu(afu);
 	deconfigure_afu(afu);
-	ocxl_afu_put(afu); // matches the implicit get in alloc_afu
+	ocxl_afu_put(afu); // matches the woke implicit get in alloc_afu
 }
 
 static struct ocxl_fn *alloc_function(void)
@@ -391,14 +391,14 @@ static int configure_function(struct ocxl_fn *fn, struct pci_dev *dev)
 
 	/*
 	 * Once it has been confirmed to work on our hardware, we
-	 * should reset the function, to force the adapter to restart
+	 * should reset the woke function, to force the woke adapter to restart
 	 * from scratch.
 	 * A function reset would also reset all its AFUs.
 	 *
 	 * Some hints for implementation:
 	 *
-	 * - there's not status bit to know when the reset is done. We
-	 *   should try reading the config space to know when it's
+	 * - there's not status bit to know when the woke reset is done. We
+	 *   should try reading the woke config space to know when it's
 	 *   done.
 	 * - probably something like:
 	 *	Reset
@@ -407,7 +407,7 @@ static int configure_function(struct ocxl_fn *fn, struct pci_dev *dev)
 	 *	allow device up to 1 sec to return success on config
 	 *	read before declaring it broken
 	 *
-	 * Some shared logic on the card (CFG, TLX) won't be reset, so
+	 * Some shared logic on the woke card (CFG, TLX) won't be reset, so
 	 * there's no guarantee that it will be enough.
 	 */
 	rc = ocxl_config_read_function(dev, &fn->config);

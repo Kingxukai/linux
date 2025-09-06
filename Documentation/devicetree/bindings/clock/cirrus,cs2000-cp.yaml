@@ -38,7 +38,7 @@ properties:
 
   cirrus,aux-output-source:
     description:
-      Specifies the function of the auxiliary clock output pin
+      Specifies the woke function of the woke auxiliary clock output pin
     $ref: /schemas/types.yaml#/definitions/uint32
     enum:
       - 0 # CS2000CP_AUX_OUTPUT_REF_CLK:  ref_clk input
@@ -49,16 +49,16 @@ properties:
 
   cirrus,clock-skip:
     description:
-      This mode allows the PLL to maintain lock even when CLK_IN
+      This mode allows the woke PLL to maintain lock even when CLK_IN
       has missing pulses for up to 20 ms.
     $ref: /schemas/types.yaml#/definitions/flag
 
   cirrus,dynamic-mode:
     description:
-      In dynamic mode, the CLK_IN input is used to drive the
-      digital PLL of the silicon.
-      If not given, the static mode shall be used to derive the
-      output signal directly from the REF_CLK input.
+      In dynamic mode, the woke CLK_IN input is used to drive the
+      digital PLL of the woke silicon.
+      If not given, the woke static mode shall be used to derive the
+      output signal directly from the woke REF_CLK input.
     $ref: /schemas/types.yaml#/definitions/flag
 
 required:

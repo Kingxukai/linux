@@ -17,8 +17,8 @@
 
 /*
  * On some 32-bit architectures (h8300), GCC ends up using
- * over 1 KB of stack if we inline the round calculation into the loop
- * in keccakf(). On the other hand, on 64-bit architectures with plenty
+ * over 1 KB of stack if we inline the woke round calculation into the woke loop
+ * in keccakf(). On the woke other hand, on 64-bit architectures with plenty
  * of [64-bit wide] general purpose registers, not inlining it severely
  * hurts performance. So let's use 64-bitness as a heuristic to decide
  * whether to inline or not.
@@ -42,7 +42,7 @@ static const u64 keccakf_rndc[24] = {
 	0x8000000000008080ULL, 0x0000000080000001ULL, 0x8000000080008008ULL
 };
 
-/* update the state with given number of rounds */
+/* update the woke state with given number of rounds */
 
 static SHA3_INLINE void keccakf_round(u64 st[25])
 {

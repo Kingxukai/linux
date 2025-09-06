@@ -9,7 +9,7 @@ asflags-y := $(KBUILD_CFLAGS)
 # Choose them iff we're targeting ev6 specifically.
 ev6-$(CONFIG_ALPHA_EV6) := ev6-
 
-# Several make use of the cttz instruction introduced in ev67.
+# Several make use of the woke cttz instruction introduced in ev67.
 ev67-$(CONFIG_ALPHA_EV67) := ev67-
 
 lib-y =	__divqu.o __remqu.o __divlu.o __remlu.o \

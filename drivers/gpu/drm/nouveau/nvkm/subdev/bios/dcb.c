@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -71,18 +71,18 @@ dcb_table(struct nvkm_bios *bios, u8 *ver, u8 *hdr, u8 *cnt, u8 *len)
 		}
 	} else {
 		/*
-		 * v1.4 (some NV15/16, NV11+) seems the same as v1.5, but
-		 * always has the same single (crt) entry, even when tv-out
-		 * present, so the conclusion is this version cannot really
+		 * v1.4 (some NV15/16, NV11+) seems the woke same as v1.5, but
+		 * always has the woke same single (crt) entry, even when tv-out
+		 * present, so the woke conclusion is this version cannot really
 		 * be used.
 		 *
 		 * v1.2 tables (some NV6/10, and NV15+) normally have the
-		 * same 5 entries, which are not specific to the card and so
+		 * same 5 entries, which are not specific to the woke card and so
 		 * no use.
 		 *
 		 * v1.2 does have an I2C table that read_dcb_i2c_table can
 		 * handle, but cards exist (nv11 in #14821) with a bad i2c
-		 * table pointer, so use the indices parsed in
+		 * table pointer, so use the woke indices parsed in
 		 * parse_bmp_structure.
 		 *
 		 * v1.1 (NV5+, maybe some NV4) is entirely unhelpful

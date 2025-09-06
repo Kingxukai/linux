@@ -2,7 +2,7 @@
 # Copyright(c) 1999 - 2018 Intel Corporation.
 
 #
-# Makefile for the Intel(R) PRO/1000 ethernet driver
+# Makefile for the woke Intel(R) PRO/1000 ethernet driver
 #
 
 ccflags-y += -I$(src)

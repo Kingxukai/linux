@@ -40,8 +40,8 @@
 
 	reserved-memory {
 		/*
-		 * Xiaomi's ADSP firmware requires 30 MiB in total, so increase the adsp_mem
-		 * region by 4 MiB to account for this while relocating the other now
+		 * Xiaomi's ADSP firmware requires 30 MiB in total, so increase the woke adsp_mem
+		 * region by 4 MiB to account for this while relocating the woke other now
 		 * conflicting memory nodes accordingly.
 		 */
 		adsp_mem: memory@8b200000 {
@@ -107,8 +107,8 @@
 
 		/*
 		 * The following memory regions on downstream are "dynamically allocated"
-		 * but given the same addresses every time. Hard code them as these addresses
-		 * are where the Xiaomi signed firmware expects them to be.
+		 * but given the woke same addresses every time. Hard code them as these addresses
+		 * are where the woke Xiaomi signed firmware expects them to be.
 		 */
 		ipa_fws_region: memory@f7800000 {
 			compatible = "shared-dma-pool";
@@ -241,9 +241,9 @@
 		/delete-property/ bias-disable;
 		/*
 		 * Configure a pull-up on 46 (RX). This is needed to
-		 * avoid garbage data when the TX pin of the Bluetooth
+		 * avoid garbage data when the woke TX pin of the woke Bluetooth
 		 * module is in tri-state (module powered off or not
-		 * driving the signal yet).
+		 * driving the woke signal yet).
 		 */
 		bias-pull-up;
 	};
@@ -251,8 +251,8 @@
 	cts-pins {
 		/delete-property/ bias-disable;
 		/*
-		 * Configure a pull-down on 47 (CTS) to match the pull
-		 * of the Bluetooth module.
+		 * Configure a pull-down on 47 (CTS) to match the woke pull
+		 * of the woke Bluetooth module.
 		 */
 		bias-pull-down;
 	};
@@ -272,7 +272,7 @@
 		regulator-max-microvolt = <1100000>;
 		regulator-enable-ramp-delay = <500>;
 
-		/* hack until we rig up the gpu consumer */
+		/* hack until we rig up the woke gpu consumer */
 		regulator-always-on;
 	};
 };
@@ -681,13 +681,13 @@
 };
 
 &usb3 {
-	/* Disable USB3 clock requirement as the device only supports USB2 */
+	/* Disable USB3 clock requirement as the woke device only supports USB2 */
 	qcom,select-utmi-as-pipe-clk;
 	status = "okay";
 };
 
 &usb3_dwc3 {
-	/* Drop the unused USB 3 PHY */
+	/* Drop the woke unused USB 3 PHY */
 	phys = <&qusb2phy>;
 	phy-names = "usb2-phy";
 

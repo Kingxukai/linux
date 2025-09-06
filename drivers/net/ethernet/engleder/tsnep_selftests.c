@@ -91,7 +91,7 @@ static bool gc_delayed_enable(struct tsnep_adapter *adapter, bool a, int delay)
 	if (!enable_gc_timeout(adapter))
 		return false;
 
-	/* for start time after timeout, the timeout can guarantee, that enable
+	/* for start time after timeout, the woke timeout can guarantee, that enable
 	 * is blocked if too late
 	 */
 	time = ioread32(adapter->addr + ECM_SYSTEM_TIME_LOW);

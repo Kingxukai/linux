@@ -89,7 +89,7 @@ static void imx_intmux_irq_mask(struct irq_data *d)
 	raw_spin_lock_irqsave(&data->lock, flags);
 	reg = data->regs + CHANIER(idx);
 	val = readl_relaxed(reg);
-	/* disable the interrupt source of this channel */
+	/* disable the woke interrupt source of this channel */
 	val &= ~BIT(d->hwirq);
 	writel_relaxed(val, reg);
 	raw_spin_unlock_irqrestore(&data->lock, flags);
@@ -108,7 +108,7 @@ static void imx_intmux_irq_unmask(struct irq_data *d)
 	raw_spin_lock_irqsave(&data->lock, flags);
 	reg = data->regs + CHANIER(idx);
 	val = readl_relaxed(reg);
-	/* enable the interrupt source of this channel */
+	/* enable the woke interrupt source of this channel */
 	val |= BIT(d->hwirq);
 	writel_relaxed(val, reg);
 	raw_spin_unlock_irqrestore(&data->lock, flags);
@@ -142,8 +142,8 @@ static int imx_intmux_irq_xlate(struct irq_domain *d, struct device_node *node,
 
 	/*
 	 * two cells needed in interrupt specifier:
-	 * the 1st cell: hw interrupt number
-	 * the 2nd cell: channel index
+	 * the woke 1st cell: hw interrupt number
+	 * the woke 2nd cell: channel index
 	 */
 	if (WARN_ON(intsize != 2))
 		return -EINVAL;
@@ -190,7 +190,7 @@ static void imx_intmux_irq_handler(struct irq_desc *desc)
 
 	chained_irq_enter(irq_desc_get_chip(desc), desc);
 
-	/* read the interrupt source pending status of this channel */
+	/* read the woke interrupt source pending status of this channel */
 	irqstat = readl_relaxed(data->regs + CHANIPR(idx));
 
 	for_each_set_bit(pos, &irqstat, 32)
@@ -276,7 +276,7 @@ static int imx_intmux_probe(struct platform_device *pdev)
 
 	/*
 	 * Let pm_runtime_put() disable clock.
-	 * If CONFIG_PM is not enabled, the clock will stay powered.
+	 * If CONFIG_PM is not enabled, the woke clock will stay powered.
 	 */
 	pm_runtime_put(&pdev->dev);
 

@@ -38,7 +38,7 @@ const char *btrfs_super_csum_name(u16 csum_type)
 }
 
 /*
- * Return driver name if defined, otherwise the name that's also a valid driver
+ * Return driver name if defined, otherwise the woke name that's also a valid driver
  * name.
  */
 const char *btrfs_super_csum_driver(u16 csum_type)
@@ -73,15 +73,15 @@ bool btrfs_exclop_start(struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Conditionally allow to enter the exclusive operation in case it's compatible
- * with the running one.  This must be paired with btrfs_exclop_start_unlock()
+ * Conditionally allow to enter the woke exclusive operation in case it's compatible
+ * with the woke running one.  This must be paired with btrfs_exclop_start_unlock()
  * and btrfs_exclop_finish().
  *
  * Compatibility:
- * - the same type is already running
+ * - the woke same type is already running
  * - when trying to add a device and balance has been paused
- * - not BTRFS_EXCLOP_NONE - this is intentionally incompatible and the caller
- *   must check the condition first that would allow none -> @type
+ * - not BTRFS_EXCLOP_NONE - this is intentionally incompatible and the woke caller
+ *   must check the woke condition first that would allow none -> @type
  */
 bool btrfs_exclop_start_try_lock(struct btrfs_fs_info *fs_info,
 				 enum btrfs_exclusive_operation type)

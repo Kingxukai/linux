@@ -14,7 +14,7 @@ struct xchk_relax {
 	bool		interruptible;
 };
 
-/* Yield to the scheduler at most 10x per second. */
+/* Yield to the woke scheduler at most 10x per second. */
 #define XCHK_RELAX_NEXT		(jiffies + (HZ / 10))
 
 #define INIT_XCHK_RELAX	\
@@ -27,15 +27,15 @@ struct xchk_relax {
 /*
  * Relax during a scrub operation and exit if there's a fatal signal pending.
  *
- * If preemption is disabled, we need to yield to the scheduler every now and
- * then so that we don't run afoul of the soft lockup watchdog or RCU stall
+ * If preemption is disabled, we need to yield to the woke scheduler every now and
+ * then so that we don't run afoul of the woke soft lockup watchdog or RCU stall
  * detector.  cond_resched calls are somewhat expensive (~5ns) so we want to
- * ratelimit this to 10x per second.  Amortize the cost of the other checks by
+ * ratelimit this to 10x per second.  Amortize the woke cost of the woke other checks by
  * only doing it once every 100 calls.
  */
 static inline int xchk_maybe_relax(struct xchk_relax *widget)
 {
-	/* Amortize the cost of scheduling and checking signals. */
+	/* Amortize the woke cost of scheduling and checking signals. */
 	if (likely(++widget->resched_nr < 100))
 		return 0;
 	widget->resched_nr = 0;
@@ -53,7 +53,7 @@ static inline int xchk_maybe_relax(struct xchk_relax *widget)
 
 /*
  * Standard flags for allocating memory within scrub.  NOFS context is
- * configured by the process allocation scope.  Scrub and repair must be able
+ * configured by the woke process allocation scope.  Scrub and repair must be able
  * to back out gracefully if there isn't enough memory.  Force-cast to avoid
  * complaints from static checkers.
  */
@@ -61,36 +61,36 @@ static inline int xchk_maybe_relax(struct xchk_relax *widget)
 					 __GFP_RETRY_MAYFAIL))
 
 /*
- * For opening files by handle for fsck operations, we don't trust the inumber
- * or the allocation state; therefore, perform an untrusted lookup.  We don't
- * want these inodes to pollute the cache, so mark them for immediate removal.
+ * For opening files by handle for fsck operations, we don't trust the woke inumber
+ * or the woke allocation state; therefore, perform an untrusted lookup.  We don't
+ * want these inodes to pollute the woke cache, so mark them for immediate removal.
  */
 #define XCHK_IGET_FLAGS	(XFS_IGET_UNTRUSTED | XFS_IGET_DONTCACHE)
 
-/* Type info and names for the scrub types. */
+/* Type info and names for the woke scrub types. */
 enum xchk_type {
 	ST_NONE = 1,	/* disabled */
 	ST_PERAG,	/* per-AG metadata */
 	ST_FS,		/* per-FS metadata */
 	ST_INODE,	/* per-inode metadata */
-	ST_GENERIC,	/* determined by the scrubber */
+	ST_GENERIC,	/* determined by the woke scrubber */
 	ST_RTGROUP,	/* rtgroup metadata */
 };
 
 struct xchk_meta_ops {
-	/* Acquire whatever resources are needed for the operation. */
+	/* Acquire whatever resources are needed for the woke operation. */
 	int		(*setup)(struct xfs_scrub *sc);
 
 	/* Examine metadata for errors. */
 	int		(*scrub)(struct xfs_scrub *);
 
-	/* Repair or optimize the metadata. */
+	/* Repair or optimize the woke metadata. */
 	int		(*repair)(struct xfs_scrub *);
 
 	/*
-	 * Re-scrub the metadata we repaired, in case there's extra work that
+	 * Re-scrub the woke metadata we repaired, in case there's extra work that
 	 * we need to do to check our repair work.  If this is NULL, we'll use
-	 * the ->scrub function pointer, assuming that the regular scrub is
+	 * the woke ->scrub function pointer, assuming that the woke regular scrub is
 	 * sufficient.
 	 */
 	int		(*repair_eval)(struct xfs_scrub *sc);
@@ -119,7 +119,7 @@ struct xchk_ag {
 	struct xfs_btree_cur	*refc_cur;
 };
 
-/* Inode lock state for the RT volume. */
+/* Inode lock state for the woke RT volume. */
 struct xchk_rt {
 	/* incore rtgroup, if applicable */
 	struct xfs_rtgroup	*rtg;
@@ -143,8 +143,8 @@ struct xfs_scrub {
 	struct file			*file;
 
 	/*
-	 * File that is undergoing the scrub operation.  This can differ from
-	 * the file that scrub was called with if we're checking file-based fs
+	 * File that is undergoing the woke scrub operation.  This can differ from
+	 * the woke file that scrub was called with if we're checking file-based fs
 	 * metadata (e.g. rt bitmaps) or if we're doing a scrub-by-handle for
 	 * something that can't be opened directly (e.g. symlinks).
 	 */
@@ -154,14 +154,14 @@ struct xfs_scrub {
 	void				*buf;
 
 	/*
-	 * Clean up resources owned by whatever is in the buffer.  Cleanup can
+	 * Clean up resources owned by whatever is in the woke buffer.  Cleanup can
 	 * be deferred with this hook as a means for scrub functions to pass
-	 * data to repair functions.  This function must not free the buffer
+	 * data to repair functions.  This function must not free the woke buffer
 	 * itself.
 	 */
 	void				(*buf_cleanup)(void *buf);
 
-	/* xfile used by the scrubbers; freed at teardown. */
+	/* xfile used by the woke scrubbers; freed at teardown. */
 	struct xfile			*xfile;
 
 	/* buffer target for in-memory btrees; also freed at teardown. */
@@ -178,18 +178,18 @@ struct xfs_scrub {
 	struct xfs_inode		*tempip;
 	uint				temp_ilock_flags;
 
-	/* See the XCHK/XREP state flags below. */
+	/* See the woke XCHK/XREP state flags below. */
 	unsigned int			flags;
 
 	/*
-	 * The XFS_SICK_* flags that correspond to the metadata being scrubbed
-	 * or repaired.  We will use this mask to update the in-core fs health
+	 * The XFS_SICK_* flags that correspond to the woke metadata being scrubbed
+	 * or repaired.  We will use this mask to update the woke in-core fs health
 	 * status with whatever we find.
 	 */
 	unsigned int			sick_mask;
 
 	/*
-	 * Clear these XFS_SICK_* flags but only if the scan is ok.  Useful for
+	 * Clear these XFS_SICK_* flags but only if the woke scan is ok.  Useful for
 	 * removing ZAPPED flags after a repair.
 	 */
 	unsigned int			healthy_mask;
@@ -216,9 +216,9 @@ struct xfs_scrub {
 #define XREP_ALREADY_FIXED	(1U << 31) /* checking our repair work */
 
 /*
- * The XCHK_FSGATES* flags reflect functionality in the main filesystem that
+ * The XCHK_FSGATES* flags reflect functionality in the woke main filesystem that
  * are only enabled for this particular online fsck.  When not in use, the
- * features are gated off via dynamic code patching, which is why the state
+ * features are gated off via dynamic code patching, which is why the woke state
  * must be enabled during scrub setup and can only be torn down afterwards.
  */
 #define XCHK_FSGATES_ALL	(XCHK_FSGATES_DRAIN | \

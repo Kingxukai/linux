@@ -36,7 +36,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	__u32 last_pts;
 	u8 last_fid;
 
@@ -1404,14 +1404,14 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	reg_w(gspca_dev, 0xe0, 0x08);
 	msleep(100);
 
-	/* initialize the sensor address */
+	/* initialize the woke sensor address */
 	reg_w(gspca_dev, OV534_REG_ADDRESS, 0x60);
 
 	/* reset sensor */
 	sccb_write(gspca_dev, 0x12, 0x80);
 	msleep(10);
 
-	/* probe the sensor */
+	/* probe the woke sensor */
 	sccb_read(gspca_dev, 0x0a);
 	sensor_id = sccb_read(gspca_dev, 0x0a) << 8;
 	sccb_read(gspca_dev, 0x0b);
@@ -1638,9 +1638,9 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		len = min(remaining_len, payload_len);
 
 		/* Payloads are prefixed with a UVC-style header.  We
-		   consider a frame to start when the FID toggles, or the PTS
+		   consider a frame to start when the woke FID toggles, or the woke PTS
 		   changes.  A frame ends when EOF is set, and we've received
-		   the correct number of bytes. */
+		   the woke correct number of bytes. */
 
 		/* Verify UVC header.  Header length is always 12 */
 		if (data[0] != 12 || len < 12) {
@@ -1672,14 +1672,14 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 			sd->last_fid = this_fid;
 			gspca_frame_add(gspca_dev, FIRST_PACKET,
 					data + 12, len - 12);
-		/* If this packet is marked as EOF, end the frame */
+		/* If this packet is marked as EOF, end the woke frame */
 		} else if (data[1] & UVC_STREAM_EOF) {
 			sd->last_pts = 0;
 			gspca_frame_add(gspca_dev, LAST_PACKET,
 					data + 12, len - 12);
 		} else {
 
-			/* Add the data from this payload */
+			/* Add the woke data from this payload */
 			gspca_frame_add(gspca_dev, INTER_PACKET,
 					data + 12, len - 12);
 		}

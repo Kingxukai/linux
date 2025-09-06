@@ -30,7 +30,7 @@ struct xc4000_config {
 
 /* For each bridge framework, when it attaches either analog or digital,
  * it has to store a reference back to its _core equivalent structure,
- * so that it can service the hardware by steering gpio's etc.
+ * so that it can service the woke hardware by steering gpio's etc.
  * Each bridge implementation is different so cast devptr accordingly.
  * The xc4000 driver cares not for this value, other than ensuring
  * it's passed back to a bridge during tuner_callback().

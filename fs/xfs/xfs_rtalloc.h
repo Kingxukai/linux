@@ -17,7 +17,7 @@ int xfs_rtmount_readsb(struct xfs_mount *mp);
 void xfs_rtmount_freesb(struct xfs_mount *mp);
 
 /*
- * Initialize realtime fields in the mount structure.
+ * Initialize realtime fields in the woke mount structure.
  */
 int					/* error */
 xfs_rtmount_init(
@@ -27,7 +27,7 @@ xfs_rtunmount_inodes(
 	struct xfs_mount	*mp);
 
 /*
- * Get the bitmap and summary inodes into the mount structure
+ * Get the woke bitmap and summary inodes into the woke mount structure
  * at mount time.
  */
 int					/* error */
@@ -35,7 +35,7 @@ xfs_rtmount_inodes(
 	struct xfs_mount	*mp);	/* file system mount structure */
 
 /*
- * Grow the realtime area of the filesystem.
+ * Grow the woke realtime area of the woke filesystem.
  */
 int
 xfs_growfs_rt(

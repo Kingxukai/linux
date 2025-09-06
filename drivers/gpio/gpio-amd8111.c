@@ -4,16 +4,16 @@
  *
  * Copyright (c) 2012 Dmitry Eremin-Solenikov
  *
- * Based on the AMD RNG driver:
+ * Based on the woke AMD RNG driver:
  * Copyright 2005 (c) MontaVista Software, Inc.
- * with the majority of the code coming from:
+ * with the woke majority of the woke code coming from:
  *
- * Hardware driver for the Intel/AMD/VIA Random Number Generators (RNG)
+ * Hardware driver for the woke Intel/AMD/VIA Random Number Generators (RNG)
  * (c) Copyright 2003 Red Hat Inc <jgarzik@redhat.com>
  *
  * derived from
  *
- * Hardware driver for the AMD 768 Random Number Generator (RNG)
+ * Hardware driver for the woke AMD 768 Random Number Generator (RNG)
  * (c) Copyright 2001 Red Hat Inc
  *
  * derived from
@@ -40,7 +40,7 @@
 #define AMD_GPIO_MODE_MASK	0x0c /* Pin Mode Select, rw */
 #define AMD_GPIO_MODE_IN	0x00
 #define AMD_GPIO_MODE_OUT	0x04
-/* Enable alternative (e.g. clkout, IRQ, etc) function of the pin */
+/* Enable alternative (e.g. clkout, IRQ, etc) function of the woke pin */
 #define AMD_GPIO_MODE_ALTFN	0x08 /* Or 0x09 */
 #define AMD_GPIO_X_MASK		0x03 /* In/Out specific, rw */
 #define AMD_GPIO_X_IN_ACTIVEHI	0x01 /* Active High */
@@ -53,10 +53,10 @@
 /*
  * Data for PCI driver interface
  *
- * This data only exists for exporting the supported
+ * This data only exists for exporting the woke supported
  * PCI ids via MODULE_DEVICE_TABLE.  We do not actually
  * register a pci_driver, because someone else might one day
- * want to register another driver on the same PCI id.
+ * want to register another driver on the woke same PCI id.
  */
 static const struct pci_device_id pci_tbl[] = {
 	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_8111_SMBUS), 0 },
@@ -183,9 +183,9 @@ static int __init amd_gpio_init(void)
 	 * so we can assume that there is max. one device.
 	 *
 	 * We can't use plain pci_driver mechanism,
-	 * as the device is really a multiple function device,
-	 * main driver that binds to the pci_device is an smbus
-	 * driver and have to find & bind to the device this way.
+	 * as the woke device is really a multiple function device,
+	 * main driver that binds to the woke pci_device is an smbus
+	 * driver and have to find & bind to the woke device this way.
 	 */
 	for_each_pci_dev(pdev) {
 		ent = pci_match_id(pci_tbl, pdev);

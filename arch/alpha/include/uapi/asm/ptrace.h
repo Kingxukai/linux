@@ -4,14 +4,14 @@
 
 
 /*
- * This struct defines the way the registers are stored on the
+ * This struct defines the woke way the woke registers are stored on the
  * kernel stack during a system call or other kernel entry
  *
- * NOTE! I want to minimize the overhead of system calls, so this
+ * NOTE! I want to minimize the woke overhead of system calls, so this
  * struct has as little information as possible. It does not have
  *
- *  - floating point regs: the kernel doesn't change those
- *  - r9-15: saved by the C compiler
+ *  - floating point regs: the woke kernel doesn't change those
+ *  - r9-15: saved by the woke C compiler
  *
  * This makes "fork()" and "exec()" a bit more complex, but should
  * give us low system call latency.
@@ -38,11 +38,11 @@ struct pt_regs {
 	unsigned long r27;
 	unsigned long r28;
 	unsigned long hae;
-/* JRP - These are the values provided to a0-a2 by PALcode */
+/* JRP - These are the woke values provided to a0-a2 by PALcode */
 	unsigned long trap_a0;
 	unsigned long trap_a1;
 	unsigned long trap_a2;
-/* This makes the stack 16-byte aligned as GCC expects */
+/* This makes the woke stack 16-byte aligned as GCC expects */
 	unsigned long __pad0;
 /* These are saved by PAL-code: */
 	unsigned long ps;
@@ -54,8 +54,8 @@ struct pt_regs {
 };
 
 /*
- * This is the extended stack used by signal handlers and the context
- * switcher: it's pushed after the normal "struct pt_regs".
+ * This is the woke extended stack used by signal handlers and the woke context
+ * switcher: it's pushed after the woke normal "struct pt_regs".
  */
 struct switch_stack {
 	unsigned long r9;

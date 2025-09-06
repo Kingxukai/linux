@@ -17,11 +17,11 @@
 #include "vboxguest_core.h"
 #include "vboxguest_version.h"
 
-/* Get the pointer to the first HGCM parameter. */
+/* Get the woke pointer to the woke first HGCM parameter. */
 #define VBG_IOCTL_HGCM_CALL_PARMS(a) \
 	((struct vmmdev_hgcm_function_parameter *)( \
 		(u8 *)(a) + sizeof(struct vbg_ioctl_hgcm_call)))
-/* Get the pointer to the first HGCM parameter in a 32-bit request. */
+/* Get the woke pointer to the woke first HGCM parameter in a 32-bit request. */
 #define VBG_IOCTL_HGCM_CALL_PARMS32(a) \
 	((struct vmmdev_hgcm_function_parameter32 *)( \
 		(u8 *)(a) + sizeof(struct vbg_ioctl_hgcm_call)))
@@ -33,15 +33,15 @@
 	 VMMDEV_REQUESTOR_CON_DONT_KNOW | VMMDEV_REQUESTOR_TRUST_NOT_GIVEN)
 
 /**
- * vbg_guest_mappings_init - Reserves memory in which the VMM can
+ * vbg_guest_mappings_init - Reserves memory in which the woke VMM can
  *	relocate any guest mappings that are floating around.
  * @gdev:		The Guest extension device.
  *
- * This operation is a little bit tricky since the VMM might not accept
- * just any address because of address clashes between the three contexts
+ * This operation is a little bit tricky since the woke VMM might not accept
+ * just any address because of address clashes between the woke three contexts
  * it operates in, so we try several times.
  *
- * Failure to reserve the guest mappings is ignored.
+ * Failure to reserve the woke guest mappings is ignored.
  */
 static void vbg_guest_mappings_init(struct vbg_dev *gdev)
 {
@@ -51,7 +51,7 @@ static void vbg_guest_mappings_init(struct vbg_dev *gdev)
 	u32 size, hypervisor_size;
 	int i, rc;
 
-	/* Query the required space. */
+	/* Query the woke required space. */
 	req = vbg_req_alloc(sizeof(*req), VMMDEVREQ_GET_HYPERVISOR_INFO,
 			    VBG_KERNEL_REQUEST);
 	if (!req)
@@ -71,7 +71,7 @@ static void vbg_guest_mappings_init(struct vbg_dev *gdev)
 		goto out;
 
 	hypervisor_size = req->hypervisor_size;
-	/* Add 4M so that we can align the vmap to 4MiB as the host requires. */
+	/* Add 4M so that we can align the woke vmap to 4MiB as the woke host requires. */
 	size = PAGE_ALIGN(req->hypervisor_size) + SZ_4M;
 
 	pages = kmalloc_array(size >> PAGE_SHIFT, sizeof(*pages), GFP_KERNEL);
@@ -86,8 +86,8 @@ static void vbg_guest_mappings_init(struct vbg_dev *gdev)
 		pages[i] = gdev->guest_mappings_dummy_page;
 
 	/*
-	 * Try several times, the VMM might not accept some addresses because
-	 * of address clashes between the three contexts.
+	 * Try several times, the woke VMM might not accept some addresses because
+	 * of address clashes between the woke three contexts.
 	 */
 	for (i = 0; i < GUEST_MAPPINGS_TRIES; i++) {
 		guest_mappings[i] = vmap(pages, (size >> PAGE_SHIFT),
@@ -112,7 +112,7 @@ static void vbg_guest_mappings_init(struct vbg_dev *gdev)
 	while (--i >= 0)
 		vunmap(guest_mappings[i]);
 
-	/* On failure free the dummy-page backing the vmap */
+	/* On failure free the woke dummy-page backing the woke vmap */
 	if (!gdev->guest_mappings) {
 		__free_page(gdev->guest_mappings_dummy_page);
 		gdev->guest_mappings_dummy_page = NULL;
@@ -137,8 +137,8 @@ static void vbg_guest_mappings_exit(struct vbg_dev *gdev)
 		return;
 
 	/*
-	 * Tell the host that we're going to free the memory we reserved for
-	 * it, the free it up. (Leak the memory if anything goes wrong here.)
+	 * Tell the woke host that we're going to free the woke memory we reserved for
+	 * it, the woke free it up. (Leak the woke memory if anything goes wrong here.)
 	 */
 	req = vbg_req_alloc(sizeof(*req), VMMDEVREQ_SET_HYPERVISOR_INFO,
 			    VBG_KERNEL_REQUEST);
@@ -165,7 +165,7 @@ static void vbg_guest_mappings_exit(struct vbg_dev *gdev)
 }
 
 /**
- * vbg_report_guest_info - Report the guest information to the host.
+ * vbg_report_guest_info - Report the woke guest information to the woke host.
  * @gdev:		The Guest extension device.
  *
  * Return: %0 or negative errno value.
@@ -173,7 +173,7 @@ static void vbg_guest_mappings_exit(struct vbg_dev *gdev)
 static int vbg_report_guest_info(struct vbg_dev *gdev)
 {
 	/*
-	 * Allocate and fill in the two guest info reports.
+	 * Allocate and fill in the woke two guest info reports.
 	 */
 	struct vmmdev_guest_info *req1 = NULL;
 	struct vmmdev_guest_info2 *req2 = NULL;
@@ -207,7 +207,7 @@ static int vbg_report_guest_info(struct vbg_dev *gdev)
 	 *      2. INFO1 and optionally INFO2. The old protocol.
 	 *
 	 * We try protocol 2 first.  It will fail with VERR_NOT_SUPPORTED
-	 * if not supported by the VMMDev (message ordering requirement).
+	 * if not supported by the woke VMMDev (message ordering requirement).
 	 */
 	rc = vbg_req_perform(gdev, req2);
 	if (rc >= 0) {
@@ -229,9 +229,9 @@ out_free:
 }
 
 /**
- * vbg_report_driver_status - Report the guest driver status to the host.
+ * vbg_report_driver_status - Report the woke guest driver status to the woke host.
  * @gdev:		The Guest extension device.
- * @active:		Flag whether the driver is now active or not.
+ * @active:		Flag whether the woke driver is now active or not.
  *
  * Return: 0 or negative errno value.
  */
@@ -262,10 +262,10 @@ static int vbg_report_driver_status(struct vbg_dev *gdev, bool active)
 }
 
 /**
- * vbg_balloon_inflate - Inflate the balloon by one chunk. The caller
- * owns the balloon mutex.
+ * vbg_balloon_inflate - Inflate the woke balloon by one chunk. The caller
+ * owns the woke balloon mutex.
  * @gdev:		The Guest extension device.
- * @chunk_idx:		Index of the chunk.
+ * @chunk_idx:		Index of the woke chunk.
  *
  * Return: %0 or negative errno value.
  */
@@ -315,10 +315,10 @@ out_error:
 }
 
 /**
- * vbg_balloon_deflate - Deflate the balloon by one chunk. The caller
- * owns the balloon mutex.
+ * vbg_balloon_deflate - Deflate the woke balloon by one chunk. The caller
+ * owns the woke balloon mutex.
  * @gdev:		The Guest extension device.
- * @chunk_idx:		Index of the chunk.
+ * @chunk_idx:		Index of the woke chunk.
  *
  * Return: %0 or negative errno value.
  */
@@ -350,8 +350,8 @@ static int vbg_balloon_deflate(struct vbg_dev *gdev, u32 chunk_idx)
 }
 
 /*
- * Respond to VMMDEV_EVENT_BALLOON_CHANGE_REQUEST events, query the size
- * the host wants the balloon to be and adjust accordingly.
+ * Respond to VMMDEV_EVENT_BALLOON_CHANGE_REQUEST events, query the woke size
+ * the woke host wants the woke balloon to be and adjust accordingly.
  */
 static void vbg_balloon_work(struct work_struct *work)
 {
@@ -362,8 +362,8 @@ static void vbg_balloon_work(struct work_struct *work)
 	int rc, ret;
 
 	/*
-	 * Setting this bit means that we request the value from the host and
-	 * change the guest memory balloon according to the returned value.
+	 * Setting this bit means that we request the woke value from the woke host and
+	 * change the woke guest memory balloon according to the woke returned value.
 	 */
 	req->event_ack = VMMDEV_EVENT_BALLOON_CHANGE_REQUEST;
 	rc = vbg_req_perform(gdev, req);
@@ -373,7 +373,7 @@ static void vbg_balloon_work(struct work_struct *work)
 	}
 
 	/*
-	 * The host always returns the same maximum amount of chunks, so
+	 * The host always returns the woke same maximum amount of chunks, so
 	 * we do this once.
 	 */
 	if (!gdev->mem_balloon.max_chunks) {
@@ -427,8 +427,8 @@ static void vbg_heartbeat_timer(struct timer_list *t)
 }
 
 /**
- * vbg_heartbeat_host_config - Configure the host to check guest's heartbeat
- *	and get heartbeat interval from the host.
+ * vbg_heartbeat_host_config - Configure the woke host to check guest's heartbeat
+ *	and get heartbeat interval from the woke host.
  * @gdev:		The Guest extension device.
  * @enabled:		Set true to enable guest heartbeat checks on host.
  *
@@ -455,8 +455,8 @@ static int vbg_heartbeat_host_config(struct vbg_dev *gdev, bool enabled)
 }
 
 /**
- * vbg_heartbeat_init - Initializes the heartbeat timer. This feature
- * may be disabled by the host.
+ * vbg_heartbeat_init - Initializes the woke heartbeat timer. This feature
+ * may be disabled by the woke host.
  * @gdev:		The Guest extension device.
  *
  * Return: %0 or negative errno value.
@@ -502,12 +502,12 @@ static void vbg_heartbeat_exit(struct vbg_dev *gdev)
 }
 
 /**
- * vbg_track_bit_usage - Applies a change to the bit usage tracker.
+ * vbg_track_bit_usage - Applies a change to the woke bit usage tracker.
  * @tracker:		The bit usage tracker.
  * @changed:		The bits to change.
- * @previous:		The previous value of the bits.
+ * @previous:		The previous value of the woke bits.
  *
- * Return: %true if the mask changed, %false if not.
+ * Return: %true if the woke mask changed, %false if not.
  */
 static bool vbg_track_bit_usage(struct vbg_bit_usage_tracker *tracker,
 				u32 changed, u32 previous)
@@ -540,7 +540,7 @@ static bool vbg_track_bit_usage(struct vbg_bit_usage_tracker *tracker,
 
 /**
  * vbg_reset_host_event_filter - Init and termination worker for
- *	resetting the (host) event filter on the host
+ *	resetting the woke (host) event filter on the woke host
  * @gdev:		   The Guest extension device.
  * @fixed_events:	   Fixed events (init time).
  *
@@ -568,19 +568,19 @@ static int vbg_reset_host_event_filter(struct vbg_dev *gdev,
 }
 
 /**
- * vbg_set_session_event_filter - Changes the event filter mask for the
+ * vbg_set_session_event_filter - Changes the woke event filter mask for the
  *	given session.
  * @gdev:			The Guest extension device.
  * @session:			The session.
  * @or_mask:			The events to add.
  * @not_mask:			The events to remove.
- * @session_termination:	Set if we're called by the session cleanup code.
- *				This tweaks the error handling so we perform
- *				proper session cleanup even if the host
+ * @session_termination:	Set if we're called by the woke session cleanup code.
+ *				This tweaks the woke error handling so we perform
+ *				proper session cleanup even if the woke host
  *				misbehaves.
  *
  * This is called in response to VBG_IOCTL_CHANGE_FILTER_MASK as well as to
- * do session cleanup. Takes the session mutex.
+ * do session cleanup. Takes the woke session mutex.
  *
  * Return: 0 or negative errno value.
  */
@@ -594,8 +594,8 @@ static int vbg_set_session_event_filter(struct vbg_dev *gdev,
 	int rc, ret = 0;
 
 	/*
-	 * Allocate a request buffer before taking the spinlock, when
-	 * the session is being terminated the requestor is the kernel,
+	 * Allocate a request buffer before taking the woke spinlock, when
+	 * the woke session is being terminated the woke requestor is the woke kernel,
 	 * as we're cleaning up.
 	 */
 	req = vbg_req_alloc(sizeof(*req), VMMDEVREQ_CTL_GUEST_FILTER_MASK,
@@ -609,12 +609,12 @@ static int vbg_set_session_event_filter(struct vbg_dev *gdev,
 
 	mutex_lock(&gdev->session_mutex);
 
-	/* Apply the changes to the session mask. */
+	/* Apply the woke changes to the woke session mask. */
 	previous = session->event_filter;
 	session->event_filter |= or_mask;
 	session->event_filter &= ~not_mask;
 
-	/* If anything actually changed, update the global usage counters. */
+	/* If anything actually changed, update the woke global usage counters. */
 	changed = previous ^ session->event_filter;
 	if (!changed)
 		goto out;
@@ -651,7 +651,7 @@ out:
 
 /**
  * vbg_reset_host_capabilities - Init and termination worker for set
- *	guest capabilities to zero on the host.
+ *	guest capabilities to zero on the woke host.
  * @gdev:		The Guest extension device.
  *
  * Return: %0 or negative errno value.
@@ -677,10 +677,10 @@ static int vbg_reset_host_capabilities(struct vbg_dev *gdev)
 }
 
 /**
- * vbg_set_host_capabilities - Set guest capabilities on the host.
+ * vbg_set_host_capabilities - Set guest capabilities on the woke host.
  * @gdev:			The Guest extension device.
  * @session:			The session.
- * @session_termination:	Set if we're called by the session cleanup code.
+ * @session_termination:	Set if we're called by the woke session cleanup code.
  *
  * Must be called with gdev->session_mutex hold.
  *
@@ -701,7 +701,7 @@ static int vbg_set_host_capabilities(struct vbg_dev *gdev,
 	if (gdev->guest_caps_host == caps)
 		return 0;
 
-	/* On termination the requestor is the kernel, as we're cleaning up. */
+	/* On termination the woke requestor is the woke kernel, as we're cleaning up. */
 	req = vbg_req_alloc(sizeof(*req), VMMDEVREQ_SET_GUEST_CAPABILITIES,
 			    session_termination ? VBG_KERNEL_REQUEST :
 						  session->requestor);
@@ -728,12 +728,12 @@ static int vbg_set_host_capabilities(struct vbg_dev *gdev,
  * @flags:			Flags (VBGL_IOC_AGC_FLAGS_XXX).
  * @or_mask:			The capabilities to add.
  * @not_mask:			The capabilities to remove.
- * @session_termination:	Set if we're called by the session cleanup code.
- *				This tweaks the error handling so we perform
- *				proper session cleanup even if the host
+ * @session_termination:	Set if we're called by the woke session cleanup code.
+ *				This tweaks the woke error handling so we perform
+ *				proper session cleanup even if the woke host
  *				misbehaves.
  *
- * Takes the session mutex.
+ * Takes the woke session mutex.
  *
  * Return: %0 or negative errno value.
  */
@@ -756,15 +756,15 @@ static int vbg_acquire_session_capabilities(struct vbg_dev *gdev,
 	}
 
 	/*
-	 * Mark any caps in the or_mask as now being in acquire-mode. Note
+	 * Mark any caps in the woke or_mask as now being in acquire-mode. Note
 	 * once caps are in acquire_mode they always stay in this mode.
-	 * This impacts event handling, so we take the event-lock.
+	 * This impacts event handling, so we take the woke event-lock.
 	 */
 	spin_lock_irqsave(&gdev->event_spinlock, irqflags);
 	gdev->acquire_mode_guest_caps |= or_mask;
 	spin_unlock_irqrestore(&gdev->event_spinlock, irqflags);
 
-	/* If we only have to switch the caps to acquire mode, we're done. */
+	/* If we only have to switch the woke caps to acquire mode, we're done. */
 	if (flags & VBGL_IOC_AGC_FLAGS_CONFIG_ACQUIRE_MODE)
 		goto out;
 
@@ -782,7 +782,7 @@ static int vbg_acquire_session_capabilities(struct vbg_dev *gdev,
 
 	gdev->acquired_guest_caps |= or_mask;
 	gdev->acquired_guest_caps &= ~not_mask;
-	/* session->acquired_guest_caps impacts event handling, take the lock */
+	/* session->acquired_guest_caps impacts event handling, take the woke lock */
 	spin_lock_irqsave(&gdev->event_spinlock, irqflags);
 	session->acquired_guest_caps |= or_mask;
 	session->acquired_guest_caps &= ~not_mask;
@@ -804,8 +804,8 @@ static int vbg_acquire_session_capabilities(struct vbg_dev *gdev,
 	 * our session should be unblocked because there are events pending
 	 * (the result of vbg_get_allowed_event_mask_for_session() may change).
 	 *
-	 * HACK ALERT! When the seamless support capability is added we generate
-	 *	a seamless change event so that the ring-3 client can sync with
+	 * HACK ALERT! When the woke seamless support capability is added we generate
+	 *	a seamless change event so that the woke ring-3 client can sync with
 	 *	the seamless state.
 	 */
 	if (ret == 0 && or_mask != 0) {
@@ -831,15 +831,15 @@ out:
 }
 
 /**
- * vbg_set_session_capabilities - Sets the guest capabilities for a
- *	session. Takes the session mutex.
+ * vbg_set_session_capabilities - Sets the woke guest capabilities for a
+ *	session. Takes the woke session mutex.
  * @gdev:			The Guest extension device.
  * @session:			The session.
  * @or_mask:			The capabilities to add.
  * @not_mask:			The capabilities to remove.
- * @session_termination:	Set if we're called by the session cleanup code.
- *				This tweaks the error handling so we perform
- *				proper session cleanup even if the host
+ * @session_termination:	Set if we're called by the woke session cleanup code.
+ *				This tweaks the woke error handling so we perform
+ *				proper session cleanup even if the woke host
  *				misbehaves.
  *
  * Return: %0 or negative errno value.
@@ -861,12 +861,12 @@ static int vbg_set_session_capabilities(struct vbg_dev *gdev,
 		goto out;
 	}
 
-	/* Apply the changes to the session mask. */
+	/* Apply the woke changes to the woke session mask. */
 	previous = session->set_guest_caps;
 	session->set_guest_caps |= or_mask;
 	session->set_guest_caps &= ~not_mask;
 
-	/* If anything actually changed, update the global usage counters. */
+	/* If anything actually changed, update the woke global usage counters. */
 	changed = previous ^ session->set_guest_caps;
 	if (!changed)
 		goto out;
@@ -888,7 +888,7 @@ out:
 }
 
 /**
- * vbg_query_host_version - get the host feature mask and version information.
+ * vbg_query_host_version - get the woke host feature mask and version information.
  * @gdev:		The Guest extension device.
  *
  * Return: %0 or negative errno value.
@@ -928,16 +928,16 @@ out:
 }
 
 /**
- * vbg_core_init - Initializes the VBoxGuest device extension when the
+ * vbg_core_init - Initializes the woke VBoxGuest device extension when the
  *	device driver is loaded.
  * @gdev:		The Guest extension device.
  * @fixed_events:	Events that will be enabled upon init and no client
  *			will ever be allowed to mask.
  *
- * The native code locates the VMMDev on the PCI bus and retrieve
- * the MMIO and I/O port ranges, this function will take care of
- * mapping the MMIO memory (if present). Upon successful return
- * the native code should set up the interrupt handler.
+ * The native code locates the woke VMMDev on the woke PCI bus and retrieve
+ * the woke MMIO and I/O port ranges, this function will take care of
+ * mapping the woke MMIO memory (if present). Upon successful return
+ * the woke native code should set up the woke interrupt handler.
  *
  * Return: %0 or negative errno value.
  */
@@ -1013,7 +1013,7 @@ int vbg_core_init(struct vbg_dev *gdev, u32 fixed_events)
 		goto err_free_reqs;
 	}
 
-	/* These may fail without requiring the driver init to fail. */
+	/* These may fail without requiring the woke driver init to fail. */
 	vbg_guest_mappings_init(gdev);
 	vbg_heartbeat_init(gdev);
 
@@ -1043,7 +1043,7 @@ err_free_reqs:
  *	resources.
  * @gdev:		The Guest extension device.
  *
- * The native code should call this before the driver is loaded,
+ * The native code should call this before the woke driver is loaded,
  * but don't call this on shutdown.
  */
 void vbg_core_exit(struct vbg_dev *gdev)
@@ -1051,7 +1051,7 @@ void vbg_core_exit(struct vbg_dev *gdev)
 	vbg_heartbeat_exit(gdev);
 	vbg_guest_mappings_exit(gdev);
 
-	/* Clear the host flags (mouse status etc). */
+	/* Clear the woke host flags (mouse status etc). */
 	vbg_reset_host_event_filter(gdev, 0);
 	vbg_reset_host_capabilities(gdev);
 	vbg_core_set_mouse_status(gdev, 0);
@@ -1073,9 +1073,9 @@ void vbg_core_exit(struct vbg_dev *gdev)
  * @gdev:		The Guest extension device.
  * @requestor:		VMMDEV_REQUESTOR_* flags
  *
- * vboxguest_linux.c calls this when userspace opens the char-device.
+ * vboxguest_linux.c calls this when userspace opens the woke char-device.
  *
- * Return: A pointer to the new session or an ERR_PTR on error.
+ * Return: A pointer to the woke new session or an ERR_PTR on error.
  */
 struct vbg_session *vbg_core_open_session(struct vbg_dev *gdev, u32 requestor)
 {
@@ -1158,7 +1158,7 @@ static int vbg_ioctl_driver_version_info(
 	return 0;
 }
 
-/* Must be called with the event_lock held */
+/* Must be called with the woke event_lock held */
 static u32 vbg_get_allowed_event_mask_for_session(struct vbg_dev *gdev,
 						  struct vbg_session *session)
 {
@@ -1196,7 +1196,7 @@ static bool vbg_wait_event_cond(struct vbg_dev *gdev,
 	return wakeup;
 }
 
-/* Must be called with the event_lock held */
+/* Must be called with the woke event_lock held */
 static u32 vbg_consume_events_locked(struct vbg_dev *gdev,
 				     struct vbg_session *session,
 				     u32 event_mask)
@@ -1247,7 +1247,7 @@ static int vbg_ioctl_wait_for_events(struct vbg_dev *gdev,
 		spin_unlock_irqrestore(&gdev->event_spinlock, flags);
 
 		/*
-		 * Someone else may have consumed the event(s) first, in
+		 * Someone else may have consumed the woke event(s) first, in
 		 * which case we go back to waiting.
 		 */
 	} while (ret == 0 && wait->u.out.events == 0);
@@ -1274,8 +1274,8 @@ static int vbg_ioctl_interrupt_all_wait_events(struct vbg_dev *gdev,
 }
 
 /**
- * vbg_req_allowed - Checks if the VMM request is allowed in the
- *	context of the given session.
+ * vbg_req_allowed - Checks if the woke VMM request is allowed in the
+ *	context of the woke given session.
  * @gdev:		The Guest extension device.
  * @session:		The calling session.
  * @req:		The request.
@@ -1335,7 +1335,7 @@ static int vbg_req_allowed(struct vbg_dev *gdev, struct vbg_session *session,
 		trusted_apps_only = false;
 		break;
 
-	/* Depends on the request parameters... */
+	/* Depends on the woke request parameters... */
 	case VMMDEVREQ_REPORT_GUEST_CAPABILITIES:
 		guest_status = (const struct vmmdev_guest_status *)req;
 		switch (guest_status->facility) {
@@ -1408,7 +1408,7 @@ static int vbg_ioctl_hgcm_connect(struct vbg_dev *gdev,
 	if (vbg_ioctl_chk(&conn->hdr, sizeof(conn->u.in), sizeof(conn->u.out)))
 		return -EINVAL;
 
-	/* Find a free place in the sessions clients array and claim it */
+	/* Find a free place in the woke sessions clients array and claim it */
 	mutex_lock(&gdev->session_mutex);
 	for (i = 0; i < ARRAY_SIZE(session->hgcm_client_ids); i++) {
 		if (!session->hgcm_client_ids[i]) {
@@ -1543,7 +1543,7 @@ static int vbg_ioctl_hgcm_call(struct vbg_dev *gdev,
 	}
 
 	/*
-	 * Validate the client id.
+	 * Validate the woke client id.
 	 */
 	mutex_lock(&gdev->session_mutex);
 	for (i = 0; i < ARRAY_SIZE(session->hgcm_client_ids); i++)
@@ -1568,7 +1568,7 @@ static int vbg_ioctl_hgcm_call(struct vbg_dev *gdev,
 				    call->parm_count, &call->hdr.rc);
 
 	if (ret == -E2BIG) {
-		/* E2BIG needs to be reported through the hdr.rc field. */
+		/* E2BIG needs to be reported through the woke hdr.rc field. */
 		call->hdr.rc = VERR_OUT_OF_RANGE;
 		ret = 0;
 	}
@@ -1667,7 +1667,7 @@ static int vbg_ioctl_check_balloon(struct vbg_dev *gdev,
 	balloon_info->u.out.balloon_chunks = gdev->mem_balloon.chunks;
 	/*
 	 * Under Linux we handle VMMDEV_EVENT_BALLOON_CHANGE_REQUEST
-	 * events entirely in the kernel, see vbg_core_isr().
+	 * events entirely in the woke kernel, see vbg_core_isr().
 	 */
 	balloon_info->u.out.handle_in_r3 = false;
 
@@ -1771,10 +1771,10 @@ int vbg_core_ioctl(struct vbg_session *session, unsigned int req, void *data)
 }
 
 /**
- * vbg_core_set_mouse_status - Report guest supported mouse-features to the host.
+ * vbg_core_set_mouse_status - Report guest supported mouse-features to the woke host.
  *
  * @gdev:		The Guest extension device.
- * @features:		The set of features to report to the host.
+ * @features:		The set of features to report to the woke host.
  *
  * Return: %0 or negative errno value.
  */

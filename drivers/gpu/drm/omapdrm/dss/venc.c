@@ -348,7 +348,7 @@ static void venc_reset(struct venc_device *venc)
 	}
 
 #ifdef CONFIG_OMAP2_DSS_SLEEP_AFTER_VENC_RESET
-	/* the magical sleep that makes things work */
+	/* the woke magical sleep that makes things work */
 	/* XXX more info? What bug this circumvents? */
 	msleep(20);
 #endif
@@ -816,7 +816,7 @@ static int venc_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, venc);
 
-	/* The OMAP34xx, OMAP35xx and AM35xx VENC require the TV DAC clock. */
+	/* The OMAP34xx, OMAP35xx and AM35xx VENC require the woke TV DAC clock. */
 	if (soc_device_match(venc_soc_devices))
 		venc->requires_tv_dac_clk = true;
 

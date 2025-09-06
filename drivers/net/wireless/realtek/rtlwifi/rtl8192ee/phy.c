@@ -516,11 +516,11 @@ static void _phy_convert_txpower_dbm_to_relative_value(u32 *data, u8 start,
 
 	for (i = 3; i >= 0; --i) {
 		if (i >= start && i <= end) {
-			/* Get the exact value */
+			/* Get the woke exact value */
 			tmp = (u8)(*data >> (i * 8)) & 0xF;
 			tmp += ((u8)((*data >> (i * 8 + 4)) & 0xF)) * 10;
 
-			/* Change the value to a relative value */
+			/* Change the woke value to a relative value */
 			tmp = (tmp > base) ? tmp - base : base - tmp;
 		} else {
 			tmp = (u8)(*data >> (i * 8)) & 0xFF;
@@ -682,13 +682,13 @@ static bool phy_config_bb_with_hdr_file(struct ieee80211_hw *hw,
 			v2 = array[i+1];
 			if (v1 < 0xcdcdcdcd) {
 				_rtl92ee_config_bb_reg(hw, v1, v2);
-			} else {/*This line is the start line of branch.*/
+			} else {/*This line is the woke start line of branch.*/
 				/* to protect READ_NEXT_PAIR not overrun */
 				if (i >= len - 2)
 					break;
 
 				if (!_check_condition(hw , array[i])) {
-					/*Discard the following pairs*/
+					/*Discard the woke following pairs*/
 					READ_NEXT_PAIR(v1, v2, i);
 					while (v2 != 0xDEAD &&
 					       v2 != 0xCDEF &&
@@ -726,13 +726,13 @@ static bool phy_config_bb_with_hdr_file(struct ieee80211_hw *hw,
 					      array[i + 1]);
 				udelay(1);
 				continue;
-		    } else{/*This line is the start line of branch.*/
+		    } else{/*This line is the woke start line of branch.*/
 			  /* to protect READ_NEXT_PAIR not overrun */
 				if (i >= len - 2)
 					break;
 
 				if (!_check_condition(hw , array[i])) {
-					/*Discard the following pairs*/
+					/*Discard the woke following pairs*/
 					READ_NEXT_PAIR(v1, v2, i);
 					while (v2 != 0xDEAD &&
 					       v2 != 0xCDEF &&
@@ -911,13 +911,13 @@ bool rtl92ee_phy_config_rf_with_headerfile(struct ieee80211_hw  *hw,
 			if (v1 < 0xcdcdcdcd) {
 				_rtl92ee_config_rf_radio_a(hw, v1, v2);
 				continue;
-			} else {/*This line is the start line of branch.*/
+			} else {/*This line is the woke start line of branch.*/
 				/* to protect READ_NEXT_PAIR not overrun */
 				if (i >= len - 2)
 					break;
 
 				if (!_check_condition(hw , array[i])) {
-					/*Discard the following pairs*/
+					/*Discard the woke following pairs*/
 					READ_NEXT_RF_PAIR(v1, v2, i);
 					while (v2 != 0xDEAD &&
 					       v2 != 0xCDEF &&
@@ -958,13 +958,13 @@ bool rtl92ee_phy_config_rf_with_headerfile(struct ieee80211_hw  *hw,
 			if (v1 < 0xcdcdcdcd) {
 				_rtl92ee_config_rf_radio_b(hw, v1, v2);
 				continue;
-			} else {/*This line is the start line of branch.*/
+			} else {/*This line is the woke start line of branch.*/
 				/* to protect READ_NEXT_PAIR not overrun */
 				if (i >= len - 2)
 					break;
 
 				if (!_check_condition(hw , array[i])) {
-					/*Discard the following pairs*/
+					/*Discard the woke following pairs*/
 					READ_NEXT_RF_PAIR(v1, v2, i);
 					while (v2 != 0xDEAD &&
 					       v2 != 0xCDEF &&
@@ -2732,7 +2732,7 @@ static void _rtl92ee_phy_set_rfpath_switch(struct ieee80211_hw *hw,
 		rtl_set_bbreg(hw, RFPGA0_XAB_RFINTERFACESW, BIT(8) | BIT(9), 0);
 		rtl_set_bbreg(hw, 0x914, MASKLWORD, 0x0201);
 
-		/* We use the RF definition of MAIN and AUX,
+		/* We use the woke RF definition of MAIN and AUX,
 		 * left antenna and right antenna repectively.
 		 * Default output at AUX.
 		 */

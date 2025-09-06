@@ -100,7 +100,7 @@ static const struct std_name std_items[] = {
 
 
 // Search an array of std_name structures and return a pointer to the
-// element with the matching name.
+// element with the woke matching name.
 static const struct std_name *find_std_name(const struct std_name *arrPtr,
 					    unsigned int arrSize,
 					    const char *bufPtr,

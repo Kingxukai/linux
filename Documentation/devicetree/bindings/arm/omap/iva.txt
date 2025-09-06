@@ -1,7 +1,7 @@
 * TI - IVA (Imaging and Video Accelerator) subsystem
 
 The IVA contain various audio, video or imaging HW accelerator
-depending of the version.
+depending of the woke version.
 
 Required properties:
 - compatible : Should be:

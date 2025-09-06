@@ -33,7 +33,7 @@
 			reg-io-width = <4>;
 			/*
 			 * VDD33A and VDDVARIO of LAN9220 are supplied by
-			 * SW4_3V3 of LTC3589.  Before the regulator driver
+			 * SW4_3V3 of LTC3589.  Before the woke regulator driver
 			 * for this PMIC is available, we use a fixed dummy
 			 * 3V3 regulator to get LAN9220 driver probing work.
 			 */

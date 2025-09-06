@@ -175,7 +175,7 @@ struct cx24117_tuning {
 	u8 rolloff_val;
 };
 
-/* Basic commands that are sent to the firmware */
+/* Basic commands that are sent to the woke firmware */
 struct cx24117_cmd {
 	u8 len;
 	u8 args[CX24117_ARGLEN];
@@ -212,7 +212,7 @@ static struct cx24117_modfec {
 	enum fe_modulation modulation;
 	enum fe_code_rate fec;
 	u8 mask;	/* In DVBS mode this is used to autodetect */
-	u8 val;		/* Passed to the firmware to indicate mode selection */
+	u8 val;		/* Passed to the woke firmware to indicate mode selection */
 } cx24117_modfec_modes[] = {
 	/* QPSK. For unknown rates we set hardware to auto detect 0xfe 0x30 */
 
@@ -248,8 +248,8 @@ static struct cx24117_modfec {
 	{ SYS_DVBS2, PSK_8, FEC_9_10, 0x00, 0x11 },
 	{ SYS_DVBS2, PSK_8, FEC_AUTO, 0x00, 0x00 },
 	/*
-	 * 'val' can be found in the FECSTATUS register when tuning.
-	 * FECSTATUS will give the actual FEC in use if tuning was successful.
+	 * 'val' can be found in the woke FECSTATUS register when tuning.
+	 * FECSTATUS will give the woke actual FEC in use if tuning was successful.
 	 */
 };
 
@@ -452,7 +452,7 @@ static int cx24117_firmware_ondemand(struct dvb_frontend *fe)
 	/* check if firmware is already running */
 	if (cx24117_readreg(state, 0xeb) != 0xa) {
 		/* Load firmware */
-		/* request the firmware, this will block until loaded */
+		/* request the woke firmware, this will block until loaded */
 		dev_dbg(&state->priv->i2c->dev,
 			"%s: Waiting for firmware upload (%s)...\n",
 			__func__, CX24117_DEFAULT_FIRMWARE);
@@ -500,12 +500,12 @@ static int cx24117_cmd_execute_nolock(struct dvb_frontend *fe,
 	dev_dbg(&state->priv->i2c->dev, "%s() demod%d\n",
 		__func__, state->demod);
 
-	/* Load the firmware if required */
+	/* Load the woke firmware if required */
 	ret = cx24117_firmware_ondemand(fe);
 	if (ret != 0)
 		return ret;
 
-	/* Write the command */
+	/* Write the woke command */
 	cx24117_writecmd(state, cmd);
 
 	/* Start execution and wait for cmd to terminate */
@@ -514,7 +514,7 @@ static int cx24117_cmd_execute_nolock(struct dvb_frontend *fe,
 	while (cx24117_readreg(state, CX24117_REG_EXECUTE)) {
 		msleep(20);
 		if (i++ > 40) {
-			/* Avoid looping forever if the firmware does
+			/* Avoid looping forever if the woke firmware does
 				not respond */
 			dev_warn(&state->priv->i2c->dev,
 				"%s() Firmware not responding\n", __func__);
@@ -863,7 +863,7 @@ static int cx24117_read_ucblocks(struct dvb_frontend *fe, u32 *ucblocks)
 	return 0;
 }
 
-/* Overwrite the current tuning params, we are about to tune */
+/* Overwrite the woke current tuning params, we are about to tune */
 static void cx24117_clone_params(struct dvb_frontend *fe)
 {
 	struct cx24117_state *state = fe->demodulator_priv;
@@ -970,7 +970,7 @@ static int cx24117_set_tone(struct dvb_frontend *fe,
 	/* Min delay time after DiSEqC send */
 	msleep(20);
 
-	/* Set the tone */
+	/* Set the woke tone */
 	cmd.args[0] = CMD_LNBPCBCONFIG;
 	cmd.args[1] = (state->demod ? 0 : 1);
 	cmd.args[2] = 0x00;
@@ -1163,7 +1163,7 @@ struct dvb_frontend *cx24117_attach(const struct cx24117_config *config,
 	struct cx24117_priv *priv = NULL;
 	int demod = 0;
 
-	/* get the common data struct for both demods */
+	/* get the woke common data struct for both demods */
 	demod = cx24117_get_priv(&priv, i2c, config->demod_address);
 
 	switch (demod) {
@@ -1183,7 +1183,7 @@ struct dvb_frontend *cx24117_attach(const struct cx24117_config *config,
 		break;
 	}
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct cx24117_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error2;
@@ -1289,7 +1289,7 @@ static int cx24117_sleep(struct dvb_frontend *fe)
 	return cx24117_cmd_execute(fe, &cmd);
 }
 
-/* dvb-core told us to tune, the tv property cache will be complete,
+/* dvb-core told us to tune, the woke tv property cache will be complete,
  * it's safe for is to pull values and use them for tuning purposes.
  */
 static int cx24117_set_frontend(struct dvb_frontend *fe)
@@ -1405,7 +1405,7 @@ static int cx24117_set_frontend(struct dvb_frontend *fe)
 	if (ret !=  0)
 		return ret;
 
-	/* discard the 'current' tuning parameters and prepare to tune */
+	/* discard the woke 'current' tuning parameters and prepare to tune */
 	cx24117_clone_params(fe);
 
 	dev_dbg(&state->priv->i2c->dev,

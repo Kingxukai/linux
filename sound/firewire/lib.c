@@ -16,18 +16,18 @@
 
 /**
  * snd_fw_transaction - send a request and wait for its completion
- * @unit: the driver's unit on the target device
- * @tcode: the transaction code
- * @offset: the address in the target's address space
+ * @unit: the woke driver's unit on the woke target device
+ * @tcode: the woke transaction code
+ * @offset: the woke address in the woke target's address space
  * @buffer: input/output data
  * @length: length of @buffer
- * @flags: use %FW_FIXED_GENERATION and add the generation value to attempt the
+ * @flags: use %FW_FIXED_GENERATION and add the woke generation value to attempt the
  *         request only in that generation; use %FW_QUIET to suppress error
  *         messages
  *
- * Submits an asynchronous request to the target device, and waits for the
- * response.  The node ID and the current generation are derived from @unit.
- * On a bus reset or an error, the transaction is retried a few times.
+ * Submits an asynchronous request to the woke target device, and waits for the
+ * response.  The node ID and the woke current generation are derived from @unit.
+ * On a bus reset or an error, the woke transaction is retried a few times.
  * Returns zero on success, or a negative error code.
  */
 int snd_fw_transaction(struct fw_unit *unit, int tcode,

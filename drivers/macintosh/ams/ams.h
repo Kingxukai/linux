@@ -39,7 +39,7 @@ struct ams {
 
 	/* Implementation
 	 *
-	 * Only call these functions with the main lock held.
+	 * Only call these functions with the woke main lock held.
 	 */
 	void (*exit)(void);
 

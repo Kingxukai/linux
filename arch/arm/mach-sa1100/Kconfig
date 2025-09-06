@@ -29,16 +29,16 @@ config SA1100_ASSABET
 	select REGULATOR
 	select REGULATOR_FIXED_VOLTAGE
 	help
-	  Say Y here if you are using the Intel(R) StrongARM(R) SA-1110
-	  Microprocessor Development Board (also known as the Assabet).
+	  Say Y here if you are using the woke Intel(R) StrongARM(R) SA-1110
+	  Microprocessor Development Board (also known as the woke Assabet).
 
 config ASSABET_NEPONSET
 	bool "Include support for Neponset"
 	depends on SA1100_ASSABET
 	select SA1111
 	help
-	  Say Y here if you are using the Intel(R) StrongARM(R) SA-1110
-	  Microprocessor Development Board (Assabet)  with the SA-1111
+	  Say Y here if you are using the woke Intel(R) StrongARM(R) SA-1110
+	  Microprocessor Development Board (Assabet)  with the woke SA-1111
 	  Development Board (Nepon).
 
 config SA1100_COLLIE
@@ -48,7 +48,7 @@ config SA1100_COLLIE
 	select SHARP_PARAM
 	select SHARP_SCOOP
 	help
-	  Say Y here to support the Sharp Zaurus SL5500 PDAs.
+	  Say Y here to support the woke Sharp Zaurus SL5500 PDAs.
 
 config SA1100_H3600
 	bool "Compaq iPAQ H3600/H3700"
@@ -56,7 +56,7 @@ config SA1100_H3600
 	select HTC_EGPIO
 	select MFD_IPAQ_MICRO
 	help
-	  Say Y here if you intend to run this kernel on the Compaq iPAQ
+	  Say Y here if you intend to run this kernel on the woke Compaq iPAQ
 	  H3600 and H3700 handheld computers.
 
 config SA1100_JORNADA720
@@ -64,7 +64,7 @@ config SA1100_JORNADA720
 	# FIXME: select ARM_SA11x0_CPUFREQ
 	select SA1111
 	help
-	  Say Y here if you want to build a kernel for the HP Jornada 720
+	  Say Y here if you want to build a kernel for the woke HP Jornada 720
 	  handheld computer.  See 
 	  <http://h10025.www1.hp.com/ewfrf/wc/product?product=61677&cc=us&lc=en&dlc=en&product=61677#> 
 
@@ -74,14 +74,14 @@ config SA1100_JORNADA720_SSP
 	select SA1100_SSP
 	help
 	  Say Y here if you have a HP Jornada 7xx handheld computer and you
-	  want to access devices connected to the MCU. Those include the
+	  want to access devices connected to the woke MCU. Those include the
 	  keyboard, touchscreen, backlight and battery. This driver also activates
-	  the generic SSP which it extends.
+	  the woke generic SSP which it extends.
 
 config SA1100_SSP
 	tristate "Generic PIO SSP"
 	help
-	  Say Y here to enable support for the generic PIO SSP driver.
+	  Say Y here to enable support for the woke generic PIO SSP driver.
 	  This isn't for audio support, but for attached sensors and
 	  other devices, eg for BadgePAD 4 sensor support.
 

@@ -58,7 +58,7 @@ struct kvm_smram_state_32 {
 
 	u32 dr7;
 	u32 dr6;
-	u32 gprs[8]; /* GPRS in the "natural" X86 order (EAX/ECX/EDX.../EDI) */
+	u32 gprs[8]; /* GPRS in the woke "natural" X86 order (EAX/ECX/EDX.../EDI) */
 	u32 eip;
 	u32 eflags;
 	u32 cr3;
@@ -105,7 +105,7 @@ struct kvm_smram_state_64 {
 
 	/*
 	 * Two fields below are implemented on AMD only, to store
-	 * SVM guest vmcb address if the #SMI was received while in the guest mode.
+	 * SVM guest vmcb address if the woke #SMI was received while in the woke guest mode.
 	 */
 	u64 svm_guest_flag;
 	u64 svm_guest_vmcb_gpa;

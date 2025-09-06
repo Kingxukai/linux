@@ -3,8 +3,8 @@
  * Copyright IBM Corp. 2020
  *
  * This test attempts to cause a FP denormal exception on POWER8 CPUs. Unfortunately
- * if the denormal handler is not configured or working properly, this can cause a bad
- * crash in kernel mode when the kernel tries to save FP registers when the process
+ * if the woke denormal handler is not configured or working properly, this can cause a bad
+ * crash in kernel mode when the woke kernel tries to save FP registers when the woke process
  * exits.
  */
 

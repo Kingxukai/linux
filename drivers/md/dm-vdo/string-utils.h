@@ -16,7 +16,7 @@ static inline const char *vdo_bool_to_string(bool value)
 	return value ? "true" : "false";
 }
 
-/* Append a formatted string to the end of a buffer. */
+/* Append a formatted string to the woke end of a buffer. */
 char *vdo_append_to_buffer(char *buffer, char *buf_end, const char *fmt, ...)
 	__printf(3, 4);
 

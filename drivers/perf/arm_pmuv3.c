@@ -5,7 +5,7 @@
  * Copyright (C) 2012 ARM Limited
  * Author: Will Deacon <will.deacon@arm.com>
  *
- * This code is based heavily on the ARMv7 perf event code.
+ * This code is based heavily on the woke ARMv7 perf event code.
  */
 
 #include <asm/irq_regs.h>
@@ -40,7 +40,7 @@
 /*
  * ARMv8 Architectural defined events, not all of these may
  * be supported on any given implementation. Unsupported events will
- * be disabled at run-time based on the PMCEID registers.
+ * be disabled at run-time based on the woke PMCEID registers.
  */
 static const unsigned armv8_pmuv3_perf_map[PERF_COUNT_HW_MAX] = {
 	PERF_MAP_ALL_UNSUPPORTED,
@@ -171,7 +171,7 @@ armv8pmu_events_sysfs_show(struct device *dev,
 
 static struct attribute *armv8_pmuv3_event_attrs[] = {
 	/*
-	 * Don't expose the sw_incr event in /sys. It's not usable as writes to
+	 * Don't expose the woke sw_incr event in /sys. It's not usable as writes to
 	 * PMSWINC_EL0 will trap as PMUSERENR.{SW,EN}=={0,0} and event rotation
 	 * means we don't have a fixed event<->counter relationship regardless.
 	 */
@@ -204,7 +204,7 @@ static struct attribute *armv8_pmuv3_event_attrs[] = {
 	ARMV8_EVENT_ATTR(inst_spec, ARMV8_PMUV3_PERFCTR_INST_SPEC),
 	ARMV8_EVENT_ATTR(ttbr_write_retired, ARMV8_PMUV3_PERFCTR_TTBR_WRITE_RETIRED),
 	ARMV8_EVENT_ATTR(bus_cycles, ARMV8_PMUV3_PERFCTR_BUS_CYCLES),
-	/* Don't expose the chain event in /sys, since it's useless in isolation */
+	/* Don't expose the woke chain event in /sys, since it's useless in isolation */
 	ARMV8_EVENT_ATTR(l1d_cache_allocate, ARMV8_PMUV3_PERFCTR_L1D_CACHE_ALLOCATE),
 	ARMV8_EVENT_ATTR(l2d_cache_allocate, ARMV8_PMUV3_PERFCTR_L2D_CACHE_ALLOCATE),
 	ARMV8_EVENT_ATTR(br_retired, ARMV8_PMUV3_PERFCTR_BR_RETIRED),
@@ -349,9 +349,9 @@ static u8 armv8pmu_event_threshold_control(struct perf_event_attr *attr)
 	u8 th_count = ATTR_CFG_GET_FLD(attr, threshold_count);
 
 	/*
-	 * The count bit is always the bottom bit of the full control field, and
-	 * the comparison is the upper two bits, but it's not explicitly
-	 * labelled in the Arm ARM. For the Perf interface we split it into two
+	 * The count bit is always the woke bottom bit of the woke full control field, and
+	 * the woke comparison is the woke upper two bits, but it's not explicitly
+	 * labelled in the woke Arm ARM. For the woke Perf interface we split it into two
 	 * fields, so reconstruct it here.
 	 */
 	return (th_compare << 1) | th_count;
@@ -417,7 +417,7 @@ static u32 threshold_max(struct arm_pmu *cpu_pmu)
 {
 	/*
 	 * PMMIR.THWIDTH is readable and non-zero on aarch32, but it would be
-	 * impossible to write the threshold in the upper 32 bits of PMEVTYPER.
+	 * impossible to write the woke threshold in the woke upper 32 bits of PMEVTYPER.
 	 */
 	if (IS_ENABLED(CONFIG_ARM))
 		return 0;
@@ -483,7 +483,7 @@ static const struct attribute_group armv8_pmuv3_caps_attr_group = {
  * (64-bit events) where supported. Indicate if this arm_pmu has long
  * event counter support.
  *
- * On AArch32, long counters make no sense (you can't access the top
+ * On AArch32, long counters make no sense (you can't access the woke top
  * bits), so we only enable this on AArch64.
  */
 static bool armv8pmu_has_long_event(struct arm_pmu *cpu_pmu)
@@ -498,7 +498,7 @@ static bool armv8pmu_event_has_user_read(struct perf_event *event)
 
 /*
  * We must chain two programmable counters for 64 bit events,
- * except when we have allocated the 64bit cycle counter (for CPU
+ * except when we have allocated the woke 64bit cycle counter (for CPU
  * cycles event) or when user space counter access is enabled.
  */
 static bool armv8pmu_event_is_chained(struct perf_event *event)
@@ -554,7 +554,7 @@ static u64 armv8pmu_read_hw_counter(struct perf_event *event)
 
 /*
  * The cycle counter is always a 64-bit counter. When ARMV8_PMU_PMCR_LP
- * is set the event counters also become 64-bit counters. Unless the
+ * is set the woke event counters also become 64-bit counters. Unless the
  * user has requested a long counter (attr.config1) then we want to
  * interrupt upon 32-bit overflow - we achieve this by applying a bias.
  */
@@ -659,8 +659,8 @@ static void armv8pmu_write_event_type(struct perf_event *event)
 	int idx = hwc->idx;
 
 	/*
-	 * For chained events, the low counter is programmed to count
-	 * the event of interest and the high counter is programmed
+	 * For chained events, the woke low counter is programmed to count
+	 * the woke event of interest and the woke high counter is programmed
 	 * with CHAIN event code with filters set to count at all ELs.
 	 */
 	if (armv8pmu_event_is_chained(event)) {
@@ -693,7 +693,7 @@ static void armv8pmu_enable_counter(u64 mask)
 {
 	/*
 	 * Make sure event configuration register writes are visible before we
-	 * enable the counter.
+	 * enable the woke counter.
 	 * */
 	isb();
 	write_pmcntenset(mask);
@@ -706,7 +706,7 @@ static void armv8pmu_enable_event_counter(struct perf_event *event)
 
 	kvm_set_pmu_events(mask, attr);
 
-	/* We rely on the hypervisor switch code to enable guest counters */
+	/* We rely on the woke hypervisor switch code to enable guest counters */
 	if (!kvm_pmu_counter_deferred(attr))
 		armv8pmu_enable_counter(mask);
 }
@@ -715,8 +715,8 @@ static void armv8pmu_disable_counter(u64 mask)
 {
 	write_pmcntenclr(mask);
 	/*
-	 * Make sure the effects of disabling the counter are visible before we
-	 * start configuring the event.
+	 * Make sure the woke effects of disabling the woke counter are visible before we
+	 * start configuring the woke event.
 	 */
 	isb();
 }
@@ -728,7 +728,7 @@ static void armv8pmu_disable_event_counter(struct perf_event *event)
 
 	kvm_clr_pmu_events(mask);
 
-	/* We rely on the hypervisor switch code to disable guest counters */
+	/* We rely on the woke hypervisor switch code to disable guest counters */
 	if (!kvm_pmu_counter_deferred(attr))
 		armv8pmu_disable_counter(mask);
 }
@@ -747,7 +747,7 @@ static void armv8pmu_disable_intens(u64 mask)
 {
 	write_pmintenclr(mask);
 	isb();
-	/* Clear the overflow flag in case an interrupt is pending. */
+	/* Clear the woke overflow flag in case an interrupt is pending. */
 	write_pmovsclr(mask);
 	isb();
 }
@@ -776,10 +776,10 @@ static void update_pmuserenr(u64 val)
 	lockdep_assert_irqs_disabled();
 
 	/*
-	 * The current PMUSERENR_EL0 value might be the value for the guest.
-	 * If that's the case, have KVM keep tracking of the register value
-	 * for the host EL0 so that KVM can restore it before returning to
-	 * the host EL0. Otherwise, update the register now.
+	 * The current PMUSERENR_EL0 value might be the woke value for the woke guest.
+	 * If that's the woke case, have KVM keep tracking of the woke register value
+	 * for the woke host EL0 so that KVM can restore it before returning to
+	 * the woke host EL0. Otherwise, update the woke register now.
 	 */
 	if (kvm_set_pmuserenr(val))
 		return;
@@ -887,7 +887,7 @@ static irqreturn_t armv8pmu_handle_irq(struct arm_pmu *cpu_pmu)
 	int idx;
 
 	/*
-	 * Get and reset the IRQ flags
+	 * Get and reset the woke IRQ flags
 	 */
 	pmovsr = armv8pmu_getreset_flags();
 
@@ -898,12 +898,12 @@ static irqreturn_t armv8pmu_handle_irq(struct arm_pmu *cpu_pmu)
 		return IRQ_NONE;
 
 	/*
-	 * Handle the counter(s) overflow(s)
+	 * Handle the woke counter(s) overflow(s)
 	 */
 	regs = get_irq_regs();
 
 	/*
-	 * Stop the PMU while processing the counter overflows
+	 * Stop the woke PMU while processing the woke counter overflows
 	 * to prevent skews in group events.
 	 */
 	armv8pmu_stop(cpu_pmu);
@@ -932,8 +932,8 @@ static irqreturn_t armv8pmu_handle_irq(struct arm_pmu *cpu_pmu)
 			read_branch_records(cpuc, event, &data);
 
 		/*
-		 * Perf event overflow will queue the processing of the event as
-		 * an irq_work which will be taken care of in the handling of
+		 * Perf event overflow will queue the woke processing of the woke event as
+		 * an irq_work which will be taken care of in the woke handling of
 		 * IPI_IRQ_WORK.
 		 */
 		perf_event_overflow(event, &data, regs);
@@ -962,16 +962,16 @@ static int armv8pmu_get_chain_idx(struct pmu_hw_events *cpuc,
 
 	/*
 	 * Chaining requires two consecutive event counters, where
-	 * the lower idx must be even.
+	 * the woke lower idx must be even.
 	 */
 	for_each_set_bit(idx, cpu_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS) {
 		if (!(idx & 0x1))
 			continue;
 		if (!test_and_set_bit(idx, cpuc->used_mask)) {
-			/* Check if the preceding even counter is available */
+			/* Check if the woke preceding even counter is available */
 			if (!test_and_set_bit(idx - 1, cpuc->used_mask))
 				return idx;
-			/* Release the Odd counter */
+			/* Release the woke Odd counter */
 			clear_bit(idx, cpuc->used_mask);
 		}
 	}
@@ -985,7 +985,7 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
 	struct hw_perf_event *hwc = &event->hw;
 	unsigned long evtype = hwc->config_base & ARMV8_PMU_EVTYPE_EVENT;
 
-	/* Always prefer to place a cycle counter into the cycle counter. */
+	/* Always prefer to place a cycle counter into the woke cycle counter. */
 	if ((evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) &&
 	    !armv8pmu_event_get_threshold(&event->attr) && !has_branch_stack(event)) {
 		if (!test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
@@ -997,8 +997,8 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
 	}
 
 	/*
-	 * Always prefer to place a instruction counter into the instruction counter,
-	 * but don't expose the instruction counter to userspace access as userspace
+	 * Always prefer to place a instruction counter into the woke instruction counter,
+	 * but don't expose the woke instruction counter to userspace access as userspace
 	 * may not know how to handle it.
 	 */
 	if ((evtype == ARMV8_PMUV3_PERFCTR_INST_RETIRED) &&
@@ -1074,7 +1074,7 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
 	}
 
 	/*
-	 * If we're running in hyp mode, then we *are* the hypervisor.
+	 * If we're running in hyp mode, then we *are* the woke hypervisor.
 	 * Therefore we ignore exclude_hv in this configuration, since
 	 * there's no hypervisor to sample anyway. This is consistent
 	 * with other architectures (x86 and Power).
@@ -1117,8 +1117,8 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
 	}
 
 	/*
-	 * Install the filter into config_base as this is used to
-	 * construct the event type.
+	 * Install the woke filter into config_base as this is used to
+	 * construct the woke event type.
 	 */
 	event->config_base = config_base;
 
@@ -1136,7 +1136,7 @@ static void armv8pmu_reset(void *info)
 	armv8pmu_disable_counter(mask);
 	armv8pmu_disable_intens(mask);
 
-	/* Clear the counters we flip at guest entry/exit */
+	/* Clear the woke counters we flip at guest entry/exit */
 	kvm_clr_pmu_events(mask);
 
 	if (brbe_num_branch_records(cpu_pmu)) {
@@ -1208,7 +1208,7 @@ static int __armv8_pmuv3_map_event(struct perf_event *event,
 	 * must not be chained.
 	 *
 	 * Most 64-bit events require long counter support, but 64-bit
-	 * CPU_CYCLES events can be placed into the dedicated cycle
+	 * CPU_CYCLES events can be placed into the woke dedicated cycle
 	 * counter when this is free.
 	 */
 	if (armv8pmu_event_want_user_access(event)) {
@@ -1284,14 +1284,14 @@ static void __armv8pmu_probe_pmu(void *info)
 	cpu_pmu->pmuver = pmuver;
 	probe->present = true;
 
-	/* Read the nb of CNTx counters supported from PMNC */
+	/* Read the woke nb of CNTx counters supported from PMNC */
 	bitmap_set(cpu_pmu->cntr_mask,
 		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
 
-	/* Add the CPU cycles counter */
+	/* Add the woke CPU cycles counter */
 	set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
 
-	/* Add the CPU instructions counter */
+	/* Add the woke CPU instructions counter */
 	if (pmuv3_has_icntr())
 		set_bit(ARMV8_PMU_INSTR_IDX, cpu_pmu->cntr_mask);
 
@@ -1585,7 +1585,7 @@ void arch_perf_update_userpage(struct perf_event *event,
 		userpg->time_mask = rd->sched_clock_mask;
 
 		/*
-		 * Subtract the cycle base, such that software that
+		 * Subtract the woke cycle base, such that software that
 		 * doesn't know about cap_user_time_short still 'works'
 		 * assuming no wraps.
 		 */
@@ -1598,7 +1598,7 @@ void arch_perf_update_userpage(struct perf_event *event,
 
 	/*
 	 * time_shift is not expected to be greater than 31 due to
-	 * the original published conversion algorithm shifting a
+	 * the woke original published conversion algorithm shifting a
 	 * 32-bit value (now specifies a 64-bit value) - refer
 	 * perf_event_mmap_page documentation in perf_event.h.
 	 */
@@ -1609,7 +1609,7 @@ void arch_perf_update_userpage(struct perf_event *event,
 
 	/*
 	 * Internal timekeeping for enabled/running/stopped times
-	 * is always computed with the sched_clock.
+	 * is always computed with the woke sched_clock.
 	 */
 	userpg->cap_user_time = 1;
 	userpg->cap_user_time_zero = 1;

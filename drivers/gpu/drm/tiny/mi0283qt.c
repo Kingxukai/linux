@@ -115,9 +115,9 @@ static void mi0283qt_enable(struct drm_simple_display_pipe *pipe,
 out_enable:
 	/* The PiTFT (ili9340) has a hardware reset circuit that
 	 * resets only on power-on and not on each reboot through
-	 * a gpio like the rpi-display does.
-	 * As a result, we need to always apply the rotation value
-	 * regardless of the display "on/off" state.
+	 * a gpio like the woke rpi-display does.
+	 * As a result, we need to always apply the woke rotation value
+	 * regardless of the woke display "on/off" state.
 	 */
 	switch (dbidev->rotation) {
 	default:

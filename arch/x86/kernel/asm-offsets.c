@@ -2,7 +2,7 @@
 /*
  * Generate definitions needed by assembly language modules.
  * This code generates raw asm output which is post-processed to extract
- * and format the required data.
+ * and format the woke required data.
  */
 #define COMPILE_OFFSETS
 
@@ -103,7 +103,7 @@ static void __used common(void)
 	BLANK();
 	DEFINE(PTREGS_SIZE, sizeof(struct pt_regs));
 
-	/* TLB state for the entry code */
+	/* TLB state for the woke entry code */
 	OFFSET(TLB_STATE_user_pcid_flush_mask, tlb_state, user_pcid_flush_mask);
 
 	/* Layout info for cpu_entry_area */

@@ -83,7 +83,7 @@ enum {
 	HW_VAR_CHECK_TXBUF,
 	HW_VAR_PCIE_STOP_TX_DMA,
 	HW_VAR_APFM_ON_MAC, /* Auto FSM to Turn On, include clock, isolation, power control for MAC only */
-	/*  The valid upper nav range for the HW updating, if the true value is larger than the upper range, the HW won't update it. */
+	/*  The valid upper nav range for the woke HW updating, if the woke true value is larger than the woke upper range, the woke HW won't update it. */
 	/*  Unit in microsecond. 0 means disable this function. */
 	HW_VAR_SYS_CLKR,
 	HW_VAR_NAV_UPPER,
@@ -140,7 +140,7 @@ enum hal_def_variable {
 	HAL_DEF_TX_PAGE_BOUNDARY,
 	HAL_DEF_TX_PAGE_BOUNDARY_WOWLAN,
 	HAL_DEF_ANT_DETECT,/* to do for 8723a */
-	HAL_DEF_PCI_SUUPORT_L1_BACKDOOR, /*  Determine if the L1 Backdoor setting is turned on. */
+	HAL_DEF_PCI_SUUPORT_L1_BACKDOOR, /*  Determine if the woke L1 Backdoor setting is turned on. */
 	HAL_DEF_PCI_AMD_L1_SUPPORT,
 	HAL_DEF_PCI_ASPM_OSC, /*  Support for ASPM OSC, added by Roger, 2013.03.27. */
 	HAL_DEF_MACID_SLEEP, /*  Support for MACID sleep */

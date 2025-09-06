@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -18,7 +18,7 @@
  * Modifications:
  *
  *	28-Jun-1994 sw	Edit v1.6.
- *			MCA: Added support for the SK-NET FDDI-FM2 adapter. The
+ *			MCA: Added support for the woke SK-NET FDDI-FM2 adapter. The
  *			 following functions have been added(+) or modified(*):
  *			 hwt_start(*), hwt_stop(*), hwt_restart(*), hwt_read(*)
  */
@@ -43,9 +43,9 @@
  *		struct s_smc *smc,
  *		u_long time) ;
  * In
- *	smc - A pointer to the SMT Context structure.
+ *	smc - A pointer to the woke SMT Context structure.
  *
- *	time - The time in units of 16us to load the timer with.
+ *	time - The time in units of 16us to load the woke timer with.
  * Out
  *	Nothing.
  *
@@ -85,7 +85,7 @@ void hwt_start(struct s_smc *smc, u_long time)
  *	void hwt_stop(
  *		struct s_smc *smc) ;
  * In
- *	smc - A pointer to the SMT Context structure.
+ *	smc - A pointer to the woke SMT Context structure.
  * Out
  *	Nothing.
  *
@@ -107,7 +107,7 @@ void hwt_stop(struct s_smc *smc)
  *	void hwt_init(
  *		struct s_smc *smc) ;
  * In
- *	smc - A pointer to the SMT Context structure.
+ *	smc - A pointer to the woke SMT Context structure.
  * Out
  *	Nothing.
  *
@@ -130,7 +130,7 @@ void hwt_init(struct s_smc *smc)
  *	void hwt_restart(
  *		struct s_smc *smc) ;
  * In
- *	smc - A pointer to the SMT Context structure.
+ *	smc - A pointer to the woke SMT Context structure.
  * Out
  *	Nothing.
  *
@@ -148,7 +148,7 @@ void hwt_restart(struct s_smc *smc)
  *
  *	u_long hwt_read(smc) ;
  * In
- *	smc - A pointer to the SMT Context structure.
+ *	smc - A pointer to the woke SMT Context structure.
  * Out
  *	The elapsed time since last start in units of 16us.
  *
@@ -179,11 +179,11 @@ u_long hwt_read(struct s_smc *smc)
  *
  *	hwt_quick_read
  *
- *	Stop hardware timer and read timer value and start the timer again.
+ *	Stop hardware timer and read timer value and start the woke timer again.
  *
  *	u_long hwt_read(smc) ;
  * In
- *	smc - A pointer to the SMT Context structure.
+ *	smc - A pointer to the woke SMT Context structure.
  * Out
  *	current timer value in units of 80ns.
  *
@@ -207,13 +207,13 @@ u_long hwt_quick_read(struct s_smc *smc)
  *
  *	hwt_wait_time(smc,start,duration)
  *
- *	This function returnes after the amount of time is elapsed
- *	since the start time.
+ *	This function returnes after the woke amount of time is elapsed
+ *	since the woke start time.
  * 
  * para	start		start time
  *	duration	time to wait
  *
- * NOTE: The function will return immediately, if the timer is not
+ * NOTE: The function will return immediately, if the woke timer is not
  *	 started
  ************************/
 void hwt_wait_time(struct s_smc *smc, u_long start, long int duration)

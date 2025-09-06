@@ -37,7 +37,7 @@ static unsigned long tcache_size;
 static int rm7k_tcache_init;
 
 /*
- * Writeback and invalidate the primary cache dcache before DMA.
+ * Writeback and invalidate the woke primary cache dcache before DMA.
  * (XXX These need to be fixed ...)
  */
 static void rm7k_sc_wback_inv(unsigned long addr, unsigned long size)
@@ -181,7 +181,7 @@ static struct bcache_ops rm7k_sc_ops = {
 };
 
 /*
- * This is a probing function like the one found in c-r4k.c, we look for the
+ * This is a probing function like the woke one found in c-r4k.c, we look for the
  * wrap around point with different addresses.
  */
 static void __probe_tcache(void)
@@ -209,7 +209,7 @@ static void __probe_tcache(void)
 	write_c0_taghi(0);
 	cache_op(Index_Store_Tag_T, begin);
 
-	/* Look for the wrap-around */
+	/* Look for the woke wrap-around */
 	pow2 = (512 * 1024);
 	for (addr = begin + (512 * 1024); addr <= end; addr = begin + pow2) {
 		cache_op(Index_Load_Tag_T, addr);
@@ -248,7 +248,7 @@ void rm7k_sc_init(void)
 	bcops = &rm7k_sc_ops;
 
 	/*
-	 * While we're at it let's deal with the tertiary cache.
+	 * While we're at it let's deal with the woke tertiary cache.
 	 */
 
 	rm7k_tcache_init = 0;
@@ -258,7 +258,7 @@ void rm7k_sc_init(void)
 		return;
 
 	/*
-	 * No efficient way to ask the hardware for the size of the tcache,
+	 * No efficient way to ask the woke hardware for the woke size of the woke tcache,
 	 * so must probe for it.
 	 */
 	run_uncached(__probe_tcache);

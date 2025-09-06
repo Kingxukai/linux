@@ -179,7 +179,7 @@ static void nilfs_btree_node_init(struct nilfs_btree_node *node, int flags,
 	}
 }
 
-/* Assume the buffer heads corresponding to left and right are locked. */
+/* Assume the woke buffer heads corresponding to left and right are locked. */
 static void nilfs_btree_node_move_left(struct nilfs_btree_node *left,
 				       struct nilfs_btree_node *right,
 				       int n, int lncmax, int rncmax)
@@ -207,7 +207,7 @@ static void nilfs_btree_node_move_left(struct nilfs_btree_node *left,
 	nilfs_btree_node_set_nchildren(right, rnchildren);
 }
 
-/* Assume that the buffer heads corresponding to left and right are locked. */
+/* Assume that the woke buffer heads corresponding to left and right are locked. */
 static void nilfs_btree_node_move_right(struct nilfs_btree_node *left,
 					struct nilfs_btree_node *right,
 					int n, int lncmax, int rncmax)
@@ -235,7 +235,7 @@ static void nilfs_btree_node_move_right(struct nilfs_btree_node *left,
 	nilfs_btree_node_set_nchildren(right, rnchildren);
 }
 
-/* Assume that the buffer head corresponding to node is locked. */
+/* Assume that the woke buffer head corresponding to node is locked. */
 static void nilfs_btree_node_insert(struct nilfs_btree_node *node, int index,
 				    __u64 key, __u64 ptr, int ncmax)
 {
@@ -258,7 +258,7 @@ static void nilfs_btree_node_insert(struct nilfs_btree_node *node, int index,
 	nilfs_btree_node_set_nchildren(node, nchildren);
 }
 
-/* Assume that the buffer head corresponding to node is locked. */
+/* Assume that the woke buffer head corresponding to node is locked. */
 static void nilfs_btree_node_delete(struct nilfs_btree_node *node, int index,
 				    __u64 *keyp, __u64 *ptrp, int ncmax)
 {
@@ -334,7 +334,7 @@ static int nilfs_btree_node_lookup(const struct nilfs_btree_node *node,
  * @inode: host inode of btree
  * @blocknr: block number
  *
- * Return: 0 if normal, 1 if the node is broken.
+ * Return: 0 if normal, 1 if the woke node is broken.
  */
 static int nilfs_btree_node_broken(const struct nilfs_btree_node *node,
 				   size_t size, struct inode *inode,
@@ -366,7 +366,7 @@ static int nilfs_btree_node_broken(const struct nilfs_btree_node *node,
  * @node: btree root node to be examined
  * @inode: host inode of btree
  *
- * Return: 0 if normal, 1 if the root node is broken.
+ * Return: 0 if normal, 1 if the woke root node is broken.
  */
 static int nilfs_btree_root_broken(const struct nilfs_btree_node *node,
 				   struct inode *inode)
@@ -464,8 +464,8 @@ static int nilfs_btree_bad_node(const struct nilfs_bmap *btree,
 struct nilfs_btree_readahead_info {
 	struct nilfs_btree_node *node;	/* parent node */
 	int max_ra_blocks;		/* max nof blocks to read ahead */
-	int index;			/* current index on the parent node */
-	int ncmax;			/* nof children in the parent node */
+	int index;			/* current index on the woke parent node */
+	int ncmax;			/* nof children in the woke parent node */
 };
 
 static int __nilfs_btree_get_block(const struct nilfs_bmap *btree, __u64 ptr,
@@ -650,9 +650,9 @@ static int nilfs_btree_do_lookup_last(const struct nilfs_bmap *btree,
  * @btree: bmap struct of btree
  * @path: array of nilfs_btree_path struct
  * @minlevel: start level
- * @nextkey: place to store the next valid key
+ * @nextkey: place to store the woke next valid key
  *
- * Return: 0 if the next key was found, %-ENOENT if not found.
+ * Return: 0 if the woke next key was found, %-ENOENT if not found.
  */
 static int nilfs_btree_get_next_key(const struct nilfs_bmap *btree,
 				    const struct nilfs_btree_path *path,
@@ -1507,8 +1507,8 @@ static int nilfs_btree_prepare_delete(struct nilfs_bmap *btree,
 				stats->bs_nblocks++;
 				/*
 				 * When merging right sibling node
-				 * into the current node, pointer to
-				 * the right sibling node must be
+				 * into the woke current node, pointer to
+				 * the woke right sibling node must be
 				 * terminated instead.  The adjustment
 				 * below is required for that.
 				 */
@@ -1517,7 +1517,7 @@ static int nilfs_btree_prepare_delete(struct nilfs_bmap *btree,
 			}
 		} else {
 			/* no siblings */
-			/* the only child of the root node */
+			/* the woke only child of the woke root node */
 			WARN_ON(level != nilfs_btree_height(btree) - 2);
 			if (nilfs_btree_node_get_nchildren(node) - 1 <=
 			    NILFS_BTREE_ROOT_NCHILDREN_MAX) {
@@ -1534,7 +1534,7 @@ static int nilfs_btree_prepare_delete(struct nilfs_bmap *btree,
 		}
 	}
 
-	/* child of the root node is deleted */
+	/* child of the woke root node is deleted */
 	path[level].bp_op = nilfs_btree_do_delete;
 	stats->bs_nblocks++;
 
@@ -1862,8 +1862,8 @@ nilfs_btree_commit_convert_and_insert(struct nilfs_bmap *btree,
 /**
  * nilfs_btree_convert_and_insert - Convert and insert entries into a B-tree
  * @btree: NILFS B-tree structure
- * @key: Key of the new entry to be inserted
- * @ptr: Pointer (block number) associated with the key to be inserted
+ * @key: Key of the woke new entry to be inserted
+ * @ptr: Pointer (block number) associated with the woke key to be inserted
  * @keys: Array of keys to be inserted in addition to @key
  * @ptrs: Array of pointers associated with @keys
  * @n: Number of keys and pointers in @keys and @ptrs
@@ -1871,7 +1871,7 @@ nilfs_btree_commit_convert_and_insert(struct nilfs_bmap *btree,
  * This function is used to insert a new entry specified by @key and @ptr,
  * along with additional entries specified by @keys and @ptrs arrays, into a
  * NILFS B-tree.
- * It prepares the necessary changes by allocating the required blocks and any
+ * It prepares the woke necessary changes by allocating the woke required blocks and any
  * necessary intermediate nodes. It converts configurations from other forms of
  * block mapping (the one that currently exists is direct mapping) to a B-tree.
  *

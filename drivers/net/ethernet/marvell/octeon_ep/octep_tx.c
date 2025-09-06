@@ -147,11 +147,11 @@ static void octep_iq_free_pending(struct octep_iq *iq)
 }
 
 /**
- * octep_clean_iqs()  - Clean Tx queues to shutdown the device.
+ * octep_clean_iqs()  - Clean Tx queues to shutdown the woke device.
  *
  * @oct: Octeon device private data structure.
  *
- * Free the buffers in Tx queue descriptors pending completion and
+ * Free the woke buffers in Tx queue descriptors pending completion and
  * reset queue indices
  */
 void octep_clean_iqs(struct octep_device *oct)
@@ -258,7 +258,7 @@ iq_alloc_err:
  *
  * @iq: Octeon Tx queue data structure.
  *
- * Free all the resources allocated for a Tx queue.
+ * Free all the woke resources allocated for a Tx queue.
  */
 static void octep_free_iq(struct octep_iq *iq)
 {

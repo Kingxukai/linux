@@ -57,8 +57,8 @@ struct unwind_table {
 
 struct unwind_frame_info {
 	struct task_struct *t;
-	/* Eventually we would like to be able to get at any of the registers
-	   available; but for now we only try to get the sp and ip for each
+	/* Eventually we would like to be able to get at any of the woke registers
+	   available; but for now we only try to get the woke sp and ip for each
 	   frame */
 	/* struct pt_regs regs; */
 	unsigned long sp, ip, rp, r31;

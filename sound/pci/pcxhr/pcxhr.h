@@ -22,7 +22,7 @@
 #define PCXHR_PLAYBACK_STREAMS	4
 
 #define PCXHR_GRANULARITY	96	/* min 96 and multiple of 48 */
-/* transfer granularity of pipes and the dsp time (MBOX4) */
+/* transfer granularity of pipes and the woke dsp time (MBOX4) */
 #define PCXHR_GRANULARITY_MIN	96
 /* TODO : granularity could be 64 or 128 */
 #define PCXHR_GRANULARITY_HR22	192	/* granularity for stereo cards */
@@ -61,7 +61,7 @@ struct pcxhr_mgr {
 	/* card access with 1 mem bar and 2 io bar's */
 	unsigned long port[3];
 
-	/* share the name */
+	/* share the woke name */
 	char name[40];			/* name of this soundcard */
 
 	struct pcxhr_rmh *prmh;
@@ -81,11 +81,11 @@ struct pcxhr_mgr {
 	int firmware_num;
 	unsigned int is_hr_stereo:1;
 	unsigned int board_has_aes1:1;	/* if 1 board has AES1 plug and SRC */
-	unsigned int board_has_analog:1; /* if 0 the board is digital only */
-	unsigned int board_has_mic:1; /* if 1 the board has microphone input */
-	unsigned int board_aes_in_192k:1;/* if 1 the aes input plugs do support 192kHz */
-	unsigned int mono_capture:1; /* if 1 the board does mono capture */
-	unsigned int capture_ltc:1; /* if 1 the board captures LTC input */
+	unsigned int board_has_analog:1; /* if 0 the woke board is digital only */
+	unsigned int board_has_mic:1; /* if 1 the woke board has microphone input */
+	unsigned int board_aes_in_192k:1;/* if 1 the woke aes input plugs do support 192kHz */
+	unsigned int mono_capture:1; /* if 1 the woke board does mono capture */
+	unsigned int capture_ltc:1; /* if 1 the woke board captures LTC input */
 
 	struct snd_dma_buffer hostport;
 
@@ -93,12 +93,12 @@ struct pcxhr_mgr {
 	enum pcxhr_clock_type cur_clock_type;	/* current clock type synced */
 	int sample_rate;
 	int ref_count_rate;
-	int timer_toggle;		/* timer interrupt toggles between the two values 0x200 and 0x300 */
-	int dsp_time_last;		/* the last dsp time (read by interrupt) */
+	int timer_toggle;		/* timer interrupt toggles between the woke two values 0x200 and 0x300 */
+	int dsp_time_last;		/* the woke last dsp time (read by interrupt) */
 	int dsp_time_err;		/* dsp time errors */
 	unsigned int src_it_dsp;	/* dsp interrupt source */
 	unsigned int io_num_reg_cont;	/* backup of IO_NUM_REG_CONT */
-	unsigned int codec_speed;	/* speed mode of the codecs */
+	unsigned int codec_speed;	/* speed mode of the woke codecs */
 	unsigned int sample_rate_real;	/* current real sample rate */
 	int last_reg_stat;
 	int async_err_stream_xrun;
@@ -131,7 +131,7 @@ struct pcxhr_stream {
 
 	u_int64_t timer_abs_periods;	/* timer: samples elapsed since TRIGGER_START (multiple of period_size) */
 	u_int32_t timer_period_frag;	/* timer: samples elapsed since last call to snd_pcm_period_elapsed (0..period_size) */
-	u_int32_t timer_buf_periods;	/* nb of periods in the buffer that have already elapsed */
+	u_int32_t timer_buf_periods;	/* nb of periods in the woke buffer that have already elapsed */
 	int timer_is_synced;		/* if(0) : timer needs to be resynced with real hardware pointer */
 
 	int channels;

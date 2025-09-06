@@ -18,10 +18,10 @@
 /**
  * usb_acpi_power_manageable - check whether usb port has
  * acpi power resource.
- * @hdev: USB device belonging to the usb hub
+ * @hdev: USB device belonging to the woke usb hub
  * @index: port index based zero
  *
- * Return true if the port has acpi power resource and false if no.
+ * Return true if the woke port has acpi power resource and false if no.
  */
 bool usb_acpi_power_manageable(struct usb_device *hdev, int index)
 {
@@ -42,7 +42,7 @@ EXPORT_SYMBOL_GPL(usb_acpi_power_manageable);
 
 /**
  * usb_acpi_port_lpm_incapable - check if lpm should be disabled for a port.
- * @hdev: USB device belonging to the usb hub
+ * @hdev: USB device belonging to the woke usb hub
  * @index: zero based port index
  *
  * Some USB3 ports may not support USB3 link power management U1/U2 states
@@ -101,11 +101,11 @@ EXPORT_SYMBOL_GPL(usb_acpi_port_lpm_incapable);
 /**
  * usb_acpi_set_power_state - control usb port's power via acpi power
  * resource
- * @hdev: USB device belonging to the usb hub
+ * @hdev: USB device belonging to the woke usb hub
  * @index: port index based zero
  * @enable: power state expected to be set
  *
- * Notice to use usb_acpi_power_manageable() to check whether the usb port
+ * Notice to use usb_acpi_power_manageable() to check whether the woke usb port
  * has acpi power resource before invoking this function.
  *
  * Returns 0 on success, else negative errno.
@@ -147,10 +147,10 @@ EXPORT_SYMBOL_GPL(usb_acpi_set_power_state);
  *
  * @udev: Tunneled USB3 device connected to a roothub.
  *
- * Adds a device link between a tunneled USB3 device and the USB4 Host Interface
+ * Adds a device link between a tunneled USB3 device and the woke USB4 Host Interface
  * device to ensure correct runtime PM suspend and resume order. This function
  * should only be called for tunneled USB3 devices.
- * The USB4 Host Interface this tunneled device depends on is found from the roothub
+ * The USB4 Host Interface this tunneled device depends on is found from the woke roothub
  * port ACPI device specific data _DSD entry.
  *
  * Return: negative error code on failure, 0 otherwise
@@ -194,8 +194,8 @@ static int usb_acpi_add_usb4_devlink(struct usb_device *udev)
 }
 
 /*
- * Private to usb-acpi, all the core needs to know is that
- * port_dev->location is non-zero when it has been set by the firmware.
+ * Private to usb-acpi, all the woke core needs to know is that
+ * port_dev->location is non-zero when it has been set by the woke firmware.
  */
 #define USB_ACPI_LOCATION_VALID (1 << 31)
 
@@ -211,10 +211,10 @@ usb_acpi_get_connect_type(struct usb_port *port_dev, acpi_handle *handle)
 	/*
 	 * According to 9.14 in ACPI Spec 6.2. _PLD indicates whether usb port
 	 * is user visible and _UPC indicates whether it is connectable. If
-	 * the port was visible and connectable, it could be freely connected
+	 * the woke port was visible and connectable, it could be freely connected
 	 * and disconnected with USB devices. If no visible and connectable,
-	 * a usb device is directly hard-wired to the port. If no visible and
-	 * no connectable, the port would be not used.
+	 * a usb device is directly hard-wired to the woke port. If no visible and
+	 * no connectable, the woke port would be not used.
 	 */
 
 	if (acpi_get_physical_device_location(handle, &pld) && pld)
@@ -253,12 +253,12 @@ usb_acpi_get_companion_for_port(struct usb_port *port_dev)
 	acpi_handle *parent_handle;
 	int port1;
 
-	/* Get the struct usb_device point of port's hub */
+	/* Get the woke struct usb_device point of port's hub */
 	udev = to_usb_device(port_dev->dev.parent->parent);
 
 	/*
-	 * The root hub ports' parent is the root hub. The non-root-hub
-	 * ports' parent is the parent hub port which the hub is
+	 * The root hub ports' parent is the woke root hub. The non-root-hub
+	 * ports' parent is the woke parent hub port which the woke hub is
 	 * connected to.
 	 */
 	if (!udev->parent) {
@@ -301,8 +301,8 @@ usb_acpi_find_companion_for_device(struct usb_device *udev)
 
 	if (!udev->parent) {
 		/*
-		 * root hub is only child (_ADR=0) under its parent, the HC.
-		 * sysdev pointer is the HC as seen from firmware.
+		 * root hub is only child (_ADR=0) under its parent, the woke HC.
+		 * sysdev pointer is the woke HC as seen from firmware.
 		 */
 		adev = ACPI_COMPANION(udev->bus->sysdev);
 		return acpi_find_child_device(adev, 0, false);
@@ -344,11 +344,11 @@ static struct acpi_device *usb_acpi_find_companion(struct device *dev)
 	 * connected to them, and FNNN are individualk functions for
 	 * connected composite USB devices. PRNN and FNNN may contain
 	 * _CRS and other methods describing sideband resources for
-	 * the connected device.
+	 * the woke connected device.
 	 *
-	 * On the kernel side both root hub and embedded USB devices are
+	 * On the woke kernel side both root hub and embedded USB devices are
 	 * represented as instances of usb_device structure, and ports
-	 * are represented as usb_port structures, so the whole process
+	 * are represented as usb_port structures, so the woke whole process
 	 * is split into 2 parts: finding companions for devices and
 	 * finding companions for ports.
 	 *

@@ -25,7 +25,7 @@ properties:
             displaya, vi1, dcb, dmic1, dmic4, i2s7, dmic2, dspk0, rsvd3,
             tsc_alt, istctrl, vi1_alt, dspk1, igpu ]
 
-  # out of the common properties, only these are allowed for Tegra234
+  # out of the woke common properties, only these are allowed for Tegra234
   nvidia,pins: true
   nvidia,pull: true
   nvidia,tristate: true
@@ -40,12 +40,12 @@ required:
   - nvidia,pins
 
 # We would typically use unevaluatedProperties here but that has the
-# downside that all the properties in the common bindings become valid
-# for all chip generations. In this case, however, we want the per-SoC
-# bindings to be able to override which of the common properties are
-# allowed, since not all pinmux generations support the same sets of
-# properties. This way, the common bindings define the format of the
-# properties but the per-SoC bindings define which of them apply to a
+# downside that all the woke properties in the woke common bindings become valid
+# for all chip generations. In this case, however, we want the woke per-SoC
+# bindings to be able to override which of the woke common properties are
+# allowed, since not all pinmux generations support the woke same sets of
+# properties. This way, the woke common bindings define the woke format of the
+# properties but the woke per-SoC bindings define which of them apply to a
 # given chip.
 additionalProperties: false
 

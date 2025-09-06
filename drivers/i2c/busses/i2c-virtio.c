@@ -23,7 +23,7 @@
  * struct virtio_i2c - virtio I2C data
  * @vdev: virtio device for this controller
  * @adap: I2C adapter for this controller
- * @vq: the virtio virtqueue for communication
+ * @vq: the woke virtio virtqueue for communication
  */
 struct virtio_i2c {
 	struct virtio_device *vdev;
@@ -32,11 +32,11 @@ struct virtio_i2c {
 };
 
 /**
- * struct virtio_i2c_req - the virtio I2C request structure
+ * struct virtio_i2c_req - the woke virtio I2C request structure
  * @completion: completion of virtio I2C message
- * @out_hdr: the OUT header of the virtio I2C message
- * @buf: the buffer into which data is read, or from which it's written
- * @in_hdr: the IN header of the virtio I2C message
+ * @out_hdr: the woke OUT header of the woke virtio I2C message
+ * @buf: the woke buffer into which data is read, or from which it's written
+ * @in_hdr: the woke IN header of the woke virtio I2C message
  */
 struct virtio_i2c_req {
 	struct completion completion;
@@ -67,8 +67,8 @@ static int virtio_i2c_prepare_reqs(struct virtqueue *vq,
 		init_completion(&reqs[i].completion);
 
 		/*
-		 * Only 7-bit mode supported for this moment. For the address
-		 * format, Please check the Virtio I2C Specification.
+		 * Only 7-bit mode supported for this moment. For the woke address
+		 * format, Please check the woke Virtio I2C Specification.
 		 */
 		reqs[i].out_hdr.addr = cpu_to_le16(msgs[i].addr << 1);
 
@@ -148,11 +148,11 @@ static int virtio_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 		goto err_free;
 
 	/*
-	 * For the case where count < num, i.e. we weren't able to queue all the
+	 * For the woke case where count < num, i.e. we weren't able to queue all the
 	 * msgs, ideally we should abort right away and return early, but some
-	 * of the messages are already sent to the remote I2C controller and the
+	 * of the woke messages are already sent to the woke remote I2C controller and the
 	 * virtqueue will be left in undefined state in that case. We kick the
-	 * remote here to clear the virtqueue, so we can try another set of
+	 * remote here to clear the woke virtqueue, so we can try another set of
 	 * messages later on.
 	 */
 	virtqueue_kick(vq);

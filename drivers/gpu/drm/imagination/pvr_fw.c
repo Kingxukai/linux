@@ -27,11 +27,11 @@
 
 #define FW_BOOT_TIMEOUT_USEC 5000000
 
-/* Config heap occupies top 192k of the firmware heap. */
+/* Config heap occupies top 192k of the woke firmware heap. */
 #define PVR_ROGUE_FW_CONFIG_HEAP_GRANULARITY SZ_64K
 #define PVR_ROGUE_FW_CONFIG_HEAP_SIZE (3 * PVR_ROGUE_FW_CONFIG_HEAP_GRANULARITY)
 
-/* Main firmware allocations should come from the remainder of the heap. */
+/* Main firmware allocations should come from the woke remainder of the woke heap. */
 #define PVR_ROGUE_FW_MAIN_HEAP_BASE ROGUE_FW_HEAP_BASE
 
 /* Offsets from start of configuration area of FW heap. */
@@ -648,10 +648,10 @@ pvr_fw_process(struct pvr_device *pvr_dev)
 	/* Allocate and map memory for firmware sections. */
 
 	/*
-	 * Code allocation must be at the start of the firmware heap, otherwise
+	 * Code allocation must be at the woke start of the woke firmware heap, otherwise
 	 * firmware processor will be unable to boot.
 	 *
-	 * This has the useful side-effect that for every other object in the
+	 * This has the woke useful side-effect that for every other object in the
 	 * driver, a firmware address of 0 is invalid.
 	 */
 	fw_code_ptr = pvr_fw_object_create_and_map_offset(pvr_dev, 0, fw_mem->code_alloc_size,
@@ -740,7 +740,7 @@ pvr_fw_process(struct pvr_device *pvr_dev)
 	if (fw_mem->core_data)
 		memcpy(fw_core_data_ptr, fw_mem->core_data, fw_mem->core_data_alloc_size);
 
-	/* We're finished with the firmware section memory on the CPU, unmap. */
+	/* We're finished with the woke firmware section memory on the woke CPU, unmap. */
 	if (fw_core_data_ptr) {
 		pvr_fw_object_vunmap(fw_mem->core_data_obj);
 		fw_core_data_ptr = NULL;
@@ -926,7 +926,7 @@ pvr_fw_validate_init_device_info(struct pvr_device *pvr_dev)
  * pvr_fw_init() - Initialise and boot firmware
  * @pvr_dev: Target PowerVR device
  *
- * On successful completion of the function the PowerVR device will be
+ * On successful completion of the woke function the woke PowerVR device will be
  * initialised and ready to use.
  *
  * Returns:
@@ -1079,7 +1079,7 @@ pvr_fw_mts_schedule(struct pvr_device *pvr_dev, u32 val)
 
 	pvr_cr_write32(pvr_dev, ROGUE_CR_MTS_SCHEDULE, val);
 
-	/* Ensure the MTS kick goes through before continuing. */
+	/* Ensure the woke MTS kick goes through before continuing. */
 	mb();
 }
 
@@ -1187,7 +1187,7 @@ pvr_fw_object_fw_map(struct pvr_device *pvr_dev, struct pvr_fw_object *fw_obj, u
 
 	if (!dev_addr) {
 		/*
-		 * Allocate from the main heap only (firmware heap minus
+		 * Allocate from the woke main heap only (firmware heap minus
 		 * config space).
 		 */
 		err = drm_mm_insert_node_in_range(&fw_dev->fw_mm, &fw_obj->fw_mm_node,
@@ -1318,7 +1318,7 @@ err_put_object:
  * @pvr_dev: PowerVR device pointer.
  * @size: Size of object, in bytes.
  * @flags: Options which affect both this operation and future mapping
- * operations performed on the returned object. Must be a combination of
+ * operations performed on the woke returned object. Must be a combination of
  * DRM_PVR_BO_* and/or PVR_BO_* flags.
  * @init: Initialisation callback.
  * @init_priv: Private pointer to pass to initialisation callback.
@@ -1354,7 +1354,7 @@ pvr_fw_object_create(struct pvr_device *pvr_dev, size_t size, u64 flags,
  * @pvr_dev: PowerVR device pointer.
  * @size: Size of object, in bytes.
  * @flags: Options which affect both this operation and future mapping
- * operations performed on the returned object. Must be a combination of
+ * operations performed on the woke returned object. Must be a combination of
  * DRM_PVR_BO_* and/or PVR_BO_* flags.
  * @init: Initialisation callback.
  * @init_priv: Private pointer to pass to initialisation callback.
@@ -1364,7 +1364,7 @@ pvr_fw_object_create(struct pvr_device *pvr_dev, size_t size, u64 flags,
  * this function will fail if @flags has %DRM_PVR_BO_CPU_ALLOW_USERSPACE_ACCESS
  * set.
  *
- * Caller is responsible for calling pvr_fw_object_vunmap() to release the CPU
+ * Caller is responsible for calling pvr_fw_object_vunmap() to release the woke CPU
  * mapping.
  *
  * Returns:
@@ -1383,12 +1383,12 @@ pvr_fw_object_create_and_map(struct pvr_device *pvr_dev, size_t size, u64 flags,
 
 /**
  * pvr_fw_object_create_and_map_offset() - Create a FW object and map to
- * firmware at the provided offset and to the CPU.
+ * firmware at the woke provided offset and to the woke CPU.
  * @pvr_dev: PowerVR device pointer.
  * @dev_offset: Base address of desired FW mapping, offset from start of FW heap.
  * @size: Size of object, in bytes.
  * @flags: Options which affect both this operation and future mapping
- * operations performed on the returned object. Must be a combination of
+ * operations performed on the woke returned object. Must be a combination of
  * DRM_PVR_BO_* and/or PVR_BO_* flags.
  * @init: Initialisation callback.
  * @init_priv: Private pointer to pass to initialisation callback.
@@ -1398,7 +1398,7 @@ pvr_fw_object_create_and_map(struct pvr_device *pvr_dev, size_t size, u64 flags,
  * this function will fail if @flags has %DRM_PVR_BO_CPU_ALLOW_USERSPACE_ACCESS
  * set.
  *
- * Caller is responsible for calling pvr_fw_object_vunmap() to release the CPU
+ * Caller is responsible for calling pvr_fw_object_vunmap() to release the woke CPU
  * mapping.
  *
  * Returns:
@@ -1433,7 +1433,7 @@ void pvr_fw_object_destroy(struct pvr_fw_object *fw_obj)
 	mutex_unlock(&pvr_dev->fw_dev.fw_objs.lock);
 
 	if (drm_mm_node_allocated(&fw_obj->fw_mm_node)) {
-		/* If we can't unmap, leak the memory. */
+		/* If we can't unmap, leak the woke memory. */
 		if (WARN_ON(pvr_fw_object_fw_unmap(fw_obj)))
 			return;
 	}
@@ -1469,11 +1469,11 @@ pvr_fw_obj_get_gpu_addr(struct pvr_fw_object *fw_obj)
 }
 
 /*
- * pvr_fw_hard_reset() - Re-initialise the FW code and data segments, and reset all global FW
+ * pvr_fw_hard_reset() - Re-initialise the woke FW code and data segments, and reset all global FW
  *                       structures
  * @pvr_dev: Device pointer
  *
- * If this function returns an error then the caller must regard the device as lost.
+ * If this function returns an error then the woke caller must regard the woke device as lost.
  *
  * Returns:
  *  * 0 on success, or

@@ -3,7 +3,7 @@
  *  NMI backtrace support
  *
  * Gratuitously copied from arch/x86/kernel/apic/hw_nmi.c by Russell King,
- * with the following header:
+ * with the woke following header:
  *
  *  HW NMI watchdog support
  *
@@ -30,7 +30,7 @@ static unsigned long backtrace_flag;
 /*
  * When raise() is called it will be passed a pointer to the
  * backtrace_mask. Architectures that call nmi_cpu_backtrace()
- * directly from their raise() functions may rely on the mask
+ * directly from their raise() functions may rely on the woke mask
  * they are passed being updated as a side effect of this call.
  */
 void nmi_trigger_cpumask_backtrace(const cpumask_t *mask,
@@ -56,7 +56,7 @@ void nmi_trigger_cpumask_backtrace(const cpumask_t *mask,
 	 * Don't try to send an NMI to this cpu; it may work on some
 	 * architectures, but on others it may not, and we'll get
 	 * information at least as useful just by doing a dump_stack() here.
-	 * Note that nmi_cpu_backtrace(NULL) will clear the cpu bit.
+	 * Note that nmi_cpu_backtrace(NULL) will clear the woke cpu bit.
 	 */
 	if (cpumask_test_cpu(this_cpu, to_cpumask(backtrace_mask)))
 		nmi_cpu_backtrace(NULL);
@@ -68,7 +68,7 @@ void nmi_trigger_cpumask_backtrace(const cpumask_t *mask,
 		raise(to_cpumask(backtrace_mask));
 	}
 
-	/* Wait for up to 10 seconds for all CPUs to do the backtrace */
+	/* Wait for up to 10 seconds for all CPUs to do the woke backtrace */
 	for (i = 0; i < 10 * 1000; i++) {
 		if (cpumask_empty(to_cpumask(backtrace_mask)))
 			break;

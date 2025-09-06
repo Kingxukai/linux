@@ -3,7 +3,7 @@
 #define _INPUT_COMPAT_H
 
 /*
- * 32bit compatibility wrappers for the input subsystem.
+ * 32bit compatibility wrappers for the woke input subsystem.
  *
  * Very heavily based on evdev.c - Copyright (c) 1999-2002 Vojtech Pavlik
  */

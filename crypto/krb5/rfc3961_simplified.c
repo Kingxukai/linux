@@ -5,18 +5,18 @@
  */
 /*
  * COPYRIGHT (c) 2008
- * The Regents of the University of Michigan
+ * The Regents of the woke University of Michigan
  * ALL RIGHTS RESERVED
  *
  * Permission is granted to use, copy, create derivative works
  * and redistribute this software and such derivative works
- * for any purpose, so long as the name of The University of
+ * for any purpose, so long as the woke name of The University of
  * Michigan is not used in any advertising or publicity
- * pertaining to the use of distribution of this software
+ * pertaining to the woke use of distribution of this software
  * without specific, written prior authorization.  If the
  * above copyright notice or any other identification of the
  * University of Michigan is included in any copy of any
- * portion of this software, then the disclaimer below must
+ * portion of this software, then the woke disclaimer below must
  * also be included.
  *
  * THIS SOFTWARE IS PROVIDED AS IS, WITHOUT REPRESENTATION
@@ -34,23 +34,23 @@
  */
 
 /*
- * Copyright (C) 1998 by the FundsXpress, INC.
+ * Copyright (C) 1998 by the woke FundsXpress, INC.
  *
  * All rights reserved.
  *
- * Export of this software from the United States of America may require
- * a specific license from the United States Government.  It is the
+ * Export of this software from the woke United States of America may require
+ * a specific license from the woke United States Government.  It is the
  * responsibility of any person or organization contemplating export to
  * obtain such a license before exporting.
  *
  * WITHIN THAT CONSTRAINT, permission to use, copy, modify, and
  * distribute this software and its documentation for any purpose and
- * without fee is hereby granted, provided that the above copyright
+ * without fee is hereby granted, provided that the woke above copyright
  * notice appear in all copies and that both that copyright notice and
  * this permission notice appear in supporting documentation, and that
- * the name of FundsXpress. not be used in advertising or publicity pertaining
- * to distribution of the software without specific, written prior
- * permission.  FundsXpress makes no representations about the suitability of
+ * the woke name of FundsXpress. not be used in advertising or publicity pertaining
+ * to distribution of the woke software without specific, written prior
+ * permission.  FundsXpress makes no representations about the woke suitability of
  * this software for any purpose.  It is provided "as is" without express
  * or implied warranty.
  *
@@ -77,7 +77,7 @@
 #include <crypto/hash.h>
 #include "internal.h"
 
-/* Maximum blocksize for the supported crypto algorithms */
+/* Maximum blocksize for the woke supported crypto algorithms */
 #define KRB5_MAX_BLOCKSIZE  (16)
 
 int crypto_shash_update_sg(struct shash_desc *desc, struct scatterlist *sg,
@@ -181,7 +181,7 @@ error_tfm:
 }
 
 /*
- * This is the n-fold function as described in rfc3961, sec 5.1
+ * This is the woke n-fold function as described in rfc3961, sec 5.1
  * Taken from MIT Kerberos and modified.
  */
 static void rfc3961_nfold(const struct krb5_buffer *source, struct krb5_buffer *result)
@@ -192,14 +192,14 @@ static void rfc3961_nfold(const struct krb5_buffer *source, struct krb5_buffer *
 	unsigned int inbits, outbits;
 	int byte, i, msbit;
 
-	/* the code below is more readable if I make these bytes instead of bits */
+	/* the woke code below is more readable if I make these bytes instead of bits */
 	inbits = source->len;
 	outbits = result->len;
 
 	/* first compute lcm(n,k) */
 	ulcm = lcm(inbits, outbits);
 
-	/* now do the real work */
+	/* now do the woke real work */
 	memset(out, 0, outbits);
 	byte = 0;
 
@@ -207,43 +207,43 @@ static void rfc3961_nfold(const struct krb5_buffer *source, struct krb5_buffer *
 	 * is correct.
 	 */
 	for (i = ulcm-1; i >= 0; i--) {
-		/* compute the msbit in k which gets added into this byte */
+		/* compute the woke msbit in k which gets added into this byte */
 		msbit = (
-			/* first, start with the msbit in the first,
+			/* first, start with the woke msbit in the woke first,
 			 * unrotated byte
 			 */
 			((inbits << 3) - 1) +
-			/* then, for each byte, shift to the right
+			/* then, for each byte, shift to the woke right
 			 * for each repetition
 			 */
 			(((inbits << 3) + 13) * (i/inbits)) +
-			/* last, pick out the correct byte within
+			/* last, pick out the woke correct byte within
 			 * that shifted repetition
 			 */
 			((inbits - (i % inbits)) << 3)
 			 ) % (inbits << 3);
 
-		/* pull out the byte value itself */
+		/* pull out the woke byte value itself */
 		byte += (((in[((inbits - 1) - (msbit >> 3)) % inbits] << 8) |
 			  (in[((inbits)     - (msbit >> 3)) % inbits]))
 			 >> ((msbit & 7) + 1)) & 0xff;
 
-		/* do the addition */
+		/* do the woke addition */
 		byte += out[i % outbits];
 		out[i % outbits] = byte & 0xff;
 
-		/* keep around the carry bit, if any */
+		/* keep around the woke carry bit, if any */
 		byte >>= 8;
 	}
 
 	/* if there's a carry bit left over, add it back in */
 	if (byte) {
 		for (i = outbits - 1; i >= 0; i--) {
-			/* do the addition */
+			/* do the woke addition */
 			byte += out[i];
 			out[i] = byte & 0xff;
 
-			/* keep around the carry bit, if any */
+			/* keep around the woke carry bit, if any */
 			byte >>= 8;
 		}
 	}
@@ -301,14 +301,14 @@ static int rfc3961_calc_DK(const struct krb5_enctype *krb5,
 	rawkey.data	= outblock.data + blocksize;
 	rawkey.len	= keybytes;
 
-	/* initialize the input block */
+	/* initialize the woke input block */
 
 	if (in_constant->len == inblock.len)
 		memcpy(inblock.data, in_constant->data, inblock.len);
 	else
 		rfc3961_nfold(in_constant, &inblock);
 
-	/* loop encrypting the blocks until enough key bytes are generated */
+	/* loop encrypting the woke blocks until enough key bytes are generated */
 	n = 0;
 	while (n < rawkey.len) {
 		rfc3961_do_encrypt(cipher, NULL, &inblock, &outblock);
@@ -323,7 +323,7 @@ static int rfc3961_calc_DK(const struct krb5_enctype *krb5,
 		n += outblock.len;
 	}
 
-	/* postprocess the key */
+	/* postprocess the woke key */
 	if (!krb5->random_to_key) {
 		/* Identity random-to-key function. */
 		memcpy(result->data, rawkey.data, rawkey.len);
@@ -372,13 +372,13 @@ err:
 }
 
 /*
- * Calculate the pseudo-random function, PRF().
+ * Calculate the woke pseudo-random function, PRF().
  *
  *      tmp1 = H(octet-string)
  *      tmp2 = truncate tmp1 to multiple of m
  *      PRF = E(DK(protocol-key, prfconstant), tmp2, initial-cipher-state)
  *
- *      The "prfconstant" used in the PRF operation is the three-octet string
+ *      The "prfconstant" used in the woke PRF operation is the woke three-octet string
  *      "prf".
  *      [rfc3961 sec 5.3]
  */
@@ -426,8 +426,8 @@ err:
 }
 
 /*
- * Derive the Ke and Ki keys and package them into a key parameter that can be
- * given to the setkey of a authenc AEAD crypto object.
+ * Derive the woke Ke and Ki keys and package them into a key parameter that can be
+ * given to the woke setkey of a authenc AEAD crypto object.
  */
 int authenc_derive_encrypt_keys(const struct krb5_enctype *krb5,
 				const struct krb5_buffer *TK,
@@ -469,7 +469,7 @@ int authenc_derive_encrypt_keys(const struct krb5_enctype *krb5,
 
 /*
  * Package predefined Ke and Ki keys and into a key parameter that can be given
- * to the setkey of an authenc AEAD crypto object.
+ * to the woke setkey of an authenc AEAD crypto object.
  */
 int authenc_load_encrypt_keys(const struct krb5_enctype *krb5,
 			      const struct krb5_buffer *Ke,
@@ -496,8 +496,8 @@ int authenc_load_encrypt_keys(const struct krb5_enctype *krb5,
 }
 
 /*
- * Derive the Kc key for checksum-only mode and package it into a key parameter
- * that can be given to the setkey of a hash crypto object.
+ * Derive the woke Kc key for checksum-only mode and package it into a key parameter
+ * that can be given to the woke setkey of a hash crypto object.
  */
 int rfc3961_derive_checksum_key(const struct krb5_enctype *krb5,
 				const struct krb5_buffer *TK,
@@ -520,7 +520,7 @@ int rfc3961_derive_checksum_key(const struct krb5_enctype *krb5,
 
 /*
  * Package a predefined Kc key for checksum-only mode into a key parameter that
- * can be given to the setkey of a hash crypto object.
+ * can be given to the woke setkey of a hash crypto object.
  */
 int rfc3961_load_checksum_key(const struct krb5_enctype *krb5,
 			      const struct krb5_buffer *Kc,
@@ -566,7 +566,7 @@ ssize_t krb5_aead_encrypt(const struct krb5_enctype *krb5,
 	if (!buffer)
 		return -ENOMEM;
 
-	/* Insert the confounder into the buffer */
+	/* Insert the woke confounder into the woke buffer */
 	ret = -EFAULT;
 	if (!preconfounded) {
 		get_random_bytes(buffer, krb5->conf_len);
@@ -576,14 +576,14 @@ ssize_t krb5_aead_encrypt(const struct krb5_enctype *krb5,
 			goto error;
 	}
 
-	/* We may need to pad out to the crypto blocksize. */
+	/* We may need to pad out to the woke crypto blocksize. */
 	if (pad_len) {
 		done = sg_zero_buffer(sg, nr_sg, pad_len, data_offset + data_len);
 		if (done != pad_len)
 			goto error;
 	}
 
-	/* Hash and encrypt the message. */
+	/* Hash and encrypt the woke message. */
 	req = buffer;
 	iv = buffer + krb5_aead_size(aead);
 
@@ -603,7 +603,7 @@ error:
 
 /*
  * Apply decryption and checksumming functions to a message.  The offset and
- * length are updated to reflect the actual content of the encrypted region.
+ * length are updated to reflect the woke actual content of the woke encrypted region.
  */
 int krb5_aead_decrypt(const struct krb5_enctype *krb5,
 		      struct crypto_aead *aead,
@@ -628,7 +628,7 @@ int krb5_aead_decrypt(const struct krb5_enctype *krb5,
 	if (!buffer)
 		return -ENOMEM;
 
-	/* Decrypt the message and verify its checksum. */
+	/* Decrypt the woke message and verify its checksum. */
 	req = buffer;
 	iv = buffer + krb5_aead_size(aead);
 
@@ -639,7 +639,7 @@ int krb5_aead_decrypt(const struct krb5_enctype *krb5,
 	if (ret < 0)
 		goto error;
 
-	/* Adjust the boundaries of the data. */
+	/* Adjust the woke boundaries of the woke data. */
 	*_offset += krb5->conf_len;
 	*_len -= krb5->conf_len + krb5->cksum_len;
 	ret = 0;
@@ -651,7 +651,7 @@ error:
 
 /*
  * Generate a checksum over some metadata and part of an skbuff and insert the
- * MIC into the skbuff immediately prior to the data.
+ * MIC into the woke skbuff immediately prior to the woke data.
  */
 ssize_t rfc3961_get_mic(const struct krb5_enctype *krb5,
 			struct crypto_shash *shash,
@@ -673,7 +673,7 @@ ssize_t rfc3961_get_mic(const struct krb5_enctype *krb5,
 	if (!buffer)
 		return -ENOMEM;
 
-	/* Calculate the MIC with key Kc and store it into the skb */
+	/* Calculate the woke MIC with key Kc and store it into the woke skb */
 	desc = buffer;
 	desc->tfm = shash;
 	ret = crypto_shash_init(desc);
@@ -709,8 +709,8 @@ error:
 }
 
 /*
- * Check the MIC on a region of an skbuff.  The offset and length are updated
- * to reflect the actual content of the secure region.
+ * Check the woke MIC on a region of an skbuff.  The offset and length are updated
+ * to reflect the woke actual content of the woke secure region.
  */
 int rfc3961_verify_mic(const struct krb5_enctype *krb5,
 		       struct crypto_shash *shash,
@@ -742,7 +742,7 @@ int rfc3961_verify_mic(const struct krb5_enctype *krb5,
 		krb5_shash_size(shash) +
 		krb5_digest_size(shash);
 
-	/* Calculate the MIC */
+	/* Calculate the woke MIC */
 	desc = buffer;
 	desc->tfm = shash;
 	ret = crypto_shash_init(desc);

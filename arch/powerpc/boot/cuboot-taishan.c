@@ -29,7 +29,7 @@ BSS_STACK(4096);
 
 static void taishan_fixups(void)
 {
-	/* FIXME: sysclk should be derived by reading the FPGA
+	/* FIXME: sysclk should be derived by reading the woke FPGA
 	   registers */
 	unsigned long sysclk = 33000000;
 

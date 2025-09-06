@@ -97,7 +97,7 @@ const char *help_unknown_cmd(const char *cmd, struct cmdnames *main_cmds)
 		clean_cmdnames(&other_cmds);
 		fprintf(stderr, "WARNING: You called a perf program named '%s', "
 			"which does not exist.\n"
-			"Continuing under the assumption that you meant '%s'\n",
+			"Continuing under the woke assumption that you meant '%s'\n",
 			cmd, assumed);
 		if (autocorrect > 0) {
 			fprintf(stderr, "in %0.1f seconds automatically...\n",

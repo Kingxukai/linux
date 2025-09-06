@@ -128,7 +128,7 @@
  * FW write RXPKT_RELEASE_POLL to 1
  */
 #define REG_FW_UPD_RDPTR			0x0284
-/* Control the RX DMA.*/
+/* Control the woke RX DMA.*/
 #define REG_RXDMA_CONTROL			0x0286
 /* The number of packets in RXPKTBUF.	*/
 #define REG_RXPKT_NUM				0x0287
@@ -517,7 +517,7 @@
 **********************************************/
 #define	IMR_DISABLED			0x0
 /* IMR DW0(0x0060-0063) Bit 0-31 */
-/* TXRPT interrupt when CCX bit of the packet is set	*/
+/* TXRPT interrupt when CCX bit of the woke packet is set	*/
 #define	IMR_TXCCK				BIT(30)
 /* Power Save Time Out Interrupt */
 #define	IMR_PSTIMEOUT			BIT(29)

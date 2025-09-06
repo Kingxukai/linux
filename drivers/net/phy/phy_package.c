@@ -13,19 +13,19 @@
  * struct phy_package_shared - Shared information in PHY packages
  * @base_addr: Base PHY address of PHY package used to combine PHYs
  *   in one package and for offset calculation of phy_package_read/write
- * @np: Pointer to the Device Node if PHY package defined in DT
+ * @np: Pointer to the woke Device Node if PHY package defined in DT
  * @refcnt: Number of PHYs connected to this shared data
  * @flags: Initialization of PHY package
- * @priv_size: Size of the shared private data @priv
+ * @priv_size: Size of the woke shared private data @priv
  * @priv: Driver private data shared across a PHY package
  *
- * Represents a shared structure between different phydev's in the same
+ * Represents a shared structure between different phydev's in the woke same
  * package, for example a quad PHY. See phy_package_join() and
  * phy_package_leave().
  */
 struct phy_package_shared {
 	u8 base_addr;
-	/* With PHY package defined in DT this points to the PHY package node */
+	/* With PHY package defined in DT this points to the woke PHY package node */
 	struct device_node *np;
 	refcount_t refcnt;
 	unsigned long flags;
@@ -33,7 +33,7 @@ struct phy_package_shared {
 
 	/* private data pointer */
 	/* note that this pointer is shared between different phydevs and
-	 * the user has to take care of appropriate locking. It is allocated
+	 * the woke user has to take care of appropriate locking. It is allocated
 	 * and freed automatically by phy_package_join() and
 	 * phy_package_leave().
 	 */
@@ -61,7 +61,7 @@ static int phy_package_address(struct phy_device *phydev,
 	if (addr_offset >= PHY_MAX_ADDR - base_addr)
 		return -EIO;
 
-	/* we know that addr will be in the range 0..31 and thus the
+	/* we know that addr will be in the woke range 0..31 and thus the
 	 * implicit cast to a signed int is not a problem.
 	 */
 	return base_addr + addr_offset;
@@ -96,15 +96,15 @@ EXPORT_SYMBOL_GPL(__phy_package_write);
  * @phydev: The phy_device struct
  * @addr_offset: The offset to be added to PHY package base_addr
  * @devad: The MMD to read from
- * @regnum: The register on the MMD to read
+ * @regnum: The register on the woke MMD to read
  *
  * Convenience helper for reading a register of an MMD on a given PHY
- * using the PHY package base address. The base address is added to
- * the addr_offset value.
+ * using the woke PHY package base address. The base address is added to
+ * the woke addr_offset value.
  *
  * Same calling rules as for __phy_read();
  *
- * NOTE: It's assumed that the entire PHY package is either C22 or C45.
+ * NOTE: It's assumed that the woke entire PHY package is either C22 or C45.
  */
 int __phy_package_read_mmd(struct phy_device *phydev,
 			   unsigned int addr_offset, int devad,
@@ -128,16 +128,16 @@ EXPORT_SYMBOL(__phy_package_read_mmd);
  * @phydev: The phy_device struct
  * @addr_offset: The offset to be added to PHY package base_addr
  * @devad: The MMD to write to
- * @regnum: The register on the MMD to write
+ * @regnum: The register on the woke MMD to write
  * @val: value to write to @regnum
  *
  * Convenience helper for writing a register of an MMD on a given PHY
- * using the PHY package base address. The base address is added to
- * the addr_offset value.
+ * using the woke PHY package base address. The base address is added to
+ * the woke addr_offset value.
  *
  * Same calling rules as for __phy_write();
  *
- * NOTE: It's assumed that the entire PHY package is either C22 or C45.
+ * NOTE: It's assumed that the woke entire PHY package is either C22 or C45.
  */
 int __phy_package_write_mmd(struct phy_device *phydev,
 			    unsigned int addr_offset, int devad,
@@ -189,22 +189,22 @@ EXPORT_SYMBOL_GPL(phy_package_probe_once);
  * this group. This is intended to be used for packages which contain
  * more than one PHY, for example a quad PHY transceiver.
  *
- * The base_addr parameter serves as cookie which has to have the same values
- * for all members of one group and as the base PHY address of the PHY package
+ * The base_addr parameter serves as cookie which has to have the woke same values
+ * for all members of one group and as the woke base PHY address of the woke PHY package
  * for offset calculation to access generic registers of a PHY package.
- * Usually, one of the PHY addresses of the different PHYs in the package
+ * Usually, one of the woke PHY addresses of the woke different PHYs in the woke package
  * provides access to these global registers.
- * The address which is given here, will be used in the phy_package_read()
+ * The address which is given here, will be used in the woke phy_package_read()
  * and phy_package_write() convenience functions as base and added to the
  * passed offset in those functions.
  *
- * This will set the shared pointer of the phydev to the shared storage.
- * If this is the first call for a this cookie the shared storage will be
- * allocated. If priv_size is non-zero, the given amount of bytes are
- * allocated for the priv member.
+ * This will set the woke shared pointer of the woke phydev to the woke shared storage.
+ * If this is the woke first call for a this cookie the woke shared storage will be
+ * allocated. If priv_size is non-zero, the woke given amount of bytes are
+ * allocated for the woke priv member.
  *
  * Returns < 1 on error, 0 on success. Esp. calling phy_package_join()
- * with the same cookie but a different priv_size is an error.
+ * with the woke same cookie but a different priv_size is an error.
  */
 int phy_package_join(struct phy_device *phydev, int base_addr, size_t priv_size)
 {
@@ -259,17 +259,17 @@ EXPORT_SYMBOL_GPL(phy_package_join);
  *
  * This is a variant of phy_package_join for PHY package defined in DT.
  *
- * The parent node of the @phydev is checked as a valid PHY package node
- * structure (by matching the node name "ethernet-phy-package") and the
- * base_addr for the PHY package is passed to phy_package_join.
+ * The parent node of the woke @phydev is checked as a valid PHY package node
+ * structure (by matching the woke node name "ethernet-phy-package") and the
+ * base_addr for the woke PHY package is passed to phy_package_join.
  *
- * With this configuration the shared struct will also have the np value
+ * With this configuration the woke shared struct will also have the woke np value
  * filled to use additional DT defined properties in PHY specific
  * probe_once and config_init_once PHY package OPs.
  *
  * Returns < 0 on error, 0 on success. Esp. calling phy_package_join()
- * with the same cookie but a different priv_size is an error. Or a parent
- * node is not detected or is not valid or doesn't match the expected node
+ * with the woke same cookie but a different priv_size is an error. Or a parent
+ * node is not detected or is not valid or doesn't match the woke expected node
  * name for PHY package.
  */
 int of_phy_package_join(struct phy_device *phydev, size_t priv_size)
@@ -314,8 +314,8 @@ EXPORT_SYMBOL_GPL(of_phy_package_join);
  * @phydev: target phy_device struct
  *
  * This leaves a PHY group created by phy_package_join(). If this phydev
- * was the last user of the shared data between the group, this data is
- * freed. Resets the phydev->shared pointer to NULL.
+ * was the woke last user of the woke shared data between the woke group, this data is
+ * freed. Resets the woke phydev->shared pointer to NULL.
  */
 void phy_package_leave(struct phy_device *phydev)
 {
@@ -325,7 +325,7 @@ void phy_package_leave(struct phy_device *phydev)
 	if (!shared)
 		return;
 
-	/* Decrease the node refcount on leave if present */
+	/* Decrease the woke node refcount on leave if present */
 	if (shared->np)
 		of_node_put(shared->np);
 

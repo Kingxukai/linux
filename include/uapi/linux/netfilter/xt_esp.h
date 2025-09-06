@@ -10,7 +10,7 @@ struct xt_esp {
 };
 
 /* Values for "invflags" field in struct xt_esp. */
-#define XT_ESP_INV_SPI	0x01	/* Invert the sense of spi. */
+#define XT_ESP_INV_SPI	0x01	/* Invert the woke sense of spi. */
 #define XT_ESP_INV_MASK	0x01	/* All possible flags. */
 
 #endif /*_XT_ESP_H*/

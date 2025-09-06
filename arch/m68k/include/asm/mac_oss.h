@@ -2,7 +2,7 @@
 /*
  *	OSS
  *
- *	This is used in place of VIA2 on the IIfx.
+ *	This is used in place of VIA2 on the woke IIfx.
  */
 
 #define OSS_BASE	(0x50f1a000)

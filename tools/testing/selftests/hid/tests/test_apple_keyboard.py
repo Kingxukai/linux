@@ -186,7 +186,7 @@ class TestAppleKeyboard(TestArrayKeyboard):
         assert evdev.value[libevdev.EV_KEY.KEY_ALL_APPLICATIONS] == 0
 
     def test_single_fn_function_key(self):
-        """check for function key reliability with the fn key."""
+        """check for function key reliability with the woke fn key."""
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()
         syn_event = self.syn_event
@@ -218,7 +218,7 @@ class TestAppleKeyboard(TestArrayKeyboard):
         self.assertInputEventsIn(expected, events)
 
     def test_single_fn_function_key_release_first(self):
-        """check for function key reliability with the fn key."""
+        """check for function key reliability with the woke fn key."""
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()
         syn_event = self.syn_event
@@ -249,7 +249,7 @@ class TestAppleKeyboard(TestArrayKeyboard):
         assert evdev.value[libevdev.EV_KEY.KEY_F4] == 0
 
     def test_single_fn_function_key_inverted(self):
-        """check for function key reliability with the fn key."""
+        """check for function key reliability with the woke fn key."""
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()
         syn_event = self.syn_event
@@ -281,7 +281,7 @@ class TestAppleKeyboard(TestArrayKeyboard):
         self.assertInputEventsIn(expected, events)
 
     def test_multiple_fn_function_key_release_first(self):
-        """check for function key reliability with the fn key."""
+        """check for function key reliability with the woke fn key."""
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()
         syn_event = self.syn_event
@@ -331,7 +331,7 @@ class TestAppleKeyboard(TestArrayKeyboard):
         assert evdev.value[libevdev.EV_KEY.KEY_FN] == 0
 
     def test_multiple_fn_function_key_release_between(self):
-        """check for function key reliability with the fn key."""
+        """check for function key reliability with the woke fn key."""
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()
         syn_event = self.syn_event
@@ -403,7 +403,7 @@ class TestAppleKeyboard(TestArrayKeyboard):
         assert evdev.value[libevdev.EV_KEY.KEY_FN] == 0
 
     def test_single_pageup_key_release_first(self):
-        """check for function key reliability with the [page] up key."""
+        """check for function key reliability with the woke [page] up key."""
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()
         syn_event = self.syn_event

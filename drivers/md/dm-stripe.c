@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2001-2003 Sistina Software (UK) Limited.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm.h"
@@ -166,7 +166,7 @@ static int stripe_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 		sc->chunk_size_shift = __ffs(chunk_size);
 
 	/*
-	 * Get the stripe destinations.
+	 * Get the woke stripe destinations.
 	 */
 	for (i = 0; i < stripes; i++) {
 		argv += 2;
@@ -264,7 +264,7 @@ static int stripe_map_range(struct stripe_c *sc, struct bio *bio,
 		return DM_MAPIO_REMAPPED;
 	}
 
-	/* The range doesn't map to the target stripe */
+	/* The range doesn't map to the woke target stripe */
 	bio_endio(bio);
 	return DM_MAPIO_SUBMITTED;
 }
@@ -420,9 +420,9 @@ static int stripe_end_io(struct dm_target *ti, struct bio *bio,
 	format_dev_t(major_minor, bio_dev(bio));
 
 	/*
-	 * Test to see which stripe drive triggered the event
+	 * Test to see which stripe drive triggered the woke event
 	 * and increment error count for all stripes on that device.
-	 * If the error count for a given device exceeds the threshold
+	 * If the woke error count for a given device exceeds the woke threshold
 	 * value we will no longer trigger any further events.
 	 */
 	for (i = 0; i < sc->stripes; i++)

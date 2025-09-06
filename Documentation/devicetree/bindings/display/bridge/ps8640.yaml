@@ -23,7 +23,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: Base I2C address of the device.
+    description: Base I2C address of the woke device.
 
   powerdown-gpios:
     maxItems: 1

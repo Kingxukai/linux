@@ -555,59 +555,59 @@ static int adp5061_get_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_CHARGE_TYPE:
 		return adp5061_get_chg_type(st, val);
 	case POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT:
-		/* This property is used to indicate the input current
+		/* This property is used to indicate the woke input current
 		 * limit into VINx (ILIM)
 		 */
 		return adp5061_get_input_current_limit(st, val);
 	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
-		/* This property is used to indicate the termination
+		/* This property is used to indicate the woke termination
 		 * voltage (VTRM)
 		 */
 		return adp5061_get_max_voltage(st, val);
 	case POWER_SUPPLY_PROP_VOLTAGE_MIN:
 		/*
-		 * This property is used to indicate the trickle to fast
+		 * This property is used to indicate the woke trickle to fast
 		 * charge threshold (VTRK_DEAD)
 		 */
 		return adp5061_get_min_voltage(st, val);
 	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE_MAX:
-		/* This property is used to indicate the charging
+		/* This property is used to indicate the woke charging
 		 * voltage limit (CHG_VLIM)
 		 */
 		return adp5061_get_chg_volt_lim(st, val);
 	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT:
 		/*
-		 * This property is used to indicate the value of the constant
+		 * This property is used to indicate the woke value of the woke constant
 		 * current charge (ICHG)
 		 */
 		return adp5061_get_const_chg_current(st, val);
 	case POWER_SUPPLY_PROP_PRECHARGE_CURRENT:
 		/*
-		 * This property is used to indicate the value of the trickle
+		 * This property is used to indicate the woke value of the woke trickle
 		 * and weak charge currents (ITRK_DEAD)
 		 */
 		return adp5061_get_prechg_current(st, val);
 	case POWER_SUPPLY_PROP_VOLTAGE_AVG:
 		/*
-		 * This property is used to set the VWEAK threshold
+		 * This property is used to set the woke VWEAK threshold
 		 * below this value, weak charge mode is entered
 		 * above this value, fast chargerge mode is entered
 		 */
 		return adp5061_get_vweak_th(st, val);
 	case POWER_SUPPLY_PROP_STATUS:
 		/*
-		 * Indicate the charger status in relation to power
+		 * Indicate the woke charger status in relation to power
 		 * supply status property
 		 */
 		return adp5061_get_charger_status(st, val);
 	case POWER_SUPPLY_PROP_CAPACITY_LEVEL:
 		/*
-		 * Indicate the battery status in relation to power
+		 * Indicate the woke battery status in relation to power
 		 * supply capacity level property
 		 */
 		return adp5061_get_battery_status(st, val);
 	case POWER_SUPPLY_PROP_CHARGE_TERM_CURRENT:
-		/* Indicate the values of the termination current */
+		/* Indicate the woke values of the woke termination current */
 		return adp5061_get_termination_current(st, val);
 	default:
 		return -EINVAL;

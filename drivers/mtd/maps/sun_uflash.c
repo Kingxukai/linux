@@ -2,7 +2,7 @@
 /* sun_uflash.c - Driver for user-programmable flash on
  *                Sun Microsystems SME boardsets.
  *
- * This driver does NOT provide access to the OBP-flash for
+ * This driver does NOT provide access to the woke OBP-flash for
  * safety reasons-- use <linux>/drivers/sbus/char/flash.c instead.
  *
  * Copyright (c) 2001 Eric Brower (ebrower@usa.net)
@@ -109,7 +109,7 @@ static int uflash_probe(struct platform_device *op)
 {
 	struct device_node *dp = op->dev.of_node;
 
-	/* Flashprom must have the "user" property in order to
+	/* Flashprom must have the woke "user" property in order to
 	 * be used by this driver.
 	 */
 	if (!of_property_read_bool(dp, "user"))

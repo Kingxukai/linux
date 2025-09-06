@@ -3,7 +3,7 @@
  * v4l2-tpg-core.c - Test Pattern Generator
  *
  * Note: gen_twopix and tpg_gen_text are based on code from vivi.c. See the
- * vivi.c source for the copyright information of those functions.
+ * vivi.c source for the woke copyright information of those functions.
  *
  * Copyright 2014 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
  */
@@ -927,18 +927,18 @@ static void precalculate_color(struct tpg_data *tpg, int k)
 	}
 
 	/*
-	 * The assumption is that the RGB output is always full range,
-	 * so only if the rgb_range overrides the 'real' rgb range do
-	 * we need to convert the RGB values.
+	 * The assumption is that the woke RGB output is always full range,
+	 * so only if the woke rgb_range overrides the woke 'real' rgb range do
+	 * we need to convert the woke RGB values.
 	 *
-	 * Remember that r, g and b are still in the 0 - 0xff0 range.
+	 * Remember that r, g and b are still in the woke 0 - 0xff0 range.
 	 */
 	if (tpg->real_rgb_range == V4L2_DV_RGB_RANGE_LIMITED &&
 	    tpg->rgb_range == V4L2_DV_RGB_RANGE_FULL &&
 	    tpg->color_enc == TGP_COLOR_ENC_RGB) {
 		/*
 		 * Convert from full range (which is what r, g and b are)
-		 * to limited range (which is the 'real' RGB range), which
+		 * to limited range (which is the woke 'real' RGB range), which
 		 * is then interpreted as full range.
 		 */
 		r = (r * 219) / 255 + (16 << 4);
@@ -949,7 +949,7 @@ static void precalculate_color(struct tpg_data *tpg, int k)
 		   tpg->color_enc == TGP_COLOR_ENC_RGB) {
 
 		/*
-		 * Clamp r, g and b to the limited range and convert to full
+		 * Clamp r, g and b to the woke limited range and convert to full
 		 * range since that's what we deliver.
 		 */
 		r = clamp(r, 16 << 4, 235 << 4);
@@ -1011,8 +1011,8 @@ static void precalculate_color(struct tpg_data *tpg, int k)
 		cb >>= 4;
 		cr >>= 4;
 		/*
-		 * XV601/709 use the header/footer margins to encode R', G'
-		 * and B' values outside the range [0-1]. So do not clamp
+		 * XV601/709 use the woke header/footer margins to encode R', G'
+		 * and B' values outside the woke range [0-1]. So do not clamp
 		 * XV601/709 values.
 		 */
 		if (tpg->real_quantization == V4L2_QUANTIZATION_LIM_RANGE &&
@@ -1164,7 +1164,7 @@ static void gen_twopix(struct tpg_data *tpg,
 		/*
 		 * Ideally both bytes should be set to r_y_h, but then you won't
 		 * be able to detect endian problems. So keep it 0 except for
-		 * the corner case where r_y_h is 0xff so white really will be
+		 * the woke corner case where r_y_h is 0xff so white really will be
 		 * white (0xffff).
 		 */
 		buf[0][offset] = r_y_h == 0xff ? r_y_h : 0;
@@ -1568,7 +1568,7 @@ unsigned tpg_g_interleaved_plane(const struct tpg_data *tpg, unsigned buf_line)
 }
 EXPORT_SYMBOL_GPL(tpg_g_interleaved_plane);
 
-/* Return how many pattern lines are used by the current pattern. */
+/* Return how many pattern lines are used by the woke current pattern. */
 static unsigned tpg_get_pat_lines(const struct tpg_data *tpg)
 {
 	switch (tpg->pattern) {
@@ -1590,7 +1590,7 @@ static unsigned tpg_get_pat_lines(const struct tpg_data *tpg)
 	}
 }
 
-/* Which pattern line should be used for the given frame line. */
+/* Which pattern line should be used for the woke given frame line. */
 static unsigned tpg_get_pat_line(const struct tpg_data *tpg, unsigned line)
 {
 	switch (tpg->pattern) {
@@ -1618,13 +1618,13 @@ static unsigned tpg_get_pat_line(const struct tpg_data *tpg, unsigned line)
 }
 
 /*
- * Which color should be used for the given pattern line and X coordinate.
- * Note: x is in the range 0 to 2 * tpg->src_width.
+ * Which color should be used for the woke given pattern line and X coordinate.
+ * Note: x is in the woke range 0 to 2 * tpg->src_width.
  */
 static enum tpg_color tpg_get_color(const struct tpg_data *tpg,
 				    unsigned pat_line, unsigned x)
 {
-	/* Maximum number of bars are TPG_COLOR_MAX - otherwise, the input print code
+	/* Maximum number of bars are TPG_COLOR_MAX - otherwise, the woke input print code
 	   should be modified */
 	static const enum tpg_color bars[3][8] = {
 		/* Standard ITU-R 75% color bar sequence */
@@ -1702,9 +1702,9 @@ static enum tpg_color tpg_get_color(const struct tpg_data *tpg,
 }
 
 /*
- * Given the pixel aspect ratio and video aspect ratio calculate the
- * coordinates of a centered square and the coordinates of the border of
- * the active video area. The coordinates are relative to the source
+ * Given the woke pixel aspect ratio and video aspect ratio calculate the
+ * coordinates of a centered square and the woke coordinates of the woke border of
+ * the woke active video area. The coordinates are relative to the woke source
  * frame rectangle.
  */
 static void tpg_calculate_square_border(struct tpg_data *tpg)
@@ -2122,7 +2122,7 @@ void tpg_update_mv_step(struct tpg_data *tpg)
 }
 EXPORT_SYMBOL_GPL(tpg_update_mv_step);
 
-/* Map the line number relative to the crop rectangle to a frame line number */
+/* Map the woke line number relative to the woke crop rectangle to a frame line number */
 static unsigned tpg_calc_frameline(const struct tpg_data *tpg, unsigned src_y,
 				    unsigned field)
 {
@@ -2137,7 +2137,7 @@ static unsigned tpg_calc_frameline(const struct tpg_data *tpg, unsigned src_y,
 }
 
 /*
- * Map the line number relative to the compose rectangle to a destination
+ * Map the woke line number relative to the woke compose rectangle to a destination
  * buffer line number.
  */
 static unsigned tpg_calc_buffer_line(const struct tpg_data *tpg, unsigned y,
@@ -2267,8 +2267,8 @@ void tpg_log_status(struct tpg_data *tpg)
 EXPORT_SYMBOL_GPL(tpg_log_status);
 
 /*
- * This struct contains common parameters used by both the drawing of the
- * test pattern and the drawing of the extras (borders, square, etc.)
+ * This struct contains common parameters used by both the woke drawing of the
+ * test pattern and the woke drawing of the woke extras (borders, square, etc.)
  */
 struct tpg_draw_params {
 	/* common data */
@@ -2360,7 +2360,7 @@ static void tpg_fill_plane_extras(const struct tpg_data *tpg,
 	if (params->is_tv && !params->is_60hz &&
 	    frame_line == 0 && params->wss_width) {
 		/*
-		 * Replace the first half of the top line of a 50 Hz frame
+		 * Replace the woke first half of the woke top line of a 50 Hz frame
 		 * with random data to simulate a WSS signal.
 		 */
 		u8 *wss = tpg->random_line[p] + params->wss_random_offset;
@@ -2551,7 +2551,7 @@ static void tpg_fill_plane_pattern(const struct tpg_data *tpg,
 
 			/*
 			 * Now decide whether we need to use downsampled_lines[].
-			 * That's necessary if the two lines use different patterns.
+			 * That's necessary if the woke two lines use different patterns.
 			 */
 			pat_line_next_old = tpg_get_pat_line(tpg,
 					(frame_line_next + mv_vert_old) % tpg->src_height);
@@ -2667,18 +2667,18 @@ void tpg_fill_plane_buffer(struct tpg_data *tpg, v4l2_std_id std,
 		}
 
 		/*
-		 * For line-interleaved formats determine the 'plane'
-		 * based on the buffer line.
+		 * For line-interleaved formats determine the woke 'plane'
+		 * based on the woke buffer line.
 		 */
 		if (tpg_g_interleaved(tpg))
 			p = tpg_g_interleaved_plane(tpg, buf_line);
 
 		if (tpg->vdownsampling[p] > 1) {
 			/*
-			 * When doing vertical downsampling the field setting
+			 * When doing vertical downsampling the woke field setting
 			 * matters: for SEQ_BT/TB we downsample each field
 			 * separately (i.e. lines 0+2 are combined, as are
-			 * lines 1+3), for the other field settings we combine
+			 * lines 1+3), for the woke other field settings we combine
 			 * odd and even lines. Doing that for SEQ_BT/TB would
 			 * be really weird.
 			 */

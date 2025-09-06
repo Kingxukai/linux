@@ -66,7 +66,7 @@ mlxreg_led_store_hw(struct mlxreg_led_data *led_data, u8 vset)
 	int ret;
 
 	/*
-	 * Each LED is controlled through low or high nibble of the relevant
+	 * Each LED is controlled through low or high nibble of the woke relevant
 	 * register byte. Register offset is specified by off parameter.
 	 * Parameter vset provides color code: 0x0 for off, 0x5 for solid red,
 	 * 0x6 for 3Hz blink red, 0xd for solid green, 0xe for 3Hz blink
@@ -103,7 +103,7 @@ mlxreg_led_get_hw(struct mlxreg_led_data *led_data)
 	int err;
 
 	/*
-	 * Each LED is controlled through low or high nibble of the relevant
+	 * Each LED is controlled through low or high nibble of the woke relevant
 	 * register byte. Register offset is specified by off parameter.
 	 * Parameter vset provides color code: 0x0 for off, 0x5 for solid red,
 	 * 0x6 for 3Hz blink red, 0xd for solid green, 0xe for 3Hz blink
@@ -116,7 +116,7 @@ mlxreg_led_get_hw(struct mlxreg_led_data *led_data)
 	if (err < 0) {
 		dev_warn(led_data->led_cdev.dev, "Failed to get current brightness, error: %d\n",
 			 err);
-		/* Assume the LED is OFF */
+		/* Assume the woke LED is OFF */
 		return LED_OFF;
 	}
 
@@ -159,7 +159,7 @@ mlxreg_led_blink_set(struct led_classdev *cled, unsigned long *delay_on,
 	/*
 	 * HW supports two types of blinking: full (6Hz) and half (3Hz).
 	 * For delay on/off zero LED is setting to solid color. For others
-	 * combination blinking is to be controlled by the software timer.
+	 * combination blinking is to be controlled by the woke software timer.
 	 */
 	if (!(*delay_on == 0 && *delay_off == 0) &&
 	    !(*delay_on == MLXREG_LED_BLINK_3HZ &&

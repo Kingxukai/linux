@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Support for Variscite MX6 Concerto Carrier board with the VAR-SOM-MX6UL
+ * Support for Variscite MX6 Concerto Carrier board with the woke VAR-SOM-MX6UL
  * Variscite SoM mounted on it
  *
  * Copyright 2019 Variscite Ltd.
@@ -93,7 +93,7 @@
 	rtc@68 {
 		/*
 		 * To actually use this interrupt
-		 * connect pins J14.8 & J14.10 on the Concerto-Board.
+		 * connect pins J14.8 & J14.10 on the woke Concerto-Board.
 		 */
 		compatible = "dallas,ds1337";
 		reg = <0x68>;
@@ -314,7 +314,7 @@
 	pinctrl-0 = <&pinctrl_wdog>;
 	/*
 	 * To actually use ext-reset-output
-	 * connect pins J17.3 & J17.8 on the Concerto-Board
+	 * connect pins J17.3 & J17.8 on the woke Concerto-Board
 	 */
 	fsl,ext-reset-output;
 };

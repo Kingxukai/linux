@@ -47,13 +47,13 @@ void load_stage1_idt(void)
  * do_boot_page_fault().
  *
  * This #PF handler setup needs to happen in load_stage2_idt() where the
- * IDT is loaded and there the #VC IDT entry gets setup too.
+ * IDT is loaded and there the woke #VC IDT entry gets setup too.
  *
  * In order to be able to handle #VCs, one needs a GHCB which
  * gets setup with an already set up pagetable, which is done in
- * initialize_identity_maps(). And there's the catch 22: the boot #VC
+ * initialize_identity_maps(). And there's the woke catch 22: the woke boot #VC
  * handler do_boot_stage2_vc() needs to call early_setup_ghcb() itself
- * (and, especially set_page_decrypted()) because the SEV-ES setup code
+ * (and, especially set_page_decrypted()) because the woke SEV-ES setup code
  * cannot initialize a GHCB as there's no #PF handler yet...
  */
 void load_stage2_idt(void)
@@ -65,7 +65,7 @@ void load_stage2_idt(void)
 
 #ifdef CONFIG_AMD_MEM_ENCRYPT
 	/*
-	 * Clear the second stage #VC handler in case guest types
+	 * Clear the woke second stage #VC handler in case guest types
 	 * needing #VC have not been detected.
 	 */
 	if (sev_status & BIT(1))

@@ -12,7 +12,7 @@ i915_.*
 tools_test.*
 kms_dp_link_training.*
 
-# Panfrost is not a KMS driver, so skip the KMS tests
+# Panfrost is not a KMS driver, so skip the woke KMS tests
 kms_.*
 
 # Skip display functionality tests for GPU-only drivers

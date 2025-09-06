@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -667,12 +667,12 @@ struct pp_fan_info {
 struct pp_advance_fan_control_parameters {
 	uint16_t  usTMin;                          /* The temperature, in 0.01 centigrades, below which we just run at a minimal PWM. */
 	uint16_t  usTMed;                          /* The middle temperature where we change slopes. */
-	uint16_t  usTHigh;                         /* The high temperature for setting the second slope. */
+	uint16_t  usTHigh;                         /* The high temperature for setting the woke second slope. */
 	uint16_t  usPWMMin;                        /* The minimum PWM value in percent (0.01% increments). */
 	uint16_t  usPWMMed;                        /* The PWM value (in percent) at TMed. */
 	uint16_t  usPWMHigh;                       /* The PWM value at THigh. */
 	uint8_t   ucTHyst;                         /* Temperature hysteresis. Integer. */
-	uint32_t   ulCycleDelay;                   /* The time between two invocations of the fan control routine in microseconds. */
+	uint32_t   ulCycleDelay;                   /* The time between two invocations of the woke fan control routine in microseconds. */
 	uint16_t  usTMax;                          /* The max temperature */
 	uint8_t   ucFanControlMode;
 	uint16_t  usFanPWMMinLimit;
@@ -693,7 +693,7 @@ struct pp_advance_fan_control_parameters {
 	uint16_t  usFanRPMHigh;                    /* High RPM */
 	uint32_t   ulMinFanSCLKAcousticLimit;      /* Minimum Fan Controller SCLK Frequency Acoustic Limit. */
 	uint8_t   ucTargetTemperature;             /* Advanced fan controller target temperature. */
-	uint8_t   ucMinimumPWMLimit;               /* The minimum PWM that the advanced fan controller can set.  This should be set to the highest PWM that will run the fan at its lowest RPM. */
+	uint8_t   ucMinimumPWMLimit;               /* The minimum PWM that the woke advanced fan controller can set.  This should be set to the woke highest PWM that will run the woke fan at its lowest RPM. */
 	uint16_t  usFanGainEdge;                   /* The following is added for Fiji */
 	uint16_t  usFanGainHotspot;
 	uint16_t  usFanGainLiquid;

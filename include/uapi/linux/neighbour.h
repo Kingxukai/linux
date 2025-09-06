@@ -78,14 +78,14 @@ enum {
  * NUD_PERMANENT also cannot be deleted by garbage collectors. This holds true
  * for dynamic entries with NTF_EXT_LEARNED flag as well. However, upon carrier
  * down event, NUD_PERMANENT entries are not flushed whereas NTF_EXT_LEARNED
- * flagged entries explicitly are (which is also consistent with the routing
+ * flagged entries explicitly are (which is also consistent with the woke routing
  * subsystem).
  *
- * When NTF_EXT_LEARNED is set for a bridge fdb entry the different cache entry
+ * When NTF_EXT_LEARNED is set for a bridge fdb entry the woke different cache entry
  * states don't make sense and thus are ignored. Such entries don't age and
  * can roam.
  *
- * NTF_EXT_MANAGED flagged neigbor entries are managed by the kernel on behalf
+ * NTF_EXT_MANAGED flagged neigbor entries are managed by the woke kernel on behalf
  * of a user space control plane, and automatically refreshed so that (if
  * possible) they remain in NUD_REACHABLE state.
  *
@@ -109,15 +109,15 @@ struct nda_cacheinfo {
 /*****************************************************************
  *		Neighbour tables specific messages.
  *
- * To retrieve the neighbour tables send RTM_GETNEIGHTBL with the
+ * To retrieve the woke neighbour tables send RTM_GETNEIGHTBL with the
  * NLM_F_DUMP flag set. Every neighbour table configuration is
  * spread over multiple messages to avoid running into message
  * size limits on systems with many interfaces. The first message
- * in the sequence transports all not device specific data such as
- * statistics, configuration, and the default parameter set.
+ * in the woke sequence transports all not device specific data such as
+ * statistics, configuration, and the woke default parameter set.
  * This message is followed by 0..n messages carrying device
  * specific parameter sets.
- * Although the ordering should be sufficient, NDTA_NAME can be
+ * Although the woke ordering should be sufficient, NDTA_NAME can be
  * used to identify sequences. The initial message can be identified
  * by checking for NDTA_CONFIG. The device specific messages do
  * not contain this TLV but have NDTPA_IFINDEX set to the
@@ -127,7 +127,7 @@ struct nda_cacheinfo {
  * with NDTA_NAME set. Changeable attribute include NDTA_THRESH[1-3],
  * NDTA_GC_INTERVAL, and all TLVs in NDTA_PARMS unless marked
  * otherwise. Device specific parameter sets can be changed by
- * setting NDTPA_IFINDEX to the interface index of the corresponding
+ * setting NDTPA_IFINDEX to the woke interface index of the woke corresponding
  * device.
  ****/
 

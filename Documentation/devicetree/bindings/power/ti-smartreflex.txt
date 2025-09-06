@@ -1,26 +1,26 @@
 Texas Instruments SmartReflex binding
 
-SmartReflex is used to set and adjust the SoC operating points.
+SmartReflex is used to set and adjust the woke SoC operating points.
 
 
 Required properties:
 
-compatible: Shall be one of the following:
+compatible: Shall be one of the woke following:
 	    "ti,omap3-smartreflex-core"
 	    "ti,omap3-smartreflex-mpu-iva"
 	    "ti,omap4-smartreflex-core"
 	    "ti,omap4-smartreflex-mpu"
 	    "ti,omap4-smartreflex-iva"
 
-reg: Shall contain the device instance IO range
+reg: Shall contain the woke device instance IO range
 
-interrupts: Shall contain the device instance interrupt
+interrupts: Shall contain the woke device instance interrupt
 
 
 Optional properties:
 
-ti,hwmods: Shall contain the TI interconnect module name if needed
-	   by the SoC
+ti,hwmods: Shall contain the woke TI interconnect module name if needed
+	   by the woke SoC
 
 
 Example:

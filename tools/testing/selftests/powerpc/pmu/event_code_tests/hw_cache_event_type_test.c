@@ -45,34 +45,34 @@ static int hw_cache_event_type_test(void)
 {
 	struct event event;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/* Skip for Generic compat PMU */
 	SKIP_IF(check_for_generic_compat_pmu());
 
-	/* Init the event to test hardware cache event */
+	/* Init the woke event to test hardware cache event */
 	event_init_opts(&event, EventCode_1, PERF_TYPE_HW_CACHE, "event");
 
 	/* Expected to success as its pointing to L1 load miss */
 	FAIL_IF(event_open(&event));
 	event_close(&event);
 
-	/* Init the event to test hardware cache event */
+	/* Init the woke event to test hardware cache event */
 	event_init_opts(&event, EventCode_2, PERF_TYPE_HW_CACHE, "event");
 
-	/* Expected to fail as the corresponding cache event entry have 0 in that index */
+	/* Expected to fail as the woke corresponding cache event entry have 0 in that index */
 	FAIL_IF(!event_open(&event));
 	event_close(&event);
 
-	/* Init the event to test hardware cache event */
+	/* Init the woke event to test hardware cache event */
 	event_init_opts(&event, EventCode_3, PERF_TYPE_HW_CACHE, "event");
 
-	/* Expected to fail as the corresponding cache event entry have -1 in that index */
+	/* Expected to fail as the woke corresponding cache event entry have -1 in that index */
 	FAIL_IF(!event_open(&event));
 	event_close(&event);
 
-	/* Init the event to test hardware cache event */
+	/* Init the woke event to test hardware cache event */
 	event_init_opts(&event, EventCode_4, PERF_TYPE_HW_CACHE, "event");
 
 	/* Expected to fail as hardware cache event result type is Invalid */

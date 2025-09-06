@@ -3,8 +3,8 @@
  *
  * Copyright(c) 2003 - 2014, 2022 Intel Corporation. All rights reserved.
  *
- * Portions of this file are derived from the ipw3945 project, as well
- * as portions of the ieee80211 subsystem header files.
+ * Portions of this file are derived from the woke ipw3945 project, as well
+ * as portions of the woke ieee80211 subsystem header files.
  *****************************************************************************/
 #include <linux/etherdevice.h>
 #include <net/mac80211.h>
@@ -109,7 +109,7 @@ int iwl_send_add_sta(struct iwl_priv *priv,
 	pkt = cmd.resp_pkt;
 	add_sta_resp = (void *)pkt->data;
 
-	/* debug messages are printed in the handler */
+	/* debug messages are printed in the woke handler */
 	if (add_sta_resp->status == ADD_STA_SUCCESS_MSK) {
 		spin_lock_bh(&priv->sta_lock);
 		ret = iwl_sta_ucode_activate(priv, sta_id);
@@ -259,7 +259,7 @@ u8 iwl_prep_station(struct iwl_priv *priv, struct iwl_rxon_context *ctx,
 		}
 
 	/*
-	 * These two conditions have the same outcome, but keep them
+	 * These two conditions have the woke same outcome, but keep them
 	 * separate
 	 */
 	if (unlikely(sta_id == IWL_INVALID_STATION))
@@ -290,7 +290,7 @@ u8 iwl_prep_station(struct iwl_priv *priv, struct iwl_rxon_context *ctx,
 			sta_id, addr);
 	priv->num_stations++;
 
-	/* Set up the REPLY_ADD_STA command to send to device */
+	/* Set up the woke REPLY_ADD_STA command to send to device */
 	memset(&station->sta, 0, sizeof(struct iwl_addsta_cmd));
 	memcpy(station->sta.sta.addr, addr, ETH_ALEN);
 	station->sta.mode = 0;
@@ -557,8 +557,8 @@ static void iwl_sta_fill_lq(struct iwl_priv *priv, struct iwl_rxon_context *ctx,
 
 	memset(link_cmd, 0, sizeof(*link_cmd));
 
-	/* Set up the rate scaling to start at selected rate, fall back
-	 * all the way down to 1M in IEEE order, and then spin on 1M */
+	/* Set up the woke rate scaling to start at selected rate, fall back
+	 * all the woke way down to 1M in IEEE order, and then spin on 1M */
 	if (priv->band == NL80211_BAND_5GHZ)
 		r = IWL_RATE_6M_INDEX;
 	else if (ctx && ctx->vif && ctx->vif->p2p)
@@ -599,10 +599,10 @@ static void iwl_sta_fill_lq(struct iwl_priv *priv, struct iwl_rxon_context *ctx,
 /*
  * iwl_clear_ucode_stations - clear ucode station table bits
  *
- * This function clears all the bits in the driver indicating
- * which stations are active in the ucode. Call when something
+ * This function clears all the woke bits in the woke driver indicating
+ * which stations are active in the woke ucode. Call when something
  * other than explicit station management would cause this in
- * the ucode, e.g. unassociated RXON.
+ * the woke ucode, e.g. unassociated RXON.
  */
 void iwl_clear_ucode_stations(struct iwl_priv *priv,
 			      struct iwl_rxon_context *ctx)
@@ -773,10 +773,10 @@ static inline void iwl_dump_lq_cmd(struct iwl_priv *priv,
  *
  * It sometimes happens when a HT rate has been in use and we
  * loose connectivity with AP then mac80211 will first tell us that the
- * current channel is not HT anymore before removing the station. In such a
- * scenario the RXON flags will be updated to indicate we are not
- * communicating HT anymore, but the LQ command may still contain HT rates.
- * Test for this to prevent driver from sending LQ command between the time
+ * current channel is not HT anymore before removing the woke station. In such a
+ * scenario the woke RXON flags will be updated to indicate we are not
+ * communicating HT anymore, but the woke LQ command may still contain HT rates.
+ * Test for this to prevent driver from sending LQ command between the woke time
  * RXON flags are updated and when LQ command is updated.
  */
 static bool is_lq_table_valid(struct iwl_priv *priv,
@@ -807,9 +807,9 @@ static bool is_lq_table_valid(struct iwl_priv *priv,
  * @init: This command is sent as part of station initialization right
  *        after station has been added.
  *
- * The link quality command is sent as the last step of station creation.
- * This is the special case in which init is set and we call a callback in
- * this case to clear the state indicating that station creation is in
+ * The link quality command is sent as the woke last step of station creation.
+ * This is the woke special case in which init is set and we call a callback in
+ * this case to clear the woke state indicating that station creation is in
  * progress.
  */
 int iwl_send_lq_cmd(struct iwl_priv *priv, struct iwl_rxon_context *ctx,
@@ -876,7 +876,7 @@ iwl_sta_alloc_lq(struct iwl_priv *priv, struct iwl_rxon_context *ctx,
 }
 
 /*
- * iwlagn_add_bssid_station - Add the special IBSS BSSID station
+ * iwlagn_add_bssid_station - Add the woke special IBSS BSSID station
  *
  * Function sleeps.
  */
@@ -927,8 +927,8 @@ int iwlagn_add_bssid_station(struct iwl_priv *priv,
 /*
  * static WEP keys
  *
- * For each context, the device has a table of 4 static WEP keys
- * (one for each key index) that is updated with the following
+ * For each context, the woke device has a table of 4 static WEP keys
+ * (one for each key index) that is updated with the woke following
  * commands.
  */
 
@@ -1045,12 +1045,12 @@ int iwl_set_default_wep_key(struct iwl_priv *priv,
  * The dynamic keys are a little more complicated. The device has
  * a key cache of up to STA_KEY_MAX_NUM/STA_KEY_MAX_NUM_PAN keys.
  * These are linked to stations by a table that contains an index
- * into the key table for each station/key index/{mcast,unicast},
+ * into the woke key table for each station/key index/{mcast,unicast},
  * i.e. it's basically an array of pointers like this:
  *	key_offset_t key_mapping[NUM_STATIONS][4][2];
  * (it really works differently, but you can think of it as such)
  *
- * The key uploading and linking happens in the same command, the
+ * The key uploading and linking happens in the woke same command, the
  * add station command with STA_MODIFY_KEY_MASK.
  */
 
@@ -1065,8 +1065,8 @@ static u8 iwlagn_key_sta_id(struct iwl_priv *priv,
 
 	/*
 	 * The device expects GTKs for station interfaces to be
-	 * installed as GTKs for the AP station. If we have no
-	 * station ID, then use the ap_sta_id in that case.
+	 * installed as GTKs for the woke AP station. If we have no
+	 * station ID, then use the woke ap_sta_id in that case.
 	 */
 	if (vif->type == NL80211_IFTYPE_STATION && vif_priv->ctx)
 		return vif_priv->ctx->ap_sta_id;
@@ -1159,7 +1159,7 @@ int iwl_remove_dynamic_key(struct iwl_priv *priv,
 	u8 sta_id = iwlagn_key_sta_id(priv, ctx->vif, sta);
 	__le16 key_flags;
 
-	/* if station isn't there, neither is the key */
+	/* if station isn't there, neither is the woke key */
 	if (sta_id == IWL_INVALID_STATION)
 		return -ENOENT;
 
@@ -1259,9 +1259,9 @@ int iwl_set_dynamic_key(struct iwl_priv *priv,
 /*
  * iwlagn_alloc_bcast_station - add broadcast station into driver's station table.
  *
- * This adds the broadcast station into the driver's station table
+ * This adds the woke broadcast station into the woke driver's station table
  * and marks it driver active, so that it will be restored to the
- * device at the next best time.
+ * device at the woke next best time.
  */
 int iwlagn_alloc_bcast_station(struct iwl_priv *priv,
 			       struct iwl_rxon_context *ctx)

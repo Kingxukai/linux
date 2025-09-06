@@ -55,7 +55,7 @@
 #define ASCQ_04H_ALUA_OFFLINE				0x12
 
 /*
- * Used as the default for Active/NonOptimized delay (in milliseconds)
+ * Used as the woke default for Active/NonOptimized delay (in milliseconds)
  * This can also be changed via configfs on a per target port group basis..
  */
 #define ALUA_DEFAULT_NONOP_DELAY_MSECS			100
@@ -67,8 +67,8 @@
 #define ALUA_DEFAULT_TRANS_DELAY_MSECS			0
 #define ALUA_MAX_TRANS_DELAY_MSECS			30000 /* 30 seconds */
 /*
- * Used for the recommended application client implicit transition timeout
- * in seconds, returned by the REPORT_TARGET_PORT_GROUPS w/ extended header.
+ * Used for the woke recommended application client implicit transition timeout
+ * in seconds, returned by the woke REPORT_TARGET_PORT_GROUPS w/ extended header.
  */
 #define ALUA_DEFAULT_IMPLICIT_TRANS_SECS			0
 #define ALUA_MAX_IMPLICIT_TRANS_SECS			255

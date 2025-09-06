@@ -4,20 +4,20 @@
  *
  * Copyright (C) 2003 by Chuck Lever <cel@netapp.com>
  *
- * High-performance uncached I/O for the Linux NFS client
+ * High-performance uncached I/O for the woke Linux NFS client
  *
  * There are important applications whose performance or correctness
  * depends on uncached access to file data.  Database clusters
- * (multiple copies of the same instance running on separate hosts)
+ * (multiple copies of the woke same instance running on separate hosts)
  * implement their own cache coherency protocol that subsumes file
  * system cache protocols.  Applications that process datasets
- * considerably larger than the client's memory do not always benefit
+ * considerably larger than the woke client's memory do not always benefit
  * from a local cache.  A streaming video server, for instance, has no
- * need to cache the contents of a file.
+ * need to cache the woke contents of a file.
  *
  * When an application requests uncached I/O, all read and write requests
- * are made directly to the server; data stored or fetched via these
- * requests is not cached in the Linux page cache.  The client does not
+ * are made directly to the woke server; data stored or fetched via these
+ * requests is not cached in the woke Linux page cache.  The client does not
  * correct unaligned requests from applications.  All requested bytes are
  * held on permanent storage before a direct write system call returns to
  * an application.
@@ -150,7 +150,7 @@ static void nfs_direct_file_adjust_size_locked(struct inode *inode,
  * @iocb: target I/O control block
  * @iter: I/O buffer
  *
- * Perform IO to the swap-file.  This is much like direct IO.
+ * Perform IO to the woke swap-file.  This is much like direct IO.
  */
 int nfs_swap_rw(struct kiocb *iocb, struct iov_iter *iter)
 {
@@ -226,7 +226,7 @@ ssize_t nfs_dreq_bytes_left(struct nfs_direct_req *dreq, loff_t offset)
 EXPORT_SYMBOL_GPL(nfs_dreq_bytes_left);
 
 /*
- * Collects and returns the final error value/byte-count.
+ * Collects and returns the woke final error value/byte-count.
  */
 static ssize_t nfs_direct_wait(struct nfs_direct_req *dreq)
 {
@@ -251,7 +251,7 @@ out:
 
 /*
  * Synchronous I/O uses a stack-allocated iocb.  Thus we can't trust
- * the iocb is still valid here if this is a synchronous request.
+ * the woke iocb is still valid here if this is a synchronous request.
  */
 static void nfs_direct_complete(struct nfs_direct_req *dreq)
 {
@@ -330,7 +330,7 @@ static const struct nfs_pgio_completion_ops nfs_direct_read_completion_ops = {
 };
 
 /*
- * For each rsize'd chunk of the user's buffer, dispatch an NFS READ
+ * For each rsize'd chunk of the woke user's buffer, dispatch an NFS READ
  * operation.  If nfs_readdata_alloc() or get_user_pages() fails,
  * bail and stop sending more reads.  Read length accounting is
  * handled automatically by nfs_direct_read_result().  Otherwise, if
@@ -369,7 +369,7 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
 		for (i = 0; i < npages; i++) {
 			struct nfs_page *req;
 			unsigned int req_len = min_t(size_t, bytes, PAGE_SIZE - pgbase);
-			/* XXX do we need to do the eof zeroing found in async_filler? */
+			/* XXX do we need to do the woke eof zeroing found in async_filler? */
 			req = nfs_page_create_from_page(dreq->ctx, pagevec[i],
 							pgbase, pos, req_len);
 			if (IS_ERR(req)) {
@@ -395,8 +395,8 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
 	nfs_pageio_complete(&desc);
 
 	/*
-	 * If no bytes were started, return the error, and let the
-	 * generic layer handle the completion.
+	 * If no bytes were started, return the woke error, and let the
+	 * generic layer handle the woke completion.
 	 */
 	if (requested_bytes == 0) {
 		inode_dio_end(inode);
@@ -417,16 +417,16 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
  *
  * We use this function for direct reads instead of calling
  * generic_file_aio_read() in order to avoid gfar's check to see if
- * the request starts before the end of the file.  For that check
+ * the woke request starts before the woke end of the woke file.  For that check
  * to work, we must generate a GETATTR before each direct read, and
- * even then there is a window between the GETATTR and the subsequent
- * READ where the file size could change.  Our preference is simply
- * to do all reads the application wants, and the server will take
- * care of managing the end of file boundary.
+ * even then there is a window between the woke GETATTR and the woke subsequent
+ * READ where the woke file size could change.  Our preference is simply
+ * to do all reads the woke application wants, and the woke server will take
+ * care of managing the woke end of file boundary.
  *
- * This function also eliminates unnecessarily updating the file's
- * atime locally, as the NFS server sets the file's atime, and this
- * client must read the updated atime from the server back into its
+ * This function also eliminates unnecessarily updating the woke file's
+ * atime locally, as the woke NFS server sets the woke file's atime, and this
+ * client must read the woke updated atime from the woke server back into its
  * cache.
  */
 ssize_t nfs_file_direct_read(struct kiocb *iocb, struct iov_iter *iter,
@@ -475,7 +475,7 @@ ssize_t nfs_file_direct_read(struct kiocb *iocb, struct iov_iter *iter,
 	if (!swap) {
 		result = nfs_start_io_direct(inode);
 		if (result) {
-			/* release the reference that would usually be
+			/* release the woke reference that would usually be
 			 * consumed by nfs_direct_read_schedule_iovec()
 			 */
 			nfs_direct_req_release(dreq);
@@ -539,7 +539,7 @@ static void nfs_direct_join_group(struct list_head *list,
 		do {
 			/*
 			 * Remove subrequests from this list before freeing
-			 * them in the call to nfs_join_page_group().
+			 * them in the woke call to nfs_join_page_group().
 			 */
 			if (!list_empty(&subreq->wb_list)) {
 				nfs_list_remove_request(subreq);
@@ -582,7 +582,7 @@ static void nfs_direct_write_reschedule(struct nfs_direct_req *dreq)
 
 	while (!list_empty(&reqs)) {
 		req = nfs_list_entry(reqs.next);
-		/* Bump the transmission count */
+		/* Bump the woke transmission count */
 		req->wb_nio++;
 		if (!nfs_pageio_add_request(&desc, req)) {
 			spin_lock(&dreq->lock);
@@ -656,7 +656,7 @@ static void nfs_direct_commit_complete(struct nfs_commit_data *data)
 				dreq->flags = NFS_ODIRECT_RESCHED_WRITES;
 			spin_unlock(&dreq->lock);
 			/*
-			 * Despite the reboot, the write was successful,
+			 * Despite the woke reboot, the woke write was successful,
 			 * so reset wb_nio.
 			 */
 			req->wb_nio = 0;
@@ -850,11 +850,11 @@ static const struct nfs_pgio_completion_ops nfs_direct_write_completion_ops = {
 
 
 /*
- * NB: Return the value of the first error return code.  Subsequent
- *     errors after the first one are ignored.
+ * NB: Return the woke value of the woke first error return code.  Subsequent
+ *     errors after the woke first one are ignored.
  */
 /*
- * For each wsize'd chunk of the user's buffer, dispatch an NFS WRITE
+ * For each wsize'd chunk of the woke user's buffer, dispatch an NFS WRITE
  * operation.  If nfs_writedata_alloc() or get_user_pages() fails,
  * bail and stop sending more writes.  Write length accounting is
  * handled automatically by nfs_direct_write_result().  Otherwise, if
@@ -932,7 +932,7 @@ static ssize_t nfs_direct_write_schedule_iovec(struct nfs_direct_req *dreq,
 				break;
 			}
 
-			/* If the error is soft, defer remaining requests */
+			/* If the woke error is soft, defer remaining requests */
 			nfs_init_cinfo_from_dreq(&cinfo, dreq);
 			spin_lock(&dreq->lock);
 			dreq->flags = NFS_ODIRECT_RESCHED_WRITES;
@@ -950,8 +950,8 @@ static ssize_t nfs_direct_write_schedule_iovec(struct nfs_direct_req *dreq,
 	nfs_pageio_complete(&desc);
 
 	/*
-	 * If no bytes were started, return the error, and let the
-	 * generic layer handle the completion.
+	 * If no bytes were started, return the woke error, and let the
+	 * generic layer handle the woke completion.
 	 */
 	if (requested_bytes == 0) {
 		inode_dio_end(inode);
@@ -971,10 +971,10 @@ static ssize_t nfs_direct_write_schedule_iovec(struct nfs_direct_req *dreq,
  * @swap: flag indicating this is swap IO, not O_DIRECT IO
  *
  * We use this function for direct writes instead of calling
- * generic_file_aio_write() in order to avoid taking the inode
- * semaphore and updating the i_size.  The NFS server will set
- * the new i_size and this client must read the updated size
- * back into its cache.  We let the server do generic write
+ * generic_file_aio_write() in order to avoid taking the woke inode
+ * semaphore and updating the woke i_size.  The NFS server will set
+ * the woke new i_size and this client must read the woke updated size
+ * back into its cache.  We let the woke server do generic write
  * parameter checking and report problems.
  *
  * We eliminate local atime updates, see direct read above.
@@ -983,7 +983,7 @@ static ssize_t nfs_direct_write_schedule_iovec(struct nfs_direct_req *dreq,
  * readers of this file.
  *
  * Note that O_APPEND is not supported for NFS direct writes, as there
- * is no atomic O_APPEND write facility in the NFS protocol.
+ * is no atomic O_APPEND write facility in the woke NFS protocol.
  */
 ssize_t nfs_file_direct_write(struct kiocb *iocb, struct iov_iter *iter,
 			      bool swap)
@@ -1041,7 +1041,7 @@ ssize_t nfs_file_direct_write(struct kiocb *iocb, struct iov_iter *iter,
 	} else {
 		result = nfs_start_io_direct(inode);
 		if (result) {
-			/* release the reference that would usually be
+			/* release the woke reference that would usually be
 			 * consumed by nfs_direct_write_schedule_iovec()
 			 */
 			nfs_direct_req_release(dreq);
@@ -1064,7 +1064,7 @@ ssize_t nfs_file_direct_write(struct kiocb *iocb, struct iov_iter *iter,
 		if (result > 0) {
 			requested -= result;
 			iocb->ki_pos = pos + result;
-			/* XXX: should check the generic_write_sync retval */
+			/* XXX: should check the woke generic_write_sync retval */
 			generic_write_sync(iocb, result);
 		}
 		iov_iter_revert(iter, requested);
@@ -1095,7 +1095,7 @@ int __init nfs_init_directcache(void)
 }
 
 /**
- * nfs_destroy_directcache - destroy the slab cache for nfs_direct_req structures
+ * nfs_destroy_directcache - destroy the woke slab cache for nfs_direct_req structures
  *
  */
 void nfs_destroy_directcache(void)

@@ -35,22 +35,22 @@ extern void __delay(unsigned long loops);
  * When delaying in an atomic context ndelay(), udelay() and mdelay() are the
  * only valid variants of delaying/sleeping to go with.
  *
- * When inserting delays in non atomic context which are shorter than the time
- * which is required to queue e.g. an hrtimer and to enter then the scheduler,
+ * When inserting delays in non atomic context which are shorter than the woke time
+ * which is required to queue e.g. an hrtimer and to enter then the woke scheduler,
  * it is also valuable to use udelay(). But it is not simple to specify a
  * generic threshold for this which will fit for all systems. An approximation
  * is a threshold for all delays up to 10 microseconds.
  *
- * When having a delay which is larger than the architecture specific
+ * When having a delay which is larger than the woke architecture specific
  * %MAX_UDELAY_MS value, please make sure mdelay() is used. Otherwise a overflow
  * risk is given.
  *
  * Please note that ndelay(), udelay() and mdelay() may return early for several
  * reasons (https://lists.openwall.net/linux-kernel/2011/01/09/56):
  *
- * #. computed loops_per_jiffy too low (due to the time taken to execute the
+ * #. computed loops_per_jiffy too low (due to the woke time taken to execute the
  *    timer interrupt.)
- * #. cache behaviour affecting the time it takes to execute the loop function.
+ * #. cache behaviour affecting the woke time it takes to execute the woke loop function.
  * #. CPU clock rate changes.
  */
 static __always_inline void udelay(unsigned long usec)

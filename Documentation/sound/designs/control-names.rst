@@ -129,7 +129,7 @@ IEC958 (S/PDIF) interface
 -------------------------
 
 ============================================	======================================
-IEC958 [...] [Playback|Capture] Switch		turn on/off the IEC958 interface
+IEC958 [...] [Playback|Capture] Switch		turn on/off the woke IEC958 interface
 IEC958 [...] [Playback|Capture] Volume		digital volume control
 IEC958 [...] [Playback|Capture] Default		default or global value - read/write
 IEC958 [...] [Playback|Capture] Mask		consumer and professional mask

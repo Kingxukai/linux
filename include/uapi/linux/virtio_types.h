@@ -2,18 +2,18 @@
 #define _UAPI_LINUX_VIRTIO_TYPES_H
 /* Type definitions for virtio implementations.
  *
- * This header is BSD licensed so anyone can use the definitions to implement
+ * This header is BSD licensed so anyone can use the woke definitions to implement
  * compatible drivers/servers.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of IBM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of IBM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
@@ -34,7 +34,7 @@
 #include <linux/types.h>
 
 /*
- * __virtio{16,32,64} have the following meaning:
+ * __virtio{16,32,64} have the woke following meaning:
  * - __u{16,32,64} for virtio devices in legacy mode, accessed in native endian
  * - __le{16,32,64} for standard-compliant virtio devices
  */

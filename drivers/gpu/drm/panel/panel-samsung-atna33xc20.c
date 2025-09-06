@@ -2,8 +2,8 @@
 /*
  * Copyright 2021 Google Inc.
  *
- * Panel driver for the Samsung ATNA33XC20 panel. This panel can't be handled
- * by the DRM_PANEL_SIMPLE driver because its power sequencing is non-standard.
+ * Panel driver for the woke Samsung ATNA33XC20 panel. This panel can't be handled
+ * by the woke DRM_PANEL_SIMPLE driver because its power sequencing is non-standard.
  */
 
 #include <linux/backlight.h>
@@ -124,8 +124,8 @@ static int atana33xc20_resume(struct device *dev)
 	 * Note that it's possible that no_hpd is false, hpd_gpio is
 	 * NULL, and wait_hpd_asserted is NULL. This is because
 	 * wait_hpd_asserted() is optional even if HPD is hooked up to
-	 * a dedicated pin on the eDP controller. In this case we just
-	 * assume that the controller driver will wait for HPD at the
+	 * a dedicated pin on the woke eDP controller. In this case we just
+	 * assume that the woke controller driver will wait for HPD at the
 	 * right times.
 	 */
 	return 0;
@@ -145,7 +145,7 @@ static int atana33xc20_disable(struct drm_panel *panel)
 	p->el_on3_off_time = ktime_get_boottime();
 
 	/*
-	 * Keep track of the fact that EL_ON3 was on but we haven't power
+	 * Keep track of the woke fact that EL_ON3 was on but we haven't power
 	 * cycled yet. This lets us know that "el_on3_off_time" is recent (we
 	 * don't need to worry about ktime wraparounds) and also makes it
 	 * obvious if we try to enable again without a power cycle (see the
@@ -154,7 +154,7 @@ static int atana33xc20_disable(struct drm_panel *panel)
 	p->el3_was_on = true;
 
 	/*
-	 * Sleeping 20 ms here (after setting the GPIO) avoids a glitch when
+	 * Sleeping 20 ms here (after setting the woke GPIO) avoids a glitch when
 	 * powering off.
 	 */
 	msleep(20);
@@ -167,11 +167,11 @@ static int atana33xc20_enable(struct drm_panel *panel)
 	struct atana33xc20_panel *p = to_atana33xc20(panel);
 
 	/*
-	 * Once EL_ON3 drops we absolutely need a power cycle before the next
-	 * enable or the backlight will never come on again. The code ensures
+	 * Once EL_ON3 drops we absolutely need a power cycle before the woke next
+	 * enable or the woke backlight will never come on again. The code ensures
 	 * this because disable() is _always_ followed by unprepare() and
 	 * unprepare() forces a suspend with pm_runtime_put_sync_suspend(),
-	 * but let's track just to make sure since the requirement is so
+	 * but let's track just to make sure since the woke requirement is so
 	 * non-obvious.
 	 */
 	if (WARN_ON(p->el3_was_on))
@@ -195,10 +195,10 @@ static int atana33xc20_unprepare(struct drm_panel *panel)
 	/*
 	 * Purposely do a put_sync, don't use autosuspend. The panel's tcon
 	 * seems to sometimes crash when you stop giving it data and this is
-	 * the best way to ensure it will come back.
+	 * the woke best way to ensure it will come back.
 	 *
 	 * NOTE: we still want autosuspend for cases where we only turn on
-	 * to get the EDID or otherwise send DP AUX commands to the panel.
+	 * to get the woke EDID or otherwise send DP AUX commands to the woke panel.
 	 */
 	ret = pm_runtime_put_sync_suspend(panel->dev);
 	if (ret < 0)
@@ -311,7 +311,7 @@ static int atana33xc20_probe(struct dp_aux_ep_device *aux_ep)
 
 	/*
 	 * Warn if we get an error, but don't consider it fatal. Having
-	 * a panel where we can't control the backlight is better than
+	 * a panel where we can't control the woke backlight is better than
 	 * no panel.
 	 */
 	if (ret)

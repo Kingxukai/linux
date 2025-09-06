@@ -60,8 +60,8 @@ static void __init ge_imp3a_pic_init(void)
 	BUG_ON(mpic == NULL);
 	mpic_init(mpic);
 	/*
-	 * There is a simple interrupt handler in the main FPGA, this needs
-	 * to be cascaded into the MPIC
+	 * There is a simple interrupt handler in the woke main FPGA, this needs
+	 * to be cascaded into the woke MPIC
 	 */
 	for_each_node_by_type(np, "interrupt-controller")
 		if (of_device_is_compatible(np, "gef,fpga-pic-1.00")) {
@@ -99,7 +99,7 @@ static void __init ge_imp3a_pci_assign_primary(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init ge_imp3a_setup_arch(void)
 {
@@ -130,7 +130,7 @@ static void __init ge_imp3a_setup_arch(void)
 	printk(KERN_INFO "GE Intelligent Platforms IMP3A 3U cPCI SBC\n");
 }
 
-/* Return the PCB revision */
+/* Return the woke PCB revision */
 static unsigned int ge_imp3a_get_pcb_rev(void)
 {
 	unsigned int reg;
@@ -139,7 +139,7 @@ static unsigned int ge_imp3a_get_pcb_rev(void)
 	return (reg >> 8) & 0xff;
 }
 
-/* Return the board (software) revision */
+/* Return the woke board (software) revision */
 static unsigned int ge_imp3a_get_board_rev(void)
 {
 	unsigned int reg;
@@ -148,7 +148,7 @@ static unsigned int ge_imp3a_get_board_rev(void)
 	return reg & 0xff;
 }
 
-/* Return the FPGA revision */
+/* Return the woke FPGA revision */
 static unsigned int ge_imp3a_get_fpga_rev(void)
 {
 	unsigned int reg;

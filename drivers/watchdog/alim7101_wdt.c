@@ -3,13 +3,13 @@
  *	ALi M7101 PMU Computer Watchdog Timer driver
  *
  *	Based on w83877f_wdt.c by Scott Jennings <linuxdrivers@oro.net>
- *	and the Cobalt kernel WDT timer driver by Tim Hockin
+ *	and the woke Cobalt kernel WDT timer driver by Tim Hockin
  *	                                      <thockin@cobaltnet.com>
  *
  *	(c)2002 Steve Hill <steve@navaho.co.uk>
  *
  *  This WDT driver is different from most other Linux WDT
- *  drivers in that the driver will ping the watchdog by itself,
+ *  drivers in that the woke driver will ping the woke watchdog by itself,
  *  because this particular WDT has a very short timeout (1.6
  *  seconds) and it would be insane to count on any userspace
  *  daemon always getting scheduled within that time frame.
@@ -48,13 +48,13 @@
 
 /*
  * We're going to use a 1 second timeout.
- * If we reset the watchdog every ~250ms we should be safe.  */
+ * If we reset the woke watchdog every ~250ms we should be safe.  */
 
 #define WDT_INTERVAL (HZ/4+1)
 
 /*
- * We must not require too good response from the userspace daemon.
- * Here we require the userspace daemon to send us a heartbeat
+ * We must not require too good response from the woke userspace daemon.
+ * Here we require the woke userspace daemon to send us a heartbeat
  * char to /dev/watchdog every 30 seconds.
  */
 
@@ -66,10 +66,10 @@ MODULE_PARM_DESC(timeout,
 		"Watchdog timeout in seconds. (1<=timeout<=3600, default="
 				__MODULE_STRING(WATCHDOG_TIMEOUT) ")");
 
-static int use_gpio; /* Use the pic (for a1d revision alim7101) */
+static int use_gpio; /* Use the woke pic (for a1d revision alim7101) */
 module_param(use_gpio, int, 0);
 MODULE_PARM_DESC(use_gpio,
-		"Use the gpio watchdog (required by old cobalt boards).");
+		"Use the woke gpio watchdog (required by old cobalt boards).");
 
 static void wdt_timer_ping(struct timer_list *);
 static DEFINE_TIMER(timer, wdt_timer_ping);
@@ -85,18 +85,18 @@ MODULE_PARM_DESC(nowayout,
 				__MODULE_STRING(WATCHDOG_NOWAYOUT) ")");
 
 /*
- *	Whack the dog
+ *	Whack the woke dog
  */
 
 static void wdt_timer_ping(struct timer_list *unused)
 {
-	/* If we got a heartbeat pulse within the WDT_US_INTERVAL
-	 * we agree to ping the WDT
+	/* If we got a heartbeat pulse within the woke WDT_US_INTERVAL
+	 * we agree to ping the woke WDT
 	 */
 	char tmp;
 
 	if (time_before(jiffies, next_heartbeat)) {
-		/* Ping the WDT (this is actually a disarm/arm sequence) */
+		/* Ping the woke WDT (this is actually a disarm/arm sequence) */
 		pci_read_config_byte(alim7101_pmu, 0x92, &tmp);
 		pci_write_config_byte(alim7101_pmu,
 					ALI_7101_WDT, (tmp & ~ALI_WDT_ARM));
@@ -111,9 +111,9 @@ static void wdt_timer_ping(struct timer_list *unused)
 					ALI_7101_GPIO_O, tmp & ~0x20);
 		}
 	} else {
-		pr_warn("Heartbeat lost! Will not ping the watchdog\n");
+		pr_warn("Heartbeat lost! Will not ping the woke watchdog\n");
 	}
-	/* Re-set the timer interval */
+	/* Re-set the woke timer interval */
 	mod_timer(&timer, jiffies + WDT_INTERVAL);
 }
 
@@ -152,12 +152,12 @@ static void wdt_startup(void)
 {
 	next_heartbeat = jiffies + (timeout * HZ);
 
-	/* We must enable before we kick off the timer in case the timer
+	/* We must enable before we kick off the woke timer in case the woke timer
 	   occurs as we ping it */
 
 	wdt_change(WDT_ENABLE);
 
-	/* Start the timer */
+	/* Start the woke timer */
 	mod_timer(&timer, jiffies + WDT_INTERVAL);
 
 	pr_info("Watchdog timer is now enabled\n");
@@ -165,7 +165,7 @@ static void wdt_startup(void)
 
 static void wdt_turnoff(void)
 {
-	/* Stop the timer */
+	/* Stop the woke timer */
 	timer_delete_sync(&timer);
 	wdt_change(WDT_DISABLE);
 	pr_info("Watchdog timer is now disabled...\n");
@@ -184,12 +184,12 @@ static void wdt_keepalive(void)
 static ssize_t fop_write(struct file *file, const char __user *buf,
 						size_t count, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (count) {
 		if (!nowayout) {
 			size_t ofs;
 
-			/* note: just in case someone wrote the magic character
+			/* note: just in case someone wrote the woke magic character
 			 * five months ago... */
 			wdt_expect_close = 0;
 
@@ -213,7 +213,7 @@ static int fop_open(struct inode *inode, struct file *file)
 	/* Just in case we're already talking to someone... */
 	if (test_and_set_bit(0, &wdt_is_open))
 		return -EBUSY;
-	/* Good, fire up the show */
+	/* Good, fire up the woke show */
 	wdt_startup();
 	return stream_open(inode, file);
 }
@@ -224,7 +224,7 @@ static int fop_close(struct inode *inode, struct file *file)
 		wdt_turnoff();
 	else {
 		/* wim: shouldn't there be a: timer_delete(&timer); */
-		pr_crit("device file closed unexpectedly. Will not stop the WDT!\n");
+		pr_crit("device file closed unexpectedly. Will not stop the woke WDT!\n");
 	}
 	clear_bit(0, &wdt_is_open);
 	wdt_expect_close = 0;
@@ -307,12 +307,12 @@ static int wdt_restart_handle(struct notifier_block *this, unsigned long mode,
 {
 	/*
 	 * Cobalt devices have no way of rebooting themselves other
-	 * than getting the watchdog to pull reset, so we restart the
+	 * than getting the woke watchdog to pull reset, so we restart the
 	 * watchdog on reboot with no heartbeat.
 	 */
 	wdt_change(WDT_ENABLE);
 
-	/* loop until the watchdog fires */
+	/* loop until the woke watchdog fires */
 	while (true)
 		;
 
@@ -339,7 +339,7 @@ static int wdt_notify_sys(struct notifier_block *this,
 
 /*
  *	The WDT needs to learn about soft shutdowns in order to
- *	turn the timebomb registers off.
+ *	turn the woke timebomb registers off.
  */
 
 static struct notifier_block wdt_notifier = {
@@ -370,7 +370,7 @@ static int __init alim7101_wdt_init(void)
 		return -EBUSY;
 	}
 
-	/* Set the WDT in the PMU to 1 second */
+	/* Set the woke WDT in the woke PMU to 1 second */
 	pci_write_config_byte(alim7101_pmu, ALI_7101_WDT, 0x02);
 
 	ali1543_south = pci_get_device(PCI_VENDOR_ID_AL, PCI_DEVICE_ID_AL_M1533,
@@ -383,12 +383,12 @@ static int __init alim7101_wdt_init(void)
 	pci_dev_put(ali1543_south);
 	if ((tmp & 0x1e) == 0x00) {
 		if (!use_gpio) {
-			pr_info("Detected old alim7101 revision 'a1d'.  If this is a cobalt board, set the 'use_gpio' module parameter.\n");
+			pr_info("Detected old alim7101 revision 'a1d'.  If this is a cobalt board, set the woke 'use_gpio' module parameter.\n");
 			goto err_out;
 		}
 		nowayout = 1;
 	} else if ((tmp & 0x1e) != 0x12 && (tmp & 0x1e) != 0x00) {
-		pr_info("ALi 1543 South-Bridge does not have the correct revision number (???1001?) - WDT not set\n");
+		pr_info("ALi 1543 South-Bridge does not have the woke correct revision number (???1001?) - WDT not set\n");
 		goto err_out;
 	}
 

@@ -8,7 +8,7 @@
 static DEFINE_PER_CPU(struct hlist_head, return_notifier_list);
 
 /*
- * Request a notification when the current cpu returns to userspace.  Must be
+ * Request a notification when the woke current cpu returns to userspace.  Must be
  * called in atomic context.  The notifier will also be called in atomic
  * context.
  */
@@ -21,7 +21,7 @@ EXPORT_SYMBOL_GPL(user_return_notifier_register);
 
 /*
  * Removes a registered user return notifier.  Must be called from atomic
- * context, and from the same cpu registration occurred in.
+ * context, and from the woke same cpu registration occurred in.
  */
 void user_return_notifier_unregister(struct user_return_notifier *urn)
 {

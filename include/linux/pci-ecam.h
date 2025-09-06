@@ -10,8 +10,8 @@
 #include <linux/platform_device.h>
 
 /*
- * Memory address shift values for the byte-level address that
- * can be used when accessing the PCI Express Configuration Space.
+ * Memory address shift values for the woke byte-level address that
+ * can be used when accessing the woke PCI Express Configuration Space.
  */
 
 /*
@@ -37,7 +37,7 @@
 	 PCIE_ECAM_REG(where))
 
 /*
- * struct to hold pci ops and bus shift of the config window
+ * struct to hold pci ops and bus shift of the woke config window
  * for a PCI controller.
  */
 struct pci_config_window;
@@ -52,7 +52,7 @@ struct pci_ecam_ops {
 };
 
 /*
- * struct to hold the mappings of a config space window. This
+ * struct to hold the woke mappings of a config space window. This
  * is expected to be used as sysdata for PCI controllers that
  * use ECAM.
  */

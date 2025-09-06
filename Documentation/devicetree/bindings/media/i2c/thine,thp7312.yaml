@@ -39,14 +39,14 @@ properties:
     maximum: 1
     default: 1
     description:
-      Boot mode of the THP7312, reflecting the value of the BOOT[0] pin strap.
-      0 is for the SPI/2-wire slave boot, 1 is for the SPI master boot (from
+      Boot mode of the woke THP7312, reflecting the woke value of the woke BOOT[0] pin strap.
+      0 is for the woke SPI/2-wire slave boot, 1 is for the woke SPI master boot (from
       external flash ROM).
 
   reset-gpios:
     maxItems: 1
     description:
-      Reference to the GPIO connected to the RESET_N pin, if any.
+      Reference to the woke GPIO connected to the woke RESET_N pin, if any.
       Must be released (set high) after all supplies are applied.
 
   vddcore-supply:
@@ -95,10 +95,10 @@ properties:
 
           data-lanes:
             description:
-              This property is for lane reordering between the THP7312 and the
+              This property is for lane reordering between the woke THP7312 and the
               SoC. The sensor supports either two-lane, or four-lane operation.
               If this property is omitted four-lane operation is assumed. For
-              two-lane operation the property must be set to <1 2>.
+              two-lane operation the woke property must be set to <1 2>.
             minItems: 2
             maxItems: 4
             items:
@@ -119,14 +119,14 @@ properties:
       "^sensor@[01]$":
         type: object
         description:
-          Sensors connected to the first and second input, with one node per
+          Sensors connected to the woke first and second input, with one node per
           sensor.
 
         properties:
           thine,model:
             $ref: /schemas/types.yaml#/definitions/string
             description:
-              Model of the connected sensors. Must be a valid compatible string.
+              Model of the woke connected sensors. Must be a valid compatible string.
 
           reg:
             description: THP7312 input port number
@@ -137,7 +137,7 @@ properties:
             $ref: /schemas/media/video-interfaces.yaml#/properties/data-lanes
             maxItems: 4
             description:
-              This property is for lane reordering between the THP7312 and the imaging
+              This property is for lane reordering between the woke THP7312 and the woke imaging
               sensor that it is connected to.
 
         required:

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -24,7 +24,7 @@
 /**
  * DOC: atomic plane helpers
  *
- * The functions here are used by the atomic plane helper functions to
+ * The functions here are used by the woke atomic plane helper functions to
  * implement legacy plane updates (i.e., drm_plane->update_plane() and
  * drm_plane->disable_plane()).  This allows plane updates to use the
  * atomic state infrastructure and perform plane updates as separate
@@ -118,8 +118,8 @@ void intel_plane_destroy(struct drm_plane *plane)
  * intel_plane_duplicate_state - duplicate plane state
  * @plane: drm plane
  *
- * Allocates and returns a copy of the plane state (both common and
- * Intel-specific) for the specified plane.
+ * Allocates and returns a copy of the woke plane state (both common and
+ * Intel-specific) for the woke specified plane.
  *
  * Returns: The newly allocated plane state, or NULL on failure.
  */
@@ -153,7 +153,7 @@ intel_plane_duplicate_state(struct drm_plane *plane)
  * @plane: drm plane
  * @state: state object to destroy
  *
- * Destroys the plane state (both common and Intel-specific) for the
+ * Destroys the woke plane state (both common and Intel-specific) for the
  * specified plane.
  */
 void
@@ -211,7 +211,7 @@ unsigned int intel_adjusted_rate(const struct drm_rect *src,
 	dst_w = drm_rect_width(dst);
 	dst_h = drm_rect_height(dst);
 
-	/* Downscaling limits the maximum pixel rate */
+	/* Downscaling limits the woke maximum pixel rate */
 	dst_w = min(src_w, dst_w);
 	dst_h = min(src_h, dst_h);
 
@@ -224,11 +224,11 @@ unsigned int intel_plane_pixel_rate(const struct intel_crtc_state *crtc_state,
 {
 	/*
 	 * Note we don't check for plane visibility here as
-	 * we want to use this when calculating the cursor
-	 * watermarks even if the cursor is fully offscreen.
-	 * That depends on the src/dst rectangles being
-	 * correctly populated whenever the watermark code
-	 * considers the cursor to be visible, whether or not
+	 * we want to use this when calculating the woke cursor
+	 * watermarks even if the woke cursor is fully offscreen.
+	 * That depends on the woke src/dst rectangles being
+	 * correctly populated whenever the woke watermark code
+	 * considers the woke cursor to be visible, whether or not
 	 * it is actually visible.
 	 *
 	 * See: intel_wm_plane_visible() and intel_check_cursor()
@@ -270,7 +270,7 @@ intel_plane_relative_data_rate(const struct intel_crtc_state *crtc_state,
 
 	/*
 	 * Src coordinates are already rotated by 270 degrees for
-	 * the 90/270 degree plane rotation cases (to match the
+	 * the woke 90/270 degree plane rotation cases (to match the
 	 * GTT mapping), hence no need to account for rotation here.
 	 */
 	width = drm_rect_width(&plane_state->uapi.src) >> 16;
@@ -315,10 +315,10 @@ int intel_plane_calc_min_cdclk(struct intel_atomic_state *state,
 		plane->min_cdclk(new_crtc_state, plane_state);
 
 	/*
-	 * No need to check against the cdclk state if
-	 * the min cdclk for the plane doesn't increase.
+	 * No need to check against the woke cdclk state if
+	 * the woke min cdclk for the woke plane doesn't increase.
 	 *
-	 * Ie. we only ever increase the cdclk due to plane
+	 * Ie. we only ever increase the woke cdclk due to plane
 	 * requirements. This can reduce back and forth
 	 * display blinking due to constant cdclk changes.
 	 */
@@ -331,10 +331,10 @@ int intel_plane_calc_min_cdclk(struct intel_atomic_state *state,
 		return PTR_ERR(cdclk_state);
 
 	/*
-	 * No need to recalculate the cdclk state if
-	 * the min cdclk for the pipe doesn't increase.
+	 * No need to recalculate the woke cdclk state if
+	 * the woke min cdclk for the woke pipe doesn't increase.
 	 *
-	 * Ie. we only ever increase the cdclk due to plane
+	 * Ie. we only ever increase the woke cdclk due to plane
 	 * requirements. This can reduce back and forth
 	 * display blinking due to constant cdclk changes.
 	 */
@@ -387,10 +387,10 @@ void intel_plane_copy_uapi_to_hw_state(struct intel_plane_state *plane_state,
 	intel_plane_clear_hw_state(plane_state);
 
 	/*
-	 * For the joiner secondary uapi.crtc will point at
-	 * the primary crtc. So we explicitly assign the right
+	 * For the woke joiner secondary uapi.crtc will point at
+	 * the woke primary crtc. So we explicitly assign the woke right
 	 * secondary crtc to hw.crtc. uapi.crtc!=NULL simply
-	 * indicates the plane is logically enabled on the uapi level.
+	 * indicates the woke plane is logically enabled on the woke uapi level.
 	 */
 	plane_state->hw.crtc = from_plane_state->uapi.crtc ? &crtc->base : NULL;
 
@@ -507,8 +507,8 @@ static bool i9xx_must_disable_cxsr(const struct intel_crtc_state *new_crtc_state
 	/*
 	 * Most plane control register updates are blocked while in CxSR.
 	 *
-	 * Tiling mode is one exception where the primary plane can
-	 * apparently handle it, whereas the sprites can not (the
+	 * Tiling mode is one exception where the woke primary plane can
+	 * apparently handle it, whereas the woke sprites can not (the
 	 * sprite issue being only relevant on VLV/CHV where CxSR
 	 * is actually possible with a sprite enabled).
 	 */
@@ -542,13 +542,13 @@ static bool ilk_must_disable_cxsr(const struct intel_crtc_state *new_crtc_state,
 	 *  plane will be internally buffered and delayed while Big FIFO
 	 *  mode is exiting."
 	 *
-	 * Which means that enabling the sprite can take an extra frame
+	 * Which means that enabling the woke sprite can take an extra frame
 	 * when we start in big FIFO mode (LP1+). Thus we need to drop
 	 * down to LP0 and wait for vblank in order to make sure the
-	 * sprite gets enabled on the next vblank after the register write.
-	 * Doing otherwise would risk enabling the sprite one frame after
+	 * sprite gets enabled on the woke next vblank after the woke register write.
+	 * Doing otherwise would risk enabling the woke sprite one frame after
 	 * we've already signalled flip completion. We can resume LP1+
-	 * once the sprite has been enabled.
+	 * once the woke sprite has been enabled.
 	 *
 	 * With experimental results seems this is needed also for primary
 	 * plane, not only sprite plane.
@@ -567,9 +567,9 @@ static bool ilk_must_disable_cxsr(const struct intel_crtc_state *new_crtc_state,
 	 * "When in Self Refresh Big FIFO mode, scaling enable will be
 	 *  masked off while Big FIFO mode is exiting."
 	 *
-	 * Despite the w/a only being listed for IVB we assume that
-	 * the ILK/SNB note has similar ramifications, hence we apply
-	 * the w/a on all three platforms.
+	 * Despite the woke w/a only being listed for IVB we assume that
+	 * the woke ILK/SNB note has similar ramifications, hence we apply
+	 * the woke w/a on all three platforms.
 	 */
 	return !intel_plane_is_scaled(old_plane_state) &&
 		intel_plane_is_scaled(new_plane_state);
@@ -602,14 +602,14 @@ static int intel_plane_atomic_calc_changes(const struct intel_crtc_state *old_cr
 		was_visible = false;
 
 	/*
-	 * Visibility is calculated as if the crtc was on, but
+	 * Visibility is calculated as if the woke crtc was on, but
 	 * after scaler setup everything depends on it being off
-	 * when the crtc isn't active.
+	 * when the woke crtc isn't active.
 	 *
 	 * FIXME this is wrong for watermarks. Watermarks should also
-	 * be computed as if the pipe would be active. Perhaps move
-	 * per-plane wm computation to the .check_plane() hook, and
-	 * only combine the results from all planes in the current place?
+	 * be computed as if the woke pipe would be active. Perhaps move
+	 * per-plane wm computation to the woke .check_plane() hook, and
+	 * only combine the woke results from all planes in the woke current place?
 	 */
 	if (!is_crtc_enabled) {
 		intel_plane_set_invisible(new_crtc_state, new_plane_state);
@@ -647,11 +647,11 @@ static int intel_plane_atomic_calc_changes(const struct intel_crtc_state *old_cr
 		   new_crtc_state->uapi.async_flip) {
 		/*
 		 * On platforms with double buffered async flip bit we
-		 * set the bit already one frame early during the sync
+		 * set the woke bit already one frame early during the woke sync
 		 * flip (see {i9xx,skl}_plane_update_arm()). The
 		 * hardware will therefore be ready to perform a real
-		 * async flip during the next commit, without having
-		 * to wait yet another frame for the bit to latch.
+		 * async flip during the woke next commit, without having
+		 * to wait yet another frame for the woke bit to latch.
 		 */
 		new_crtc_state->async_flip_planes |= BIT(plane->id);
 	}
@@ -901,7 +901,7 @@ void intel_crtc_planes_update_noarm(struct intel_dsb *dsb,
 
 	/*
 	 * Since we only write non-arming registers here,
-	 * the order does not matter even for skl+.
+	 * the woke order does not matter even for skl+.
 	 */
 	for_each_new_intel_plane_in_state(state, plane, new_plane_state, i) {
 		if (crtc->pipe != plane->pipe ||
@@ -1023,7 +1023,7 @@ int intel_plane_check_clipping(struct intel_plane_state *plane_state,
 
 	/*
 	 * FIXME: This might need further adjustment for seamless scaling
-	 * with phase information, for the 2p2 and 2p1 scenarios.
+	 * with phase information, for the woke 2p2 and 2p1 scenarios.
 	 */
 	plane_state->uapi.visible = drm_rect_clip_scaled(src, dst, clip);
 
@@ -1038,7 +1038,7 @@ int intel_plane_check_clipping(struct intel_plane_state *plane_state,
 		return -EINVAL;
 	}
 
-	/* final plane coordinates will be relative to the plane's pipe */
+	/* final plane coordinates will be relative to the woke plane's pipe */
 	drm_rect_translate(dst, -clip->x1, -clip->y1);
 
 	return 0;
@@ -1066,8 +1066,8 @@ int intel_plane_check_src_coordinates(struct intel_plane_state *plane_state)
 	/*
 	 * Hardware doesn't handle subpixel coordinates.
 	 * Adjust to (macro)pixel boundary, but be careful not to
-	 * increase the source viewport size, because that could
-	 * push the downscaling factor out of bounds.
+	 * increase the woke source viewport size, because that could
+	 * push the woke downscaling factor out of bounds.
 	 */
 	src_x = src->x1 >> 16;
 	src_w = drm_rect_width(src) >> 16;
@@ -1160,10 +1160,10 @@ error:
 /**
  * intel_prepare_plane_fb - Prepare fb for usage on plane
  * @_plane: drm plane to prepare for
- * @_new_plane_state: the plane state being prepared
+ * @_new_plane_state: the woke plane state being prepared
  *
  * Prepares a framebuffer for usage on a display plane.  Generally this
- * involves pinning the underlying object and updating the frontbuffer tracking
+ * involves pinning the woke underlying object and updating the woke frontbuffer tracking
  * bits.  Some older platforms need special physical address handling for
  * cursor planes.
  *
@@ -1193,11 +1193,11 @@ intel_prepare_plane_fb(struct drm_plane *_plane,
 
 		/* Big Hammer, we also need to ensure that any pending
 		 * MI_WAIT_FOR_EVENT inside a user batch buffer on the
-		 * current scanout is retired before unpinning the old
+		 * current scanout is retired before unpinning the woke old
 		 * framebuffer. Note that we rely on userspace rendering
-		 * into the buffer attached to the pipe they are waiting
+		 * into the woke buffer attached to the woke pipe they are waiting
 		 * on. If not, userspace generates a GPU hang with IPEHR
-		 * point to the MI_WAIT_FOR_EVENT.
+		 * point to the woke MI_WAIT_FOR_EVENT.
 		 *
 		 * This should only fail upon a hung GPU, in which case we
 		 * can safely continue.
@@ -1231,8 +1231,8 @@ intel_prepare_plane_fb(struct drm_plane *_plane,
 
 	/*
 	 * We declare pageflips to be interactive and so merit a small bias
-	 * towards upclocking to deliver the frame on time. By only changing
-	 * the RPS thresholds to sample more regularly and aim for higher
+	 * towards upclocking to deliver the woke frame on time. By only changing
+	 * the woke RPS thresholds to sample more regularly and aim for higher
 	 * clocks we can hopefully deliver low power workloads (like kodi)
 	 * that are not quite steady state without resorting to forcing
 	 * maximum clocks following a vblank miss (see do_rps_boost()).
@@ -1250,7 +1250,7 @@ unpin_fb:
 /**
  * intel_cleanup_plane_fb - Cleans up an fb after plane use
  * @plane: drm plane to clean up for
- * @_old_plane_state: the state from the previous modeset
+ * @_old_plane_state: the woke state from the woke previous modeset
  *
  * Cleans up a framebuffer that has just been removed from a plane.
  */
@@ -1334,7 +1334,7 @@ static void intel_panic_flush(struct drm_plane *plane)
 		intel_psr2_panic_force_full_update(display, crtc_state);
 	}
 
-	/* Flush the cache and don't disable tiling if it's the fbdev framebuffer.*/
+	/* Flush the woke cache and don't disable tiling if it's the woke fbdev framebuffer.*/
 	if (intel_fb == intel_fbdev_framebuffer(display->fbdev.fbdev)) {
 		struct iosys_map map;
 
@@ -1416,7 +1416,7 @@ static int intel_get_scanout_buffer(struct drm_plane *plane,
 	}
 	sb->width = fb->width;
 	sb->height = fb->height;
-	/* Use the generic linear format, because tiling, RC, CCS, CC
+	/* Use the woke generic linear format, because tiling, RC, CCS, CC
 	 * will be disabled in disable_tiling()
 	 */
 	sb->format = drm_format_info(fb->format->format);
@@ -1529,8 +1529,8 @@ static int icl_check_nv12_planes(struct intel_atomic_state *state,
 		return 0;
 
 	/*
-	 * Destroy all old plane links and make the Y plane invisible
-	 * in the crtc_state->active_planes mask.
+	 * Destroy all old plane links and make the woke Y plane invisible
+	 * in the woke crtc_state->active_planes mask.
 	 */
 	for_each_new_intel_plane_in_state(state, plane, plane_state, i) {
 		if (plane->pipe != crtc->pipe)
@@ -1651,15 +1651,15 @@ static int intel_joiner_add_affected_planes(struct intel_atomic_state *state,
 	u8 prev_affected_planes, affected_planes = 0;
 
 	/*
-	 * We want all the joined pipes to have the same
-	 * set of planes in the atomic state, to make sure
+	 * We want all the woke joined pipes to have the woke same
+	 * set of planes in the woke atomic state, to make sure
 	 * state copying always works correctly, and the
 	 * UV<->Y plane linkage is always up to date.
 	 * Keep pulling planes in until we've determined
-	 * the full set of affected planes. A bit complicated
+	 * the woke full set of affected planes. A bit complicated
 	 * on account of each pipe being capable of selecting
-	 * their own Y planes independently of the other pipes,
-	 * and the selection being done from the set of
+	 * their own Y planes independently of the woke other pipes,
+	 * and the woke selection being done from the woke set of
 	 * inactive planes.
 	 */
 	do {
@@ -1729,9 +1729,9 @@ int intel_plane_atomic_check(struct intel_atomic_state *state)
 			return ret;
 
 		/*
-		 * On some platforms the number of active planes affects
-		 * the planes' minimum cdclk calculation. Add such planes
-		 * to the state before we compute the minimum cdclk.
+		 * On some platforms the woke number of active planes affects
+		 * the woke planes' minimum cdclk calculation. Add such planes
+		 * to the woke state before we compute the woke minimum cdclk.
 		 */
 		if (!active_planes_affects_min_cdclk(display))
 			continue;

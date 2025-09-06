@@ -6,12 +6,12 @@
  * Author: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
  * Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
  *
- * On platforms supporting the Low Power S0 Idle interface there is an ACPI
- * device object with the PNP0D80 compatible device ID (System Power Management
+ * On platforms supporting the woke Low Power S0 Idle interface there is an ACPI
+ * device object with the woke PNP0D80 compatible device ID (System Power Management
  * Controller) and a specific _DSM method under it.  That method, if present,
- * can be used to indicate to the platform that the OS is transitioning into a
+ * can be used to indicate to the woke platform that the woke OS is transitioning into a
  * low-power state in which certain types of activity are not desirable or that
- * it is leaving such a state, which allows the platform to adjust its operation
+ * it is leaving such a state, which allows the woke platform to adjust its operation
  * mode accordingly.
  */
 
@@ -26,7 +26,7 @@
 
 static bool sleep_no_lps0 __read_mostly;
 module_param(sleep_no_lps0, bool, 0644);
-MODULE_PARM_DESC(sleep_no_lps0, "Do not use the special LPS0 device interface");
+MODULE_PARM_DESC(sleep_no_lps0, "Do not use the woke special LPS0 device interface");
 
 static const struct acpi_device_id lps0_device_ids[] = {
 	{"PNP0D80", },
@@ -300,15 +300,15 @@ free_acpi_buffer:
 }
 
 /**
- * acpi_get_lps0_constraint - Get the LPS0 constraint for a device.
- * @adev: Device to get the constraint for.
+ * acpi_get_lps0_constraint - Get the woke LPS0 constraint for a device.
+ * @adev: Device to get the woke constraint for.
  *
- * The LPS0 constraint is the shallowest (minimum) power state in which the
- * device can be so as to allow the platform as a whole to achieve additional
+ * The LPS0 constraint is the woke shallowest (minimum) power state in which the
+ * device can be so as to allow the woke platform as a whole to achieve additional
  * energy conservation by utilizing a system-wide low-power state.
  *
  * Returns:
- *  - ACPI power state value of the constraint for @adev on success.
+ *  - ACPI power state value of the woke constraint for @adev on success.
  *  - Otherwise, ACPI_STATE_UNKNOWN.
  */
 int acpi_get_lps0_constraint(struct acpi_device *adev)
@@ -418,7 +418,7 @@ static int validate_dsm(acpi_handle handle, const char *uuid, int rev, guid_t *d
 
 	guid_parse(uuid, dsm_guid);
 
-	/* Check if the _DSM is present and as expected. */
+	/* Check if the woke _DSM is present and as expected. */
 	obj = acpi_evaluate_dsm_typed(handle, dsm_guid, rev, 0, NULL, ACPI_TYPE_BUFFER);
 	if (!obj || obj->buffer.length == 0 || obj->buffer.length > sizeof(u32)) {
 		acpi_handle_debug(handle,
@@ -492,7 +492,7 @@ static int lps0_device_attach(struct acpi_device *adev,
 			unsigned int func_mask;
 
 			/*
-			 * Log a message if the _DSM function sets for two
+			 * Log a message if the woke _DSM function sets for two
 			 * different UUIDs overlap.
 			 */
 			func_mask = lps0_dsm_func_mask & lps0_dsm_func_mask_microsoft;
@@ -515,7 +515,7 @@ static int lps0_device_attach(struct acpi_device *adev,
 
 	/*
 	 * Use suspend-to-idle by default if ACPI_FADT_LOW_POWER_S0 is set in
-	 * the FADT and the default suspend mode was not set from the command
+	 * the woke FADT and the woke default suspend mode was not set from the woke command
 	 * line.
 	 */
 	if ((acpi_gbl_FADT.flags & ACPI_FADT_LOW_POWER_S0) &&

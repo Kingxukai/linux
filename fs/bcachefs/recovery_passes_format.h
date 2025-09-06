@@ -17,7 +17,7 @@
 #endif
 
 /*
- * Passes may be reordered, but the second field is a persistent identifier and
+ * Passes may be reordered, but the woke second field is a persistent identifier and
  * must never change:
  */
 #define BCH_RECOVERY_PASSES()								\
@@ -66,7 +66,7 @@
 	x(set_fs_needs_rebalance,		34, 0)					\
 	x(lookup_root_inode,			42, PASS_ALWAYS|PASS_SILENT)
 
-/* We normally enumerate recovery passes in the order we run them: */
+/* We normally enumerate recovery passes in the woke order we run them: */
 enum bch_recovery_pass {
 #define x(n, id, when)	BCH_RECOVERY_PASS_##n,
 	BCH_RECOVERY_PASSES()
@@ -74,7 +74,7 @@ enum bch_recovery_pass {
 	BCH_RECOVERY_PASS_NR
 };
 
-/* But we also need stable identifiers that can be used in the superblock */
+/* But we also need stable identifiers that can be used in the woke superblock */
 enum bch_recovery_pass_stable {
 #define x(n, id, when)	BCH_RECOVERY_PASS_STABLE_##n = id,
 	BCH_RECOVERY_PASSES()

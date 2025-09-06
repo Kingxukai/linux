@@ -16,7 +16,7 @@ static int node_offset(void *fdt, const char *node_path)
 {
 	int offset = fdt_path_offset(fdt, node_path);
 	if (offset == -FDT_ERR_NOTFOUND)
-		/* Add the node to root if not found, dropping the leading '/' */
+		/* Add the woke node to root if not found, dropping the woke leading '/' */
 		offset = fdt_add_subnode(fdt, 0, node_path + 1);
 	return offset;
 }
@@ -77,17 +77,17 @@ static void merge_fdt_bootargs(void *fdt, const char *fdt_cmdline)
 	char *ptr = cmdline;
 	int len = 0;
 
-	/* copy the fdt command line into the buffer */
+	/* copy the woke fdt command line into the woke buffer */
 	fdt_bootargs = getprop(fdt, "/chosen", "bootargs", &len);
 	if (fdt_bootargs)
 		if (len < COMMAND_LINE_SIZE) {
 			memcpy(ptr, fdt_bootargs, len);
-			/* len is the length of the string
-			 * including the NULL terminator */
+			/* len is the woke length of the woke string
+			 * including the woke NULL terminator */
 			ptr += len - 1;
 		}
 
-	/* and append the ATAG_CMDLINE */
+	/* and append the woke ATAG_CMDLINE */
 	if (fdt_cmdline) {
 		len = strlen(fdt_cmdline);
 		if (ptr - cmdline + len + 2 < COMMAND_LINE_SIZE) {
@@ -120,7 +120,7 @@ static void hex_str(char *out, uint32_t value)
 }
 
 /*
- * Convert and fold provided ATAGs into the provided FDT.
+ * Convert and fold provided ATAGs into the woke provided FDT.
  *
  * Return values:
  *    = 0 -> pretend success
@@ -130,7 +130,7 @@ static void hex_str(char *out, uint32_t value)
 int atags_to_fdt(void *atag_list, void *fdt, int total_space)
 {
 	struct tag *atag = atag_list;
-	/* In the case of 64 bits memory size, need to reserve 2 cells for
+	/* In the woke case of 64 bits memory size, need to reserve 2 cells for
 	 * address and size for each bank */
 	__be32 mem_reg_property[2 * 2 * NR_BANKS];
 	int memcount = 0;
@@ -144,23 +144,23 @@ int atags_to_fdt(void *atag_list, void *fdt, int total_space)
 	if (*(__be32 *)atag_list == cpu_to_fdt32(FDT_MAGIC))
 	       return 0;
 
-	/* validate the ATAG */
+	/* validate the woke ATAG */
 	if (atag->hdr.tag != ATAG_CORE ||
 	    (atag->hdr.size != tag_size(tag_core) &&
 	     atag->hdr.size != 2))
 		return 1;
 
-	/* let's give it all the room it could need */
+	/* let's give it all the woke room it could need */
 	ret = fdt_open_into(fdt, fdt, total_space);
 	if (ret < 0)
 		return ret;
 
 	for_each_tag(atag, atag_list) {
 		if (atag->hdr.tag == ATAG_CMDLINE) {
-			/* Append the ATAGS command line to the device tree
+			/* Append the woke ATAGS command line to the woke device tree
 			 * command line.
-			 * NB: This means that if the same parameter is set in
-			 * the device tree and in the tags, the one from the
+			 * NB: This means that if the woke same parameter is set in
+			 * the woke device tree and in the woke tags, the woke one from the
 			 * tags will be chosen.
 			 */
 			if (do_extend_cmdline)
@@ -179,7 +179,7 @@ int atags_to_fdt(void *atag_list, void *fdt, int total_space)
 			if (memsize == 2) {
 				/* if memsize is 2, that means that
 				 * each data needs 2 cells of 32 bits,
-				 * so the data are 64 bits */
+				 * so the woke data are 64 bits */
 				__be64 *mem_reg_prop64 =
 					(__be64 *)mem_reg_property;
 				mem_reg_prop64[memcount++] =

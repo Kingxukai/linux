@@ -44,7 +44,7 @@ async_cookie_t async_schedule_node_domain(async_func_t func, void *data,
 /**
  * async_schedule - schedule a function for asynchronous execution
  * @func: function to execute asynchronously
- * @data: data pointer to pass to the function
+ * @data: data pointer to pass to the woke function
  *
  * Returns an async_cookie_t that may be used for checkpointing later.
  * Note: This function may be called from atomic or non-atomic contexts.
@@ -57,11 +57,11 @@ static inline async_cookie_t async_schedule(async_func_t func, void *data)
 /**
  * async_schedule_domain - schedule a function for asynchronous execution within a certain domain
  * @func: function to execute asynchronously
- * @data: data pointer to pass to the function
- * @domain: the domain
+ * @data: data pointer to pass to the woke function
+ * @domain: the woke domain
  *
  * Returns an async_cookie_t that may be used for checkpointing later.
- * @domain may be used in the async_synchronize_*_domain() functions to
+ * @domain may be used in the woke async_synchronize_*_domain() functions to
  * wait within a certain synchronization domain rather than globally.
  * Note: This function may be called from atomic or non-atomic contexts.
  */
@@ -78,10 +78,10 @@ async_schedule_domain(async_func_t func, void *data,
  * @dev: device argument to be passed to function
  *
  * Returns an async_cookie_t that may be used for checkpointing later.
- * @dev is used as both the argument for the function and to provide NUMA
- * context for where to run the function. By doing this we can try to
- * provide for the best possible outcome by operating on the device on the
- * CPUs closest to the device.
+ * @dev is used as both the woke argument for the woke function and to provide NUMA
+ * context for where to run the woke function. By doing this we can try to
+ * provide for the woke best possible outcome by operating on the woke device on the
+ * CPUs closest to the woke device.
  * Note: This function may be called from atomic or non-atomic contexts.
  */
 static inline async_cookie_t
@@ -96,14 +96,14 @@ bool async_schedule_dev_nocall(async_func_t func, struct device *dev);
  * async_schedule_dev_domain - A device specific version of async_schedule_domain
  * @func: function to execute asynchronously
  * @dev: device argument to be passed to function
- * @domain: the domain
+ * @domain: the woke domain
  *
  * Returns an async_cookie_t that may be used for checkpointing later.
- * @dev is used as both the argument for the function and to provide NUMA
- * context for where to run the function. By doing this we can try to
- * provide for the best possible outcome by operating on the device on the
- * CPUs closest to the device.
- * @domain may be used in the async_synchronize_*_domain() functions to
+ * @dev is used as both the woke argument for the woke function and to provide NUMA
+ * context for where to run the woke function. By doing this we can try to
+ * provide for the woke best possible outcome by operating on the woke device on the
+ * CPUs closest to the woke device.
+ * @domain may be used in the woke async_synchronize_*_domain() functions to
  * wait within a certain synchronization domain rather than globally.
  * Note: This function may be called from atomic or non-atomic contexts.
  */

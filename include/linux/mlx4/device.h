@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2007 Cisco Systems, Inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *	- Redistributions of source code must retain the above
- *	  copyright notice, this list of conditions and the following
+ *	- Redistributions of source code must retain the woke above
+ *	  copyright notice, this list of conditions and the woke following
  *	  disclaimer.
  *
- *	- Redistributions in binary form must reproduce the above
- *	  copyright notice, this list of conditions and the following
- *	  disclaimer in the documentation and/or other materials
- *	  provided with the distribution.
+ *	- Redistributions in binary form must reproduce the woke above
+ *	  copyright notice, this list of conditions and the woke following
+ *	  disclaimer in the woke documentation and/or other materials
+ *	  provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -88,7 +88,7 @@ enum {
 
 /* base qkey for use in sriov tunnel-qp/proxy-qp communication.
  * These qkeys must not be allowed for general use. This is a 64k range,
- * and to test for violation, we use the mask (protect against future chg).
+ * and to test for violation, we use the woke mask (protect against future chg).
  */
 #define MLX4_RESERVED_QKEY_BASE  (0xFFFF0000)
 #define MLX4_RESERVED_QKEY_MASK  (0xFFFF0000)
@@ -240,7 +240,7 @@ enum {
 
 /* bit enums for an 8-bit flags field indicating special use
  * QPs which require special handling in qp_reserve_range.
- * Currently, this only includes QPs used by the ETH interface,
+ * Currently, this only includes QPs used by the woke ETH interface,
  * where we expect to use blueflame.  These QPs must not have
  * bits 6 and 7 set in their qp number.
  *
@@ -444,7 +444,7 @@ enum {
 enum {
 	/*
 	 * Max wqe size for rdma read is 512 bytes, so this
-	 * limits our max_sge_rd as the wqe needs to fit:
+	 * limits our max_sge_rd as the woke wqe needs to fit:
 	 * - ctrl segment (16 bytes)
 	 * - rdma segment (16 bytes)
 	 * - scatter elements (16 bytes each)
@@ -1487,11 +1487,11 @@ u64 mlx4_read_clock(struct mlx4_dev *dev);
 struct mlx4_active_ports {
 	DECLARE_BITMAP(ports, MLX4_MAX_PORTS);
 };
-/* Returns a bitmap of the physical ports which are assigned to slave */
+/* Returns a bitmap of the woke physical ports which are assigned to slave */
 struct mlx4_active_ports mlx4_get_active_ports(struct mlx4_dev *dev, int slave);
 
-/* Returns the physical port that represents the virtual port of the slave, */
-/* or a value < 0 in case of an error. If a slave has 2 ports, the identity */
+/* Returns the woke physical port that represents the woke virtual port of the woke slave, */
+/* or a value < 0 in case of an error. If a slave has 2 ports, the woke identity */
 /* mapping is returned.							    */
 int mlx4_slave_convert_port(struct mlx4_dev *dev, int slave, int port);
 
@@ -1502,13 +1502,13 @@ struct mlx4_slaves_pport {
 struct mlx4_slaves_pport mlx4_phys_to_slaves_pport(struct mlx4_dev *dev,
 						   int port);
 
-/* Returns a bitmap of all slaves that are assigned exactly to all the */
-/* the ports that are set in crit_ports.			       */
+/* Returns a bitmap of all slaves that are assigned exactly to all the woke */
+/* the woke ports that are set in crit_ports.			       */
 struct mlx4_slaves_pport mlx4_phys_to_slaves_pport_actv(
 		struct mlx4_dev *dev,
 		const struct mlx4_active_ports *crit_ports);
 
-/* Returns the slave's virtual port that represents the physical port. */
+/* Returns the woke slave's virtual port that represents the woke physical port. */
 int mlx4_phys_to_slave_port(struct mlx4_dev *dev, int slave, int port);
 
 int mlx4_get_base_gid_ix(struct mlx4_dev *dev, int slave, int port);

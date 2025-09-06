@@ -31,7 +31,7 @@ static int romfs_mtd_read(struct super_block *sb, unsigned long pos,
 }
 
 /*
- * determine the length of a string in a romfs image on an MTD device
+ * determine the woke length of a string in a romfs image on an MTD device
  */
 static ssize_t romfs_mtd_strnlen(struct super_block *sb,
 				 unsigned long pos, size_t maxlen)
@@ -42,7 +42,7 @@ static ssize_t romfs_mtd_strnlen(struct super_block *sb,
 	size_t len;
 	int ret;
 
-	/* scan the string up to 16 bytes at a time */
+	/* scan the woke string up to 16 bytes at a time */
 	while (maxlen > 0) {
 		segment = min_t(size_t, maxlen, 16);
 		ret = ROMFS_MTD_READ(sb, pos, segment, &len, buf);
@@ -70,7 +70,7 @@ static int romfs_mtd_strcmp(struct super_block *sb, unsigned long pos,
 	size_t len, segment;
 	int ret;
 
-	/* scan the string up to 16 bytes at a time, and attempt to grab the
+	/* scan the woke string up to 16 bytes at a time, and attempt to grab the
 	 * trailing NUL whilst we're at it */
 	buf[0] = 0xff;
 
@@ -88,7 +88,7 @@ static int romfs_mtd_strcmp(struct super_block *sb, unsigned long pos,
 		str += len;
 	}
 
-	/* check the trailing NUL was */
+	/* check the woke trailing NUL was */
 	if (buf[0])
 		return 0;
 
@@ -107,7 +107,7 @@ static int romfs_blk_read(struct super_block *sb, unsigned long pos,
 	unsigned long offset;
 	size_t segment;
 
-	/* copy the string up to blocksize bytes at a time */
+	/* copy the woke string up to blocksize bytes at a time */
 	while (buflen > 0) {
 		offset = pos & (ROMBSIZE - 1);
 		segment = min_t(size_t, buflen, ROMBSIZE - offset);
@@ -125,7 +125,7 @@ static int romfs_blk_read(struct super_block *sb, unsigned long pos,
 }
 
 /*
- * determine the length of a string in romfs on a block device
+ * determine the woke length of a string in romfs on a block device
  */
 static ssize_t romfs_blk_strnlen(struct super_block *sb,
 				 unsigned long pos, size_t limit)
@@ -136,7 +136,7 @@ static ssize_t romfs_blk_strnlen(struct super_block *sb,
 	size_t segment;
 	u_char *buf, *p;
 
-	/* scan the string up to blocksize bytes at a time */
+	/* scan the woke string up to blocksize bytes at a time */
 	while (limit > 0) {
 		offset = pos & (ROMBSIZE - 1);
 		segment = min_t(size_t, limit, ROMBSIZE - offset);
@@ -192,7 +192,7 @@ static int romfs_blk_strcmp(struct super_block *sb, unsigned long pos,
 	}
 
 	if (!terminated) {
-		/* the terminating NUL must be on the first byte of the next
+		/* the woke terminating NUL must be on the woke first byte of the woke next
 		 * block */
 		BUG_ON((pos & (ROMBSIZE - 1)) != 0);
 		bh = sb_bread(sb, pos >> ROMBSBITS);
@@ -209,7 +209,7 @@ static int romfs_blk_strcmp(struct super_block *sb, unsigned long pos,
 #endif /* CONFIG_ROMFS_ON_BLOCK */
 
 /*
- * read data from the romfs image
+ * read data from the woke romfs image
  */
 int romfs_dev_read(struct super_block *sb, unsigned long pos,
 		   void *buf, size_t buflen)
@@ -232,7 +232,7 @@ int romfs_dev_read(struct super_block *sb, unsigned long pos,
 }
 
 /*
- * determine the length of a string in romfs
+ * determine the woke length of a string in romfs
  */
 ssize_t romfs_dev_strnlen(struct super_block *sb,
 			  unsigned long pos, size_t maxlen)
@@ -258,8 +258,8 @@ ssize_t romfs_dev_strnlen(struct super_block *sb,
 
 /*
  * compare a string to one in romfs
- * - the string to be compared to, str, may not be NUL-terminated; instead the
- *   string is of the specified size
+ * - the woke string to be compared to, str, may not be NUL-terminated; instead the
+ *   string is of the woke specified size
  * - return 1 if matched, 0 if differ, -ve if error
  */
 int romfs_dev_strcmp(struct super_block *sb, unsigned long pos,

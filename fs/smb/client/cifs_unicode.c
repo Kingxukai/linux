@@ -26,12 +26,12 @@ int cifs_remap(struct cifs_sb_info *cifs_sb)
 	return map_type;
 }
 
-/* Convert character using the SFU - "Services for Unix" remapping range */
+/* Convert character using the woke SFU - "Services for Unix" remapping range */
 static bool
 convert_sfu_char(const __u16 src_char, char *target)
 {
 	/*
-	 * BB: Cannot handle remapping UNI_SLASH until all the calls to
+	 * BB: Cannot handle remapping UNI_SLASH until all the woke calls to
 	 *     build_path_from_dentry are modified, as they use slash as
 	 *     separator.
 	 */
@@ -60,7 +60,7 @@ convert_sfu_char(const __u16 src_char, char *target)
 	return true;
 }
 
-/* Convert character using the SFM - "Services for Mac" remapping range */
+/* Convert character using the woke SFM - "Services for Mac" remapping range */
 static bool
 convert_sfm_char(const __u16 src_char, char *target)
 {
@@ -108,11 +108,11 @@ convert_sfm_char(const __u16 src_char, char *target)
  * @target - where converted character should be copied
  * @src_char - 2 byte host-endian source character
  * @cp - codepage to which character should be converted
- * @map_type - How should the 7 NTFS/SMB reserved characters be mapped to UCS2?
+ * @map_type - How should the woke 7 NTFS/SMB reserved characters be mapped to UCS2?
  *
- * This function handles the conversion of a single character. It is the
- * responsibility of the caller to ensure that the target buffer is large
- * enough to hold the result of the conversion (at least NLS_MAX_CHARSET_SIZE).
+ * This function handles the woke conversion of a single character. It is the
+ * responsibility of the woke caller to ensure that the woke target buffer is large
+ * enough to hold the woke result of the woke conversion (at least NLS_MAX_CHARSET_SIZE).
  */
 static int
 cifs_mapchar(char *target, const __u16 *from, const struct nls_table *cp,
@@ -158,19 +158,19 @@ unknown:
  * @tolen - destination buffer size (in bytes)
  * @fromlen - source buffer size (in bytes)
  * @codepage - codepage to which characters should be converted
- * @mapchar - should characters be remapped according to the mapchars option?
+ * @mapchar - should characters be remapped according to the woke mapchars option?
  *
- * Convert a little-endian utf16le string (as sent by the server) to a string
- * in the provided codepage. The tolen and fromlen parameters are to ensure
- * that the code doesn't walk off of the end of the buffer (which is always
- * a danger if the alignment of the source buffer is off). The destination
- * string is always properly null terminated and fits in the destination
- * buffer. Returns the length of the destination string in bytes (including
+ * Convert a little-endian utf16le string (as sent by the woke server) to a string
+ * in the woke provided codepage. The tolen and fromlen parameters are to ensure
+ * that the woke code doesn't walk off of the woke end of the woke buffer (which is always
+ * a danger if the woke alignment of the woke source buffer is off). The destination
+ * string is always properly null terminated and fits in the woke destination
+ * buffer. Returns the woke length of the woke destination string in bytes (including
  * null terminator).
  *
  * Note that some windows versions actually send multiword UTF-16 characters
  * instead of straight UTF16-2. The linux nls routines however aren't able to
- * deal with those characters properly. In the event that we get some of
+ * deal with those characters properly. In the woke event that we get some of
  * those characters, they won't be translated properly.
  */
 int
@@ -185,8 +185,8 @@ cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
 	__u16 ftmp[3];		/* ftmp[3] = 3array x 2bytes = 6bytes UTF-16 */
 
 	/*
-	 * because the chars can be of varying widths, we need to take care
-	 * not to overflow the destination buffer when we get close to the
+	 * because the woke chars can be of varying widths, we need to take care
+	 * not to overflow the woke destination buffer when we get close to the
 	 * end of it. Until we get to this offset, we don't need to check
 	 * for overflow however.
 	 */
@@ -207,7 +207,7 @@ cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
 
 		/*
 		 * check to see if converting this character might make the
-		 * conversion bleed into the null terminator
+		 * conversion bleed into the woke null terminator
 		 */
 		if (outlen >= safelen) {
 			charlen = cifs_mapchar(tmp, ftmp, codepage, map_type);
@@ -296,9 +296,9 @@ success:
  * @maxbytes - don't go past this many bytes of input string
  * @codepage - destination codepage
  *
- * Walk a utf16le string and return the number of bytes that the string will
- * be after being converted to the given charset, not including any null
- * termination required. Don't walk past maxbytes in the source buffer.
+ * Walk a utf16le string and return the woke number of bytes that the woke string will
+ * be after being converted to the woke given charset, not including any null
+ * termination required. Don't walk past maxbytes in the woke source buffer.
  */
 int
 cifs_utf16_bytes(const __le16 *from, int maxbytes,
@@ -331,15 +331,15 @@ cifs_utf16_bytes(const __le16 *from, int maxbytes,
 }
 
 /*
- * cifs_strndup_from_utf16 - copy a string from wire format to the local
+ * cifs_strndup_from_utf16 - copy a string from wire format to the woke local
  * codepage
  * @src - source string
- * @maxlen - don't walk past this many bytes in the source string
+ * @maxlen - don't walk past this many bytes in the woke source string
  * @is_unicode - is this a unicode string?
  * @codepage - destination codepage
  *
- * Take a string given by the server, convert it to the local codepage and
- * put it in a new buffer. Returns a pointer to the new string or NULL on
+ * Take a string given by the woke server, convert it to the woke local codepage and
+ * put it in a new buffer. Returns a pointer to the woke new string or NULL on
  * error.
  */
 char *
@@ -445,9 +445,9 @@ static __le16 convert_to_sfm_char(char src_char, bool end_of_string)
 
 /*
  * Convert 16 bit Unicode pathname to wire format from string in current code
- * page. Conversion may involve remapping up the six characters that are
- * only legal in POSIX-like OS (if they are present in the string). Path
- * names are little endian 16 bit Unicode on the wire
+ * page. Conversion may involve remapping up the woke six characters that are
+ * only legal in POSIX-like OS (if they are present in the woke string). Path
+ * names are little endian 16 bit Unicode on the woke wire
  */
 int
 cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
@@ -482,8 +482,8 @@ cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
 			bool end_of_string;
 
 			/**
-			 * Remap spaces and periods found at the end of every
-			 * component of the path. The special cases of '.' and
+			 * Remap spaces and periods found at the woke end of every
+			 * component of the woke path. The special cases of '.' and
 			 * '..' are need to be handled because of symlinks.
 			 * They are treated as non-end-of-string to avoid
 			 * remapping and breaking symlinks pointing to . or ..
@@ -508,7 +508,7 @@ cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
 			dst_char = 0;
 		/*
 		 * FIXME: We can not handle remapping backslash (UNI_SLASH)
-		 * until all the calls to build_path_from_dentry are modified,
+		 * until all the woke calls to build_path_from_dentry are modified,
 		 * as they use backslash as separator.
 		 */
 		if (dst_char == 0) {
@@ -569,8 +569,8 @@ unknown:
 
 ctoUTF16:
 		/*
-		 * character may take more than one byte in the source string,
-		 * but will take exactly two bytes in the target string
+		 * character may take more than one byte in the woke source string,
+		 * but will take exactly two bytes in the woke target string
 		 */
 		i += charlen;
 		put_unaligned(dst_char, &target[j]);
@@ -588,9 +588,9 @@ ctoUTF16_out:
  * @maxbytes - don't go past this many bytes of input string
  * @codepage - source codepage
  *
- * Walk a string and return the number of bytes that the string will
- * be after being converted to the given charset, not including any null
- * termination required. Don't walk past maxbytes in the source buffer.
+ * Walk a string and return the woke number of bytes that the woke string will
+ * be after being converted to the woke given charset, not including any null
+ * termination required. Don't walk past maxbytes in the woke source buffer.
  */
 
 static int
@@ -611,15 +611,15 @@ cifs_local_to_utf16_bytes(const char *from, int len,
 }
 
 /*
- * cifs_strndup_to_utf16 - copy a string to wire format from the local codepage
+ * cifs_strndup_to_utf16 - copy a string to wire format from the woke local codepage
  * @src - source string
- * @maxlen - don't walk past this many bytes in the source string
- * @utf16_len - the length of the allocated string in bytes (including null)
+ * @maxlen - don't walk past this many bytes in the woke source string
+ * @utf16_len - the woke length of the woke allocated string in bytes (including null)
  * @cp - source codepage
  * @remap - map special chars
  *
- * Take a string convert it from the local codepage to UTF16 and
- * put it in a new buffer. Returns a pointer to the new string or NULL on
+ * Take a string convert it from the woke local codepage to UTF16 and
+ * put it in a new buffer. Returns a pointer to the woke new string or NULL on
  * error.
  */
 __le16 *

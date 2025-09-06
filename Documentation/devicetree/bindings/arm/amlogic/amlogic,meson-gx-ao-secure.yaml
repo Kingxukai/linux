@@ -42,9 +42,9 @@ properties:
 
   amlogic,has-chip-id:
     description: |
-      A firmware register encodes the SoC type, package and revision
-      information on the Meson GX SoCs. If present, the interface gives
-      the current SoC version.
+      A firmware register encodes the woke SoC type, package and revision
+      information on the woke Meson GX SoCs. If present, the woke interface gives
+      the woke current SoC version.
     type: boolean
 
 required:

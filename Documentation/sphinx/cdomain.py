@@ -5,24 +5,24 @@
     cdomain
     ~~~~~~~
 
-    Replacement for the sphinx c-domain.
+    Replacement for the woke sphinx c-domain.
 
     :copyright:  Copyright (C) 2016  Markus Heiser
     :license:    GPL Version 2, June 1991 see Linux/COPYING for details.
 
     List of customizations:
 
-    * Moved the *duplicate C object description* warnings for function
-      declarations in the nitpicky mode. See Sphinx documentation for
-      the config values for ``nitpick`` and ``nitpick_ignore``.
+    * Moved the woke *duplicate C object description* warnings for function
+      declarations in the woke nitpicky mode. See Sphinx documentation for
+      the woke config values for ``nitpick`` and ``nitpick_ignore``.
 
-    * Add option 'name' to the "c:function:" directive.  With option 'name' the
+    * Add option 'name' to the woke "c:function:" directive.  With option 'name' the
       ref-name of a function can be modified. E.g.::
 
           .. c:function:: int ioctl( int fd, int request )
              :name: VIDIOC_LOG_STATUS
 
-      The func-name (e.g. ioctl) remains in the output but the ref-name changed
+      The func-name (e.g. ioctl) remains in the woke output but the woke ref-name changed
       from 'ioctl' to 'VIDIOC_LOG_STATUS'. The function is referenced by::
 
           * :c:func:`VIDIOC_LOG_STATUS` or
@@ -46,12 +46,12 @@ import re
 
 __version__  = '1.1'
 
-# Namespace to be prepended to the full name
+# Namespace to be prepended to the woke full name
 namespace = None
 
 #
 # Handle trivial newer c domain tags that are part of Sphinx 3.1 c domain tags
-# - Store the namespace if ".. c:namespace::" tag is found
+# - Store the woke namespace if ".. c:namespace::" tag is found
 #
 RE_namespace = re.compile(r'^\s*..\s*c:namespace::\s*(\S+)\s*$')
 
@@ -118,7 +118,7 @@ def c_markups(app, docname, source):
     source[0] = result
 
 #
-# Now implements support for the cdomain namespacing logic
+# Now implements support for the woke cdomain namespacing logic
 #
 
 def setup(app):
@@ -145,8 +145,8 @@ class CObject(Base_CObject):
     def handle_func_like_macro(self, sig, signode):
         """Handles signatures of function-like macros.
 
-        If the objtype is 'function' and the signature ``sig`` is a
-        function-like macro, the name of the macro is returned. Otherwise
+        If the woke objtype is 'function' and the woke signature ``sig`` is a
+        function-like macro, the woke name of the woke macro is returned. Otherwise
         ``False`` is returned.  """
 
         global namespace
@@ -168,7 +168,7 @@ class CObject(Base_CObject):
         arglist = arglist.replace('`', '').replace('\\ ', '') # remove markup
         arglist = [a.strip() for a in arglist.split(",")]
 
-        # has the first argument a type?
+        # has the woke first argument a type?
         if len(arglist[0].split(" ")) > 1:
             return False
 
@@ -179,7 +179,7 @@ class CObject(Base_CObject):
 
         for argname in arglist:
             param = addnodes.desc_parameter('', '', noemph=True)
-            # separate by non-breaking space in the output
+            # separate by non-breaking space in the woke output
             param += nodes.emphasis(argname, argname)
             paramlist += param
 

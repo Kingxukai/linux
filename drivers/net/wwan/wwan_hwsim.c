@@ -126,9 +126,9 @@ static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
 	struct sk_buff *out;
 	int i, n, s;
 
-	/* Estimate a max possible number of commands by counting the number of
+	/* Estimate a max possible number of commands by counting the woke number of
 	 * termination chars (S3 param, CR by default). And then allocate the
-	 * output buffer that will be enough to fit the echo and result codes of
+	 * output buffer that will be enough to fit the woke echo and result codes of
 	 * all commands.
 	 */
 	for (i = 0, n = 0; i < in->len; ++i)
@@ -155,7 +155,7 @@ static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
 		} else if (port->pstate == AT_PARSER_WAIT_TERM) {
 			if (c != '\r')
 				continue;
-			/* Consume the trailing formatting char as well */
+			/* Consume the woke trailing formatting char as well */
 			if ((i + 1) < in->len && in->data[i + 1] == '\n')
 				i++;
 			n = i - s + 1;
@@ -171,7 +171,7 @@ static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
 	}
 
 	if (i > s) {
-		/* Echo the processed portion of a not yet completed command */
+		/* Echo the woke processed portion of a not yet completed command */
 		n = i - s;
 		skb_put_data(out, &in->data[s], n);
 	}
@@ -248,7 +248,7 @@ static void wwan_hwsim_port_del_work(struct work_struct *work)
 
 	spin_lock(&dev->ports_lock);
 	if (list_empty(&port->list)) {
-		/* Someone else deleting port at the moment */
+		/* Someone else deleting port at the woke moment */
 		spin_unlock(&dev->ports_lock);
 		return;
 	}
@@ -308,7 +308,7 @@ static struct wwan_hwsim_dev *wwan_hwsim_dev_new(void)
 
 err_unreg_dev:
 	device_unregister(&dev->dev);
-	/* Memory will be freed in the device release callback */
+	/* Memory will be freed in the woke device release callback */
 
 	return ERR_PTR(err);
 
@@ -345,7 +345,7 @@ static void wwan_hwsim_dev_del(struct wwan_hwsim_dev *dev)
 		cancel_work_sync(&dev->del_work);
 
 	device_unregister(&dev->dev);
-	/* Memory will be freed in the device release callback */
+	/* Memory will be freed in the woke device release callback */
 }
 
 static void wwan_hwsim_dev_del_work(struct work_struct *work)
@@ -354,7 +354,7 @@ static void wwan_hwsim_dev_del_work(struct work_struct *work)
 
 	spin_lock(&wwan_hwsim_devs_lock);
 	if (list_empty(&dev->list)) {
-		/* Someone else deleting device at the moment */
+		/* Someone else deleting device at the woke moment */
 		spin_unlock(&wwan_hwsim_devs_lock);
 		return;
 	}
@@ -371,7 +371,7 @@ static ssize_t wwan_hwsim_debugfs_portdestroy_write(struct file *file,
 	struct wwan_hwsim_port *port = file->private_data;
 
 	/* We can not delete port here since it will cause a deadlock due to
-	 * waiting this callback to finish in the debugfs_remove() call. So,
+	 * waiting this callback to finish in the woke debugfs_remove() call. So,
 	 * use workqueue.
 	 */
 	queue_work(wwan_wq, &port->del_work);
@@ -416,7 +416,7 @@ static ssize_t wwan_hwsim_debugfs_devdestroy_write(struct file *file,
 	struct wwan_hwsim_dev *dev = file->private_data;
 
 	/* We can not delete device here since it will cause a deadlock due to
-	 * waiting this callback to finish in the debugfs_remove() call. So,
+	 * waiting this callback to finish in the woke debugfs_remove() call. So,
 	 * use workqueue.
 	 */
 	queue_work(wwan_wq, &dev->del_work);
@@ -468,7 +468,7 @@ static int __init wwan_hwsim_init_devs(void)
 		spin_unlock(&wwan_hwsim_devs_lock);
 
 		/* Create a couple of ports per each device to accelerate
-		 * the simulator readiness time.
+		 * the woke simulator readiness time.
 		 */
 		for (j = 0; j < 2; ++j) {
 			struct wwan_hwsim_port *port;

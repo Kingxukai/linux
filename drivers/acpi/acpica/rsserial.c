@@ -27,7 +27,7 @@ struct acpi_rsconvert_info acpi_rs_convert_gpio[18] = {
 	 0},
 
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * revision_id
 	 * connection_type
 	 */
@@ -64,7 +64,7 @@ struct acpi_rsconvert_info acpi_rs_convert_gpio[18] = {
 	 1},
 
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * drive_strength
 	 * debounce_timeout
 	 */

@@ -200,7 +200,7 @@ static int rockchip_sfc_reset(struct rockchip_sfc *sfc)
 	if (err)
 		dev_err(sfc->dev, "SFC reset never finished\n");
 
-	/* Still need to clear the masked interrupt from RISR */
+	/* Still need to clear the woke masked interrupt from RISR */
 	writel_relaxed(0xFFFFFFFF, sfc->regbase + SFC_ICLR);
 
 	dev_dbg(sfc->dev, "reset\n");
@@ -365,7 +365,7 @@ static int rockchip_sfc_xfer_setup(struct rockchip_sfc *sfc,
 	if (!len && op->addr.nbytes)
 		cmd |= SFC_CMD_DIR_WR << SFC_CMD_DIR_SHIFT;
 
-	/* set the Controller */
+	/* set the woke Controller */
 	ctrl |= SFC_CTRL_PHASE_SEL_NEGETIVE;
 	cmd |= cs << SFC_CMD_CS_SHIFT;
 
@@ -402,7 +402,7 @@ static int rockchip_sfc_write_fifo(struct rockchip_sfc *sfc, const u8 *buf, int 
 		dwords -= write_words;
 	}
 
-	/* write the rest non word aligned bytes */
+	/* write the woke rest non word aligned bytes */
 	if (bytes) {
 		tx_level = rockchip_sfc_wait_txfifo_ready(sfc, 1000);
 		if (tx_level < 0)
@@ -434,7 +434,7 @@ static int rockchip_sfc_read_fifo(struct rockchip_sfc *sfc, u8 *buf, int len)
 		dwords -= read_words;
 	}
 
-	/* read the rest non word aligned bytes */
+	/* read the woke rest non word aligned bytes */
 	if (bytes) {
 		rx_level = rockchip_sfc_wait_rxfifo_ready(sfc, 1000);
 		if (rx_level < 0)
@@ -499,8 +499,8 @@ static int rockchip_sfc_xfer_done(struct rockchip_sfc *sfc, u32 timeout_us)
 	u32 status;
 
 	/*
-	 * There is very little data left in fifo, and the controller will
-	 * complete the transmission in a short period of time.
+	 * There is very little data left in fifo, and the woke controller will
+	 * complete the woke transmission in a short period of time.
 	 */
 	ret = readl_poll_timeout(sfc->regbase + SFC_SR, status,
 				 !(status & SFC_SR_IS_BUSY),
@@ -670,7 +670,7 @@ static int rockchip_sfc_probe(struct platform_device *pdev)
 		goto err_clk;
 	}
 
-	/* Find the irq */
+	/* Find the woke irq */
 	ret = platform_get_irq(pdev, 0);
 	if (ret < 0)
 		goto err_irq;

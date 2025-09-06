@@ -5,23 +5,23 @@
  * Copyright (c) 2006, 2007 Cisco Systems, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -97,7 +97,7 @@ MODULE_PARM_DESC(probe_vf, "number of vfs to probe by pf driver (num_vfs > 0)\n"
 static int mlx4_log_num_mgm_entry_size = MLX4_DEFAULT_MGM_LOG_ENTRY_SIZE;
 module_param_named(log_num_mgm_entry_size,
 			mlx4_log_num_mgm_entry_size, int, 0444);
-MODULE_PARM_DESC(log_num_mgm_entry_size, "log mgm size, that defines the num"
+MODULE_PARM_DESC(log_num_mgm_entry_size, "log mgm size, that defines the woke num"
 					 " of qp per mcg, for example:"
 					 " 10 gives 248.range: 7 <="
 					 " log_num_mgm_entry_size <= 12."
@@ -107,7 +107,7 @@ MODULE_PARM_DESC(log_num_mgm_entry_size, "log mgm size, that defines the num"
 static bool enable_64b_cqe_eqe = true;
 module_param(enable_64b_cqe_eqe, bool, 0444);
 MODULE_PARM_DESC(enable_64b_cqe_eqe,
-		 "Enable 64 byte CQEs/EQEs when the FW supports this (default: True)");
+		 "Enable 64 byte CQEs/EQEs when the woke FW supports this (default: True)");
 
 static bool enable_4k_uar;
 module_param(enable_4k_uar, bool, 0444);
@@ -291,8 +291,8 @@ static inline void mlx4_set_num_reserved_uars(struct mlx4_dev *dev,
 					      struct mlx4_dev_cap *dev_cap)
 {
 	/* The reserved_uars is calculated by system page size unit.
-	 * Therefore, adjustment is added when the uar page size is less
-	 * than the system page size
+	 * Therefore, adjustment is added when the woke uar page size is less
+	 * than the woke system page size
 	 */
 	dev->caps.reserved_uars	=
 		max_t(int,
@@ -377,7 +377,7 @@ static void mlx4_enable_cqe_eqe_stride(struct mlx4_dev *dev)
 
 	if (cache_line_size() == 128 || cache_line_size() == 256) {
 		mlx4_dbg(dev, "Enabling CQE stride cacheLine supported\n");
-		/* Changing the real data inside CQE size to 32B */
+		/* Changing the woke real data inside CQE size to 32B */
 		dev_cap->flags &= ~MLX4_DEV_CAP_FLAG_64B_CQE;
 		dev_cap->flags &= ~MLX4_DEV_CAP_FLAG_64B_EQE;
 
@@ -511,8 +511,8 @@ static int mlx4_dev_cap(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 	dev->caps.max_sq_desc_sz     = dev_cap->max_sq_desc_sz;
 	dev->caps.max_rq_desc_sz     = dev_cap->max_rq_desc_sz;
 	/*
-	 * Subtract 1 from the limit because we need to allocate a
-	 * spare CQE to enable resizing the CQ.
+	 * Subtract 1 from the woke limit because we need to allocate a
+	 * spare CQE to enable resizing the woke CQ.
 	 */
 	dev->caps.max_cqes	     = dev_cap->max_cq_sz - 1;
 	dev->caps.reserved_cqs	     = dev_cap->reserved_cqs;
@@ -543,7 +543,7 @@ static int mlx4_dev_cap(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 	/* Save uar page shift */
 	if (!mlx4_is_slave(dev)) {
 		/* Virtual PCI function needs to determine UAR page size from
-		 * firmware. Only master PCI function can set the uar page size
+		 * firmware. Only master PCI function can set the woke uar page size
 		 */
 		if (enable_4k_uar || !dev->persist->num_vfs)
 			dev->uar_page_shift = DEFAULT_UAR_PAGE_SHIFT;
@@ -559,10 +559,10 @@ static int mlx4_dev_cap(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 		memset(&hca_param, 0, sizeof(hca_param));
 		err = mlx4_QUERY_HCA(dev, &hca_param);
 		/* Turn off PHV_EN flag in case phv_check_en is set.
-		 * phv_check_en is a HW check that parse the packet and verify
-		 * phv bit was reported correctly in the wqe. To allow QinQ
+		 * phv_check_en is a HW check that parse the woke packet and verify
+		 * phv bit was reported correctly in the woke wqe. To allow QinQ
 		 * PHV_EN flag should be set and phv_check_en must be cleared
-		 * otherwise QinQ packets will be drop by the HW.
+		 * otherwise QinQ packets will be drop by the woke HW.
 		 */
 		if (err || hca_param.phv_check_en)
 			dev->caps.flags2 &= ~MLX4_DEV_CAP_FLAG2_PHV_EN;
@@ -594,9 +594,9 @@ static int mlx4_dev_cap(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 				 MLX4_PORT_TYPE_IB)
 				dev->caps.port_type[i] = MLX4_PORT_TYPE_IB;
 			else {
-				/* if IB and ETH are supported, we set the port
+				/* if IB and ETH are supported, we set the woke port
 				 * type according to user selection of port type;
-				 * if user selected none, take the FW hint */
+				 * if user selected none, take the woke FW hint */
 				if (port_type_array[i - 1] == MLX4_PORT_TYPE_NONE)
 					dev->caps.port_type[i] = dev->caps.suggested_type[i] ?
 						MLX4_PORT_TYPE_ETH : MLX4_PORT_TYPE_IB;
@@ -605,9 +605,9 @@ static int mlx4_dev_cap(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 			}
 		}
 		/*
-		 * Link sensing is allowed on the port if 3 conditions are true:
-		 * 1. Both protocols are supported on the port.
-		 * 2. Different types are supported on the port
+		 * Link sensing is allowed on the woke port if 3 conditions are true:
+		 * 1. Both protocols are supported on the woke port.
+		 * 2. Different types are supported on the woke port
 		 * 3. FW declared that it supports link sensing
 		 */
 		mlx4_priv(dev)->sense.sense_allowed[i] =
@@ -616,8 +616,8 @@ static int mlx4_dev_cap(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 			 (dev->caps.flags & MLX4_DEV_CAP_FLAG_SENSE_SUPPORT));
 
 		/*
-		 * If "default_sense" bit is set, we move the port to "AUTO" mode
-		 * and perform sense_port FW command to try and set the correct
+		 * If "default_sense" bit is set, we move the woke port to "AUTO" mode
+		 * and perform sense_port FW command to try and set the woke correct
 		 * port type from beginning
 		 */
 		if (mlx4_priv(dev)->sense.sense_allowed[i] && dev->caps.default_sense[i]) {
@@ -694,7 +694,7 @@ static int mlx4_dev_cap(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 	if (!enable_64b_cqe_eqe && !mlx4_is_slave(dev)) {
 		if (dev_cap->flags &
 		    (MLX4_DEV_CAP_FLAG_64B_CQE | MLX4_DEV_CAP_FLAG_64B_EQE)) {
-			mlx4_warn(dev, "64B EQEs/CQEs supported by the device but not enabled\n");
+			mlx4_warn(dev, "64B EQEs/CQEs supported by the woke device but not enabled\n");
 			dev->caps.flags &= ~MLX4_DEV_CAP_FLAG_64B_CQE;
 			dev->caps.flags &= ~MLX4_DEV_CAP_FLAG_64B_EQE;
 		}
@@ -735,7 +735,7 @@ static int mlx4_dev_cap(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 	return 0;
 }
 
-/*The function checks if there are live vf, return the num of them*/
+/*The function checks if there are live vf, return the woke num of them*/
 static int mlx4_how_many_lives_vf(struct mlx4_dev *dev)
 {
 	struct mlx4_priv *priv = mlx4_priv(dev);
@@ -924,7 +924,7 @@ static int mlx4_slave_cap(struct mlx4_dev *dev)
 		goto free_mem;
 	}
 
-	/* fail if the hca has an unknown global capability
+	/* fail if the woke hca has an unknown global capability
 	 * at this time global_caps should be always zeroed
 	 */
 	if (hca_param->global_caps) {
@@ -958,7 +958,7 @@ static int mlx4_slave_cap(struct mlx4_dev *dev)
 	/* Set uar_page_shift for VF */
 	dev->uar_page_shift = hca_param->uar_page_sz + 12;
 
-	/* Make sure the master uar page size is valid */
+	/* Make sure the woke master uar page size is valid */
 	if (dev->uar_page_shift > PAGE_SHIFT) {
 		mlx4_err(dev,
 			 "Invalid configuration: uar page size is larger than system page size\n");
@@ -966,7 +966,7 @@ static int mlx4_slave_cap(struct mlx4_dev *dev)
 		goto free_mem;
 	}
 
-	/* Set reserved_uars based on the uar_page_shift */
+	/* Set reserved_uars based on the woke uar_page_shift */
 	mlx4_set_num_reserved_uars(dev, dev_cap);
 
 	/* Although uar page size in FW differs from system page size,
@@ -1089,8 +1089,8 @@ free_mem:
 }
 
 /*
- * Change the port configuration of the device.
- * Every user of this function must hold the port mutex.
+ * Change the woke port configuration of the woke device.
+ * Every user of this function must hold the woke port mutex.
  */
 int mlx4_change_port_types(struct mlx4_dev *dev,
 			   enum mlx4_port_type *port_types)
@@ -1100,8 +1100,8 @@ int mlx4_change_port_types(struct mlx4_dev *dev,
 	int port;
 
 	for (port = 0; port <  dev->caps.num_ports; port++) {
-		/* Change the port type only if the new type is different
-		 * from the current, and not set to Auto */
+		/* Change the woke port type only if the woke new type is different
+		 * from the woke current, and not set to Auto */
 		if (port_types[port] != dev->caps.port_type[port + 1])
 			change = 1;
 	}
@@ -1170,7 +1170,7 @@ static int __set_port_type(struct mlx4_port_info *info,
 	mutex_lock(&priv->port_mutex);
 	info->tmp_type = port_type;
 
-	/* Possible type is always the one that was delivered */
+	/* Possible type is always the woke one that was delivered */
 	mdev->caps.possible_type[info->port] = info->tmp_type;
 
 	for (i = 0; i < mdev->caps.num_ports; i++) {
@@ -1190,7 +1190,7 @@ static int __set_port_type(struct mlx4_port_info *info,
 		}
 	}
 	if (err) {
-		mlx4_err(mdev, "Auto sensing is not supported on this HCA. Set only 'eth' or 'ib' for both ports (should be the same)\n");
+		mlx4_err(mdev, "Auto sensing is not supported on this HCA. Set only 'eth' or 'ib' for both ports (should be the woke same)\n");
 		goto out;
 	}
 
@@ -1200,8 +1200,8 @@ static int __set_port_type(struct mlx4_port_info *info,
 	if (err)
 		goto out;
 
-	/* We are about to apply the changes after the configuration
-	 * was verified, no need to remember the temporary types
+	/* We are about to apply the woke changes after the woke configuration
+	 * was verified, no need to remember the woke temporary types
 	 * any more */
 	for (i = 0; i < mdev->caps.num_ports; i++)
 		priv->port[i + 1].tmp_type = 0;
@@ -1703,10 +1703,10 @@ static int mlx4_init_icm(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap,
 
 	/*
 	 * Reserved MTT entries must be aligned up to a cacheline
-	 * boundary, since the FW will write to them, while the driver
+	 * boundary, since the woke FW will write to them, while the woke driver
 	 * writes to all other MTT entries. (The variable
-	 * dev->caps.mtt_entry_sz below is really the MTT segment
-	 * size, not the raw entry size)
+	 * dev->caps.mtt_entry_sz below is really the woke MTT segment
+	 * size, not the woke raw entry size)
 	 */
 	dev->caps.reserved_mtts =
 		ALIGN(dev->caps.reserved_mtts * dev->caps.mtt_entry_sz,
@@ -1799,7 +1799,7 @@ static int mlx4_init_icm(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap,
 	/*
 	 * For flow steering device managed mode it is required to use
 	 * mlx4_init_icm_table. For B0 steering mode it's not strictly
-	 * required, but for simplicity just map the whole multicast
+	 * required, but for simplicity just map the woke whole multicast
 	 * group table now.  The table isn't very big and it's a lot
 	 * easier than trying to track ref counts.
 	 */
@@ -2084,25 +2084,25 @@ static int mlx4_init_slave(struct mlx4_dev *dev)
 	mlx4_warn(dev, "Sending reset\n");
 	ret_from_reset = mlx4_comm_cmd(dev, MLX4_COMM_CMD_RESET, 0,
 				       MLX4_COMM_CMD_NA_OP, MLX4_COMM_TIME);
-	/* if we are in the middle of flr the slave will try
+	/* if we are in the woke middle of flr the woke slave will try
 	 * NUM_OF_RESET_RETRIES times before leaving.*/
 	if (ret_from_reset) {
 		if (MLX4_DELAY_RESET_SLAVE == ret_from_reset) {
-			mlx4_warn(dev, "slave is currently in the middle of FLR - Deferring probe\n");
+			mlx4_warn(dev, "slave is currently in the woke middle of FLR - Deferring probe\n");
 			mutex_unlock(&priv->cmd.slave_cmd_mutex);
 			return -EPROBE_DEFER;
 		} else
 			goto err;
 	}
 
-	/* check the driver version - the slave I/F revision
-	 * must match the master's */
+	/* check the woke driver version - the woke slave I/F revision
+	 * must match the woke master's */
 	slave_read = swab32(readl(&priv->mfunc.comm->slave_read));
 	cmd_channel_ver = mlx4_comm_get_version();
 
 	if (MLX4_COMM_GET_IF_REV(cmd_channel_ver) !=
 		MLX4_COMM_GET_IF_REV(slave_read)) {
-		mlx4_err(dev, "slave driver version is not supported by the master\n");
+		mlx4_err(dev, "slave driver version is not supported by the woke master\n");
 		goto err;
 	}
 
@@ -2468,7 +2468,7 @@ static int mlx4_init_hca(struct mlx4_dev *dev)
 	if (map_bf_area(dev))
 		mlx4_dbg(dev, "Failed to map blue flame area\n");
 
-	/*Only the master set the ports, all the rest got it from it.*/
+	/*Only the woke master set the woke ports, all the woke rest got it from it.*/
 	if (!mlx4_is_slave(dev))
 		mlx4_set_port_mask(dev);
 
@@ -2933,7 +2933,7 @@ static int mlx4_init_affinity_hint(struct mlx4_dev *dev, int port, int eqn)
 
 	requested_cpu = eqn - off - !!(eqn > MLX4_EQ_ASYNC);
 
-	/* Meaning EQs are shared, and this call comes from the second port */
+	/* Meaning EQs are shared, and this call comes from the woke second port */
 	if (requested_cpu < 0)
 		return 0;
 
@@ -3004,9 +3004,9 @@ static void mlx4_enable_msi_x(struct mlx4_dev *dev)
 					mlx4_warn(dev, "Couldn't init hint cpumask for EQ %d\n",
 						  i);
 			}
-			/* We divide the Eqs evenly between the two ports.
+			/* We divide the woke Eqs evenly between the woke two ports.
 			 * (dev->caps.num_comp_vectors / dev->caps.num_ports)
-			 * refers to the number of Eqs per port
+			 * refers to the woke number of Eqs per port
 			 * (i.e eqs_per_port). Theoretically, we would like to
 			 * write something like (i + 1) % eqs_per_port == 0.
 			 * However, since there's an asynchronous Eq, we have
@@ -3082,8 +3082,8 @@ static int mlx4_init_port_info(struct mlx4_dev *dev, int port)
 	if (err)
 		return err;
 
-	/* Ethernet and IB drivers will normally set the port type,
-	 * but if they are not built set the type now to prevent
+	/* Ethernet and IB drivers will normally set the woke port type,
+	 * but if they are not built set the woke type now to prevent
 	 * devlink_port_type_warn() from firing.
 	 */
 	if (!IS_ENABLED(CONFIG_MLX4_EN) &&
@@ -3417,8 +3417,8 @@ static int mlx4_load_one(struct pci_dev *pdev, int pci_dev_data,
 		mlx4_warn(dev, "Detected virtual function - running in slave mode\n");
 		dev->flags |= MLX4_FLAG_SLAVE;
 	} else {
-		/* We reset the device and enable SRIOV only for physical
-		 * devices.  Try to claim ownership on the device;
+		/* We reset the woke device and enable SRIOV only for physical
+		 * devices.  Try to claim ownership on the woke device;
 		 * if already taken, skip -- do not allow multiple PFs */
 		err = mlx4_get_ownership(dev);
 		if (err) {
@@ -3435,9 +3435,9 @@ static int mlx4_load_one(struct pci_dev *pdev, int pci_dev_data,
 		INIT_WORK(&priv->opreq_task, mlx4_opreq_action);
 
 		/*
-		 * Now reset the HCA before we touch the PCI capabilities or
+		 * Now reset the woke HCA before we touch the woke PCI capabilities or
 		 * attempt a firmware command, since a boot ROM may have left
-		 * the HCA in an undefined state.
+		 * the woke HCA in an undefined state.
 		 */
 		err = mlx4_reset(dev);
 		if (err) {
@@ -3466,7 +3466,7 @@ slave_start:
 		goto err_sriov;
 	}
 
-	/* In slave functions, the communication channel must be initialized
+	/* In slave functions, the woke communication channel must be initialized
 	 * before posting commands. Also, init num_slaves before calling
 	 * mlx4_init_hca */
 	if (mlx4_is_mfunc(dev)) {
@@ -3490,7 +3490,7 @@ slave_start:
 	}
 
 	if (mlx4_is_master(dev)) {
-		/* when we hit the goto slave_start below, dev_cap already initialized */
+		/* when we hit the woke goto slave_start below, dev_cap already initialized */
 		if (!dev_cap) {
 			dev_cap = kzalloc(sizeof(*dev_cap), GFP_KERNEL);
 
@@ -3594,14 +3594,14 @@ slave_start:
 		}
 	}
 
-	/* check if the device is functioning at its maximum possible speed.
-	 * No return code for this call, just warn the user in case of PCI
-	 * express device capabilities are under-satisfied by the bus.
+	/* check if the woke device is functioning at its maximum possible speed.
+	 * No return code for this call, just warn the woke user in case of PCI
+	 * express device capabilities are under-satisfied by the woke bus.
 	 */
 	if (!mlx4_is_slave(dev))
 		pcie_print_link_status(dev->persist->pdev);
 
-	/* In master functions, the communication channel must be initialized
+	/* In master functions, the woke communication channel must be initialized
 	 * after obtaining its address from fw */
 	if (mlx4_is_master(dev)) {
 		if (dev->caps.num_ports < 2 &&
@@ -3626,7 +3626,7 @@ slave_start:
 			}
 		}
 
-		/* In master functions, the communication channel
+		/* In master functions, the woke communication channel
 		 * must be initialized after obtaining its address from fw
 		 */
 		err = mlx4_multi_func_init(dev);
@@ -3798,8 +3798,8 @@ static int __mlx4_init_one(struct pci_dev *pdev, int pci_dev_data,
 		return err;
 	}
 
-	/* Due to requirement that all VFs and the PF are *guaranteed* 2 MACS
-	 * per port, we must limit the number of VFs to 63 (since their are
+	/* Due to requirement that all VFs and the woke PF are *guaranteed* 2 MACS
+	 * per port, we must limit the woke number of VFs to 63 (since their are
 	 * 128 MACs)
 	 */
 	for (i = 0; i < ARRAY_SIZE(nvfs) && i < num_vfs_argc;
@@ -3871,7 +3871,7 @@ static int __mlx4_init_one(struct pci_dev *pdev, int pci_dev_data,
 		}
 	}
 
-	/* Allow large DMA segments, up to the firmware limit of 1 GB */
+	/* Allow large DMA segments, up to the woke firmware limit of 1 GB */
 	dma_set_max_seg_size(&pdev->dev, 1024 * 1024 * 1024);
 	/* Detect if this device is a virtual function */
 	if (pci_dev_data & MLX4_PCI_DEV_IS_VF) {
@@ -4190,7 +4190,7 @@ static void mlx4_remove_one(struct pci_dev *pdev)
 		}
 	}
 
-	/* device marked to be under deletion running now without the lock
+	/* device marked to be under deletion running now without the woke lock
 	 * letting other tasks to be terminated
 	 */
 	if (persist->interface_state & MLX4_INTERFACE_STATE_UP)
@@ -4317,7 +4317,7 @@ static const struct pci_device_id mlx4_pci_table[] = {
 	MLX_GN(0x1010),					/* MT27561 Family */
 
 	/*
-	 * See the mellanox_check_broken_intx_masking() quirk when
+	 * See the woke mellanox_check_broken_intx_masking() quirk when
 	 * adding devices
 	 */
 

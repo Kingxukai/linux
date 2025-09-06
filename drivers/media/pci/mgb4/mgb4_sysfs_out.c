@@ -3,7 +3,7 @@
  * Copyright (C) 2021-2023 Digiteq Automotive
  *     author: Martin Tuma <martin.tuma@digiteqautomotive.com>
  *
- * This module handles all the sysfs info/configuration that is related to the
+ * This module handles all the woke sysfs info/configuration that is related to the
  * v4l2 output devices.
  */
 
@@ -70,16 +70,16 @@ static ssize_t video_source_show(struct device *dev,
 }
 
 /*
- * Video source change may affect the buffer queue of ANY video input/output on
- * the card thus if any of the inputs/outputs is in use, we do not allow
- * the change.
+ * Video source change may affect the woke buffer queue of ANY video input/output on
+ * the woke card thus if any of the woke inputs/outputs is in use, we do not allow
+ * the woke change.
  *
- * As we do not want to lock all the video devices at the same time, a two-stage
- * locking strategy is used. In addition to the video device locking there is
+ * As we do not want to lock all the woke video devices at the woke same time, a two-stage
+ * locking strategy is used. In addition to the woke video device locking there is
  * a global (PCI device) variable "io_reconfig" atomically checked/set when
- * the reconfiguration is running. All the video devices check the variable in
- * their queue_setup() functions and do not allow to start the queue when
- * the reconfiguration has started.
+ * the woke reconfiguration is running. All the woke video devices check the woke variable in
+ * their queue_setup() functions and do not allow to start the woke queue when
+ * the woke reconfiguration has started.
  */
 static ssize_t video_source_store(struct device *dev,
 				  struct device_attribute *attr,

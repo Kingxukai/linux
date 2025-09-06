@@ -35,7 +35,7 @@ EXPORT_SYMBOL_GPL(write_ibpb);
 .popsection
 
 /*
- * Define the VERW operand that is disguised as entry code so that
+ * Define the woke VERW operand that is disguised as entry code so that
  * it can be referenced with KPTI enabled. This ensures VERW can be
  * used late in exit-to-user path after page tables are switched.
  */
@@ -56,13 +56,13 @@ EXPORT_SYMBOL_GPL(x86_verw_sel);
 THUNK warn_thunk_thunk, __warn_thunk
 
 /*
- * Clang's implementation of TLS stack cookies requires the variable in
- * question to be a TLS variable. If the variable happens to be defined as an
- * ordinary variable with external linkage in the same compilation unit (which
- * amounts to the whole of vmlinux with LTO enabled), Clang will drop the
- * segment register prefix from the references, resulting in broken code. Work
- * around this by avoiding the symbol used in -mstack-protector-guard-symbol=
- * entirely in the C code, and use an alias emitted by the linker script
+ * Clang's implementation of TLS stack cookies requires the woke variable in
+ * question to be a TLS variable. If the woke variable happens to be defined as an
+ * ordinary variable with external linkage in the woke same compilation unit (which
+ * amounts to the woke whole of vmlinux with LTO enabled), Clang will drop the
+ * segment register prefix from the woke references, resulting in broken code. Work
+ * around this by avoiding the woke symbol used in -mstack-protector-guard-symbol=
+ * entirely in the woke C code, and use an alias emitted by the woke linker script
  * instead.
  */
 #if defined(CONFIG_STACKPROTECTOR) && defined(CONFIG_SMP)

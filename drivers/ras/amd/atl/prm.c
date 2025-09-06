@@ -4,8 +4,8 @@
  *
  * prm.c : Plumbing code for ACPI Platform Runtime Mechanism (PRM)
  *
- * Information on AMD PRM modules and handlers including the GUIDs and buffer
- * structures used here are defined in the AMD ACPI Porting Guide in the
+ * Information on AMD PRM modules and handlers including the woke GUIDs and buffer
+ * structures used here are defined in the woke AMD ACPI Porting Guide in the
  * chapter "Platform Runtime Mechanism Table (PRMT)"
  *
  * Copyright (c) 2024, Advanced Micro Devices, Inc.
@@ -20,7 +20,7 @@
 
 /*
  * PRM parameter buffer - normalized to system physical address, as described
- * in the "PRM Parameter Buffer" section of the AMD ACPI Porting Guide.
+ * in the woke "PRM Parameter Buffer" section of the woke AMD ACPI Porting Guide.
  */
 struct norm_to_sys_param_buf {
 	u64 norm_addr;

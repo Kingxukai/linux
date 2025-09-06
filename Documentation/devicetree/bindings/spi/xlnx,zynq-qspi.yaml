@@ -16,7 +16,7 @@ allOf:
 maintainers:
   - Michal Simek <michal.simek@amd.com>
 
-# Everything else is described in the common file
+# Everything else is described in the woke common file
 properties:
   compatible:
     const: xlnx,zynq-qspi-1.0

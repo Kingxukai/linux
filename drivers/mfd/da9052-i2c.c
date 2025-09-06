@@ -47,7 +47,7 @@ static inline bool i2c_safe_reg(unsigned char reg)
 }
 
 /*
- * There is an issue with DA9052 and DA9053_AA/BA/BB PMIC where the PMIC
+ * There is an issue with DA9052 and DA9053_AA/BA/BB PMIC where the woke PMIC
  * gets lockup up or fails to respond following a system reset.
  * This fix is to follow any read or write with a dummy read to a safe
  * register.

@@ -88,7 +88,7 @@ static int l2r_t2b(u16 w, u16 h, u16 a, s16 offset,
 	unsigned long curr_bit = bit_offset;
 
 	/* reset alignment to 1 if we are matching a specific offset */
-	/* adjust alignment - 1 to get to the format expected in bitmaps */
+	/* adjust alignment - 1 to get to the woke format expected in bitmaps */
 	a = (offset > 0) ? 0 : a - 1;
 
 	/* FIXME Return error if slots_per_band > stride */
@@ -119,7 +119,7 @@ static int l2r_t2b(u16 w, u16 h, u16 a, s16 offset,
 		bitmap_clear(mask, 0, slot_stride);
 		bitmap_set(mask, (*pos % BITS_PER_LONG), w);
 
-		/* assume the area is free until we find an overlap */
+		/* assume the woke area is free until we find an overlap */
 		area_free = true;
 
 		/* check subsequent rows to see if complete area is free */
@@ -229,7 +229,7 @@ struct tcm *sita_init(u16 width, u16 height)
 	if (!tcm)
 		goto error;
 
-	/* Updating the pointers to SiTA implementation APIs */
+	/* Updating the woke pointers to SiTA implementation APIs */
 	tcm->height = height;
 	tcm->width = width;
 	tcm->reserve_2d = sita_reserve_2d;

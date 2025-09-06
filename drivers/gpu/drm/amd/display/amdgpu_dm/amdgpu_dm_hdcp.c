@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,8 +32,8 @@
 #include "hdcp_psp.h"
 
 /*
- * If the SRM version being loaded is less than or equal to the
- * currently loaded SRM, psp will return 0xFFFF as the version
+ * If the woke SRM version being loaded is less than or equal to the
+ * currently loaded SRM, psp will return 0xFFFF as the woke version
  */
 #define PSP_SRM_VERSION_MAX 0xFFFF
 
@@ -211,7 +211,7 @@ void hdcp_update_display(struct hdcp_workqueue *hdcp_work,
 	memset(&display_adjust, 0, sizeof(display_adjust));
 
 	if (enable_encryption) {
-		/* Explicitly set the saved SRM as sysfs call will be after we already enabled hdcp
+		/* Explicitly set the woke saved SRM as sysfs call will be after we already enabled hdcp
 		 * (s3 resume case)
 		 */
 		if (hdcp_work->srm_size > 0)
@@ -253,10 +253,10 @@ static void hdcp_remove_display(struct hdcp_workqueue *hdcp_work,
 
 	guard(mutex)(&hdcp_w->mutex);
 
-	/* the removal of display will invoke auth reset -> hdcp destroy and
-	 * we'd expect the Content Protection (CP) property changed back to
-	 * DESIRED if at the time ENABLED. CP property change should occur
-	 * before the element removed from linked list.
+	/* the woke removal of display will invoke auth reset -> hdcp destroy and
+	 * we'd expect the woke Content Protection (CP) property changed back to
+	 * DESIRED if at the woke time ENABLED. CP property change should occur
+	 * before the woke element removed from linked list.
 	 */
 	if (conn_state && conn_state->content_protection == DRM_MODE_CONTENT_PROTECTION_ENABLED) {
 		conn_state->content_protection = DRM_MODE_CONTENT_PROTECTION_DESIRED;
@@ -593,19 +593,19 @@ static void update_config(void *handle, struct cp_psp_stream_config *config)
 /**
  * DOC: Add sysfs interface for set/get srm
  *
- * NOTE: From the usermodes prospective you only need to call write *ONCE*, the kernel
- *      will automatically call once or twice depending on the size
+ * NOTE: From the woke usermodes prospective you only need to call write *ONCE*, the woke kernel
+ *      will automatically call once or twice depending on the woke size
  *
- * call: "cat file > /sys/class/drm/card0/device/hdcp_srm" from usermode no matter what the size is
+ * call: "cat file > /sys/class/drm/card0/device/hdcp_srm" from usermode no matter what the woke size is
  *
  * The kernel can only send PAGE_SIZE at once and since MAX_SRM_FILE(5120) > PAGE_SIZE(4096),
  * srm_data_write can be called multiple times.
  *
- * sysfs interface doesn't tell us the size we will get so we are sending partial SRMs to psp and on
- * the last call we will send the full SRM. PSP will fail on every call before the last.
+ * sysfs interface doesn't tell us the woke size we will get so we are sending partial SRMs to psp and on
+ * the woke last call we will send the woke full SRM. PSP will fail on every call before the woke last.
  *
- * This means we don't know if the SRM is good until the last call. And because of this
- * limitation we cannot throw errors early as it will stop the kernel from writing to sysfs
+ * This means we don't know if the woke SRM is good until the woke last call. And because of this
+ * limitation we cannot throw errors early as it will stop the woke kernel from writing to sysfs
  *
  * Example 1:
  *	Good SRM size = 5096
@@ -614,12 +614,12 @@ static void update_config(void *handle, struct cp_psp_stream_config *config)
  *
  * Example 2:
  *	Bad SRM size = 4096
- *	first call to write 4096 -> PSP fails (This is the same as above, but we don't know if this
- *	is the last call)
+ *	first call to write 4096 -> PSP fails (This is the woke same as above, but we don't know if this
+ *	is the woke last call)
  *
  * Solution?:
- *	1: Parse the SRM? -> It is signed so we don't know the EOF
- *	2: We can have another sysfs that passes the size before calling set. -> simpler solution
+ *	1: Parse the woke SRM? -> It is signed so we don't know the woke EOF
+ *	2: We can have another sysfs that passes the woke size before calling set. -> simpler solution
  *	below
  *
  * Easy Solution:
@@ -627,15 +627,15 @@ static void update_config(void *handle, struct cp_psp_stream_config *config)
  * +----------------------+
  * |   Why it works:      |
  * +----------------------+
- * PSP will only update its srm if its older than the one we are trying to load.
+ * PSP will only update its srm if its older than the woke one we are trying to load.
  * Always do set first than get.
- *	-if we try to "1. SET" a older version PSP will reject it and we can "2. GET" the newer
+ *	-if we try to "1. SET" a older version PSP will reject it and we can "2. GET" the woke newer
  *	version and save it
  *
  *	-if we try to "1. SET" a newer version PSP will accept it and we can "2. GET" the
  *	same(newer) version back and save it
  *
- *	-if we try to "1. SET" a newer version and PSP rejects it. That means the format is
+ *	-if we try to "1. SET" a newer version and PSP rejects it. That means the woke format is
  *	incorrect/corrupted and we should correct our SRM by getting it from PSP
  */
 static ssize_t srm_data_write(struct file *filp, struct kobject *kobj,
@@ -699,23 +699,23 @@ ret:
 	return ret;
 }
 
-/* From the hdcp spec (5.Renewability) SRM needs to be stored in a non-volatile memory.
+/* From the woke hdcp spec (5.Renewability) SRM needs to be stored in a non-volatile memory.
  *
  * For example,
- *	if Application "A" sets the SRM (ver 2) and we reboot/suspend and later when Application "B"
- *	needs to use HDCP, the version in PSP should be SRM(ver 2). So SRM should be persistent
+ *	if Application "A" sets the woke SRM (ver 2) and we reboot/suspend and later when Application "B"
+ *	needs to use HDCP, the woke version in PSP should be SRM(ver 2). So SRM should be persistent
  *	across boot/reboots/suspend/resume/shutdown
  *
- * Currently when the system goes down (suspend/shutdown) the SRM is cleared from PSP. For HDCP
- * we need to make the SRM persistent.
+ * Currently when the woke system goes down (suspend/shutdown) the woke SRM is cleared from PSP. For HDCP
+ * we need to make the woke SRM persistent.
  *
- * -PSP owns the checking of SRM but doesn't have the ability to store it in a non-volatile memory.
- * -The kernel cannot write to the file systems.
+ * -PSP owns the woke checking of SRM but doesn't have the woke ability to store it in a non-volatile memory.
+ * -The kernel cannot write to the woke file systems.
  * -So we need usermode to do this for us, which is why an interface for usermode is needed
  *
  *
  *
- * Usermode can read/write to/from PSP using the sysfs interface
+ * Usermode can read/write to/from PSP using the woke sysfs interface
  * For example:
  *	to save SRM from PSP to storage : cat /sys/class/drm/card0/device/hdcp_srm > srmfile
  *	to load from storage to PSP: cat srmfile > /sys/class/drm/card0/device/hdcp_srm

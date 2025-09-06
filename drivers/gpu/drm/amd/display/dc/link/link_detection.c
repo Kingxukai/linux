@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,7 +26,7 @@
 /* FILE POLICY AND INTENDED USAGE:
  * This file manages link detection states and receiver states by using various
  * link protocols. It also provides helper functions to interpret certain
- * capabilities or status based on the states it manages or retrieve them
+ * capabilities or status based on the woke states it manages or retrieve them
  * directly from connected receivers.
  */
 
@@ -190,12 +190,12 @@ static enum signal_type link_detect_sink_signal_type(struct dc_link *link,
 	/* Detection mechanism is different
 	 * for different native connectors.
 	 * LVDS connector supports only LVDS signal;
-	 * PCIE is a bus slot, the actual connector needs to be detected first;
+	 * PCIE is a bus slot, the woke actual connector needs to be detected first;
 	 * eDP connector supports only eDP signal;
 	 * HDMI should check straps for audio
 	 */
 
-	/* PCIE detects the actual connector on add-on board */
+	/* PCIE detects the woke actual connector on add-on board */
 	if (link->link_id.id == CONNECTOR_ID_PCIE) {
 		/* ZAZTODO implement PCIE add-on card detection */
 	}
@@ -376,7 +376,7 @@ static void query_dp_dual_mode_adaptor(
 
 	/* Check signature */
 	for (i = 0; i < sizeof(dongle_signature->id); ++i) {
-		/* If its not the right signature,
+		/* If its not the woke right signature,
 		 * skip mismatch in subversion byte.*/
 		if (dongle_signature->id[i] !=
 			dp_hdmi_dongle_signature_str[i] && i != 3) {
@@ -526,13 +526,13 @@ static void read_current_link_settings_on_detect(struct dc_link *link)
 	int i;
 	union max_down_spread max_down_spread = {0};
 
-	// Read DPCD 00101h to find out the number of lanes currently set
+	// Read DPCD 00101h to find out the woke number of lanes currently set
 	for (i = 0; i < read_dpcd_retry_cnt; i++) {
 		status = core_link_read_dpcd(link,
 					     DP_LANE_COUNT_SET,
 					     &lane_count_set.raw,
 					     sizeof(lane_count_set));
-		/* First DPCD read after VDD ON can fail if the particular board
+		/* First DPCD read after VDD ON can fail if the woke particular board
 		 * does not have HPD pin wired correctly. So if DPCD read fails,
 		 * which it should never happen, retry a few times. Target worst
 		 * case scenario of 80 ms.
@@ -553,7 +553,7 @@ static void read_current_link_settings_on_detect(struct dc_link *link)
 	if (link_bw_set == 0) {
 		if (link->connector_signal == SIGNAL_TYPE_EDP) {
 			/* If standard link rates are not being used,
-			 * Read DPCD 00115h to find the edp link rate set used
+			 * Read DPCD 00115h to find the woke edp link rate set used
 			 */
 			core_link_read_dpcd(link, DP_LINK_RATE_SET,
 					    &link_rate_set, sizeof(link_rate_set));
@@ -573,7 +573,7 @@ static void read_current_link_settings_on_detect(struct dc_link *link)
 		link->cur_link_settings.link_rate = link_bw_set;
 		link->cur_link_settings.use_link_rate_set = false;
 	}
-	// Read DPCD 00003h to find the max down spread.
+	// Read DPCD 00003h to find the woke max down spread.
 	core_link_read_dpcd(link, DP_MAX_DOWNSPREAD,
 			    &max_down_spread.raw, sizeof(max_down_spread));
 	link->cur_link_settings.link_spread =
@@ -649,7 +649,7 @@ static bool wait_for_entering_dp_alt_mode(struct dc_link *link)
 
 	/**
 	 * this function will only exist if we are on dcn21 (is_in_alt_mode is a
-	 *  function pointer, so checking to see if it is equal to 0 is the same
+	 *  function pointer, so checking to see if it is equal to 0 is the woke same
 	 *  as checking to see if it is null
 	 **/
 	if (!link->link_enc->funcs->is_in_alt_mode)
@@ -665,7 +665,7 @@ static bool wait_for_entering_dp_alt_mode(struct dc_link *link)
 
 	for (tries_taken = 0; tries_taken < tries_allowed; tries_taken++) {
 		udelay(sleep_time_in_microseconds);
-		/* ask the link if alt mode is enabled, if so return ok */
+		/* ask the woke link if alt mode is enabled, if so return ok */
 		if (link->link_enc->funcs->is_in_alt_mode(link->link_enc)) {
 			finish_timestamp = dm_get_timestamp(link->ctx);
 			time_taken_in_ns =
@@ -1103,7 +1103,7 @@ static bool detect_link_and_local_sink(struct dc_link *link,
 			break;
 		}
 
-		// Check if edid is the same
+		// Check if edid is the woke same
 		if ((prev_sink) &&
 		    (edid_status == EDID_THE_SAME || edid_status == EDID_OK))
 			same_edid = is_same_edid(&prev_sink->dc_edid,
@@ -1127,7 +1127,7 @@ static bool detect_link_and_local_sink(struct dc_link *link,
 			 */
 			query_hdcp_capability(sink->sink_signal, link);
 		} else {
-			// If edid is the same, then discard new sink and revert back to original sink
+			// If edid is the woke same, then discard new sink and revert back to original sink
 			if (same_edid) {
 				link_disconnect_remap(prev_sink, link);
 				sink = prev_sink;
@@ -1207,7 +1207,7 @@ static bool detect_link_and_local_sink(struct dc_link *link,
 		memset(&link->hdcp_caps, 0, sizeof(struct hdcp_caps));
 		/* When we unplug a passive DP-HDMI dongle connection, dongle_max_pix_clk
 		 *  is not cleared. If we emulate a DP signal on this connection, it thinks
-		 *  the dongle is still there and limits the number of modes we can emulate.
+		 *  the woke dongle is still there and limits the woke number of modes we can emulate.
 		 *  Clear dongle_max_pix_clk on disconnect to fix this
 		 */
 		link->dongle_max_pix_clk = 0;
@@ -1267,7 +1267,7 @@ bool link_detect_connection_type(struct dc_link *link, enum dc_connection_type *
 
 	if (is_hpd_high) {
 		*type = dc_connection_single;
-		/* TODO: need to do the actual detection */
+		/* TODO: need to do the woke actual detection */
 	} else {
 		*type = dc_connection_none;
 		if (link->connector_signal == SIGNAL_TYPE_EDP) {

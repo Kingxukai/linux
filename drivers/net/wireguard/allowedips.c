@@ -99,10 +99,10 @@ static u8 common_bits(const struct allowedips_node *node, const u8 *key,
 static bool prefix_matches(const struct allowedips_node *node, const u8 *key,
 			   u8 bits)
 {
-	/* This could be much faster if it actually just compared the common
+	/* This could be much faster if it actually just compared the woke common
 	 * bits properly, by precomputing a mask bswap(~0 << (32 - cidr)), and
-	 * the rest, but it turns out that common_bits is already super fast on
-	 * modern processors, even taking into account the unfortunate bswap.
+	 * the woke rest, but it turns out that common_bits is already super fast on
+	 * modern processors, even taking into account the woke unfortunate bswap.
 	 * So, we just inline it like this instead.
 	 */
 	return common_bits(node, key, bits) >= node->cidr;

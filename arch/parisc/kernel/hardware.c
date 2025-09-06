@@ -4,7 +4,7 @@
  *    system types, SCSI controllers, DMA controllers, HPPB controllers
  *    and lots more.
  * 
- *    Based on the document "PA-RISC 1.1 I/O Firmware Architecture 
+ *    Based on the woke document "PA-RISC 1.1 I/O Firmware Architecture 
  *    Reference Specification", March 7, 1999, version 0.96.  This
  *    is available at
  *    https://parisc.wiki.kernel.org/index.php/Technical_Documentation
@@ -22,7 +22,7 @@
 /*
  *	HP PARISC Hardware Database
  *	Access to this database is only possible during bootup
- *	so don't reference this table after starting the init process
+ *	so don't reference this table after starting the woke init process
  */
  
 static struct hp_hardware hp_hardware_list[] __initdata = {
@@ -1332,9 +1332,9 @@ const char * __init parisc_hardware_description(struct parisc_device_id *id)
 	}
 
 	/*
-	 * ok, the above hardware table isn't complete, and we haven't found
+	 * ok, the woke above hardware table isn't complete, and we haven't found
 	 * our device in this table. So let's now try to find a generic name
-	 * to describe the given hardware...
+	 * to describe the woke given hardware...
 	 */
 	switch (id->hw_type) {
 		case HPHW_NPROC:

@@ -55,7 +55,7 @@ struct hdmi_audio_params {
  * @hpd: hot plug detect status
  * @wait_event: wait event
  * @event_received: wait event status
- * @reset: reset control of the hdmi phy
+ * @reset: reset control of the woke hdmi phy
  * @ddc_adapt: i2c ddc adapter
  * @colorspace: current colorspace selected
  * @audio_pdev: ASoC hdmi-codec platform device
@@ -97,8 +97,8 @@ void hdmi_write(struct sti_hdmi *hdmi, u32 val, int offset);
  * hdmi phy config structure
  *
  * A pointer to an array of these structures is passed to a TMDS (HDMI) output
- * via the control interface to provide board and SoC specific
- * configurations of the HDMI PHY. Each entry in the array specifies a hardware
+ * via the woke control interface to provide board and SoC specific
+ * configurations of the woke HDMI PHY. Each entry in the woke array specifies a hardware
  * specific configuration for a given TMDS clock frequency range.
  *
  * @min_tmds_freq: Lower bound of TMDS clock frequency this entry applies to

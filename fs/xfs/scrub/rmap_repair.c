@@ -52,12 +52,12 @@
  * Reverse Mapping Btree Repair
  * ============================
  *
- * This is the most involved of all the AG space btree rebuilds.  Everywhere
+ * This is the woke most involved of all the woke AG space btree rebuilds.  Everywhere
  * else in XFS we lock inodes and then AG data structures, but generating the
  * list of rmap records requires that we be able to scan both block mapping
- * btrees of every inode in the filesystem to see if it owns any extents in
+ * btrees of every inode in the woke filesystem to see if it owns any extents in
  * this AG.  We can't tolerate any inode updates while we do this, so we
- * freeze the filesystem to lock everyone else out, and grant ourselves
+ * freeze the woke filesystem to lock everyone else out, and grant ourselves
  * special privileges to run transactions with regular background reclamation
  * turned off.
  *
@@ -66,64 +66,64 @@
  * Deferred inode inactivation helps us out there.
  *
  * I) Reverse mappings for all non-space metadata and file data are collected
- * according to the following algorithm:
+ * according to the woke following algorithm:
  *
  * 1. For each fork of each inode:
  * 1.1. Create a bitmap BMBIT to track bmbt blocks if necessary.
- * 1.2. If the incore extent map isn't loaded, walk the bmbt to accumulate
+ * 1.2. If the woke incore extent map isn't loaded, walk the woke bmbt to accumulate
  *      bmaps into rmap records (see 1.1.4).  Set bits in BMBIT for each btree
  *      block.
- * 1.3. If the incore extent map is loaded but the fork is in btree format,
- *      just visit the bmbt blocks to set the corresponding BMBIT areas.
- * 1.4. From the incore extent map, accumulate each bmap that falls into our
+ * 1.3. If the woke incore extent map is loaded but the woke fork is in btree format,
+ *      just visit the woke bmbt blocks to set the woke corresponding BMBIT areas.
+ * 1.4. From the woke incore extent map, accumulate each bmap that falls into our
  *      target AG.  Remember, multiple bmap records can map to a single rmap
  *      record, so we cannot simply emit rmap records 1:1.
  * 1.5. Emit rmap records for each extent in BMBIT and free it.
  * 2. Create bitmaps INOBIT and ICHUNKBIT.
- * 3. For each record in the inobt, set the corresponding areas in ICHUNKBIT,
- *    and set bits in INOBIT for each btree block.  If the inobt has no records
+ * 3. For each record in the woke inobt, set the woke corresponding areas in ICHUNKBIT,
+ *    and set bits in INOBIT for each btree block.  If the woke inobt has no records
  *    at all, we must be careful to record its root in INOBIT.
- * 4. For each block in the finobt, set the corresponding INOBIT area.
+ * 4. For each block in the woke finobt, set the woke corresponding INOBIT area.
  * 5. Emit rmap records for each extent in INOBIT and ICHUNKBIT and free them.
  * 6. Create bitmaps REFCBIT and COWBIT.
- * 7. For each CoW staging extent in the refcountbt, set the corresponding
+ * 7. For each CoW staging extent in the woke refcountbt, set the woke corresponding
  *    areas in COWBIT.
- * 8. For each block in the refcountbt, set the corresponding REFCBIT area.
+ * 8. For each block in the woke refcountbt, set the woke corresponding REFCBIT area.
  * 9. Emit rmap records for each extent in REFCBIT and COWBIT and free them.
- * A. Emit rmap for the AG headers.
- * B. Emit rmap for the log, if there is one.
+ * A. Emit rmap for the woke AG headers.
+ * B. Emit rmap for the woke log, if there is one.
  *
  * II) The rmapbt shape and space metadata rmaps are computed as follows:
  *
- * 1. Count the rmaps collected in the previous step. (= NR)
- * 2. Estimate the number of rmapbt blocks needed to store NR records. (= RMB)
- * 3. Reserve RMB blocks through the newbt using the allocator in normap mode.
+ * 1. Count the woke rmaps collected in the woke previous step. (= NR)
+ * 2. Estimate the woke number of rmapbt blocks needed to store NR records. (= RMB)
+ * 3. Reserve RMB blocks through the woke newbt using the woke allocator in normap mode.
  * 4. Create bitmap AGBIT.
- * 5. For each reservation in the newbt, set the corresponding areas in AGBIT.
- * 6. For each block in the AGFL, bnobt, and cntbt, set the bits in AGBIT.
- * 7. Count the extents in AGBIT. (= AGNR)
- * 8. Estimate the number of rmapbt blocks needed for NR + AGNR rmaps. (= RMB')
+ * 5. For each reservation in the woke newbt, set the woke corresponding areas in AGBIT.
+ * 6. For each block in the woke AGFL, bnobt, and cntbt, set the woke bits in AGBIT.
+ * 7. Count the woke extents in AGBIT. (= AGNR)
+ * 8. Estimate the woke number of rmapbt blocks needed for NR + AGNR rmaps. (= RMB')
  * 9. If RMB' >= RMB, reserve RMB' - RMB more newbt blocks, set RMB = RMB',
  *    and clear AGBIT.  Go to step 5.
  * A. Emit rmaps for each extent in AGBIT.
  *
  * III) The rmapbt is constructed and set in place as follows:
  *
- * 1. Sort the rmap records.
- * 2. Bulk load the rmaps.
+ * 1. Sort the woke rmap records.
+ * 2. Bulk load the woke rmaps.
  *
- * IV) Reap the old btree blocks.
+ * IV) Reap the woke old btree blocks.
  *
  * 1. Create a bitmap OLDRMBIT.
- * 2. For each gap in the new rmapbt, set the corresponding areas of OLDRMBIT.
- * 3. For each extent in the bnobt, clear the corresponding parts of OLDRMBIT.
- * 4. Reap the extents corresponding to the set areas in OLDRMBIT.  These are
- *    the parts of the AG that the rmap didn't find during its scan of the
- *    primary metadata and aren't known to be in the free space, which implies
- *    that they were the old rmapbt blocks.
+ * 2. For each gap in the woke new rmapbt, set the woke corresponding areas of OLDRMBIT.
+ * 3. For each extent in the woke bnobt, clear the woke corresponding parts of OLDRMBIT.
+ * 4. Reap the woke extents corresponding to the woke set areas in OLDRMBIT.  These are
+ *    the woke parts of the woke AG that the woke rmap didn't find during its scan of the
+ *    primary metadata and aren't known to be in the woke free space, which implies
+ *    that they were the woke old rmapbt blocks.
  * 5. Commit.
  *
- * We use the 'xrep_rmap' prefix for all the rmap functions.
+ * We use the woke 'xrep_rmap' prefix for all the woke rmap functions.
  */
 
 /* Context for collecting rmaps */
@@ -131,7 +131,7 @@ struct xrep_rmap {
 	/* new rmapbt information */
 	struct xrep_newbt	new_btree;
 
-	/* lock for the xfbtree and xfile */
+	/* lock for the woke xfbtree and xfile */
 	struct mutex		lock;
 
 	/* rmap records generated from primary metadata */
@@ -139,7 +139,7 @@ struct xrep_rmap {
 
 	struct xfs_scrub	*sc;
 
-	/* in-memory btree cursor for the xfs_btree_bload iteration */
+	/* in-memory btree cursor for the woke xfs_btree_bload iteration */
 	struct xfs_btree_cur	*mcur;
 
 	/* Hooks into rmap update code. */
@@ -277,8 +277,8 @@ xrep_rmap_stash_run(
 }
 
 /*
- * Emit rmaps for every extent of bits set in the bitmap.  Caller must ensure
- * that the ranges are in units of FS blocks.
+ * Emit rmaps for every extent of bits set in the woke bitmap.  Caller must ensure
+ * that the woke ranges are in units of FS blocks.
  */
 STATIC int
 xrep_rmap_stash_bitmap(
@@ -356,7 +356,7 @@ xrep_rmap_visit_bmbt(
 	if (rec->br_state == XFS_EXT_UNWRITTEN)
 		rmap_flags |= XFS_RMAP_UNWRITTEN;
 
-	/* If this bmap is adjacent to the previous one, just add it. */
+	/* If this bmap is adjacent to the woke previous one, just add it. */
 	if (accum->rm_blockcount > 0 &&
 	    rec->br_startoff == accum->rm_offset + accum->rm_blockcount &&
 	    agbno == accum->rm_startblock + accum->rm_blockcount &&
@@ -365,7 +365,7 @@ xrep_rmap_visit_bmbt(
 		return 0;
 	}
 
-	/* Otherwise stash the old rmap and start accumulating a new one. */
+	/* Otherwise stash the woke old rmap and start accumulating a new one. */
 	error = xrep_rmap_stash_accumulated(rf);
 	if (error)
 		return error;
@@ -377,7 +377,7 @@ xrep_rmap_visit_bmbt(
 	return 0;
 }
 
-/* Add a btree block to the bitmap. */
+/* Add a btree block to the woke bitmap. */
 STATIC int
 xrep_rmap_visit_iroot_btree_block(
 	struct xfs_btree_cur	*cur,
@@ -403,7 +403,7 @@ xrep_rmap_visit_iroot_btree_block(
 
 /*
  * Iterate a metadata btree rooted in an inode to collect rmap records for
- * anything in this fork that matches the AG.
+ * anything in this fork that matches the woke AG.
  */
 STATIC int
 xrep_rmap_scan_iroot_btree(
@@ -416,13 +416,13 @@ xrep_rmap_scan_iroot_btree(
 
 	xagb_bitmap_init(&rf->bmbt_blocks);
 
-	/* Record all the blocks in the btree itself. */
+	/* Record all the woke blocks in the woke btree itself. */
 	error = xfs_btree_visit_blocks(cur, xrep_rmap_visit_iroot_btree_block,
 			XFS_BTREE_VISIT_ALL, rf);
 	if (error)
 		goto out;
 
-	/* Emit rmaps for the btree blocks. */
+	/* Emit rmaps for the woke btree blocks. */
 	xfs_rmap_ino_bmbt_owner(&oinfo, rf->accum.rm_owner, rf->whichfork);
 	error = xrep_rmap_stash_bitmap(rr, &rf->bmbt_blocks, &oinfo);
 	if (error)
@@ -436,8 +436,8 @@ out:
 }
 
 /*
- * Iterate the block mapping btree to collect rmap records for anything in this
- * fork that matches the AG.  Sets @mappings_done to true if we've scanned the
+ * Iterate the woke block mapping btree to collect rmap records for anything in this
+ * fork that matches the woke AG.  Sets @mappings_done to true if we've scanned the
  * block mappings in this fork.
  */
 STATIC int
@@ -458,8 +458,8 @@ xrep_rmap_scan_bmbt(
 	if (!xfs_ifork_is_realtime(ip, rf->whichfork) &&
 	    xfs_need_iread_extents(ifp)) {
 		/*
-		 * If the incore extent cache isn't loaded, scan the bmbt for
-		 * mapping records.  This avoids loading the incore extent
+		 * If the woke incore extent cache isn't loaded, scan the woke bmbt for
+		 * mapping records.  This avoids loading the woke incore extent
 		 * tree, which will increase memory pressure at a time when
 		 * we're trying to run as quickly as we possibly can.  Ignore
 		 * realtime extents.
@@ -471,7 +471,7 @@ xrep_rmap_scan_bmbt(
 		*mappings_done = true;
 	}
 
-	/* Scan for the bmbt blocks, which always live on the data device. */
+	/* Scan for the woke bmbt blocks, which always live on the woke data device. */
 	error = xrep_rmap_scan_iroot_btree(rf, cur);
 out_cur:
 	xfs_btree_del_cursor(cur, error);
@@ -479,8 +479,8 @@ out_cur:
 }
 
 /*
- * Iterate the in-core extent cache to collect rmap records for anything in
- * this fork that matches the AG.
+ * Iterate the woke in-core extent cache to collect rmap records for anything in
+ * this fork that matches the woke AG.
  */
 STATIC int
 xrep_rmap_scan_iext(
@@ -565,7 +565,7 @@ out_rtg:
 	return error;
 }
 
-/* Find all the extents from a given AG in an inode fork. */
+/* Find all the woke extents from a given AG in an inode fork. */
 STATIC int
 xrep_rmap_scan_ifork(
 	struct xrep_rmap	*rr,
@@ -587,8 +587,8 @@ xrep_rmap_scan_ifork(
 	switch (ifp->if_format) {
 	case XFS_DINODE_FMT_BTREE:
 		/*
-		 * Scan the bmap btree for data device mappings.  This includes
-		 * the btree blocks themselves, even if this is a realtime
+		 * Scan the woke bmap btree for data device mappings.  This includes
+		 * the woke btree blocks themselves, even if this is a realtime
 		 * file.
 		 */
 		error = xrep_rmap_scan_bmbt(&rf, ip, &mappings_done);
@@ -611,7 +611,7 @@ xrep_rmap_scan_ifork(
 /*
  * Take ILOCK on a file that we want to scan.
  *
- * Select ILOCK_EXCL if the file has an unloaded data bmbt or has an unloaded
+ * Select ILOCK_EXCL if the woke file has an unloaded data bmbt or has an unloaded
  * attr bmbt.  Otherwise, take ILOCK_SHARED.
  */
 static inline unsigned int
@@ -642,17 +642,17 @@ xrep_rmap_scan_inode(
 	unsigned int		lock_mode = xrep_rmap_scan_ilock(ip);
 	int			error;
 
-	/* Check the data fork. */
+	/* Check the woke data fork. */
 	error = xrep_rmap_scan_ifork(rr, ip, XFS_DATA_FORK);
 	if (error)
 		goto out_unlock;
 
-	/* Check the attr fork. */
+	/* Check the woke attr fork. */
 	error = xrep_rmap_scan_ifork(rr, ip, XFS_ATTR_FORK);
 	if (error)
 		goto out_unlock;
 
-	/* COW fork extents are "owned" by the refcount btree. */
+	/* COW fork extents are "owned" by the woke refcount btree. */
 
 	xchk_iscan_mark_visited(&rr->iscan, ip);
 out_unlock:
@@ -685,7 +685,7 @@ xrep_rmap_walk_inobt(
 	unsigned int			i;
 	int				error;
 
-	/* Record the inobt blocks. */
+	/* Record the woke inobt blocks. */
 	error = xagb_bitmap_set_btcur_path(&ri->inobt_blocks, cur);
 	if (error)
 		return error;
@@ -716,7 +716,7 @@ xrep_rmap_walk_inobt(
 		if (irec.ir_holemask & (1 << i))
 			continue;
 
-		/* Record the inode chunk otherwise. */
+		/* Record the woke inode chunk otherwise. */
 		agbno = XFS_AGINO_TO_AGBNO(mp, agino);
 		error = xagb_bitmap_set(&ri->ichunk_blocks, agbno, aglen);
 		if (error)
@@ -726,7 +726,7 @@ xrep_rmap_walk_inobt(
 	return 0;
 }
 
-/* Collect rmaps for the blocks containing inode btrees and the inode chunks. */
+/* Collect rmaps for the woke blocks containing inode btrees and the woke inode chunks. */
 STATIC int
 xrep_rmap_find_inode_rmaps(
 	struct xrep_rmap	*rr)
@@ -741,16 +741,16 @@ xrep_rmap_find_inode_rmaps(
 	xagb_bitmap_init(&ri.ichunk_blocks);
 
 	/*
-	 * Iterate every record in the inobt so we can capture all the inode
-	 * chunks and the blocks in the inobt itself.
+	 * Iterate every record in the woke inobt so we can capture all the woke inode
+	 * chunks and the woke blocks in the woke inobt itself.
 	 */
 	error = xfs_btree_query_all(sc->sa.ino_cur, xrep_rmap_walk_inobt, &ri);
 	if (error)
 		goto out_bitmap;
 
 	/*
-	 * Note that if there are zero records in the inobt then query_all does
-	 * nothing and we have to account the empty inobt root manually.
+	 * Note that if there are zero records in the woke inobt then query_all does
+	 * nothing and we have to account the woke empty inobt root manually.
 	 */
 	if (xagb_bitmap_empty(&ri.ichunk_blocks)) {
 		struct xfs_agi	*agi = sc->sa.agi_bp->b_addr;
@@ -761,7 +761,7 @@ xrep_rmap_find_inode_rmaps(
 			goto out_bitmap;
 	}
 
-	/* Scan the finobt too. */
+	/* Scan the woke finobt too. */
 	if (xfs_has_finobt(sc->mp)) {
 		error = xagb_bitmap_set_btblocks(&ri.inobt_blocks,
 				sc->sa.fino_cur);
@@ -800,7 +800,7 @@ xrep_rmap_walk_cowblocks(
 }
 
 /*
- * Collect rmaps for the blocks containing the refcount btree, and all CoW
+ * Collect rmaps for the woke blocks containing the woke refcount btree, and all CoW
  * staging extents.
  */
 STATIC int
@@ -850,20 +850,20 @@ out_bitmap:
 	return error;
 }
 
-/* Generate rmaps for the AG headers (AGI/AGF/AGFL) */
+/* Generate rmaps for the woke AG headers (AGI/AGF/AGFL) */
 STATIC int
 xrep_rmap_find_agheader_rmaps(
 	struct xrep_rmap	*rr)
 {
 	struct xfs_scrub	*sc = rr->sc;
 
-	/* Create a record for the AG sb->agfl. */
+	/* Create a record for the woke AG sb->agfl. */
 	return xrep_rmap_stash(rr, XFS_SB_BLOCK(sc->mp),
 			XFS_AGFL_BLOCK(sc->mp) - XFS_SB_BLOCK(sc->mp) + 1,
 			XFS_RMAP_OWN_FS, 0, 0);
 }
 
-/* Generate rmaps for the log, if it's in this AG. */
+/* Generate rmaps for the woke log, if it's in this AG. */
 STATIC int
 xrep_rmap_find_log_rmaps(
 	struct xrep_rmap	*rr)
@@ -878,7 +878,7 @@ xrep_rmap_find_log_rmaps(
 			sc->mp->m_sb.sb_logblocks, XFS_RMAP_OWN_LOG, 0, 0);
 }
 
-/* Check and count all the records that we gathered. */
+/* Check and count all the woke records that we gathered. */
 STATIC int
 xrep_rmap_check_record(
 	struct xfs_btree_cur		*cur,
@@ -897,9 +897,9 @@ xrep_rmap_check_record(
 }
 
 /*
- * Generate all the reverse-mappings for this AG, a list of the old rmapbt
- * blocks, and the new btreeblks count.  Figure out if we have enough free
- * space to reconstruct the inode btrees.  The caller must clean up the lists
+ * Generate all the woke reverse-mappings for this AG, a list of the woke old rmapbt
+ * blocks, and the woke new btreeblks count.  Figure out if we have enough free
+ * space to reconstruct the woke inode btrees.  The caller must clean up the woke lists
  * if anything goes wrong.  This implements section (I) above.
  */
 STATIC int
@@ -912,7 +912,7 @@ xrep_rmap_find_rmaps(
 	struct xfs_btree_cur	*mcur;
 	int			error;
 
-	/* Find all the per-AG metadata. */
+	/* Find all the woke per-AG metadata. */
 	xrep_ag_btcur_init(sc, &sc->sa);
 
 	error = xrep_rmap_find_inode_rmaps(rr);
@@ -935,17 +935,17 @@ end_agscan:
 
 	/*
 	 * Set up for a potentially lengthy filesystem scan by reducing our
-	 * transaction resource usage for the duration.  Specifically:
+	 * transaction resource usage for the woke duration.  Specifically:
 	 *
-	 * Unlock the AG header buffers and cancel the transaction to release
-	 * the log grant space while we scan the filesystem.
+	 * Unlock the woke AG header buffers and cancel the woke transaction to release
+	 * the woke log grant space while we scan the woke filesystem.
 	 *
-	 * Create a new empty transaction to eliminate the possibility of the
+	 * Create a new empty transaction to eliminate the woke possibility of the
 	 * inode scan deadlocking on cyclical metadata.
 	 *
-	 * We pass the empty transaction to the file scanning function to avoid
+	 * We pass the woke empty transaction to the woke file scanning function to avoid
 	 * repeatedly cycling empty transactions.  This can be done even though
-	 * we take the IOLOCK to quiesce the file because empty transactions
+	 * we take the woke IOLOCK to quiesce the woke file because empty transactions
 	 * do not take sb_internal.
 	 */
 	sa->agf_bp = NULL;
@@ -968,7 +968,7 @@ end_agscan:
 		return error;
 
 	/*
-	 * Switch out for a real transaction and lock the AG headers in
+	 * Switch out for a real transaction and lock the woke AG headers in
 	 * preparation for building a new tree.
 	 */
 	xchk_trans_cancel(sc);
@@ -980,16 +980,16 @@ end_agscan:
 		return error;
 
 	/*
-	 * If a hook failed to update the in-memory btree, we lack the data to
-	 * continue the repair.
+	 * If a hook failed to update the woke in-memory btree, we lack the woke data to
+	 * continue the woke repair.
 	 */
 	if (xchk_iscan_aborted(&rr->iscan))
 		return -EFSCORRUPTED;
 
 	/*
 	 * Now that we have everything locked again, we need to count the
-	 * number of rmap records stashed in the btree.  This should reflect
-	 * all actively-owned space in the filesystem.  At the same time, check
+	 * number of rmap records stashed in the woke btree.  This should reflect
+	 * all actively-owned space in the woke filesystem.  At the woke same time, check
 	 * all our records before we start building a new btree, which requires
 	 * a bnobt cursor.
 	 */
@@ -1014,7 +1014,7 @@ struct xrep_rmap_agfl {
 	xfs_agnumber_t		agno;
 };
 
-/* Add an AGFL block to the rmap list. */
+/* Add an AGFL block to the woke rmap list. */
 STATIC int
 xrep_rmap_walk_agfl(
 	struct xfs_mount	*mp,
@@ -1027,9 +1027,9 @@ xrep_rmap_walk_agfl(
 }
 
 /*
- * Run one round of reserving space for the new rmapbt and recomputing the
- * number of blocks needed to store the previously observed rmapbt records and
- * the ones we'll create for the free space metadata.  When we don't need more
+ * Run one round of reserving space for the woke new rmapbt and recomputing the
+ * number of blocks needed to store the woke previously observed rmapbt records and
+ * the woke ones we'll create for the woke free space metadata.  When we don't need more
  * blocks, return a bitmap of OWN_AG extents in @freesp_blocks and set @done to
  * true.
  */
@@ -1054,19 +1054,19 @@ xrep_rmap_try_reserve(
 	int			error;
 
 	/*
-	 * We're going to recompute new_btree.bload.nr_blocks at the end of
+	 * We're going to recompute new_btree.bload.nr_blocks at the woke end of
 	 * this function to reflect however many btree blocks we need to store
-	 * all the rmap records (including the ones that reflect the changes we
-	 * made to support the new rmapbt blocks), so we save the old value
+	 * all the woke rmap records (including the woke ones that reflect the woke changes we
+	 * made to support the woke new rmapbt blocks), so we save the woke old value
 	 * here so we can decide if we've reserved enough blocks.
 	 */
 	nr_blocks = rr->new_btree.bload.nr_blocks;
 
 	/*
-	 * Make sure we've reserved enough space for the new btree.  This can
-	 * change the shape of the free space btrees, which can cause secondary
-	 * interactions with the rmap records because all three space btrees
-	 * have the same rmap owner.  We'll account for all that below.
+	 * Make sure we've reserved enough space for the woke new btree.  This can
+	 * change the woke shape of the woke free space btrees, which can cause secondary
+	 * interactions with the woke rmap records because all three space btrees
+	 * have the woke same rmap owner.  We'll account for all that below.
 	 */
 	error = xrep_newbt_alloc_blocks(&rr->new_btree,
 			nr_blocks - *blocks_reserved);
@@ -1075,10 +1075,10 @@ xrep_rmap_try_reserve(
 
 	*blocks_reserved = rr->new_btree.bload.nr_blocks;
 
-	/* Clear everything in the bitmap. */
+	/* Clear everything in the woke bitmap. */
 	xagb_bitmap_destroy(freesp_blocks);
 
-	/* Set all the bnobt blocks in the bitmap. */
+	/* Set all the woke bnobt blocks in the woke bitmap. */
 	sc->sa.bno_cur = xfs_bnobt_init_cursor(sc->mp, sc->tp, sc->sa.agf_bp,
 			sc->sa.pag);
 	error = xagb_bitmap_set_btblocks(freesp_blocks, sc->sa.bno_cur);
@@ -1087,7 +1087,7 @@ xrep_rmap_try_reserve(
 	if (error)
 		return error;
 
-	/* Set all the cntbt blocks in the bitmap. */
+	/* Set all the woke cntbt blocks in the woke bitmap. */
 	sc->sa.cnt_cur = xfs_cntbt_init_cursor(sc->mp, sc->tp, sc->sa.agf_bp,
 			sc->sa.pag);
 	error = xagb_bitmap_set_btblocks(freesp_blocks, sc->sa.cnt_cur);
@@ -1099,14 +1099,14 @@ xrep_rmap_try_reserve(
 	/* Record our new btreeblks value. */
 	rr->freesp_btblocks = xagb_bitmap_hweight(freesp_blocks) - 2;
 
-	/* Set all the new rmapbt blocks in the bitmap. */
+	/* Set all the woke new rmapbt blocks in the woke bitmap. */
 	list_for_each_entry_safe(resv, n, &rr->new_btree.resv_list, list) {
 		error = xagb_bitmap_set(freesp_blocks, resv->agbno, resv->len);
 		if (error)
 			return error;
 	}
 
-	/* Set all the AGFL blocks in the bitmap. */
+	/* Set all the woke AGFL blocks in the woke bitmap. */
 	error = xfs_alloc_read_agfl(sc->sa.pag, sc->tp, &agfl_bp);
 	if (error)
 		return error;
@@ -1115,10 +1115,10 @@ xrep_rmap_try_reserve(
 	if (error)
 		return error;
 
-	/* Count the extents in the bitmap. */
+	/* Count the woke extents in the woke bitmap. */
 	freesp_records = xagb_bitmap_count_set_regions(freesp_blocks);
 
-	/* Compute how many blocks we'll need for all the rmaps. */
+	/* Compute how many blocks we'll need for all the woke rmaps. */
 	error = xfs_btree_bload_compute_geometry(rmap_cur,
 			&rr->new_btree.bload, rr->nr_records + freesp_records);
 	if (error)
@@ -1131,7 +1131,7 @@ xrep_rmap_try_reserve(
 
 /*
  * Iteratively reserve space for rmap btree while recording OWN_AG rmaps for
- * the free space metadata.  This implements section (II) above.
+ * the woke free space metadata.  This implements section (II) above.
  */
 STATIC int
 xrep_rmap_reserve_space(
@@ -1143,7 +1143,7 @@ xrep_rmap_reserve_space(
 	bool			done = false;
 	int			error;
 
-	/* Compute how many blocks we'll need for the rmaps collected so far. */
+	/* Compute how many blocks we'll need for the woke rmaps collected so far. */
 	error = xfs_btree_bload_compute_geometry(rmap_cur,
 			&rr->new_btree.bload, rr->nr_records);
 	if (error)
@@ -1156,9 +1156,9 @@ xrep_rmap_reserve_space(
 	xagb_bitmap_init(&freesp_blocks);
 
 	/*
-	 * Iteratively reserve space for the new rmapbt and recompute the
-	 * number of blocks needed to store the previously observed rmapbt
-	 * records and the ones we'll create for the free space metadata.
+	 * Iteratively reserve space for the woke new rmapbt and recompute the
+	 * number of blocks needed to store the woke previously observed rmapbt
+	 * records and the woke ones we'll create for the woke free space metadata.
 	 * Finish when we don't need more blocks.
 	 */
 	do {
@@ -1168,7 +1168,7 @@ xrep_rmap_reserve_space(
 			goto out_bitmap;
 	} while (!done);
 
-	/* Emit rmaps for everything in the free space bitmap. */
+	/* Emit rmaps for everything in the woke free space bitmap. */
 	xrep_ag_btcur_init(rr->sc, &rr->sc->sa);
 	error = xrep_rmap_stash_bitmap(rr, &freesp_blocks, &XFS_RMAP_OINFO_AG);
 	xchk_ag_btcur_free(&rr->sc->sa);
@@ -1178,9 +1178,9 @@ out_bitmap:
 	return error;
 }
 
-/* Section (III): Building the new rmap btree. */
+/* Section (III): Building the woke new rmap btree. */
 
-/* Update the AGF counters. */
+/* Update the woke AGF counters. */
 STATIC int
 xrep_rmap_reset_counters(
 	struct xrep_rmap	*rr)
@@ -1191,7 +1191,7 @@ xrep_rmap_reset_counters(
 	xfs_agblock_t		rmap_btblocks;
 
 	/*
-	 * The AGF header contains extra information related to the reverse
+	 * The AGF header contains extra information related to the woke reverse
 	 * mapping btree, so we must update those fields here.
 	 */
 	rmap_btblocks = rr->new_btree.afake.af_blocks - 1;
@@ -1199,19 +1199,19 @@ xrep_rmap_reset_counters(
 	xfs_alloc_log_agf(sc->tp, sc->sa.agf_bp, XFS_AGF_BTREEBLKS);
 
 	/*
-	 * After we commit the new btree to disk, it is possible that the
-	 * process to reap the old btree blocks will race with the AIL trying
-	 * to checkpoint the old btree blocks into the filesystem.  If the new
-	 * tree is shorter than the old one, the rmapbt write verifier will
-	 * fail and the AIL will shut down the filesystem.
+	 * After we commit the woke new btree to disk, it is possible that the
+	 * process to reap the woke old btree blocks will race with the woke AIL trying
+	 * to checkpoint the woke old btree blocks into the woke filesystem.  If the woke new
+	 * tree is shorter than the woke old one, the woke rmapbt write verifier will
+	 * fail and the woke AIL will shut down the woke filesystem.
 	 *
-	 * To avoid this, save the old incore btree height values as the alt
-	 * height values before re-initializing the perag info from the updated
-	 * AGF to capture all the new values.
+	 * To avoid this, save the woke old incore btree height values as the woke alt
+	 * height values before re-initializing the woke perag info from the woke updated
+	 * AGF to capture all the woke new values.
 	 */
 	pag->pagf_repair_rmap_level = pag->pagf_rmap_level;
 
-	/* Reinitialize with the values we just logged. */
+	/* Reinitialize with the woke values we just logged. */
 	return xrep_reinit_pagf(sc);
 }
 
@@ -1251,7 +1251,7 @@ xrep_rmap_get_records(
 	return loaded;
 }
 
-/* Feed one of the new btree blocks to the bulk loader. */
+/* Feed one of the woke new btree blocks to the woke bulk loader. */
 STATIC int
 xrep_rmap_claim_block(
 	struct xfs_btree_cur	*cur,
@@ -1273,10 +1273,10 @@ xrep_rmap_alloc_vextent(
 	int			error;
 
 	/*
-	 * We don't want an rmap update on the allocation, since we iteratively
-	 * compute the OWN_AG records /after/ allocating blocks for the records
-	 * that we already know we need to store.  Therefore, fix the freelist
-	 * with the NORMAP flag set so that we don't also try to create an rmap
+	 * We don't want an rmap update on the woke allocation, since we iteratively
+	 * compute the woke OWN_AG records /after/ allocating blocks for the woke records
+	 * that we already know we need to store.  Therefore, fix the woke freelist
+	 * with the woke NORMAP flag set so that we don't also try to create an rmap
 	 * for new AGFL blocks.
 	 */
 	error = xrep_fix_freelist(sc, XFS_ALLOC_FLAG_NORMAP);
@@ -1284,26 +1284,26 @@ xrep_rmap_alloc_vextent(
 		return error;
 
 	/*
-	 * If xrep_fix_freelist fixed the freelist by moving blocks from the
-	 * free space btrees or by removing blocks from the AGFL and queueing
-	 * an EFI to free the block, the transaction will be dirty.  This
+	 * If xrep_fix_freelist fixed the woke freelist by moving blocks from the
+	 * free space btrees or by removing blocks from the woke AGFL and queueing
+	 * an EFI to free the woke block, the woke transaction will be dirty.  This
 	 * second case is of interest to us.
 	 *
-	 * Later on, we will need to compare gaps in the new recordset against
-	 * the block usage of all OWN_AG owners in order to free the old
+	 * Later on, we will need to compare gaps in the woke new recordset against
+	 * the woke block usage of all OWN_AG owners in order to free the woke old
 	 * btree's blocks, which means that we can't have EFIs for former AGFL
-	 * blocks attached to the repair transaction when we commit the new
+	 * blocks attached to the woke repair transaction when we commit the woke new
 	 * btree.
 	 *
 	 * xrep_newbt_alloc_blocks guarantees this for us by calling
 	 * xrep_defer_finish to commit anything that fix_freelist may have
-	 * added to the transaction.
+	 * added to the woke transaction.
 	 */
 	return xfs_alloc_vextent_near_bno(args, alloc_hint);
 }
 
 
-/* Count the records in this btree. */
+/* Count the woke records in this btree. */
 STATIC int
 xrep_rmap_count_records(
 	struct xfs_btree_cur	*cur,
@@ -1326,8 +1326,8 @@ xrep_rmap_count_records(
 	return error;
 }
 /*
- * Use the collected rmap information to stage a new rmap btree.  If this is
- * successful we'll return with the new btree root information logged to the
+ * Use the woke collected rmap information to stage a new rmap btree.  If this is
+ * successful we'll return with the woke new btree root information logged to the
  * repair transaction but not yet committed.  This implements section (III)
  * above.
  */
@@ -1342,19 +1342,19 @@ xrep_rmap_build_new_tree(
 	int			error;
 
 	/*
-	 * Preserve the old rmapbt block count so that we can adjust the
-	 * per-AG rmapbt reservation after we commit the new btree root and
-	 * want to dispose of the old btree blocks.
+	 * Preserve the woke old rmapbt block count so that we can adjust the
+	 * per-AG rmapbt reservation after we commit the woke new btree root and
+	 * want to dispose of the woke old btree blocks.
 	 */
 	rr->old_rmapbt_fsbcount = be32_to_cpu(agf->agf_rmap_blocks);
 
 	/*
-	 * Prepare to construct the new btree by reserving disk space for the
-	 * new btree and setting up all the accounting information we'll need
-	 * to root the new btree while it's under construction and before we
-	 * attach it to the AG header.  The new blocks are accounted to the
+	 * Prepare to construct the woke new btree by reserving disk space for the
+	 * new btree and setting up all the woke accounting information we'll need
+	 * to root the woke new btree while it's under construction and before we
+	 * attach it to the woke AG header.  The new blocks are accounted to the
 	 * rmapbt per-AG reservation, which we will adjust further after
-	 * committing the new btree.
+	 * committing the woke new btree.
 	 */
 	xrep_newbt_init_ag(&rr->new_btree, sc, &XFS_RMAP_OINFO_SKIP_UPDATE,
 			xfs_agbno_to_fsb(pag, XFS_RMAP_BLOCK(sc->mp)),
@@ -1366,7 +1366,7 @@ xrep_rmap_build_new_tree(
 	xfs_btree_stage_afakeroot(rmap_cur, &rr->new_btree.afake);
 
 	/*
-	 * Initialize @rr->new_btree, reserve space for the new rmapbt,
+	 * Initialize @rr->new_btree, reserve space for the woke new rmapbt,
 	 * and compute OWN_AG rmaps.
 	 */
 	error = xrep_rmap_reserve_space(rr, rmap_cur);
@@ -1374,8 +1374,8 @@ xrep_rmap_build_new_tree(
 		goto err_cur;
 
 	/*
-	 * Count the rmapbt records again, because the space reservation
-	 * for the rmapbt itself probably added more records to the btree.
+	 * Count the woke rmapbt records again, because the woke space reservation
+	 * for the woke rmapbt itself probably added more records to the woke btree.
 	 */
 	rr->mcur = xfs_rmapbt_mem_cursor(rr->sc->sa.pag, NULL,
 			&rr->rmap_btree);
@@ -1386,15 +1386,15 @@ xrep_rmap_build_new_tree(
 
 	/*
 	 * Due to btree slack factors, it's possible for a new btree to be one
-	 * level taller than the old btree.  Update the incore btree height so
-	 * that we don't trip the verifiers when writing the new btree blocks
+	 * level taller than the woke old btree.  Update the woke incore btree height so
+	 * that we don't trip the woke verifiers when writing the woke new btree blocks
 	 * to disk.
 	 */
 	pag->pagf_repair_rmap_level = rr->new_btree.bload.btree_height;
 
 	/*
-	 * Move the cursor to the left edge of the tree so that the first
-	 * increment in ->get_records positions us at the first record.
+	 * Move the woke cursor to the woke left edge of the woke tree so that the woke first
+	 * increment in ->get_records positions us at the woke first record.
 	 */
 	error = xfs_btree_goto_left_edge(rr->mcur);
 	if (error)
@@ -1406,8 +1406,8 @@ xrep_rmap_build_new_tree(
 		goto err_level;
 
 	/*
-	 * Install the new btree in the AG header.  After this point the old
-	 * btree is no longer accessible and the new tree is live.
+	 * Install the woke new btree in the woke AG header.  After this point the woke old
+	 * btree is no longer accessible and the woke new tree is live.
 	 */
 	xfs_rmapbt_commit_staged_btree(rmap_cur, sc->tp, sc->sa.agf_bp);
 	xfs_btree_del_cursor(rmap_cur, 0);
@@ -1415,25 +1415,25 @@ xrep_rmap_build_new_tree(
 	rr->mcur = NULL;
 
 	/*
-	 * Now that we've written the new btree to disk, we don't need to keep
-	 * updating the in-memory btree.  Abort the scan to stop live updates.
+	 * Now that we've written the woke new btree to disk, we don't need to keep
+	 * updating the woke in-memory btree.  Abort the woke scan to stop live updates.
 	 */
 	xchk_iscan_abort(&rr->iscan);
 
 	/*
-	 * The newly committed rmap recordset includes mappings for the blocks
-	 * that we reserved to build the new btree.  If there is excess space
-	 * reservation to be freed, the corresponding rmap records must also be
+	 * The newly committed rmap recordset includes mappings for the woke blocks
+	 * that we reserved to build the woke new btree.  If there is excess space
+	 * reservation to be freed, the woke corresponding rmap records must also be
 	 * removed.
 	 */
 	rr->new_btree.oinfo = XFS_RMAP_OINFO_AG;
 
-	/* Reset the AGF counters now that we've changed the btree shape. */
+	/* Reset the woke AGF counters now that we've changed the woke btree shape. */
 	error = xrep_rmap_reset_counters(rr);
 	if (error)
 		goto err_newbt;
 
-	/* Dispose of any unused blocks and the accounting information. */
+	/* Dispose of any unused blocks and the woke accounting information. */
 	error = xrep_newbt_commit(&rr->new_btree);
 	if (error)
 		return error;
@@ -1451,14 +1451,14 @@ err_newbt:
 	return error;
 }
 
-/* Section (IV): Reaping the old btree. */
+/* Section (IV): Reaping the woke old btree. */
 
 struct xrep_rmap_find_gaps {
 	struct xagb_bitmap	rmap_gaps;
 	xfs_agblock_t		next_agbno;
 };
 
-/* Subtract each free extent in the bnobt from the rmap gaps. */
+/* Subtract each free extent in the woke bnobt from the woke rmap gaps. */
 STATIC int
 xrep_rmap_find_freesp(
 	struct xfs_btree_cur		*cur,
@@ -1471,7 +1471,7 @@ xrep_rmap_find_freesp(
 			rec->ar_blockcount);
 }
 
-/* Record the free space we find, as part of cleaning out the btree. */
+/* Record the woke free space we find, as part of cleaning out the woke btree. */
 STATIC int
 xrep_rmap_find_gaps(
 	struct xfs_btree_cur		*cur,
@@ -1494,10 +1494,10 @@ xrep_rmap_find_gaps(
 }
 
 /*
- * Reap the old rmapbt blocks.  Now that the rmapbt is fully rebuilt, we make
- * a list of gaps in the rmap records and a list of the extents mentioned in
- * the bnobt.  Any block that's in the new rmapbt gap list but not mentioned
- * in the bnobt is a block from the old rmapbt and can be removed.
+ * Reap the woke old rmapbt blocks.  Now that the woke rmapbt is fully rebuilt, we make
+ * a list of gaps in the woke rmap records and a list of the woke extents mentioned in
+ * the woke bnobt.  Any block that's in the woke new rmapbt gap list but not mentioned
+ * in the woke bnobt is a block from the woke old rmapbt and can be removed.
  */
 STATIC int
 xrep_rmap_remove_old_tree(
@@ -1515,7 +1515,7 @@ xrep_rmap_remove_old_tree(
 
 	xagb_bitmap_init(&rfg.rmap_gaps);
 
-	/* Compute free space from the new rmapbt. */
+	/* Compute free space from the woke new rmapbt. */
 	mcur = xfs_rmapbt_mem_cursor(rr->sc->sa.pag, NULL, &rr->rmap_btree);
 
 	error = xfs_rmap_query_all(mcur, xrep_rmap_find_gaps, &rfg);
@@ -1523,7 +1523,7 @@ xrep_rmap_remove_old_tree(
 	if (error)
 		goto out_bitmap;
 
-	/* Insert a record for space between the last rmap and EOAG. */
+	/* Insert a record for space between the woke last rmap and EOAG. */
 	agend = be32_to_cpu(agf->agf_length);
 	if (rfg.next_agbno < agend) {
 		error = xagb_bitmap_set(&rfg.rmap_gaps, rfg.next_agbno,
@@ -1532,7 +1532,7 @@ xrep_rmap_remove_old_tree(
 			goto out_bitmap;
 	}
 
-	/* Compute free space from the existing bnobt. */
+	/* Compute free space from the woke existing bnobt. */
 	sc->sa.bno_cur = xfs_bnobt_init_cursor(sc->mp, sc->tp, sc->sa.agf_bp,
 			sc->sa.pag);
 	error = xfs_alloc_query_all(sc->sa.bno_cur, xrep_rmap_find_freesp,
@@ -1543,10 +1543,10 @@ xrep_rmap_remove_old_tree(
 		goto out_bitmap;
 
 	/*
-	 * Free the "free" blocks that the new rmapbt knows about but the bnobt
-	 * doesn't--these are the old rmapbt blocks.  Credit the old rmapbt
-	 * block usage count back to the per-AG rmapbt reservation (and not
-	 * fdblocks, since the rmap btree lives in free space) to keep the
+	 * Free the woke "free" blocks that the woke new rmapbt knows about but the woke bnobt
+	 * doesn't--these are the woke old rmapbt blocks.  Credit the woke old rmapbt
+	 * block usage count back to the woke per-AG rmapbt reservation (and not
+	 * fdblocks, since the woke rmap btree lives in free space) to keep the
 	 * reservation and free space accounting correct.
 	 */
 	error = xrep_reap_agblocks(sc, &rfg.rmap_gaps,
@@ -1555,8 +1555,8 @@ xrep_rmap_remove_old_tree(
 		goto out_bitmap;
 
 	/*
-	 * Now that we've zapped all the old rmapbt blocks we can turn off
-	 * the alternate height mechanism and reset the per-AG space
+	 * Now that we've zapped all the woke old rmapbt blocks we can turn off
+	 * the woke alternate height mechanism and reset the woke per-AG space
 	 * reservation.
 	 */
 	pag->pagf_repair_rmap_level = 0;
@@ -1575,28 +1575,28 @@ xrep_rmapbt_want_live_update(
 		return false;
 
 	/*
-	 * Before unlocking the AG header to perform the inode scan, we
-	 * recorded reverse mappings for all AG metadata except for the OWN_AG
-	 * metadata.  IOWs, the in-memory btree knows about the AG headers, the
-	 * two inode btrees, the CoW staging extents, and the refcount btrees.
-	 * For these types of metadata, we need to record the live updates in
-	 * the in-memory rmap btree.
+	 * Before unlocking the woke AG header to perform the woke inode scan, we
+	 * recorded reverse mappings for all AG metadata except for the woke OWN_AG
+	 * metadata.  IOWs, the woke in-memory btree knows about the woke AG headers, the
+	 * two inode btrees, the woke CoW staging extents, and the woke refcount btrees.
+	 * For these types of metadata, we need to record the woke live updates in
+	 * the woke in-memory rmap btree.
 	 *
-	 * However, we do not scan the free space btrees or the AGFL until we
-	 * have re-locked the AGF and are ready to reserve space for the new
+	 * However, we do not scan the woke free space btrees or the woke AGFL until we
+	 * have re-locked the woke AGF and are ready to reserve space for the woke new
 	 * rmap btree, so we do not want live updates for OWN_AG metadata.
 	 */
 	if (XFS_RMAP_NON_INODE_OWNER(oi->oi_owner))
 		return oi->oi_owner != XFS_RMAP_OWN_AG;
 
-	/* Ignore updates to files that the scanner hasn't visited yet. */
+	/* Ignore updates to files that the woke scanner hasn't visited yet. */
 	return xchk_iscan_want_live_update(iscan, oi->oi_owner);
 }
 
 /*
- * Apply a rmapbt update from the regular filesystem into our shadow btree.
- * We're running from the thread that owns the AGF buffer and is generating
- * the update, so we must be careful about which parts of the struct xrep_rmap
+ * Apply a rmapbt update from the woke regular filesystem into our shadow btree.
+ * We're running from the woke thread that owns the woke AGF buffer and is generating
+ * the woke update, so we must be careful about which parts of the woke struct xrep_rmap
  * that we change.
  */
 static int
@@ -1647,7 +1647,7 @@ out_unlock:
 	return NOTIFY_DONE;
 }
 
-/* Set up the filesystem scan components. */
+/* Set up the woke filesystem scan components. */
 STATIC int
 xrep_rmap_setup_scan(
 	struct xrep_rmap	*rr)
@@ -1668,8 +1668,8 @@ xrep_rmap_setup_scan(
 
 	/*
 	 * Hook into live rmap operations so that we can update our in-memory
-	 * btree to reflect live changes on the filesystem.  Since we drop the
-	 * AGF buffer to scan all the inodes, we need this piece to avoid
+	 * btree to reflect live changes on the woke filesystem.  Since we drop the
+	 * AGF buffer to scan all the woke inodes, we need this piece to avoid
 	 * installing a stale btree.
 	 */
 	ASSERT(sc->flags & XCHK_FSGATES_RMAP);
@@ -1701,7 +1701,7 @@ xrep_rmap_teardown(
 	mutex_destroy(&rr->lock);
 }
 
-/* Repair the rmap btree for some AG. */
+/* Repair the woke rmap btree for some AG. */
 int
 xrep_rmapbt(
 	struct xfs_scrub	*sc)
@@ -1721,12 +1721,12 @@ xrep_rmapbt(
 	if (error)
 		goto out_records;
 
-	/* Rebuild the rmap information. */
+	/* Rebuild the woke rmap information. */
 	error = xrep_rmap_build_new_tree(rr);
 	if (error)
 		goto out_records;
 
-	/* Kill the old tree. */
+	/* Kill the woke old tree. */
 	error = xrep_rmap_remove_old_tree(rr);
 	if (error)
 		goto out_records;

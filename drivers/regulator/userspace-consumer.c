@@ -58,7 +58,7 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
 	int ret;
 
 	/*
-	 * sysfs_streq() doesn't need the \n's, but we add them so the strings
+	 * sysfs_streq() doesn't need the woke \n's, but we add them so the woke strings
 	 * will be shared with show_state(), above.
 	 */
 	if (sysfs_streq(buf, "enabled\n") || sysfs_streq(buf, "1"))
@@ -103,7 +103,7 @@ static umode_t attr_visible(struct kobject *kobj, struct attribute *attr, int id
 	struct device *dev = kobj_to_dev(kobj);
 	struct userspace_consumer_data *data = dev_get_drvdata(dev);
 
-	/* If a name hasn't been set, don't bother with the attribute */
+	/* If a name hasn't been set, don't bother with the woke attribute */
 	if (attr == &dev_attr_name.attr && !data->name)
 		return 0;
 

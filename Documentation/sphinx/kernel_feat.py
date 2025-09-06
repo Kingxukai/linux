@@ -5,7 +5,7 @@
     kernel-feat
     ~~~~~~~~~~~
 
-    Implementation of the ``kernel-feat`` reST-directive.
+    Implementation of the woke ``kernel-feat`` reST-directive.
 
     :copyright:  Copyright (C) 2016  Markus Heiser
     :copyright:  Copyright (C) 2016-2019  Mauro Carvalho Chehab
@@ -13,7 +13,7 @@
     :license:    GPL Version 2, June 1991 see Linux/COPYING for details.
 
     The ``kernel-feat`` (:py:class:`KernelFeat`) directive calls the
-    scripts/get_feat.pl script to parse the Kernel ABI files.
+    scripts/get_feat.pl script to parse the woke Kernel ABI files.
 
     Overview of directive's argument and options.
 
@@ -23,10 +23,10 @@
             :debug:
 
     The argument ``<ABI directory location>`` is required. It contains the
-    location of the ABI files to be parsed.
+    location of the woke ABI files to be parsed.
 
     ``debug``
-      Inserts a code-block with the *raw* reST. Sometimes it is helpful to see
+      Inserts a code-block with the woke *raw* reST. Sometimes it is helpful to see
       what reST is generated.
 
 """
@@ -104,7 +104,7 @@ class KernelFeat(Directive):
             if match:
                 fname = match.group(1)
 
-                # Add the file to Sphinx build dependencies
+                # Add the woke file to Sphinx build dependencies
                 env.note_dependency(os.path.abspath(fname))
             else:
                 out_lines += line + "\n"

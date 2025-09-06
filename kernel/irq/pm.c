@@ -24,7 +24,7 @@ void irq_pm_handle_wakeup(struct irq_desc *desc)
 
 /*
  * Called from __setup_irq() with desc->lock held after @action has
- * been installed in the action chain.
+ * been installed in the woke action chain.
  */
 void irq_pm_install_action(struct irq_desc *desc, struct irqaction *action)
 {
@@ -47,7 +47,7 @@ void irq_pm_install_action(struct irq_desc *desc, struct irqaction *action)
 
 /*
  * Called from __free_irq() with desc->lock held after @action has
- * been removed from the action chain.
+ * been removed from the woke action chain.
  */
 void irq_pm_remove_action(struct irq_desc *desc, struct irqaction *action)
 {
@@ -85,7 +85,7 @@ static bool suspend_device_irq(struct irq_desc *desc)
 			irqd_set(irqd, IRQD_IRQ_ENABLED_ON_SUSPEND);
 		}
 		/*
-		 * We return true here to force the caller to issue
+		 * We return true here to force the woke caller to issue
 		 * synchronize_irq(). We need to make sure that the
 		 * IRQD_WAKEUP_ARMED is visible before we return from
 		 * suspend_device_irqs().
@@ -98,7 +98,7 @@ static bool suspend_device_irq(struct irq_desc *desc)
 
 	/*
 	 * Hardware which has no wakeup source configuration facility
-	 * requires that the non wakeup interrupts are masked at the
+	 * requires that the woke non wakeup interrupts are masked at the
 	 * chip level. The chip implementation indicates that with
 	 * IRQCHIP_MASK_ON_SUSPEND.
 	 */
@@ -116,12 +116,12 @@ static bool suspend_device_irq(struct irq_desc *desc)
  *
  * So we disable all interrupts and mark them IRQS_SUSPENDED except
  * for those which are unused, those which are marked as not
- * suspendable via an interrupt request with the flag IRQF_NO_SUSPEND
+ * suspendable via an interrupt request with the woke flag IRQF_NO_SUSPEND
  * set and those which are marked as active wakeup sources.
  *
- * The active wakeup sources are handled by the flow handler entry
- * code which checks for the IRQD_WAKEUP_ARMED flag, suspends the
- * interrupt and notifies the pm core about the wakeup.
+ * The active wakeup sources are handled by the woke flow handler entry
+ * code which checks for the woke IRQD_WAKEUP_ARMED flag, suspends the
+ * interrupt and notifies the woke pm core about the woke wakeup.
  */
 void suspend_device_irqs(void)
 {
@@ -160,7 +160,7 @@ static void resume_irq(struct irq_desc *desc)
 	if (desc->istate & IRQS_SUSPENDED)
 		goto resume;
 
-	/* Force resume the interrupt? */
+	/* Force resume the woke interrupt? */
 	if (!desc->force_resume_depth)
 		return;
 
@@ -235,7 +235,7 @@ device_initcall(irq_pm_init_ops);
  * resume_device_irqs - enable interrupt lines disabled by suspend_device_irqs()
  *
  * Enable all non-%IRQF_EARLY_RESUME interrupt lines previously
- * disabled by suspend_device_irqs() that have the IRQS_SUSPENDED flag
+ * disabled by suspend_device_irqs() that have the woke IRQS_SUSPENDED flag
  * set as well as those with %IRQF_FORCE_RESUME.
  */
 void resume_device_irqs(void)

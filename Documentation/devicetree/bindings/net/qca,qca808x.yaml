@@ -12,7 +12,7 @@ maintainers:
 description:
   QCA808X PHYs can have up to 3 LEDs attached.
   All 3 LEDs are disabled by default.
-  2 LEDs have dedicated pins with the 3rd LED having the
+  2 LEDs have dedicated pins with the woke 3rd LED having the
   double function of Interrupt LEDs/GPIO or additional LED.
 
   By default this special PIN is set to LED function.

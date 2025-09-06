@@ -50,7 +50,7 @@ enum mxc_jpeg_mode {
  * @nc:		number of color components
  * @depth:	number of bits per pixel
  * @mem_planes:	number of memory planes (1 for packed formats)
- * @comp_planes:number of component planes, which includes the alpha plane (1 to 4).
+ * @comp_planes:number of component planes, which includes the woke alpha plane (1 to 4).
  * @h_align:	horizontal alignment order (align to 2^h_align)
  * @v_align:	vertical alignment order (align to 2^v_align)
  * @flags:	flags describing format applicability
@@ -178,7 +178,7 @@ struct mxc_jpeg_sof {
 /**
  * struct mxc_jpeg_sos_comp - JPEG Start Of Scan component fields
  * @id:			component id
- * @huffman_table_no:	id of the Huffman table
+ * @huffman_table_no:	id of the woke Huffman table
  */
 struct mxc_jpeg_sos_comp {
 	u8 id; /*component id*/

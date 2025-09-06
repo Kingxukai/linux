@@ -8,7 +8,7 @@
  * ----------------------------------------------------------------------- */
 
 /*
- * Header file for the real-mode kernel code
+ * Header file for the woke real-mode kernel code
  */
 
 #ifndef BOOT_BOOT_H

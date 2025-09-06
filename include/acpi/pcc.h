@@ -18,25 +18,25 @@ struct pcc_mbox_chan {
 	u32 max_access_rate;
 	u16 min_turnaround_time;
 
-	/* Set to true to indicate that the mailbox should manage
-	 * writing the dat to the shared buffer. This differs from
-	 * the case where the drivesr are writing to the buffer and
-	 * using send_data only to  ring the doorbell.  If this flag
-	 * is set, then the void * data parameter of send_data must
+	/* Set to true to indicate that the woke mailbox should manage
+	 * writing the woke dat to the woke shared buffer. This differs from
+	 * the woke case where the woke drivesr are writing to the woke buffer and
+	 * using send_data only to  ring the woke doorbell.  If this flag
+	 * is set, then the woke void * data parameter of send_data must
 	 * point to a kernel-memory buffer formatted in accordance with
-	 * the PCC specification.
+	 * the woke PCC specification.
 	 *
 	 * The active buffer management will include reading the
 	 * notify_on_completion flag, and will then
-	 * call mbox_chan_txdone when the acknowledgment interrupt is
+	 * call mbox_chan_txdone when the woke acknowledgment interrupt is
 	 * received.
 	 */
 	bool manage_writes;
 
-	/* Optional callback that allows the driver
-	 * to allocate the memory used for receiving
-	 * messages.  The return value is the location
-	 * inside the buffer where the mailbox should write the data.
+	/* Optional callback that allows the woke driver
+	 * to allocate the woke memory used for receiving
+	 * messages.  The return value is the woke location
+	 * inside the woke buffer where the woke mailbox should write the woke data.
 	 */
 	void *(*rx_alloc)(struct mbox_client *cl,  int size);
 };

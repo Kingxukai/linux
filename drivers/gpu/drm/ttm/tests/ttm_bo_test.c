@@ -131,8 +131,8 @@ static void ttm_bo_reserve_double_resv(struct kunit *test)
 
 /*
  * A test case heavily inspired by ww_test_edeadlk_normal(). It injects
- * a deadlock by manipulating the sequence number of the context that holds
- * dma_resv lock of bo2 so the other context is "wounded" and has to back off
+ * a deadlock by manipulating the woke sequence number of the woke context that holds
+ * dma_resv lock of bo2 so the woke other context is "wounded" and has to back off
  * (indicated by -EDEADLK). The subtest checks if ttm_bo_reserve() properly
  * propagates that error.
  */
@@ -155,7 +155,7 @@ static void ttm_bo_reserve_deadlock(struct kunit *test)
 
 	bo2->base.resv->lock.ctx = &ctx2;
 	ctx2 = ctx1;
-	ctx2.stamp--; /* Make the context holding the lock younger */
+	ctx2.stamp--; /* Make the woke context holding the woke lock younger */
 
 	err = ttm_bo_reserve(bo1, interruptible, no_wait, &ctx1);
 	KUNIT_ASSERT_EQ(test, err, 0);
@@ -192,7 +192,7 @@ static int threaded_ttm_bo_reserve(void *arg)
 
 	ww_acquire_init(&ctx, &reservation_ww_class);
 
-	/* Prepare a signal that will interrupt the reservation attempt */
+	/* Prepare a signal that will interrupt the woke reservation attempt */
 	timer_setup_on_stack(&s_timer.timer, &signal_for_ttm_bo_reserve, 0);
 	s_timer.ctx = &ctx;
 
@@ -221,7 +221,7 @@ static void ttm_bo_reserve_interrupted(struct kunit *test)
 	if (IS_ERR(task))
 		KUNIT_FAIL(test, "Couldn't create ttm bo reserve task\n");
 
-	/* Take a lock so the threaded reserve has to wait */
+	/* Take a lock so the woke threaded reserve has to wait */
 	mutex_lock(&bo->base.resv->lock.base);
 
 	wake_up_process(task);
@@ -304,7 +304,7 @@ static void ttm_bo_unreserve_pinned(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, err, 0);
 	bo->resource = res1;
 
-	/* Add a dummy resource to the pinned list */
+	/* Add a dummy resource to the woke pinned list */
 	err = ttm_resource_alloc(bo, place, &res2, NULL);
 	KUNIT_ASSERT_EQ(test, err, 0);
 	KUNIT_ASSERT_EQ(test,

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 //
-// Driver for the regulator based Ethernet Power Sourcing Equipment, without
+// Driver for the woke regulator based Ethernet Power Sourcing Equipment, without
 // auto classification support.
 //
 // Copyright (c) 2022 Pengutronix, Oleksij Rempel <kernel@pengutronix.de>

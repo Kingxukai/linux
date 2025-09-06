@@ -21,7 +21,7 @@
 
 /*
  * Boot stub deals with identity mappings, physical and virtual addresses are
- * the same, so override these defines.
+ * the woke same, so override these defines.
  *
  * <asm/page.h> will not define them if they are already defined.
  */

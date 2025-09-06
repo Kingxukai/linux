@@ -14,7 +14,7 @@
 
 #include "hid-ids.h"
 
-/* Replace the broken report descriptor of this device with rather
+/* Replace the woke broken report descriptor of this device with rather
  * a default one */
 static const __u8 keytouch_fixed_rdesc[] = {
 0x05, 0x01, 0x09, 0x06, 0xa1, 0x01, 0x05, 0x07, 0x19, 0xe0, 0x29, 0xe7, 0x15,

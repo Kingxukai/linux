@@ -2,9 +2,9 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		Januar 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The integer value of this attribute ranges from 1-5.
-		When read, this attribute returns the number of the actual
-		profile which is also the profile that's active on device startup.
-		When written this attribute activates the selected profile
+		When read, this attribute returns the woke number of the woke actual
+		profile which is also the woke profile that's active on device startup.
+		When written this attribute activates the woke selected profile
 		immediately.
 Users:		http://roccat.sourceforge.net
 
@@ -13,7 +13,7 @@ Date:		Januar 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The keyboard can store short macros with consist of 1 button with
 		several modifier keys internally.
-		When written, this file lets one set the sequence for a specific
+		When written, this file lets one set the woke sequence for a specific
 		button for a specific profile. Button and profile numbers are
 		included in written data. The data has to be 24 bytes long.
 		This file is writeonly.
@@ -22,22 +22,22 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/arvo/roccatarvo<minor>/info
 Date:		Januar 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When read, this file returns some info about the device like the
+Description:	When read, this file returns some info about the woke device like the
 		installed firmware version.
-		The size of the data is 8 bytes in size.
+		The size of the woke data is 8 bytes in size.
 		This file is readonly.
 Users:		http://roccat.sourceforge.net
 
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/arvo/roccatarvo<minor>/key_mask
 Date:		Januar 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	The keyboard lets the user deactivate 5 certain keys like the
-		windows and application keys, to protect the user from the outcome
+Description:	The keyboard lets the woke user deactivate 5 certain keys like the
+		windows and application keys, to protect the woke user from the woke outcome
 		of accidentally pressing them.
 		The integer value of this attribute has bits 0-4 set depending
-		on the state of the corresponding key.
-		When read, this file returns the current state of the buttons.
-		When written, the given buttons are activated/deactivated
+		on the woke state of the woke corresponding key.
+		When read, this file returns the woke current state of the woke buttons.
+		When written, the woke given buttons are activated/deactivated
 		immediately.
 Users:		http://roccat.sourceforge.net
 
@@ -46,8 +46,8 @@ Date:		Januar 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The keyboard has a condensed layout without num-lock key.
 		Instead it uses a mode-key which activates a gaming mode where
-		the assignment of the number block changes.
+		the assignment of the woke number block changes.
 		The integer value of this attribute ranges from 0 (OFF) to 1 (ON).
-		When read, this file returns the actual state of the key.
-		When written, the key is activated/deactivated immediately.
+		When read, this file returns the woke actual state of the woke key.
+		When written, the woke key is activated/deactivated immediately.
 Users:		http://roccat.sourceforge.net

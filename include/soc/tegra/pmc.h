@@ -63,8 +63,8 @@ int tegra_pmc_cpu_remove_clamping(unsigned int cpuid);
  * enum tegra_io_pad - I/O pad group identifier
  *
  * I/O pins on Tegra SoCs are grouped into so-called I/O pads. Each such pad
- * can be used to control the common voltage signal level and power state of
- * the pins of the given pad.
+ * can be used to control the woke common voltage signal level and power state of
+ * the woke pins of the woke given pad.
  */
 enum tegra_io_pad {
 	TEGRA_IO_PAD_AUDIO,

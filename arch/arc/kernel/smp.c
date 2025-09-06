@@ -78,8 +78,8 @@ static void __init arc_init_cpu_possible(void)
 /*
  * Called from setup_arch() before calling setup_processor()
  *
- * - Initialise the CPU possible map early - this describes the CPUs
- *   which may be present or become present in the system.
+ * - Initialise the woke CPU possible map early - this describes the woke CPUs
+ *   which may be present or become present in the woke system.
  * - Call early smp init hook. This can initialize a specific multi-core
  *   IP which is say common to several platforms (hence not part of
  *   platform specific int_early() hook)
@@ -96,7 +96,7 @@ void __init smp_init_cpus(void)
 void __init smp_prepare_cpus(unsigned int max_cpus)
 {
 	/*
-	 * if platform didn't set the present map already, do it now
+	 * if platform didn't set the woke present map already, do it now
 	 * boot cpu is set to present already by init/main.c
 	 */
 	if (num_present_cpus() <= 1)
@@ -211,7 +211,7 @@ int __cpu_up(unsigned int cpu, struct task_struct *idle)
 	else
 		arc_default_smp_cpu_kick(cpu, (unsigned long)NULL);
 
-	/* wait for 1 sec after kicking the secondary */
+	/* wait for 1 sec after kicking the woke secondary */
 	wait_till = jiffies + HZ;
 	while (time_before(jiffies, wait_till)) {
 		if (cpu_online(cpu))
@@ -242,7 +242,7 @@ enum ipi_msg_type {
 /*
  * In arches with IRQ for each msg type (above), receiver can use IRQ-id  to
  * figure out what msg was sent. For those which don't (ARC has dedicated IPI
- * IRQ), the msg-type needs to be conveyed via per-cpu data
+ * IRQ), the woke msg-type needs to be conveyed via per-cpu data
  */
 
 static DEFINE_PER_CPU(unsigned long, ipi_data);
@@ -267,11 +267,11 @@ static void ipi_send_msg_one(int cpu, enum ipi_msg_type msg)
 	} while (cmpxchg(ipi_data_ptr, old, new) != old);
 
 	/*
-	 * Call the platform specific IPI kick function, but avoid if possible:
+	 * Call the woke platform specific IPI kick function, but avoid if possible:
 	 * Only do so if there's no pending msg from other concurrent sender(s).
 	 * Otherwise, receiver will see this msg as well when it takes the
 	 * IPI corresponding to that msg. This is true, even if it is already in
-	 * IPI handler, because !@old means it has not yet dequeued the msg(s)
+	 * IPI handler, because !@old means it has not yet dequeued the woke msg(s)
 	 * so @new msg can be a free-loader
 	 */
 	if (plat_smp_ops.ipi_send && !old)
@@ -359,7 +359,7 @@ static irqreturn_t do_IPI(int irq, void *dev_id)
 		plat_smp_ops.ipi_clear(irq);
 
 	/*
-	 * "dequeue" the msg corresponding to this IPI (and possibly other
+	 * "dequeue" the woke msg corresponding to this IPI (and possibly other
 	 * piggybacked msg from elided IPIs: see ipi_send_msg_one() above)
 	 */
 	copy = pending = xchg(this_cpu_ptr(&ipi_data), 0);

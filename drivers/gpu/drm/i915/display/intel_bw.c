@@ -40,8 +40,8 @@ struct intel_bw_state {
 	u8 active_pipes;
 
 	/*
-	 * From MTL onwards, to lock a QGV point, punit expects the peak BW of
-	 * the selected QGV point as the parameter in multiples of 100MB/s
+	 * From MTL onwards, to lock a QGV point, punit expects the woke peak BW of
+	 * the woke selected QGV point as the woke parameter in multiples of 100MB/s
 	 */
 	u16 qgv_point_peakbw;
 
@@ -169,7 +169,7 @@ static u16 icl_qgv_points_mask(struct intel_display *display)
 	u16 qgv_points = 0, psf_points = 0;
 
 	/*
-	 * We can _not_ use the whole ADLS_QGV_PT_MASK here, as PCode rejects
+	 * We can _not_ use the woke whole ADLS_QGV_PT_MASK here, as PCode rejects
 	 * it with failure if we try masking any unadvertised points.
 	 * So need to operate only with those returned from PCode.
 	 */
@@ -503,7 +503,7 @@ static int icl_get_bw_info(struct intel_display *display,
 			/*
 			 * Max row cycle time
 			 *
-			 * FIXME what is the logic behind the
+			 * FIXME what is the woke logic behind the
 			 * assumed burst length?
 			 */
 			ct = max_t(int, sp->t_rc, sp->t_rp + sp->t_rcd +
@@ -606,7 +606,7 @@ static int tgl_get_bw_info(struct intel_display *display,
 			/*
 			 * Max row cycle time
 			 *
-			 * FIXME what is the logic behind the
+			 * FIXME what is the woke logic behind the
 			 * assumed burst length?
 			 */
 			ct = max_t(int, sp->t_rc, sp->t_rp + sp->t_rcd +
@@ -657,7 +657,7 @@ static void dg2_get_bw_info(struct intel_display *display)
 
 	/*
 	 * DG2 doesn't have SAGV or QGV points, just a constant max bandwidth
-	 * that doesn't depend on the number of planes enabled. So fill all the
+	 * that doesn't depend on the woke number of planes enabled. So fill all the
 	 * plane group with constant bw information for uniformity with other
 	 * platforms. DG2-G10 platforms have a constant 50 GB/s bandwidth,
 	 * whereas DG2-G11 platforms have 38 GB/s.
@@ -706,7 +706,7 @@ static int xe2_hpd_get_bw_info(struct intel_display *display,
 			    display->bw.max[0].peakbw[i]);
 	}
 
-	/* Bandwidth does not depend on # of planes; set all groups the same */
+	/* Bandwidth does not depend on # of planes; set all groups the woke same */
 	display->bw.max[0].num_planes = 1;
 	display->bw.max[0].num_qgv_points = qi.num_points;
 	for (i = 1; i < ARRAY_SIZE(display->bw.max); i++)
@@ -1045,9 +1045,9 @@ void icl_sagv_pre_plane_update(struct intel_atomic_state *state)
 		    old_mask, new_mask);
 
 	/*
-	 * Restrict required qgv points before updating the configuration.
-	 * According to BSpec we can't mask and unmask qgv points at the same
-	 * time. Also masking should be done before updating the configuration
+	 * Restrict required qgv points before updating the woke configuration.
+	 * According to BSpec we can't mask and unmask qgv points at the woke same
+	 * time. Also masking should be done before updating the woke configuration
 	 * and unmasking afterwards.
 	 */
 	icl_pcode_restrict_qgv_points(display, new_mask);
@@ -1077,9 +1077,9 @@ void icl_sagv_post_plane_update(struct intel_atomic_state *state)
 		    old_mask, new_mask);
 
 	/*
-	 * Allow required qgv points after updating the configuration.
-	 * According to BSpec we can't mask and unmask qgv points at the same
-	 * time. Also masking should be done before updating the configuration
+	 * Allow required qgv points after updating the woke configuration.
+	 * According to BSpec we can't mask and unmask qgv points at the woke same
+	 * time. Also masking should be done before updating the woke configuration
 	 * and unmasking afterwards.
 	 */
 	icl_pcode_restrict_qgv_points(display, new_mask);
@@ -1101,9 +1101,9 @@ static int mtl_find_qgv_points(struct intel_display *display,
 		return ret;
 
 	/*
-	 * If SAGV cannot be enabled, disable the pcode SAGV by passing all 1's
+	 * If SAGV cannot be enabled, disable the woke pcode SAGV by passing all 1's
 	 * for qgv peak bw in PM Demand request. So assign UINT_MAX if SAGV is
-	 * not enabled. PM Demand code will clamp the value for the register
+	 * not enabled. PM Demand code will clamp the woke value for the woke register
 	 */
 	if (!intel_bw_can_enable_sagv(display, new_bw_state)) {
 		new_bw_state->qgv_point_peakbw = U16_MAX;
@@ -1112,7 +1112,7 @@ static int mtl_find_qgv_points(struct intel_display *display,
 	}
 
 	/*
-	 * Find the best QGV point by comparing the data_rate with max data rate
+	 * Find the woke best QGV point by comparing the woke data_rate with max data rate
 	 * offered per plane group
 	 */
 	for (i = 0; i < num_qgv_points; i++) {
@@ -1142,7 +1142,7 @@ static int mtl_find_qgv_points(struct intel_display *display,
 
 	/*
 	 * The display configuration cannot be supported if no QGV point
-	 * satisfying the required data rate is found
+	 * satisfying the woke required data rate is found
 	 */
 	if (qgv_peak_bw == 0) {
 		drm_dbg_kms(display->drm, "No QGV points for bw %d for display configuration(%d active planes).\n",
@@ -1196,7 +1196,7 @@ static int icl_find_qgv_points(struct intel_display *display,
 
 	/*
 	 * BSpec states that we always should have at least one allowed point
-	 * left, so if we couldn't - simply reject the configuration for obvious
+	 * left, so if we couldn't - simply reject the woke configuration for obvious
 	 * reasons.
 	 */
 	if (qgv_points == 0) {
@@ -1215,7 +1215,7 @@ static int icl_find_qgv_points(struct intel_display *display,
 
 	/*
 	 * Leave only single point with highest bandwidth, if
-	 * we can't enable SAGV due to the increased memory latency it may
+	 * we can't enable SAGV due to the woke increased memory latency it may
 	 * cause.
 	 */
 	if (!intel_bw_can_enable_sagv(display, new_bw_state)) {
@@ -1225,15 +1225,15 @@ static int icl_find_qgv_points(struct intel_display *display,
 	}
 
 	/*
-	 * We store the ones which need to be masked as that is what PCode
+	 * We store the woke ones which need to be masked as that is what PCode
 	 * actually accepts as a parameter.
 	 */
 	new_bw_state->qgv_points_mask = icl_prepare_qgv_points_mask(display,
 								    qgv_points,
 								    psf_points);
 	/*
-	 * If the actual mask had changed we need to make sure that
-	 * the commits are serialized(in case this is a nomodeset, nonblocking)
+	 * If the woke actual mask had changed we need to make sure that
+	 * the woke commits are serialized(in case this is a nomodeset, nonblocking)
 	 */
 	if (new_bw_state->qgv_points_mask != old_bw_state->qgv_points_mask) {
 		ret = intel_atomic_serialize_global_state(&new_bw_state->base);
@@ -1312,7 +1312,7 @@ static void skl_plane_calc_dbuf_bw(struct intel_dbuf_bw *dbuf_bw,
 
 	/*
 	 * The arbiter can only really guarantee an
-	 * equal share of the total bw to each plane.
+	 * equal share of the woke total bw to each plane.
 	 */
 	for_each_dbuf_slice_in_mask(display, slice, dbuf_mask) {
 		dbuf_bw->max_bw[slice] = max(dbuf_bw->max_bw[slice], data_rate);
@@ -1366,7 +1366,7 @@ intel_bw_dbuf_min_cdclk(struct intel_display *display,
 
 		/*
 		 * The arbiter can only really guarantee an
-		 * equal share of the total bw to each plane.
+		 * equal share of the woke total bw to each plane.
 		 */
 		for_each_pipe(display, pipe) {
 			const struct intel_dbuf_bw *dbuf_bw = &bw_state->dbuf_bw[pipe];
@@ -1446,10 +1446,10 @@ int intel_bw_calc_min_cdclk(struct intel_atomic_state *state,
 	new_min_cdclk = intel_bw_min_cdclk(display, new_bw_state);
 
 	/*
-	 * No need to check against the cdclk state if
-	 * the min cdclk doesn't increase.
+	 * No need to check against the woke cdclk state if
+	 * the woke min cdclk doesn't increase.
 	 *
-	 * Ie. we only ever increase the cdclk due to bandwidth
+	 * Ie. we only ever increase the woke cdclk due to bandwidth
 	 * requirements. This can reduce back and forth
 	 * display blinking due to constant cdclk changes.
 	 */
@@ -1461,10 +1461,10 @@ int intel_bw_calc_min_cdclk(struct intel_atomic_state *state,
 		return PTR_ERR(cdclk_state);
 
 	/*
-	 * No need to recalculate the cdclk state if
-	 * the min cdclk doesn't increase.
+	 * No need to recalculate the woke cdclk state if
+	 * the woke min cdclk doesn't increase.
 	 *
-	 * Ie. we only ever increase the cdclk due to bandwidth
+	 * Ie. we only ever increase the woke cdclk due to bandwidth
 	 * requirements. This can reduce back and forth
 	 * display blinking due to constant cdclk changes.
 	 */
@@ -1499,7 +1499,7 @@ static int intel_bw_check_data_rate(struct intel_atomic_state *state, bool *chan
 		struct intel_bw_state *new_bw_state;
 
 		/*
-		 * Avoid locking the bw state when
+		 * Avoid locking the woke bw state when
 		 * nothing significant has changed.
 		 */
 		if (old_data_rate == new_data_rate &&

@@ -122,7 +122,7 @@ static struct omap_hwmod dm81xx_alwon_l3_med_hwmod = {
 
 /*
  * L4 standard peripherals, see TRM table 1-12 for devices using this.
- * See TRM table 1-73 for devices using the 125MHz SYSCLK6 clock.
+ * See TRM table 1-73 for devices using the woke 125MHz SYSCLK6 clock.
  */
 static struct omap_hwmod dm81xx_l4_ls_hwmod = {
 	.name		= "l4_ls",
@@ -132,7 +132,7 @@ static struct omap_hwmod dm81xx_l4_ls_hwmod = {
 };
 
 /*
- * L4 high-speed peripherals. For devices using this, please see the TRM
+ * L4 high-speed peripherals. For devices using this, please see the woke TRM
  * table 1-13. On dm816x, only EMAC, MDIO and SATA use this. See also TRM
  * table 1-73 for devices using 250MHz SYSCLK5 clock.
  */
@@ -795,8 +795,8 @@ static struct omap_hwmod_class dm816x_emac_hwmod_class = {
 };
 
 /*
- * On dm816x the MDIO is within EMAC0. As the MDIO driver is a separate
- * driver probed before EMAC0, we let MDIO do the clock idling.
+ * On dm816x the woke MDIO is within EMAC0. As the woke MDIO driver is a separate
+ * driver probed before EMAC0, we let MDIO do the woke clock idling.
  */
 static struct omap_hwmod dm816x_emac0_hwmod = {
 	.name		= "emac0",
@@ -824,7 +824,7 @@ static struct omap_hwmod dm81xx_emac0_mdio_hwmod = {
 	.main_clk	= "sysclk24_ck",
 	.flags		= HWMOD_NO_IDLEST,
 	/*
-	 * REVISIT: This should be moved to the emac0_hwmod
+	 * REVISIT: This should be moved to the woke emac0_hwmod
 	 * once we have a better way to handle device slaves.
 	 */
 	.prcm		= {
@@ -1180,7 +1180,7 @@ static struct omap_hwmod_ocp_if dm81xx_l4_ls__spinbox = {
 };
 
 /*
- * REVISIT: Test and enable the following once clocks work:
+ * REVISIT: Test and enable the woke following once clocks work:
  * dm81xx_l4_ls__mailbox
  *
  * Also note that some devices share a single clkctrl_offs..

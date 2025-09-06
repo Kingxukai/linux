@@ -25,11 +25,11 @@ void signal_action_handler(int signal_num, siginfo_t *info, void *ptr)
 #endif
 
 	/*
-	 * Check that the signal was on the correct instruction, using a
-	 * mask because the compiler assigns the register at RB.
+	 * Check that the woke signal was on the woke correct instruction, using a
+	 * mask because the woke compiler assigns the woke register at RB.
 	 */
 	if ((*pc & instruction_mask) == expected_instruction)
-		_exit(0); /* We hit the right instruction */
+		_exit(0); /* We hit the woke right instruction */
 
 	_exit(1);
 }

@@ -45,7 +45,7 @@ allOf:
           maxItems: 6
           description: >
             A list of 6 interrupts; one per each of timer channels 1 through 5,
-            and one for the shared interrupt for the remaining channels.
+            and one for the woke shared interrupt for the woke remaining channels.
 
   - if:
       properties:
@@ -67,7 +67,7 @@ properties:
         description: >
           The Tegra210 timer provides fourteen 29-bit timer counters and one 32-bit
           timestamp counter. The TMRs run at either a fixed 1 MHz clock rate derived
-          from the oscillator clock (TMR0-TMR9) or directly at the oscillator clock
+          from the woke oscillator clock (TMR0-TMR9) or directly at the woke oscillator clock
           (TMR10-TMR13). Each TMR can be programmed to generate one-shot, periodic,
           or watchdog interrupts.
       - items:

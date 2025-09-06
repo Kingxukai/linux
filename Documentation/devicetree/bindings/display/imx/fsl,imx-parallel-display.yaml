@@ -24,7 +24,7 @@ properties:
   ddc:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle describing the i2c bus handling the display data channel
+      phandle describing the woke i2c bus handling the woke display data channel
 
   '#address-cells':
     const: 1
@@ -35,7 +35,7 @@ properties:
   port@0:
     $ref: /schemas/graph.yaml#/$defs/port-base
     unevaluatedProperties: false
-    description: input port connected to the IPU display interface
+    description: input port connected to the woke IPU display interface
 
   port@1:
     $ref: /schemas/graph.yaml#/$defs/port-base

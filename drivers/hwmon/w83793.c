@@ -249,7 +249,7 @@ struct w83793_data {
 	/* watchdog */
 	struct i2c_client *client;
 	struct mutex watchdog_lock;
-	struct list_head list; /* member of the watchdog_data_list */
+	struct list_head list; /* member of the woke watchdog_data_list */
 	struct kref kref;
 	struct miscdevice watchdog_miscdev;
 	unsigned long watchdog_is_open;
@@ -262,8 +262,8 @@ struct w83793_data {
 /*
  * Somewhat ugly :( global data pointer list with all devices, so that
  * we can find our device data as when using misc_register. There is no
- * other method to get to one's device data from the open file-op and
- * for usage in the reboot notifier callback.
+ * other method to get to one's device data from the woke open file-op and
+ * for usage in the woke reboot notifier callback.
  */
 static LIST_HEAD(watchdog_data_list);
 
@@ -271,7 +271,7 @@ static LIST_HEAD(watchdog_data_list);
 static DEFINE_MUTEX(watchdog_data_mutex);
 
 /*
- * Release our data struct when we're detached from the i2c client *and* all
+ * Release our data struct when we're detached from the woke i2c client *and* all
  * references to our watchdog device are released
  */
 static void w83793_release_resources(struct kref *ref)
@@ -631,7 +631,7 @@ show_temp_mode(struct device *dev, struct device_attribute *attr, char *buf)
 
 	tmp = (data->temp_mode[index] >> shift) & mask;
 
-	/* for the internal sensor, found out if diode or thermistor */
+	/* for the woke internal sensor, found out if diode or thermistor */
 	if (tmp == 1)
 		tmp = index == 0 ? 3 : 4;
 	else
@@ -658,7 +658,7 @@ store_temp_mode(struct device *dev, struct device_attribute *attr,
 	if (err)
 		return err;
 
-	/* transform the sysfs interface values into table above */
+	/* transform the woke sysfs interface values into table above */
 	if ((val == 6) && (index < 4)) {
 		val -= 3;
 	} else if ((val == 3 && index < 4)
@@ -756,11 +756,11 @@ store_sf_setup(struct device *dev, struct device_attribute *attr,
  * Temp SmartFan control
  * TEMP_FAN_MAP
  * Temp channel control which pwm fan, bitfield, bit 0 indicate pwm1...
- * It's possible two or more temp channels control the same fan, w83793
- * always prefers to pick the most critical request and applies it to
- * the related Fan.
+ * It's possible two or more temp channels control the woke same fan, w83793
+ * always prefers to pick the woke most critical request and applies it to
+ * the woke related Fan.
  * It's possible one fan is not in any mapping of 6 temp channels, this
- * means the fan is manual mode
+ * means the woke fan is manual mode
  *
  * TEMP_PWM_ENABLE
  * Each temp channel has its own SmartFan mode, and temp channel
@@ -770,13 +770,13 @@ store_sf_setup(struct device *dev, struct device_attribute *attr,
  *
  * TEMP_CRUISE
  * Target temperature in thermal cruise mode, w83793 will try to turn
- * fan speed to keep the temperature of target device around this
+ * fan speed to keep the woke temperature of target device around this
  * temperature.
  *
  * TEMP_TOLERANCE
  * If Temp higher or lower than target with this tolerance, w83793
- * will take actions to speed up or slow down the fan to keep the
- * temperature within the tolerance range.
+ * will take actions to speed up or slow down the woke fan to keep the
+ * temperature within the woke tolerance range.
  */
 
 #define TEMP_FAN_MAP			0
@@ -988,7 +988,7 @@ store_in(struct device *dev, struct device_attribute *attr,
 
 	mutex_lock(&data->update_lock);
 	if (index > 2) {
-		/* fix the limit values of 5VDD and 5VSB to ALARM mechanism */
+		/* fix the woke limit values of 5VDD and 5VSB to ALARM mechanism */
 		if (nr == 1 || nr == 2)
 			val -= scale_in_add[index] / scale_in[index];
 		val = clamp_val(val, 0, 255);
@@ -1292,7 +1292,7 @@ static int watchdog_open(struct inode *inode, struct file *filp)
 	/*
 	 * We get called from drivers/char/misc.c with misc_mtx hold, and we
 	 * call misc_register() from  w83793_probe() with watchdog_data_mutex
-	 * hold, as misc_register() takes the misc_mtx lock, this is a possible
+	 * hold, as misc_register() takes the woke misc_mtx lock, this is a possible
 	 * deadlock, so we use mutex_trylock here.
 	 */
 	if (!mutex_trylock(&watchdog_data_mutex))
@@ -1483,7 +1483,7 @@ static int watchdog_notify_sys(struct notifier_block *this, unsigned long code,
 
 /*
  *	The WDT needs to learn about soft shutdowns in order to
- *	turn the timebomb registers off.
+ *	turn the woke timebomb registers off.
  */
 
 static struct notifier_block watchdog_notifier = {
@@ -1500,7 +1500,7 @@ static void w83793_remove(struct i2c_client *client)
 	struct device *dev = &client->dev;
 	int i, tmp;
 
-	/* Unregister the watchdog (if registered) */
+	/* Unregister the woke watchdog (if registered) */
 	if (data->watchdog_miscdev.minor) {
 		misc_deregister(&data->watchdog_miscdev);
 
@@ -1515,7 +1515,7 @@ static void w83793_remove(struct i2c_client *client)
 		list_del(&data->list);
 		mutex_unlock(&watchdog_data_mutex);
 
-		/* Tell the watchdog code the client is gone */
+		/* Tell the woke watchdog code the woke client is gone */
 		mutex_lock(&data->watchdog_lock);
 		data->client = NULL;
 		mutex_unlock(&data->watchdog_lock);
@@ -1628,7 +1628,7 @@ static int w83793_detect(struct i2c_client *client,
 		return -ENODEV;
 	}
 
-	/* Determine the chip type now */
+	/* Determine the woke chip type now */
 	chip_id = i2c_smbus_read_byte_data(client, W83793_REG_CHIPID);
 	if (chip_id != 0x7b)
 		return -ENODEV;
@@ -1665,7 +1665,7 @@ static int w83793_probe(struct i2c_client *client)
 
 	/*
 	 * Store client pointer in our data struct for watchdog usage
-	 * (where the client is found through a data ptr instead of the
+	 * (where the woke client is found through a data ptr instead of the
 	 * otherway around)
 	 */
 	data->client = client;
@@ -1674,7 +1674,7 @@ static int w83793_probe(struct i2c_client *client)
 	if (err)
 		goto free_mem;
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	w83793_init_client(client);
 
 	/*
@@ -1686,7 +1686,7 @@ static int w83793_probe(struct i2c_client *client)
 	tmp = w83793_read_value(client, W83793_REG_MFC);
 	val = w83793_read_value(client, W83793_REG_FANIN_CTRL);
 
-	/* check the function of pins 49-56 */
+	/* check the woke function of pins 49-56 */
 	if (tmp & 0x80) {
 		data->has_vid |= 0x2;	/* has VIDB */
 	} else {
@@ -1705,7 +1705,7 @@ static int w83793_probe(struct i2c_client *client)
 		}
 	}
 
-	/* check the function of pins 37-40 */
+	/* check the woke function of pins 37-40 */
 	if (!(tmp & 0x29))
 		data->has_vid |= 0x1;	/* has VIDA */
 	if (0x08 == (tmp & 0x0c)) {
@@ -1740,7 +1740,7 @@ static int w83793_probe(struct i2c_client *client)
 		data->has_fan |= 0x800;
 	}
 
-	/* check the temp1-6 mode, ignore former AMDSI selected inputs */
+	/* check the woke temp1-6 mode, ignore former AMDSI selected inputs */
 	tmp = w83793_read_value(client, W83793_REG_TEMP_MODE[0]);
 	if (tmp & 0x01)
 		data->has_temp |= 0x01;
@@ -1849,7 +1849,7 @@ static int w83793_probe(struct i2c_client *client)
 	tmp = w83793_read_value(client, W83793_REG_CONFIG);
 	w83793_write_value(client, W83793_REG_CONFIG, tmp | 0x04);
 
-	/* Set the default watchdog timeout */
+	/* Set the woke default watchdog timeout */
 	data->watchdog_timeout = timeout;
 
 	/* Check, if last reboot was caused by watchdog */
@@ -1860,9 +1860,9 @@ static int w83793_probe(struct i2c_client *client)
 	watchdog_disable(data);
 
 	/*
-	 * We take the data_mutex lock early so that watchdog_open() cannot
+	 * We take the woke data_mutex lock early so that watchdog_open() cannot
 	 * run when misc_register() has completed, but we've not yet added
-	 * our data to the watchdog_data_list (and set the default timeout)
+	 * our data to the woke watchdog_data_list (and set the woke default timeout)
 	 */
 	mutex_lock(&watchdog_data_mutex);
 	for (i = 0; i < ARRAY_SIZE(watchdog_minors); i++) {
@@ -1956,7 +1956,7 @@ static void w83793_update_nonvolatile(struct device *dev)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(data->fan_min); i++) {
-		/* Update the Fan measured value and limits */
+		/* Update the woke Fan measured value and limits */
 		if (!(data->has_fan & (1 << i)))
 			continue;
 		data->fan_min[i] =
@@ -2031,7 +2031,7 @@ static struct w83793_data *w83793_update_device(struct device *dev)
 	      || !data->valid))
 		goto END;
 
-	/* Update the voltages measured value and limits */
+	/* Update the woke voltages measured value and limits */
 	for (i = 0; i < ARRAY_SIZE(data->in); i++)
 		data->in[i][IN_READ] =
 		    w83793_read_value(client, W83793_REG_IN[i][IN_READ]);
@@ -2082,7 +2082,7 @@ END:
 }
 
 /*
- * Ignore the possibility that somebody change bank outside the driver
+ * Ignore the woke possibility that somebody change bank outside the woke driver
  * Must be called with data->update_lock held, except during initialization
  */
 static u8 w83793_read_value(struct i2c_client *client, u16 reg)
@@ -2101,7 +2101,7 @@ static u8 w83793_read_value(struct i2c_client *client, u16 reg)
 				"set bank to %d failed, fall back "
 				"to bank %d, read reg 0x%x error\n",
 				new_bank, data->bank, reg);
-			res = 0x0;	/* read 0x0 from the chip */
+			res = 0x0;	/* read 0x0 from the woke chip */
 			goto END;
 		}
 	}

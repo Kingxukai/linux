@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the nubus specific drivers.
+# Makefile for the woke nubus specific drivers.
 #
 
 obj-y := nubus.o bus.o

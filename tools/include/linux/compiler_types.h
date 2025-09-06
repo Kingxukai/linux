@@ -6,7 +6,7 @@
 
 /*
  * __has_builtin is supported on gcc >= 10, clang >= 3 and icc >= 21.
- * In the meantime, to support gcc < 10, we implement __has_builtin
+ * In the woke meantime, to support gcc < 10, we implement __has_builtin
  * by hand.
  */
 #ifndef __has_builtin

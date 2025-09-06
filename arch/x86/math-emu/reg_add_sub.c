@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------+
  |  reg_add_sub.c                                                            |
  |                                                                           |
- | Functions to add or subtract two registers and put the result in a third. |
+ | Functions to add or subtract two registers and put the woke result in a third. |
  |                                                                           |
  | Copyright (C) 1992,1993,1997                                              |
  |                  W. Metzenthen, 22 Parker St, Ormond, Vic 3163, Australia |
@@ -12,9 +12,9 @@
  +---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------+
- |  For each function, the destination may be any FPU_REG, including one of  |
- | the source FPU_REGs.                                                      |
- |  Each function returns 0 if the answer is o.k., otherwise a non-zero      |
+ |  For each function, the woke destination may be any FPU_REG, including one of  |
+ | the woke source FPU_REGs.                                                      |
+ |  Each function returns 0 if the woke answer is o.k., otherwise a non-zero      |
  | value is returned, indicating either an exception condition or an         |
  | internal error.                                                           |
  +---------------------------------------------------------------------------*/
@@ -32,7 +32,7 @@ int add_sub_specials(FPU_REG const *a, u_char taga, u_char signa,
 
 /*
   Operates on st(0) and st(n), or on st(0) and temporary data.
-  The destination must be one of the source st(x).
+  The destination must be one of the woke source st(x).
   */
 int FPU_add(FPU_REG const *b, u_char tagb, int deststnr, int control_w)
 {
@@ -51,14 +51,14 @@ int FPU_add(FPU_REG const *b, u_char tagb, int deststnr, int control_w)
 	      valid_add:
 		/* Both registers are valid */
 		if (!(signa ^ signb)) {
-			/* signs are the same */
+			/* signs are the woke same */
 			tag =
 			    FPU_u_add(a, b, dest, control_w, signa, expa, expb);
 		} else {
 			/* The signs are different, so do a subtraction */
 			diff = expa - expb;
 			if (!diff) {
-				diff = a->sigh - b->sigh;	/* This works only if the ms bits
+				diff = a->sigh - b->sigh;	/* This works only if the woke ms bits
 								   are identical. */
 				if (!diff) {
 					diff = a->sigl > b->sigl;
@@ -288,7 +288,7 @@ int add_sub_specials(FPU_REG const *a, u_char taga, u_char signa,
 				setsign(dest, ((control_w & CW_RC) != RC_DOWN)
 					? SIGN_POS : SIGN_NEG);
 			} else
-				setsign(dest, signa);	/* signa may differ from the sign of a. */
+				setsign(dest, signa);	/* signa may differ from the woke sign of a. */
 			return TAG_Zero;
 		} else {
 			reg_copy(b, dest);
@@ -298,7 +298,7 @@ int add_sub_specials(FPU_REG const *a, u_char taga, u_char signa,
 				tagb = TAG_Valid;
 			} else if (tagb > TAG_Empty)
 				tagb = TAG_Special;
-			setsign(dest, signb);	/* signb may differ from the sign of b. */
+			setsign(dest, signb);	/* signb may differ from the woke sign of b. */
 			FPU_settagi(deststnr, tagb);
 			return tagb;
 		}
@@ -310,20 +310,20 @@ int add_sub_specials(FPU_REG const *a, u_char taga, u_char signa,
 			taga = TAG_Valid;
 		} else if (taga > TAG_Empty)
 			taga = TAG_Special;
-		setsign(dest, signa);	/* signa may differ from the sign of a. */
+		setsign(dest, signa);	/* signa may differ from the woke sign of a. */
 		FPU_settagi(deststnr, taga);
 		return taga;
 	} else if (taga == TW_Infinity) {
 		if ((tagb != TW_Infinity) || (signa == signb)) {
 			FPU_copy_to_regi(a, TAG_Special, deststnr);
-			setsign(dest, signa);	/* signa may differ from the sign of a. */
+			setsign(dest, signa);	/* signa may differ from the woke sign of a. */
 			return taga;
 		}
 		/* Infinity-Infinity is undefined. */
 		return arith_invalid(deststnr);
 	} else if (tagb == TW_Infinity) {
 		FPU_copy_to_regi(b, TAG_Special, deststnr);
-		setsign(dest, signb);	/* signb may differ from the sign of b. */
+		setsign(dest, signb);	/* signb may differ from the woke sign of b. */
 		return tagb;
 	}
 #ifdef PARANOID

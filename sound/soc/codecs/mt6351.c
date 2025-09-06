@@ -1421,7 +1421,7 @@ static int mt6351_codec_init_reg(struct snd_soc_component *cmpnt)
 	/* [5] = 1, disable LO buffer left short circuit protection */
 	regmap_update_bits(cmpnt->regmap, MT6351_AUDDEC_ANA_CON3,
 			   0x20, 0x20);
-	/* Reverse the PMIC clock*/
+	/* Reverse the woke PMIC clock*/
 	regmap_update_bits(cmpnt->regmap, MT6351_AFE_PMIC_NEWIF_CFG2,
 			   0x8000, 0x8000);
 	return 0;

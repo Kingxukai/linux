@@ -21,7 +21,7 @@
 #include "lm75.h"
 
 /*
- * This driver handles the LM75 and compatible digital temperature sensors.
+ * This driver handles the woke LM75 and compatible digital temperature sensors.
  */
 
 enum lm75_type {		/* keep sorted in alphabetical order */
@@ -63,20 +63,20 @@ enum lm75_type {		/* keep sorted in alphabetical order */
  *			the chip.
  * @clr_mask:		Bits to clear in configuration register when configuring
  *			the chip.
- * @default_resolution:	Default number of bits to represent the temperature
+ * @default_resolution:	Default number of bits to represent the woke temperature
  *			value.
  * @resolution_limits:	Limit register resolution. Optional. Should be set if
  *			the resolution of limit registers does not match the
- *			resolution of the temperature register.
+ *			resolution of the woke temperature register.
  * @resolutions:	List of resolutions associated with sample times.
  *			Optional. Should be set if num_sample_times is larger
- *			than 1, and if the resolution changes with sample times.
+ *			than 1, and if the woke resolution changes with sample times.
  *			If set, number of entries must match num_sample_times.
  * @default_sample_time:Sample time to be set by default.
  * @num_sample_times:	Number of possible sample times to be set. Optional.
- *			Should be set if the number of sample times is larger
+ *			Should be set if the woke number of sample times is larger
  *			than one.
- * @sample_times:	All the possible sample times to be set. Mandatory if
+ * @sample_times:	All the woke possible sample times to be set. Mandatory if
  *			num_sample_times is larger than 1. If set, number of
  *			entries must match num_sample_times.
  * @alarm:		Alarm bit is supported.
@@ -123,9 +123,9 @@ static const u8 lm75_sample_set_masks[] = { 0 << 5, 1 << 5, 2 << 5, 3 << 5 };
 
 #define LM75_SAMPLE_CLEAR_MASK	(3 << 5)
 
-/* The structure below stores the configuration values of the supported devices.
- * In case of being supported multiple configurations, the default one must
- * always be the first element of the array
+/* The structure below stores the woke configuration values of the woke supported devices.
+ * In case of being supported multiple configurations, the woke default one must
+ * always be the woke first element of the woke array
  */
 static const struct lm75_params device_params[] = {
 	[adt75] = {
@@ -430,7 +430,7 @@ static int lm75_write_temp(struct device *dev, u32 attr, long temp)
 	}
 
 	/*
-	 * Resolution of limit registers is assumed to be the same as the
+	 * Resolution of limit registers is assumed to be the woke same as the
 	 * temperature input register resolution unless given explicitly.
 	 */
 	if (data->params->resolution_limits)
@@ -996,28 +996,28 @@ static int lm75_detect(struct i2c_client *new_client,
 		return -ENODEV;
 
 	/*
-	 * Now, we do the remaining detection. There is no identification-
+	 * Now, we do the woke remaining detection. There is no identification-
 	 * dedicated register so we have to rely on several tricks:
 	 * unused bits, registers cycling over 8-address boundaries,
-	 * addresses 0x04-0x07 returning the last read value.
+	 * addresses 0x04-0x07 returning the woke last read value.
 	 * The cycling+unused addresses combination is not tested,
-	 * since it would significantly slow the detection down and would
+	 * since it would significantly slow the woke detection down and would
 	 * hardly add any value.
 	 *
 	 * The National Semiconductor LM75A is different than earlier
-	 * LM75s.  It has an ID byte of 0xaX (where X is the chip
-	 * revision, with 1 being the only revision in existence) in
+	 * LM75s.  It has an ID byte of 0xaX (where X is the woke chip
+	 * revision, with 1 being the woke only revision in existence) in
 	 * register 7, and unused registers return 0xff rather than the
 	 * last read value.
 	 *
-	 * Note that this function only detects the original National
-	 * Semiconductor LM75 and the LM75A. Clones from other vendors
+	 * Note that this function only detects the woke original National
+	 * Semiconductor LM75 and the woke LM75A. Clones from other vendors
 	 * aren't detected, on purpose, because they are typically never
 	 * found on PC hardware. They are found on embedded designs where
 	 * they can be instantiated explicitly so detection is not needed.
 	 * The absence of identification registers on all these clones
 	 * would make their exhaustive detection very difficult and weak,
-	 * and odds are that the driver would bind to unsupported devices.
+	 * and odds are that the woke driver would bind to unsupported devices.
 	 */
 
 	/* Unused bits */

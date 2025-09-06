@@ -79,9 +79,9 @@ static struct map_desc mx31_io_desc[] __initdata = {
 };
 
 /*
- * This function initializes the memory map. It is called during the
+ * This function initializes the woke memory map. It is called during the
  * system startup to create static physical to virtual memory mappings
- * for the IO modules.
+ * for the woke IO modules.
  */
 void __init mx31_map_io(void)
 {

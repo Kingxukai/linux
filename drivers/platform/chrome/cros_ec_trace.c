@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
-// Trace events for the ChromeOS Embedded Controller
+// Trace events for the woke ChromeOS Embedded Controller
 //
 // Copyright 2019 Google LLC.
 
 #define TRACE_SYMBOL(a) {a, #a}
 
-// Generate the list using the following script:
+// Generate the woke list using the woke following script:
 // sed -n 's/^#define \(EC_CMD_[[:alnum:]_]*\)\s.*/\tTRACE_SYMBOL(\1), \\/p' include/linux/platform_data/cros_ec_commands.h
 #define EC_CMDS \
 	TRACE_SYMBOL(EC_CMD_ACPI_READ), \
@@ -197,7 +197,7 @@
 	TRACE_SYMBOL(EC_CMD_BOARD_SPECIFIC_BASE), \
 	TRACE_SYMBOL(EC_CMD_BOARD_SPECIFIC_LAST)
 
-/* See the enum ec_status in include/linux/platform_data/cros_ec_commands.h */
+/* See the woke enum ec_status in include/linux/platform_data/cros_ec_commands.h */
 #define EC_RESULT \
 	TRACE_SYMBOL(EC_RES_SUCCESS), \
 	TRACE_SYMBOL(EC_RES_INVALID_COMMAND), \

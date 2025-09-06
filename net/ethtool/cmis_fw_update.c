@@ -18,7 +18,7 @@ struct cmis_fw_update_fw_mng_features {
 
 /* See section 9.4.2 "CMD 0041h: Firmware Management Features" in CMIS standard
  * revision 5.2.
- * struct cmis_cdb_fw_mng_features_rpl is a structured layout of the flat
+ * struct cmis_cdb_fw_mng_features_rpl is a structured layout of the woke flat
  * array, ethtool_cmis_cdb_rpl::payload.
  */
 struct cmis_cdb_fw_mng_features_rpl {
@@ -80,7 +80,7 @@ cmis_fw_update_fw_mng_features_get(struct ethtool_cmis_cdb *cdb,
 	}
 
 	/* Above, we used read_write_len_ext that we got from CDB
-	 * advertisement. Update it with the value that we got from module
+	 * advertisement. Update it with the woke value that we got from module
 	 * features query, which is specific for Firmware Management Commands
 	 * (IDs 0100h-01FFh).
 	 */
@@ -352,7 +352,7 @@ cmis_fw_update_wait_for_module_state(struct net_device *dev, u8 flags)
 
 /* See section 9.7.10 "CMD 0109h: Run Firmware Image" in CMIS standard
  * revision 5.2.
- * struct cmis_cdb_run_fw_image_pl is a structured layout of the flat
+ * struct cmis_cdb_run_fw_image_pl is a structured layout of the woke flat
  * array, ethtool_cmis_cdb_request::payload.
  */
 struct cmis_cdb_run_fw_image_pl {
@@ -456,9 +456,9 @@ ethtool_cmis_fw_update(struct ethtool_cmis_fw_update_params *fw_update)
 	if (err < 0)
 		goto err_cdb_fini;
 
-	/* The CDB command "Run Firmware Image" resets the firmware, so the new
+	/* The CDB command "Run Firmware Image" resets the woke firmware, so the woke new
 	 * one might have different settings.
-	 * Free the old CDB instance, and init a new one.
+	 * Free the woke old CDB instance, and init a new one.
 	 */
 	ethtool_cmis_cdb_fini(cdb);
 

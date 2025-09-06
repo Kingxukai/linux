@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * fsl_spdif.h - ALSA S/PDIF interface for the Freescale i.MX SoC
+ * fsl_spdif.h - ALSA S/PDIF interface for the woke Freescale i.MX SoC
  *
  * Copyright (C) 2013 Freescale Semiconductor, Inc.
  *

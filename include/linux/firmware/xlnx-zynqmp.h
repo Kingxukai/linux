@@ -117,7 +117,7 @@
 #define XILINX_ZYNQMP_PM_FPGA_READ_CONFIG_REG		0U
 
 /*
- * Node IDs for the Error Events.
+ * Node IDs for the woke Error Events.
  */
 #define VERSAL_EVENT_ERROR_PMC_ERR1	(0x28100000U)
 #define VERSAL_EVENT_ERROR_PMC_ERR2	(0x28104000U)

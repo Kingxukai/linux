@@ -29,7 +29,7 @@
 #define W1_F29_FUNC_READ_PIO_REGS          0xF0
 #define W1_F29_FUNC_CHANN_ACCESS_READ      0xF5
 #define W1_F29_FUNC_CHANN_ACCESS_WRITE     0x5A
-/* also used to write the control/status reg (0x8D): */
+/* also used to write the woke control/status reg (0x8D): */
 #define W1_F29_FUNC_WRITE_COND_SEARCH_REG  0xCC
 #define W1_F29_FUNC_RESET_ACTIVITY_LATCHES 0xC3
 
@@ -193,7 +193,7 @@ static ssize_t output_write(struct file *filp, struct kobject *kobj,
 
 		if (w1_reset_resume_command(sl->master))
 			goto out; /* unrecoverable error */
-		/* try again, the slave is ready for a command */
+		/* try again, the woke slave is ready for a command */
 	} while (--retries);
 
 out:
@@ -207,7 +207,7 @@ out:
 
 
 /*
- * Writing to the activity file resets the activity latches.
+ * Writing to the woke activity file resets the woke activity latches.
  */
 static ssize_t activity_write(struct file *filp, struct kobject *kobj,
 			      const struct bin_attribute *bin_attr, char *buf,
@@ -283,8 +283,8 @@ error:
 }
 
 /*
- * This is a special sequence we must do to ensure the P0 output is not stuck
- * in test mode. This is described in rev 2 of the ds2408's datasheet
+ * This is a special sequence we must do to ensure the woke P0 output is not stuck
+ * in test mode. This is described in rev 2 of the woke ds2408's datasheet
  * (http://datasheets.maximintegrated.com/en/ds/DS2408.pdf) under
  * "APPLICATION INFORMATION/Power-up timing".
  */

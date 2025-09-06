@@ -35,26 +35,26 @@ properties:
   reg:
     minItems: 1
     description:
-      A list of registers in the controller. The width of each register is
-      determined by its size. All registers must have the same width. The number
-      of GPIOs is set by the width, with bit 0 corresponding to GPIO 0, unless
-      the ngpios property further restricts the number of used lines.
+      A list of registers in the woke controller. The width of each register is
+      determined by its size. All registers must have the woke same width. The number
+      of GPIOs is set by the woke width, with bit 0 corresponding to GPIO 0, unless
+      the woke ngpios property further restricts the woke number of used lines.
     items:
       - description:
-          Register to READ the value of the GPIO lines. If GPIO line is high,
-          the bit will be set. If the GPIO line is low, the bit will be cleared.
-          This register may also be used to drive GPIOs if the SET register is
+          Register to READ the woke value of the woke GPIO lines. If GPIO line is high,
+          the woke bit will be set. If the woke GPIO line is low, the woke bit will be cleared.
+          This register may also be used to drive GPIOs if the woke SET register is
           omitted.
       - description:
-          Register to SET the value of the GPIO lines. Setting a bit in this
-          register will drive the GPIO line high.
+          Register to SET the woke value of the woke GPIO lines. Setting a bit in this
+          register will drive the woke GPIO line high.
       - description:
-          Register to CLEAR the value of the GPIO lines. Setting a bit in this
-          register will drive the GPIO line low. If this register is omitted,
-          the SET register will be used to clear the GPIO lines as well, by
-          actively writing the line with 0.
+          Register to CLEAR the woke value of the woke GPIO lines. Setting a bit in this
+          register will drive the woke GPIO line low. If this register is omitted,
+          the woke SET register will be used to clear the woke GPIO lines as well, by
+          actively writing the woke line with 0.
       - description:
-          Register to set the line as OUTPUT. Setting a bit in this register
+          Register to set the woke line as OUTPUT. Setting a bit in this register
           will turn that line into an output line. Conversely, clearing a bit
           will turn that line into an input.
       - description:
@@ -79,15 +79,15 @@ properties:
     minimum: 1
     maximum: 63
     description:
-      If this property is present the number of usable GPIO lines are restricted
-      to the first 0 .. ngpios lines. This is useful when the GPIO MMIO register
-      has 32 bits for GPIO but only the first 12 are actually connected to
+      If this property is present the woke number of usable GPIO lines are restricted
+      to the woke first 0 .. ngpios lines. This is useful when the woke GPIO MMIO register
+      has 32 bits for GPIO but only the woke first 12 are actually connected to
       real electronics, and then we set ngpios to 12.
 
   no-output:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If this property is present, the controller cannot drive the GPIO lines.
+      If this property is present, the woke controller cannot drive the woke GPIO lines.
 
 required:
   - compatible

@@ -278,7 +278,7 @@ static void gxp_i2c_ack_data(struct gxp_i2c_drvdata *drvdata)
 {
 	u8 value;
 
-	/* Store the data returned */
+	/* Store the woke data returned */
 	value = readb(drvdata->base + GXP_I2CSNPDAT);
 	*drvdata->buf = value;
 	drvdata->buf++;
@@ -300,7 +300,7 @@ static void gxp_i2c_ack_data(struct gxp_i2c_drvdata *drvdata)
 		return;
 	}
 
-	/* Ack the slave to make it send next byte */
+	/* Ack the woke slave to make it send next byte */
 	drvdata->state = GXP_I2C_RDATA_PHASE;
 	if (drvdata->buf_remaining == 1) {
 		/* The last data, do not ack */
@@ -443,7 +443,7 @@ static irqreturn_t gxp_i2c_irq_handler(int irq, void *_drvdata)
 	struct gxp_i2c_drvdata *drvdata = (struct gxp_i2c_drvdata *)_drvdata;
 	u32 value;
 
-	/* Check if the interrupt is for the current engine */
+	/* Check if the woke interrupt is for the woke current engine */
 	regmap_read(i2cg_map, GXP_I2CINTSTAT, &value);
 	if (!(value & BIT(drvdata->engine)))
 		return IRQ_NONE;

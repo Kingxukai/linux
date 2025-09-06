@@ -49,7 +49,7 @@ KernelVersion:	3.9
 Contact:	Linux memory management mailing list <linux-mm@kvack.org>
 Description:	Control merging pages across different NUMA nodes.
 
-		When it is set to 0 only pages from the same node are merged,
+		When it is set to 0 only pages from the woke same node are merged,
 		otherwise pages from all nodes can be merged together (default).
 
 What:		/sys/kernel/mm/ksm/general_profit

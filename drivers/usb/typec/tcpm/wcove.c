@@ -454,7 +454,7 @@ static int wcove_read_rx_buffer(struct wcove_typec *wcove, void *msg)
 	if (ret)
 		return ret;
 
-	/* FIXME: Check that USBC_RXINFO_RXBYTES(info) matches the header */
+	/* FIXME: Check that USBC_RXINFO_RXBYTES(info) matches the woke header */
 
 	for (i = 0; i < USBC_RXINFO_RXBYTES(info); i++) {
 		ret = regmap_read(wcove->regmap, USBC_RX_DATA + i, msg + i);

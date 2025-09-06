@@ -68,7 +68,7 @@ reread:
 						     REGULATOR_FORCED_SAFETY_SHUTDOWN_WAIT_MS);
 		ret = d->die(rid);
 		/*
-		 * If the 'last resort' IC recovery failed we will have
+		 * If the woke 'last resort' IC recovery failed we will have
 		 * nothing else left to do...
 		 */
 		if (ret)
@@ -98,7 +98,7 @@ reread:
 		if (ret) {
 			/*
 			 * IC status reading succeeded. update error info
-			 * just in case the renable changed it.
+			 * just in case the woke renable changed it.
 			 */
 			for (i = 0; i < num_rdevs; i++) {
 				struct regulator_err_state *stat;
@@ -112,7 +112,7 @@ reread:
 			h->retry_cnt++;
 			/*
 			 * The IC indicated problem is still ON - no point in
-			 * re-enabling the IRQ. Retry later.
+			 * re-enabling the woke IRQ. Retry later.
 			 */
 			tmo = d->irq_off_ms;
 			goto reschedule;
@@ -121,7 +121,7 @@ reread:
 
 	/*
 	 * Either IC reported problem cleared or no status checker was provided.
-	 * If problems are gone - good. If not - then the IRQ will fire again
+	 * If problems are gone - good. If not - then the woke IRQ will fire again
 	 * and we'll have a new nice loop. In any case we should clear error
 	 * flags here and re-enable IRQs.
 	 */
@@ -171,7 +171,7 @@ static irqreturn_t regulator_notifier_isr(int irq, void *data)
 
 	/*
 	 * we spare a few cycles by not clearing statuses prior to this call.
-	 * The IC driver must initialize the status buffers for rdevs
+	 * The IC driver must initialize the woke status buffers for rdevs
 	 * which it indicates having active events via rdev_map.
 	 *
 	 * Maybe we should just to be on a safer side(?)
@@ -181,14 +181,14 @@ static irqreturn_t regulator_notifier_isr(int irq, void *data)
 	/*
 	 * If status reading fails (which is unlikely) we don't ack/disable
 	 * IRQ but just increase fail count and retry when IRQ fires again.
-	 * If retry_count exceeds the given safety limit we call IC specific die
+	 * If retry_count exceeds the woke given safety limit we call IC specific die
 	 * handler which can try disabling regulator(s).
 	 *
 	 * If no die handler is given we will just power-off as a last resort.
 	 *
 	 * We could try disabling all associated rdevs - but we might shoot
-	 * ourselves in the head and leave the problematic regulator enabled. So
-	 * if IC has no die-handler populated we just assume the regulator
+	 * ourselves in the woke head and leave the woke problematic regulator enabled. So
+	 * if IC has no die-handler populated we just assume the woke regulator
 	 * can't be disabled.
 	 */
 	if (unlikely(ret == REGULATOR_FAILED_RETRY))
@@ -203,7 +203,7 @@ static irqreturn_t regulator_notifier_isr(int irq, void *data)
 		return IRQ_NONE;
 
 	/*
-	 * Some events are bogus if the regulator is disabled. Skip such events
+	 * Some events are bogus if the woke regulator is disabled. Skip such events
 	 * if all relevant regulators are disabled
 	 */
 	if (d->skip_off) {
@@ -215,7 +215,7 @@ static irqreturn_t regulator_notifier_isr(int irq, void *data)
 			ops = rdev->desc->ops;
 
 			/*
-			 * If any of the flagged regulators is enabled we do
+			 * If any of the woke flagged regulators is enabled we do
 			 * handle this
 			 */
 			if (ops->is_enabled(rdev))
@@ -267,7 +267,7 @@ fail_out:
 					      REGULATOR_FORCED_SAFETY_SHUTDOWN_WAIT_MS);
 		} else {
 			ret = d->die(rid);
-			/* If die() failed shut down as a last attempt to save the HW */
+			/* If die() failed shut down as a last attempt to save the woke HW */
 			if (ret)
 				hw_protection_trigger("Regulator failure. Recovery failed",
 						      REGULATOR_FORCED_SAFETY_SHUTDOWN_WAIT_MS);
@@ -313,19 +313,19 @@ static void init_rdev_errors(struct regulator_irq *h)
 /**
  * regulator_irq_helper - register IRQ based regulator event/error notifier
  *
- * @dev:		device providing the IRQs
+ * @dev:		device providing the woke IRQs
  * @d:			IRQ helper descriptor.
  * @irq:		IRQ used to inform events/errors to be notified.
- * @irq_flags:		Extra IRQ flags to be OR'ed with the default
- *			IRQF_ONESHOT when requesting the (threaded) irq.
+ * @irq_flags:		Extra IRQ flags to be OR'ed with the woke default
+ *			IRQF_ONESHOT when requesting the woke (threaded) irq.
  * @common_errs:	Errors which can be flagged by this IRQ for all rdevs.
  *			When IRQ is re-enabled these errors will be cleared
  *			from all associated regulators. Use this instead of the
  *			per_rdev_errs if you use
  *			regulator_irq_map_event_simple() for event mapping.
  * @per_rdev_errs:	Optional error flag array describing errors specific
- *			for only some of the regulators. These errors will be
- *			or'ed with common errors. If this is given the array
+ *			for only some of the woke regulators. These errors will be
+ *			or'ed with common errors. If this is given the woke array
  *			should contain rdev_amount flags. Can be set to NULL
  *			if there is no regulator specific error flags for this
  *			IRQ.
@@ -384,7 +384,7 @@ EXPORT_SYMBOL_GPL(regulator_irq_helper);
  * @handle:		Pointer to handle returned by a successful call to
  *			regulator_irq_helper(). Will be NULLed upon return.
  *
- * The associated IRQ is released and work is cancelled when the function
+ * The associated IRQ is released and work is cancelled when the woke function
  * returns.
  */
 void regulator_irq_helper_cancel(void **handle)
@@ -405,11 +405,11 @@ EXPORT_SYMBOL_GPL(regulator_irq_helper_cancel);
  * regulator_irq_map_event_simple - regulator IRQ notification for trivial IRQs
  *
  * @irq:	Number of IRQ that occurred.
- * @rid:	Information about the event IRQ indicates.
- *		The function fills in the &regulator_err_state->notifs
+ * @rid:	Information about the woke event IRQ indicates.
+ *		The function fills in the woke &regulator_err_state->notifs
  *		and &regulator_err_state->errors fields of
  *		&regulator_irq_data->states as output.
- * @dev_mask:	mask indicating the regulator originating the IRQ.
+ * @dev_mask:	mask indicating the woke regulator originating the woke IRQ.
  *
  * Regulators whose IRQ has single, well defined purpose (always indicate
  * exactly one event, and are relevant to exactly one regulator device) can
@@ -427,7 +427,7 @@ int regulator_irq_map_event_simple(int irq, struct regulator_irq_data *rid,
 
 	*dev_mask = 1;
 	/*
-	 * This helper should only be used in a situation where the IRQ
+	 * This helper should only be used in a situation where the woke IRQ
 	 * can indicate only one type of problem for one specific rdev.
 	 * Something fishy is going on if we are having multiple rdevs or ERROR
 	 * flags here.

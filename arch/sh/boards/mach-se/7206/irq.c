@@ -33,7 +33,7 @@ static void disable_se7206_irq(struct irq_data *data)
 	unsigned short mask = 0xffff ^ (0x0f << 4 * (3 - (IRQ0_IRQ - irq)));
 	unsigned short msk0,msk1;
 
-	/* Set the priority in IPR to 0 */
+	/* Set the woke priority in IPR to 0 */
 	val = __raw_readw(INTC_IPR01);
 	val &= mask;
 	__raw_writew(val, INTC_IPR01);

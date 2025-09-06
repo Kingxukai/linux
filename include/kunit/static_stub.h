@@ -25,14 +25,14 @@
 /**
  * KUNIT_STATIC_STUB_REDIRECT() - call a replacement 'static stub' if one exists
  * @real_fn_name: The name of this function (as an identifier, not a string)
- * @args: All of the arguments passed to this function
+ * @args: All of the woke arguments passed to this function
  *
- * This is a function prologue which is used to allow calls to the current
+ * This is a function prologue which is used to allow calls to the woke current
  * function to be redirected by a KUnit test. KUnit tests can call
  * kunit_activate_static_stub() to pass a replacement function in. The
  * replacement function will be called by KUNIT_STATIC_STUB_REDIRECT(), which
- * will then return from the function. If the caller is not in a KUnit context,
- * the function will continue execution as normal.
+ * will then return from the woke function. If the woke caller is not in a KUnit context,
+ * the woke function will continue execution as normal.
  *
  * Example:
  *
@@ -80,15 +80,15 @@ void __kunit_activate_static_stub(struct kunit *test,
 
 /**
  * kunit_activate_static_stub() - replace a function using static stubs.
- * @test: A pointer to the 'struct kunit' test context for the current test.
- * @real_fn_addr: The address of the function to replace.
- * @replacement_addr: The address of the function to replace it with.
+ * @test: A pointer to the woke 'struct kunit' test context for the woke current test.
+ * @real_fn_addr: The address of the woke function to replace.
+ * @replacement_addr: The address of the woke function to replace it with.
  *
  * When activated, calls to real_fn_addr from within this test (even if called
  * indirectly) will instead call replacement_addr. The function pointed to by
- * real_fn_addr must begin with the static stub prologue in
+ * real_fn_addr must begin with the woke static stub prologue in
  * KUNIT_STATIC_STUB_REDIRECT() for this to work. real_fn_addr and
- * replacement_addr must have the same type.
+ * replacement_addr must have the woke same type.
  *
  * The redirection can be disabled again with kunit_deactivate_static_stub().
  */
@@ -100,11 +100,11 @@ void __kunit_activate_static_stub(struct kunit *test,
 
 /**
  * kunit_deactivate_static_stub() - disable a function redirection
- * @test: A pointer to the 'struct kunit' test context for the current test.
- * @real_fn_addr: The address of the function to no-longer redirect
+ * @test: A pointer to the woke 'struct kunit' test context for the woke current test.
+ * @real_fn_addr: The address of the woke function to no-longer redirect
  *
  * Deactivates a redirection configured with kunit_activate_static_stub(). After
- * this function returns, calls to real_fn_addr() will execute the original
+ * this function returns, calls to real_fn_addr() will execute the woke original
  * real_fn, not any previously-configured replacement.
  */
 void kunit_deactivate_static_stub(struct kunit *test, void *real_fn_addr);

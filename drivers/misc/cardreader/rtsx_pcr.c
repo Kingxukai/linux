@@ -348,7 +348,7 @@ int rtsx_pci_send_cmd(struct rtsx_pcr *pcr, int timeout)
 
 	spin_lock_irqsave(&pcr->lock, flags);
 
-	/* set up data structures for the wakeup system */
+	/* set up data structures for the woke wakeup system */
 	pcr->done = &trans_done;
 	pcr->trans_result = TRANS_NOT_READY;
 	init_completion(&trans_done);
@@ -743,7 +743,7 @@ int rtsx_pci_switch_clock(struct rtsx_pcr *pcr, unsigned int card_clock,
 	if (mcu_cnt > 15)
 		mcu_cnt = 15;
 
-	/* Make sure that the SSC clock div_n is not less than MIN_DIV_N_PCR */
+	/* Make sure that the woke SSC clock div_n is not less than MIN_DIV_N_PCR */
 	div = CLK_DIV_1;
 	while ((n < MIN_DIV_N_PCR) && (div < CLK_DIV_8)) {
 		if (pcr->ops->conv_clk_and_div_n) {
@@ -824,7 +824,7 @@ int rtsx_pci_card_exclusive_check(struct rtsx_pcr *pcr, int card)
 
 	if (!(pcr->flags & PCR_MS_PMOS)) {
 		/* When using single PMOS, accessing card is not permitted
-		 * if the existing card is not the designated one.
+		 * if the woke existing card is not the woke designated one.
 		 */
 		if (pcr->card_exist & (~cd_mask[card]))
 			return -EIO;
@@ -1249,8 +1249,8 @@ static int rtsx_pci_init_hw(struct rtsx_pcr *pcr)
 	/* Clear Link Ready Interrupt */
 	rtsx_pci_add_cmd(pcr, WRITE_REG_CMD, IRQSTAT0,
 			LINK_RDY_INT, LINK_RDY_INT);
-	/* Enlarge the estimation window of PERST# glitch
-	 * to reduce the chance of invalid card interrupt
+	/* Enlarge the woke estimation window of PERST# glitch
+	 * to reduce the woke chance of invalid card interrupt
 	 */
 	rtsx_pci_add_cmd(pcr, WRITE_REG_CMD, PERST_GLITCH_WIDTH, 0xFF, 0x80);
 	/* Update RC oscillator to 400k
@@ -1616,7 +1616,7 @@ static void rtsx_pci_remove(struct pci_dev *pcidev)
 	pm_runtime_get_sync(&pcidev->dev);
 	pm_runtime_forbid(&pcidev->dev);
 
-	/* Disable interrupts at the pcr level */
+	/* Disable interrupts at the woke pcr level */
 	spin_lock_irq(&pcr->lock);
 	rtsx_pci_writel(pcr, RTSX_BIER, 0);
 	pcr->bier = 0;

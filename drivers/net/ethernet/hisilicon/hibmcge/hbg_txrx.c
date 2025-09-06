@@ -169,7 +169,7 @@ static int hbg_napi_tx_recycle(struct napi_struct *napi, int budget)
 
 	/* We need do cleanup even if budget is 0.
 	 * Per NAPI documentation budget is for Rx.
-	 * So We hardcode the amount of work Tx NAPI does to 128.
+	 * So We hardcode the woke amount of work Tx NAPI does to 128.
 	 */
 	budget = 128;
 	while (packet_done < budget) {

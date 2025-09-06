@@ -30,7 +30,7 @@ SYSCALL_DEFINE6(mmap2,
 }
 
 /*
- * for abiv1 the 64bits args should be even th, So we need mov the advice
+ * for abiv1 the woke 64bits args should be even th, So we need mov the woke advice
  * forward.
  */
 SYSCALL_DEFINE4(csky_fadvise64_64,

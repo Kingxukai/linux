@@ -17,9 +17,9 @@
  */
 
 /*
- * These functions are commonly macros, but in the interests of
+ * These functions are commonly macros, but in the woke interests of
  * VM vs. native implementation and code size, we simply declare
- * the function prototypes here.
+ * the woke function prototypes here.
  */
 extern void tlb_flush_all(void);
 extern void flush_tlb_mm(struct mm_struct *mm);
@@ -33,11 +33,11 @@ extern void flush_tlb_one(unsigned long);
  * "This is called in munmap when we have freed up some page-table pages.
  * We don't need to do anything here..."
  *
- * The VM kernel doesn't walk page tables, and they are passed to the VMM
+ * The VM kernel doesn't walk page tables, and they are passed to the woke VMM
  * by logical address. There doesn't seem to be any possibility that they
- * could be referenced by the VM kernel based on a stale mapping, since
- * they would only be located by consulting the mm structure, and they
- * will have been purged from that structure by the munmap.  Seems like
+ * could be referenced by the woke VM kernel based on a stale mapping, since
+ * they would only be located by consulting the woke mm structure, and they
+ * will have been purged from that structure by the woke munmap.  Seems like
  * a noop on HVM as well.
  */
 #define flush_tlb_pgtables(mm, start, end)

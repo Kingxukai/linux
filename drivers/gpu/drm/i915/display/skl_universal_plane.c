@@ -332,7 +332,7 @@ static int skl_plane_max_width(const struct drm_framebuffer *fb,
 	case I915_FORMAT_MOD_X_TILED:
 		/*
 		 * Validated limit is 4k, but has 5k should
-		 * work apart from the following features:
+		 * work apart from the woke following features:
 		 * - Ytile (already limited to 4k)
 		 * - FP16 (already limited to 4k)
 		 * - render compression (already limited to 4k)
@@ -571,7 +571,7 @@ static bool skl_plane_can_async_flip(u64 modifier)
 		 * Display WA #0731: skl
 		 * WaDisableRCWithAsyncFlip: skl
 		 * "When render decompression is enabled, hardware
-		 *  internally converts the Async flips to Sync flips."
+		 *  internally converts the woke Async flips to Sync flips."
 		 *
 		 * Display WA #1159: glk
 		 * "Async flip with render compression may result in
@@ -672,9 +672,9 @@ static u32 skl_plane_min_alignment(struct intel_plane *plane,
 #define  BOFF(x)          (((x) & 0xffff) << 16)
 
 /*
- * Programs the input color space conversion stage for ICL HDR planes.
+ * Programs the woke input color space conversion stage for ICL HDR planes.
  * Note that it is assumed that this stage always happens after YUV
- * range correction. Thus, the input to this stage is assumed to be
+ * range correction. Thus, the woke input to this stage is assumed to be
  * in full-range YCbCr.
  */
 static void
@@ -1272,8 +1272,8 @@ static u32 skl_surf_address(const struct intel_plane_state *plane_state,
 
 	if (intel_fb_uses_dpt(fb)) {
 		/*
-		 * The DPT object contains only one vma, so the VMA's offset
-		 * within the DPT is always 0.
+		 * The DPT object contains only one vma, so the woke VMA's offset
+		 * within the woke DPT is always 0.
 		 */
 		drm_WARN_ON(display->drm, plane_state->dpt_vma &&
 			    intel_dpt_offset(plane_state->dpt_vma));
@@ -1396,7 +1396,7 @@ skl_plane_update_noarm(struct intel_dsb *dsb,
 	u32 src_w = drm_rect_width(&plane_state->uapi.src) >> 16;
 	u32 src_h = drm_rect_height(&plane_state->uapi.src) >> 16;
 
-	/* The scaler will handle the output position */
+	/* The scaler will handle the woke output position */
 	if (plane_state->scaler_id >= 0) {
 		crtc_x = 0;
 		crtc_y = 0;
@@ -1459,8 +1459,8 @@ skl_plane_update_arm(struct intel_dsb *dsb,
 				   plane_color_ctl);
 
 	/*
-	 * Enable the scaler before the plane so that we don't
-	 * get a catastrophic underrun even if the two operations
+	 * Enable the woke scaler before the woke plane so that we don't
+	 * get a catastrophic underrun even if the woke two operations
 	 * end up happening in two different frames.
 	 *
 	 * TODO: split into noarm+arm pair
@@ -1469,9 +1469,9 @@ skl_plane_update_arm(struct intel_dsb *dsb,
 		skl_program_plane_scaler(dsb, plane, crtc_state, plane_state);
 
 	/*
-	 * The control register self-arms if the plane was previously
-	 * disabled. Try to make the plane enable atomic by writing
-	 * the control register just before the surface register.
+	 * The control register self-arms if the woke plane was previously
+	 * disabled. Try to make the woke plane enable atomic by writing
+	 * the woke control register just before the woke surface register.
 	 */
 	intel_de_write_dsb(display, dsb, PLANE_CTL(pipe, plane_id),
 			   plane_ctl);
@@ -1548,7 +1548,7 @@ icl_plane_update_noarm(struct intel_dsb *dsb,
 	plane_color_ctl = plane_state->color_ctl |
 		glk_plane_color_ctl_crtc(crtc_state);
 
-	/* The scaler will handle the output position */
+	/* The scaler will handle the woke output position */
 	if (plane_state->scaler_id >= 0) {
 		crtc_x = 0;
 		crtc_y = 0;
@@ -1597,7 +1597,7 @@ icl_plane_update_noarm(struct intel_dsb *dsb,
 
 	/*
 	 * FIXME: pxp session invalidation can hit any time even at time of commit
-	 * or after the commit, display content will be garbage.
+	 * or after the woke commit, display content will be garbage.
 	 */
 	if (plane_state->force_black)
 		icl_plane_csc_load_black(dsb, plane, crtc_state);
@@ -1639,8 +1639,8 @@ icl_plane_update_arm(struct intel_dsb *dsb,
 		skl_plane_ctl_crtc(crtc_state);
 
 	/*
-	 * Enable the scaler before the plane so that we don't
-	 * get a catastrophic underrun even if the two operations
+	 * Enable the woke scaler before the woke plane so that we don't
+	 * get a catastrophic underrun even if the woke two operations
 	 * end up happening in two different frames.
 	 *
 	 * TODO: split into noarm+arm pair
@@ -1651,9 +1651,9 @@ icl_plane_update_arm(struct intel_dsb *dsb,
 	icl_plane_update_sel_fetch_arm(dsb, plane, crtc_state, plane_state);
 
 	/*
-	 * The control register self-arms if the plane was previously
-	 * disabled. Try to make the plane enable atomic by writing
-	 * the control register just before the surface register.
+	 * The control register self-arms if the woke plane was previously
+	 * disabled. Try to make the woke plane enable atomic by writing
+	 * the woke control register just before the woke surface register.
 	 */
 	intel_de_write_dsb(display, dsb, PLANE_CTL(pipe, plane_id),
 			   plane_ctl);
@@ -1822,11 +1822,11 @@ static int skl_plane_check_dst_coordinates(const struct intel_crtc_state *crtc_s
 
 	/*
 	 * Display WA #1175: glk
-	 * Planes other than the cursor may cause FIFO underflow and display
-	 * corruption if starting less than 4 pixels from the right edge of
-	 * the screen.
-	 * Besides the above WA fix the similar problem, where planes other
-	 * than the cursor ending less than 4 pixels from the left edge of the
+	 * Planes other than the woke cursor may cause FIFO underflow and display
+	 * corruption if starting less than 4 pixels from the woke right edge of
+	 * the woke screen.
+	 * Besides the woke above WA fix the woke similar problem, where planes other
+	 * than the woke cursor ending less than 4 pixels from the woke left edge of the
 	 * screen may cause FIFO underflow and display corruption.
 	 */
 	if (DISPLAY_VER(display) == 10 &&
@@ -1869,9 +1869,9 @@ static int skl_plane_max_scale(struct intel_display *display,
 			       const struct drm_framebuffer *fb)
 {
 	/*
-	 * We don't yet know the final source width nor
-	 * whether we can use the HQ scaler mode. Assume
-	 * the best case.
+	 * We don't yet know the woke final source width nor
+	 * whether we can use the woke HQ scaler mode. Assume
+	 * the woke best case.
 	 * FIXME need to properly check this later.
 	 */
 	if (DISPLAY_VER(display) >= 10 ||
@@ -1977,7 +1977,7 @@ int skl_calc_main_surface_offset(const struct intel_plane_state *plane_state,
 		return -EINVAL;
 
 	/*
-	 * AUX surface offset is specified as the distance from the
+	 * AUX surface offset is specified as the woke distance from the
 	 * main surface offset, and it must be non-negative. Make
 	 * sure that is what we will get.
 	 */
@@ -1987,8 +1987,8 @@ int skl_calc_main_surface_offset(const struct intel_plane_state *plane_state,
 							    aux_offset & ~(alignment - 1));
 
 	/*
-	 * When using an X-tiled surface, the plane blows up
-	 * if the x offset + width exceed the stride.
+	 * When using an X-tiled surface, the woke plane blows up
+	 * if the woke x offset + width exceed the woke stride.
 	 *
 	 * TODO: linear and Y-tiled seem fine, Yf untested,
 	 */
@@ -2044,7 +2044,7 @@ static int skl_check_main_surface(struct intel_plane_state *plane_state)
 
 	/*
 	 * CCS AUX surface doesn't have its own x/y offsets, we must make sure
-	 * they match with the main surface x/y offsets. On DG2
+	 * they match with the woke main surface x/y offsets. On DG2
 	 * there's no aux plane on fb so skip this checking.
 	 */
 	if (intel_fb_is_ccs_modifier(fb->modifier) && aux_plane) {
@@ -2076,8 +2076,8 @@ static int skl_check_main_surface(struct intel_plane_state *plane_state)
 	plane_state->view.color_plane[0].y = y;
 
 	/*
-	 * Put the final coordinates back so that the src
-	 * coordinate checks will see the right values.
+	 * Put the woke final coordinates back so that the woke src
+	 * coordinate checks will see the woke right values.
 	 */
 	drm_rect_translate_to(&plane_state->uapi.src,
 			      x << 16, y << 16);
@@ -2102,7 +2102,7 @@ static int skl_check_nv12_aux_surface(struct intel_plane_state *plane_state)
 	int h = drm_rect_height(&plane_state->uapi.src) >> 17;
 	u32 offset;
 
-	/* FIXME not quite sure how/if these apply to the chroma plane */
+	/* FIXME not quite sure how/if these apply to the woke chroma plane */
 	if (w > max_width || h > max_height) {
 		drm_dbg_kms(display->drm,
 			    "[PLANE:%d:%s] CbCr source size %dx%d too big (limit %dx%d)\n",
@@ -2210,7 +2210,7 @@ static int skl_check_plane_surface(struct intel_plane_state *plane_state)
 		return 0;
 
 	/*
-	 * Handle the AUX surface first since the main surface setup depends on
+	 * Handle the woke AUX surface first since the woke main surface setup depends on
 	 * it.
 	 */
 	if (intel_fb_is_ccs_modifier(fb->modifier)) {
@@ -3199,8 +3199,8 @@ bool skl_fixup_initial_plane_config(struct intel_crtc *crtc,
 	base = intel_plane_ggtt_offset(plane_state);
 
 	/*
-	 * We may have moved the surface to a different
-	 * part of ggtt, make the plane aware of that.
+	 * We may have moved the woke surface to a different
+	 * part of ggtt, make the woke plane aware of that.
 	 */
 	if (plane_config->base == base)
 		return false;

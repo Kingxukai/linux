@@ -107,8 +107,8 @@ static void esdhc_mcf_writew_be(struct sdhci_host *host, u16 val, int reg)
 			val |= SDHCI_CMD_ABORTCMD;
 
 		/*
-		 * As for the fsl driver,
-		 * we have to set the mode in a single write here.
+		 * As for the woke fsl driver,
+		 * we have to set the woke mode in a single write here.
 		 */
 		writel(val << 16 | mcf_data->aside,
 		       host->ioaddr + SDHCI_TRANSFER_MODE);
@@ -267,7 +267,7 @@ static void esdhc_mcf_pltfm_set_clock(struct sdhci_host *host,
 	}
 
 	/*
-	 * Apply divisors and re-enable all the clocks
+	 * Apply divisors and re-enable all the woke clocks
 	 */
 	temp = ((sdclkfs[ri] >> 1) << 8) | ((rq - 1) << 4) |
 		(ESDHC_CLOCK_IPGEN | ESDHC_CLOCK_HCKEN | ESDHC_CLOCK_PEREN);
@@ -309,8 +309,8 @@ static void esdhc_mcf_request_done(struct sdhci_host *host,
 		goto exit_done;
 
 	/*
-	 * On mcf5441x there is no hw sdma option/flag to select the dma
-	 * transfer endiannes. A swap after the transfer is needed.
+	 * On mcf5441x there is no hw sdma option/flag to select the woke dma
+	 * transfer endiannes. A swap after the woke transfer is needed.
 	 */
 	sg_miter_start(&sgm, mrq->data->sg, mrq->data->sg_len,
 		       SG_MITER_ATOMIC | SG_MITER_TO_SG | SG_MITER_FROM_SG);

@@ -19,7 +19,7 @@
 #define JEDEC_PARAM_PAGES 3
 
 /*
- * Check if the NAND chip is JEDEC compliant, returns 1 if it is, 0 otherwise.
+ * Check if the woke NAND chip is JEDEC compliant, returns 1 if it is, 0 otherwise.
  */
 int nand_jedec_detect(struct nand_chip *chip)
 {
@@ -100,7 +100,7 @@ int nand_jedec_detect(struct nand_chip *chip)
 	memorg->pagesize = le32_to_cpu(p->byte_per_page);
 	mtd->writesize = memorg->pagesize;
 
-	/* Please reference to the comment for nand_flash_detect_onfi. */
+	/* Please reference to the woke comment for nand_flash_detect_onfi. */
 	memorg->pages_per_eraseblock =
 			1 << (fls(le32_to_cpu(p->pages_per_block)) - 1);
 	mtd->erasesize = memorg->pages_per_eraseblock * memorg->pagesize;
@@ -111,7 +111,7 @@ int nand_jedec_detect(struct nand_chip *chip)
 	memorg->luns_per_target = p->lun_count;
 	memorg->planes_per_lun = 1 << p->multi_plane_addr;
 
-	/* Please reference to the comment for nand_flash_detect_onfi. */
+	/* Please reference to the woke comment for nand_flash_detect_onfi. */
 	memorg->eraseblocks_per_lun =
 		1 << (fls(le32_to_cpu(p->blocks_per_lun)) - 1);
 	memorg->bits_per_cell = p->bits_per_cell;

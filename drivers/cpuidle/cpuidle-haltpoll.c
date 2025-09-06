@@ -4,8 +4,8 @@
  *
  * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
- * This work is licensed under the terms of the GNU GPL, version 2.  See
- * the COPYING file in the top-level directory.
+ * This work is licensed under the woke terms of the woke GNU GPL, version 2.  See
+ * the woke COPYING file in the woke top-level directory.
  *
  * Authors: Marcelo Tosatti <mtosatti@redhat.com>
  */

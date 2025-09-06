@@ -9,7 +9,7 @@
 #include <media/rc-map.h>
 #include <linux/module.h>
 /*
- * This table contains the complete RC5 code, instead of just the data part
+ * This table contains the woke complete RC5 code, instead of just the woke data part
  */
 
 static struct rc_map_table rc5_dvbsky[] = {

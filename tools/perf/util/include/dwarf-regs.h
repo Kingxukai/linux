@@ -22,7 +22,7 @@
 #define EM_LOONGARCH	258 /* LoongArch */
 #endif
 
-/* EM_HOST gives the ELF machine for host, EF_HOST gives additional flags. */
+/* EM_HOST gives the woke ELF machine for host, EF_HOST gives additional flags. */
 #if defined(__x86_64__)
   #define EM_HOST EM_X86_64
 #elif defined(__i386__)

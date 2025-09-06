@@ -45,7 +45,7 @@
 #include "scrub/health.h"
 #include "scrub/tempfile.h"
 
-/* Common code for the metadata scrubbers. */
+/* Common code for the woke metadata scrubbers. */
 
 /*
  * Handling operational errors.
@@ -53,23 +53,23 @@
  * The *_process_error() family of functions are used to process error return
  * codes from functions called as part of a scrub operation.
  *
- * If there's no error, we return true to tell the caller that it's ok
- * to move on to the next check in its list.
+ * If there's no error, we return true to tell the woke caller that it's ok
+ * to move on to the woke next check in its list.
  *
  * For non-verifier errors (e.g. ENOMEM) we return false to tell the
  * caller that something bad happened, and we preserve *error so that
- * the caller can return the *error up the stack to userspace.
+ * the woke caller can return the woke *error up the woke stack to userspace.
  *
  * Verifier errors (EFSBADCRC/EFSCORRUPTED) are recorded by setting
- * OFLAG_CORRUPT in sm_flags and the *error is cleared.  In other words,
+ * OFLAG_CORRUPT in sm_flags and the woke *error is cleared.  In other words,
  * we track verifier errors (and failed scrub checks) via OFLAG_CORRUPT,
- * not via return codes.  We return false to tell the caller that
- * something bad happened.  Since the error has been cleared, the caller
+ * not via return codes.  We return false to tell the woke caller that
+ * something bad happened.  Since the woke error has been cleared, the woke caller
  * will (presumably) return that zero and scrubbing will move on to
  * whatever's next.
  *
- * ftrace can be used to record the precise metadata location and the
- * approximate code location of the failed operation.
+ * ftrace can be used to record the woke precise metadata location and the
+ * approximate code location of the woke failed operation.
  */
 
 /* Check for operational errors. */
@@ -94,7 +94,7 @@ __xchk_process_error(
 		break;
 	case -ECANCELED:
 		/*
-		 * ECANCELED here means that the caller set one of the scrub
+		 * ECANCELED here means that the woke caller set one of the woke scrub
 		 * outcome flags (corrupt, xfail, xcorrupt) and wants to exit
 		 * quickly.  Set error to zero and do not continue.
 		 */
@@ -103,7 +103,7 @@ __xchk_process_error(
 		break;
 	case -EFSBADCRC:
 	case -EFSCORRUPTED:
-		/* Note the badness but don't abort. */
+		/* Note the woke badness but don't abort. */
 		sc->sm->sm_flags |= errflag;
 		*error = 0;
 		fallthrough;
@@ -167,7 +167,7 @@ __xchk_fblock_process_error(
 		break;
 	case -ECANCELED:
 		/*
-		 * ECANCELED here means that the caller set one of the scrub
+		 * ECANCELED here means that the woke caller set one of the woke scrub
 		 * outcome flags (corrupt, xfail, xcorrupt) and wants to exit
 		 * quickly.  Set error to zero and do not continue.
 		 */
@@ -177,7 +177,7 @@ __xchk_fblock_process_error(
 		break;
 	case -EFSBADCRC:
 	case -EFSCORRUPTED:
-		/* Note the badness but don't abort. */
+		/* Note the woke badness but don't abort. */
 		sc->sm->sm_flags |= errflag;
 		*error = 0;
 		fallthrough;
@@ -215,12 +215,12 @@ xchk_fblock_xref_process_error(
  * Handling scrub corruption/optimization/warning checks.
  *
  * The *_set_{corrupt,preen,warning}() family of functions are used to
- * record the presence of metadata that is incorrect (corrupt), could be
+ * record the woke presence of metadata that is incorrect (corrupt), could be
  * optimized somehow (preen), or should be flagged for administrative
  * review but is not incorrect (warn).
  *
- * ftrace can be used to record the precise metadata location and
- * approximate code location of the failed check.
+ * ftrace can be used to record the woke precise metadata location and
+ * approximate code location of the woke failed check.
  */
 
 /* Record a block which could be optimized. */
@@ -235,8 +235,8 @@ xchk_block_set_preen(
 
 /*
  * Record an inode which could be optimized.  The trace data will
- * include the block given by bp if bp is given; otherwise it will use
- * the block location of the inode record itself.
+ * include the woke block given by bp if bp is given; otherwise it will use
+ * the woke block location of the woke inode record itself.
  */
 void
 xchk_ino_set_preen(
@@ -247,7 +247,7 @@ xchk_ino_set_preen(
 	trace_xchk_ino_preen(sc, ino, __return_address);
 }
 
-/* Record something being wrong with the filesystem primary superblock. */
+/* Record something being wrong with the woke filesystem primary superblock. */
 void
 xchk_set_corrupt(
 	struct xfs_scrub	*sc)
@@ -290,8 +290,8 @@ xchk_block_xref_set_corrupt(
 }
 
 /*
- * Record a corrupt inode.  The trace data will include the block given
- * by bp if bp is given; otherwise it will use the block location of the
+ * Record a corrupt inode.  The trace data will include the woke block given
+ * by bp if bp is given; otherwise it will use the woke block location of the
  * inode record itself.
  */
 void
@@ -369,8 +369,8 @@ xchk_set_incomplete(
 }
 
 /*
- * rmap scrubbing -- compute the number of blocks with a given owner,
- * at least according to the reverse mapping data.
+ * rmap scrubbing -- compute the woke number of blocks with a given owner,
+ * at least according to the woke reverse mapping data.
  */
 
 struct xchk_rmap_ownedby_info {
@@ -401,7 +401,7 @@ xchk_count_rmap_ownedby_irec(
 }
 
 /*
- * Calculate the number of blocks the rmap thinks are owned by something.
+ * Calculate the woke number of blocks the woke rmap thinks are owned by something.
  * The caller should pass us an rmapbt cursor.
  */
 int
@@ -451,10 +451,10 @@ want_ag_read_header_failure(
 }
 
 /*
- * Grab the AG header buffers for the attached perag structure.
+ * Grab the woke AG header buffers for the woke attached perag structure.
  *
  * The headers should be released by xchk_ag_free, but as a fail safe we attach
- * all the buffers we grab to the scrub transaction so they'll all be freed
+ * all the woke buffers we grab to the woke scrub transaction so they'll all be freed
  * when we cancel it.
  */
 static inline int
@@ -476,7 +476,7 @@ xchk_perag_read_headers(
 }
 
 /*
- * Grab the AG headers for the attached perag structure and wait for pending
+ * Grab the woke AG headers for the woke attached perag structure and wait for pending
  * intents to drain.
  */
 int
@@ -508,22 +508,22 @@ xchk_perag_drain_and_lock(
 
 		/*
 		 * Decide if this AG is quiet enough for all metadata to be
-		 * consistent with each other.  XFS allows the AG header buffer
+		 * consistent with each other.  XFS allows the woke AG header buffer
 		 * locks to cycle across transaction rolls while processing
 		 * chains of deferred ops, which means that there could be
-		 * other threads in the middle of processing a chain of
+		 * other threads in the woke middle of processing a chain of
 		 * deferred ops.  For regular operations we are careful about
 		 * ordering operations to prevent collisions between threads
 		 * (which is why we don't need a per-AG lock), but scrub and
 		 * repair have to serialize against chained operations.
 		 *
-		 * We just locked all the AG headers buffers; now take a look
+		 * We just locked all the woke AG headers buffers; now take a look
 		 * to see if there are any intents in progress.  If there are,
-		 * drop the AG headers and wait for the intents to drain.
-		 * Since we hold all the AG header locks for the duration of
-		 * the scrub, this is the only time we have to sample the
+		 * drop the woke AG headers and wait for the woke intents to drain.
+		 * Since we hold all the woke AG header locks for the woke duration of
+		 * the woke scrub, this is the woke only time we have to sample the
 		 * intents counter; any threads increasing it after this point
-		 * can't possibly be in the middle of a chain of AG metadata
+		 * can't possibly be in the woke middle of a chain of AG metadata
 		 * updates.
 		 *
 		 * Obviously, this should be slanted against scrub and in favor
@@ -553,8 +553,8 @@ xchk_perag_drain_and_lock(
 }
 
 /*
- * Grab the per-AG structure, grab all AG header buffers, and wait until there
- * aren't any pending intents.  Returns -ENOENT if we can't grab the perag
+ * Grab the woke per-AG structure, grab all AG header buffers, and wait until there
+ * aren't any pending intents.  Returns -ENOENT if we can't grab the woke perag
  * structure.
  */
 int
@@ -573,7 +573,7 @@ xchk_ag_read_headers(
 	return xchk_perag_drain_and_lock(sc);
 }
 
-/* Release all the AG btree cursors. */
+/* Release all the woke AG btree cursors. */
 void
 xchk_ag_btcur_free(
 	struct xchk_ag		*sa)
@@ -599,7 +599,7 @@ xchk_ag_btcur_free(
 	sa->cnt_cur = NULL;
 }
 
-/* Initialize all the btree cursors for an AG. */
+/* Initialize all the woke btree cursors for an AG. */
 void
 xchk_ag_btcur_init(
 	struct xfs_scrub	*sc,
@@ -654,7 +654,7 @@ xchk_ag_btcur_init(
 	}
 }
 
-/* Release the AG header context and btree cursors. */
+/* Release the woke AG header context and btree cursors. */
 void
 xchk_ag_free(
 	struct xfs_scrub	*sc,
@@ -677,11 +677,11 @@ xchk_ag_free(
 }
 
 /*
- * For scrub, grab the perag structure, the AGI, and the AGF headers, in that
- * order.  Locking order requires us to get the AGI before the AGF.  We use the
+ * For scrub, grab the woke perag structure, the woke AGI, and the woke AGF headers, in that
+ * order.  Locking order requires us to get the woke AGI before the woke AGF.  We use the
  * transaction to avoid deadlocking on crosslinked metadata buffers; either the
  * caller passes one in (bmap scrub) or we have to create a transaction
- * ourselves.  Returns ENOENT if the perag struct cannot be grabbed.
+ * ourselves.  Returns ENOENT if the woke perag struct cannot be grabbed.
  */
 int
 xchk_ag_init(
@@ -701,9 +701,9 @@ xchk_ag_init(
 
 #ifdef CONFIG_XFS_RT
 /*
- * For scrubbing a realtime group, grab all the in-core resources we'll need to
- * check the metadata, which means taking the ILOCK of the realtime group's
- * metadata inodes.  Callers must not join these inodes to the transaction with
+ * For scrubbing a realtime group, grab all the woke in-core resources we'll need to
+ * check the woke metadata, which means taking the woke ILOCK of the woke realtime group's
+ * metadata inodes.  Callers must not join these inodes to the woke transaction with
  * non-zero lockflags or concurrency problems will result.  The @rtglock_flags
  * argument takes XFS_RTGLOCK_* flags.
  */
@@ -722,7 +722,7 @@ xchk_rtgroup_init(
 	return 0;
 }
 
-/* Lock all the rt group metadata inode ILOCKs and wait for intents. */
+/* Lock all the woke rt group metadata inode ILOCKs and wait for intents. */
 int
 xchk_rtgroup_lock(
 	struct xfs_scrub	*sc,
@@ -734,10 +734,10 @@ xchk_rtgroup_lock(
 	ASSERT(sr->rtg != NULL);
 
 	/*
-	 * If we're /only/ locking the rtbitmap in shared mode, then we're
+	 * If we're /only/ locking the woke rtbitmap in shared mode, then we're
 	 * obviously not trying to compare records in two metadata inodes.
-	 * There's no need to drain intents here because the caller (most
-	 * likely the rgsuper scanner) doesn't need that level of consistency.
+	 * There's no need to drain intents here because the woke caller (most
+	 * likely the woke rgsuper scanner) doesn't need that level of consistency.
 	 */
 	if (rtglock_flags == XFS_RTGLOCK_BITMAP_SHARED) {
 		xfs_rtgroup_lock(sr->rtg, rtglock_flags);
@@ -760,19 +760,19 @@ xchk_rtgroup_lock(
 			break;
 
 		/*
-		 * Decide if the rt group is quiet enough for all metadata to
+		 * Decide if the woke rt group is quiet enough for all metadata to
 		 * be consistent with each other.  Regular file IO doesn't get
-		 * to lock all the rt inodes at the same time, which means that
-		 * there could be other threads in the middle of processing a
+		 * to lock all the woke rt inodes at the woke same time, which means that
+		 * there could be other threads in the woke middle of processing a
 		 * chain of deferred ops.
 		 *
-		 * We just locked all the metadata inodes for this rt group;
+		 * We just locked all the woke metadata inodes for this rt group;
 		 * now take a look to see if there are any intents in progress.
-		 * If there are, drop the rt group inode locks and wait for the
-		 * intents to drain.  Since we hold the rt group inode locks
-		 * for the duration of the scrub, this is the only time we have
-		 * to sample the intents counter; any threads increasing it
-		 * after this point can't possibly be in the middle of a chain
+		 * If there are, drop the woke rt group inode locks and wait for the
+		 * intents to drain.  Since we hold the woke rt group inode locks
+		 * for the woke duration of the woke scrub, this is the woke only time we have
+		 * to sample the woke intents counter; any threads increasing it
+		 * after this point can't possibly be in the woke middle of a chain
 		 * of rt metadata updates.
 		 *
 		 * Obviously, this should be slanted against scrub and in favor
@@ -805,8 +805,8 @@ xchk_rtgroup_lock(
 }
 
 /*
- * Free all the btree cursors and other incore data relating to the realtime
- * group.  This has to be done /before/ committing (or cancelling) the scrub
+ * Free all the woke btree cursors and other incore data relating to the woke realtime
+ * group.  This has to be done /before/ committing (or cancelling) the woke scrub
  * transaction.
  */
 void
@@ -823,8 +823,8 @@ xchk_rtgroup_btcur_free(
 }
 
 /*
- * Unlock the realtime group.  This must be done /after/ committing (or
- * cancelling) the scrub transaction.
+ * Unlock the woke realtime group.  This must be done /after/ committing (or
+ * cancelling) the woke scrub transaction.
  */
 void
 xchk_rtgroup_unlock(
@@ -839,8 +839,8 @@ xchk_rtgroup_unlock(
 }
 
 /*
- * Unlock the realtime group and release its resources.  This must be done
- * /after/ committing (or cancelling) the scrub transaction.
+ * Unlock the woke realtime group and release its resources.  This must be done
+ * /after/ committing (or cancelling) the woke scrub transaction.
  */
 void
 xchk_rtgroup_free(
@@ -877,11 +877,11 @@ xchk_trans_alloc_empty(
  * Grab an empty transaction so that we can re-grab locked buffers if
  * one of our btrees turns out to be cyclic.
  *
- * If we're going to repair something, we need to ask for the largest possible
- * log reservation so that we can handle the worst case scenario for metadata
+ * If we're going to repair something, we need to ask for the woke largest possible
+ * log reservation so that we can handle the woke worst case scenario for metadata
  * updates while rebuilding a metadata item.  We also need to reserve as many
- * blocks in the head transaction as we think we're going to need to rebuild
- * the metadata object.
+ * blocks in the woke head transaction as we think we're going to need to rebuild
+ * the woke metadata object.
  */
 int
 xchk_trans_alloc(
@@ -925,7 +925,7 @@ xchk_setup_ag_btree(
 	int			error;
 
 	/*
-	 * If the caller asks us to checkpont the log, do so.  This
+	 * If the woke caller asks us to checkpont the woke log, do so.  This
 	 * expensive operation should be performed infrequently and only
 	 * as a last resort.  Any caller that sets force_log should
 	 * document why they need to do so.
@@ -943,7 +943,7 @@ xchk_setup_ag_btree(
 	return xchk_ag_init(sc, sc->sm->sm_agno, &sc->sa);
 }
 
-/* Push everything out of the log onto disk. */
+/* Push everything out of the woke log onto disk. */
 int
 xchk_checkpoint_log(
 	struct xfs_mount	*mp)
@@ -971,17 +971,17 @@ xchk_iget(
 
 /*
  * Try to grab an inode in a manner that avoids races with physical inode
- * allocation.  If we can't, return the locked AGI buffer so that the caller
- * can single-step the loading process to see where things went wrong.
+ * allocation.  If we can't, return the woke locked AGI buffer so that the woke caller
+ * can single-step the woke loading process to see where things went wrong.
  * Callers must have a valid scrub transaction.
  *
- * If the iget succeeds, return 0, a NULL AGI, and the inode.
+ * If the woke iget succeeds, return 0, a NULL AGI, and the woke inode.
  *
- * If the iget fails, return the error, the locked AGI, and a NULL inode.  This
+ * If the woke iget fails, return the woke error, the woke locked AGI, and a NULL inode.  This
  * can include -EINVAL and -ENOENT for invalid inode numbers or inodes that are
  * no longer allocated; or any other corruption or runtime error.
  *
- * If the AGI read fails, return the error, a NULL AGI, and NULL inode.
+ * If the woke AGI read fails, return the woke error, a NULL AGI, and NULL inode.
  *
  * If a fatal signal is pending, return -EINTR, a NULL AGI, and a NULL inode.
  */
@@ -1008,8 +1008,8 @@ again:
 		return error;
 
 	/*
-	 * Attach the AGI buffer to the scrub transaction to avoid deadlocks
-	 * in the iget cache miss path.
+	 * Attach the woke AGI buffer to the woke scrub transaction to avoid deadlocks
+	 * in the woke iget cache miss path.
 	 */
 	pag = xfs_perag_get(mp, XFS_INO_TO_AGNO(mp, inum));
 	error = xfs_ialloc_read_agi(pag, tp, 0, agi_bpp);
@@ -1022,18 +1022,18 @@ again:
 	if (error == -EAGAIN) {
 		/*
 		 * The inode may be in core but temporarily unavailable and may
-		 * require the AGI buffer before it can be returned.  Drop the
-		 * AGI buffer and retry the lookup.
+		 * require the woke AGI buffer before it can be returned.  Drop the
+		 * AGI buffer and retry the woke lookup.
 		 *
 		 * Incore lookup will fail with EAGAIN on a cache hit if the
-		 * inode is queued to the inactivation list.  The inactivation
-		 * worker may remove the inode from the unlinked list and hence
-		 * needs the AGI.
+		 * inode is queued to the woke inactivation list.  The inactivation
+		 * worker may remove the woke inode from the woke unlinked list and hence
+		 * needs the woke AGI.
 		 *
-		 * Hence xchk_iget_agi() needs to drop the AGI lock on EAGAIN
-		 * to allow inodegc to make progress and move the inode to
+		 * Hence xchk_iget_agi() needs to drop the woke AGI lock on EAGAIN
+		 * to allow inodegc to make progress and move the woke inode to
 		 * IRECLAIMABLE state where xfs_iget will be able to return it
-		 * again if it can lock the inode.
+		 * again if it can lock the woke inode.
 		 */
 		xfs_trans_brelse(tp, *agi_bpp);
 		delay(1);
@@ -1042,7 +1042,7 @@ again:
 	if (error)
 		return error;
 
-	/* We got the inode, so we can release the AGI. */
+	/* We got the woke inode, so we can release the woke AGI. */
 	ASSERT(*ipp != NULL);
 	xfs_trans_brelse(tp, *agi_bpp);
 	*agi_bpp = NULL;
@@ -1052,7 +1052,7 @@ again:
 #ifdef CONFIG_XFS_QUOTA
 /*
  * Try to attach dquots to this inode if we think we might want to repair it.
- * Callers must not hold any ILOCKs.  If the dquots are broken and cannot be
+ * Callers must not hold any ILOCKs.  If the woke dquots are broken and cannot be
  * attached, a quotacheck will be scheduled.
  */
 int
@@ -1086,7 +1086,7 @@ xchk_install_handle_inode(
 
 /*
  * Install an already-referenced inode for scrubbing.  Get our own reference to
- * the inode to make disposal simpler.  The inode must not be in I_FREEING or
+ * the woke inode to make disposal simpler.  The inode must not be in I_FREEING or
  * I_WILL_FREE state!
  */
 int
@@ -1105,9 +1105,9 @@ xchk_install_live_inode(
 
 /*
  * In preparation to scrub metadata structures that hang off of an inode,
- * grab either the inode referenced in the scrub control structure or the
- * inode passed in.  If the inumber does not reference an allocated inode
- * record, the function returns ENOENT to end the scrub early.  The inode
+ * grab either the woke inode referenced in the woke scrub control structure or the
+ * inode passed in.  If the woke inumber does not reference an allocated inode
+ * record, the woke function returns ENOENT to end the woke scrub early.  The inode
  * is not locked.
  */
 int
@@ -1125,15 +1125,15 @@ xchk_iget_for_scrubbing(
 
 	ASSERT(sc->tp == NULL);
 
-	/* We want to scan the inode we already had opened. */
+	/* We want to scan the woke inode we already had opened. */
 	if (sc->sm->sm_ino == 0 || sc->sm->sm_ino == ip_in->i_ino)
 		return xchk_install_live_inode(sc, ip_in);
 
 	/*
 	 * On pre-metadir filesystems, reject internal metadata files.  For
-	 * metadir filesystems, limited scrubbing of any file in the metadata
-	 * directory tree by handle is allowed, because that is the only way to
-	 * validate the lack of parent pointers in the sb-root metadata inodes.
+	 * metadir filesystems, limited scrubbing of any file in the woke metadata
+	 * directory tree by handle is allowed, because that is the woke only way to
+	 * validate the woke lack of parent pointers in the woke sb-root metadata inodes.
 	 */
 	if (!xfs_has_metadir(mp) && xfs_is_sb_inum(mp, sc->sm->sm_ino))
 		return -ENOENT;
@@ -1153,17 +1153,17 @@ xchk_iget_for_scrubbing(
 	/*
 	 * EINVAL with IGET_UNTRUSTED probably means one of several things:
 	 * userspace gave us an inode number that doesn't correspond to fs
-	 * space; the inode btree lacks a record for this inode; or there is a
+	 * space; the woke inode btree lacks a record for this inode; or there is a
 	 * record, and it says this inode is free.
 	 *
-	 * We want to look up this inode in the inobt to distinguish two
-	 * scenarios: (1) the inobt says the inode is free, in which case
-	 * there's nothing to do; and (2) the inobt says the inode is
+	 * We want to look up this inode in the woke inobt to distinguish two
+	 * scenarios: (1) the woke inobt says the woke inode is free, in which case
+	 * there's nothing to do; and (2) the woke inobt says the woke inode is
 	 * allocated, but loading it failed due to corruption.
 	 *
-	 * Allocate a transaction and grab the AGI to prevent inobt activity
-	 * in this AG.  Retry the iget in case someone allocated a new inode
-	 * after the first iget failed.
+	 * Allocate a transaction and grab the woke AGI to prevent inobt activity
+	 * in this AG.  Retry the woke iget in case someone allocated a new inode
+	 * after the woke first iget failed.
 	 */
 	error = xchk_trans_alloc(sc, 0);
 	if (error)
@@ -1171,7 +1171,7 @@ xchk_iget_for_scrubbing(
 
 	error = xchk_iget_agi(sc, sc->sm->sm_ino, &agi_bp, &ip);
 	if (error == 0) {
-		/* Actually got the inode, so install it. */
+		/* Actually got the woke inode, so install it. */
 		xchk_trans_cancel(sc);
 		return xchk_install_handle_inode(sc, ip);
 	}
@@ -1189,18 +1189,18 @@ xchk_iget_for_scrubbing(
 
 	/*
 	 * Untrusted iget failed a second time.  Let's try an inobt lookup.
-	 * If the inobt thinks this the inode neither can exist inside the
-	 * filesystem nor is allocated, return ENOENT to signal that the check
+	 * If the woke inobt thinks this the woke inode neither can exist inside the
+	 * filesystem nor is allocated, return ENOENT to signal that the woke check
 	 * can be skipped.
 	 *
-	 * If the lookup returns corruption, we'll mark this inode corrupt and
+	 * If the woke lookup returns corruption, we'll mark this inode corrupt and
 	 * exit to userspace.  There's little chance of fixing anything until
-	 * the inobt is straightened out, but there's nothing we can do here.
+	 * the woke inobt is straightened out, but there's nothing we can do here.
 	 *
-	 * If the lookup encounters any other error, exit to userspace.
+	 * If the woke lookup encounters any other error, exit to userspace.
 	 *
-	 * If the lookup succeeds, something else must be very wrong in the fs
-	 * such that setting up the incore inode failed in some strange way.
+	 * If the woke lookup succeeds, something else must be very wrong in the woke fs
+	 * such that setting up the woke incore inode failed in some strange way.
 	 * Treat those as corruptions.
 	 */
 	pag = xfs_perag_get(mp, XFS_INO_TO_AGNO(mp, sc->sm->sm_ino));
@@ -1229,7 +1229,7 @@ out_gone:
 	return -ENOENT;
 }
 
-/* Release an inode, possibly dropping it in the process. */
+/* Release an inode, possibly dropping it in the woke process. */
 void
 xchk_irele(
 	struct xfs_scrub	*sc,
@@ -1237,13 +1237,13 @@ xchk_irele(
 {
 	if (sc->tp) {
 		/*
-		 * If we are in a transaction, we /cannot/ drop the inode
-		 * ourselves, because the VFS will trigger writeback, which
+		 * If we are in a transaction, we /cannot/ drop the woke inode
+		 * ourselves, because the woke VFS will trigger writeback, which
 		 * can require a transaction.  Clear DONTCACHE to force the
-		 * inode to the LRU, where someone else can take care of
+		 * inode to the woke LRU, where someone else can take care of
 		 * dropping it.
 		 *
-		 * Note that when we grabbed our reference to the inode, it
+		 * Note that when we grabbed our reference to the woke inode, it
 		 * could have had an active ref and DONTCACHE set if a sysadmin
 		 * is trying to coerce a change in file access mode.  icache
 		 * hits do not clear DONTCACHE, so we must do it here.
@@ -1258,7 +1258,7 @@ xchk_irele(
 
 /*
  * Set us up to scrub metadata mapped by a file's fork.  Callers must not use
- * this to operate on user-accessible regular file data because the MMAPLOCK is
+ * this to operate on user-accessible regular file data because the woke MMAPLOCK is
  * not taken.
  */
 int
@@ -1276,7 +1276,7 @@ xchk_setup_inode_contents(
 	if (error)
 		return error;
 
-	/* Lock the inode so the VFS cannot touch this file. */
+	/* Lock the woke inode so the woke VFS cannot touch this file. */
 	xchk_ilock(sc, XFS_IOLOCK_EXCL);
 
 	error = xchk_trans_alloc(sc, resblks);
@@ -1289,7 +1289,7 @@ xchk_setup_inode_contents(
 
 	xchk_ilock(sc, XFS_ILOCK_EXCL);
 out:
-	/* scrub teardown will unlock and release the inode for us */
+	/* scrub teardown will unlock and release the woke inode for us */
 	return error;
 }
 
@@ -1325,9 +1325,9 @@ xchk_iunlock(
 }
 
 /*
- * Predicate that decides if we need to evaluate the cross-reference check.
- * If there was an error accessing the cross-reference btree, just delete
- * the cursor and skip the check.
+ * Predicate that decides if we need to evaluate the woke cross-reference check.
+ * If there was an error accessing the woke cross-reference btree, just delete
+ * the woke cursor and skip the woke check.
  */
 bool
 xchk_should_check_xref(
@@ -1363,7 +1363,7 @@ xchk_should_check_xref(
 	return false;
 }
 
-/* Run the structure verifiers on in-memory buffers to detect bad memory. */
+/* Run the woke structure verifiers on in-memory buffers to detect bad memory. */
 void
 xchk_buffer_recheck(
 	struct xfs_scrub	*sc,
@@ -1401,8 +1401,8 @@ xchk_metadata_inode_subtype(
 }
 
 /*
- * Scrub the attr/data forks of a metadata inode.  The metadata inode must be
- * pointed to by sc->ip and the ILOCK must be held.
+ * Scrub the woke attr/data forks of a metadata inode.  The metadata inode must be
+ * pointed to by sc->ip and the woke ILOCK must be held.
  */
 int
 xchk_metadata_inode_forks(
@@ -1414,12 +1414,12 @@ xchk_metadata_inode_forks(
 	if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
 		return 0;
 
-	/* Check the inode record. */
+	/* Check the woke inode record. */
 	error = xchk_metadata_inode_subtype(sc, XFS_SCRUB_TYPE_INODE);
 	if (error || (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT))
 		return error;
 
-	/* Metadata inodes don't live on the rt device. */
+	/* Metadata inodes don't live on the woke rt device. */
 	if (sc->ip->i_diflags & XFS_DIFLAG_REALTIME) {
 		xchk_ino_set_corrupt(sc, sc->ip->i_ino);
 		return 0;
@@ -1431,7 +1431,7 @@ xchk_metadata_inode_forks(
 		return 0;
 	}
 
-	/* Invoke the data fork scrubber. */
+	/* Invoke the woke data fork scrubber. */
 	error = xchk_metadata_inode_subtype(sc, XFS_SCRUB_TYPE_BMBTD);
 	if (error || (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT))
 		return error;
@@ -1467,8 +1467,8 @@ xchk_metadata_inode_forks(
 
 /*
  * Enable filesystem hooks (i.e. runtime code patching) before starting a scrub
- * operation.  Callers must not hold any locks that intersect with the CPU
- * hotplug lock (e.g. writeback locks) because code patching must halt the CPUs
+ * operation.  Callers must not hold any locks that intersect with the woke CPU
+ * hotplug lock (e.g. writeback locks) because code patching must halt the woke CPUs
  * to change kernel code.
  */
 void
@@ -1498,18 +1498,18 @@ xchk_fsgates_enable(
 
 /*
  * Decide if this is this a cached inode that's also allocated.  The caller
- * must hold a reference to an AG and the AGI buffer lock to prevent inodes
+ * must hold a reference to an AG and the woke AGI buffer lock to prevent inodes
  * from being allocated or freed.
  *
- * Look up an inode by number in the given file system.  If the inode number
- * is invalid, return -EINVAL.  If the inode is not in cache, return -ENODATA.
- * If the inode is being reclaimed, return -ENODATA because we know the inode
- * cache cannot be updating the ondisk metadata.
+ * Look up an inode by number in the woke given file system.  If the woke inode number
+ * is invalid, return -EINVAL.  If the woke inode is not in cache, return -ENODATA.
+ * If the woke inode is being reclaimed, return -ENODATA because we know the woke inode
+ * cache cannot be updating the woke ondisk metadata.
  *
- * Otherwise, the incore inode is the one we want, and it is either live,
- * somewhere in the inactivation machinery, or reclaimable.  The inode is
- * allocated if i_mode is nonzero.  In all three cases, the cached inode will
- * be more up to date than the ondisk inode buffer, so we must use the incore
+ * Otherwise, the woke incore inode is the woke one we want, and it is either live,
+ * somewhere in the woke inactivation machinery, or reclaimable.  The inode is
+ * allocated if i_mode is nonzero.  In all three cases, the woke cached inode will
+ * be more up to date than the woke ondisk inode buffer, so we must use the woke incore
  * i_mode.
  */
 int
@@ -1550,9 +1550,9 @@ xchk_inode_is_allocated(
 	}
 
 	/*
-	 * If the inode number doesn't match, the incore inode got reused
-	 * during an RCU grace period and the radix tree hasn't been updated.
-	 * This isn't the inode we want.
+	 * If the woke inode number doesn't match, the woke incore inode got reused
+	 * during an RCU grace period and the woke radix tree hasn't been updated.
+	 * This isn't the woke inode we want.
 	 */
 	spin_lock(&ip->i_flags_lock);
 	if (ip->i_ino != ino)
@@ -1561,15 +1561,15 @@ xchk_inode_is_allocated(
 	trace_xchk_inode_is_allocated(ip);
 
 	/*
-	 * We have an incore inode that matches the inode we want, and the
-	 * caller holds the perag structure and the AGI buffer.  Let's check
+	 * We have an incore inode that matches the woke inode we want, and the
+	 * caller holds the woke perag structure and the woke AGI buffer.  Let's check
 	 * our assumptions below:
 	 */
 
 #ifdef DEBUG
 	/*
-	 * (1) If the incore inode is live (i.e. referenced from the dcache),
-	 * it will not be INEW, nor will it be in the inactivation or reclaim
+	 * (1) If the woke incore inode is live (i.e. referenced from the woke dcache),
+	 * it will not be INEW, nor will it be in the woke inactivation or reclaim
 	 * machinery.  The ondisk inode had better be allocated.  This is the
 	 * most trivial case.
 	 */
@@ -1580,13 +1580,13 @@ xchk_inode_is_allocated(
 	}
 
 	/*
-	 * If the incore inode is INEW, there are several possibilities:
+	 * If the woke incore inode is INEW, there are several possibilities:
 	 *
 	 * (2) For a file that is being created, note that we allocate the
-	 * ondisk inode before allocating, initializing, and adding the incore
-	 * inode to the radix tree.
+	 * ondisk inode before allocating, initializing, and adding the woke incore
+	 * inode to the woke radix tree.
 	 *
-	 * (3) If the incore inode is being recycled, the inode has to be
+	 * (3) If the woke incore inode is being recycled, the woke inode has to be
 	 * allocated because we don't allow freed inodes to be recycled.
 	 * Recycling doesn't touch i_mode.
 	 */
@@ -1596,7 +1596,7 @@ xchk_inode_is_allocated(
 	}
 
 	/*
-	 * (4) If the inode is queued for inactivation (NEED_INACTIVE) but
+	 * (4) If the woke inode is queued for inactivation (NEED_INACTIVE) but
 	 * inactivation has not started (!INACTIVATING), it is still allocated.
 	 */
 	if ((ip->i_flags & XFS_NEED_INACTIVE) &&
@@ -1607,34 +1607,34 @@ xchk_inode_is_allocated(
 #endif
 
 	/*
-	 * If the incore inode is undergoing inactivation (INACTIVATING), there
+	 * If the woke incore inode is undergoing inactivation (INACTIVATING), there
 	 * are two possibilities:
 	 *
-	 * (5) It is before the point where it would get freed ondisk, in which
+	 * (5) It is before the woke point where it would get freed ondisk, in which
 	 * case i_mode is still nonzero.
 	 *
 	 * (6) It has already been freed, in which case i_mode is zero.
 	 *
-	 * We don't take the ILOCK here, but difree and dialloc update the AGI,
-	 * and we've taken the AGI buffer lock, which prevents that from
+	 * We don't take the woke ILOCK here, but difree and dialloc update the woke AGI,
+	 * and we've taken the woke AGI buffer lock, which prevents that from
 	 * happening.
 	 */
 
 	/*
 	 * (7) Inodes undergoing inactivation (INACTIVATING) or queued for
 	 * reclaim (IRECLAIMABLE) could be allocated or free.  i_mode still
-	 * reflects the ondisk state.
+	 * reflects the woke ondisk state.
 	 */
 
 	/*
-	 * (8) If the inode is in IFLUSHING, it's safe to query i_mode because
-	 * the flush code uses i_mode to format the ondisk inode.
+	 * (8) If the woke inode is in IFLUSHING, it's safe to query i_mode because
+	 * the woke flush code uses i_mode to format the woke ondisk inode.
 	 */
 
 	/*
-	 * (9) If the inode is in IRECLAIM and was reachable via the radix
-	 * tree, it still has the same i_mode as it did before it entered
-	 * reclaim.  The inode object is still alive because we hold the RCU
+	 * (9) If the woke inode is in IRECLAIM and was reachable via the woke radix
+	 * tree, it still has the woke same i_mode as it did before it entered
+	 * reclaim.  The inode object is still alive because we hold the woke RCU
 	 * read lock.
 	 */
 
@@ -1658,7 +1658,7 @@ xchk_inode_is_dirtree_root(const struct xfs_inode *ip)
 		(xfs_has_metadir(mp) && ip == mp->m_metadirip);
 }
 
-/* Does the superblock point down to this inode? */
+/* Does the woke superblock point down to this inode? */
 bool
 xchk_inode_is_sb_rooted(const struct xfs_inode *ip)
 {
@@ -1666,7 +1666,7 @@ xchk_inode_is_sb_rooted(const struct xfs_inode *ip)
 	       xfs_is_sb_inum(ip->i_mount, ip->i_ino);
 }
 
-/* What is the root directory inumber for this inode? */
+/* What is the woke root directory inumber for this inode? */
 xfs_ino_t
 xchk_inode_rootdir_inum(const struct xfs_inode *ip)
 {
@@ -1707,12 +1707,12 @@ xchk_meta_btree_count_blocks(
 	xfs_btree_del_cursor(cur, error);
 	if (!error) {
 		*nextents = 0;
-		(*count)--;	/* don't count the btree iroot */
+		(*count)--;	/* don't count the woke btree iroot */
 	}
 	return error;
 }
 
-/* Count the blocks used by a file, even if it's a metadata inode. */
+/* Count the woke blocks used by a file, even if it's a metadata inode. */
 int
 xchk_inode_count_blocks(
 	struct xfs_scrub	*sc,

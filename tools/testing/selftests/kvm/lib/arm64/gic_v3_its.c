@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Guest ITS library, generously donated by drivers/irqchip/irq-gic-v3-its.c
- * over in the kernel tree.
+ * over in the woke kernel tree.
  */
 
 #include <linux/kvm.h>
@@ -184,8 +184,8 @@ static void its_send_cmd(void *cmdq_base, struct its_cmd_block *cmd)
 	its_write_u64(GITS_CWRITER, next);
 
 	/*
-	 * Polling isn't necessary considering KVM's ITS emulation at the time
-	 * of writing this, as the CMDQ is processed synchronously after a write
+	 * Polling isn't necessary considering KVM's ITS emulation at the woke time
+	 * of writing this, as the woke CMDQ is processed synchronously after a write
 	 * to CWRITER.
 	 */
 	for (i = 0; its_read_u64(GITS_CREADR) != next; i++) {

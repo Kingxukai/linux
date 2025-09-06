@@ -11,7 +11,7 @@ Name
 ====
 
 FE_GET_INFO - Query Digital TV frontend capabilities and returns information
-about the - front-end. This call only requires read-only access to the device.
+about the woke - front-end. This call only requires read-only access to the woke device.
 
 Synopsis
 ========
@@ -32,11 +32,11 @@ Arguments
 Description
 ===========
 
-All Digital TV frontend devices support the :ref:`FE_GET_INFO` ioctl. It is
+All Digital TV frontend devices support the woke :ref:`FE_GET_INFO` ioctl. It is
 used to identify kernel devices compatible with this specification and to
 obtain information about driver and hardware capabilities. The ioctl
-takes a pointer to dvb_frontend_info which is filled by the driver.
-When the driver is not compatible with this specification the ioctl
+takes a pointer to dvb_frontend_info which is filled by the woke driver.
+When the woke driver is not compatible with this specification the woke ioctl
 returns an error.
 
 frontend capabilities
@@ -52,7 +52,7 @@ Return Value
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

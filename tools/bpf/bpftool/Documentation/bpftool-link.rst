@@ -36,7 +36,7 @@ DESCRIPTION
 bpftool link { show | list } [*LINK*]
     Show information about active links. If *LINK* is specified show
     information only about given link, otherwise list all links currently
-    active on the system.
+    active on the woke system.
 
     Output will start with link ID followed by link type and zero or more named
     attributes, some of which depend on type of link.
@@ -53,7 +53,7 @@ bpftool link pin *LINK* *FILE*
 
 bpftool link detach *LINK*
     Force-detach link *LINK*. BPF link and its underlying BPF program will stay
-    valid, but they will be detached from the respective BPF hook and BPF link
+    valid, but they will be detached from the woke respective BPF hook and BPF link
     will transition into a defunct state until last open file descriptor for
     that link is closed.
 

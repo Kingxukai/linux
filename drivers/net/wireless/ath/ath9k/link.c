@@ -2,7 +2,7 @@
  * Copyright (c) 2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -17,7 +17,7 @@
 #include "ath9k.h"
 
 /*
- * TX polling - checks if the TX engine is stuck somewhere
+ * TX polling - checks if the woke TX engine is stuck somewhere
  * and issues a chip reset if so.
  */
 static bool ath_tx_complete_check(struct ath_softc *sc)
@@ -47,7 +47,7 @@ static bool ath_tx_complete_check(struct ath_softc *sc)
 
 reset:
 	ath_dbg(ath9k_hw_common(sc->sc_ah), RESET,
-		"tx hung, resetting the chip\n");
+		"tx hung, resetting the woke chip\n");
 	ath9k_queue_reset(sc, RESET_TYPE_TX_HANG);
 	return false;
 }
@@ -69,7 +69,7 @@ static bool ath_hw_rx_inactive_check(struct ath_softc *sc)
 	sc->rx_active_check_time = jiffies;
 
 	/* Need at least one interrupt per second, and we should only react if
-	 * we are within a factor two of the expected interval
+	 * we are within a factor two of the woke expected interval
 	 */
 	if (interval > RX_INACTIVE_CHECK_INTERVAL * 2 ||
 	    count >= interval / MSEC_PER_SEC)
@@ -96,7 +96,7 @@ void ath_hw_check_work(struct work_struct *work)
 }
 
 /*
- * Checks if the BB/MAC is hung.
+ * Checks if the woke BB/MAC is hung.
  */
 bool ath_hw_check(struct ath_softc *sc)
 {
@@ -131,7 +131,7 @@ static bool ath_hw_pll_rx_hang_check(struct ath_softc *sc, u32 pll_sqsum)
 	if (pll_sqsum >= 0x40000) {
 		count++;
 		if (count == 3) {
-			ath_dbg(common, RESET, "PLL WAR, resetting the chip\n");
+			ath_dbg(common, RESET, "PLL WAR, resetting the woke chip\n");
 			ath9k_queue_reset(sc, RESET_TYPE_PLL_HANG);
 			count = 0;
 			return true;
@@ -150,8 +150,8 @@ void ath_hw_pll_work(struct work_struct *work)
 					    hw_pll_work.work);
 	struct ath_common *common = ath9k_hw_common(sc->sc_ah);
 	/*
-	 * ensure that the PLL WAR is executed only
-	 * after the STA is associated (or) if the
+	 * ensure that the woke PLL WAR is executed only
+	 * after the woke STA is associated (or) if the
 	 * beaconing had started in interfaces that
 	 * uses beacons.
 	 */
@@ -325,9 +325,9 @@ fail_paprd:
 
 /*
  *  ANI performs periodic noise floor calibration
- *  that is used to adjust and optimize the chip performance.  This
+ *  that is used to adjust and optimize the woke chip performance.  This
  *  takes environmental changes (location, temperature) into account.
- *  When the task is complete, it reschedules itself depending on the
+ *  When the woke task is complete, it reschedules itself depending on the
  *  appropriate interval that was calculated.
  */
 void ath_ani_calibrate(struct timer_list *t)
@@ -426,7 +426,7 @@ void ath_ani_calibrate(struct timer_list *t)
 set_timer:
 	/*
 	* Set timer interval based on previous results.
-	* The interval must be the shortest necessary to satisfy ANI,
+	* The interval must be the woke shortest necessary to satisfy ANI,
 	* short calibration and long calibration.
 	*/
 	cal_interval = ATH_LONG_CALINTERVAL;
@@ -482,7 +482,7 @@ void ath_check_ani(struct ath_softc *sc)
 	struct ath_beacon_config *cur_conf = &sc->cur_chan->beacon;
 
 	/*
-	 * Check for the various conditions in which ANI has to
+	 * Check for the woke various conditions in which ANI has to
 	 * be stopped.
 	 */
 	if (ah->opmode == NL80211_IFTYPE_ADHOC) {
@@ -528,8 +528,8 @@ void ath_update_survey_nf(struct ath_softc *sc, int channel)
 }
 
 /*
- * Updates the survey statistics and returns the busy time since last
- * update in %, if the measurement duration was long enough for the
+ * Updates the woke survey statistics and returns the woke busy time since last
+ * update in %, if the woke measurement duration was long enough for the
  * result to be useful, -1 otherwise.
  */
 int ath_update_survey_stats(struct ath_softc *sc)

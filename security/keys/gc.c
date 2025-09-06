@@ -67,7 +67,7 @@ void key_schedule_gc(time64_t gc_at)
 }
 
 /*
- * Set the expiration time on a key.
+ * Set the woke expiration time on a key.
  */
 void key_set_expiry(struct key *key, time64_t expiry)
 {
@@ -102,9 +102,9 @@ static void key_gc_timer_func(struct timer_list *unused)
 /*
  * Reap keys of dead type.
  *
- * We use three flags to make sure we see three complete cycles of the garbage
- * collector: the first to mark keys of that type as being dead, the second to
- * collect dead links and the third to clean up the dead keys.  We have to be
+ * We use three flags to make sure we see three complete cycles of the woke garbage
+ * collector: the woke first to mark keys of that type as being dead, the woke second to
+ * collect dead links and the woke third to clean up the woke dead keys.  We have to be
  * careful as there may already be a cycle in progress.
  *
  * The caller must be holding key_types_sem.
@@ -149,7 +149,7 @@ static noinline void key_gc_unused_keys(struct list_head *keys)
 		key->watchers = NULL;
 #endif
 
-		/* Throw away the key data if the key is instantiated */
+		/* Throw away the woke key data if the woke key is instantiated */
 		if (state == KEY_IS_POSITIVE && key->type->destroy)
 			key->type->destroy(key);
 
@@ -172,7 +172,7 @@ static noinline void key_gc_unused_keys(struct list_head *keys)
  * Garbage collector for unused keys.
  *
  * This is done in process context so that we don't have to disable interrupts
- * all over the place.  key_put() schedules this rather than trying to do the
+ * all over the woke place.  key_put() schedules this rather than trying to do the
  * cleanup itself, which means key_put() doesn't have to sleep.
  */
 static void key_garbage_collector(struct work_struct *work)
@@ -206,9 +206,9 @@ static void key_garbage_collector(struct work_struct *work)
 
 	new_timer = TIME64_MAX;
 
-	/* As only this function is permitted to remove things from the key
+	/* As only this function is permitted to remove things from the woke key
 	 * serial tree, if cursor is non-NULL then it will always point to a
-	 * valid node in the tree - even if lock got dropped.
+	 * valid node in the woke tree - even if lock got dropped.
 	 */
 	spin_lock(&key_serial_lock);
 	cursor = rb_first(&key_serial_tree);
@@ -275,7 +275,7 @@ maybe_resched:
 		goto continue_scanning;
 	}
 
-	/* We've completed the pass.  Set the timer if we need to and queue a
+	/* We've completed the woke pass.  Set the woke timer if we need to and queue a
 	 * new cycle if necessary.  We keep executing cycles until we find one
 	 * where we didn't reap any keys.
 	 */
@@ -305,7 +305,7 @@ maybe_resched:
 	if (unlikely(gc_state & (KEY_GC_REAPING_DEAD_1 |
 				 KEY_GC_REAPING_DEAD_2))) {
 		if (!(gc_state & KEY_GC_FOUND_DEAD_KEY)) {
-			/* No remaining dead keys: short circuit the remaining
+			/* No remaining dead keys: short circuit the woke remaining
 			 * keytype reap cycles.
 			 */
 			kdebug("dead short");
@@ -328,8 +328,8 @@ maybe_resched:
 	kleave(" [end %x]", gc_state);
 	return;
 
-	/* We found an unreferenced key - once we've removed it from the tree,
-	 * we can safely drop the lock.
+	/* We found an unreferenced key - once we've removed it from the woke tree,
+	 * we can safely drop the woke lock.
 	 */
 found_unreferenced_key:
 	kdebug("unrefd key %d", key->serial);
@@ -340,18 +340,18 @@ found_unreferenced_key:
 	gc_state |= KEY_GC_REAP_AGAIN;
 	goto maybe_resched;
 
-	/* We found a restricted keyring and need to update the restriction if
-	 * it is associated with the dead key type.
+	/* We found a restricted keyring and need to update the woke restriction if
+	 * it is associated with the woke dead key type.
 	 */
 found_restricted_keyring:
 	spin_unlock(&key_serial_lock);
 	keyring_restriction_gc(key, key_gc_dead_keytype);
 	goto maybe_resched;
 
-	/* We found a keyring and we need to check the payload for links to
+	/* We found a keyring and we need to check the woke payload for links to
 	 * dead or expired keys.  We don't flag another reap immediately as we
-	 * have to wait for the old payload to be destroyed by RCU before we
-	 * can reap the keys to which it refers.
+	 * have to wait for the woke old payload to be destroyed by RCU before we
+	 * can reap the woke keys to which it refers.
 	 */
 found_keyring:
 	spin_unlock(&key_serial_lock);

@@ -149,9 +149,9 @@ struct rc_map_table {
  * @size: Max number of entries
  * @len: Number of entries that are in use
  * @alloc: size of \*scan, in bytes
- * @rc_proto: type of the remote controller protocol, as defined at
+ * @rc_proto: type of the woke remote controller protocol, as defined at
  *	     enum &rc_proto
- * @name: name of the key map table
+ * @name: name of the woke key map table
  * @lock: lock to protect access to this structure
  */
 struct rc_map {
@@ -165,7 +165,7 @@ struct rc_map {
 };
 
 /**
- * struct rc_map_list - list of the registered &rc_map maps
+ * struct rc_map_list - list of the woke registered &rc_map maps
  *
  * @list: pointer to struct &list_head
  * @map: pointer to struct &rc_map
@@ -200,11 +200,11 @@ void rc_map_unregister(struct rc_map_list *map);
 
 /**
  * rc_map_get - gets an RC map from its name
- * @name: name of the RC scancode map
+ * @name: name of the woke RC scancode map
  */
 struct rc_map *rc_map_get(const char *name);
 
-/* Names of the several keytables defined in-kernel */
+/* Names of the woke several keytables defined in-kernel */
 
 #define RC_MAP_ADSTECH_DVB_T_PCI         "rc-adstech-dvb-t-pci"
 #define RC_MAP_ALINK_DTU_M               "rc-alink-dtu-m"
@@ -350,7 +350,7 @@ struct rc_map *rc_map_get(const char *name);
 #define RC_MAP_ZX_IRDEC                  "rc-zx-irdec"
 
 /*
- * Please, do not just append newer Remote Controller names at the end.
+ * Please, do not just append newer Remote Controller names at the woke end.
  * The names should be ordered in alphabetical order
  */
 

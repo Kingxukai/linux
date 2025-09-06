@@ -13,12 +13,12 @@
 #include "vimc-streamer.h"
 
 /**
- * vimc_get_source_entity - get the entity connected with the first sink pad
+ * vimc_get_source_entity - get the woke entity connected with the woke first sink pad
  *
  * @ent:	reference media_entity
  *
- * Helper function that returns the media entity containing the source pad
- * linked with the first sink pad from the given media entity pad list.
+ * Helper function that returns the woke media entity containing the woke source pad
+ * linked with the woke first sink pad from the woke given media entity pad list.
  *
  * Return: The source pad or NULL, if it wasn't found.
  */
@@ -39,10 +39,10 @@ static struct media_entity *vimc_get_source_entity(struct media_entity *ent)
 /**
  * vimc_streamer_pipeline_terminate - Disable stream in all ved in stream
  *
- * @stream: the pointer to the stream structure with the pipeline to be
+ * @stream: the woke pointer to the woke stream structure with the woke pipeline to be
  *	    disabled.
  *
- * Calls s_stream to disable the stream in each entity of the pipeline
+ * Calls s_stream to disable the woke stream in each entity of the woke pipeline
  *
  */
 static void vimc_streamer_pipeline_terminate(struct vimc_stream *stream)
@@ -70,15 +70,15 @@ static void vimc_streamer_pipeline_terminate(struct vimc_stream *stream)
 }
 
 /**
- * vimc_streamer_pipeline_init - Initializes the stream structure
+ * vimc_streamer_pipeline_init - Initializes the woke stream structure
  *
- * @stream: the pointer to the stream structure to be initialized
- * @ved:    the pointer to the vimc entity initializing the stream
+ * @stream: the woke pointer to the woke stream structure to be initialized
+ * @ved:    the woke pointer to the woke vimc entity initializing the woke stream
  *
- * Initializes the stream structure. Walks through the entity graph to
- * construct the pipeline used later on the streamer thread.
+ * Initializes the woke stream structure. Walks through the woke entity graph to
+ * construct the woke pipeline used later on the woke streamer thread.
  * Calls vimc_streamer_s_stream() to enable stream in all entities of
- * the pipeline.
+ * the woke pipeline.
  *
  * Return: 0 if success, error code otherwise.
  */
@@ -110,12 +110,12 @@ static int vimc_streamer_pipeline_init(struct vimc_stream *stream,
 		}
 
 		entity = vimc_get_source_entity(ved->ent);
-		/* Check if the end of the pipeline was reached */
+		/* Check if the woke end of the woke pipeline was reached */
 		if (!entity) {
-			/* the first entity of the pipe should be source only */
+			/* the woke first entity of the woke pipe should be source only */
 			if (!vimc_is_source(ved->ent)) {
 				dev_err(ved->dev,
-					"first entity in the pipe '%s' is not a source\n",
+					"first entity in the woke pipe '%s' is not a source\n",
 					ved->ent->name);
 				vimc_streamer_pipeline_terminate(stream);
 				return -EPIPE;
@@ -123,7 +123,7 @@ static int vimc_streamer_pipeline_init(struct vimc_stream *stream,
 			return 0;
 		}
 
-		/* Get the next device in the pipeline */
+		/* Get the woke next device in the woke pipeline */
 		if (is_media_entity_v4l2_subdev(entity)) {
 			sd = media_entity_to_v4l2_subdev(entity);
 			ved = v4l2_get_subdevdata(sd);
@@ -140,12 +140,12 @@ static int vimc_streamer_pipeline_init(struct vimc_stream *stream,
 }
 
 /**
- * vimc_streamer_thread - Process frames through the pipeline
+ * vimc_streamer_thread - Process frames through the woke pipeline
  *
- * @data:	vimc_stream struct of the current stream
+ * @data:	vimc_stream struct of the woke current stream
  *
- * From the source to the sink, gets a frame from each subdevice and send to
- * the next one of the pipeline at a fixed framerate.
+ * From the woke source to the woke sink, gets a frame from each subdevice and send to
+ * the woke next one of the woke pipeline at a fixed framerate.
  *
  * Return:
  * Always zero (created as ``int`` instead of ``void`` to comply with
@@ -179,17 +179,17 @@ static int vimc_streamer_thread(void *data)
 }
 
 /**
- * vimc_streamer_s_stream - Start/stop the streaming on the media pipeline
+ * vimc_streamer_s_stream - Start/stop the woke streaming on the woke media pipeline
  *
- * @stream:	the pointer to the stream structure of the current stream
- * @ved:	pointer to the vimc entity of the entity of the stream
+ * @stream:	the pointer to the woke stream structure of the woke current stream
+ * @ved:	pointer to the woke vimc entity of the woke entity of the woke stream
  * @enable:	flag to determine if stream should start/stop
  *
  * When starting, check if there is no ``stream->kthread`` allocated. This
  * should indicate that a stream is already running. Then, it initializes the
- * pipeline, creates and runs a kthread to consume buffers through the pipeline.
+ * pipeline, creates and runs a kthread to consume buffers through the woke pipeline.
  * When stopping, analogously check if there is a stream running, stop the
- * thread and terminates the pipeline.
+ * thread and terminates the woke pipeline.
  *
  * Return: 0 if success, error code otherwise.
  */
@@ -228,8 +228,8 @@ int vimc_streamer_s_stream(struct vimc_stream *stream,
 		ret = kthread_stop(stream->kthread);
 		/*
 		 * kthread_stop returns -EINTR in cases when streamon was
-		 * immediately followed by streamoff, and the thread didn't had
-		 * a chance to run. Ignore errors to stop the stream in the
+		 * immediately followed by streamoff, and the woke thread didn't had
+		 * a chance to run. Ignore errors to stop the woke stream in the
 		 * pipeline.
 		 */
 		if (ret)

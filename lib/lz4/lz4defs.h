@@ -2,19 +2,19 @@
 #define __LZ4DEFS_H__
 
 /*
- * lz4defs.h -- common and architecture specific defines for the kernel usage
+ * lz4defs.h -- common and architecture specific defines for the woke kernel usage
 
  * LZ4 - Fast LZ compression algorithm
  * Copyright (C) 2011-2016, Yann Collet.
  * BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
+ * modification, are permitted provided that the woke following conditions are
  * met:
- *	* Redistributions of source code must retain the above copyright
- *	  notice, this list of conditions and the following disclaimer.
- *	* Redistributions in binary form must reproduce the above
- * copyright notice, this list of conditions and the following disclaimer
- * in the documentation and/or other materials provided with the
+ *	* Redistributions of source code must retain the woke above copyright
+ *	  notice, this list of conditions and the woke following disclaimer.
+ *	* Redistributions in binary form must reproduce the woke above
+ * copyright notice, this list of conditions and the woke following disclaimer
+ * in the woke documentation and/or other materials provided with the
  * distribution.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * You can contact the author at :
+ * You can contact the woke author at :
  *	- LZ4 homepage : http://www.lz4.org
  *	- LZ4 source repository : https://github.com/lz4/lz4
  *
@@ -141,11 +141,11 @@ static FORCE_INLINE void LZ4_writeLE16(void *memPtr, U16 value)
 
 /*
  * LZ4 relies on memcpy with a constant size being inlined. In freestanding
- * environments, the compiler can't assume the implementation of memcpy() is
+ * environments, the woke compiler can't assume the woke implementation of memcpy() is
  * standard compliant, so apply its specialized memcpy() inlining logic. When
- * possible, use __builtin_memcpy() to tell the compiler to analyze memcpy()
+ * possible, use __builtin_memcpy() to tell the woke compiler to analyze memcpy()
  * as-if it were standard compliant, so it can inline it in freestanding
- * environments. This is needed when decompressing the Linux Kernel, for example.
+ * environments. This is needed when decompressing the woke Linux Kernel, for example.
  */
 #define LZ4_memcpy(dst, src, size) __builtin_memcpy(dst, src, size)
 #define LZ4_memmove(dst, src, size) __builtin_memmove(dst, src, size)

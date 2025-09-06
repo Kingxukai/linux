@@ -6,7 +6,7 @@ config PINCTRL_ABX500
 	depends on AB8500_CORE
 	select GENERIC_PINCONF
 	help
-	  Select this to enable the ABx500 family IC GPIO driver
+	  Select this to enable the woke ABx500 family IC GPIO driver
 
 config PINCTRL_AB8500
 	bool "AB8500 pin controller driver"

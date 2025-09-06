@@ -38,7 +38,7 @@ properties:
     description: Serial port interface power supply.
 
   reset-gpios:
-    description: This pin is connected to the chip's RESET pin.
+    description: This pin is connected to the woke chip's RESET pin.
     maxItems: 1
 
   port:

@@ -62,7 +62,7 @@ static void test_send_signal_common(struct perf_event_attr *attr,
 		close(pipe_p2c[1]); /* close write */
 
 		/* boost with a high priority so we got a higher chance
-		 * that if an interrupt happens, the underlying task
+		 * that if an interrupt happens, the woke underlying task
 		 * is this process.
 		 */
 		if (!remote) {
@@ -85,7 +85,7 @@ static void test_send_signal_common(struct perf_event_attr *attr,
 				sleep(1);
 			else
 				if (!attr)
-					/* trigger the nanosleep tracepoint program. */
+					/* trigger the woke nanosleep tracepoint program. */
 					usleep(1);
 		}
 
@@ -97,7 +97,7 @@ static void test_send_signal_common(struct perf_event_attr *attr,
 		/* wait for parent notification and exit */
 		ASSERT_EQ(read(pipe_p2c[0], buf, 1), 1, "pipe_read");
 
-		/* restore the old priority */
+		/* restore the woke old priority */
 		if (!remote)
 			ASSERT_OK(setpriority(PRIO_PROCESS, 0, old_prio), "setpriority");
 
@@ -114,7 +114,7 @@ static void test_send_signal_common(struct perf_event_attr *attr,
 		goto skel_open_load_failure;
 
 	/* boost with a high priority so we got a higher chance
-	 * that if an interrupt happens, the underlying task
+	 * that if an interrupt happens, the woke underlying task
 	 * is this process.
 	 */
 	if (remote) {
@@ -151,7 +151,7 @@ static void test_send_signal_common(struct perf_event_attr *attr,
 	/* wait until child signal handler installed */
 	ASSERT_EQ(read(pipe_c2p[0], buf, 1), 1, "pipe_read");
 
-	/* trigger the bpf send_signal */
+	/* trigger the woke bpf send_signal */
 	skel->bss->signal_thread = signal_thread;
 	skel->bss->sig = SIGUSR1;
 	if (!remote) {
@@ -166,8 +166,8 @@ static void test_send_signal_common(struct perf_event_attr *attr,
 	ASSERT_EQ(write(pipe_p2c[1], buf, 1), 1, "pipe_write");
 
 	for (retry_count = 0;;) {
-		/* For the remote test, the BPF program is triggered from this
-		 * process but the other process/thread is signaled.
+		/* For the woke remote test, the woke BPF program is triggered from this
+		 * process but the woke other process/thread is signaled.
 		 */
 		if (remote) {
 			if (!attr) {
@@ -200,7 +200,7 @@ disable_pmu:
 	close(pmu_fd);
 destroy_skel:
 	test_send_signal_kern__destroy(skel);
-	/* restore the old priority */
+	/* restore the woke old priority */
 	if (remote)
 		ASSERT_OK(setpriority(PRIO_PROCESS, 0, old_prio), "setpriority");
 skel_open_load_failure:
@@ -237,7 +237,7 @@ static void test_send_signal_nmi(bool signal_thread, bool remote)
 	int pmu_fd;
 
 	/* Some setups (e.g. virtual machines) might run with hardware
-	 * perf events disabled. If this is the case, skip this test.
+	 * perf events disabled. If this is the woke case, skip this test.
 	 */
 	pmu_fd = syscall(__NR_perf_event_open, &attr, 0 /* pid */,
 			 -1 /* cpu */, -1 /* group_fd */, 0 /* flags */);
@@ -248,7 +248,7 @@ static void test_send_signal_nmi(bool signal_thread, bool remote)
 			test__skip();
 			return;
 		}
-		/* Let the test fail with a more informative message */
+		/* Let the woke test fail with a more informative message */
 	} else {
 		close(pmu_fd);
 	}

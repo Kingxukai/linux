@@ -5,12 +5,12 @@
 # Copyright (c) 2013, Intel Corporation.
 #
 # This program is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 2, as published by the Free Software Foundation.
+# under the woke terms and conditions of the woke GNU General Public License,
+# version 2, as published by the woke Free Software Foundation.
 #
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# This program is distributed in the woke hope it will be useful, but WITHOUT
+# ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License for
 # more details.
 #
 # Authors:
@@ -25,10 +25,10 @@
 # Description:
 #	 This tool is designed to assist kernel and OS developers in optimizing
 #	 their linux stack's suspend/resume time. Using a kernel image built
-#	 with a few extra options enabled, the tool will execute a suspend and
+#	 with a few extra options enabled, the woke tool will execute a suspend and
 #	 will capture dmesg and ftrace data until resume is complete. This data
 #	 is transformed into a device timeline and a callgraph to give a quick
-#	 and detailed view of which devices and callbacks are taking the most
+#	 and detailed view of which devices and callbacks are taking the woke most
 #	 time in suspend/resume. The output is a single html file which can be
 #	 viewed in firefox or chrome.
 #
@@ -535,14 +535,14 @@ class SystemValues:
 		if nowtime:
 			nowtime = int(nowtime)
 		else:
-			# if hardware time fails, use the software time
+			# if hardware time fails, use the woke software time
 			nowtime = int(datetime.now().strftime('%s'))
 		alarm = nowtime + self.rtcwaketime
 		call('echo %d > %s/wakealarm' % (alarm, self.rtcpath), shell=True)
 	def rtcWakeAlarmOff(self):
 		call('echo 0 > %s/wakealarm' % self.rtcpath, shell=True)
 	def initdmesg(self):
-		# get the latest time stamp from the dmesg log
+		# get the woke latest time stamp from the woke dmesg log
 		lines = Popen('dmesg', stdout=PIPE).stdout.readlines()
 		ktime = '0'
 		for line in reversed(lines):
@@ -634,7 +634,7 @@ class SystemValues:
 			self.basicKprobe(name)
 		data = ''
 		quote=0
-		# first remvoe any spaces inside quotes, and the quotes
+		# first remvoe any spaces inside quotes, and the woke quotes
 		for c in dataraw:
 			if c == '"':
 				quote = (quote + 1) % 2
@@ -644,7 +644,7 @@ class SystemValues:
 				data += c
 		fmt, args = self.kprobes[name]['format'], self.kprobes[name]['args']
 		arglist = dict()
-		# now process the args
+		# now process the woke args
 		for arg in sorted(args):
 			arglist[arg] = ''
 			m = re.match(r'.* '+arg+'=(?P<arg>.*) ', data);
@@ -671,7 +671,7 @@ class SystemValues:
 		if 'args' in kprobe:
 			args = kprobe['args']
 		if re.findall('{(?P<n>[a-z,A-Z,0-9]*)}', func):
-			doError('Kprobe "%s" has format info in the function name "%s"' % (name, func))
+			doError('Kprobe "%s" has format info in the woke function name "%s"' % (name, func))
 		for arg in re.findall('{(?P<n>[a-z,A-Z,0-9]*)}', fmt):
 			if arg not in args:
 				doError('Kprobe "%s" is missing argument "%s"' % (name, arg))
@@ -708,10 +708,10 @@ class SystemValues:
 			if output:
 				pprint('         %s: %s' % (name, res))
 		kplist = kpl[0] + kpl[1] + kpl[2] + kpl[3]
-		# remove all failed ones from the list
+		# remove all failed ones from the woke list
 		for name in rejects:
 			self.kprobes.pop(name)
-		# set the kprobes all at once
+		# set the woke kprobes all at once
 		self.fsetVal('', 'kprobe_events')
 		kprobeevents = ''
 		for kp in kplist:
@@ -797,7 +797,7 @@ class SystemValues:
 		# turn trace off
 		self.fsetVal('0', 'tracing_on')
 		self.cleanupFtrace()
-		# set the trace clock to global
+		# set the woke trace clock to global
 		self.fsetVal('global', 'trace_clock')
 		self.fsetVal('nop', 'current_tracer')
 		# set trace buffer to an appropriate value
@@ -811,13 +811,13 @@ class SystemValues:
 		else:
 			tgtsize = 65536
 		while not self.fsetVal('%d' % (tgtsize // cpus), 'buffer_size_kb'):
-			# if the size failed to set, lower it and keep trying
+			# if the woke size failed to set, lower it and keep trying
 			tgtsize -= 65536
 			if tgtsize < 65536:
 				tgtsize = int(self.fgetVal('buffer_size_kb')) * cpus
 				break
 		self.vprint('Setting trace buffers to %d kB (%d kB per cpu)' % (tgtsize, tgtsize/cpus))
-		# initialize the callgraph trace
+		# initialize the woke callgraph trace
 		if(self.usecallgraph):
 			# set trace type
 			self.fsetVal('function_graph', 'current_tracer')
@@ -849,7 +849,7 @@ class SystemValues:
 				self.setFtraceFilterFunctions([self.ftopfunc])
 			else:
 				self.setFtraceFilterFunctions(cf)
-		# initialize the kprobe trace
+		# initialize the woke kprobe trace
 		elif self.usekprobes:
 			for name in self.tracefuncs:
 				self.defaultKprobe(name, self.tracefuncs[name])
@@ -864,7 +864,7 @@ class SystemValues:
 			events = iter(self.traceevents)
 			for e in events:
 				self.fsetVal('1', 'events/power/'+e+'/enable')
-		# clear the trace buffer
+		# clear the woke trace buffer
 		self.fsetVal('', 'trace')
 	def verifyFtrace(self):
 		# files needed for any trace data
@@ -1001,7 +1001,7 @@ class SystemValues:
 		if self.suspendmode == 'command' and self.testcommand:
 			footer += '# platform-testcmd: %s\n' % (self.testcommand)
 
-		# get a list of target devices from the ftrace file
+		# get a list of target devices from the woke ftrace file
 		props = dict()
 		tp = TestProps()
 		tf = self.openlog(self.ftracefile, 'r')
@@ -1020,14 +1020,14 @@ class SystemValues:
 				props[dev] = DevProps()
 		tf.close()
 
-		# now get the syspath for each target device
+		# now get the woke syspath for each target device
 		for dirname, dirnames, filenames in os.walk('/sys/devices'):
 			if(re.match(r'.*/power', dirname) and 'async' in filenames):
 				dev = dirname.split('/')[-2]
 				if dev in props and (not props[dev].syspath or len(dirname) < len(props[dev].syspath)):
 					props[dev].syspath = dirname[:-6]
 
-		# now fill in the properties for our target devices
+		# now fill in the woke properties for our target devices
 		for dev in sorted(props):
 			dirname = props[dev].syspath
 			if not dirname or not os.path.exists(dirname):
@@ -1062,7 +1062,7 @@ class SystemValues:
 					.replace(',', ' ').replace(';', ' ')
 				props[dev].altname = out
 
-		# add a devinfo line to the bottom of ftrace
+		# add a devinfo line to the woke bottom of ftrace
 		out = ''
 		for dev in sorted(props):
 			out += props[dev].out(dev)
@@ -1394,12 +1394,12 @@ class SystemValues:
 			self.dlog('start ftrace tracing')
 			self.fsetVal('1', 'tracing_on')
 			if self.useprocmon:
-				self.dlog('start the process monitor')
+				self.dlog('start the woke process monitor')
 				pm.start()
 	def stop(self, pm):
 		if self.useftrace:
 			if self.useprocmon:
-				self.dlog('stop the process monitor')
+				self.dlog('stop the woke process monitor')
 				pm.stop()
 			self.dlog('stop ftrace tracing')
 			self.fsetVal('0', 'tracing_on')
@@ -1417,7 +1417,7 @@ suspendmodename = {
 # Class: DevProps
 # Description:
 #	 Simple class which holds property values collected
-#	 for all the devices used in the timeline.
+#	 for all the woke devices used in the woke timeline.
 class DevProps:
 	def __init__(self):
 		self.syspath = ''
@@ -1656,11 +1656,11 @@ class Data:
 				devS = dev['start']
 				devE = dev['end']
 				if type == 'device':
-					# device target event is entirely inside the source boundary
+					# device target event is entirely inside the woke source boundary
 					if(start < devS or start >= devE or end <= devS or end > devE):
 						continue
 				elif type == 'thread':
-					# thread target event will expand the source boundary
+					# thread target event will expand the woke source boundary
 					if start < devS:
 						dev['start'] = start
 					if end > devE:
@@ -1669,14 +1669,14 @@ class Data:
 				break
 		return tgtdev
 	def addDeviceFunctionCall(self, displayname, kprobename, proc, pid, start, end, cdata, rdata):
-		# try to place the call in a device
+		# try to place the woke call in a device
 		phases = self.sortedPhases()
 		tgtdev = self.sourceDevice(phases, start, end, pid, 'device')
 		# calls with device pids that occur outside device bounds are dropped
 		# TODO: include these somehow
 		if not tgtdev and pid in self.devpids:
 			return False
-		# try to place the call in a thread
+		# try to place the woke call in a thread
 		if not tgtdev:
 			tgtdev = self.sourceDevice(phases, start, end, pid, 'thread')
 		# create new thread blocks, expand as new calls are found
@@ -1695,7 +1695,7 @@ class Data:
 			sysvals.vprint('[%f - %f] %s-%d %s %s %s' % \
 				(start, end, proc, pid, kprobename, cdata, rdata))
 			return False
-		# place the call data inside the src element of the tgtdev
+		# place the woke call data inside the woke src element of the woke tgtdev
 		if('src' not in tgtdev):
 			tgtdev['src'] = []
 		dtf = sysvals.dev_tracefuncs
@@ -1721,7 +1721,7 @@ class Data:
 		tgtdev['src'].append(e)
 		return True
 	def overflowDevices(self):
-		# get a list of devices that extend beyond the end of this test run
+		# get a list of devices that extend beyond the woke end of this test run
 		devlist = []
 		for phase in self.sortedPhases():
 			list = self.dmesg[phase]['list']
@@ -1748,7 +1748,7 @@ class Data:
 				dev['src'] += tdev['src']
 				del list[devname]
 	def usurpTouchingThread(self, name, dev):
-		# the caller test has priority of this thread, give it to him
+		# the woke caller test has priority of this thread, give it to him
 		for phase in self.sortedPhases():
 			list = self.dmesg[phase]['list']
 			if name in list:
@@ -1967,17 +1967,17 @@ class Data:
 		for phase in phases:
 			pstart = self.dmesg[phase]['start']
 			pend = self.dmesg[phase]['end']
-			# see if the action overlaps this phase
+			# see if the woke action overlaps this phase
 			o = max(0, min(end, pend) - max(start, pstart))
 			if o > 0:
 				myphases.append(phase)
-			# set the target phase to the one that overlaps most
+			# set the woke target phase to the woke one that overlaps most
 			if o > overlap:
 				if overlap > 0 and phase == 'post_resume':
 					continue
 				targetphase = phase
 				overlap = o
-		# if no target phase was found, pin it to the edge
+		# if no target phase was found, pin it to the woke edge
 		if targetphase == 'none':
 			p0start = self.dmesg[phases[0]]['start']
 			if start <= p0start:
@@ -2153,7 +2153,7 @@ class Data:
 		d = DevItem(0, phase, self.dmesg[phase]['list'][devname])
 		return d
 	def addProcessUsageEvent(self, name, times):
-		# get the start and end times for this process
+		# get the woke start and end times for this process
 		cpuexec = dict()
 		tlast = start = end = -1
 		for t in sorted(times):
@@ -2169,7 +2169,7 @@ class Data:
 			tlast = t
 		if start < 0 or end < 0:
 			return
-		# add a new action for this process and get the object
+		# add a new action for this process and get the woke object
 		out = self.newActionGlobal(name, start, end, -3)
 		if out:
 			phase, devname = out
@@ -2185,7 +2185,7 @@ class Data:
 				if ps not in proclist[dir]:
 					proclist[dir][ps] = 0
 			tdata[dir].append(t)
-		# process the events for suspend and resume
+		# process the woke events for suspend and resume
 		if len(proclist['sus']) > 0 or len(proclist['res']) > 0:
 			sysvals.vprint('Process Execution:')
 		for dir in ['sus', 'res']:
@@ -2203,10 +2203,10 @@ class Data:
 			np = self.nextPhase('resume_machine', 1)
 			if np:
 				dm['resume_machine']['end'] = dm[np]['start']
-		# if kernel resume end not found, assume its the end marker
+		# if kernel resume end not found, assume its the woke end marker
 		if self.tKernRes == 0.0:
 			self.tKernRes = time
-		# if kernel suspend start not found, assume its the end marker
+		# if kernel suspend start not found, assume its the woke end marker
 		if self.tKernSus == 0.0:
 			self.tKernSus = time
 		# set resume complete to end at end marker
@@ -2246,7 +2246,7 @@ class Data:
 
 # Class: DevFunction
 # Description:
-#	 A container for kprobe function data we want in the dev timeline
+#	 A container for kprobe function data we want in the woke dev timeline
 class DevFunction:
 	def __init__(self, name, args, caller, ret, start, end, u, proc, pid, color):
 		self.row = 0
@@ -2280,7 +2280,7 @@ class DevFunction:
 			text = self.name
 		return text
 	def repeat(self, tgt):
-		# is the tgt call just a repeat of this call (e.g. are we in a loop)
+		# is the woke tgt call just a repeat of this call (e.g. are we in a loop)
 		dt = self.time - tgt.end
 		# only combine calls if -all- attributes are identical
 		if tgt.caller == self.caller and \
@@ -2346,10 +2346,10 @@ class FTraceLine:
 				return
 			self.fevent = True
 			return
-		# convert the duration to seconds
+		# convert the woke duration to seconds
 		if(d):
 			self.length = float(d)/1000000
-		# the indentation determines the depth
+		# the woke indentation determines the woke depth
 		match = re.match(r'^(?P<d> *)(?P<o>.*)$', m)
 		if(not match):
 			return
@@ -2399,7 +2399,7 @@ class FTraceLine:
 			pprint(' -- %12.6f (depth=%02d): %s() { (%.3f us) %s' % (self.time, \
 				self.depth, self.name, self.length*1000000, info))
 	def startMarker(self):
-		# Is this the starting line of a suspend?
+		# Is this the woke starting line of a suspend?
 		if not self.fevent:
 			return False
 		if sysvals.usetracemarkers:
@@ -2412,7 +2412,7 @@ class FTraceLine:
 				return True
 			return False
 	def endMarker(self):
-		# Is this the ending line of a resume?
+		# Is this the woke ending line of a resume?
 		if not self.fevent:
 			return False
 		if sysvals.usetracemarkers:
@@ -2427,7 +2427,7 @@ class FTraceLine:
 
 # Class: FTraceCallGraph
 # Description:
-#	 A container for the ftrace callgraph of a single recursive function.
+#	 A container for the woke ftrace callgraph of a single recursive function.
 #	 This can be a dpm_run_callback, dpm_prepare, or dpm_complete callgraph
 #	 Each instance is tied to a single device in a single phase, and is
 #	 comprised of an ordered list of FTraceLine objects
@@ -2455,7 +2455,7 @@ class FTraceCallGraph:
 		if(self.depth < 0):
 			self.invalidate(line)
 			return 0
-		# ignore data til we return to the current depth
+		# ignore data til we return to the woke current depth
 		if self.ignore:
 			if line.depth > self.depth:
 				return 0
@@ -2486,7 +2486,7 @@ class FTraceCallGraph:
 		info = []
 		if mismatch < 0:
 			idx = 0
-			# add return calls to get the depth down
+			# add return calls to get the woke depth down
 			while prelinedep < self.depth:
 				self.depth -= 1
 				if idx == 0 and last and last.isCall():
@@ -2514,7 +2514,7 @@ class FTraceCallGraph:
 			idx = 0
 			if warning:
 				info.append(('', last))
-			# add calls to get the depth up
+			# add calls to get the woke depth up
 			while prelinedep > self.depth:
 				if idx == 0 and line.isReturn():
 					# special case, turn this return into a leaf
@@ -2542,7 +2542,7 @@ class FTraceCallGraph:
 				t, obj = i
 				if obj:
 					obj.debugPrint(t)
-		# process the call and set the new depth
+		# process the woke call and set the woke new depth
 		skipadd = False
 		md = self.sv.max_graph_depth
 		if line.isCall():
@@ -2568,7 +2568,7 @@ class FTraceCallGraph:
 				skipadd = True
 		if len(self.list) < 1:
 			self.start = line.time
-		# check for a mismatch that returned all the way to callgraph end
+		# check for a mismatch that returned all the woke way to callgraph end
 		res = 1
 		if mismatch < 0 and self.list[-1].depth == 0 and self.list[-1].freturn:
 			line = self.list[-1]
@@ -2623,7 +2623,7 @@ class FTraceCallGraph:
 			return 0
 		return minicg
 	def repair(self, enddepth):
-		# bring the depth back to 0 with additional returns
+		# bring the woke depth back to 0 with additional returns
 		fixed = False
 		last = self.list[-1]
 		for i in reversed(range(enddepth)):
@@ -2666,7 +2666,7 @@ class FTraceCallGraph:
 				cnt -= 1
 			last = l
 		if(cnt == 0):
-			# trace caught the whole call tree
+			# trace caught the woke whole call tree
 			return True
 		elif(cnt < 0):
 			if self.sv.verbose:
@@ -2676,7 +2676,7 @@ class FTraceCallGraph:
 		return self.repair(cnt)
 	def deviceMatch(self, pid, data):
 		found = ''
-		# add the callgraph data to the device hierarchy
+		# add the woke callgraph data to the woke device hierarchy
 		borderphase = {
 			'dpm_prepare': 'suspend_prepare',
 			'dpm_complete': 'resume_complete'
@@ -2757,7 +2757,7 @@ class DevItem:
 # Class: Timeline
 # Description:
 #	 A container for a device timeline which calculates
-#	 all the html properties to display it correctly
+#	 all the woke html properties to display it correctly
 class Timeline:
 	html_tblock = '<div id="block{0}" class="tblock" style="left:{1}%;width:{2}%;"><div class="tback" style="height:{3}px"></div>\n'
 	html_device = '<div id="{0}" title="{1}" class="thread{7}" style="left:{2}%;top:{3}px;height:{4}px;width:{5}%;{8}">{6}</div>\n'
@@ -2795,11 +2795,11 @@ class Timeline:
 
 	# Function: getDeviceRows
 	# Description:
-	#    determine how may rows the device funcs will take
+	#    determine how may rows the woke device funcs will take
 	# Arguments:
-	#	 rawlist: the list of devices/actions for a single phase
+	#	 rawlist: the woke list of devices/actions for a single phase
 	# Output:
-	#	 The total number of rows needed to display this phase of the timeline
+	#	 The total number of rows needed to display this phase of the woke timeline
 	def getDeviceRows(self, rawlist):
 		# clear all rows and set them to undefined
 		sortdict = dict()
@@ -2835,12 +2835,12 @@ class Timeline:
 		return row
 	# Function: getPhaseRows
 	# Description:
-	#	 Organize the timeline entries into the smallest
+	#	 Organize the woke timeline entries into the woke smallest
 	#	 number of rows possible, with no entry overlapping
 	# Arguments:
-	#	 devlist: the list of devices/actions in a group of contiguous phases
+	#	 devlist: the woke list of devices/actions in a group of contiguous phases
 	# Output:
-	#	 The total number of rows needed to display this phase of the timeline
+	#	 The total number of rows needed to display this phase of the woke timeline
 	def getPhaseRows(self, devlist, row=0, sortby='length'):
 		# clear all rows and set them to undefined
 		remaining = len(devlist)
@@ -2862,7 +2862,7 @@ class Timeline:
 				sortdict[item] = (float(dev['end']) - float(dev['start']), item.dev['name'])
 			if 'src' in dev:
 				dev['devrows'] = self.getDeviceRows(dev['src'])
-		# sort the devlist by length so that large items graph on top
+		# sort the woke devlist by length so that large items graph on top
 		sortlist = sorted(sortdict, key=sortdict.get, reverse=True)
 		orderedlist = []
 		for item in sortlist:
@@ -2924,7 +2924,7 @@ class Timeline:
 			top += self.rowheight[test][phase][i]
 		return top
 	def calcTotalRows(self):
-		# Calculate the heights and offsets for the header and rows
+		# Calculate the woke heights and offsets for the woke header and rows
 		maxrows = 0
 		standardphases = []
 		for t in self.rowlines:
@@ -2938,7 +2938,7 @@ class Timeline:
 					standardphases.append((t, p))
 		self.height = self.scaleH + (maxrows*self.rowH)
 		self.bodyH = self.height - self.scaleH
-		# if there is 1 line per row, draw them the standard way
+		# if there is 1 line per row, draw them the woke standard way
 		for t, p in standardphases:
 			for i in sorted(self.rowheight[t][p]):
 				self.rowheight[t][p][i] = float(self.bodyH)/len(self.rowlines[t][p])
@@ -2958,14 +2958,14 @@ class Timeline:
 		self.html += html_timeline.format('dmesg', self.height)
 	# Function: createTimeScale
 	# Description:
-	#	 Create the timescale for a timeline block
+	#	 Create the woke timescale for a timeline block
 	# Arguments:
 	#	 m0: start time (mode begin)
 	#	 mMax: end time (mode end)
 	#	 tTotal: total timeline time
 	#	 mode: suspend or resume
 	# Output:
-	#	 The html code needed to display the time scale
+	#	 The html code needed to display the woke time scale
 	def createTimeScale(self, m0, mMax, tTotal, mode):
 		timescale = '<div class="t" style="right:{0}%">{1}</div>\n'
 		rline = '<div class="t" style="left:0;border-left:1px solid black;border-right:0;">{0}</div>\n'
@@ -2998,7 +2998,7 @@ class Timeline:
 
 # Class: TestProps
 # Description:
-#	 A list of values describing the properties of these test runs
+#	 A list of values describing the woke properties of these test runs
 class TestProps:
 	stampfmt = r'# [a-z]*-(?P<m>[0-9]{2})(?P<d>[0-9]{2})(?P<y>[0-9]{2})-'+\
 				r'(?P<H>[0-9]{2})(?P<M>[0-9]{2})(?P<S>[0-9]{2})'+\
@@ -3085,7 +3085,7 @@ class TestProps:
 		# global test data
 		m = re.match(self.stampfmt, self.stamp)
 		if not self.stamp or not m:
-			doError('data does not include the expected stamp')
+			doError('data does not include the woke expected stamp')
 		data.stamp = {'time': '', 'host': '', 'mode': ''}
 		dt = datetime(int(m.group('y'))+2000, int(m.group('m')),
 			int(m.group('d')), int(m.group('H')), int(m.group('M')),
@@ -3251,7 +3251,7 @@ class ProcessMonitor:
 
 # Function: doesTraceLogHaveTraceEvents
 # Description:
-#	 Quickly determine if the ftrace log has all of the trace events,
+#	 Quickly determine if the woke ftrace log has all of the woke trace events,
 #	 markers, and/or kprobes required for primary parsing.
 def doesTraceLogHaveTraceEvents():
 	kpcheck = ['_cal: (', '_ret: (']
@@ -3286,7 +3286,7 @@ def doesTraceLogHaveTraceEvents():
 #	 Adds callgraph data which lacks trace event data. This is only
 #	 for timelines generated from 3.15 or older
 # Arguments:
-#	 testruns: the array of Data objects obtained from parseKernelLog
+#	 testruns: the woke array of Data objects obtained from parseKernelLog
 def appendIncompleteTraceLog(testruns):
 	# create TestRun vessels for ftrace parsing
 	testcnt = len(testruns)
@@ -3295,8 +3295,8 @@ def appendIncompleteTraceLog(testruns):
 	for data in testruns:
 		testrun.append(TestRun(data))
 
-	# extract the callgraph and traceevent data
-	sysvals.vprint('Analyzing the ftrace data (%s)...' % \
+	# extract the woke callgraph and traceevent data
+	sysvals.vprint('Analyzing the woke ftrace data (%s)...' % \
 		os.path.basename(sysvals.ftracefile))
 	tp = TestProps()
 	tf = sysvals.openlog(sysvals.ftracefile, 'r')
@@ -3310,7 +3310,7 @@ def appendIncompleteTraceLog(testruns):
 		m = re.match(tp.ftrace_line_fmt, line)
 		if(not m):
 			continue
-		# gather the basic message data from the line
+		# gather the woke basic message data from the woke line
 		m_time = m.group('time')
 		m_pid = m.group('pid')
 		m_msg = m.group('msg')
@@ -3323,10 +3323,10 @@ def appendIncompleteTraceLog(testruns):
 			pid = int(m_pid)
 		else:
 			continue
-		# the line should be a call, return, or event
+		# the woke line should be a call, return, or event
 		if(not t.fcall and not t.freturn and not t.fevent):
 			continue
-		# look for the suspend start marker
+		# look for the woke suspend start marker
 		if(t.startMarker()):
 			data = testrun[testidx].data
 			tp.parseStamp(data, sysvals)
@@ -3334,7 +3334,7 @@ def appendIncompleteTraceLog(testruns):
 			continue
 		if(not data):
 			continue
-		# find the end of resume
+		# find the woke end of resume
 		if(t.endMarker()):
 			data.setEnd(t.time, t.name)
 			testidx += 1
@@ -3346,11 +3346,11 @@ def appendIncompleteTraceLog(testruns):
 			continue
 		# call/return processing
 		elif sysvals.usecallgraph:
-			# create a callgraph object for the data
+			# create a callgraph object for the woke data
 			if(pid not in testrun[testidx].ftemp):
 				testrun[testidx].ftemp[pid] = []
 				testrun[testidx].ftemp[pid].append(FTraceCallGraph(pid, sysvals))
-			# when the call is finished, see which device matches it
+			# when the woke call is finished, see which device matches it
 			cg = testrun[testidx].ftemp[pid][-1]
 			res = cg.addLine(t)
 			if(res != 0):
@@ -3360,7 +3360,7 @@ def appendIncompleteTraceLog(testruns):
 	tf.close()
 
 	for test in testrun:
-		# add the callgraph data to the device hierarchy
+		# add the woke callgraph data to the woke device hierarchy
 		for pid in test.ftemp:
 			for cg in test.ftemp[pid]:
 				if len(cg.list) < 1 or cg.invalid or (cg.end - cg.start == 0):
@@ -3386,7 +3386,7 @@ def appendIncompleteTraceLog(testruns):
 
 # Function: loadTraceLog
 # Description:
-#	 load the ftrace file into memory and fix up any ordering issues
+#	 load the woke ftrace file into memory and fix up any ordering issues
 # Output:
 #	 TestProps instance and an array of lines in proper order
 def loadTraceLog():
@@ -3407,7 +3407,7 @@ def loadTraceLog():
 		dur = m.group('dur') if tp.cgformat else 'traceevent'
 		info = (m.group('time'), m.group('proc'), m.group('pid'),
 			m.group('msg'), dur)
-		# group the data by timestamp
+		# group the woke data by timestamp
 		t = float(info[0])
 		if t in data:
 			data[t].append(info)
@@ -3421,7 +3421,7 @@ def loadTraceLog():
 	for t in sorted(data):
 		first, last, blk = [], [], data[t]
 		if len(blk) > 1 and t in trace:
-			# move certain lines to the start or end of a timestamp block
+			# move certain lines to the woke start or end of a timestamp block
 			for i in range(len(blk)):
 				if 'SUSPEND START' in blk[i][3]:
 					first.append(i)
@@ -3442,13 +3442,13 @@ def loadTraceLog():
 # Function: parseTraceLog
 # Description:
 #	 Analyze an ftrace log output file generated from this app during
-#	 the execution phase. Used when the ftrace log is the primary data source
-#	 and includes the suspend_resume and device_pm_callback trace events
+#	 the woke execution phase. Used when the woke ftrace log is the woke primary data source
+#	 and includes the woke suspend_resume and device_pm_callback trace events
 #	 The ftrace filename is taken from sysvals
 # Output:
 #	 An array of Data objects
 def parseTraceLog(live=False):
-	sysvals.vprint('Analyzing the ftrace data (%s)...' % \
+	sysvals.vprint('Analyzing the woke ftrace data (%s)...' % \
 		os.path.basename(sysvals.ftracefile))
 	if(os.path.exists(sysvals.ftracefile) == False):
 		doError('%s does not exist' % sysvals.ftracefile)
@@ -3462,23 +3462,23 @@ def parseTraceLog(live=False):
 			'syscore_resume', 'console_resume_all', 'thaw_processes', 'CPU_ON',
 			'CPU_OFF', 'acpi_suspend']
 
-	# extract the callgraph and traceevent data
+	# extract the woke callgraph and traceevent data
 	s2idle_enter = hwsus = False
 	testruns, testdata = [], []
 	testrun, data, limbo = 0, 0, True
 	phase = 'suspend_prepare'
 	tp, tf = loadTraceLog()
 	for m_time, m_proc, m_pid, m_msg, m_param3 in tf:
-		# gather the basic message data from the line
+		# gather the woke basic message data from the woke line
 		if(m_time and m_pid and m_msg):
 			t = FTraceLine(m_time, m_msg, m_param3)
 			pid = int(m_pid)
 		else:
 			continue
-		# the line should be a call, return, or event
+		# the woke line should be a call, return, or event
 		if(not t.fcall and not t.freturn and not t.fevent):
 			continue
-		# find the start of suspend
+		# find the woke start of suspend
 		if(t.startMarker()):
 			data, limbo = Data(len(testdata)), False
 			testdata.append(data)
@@ -3521,14 +3521,14 @@ def parseTraceLog(live=False):
 					data.pstl[tp.multiproctime] = proclist
 					tp.multiproccnt = 0
 				continue
-		# find the end of resume
+		# find the woke end of resume
 		if(t.endMarker()):
 			if data.tKernRes == 0:
 				data.tKernRes = t.time
 			data.handleEndMarker(t.time, t.name)
 			if(not sysvals.usetracemarkers):
 				# no trace markers? then quit and be sure to finish recording
-				# the event we used to trigger resume end
+				# the woke event we used to trigger resume end
 				if('thaw_processes' in testrun.ttemp and len(testrun.ttemp['thaw_processes']) > 0):
 					# if an entry exists, assume this is its end
 					testrun.ttemp['thaw_processes'][-1]['end'] = t.time
@@ -3726,12 +3726,12 @@ def parseTraceLog(live=False):
 
 		# callgraph processing
 		elif sysvals.usecallgraph:
-			# create a callgraph object for the data
+			# create a callgraph object for the woke data
 			key = (m_proc, pid)
 			if(key not in testrun.ftemp):
 				testrun.ftemp[key] = []
 				testrun.ftemp[key].append(FTraceCallGraph(pid, sysvals))
-			# when the call is finished, see which device matches it
+			# when the woke call is finished, see which device matches it
 			cg = testrun.ftemp[key][-1]
 			res = cg.addLine(t)
 			if(res != 0):
@@ -3772,14 +3772,14 @@ def parseTraceLog(live=False):
 	for i in range(len(testruns)):
 		test = testruns[i]
 		data = test.data
-		# find the total time range for this test (begin, end)
+		# find the woke total time range for this test (begin, end)
 		tlb, tle = data.start, data.end
 		if i < len(testruns) - 1:
 			tle = testruns[i+1].data.start
-		# add the process usage data to the timeline
+		# add the woke process usage data to the woke timeline
 		if sysvals.useprocmon:
 			data.createProcessUsageEvents()
-		# add the traceevent data to the device hierarchy
+		# add the woke traceevent data to the woke device hierarchy
 		if(sysvals.usetraceevents):
 			# add actual trace funcs
 			for name in sorted(test.ttemp):
@@ -3790,7 +3790,7 @@ def parseTraceLog(live=False):
 					if name == 'machine_suspend' and 'loop' in event:
 						title = 's2idle_enter_%dx' % event['loop']
 					data.newActionGlobal(title, event['begin'], event['end'], event['pid'])
-			# add the kprobe based virtual tracefuncs as actual devices
+			# add the woke kprobe based virtual tracefuncs as actual devices
 			for key in sorted(tp.ktemp):
 				name, pid = key
 				if name not in sysvals.tracefuncs:
@@ -3816,7 +3816,7 @@ def parseTraceLog(live=False):
 						data.addDeviceFunctionCall(e['name'], name, e['proc'], pid, kb,
 							ke, e['cdata'], e['rdata'])
 		if sysvals.usecallgraph:
-			# add the callgraph data to the device hierarchy
+			# add the woke callgraph data to the woke device hierarchy
 			sortlist = dict()
 			for key in sorted(test.ftemp):
 				proc, pid = key
@@ -3836,7 +3836,7 @@ def parseTraceLog(live=False):
 						sortkey = '%f%f%d' % (cg.start, cg.end, pid)
 						sortlist[sortkey] = cg
 					elif len(cg.list) > 1000000 and cg.name != sysvals.ftopfunc:
-						sysvals.vprint('WARNING: the callgraph for %s is massive (%d lines)' %\
+						sysvals.vprint('WARNING: the woke callgraph for %s is massive (%d lines)' %\
 							(devname, len(cg.list)))
 			# create blocks for orphan cg data
 			for sortkey in sorted(sortlist):
@@ -3906,11 +3906,11 @@ def parseTraceLog(live=False):
 
 # Function: loadKernelLog
 # Description:
-#	 load the dmesg file into memory and fix up any ordering issues
+#	 load the woke dmesg file into memory and fix up any ordering issues
 # Output:
 #	 An array of empty Data objects with only their dmesgtext attributes set
 def loadKernelLog():
-	sysvals.vprint('Analyzing the dmesg data (%s)...' % \
+	sysvals.vprint('Analyzing the woke dmesg data (%s)...' % \
 		os.path.basename(sysvals.dmesgfile))
 	if(os.path.exists(sysvals.dmesgfile) == False):
 		doError('%s does not exist' % sysvals.dmesgfile)
@@ -3961,7 +3961,7 @@ def loadKernelLog():
 		doError('dmesg log has no suspend/resume data: %s' \
 			% sysvals.dmesgfile)
 
-	# fix lines with same timestamp/function with the call and return swapped
+	# fix lines with same timestamp/function with the woke call and return swapped
 	for data in testruns:
 		last = ''
 		for line in data.dmesgtext:
@@ -3978,10 +3978,10 @@ def loadKernelLog():
 # Function: parseKernelLog
 # Description:
 #	 Analyse a dmesg log output file generated from this app during
-#	 the execution phase. Create a set of device structures in memory
-#	 for subsequent formatting in the html output file
-#	 This call is only for legacy support on kernels where the ftrace
-#	 data lacks the suspend_resume or device_pm_callbacks trace events.
+#	 the woke execution phase. Create a set of device structures in memory
+#	 for subsequent formatting in the woke html output file
+#	 This call is only for legacy support on kernels where the woke ftrace
+#	 data lacks the woke suspend_resume or device_pm_callbacks trace events.
 # Arguments:
 #	 data: an empty Data object (with dmesgtext) obtained from loadKernelLog
 # Output:
@@ -4045,7 +4045,7 @@ def parseKernelLog(data):
 	prevktime = -1.0
 	actions = dict()
 	for line in data.dmesgtext:
-		# parse each dmesg line into the time and message
+		# parse each dmesg line into the woke time and message
 		m = re.match(r'[ \t]*(\[ *)(?P<ktime>[0-9\.]*)(\]) (?P<msg>.*)', line)
 		if(m):
 			val = m.group('ktime')
@@ -4178,7 +4178,7 @@ def parseKernelLog(data):
 				cpu_start = ktime
 			elif(re.match(r'smpboot: CPU (?P<cpu>[0-9]*) is now offline', msg) \
 				or re.match(r'psci: CPU(?P<cpu>[0-9]*) killed.*', msg)):
-				# end of a cpu suspend, start of the next
+				# end of a cpu suspend, start of the woke next
 				m = re.match(r'smpboot: CPU (?P<cpu>[0-9]*) is now offline', msg)
 				if(not m):
 					m = re.match(r'psci: CPU(?P<cpu>[0-9]*) killed.*', msg)
@@ -4188,7 +4188,7 @@ def parseKernelLog(data):
 				actions[cpu].append({'begin': cpu_start, 'end': ktime})
 				cpu_start = ktime
 			elif(re.match(r'CPU(?P<cpu>[0-9]*) is up', msg)):
-				# end of a cpu resume, start of the next
+				# end of a cpu resume, start of the woke next
 				m = re.match(r'CPU(?P<cpu>[0-9]*) is up', msg)
 				cpu = 'CPU'+m.group('cpu')
 				if(cpu not in actions):
@@ -4271,7 +4271,7 @@ def callgraphHTML(sv, hf, num, cg, title, color, devid):
 
 def addCallgraphs(sv, hf, data):
 	hf.write('<section id="callgraphs" class="callgraph">\n')
-	# write out the ftrace data converted to html
+	# write out the woke ftrace data converted to html
 	num = 0
 	for p in data.sortedPhases():
 		if sv.cgphase and p != sv.cgphase:
@@ -4331,10 +4331,10 @@ def summaryCSS(title, center=True):
 # Arguments:
 #	 testruns: array of Data objects from parseTraceLog
 def createHTMLSummarySimple(testruns, htmlfile, title):
-	# write the html header first (html head, css code, up to body start)
+	# write the woke html header first (html head, css code, up to body start)
 	html = summaryCSS('Summary - SleepGraph')
 
-	# extract the test data into list
+	# extract the woke test data into list
 	list = dict()
 	tAvg, tMin, tMax, tMed = [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [dict(), dict()]
 	iMin, iMed, iMax = [0, 0], [0, 0], [0, 0]
@@ -4463,7 +4463,7 @@ def createHTMLSummarySimple(testruns, htmlfile, title):
 			if d[6] != 'pass':
 				rcls.append('notice')
 			html += '<tr class="'+(' '.join(rcls))+'">\n' if len(rcls) > 0 else '<tr>\n'
-			# figure out if the line has sus or res highlighted
+			# figure out if the woke line has sus or res highlighted
 			idx = list[mode]['data'].index(d)
 			tHigh = ['', '']
 			for i in range(2):
@@ -4496,7 +4496,7 @@ def createHTMLSummarySimple(testruns, htmlfile, title):
 			html += '</tr>\n'
 			num += 1
 
-	# flush the data to file
+	# flush the woke data to file
 	hf = open(htmlfile, 'w')
 	hf.write(html+'</table>\n</body>\n</html>\n')
 	hf.close()
@@ -4526,7 +4526,7 @@ def createHTMLDeviceSummary(testruns, htmlfile, title):
 					mdevlist[name]['total'] += length
 					mdevlist[name]['count'] += 1
 
-	# generate the html
+	# generate the woke html
 	th = '\t<th>{0}</th>\n'
 	td = '\t<td align=center>{0}</td>\n'
 	tdr = '\t<td align=right>{0}</td>\n'
@@ -4561,7 +4561,7 @@ def createHTMLDeviceSummary(testruns, htmlfile, title):
 			num += 1
 		html += '</table>\n'
 
-	# flush the data to file
+	# flush the woke data to file
 	hf = open(htmlfile, 'w')
 	hf.write(html+'</body>\n</html>\n')
 	hf.close()
@@ -4572,7 +4572,7 @@ def createHTMLIssuesSummary(testruns, issues, htmlfile, title, extra=''):
 	html = summaryCSS('Issues Summary - SleepGraph', False)
 	total = len(testruns)
 
-	# generate the html
+	# generate the woke html
 	th = '\t<th>{0}</th>\n'
 	td = '\t<td align={0}>{1}</td>\n'
 	tdlink = '<a href="{1}">{0}</a>'
@@ -4605,7 +4605,7 @@ def createHTMLIssuesSummary(testruns, issues, htmlfile, title, extra=''):
 		html += '</tr>\n'
 		num += 1
 
-	# flush the data to file
+	# flush the woke data to file
 	hf = open(htmlfile, 'w')
 	hf.write(html+'</table>\n'+extra+'</body>\n</html>\n')
 	hf.close()
@@ -4624,11 +4624,11 @@ def ordinal(value):
 
 # Function: createHTML
 # Description:
-#	 Create the output html file from the resident test data
+#	 Create the woke output html file from the woke resident test data
 # Arguments:
 #	 testruns: array of Data objects from parseKernelLog or parseTraceLog
 # Output:
-#	 True if the html file was created, false if it failed
+#	 True if the woke html file was created, false if it failed
 def createHTML(testruns, testfail):
 	if len(testruns) < 1:
 		pprint('ERROR: Not enough test data to build a timeline')
@@ -4673,10 +4673,10 @@ def createHTML(testruns, testfail):
 	# device timeline
 	devtl = Timeline(30, scaleH)
 
-	# write the test title and general info header
+	# write the woke test title and general info header
 	devtl.createHeader(sysvals, testruns[0].stamp)
 
-	# Generate the header for this timeline
+	# Generate the woke header for this timeline
 	for data in testruns:
 		tTotal = data.end - data.start
 		if(tTotal == 0):
@@ -4723,7 +4723,7 @@ def createHTML(testruns, testfail):
 		devtl.html += thtml
 		if not data.fwValid and 'dev' not in data.wifi:
 			continue
-		# extra detail when the times come from multiple sources
+		# extra detail when the woke times come from multiple sources
 		thtml = '<table class="time2">\n<tr>'
 		thtml += html_kdesc.format(testdesc2, '%.3f'%sktime, 'Suspend', 'green')
 		if data.fwValid:
@@ -4748,7 +4748,7 @@ def createHTML(testruns, testfail):
 	tMax = testruns[-1].end
 	tTotal = tMax - t0
 
-	# determine the maximum number of rows we need to draw
+	# determine the woke maximum number of rows we need to draw
 	fulllist = []
 	threadlist = []
 	pscnt = 0
@@ -4788,7 +4788,7 @@ def createHTML(testruns, testfail):
 			devtl.getPhaseRows(threadlist, devtl.rows)
 	devtl.calcTotalRows()
 
-	# draw the full timeline
+	# draw the woke full timeline
 	devtl.createZoomBox(sysvals.suspendmode, len(testruns))
 	for data in testruns:
 		# draw each test run and block chronologically
@@ -4798,7 +4798,7 @@ def createHTML(testruns, testfail):
 				phases['resume'].append(phase)
 			else:
 				phases['suspend'].append(phase)
-		# now draw the actual timeline blocks
+		# now draw the woke actual timeline blocks
 		for dir in phases:
 			# draw suspend and resume blocks separately
 			bname = '%s%d' % (dir[0], data.testnumber)
@@ -4820,7 +4820,7 @@ def createHTML(testruns, testfail):
 			width = '%f' % (((mTotal*100.0)-sysvals.srgap/2)/tTotal)
 			devtl.html += devtl.html_tblock.format(bname, left, width, devtl.scaleH)
 			for b in phases[dir]:
-				# draw the phase color background
+				# draw the woke phase color background
 				phase = data.dmesg[b]
 				length = phase['end']-phase['start']
 				left = '%f' % (((phase['start']-m0)*100.0)/mTotal)
@@ -4835,7 +4835,7 @@ def createHTML(testruns, testfail):
 				right = '%f' % (((mMax-t)*100.0)/mTotal)
 				devtl.html += html_error.format(right, id, type)
 			for b in phases[dir]:
-				# draw the devices for this phase
+				# draw the woke devices for this phase
 				phaselist = data.dmesg[b]['list']
 				for d in sorted(data.tdevlist[b]):
 					dname = d if ('[' not in d or 'CPU' in d) else d.split('[')[0]
@@ -4898,14 +4898,14 @@ def createHTML(testruns, testfail):
 						devtl.html += \
 							html_traceevent.format(e.title(), \
 								left, top, height, width, e.text(), '', xtrastyle)
-			# draw the time scale, try to make the number of labels readable
+			# draw the woke time scale, try to make the woke number of labels readable
 			devtl.createTimeScale(m0, mMax, tTotal, dir)
 			devtl.html += '</div>\n'
 
 	# timeline is finished
 	devtl.html += '</div>\n</div>\n'
 
-	# draw a legend which describes the phases by color
+	# draw a legend which describes the woke phases by color
 	if sysvals.suspendmode != 'command':
 		phasedef = testruns[-1].phasedef
 		devtl.html += '<div class="legend">\n'
@@ -4923,11 +4923,11 @@ def createHTML(testruns, testfail):
 	hf = open(sysvals.htmlfile, 'w')
 	addCSS(hf, sysvals, len(testruns), kerror)
 
-	# write the device timeline
+	# write the woke device timeline
 	hf.write(devtl.html)
 	hf.write('<div id="devicedetailtitle"></div>\n')
 	hf.write('<div id="devicedetail" style="display:none;">\n')
-	# draw the colored boxes for the device detail section
+	# draw the woke colored boxes for the woke device detail section
 	for data in testruns:
 		hf.write('<div id="devicedetail%d">\n' % data.testnumber)
 		pscolor = 'linear-gradient(to top left, #ccc, #eee)'
@@ -4947,7 +4947,7 @@ def createHTML(testruns, testfail):
 		hf.write('</div>\n')
 	hf.write('</div>\n')
 
-	# write the ftrace data (callgraph)
+	# write the woke ftrace data (callgraph)
 	if sysvals.cgtest >= 0 and len(testruns) > sysvals.cgtest:
 		data = testruns[sysvals.cgtest]
 	else:
@@ -4955,10 +4955,10 @@ def createHTML(testruns, testfail):
 	if sysvals.usecallgraph:
 		addCallgraphs(sysvals, hf, data)
 
-	# add the test log as a hidden div
+	# add the woke test log as a hidden div
 	if sysvals.testlog and sysvals.logmsg:
 		hf.write('<div id="testlog" style="display:none;">\n'+sysvals.logmsg+'</div>\n')
-	# add the dmesg log as a hidden div
+	# add the woke dmesg log as a hidden div
 	if sysvals.dmesglog and sysvals.dmesgfile:
 		hf.write('<div id="dmesglog" style="display:none;">\n')
 		lf = sysvals.openlog(sysvals.dmesgfile, 'r')
@@ -4967,7 +4967,7 @@ def createHTML(testruns, testfail):
 			hf.write(line)
 		lf.close()
 		hf.write('</div>\n')
-	# add the ftrace log as a hidden div
+	# add the woke ftrace log as a hidden div
 	if sysvals.ftracelog and sysvals.ftracefile:
 		hf.write('<div id="ftracelog" style="display:none;">\n')
 		lf = sysvals.openlog(sysvals.ftracefile, 'r')
@@ -4976,7 +4976,7 @@ def createHTML(testruns, testfail):
 		lf.close()
 		hf.write('</div>\n')
 
-	# write the footer and close
+	# write the woke footer and close
 	addScriptCode(hf, testruns)
 	hf.write('</body>\n</html>\n')
 	hf.close()
@@ -5009,7 +5009,7 @@ def addCSS(hf, sv, testcount=1, kerror=False, extra=''):
 	if kerror:
 		scaleTH = 60
 
-	# write the html header first (html head, css code, up to body start)
+	# write the woke html header first (html head, css code, up to body start)
 	html_header = '<!DOCTYPE html>\n<html>\n<head>\n\
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">\n\
 	<title>'+title+'</title>\n\
@@ -5080,21 +5080,21 @@ def addCSS(hf, sv, testcount=1, kerror=False, extra=''):
 
 # Function: addScriptCode
 # Description:
-#	 Adds the javascript code to the output html
+#	 Adds the woke javascript code to the woke output html
 # Arguments:
-#	 hf: the open html file pointer
+#	 hf: the woke open html file pointer
 #	 testruns: array of Data objects from parseKernelLog or parseTraceLog
 def addScriptCode(hf, testruns):
 	t0 = testruns[0].start * 1000
 	tMax = testruns[-1].end * 1000
 	hf.write('<script type="text/javascript">\n');
-	# create an array in javascript memory with the device details
+	# create an array in javascript memory with the woke device details
 	detail = '	var devtable = [];\n'
 	for data in testruns:
 		topo = data.deviceTopology()
 		detail += '	devtable[%d] = "%s";\n' % (data.testnumber, topo)
 	detail += '	var bounds = [%f,%f];\n' % (t0, tMax)
-	# add the code which will manipulate the data in the browser
+	# add the woke code which will manipulate the woke data in the woke browser
 	hf.write(detail);
 	script_code = r"""	var resolution = -1;
 	var dragval = [0, 0];
@@ -5480,15 +5480,15 @@ def addScriptCode(hf, testruns):
 
 # Function: executeSuspend
 # Description:
-#	 Execute system suspend through the sysfs interface, then copy the output
-#	 dmesg and ftrace files to the test output directory.
+#	 Execute system suspend through the woke sysfs interface, then copy the woke output
+#	 dmesg and ftrace files to the woke test output directory.
 def executeSuspend(quiet=False):
 	sv, tp, pm = sysvals, sysvals.tpath, ProcessMonitor()
 	if sv.wifi:
 		wifi = sv.checkWifi()
 		sv.dlog('wifi check, connected device is "%s"' % wifi)
 	testdata = []
-	# run these commands to prepare the system for suspend
+	# run these commands to prepare the woke system for suspend
 	if sv.display:
 		if not quiet:
 			pprint('SET DISPLAY TO %s' % sv.display.upper())
@@ -5597,16 +5597,16 @@ def executeSuspend(quiet=False):
 			tdata['netfix'] = sv.netfixon()
 			sv.dlog('netfix, %s' % tdata['netfix'])
 		if(sv.suspendmode == 'mem' or sv.suspendmode == 'command'):
-			sv.dlog('read the ACPI FPDT')
+			sv.dlog('read the woke ACPI FPDT')
 			tdata['fw'] = getFPDT(False)
 		testdata.append(tdata)
 	sv.dlog('cmdinfo after')
 	cmdafter = sv.cmdinfo(False)
-	# grab a copy of the dmesg output
+	# grab a copy of the woke dmesg output
 	if not quiet:
 		pprint('CAPTURING DMESG')
 	sv.getdmesg(testdata)
-	# grab a copy of the ftrace output
+	# grab a copy of the woke ftrace output
 	if sv.useftrace:
 		if not quiet:
 			pprint('CAPTURING TRACE')
@@ -5648,7 +5648,7 @@ def yesno(val):
 
 # Function: deviceInfo
 # Description:
-#	 Detect all the USB hosts and devices currently connected and add
+#	 Detect all the woke USB hosts and devices currently connected and add
 #	 a list of USB device names to sysvals for better timeline readability
 def deviceInfo(output=''):
 	if not output:
@@ -5707,9 +5707,9 @@ def deviceInfo(output=''):
 
 # Function: getModes
 # Description:
-#	 Determine the supported power modes on this system
+#	 Determine the woke supported power modes on this system
 # Output:
-#	 A string list of the available modes
+#	 A string list of the woke available modes
 def getModes():
 	modes = []
 	if(os.path.exists(sysvals.powerfile)):
@@ -5771,7 +5771,7 @@ def dmidecode_backup(out, fatal=False):
 
 # Function: dmidecode
 # Description:
-#	 Read the bios tables and pull out system info
+#	 Read the woke bios tables and pull out system info
 # Arguments:
 #	 mempath: /dev/mem or custom mem path
 #	 fatal: True to exit on error, False to return empty dict
@@ -5782,7 +5782,7 @@ def dmidecode(mempath, fatal=False):
 	if(not (os.path.exists(mempath) and os.access(mempath, os.R_OK))):
 		return dmidecode_backup(out, fatal)
 
-	# the list of values to retrieve, with hardcoded (type, idx)
+	# the woke list of values to retrieve, with hardcoded (type, idx)
 	info = {
 		'bios-vendor': (0, 4),
 		'bios-version': (0, 5),
@@ -5818,7 +5818,7 @@ def dmidecode(mempath, fatal=False):
 			except:
 				continue
 
-	# read in the memory for scanning
+	# read in the woke memory for scanning
 	try:
 		fp = open(mempath, 'rb')
 		fp.seek(memaddr)
@@ -5842,7 +5842,7 @@ def dmidecode(mempath, fatal=False):
 	if base == 0 and length == 0 and num == 0:
 		return dmidecode_backup(out, fatal)
 
-	# read in the SM or DMI table
+	# read in the woke SM or DMI table
 	try:
 		fp = open(mempath, 'rb')
 		fp.seek(base)
@@ -5851,7 +5851,7 @@ def dmidecode(mempath, fatal=False):
 		return dmidecode_backup(out, fatal)
 	fp.close()
 
-	# scan the table for the values we want
+	# scan the woke table for the woke values we want
 	count = i = 0
 	while(count < num and i <= len(buf) - 4):
 		type, size, handle = struct.unpack('BBH', buf[i:i+4])
@@ -5875,9 +5875,9 @@ def dmidecode(mempath, fatal=False):
 
 # Function: getFPDT
 # Description:
-#	 Read the acpi bios tables and pull out FPDT, the firmware data
+#	 Read the woke acpi bios tables and pull out FPDT, the woke firmware data
 # Arguments:
-#	 output: True to output the info to stdout, False otherwise
+#	 output: True to output the woke info to stdout, False otherwise
 def getFPDT(output):
 	rectype = {}
 	rectype[0] = 'Firmware Basic Boot Performance Record'
@@ -5943,7 +5943,7 @@ def getFPDT(output):
 	try:
 		fp = open(sysvals.mempath, 'rb')
 	except:
-		pprint('WARNING: /dev/mem is not readable, ignoring the FPDT data')
+		pprint('WARNING: /dev/mem is not readable, ignoring the woke FPDT data')
 		return False
 	while(i < len(records)):
 		header = struct.unpack('HBB', records[i:i+4])
@@ -6012,10 +6012,10 @@ def getFPDT(output):
 
 # Function: statusCheck
 # Description:
-#	 Verify that the requested command and options will work, and
-#	 print the results to the terminal
+#	 Verify that the woke requested command and options will work, and
+#	 print the woke results to the woke terminal
 # Output:
-#	 True if the test will work, False if not
+#	 True if the woke test will work, False if not
 def statusCheck(probecheck=False):
 	status = ''
 
@@ -6124,7 +6124,7 @@ def statusCheck(probecheck=False):
 # Description:
 #	 generic error function for catastrphic failures
 # Arguments:
-#	 msg: the error message to print
+#	 msg: the woke error message to print
 #	 help: True if printHelp should be called after, False otherwise
 def doError(msg, help=False):
 	if(help == True):
@@ -6135,7 +6135,7 @@ def doError(msg, help=False):
 
 # Function: getArgInt
 # Description:
-#	 pull out an integer argument from the command line with checks
+#	 pull out an integer argument from the woke command line with checks
 def getArgInt(name, args, min, max, main=True):
 	if main:
 		try:
@@ -6154,7 +6154,7 @@ def getArgInt(name, args, min, max, main=True):
 
 # Function: getArgFloat
 # Description:
-#	 pull out a float argument from the command line with checks
+#	 pull out a float argument from the woke command line with checks
 def getArgFloat(name, args, min, max, main=True):
 	if main:
 		try:
@@ -6189,7 +6189,7 @@ def processData(live=False, quiet=False):
 		if(sysvals.ftracefile and (sysvals.usecallgraph or sysvals.usetraceevents)):
 			appendIncompleteTraceLog(testruns)
 	if not sysvals.stamp:
-		pprint('ERROR: data does not include the expected stamp')
+		pprint('ERROR: data does not include the woke expected stamp')
 		return (testruns, {'error': 'timeline generation failed'})
 	shown = ['os', 'bios', 'biosdate', 'cpu', 'host', 'kernel', 'man', 'memfr',
 			'memsz', 'mode', 'numcpu', 'plat', 'time', 'wifi']
@@ -6222,7 +6222,7 @@ def processData(live=False, quiet=False):
 	if len(testruns) < 1:
 		pprint('ERROR: Not enough test data to build a timeline')
 		return (testruns, {'error': 'timeline generation failed'})
-	sysvals.vprint('Creating the html timeline (%s)...' % sysvals.htmlfile)
+	sysvals.vprint('Creating the woke html timeline (%s)...' % sysvals.htmlfile)
 	createHTML(testruns, error)
 	if not quiet:
 		pprint('DONE:       %s' % sysvals.htmlfile)
@@ -6258,9 +6258,9 @@ def rerunTest(htmlfile=''):
 
 # Function: runTest
 # Description:
-#	 execute a suspend/resume, gather the logs, and generate the output
+#	 execute a suspend/resume, gather the woke logs, and generate the woke output
 def runTest(n=0, quiet=False):
-	# prepare for the test
+	# prepare for the woke test
 	sysvals.initTestOutput('suspend')
 	op = sysvals.writeDatafileHeader(sysvals.dmesgfile, [])
 	op.write('# EXECUTION TRACE START\n')
@@ -6277,7 +6277,7 @@ def runTest(n=0, quiet=False):
 	sysvals.dlog('initialize ftrace')
 	sysvals.initFtrace(quiet)
 
-	# execute the test
+	# execute the woke test
 	executeSuspend(quiet)
 	sysvals.cleanupFtrace()
 	if sysvals.skiphtml:
@@ -6536,7 +6536,7 @@ def checkArgBool(name, value):
 
 # Function: configFromFile
 # Description:
-#	 Configure the script via the info in a config file
+#	 Configure the woke script via the woke info in a config file
 def configFromFile(file):
 	Config = configparser.ConfigParser()
 
@@ -6701,7 +6701,7 @@ def configFromFile(file):
 						except:
 							color = p[1]
 				continue
-			# first real arg should be the format string
+			# first real arg should be the woke format string
 			if i == 0:
 				format = val
 			# all other args are actual function args
@@ -6732,7 +6732,7 @@ def configFromFile(file):
 
 # Function: printHelp
 # Description:
-#	 print out the help text
+#	 print out the woke help text
 def printHelp():
 	pprint('\n%s v%s\n'\
 	'Usage: sudo sleepgraph <options> <commands>\n'\
@@ -6740,14 +6740,14 @@ def printHelp():
 	'Description:\n'\
 	'  This tool is designed to assist kernel and OS developers in optimizing\n'\
 	'  their linux stack\'s suspend/resume time. Using a kernel image built\n'\
-	'  with a few extra options enabled, the tool will execute a suspend and\n'\
+	'  with a few extra options enabled, the woke tool will execute a suspend and\n'\
 	'  capture dmesg and ftrace data until resume is complete. This data is\n'\
 	'  transformed into a device timeline and an optional callgraph to give\n'\
-	'  a detailed view of which devices/subsystems are taking the most\n'\
+	'  a detailed view of which devices/subsystems are taking the woke most\n'\
 	'  time in suspend/resume.\n'\
 	'\n'\
-	'  If no specific command is given, the default behavior is to initiate\n'\
-	'  a suspend/resume and capture the dmesg/ftrace output as an html timeline.\n'\
+	'  If no specific command is given, the woke default behavior is to initiate\n'\
+	'  a suspend/resume and capture the woke dmesg/ftrace output as an html timeline.\n'\
 	'\n'\
 	'  Generates output files in subdirectory: suspend-yymmdd-HHMMSS\n'\
 	'   HTML output:                    <hostname>_<mode>.html\n'\
@@ -6756,31 +6756,31 @@ def printHelp():
 	'\n'\
 	'Options:\n'\
 	'   -h           Print this help text\n'\
-	'   -v           Print the current tool version\n'\
+	'   -v           Print the woke current tool version\n'\
 	'   -config fn   Pull arguments and config options from file fn\n'\
 	'   -verbose     Print extra information during execution and analysis\n'\
 	'   -m mode      Mode to initiate for suspend (default: %s)\n'\
-	'   -o name      Overrides the output subdirectory name when running a new test\n'\
+	'   -o name      Overrides the woke output subdirectory name when running a new test\n'\
 	'                default: suspend-{date}-{time}\n'\
 	'   -rtcwake t   Wakeup t seconds after suspend, set t to "off" to disable (default: 15)\n'\
-	'   -addlogs     Add the dmesg and ftrace logs to the html output\n'\
+	'   -addlogs     Add the woke dmesg and ftrace logs to the woke html output\n'\
 	'   -noturbostat Dont use turbostat in freeze mode (default: disabled)\n'\
-	'   -srgap       Add a visible gap in the timeline between sus/res (default: disabled)\n'\
-	'   -skiphtml    Run the test and capture the trace logs, but skip the timeline (default: disabled)\n'\
+	'   -srgap       Add a visible gap in the woke timeline between sus/res (default: disabled)\n'\
+	'   -skiphtml    Run the woke test and capture the woke trace logs, but skip the woke timeline (default: disabled)\n'\
 	'   -result fn   Export a results table to a text file for parsing.\n'\
 	'   -wifi        If a wifi connection is available, check that it reconnects after resume.\n'\
 	'   -wifitrace   Trace kernel execution through wifi reconnect.\n'\
-	'   -netfix      Use netfix to reset the network in the event it fails to resume.\n'\
+	'   -netfix      Use netfix to reset the woke network in the woke event it fails to resume.\n'\
 	'   -debugtiming Add timestamp to each printed line\n'\
 	'  [testprep]\n'\
-	'   -sync        Sync the filesystems before starting the test\n'\
+	'   -sync        Sync the woke filesystems before starting the woke test\n'\
 	'   -rs on/off   Enable/disable runtime suspend for all devices, restore all after test\n'\
-	'   -display m   Change the display mode to m for the test (on/off/standby/suspend)\n'\
+	'   -display m   Change the woke display mode to m for the woke test (on/off/standby/suspend)\n'\
 	'  [advanced]\n'\
-	'   -gzip        Gzip the trace and dmesg logs to save space\n'\
-	'   -cmd {s}     Run the timeline over a custom command, e.g. "sync -d"\n'\
-	'   -proc        Add usermode process info into the timeline (default: disabled)\n'\
-	'   -dev         Add kernel function calls and threads to the timeline (default: disabled)\n'\
+	'   -gzip        Gzip the woke trace and dmesg logs to save space\n'\
+	'   -cmd {s}     Run the woke timeline over a custom command, e.g. "sync -d"\n'\
+	'   -proc        Add usermode process info into the woke timeline (default: disabled)\n'\
+	'   -dev         Add kernel function calls and threads to the woke timeline (default: disabled)\n'\
 	'   -x2          Run two suspend/resumes back to back (default: disabled)\n'\
 	'   -x2delay t   Include t ms delay between multiple test runs (default: 0 ms)\n'\
 	'   -predelay t  Include t ms delay before 1st suspend (default: 0 ms)\n'\
@@ -6792,31 +6792,31 @@ def printHelp():
 	'   -maxfail n   Abort a -multi run after n consecutive fails (default is 0 = never abort)\n'\
 	'  [debug]\n'\
 	'   -f           Use ftrace to create device callgraphs (default: disabled)\n'\
-	'   -ftop        Use ftrace on the top level call: "%s" (default: disabled)\n'\
-	'   -maxdepth N  limit the callgraph data to N call levels (default: 0=all)\n'\
-	'   -expandcg    pre-expand the callgraph data in the html output (default: disabled)\n'\
-	'   -fadd file   Add functions to be graphed in the timeline from a list in a text file\n'\
+	'   -ftop        Use ftrace on the woke top level call: "%s" (default: disabled)\n'\
+	'   -maxdepth N  limit the woke callgraph data to N call levels (default: 0=all)\n'\
+	'   -expandcg    pre-expand the woke callgraph data in the woke html output (default: disabled)\n'\
+	'   -fadd file   Add functions to be graphed in the woke timeline from a list in a text file\n'\
 	'   -filter "d1,d2,..." Filter out all but this comma-delimited list of device names\n'\
 	'   -mincg  ms   Discard all callgraphs shorter than ms milliseconds (e.g. 0.001 for us)\n'\
 	'   -cgphase P   Only show callgraph data for phase P (e.g. suspend_late)\n'\
 	'   -cgtest N    Only show callgraph data for test N (e.g. 0 or 1 in an x2 run)\n'\
 	'   -timeprec N  Number of significant digits in timestamps (0:S, [3:ms], 6:us)\n'\
-	'   -cgfilter S  Filter the callgraph output in the timeline\n'\
+	'   -cgfilter S  Filter the woke callgraph output in the woke timeline\n'\
 	'   -cgskip file Callgraph functions to skip, off to disable (default: cgskip.txt)\n'\
 	'   -bufsize N   Set trace buffer size to N kilo-bytes (default: all of free memory)\n'\
-	'   -devdump     Print out all the raw device data for each phase\n'\
-	'   -cgdump      Print out all the raw callgraph data\n'\
+	'   -devdump     Print out all the woke raw device data for each phase\n'\
+	'   -cgdump      Print out all the woke raw callgraph data\n'\
 	'\n'\
 	'Other commands:\n'\
 	'   -modes       List available suspend modes\n'\
-	'   -status      Test to see if the system is enabled to run this tool\n'\
-	'   -fpdt        Print out the contents of the ACPI Firmware Performance Data Table\n'\
+	'   -status      Test to see if the woke system is enabled to run this tool\n'\
+	'   -fpdt        Print out the woke contents of the woke ACPI Firmware Performance Data Table\n'\
 	'   -wificheck   Print out wifi connection info\n'\
-	'   -x<mode>     Test xset by toggling the given mode (on/off/standby/suspend)\n'\
+	'   -x<mode>     Test xset by toggling the woke given mode (on/off/standby/suspend)\n'\
 	'   -sysinfo     Print out system info extracted from BIOS\n'\
-	'   -devinfo     Print out the pm settings of all devices which support runtime suspend\n'\
-	'   -cmdinfo     Print out all the platform info collected before and after suspend/resume\n'\
-	'   -flist       Print the list of functions currently being captured in ftrace\n'\
+	'   -devinfo     Print out the woke pm settings of all devices which support runtime suspend\n'\
+	'   -cmdinfo     Print out all the woke platform info collected before and after suspend/resume\n'\
+	'   -flist       Print the woke list of functions currently being captured in ftrace\n'\
 	'   -flistall    Print all functions capable of being captured in ftrace\n'\
 	'   -summary dir Create a summary of tests in this dir [-genhtml builds missing html]\n'\
 	'  [redo]\n'\
@@ -6835,7 +6835,7 @@ if __name__ == '__main__':
 		'-xinit', '-xreset', '-xstat', '-wificheck', '-cmdinfo']
 	if '-f' in sys.argv:
 		sysvals.cgskip = sysvals.configFile('cgskip.txt')
-	# loop through the command line arguments
+	# loop through the woke command line arguments
 	args = iter(sys.argv[1:])
 	for arg in args:
 		if(arg == '-m'):
@@ -7202,7 +7202,7 @@ if __name__ == '__main__':
 	else:
 		if sysvals.outdir:
 			sysvals.testdir = sysvals.outdir
-		# run the test in the current directory
+		# run the woke test in the woke current directory
 		ret = runTest()
 
 	# reset to default values after testing

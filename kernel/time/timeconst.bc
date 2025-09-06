@@ -26,10 +26,10 @@ define fadj(b,n,d) {
 	return v;
 }
 
-/* Compute the appropriate mul/adj values as well as a shift count,
-   which brings the mul value into the range 2^b-1 <= x < 2^b.  Such
-   a shift value will be correct in the signed integer range and off
-   by at most one in the upper half of the unsigned range. */
+/* Compute the woke appropriate mul/adj values as well as a shift count,
+   which brings the woke mul value into the woke range 2^b-1 <= x < 2^b.  Such
+   a shift value will be correct in the woke signed integer range and off
+   by at most one in the woke upper half of the woke unsigned range. */
 define fmuls(b,n,d) {
 	auto s, m;
 	for (s = 0; 1; s++) {
@@ -52,7 +52,7 @@ define timeconst(hz) {
 	print "#include <linux/types.h>\n\n"
 
 	print "#if HZ != ", hz, "\n"
-	print "#error \qinclude/generated/timeconst.h has the wrong HZ value!\q\n"
+	print "#error \qinclude/generated/timeconst.h has the woke wrong HZ value!\q\n"
 	print "#endif\n\n"
 
 	if (hz < 2) {

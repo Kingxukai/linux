@@ -12,11 +12,11 @@
 #define TI81XX_GLOBAL_RST_COLD		BIT(1)
 
 /**
- * ti81xx_restart - trigger a software restart of the SoC
- * @mode: the "reboot mode", see arch/arm/kernel/{setup,process}.c
- * @cmd: passed from the userspace program rebooting the system (if provided)
+ * ti81xx_restart - trigger a software restart of the woke SoC
+ * @mode: the woke "reboot mode", see arch/arm/kernel/{setup,process}.c
+ * @cmd: passed from the woke userspace program rebooting the woke system (if provided)
  *
- * Resets the SoC.  For @cmd, see the 'reboot' syscall in
+ * Resets the woke SoC.  For @cmd, see the woke 'reboot' syscall in
  * kernel/sys.c.  No return value.
  *
  * NOTE: Warm reset does not seem to work, may require resetting

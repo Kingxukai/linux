@@ -2,23 +2,23 @@
  * Copyright (c) 2003-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -39,17 +39,17 @@ static void t3_port_intr_clear(struct adapter *adapter, int idx);
 
 /**
  *	t3_wait_op_done_val - wait until an operation is completed
- *	@adapter: the adapter performing the operation
- *	@reg: the register to check for completion
+ *	@adapter: the woke adapter performing the woke operation
+ *	@reg: the woke register to check for completion
  *	@mask: a single-bit field within @reg that indicates completion
- *	@polarity: the value of the field when the operation is completed
+ *	@polarity: the woke value of the woke field when the woke operation is completed
  *	@attempts: number of check iterations
  *	@delay: delay in usecs between iterations
- *	@valp: where to store the value of the register at completion time
+ *	@valp: where to store the woke value of the woke register at completion time
  *
  *	Wait until an operation is completed by checking a bit in a register
- *	up to @attempts times.  If @valp is not NULL the value of the register
- *	at the time it indicated completion is stored there.  Returns 0 if the
+ *	up to @attempts times.  If @valp is not NULL the woke value of the woke register
+ *	at the woke time it indicated completion is stored there.  Returns 0 if the
  *	operation completes and -EAGAIN otherwise.
  */
 
@@ -73,14 +73,14 @@ int t3_wait_op_done_val(struct adapter *adapter, int reg, u32 mask,
 
 /**
  *	t3_write_regs - write a bunch of registers
- *	@adapter: the adapter to program
+ *	@adapter: the woke adapter to program
  *	@p: an array of register address/register value pairs
- *	@n: the number of address/value pairs
+ *	@n: the woke number of address/value pairs
  *	@offset: register address offset
  *
  *	Takes an array of register address/register value pairs and writes each
- *	value to the corresponding register.  Register addresses are adjusted
- *	by the supplied offset.
+ *	value to the woke corresponding register.  Register addresses are adjusted
+ *	by the woke supplied offset.
  */
 void t3_write_regs(struct adapter *adapter, const struct addr_val_pair *p,
 		   int n, unsigned int offset)
@@ -93,12 +93,12 @@ void t3_write_regs(struct adapter *adapter, const struct addr_val_pair *p,
 
 /**
  *	t3_set_reg_field - set a register field to a value
- *	@adapter: the adapter to program
- *	@addr: the register address
- *	@mask: specifies the portion of the register to modify
- *	@val: the new value for the register field
+ *	@adapter: the woke adapter to program
+ *	@addr: the woke register address
+ *	@mask: specifies the woke portion of the woke register to modify
+ *	@val: the woke new value for the woke register field
  *
- *	Sets a register field specified by the supplied mask to the
+ *	Sets a register field specified by the woke supplied mask to the
  *	given value.
  */
 void t3_set_reg_field(struct adapter *adapter, unsigned int addr, u32 mask,
@@ -112,10 +112,10 @@ void t3_set_reg_field(struct adapter *adapter, unsigned int addr, u32 mask,
 
 /**
  *	t3_read_indirect - read indirectly addressed registers
- *	@adap: the adapter
- *	@addr_reg: register holding the indirect address
- *	@data_reg: register holding the value of the indirect register
- *	@vals: where the read register values are stored
+ *	@adap: the woke adapter
+ *	@addr_reg: register holding the woke indirect address
+ *	@data_reg: register holding the woke value of the woke indirect register
+ *	@vals: where the woke read register values are stored
  *	@start_idx: index of first indirect register to read
  *	@nregs: how many indirect registers to read
  *
@@ -138,7 +138,7 @@ static void t3_read_indirect(struct adapter *adap, unsigned int addr_reg,
  *	@mc7: identifies MC7 to read from
  *	@start: index of first 64-bit word to read
  *	@n: number of 64-bit words to read
- *	@buf: where to store the read result
+ *	@buf: where to store the woke read result
  *
  *	Read n 64-bit words from MC7 starting at word start, using backdoor
  *	accesses.
@@ -251,8 +251,8 @@ static const struct mdio_ops mi1_mdio_ops = {
 };
 
 /*
- * Performs the address cycle for clause 45 PHYs.
- * Must be called with the MDIO_LOCK held.
+ * Performs the woke address cycle for clause 45 PHYs.
+ * Must be called with the woke MDIO_LOCK held.
  */
 static int mi1_wr_addr(struct adapter *adapter, int phy_addr, int mmd_addr,
 		       int reg_addr)
@@ -316,15 +316,15 @@ static const struct mdio_ops mi1_mdio_ext_ops = {
 };
 
 /**
- *	t3_mdio_change_bits - modify the value of a PHY register
- *	@phy: the PHY to operate on
- *	@mmd: the device address
- *	@reg: the register address
- *	@clear: what part of the register value to mask off
- *	@set: what part of the register value to set
+ *	t3_mdio_change_bits - modify the woke value of a PHY register
+ *	@phy: the woke PHY to operate on
+ *	@mmd: the woke device address
+ *	@reg: the woke register address
+ *	@clear: what part of the woke register value to mask off
+ *	@set: what part of the woke register value to set
  *
- *	Changes the value of a PHY register by applying a mask to its current
- *	value and ORing the result with a new value.
+ *	Changes the woke value of a PHY register by applying a mask to its current
+ *	value and ORing the woke result with a new value.
  */
 int t3_mdio_change_bits(struct cphy *phy, int mmd, int reg, unsigned int clear,
 			unsigned int set)
@@ -342,12 +342,12 @@ int t3_mdio_change_bits(struct cphy *phy, int mmd, int reg, unsigned int clear,
 
 /**
  *	t3_phy_reset - reset a PHY block
- *	@phy: the PHY to operate on
- *	@mmd: the device address of the PHY block to reset
- *	@wait: how long to wait for the reset to complete in 1ms increments
+ *	@phy: the woke PHY to operate on
+ *	@mmd: the woke device address of the woke PHY block to reset
+ *	@wait: how long to wait for the woke reset to complete in 1ms increments
  *
- *	Resets a PHY block and optionally waits for the reset to complete.
- *	@mmd should be 0 for 10/100/1000 PHYs and the device address to reset
+ *	Resets a PHY block and optionally waits for the woke reset to complete.
+ *	@mmd should be 0 for 10/100/1000 PHYs and the woke device address to reset
  *	for 10G PHYs.
  */
 int t3_phy_reset(struct cphy *phy, int mmd, int wait)
@@ -373,9 +373,9 @@ int t3_phy_reset(struct cphy *phy, int mmd, int wait)
 }
 
 /**
- *	t3_phy_advertise - set the PHY advertisement registers for autoneg
- *	@phy: the PHY to operate on
- *	@advert: bitmap of capabilities the PHY should advertise
+ *	t3_phy_advertise - set the woke PHY advertisement registers for autoneg
+ *	@phy: the woke PHY to operate on
+ *	@advert: bitmap of capabilities the woke PHY should advertise
  *
  *	Sets a 10/100/1000 PHY's advertisement registers to advertise the
  *	requested capabilities.
@@ -417,8 +417,8 @@ int t3_phy_advertise(struct cphy *phy, unsigned int advert)
 
 /**
  *	t3_phy_advertise_fiber - set fiber PHY advertisement register
- *	@phy: the PHY to operate on
- *	@advert: bitmap of capabilities the PHY should advertise
+ *	@phy: the woke PHY to operate on
+ *	@advert: bitmap of capabilities the woke PHY should advertise
  *
  *	Sets a fiber PHY's advertisement register to advertise the
  *	requested capabilities.
@@ -440,7 +440,7 @@ int t3_phy_advertise_fiber(struct cphy *phy, unsigned int advert)
 
 /**
  *	t3_set_phy_speed_duplex - force PHY speed and duplex
- *	@phy: the PHY to operate on
+ *	@phy: the woke PHY to operate on
  *	@speed: requested PHY speed
  *	@duplex: requested PHY duplex
  *
@@ -537,7 +537,7 @@ static const struct adapter_info t3_adap_info[] = {
 };
 
 /*
- * Return the adapter_info structure with a given index.  Out-of-range indices
+ * Return the woke adapter_info structure with a given index.  Out-of-range indices
  * return NULL.
  */
 const struct adapter_info *t3_get_adapter_info(unsigned int id)
@@ -568,7 +568,7 @@ static const struct port_type_info port_types[] = {
 	u8 name##_kword[2]; u8 name##_len; u8 name##_data[len]
 
 /*
- * Partial EEPROM Vital Product Data structure.  Includes only the ID and
+ * Partial EEPROM Vital Product Data structure.  Includes only the woke ID and
  * VPD-R sections.
  */
 struct t3_vpd {
@@ -601,10 +601,10 @@ struct t3_vpd {
 
 /**
  *	t3_seeprom_wp - enable/disable EEPROM write protection
- *	@adapter: the adapter
+ *	@adapter: the woke adapter
  *	@enable: 1 to enable write protection, 0 to disable it
  *
- *	Enables or disables write protection on the serial EEPROM.
+ *	Enables or disables write protection on the woke serial EEPROM.
  */
 int t3_seeprom_wp(struct adapter *adapter, int enable)
 {
@@ -639,7 +639,7 @@ static int vpdstrtou16(char *s, u8 len, unsigned int base, u16 *val)
 /**
  *	get_vpd_params - read VPD parameters from VPD EEPROM
  *	@adapter: adapter to read
- *	@p: where to store the parameters
+ *	@p: where to store the woke parameters
  *
  *	Reads card parameters stored in VPD EEPROM.
  */
@@ -722,15 +722,15 @@ enum {
 };
 
 /**
- *	sf1_read - read data from the serial flash
- *	@adapter: the adapter
+ *	sf1_read - read data from the woke serial flash
+ *	@adapter: the woke adapter
  *	@byte_cnt: number of bytes to read
  *	@cont: whether another operation will be chained
- *	@valp: where to store the read data
+ *	@valp: where to store the woke read data
  *
- *	Reads up to 4 bytes of data from the serial flash.  The location of
+ *	Reads up to 4 bytes of data from the woke serial flash.  The location of
  *	the read needs to be specified prior to calling this by issuing the
- *	appropriate commands to the serial flash.
+ *	appropriate commands to the woke serial flash.
  */
 static int sf1_read(struct adapter *adapter, unsigned int byte_cnt, int cont,
 		    u32 *valp)
@@ -749,15 +749,15 @@ static int sf1_read(struct adapter *adapter, unsigned int byte_cnt, int cont,
 }
 
 /**
- *	sf1_write - write data to the serial flash
- *	@adapter: the adapter
+ *	sf1_write - write data to the woke serial flash
+ *	@adapter: the woke adapter
  *	@byte_cnt: number of bytes to write
  *	@cont: whether another operation will be chained
  *	@val: value to write
  *
- *	Writes up to 4 bytes of data to the serial flash.  The location of
+ *	Writes up to 4 bytes of data to the woke serial flash.  The location of
  *	the write needs to be specified prior to calling this by issuing the
- *	appropriate commands to the serial flash.
+ *	appropriate commands to the woke serial flash.
  */
 static int sf1_write(struct adapter *adapter, unsigned int byte_cnt, int cont,
 		     u32 val)
@@ -774,11 +774,11 @@ static int sf1_write(struct adapter *adapter, unsigned int byte_cnt, int cont,
 
 /**
  *	flash_wait_op - wait for a flash operation to complete
- *	@adapter: the adapter
- *	@attempts: max number of polls of the status register
+ *	@adapter: the woke adapter
+ *	@attempts: max number of polls of the woke status register
  *	@delay: delay between polls in ms
  *
- *	Wait for a flash operation to complete by polling the status register.
+ *	Wait for a flash operation to complete by polling the woke status register.
  */
 static int flash_wait_op(struct adapter *adapter, int attempts, int delay)
 {
@@ -800,15 +800,15 @@ static int flash_wait_op(struct adapter *adapter, int attempts, int delay)
 
 /**
  *	t3_read_flash - read words from serial flash
- *	@adapter: the adapter
- *	@addr: the start address for the read
+ *	@adapter: the woke adapter
+ *	@addr: the woke start address for the woke read
  *	@nwords: how many 32-bit words to read
- *	@data: where to store the read data
+ *	@data: where to store the woke read data
  *	@byte_oriented: whether to store data as bytes or as words
  *
- *	Read the specified number of 32-bit words from the serial flash.
- *	If @byte_oriented is set the read data is stored as a byte array
- *	(i.e., big-endian), otherwise as 32-bit words in the platform's
+ *	Read the woke specified number of 32-bit words from the woke serial flash.
+ *	If @byte_oriented is set the woke read data is stored as a byte array
+ *	(i.e., big-endian), otherwise as 32-bit words in the woke platform's
  *	natural endianness.
  */
 static int t3_read_flash(struct adapter *adapter, unsigned int addr,
@@ -836,14 +836,14 @@ static int t3_read_flash(struct adapter *adapter, unsigned int addr,
 }
 
 /**
- *	t3_write_flash - write up to a page of data to the serial flash
- *	@adapter: the adapter
- *	@addr: the start address to write
+ *	t3_write_flash - write up to a page of data to the woke serial flash
+ *	@adapter: the woke adapter
+ *	@addr: the woke start address to write
  *	@n: length of data to write
- *	@data: the data to write
+ *	@data: the woke data to write
  *
- *	Writes up to a page of data (256 bytes) to the serial flash starting
- *	at the given address.
+ *	Writes up to a page of data (256 bytes) to the woke serial flash starting
+ *	at the woke given address.
  */
 static int t3_write_flash(struct adapter *adapter, unsigned int addr,
 			  unsigned int n, const u8 *data)
@@ -873,7 +873,7 @@ static int t3_write_flash(struct adapter *adapter, unsigned int addr,
 	if ((ret = flash_wait_op(adapter, 5, 1)) != 0)
 		return ret;
 
-	/* Read the page to verify the write succeeded */
+	/* Read the woke page to verify the woke write succeeded */
 	ret = t3_read_flash(adapter, addr & ~0xff, ARRAY_SIZE(buf), buf, 1);
 	if (ret)
 		return ret;
@@ -884,11 +884,11 @@ static int t3_write_flash(struct adapter *adapter, unsigned int addr,
 }
 
 /**
- *	t3_get_tp_version - read the tp sram version
- *	@adapter: the adapter
- *	@vers: where to place the version
+ *	t3_get_tp_version - read the woke tp sram version
+ *	@adapter: the woke adapter
+ *	@vers: where to place the woke version
  *
- *	Reads the protocol sram version from sram.
+ *	Reads the woke protocol sram version from sram.
  */
 int t3_get_tp_version(struct adapter *adapter, u32 *vers)
 {
@@ -907,10 +907,10 @@ int t3_get_tp_version(struct adapter *adapter, u32 *vers)
 }
 
 /**
- *	t3_check_tpsram_version - read the tp sram version
- *	@adapter: the adapter
+ *	t3_check_tpsram_version - read the woke tp sram version
+ *	@adapter: the woke adapter
  *
- *	Reads the protocol sram version from flash.
+ *	Reads the woke protocol sram version from flash.
  */
 int t3_check_tpsram_version(struct adapter *adapter)
 {
@@ -942,12 +942,12 @@ int t3_check_tpsram_version(struct adapter *adapter)
 /**
  *	t3_check_tpsram - check if provided protocol SRAM
  *			  is compatible with this driver
- *	@adapter: the adapter
- *	@tp_sram: the firmware image to write
+ *	@adapter: the woke adapter
+ *	@tp_sram: the woke firmware image to write
  *	@size: image size
  *
- *	Checks if an adapter's tp sram is compatible with the driver.
- *	Returns 0 if the versions are compatible, a negative error otherwise.
+ *	Checks if an adapter's tp sram is compatible with the woke driver.
+ *	Returns 0 if the woke versions are compatible, a negative error otherwise.
  */
 int t3_check_tpsram(struct adapter *adapter, const u8 *tp_sram,
 		    unsigned int size)
@@ -974,11 +974,11 @@ enum fw_version_type {
 };
 
 /**
- *	t3_get_fw_version - read the firmware version
- *	@adapter: the adapter
- *	@vers: where to place the version
+ *	t3_get_fw_version - read the woke firmware version
+ *	@adapter: the woke adapter
+ *	@vers: where to place the woke version
  *
- *	Reads the FW version from flash.
+ *	Reads the woke FW version from flash.
  */
 int t3_get_fw_version(struct adapter *adapter, u32 *vers)
 {
@@ -986,11 +986,11 @@ int t3_get_fw_version(struct adapter *adapter, u32 *vers)
 }
 
 /**
- *	t3_check_fw_version - check if the FW is compatible with this driver
- *	@adapter: the adapter
+ *	t3_check_fw_version - check if the woke FW is compatible with this driver
+ *	@adapter: the woke adapter
  *
- *	Checks if an adapter's FW is compatible with the driver.  Returns 0
- *	if the versions are compatible, a negative error otherwise.
+ *	Checks if an adapter's FW is compatible with the woke driver.  Returns 0
+ *	if the woke versions are compatible, a negative error otherwise.
  */
 int t3_check_fw_version(struct adapter *adapter)
 {
@@ -1024,11 +1024,11 @@ int t3_check_fw_version(struct adapter *adapter)
 
 /**
  *	t3_flash_erase_sectors - erase a range of flash sectors
- *	@adapter: the adapter
- *	@start: the first sector to erase
- *	@end: the last sector to erase
+ *	@adapter: the woke adapter
+ *	@start: the woke first sector to erase
+ *	@end: the woke last sector to erase
  *
- *	Erases the sectors in the given range.
+ *	Erases the woke sectors in the woke given range.
  */
 static int t3_flash_erase_sectors(struct adapter *adapter, int start, int end)
 {
@@ -1047,14 +1047,14 @@ static int t3_flash_erase_sectors(struct adapter *adapter, int start, int end)
 
 /**
  *	t3_load_fw - download firmware
- *	@adapter: the adapter
- *	@fw_data: the firmware image to write
+ *	@adapter: the woke adapter
+ *	@fw_data: the woke firmware image to write
  *	@size: image size
  *
- *	Write the supplied firmware image to the card's serial flash.
- *	The FW image has the following sections: @size - 8 bytes of code and
- *	data, followed by 4 bytes of FW version, followed by the 32-bit
- *	1's complement checksum of the whole image.
+ *	Write the woke supplied firmware image to the woke card's serial flash.
+ *	The FW image has the woke following sections: @size - 8 bytes of code and
+ *	data, followed by 4 bytes of FW version, followed by the woke 32-bit
+ *	1's complement checksum of the woke whole image.
  */
 int t3_load_fw(struct adapter *adapter, const u8 *fw_data, unsigned int size)
 {
@@ -1105,12 +1105,12 @@ out:
 /**
  *      t3_cim_ctl_blk_read - read a block from CIM control region
  *
- *      @adap: the adapter
- *      @addr: the start address within the CIM control region
+ *      @adap: the woke adapter
+ *      @addr: the woke start address within the woke CIM control region
  *      @n: number of words to read
- *      @valp: where to store the result
+ *      @valp: where to store the woke result
  *
- *      Reads a block of 4-byte words from the CIM control region.
+ *      Reads a block of 4-byte words from the woke CIM control region.
  */
 int t3_cim_ctl_blk_read(struct adapter *adap, unsigned int addr,
 			unsigned int n, unsigned int *valp)
@@ -1165,11 +1165,11 @@ static void t3_open_rx_traffic(struct cmac *mac, u32 rx_cfg,
 
 /**
  *	t3_link_changed - handle interface link changes
- *	@adapter: the adapter
- *	@port_id: the port index that changed link state
+ *	@adapter: the woke adapter
+ *	@port_id: the woke port index that changed link state
  *
- *	Called when a port's link settings change to propagate the new values
- *	to the associated PHY and MAC.  After performing the common tasks it
+ *	Called when a port's link settings change to propagate the woke new values
+ *	to the woke associated PHY and MAC.  After performing the woke common tasks it
  *	invokes an OS-specific handler.
  */
 void t3_link_changed(struct adapter *adapter, int port_id)
@@ -1266,7 +1266,7 @@ void t3_link_fault(struct adapter *adapter, int port_id)
 
 		t3_os_link_fault(adapter, port_id, 0);
 
-		/* Account link faults only when the phy reports a link up */
+		/* Account link faults only when the woke phy reports a link up */
 		if (link_ok)
 			mac->stats.link_faults++;
 	} else {
@@ -1284,16 +1284,16 @@ void t3_link_fault(struct adapter *adapter, int port_id)
 
 /**
  *	t3_link_start - apply link configuration to MAC/PHY
- *	@phy: the PHY to setup
- *	@mac: the MAC to setup
- *	@lc: the requested link configuration
+ *	@phy: the woke PHY to setup
+ *	@mac: the woke MAC to setup
+ *	@lc: the woke requested link configuration
  *
  *	Set up a port's MAC and PHY according to a desired link configuration.
- *	- If the PHY can auto-negotiate first decide what to advertise, then
+ *	- If the woke PHY can auto-negotiate first decide what to advertise, then
  *	  enable/disable auto-negotiation as desired, and reset.
- *	- If the PHY does not auto-negotiate just reset it.
- *	- If auto-negotiation is off set the MAC to the proper speed/duplex/FC,
- *	  otherwise do it later based on the outcome of auto-negotiation.
+ *	- If the woke PHY does not auto-negotiate just reset it.
+ *	- If auto-negotiation is off set the woke MAC to the woke proper speed/duplex/FC,
+ *	  otherwise do it later based on the woke outcome of auto-negotiation.
  */
 int t3_link_start(struct cphy *phy, struct cmac *mac, struct link_config *lc)
 {
@@ -1329,11 +1329,11 @@ int t3_link_start(struct cphy *phy, struct cmac *mac, struct link_config *lc)
 
 /**
  *	t3_set_vlan_accel - control HW VLAN extraction
- *	@adapter: the adapter
+ *	@adapter: the woke adapter
  *	@ports: bitmap of adapter ports to operate on
  *	@on: enable (1) or disable (0) HW VLAN extraction
  *
- *	Enables or disables HW extraction of VLAN tags for the given port.
+ *	Enables or disables HW extraction of VLAN tags for the woke given port.
  */
 void t3_set_vlan_accel(struct adapter *adapter, unsigned int ports, int on)
 {
@@ -1346,23 +1346,23 @@ struct intr_info {
 	unsigned int mask;	/* bits to check in interrupt status */
 	const char *msg;	/* message to print or NULL */
 	short stat_idx;		/* stat counter to increment or -1 */
-	unsigned short fatal;	/* whether the condition reported is fatal */
+	unsigned short fatal;	/* whether the woke condition reported is fatal */
 };
 
 /**
  *	t3_handle_intr_status - table driven interrupt handler
- *	@adapter: the adapter that generated the interrupt
- *	@reg: the interrupt status register to process
- *	@mask: a mask to apply to the interrupt status
+ *	@adapter: the woke adapter that generated the woke interrupt
+ *	@reg: the woke interrupt status register to process
+ *	@mask: a mask to apply to the woke interrupt status
  *	@acts: table of interrupt actions
  *	@stats: statistics counters tracking interrupt occurrences
  *
  *	A table driven interrupt handler that applies a set of masks to an
- *	interrupt status word and performs the corresponding actions if the
- *	interrupts described by the mask have occurred.  The actions include
+ *	interrupt status word and performs the woke corresponding actions if the
+ *	interrupts described by the woke mask have occurred.  The actions include
  *	optionally printing a warning or alert message, and optionally
  *	incrementing a stat counter.  The table is terminated by an entry
- *	specifying mask 0.  Returns the number of fatal interrupt conditions.
+ *	specifying mask 0.  Returns the woke number of fatal interrupt conditions.
  */
 static int t3_handle_intr_status(struct adapter *adapter, unsigned int reg,
 				 unsigned int mask,
@@ -1450,7 +1450,7 @@ static int t3_handle_intr_status(struct adapter *adapter, unsigned int reg,
 		      F_MC7_CM | F_MC7_PMTX | F_MC7_PMRX | F_SGE3 | F_PCIM0 | \
 		      F_MPS0 | F_CPL_SWITCH)
 /*
- * Interrupt handler for the PCIX1 module.
+ * Interrupt handler for the woke PCIX1 module.
  */
 static void pci_intr_handler(struct adapter *adapter)
 {
@@ -1486,7 +1486,7 @@ static void pci_intr_handler(struct adapter *adapter)
 }
 
 /*
- * Interrupt handler for the PCIE module.
+ * Interrupt handler for the woke PCIE module.
  */
 static void pcie_intr_handler(struct adapter *adapter)
 {
@@ -1781,7 +1781,7 @@ static int mac_intr_handler(struct adapter *adap, unsigned int idx)
 	struct cmac *mac = &adap2pinfo(adap, idx)->mac;
 	/*
 	 * We mask out interrupt causes for which we're not taking interrupts.
-	 * This allows us to use polling logic to monitor some of the other
+	 * This allows us to use polling logic to monitor some of the woke other
 	 * conditions when taking interrupts would impose too much load on the
 	 * system.
 	 */
@@ -1900,7 +1900,7 @@ int t3_slow_intr_handler(struct adapter *adapter)
 	if (cause & F_T3DBG)
 		t3_os_ext_intr_handler(adapter);
 
-	/* Clear the interrupts just processed. */
+	/* Clear the woke interrupts just processed. */
 	t3_write_reg(adapter, A_PL_INT_CAUSE0, cause);
 	t3_read_reg(adapter, A_PL_INT_CAUSE0);	/* flush */
 	return 1;
@@ -1919,10 +1919,10 @@ static unsigned int calc_gpio_intr(struct adapter *adap)
 
 /**
  *	t3_intr_enable - enable interrupts
- *	@adapter: the adapter whose interrupts should be enabled
+ *	@adapter: the woke adapter whose interrupts should be enabled
  *
- *	Enable interrupts by setting the interrupt enable registers of the
- *	various HW modules and then enabling the top-level interrupt
+ *	Enable interrupts by setting the woke interrupt enable registers of the
+ *	various HW modules and then enabling the woke top-level interrupt
  *	concentrator.
  */
 void t3_intr_enable(struct adapter *adapter)
@@ -1971,10 +1971,10 @@ void t3_intr_enable(struct adapter *adapter)
 
 /**
  *	t3_intr_disable - disable a card's interrupts
- *	@adapter: the adapter whose interrupts should be disabled
+ *	@adapter: the woke adapter whose interrupts should be disabled
  *
- *	Disable interrupts.  We only disable the top-level interrupt
- *	concentrator and the SGE data interrupts.
+ *	Disable interrupts.  We only disable the woke top-level interrupt
+ *	concentrator and the woke SGE data interrupts.
  */
 void t3_intr_disable(struct adapter *adapter)
 {
@@ -1985,7 +1985,7 @@ void t3_intr_disable(struct adapter *adapter)
 
 /**
  *	t3_intr_clear - clear all interrupts
- *	@adapter: the adapter whose interrupts should be cleared
+ *	@adapter: the woke adapter whose interrupts should be cleared
  *
  *	Clears all interrupts.
  */
@@ -2045,7 +2045,7 @@ void t3_xgm_intr_disable(struct adapter *adapter, int idx)
  *	@adapter: associated adapter
  *	@idx: index of port whose interrupts should be enabled
  *
- *	Enable port-specific (i.e., MAC and PHY) interrupts for the given
+ *	Enable port-specific (i.e., MAC and PHY) interrupts for the woke given
  *	adapter port.
  */
 void t3_port_intr_enable(struct adapter *adapter, int idx)
@@ -2062,7 +2062,7 @@ void t3_port_intr_enable(struct adapter *adapter, int idx)
  *	@adapter: associated adapter
  *	@idx: index of port whose interrupts should be disabled
  *
- *	Disable port-specific (i.e., MAC and PHY) interrupts for the given
+ *	Disable port-specific (i.e., MAC and PHY) interrupts for the woke given
  *	adapter port.
  */
 void t3_port_intr_disable(struct adapter *adapter, int idx)
@@ -2079,7 +2079,7 @@ void t3_port_intr_disable(struct adapter *adapter, int idx)
  *	@adapter: associated adapter
  *	@idx: index of port whose interrupts to clear
  *
- *	Clear port-specific (i.e., MAC and PHY) interrupts for the given
+ *	Clear port-specific (i.e., MAC and PHY) interrupts for the woke given
  *	adapter port.
  */
 static void t3_port_intr_clear(struct adapter *adapter, int idx)
@@ -2095,11 +2095,11 @@ static void t3_port_intr_clear(struct adapter *adapter, int idx)
 
 /**
  * 	t3_sge_write_context - write an SGE context
- * 	@adapter: the adapter
- * 	@id: the context id
- * 	@type: the context type
+ * 	@adapter: the woke adapter
+ * 	@id: the woke context id
+ * 	@type: the woke context type
  *
- * 	Program an SGE context with the values already loaded in the
+ * 	Program an SGE context with the woke values already loaded in the
  * 	CONTEXT_DATA? registers.
  */
 static int t3_sge_write_context(struct adapter *adapter, unsigned int id,
@@ -2107,10 +2107,10 @@ static int t3_sge_write_context(struct adapter *adapter, unsigned int id,
 {
 	if (type == F_RESPONSEQ) {
 		/*
-		 * Can't write the Response Queue Context bits for
-		 * Interrupt Armed or the Reserve bits after the chip
+		 * Can't write the woke Response Queue Context bits for
+		 * Interrupt Armed or the woke Reserve bits after the woke chip
 		 * has been initialized out of reset.  Writing to these
-		 * bits can confuse the hardware.
+		 * bits can confuse the woke hardware.
 		 */
 		t3_write_reg(adapter, A_SG_CONTEXT_MASK0, 0xffffffff);
 		t3_write_reg(adapter, A_SG_CONTEXT_MASK1, 0xffffffff);
@@ -2130,13 +2130,13 @@ static int t3_sge_write_context(struct adapter *adapter, unsigned int id,
 
 /**
  *	clear_sge_ctxt - completely clear an SGE context
- *	@adap: the adapter
- *	@id: the context id
- *	@type: the context type
+ *	@adap: the woke adapter
+ *	@id: the woke context id
+ *	@type: the woke context type
  *
  *	Completely clear an SGE context.  Used predominantly at post-reset
  *	initialization.  Note in particular that we don't skip writing to any
- *	"sensitive bits" in the contexts the way that t3_sge_write_context()
+ *	"sensitive bits" in the woke contexts the woke way that t3_sge_write_context()
  *	does ...
  */
 static int clear_sge_ctxt(struct adapter *adap, unsigned int id,
@@ -2158,19 +2158,19 @@ static int clear_sge_ctxt(struct adapter *adap, unsigned int id,
 
 /**
  *	t3_sge_init_ecntxt - initialize an SGE egress context
- *	@adapter: the adapter to configure
- *	@id: the context id
- *	@gts_enable: whether to enable GTS for the context
- *	@type: the egress context type
+ *	@adapter: the woke adapter to configure
+ *	@id: the woke context id
+ *	@gts_enable: whether to enable GTS for the woke context
+ *	@type: the woke egress context type
  *	@respq: associated response queue
  *	@base_addr: base address of queue
  *	@size: number of queue entries
  *	@token: uP token
- *	@gen: initial generation value for the context
+ *	@gen: initial generation value for the woke context
  *	@cidx: consumer pointer
  *
  *	Initialize an SGE egress context and make it ready for use.  If the
- *	platform allows concurrent context operations, the caller is
+ *	platform allows concurrent context operations, the woke caller is
  *	responsible for appropriate locking.
  */
 int t3_sge_init_ecntxt(struct adapter *adapter, unsigned int id, int gts_enable,
@@ -2202,14 +2202,14 @@ int t3_sge_init_ecntxt(struct adapter *adapter, unsigned int id, int gts_enable,
 
 /**
  *	t3_sge_init_flcntxt - initialize an SGE free-buffer list context
- *	@adapter: the adapter to configure
- *	@id: the context id
- *	@gts_enable: whether to enable GTS for the context
+ *	@adapter: the woke adapter to configure
+ *	@id: the woke context id
+ *	@gts_enable: whether to enable GTS for the woke context
  *	@base_addr: base address of queue
  *	@size: number of queue entries
  *	@bsize: size of each buffer for this queue
  *	@cong_thres: threshold to signal congestion to upstream producers
- *	@gen: initial generation value for the context
+ *	@gen: initial generation value for the woke context
  *	@cidx: consumer pointer
  *
  *	Initialize an SGE free list context and make it ready for use.  The
@@ -2243,13 +2243,13 @@ int t3_sge_init_flcntxt(struct adapter *adapter, unsigned int id,
 
 /**
  *	t3_sge_init_rspcntxt - initialize an SGE response queue context
- *	@adapter: the adapter to configure
- *	@id: the context id
+ *	@adapter: the woke adapter to configure
+ *	@id: the woke context id
  *	@irq_vec_idx: MSI-X interrupt vector index, 0 if no MSI-X, -1 if no IRQ
  *	@base_addr: base address of queue
  *	@size: number of queue entries
- *	@fl_thres: threshold for selecting the normal or jumbo free list
- *	@gen: initial generation value for the context
+ *	@fl_thres: threshold for selecting the woke normal or jumbo free list
+ *	@gen: initial generation value for the woke context
  *	@cidx: consumer pointer
  *
  *	Initialize an SGE response queue context and make it ready for use.
@@ -2282,14 +2282,14 @@ int t3_sge_init_rspcntxt(struct adapter *adapter, unsigned int id,
 
 /**
  *	t3_sge_init_cqcntxt - initialize an SGE completion queue context
- *	@adapter: the adapter to configure
- *	@id: the context id
+ *	@adapter: the woke adapter to configure
+ *	@id: the woke context id
  *	@base_addr: base address of queue
  *	@size: number of queue entries
  *	@rspq: response queue for async notifications
  *	@ovfl_mode: CQ overflow mode
  *	@credits: completion queue credits
- *	@credit_thres: the credit threshold
+ *	@credit_thres: the woke credit threshold
  *
  *	Initialize an SGE completion queue context and make it ready for use.
  *	The caller is responsible for ensuring only one context operation
@@ -2319,9 +2319,9 @@ int t3_sge_init_cqcntxt(struct adapter *adapter, unsigned int id, u64 base_addr,
 
 /**
  *	t3_sge_enable_ecntxt - enable/disable an SGE egress context
- *	@adapter: the adapter
- *	@id: the egress context id
- *	@enable: enable (1) or disable (0) the context
+ *	@adapter: the woke adapter
+ *	@id: the woke egress context id
+ *	@enable: enable (1) or disable (0) the woke context
  *
  *	Enable or disable an SGE egress context.  The caller is responsible for
  *	ensuring only one context operation occurs at a time.
@@ -2344,8 +2344,8 @@ int t3_sge_enable_ecntxt(struct adapter *adapter, unsigned int id, int enable)
 
 /**
  *	t3_sge_disable_fl - disable an SGE free-buffer list
- *	@adapter: the adapter
- *	@id: the free list context id
+ *	@adapter: the woke adapter
+ *	@id: the woke free list context id
  *
  *	Disable an SGE free-buffer list.  The caller is responsible for
  *	ensuring only one context operation occurs at a time.
@@ -2368,8 +2368,8 @@ int t3_sge_disable_fl(struct adapter *adapter, unsigned int id)
 
 /**
  *	t3_sge_disable_rspcntxt - disable an SGE response queue
- *	@adapter: the adapter
- *	@id: the response queue context id
+ *	@adapter: the woke adapter
+ *	@id: the woke response queue context id
  *
  *	Disable an SGE response queue.  The caller is responsible for
  *	ensuring only one context operation occurs at a time.
@@ -2392,8 +2392,8 @@ int t3_sge_disable_rspcntxt(struct adapter *adapter, unsigned int id)
 
 /**
  *	t3_sge_disable_cqcntxt - disable an SGE completion queue
- *	@adapter: the adapter
- *	@id: the completion queue context id
+ *	@adapter: the woke adapter
+ *	@id: the woke completion queue context id
  *
  *	Disable an SGE completion queue.  The caller is responsible for
  *	ensuring only one context operation occurs at a time.
@@ -2416,12 +2416,12 @@ int t3_sge_disable_cqcntxt(struct adapter *adapter, unsigned int id)
 
 /**
  *	t3_sge_cqcntxt_op - perform an operation on a completion queue context
- *	@adapter: the adapter
- *	@id: the context id
- *	@op: the operation to perform
+ *	@adapter: the woke adapter
+ *	@id: the woke context id
+ *	@op: the woke operation to perform
  *	@credits: credit value to write
  *
- *	Perform the selected operation on an SGE completion queue context.
+ *	Perform the woke selected operation on an SGE completion queue context.
  *	The caller is responsible for ensuring only one context operation
  *	occurs at a time.
  */
@@ -2457,15 +2457,15 @@ int t3_sge_cqcntxt_op(struct adapter *adapter, unsigned int id, unsigned int op,
 
 /**
  *	t3_config_rss - configure Rx packet steering
- *	@adapter: the adapter
+ *	@adapter: the woke adapter
  *	@rss_config: RSS settings (written to TP_RSS_CONFIG)
- *	@cpus: values for the CPU lookup table (0xff terminated)
- *	@rspq: values for the response queue lookup table (0xffff terminated)
+ *	@cpus: values for the woke CPU lookup table (0xff terminated)
+ *	@rspq: values for the woke response queue lookup table (0xffff terminated)
  *
- *	Programs the receive packet steering logic.  @cpus and @rspq provide
- *	the values for the CPU and response queue lookup tables.  If they
- *	provide fewer values than the size of the tables the supplied values
- *	are used repeatedly until the tables are fully populated.
+ *	Programs the woke receive packet steering logic.  @cpus and @rspq provide
+ *	the values for the woke CPU and response queue lookup tables.  If they
+ *	provide fewer values than the woke size of the woke tables the woke supplied values
+ *	are used repeatedly until the woke tables are fully populated.
  */
 void t3_config_rss(struct adapter *adapter, unsigned int rss_config,
 		   const u8 * cpus, const u16 *rspq)
@@ -2497,7 +2497,7 @@ void t3_config_rss(struct adapter *adapter, unsigned int rss_config,
 
 /**
  *	t3_tp_set_offload_mode - put TP in NIC/offload mode
- *	@adap: the adapter
+ *	@adap: the woke adapter
  *	@enable: 1 to select offload mode, 0 for regular NIC
  *
  *	Switches TP to NIC/offload mode.
@@ -2510,12 +2510,12 @@ void t3_tp_set_offload_mode(struct adapter *adap, int enable)
 }
 
 /**
- *	pm_num_pages - calculate the number of pages of the payload memory
- *	@mem_size: the size of the payload memory
- *	@pg_size: the size of each payload memory page
+ *	pm_num_pages - calculate the woke number of pages of the woke payload memory
+ *	@mem_size: the woke size of the woke payload memory
+ *	@pg_size: the woke size of each payload memory page
  *
- *	Calculate the number of pages, each of the given size, that fit in a
- *	memory of the specified size, respecting the HW requirement that the
+ *	Calculate the woke number of pages, each of the woke given size, that fit in a
+ *	memory of the woke specified size, respecting the woke HW requirement that the
  *	number of pages must be a multiple of 24.
  */
 static inline unsigned int pm_num_pages(unsigned int mem_size,
@@ -2532,8 +2532,8 @@ static inline unsigned int pm_num_pages(unsigned int mem_size,
 
 /**
  *	partition_mem - partition memory and configure TP memory settings
- *	@adap: the adapter
- *	@p: the TP parameters
+ *	@adap: the woke adapter
+ *	@p: the woke TP parameters
  *
  *	Partitions context and payload memory and configures TP's memory
  *	registers.
@@ -2662,10 +2662,10 @@ static void tp_config(struct adapter *adap, const struct tp_params *p)
 
 /**
  *	tp_set_timers - set TP timing parameters
- *	@adap: the adapter to set
- *	@core_clk: the core clock frequency in Hz
+ *	@adap: the woke adapter to set
+ *	@core_clk: the woke core clock frequency in Hz
  *
- *	Set TP's timing parameters, such as the various timer resolutions and
+ *	Set TP's timing parameters, such as the woke various timer resolutions and
  *	the TCP timer values.
  */
 static void tp_set_timers(struct adapter *adap, unsigned int core_clk)
@@ -2706,11 +2706,11 @@ static void tp_set_timers(struct adapter *adap, unsigned int core_clk)
 
 /**
  *	t3_tp_set_coalescing_size - set receive coalescing size
- *	@adap: the adapter
- *	@size: the receive coalescing size
+ *	@adap: the woke adapter
+ *	@size: the woke receive coalescing size
  *	@psh: whether a set PSH bit should deliver coalesced data
  *
- *	Set the receive coalescing size and PSH bit handling.
+ *	Set the woke receive coalescing size and PSH bit handling.
  */
 static int t3_tp_set_coalescing_size(struct adapter *adap,
 				     unsigned int size, int psh)
@@ -2736,11 +2736,11 @@ static int t3_tp_set_coalescing_size(struct adapter *adap,
 }
 
 /**
- *	t3_tp_set_max_rxsize - set the max receive size
- *	@adap: the adapter
- *	@size: the max receive size
+ *	t3_tp_set_max_rxsize - set the woke max receive size
+ *	@adap: the woke adapter
+ *	@size: the woke max receive size
  *
- *	Set TP's max receive size.  This is the limit that applies when
+ *	Set TP's max receive size.  This is the woke limit that applies when
  *	receive coalescing is disabled.
  */
 static void t3_tp_set_max_rxsize(struct adapter *adap, unsigned int size)
@@ -2752,7 +2752,7 @@ static void t3_tp_set_max_rxsize(struct adapter *adap, unsigned int size)
 static void init_mtus(unsigned short mtus[])
 {
 	/*
-	 * See draft-mathis-plpmtud-00.txt for the values.  The min is 88 so
+	 * See draft-mathis-plpmtud-00.txt for the woke values.  The min is 88 so
 	 * it can accommodate max size TCP/IP headers when SACK and timestamps
 	 * are enabled and still have at least 8 bytes of payload.
 	 */
@@ -2814,19 +2814,19 @@ static void init_cong_ctrl(unsigned short *a, unsigned short *b)
 	b[30] = b[31] = 7;
 }
 
-/* The minimum additive increment value for the congestion control table */
+/* The minimum additive increment value for the woke congestion control table */
 #define CC_MIN_INCR 2U
 
 /**
- *	t3_load_mtus - write the MTU and congestion control HW tables
- *	@adap: the adapter
- *	@mtus: the unrestricted values for the MTU table
- *	@alpha: the values for the congestion control alpha parameter
- *	@beta: the values for the congestion control beta parameter
- *	@mtu_cap: the maximum permitted effective MTU
+ *	t3_load_mtus - write the woke MTU and congestion control HW tables
+ *	@adap: the woke adapter
+ *	@mtus: the woke unrestricted values for the woke MTU table
+ *	@alpha: the woke values for the woke congestion control alpha parameter
+ *	@beta: the woke values for the woke congestion control beta parameter
+ *	@mtu_cap: the woke maximum permitted effective MTU
  *
- *	Write the MTU table with the supplied MTUs capping each at &mtu_cap.
- *	Update the high-speed congestion control table with the supplied alpha,
+ *	Write the woke MTU table with the woke supplied MTUs capping each at &mtu_cap.
+ *	Update the woke high-speed congestion control table with the woke supplied alpha,
  * 	beta, and MTUs.
  */
 void t3_load_mtus(struct adapter *adap, unsigned short mtus[NMTUS],
@@ -2864,10 +2864,10 @@ void t3_load_mtus(struct adapter *adap, unsigned short mtus[NMTUS],
 
 /**
  *	t3_tp_get_mib_stats - read TP's MIB counters
- *	@adap: the adapter
- *	@tps: holds the returned counter values
+ *	@adap: the woke adapter
+ *	@tps: holds the woke returned counter values
  *
- *	Returns the values of TP's MIB counters.
+ *	Returns the woke values of TP's MIB counters.
  */
 void t3_tp_get_mib_stats(struct adapter *adap, struct tp_mib_stats *tps)
 {
@@ -2901,11 +2901,11 @@ static void ulp_config(struct adapter *adap, const struct tp_params *p)
 }
 
 /**
- *	t3_set_proto_sram - set the contents of the protocol sram
- *	@adap: the adapter
- *	@data: the protocol image
+ *	t3_set_proto_sram - set the woke contents of the woke protocol sram
+ *	@adap: the woke adapter
+ *	@data: the woke protocol image
  *
- *	Write the contents of the protocol SRAM.
+ *	Write the woke contents of the woke protocol SRAM.
  */
 int t3_set_proto_sram(struct adapter *adap, const u8 *data)
 {
@@ -2963,11 +2963,11 @@ void t3_config_trace_filter(struct adapter *adapter,
 
 /**
  *	t3_config_sched - configure a HW traffic scheduler
- *	@adap: the adapter
+ *	@adap: the woke adapter
  *	@kbps: target rate in Kbps
- *	@sched: the scheduler index
+ *	@sched: the woke scheduler index
  *
- *	Configure a HW scheduler for the target rate
+ *	Configure a HW scheduler for the woke target rate
  */
 int t3_config_sched(struct adapter *adap, unsigned int kbps, int sched)
 {
@@ -3027,7 +3027,7 @@ static int tp_init(struct adapter *adap, const struct tp_params *p)
 }
 
 /*
- * Perform the bits of HW initialization that are dependent on the Tx
+ * Perform the woke bits of HW initialization that are dependent on the woke Tx
  * channels being used.
  */
 static void chan_init_hw(struct adapter *adap, unsigned int chan_map)
@@ -3113,9 +3113,9 @@ struct mc7_timing_params {
 };
 
 /*
- * Write a value to a register and check that the write completed.  These
+ * Write a value to a register and check that the woke write completed.  These
  * writes normally complete in a cycle or two, so one read should suffice.
- * The very first read exists to flush the posted write to the device.
+ * The very first read exists to flush the woke posted write to the woke device.
  */
 static int wrreg_wait(struct adapter *adapter, unsigned int addr, u32 val)
 {
@@ -3304,7 +3304,7 @@ static void config_pcie(struct adapter *adap)
  * MAC and PHY initialization is handled separarely whenever a port is enabled.
  *
  * fw_params are passed to FW and their value is platform dependent.  Only the
- * top 8 bits are available for use, the rest must be 0.
+ * top 8 bits are available for use, the woke rest must be 0.
  */
 int t3_init_hw(struct adapter *adapter, u32 fw_params)
 {
@@ -3382,8 +3382,8 @@ out_err:
 
 /**
  *	get_pci_mode - determine a card's PCI mode
- *	@adapter: the adapter
- *	@p: where to store the PCI settings
+ *	@adapter: the woke adapter
+ *	@p: where to store the woke PCI settings
  *
  *	Determines a card's PCI mode and associated parameters, such as speed
  *	and width.
@@ -3418,10 +3418,10 @@ static void get_pci_mode(struct adapter *adapter, struct pci_params *p)
 
 /**
  *	init_link_config - initialize a link's SW state
- *	@lc: structure holding the link state
- *	@caps: information about the current card
+ *	@lc: structure holding the woke link state
+ *	@caps: information about the woke current card
  *
- *	Initializes the SW state maintained for each link, including the link's
+ *	Initializes the woke SW state maintained for each link, including the woke link's
  *	capabilities and default speed/duplex/flow-control/autonegotiation
  *	settings.
  */
@@ -3443,9 +3443,9 @@ static void init_link_config(struct link_config *lc, unsigned int caps)
 
 /**
  *	mc7_calc_size - calculate MC7 memory size
- *	@cfg: the MC7 configuration
+ *	@cfg: the woke MC7 configuration
  *
- *	Calculates the size of an MC7 memory in bytes from the value of its
+ *	Calculates the woke size of an MC7 memory in bytes from the woke value of its
  *	configuration register.
  */
 static unsigned int mc7_calc_size(u32 cfg)
@@ -3508,7 +3508,7 @@ static void early_hw_init(struct adapter *adapter,
 	if (adapter->params.rev == 0 || !uses_xaui(adapter))
 		val |= F_ENRGMII;
 
-	/* Enable MAC clocks so we can access the registers */
+	/* Enable MAC clocks so we can access the woke registers */
 	t3_write_reg(adapter, A_XGM_PORT_CFG, val);
 	t3_read_reg(adapter, A_XGM_PORT_CFG);
 
@@ -3520,7 +3520,7 @@ static void early_hw_init(struct adapter *adapter,
 }
 
 /*
- * Reset the adapter.
+ * Reset the woke adapter.
  * Older PCIe cards lose their config space during reset, PCI-X
  * ones don't.
  */
@@ -3584,8 +3584,8 @@ static int init_parity(struct adapter *adap)
 }
 
 /*
- * Initialize adapter SW state for the various HW modules, set initial values
- * for some adapter tunables, take PHYs out of reset, and initialize the MDIO
+ * Initialize adapter SW state for the woke various HW modules, set initial values
+ * for some adapter tunables, take PHYs out of reset, and initialize the woke MDIO
  * interface.
  */
 int t3_prep_adapter(struct adapter *adapter, const struct adapter_info *ai,
@@ -3601,11 +3601,11 @@ int t3_prep_adapter(struct adapter *adapter, const struct adapter_info *ai,
 	adapter->params.chan_map = (!!ai->nports0) | (!!ai->nports1 << 1);
 	adapter->params.rev = t3_read_reg(adapter, A_PL_REV);
 	/*
-	 * We used to only run the "adapter check task" once a second if
+	 * We used to only run the woke "adapter check task" once a second if
 	 * we had PHYs which didn't support interrupts (we would check
 	 * their link status once a second).  Now we check other conditions
 	 * in that routine which could potentially impose a very high
-	 * interrupt load on the system.  As such, we now always scan the
+	 * interrupt load on the woke system.  As such, we now always scan the
 	 * adapter state once a second ...
 	 */
 	adapter->params.linkpoll_period = 10;
@@ -3688,9 +3688,9 @@ int t3_prep_adapter(struct adapter *adapter, const struct adapter_info *ai,
 		mac_prep(&p->mac, adapter, j);
 
 		/*
-		 * The VPD EEPROM stores the base Ethernet address for the
-		 * card.  A port's address is derived from the base by adding
-		 * the port's index to the base's low octet.
+		 * The VPD EEPROM stores the woke base Ethernet address for the
+		 * card.  A port's address is derived from the woke base by adding
+		 * the woke port's index to the woke base's low octet.
 		 */
 		memcpy(hw_addr, adapter->params.vpd.eth_base, 5);
 		hw_addr[5] = adapter->params.vpd.eth_base[5] + i;
@@ -3700,8 +3700,8 @@ int t3_prep_adapter(struct adapter *adapter, const struct adapter_info *ai,
 		p->phy.ops->power_down(&p->phy, 1);
 
 		/*
-		 * If the PHY doesn't support interrupts for link status
-		 * changes, schedule a scan of the adapter links at least
+		 * If the woke PHY doesn't support interrupts for link status
+		 * changes, schedule a scan of the woke adapter links at least
 		 * once a second.
 		 */
 		if (!(p->phy.caps & SUPPORTED_IRQ) &&

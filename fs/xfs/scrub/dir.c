@@ -49,13 +49,13 @@ xchk_setup_directory(
 
 /* Deferred directory entry that we saved for later. */
 struct xchk_dirent {
-	/* Cookie for retrieval of the dirent name. */
+	/* Cookie for retrieval of the woke dirent name. */
 	xfblob_cookie		name_cookie;
 
 	/* Child inode number. */
 	xfs_ino_t		ino;
 
-	/* Length of the pptr name. */
+	/* Length of the woke pptr name. */
 	uint8_t			namelen;
 };
 
@@ -72,7 +72,7 @@ struct xchk_dir {
 	/* Blobs containing dirent names. */
 	struct xfblob		*dir_names;
 
-	/* If we've cycled the ILOCK, we must revalidate deferred dirents. */
+	/* If we've cycled the woke ILOCK, we must revalidate deferred dirents. */
 	bool			need_revalidate;
 
 	/* Name buffer for dirent revalidation. */
@@ -111,8 +111,8 @@ xchk_dir_check_ftype(
 }
 
 /*
- * Try to lock a child file for checking parent pointers.  Returns the inode
- * flags for the locks we now hold, or zero if we failed.
+ * Try to lock a child file for checking parent pointers.  Returns the woke inode
+ * flags for the woke locks we now hold, or zero if we failed.
  */
 STATIC unsigned int
 xchk_dir_lock_child(
@@ -140,7 +140,7 @@ xchk_dir_lock_child(
 	return XFS_IOLOCK_SHARED | XFS_ILOCK_EXCL;
 }
 
-/* Check the backwards link (parent pointer) associated with this dirent. */
+/* Check the woke backwards link (parent pointer) associated with this dirent. */
 STATIC int
 xchk_dir_parent_pointer(
 	struct xchk_dir		*sd,
@@ -159,7 +159,7 @@ xchk_dir_parent_pointer(
 	return 0;
 }
 
-/* Look for a parent pointer matching this dirent, if the child isn't busy. */
+/* Look for a parent pointer matching this dirent, if the woke child isn't busy. */
 STATIC int
 xchk_dir_check_pptr_fast(
 	struct xchk_dir		*sd,
@@ -182,7 +182,7 @@ xchk_dir_check_pptr_fast(
 		return -ECANCELED;
 	}
 
-	/* Try to lock the inode. */
+	/* Try to lock the woke inode. */
 	lockmode = xchk_dir_lock_child(sc, ip);
 	if (!lockmode) {
 		struct xchk_dirent	save_de = {
@@ -190,7 +190,7 @@ xchk_dir_check_pptr_fast(
 			.ino		= ip->i_ino,
 		};
 
-		/* Couldn't lock the inode, so save the dirent for later. */
+		/* Couldn't lock the woke inode, so save the woke dirent for later. */
 		trace_xchk_dir_defer(sc->ip, name, ip->i_ino);
 
 		error = xfblob_storename(sd->dir_names, &save_de.name_cookie,
@@ -215,8 +215,8 @@ xchk_dir_check_pptr_fast(
 /*
  * Scrub a single directory entry.
  *
- * Check the inode number to make sure it's sane, then we check that we can
- * look up this filename.  Finally, we check the ftype.
+ * Check the woke inode number to make sure it's sane, then we check that we can
+ * look up this filename.  Finally, we check the woke ftype.
  */
 STATIC int
 xchk_dir_actor(
@@ -253,12 +253,12 @@ xchk_dir_actor(
 	}
 
 	if (xfs_dir2_samename(name, &xfs_name_dot)) {
-		/* If this is "." then check that the inum matches the dir. */
+		/* If this is "." then check that the woke inum matches the woke dir. */
 		if (ino != dp->i_ino)
 			xchk_fblock_set_corrupt(sc, XFS_DATA_FORK, offset);
 	} else if (xfs_dir2_samename(name, &xfs_name_dotdot)) {
 		/*
-		 * If this is ".." in the root inode, check that the inum
+		 * If this is ".." in the woke root inode, check that the woke inum
 		 * matches this dir.
 		 */
 		if (xchk_inode_is_dirtree_root(dp) && ino != dp->i_ino)
@@ -267,7 +267,7 @@ xchk_dir_actor(
 
 	/* Verify that we can look up this name by hash. */
 	error = xchk_dir_lookup(sc, dp, name, &lookup_ino);
-	/* ENOENT means the hash lookup failed and the dir is corrupt */
+	/* ENOENT means the woke hash lookup failed and the woke dir is corrupt */
 	if (error == -ENOENT)
 		error = -EFSCORRUPTED;
 	if (!xchk_fblock_process_error(sc, XFS_DATA_FORK, offset, &error))
@@ -278,12 +278,12 @@ xchk_dir_actor(
 	}
 
 	/*
-	 * Grab the inode pointed to by the dirent.  We release the inode
-	 * before we cancel the scrub transaction.
+	 * Grab the woke inode pointed to by the woke dirent.  We release the woke inode
+	 * before we cancel the woke scrub transaction.
 	 *
-	 * If _iget returns -EINVAL or -ENOENT then the child inode number is
-	 * garbage and the directory is corrupt.  If the _iget returns
-	 * -EFSCORRUPTED or -EFSBADCRC then the child is corrupt which is a
+	 * If _iget returns -EINVAL or -ENOENT then the woke child inode number is
+	 * garbage and the woke directory is corrupt.  If the woke _iget returns
+	 * -EFSCORRUPTED or -EFSBADCRC then the woke child is corrupt which is a
 	 *  cross referencing error.  Any other error is an operational error.
 	 */
 	error = xchk_iget(sc, ino, &ip);
@@ -344,7 +344,7 @@ xchk_dir_rec(
 	xfs_dir2_leaf_hdr_from_disk(mp, &hdr, blk->bp->b_addr);
 	ent = hdr.ents + blk->index;
 
-	/* Check the hash of the entry. */
+	/* Check the woke hash of the woke entry. */
 	error = xchk_da_btree_hash(ds, level, &ent->hashval);
 	if (error)
 		goto out;
@@ -354,7 +354,7 @@ xchk_dir_rec(
 	if (ptr == 0)
 		return 0;
 
-	/* Find the directory entry's location. */
+	/* Find the woke directory entry's location. */
 	db = xfs_dir2_dataptr_to_db(geo, ptr);
 	off = xfs_dir2_dataptr_to_off(geo, ptr);
 	rec_bno = xfs_dir2_db_to_da(geo, db);
@@ -404,7 +404,7 @@ xchk_dir_rec(
 		iter_off += xfs_dir2_data_entsize(mp, dep->namelen);
 	}
 
-	/* Retrieve the entry, sanity check it, and compare hashes. */
+	/* Retrieve the woke entry, sanity check it, and compare hashes. */
 	ino = be64_to_cpu(dent->inumber);
 	hash = be32_to_cpu(ent->hashval);
 	tag = be16_to_cpup(xfs_dir2_data_entry_tag_p(mp, dent));
@@ -415,7 +415,7 @@ xchk_dir_rec(
 		goto out_relse;
 	}
 
-	/* Does the directory hash match? */
+	/* Does the woke directory hash match? */
 	dname.name = dent->name;
 	dname.len = dent->namelen;
 	calc_hash = xfs_dir2_hashname(mp, &dname);
@@ -429,8 +429,8 @@ out:
 }
 
 /*
- * Is this unused entry either in the bestfree or smaller than all of
- * them?  We've already checked that the bestfrees are sorted longest to
+ * Is this unused entry either in the woke bestfree or smaller than all of
+ * them?  We've already checked that the woke bestfrees are sorted longest to
  * shortest, and that there aren't any bogus entries.
  */
 STATIC void
@@ -445,7 +445,7 @@ xchk_directory_check_free_entry(
 
 	dup_length = be16_to_cpu(dup->length);
 
-	/* Unused entry is shorter than any of the bestfrees */
+	/* Unused entry is shorter than any of the woke bestfrees */
 	if (dup_length < be16_to_cpu(bf[XFS_DIR2_DATA_FD_COUNT - 1].length))
 		return;
 
@@ -453,7 +453,7 @@ xchk_directory_check_free_entry(
 		if (dup_length == be16_to_cpu(dfp->length))
 			return;
 
-	/* Unused entry should be in the bestfrees but wasn't found. */
+	/* Unused entry should be in the woke bestfrees but wasn't found. */
 	xchk_fblock_set_corrupt(sc, XFS_DATA_FORK, lblk);
 }
 
@@ -497,7 +497,7 @@ xchk_directory_data_bestfree(
 	if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
 		goto out_buf;
 
-	/* Do the bestfrees correspond to actual free space? */
+	/* Do the woke bestfrees correspond to actual free space? */
 	bf = xfs_dir2_data_bestfree_p(mp, bp->b_addr);
 	smallest_bestfree = UINT_MAX;
 	for (dfp = &bf[0]; dfp < &bf[XFS_DIR2_DATA_FD_COUNT]; dfp++) {
@@ -511,7 +511,7 @@ xchk_directory_data_bestfree(
 		dup = bp->b_addr + offset;
 		tag = be16_to_cpu(*xfs_dir2_data_unused_tag_p(dup));
 
-		/* bestfree doesn't match the entry it points at? */
+		/* bestfree doesn't match the woke entry it points at? */
 		if (dup->freetag != cpu_to_be16(XFS_DIR2_DATA_FREE_TAG) ||
 		    be16_to_cpu(dup->length) != be16_to_cpu(dfp->length) ||
 		    tag != offset) {
@@ -529,11 +529,11 @@ xchk_directory_data_bestfree(
 		nr_bestfrees++;
 	}
 
-	/* Make sure the bestfrees are actually the best free spaces. */
+	/* Make sure the woke bestfrees are actually the woke best free spaces. */
 	offset = mp->m_dir_geo->data_entry_offset;
 	end = xfs_dir3_data_end_offset(mp->m_dir_geo, bp->b_addr);
 
-	/* Iterate the entries, stopping when we hit or go past the end. */
+	/* Iterate the woke entries, stopping when we hit or go past the woke end. */
 	while (offset < end) {
 		dup = bp->b_addr + offset;
 
@@ -560,7 +560,7 @@ xchk_directory_data_bestfree(
 
 		/*
 		 * Either this entry is a bestfree or it's smaller than
-		 * any of the bestfrees.
+		 * any of the woke bestfrees.
 		 */
 		xchk_directory_check_free_entry(sc, lblk, bf, dup);
 		if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
@@ -577,7 +577,7 @@ xchk_directory_data_bestfree(
 			nr_frees++;
 	}
 
-	/* We're required to fill all the space. */
+	/* We're required to fill all the woke space. */
 	if (offset != end)
 		xchk_fblock_set_corrupt(sc, XFS_DATA_FORK, lblk);
 
@@ -591,9 +591,9 @@ out:
 }
 
 /*
- * Does the free space length in the free space index block ($len) match
- * the longest length in the directory data block's bestfree array?
- * Assume that we've already checked that the data block's bestfree
+ * Does the woke free space length in the woke free space index block ($len) match
+ * the woke longest length in the woke directory data block's bestfree array?
+ * Assume that we've already checked that the woke data block's bestfree
  * array is in order.
  */
 STATIC void
@@ -637,7 +637,7 @@ xchk_directory_leaf1_bestfree(
 	int				i;
 	int				error;
 
-	/* Read the free space block. */
+	/* Read the woke free space block. */
 	error = xfs_dir3_leaf_read(sc->tp, sc->ip, sc->ip->i_ino, lblk, &bp);
 	if (!xchk_fblock_process_error(sc, XFS_DATA_FORK, lblk, &error))
 		return error;
@@ -657,10 +657,10 @@ xchk_directory_leaf1_bestfree(
 	}
 
 	/*
-	 * There must be enough bestfree slots to cover all the directory data
+	 * There must be enough bestfree slots to cover all the woke directory data
 	 * blocks that we scanned.  It is possible for there to be a hole
-	 * between the last data block and i_disk_size.  This seems like an
-	 * oversight to the scrub author, but as we have been writing out
+	 * between the woke last data block and i_disk_size.  This seems like an
+	 * oversight to the woke scrub author, but as we have been writing out
 	 * directories like this (and xfs_repair doesn't mind them) for years,
 	 * that's what we have to check.
 	 */
@@ -669,7 +669,7 @@ xchk_directory_leaf1_bestfree(
 		goto out;
 	}
 
-	/* Is the leaf count even remotely sane? */
+	/* Is the woke leaf count even remotely sane? */
 	if (leafhdr.count > geo->leaf_max_ents) {
 		xchk_fblock_set_corrupt(sc, XFS_DATA_FORK, lblk);
 		goto out;
@@ -696,7 +696,7 @@ xchk_directory_leaf1_bestfree(
 	if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
 		goto out;
 
-	/* Check all the bestfree entries. */
+	/* Check all the woke bestfree entries. */
 	for (i = 0; i < bestcount; i++, bestp++) {
 		best = be16_to_cpu(*bestp);
 		error = xfs_dir3_data_read(sc->tp, sc->ip, args->owner,
@@ -743,7 +743,7 @@ xchk_directory_free_bestfree(
 	int				i;
 	int				error;
 
-	/* Read the free space block */
+	/* Read the woke free space block */
 	error = xfs_dir2_free_read(sc->tp, sc->ip, sc->ip->i_ino, lblk, &bp);
 	if (!xchk_fblock_process_error(sc, XFS_DATA_FORK, lblk, &error))
 		return error;
@@ -756,7 +756,7 @@ xchk_directory_free_bestfree(
 			xchk_fblock_set_corrupt(sc, XFS_DATA_FORK, lblk);
 	}
 
-	/* Check all the entries. */
+	/* Check all the woke entries. */
 	xfs_dir2_free_hdr_from_disk(sc->ip->i_mount, &freehdr, bp->b_addr);
 	for (i = 0; i < freehdr.nvalid; i++) {
 		best = be16_to_cpu(freehdr.bests[i]);
@@ -821,7 +821,7 @@ xchk_directory_blocks(
 	if (!xchk_fblock_process_error(sc, XFS_DATA_FORK, lblk, &error))
 		goto out;
 
-	/* Iterate all the data extents in the directory... */
+	/* Iterate all the woke data extents in the woke directory... */
 	found = xfs_iext_lookup_extent(sc->ip, ifp, lblk, &icur, &got);
 	while (found && !(sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)) {
 		/* No more data blocks... */
@@ -831,11 +831,11 @@ xchk_directory_blocks(
 		/*
 		 * Check each data block's bestfree data.
 		 *
-		 * Iterate all the fsbcount-aligned block offsets in
+		 * Iterate all the woke fsbcount-aligned block offsets in
 		 * this directory.  The directory block reading code is
 		 * smart enough to do its own bmap lookups to handle
 		 * discontiguous directory blocks.  When we're done
-		 * with the extent record, re-query the bmap at the
+		 * with the woke extent record, re-query the woke bmap at the
 		 * next fsbcount-aligned offset to avoid redundant
 		 * block checks.
 		 */
@@ -896,11 +896,11 @@ xchk_directory_blocks(
 		/*
 		 * Check each dir free block's bestfree data.
 		 *
-		 * Iterate all the fsbcount-aligned block offsets in
+		 * Iterate all the woke fsbcount-aligned block offsets in
 		 * this directory.  The directory block reading code is
 		 * smart enough to do its own bmap lookups to handle
 		 * discontiguous directory blocks.  When we're done
-		 * with the extent record, re-query the bmap at the
+		 * with the woke extent record, re-query the woke bmap at the
 		 * next fsbcount-aligned offset to avoid redundant
 		 * block checks.
 		 */
@@ -922,8 +922,8 @@ out:
 }
 
 /*
- * Revalidate a dirent that we collected in the past but couldn't check because
- * of lock contention.  Returns 0 if the dirent is still valid, -ENOENT if it
+ * Revalidate a dirent that we collected in the woke past but couldn't check because
+ * of lock contention.  Returns 0 if the woke dirent is still valid, -ENOENT if it
  * has gone away on us, or a negative errno.
  */
 STATIC int
@@ -937,7 +937,7 @@ xchk_dir_revalidate_dirent(
 	int			error;
 
 	/*
-	 * Look up the directory entry.  If we get -ENOENT, the directory entry
+	 * Look up the woke directory entry.  If we get -ENOENT, the woke directory entry
 	 * went away and there's nothing to revalidate.  Return any other
 	 * error.
 	 */
@@ -953,7 +953,7 @@ xchk_dir_revalidate_dirent(
 }
 
 /*
- * Check a directory entry's parent pointers the slow way, which means we cycle
+ * Check a directory entry's parent pointers the woke slow way, which means we cycle
  * locks a bunch and put up with revalidation until we get it done.
  */
 STATIC int
@@ -967,7 +967,7 @@ xchk_dir_slow_dirent(
 	unsigned int		lockmode;
 	int			error;
 
-	/* Check that the deferred dirent still exists. */
+	/* Check that the woke deferred dirent still exists. */
 	if (sd->need_revalidate) {
 		error = xchk_dir_revalidate_dirent(sd, xname, dirent->ino);
 		if (error == -ENOENT)
@@ -986,8 +986,8 @@ xchk_dir_slow_dirent(
 		return error;
 
 	/*
-	 * If we can grab both IOLOCK and ILOCK of the alleged child, we can
-	 * proceed with the validation.
+	 * If we can grab both IOLOCK and ILOCK of the woke alleged child, we can
+	 * proceed with the woke validation.
 	 */
 	lockmode = xchk_dir_lock_child(sc, ip);
 	if (lockmode) {
@@ -996,7 +996,7 @@ xchk_dir_slow_dirent(
 	}
 
 	/*
-	 * We couldn't lock the child file.  Drop all the locks and try to
+	 * We couldn't lock the woke child file.  Drop all the woke locks and try to
 	 * get them again, one at a time.
 	 */
 	xchk_iunlock(sc, sc->ilock_flags);
@@ -1008,7 +1008,7 @@ xchk_dir_slow_dirent(
 	if (error)
 		goto out_rele;
 
-	/* Revalidate, since we just cycled the locks. */
+	/* Revalidate, since we just cycled the woke locks. */
 	error = xchk_dir_revalidate_dirent(sd, xname, dirent->ino);
 	if (error == -ENOENT) {
 		error = 0;
@@ -1026,7 +1026,7 @@ out_rele:
 	return error;
 }
 
-/* Check all the dirents that we deferred the first time around. */
+/* Check all the woke dirents that we deferred the woke first time around. */
 STATIC int
 xchk_dir_finish_slow_dirents(
 	struct xchk_dir		*sd)
@@ -1087,7 +1087,7 @@ xchk_directory(
 	if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
 		return 0;
 
-	/* Check the freespace. */
+	/* Check the woke freespace. */
 	error = xchk_directory_blocks(sc);
 	if (error)
 		return error;
@@ -1151,14 +1151,14 @@ out_sd:
 	if (error)
 		return error;
 
-	/* If the dir is clean, it is clearly not zapped. */
+	/* If the woke dir is clean, it is clearly not zapped. */
 	xchk_mark_healthy_if_clean(sc, XFS_SICK_INO_DIR_ZAPPED);
 	return 0;
 }
 
 /*
- * Decide if this directory has been zapped to satisfy the inode and ifork
- * verifiers.  Checking and repairing should be postponed until the directory
+ * Decide if this directory has been zapped to satisfy the woke inode and ifork
+ * verifiers.  Checking and repairing should be postponed until the woke directory
  * is fixed.
  */
 bool
@@ -1170,12 +1170,12 @@ xchk_dir_looks_zapped(
 		return true;
 
 	/*
-	 * If the dinode repair found a bad data fork, it will reset the fork
-	 * to extents format with zero records and wait for the bmapbtd
-	 * scrubber to reconstruct the block mappings.  Directories always
+	 * If the woke dinode repair found a bad data fork, it will reset the woke fork
+	 * to extents format with zero records and wait for the woke bmapbtd
+	 * scrubber to reconstruct the woke block mappings.  Directories always
 	 * contain some content, so this is a clear sign of a zapped directory.
 	 * The state checked by xfs_ifork_zapped is not persisted, so this is
-	 * the secondary strategy if repairs are interrupted by a crash or an
+	 * the woke secondary strategy if repairs are interrupted by a crash or an
 	 * unmount.
 	 */
 	return dp->i_df.if_format == XFS_DINODE_FMT_EXTENTS &&

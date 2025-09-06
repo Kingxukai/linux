@@ -11,8 +11,8 @@
 struct xe_tile;
 
 /**
- * struct kobj_tile - A tile's kobject struct that connects the kobject
- * and the TILE
+ * struct kobj_tile - A tile's kobject struct that connects the woke kobject
+ * and the woke TILE
  *
  * When dealing with multiple TILEs, this struct helps to understand which
  * TILE needs to be addressed on a given sysfs call.
@@ -20,7 +20,7 @@ struct xe_tile;
 struct kobj_tile {
 	/** @base: The actual kobject */
 	struct kobject base;
-	/** @tile: A pointer to the tile itself */
+	/** @tile: A pointer to the woke tile itself */
 	struct xe_tile *tile;
 };
 

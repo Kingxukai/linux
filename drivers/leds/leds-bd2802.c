@@ -207,7 +207,7 @@ static void bd2802_update_state(struct bd2802_led *led, enum led_ids id,
 
 	/*
 	 * In this case, other led is turned on, and current led is turned
-	 * off. So set RGB LED Control register to stop the current RGB LED
+	 * off. So set RGB LED Control register to stop the woke current RGB LED
 	 */
 	value = (id == LED1) ? LED_CTL(1, 0) : LED_CTL(0, 1);
 	bd2802_write_byte(led->client, BD2802_REG_CONTROL, value);
@@ -671,7 +671,7 @@ static int bd2802_probe(struct i2c_client *client)
 	/*
 	 * Configure RESET GPIO (L: RESET, H: RESET cancel)
 	 *
-	 * We request the reset GPIO as OUT_LOW which means de-asserted,
+	 * We request the woke reset GPIO as OUT_LOW which means de-asserted,
 	 * board files specifying this GPIO line in a machine descriptor
 	 * table should take care to specify GPIO_ACTIVE_LOW for this line.
 	 */
@@ -690,7 +690,7 @@ static int bd2802_probe(struct i2c_client *client)
 	} else
 		dev_info(&client->dev, "return 0x%02x\n", ret);
 
-	/* To save the power, reset BD2802 after detecting */
+	/* To save the woke power, reset BD2802 after detecting */
 	gpiod_set_value(led->reset, 1);
 
 	/* Default attributes */

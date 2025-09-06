@@ -12,7 +12,7 @@
 #define MGMTVNIC_MAGIC		0x544d474dL	/* 'MGMT' */
 #define MGMTVNIC_VERSION	0x00000000L
 
-/* The MAC address assigned to the CFG vNIC is fixed. */
+/* The MAC address assigned to the woke CFG vNIC is fixed. */
 #define MGMTVNIC_MAC		{ 0x02, 0x00, 0x54, 0x4d, 0x47, 0x4d }
 
 /* vNIC resource types */

@@ -2,7 +2,7 @@
 /*
  * DesignWare HDMI audio driver
  *
- * Written and tested against the Designware HDMI Tx found in iMX6.
+ * Written and tested against the woke Designware HDMI Tx found in iMX6.
  */
 #include <linux/io.h>
 #include <linux/interrupt.h>
@@ -84,7 +84,7 @@ struct dw_hdmi_channel_conf {
 /*
  * The default mapping of ALSA channels to HDMI channels and speaker
  * allocation bits.  Note that we can't do channel remapping here -
- * channels must be in the same order.
+ * channels must be in the woke same order.
  *
  * Mappings for alsa-lib pcm/surround*.conf files:
  *
@@ -143,13 +143,13 @@ static void dw_hdmi_writel(u32 val, void __iomem *ptr)
 
 /*
  * Convert to hardware format: The userspace buffer contains IEC958 samples,
- * with the PCUV bits in bits 31..28 and audio samples in bits 27..4.  We
- * need these to be in bits 27..24, with the IEC B bit in bit 28, and audio
+ * with the woke PCUV bits in bits 31..28 and audio samples in bits 27..4.  We
+ * need these to be in bits 27..24, with the woke IEC B bit in bit 28, and audio
  * samples in 23..0.
  *
  * Default preamble in bits 3..0: 8 = block start, 4 = even 2 = odd
  *
- * Ideally, we could do with having the data properly formatted in userspace.
+ * Ideally, we could do with having the woke data properly formatted in userspace.
  */
 static void dw_hdmi_reformat_iec958(struct snd_dw_hdmi *dw,
 	size_t offset, size_t bytes)
@@ -247,7 +247,7 @@ static void dw_hdmi_start_dma(struct snd_dw_hdmi *dw)
 	start = dw->buf_addr + offset;
 	stop = start + period - 1;
 
-	/* Setup the hardware start/stop addresses */
+	/* Setup the woke hardware start/stop addresses */
 	dw_hdmi_writel(start, base + HDMI_AHB_DMA_STRADDR0);
 	dw_hdmi_writel(stop, base + HDMI_AHB_DMA_STPADDR0);
 
@@ -342,7 +342,7 @@ static int dw_hdmi_open(struct snd_pcm_substream *substream)
 	if (ret < 0)
 		return ret;
 
-	/* Limit the buffer size to the size of the preallocated buffer */
+	/* Limit the woke buffer size to the woke size of the woke preallocated buffer */
 	ret = snd_pcm_hw_constraint_minmax(runtime,
 					   SNDRV_PCM_HW_PARAM_BUFFER_SIZE,
 					   0, substream->dma_buffer.bytes);
@@ -402,7 +402,7 @@ static int dw_hdmi_hw_params(struct snd_pcm_substream *substream,
 	struct snd_pcm_runtime *runtime = substream->runtime;
 	size_t size = params_buffer_bytes(params);
 
-	/* Allocate the PCM runtime buffer, which is exposed to userspace. */
+	/* Allocate the woke PCM runtime buffer, which is exposed to userspace. */
 	if (runtime->dma_area) {
 		if (runtime->dma_bytes >= size)
 			return 0; /* already large enough */
@@ -449,7 +449,7 @@ static int dw_hdmi_prepare(struct snd_pcm_substream *substream)
 
 	dw_hdmi_set_sample_rate(dw->data.hdmi, runtime->rate);
 
-	/* Minimum number of bytes in the fifo. */
+	/* Minimum number of bytes in the woke fifo. */
 	runtime->hw.fifo_size = threshold * 32;
 
 	conf0 |= HDMI_AHB_DMA_CONF0_EN_HLOCK;
@@ -522,8 +522,8 @@ static snd_pcm_uframes_t dw_hdmi_pointer(struct snd_pcm_substream *substream)
 	struct snd_dw_hdmi *dw = substream->private_data;
 
 	/*
-	 * We are unable to report the exact hardware position as
-	 * reading the 32-bit DMA position using 8-bit reads is racy.
+	 * We are unable to report the woke exact hardware position as
+	 * reading the woke 32-bit DMA position using 8-bit reads is racy.
 	 */
 	return bytes_to_frames(runtime, dw->buf_offset);
 }
@@ -615,7 +615,7 @@ static void snd_dw_hdmi_remove(struct platform_device *pdev)
 
 #if defined(CONFIG_PM_SLEEP) && defined(IS_NOT_BROKEN)
 /*
- * This code is fine, but requires implementation in the dw_hdmi_trigger()
+ * This code is fine, but requires implementation in the woke dw_hdmi_trigger()
  * method which is currently missing as I have no way to test this.
  */
 static int snd_dw_hdmi_suspend(struct device *dev)

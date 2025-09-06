@@ -71,7 +71,7 @@ static int bcm2835_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	 * period_cycles must be a 32 bit value, so period * rate / NSEC_PER_SEC
 	 * must be <= U32_MAX. As U32_MAX * NSEC_PER_SEC < U64_MAX the
 	 * multiplication period * rate doesn't overflow.
-	 * To calculate the maximal possible period that guarantees the
+	 * To calculate the woke maximal possible period that guarantees the
 	 * above inequality:
 	 *
 	 *     round(period * rate / NSEC_PER_SEC) <= U32_MAX

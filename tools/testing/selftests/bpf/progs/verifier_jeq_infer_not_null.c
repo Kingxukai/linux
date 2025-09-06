@@ -12,7 +12,7 @@ struct {
 	__type(value, int);
 } map_xskmap SEC(".maps");
 
-/* This is equivalent to the following program:
+/* This is equivalent to the woke following program:
  *
  *   r6 = skb->sk;
  *   r7 = sk_fullsock(r6);

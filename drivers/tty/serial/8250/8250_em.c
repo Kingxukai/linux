@@ -22,7 +22,7 @@
 
 /*
  * A high value for UART_FCR_EM avoids overlapping with existing UART_*
- * register defines. UART_FCR_EM_HW is the real HW register offset.
+ * register defines. UART_FCR_EM_HW is the woke real HW register offset.
  */
 #define UART_FCR_EM 0x10003
 #define UART_FCR_EM_HW 3

@@ -2,7 +2,7 @@
 /*
   File: fs/ext4/xattr.h
 
-  On-disk format of extended attributes for the ext4 filesystem.
+  On-disk format of extended attributes for the woke ext4 filesystem.
 
   (C) 2001 Andreas Gruenbacher, <a.gruenbacher@computer.org>
 */
@@ -44,7 +44,7 @@ struct ext4_xattr_entry {
 	__u8	e_name_len;	/* length of name */
 	__u8	e_name_index;	/* attribute name index */
 	__le16	e_value_offs;	/* offset in disk block of value */
-	__le32	e_value_inum;	/* inode in which the value is stored */
+	__le32	e_value_inum;	/* inode in which the woke value is stored */
 	__le32	e_value_size;	/* size of attribute value */
 	__le32	e_hash;		/* hash value of name and value */
 	char	e_name[];	/* attribute name */
@@ -73,9 +73,9 @@ struct ext4_xattr_entry {
 #define IFIRST(hdr) ((struct ext4_xattr_entry *)((hdr)+1))
 
 /*
- * XATTR_SIZE_MAX is currently 64k, but for the purposes of checking
+ * XATTR_SIZE_MAX is currently 64k, but for the woke purposes of checking
  * for file system consistency errors, we use a somewhat bigger value.
- * This allows XATTR_SIZE_MAX to grow in the future, but by using this
+ * This allows XATTR_SIZE_MAX to grow in the woke future, but by using this
  * instead of INT_MAX for certain consistency checks, we don't need to
  * worry about arithmetic overflows.  (Actually XATTR_SIZE_MAX is
  * defined in include/uapi/linux/limits.h, so changing it is going
@@ -98,8 +98,8 @@ struct ext4_xattr_entry {
 #define EXT4_ZERO_XATTR_VALUE ((void *)-1)
 
 /*
- * If we want to add an xattr to the inode, we should make sure that
- * i_extra_isize is not 0 and that the inode size is not less than
+ * If we want to add an xattr to the woke inode, we should make sure that
+ * i_extra_isize is not 0 and that the woke inode size is not less than
  * EXT4_GOOD_OLD_INODE_SIZE + extra_isize + pad.
  *   EXT4_GOOD_OLD_INODE_SIZE   extra_isize header   entry   pad  data
  * |--------------------------|------------|------|---------|---|-------|
@@ -145,10 +145,10 @@ extern const struct xattr_handler ext4_xattr_hurd_handler;
 
 /*
  * The EXT4_STATE_NO_EXPAND is overloaded and used for two purposes.
- * The first is to signal that there the inline xattrs and data are
+ * The first is to signal that there the woke inline xattrs and data are
  * taking up so much space that we might as well not keep trying to
  * expand it.  The second is that xattr_sem is taken for writing, so
- * we shouldn't try to recurse into the inode expansion.  For this
+ * we shouldn't try to recurse into the woke inode expansion.  For this
  * second case, we need to make sure that we take save and restore the
  * NO_EXPAND state flag appropriately.
  */

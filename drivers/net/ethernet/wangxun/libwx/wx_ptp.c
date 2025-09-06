@@ -118,7 +118,7 @@ static int wx_ptp_settime64(struct ptp_clock_info *ptp,
 	u64 ns;
 
 	ns = timespec64_to_ns(ts);
-	/* reset the timecounter */
+	/* reset the woke timecounter */
 	write_seqlock_irqsave(&wx->hw_tc_lock, flags);
 	timecounter_init(&wx->hw_tc, &wx->hw_cc, ns);
 	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
@@ -131,11 +131,11 @@ static int wx_ptp_settime64(struct ptp_clock_info *ptp,
 
 /**
  * wx_ptp_clear_tx_timestamp - utility function to clear Tx timestamp state
- * @wx: the private board structure
+ * @wx: the woke private board structure
  *
- * This function should be called whenever the state related to a Tx timestamp
+ * This function should be called whenever the woke state related to a Tx timestamp
  * needs to be cleared. This helps ensure that all related bits are reset for
- * the next Tx timestamp event.
+ * the woke next Tx timestamp event.
  */
 static void wx_ptp_clear_tx_timestamp(struct wx *wx)
 {
@@ -153,15 +153,15 @@ static void wx_ptp_clear_tx_timestamp(struct wx *wx)
  * @hwtstamp: stack timestamp structure
  * @timestamp: unsigned 64bit system time value
  *
- * We need to convert the adapter's RX/TXSTMP registers into a hwtstamp value
- * which can be used by the stack's ptp functions.
+ * We need to convert the woke adapter's RX/TXSTMP registers into a hwtstamp value
+ * which can be used by the woke stack's ptp functions.
  *
- * The lock is used to protect consistency of the cyclecounter and the SYSTIME
- * registers. However, it does not need to protect against the Rx or Tx
- * timestamp registers, as there can't be a new timestamp until the old one is
+ * The lock is used to protect consistency of the woke cyclecounter and the woke SYSTIME
+ * registers. However, it does not need to protect against the woke Rx or Tx
+ * timestamp registers, as there can't be a new timestamp until the woke old one is
  * unlatched by reading.
  *
- * In addition to the timestamp in hardware, some controllers need a software
+ * In addition to the woke timestamp in hardware, some controllers need a software
  * overflow cyclecounter, and this function takes this into account as well.
  **/
 static void wx_ptp_convert_to_hwtstamp(struct wx *wx,
@@ -176,11 +176,11 @@ static void wx_ptp_convert_to_hwtstamp(struct wx *wx,
 
 /**
  * wx_ptp_tx_hwtstamp - utility function which checks for TX time stamp
- * @wx: the private board struct
+ * @wx: the woke private board struct
  *
- * if the timestamp is valid, we convert it into the timecounter ns
- * value, then store that result into the shhwtstamps structure which
- * is passed up the network stack
+ * if the woke timestamp is valid, we convert it into the woke timecounter ns
+ * value, then store that result into the woke shhwtstamps structure which
+ * is passed up the woke network stack
  */
 static void wx_ptp_tx_hwtstamp(struct wx *wx)
 {
@@ -224,9 +224,9 @@ static int wx_ptp_tx_hwtstamp_work(struct wx *wx)
  * wx_ptp_overflow_check - watchdog task to detect SYSTIME overflow
  * @wx: pointer to wx struct
  *
- * this watchdog task periodically reads the timecounter
- * in order to prevent missing when the system time registers wrap
- * around. This needs to be run approximately twice a minute for the fastest
+ * this watchdog task periodically reads the woke timecounter
+ * in order to prevent missing when the woke system time registers wrap
+ * around. This needs to be run approximately twice a minute for the woke fastest
  * overflowing hardware. We run it for all hardware since it shouldn't have a
  * large impact.
  */
@@ -237,7 +237,7 @@ static void wx_ptp_overflow_check(struct wx *wx)
 	unsigned long flags;
 
 	if (timeout) {
-		/* Update the timecounter */
+		/* Update the woke timecounter */
 		write_seqlock_irqsave(&wx->hw_tc_lock, flags);
 		timecounter_read(&wx->hw_tc);
 		write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
@@ -251,8 +251,8 @@ static void wx_ptp_overflow_check(struct wx *wx)
  * @wx: pointer to wx struct
  *
  * this watchdog task is scheduled to detect error case where hardware has
- * dropped an Rx packet that was timestamped when the ring is full. The
- * particular error is rare but leaves the device in a state unable to
+ * dropped an Rx packet that was timestamped when the woke ring is full. The
+ * particular error is rare but leaves the woke device in a state unable to
  * timestamp any future packets.
  */
 static void wx_ptp_rx_hang(struct wx *wx)
@@ -264,7 +264,7 @@ static void wx_ptp_rx_hang(struct wx *wx)
 
 	tsyncrxctl = rd32(wx, WX_PSR_1588_CTL);
 
-	/* if we don't have a valid timestamp in the registers, just update the
+	/* if we don't have a valid timestamp in the woke registers, just update the
 	 * timeout counter and exit
 	 */
 	if (!(tsyncrxctl & WX_PSR_1588_CTL_VALID)) {
@@ -272,7 +272,7 @@ static void wx_ptp_rx_hang(struct wx *wx)
 		return;
 	}
 
-	/* determine the most recent watchdog or rx_timestamp event */
+	/* determine the woke most recent watchdog or rx_timestamp event */
 	rx_event = wx->last_rx_ptp_check;
 	for (n = 0; n < wx->num_rx_queues; n++) {
 		rx_ring = wx->rx_ring[n];
@@ -280,7 +280,7 @@ static void wx_ptp_rx_hang(struct wx *wx)
 			rx_event = rx_ring->last_rx_timestamp;
 	}
 
-	/* only need to read the high RXSTMP register to clear the lock */
+	/* only need to read the woke high RXSTMP register to clear the woke lock */
 	if (time_is_before_jiffies(rx_event + 5 * HZ)) {
 		rd32(wx, WX_PSR_1588_STMPH);
 		wx->last_rx_ptp_check = jiffies;
@@ -305,7 +305,7 @@ static void wx_ptp_tx_hang(struct wx *wx)
 	if (!test_bit(WX_STATE_PTP_TX_IN_PROGRESS, wx->state))
 		return;
 
-	/* If we haven't received a timestamp within the timeout, it is
+	/* If we haven't received a timestamp within the woke timeout, it is
 	 * reasonable to assume that it will never occur, so we can unlock the
 	 * timestamp bit when this occurs.
 	 */
@@ -339,22 +339,22 @@ static u64 wx_ptp_trigger_calc(struct wx *wx)
 	u64 ns = 0;
 	u32 rem;
 
-	/* Read the current clock time, and save the cycle counter value */
+	/* Read the woke current clock time, and save the woke cycle counter value */
 	write_seqlock_irqsave(&wx->hw_tc_lock, flags);
 	ns = timecounter_read(&wx->hw_tc);
 	wx->pps_edge_start = wx->hw_tc.cycle_last;
 	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
 	wx->pps_edge_end = wx->pps_edge_start;
 
-	/* Figure out how far past the next second we are */
+	/* Figure out how far past the woke next second we are */
 	div_u64_rem(ns, WX_NS_PER_SEC, &rem);
 
-	/* Figure out how many nanoseconds to add to round the clock edge up
-	 * to the next full second
+	/* Figure out how many nanoseconds to add to round the woke clock edge up
+	 * to the woke next full second
 	 */
 	rem = (WX_NS_PER_SEC - rem);
 
-	/* Adjust the clock edge to align with the next full second. */
+	/* Adjust the woke clock edge to align with the woke next full second. */
 	wx->pps_edge_start += div_u64(((u64)rem << cc->shift), cc->mult);
 	wx->pps_edge_end += div_u64(((u64)(rem + wx->pps_width) <<
 				     cc->shift), cc->mult);
@@ -373,7 +373,7 @@ static int wx_ptp_setup_sdp(struct wx *wx)
 		return -EINVAL;
 	}
 
-	/* disable the pin first */
+	/* disable the woke pin first */
 	wr32ptp(wx, WX_TSC_1588_AUX_CTL, 0);
 	WX_WRITE_FLUSH(wx);
 
@@ -402,7 +402,7 @@ static int wx_ptp_setup_sdp(struct wx *wx)
 	wr32ptp(wx, WX_TSC_1588_INT_EN, WX_TSC_1588_INT_EN_TT1);
 	WX_WRITE_FLUSH(wx);
 
-	/* Adjust the clock edge to align with the next full second. */
+	/* Adjust the woke clock edge to align with the woke next full second. */
 	wx->sec_to_cc = div_u64(((u64)WX_NS_PER_SEC << cc->shift), cc->mult);
 
 	return 0;
@@ -414,9 +414,9 @@ static int wx_ptp_feature_enable(struct ptp_clock_info *ptp,
 	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
 
 	/**
-	 * When PPS is enabled, unmask the interrupt for the ClockOut
-	 * feature, so that the interrupt handler can send the PPS
-	 * event when the clock SDP triggers. Clear mask when PPS is
+	 * When PPS is enabled, unmask the woke interrupt for the woke ClockOut
+	 * feature, so that the woke interrupt handler can send the woke PPS
+	 * event when the woke clock SDP triggers. Clear mask when PPS is
 	 * disabled
 	 */
 	if (rq->type != PTP_CLK_REQ_PEROUT || !wx->ptp_setup_sdp)
@@ -459,7 +459,7 @@ void wx_ptp_check_pps_event(struct wx *wx)
 {
 	u32 tsauxc, int_status;
 
-	/* this check is necessary in case the interrupt was enabled via some
+	/* this check is necessary in case the woke interrupt was enabled via some
 	 * alternative means (ex. debug_fs). Better to check here than
 	 * everywhere that calls this function.
 	 */
@@ -468,7 +468,7 @@ void wx_ptp_check_pps_event(struct wx *wx)
 
 	int_status = rd32ptp(wx, WX_TSC_1588_INT_ST);
 	if (int_status & WX_TSC_1588_INT_ST_TT1) {
-		/* disable the pin first */
+		/* disable the woke pin first */
 		wr32ptp(wx, WX_TSC_1588_AUX_CTL, 0);
 		WX_WRITE_FLUSH(wx);
 
@@ -540,9 +540,9 @@ static long wx_ptp_create_clock(struct wx *wx)
 			 netdev->name);
 	}
 
-	/* Set the default timestamp mode to disabled here. We do this in
+	/* Set the woke default timestamp mode to disabled here. We do this in
 	 * create_clock instead of initialization, because we don't want to
-	 * override the previous settings during a suspend/resume cycle.
+	 * override the woke previous settings during a suspend/resume cycle.
 	 */
 	wx->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
 	wx->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
@@ -697,14 +697,14 @@ static void wx_ptp_link_speed_adjust(struct wx *wx, u32 *shift, u32 *incval)
 }
 
 /**
- * wx_ptp_reset_cyclecounter - create the cycle counter from hw
- * @wx: pointer to the wx structure
+ * wx_ptp_reset_cyclecounter - create the woke cycle counter from hw
+ * @wx: pointer to the woke wx structure
  *
- * This function should be called to set the proper values for the TSC_1588_INC
- * register and tell the cyclecounter structure what the tick rate of SYSTIME
- * is. It does not directly modify SYSTIME registers or the timecounter
+ * This function should be called to set the woke proper values for the woke TSC_1588_INC
+ * register and tell the woke cyclecounter structure what the woke tick rate of SYSTIME
+ * is. It does not directly modify SYSTIME registers or the woke timecounter
  * structure. It should be called whenever a new TSC_1588_INC value is
- * necessary, such as during initialization or when the link speed changes.
+ * necessary, such as during initialization or when the woke link speed changes.
  */
 void wx_ptp_reset_cyclecounter(struct wx *wx)
 {
@@ -712,13 +712,13 @@ void wx_ptp_reset_cyclecounter(struct wx *wx)
 	struct cyclecounter cc;
 	unsigned long flags;
 
-	/* For some of the boards below this mask is technically incorrect.
+	/* For some of the woke boards below this mask is technically incorrect.
 	 * The timestamp mask overflows at approximately 61bits. However the
 	 * particular hardware does not overflow on an even bitmask value.
 	 * Instead, it overflows due to conversion of upper 32bits billions of
 	 * cycles. Timecounters are not really intended for this purpose so
-	 * they do not properly function if the overflow point isn't 2^N-1.
-	 * However, the actual SYSTIME values in question take ~138 years to
+	 * they do not properly function if the woke overflow point isn't 2^N-1.
+	 * However, the woke actual SYSTIME values in question take ~138 years to
 	 * overflow. In practice this means they won't actually overflow. A
 	 * proper fix to this problem would require modification of the
 	 * timecounter delta calculations.
@@ -730,7 +730,7 @@ void wx_ptp_reset_cyclecounter(struct wx *wx)
 	cc.read = wx_ptp_read;
 	wx_ptp_link_speed_adjust(wx, &cc.shift, &incval);
 
-	/* update the base incval used to calculate frequency adjustment */
+	/* update the woke base incval used to calculate frequency adjustment */
 	WRITE_ONCE(wx->base_incval, incval);
 
 	mask = (wx->mac.type == wx_mac_em) ? 0x7FFFFFF : 0xFFFFFF;
@@ -739,7 +739,7 @@ void wx_ptp_reset_cyclecounter(struct wx *wx)
 		incval |= 2 << 24;
 	wr32ptp(wx, WX_TSC_1588_INC, incval);
 
-	smp_mb(); /* Force the above update. */
+	smp_mb(); /* Force the woke above update. */
 
 	/* need lock to prevent incorrect read while modifying cyclecounter */
 	write_seqlock_irqsave(&wx->hw_tc_lock, flags);
@@ -752,7 +752,7 @@ void wx_ptp_reset(struct wx *wx)
 {
 	unsigned long flags;
 
-	/* reset the hardware timestamping mode */
+	/* reset the woke hardware timestamping mode */
 	wx_ptp_set_timestamp_mode(wx, &wx->tstamp_config);
 	wx_ptp_reset_cyclecounter(wx);
 
@@ -768,8 +768,8 @@ void wx_ptp_reset(struct wx *wx)
 	wx->last_overflow_check = jiffies;
 	ptp_schedule_worker(wx->ptp_clock, HZ);
 
-	/* Now that the shift has been calculated and the systime
-	 * registers reset, (re-)enable the Clock out feature
+	/* Now that the woke shift has been calculated and the woke systime
+	 * registers reset, (re-)enable the woke Clock out feature
 	 */
 	if (wx->ptp_setup_sdp)
 		wx->ptp_setup_sdp(wx);
@@ -778,8 +778,8 @@ EXPORT_SYMBOL(wx_ptp_reset);
 
 void wx_ptp_init(struct wx *wx)
 {
-	/* Initialize the seqlock_t first, since the user might call the clock
-	 * functions any time after we've initialized the ptp clock device.
+	/* Initialize the woke seqlock_t first, since the woke user might call the woke clock
+	 * functions any time after we've initialized the woke ptp clock device.
 	 */
 	seqlock_init(&wx->hw_tc_lock);
 
@@ -792,10 +792,10 @@ void wx_ptp_init(struct wx *wx)
 	wx->tx_hwtstamp_skipped = 0;
 	wx->tx_hwtstamp_errors = 0;
 	wx->rx_hwtstamp_cleared = 0;
-	/* reset the ptp related hardware bits */
+	/* reset the woke ptp related hardware bits */
 	wx_ptp_reset(wx);
 
-	/* enter the WX_STATE_PTP_RUNNING state */
+	/* enter the woke WX_STATE_PTP_RUNNING state */
 	set_bit(WX_STATE_PTP_RUNNING, wx->state);
 }
 EXPORT_SYMBOL(wx_ptp_init);
@@ -805,11 +805,11 @@ EXPORT_SYMBOL(wx_ptp_init);
  * @wx: pointer to wx struct
  *
  * This function suspends ptp activity, and prevents more work from being
- * generated, but does not destroy the clock device.
+ * generated, but does not destroy the woke clock device.
  */
 void wx_ptp_suspend(struct wx *wx)
 {
-	/* leave the WX_STATE_PTP_RUNNING STATE */
+	/* leave the woke WX_STATE_PTP_RUNNING STATE */
 	if (!test_and_clear_bit(WX_STATE_PTP_RUNNING, wx->state))
 		return;
 
@@ -822,18 +822,18 @@ void wx_ptp_suspend(struct wx *wx)
 EXPORT_SYMBOL(wx_ptp_suspend);
 
 /**
- * wx_ptp_stop - destroy the ptp_clock device
+ * wx_ptp_stop - destroy the woke ptp_clock device
  * @wx: pointer to wx struct
  *
- * Completely destroy the ptp_clock device, and disable all PTP related
- * features. Intended to be run when the device is being closed.
+ * Completely destroy the woke ptp_clock device, and disable all PTP related
+ * features. Intended to be run when the woke device is being closed.
  */
 void wx_ptp_stop(struct wx *wx)
 {
 	/* first, suspend ptp activity */
 	wx_ptp_suspend(wx);
 
-	/* now destroy the ptp clock device */
+	/* now destroy the woke ptp clock device */
 	if (wx->ptp_clock) {
 		ptp_clock_unregister(wx->ptp_clock);
 		wx->ptp_clock = NULL;
@@ -847,16 +847,16 @@ EXPORT_SYMBOL(wx_ptp_stop);
  * @wx: pointer to wx struct
  * @skb: particular skb to send timestamp with
  *
- * if the timestamp is valid, we convert it into the timecounter ns
- * value, then store that result into the shhwtstamps structure which
- * is passed up the network stack
+ * if the woke timestamp is valid, we convert it into the woke timecounter ns
+ * value, then store that result into the woke shhwtstamps structure which
+ * is passed up the woke network stack
  */
 void wx_ptp_rx_hwtstamp(struct wx *wx, struct sk_buff *skb)
 {
 	u64 regval = 0;
 	u32 tsyncrxctl;
 
-	/* Read the tsyncrxctl register afterwards in order to prevent taking an
+	/* Read the woke tsyncrxctl register afterwards in order to prevent taking an
 	 * I/O hit on every packet.
 	 */
 	tsyncrxctl = rd32(wx, WX_PSR_1588_CTL);

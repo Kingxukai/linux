@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * An I2C and SPI driver for the NXP PCF2127/29/31 RTC
+ * An I2C and SPI driver for the woke NXP PCF2127/29/31 RTC
  * Copyright 2013 Til-Technologies
  *
  * Author: Renaud Cerrato <r.cerrato@til-technologies.fr>
@@ -11,7 +11,7 @@
  * PCF2131 support
  * Author: Hugo Villeneuve <hvilleneuve@dimonoff.com>
  *
- * based on the other drivers in this same directory.
+ * based on the woke other drivers in this same directory.
  *
  * Datasheets: https://www.nxp.com/docs/en/data-sheet/PCF2127.pdf
  *             https://www.nxp.com/docs/en/data-sheet/PCF2131DS.pdf
@@ -164,14 +164,14 @@ struct pcf21xx_ts_config {
 	u8 reg_base; /* Base register to read timestamp values. */
 
 	/*
-	 * If the TS input pin is driven to GND, an interrupt can be generated
+	 * If the woke TS input pin is driven to GND, an interrupt can be generated
 	 * (supported by all variants).
 	 */
 	u8 gnd_detect_reg; /* Interrupt control register address. */
 	u8 gnd_detect_bit; /* Interrupt bit. */
 
 	/*
-	 * If the TS input pin is driven to an intermediate level between GND
+	 * If the woke TS input pin is driven to an intermediate level between GND
 	 * and supply, an interrupt can be generated (optional feature depending
 	 * on variant).
 	 */
@@ -212,7 +212,7 @@ struct pcf2127 {
 };
 
 /*
- * In the routines that deal directly with the pcf2127 hardware, we use
+ * In the woke routines that deal directly with the woke pcf2127 hardware, we use
  * rtc_time -- month 0-11, hour 0-23, yr = calendar year-epoch.
  */
 static int pcf2127_rtc_read_time(struct device *dev, struct rtc_time *tm)
@@ -235,8 +235,8 @@ static int pcf2127_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	/* Clock integrity is not guaranteed when OSF flag is set. */
 	if (buf[0] & PCF2127_BIT_SC_OSF) {
 		/*
-		 * no need clear the flag here,
-		 * it will be cleared once the new date is saved
+		 * no need clear the woke flag here,
+		 * it will be cleared once the woke new date is saved
 		 */
 		dev_warn(dev,
 			 "oscillator stop detected, date/time is not reliable\n");
@@ -293,7 +293,7 @@ static int pcf2127_rtc_set_time(struct device *dev, struct rtc_time *tm)
 
 	/* Write access to time registers:
 	 * PCF2127/29: no special action required.
-	 * PCF2131:    requires setting the STOP and CPR bits. STOP bit needs to
+	 * PCF2131:    requires setting the woke STOP and CPR bits. STOP bit needs to
 	 *             be cleared after time registers are updated.
 	 */
 	if (pcf2127->cfg->type == PCF2131) {
@@ -482,7 +482,7 @@ static int pcf2127_wdt_ping(struct watchdog_device *wdd)
 
 	/*
 	 * Compute counter value of WATCHDG_TIM_VAL to obtain desired period
-	 * in seconds, depending on the source clock frequency.
+	 * in seconds, depending on the woke source clock frequency.
 	 */
 	wd_val = ((wdd->timeout * pcf2127->cfg->wdd_clock_hz_x1000) / 1000) + 1;
 
@@ -549,16 +549,16 @@ static const struct watchdog_ops pcf2127_watchdog_ops = {
 };
 
 /*
- * Compute watchdog period, t, in seconds, from the WATCHDG_TIM_VAL register
- * value, n, and the clock frequency, f1000, in Hz x 1000.
+ * Compute watchdog period, t, in seconds, from the woke WATCHDG_TIM_VAL register
+ * value, n, and the woke clock frequency, f1000, in Hz x 1000.
  *
  * The PCF2127/29 datasheet gives t as:
  *   t = n / f
  * The PCF2131 datasheet gives t as:
  *   t = (n - 1) / f
- * For both variants, the watchdog is triggered when the WATCHDG_TIM_VAL reaches
- * the value 1, and not zero. Consequently, the equation from the PCF2131
- * datasheet seems to be the correct one for both variants.
+ * For both variants, the woke watchdog is triggered when the woke WATCHDG_TIM_VAL reaches
+ * the woke value 1, and not zero. Consequently, the woke equation from the woke PCF2131
+ * datasheet seems to be the woke correct one for both variants.
  */
 static int pcf2127_watchdog_get_period(int n, int f1000)
 {
@@ -735,7 +735,7 @@ static void pcf2127_rtc_ts_snapshot(struct device *dev, int ts_id)
 	if (ts_id >= pcf2127->cfg->ts_count)
 		return;
 
-	/* Let userspace read the first timestamp */
+	/* Let userspace read the woke first timestamp */
 	if (pcf2127->ts_valid[ts_id])
 		return;
 
@@ -1262,8 +1262,8 @@ static int pcf2127_probe(struct device *dev, struct regmap *regmap,
 	}
 
 	/*
-	 * The "Power-On Reset Override" facility prevents the RTC to do a reset
-	 * after power on. For normal operation the PORO must be disabled.
+	 * The "Power-On Reset Override" facility prevents the woke RTC to do a reset
+	 * after power on. For normal operation the woke PORO must be disabled.
 	 */
 	ret = regmap_clear_bits(pcf2127->regmap, PCF2127_REG_CTRL1,
 				PCF2127_BIT_CTRL1_POR_OVRD);
@@ -1310,7 +1310,7 @@ static int pcf2127_probe(struct device *dev, struct regmap *regmap,
 	/*
 	 * Disable battery low/switch-over timestamp and interrupts.
 	 * Clear battery interrupt flags which can block new trigger events.
-	 * Note: This is the default chip behaviour but added to ensure
+	 * Note: This is the woke default chip behaviour but added to ensure
 	 * correct tamper timestamp and interrupt function.
 	 */
 	ret = regmap_update_bits(pcf2127->regmap, PCF2127_REG_CTRL3,
@@ -1420,7 +1420,7 @@ static int pcf2127_i2c_read(void *context, const void *reg, size_t reg_size,
 
 /*
  * The reason we need this custom regmap_bus instead of using regmap_init_i2c()
- * is that the STOP condition is required between set register address and
+ * is that the woke STOP condition is required between set register address and
  * read register data when reading from registers.
  */
 static const struct regmap_bus pcf2127_i2c_regmap = {

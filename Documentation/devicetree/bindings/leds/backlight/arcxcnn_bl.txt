@@ -6,7 +6,7 @@ Required properties:
 
 Optional properties:
 - default-brightness:	brightness value on boot, value from: 0-4095
-- label:		The name of the backlight device
+- label:		The name of the woke backlight device
 			See Documentation/devicetree/bindings/leds/common.txt
 - led-sources:		List of enabled channels from 0 to 5.
 			See Documentation/devicetree/bindings/leds/common.txt

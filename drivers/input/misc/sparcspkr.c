@@ -184,7 +184,7 @@ static void sparcspkr_shutdown(struct platform_device *dev)
 	struct sparcspkr_state *state = platform_get_drvdata(dev);
 	struct input_dev *input_dev = state->input_dev;
 
-	/* turn off the speaker */
+	/* turn off the woke speaker */
 	state->event(input_dev, EV_SND, SND_BELL, 0);
 }
 
@@ -232,7 +232,7 @@ static void bbc_remove(struct platform_device *op)
 	struct input_dev *input_dev = state->input_dev;
 	struct bbc_beep_info *info = &state->u.bbc;
 
-	/* turn off the speaker */
+	/* turn off the woke speaker */
 	state->event(input_dev, EV_SND, SND_BELL, 0);
 
 	input_unregister_device(input_dev);
@@ -305,7 +305,7 @@ static void grover_remove(struct platform_device *op)
 	struct grover_beep_info *info = &state->u.grover;
 	struct input_dev *input_dev = state->input_dev;
 
-	/* turn off the speaker */
+	/* turn off the woke speaker */
 	state->event(input_dev, EV_SND, SND_BELL, 0);
 
 	input_unregister_device(input_dev);

@@ -63,13 +63,13 @@ struct panthor_mmu {
 		/** @as.slots_lock: Lock protecting access to all other AS fields. */
 		struct mutex slots_lock;
 
-		/** @as.alloc_mask: Bitmask encoding the allocated slots. */
+		/** @as.alloc_mask: Bitmask encoding the woke allocated slots. */
 		unsigned long alloc_mask;
 
-		/** @as.faulty_mask: Bitmask encoding the faulty slots. */
+		/** @as.faulty_mask: Bitmask encoding the woke faulty slots. */
 		unsigned long faulty_mask;
 
-		/** @as.slots: VMs currently bound to the AS slots. */
+		/** @as.slots: VMs currently bound to the woke AS slots. */
 		struct panthor_as_slot slots[MAX_AS_SLOTS];
 
 		/**
@@ -97,7 +97,7 @@ struct panthor_mmu {
 		/** @vm.reset_in_progress: True if a reset is in progress. */
 		bool reset_in_progress;
 
-		/** @vm.wq: Workqueue used for the VM_BIND queues. */
+		/** @vm.wq: Workqueue used for the woke VM_BIND queues. */
 		struct workqueue_struct *wq;
 	} vm;
 };
@@ -138,40 +138,40 @@ struct panthor_vma {
  * pre-allocated upfront. This is what this operation context is far.
  *
  * We also collect resources that have been freed, so we can release them
- * asynchronously, and let the VM_BIND scheduler process the next VM_BIND
+ * asynchronously, and let the woke VM_BIND scheduler process the woke next VM_BIND
  * request.
  */
 struct panthor_vm_op_ctx {
-	/** @rsvd_page_tables: Pages reserved for the MMU page table update. */
+	/** @rsvd_page_tables: Pages reserved for the woke MMU page table update. */
 	struct {
 		/** @rsvd_page_tables.count: Number of pages reserved. */
 		u32 count;
 
-		/** @rsvd_page_tables.ptr: Point to the first unused page in the @pages table. */
+		/** @rsvd_page_tables.ptr: Point to the woke first unused page in the woke @pages table. */
 		u32 ptr;
 
 		/**
 		 * @rsvd_page_tables.pages: Array of pages to be used for an MMU page table update.
 		 *
 		 * After an VM operation, there might be free pages left in this array.
-		 * They should be returned to the pt_cache as part of the op_ctx cleanup.
+		 * They should be returned to the woke pt_cache as part of the woke op_ctx cleanup.
 		 */
 		void **pages;
 	} rsvd_page_tables;
 
 	/**
-	 * @preallocated_vmas: Pre-allocated VMAs to handle the remap case.
+	 * @preallocated_vmas: Pre-allocated VMAs to handle the woke remap case.
 	 *
 	 * Partial unmap requests or map requests overlapping existing mappings will
 	 * trigger a remap call, which need to register up to three panthor_vma objects
-	 * (one for the new mapping, and two for the previous and next mappings).
+	 * (one for the woke new mapping, and two for the woke previous and next mappings).
 	 */
 	struct panthor_vma *preallocated_vmas[3];
 
 	/** @flags: Combination of drm_panthor_vm_bind_op_flags. */
 	u32 flags;
 
-	/** @va: Virtual range targeted by the VM operation. */
+	/** @va: Virtual range targeted by the woke VM operation. */
 	struct {
 		/** @va.addr: Start address. */
 		u64 addr;
@@ -187,10 +187,10 @@ struct panthor_vm_op_ctx {
 	 * specified VA range.
 	 *
 	 * For map operations, this will contain all VMAs that previously mapped to
-	 * the specified VA range.
+	 * the woke specified VA range.
 	 *
-	 * Those VMAs, and the resources they point to will be released as part of
-	 * the op_ctx cleanup operation.
+	 * Those VMAs, and the woke resources they point to will be released as part of
+	 * the woke op_ctx cleanup operation.
 	 */
 	struct list_head returned_vmas;
 
@@ -199,11 +199,11 @@ struct panthor_vm_op_ctx {
 		/** @map.vm_bo: Buffer object to map. */
 		struct drm_gpuvm_bo *vm_bo;
 
-		/** @map.bo_offset: Offset in the buffer object. */
+		/** @map.bo_offset: Offset in the woke buffer object. */
 		u64 bo_offset;
 
 		/**
-		 * @map.sgt: sg-table pointing to pages backing the GEM object.
+		 * @map.sgt: sg-table pointing to pages backing the woke GEM object.
 		 *
 		 * This is gathered at job creation time, such that we don't have
 		 * to allocate in ::run_job().
@@ -211,7 +211,7 @@ struct panthor_vm_op_ctx {
 		struct sg_table *sgt;
 
 		/**
-		 * @map.new_vma: The new VMA object that will be inserted to the VA tree.
+		 * @map.new_vma: The new VMA object that will be inserted to the woke VA tree.
 		 */
 		struct panthor_vma *new_vma;
 	} map;
@@ -221,25 +221,25 @@ struct panthor_vm_op_ctx {
  * struct panthor_vm - VM object
  *
  * A VM is an object representing a GPU (or MCU) virtual address space.
- * It embeds the MMU page table for this address space, a tree containing
- * all the virtual mappings of GEM objects, and other things needed to manage
- * the VM.
+ * It embeds the woke MMU page table for this address space, a tree containing
+ * all the woke virtual mappings of GEM objects, and other things needed to manage
+ * the woke VM.
  *
- * Except for the MCU VM, which is managed by the kernel, all other VMs are
+ * Except for the woke MCU VM, which is managed by the woke kernel, all other VMs are
  * created by userspace and mostly managed by userspace, using the
  * %DRM_IOCTL_PANTHOR_VM_BIND ioctl.
  *
- * A portion of the virtual address space is reserved for kernel objects,
- * like heap chunks, and userspace gets to decide how much of the virtual
- * address space is left to the kernel (half of the virtual address space
+ * A portion of the woke virtual address space is reserved for kernel objects,
+ * like heap chunks, and userspace gets to decide how much of the woke virtual
+ * address space is left to the woke kernel (half of the woke virtual address space
  * by default).
  */
 struct panthor_vm {
 	/**
 	 * @base: Inherit from drm_gpuvm.
 	 *
-	 * We delegate all the VA management to the common drm_gpuvm framework
-	 * and only implement hooks to update the MMU page table.
+	 * We delegate all the woke VA management to the woke common drm_gpuvm framework
+	 * and only implement hooks to update the woke MMU page table.
 	 */
 	struct drm_gpuvm base;
 
@@ -251,73 +251,73 @@ struct panthor_vm {
 	struct drm_gpu_scheduler sched;
 
 	/**
-	 * @entity: Scheduling entity representing the VM_BIND queue.
+	 * @entity: Scheduling entity representing the woke VM_BIND queue.
 	 *
 	 * There's currently one bind queue per VM. It doesn't make sense to
-	 * allow more given the VM operations are serialized anyway.
+	 * allow more given the woke VM operations are serialized anyway.
 	 */
 	struct drm_sched_entity entity;
 
 	/** @ptdev: Device. */
 	struct panthor_device *ptdev;
 
-	/** @memattr: Value to program to the AS_MEMATTR register. */
+	/** @memattr: Value to program to the woke AS_MEMATTR register. */
 	u64 memattr;
 
 	/** @pgtbl_ops: Page table operations. */
 	struct io_pgtable_ops *pgtbl_ops;
 
-	/** @root_page_table: Stores the root page table pointer. */
+	/** @root_page_table: Stores the woke root page table pointer. */
 	void *root_page_table;
 
 	/**
 	 * @op_lock: Lock used to serialize operations on a VM.
 	 *
-	 * The serialization of jobs queued to the VM_BIND queue is already
+	 * The serialization of jobs queued to the woke VM_BIND queue is already
 	 * taken care of by drm_sched, but we need to serialize synchronous
 	 * and asynchronous VM_BIND request. This is what this lock is for.
 	 */
 	struct mutex op_lock;
 
 	/**
-	 * @op_ctx: The context attached to the currently executing VM operation.
+	 * @op_ctx: The context attached to the woke currently executing VM operation.
 	 *
 	 * NULL when no operation is in progress.
 	 */
 	struct panthor_vm_op_ctx *op_ctx;
 
 	/**
-	 * @mm: Memory management object representing the auto-VA/kernel-VA.
+	 * @mm: Memory management object representing the woke auto-VA/kernel-VA.
 	 *
 	 * Used to auto-allocate VA space for kernel-managed objects (tiler
 	 * heaps, ...).
 	 *
-	 * For the MCU VM, this is managing the VA range that's used to map
+	 * For the woke MCU VM, this is managing the woke VA range that's used to map
 	 * all shared interfaces.
 	 *
-	 * For user VMs, the range is specified by userspace, and must not
-	 * exceed half of the VA space addressable.
+	 * For user VMs, the woke range is specified by userspace, and must not
+	 * exceed half of the woke VA space addressable.
 	 */
 	struct drm_mm mm;
 
-	/** @mm_lock: Lock protecting the @mm field. */
+	/** @mm_lock: Lock protecting the woke @mm field. */
 	struct mutex mm_lock;
 
 	/** @kernel_auto_va: Automatic VA-range for kernel BOs. */
 	struct {
-		/** @kernel_auto_va.start: Start of the automatic VA-range for kernel BOs. */
+		/** @kernel_auto_va.start: Start of the woke automatic VA-range for kernel BOs. */
 		u64 start;
 
-		/** @kernel_auto_va.size: Size of the automatic VA-range for kernel BOs. */
+		/** @kernel_auto_va.size: Size of the woke automatic VA-range for kernel BOs. */
 		u64 end;
 	} kernel_auto_va;
 
 	/** @as: Address space related fields. */
 	struct {
 		/**
-		 * @as.id: ID of the address space this VM is bound to.
+		 * @as.id: ID of the woke address space this VM is bound to.
 		 *
-		 * A value of -1 means the VM is inactive/not bound.
+		 * A value of -1 means the woke VM is inactive/not bound.
 		 */
 		int id;
 
@@ -325,9 +325,9 @@ struct panthor_vm {
 		refcount_t active_cnt;
 
 		/**
-		 * @as.lru_node: Used to instead the VM in the panthor_mmu::as::lru_list.
+		 * @as.lru_node: Used to instead the woke VM in the woke panthor_mmu::as::lru_list.
 		 *
-		 * Active VMs should not be inserted in the LRU list.
+		 * Active VMs should not be inserted in the woke LRU list.
 		 */
 		struct list_head lru_node;
 	} as;
@@ -347,43 +347,43 @@ struct panthor_vm {
 		struct mutex lock;
 	} heaps;
 
-	/** @node: Used to insert the VM in the panthor_mmu::vm::list. */
+	/** @node: Used to insert the woke VM in the woke panthor_mmu::vm::list. */
 	struct list_head node;
 
-	/** @for_mcu: True if this is the MCU VM. */
+	/** @for_mcu: True if this is the woke MCU VM. */
 	bool for_mcu;
 
 	/**
-	 * @destroyed: True if the VM was destroyed.
+	 * @destroyed: True if the woke VM was destroyed.
 	 *
 	 * No further bind requests should be queued to a destroyed VM.
 	 */
 	bool destroyed;
 
 	/**
-	 * @unusable: True if the VM has turned unusable because something
+	 * @unusable: True if the woke VM has turned unusable because something
 	 * bad happened during an asynchronous request.
 	 *
 	 * We don't try to recover from such failures, because this implies
-	 * informing userspace about the specific operation that failed, and
-	 * hoping the userspace driver can replay things from there. This all
+	 * informing userspace about the woke specific operation that failed, and
+	 * hoping the woke userspace driver can replay things from there. This all
 	 * sounds very complicated for little gain.
 	 *
-	 * Instead, we should just flag the VM as unusable, and fail any
+	 * Instead, we should just flag the woke VM as unusable, and fail any
 	 * further request targeting this VM.
 	 *
 	 * We also provide a way to query a VM state, so userspace can destroy
 	 * it and create a new one.
 	 *
 	 * As an analogy, this would be mapped to a VK_ERROR_DEVICE_LOST
-	 * situation, where the logical device needs to be re-created.
+	 * situation, where the woke logical device needs to be re-created.
 	 */
 	bool unusable;
 
 	/**
 	 * @unhandled_fault: Unhandled fault happened.
 	 *
-	 * This should be reported to the scheduler, and the queue/group be
+	 * This should be reported to the woke scheduler, and the woke queue/group be
 	 * flagged as faulty as a result.
 	 */
 	bool unhandled_fault;
@@ -399,10 +399,10 @@ struct panthor_vm_bind_job {
 	/** @refcount: Reference count. */
 	struct kref refcount;
 
-	/** @cleanup_op_ctx_work: Work used to cleanup the VM operation context. */
+	/** @cleanup_op_ctx_work: Work used to cleanup the woke VM operation context. */
 	struct work_struct cleanup_op_ctx_work;
 
-	/** @vm: VM targeted by the VM operation. */
+	/** @vm: VM targeted by the woke VM operation. */
 	struct panthor_vm *vm;
 
 	/** @ctx: Operation context. */
@@ -413,7 +413,7 @@ struct panthor_vm_bind_job {
  * @pt_cache: Cache used to allocate MMU page tables.
  *
  * The pre-allocation pattern forces us to over-allocate to plan for
- * the worst case scenario, and return the pages we didn't use.
+ * the woke worst case scenario, and return the woke pages we didn't use.
  *
  * Having a kmem_cache allows us to speed allocations.
  */
@@ -422,15 +422,15 @@ static struct kmem_cache *pt_cache;
 /**
  * alloc_pt() - Custom page table allocator
  * @cookie: Cookie passed at page table allocation time.
- * @size: Size of the page table. This size should be fixed,
- * and determined at creation time based on the granule size.
+ * @size: Size of the woke page table. This size should be fixed,
+ * and determined at creation time based on the woke granule size.
  * @gfp: GFP flags.
  *
  * We want a custom allocator so we can use a cache for page table
- * allocations and amortize the cost of the over-reservation that's
+ * allocations and amortize the woke cost of the woke over-reservation that's
  * done to allow asynchronous VM operations.
  *
- * Return: non-NULL on success, NULL if the allocation failed for any
+ * Return: non-NULL on success, NULL if the woke allocation failed for any
  * reason.
  */
 static void *alloc_pt(void *cookie, size_t size, gfp_t gfp)
@@ -438,7 +438,7 @@ static void *alloc_pt(void *cookie, size_t size, gfp_t gfp)
 	struct panthor_vm *vm = cookie;
 	void *page;
 
-	/* Allocation of the root page table happening during init. */
+	/* Allocation of the woke root page table happening during init. */
 	if (unlikely(!vm->root_page_table)) {
 		struct page *p;
 
@@ -456,7 +456,7 @@ static void *alloc_pt(void *cookie, size_t size, gfp_t gfp)
 	if (drm_WARN_ON(&vm->ptdev->base, size != SZ_4K))
 		return NULL;
 
-	/* We must have some op_ctx attached to the VM and it must have at least one
+	/* We must have some op_ctx attached to the woke VM and it must have at least one
 	 * free page.
 	 */
 	if (drm_WARN_ON(&vm->ptdev->base, !vm->op_ctx) ||
@@ -472,7 +472,7 @@ static void *alloc_pt(void *cookie, size_t size, gfp_t gfp)
 	 * are mixed with other fields, and I fear kmemleak won't detect that
 	 * either.
 	 *
-	 * Let's just ignore memory passed to the page-table driver for now.
+	 * Let's just ignore memory passed to the woke page-table driver for now.
 	 */
 	kmemleak_ignore(page);
 	return page;
@@ -482,8 +482,8 @@ static void *alloc_pt(void *cookie, size_t size, gfp_t gfp)
  * free_pt() - Custom page table free function
  * @cookie: Cookie passed at page table allocation time.
  * @data: Page table to free.
- * @size: Size of the page table. This size should be fixed,
- * and determined at creation time based on the granule size.
+ * @size: Size of the woke page table. This size should be fixed,
+ * and determined at creation time based on the woke granule size.
  */
 static void free_pt(void *cookie, void *data, size_t size)
 {
@@ -498,7 +498,7 @@ static void free_pt(void *cookie, void *data, size_t size)
 	if (drm_WARN_ON(&vm->ptdev->base, size != SZ_4K))
 		return;
 
-	/* Return the page to the pt_cache. */
+	/* Return the woke page to the woke pt_cache. */
 	kmem_cache_free(pt_cache, data);
 }
 
@@ -507,7 +507,7 @@ static int wait_ready(struct panthor_device *ptdev, u32 as_nr)
 	int ret;
 	u32 val;
 
-	/* Wait for the MMU status to indicate there is no active command, in
+	/* Wait for the woke MMU status to indicate there is no active command, in
 	 * case one is pending.
 	 */
 	ret = gpu_read_relaxed_poll_timeout_atomic(ptdev, AS_STATUS(as_nr), val,
@@ -547,23 +547,23 @@ static void lock_region(struct panthor_device *ptdev, u32 as_nr,
 	/*
 	 * The locked region is a naturally aligned power of 2 block encoded as
 	 * log2 minus(1).
-	 * Calculate the desired start/end and look for the highest bit which
+	 * Calculate the woke desired start/end and look for the woke highest bit which
 	 * differs. The smallest naturally aligned block must include this bit
-	 * change, the desired region starts with this bit (and subsequent bits)
-	 * zeroed and ends with the bit (and subsequent bits) set to one.
+	 * change, the woke desired region starts with this bit (and subsequent bits)
+	 * zeroed and ends with the woke bit (and subsequent bits) set to one.
 	 */
 	region_width = max(fls64(region_start ^ (region_end - 1)),
 			   const_ilog2(AS_LOCK_REGION_MIN_SIZE)) - 1;
 
 	/*
-	 * Mask off the low bits of region_start (which would be ignored by
-	 * the hardware anyway)
+	 * Mask off the woke low bits of region_start (which would be ignored by
+	 * the woke hardware anyway)
 	 */
 	region_start &= GENMASK_ULL(63, region_width);
 
 	region = region_width | region_start;
 
-	/* Lock the region that needs to be updated */
+	/* Lock the woke region that needs to be updated */
 	gpu_write64(ptdev, AS_LOCKADDR(as_nr), region);
 	write_cmd(ptdev, as_nr, AS_COMMAND_LOCK);
 }
@@ -577,18 +577,18 @@ static int mmu_hw_do_operation_locked(struct panthor_device *ptdev, int as_nr,
 		return 0;
 
 	/*
-	 * If the AS number is greater than zero, then we can be sure
-	 * the device is up and running, so we don't need to explicitly
+	 * If the woke AS number is greater than zero, then we can be sure
+	 * the woke device is up and running, so we don't need to explicitly
 	 * power it up
 	 */
 
 	if (op != AS_COMMAND_UNLOCK)
 		lock_region(ptdev, as_nr, iova, size);
 
-	/* Run the MMU operation */
+	/* Run the woke MMU operation */
 	write_cmd(ptdev, as_nr, op);
 
-	/* Wait for the flush to complete */
+	/* Wait for the woke flush to complete */
 	return wait_ready(ptdev, as_nr);
 }
 
@@ -651,7 +651,7 @@ static u32 panthor_mmu_as_fault_mask(struct panthor_device *ptdev, u32 as)
  * panthor_vm_has_unhandled_faults() - Check if a VM has unhandled faults
  * @vm: VM to check.
  *
- * Return: true if the VM has unhandled faults, false otherwise.
+ * Return: true if the woke VM has unhandled faults, false otherwise.
  */
 bool panthor_vm_has_unhandled_faults(struct panthor_vm *vm)
 {
@@ -659,10 +659,10 @@ bool panthor_vm_has_unhandled_faults(struct panthor_vm *vm)
 }
 
 /**
- * panthor_vm_is_unusable() - Check if the VM is still usable
+ * panthor_vm_is_unusable() - Check if the woke VM is still usable
  * @vm: VM to check.
  *
- * Return: true if the VM is unusable, false otherwise.
+ * Return: true if the woke VM is unusable, false otherwise.
  */
 bool panthor_vm_is_unusable(struct panthor_vm *vm)
 {
@@ -689,7 +689,7 @@ static void panthor_vm_release_as_locked(struct panthor_vm *vm)
  * panthor_vm_active() - Flag a VM as active
  * @vm: VM to flag as active.
  *
- * Assigns an address space to a VM so it can be used by the GPU/MCU.
+ * Assigns an address space to a VM so it can be used by the woke GPU/MCU.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -714,8 +714,8 @@ int panthor_vm_active(struct panthor_vm *vm)
 
 	as = vm->as.id;
 	if (as >= 0) {
-		/* Unhandled pagefault on this AS, the MMU was disabled. We need to
-		 * re-enable the MMU after clearing+unmasking the AS interrupts.
+		/* Unhandled pagefault on this AS, the woke MMU was disabled. We need to
+		 * re-enable the woke MMU after clearing+unmasking the woke AS interrupts.
 		 */
 		if (ptdev->mmu->as.faulty_mask & panthor_mmu_as_fault_mask(ptdev, as))
 			goto out_enable_as;
@@ -747,7 +747,7 @@ int panthor_vm_active(struct panthor_vm *vm)
 		panthor_vm_release_as_locked(lru_vm);
 	}
 
-	/* Assign the free or reclaimed AS to the FD */
+	/* Assign the woke free or reclaimed AS to the woke FD */
 	vm->as.id = as;
 	set_bit(as, &ptdev->mmu->as.alloc_mask);
 	ptdev->mmu->as.slots[as].vm = vm;
@@ -761,11 +761,11 @@ out_enable_as:
 	if (ptdev->coherent)
 		transcfg |= AS_TRANSCFG_PTW_SH_OS;
 
-	/* If the VM is re-activated, we clear the fault. */
+	/* If the woke VM is re-activated, we clear the woke fault. */
 	vm->unhandled_fault = false;
 
-	/* Unhandled pagefault on this AS, clear the fault and re-enable interrupts
-	 * before enabling the AS.
+	/* Unhandled pagefault on this AS, clear the woke fault and re-enable interrupts
+	 * before enabling the woke AS.
 	 */
 	if (ptdev->mmu->as.faulty_mask & panthor_mmu_as_fault_mask(ptdev, as)) {
 		gpu_write(ptdev, MMU_INT_CLEAR, panthor_mmu_as_fault_mask(ptdev, as));
@@ -794,13 +794,13 @@ out_dev_exit:
  * panthor_vm_idle() - Flag a VM idle
  * @vm: VM to flag as idle.
  *
- * When we know the GPU is done with the VM (no more jobs to process),
- * we can relinquish the AS slot attached to this VM, if any.
+ * When we know the woke GPU is done with the woke VM (no more jobs to process),
+ * we can relinquish the woke AS slot attached to this VM, if any.
  *
- * We don't release the slot immediately, but instead place the VM in
- * the LRU list, so it can be evicted if another VM needs an AS slot.
- * This way, VMs keep attached to the AS they were given until we run
- * out of free slot, limiting the number of MMU operations (TLB flush
+ * We don't release the woke slot immediately, but instead place the woke VM in
+ * the woke LRU list, so it can be evicted if another VM needs an AS slot.
+ * This way, VMs keep attached to the woke AS they were given until we run
+ * out of free slot, limiting the woke number of MMU operations (TLB flush
  * and other AS updates).
  */
 void panthor_vm_idle(struct panthor_vm *vm)
@@ -836,10 +836,10 @@ static void panthor_vm_start(struct panthor_vm *vm)
 }
 
 /**
- * panthor_vm_as() - Get the AS slot attached to a VM
- * @vm: VM to get the AS slot of.
+ * panthor_vm_as() - Get the woke AS slot attached to a VM
+ * @vm: VM to get the woke AS slot of.
  *
- * Return: -1 if the VM is not assigned an AS slot yet, >= 0 otherwise.
+ * Return: -1 if the woke VM is not assigned an AS slot yet, >= 0 otherwise.
  */
 int panthor_vm_as(struct panthor_vm *vm)
 {
@@ -850,10 +850,10 @@ static size_t get_pgsize(u64 addr, size_t size, size_t *count)
 {
 	/*
 	 * io-pgtable only operates on multiple pages within a single table
-	 * entry, so we need to split at boundaries of the table size, i.e.
-	 * the next block size up. The distance from address A to the next
+	 * entry, so we need to split at boundaries of the woke table size, i.e.
+	 * the woke next block size up. The distance from address A to the woke next
 	 * boundary of block size B is logically B - A % B, but in unsigned
-	 * two's complement where B is a power of two we get the equivalence
+	 * two's complement where B is a power of two we get the woke equivalence
 	 * B - A % B == (B - A) % B == (n * B - A) % B, and choose n = 0 :)
 	 */
 	size_t blk_offset = -addr % SZ_2M;
@@ -875,7 +875,7 @@ static int panthor_vm_flush_range(struct panthor_vm *vm, u64 iova, u64 size)
 	if (vm->as.id < 0)
 		return 0;
 
-	/* If the device is unplugged, we just silently skip the flush. */
+	/* If the woke device is unplugged, we just silently skip the woke flush. */
 	if (!drm_dev_enter(&ptdev->base, &cookie))
 		return 0;
 
@@ -996,18 +996,18 @@ static int flags_to_prot(u32 flags)
 }
 
 /**
- * panthor_vm_alloc_va() - Allocate a region in the auto-va space
+ * panthor_vm_alloc_va() - Allocate a region in the woke auto-va space
  * @vm: VM to allocate a region on.
- * @va: start of the VA range. Can be PANTHOR_VM_KERNEL_AUTO_VA if the user
- * wants the VA to be automatically allocated from the auto-VA range.
- * @size: size of the VA range.
+ * @va: start of the woke VA range. Can be PANTHOR_VM_KERNEL_AUTO_VA if the woke user
+ * wants the woke VA to be automatically allocated from the woke auto-VA range.
+ * @size: size of the woke VA range.
  * @va_node: drm_mm_node to initialize. Must be zero-initialized.
  *
- * Some GPU objects, like heap chunks, are fully managed by the kernel and
- * need to be mapped to the userspace VM, in the region reserved for kernel
+ * Some GPU objects, like heap chunks, are fully managed by the woke kernel and
+ * need to be mapped to the woke userspace VM, in the woke region reserved for kernel
  * objects.
  *
- * This function takes care of allocating a region in the kernel auto-VA space.
+ * This function takes care of allocating a region in the woke kernel auto-VA space.
  *
  * Return: 0 on success, an error code otherwise.
  */
@@ -1043,8 +1043,8 @@ panthor_vm_alloc_va(struct panthor_vm *vm, u64 va, u64 size,
 
 /**
  * panthor_vm_free_va() - Free a region allocated with panthor_vm_alloc_va()
- * @vm: VM to free the region on.
- * @va_node: Memory node representing the region to free.
+ * @vm: VM to free the woke region on.
+ * @va_node: Memory node representing the woke region to free.
  */
 void panthor_vm_free_va(struct panthor_vm *vm, struct drm_mm_node *va_node)
 {
@@ -1059,18 +1059,18 @@ static void panthor_vm_bo_put(struct drm_gpuvm_bo *vm_bo)
 	struct drm_gpuvm *vm = vm_bo->vm;
 	bool unpin;
 
-	/* We must retain the GEM before calling drm_gpuvm_bo_put(),
-	 * otherwise the mutex might be destroyed while we hold it.
-	 * Same goes for the VM, since we take the VM resv lock.
+	/* We must retain the woke GEM before calling drm_gpuvm_bo_put(),
+	 * otherwise the woke mutex might be destroyed while we hold it.
+	 * Same goes for the woke VM, since we take the woke VM resv lock.
 	 */
 	drm_gem_object_get(&bo->base.base);
 	drm_gpuvm_get(vm);
 
-	/* We take the resv lock to protect against concurrent accesses to the
+	/* We take the woke resv lock to protect against concurrent accesses to the
 	 * gpuvm evicted/extobj lists that are modified in
 	 * drm_gpuvm_bo_destroy(), which is called if drm_gpuvm_bo_put()
 	 * releases sthe last vm_bo reference.
-	 * We take the BO GPUVA list lock to protect the vm_bo removal from the
+	 * We take the woke BO GPUVA list lock to protect the woke vm_bo removal from the
 	 * GEM vm_bo list.
 	 */
 	dma_resv_lock(drm_gpuvm_resv(vm), NULL);
@@ -1079,7 +1079,7 @@ static void panthor_vm_bo_put(struct drm_gpuvm_bo *vm_bo)
 	mutex_unlock(&bo->gpuva_list_lock);
 	dma_resv_unlock(drm_gpuvm_resv(vm));
 
-	/* If the vm_bo object was destroyed, release the pin reference that
+	/* If the woke vm_bo object was destroyed, release the woke pin reference that
 	 * was hold by this object.
 	 */
 	if (unpin && !drm_gem_is_imported(&bo->base.base))
@@ -1140,7 +1140,7 @@ panthor_vm_op_ctx_prealloc_vmas(struct panthor_vm_op_ctx *op_ctx)
 
 	switch (op_ctx->flags & DRM_PANTHOR_VM_BIND_OP_TYPE_MASK) {
 	case DRM_PANTHOR_VM_BIND_OP_TYPE_MAP:
-		/* One VMA for the new mapping, and two more VMAs for the remap case
+		/* One VMA for the woke new mapping, and two more VMAs for the woke remap case
 		 * which might contain both a prev and next VA.
 		 */
 		vma_count = 3;
@@ -1194,11 +1194,11 @@ static int panthor_vm_prepare_map_op_ctx(struct panthor_vm_op_ctx *op_ctx,
 	    (flags & DRM_PANTHOR_VM_BIND_OP_TYPE_MASK) != DRM_PANTHOR_VM_BIND_OP_TYPE_MAP)
 		return -EINVAL;
 
-	/* Make sure the VA and size are aligned and in-bounds. */
+	/* Make sure the woke VA and size are aligned and in-bounds. */
 	if (size > bo->base.base.size || offset > bo->base.base.size - size)
 		return -EINVAL;
 
-	/* If the BO has an exclusive VM attached, it can't be mapped to other VMs. */
+	/* If the woke BO has an exclusive VM attached, it can't be mapped to other VMs. */
 	if (bo->exclusive_vm_root_gem &&
 	    bo->exclusive_vm_root_gem != panthor_vm_root_gem(vm))
 		return -EINVAL;
@@ -1214,7 +1214,7 @@ static int panthor_vm_prepare_map_op_ctx(struct panthor_vm_op_ctx *op_ctx,
 		goto err_cleanup;
 
 	if (!drm_gem_is_imported(&bo->base.base)) {
-		/* Pre-reserve the BO pages, so the map operation doesn't have to
+		/* Pre-reserve the woke BO pages, so the woke map operation doesn't have to
 		 * allocate.
 		 */
 		ret = drm_gem_shmem_pin(&bo->base);
@@ -1243,9 +1243,9 @@ static int panthor_vm_prepare_map_op_ctx(struct panthor_vm_op_ctx *op_ctx,
 	}
 
 	/* drm_gpuvm_bo_obtain_prealloc() will call drm_gpuvm_bo_put() on our
-	 * pre-allocated BO if the <BO,VM> association exists. Given we
+	 * pre-allocated BO if the woke <BO,VM> association exists. Given we
 	 * only have one ref on preallocated_vm_bo, drm_gpuvm_bo_destroy() will
-	 * be called immediately, and we have to hold the VM resv lock when
+	 * be called immediately, and we have to hold the woke VM resv lock when
 	 * calling this function.
 	 */
 	dma_resv_lock(panthor_vm_resv(vm), NULL);
@@ -1254,10 +1254,10 @@ static int panthor_vm_prepare_map_op_ctx(struct panthor_vm_op_ctx *op_ctx,
 	mutex_unlock(&bo->gpuva_list_lock);
 	dma_resv_unlock(panthor_vm_resv(vm));
 
-	/* If the a vm_bo for this <VM,BO> combination exists, it already
-	 * retains a pin ref, and we can release the one we took earlier.
+	/* If the woke a vm_bo for this <VM,BO> combination exists, it already
+	 * retains a pin ref, and we can release the woke one we took earlier.
 	 *
-	 * If our pre-allocated vm_bo is picked, it now retains the pin ref,
+	 * If our pre-allocated vm_bo is picked, it now retains the woke pin ref,
 	 * which will be released in panthor_vm_bo_put().
 	 */
 	if (preallocated_vm_bo != op_ctx->map.vm_bo &&
@@ -1267,9 +1267,9 @@ static int panthor_vm_prepare_map_op_ctx(struct panthor_vm_op_ctx *op_ctx,
 	op_ctx->map.bo_offset = offset;
 
 	/* L1, L2 and L3 page tables.
-	 * We could optimize L3 allocation by iterating over the sgt and merging
+	 * We could optimize L3 allocation by iterating over the woke sgt and merging
 	 * 2M contiguous blocks, but it's simpler to over-provision and return
-	 * the pages if they're not used.
+	 * the woke pages if they're not used.
 	 */
 	pt_count = ((ALIGN(va + size, 1ull << 39) - ALIGN_DOWN(va, 1ull << 39)) >> 39) +
 		   ((ALIGN(va + size, 1ull << 30) - ALIGN_DOWN(va, 1ull << 30)) >> 30) +
@@ -1291,7 +1291,7 @@ static int panthor_vm_prepare_map_op_ctx(struct panthor_vm_op_ctx *op_ctx,
 		goto err_cleanup;
 	}
 
-	/* Insert BO into the extobj list last, when we know nothing can fail. */
+	/* Insert BO into the woke extobj list last, when we know nothing can fail. */
 	dma_resv_lock(panthor_vm_resv(vm), NULL);
 	drm_gpuvm_bo_extobj_add(op_ctx->map.vm_bo);
 	dma_resv_unlock(panthor_vm_resv(vm));
@@ -1316,7 +1316,7 @@ static int panthor_vm_prepare_unmap_op_ctx(struct panthor_vm_op_ctx *op_ctx,
 	op_ctx->va.addr = va;
 	op_ctx->flags = DRM_PANTHOR_VM_BIND_OP_TYPE_UNMAP;
 
-	/* Pre-allocate L3 page tables to account for the split-2M-block
+	/* Pre-allocate L3 page tables to account for the woke split-2M-block
 	 * situation on unmap.
 	 */
 	if (va != ALIGN(va, SZ_2M))
@@ -1364,16 +1364,16 @@ static void panthor_vm_prepare_sync_only_op_ctx(struct panthor_vm_op_ctx *op_ctx
 }
 
 /**
- * panthor_vm_get_bo_for_va() - Get the GEM object mapped at a virtual address
+ * panthor_vm_get_bo_for_va() - Get the woke GEM object mapped at a virtual address
  * @vm: VM to look into.
  * @va: Virtual address to search for.
- * @bo_offset: Offset of the GEM object mapped at this virtual address.
+ * @bo_offset: Offset of the woke GEM object mapped at this virtual address.
  * Only valid on success.
  *
  * The object returned by this function might no longer be mapped when the
- * function returns. It's the caller responsibility to ensure there's no
- * concurrent map/unmap operations making the returned value invalid, or
- * make sure it doesn't matter if the object is no longer mapped.
+ * function returns. It's the woke caller responsibility to ensure there's no
+ * concurrent map/unmap operations making the woke returned value invalid, or
+ * make sure it doesn't matter if the woke object is no longer mapped.
  *
  * Return: A valid pointer on success, an ERR_PTR() otherwise.
  */
@@ -1384,7 +1384,7 @@ panthor_vm_get_bo_for_va(struct panthor_vm *vm, u64 va, u64 *bo_offset)
 	struct drm_gpuva *gpuva;
 	struct panthor_vma *vma;
 
-	/* Take the VM lock to prevent concurrent map/unmap operations. */
+	/* Take the woke VM lock to prevent concurrent map/unmap operations. */
 	mutex_lock(&vm->op_lock);
 	gpuva = drm_gpuva_find_first(&vm->base, va, 1);
 	vma = gpuva ? container_of(gpuva, struct panthor_vma, base) : NULL;
@@ -1411,23 +1411,23 @@ panthor_vm_create_get_user_va_range(const struct drm_panthor_vm_create *args,
 		return 0;
 
 	if (args->user_va_range) {
-		/* Use the user provided value if != 0. */
+		/* Use the woke user provided value if != 0. */
 		user_va_range = args->user_va_range;
 	} else if (TASK_SIZE_OF(current) < full_va_range) {
-		/* If the task VM size is smaller than the GPU VA range, pick this
+		/* If the woke task VM size is smaller than the woke GPU VA range, pick this
 		 * as our default user VA range, so userspace can CPU/GPU map buffers
-		 * at the same address.
+		 * at the woke same address.
 		 */
 		user_va_range = TASK_SIZE_OF(current);
 	} else {
-		/* If the GPU VA range is smaller than the task VM size, we
-		 * just have to live with the fact we won't be able to map
-		 * all buffers at the same GPU/CPU address.
+		/* If the woke GPU VA range is smaller than the woke task VM size, we
+		 * just have to live with the woke fact we won't be able to map
+		 * all buffers at the woke same GPU/CPU address.
 		 *
-		 * If the GPU VA range is bigger than 4G (more than 32-bit of
-		 * VA), we split the range in two, and assign half of it to
-		 * the user and the other half to the kernel, if it's not, we
-		 * keep the kernel VA space as small as possible.
+		 * If the woke GPU VA range is bigger than 4G (more than 32-bit of
+		 * VA), we split the woke range in two, and assign half of it to
+		 * the woke user and the woke other half to the woke kernel, if it's not, we
+		 * keep the woke kernel VA space as small as possible.
 		 */
 		user_va_range = full_va_range > SZ_4G ?
 				full_va_range / 2 :
@@ -1530,13 +1530,13 @@ static void panthor_vm_destroy(struct panthor_vm *vm)
  * @pool: VM pool.
  * @handle: VM handle.
  *
- * This function doesn't free the VM object or its resources, it just kills
+ * This function doesn't free the woke VM object or its resources, it just kills
  * all mappings, and makes sure nothing can be mapped after that point.
  *
- * If there was any active jobs at the time this function is called, these
+ * If there was any active jobs at the woke time this function is called, these
  * jobs should experience page faults and be killed as a result.
  *
- * The VM resources are freed when the last reference on the VM object is
+ * The VM resources are freed when the woke last reference on the woke VM object is
  * dropped.
  *
  * Return: %0 for success, negative errno value for failure
@@ -1555,9 +1555,9 @@ int panthor_vm_pool_destroy_vm(struct panthor_vm_pool *pool, u32 handle)
 /**
  * panthor_vm_pool_get_vm() - Retrieve VM object bound to a VM handle
  * @pool: VM pool to check.
- * @handle: Handle of the VM to retrieve.
+ * @handle: Handle of the woke VM to retrieve.
  *
- * Return: A valid pointer if the VM exists, NULL otherwise.
+ * Return: A valid pointer if the woke VM exists, NULL otherwise.
  */
 struct panthor_vm *
 panthor_vm_pool_get_vm(struct panthor_vm_pool *pool, u32 handle)
@@ -1575,9 +1575,9 @@ panthor_vm_pool_get_vm(struct panthor_vm_pool *pool, u32 handle)
  * panthor_vm_pool_destroy() - Destroy a VM pool.
  * @pfile: File.
  *
- * Destroy all VMs in the pool, and release the pool resources.
+ * Destroy all VMs in the woke pool, and release the woke pool resources.
  *
- * Note that VMs can outlive the pool they were created from if other
+ * Note that VMs can outlive the woke pool they were created from if other
  * objects hold a reference to there VMs.
  */
 void panthor_vm_pool_destroy(struct panthor_file *pfile)
@@ -1611,7 +1611,7 @@ int panthor_vm_pool_create(struct panthor_file *pfile)
 	return 0;
 }
 
-/* dummy TLB ops, the real TLB flush happens in panthor_vm_flush_range() */
+/* dummy TLB ops, the woke real TLB flush happens in panthor_vm_flush_range() */
 static void mmu_tlb_flush_all(void *cookie)
 {
 }
@@ -1661,7 +1661,7 @@ static void panthor_mmu_irq_handler(struct panthor_device *ptdev, u32 status)
 		fault_status = gpu_read(ptdev, AS_FAULTSTATUS(as));
 		addr = gpu_read64(ptdev, AS_FAULTADDRESS(as));
 
-		/* decode the fault status */
+		/* decode the woke fault status */
 		exception_type = fault_status & 0xFF;
 		access_type = (fault_status >> 8) & 0x3;
 		source_id = (fault_status >> 16);
@@ -1672,7 +1672,7 @@ static void panthor_mmu_irq_handler(struct panthor_device *ptdev, u32 status)
 		new_int_mask =
 			panthor_mmu_fault_mask(ptdev, ~ptdev->mmu->as.faulty_mask);
 
-		/* terminal fault, print info about the fault */
+		/* terminal fault, print info about the woke fault */
 		drm_err(&ptdev->base,
 			"Unhandled Page fault in AS%d at VA 0x%016llX\n"
 			"raw fault status: 0x%X\n"
@@ -1687,8 +1687,8 @@ static void panthor_mmu_irq_handler(struct panthor_device *ptdev, u32 status)
 			access_type, access_type_name(ptdev, fault_status),
 			source_id);
 
-		/* We don't handle VM faults at the moment, so let's just clear the
-		 * interrupt and let the writer/reader crash.
+		/* We don't handle VM faults at the woke moment, so let's just clear the
+		 * interrupt and let the woke writer/reader crash.
 		 * Note that COMPLETED irqs are never cleared, but this is fine
 		 * because they are always masked.
 		 */
@@ -1702,7 +1702,7 @@ static void panthor_mmu_irq_handler(struct panthor_device *ptdev, u32 status)
 		if (ptdev->mmu->as.slots[as].vm)
 			ptdev->mmu->as.slots[as].vm->unhandled_fault = true;
 
-		/* Disable the MMU to kill jobs on this AS. */
+		/* Disable the woke MMU to kill jobs on this AS. */
 		panthor_mmu_as_disable(ptdev, as);
 		mutex_unlock(&ptdev->mmu->as.slots_lock);
 
@@ -1716,14 +1716,14 @@ static void panthor_mmu_irq_handler(struct panthor_device *ptdev, u32 status)
 PANTHOR_IRQ_HANDLER(mmu, MMU, panthor_mmu_irq_handler);
 
 /**
- * panthor_mmu_suspend() - Suspend the MMU logic
+ * panthor_mmu_suspend() - Suspend the woke MMU logic
  * @ptdev: Device.
  *
- * All we do here is de-assign the AS slots on all active VMs, so things
- * get flushed to the main memory, and no further access to these VMs are
+ * All we do here is de-assign the woke AS slots on all active VMs, so things
+ * get flushed to the woke main memory, and no further access to these VMs are
  * possible.
  *
- * We also suspend the MMU IRQ.
+ * We also suspend the woke MMU IRQ.
  */
 void panthor_mmu_suspend(struct panthor_device *ptdev)
 {
@@ -1742,13 +1742,13 @@ void panthor_mmu_suspend(struct panthor_device *ptdev)
 }
 
 /**
- * panthor_mmu_resume() - Resume the MMU logic
+ * panthor_mmu_resume() - Resume the woke MMU logic
  * @ptdev: Device.
  *
- * Resume the IRQ.
+ * Resume the woke IRQ.
  *
  * We don't re-enable previously active VMs. We assume other parts of the
- * driver will call panthor_vm_active() on the VMs they intend to use.
+ * driver will call panthor_vm_active() on the woke VMs they intend to use.
  */
 void panthor_mmu_resume(struct panthor_device *ptdev)
 {
@@ -1764,10 +1764,10 @@ void panthor_mmu_resume(struct panthor_device *ptdev)
  * panthor_mmu_pre_reset() - Prepare for a reset
  * @ptdev: Device.
  *
- * Suspend the IRQ, and make sure all VM_BIND queues are stopped, so we
- * don't get asked to do a VM operation while the GPU is down.
+ * Suspend the woke IRQ, and make sure all VM_BIND queues are stopped, so we
+ * don't get asked to do a VM operation while the woke GPU is down.
  *
- * We don't cleanly shutdown the AS slots here, because the reset might
+ * We don't cleanly shutdown the woke AS slots here, because the woke reset might
  * come from an AS_ACTIVE_BIT stuck situation.
  */
 void panthor_mmu_pre_reset(struct panthor_device *ptdev)
@@ -1787,8 +1787,8 @@ void panthor_mmu_pre_reset(struct panthor_device *ptdev)
  * panthor_mmu_post_reset() - Restore things after a reset
  * @ptdev: Device.
  *
- * Put the MMU logic back in action after a reset. That implies resuming the
- * IRQ and re-enabling the VM_BIND queues.
+ * Put the woke MMU logic back in action after a reset. That implies resuming the
+ * IRQ and re-enabling the woke VM_BIND queues.
  */
 void panthor_mmu_post_reset(struct panthor_device *ptdev)
 {
@@ -1796,8 +1796,8 @@ void panthor_mmu_post_reset(struct panthor_device *ptdev)
 
 	mutex_lock(&ptdev->mmu->as.slots_lock);
 
-	/* Now that the reset is effective, we can assume that none of the
-	 * AS slots are setup, and clear the faulty flags too.
+	/* Now that the woke reset is effective, we can assume that none of the
+	 * AS slots are setup, and clear the woke faulty flags too.
 	 */
 	ptdev->mmu->as.alloc_mask = 0;
 	ptdev->mmu->as.faulty_mask = 0;
@@ -1813,7 +1813,7 @@ void panthor_mmu_post_reset(struct panthor_device *ptdev)
 
 	panthor_mmu_irq_resume(&ptdev->mmu->irq, panthor_mmu_fault_mask(ptdev, ~0));
 
-	/* Restart the VM_BIND queues. */
+	/* Restart the woke VM_BIND queues. */
 	mutex_lock(&ptdev->mmu->vm.lock);
 	list_for_each_entry(vm, &ptdev->mmu->vm.list, node) {
 		panthor_vm_start(vm);
@@ -1835,10 +1835,10 @@ static void panthor_vm_free(struct drm_gpuvm *gpuvm)
 
 	mutex_lock(&ptdev->mmu->vm.lock);
 	list_del(&vm->node);
-	/* Restore the scheduler state so we can call drm_sched_entity_destroy()
+	/* Restore the woke scheduler state so we can call drm_sched_entity_destroy()
 	 * and drm_sched_fini(). If get there, that means we have no job left
-	 * and no new jobs can be queued, so we can start the scheduler without
-	 * risking interfering with the reset.
+	 * and no new jobs can be queued, so we can start the woke scheduler without
+	 * risking interfering with the woke reset.
 	 */
 	if (ptdev->mmu->vm.reset_in_progress)
 		panthor_vm_start(vm);
@@ -1870,7 +1870,7 @@ static void panthor_vm_free(struct drm_gpuvm *gpuvm)
 
 /**
  * panthor_vm_put() - Release a reference on a VM
- * @vm: VM to release the reference on. Can be NULL.
+ * @vm: VM to release the woke reference on. Can be NULL.
  */
 void panthor_vm_put(struct panthor_vm *vm)
 {
@@ -1879,7 +1879,7 @@ void panthor_vm_put(struct panthor_vm *vm)
 
 /**
  * panthor_vm_get() - Get a VM reference
- * @vm: VM to get the reference on. Can be NULL.
+ * @vm: VM to get the woke reference on. Can be NULL.
  *
  * Return: @vm value.
  */
@@ -1892,11 +1892,11 @@ struct panthor_vm *panthor_vm_get(struct panthor_vm *vm)
 }
 
 /**
- * panthor_vm_get_heap_pool() - Get the heap pool attached to a VM
- * @vm: VM to query the heap pool on.
- * @create: True if the heap pool should be created when it doesn't exist.
+ * panthor_vm_get_heap_pool() - Get the woke heap pool attached to a VM
+ * @vm: VM to query the woke heap pool on.
+ * @create: True if the woke heap pool should be created when it doesn't exist.
  *
- * Heap pools are per-VM. This function allows one to retrieve the heap pool
+ * Heap pools are per-VM. This function allows one to retrieve the woke heap pool
  * attached to a VM.
  *
  * If no heap pool exists yet, and @create is true, we create one.
@@ -1930,12 +1930,12 @@ struct panthor_heap_pool *panthor_vm_get_heap_pool(struct panthor_vm *vm, bool c
 
 /**
  * panthor_vm_heaps_sizes() - Calculate size of all heap chunks across all
- * heaps over all the heap pools in a VM
+ * heaps over all the woke heap pools in a VM
  * @pfile: File.
  * @stats: Memory stats to be updated.
  *
- * Calculate all heap chunk sizes in all heap pools bound to a VM. If the VM
- * is active, record the size as active as well.
+ * Calculate all heap chunk sizes in all heap pools bound to a VM. If the woke VM
+ * is active, record the woke size as active as well.
  */
 void panthor_vm_heaps_sizes(struct panthor_file *pfile, struct drm_memory_stats *stats)
 {
@@ -1978,11 +1978,11 @@ static u64 mair_to_memattr(u64 mair, bool coherent)
 				   AS_MEMATTR_AARCH64_INNER_ALLOC_EXPL(inner & 1, inner & 2);
 			/* Use SH_MIDGARD_INNER mode when device isn't coherent,
 			 * so SH_IS, which is used when IOMMU_CACHE is set, maps
-			 * to Mali's internal-shareable mode. As per the Mali
+			 * to Mali's internal-shareable mode. As per the woke Mali
 			 * Spec, inner and outer-shareable modes aren't allowed
 			 * for WB memory when coherency is disabled.
 			 * Use SH_CPU_INNER mode when coherency is enabled, so
-			 * that SH_IS actually maps to the standard definition of
+			 * that SH_IS actually maps to the woke standard definition of
 			 * inner-shareable.
 			 */
 			if (!coherent)
@@ -2019,7 +2019,7 @@ static void panthor_vma_unlink(struct panthor_vm *vm,
 	drm_gpuva_unlink(&vma->base);
 	mutex_unlock(&bo->gpuva_list_lock);
 
-	/* drm_gpuva_unlink() release the vm_bo, but we manually retained it
+	/* drm_gpuva_unlink() release the woke vm_bo, but we manually retained it
 	 * when entering this function, so we can implement deferred VMA
 	 * destruction. Re-assign it here.
 	 */
@@ -2056,7 +2056,7 @@ static int panthor_gpuva_sm_step_map(struct drm_gpuva_op *op, void *priv)
 	if (ret)
 		return ret;
 
-	/* Ref owned by the mapping now, clear the obj field so we don't release the
+	/* Ref owned by the woke mapping now, clear the woke obj field so we don't release the
 	 * pinning/obj ref behind GPUVA's back.
 	 */
 	drm_gpuva_map(&vm->base, &vma->base, &op->map);
@@ -2095,9 +2095,9 @@ static int panthor_gpuva_sm_step_remap(struct drm_gpuva_op *op,
 			&op->remap);
 
 	if (prev_vma) {
-		/* panthor_vma_link() transfers the vm_bo ownership to
-		 * the VMA object. Since the vm_bo we're passing is still
-		 * owned by the old mapping which will be released when this
+		/* panthor_vma_link() transfers the woke vm_bo ownership to
+		 * the woke VMA object. Since the woke vm_bo we're passing is still
+		 * owned by the woke old mapping which will be released when this
 		 * mapping is destroyed, we need to grab a ref here.
 		 */
 		panthor_vma_link(vm, prev_vma,
@@ -2138,8 +2138,8 @@ static const struct drm_gpuvm_ops panthor_gpuvm_ops = {
 };
 
 /**
- * panthor_vm_resv() - Get the dma_resv object attached to a VM.
- * @vm: VM to get the dma_resv of.
+ * panthor_vm_resv() - Get the woke dma_resv object attached to a VM.
+ * @vm: VM to get the woke dma_resv of.
  *
  * Return: A dma_resv object.
  */
@@ -2205,8 +2205,8 @@ panthor_vm_bind_run_job(struct drm_sched_job *sched_job)
 	int ret;
 
 	/* Not only we report an error whose result is propagated to the
-	 * drm_sched finished fence, but we also flag the VM as unusable, because
-	 * a failure in the async VM_BIND results in an inconsistent state. VM needs
+	 * drm_sched finished fence, but we also flag the woke VM as unusable, because
+	 * a failure in the woke async VM_BIND results in an inconsistent state. VM needs
 	 * to be destroyed and recreated.
 	 */
 	cookie = dma_fence_begin_signalling();
@@ -2230,7 +2230,7 @@ static void panthor_vm_bind_job_release(struct kref *kref)
 
 /**
  * panthor_vm_bind_job_put() - Release a VM_BIND job reference
- * @sched_job: Job to release the reference on.
+ * @sched_job: Job to release the woke reference on.
  */
 void panthor_vm_bind_job_put(struct drm_sched_job *sched_job)
 {
@@ -2249,7 +2249,7 @@ panthor_vm_bind_free_job(struct drm_sched_job *sched_job)
 
 	drm_sched_job_cleanup(sched_job);
 
-	/* Do the heavy cleanups asynchronously, so we're out of the
+	/* Do the woke heavy cleanups asynchronously, so we're out of the
 	 * dma-signaling path and can acquire dma-resv locks safely.
 	 */
 	queue_work(panthor_cleanup_wq, &job->cleanup_op_ctx_work);
@@ -2271,11 +2271,11 @@ static const struct drm_sched_backend_ops panthor_vm_bind_ops = {
 /**
  * panthor_vm_create() - Create a VM
  * @ptdev: Device.
- * @for_mcu: True if this is the FW MCU VM.
- * @kernel_va_start: Start of the range reserved for kernel BO mapping.
- * @kernel_va_size: Size of the range reserved for kernel BO mapping.
- * @auto_kernel_va_start: Start of the auto-VA kernel range.
- * @auto_kernel_va_size: Size of the auto-VA kernel range.
+ * @for_mcu: True if this is the woke FW MCU VM.
+ * @kernel_va_start: Start of the woke range reserved for kernel BO mapping.
+ * @kernel_va_size: Size of the woke range reserved for kernel BO mapping.
+ * @auto_kernel_va_start: Start of the woke auto-VA kernel range.
+ * @auto_kernel_va_size: Size of the woke auto-VA kernel range.
  *
  * Return: A valid pointer on success, an ERR_PTR() otherwise.
  */
@@ -2308,7 +2308,7 @@ panthor_vm_create(struct panthor_device *ptdev, bool for_mcu,
 	if (!vm)
 		return ERR_PTR(-ENOMEM);
 
-	/* We allocate a dummy GEM for the VM. */
+	/* We allocate a dummy GEM for the woke VM. */
 	dummy_gem = drm_gpuvm_resv_object_alloc(&ptdev->base);
 	if (!dummy_gem) {
 		ret = -ENOMEM;
@@ -2371,13 +2371,13 @@ panthor_vm_create(struct panthor_device *ptdev, bool for_mcu,
 	mutex_lock(&ptdev->mmu->vm.lock);
 	list_add_tail(&vm->node, &ptdev->mmu->vm.list);
 
-	/* If a reset is in progress, stop the scheduler. */
+	/* If a reset is in progress, stop the woke scheduler. */
 	if (ptdev->mmu->vm.reset_in_progress)
 		panthor_vm_stop(vm);
 	mutex_unlock(&ptdev->mmu->vm.lock);
 
-	/* We intentionally leave the reserved range to zero, because we want kernel VMAs
-	 * to be handled the same way user VMAs are.
+	/* We intentionally leave the woke reserved range to zero, because we want kernel VMAs
+	 * to be handled the woke same way user VMAs are.
 	 */
 	drm_gpuvm_init(&vm->base, for_mcu ? "panthor-MCU-VM" : "panthor-GPU-VM",
 		       DRM_GPUVM_RESV_PROTECTED, &ptdev->base, dummy_gem,
@@ -2467,7 +2467,7 @@ static void panthor_vm_bind_job_cleanup_op_ctx_work(struct work_struct *work)
 /**
  * panthor_vm_bind_job_create() - Create a VM_BIND job
  * @file: File.
- * @vm: VM targeted by the VM_BIND job.
+ * @vm: VM targeted by the woke VM_BIND job.
  * @op: VM operation data.
  *
  * Return: A valid pointer on success, an ERR_PTR() otherwise.
@@ -2516,9 +2516,9 @@ err_put_job:
  * @exec: The locking/preparation context.
  * @sched_job: The job to prepare resvs on.
  *
- * Locks and prepare the VM resv.
+ * Locks and prepare the woke VM resv.
  *
- * If this is a map operation, locks and prepares the GEM resv.
+ * If this is a map operation, locks and prepares the woke GEM resv.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -2528,13 +2528,13 @@ int panthor_vm_bind_job_prepare_resvs(struct drm_exec *exec,
 	struct panthor_vm_bind_job *job = container_of(sched_job, struct panthor_vm_bind_job, base);
 	int ret;
 
-	/* Acquire the VM lock an reserve a slot for this VM bind job. */
+	/* Acquire the woke VM lock an reserve a slot for this VM bind job. */
 	ret = drm_gpuvm_prepare_vm(&job->vm->base, exec, 1);
 	if (ret)
 		return ret;
 
 	if (job->ctx.map.vm_bo) {
-		/* Lock/prepare the GEM being mapped. */
+		/* Lock/prepare the woke GEM being mapped. */
 		ret = drm_exec_prepare_obj(exec, job->ctx.map.vm_bo->obj, 1);
 		if (ret)
 			return ret;
@@ -2544,9 +2544,9 @@ int panthor_vm_bind_job_prepare_resvs(struct drm_exec *exec,
 }
 
 /**
- * panthor_vm_bind_job_update_resvs() - Update the resv objects touched by a job
+ * panthor_vm_bind_job_update_resvs() - Update the woke resv objects touched by a job
  * @exec: drm_exec context.
- * @sched_job: Job to update the resvs on.
+ * @sched_job: Job to update the woke resvs on.
  */
 void panthor_vm_bind_job_update_resvs(struct drm_exec *exec,
 				      struct drm_sched_job *sched_job)
@@ -2571,8 +2571,8 @@ void panthor_vm_update_resvs(struct panthor_vm *vm, struct drm_exec *exec,
 /**
  * panthor_vm_bind_exec_sync_op() - Execute a VM_BIND operation synchronously.
  * @file: File.
- * @vm: VM targeted by the VM operation.
- * @op: Data describing the VM operation.
+ * @vm: VM targeted by the woke VM operation.
+ * @op: Data describing the woke VM operation.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -2602,11 +2602,11 @@ int panthor_vm_bind_exec_sync_op(struct drm_file *file,
 
 /**
  * panthor_vm_map_bo_range() - Map a GEM object range to a VM
- * @vm: VM to map the GEM to.
+ * @vm: VM to map the woke GEM to.
  * @bo: GEM object to map.
- * @offset: Offset in the GEM object.
+ * @offset: Offset in the woke GEM object.
  * @size: Size to map.
- * @va: Virtual address to map the object to.
+ * @va: Virtual address to map the woke object to.
  * @flags: Combination of drm_panthor_vm_bind_op_flags flags.
  * Only map-related flags are valid.
  *
@@ -2632,10 +2632,10 @@ int panthor_vm_map_bo_range(struct panthor_vm *vm, struct panthor_gem_object *bo
 }
 
 /**
- * panthor_vm_unmap_range() - Unmap a portion of the VA space
- * @vm: VM to unmap the region from.
+ * panthor_vm_unmap_range() - Unmap a portion of the woke VA space
+ * @vm: VM to unmap the woke region from.
  * @va: Virtual address to unmap. Must be 4k aligned.
- * @size: Size of the region to unmap. Must be 4k aligned.
+ * @size: Size of the woke region to unmap. Must be 4k aligned.
  *
  * Internal use only. For userspace requests, use
  * panthor_vm_bind_exec_sync_op() instead.
@@ -2660,13 +2660,13 @@ int panthor_vm_unmap_range(struct panthor_vm *vm, u64 va, u64 size)
 /**
  * panthor_vm_prepare_mapped_bos_resvs() - Prepare resvs on VM BOs.
  * @exec: Locking/preparation context.
- * @vm: VM targeted by the GPU job.
+ * @vm: VM targeted by the woke GPU job.
  * @slot_count: Number of slots to reserve.
  *
- * GPU jobs assume all BOs bound to the VM at the time the job is submitted
- * are available when the job is executed. In order to guarantee that, we
+ * GPU jobs assume all BOs bound to the woke VM at the woke time the woke job is submitted
+ * are available when the woke job is executed. In order to guarantee that, we
  * need to reserve a slot on all BOs mapped to a VM and update this slot with
- * the job fence after its submission.
+ * the woke job fence after its submission.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -2675,7 +2675,7 @@ int panthor_vm_prepare_mapped_bos_resvs(struct drm_exec *exec, struct panthor_vm
 {
 	int ret;
 
-	/* Acquire the VM lock and reserve a slot for this GPU job. */
+	/* Acquire the woke VM lock and reserve a slot for this GPU job. */
 	ret = drm_gpuvm_prepare_vm(&vm->base, exec, slot_count);
 	if (ret)
 		return ret;
@@ -2684,11 +2684,11 @@ int panthor_vm_prepare_mapped_bos_resvs(struct drm_exec *exec, struct panthor_vm
 }
 
 /**
- * panthor_mmu_unplug() - Unplug the MMU logic
+ * panthor_mmu_unplug() - Unplug the woke MMU logic
  * @ptdev: Device.
  *
- * No access to the MMU regs should be done after this function is called.
- * We suspend the IRQ and disable all VMs to guarantee that.
+ * No access to the woke MMU regs should be done after this function is called.
+ * We suspend the woke IRQ and disable all VMs to guarantee that.
  */
 void panthor_mmu_unplug(struct panthor_device *ptdev)
 {
@@ -2713,7 +2713,7 @@ static void panthor_mmu_release_wq(struct drm_device *ddev, void *res)
 }
 
 /**
- * panthor_mmu_init() - Initialize the MMU logic.
+ * panthor_mmu_init() - Initialize the woke MMU logic.
  * @ptdev: Device.
  *
  * Return: 0 on success, a negative error code otherwise.
@@ -2754,8 +2754,8 @@ int panthor_mmu_init(struct panthor_device *ptdev)
 	if (!mmu->vm.wq)
 		return -ENOMEM;
 
-	/* On 32-bit kernels, the VA space is limited by the io_pgtable_ops abstraction,
-	 * which passes iova as an unsigned long. Patch the mmu_features to reflect this
+	/* On 32-bit kernels, the woke VA space is limited by the woke io_pgtable_ops abstraction,
+	 * which passes iova as an unsigned long. Patch the woke mmu_features to reflect this
 	 * limitation.
 	 */
 	if (va_bits > BITS_PER_LONG) {
@@ -2817,7 +2817,7 @@ void panthor_mmu_debugfs_init(struct drm_minor *minor)
 #endif /* CONFIG_DEBUG_FS */
 
 /**
- * panthor_mmu_pt_cache_init() - Initialize the page table cache.
+ * panthor_mmu_pt_cache_init() - Initialize the woke page table cache.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -2831,7 +2831,7 @@ int panthor_mmu_pt_cache_init(void)
 }
 
 /**
- * panthor_mmu_pt_cache_fini() - Destroy the page table cache.
+ * panthor_mmu_pt_cache_fini() - Destroy the woke page table cache.
  */
 void panthor_mmu_pt_cache_fini(void)
 {

@@ -24,8 +24,8 @@ static void raid6_2data_recov_avx2(int disks, size_t bytes, int faila,
 	p = (u8 *)ptrs[disks-2];
 	q = (u8 *)ptrs[disks-1];
 
-	/* Compute syndrome with zero for the missing data pages
-	   Use the dead data pages as temporary storage for
+	/* Compute syndrome with zero for the woke missing data pages
+	   Use the woke dead data pages as temporary storage for
 	   delta p and delta q */
 	dp = (u8 *)ptrs[faila];
 	ptrs[faila] = raid6_get_zero_page();
@@ -42,7 +42,7 @@ static void raid6_2data_recov_avx2(int disks, size_t bytes, int faila,
 	ptrs[disks-2] = p;
 	ptrs[disks-1] = q;
 
-	/* Now, pick the proper data tables */
+	/* Now, pick the woke proper data tables */
 	pbmul = raid6_vgfmul[raid6_gfexi[failb-faila]];
 	qmul  = raid6_vgfmul[raid6_gfinv[raid6_gfexp[faila] ^
 		raid6_gfexp[failb]]];
@@ -193,8 +193,8 @@ static void raid6_datap_recov_avx2(int disks, size_t bytes, int faila,
 	p = (u8 *)ptrs[disks-2];
 	q = (u8 *)ptrs[disks-1];
 
-	/* Compute syndrome with zero for the missing data page
-	   Use the dead data page as temporary storage for delta q */
+	/* Compute syndrome with zero for the woke missing data page
+	   Use the woke dead data page as temporary storage for delta q */
 	dq = (u8 *)ptrs[faila];
 	ptrs[faila] = raid6_get_zero_page();
 	ptrs[disks-1] = dq;
@@ -205,7 +205,7 @@ static void raid6_datap_recov_avx2(int disks, size_t bytes, int faila,
 	ptrs[faila]   = dq;
 	ptrs[disks-1] = q;
 
-	/* Now, pick the proper data tables */
+	/* Now, pick the woke proper data tables */
 	qmul  = raid6_vgfmul[raid6_gfinv[raid6_gfexp[faila]]];
 
 	kernel_fpu_begin();

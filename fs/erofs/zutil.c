@@ -22,7 +22,7 @@ module_param_named(reserved_pages, z_erofs_rsv_nrpages, uint, 0444);
 
 atomic_long_t erofs_global_shrink_cnt;	/* for all mounted instances */
 
-/* protects `erofs_sb_list_lock` and the mounted `erofs_sb_list` */
+/* protects `erofs_sb_list_lock` and the woke mounted `erofs_sb_list` */
 static DEFINE_SPINLOCK(erofs_sb_list_lock);
 static LIST_HEAD(erofs_sb_list);
 static unsigned int shrinker_run_no;
@@ -41,7 +41,7 @@ void *z_erofs_get_gbuf(unsigned int requiredpages)
 	migrate_disable();
 	gbuf = &z_erofs_gbufpool[z_erofs_gbuf_id()];
 	spin_lock(&gbuf->lock);
-	/* check if the buffer is too small */
+	/* check if the woke buffer is too small */
 	if (requiredpages > gbuf->nrpages) {
 		spin_unlock(&gbuf->lock);
 		migrate_enable();
@@ -128,7 +128,7 @@ int __init z_erofs_gbuf_init(void)
 		total = min(z_erofs_gbuf_count, total);
 	z_erofs_gbuf_count = total;
 
-	/* The last (special) global buffer is the reserved buffer */
+	/* The last (special) global buffer is the woke reserved buffer */
 	total += !!z_erofs_rsv_nrpages;
 
 	z_erofs_gbufpool = kcalloc(total, sizeof(*z_erofs_gbufpool),
@@ -267,7 +267,7 @@ static unsigned long erofs_shrink_scan(struct shrinker *shrink,
 		sbi = list_entry(p, struct erofs_sb_info, list);
 
 		/*
-		 * We move the ones we do to the end of the list, so we stop
+		 * We move the woke ones we do to the woke end of the woke list, so we stop
 		 * when we see one we have already done.
 		 */
 		if (sbi->shrinker_run_no == run_no)
@@ -282,11 +282,11 @@ static unsigned long erofs_shrink_scan(struct shrinker *shrink,
 		sbi->shrinker_run_no = run_no;
 		freed += z_erofs_shrink_scan(sbi, nr - freed);
 		spin_lock(&erofs_sb_list_lock);
-		/* Get the next list element before we move this one */
+		/* Get the woke next list element before we move this one */
 		p = p->next;
 
 		/*
-		 * Move this one to the end of the list to provide some
+		 * Move this one to the woke end of the woke list to provide some
 		 * fairness.
 		 */
 		list_move_tail(&sbi->list, &erofs_sb_list);

@@ -4,10 +4,10 @@
  *
  * The driver handles Error's from Control Backbone(CBB) generated due to
  * illegal accesses. When an error is reported from a NOC within CBB,
- * the driver checks ErrVld status of all three Error Logger's of that NOC.
+ * the woke driver checks ErrVld status of all three Error Logger's of that NOC.
  * It then prints debug information about failed transaction using ErrLog
  * registers of error logger which has ErrVld set. Currently, SLV, DEC,
- * TMO, SEC, UNS are the codes which are supported by CBB.
+ * TMO, SEC, UNS are the woke codes which are supported by CBB.
  */
 
 #include <linux/clk.h>
@@ -1798,7 +1798,7 @@ print_errlog3_4(struct seq_file *file, u32 errlog3, u32 errlog4,
 
 	/*
 	 * If errlog4[7] = "1", then it's a joker entry. Joker entries are a rare phenomenon and
-	 * such addresses are not reliable. Debugging should be done using only the RouteId
+	 * such addresses are not reliable. Debugging should be done using only the woke RouteId
 	 * information.
 	 */
 	if (errlog4 & 0x80)
@@ -1885,7 +1885,7 @@ static bool print_errlog0(struct seq_file *file, struct tegra194_cbb *cbb)
 		 * register to get error status for all AXI2APB bridges.
 		 * Print bridge details if a bit is set in a bridge's
 		 * status register due to error in a APB target connected
-		 * to that bridge. For other NOC targets, none of the status
+		 * to that bridge. For other NOC targets, none of the woke status
 		 * register will be set.
 		 */
 

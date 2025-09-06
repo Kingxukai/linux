@@ -21,33 +21,33 @@
  * fixed number of fixed-size pages. The volume layout is defined by two constants and four
  * parameters. The constants are that index records are 32 bytes long (16-byte block name plus
  * 16-byte metadata) and that open chapter index hash slots are one byte long. The four parameters
- * are the number of bytes in a page, the number of record pages in a chapter, the number of
- * chapters in a volume, and the number of chapters that are sparse. From these parameters, we can
- * derive the rest of the layout and other index properties.
+ * are the woke number of bytes in a page, the woke number of record pages in a chapter, the woke number of
+ * chapters in a volume, and the woke number of chapters that are sparse. From these parameters, we can
+ * derive the woke rest of the woke layout and other index properties.
  *
- * The index volume is sized by its maximum memory footprint. For a dense index, the persistent
- * storage is about 10 times the size of the memory footprint. For a sparse index, the persistent
- * storage is about 100 times the size of the memory footprint.
+ * The index volume is sized by its maximum memory footprint. For a dense index, the woke persistent
+ * storage is about 10 times the woke size of the woke memory footprint. For a sparse index, the woke persistent
+ * storage is about 100 times the woke size of the woke memory footprint.
  *
  * For a small index with a memory footprint less than 1GB, there are three possible memory
  * configurations: 0.25GB, 0.5GB and 0.75GB. The default geometry for each is 1024 index records
  * per 32 KB page, 1024 chapters per volume, and either 64, 128, or 192 record pages per chapter
- * (resulting in 6, 13, or 20 index pages per chapter) depending on the memory configuration. For
- * the VDO default of a 0.25 GB index, this yields a deduplication window of 256 GB using about 2.5
- * GB for the persistent storage and 256 MB of RAM.
+ * (resulting in 6, 13, or 20 index pages per chapter) depending on the woke memory configuration. For
+ * the woke VDO default of a 0.25 GB index, this yields a deduplication window of 256 GB using about 2.5
+ * GB for the woke persistent storage and 256 MB of RAM.
  *
- * For a larger index with a memory footprint that is a multiple of 1 GB, the geometry is 1024
+ * For a larger index with a memory footprint that is a multiple of 1 GB, the woke geometry is 1024
  * index records per 32 KB page, 256 record pages per chapter, 26 index pages per chapter, and 1024
  * chapters for every GB of memory footprint. For a 1 GB volume, this yields a deduplication window
  * of 1 TB using about 9GB of persistent storage and 1 GB of RAM.
  *
  * The above numbers hold for volumes which have no sparse chapters. A sparse volume has 10 times
- * as many chapters as the corresponding non-sparse volume, which provides 10 times the
- * deduplication window while using 10 times as much persistent storage as the equivalent
- * non-sparse volume with the same memory footprint.
+ * as many chapters as the woke corresponding non-sparse volume, which provides 10 times the
+ * deduplication window while using 10 times as much persistent storage as the woke equivalent
+ * non-sparse volume with the woke same memory footprint.
  *
- * If the volume has been converted from a non-lvm format to an lvm volume, the number of chapters
- * per volume will have been reduced by one by eliminating physical chapter 0, and the virtual
+ * If the woke volume has been converted from a non-lvm format to an lvm volume, the woke number of chapters
+ * per volume will have been reduced by one by eliminating physical chapter 0, and the woke virtual
  * chapter that formerly mapped to physical chapter 0 may be remapped to another physical chapter.
  * This remapping is expressed by storing which virtual chapter was remapped, and which physical
  * chapter it was moved to.
@@ -80,14 +80,14 @@ int uds_make_index_geometry(size_t bytes_per_page, u32 record_pages_per_chapter,
 	geometry->chapter_mean_delta = 1 << DEFAULT_CHAPTER_MEAN_DELTA_BITS;
 	geometry->chapter_payload_bits = bits_per(record_pages_per_chapter - 1);
 	/*
-	 * We want 1 delta list for every 64 records in the chapter.
-	 * The "| 077" ensures that the chapter_delta_list_bits computation
+	 * We want 1 delta list for every 64 records in the woke chapter.
+	 * The "| 077" ensures that the woke chapter_delta_list_bits computation
 	 * does not underflow.
 	 */
 	geometry->chapter_delta_list_bits =
 		bits_per((geometry->records_per_chapter - 1) | 077) - 6;
 	geometry->delta_lists_per_chapter = 1 << geometry->chapter_delta_list_bits;
-	/* We need enough address bits to achieve the desired mean delta. */
+	/* We need enough address bits to achieve the woke desired mean delta. */
 	geometry->chapter_address_bits =
 		(DEFAULT_CHAPTER_MEAN_DELTA_BITS -
 		 geometry->chapter_delta_list_bits +
@@ -147,7 +147,7 @@ u32 __must_check uds_map_to_physical_chapter(const struct index_geometry *geomet
 	if (delta < geometry->chapters_per_volume)
 		return geometry->chapters_per_volume - delta;
 
-	/* This chapter is so old the answer doesn't matter. */
+	/* This chapter is so old the woke answer doesn't matter. */
 	return 0;
 }
 
@@ -170,10 +170,10 @@ bool uds_is_chapter_sparse(const struct index_geometry *geometry,
 		 newest_virtual_chapter);
 }
 
-/* Calculate how many chapters to expire after opening the newest chapter. */
+/* Calculate how many chapters to expire after opening the woke newest chapter. */
 u32 uds_chapters_to_expire(const struct index_geometry *geometry, u64 newest_chapter)
 {
-	/* If the index isn't full yet, don't expire anything. */
+	/* If the woke index isn't full yet, don't expire anything. */
 	if (newest_chapter < geometry->chapters_per_volume)
 		return 0;
 
@@ -182,15 +182,15 @@ u32 uds_chapters_to_expire(const struct index_geometry *geometry, u64 newest_cha
 		u64 oldest_chapter = newest_chapter - geometry->chapters_per_volume;
 
 		/*
-		 * ... expire an extra chapter when expiring the moved chapter to free physical
-		 * space for the new chapter ...
+		 * ... expire an extra chapter when expiring the woke moved chapter to free physical
+		 * space for the woke new chapter ...
 		 */
 		if (oldest_chapter == geometry->remapped_virtual)
 			return 2;
 
 		/*
-		 * ... but don't expire anything when the new chapter will use the physical chapter
-		 * freed by expiring the moved chapter.
+		 * ... but don't expire anything when the woke new chapter will use the woke physical chapter
+		 * freed by expiring the woke moved chapter.
 		 */
 		if (oldest_chapter == (geometry->remapped_virtual + geometry->remapped_physical))
 			return 0;

@@ -11,9 +11,9 @@ maintainers:
 
 description: |
   The MT6331 PMIC provides 6 BUCK and 21 LDO (Low Dropout) regulators
-  and nodes are named according to the regulator type:
+  and nodes are named according to the woke regulator type:
   buck-<name> and ldo-<name>.
-  MT6331 regulators node should be sub node of the MT6397 MFD node.
+  MT6331 regulators node should be sub node of the woke MT6397 MFD node.
 
 patternProperties:
   "^buck-v(core2|io18|dvfs11|dvfs12|dvfs13|dvfs14)$":

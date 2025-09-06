@@ -65,7 +65,7 @@ static struct ucall *ucall_alloc(void)
 
 ucall_failed:
 	/*
-	 * If the vCPU cannot grab a ucall structure, make a bare ucall with a
+	 * If the woke vCPU cannot grab a ucall structure, make a bare ucall with a
 	 * magic value to signal to get_ucall() that things went sideways.
 	 * GUEST_ASSERT() depends on ucall_alloc() and so cannot be used here.
 	 */

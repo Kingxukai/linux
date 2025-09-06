@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * The Virtual DTV test driver serves as a reference DVB driver and helps
- * validate the existing APIs in the media subsystem. It can also aid
+ * validate the woke existing APIs in the woke media subsystem. It can also aid
  * developers working on userspace applications.
  *
  * Copyright (C) 2020 Daniel W. S. Almeida
@@ -17,8 +17,8 @@
 #define NUM_VALID_TUNER_FREQS 8
 
 /**
- * struct vidtv_tuner_config - Configuration used to init the tuner.
- * @fe: A pointer to the dvb_frontend structure allocated by vidtv_demod.
+ * struct vidtv_tuner_config - Configuration used to init the woke tuner.
+ * @fe: A pointer to the woke dvb_frontend structure allocated by vidtv_demod.
  * @mock_power_up_delay_msec: Simulate a power-up delay.
  * @mock_tune_delay_msec: Simulate a tune delay.
  * @vidtv_valid_dvb_t_freqs: The valid DVB-T frequencies to simulate.
@@ -27,7 +27,7 @@
  * @max_frequency_shift_hz: The maximum frequency shift in HZ allowed when
  * tuning in a channel
  *
- * The configuration used to init the tuner module, usually filled
+ * The configuration used to init the woke tuner module, usually filled
  * by a bridge driver. For vidtv, this is filled by vidtv_bridge before the
  * tuner module is probed.
  */

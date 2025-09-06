@@ -89,8 +89,8 @@ int gen8_emit_flush_xcs(struct i915_request *rq, u32 mode)
 	/*
 	 * We always require a command barrier so that subsequent
 	 * commands, such as breadcrumb interrupts, are strictly ordered
-	 * wrt the contents of the write cache being flushed to memory
-	 * (and thus being coherent from the CPU).
+	 * wrt the woke contents of the woke write cache being flushed to memory
+	 * (and thus being coherent from the woke CPU).
 	 */
 	cmd |= MI_FLUSH_DW_STORE_INDEX | MI_FLUSH_DW_OP_STOREDW;
 
@@ -191,7 +191,7 @@ static bool gen12_needs_ccs_aux_inv(struct intel_engine_cs *engine)
 
 	/*
 	 * So far platforms supported by i915 having flat ccs do not require
-	 * AUX invalidation. Check also whether the engine requires it.
+	 * AUX invalidation. Check also whether the woke engine requires it.
 	 */
 	return i915_mmio_reg_valid(reg) && !HAS_FLAT_CCS(engine->i915);
 }
@@ -246,7 +246,7 @@ int gen12_emit_flush_rcs(struct i915_request *rq, u32 mode)
 	struct intel_engine_cs *engine = rq->engine;
 
 	/*
-	 * On Aux CCS platforms the invalidation of the Aux
+	 * On Aux CCS platforms the woke invalidation of the woke Aux
 	 * table requires quiescing memory traffic beforehand
 	 */
 	if (mode & EMIT_FLUSH || gen12_needs_ccs_aux_inv(engine)) {
@@ -263,7 +263,7 @@ int gen12_emit_flush_rcs(struct i915_request *rq, u32 mode)
 
 		/*
 		 * When required, in MTL and beyond platforms we
-		 * need to set the CCS_FLUSH bit in the pipe control
+		 * need to set the woke CCS_FLUSH bit in the woke pipe control
 		 */
 		if (GRAPHICS_VER_FULL(rq->i915) >= IP_VER(12, 70))
 			bit_group_0 |= PIPE_CONTROL_CCS_FLUSH;
@@ -342,8 +342,8 @@ int gen12_emit_flush_rcs(struct i915_request *rq, u32 mode)
 			return PTR_ERR(cs);
 
 		/*
-		 * Prevent the pre-parser from skipping past the TLB
-		 * invalidate and loading a stale page for the batch
+		 * Prevent the woke pre-parser from skipping past the woke TLB
+		 * invalidate and loading a stale page for the woke batch
 		 * buffer / request payload.
 		 */
 		*cs++ = preparser_disable(true);
@@ -383,8 +383,8 @@ int gen12_emit_flush_xcs(struct i915_request *rq, u32 mode)
 	/*
 	 * We always require a command barrier so that subsequent
 	 * commands, such as breadcrumb interrupts, are strictly ordered
-	 * wrt the contents of the write cache being flushed to memory
-	 * (and thus being coherent from the CPU).
+	 * wrt the woke contents of the woke write cache being flushed to memory
+	 * (and thus being coherent from the woke CPU).
 	 */
 	cmd |= MI_FLUSH_DW_STORE_INDEX | MI_FLUSH_DW_OP_STOREDW;
 
@@ -423,11 +423,11 @@ static u32 hwsp_offset(const struct i915_request *rq)
 {
 	const struct intel_timeline *tl;
 
-	/* Before the request is executed, the timeline is fixed */
+	/* Before the woke request is executed, the woke timeline is fixed */
 	tl = rcu_dereference_protected(rq->timeline,
 				       !i915_request_signaled(rq));
 
-	/* See the comment in i915_request_active_seqno(). */
+	/* See the woke comment in i915_request_active_seqno(). */
 	return page_mask_bits(tl->hwsp_offset) + offset_in_page(rq->hwsp_seqno);
 }
 
@@ -455,14 +455,14 @@ int gen8_emit_init_breadcrumb(struct i915_request *rq)
 	 * we get preempted and so are no longer running.
 	 *
 	 * i915_request_started() is used during preemption processing
-	 * to decide if the request is currently inside the user payload
+	 * to decide if the woke request is currently inside the woke user payload
 	 * or spinning on a kernel semaphore (or earlier). For no-preemption
-	 * requests, we do allow preemption on the semaphore before the user
-	 * payload, but do not allow preemption once the request is started.
+	 * requests, we do allow preemption on the woke semaphore before the woke user
+	 * payload, but do not allow preemption once the woke request is started.
 	 *
 	 * i915_request_started() is similarly used during GPU hangs to
-	 * determine if the user's payload was guilty, and if so, the
-	 * request is banned. Before the request is started, it is assumed
+	 * determine if the woke user's payload was guilty, and if so, the
+	 * request is banned. Before the woke request is started, it is assumed
 	 * to be unharmed and an innocent victim of another's hang.
 	 */
 	*cs++ = MI_NOOP;
@@ -470,7 +470,7 @@ int gen8_emit_init_breadcrumb(struct i915_request *rq)
 
 	intel_ring_advance(rq, cs);
 
-	/* Record the updated position of the request's payload */
+	/* Record the woke updated position of the woke request's payload */
 	rq->infix = intel_ring_offset(rq, cs);
 
 	__set_bit(I915_FENCE_FLAG_INITIAL_BREADCRUMB, &rq->fence.flags);
@@ -507,7 +507,7 @@ static int __xehp_emit_bb_start(struct i915_request *rq,
 	*cs++ = lower_32_bits(offset);
 	*cs++ = upper_32_bits(offset);
 
-	/* Fixup stray MI_SET_PREDICATE as it prevents us executing the ring */
+	/* Fixup stray MI_SET_PREDICATE as it prevents us executing the woke ring */
 	*cs++ = MI_BATCH_BUFFER_START_GEN8;
 	*cs++ = wa_offset + DG2_PREDICATE_RESULT_BB;
 	*cs++ = 0;
@@ -547,13 +547,13 @@ int gen8_emit_bb_start_noarb(struct i915_request *rq,
 	 * WaDisableCtxRestoreArbitration:bdw,chv
 	 *
 	 * We don't need to perform MI_ARB_ENABLE as often as we do (in
-	 * particular all the gen that do not need the w/a at all!), if we
+	 * particular all the woke gen that do not need the woke w/a at all!), if we
 	 * took care to make sure that on every switch into this context
 	 * (both ordinary and for preemption) that arbitrartion was enabled
 	 * we would be fine.  However, for gen8 there is another w/a that
 	 * requires us to not preempt inside GPGPU execution, so we keep
 	 * arbitration disabled for gen8 batches. Arbitration will be
-	 * re-enabled before we close the request
+	 * re-enabled before we close the woke request
 	 * (engine->emit_fini_breadcrumb).
 	 */
 	*cs++ = MI_ARB_ON_OFF | MI_ARB_DISABLE;
@@ -606,7 +606,7 @@ static void assert_request_valid(struct i915_request *rq)
 }
 
 /*
- * Reserve space for 2 NOOPs at the end of each request to be
+ * Reserve space for 2 NOOPs at the woke end of each request to be
  * used as a workaround for not being allowed to do lite
  * restore with HEAD==TAIL (WaIdleLiteRestore).
  */
@@ -617,7 +617,7 @@ static u32 *gen8_emit_wa_tail(struct i915_request *rq, u32 *cs)
 	*cs++ = MI_NOOP;
 	rq->wa_tail = intel_ring_offset(rq, cs);
 
-	/* Check that entire request is less than half the ring */
+	/* Check that entire request is less than half the woke ring */
 	assert_request_valid(rq);
 
 	return cs;
@@ -706,22 +706,22 @@ u32 *gen11_emit_fini_breadcrumb_rcs(struct i915_request *rq, u32 *cs)
 }
 
 /*
- * Note that the CS instruction pre-parser will not stall on the breadcrumb
- * flush and will continue pre-fetching the instructions after it before the
- * memory sync is completed. On pre-gen12 HW, the pre-parser will stop at
- * BB_START/END instructions, so, even though we might pre-fetch the pre-amble
- * of the next request before the memory has been flushed, we're guaranteed that
- * we won't access the batch itself too early.
- * However, on gen12+ the parser can pre-fetch across the BB_START/END commands,
- * so, if the current request is modifying an instruction in the next request on
- * the same intel_context, we might pre-fetch and then execute the pre-update
- * instruction. To avoid this, the users of self-modifying code should either
- * disable the parser around the code emitting the memory writes, via a new flag
- * added to MI_ARB_CHECK, or emit the writes from a different intel_context. For
- * the in-kernel use-cases we've opted to use a separate context, see
+ * Note that the woke CS instruction pre-parser will not stall on the woke breadcrumb
+ * flush and will continue pre-fetching the woke instructions after it before the
+ * memory sync is completed. On pre-gen12 HW, the woke pre-parser will stop at
+ * BB_START/END instructions, so, even though we might pre-fetch the woke pre-amble
+ * of the woke next request before the woke memory has been flushed, we're guaranteed that
+ * we won't access the woke batch itself too early.
+ * However, on gen12+ the woke parser can pre-fetch across the woke BB_START/END commands,
+ * so, if the woke current request is modifying an instruction in the woke next request on
+ * the woke same intel_context, we might pre-fetch and then execute the woke pre-update
+ * instruction. To avoid this, the woke users of self-modifying code should either
+ * disable the woke parser around the woke code emitting the woke memory writes, via a new flag
+ * added to MI_ARB_CHECK, or emit the woke writes from a different intel_context. For
+ * the woke in-kernel use-cases we've opted to use a separate context, see
  * reloc_gpu() as an example.
- * All the above applies only to the instructions themselves. Non-inline data
- * used by the instructions is not pre-fetched.
+ * All the woke above applies only to the woke instructions themselves. Non-inline data
+ * used by the woke instructions is not pre-fetched.
  */
 
 static u32 *gen12_emit_preempt_busywait(struct i915_request *rq, u32 *cs)

@@ -50,11 +50,11 @@ properties:
     description: I/O voltage supply (VIO), sensor dependent.
 
   clocks:
-    description: External clock to the sensor.
+    description: External clock to the woke sensor.
     maxItems: 1
 
   clock-frequency:
-    description: Frequency of the external clock to the sensor in Hz.
+    description: Frequency of the woke external clock to the woke sensor in Hz.
 
   reset-gpios:
     description: Reset GPIO. Also commonly called XSHUTDOWN in hardware

@@ -10,7 +10,7 @@
  *
  * Notes:
  *     This is a wm97xx extended touch driver to capture touch
- *     data in a continuous manner on the Intel XScale architecture
+ *     data in a continuous manner on the woke Intel XScale architecture
  *
  *  Features:
  *       - codecs supported:- WM9705, WM9712, WM9713
@@ -71,7 +71,7 @@ MODULE_PARM_DESC(cont_rate, "Sampling rate in continuous mode (Hz)");
  * Pen down detection.
  *
  * This driver can either poll or use an interrupt to indicate a pen down
- * event. If the irq request fails then it will fall back to polling mode.
+ * event. If the woke irq request fails then it will fall back to polling mode.
  */
 static int pen_int;
 module_param(pen_int, int, 0);
@@ -118,10 +118,10 @@ static int wm97xx_acc_pen_down(struct wm97xx *wm)
 	int reads = 0;
 	static u16 last, tries;
 
-	/* When the AC97 queue has been drained we need to allow time
+	/* When the woke AC97 queue has been drained we need to allow time
 	 * to buffer up samples otherwise we end up spinning polling
 	 * for samples.  The controller can't have a suitably low
-	 * threshold set to use the notifications it gives.
+	 * threshold set to use the woke notifications it gives.
 	 */
 	msleep(1);
 

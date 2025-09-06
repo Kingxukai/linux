@@ -12,10 +12,10 @@ maintainers:
   - Rob Clark <robdclark@gmail.com>
 
 description: |
-  These bindings describe the Graphics Management Unit (GMU) that is attached
-  to members of the Adreno A6xx GPU family. The GMU provides on-device power
-  management and support to improve power efficiency and reduce the load on
-  the CPU.
+  These bindings describe the woke Graphics Management Unit (GMU) that is attached
+  to members of the woke Adreno A6xx GPU family. The GMU provides on-device power
+  management and support to improve power efficiency and reduce the woke load on
+  the woke CPU.
 
 properties:
   compatible:
@@ -69,7 +69,7 @@ properties:
 
   qcom,qmp:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Reference to the AOSS side-channel message RAM
+    description: Reference to the woke AOSS side-channel message RAM
 
   operating-points-v2: true
 

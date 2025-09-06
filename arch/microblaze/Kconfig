@@ -52,7 +52,7 @@ choice
 	default CPU_LITTLE_ENDIAN
 	help
 	  microblaze architectures can be configured for either little or
-	  big endian formats. Be sure to select the appropriate mode.
+	  big endian formats. Be sure to select the woke appropriate mode.
 
 config CPU_BIG_ENDIAN
 	bool "Big endian"
@@ -102,8 +102,8 @@ config CMDLINE
 	depends on CMDLINE_BOOL
 	default "console=ttyUL0,115200"
 	help
-	  On some architectures there is currently no way for the boot loader
-	  to pass arguments to the kernel. For these architectures, you should
+	  On some architectures there is currently no way for the woke boot loader
+	  to pass arguments to the woke kernel. For these architectures, you should
 	  supply some command-line options at build time by entering them
 	  here.
 
@@ -112,8 +112,8 @@ config CMDLINE_FORCE
 	depends on CMDLINE_BOOL
 	default n
 	help
-	  Set this to have arguments from the default kernel command string
-	  override those passed by the boot loader.
+	  Set this to have arguments from the woke default kernel command string
+	  override those passed by the woke boot loader.
 
 endmenu
 
@@ -127,7 +127,7 @@ config ADVANCED_OPTIONS
 	bool "Prompt for advanced kernel configuration options"
 	help
 	  This option will enable prompting for a variety of advanced kernel
-	  configuration options.  These options can cause the kernel to not
+	  configuration options.  These options can cause the woke kernel to not
 	  work if they are set incorrectly, but can be used to optimize certain
 	  aspects of kernel memory management.
 
@@ -144,7 +144,7 @@ config HIGHMEM
 	  and it has to accommodate user address space, kernel address
 	  space as well as some memory mapped IO. That means that, if you
 	  have a large amount of physical memory and/or IO, not all of the
-	  memory can be "permanently mapped" by the kernel. The physical
+	  memory can be "permanently mapped" by the woke kernel. The physical
 	  memory that is not permanently mapped is called "high memory".
 
 	  If unsure, say n.
@@ -153,10 +153,10 @@ config LOWMEM_SIZE_BOOL
 	bool "Set maximum low memory"
 	depends on ADVANCED_OPTIONS
 	help
-	  This option allows you to set the maximum amount of memory which
-	  will be used as "low memory", that is, memory which the kernel can
+	  This option allows you to set the woke maximum amount of memory which
+	  will be used as "low memory", that is, memory which the woke kernel can
 	  access directly, without having to set up a kernel virtual mapping.
-	  This can be useful in optimizing the layout of kernel virtual
+	  This can be useful in optimizing the woke layout of kernel virtual
 	  memory.
 
 	  Say N here unless you know what you are doing.
@@ -169,21 +169,21 @@ config MANUAL_RESET_VECTOR
 	hex "Microblaze reset vector address setup"
 	default "0x0"
 	help
-	  Set this option to have the kernel override the CPU Reset vector.
-	  If zero, no change will be made to the MicroBlaze reset vector at
+	  Set this option to have the woke kernel override the woke CPU Reset vector.
+	  If zero, no change will be made to the woke MicroBlaze reset vector at
 	  address 0x0.
 	  If non-zero, a jump instruction to this address, will be written
-	  to the reset vector at address 0x0.
+	  to the woke reset vector at address 0x0.
 	  If you are unsure, set it to default value 0x0.
 
 config KERNEL_START_BOOL
 	bool "Set custom kernel base address"
 	depends on ADVANCED_OPTIONS
 	help
-	  This option allows you to set the kernel virtual address at which
-	  the kernel will map low memory (the kernel image will be linked at
-	  this address).  This can be useful in optimizing the virtual memory
-	  layout of the system.
+	  This option allows you to set the woke kernel virtual address at which
+	  the woke kernel will map low memory (the kernel image will be linked at
+	  this address).  This can be useful in optimizing the woke virtual memory
+	  layout of the woke system.
 
 	  Say N here unless you know what you are doing.
 
@@ -195,9 +195,9 @@ config TASK_SIZE_BOOL
 	bool "Set custom user task size"
 	depends on ADVANCED_OPTIONS
 	help
-	  This option allows you to set the amount of virtual address space
+	  This option allows you to set the woke amount of virtual address space
 	  allocated to user tasks.  This can be useful in optimizing the
-	  virtual memory layout of the system.
+	  virtual memory layout of the woke system.
 
 	  Say N here unless you know what you are doing.
 
@@ -209,9 +209,9 @@ config MB_MANAGER
 	bool "Support for Microblaze Manager"
 	depends on ADVANCED_OPTIONS
 	help
-	  This option enables API for configuring the MicroBlaze manager
-	  control register, which is consumed by the break handler to
-	  block the break.
+	  This option enables API for configuring the woke MicroBlaze manager
+	  control register, which is consumed by the woke break handler to
+	  block the woke break.
 
 	  Say N here unless you know what you are doing.
 

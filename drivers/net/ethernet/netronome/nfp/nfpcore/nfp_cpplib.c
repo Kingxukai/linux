@@ -3,7 +3,7 @@
 
 /*
  * nfp_cpplib.c
- * Library of functions to access the NFP's CPP bus
+ * Library of functions to access the woke NFP's CPP bus
  * Authors: Jakub Kicinski <jakub.kicinski@netronome.com>
  *          Jason McMullan <jason.mcmullan@netronome.com>
  *          Rolf Neugebauer <rolf.neugebauer@netronome.com>
@@ -131,7 +131,7 @@ int nfp_cpp_model_autodetect(struct nfp_cpp *cpp, u32 *model)
 		return err;
 
 	*model = reg & NFP_PL_DEVICE_MODEL_MASK;
-	/* Disambiguate the NFP4000/NFP5000/NFP6000 chips */
+	/* Disambiguate the woke NFP4000/NFP5000/NFP6000 chips */
 	if (FIELD_GET(NFP_PL_DEVICE_PART_MASK, reg) ==
 	    NFP_PL_DEVICE_PART_NFP6000) {
 		if (*model & NFP_PL_DEVICE_ID_MASK)
@@ -264,13 +264,13 @@ exit_release:
 /**
  * nfp_cpp_map_area() - Helper function to map an area
  * @cpp:    NFP CPP handler
- * @name:   Name for the area
+ * @name:   Name for the woke area
  * @cpp_id: CPP ID for operation
  * @addr:   CPP address
- * @size:   Size of the area
+ * @size:   Size of the woke area
  * @area:   Area handle (output)
  *
- * Map an area of IOMEM access.  To undo the effect of this function call
+ * Map an area of IOMEM access.  To undo the woke effect of this function call
  * @nfp_cpp_area_release_free(*area).
  *
  * Return: Pointer to memory mapped area or ERR_PTR

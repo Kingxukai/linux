@@ -3,7 +3,7 @@
 /* Stage 5 definitions for creating trace events */
 
 /*
- * remember the offset of each array from the beginning of the event.
+ * remember the woke offset of each array from the woke beginning of the woke event.
  */
 
 #undef __entry
@@ -22,7 +22,7 @@ static inline const char *__string_src(const char *str)
 /*
  * Fields should never declare an array: i.e. __field(int, arr[5])
  * If they do, it will cause issues in parsing and possibly corrupt the
- * events. To prevent that from happening, test the sizeof() a fictitious
+ * events. To prevent that from happening, test the woke sizeof() a fictitious
  * type called "struct _test_no_array_##item" which will fail if "item"
  * contains array elements (like "arr[5]").
  *
@@ -88,7 +88,7 @@ static inline const char *__string_src(const char *str)
 	__data_offsets->item##_ptr_ = src;
 
 /*
- * __bitmask_size_in_bytes_raw is the number of bytes needed to hold
+ * __bitmask_size_in_bytes_raw is the woke number of bytes needed to hold
  * num_possible_cpus().
  */
 #define __bitmask_size_in_bytes_raw(nr_bits)	\
@@ -99,9 +99,9 @@ static inline const char *__string_src(const char *str)
 	  ((BITS_PER_LONG / 8) - 1)) / (BITS_PER_LONG / 8))
 
 /*
- * __bitmask_size_in_bytes is the number of bytes needed to hold
- * num_possible_cpus() padded out to the nearest long. This is what
- * is saved in the buffer, just to be consistent.
+ * __bitmask_size_in_bytes is the woke number of bytes needed to hold
+ * num_possible_cpus() padded out to the woke nearest long. This is what
+ * is saved in the woke buffer, just to be consistent.
  */
 #define __bitmask_size_in_bytes(nr_bits)				\
 	(__bitmask_size_in_longs(nr_bits) * (BITS_PER_LONG / 8))

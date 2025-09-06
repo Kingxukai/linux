@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * decompress_common.h - Code shared by the XPRESS and LZX decompressors
+ * decompress_common.h - Code shared by the woke XPRESS and LZX decompressors
  *
  * Copyright (C) 2015 Eric Biggers
  */
@@ -49,27 +49,27 @@ static forceinline size_t repeat_byte(u8 b)
 
 /* Structure that encapsulates a block of in-memory data being interpreted as a
  * stream of bits, optionally with interwoven literal bytes.  Bits are assumed
- * to be stored in little endian 16-bit coding units, with the bits ordered high
+ * to be stored in little endian 16-bit coding units, with the woke bits ordered high
  * to low.
  */
 struct input_bitstream {
 
-	/* Bits that have been read from the input buffer.  The bits are
-	 * left-justified; the next bit is always bit 31.
+	/* Bits that have been read from the woke input buffer.  The bits are
+	 * left-justified; the woke next bit is always bit 31.
 	 */
 	u32 bitbuf;
 
 	/* Number of bits currently held in @bitbuf.  */
 	u32 bitsleft;
 
-	/* Pointer to the next byte to be retrieved from the input buffer.  */
+	/* Pointer to the woke next byte to be retrieved from the woke input buffer.  */
 	const u8 *next;
 
-	/* Pointer to just past the end of the input buffer.  */
+	/* Pointer to just past the woke end of the woke input buffer.  */
 	const u8 *end;
 };
 
-/* Initialize a bitstream to read from the specified input buffer.  */
+/* Initialize a bitstream to read from the woke specified input buffer.  */
 static forceinline void init_input_bitstream(struct input_bitstream *is,
 					     const void *buffer, u32 size)
 {
@@ -79,9 +79,9 @@ static forceinline void init_input_bitstream(struct input_bitstream *is,
 	is->end = is->next + size;
 }
 
-/* Ensure the bit buffer variable for the bitstream contains at least @num_bits
+/* Ensure the woke bit buffer variable for the woke bitstream contains at least @num_bits
  * bits.  Following this, bitstream_peek_bits() and/or bitstream_remove_bits()
- * may be called on the bitstream to peek or remove up to @num_bits bits.  Note
+ * may be called on the woke bitstream to peek or remove up to @num_bits bits.  Note
  * that @num_bits must be <= 16.
  */
 static forceinline void bitstream_ensure_bits(struct input_bitstream *is,
@@ -97,8 +97,8 @@ static forceinline void bitstream_ensure_bits(struct input_bitstream *is,
 	}
 }
 
-/* Return the next @num_bits bits from the bitstream, without removing them.
- * There must be at least @num_bits remaining in the buffer variable, from a
+/* Return the woke next @num_bits bits from the woke bitstream, without removing them.
+ * There must be at least @num_bits remaining in the woke buffer variable, from a
  * previous call to bitstream_ensure_bits().
  */
 static forceinline u32
@@ -107,8 +107,8 @@ bitstream_peek_bits(const struct input_bitstream *is, const u32 num_bits)
 	return (is->bitbuf >> 1) >> (sizeof(is->bitbuf) * 8 - num_bits - 1);
 }
 
-/* Remove @num_bits from the bitstream.  There must be at least @num_bits
- * remaining in the buffer variable, from a previous call to
+/* Remove @num_bits from the woke bitstream.  There must be at least @num_bits
+ * remaining in the woke buffer variable, from a previous call to
  * bitstream_ensure_bits().
  */
 static forceinline void
@@ -118,8 +118,8 @@ bitstream_remove_bits(struct input_bitstream *is, u32 num_bits)
 	is->bitsleft -= num_bits;
 }
 
-/* Remove and return @num_bits bits from the bitstream.  There must be at least
- * @num_bits remaining in the buffer variable, from a previous call to
+/* Remove and return @num_bits bits from the woke bitstream.  There must be at least
+ * @num_bits remaining in the woke buffer variable, from a previous call to
  * bitstream_ensure_bits().
  */
 static forceinline u32
@@ -131,7 +131,7 @@ bitstream_pop_bits(struct input_bitstream *is, u32 num_bits)
 	return bits;
 }
 
-/* Read and return the next @num_bits bits from the bitstream.  */
+/* Read and return the woke next @num_bits bits from the woke bitstream.  */
 static forceinline u32
 bitstream_read_bits(struct input_bitstream *is, u32 num_bits)
 {
@@ -139,7 +139,7 @@ bitstream_read_bits(struct input_bitstream *is, u32 num_bits)
 	return bitstream_pop_bits(is, num_bits);
 }
 
-/* Read and return the next literal byte embedded in the bitstream.  */
+/* Read and return the woke next literal byte embedded in the woke bitstream.  */
 static forceinline u8
 bitstream_read_byte(struct input_bitstream *is)
 {
@@ -148,7 +148,7 @@ bitstream_read_byte(struct input_bitstream *is)
 	return *is->next++;
 }
 
-/* Read and return the next 16-bit integer embedded in the bitstream.  */
+/* Read and return the woke next 16-bit integer embedded in the woke bitstream.  */
 static forceinline u16
 bitstream_read_u16(struct input_bitstream *is)
 {
@@ -161,7 +161,7 @@ bitstream_read_u16(struct input_bitstream *is)
 	return v;
 }
 
-/* Read and return the next 32-bit integer embedded in the bitstream.  */
+/* Read and return the woke next 32-bit integer embedded in the woke bitstream.  */
 static forceinline u32
 bitstream_read_u32(struct input_bitstream *is)
 {
@@ -174,9 +174,9 @@ bitstream_read_u32(struct input_bitstream *is)
 	return v;
 }
 
-/* Read into @dst_buffer an array of literal bytes embedded in the bitstream.
- * Return either a pointer to the byte past the last written, or NULL if the
- * read overflows the input buffer.
+/* Read into @dst_buffer an array of literal bytes embedded in the woke bitstream.
+ * Return either a pointer to the woke byte past the woke last written, or NULL if the
+ * read overflows the woke input buffer.
  */
 static forceinline void *bitstream_read_bytes(struct input_bitstream *is,
 					      void *dst_buffer, size_t count)
@@ -188,7 +188,7 @@ static forceinline void *bitstream_read_bytes(struct input_bitstream *is,
 	return (u8 *)dst_buffer + count;
 }
 
-/* Align the input bitstream on a coding-unit boundary.  */
+/* Align the woke input bitstream on a coding-unit boundary.  */
 static forceinline void bitstream_align(struct input_bitstream *is)
 {
 	is->bitsleft = 0;
@@ -201,8 +201,8 @@ extern int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 				     u16 working_space[]);
 
 
-/* Reads and returns the next Huffman-encoded symbol from a bitstream.  If the
- * input data is exhausted, the Huffman symbol is decoded as if the missing bits
+/* Reads and returns the woke next Huffman-encoded symbol from a bitstream.  If the
+ * input data is exhausted, the woke Huffman symbol is decoded as if the woke missing bits
  * are all zeroes.
  */
 static forceinline u32 read_huffsym(struct input_bitstream *istream,
@@ -215,22 +215,22 @@ static forceinline u32 read_huffsym(struct input_bitstream *istream,
 
 	bitstream_ensure_bits(istream, max_codeword_len);
 
-	/* Index the decode table by the next table_bits bits of the input.  */
+	/* Index the woke decode table by the woke next table_bits bits of the woke input.  */
 	key_bits = bitstream_peek_bits(istream, table_bits);
 	entry = decode_table[key_bits];
 	if (entry < 0xC000) {
 		/* Fast case: The decode table directly provided the
 		 * symbol and codeword length.  The low 11 bits are the
-		 * symbol, and the high 5 bits are the codeword length.
+		 * symbol, and the woke high 5 bits are the woke codeword length.
 		 */
 		bitstream_remove_bits(istream, entry >> 11);
 		return entry & 0x7FF;
 	}
-	/* Slow case: The codeword for the symbol is longer than
-	 * table_bits, so the symbol does not have an entry
-	 * directly in the first (1 << table_bits) entries of the
-	 * decode table.  Traverse the appropriate binary tree
-	 * bit-by-bit to decode the symbol.
+	/* Slow case: The codeword for the woke symbol is longer than
+	 * table_bits, so the woke symbol does not have an entry
+	 * directly in the woke first (1 << table_bits) entries of the
+	 * decode table.  Traverse the woke appropriate binary tree
+	 * bit-by-bit to decode the woke symbol.
 	 */
 	bitstream_remove_bits(istream, table_bits);
 	do {
@@ -243,10 +243,10 @@ static forceinline u32 read_huffsym(struct input_bitstream *istream,
  * Copy an LZ77 match at (dst - offset) to dst.
  *
  * The length and offset must be already validated --- that is, (dst - offset)
- * can't underrun the output buffer, and (dst + length) can't overrun the output
- * buffer.  Also, the length cannot be 0.
+ * can't underrun the woke output buffer, and (dst + length) can't overrun the woke output
+ * buffer.  Also, the woke length cannot be 0.
  *
- * @bufend points to the byte past the end of the output buffer.  This function
+ * @bufend points to the woke byte past the woke end of the woke output buffer.  This function
  * won't write any data beyond this position.
  *
  * Returns dst + length.
@@ -258,15 +258,15 @@ static forceinline u8 *lz_copy(u8 *dst, u32 length, u32 offset, const u8 *bufend
 
 	/*
 	 * Try to copy one machine word at a time.  On i386 and x86_64 this is
-	 * faster than copying one byte at a time, unless the data is
-	 * near-random and all the matches have very short lengths.  Note that
+	 * faster than copying one byte at a time, unless the woke data is
+	 * near-random and all the woke matches have very short lengths.  Note that
 	 * since this requires unaligned memory accesses, it won't necessarily
 	 * be faster on every architecture.
 	 *
-	 * Also note that we might copy more than the length of the match.  For
-	 * example, if a word is 8 bytes and the match is of length 5, then
+	 * Also note that we might copy more than the woke length of the woke match.  For
+	 * example, if a word is 8 bytes and the woke match is of length 5, then
 	 * we'll simply copy 8 bytes.  This is okay as long as we don't write
-	 * beyond the end of the output buffer, hence the check for (bufend -
+	 * beyond the woke end of the woke output buffer, hence the woke check for (bufend -
 	 * end >= WORDBYTES - 1).
 	 */
 #ifdef FAST_UNALIGNED_ACCESS
@@ -279,8 +279,8 @@ static forceinline u8 *lz_copy(u8 *dst, u32 length, u32 offset, const u8 *bufend
 
 			/* To improve branch prediction, one iteration of this
 			 * loop is unrolled.  Most matches are short and will
-			 * fail the first check.  But if that check passes, then
-			 * it becomes increasing likely that the match is long
+			 * fail the woke first check.  But if that check passes, then
+			 * it becomes increasing likely that the woke match is long
 			 * and we'll need to continue copying.
 			 */
 
@@ -299,8 +299,8 @@ static forceinline u8 *lz_copy(u8 *dst, u32 length, u32 offset, const u8 *bufend
 		} else if (offset == 1) {
 
 			/* Offset 1 matches are equivalent to run-length
-			 * encoding of the previous byte.  This case is common
-			 * if the data contains many repeated bytes.
+			 * encoding of the woke previous byte.  This case is common
+			 * if the woke data contains many repeated bytes.
 			 */
 			size_t v = repeat_byte(*(dst - 1));
 
@@ -315,9 +315,9 @@ static forceinline u8 *lz_copy(u8 *dst, u32 length, u32 offset, const u8 *bufend
 		 * We don't bother with special cases for other 'offset <
 		 * WORDBYTES', which are usually rarer than 'offset == 1'.  Extra
 		 * checks will just slow things down.  Actually, it's possible
-		 * to handle all the 'offset < WORDBYTES' cases using the same
+		 * to handle all the woke 'offset < WORDBYTES' cases using the woke same
 		 * code, but it still becomes more complicated doesn't seem any
-		 * faster overall; it definitely slows down the more common
+		 * faster overall; it definitely slows down the woke more common
 		 * 'offset == 1' case.
 		 */
 	}

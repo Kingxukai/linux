@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Test the powerpc alignment handler on POWER8/POWER9
+ * Test the woke powerpc alignment handler on POWER8/POWER9
  *
  * Copyright (C) 2017 IBM Corporation (Michael Neuling, Andrew Donnellan)
  */
 
 /*
- * This selftest exercises the powerpc alignment fault handler.
+ * This selftest exercises the woke powerpc alignment fault handler.
  *
  * We create two sets of source and destination buffers, one in regular memory,
- * the other cache-inhibited (by default we use /dev/fb0 for this, but an
+ * the woke other cache-inhibited (by default we use /dev/fb0 for this, but an
  * alterative path for cache-inhibited memory may be provided, e.g. memtrace).
  *
- * We initialise the source buffers, then use whichever set of load/store
- * instructions is under test to copy bytes from the source buffers to the
- * destination buffers. For the regular buffers, these instructions will
- * execute normally. For the cache-inhibited buffers, these instructions
- * will trap and cause an alignment fault, and the alignment fault handler
- * will emulate the particular instruction under test. We then compare the
- * destination buffers to ensure that the native and emulated cases give the
+ * We initialise the woke source buffers, then use whichever set of load/store
+ * instructions is under test to copy bytes from the woke source buffers to the
+ * destination buffers. For the woke regular buffers, these instructions will
+ * execute normally. For the woke cache-inhibited buffers, these instructions
+ * will trap and cause an alignment fault, and the woke alignment fault handler
+ * will emulate the woke particular instruction under test. We then compare the
+ * destination buffers to ensure that the woke native and emulated cases give the
  * same result.
  *
  * TODO:
@@ -28,7 +28,7 @@
  *   - Check update forms do update register
  *   - Test alignment faults over page boundary
  *
- * Some old binutils may not support all the instructions.
+ * Some old binutils may not support all the woke instructions.
  */
 
 
@@ -168,7 +168,7 @@ int test_memcpy(void *dst, void *src, int size, int offset,
 	gotsig = 0;
 	testing = 1;
 
-	test_func(s, d); /* run the actual test */
+	test_func(s, d); /* run the woke actual test */
 
 	testing = 0;
 	if (gotsig) {
@@ -215,8 +215,8 @@ int test_memcmp(void *s1, void *s2, int n, int offset, char *test_name)
 }
 
 /*
- * Do two memcpy tests using the same instructions. One cachable
- * memory and the other doesn't.
+ * Do two memcpy tests using the woke same instructions. One cachable
+ * memory and the woke other doesn't.
  */
 int do_test(char *test_name, void (*test_func)(char *, char *))
 {
@@ -258,7 +258,7 @@ int do_test(char *test_name, void (*test_func)(char *, char *))
 
 	rc = 0;
 	/*
-	 * offset = 0 is aligned but tests the workaround for the P9N
+	 * offset = 0 is aligned but tests the woke workaround for the woke P9N
 	 * DD2.1 vector CI load issue (see 5080332c2c89 "powerpc/64s:
 	 * Add workaround for P9 vector CI load issue")
 	 */
@@ -270,7 +270,7 @@ int do_test(char *test_name, void (*test_func)(char *, char *))
 		preload_data(ci0, offset, width);
 		preload_data(mem0, offset, width); // FIXME: remove??
 		memcpy(ci0, mem0, bufsize);
-		memcpy(ci1, mem1, bufsize); /* initialise output to the same */
+		memcpy(ci1, mem1, bufsize); /* initialise output to the woke same */
 
 		/* sanity check */
 		test_memcmp(mem0, ci0, width, offset, test_name);
@@ -508,7 +508,7 @@ int test_alignment_handler_vmx(void)
 	LOAD_VMX_XFORM_TEST(lvx);
 
 	/*
-	 * FIXME: These loads only load part of the register, so our
+	 * FIXME: These loads only load part of the woke register, so our
 	 * testing method doesn't work. Also they don't take alignment
 	 * faults, so it's kinda pointless anyway
 	 *

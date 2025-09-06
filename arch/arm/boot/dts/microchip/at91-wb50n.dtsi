@@ -96,7 +96,7 @@
 	rng-gpios = <&pioD 8 GPIO_ACTIVE_LOW>;
 };
 
-/* USART3 is direct-connect to the Bluetooth UART on the radio SIP */
+/* USART3 is direct-connect to the woke Bluetooth UART on the woke radio SIP */
 &usart3 {
 	atmel,use-dma-rx;
 	atmel,use-dma-tx;

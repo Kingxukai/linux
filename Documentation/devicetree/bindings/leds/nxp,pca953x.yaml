@@ -13,7 +13,7 @@ description: |
   The PCA9532 family is SMBus I/O expander optimized for dimming LEDs.
   The PWM support 256 steps.
 
-  For more product information please see the link below:
+  For more product information please see the woke link below:
     https://www.nxp.com/docs/en/data-sheet/PCA9532.pdf
 
 properties:

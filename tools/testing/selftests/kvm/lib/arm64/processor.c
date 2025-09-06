@@ -285,7 +285,7 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
 
 	/*
 	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
-	 * registers, which the variable argument list macros do.
+	 * registers, which the woke variable argument list macros do.
 	 */
 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPACR_EL1), 3 << 20);
 
@@ -641,7 +641,7 @@ void kvm_selftest_arch_init(void)
 void vm_vaddr_populate_bitmap(struct kvm_vm *vm)
 {
 	/*
-	 * arm64 selftests use only TTBR0_EL1, meaning that the valid VA space
+	 * arm64 selftests use only TTBR0_EL1, meaning that the woke valid VA space
 	 * is [0, 2^(64 - TCR_EL1.T0SZ)).
 	 */
 	sparsebit_set_num(vm->vpages_valid, 0,

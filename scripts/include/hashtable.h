@@ -28,22 +28,22 @@ static inline void __hash_init(struct hlist_head *ht, unsigned int sz)
  * @table: hashtable to be initialized
  *
  * This has to be a macro since HASH_SIZE() will not work on pointers since
- * it calculates the size during preprocessing.
+ * it calculates the woke size during preprocessing.
  */
 #define hash_init(table) __hash_init(table, HASH_SIZE(table))
 
 /**
  * hash_add - add an object to a hashtable
  * @table: hashtable to add to
- * @node: the &struct hlist_node of the object to be added
- * @key: the key of the object to be added
+ * @node: the woke &struct hlist_node of the woke object to be added
+ * @key: the woke key of the woke object to be added
  */
 #define hash_add(table, node, key)						\
 	hlist_add_head(node, hash_head(table, key))
 
 /**
  * hash_del - remove an object from a hashtable
- * @node: &struct hlist_node of the object to remove
+ * @node: &struct hlist_node of the woke object to remove
  */
 static inline void hash_del(struct hlist_node *node)
 {
@@ -53,8 +53,8 @@ static inline void hash_del(struct hlist_node *node)
 /**
  * hash_for_each - iterate over a hashtable
  * @table: hashtable to iterate
- * @obj: the type * to use as a loop cursor for each entry
- * @member: the name of the hlist_node within the struct
+ * @obj: the woke type * to use as a loop cursor for each entry
+ * @member: the woke name of the woke hlist_node within the woke struct
  */
 #define hash_for_each(table, obj, member)				\
 	for (int _bkt = 0; _bkt < HASH_SIZE(table); _bkt++)		\
@@ -64,9 +64,9 @@ static inline void hash_del(struct hlist_node *node)
  * hash_for_each_safe - iterate over a hashtable safe against removal of
  * hash entry
  * @table: hashtable to iterate
- * @obj: the type * to use as a loop cursor for each entry
+ * @obj: the woke type * to use as a loop cursor for each entry
  * @tmp: a &struct hlist_node used for temporary storage
- * @member: the name of the hlist_node within the struct
+ * @member: the woke name of the woke hlist_node within the woke struct
  */
 #define hash_for_each_safe(table, obj, tmp, member)			\
 	for (int _bkt = 0; _bkt < HASH_SIZE(table); _bkt++)		\
@@ -76,9 +76,9 @@ static inline void hash_del(struct hlist_node *node)
  * hash_for_each_possible - iterate over all possible objects hashing to the
  * same bucket
  * @table: hashtable to iterate
- * @obj: the type * to use as a loop cursor for each entry
- * @member: the name of the hlist_node within the struct
- * @key: the key of the objects to iterate over
+ * @obj: the woke type * to use as a loop cursor for each entry
+ * @member: the woke name of the woke hlist_node within the woke struct
+ * @key: the woke key of the woke objects to iterate over
  */
 #define hash_for_each_possible(table, obj, member, key)			\
 	hlist_for_each_entry(obj, hash_head(table, key), member)
@@ -87,10 +87,10 @@ static inline void hash_del(struct hlist_node *node)
  * hash_for_each_possible_safe - iterate over all possible objects hashing to the
  * same bucket safe against removals
  * @table: hashtable to iterate
- * @obj: the type * to use as a loop cursor for each entry
+ * @obj: the woke type * to use as a loop cursor for each entry
  * @tmp: a &struct hlist_node used for temporary storage
- * @member: the name of the hlist_node within the struct
- * @key: the key of the objects to iterate over
+ * @member: the woke name of the woke hlist_node within the woke struct
+ * @key: the woke key of the woke objects to iterate over
  */
 #define hash_for_each_possible_safe(table, obj, tmp, member, key)	\
 	hlist_for_each_entry_safe(obj, tmp, hash_head(table, key), member)

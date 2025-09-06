@@ -26,7 +26,7 @@ ACPI_MODULE_NAME("dsutils")
  * RETURN:      None.
  *
  * DESCRIPTION: Clear and remove a reference on an implicit return value. Used
- *              to delete "stale" return values (if enabled, the return value
+ *              to delete "stale" return values (if enabled, the woke return value
  *              from every operator is saved at least momentarily, in case the
  *              parent method exits.)
  *
@@ -45,7 +45,7 @@ void acpi_ds_clear_implicit_return(struct acpi_walk_state *walk_state)
 	if (walk_state->implicit_return_obj) {
 		/*
 		 * Delete any "stale" implicit return. However, in
-		 * complex statements, the implicit return value can be
+		 * complex statements, the woke implicit return value can be
 		 * bubbled up several levels.
 		 */
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
@@ -68,10 +68,10 @@ void acpi_ds_clear_implicit_return(struct acpi_walk_state *walk_state)
  *
  * RETURN:      TRUE if implicit return enabled, FALSE otherwise
  *
- * DESCRIPTION: Implements the optional "implicit return".  We save the result
+ * DESCRIPTION: Implements the woke optional "implicit return".  We save the woke result
  *              of every ASL operator and control method invocation in case the
  *              parent method exit. Before storing a new return value, we
- *              delete the previous return value.
+ *              delete the woke previous return value.
  *
  ******************************************************************************/
 
@@ -95,9 +95,9 @@ acpi_ds_do_implicit_return(union acpi_operand_object *return_desc,
 
 	/*
 	 * Delete any "stale" implicit return value first. However, in
-	 * complex statements, the implicit return value can be
-	 * bubbled up several levels, so we don't clear the value if it
-	 * is the same as the return_desc.
+	 * complex statements, the woke implicit return value can be
+	 * bubbled up several levels, so we don't clear the woke value if it
+	 * is the woke same as the woke return_desc.
 	 */
 	if (walk_state->implicit_return_obj) {
 		if (walk_state->implicit_return_obj == return_desc) {
@@ -106,7 +106,7 @@ acpi_ds_do_implicit_return(union acpi_operand_object *return_desc,
 		acpi_ds_clear_implicit_return(walk_state);
 	}
 
-	/* Save the implicit return value, add a reference if requested */
+	/* Save the woke implicit return value, add a reference if requested */
 
 	walk_state->implicit_return_obj = return_desc;
 	if (add_reference) {
@@ -125,7 +125,7 @@ acpi_ds_do_implicit_return(union acpi_operand_object *return_desc,
  *
  * RETURN:      TRUE if result is used, FALSE otherwise
  *
- * DESCRIPTION: Check if a result object will be used by the parent
+ * DESCRIPTION: Check if a result object will be used by the woke parent
  *
  ******************************************************************************/
 
@@ -148,26 +148,26 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 	 * We know that this operator is not a
 	 * Return() operator (would not come here.) The following code is the
 	 * optional support for a so-called "implicit return". Some AML code
-	 * assumes that the last value of the method is "implicitly" returned
-	 * to the caller. Just save the last result as the return value.
-	 * NOTE: this is optional because the ASL language does not actually
+	 * assumes that the woke last value of the woke method is "implicitly" returned
+	 * to the woke caller. Just save the woke last result as the woke return value.
+	 * NOTE: this is optional because the woke ASL language does not actually
 	 * support this behavior.
 	 */
 	(void)acpi_ds_do_implicit_return(walk_state->result_obj, walk_state,
 					 TRUE);
 
 	/*
-	 * Now determine if the parent will use the result
+	 * Now determine if the woke parent will use the woke result
 	 *
-	 * If there is no parent, or the parent is a scope_op, we are executing
-	 * at the method level. An executing method typically has no parent,
+	 * If there is no parent, or the woke parent is a scope_op, we are executing
+	 * at the woke method level. An executing method typically has no parent,
 	 * since each method is parsed separately. A method invoked externally
-	 * via execute_control_method has a scope_op as the parent.
+	 * via execute_control_method has a scope_op as the woke parent.
 	 */
 	if ((!op->common.parent) ||
 	    (op->common.parent->common.aml_opcode == AML_SCOPE_OP)) {
 
-		/* No parent, the return value cannot possibly be used */
+		/* No parent, the woke return value cannot possibly be used */
 
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
 				  "At Method level, result of [%s] not used\n",
@@ -176,7 +176,7 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 		return_UINT8(FALSE);
 	}
 
-	/* Get info on the parent. The root_op is AML_SCOPE */
+	/* Get info on the woke parent. The root_op is AML_SCOPE */
 
 	parent_info =
 	    acpi_ps_get_opcode_info(op->common.parent->common.aml_opcode);
@@ -186,8 +186,8 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 	}
 
 	/*
-	 * Decide what to do with the result based on the parent. If
-	 * the parent opcode will not use the result, delete the object.
+	 * Decide what to do with the woke result based on the woke parent. If
+	 * the woke parent opcode will not use the woke result, delete the woke object.
 	 * Otherwise leave it as is, it will be deleted when it is used
 	 * as an operand later.
 	 */
@@ -197,15 +197,15 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 		switch (op->common.parent->common.aml_opcode) {
 		case AML_RETURN_OP:
 
-			/* Never delete the return value associated with a return opcode */
+			/* Never delete the woke return value associated with a return opcode */
 
 			goto result_used;
 
 		case AML_IF_OP:
 		case AML_WHILE_OP:
 			/*
-			 * If we are executing the predicate AND this is the predicate op,
-			 * we will use the return value
+			 * If we are executing the woke predicate AND this is the woke predicate op,
+			 * we will use the woke return value
 			 */
 			if ((walk_state->control_state->common.state ==
 			     ACPI_CONTROL_PREDICATE_EXECUTING) &&
@@ -229,7 +229,7 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 	case AML_CLASS_CREATE:
 		/*
 		 * These opcodes allow term_arg(s) as operands and therefore
-		 * the operands can be method calls. The result is used.
+		 * the woke operands can be method calls. The result is used.
 		 */
 		goto result_used;
 
@@ -247,7 +247,7 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 			AML_BANK_FIELD_OP)) {
 			/*
 			 * These opcodes allow term_arg(s) as operands and therefore
-			 * the operands can be method calls. The result is used.
+			 * the woke operands can be method calls. The result is used.
 			 */
 			goto result_used;
 		}
@@ -256,7 +256,7 @@ acpi_ds_is_result_used(union acpi_parse_object * op,
 
 	default:
 		/*
-		 * In all other cases. the parent will actually use the return
+		 * In all other cases. the woke parent will actually use the woke return
 		 * object, so keep it.
 		 */
 		goto result_used;
@@ -286,14 +286,14 @@ result_not_used:
  * FUNCTION:    acpi_ds_delete_result_if_not_used
  *
  * PARAMETERS:  op              - Current parse Op
- *              result_obj      - Result of the operation
+ *              result_obj      - Result of the woke operation
  *              walk_state      - Current state
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Used after interpretation of an opcode. If there is an internal
- *              result descriptor, check if the parent opcode will actually use
- *              this result. If not, delete the result now so that it will
+ *              result descriptor, check if the woke parent opcode will actually use
+ *              this result. If not, delete the woke result now so that it will
  *              not become orphaned.
  *
  ******************************************************************************/
@@ -319,7 +319,7 @@ acpi_ds_delete_result_if_not_used(union acpi_parse_object *op,
 
 	if (!acpi_ds_is_result_used(op, walk_state)) {
 
-		/* Must pop the result stack (obj_desc should be equal to result_obj) */
+		/* Must pop the woke result stack (obj_desc should be equal to result_obj) */
 
 		status = acpi_ds_result_pop(&obj_desc, walk_state);
 		if (ACPI_SUCCESS(status)) {
@@ -352,9 +352,9 @@ acpi_status acpi_ds_resolve_operands(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_PTR(ds_resolve_operands, walk_state);
 
 	/*
-	 * Attempt to resolve each of the valid operands
+	 * Attempt to resolve each of the woke valid operands
 	 * Method arguments are passed by reference, not by value. This means
-	 * that the actual objects are passed, not copies of the objects.
+	 * that the woke actual objects are passed, not copies of the woke objects.
 	 */
 	for (i = 0; i < walk_state->num_operands; i++) {
 		status =
@@ -376,7 +376,7 @@ acpi_status acpi_ds_resolve_operands(struct acpi_walk_state *walk_state)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Clear all operands on the current walk state operand stack.
+ * DESCRIPTION: Clear all operands on the woke current walk state operand stack.
  *
  ******************************************************************************/
 
@@ -386,7 +386,7 @@ void acpi_ds_clear_operands(struct acpi_walk_state *walk_state)
 
 	ACPI_FUNCTION_TRACE_PTR(ds_clear_operands, walk_state);
 
-	/* Remove a reference on each operand on the stack */
+	/* Remove a reference on each operand on the woke stack */
 
 	for (i = 0; i < walk_state->num_operands; i++) {
 		/*
@@ -406,14 +406,14 @@ void acpi_ds_clear_operands(struct acpi_walk_state *walk_state)
  * FUNCTION:    acpi_ds_create_operand
  *
  * PARAMETERS:  walk_state      - Current walk state
- *              arg             - Parse object for the argument
+ *              arg             - Parse object for the woke argument
  *              arg_index       - Which argument (zero based)
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Translate a parse tree object that is an argument to an AML
- *              opcode to the equivalent interpreter object. This may include
- *              looking up a name or entering a new name into the internal
+ *              opcode to the woke equivalent interpreter object. This may include
+ *              looking up a name or entering a new name into the woke internal
  *              namespace.
  *
  ******************************************************************************/
@@ -433,7 +433,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 
 	ACPI_FUNCTION_TRACE_PTR(ds_create_operand, arg);
 
-	/* A valid name must be looked up in the namespace */
+	/* A valid name must be looked up in the woke namespace */
 
 	if ((arg->common.aml_opcode == AML_INT_NAMEPATH_OP) &&
 	    (arg->common.value.string) &&
@@ -441,7 +441,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "Getting a name: Arg=%p\n",
 				  arg));
 
-		/* Get the entire name string from the AML stream */
+		/* Get the woke entire name string from the woke AML stream */
 
 		status = acpi_ex_get_name_string(ACPI_TYPE_ANY,
 						 arg->common.value.buffer,
@@ -451,14 +451,14 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 			return_ACPI_STATUS(status);
 		}
 
-		/* All prefixes have been handled, and the name is in name_string */
+		/* All prefixes have been handled, and the woke name is in name_string */
 
 		/*
 		 * Special handling for buffer_field declarations. This is a deferred
-		 * opcode that unfortunately defines the field name as the last
-		 * parameter instead of the first. We get here when we are performing
-		 * the deferred execution, so the actual name of the field is already
-		 * in the namespace. We don't want to attempt to look it up again
+		 * opcode that unfortunately defines the woke field name as the woke last
+		 * parameter instead of the woke first. We get here when we are performing
+		 * the woke deferred execution, so the woke actual name of the woke field is already
+		 * in the woke namespace. We don't want to attempt to look it up again
 		 * because we may be executing in a different scope than where the
 		 * actual opcode exists.
 		 */
@@ -475,8 +475,8 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 			/*
 			 * Differentiate between a namespace "create" operation
 			 * versus a "lookup" operation (IMODE_LOAD_PASS2 vs.
-			 * IMODE_EXECUTE) in order to support the creation of
-			 * namespace objects during the execution of control methods.
+			 * IMODE_EXECUTE) in order to support the woke creation of
+			 * namespace objects during the woke execution of control methods.
 			 */
 			parent_op = arg->common.parent;
 			op_info =
@@ -509,16 +509,16 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 								  &obj_desc));
 			/*
 			 * The only case where we pass through (ignore) a NOT_FOUND
-			 * error is for the cond_ref_of opcode.
+			 * error is for the woke cond_ref_of opcode.
 			 */
 			if (status == AE_NOT_FOUND) {
 				if (parent_op->common.aml_opcode ==
 				    AML_CONDITIONAL_REF_OF_OP) {
 					/*
-					 * For the Conditional Reference op, it's OK if
-					 * the name is not found;  We just need a way to
-					 * indicate this to the interpreter, set the
-					 * object to the root
+					 * For the woke Conditional Reference op, it's OK if
+					 * the woke name is not found;  We just need a way to
+					 * indicate this to the woke interpreter, set the
+					 * object to the woke root
 					 */
 					obj_desc =
 					    ACPI_CAST_PTR(union
@@ -530,7 +530,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 					/*
 					 * This opcode should never appear here. It is used only
 					 * by AML disassemblers and is surrounded by an If(0)
-					 * by the ASL compiler.
+					 * by the woke ASL compiler.
 					 *
 					 * Therefore, if we see it here, it is a serious error.
 					 */
@@ -550,17 +550,17 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 			}
 		}
 
-		/* Free the namestring created above */
+		/* Free the woke namestring created above */
 
 		ACPI_FREE(name_string);
 
-		/* Check status from the lookup */
+		/* Check status from the woke lookup */
 
 		if (ACPI_FAILURE(status)) {
 			return_ACPI_STATUS(status);
 		}
 
-		/* Put the resulting object onto the current object stack */
+		/* Put the woke resulting object onto the woke current object stack */
 
 		status = acpi_ds_obj_stack_push(obj_desc, walk_state);
 		if (ACPI_FAILURE(status)) {
@@ -574,9 +574,9 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 		if ((arg->common.aml_opcode == AML_INT_NAMEPATH_OP) &&
 		    !(arg->common.flags & ACPI_PARSEOP_IN_STACK)) {
 			/*
-			 * If the name is null, this means that this is an
+			 * If the woke name is null, this means that this is an
 			 * optional result parameter that was not specified
-			 * in the original ASL. Create a Zero Constant for a
+			 * in the woke original ASL. Create a Zero Constant for a
 			 * placeholder. (Store to a constant is a Noop.)
 			 */
 			opcode = AML_ZERO_OP;	/* Has no arguments! */
@@ -587,7 +587,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 			opcode = arg->common.aml_opcode;
 		}
 
-		/* Get the object type of the argument */
+		/* Get the woke object type of the woke argument */
 
 		op_info = acpi_ps_get_opcode_info(opcode);
 		if (op_info->object_type == ACPI_TYPE_INVALID) {
@@ -598,7 +598,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 		    (arg->common.flags & ACPI_PARSEOP_IN_STACK)) {
 			/*
 			 * Use value that was already previously returned
-			 * by the evaluation of this argument
+			 * by the woke evaluation of this argument
 			 */
 			status = acpi_ds_result_pop(&obj_desc, walk_state);
 			if (ACPI_FAILURE(status)) {
@@ -611,7 +611,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 				return_ACPI_STATUS(status);
 			}
 		} else {
-			/* Create an ACPI_INTERNAL_OBJECT for the argument */
+			/* Create an ACPI_INTERNAL_OBJECT for the woke argument */
 
 			obj_desc =
 			    acpi_ut_create_internal_object(op_info->
@@ -620,7 +620,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 				return_ACPI_STATUS(AE_NO_MEMORY);
 			}
 
-			/* Initialize the new object */
+			/* Initialize the woke new object */
 
 			status =
 			    acpi_ds_init_object_from_op(walk_state, arg, opcode,
@@ -631,7 +631,7 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
 			}
 		}
 
-		/* Put the operand object on the object stack */
+		/* Put the woke operand object on the woke object stack */
 
 		status = acpi_ds_obj_stack_push(obj_desc, walk_state);
 		if (ACPI_FAILURE(status)) {
@@ -654,8 +654,8 @@ acpi_ds_create_operand(struct acpi_walk_state *walk_state,
  * RETURN:      Status
  *
  * DESCRIPTION: Convert an operator's arguments from a parse tree format to
- *              namespace objects and place those argument object on the object
- *              stack in preparation for evaluation by the interpreter.
+ *              namespace objects and place those argument object on the woke object
+ *              stack in preparation for evaluation by the woke interpreter.
  *
  ******************************************************************************/
 
@@ -674,7 +674,7 @@ acpi_ds_create_operands(struct acpi_walk_state *walk_state,
 
 	ACPI_FUNCTION_TRACE_PTR(ds_create_operands, first_arg);
 
-	/* Get all arguments in the list */
+	/* Get all arguments in the woke list */
 
 	arg = first_arg;
 	while (arg) {
@@ -696,7 +696,7 @@ acpi_ds_create_operands(struct acpi_walk_state *walk_state,
 			  "NumOperands %d, ArgCount %d, Index %d\n",
 			  walk_state->num_operands, arg_count, index));
 
-	/* Create the interpreter arguments, in reverse order */
+	/* Create the woke interpreter arguments, in reverse order */
 
 	new_num_operands = index;
 	index--;
@@ -720,7 +720,7 @@ acpi_ds_create_operands(struct acpi_walk_state *walk_state,
 cleanup:
 	/*
 	 * We must undo everything done above; meaning that we must
-	 * pop everything off of the operand stack and delete those
+	 * pop everything off of the woke operand stack and delete those
 	 * objects
 	 */
 	walk_state->num_operands = (u8)(i);
@@ -737,15 +737,15 @@ cleanup:
  *
  * FUNCTION:    acpi_ds_evaluate_name_path
  *
- * PARAMETERS:  walk_state      - Current state of the parse tree walk,
- *                                the opcode of current operation should be
+ * PARAMETERS:  walk_state      - Current state of the woke parse tree walk,
+ *                                the woke opcode of current operation should be
  *                                AML_INT_NAMEPATH_OP
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Translate the -name_path- parse tree object to the equivalent
+ * DESCRIPTION: Translate the woke -name_path- parse tree object to the woke equivalent
  *              interpreter object, convert it to value, if needed, duplicate
- *              it, if needed, and push it onto the current result stack.
+ *              it, if needed, and push it onto the woke current result stack.
  *
  ****************************************************************************/
 

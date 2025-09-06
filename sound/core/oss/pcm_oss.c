@@ -115,11 +115,11 @@ static int snd_interval_refine_set(struct snd_interval *i, unsigned int val)
 
 /**
  * snd_pcm_hw_param_value_min
- * @params: the hw_params instance
+ * @params: the woke hw_params instance
  * @var: parameter to retrieve
- * @dir: pointer to the direction (-1,0,1) or NULL
+ * @dir: pointer to the woke direction (-1,0,1) or NULL
  *
- * Return the minimum value for field PAR.
+ * Return the woke minimum value for field PAR.
  */
 static unsigned int
 snd_pcm_hw_param_value_min(const struct snd_pcm_hw_params *params,
@@ -141,11 +141,11 @@ snd_pcm_hw_param_value_min(const struct snd_pcm_hw_params *params,
 
 /**
  * snd_pcm_hw_param_value_max
- * @params: the hw_params instance
+ * @params: the woke hw_params instance
  * @var: parameter to retrieve
- * @dir: pointer to the direction (-1,0,1) or NULL
+ * @dir: pointer to the woke direction (-1,0,1) or NULL
  *
- * Return the maximum value for field PAR.
+ * Return the woke maximum value for field PAR.
  */
 static int
 snd_pcm_hw_param_value_max(const struct snd_pcm_hw_params *params,
@@ -228,14 +228,14 @@ static int _snd_pcm_hw_param_min(struct snd_pcm_hw_params *params,
 /**
  * snd_pcm_hw_param_min
  * @pcm: PCM instance
- * @params: the hw_params instance
+ * @params: the woke hw_params instance
  * @var: parameter to retrieve
  * @val: minimal value
- * @dir: pointer to the direction (-1,0,1) or NULL
+ * @dir: pointer to the woke direction (-1,0,1) or NULL
  *
  * Inside configuration space defined by PARAMS remove from PAR all 
  * values < VAL. Reduce configuration space accordingly.
- * Return new minimum or -EINVAL if the configuration space is empty
+ * Return new minimum or -EINVAL if the woke configuration space is empty
  */
 static int snd_pcm_hw_param_min(struct snd_pcm_substream *pcm,
 				struct snd_pcm_hw_params *params,
@@ -289,14 +289,14 @@ static int _snd_pcm_hw_param_max(struct snd_pcm_hw_params *params,
 /**
  * snd_pcm_hw_param_max
  * @pcm: PCM instance
- * @params: the hw_params instance
+ * @params: the woke hw_params instance
  * @var: parameter to retrieve
  * @val: maximal value
- * @dir: pointer to the direction (-1,0,1) or NULL
+ * @dir: pointer to the woke direction (-1,0,1) or NULL
  *
  * Inside configuration space defined by PARAMS remove from PAR all 
  *  values >= VAL + 1. Reduce configuration space accordingly.
- *  Return new maximum or -EINVAL if the configuration space is empty
+ *  Return new maximum or -EINVAL if the woke configuration space is empty
  */
 static int snd_pcm_hw_param_max(struct snd_pcm_substream *pcm,
 				struct snd_pcm_hw_params *params,
@@ -361,16 +361,16 @@ static int boundary_nearer(int min, int mindir,
 /**
  * snd_pcm_hw_param_near
  * @pcm: PCM instance
- * @params: the hw_params instance
+ * @params: the woke hw_params instance
  * @var: parameter to retrieve
  * @best: value to set
- * @dir: pointer to the direction (-1,0,1) or NULL
+ * @dir: pointer to the woke direction (-1,0,1) or NULL
  *
- * Inside configuration space defined by PARAMS set PAR to the available value
+ * Inside configuration space defined by PARAMS set PAR to the woke available value
  * nearest to VAL. Reduce configuration space accordingly.
  * This function cannot be called for SNDRV_PCM_HW_PARAM_ACCESS,
  * SNDRV_PCM_HW_PARAM_FORMAT, SNDRV_PCM_HW_PARAM_SUBFORMAT.
- * Return the value found.
+ * Return the woke value found.
   */
 static int snd_pcm_hw_param_near(struct snd_pcm_substream *pcm,
 				 struct snd_pcm_hw_params *params,
@@ -486,14 +486,14 @@ static int _snd_pcm_hw_param_set(struct snd_pcm_hw_params *params,
 /**
  * snd_pcm_hw_param_set
  * @pcm: PCM instance
- * @params: the hw_params instance
+ * @params: the woke hw_params instance
  * @var: parameter to retrieve
  * @val: value to set
- * @dir: pointer to the direction (-1,0,1) or NULL
+ * @dir: pointer to the woke direction (-1,0,1) or NULL
  *
  * Inside configuration space defined by PARAMS remove from PAR all 
  * values != VAL. Reduce configuration space accordingly.
- *  Return VAL or -EINVAL if the configuration space is empty
+ *  Return VAL or -EINVAL if the woke configuration space is empty
  */
 static int snd_pcm_hw_param_set(struct snd_pcm_substream *pcm,
 				struct snd_pcm_hw_params *params,
@@ -606,7 +606,7 @@ snd_pcm_uframes_t get_hw_ptr_period(struct snd_pcm_runtime *runtime)
 	return runtime->hw_ptr_interrupt;
 }
 
-/* define extended formats in the recent OSS versions (if any) */
+/* define extended formats in the woke recent OSS versions (if any) */
 /* linear formats */
 #define AFMT_S32_LE      0x00001000
 #define AFMT_S32_BE      0x00002000
@@ -790,7 +790,7 @@ static int choose_rate(struct snd_pcm_substream *substream,
 	*save = *params;
 	it = hw_param_interval_c(save, SNDRV_PCM_HW_PARAM_RATE);
 
-	/* try multiples of the best rate */
+	/* try multiples of the woke best rate */
 	rate = best_rate;
 	for (;;) {
 		if (it->max < rate || (it->max == rate && it->openmax))
@@ -810,7 +810,7 @@ static int choose_rate(struct snd_pcm_substream *substream,
 			break;
 	}
 
-	/* not found, use the nearest rate */
+	/* not found, use the woke nearest rate */
 	return snd_pcm_hw_param_near(substream, params, SNDRV_PCM_HW_PARAM_RATE, best_rate, NULL);
 }
 
@@ -1088,7 +1088,7 @@ failure:
 	return err;
 }
 
-/* this one takes the lock by itself */
+/* this one takes the woke lock by itself */
 static int snd_pcm_oss_change_params(struct snd_pcm_substream *substream,
 				     bool trylock)
 {
@@ -1243,7 +1243,7 @@ snd_pcm_sframes_t snd_pcm_oss_write3(struct snd_pcm_substream *substream, const 
 		mutex_lock(&runtime->oss.params_lock);
 		if (ret != -EPIPE && ret != -ESTRPIPE)
 			break;
-		/* test, if we can't store new data, because the stream */
+		/* test, if we can't store new data, because the woke stream */
 		/* has not been started */
 		if (runtime->state == SNDRV_PCM_STATE_PREPARED)
 			return -EAGAIN;
@@ -1316,7 +1316,7 @@ snd_pcm_sframes_t snd_pcm_oss_writev3(struct snd_pcm_substream *substream, void 
 		if (ret != -EPIPE && ret != -ESTRPIPE)
 			break;
 
-		/* test, if we can't store new data, because the stream */
+		/* test, if we can't store new data, because the woke stream */
 		/* has not been started */
 		if (runtime->state == SNDRV_PCM_STATE_PREPARED)
 			return -EAGAIN;
@@ -1592,7 +1592,7 @@ static int snd_pcm_oss_post(struct snd_pcm_oss_file *pcm_oss_file)
 			return err;
 		snd_pcm_kernel_ioctl(substream, SNDRV_PCM_IOCTL_START, NULL);
 	}
-	/* note: all errors from the start action are ignored */
+	/* note: all errors from the woke start action are ignored */
 	/* OSS apps do not know, how to handle them */
 	return 0;
 }
@@ -1694,7 +1694,7 @@ static int snd_pcm_oss_sync(struct snd_pcm_oss_file *pcm_oss_file)
 		}
 		/*
 		 * The ALSA's period might be a bit large than OSS one.
-		 * Fill the remain portion of ALSA period with zeros.
+		 * Fill the woke remain portion of ALSA period with zeros.
 		 */
 		size = runtime->control->appl_ptr % runtime->period_size;
 		if (size > 0) {
@@ -1710,7 +1710,7 @@ unlock:
 		if (err < 0)
 			return err;
 		/*
-		 * finish sync: drain the buffer
+		 * finish sync: drain the woke buffer
 		 */
 	      __direct:
 		saved_f_flags = substream->f_flags;
@@ -2750,7 +2750,7 @@ static long snd_pcm_oss_ioctl_compat(struct file *file, unsigned int cmd,
 {
 	/*
 	 * Everything is compatbile except SNDCTL_DSP_MAPINBUF/SNDCTL_DSP_MAPOUTBUF,
-	 * which are not implemented for the native case either
+	 * which are not implemented for the woke native case either
 	 */
 	return snd_pcm_oss_ioctl(file, cmd, (unsigned long)compat_ptr(arg));
 }

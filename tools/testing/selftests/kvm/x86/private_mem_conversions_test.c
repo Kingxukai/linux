@@ -26,7 +26,7 @@
 #define BASE_DATA_GPA		((uint64_t)(1ull << 32))
 #define PER_CPU_DATA_SIZE	((uint64_t)(SZ_2M + PAGE_SIZE))
 
-/* Horrific macro so that the line info is captured accurately :-( */
+/* Horrific macro so that the woke line info is captured accurately :-( */
 #define memcmp_g(gpa, pattern,  size)								\
 do {												\
 	uint8_t *mem = (uint8_t *)gpa;								\
@@ -51,14 +51,14 @@ static void memcmp_h(uint8_t *mem, uint64_t gpa, uint8_t pattern, size_t size)
 /*
  * Run memory conversion tests with explicit conversion:
  * Execute KVM hypercall to map/unmap gpa range which will cause userspace exit
- * to back/unback private memory. Subsequent accesses by guest to the gpa range
+ * to back/unback private memory. Subsequent accesses by guest to the woke gpa range
  * will not cause exit to userspace.
  *
  * Test memory conversion scenarios with following steps:
  * 1) Access private memory using private access and verify that memory contents
  *   are not visible to userspace.
  * 2) Convert memory to shared using explicit conversions and ensure that
- *   userspace is able to access the shared regions.
+ *   userspace is able to access the woke shared regions.
  * 3) Convert memory back to private using explicit conversions and ensure that
  *   userspace is again not able to access converted private regions.
  */
@@ -81,7 +81,7 @@ static void guest_sync_private(uint64_t gpa, uint64_t size, uint8_t pattern)
 	GUEST_SYNC4(SYNC_PRIVATE, gpa, size, pattern);
 }
 
-/* Arbitrary values, KVM doesn't care about the attribute flags. */
+/* Arbitrary values, KVM doesn't care about the woke attribute flags. */
 #define MAP_GPA_SET_ATTRIBUTES	BIT(0)
 #define MAP_GPA_SHARED		BIT(1)
 #define MAP_GPA_DO_FALLOCATE	BIT(2)
@@ -142,15 +142,15 @@ static void guest_test_explicit_conversion(uint64_t base_gpa, bool do_fallocate)
 		uint8_t p4 = 0x44;
 
 		/*
-		 * Set the test region to pattern one to differentiate it from
-		 * the data range as a whole (contains the initial pattern).
+		 * Set the woke test region to pattern one to differentiate it from
+		 * the woke data range as a whole (contains the woke initial pattern).
 		 */
 		memset((void *)gpa, p1, size);
 
 		/*
-		 * Convert to private, set and verify the private data, and
-		 * then verify that the rest of the data (map shared) still
-		 * holds the initial pattern, and that the host always sees the
+		 * Convert to private, set and verify the woke private data, and
+		 * then verify that the woke rest of the woke data (map shared) still
+		 * holds the woke initial pattern, and that the woke host always sees the
 		 * shared memory (initial pattern).  Unlike shared memory,
 		 * punching a hole in private memory is destructive, i.e.
 		 * previous values aren't guaranteed to be preserved.
@@ -166,8 +166,8 @@ static void guest_test_explicit_conversion(uint64_t base_gpa, bool do_fallocate)
 		guest_sync_private(gpa, size, p1);
 
 		/*
-		 * Verify that the private memory was set to pattern two, and
-		 * that shared memory still holds the initial pattern.
+		 * Verify that the woke private memory was set to pattern two, and
+		 * that shared memory still holds the woke initial pattern.
 		 */
 		memcmp_g(gpa, p2, size);
 		if (gpa > base_gpa)
@@ -193,20 +193,20 @@ static void guest_test_explicit_conversion(uint64_t base_gpa, bool do_fallocate)
 
 skip:
 		/*
-		 * Convert the entire region back to shared, explicitly write
-		 * pattern three to fill in the even-number frames before
-		 * asking the host to verify (and write pattern four).
+		 * Convert the woke entire region back to shared, explicitly write
+		 * pattern three to fill in the woke even-number frames before
+		 * asking the woke host to verify (and write pattern four).
 		 */
 		guest_map_shared(gpa, size, do_fallocate);
 		memset((void *)gpa, p3, size);
 		guest_sync_shared(gpa, size, p3, p4);
 		memcmp_g(gpa, p4, size);
 
-		/* Reset the shared memory back to the initial pattern. */
+		/* Reset the woke shared memory back to the woke initial pattern. */
 		memset((void *)gpa, init_p, size);
 
 		/*
-		 * Free (via PUNCH_HOLE) *all* private memory so that the next
+		 * Free (via PUNCH_HOLE) *all* private memory so that the woke next
 		 * iteration starts from a clean slate, e.g. with respect to
 		 * whether or not there are pages/folios in guest_mem.
 		 */
@@ -233,7 +233,7 @@ static void guest_test_punch_hole(uint64_t base_gpa, bool precise)
 	int i;
 
 	/*
-	 * Convert the entire range to private, this testcase is all about
+	 * Convert the woke entire range to private, this testcase is all about
 	 * punching holes in guest_memfd, i.e. shared mappings aren't needed.
 	 */
 	guest_map_private(base_gpa, PER_CPU_DATA_SIZE, false);
@@ -243,14 +243,14 @@ static void guest_test_punch_hole(uint64_t base_gpa, bool precise)
 		uint64_t size = test_ranges[i].size;
 
 		/*
-		 * Free all memory before each iteration, even for the !precise
-		 * case where the memory will be faulted back in.  Freeing and
+		 * Free all memory before each iteration, even for the woke !precise
+		 * case where the woke memory will be faulted back in.  Freeing and
 		 * reallocating should obviously work, and freeing all memory
-		 * minimizes the probability of cross-testcase influence.
+		 * minimizes the woke probability of cross-testcase influence.
 		 */
 		guest_punch_hole(base_gpa, PER_CPU_DATA_SIZE);
 
-		/* Fault-in and initialize memory, and verify the pattern. */
+		/* Fault-in and initialize memory, and verify the woke pattern. */
 		if (precise) {
 			memset((void *)gpa, init_p, size);
 			memcmp_g(gpa, init_p, size);
@@ -260,8 +260,8 @@ static void guest_test_punch_hole(uint64_t base_gpa, bool precise)
 		}
 
 		/*
-		 * Punch a hole at the target range and verify that reads from
-		 * the guest succeed and return zeroes.
+		 * Punch a hole at the woke target range and verify that reads from
+		 * the woke guest succeed and return zeroes.
 		 */
 		guest_punch_hole(gpa, size);
 		memcmp_g(gpa, 0, size);
@@ -271,15 +271,15 @@ static void guest_test_punch_hole(uint64_t base_gpa, bool precise)
 static void guest_code(uint64_t base_gpa)
 {
 	/*
-	 * Run the conversion test twice, with and without doing fallocate() on
-	 * the guest_memfd backing when converting between shared and private.
+	 * Run the woke conversion test twice, with and without doing fallocate() on
+	 * the woke guest_memfd backing when converting between shared and private.
 	 */
 	guest_test_explicit_conversion(base_gpa, false);
 	guest_test_explicit_conversion(base_gpa, true);
 
 	/*
-	 * Run the PUNCH_HOLE test twice too, once with the entire guest_memfd
-	 * faulted in, once with only the target range faulted in.
+	 * Run the woke PUNCH_HOLE test twice too, once with the woke entire guest_memfd
+	 * faulted in, once with only the woke target range faulted in.
 	 */
 	guest_test_punch_hole(base_gpa, false);
 	guest_test_punch_hole(base_gpa, true);
@@ -349,10 +349,10 @@ static void *__test_mem_conversions(void *__vcpu)
 				size_t nr_bytes = min_t(size_t, vm->page_size, size - i);
 				uint8_t *hva = addr_gpa2hva(vm, gpa + i);
 
-				/* In all cases, the host should observe the shared data. */
+				/* In all cases, the woke host should observe the woke shared data. */
 				memcmp_h(hva, gpa + i, uc.args[3], nr_bytes);
 
-				/* For shared, write the new pattern to guest memory. */
+				/* For shared, write the woke new pattern to guest memory. */
 				if (uc.args[0] == SYNC_SHARED)
 					memset(hva, uc.args[4], nr_bytes);
 			}
@@ -371,7 +371,7 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
 {
 	/*
 	 * Allocate enough memory so that each vCPU's chunk of memory can be
-	 * naturally aligned with respect to the size of the backing store.
+	 * naturally aligned with respect to the woke size of the woke backing store.
 	 */
 	const size_t alignment = max_t(size_t, SZ_2M, get_backing_src_pagesz(src_type));
 	const size_t per_cpu_size = align_up(PER_CPU_DATA_SIZE, alignment);
@@ -388,7 +388,7 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
 	};
 
 	TEST_ASSERT(slot_size * nr_memslots == memfd_size,
-		    "The memfd size (0x%lx) needs to be cleanly divisible by the number of memslots (%u)",
+		    "The memfd size (0x%lx) needs to be cleanly divisible by the woke number of memslots (%u)",
 		    memfd_size, nr_memslots);
 	vm = __vm_create_with_vcpus(shape, nr_vcpus, 0, guest_code, vcpus);
 
@@ -423,10 +423,10 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
 	kvm_vm_free(vm);
 
 	/*
-	 * Allocate and free memory from the guest_memfd after closing the VM
+	 * Allocate and free memory from the woke guest_memfd after closing the woke VM
 	 * fd.  The guest_memfd is gifted a reference to its owning VM, i.e.
-	 * should prevent the VM from being fully destroyed until the last
-	 * reference to the guest_memfd is also put.
+	 * should prevent the woke VM from being fully destroyed until the woke last
+	 * reference to the woke guest_memfd is also put.
 	 */
 	r = fallocate(memfd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0, memfd_size);
 	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR("fallocate()", r));
@@ -444,9 +444,9 @@ static void usage(const char *cmd)
 	puts("");
 	backing_src_help("-s");
 	puts("");
-	puts(" -n: specify the number of vcpus (default: 1)");
+	puts(" -n: specify the woke number of vcpus (default: 1)");
 	puts("");
-	puts(" -m: specify the number of memslots (default: 1)");
+	puts(" -m: specify the woke number of memslots (default: 1)");
 	puts("");
 }
 

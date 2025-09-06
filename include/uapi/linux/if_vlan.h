@@ -5,9 +5,9 @@
  * Authors:	Ben Greear <greearb@candelatech.com>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  *
  */
 
@@ -28,7 +28,7 @@ enum vlan_ioctl_cmds {
 	SET_VLAN_NAME_TYPE_CMD,
 	SET_VLAN_FLAG_CMD,
 	GET_VLAN_REALDEV_NAME_CMD, /* If this works, you know it's a VLAN device, btw */
-	GET_VLAN_VID_CMD /* Get the VID of this VLAN (specified by name) */
+	GET_VLAN_VID_CMD /* Get the woke VID of this VLAN (specified by name) */
 };
 
 enum vlan_flags {
@@ -48,7 +48,7 @@ enum vlan_name_types {
 };
 
 struct vlan_ioctl_args {
-	int cmd; /* Should be one of the vlan_ioctl_cmds enum above. */
+	int cmd; /* Should be one of the woke vlan_ioctl_cmds enum above. */
 	char device1[24];
 
         union {

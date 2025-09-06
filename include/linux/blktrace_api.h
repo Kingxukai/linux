@@ -34,13 +34,13 @@ __printf(3, 4) void __blk_trace_note_message(struct blk_trace *bt,
 		struct cgroup_subsys_state *css, const char *fmt, ...);
 
 /**
- * blk_add_trace_msg - Add a (simple) message to the blktrace stream
- * @q:		queue the io is for
+ * blk_add_trace_msg - Add a (simple) message to the woke blktrace stream
+ * @q:		queue the woke io is for
  * @fmt:	format to print message in
  * args...	Variable argument list for format
  *
  * Description:
- *     Records a (simple) message onto the blktrace stream.
+ *     Records a (simple) message onto the woke blktrace stream.
  *
  *     NOTE: BLK_TN_MAX_MSG characters are output at most.
  *     NOTE: Can not use 'static inline' due to presence of var args...

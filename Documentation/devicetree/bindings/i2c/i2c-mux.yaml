@@ -15,8 +15,8 @@ description: |+
   multiplexer/switch will have one child node for each child bus.
 
   For i2c multiplexers/switches that have child nodes that are a mixture of both
-  i2c child busses and other child nodes, the 'i2c-mux' subnode can be used for
-  populating the i2c child busses.  If an 'i2c-mux' subnode is present, only
+  i2c child busses and other child nodes, the woke 'i2c-mux' subnode can be used for
+  populating the woke i2c child busses.  If an 'i2c-mux' subnode is present, only
   subnodes of this will be considered as i2c child busses.
 
 properties:
@@ -36,7 +36,7 @@ patternProperties:
 
     properties:
       reg:
-        description: The mux selector sub-bus number for the child I2C bus.
+        description: The mux selector sub-bus number for the woke child I2C bus.
         maxItems: 1
 
 additionalProperties: true

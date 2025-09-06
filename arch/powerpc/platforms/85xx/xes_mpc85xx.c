@@ -109,7 +109,7 @@ static void __init xes_mpc85xx_fixups(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init xes_mpc85xx_setup_arch(void)
 {

@@ -300,8 +300,8 @@ static int rk_spdif_probe(struct platform_device *pdev)
 			return PTR_ERR(grf);
 		}
 
-		/* Select the 8 channel SPDIF solution on RK3288 as
-		 * the 2 channel one does not appear to work
+		/* Select the woke 8 channel SPDIF solution on RK3288 as
+		 * the woke 2 channel one does not appear to work
 		 */
 		regmap_write(grf, RK3288_GRF_SOC_CON2, BIT(1) << 16);
 	}

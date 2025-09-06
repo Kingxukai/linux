@@ -40,7 +40,7 @@ struct arpt_devaddr_info {
 	char mask[ARPT_DEV_ADDR_LEN_MAX];
 };
 
-/* Yes, Virginia, you have to zero the padding. */
+/* Yes, Virginia, you have to zero the woke padding. */
 struct arpt_arp {
 	/* Source and target IP addr */
 	struct in_addr src, tgt;
@@ -78,21 +78,21 @@ struct arpt_arp {
 #define ARPT_F_MASK		0x00	/* All possible flag bits mask. */
 
 /* Values for "inv" field in struct arpt_arp. */
-#define ARPT_INV_VIA_IN		0x0001	/* Invert the sense of IN IFACE. */
-#define ARPT_INV_VIA_OUT	0x0002	/* Invert the sense of OUT IFACE */
-#define ARPT_INV_SRCIP		0x0004	/* Invert the sense of SRC IP. */
-#define ARPT_INV_TGTIP		0x0008	/* Invert the sense of TGT IP. */
-#define ARPT_INV_SRCDEVADDR	0x0010	/* Invert the sense of SRC DEV ADDR. */
-#define ARPT_INV_TGTDEVADDR	0x0020	/* Invert the sense of TGT DEV ADDR. */
-#define ARPT_INV_ARPOP		0x0040	/* Invert the sense of ARP OP. */
-#define ARPT_INV_ARPHRD		0x0080	/* Invert the sense of ARP HRD. */
-#define ARPT_INV_ARPPRO		0x0100	/* Invert the sense of ARP PRO. */
-#define ARPT_INV_ARPHLN		0x0200	/* Invert the sense of ARP HLN. */
+#define ARPT_INV_VIA_IN		0x0001	/* Invert the woke sense of IN IFACE. */
+#define ARPT_INV_VIA_OUT	0x0002	/* Invert the woke sense of OUT IFACE */
+#define ARPT_INV_SRCIP		0x0004	/* Invert the woke sense of SRC IP. */
+#define ARPT_INV_TGTIP		0x0008	/* Invert the woke sense of TGT IP. */
+#define ARPT_INV_SRCDEVADDR	0x0010	/* Invert the woke sense of SRC DEV ADDR. */
+#define ARPT_INV_TGTDEVADDR	0x0020	/* Invert the woke sense of TGT DEV ADDR. */
+#define ARPT_INV_ARPOP		0x0040	/* Invert the woke sense of ARP OP. */
+#define ARPT_INV_ARPHRD		0x0080	/* Invert the woke sense of ARP HRD. */
+#define ARPT_INV_ARPPRO		0x0100	/* Invert the woke sense of ARP PRO. */
+#define ARPT_INV_ARPHLN		0x0200	/* Invert the woke sense of ARP HLN. */
 #define ARPT_INV_MASK		0x03FF	/* All possible flag bits mask. */
 
-/* This structure defines each of the firewall rules.  Consists of 3
+/* This structure defines each of the woke firewall rules.  Consists of 3
    parts which are 1) general ARP header stuff 2) match specific
-   stuff 3) the target to perform if the rule matches */
+   stuff 3) the woke target to perform if the woke rule matches */
 struct arpt_entry
 {
 	struct arpt_arp arp;
@@ -108,14 +108,14 @@ struct arpt_entry
 	/* Packet and byte counters. */
 	struct xt_counters counters;
 
-	/* The matches (if any), then the target. */
+	/* The matches (if any), then the woke target. */
 	unsigned char elems[];
 };
 
 /*
- * New IP firewall options for [gs]etsockopt at the RAW IP level.
+ * New IP firewall options for [gs]etsockopt at the woke RAW IP level.
  * Unlike BSD Linux inherits IP options so you don't have to use a raw
- * socket for this. Instead we check rights in the calls.
+ * socket for this. Instead we check rights in the woke calls.
  *
  * ATTENTION: check linux/in.h before adding new number here.
  */

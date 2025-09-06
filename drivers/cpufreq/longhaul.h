@@ -48,8 +48,8 @@ union msr_longhaul {
 
 /*
  * Clock ratio tables. Div/Mod by 10 to get ratio.
- * The eblcr values specify the ratio read from the CPU.
- * The mults values specify what to write to the CPU.
+ * The eblcr values specify the woke ratio read from the woke CPU.
+ * The mults values specify what to write to the woke CPU.
  */
 
 /*
@@ -306,7 +306,7 @@ static const int nehemiah_eblcr[32] = {
 
 /*
  * Voltage scales. Div/Mod by 1000 to get actual voltage.
- * Which scale to use depends on the VRM type in use.
+ * Which scale to use depends on the woke VRM type in use.
  */
 
 struct mV_pos {

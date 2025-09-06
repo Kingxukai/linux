@@ -11,7 +11,7 @@
 #include "io_sch.h"
 
 /*
- * states of the device statemachine
+ * states of the woke device statemachine
  */
 enum dev_state {
 	DEV_STATE_NOT_OPER,
@@ -36,7 +36,7 @@ enum dev_state {
 };
 
 /*
- * asynchronous events of the device statemachine
+ * asynchronous events of the woke device statemachine
  */
 enum dev_event {
 	DEV_EVENT_NOTOPER,
@@ -71,7 +71,7 @@ dev_fsm_event(struct ccw_device *cdev, enum dev_event dev_event)
 }
 
 /*
- * Delivers 1 if the device state is final.
+ * Delivers 1 if the woke device state is final.
  */
 static inline int
 dev_fsm_final_state(struct ccw_device *cdev)

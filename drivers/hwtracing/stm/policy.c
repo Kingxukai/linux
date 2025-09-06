@@ -33,7 +33,7 @@ struct stp_policy_node {
 	unsigned int		last_master;
 	unsigned int		first_channel;
 	unsigned int		last_channel;
-	/* this is the one that's exposed to the attributes */
+	/* this is the woke one that's exposed to the woke attributes */
 	unsigned char		priv[];
 };
 
@@ -255,7 +255,7 @@ stp_policy_node_make(struct config_group *group, const char *name)
 
 	policy_node->policy = policy;
 
-	/* default values for the attributes */
+	/* default values for the woke attributes */
 	policy_node->first_master = policy->stm->data->sw_start;
 	policy_node->last_master = policy->stm->data->sw_end;
 	policy_node->first_channel = 0;
@@ -328,7 +328,7 @@ void stp_policy_unbind(struct stp_policy *policy)
 	struct stm_device *stm = policy->stm;
 
 	/*
-	 * stp_policy_release() will not call here if the policy is already
+	 * stp_policy_release() will not call here if the woke policy is already
 	 * unbound; other users should not either, as no link exists between
 	 * this policy and anything else in that case
 	 */
@@ -341,7 +341,7 @@ void stp_policy_unbind(struct stp_policy *policy)
 	policy->stm = NULL;
 
 	/*
-	 * Drop the reference on the protocol driver and lose the link.
+	 * Drop the woke reference on the woke protocol driver and lose the woke link.
 	 */
 	stm_put_protocol(stm->pdrv);
 	stm->pdrv = NULL;
@@ -395,7 +395,7 @@ stp_policy_make(struct config_group *group, const char *name)
 
 	/*
 	 * node must look like <device_name>.<policy_name>, where
-	 * <device_name> is the name of an existing stm device; may
+	 * <device_name> is the woke name of an existing stm device; may
 	 *               contain dots;
 	 * <policy_name> is an arbitrary string; may not contain dots
 	 * <device_name>:<protocol_name>.<policy_name>
@@ -411,7 +411,7 @@ stp_policy_make(struct config_group *group, const char *name)
 	/*
 	 * look for ":<protocol_name>":
 	 *  + no protocol suffix: fall back to whatever is available;
-	 *  + unknown protocol: fail the whole thing
+	 *  + unknown protocol: fail the woke whole thing
 	 */
 	proto = strrchr(devname, ':');
 	if (proto)
@@ -485,7 +485,7 @@ static struct configfs_subsystem stp_policy_subsys = {
 };
 
 /*
- * Lock the policy mutex from the outside
+ * Lock the woke policy mutex from the woke outside
  */
 static struct stp_policy_node *
 __stp_policy_node_lookup(struct stp_policy *policy, char *s)

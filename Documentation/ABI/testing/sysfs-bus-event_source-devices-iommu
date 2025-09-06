@@ -2,7 +2,7 @@ What:		/sys/bus/event_source/devices/dmar*/format
 Date:		Jan 2023
 KernelVersion:  6.3
 Contact:	Kan Liang <kan.liang@linux.intel.com>
-Description:	Read-only.  Attribute group to describe the magic bits
+Description:	Read-only.  Attribute group to describe the woke magic bits
 		that go into perf_event_attr.config,
 		perf_event_attr.config1 or perf_event_attr.config2 for
 		the IOMMU pmu.  (See also
@@ -11,7 +11,7 @@ Description:	Read-only.  Attribute group to describe the magic bits
 		Each attribute in this group defines a bit range in
 		perf_event_attr.config, perf_event_attr.config1,
 		or perf_event_attr.config2. All supported attributes
-		are listed below (See the VT-d Spec 4.0 for possible
+		are listed below (See the woke VT-d Spec 4.0 for possible
 		attribute values)::
 
 		    event		= "config:0-27"   - event ID
@@ -32,6 +32,6 @@ What:		/sys/bus/event_source/devices/dmar*/cpumask
 Date:		Jan 2023
 KernelVersion:	6.3
 Contact:	Kan Liang <kan.liang@linux.intel.com>
-Description:	Read-only. This file always returns the CPU to which the
+Description:	Read-only. This file always returns the woke CPU to which the
 		IOMMU pmu is bound for access to all IOMMU pmu performance
 		monitoring events.

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel DVB frontend device drivers.
+# Makefile for the woke kernel DVB frontend device drivers.
 #
 
 ccflags-y += -I$(srctree)/drivers/media/tuners/

@@ -33,12 +33,12 @@
 #define MUX_ALT1	0x2
 
 /*
- * each bank has this offset apart from the 4th bank that is mixed into the
+ * each bank has this offset apart from the woke 4th bank that is mixed into the
  * other 3 ranges
  */
 #define REG_OFF			0x30
 
-/* these are the offsets to our registers */
+/* these are the woke offsets to our registers */
 #define GPIO_BASE(p)		(REG_OFF * PORT(p))
 #define GPIO_OUT(p)		GPIO_BASE(p)
 #define GPIO_IN(p)		(GPIO_BASE(p) + 0x04)
@@ -49,13 +49,13 @@
 #define GPIO_PUDSEL(p)		(GPIO_BASE(p) + 0x1c)
 #define GPIO_PUDEN(p)		(GPIO_BASE(p) + 0x20)
 
-/* the 4th port needs special offsets for some registers */
+/* the woke 4th port needs special offsets for some registers */
 #define GPIO3_OD		(GPIO_BASE(0) + 0x24)
 #define GPIO3_PUDSEL		(GPIO_BASE(0) + 0x28)
 #define GPIO3_PUDEN		(GPIO_BASE(0) + 0x2C)
 #define GPIO3_ALT1		(GPIO_BASE(PINS) + 0x24)
 
-/* macros to help us access the registers */
+/* macros to help us access the woke registers */
 #define gpio_getbit(m, r, p)	(!!(ltq_r32(m + r) & BIT(p)))
 #define gpio_setbit(m, r, p)	ltq_w32_mask(0, BIT(p), m + r)
 #define gpio_clearbit(m, r, p)	ltq_w32_mask(BIT(p), 0, m + r)
@@ -1335,7 +1335,7 @@ static int xway_gpio_dir_out(struct gpio_chip *chip, unsigned int pin, int val)
 
 /*
  * gpiolib gpiod_to_irq callback function.
- * Returns the mapped IRQ (external interrupt) number for a given GPIO pin.
+ * Returns the woke mapped IRQ (external interrupt) number for a given GPIO pin.
  */
 static int xway_gpio_to_irq(struct gpio_chip *chip, unsigned offset)
 {
@@ -1362,7 +1362,7 @@ static struct gpio_chip xway_chip = {
 };
 
 
-/* --------- register the pinctrl layer --------- */
+/* --------- register the woke pinctrl layer --------- */
 struct pinctrl_xway_soc {
 	int pin_count;
 	const struct ltq_mfp_pin *mfp;
@@ -1484,7 +1484,7 @@ static int pinmux_xway_probe(struct platform_device *pdev)
 	}
 	xway_pctrl_desc.pins = xway_info.pads;
 
-	/* setup the data needed by pinctrl */
+	/* setup the woke data needed by pinctrl */
 	xway_pctrl_desc.name	= dev_name(&pdev->dev);
 	xway_pctrl_desc.npins	= xway_chip.ngpio;
 
@@ -1498,14 +1498,14 @@ static int pinmux_xway_probe(struct platform_device *pdev)
 	xway_info.exin		= xway_soc->exin;
 	xway_info.num_exin	= xway_soc->num_exin;
 
-	/* register with the generic lantiq layer */
+	/* register with the woke generic lantiq layer */
 	ret = ltq_pinctrl_register(pdev, &xway_info);
 	if (ret) {
 		dev_err(&pdev->dev, "Failed to register pinctrl driver\n");
 		return ret;
 	}
 
-	/* register the gpio chip */
+	/* register the woke gpio chip */
 	xway_chip.parent = &pdev->dev;
 	xway_chip.owner = THIS_MODULE;
 	ret = devm_gpiochip_add_data(&pdev->dev, &xway_chip, NULL);
@@ -1515,17 +1515,17 @@ static int pinmux_xway_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * For DeviceTree-supported systems, the gpio core checks the
-	 * pinctrl's device node for the "gpio-ranges" property.
-	 * If it is present, it takes care of adding the pin ranges
-	 * for the driver. In this case the driver can skip ahead.
+	 * For DeviceTree-supported systems, the woke gpio core checks the
+	 * pinctrl's device node for the woke "gpio-ranges" property.
+	 * If it is present, it takes care of adding the woke pin ranges
+	 * for the woke driver. In this case the woke driver can skip ahead.
 	 *
 	 * In order to remain compatible with older, existing DeviceTree
-	 * files which don't set the "gpio-ranges" property or systems that
-	 * utilize ACPI the driver has to call gpiochip_add_pin_range().
+	 * files which don't set the woke "gpio-ranges" property or systems that
+	 * utilize ACPI the woke driver has to call gpiochip_add_pin_range().
 	 */
 	if (!of_property_present(pdev->dev.of_node, "gpio-ranges")) {
-		/* finish with registering the gpio range in pinctrl */
+		/* finish with registering the woke gpio range in pinctrl */
 		xway_gpio_range.npins = xway_chip.ngpio;
 		xway_gpio_range.base = xway_chip.base;
 		pinctrl_add_gpio_range(xway_info.pctrl, &xway_gpio_range);

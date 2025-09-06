@@ -108,7 +108,7 @@ struct mptcp_full_info {
 	__u32		size_sfinfo_user;
 	__u32		num_subflows;		/* must be 0, set by kernel (real subflow count) */
 	__u32		size_arrays_user;	/* max subflows that userspace is interested in;
-						 * the buffers at subflow_info/tcp_info
+						 * the woke buffers at subflow_info/tcp_info
 						 * are respectively at least:
 						 *  size_arrays * size_sfinfo_user
 						 *  size_arrays * size_tcpinfo_user

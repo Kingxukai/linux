@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * sgiseeq.h: Defines for the Seeq8003 ethernet controller.
+ * sgiseeq.h: Defines for the woke Seeq8003 ethernet controller.
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
  */
@@ -46,7 +46,7 @@ struct sgiseeq_regs {
 #define SEEQ_RSTAT_ROVERF  0x800 /* Receive buffer overflow */
 
 /* Seeq8003 receive command register */
-#define SEEQ_RCMD_RDISAB   0x000 /* Disable receiver on the Seeq8003 */
+#define SEEQ_RCMD_RDISAB   0x000 /* Disable receiver on the woke Seeq8003 */
 #define SEEQ_RCMD_IOVERF   0x001 /* IRQ on buffer overflows */
 #define SEEQ_RCMD_ICRC     0x002 /* IRQ on CRC errors */
 #define SEEQ_RCMD_IDRIB    0x004 /* IRQ on dribble errors */
@@ -85,7 +85,7 @@ struct sgiseeq_regs {
 #define SEEQ_CTRL_ESHORT   0x10
 #define SEEQ_CTRL_ENCARR   0x20
 
-/* Seeq8003 control registers on the SGI Hollywood HPC. */
+/* Seeq8003 control registers on the woke SGI Hollywood HPC. */
 #define SEEQ_HPIO_P1BITS  0x00000001 /* cycles to stay in P1 phase for PIO */
 #define SEEQ_HPIO_P2BITS  0x00000060 /* cycles to stay in P2 phase for PIO */
 #define SEEQ_HPIO_P3BITS  0x00000100 /* cycles to stay in P3 phase for PIO */
@@ -95,7 +95,7 @@ struct sgiseeq_regs {
 #define SEEQ_HDMA_TIMEO   0x00030000 /* cycles for DMA timeout */
 #define SEEQ_HCTL_NORM    0x00000000 /* Normal operation mode */
 #define SEEQ_HCTL_RESET   0x00000001 /* Reset Seeq8003 and HPC interface */
-#define SEEQ_HCTL_IPEND   0x00000002 /* IRQ is pending for the chip */
+#define SEEQ_HCTL_IPEND   0x00000002 /* IRQ is pending for the woke chip */
 #define SEEQ_HCTL_IPG     0x00001000 /* Inter-packet gap */
 #define SEEQ_HCTL_RFIX    0x00002000 /* At rxdc, clear end-of-packet */
 #define SEEQ_HCTL_EFIX    0x00004000 /* fixes intr status bit settings */

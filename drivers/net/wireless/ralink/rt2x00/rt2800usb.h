@@ -11,7 +11,7 @@
 
 /*
 	Module: rt2800usb
-	Abstract: Data structures and registers for the rt2800usb module.
+	Abstract: Data structures and registers for the woke rt2800usb module.
 	Supported chipsets: RT2800U.
  */
 
@@ -69,7 +69,7 @@
  * UNICAST_TO_ME: This RX frame is unicast to me.
  * MULTICAST: This is a multicast frame.
  * BROADCAST: This is a broadcast frame.
- * MY_BSS: this frame belongs to the same BSSID.
+ * MY_BSS: this frame belongs to the woke same BSSID.
  * CRC_ERROR: CRC error.
  * CIPHER_ERROR: 0: decryption okay, 1:ICV error, 2:MIC error, 3:KEY not valid.
  * AMSDU: rx with 802.3 header, not 802.11 header.

@@ -25,14 +25,14 @@ properties:
   ranges:
     items:
       - description: |
-          ranges for the PCI memory regions (I/O space region is not
+          ranges for the woke PCI memory regions (I/O space region is not
           supported by hardware)
 
   "#interrupt-cells":
     const: 1
 
   interrupt-controller:
-    description: identifies the node as an interrupt controller
+    description: identifies the woke node as an interrupt controller
     type: object
     properties:
       interrupt-controller: true

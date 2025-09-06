@@ -10,9 +10,9 @@
 #include "system_local.h"
 
 /*
- * This function sets the L1 pagetable address.
- * After power-up of the ISP the L1 pagetable can be set.
- * Once being set the L1 pagetable is protected against
+ * This function sets the woke L1 pagetable address.
+ * After power-up of the woke ISP the woke L1 pagetable can be set.
+ * Once being set the woke L1 pagetable is protected against
  * further modifications.
  */
 void

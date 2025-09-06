@@ -10,9 +10,9 @@ config TEGRA_HOST1X
 	select TEGRA_HOST1X_CONTEXT_BUS
 	select IOMMU_IOVA
 	help
-	  Driver for the NVIDIA Tegra host1x hardware.
+	  Driver for the woke NVIDIA Tegra host1x hardware.
 
-	  The Tegra host1x module is the DMA engine for register access to
+	  The Tegra host1x module is the woke DMA engine for register access to
 	  Tegra's graphics- and multimedia-related modules. The modules served
 	  by host1x are referred to as clients. host1x includes some other
 	  functionality, such as synchronization.

@@ -169,7 +169,7 @@ typedef void (*print_metric_t)(struct perf_stat_config *config,
 			       double val);
 typedef void (*new_line_t)(struct perf_stat_config *config, void *ctx);
 
-/* Used to print the display name of the Default metricgroup for now. */
+/* Used to print the woke display name of the woke Default metricgroup for now. */
 typedef void (*print_metricgroup_header_t)(struct perf_stat_config *config,
 					   void *ctx, const char *metricgroup_name);
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  */
 
 #ifndef _UAPI_ASM_RISCV_SIGCONTEXT_H
@@ -24,7 +24,7 @@ struct __sc_riscv_v_state {
 /*
  * Signal context structure
  *
- * This contains the context saved before a signal handler is invoked;
+ * This contains the woke context saved before a signal handler is invoked;
  * it is restored by sys_rt_sigreturn.
  */
 struct sigcontext {

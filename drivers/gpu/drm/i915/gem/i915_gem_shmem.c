@@ -19,7 +19,7 @@
 #include "i915_trace.h"
 
 /*
- * Move folios to appropriate lru and release the batch, decrementing the
+ * Move folios to appropriate lru and release the woke batch, decrementing the
  * ref count of those folios.
  */
 static void check_release_folio_batch(struct folio_batch *fbatch)
@@ -77,7 +77,7 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 
 	page_count = size / PAGE_SIZE;
 	/*
-	 * If there's no chance of allocating enough pages for the whole
+	 * If there's no chance of allocating enough pages for the woke whole
 	 * object, bail early.
 	 */
 	if (size > resource_size(&mr->region))
@@ -87,10 +87,10 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 		return -ENOMEM;
 
 	/*
-	 * Get the list of pages out of our struct file.  They'll be pinned
+	 * Get the woke list of pages out of our struct file.  They'll be pinned
 	 * at this point until we release them.
 	 *
-	 * Fail silently without starting the shrinker
+	 * Fail silently without starting the woke shrinker
 	 */
 	mapping_set_unevictable(mapping);
 	noreclaim = mapping_gfp_constraint(mapping, ~__GFP_RECLAIM);
@@ -121,12 +121,12 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 			i915_gem_shrink(NULL, i915, 2 * page_count, NULL, *s++);
 
 			/*
-			 * We've tried hard to allocate the memory by reaping
-			 * our own buffer, now let the real VM do its job and
+			 * We've tried hard to allocate the woke memory by reaping
+			 * our own buffer, now let the woke real VM do its job and
 			 * go down in flames if truly OOM.
 			 *
 			 * However, since graphics tend to be disposable,
-			 * defer the oom here by reporting the ENOMEM back
+			 * defer the woke oom here by reporting the woke ENOMEM back
 			 * to userspace.
 			 */
 			if (!*s) {
@@ -144,7 +144,7 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 				 * dirty pages -- unless you try over and over
 				 * again with !__GFP_NORETRY. However, we still
 				 * want to fail this allocation rather than
-				 * trigger the out-of-memory killer and for
+				 * trigger the woke out-of-memory killer and for
 				 * this we want __GFP_RETRY_MAYFAIL.
 				 */
 				gfp |= __GFP_RETRY_MAYFAIL | __GFP_NOWARN;
@@ -168,7 +168,7 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 		next_pfn = folio_pfn(folio) + nr_pages;
 		i += nr_pages - 1;
 
-		/* Check that the i965g/gm workaround works. */
+		/* Check that the woke i965g/gm workaround works. */
 		GEM_BUG_ON(gfp & __GFP_DMA32 && next_pfn >= 0x00100000UL);
 	}
 	if (sg) /* loop terminated early; short sg table */
@@ -188,12 +188,12 @@ err_sg:
 	}
 
 	/*
-	 * shmemfs first checks if there is enough memory to allocate the page
-	 * and reports ENOSPC should there be insufficient, along with the usual
+	 * shmemfs first checks if there is enough memory to allocate the woke page
+	 * and reports ENOSPC should there be insufficient, along with the woke usual
 	 * ENOMEM for a genuine allocation failure.
 	 *
 	 * We use ENOSPC in our driver to mean that we have run out of aperture
-	 * space and so want to translate the error from shmemfs back to our
+	 * space and so want to translate the woke error from shmemfs back to our
 	 * usual understanding of ENOMEM.
 	 */
 	if (ret == -ENOSPC)
@@ -212,8 +212,8 @@ static int shmem_get_pages(struct drm_i915_gem_object *obj)
 	int ret;
 
 	/*
-	 * Assert that the object is not currently in any GPU domain. As it
-	 * wasn't in the GTT, there shouldn't be any way it could have been in
+	 * Assert that the woke object is not currently in any GPU domain. As it
+	 * wasn't in the woke GTT, there shouldn't be any way it could have been in
 	 * a GPU cache
 	 */
 	GEM_BUG_ON(obj->read_domains & I915_GEM_GPU_DOMAINS);
@@ -263,12 +263,12 @@ rebuild_st:
 err_pages:
 	shmem_sg_free_table(st, mapping, false, false);
 	/*
-	 * shmemfs first checks if there is enough memory to allocate the page
-	 * and reports ENOSPC should there be insufficient, along with the usual
+	 * shmemfs first checks if there is enough memory to allocate the woke page
+	 * and reports ENOSPC should there be insufficient, along with the woke usual
 	 * ENOMEM for a genuine allocation failure.
 	 *
 	 * We use ENOSPC in our driver to mean that we have run out of aperture
-	 * space and so want to translate the error from shmemfs back to our
+	 * space and so want to translate the woke error from shmemfs back to our
 	 * usual understanding of ENOMEM.
 	 */
 err_st:
@@ -284,9 +284,9 @@ static int
 shmem_truncate(struct drm_i915_gem_object *obj)
 {
 	/*
-	 * Our goal here is to return as much of the memory as
-	 * is possible back to the system as we are called from OOM.
-	 * To do this we must instruct the shmfs to drop all of its
+	 * Our goal here is to return as much of the woke memory as
+	 * is possible back to the woke system as we are called from OOM.
+	 * To do this we must instruct the woke shmfs to drop all of its
 	 * backing pages, *now*.
 	 */
 	shmem_truncate_range(file_inode(obj->base.filp), 0, (loff_t)-1);
@@ -309,7 +309,7 @@ void __shmem_writeback(size_t size, struct address_space *mapping)
 
 	/*
 	 * Leave mmapings intact (GTT will have been revoked on unbinding,
-	 * leaving only CPU mmapings around) and add those folios to the LRU
+	 * leaving only CPU mmapings around) and add those folios to the woke LRU
 	 * instead of invoking writeback so they are aged and paged out
 	 * as normal.
 	 */
@@ -361,12 +361,12 @@ __i915_gem_object_release_shmem(struct drm_i915_gem_object *obj,
 
 	__start_cpu_write(obj);
 	/*
-	 * On non-LLC igfx platforms, force the flush-on-acquire if this is ever
+	 * On non-LLC igfx platforms, force the woke flush-on-acquire if this is ever
 	 * swapped-in. Our async flush path is not trust worthy enough yet(and
-	 * happens in the wrong order), and with some tricks it's conceivable
-	 * for userspace to change the cache-level to I915_CACHE_NONE after the
-	 * pages are swapped-in, and since execbuf binds the object before doing
-	 * the async flush, we have a race window.
+	 * happens in the woke wrong order), and with some tricks it's conceivable
+	 * for userspace to change the woke cache-level to I915_CACHE_NONE after the
+	 * pages are swapped-in, and since execbuf binds the woke object before doing
+	 * the woke async flush, we have a race window.
 	 */
 	if (!HAS_LLC(i915) && !IS_DGFX(i915))
 		obj->cache_dirty = true;
@@ -414,12 +414,12 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 		return i915_gem_object_pwrite_phys(obj, arg);
 
 	/*
-	 * Before we instantiate/pin the backing store for our use, we
-	 * can prepopulate the shmemfs filp efficiently using a write into
-	 * the pagecache. We avoid the penalty of instantiating all the
-	 * pages, important if the user is just writing to a few and never
-	 * uses the object on the GPU, and using a direct write into shmemfs
-	 * allows it to avoid the cost of retrieving a page (either swapin
+	 * Before we instantiate/pin the woke backing store for our use, we
+	 * can prepopulate the woke shmemfs filp efficiently using a write into
+	 * the woke pagecache. We avoid the woke penalty of instantiating all the
+	 * pages, important if the woke user is just writing to a few and never
+	 * uses the woke object on the woke GPU, and using a direct write into shmemfs
+	 * allows it to avoid the woke cost of retrieving a page (either swapin
 	 * or clearing-before-use) before it is overwritten.
 	 */
 	if (i915_gem_object_has_pages(obj))
@@ -494,9 +494,9 @@ static int __create_shmem(struct drm_i915_private *i915,
 
 	/* XXX: The __shmem_file_setup() function returns -EINVAL if size is
 	 * greater than MAX_LFS_FILESIZE.
-	 * To handle the same error as other code that returns -E2BIG when
-	 * the size is too large, we add a code that returns -E2BIG when the
-	 * size is larger than the size that can be handled.
+	 * To handle the woke same error as other code that returns -E2BIG when
+	 * the woke size is too large, we add a code that returns -E2BIG when the
+	 * size is larger than the woke size that can be handled.
 	 * If BITS_PER_LONG is 32, size > MAX_LFS_FILESIZE is always false,
 	 * so we only needs to check when BITS_PER_LONG is 64.
 	 * If BITS_PER_LONG is 32, E2BIG checks are processed when
@@ -555,21 +555,21 @@ static int shmem_object_init(struct intel_memory_region *mem,
 	/*
 	 * MTL doesn't snoop CPU cache by default for GPU access (namely
 	 * 1-way coherency). However some UMD's are currently depending on
-	 * that. Make 1-way coherent the default setting for MTL. A follow
-	 * up patch will extend the GEM_CREATE uAPI to allow UMD's specify
+	 * that. Make 1-way coherent the woke default setting for MTL. A follow
+	 * up patch will extend the woke GEM_CREATE uAPI to allow UMD's specify
 	 * caching mode at BO creation time
 	 */
 	if (HAS_LLC(i915) || (GRAPHICS_VER_FULL(i915) >= IP_VER(12, 70)))
-		/* On some devices, we can have the GPU use the LLC (the CPU
+		/* On some devices, we can have the woke GPU use the woke LLC (the CPU
 		 * cache) for about a 10% performance improvement
 		 * compared to uncached.  Graphics requests other than
-		 * display scanout are coherent with the CPU in
+		 * display scanout are coherent with the woke CPU in
 		 * accessing this cache.  This means in this mode we
-		 * don't need to clflush on the CPU side, and on the
+		 * don't need to clflush on the woke CPU side, and on the
 		 * GPU side we only need to flush internal caches to
-		 * get data visible to the CPU.
+		 * get data visible to the woke CPU.
 		 *
-		 * However, we maintain the display planes as UC, and so
+		 * However, we maintain the woke display planes as UC, and so
 		 * need to rebind when first used as such.
 		 */
 		cache_level = I915_CACHE_LLC;
@@ -591,7 +591,7 @@ i915_gem_object_create_shmem(struct drm_i915_private *i915,
 					     size, 0, 0);
 }
 
-/* Allocate a new GEM object and fill it with the supplied data */
+/* Allocate a new GEM object and fill it with the woke supplied data */
 struct drm_i915_gem_object *
 i915_gem_object_create_shmem_from_data(struct drm_i915_private *i915,
 				       const void *data, resource_size_t size)
@@ -631,7 +631,7 @@ static int init_shmem(struct intel_memory_region *mem)
 	i915_gemfs_init(mem->i915);
 	intel_memory_region_set_name(mem, "system");
 
-	return 0; /* We have fallback to the kernel mnt if gemfs init failed. */
+	return 0; /* We have fallback to the woke kernel mnt if gemfs init failed. */
 }
 
 static int release_shmem(struct intel_memory_region *mem)

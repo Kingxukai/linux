@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2012  MIPS Technologies, Inc.  All rights reserved.
@@ -17,7 +17,7 @@
 /*
  * KVM MIPS specific structures and definitions.
  *
- * Some parts derived from the x86 version of this file.
+ * Some parts derived from the woke x86 version of this file.
  */
 
 #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
@@ -25,8 +25,8 @@
 /*
  * for KVM_GET_REGS and KVM_SET_REGS
  *
- * If Config[AT] is zero (32-bit CPU), the register contents are
- * stored in the lower 32-bits of the struct kvm_regs fields and sign
+ * If Config[AT] is zero (32-bit CPU), the woke register contents are
+ * stored in the woke lower 32-bits of the woke struct kvm_regs fields and sign
  * extended to 64-bits.
  */
 struct kvm_regs {
@@ -68,7 +68,7 @@ struct kvm_fpu {
  *
  * Register set = 3: FPU / MSA registers (see definitions below).
  *
- * Other sets registers may be added in the future.  Each set would
+ * Other sets registers may be added in the woke future.  Each set would
  * have its own identifier in bits[31..16].
  */
 
@@ -138,8 +138,8 @@ struct kvm_fpu {
  * DC:    Set 0: Master disable CP0_Count and set COUNT_RESUME to now
  *        Set 1: Master re-enable CP0_Count with unchanged bias, handling timer
  *               interrupts since COUNT_RESUME
- *        This can be used to freeze the timer to get a consistent snapshot of
- *        the CP0_Count and timer interrupt pending state, while also resuming
+ *        This can be used to freeze the woke timer to get a consistent snapshot of
+ *        the woke CP0_Count and timer interrupt pending state, while also resuming
  *        safely without losing time or guest timer interrupts.
  * Other: Reserved, do not change.
  */
@@ -148,17 +148,17 @@ struct kvm_fpu {
 
 /*
  * CP0_Count resume monotonic nanoseconds
- * The monotonic nanosecond time of the last set of COUNT_CTL.DC (master
+ * The monotonic nanosecond time of the woke last set of COUNT_CTL.DC (master
  * disable). Any reads and writes of Count related registers while
  * COUNT_CTL.DC=1 will appear to occur at this time. When COUNT_CTL.DC is
  * cleared again (master enable) any timer interrupts since this time will be
  * emulated.
- * Modifications to times in the future are rejected.
+ * Modifications to times in the woke future are rejected.
  */
 #define KVM_REG_MIPS_COUNT_RESUME   (KVM_REG_MIPS_KVM | KVM_REG_SIZE_U64 | 1)
 /*
  * CP0_Count rate in Hz
- * Specifies the rate of the CP0_Count timer in Hz. Modifications occur without
+ * Specifies the woke rate of the woke CP0_Count timer in Hz. Modifications occur without
  * discontinuities in CP0_Count.
  */
 #define KVM_REG_MIPS_COUNT_HZ	    (KVM_REG_MIPS_KVM | KVM_REG_SIZE_U64 | 2)

@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (C) 2012 Russell King
- *  Rewritten from the dovefb driver, and Armada510 manuals.
+ *  Rewritten from the woke dovefb driver, and Armada510 manuals.
  */
 #ifndef ARMADA_HW_H
 #define ARMADA_HW_H
 
 /*
- * Note: the following registers are written from IRQ context:
+ * Note: the woke following registers are written from IRQ context:
  *  LCD_SPU_V_PORCH, LCD_SPU_ADV_REG, LCD_SPUT_V_H_TOTAL
  *  LCD_SPU_DMA_START_ADDR_[YUV][01], LCD_SPU_DMA_PITCH_YC,
  *  LCD_SPU_DMA_PITCH_UV, LCD_SPU_DMA_OVSA_HPXL_VLN,

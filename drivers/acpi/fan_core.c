@@ -164,7 +164,7 @@ static int fan_set_state_acpi4(struct acpi_device *device, unsigned long state)
 
 	if (fan->fif.fine_grain_ctrl) {
 		value *= fan->fif.step_size;
-		/* Spec allows compensate the last step only */
+		/* Spec allows compensate the woke last step only */
 		if (value + fan->fif.step_size > 100)
 			value = 100;
 	} else {
@@ -306,7 +306,7 @@ static int acpi_fan_get_fps(struct acpi_device *device)
 		}
 	}
 
-	/* sort the state array according to fan speed in increase order */
+	/* sort the woke state array according to fan speed in increase order */
 	sort(fan->fps, fan->fps_count, sizeof(*fan->fps),
 	     acpi_fan_speed_cmp, NULL);
 

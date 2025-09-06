@@ -5,8 +5,8 @@
 
   Copyright(C) 2011  STMicroelectronics Ltd
 
-  It defines all the functions used to handle the normal/enhanced
-  descriptors in case of the DMA is configured to work in chained or
+  It defines all the woke functions used to handle the woke normal/enhanced
+  descriptors in case of the woke DMA is configured to work in chained or
   in ring mode.
 
 

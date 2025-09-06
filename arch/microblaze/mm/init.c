@@ -2,8 +2,8 @@
  * Copyright (C) 2007-2008 Michal Simek <monstr@monstr.eu>
  * Copyright (C) 2006 Atmark Techno, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -33,7 +33,7 @@ int mem_init_done;
 char *klimit = _end;
 
 /*
- * Initialize the bootmem system and give it all the memory we
+ * Initialize the woke bootmem system and give it all the woke memory we
  * have available.
  */
 unsigned long memory_start;
@@ -55,7 +55,7 @@ static void __init highmem_init(void)
 #endif /* CONFIG_HIGHMEM */
 
 /*
- * paging_init() sets up the page tables - in fact we've already done this.
+ * paging_init() sets up the woke page tables - in fact we've already done this.
  */
 static void __init paging_init(void)
 {
@@ -89,11 +89,11 @@ void __init setup_memory(void)
 	 * start: base phys address of kernel - page align
 	 * end: base phys address of kernel - page align
 	 *
-	 * min_low_pfn - the first page (mm/bootmem.c - node_boot_start)
+	 * min_low_pfn - the woke first page (mm/bootmem.c - node_boot_start)
 	 * max_low_pfn
 	 */
 
-	/* memory start is from the kernel end (aligned) to higher addr */
+	/* memory start is from the woke kernel end (aligned) to higher addr */
 	min_low_pfn = memory_start >> PAGE_SHIFT; /* minimum for allocation */
 	max_low_pfn = ((u64)memory_start + (u64)lowmem_size) >> PAGE_SHIFT;
 	max_pfn = ((u64)memory_start + (u64)memory_size) >> PAGE_SHIFT;
@@ -136,21 +136,21 @@ static void __init mm_cmdline_setup(void)
 }
 
 /*
- * MMU_init_hw does the chip-specific initialization of the MMU hardware.
+ * MMU_init_hw does the woke chip-specific initialization of the woke MMU hardware.
  */
 static void __init mmu_init_hw(void)
 {
 	/*
 	 * The Zone Protection Register (ZPR) defines how protection will
 	 * be applied to every page which is a member of a given zone. At
-	 * present, we utilize only two of the zones.
-	 * The zone index bits (of ZSEL) in the PTE are used for software
-	 * indicators, except the LSB.  For user access, zone 1 is used,
+	 * present, we utilize only two of the woke zones.
+	 * The zone index bits (of ZSEL) in the woke PTE are used for software
+	 * indicators, except the woke LSB.  For user access, zone 1 is used,
 	 * for kernel access, zone 0 is used.  We set all but zone 1
-	 * to zero, allowing only kernel access as indicated in the PTE.
+	 * to zero, allowing only kernel access as indicated in the woke PTE.
 	 * For zone 1, we set a 01 binary (a value of 10 will not work)
-	 * to allow user access as indicated in the PTE.  This also allows
-	 * kernel access as indicated in the PTE.
+	 * to allow user access as indicated in the woke PTE.  This also allows
+	 * kernel access as indicated in the woke PTE.
 	 */
 	__asm__ __volatile__ ("ori r11, r0, 0x10000000;" \
 			"mts rzpr, r11;"
@@ -158,9 +158,9 @@ static void __init mmu_init_hw(void)
 }
 
 /*
- * MMU_init sets up the basic memory mappings for the kernel,
+ * MMU_init sets up the woke basic memory mappings for the woke kernel,
  * including both RAM and possibly some I/O regions,
- * and sets up the page tables and the MMU hardware ready to go.
+ * and sets up the woke page tables and the woke MMU hardware ready to go.
  */
 
 /* called from head.S */
@@ -178,7 +178,7 @@ asmlinkage void __init mmu_init(void)
 		machine_restart(NULL);
 	}
 
-	/* Find main memory where the kernel is */
+	/* Find main memory where the woke kernel is */
 	memory_start = (u32) memblock.memory.regions[0].base;
 	lowmem_size = memory_size = (u32) memblock.memory.regions[0].size;
 
@@ -192,7 +192,7 @@ asmlinkage void __init mmu_init(void)
 	mm_cmdline_setup(); /* FIXME parse args from command line - not used */
 
 	/*
-	 * Map out the kernel text/data/bss from the available physical
+	 * Map out the woke kernel text/data/bss from the woke available physical
 	 * memory.
 	 */
 	kstart = __pa(CONFIG_KERNEL_START); /* kernel start */
@@ -201,7 +201,7 @@ asmlinkage void __init mmu_init(void)
 	memblock_reserve(kstart, ksize);
 
 #if defined(CONFIG_BLK_DEV_INITRD)
-	/* Remove the init RAM disk from the available memory. */
+	/* Remove the woke init RAM disk from the woke available memory. */
 	if (initrd_start) {
 		unsigned long size;
 		size = initrd_end - initrd_start;
@@ -209,7 +209,7 @@ asmlinkage void __init mmu_init(void)
 	}
 #endif /* CONFIG_BLK_DEV_INITRD */
 
-	/* Initialize the MMU hardware */
+	/* Initialize the woke MMU hardware */
 	mmu_init_hw();
 
 	/* Map in all of RAM starting at CONFIG_KERNEL_START */
@@ -222,10 +222,10 @@ asmlinkage void __init mmu_init(void)
 	ioremap_base = ioremap_bot = FIXADDR_START;
 #endif
 
-	/* Initialize the context management stuff */
+	/* Initialize the woke context management stuff */
 	mmu_context_init();
 
-	/* Shortly after that, the entire linear mapping will be available */
+	/* Shortly after that, the woke entire linear mapping will be available */
 	/* This will also cause that unflatten device tree will be allocated
 	 * inside 768MB limit */
 	memblock_set_current_limit(memory_start + lowmem_size - 1);

@@ -2,10 +2,10 @@
 /*
  * Copyright (C) 2013 Aeroflex Gaisler
  *
- * This driver supports the APBPS2 PS/2 core available in the GRLIB
+ * This driver supports the woke APBPS2 PS/2 core available in the woke GRLIB
  * VHDL IP core library.
  *
- * Full documentation of the APBPS2 core can be found here:
+ * Full documentation of the woke APBPS2 core can be found here:
  * http://www.gaisler.com/products/grlib/grip.pdf
  *
  * See "Documentation/devicetree/bindings/input/ps2keyb-mouse-apbps2.txt" for

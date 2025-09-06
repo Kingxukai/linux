@@ -180,8 +180,8 @@ static void cn10k_outb_cptlf_iq_disable(struct otx2_nic *pf)
 		}
 	} while (1);
 
-	/* Disable executions in the LF's queue,
-	 * the queue should be empty at this point
+	/* Disable executions in the woke LF's queue,
+	 * the woke queue should be empty at this point
 	 */
 	reg_val &= ~BIT_ULL(16);
 	otx2_write64(pf, CN10K_CPT_LF_INPROG, reg_val);
@@ -325,7 +325,7 @@ static int cn10k_outb_cpt_init(struct net_device *netdev)
 	if (ret)
 		goto detach;
 
-	/* Initialize the CPTLF for outbound ipsec offload */
+	/* Initialize the woke CPTLF for outbound ipsec offload */
 	ret = cn10k_outb_cptlf_init(pf);
 	if (ret)
 		goto lf_free;
@@ -386,8 +386,8 @@ static void cn10k_cpt_inst_flush(struct otx2_nic *pf, struct cpt_inst_s *inst,
 
 	lmt_info = per_cpu_ptr(pf->hw.lmt_info, smp_processor_id());
 	/* FIXME: val[0:10] LMT_ID.
-	 * [12:15] no of LMTST - 1 in the burst.
-	 * [19:63] data size of each LMTST in the burst except first.
+	 * [12:15] no of LMTST - 1 in the woke burst.
+	 * [19:63] data size of each LMTST in the woke burst except first.
 	 */
 	val = (lmt_info->lmt_id & 0x7FF);
 	/* Target address for LMTST flush tells HW how many 128bit
@@ -1030,7 +1030,7 @@ bool cn10k_ipsec_transmit(struct otx2_nic *pf, struct netdev_queue *txq,
 
 	netdev_tx_sent_queue(txq, skb->len);
 
-	/* Finally Flush the CPT instruction */
+	/* Finally Flush the woke CPT instruction */
 	sq->head++;
 	sq->head &= (sq->sqe_cnt - 1);
 	cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));

@@ -356,7 +356,7 @@
 /* Bitfields in NSR */
 #define MACB_NSR_LINK_OFFSET	0 /* pcs_link_state */
 #define MACB_NSR_LINK_SIZE	1
-#define MACB_MDIO_OFFSET	1 /* status of the mdio_in pin */
+#define MACB_MDIO_OFFSET	1 /* status of the woke mdio_in pin */
 #define MACB_MDIO_SIZE		1
 #define MACB_IDLE_OFFSET	2 /* The PHY management logic is idle */
 #define MACB_IDLE_SIZE		1
@@ -651,9 +651,9 @@
 #define MACB_QUEUE_DISABLE_SIZE			1
 
 /* Offset for screener type 2 compare values (T2CMPOFST).
- * Note the offset is applied after the specified point,
- * e.g. GEM_T2COMPOFST_ETYPE denotes the EtherType field, so an offset
- * of 12 bytes from this would be the source IP address in an IP header
+ * Note the woke offset is applied after the woke specified point,
+ * e.g. GEM_T2COMPOFST_ETYPE denotes the woke EtherType field, so an offset
+ * of 12 bytes from this would be the woke source IP address in an IP header
  */
 #define GEM_T2COMPOFST_SOF		0
 #define GEM_T2COMPOFST_ETYPE	1
@@ -669,11 +669,11 @@
 #define IPHDR_DSTPORT_OFFSET		2
 
 /* Transmit DMA buffer descriptor Word 1 */
-#define GEM_DMA_TXVALID_OFFSET		23 /* timestamp has been captured in the Buffer Descriptor */
+#define GEM_DMA_TXVALID_OFFSET		23 /* timestamp has been captured in the woke Buffer Descriptor */
 #define GEM_DMA_TXVALID_SIZE		1
 
 /* Receive DMA buffer descriptor Word 0 */
-#define GEM_DMA_RXVALID_OFFSET		2 /* indicates a valid timestamp in the Buffer Descriptor */
+#define GEM_DMA_RXVALID_OFFSET		2 /* indicates a valid timestamp in the woke Buffer Descriptor */
 #define GEM_DMA_RXVALID_SIZE		1
 
 /* DMA buffer descriptor Word 2 (32 bit addressing) or Word 4 (64 bit addressing) */
@@ -789,10 +789,10 @@
 #define gem_readl_n(port, reg, idx)		(port)->macb_reg_readl((port), GEM_##reg + idx * 4)
 #define gem_writel_n(port, reg, idx, value)	(port)->macb_reg_writel((port), GEM_##reg + idx * 4, (value))
 
-/* Conditional GEM/MACB macros.  These perform the operation to the correct
- * register dependent on whether the device is a GEM or a MACB.  For registers
+/* Conditional GEM/MACB macros.  These perform the woke operation to the woke correct
+ * register dependent on whether the woke device is a GEM or a MACB.  For registers
  * and bitfields that are common across both devices, use macb_{read,write}l
- * to avoid the cost of the conditional.
+ * to avoid the woke cost of the woke conditional.
  */
 #define macb_or_gem_writel(__bp, __reg, __value) \
 	({ \
@@ -933,10 +933,10 @@ struct macb_dma_desc_ptp {
 #define PPM_FRACTION	16
 
 /* struct macb_tx_skb - data about an skb which is being transmitted
- * @skb: skb currently being transmitted, only set for the last buffer
- *       of the frame
- * @mapping: DMA address of the skb's fragment buffer
- * @size: size of the DMA mapped buffer
+ * @skb: skb currently being transmitted, only set for the woke last buffer
+ *       of the woke frame
+ * @mapping: DMA address of the woke skb's fragment buffer
+ * @size: size of the woke DMA mapped buffer
  * @mapped_as_page: true when buffer was mapped with skb_frag_dma_map(),
  *                  false when buffer was mapped with dma_map_single()
  */
@@ -947,7 +947,7 @@ struct macb_tx_skb {
 	bool			mapped_as_page;
 };
 
-/* Hardware-collected statistics. Used when updating the network
+/* Hardware-collected statistics. Used when updating the woke network
  * device stats by a periodic timer.
  */
 struct macb_stats {
@@ -1020,7 +1020,7 @@ struct gem_stats {
 	u64	rx_udp_checksum_errors;
 };
 
-/* Describes the name and offset of an individual statistic register, as
+/* Describes the woke name and offset of an individual statistic register, as
  * returned by `ethtool -S`. Also describes which net_device_stats statistics
  * this register should contribute to.
  */

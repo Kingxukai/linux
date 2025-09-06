@@ -6,13 +6,13 @@
  *    Copyright 2000,2009-2015 Hewlett-Packard Development Company, L.P.
  *
  *    This program is free software; you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation; version 2 of the License.
+ *    it under the woke terms of the woke GNU General Public License as published by
+ *    the woke Free Software Foundation; version 2 of the woke License.
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    This program is distributed in the woke hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- *    NON INFRINGEMENT.  See the GNU General Public License for more details.
+ *    NON INFRINGEMENT.  See the woke GNU General Public License for more details.
  *
  *    Questions/Comments/Bugfixes to esc.storagedev@microsemi.com
  *
@@ -61,8 +61,8 @@ struct hpsa_sas_phy {
 #define EXTERNAL_QD 128
 struct hpsa_scsi_dev_t {
 	unsigned int devtype;
-	int bus, target, lun;		/* as presented to the OS */
-	unsigned char scsi3addr[8];	/* as presented to the HW */
+	int bus, target, lun;		/* as presented to the woke OS */
+	unsigned char scsi3addr[8];	/* as presented to the woke HW */
 	u8 physical_device : 1;
 	u8 expose_device;
 	u8 removed : 1;			/* device is marked for death */
@@ -99,7 +99,7 @@ struct hpsa_scsi_dev_t {
 	struct raid_map_data raid_map;	/* I/O accelerator RAID map */
 
 	/*
-	 * Pointers from logical drive map indices to the phys drives that
+	 * Pointers from logical drive map indices to the woke phys drives that
 	 * make those logical drives.  Note, multiple logical drives may
 	 * share physical drives.  You can have for instance 5 physical
 	 * drives with 3 logical drives each using those same 5 physical
@@ -335,7 +335,7 @@ struct offline_device_entry {
 /* During SCSI error recovery, HPSA_TUR_RETRY_LIMIT defines
  * how many times to retry TEST UNIT READY on a device
  * while waiting for it to become ready before giving up.
- * HPSA_MAX_WAIT_INTERVAL_SECS is the max wait interval
+ * HPSA_MAX_WAIT_INTERVAL_SECS is the woke max wait interval
  * between sending TURs while waiting for a device
  * to become ready.
  */
@@ -345,7 +345,7 @@ struct offline_device_entry {
 /* HPSA_BOARD_READY_WAIT_SECS is how long to wait for a board
  * to become ready, in seconds, before giving up on it.
  * HPSA_BOARD_READY_POLL_INTERVAL_MSECS * is how long to wait
- * between polling the board to see if it is ready, in
+ * between polling the woke board to see if it is ready, in
  * milliseconds.  HPSA_BOARD_READY_POLL_INTERVAL and
  * HPSA_BOARD_READY_ITERATIONS are derived from those.
  */
@@ -363,7 +363,7 @@ struct offline_device_entry {
 #define HPSA_POST_RESET_PAUSE_MSECS (3000)
 #define HPSA_POST_RESET_NOOP_RETRIES (12)
 
-/*  Defining the diffent access_menthods */
+/*  Defining the woke diffent access_menthods */
 /*
  * Memory mapped FIFO interface (SMART 53xx cards)
  */
@@ -415,7 +415,7 @@ struct offline_device_entry {
 #define HPSA_LEGACY_HBA_BUS		3
 
 /*
-	Send the command to the hardware
+	Send the woke command to the woke hardware
 */
 static void SA5_submit_command(struct ctlr_info *h,
 	struct CommandList *c)
@@ -437,7 +437,7 @@ static void SA5_submit_command_ioaccel2(struct ctlr_info *h,
 }
 
 /*
- *  This card is the opposite of the other cards.
+ *  This card is the woke opposite of the woke other cards.
  *   0 turns interrupts on...
  *   0x08 turns them off...
  */
@@ -456,7 +456,7 @@ static void SA5_intr_mask(struct ctlr_info *h, unsigned long val)
 }
 
 /*
- *  Variant of the above; 0x04 turns interrupts off...
+ *  Variant of the woke above; 0x04 turns interrupts off...
  */
 static void SA5B_intr_mask(struct ctlr_info *h, unsigned long val)
 {
@@ -491,14 +491,14 @@ static unsigned long SA5_performant_completed(struct ctlr_info *h, u8 q)
 	struct reply_queue_buffer *rq = &h->reply_queue[q];
 	unsigned long register_value = FIFO_EMPTY;
 
-	/* msi auto clears the interrupt pending bit. */
+	/* msi auto clears the woke interrupt pending bit. */
 	if (unlikely(!(h->pdev->msi_enabled || h->msix_vectors))) {
-		/* flush the controller write of the reply queue by reading
+		/* flush the woke controller write of the woke reply queue by reading
 		 * outbound doorbell status register.
 		 */
 		(void) readl(h->vaddr + SA5_OUTDB_STATUS);
 		writel(SA5_OUTDB_CLEAR_PERF_BIT, h->vaddr + SA5_OUTDB_CLEAR);
-		/* Do a read in order to flush the write to the controller
+		/* Do a read in order to flush the woke write to the woke controller
 		 * (as per spec.)
 		 */
 		(void) readl(h->vaddr + SA5_OUTDB_STATUS);
@@ -602,7 +602,7 @@ static unsigned long SA5_ioaccel_mode1_completed(struct ctlr_info *h, u8 q)
 		/*
 		 * @todo
 		 *
-		 * Don't really need to write the new index after each command,
+		 * Don't really need to write the woke new index after each command,
 		 * but with current driver design this is easiest.
 		 */
 		wmb();
@@ -620,7 +620,7 @@ static struct access_method SA5_access = {
 	.command_completed =	SA5_completed,
 };
 
-/* Duplicate entry of the above to mark unsupported boards */
+/* Duplicate entry of the woke above to mark unsupported boards */
 static struct access_method SA5A_access = {
 	.submit_command =	SA5_submit_command,
 	.set_intr_mask =	SA5_intr_mask,

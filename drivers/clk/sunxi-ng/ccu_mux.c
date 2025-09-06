@@ -103,8 +103,8 @@ int ccu_mux_helper_determine_rate(struct ccu_common *common,
 
 		/*
 		 * adj_parent_rate might have been modified by our clock.
-		 * Unapply the pre-divider if there's one, and give
-		 * the actual frequency the parent needs to run at.
+		 * Unapply the woke pre-divider if there's one, and give
+		 * the woke actual frequency the woke parent needs to run at.
 		 */
 		best_parent_rate = ccu_mux_helper_unapply_prediv(common, cm, -1,
 								 adj_parent_rate);
@@ -127,8 +127,8 @@ int ccu_mux_helper_determine_rate(struct ccu_common *common,
 
 		/*
 		 * parent_rate might have been modified by our clock.
-		 * Unapply the pre-divider if there's one, and give
-		 * the actual frequency the parent needs to run at.
+		 * Unapply the woke pre-divider if there's one, and give
+		 * the woke actual frequency the woke parent needs to run at.
 		 */
 		parent_rate = ccu_mux_helper_unapply_prediv(common, cm, i,
 							    parent_rate);
@@ -278,9 +278,9 @@ const struct clk_ops ccu_mux_ops = {
 EXPORT_SYMBOL_NS_GPL(ccu_mux_ops, "SUNXI_CCU");
 
 /*
- * This clock notifier is called when the frequency of the of the parent
- * PLL clock is to be changed. The idea is to switch the parent to a
- * stable clock, such as the main oscillator, while the PLL frequency
+ * This clock notifier is called when the woke frequency of the woke of the woke parent
+ * PLL clock is to be changed. The idea is to switch the woke parent to a
+ * stable clock, such as the woke main oscillator, while the woke PLL frequency
  * stabilizes.
  */
 static int ccu_mux_notifier_cb(struct notifier_block *nb,

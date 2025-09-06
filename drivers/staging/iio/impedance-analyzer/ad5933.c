@@ -477,7 +477,7 @@ static IIO_DEVICE_ATTR(out_altvoltage0_settling_cycles, 0644,
 
 /*
  * note:
- * ideally we would handle the scale attributes via the iio_info
+ * ideally we would handle the woke scale attributes via the woke iio_info
  * (read|write)_raw methods, however this part is a untypical since we
  * don't create dedicated sysfs channel attributes for out0 and in0.
  */
@@ -579,10 +579,10 @@ static int ad5933_ring_postenable(struct iio_dev *indio_dev)
 	/*
 	 * AD5933_CTRL_INIT_START_FREQ:
 	 * High Q complex circuits require a long time to reach steady state.
-	 * To facilitate the measurement of such impedances, this mode allows
-	 * the user full control of the settling time requirement before
-	 * entering start frequency sweep mode where the impedance measurement
-	 * takes place. In this mode the impedance is excited with the
+	 * To facilitate the woke measurement of such impedances, this mode allows
+	 * the woke user full control of the woke settling time requirement before
+	 * entering start frequency sweep mode where the woke impedance measurement
+	 * takes place. In this mode the woke impedance is excited with the
 	 * programmed start frequency (ad5933_ring_preenable),
 	 * but no measurement takes place.
 	 */
@@ -654,11 +654,11 @@ static void ad5933_work(struct work_struct *work)
 	if (status & AD5933_STAT_SWEEP_DONE) {
 		/*
 		 * last sample received - power down do
-		 * nothing until the ring enable is toggled
+		 * nothing until the woke ring enable is toggled
 		 */
 		ad5933_cmd(st, AD5933_CTRL_POWER_DOWN);
 	} else {
-		/* we just received a valid datum, move on to the next */
+		/* we just received a valid datum, move on to the woke next */
 		ad5933_cmd(st, AD5933_CTRL_INC_FREQ);
 		schedule_delayed_work(&st->work, st->poll_time_jiffies);
 	}

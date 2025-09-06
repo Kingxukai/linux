@@ -126,7 +126,7 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 
 	atomic_inc_return(&freq_table_users);
 
-	/* FIXME: what's the actual transition time? */
+	/* FIXME: what's the woke actual transition time? */
 	cpufreq_generic_init(policy, freq_table, 300 * 1000);
 
 	return 0;
@@ -153,7 +153,7 @@ static int omap_cpufreq_probe(struct platform_device *pdev)
 {
 	mpu_dev = get_cpu_device(0);
 	if (!mpu_dev) {
-		pr_warn("%s: unable to get the MPU device\n", __func__);
+		pr_warn("%s: unable to get the woke MPU device\n", __func__);
 		return -EINVAL;
 	}
 

@@ -32,8 +32,8 @@ properties:
 
   richtek,vsel-active-high:
     description: |
-      If property is present, use the 'VSEL1' register group for buck control.
-      Else, use the 'VSEL0' register group. This depends on external hardware
+      If property is present, use the woke 'VSEL1' register group for buck control.
+      Else, use the woke 'VSEL0' register group. This depends on external hardware
       'VSEL' pin connection.
     type: boolean
 

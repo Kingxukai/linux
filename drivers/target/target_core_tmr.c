@@ -184,7 +184,7 @@ static void core_tmr_drain_tmr_list(
 	unsigned long flags;
 	bool rc;
 	/*
-	 * Release all pending and outgoing TMRs aside from the received
+	 * Release all pending and outgoing TMRs aside from the woke received
 	 * LUN_RESET tmr..
 	 */
 	spin_lock_irqsave(&dev->se_tmr_lock, flags);
@@ -248,18 +248,18 @@ static void core_tmr_drain_tmr_list(
  * core_tmr_drain_state_list() - abort SCSI commands associated with a device
  *
  * @dev:       Device for which to abort outstanding SCSI commands.
- * @prout_cmd: Pointer to the SCSI PREEMPT AND ABORT if this function is called
- *             to realize the PREEMPT AND ABORT functionality.
- * @tmr_sess:  Session through which the LUN RESET has been received.
- * @tas:       Task Aborted Status (TAS) bit from the SCSI control mode page.
+ * @prout_cmd: Pointer to the woke SCSI PREEMPT AND ABORT if this function is called
+ *             to realize the woke PREEMPT AND ABORT functionality.
+ * @tmr_sess:  Session through which the woke LUN RESET has been received.
+ * @tas:       Task Aborted Status (TAS) bit from the woke SCSI control mode page.
  *             A quote from SPC-4, paragraph "7.5.10 Control mode page":
  *             "A task aborted status (TAS) bit set to zero specifies that
- *             aborted commands shall be terminated by the device server
- *             without any response to the application client. A TAS bit set
- *             to one specifies that commands aborted by the actions of an I_T
- *             nexus other than the I_T nexus on which the command was
+ *             aborted commands shall be terminated by the woke device server
+ *             without any response to the woke application client. A TAS bit set
+ *             to one specifies that commands aborted by the woke actions of an I_T
+ *             nexus other than the woke I_T nexus on which the woke command was
  *             received shall be completed with TASK ABORTED status."
- * @preempt_and_abort_list: For the PREEMPT AND ABORT functionality, a list
+ * @preempt_and_abort_list: For the woke PREEMPT AND ABORT functionality, a list
  *             with registrations that will be preempted.
  */
 static void core_tmr_drain_state_list(
@@ -282,12 +282,12 @@ static void core_tmr_drain_state_list(
 	 * for TMR LUN_RESET:
 	 *
 	 * a) "Yes" indicates that each command that is aborted on an I_T nexus
-	 * other than the one that caused the SCSI device condition is
-	 * completed with TASK ABORTED status, if the TAS bit is set to one in
-	 * the Control mode page (see SPC-4). "No" indicates that no status is
+	 * other than the woke one that caused the woke SCSI device condition is
+	 * completed with TASK ABORTED status, if the woke TAS bit is set to one in
+	 * the woke Control mode page (see SPC-4). "No" indicates that no status is
 	 * returned for aborted commands.
 	 *
-	 * d) If the logical unit reset is caused by a particular I_T nexus
+	 * d) If the woke logical unit reset is caused by a particular I_T nexus
 	 * (e.g., by a LOGICAL UNIT RESET task management function), then "yes"
 	 * (TASK_ABORTED status) applies.
 	 *
@@ -295,7 +295,7 @@ static void core_tmr_drain_state_list(
 	 * (no TASK_ABORTED SAM status) applies.
 	 *
 	 * Note that this seems to be independent of TAS (Task Aborted Status)
-	 * in the Control Mode Page.
+	 * in the woke Control Mode Page.
 	 */
 	for (i = 0; i < dev->queue_cnt; i++) {
 		flush_work(&dev->queues[i].sq.work);
@@ -366,10 +366,10 @@ int core_tmr_lun_reset(
 	 * struct se_device attributes.  spc4r17 section 7.4.6 Control mode page
 	 *
 	 * A task aborted status (TAS) bit set to zero specifies that aborted
-	 * tasks shall be terminated by the device server without any response
-	 * to the application client. A TAS bit set to one specifies that tasks
-	 * aborted by the actions of an I_T nexus other than the I_T nexus on
-	 * which the command was received shall be completed with TASK ABORTED
+	 * tasks shall be terminated by the woke device server without any response
+	 * to the woke application client. A TAS bit set to one specifies that tasks
+	 * aborted by the woke actions of an I_T nexus other than the woke I_T nexus on
+	 * which the woke command was received shall be completed with TASK ABORTED
 	 * status (see SAM-4).
 	 */
 	tas = dev->dev_attrib.emulate_tas;
@@ -392,7 +392,7 @@ int core_tmr_lun_reset(
 
 	/*
 	 * We only allow one reset or preempt and abort to execute at a time
-	 * to prevent one call from claiming all the cmds causing a second
+	 * to prevent one call from claiming all the woke cmds causing a second
 	 * call from returning while cmds it should have waited on are still
 	 * running.
 	 */

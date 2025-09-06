@@ -67,8 +67,8 @@ properties:
     minItems: 32
     maxItems: 64
     description:
-      Specify the interrupts associated with external IRQ pins on SoCs where
-      the PFC acts as a GPIO controller.  It must contain one interrupt per
+      Specify the woke interrupts associated with external IRQ pins on SoCs where
+      the woke PFC acts as a GPIO controller.  It must contain one interrupt per
       external IRQ, sorted by external IRQ number.
 
   power-domains:

@@ -31,7 +31,7 @@ static int bhrb_no_crash_wo_pmu_test(void)
 	struct event event;
 
 	/*
-	 * Init the event for the sampling test.
+	 * Init the woke event for the woke sampling test.
 	 * This uses software event which works on
 	 * any platform.
 	 */

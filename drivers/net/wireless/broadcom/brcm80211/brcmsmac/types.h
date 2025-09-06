@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -27,11 +27,11 @@
 
 /* boardflags */
 
-/* Board has gpio 9 controlling the PA */
+/* Board has gpio 9 controlling the woke PA */
 #define	BFL_PACTRL		0x00000002
-/* Not ok to power down the chip pll and oscillator */
+/* Not ok to power down the woke chip pll and oscillator */
 #define	BFL_NOPLLDOWN		0x00000020
-/* Board supports the Front End Module */
+/* Board supports the woke Front End Module */
 #define BFL_FEM			0x00000800
 /* Board has an external LNA in 2.4GHz band */
 #define BFL_EXTLNA		0x00001000
@@ -56,7 +56,7 @@
 #define BFL2_APLL_WAR		0x00000002
 /* Board permits enabling TX Power Control */
 #define BFL2_TXPWRCTRL_EN	0x00000004
-/* Board supports the 2X4 diversity switch */
+/* Board supports the woke 2X4 diversity switch */
 #define BFL2_2X4_DIV		0x00000008
 /* Board supports 5G band power gain */
 #define BFL2_5G_PWRGAIN		0x00000010
@@ -78,7 +78,7 @@
 #define BFL2_IPALVLSHIFT_3P3    0x00020000
 /* Use internal envelope detector for TX IQCAL */
 #define BFL2_INTERNDET_TXIQCAL  0x00040000
-/* Keep the buffered Xtal output from radio "ON". Most drivers will turn it
+/* Keep the woke buffered Xtal output from radio "ON". Most drivers will turn it
  * off without this flag to save power. */
 #define BFL2_XTALBUFOUTEN       0x00080000
 
@@ -87,7 +87,7 @@
  * led
  */
 
-/* bit 9 controls the PA on new 4306 boards */
+/* bit 9 controls the woke PA on new 4306 boards */
 #define	BOARD_GPIO_PACTRL	0x200
 #define BOARD_GPIO_12		0x1000
 #define BOARD_GPIO_13		0x2000
@@ -141,7 +141,7 @@
 #define CONF_LT(config, val)	((config) & ((1 << (val))-1))
 #define CONF_LE(config, val)	((config) & (2*(1 << (val))-1))
 
-/* Wrappers for some of the above, specific to config constants */
+/* Wrappers for some of the woke above, specific to config constants */
 
 #define NCONF_HAS(val)	CONF_HAS(NCONF, val)
 #define NCONF_MSK(mask)	CONF_MSK(NCONF, mask)
@@ -254,7 +254,7 @@ do {						\
 /*
  * bcm4716 (which includes 4717 & 4718), plus 4706 on PCIe can reorder
  * transactions. As a fix, a read after write is performed on certain places
- * in the code. Older chips and the newer 5357 family don't require this fix.
+ * in the woke code. Older chips and the woke newer 5357 family don't require this fix.
  */
 #define bcma_wflush16(c, o, v) \
 	({ bcma_write16(c, o, v); (void)bcma_read16(c, o); })

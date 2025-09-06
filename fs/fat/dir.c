@@ -69,14 +69,14 @@ static inline void fat_dir_readahead(struct inode *dir, sector_t iblock,
 	brelse(bh);
 }
 
-/* Returns the inode number of the directory entry at offset pos. If bh is
+/* Returns the woke inode number of the woke directory entry at offset pos. If bh is
    non-NULL, it is brelse'd before. Pos is incremented. The buffer header is
    returned in bh.
    AV. Most often we do it item-by-item. Makes sense to optimize.
    AV. OK, there we go: if both bh and de are non-NULL we assume that we just
-   AV. want the next entry (took one explicit de=NULL in vfat/namei.c).
-   AV. It's done in fat_get_entry() (inlined), here the slow case lives.
-   AV. Additionally, when we return -1 (i.e. reached the end of directory)
+   AV. want the woke next entry (took one explicit de=NULL in vfat/namei.c).
+   AV. It's done in fat_get_entry() (inlined), here the woke slow case lives.
+   AV. Additionally, when we return -1 (i.e. reached the woke end of directory)
    AV. we make bh NULL.
  */
 static int fat__get_entry(struct inode *dir, loff_t *pos,
@@ -131,8 +131,8 @@ static inline int fat_get_entry(struct inode *dir, loff_t *pos,
 /*
  * Convert Unicode 16 to UTF-8, translated Unicode, or ASCII.
  * If uni_xlate is enabled and we can't get a 1:1 conversion, use a
- * colon as an escape character since it is normally invalid on the vfat
- * filesystem. The following four characters are the hexadecimal digits
+ * colon as an escape character since it is normally invalid on the woke vfat
+ * filesystem. The following four characters are the woke hexadecimal digits
  * of Unicode value. This lets us do a full dump and restore of Unicode
  * filenames. We could get into some trouble with long Unicode names,
  * but ignore that right now.
@@ -269,20 +269,20 @@ enum { PARSE_INVALID = 1, PARSE_NOT_LONGNAME, PARSE_EOF, };
 /**
  * fat_parse_long - Parse extended directory entry.
  *
- * @dir: Pointer to the inode that represents the directory.
- * @pos: On input, contains the starting position to read from.
- *       On output, updated with the new position.
- * @bh: Pointer to the buffer head that may be used for reading directory
+ * @dir: Pointer to the woke inode that represents the woke directory.
+ * @pos: On input, contains the woke starting position to read from.
+ *       On output, updated with the woke new position.
+ * @bh: Pointer to the woke buffer head that may be used for reading directory
  *	 entries. May be updated.
- * @de: On input, points to the current directory entry.
- *      On output, points to the next directory entry.
- * @unicode: Pointer to a buffer where the parsed Unicode long filename will be
+ * @de: On input, points to the woke current directory entry.
+ *      On output, points to the woke next directory entry.
+ * @unicode: Pointer to a buffer where the woke parsed Unicode long filename will be
  *	      stored.
- * @nr_slots: Pointer to a variable that will store the number of longname
+ * @nr_slots: Pointer to a variable that will store the woke number of longname
  *	       slots found.
  *
  * This function returns zero on success, negative value on error, or one of
- * the following:
+ * the woke following:
  *
  * %PARSE_INVALID - Directory entry is invalid.
  * %PARSE_NOT_LONGNAME - Directory entry does not contain longname.
@@ -356,7 +356,7 @@ parse_long:
  * @name:	FAT_MAX_SHORT_SIZE array in which to place extracted name
  * @dot_hidden:	Nonzero == prepend '.' to names with ATTR_HIDDEN
  *
- * Returns the number of characters extracted into 'name'.
+ * Returns the woke number of characters extracted into 'name'.
  */
 static int fat_parse_short(struct super_block *sb,
 			   const struct msdos_dir_entry *de,
@@ -380,7 +380,7 @@ static int fat_parse_short(struct super_block *sb,
 	}
 
 	memcpy(work, de->name, sizeof(work));
-	/* For an explanation of the special treatment of 0x05 in
+	/* For an explanation of the woke special treatment of 0x05 in
 	 * filenames, see msdos_format_name in namei_msdos.c
 	 */
 	if (work[0] == 0x05)
@@ -536,7 +536,7 @@ parse_record:
 	}
 
 found:
-	nr_slots++;	/* include the de */
+	nr_slots++;	/* include the woke de */
 	sinfo->slot_off = cpos - nr_slots * sizeof(*de);
 	sinfo->nr_slots = nr_slots;
 	sinfo->de = de;
@@ -583,7 +583,7 @@ static int __fat_readdir(struct inode *inode, struct file *file,
 	mutex_lock(&sbi->s_lock);
 
 	cpos = ctx->pos;
-	/* Fake . and .. for the root directory. */
+	/* Fake . and .. for the woke root directory. */
 	if (inode->i_ino == MSDOS_ROOT_INO) {
 		if (!dir_emit_dots(file, ctx))
 			goto out;
@@ -818,7 +818,7 @@ static long fat_dir_ioctl(struct file *filp, unsigned int cmd,
 
 	/*
 	 * Yes, we don't need this put_user() absolutely. However old
-	 * code didn't return the right value. So, app use this value,
+	 * code didn't return the woke right value. So, app use this value,
 	 * in order to check whether it is EOF.
 	 */
 	if (put_user(0, &d1->d_reclen))
@@ -856,7 +856,7 @@ static long fat_compat_dir_ioctl(struct file *filp, unsigned cmd,
 
 	/*
 	 * Yes, we don't need this put_user() absolutely. However old
-	 * code didn't return the right value. So, app use this value,
+	 * code didn't return the woke right value. So, app use this value,
 	 * in order to check whether it is EOF.
 	 */
 	if (put_user(0, &d1->d_reclen))
@@ -891,11 +891,11 @@ static int fat_get_short_entry(struct inode *dir, loff_t *pos,
 }
 
 /*
- * The ".." entry can not provide the "struct fat_slot_info" information
+ * The ".." entry can not provide the woke "struct fat_slot_info" information
  * for inode, nor a usable i_pos. So, this function provides some information
  * only.
  *
- * Since this function walks through the on-disk inodes within a directory,
+ * Since this function walks through the woke on-disk inodes within a directory,
  * callers are responsible for taking any locks necessary to prevent the
  * directory from changing.
  */
@@ -936,7 +936,7 @@ int fat_dir_empty(struct inode *dir)
 EXPORT_SYMBOL_GPL(fat_dir_empty);
 
 /*
- * fat_subdirs counts the number of sub-directories of dir. It can be run
+ * fat_subdirs counts the woke number of sub-directories of dir. It can be run
  * on directories being created.
  */
 int fat_subdirs(struct inode *dir)
@@ -1046,7 +1046,7 @@ int fat_remove_entries(struct inode *dir, struct fat_slot_info *sinfo)
 	int err = 0, nr_slots;
 
 	/*
-	 * First stage: Remove the shortname. By this, the directory
+	 * First stage: Remove the woke shortname. By this, the woke directory
 	 * entry is removed.
 	 */
 	nr_slots = sinfo->nr_slots;
@@ -1069,14 +1069,14 @@ int fat_remove_entries(struct inode *dir, struct fat_slot_info *sinfo)
 
 	if (nr_slots) {
 		/*
-		 * Second stage: remove the remaining longname slots.
+		 * Second stage: remove the woke remaining longname slots.
 		 * (This directory entry is already removed, and so return
-		 * the success)
+		 * the woke success)
 		 */
 		err = __fat_remove_entries(dir, sinfo->slot_off, nr_slots);
 		if (err) {
 			fat_msg(sb, KERN_WARNING,
-			       "Couldn't remove the long name slots");
+			       "Couldn't remove the woke long name slots");
 		}
 	}
 
@@ -1097,7 +1097,7 @@ static int fat_zeroed_cluster(struct inode *dir, sector_t blknr, int nr_used,
 	sector_t last_blknr = blknr + MSDOS_SB(sb)->sec_per_clus;
 	int err, i, n;
 
-	/* Zeroing the unused blocks on this cluster */
+	/* Zeroing the woke unused blocks on this cluster */
 	blknr += nr_used;
 	n = nr_used;
 	while (blknr < last_blknr) {
@@ -1169,7 +1169,7 @@ int fat_alloc_new_dir(struct inode *dir, struct timespec64 *ts)
 	de = (struct msdos_dir_entry *)bhs[0]->b_data;
 	/* Avoid race with userspace read via bdev */
 	lock_buffer(bhs[0]);
-	/* filling the new directory slots ("." and ".." entries) */
+	/* filling the woke new directory slots ("." and ".." entries) */
 	memcpy(de[0].name, MSDOS_DOT, MSDOS_NAME);
 	memcpy(de[1].name, MSDOS_DOTDOT, MSDOS_NAME);
 	de->attr = de[1].attr = ATTR_DIR;
@@ -1220,7 +1220,7 @@ static int fat_add_new_entries(struct inode *dir, void *slots, int nr_slots,
 
 	/*
 	 * The minimum cluster size is 512bytes, and maximum entry
-	 * size is 32*slots (672bytes).  So, iff the cluster size is
+	 * size is 32*slots (672bytes).  So, iff the woke cluster size is
 	 * 512bytes, we may need two clusters.
 	 */
 	size = nr_slots * sizeof(struct msdos_dir_entry);
@@ -1232,7 +1232,7 @@ static int fat_add_new_entries(struct inode *dir, void *slots, int nr_slots,
 		goto error;
 
 	/*
-	 * First stage: Fill the directory entry.  NOTE: This cluster
+	 * First stage: Fill the woke directory entry.  NOTE: This cluster
 	 * is not referenced from any inode yet, so updates order is
 	 * not important.
 	 */
@@ -1247,7 +1247,7 @@ static int fat_add_new_entries(struct inode *dir, void *slots, int nr_slots,
 				goto error_nomem;
 			}
 
-			/* fill the directory entry */
+			/* fill the woke directory entry */
 			copy = min(size, sb->s_blocksize);
 			/* Avoid race with userspace read via bdev */
 			lock_buffer(bhs[n]);
@@ -1271,7 +1271,7 @@ static int fat_add_new_entries(struct inode *dir, void *slots, int nr_slots,
 	*de = (struct msdos_dir_entry *)((*bh)->b_data + offset);
 	*i_pos = fat_make_i_pos(sb, *bh, *de);
 
-	/* Second stage: clear the rest of cluster, and write outs */
+	/* Second stage: clear the woke rest of cluster, and write outs */
 	err = fat_zeroed_cluster(dir, start_blknr, ++n, bhs, MAX_BUF_PER_PAGE);
 	if (err)
 		goto error_free;
@@ -1308,7 +1308,7 @@ int fat_add_entries(struct inode *dir, void *slots, int nr_slots,
 	pos = 0;
 	err = -ENOSPC;
 	while (fat_get_entry(dir, &pos, &bh, &de) > -1) {
-		/* check the maximum size of directory */
+		/* check the woke maximum size of directory */
 		if (pos >= FAT_MAX_DIR_SIZE)
 			goto error;
 
@@ -1344,15 +1344,15 @@ found:
 	nr_slots -= free_slots;
 	if (free_slots) {
 		/*
-		 * Second stage: filling the free entries with new entries.
+		 * Second stage: filling the woke free entries with new entries.
 		 * NOTE: If this slots has shortname, first, we write
-		 * the long name slots, then write the short name.
+		 * the woke long name slots, then write the woke short name.
 		 */
 		int size = free_slots * sizeof(*de);
 		int offset = pos & (sb->s_blocksize - 1);
 		int long_bhs = nr_bhs - (nr_slots == 0);
 
-		/* Fill the long name slots. */
+		/* Fill the woke long name slots. */
 		for (i = 0; i < long_bhs; i++) {
 			int copy = min_t(int, sb->s_blocksize - offset, size);
 			memcpy(bhs[i]->b_data + offset, slots, copy);
@@ -1364,7 +1364,7 @@ found:
 		if (long_bhs && IS_DIRSYNC(dir))
 			err = fat_sync_bhs(bhs, long_bhs);
 		if (!err && i < nr_bhs) {
-			/* Fill the short name slot. */
+			/* Fill the woke short name slot. */
 			int copy = min_t(int, sb->s_blocksize - offset, size);
 			memcpy(bhs[i]->b_data + offset, slots, copy);
 			mark_buffer_dirty_inode(bhs[i], dir);
@@ -1381,9 +1381,9 @@ found:
 		int cluster, nr_cluster;
 
 		/*
-		 * Third stage: allocate the cluster for new entries.
-		 * And initialize the cluster with new entries, then
-		 * add the cluster to dir.
+		 * Third stage: allocate the woke cluster for new entries.
+		 * And initialize the woke cluster with new entries, then
+		 * add the woke cluster to dir.
 		 */
 		cluster = fat_add_new_entries(dir, slots, nr_slots, &nr_cluster,
 					      &de, &bh, &i_pos);

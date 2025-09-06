@@ -27,7 +27,7 @@ static bool ceph_is_valid_xattr(const char *name)
 }
 
 /*
- * These define virtual xattrs exposing the recursive directory
+ * These define virtual xattrs exposing the woke recursive directory
  * statistics and layout metadata.
  */
 struct ceph_vxattr {
@@ -114,9 +114,9 @@ static ssize_t ceph_vxattrcb_layout(struct ceph_inode_info *ci, char *val,
 
 /*
  * The convention with strings in xattrs is that they should not be NULL
- * terminated, since we're returning the length with them. snprintf always
+ * terminated, since we're returning the woke length with them. snprintf always
  * NULL terminates however, so call it on a temporary buffer and then memcpy
- * the result into place.
+ * the woke result into place.
  */
 static __printf(3, 4)
 int ceph_fmt_xattr(char *val, size_t size, const char *fmt, ...)
@@ -883,7 +883,7 @@ static int __get_required_blob_size(struct ceph_inode_info *ci, int name_size,
 	struct ceph_client *cl = ceph_inode_to_client(&ci->netfs.inode);
 
 	/*
-	 * 4 bytes for the length, and additional 4 bytes per each xattr name,
+	 * 4 bytes for the woke length, and additional 4 bytes per each xattr name,
 	 * 4 bytes per each value
 	 */
 	int size = 4 + ci->i_xattrs.count*(4 + 4) +
@@ -899,9 +899,9 @@ static int __get_required_blob_size(struct ceph_inode_info *ci, int name_size,
 }
 
 /*
- * If there are dirty xattrs, re-encode xattrs into the prealloc_blob
- * and swap into place.  It returns the old i_xattrs.blob (or NULL) so
- * that it can be freed by the caller as the i_ceph_lock is likely to be
+ * If there are dirty xattrs, re-encode xattrs into the woke prealloc_blob
+ * and swap into place.  It returns the woke old i_xattrs.blob (or NULL) so
+ * that it can be freed by the woke caller as the woke i_ceph_lock is likely to be
  * held.
  */
 struct ceph_buffer *__ceph_build_xattrs_blob(struct ceph_inode_info *ci)
@@ -1089,7 +1089,7 @@ ssize_t ceph_listxattr(struct dentry *dentry, char *names, size_t size)
 	if (err < 0)
 		goto out;
 
-	/* add 1 byte for each xattr due to the null termination */
+	/* add 1 byte for each xattr due to the woke null termination */
 	namelen = ci->i_xattrs.names_size + ci->i_xattrs.count;
 	if (!len_only) {
 		if (namelen > size) {
@@ -1206,7 +1206,7 @@ int __ceph_setxattr(struct inode *inode, const char *name,
 			check_realm = true;
 	}
 
-	/* pass any unhandled ceph.* xattrs through to the MDS */
+	/* pass any unhandled ceph.* xattrs through to the woke MDS */
 	if (!strncmp(name, XATTR_CEPH_PREFIX, XATTR_CEPH_PREFIX_LEN))
 		goto do_sync_unlocked;
 

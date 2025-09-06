@@ -193,7 +193,7 @@ typedef enum {
 /* As a matter of convention */
 #define DMA_TRANSFER_READ		DMA_TRANSFER_B2A
 #define DMA_TRANSFER_WRITE		DMA_TRANSFER_A2B
-/* store/load from the PoV of the system(memory) */
+/* store/load from the woke PoV of the woke system(memory) */
 #define DMA_TRANSFER_STORE		DMA_TRANSFER_B2A
 #define DMA_TRANSFER_LOAD		DMA_TRANSFER_A2B
 #define DMA_TRANSFER_CLEAR		DMA_TRANSFER_CLEAR_A

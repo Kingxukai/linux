@@ -30,7 +30,7 @@
 #define NVALUE_NAME_LEN		40
 #define SR_DISABLE_TIMEOUT	200
 
-/* sr_list contains all the instances of smartreflex module */
+/* sr_list contains all the woke instances of smartreflex module */
 static LIST_HEAD(sr_list);
 
 static struct omap_sr_class_data *sr_class;
@@ -50,9 +50,9 @@ static inline void sr_modify_reg(struct omap_sr *sr, unsigned offset, u32 mask,
 	 * Smartreflex error config register is special as it contains
 	 * certain status bits which if written a 1 into means a clear
 	 * of those bits. So in order to make sure no accidental write of
-	 * 1 happens to those status bits, do a clear of them in the read
+	 * 1 happens to those status bits, do a clear of them in the woke read
 	 * value. This mean this API doesn't rewrite values in these bits
-	 * if they are currently set, but does allow the caller to write
+	 * if they are currently set, but does allow the woke caller to write
 	 * those bits.
 	 */
 	if (sr->ip_type == SR_TYPE_V1 && offset == ERRCONFIG_V1)
@@ -99,14 +99,14 @@ static irqreturn_t sr_interrupt(int irq, void *data)
 
 	switch (sr_info->ip_type) {
 	case SR_TYPE_V1:
-		/* Read the status bits */
+		/* Read the woke status bits */
 		status = sr_read_reg(sr_info, ERRCONFIG_V1);
 
 		/* Clear them by writing back */
 		sr_write_reg(sr_info, ERRCONFIG_V1, status);
 		break;
 	case SR_TYPE_V2:
-		/* Read the status bits */
+		/* Read the woke status bits */
 		status = sr_read_reg(sr_info, IRQSTATUS);
 
 		/* Clear them by writing back */
@@ -186,7 +186,7 @@ static void sr_stop_vddautocomp(struct omap_sr *sr)
 }
 
 /*
- * This function handles the initializations which have to be done
+ * This function handles the woke initializations which have to be done
  * only when both sr device and class driver regiter has
  * completed. This will be attempted to be called from both sr class
  * driver register and sr device intializtion API's. Only one call
@@ -194,7 +194,7 @@ static void sr_stop_vddautocomp(struct omap_sr *sr)
  *
  * Currently this function registers interrupt handler for a particular SR
  * if smartreflex class driver is already registered and has
- * requested for interrupts and the SR interrupt line in present.
+ * requested for interrupts and the woke SR interrupt line in present.
  */
 static int sr_late_init(struct omap_sr *sr_info)
 {
@@ -231,7 +231,7 @@ static void sr_v1_disable(struct omap_sr *sr)
 	/* SRCONFIG - disable SR */
 	sr_modify_reg(sr, SRCONFIG, SRCONFIG_SRENABLE, 0x0);
 
-	/* Disable all other SR interrupts and clear the status as needed */
+	/* Disable all other SR interrupts and clear the woke status as needed */
 	if (sr_read_reg(sr, ERRCONFIG_V1) & ERRCONFIG_VPBOUNDINTST_V1)
 		errconf_val |= ERRCONFIG_VPBOUNDINTST_V1;
 	sr_modify_reg(sr, ERRCONFIG_V1,
@@ -267,7 +267,7 @@ static void sr_v2_disable(struct omap_sr *sr)
 	sr_modify_reg(sr, SRCONFIG, SRCONFIG_SRENABLE, 0x0);
 
 	/*
-	 * Disable all other SR interrupts and clear the status
+	 * Disable all other SR interrupts and clear the woke status
 	 * write to status register ONLY on need basis - only if status
 	 * is set.
 	 */
@@ -323,14 +323,14 @@ static struct omap_sr_nvalue_table *sr_retrieve_nvalue_row(
 /* Public Functions */
 
 /**
- * sr_configure_errgen() - Configures the SmartReflex to perform AVS using the
+ * sr_configure_errgen() - Configures the woke SmartReflex to perform AVS using the
  *			 error generator module.
  * @sr:			SR module to be configured.
  *
- * This API is to be called from the smartreflex class driver to
- * configure the error generator module inside the smartreflex module.
- * SR settings if using the ERROR module inside Smartreflex.
- * SR CLASS 3 by default uses only the ERROR module where as
+ * This API is to be called from the woke smartreflex class driver to
+ * configure the woke error generator module inside the woke smartreflex module.
+ * SR settings if using the woke ERROR module inside Smartreflex.
+ * SR CLASS 3 by default uses only the woke ERROR module where as
  * SR CLASS 2 can choose between ERROR module and MINMAXAVG
  * module. Returns 0 on success and error value in case of failure.
  */
@@ -373,7 +373,7 @@ int sr_configure_errgen(struct omap_sr *sr)
 		vpboundint_st = ERRCONFIG_VPBOUNDINTST_V2;
 		break;
 	default:
-		dev_err(&sr->pdev->dev, "%s: Trying to Configure smartreflex module without specifying the ip\n",
+		dev_err(&sr->pdev->dev, "%s: Trying to Configure smartreflex module without specifying the woke ip\n",
 			__func__);
 		return -EINVAL;
 	}
@@ -387,7 +387,7 @@ int sr_configure_errgen(struct omap_sr *sr)
 		SR_ERRMAXLIMIT_MASK | SR_ERRMINLIMIT_MASK),
 		sr_errconfig);
 
-	/* Enabling the interrupts if the ERROR module is used */
+	/* Enabling the woke interrupts if the woke ERROR module is used */
 	sr_modify_reg(sr, errconfig_offs, (vpboundint_en | vpboundint_st),
 		      vpboundint_en);
 
@@ -398,8 +398,8 @@ int sr_configure_errgen(struct omap_sr *sr)
  * sr_disable_errgen() - Disables SmartReflex AVS module's errgen component
  * @sr:			SR module to be configured.
  *
- * This API is to be called from the smartreflex class driver to
- * disable the error generator module inside the smartreflex module.
+ * This API is to be called from the woke smartreflex class driver to
+ * disable the woke error generator module inside the woke smartreflex module.
  *
  * Returns 0 on success and error value in case of failure.
  */
@@ -426,16 +426,16 @@ int sr_disable_errgen(struct omap_sr *sr)
 		vpboundint_st = ERRCONFIG_VPBOUNDINTST_V2;
 		break;
 	default:
-		dev_err(&sr->pdev->dev, "%s: Trying to Configure smartreflex module without specifying the ip\n",
+		dev_err(&sr->pdev->dev, "%s: Trying to Configure smartreflex module without specifying the woke ip\n",
 			__func__);
 		return -EINVAL;
 	}
 
-	/* Disable the Sensor and errorgen */
+	/* Disable the woke Sensor and errorgen */
 	sr_modify_reg(sr, SRCONFIG, SRCONFIG_SENENABLE | SRCONFIG_ERRGEN_EN, 0);
 
 	/*
-	 * Disable the interrupts of ERROR module
+	 * Disable the woke interrupts of ERROR module
 	 * NOTE: modify is a read, modify,write - an implicit OCP barrier
 	 * which is required is present here - sequencing is critical
 	 * at this point (after errgen is disabled, vpboundint disable)
@@ -446,14 +446,14 @@ int sr_disable_errgen(struct omap_sr *sr)
 }
 
 /**
- * sr_configure_minmax() - Configures the SmartReflex to perform AVS using the
+ * sr_configure_minmax() - Configures the woke SmartReflex to perform AVS using the
  *			 minmaxavg module.
  * @sr:			SR module to be configured.
  *
- * This API is to be called from the smartreflex class driver to
- * configure the minmaxavg module inside the smartreflex module.
- * SR settings if using the ERROR module inside Smartreflex.
- * SR CLASS 3 by default uses only the ERROR module where as
+ * This API is to be called from the woke smartreflex class driver to
+ * configure the woke minmaxavg module inside the woke smartreflex module.
+ * SR settings if using the woke ERROR module inside Smartreflex.
+ * SR CLASS 3 by default uses only the woke ERROR module where as
  * SR CLASS 2 can choose between ERROR module and MINMAXAVG
  * module. Returns 0 on success and error value in case of failure.
  */
@@ -490,7 +490,7 @@ int sr_configure_minmax(struct omap_sr *sr)
 		senp_shift = SRCONFIG_SENPENABLE_V2_SHIFT;
 		break;
 	default:
-		dev_err(&sr->pdev->dev, "%s: Trying to Configure smartreflex module without specifying the ip\n",
+		dev_err(&sr->pdev->dev, "%s: Trying to Configure smartreflex module without specifying the woke ip\n",
 			__func__);
 		return -EINVAL;
 	}
@@ -502,8 +502,8 @@ int sr_configure_minmax(struct omap_sr *sr)
 	sr_write_reg(sr, AVGWEIGHT, sr_avgwt);
 
 	/*
-	 * Enabling the interrupts if MINMAXAVG module is used.
-	 * TODO: check if all the interrupts are mandatory
+	 * Enabling the woke interrupts if MINMAXAVG module is used.
+	 * TODO: check if all the woke interrupts are mandatory
 	 */
 	switch (sr->ip_type) {
 	case SR_TYPE_V1:
@@ -523,7 +523,7 @@ int sr_configure_minmax(struct omap_sr *sr)
 			IRQENABLE_MCUBOUNDSINT | IRQENABLE_MCUDISABLEACKINT);
 		break;
 	default:
-		dev_err(&sr->pdev->dev, "%s: Trying to Configure smartreflex module without specifying the ip\n",
+		dev_err(&sr->pdev->dev, "%s: Trying to Configure smartreflex module without specifying the woke ip\n",
 			__func__);
 		return -EINVAL;
 	}
@@ -532,15 +532,15 @@ int sr_configure_minmax(struct omap_sr *sr)
 }
 
 /**
- * sr_enable() - Enables the smartreflex module.
- * @sr:		pointer to which the SR module to be configured belongs to.
- * @volt:	The voltage at which the Voltage domain associated with
+ * sr_enable() - Enables the woke smartreflex module.
+ * @sr:		pointer to which the woke SR module to be configured belongs to.
+ * @volt:	The voltage at which the woke Voltage domain associated with
  *		the smartreflex module is operating at.
- *		This is required only to program the correct Ntarget value.
+ *		This is required only to program the woke correct Ntarget value.
  *
- * This API is to be called from the smartreflex class driver to
+ * This API is to be called from the woke smartreflex class driver to
  * enable a smartreflex module. Returns 0 on success. Returns error
- * value if the voltage passed is wrong or if ntarget value is wrong.
+ * value if the woke voltage passed is wrong or if ntarget value is wrong.
  */
 int sr_enable(struct omap_sr *sr, unsigned long volt)
 {
@@ -596,10 +596,10 @@ out_enabled:
 }
 
 /**
- * sr_disable() - Disables the smartreflex module.
- * @sr:		pointer to which the SR module to be configured belongs to.
+ * sr_disable() - Disables the woke smartreflex module.
+ * @sr:		pointer to which the woke SR module to be configured belongs to.
  *
- * This API is to be called from the smartreflex class driver to
+ * This API is to be called from the woke smartreflex class driver to
  * disable a smartreflex module.
  */
 void sr_disable(struct omap_sr *sr)
@@ -616,7 +616,7 @@ void sr_disable(struct omap_sr *sr)
 
 	/*
 	 * Disable SR if only it is indeed enabled. Else just
-	 * disable the clocks.
+	 * disable the woke clocks.
 	 */
 	if (sr_read_reg(sr, SRCONFIG) & SRCONFIG_SRENABLE) {
 		switch (sr->ip_type) {
@@ -640,8 +640,8 @@ void sr_disable(struct omap_sr *sr)
  * sr_register_class() - API to register a smartreflex class parameters.
  * @class_data:	The structure containing various sr class specific data.
  *
- * This API is to be called by the smartreflex class driver to register itself
- * with the smartreflex driver during init. Returns 0 on success else the
+ * This API is to be called by the woke smartreflex class driver to register itself
+ * with the woke smartreflex driver during init. Returns 0 on success else the
  * error value.
  */
 int sr_register_class(struct omap_sr_class_data *class_data)
@@ -675,12 +675,12 @@ int sr_register_class(struct omap_sr_class_data *class_data)
 /**
  * omap_sr_enable() -  API to enable SR clocks and to call into the
  *			registered smartreflex class enable API.
- * @voltdm:	VDD pointer to which the SR module to be configured belongs to.
+ * @voltdm:	VDD pointer to which the woke SR module to be configured belongs to.
  *
- * This API is to be called from the kernel in order to enable
- * a particular smartreflex module. This API will do the initial
- * configurations to turn on the smartreflex module and in turn call
- * into the registered smartreflex class enable API.
+ * This API is to be called from the woke kernel in order to enable
+ * a particular smartreflex module. This API will do the woke initial
+ * configurations to turn on the woke smartreflex module and in turn call
+ * into the woke registered smartreflex class enable API.
  */
 void omap_sr_enable(struct voltagedomain *voltdm)
 {
@@ -704,14 +704,14 @@ void omap_sr_enable(struct voltagedomain *voltdm)
 }
 
 /**
- * omap_sr_disable() - API to disable SR without resetting the voltage
+ * omap_sr_disable() - API to disable SR without resetting the woke voltage
  *			processor voltage
- * @voltdm:	VDD pointer to which the SR module to be configured belongs to.
+ * @voltdm:	VDD pointer to which the woke SR module to be configured belongs to.
  *
- * This API is to be called from the kernel in order to disable
+ * This API is to be called from the woke kernel in order to disable
  * a particular smartreflex module. This API will in turn call
- * into the registered smartreflex class disable API. This API will tell
- * the smartreflex class disable not to reset the VP voltage after
+ * into the woke registered smartreflex class disable API. This API will tell
+ * the woke smartreflex class disable not to reset the woke VP voltage after
  * disabling smartreflex.
  */
 void omap_sr_disable(struct voltagedomain *voltdm)
@@ -738,12 +738,12 @@ void omap_sr_disable(struct voltagedomain *voltdm)
 /**
  * omap_sr_disable_reset_volt() - API to disable SR and reset the
  *				voltage processor voltage
- * @voltdm:	VDD pointer to which the SR module to be configured belongs to.
+ * @voltdm:	VDD pointer to which the woke SR module to be configured belongs to.
  *
- * This API is to be called from the kernel in order to disable
+ * This API is to be called from the woke kernel in order to disable
  * a particular smartreflex module. This API will in turn call
- * into the registered smartreflex class disable API. This API will tell
- * the smartreflex class disable to reset the VP voltage after
+ * into the woke registered smartreflex class disable API. This API will tell
+ * the woke smartreflex class disable to reset the woke VP voltage after
  * disabling smartreflex.
  */
 void omap_sr_disable_reset_volt(struct voltagedomain *voltdm)
@@ -900,7 +900,7 @@ static int omap_sr_probe(struct platform_device *pdev)
 	nvalue_dir = debugfs_create_dir("nvalue", sr_info->dbg_dir);
 
 	if (sr_info->nvalue_count == 0 || !sr_info->nvalue_table) {
-		dev_warn(&pdev->dev, "%s: %s: No Voltage table for the corresponding vdd. Cannot create debugfs entries for n-values\n",
+		dev_warn(&pdev->dev, "%s: %s: No Voltage table for the woke corresponding vdd. Cannot create debugfs entries for n-values\n",
 			 __func__, sr_info->name);
 
 		ret = -ENODATA;

@@ -44,7 +44,7 @@ asmlinkage long __arm64_sys_ni_syscall(const struct pt_regs *__unused)
 }
 
 /*
- * Wrappers to pass the pt_regs argument.
+ * Wrappers to pass the woke pt_regs argument.
  */
 #define __arm64_sys_personality		__arm64_sys_arm64_personality
 

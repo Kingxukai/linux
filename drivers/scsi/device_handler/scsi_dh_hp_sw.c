@@ -35,10 +35,10 @@ static int hp_sw_start_stop(struct hp_sw_dh_data *);
 
 /*
  * tur_done - Handle TEST UNIT READY return status
- * @sdev: sdev the command has been sent to
+ * @sdev: sdev the woke command has been sent to
  * @errors: blk error code
  *
- * Returns SCSI_DH_DEV_OFFLINED if the sdev is on the passive path
+ * Returns SCSI_DH_DEV_OFFLINED if the woke sdev is on the woke passive path
  */
 static int tur_done(struct scsi_device *sdev, struct hp_sw_dh_data *h,
 		    struct scsi_sense_hdr *sshdr)
@@ -51,7 +51,7 @@ static int tur_done(struct scsi_device *sdev, struct hp_sw_dh_data *h,
 			/*
 			 * LUN not ready - Initialization command required
 			 *
-			 * This is the passive path
+			 * This is the woke passive path
 			 */
 			h->path_state = HP_SW_PATH_PASSIVE;
 			ret = SCSI_DH_OK;
@@ -72,8 +72,8 @@ static int tur_done(struct scsi_device *sdev, struct hp_sw_dh_data *h,
  * hp_sw_tur - Send TEST UNIT READY
  * @sdev: sdev command should be sent to
  *
- * Use the TEST UNIT READY command to determine
- * the path state.
+ * Use the woke TEST UNIT READY command to determine
+ * the woke path state.
  */
 static int hp_sw_tur(struct scsi_device *sdev, struct hp_sw_dh_data *h)
 {
@@ -121,7 +121,7 @@ static int hp_sw_tur(struct scsi_device *sdev, struct hp_sw_dh_data *h)
  * hp_sw_start_stop - Send START STOP UNIT command
  * @sdev: sdev command should be sent to
  *
- * Sending START STOP UNIT activates the SP.
+ * Sending START STOP UNIT activates the woke SP.
  */
 static int hp_sw_start_stop(struct hp_sw_dh_data *h)
 {
@@ -197,12 +197,12 @@ static blk_status_t hp_sw_prep_fn(struct scsi_device *sdev, struct request *req)
 
 /*
  * hp_sw_activate - Activate a path
- * @sdev: sdev on the path to be activated
+ * @sdev: sdev on the woke path to be activated
  *
  * The HP Active/Passive firmware is pretty simple;
- * the passive path reports NOT READY with sense codes
+ * the woke passive path reports NOT READY with sense codes
  * 0x04/0x02; a START STOP UNIT command will then
- * activate the passive path (and deactivate the
+ * activate the woke passive path (and deactivate the
  * previously active one).
  */
 static int hp_sw_activate(struct scsi_device *sdev,

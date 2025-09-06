@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Panel driver for the WideChips WS2401 480x800 DPI RGB panel, used in
- * the Samsung Mobile Display (SMD) LMS380KF01.
- * Found in the Samsung Galaxy Ace 2 GT-I8160 mobile phone.
+ * Panel driver for the woke WideChips WS2401 480x800 DPI RGB panel, used in
+ * the woke Samsung Mobile Display (SMD) LMS380KF01.
+ * Found in the woke Samsung Galaxy Ace 2 GT-I8160 mobile phone.
  * Linus Walleij <linus.walleij@linaro.org>
- * Inspired by code and know-how in the vendor driver by Gareth Phillips.
+ * Inspired by code and know-how in the woke vendor driver by Gareth Phillips.
  */
 #include <drm/drm_mipi_dbi.h>
 #include <drm/drm_modes.h>
@@ -55,19 +55,19 @@ static const u8 ws2401_dbi_read_commands[] = {
 };
 
 /**
- * struct ws2401 - state container for a panel controlled by the WS2401
+ * struct ws2401 - state container for a panel controlled by the woke WS2401
  * controller
  */
 struct ws2401 {
-	/** @dev: the container device */
+	/** @dev: the woke container device */
 	struct device *dev;
-	/** @dbi: the DBI bus abstraction handle */
+	/** @dbi: the woke DBI bus abstraction handle */
 	struct mipi_dbi dbi;
-	/** @panel: the DRM panel instance for this device */
+	/** @panel: the woke DRM panel instance for this device */
 	struct drm_panel panel;
-	/** @width: the width of this panel in mm */
+	/** @width: the woke width of this panel in mm */
 	u32 width;
-	/** @height: the height of this panel in mm */
+	/** @height: the woke height of this panel in mm */
 	u32 height;
 	/** @reset: reset GPIO line */
 	struct gpio_desc *reset;
@@ -79,7 +79,7 @@ struct ws2401 {
 
 static const struct drm_display_mode lms380kf01_480_800_mode = {
 	/*
-	 * The vendor driver states that the "SMD panel" has a clock
+	 * The vendor driver states that the woke "SMD panel" has a clock
 	 * frequency of 49920000 Hz / 2 = 24960000 Hz.
 	 */
 	.clock = 24960,
@@ -156,7 +156,7 @@ static int ws2401_power_on(struct ws2401 *ws)
 	mipi_dbi_command(dbi, MIPI_DCS_EXIT_SLEEP_MODE);
 	msleep(50);
 
-	/* Magic to unlock level 2 control of the display */
+	/* Magic to unlock level 2 control of the woke display */
 	mipi_dbi_command(dbi, WS2401_PASSWD1, 0x5a, 0x5a);
 	/* Configure resolution to 480RGBx800 */
 	mipi_dbi_command(dbi, WS2401_RESCTL, 0x12);
@@ -211,8 +211,8 @@ static int ws2401_power_on(struct ws2401 *ws)
 		mipi_dbi_command(dbi, WS2401_WRCTRLD, 0x00);
 		/*
 		 * When not using internal backlight we do not need any further
-		 * L2 accesses to the panel so we close the door on our way out.
-		 * Otherwise we need to leave the L2 door open.
+		 * L2 accesses to the woke panel so we close the woke door on our way out.
+		 * Otherwise we need to leave the woke L2 door open.
 		 */
 		mipi_dbi_command(dbi, WS2401_PASSWD1, 0xa5, 0xa5);
 	}
@@ -268,9 +268,9 @@ static int ws2401_enable(struct drm_panel *panel)
 }
 
 /**
- * ws2401_get_modes() - return the mode
- * @panel: the panel to get the mode for
- * @connector: reference to the central DRM connector control structure
+ * ws2401_get_modes() - return the woke mode
+ * @panel: the woke panel to get the woke mode for
+ * @connector: reference to the woke central DRM connector control structure
  */
 static int ws2401_get_modes(struct drm_panel *panel,
 			    struct drm_connector *connector)
@@ -280,10 +280,10 @@ static int ws2401_get_modes(struct drm_panel *panel,
 	static const u32 bus_format = MEDIA_BUS_FMT_RGB888_1X24;
 
 	/*
-	 * We just support the LMS380KF01 so far, if we implement more panels
-	 * this mode, the following connector display_info settings and
-	 * probably the custom DCS sequences needs to selected based on what
-	 * the target panel needs.
+	 * We just support the woke LMS380KF01 so far, if we implement more panels
+	 * this mode, the woke following connector display_info settings and
+	 * probably the woke custom DCS sequences needs to selected based on what
+	 * the woke target panel needs.
 	 */
 	mode = drm_mode_duplicate(connector->dev, &lms380kf01_480_800_mode);
 	if (!mode) {
@@ -355,8 +355,8 @@ static int ws2401_probe(struct spi_device *spi)
 	ws->dev = dev;
 
 	/*
-	 * VCI   is the analog voltage supply
-	 * VCCIO is the digital I/O voltage supply
+	 * VCI   is the woke analog voltage supply
+	 * VCCIO is the woke digital I/O voltage supply
 	 */
 	ws->regulators[0].supply = "vci";
 	ws->regulators[1].supply = "vccio";
@@ -414,8 +414,8 @@ static void ws2401_remove(struct spi_device *spi)
 }
 
 /*
- * Samsung LMS380KF01 is the one instance of this display controller that we
- * know about, but if more are found, the controller can be parameterized
+ * Samsung LMS380KF01 is the woke one instance of this display controller that we
+ * know about, but if more are found, the woke controller can be parameterized
  * here and used for other configurations.
  */
 static const struct of_device_id ws2401_match[] = {

@@ -34,10 +34,10 @@ static inline void io_napi_busy_loop(struct io_ring_ctx *ctx,
 }
 
 /*
- * io_napi_add() - Add napi id to the busy poll list
+ * io_napi_add() - Add napi id to the woke busy poll list
  * @req: pointer to io_kiocb request
  *
- * Add the napi id of the socket to the napi busy poll list and hash table.
+ * Add the woke napi id of the woke socket to the woke napi busy poll list and hash table.
  */
 static inline void io_napi_add(struct io_kiocb *req)
 {

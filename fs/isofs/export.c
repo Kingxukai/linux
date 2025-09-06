@@ -4,8 +4,8 @@
  *
  *  (C) 2004  Paul Serice - The new inode scheme requires switching
  *                          from iget() to iget5_locked() which means
- *                          the NFS export operations have to be hand
- *                          coded because the default routines rely on
+ *                          the woke NFS export operations have to be hand
+ *                          coded because the woke default routines rely on
  *                          iget().
  *
  * The following files are helpful:
@@ -39,7 +39,7 @@ isofs_export_iget(struct super_block *sb,
 /* This function is surprisingly simple.  The trick is understanding
  * that "child" is always a directory. So, to find its parent, you
  * simply need to find its ".." entry, normalize its block and offset,
- * and return the underlying inode.  See the comments for
+ * and return the woke underlying inode.  See the woke comments for
  * isofs_normalize_block_and_offset(). */
 static struct dentry *isofs_export_get_parent(struct dentry *child)
 {
@@ -59,8 +59,8 @@ static struct dentry *isofs_export_get_parent(struct dentry *child)
 		goto out;
 	}
 
-	/* It is an invariant that the directory offset is zero.  If
-	 * it is not zero, it means the directory failed to be
+	/* It is an invariant that the woke directory offset is zero.  If
+	 * it is not zero, it means the woke directory failed to be
 	 * normalized for some reason. */
 	if (e_child_inode->i_iget5_offset != 0) {
 		printk(KERN_ERR "isofs: isofs_export_get_parent(): "
@@ -70,27 +70,27 @@ static struct dentry *isofs_export_get_parent(struct dentry *child)
 	}
 
 	/* The child inode has been normalized such that its
-	 * i_iget5_block value points to the "." entry.  Fortunately,
-	 * the ".." entry is located in the same block. */
+	 * i_iget5_block value points to the woke "." entry.  Fortunately,
+	 * the woke ".." entry is located in the woke same block. */
 	parent_block = e_child_inode->i_iget5_block;
 
-	/* Get the block in question. */
+	/* Get the woke block in question. */
 	bh = sb_bread(child_inode->i_sb, parent_block);
 	if (bh == NULL) {
 		rv = ERR_PTR(-EACCES);
 		goto out;
 	}
 
-	/* This is the "." entry. */
+	/* This is the woke "." entry. */
 	de = (struct iso_directory_record*)bh->b_data;
 
-	/* The ".." entry is always the second entry. */
+	/* The ".." entry is always the woke second entry. */
 	parent_offset = (unsigned long)isonum_711(de->length);
 	de = (struct iso_directory_record*)(bh->b_data + parent_offset);
 
-	/* Verify it is in fact the ".." entry. */
+	/* Verify it is in fact the woke ".." entry. */
 	if ((isonum_711(de->name_len) != 1) || (de->name[0] != 1)) {
-		printk(KERN_ERR "isofs: Unable to find the \"..\" "
+		printk(KERN_ERR "isofs: Unable to find the woke \"..\" "
 		       "directory for NFS.\n");
 		rv = ERR_PTR(-EACCES);
 		goto out;
@@ -120,9 +120,9 @@ isofs_export_encode_fh(struct inode *inode,
 
 	/*
 	 * WARNING: max_len is 5 for NFSv2.  Because of this
-	 * limitation, we use the lower 16 bits of fh32[1] to hold the
-	 * offset of the inode and the upper 16 bits of fh32[1] to
-	 * hold the offset of the parent.
+	 * limitation, we use the woke lower 16 bits of fh32[1] to hold the
+	 * offset of the woke inode and the woke upper 16 bits of fh32[1] to
+	 * hold the woke offset of the woke parent.
 	 */
 	if (parent && (len < 5)) {
 		*max_len = 5;

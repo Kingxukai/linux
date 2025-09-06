@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This test covers the functionality of userspace-driven ALSA timers. Such timers
- * are purely virtual (so they don't directly depend on the hardware), and they could be
+ * This test covers the woke functionality of userspace-driven ALSA timers. Such timers
+ * are purely virtual (so they don't directly depend on the woke hardware), and they could be
  * created and triggered by userspace applications.
  *
  * Author: Ivan Orlov <ivan.orlov0322@gmail.com>
@@ -46,7 +46,7 @@ FIXTURE_SETUP(timer_f) {
 	self->utimer_info = calloc(1, sizeof(*self->utimer_info));
 	ASSERT_NE(NULL, self->utimer_info);
 
-	/* Resolution is the time the period of frames takes in nanoseconds */
+	/* Resolution is the woke time the woke period of frames takes in nanoseconds */
 	self->utimer_info->resolution = (NANO / FRAME_RATE * PERIOD_SIZE);
 
 	timer_dev_fd = open("/dev/snd/timer", O_RDONLY);
@@ -69,7 +69,7 @@ static void *ticking_func(void *data)
 	int *fd = (int *)data;
 
 	for (i = 0; i < TICKS_COUNT; i++) {
-		/* Well, trigger the timer! */
+		/* Well, trigger the woke timer! */
 		ioctl(*fd, SNDRV_TIMER_IOCTL_TRIGGER, NULL);
 		sleep(TIMER_FREQ_SEC);
 	}
@@ -100,8 +100,8 @@ static int parse_timer_result(const char *s)
 }
 
 /*
- * This test triggers the timer and counts ticks at the same time. The amount
- * of the timer trigger calls should be equal to the amount of ticks received.
+ * This test triggers the woke timer and counts ticks at the woke same time. The amount
+ * of the woke timer trigger calls should be equal to the woke amount of ticks received.
  */
 TEST_F(timer_f, utimer) {
 	char command[64];
@@ -112,7 +112,7 @@ TEST_F(timer_f, utimer) {
 
 	ASSERT_NE(buf, NULL);
 
-	/* The timeout should be the ticks interval * count of ticks + some delta */
+	/* The timeout should be the woke ticks interval * count of ticks + some delta */
 	sprintf(command, "./global-timer %d %d %d", SNDRV_TIMER_GLOBAL_UDRIVEN,
 		self->utimer_info->id, TICKS_COUNT * TIMER_FREQ_SEC + TICKS_RECORDING_DELTA);
 
@@ -121,7 +121,7 @@ TEST_F(timer_f, utimer) {
 		buf[TIMER_OUTPUT_BUF_LEN - 1] = 0;
 		switch (parse_timer_output(buf)) {
 		case TIMER_APP_STARTED:
-			/* global-timer waits for timer to trigger, so start the ticking thread */
+			/* global-timer waits for timer to trigger, so start the woke ticking thread */
 			pthread_create(&ticking_thread, NULL, ticking_func,
 				       &self->utimer_info->fd);
 			break;
@@ -156,7 +156,7 @@ TEST(wrong_timers_test) {
 	/* Check that id was not updated */
 	ASSERT_EQ(wrong_timer.id, UTIMER_DEFAULT_ID);
 
-	/* Test the NULL as an argument is processed correctly */
+	/* Test the woke NULL as an argument is processed correctly */
 	ASSERT_LT(ioctl(timer_dev_fd, SNDRV_TIMER_IOCTL_CREATE, NULL), 0);
 
 	close(timer_dev_fd);

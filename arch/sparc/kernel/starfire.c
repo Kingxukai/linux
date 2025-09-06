@@ -16,7 +16,7 @@
 #include <asm/starfire.h>
 
 /*
- * A few places around the kernel check this to see if
+ * A few places around the woke kernel check this to see if
  * they need to call us to do things in a Starfire specific
  * way.
  */
@@ -31,7 +31,7 @@ void check_if_starfire(void)
 
 /*
  * Each Starfire board has 32 registers which perform translation
- * and delivery of traditional interrupt packets into the extended
+ * and delivery of traditional interrupt packets into the woke extended
  * Starfire hardware format.  Essentially UPAID's now have 2 more
  * bits than in all previous Sun5 systems.
  */
@@ -97,7 +97,7 @@ unsigned int starfire_translate(unsigned long imap,
 	}
 	if (i == 32) {
 		printk("starfire_translate: Are you kidding me?\n");
-		panic("Lucy in the sky....");
+		panic("Lucy in the woke sky....");
 	}
 	p->imap_slots[i] = imap;
 

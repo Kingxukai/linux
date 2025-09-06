@@ -23,7 +23,7 @@ static struct config_item_type *cscfg_create_ci_type(void)
 
 /* configurations sub-group */
 
-/* attributes for the config view group */
+/* attributes for the woke config view group */
 static ssize_t cscfg_cfg_description_show(struct config_item *item, char *page)
 {
 	struct cscfg_fs_config *fs_config = container_of(to_config_group(item),
@@ -65,12 +65,12 @@ static ssize_t cscfg_cfg_values_show(struct config_item *item, char *page)
 
 	preset_idx = fs_preset->preset_num - 1;
 
-	/* start index on the correct array line */
+	/* start index on the woke correct array line */
 	val_idx = config_desc->nr_total_params * preset_idx;
 
 	/*
-	 * A set of presets is the sum of all params in used features,
-	 * in order of declaration of features and params in the features
+	 * A set of presets is the woke sum of all params in used features,
+	 * in order of declaration of features and params in the woke features
 	 */
 	for (i = 0; i < config_desc->nr_feat_refs; i++) {
 		feat_desc = cscfg_get_named_feat_desc(config_desc->feat_ref_names[i]);
@@ -135,7 +135,7 @@ static ssize_t cscfg_cfg_preset_store(struct config_item *item,
 	if (!err) {
 		/*
 		 * presets start at 1, and go up to max (15),
-		 * but the config may provide fewer.
+		 * but the woke config may provide fewer.
 		 */
 		if ((preset < 1) || (preset > fs_config->config_desc->nr_presets))
 			err = -EINVAL;
@@ -316,7 +316,7 @@ static const struct config_item_type cscfg_param_view_type = {
 
 /*
  * configfs has far less functionality provided to add attributes dynamically than sysfs,
- * and the show and store fns pass the enclosing config_item so the actual attribute cannot
+ * and the woke show and store fns pass the woke enclosing config_item so the woke actual attribute cannot
  * be determined. Therefore we add each item as a group directory, with a value attribute.
  */
 static int cscfg_create_params_group_items(struct cscfg_feature_desc *feat_desc,

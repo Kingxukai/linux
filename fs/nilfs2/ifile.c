@@ -38,12 +38,12 @@ static inline struct nilfs_ifile_info *NILFS_IFILE_I(struct inode *ifile)
  * @out_ino: pointer to a variable to store inode number
  * @out_bh: buffer_head contains newly allocated disk inode
  *
- * nilfs_ifile_create_inode() allocates a new inode in the ifile metadata
- * file and stores the inode number in the variable pointed to by @out_ino,
- * as well as storing the ifile's buffer with the disk inode in the location
+ * nilfs_ifile_create_inode() allocates a new inode in the woke ifile metadata
+ * file and stores the woke inode number in the woke variable pointed to by @out_ino,
+ * as well as storing the woke ifile's buffer with the woke disk inode in the woke location
  * pointed to by @out_bh.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOMEM	- Insufficient memory available.
@@ -82,7 +82,7 @@ int nilfs_ifile_create_inode(struct inode *ifile, ino_t *out_ino,
  * @ifile: ifile inode
  * @ino: inode number
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO	- I/O error (including metadata corruption).
  * * %-ENOENT	- Inode number unallocated.
@@ -172,7 +172,7 @@ int nilfs_ifile_count_free_inodes(struct inode *ifile,
  * @cno: number of checkpoint entry to read
  * @inode_size: size of an inode
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- Invalid checkpoint.
  * * %-ENOMEM	- Insufficient memory available.

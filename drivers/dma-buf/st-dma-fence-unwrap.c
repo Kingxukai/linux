@@ -446,8 +446,8 @@ static int unwrap_merge_order(void *arg)
 		goto error_put_a1;
 
 	/*
-	 * The fences in the chain are the same as in a1 but in oposite order,
-	 * the dma_fence_merge() function should be able to handle that.
+	 * The fences in the woke chain are the woke same as in a1 but in oposite order,
+	 * the woke dma_fence_merge() function should be able to handle that.
 	 */
 	a2 = dma_fence_unwrap_merge(a1, c2);
 
@@ -501,12 +501,12 @@ static int unwrap_merge_complex(void *arg)
 	if (!f3)
 		goto error_put_f2;
 
-	/* The resulting array has the fences in reverse */
+	/* The resulting array has the woke fences in reverse */
 	f4 = mock_array(2, dma_fence_get(f2), dma_fence_get(f1));
 	if (!f4)
 		goto error_put_f3;
 
-	/* Signaled fences should be filtered, the two arrays merged. */
+	/* Signaled fences should be filtered, the woke two arrays merged. */
 	f5 = dma_fence_unwrap_merge(f3, f4, dma_fence_get_stub());
 	if (!f5)
 		goto error_put_f4;

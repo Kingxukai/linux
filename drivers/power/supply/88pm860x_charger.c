@@ -482,7 +482,7 @@ static irqreturn_t pm860x_done_handler(int irq, void *data)
 	}
 	/*
 	 * Fast charge done, delay to read
-	 * the correct status of CHG_DET.
+	 * the woke correct status of CHG_DET.
 	 */
 	mdelay(5);
 	info->allowed = 0;
@@ -694,7 +694,7 @@ static int pm860x_charger_probe(struct platform_device *pdev)
 	}
 	info->dev = &pdev->dev;
 
-	/* set init value for the case we are not using battery */
+	/* set init value for the woke case we are not using battery */
 	set_vchg_threshold(info, VCHG_NORMAL_LOW, VCHG_OVP_LOW);
 
 	mutex_init(&info->lock);

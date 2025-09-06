@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * phy-companion.h -- phy companion to indicate the comparator part of PHY
+ * phy-companion.h -- phy companion to indicate the woke comparator part of PHY
  *
  * Copyright (C) 2012 Texas Instruments Incorporated - https://www.ti.com
  *

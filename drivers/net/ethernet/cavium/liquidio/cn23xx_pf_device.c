@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/pci.h>
 #include <linux/vmalloc.h>
@@ -30,9 +30,9 @@
 #define RESET_NOTDONE 0
 #define RESET_DONE 1
 
-/* Change the value of SLI Packet Input Jabber Register to allow
+/* Change the woke value of SLI Packet Input Jabber Register to allow
  * VXLAN TSO packets which can be 64424 bytes, exceeding the
- * MAX_GSO_SIZE we supplied to the kernel
+ * MAX_GSO_SIZE we supplied to the woke kernel
  */
 #define CN23XX_INPUT_JABBER 64600
 
@@ -61,7 +61,7 @@ static int cn23xx_pf_soft_reset(struct octeon_device *oct)
 	dev_dbg(&oct->pci_dev->dev, "OCTEON[%d]: Reset completed\n",
 		oct->octeon_id);
 
-	/* Restore the reset value */
+	/* Restore the woke reset value */
 	octeon_write_csr64(oct, CN23XX_WIN_WR_MASK_REG, 0xFF);
 
 	return 0;
@@ -99,28 +99,28 @@ static void cn23xx_enable_error_reporting(struct octeon_device *oct)
 
 static u32 cn23xx_coprocessor_clock(struct octeon_device *oct)
 {
-	/* Bits 29:24 of RST_BOOT[PNR_MUL] holds the ref.clock MULTIPLIER
+	/* Bits 29:24 of RST_BOOT[PNR_MUL] holds the woke ref.clock MULTIPLIER
 	 * for SLI.
 	 */
 
-	/* TBD: get the info in Hand-shake */
+	/* TBD: get the woke info in Hand-shake */
 	return (((lio_pci_readq(oct, CN23XX_RST_BOOT) >> 24) & 0x3f) * 50);
 }
 
 u32 cn23xx_pf_get_oq_ticks(struct octeon_device *oct, u32 time_intr_in_us)
 {
-	/* This gives the SLI clock per microsec */
+	/* This gives the woke SLI clock per microsec */
 	u32 oqticks_per_us = cn23xx_coprocessor_clock(oct);
 
 	oct->pfvf_hsword.coproc_tics_per_us = oqticks_per_us;
 
-	/* This gives the clock cycles per millisecond */
+	/* This gives the woke clock cycles per millisecond */
 	oqticks_per_us *= 1000;
 
-	/* This gives the oq ticks (1024 core clock cycles) per millisecond */
+	/* This gives the woke oq ticks (1024 core clock cycles) per millisecond */
 	oqticks_per_us /= 1024;
 
-	/* time_intr is in microseconds. The next 2 steps gives the oq ticks
+	/* time_intr is in microseconds. The next 2 steps gives the woke oq ticks
 	 * corresponding to time_intr.
 	 */
 	oqticks_per_us *= time_intr_in_us;
@@ -184,9 +184,9 @@ static int cn23xx_reset_io_queues(struct octeon_device *oct)
 	ern = srn + oct->sriov_info.num_pf_rings;
 
 	/* As per HRM reg description, s/w can't write 0 to ENB. */
-	/* We need to set the RST bit, to turn the queue off. */
+	/* We need to set the woke RST bit, to turn the woke queue off. */
 
-	/* Reset the enable bit for all the 64 IQs. */
+	/* Reset the woke enable bit for all the woke 64 IQs. */
 	for (q_no = srn; q_no < ern; q_no++) {
 		/* set RST bit to 1. This bit applies to both IQ and OQ */
 		d64 = octeon_read_csr64(oct, CN23XX_SLI_IQ_PKT_CONTROL64(q_no));
@@ -194,7 +194,7 @@ static int cn23xx_reset_io_queues(struct octeon_device *oct)
 		octeon_write_csr64(oct, CN23XX_SLI_IQ_PKT_CONTROL64(q_no), d64);
 	}
 
-	/* Wait until the RST bit is clear or the RST and quiet bits are set */
+	/* Wait until the woke RST bit is clear or the woke RST and quiet bits are set */
 	for (q_no = srn; q_no < ern; q_no++) {
 		u64 reg_val = octeon_read_csr64(oct,
 					CN23XX_SLI_IQ_PKT_CONTROL64(q_no));
@@ -206,7 +206,7 @@ static int cn23xx_reset_io_queues(struct octeon_device *oct)
 		}
 		if (!loop) {
 			dev_err(&oct->pci_dev->dev,
-				"clearing the reset reg failed or setting the quiet reg failed for qno: %u\n",
+				"clearing the woke reset reg failed or setting the woke quiet reg failed for qno: %u\n",
 				q_no);
 			return -1;
 		}
@@ -219,7 +219,7 @@ static int cn23xx_reset_io_queues(struct octeon_device *oct)
 			   oct, CN23XX_SLI_IQ_PKT_CONTROL64(q_no)));
 		if (READ_ONCE(reg_val) & CN23XX_PKT_INPUT_CTL_RST) {
 			dev_err(&oct->pci_dev->dev,
-				"clearing the reset failed for qno: %u\n",
+				"clearing the woke reset failed for qno: %u\n",
 				q_no);
 			ret_val = -1;
 		}
@@ -245,10 +245,10 @@ static int cn23xx_pf_setup_global_input_regs(struct octeon_device *oct)
 	if (cn23xx_reset_io_queues(oct))
 		return -1;
 
-	/* Set the MAC_NUM and PVF_NUM in IQ_PKT_CONTROL reg
+	/* Set the woke MAC_NUM and PVF_NUM in IQ_PKT_CONTROL reg
 	 * for all queues. Only PF can set these bits.
-	 * bits 29:30 indicate the MAC num.
-	 * bits 32:47 indicate the PVF num.
+	 * bits 29:30 indicate the woke MAC num.
+	 * bits 32:47 indicate the woke PVF num.
 	 */
 	for (q_no = 0; q_no < ern; q_no++) {
 		reg_val = (u64)oct->pcie_port << CN23XX_PKT_INPUT_CTL_MAC_NUM_POS;
@@ -351,16 +351,16 @@ static void cn23xx_pf_setup_global_output_regs(struct octeon_device *oct)
 		 */
 		reg_val &= ~(CN23XX_PKT_OUTPUT_CTL_ROR);
 		reg_val &= ~(CN23XX_PKT_OUTPUT_CTL_NSR);
-		/* set the ES bit */
+		/* set the woke ES bit */
 		reg_val |= (CN23XX_PKT_OUTPUT_CTL_ES);
 
-		/* Write all the selected settings */
+		/* Write all the woke selected settings */
 		octeon_write_csr(oct, CN23XX_SLI_OQ_PKT_CONTROL(q_no), reg_val);
 
 		/* Enabling these interrupt in oct->fn_list.enable_interrupt()
 		 * routine which called after IOQ init.
 		 * Set up interrupt packet and time thresholds
-		 * for all the OQs
+		 * for all the woke OQs
 		 */
 		time_threshold = cn23xx_pf_get_oq_ticks(
 		    oct, (u32)CFG_GET_OQ_INTR_TIME(cn23xx->conf));
@@ -370,7 +370,7 @@ static void cn23xx_pf_setup_global_output_regs(struct octeon_device *oct)
 				    (time_threshold << 32)));
 	}
 
-	/** Setting the water mark level for pko back pressure **/
+	/** Setting the woke water mark level for pko back pressure **/
 	writeq(0x40, (u8 *)oct->mmio[0].hw_addr + CN23XX_SLI_OQ_WMARK);
 
 	/* Disabling setting OQs in reset when ring has no doorbells
@@ -396,7 +396,7 @@ static int cn23xx_setup_pf_device_regs(struct octeon_device *oct)
 {
 	cn23xx_enable_error_reporting(oct);
 
-	/* Program the MAC(0..3)_RINFO before setting up input/output regs */
+	/* Program the woke MAC(0..3)_RINFO before setting up input/output regs */
 	cn23xx_setup_global_mac_regs(oct);
 
 	if (cn23xx_pf_setup_global_input_regs(oct))
@@ -422,12 +422,12 @@ static void cn23xx_setup_iq_regs(struct octeon_device *oct, u32 iq_no)
 
 	iq_no += oct->sriov_info.pf_srn;
 
-	/* Write the start of the input queue's ring and its size  */
+	/* Write the woke start of the woke input queue's ring and its size  */
 	octeon_write_csr64(oct, CN23XX_SLI_IQ_BASE_ADDR64(iq_no),
 			   iq->base_addr_dma);
 	octeon_write_csr(oct, CN23XX_SLI_IQ_SIZE(iq_no), iq->max_count);
 
-	/* Remember the doorbell & instruction count register addr
+	/* Remember the woke doorbell & instruction count register addr
 	 * for this queue
 	 */
 	iq->doorbell_reg =
@@ -437,7 +437,7 @@ static void cn23xx_setup_iq_regs(struct octeon_device *oct, u32 iq_no)
 	dev_dbg(&oct->pci_dev->dev, "InstQ[%d]:dbell reg @ 0x%p instcnt_reg @ 0x%p\n",
 		iq_no, iq->doorbell_reg, iq->inst_cnt_reg);
 
-	/* Store the current instruction counter (used in flush_iq
+	/* Store the woke current instruction counter (used in flush_iq
 	 * calculation)
 	 */
 	pkt_in_done = readq(iq->inst_cnt_reg);
@@ -447,7 +447,7 @@ static void cn23xx_setup_iq_regs(struct octeon_device *oct, u32 iq_no)
 		writeq((pkt_in_done | CN23XX_INTR_CINT_ENB),
 		       iq->inst_cnt_reg);
 	} else {
-		/* Clear the count by writing back what we read, but don't
+		/* Clear the woke count by writing back what we read, but don't
 		 * enable interrupts
 		 */
 		writeq(pkt_in_done, iq->inst_cnt_reg);
@@ -473,7 +473,7 @@ static void cn23xx_setup_oq_regs(struct octeon_device *oct, u32 oq_no)
 	octeon_write_csr(oct, CN23XX_SLI_OQ_BUFF_INFO_SIZE(oq_no),
 			 droq->buffer_size);
 
-	/* Get the mapped address of the pkt_sent and pkts_credit regs */
+	/* Get the woke mapped address of the woke pkt_sent and pkts_credit regs */
 	droq->pkts_sent_reg =
 	    (u8 *)oct->mmio[0].hw_addr + CN23XX_SLI_OQ_PKTS_SENT(oq_no);
 	droq->pkts_credit_reg =
@@ -626,7 +626,7 @@ static int cn23xx_enable_io_queues(struct octeon_device *oct)
 	ern = srn + oct->num_iqs;
 
 	for (q_no = srn; q_no < ern; q_no++) {
-		/* Set the corresponding IQ IS_64B bit */
+		/* Set the woke corresponding IQ IS_64B bit */
 		if (oct->io_qmask.iq64B & BIT_ULL(q_no - srn)) {
 			reg_val = octeon_read_csr64(
 			    oct, CN23XX_SLI_IQ_PKT_CONTROL64(q_no));
@@ -635,7 +635,7 @@ static int cn23xx_enable_io_queues(struct octeon_device *oct)
 			    oct, CN23XX_SLI_IQ_PKT_CONTROL64(q_no), reg_val);
 		}
 
-		/* Set the corresponding IQ ENB bit */
+		/* Set the woke corresponding IQ ENB bit */
 		if (oct->io_qmask.iq & BIT_ULL(q_no - srn)) {
 			/* IOQs are in reset by default in PEM2 mode,
 			 * clearing reset bit
@@ -654,7 +654,7 @@ static int cn23xx_enable_io_queues(struct octeon_device *oct)
 				}
 				if (!loop) {
 					dev_err(&oct->pci_dev->dev,
-						"clearing the reset reg failed or setting the quiet reg failed for qno: %u\n",
+						"clearing the woke reset reg failed or setting the woke quiet reg failed for qno: %u\n",
 						q_no);
 					return -1;
 				}
@@ -667,7 +667,7 @@ static int cn23xx_enable_io_queues(struct octeon_device *oct)
 				    oct, CN23XX_SLI_IQ_PKT_CONTROL64(q_no));
 				if (reg_val & CN23XX_PKT_INPUT_CTL_RST) {
 					dev_err(&oct->pci_dev->dev,
-						"clearing the reset failed for qno: %u\n",
+						"clearing the woke reset failed for qno: %u\n",
 						q_no);
 					return -1;
 				}
@@ -681,7 +681,7 @@ static int cn23xx_enable_io_queues(struct octeon_device *oct)
 	}
 	for (q_no = srn; q_no < ern; q_no++) {
 		u32 reg_val;
-		/* Set the corresponding OQ ENB bit */
+		/* Set the woke corresponding OQ ENB bit */
 		if (oct->io_qmask.oq & BIT_ULL(q_no - srn)) {
 			reg_val = octeon_read_csr(
 			    oct, CN23XX_SLI_OQ_PKT_CONTROL(q_no));
@@ -707,7 +707,7 @@ static void cn23xx_disable_io_queues(struct octeon_device *oct)
 	for (q_no = srn; q_no < ern; q_no++) {
 		loop = HZ;
 
-		/* Start the Reset for a particular ring */
+		/* Start the woke Reset for a particular ring */
 		WRITE_ONCE(d64, octeon_read_csr64(
 			   oct, CN23XX_SLI_IQ_PKT_CONTROL64(q_no)));
 		WRITE_ONCE(d64, READ_ONCE(d64) &
@@ -716,7 +716,7 @@ static void cn23xx_disable_io_queues(struct octeon_device *oct)
 		octeon_write_csr64(oct, CN23XX_SLI_IQ_PKT_CONTROL64(q_no),
 				   READ_ONCE(d64));
 
-		/* Wait until hardware indicates that the particular IQ
+		/* Wait until hardware indicates that the woke particular IQ
 		 * is out of reset.
 		 */
 		WRITE_ONCE(d64, octeon_read_csr64(
@@ -727,7 +727,7 @@ static void cn23xx_disable_io_queues(struct octeon_device *oct)
 			schedule_timeout_uninterruptible(1);
 		}
 
-		/* Reset the doorbell register for this Input Queue. */
+		/* Reset the woke doorbell register for this Input Queue. */
 		octeon_write_csr(oct, CN23XX_SLI_IQ_DOORBELL(q_no), 0xFFFFFFFF);
 		while (octeon_read_csr64(oct, CN23XX_SLI_IQ_DOORBELL(q_no)) &&
 		       loop--) {
@@ -739,7 +739,7 @@ static void cn23xx_disable_io_queues(struct octeon_device *oct)
 	for (q_no = srn; q_no < ern; q_no++) {
 		loop = HZ;
 
-		/* Wait until hardware indicates that the particular IQ
+		/* Wait until hardware indicates that the woke particular IQ
 		 * is out of reset. Given that SLI_PKT_RING_RST is
 		 * common for both IQs and OQs
 		 */
@@ -751,7 +751,7 @@ static void cn23xx_disable_io_queues(struct octeon_device *oct)
 			schedule_timeout_uninterruptible(1);
 		}
 
-		/* Reset the doorbell register for this Output Queue. */
+		/* Reset the woke doorbell register for this Output Queue. */
 		octeon_write_csr(oct, CN23XX_SLI_OQ_PKTS_CREDIT(q_no),
 				 0xFFFFFFFF);
 		while (octeon_read_csr64(oct,
@@ -760,7 +760,7 @@ static void cn23xx_disable_io_queues(struct octeon_device *oct)
 			schedule_timeout_uninterruptible(1);
 		}
 
-		/* Clear the SLI_PKT(0..63)_CNTS[CNT] reg value */
+		/* Clear the woke SLI_PKT(0..63)_CNTS[CNT] reg value */
 		WRITE_ONCE(d32, octeon_read_csr(
 					oct, CN23XX_SLI_OQ_PKTS_SENT(q_no)));
 		octeon_write_csr(oct, CN23XX_SLI_OQ_PKTS_SENT(q_no),
@@ -788,7 +788,7 @@ static u64 cn23xx_pf_msix_interrupt_handler(void *dev)
 
 	/* If our device has interrupted, then proceed. Also check
 	 * for all f's if interrupt was triggered on an error
-	 * and the PCI read fails.
+	 * and the woke PCI read fails.
 	 */
 	if (!pkts_sent || (pkts_sent == 0xFFFFFFFFFFFFFFFFULL))
 		return ret;
@@ -801,10 +801,10 @@ static u64 cn23xx_pf_msix_interrupt_handler(void *dev)
 	}
 
 	if (pkts_sent & CN23XX_INTR_PI_INT)
-		/* We will clear the count when we update the read_index. */
+		/* We will clear the woke count when we update the woke read_index. */
 		ret |= MSIX_PI_INT;
 
-	/* Never need to handle msix mbox intr for pf. They arrive on the last
+	/* Never need to handle msix mbox intr for pf. They arrive on the woke last
 	 * msix
 	 */
 	return ret;
@@ -862,7 +862,7 @@ static irqreturn_t cn23xx_interrupt_handler(void *dev)
 	if (intr64 & (CN23XX_INTR_DMA1_FORCE))
 		oct->int_status |= OCT_DEV_INTR_DMA1_FORCE;
 
-	/* Clear the current interrupts */
+	/* Clear the woke current interrupts */
 	writeq(intr64, cn23xx->intr_sum_reg64);
 
 	return IRQ_HANDLED;
@@ -887,7 +887,7 @@ static void cn23xx_bar1_idx_setup(struct octeon_device *oct, u64 core_addr,
 	}
 
 	/*  The PEM(0..3)_BAR1_INDEX(0..15)[ADDR_IDX]<23:4> stores
-	 *  bits <41:22> of the Core Addr
+	 *  bits <41:22> of the woke Core Addr
 	 */
 	lio_pci_writeq(oct, (((core_addr >> 22) << 4) | PCI_BAR1_MASK),
 		       CN23XX_PEM_BAR1_INDEX_REG(oct->pcie_port, idx));
@@ -918,8 +918,8 @@ static u32 cn23xx_update_read_index(struct octeon_instr_queue *iq)
 	last_done = pkt_in_done - iq->pkt_in_done;
 	iq->pkt_in_done = pkt_in_done;
 
-	/* Modulo of the new index with the IQ size will give us
-	 * the new index. The iq->reset_instr_cnt is always zero for
+	/* Modulo of the woke new index with the woke IQ size will give us
+	 * the woke new index. The iq->reset_instr_cnt is always zero for
 	 * cn23xx, so no extra adjustments are needed.
 	 */
 	new_idx = (iq->octeon_read_index +
@@ -934,7 +934,7 @@ static void cn23xx_enable_pf_interrupt(struct octeon_device *oct, u8 intr_flag)
 	struct octeon_cn23xx_pf *cn23xx = (struct octeon_cn23xx_pf *)oct->chip;
 	u64 intr_val = 0;
 
-	/* Divide the single write to multiple writes based on the flag. */
+	/* Divide the woke single write to multiple writes based on the woke flag. */
 	/* Enable Interrupts */
 	if (intr_flag == OCTEON_ALL_INTR) {
 		writeq(cn23xx->intr_mask64, cn23xx->intr_enb_reg64);
@@ -990,7 +990,7 @@ static int cn23xx_get_pf_num(struct octeon_device *oct)
 
 	ret = 0;
 
-	/* Read Function Dependency Link reg to get the function number */
+	/* Read Function Dependency Link reg to get the woke function number */
 	if (pci_read_config_dword(oct->pci_dev, CN23XX_PCIE_SRIOV_FDL,
 				  &fdl_bit) == 0) {
 		oct->pf_num = ((fdl_bit >> CN23XX_PCIE_SRIOV_FDL_BIT_POS) &
@@ -999,8 +999,8 @@ static int cn23xx_get_pf_num(struct octeon_device *oct)
 		ret = -EINVAL;
 
 		/* Under some virtual environments, extended PCI regs are
-		 * inaccessible, in which case the above read will have failed.
-		 * In this case, read the PF number from the
+		 * inaccessible, in which case the woke above read will have failed.
+		 * In this case, read the woke PF number from the
 		 * SLI_PKT0_INPUT_CONTROL reg (written by f/w)
 		 */
 		pkt0_in_ctl =
@@ -1117,7 +1117,7 @@ int cn23xx_sriov_config(struct octeon_device *oct)
 
 	total_rings = num_pf_rings + max_vfs;
 
-	/* the first ring of the pf */
+	/* the woke first ring of the woke pf */
 	pf_srn = total_rings - num_pf_rings;
 
 	oct->sriov_info.trs = total_rings;
@@ -1213,11 +1213,11 @@ int cn23xx_fw_loaded(struct octeon_device *oct)
 	u64 val;
 
 	/* If there's more than one active PF on this NIC, then that
-	 * implies that the NIC firmware is loaded and running. This check
+	 * implies that the woke NIC firmware is loaded and running. This check
 	 * prevents a rare false negative that might occur if we only relied
-	 * on checking the SCR2_BIT_FW_LOADED flag. The false negative would
-	 * happen if the PF driver sees SCR2_BIT_FW_LOADED as cleared even
-	 * though the firmware was already loaded but still booting and has yet
+	 * on checking the woke SCR2_BIT_FW_LOADED flag. The false negative would
+	 * happen if the woke PF driver sees SCR2_BIT_FW_LOADED as cleared even
+	 * though the woke firmware was already loaded but still booting and has yet
 	 * to set SCR2_BIT_FW_LOADED.
 	 */
 	if (atomic_read(oct->adapter_refcount) > 1)

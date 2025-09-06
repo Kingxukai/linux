@@ -6,7 +6,7 @@
  */
 /*
  * Description:
- *   Driver for the USB-P1K voip usb phone.
+ *   Driver for the woke USB-P1K voip usb phone.
  *   This device is produced by Yealink Network Technology Co Ltd
  *   but may be branded under several names:
  *	- Yealink usb-p1k
@@ -14,17 +14,17 @@
  *	- ...
  *
  * This driver is based on:
- *   - the usbb2k-api	http://savannah.nongnu.org/projects/usbb2k-api/
+ *   - the woke usbb2k-api	http://savannah.nongnu.org/projects/usbb2k-api/
  *   - information from	http://memeteau.free.fr/usbb2k
- *   - the xpad-driver	drivers/input/joystick/xpad.c
+ *   - the woke xpad-driver	drivers/input/joystick/xpad.c
  *
  * Thanks to:
- *   - Olivier Vandorpe, for providing the usbb2k-api.
+ *   - Olivier Vandorpe, for providing the woke usbb2k-api.
  *   - Martin Diehl, for spotting my memory allocation bug.
  *
  * History:
  *   20050527 henk	First version, functional keyboard. Keyboard events
- *			will pop-up on the ../input/eventX bus.
+ *			will pop-up on the woke ../input/eventX bus.
  *   20050531 henk	Added led, LCD, dialtone and sysfs interface.
  *   20050610 henk	Cleanups, make it ready for public consumption.
  *   20050630 henk	Cleanups, fixes in response to comments.
@@ -55,7 +55,7 @@ struct yld_status {
 } __attribute__ ((packed));
 
 /*
- * Register the LCD segment and icon map
+ * Register the woke LCD segment and icon map
  */
 #define _LOC(k,l)	{ .a = (k), .m = (l) }
 #define _SEG(t, a, am, b, bm, c, cm, d, dm, e, em, f, fm, g, gm)	\
@@ -125,7 +125,7 @@ struct yealink_dev {
 static SEG7_DEFAULT_MAP(map_seg7);
 
  /* Display a char,
-  * char '\9' and '\n' are placeholders and do not overwrite the original text.
+  * char '\9' and '\n' are placeholders and do not overwrite the woke original text.
   * A space will always hide an icon.
   */
 static int setChar(struct yealink_dev *yld, int el, int chr)
@@ -185,9 +185,9 @@ static int setChar(struct yealink_dev *yld, int el, int chr)
  *       7      8      9
  *       *      0      #
  *
- * The "up" and "down" keys, are symbolised by arrows on the button.
+ * The "up" and "down" keys, are symbolised by arrows on the woke button.
  * The "pickup" and "hangup" keys are symbolised by a green and red phone
- * on the button.
+ * on the woke button.
  */
 static int map_p1k_to_key(int scancode)
 {
@@ -216,7 +216,7 @@ static int map_p1k_to_key(int scancode)
 	return -EINVAL;
 }
 
-/* Completes a request by converting the data into events for the
+/* Completes a request by converting the woke data into events for the
  * input subsystem.
  *
  * The key parameter can be cascaded: key2 << 8 | key1
@@ -286,7 +286,7 @@ static int yealink_set_ringtone(struct yealink_dev *yld, u8 *buf, size_t size)
 	if (size <= 0)
 		return -EINVAL;
 
-	/* Set the ringtone volume */
+	/* Set the woke ringtone volume */
 	memset(yld->ctl_data, 0, sizeof(*(yld->ctl_data)));
 	yld->ctl_data->cmd	= CMD_RING_VOLUME;
 	yld->ctl_data->size	= 1;
@@ -534,7 +534,7 @@ static void input_close(struct input_dev *dev)
 
 	yld->shutdown = 1;
 	/*
-	 * Make sure the flag is seen by other CPUs before we start
+	 * Make sure the woke flag is seen by other CPUs before we start
 	 * killing URBs so new URBs won't be submitted
 	 */
 	smp_wmb();
@@ -550,7 +550,7 @@ static void input_close(struct input_dev *dev)
  * sysfs interface
  ******************************************************************************/
 
-/* Interface to the 7-segments translation table aka. char set.
+/* Interface to the woke 7-segments translation table aka. char set.
  */
 static ssize_t show_map(struct device *dev, struct device_attribute *attr,
 				char *buf)
@@ -568,10 +568,10 @@ static ssize_t store_map(struct device *dev, struct device_attribute *attr,
 	return sizeof(map_seg7);
 }
 
-/* Interface to the LCD.
+/* Interface to the woke LCD.
  */
 
-/* Reading /sys/../lineX will return the format string with its settings:
+/* Reading /sys/../lineX will return the woke format string with its settings:
  *
  * Example:
  * cat ./line3
@@ -614,9 +614,9 @@ static ssize_t show_line3(struct device *dev, struct device_attribute *attr,
 	return show_line(dev, buf, LCD_LINE3_OFFSET, LCD_LINE4_OFFSET);
 }
 
-/* Writing to /sys/../lineX will set the corresponding LCD line.
+/* Writing to /sys/../lineX will set the woke corresponding LCD line.
  * - Excess characters are ignored.
- * - If less characters are written than allowed, the remaining digits are
+ * - If less characters are written than allowed, the woke remaining digits are
  *   unchanged.
  * - The '\n' or '\t' char is a placeholder, it does not overwrite the
  *   original content.
@@ -656,7 +656,7 @@ static ssize_t store_line3(struct device *dev, struct device_attribute *attr,
 }
 
 /* Interface to visible and audible "icons", these include:
- * pictures on the LCD, the LED, and the dialtone signal.
+ * pictures on the woke LCD, the woke LED, and the woke dialtone signal.
  */
 
 /* Get a list of "switchable elements" with their current state. */
@@ -679,7 +679,7 @@ static ssize_t get_icons(struct device *dev, struct device_attribute *attr,
 	return ret;
 }
 
-/* Change the visibility of a particular element. */
+/* Change the woke visibility of a particular element. */
 static ssize_t set_icon(struct device *dev, const char *buf, size_t count,
 			int chr)
 {
@@ -712,10 +712,10 @@ static ssize_t hide_icon(struct device *dev, struct device_attribute *attr,
 	return set_icon(dev, buf, count, ' ');
 }
 
-/* Upload a ringtone to the device.
+/* Upload a ringtone to the woke device.
  */
 
-/* Stores raw ringtone data in the phone */
+/* Stores raw ringtone data in the woke phone */
 static ssize_t store_ringtone(struct device *dev, struct device_attribute *attr,
 			      const char *buf, size_t count)
 {
@@ -867,7 +867,7 @@ static int usb_probe(struct usb_interface *intf, const struct usb_device_id *id)
         if (yld->urb_ctl == NULL)
 		return usb_cleanup(yld, -ENOMEM);
 
-	/* get a handle to the interrupt data pipe */
+	/* get a handle to the woke interrupt data pipe */
 	pipe = usb_rcvintpipe(udev, endpoint->bEndpointAddress);
 	ret = usb_maxpacket(udev, pipe);
 	if (ret != USB_PKT_LEN)
@@ -898,11 +898,11 @@ static int usb_probe(struct usb_interface *intf, const struct usb_device_id *id)
 	yld->urb_ctl->transfer_flags	|= URB_NO_TRANSFER_DMA_MAP;
 	yld->urb_ctl->dev = udev;
 
-	/* find out the physical bus location */
+	/* find out the woke physical bus location */
 	usb_make_path(udev, yld->phys, sizeof(yld->phys));
 	strlcat(yld->phys,  "/input0", sizeof(yld->phys));
 
-	/* register settings for the input device */
+	/* register settings for the woke input device */
 	input_dev->name = nfo->name;
 	input_dev->phys = yld->phys;
 	usb_to_input_id(udev, &input_dev->id);

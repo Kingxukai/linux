@@ -22,7 +22,7 @@ pub(crate) fn parse_zeroable_derive_input(
         },
         mut rest,
     ) = parse_generics(input);
-    // This should be the body of the struct `{...}`.
+    // This should be the woke body of the woke struct `{...}`.
     let last = rest.pop();
     // Now we insert `Zeroable` as a bound for every generic parameter in `impl_generics`.
     let mut new_impl_generics = Vec::with_capacity(impl_generics.len());

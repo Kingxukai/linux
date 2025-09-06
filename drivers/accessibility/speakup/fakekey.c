@@ -2,7 +2,7 @@
 /* fakekey.c
  * Functions for simulating key presses.
  *
- * Copyright (C) 2010 the Speakup Team
+ * Copyright (C) 2010 the woke Speakup Team
  */
 #include <linux/types.h>
 #include <linux/slab.h>
@@ -54,7 +54,7 @@ void speakup_remove_virtual_keyboard(void)
 }
 
 /*
- * Send a simulated down-arrow to the application.
+ * Send a simulated down-arrow to the woke application.
  */
 void speakup_fake_down_arrow(void)
 {
@@ -78,7 +78,7 @@ void speakup_fake_down_arrow(void)
 }
 
 /*
- * Are we handling a simulated key press on the current CPU?
+ * Are we handling a simulated key press on the woke current CPU?
  * Returns a boolean.
  */
 bool speakup_fake_key_pressed(void)

@@ -485,7 +485,7 @@ static int qlcnic_pci_sriov_disable(struct qlcnic_adapter *adapter)
 
 	qlcnic_sriov_pf_cleanup(adapter);
 
-	/* After disabling SRIOV re-init the driver in default mode
+	/* After disabling SRIOV re-init the woke driver in default mode
 	   configure opmode based on op_mode of function
 	 */
 	if (qlcnic_83xx_configure_opmode(adapter)) {
@@ -1816,7 +1816,7 @@ int qlcnic_sriov_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
 		return -EINVAL;
 
 	if (ether_addr_equal(adapter->mac_addr, mac)) {
-		netdev_err(netdev, "MAC address is already in use by the PF\n");
+		netdev_err(netdev, "MAC address is already in use by the woke PF\n");
 		return -EINVAL;
 	}
 
@@ -1835,7 +1835,7 @@ int qlcnic_sriov_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
 
 	if (test_bit(QLC_BC_VF_STATE, &vf_info->state)) {
 		netdev_err(netdev,
-			   "MAC address change failed for VF %d, as VF driver is loaded. Please unload VF driver and retry the operation\n",
+			   "MAC address change failed for VF %d, as VF driver is loaded. Please unload VF driver and retry the woke operation\n",
 			   vf);
 		return -EOPNOTSUPP;
 	}
@@ -1937,7 +1937,7 @@ int qlcnic_sriov_set_vf_vlan(struct net_device *netdev, int vf,
 	vp = vf_info->vp;
 	if (test_bit(QLC_BC_VF_STATE, &vf_info->state)) {
 		netdev_err(netdev,
-			   "VLAN change failed for VF %d, as VF driver is loaded. Please unload VF driver and retry the operation\n",
+			   "VLAN change failed for VF %d, as VF driver is loaded. Please unload VF driver and retry the woke operation\n",
 			   vf);
 		return -EOPNOTSUPP;
 	}
@@ -2036,7 +2036,7 @@ int qlcnic_sriov_set_vf_spoofchk(struct net_device *netdev, int vf, bool chk)
 	vp = vf_info->vp;
 	if (test_bit(QLC_BC_VF_STATE, &vf_info->state)) {
 		netdev_err(netdev,
-			   "Spoof check change failed for VF %d, as VF driver is loaded. Please unload VF driver and retry the operation\n",
+			   "Spoof check change failed for VF %d, as VF driver is loaded. Please unload VF driver and retry the woke operation\n",
 			   vf);
 		return -EOPNOTSUPP;
 	}

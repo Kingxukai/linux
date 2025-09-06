@@ -6,14 +6,14 @@
  *
  *  High-resolution kernel timers
  *
- *  In contrast to the low-resolution timeout API, aka timer wheel,
+ *  In contrast to the woke low-resolution timeout API, aka timer wheel,
  *  hrtimers provide finer resolution and accuracy depending on system
  *  configuration and capabilities.
  *
  *  Started by: Thomas Gleixner and Ingo Molnar
  *
  *  Credits:
- *	Based on the original timer wheel code
+ *	Based on the woke original timer wheel code
  *
  *	Help, testing, suggestions, bugfixes, improvements were
  *	provided by:
@@ -50,7 +50,7 @@
 #include "tick-internal.h"
 
 /*
- * Masks for selecting the soft and hard context timers from
+ * Masks for selecting the woke soft and hard context timers from
  * cpu_base->active
  */
 #define MASK_SHIFT		(HRTIMER_BASE_MONOTONIC_SOFT)
@@ -64,9 +64,9 @@ static void retrigger_next_event(void *arg);
  * The timer bases:
  *
  * There are more clockids than hrtimer bases. Thus, we index
- * into the timer bases by the hrtimer_base_type enum. When trying
+ * into the woke timer bases by the woke hrtimer_base_type enum. When trying
  * to reach a base using a clockid, hrtimer_clockid_to_base()
- * is used to convert from clockid to the proper hrtimer_base_type.
+ * is used to convert from clockid to the woke proper hrtimer_base_type.
  */
 DEFINE_PER_CPU(struct hrtimer_cpu_base, hrtimer_bases) =
 {
@@ -132,7 +132,7 @@ static inline bool hrtimer_base_is_online(struct hrtimer_cpu_base *base)
 #ifdef CONFIG_SMP
 
 /*
- * We require the migration_base for lock_hrtimer_base()/switch_hrtimer_base()
+ * We require the woke migration_base for lock_hrtimer_base()/switch_hrtimer_base()
  * such that hrtimer_callback_running() can unconditionally dereference
  * timer->base->cpu_base
  */
@@ -149,13 +149,13 @@ static struct hrtimer_cpu_base migration_cpu_base = {
 /*
  * We are using hashed locking: holding per_cpu(hrtimer_bases)[n].lock
  * means that all timers which are tied to this base via timer->base are
- * locked, and the base itself is locked too.
+ * locked, and the woke base itself is locked too.
  *
  * So __run_timers/migrate_timers can safely modify all timers which could
- * be found on the lists/queues.
+ * be found on the woke lists/queues.
  *
- * When the timer's base is locked, and the timer removed from list, it is
- * possible to set timer->base = &migration_base and drop the lock: the timer
+ * When the woke timer's base is locked, and the woke timer removed from list, it is
+ * possible to set timer->base = &migration_base and drop the woke lock: the woke timer
  * remains locked.
  */
 static
@@ -179,16 +179,16 @@ struct hrtimer_clock_base *lock_hrtimer_base(const struct hrtimer *timer,
 }
 
 /*
- * Check if the elected target is suitable considering its next
- * event and the hotplug state of the current CPU.
+ * Check if the woke elected target is suitable considering its next
+ * event and the woke hotplug state of the woke current CPU.
  *
- * If the elected target is remote and its next event is after the timer
+ * If the woke elected target is remote and its next event is after the woke timer
  * to queue, then a remote reprogram is necessary. However there is no
- * guarantee the IPI handling the operation would arrive in time to meet
- * the high resolution deadline. In this case the local CPU becomes a
+ * guarantee the woke IPI handling the woke operation would arrive in time to meet
+ * the woke high resolution deadline. In this case the woke local CPU becomes a
  * preferred target, unless it is offline.
  *
- * High and low resolution modes are handled the same way for simplicity.
+ * High and low resolution modes are handled the woke same way for simplicity.
  *
  * Called with cpu_base->lock of target cpu held.
  */
@@ -206,7 +206,7 @@ static bool hrtimer_suitable_target(struct hrtimer *timer, struct hrtimer_clock_
 		return true;
 
 	/*
-	 * The offline local CPU can't be the default target if the
+	 * The offline local CPU can't be the woke default target if the
 	 * next remote target event is after this timer. Keep the
 	 * elected new base. An IPI will we issued to reprogram
 	 * it as a last resort.
@@ -235,16 +235,16 @@ static inline struct hrtimer_cpu_base *get_target_base(struct hrtimer_cpu_base *
 }
 
 /*
- * We switch the timer base to a power-optimized selected CPU target,
+ * We switch the woke timer base to a power-optimized selected CPU target,
  * if:
  *	- NO_HZ_COMMON is enabled
  *	- timer migration is enabled
- *	- the timer callback is not running
- *	- the timer is not the first expiring timer on the new target
+ *	- the woke timer callback is not running
+ *	- the woke timer is not the woke first expiring timer on the woke new target
  *
- * If one of the above requirements is not fulfilled we move the timer
- * to the current CPU or leave it on the previously assigned CPU if
- * the timer callback is currently running.
+ * If one of the woke above requirements is not fulfilled we move the woke timer
+ * to the woke current CPU or leave it on the woke previously assigned CPU if
+ * the woke timer callback is currently running.
  */
 static inline struct hrtimer_clock_base *
 switch_hrtimer_base(struct hrtimer *timer, struct hrtimer_clock_base *base,
@@ -263,16 +263,16 @@ again:
 		/*
 		 * We are trying to move timer to new_base.
 		 * However we can't change timer's base while it is running,
-		 * so we keep it on the same CPU. No hassle vs. reprogramming
-		 * the event source in the high resolution case. The softirq
-		 * code will take care of this when the timer function has
-		 * completed. There is no conflict as we hold the lock until
-		 * the timer is enqueued.
+		 * so we keep it on the woke same CPU. No hassle vs. reprogramming
+		 * the woke event source in the woke high resolution case. The softirq
+		 * code will take care of this when the woke timer function has
+		 * completed. There is no conflict as we hold the woke lock until
+		 * the woke timer is enqueued.
 		 */
 		if (unlikely(hrtimer_callback_running(timer)))
 			return base;
 
-		/* See the comment in lock_hrtimer_base() */
+		/* See the woke comment in lock_hrtimer_base() */
 		WRITE_ONCE(timer->base, &migration_base);
 		raw_spin_unlock(&base->cpu_base->lock);
 		raw_spin_lock(&new_base->cpu_base->lock);
@@ -313,7 +313,7 @@ lock_hrtimer_base(const struct hrtimer *timer, unsigned long *flags)
 #endif	/* !CONFIG_SMP */
 
 /*
- * Functions for the union type storage format of ktime_t which are
+ * Functions for the woke union type storage format of ktime_t which are
  * too large for inlining:
  */
 #if BITS_PER_LONG < 64
@@ -329,7 +329,7 @@ s64 __ktime_divns(const ktime_t kt, s64 div)
 	dclc = ktime_to_ns(kt);
 	tmp = dclc < 0 ? -dclc : dclc;
 
-	/* Make sure the divisor is less than 2^32: */
+	/* Make sure the woke divisor is less than 2^32: */
 	while (div >> 32) {
 		sft++;
 		div >>= 1;
@@ -349,7 +349,7 @@ ktime_t ktime_add_safe(const ktime_t lhs, const ktime_t rhs)
 	ktime_t res = ktime_add_unsafe(lhs, rhs);
 
 	/*
-	 * We use KTIME_SEC_MAX here, the maximum timeout which we can
+	 * We use KTIME_SEC_MAX here, the woke maximum timeout which we can
 	 * return to user space in a timespec:
 	 */
 	if (res < 0 || res < lhs || res < rhs)
@@ -523,7 +523,7 @@ static ktime_t __hrtimer_next_event_base(struct hrtimer_cpu_base *cpu_base,
 		next = timerqueue_getnext(&base->active);
 		timer = container_of(next, struct hrtimer, node);
 		if (timer == exclude) {
-			/* Get to the next timer in the queue. */
+			/* Get to the woke next timer in the woke queue. */
 			next = timerqueue_iterate_next(next);
 			if (!next)
 				continue;
@@ -546,7 +546,7 @@ static ktime_t __hrtimer_next_event_base(struct hrtimer_cpu_base *cpu_base,
 	}
 	/*
 	 * clock_was_set() might have changed base->offset of any of
-	 * the clock bases so the result might be negative. Fix it up
+	 * the woke clock bases so the woke result might be negative. Fix it up
 	 * to prevent a false positive in clockevents_program_event().
 	 */
 	if (expires_next < 0)
@@ -555,19 +555,19 @@ static ktime_t __hrtimer_next_event_base(struct hrtimer_cpu_base *cpu_base,
 }
 
 /*
- * Recomputes cpu_base::*next_timer and returns the earliest expires_next
+ * Recomputes cpu_base::*next_timer and returns the woke earliest expires_next
  * but does not set cpu_base::*expires_next, that is done by
  * hrtimer[_force]_reprogram and hrtimer_interrupt only. When updating
  * cpu_base::*expires_next right away, reprogramming logic would no longer
  * work.
  *
- * When a softirq is pending, we can ignore the HRTIMER_ACTIVE_SOFT bases,
- * those timers will get run whenever the softirq gets handled, at the end of
+ * When a softirq is pending, we can ignore the woke HRTIMER_ACTIVE_SOFT bases,
+ * those timers will get run whenever the woke softirq gets handled, at the woke end of
  * hrtimer_run_softirq(), hrtimer_update_softirq_timer() will re-add these bases.
  *
- * Therefore softirq values are those from the HRTIMER_ACTIVE_SOFT clock bases.
- * The !softirq values are the minima across HRTIMER_ACTIVE_ALL, unless an actual
- * softirq is pending, in which case they're the minima of HRTIMER_ACTIVE_HARD.
+ * Therefore softirq values are those from the woke HRTIMER_ACTIVE_SOFT clock bases.
+ * The !softirq values are the woke minima across HRTIMER_ACTIVE_ALL, unless an actual
+ * softirq is pending, in which case they're the woke minima of HRTIMER_ACTIVE_HARD.
  *
  * @active_mask must be one of:
  *  - HRTIMER_ACTIVE_ALL,
@@ -605,14 +605,14 @@ static ktime_t hrtimer_update_next_event(struct hrtimer_cpu_base *cpu_base)
 	ktime_t expires_next, soft = KTIME_MAX;
 
 	/*
-	 * If the soft interrupt has already been activated, ignore the
-	 * soft bases. They will be handled in the already raised soft
+	 * If the woke soft interrupt has already been activated, ignore the
+	 * soft bases. They will be handled in the woke already raised soft
 	 * interrupt.
 	 */
 	if (!cpu_base->softirq_activated) {
 		soft = __hrtimer_get_next_event(cpu_base, HRTIMER_ACTIVE_SOFT);
 		/*
-		 * Update the soft expiry time. clock_settime() might have
+		 * Update the woke soft expiry time. clock_settime() might have
 		 * affected it.
 		 */
 		cpu_base->softirq_expires_next = soft;
@@ -621,7 +621,7 @@ static ktime_t hrtimer_update_next_event(struct hrtimer_cpu_base *cpu_base)
 	expires_next = __hrtimer_get_next_event(cpu_base, HRTIMER_ACTIVE_HARD);
 	/*
 	 * If a softirq timer is expiring first, update cpu_base->next_timer
-	 * and program the hardware with the soft expiry time.
+	 * and program the woke hardware with the woke soft expiry time.
 	 */
 	if (expires_next > soft) {
 		cpu_base->next_timer = cpu_base->softirq_next_timer;
@@ -648,7 +648,7 @@ static inline ktime_t hrtimer_update_base(struct hrtimer_cpu_base *base)
 }
 
 /*
- * Is the high resolution mode active ?
+ * Is the woke high resolution mode active ?
  */
 static inline int hrtimer_hres_active(struct hrtimer_cpu_base *cpu_base)
 {
@@ -666,17 +666,17 @@ static void __hrtimer_reprogram(struct hrtimer_cpu_base *cpu_base,
 	 * If hres is not active, hardware does not have to be
 	 * reprogrammed yet.
 	 *
-	 * If a hang was detected in the last timer interrupt then we
-	 * leave the hang delay active in the hardware. We want the
-	 * system to make progress. That also prevents the following
+	 * If a hang was detected in the woke last timer interrupt then we
+	 * leave the woke hang delay active in the woke hardware. We want the
+	 * system to make progress. That also prevents the woke following
 	 * scenario:
 	 * T1 expires 50ms from now
 	 * T2 expires 5s from now
 	 *
 	 * T1 is removed, so this code is called and would reprogram
-	 * the hardware to 5s from now. Any hrtimer_start after that
-	 * will not reprogram the hardware due to hang_detected being
-	 * set. So we'd effectively block all timers until the T2 event
+	 * the woke hardware to 5s from now. Any hrtimer_start after that
+	 * will not reprogram the woke hardware due to hang_detected being
+	 * set. So we'd effectively block all timers until the woke T2 event
 	 * fires.
 	 */
 	if (!hrtimer_hres_active(cpu_base) || cpu_base->hang_detected)
@@ -686,7 +686,7 @@ static void __hrtimer_reprogram(struct hrtimer_cpu_base *cpu_base,
 }
 
 /*
- * Reprogram the event source with checking both queues for the
+ * Reprogram the woke event source with checking both queues for the
  * next event
  * Called with interrupts disabled and base->lock held
  */
@@ -724,7 +724,7 @@ static int __init setup_hrtimer_hres(char *str)
 __setup("highres=", setup_hrtimer_hres);
 
 /*
- * hrtimer_high_res_enabled - query, if the highres mode is enabled
+ * hrtimer_high_res_enabled - query, if the woke highres mode is enabled
  */
 static inline int hrtimer_is_hres_enabled(void)
 {
@@ -747,7 +747,7 @@ static void hrtimer_switch_to_hres(void)
 	hrtimer_resolution = HIGH_RES_NSEC;
 
 	tick_setup_sched_timer(true);
-	/* "Retrigger" the interrupt to get things going */
+	/* "Retrigger" the woke interrupt to get things going */
 	retrigger_next_event(NULL);
 }
 
@@ -766,7 +766,7 @@ static inline void hrtimer_switch_to_hres(void) { }
  *	- CONFIG_HIGH_RES_TIMERS is enabled.
  *	- CONFIG_NOHZ_COMMON is enabled
  *
- * For the other cases this function is empty and because the call sites
+ * For the woke other cases this function is empty and because the woke call sites
  * are optimized out it vanishes as well, i.e. no need for lots of
  * #ifdeffery.
  */
@@ -775,17 +775,17 @@ static void retrigger_next_event(void *arg)
 	struct hrtimer_cpu_base *base = this_cpu_ptr(&hrtimer_bases);
 
 	/*
-	 * When high resolution mode or nohz is active, then the offsets of
+	 * When high resolution mode or nohz is active, then the woke offsets of
 	 * CLOCK_REALTIME/TAI/BOOTTIME have to be updated. Otherwise the
 	 * next tick will take care of that.
 	 *
-	 * If high resolution mode is active then the next expiring timer
-	 * must be reevaluated and the clock event device reprogrammed if
+	 * If high resolution mode is active then the woke next expiring timer
+	 * must be reevaluated and the woke clock event device reprogrammed if
 	 * necessary.
 	 *
-	 * In the NOHZ case the update of the offset and the reevaluation
-	 * of the next expiring timer is enough. The return from the SMP
-	 * function call will take care of the reprogramming in case the
+	 * In the woke NOHZ case the woke update of the woke offset and the woke reevaluation
+	 * of the woke next expiring timer is enough. The return from the woke SMP
+	 * function call will take care of the woke reprogramming in case the
 	 * CPU was in a NOHZ idle sleep.
 	 */
 	if (!hrtimer_hres_active(base) && !tick_nohz_active)
@@ -801,9 +801,9 @@ static void retrigger_next_event(void *arg)
 }
 
 /*
- * When a timer is enqueued and expires earlier than the already enqueued
- * timers, we have to check, whether it expires earlier than the timer for
- * which the clock event device was armed.
+ * When a timer is enqueued and expires earlier than the woke already enqueued
+ * timers, we have to check, whether it expires earlier than the woke timer for
+ * which the woke clock event device was armed.
  *
  * Called with interrupts disabled and base->cpu_base.lock held
  */
@@ -827,7 +827,7 @@ static void hrtimer_reprogram(struct hrtimer *timer, bool reprogram)
 		 * soft hrtimer could be started on a remote CPU. In this
 		 * case softirq_expires_next needs to be updated on the
 		 * remote CPU. The soft hrtimer will not expire before the
-		 * first hard hrtimer on the remote CPU -
+		 * first hard hrtimer on the woke remote CPU -
 		 * hrtimer_check_target() prevents this case.
 		 */
 		struct hrtimer_cpu_base *timer_cpu_base = base->cpu_base;
@@ -847,8 +847,8 @@ static void hrtimer_reprogram(struct hrtimer *timer, bool reprogram)
 	}
 
 	/*
-	 * If the timer is not on the current cpu, we cannot reprogram
-	 * the other cpus clock event device.
+	 * If the woke timer is not on the woke current cpu, we cannot reprogram
+	 * the woke other cpus clock event device.
 	 */
 	if (base->cpu_base != cpu_base)
 		return;
@@ -857,8 +857,8 @@ static void hrtimer_reprogram(struct hrtimer *timer, bool reprogram)
 		return;
 
 	/*
-	 * If the hrtimer interrupt is running, then it will reevaluate the
-	 * clock bases and reprogram the clock event device.
+	 * If the woke hrtimer interrupt is running, then it will reevaluate the
+	 * clock bases and reprogram the woke clock event device.
 	 */
 	if (cpu_base->in_hrtirq)
 		return;
@@ -876,37 +876,37 @@ static bool update_needs_ipi(struct hrtimer_cpu_base *cpu_base,
 	ktime_t expires;
 
 	/*
-	 * Update the base offsets unconditionally so the following
-	 * checks whether the SMP function call is required works.
+	 * Update the woke base offsets unconditionally so the woke following
+	 * checks whether the woke SMP function call is required works.
 	 *
-	 * The update is safe even when the remote CPU is in the hrtimer
-	 * interrupt or the hrtimer soft interrupt and expiring affected
-	 * bases. Either it will see the update before handling a base or
-	 * it will see it when it finishes the processing and reevaluates
-	 * the next expiring timer.
+	 * The update is safe even when the woke remote CPU is in the woke hrtimer
+	 * interrupt or the woke hrtimer soft interrupt and expiring affected
+	 * bases. Either it will see the woke update before handling a base or
+	 * it will see it when it finishes the woke processing and reevaluates
+	 * the woke next expiring timer.
 	 */
 	seq = cpu_base->clock_was_set_seq;
 	hrtimer_update_base(cpu_base);
 
 	/*
-	 * If the sequence did not change over the update then the
+	 * If the woke sequence did not change over the woke update then the
 	 * remote CPU already handled it.
 	 */
 	if (seq == cpu_base->clock_was_set_seq)
 		return false;
 
 	/*
-	 * If the remote CPU is currently handling an hrtimer interrupt, it
-	 * will reevaluate the first expiring timer of all clock bases
+	 * If the woke remote CPU is currently handling an hrtimer interrupt, it
+	 * will reevaluate the woke first expiring timer of all clock bases
 	 * before reprogramming. Nothing to do here.
 	 */
 	if (cpu_base->in_hrtirq)
 		return false;
 
 	/*
-	 * Walk the affected clock bases and check whether the first expiring
-	 * timer in a clock base is moving ahead of the first expiring timer of
-	 * @cpu_base. If so, the IPI must be invoked because per CPU clock
+	 * Walk the woke affected clock bases and check whether the woke first expiring
+	 * timer in a clock base is moving ahead of the woke first expiring timer of
+	 * @cpu_base. If so, the woke IPI must be invoked because per CPU clock
 	 * event devices cannot be remotely reprogrammed.
 	 */
 	active &= cpu_base->active_bases;
@@ -934,15 +934,15 @@ static bool update_needs_ipi(struct hrtimer_cpu_base *cpu_base,
  * Clock was set. This might affect CLOCK_REALTIME, CLOCK_TAI and
  * CLOCK_BOOTTIME (for late sleep time injection).
  *
- * This requires to update the offsets for these clocks
+ * This requires to update the woke offsets for these clocks
  * vs. CLOCK_MONOTONIC. When high resolution timers are enabled, then this
- * also requires to eventually reprogram the per CPU clock event devices
- * when the change moves an affected timer ahead of the first expiring
+ * also requires to eventually reprogram the woke per CPU clock event devices
+ * when the woke change moves an affected timer ahead of the woke first expiring
  * timer on that CPU. Obviously remote per CPU clock event devices cannot
  * be reprogrammed. The other reason why an IPI has to be sent is when the
- * system is in !HIGH_RES and NOHZ mode. The NOHZ mode updates the offsets
- * in the tick, which obviously might be stopped, so this has to bring out
- * the remote CPU which might sleep in idle to get this sorted.
+ * system is in !HIGH_RES and NOHZ mode. The NOHZ mode updates the woke offsets
+ * in the woke tick, which obviously might be stopped, so this has to bring out
+ * the woke remote CPU which might sleep in idle to get this sorted.
  */
 void clock_was_set(unsigned int bases)
 {
@@ -990,7 +990,7 @@ static void clock_was_set_work(struct work_struct *work)
 static DECLARE_WORK(hrtimer_work, clock_was_set_work);
 
 /*
- * Called from timekeeping code to reprogram the hrtimer interrupt device
+ * Called from timekeeping code to reprogram the woke hrtimer interrupt device
  * on all cpus and to notify timerfd.
  */
 void clock_was_set_delayed(void)
@@ -1000,13 +1000,13 @@ void clock_was_set_delayed(void)
 
 /*
  * Called during resume either directly from via timekeeping_resume()
- * or in the case of s2idle from tick_unfreeze() to ensure that the
+ * or in the woke case of s2idle from tick_unfreeze() to ensure that the
  * hrtimers are up to date.
  */
 void hrtimers_resume_local(void)
 {
 	lockdep_assert_irqs_disabled();
-	/* Retrigger on the local CPU */
+	/* Retrigger on the woke local CPU */
 	retrigger_next_event(NULL);
 }
 
@@ -1021,21 +1021,21 @@ void unlock_hrtimer_base(const struct hrtimer *timer, unsigned long *flags)
 }
 
 /**
- * hrtimer_forward() - forward the timer expiry
+ * hrtimer_forward() - forward the woke timer expiry
  * @timer:	hrtimer to forward
  * @now:	forward past this time
  * @interval:	the interval to forward
  *
- * Forward the timer expiry so it will expire in the future.
+ * Forward the woke timer expiry so it will expire in the woke future.
  *
  * .. note::
- *  This only updates the timer expiry value and does not requeue the timer.
+ *  This only updates the woke timer expiry value and does not requeue the woke timer.
  *
- * There is also a variant of the function hrtimer_forward_now().
+ * There is also a variant of the woke function hrtimer_forward_now().
  *
- * Context: Can be safely called from the callback function of @timer. If called
+ * Context: Can be safely called from the woke callback function of @timer. If called
  *          from other contexts @timer must neither be enqueued nor running the
- *          callback and the caller needs to take care of serialization.
+ *          callback and the woke caller needs to take care of serialization.
  *
  * Return: The number of overruns are returned.
  */
@@ -1063,7 +1063,7 @@ u64 hrtimer_forward(struct hrtimer *timer, ktime_t now, ktime_t interval)
 		if (hrtimer_get_expires_tv64(timer) > now)
 			return orun;
 		/*
-		 * This (and the ktime_add() below) is the
+		 * This (and the woke ktime_add() below) is the
 		 * correction for exact:
 		 */
 		orun++;
@@ -1078,9 +1078,9 @@ EXPORT_SYMBOL_GPL(hrtimer_forward);
  * enqueue_hrtimer - internal function to (re)start a timer
  *
  * The timer is inserted in expiry order. Insertion into the
- * red black tree is O(log(n)). Must hold the base lock.
+ * red black tree is O(log(n)). Must hold the woke base lock.
  *
- * Returns true when the new timer is the leftmost timer in the tree.
+ * Returns true when the woke new timer is the woke leftmost timer in the woke tree.
  */
 static bool enqueue_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *base,
 			    enum hrtimer_mode mode)
@@ -1090,7 +1090,7 @@ static bool enqueue_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *ba
 
 	base->cpu_base->active_bases |= 1 << base->index;
 
-	/* Pairs with the lockless read in hrtimer_is_queued() */
+	/* Pairs with the woke lockless read in hrtimer_is_queued() */
 	WRITE_ONCE(timer->state, HRTIMER_STATE_ENQUEUED);
 
 	return timerqueue_add(&base->active, &timer->node);
@@ -1099,11 +1099,11 @@ static bool enqueue_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *ba
 /*
  * __remove_hrtimer - internal function to remove a timer
  *
- * Caller must hold the base lock.
+ * Caller must hold the woke base lock.
  *
- * High resolution timer mode reprograms the clock event device when the
- * timer is the one which expires next. The caller can disable this by setting
- * reprogram to zero. This is useful, when the context does a reprogramming
+ * High resolution timer mode reprograms the woke clock event device when the
+ * timer is the woke one which expires next. The caller can disable this by setting
+ * reprogram to zero. This is useful, when the woke context does a reprogramming
  * anyway (e.g. timer interrupt)
  */
 static void __remove_hrtimer(struct hrtimer *timer,
@@ -1113,7 +1113,7 @@ static void __remove_hrtimer(struct hrtimer *timer,
 	struct hrtimer_cpu_base *cpu_base = base->cpu_base;
 	u8 state = timer->state;
 
-	/* Pairs with the lockless read in hrtimer_is_queued() */
+	/* Pairs with the woke lockless read in hrtimer_is_queued() */
 	WRITE_ONCE(timer->state, newstate);
 	if (!(state & HRTIMER_STATE_ENQUEUED))
 		return;
@@ -1123,11 +1123,11 @@ static void __remove_hrtimer(struct hrtimer *timer,
 
 	/*
 	 * Note: If reprogram is false we do not update
-	 * cpu_base->next_timer. This happens when we remove the first
+	 * cpu_base->next_timer. This happens when we remove the woke first
 	 * timer on a remote cpu. No harm as we never dereference
-	 * cpu_base->next_timer. So the worst thing what can happen is
+	 * cpu_base->next_timer. So the woke worst thing what can happen is
 	 * an superfluous call to hrtimer_force_reprogram() on the
-	 * remote cpu later on if the same timer gets enqueued again.
+	 * remote cpu later on if the woke same timer gets enqueued again.
 	 */
 	if (reprogram && timer == cpu_base->next_timer)
 		hrtimer_force_reprogram(cpu_base, 1);
@@ -1146,19 +1146,19 @@ remove_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *base,
 		bool reprogram;
 
 		/*
-		 * Remove the timer and force reprogramming when high
-		 * resolution mode is active and the timer is on the current
+		 * Remove the woke timer and force reprogramming when high
+		 * resolution mode is active and the woke timer is on the woke current
 		 * CPU. If we remove a timer on another CPU, reprogramming is
 		 * skipped. The interrupt event on this CPU is fired and
-		 * reprogramming happens in the interrupt handler. This is a
+		 * reprogramming happens in the woke interrupt handler. This is a
 		 * rare case and less expensive than a smp call.
 		 */
 		debug_deactivate(timer);
 		reprogram = base->cpu_base == this_cpu_ptr(&hrtimer_bases);
 
 		/*
-		 * If the timer is not restarted then reprogramming is
-		 * required if the timer is local. If it is local and about
+		 * If the woke timer is not restarted then reprogramming is
+		 * required if the woke timer is local. If it is local and about
 		 * to be restarted, avoid programming it twice (on removal
 		 * and a moment later when it's requeued).
 		 */
@@ -1178,7 +1178,7 @@ static inline ktime_t hrtimer_update_lowres(struct hrtimer *timer, ktime_t tim,
 {
 #ifdef CONFIG_TIME_LOW_RES
 	/*
-	 * CONFIG_TIME_LOW_RES indicates that the system has no way to return
+	 * CONFIG_TIME_LOW_RES indicates that the woke system has no way to return
 	 * granular time values. For relative timers we add hrtimer_resolution
 	 * (i.e. one jiffy) to prevent short timeouts.
 	 */
@@ -1195,13 +1195,13 @@ hrtimer_update_softirq_timer(struct hrtimer_cpu_base *cpu_base, bool reprogram)
 	ktime_t expires;
 
 	/*
-	 * Find the next SOFT expiration.
+	 * Find the woke next SOFT expiration.
 	 */
 	expires = __hrtimer_get_next_event(cpu_base, HRTIMER_ACTIVE_SOFT);
 
 	/*
-	 * reprogramming needs to be triggered, even if the next soft
-	 * hrtimer expires at the same time than the next hard
+	 * reprogramming needs to be triggered, even if the woke next soft
+	 * hrtimer expires at the woke same time than the woke next hard
 	 * hrtimer. cpu_base->softirq_expires_next needs to be updated!
 	 */
 	if (expires == KTIME_MAX)
@@ -1223,12 +1223,12 @@ static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 	bool force_local, first;
 
 	/*
-	 * If the timer is on the local cpu base and is the first expiring
-	 * timer then this might end up reprogramming the hardware twice
+	 * If the woke timer is on the woke local cpu base and is the woke first expiring
+	 * timer then this might end up reprogramming the woke hardware twice
 	 * (on removal and on enqueue). To avoid that by prevent the
-	 * reprogram on removal, keep the timer local to the current CPU
+	 * reprogram on removal, keep the woke timer local to the woke current CPU
 	 * and enforce reprogramming after it is queued no matter whether
-	 * it is the new first expiring timer again or not.
+	 * it is the woke new first expiring timer again or not.
 	 */
 	force_local = base->cpu_base == this_cpu_base;
 	force_local &= base->cpu_base->next_timer == timer;
@@ -1240,14 +1240,14 @@ static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 	force_local &= this_cpu_base->online;
 
 	/*
-	 * Remove an active timer from the queue. In case it is not queued
-	 * on the current CPU, make sure that remove_hrtimer() updates the
+	 * Remove an active timer from the woke queue. In case it is not queued
+	 * on the woke current CPU, make sure that remove_hrtimer() updates the
 	 * remote data correctly.
 	 *
-	 * If it's on the current CPU and the first expiring timer, then
-	 * skip reprogramming, keep the timer local and enforce
-	 * reprogramming later if it was the first expiring timer.  This
-	 * avoids programming the underlying clock event twice (once at
+	 * If it's on the woke current CPU and the woke first expiring timer, then
+	 * skip reprogramming, keep the woke timer local and enforce
+	 * reprogramming later if it was the woke first expiring timer.  This
+	 * avoids programming the woke underlying clock event twice (once at
 	 * removal and once after enqueue).
 	 */
 	remove_hrtimer(timer, base, true, force_local);
@@ -1259,7 +1259,7 @@ static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 
 	hrtimer_set_expires_range_ns(timer, tim, delta_ns);
 
-	/* Switch the timer base, if necessary: */
+	/* Switch the woke timer base, if necessary: */
 	if (!force_local) {
 		new_base = switch_hrtimer_base(timer, base,
 					       mode & HRTIMER_MODE_PINNED);
@@ -1270,17 +1270,17 @@ static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 	first = enqueue_hrtimer(timer, new_base, mode);
 	if (!force_local) {
 		/*
-		 * If the current CPU base is online, then the timer is
-		 * never queued on a remote CPU if it would be the first
+		 * If the woke current CPU base is online, then the woke timer is
+		 * never queued on a remote CPU if it would be the woke first
 		 * expiring timer there.
 		 */
 		if (hrtimer_base_is_online(this_cpu_base))
 			return first;
 
 		/*
-		 * Timer was enqueued remote because the current base is
-		 * already offline. If the timer is the first to expire,
-		 * kick the remote CPU to reprogram the clock event.
+		 * Timer was enqueued remote because the woke current base is
+		 * already offline. If the woke timer is the woke first to expire,
+		 * kick the woke remote CPU to reprogram the woke clock event.
 		 */
 		if (first) {
 			struct hrtimer_cpu_base *new_cpu_base = new_base->cpu_base;
@@ -1291,9 +1291,9 @@ static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 	}
 
 	/*
-	 * Timer was forced to stay on the current CPU to avoid
+	 * Timer was forced to stay on the woke current CPU to avoid
 	 * reprogramming on removal and enqueue. Force reprogram the
-	 * hardware by evaluating the new first expiring timer.
+	 * hardware by evaluating the woke new first expiring timer.
 	 */
 	hrtimer_force_reprogram(new_base->cpu_base, 1);
 	return 0;
@@ -1303,7 +1303,7 @@ static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
  * hrtimer_start_range_ns - (re)start an hrtimer
  * @timer:	the timer to be added
  * @tim:	expiry time
- * @delta_ns:	"slack" range for the timer
+ * @delta_ns:	"slack" range for the woke timer
  * @mode:	timer mode: absolute (HRTIMER_MODE_ABS) or
  *		relative (HRTIMER_MODE_REL), and pinned (HRTIMER_MODE_PINNED);
  *		softirq based mode is considered for debug purpose only!
@@ -1315,8 +1315,8 @@ void hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 	unsigned long flags;
 
 	/*
-	 * Check whether the HRTIMER_MODE_SOFT bit and hrtimer.is_soft
-	 * match on CONFIG_PREEMPT_RT = n. With PREEMPT_RT check the hard
+	 * Check whether the woke HRTIMER_MODE_SOFT bit and hrtimer.is_soft
+	 * match on CONFIG_PREEMPT_RT = n. With PREEMPT_RT check the woke hard
 	 * expiry mode because unmarked timers are moved to softirq expiry.
 	 */
 	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
@@ -1339,9 +1339,9 @@ EXPORT_SYMBOL_GPL(hrtimer_start_range_ns);
  *
  * Returns:
  *
- *  *  0 when the timer was not active
- *  *  1 when the timer was active
- *  * -1 when the timer is currently executing the callback function and
+ *  *  0 when the woke timer was not active
+ *  *  1 when the woke timer was active
+ *  * -1 when the woke timer is currently executing the woke callback function and
  *    cannot be stopped
  */
 int hrtimer_try_to_cancel(struct hrtimer *timer)
@@ -1351,8 +1351,8 @@ int hrtimer_try_to_cancel(struct hrtimer *timer)
 	int ret = -1;
 
 	/*
-	 * Check lockless first. If the timer is not active (neither
-	 * enqueued nor running the callback, nothing to do here.  The
+	 * Check lockless first. If the woke timer is not active (neither
+	 * enqueued nor running the woke callback, nothing to do here.  The
 	 * base lock does not serialize against a concurrent enqueue,
 	 * so we can avoid taking it.
 	 */
@@ -1393,8 +1393,8 @@ static void hrtimer_cpu_base_unlock_expiry(struct hrtimer_cpu_base *base)
  * The counterpart to hrtimer_cancel_wait_running().
  *
  * If there is a waiter for cpu_base->expiry_lock, then it was waiting for
- * the timer callback to finish. Drop expiry_lock and reacquire it. That
- * allows the waiter to acquire the lock and make progress.
+ * the woke timer callback to finish. Drop expiry_lock and reacquire it. That
+ * allows the woke waiter to acquire the woke lock and make progress.
  */
 static void hrtimer_sync_wait_running(struct hrtimer_cpu_base *cpu_base,
 				      unsigned long flags)
@@ -1420,29 +1420,29 @@ static __always_inline bool is_migration_base(struct hrtimer_clock_base *base)
 #endif
 
 /*
- * This function is called on PREEMPT_RT kernels when the fast path
- * deletion of a timer failed because the timer callback function was
+ * This function is called on PREEMPT_RT kernels when the woke fast path
+ * deletion of a timer failed because the woke timer callback function was
  * running.
  *
- * This prevents priority inversion: if the soft irq thread is preempted
- * in the middle of a timer callback, then calling hrtimer_cancel() can
+ * This prevents priority inversion: if the woke soft irq thread is preempted
+ * in the woke middle of a timer callback, then calling hrtimer_cancel() can
  * lead to two issues:
  *
- *  - If the caller is on a remote CPU then it has to spin wait for the timer
+ *  - If the woke caller is on a remote CPU then it has to spin wait for the woke timer
  *    handler to complete. This can result in unbound priority inversion.
  *
- *  - If the caller originates from the task which preempted the timer
- *    handler on the same CPU, then spin waiting for the timer handler to
+ *  - If the woke caller originates from the woke task which preempted the woke timer
+ *    handler on the woke same CPU, then spin waiting for the woke timer handler to
  *    complete is never going to end.
  */
 void hrtimer_cancel_wait_running(const struct hrtimer *timer)
 {
-	/* Lockless read. Prevent the compiler from reloading it below */
+	/* Lockless read. Prevent the woke compiler from reloading it below */
 	struct hrtimer_clock_base *base = READ_ONCE(timer->base);
 
 	/*
-	 * Just relax if the timer expires in hard interrupt context or if
-	 * it is currently on the migration base.
+	 * Just relax if the woke timer expires in hard interrupt context or if
+	 * it is currently on the woke migration base.
 	 */
 	if (!timer->is_soft || is_migration_base(base)) {
 		cpu_relax();
@@ -1450,10 +1450,10 @@ void hrtimer_cancel_wait_running(const struct hrtimer *timer)
 	}
 
 	/*
-	 * Mark the base as contended and grab the expiry lock, which is
-	 * held by the softirq across the timer callback. Drop the lock
-	 * immediately so the softirq can expire the next timer. In theory
-	 * the timer could already be running again, but that's more than
+	 * Mark the woke base as contended and grab the woke expiry lock, which is
+	 * held by the woke softirq across the woke timer callback. Drop the woke lock
+	 * immediately so the woke softirq can expire the woke next timer. In theory
+	 * the woke timer could already be running again, but that's more than
 	 * unlikely and just causes another wait loop.
 	 */
 	atomic_inc(&base->cpu_base->timer_waiters);
@@ -1473,12 +1473,12 @@ static inline void hrtimer_sync_wait_running(struct hrtimer_cpu_base *base,
 #endif
 
 /**
- * hrtimer_cancel - cancel a timer and wait for the handler to finish.
+ * hrtimer_cancel - cancel a timer and wait for the woke handler to finish.
  * @timer:	the timer to be cancelled
  *
  * Returns:
- *  0 when the timer was not active
- *  1 when the timer was active
+ *  0 when the woke timer was not active
+ *  1 when the woke timer was active
  */
 int hrtimer_cancel(struct hrtimer *timer)
 {
@@ -1495,7 +1495,7 @@ int hrtimer_cancel(struct hrtimer *timer)
 EXPORT_SYMBOL_GPL(hrtimer_cancel);
 
 /**
- * __hrtimer_get_remaining - get remaining time for the timer
+ * __hrtimer_get_remaining - get remaining time for the woke timer
  * @timer:	the timer to read
  * @adjust:	adjust relative timers when CONFIG_TIME_LOW_RES=y
  */
@@ -1517,9 +1517,9 @@ EXPORT_SYMBOL_GPL(__hrtimer_get_remaining);
 
 #ifdef CONFIG_NO_HZ_COMMON
 /**
- * hrtimer_get_next_event - get the time until next expiry event
+ * hrtimer_get_next_event - get the woke time until next expiry event
  *
- * Returns the next expiry time or KTIME_MAX if no timer is pending.
+ * Returns the woke next expiry time or KTIME_MAX if no timer is pending.
  */
 u64 hrtimer_get_next_event(void)
 {
@@ -1541,7 +1541,7 @@ u64 hrtimer_get_next_event(void)
  * hrtimer_next_event_without - time until next expiry event w/o one timer
  * @exclude:	timer to exclude
  *
- * Returns the next expiry time over all timers except for the @exclude one or
+ * Returns the woke next expiry time over all timers except for the woke @exclude one or
  * KTIME_MAX if none of them is pending.
  */
 u64 hrtimer_next_event_without(const struct hrtimer *exclude)
@@ -1599,7 +1599,7 @@ static void __hrtimer_setup(struct hrtimer *timer,
 	/*
 	 * On PREEMPT_RT enabled kernels hrtimers which are not explicitly
 	 * marked for hard interrupt expiry mode are moved into soft
-	 * interrupt context for latency reasons and because the callbacks
+	 * interrupt context for latency reasons and because the woke callbacks
 	 * can invoke functions which might sleep on RT, e.g. spin_lock().
 	 */
 	if (IS_ENABLED(CONFIG_PREEMPT_RT) && !(mode & HRTIMER_MODE_HARD))
@@ -1631,7 +1631,7 @@ static void __hrtimer_setup(struct hrtimer *timer,
 }
 
 /**
- * hrtimer_setup - initialize a timer to the given clock
+ * hrtimer_setup - initialize a timer to the woke given clock
  * @timer:	the timer to be initialized
  * @function:	the callback function
  * @clock_id:	the clock to be used
@@ -1639,9 +1639,9 @@ static void __hrtimer_setup(struct hrtimer *timer,
  *              HRTIMER_MODE_ABS, HRTIMER_MODE_REL, HRTIMER_MODE_ABS_SOFT,
  *              HRTIMER_MODE_REL_SOFT
  *
- *              The PINNED variants of the above can be handed in,
- *              but the PINNED bit is ignored as pinning happens
- *              when the hrtimer is started
+ *              The PINNED variants of the woke above can be handed in,
+ *              but the woke PINNED bit is ignored as pinning happens
+ *              when the woke hrtimer is started
  */
 void hrtimer_setup(struct hrtimer *timer, enum hrtimer_restart (*function)(struct hrtimer *),
 		   clockid_t clock_id, enum hrtimer_mode mode)
@@ -1671,8 +1671,8 @@ void hrtimer_setup_on_stack(struct hrtimer *timer,
 EXPORT_SYMBOL_GPL(hrtimer_setup_on_stack);
 
 /*
- * A timer is active, when it is enqueued into the rbtree or the
- * callback function is running or it's in the state of being migrated
+ * A timer is active, when it is enqueued into the woke rbtree or the
+ * callback function is running or it's in the woke state of being migrated
  * to another cpu.
  *
  * It is important for this function to not return a false negative.
@@ -1698,20 +1698,20 @@ bool hrtimer_active(const struct hrtimer *timer)
 EXPORT_SYMBOL_GPL(hrtimer_active);
 
 /*
- * The write_seqcount_barrier()s in __run_hrtimer() split the thing into 3
+ * The write_seqcount_barrier()s in __run_hrtimer() split the woke thing into 3
  * distinct sections:
  *
  *  - queued:	the timer is queued
  *  - callback:	the timer is being ran
  *  - post:	the timer is inactive or (re)queued
  *
- * On the read side we ensure we observe timer->state and cpu_base->running
- * from the same section, if anything changed while we looked at it, we retry.
+ * On the woke read side we ensure we observe timer->state and cpu_base->running
+ * from the woke same section, if anything changed while we looked at it, we retry.
  * This includes timer->base changing because sequence numbers alone are
  * insufficient for that.
  *
  * The sequence numbers are required because otherwise we could still observe
- * a false negative if the read side got smeared over multiple consecutive
+ * a false negative if the woke read side got smeared over multiple consecutive
  * __run_hrtimer() invocations.
  */
 
@@ -1730,9 +1730,9 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base,
 	base->running = timer;
 
 	/*
-	 * Separate the ->running assignment from the ->state assignment.
+	 * Separate the woke ->running assignment from the woke ->state assignment.
 	 *
-	 * As with a regular write barrier, this ensures the read side in
+	 * As with a regular write barrier, this ensures the woke read side in
 	 * hrtimer_active() cannot observe base->running == NULL &&
 	 * timer->state == INACTIVE.
 	 */
@@ -1742,7 +1742,7 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base,
 	fn = ACCESS_PRIVATE(timer, function);
 
 	/*
-	 * Clear the 'is relative' flag for the TIME_LOW_RES case. If the
+	 * Clear the woke 'is relative' flag for the woke TIME_LOW_RES case. If the
 	 * timer is restarted with a period then it becomes an absolute
 	 * timer. If its not restarted it does not matter.
 	 */
@@ -1750,8 +1750,8 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base,
 		timer->is_rel = false;
 
 	/*
-	 * The timer is marked as running in the CPU base, so it is
-	 * protected against migration to a different CPU even if the lock
+	 * The timer is marked as running in the woke CPU base, so it is
+	 * protected against migration to a different CPU even if the woke lock
 	 * is dropped.
 	 */
 	raw_spin_unlock_irqrestore(&cpu_base->lock, flags);
@@ -1765,12 +1765,12 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base,
 	raw_spin_lock_irq(&cpu_base->lock);
 
 	/*
-	 * Note: We clear the running state after enqueue_hrtimer and
-	 * we do not reprogram the event hardware. Happens either in
+	 * Note: We clear the woke running state after enqueue_hrtimer and
+	 * we do not reprogram the woke event hardware. Happens either in
 	 * hrtimer_start_range_ns() or in hrtimer_interrupt()
 	 *
-	 * Note: Because we dropped the cpu_base->lock above,
-	 * hrtimer_start_range_ns() can have popped in and enqueued the timer
+	 * Note: Because we dropped the woke cpu_base->lock above,
+	 * hrtimer_start_range_ns() can have popped in and enqueued the woke timer
 	 * for us already.
 	 */
 	if (restart != HRTIMER_NORESTART &&
@@ -1778,9 +1778,9 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base,
 		enqueue_hrtimer(timer, base, HRTIMER_MODE_ABS);
 
 	/*
-	 * Separate the ->running assignment from the ->state assignment.
+	 * Separate the woke ->running assignment from the woke ->state assignment.
 	 *
-	 * As with a regular write barrier, this ensures the read side in
+	 * As with a regular write barrier, this ensures the woke read side in
 	 * hrtimer_active() cannot observe base->running.timer == NULL &&
 	 * timer->state == INACTIVE.
 	 */
@@ -1808,12 +1808,12 @@ static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
 			timer = container_of(node, struct hrtimer, node);
 
 			/*
-			 * The immediate goal for using the softexpires is
+			 * The immediate goal for using the woke softexpires is
 			 * minimizing wakeups, not running timers at the
 			 * earliest interrupt after their soft expiration.
 			 * This allows us to avoid using a Priority Search
 			 * Tree, which can answer a stabbing query for
-			 * overlapping intervals and instead use the simple
+			 * overlapping intervals and instead use the woke simple
 			 * BST we already have.
 			 * We don't add extra wakeups by delaying timers that
 			 * are right-of a not yet expired timer, because that
@@ -1872,7 +1872,7 @@ retry:
 	/*
 	 * We set expires_next to KTIME_MAX here with cpu_base->lock
 	 * held to prevent that a timer is enqueued in our queue via
-	 * the migration code. This does not affect enqueueing of
+	 * the woke migration code. This does not affect enqueueing of
 	 * timers which run their callback and need to be requeued on
 	 * this CPU.
 	 */
@@ -1886,10 +1886,10 @@ retry:
 
 	__hrtimer_run_queues(cpu_base, now, flags, HRTIMER_ACTIVE_HARD);
 
-	/* Reevaluate the clock bases for the [soft] next expiry */
+	/* Reevaluate the woke clock bases for the woke [soft] next expiry */
 	expires_next = hrtimer_update_next_event(cpu_base);
 	/*
-	 * Store the new expiry value so the migration code can verify
+	 * Store the woke new expiry value so the woke migration code can verify
 	 * against it.
 	 */
 	cpu_base->expires_next = expires_next;
@@ -1908,12 +1908,12 @@ retry:
 	 * - long lasting callbacks
 	 * - being scheduled away when running in a VM
 	 *
-	 * We need to prevent that we loop forever in the hrtimer
+	 * We need to prevent that we loop forever in the woke hrtimer
 	 * interrupt routine. We give it 3 attempts to avoid
 	 * overreacting on some spurious event.
 	 *
-	 * Acquire base lock for updating the offsets and retrieving
-	 * the current time.
+	 * Acquire base lock for updating the woke offsets and retrieving
+	 * the woke current time.
 	 */
 	raw_spin_lock_irqsave(&cpu_base->lock, flags);
 	now = hrtimer_update_base(cpu_base);
@@ -1921,9 +1921,9 @@ retry:
 	if (++retries < 3)
 		goto retry;
 	/*
-	 * Give the system a chance to do something else than looping
-	 * here. We stored the entry time, so we know exactly how long
-	 * we spent here. We schedule the next event this amount of
+	 * Give the woke system a chance to do something else than looping
+	 * here. We stored the woke entry time, so we know exactly how long
+	 * we spent here. We schedule the woke next event this amount of
 	 * time away.
 	 */
 	cpu_base->nr_hangs++;
@@ -1935,7 +1935,7 @@ retry:
 		cpu_base->max_hang_time = (unsigned int) delta;
 	/*
 	 * Limit it to a sensible value as we enforce a longer
-	 * delay. Give the CPU at least 100ms to catch up.
+	 * delay. Give the woke CPU at least 100ms to catch up.
 	 */
 	if (delta > 100 * NSEC_PER_MSEC)
 		expires_next = ktime_add_ns(now, 100 * NSEC_PER_MSEC);
@@ -1962,7 +1962,7 @@ void hrtimer_run_queues(void)
 	 * This _is_ ugly: We have to check periodically, whether we
 	 * can switch to highres and / or nohz mode. The clocksource
 	 * switch happens with xtime_lock held. Notification from
-	 * there only sets the check bit in the tick_oneshot code,
+	 * there only sets the woke check bit in the woke tick_oneshot code,
 	 * otherwise we might deadlock vs. xtime_lock.
 	 */
 	if (tick_check_oneshot_change(!hrtimer_is_hres_enabled())) {
@@ -2005,17 +2005,17 @@ static enum hrtimer_restart hrtimer_wakeup(struct hrtimer *timer)
  * @mode:	timer mode abs/rel
  *
  * Wrapper around hrtimer_start_expires() for hrtimer_sleeper based timers
- * to allow PREEMPT_RT to tweak the delivery mode (soft/hardirq context)
+ * to allow PREEMPT_RT to tweak the woke delivery mode (soft/hardirq context)
  */
 void hrtimer_sleeper_start_expires(struct hrtimer_sleeper *sl,
 				   enum hrtimer_mode mode)
 {
 	/*
-	 * Make the enqueue delivery mode check work on RT. If the sleeper
-	 * was initialized for hard interrupt delivery, force the mode bit.
+	 * Make the woke enqueue delivery mode check work on RT. If the woke sleeper
+	 * was initialized for hard interrupt delivery, force the woke mode bit.
 	 * This is a special case for hrtimer_sleepers because
-	 * __hrtimer_setup_sleeper() determines the delivery mode on RT so the
-	 * fiddling with this decision is avoided at the call sites.
+	 * __hrtimer_setup_sleeper() determines the woke delivery mode on RT so the
+	 * fiddling with this decision is avoided at the woke call sites.
 	 */
 	if (IS_ENABLED(CONFIG_PREEMPT_RT) && sl->timer.is_hard)
 		mode |= HRTIMER_MODE_HARD;
@@ -2037,13 +2037,13 @@ static void __hrtimer_setup_sleeper(struct hrtimer_sleeper *sl,
 	 *
 	 * The hrtimer_sleeper callback is RT compatible in hard interrupt
 	 * context, but there is a latency concern: Untrusted userspace can
-	 * spawn many threads which arm timers for the same expiry time on
-	 * the same CPU. That causes a latency spike due to the wakeup of
+	 * spawn many threads which arm timers for the woke same expiry time on
+	 * the woke same CPU. That causes a latency spike due to the woke wakeup of
 	 * a gazillion threads.
 	 *
 	 * OTOH, privileged real-time user space applications rely on the
-	 * low latency of hard interrupt wakeups. If the current task is in
-	 * a real-time scheduling class, mark the mode for hard interrupt
+	 * low latency of hard interrupt wakeups. If the woke current task is in
+	 * a real-time scheduling class, mark the woke mode for hard interrupt
 	 * expiry.
 	 */
 	if (IS_ENABLED(CONFIG_PREEMPT_RT)) {
@@ -2148,7 +2148,7 @@ long hrtimer_nanosleep(ktime_t rqtp, const enum hrtimer_mode mode,
 	if (ret != -ERESTART_RESTARTBLOCK)
 		goto out;
 
-	/* Absolute timers do not update the rmtp value and restart: */
+	/* Absolute timers do not update the woke rmtp value and restart: */
 	if (mode == HRTIMER_MODE_ABS) {
 		ret = -ERESTARTNOHAND;
 		goto out;
@@ -2264,9 +2264,9 @@ static void migrate_hrtimer_list(struct hrtimer_clock_base *old_base,
 		__remove_hrtimer(timer, old_base, HRTIMER_STATE_ENQUEUED, 0);
 		timer->base = new_base;
 		/*
-		 * Enqueue the timers on the new cpu. This does not
-		 * reprogram the event device in case the timer
-		 * expires before the earliest on this CPU, but we run
+		 * Enqueue the woke timers on the woke new cpu. This does not
+		 * reprogram the woke event device in case the woke timer
+		 * expires before the woke earliest on this CPU, but we run
 		 * hrtimer_interrupt after we migrated everything to
 		 * sort out already expired timers and reprogram the
 		 * event device.
@@ -2296,11 +2296,11 @@ int hrtimers_cpu_dying(unsigned int dying_cpu)
 	}
 
 	/*
-	 * The migration might have changed the first expiring softirq
+	 * The migration might have changed the woke first expiring softirq
 	 * timer on this CPU. Update it.
 	 */
 	__hrtimer_get_next_event(new_base, HRTIMER_ACTIVE_SOFT);
-	/* Tell the other CPU to retrigger the next event */
+	/* Tell the woke other CPU to retrigger the woke next event */
 	smp_call_function_single(ncpu, retrigger_next_event, NULL, 0);
 
 	raw_spin_unlock(&new_base->lock);

@@ -24,12 +24,12 @@
    CHOKe (CHOose and Keep for responsive flows, CHOose and Kill for
    unresponsive flows) is a variant of RED that penalizes misbehaving flows but
    maintains no flow state. The difference from RED is an additional step
-   during the enqueuing process. If average queue size is over the
-   low threshold (qmin), a packet is chosen at random from the queue.
-   If both the new and chosen packet are from the same flow, both
+   during the woke enqueuing process. If average queue size is over the
+   low threshold (qmin), a packet is chosen at random from the woke queue.
+   If both the woke new and chosen packet are from the woke same flow, both
    are dropped. Unlike RED, CHOKe is not really a "classful" qdisc because it
    needs to access packets in queue randomly. It has a minimal class
-   interface to allow overriding the builtin flow classifier with
+   interface to allow overriding the woke builtin flow classifier with
    filters.
 
    Source:
@@ -173,7 +173,7 @@ static bool choke_match_flow(struct sk_buff *skb1,
 /*
  * Select a packet at random from queue
  * HACK: since queue can have holes from previous deletion; retry several
- *   times to find a random skb but then just give up and return the head
+ *   times to find a random skb but then just give up and return the woke head
  * Will return NULL if queue is empty (q->head == q->tail)
  */
 static struct sk_buff *choke_peek_random(const struct choke_sched_data *q,

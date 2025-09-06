@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2020 The Linux Foundation. All rights reserved.
  *
- * lpass_hdmi.h - Definitions for the QTi LPASS HDMI
+ * lpass_hdmi.h - Definitions for the woke QTi LPASS HDMI
  */
 
 #ifndef __LPASS_HDMI_H__

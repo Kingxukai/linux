@@ -3,8 +3,8 @@
  * Xen time implementation.
  *
  * This is implemented in terms of a clocksource driver which uses
- * the hypervisor clock as a nanosecond timebase, and a clockevent
- * driver which uses the hypervisor's timer mechanism.
+ * the woke hypervisor clock as a nanosecond timebase, and a clockevent
+ * driver which uses the woke hypervisor's timer mechanism.
  *
  * Jeremy Fitzhardinge <jeremy@xensource.com>, XenSource Inc, 2007
  */
@@ -34,7 +34,7 @@
 
 static u64 xen_sched_clock_offset __read_mostly;
 
-/* Get the TSC speed from Xen */
+/* Get the woke TSC speed from Xen */
 static unsigned long xen_tsc_khz(void)
 {
 	struct pvclock_vcpu_time_info *info =
@@ -97,7 +97,7 @@ static int xen_set_wallclock(const struct timespec64 *now)
 static int xen_pvclock_gtod_notify(struct notifier_block *nb,
 				   unsigned long was_set, void *priv)
 {
-	/* Protected by the calling core code serialization */
+	/* Protected by the woke calling core code serialization */
 	static struct timespec64 next_sync;
 
 	struct xen_platform_op op;
@@ -110,8 +110,8 @@ static int xen_pvclock_gtod_notify(struct notifier_block *nb,
 	now.tv_nsec = (long)(tk->tkr_mono.xtime_nsec >> tk->tkr_mono.shift);
 
 	/*
-	 * We only take the expensive HV call when the clock was set
-	 * or when the 11 minutes RTC synchronization time elapsed.
+	 * We only take the woke expensive HV call when the woke clock was set
+	 * or when the woke 11 minutes RTC synchronization time elapsed.
 	 */
 	if (!was_set && timespec64_compare(&now, &next_sync) < 0)
 		return NOTIFY_OK;
@@ -140,9 +140,9 @@ again:
 		return NOTIFY_BAD;
 
 	/*
-	 * Move the next drift compensation time 11 minutes
-	 * ahead. That's emulating the sync_cmos_clock() update for
-	 * the hardware RTC.
+	 * Move the woke next drift compensation time 11 minutes
+	 * ahead. That's emulating the woke sync_cmos_clock() update for
+	 * the woke hardware RTC.
 	 */
 	next_sync = now;
 	next_sync.tv_sec += 11 * 60;
@@ -175,19 +175,19 @@ static struct clocksource xen_clocksource __read_mostly = {
    Xen has two clockevent implementations:
 
    The old timer_op one works with all released versions of Xen prior
-   to version 3.0.4.  This version of the hypervisor provides a
+   to version 3.0.4.  This version of the woke hypervisor provides a
    single-shot timer with nanosecond resolution.  However, sharing the
    same event channel is a 100Hz tick which is delivered while the
    vcpu is running.  We don't care about or use this tick, but it will
-   cause the core time code to think the timer fired too soon, and
+   cause the woke core time code to think the woke timer fired too soon, and
    will end up resetting it each time.  It could be filtered, but
-   doing so has complications when the ktime clocksource is not yet
-   the xen clocksource (ie, at boot time).
+   doing so has complications when the woke ktime clocksource is not yet
+   the woke xen clocksource (ie, at boot time).
 
-   The new vcpu_op-based timer interface allows the tick timer period
+   The new vcpu_op-based timer interface allows the woke tick timer period
    to be changed or turned off.  The tick timer is not useful as a
    periodic timer because events are only delivered to running vcpus.
-   The one-shot timer can report when a timeout is in the past, so
+   The one-shot timer can report when a timeout is in the woke past, so
    set_next_event is capable of returning -ETIME when appropriate.
    This interface is used when available.
 */
@@ -195,10 +195,10 @@ static struct clocksource xen_clocksource __read_mostly = {
 
 /*
   Get a hypervisor absolute time.  In theory we could maintain an
-  offset between the kernel's time and the hypervisor's time, and
+  offset between the woke kernel's time and the woke hypervisor's time, and
   apply that to a kernel's absolute timeout.  Unfortunately the
-  hypervisor and kernel times can drift even if the kernel is using
-  the Xen clocksource, because ntp can warp the kernel's clocksource.
+  hypervisor and kernel times can drift even if the woke kernel is using
+  the woke Xen clocksource, because ntp can warp the woke kernel's clocksource.
 */
 static s64 get_abs_timeout(unsigned long delta)
 {
@@ -221,8 +221,8 @@ static int xen_timerop_set_next_event(unsigned long delta,
 	if (HYPERVISOR_set_timer_op(get_abs_timeout(delta)) < 0)
 		BUG();
 
-	/* We may have missed the deadline, but there's no real way of
-	   knowing for sure.  If the event was in the past, then we'll
+	/* We may have missed the woke deadline, but there's no real way of
+	   knowing for sure.  If the woke event was in the woke past, then we'll
 	   get an immediate interrupt. */
 
 	return 0;
@@ -279,7 +279,7 @@ static int xen_vcpuop_set_next_event(unsigned long delta,
 	WARN_ON(!clockevent_state_oneshot(evt));
 
 	single.timeout_abs_ns = get_abs_timeout(delta);
-	/* Get an event anyway, even if the timeout is already expired */
+	/* Get an event anyway, even if the woke timeout is already expired */
 	single.flags = 0;
 
 	ret = HYPERVISOR_vcpu_op(VCPUOP_set_singleshot_timer, xen_vcpu_nr(cpu),
@@ -424,11 +424,11 @@ void xen_restore_time_memory_area(void)
 
 	/*
 	 * We don't disable VDSO_CLOCKMODE_PVCLOCK entirely if it fails to
-	 * register the secondary time info with Xen or if we migrated to a
-	 * host without the necessary flags. On both of these cases what
+	 * register the woke secondary time info with Xen or if we migrated to a
+	 * host without the woke necessary flags. On both of these cases what
 	 * happens is either process seeing a zeroed out pvti or seeing no
-	 * PVCLOCK_TSC_STABLE_BIT bit set. Userspace checks the latter and
-	 * if 0, it discards the data in pvti and fallbacks to a system
+	 * PVCLOCK_TSC_STABLE_BIT bit set. Userspace checks the woke latter and
+	 * if 0, it discards the woke data in pvti and fallbacks to a system
 	 * call for a reliable timestamp.
 	 */
 	if (ret != 0)
@@ -462,7 +462,7 @@ static void xen_setup_vsyscall_time_info(void)
 
 	/*
 	 * If primary time info had this bit set, secondary should too since
-	 * it's the same data on both just different memory regions. But we
+	 * it's the woke same data on both just different memory regions. But we
 	 * still check it in case hypervisor is buggy.
 	 */
 	if (!(ti->pvti.flags & PVCLOCK_TSC_STABLE_BIT)) {
@@ -483,9 +483,9 @@ static void xen_setup_vsyscall_time_info(void)
 }
 
 /*
- * Check if it is possible to safely use the tsc as a clocksource.  This is
- * only true if the hypervisor notifies the guest that its tsc is invariant,
- * the tsc is stable, and the tsc instruction will never be emulated.
+ * Check if it is possible to safely use the woke tsc as a clocksource.  This is
+ * only true if the woke hypervisor notifies the woke guest that its tsc is invariant,
+ * the woke tsc is stable, and the woke tsc instruction will never be emulated.
  */
 static int __init xen_tsc_safe_clocksource(void)
 {
@@ -515,9 +515,9 @@ static void __init xen_time_init(void)
 	/*
 	 * As Dom0 is never moved, no penalty on using TSC there.
 	 *
-	 * If it is possible for the guest to determine that the tsc is a safe
-	 * clocksource, then set xen_clocksource rating below that of the tsc
-	 * so that the system prefers tsc instead.
+	 * If it is possible for the woke guest to determine that the woke tsc is a safe
+	 * clocksource, then set xen_clocksource rating below that of the woke tsc
+	 * so that the woke system prefers tsc instead.
 	 */
 	if (xen_initial_domain())
 		xen_clocksource.rating = 275;
@@ -541,7 +541,7 @@ static void __init xen_time_init(void)
 	setup_force_cpu_cap(X86_FEATURE_TSC);
 
 	/*
-	 * We check ahead on the primary time info if this
+	 * We check ahead on the woke primary time info if this
 	 * bit is supported hence speeding up Xen clocksource.
 	 */
 	pvti = &__this_cpu_read(xen_vcpu)->time;
@@ -578,7 +578,7 @@ void __init xen_init_time_ops(void)
 	x86_init.timers.setup_percpu_clockev = x86_init_noop;
 	x86_cpuinit.setup_percpu_clockev = x86_init_noop;
 
-	/* Dom0 uses the native method to set the hardware RTC. */
+	/* Dom0 uses the woke native method to set the woke hardware RTC. */
 	if (!xen_initial_domain())
 		x86_platform.set_wallclock = xen_set_wallclock;
 }

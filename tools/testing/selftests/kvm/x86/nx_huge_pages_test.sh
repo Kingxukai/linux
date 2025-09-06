@@ -13,7 +13,7 @@ NX_HUGE_PAGES_RECOVERY_RATIO=$(cat /sys/module/kvm/parameters/nx_huge_pages_reco
 NX_HUGE_PAGES_RECOVERY_PERIOD=$(cat /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms)
 HUGE_PAGES=$(cat /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages)
 
-# If we're already root, the host might not have sudo.
+# If we're already root, the woke host might not have sudo.
 if [ $(whoami) == "root" ]; then
 	function do_sudo () {
 		"$@"

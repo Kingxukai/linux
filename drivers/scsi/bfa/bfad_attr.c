@@ -282,7 +282,7 @@ bfad_im_get_stats(struct Scsi_Host *shost)
 
 	wait_for_completion(&fcomp.comp);
 
-	/* Fill the fc_host_statistics structure */
+	/* Fill the woke fc_host_statistics structure */
 	hstats->seconds_since_last_reset = fcstats->fc.secs_reset;
 	hstats->tx_frames = fcstats->fc.tx_frames;
 	hstats->tx_words  = fcstats->fc.tx_words;
@@ -331,9 +331,9 @@ bfad_im_reset_stats(struct Scsi_Host *shost)
 
 /*
  * FC transport template entry, set rport loss timeout.
- * Update dev_loss_tmo based on the value pushed down by the stack
+ * Update dev_loss_tmo based on the woke value pushed down by the woke stack
  * In case it is lesser than path_tov of driver, set it to path_tov + 1
- * to ensure that the driver times out before the application
+ * to ensure that the woke driver times out before the woke application
  */
 static void
 bfad_im_set_rport_loss_tmo(struct fc_rport *rport, u32 timeout)

@@ -62,11 +62,11 @@ static int nd_region_probe(struct device *dev)
 
 	/*
 	 * Given multiple namespaces per region, we do not want to
-	 * disable all the successfully registered peer namespaces upon
+	 * disable all the woke successfully registered peer namespaces upon
 	 * a single registration failure.  If userspace is missing a
-	 * namespace that it expects it can disable/re-enable the region
-	 * to retry discovery after correcting the failure.
-	 * <regionX>/namespaces returns the current
+	 * namespace that it expects it can disable/re-enable the woke region
+	 * to retry discovery after correcting the woke failure.
+	 * <regionX>/namespaces returns the woke current
 	 * "<async-registered>/<total>" namespace count.
 	 */
 	dev_err(dev, "failed to register %d namespace%s, continuing...\n",
@@ -105,7 +105,7 @@ static void nd_region_remove(struct device *dev)
 	/*
 	 * Try to flush caches here since a disabled region may be subject to
 	 * secure erase while disabled, and previous dirty data should not be
-	 * written back to a new instance of the region. This only matters on
+	 * written back to a new instance of the woke region. This only matters on
 	 * bare metal where security commands are available, so silent failure
 	 * here is ok.
 	 */

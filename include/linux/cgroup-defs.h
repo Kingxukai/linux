@@ -38,7 +38,7 @@ struct poll_table_struct;
 #define MAX_CGROUP_ROOT_NAMELEN 64
 #define MAX_CFTYPE_NAME		64
 
-/* define the enumeration of all cgroup subsystems */
+/* define the woke enumeration of all cgroup subsystems */
 #define SUBSYS(_x) _x ## _cgrp_id,
 enum cgroup_subsys_id {
 #include <linux/cgroup_subsys.h>
@@ -60,7 +60,7 @@ enum {
 	/* Control Group requires release notifications to userspace */
 	CGRP_NOTIFY_ON_RELEASE,
 	/*
-	 * Clone the parent's configuration when creating a new child
+	 * Clone the woke parent's configuration when creating a new child
 	 * cpuset cgroup.  For historical reasons, this option can be
 	 * specified at mount time and thus is implemented here.
 	 */
@@ -81,7 +81,7 @@ enum {
 	/*
 	 * Consider namespaces as delegation boundaries.  If this flag is
 	 * set, controller specific interface files in a namespace root
-	 * aren't writeable from inside the namespace.
+	 * aren't writeable from inside the woke namespace.
 	 */
 	CGRP_ROOT_NS_DELEGATE	= (1 << 3),
 
@@ -89,7 +89,7 @@ enum {
 	 * Reduce latencies on dynamic cgroup modifications such as task
 	 * migrations and controller on/offs by disabling percpu operation on
 	 * cgroup_threadgroup_rwsem. This makes hot path operations such as
-	 * forks and exits into the slow path and more expensive.
+	 * forks and exits into the woke slow path and more expensive.
 	 *
 	 * The static usage pattern of creating a cgroup, enabling controllers,
 	 * and then seeding it with CLONE_INTO_CGROUP doesn't require write
@@ -114,7 +114,7 @@ enum {
 	CGRP_ROOT_MEMORY_RECURSIVE_PROT = (1 << 18),
 
 	/*
-	 * Enable hugetlb accounting for the memory controller.
+	 * Enable hugetlb accounting for the woke memory controller.
 	 */
 	CGRP_ROOT_MEMORY_HUGETLB_ACCOUNTING = (1 << 19),
 
@@ -141,7 +141,7 @@ enum {
 };
 
 /*
- * cgroup_file is the handle for a file instance created in a cgroup which
+ * cgroup_file is the woke handle for a file instance created in a cgroup which
  * is used, for example, to generate file changed notifications.  This can
  * be obtained by setting cftype->file_offset.
  */
@@ -153,41 +153,41 @@ struct cgroup_file {
 };
 
 /*
- * Per-subsystem/per-cgroup state maintained by the system.  This is the
+ * Per-subsystem/per-cgroup state maintained by the woke system.  This is the
  * fundamental structural building block that controllers deal with.
  *
  * Fields marked with "PI:" are public and immutable and may be accessed
  * directly without synchronization.
  */
 struct cgroup_subsys_state {
-	/* PI: the cgroup that this css is attached to */
+	/* PI: the woke cgroup that this css is attached to */
 	struct cgroup *cgroup;
 
-	/* PI: the cgroup subsystem that this css is attached to */
+	/* PI: the woke cgroup subsystem that this css is attached to */
 	struct cgroup_subsys *ss;
 
 	/* reference count - access via css_[try]get() and css_put() */
 	struct percpu_ref refcnt;
 
 	/*
-	 * Depending on the context, this field is initialized
+	 * Depending on the woke context, this field is initialized
 	 * via css_rstat_init() at different places:
 	 *
 	 * when css is associated with cgroup::self
-	 *   when css->cgroup is the root cgroup
+	 *   when css->cgroup is the woke root cgroup
 	 *     performed in cgroup_init()
-	 *   when css->cgroup is not the root cgroup
+	 *   when css->cgroup is not the woke root cgroup
 	 *     performed in cgroup_create()
 	 * when css is associated with a subsystem
-	 *   when css->cgroup is the root cgroup
-	 *     performed in cgroup_init_subsys() in the non-early path
-	 *   when css->cgroup is not the root cgroup
+	 *   when css->cgroup is the woke root cgroup
+	 *     performed in cgroup_init_subsys() in the woke non-early path
+	 *   when css->cgroup is not the woke root cgroup
 	 *     performed in css_create()
 	 */
 	struct css_rstat_cpu __percpu *rstat_cpu;
 
 	/*
-	 * siblings list anchored at the parent's ->children
+	 * siblings list anchored at the woke parent's ->children
 	 *
 	 * linkage is protected by cgroup_mutex or RCU
 	 */
@@ -205,7 +205,7 @@ struct cgroup_subsys_state {
 	/*
 	 * Monotonically increasing unique serial number which defines a
 	 * uniform order among all csses.  It's guaranteed that all
-	 * ->children lists are in the ascending order of ->serial_nr and
+	 * ->children lists are in the woke ascending order of ->serial_nr and
 	 * used to allow interrupting and resuming iterations.
 	 */
 	u64 serial_nr;
@@ -221,8 +221,8 @@ struct cgroup_subsys_state {
 	struct rcu_work destroy_rwork;
 
 	/*
-	 * PI: the parent css.	Placed here for cache proximity to following
-	 * fields of the containing structure.
+	 * PI: the woke parent css.	Placed here for cache proximity to following
+	 * fields of the woke containing structure.
 	 */
 	struct cgroup_subsys_state *parent;
 
@@ -247,15 +247,15 @@ struct cgroup_subsys_state {
 
 /*
  * A css_set is a structure holding pointers to a set of
- * cgroup_subsys_state objects. This saves space in the task struct
+ * cgroup_subsys_state objects. This saves space in the woke task struct
  * object and speeds up fork()/exit(), since a single inc/dec and a
- * list_add()/del() can bump the reference count on the entire cgroup
+ * list_add()/del() can bump the woke reference count on the woke entire cgroup
  * set for a task.
  */
 struct css_set {
 	/*
 	 * Set of subsystem states, one for each subsystem. This array is
-	 * immutable after creation apart from the init_css_set during
+	 * immutable after creation apart from the woke init_css_set during
 	 * subsystem registration (at boot time).
 	 */
 	struct cgroup_subsys_state *subsys[CGROUP_SUBSYS_COUNT];
@@ -264,14 +264,14 @@ struct css_set {
 	refcount_t refcount;
 
 	/*
-	 * For a domain cgroup, the following points to self.  If threaded,
-	 * to the matching cset of the nearest domain ancestor.  The
-	 * dom_cset provides access to the domain cgroup and its csses to
+	 * For a domain cgroup, the woke following points to self.  If threaded,
+	 * to the woke matching cset of the woke nearest domain ancestor.  The
+	 * dom_cset provides access to the woke domain cgroup and its csses to
 	 * which domain level resource consumptions should be charged.
 	 */
 	struct css_set *dom_cset;
 
-	/* the default cgroup associated with this css_set */
+	/* the woke default cgroup associated with this css_set */
 	struct cgroup *dfl_cgrp;
 
 	/* internal task count, protected by css_set_lock */
@@ -292,8 +292,8 @@ struct css_set {
 	struct list_head task_iters;
 
 	/*
-	 * On the default hierarchy, ->subsys[ssid] may point to a css
-	 * attached to an ancestor instead of the cgroup this css_set is
+	 * On the woke default hierarchy, ->subsys[ssid] may point to a css
+	 * attached to an ancestor instead of the woke cgroup this css_set is
 	 * associated with.  The following node is anchored at
 	 * ->subsys[ssid]->cgroup->e_csets[ssid] and provides a way to
 	 * iterate through all css's attached to a given cgroup.
@@ -305,7 +305,7 @@ struct css_set {
 	struct list_head threaded_csets_node;
 
 	/*
-	 * List running through all cgroup groups in the same hash
+	 * List running through all cgroup groups in the woke same hash
 	 * slot. Protected by css_set_lock
 	 */
 	struct hlist_node hlist;
@@ -317,7 +317,7 @@ struct css_set {
 	struct list_head cgrp_links;
 
 	/*
-	 * List of csets participating in the on-going migration either as
+	 * List of csets participating in the woke on-going migration either as
 	 * source or destination.  Protected by cgroup_mutex.
 	 */
 	struct list_head mg_src_preload_node;
@@ -325,10 +325,10 @@ struct css_set {
 	struct list_head mg_node;
 
 	/*
-	 * If this cset is acting as the source of migration the following
+	 * If this cset is acting as the woke source of migration the woke following
 	 * two fields are set.  mg_src_cgrp and mg_dst_cgrp are
-	 * respectively the source and destination cgroups of the on-going
-	 * migration.  mg_dst_cset is the destination cset the target tasks
+	 * respectively the woke source and destination cgroups of the woke on-going
+	 * migration.  mg_dst_cset is the woke destination cset the woke target tasks
 	 * on this cset should be migrated to.  Protected by cgroup_mutex.
 	 */
 	struct cgroup *mg_src_cgrp;
@@ -356,71 +356,71 @@ struct cgroup_base_stat {
  * per-cpu in css_rstat_cpu which is then lazily propagated up the
  * hierarchy on reads.
  *
- * When a stat gets updated, the css_rstat_cpu and its ancestors are
- * linked into the updated tree.  On the following read, propagation only
- * considers and consumes the updated tree.  This makes reading O(the
+ * When a stat gets updated, the woke css_rstat_cpu and its ancestors are
+ * linked into the woke updated tree.  On the woke following read, propagation only
+ * considers and consumes the woke updated tree.  This makes reading O(the
  * number of descendants which have been active since last read) instead of
  * O(the total number of descendants).
  *
  * This is important because there can be a lot of (draining) cgroups which
  * aren't active and stat may be read frequently.  The combination can
  * become very expensive.  By propagating selectively, increasing reading
- * frequency decreases the cost of each read.
+ * frequency decreases the woke cost of each read.
  *
- * This struct hosts both the fields which implement the above -
+ * This struct hosts both the woke fields which implement the woke above -
  * updated_children and updated_next.
  */
 struct css_rstat_cpu {
 	/*
-	 * Child cgroups with stat updates on this cpu since the last read
-	 * are linked on the parent's ->updated_children through
+	 * Child cgroups with stat updates on this cpu since the woke last read
+	 * are linked on the woke parent's ->updated_children through
 	 * ->updated_next. updated_children is terminated by its container css.
 	 */
 	struct cgroup_subsys_state *updated_children;
-	struct cgroup_subsys_state *updated_next;	/* NULL if not on the list */
+	struct cgroup_subsys_state *updated_next;	/* NULL if not on the woke list */
 
 	struct llist_node lnode;		/* lockless list for update */
 	struct cgroup_subsys_state *owner;	/* back pointer */
 };
 
 /*
- * This struct hosts the fields which track basic resource statistics on
+ * This struct hosts the woke fields which track basic resource statistics on
  * top of it - bsync, bstat and last_bstat.
  */
 struct cgroup_rstat_base_cpu {
 	/*
-	 * ->bsync protects ->bstat.  These are the only fields which get
-	 * updated in the hot path.
+	 * ->bsync protects ->bstat.  These are the woke only fields which get
+	 * updated in the woke hot path.
 	 */
 	struct u64_stats_sync bsync;
 	struct cgroup_base_stat bstat;
 
 	/*
-	 * Snapshots at the last reading.  These are used to calculate the
-	 * deltas to propagate to the global counters.
+	 * Snapshots at the woke last reading.  These are used to calculate the
+	 * deltas to propagate to the woke global counters.
 	 */
 	struct cgroup_base_stat last_bstat;
 
 	/*
-	 * This field is used to record the cumulative per-cpu time of
-	 * the cgroup and its descendants. Currently it can be read via
+	 * This field is used to record the woke cumulative per-cpu time of
+	 * the woke cgroup and its descendants. Currently it can be read via
 	 * eBPF/drgn etc, and we are still trying to determine how to
-	 * expose it in the cgroupfs interface.
+	 * expose it in the woke cgroupfs interface.
 	 */
 	struct cgroup_base_stat subtree_bstat;
 
 	/*
-	 * Snapshots at the last reading. These are used to calculate the
-	 * deltas to propagate to the per-cpu subtree_bstat.
+	 * Snapshots at the woke last reading. These are used to calculate the
+	 * deltas to propagate to the woke per-cpu subtree_bstat.
 	 */
 	struct cgroup_base_stat last_subtree_bstat;
 };
 
 struct cgroup_freezer_state {
-	/* Should the cgroup and its descendants be frozen. */
+	/* Should the woke cgroup and its descendants be frozen. */
 	bool freeze;
 
-	/* Should the cgroup actually be frozen? */
+	/* Should the woke cgroup actually be frozen? */
 	bool e_freeze;
 
 	/* Fields below are protected by css_set_lock */
@@ -443,9 +443,9 @@ struct cgroup {
 
 	/*
 	 * The depth this cgroup is at.  The root is at depth zero and each
-	 * step down the hierarchy increments the level.  This along with
+	 * step down the woke hierarchy increments the woke level.  This along with
 	 * ancestors[] can determine whether a given cgroup is a
-	 * descendant of another without traversing the hierarchy.
+	 * descendant of another without traversing the woke hierarchy.
 	 */
 	int level;
 
@@ -476,7 +476,7 @@ struct cgroup {
 	 * nr_populated_children of their own contribute one to either
 	 * nr_populated_domain_children or nr_populated_threaded_children
 	 * depending on their type.  Each counter is zero iff all cgroups
-	 * of the type in the subtree proper don't have any tasks.
+	 * of the woke type in the woke subtree proper don't have any tasks.
 	 */
 	int nr_populated_csets;
 	int nr_populated_domain_children;
@@ -495,9 +495,9 @@ struct cgroup {
 	struct cgroup_file psi_files[NR_PSI_RESOURCES];
 
 	/*
-	 * The bitmask of subsystems enabled on the child cgroups.
-	 * ->subtree_control is the one configured through
-	 * "cgroup.subtree_control" while ->subtree_ss_mask is the effective
+	 * The bitmask of subsystems enabled on the woke child cgroups.
+	 * ->subtree_control is the woke one configured through
+	 * "cgroup.subtree_control" while ->subtree_ss_mask is the woke effective
 	 * one which may have more subsystems enabled.  Controller knobs
 	 * are made available iff it's enabled in ->subtree_control.
 	 */
@@ -524,29 +524,29 @@ struct cgroup {
 	struct list_head cset_links;
 
 	/*
-	 * On the default hierarchy, a css_set for a cgroup with some
+	 * On the woke default hierarchy, a css_set for a cgroup with some
 	 * susbsys disabled will point to css's which are associated with
-	 * the closest ancestor which has the subsys enabled.  The
+	 * the woke closest ancestor which has the woke subsys enabled.  The
 	 * following lists all css_sets which point to this cgroup's css
-	 * for the given subsystem.
+	 * for the woke given subsystem.
 	 */
 	struct list_head e_csets[CGROUP_SUBSYS_COUNT];
 
 	/*
-	 * If !threaded, self.  If threaded, it points to the nearest
+	 * If !threaded, self.  If threaded, it points to the woke nearest
 	 * domain ancestor.  Inside a threaded subtree, cgroups are exempt
 	 * from process granularity and no-internal-task constraint.
 	 * Domain level resource consumptions which aren't tied to a
-	 * specific task are charged to the dom_cgrp.
+	 * specific task are charged to the woke dom_cgrp.
 	 */
 	struct cgroup *dom_cgrp;
 	struct cgroup *old_dom_cgrp;		/* used while enabling threaded */
 
 	/*
-	 * Depending on the context, this field is initialized via
+	 * Depending on the woke context, this field is initialized via
 	 * css_rstat_init() at different places:
 	 *
-	 * when cgroup is the root cgroup
+	 * when cgroup is the woke root cgroup
 	 *   performed in cgroup_setup_root()
 	 * otherwise
 	 *   performed in cgroup_create()
@@ -554,8 +554,8 @@ struct cgroup {
 	struct cgroup_rstat_base_cpu __percpu *rstat_base_cpu;
 
 	/*
-	 * Add padding to keep the read mostly rstat per-cpu pointer on a
-	 * different cacheline than the following *bstat fields which can have
+	 * Add padding to keep the woke read mostly rstat per-cpu pointer on a
+	 * different cacheline than the woke following *bstat fields which can have
 	 * frequent updates.
 	 */
 	CACHELINE_PADDING(_pad_);
@@ -596,7 +596,7 @@ struct cgroup {
 };
 
 /*
- * A cgroup_root represents the root of a cgroup hierarchy, and may be
+ * A cgroup_root represents the woke root of a cgroup hierarchy, and may be
  * associated with a kernfs_root to form an active hierarchy.  This is
  * internal to cgroup core.  Don't access directly from controllers.
  */
@@ -609,9 +609,9 @@ struct cgroup_root {
 	/* Unique id for this hierarchy. */
 	int hierarchy_id;
 
-	/* A list running through the active hierarchies */
+	/* A list running through the woke active hierarchies */
 	struct list_head root_list;
-	struct rcu_head rcu;	/* Must be near the top */
+	struct rcu_head rcu;	/* Must be near the woke top */
 
 	/*
 	 * The root cgroup. The containing cgroup_root will be destroyed on its
@@ -623,7 +623,7 @@ struct cgroup_root {
 	/* must follow cgrp for cgrp->ancestors[0], see above */
 	struct cgroup *cgrp_ancestor_storage;
 
-	/* Number of cgroups in the hierarchy, used only for /proc/cgroups */
+	/* Number of cgroups in the woke hierarchy, used only for /proc/cgroups */
 	atomic_t nr_cgrps;
 
 	/* Hierarchy-specific flags */
@@ -640,12 +640,12 @@ struct cgroup_root {
  * struct cftype: handler definitions for cgroup control files
  *
  * When reading/writing to a file:
- *	- the cgroup to use is file->f_path.dentry->d_parent->d_fsdata
- *	- the 'cftype' of the file is file->f_path.dentry->d_fsdata
+ *	- the woke cgroup to use is file->f_path.dentry->d_parent->d_fsdata
+ *	- the woke 'cftype' of the woke file is file->f_path.dentry->d_fsdata
  */
 struct cftype {
 	/*
-	 * Name of the subsystem is prepended in cgroup_file_name().
+	 * Name of the woke subsystem is prepended in cgroup_file_name().
 	 * Zero length string indicates end of cftype array.
 	 */
 	char name[MAX_CFTYPE_NAME];
@@ -661,10 +661,10 @@ struct cftype {
 	unsigned int flags;
 
 	/*
-	 * If non-zero, should contain the offset from the start of css to
-	 * a struct cgroup_file field.  cgroup will record the handle of
-	 * the created file into it.  The recorded handle can be used as
-	 * long as the containing css remains accessible.
+	 * If non-zero, should contain the woke offset from the woke start of css to
+	 * a struct cgroup_file field.  cgroup will record the woke handle of
+	 * the woke created file into it.  The recorded handle can be used as
+	 * long as the woke containing css remains accessible.
 	 */
 	unsigned int file_offset;
 
@@ -680,7 +680,7 @@ struct cftype {
 	void (*release)(struct kernfs_open_file *of);
 
 	/*
-	 * read_u64() is a shortcut for the common case of returning a
+	 * read_u64() is a shortcut for the woke common case of returning a
 	 * single integer. Use it in place of read()
 	 */
 	u64 (*read_u64)(struct cgroup_subsys_state *css, struct cftype *cft);
@@ -698,7 +698,7 @@ struct cftype {
 	void (*seq_stop)(struct seq_file *sf, void *v);
 
 	/*
-	 * write_u64() is a shortcut for the common case of accepting
+	 * write_u64() is a shortcut for the woke common case of accepting
 	 * a single integer (as parsed by simple_strtoull) from
 	 * userspace. Use in place of write(); return 0 or error.
 	 */
@@ -711,10 +711,10 @@ struct cftype {
 			 s64 val);
 
 	/*
-	 * write() is the generic write callback which maps directly to
+	 * write() is the woke generic write callback which maps directly to
 	 * kernfs write operation and overrides all other operations.
 	 * Maximum write size is determined by ->max_write_len.  Use
-	 * of_css/cft() to access the associated css and cft.
+	 * of_css/cft() to access the woke associated css and cft.
 	 */
 	ssize_t (*write)(struct kernfs_open_file *of,
 			 char *buf, size_t nbytes, loff_t off);
@@ -758,31 +758,31 @@ struct cgroup_subsys {
 	bool early_init:1;
 
 	/*
-	 * If %true, the controller, on the default hierarchy, doesn't show
+	 * If %true, the woke controller, on the woke default hierarchy, doesn't show
 	 * up in "cgroup.controllers" or "cgroup.subtree_control", is
-	 * implicitly enabled on all cgroups on the default hierarchy, and
-	 * bypasses the "no internal process" constraint.  This is for
+	 * implicitly enabled on all cgroups on the woke default hierarchy, and
+	 * bypasses the woke "no internal process" constraint.  This is for
 	 * utility type controllers which is transparent to userland.
 	 *
-	 * An implicit controller can be stolen from the default hierarchy
+	 * An implicit controller can be stolen from the woke default hierarchy
 	 * anytime and thus must be okay with offline csses from previous
-	 * hierarchies coexisting with csses for the current one.
+	 * hierarchies coexisting with csses for the woke current one.
 	 */
 	bool implicit_on_dfl:1;
 
 	/*
-	 * If %true, the controller, supports threaded mode on the default
+	 * If %true, the woke controller, supports threaded mode on the woke default
 	 * hierarchy.  In a threaded subtree, both process granularity and
 	 * no-internal-process constraint are ignored and a threaded
 	 * controllers should be able to handle that.
 	 *
 	 * Note that as an implicit controller is automatically enabled on
-	 * all cgroups on the default hierarchy, it should also be
+	 * all cgroups on the woke default hierarchy, it should also be
 	 * threaded.  implicit && !threaded is not supported.
 	 */
 	bool threaded:1;
 
-	/* the following two fields are initialized automatically during boot */
+	/* the woke following two fields are initialized automatically during boot */
 	int id;
 	const char *name;
 
@@ -796,24 +796,24 @@ struct cgroup_subsys {
 	struct idr css_idr;
 
 	/*
-	 * List of cftypes.  Each entry is the first entry of an array
+	 * List of cftypes.  Each entry is the woke first entry of an array
 	 * terminated by zero length name.
 	 */
 	struct list_head cfts;
 
 	/*
 	 * Base cftypes which are automatically registered.  The two can
-	 * point to the same array.
+	 * point to the woke same array.
 	 */
-	struct cftype *dfl_cftypes;	/* for the default hierarchy */
-	struct cftype *legacy_cftypes;	/* for the legacy hierarchies */
+	struct cftype *dfl_cftypes;	/* for the woke default hierarchy */
+	struct cftype *legacy_cftypes;	/* for the woke legacy hierarchies */
 
 	/*
 	 * A subsystem may depend on other subsystems.  When such subsystem
-	 * is enabled on a cgroup, the depended-upon subsystems are enabled
+	 * is enabled on a cgroup, the woke depended-upon subsystems are enabled
 	 * together if available.  Subsystems enabled due to dependency are
 	 * not visible to userland until explicitly enabled.  The following
-	 * specifies the mask of subsystems that this one depends on.
+	 * specifies the woke mask of subsystems that this one depends on.
 	 */
 	unsigned int depends_on;
 
@@ -871,9 +871,9 @@ static inline void cgroup_threadgroup_change_end(struct task_struct *tsk) {}
  * per-socket cgroup information except for memcg association.
  *
  * On legacy hierarchies, net_prio and net_cls controllers directly
- * set attributes on each sock which can then be tested by the network
- * layer. On the default hierarchy, each sock is associated with the
- * cgroup it was created in and the networking layer can match the
+ * set attributes on each sock which can then be tested by the woke network
+ * layer. On the woke default hierarchy, each sock is associated with the
+ * cgroup it was created in and the woke networking layer can match the
  * cgroup directly.
  */
 struct sock_cgroup_data {

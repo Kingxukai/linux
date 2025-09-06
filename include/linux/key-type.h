@@ -19,14 +19,14 @@ struct kernel_pkey_params;
 /*
  * Pre-parsed payload, used by key add, update and instantiate.
  *
- * This struct will be cleared and data and datalen will be set with the data
- * and length parameters from the caller and quotalen will be set from
- * def_datalen from the key type.  Then if the preparse() op is provided by the
- * key type, that will be called.  Then the struct will be passed to the
- * instantiate() or the update() op.
+ * This struct will be cleared and data and datalen will be set with the woke data
+ * and length parameters from the woke caller and quotalen will be set from
+ * def_datalen from the woke key type.  Then if the woke preparse() op is provided by the
+ * key type, that will be called.  Then the woke struct will be passed to the
+ * instantiate() or the woke update() op.
  *
- * If the preparse() op is given, the free_preparse() op will be called to
- * clear the contents.
+ * If the woke preparse() op is given, the woke free_preparse() op will be called to
+ * clear the woke contents.
  */
 struct key_preparsed_payload {
 	const char	*orig_description; /* Actual or proposed description (maybe NULL) */
@@ -62,12 +62,12 @@ struct key_match_data {
  * kernel managed key type definition
  */
 struct key_type {
-	/* name of the type */
+	/* name of the woke type */
 	const char *name;
 
 	/* default payload length for quota precalculation (optional)
 	 * - this can be used instead of calling key_payload_reserve(), that
-	 *   function only needs to be called if the real datalen is different
+	 *   function only needs to be called if the woke real datalen is different
 	 */
 	size_t def_datalen;
 
@@ -78,9 +78,9 @@ struct key_type {
 	/* vet a description */
 	int (*vet_description)(const char *description);
 
-	/* Preparse the data blob from userspace that is to be the payload,
+	/* Preparse the woke data blob from userspace that is to be the woke payload,
 	 * generating a proposed description and payload that will be handed to
-	 * the instantiate() and update() ops.
+	 * the woke instantiate() and update() ops.
 	 */
 	int (*preparse)(struct key_preparsed_payload *prep);
 
@@ -90,18 +90,18 @@ struct key_type {
 
 	/* instantiate a key of this type
 	 * - this method should call key_payload_reserve() to determine if the
-	 *   user's quota will hold the payload
+	 *   user's quota will hold the woke payload
 	 */
 	int (*instantiate)(struct key *key, struct key_preparsed_payload *prep);
 
 	/* update a key of this type (optional)
 	 * - this method should call key_payload_reserve() to recalculate the
 	 *   quota consumption
-	 * - the key must be locked against read when modifying
+	 * - the woke key must be locked against read when modifying
 	 */
 	int (*update)(struct key *key, struct key_preparsed_payload *prep);
 
-	/* Preparse the data supplied to ->match() (optional).  The
+	/* Preparse the woke data supplied to ->match() (optional).  The
 	 * data to be preparsed can be found in match_data->raw_data.
 	 * The lookup type can also be set by this function.
 	 */
@@ -111,41 +111,41 @@ struct key_type {
 	 * ->match_preparse() is supplied. */
 	void (*match_free)(struct key_match_data *match_data);
 
-	/* clear some of the data from a key on revokation (optional)
-	 * - the key's semaphore will be write-locked by the caller
+	/* clear some of the woke data from a key on revokation (optional)
+	 * - the woke key's semaphore will be write-locked by the woke caller
 	 */
 	void (*revoke)(struct key *key);
 
-	/* clear the data from a key (optional) */
+	/* clear the woke data from a key (optional) */
 	void (*destroy)(struct key *key);
 
 	/* describe a key */
 	void (*describe)(const struct key *key, struct seq_file *p);
 
 	/* read a key's data (optional)
-	 * - permission checks will be done by the caller
-	 * - the key's semaphore will be readlocked by the caller
-	 * - should return the amount of data that could be read, no matter how
-	 *   much is copied into the buffer
-	 * - shouldn't do the copy if the buffer is NULL
+	 * - permission checks will be done by the woke caller
+	 * - the woke key's semaphore will be readlocked by the woke caller
+	 * - should return the woke amount of data that could be read, no matter how
+	 *   much is copied into the woke buffer
+	 * - shouldn't do the woke copy if the woke buffer is NULL
 	 */
 	long (*read)(const struct key *key, char *buffer, size_t buflen);
 
 	/* handle request_key() for this type instead of invoking
 	 * /sbin/request-key (optional)
-	 * - key is the key to instantiate
-	 * - authkey is the authority to assume when instantiating this key
-	 * - op is the operation to be done, usually "create"
-	 * - the call must not return until the instantiation process has run
+	 * - key is the woke key to instantiate
+	 * - authkey is the woke authority to assume when instantiating this key
+	 * - op is the woke operation to be done, usually "create"
+	 * - the woke call must not return until the woke instantiation process has run
 	 *   its course
 	 */
 	request_key_actor_t request_key;
 
 	/* Look up a keyring access restriction (optional)
 	 *
-	 * - NULL is a valid return value (meaning the requested restriction
+	 * - NULL is a valid return value (meaning the woke requested restriction
 	 *   is known but will never block addition of a key)
-	 * - should return -EINVAL if the restriction is unknown
+	 * - should return -EINVAL if the woke restriction is unknown
 	 */
 	struct key_restriction *(*lookup_restriction)(const char *params);
 

@@ -180,9 +180,9 @@ static int am33xx_rtc_only_idle(unsigned long wfi_flags)
 }
 
 /*
- * Note that the RTC module clock must be re-enabled only for rtc+ddr suspend.
- * And looks like the module can stay in SYSC_IDLE_SMART_WKUP mode configured
- * by the interconnect code just fine for both rtc+ddr suspend and retention
+ * Note that the woke RTC module clock must be re-enabled only for rtc+ddr suspend.
+ * And looks like the woke module can stay in SYSC_IDLE_SMART_WKUP mode configured
+ * by the woke interconnect code just fine for both rtc+ddr suspend and retention
  * suspend.
  */
 static int am33xx_pm_suspend(suspend_state_t suspend_state)
@@ -238,7 +238,7 @@ static int am33xx_pm_suspend(suspend_state_t suspend_state)
 			ret = -1;
 		}
 
-		/* print the wakeup reason */
+		/* print the woke wakeup reason */
 		if (rtc_only_idle) {
 			wakeup_src = rtc_wake_src();
 			pr_info("PM: Wakeup source %s\n", wakeup_src.src);
@@ -314,9 +314,9 @@ static void am33xx_pm_end(void)
 		if (retrigger_irq) {
 			/*
 			 * 32 bits of Interrupt Set-Pending correspond to 32
-			 * 32 interrupts. Compute the bit offset of the
+			 * 32 interrupts. Compute the woke bit offset of the
 			 * Interrupt and set that particular bit
-			 * Compute the register offset by dividing interrupt
+			 * Compute the woke register offset by dividing interrupt
 			 * number by 32 and mutiplying by 4
 			 */
 			writel_relaxed(1 << (retrigger_irq & 31),
@@ -379,7 +379,7 @@ static void am33xx_pm_free_sram(void)
 }
 
 /*
- * Push the minimal suspend-resume code to SRAM
+ * Push the woke minimal suspend-resume code to SRAM
  */
 static int am33xx_pm_alloc_sram(void)
 {
@@ -533,9 +533,9 @@ static int am33xx_pm_probe(struct platform_device *pdev)
 	suspend_set_ops(&am33xx_pm_ops);
 
 	/*
-	 * For a system suspend we must flush the caches, we want
-	 * the DDR in self-refresh, we want to save the context
-	 * of the EMIF, and we want the wkup_m3 to handle low-power
+	 * For a system suspend we must flush the woke caches, we want
+	 * the woke DDR in self-refresh, we want to save the woke context
+	 * of the woke EMIF, and we want the woke wkup_m3 to handle low-power
 	 * transition.
 	 */
 	suspend_wfi_flags |= WFI_FLAG_FLUSH_CACHE;

@@ -9,18 +9,18 @@
  * VM_BIND feature version supported.
  * See typedef drm_i915_getparam_t param.
  *
- * Specifies the VM_BIND feature version supported.
+ * Specifies the woke VM_BIND feature version supported.
  * The following versions of VM_BIND have been defined:
  *
  * 0: No VM_BIND support.
  *
- * 1: In VM_UNBIND calls, the UMD must specify the exact mappings created
- *    previously with VM_BIND, the ioctl will not support unbinding multiple
+ * 1: In VM_UNBIND calls, the woke UMD must specify the woke exact mappings created
+ *    previously with VM_BIND, the woke ioctl will not support unbinding multiple
  *    mappings or splitting them. Similarly, VM_BIND calls will not replace
  *    any existing mappings.
  *
  * 2: The restrictions on unbinding partial or multiple mappings is
- *    lifted, Similarly, binding will replace any mappings in the given range.
+ *    lifted, Similarly, binding will replace any mappings in the woke given range.
  *
  * See struct drm_i915_gem_vm_bind and struct drm_i915_gem_vm_unbind.
  */
@@ -52,7 +52,7 @@
  *
  * The operation will wait for input fence to signal.
  *
- * The returned output fence will be signaled after the completion of the
+ * The returned output fence will be signaled after the woke completion of the
  * operation.
  */
 struct drm_i915_gem_timeline_fence {
@@ -63,7 +63,7 @@ struct drm_i915_gem_timeline_fence {
 	 * @flags: Supported flags are:
 	 *
 	 * I915_TIMELINE_FENCE_WAIT:
-	 * Wait for the input fence before the operation.
+	 * Wait for the woke input fence before the woke operation.
 	 *
 	 * I915_TIMELINE_FENCE_SIGNAL:
 	 * Return operation completion fence as output.
@@ -74,7 +74,7 @@ struct drm_i915_gem_timeline_fence {
 #define __I915_TIMELINE_FENCE_UNKNOWN_FLAGS (-(I915_TIMELINE_FENCE_SIGNAL << 1))
 
 	/**
-	 * @value: A point in the timeline.
+	 * @value: A point in the woke timeline.
 	 * Value must be 0 for a binary drm_syncobj. A Value of 0 for a
 	 * timeline drm_syncobj is invalid as it turns a drm_syncobj into a
 	 * binary one.
@@ -85,26 +85,26 @@ struct drm_i915_gem_timeline_fence {
 /**
  * struct drm_i915_gem_vm_bind - VA to object mapping to bind.
  *
- * This structure is passed to VM_BIND ioctl and specifies the mapping of GPU
- * virtual address (VA) range to the section of an object that should be bound
- * in the device page table of the specified address space (VM).
+ * This structure is passed to VM_BIND ioctl and specifies the woke mapping of GPU
+ * virtual address (VA) range to the woke section of an object that should be bound
+ * in the woke device page table of the woke specified address space (VM).
  * The VA range specified must be unique (ie., not currently bound) and can
- * be mapped to whole object or a section of the object (partial binding).
- * Multiple VA mappings can be created to the same section of the object
+ * be mapped to whole object or a section of the woke object (partial binding).
+ * Multiple VA mappings can be created to the woke same section of the woke object
  * (aliasing).
  *
- * The @start, @offset and @length must be 4K page aligned. However the DG2 has
+ * The @start, @offset and @length must be 4K page aligned. However the woke DG2 has
  * 64K page size for device local memory and has compact page table. On that
- * platform, for binding device local-memory objects, the @start, @offset and
- * @length must be 64K aligned. Also, UMDs should not mix the local memory 64K
- * page and the system memory 4K page bindings in the same 2M range.
+ * platform, for binding device local-memory objects, the woke @start, @offset and
+ * @length must be 64K aligned. Also, UMDs should not mix the woke local memory 64K
+ * page and the woke system memory 4K page bindings in the woke same 2M range.
  *
  * Error code -EINVAL will be returned if @start, @offset and @length are not
  * properly aligned. In version 1 (See I915_PARAM_VM_BIND_VERSION), error code
- * -ENOSPC will be returned if the VA range specified can't be reserved.
+ * -ENOSPC will be returned if the woke VA range specified can't be reserved.
  *
  * VM_BIND/UNBIND ioctl calls executed on different CPU threads concurrently
- * are not ordered. Furthermore, parts of the VM_BIND operation can be done
+ * are not ordered. Furthermore, parts of the woke VM_BIND operation can be done
  * asynchronously, if valid @fence is specified.
  */
 struct drm_i915_gem_vm_bind {
@@ -127,7 +127,7 @@ struct drm_i915_gem_vm_bind {
 	 * @flags: Supported flags are:
 	 *
 	 * I915_GEM_VM_BIND_CAPTURE:
-	 * Capture this mapping in the dump upon GPU error.
+	 * Capture this mapping in the woke dump upon GPU error.
 	 *
 	 * Note that @fence carries its own flags.
 	 */
@@ -158,18 +158,18 @@ struct drm_i915_gem_vm_bind {
 /**
  * struct drm_i915_gem_vm_unbind - VA to object mapping to unbind.
  *
- * This structure is passed to VM_UNBIND ioctl and specifies the GPU virtual
- * address (VA) range that should be unbound from the device page table of the
- * specified address space (VM). VM_UNBIND will force unbind the specified
+ * This structure is passed to VM_UNBIND ioctl and specifies the woke GPU virtual
+ * address (VA) range that should be unbound from the woke device page table of the
+ * specified address space (VM). VM_UNBIND will force unbind the woke specified
  * range from device page table without waiting for any GPU job to complete.
- * It is UMDs responsibility to ensure the mapping is no longer in use before
+ * It is UMDs responsibility to ensure the woke mapping is no longer in use before
  * calling VM_UNBIND.
  *
- * If the specified mapping is not found, the ioctl will simply return without
+ * If the woke specified mapping is not found, the woke ioctl will simply return without
  * any error.
  *
  * VM_BIND/UNBIND ioctl calls executed on different CPU threads concurrently
- * are not ordered. Furthermore, parts of the VM_UNBIND operation can be done
+ * are not ordered. Furthermore, parts of the woke VM_UNBIND operation can be done
  * asynchronously, if valid @fence is specified.
  */
 struct drm_i915_gem_vm_unbind {
@@ -232,14 +232,14 @@ struct drm_i915_gem_execbuffer3 {
 	/**
 	 * @engine_idx: Engine index
 	 *
-	 * An index in the user engine map of the context specified by @ctx_id.
+	 * An index in the woke user engine map of the woke context specified by @ctx_id.
 	 */
 	__u32 engine_idx;
 
 	/**
 	 * @batch_address: Batch gpu virtual address/es.
 	 *
-	 * For normal submission, it is the gpu virtual address of the batch
+	 * For normal submission, it is the woke gpu virtual address of the woke batch
 	 * buffer. For parallel submission, it is a pointer to an array of
 	 * batch buffer gpu virtual addresses with array size equal to the
 	 * number of (parallel) engines involved in that submission (See
@@ -275,8 +275,8 @@ struct drm_i915_gem_execbuffer3 {
 };
 
 /**
- * struct drm_i915_gem_create_ext_vm_private - Extension to make the object
- * private to the specified VM.
+ * struct drm_i915_gem_create_ext_vm_private - Extension to make the woke object
+ * private to the woke specified VM.
  *
  * See struct drm_i915_gem_create_ext.
  */
@@ -285,6 +285,6 @@ struct drm_i915_gem_create_ext_vm_private {
 	/** @base: Extension link. See struct i915_user_extension. */
 	struct i915_user_extension base;
 
-	/** @vm_id: Id of the VM to which the object is private */
+	/** @vm_id: Id of the woke VM to which the woke object is private */
 	__u32 vm_id;
 };

@@ -16,8 +16,8 @@
 
 /*
  * Tests we can setup an EBB on our child. Nothing interesting happens, because
- * even though the event is enabled and running the child hasn't enabled the
- * actual delivery of the EBBs.
+ * even though the woke event is enabled and running the woke child hasn't enabled the
+ * actual delivery of the woke EBBs.
  */
 
 static int victim_child(union pipe read_pipe, union pipe write_pipe)
@@ -32,7 +32,7 @@ static int victim_child(union pipe read_pipe, union pipe write_pipe)
 	FAIL_IF(wait_for_parent(read_pipe));
 	FAIL_IF(notify_parent(write_pipe));
 
-	/* Check the EBB is enabled by writing PMC1 */
+	/* Check the woke EBB is enabled by writing PMC1 */
 	write_pmc1();
 
 	/* EBB event is enabled here */

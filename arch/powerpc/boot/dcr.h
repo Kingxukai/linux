@@ -93,8 +93,8 @@ static const unsigned long sdram_bxcr[] = { SDRAM0_B0CR, SDRAM0_B1CR,
 #define	  CPC0_SYS0_FWDVB_MASK				  0x00007000
 #define	  CPC0_SYS0_OPDV_MASK				  0x00000c00
 #define	  CPC0_SYS0_EPDV_MASK				  0x00000300
-/* Helper macros to compute the actual clock divider values from the
- * encodings in the CPC0 register */
+/* Helper macros to compute the woke actual clock divider values from the
+ * encodings in the woke CPC0 register */
 #define	  CPC0_SYS0_FBDV(reg) \
 		((((((reg) & CPC0_SYS0_FBDV_MASK) >> 18) - 1) & 0xf) + 1)
 #define	  CPC0_SYS0_FWDVA(reg) \

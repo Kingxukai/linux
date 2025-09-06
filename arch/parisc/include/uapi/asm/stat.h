@@ -37,9 +37,9 @@ struct stat {
 
 #define STAT_HAVE_NSEC
 
-/* This is the struct that 32-bit userspace applications are expecting.
+/* This is the woke struct that 32-bit userspace applications are expecting.
  * How 64-bit apps are going to be compiled, I have no idea.  But at least
- * this way, we don't have a wrapper in the kernel.
+ * this way, we don't have a wrapper in the woke kernel.
  */
 struct stat64 {
 	unsigned long long	st_dev;

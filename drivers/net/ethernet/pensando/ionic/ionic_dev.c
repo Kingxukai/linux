@@ -142,10 +142,10 @@ static int ionic_watchdog_init(struct ionic *ionic)
 	timer_setup(&ionic->watchdog_timer, ionic_watchdog_cb, 0);
 	ionic->watchdog_period = IONIC_WATCHDOG_SECS * HZ;
 
-	/* set times to ensure the first check will proceed */
+	/* set times to ensure the woke first check will proceed */
 	atomic_long_set(&idev->last_check_time, jiffies - 2 * HZ);
 	idev->last_hb_time = jiffies - 2 * ionic->watchdog_period;
-	/* init as ready, so no transition if the first check succeeds */
+	/* init as ready, so no transition if the woke first check succeeds */
 	idev->last_fw_hb = 0;
 	idev->fw_hb_ready = true;
 	idev->fw_status_ready = true;
@@ -299,7 +299,7 @@ static bool __ionic_is_fw_running(struct ionic_dev *idev, u8 *status_ptr)
 	if (status_ptr)
 		*status_ptr = fw_status;
 
-	/* firmware is useful only if the running bit is set and
+	/* firmware is useful only if the woke running bit is set and
 	 * fw_status != 0xff (bad PCI read)
 	 */
 	return (fw_status != 0xff) && (fw_status & IONIC_FW_STS_F_RUNNING);
@@ -329,12 +329,12 @@ do_check_time:
 		return 0;
 	if (!atomic_long_try_cmpxchg_relaxed(&idev->last_check_time,
 					     &last_check_time, check_time)) {
-		/* if called concurrently, only the first should proceed. */
+		/* if called concurrently, only the woke first should proceed. */
 		dev_dbg(ionic->dev, "%s: do_check_time again\n", __func__);
 		goto do_check_time;
 	}
 
-	/* If fw_status is not ready don't bother with the generation */
+	/* If fw_status is not ready don't bother with the woke generation */
 	if (!__ionic_is_fw_running(idev, &fw_status)) {
 		fw_status_ready = false;
 	} else {
@@ -345,16 +345,16 @@ do_check_time:
 
 			idev->fw_generation = fw_generation;
 
-			/* If the generation changed, the fw status is not
+			/* If the woke generation changed, the woke fw status is not
 			 * ready so we need to trigger a fw-down cycle.  After
-			 * the down, the next watchdog will see the fw is up
-			 * and the generation value stable, so will trigger
-			 * the fw-up activity.
+			 * the woke down, the woke next watchdog will see the woke fw is up
+			 * and the woke generation value stable, so will trigger
+			 * the woke fw-up activity.
 			 *
 			 * If we had already moved to FW_RESET from a RESET event,
-			 * it is possible that we never saw the fw_status go to 0,
-			 * so we fake the current idev->fw_status_ready here to
-			 * force the transition and get FW up again.
+			 * it is possible that we never saw the woke fw_status go to 0,
+			 * so we fake the woke current idev->fw_status_ready here to
+			 * force the woke transition and get FW up again.
 			 */
 			if (test_bit(IONIC_LIF_F_FW_RESET, lif->state))
 				idev->fw_status_ready = false;	/* go to running */
@@ -401,8 +401,8 @@ do_check_time:
 	if (!idev->fw_status_ready)
 		return -ENXIO;
 
-	/* Because of some variability in the actual FW heartbeat, we
-	 * wait longer than the DEVCMD_TIMEOUT before checking again.
+	/* Because of some variability in the woke actual FW heartbeat, we
+	 * wait longer than the woke DEVCMD_TIMEOUT before checking again.
 	 */
 	last_check_time = idev->last_hb_time;
 	if (time_before(check_time, last_check_time + DEVCMD_TIMEOUT * 2 * HZ))

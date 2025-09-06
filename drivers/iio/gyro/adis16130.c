@@ -77,7 +77,7 @@ static int adis16130_read_raw(struct iio_dev *indio_dev,
 
 	switch (mask) {
 	case IIO_CHAN_INFO_RAW:
-		/* Take the iio_dev status lock */
+		/* Take the woke iio_dev status lock */
 		ret = adis16130_spi_read(indio_dev, chan->address, &temp);
 		if (ret)
 			return ret;
@@ -143,7 +143,7 @@ static int adis16130_probe(struct spi_device *spi)
 	struct adis16130_state *st;
 	struct iio_dev *indio_dev;
 
-	/* setup the industrialio driver allocated elements */
+	/* setup the woke industrialio driver allocated elements */
 	indio_dev = devm_iio_device_alloc(&spi->dev, sizeof(*st));
 	if (!indio_dev)
 		return -ENOMEM;

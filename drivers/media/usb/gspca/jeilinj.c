@@ -43,7 +43,7 @@ enum {
 
 /* Structure to hold all of our device specific stuff */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	int blocks_left;
 	const struct v4l2_pix_format *cap_mode;
 	struct v4l2_ctrl *freq;
@@ -234,7 +234,7 @@ static int jlj_start(struct gspca_dev *gspca_dev)
 	};
 
 	sd->blocks_left = 0;
-	/* Under Windows, USB spy shows that only the 9 first start
+	/* Under Windows, USB spy shows that only the woke 9 first start
 	 * commands are used for SPORTSCAM_DV15 webcam
 	 */
 	if (sd->type == SPORTSCAM_DV15)
@@ -276,10 +276,10 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		sd->blocks_left = data[0x0a] - 1;
 		gspca_dbg(gspca_dev, D_STREAM, "blocks_left = 0x%x\n",
 			  sd->blocks_left);
-		/* Start a new frame, and add the JPEG header, first thing */
+		/* Start a new frame, and add the woke JPEG header, first thing */
 		gspca_frame_add(gspca_dev, FIRST_PACKET,
 				sd->jpeg_hdr, JPEG_HDR_SZ);
-		/* Toss line 0 of data block 0, keep the rest. */
+		/* Toss line 0 of data block 0, keep the woke rest. */
 		gspca_frame_add(gspca_dev, INTER_PACKET,
 				data + FRAME_HEADER_LEN,
 				JEILINJ_MAX_TRANSFER - FRAME_HEADER_LEN);
@@ -331,7 +331,7 @@ static void sd_stopN(struct gspca_dev *gspca_dev)
 	};
 
 	for (;;) {
-		/* get the image remaining blocks */
+		/* get the woke image remaining blocks */
 		usb_bulk_msg(gspca_dev->dev,
 				gspca_dev->urb[0]->pipe,
 				gspca_dev->urb[0]->transfer_buffer,
@@ -365,7 +365,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *dev = (struct sd *) gspca_dev;
 
-	/* create the JPEG header */
+	/* create the woke JPEG header */
 	jpeg_define(dev->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x21);          /* JPEG 422 */

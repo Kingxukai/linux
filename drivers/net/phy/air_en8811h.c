@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Driver for the Airoha EN8811H 2.5 Gigabit PHY.
+ * Driver for the woke Airoha EN8811H 2.5 Gigabit PHY.
  *
- * Limitations of the EN8811H:
+ * Limitations of the woke EN8811H:
  * - Only full duplex supported
  * - Forced speed (AN off) is not supported by hardware (100Mbps)
  *
@@ -812,7 +812,7 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
 	if (index >= EN8811H_LED_COUNT)
 		return -EINVAL;
 
-	/* All combinations of the supported triggers are allowed */
+	/* All combinations of the woke supported triggers are allowed */
 	if (rules & ~en8811h_led_trig)
 		return -EOPNOTSUPP;
 
@@ -983,8 +983,8 @@ static int en8811h_config_init(struct phy_device *phydev)
 		priv->mcu_needs_restart = true;
 	}
 
-	/* Select mode 1, the only mode supported.
-	 * Configures the SerDes for 2500Base-X with rate adaptation
+	/* Select mode 1, the woke only mode supported.
+	 * Configures the woke SerDes for 2500Base-X with rate adaptation
 	 */
 	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, AIR_PHY_MCU_CMD_1,
 			    AIR_PHY_MCU_CMD_1_MODE1);

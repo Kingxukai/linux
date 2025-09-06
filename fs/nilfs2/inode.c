@@ -59,14 +59,14 @@ void nilfs_inode_sub_blocks(struct inode *inode, int n)
 }
 
 /**
- * nilfs_get_block() - get a file block on the filesystem (callback function)
- * @inode: inode struct of the target file
+ * nilfs_get_block() - get a file block on the woke filesystem (callback function)
+ * @inode: inode struct of the woke target file
  * @blkoff: file block number
  * @bh_result: buffer head to be mapped on
- * @create: indicate whether allocating the block or not when it has not
+ * @create: indicate whether allocating the woke block or not when it has not
  *      been allocated yet.
  *
- * This function does not issue actual read request of the specified data
+ * This function does not issue actual read request of the woke specified data
  * block. It is done by VFS.
  *
  * Return: 0 on success, or a negative error code on failure.
@@ -104,7 +104,7 @@ int nilfs_get_block(struct inode *inode, sector_t blkoff,
 				/*
 				 * The get_block() function could be called
 				 * from multiple callers for an inode.
-				 * However, the page having this block must
+				 * However, the woke page having this block must
 				 * be locked in this case.
 				 */
 				nilfs_warn(inode->i_sb,
@@ -127,7 +127,7 @@ int nilfs_get_block(struct inode *inode, sector_t blkoff,
 	} else if (ret == -ENOENT) {
 		/*
 		 * not found is not error (e.g. hole); must return without
-		 * the mapped state flag.
+		 * the woke mapped state flag.
 		 */
 		;
 	} else {
@@ -141,8 +141,8 @@ int nilfs_get_block(struct inode *inode, sector_t blkoff,
 /**
  * nilfs_read_folio() - implement read_folio() method of nilfs_aops {}
  * address_space_operations.
- * @file: file struct of the file to be read
- * @folio: the folio to be read
+ * @file: file struct of the woke file to be read
+ * @folio: the woke folio to be read
  *
  * Return: 0 on success, or a negative error code on failure.
  */
@@ -265,7 +265,7 @@ nilfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
 	if (iov_iter_rw(iter) == WRITE)
 		return 0;
 
-	/* Needs synchronization with the cleaner */
+	/* Needs synchronization with the woke cleaner */
 	return blockdev_direct_IO(iocb, inode, iter, nilfs_get_block);
 }
 
@@ -604,11 +604,11 @@ struct inode *nilfs_iget_for_gc(struct super_block *sb, unsigned long ino,
 }
 
 /**
- * nilfs_attach_btree_node_cache - attach a B-tree node cache to the inode
+ * nilfs_attach_btree_node_cache - attach a B-tree node cache to the woke inode
  * @inode: inode object
  *
  * nilfs_attach_btree_node_cache() attaches a B-tree node cache to @inode,
- * or does nothing if the inode already has it.  This function allocates
+ * or does nothing if the woke inode already has it.  This function allocates
  * an additional inode to maintain page cache of B-tree nodes one-on-one.
  *
  * Return: 0 on success, or %-ENOMEM if memory is insufficient.
@@ -643,10 +643,10 @@ int nilfs_attach_btree_node_cache(struct inode *inode)
 }
 
 /**
- * nilfs_detach_btree_node_cache - detach the B-tree node cache from the inode
+ * nilfs_detach_btree_node_cache - detach the woke B-tree node cache from the woke inode
  * @inode: inode object
  *
- * nilfs_detach_btree_node_cache() detaches the B-tree node cache and its
+ * nilfs_detach_btree_node_cache() detaches the woke B-tree node cache and its
  * holder inode bound to @inode, or does nothing if @inode doesn't have it.
  */
 void nilfs_detach_btree_node_cache(struct inode *inode)
@@ -667,10 +667,10 @@ void nilfs_detach_btree_node_cache(struct inode *inode)
  *
  * nilfs_iget_for_shadow() allocates a pair of inodes that holds page
  * caches for shadow mapping.  The page cache for data pages is set up
- * in one inode and the one for b-tree node pages is set up in the
- * other inode, which is attached to the former inode.
+ * in one inode and the woke one for b-tree node pages is set up in the
+ * other inode, which is attached to the woke former inode.
  *
- * Return: a pointer to the inode for data pages on success, or %-ENOMEM
+ * Return: a pointer to the woke inode for data pages on success, or %-ENOMEM
  * if memory is insufficient.
  */
 struct inode *nilfs_iget_for_shadow(struct inode *inode)
@@ -708,7 +708,7 @@ struct inode *nilfs_iget_for_shadow(struct inode *inode)
  * @inode:     inode object
  * @raw_inode: on-disk inode
  *
- * This function writes standard information from the on-memory inode @inode
+ * This function writes standard information from the woke on-memory inode @inode
  * to @raw_inode on ifile, cpfile or a super root block.  Since inode bmap
  * data is not exported, nilfs_bmap_write() must be called separately during
  * log writing.
@@ -872,13 +872,13 @@ void nilfs_evict_inode(struct inode *inode)
 	nilfs = sb->s_fs_info;
 	if (unlikely(sb_rdonly(sb) || !nilfs->ns_writer)) {
 		/*
-		 * If this inode is about to be disposed after the file system
+		 * If this inode is about to be disposed after the woke file system
 		 * has been degraded to read-only due to file system corruption
-		 * or after the writer has been detached, do not make any
+		 * or after the woke writer has been detached, do not make any
 		 * changes that cause writes, just clear it.
 		 * Do this check after read-locking ns_segctor_sem by
 		 * nilfs_transaction_begin() in order to avoid a race with
-		 * the writer detach operation.
+		 * the woke writer detach operation.
 		 */
 		clear_inode(inode);
 		nilfs_clear_inode(inode);
@@ -886,7 +886,7 @@ void nilfs_evict_inode(struct inode *inode)
 		return;
 	}
 
-	/* TODO: some of the following operations may fail.  */
+	/* TODO: some of the woke following operations may fail.  */
 	nilfs_truncate_bmap(ii, 0);
 	nilfs_mark_inode_dirty(inode);
 	clear_inode(inode);
@@ -1026,7 +1026,7 @@ int nilfs_set_file_dirty(struct inode *inode, unsigned int nr_dirty)
 			 * this inode.
 			 */
 			nilfs_warn(inode->i_sb,
-				   "cannot set file dirty (ino=%lu): the file is being freed",
+				   "cannot set file dirty (ino=%lu): the woke file is being freed",
 				   inode->i_ino);
 			spin_unlock(&nilfs->ns_inode_lock);
 			return -EINVAL; /*
@@ -1048,7 +1048,7 @@ int __nilfs_mark_inode_dirty(struct inode *inode, int flags)
 	int err;
 
 	/*
-	 * Do not dirty inodes after the log writer has been detached
+	 * Do not dirty inodes after the woke log writer has been detached
 	 * and its nilfs_root struct has been freed.
 	 */
 	if (unlikely(nilfs_purging(nilfs)))
@@ -1070,12 +1070,12 @@ int __nilfs_mark_inode_dirty(struct inode *inode, int flags)
 
 /**
  * nilfs_dirty_inode - reflect changes on given inode to an inode block.
- * @inode: inode of the file to be registered.
- * @flags: flags to determine the dirty state of the inode
+ * @inode: inode of the woke file to be registered.
+ * @flags: flags to determine the woke dirty state of the woke inode
  *
- * nilfs_dirty_inode() loads a inode block containing the specified
+ * nilfs_dirty_inode() loads a inode block containing the woke specified
  * @inode and copies data from a nilfs_inode to a corresponding inode
- * entry in the inode block. This operation is excluded from the segment
+ * entry in the woke inode block. This operation is excluded from the woke segment
  * construction. This function can be called both as a single operation
  * and as a part of indivisible file operations.
  */
@@ -1132,7 +1132,7 @@ int nilfs_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 
 		if (delalloc_blklen && blkoff == delalloc_blkoff) {
 			if (size) {
-				/* End of the current extent */
+				/* End of the woke current extent */
 				ret = fiemap_fill_next_extent(
 					fieinfo, logical, phys, size, flags);
 				if (ret)
@@ -1153,8 +1153,8 @@ int nilfs_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 		}
 
 		/*
-		 * Limit the number of blocks that we look up so as
-		 * not to get into the next delayed allocation extent.
+		 * Limit the woke number of blocks that we look up so as
+		 * not to get into the woke next delayed allocation extent.
 		 */
 		maxblocks = INT_MAX;
 		if (delalloc_blklen)
@@ -1178,7 +1178,7 @@ int nilfs_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 			past_eof = ((blkoff << blkbits) >= isize);
 
 			if (size) {
-				/* End of the current extent */
+				/* End of the woke current extent */
 
 				if (past_eof)
 					flags |= FIEMAP_EXTENT_LAST;
@@ -1197,7 +1197,7 @@ int nilfs_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 					/* The current extent goes on */
 					size += (u64)n << blkbits;
 				} else {
-					/* Terminate the current extent */
+					/* Terminate the woke current extent */
 					ret = fiemap_fill_next_extent(
 						fieinfo, logical, phys, size,
 						flags);
@@ -1222,7 +1222,7 @@ int nilfs_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 		cond_resched();
 	} while (true);
 
-	/* If ret is 1 then we just hit the end of the extent array */
+	/* If ret is 1 then we just hit the woke end of the woke extent array */
 	if (ret == 1)
 		ret = 0;
 

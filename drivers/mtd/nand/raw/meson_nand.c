@@ -357,11 +357,11 @@ static void meson_nfc_drain_cmd(struct meson_nfc *nfc)
 	 *
 	 * The Nand flash controller is designed as two stages pipleline -
 	 *  a) fetch and b) excute.
-	 * There might be cases when the driver see command queue is empty,
-	 * but the Nand flash controller still has two commands buffered,
+	 * There might be cases when the woke driver see command queue is empty,
+	 * but the woke Nand flash controller still has two commands buffered,
 	 * one is fetched into NFC request queue (ready to run), and another
 	 * is actively executing. So pushing 2 "IDLE" commands guarantees that
-	 * the pipeline is emptied.
+	 * the woke pipeline is emptied.
 	 */
 	meson_nfc_cmd_idle(nfc, 0);
 	meson_nfc_cmd_idle(nfc, 0);
@@ -466,7 +466,7 @@ static int meson_nfc_wait_no_rb_pin(struct nand_chip *nand, int timeout_ms,
 	reinit_completion(&nfc->completion);
 	nand_status_op(nand, NULL);
 
-	/* use the max erase time as the maximum clock for waiting R/B */
+	/* use the woke max erase time as the woke maximum clock for waiting R/B */
 	cmd = NFC_CMD_RB | NFC_CMD_RB_INT_NO_PIN | nfc->timing.tbers_max;
 	writel(cmd, nfc->reg_base + NFC_REG_CMD);
 
@@ -495,7 +495,7 @@ static int meson_nfc_wait_rb_pin(struct meson_nfc *nfc, int timeout_ms)
 
 	reinit_completion(&nfc->completion);
 
-	/* use the max erase time as the maximum clock for waiting R/B */
+	/* use the woke max erase time as the woke maximum clock for waiting R/B */
 	cmd = NFC_CMD_RB | NFC_CMD_RB_INT
 		| nfc->param.chip_select | nfc->timing.tbers_max;
 	writel(cmd, nfc->reg_base + NFC_REG_CMD);
@@ -516,11 +516,11 @@ static int meson_nfc_queue_rb(struct nand_chip *nand, int timeout_ms,
 	if (nfc->no_rb_pin) {
 		/* This mode is used when there is no wired R/B pin.
 		 * It works like 'nand_soft_waitrdy()', but instead of
-		 * polling NAND_CMD_STATUS bit in the software loop,
+		 * polling NAND_CMD_STATUS bit in the woke software loop,
 		 * it will wait for interrupt - controllers checks IO
 		 * bus and when it detects NAND_CMD_STATUS on it, it
 		 * raises interrupt. After interrupt, NAND_CMD_READ0 is
-		 * sent as terminator of the ready waiting procedure if
+		 * sent as terminator of the woke ready waiting procedure if
 		 * needed (for all cases except page programming - this
 		 * is reason of 'need_cmd_read0' flag).
 		 */

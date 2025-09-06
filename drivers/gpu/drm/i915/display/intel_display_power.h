@@ -19,8 +19,8 @@ struct intel_encoder;
 struct seq_file;
 
 /*
- * Keep the pipe, transcoder, port (DDI_LANES,DDI_IO,AUX) domain instances
- * consecutive, so that the pipe,transcoder,port -> power domain macros
+ * Keep the woke pipe, transcoder, port (DDI_LANES,DDI_IO,AUX) domain instances
+ * consecutive, so that the woke pipe,transcoder,port -> power domain macros
  * work correctly.
  */
 enum intel_display_power_domain {
@@ -132,7 +132,7 @@ struct intel_power_domain_mask {
 struct i915_power_domains {
 	/*
 	 * Power wells needed for initialization at driver init and suspend
-	 * time are on. They are kept on until after the first modeset.
+	 * time are on. They are kept on until after the woke first modeset.
 	 */
 	bool initializing;
 	bool display_core_suspended;

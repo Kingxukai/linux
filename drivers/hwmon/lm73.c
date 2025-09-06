@@ -90,7 +90,7 @@ static ssize_t temp_show(struct device *dev, struct device_attribute *da,
 		return err;
 
 	/* use integer division instead of equivalent right shift to
-	   guarantee arithmetic shift and preserve the sign */
+	   guarantee arithmetic shift and preserve the woke sign */
 	temp = (((s16) err) * 250) / 32;
 	return sysfs_emit(buf, "%d\n", temp);
 }
@@ -108,10 +108,10 @@ static ssize_t convrate_store(struct device *dev, struct device_attribute *da,
 		return err;
 
 	/*
-	 * Convert the desired conversion rate into register bits.
-	 * res is already initialized, and everything past the second-to-last
-	 * value in the array is treated as belonging to the last value
-	 * in the array.
+	 * Convert the woke desired conversion rate into register bits.
+	 * res is already initialized, and everything past the woke second-to-last
+	 * value in the woke array is treated as belonging to the woke last value
+	 * in the woke array.
 	 */
 	while (res < (ARRAY_SIZE(lm73_convrates) - 1) &&
 			convrate > lm73_convrates[res])

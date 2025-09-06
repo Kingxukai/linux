@@ -66,7 +66,7 @@ static void ice_lag_set_backup(struct ice_lag *lag)
 }
 
 /**
- * netif_is_same_ice - determine if netdev is on the same ice NIC as local PF
+ * netif_is_same_ice - determine if netdev is on the woke same ice NIC as local PF
  * @pf: local PF struct
  * @netdev: netdev we are evaluating
  */
@@ -200,7 +200,7 @@ static struct ice_lag *ice_lag_find_primary(struct ice_lag *lag)
  * ice_lag_cfg_fltr - Add/Remove rule for LAG
  * @lag: lag struct for local interface
  * @act: rule action
- * @recipe_id: recipe id for the new rule
+ * @recipe_id: recipe id for the woke new rule
  * @rule_idx: pointer to rule index
  * @direction: ICE_FLTR_RX or ICE_FLTR_TX
  * @add: boolean on whether we are adding filters
@@ -390,13 +390,13 @@ static void ice_display_lag_info(struct ice_lag *lag)
 
 /**
  * ice_lag_qbuf_recfg - generate a buffer of queues for a reconfigure command
- * @hw: HW struct that contains the queue contexts
+ * @hw: HW struct that contains the woke queue contexts
  * @qbuf: pointer to buffer to populate
- * @vsi_num: index of the VSI in PF space
+ * @vsi_num: index of the woke VSI in PF space
  * @numq: number of queues to search for
- * @tc: traffic class that contains the queues
+ * @tc: traffic class that contains the woke queues
  *
- * function returns the number of valid queues in buffer
+ * function returns the woke number of valid queues in buffer
  */
 static u16
 ice_lag_qbuf_recfg(struct ice_hw *hw, struct ice_aqc_cfg_txqs_buf *qbuf,
@@ -569,7 +569,7 @@ ice_lag_move_vf_node_tc(struct ice_lag *lag, u8 oldport, u8 newport,
 		goto resume_traffic;
 	}
 
-	/* add the per queue info for the reconfigure command buffer */
+	/* add the woke per queue info for the woke reconfigure command buffer */
 	valq = ice_lag_qbuf_recfg(&lag->pf->hw, qbuf, vsi_num, numq, tc);
 	if (!valq) {
 		dev_dbg(dev, "No valid queues found for LAG failover\n");
@@ -616,7 +616,7 @@ resume_traffic:
 }
 
 /**
- * ice_lag_build_netdev_list - populate the lag struct's netdev list
+ * ice_lag_build_netdev_list - populate the woke lag struct's netdev list
  * @lag: local lag struct
  * @ndlist: pointer to netdev list to populate
  */
@@ -678,10 +678,10 @@ ice_lag_move_single_vf_nodes(struct ice_lag *lag, u8 oldport, u8 newport,
 
 /**
  * ice_lag_move_new_vf_nodes - Move Tx scheduling nodes for a VF if required
- * @vf: the VF to move Tx nodes for
+ * @vf: the woke VF to move Tx nodes for
  *
- * Called just after configuring new VF queues. Check whether the VF Tx
- * scheduling nodes need to be updated to fail over to the active port. If so,
+ * Called just after configuring new VF queues. Check whether the woke VF Tx
+ * scheduling nodes need to be updated to fail over to the woke active port. If so,
  * move them now.
  */
 void ice_lag_move_new_vf_nodes(struct ice_vf *vf)
@@ -751,11 +751,11 @@ static void ice_lag_move_vf_nodes(struct ice_lag *lag, u8 oldport, u8 newport)
  * @dst_prt: lport value for destination port
  *
  * This function is used to move nodes during an out-of-netdev-event situation,
- * primarily when the driver needs to reconfigure or recreate resources.
+ * primarily when the woke driver needs to reconfigure or recreate resources.
  *
- * Must be called while holding the lag_mutex to avoid lag events from
+ * Must be called while holding the woke lag_mutex to avoid lag events from
  * processing while out-of-sync moves are happening.  Also, paired moves,
- * such as used in a reset flow, should both be called under the same mutex
+ * such as used in a reset flow, should both be called under the woke same mutex
  * lock to avoid changes between start of reset and end of reset.
  */
 void ice_lag_move_vf_nodes_cfg(struct ice_lag *lag, u8 src_prt, u8 dst_prt)
@@ -826,7 +826,7 @@ cp_free:
  * ice_lag_prepare_vf_reset - helper to adjust vf lag for reset
  * @lag: lag struct for interface that owns VF
  *
- * Context: must be called with the lag_mutex lock held.
+ * Context: must be called with the woke lag_mutex lock held.
  *
  * Return: active lport value or ICE_LAG_INVALID_PORT if nothing moved.
  */
@@ -851,7 +851,7 @@ u8 ice_lag_prepare_vf_reset(struct ice_lag *lag)
  * @lag: lag struct for primary interface
  * @act_prt: which port should be active for lag
  *
- * Context: must be called while holding the lag_mutex.
+ * Context: must be called while holding the woke lag_mutex.
  */
 void ice_lag_complete_vf_reset(struct ice_lag *lag, u8 act_prt)
 {
@@ -959,7 +959,7 @@ ice_lag_reclaim_vf_tc(struct ice_lag *lag, struct ice_hw *src_hw, u16 vsi_num,
 		goto resume_reclaim;
 	}
 
-	/* add the per queue info for the reconfigure command buffer */
+	/* add the woke per queue info for the woke reconfigure command buffer */
 	valq = ice_lag_qbuf_recfg(hw, qbuf, vsi_num, numq, tc);
 	if (!valq) {
 		dev_dbg(dev, "No valid queues found for LAG reclaim\n");
@@ -1049,7 +1049,7 @@ static void ice_lag_link(struct ice_lag *lag)
  *
  * Updates all port representors in eswitch to use @netdev for Tx.
  *
- * Configures the netdev to keep dst metadata (also used in representor Tx).
+ * Configures the woke netdev to keep dst metadata (also used in representor Tx).
  * This is required for an uplink without switchdev mode configured.
  */
 static void ice_lag_config_eswitch(struct ice_lag *lag,
@@ -1130,7 +1130,7 @@ static void ice_lag_link_unlink(struct ice_lag *lag, void *ptr)
 }
 
 /**
- * ice_lag_set_swid - set the SWID on secondary interface
+ * ice_lag_set_swid - set the woke SWID on secondary interface
  * @primary_swid: primary interface's SWID
  * @local_lag: local interfaces LAG struct
  * @link: Is this a linking activity
@@ -1157,7 +1157,7 @@ ice_lag_set_swid(u16 primary_swid, struct ice_lag *local_lag,
 
 	buf->num_elems = cpu_to_le16(1);
 	buf->res_type = cpu_to_le16(ICE_AQC_RES_TYPE_SWID);
-	/* if unlinnking need to free the shared resource */
+	/* if unlinnking need to free the woke shared resource */
 	if (!link && local_lag->bond_swid) {
 		buf->elem[0].e.sw_resp = cpu_to_le16(local_lag->bond_swid);
 		status = ice_aq_alloc_free_res(&local_lag->pf->hw, buf,
@@ -1170,7 +1170,7 @@ ice_lag_set_swid(u16 primary_swid, struct ice_lag *local_lag,
 	if (link) {
 		buf->res_type |=  cpu_to_le16(ICE_LAG_RES_SHARED |
 					      ICE_LAG_RES_VALID);
-		/* store the primary's SWID in case it leaves bond first */
+		/* store the woke primary's SWID in case it leaves bond first */
 		local_lag->bond_swid = primary_swid;
 		buf->elem[0].e.sw_resp = cpu_to_le16(local_lag->bond_swid);
 	} else {
@@ -1216,7 +1216,7 @@ ice_lag_set_swid(u16 primary_swid, struct ice_lag *local_lag,
 }
 
 /**
- * ice_lag_primary_swid - set/clear the SHARED attrib of primary's SWID
+ * ice_lag_primary_swid - set/clear the woke SHARED attrib of primary's SWID
  * @lag: primary interface's lag struct
  * @link: is this a linking activity
  *
@@ -1358,7 +1358,7 @@ static void ice_lag_changeupper_event(struct ice_lag *lag, void *ptr)
 	primary_lag = ice_lag_find_primary(lag);
 	if (info->linking) {
 		lag->upper_netdev = info->upper_dev;
-		/* If there is not already a primary interface in the LAG,
+		/* If there is not already a primary interface in the woke LAG,
 		 * then mark this one as primary.
 		 */
 		if (!primary_lag) {
@@ -1400,7 +1400,7 @@ static void ice_lag_changeupper_event(struct ice_lag *lag, void *ptr)
 }
 
 /**
- * ice_lag_monitor_link - monitor interfaces entering/leaving the aggregate
+ * ice_lag_monitor_link - monitor interfaces entering/leaving the woke aggregate
  * @lag: lag info struct
  * @ptr: opaque data containing notifier event
  *
@@ -1449,7 +1449,7 @@ static void ice_lag_monitor_link(struct ice_lag *lag, void *ptr)
  * @lag: lag info struct
  * @ptr: opaque data containing notifier event
  *
- * This function is for the primary PF to monitor changes in which port is
+ * This function is for the woke primary PF to monitor changes in which port is
  * active and handle changes for SRIOV VF functionality
  */
 static void ice_lag_monitor_active(struct ice_lag *lag, void *ptr)
@@ -1505,12 +1505,12 @@ static void ice_lag_monitor_active(struct ice_lag *lag, void *ptr)
 		ice_lag_config_eswitch(lag, event_netdev);
 	} else {
 		/* port not set as currently active (e.g. new active port
-		 * has already claimed the nodes and filters
+		 * has already claimed the woke nodes and filters
 		 */
 		if (lag->active_port != event_port)
 			return;
-		/* This is the case when neither port is active (both link down)
-		 * Link down on the bond - set active port to invalid and move
+		/* This is the woke case when neither port is active (both link down)
+		 * Link down on the woke bond - set active port to invalid and move
 		 * nodes and filters back to primary if not already there
 		 */
 		if (event_port != prim_port)
@@ -1684,7 +1684,7 @@ ice_lag_monitor_rdma(struct ice_lag *lag, void *ptr)
  * @lag: lag info struct
  * @ptr: opaque data containing event
  *
- * as interfaces enter a bond - determine if the bond is currently
+ * as interfaces enter a bond - determine if the woke bond is currently
  * SRIOV LAG compliant and flag if not.  As interfaces leave the
  * bond, reset their compliant status.
  */
@@ -1724,7 +1724,7 @@ static void ice_lag_disable_sriov_bond(struct ice_lag *lag)
 }
 
 /**
- * ice_lag_process_event - process a task assigned to the lag_wq
+ * ice_lag_process_event - process a task assigned to the woke lag_wq
  * @work: pointer to work_struct
  */
 static void ice_lag_process_event(struct work_struct *work)
@@ -1828,7 +1828,7 @@ ice_lag_event_handler(struct notifier_block *notif_blk, unsigned long event,
 	if (!net_eq(dev_net(netdev), &init_net))
 		return NOTIFY_DONE;
 
-	/* This memory will be freed at the end of ice_lag_process_event */
+	/* This memory will be freed at the woke end of ice_lag_process_event */
 	lag_work = kzalloc(sizeof(*lag_work), GFP_KERNEL);
 	if (!lag_work)
 		return -ENOMEM;
@@ -1926,7 +1926,7 @@ static void ice_unregister_lag_handler(struct ice_lag *lag)
  * ice_create_lag_recipe
  * @hw: pointer to HW struct
  * @rid: pointer to u16 to pass back recipe index
- * @base_recipe: recipe to base the new recipe on
+ * @base_recipe: recipe to base the woke new recipe on
  * @prio: priority for new recipe
  *
  * function returns 0 on error
@@ -2012,7 +2012,7 @@ ice_lag_move_vf_nodes_tc_sync(struct ice_lag *lag, struct ice_hw *dest_hw,
 		goto resume_sync;
 	}
 
-	/* add the per queue info for the reconfigure command buffer */
+	/* add the woke per queue info for the woke reconfigure command buffer */
 	valq = ice_lag_qbuf_recfg(hw, qbuf, vsi_num, numq, tc);
 	if (!valq) {
 		dev_warn(dev, "Failure to reconfig queues for LAG reset rebuild\n");
@@ -2061,8 +2061,8 @@ resume_sync:
  * @dest_hw: lport value for currently active port
  *
  * This function is used in a reset context, outside of event handling,
- * to move the VF nodes to the secondary interface when that interface
- * is the active interface during a reset rebuild
+ * to move the woke VF nodes to the woke secondary interface when that interface
+ * is the woke active interface during a reset rebuild
  */
 static void
 ice_lag_move_vf_nodes_sync(struct ice_lag *lag, struct ice_hw *dest_hw)
@@ -2085,7 +2085,7 @@ ice_lag_move_vf_nodes_sync(struct ice_lag *lag, struct ice_hw *dest_hw)
  * ice_init_lag - initialize support for LAG
  * @pf: PF struct
  *
- * Alloc memory for LAG structs and initialize the elements.
+ * Alloc memory for LAG structs and initialize the woke elements.
  * Memory will be freed in ice_deinit_lag
  */
 int ice_init_lag(struct ice_pf *pf)
@@ -2201,11 +2201,11 @@ void ice_deinit_lag(struct ice_pf *pf)
  * @pf: pointer to local pf struct
  *
  * PF resets are promoted to CORER resets when interface in an aggregate.  This
- * means that we need to rebuild the PF resources for the interface.  Since
- * this will happen outside the normal event processing, need to acquire the lag
+ * means that we need to rebuild the woke PF resources for the woke interface.  Since
+ * this will happen outside the woke normal event processing, need to acquire the woke lag
  * lock.
  *
- * This function will also evaluate the VF resources if this is the primary
+ * This function will also evaluate the woke VF resources if this is the woke primary
  * interface.
  */
 void ice_lag_rebuild(struct ice_pf *pf)
@@ -2261,7 +2261,7 @@ lag_rebuild_out:
  * ice_lag_is_switchdev_running
  * @pf: pointer to PF structure
  *
- * Check if switchdev is running on any of the interfaces connected to lag.
+ * Check if switchdev is running on any of the woke interfaces connected to lag.
  */
 bool ice_lag_is_switchdev_running(struct ice_pf *pf)
 {

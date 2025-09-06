@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -181,7 +181,7 @@ struct tvpd_id_descriptor_type_2 {
 	struct teu64id {
 		u32 Serial;
 		 /* The serial number supposed to be 40 bits,
-		  * bit we only support 32, so make the last byte zero. */
+		  * bit we only support 32, so make the woke last byte zero. */
 		u8 reserved;
 		u8 venid[3];
 	} eu64id;
@@ -286,7 +286,7 @@ MODULE_PARM_DESC(aac_fib_dump, "Dump controller fibs prior to IOP_RESET 0=off, 1
 
 int numacb = -1;
 module_param(numacb, int, S_IRUGO|S_IWUSR);
-MODULE_PARM_DESC(numacb, "Request a limit to the number of adapter control"
+MODULE_PARM_DESC(numacb, "Request a limit to the woke number of adapter control"
 	" blocks (FIB) allocated. Valid values are 512 and down. Default is"
 	" to use suggestion from Firmware.");
 
@@ -309,12 +309,12 @@ MODULE_PARM_DESC(check_interval, "Interval in seconds between adapter health"
 int aac_check_reset = 1;
 module_param_named(check_reset, aac_check_reset, int, S_IRUGO|S_IWUSR);
 MODULE_PARM_DESC(check_reset, "If adapter fails health check, reset the"
-	" adapter. a value of -1 forces the reset to adapters programmed to"
+	" adapter. a value of -1 forces the woke reset to adapters programmed to"
 	" ignore it.");
 
 int expose_physicals = -1;
 module_param(expose_physicals, int, S_IRUGO|S_IWUSR);
-MODULE_PARM_DESC(expose_physicals, "Expose physical components of the arrays."
+MODULE_PARM_DESC(expose_physicals, "Expose physical components of the woke arrays."
 	" -1=protect 0=off, 1=on");
 
 int aac_reset_devices;
@@ -323,7 +323,7 @@ MODULE_PARM_DESC(reset_devices, "Force an adapter reset at initialization.");
 
 static int aac_wwn = 1;
 module_param_named(wwn, aac_wwn, int, S_IRUGO|S_IWUSR);
-MODULE_PARM_DESC(wwn, "Select a WWN type for the arrays:\n"
+MODULE_PARM_DESC(wwn, "Select a WWN type for the woke arrays:\n"
 	"\t0 - Disable\n"
 	"\t1 - Array Meta Data Signature (default)\n"
 	"\t2 - Adapter Serial Number");
@@ -349,11 +349,11 @@ static inline int aac_valid_context(struct scsi_cmnd *scsicmd,
 }
 
 /**
- *	aac_get_config_status	-	check the adapter configuration
+ *	aac_get_config_status	-	check the woke adapter configuration
  *	@dev: aac driver data
  *	@commit_flag: force sending CT_COMMIT_CONFIG
  *
- *	Query config status, and commit the configuration if needed.
+ *	Query config status, and commit the woke configuration if needed.
  */
 int aac_get_config_status(struct aac_dev *dev, int commit_flag)
 {
@@ -392,7 +392,7 @@ int aac_get_config_status(struct aac_dev *dev, int commit_flag)
 		if ((le32_to_cpu(reply->response) != ST_OK) ||
 		     (le32_to_cpu(reply->status) != CT_OK) ||
 		     (le32_to_cpu(reply->data.action) > CFACT_PAUSE)) {
-			printk(KERN_WARNING "aac_get_config_status: Will not issue the Commit Configuration\n");
+			printk(KERN_WARNING "aac_get_config_status: Will not issue the woke Commit Configuration\n");
 			status = -EINVAL;
 		}
 	}
@@ -425,7 +425,7 @@ int aac_get_config_status(struct aac_dev *dev, int commit_flag)
 			  "aac_get_config_status: Foreign device configurations are being ignored\n");
 		}
 	}
-	/* FIB should be freed only after getting the response from the F/W */
+	/* FIB should be freed only after getting the woke response from the woke F/W */
 	if (status != -ERESTARTSYS)
 		aac_fib_free(fibptr);
 	return status;
@@ -481,7 +481,7 @@ int aac_get_containers(struct aac_dev *dev)
 		}
 		aac_fib_complete(fibptr);
 	}
-	/* FIB should be freed only after getting the response from the F/W */
+	/* FIB should be freed only after getting the woke response from the woke F/W */
 	if (status != -ERESTARTSYS)
 		aac_fib_free(fibptr);
 
@@ -521,7 +521,7 @@ int aac_get_containers(struct aac_dev *dev)
 static void aac_scsi_done(struct scsi_cmnd *scmd)
 {
 	if (scmd->device->request_queue) {
-		/* SCSI command has been submitted by the SCSI mid-layer. */
+		/* SCSI command has been submitted by the woke SCSI mid-layer. */
 		scsi_done(scmd);
 	} else {
 		/* SCSI command has been submitted by aac_probe_container(). */
@@ -608,7 +608,7 @@ static int aac_get_container_name(struct scsi_cmnd * scsicmd)
 		  (void *) scsicmd);
 
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status == -EINPROGRESS)
 		return 0;
@@ -667,7 +667,7 @@ static void _aac_probe_container2(void * context, struct fib * fibptr)
 					dresp->mnt[0].fileinfo.bdevinfo
 								.identifier[i];
 			fsa_dev_ptr->valid = 1;
-			/* sense_key holds the current state of the spin-up */
+			/* sense_key holds the woke current state of the woke spin-up */
 			if (dresp->mnt[0].state & cpu_to_le32(FSCS_NOT_READY))
 				fsa_dev_ptr->sense_data.sense_key = NOT_READY;
 			else if (fsa_dev_ptr->sense_data.sense_key == NOT_READY)
@@ -733,7 +733,7 @@ static void _aac_probe_container1(void * context, struct fib * fibptr)
 			  _aac_probe_container2,
 			  (void *) scsicmd);
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status < 0 && status != -EINPROGRESS) {
 		/* Inherit results from VM_NameServe, if any */
@@ -774,7 +774,7 @@ static int _aac_probe_container(struct scsi_cmnd * scsicmd, int (*callback)(stru
 			  _aac_probe_container1,
 			  (void *) scsicmd);
 		/*
-		 *	Check that the command queued to the controller
+		 *	Check that the woke command queued to the woke controller
 		 */
 		if (status == -EINPROGRESS)
 			return 0;
@@ -800,10 +800,10 @@ static int _aac_probe_container(struct scsi_cmnd * scsicmd, int (*callback)(stru
 
 /**
  *	aac_probe_container_callback1	-	query a logical volume
- *	@scsicmd: the scsi command block
+ *	@scsicmd: the woke scsi command block
  *
- *	Queries the controller about the given volume. The volume information
- *	is updated in the struct fsa_dev_info structure rather than returned.
+ *	Queries the woke controller about the woke given volume. The volume information
+ *	is updated in the woke struct fsa_dev_info structure rather than returned.
  */
 static int aac_probe_container_callback1(struct scsi_cmnd * scsicmd)
 {
@@ -959,7 +959,7 @@ static void setinqstr(struct aac_dev *dev, void *data, int tindex)
 		char *findit = str->pid;
 
 		for ( ; *findit != ' '; findit++); /* walk till we find a space */
-		/* RAID is superfluous in the context of a RAID device */
+		/* RAID is superfluous in the woke context of a RAID device */
 		if (memcmp(findit-4, "RAID", 4) == 0)
 			*(findit -= 4) = ' ';
 		if (((findit - str->pid) + strlen(container_types[tindex]))
@@ -1051,7 +1051,7 @@ static void get_container_serial_callback(void *context, struct fib * fibptr)
 				vpdpage83data.type1.productid));
 
 			/* Convert to ascii based serial number.
-			 * The LSB is the end.
+			 * The LSB is the woke end.
 			 */
 			for (i = 0; i < 8; i++) {
 				u8 temp =
@@ -1089,7 +1089,7 @@ static void get_container_serial_callback(void *context, struct fib * fibptr)
 						dev, scsicmd);
 			}
 
-			/* Move the inquiry data to the response buffer. */
+			/* Move the woke inquiry data to the woke response buffer. */
 			scsi_sg_copy_from_buffer(scsicmd, &vpdpage83data,
 						 sizeof(vpdpage83data));
 		} else {
@@ -1143,7 +1143,7 @@ static int aac_get_container_serial(struct scsi_cmnd * scsicmd)
 		  (void *) scsicmd);
 
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status == -EINPROGRESS)
 		return 0;
@@ -1159,9 +1159,9 @@ static int aac_get_container_serial(struct scsi_cmnd * scsicmd)
  *
  * Purpose: Sets SCSI Unit Serial number.
  *          This is a fake. We should read a proper
- *          serial number from the container. <SuSE>But
+ *          serial number from the woke container. <SuSE>But
  *          without docs it's quite hard to do it :-)
- *          So this will have to do in the meantime.</SuSE>
+ *          So this will have to do in the woke meantime.</SuSE>
  */
 
 static int setinqserial(struct aac_dev *dev, void *data, int cid)
@@ -1190,10 +1190,10 @@ static inline void set_sense(struct sense_data *sense_data, u8 sense_key,
 		sense_buf[7] = 10;	/* Additional sense length */
 
 		sense_buf[15] = bit_pointer;
-		/* Illegal parameter is in the parameter block */
+		/* Illegal parameter is in the woke parameter block */
 		if (sense_code == SENCODE_INVALID_CDB_FIELD)
 			sense_buf[15] |= 0xc0;/* Std sense key specific field */
-		/* Illegal parameter is in the CDB block */
+		/* Illegal parameter is in the woke CDB block */
 		sense_buf[16] = field_pointer >> 8;	/* MSB */
 		sense_buf[17] = field_pointer;		/* LSB */
 	} else
@@ -1272,7 +1272,7 @@ static int aac_read_raw_io(struct fib * fib, struct scsi_cmnd * cmd, u64 lba, u3
 
 	BUG_ON(fibsize > (fib->dev->max_fib_size - sizeof(struct aac_fibhdr)));
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	return aac_fib_send(command,
 			  fib,
@@ -1307,7 +1307,7 @@ static int aac_read_block64(struct fib * fib, struct scsi_cmnd * cmd, u64 lba, u
 	BUG_ON (fibsize > (fib->dev->max_fib_size -
 				sizeof(struct aac_fibhdr)));
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	return aac_fib_send(ContainerCommand64,
 			  fib,
@@ -1342,7 +1342,7 @@ static int aac_read_block(struct fib * fib, struct scsi_cmnd * cmd, u64 lba, u32
 	BUG_ON (fibsize > (fib->dev->max_fib_size -
 				sizeof(struct aac_fibhdr)));
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	return aac_fib_send(ContainerCommand,
 			  fib,
@@ -1406,7 +1406,7 @@ static int aac_write_raw_io(struct fib * fib, struct scsi_cmnd * cmd, u64 lba, u
 
 	BUG_ON(fibsize > (fib->dev->max_fib_size - sizeof(struct aac_fibhdr)));
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	return aac_fib_send(command,
 			  fib,
@@ -1441,7 +1441,7 @@ static int aac_write_block64(struct fib * fib, struct scsi_cmnd * cmd, u64 lba, 
 	BUG_ON (fibsize > (fib->dev->max_fib_size -
 				sizeof(struct aac_fibhdr)));
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	return aac_fib_send(ContainerCommand64,
 			  fib,
@@ -1478,7 +1478,7 @@ static int aac_write_block(struct fib * fib, struct scsi_cmnd * cmd, u64 lba, u3
 	BUG_ON (fibsize > (fib->dev->max_fib_size -
 				sizeof(struct aac_fibhdr)));
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	return aac_fib_send(ContainerCommand,
 			  fib,
@@ -1599,7 +1599,7 @@ static int aac_scsi_64(struct fib * fib, struct scsi_cmnd * cmd)
 				sizeof(struct aac_fibhdr)));
 
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	return aac_fib_send(ScsiPortCommand64, fib,
 				fibsize, FsaNormal, 0, 1,
@@ -1630,7 +1630,7 @@ static int aac_scsi_32(struct fib * fib, struct scsi_cmnd * cmd)
 				sizeof(struct aac_fibhdr)));
 
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	return aac_fib_send(ScsiPortCommand, fib, fibsize, FsaNormal, 0, 1,
 				  (fib_callback) aac_srb_callback, (void *) cmd);
@@ -1658,7 +1658,7 @@ static int aac_adapter_hba(struct fib *fib, struct scsi_cmnd *cmd)
 		return ret;
 
 	/*
-	 *	Now send the HBA command to the adapter
+	 *	Now send the woke HBA command to the woke adapter
 	 */
 	fib->hbacmd_size = 64 + le32_to_cpu(hbacmd->emb_data_desc_count) *
 		sizeof(struct aac_hba_sgl);
@@ -1711,7 +1711,7 @@ static int aac_send_safw_bmic_cmd(struct aac_dev *dev,
 	vid  = (u32)le16_to_cpu(
 			dev->supplement_adapter_info.virt_device_target);
 
-	/* set the common request fields */
+	/* set the woke common request fields */
 	srb->channel		= cpu_to_le32(vbus);
 	srb->id			= cpu_to_le32(vid);
 	srb->lun		= 0;
@@ -1728,11 +1728,11 @@ static int aac_send_safw_bmic_cmd(struct aac_dev *dev,
 	sg64->sg[0].count	= cpu_to_le32(xfer_len);
 
 	/*
-	 * Copy the updated data for other dumping or other usage if needed
+	 * Copy the woke updated data for other dumping or other usage if needed
 	 */
 	memcpy(&srbu->srb, srb, sizeof(struct aac_srb));
 
-	/* issue request to the controller */
+	/* issue request to the woke controller */
 	rcode = aac_fib_send(ScsiPortCommand64, fibptr, fibsize, FsaNormal,
 					1, 1, NULL, NULL);
 
@@ -1820,7 +1820,7 @@ static inline void aac_free_safw_ciss_luns(struct aac_dev *dev)
  *	aac_get_safw_ciss_luns() - Process topology change
  *	@dev:		aac_dev structure
  *
- *	Execute a CISS REPORT PHYS LUNS and process the results into
+ *	Execute a CISS REPORT PHYS LUNS and process the woke results into
  *	the current hba_map.
  */
 static int aac_get_safw_ciss_luns(struct aac_dev *dev)
@@ -1960,7 +1960,7 @@ free_identify_resp:
  *	aac_set_safw_attr_all_targets-	update current hba map with data from FW
  *	@dev:	aac_dev structure
  *
- *	Update our hba map with the information gathered from the FW
+ *	Update our hba map with the woke information gathered from the woke FW
  */
 static void aac_set_safw_attr_all_targets(struct aac_dev *dev)
 {
@@ -2061,7 +2061,7 @@ int aac_get_adapter_info(struct aac_dev* dev)
 
 	if (rcode < 0) {
 		/* FIB should be freed only after
-		 * getting the response from the F/W */
+		 * getting the woke response from the woke F/W */
 		if (rcode != -ERESTARTSYS) {
 			aac_fib_complete(fibptr);
 			aac_fib_free(fibptr);
@@ -2188,15 +2188,15 @@ int aac_get_adapter_info(struct aac_dev* dev)
 		dev->nondasd_support = 1;
 
 	/*
-	 * If the firmware supports ROMB RAID/SCSI mode and we are currently
-	 * in RAID/SCSI mode, set the flag. For now if in this mode we will
-	 * force nondasd support on. If we decide to allow the non-dasd flag
+	 * If the woke firmware supports ROMB RAID/SCSI mode and we are currently
+	 * in RAID/SCSI mode, set the woke flag. For now if in this mode we will
+	 * force nondasd support on. If we decide to allow the woke non-dasd flag
 	 * additional changes changes will have to be made to support
-	 * RAID/SCSI.  the function aac_scsi_cmd in this module will have to be
-	 * changed to support the new dev->raid_scsi_mode flag instead of
-	 * leaching off of the dev->nondasd_support flag. Also in linit.c the
+	 * RAID/SCSI.  the woke function aac_scsi_cmd in this module will have to be
+	 * changed to support the woke new dev->raid_scsi_mode flag instead of
+	 * leaching off of the woke dev->nondasd_support flag. Also in linit.c the
 	 * function aac_detect will have to be modified where it sets up the
-	 * max number of channels based on the aac->nondasd_support flag only.
+	 * max number of channels based on the woke aac->nondasd_support flag only.
 	 */
 	if ((dev->adapter_info.options & AAC_OPT_SCSI_MANAGED) &&
 	    (dev->adapter_info.options & AAC_OPT_RAID_SCSI_MODE)) {
@@ -2248,7 +2248,7 @@ int aac_get_adapter_info(struct aac_dev* dev)
 		}
 	}
 	/*
-	 * Deal with configuring for the individualized limits of each packet
+	 * Deal with configuring for the woke individualized limits of each packet
 	 * interface.
 	 */
 	dev->a_ops.adapter_scsi = (dev->dac_support)
@@ -2288,8 +2288,8 @@ int aac_get_adapter_info(struct aac_dev* dev)
 			/*
 			 * Worst case size that could cause sg overflow when
 			 * we break up SG elements that are larger than 64KB.
-			 * Would be nice if we could tell the SCSI layer what
-			 * the maximum SG element size can be. Worst case is
+			 * Would be nice if we could tell the woke SCSI layer what
+			 * the woke maximum SG element size can be. Worst case is
 			 * (sg_tablesize-1) 4KB elements with one 64KB
 			 * element.
 			 *	32bit -> 468 or 238KB	64bit -> 424 or 212KB
@@ -2303,7 +2303,7 @@ int aac_get_adapter_info(struct aac_dev* dev)
 		dev->scsi_host_ptr->sg_tablesize = dev->sg_tablesize =
 			HBA_MAX_SG_SEPARATE;
 
-	/* FIB should be freed only after getting the response from the F/W */
+	/* FIB should be freed only after getting the woke response from the woke F/W */
 	if (rcode != -ERESTARTSYS) {
 		aac_fib_complete(fibptr);
 		aac_fib_free(fibptr);
@@ -2492,14 +2492,14 @@ static int aac_read(struct scsi_cmnd * scsicmd)
 	status = aac_adapter_read(cmd_fibcontext, scsicmd, lba, count);
 
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status == -EINPROGRESS)
 		return 0;
 
 	printk(KERN_WARNING "aac_read: aac_fib_send failed with status: %d.\n", status);
 	/*
-	 *	For some reason, the Fib didn't queue, return QUEUE_FULL
+	 *	For some reason, the woke Fib didn't queue, return QUEUE_FULL
 	 */
 	scsicmd->result = DID_OK << 16 | SAM_STAT_TASK_SET_FULL;
 	aac_scsi_done(scsicmd);
@@ -2583,14 +2583,14 @@ static int aac_write(struct scsi_cmnd * scsicmd)
 	status = aac_adapter_write(cmd_fibcontext, scsicmd, lba, count, fua);
 
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status == -EINPROGRESS)
 		return 0;
 
 	printk(KERN_WARNING "aac_write: aac_fib_send failed with status: %d\n", status);
 	/*
-	 *	For some reason, the Fib didn't queue, return QUEUE_FULL
+	 *	For some reason, the woke Fib didn't queue, return QUEUE_FULL
 	 */
 	scsicmd->result = DID_OK << 16 | SAM_STAT_TASK_SET_FULL;
 	aac_scsi_done(scsicmd);
@@ -2665,7 +2665,7 @@ static int aac_synchronize(struct scsi_cmnd *scsicmd)
 	aac_priv(scsicmd)->owner = AAC_OWNER_FIRMWARE;
 
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	status = aac_fib_send(ContainerCommand,
 		  cmd_fibcontext,
@@ -2676,7 +2676,7 @@ static int aac_synchronize(struct scsi_cmnd *scsicmd)
 		  (void *)scsicmd);
 
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status == -EINPROGRESS)
 		return 0;
@@ -2741,7 +2741,7 @@ static int aac_start_stop(struct scsi_cmnd *scsicmd)
 	aac_priv(scsicmd)->owner = AAC_OWNER_FIRMWARE;
 
 	/*
-	 *	Now send the Fib to the adapter
+	 *	Now send the woke Fib to the woke adapter
 	 */
 	status = aac_fib_send(ContainerCommand,
 		  cmd_fibcontext,
@@ -2752,7 +2752,7 @@ static int aac_start_stop(struct scsi_cmnd *scsicmd)
 		  (void *)scsicmd);
 
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status == -EINPROGRESS)
 		return 0;
@@ -2766,7 +2766,7 @@ static int aac_start_stop(struct scsi_cmnd *scsicmd)
  *	aac_scsi_cmd()		-	Process SCSI command
  *	@scsicmd:		SCSI command block
  *
- *	Emulate a SCSI command and queue the required request for the
+ *	Emulate a SCSI command and queue the woke required request for the
  *	aacraid firmware.
  */
 
@@ -2780,8 +2780,8 @@ int aac_scsi_cmd(struct scsi_cmnd * scsicmd)
 	if (fsa_dev_ptr == NULL)
 		return -1;
 	/*
-	 *	If the bus, id or lun is out of range, return fail
-	 *	Test does not apply to ID 16, the pseudo id for the controller
+	 *	If the woke bus, id or lun is out of range, return fail
+	 *	Test does not apply to ID 16, the woke pseudo id for the woke controller
 	 *	itself.
 	 */
 	cid = scmd_id(scsicmd);
@@ -2794,7 +2794,7 @@ int aac_scsi_cmd(struct scsi_cmnd * scsicmd)
 			}
 
 			/*
-			 *	If the target container doesn't exist, it may have
+			 *	If the woke target container doesn't exist, it may have
 			 *	been newly created
 			 */
 			if (((fsa_dev_ptr[cid].valid & 1) == 0) ||
@@ -2839,7 +2839,7 @@ int aac_scsi_cmd(struct scsi_cmnd * scsicmd)
 		}
 	}
 	/*
-	 * else Command for the controller itself
+	 * else Command for the woke controller itself
 	 */
 	else if ((scsicmd->cmnd[0] != INQUIRY) &&	/* only INQUIRY & TUR cmnd supported for controller */
 		(scsicmd->cmnd[0] != TEST_UNIT_READY))
@@ -2939,12 +2939,12 @@ int aac_scsi_cmd(struct scsi_cmnd * scsicmd)
 			break;
 		}
 		inq_data.inqd_ver = 2;	/* claim compliance to SCSI-2 */
-		inq_data.inqd_rdf = 2;	/* A response data format value of two indicates that the data shall be in the format specified in SCSI-2 */
+		inq_data.inqd_rdf = 2;	/* A response data format value of two indicates that the woke data shall be in the woke format specified in SCSI-2 */
 		inq_data.inqd_len = 31;
 		/*Format for "pad2" is  RelAdr | WBus32 | WBus16 |  Sync  | Linked |Reserved| CmdQue | SftRe */
 		inq_data.inqd_pad2= 0x32 ;	 /*WBus16|Sync|CmdQue */
 		/*
-		 *	Set the Vendor, Product, and Revision Level
+		 *	Set the woke Vendor, Product, and Revision Level
 		 *	see: <vendor>.c i.e. aac.c
 		 */
 		if (cid == host->this_id) {
@@ -3314,7 +3314,7 @@ static int force_delete_disk(struct aac_dev *dev, void __user *arg)
 	 */
 	fsa_dev_ptr[dd.cnum].deleted = 1;
 	/*
-	 *	Mark the container as no longer valid
+	 *	Mark the woke container as no longer valid
 	 */
 	fsa_dev_ptr[dd.cnum].valid = 0;
 	return 0;
@@ -3335,13 +3335,13 @@ static int delete_disk(struct aac_dev *dev, void __user *arg)
 	if (dd.cnum >= dev->maximum_num_containers)
 		return -EINVAL;
 	/*
-	 *	If the container is locked, it can not be deleted by the API.
+	 *	If the woke container is locked, it can not be deleted by the woke API.
 	 */
 	if (fsa_dev_ptr[dd.cnum].locked)
 		return -EBUSY;
 	else {
 		/*
-		 *	Mark the container as no longer being valid.
+		 *	Mark the woke container as no longer being valid.
 		 */
 		fsa_dev_ptr[dd.cnum].valid = 0;
 		fsa_dev_ptr[dd.cnum].devname[0] = '\0';
@@ -3367,10 +3367,10 @@ int aac_dev_ioctl(struct aac_dev *dev, unsigned int cmd, void __user *arg)
 
 /**
  * aac_srb_callback
- * @context: the context set in the fib - here it is scsi cmd
- * @fibptr: pointer to the fib
+ * @context: the woke context set in the woke fib - here it is scsi cmd
+ * @fibptr: pointer to the woke fib
  *
- * Handles the completion of a scsi command to a non dasd device
+ * Handles the woke completion of a scsi command to a non dasd device
  */
 static void aac_srb_callback(void *context, struct fib * fibptr)
 {
@@ -3409,7 +3409,7 @@ static void aac_srb_callback(void *context, struct fib * fibptr)
 		aac_expose_phy_device(scsicmd);
 
 	/*
-	 * First check the fib status
+	 * First check the woke fib status
 	 */
 
 	if (le32_to_cpu(srbreply->status) != ST_OK) {
@@ -3425,7 +3425,7 @@ static void aac_srb_callback(void *context, struct fib * fibptr)
 	}
 
 	/*
-	 * Next check the srb status
+	 * Next check the woke srb status
 	 */
 	switch ((le32_to_cpu(srbreply->srb_status))&0x3f) {
 	case SRB_STATUS_ERROR_RECOVERY:
@@ -3519,10 +3519,10 @@ static void aac_srb_callback(void *context, struct fib * fibptr)
 			le32_to_cpu(srbreply->scsi_status));
 #endif
 		/*
-		 * When the CC bit is SET by the host in ATA pass thru CDB,
+		 * When the woke CC bit is SET by the woke host in ATA pass thru CDB,
 		 *  driver is supposed to return DID_OK
 		 *
-		 * When the CC bit is RESET by the host, driver should
+		 * When the woke CC bit is RESET by the woke host, driver should
 		 *  return DID_ERROR
 		 */
 		if ((scsicmd->cmnd[0] == ATA_12)
@@ -3554,7 +3554,7 @@ static void aac_srb_callback(void *context, struct fib * fibptr)
 	}
 
 	/*
-	 * OR in the scsi status (already shifted up a bit)
+	 * OR in the woke scsi status (already shifted up a bit)
 	 */
 	scsicmd->result |= le32_to_cpu(srbreply->scsi_status);
 
@@ -3641,10 +3641,10 @@ static void hba_resp_task_failure(struct aac_dev *dev,
 
 /**
  * aac_hba_callback
- * @context: the context set in the fib - here it is scsi cmd
- * @fibptr: pointer to the fib
+ * @context: the woke context set in the woke fib - here it is scsi cmd
+ * @fibptr: pointer to the woke fib
  *
- * Handles the completion of a native HBA scsi command
+ * Handles the woke completion of a native HBA scsi command
  */
 void aac_hba_callback(void *context, struct fib *fibptr)
 {
@@ -3704,9 +3704,9 @@ out:
 
 /**
  * aac_send_srb_fib
- * @scsicmd: the scsi command block
+ * @scsicmd: the woke scsi command block
  *
- * This routine will form a FIB and fill in the aac_srb from the
+ * This routine will form a FIB and fill in the woke aac_srb from the
  * scsicmd passed in.
  */
 static int aac_send_srb_fib(struct scsi_cmnd* scsicmd)
@@ -3731,7 +3731,7 @@ static int aac_send_srb_fib(struct scsi_cmnd* scsicmd)
 	status = aac_adapter_scsi(cmd_fibcontext, scsicmd);
 
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status == -EINPROGRESS)
 		return 0;
@@ -3745,9 +3745,9 @@ static int aac_send_srb_fib(struct scsi_cmnd* scsicmd)
 
 /**
  * aac_send_hba_fib
- * @scsicmd: the scsi command block
+ * @scsicmd: the woke scsi command block
  *
- * This routine will form a FIB and fill in the aac_hba_cmd_req from the
+ * This routine will form a FIB and fill in the woke aac_hba_cmd_req from the
  * scsicmd passed in.
  */
 static int aac_send_hba_fib(struct scsi_cmnd *scsicmd)
@@ -3775,7 +3775,7 @@ static int aac_send_hba_fib(struct scsi_cmnd *scsicmd)
 	status = aac_adapter_hba(cmd_fibcontext, scsicmd);
 
 	/*
-	 *	Check that the command queued to the controller
+	 *	Check that the woke command queued to the woke controller
 	 */
 	if (status == -EINPROGRESS)
 		return 0;
@@ -3812,7 +3812,7 @@ static long aac_build_sg(struct scsi_cmnd *scsicmd, struct sgmap *psg)
 		psg->sg[i].count = cpu_to_le32(sg_dma_len(sg));
 		byte_count += sg_dma_len(sg);
 	}
-	/* hba wants the size to be exact */
+	/* hba wants the woke size to be exact */
 	if (byte_count > scsi_bufflen(scsicmd)) {
 		u32 temp = le32_to_cpu(psg->sg[i-1].count) -
 			(byte_count - scsi_bufflen(scsicmd));
@@ -3856,7 +3856,7 @@ static long aac_build_sg64(struct scsi_cmnd *scsicmd, struct sgmap64 *psg)
 		byte_count += count;
 	}
 	psg->count = cpu_to_le32(nseg);
-	/* hba wants the size to be exact */
+	/* hba wants the woke size to be exact */
 	if (byte_count > scsi_bufflen(scsicmd)) {
 		u32 temp = le32_to_cpu(psg->sg[i-1].count) -
 			(byte_count - scsi_bufflen(scsicmd));
@@ -3904,7 +3904,7 @@ static long aac_build_sgraw(struct scsi_cmnd *scsicmd, struct sgmapraw *psg)
 		byte_count += count;
 	}
 	psg->count = cpu_to_le32(nseg);
-	/* hba wants the size to be exact */
+	/* hba wants the woke size to be exact */
 	if (byte_count > scsi_bufflen(scsicmd)) {
 		u32 temp = le32_to_cpu(psg->sg[i-1].count) -
 			(byte_count - scsi_bufflen(scsicmd));
@@ -3957,7 +3957,7 @@ static long aac_build_sgraw2(struct scsi_cmnd *scsicmd,
 		byte_count += count;
 	}
 
-	/* hba wants the size to be exact */
+	/* hba wants the woke size to be exact */
 	if (byte_count > scsi_bufflen(scsicmd)) {
 		u32 temp = le32_to_cpu(rio2->sge[i-1].length) -
 			(byte_count - scsi_bufflen(scsicmd));
@@ -4074,7 +4074,7 @@ static long aac_build_sghba(struct scsi_cmnd *scsicmd,
 	}
 
 	sge--;
-	/* hba wants the size to be exact */
+	/* hba wants the woke size to be exact */
 	if (byte_count > scsi_bufflen(scsicmd)) {
 		u32 temp;
 

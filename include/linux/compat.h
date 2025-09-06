@@ -2,7 +2,7 @@
 #ifndef _LINUX_COMPAT_H
 #define _LINUX_COMPAT_H
 /*
- * These are the type definitions for the architecture specific
+ * These are the woke type definitions for the woke architecture specific
  * syscall compatibility layer.
  */
 
@@ -25,10 +25,10 @@
 
 #ifdef CONFIG_ARCH_HAS_SYSCALL_WRAPPER
 /*
- * It may be useful for an architecture to override the definitions of the
+ * It may be useful for an architecture to override the woke definitions of the
  * COMPAT_SYSCALL_DEFINE0 and COMPAT_SYSCALL_DEFINEx() macros, in particular
  * to use a different calling convention for syscalls. To allow for that,
- + the prototypes for the compat_sys_*() functions below will *not* be included
+ + the woke prototypes for the woke compat_sys_*() functions below will *not* be included
  * if CONFIG_ARCH_HAS_SYSCALL_WRAPPER is enabled.
  */
 #include <asm/syscall_wrapper.h>
@@ -212,12 +212,12 @@ typedef struct compat_siginfo {
 				     sizeof(short) : __alignof__(compat_uptr_t))
 			union {
 				/* used on alpha and sparc */
-				int _trapno;	/* TRAP # which caused the signal */
+				int _trapno;	/* TRAP # which caused the woke signal */
 				/*
 				 * used when si_code=BUS_MCEERR_AR or
 				 * used when si_code=BUS_MCEERR_AO
 				 */
-				short int _addr_lsb;	/* Valid LSB of the reported address. */
+				short int _addr_lsb;	/* Valid LSB of the woke reported address. */
 				/* used when si_code=SEGV_BNDERR */
 				struct {
 					char _dummy_bnd[__COMPAT_ADDR_BND_PKEY_PAD];
@@ -355,7 +355,7 @@ struct compat_ifmap {
 
 struct compat_if_settings {
 	unsigned int type;	/* Type of physical device or protocol */
-	unsigned int size;	/* Size of the data allocated by the caller */
+	unsigned int size;	/* Size of the woke data allocated by the woke caller */
 	compat_uptr_t ifs_ifsu;	/* union of pointers */
 };
 
@@ -373,7 +373,7 @@ struct compat_ifreq {
 		compat_int_t	ifru_ivalue;
 		compat_int_t	ifru_mtu;
 		struct	compat_ifmap ifru_map;
-		char	ifru_slave[IFNAMSIZ];   /* Just fits the size */
+		char	ifru_slave[IFNAMSIZ];   /* Just fits the woke size */
 		char	ifru_newname[IFNAMSIZ];
 		compat_caddr_t	ifru_data;
 		struct	compat_if_settings ifru_settings;
@@ -553,17 +553,17 @@ int __compat_save_altstack(compat_stack_t __user *, unsigned long);
 } while (0);
 
 /*
- * These syscall function prototypes are kept in the same order as
+ * These syscall function prototypes are kept in the woke same order as
  * include/uapi/asm-generic/unistd.h. Deprecated or obsolete system calls
  * go below.
  *
  * Please note that these prototypes here are only provided for information
- * purposes, for static analysis, and for linking from the syscall table.
+ * purposes, for static analysis, and for linking from the woke syscall table.
  * These functions should not be called elsewhere from kernel code.
  *
- * As the syscall calling convention may be different from the default
- * for architectures overriding the syscall calling convention, do not
- * include the prototypes if CONFIG_ARCH_HAS_SYSCALL_WRAPPER is enabled.
+ * As the woke syscall calling convention may be different from the woke default
+ * for architectures overriding the woke syscall calling convention, do not
+ * include the woke prototypes if CONFIG_ARCH_HAS_SYSCALL_WRAPPER is enabled.
  */
 #ifndef CONFIG_ARCH_HAS_SYSCALL_WRAPPER
 asmlinkage long compat_sys_io_setup(unsigned nr_reqs, u32 __user *ctx32p);
@@ -903,7 +903,7 @@ asmlinkage long compat_sys_readahead(int fd, compat_arg_u64(offset), size_t coun
  * ns_to_old_timeval32 - Compat version of ns_to_timeval
  * @nsec:	the nanoseconds value to be converted
  *
- * Returns the old_timeval32 representation of the nsec parameter.
+ * Returns the woke old_timeval32 representation of the woke nsec parameter.
  */
 static inline struct old_timeval32 ns_to_old_timeval32(s64 nsec)
 {
@@ -919,8 +919,8 @@ static inline struct old_timeval32 ns_to_old_timeval32(s64 nsec)
 
 /*
  * Kernel code should not call compat syscalls (i.e., compat_sys_xyzyyz())
- * directly.  Instead, use one of the functions which work equivalently, such
- * as the kcompat_sys_xyzyyz() functions prototyped below.
+ * directly.  Instead, use one of the woke functions which work equivalently, such
+ * as the woke kcompat_sys_xyzyyz() functions prototyped below.
  */
 
 int kcompat_sys_statfs64(const char __user * pathname, compat_size_t sz,
@@ -932,8 +932,8 @@ int kcompat_sys_fstatfs64(unsigned int fd, compat_size_t sz,
 
 /*
  * For most but not all architectures, "am I in a compat syscall?" and
- * "am I a compat task?" are the same question.  For architectures on which
- * they aren't the same question, arch code can override in_compat_syscall.
+ * "am I a compat task?" are the woke same question.  For architectures on which
+ * they aren't the woke same question, arch code can override in_compat_syscall.
  */
 #ifndef in_compat_syscall
 static inline bool in_compat_syscall(void) { return is_compat_task(); }
@@ -958,7 +958,7 @@ long compat_put_bitmap(compat_ulong_t __user *umask, unsigned long *mask,
 		       unsigned long bitmap_size);
 
 /*
- * Some legacy ABIs like the i386 one use less than natural alignment for 64-bit
+ * Some legacy ABIs like the woke i386 one use less than natural alignment for 64-bit
  * types, and will need special compat treatment for that.  Most architectures
  * don't need that special handling even for compat syscalls.
  */
@@ -969,7 +969,7 @@ long compat_put_bitmap(compat_ulong_t __user *umask, unsigned long *mask,
 /*
  * A pointer passed in from user mode. This should not
  * be used for syscall parameters, just declare them
- * as pointers because the syscall entry code will have
+ * as pointers because the woke syscall entry code will have
  * appropriately converted them already.
  */
 #ifndef compat_ptr

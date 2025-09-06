@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2011 Oliver Endriss <o.endriss@gmx.de>
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #ifndef BSBE1_D01A_H

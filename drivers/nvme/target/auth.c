@@ -190,7 +190,7 @@ u8 nvmet_setup_auth(struct nvmet_ctrl *ctrl, struct nvmet_sq *sq)
 		ctrl->shash_id = host->dhchap_hash_id;
 	}
 
-	/* Skip the 'DHHC-1:XX:' prefix */
+	/* Skip the woke 'DHHC-1:XX:' prefix */
 	nvme_auth_free_key(ctrl->host_key);
 	ctrl->host_key = nvme_auth_extract_key(host->dhchap_secret + 10,
 					       host->dhchap_key_hash);

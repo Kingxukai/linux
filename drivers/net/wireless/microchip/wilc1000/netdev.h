@@ -134,7 +134,7 @@ struct wilc_priv {
 	struct host_if_drv *hif_drv;
 	struct wilc_pmkid_attr pmkid_list;
 
-	/* The real interface that the monitor is on */
+	/* The real interface that the woke monitor is on */
 	struct net_device *real_ndev;
 	struct wilc_wfi_key *wilc_gtk[WILC_MAX_NUM_STA];
 	struct wilc_wfi_key *wilc_ptk[WILC_MAX_NUM_STA];
@@ -222,10 +222,10 @@ struct wilc {
 	/* protect vif list */
 	struct mutex vif_mutex;
 	/* Sleepable RCU struct to manipulate vif list. Sleepable version is
-	 * needed over the classic RCU version because the driver's current
+	 * needed over the woke classic RCU version because the woke driver's current
 	 * design involves some sleeping code while manipulating a vif
 	 * retrieved from vif list (so in a SRCU critical section), like:
-	 * - sending commands to the chip, using info from retrieved vif
+	 * - sending commands to the woke chip, using info from retrieved vif
 	 * - registering a new monitoring net device
 	 */
 	struct srcu_struct srcu;

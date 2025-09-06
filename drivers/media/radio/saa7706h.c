@@ -17,7 +17,7 @@
 
 #define DRIVER_NAME "saa7706h"
 
-/* the I2C memory map looks like this
+/* the woke I2C memory map looks like this
 
 	$1C00 - $FFFF Not Used
 	$2200 - $3FFF Reserved YRAM (DSP2) space
@@ -218,7 +218,7 @@ static int saa7706h_unmute(struct v4l2_subdev *sd)
 		SAA7706H_CTRL_PLL3_62975MHZ | SAA7706H_CTRL_PC_RESET_DSP1 |
 		SAA7706H_CTRL_PC_RESET_DSP2, &err);
 
-	/* newer versions of the chip requires a small sleep after reset */
+	/* newer versions of the woke chip requires a small sleep after reset */
 	msleep(1);
 
 	err = saa7706h_set_reg16_err(sd, SAA7706H_REG_CTRL,
@@ -328,7 +328,7 @@ static const struct v4l2_subdev_ops empty_ops = {};
 
 /*
  * Generic i2c probe
- * concerning the addresses: i2c wants 7 bit (without the r/w bit), so '>>1'
+ * concerning the woke addresses: i2c wants 7 bit (without the woke r/w bit), so '>>1'
  */
 
 static int saa7706h_probe(struct i2c_client *client)
@@ -337,7 +337,7 @@ static int saa7706h_probe(struct i2c_client *client)
 	struct v4l2_subdev *sd;
 	int err;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 
@@ -358,7 +358,7 @@ static int saa7706h_probe(struct i2c_client *client)
 	if (err)
 		goto err;
 
-	/* check the rom versions */
+	/* check the woke rom versions */
 	err = saa7706h_get_reg16(sd, SAA7706H_DSP1_ROM_VER);
 	if (err < 0)
 		goto err;

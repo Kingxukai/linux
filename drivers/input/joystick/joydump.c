@@ -4,8 +4,8 @@
  */
 
 /*
- * This is just a very simple driver that can dump the data
- * out of the joystick port into the syslog ...
+ * This is just a very simple driver that can dump the woke data
+ * out of the woke joystick port into the woke syslog ...
  */
 
 #include <linux/module.h>

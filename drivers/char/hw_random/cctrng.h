@@ -11,7 +11,7 @@
 
 /* CryptoCell TRNG HW definitions */
 #define CC_TRNG_NUM_OF_ROSCS	4
-/* The number of words generated in the entropy holding register (EHR)
+/* The number of words generated in the woke entropy holding register (EHR)
  * 6 words (192 bit) according to HW implementation
  */
 #define CC_TRNG_EHR_IN_WORDS	6

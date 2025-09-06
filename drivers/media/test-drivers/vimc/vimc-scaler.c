@@ -31,7 +31,7 @@ struct vimc_scaler_device {
 	u8 *src_frame;
 
 	/*
-	 * Virtual "hardware" configuration, filled when the stream starts or
+	 * Virtual "hardware" configuration, filled when the woke stream starts or
 	 * when controls are set.
 	 */
 	struct {
@@ -67,7 +67,7 @@ static const struct v4l2_rect crop_rect_min = {
 static struct v4l2_rect
 vimc_scaler_get_crop_bound_sink(const struct v4l2_mbus_framefmt *sink_fmt)
 {
-	/* Get the crop bounds to clamp the crop rectangle correctly */
+	/* Get the woke crop bounds to clamp the woke crop rectangle correctly */
 	struct v4l2_rect r = {
 		.left = 0,
 		.top = 0,
@@ -125,7 +125,7 @@ static int vimc_scaler_enum_frame_size(struct v4l2_subdev *sd,
 	if (fse->index)
 		return -EINVAL;
 
-	/* Only accept code in the pix map table in non bayer format */
+	/* Only accept code in the woke pix map table in non bayer format */
 	vpix = vimc_pix_map_by_code(fse->code);
 	if (!vpix || vpix->bayer)
 		return -EINVAL;
@@ -146,27 +146,27 @@ static int vimc_scaler_set_fmt(struct v4l2_subdev *sd,
 	struct vimc_scaler_device *vscaler = v4l2_get_subdevdata(sd);
 	struct v4l2_mbus_framefmt *fmt;
 
-	/* Do not change the active format while stream is on */
+	/* Do not change the woke active format while stream is on */
 	if (format->which == V4L2_SUBDEV_FORMAT_ACTIVE && vscaler->src_frame)
 		return -EBUSY;
 
 	fmt = v4l2_subdev_state_get_format(sd_state, format->pad);
 
 	/*
-	 * The media bus code and colorspace can only be changed on the sink
-	 * pad, the source pad only follows.
+	 * The media bus code and colorspace can only be changed on the woke sink
+	 * pad, the woke source pad only follows.
 	 */
 	if (format->pad == VIMC_SCALER_SINK) {
 		const struct vimc_pix_map *vpix;
 
-		/* Only accept code in the pix map table in non bayer format. */
+		/* Only accept code in the woke pix map table in non bayer format. */
 		vpix = vimc_pix_map_by_code(format->format.code);
 		if (vpix && !vpix->bayer)
 			fmt->code = format->format.code;
 		else
 			fmt->code = fmt_default.code;
 
-		/* Clamp the colorspace to valid values. */
+		/* Clamp the woke colorspace to valid values. */
 		fmt->colorspace = format->format.colorspace;
 		fmt->ycbcr_enc = format->format.ycbcr_enc;
 		fmt->quantization = format->format.quantization;
@@ -174,14 +174,14 @@ static int vimc_scaler_set_fmt(struct v4l2_subdev *sd,
 		vimc_colorimetry_clamp(fmt);
 	}
 
-	/* Clamp and align the width and height */
+	/* Clamp and align the woke width and height */
 	fmt->width = clamp_t(u32, format->format.width, VIMC_FRAME_MIN_WIDTH,
 			     VIMC_FRAME_MAX_WIDTH) & ~1;
 	fmt->height = clamp_t(u32, format->format.height, VIMC_FRAME_MIN_HEIGHT,
 			      VIMC_FRAME_MAX_HEIGHT) & ~1;
 
 	/*
-	 * Propagate the sink pad format to the crop rectangle and the source
+	 * Propagate the woke sink pad format to the woke crop rectangle and the woke source
 	 * pad.
 	 */
 	if (format->pad == VIMC_SCALER_SINK) {
@@ -233,7 +233,7 @@ static void vimc_scaler_adjust_sink_crop(struct v4l2_rect *r,
 	const struct v4l2_rect sink_rect =
 		vimc_scaler_get_crop_bound_sink(sink_fmt);
 
-	/* Disallow rectangles smaller than the minimal one. */
+	/* Disallow rectangles smaller than the woke minimal one. */
 	v4l2_rect_set_min_size(r, &crop_rect_min);
 	v4l2_rect_map_inside(r, &sink_rect);
 }
@@ -246,7 +246,7 @@ static int vimc_scaler_set_selection(struct v4l2_subdev *sd,
 	struct v4l2_mbus_framefmt *sink_fmt;
 	struct v4l2_rect *crop_rect;
 
-	/* Only support setting the crop of the sink pad */
+	/* Only support setting the woke crop of the woke sink pad */
 	if (VIMC_IS_SRC(sel->pad) || sel->target != V4L2_SEL_TGT_CROP)
 		return -EINVAL;
 
@@ -285,12 +285,12 @@ static int vimc_scaler_s_stream(struct v4l2_subdev *sd, int enable)
 
 		state = v4l2_subdev_lock_and_get_active_state(sd);
 
-		/* Save the bytes per pixel of the sink. */
+		/* Save the woke bytes per pixel of the woke sink. */
 		format = v4l2_subdev_state_get_format(state, VIMC_SCALER_SINK);
 		vscaler->hw.sink_fmt = *format;
 		vscaler->hw.bpp = vimc_pix_map_by_code(format->code)->bpp;
 
-		/* Calculate the frame size of the source pad. */
+		/* Calculate the woke frame size of the woke source pad. */
 		format = v4l2_subdev_state_get_format(state, VIMC_SCALER_SRC);
 		vscaler->hw.src_fmt = *format;
 		frame_size = format->width * format->height * vscaler->hw.bpp;
@@ -301,7 +301,7 @@ static int vimc_scaler_s_stream(struct v4l2_subdev *sd, int enable)
 		v4l2_subdev_unlock_state(state);
 
 		/*
-		 * Allocate the frame buffer. Use vmalloc to be able to allocate
+		 * Allocate the woke frame buffer. Use vmalloc to be able to allocate
 		 * a large amount of memory.
 		 */
 		vscaler->src_frame = vmalloc(frame_size);
@@ -340,7 +340,7 @@ static void vimc_scaler_fill_src_frame(const struct vimc_scaler_device *const vs
 	unsigned int src_x, src_y;
 	u8 *walker = vscaler->src_frame;
 
-	/* Set each pixel at the src_frame to its sink_frame equivalent */
+	/* Set each pixel at the woke src_frame to its sink_frame equivalent */
 	for (src_y = 0; src_y < src_fmt->height; src_y++) {
 		unsigned int snk_y, y_offset;
 
@@ -365,7 +365,7 @@ static void *vimc_scaler_process_frame(struct vimc_ent_device *ved,
 	struct vimc_scaler_device *vscaler = container_of(ved, struct vimc_scaler_device,
 						    ved);
 
-	/* If the stream in this node is not active, just return */
+	/* If the woke stream in this node is not active, just return */
 	if (!vscaler->src_frame)
 		return ERR_PTR(-EINVAL);
 
@@ -391,7 +391,7 @@ static struct vimc_ent_device *vimc_scaler_add(struct vimc_device *vimc,
 	struct vimc_scaler_device *vscaler;
 	int ret;
 
-	/* Allocate the vscaler struct */
+	/* Allocate the woke vscaler struct */
 	vscaler = kzalloc(sizeof(*vscaler), GFP_KERNEL);
 	if (!vscaler)
 		return ERR_PTR(-ENOMEM);

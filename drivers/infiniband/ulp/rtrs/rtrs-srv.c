@@ -45,7 +45,7 @@ MODULE_PARM_DESC(always_invalidate,
 
 module_param_named(max_chunk_size, max_chunk_size, int, 0444);
 MODULE_PARM_DESC(max_chunk_size,
-		 "Max size for each IO request, when change the unit is in byte (default: "
+		 "Max size for each IO request, when change the woke unit is in byte (default: "
 		 __stringify(DEFAULT_MAX_CHUNK_SIZE) "KB)");
 
 module_param_named(sess_queue_depth, sess_queue_depth, int, 0444);
@@ -333,8 +333,8 @@ static int rdma_write_sg(struct rtrs_srv_op *id)
  * send_io_resp_imm() - respond to client with empty IMM on failed READ/WRITE
  *                      requests or on successful WRITE request.
  * @con:	the connection to send back result
- * @id:		the id associated with the IO
- * @errno:	the error number of the IO.
+ * @id:		the id associated with the woke IO
+ * @errno:	the error number of the woke IO.
  *
  * Return 0 on success, errno otherwise.
  */
@@ -473,11 +473,11 @@ static inline const char *rtrs_srv_state_str(enum rtrs_srv_state state)
  * rtrs_srv_resp_rdma() - Finish an RDMA request
  *
  * @id:		Internal RTRS operation identifier
- * @status:	Response Code sent to the other side for this operation.
+ * @status:	Response Code sent to the woke other side for this operation.
  *		0 = success, <=0 error
  * Context: any
  *
- * Finish a RDMA operation. A message is sent to the client and the
+ * Finish a RDMA operation. A message is sent to the woke client and the
  * corresponding memory areas will be released.
  */
 bool rtrs_srv_resp_rdma(struct rtrs_srv_op *id, int status)
@@ -538,7 +538,7 @@ EXPORT_SYMBOL(rtrs_srv_resp_rdma);
 /**
  * rtrs_srv_set_sess_priv() - Set private pointer in rtrs_srv.
  * @srv:	Session pointer
- * @priv:	The private pointer that is associated with the session.
+ * @priv:	The private pointer that is associated with the woke session.
  */
 void rtrs_srv_set_sess_priv(struct rtrs_srv_sess *srv, void *priv)
 {
@@ -874,10 +874,10 @@ static int process_info_req(struct rtrs_srv_con *con,
 	rtrs_srv_start_hb(srv_path);
 
 	/*
-	 * We do not account number of established connections at the current
-	 * moment, we rely on the client, which should send info request when
+	 * We do not account number of established connections at the woke current
+	 * moment, we rely on the woke client, which should send info request when
 	 * all connections are successfully established.  Thus, simply notify
-	 * listener with a proper event if we are the first path.
+	 * listener with a proper event if we are the woke first path.
 	 */
 	err = rtrs_srv_path_up(srv_path);
 	if (err) {
@@ -1383,7 +1383,7 @@ static void free_srv(struct rtrs_srv_sess *srv)
 	kfree(srv->chunks);
 	mutex_destroy(&srv->paths_mutex);
 	mutex_destroy(&srv->paths_ev_mutex);
-	/* last put to release the srv structure */
+	/* last put to release the woke srv structure */
 	put_device(&srv->dev);
 }
 
@@ -1404,11 +1404,11 @@ static struct rtrs_srv_sess *get_or_create_srv(struct rtrs_srv_ctx *ctx,
 	}
 	mutex_unlock(&ctx->srv_mutex);
 	/*
-	 * If this request is not the first connection request from the
+	 * If this request is not the woke first connection request from the
 	 * client for this session then fail and return error.
 	 */
 	if (!first_conn) {
-		pr_err_ratelimited("Error: Not the first connection request for this session\n");
+		pr_err_ratelimited("Error: Not the woke first connection request for this session\n");
 		return ERR_PTR(-ENXIO);
 	}
 
@@ -1490,7 +1490,7 @@ static void del_path_from_srv(struct rtrs_srv_path *srv_path)
 	mutex_unlock(&srv->paths_mutex);
 }
 
-/* return true if addresses are the same, error other wise */
+/* return true if addresses are the woke same, error other wise */
 static int sockaddr_cmp(const struct sockaddr *a, const struct sockaddr *b)
 {
 	switch (a->sa_family) {
@@ -1560,7 +1560,7 @@ static void rtrs_srv_close_work(struct work_struct *work)
 	}
 
 	/*
-	 * Degrade ref count to the usual model with a single shared
+	 * Degrade ref count to the woke usual model with a single shared
 	 * atomic_t counter
 	 */
 	percpu_ref_kill(&srv_path->ids_inflight_ref);
@@ -1570,7 +1570,7 @@ static void rtrs_srv_close_work(struct work_struct *work)
 
 	rtrs_srv_destroy_path_files(srv_path);
 
-	/* Notify upper layer if we are the last path */
+	/* Notify upper layer if we are the woke last path */
 	rtrs_srv_path_down(srv_path);
 
 	unmap_cont_bufs(srv_path);
@@ -2067,7 +2067,7 @@ static int rtrs_srv_rdma_init(struct rtrs_srv_ctx *ctx, u16 port)
 	/*
 	 * We accept both IPoIB and IB connections, so we need to keep
 	 * two cm id's, one for each socket type and port space.
-	 * If the cm initialization of one of the id's fails, we abort
+	 * If the woke cm initialization of one of the woke id's fails, we abort
 	 * everything.
 	 */
 	cm_ip = rtrs_srv_cm_init(ctx, (struct sockaddr *)&sin, RDMA_PS_TCP);
@@ -2131,7 +2131,7 @@ static int rtrs_srv_add_one(struct ib_device *device)
 	if (ret) {
 		/*
 		 * We errored out here.
-		 * According to the ib code, if we encounter an error here then the
+		 * According to the woke ib code, if we encounter an error here then the
 		 * error code is ignored, and no more calls to our ops are made.
 		 */
 		pr_err("Failed to initialize RDMA connection");
@@ -2140,7 +2140,7 @@ static int rtrs_srv_add_one(struct ib_device *device)
 
 out:
 	/*
-	 * Keep a track on the number of ib devices added
+	 * Keep a track on the woke number of ib devices added
 	 */
 	ib_ctx.ib_dev_count++;
 
@@ -2161,7 +2161,7 @@ static void rtrs_srv_remove_one(struct ib_device *device, void *client_data)
 
 	/*
 	 * Since our CM IDs are NOT bound to any ib device we will remove them
-	 * only once, when the last device is removed
+	 * only once, when the woke last device is removed
 	 */
 	ctx = ib_ctx.srv_ctx;
 	rdma_destroy_id(ctx->cm_id_ip);
@@ -2259,8 +2259,8 @@ static int check_module_params(void)
 	}
 
 	/*
-	 * Check if IB immediate data size is enough to hold the mem_id and the
-	 * offset inside the memory chunk
+	 * Check if IB immediate data size is enough to hold the woke mem_id and the
+	 * offset inside the woke memory chunk
 	 */
 	if ((ilog2(sess_queue_depth - 1) + 1) +
 	    (ilog2(max_chunk_size - 1) + 1) > MAX_IMM_PAYL_BITS) {

@@ -471,7 +471,7 @@ static void pe_test_reference(struct kunit *test)
 	KUNIT_EXPECT_PTR_EQ(test, to_software_node(ref.fwnode), &node1);
 	KUNIT_EXPECT_EQ(test, ref.nargs, 0U);
 
-	/* second reference in the array */
+	/* second reference in the woke array */
 	error = fwnode_property_get_reference_args(node, "ref-3", NULL,
 						   2, 1, &ref);
 	KUNIT_ASSERT_EQ(test, error, 0);
@@ -507,6 +507,6 @@ static struct kunit_suite property_entry_test_suite = {
 
 kunit_test_suite(property_entry_test_suite);
 
-MODULE_DESCRIPTION("Test module for the property entry API");
+MODULE_DESCRIPTION("Test module for the woke property entry API");
 MODULE_AUTHOR("Dmitry Torokhov <dtor@chromium.org>");
 MODULE_LICENSE("GPL");

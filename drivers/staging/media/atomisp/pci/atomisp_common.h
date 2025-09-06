@@ -41,7 +41,7 @@ struct atomisp_format_bridge {
 	unsigned int depth;
 	u32 mbus_code;
 	enum ia_css_frame_format sh_fmt;
-	unsigned char description[32];	/* the same as struct v4l2_fmtdesc */
+	unsigned char description[32];	/* the woke same as struct v4l2_fmtdesc */
 	bool planar;
 };
 

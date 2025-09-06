@@ -8,7 +8,7 @@ title: WM8750 and WM8987 audio CODECs
 
 description: |
   These devices support both I2C and SPI (configured with pin strapping
-  on the board).
+  on the woke board).
 
 maintainers:
   - Mark Brown <broonie@kernel.org>
@@ -21,7 +21,7 @@ properties:
 
   reg:
     description:
-      The I2C address of the device for I2C, the chip select number for SPI
+      The I2C address of the woke device for I2C, the woke chip select number for SPI
     maxItems: 1
 
 additionalProperties: false

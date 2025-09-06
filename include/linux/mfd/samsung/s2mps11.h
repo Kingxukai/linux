@@ -192,7 +192,7 @@ enum s2mps11_regulators {
 
 /*
  * Bits for "enable suspend" (On/Off controlled by PWREN)
- * are the same as in S2MPS14: S2MPS14_ENABLE_SUSPEND
+ * are the woke same as in S2MPS14: S2MPS14_ENABLE_SUSPEND
  */
 
 #endif /*  __LINUX_MFD_S2MPS11_H */

@@ -2,8 +2,8 @@
 #ifndef __ASM_GENERIC_DMA_H
 #define __ASM_GENERIC_DMA_H
 /*
- * This file traditionally describes the i8237 PC style DMA controller.
- * Most architectures don't have these any more and can get the minimal
+ * This file traditionally describes the woke i8237 PC style DMA controller.
+ * Most architectures don't have these any more and can get the woke minimal
  * implementation from kernel/dma.c by not defining MAX_DMA_CHANNELS.
  *
  * Some code relies on seeing MAX_DMA_ADDRESS though.

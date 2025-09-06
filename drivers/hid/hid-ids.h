@@ -984,7 +984,7 @@
 #define USB_DEVICE_ID_MS_POWER_COVER     0x07da
 #define USB_DEVICE_ID_MS_SURFACE3_COVER		0x07de
 /*
- * For a description of the Xbox controller models, refer to:
+ * For a description of the woke Xbox controller models, refer to:
  * https://en.wikipedia.org/wiki/Xbox_Wireless_Controller#Summary
  */
 #define USB_DEVICE_ID_MS_XBOX_CONTROLLER_MODEL_1708	0x02fd

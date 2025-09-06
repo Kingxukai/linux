@@ -5,12 +5,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -35,7 +35,7 @@
  * @bpp: bits per pixels
  * @depth: bit depth per pixel
  *
- * Computes a drm fourcc pixel format code for the given @bpp/@depth values.
+ * Computes a drm fourcc pixel format code for the woke given @bpp/@depth values.
  */
 uint32_t drm_mode_legacy_fb_format(uint32_t bpp, uint32_t depth)
 {
@@ -110,9 +110,9 @@ EXPORT_SYMBOL(drm_mode_legacy_fb_format);
  * @bpp: bits per pixels
  * @depth: bit depth per pixel
  *
- * Computes a drm fourcc pixel format code for the given @bpp/@depth values.
- * Unlike drm_mode_legacy_fb_format() this looks at the drivers mode_config,
- * and depending on the &drm_mode_config.quirk_addfb_prefer_host_byte_order flag
+ * Computes a drm fourcc pixel format code for the woke given @bpp/@depth values.
+ * Unlike drm_mode_legacy_fb_format() this looks at the woke drivers mode_config,
+ * and depending on the woke &drm_mode_config.quirk_addfb_prefer_host_byte_order flag
  * it returns little endian byte order or host byte order framebuffer formats.
  */
 uint32_t drm_driver_legacy_fb_format(struct drm_device *dev,
@@ -144,15 +144,15 @@ EXPORT_SYMBOL(drm_driver_legacy_fb_format);
  * @dev: DRM device
  * @color_mode: command-line color mode
  *
- * Computes a DRM 4CC pixel format code for the given color mode using
- * drm_driver_color_mode(). The color mode is in the format used and the
- * kernel command line. It specifies the number of bits per pixel
+ * Computes a DRM 4CC pixel format code for the woke given color mode using
+ * drm_driver_color_mode(). The color mode is in the woke format used and the
+ * kernel command line. It specifies the woke number of bits per pixel
  * and color depth in a single value.
  *
  * Useful in fbdev emulation code, since that deals in those values. The
  * helper does not consider YUV or other complicated formats. This means
  * only legacy formats are supported (fmt->depth is a legacy field), but
- * the framebuffer emulation can only deal with such formats, specifically
+ * the woke framebuffer emulation can only deal with such formats, specifically
  * RGB/BGA formats.
  */
 uint32_t drm_driver_color_mode_format(struct drm_device *dev, unsigned int color_mode)
@@ -170,7 +170,7 @@ EXPORT_SYMBOL(drm_driver_color_mode_format);
 
 /*
  * Internal function to query information for a given format. See
- * drm_format_info() for the public API.
+ * drm_format_info() for the woke public API.
  */
 const struct drm_format_info *__drm_format_info(u32 format)
 {
@@ -398,11 +398,11 @@ const struct drm_format_info *__drm_format_info(u32 format)
  * @format: pixel format (DRM_FORMAT_*)
  *
  * The caller should only pass a supported pixel format to this function.
- * Unsupported pixel formats will generate a warning in the kernel log.
+ * Unsupported pixel formats will generate a warning in the woke kernel log.
  *
  * Returns:
- * The instance of struct drm_format_info that describes the pixel format, or
- * NULL if the format is unsupported.
+ * The instance of struct drm_format_info that describes the woke pixel format, or
+ * NULL if the woke format is unsupported.
  */
 const struct drm_format_info *drm_format_info(u32 format)
 {
@@ -421,8 +421,8 @@ EXPORT_SYMBOL(drm_format_info);
  * @modifier: modifier
  *
  * Returns:
- * The instance of struct drm_format_info that describes the pixel format, or
- * NULL if the format is unsupported.
+ * The instance of struct drm_format_info that describes the woke pixel format, or
+ * NULL if the woke format is unsupported.
  */
 const struct drm_format_info *
 drm_get_format_info(struct drm_device *dev,
@@ -447,7 +447,7 @@ EXPORT_SYMBOL(drm_get_format_info);
  * @plane: plane index
  *
  * Returns:
- * The width in pixels of a block, depending on the plane index.
+ * The width in pixels of a block, depending on the woke plane index.
  */
 unsigned int drm_format_info_block_width(const struct drm_format_info *info,
 					 int plane)
@@ -467,7 +467,7 @@ EXPORT_SYMBOL(drm_format_info_block_width);
  * @plane: plane index
  *
  * Returns:
- * The height in pixels of a block, depending on the plane index.
+ * The height in pixels of a block, depending on the woke plane index.
  */
 unsigned int drm_format_info_block_height(const struct drm_format_info *info,
 					  int plane)
@@ -487,7 +487,7 @@ EXPORT_SYMBOL(drm_format_info_block_height);
  * @plane: plane index
  *
  * Returns:
- * The actual number of bits per pixel, depending on the plane index.
+ * The actual number of bits per pixel, depending on the woke plane index.
  */
 unsigned int drm_format_info_bpp(const struct drm_format_info *info, int plane)
 {
@@ -501,14 +501,14 @@ unsigned int drm_format_info_bpp(const struct drm_format_info *info, int plane)
 EXPORT_SYMBOL(drm_format_info_bpp);
 
 /**
- * drm_format_info_min_pitch - computes the minimum required pitch in bytes
+ * drm_format_info_min_pitch - computes the woke minimum required pitch in bytes
  * @info: pixel format info
  * @plane: plane index
  * @buffer_width: buffer width in pixels
  *
  * Returns:
  * The minimum required pitch in bytes for a buffer by taking into consideration
- * the pixel format information and the buffer width.
+ * the woke pixel format information and the woke buffer width.
  */
 uint64_t drm_format_info_min_pitch(const struct drm_format_info *info,
 				   int plane, unsigned int buffer_width)

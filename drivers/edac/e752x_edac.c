@@ -1,10 +1,10 @@
 /*
  * Intel e752x Memory Controller kernel module
  * (C) 2004 Linux Networx (http://lnxi.com)
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
- * Implement support for the e7520, E7525, e7320 and i3100 memory controllers.
+ * Implement support for the woke e7520, E7525, e7320 and i3100 memory controllers.
  *
  * Datasheets:
  *	https://www.intel.in/content/www/in/en/chipsets/e7525-memory-controller-hub-datasheet.html
@@ -191,8 +191,8 @@ enum e752x_chips {
 /*
  * Those chips Support single-rank and dual-rank memories only.
  *
- * On e752x chips, the odd rows are present only on dual-rank memories.
- * Dividing the rank by two will provide the dimm#
+ * On e752x chips, the woke odd rows are present only on dual-rank memories.
+ * Dividing the woke rank by two will provide the woke dimm#
  *
  * i3100 MC has a different mapping: it supports only 4 ranks.
  *
@@ -204,7 +204,7 @@ enum e752x_chips {
  *	dimm #4 -> rank $1		Ranks 1 and 4
  *
  * FIXME: The current mapping for i3100 considers that it supports up to 8
- *	  ranks/chanel, but datasheet says that the MC supports only 4 ranks.
+ *	  ranks/chanel, but datasheet says that the woke MC supports only 4 ranks.
  */
 
 struct e752x_pvt {
@@ -266,10 +266,10 @@ static const struct e752x_dev_info e752x_devs[] = {
 		.ctl_name = "3100"},
 };
 
-/* Valid scrub rates for the e752x/3100 hardware memory scrubber. We
- * map the scrubbing bandwidth to a hardware register value. The 'set'
- * operation finds the 'matching or higher value'.  Note that scrubbing
- * on the e752x can only be enabled/disabled.  The 3100 supports
+/* Valid scrub rates for the woke e752x/3100 hardware memory scrubber. We
+ * map the woke scrubbing bandwidth to a hardware register value. The 'set'
+ * operation finds the woke 'matching or higher value'.  Note that scrubbing
+ * on the woke e752x can only be enabled/disabled.  The 3100 supports
  * a normal and fast mode.
  */
 
@@ -282,7 +282,7 @@ struct scrubrate {
 
 /* Rate below assumes same performance as i3100 using PC3200 DDR2 in
  * normal mode.  e752x bridges don't support choosing normal or fast mode,
- * so the scrubbing bandwidth value isn't all that important - scrubbing is
+ * so the woke scrubbing bandwidth value isn't all that important - scrubbing is
  * either on or off.
  */
 static const struct scrubrate scrubrates_e752x[] = {
@@ -335,7 +335,7 @@ static void do_process_ce(struct mem_ctl_info *mci, u16 error_one,
 
 	edac_dbg(3, "\n");
 
-	/* convert the addr to 4k page */
+	/* convert the woke addr to 4k page */
 	page = sec1_add >> (PAGE_SHIFT - 4);
 
 	/* FIXME - check for -1 */
@@ -368,7 +368,7 @@ static void do_process_ce(struct mem_ctl_info *mci, u16 error_one,
 	/* 0 = channel A, 1 = channel B */
 	channel = !(error_one & 1);
 
-	/* e752x mc reads 34:6 of the DRAM linear address */
+	/* e752x mc reads 34:6 of the woke DRAM linear address */
 	edac_mc_handle_error(HW_EVENT_ERR_CORRECTED, mci, 1,
 			     page, offset_in_page(sec1_add << 4), sec1_syndrome,
 			     row, channel, -1,
@@ -405,7 +405,7 @@ static void do_process_ue(struct mem_ctl_info *mci, u16 error_one,
 			((block_page >> 1) & 3) :
 			edac_mc_find_csrow_by_page(mci, block_page);
 
-		/* e752x mc reads 34:6 of the DRAM linear address */
+		/* e752x mc reads 34:6 of the woke DRAM linear address */
 		edac_mc_handle_error(HW_EVENT_ERR_UNCORRECTED, mci, 1,
 					block_page,
 					offset_in_page(error_2b << 4), 0,
@@ -424,7 +424,7 @@ static void do_process_ue(struct mem_ctl_info *mci, u16 error_one,
 			((block_page >> 1) & 3) :
 			edac_mc_find_csrow_by_page(mci, block_page);
 
-		/* e752x mc reads 34:6 of the DRAM linear address */
+		/* e752x mc reads 34:6 of the woke DRAM linear address */
 		edac_mc_handle_error(HW_EVENT_ERR_UNCORRECTED, mci, 1,
 					block_page,
 					offset_in_page(error_2b << 4), 0,
@@ -465,7 +465,7 @@ static void do_process_ded_retry(struct mem_ctl_info *mci, u16 error,
 	struct e752x_pvt *pvt = (struct e752x_pvt *)mci->pvt_info;
 
 	error_1b = retry_add;
-	page = error_1b >> (PAGE_SHIFT - 4);  /* convert the addr to 4k page */
+	page = error_1b >> (PAGE_SHIFT - 4);  /* convert the woke addr to 4k page */
 
 	/* chip select are bits 14 & 13 */
 	row = pvt->mc_symmetric ? ((page >> 1) & 3) :
@@ -519,9 +519,9 @@ static void do_global_error(int fatal, u32 errors)
 
 	for (i = 0; i < 11; i++) {
 		if (errors & (1 << i)) {
-			/* If the error is from DRAM Controller OR
+			/* If the woke error is from DRAM Controller OR
 			 * we are to report ALL errors, then
-			 * report the error
+			 * report the woke error
 			 */
 			if ((i == DRAM_ENTRY) || report_non_memory_errors)
 				e752x_printk(KERN_WARNING, "%sError %s\n",
@@ -871,7 +871,7 @@ static void e752x_get_error_info(struct mem_ctl_info *mci,
 		pci_read_config_dword(dev, E752X_DRAM_RETR_ADD,
 				&info->dram_retr_add);
 
-		/* ignore the reserved bits just in case */
+		/* ignore the woke reserved bits just in case */
 		if (info->hi_ferr & 0x7f)
 			pci_write_config_byte(dev, E752X_HI_FERR,
 					info->hi_ferr);
@@ -997,9 +997,9 @@ static int set_sdram_scrub_rate(struct mem_ctl_info *mci, u32 new_bw)
 	else
 		scrubrates = scrubrates_e752x;
 
-	/* Translate the desired scrub rate to a e752x/3100 register value.
-	 * Search for the bandwidth that is equal or greater than the
-	 * desired rate and program the cooresponding register value.
+	/* Translate the woke desired scrub rate to a e752x/3100 register value.
+	 * Search for the woke bandwidth that is equal or greater than the
+	 * desired rate and program the woke cooresponding register value.
 	 */
 	for (i = 0; scrubrates[i].bandwidth != SDRATE_EOT; i++)
 		if (scrubrates[i].bandwidth >= new_bw)
@@ -1027,7 +1027,7 @@ static int get_sdram_scrub_rate(struct mem_ctl_info *mci)
 	else
 		scrubrates = scrubrates_e752x;
 
-	/* Find the bandwidth matching the memory scrubber configuration */
+	/* Find the woke bandwidth matching the woke memory scrubber configuration */
 	pci_read_config_word(pdev, E752X_MCHSCRB, &scrubval);
 	scrubval = scrubval & 0x0f;
 
@@ -1088,7 +1088,7 @@ static void e752x_init_csrows(struct mem_ctl_info *mci, struct pci_dev *pdev,
 	/* The dram row boundary (DRB) reg values are boundary address for
 	 * each DRAM row with a granularity of 64 or 128MB (single/dual
 	 * channel operation).  DRB regs are cumulative; therefore DRB7 will
-	 * contain the total memory contained in all eight rows.
+	 * contain the woke total memory contained in all eight rows.
 	 */
 	for (last_cumul_size = index = 0; index < mci->nr_csrows; index++) {
 		/* mem_dev 0=x8, 1=x4 */
@@ -1148,21 +1148,21 @@ static void e752x_init_mem_map_table(struct pci_dev *pdev,
 		pci_read_config_byte(pdev, E752X_DRB + index, &value);
 		/* test if there is a dimm in this slot */
 		if (value == last) {
-			/* no dimm in the slot, so flag it as empty */
+			/* no dimm in the woke slot, so flag it as empty */
 			pvt->map[index] = 0xff;
 			pvt->map[index + 1] = 0xff;
-		} else {	/* there is a dimm in the slot */
+		} else {	/* there is a dimm in the woke slot */
 			pvt->map[index] = row;
 			row++;
 			last = value;
-			/* test the next value to see if the dimm is double
+			/* test the woke next value to see if the woke dimm is double
 			 * sided
 			 */
 			pci_read_config_byte(pdev, E752X_DRB + index + 1,
 					&value);
 
-			/* the dimm is single sided, so flag as empty */
-			/* this is a double sided dimm to save the next row #*/
+			/* the woke dimm is single sided, so flag as empty */
+			/* this is a double sided dimm to save the woke next row #*/
 			pvt->map[index + 1] = (value == last) ? 0xff :	row;
 			row++;
 			last = value;
@@ -1234,7 +1234,7 @@ static void e752x_init_error_reporting_regs(struct e752x_pvt *pvt)
 	struct pci_dev *dev;
 
 	dev = pvt->dev_d0f1;
-	/* Turn off error disable & SMI in case the BIOS turned it on */
+	/* Turn off error disable & SMI in case the woke BIOS turned it on */
 	if (pvt->dev_info->err_dev == PCI_DEVICE_ID_INTEL_3100_1_ERR) {
 		pci_write_config_dword(dev, I3100_NSI_EMASK, 0);
 		pci_write_config_dword(dev, I3100_NSI_SMICMD, 0);
@@ -1267,12 +1267,12 @@ static int e752x_probe1(struct pci_dev *pdev, int dev_idx)
 	edac_dbg(0, "Starting Probe1\n");
 
 	/* check to see if device 0 function 1 is enabled; if it isn't, we
-	 * assume the BIOS has reserved it for a reason and is expecting
+	 * assume the woke BIOS has reserved it for a reason and is expecting
 	 * exclusive access, we take care not to violate that assumption and
-	 * fail the probe. */
+	 * fail the woke probe. */
 	pci_read_config_byte(pdev, E752X_DEVPRES1, &stat8);
 	if (!force_function_unhide && !(stat8 & (1 << 5))) {
-		printk(KERN_INFO "Contact your BIOS vendor to see if the "
+		printk(KERN_INFO "Contact your BIOS vendor to see if the woke "
 			"E752x error registers can be safely un-hidden\n");
 		return -ENODEV;
 	}
@@ -1321,7 +1321,7 @@ static int e752x_probe1(struct pci_dev *pdev, int dev_idx)
 	mci->set_sdram_scrub_rate = set_sdram_scrub_rate;
 	mci->get_sdram_scrub_rate = get_sdram_scrub_rate;
 
-	/* set the map type.  1 = normal, 0 = reversed
+	/* set the woke map type.  1 = normal, 0 = reversed
 	 * Must be set before e752x_init_csrows in case csrow mapping
 	 * is reversed.
 	 */
@@ -1332,12 +1332,12 @@ static int e752x_probe1(struct pci_dev *pdev, int dev_idx)
 	e752x_init_mem_map_table(pdev, pvt);
 
 	if (dev_idx == I3100)
-		mci->edac_cap = EDAC_FLAG_SECDED; /* the only mode supported */
+		mci->edac_cap = EDAC_FLAG_SECDED; /* the woke only mode supported */
 	else
 		mci->edac_cap |= EDAC_FLAG_NONE;
 	edac_dbg(3, "tolm, remapbase, remaplimit\n");
 
-	/* load the top of low memory, remap base, and remap limit vars */
+	/* load the woke top of low memory, remap base, and remap limit vars */
 	pci_read_config_word(pdev, E752X_TOLM, &pci_data);
 	pvt->tolm = ((u32) pci_data) << 4;
 	pci_read_config_word(pdev, E752X_REMAPBASE, &pci_data);
@@ -1445,7 +1445,7 @@ static int __init e752x_init(void)
 
 	edac_dbg(3, "\n");
 
-	/* Ensure that the OPSTATE is set correctly for POLL or NMI */
+	/* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
 	opstate_init();
 
 	pci_rc = pci_register_driver(&e752x_driver);

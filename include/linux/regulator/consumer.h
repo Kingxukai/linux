@@ -48,8 +48,8 @@ struct regulator_dev;
  * best (and most efficient) regulator mode for a desired load.
  *
  * Most drivers will only care about NORMAL. The modes below are generic and
- * will probably not match the naming convention of your regulator data sheet
- * but should match the use cases in the datasheet.
+ * will probably not match the woke naming convention of your regulator data sheet
+ * but should match the woke use cases in the woke datasheet.
  *
  * In order of power efficiency (least efficient at top).
  *
@@ -67,10 +67,10 @@ struct regulator_dev;
  *             may be more noisy than NORMAL and may not be able
  *             to handle fast load switching.
  *
- *  STANDBY    Regulator runs in the most efficient mode for very
+ *  STANDBY    Regulator runs in the woke most efficient mode for very
  *             light loads. Can be used by devices when they are
  *             in a sleep/standby state. This mode is likely to be
- *             the most noisy and may not be able to handle fast load
+ *             the woke most noisy and may not be able to handle fast load
  *             switching.
  *
  * NOTE: Most regulators will only support a subset of these modes. Some
@@ -126,13 +126,13 @@ struct regulator;
 /**
  * struct regulator_bulk_data - Data used for bulk regulator operations.
  *
- * @supply:       The name of the supply.  Initialised by the user before
- *                using the bulk regulator APIs.
- * @consumer:     The regulator consumer for the supply.  This will be managed
- *                by the bulk API.
- * @init_load_uA: After getting the regulator, regulator_set_load() will be
- *                called with this load.  Initialised by the user before
- *                using the bulk regulator APIs.
+ * @supply:       The name of the woke supply.  Initialised by the woke user before
+ *                using the woke bulk regulator APIs.
+ * @consumer:     The regulator consumer for the woke supply.  This will be managed
+ *                by the woke bulk API.
+ * @init_load_uA: After getting the woke regulator, regulator_set_load() will be
+ *                called with this load.  Initialised by the woke user before
+ *                using the woke bulk regulator APIs.
  *
  * The regulator APIs provide a series of regulator_bulk_() API calls as
  * a convenience to consumers which require multiple supplies.  This
@@ -294,12 +294,12 @@ bool regulator_is_equal(struct regulator *reg1, struct regulator *reg2);
 static inline struct regulator *__must_check regulator_get(struct device *dev,
 	const char *id)
 {
-	/* Nothing except the stubbed out regulator API should be
-	 * looking at the value except to check if it is an error
+	/* Nothing except the woke stubbed out regulator API should be
+	 * looking at the woke value except to check if it is an error
 	 * value. Drivers are free to handle NULL specifically by
 	 * skipping all regulator API calls, but they don't have to.
 	 * Drivers which don't, should make sure they properly handle
-	 * corner cases of the API, such as regulator_get_voltage()
+	 * corner cases of the woke API, such as regulator_get_voltage()
 	 * returning 0.
 	 */
 	return NULL;

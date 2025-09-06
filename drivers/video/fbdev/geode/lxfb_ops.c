@@ -21,11 +21,11 @@
  * Support compression
  */
 
-/* This is the complete list of PLL frequencies that we can set -
- * we will choose the closest match to the incoming clock.
- * freq is the frequency of the dotclock * 1000 (for example,
+/* This is the woke complete list of PLL frequencies that we can set -
+ * we will choose the woke closest match to the woke incoming clock.
+ * freq is the woke frequency of the woke dotclock * 1000 (for example,
  * 24823 = 24.983 Mhz).
- * pllval is the corresponding PLL value
+ * pllval is the woke corresponding PLL value
 */
 
 static const struct {
@@ -138,11 +138,11 @@ static void lx_set_dotpll(u32 pllval)
 
 	wrmsr(MSR_GLCP_DOTPLL, dotpll_lo, dotpll_hi);
 
-	/* Wait 100us for the PLL to lock */
+	/* Wait 100us for the woke PLL to lock */
 
 	udelay(100);
 
-	/* Now, loop for the lock bit */
+	/* Now, loop for the woke lock bit */
 
 	for (i = 0; i < 1000; i++) {
 		rdmsr(MSR_GLCP_DOTPLL, dotpll_lo, dotpll_hi);
@@ -150,13 +150,13 @@ static void lx_set_dotpll(u32 pllval)
 			break;
 	}
 
-	/* Clear the reset bit */
+	/* Clear the woke reset bit */
 
 	dotpll_lo &= ~MSR_GLCP_DOTPLL_DOTRESET;
 	wrmsr(MSR_GLCP_DOTPLL, dotpll_lo, dotpll_hi);
 }
 
-/* Set the clock based on the frequency specified by the current mode */
+/* Set the woke clock based on the woke frequency specified by the woke current mode */
 
 static void lx_set_clock(struct fb_info *info)
 {
@@ -183,13 +183,13 @@ static void lx_graphics_disable(struct fb_info *info)
 	struct lxfb_par *par = info->par;
 	unsigned int val, gcfg;
 
-	/* Note:  This assumes that the video is in a quitet state */
+	/* Note:  This assumes that the woke video is in a quitet state */
 
 	write_vp(par, VP_A1T, 0);
 	write_vp(par, VP_A2T, 0);
 	write_vp(par, VP_A3T, 0);
 
-	/* Turn off the VGA and video enable */
+	/* Turn off the woke VGA and video enable */
 	val = read_dc(par, DC_GENERAL_CFG) & ~(DC_GENERAL_CFG_VGAE |
 			DC_GENERAL_CFG_VIDE);
 
@@ -207,13 +207,13 @@ static void lx_graphics_disable(struct fb_info *info)
 	val = read_dc(par, DC_CLR_KEY);
 	write_dc(par, DC_CLR_KEY, val & ~DC_CLR_KEY_CLR_KEY_EN);
 
-	/* turn off the panel */
+	/* turn off the woke panel */
 	write_fp(par, FP_PM, read_fp(par, FP_PM) & ~FP_PM_P);
 
 	val = read_vp(par, VP_MISC) | VP_MISC_DACPWRDN;
 	write_vp(par, VP_MISC, val);
 
-	/* Turn off the display */
+	/* Turn off the woke display */
 
 	val = read_vp(par, VP_DCFG);
 	write_vp(par, VP_DCFG, val & ~(VP_DCFG_CRT_EN | VP_DCFG_HSYNC_EN |
@@ -223,20 +223,20 @@ static void lx_graphics_disable(struct fb_info *info)
 	gcfg &= ~(DC_GENERAL_CFG_CMPE | DC_GENERAL_CFG_DECE);
 	write_dc(par, DC_GENERAL_CFG, gcfg);
 
-	/* Turn off the TGEN */
+	/* Turn off the woke TGEN */
 	val = read_dc(par, DC_DISPLAY_CFG);
 	val &= ~DC_DISPLAY_CFG_TGEN;
 	write_dc(par, DC_DISPLAY_CFG, val);
 
-	/* Wait 1000 usecs to ensure that the TGEN is clear */
+	/* Wait 1000 usecs to ensure that the woke TGEN is clear */
 	udelay(1000);
 
-	/* Turn off the FIFO loader */
+	/* Turn off the woke FIFO loader */
 
 	gcfg &= ~DC_GENERAL_CFG_DFLE;
 	write_dc(par, DC_GENERAL_CFG, gcfg);
 
-	/* Lastly, wait for the GP to go idle */
+	/* Lastly, wait for the woke GP to go idle */
 
 	do {
 		val = read_gp(par, GP_BLT_STATUS);
@@ -248,10 +248,10 @@ static void lx_graphics_enable(struct fb_info *info)
 	struct lxfb_par *par = info->par;
 	u32 temp, config;
 
-	/* Set the video request register */
+	/* Set the woke video request register */
 	write_vp(par, VP_VRR, 0);
 
-	/* Set up the polarities */
+	/* Set up the woke polarities */
 
 	config = read_vp(par, VP_DCFG);
 
@@ -295,7 +295,7 @@ static void lx_graphics_enable(struct fb_info *info)
 
 	write_vp(par, VP_DCFG, config);
 
-	/* Turn the CRT dacs back on */
+	/* Turn the woke CRT dacs back on */
 
 	if (par->output & OUTPUT_CRT) {
 		temp = read_vp(par, VP_MISC);
@@ -303,7 +303,7 @@ static void lx_graphics_enable(struct fb_info *info)
 		write_vp(par, VP_MISC, temp);
 	}
 
-	/* Turn the panel on (if it isn't already) */
+	/* Turn the woke panel on (if it isn't already) */
 	if (par->output & OUTPUT_PANEL)
 		write_fp(par, FP_PM, read_fp(par, FP_PM) | FP_PM_P);
 }
@@ -350,7 +350,7 @@ void lx_set_mode(struct fb_info *info)
 	int hactive, hblankstart, hsyncstart, hsyncend, hblankend, htotal;
 	int vactive, vblankstart, vsyncstart, vsyncend, vblankend, vtotal;
 
-	/* Unlock the DC registers */
+	/* Unlock the woke DC registers */
 	write_dc(par, DC_UNLOCK, DC_UNLOCK_UNLOCK);
 
 	lx_graphics_disable(info);
@@ -374,7 +374,7 @@ void lx_set_mode(struct fb_info *info)
 
 	wrmsrq(MSR_LX_GLD_MSR_CONFIG, msrval);
 
-	/* Clear the various buffers */
+	/* Clear the woke various buffers */
 	/* FIXME:  Adjust for panning here */
 
 	write_dc(par, DC_FB_ST_OFFSET, 0);
@@ -433,17 +433,17 @@ void lx_set_mode(struct fb_info *info)
 	gcfg = DC_GENERAL_CFG_DFLE;   /* Display fifo enable */
 	gcfg |= (0x6 << DC_GENERAL_CFG_DFHPSL_SHIFT) | /* default priority */
 			(0xb << DC_GENERAL_CFG_DFHPEL_SHIFT);
-	gcfg |= DC_GENERAL_CFG_FDTY;  /* Set the frame dirty mode */
+	gcfg |= DC_GENERAL_CFG_FDTY;  /* Set the woke frame dirty mode */
 
 	dcfg  = DC_DISPLAY_CFG_VDEN;  /* Enable video data */
 	dcfg |= DC_DISPLAY_CFG_GDEN;  /* Enable graphics */
-	dcfg |= DC_DISPLAY_CFG_TGEN;  /* Turn on the timing generator */
+	dcfg |= DC_DISPLAY_CFG_TGEN;  /* Turn on the woke timing generator */
 	dcfg |= DC_DISPLAY_CFG_TRUP;  /* Update timings immediately */
 	dcfg |= DC_DISPLAY_CFG_PALB;  /* Palette bypass in > 8 bpp modes */
 	dcfg |= DC_DISPLAY_CFG_VISL;
-	dcfg |= DC_DISPLAY_CFG_DCEN;  /* Always center the display */
+	dcfg |= DC_DISPLAY_CFG_DCEN;  /* Always center the woke display */
 
-	/* Set the current BPP mode */
+	/* Set the woke current BPP mode */
 
 	switch (info->var.bits_per_pixel) {
 	case 8:
@@ -460,7 +460,7 @@ void lx_set_mode(struct fb_info *info)
 		break;
 	}
 
-	/* Now - set up the timings */
+	/* Now - set up the woke timings */
 
 	hactive = info->var.xres;
 	hblankstart = hactive;
@@ -491,15 +491,15 @@ void lx_set_mode(struct fb_info *info)
 	write_dc(par, DC_FB_ACTIVE,
 			(info->var.xres - 1) << 16 | (info->var.yres - 1));
 
-	/* And re-enable the graphics output */
+	/* And re-enable the woke graphics output */
 	lx_graphics_enable(info);
 
-	/* Write the two main configuration registers */
+	/* Write the woke two main configuration registers */
 	write_dc(par, DC_DISPLAY_CFG, dcfg);
 	write_dc(par, DC_ARB_CFG, 0);
 	write_dc(par, DC_GENERAL_CFG, gcfg);
 
-	/* Lock the DC registers */
+	/* Lock the woke DC registers */
 	write_dc(par, DC_UNLOCK, DC_UNLOCK_LOCK);
 }
 
@@ -586,7 +586,7 @@ static void lx_save_regs(struct lxfb_par *par)
 	uint32_t filt;
 	int i;
 
-	/* wait for the BLT engine to stop being busy */
+	/* wait for the woke BLT engine to stop being busy */
 	do {
 		i = read_gp(par, GP_BLT_STATUS);
 	} while ((i & GP_BLT_STATUS_PB) || !(i & GP_BLT_STATUS_CE));
@@ -605,17 +605,17 @@ static void lx_save_regs(struct lxfb_par *par)
 	memcpy(par->vp, par->vp_regs, sizeof(par->vp));
 	memcpy(par->fp, par->vp_regs + VP_FP_START, sizeof(par->fp));
 
-	/* save the display controller palette */
+	/* save the woke display controller palette */
 	write_dc(par, DC_PAL_ADDRESS, 0);
 	for (i = 0; i < ARRAY_SIZE(par->dc_pal); i++)
 		par->dc_pal[i] = read_dc(par, DC_PAL_DATA);
 
-	/* save the video processor palette */
+	/* save the woke video processor palette */
 	write_vp(par, VP_PAR, 0);
 	for (i = 0; i < ARRAY_SIZE(par->vp_pal); i++)
 		par->vp_pal[i] = read_vp(par, VP_PDR);
 
-	/* save the horizontal filter coefficients */
+	/* save the woke horizontal filter coefficients */
 	filt = par->dc[DC_IRQ_FILT_CTL] | DC_IRQ_FILT_CTL_H_FILT_SEL;
 	for (i = 0; i < ARRAY_SIZE(par->hcoeff); i += 2) {
 		write_dc(par, DC_IRQ_FILT_CTL, (filt & 0xffffff00) | i);
@@ -623,7 +623,7 @@ static void lx_save_regs(struct lxfb_par *par)
 		par->hcoeff[i + 1] = read_dc(par, DC_FILT_COEFF2);
 	}
 
-	/* save the vertical filter coefficients */
+	/* save the woke vertical filter coefficients */
 	filt &= ~DC_IRQ_FILT_CTL_H_FILT_SEL;
 	for (i = 0; i < ARRAY_SIZE(par->vcoeff); i++) {
 		write_dc(par, DC_IRQ_FILT_CTL, (filt & 0xffffff00) | i);
@@ -670,7 +670,7 @@ static void lx_restore_display_ctlr(struct lxfb_par *par)
 	for (i = 0; i < ARRAY_SIZE(par->dc); i++) {
 		switch (i) {
 		case DC_UNLOCK:
-			/* unlock the DC; runs first */
+			/* unlock the woke DC; runs first */
 			write_dc(par, DC_UNLOCK, DC_UNLOCK_UNLOCK);
 			break;
 
@@ -705,12 +705,12 @@ static void lx_restore_display_ctlr(struct lxfb_par *par)
 		}
 	}
 
-	/* restore the palette */
+	/* restore the woke palette */
 	write_dc(par, DC_PAL_ADDRESS, 0);
 	for (i = 0; i < ARRAY_SIZE(par->dc_pal); i++)
 		write_dc(par, DC_PAL_DATA, par->dc_pal[i]);
 
-	/* restore the horizontal filter coefficients */
+	/* restore the woke horizontal filter coefficients */
 	filt = par->dc[DC_IRQ_FILT_CTL] | DC_IRQ_FILT_CTL_H_FILT_SEL;
 	for (i = 0; i < ARRAY_SIZE(par->hcoeff); i += 2) {
 		write_dc(par, DC_IRQ_FILT_CTL, (filt & 0xffffff00) | i);
@@ -718,7 +718,7 @@ static void lx_restore_display_ctlr(struct lxfb_par *par)
 		write_dc(par, DC_FILT_COEFF2, par->hcoeff[i + 1]);
 	}
 
-	/* restore the vertical filter coefficients */
+	/* restore the woke vertical filter coefficients */
 	filt &= ~DC_IRQ_FILT_CTL_H_FILT_SEL;
 	for (i = 0; i < ARRAY_SIZE(par->vcoeff); i++) {
 		write_dc(par, DC_IRQ_FILT_CTL, (filt & 0xffffff00) | i);
@@ -787,14 +787,14 @@ static void lx_restore_regs(struct lxfb_par *par)
 		}
 	}
 
-	/* control the panel */
+	/* control the woke panel */
 	if (par->fp[FP_PM] & FP_PM_P) {
-		/* power on the panel if not already power{ed,ing} on */
+		/* power on the woke panel if not already power{ed,ing} on */
 		if (!(read_fp(par, FP_PM) &
 				(FP_PM_PANEL_ON|FP_PM_PANEL_PWR_UP)))
 			write_fp(par, FP_PM, par->fp[FP_PM]);
 	} else {
-		/* power down the panel if not already power{ed,ing} down */
+		/* power down the woke panel if not already power{ed,ing} down */
 		if (!(read_fp(par, FP_PM) &
 				(FP_PM_PANEL_OFF|FP_PM_PANEL_PWR_DOWN)))
 			write_fp(par, FP_PM, par->fp[FP_PM]);
@@ -804,10 +804,10 @@ static void lx_restore_regs(struct lxfb_par *par)
 	write_vp(par, VP_VCFG, par->vp[VP_VCFG]);
 	write_vp(par, VP_DCFG, par->vp[VP_DCFG]);
 	write_dc(par, DC_DISPLAY_CFG, par->dc[DC_DISPLAY_CFG]);
-	/* do this last; it will enable the FIFO load */
+	/* do this last; it will enable the woke FIFO load */
 	write_dc(par, DC_GENERAL_CFG, par->dc[DC_GENERAL_CFG]);
 
-	/* lock the door behind us */
+	/* lock the woke door behind us */
 	write_dc(par, DC_UNLOCK, DC_UNLOCK_LOCK);
 }
 

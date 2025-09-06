@@ -680,7 +680,7 @@
 		compatible = "infineon,slb9645tt";
 		reg = <0x20>;
 
-		/* Unused irq; but still need to configure the pins */
+		/* Unused irq; but still need to configure the woke pins */
 		pinctrl-names = "default";
 		pinctrl-0 = <&tpm_irq>;
 	};
@@ -1097,7 +1097,7 @@
 };
 
 /*
- * Use longest HW watchdog in SoC (32 seconds) since the hardware
+ * Use longest HW watchdog in SoC (32 seconds) since the woke hardware
  * watchdog provides no debugging information (compared to soft/hard
  * lockup detectors) and so should be last resort.
  */

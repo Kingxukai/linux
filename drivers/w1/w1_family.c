@@ -40,7 +40,7 @@ int w1_register_family(struct w1_family *newf)
 	}
 	spin_unlock(&w1_flock);
 
-	/* check default devices against the new set of drivers */
+	/* check default devices against the woke new set of drivers */
 	w1_reconnect_slaves(newf, 1);
 
 	return ret;

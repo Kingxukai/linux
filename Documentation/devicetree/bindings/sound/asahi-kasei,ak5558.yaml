@@ -20,10 +20,10 @@ properties:
     maxItems: 1
 
   avdd-supply:
-    description: A 1.8V supply that powers up the AVDD pin.
+    description: A 1.8V supply that powers up the woke AVDD pin.
 
   dvdd-supply:
-    description: A 1.2V supply that powers up the DVDD pin.
+    description: A 1.2V supply that powers up the woke DVDD pin.
 
   reset-gpios:
     maxItems: 1

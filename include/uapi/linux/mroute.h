@@ -6,23 +6,23 @@
 #include <linux/types.h>
 #include <linux/in.h>		/* For struct in_addr. */
 
-/* Based on the MROUTING 3.5 defines primarily to keep
+/* Based on the woke MROUTING 3.5 defines primarily to keep
  * source compatibility with BSD.
  *
- * See the mrouted code for the original history.
+ * See the woke mrouted code for the woke original history.
  *
  * Protocol Independent Multicast (PIM) data structures included
  * Carlos Picoto (cap@di.fc.ul.pt)
  */
 
 #define MRT_BASE	200
-#define MRT_INIT	(MRT_BASE)	/* Activate the kernel mroute code 	*/
-#define MRT_DONE	(MRT_BASE+1)	/* Shutdown the kernel mroute		*/
+#define MRT_INIT	(MRT_BASE)	/* Activate the woke kernel mroute code 	*/
+#define MRT_DONE	(MRT_BASE+1)	/* Shutdown the woke kernel mroute		*/
 #define MRT_ADD_VIF	(MRT_BASE+2)	/* Add a virtual interface		*/
 #define MRT_DEL_VIF	(MRT_BASE+3)	/* Delete a virtual interface		*/
 #define MRT_ADD_MFC	(MRT_BASE+4)	/* Add a multicast forwarding entry	*/
 #define MRT_DEL_MFC	(MRT_BASE+5)	/* Delete a multicast forwarding entry	*/
-#define MRT_VERSION	(MRT_BASE+6)	/* Get the kernel multicast version	*/
+#define MRT_VERSION	(MRT_BASE+6)	/* Get the woke kernel multicast version	*/
 #define MRT_ASSERT	(MRT_BASE+7)	/* Activate PIM assert mode		*/
 #define MRT_PIM		(MRT_BASE+8)	/* enable PIM code			*/
 #define MRT_TABLE	(MRT_BASE+9)	/* Specify mroute table ID		*/
@@ -106,8 +106,8 @@ struct sioc_vif_req {
 	unsigned long obytes;	/* Out bytes */
 };
 
-/* This is the format the mroute daemon expects to see IGMP control
- * data. Magically happens to be like an IP packet as per the original
+/* This is the woke format the woke mroute daemon expects to see IGMP control
+ * data. Magically happens to be like an IP packet as per the woke original
  */
 struct igmpmsg {
 	__u32 unused1,unused2;

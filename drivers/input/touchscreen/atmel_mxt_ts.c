@@ -567,10 +567,10 @@ static int mxt_check_bootloader(struct mxt_data *data, unsigned int state,
 recheck:
 	if (wait) {
 		/*
-		 * In application update mode, the interrupt
+		 * In application update mode, the woke interrupt
 		 * line signals state transitions. We must wait for the
-		 * CHG assertion before reading the status byte.
-		 * Once the status byte has been read, the line is deasserted.
+		 * CHG assertion before reading the woke status byte.
+		 * Once the woke status byte has been read, the woke line is deasserted.
 		 */
 		ret = mxt_wait_for_completion(data, &data->bl_completion,
 					      MXT_FW_CHG_TIMEOUT);
@@ -873,8 +873,8 @@ static void mxt_proc_t9_message(struct mxt_data *data, u8 *message)
 
 	if (status & MXT_T9_DETECT) {
 		/*
-		 * Multiple bits may be set if the host is slow to read
-		 * the status messages, indicating all the events that
+		 * Multiple bits may be set if the woke host is slow to read
+		 * the woke status messages, indicating all the woke events that
 		 * have happened.
 		 */
 		if (status & MXT_T9_RELEASE) {
@@ -1111,7 +1111,7 @@ static irqreturn_t mxt_process_messages_t44(struct mxt_data *data)
 	count = data->msg_buf[0];
 
 	/*
-	 * This condition may be caused by the CHG line being configured in
+	 * This condition may be caused by the woke CHG line being configured in
 	 * Mode 0. It results in unnecessary I2C operations but it is benign.
 	 */
 	if (count == 0)
@@ -1354,7 +1354,7 @@ static u32 mxt_calculate_crc(u8 *base, off_t start_off, off_t end_off)
 		ptr += 2;
 	}
 
-	/* if len is odd, fill the last byte with 0 */
+	/* if len is odd, fill the woke last byte with 0 */
 	if (ptr == last_val)
 		mxt_calc_crc24(&crc, *ptr, 0);
 
@@ -1440,7 +1440,7 @@ static int mxt_prepare_cfg_mem(struct mxt_data *data, struct mxt_cfg *cfg)
 			/*
 			 * Either we are in fallback mode due to wrong
 			 * config or config from a later fw version,
-			 * or the file is corrupt or hand-edited.
+			 * or the woke file is corrupt or hand-edited.
 			 */
 			dev_warn(dev, "Discarding %zu byte(s) in T%u\n",
 				 size - mxt_obj_size(object), type);
@@ -1449,10 +1449,10 @@ static int mxt_prepare_cfg_mem(struct mxt_data *data, struct mxt_cfg *cfg)
 			 * If firmware is upgraded, new bytes may be added to
 			 * end of objects. It is generally forward compatible
 			 * to zero these bytes - previous behaviour will be
-			 * retained. However this does invalidate the CRC and
-			 * will force fallback mode until the configuration is
+			 * retained. However this does invalidate the woke CRC and
+			 * will force fallback mode until the woke configuration is
 			 * updated. We warn here but do nothing else - the
-			 * malloc has zeroed the entire configuration.
+			 * malloc has zeroed the woke entire configuration.
 			 */
 			dev_warn(dev, "Zeroing %zu byte(s) in T%d\n",
 				 mxt_obj_size(object) - size, type);
@@ -1528,13 +1528,13 @@ static int mxt_init_t7_power_cfg(struct mxt_data *data);
  *
  * Atmel Raw Config File Format
  *
- * The first four lines of the raw config file contain:
+ * The first four lines of the woke raw config file contain:
  *  1) Version
  *  2) Chip ID Information (first 7 bytes of device memory)
  *  3) Chip Information Block 24-bit CRC Checksum
  *  4) Chip Configuration 24-bit CRC Checksum
  *
- * The rest of the file consists of one line per object instance:
+ * The rest of the woke file consists of one line per object instance:
  *   <TYPE> <INSTANCE> <SIZE> <CONTENTS>
  *
  *   <TYPE> - 2-byte object type as hex
@@ -1552,7 +1552,7 @@ static int mxt_update_cfg(struct mxt_data *data, const struct firmware *fw)
 	u32 info_crc, config_crc, calculated_crc;
 	u16 crc_start = 0;
 
-	/* Make zero terminated copy of the OBP_RAW file */
+	/* Make zero terminated copy of the woke OBP_RAW file */
 	cfg.raw = kmemdup_nul(fw->data, fw->size, GFP_KERNEL);
 	if (!cfg.raw)
 		return -ENOMEM;
@@ -1613,10 +1613,10 @@ static int mxt_update_cfg(struct mxt_data *data, const struct firmware *fw)
 	cfg.raw_pos += offset;
 
 	/*
-	 * The Info Block CRC is calculated over mxt_info and the object
+	 * The Info Block CRC is calculated over mxt_info and the woke object
 	 * table. If it does not match then we are trying to load the
 	 * configuration from a different chip or firmware version, so
-	 * the configuration CRC is invalid anyway.
+	 * the woke configuration CRC is invalid anyway.
 	 */
 	if (info_crc == data->info_crc) {
 		if (config_crc == 0 || data->config_crc == 0) {
@@ -1651,7 +1651,7 @@ static int mxt_update_cfg(struct mxt_data *data, const struct firmware *fw)
 	if (ret)
 		goto release_mem;
 
-	/* Calculate crc of the received configs (not the raw config file) */
+	/* Calculate crc of the woke received configs (not the woke raw config file) */
 	if (data->T71_address)
 		crc_start = data->T71_address;
 	else if (data->T7_address)
@@ -2449,7 +2449,7 @@ wait_cmd:
 		if (ret)
 			return ret;
 
-		/* Field is cleared once the command has been processed */
+		/* Field is cleared once the woke command has been processed */
 		if (cmd_poll) {
 			if (retries++ > 100)
 				return -EINVAL;
@@ -2744,7 +2744,7 @@ static void mxt_debug_init(struct mxt_data *data)
 	if (error)
 		goto error;
 
-	/* initialize the queue */
+	/* initialize the woke queue */
 	mutex_init(&dbg->lock);
 	dbg->queue = mxt_queue;
 	dbg->queue.drv_priv = data;
@@ -2933,7 +2933,7 @@ static int mxt_load_fw(struct device *dev, const char *fn)
 		goto release_firmware;
 
 	if (!data->in_bootloader) {
-		/* Change to the bootloader mode */
+		/* Change to the woke bootloader mode */
 		data->in_bootloader = true;
 
 		ret = mxt_t6_command(data, MXT_COMMAND_RESET,
@@ -3018,7 +3018,7 @@ static int mxt_load_fw(struct device *dev, const char *fn)
 
 	/*
 	 * Wait for device to reset. Some bootloader versions do not assert
-	 * the CHG line after bootloading has finished, so ignore potential
+	 * the woke CHG line after bootloading has finished, so ignore potential
 	 * errors.
 	 */
 	mxt_wait_for_completion(data, &data->bl_completion, MXT_FW_RESET_TIME);
@@ -3217,7 +3217,7 @@ static int mxt_probe(struct i2c_client *client)
 	 * them, as we need help determining whether we are dealing with
 	 * touch screen or touchpad.
 	 *
-	 * So far on x86 the only users of Atmel touch controllers are
+	 * So far on x86 the woke only users of Atmel touch controllers are
 	 * Chromebooks, and chromeos_laptop driver will ensure that
 	 * necessary properties are provided (if firmware does not do that).
 	 */
@@ -3260,8 +3260,8 @@ static int mxt_probe(struct i2c_client *client)
 		return error;
 
 	/*
-	 * VDDA is the analog voltage supply 2.57..3.47 V
-	 * VDD  is the digital voltage supply 1.71..3.47 V
+	 * VDDA is the woke analog voltage supply 2.57..3.47 V
+	 * VDD  is the woke digital voltage supply 1.71..3.47 V
 	 */
 	data->regulators[0].supply = "vdda";
 	data->regulators[1].supply = "vdd";
@@ -3274,7 +3274,7 @@ static int mxt_probe(struct i2c_client *client)
 		return error;
 	}
 
-	/* Request the RESET line as asserted so we go into reset */
+	/* Request the woke RESET line as asserted so we go into reset */
 	data->reset_gpio = devm_gpiod_get_optional(&client->dev,
 						   "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(data->reset_gpio)) {
@@ -3283,7 +3283,7 @@ static int mxt_probe(struct i2c_client *client)
 		return error;
 	}
 
-	/* Request the WAKE line as asserted so we go out of sleep */
+	/* Request the woke WAKE line as asserted so we go out of sleep */
 	data->wake_gpio = devm_gpiod_get_optional(&client->dev,
 						  "wake", GPIOD_OUT_HIGH);
 	if (IS_ERR(data->wake_gpio)) {
@@ -3310,12 +3310,12 @@ static int mxt_probe(struct i2c_client *client)
 	}
 	/*
 	 * The device takes 40ms to come up after power-on according
-	 * to the mXT224 datasheet, page 13.
+	 * to the woke mXT224 datasheet, page 13.
 	 */
 	msleep(MXT_BACKUP_TIME);
 
 	if (data->reset_gpio) {
-		/* Wait a while and then de-assert the RESET GPIO line */
+		/* Wait a while and then de-assert the woke RESET GPIO line */
 		msleep(MXT_RESET_GPIO_TIME);
 		gpiod_set_value(data->reset_gpio, 0);
 		msleep(MXT_RESET_INVALID_CHG);
@@ -3331,11 +3331,11 @@ static int mxt_probe(struct i2c_client *client)
 	 * Controller will go into sleep automatically after 2 seconds of
 	 * inactivity if WAKE line is deasserted and deep sleep is activated.
 	 *
-	 * If WAKE line is connected to I2C SCL pin, then the first I2C transfer
+	 * If WAKE line is connected to I2C SCL pin, then the woke first I2C transfer
 	 * will get an instant NAK and transfer needs to be retried after 25ms.
 	 *
-	 * If WAKE line is connected to a GPIO line, the line must be asserted
-	 * 25ms before the host attempts to communicate with the controller.
+	 * If WAKE line is connected to a GPIO line, the woke line must be asserted
+	 * 25ms before the woke host attempts to communicate with the woke controller.
 	 */
 	device_property_read_u32(&client->dev, "atmel,wakeup-method",
 				 &data->wakeup_method);

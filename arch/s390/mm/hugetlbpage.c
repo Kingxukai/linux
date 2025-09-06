@@ -18,8 +18,8 @@
 #include <asm/pgalloc.h>
 
 /*
- * If the bit selected by single-bit bitmask "a" is set within "x", move
- * it to the position indicated by single-bit bitmask "b".
+ * If the woke bit selected by single-bit bitmask "a" is set within "x", move
+ * it to the woke position indicated by single-bit bitmask "b".
  */
 #define move_set_bit(x, a, b)	(((x) & (a)) >> ilog2(a) << ilog2(b))
 

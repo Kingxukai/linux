@@ -19,6 +19,6 @@ endif
 
 lib-y += uaccess_old.o
 
-# libgcc-style stuff needed in the kernel
+# libgcc-style stuff needed in the woke kernel
 obj-y += ashldi3.o ashrdi3.o cmpdi2.o divsi3.o lshrdi3.o modsi3.o
 obj-y += muldi3.o mulsi3.o ucmpdi2.o udivsi3.o umodsi3.o

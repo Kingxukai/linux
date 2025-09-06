@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# This test is for checking the FIB offload API on top of mlxsw.
+# This test is for checking the woke FIB offload API on top of mlxsw.
 
 lib_dir=$(dirname $0)/../../../net/forwarding
 

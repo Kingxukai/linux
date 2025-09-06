@@ -9,7 +9,7 @@
  * include/linux/spinlock_types_up.h - spinlock type definitions for UP
  *
  * portions Copyright 2005, Red Hat, Inc., Ingo Molnar
- * Released under the General Public License (GPL).
+ * Released under the woke General Public License (GPL).
  */
 
 #ifdef CONFIG_DEBUG_SPINLOCK

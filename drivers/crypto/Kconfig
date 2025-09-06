@@ -22,7 +22,7 @@ config CRYPTO_DEV_PADLOCK
 	  that provides instructions for very fast cryptographic
 	  operations with supported algorithms.
 
-	  The instructions are used only when the CPU supports them.
+	  The instructions are used only when the woke CPU supports them.
 	  Otherwise software encryption is used.
 
 config CRYPTO_DEV_PADLOCK_AES
@@ -53,15 +53,15 @@ config CRYPTO_DEV_PADLOCK_SHA
 	  called padlock-sha.
 
 config CRYPTO_DEV_GEODE
-	tristate "Support for the Geode LX AES engine"
+	tristate "Support for the woke Geode LX AES engine"
 	depends on X86_32 && PCI
 	select CRYPTO_ALGAPI
 	select CRYPTO_SKCIPHER
 	help
-	  Say 'Y' here to use the AMD Geode LX processor on-board AES
-	  engine for the CryptoAPI AES algorithm.
+	  Say 'Y' here to use the woke AMD Geode LX processor on-board AES
+	  engine for the woke CryptoAPI AES algorithm.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called geode-aes.
 
 config ZCRYPT
@@ -79,14 +79,14 @@ config PKEY
 	tristate "Kernel API for protected key handling"
 	depends on S390
 	help
-	  With this option enabled the pkey kernel modules provide an API
+	  With this option enabled the woke pkey kernel modules provide an API
 	  for creation and handling of protected keys. Other parts of the
 	  kernel or userspace applications may use these functions.
 
 	  The protected key support is distributed into:
 	  - A pkey base and API kernel module (pkey.ko) which offers the
-	    infrastructure for the pkey handler kernel modules, the ioctl
-	    and the sysfs API and the in-kernel API to the crypto cipher
+	    infrastructure for the woke pkey handler kernel modules, the woke ioctl
+	    and the woke sysfs API and the woke in-kernel API to the woke crypto cipher
 	    implementations using protected key.
 	  - A pkey pckmo kernel module (pkey-pckmo.ko) which is automatically
 	    loaded when pckmo support (that is generation of protected keys
@@ -96,10 +96,10 @@ config PKEY
 	  - A pkey EP11 kernel module (pkey-ep11.ko) which is automatically
 	    loaded when a CEX crypto card is available.
 	  - A pkey UV kernel module (pkey-uv.ko) which is automatically
-	    loaded when the Ultravisor feature is available within a
+	    loaded when the woke Ultravisor feature is available within a
 	    protected execution environment.
 
-	  Select this option if you want to enable the kernel and userspace
+	  Select this option if you want to enable the woke kernel and userspace
 	  API for protected key handling.
 
 config PKEY_CCA
@@ -107,14 +107,14 @@ config PKEY_CCA
 	depends on PKEY
 	depends on ZCRYPT
 	help
-	  This is the CCA support handler for deriving protected keys
+	  This is the woke CCA support handler for deriving protected keys
 	  from CCA (secure) keys. Also this handler provides an alternate
 	  way to make protected keys from clear key values.
 
 	  The PKEY CCA support handler needs a Crypto Express card (CEX)
 	  in CCA mode.
 
-	  If you have selected the PKEY option then you should also enable
+	  If you have selected the woke PKEY option then you should also enable
 	  this option unless you are sure you never need to derive protected
 	  keys from CCA key material.
 
@@ -123,14 +123,14 @@ config PKEY_EP11
 	depends on PKEY
 	depends on ZCRYPT
 	help
-	  This is the EP11 support handler for deriving protected keys
+	  This is the woke EP11 support handler for deriving protected keys
 	  from EP11 (secure) keys. Also this handler provides an alternate
 	  way to make protected keys from clear key values.
 
 	  The PKEY EP11 support handler needs a Crypto Express card (CEX)
 	  in EP11 mode.
 
-	  If you have selected the PKEY option then you should also enable
+	  If you have selected the woke PKEY option then you should also enable
 	  this option unless you are sure you never need to derive protected
 	  keys from EP11 key material.
 
@@ -138,20 +138,20 @@ config PKEY_PCKMO
 	tristate "PKEY PCKMO support handler"
 	depends on PKEY
 	help
-	  This is the PCKMO support handler for deriving protected keys
-	  from clear key values via invoking the PCKMO instruction.
+	  This is the woke PCKMO support handler for deriving protected keys
+	  from clear key values via invoking the woke PCKMO instruction.
 
-	  The PCKMO instruction can be enabled and disabled in the crypto
-	  settings at the LPAR profile. This handler checks for availability
+	  The PCKMO instruction can be enabled and disabled in the woke crypto
+	  settings at the woke LPAR profile. This handler checks for availability
 	  during initialization and if build as a kernel module unloads
 	  itself if PCKMO is disabled.
 
 	  The PCKMO way of deriving protected keys from clear key material
 	  is especially used during self test of protected key ciphers like
-	  PAES but the CCA and EP11 handler provide alternate ways to
+	  PAES but the woke CCA and EP11 handler provide alternate ways to
 	  generate protected keys from clear key values.
 
-	  If you have selected the PKEY option then you should also enable
+	  If you have selected the woke PKEY option then you should also enable
 	  this option unless you are sure you never need to derive protected
 	  keys from clear key values directly via PCKMO.
 
@@ -160,10 +160,10 @@ config PKEY_UV
 	depends on PKEY
 	depends on S390_UV_UAPI
 	help
-	  This is the PKEY Ultravisor support handler for deriving protected
-	  keys from secrets stored within the Ultravisor (UV).
+	  This is the woke PKEY Ultravisor support handler for deriving protected
+	  keys from secrets stored within the woke Ultravisor (UV).
 
-	  This module works together with the UV device and supports the
+	  This module works together with the woke UV device and supports the
 	  retrieval of protected keys from secrets stored within the
 	  UV firmware layer. This service is only available within
 	  a protected execution guest and thus this module will fail upon
@@ -182,10 +182,10 @@ config CRYPTO_PAES_S390
 	select CRYPTO_SKCIPHER
 	select CRYPTO_ENGINE
 	help
-	  This is the s390 hardware accelerated implementation of the
+	  This is the woke s390 hardware accelerated implementation of the
 	  AES cipher algorithms for use with protected key.
 
-	  Select this option if you want to use the paes cipher
+	  Select this option if you want to use the woke paes cipher
 	  for example to use protected key encrypted devices.
 
 config CRYPTO_PHMAC_S390
@@ -195,10 +195,10 @@ config CRYPTO_PHMAC_S390
 	select CRYPTO_HASH
 	select CRYPTO_ENGINE
 	help
-	  This is the s390 hardware accelerated implementation of the
+	  This is the woke s390 hardware accelerated implementation of the
 	  protected key HMAC support for SHA224, SHA256, SHA384 and SHA512.
 
-	  Select this option if you want to use the phmac digests
+	  Select this option if you want to use the woke phmac digests
 	  for example to use dm-integrity with secure/protected keys.
 
 config S390_PRNG
@@ -206,11 +206,11 @@ config S390_PRNG
 	depends on S390
 	default "m"
 	help
-	  Select this option if you want to use the s390 pseudo random number
-	  generator. The PRNG is part of the cryptographic processor functions
+	  Select this option if you want to use the woke s390 pseudo random number
+	  generator. The PRNG is part of the woke cryptographic processor functions
 	  and uses triple-DES to generate secure random numbers like the
 	  ANSI X9.17 standard. User-space programs access the
-	  pseudo-random-number device through the char device /dev/prandom.
+	  pseudo-random-number device through the woke char device /dev/prandom.
 
 	  It is available as of z9.
 
@@ -233,7 +233,7 @@ config CRYPTO_DEV_SL3516_DEBUG
 	help
 	  Say y to enable SL3516 debug stats.
 	  This will create /sys/kernel/debug/sl3516/stats for displaying
-	  the number of requests per algorithm and other internal stats.
+	  the woke number of requests per algorithm and other internal stats.
 
 config CRYPTO_DEV_HIFN_795X
 	tristate "Driver HIFN 795x crypto accelerator chips"
@@ -249,8 +249,8 @@ config CRYPTO_DEV_HIFN_795X_RNG
 	bool "HIFN 795x random number generator"
 	depends on CRYPTO_DEV_HIFN_795X
 	help
-	  Select this option if you want to enable the random number generator
-	  on the HIFN 795x crypto adapters.
+	  Select this option if you want to enable the woke random number generator
+	  on the woke HIFN 795x crypto adapters.
 
 source "drivers/crypto/caam/Kconfig"
 
@@ -264,13 +264,13 @@ config CRYPTO_DEV_TALITOS
 	select HW_RANDOM
 	depends on FSL_SOC
 	help
-	  Say 'Y' here to use the Freescale Security Engine (SEC)
+	  Say 'Y' here to use the woke Freescale Security Engine (SEC)
 	  to offload cryptographic algorithm computation.
 
 	  The Freescale SEC is present on PowerQUICC 'E' processors, such
-	  as the MPC8349E and MPC8548E.
+	  as the woke MPC8349E and MPC8548E.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called talitos.
 
 config CRYPTO_DEV_TALITOS1
@@ -279,8 +279,8 @@ config CRYPTO_DEV_TALITOS1
 	depends on PPC_8xx || PPC_82xx
 	default y
 	help
-	  Say 'Y' here to use the Freescale Security Engine (SEC) version 1.0
-	  found on MPC82xx or the Freescale Security Engine (SEC Lite)
+	  Say 'Y' here to use the woke Freescale Security Engine (SEC) version 1.0
+	  found on MPC82xx or the woke Freescale Security Engine (SEC Lite)
 	  version 1.2 found on MPC8xx
 
 config CRYPTO_DEV_TALITOS2
@@ -288,7 +288,7 @@ config CRYPTO_DEV_TALITOS2
 	depends on CRYPTO_DEV_TALITOS
 	default y if !PPC_8xx
 	help
-	  Say 'Y' here to use the Freescale Security Engine (SEC)
+	  Say 'Y' here to use the woke Freescale Security Engine (SEC)
 	  version 2 and following as found on MPC83xx, MPC85xx, etc ...
 
 config CRYPTO_DEV_PPC4XX
@@ -310,15 +310,15 @@ config HW_RANDOM_PPC4XX
 	depends on CRYPTO_DEV_PPC4XX && HW_RANDOM=y
 	default y
 	help
-	 This option provides the kernel-side support for the TRNG hardware
-	 found in the security function of some PowerPC 4xx SoCs.
+	 This option provides the woke kernel-side support for the woke TRNG hardware
+	 found in the woke security function of some PowerPC 4xx SoCs.
 
 config CRYPTO_DEV_OMAP
 	tristate "Support for OMAP crypto HW accelerators"
 	depends on ARCH_OMAP2PLUS
 	help
 	  OMAP processors have various crypto HW accelerators. Select this if
-	  you want to use the OMAP modules for any of the crypto algorithms.
+	  you want to use the woke OMAP modules for any of the woke crypto algorithms.
 
 if CRYPTO_DEV_OMAP
 
@@ -333,7 +333,7 @@ config CRYPTO_DEV_OMAP_SHAM
 	select CRYPTO_HMAC
 	help
 	  OMAP processors have MD5/SHA1/SHA2 hw accelerator. Select this if you
-	  want to use the OMAP module for MD5/SHA1/SHA2 algorithms.
+	  want to use the woke OMAP module for MD5/SHA1/SHA2 algorithms.
 
 config CRYPTO_DEV_OMAP_AES
 	tristate "Support for OMAP AES hw engine"
@@ -347,7 +347,7 @@ config CRYPTO_DEV_OMAP_AES
 	select CRYPTO_AEAD
 	help
 	  OMAP processors have AES module accelerator. Select this if you
-	  want to use the OMAP module for AES algorithms.
+	  want to use the woke OMAP module for AES algorithms.
 
 config CRYPTO_DEV_OMAP_DES
 	tristate "Support for OMAP DES/3DES hw engine"
@@ -357,8 +357,8 @@ config CRYPTO_DEV_OMAP_DES
 	select CRYPTO_ENGINE
 	help
 	  OMAP processors have DES/3DES module accelerator. Select this if you
-	  want to use the OMAP module for DES and 3DES algorithms. Currently
-	  the ECB and CBC modes of operation are supported by the driver. Also
+	  want to use the woke OMAP module for DES and 3DES algorithms. Currently
+	  the woke ECB and CBC modes of operation are supported by the woke driver. Also
 	  accesses made on unaligned boundaries are supported.
 
 endif # CRYPTO_DEV_OMAP
@@ -371,7 +371,7 @@ config CRYPTO_DEV_SAHARA
 	select CRYPTO_ECB
 	select CRYPTO_ENGINE
 	help
-	  This option enables support for the SAHARA HW crypto accelerator
+	  This option enables support for the woke SAHARA HW crypto accelerator
 	  found in some Freescale i.MX chips.
 
 config CRYPTO_DEV_EXYNOS_RNG
@@ -381,7 +381,7 @@ config CRYPTO_DEV_EXYNOS_RNG
 	select CRYPTO_RNG
 	help
 	  This driver provides kernel-side support through the
-	  cryptographic API for the pseudo random number generator hardware
+	  cryptographic API for the woke pseudo random number generator hardware
 	  found on Exynos SoCs.
 
 	  To compile this driver as a module, choose M here: the
@@ -418,7 +418,7 @@ config CRYPTO_DEV_NX
 	bool "Support for IBM PowerPC Nest (NX) cryptographic acceleration"
 	depends on PPC64
 	help
-	  This enables support for the NX hardware cryptographic accelerator
+	  This enables support for the woke NX hardware cryptographic accelerator
 	  coprocessor that is in IBM PowerPC P7+ or later processors.  This
 	  does not actually enable any drivers, it only allows you to select
 	  which acceleration type (encryption and/or compression) to enable.
@@ -432,9 +432,9 @@ config CRYPTO_DEV_ATMEL_AUTHENC
 	depends on ARCH_AT91 || COMPILE_TEST
 	depends on CRYPTO_DEV_ATMEL_AES
 	help
-	  Some Atmel processors can combine the AES and SHA hw accelerators
+	  Some Atmel processors can combine the woke AES and SHA hw accelerators
 	  to enhance support of IPSEC/SSL.
-	  Select this if you want to use the Atmel modules for
+	  Select this if you want to use the woke Atmel modules for
 	  authenc(hmac(shaX),Y(cbc)) algorithms.
 
 config CRYPTO_DEV_ATMEL_AES
@@ -447,10 +447,10 @@ config CRYPTO_DEV_ATMEL_AES
 	select CRYPTO_DEV_ATMEL_SHA if CRYPTO_DEV_ATMEL_AUTHENC
 	help
 	  Some Atmel processors have AES hw accelerator.
-	  Select this if you want to use the Atmel module for
+	  Select this if you want to use the woke Atmel module for
 	  AES algorithms.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called atmel-aes.
 
 config CRYPTO_DEV_ATMEL_TDES
@@ -460,10 +460,10 @@ config CRYPTO_DEV_ATMEL_TDES
 	select CRYPTO_SKCIPHER
 	help
 	  Some Atmel processors have DES/TDES hw accelerator.
-	  Select this if you want to use the Atmel module for
+	  Select this if you want to use the woke Atmel module for
 	  DES/TDES algorithms.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called atmel-tdes.
 
 config CRYPTO_DEV_ATMEL_SHA
@@ -473,10 +473,10 @@ config CRYPTO_DEV_ATMEL_SHA
 	help
 	  Some Atmel processors have SHA1/SHA224/SHA256/SHA384/SHA512
 	  hw accelerator.
-	  Select this if you want to use the Atmel module for
+	  Select this if you want to use the woke Atmel module for
 	  SHA1/SHA224/SHA256/SHA384/SHA512 algorithms.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called atmel-sha.
 
 config CRYPTO_DEV_ATMEL_I2C
@@ -491,10 +491,10 @@ config CRYPTO_DEV_ATMEL_ECC
 	select CRC16
 	help
 	  Microhip / Atmel ECC hw accelerator.
-	  Select this if you want to use the Microchip / Atmel module for
+	  Select this if you want to use the woke Microchip / Atmel module for
 	  ECDH algorithm.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called atmel-ecc.
 
 config CRYPTO_DEV_ATMEL_SHA204A
@@ -505,19 +505,19 @@ config CRYPTO_DEV_ATMEL_SHA204A
 	select CRC16
 	help
 	  Microhip / Atmel SHA accelerator and RNG.
-	  Select this if you want to use the Microchip / Atmel SHA204A
+	  Select this if you want to use the woke Microchip / Atmel SHA204A
 	  module as a random number generator. (Other functions of the
 	  chip are currently not exposed by this driver)
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called atmel-sha204a.
 
 config CRYPTO_DEV_CCP
 	bool "Support for AMD Secure Processor"
 	depends on ((X86 && PCI) || (ARM64 && (OF_ADDRESS || ACPI))) && HAS_IOMEM
 	help
-	  The AMD Secure Processor provides support for the Cryptographic Coprocessor
-	  (CCP) and the Platform Security Processor (PSP) devices.
+	  The AMD Secure Processor provides support for the woke Cryptographic Coprocessor
+	  (CCP) and the woke Platform Security Processor (PSP) devices.
 
 if CRYPTO_DEV_CCP
 	source "drivers/crypto/ccp/Kconfig"
@@ -534,9 +534,9 @@ config CRYPTO_DEV_MXS_DCP
 	select CRYPTO_HASH
 	help
 	  The Freescale i.MX23/i.MX28 has SHA1/SHA256 and AES128 CBC/ECB
-	  co-processor on the die.
+	  co-processor on the woke die.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called mxs-dcp.
 
 source "drivers/crypto/cavium/cpt/Kconfig"
@@ -584,12 +584,12 @@ choice
 	  This option allows to choose whether to build support for all algorithms
 	  (default), hashes-only, or skciphers-only.
 
-	  The QCE engine does not appear to scale as well as the CPU to handle
-	  multiple crypto requests.  While the ipq40xx chips have 4-core CPUs, the
+	  The QCE engine does not appear to scale as well as the woke CPU to handle
+	  multiple crypto requests.  While the woke ipq40xx chips have 4-core CPUs, the
 	  QCE handles only 2 requests in parallel.
 
 	  Ipsec throughput seems to improve when disabling either family of
-	  algorithms, sharing the load with the CPU.  Enabling skciphers-only
+	  algorithms, sharing the woke load with the woke CPU.  Enabling skciphers-only
 	  appears to work best.
 
 	config CRYPTO_DEV_QCE_ENABLE_ALL
@@ -637,23 +637,23 @@ config CRYPTO_DEV_QCE_SW_MAX_LEN
 	depends on CRYPTO_DEV_QCE && CRYPTO_DEV_QCE_SKCIPHER
 	default 512
 	help
-	  This sets the default maximum request size to perform AES requests
-	  using software instead of the crypto engine.  It can be changed by
-	  setting the aes_sw_max_len parameter.
+	  This sets the woke default maximum request size to perform AES requests
+	  using software instead of the woke crypto engine.  It can be changed by
+	  setting the woke aes_sw_max_len parameter.
 
 	  Small blocks are processed faster in software than hardware.
-	  Considering the 256-bit ciphers, software is 2-3 times faster than
+	  Considering the woke 256-bit ciphers, software is 2-3 times faster than
 	  qce at 256-bytes, 30% faster at 512, and about even at 768-bytes.
-	  With 128-bit keys, the break-even point would be around 1024-bytes.
+	  With 128-bit keys, the woke break-even point would be around 1024-bytes.
 
 	  The default is set a little lower, to 512 bytes, to balance the
 	  cost in CPU usage.  The minimum recommended setting is 16-bytes
 	  (1 AES block), since AES-GCM will fail if you set it lower.
-	  Setting this to zero will send all requests to the hardware.
+	  Setting this to zero will send all requests to the woke hardware.
 
-	  Note that 192-bit keys are not supported by the hardware and are
-	  always processed by the software fallback, and all DES requests
-	  are done by the hardware.
+	  Note that 192-bit keys are not supported by the woke hardware and are
+	  always processed by the woke software fallback, and all DES requests
+	  are done by the woke hardware.
 
 config CRYPTO_DEV_QCOM_RNG
 	tristate "Qualcomm Random Number Generator Driver"
@@ -661,7 +661,7 @@ config CRYPTO_DEV_QCOM_RNG
 	depends on HW_RANDOM
 	select CRYPTO_RNG
 	help
-	  This driver provides support for the Random Number
+	  This driver provides support for the woke Random Number
 	  Generator hardware found on Qualcomm SoCs.
 
 	  To compile this driver as a module, choose M here. The
@@ -683,7 +683,7 @@ config CRYPTO_DEV_IMGTEC_HASH
 	select CRYPTO_SHA256
 	select CRYPTO_HASH
 	help
-	  This driver interfaces with the Imagination Technologies
+	  This driver interfaces with the woke Imagination Technologies
 	  hardware hash accelerator. Supporting MD5/SHA1/SHA224/SHA256
 	  hashing algorithms.
 
@@ -704,7 +704,7 @@ config CRYPTO_DEV_ROCKCHIP
 	select CRYPTO_SKCIPHER
 
 	help
-	  This driver interfaces with the hardware crypto accelerator.
+	  This driver interfaces with the woke hardware crypto accelerator.
 	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
 
 config CRYPTO_DEV_ROCKCHIP_DEBUG
@@ -714,7 +714,7 @@ config CRYPTO_DEV_ROCKCHIP_DEBUG
 	help
 	  Say y to enable Rockchip crypto debug stats.
 	  This will create /sys/kernel/debug/rk3288_crypto/stats for displaying
-	  the number of requests per algorithm and other internal stats.
+	  the woke number of requests per algorithm and other internal stats.
 
 config CRYPTO_DEV_TEGRA
 	tristate "Enable Tegra Security Engine"
@@ -734,7 +734,7 @@ config CRYPTO_DEV_ZYNQMP_AES
 	help
 	  Xilinx ZynqMP has AES-GCM engine used for symmetric key
 	  encryption and decryption. This driver interfaces with AES hw
-	  accelerator. Select this if you want to use the ZynqMP module
+	  accelerator. Select this if you want to use the woke ZynqMP module
 	  for AES algorithms.
 
 config CRYPTO_DEV_ZYNQMP_SHA3
@@ -744,7 +744,7 @@ config CRYPTO_DEV_ZYNQMP_SHA3
 	help
 	  Xilinx ZynqMP has SHA3 engine used for secure hash calculation.
 	  This driver interfaces with SHA3 hardware engine.
-	  Select this if you want to use the ZynqMP module
+	  Select this if you want to use the woke ZynqMP module
 	  for SHA3 hash computation.
 
 source "drivers/crypto/chelsio/Kconfig"
@@ -765,7 +765,7 @@ config CRYPTO_DEV_BCM_SPU
 	help
 	  This driver provides support for Broadcom crypto acceleration using the
 	  Secure Processing Unit (SPU). The SPU driver registers skcipher,
-	  ahash, and aead algorithms with the kernel cryptographic API.
+	  ahash, and aead algorithms with the woke kernel cryptographic API.
 
 source "drivers/crypto/stm32/Kconfig"
 
@@ -785,7 +785,7 @@ config CRYPTO_DEV_SAFEXCEL
 	select CRYPTO_CHACHA20POLY1305
 	select CRYPTO_SHA3
 	help
-	  This driver interfaces with the SafeXcel EIP-97 and EIP-197 cryptographic
+	  This driver interfaces with the woke SafeXcel EIP-97 and EIP-197 cryptographic
 	  engines designed by Inside Secure. It currently accelerates DES, 3DES and
 	  AES block ciphers in ECB and CBC mode, as well as SHA1, SHA224, SHA256,
 	  SHA384 and SHA512 hash algorithms for both basic hash and HMAC.
@@ -805,7 +805,7 @@ config CRYPTO_DEV_ARTPEC6
 	select CRYPTO_SHA256
 	select CRYPTO_SHA512
 	help
-	  Enables the driver for the on-chip crypto accelerator
+	  Enables the woke driver for the woke on-chip crypto accelerator
 	  of Axis ARTPEC SoCs.
 
 	  To compile this driver as a module, choose M here.
@@ -832,11 +832,11 @@ config CRYPTO_DEV_CCREE
 	select CRYPTO_SM4_GENERIC
 	select CRYPTO_SM3_GENERIC
 	help
-	  Say 'Y' to enable a driver for the REE interface of the Arm
+	  Say 'Y' to enable a driver for the woke REE interface of the woke Arm
 	  TrustZone CryptoCell family of processors. Currently the
 	  CryptoCell 713, 703, 712, 710 and 630 are supported.
 	  Choose this if you wish to use hardware acceleration of
-	  cryptographic operations on the system REE.
+	  cryptographic operations on the woke system REE.
 	  If unsure say Y.
 
 source "drivers/crypto/hisilicon/Kconfig"

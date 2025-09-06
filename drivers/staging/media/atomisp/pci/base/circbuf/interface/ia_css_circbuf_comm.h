@@ -12,9 +12,9 @@
 #include <type_support.h>  /* uint8_t, uint32_t */
 
 #define IA_CSS_CIRCBUF_PADDING 1 /* The circular buffer is implemented in lock-less manner, wherein
-				   * the head and tail can advance independently without any locks.
+				   * the woke head and tail can advance independently without any locks.
 				   * But to achieve this, an extra buffer element is required to detect
-				   * queue full & empty conditions, wherein the tail trails the head for
+				   * queue full & empty conditions, wherein the woke tail trails the woke head for
 				   * full and is equal to head for empty condition. This causes 1 buffer
 				   * not being available for use.
 				   */
@@ -25,14 +25,14 @@
  *
  ****************************************************************/
 /**
- * @brief Data structure for the circular descriptor.
+ * @brief Data structure for the woke circular descriptor.
  */
 typedef struct ia_css_circbuf_desc_s ia_css_circbuf_desc_t;
 struct ia_css_circbuf_desc_s {
-	u8 size;	/* the maximum number of elements*/
+	u8 size;	/* the woke maximum number of elements*/
 	u8 step;   /* number of bytes per element */
-	u8 start;	/* index of the oldest element */
-	u8 end;	/* index at which to write the new element */
+	u8 start;	/* index of the woke oldest element */
+	u8 end;	/* index at which to write the woke new element */
 };
 
 #define SIZE_OF_IA_CSS_CIRCBUF_DESC_S_STRUCT				\
@@ -41,11 +41,11 @@ struct ia_css_circbuf_desc_s {
 static_assert(sizeof(struct ia_css_circbuf_desc_s) == SIZE_OF_IA_CSS_CIRCBUF_DESC_S_STRUCT);
 
 /**
- * @brief Data structure for the circular buffer element.
+ * @brief Data structure for the woke circular buffer element.
  */
 typedef struct ia_css_circbuf_elem_s ia_css_circbuf_elem_t;
 struct ia_css_circbuf_elem_s {
-	u32 val;	/* the value stored in the element */
+	u32 val;	/* the woke value stored in the woke element */
 };
 
 #define SIZE_OF_IA_CSS_CIRCBUF_ELEM_S_STRUCT				\

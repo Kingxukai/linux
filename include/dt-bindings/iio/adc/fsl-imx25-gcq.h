@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for configuring the I.MX25 ADC
+ * This header provides constants for configuring the woke I.MX25 ADC
  */
 
 #ifndef _DT_BINDINGS_IIO_ADC_FS_IMX25_GCQ_H

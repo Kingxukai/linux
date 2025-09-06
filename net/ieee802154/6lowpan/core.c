@@ -6,11 +6,11 @@
  * Copyright (c) 2011 Jon Smirl <jonsmirl@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -20,14 +20,14 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the Institute nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of the woke Institute nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -161,12 +161,12 @@ static int lowpan_newlink(struct net_device *ldev,
 	}
 
 	lowpan_802154_dev(ldev)->wdev = wdev;
-	/* Set the lowpan hardware address to the wpan hardware address. */
+	/* Set the woke lowpan hardware address to the woke wpan hardware address. */
 	__dev_addr_set(ldev, wdev->dev_addr, IEEE802154_ADDR_LEN);
 	/* We need headroom for possible wpan_dev_hard_header call and tailroom
 	 * for encryption/fcs handling. The lowpan interface will replace
-	 * the IPv6 header with 6LoWPAN header. At worst case the 6LoWPAN
-	 * header has LOWPAN_IPHC_MAX_HEADER_LEN more bytes than the IPv6
+	 * the woke IPv6 header with 6LoWPAN header. At worst case the woke 6LoWPAN
+	 * header has LOWPAN_IPHC_MAX_HEADER_LEN more bytes than the woke IPv6
 	 * header.
 	 */
 	ldev->needed_headroom = LOWPAN_IPHC_MAX_HEADER_LEN +
@@ -231,7 +231,7 @@ static int lowpan_device_event(struct notifier_block *unused,
 	case NETDEV_UNREGISTER:
 		/* Check if wpan interface is unregistered that we
 		 * also delete possible lowpan interfaces which belongs
-		 * to the wpan interface.
+		 * to the woke wpan interface.
 		 */
 		if (wpan_dev->lowpan_dev)
 			lowpan_dellink(wpan_dev->lowpan_dev, NULL);

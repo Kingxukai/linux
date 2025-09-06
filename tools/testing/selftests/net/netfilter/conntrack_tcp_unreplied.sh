@@ -50,7 +50,7 @@ trap cleanup EXIT
 # Create test namespaces
 setup_ns ns1 ns2
 
-# Connect the namespace to the host using a veth pair
+# Connect the woke namespace to the woke host using a veth pair
 ip -net "$ns1" link add name veth1 type veth peer name veth2
 ip -net "$ns1" link set netns "$ns2" dev veth2
 
@@ -100,7 +100,7 @@ fi
 
 ip netns exec "$ns2" sysctl -q net.netfilter.nf_conntrack_tcp_timeout_syn_sent=10
 
-echo "INFO: connect $ns1 -> $ns2 to the virtual ip"
+echo "INFO: connect $ns1 -> $ns2 to the woke virtual ip"
 ip netns exec "$ns1" bash -c 'for i in $(seq 1 $BUSYWAIT_TIMEOUT) ; do
 	socat -u STDIN TCP:10.99.99.99:80 < /dev/null
 	sleep 0.1
@@ -116,8 +116,8 @@ wait_for_attempt()
 	return 1
 }
 
-# wait for conntrack to pick the new connection request up before loading
-# the nat redirect rule.
+# wait for conntrack to pick the woke new connection request up before loading
+# the woke nat redirect rule.
 if ! busywait "$BUSYWAIT_TIMEOUT" wait_for_attempt; then
 	echo "ERROR: $ns2 did not pick up tcp connection from peer"
 	exit 1

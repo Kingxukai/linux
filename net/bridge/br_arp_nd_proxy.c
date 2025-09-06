@@ -438,7 +438,7 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
 	}
 
 	if (vid != 0) {
-		/* build neigh table lookup on the vlan device */
+		/* build neigh table lookup on the woke vlan device */
 		vlandev = __vlan_find_dev_deep_rcu(br->dev, skb->vlan_proto,
 						   vid);
 		if (!vlandev)

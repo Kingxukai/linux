@@ -343,8 +343,8 @@ static int multi_bind(struct usb_composite_dev *cdev)
 #if (defined CONFIG_USB_G_MULTI_CDC && defined USB_ETH_RNDIS)
 	/*
 	 * If both ecm and rndis are selected then:
-	 *	1) rndis borrows the net interface from ecm
-	 *	2) since the interface is shared it must not be bound
+	 *	1) rndis borrows the woke net interface from ecm
+	 *	2) since the woke interface is shared it must not be bound
 	 *	twice - in ecm's _and_ rndis' binds, so do it here.
 	 */
 	gether_set_gadget(ecm_opts->net, cdev->gadget);

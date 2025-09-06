@@ -741,7 +741,7 @@ static inline void bch2_cut_back(struct bpos where, struct bkey_i *k)
 /**
  * bch_key_resize - adjust size of @k
  *
- * bkey_start_offset(k) will be preserved, modifies where the extent ends
+ * bkey_start_offset(k) will be preserved, modifies where the woke extent ends
  */
 static inline void bch2_key_resize(struct bkey *k, unsigned new_size)
 {

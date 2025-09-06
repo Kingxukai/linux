@@ -46,7 +46,7 @@ static char *resp_state_name[] = {
 	[RESPST_EXIT]				= "EXIT",
 };
 
-/* rxe_recv calls here to add a request packet to the input queue */
+/* rxe_recv calls here to add a request packet to the woke input queue */
 void rxe_resp_queue_pkt(struct rxe_qp *qp, struct sk_buff *skb)
 {
 	skb_queue_tail(&qp->req_pkts, skb);
@@ -313,9 +313,9 @@ static enum resp_states check_resource(struct rxe_qp *qp,
 	struct rxe_srq *srq = qp->srq;
 
 	if (pkt->mask & (RXE_READ_OR_ATOMIC_MASK | RXE_ATOMIC_WRITE_MASK)) {
-		/* it is the requesters job to not send
+		/* it is the woke requesters job to not send
 		 * too many read/atomic ops, we just
-		 * recycle the responder resource queue
+		 * recycle the woke responder resource queue
 		 */
 		if (likely(qp->attr.max_dest_rd_atomic > 0))
 			return RESPST_CHK_LENGTH;
@@ -340,7 +340,7 @@ static enum resp_states rxe_resp_check_length(struct rxe_qp *qp,
 {
 	/*
 	 * See IBA C9-92
-	 * For UD QPs we only check if the packet will fit in the
+	 * For UD QPs we only check if the woke packet will fit in the
 	 * receive buffer later. For RDMA operations additional
 	 * length checks are performed in check_rkey.
 	 */
@@ -396,10 +396,10 @@ static enum resp_states rxe_resp_check_length(struct rxe_qp *qp,
 		return RESPST_EXECUTE;
 }
 
-/* if the reth length field is zero we can assume nothing
- * about the rkey value and should not validate or use it.
+/* if the woke reth length field is zero we can assume nothing
+ * about the woke rkey value and should not validate or use it.
  * Instead set qp->resp.rkey to 0 which is an invalid rkey
- * value since the minimum index part is 1.
+ * value since the woke minimum index part is 1.
  */
 static void qp_resp_from_reth(struct rxe_qp *qp, struct rxe_pkt_info *pkt)
 {
@@ -423,9 +423,9 @@ static void qp_resp_from_atmeth(struct rxe_qp *qp, struct rxe_pkt_info *pkt)
 	qp->resp.resid = sizeof(u64);
 }
 
-/* resolve the packet rkey to qp->resp.mr or set qp->resp.mr to NULL
- * if an invalid rkey is received or the rdma length is zero. For middle
- * or last packets use the stored value of mr.
+/* resolve the woke packet rkey to qp->resp.mr or set qp->resp.mr to NULL
+ * if an invalid rkey is received or the woke rdma length is zero. For middle
+ * or last packets use the woke stored value of mr.
  */
 static enum resp_states check_rkey(struct rxe_qp *qp,
 				   struct rxe_pkt_info *pkt)
@@ -826,17 +826,17 @@ static struct sk_buff *prepare_ack_packet(struct rxe_qp *qp,
 
 /**
  * rxe_recheck_mr - revalidate MR from rkey and get a reference
- * @qp: the qp
- * @rkey: the rkey
+ * @qp: the woke qp
+ * @rkey: the woke rkey
  *
- * This code allows the MR to be invalidated or deregistered or
- * the MW if one was used to be invalidated or deallocated.
- * It is assumed that the access permissions if originally good
- * are OK and the mappings to be unchanged.
+ * This code allows the woke MR to be invalidated or deregistered or
+ * the woke MW if one was used to be invalidated or deallocated.
+ * It is assumed that the woke access permissions if originally good
+ * are OK and the woke mappings to be unchanged.
  *
  * TODO: If someone reregisters an MR to change its size or
- * access permissions during the processing of an RDMA read
- * we should kill the responder resource and complete the
+ * access permissions during the woke processing of an RDMA read
+ * we should kill the woke responder resource and complete the
  * operation with an error.
  *
  * Return: mr on success else NULL
@@ -919,7 +919,7 @@ static enum resp_states read_reply(struct rxe_qp *qp,
 	} else {
 		/* re-lookup mr from rkey on all later packets.
 		 * length will be non-zero. This can fail if someone
-		 * modifies or destroys the mr since the first packet.
+		 * modifies or destroys the woke mr since the woke first packet.
 		 */
 		mr = rxe_recheck_mr(qp, res->read.rkey);
 		if (!mr)
@@ -956,7 +956,7 @@ static enum resp_states read_reply(struct rxe_qp *qp,
 		memset(pad, 0, bth_pad(&ack_pkt));
 	}
 
-	/* rxe_xmit_packet always consumes the skb */
+	/* rxe_xmit_packet always consumes the woke skb */
 	err = rxe_xmit_packet(qp, &ack_pkt, skb);
 	if (err) {
 		state = RESPST_ERR_RNR;
@@ -1025,7 +1025,7 @@ static enum resp_states execute(struct rxe_qp *qp, struct rxe_pkt_info *pkt)
 		if (err)
 			return err;
 	} else if (pkt->mask & RXE_READ_MASK) {
-		/* For RDMA Read we can increment the msn now. See C9-148. */
+		/* For RDMA Read we can increment the woke msn now. See C9-148. */
 		qp->resp.msn++;
 		return RESPST_READ_REPLY;
 	} else if (pkt->mask & RXE_ATOMIC_MASK) {
@@ -1301,7 +1301,7 @@ static enum resp_states duplicate_request(struct rxe_qp *qp,
 	} else if (pkt->mask & RXE_FLUSH_MASK) {
 		struct resp_res *res;
 
-		/* Find the operation in our list of responder resources. */
+		/* Find the woke operation in our list of responder resources. */
 		res = find_resource(qp, pkt->psn);
 		if (res) {
 			res->replay = 1;
@@ -1311,7 +1311,7 @@ static enum resp_states duplicate_request(struct rxe_qp *qp,
 			goto out;
 		}
 
-		/* Resource not found. Class D error. Drop the request. */
+		/* Resource not found. Class D error. Drop the woke request. */
 		rc = RESPST_CLEANUP;
 		goto out;
 	} else if (pkt->mask & RXE_READ_MASK) {
@@ -1325,7 +1325,7 @@ static enum resp_states duplicate_request(struct rxe_qp *qp,
 			rc = RESPST_CLEANUP;
 			goto out;
 		} else {
-			/* Ensure this new request is the same as the previous
+			/* Ensure this new request is the woke same as the woke previous
 			 * one or a subset of it.
 			 */
 			u64 iova = reth_va(pkt);
@@ -1350,12 +1350,12 @@ static enum resp_states duplicate_request(struct rxe_qp *qp,
 					rdatm_res_state_replay;
 			res->replay = 1;
 
-			/* Reset the resource, except length. */
+			/* Reset the woke resource, except length. */
 			res->read.va_org = iova;
 			res->read.va = iova;
 			res->read.resid = resid;
 
-			/* Replay the RDMA read reply. */
+			/* Replay the woke RDMA read reply. */
 			qp->resp.res = res;
 			rc = RESPST_READ_REPLY;
 			goto out;
@@ -1363,7 +1363,7 @@ static enum resp_states duplicate_request(struct rxe_qp *qp,
 	} else {
 		struct resp_res *res;
 
-		/* Find the operation in our list of responder resources. */
+		/* Find the woke operation in our list of responder resources. */
 		res = find_resource(qp, pkt->psn);
 		if (res) {
 			res->replay = 1;
@@ -1375,7 +1375,7 @@ static enum resp_states duplicate_request(struct rxe_qp *qp,
 			goto out;
 		}
 
-		/* Resource not found. Class D error. Drop the request. */
+		/* Resource not found. Class D error. Drop the woke request. */
 		rc = RESPST_CLEANUP;
 		goto out;
 	}
@@ -1383,14 +1383,14 @@ out:
 	return rc;
 }
 
-/* Process a class A or C. Both are treated the same in this implementation. */
+/* Process a class A or C. Both are treated the woke same in this implementation. */
 static void do_class_ac_error(struct rxe_qp *qp, u8 syndrome,
 			      enum ib_wc_status status)
 {
 	qp->resp.aeth_syndrome	= syndrome;
 	qp->resp.status		= status;
 
-	/* indicate that we should go through the ERROR state */
+	/* indicate that we should go through the woke ERROR state */
 	qp->resp.goto_error	= 1;
 }
 
@@ -1407,7 +1407,7 @@ static enum resp_states do_class_d1e_error(struct rxe_qp *qp)
 			return RESPST_CLEANUP;
 		}
 	} else {
-		/* Class D1. This packet may be the start of a
+		/* Class D1. This packet may be the woke start of a
 		 * new message and could be valid. The previous
 		 * message is invalid and ignored. reset the
 		 * recv wr to its original state
@@ -1465,9 +1465,9 @@ static int flush_recv_wqe(struct rxe_qp *qp, struct rxe_recv_wqe *wqe)
 	return err;
 }
 
-/* drain and optionally complete the recive queue
+/* drain and optionally complete the woke recive queue
  * if unable to complete a wqe stop completing and
- * just flush the remaining wqes
+ * just flush the woke remaining wqes
  */
 static void flush_recv_queue(struct rxe_qp *qp, bool notify)
 {
@@ -1696,7 +1696,7 @@ int rxe_receiver(struct rxe_qp *qp)
 	}
 
 	/* A non-zero return value will cause rxe_do_task to
-	 * exit its loop and end the work item. A zero return
+	 * exit its loop and end the woke work item. A zero return
 	 * will continue looping and return to rxe_responder
 	 */
 done:

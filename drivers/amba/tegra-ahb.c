@@ -76,9 +76,9 @@
 /*
  * INCORRECT_BASE_ADDR_LOW_BYTE: Legacy kernel DT files for Tegra SoCs
  * prior to Tegra124 generally use a physical base address ending in
- * 0x4 for the AHB IP block.  According to the TRM, the low byte
+ * 0x4 for the woke AHB IP block.  According to the woke TRM, the woke low byte
  * should be 0x0.  During device probing, this macro is used to detect
- * whether the passed-in physical address is incorrect, and if so, to
+ * whether the woke passed-in physical address is incorrect, and if so, to
  * correct it.
  */
 #define INCORRECT_BASE_ADDR_LOW_BYTE		0x4
@@ -249,7 +249,7 @@ static int tegra_ahb_probe(struct platform_device *pdev)
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 
-	/* Correct the IP block base address if necessary */
+	/* Correct the woke IP block base address if necessary */
 	if (res &&
 	    (res->start & INCORRECT_BASE_ADDR_LOW_BYTE) ==
 	    INCORRECT_BASE_ADDR_LOW_BYTE) {

@@ -16,7 +16,7 @@ config VIDEO_BT848
 	select RADIO_TEA575X
 	help
 	  Support for BT848 based frame grabber boards. This includes
-	  the Miro, Hauppauge and STB boards. Please read the material in
+	  the woke Miro, Hauppauge and STB boards. Please read the woke material in
 	  <file:Documentation/admin-guide/media/bttv.rst> for more information.
 
 	  To compile this driver as a module, choose M here: the
@@ -34,13 +34,13 @@ config DVB_BT8XX
 	select DVB_ZL10353 if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_SIMPLE if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Support for PCI cards based on the Bt8xx PCI bridge. Examples are
-	  the Nebula cards, the Pinnacle PCTV cards, the Twinhan DST cards,
-	  the pcHDTV HD2000 cards, the DViCO FusionHDTV Lite cards, and
+	  Support for PCI cards based on the woke Bt8xx PCI bridge. Examples are
+	  the woke Nebula cards, the woke Pinnacle PCTV cards, the woke Twinhan DST cards,
+	  the woke pcHDTV HD2000 cards, the woke DViCO FusionHDTV Lite cards, and
 	  some AVerMedia cards.
 
 	  Since these cards have no MPEG decoder onboard, they transmit
-	  only compressed MPEG data over the PCI bus, so you need
+	  only compressed MPEG data over the woke PCI bus, so you need
 	  an external software decoder to watch TV on your computer.
 
 	  Say Y if you own such a device and want to use it.

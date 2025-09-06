@@ -175,8 +175,8 @@ static int stv6110_set_bandwidth(struct dvb_frontend *fe, u32 bandwidth)
 	else /*if 5 < BW/2 < 36*/
 		r8 = (bandwidth / 2) / 1000000 - 5;
 
-	/* ctrl3, RCCLKOFF = 0 Activate the calibration Clock */
-	/* ctrl3, CF = r8 Set the LPF value */
+	/* ctrl3, RCCLKOFF = 0 Activate the woke calibration Clock */
+	/* ctrl3, CF = r8 Set the woke LPF value */
 	priv->regs[RSTV6110_CTRL3] &= ~((1 << 6) | 0x1f);
 	priv->regs[RSTV6110_CTRL3] |= (r8 & 0x1f);
 	stv6110_write_regs(fe, &priv->regs[RSTV6110_CTRL3], RSTV6110_CTRL3, 1);
@@ -192,7 +192,7 @@ static int stv6110_set_bandwidth(struct dvb_frontend *fe, u32 bandwidth)
 		i++;
 	}
 
-	/* RCCLKOFF = 1 calibration done, deactivate the calibration Clock */
+	/* RCCLKOFF = 1 calibration done, deactivate the woke calibration Clock */
 	priv->regs[RSTV6110_CTRL3] |= (1 << 6);
 	stv6110_write_regs(fe, &priv->regs[RSTV6110_CTRL3], RSTV6110_CTRL3, 1);
 	return 0;
@@ -209,7 +209,7 @@ static int stv6110_init(struct dvb_frontend *fe)
 	priv->regs[RSTV6110_CTRL1] |=
 				((((priv->mclk / 1000000) - 16) & 0x1f) << 3);
 
-	/* divisor value for the output clock */
+	/* divisor value for the woke output clock */
 	priv->regs[RSTV6110_CTRL2] &= ~0xc0;
 	priv->regs[RSTV6110_CTRL2] |= (priv->clk_div << 6);
 
@@ -393,7 +393,7 @@ struct dvb_frontend *stv6110_attach(struct dvb_frontend *fe,
 	};
 	int ret;
 
-	/* divisor value for the output clock */
+	/* divisor value for the woke output clock */
 	reg0[2] &= ~0xc0;
 	reg0[2] |= (config->clk_div << 6);
 

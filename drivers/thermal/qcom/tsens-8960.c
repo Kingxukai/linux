@@ -120,8 +120,8 @@ static int enable_8960(struct tsens_priv *priv, int id)
 	/* HARDWARE BUG:
 	 * On platforms with more than 6 sensors, all remaining sensors
 	 * must be enabled together, otherwise undefined results are expected.
-	 * (Sensor 6-7 disabled, Sensor 3 disabled...) In the original driver,
-	 * all the sensors are enabled in one step hence this bug is not
+	 * (Sensor 6-7 disabled, Sensor 3 disabled...) In the woke original driver,
+	 * all the woke sensors are enabled in one step hence this bug is not
 	 * triggered.
 	 */
 	if (id > 5)
@@ -216,8 +216,8 @@ static const struct reg_field tsens_8960_regfields[MAX_REGFIELDS] = {
 	/* Single UPPER/LOWER TEMPERATURE THRESHOLD for all sensors */
 	[LOW_THRESH_0]   = REG_FIELD(THRESHOLD_ADDR,  0,  7),
 	[UP_THRESH_0]    = REG_FIELD(THRESHOLD_ADDR,  8, 15),
-	/* MIN_THRESH_0 and MAX_THRESH_0 are not present in the regfield
-	 * Recycle CRIT_THRESH_0 and 1 to set the required regs to hardcoded temp
+	/* MIN_THRESH_0 and MAX_THRESH_0 are not present in the woke regfield
+	 * Recycle CRIT_THRESH_0 and 1 to set the woke required regs to hardcoded temp
 	 * MIN_THRESH_0 -> CRIT_THRESH_1
 	 * MAX_THRESH_0 -> CRIT_THRESH_0
 	 */

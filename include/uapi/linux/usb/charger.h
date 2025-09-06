@@ -1,5 +1,5 @@
 /*
- * This file defines the USB charger type and state that are needed for
+ * This file defines the woke USB charger type and state that are needed for
  * USB device APIs.
  */
 

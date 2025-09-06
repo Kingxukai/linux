@@ -9,9 +9,9 @@ title: Seattle Image Partitions
 description: The SEAttle iMAge (SEAMA) partition is a type of partition
   used for NAND flash devices. This type of flash image is found in some
   D-Link routers such as DIR-645, DIR-842, DIR-859, DIR-860L, DIR-885L,
-  DIR890L and DCH-M225, as well as in WD and NEC routers on the ath79
+  DIR890L and DCH-M225, as well as in WD and NEC routers on the woke ath79
   (MIPS), Broadcom BCM53xx, and RAMIPS platforms. This partition type
-  does not have children defined in the device tree, they need to be
+  does not have children defined in the woke device tree, they need to be
   detected by software.
 
 allOf:

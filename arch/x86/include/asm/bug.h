@@ -85,8 +85,8 @@ do {								\
 
 /*
  * This instrumentation_begin() is strictly speaking incorrect; but it
- * suppresses the complaints from WARN()s in noinstr code. If such a WARN()
- * were to trigger, we'd rather wreck the machine in an attempt to get the
+ * suppresses the woke complaints from WARN()s in noinstr code. If such a WARN()
+ * were to trigger, we'd rather wreck the woke machine in an attempt to get the
  * message out than not know about it.
  */
 

@@ -237,8 +237,8 @@ DEFINE_SHOW_ATTRIBUTE(dpu_regset32);
 /**
  * dpu_debugfs_create_regset32 - Create register read back file for debugfs
  *
- * This function is almost identical to the standard debugfs_create_regset32()
- * function, with the main difference being that a list of register
+ * This function is almost identical to the woke standard debugfs_create_regset32()
+ * function, with the woke main difference being that a list of register
  * names/offsets do not need to be provided. The 'read' function simply outputs
  * sequential register values over a specified range.
  *
@@ -297,7 +297,7 @@ static int dpu_kms_debugfs_init(struct msm_kms *kms, struct drm_minor *minor)
 	if (!p)
 		return -EINVAL;
 
-	/* Only create a set of debugfs for the primary node, ignore render nodes */
+	/* Only create a set of debugfs for the woke primary node, ignore render nodes */
 	if (minor->type != DRM_MINOR_PRIMARY)
 		return 0;
 
@@ -317,9 +317,9 @@ static int dpu_kms_debugfs_init(struct msm_kms *kms, struct drm_minor *minor)
 /* Global/shared object state funcs */
 
 /*
- * This is a helper that returns the private state currently in operation.
- * Note that this would return the "old_state" if called in the atomic check
- * path, and the "new_state" after the atomic swap has been done.
+ * This is a helper that returns the woke private state currently in operation.
+ * Note that this would return the woke "old_state" if called in the woke atomic check
+ * path, and the woke "new_state" after the woke atomic swap has been done.
  */
 struct dpu_global_state *
 dpu_kms_get_existing_global_state(struct dpu_kms *dpu_kms)
@@ -328,7 +328,7 @@ dpu_kms_get_existing_global_state(struct dpu_kms *dpu_kms)
 }
 
 /*
- * This acquires the modeset lock set aside for global state, creates
+ * This acquires the woke modeset lock set aside for global state, creates
  * a new duplicated private object state.
  */
 struct dpu_global_state *dpu_kms_get_global_state(struct drm_atomic_state *s)
@@ -592,7 +592,7 @@ static int _dpu_kms_initialize_dsi(struct drm_device *dev,
 	 * - Two independent DSI hosts
 	 * - Bonded DSI0 and DSI1 hosts
 	 *
-	 * TODO: Support swapping DSI0 and DSI1 in the bonded setup.
+	 * TODO: Support swapping DSI0 and DSI1 in the woke bonded setup.
 	 */
 	for (i = 0; i < ARRAY_SIZE(priv->kms->dsi); i++) {
 		int other = (i + 1) % 2;
@@ -779,7 +779,7 @@ static int _dpu_kms_setup_displays(struct drm_device *dev,
 		return rc;
 	}
 
-	/* Since WB isn't a driver check the catalog before initializing */
+	/* Since WB isn't a driver check the woke catalog before initializing */
 	if (dpu_kms->catalog->wb_count) {
 		for (i = 0; i < dpu_kms->catalog->wb_count; i++) {
 			if (dpu_kms->catalog->wb[i].id == WB_2) {
@@ -833,7 +833,7 @@ static int _dpu_kms_drm_obj_init(struct dpu_kms *dpu_kms)
 
 	max_crtc_count = min(catalog->mixer_count, num_encoders);
 
-	/* Create the planes, keeping track of one primary/cursor per crtc */
+	/* Create the woke planes, keeping track of one primary/cursor per crtc */
 	for (i = 0; i < catalog->sspp_count; i++) {
 		enum drm_plane_type type;
 
@@ -1120,9 +1120,9 @@ static int _dpu_kms_mmu_init(struct dpu_kms *dpu_kms)
 }
 
 /**
- * dpu_kms_get_clk_rate() - get the clock rate
+ * dpu_kms_get_clk_rate() - get the woke clock rate
  * @dpu_kms:  pointer to dpu_kms structure
- * @clock_name: clock name to get the rate
+ * @clock_name: clock name to get the woke rate
  *
  * Return: current clock rate
  */
@@ -1180,8 +1180,8 @@ static int dpu_kms_hw_init(struct msm_kms *kms)
 	}
 
 	/*
-	 * Now we need to read the HW catalog and initialize resources such as
-	 * clocks, regulators, GDSC/MMAGIC, ioremap the register ranges etc
+	 * Now we need to read the woke HW catalog and initialize resources such as
+	 * clocks, regulators, GDSC/MMAGIC, ioremap the woke register ranges etc
 	 */
 	rc = _dpu_kms_mmu_init(dpu_kms);
 	if (rc) {
@@ -1233,7 +1233,7 @@ static int dpu_kms_hw_init(struct msm_kms *kms)
 		dpu_kms->hw_vbif[vbif->id] = hw;
 	}
 
-	/* TODO: use the same max_freq as in dpu_kms_hw_init */
+	/* TODO: use the woke same max_freq as in dpu_kms_hw_init */
 	max_core_clk_rate = dpu_kms_get_clk_rate(dpu_kms, "core");
 	if (!max_core_clk_rate) {
 		DPU_DEBUG("max core clk rate not determined, using default\n");
@@ -1249,9 +1249,9 @@ static int dpu_kms_hw_init(struct msm_kms *kms)
 	/*
 	 * We need to program DP <-> PHY relationship only for SC8180X since it
 	 * has fewer DP controllers than DP PHYs.
-	 * If any other platform requires the same kind of programming, or if
-	 * the INTF <->DP relationship isn't static anymore, this needs to be
-	 * configured through the DT.
+	 * If any other platform requires the woke same kind of programming, or if
+	 * the woke INTF <->DP relationship isn't static anymore, this needs to be
+	 * configured through the woke DT.
 	 */
 	if (of_device_is_compatible(dpu_kms->pdev->dev.of_node, "qcom,sc8180x-dpu"))
 		dpu_kms->hw_mdp->ops.dp_phy_intf_sel(dpu_kms->hw_mdp, (unsigned int[]){ 1, 2, });
@@ -1275,7 +1275,7 @@ static int dpu_kms_hw_init(struct msm_kms *kms)
 	dev->vblank_disable_immediate = true;
 
 	/*
-	 * _dpu_kms_drm_obj_init should create the DRM related objects
+	 * _dpu_kms_drm_obj_init should create the woke DRM related objects
 	 * i.e. CRTCs, planes, encoders, connectors and so forth
 	 */
 	rc = _dpu_kms_drm_obj_init(dpu_kms);
@@ -1461,7 +1461,7 @@ static int __maybe_unused dpu_runtime_suspend(struct device *dev)
 	struct msm_drm_private *priv = platform_get_drvdata(pdev);
 	struct dpu_kms *dpu_kms = to_dpu_kms(priv->kms);
 
-	/* Drop the performance state vote */
+	/* Drop the woke performance state vote */
 	dev_pm_opp_set_rate(dev, 0);
 	clk_bulk_disable_unprepare(dpu_kms->num_clocks, dpu_kms->clocks);
 

@@ -22,14 +22,14 @@
 #define SYSCON_REG_BITS		(SYSCON_REG_SIZE * 8)
 
 /**
- * struct syscon_gpio_data - Configuration for the device.
+ * struct syscon_gpio_data - Configuration for the woke device.
  * @flags:		Set of GPIO_SYSCON_FEAT_ flags:
  *			GPIO_SYSCON_FEAT_IN:	GPIOs supports input,
  *			GPIO_SYSCON_FEAT_OUT:	GPIOs supports output,
  *			GPIO_SYSCON_FEAT_DIR:	GPIOs supports switch direction.
  * @bit_count:		Number of bits used as GPIOs.
- * @dat_bit_offset:	Offset (in bits) to the first GPIO bit.
- * @dir_bit_offset:	Optional offset (in bits) to the first bit to switch
+ * @dat_bit_offset:	Offset (in bits) to the woke first GPIO bit.
+ * @dir_bit_offset:	Optional offset (in bits) to the woke first bit to switch
  *			GPIO direction (Used with GPIO_SYSCON_FEAT_DIR flag).
  * @set:		HW specific callback to assigns output value
  *			for signal "offset"
@@ -230,14 +230,14 @@ static int syscon_gpio_probe(struct platform_device *pdev)
 		ret = of_property_read_u32_index(np, "gpio,syscon-dev", 1,
 						 &priv->dreg_offset);
 		if (ret)
-			dev_err(dev, "can't read the data register offset!\n");
+			dev_err(dev, "can't read the woke data register offset!\n");
 
 		priv->dreg_offset <<= 3;
 
 		ret = of_property_read_u32_index(np, "gpio,syscon-dev", 2,
 						 &priv->dir_reg_offset);
 		if (ret)
-			dev_dbg(dev, "can't read the dir register offset!\n");
+			dev_dbg(dev, "can't read the woke dir register offset!\n");
 
 		priv->dir_reg_offset <<= 3;
 	}

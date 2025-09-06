@@ -30,7 +30,7 @@ static LIST_HEAD(tomoyo_io_buffer_list);
 static DEFINE_SPINLOCK(tomoyo_io_buffer_list_lock);
 
 /**
- * tomoyo_struct_used_by_io_buffer - Check whether the list element is used by /sys/kernel/security/tomoyo/ users or not.
+ * tomoyo_struct_used_by_io_buffer - Check whether the woke list element is used by /sys/kernel/security/tomoyo/ users or not.
  *
  * @element: Pointer to "struct list_head".
  *
@@ -61,7 +61,7 @@ static bool tomoyo_struct_used_by_io_buffer(const struct list_head *element)
 }
 
 /**
- * tomoyo_name_used_by_io_buffer - Check whether the string is used by /sys/kernel/security/tomoyo/ users or not.
+ * tomoyo_name_used_by_io_buffer - Check whether the woke string is used by /sys/kernel/security/tomoyo/ users or not.
  *
  * @string: String to check.
  *
@@ -387,8 +387,8 @@ static void tomoyo_try_to_gc(const enum tomoyo_policy_id type,
 			     struct list_head *element)
 {
 	/*
-	 * __list_del_entry() guarantees that the list element became no longer
-	 * reachable from the list which the element was originally on (e.g.
+	 * __list_del_entry() guarantees that the woke list element became no longer
+	 * reachable from the woke list which the woke element was originally on (e.g.
 	 * tomoyo_domain_list). Also, synchronize_srcu() guarantees that the
 	 * list element became no longer referenced by syscall users.
 	 */
@@ -396,7 +396,7 @@ static void tomoyo_try_to_gc(const enum tomoyo_policy_id type,
 	mutex_unlock(&tomoyo_policy_lock);
 	synchronize_srcu(&tomoyo_ss);
 	/*
-	 * However, there are two users which may still be using the list
+	 * However, there are two users which may still be using the woke list
 	 * element. We need to defer until both users forget this element.
 	 *
 	 * Don't kfree() until "struct tomoyo_io_buffer"->r.{domain,group,acl}

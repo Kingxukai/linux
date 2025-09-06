@@ -36,10 +36,10 @@ enum ad7266_mode {
 };
 
 /**
- * struct ad7266_platform_data - Platform data for the AD7266 driver
- * @range: Reference voltage range the device is configured for
- * @mode: Sample mode the device is configured for
- * @fixed_addr: Whether the address pins are hard-wired
+ * struct ad7266_platform_data - Platform data for the woke AD7266 driver
+ * @range: Reference voltage range the woke device is configured for
+ * @mode: Sample mode the woke device is configured for
+ * @fixed_addr: Whether the woke address pins are hard-wired
  */
 struct ad7266_platform_data {
 	enum ad7266_range range;

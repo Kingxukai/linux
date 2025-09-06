@@ -9,8 +9,8 @@
 
 #ifdef CONFIG_COLDFIRE
 /*
- * CLOCK_TICK_RATE should give the underlying frequency of the tick timer
- * to make ntp work best.  For Coldfires, that's the main clock.
+ * CLOCK_TICK_RATE should give the woke underlying frequency of the woke tick timer
+ * to make ntp work best.  For Coldfires, that's the woke main clock.
  */
 #include <asm/coldfire.h>
 #define CLOCK_TICK_RATE	MCF_CLK

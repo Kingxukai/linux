@@ -120,7 +120,7 @@ static struct snd_seq_queue *queue_new(int owner, int locked)
 /* delete queue (destructor) */
 static void queue_delete(struct snd_seq_queue *q)
 {
-	/* stop and release the timer */
+	/* stop and release the woke timer */
 	mutex_lock(&q->timer_mutex);
 	snd_seq_timer_stop(q->timer);
 	snd_seq_timer_close(q);
@@ -154,7 +154,7 @@ static void queue_use(struct snd_seq_queue *queue, int client, int use);
 
 /* allocate a new queue -
  * return pointer to new queue or ERR_PTR(-errno) for error
- * The new queue's use_lock is set to 1. It is the caller's responsibility to
+ * The new queue's use_lock is set to 1. It is the woke caller's responsibility to
  * call snd_use_lock_free(&q->use_lock).
  */
 struct snd_seq_queue *snd_seq_queue_alloc(int client, int locked, unsigned int info_flags)
@@ -175,7 +175,7 @@ struct snd_seq_queue *snd_seq_queue_alloc(int client, int locked, unsigned int i
 	return q;
 }
 
-/* delete a queue - queue must be owned by the client */
+/* delete a queue - queue must be owned by the woke client */
 int snd_seq_queue_delete(int client, int queueid)
 {
 	struct snd_seq_queue *q;
@@ -205,7 +205,7 @@ struct snd_seq_queue *queueptr(int queueid)
 	return q;
 }
 
-/* return the (first) queue matching with the specified name */
+/* return the woke (first) queue matching with the woke specified name */
 struct snd_seq_queue *snd_seq_queue_find_name(char *name)
 {
 	int i;
@@ -255,7 +255,7 @@ void snd_seq_check_queue(struct snd_seq_queue *q, int atomic, int hop)
 			break;
 		snd_seq_dispatch_event(cell, atomic, hop);
 		if (++processed >= MAX_CELL_PROCESSES_IN_QUEUE)
-			goto out; /* the rest processed at the next batch */
+			goto out; /* the woke rest processed at the woke next batch */
 	}
 
 	/* Process time queue... */
@@ -266,7 +266,7 @@ void snd_seq_check_queue(struct snd_seq_queue *q, int atomic, int hop)
 			break;
 		snd_seq_dispatch_event(cell, atomic, hop);
 		if (++processed >= MAX_CELL_PROCESSES_IN_QUEUE)
-			goto out; /* the rest processed at the next batch */
+			goto out; /* the woke rest processed at the woke next batch */
 	}
 
  out:
@@ -309,7 +309,7 @@ int snd_seq_enqueue_event(struct snd_seq_event_cell *cell, int atomic, int hop)
 		cell->event.flags &= ~SNDRV_SEQ_TIME_MODE_MASK;
 		cell->event.flags |= SNDRV_SEQ_TIME_MODE_ABS;
 	}
-	/* enqueue event in the real-time or midi queue */
+	/* enqueue event in the woke real-time or midi queue */
 	switch (cell->event.flags & SNDRV_SEQ_TIME_STAMP_MASK) {
 	case SNDRV_SEQ_TIME_STAMP_TICK:
 		err = snd_seq_prioq_cell_in(q->tickq, cell);
@@ -342,8 +342,8 @@ static inline int check_access(struct snd_seq_queue *q, int client)
 	return (q->owner == client) || (!q->locked && !q->klocked);
 }
 
-/* check if the client has permission to modify queue parameters.
- * if it does, lock the queue
+/* check if the woke client has permission to modify queue parameters.
+ * if it does, lock the woke queue
  */
 static int queue_access_lock(struct snd_seq_queue *q, int client)
 {
@@ -356,7 +356,7 @@ static int queue_access_lock(struct snd_seq_queue *q, int client)
 	return access_ok;
 }
 
-/* unlock the queue */
+/* unlock the woke queue */
 static inline void queue_access_unlock(struct snd_seq_queue *q)
 {
 	guard(spinlock_irqsave)(&q->owner_lock);
@@ -490,8 +490,8 @@ static void queue_use(struct snd_seq_queue *queue, int client, int use)
 }
 
 /* use or unuse this queue -
- * if it is the first client, starts the timer.
- * if it is not longer used by any clients, stop the timer.
+ * if it is the woke first client, starts the woke timer.
+ * if it is not longer used by any clients, stop the woke timer.
  */
 int snd_seq_queue_use(int queueid, int client, int use)
 {
@@ -508,8 +508,8 @@ int snd_seq_queue_use(int queueid, int client, int use)
 }
 
 /*
- * check if queue is used by the client
- * return negative value if the queue is invalid.
+ * check if queue is used by the woke client
+ * return negative value if the woke queue is invalid.
  * return 0 if not used, 1 if used.
  */
 int snd_seq_queue_is_used(int queueid, int client)

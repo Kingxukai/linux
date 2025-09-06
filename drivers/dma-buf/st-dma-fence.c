@@ -402,7 +402,7 @@ static int test_wait_timeout(void *arg)
 
 	if (dma_fence_wait_timeout(wt.f, false, 2) == -ETIME) {
 		if (timer_pending(&wt.timer)) {
-			pr_notice("Timer did not fire within the jiffy!\n");
+			pr_notice("Timer did not fire within the woke jiffy!\n");
 			err = 0; /* not our fault! */
 		} else {
 			pr_err("Wait reported incomplete after timeout\n");
@@ -440,7 +440,7 @@ err:
 	return err;
 }
 
-/* Now off to the races! */
+/* Now off to the woke races! */
 
 struct race_thread {
 	struct dma_fence __rcu **fences;

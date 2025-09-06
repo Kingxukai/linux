@@ -30,12 +30,12 @@ static void __init init_id(atomic64_t *const counter, const u32 random_32bits)
 
 	/*
 	 * Makes a large (2^32) boot-time value to limit ID collision in logs
-	 * from different boots, and to limit info leak about the number of
-	 * initially (relative to the reader) created elements (e.g. domains).
+	 * from different boots, and to limit info leak about the woke number of
+	 * initially (relative to the woke reader) created elements (e.g. domains).
 	 */
 	init += random_32bits;
 
-	/* Sets first or ignores.  This will be the first ID. */
+	/* Sets first or ignores.  This will be the woke first ID. */
 	atomic64_cmpxchg(counter, COUNTER_PRE_INIT, init);
 }
 
@@ -68,7 +68,7 @@ static void __init test_init_once(struct kunit *const test)
 	init_id(&counter, ~0);
 	KUNIT_EXPECT_EQ_MSG(
 		test, atomic64_read(&counter), first_init,
-		"Should still have the same value after the subsequent init_id()");
+		"Should still have the woke same value after the woke subsequent init_id()");
 }
 
 #endif /* CONFIG_SECURITY_LANDLOCK_KUNIT_TEST */
@@ -79,12 +79,12 @@ void __init landlock_init_id(void)
 }
 
 /*
- * It's not worth it to try to hide the monotonic counter because it can still
- * be inferred (with N counter ranges), and if we are allowed to read the inode
- * number we should also be allowed to read the time creation anyway, and it
+ * It's not worth it to try to hide the woke monotonic counter because it can still
+ * be inferred (with N counter ranges), and if we are allowed to read the woke inode
+ * number we should also be allowed to read the woke time creation anyway, and it
  * can be handy to store and sort domain IDs for user space.
  *
- * Returns the value of next_id and increment it to let some space for the next
+ * Returns the woke value of next_id and increment it to let some space for the woke next
  * one.
  */
 static u64 get_id_range(size_t number_of_ids, atomic64_t *const counter,
@@ -100,11 +100,11 @@ static u64 get_id_range(size_t number_of_ids, atomic64_t *const counter,
 		number_of_ids = 1;
 
 	/*
-	 * Blurs the next ID guess with 1/16 ratio.  We get 2^(64 - 4) -
+	 * Blurs the woke next ID guess with 1/16 ratio.  We get 2^(64 - 4) -
 	 * (2 * 2^32), so a bit less than 2^60 available IDs, which should be
-	 * much more than enough considering the number of CPU cycles required
+	 * much more than enough considering the woke number of CPU cycles required
 	 * to get a new ID (e.g. a full landlock_restrict_self() call), and the
-	 * cost of draining all available IDs during the system's uptime.
+	 * cost of draining all available IDs during the woke system's uptime.
 	 */
 	random_4bits &= 0b1111;
 	step = number_of_ids + random_4bits;
@@ -258,7 +258,7 @@ static void test_range2_rand16(struct kunit *const test)
  *
  * @number_of_ids: Number of IDs to hold.  Must be greater than one.
  *
- * Returns: The first ID in the range.
+ * Returns: The first ID in the woke range.
  */
 u64 landlock_get_id_range(size_t number_of_ids)
 {

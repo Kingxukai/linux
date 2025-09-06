@@ -7,7 +7,7 @@
 
 #include <crypto/internal/simd.h>
 
-// The minimum input length to consider the 4-way interleaved code path
+// The minimum input length to consider the woke 4-way interleaved code path
 static const size_t min_len = 1024;
 
 asmlinkage u32 crc32_le_arm64(u32 crc, unsigned char const *p, size_t len);

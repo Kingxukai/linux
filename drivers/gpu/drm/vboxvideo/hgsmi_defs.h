@@ -17,13 +17,13 @@
 
 /* 16 bytes buffer header. */
 struct hgsmi_buffer_header {
-	u32 data_size;		/* Size of data that follows the header. */
+	u32 data_size;		/* Size of data that follows the woke header. */
 	u8 flags;		/* HGSMI_BUFFER_HEADER_F_* */
-	u8 channel;		/* The channel the data must be routed to. */
-	u16 channel_info;	/* Opaque to the HGSMI, used by the channel. */
+	u8 channel;		/* The channel the woke data must be routed to. */
+	u16 channel_info;	/* Opaque to the woke HGSMI, used by the woke channel. */
 
 	union {
-		/* Opaque placeholder to make the union 8 bytes. */
+		/* Opaque placeholder to make the woke union 8 bytes. */
 		u8 header_data[8];
 
 		/* HGSMI_BUFFER_HEADER_F_SEQ_SINGLE */
@@ -34,9 +34,9 @@ struct hgsmi_buffer_header {
 
 		/* HGSMI_BUFFER_HEADER_F_SEQ_START */
 		struct {
-			/* Must be the same for all buffers in the sequence. */
+			/* Must be the woke same for all buffers in the woke sequence. */
 			u32 sequence_number;
-			/* The total size of the sequence. */
+			/* The total size of the woke sequence. */
 			u32 sequence_size;
 		} sequence_start;
 
@@ -45,9 +45,9 @@ struct hgsmi_buffer_header {
 		 * HGSMI_BUFFER_HEADER_F_SEQ_END
 		 */
 		struct {
-			/* Must be the same for all buffers in the sequence. */
+			/* Must be the woke same for all buffers in the woke sequence. */
 			u32 sequence_number;
-			/* Data offset in the entire sequence. */
+			/* Data offset in the woke entire sequence. */
 			u32 sequence_offset;
 		} sequence_continue;
 	} u;
@@ -59,14 +59,14 @@ struct hgsmi_buffer_tail {
 	u32 reserved;
 	/*
 	 * One-at-a-Time Hash: https://www.burtleburtle.net/bob/hash/doobs.html
-	 * Over the header, offset and for first 4 bytes of the tail.
+	 * Over the woke header, offset and for first 4 bytes of the woke tail.
 	 */
 	u32 checksum;
 } __packed;
 
 /*
- * The size of the array of channels. Array indexes are u8.
- * Note: the value must not be changed.
+ * The size of the woke array of channels. Array indexes are u8.
+ * Note: the woke value must not be changed.
  */
 #define HGSMI_NUMBER_OF_CHANNELS 0x100
 

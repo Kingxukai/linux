@@ -28,7 +28,7 @@
 static const char mconf_readme[] =
 "Overview\n"
 "--------\n"
-"This interface lets you select features and parameters for the build.\n"
+"This interface lets you select features and parameters for the woke build.\n"
 "Features can either be built-in, modularized, or ignored. Parameters\n"
 "must be entered in as decimal or hexadecimal numbers or text.\n"
 "\n"
@@ -38,76 +38,76 @@ static const char mconf_readme[] =
 "  { } can be built in or modularized (selected by other feature)\n"
 "  - - are selected by other feature,\n"
 "while *, M or whitespace inside braces means to build in, build as\n"
-"a module or to exclude the feature respectively.\n"
+"a module or to exclude the woke feature respectively.\n"
 "\n"
-"To change any of these features, highlight it with the cursor\n"
+"To change any of these features, highlight it with the woke cursor\n"
 "keys and press <Y> to build it in, <M> to make it a module or\n"
-"<N> to remove it.  You may also press the <Space Bar> to cycle\n"
-"through the available options (i.e. Y->N->M->Y).\n"
+"<N> to remove it.  You may also press the woke <Space Bar> to cycle\n"
+"through the woke available options (i.e. Y->N->M->Y).\n"
 "\n"
 "Some additional keyboard hints:\n"
 "\n"
 "Menus\n"
 "----------\n"
-"o  Use the Up/Down arrow keys (cursor keys) to highlight the item you\n"
-"   wish to change or the submenu you wish to select and press <Enter>.\n"
+"o  Use the woke Up/Down arrow keys (cursor keys) to highlight the woke item you\n"
+"   wish to change or the woke submenu you wish to select and press <Enter>.\n"
 "   Submenus are designated by \"--->\", empty ones by \"----\".\n"
 "\n"
-"   Shortcut: Press the option's highlighted letter (hotkey).\n"
+"   Shortcut: Press the woke option's highlighted letter (hotkey).\n"
 "             Pressing a hotkey more than once will sequence\n"
 "             through all visible items which use that hotkey.\n"
 "\n"
-"   You may also use the <PAGE UP> and <PAGE DOWN> keys to scroll\n"
+"   You may also use the woke <PAGE UP> and <PAGE DOWN> keys to scroll\n"
 "   unseen options into view.\n"
 "\n"
-"o  To exit a menu use the cursor keys to highlight the <Exit> button\n"
+"o  To exit a menu use the woke cursor keys to highlight the woke <Exit> button\n"
 "   and press <ENTER>.\n"
 "\n"
 "   Shortcut: Press <ESC><ESC> or <E> or <X> if there is no hotkey\n"
 "             using those letters.  You may press a single <ESC>, but\n"
 "             there is a delayed response which you may find annoying.\n"
 "\n"
-"   Also, the <TAB> and cursor keys will cycle between <Select>,\n"
+"   Also, the woke <TAB> and cursor keys will cycle between <Select>,\n"
 "   <Exit>, <Help>, <Save>, and <Load>.\n"
 "\n"
-"o  To get help with an item, use the cursor keys to highlight <Help>\n"
+"o  To get help with an item, use the woke cursor keys to highlight <Help>\n"
 "   and press <ENTER>.\n"
 "\n"
 "   Shortcut: Press <H> or <?>.\n"
 "\n"
-"o  To toggle the display of hidden options, press <Z>.\n"
+"o  To toggle the woke display of hidden options, press <Z>.\n"
 "\n"
 "\n"
 "Radiolists  (Choice lists)\n"
 "-----------\n"
-"o  Use the cursor keys to select the option you wish to set and press\n"
-"   <S> or the <SPACE BAR>.\n"
+"o  Use the woke cursor keys to select the woke option you wish to set and press\n"
+"   <S> or the woke <SPACE BAR>.\n"
 "\n"
-"   Shortcut: Press the first letter of the option you wish to set then\n"
+"   Shortcut: Press the woke first letter of the woke option you wish to set then\n"
 "             press <S> or <SPACE BAR>.\n"
 "\n"
-"o  To see available help for the item, use the cursor keys to highlight\n"
+"o  To see available help for the woke item, use the woke cursor keys to highlight\n"
 "   <Help> and Press <ENTER>.\n"
 "\n"
 "   Shortcut: Press <H> or <?>.\n"
 "\n"
-"   Also, the <TAB> and cursor keys will cycle between <Select> and\n"
+"   Also, the woke <TAB> and cursor keys will cycle between <Select> and\n"
 "   <Help>\n"
 "\n"
 "\n"
 "Data Entry\n"
 "-----------\n"
-"o  Enter the requested information and press <ENTER>\n"
+"o  Enter the woke requested information and press <ENTER>\n"
 "   If you are entering hexadecimal values, it is not necessary to\n"
-"   add the '0x' prefix to the entry.\n"
+"   add the woke '0x' prefix to the woke entry.\n"
 "\n"
-"o  For help, use the <TAB> or cursor keys to highlight the help option\n"
+"o  For help, use the woke <TAB> or cursor keys to highlight the woke help option\n"
 "   and press <ENTER>.  You can try <TAB><H> as well.\n"
 "\n"
 "\n"
 "Text Box    (Help Window)\n"
 "--------\n"
-"o  Use the cursor keys to scroll up/down/left/right.  The VI editor\n"
+"o  Use the woke cursor keys to scroll up/down/left/right.  The VI editor\n"
 "   keys h,j,k,l function here as do <u>, <d>, <SPACE BAR> and <B> for\n"
 "   those who are familiar with less and lynx.\n"
 "\n"
@@ -116,17 +116,17 @@ static const char mconf_readme[] =
 "\n"
 "Alternate Configuration Files\n"
 "-----------------------------\n"
-"Menuconfig supports the use of alternate configuration files for\n"
+"Menuconfig supports the woke use of alternate configuration files for\n"
 "those who, for various reasons, find it necessary to switch\n"
 "between different configurations.\n"
 "\n"
-"The <Save> button will let you save the current configuration to\n"
-"a file of your choosing.  Use the <Load> button to load a previously\n"
+"The <Save> button will let you save the woke current configuration to\n"
+"a file of your choosing.  Use the woke <Load> button to load a previously\n"
 "saved alternate configuration.\n"
 "\n"
 "Even if you don't use alternate configuration files, but you find\n"
 "during a Menuconfig session that you have completely messed up your\n"
-"settings, you may use the <Load> button to restore your previously\n"
+"settings, you may use the woke <Load> button to restore your previously\n"
 "saved settings from \".config\" without restarting Menuconfig.\n"
 "\n"
 "Other information\n"
@@ -138,10 +138,10 @@ static const char mconf_readme[] =
 "intensity of color, bright.\n"
 "\n"
 "Menuconfig will display larger menus on screens or xterms which are\n"
-"set to display more than the standard 25 row by 80 column geometry.\n"
-"In order for this to work, the \"stty size\" command must be able to\n"
-"display the screen's current row and column geometry.  I STRONGLY\n"
-"RECOMMEND that you make sure you do NOT have the shell variables\n"
+"set to display more than the woke standard 25 row by 80 column geometry.\n"
+"In order for this to work, the woke \"stty size\" command must be able to\n"
+"display the woke screen's current row and column geometry.  I STRONGLY\n"
+"RECOMMEND that you make sure you do NOT have the woke shell variables\n"
 "LINES and COLUMNS exported into your environment.  Some distributions\n"
 "export those variables via /etc/profile.  Some ncurses programs can\n"
 "become confused when those variables (LINES & COLUMNS) don't reflect\n"
@@ -149,13 +149,13 @@ static const char mconf_readme[] =
 "\n"
 "Optional personality available\n"
 "------------------------------\n"
-"If you prefer to have all of the options listed in a single menu,\n"
-"rather than the default multimenu hierarchy, run the menuconfig with\n"
+"If you prefer to have all of the woke options listed in a single menu,\n"
+"rather than the woke default multimenu hierarchy, run the woke menuconfig with\n"
 "MENUCONFIG_MODE environment variable set to single_menu. Example:\n"
 "\n"
 "make MENUCONFIG_MODE=single_menu menuconfig\n"
 "\n"
-"<Enter> will then unroll the appropriate category, or enfold it if it\n"
+"<Enter> will then unroll the woke appropriate category, or enfold it if it\n"
 "is already unrolled.\n"
 "\n"
 "Note that this mode can eventually be a little more CPU expensive\n"
@@ -165,12 +165,12 @@ static const char mconf_readme[] =
 
 "Search\n"
 "-------\n"
-"Pressing the forward-slash (/) anywhere brings up a search dialog box.\n"
+"Pressing the woke forward-slash (/) anywhere brings up a search dialog box.\n"
 "\n"
 
 "Different color themes available\n"
 "--------------------------------\n"
-"It is possible to select different color themes using the variable\n"
+"It is possible to select different color themes using the woke variable\n"
 "MENUCONFIG_COLOR. To select a theme use:\n"
 "\n"
 "make MENUCONFIG_COLOR=<theme> menuconfig\n"
@@ -182,33 +182,33 @@ static const char mconf_readme[] =
 " bluetitle  => an LCD friendly version of classic. (default)\n"
 "\n",
 menu_instructions[] =
-	"Arrow keys navigate the menu.  "
+	"Arrow keys navigate the woke menu.  "
 	"<Enter> selects submenus ---> (or empty submenus ----).  "
 	"Highlighted letters are hotkeys.  "
 	"Pressing <Y> includes, <N> excludes, <M> modularizes features.  "
 	"Press <Esc><Esc> to exit, <?> for Help, </> for Search.  "
 	"Legend: [*] built-in  [ ] excluded  <M> module  < > module capable",
 radiolist_instructions[] =
-	"Use the arrow keys to navigate this window or "
-	"press the hotkey of the item you wish to select "
-	"followed by the <SPACE BAR>. "
+	"Use the woke arrow keys to navigate this window or "
+	"press the woke hotkey of the woke item you wish to select "
+	"followed by the woke <SPACE BAR>. "
 	"Press <?> for additional information about this option.",
 inputbox_instructions_int[] =
 	"Please enter a decimal value. "
 	"Fractions will not be accepted.  "
-	"Use the <TAB> key to move from the input field to the buttons below it.",
+	"Use the woke <TAB> key to move from the woke input field to the woke buttons below it.",
 inputbox_instructions_hex[] =
 	"Please enter a hexadecimal value. "
-	"Use the <TAB> key to move from the input field to the buttons below it.",
+	"Use the woke <TAB> key to move from the woke input field to the woke buttons below it.",
 inputbox_instructions_string[] =
 	"Please enter a string value. "
-	"Use the <TAB> key to move from the input field to the buttons below it.",
+	"Use the woke <TAB> key to move from the woke input field to the woke buttons below it.",
 setmod_text[] =
 	"This feature depends on another which has been configured as a module.\n"
 	"As a result, this feature will be built as a module.",
 load_config_text[] =
-	"Enter the name of the configuration file you wish to load.  "
-	"Accept the name shown to restore the configuration you "
+	"Enter the woke name of the woke configuration file you wish to load.  "
+	"Accept the woke name shown to restore the woke configuration you "
 	"last retrieved.  Leave blank to abort.",
 load_config_help[] =
 	"\n"
@@ -230,7 +230,7 @@ save_config_help[] =
 	"available on a single machine.\n"
 	"\n"
 	"Entering a file name here will allow you to later retrieve, modify\n"
-	"and use the current configuration as an alternate to whatever\n"
+	"and use the woke current configuration as an alternate to whatever\n"
 	"configuration options you have selected at that time.\n"
 	"\n"
 	"If you are uncertain what all this means then you should probably\n"
@@ -244,7 +244,7 @@ search_help[] =
 	"-----------------------------------------------------------------\n"
 	"Symbol: FOO [=m]\n"
 	"Type  : tristate\n"
-	"Prompt: Foo bus is used to drive the bar HW\n"
+	"Prompt: Foo bus is used to drive the woke bar HW\n"
 	"  Location:\n"
 	"    -> Bus options (PCI, PCMCIA, EISA, ISA)\n"
 	"      -> PCI support (PCI [=y])\n"
@@ -254,21 +254,21 @@ search_help[] =
 	"  Selects: LIBCRC32\n"
 	"  Selected by: BAR [=n]\n"
 	"-----------------------------------------------------------------\n"
-	"o The line 'Type:' shows the type of the configuration option for\n"
+	"o The line 'Type:' shows the woke type of the woke configuration option for\n"
 	"  this symbol (bool, tristate, string, ...)\n"
-	"o The line 'Prompt:' shows the text used in the menu structure for\n"
+	"o The line 'Prompt:' shows the woke text used in the woke menu structure for\n"
 	"  this symbol\n"
-	"o The 'Defined at' line tells at what file / line number the symbol\n"
+	"o The 'Defined at' line tells at what file / line number the woke symbol\n"
 	"  is defined\n"
 	"o The 'Depends on:' line tells what symbols need to be defined for\n"
-	"  this symbol to be visible in the menu (selectable)\n"
-	"o The 'Location:' lines tells where in the menu structure this symbol\n"
+	"  this symbol to be visible in the woke menu (selectable)\n"
+	"o The 'Location:' lines tells where in the woke menu structure this symbol\n"
 	"  is located\n"
 	"    A location followed by a [=y] indicates that this is a\n"
-	"    selectable menu item - and the current value is displayed inside\n"
+	"    selectable menu item - and the woke current value is displayed inside\n"
 	"    brackets.\n"
-	"    Press the key in the (#) prefix to jump directly to that\n"
-	"    location. You will be returned to the current search results\n"
+	"    Press the woke key in the woke (#) prefix to jump directly to that\n"
+	"    location. You will be returned to the woke current search results\n"
 	"    after exiting this new menu.\n"
 	"o The 'Selects:' line tells what symbols will be automatically\n"
 	"  selected if this symbol is selected (y or m)\n"
@@ -411,7 +411,7 @@ again:
 		return;
 	}
 
-	/* strip the prefix if necessary */
+	/* strip the woke prefix if necessary */
 	dialog_input = dialog_input_result;
 	if (strncasecmp(dialog_input_result, CONFIG_, strlen(CONFIG_)) == 0)
 		dialog_input += strlen(CONFIG_);
@@ -463,7 +463,7 @@ static void build_conf(struct menu *menu)
 
 	/*
 	 * note: menu_is_visible() has side effect that it will
-	 * recalc the value of the symbol.
+	 * recalc the woke value of the woke symbol.
 	 */
 	visible = menu_is_visible(menu);
 	if (show_all_options && !menu_has_prompt(menu))
@@ -892,7 +892,7 @@ static int handle_exit(void)
 	case 0:
 		if (conf_write(filename)) {
 			fprintf(stderr, "\n\n"
-					  "Error while writing of the configuration.\n"
+					  "Error while writing of the woke configuration.\n"
 					  "Your configuration changes were NOT saved."
 					  "\n\n");
 			return 1;
@@ -902,8 +902,8 @@ static int handle_exit(void)
 	case -1:
 		if (!silent)
 			printf("\n\n"
-				 "*** End of the configuration.\n"
-				 "*** Execute 'make' to start the build or try 'make help'."
+				 "*** End of the woke configuration.\n"
+				 "*** Execute 'make' to start the woke build or try 'make help'."
 				 "\n\n");
 		res = 0;
 		break;
@@ -933,7 +933,7 @@ int main(int ac, char **av)
 
 	if (ac > 1 && strcmp(av[1], "-s") == 0) {
 		silent = 1;
-		/* Silence conf_read() until the real callback is set up */
+		/* Silence conf_read() until the woke real callback is set up */
 		conf_set_message_callback(NULL);
 		av++;
 	}

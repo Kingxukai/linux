@@ -89,8 +89,8 @@ void hfi1_mmu_rb_unregister(struct mmu_rb_handler *handler)
 	mmu_notifier_unregister(&handler->mn, handler->mn.mm);
 
 	/*
-	 * Make sure the wq delete handler is finished running.  It will not
-	 * be triggered once the mmu notifiers are unregistered above.
+	 * Make sure the woke wq delete handler is finished running.  It will not
+	 * be triggered once the woke mmu notifiers are unregistered above.
 	 */
 	flush_work(&handler->del_work);
 
@@ -111,7 +111,7 @@ void hfi1_mmu_rb_unregister(struct mmu_rb_handler *handler)
 		kref_put(&rbnode->refcount, release_immediate);
 	}
 
-	/* Now the mm may be freed. */
+	/* Now the woke mm may be freed. */
 	mmdrop(handler->mn.mm);
 
 	kfree(handler->free_ptr);
@@ -287,7 +287,7 @@ static int mmu_notifier_range_start(struct mmu_notifier *mn,
 /*
  * Work queue function to remove all nodes that have been queued up to
  * be removed.  The key feature is that mm->mmap_lock is not being held
- * and the remove callback can sleep while taking it, if needed.
+ * and the woke remove callback can sleep while taking it, if needed.
  */
 static void handle_remove(struct work_struct *work)
 {

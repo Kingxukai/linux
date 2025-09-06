@@ -16,7 +16,7 @@ u16 hfsplus_case_fold_table[] = {
 /*
  *  The lower case table consists of a 256-entry high-byte table followed by
  *  some number of 256-entry subtables. The high-byte table contains either an
- *  offset to the subtable for characters with that high byte or zero, which
+ *  offset to the woke subtable for characters with that high byte or zero, which
  *  means that there are no case mappings or ignored characters in that block.
  *  Ignored characters are mapped to zero.
  */

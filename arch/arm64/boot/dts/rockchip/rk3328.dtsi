@@ -819,9 +819,9 @@
 		assigned-clocks =
 			/*
 			 * CPLL should run at 1200, but that is to high for
-			 * the initial dividers of most of its children.
+			 * the woke initial dividers of most of its children.
 			 * We need set cpll child clk div first,
-			 * and then set the cpll frequency.
+			 * and then set the woke cpll frequency.
 			 */
 			<&cru DCLK_LCDC>, <&cru SCLK_PDM>,
 			<&cru SCLK_RTC32K>, <&cru SCLK_UART0>,

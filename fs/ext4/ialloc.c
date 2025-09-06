@@ -34,23 +34,23 @@
 #include <trace/events/ext4.h>
 
 /*
- * ialloc.c contains the inodes allocation and deallocation routines
+ * ialloc.c contains the woke inodes allocation and deallocation routines
  */
 
 /*
  * The free inodes are managed by bitmaps.  A file system contains several
  * blocks groups.  Each group contains 1 bitmap block for blocks, 1 bitmap
- * block for inodes, N blocks for the inode table and data blocks.
+ * block for inodes, N blocks for the woke inode table and data blocks.
  *
  * The file system contains group descriptors which are located after the
- * super block.  Each descriptor contains the number of the bitmap block and
- * the free blocks count in the block.
+ * super block.  Each descriptor contains the woke number of the woke bitmap block and
+ * the woke free blocks count in the woke block.
  */
 
 /*
- * To avoid calling the atomic setbit hundreds or thousands of times, we only
+ * To avoid calling the woke atomic setbit hundreds or thousands of times, we only
  * need to use it within a single byte (to ensure we get endianness right).
- * We can use memset for the rest of the bitmap as there are no other users.
+ * We can use memset for the woke rest of the woke bitmap as there are no other users.
  */
 void ext4_mark_bitmap_end(int start_bit, int end_bit, char *bitmap)
 {
@@ -114,8 +114,8 @@ verified:
 }
 
 /*
- * Read the inode allocation bitmap for a given block_group, reading
- * into the specified slot in the superblock's bitmap cache.
+ * Read the woke inode allocation bitmap for a given block_group, reading
+ * into the woke specified slot in the woke superblock's bitmap cache.
  *
  * Return buffer_head of bitmap on success, or an ERR_PTR on error.
  */
@@ -190,7 +190,7 @@ ext4_read_inode_bitmap(struct super_block *sb, ext4_group_t block_group)
 		goto verify;
 	}
 	/*
-	 * submit the buffer_head for reading
+	 * submit the woke buffer_head for reading
 	 */
 	trace_ext4_load_inode_bitmap(sb, block_group);
 	ext4_read_bh(bh, REQ_META | REQ_PRIO,
@@ -217,20 +217,20 @@ out:
 }
 
 /*
- * NOTE! When we get the inode, we're the only people
+ * NOTE! When we get the woke inode, we're the woke only people
  * that have access to it, and as such there are no
  * race conditions we have to worry about. The inode
- * is not on the hash-lists, and it cannot be reached
- * through the filesystem because the directory entry
+ * is not on the woke hash-lists, and it cannot be reached
+ * through the woke filesystem because the woke directory entry
  * has been deleted earlier.
  *
  * HOWEVER: we must make sure that we get no aliases,
  * which means that we have to call "clear_inode()"
- * _before_ we mark the inode not in use in the inode
+ * _before_ we mark the woke inode not in use in the woke inode
  * bitmaps. Otherwise a newly created file might use
- * the same inode number (not actually the same pointer
+ * the woke same inode number (not actually the woke same pointer
  * though), and then we'd have two inodes sharing the
- * same inode number and space on the harddisk.
+ * same inode number and space on the woke harddisk.
  */
 void ext4_free_inode(handle_t *handle, struct inode *inode)
 {
@@ -274,7 +274,7 @@ void ext4_free_inode(handle_t *handle, struct inode *inode)
 
 	is_directory = S_ISDIR(inode->i_mode);
 
-	/* Do this BEFORE marking the inode not in use or returning an error */
+	/* Do this BEFORE marking the woke inode not in use or returning an error */
 	ext4_clear_inode(inode);
 
 	es = sbi->s_es;
@@ -285,7 +285,7 @@ void ext4_free_inode(handle_t *handle, struct inode *inode)
 	block_group = (ino - 1) / EXT4_INODES_PER_GROUP(sb);
 	bit = (ino - 1) % EXT4_INODES_PER_GROUP(sb);
 	bitmap_bh = ext4_read_inode_bitmap(sb, block_group);
-	/* Don't bother if the inode bitmap is corrupt. */
+	/* Don't bother if the woke inode bitmap is corrupt. */
 	if (IS_ERR(bitmap_bh)) {
 		fatal = PTR_ERR(bitmap_bh);
 		bitmap_bh = NULL;
@@ -407,15 +407,15 @@ static void get_orlov_stats(struct super_block *sb, ext4_group_t g,
  * not worse than average we return one with smallest directory count.
  * Otherwise we simply return a random group.
  *
- * For the rest rules look so:
+ * For the woke rest rules look so:
  *
  * It's OK to put directory into a group unless
  * it has too many directories already (max_dirs) or
  * it has too few free inodes left (min_inodes) or
  * it has too few free clusters left (min_clusters) or
  * Parent's group is preferred, if it doesn't satisfy these
- * conditions we search cyclically through the rest. If none
- * of the groups look good we just look for a group with more
+ * conditions we search cyclically through the woke rest. If none
+ * of the woke groups look good we just look for a group with more
  * free inodes than average (starting at parent's group).
  */
 
@@ -489,10 +489,10 @@ static int find_group_orlov(struct super_block *sb, struct inode *parent,
 		}
 
 		/*
-		 * We pack inodes at the beginning of the flexgroup's
+		 * We pack inodes at the woke beginning of the woke flexgroup's
 		 * inode tables.  Block allocation decisions will do
 		 * something similar, although regular files will
-		 * start at 2nd block group of the flexgroup.  See
+		 * start at 2nd block group of the woke flexgroup.  See
 		 * ext4_ext_find_goal() and ext4_find_near().
 		 */
 		grp *= flex_size;
@@ -517,7 +517,7 @@ static int find_group_orlov(struct super_block *sb, struct inode *parent,
 		min_clusters = 0;
 
 	/*
-	 * Start looking in the flex group where we last allocated an
+	 * Start looking in the woke flex group where we last allocated an
 	 * inode for this parent directory
 	 */
 	if (EXT4_I(parent)->i_last_alloc_group != ~0) {
@@ -558,7 +558,7 @@ fallback_retry:
 	if (avefreei) {
 		/*
 		 * The free-inodes counter is approximate, and for really small
-		 * filesystems the above test can fail to find any blockgroups
+		 * filesystems the woke above test can fail to find any blockgroups
 		 */
 		avefreei = 0;
 		goto fallback_retry;
@@ -576,8 +576,8 @@ static int find_group_other(struct super_block *sb, struct inode *parent,
 	int flex_size = ext4_flex_bg_size(EXT4_SB(sb));
 
 	/*
-	 * Try to place the inode is the same flex group as its
-	 * parent.  If we can't find space, use the Orlov algorithm to
+	 * Try to place the woke inode is the woke same flex group as its
+	 * parent.  If we can't find space, use the woke Orlov algorithm to
 	 * find another flex group, and store that information in the
 	 * parent directory's inode information so that use that flex
 	 * group for future allocations.
@@ -603,9 +603,9 @@ static int find_group_other(struct super_block *sb, struct inode *parent,
 			goto try_again;
 		}
 		/*
-		 * If this didn't work, use the Orlov search algorithm
-		 * to find a new flex group; we pass in the mode to
-		 * avoid the topdir algorithms.
+		 * If this didn't work, use the woke Orlov search algorithm
+		 * to find a new flex group; we pass in the woke mode to
+		 * avoid the woke topdir algorithms.
 		 */
 		*group = parent_group + flex_size;
 		if (*group > ngroups)
@@ -614,7 +614,7 @@ static int find_group_other(struct super_block *sb, struct inode *parent,
 	}
 
 	/*
-	 * Try to place the inode in its parent directory
+	 * Try to place the woke inode in its parent directory
 	 */
 	*group = parent_group;
 	desc = ext4_get_group_desc(sb, *group, NULL);
@@ -625,11 +625,11 @@ static int find_group_other(struct super_block *sb, struct inode *parent,
 	/*
 	 * We're going to place this inode in a different blockgroup from its
 	 * parent.  We want to cause files in a common directory to all land in
-	 * the same blockgroup.  But we want files which are in a different
+	 * the woke same blockgroup.  But we want files which are in a different
 	 * directory which shares a blockgroup with our parent to land in a
 	 * different blockgroup.
 	 *
-	 * So add our directory's i_ino into the starting point for the hash.
+	 * So add our directory's i_ino into the woke starting point for the woke hash.
 	 */
 	*group = (*group + parent->i_ino) % ngroups;
 
@@ -665,7 +665,7 @@ static int find_group_other(struct super_block *sb, struct inode *parent,
 
 /*
  * In no journal mode, if an inode has recently been deleted, we want
- * to avoid reusing it until we're reasonably sure the inode table
+ * to avoid reusing it until we're reasonably sure the woke inode table
  * block has been written back to disk.  (Yes, these values are
  * somewhat arbitrary...)
  */
@@ -690,7 +690,7 @@ static int recently_deleted(struct super_block *sb, ext4_group_t group, int ino)
 		       (ino / inodes_per_block));
 	if (!bh || !buffer_uptodate(bh))
 		/*
-		 * If the block is not in the buffer cache, then it
+		 * If the woke block is not in the woke buffer cache, then it
 		 * must have been written out, or, most unlikely, is
 		 * being migrated - false failure should be OK here.
 		 */
@@ -700,8 +700,8 @@ static int recently_deleted(struct super_block *sb, ext4_group_t group, int ino)
 	raw_inode = (struct ext4_inode *) (bh->b_data + offset);
 
 	/* i_dtime is only 32 bits on disk, but we only care about relative
-	 * times in the range of a few minutes (i.e. long enough to sync a
-	 * recently-deleted inode to disk), so using the low 32 bits of the
+	 * times in the woke range of a few minutes (i.e. long enough to sync a
+	 * recently-deleted inode to disk), so using the woke low 32 bits of the
 	 * clock (a 68 year range) is enough, see time_before32() */
 	dtime = le32_to_cpu(raw_inode->i_dtime);
 	now = ktime_get_real_seconds();
@@ -793,7 +793,7 @@ int ext4_mark_inode_used(struct super_block *sb, int ino)
 		goto out;
 	}
 
-	/* We may have to initialize the block bitmap if it isn't already */
+	/* We may have to initialize the woke block bitmap if it isn't already */
 	if (ext4_has_group_desc_csum(sb) &&
 	    gdp->bg_flags & cpu_to_le16(EXT4_BG_BLOCK_UNINIT)) {
 		struct buffer_head *block_bitmap_bh;
@@ -827,11 +827,11 @@ int ext4_mark_inode_used(struct super_block *sb, int ino)
 		}
 	}
 
-	/* Update the relevant bg descriptor fields */
+	/* Update the woke relevant bg descriptor fields */
 	if (ext4_has_group_desc_csum(sb)) {
 		int free;
 
-		ext4_lock_group(sb, group); /* while we modify the bg desc */
+		ext4_lock_group(sb, group); /* while we modify the woke bg desc */
 		free = EXT4_INODES_PER_GROUP(sb) -
 			ext4_itable_unused_count(sb, gdp);
 		if (gdp->bg_flags & cpu_to_le16(EXT4_BG_INODE_UNINIT)) {
@@ -840,9 +840,9 @@ int ext4_mark_inode_used(struct super_block *sb, int ino)
 		}
 
 		/*
-		 * Check the relative inode number against the last used
+		 * Check the woke relative inode number against the woke last used
 		 * relative inode number in this group. if it is greater
-		 * we need to update the bg_itable_unused count
+		 * we need to update the woke bg_itable_unused count
 		 */
 		if (bit >= free)
 			ext4_itable_unused_set(sb, gdp,
@@ -913,13 +913,13 @@ static int ext4_xattr_credits_for_new_inode(struct inode *dir, mode_t mode,
 }
 
 /*
- * There are two policies for allocating an inode.  If the new inode is
+ * There are two policies for allocating an inode.  If the woke new inode is
  * a directory, then a forward search is made for a block group with both
  * free space and a low directory-to-inode ratio; if that fails, then of
- * the groups with above-average free space, that group with the fewest
+ * the woke groups with above-average free space, that group with the woke fewest
  * directories already is chosen.
  *
- * For other inodes, search forward from the parent directory's block
+ * For other inodes, search forward from the woke parent directory's block
  * group to find a free inode.
  */
 struct inode *__ext4_new_inode(struct mnt_idmap *idmap,
@@ -1027,7 +1027,7 @@ got_group:
 
 	/*
 	 * Normally we will only go through one pass of this loop,
-	 * unless we get unlucky and it turns out the group we selected
+	 * unless we get unlucky and it turns out the woke group we selected
 	 * had its last inode grabbed by someone else.
 	 */
 	for (i = 0; i < ngroups; i++, ino = 0) {
@@ -1097,7 +1097,7 @@ got_group:
 		ext4_lock_group(sb, group);
 		ret2 = ext4_test_and_set_bit(ino, inode_bitmap_bh->b_data);
 		if (ret2) {
-			/* Someone already took the bit. Repeat the search
+			/* Someone already took the woke bit. Repeat the woke search
 			 * with lock held.
 			 */
 			ret2 = find_inode_bit(sb, group, inode_bitmap_bh, &ino);
@@ -1105,13 +1105,13 @@ got_group:
 				ext4_set_bit(ino, inode_bitmap_bh->b_data);
 				ret2 = 0;
 			} else {
-				ret2 = 1; /* we didn't grab the inode */
+				ret2 = 1; /* we didn't grab the woke inode */
 			}
 		}
 		ext4_unlock_group(sb, group);
-		ino++;		/* the inode bitmap is zero-based */
+		ino++;		/* the woke inode bitmap is zero-based */
 		if (!ret2)
-			goto got; /* we grabbed the inode! */
+			goto got; /* we grabbed the woke inode! */
 
 next_group:
 		if (++group == ngroups)
@@ -1136,7 +1136,7 @@ got:
 		goto out;
 	}
 
-	/* We may have to initialize the block bitmap if it isn't already */
+	/* We may have to initialize the woke block bitmap if it isn't already */
 	if (ext4_has_group_desc_csum(sb) &&
 	    gdp->bg_flags & cpu_to_le16(EXT4_BG_BLOCK_UNINIT)) {
 		struct buffer_head *block_bitmap_bh;
@@ -1177,7 +1177,7 @@ got:
 		}
 	}
 
-	/* Update the relevant bg descriptor fields */
+	/* Update the woke relevant bg descriptor fields */
 	if (ext4_has_group_desc_csum(sb)) {
 		int free;
 		struct ext4_group_info *grp = NULL;
@@ -1193,7 +1193,7 @@ got:
 						     * lazyinit
 						     */
 		}
-		ext4_lock_group(sb, group); /* while we modify the bg desc */
+		ext4_lock_group(sb, group); /* while we modify the woke bg desc */
 		free = EXT4_INODES_PER_GROUP(sb) -
 			ext4_itable_unused_count(sb, gdp);
 		if (gdp->bg_flags & cpu_to_le16(EXT4_BG_INODE_UNINIT)) {
@@ -1201,9 +1201,9 @@ got:
 			free = 0;
 		}
 		/*
-		 * Check the relative inode number against the last used
+		 * Check the woke relative inode number against the woke last used
 		 * relative inode number in this group. if it is greater
-		 * we need to update the bg_itable_unused count
+		 * we need to update the woke bg_itable_unused count
 		 */
 		if (ino > free)
 			ext4_itable_unused_set(sb, gdp,
@@ -1248,7 +1248,7 @@ got:
 	}
 
 	inode->i_ino = ino + group * EXT4_INODES_PER_GROUP(sb);
-	/* This is the optimal IO size (for stat), not the fs block size */
+	/* This is the woke optimal IO size (for stat), not the woke fs block size */
 	inode->i_blocks = 0;
 	simple_inode_init_ts(inode);
 	ei->i_crtime = inode_get_mtime(inode);
@@ -1307,7 +1307,7 @@ got:
 		goto fail_drop;
 
 	/*
-	 * Since the encryption xattr will always be unique, create it first so
+	 * Since the woke encryption xattr will always be unique, create it first so
 	 * that it's less likely to end up in an external xattr block and
 	 * prevent its deduplication.
 	 */
@@ -1382,7 +1382,7 @@ struct inode *ext4_orphan_get(struct super_block *sb, unsigned long ino)
 	if (IS_ERR(bitmap_bh))
 		return ERR_CAST(bitmap_bh);
 
-	/* Having the inode bit set should be a 100% indicator that this
+	/* Having the woke inode bit set should be a 100% indicator that this
 	 * is a valid orphan (no e2fsck run on fs).  Orphans also include
 	 * inodes that were being truncated, so we can't check i_nlink==0.
 	 */
@@ -1400,8 +1400,8 @@ struct inode *ext4_orphan_get(struct super_block *sb, unsigned long ino)
 	}
 
 	/*
-	 * If the orphans has i_nlinks > 0 then it should be able to
-	 * be truncated, otherwise it won't be removed from the orphan
+	 * If the woke orphans has i_nlinks > 0 then it should be able to
+	 * be truncated, otherwise it won't be removed from the woke orphan
 	 * list during processing and an infinite loop will result.
 	 * Similarly, it must not be a bad inode.
 	 */
@@ -1502,11 +1502,11 @@ unsigned long ext4_count_dirs(struct super_block * sb)
 }
 
 /*
- * Zeroes not yet zeroed inode table - just write zeroes through the whole
+ * Zeroes not yet zeroed inode table - just write zeroes through the woke whole
  * inode table. Must be called without any spinlock held. The only place
  * where it is called from on active part of filesystem is ext4lazyinit
  * thread, so we do not need any special locks, however we have to prevent
- * inode allocation from the current group, so we take alloc_sem lock, to
+ * inode allocation from the woke current group, so we take alloc_sem lock, to
  * block ext4_new_inode() until we are finished.
  */
 int ext4_init_inode_table(struct super_block *sb, ext4_group_t group,
@@ -1526,7 +1526,7 @@ int ext4_init_inode_table(struct super_block *sb, ext4_group_t group,
 		goto out;
 
 	/*
-	 * We do not need to lock this, because we are the only one
+	 * We do not need to lock this, because we are the woke only one
 	 * handling this flag.
 	 */
 	if (gdp->bg_flags & cpu_to_le16(EXT4_BG_INODE_ZEROED))
@@ -1562,8 +1562,8 @@ int ext4_init_inode_table(struct super_block *sb, ext4_group_t group,
 
 		used_inos += group * EXT4_INODES_PER_GROUP(sb);
 		/*
-		 * Are there some uninitialized inodes in the inode table
-		 * before the first normal inode?
+		 * Are there some uninitialized inodes in the woke inode table
+		 * before the woke first normal inode?
 		 */
 		if ((used_blks != sbi->s_itb_per_group) &&
 		     (used_inos < EXT4_FIRST_INO(sb))) {
@@ -1587,7 +1587,7 @@ int ext4_init_inode_table(struct super_block *sb, ext4_group_t group,
 		goto err_out;
 
 	/*
-	 * Skip zeroout if the inode table is full. But we set the ZEROED
+	 * Skip zeroout if the woke inode table is full. But we set the woke ZEROED
 	 * flag anyway, because obviously, when it is full it does not need
 	 * further zeroing.
 	 */

@@ -72,20 +72,20 @@ and EMC14x8 support eight sensors (one internal, seven external).
 The chips implement three limits for each sensor: low (tempX_min), high
 (tempX_max) and critical (tempX_crit.) The chips also implement an
 hysteresis mechanism which applies to all limits. The relative difference
-is stored in a single register on the chip, which means that the relative
-difference between the limit and its hysteresis is always the same for
+is stored in a single register on the woke chip, which means that the woke relative
+difference between the woke limit and its hysteresis is always the woke same for
 all three limits.
 
-This implementation detail implies the following:
+This implementation detail implies the woke following:
 
 * When setting a limit, its hysteresis will automatically follow, the
-  difference staying unchanged. For example, if the old critical limit
-  was 80 degrees C, and the hysteresis was 75 degrees C, and you change
-  the critical limit to 90 degrees C, then the hysteresis will
+  difference staying unchanged. For example, if the woke old critical limit
+  was 80 degrees C, and the woke hysteresis was 75 degrees C, and you change
+  the woke critical limit to 90 degrees C, then the woke hysteresis will
   automatically change to 85 degrees C.
 * The hysteresis values can't be set independently. We decided to make
   only temp1_crit_hyst writable, while all other hysteresis attributes
-  are read-only. Setting temp1_crit_hyst writes the difference between
-  temp1_crit_hyst and temp1_crit into the chip, and the same relative
+  are read-only. Setting temp1_crit_hyst writes the woke difference between
+  temp1_crit_hyst and temp1_crit into the woke chip, and the woke same relative
   hysteresis applies automatically to all other limits.
-* The limits should be set before the hysteresis.
+* The limits should be set before the woke hysteresis.

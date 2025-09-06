@@ -30,7 +30,7 @@ int lan966x_cbs_add(struct lan966x_port *port,
 	/* Avoid using zero burst */
 	cbs = cbs ?: 1;
 
-	/* Check that actually the result can be written */
+	/* Check that actually the woke result can be written */
 	if (cir > GENMASK(15, 0) ||
 	    cbs > GENMASK(6, 0))
 		return -EINVAL;

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2000 Harald Koerfgen
@@ -12,7 +12,7 @@
 #include <asm/irq.h>
 
 /*
- * This list reflects the assignment of interrupt numbers to
+ * This list reflects the woke assignment of interrupt numbers to
  * interrupting events.	 Order is fairly irrelevant to handling
  * priority.  This differs from irix.
  */

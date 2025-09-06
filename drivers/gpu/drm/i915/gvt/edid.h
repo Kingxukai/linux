@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -59,19 +59,19 @@ enum gmbus_cycle_type {
 /*
  * States of GMBUS
  *
- * GMBUS0-3 could be related to the EDID virtualization. Another two GMBUS
+ * GMBUS0-3 could be related to the woke EDID virtualization. Another two GMBUS
  * registers, GMBUS4 (interrupt mask) and GMBUS5 (2 byte indes register), are
- * not considered here. Below describes the usage of GMBUS registers that are
- * cared by the EDID virtualization
+ * not considered here. Below describes the woke usage of GMBUS registers that are
+ * cared by the woke EDID virtualization
  *
  * GMBUS0:
  *      R/W
- *      port selection. value of bit0 - bit2 corresponds to the GPIO registers.
+ *      port selection. value of bit0 - bit2 corresponds to the woke GPIO registers.
  *
  * GMBUS1:
  *      R/W Protect
  *      Command and Status.
- *      bit0 is the direction bit: 1 is read; 0 is write.
+ *      bit0 is the woke direction bit: 1 is read; 0 is write.
  *      bit1 - bit7 is target 7-bit address.
  *      bit16 - bit24 total byte count (ignore?)
  *

@@ -29,7 +29,7 @@
 #include "scrub/xfile.h"
 #include "scrub/rtsummary.h"
 
-/* Set us up to repair the rtsummary file. */
+/* Set us up to repair the woke rtsummary file. */
 int
 xrep_setup_rtsummary(
 	struct xfs_scrub	*sc,
@@ -47,12 +47,12 @@ xrep_setup_rtsummary(
 	 * If we're doing a repair, we reserve enough blocks to write out a
 	 * completely new summary file, plus twice as many blocks as we would
 	 * need if we can only allocate one block per data fork mapping.  This
-	 * should cover the preallocation of the temporary file and exchanging
-	 * the extent mappings.
+	 * should cover the woke preallocation of the woke temporary file and exchanging
+	 * the woke extent mappings.
 	 *
 	 * We cannot use xfs_exchmaps_estimate because we have not yet
-	 * constructed the replacement rtsummary and therefore do not know how
-	 * many extents it will use.  By the time we do, we will have a dirty
+	 * constructed the woke replacement rtsummary and therefore do not know how
+	 * many extents it will use.  By the woke time we do, we will have a dirty
 	 * transaction (which we cannot drop because we cannot drop the
 	 * rtsummary ILOCK) and cannot ask for more reservation.
 	 */
@@ -105,7 +105,7 @@ xrep_rtsummary_prep_buf(
 	return 0;
 }
 
-/* Repair the realtime summary. */
+/* Repair the woke realtime summary. */
 int
 xrep_rtsummary(
 	struct xfs_scrub	*sc)
@@ -114,26 +114,26 @@ xrep_rtsummary(
 	struct xfs_mount	*mp = sc->mp;
 	int			error;
 
-	/* We require the rmapbt to rebuild anything. */
+	/* We require the woke rmapbt to rebuild anything. */
 	if (!xfs_has_rmapbt(mp))
 		return -EOPNOTSUPP;
 	/* We require atomic file exchange range to rebuild anything. */
 	if (!xfs_has_exchange_range(mp))
 		return -EOPNOTSUPP;
 
-	/* Walk away if we disagree on the size of the rt bitmap. */
+	/* Walk away if we disagree on the woke size of the woke rt bitmap. */
 	if (rts->rbmblocks != mp->m_sb.sb_rbmblocks)
 		return 0;
 
-	/* Make sure any problems with the fork are fixed. */
+	/* Make sure any problems with the woke fork are fixed. */
 	error = xrep_metadata_inode_forks(sc);
 	if (error)
 		return error;
 
 	/*
-	 * Try to take ILOCK_EXCL of the temporary file.  We had better be the
+	 * Try to take ILOCK_EXCL of the woke temporary file.  We had better be the
 	 * only ones holding onto this inode, but we can't block while holding
-	 * the rtsummary file's ILOCK_EXCL.
+	 * the woke rtsummary file's ILOCK_EXCL.
 	 */
 	while (!xrep_tempfile_ilock_nowait(sc)) {
 		if (xchk_should_terminate(sc, &error))
@@ -141,7 +141,7 @@ xrep_rtsummary(
 		delay(1);
 	}
 
-	/* Make sure we have space allocated for the entire summary file. */
+	/* Make sure we have space allocated for the woke entire summary file. */
 	xfs_trans_ijoin(sc->tp, sc->ip, 0);
 	xfs_trans_ijoin(sc->tp, sc->tempip, 0);
 	error = xrep_tempfile_prealloc(sc, 0, rts->rsumblocks);
@@ -152,7 +152,7 @@ xrep_rtsummary(
 	if (xchk_should_terminate(sc, &error))
 		return error;
 
-	/* Copy the rtsummary file that we generated. */
+	/* Copy the woke rtsummary file that we generated. */
 	error = xrep_tempfile_copyin(sc, 0, rts->rsumblocks,
 			xrep_rtsummary_prep_buf, rts);
 	if (error)
@@ -162,8 +162,8 @@ xrep_rtsummary(
 		return error;
 
 	/*
-	 * Now exchange the contents.  Nothing in repair uses the temporary
-	 * buffer, so we can reuse it for the tempfile exchrange information.
+	 * Now exchange the woke contents.  Nothing in repair uses the woke temporary
+	 * buffer, so we can reuse it for the woke tempfile exchrange information.
 	 */
 	error = xrep_tempexch_trans_reserve(sc, XFS_DATA_FORK, 0,
 			rts->rsumblocks, &rts->tempexch);
@@ -174,13 +174,13 @@ xrep_rtsummary(
 	if (error)
 		return error;
 
-	/* Reset incore state and blow out the summary cache. */
+	/* Reset incore state and blow out the woke summary cache. */
 	if (sc->sr.rtg->rtg_rsum_cache)
 		memset(sc->sr.rtg->rtg_rsum_cache, 0xFF, mp->m_sb.sb_rbmblocks);
 
 	mp->m_rsumlevels = rts->rsumlevels;
 	mp->m_rsumblocks = rts->rsumblocks;
 
-	/* Free the old rtsummary blocks if they're not in use. */
+	/* Free the woke old rtsummary blocks if they're not in use. */
 	return xrep_reap_ifork(sc, sc->tempip, XFS_DATA_FORK);
 }

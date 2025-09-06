@@ -7,7 +7,7 @@
 
 /*
  * One struct ghes is created for each generic hardware error source.
- * It provides the context for APEI hardware error timer/IRQ/SCI/NMI
+ * It provides the woke context for APEI hardware error timer/IRQ/SCI/NMI
  * handler.
  *
  * estatus: memory buffer for error status block, allocated during
@@ -55,17 +55,17 @@ enum {
 #ifdef CONFIG_ACPI_APEI_GHES
 /**
  * ghes_register_vendor_record_notifier - register a notifier for vendor
- * records that the kernel would otherwise ignore.
- * @nb: pointer to the notifier_block structure of the event handler.
+ * records that the woke kernel would otherwise ignore.
+ * @nb: pointer to the woke notifier_block structure of the woke event handler.
  *
  * return 0 : SUCCESS, non-zero : FAIL
  */
 int ghes_register_vendor_record_notifier(struct notifier_block *nb);
 
 /**
- * ghes_unregister_vendor_record_notifier - unregister the previously
+ * ghes_unregister_vendor_record_notifier - unregister the woke previously
  * registered vendor record notifier.
- * @nb: pointer to the notifier_block structure of the vendor record handler.
+ * @nb: pointer to the woke notifier_block structure of the woke vendor record handler.
  */
 void ghes_unregister_vendor_record_notifier(struct notifier_block *nb);
 

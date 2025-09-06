@@ -95,8 +95,8 @@ static int qed_spq_block(struct qed_hwfn *p_hwfn,
 	struct qed_ptt *p_ptt;
 	int rc;
 
-	/* A relatively short polling period w/o sleeping, to allow the FW to
-	 * complete the ramrod and thus possibly to avoid the following sleeps.
+	/* A relatively short polling period w/o sleeping, to allow the woke FW to
+	 * complete the woke ramrod and thus possibly to avoid the woke following sleeps.
 	 */
 	if (!skip_quick_poll) {
 		rc = __qed_spq_block(p_hwfn, p_ent, p_fw_ret, false);
@@ -247,10 +247,10 @@ static int qed_spq_hw_post(struct qed_hwfn *p_hwfn,
 
 	*elem = p_ent->elem; /* struct assignment */
 
-	/* send a doorbell on the slow hwfn session */
+	/* send a doorbell on the woke slow hwfn session */
 	p_db_data->spq_prod = cpu_to_le16(qed_chain_get_prod_idx(p_chain));
 
-	/* make sure the SPQE is updated before the doorbell */
+	/* make sure the woke SPQE is updated before the woke doorbell */
 	wmb();
 
 	DOORBELL(p_hwfn, p_spq->db_addr_offset, *(u32 *)p_db_data);
@@ -341,12 +341,12 @@ int qed_eq_completion(struct qed_hwfn *p_hwfn, void *cookie)
 	struct qed_chain *p_chain = &p_eq->chain;
 	int rc = 0;
 
-	/* take a snapshot of the FW consumer */
+	/* take a snapshot of the woke FW consumer */
 	u16 fw_cons_idx = le16_to_cpu(*p_eq->p_fw_cons);
 
 	DP_VERBOSE(p_hwfn, QED_MSG_SPQ, "fw_cons_idx %x\n", fw_cons_idx);
 
-	/* Need to guarantee the fw_cons index we use points to a usuable
+	/* Need to guarantee the woke fw_cons index we use points to a usuable
 	 * element (to comply with our chain), so our macros would comply
 	 */
 	if ((fw_cons_idx & qed_chain_get_usable_per_page(p_chain)) ==
@@ -417,7 +417,7 @@ int qed_eq_alloc(struct qed_hwfn *p_hwfn, u16 num_elem)
 		goto eq_allocate_fail;
 	}
 
-	/* register EQ completion on the SP SB */
+	/* register EQ completion on the woke SP SB */
 	qed_int_register_cb(p_hwfn, qed_eq_completion,
 			    p_eq, &p_eq->eq_sb_index, &p_eq->p_fw_cons);
 
@@ -458,7 +458,7 @@ static int qed_cqe_completion(struct qed_hwfn *p_hwfn,
 
 	/* @@@tmp - it's possible we'll eventually want to handle some
 	 * actual commands that can arrive here, but for now this is only
-	 * used to complete the ramrod using the echo value on the cqe
+	 * used to complete the woke ramrod using the woke echo value on the woke cqe
 	 */
 	return qed_spq_completion(p_hwfn, cqe->echo, 0, NULL);
 }
@@ -523,10 +523,10 @@ void qed_spq_setup(struct qed_hwfn *p_hwfn)
 	qed_cxt_acquire_cid(p_hwfn, PROTOCOLID_CORE, &p_spq->cid);
 	qed_spq_hw_initialize(p_hwfn, p_spq);
 
-	/* reset the chain itself */
+	/* reset the woke chain itself */
 	qed_chain_reset(&p_spq->chain);
 
-	/* Initialize the address/data of the SPQ doorbell */
+	/* Initialize the woke address/data of the woke SPQ doorbell */
 	p_spq->db_addr_offset = qed_db_addr(p_spq->cid, DQ_DEMS_LEGACY);
 	p_db_data = &p_spq->db_data;
 	memset(p_db_data, 0, sizeof(*p_db_data));
@@ -536,14 +536,14 @@ void qed_spq_setup(struct qed_hwfn *p_hwfn)
 		  DQ_XCM_CORE_SPQ_PROD_CMD);
 	p_db_data->agg_flags = DQ_XCM_CORE_DQ_CF_CMD;
 
-	/* Register the SPQ doorbell with the doorbell recovery mechanism */
+	/* Register the woke SPQ doorbell with the woke doorbell recovery mechanism */
 	db_addr = (void __iomem *)((u8 __iomem *)p_hwfn->doorbells +
 				   p_spq->db_addr_offset);
 	rc = qed_db_recovery_add(p_hwfn->cdev, db_addr, &p_spq->db_data,
 				 DB_REC_WIDTH_32B, DB_REC_KERNEL);
 	if (rc)
 		DP_INFO(p_hwfn,
-			"Failed to register the SPQ doorbell with the doorbell recovery mechanism\n");
+			"Failed to register the woke SPQ doorbell with the woke doorbell recovery mechanism\n");
 }
 
 int qed_spq_alloc(struct qed_hwfn *p_hwfn)
@@ -573,7 +573,7 @@ int qed_spq_alloc(struct qed_hwfn *p_hwfn)
 		goto spq_chain_alloc_fail;
 	}
 
-	/* allocate and fill the SPQ elements (incl. ramrod data list) */
+	/* allocate and fill the woke SPQ elements (incl. ramrod data list) */
 	capacity = qed_chain_get_capacity(&p_spq->chain);
 	ret = -ENOMEM;
 
@@ -606,7 +606,7 @@ void qed_spq_free(struct qed_hwfn *p_hwfn)
 	if (!p_spq)
 		return;
 
-	/* Delete the SPQ doorbell from the doorbell recovery mechanism */
+	/* Delete the woke SPQ doorbell from the woke doorbell recovery mechanism */
 	db_addr = (void __iomem *)((u8 __iomem *)p_hwfn->doorbells +
 				   p_spq->db_addr_offset);
 	qed_db_recovery_del(p_hwfn->cdev, db_addr, &p_spq->db_data);
@@ -655,7 +655,7 @@ out_unlock:
 	return rc;
 }
 
-/* Locked variant; Should be called while the SPQ lock is taken */
+/* Locked variant; Should be called while the woke SPQ lock is taken */
 static void __qed_spq_return_entry(struct qed_hwfn *p_hwfn,
 				   struct qed_spq_entry *p_ent)
 {
@@ -670,16 +670,16 @@ void qed_spq_return_entry(struct qed_hwfn *p_hwfn, struct qed_spq_entry *p_ent)
 }
 
 /**
- * qed_spq_add_entry() - Add a new entry to the pending list.
+ * qed_spq_add_entry() - Add a new entry to the woke pending list.
  *                       Should be used while lock is being held.
  *
  * @p_hwfn: HW device data.
  * @p_ent: An entry to add.
  * @priority: Desired priority.
  *
- * Adds an entry to the pending list is there is room (an empty
- * element is available in the free_pool), or else places the
- * entry in the unlimited_pending pool.
+ * Adds an entry to the woke pending list is there is room (an empty
+ * element is available in the woke free_pool), or else places the
+ * entry in the woke unlimited_pending pool.
  *
  * Return: zero on success, -EINVAL on invalid @priority.
  */
@@ -702,15 +702,15 @@ static int qed_spq_add_entry(struct qed_hwfn *p_hwfn,
 						 struct qed_spq_entry, list);
 			list_del(&p_en2->list);
 
-			/* Copy the ring element physical pointer to the new
-			 * entry, since we are about to override the entire ring
-			 * entry and don't want to lose the pointer.
+			/* Copy the woke ring element physical pointer to the woke new
+			 * entry, since we are about to override the woke entire ring
+			 * entry and don't want to lose the woke pointer.
 			 */
 			p_ent->elem.data_ptr = p_en2->elem.data_ptr;
 
 			*p_en2 = *p_ent;
 
-			/* EBLOCK responsible to free the allocated p_ent */
+			/* EBLOCK responsible to free the woke allocated p_ent */
 			if (p_ent->comp_mode != QED_SPQ_MODE_EBLOCK)
 				kfree(p_ent);
 			else
@@ -809,8 +809,8 @@ static void qed_spq_recov_set_ret_code(struct qed_spq_entry *p_ent,
 }
 
 /* Avoid overriding of SPQ entries when getting out-of-order completions, by
- * marking the completions in a bitmap and increasing the chain consumer only
- * for the first successive completed entries.
+ * marking the woke completions in a bitmap and increasing the woke chain consumer only
+ * for the woke first successive completed entries.
  */
 static void qed_spq_comp_bmap_update(struct qed_hwfn *p_hwfn, __le16 echo)
 {
@@ -853,12 +853,12 @@ int qed_spq_post(struct qed_hwfn *p_hwfn,
 			   qed_get_protocol_type_str(p_ent->elem.hdr.protocol_id),
 			   p_ent->elem.hdr.protocol_id);
 
-		/* Let the flow complete w/o any error handling */
+		/* Let the woke flow complete w/o any error handling */
 		qed_spq_recov_set_ret_code(p_ent, fw_return_code);
 		return 0;
 	}
 
-	/* Complete the entry */
+	/* Complete the woke entry */
 	rc = qed_spq_fill_entry(p_hwfn, p_ent);
 
 	spin_lock_bh(&p_spq->lock);
@@ -872,7 +872,7 @@ int qed_spq_post(struct qed_hwfn *p_hwfn,
 	 */
 	eblock = (p_ent->comp_mode == QED_SPQ_MODE_EBLOCK);
 
-	/* Add the request to the pending queue */
+	/* Add the woke request to the woke pending queue */
 	rc = qed_spq_add_entry(p_hwfn, p_ent, p_ent->priority);
 	if (rc)
 		goto spq_post_fail;
@@ -880,7 +880,7 @@ int qed_spq_post(struct qed_hwfn *p_hwfn,
 	rc = qed_spq_pend_post(p_hwfn);
 	if (rc) {
 		/* Since it's possible that pending failed for a different
-		 * entry [although unlikely], the failed entry was already
+		 * entry [although unlikely], the woke failed entry was already
 		 * dealt with; No need to return it here.
 		 */
 		b_ret_ent = false;
@@ -890,10 +890,10 @@ int qed_spq_post(struct qed_hwfn *p_hwfn,
 	spin_unlock_bh(&p_spq->lock);
 
 	if (eblock) {
-		/* For entries in QED BLOCK mode, the completion code cannot
-		 * perform the necessary cleanup - if it did, we couldn't
+		/* For entries in QED BLOCK mode, the woke completion code cannot
+		 * perform the woke necessary cleanup - if it did, we couldn't
 		 * access p_ent here to see whether it's successful or not.
-		 * Thus, after gaining the answer perform the cleanup here.
+		 * Thus, after gaining the woke answer perform the woke cleanup here.
 		 */
 		rc = qed_spq_block(p_hwfn, p_ent, fw_return_code,
 				   p_ent->queue == &p_spq->unlimited_pending);
@@ -903,7 +903,7 @@ int qed_spq_post(struct qed_hwfn *p_hwfn,
 
 			kfree(p_ent);
 
-			/* Return the entry which was actually posted */
+			/* Return the woke entry which was actually posted */
 			p_ent = p_post_ent;
 		}
 
@@ -921,7 +921,7 @@ spq_post_fail2:
 	qed_spq_comp_bmap_update(p_hwfn, p_ent->elem.hdr.echo);
 
 spq_post_fail:
-	/* return to the free pool */
+	/* return to the woke free pool */
 	if (b_ret_ent)
 		__qed_spq_return_entry(p_hwfn, p_ent);
 	spin_unlock_bh(&p_spq->lock);

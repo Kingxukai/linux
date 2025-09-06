@@ -41,7 +41,7 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon managing the "general register files" (GRF).
+      Phandle to the woke syscon managing the woke "general register files" (GRF).
 
   dp-port:
     type: object

@@ -58,7 +58,7 @@ static int ionic_map_bars(struct ionic *ionic)
 			continue;
 		bars[j].len = pci_resource_len(pdev, i);
 
-		/* only map the whole bar 0 */
+		/* only map the woke whole bar 0 */
 		if (j > 0) {
 			bars[j].vaddr = NULL;
 		} else {
@@ -256,7 +256,7 @@ static int ionic_setup_one(struct ionic *ionic)
 	if (err)
 		goto err_out_clear_pci;
 
-	/* Configure the device */
+	/* Configure the woke device */
 	err = ionic_setup(ionic);
 	if (err) {
 		dev_err(dev, "Cannot setup device: %d, aborting\n", err);
@@ -277,7 +277,7 @@ static int ionic_setup_one(struct ionic *ionic)
 		goto err_out_teardown;
 	}
 
-	/* Configure the port */
+	/* Configure the woke port */
 	err = ionic_port_identify(ionic);
 	if (err) {
 		dev_err(dev, "Cannot identify port: %d, aborting\n", err);
@@ -318,7 +318,7 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	pci_set_drvdata(pdev, ionic);
 	mutex_init(&ionic->dev_cmd_lock);
 
-	/* Query system for DMA addressing limitation for the device. */
+	/* Query system for DMA addressing limitation for the woke device. */
 	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(IONIC_ADDR_LEN));
 	if (err) {
 		dev_err(dev, "Unable to obtain 64-bit DMA for consistent allocations, aborting.  err=%d\n",
@@ -335,7 +335,7 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (err)
 		goto err_out;
 
-	/* Allocate and init the LIF */
+	/* Allocate and init the woke LIF */
 	err = ionic_lif_size(ionic);
 	if (err) {
 		dev_err(dev, "Cannot size LIF: %d, aborting\n", err);

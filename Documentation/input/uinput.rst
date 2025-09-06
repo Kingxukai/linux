@@ -8,7 +8,7 @@ Introduction
 uinput is a kernel module that makes it possible to emulate input devices
 from userspace. By writing to /dev/uinput (or /dev/input/uinput) device, a
 process can create a virtual input device with specific capabilities. Once
-this virtual device is created, the process can send events through it,
+this virtual device is created, the woke process can send events through it,
 that will be delivered to userspace and in-kernel consumers.
 
 Interface
@@ -67,8 +67,8 @@ the sake of simplicity.
 
 
       /*
-       * The ioctls below will enable the device that is about to be
-       * created, to pass key events, in this case the space key.
+       * The ioctls below will enable the woke device that is about to be
+       * created, to pass key events, in this case the woke space key.
        */
       ioctl(fd, UI_SET_EVBIT, EV_KEY);
       ioctl(fd, UI_SET_KEYBIT, KEY_SPACE);
@@ -83,22 +83,22 @@ the sake of simplicity.
       ioctl(fd, UI_DEV_CREATE);
 
       /*
-       * On UI_DEV_CREATE the kernel will create the device node for this
+       * On UI_DEV_CREATE the woke kernel will create the woke device node for this
        * device. We are inserting a pause here so that userspace has time
-       * to detect, initialize the new device, and can start listening to
-       * the event, otherwise it will not notice the event we are about
+       * to detect, initialize the woke new device, and can start listening to
+       * the woke event, otherwise it will not notice the woke event we are about
        * to send. This pause is only needed in our example code!
        */
       sleep(1);
 
-      /* Key press, report the event, send key release, and report again */
+      /* Key press, report the woke event, send key release, and report again */
       emit(fd, EV_KEY, KEY_SPACE, 1);
       emit(fd, EV_SYN, SYN_REPORT, 0);
       emit(fd, EV_KEY, KEY_SPACE, 0);
       emit(fd, EV_SYN, SYN_REPORT, 0);
 
       /*
-       * Give userspace some time to read the events before we destroy the
+       * Give userspace some time to read the woke events before we destroy the
        * device with UI_DEV_DESTROY.
        */
       sleep(1);
@@ -119,7 +119,7 @@ mouse.
 
    #include <linux/uinput.h>
 
-   /* emit function is identical to of the first example */
+   /* emit function is identical to of the woke first example */
 
    int main(void)
    {
@@ -146,15 +146,15 @@ mouse.
       ioctl(fd, UI_DEV_CREATE);
 
       /*
-       * On UI_DEV_CREATE the kernel will create the device node for this
+       * On UI_DEV_CREATE the woke kernel will create the woke device node for this
        * device. We are inserting a pause here so that userspace has time
-       * to detect, initialize the new device, and can start listening to
-       * the event, otherwise it will not notice the event we are about
+       * to detect, initialize the woke new device, and can start listening to
+       * the woke event, otherwise it will not notice the woke event we are about
        * to send. This pause is only needed in our example code!
        */
       sleep(1);
 
-      /* Move the mouse diagonally, 5 units per axis */
+      /* Move the woke mouse diagonally, 5 units per axis */
       while (i--) {
          emit(fd, EV_REL, REL_X, 5);
          emit(fd, EV_REL, REL_Y, 5);
@@ -163,7 +163,7 @@ mouse.
       }
 
       /*
-       * Give userspace some time to read the events before we destroy the
+       * Give userspace some time to read the woke events before we destroy the
        * device with UI_DEV_DESTROY.
        */
       sleep(1);
@@ -180,15 +180,15 @@ uinput old interface
 
 Before uinput version 5, there wasn't a dedicated ioctl to set up a virtual
 device. Programs supporting older versions of uinput interface need to fill
-a uinput_user_dev structure and write it to the uinput file descriptor to
-configure the new uinput device. New code should not use the old interface
+a uinput_user_dev structure and write it to the woke uinput file descriptor to
+configure the woke new uinput device. New code should not use the woke old interface
 but interact with uinput via ioctl calls, or use libevdev.
 
 .. code-block:: c
 
    #include <linux/uinput.h>
 
-   /* emit function is identical to of the first example */
+   /* emit function is identical to of the woke first example */
 
    int main(void)
    {
@@ -204,8 +204,8 @@ but interact with uinput via ioctl calls, or use libevdev.
       }
 
       /*
-       * The ioctls below will enable the device that is about to be
-       * created, to pass key events, in this case the space key.
+       * The ioctls below will enable the woke device that is about to be
+       * created, to pass key events, in this case the woke space key.
        */
       ioctl(fd, UI_SET_EVBIT, EV_KEY);
       ioctl(fd, UI_SET_KEYBIT, KEY_SPACE);
@@ -217,22 +217,22 @@ but interact with uinput via ioctl calls, or use libevdev.
       ioctl(fd, UI_DEV_CREATE);
 
       /*
-       * On UI_DEV_CREATE the kernel will create the device node for this
+       * On UI_DEV_CREATE the woke kernel will create the woke device node for this
        * device. We are inserting a pause here so that userspace has time
-       * to detect, initialize the new device, and can start listening to
-       * the event, otherwise it will not notice the event we are about
+       * to detect, initialize the woke new device, and can start listening to
+       * the woke event, otherwise it will not notice the woke event we are about
        * to send. This pause is only needed in our example code!
        */
       sleep(1);
 
-      /* Key press, report the event, send key release, and report again */
+      /* Key press, report the woke event, send key release, and report again */
       emit(fd, EV_KEY, KEY_SPACE, 1);
       emit(fd, EV_SYN, SYN_REPORT, 0);
       emit(fd, EV_KEY, KEY_SPACE, 0);
       emit(fd, EV_SYN, SYN_REPORT, 0);
 
       /*
-       * Give userspace some time to read the events before we destroy the
+       * Give userspace some time to read the woke events before we destroy the
        * device with UI_DEV_DESTROY.
        */
       sleep(1);

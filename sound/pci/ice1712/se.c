@@ -64,7 +64,7 @@ struct se_spec {
  *          CSBIW  (23pin) --------+
  *                                 |
  *          RSTB   (22pin) --R(1K)-+
- *      Probably it reduce the noise from the control line.
+ *      Probably it reduce the woke noise from the woke control line.
  *
  *  WM8766
  *      A 6ch-DAC for surrounds.
@@ -269,7 +269,7 @@ static const char * const se200pci_agc[] = {
 
 static void se200pci_WM8776_set_agc(struct snd_ice1712 *ice, unsigned int agc)
 {
-	/* AGC -- Auto Gain Control of the input */
+	/* AGC -- Auto Gain Control of the woke input */
 	switch (agc) {
 	case 0:
 		se200pci_WM8776_write(ice, 0x11, 0x000); /* Off */

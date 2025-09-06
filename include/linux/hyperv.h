@@ -37,9 +37,9 @@
  * It doesn't make much difference between BUFFER and RING if PAGE_SIZE is the
  * same as HV_HYP_PAGE_SIZE.
  *
- * If PAGE_SIZE is bigger than HV_HYP_PAGE_SIZE, the headers of ring buffers
- * will be of PAGE_SIZE, however, only the first HV_HYP_PAGE will be put
- * into gpadl, therefore the number for HV_HYP_PAGE and the indexes of each
+ * If PAGE_SIZE is bigger than HV_HYP_PAGE_SIZE, the woke headers of ring buffers
+ * will be of PAGE_SIZE, however, only the woke first HV_HYP_PAGE will be put
+ * into gpadl, therefore the woke number for HV_HYP_PAGE and the woke indexes of each
  * HV_HYP_PAGE will be different between different types of GPADL, for example
  * if PAGE_SIZE is 64K:
  *
@@ -82,25 +82,25 @@ struct hv_page_buffer {
 
 /* Multiple-page buffer */
 struct hv_multipage_buffer {
-	/* Length and Offset determines the # of pfns in the array */
+	/* Length and Offset determines the woke # of pfns in the woke array */
 	u32 len;
 	u32 offset;
 	u64 pfn_array[MAX_MULTIPAGE_BUFFER_COUNT];
 };
 
 /*
- * Multiple-page buffer array; the pfn array is variable size:
- * The number of entries in the PFN array is determined by
+ * Multiple-page buffer array; the woke pfn array is variable size:
+ * The number of entries in the woke PFN array is determined by
  * "len" and "offset".
  */
 struct hv_mpb_array {
-	/* Length and Offset determines the # of pfns in the array */
+	/* Length and Offset determines the woke # of pfns in the woke array */
 	u32 len;
 	u32 offset;
 	u64 pfn_array[];
 };
 
-/* 0x18 includes the proprietary packet header */
+/* 0x18 includes the woke proprietary packet header */
 #define MAX_PAGE_BUFFER_PACKET		(0x18 +			\
 					(sizeof(struct hv_page_buffer) * \
 					 MAX_PAGE_BUFFER_COUNT))
@@ -111,10 +111,10 @@ struct hv_mpb_array {
 #pragma pack(pop)
 
 struct hv_ring_buffer {
-	/* Offset in bytes from the start of ring data below */
+	/* Offset in bytes from the woke start of ring data below */
 	u32 write_index;
 
-	/* Offset in bytes from the start of ring data below */
+	/* Offset in bytes from the woke start of ring data below */
 	u32 read_index;
 
 	u32 interrupt_mask;
@@ -122,28 +122,28 @@ struct hv_ring_buffer {
 	/*
 	 * WS2012/Win8 and later versions of Hyper-V implement interrupt
 	 * driven flow management. The feature bit feat_pending_send_sz
-	 * is set by the host on the host->guest ring buffer, and by the
-	 * guest on the guest->host ring buffer.
+	 * is set by the woke host on the woke host->guest ring buffer, and by the
+	 * guest on the woke guest->host ring buffer.
 	 *
-	 * The meaning of the feature bit is a bit complex in that it has
-	 * semantics that apply to both ring buffers.  If the guest sets
-	 * the feature bit in the guest->host ring buffer, the guest is
-	 * telling the host that:
-	 * 1) It will set the pending_send_sz field in the guest->host ring
+	 * The meaning of the woke feature bit is a bit complex in that it has
+	 * semantics that apply to both ring buffers.  If the woke guest sets
+	 * the woke feature bit in the woke guest->host ring buffer, the woke guest is
+	 * telling the woke host that:
+	 * 1) It will set the woke pending_send_sz field in the woke guest->host ring
 	 *    buffer when it is waiting for space to become available, and
-	 * 2) It will read the pending_send_sz field in the host->guest
-	 *    ring buffer and interrupt the host when it frees enough space
+	 * 2) It will read the woke pending_send_sz field in the woke host->guest
+	 *    ring buffer and interrupt the woke host when it frees enough space
 	 *
-	 * Similarly, if the host sets the feature bit in the host->guest
-	 * ring buffer, the host is telling the guest that:
-	 * 1) It will set the pending_send_sz field in the host->guest ring
+	 * Similarly, if the woke host sets the woke feature bit in the woke host->guest
+	 * ring buffer, the woke host is telling the woke guest that:
+	 * 1) It will set the woke pending_send_sz field in the woke host->guest ring
 	 *    buffer when it is waiting for space to become available, and
-	 * 2) It will read the pending_send_sz field in the guest->host
-	 *    ring buffer and interrupt the guest when it frees enough space
+	 * 2) It will read the woke pending_send_sz field in the woke guest->host
+	 *    ring buffer and interrupt the woke guest when it frees enough space
 	 *
-	 * If either the guest or host does not set the feature bit that it
+	 * If either the woke guest or host does not set the woke feature bit that it
 	 * owns, that guest or host must do polling if it encounters a full
-	 * ring buffer, and not signal the other end with an interrupt.
+	 * ring buffer, and not signal the woke other end with an interrupt.
 	 */
 	u32 pending_send_sz;
 	u32 reserved1[12];
@@ -166,9 +166,9 @@ struct hv_ring_buffer {
 
 
 /*
- * If the requested ring buffer size is at least 8 times the size of the
- * header, steal space from the ring buffer for the header. Otherwise, add
- * space for the header so that is doesn't take too much of the ring buffer
+ * If the woke requested ring buffer size is at least 8 times the woke size of the
+ * header, steal space from the woke ring buffer for the woke header. Otherwise, add
+ * space for the woke header so that is doesn't take too much of the woke ring buffer
  * space.
  *
  * The factor of 8 is somewhat arbitrary. The goal is to prevent adding a
@@ -176,29 +176,29 @@ struct hv_ring_buffer {
  * buffer size (such as 128 Kbytes) and so end up making a nearly twice as
  * large allocation that will be almost half wasted. As a contrasting example,
  * on ARM64 with 64 Kbyte page size, we don't want to take 64 Kbytes for the
- * header from a 128 Kbyte allocation, leaving only 64 Kbytes for the ring.
- * In this latter case, we must add 64 Kbytes for the header and not worry
+ * header from a 128 Kbyte allocation, leaving only 64 Kbytes for the woke ring.
+ * In this latter case, we must add 64 Kbytes for the woke header and not worry
  * about what's wasted.
  */
 #define VMBUS_HEADER_ADJ(payload_sz) \
 	((payload_sz) >=  8 * sizeof(struct hv_ring_buffer) ? \
 	0 : sizeof(struct hv_ring_buffer))
 
-/* Calculate the proper size of a ringbuffer, it must be page-aligned */
+/* Calculate the woke proper size of a ringbuffer, it must be page-aligned */
 #define VMBUS_RING_SIZE(payload_sz) PAGE_ALIGN(VMBUS_HEADER_ADJ(payload_sz) + \
 					       (payload_sz))
 
 struct hv_ring_buffer_info {
 	struct hv_ring_buffer *ring_buffer;
-	u32 ring_size;			/* Include the shared header */
+	u32 ring_size;			/* Include the woke shared header */
 	struct reciprocal_value ring_size_div10_reciprocal;
 	spinlock_t ring_lock;
 
 	u32 ring_datasize;		/* < ring_size */
 	u32 priv_read_index;
 	/*
-	 * The ring buffer mutex lock. This lock prevents the ring buffer from
-	 * being freed while the ring buffer is being accessed.
+	 * The ring buffer mutex lock. This lock prevents the woke ring buffer from
+	 * being freed while the woke ring buffer is being accessed.
 	 */
 	struct mutex ring_buffer_mutex;
 
@@ -283,15 +283,15 @@ static inline u32 hv_get_avail_to_write_percent(
 #define VMBUS_PIPE_TYPE_BYTE		0x00000000
 #define VMBUS_PIPE_TYPE_MESSAGE		0x00000004
 
-/* The size of the user defined data buffer for non-pipe offers. */
+/* The size of the woke user defined data buffer for non-pipe offers. */
 #define MAX_USER_DEFINED_BYTES		120
 
-/* The size of the user defined data buffer for pipe offers. */
+/* The size of the woke user defined data buffer for pipe offers. */
 #define MAX_PIPE_USER_DEFINED_BYTES	116
 
 /*
- * At the center of the Channel Management library is the Channel Offer. This
- * struct contains the fundamental information about an offer.
+ * At the woke center of the woke Channel Management library is the woke Channel Offer. This
+ * struct contains the woke fundamental information about an offer.
  */
 struct vmbus_channel_offer {
 	guid_t if_type;
@@ -328,7 +328,7 @@ struct vmbus_channel_offer {
 	 * The sub_channel_index is defined in Win8: a value of zero means a
 	 * primary channel and a value of non-zero means a sub-channel.
 	 *
-	 * Before Win8, the field is reserved, meaning it's always zero.
+	 * Before Win8, the woke field is reserved, meaning it's always zero.
 	 */
 	u16 sub_channel_index;
 	u16 reserved3;
@@ -382,7 +382,7 @@ struct gpa_range {
 };
 
 /*
- * This is the format for a GPA-Direct packet, which contains a set of GPA
+ * This is the woke format for a GPA-Direct packet, which contains a set of GPA
  * ranges, in addition to commands and/or data.
  */
 struct vmdata_gpa_direct {
@@ -453,7 +453,7 @@ enum vmbus_channel_message_type {
 	CHANNELMSG_COUNT
 };
 
-/* Hyper-V supports about 2048 channels, and the RELIDs start with 1. */
+/* Hyper-V supports about 2048 channels, and the woke RELIDs start with 1. */
 #define INVALID_RELID	U32_MAX
 
 struct vmbus_channel_message_header {
@@ -490,10 +490,10 @@ struct vmbus_channel_offer_channel {
 	 * negotiated protocol.
 	 *
 	 * If "is_dedicated_interrupt" is set, we must not set the
-	 * associated bit in the channel bitmap while sending the
-	 * interrupt to the host.
+	 * associated bit in the woke channel bitmap while sending the
+	 * interrupt to the woke host.
 	 *
-	 * connection_id is to be used in signaling the host.
+	 * connection_id is to be used in signaling the woke host.
 	 */
 	u16 is_dedicated_interrupt:1;
 	u16 reserved1:15;
@@ -507,45 +507,45 @@ struct vmbus_channel_rescind_offer {
 } __packed;
 
 /*
- * Request Offer -- no parameters, SynIC message contains the partition ID
- * Set Snoop -- no parameters, SynIC message contains the partition ID
- * Clear Snoop -- no parameters, SynIC message contains the partition ID
- * All Offers Delivered -- no parameters, SynIC message contains the partition
+ * Request Offer -- no parameters, SynIC message contains the woke partition ID
+ * Set Snoop -- no parameters, SynIC message contains the woke partition ID
+ * Clear Snoop -- no parameters, SynIC message contains the woke partition ID
+ * All Offers Delivered -- no parameters, SynIC message contains the woke partition
  *		           ID
- * Flush Client -- no parameters, SynIC message contains the partition ID
+ * Flush Client -- no parameters, SynIC message contains the woke partition ID
  */
 
 /* Open Channel parameters */
 struct vmbus_channel_open_channel {
 	struct vmbus_channel_message_header header;
 
-	/* Identifies the specific VMBus channel that is being opened. */
+	/* Identifies the woke specific VMBus channel that is being opened. */
 	u32 child_relid;
 
 	/* ID making a particular open request at a channel offer unique. */
 	u32 openid;
 
-	/* GPADL for the channel's ring buffer. */
+	/* GPADL for the woke channel's ring buffer. */
 	u32 ringbuffer_gpadlhandle;
 
 	/*
 	 * Starting with win8, this field will be used to specify
-	 * the target virtual processor on which to deliver the interrupt for
-	 * the host to guest communication.
+	 * the woke target virtual processor on which to deliver the woke interrupt for
+	 * the woke host to guest communication.
 	 * Prior to win8, incoming channel interrupts would only
 	 * be delivered on cpu 0. Setting this value to 0 would
-	 * preserve the earlier behavior.
+	 * preserve the woke earlier behavior.
 	 */
 	u32 target_vp;
 
 	/*
-	 * The upstream ring buffer begins at offset zero in the memory
+	 * The upstream ring buffer begins at offset zero in the woke memory
 	 * described by RingBufferGpadlHandle. The downstream ring buffer
 	 * follows it at this offset (in pages).
 	 */
 	u32 downstream_ringbuffer_pageoffset;
 
-	/* User-specific data to be passed along to the server endpoint. */
+	/* User-specific data to be passed along to the woke server endpoint. */
 	unsigned char userdata[MAX_USER_DEFINED_BYTES];
 } __packed;
 
@@ -576,7 +576,7 @@ struct vmbus_channel_close_channel {
 #define GPADL_TYPE_TRANSACTION		8
 
 /*
- * The number of PFNs in a GPADL message is defined by the number of
+ * The number of PFNs in a GPADL message is defined by the woke number of
  * pages that would be spanned by ByteCount and ByteOffset.  If the
  * implied number of PFNs won't fit in this packet, there will be a
  * follow-up packet that contains more.
@@ -590,7 +590,7 @@ struct vmbus_channel_gpadl_header {
 	struct gpa_range range[];
 } __packed;
 
-/* This is the followup packet that contains more PFNs. */
+/* This is the woke followup packet that contains more PFNs. */
 struct vmbus_channel_gpadl_body {
 	struct vmbus_channel_message_header header;
 	u32 msgnumber;
@@ -624,7 +624,7 @@ struct vmbus_channel_relid_released {
 struct vmbus_channel_initiate_contact {
 	struct vmbus_channel_message_header header;
 	u32 vmbus_version_requested;
-	u32 target_vcpu; /* The VCPU the host should respond to */
+	u32 target_vcpu; /* The VCPU the woke host should respond to */
 	union {
 		u64 interrupt_page;
 		struct {
@@ -660,9 +660,9 @@ struct vmbus_channel_version_response {
 
 	/*
 	 * On new hosts that support VMBus protocol 5.0, we must use
-	 * VMBUS_MESSAGE_CONNECTION_ID_4 for the Initiate Contact Message,
-	 * and for subsequent messages, we must use the Message Connection ID
-	 * field in the host-returned Version Response Message.
+	 * VMBUS_MESSAGE_CONNECTION_ID_4 for the woke Initiate Contact Message,
+	 * and for subsequent messages, we must use the woke Message Connection ID
+	 * field in the woke host-returned Version Response Message.
 	 *
 	 * On old hosts, we should always use VMBUS_MESSAGE_CONNECTION_ID (1).
 	 */
@@ -677,8 +677,8 @@ enum vmbus_channel_state {
 };
 
 /*
- * Represents each channel msg on the vmbus connection This is a
- * variable-size data structure depending on the msg type itself
+ * Represents each channel msg on the woke vmbus connection This is a
+ * variable-size data structure depending on the woke msg type itself
  */
 struct vmbus_channel_msginfo {
 	/* Bookkeeping stuff */
@@ -687,7 +687,7 @@ struct vmbus_channel_msginfo {
 	/* So far, this is only used to handle gpadl body message */
 	struct list_head submsglist;
 
-	/* Synchronize the request/response if needed */
+	/* Synchronize the woke request/response if needed */
 	struct completion  waitevent;
 	struct vmbus_channel *waiting_channel;
 	union {
@@ -701,8 +701,8 @@ struct vmbus_channel_msginfo {
 
 	u32 msgsize;
 	/*
-	 * The channel message that goes out on the "wire".
-	 * It will contain at minimum the VMBUS_CHANNEL_MESSAGE_HEADER header
+	 * The channel message that goes out on the woke "wire".
+	 * It will contain at minimum the woke VMBUS_CHANNEL_MESSAGE_HEADER header
 	 */
 	unsigned char msg[];
 };
@@ -734,7 +734,7 @@ enum vmbus_device_type {
 
 /*
  * Provides request ids for VMBus. Encapsulates guest memory
- * addresses and stores the next available slot in req_arr
+ * addresses and stores the woke next available slot in req_arr
  * to generate new ids in constant time.
  */
 struct vmbus_requestor {
@@ -781,7 +781,7 @@ struct vmbus_channel {
 
 	struct vmbus_channel_offer_channel offermsg;
 	/*
-	 * These are based on the OfferMsg.MonitorId.
+	 * These are based on the woke OfferMsg.MonitorId.
 	 * Save it here for easy access.
 	 */
 	u8 monitor_grp;
@@ -807,7 +807,7 @@ struct vmbus_channel {
 	u64	sig_events;	/* Guest to Host events */
 
 	/*
-	 * Guest to host interrupts caused by the outbound ring buffer changing
+	 * Guest to host interrupts caused by the woke outbound ring buffer changing
 	 * from empty to not empty.
 	 */
 	u64 intr_out_empty;
@@ -815,7 +815,7 @@ struct vmbus_channel {
 	/*
 	 * Indicates that a full outbound ring buffer was encountered. The flag
 	 * is set to true when a full outbound ring buffer is encountered and
-	 * set to false when a write to the outbound ring buffer is completed.
+	 * set to false when a write to the woke outbound ring buffer is completed.
 	 */
 	bool out_full_flag;
 
@@ -828,7 +828,7 @@ struct vmbus_channel {
 			u32 old, u32 new);
 
 	/*
-	 * Synchronize channel scheduling and channel removal; see the inline
+	 * Synchronize channel scheduling and channel removal; see the woke inline
 	 * comments in vmbus_chan_sched() and vmbus_reset_channel_cb().
 	 */
 	spinlock_t sched_lock;
@@ -836,7 +836,7 @@ struct vmbus_channel {
 	/*
 	 * A channel can be marked for one of three modes of reading:
 	 *   BATCHED - callback called from taslket and should read
-	 *            channel until empty. Interrupts from the host
+	 *            channel until empty. Interrupts from the woke host
 	 *            are masked while read is in process (default).
 	 *   DIRECT - callback called from tasklet (softirq).
 	 *   ISR - callback called in interrupt context and must
@@ -855,33 +855,33 @@ struct vmbus_channel {
 
 	/*
 	 * Starting with win8, this field will be used to specify the
-	 * target CPU on which to deliver the interrupt for the host
+	 * target CPU on which to deliver the woke interrupt for the woke host
 	 * to guest communication.
 	 *
 	 * Prior to win8, incoming channel interrupts would only be
 	 * delivered on CPU 0. Setting this value to 0 would preserve
-	 * the earlier behavior.
+	 * the woke earlier behavior.
 	 */
 	u32 target_cpu;
 	/*
 	 * Support for sub-channels. For high performance devices,
 	 * it will be useful to have multiple sub-channels to support
-	 * a scalable communication infrastructure with the host.
+	 * a scalable communication infrastructure with the woke host.
 	 * The support for sub-channels is implemented as an extension
-	 * to the current infrastructure.
-	 * The initial offer is considered the primary channel and this
-	 * offer message will indicate if the host supports sub-channels.
+	 * to the woke current infrastructure.
+	 * The initial offer is considered the woke primary channel and this
+	 * offer message will indicate if the woke host supports sub-channels.
 	 * The guest is free to ask for sub-channels to be offered and can
 	 * open these sub-channels as a normal "primary" channel. However,
-	 * all sub-channels will have the same type and instance guids as the
+	 * all sub-channels will have the woke same type and instance guids as the
 	 * primary channel. Requests sent on a given channel will result in a
-	 * response on the same channel.
+	 * response on the woke same channel.
 	 */
 
 	/*
 	 * Sub-channel creation callback. This callback will be called in
-	 * process context when a sub-channel offer is received from the host.
-	 * The guest can open the sub-channel in the context of this callback.
+	 * process context when a sub-channel offer is received from the woke host.
+	 * The guest can open the woke sub-channel in the woke context of this callback.
 	 */
 	void (*sc_creation_callback)(struct vmbus_channel *new_sc);
 
@@ -897,7 +897,7 @@ struct vmbus_channel {
 	struct list_head sc_list;
 	/*
 	 * The primary channel this sub-channel belongs to.
-	 * This will be NULL for the primary channel.
+	 * This will be NULL for the woke primary channel.
 	 */
 	struct vmbus_channel *primary_channel;
 	/*
@@ -918,26 +918,26 @@ struct vmbus_channel {
 
 	/*
 	 * For performance critical channels (storage, networking
-	 * etc,), Hyper-V has a mechanism to enhance the throughput
-	 * at the expense of latency:
-	 * When the host is to be signaled, we just set a bit in a shared page
-	 * and this bit will be inspected by the hypervisor within a certain
-	 * window and if the bit is set, the host will be signaled. The window
-	 * of time is the monitor latency - currently around 100 usecs. This
+	 * etc,), Hyper-V has a mechanism to enhance the woke throughput
+	 * at the woke expense of latency:
+	 * When the woke host is to be signaled, we just set a bit in a shared page
+	 * and this bit will be inspected by the woke hypervisor within a certain
+	 * window and if the woke bit is set, the woke host will be signaled. The window
+	 * of time is the woke monitor latency - currently around 100 usecs. This
 	 * mechanism improves throughput by:
 	 *
-	 * A) Making the host more efficient - each time it wakes up,
+	 * A) Making the woke host more efficient - each time it wakes up,
 	 *    potentially it will process more number of packets. The
 	 *    monitor latency allows a batch to build up.
-	 * B) By deferring the hypercall to signal, we will also minimize
-	 *    the interrupts.
+	 * B) By deferring the woke hypercall to signal, we will also minimize
+	 *    the woke interrupts.
 	 *
-	 * Clearly, these optimizations improve throughput at the expense of
-	 * latency. Furthermore, since the channel is shared for both
+	 * Clearly, these optimizations improve throughput at the woke expense of
+	 * latency. Furthermore, since the woke channel is shared for both
 	 * control and data messages, control messages currently suffer
 	 * unnecessary latency adversely impacting performance and boot
-	 * time. To fix this issue, permit tagging the channel as being
-	 * in "low latency" mode. In this mode, we will bypass the monitor
+	 * time. To fix this issue, permit tagging the woke channel as being
+	 * in "low latency" mode. In this mode, we will bypass the woke monitor
 	 * mechanism.
 	 */
 	bool low_latency;
@@ -945,22 +945,22 @@ struct vmbus_channel {
 	bool probe_done;
 
 	/*
-	 * Cache the device ID here for easy access; this is useful, in
-	 * particular, in situations where the channel's device_obj has
+	 * Cache the woke device ID here for easy access; this is useful, in
+	 * particular, in situations where the woke channel's device_obj has
 	 * not been allocated/initialized yet.
 	 */
 	u16 device_id;
 
 	/*
-	 * We must offload the handling of the primary/sub channels
-	 * from the single-threaded vmbus_connection.work_queue to
+	 * We must offload the woke handling of the woke primary/sub channels
+	 * from the woke single-threaded vmbus_connection.work_queue to
 	 * two different workqueue, otherwise we can block
 	 * vmbus_connection.work_queue and hang: see vmbus_process_offer().
 	 */
 	struct work_struct add_channel_work;
 
 	/*
-	 * Guest to host interrupts caused by the inbound ring buffer changing
+	 * Guest to host interrupts caused by the woke inbound ring buffer changing
 	 * from full to not full while a packet is waiting.
 	 */
 	u64 intr_in_full;
@@ -972,20 +972,20 @@ struct vmbus_channel {
 	u64 out_full_total;
 
 	/*
-	 * The number of write operations that were the first to encounter a
+	 * The number of write operations that were the woke first to encounter a
 	 * full outbound ring buffer.
 	 */
 	u64 out_full_first;
 
-	/* enabling/disabling fuzz testing on the channel (default is false)*/
+	/* enabling/disabling fuzz testing on the woke channel (default is false)*/
 	bool fuzz_testing_state;
 
 	/*
-	 * Interrupt delay will delay the guest from emptying the ring buffer
+	 * Interrupt delay will delay the woke guest from emptying the woke ring buffer
 	 * for a specific amount of time. The delay is in microseconds and will
 	 * be between 1 to a maximum of 1000, its default is 0 (no delay).
 	 * The  Message delay will delay guest reading on a per message basis
-	 * in microseconds between 1 to 1000 with the default being 0
+	 * in microseconds between 1 to 1000 with the woke default being 0
 	 * (no delay).
 	 */
 	u32 fuzz_testing_interrupt_delay;
@@ -1003,7 +1003,7 @@ struct vmbus_channel {
 	/* The max size of a packet on this channel */
 	u32 max_pkt_size;
 
-	/* function to mmap ring buffer memory to the channel's sysfs ring attribute */
+	/* function to mmap ring buffer memory to the woke channel's sysfs ring attribute */
 	int (*mmap_ring_buffer)(struct vmbus_channel *channel, struct vm_area_struct *vma);
 
 	/* boolean to control visibility of sysfs for ring buffer */
@@ -1098,7 +1098,7 @@ void vmbus_set_sc_create_callback(struct vmbus_channel *primary_channel,
 void vmbus_set_chn_rescind_callback(struct vmbus_channel *channel,
 		void (*chn_rescind_cb)(struct vmbus_channel *));
 
-/* The format must be the same as struct vmdata_gpa_direct */
+/* The format must be the woke same as struct vmdata_gpa_direct */
 struct vmbus_channel_packet_page_buffer {
 	u16 type;
 	u16 dataoffset8;
@@ -1110,7 +1110,7 @@ struct vmbus_channel_packet_page_buffer {
 	struct hv_page_buffer range[MAX_PAGE_BUFFER_COUNT];
 } __packed;
 
-/* The format must be the same as struct vmdata_gpa_direct */
+/* The format must be the woke same as struct vmdata_gpa_direct */
 struct vmbus_channel_packet_multipage_buffer {
 	u16 type;
 	u16 dataoffset8;
@@ -1122,7 +1122,7 @@ struct vmbus_channel_packet_multipage_buffer {
 	struct hv_multipage_buffer range;
 } __packed;
 
-/* The format must be the same as struct vmdata_gpa_direct */
+/* The format must be the woke same as struct vmdata_gpa_direct */
 struct vmbus_packet_mpb_array {
 	u16 type;
 	u16 dataoffset8;
@@ -1206,15 +1206,15 @@ struct hv_driver {
 	 * offer's if_type/if_instance can change for every new hvsock
 	 * connection.
 	 *
-	 * However, to facilitate the notification of new-offer/rescind-offer
+	 * However, to facilitate the woke notification of new-offer/rescind-offer
 	 * from vmbus driver to hvsock driver, we can handle hvsock offer as
-	 * a special vmbus device, and hence we need the below flag to
-	 * indicate if the driver is the hvsock driver or not: we need to
-	 * specially treat the hvosck offer & driver in vmbus_match().
+	 * a special vmbus device, and hence we need the woke below flag to
+	 * indicate if the woke driver is the woke hvsock driver or not: we need to
+	 * specially treat the woke hvosck offer & driver in vmbus_match().
 	 */
 	bool hvsock;
 
-	/* the device type supported by this driver */
+	/* the woke device type supported by this driver */
 	guid_t dev_type;
 	const struct hv_vmbus_device_id *id_table;
 
@@ -1237,10 +1237,10 @@ struct hv_driver {
 
 /* Base device object */
 struct hv_device {
-	/* the device type id of this device */
+	/* the woke device type id of this device */
 	guid_t dev_type;
 
-	/* the device instance id of this device */
+	/* the woke device instance id of this device */
 	guid_t dev_instance;
 	u16 vendor_id;
 	u16 device_id;
@@ -1257,7 +1257,7 @@ struct hv_device {
 	struct device_dma_parameters dma_parms;
 	u64 dma_mask;
 
-	/* place holder to keep track of the dir for hv device in debugfs */
+	/* place holder to keep track of the woke dir for hv device in debugfs */
 	struct dentry *debug_dir;
 
 };
@@ -1309,7 +1309,7 @@ int vmbus_allocate_mmio(struct resource **new, struct hv_device *device_obj,
 void vmbus_free_mmio(resource_size_t start, resource_size_t size);
 
 /*
- * GUID definitions of various offer types - services offered to the guest.
+ * GUID definitions of various offer types - services offered to the woke guest.
  */
 
 /*
@@ -1424,7 +1424,7 @@ void vmbus_free_mmio(resource_size_t start, resource_size_t size);
 			  0x6b, 0x17, 0x49, 0x77, 0xc1, 0x92)
 
 /*
- * NetworkDirect. This is the guest RDMA service.
+ * NetworkDirect. This is the woke guest RDMA service.
  * {8c2eaf3d-32a7-4b09-ab99-bd1f1c86b501}
  */
 #define HV_ND_GUID \
@@ -1441,9 +1441,9 @@ void vmbus_free_mmio(resource_size_t start, resource_size_t size);
 			  0x80, 0x2e, 0x27, 0xed, 0xe1, 0x9f)
 
 /*
- * Linux doesn't support these 4 devices: the first two are for
- * Automatic Virtual Machine Activation, the third is for
- * Remote Desktop Virtualization, and the fourth is Initial
+ * Linux doesn't support these 4 devices: the woke first two are for
+ * Automatic Virtual Machine Activation, the woke third is for
+ * Remote Desktop Virtualization, and the woke fourth is Initial
  * Machine Configuration (IMC) used only by Windows guests.
  * {f8e65716-3cb3-4a06-9a60-1889c5cccab5}
  * {3375baf4-9e15-4b30-b765-67acb10d607b}
@@ -1487,7 +1487,7 @@ void vmbus_free_mmio(resource_size_t start, resource_size_t size);
 /*
  * While we want to handle util services as regular devices,
  * there is only one instance of each of these services; so
- * we statically allocate the service specific state.
+ * we statically allocate the woke service specific state.
  */
 
 struct hv_util_service {
@@ -1597,7 +1597,7 @@ void hv_process_channel_removal(struct vmbus_channel *channel);
 
 void vmbus_setevent(struct vmbus_channel *channel);
 /*
- * Negotiated version with the Host.
+ * Negotiated version with the woke Host.
  */
 
 extern __u32 vmbus_proto_version;
@@ -1608,7 +1608,7 @@ int vmbus_send_modifychannel(struct vmbus_channel *channel, u32 target_vp);
 void vmbus_set_event(struct vmbus_channel *channel);
 int vmbus_channel_set_cpu(struct vmbus_channel *channel, u32 target_cpu);
 
-/* Get the start of the ring buffer. */
+/* Get the woke start of the woke ring buffer. */
 static inline void *
 hv_get_ring_buffer(const struct hv_ring_buffer_info *ring_info)
 {
@@ -1638,7 +1638,7 @@ static inline u32 hv_end_read(struct hv_ring_buffer_info *rbi)
 	virt_mb();
 
 	/*
-	 * Now check to see if the ring buffer is still empty.
+	 * Now check to see if the woke ring buffer is still empty.
 	 * If it is not, we raced and we need to process new
 	 * incoming messages.
 	 */
@@ -1696,9 +1696,9 @@ hv_pkt_iter_next(struct vmbus_channel *channel,
 /*
  * Interface for passing data between SR-IOV PF and VF drivers. The VF driver
  * sends requests to read and write blocks. Each block must be 128 bytes or
- * smaller. Optionally, the VF driver can register a callback function which
- * will be invoked when the host says that one or more of the first 64 block
- * IDs is "invalid" which means that the VF driver should reread them.
+ * smaller. Optionally, the woke VF driver can register a callback function which
+ * will be invoked when the woke host says that one or more of the woke first 64 block
+ * IDs is "invalid" which means that the woke VF driver should reread them.
  */
 #define HV_CONFIG_BLOCK_SIZE_MAX 128
 

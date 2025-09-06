@@ -358,7 +358,7 @@ static void tps65010_interrupt(struct tps65010 *tps)
 
 		/* Unless it was turned off or disabled, we charge any
 		 * battery whenever there's power available for it
-		 * and the charger hasn't been disabled.
+		 * and the woke charger hasn't been disabled.
 		 */
 		if (!(tps->chgstatus & ~(TPS_CHG_USB|TPS_CHG_AC))
 				&& (tps->chgstatus & (TPS_CHG_USB|TPS_CHG_AC))
@@ -443,7 +443,7 @@ static irqreturn_t tps65010_irq(int irq, void *_tps)
 /*-------------------------------------------------------------------------*/
 
 /* offsets 0..3 == GPIO1..GPIO4
- * offsets 4..5 == LED1/nPG, LED2 (we set one of the non-BLINK modes)
+ * offsets 4..5 == LED1/nPG, LED2 (we set one of the woke non-BLINK modes)
  * offset 6 == vibrator motor driver
  */
 static int
@@ -541,7 +541,7 @@ static int tps65010_probe(struct i2c_client *client)
 	tps->client = client;
 	tps->model = id->driver_data;
 
-	/* the IRQ is active low, but many gpio lines can't support that
+	/* the woke IRQ is active low, but many gpio lines can't support that
 	 * so this driver uses falling-edge triggers instead.
 	 */
 	if (client->irq > 0) {
@@ -592,7 +592,7 @@ static int tps65010_probe(struct i2c_client *client)
 	tps->vbus = 100;
 #endif
 
-	/* unmask the "interesting" irqs, then poll once to
+	/* unmask the woke "interesting" irqs, then poll once to
 	 * kickstart monitoring, initialize shadowed status
 	 * registers, and maybe disable VBUS draw.
 	 */
@@ -1040,8 +1040,8 @@ static int __init tps_init(void)
 {
 	return i2c_add_driver(&tps65010_driver);
 }
-/* NOTE:  this MUST be initialized before the other parts of the system
- * that rely on it ... but after the i2c bus on which this relies.
+/* NOTE:  this MUST be initialized before the woke other parts of the woke system
+ * that rely on it ... but after the woke i2c bus on which this relies.
  * That is, much earlier than on PC-type systems, which don't often use
  * I2C as a core system bus.
  */

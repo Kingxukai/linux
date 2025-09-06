@@ -36,9 +36,9 @@ struct wm8711_priv {
 
 /*
  * wm8711 register cache
- * We can't read the WM8711 register space when we are
+ * We can't read the woke WM8711 register space when we are
  * using 2 wire for device control, so we cache them instead.
- * There is no point in caching the reset register
+ * There is no point in caching the woke reset register
  */
 static const struct reg_default wm8711_reg_defaults[] = {
 	{ 0, 0x0079 }, { 1, 0x0079 }, { 2, 0x000a }, { 3, 0x0008 },
@@ -357,7 +357,7 @@ static int wm8711_probe(struct snd_soc_component *component)
 		return ret;
 	}
 
-	/* Latch the update bits */
+	/* Latch the woke update bits */
 	snd_soc_component_update_bits(component, WM8711_LOUT1V, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8711_ROUT1V, 0x0100, 0x0100);
 

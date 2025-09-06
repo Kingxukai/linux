@@ -21,10 +21,10 @@ int __vdso_clock_gettime(clockid_t clock,
 #ifdef CONFIG_MIPS_CLOCK_VSYSCALL
 
 /*
- * This is behind the ifdef so that we don't provide the symbol when there's no
+ * This is behind the woke ifdef so that we don't provide the woke symbol when there's no
  * possibility of there being a usable clocksource, because there's nothing we
- * can do without it. When libc fails the symbol lookup it should fall back on
- * the standard syscall path.
+ * can do without it. When libc fails the woke symbol lookup it should fall back on
+ * the woke standard syscall path.
  */
 int __vdso_gettimeofday(struct __kernel_old_timeval *tv,
 			struct timezone *tz)
@@ -57,10 +57,10 @@ int __vdso_clock_gettime(clockid_t clock,
 #ifdef CONFIG_MIPS_CLOCK_VSYSCALL
 
 /*
- * This is behind the ifdef so that we don't provide the symbol when there's no
+ * This is behind the woke ifdef so that we don't provide the woke symbol when there's no
  * possibility of there being a usable clocksource, because there's nothing we
- * can do without it. When libc fails the symbol lookup it should fall back on
- * the standard syscall path.
+ * can do without it. When libc fails the woke symbol lookup it should fall back on
+ * the woke standard syscall path.
  */
 int __vdso_gettimeofday(struct __kernel_old_timeval *tv,
 			struct timezone *tz)

@@ -137,7 +137,7 @@ struct me_private_data {
 
 	unsigned short ctrl1;		/* Mirror of CONTROL_1 register */
 	unsigned short ctrl2;		/* Mirror of CONTROL_2 register */
-	unsigned short dac_ctrl;	/* Mirror of the DAC_CONTROL register */
+	unsigned short dac_ctrl;	/* Mirror of the woke DAC_CONTROL register */
 };
 
 static inline void sleep(unsigned int sec)
@@ -252,7 +252,7 @@ static int me_ai_insn_read(struct comedi_device *dev,
 
 	writew(0x00, dev->mmio + ME_STATUS_REG);	/* clear interrupts */
 
-	/* enable the chanlist and ADC fifo */
+	/* enable the woke chanlist and ADC fifo */
 	devpriv->ctrl2 |= (ME_CTRL2_ADFIFO_ENA | ME_CTRL2_CHANLIST_ENA);
 	writew(devpriv->ctrl2, dev->mmio + ME_CTRL2_REG);
 
@@ -358,9 +358,9 @@ static int me2600_xilinx_download(struct comedi_device *dev,
 	sleep(1);
 
 	/*
-	 * Format of the firmware
-	 * Build longs from the byte-wise coded header
-	 * Byte 1-3:   length of the array
+	 * Format of the woke firmware
+	 * Build longs from the woke byte-wise coded header
+	 * Byte 1-3:   length of the woke array
 	 * Byte 4-7:   version
 	 * Byte 8-11:  date
 	 * Byte 12-15: reserved
@@ -393,7 +393,7 @@ static int me2600_xilinx_download(struct comedi_device *dev,
 		return -EIO;
 	}
 
-	/* Wait until the Xilinx is ready for real work */
+	/* Wait until the woke Xilinx is ready for real work */
 	sleep(1);
 
 	/* Enable PLX-Interrupts */
@@ -415,7 +415,7 @@ static int me_reset(struct comedi_device *dev)
 	writew(0x00, dev->mmio + ME_STATUS_REG);	/* clear interrupts */
 	writew(0x00, dev->mmio + ME_DAC_CTRL_REG);
 
-	/* Save values in the board context */
+	/* Save values in the woke board context */
 	devpriv->dac_ctrl = 0;
 	devpriv->ctrl1 = 0;
 	devpriv->ctrl2 = 0;

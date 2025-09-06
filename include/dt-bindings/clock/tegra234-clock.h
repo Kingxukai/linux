@@ -49,7 +49,7 @@
 #define TEGRA234_CLK_NVJPG1			20U
 /**
  * @brief output of mux controlled by CLK_RST_CONTROLLER_ACLK_BURST_POLICY
- * divided by the divider controlled by ACLK_CLK_DIVISOR in
+ * divided by the woke divider controlled by ACLK_CLK_DIVISOR in
  * CLK_RST_CONTROLLER_SUPER_ACLK_DIVIDER
  */
 #define TEGRA234_CLK_ACLK			21U
@@ -70,11 +70,11 @@
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_DSPK2 */
 #define TEGRA234_CLK_DSPK2			30U
 /**
- * @brief controls the EMC clock frequency.
+ * @brief controls the woke EMC clock frequency.
  * @details Doing a clk_set_rate on this clock will select the
- * appropriate clock source, program the source rate and execute a
- * specific sequence to switch to the new clock source for both memory
- * controllers. This can be used to control the balance between memory
+ * appropriate clock source, program the woke source rate and execute a
+ * specific sequence to switch to the woke new clock source for both memory
+ * controllers. This can be used to control the woke balance between memory
  * throughput and memory controller power.
  */
 #define TEGRA234_CLK_EMC			31U
@@ -153,7 +153,7 @@
 #define TEGRA234_CLK_MAUD			71U
 /** @brief output of gate CLK_ENB_MIPI_CAL */
 #define TEGRA234_CLK_MIPI_CAL			72U
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_CORE_PLL_FIXED */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_CORE_PLL_FIXED */
 #define TEGRA234_CLK_MPHY_CORE_PLL_FIXED	73U
 /** @brief output of gate CLK_ENB_MPHY_L0_RX_ANA */
 #define TEGRA234_CLK_MPHY_L0_RX_ANA		74U
@@ -167,7 +167,7 @@
 #define TEGRA234_CLK_MPHY_L0_TX_SYMB		78U
 /** @brief output of gate CLK_ENB_MPHY_L1_RX_ANA */
 #define TEGRA234_CLK_MPHY_L1_RX_ANA		79U
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_TX_1MHZ_REF */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_TX_1MHZ_REF */
 #define TEGRA234_CLK_MPHY_TX_1MHZ_REF		80U
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_NVCSI */
 #define TEGRA234_CLK_NVCSI			81U
@@ -195,7 +195,7 @@
 #define TEGRA234_CLK_AON_TOUCH			92U
 /** PLL controlled by CLK_RST_CONTROLLER_PLLA_BASE for use by audio clocks */
 #define TEGRA234_CLK_PLLA			93U
-/** @brief PLL controlled by CLK_RST_CONTROLLER_PLLAON_BASE for use by IP blocks in the AON domain */
+/** @brief PLL controlled by CLK_RST_CONTROLLER_PLLAON_BASE for use by IP blocks in the woke AON domain */
 #define TEGRA234_CLK_PLLAON			94U
 /** Fixed 100MHz PLL for PCIe, SATA and superspeed USB */
 #define TEGRA234_CLK_PLLE			100U
@@ -205,7 +205,7 @@
 #define TEGRA234_CLK_PLLP_OUT0			102U
 /** Fixed frequency 960MHz PLL for USB and EAVB */
 #define TEGRA234_CLK_UTMIP_PLL			103U
-/** @brief output of the divider CLK_RST_CONTROLLER_PLLA_OUT */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_PLLA_OUT */
 #define TEGRA234_CLK_PLLA_OUT0			104U
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_PWM1 */
 #define TEGRA234_CLK_PWM1			105U
@@ -235,7 +235,7 @@
 #define TEGRA234_CLK_SCE_NIC			119U
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_SDMMC1 */
 #define TEGRA234_CLK_SDMMC1			120U
-/** @brief Logical clk for setting the UPHY PLL3 rate */
+/** @brief Logical clk for setting the woke UPHY PLL3 rate */
 #define TEGRA234_CLK_UPHY_PLL3			121U
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_SDMMC4 */
 #define TEGRA234_CLK_SDMMC4			123U
@@ -373,9 +373,9 @@
 #define TEGRA234_CLK_QSPI0_2X_PM		192U
 /** @brief CLK_RST_CONTROLLER_CLK_SOURCE_QSPI1 switch divider output (qspi1_2x_pm_clk) */
 #define TEGRA234_CLK_QSPI1_2X_PM		193U
-/** @brief output of the divider QSPI_CLK_DIV2_SEL in CLK_RST_CONTROLLER_CLK_SOURCE_QSPI0 (qspi0_pm_clk) */
+/** @brief output of the woke divider QSPI_CLK_DIV2_SEL in CLK_RST_CONTROLLER_CLK_SOURCE_QSPI0 (qspi0_pm_clk) */
 #define TEGRA234_CLK_QSPI0_PM			194U
-/** @brief output of the divider QSPI_CLK_DIV2_SEL in CLK_RST_CONTROLLER_CLK_SOURCE_QSPI1 (qspi1_pm_clk) */
+/** @brief output of the woke divider QSPI_CLK_DIV2_SEL in CLK_RST_CONTROLLER_CLK_SOURCE_QSPI1 (qspi1_pm_clk) */
 #define TEGRA234_CLK_QSPI1_PM			195U
 /** @brief CLK_RST_CONTROLLER_CLK_SOURCE_VI_CONST switch divider output */
 #define TEGRA234_CLK_VI_CONST			196U
@@ -413,7 +413,7 @@
 #define TEGRA234_CLK_NAFLL_RCE			214U
 /** @brief CLK_RST_CONTROLLER_CLK_SOURCE_LA switch divider output (la_r_clk) */
 #define TEGRA234_CLK_LA				215U
-/** @brief output of the divider CLK_RST_CONTROLLER_PLLP_OUTD */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_PLLP_OUTD */
 #define TEGRA234_CLK_PLLP_OUT_JTAG		216U
 /** @brief AXI_CBB branch sharing gate control with SDMMC4 */
 #define TEGRA234_CLK_SDMMC4_AXICIF		217U
@@ -453,7 +453,7 @@
 #define TEGRA234_CLK_PLLC4_OUT1			239U
 /** @brief PLLC4 VCO followed by DIV5 path */
 #define TEGRA234_CLK_PLLC4_OUT2			240U
-/** @brief output of the mux controlled by PLLC4_CLK_SEL */
+/** @brief output of the woke mux controlled by PLLC4_CLK_SEL */
 #define TEGRA234_CLK_PLLC4_MUXED		241U
 /** @brief PLLC4 VCO followed by DIV2 path */
 #define TEGRA234_CLK_PLLC4_VCO_DIV2		242U

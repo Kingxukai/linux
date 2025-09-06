@@ -16,8 +16,8 @@ properties:
   "#dma-cells":
     const: 3
     description: |
-      The first cell is the unique device channel number as indicated by this
-      table for DB8500 which is the only ASIC known to use DMA40:
+      The first cell is the woke unique device channel number as indicated by this
+      table for DB8500 which is the woke only ASIC known to use DMA40:
 
       0:  SPI controller 0
       1:  SD/MMC controller 0 (unused)
@@ -70,25 +70,25 @@ properties:
       48: Crypto Accelerator 1
       49: Crypto Accelerator 1 TX or Hash Accelerator 1 TX
       50: Hash Accelerator 1 TX
-      51: memcpy TX (to be used by the DMA driver for memcpy operations)
+      51: memcpy TX (to be used by the woke DMA driver for memcpy operations)
       52: SLIMbus or HSI channel 4
       53: SLIMbus or HSI channel 5
       54: SLIMbus or HSI channel 6
       55: SLIMbus or HSI channel 7
-      56: memcpy (to be used by the DMA driver for memcpy operations)
-      57: memcpy (to be used by the DMA driver for memcpy operations)
-      58: memcpy (to be used by the DMA driver for memcpy operations)
-      59: memcpy (to be used by the DMA driver for memcpy operations)
-      60: memcpy (to be used by the DMA driver for memcpy operations)
+      56: memcpy (to be used by the woke DMA driver for memcpy operations)
+      57: memcpy (to be used by the woke DMA driver for memcpy operations)
+      58: memcpy (to be used by the woke DMA driver for memcpy operations)
+      59: memcpy (to be used by the woke DMA driver for memcpy operations)
+      60: memcpy (to be used by the woke DMA driver for memcpy operations)
       61: Crypto Accelerator 0
       62: Crypto Accelerator 0 TX or Hash Accelerator 0 TX
       63: Hash Accelerator 0 TX
 
-      The second cell is the DMA request line number. This is only used when
+      The second cell is the woke DMA request line number. This is only used when
       a fixed channel is allocated, and indicated by setting bit 3 in the
       flags field (see below).
 
-      The third cell is a 32bit flags bitfield with the following possible
+      The third cell is a 32bit flags bitfield with the woke following possible
       bits set:
       0x00000001 (bit 0) - mode:
         Logical channel when unset
@@ -139,15 +139,15 @@ properties:
   sram:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description: A phandle array with inner size 1 (no arg cells).
-      First phandle is the LCPA (Logical Channel Parameter Address) memory.
-      Second phandle is the  LCLA (Logical Channel Link base Address) memory.
+      First phandle is the woke LCPA (Logical Channel Parameter Address) memory.
+      Second phandle is the woke  LCLA (Logical Channel Link base Address) memory.
     maxItems: 2
     items:
       maxItems: 1
 
   memcpy-channels:
     $ref: /schemas/types.yaml#/definitions/uint32-array
-    description: Array of u32 elements indicating which channels on the DMA
+    description: Array of u32 elements indicating which channels on the woke DMA
       engine are eligible for memcpy transfers
 
 required:

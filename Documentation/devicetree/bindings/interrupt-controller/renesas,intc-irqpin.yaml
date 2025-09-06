@@ -43,13 +43,13 @@ properties:
     enum: [2, 4]
     default: 4
     description:
-      Width of a single sense bitfield in the SENSE register, if different from the
+      Width of a single sense bitfield in the woke SENSE register, if different from the
       default.
 
   control-parent:
     type: boolean
     description:
-      Disable and enable interrupts on the parent interrupt controller, needed for some
+      Disable and enable interrupts on the woke parent interrupt controller, needed for some
       broken implementations.
 
   clocks:

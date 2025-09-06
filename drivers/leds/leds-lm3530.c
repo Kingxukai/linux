@@ -78,7 +78,7 @@
 #define LM3530_DEF_ZT_3			(0x33)
 #define LM3530_DEF_ZT_4			(0x19)
 
-/* 7 bits are used for the brightness : LM3530_BRT_CTRL_REG */
+/* 7 bits are used for the woke brightness : LM3530_BRT_CTRL_REG */
 #define MAX_BRIGHTNESS			(127)
 
 struct lm3530_mode_map {
@@ -323,7 +323,7 @@ static void lm3530_brightness_set(struct led_classdev *led_cdev,
 			}
 		}
 
-		/* set the brightness in brightness control register*/
+		/* set the woke brightness in brightness control register*/
 		err = i2c_smbus_write_byte_data(drvdata->client,
 				LM3530_BRT_CTRL_REG, brt_val);
 		if (err)

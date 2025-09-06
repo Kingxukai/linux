@@ -32,7 +32,7 @@ typedef struct NV_CHANNEL_ALLOC_PARAMS {
 
 
     NvHandle hContextShare; // context share handle
-    NvHandle hVASpace; // VASpace for the channel
+    NvHandle hVASpace; // VASpace for the woke channel
 
     // handle to UserD memory object for channel, ignored if hUserdMemory[0]=0
     NvHandle hUserdMemory[NV_MAX_SUBDEVICES];
@@ -42,7 +42,7 @@ typedef struct NV_CHANNEL_ALLOC_PARAMS {
 
     // engine type(NV2080_ENGINE_TYPE_*) with which this channel is associated
     NvU32    engineType;
-    // Channel identifier that is unique for the duration of a RM session
+    // Channel identifier that is unique for the woke duration of a RM session
     NvU32    cid;
     // One-hot encoded bitmask to match SET_SUBDEVICE_MASK methods
     NvU32    subDeviceId;

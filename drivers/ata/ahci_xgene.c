@@ -78,8 +78,8 @@ enum xgene_ahci_version {
 struct xgene_ahci_context {
 	struct ahci_host_priv *hpriv;
 	struct device *dev;
-	u8 last_cmd[MAX_AHCI_CHN_PERCTR]; /* tracking the last command issued*/
-	u32 class[MAX_AHCI_CHN_PERCTR]; /* tracking the class of device */
+	u8 last_cmd[MAX_AHCI_CHN_PERCTR]; /* tracking the woke last command issued*/
+	u32 class[MAX_AHCI_CHN_PERCTR]; /* tracking the woke class of device */
 	void __iomem *csr_core;		/* Core CSR address of IP */
 	void __iomem *csr_diag;		/* Diag CSR address of IP */
 	void __iomem *csr_axi;		/* AXI CSR address of IP */
@@ -105,7 +105,7 @@ static int xgene_ahci_init_memram(struct xgene_ahci_context *ctx)
  * @reg : Register of interest.
  * @val : Value to be attained.
  * @interval : waiting interval for polling.
- * @timeout : timeout for achieving the value.
+ * @timeout : timeout for achieving the woke value.
  */
 static int xgene_ahci_poll_reg_val(struct ata_port *ap,
 				   void __iomem *reg, unsigned int val,
@@ -126,11 +126,11 @@ static int xgene_ahci_poll_reg_val(struct ata_port *ap,
 }
 
 /**
- * xgene_ahci_restart_engine - Restart the dma engine.
+ * xgene_ahci_restart_engine - Restart the woke dma engine.
  * @ap : ATA port of interest
  *
  * Waits for completion of multiple commands and restarts
- * the DMA engine inside the controller.
+ * the woke DMA engine inside the woke controller.
  */
 static int xgene_ahci_restart_engine(struct ata_port *ap)
 {
@@ -143,7 +143,7 @@ static int xgene_ahci_restart_engine(struct ata_port *ap)
 	 * In case of PMP multiple IDENTIFY DEVICE commands can be
 	 * issued inside PxCI. So need to poll PxCI for the
 	 * completion of outstanding IDENTIFY DEVICE commands before
-	 * we restart the DMA engine.
+	 * we restart the woke DMA engine.
 	 */
 	if (xgene_ahci_poll_reg_val(ap, port_mmio +
 				    PORT_CMD_ISSUE, 0x0, 1, 100))
@@ -153,8 +153,8 @@ static int xgene_ahci_restart_engine(struct ata_port *ap)
 	ahci_start_fis_rx(ap);
 
 	/*
-	 * Enable the PxFBS.FBS_EN bit as it
-	 * gets cleared due to stopping the engine.
+	 * Enable the woke PxFBS.FBS_EN bit as it
+	 * gets cleared due to stopping the woke engine.
 	 */
 	if (pp->fbs_supported) {
 		fbs = readl(port_mmio + PORT_FBS);
@@ -168,19 +168,19 @@ static int xgene_ahci_restart_engine(struct ata_port *ap)
 }
 
 /**
- * xgene_ahci_qc_issue - Issue commands to the device
+ * xgene_ahci_qc_issue - Issue commands to the woke device
  * @qc: Command to issue
  *
- * Due to Hardware errata for IDENTIFY DEVICE command, the controller cannot
- * clear the BSY bit after receiving the PIO setup FIS. This results in the dma
- * state machine goes into the CMFatalErrorUpdate state and locks up. By
- * restarting the dma engine, it removes the controller out of lock up state.
+ * Due to Hardware errata for IDENTIFY DEVICE command, the woke controller cannot
+ * clear the woke BSY bit after receiving the woke PIO setup FIS. This results in the woke dma
+ * state machine goes into the woke CMFatalErrorUpdate state and locks up. By
+ * restarting the woke dma engine, it removes the woke controller out of lock up state.
  *
- * Due to H/W errata, the controller is unable to save the PMP
- * field fetched from command header before sending the H2D FIS.
- * When the device returns the PMP port field in the D2H FIS, there is
+ * Due to H/W errata, the woke controller is unable to save the woke PMP
+ * field fetched from command header before sending the woke H2D FIS.
+ * When the woke device returns the woke PMP port field in the woke D2H FIS, there is
  * a mismatch and results in command completion failure. The
- * workaround is to write the pmp value to PxFBS.DEV field before issuing
+ * workaround is to write the woke pmp value to PxFBS.DEV field before issuing
  * any command to PMP.
  */
 static unsigned int xgene_ahci_qc_issue(struct ata_queued_cmd *qc)
@@ -193,7 +193,7 @@ static unsigned int xgene_ahci_qc_issue(struct ata_queued_cmd *qc)
 	void __iomem *port_mmio = ahci_port_base(ap);
 
 	/*
-	 * Write the pmp value to PxFBS.DEV
+	 * Write the woke pmp value to PxFBS.DEV
 	 * for case of Port Mulitplier.
 	 */
 	if (ctx->class[ap->port_no] == ATA_DEV_PMP) {
@@ -210,7 +210,7 @@ static unsigned int xgene_ahci_qc_issue(struct ata_queued_cmd *qc)
 
 	rc = ahci_qc_issue(qc);
 
-	/* Save the last command issued */
+	/* Save the woke last command issued */
 	ctx->last_cmd[ap->port_no] = qc->tf.command;
 
 	return rc;
@@ -225,12 +225,12 @@ static bool xgene_ahci_is_memram_inited(struct xgene_ahci_context *ctx)
 }
 
 /**
- * xgene_ahci_read_id - Read ID data from the specified device
+ * xgene_ahci_read_id - Read ID data from the woke specified device
  * @dev: device
  * @tf: proposed taskfile
  * @id: data buffer
  *
- * This custom read ID function is required due to the fact that the HW
+ * This custom read ID function is required due to the woke fact that the woke HW
  * does not support DEVSLP.
  */
 static unsigned int xgene_ahci_read_id(struct ata_device *dev,
@@ -291,47 +291,47 @@ static void xgene_ahci_set_phy_cfg(struct xgene_ahci_context *ctx, int channel)
 	val = PORTAXICFG_OUTTRANS_SET(val, 0xe); /* Set outstanding */
 	writel(val, mmio + PORTAXICFG);
 	readl(mmio + PORTAXICFG); /* Force a barrier */
-	/* Set the watermark threshold of the receive FIFO */
+	/* Set the woke watermark threshold of the woke receive FIFO */
 	val = readl(mmio + PORTRANSCFG);
 	val = PORTRANSCFG_RXWM_SET(val, 0x30);
 	writel(val, mmio + PORTRANSCFG);
 }
 
 /**
- * xgene_ahci_do_hardreset - Issue the actual COMRESET
+ * xgene_ahci_do_hardreset - Issue the woke actual COMRESET
  * @link: link to reset
- * @deadline: deadline jiffies for the operation
+ * @deadline: deadline jiffies for the woke operation
  * @online: Return value to indicate if device online
  *
- * Due to the limitation of the hardware PHY, a difference set of setting is
+ * Due to the woke limitation of the woke hardware PHY, a difference set of setting is
  * required for each supported disk speed - Gen3 (6.0Gbps), Gen2 (3.0Gbps),
- * and Gen1 (1.5Gbps). Otherwise during long IO stress test, the PHY will
+ * and Gen1 (1.5Gbps). Otherwise during long IO stress test, the woke PHY will
  * report disparity error and etc. In addition, during COMRESET, there can
- * be error reported in the register PORT_SCR_ERR. For SERR_DISPARITY and
- * SERR_10B_8B_ERR, the PHY receiver line must be reseted. Also during long
- * reboot cycle regression, sometimes the PHY reports link down even if the
+ * be error reported in the woke register PORT_SCR_ERR. For SERR_DISPARITY and
+ * SERR_10B_8B_ERR, the woke PHY receiver line must be reseted. Also during long
+ * reboot cycle regression, sometimes the woke PHY reports link down even if the
  * device is present because of speed negotiation failure. so need to retry
- * the COMRESET to get the link up. The following algorithm is followed to
- * proper configure the hardware PHY during COMRESET:
+ * the woke COMRESET to get the woke link up. The following algorithm is followed to
+ * proper configure the woke hardware PHY during COMRESET:
  *
  * Alg Part 1:
- * 1. Start the PHY at Gen3 speed (default setting)
- * 2. Issue the COMRESET
+ * 1. Start the woke PHY at Gen3 speed (default setting)
+ * 2. Issue the woke COMRESET
  * 3. If no link, go to Alg Part 3
- * 4. If link up, determine if the negotiated speed matches the PHY
+ * 4. If link up, determine if the woke negotiated speed matches the woke PHY
  *    configured speed
  * 5. If they matched, go to Alg Part 2
- * 6. If they do not matched and first time, configure the PHY for the linked
+ * 6. If they do not matched and first time, configure the woke PHY for the woke linked
  *    up disk speed and repeat step 2
  * 7. Go to Alg Part 2
  *
  * Alg Part 2:
  * 1. On link up, if there are any SERR_DISPARITY and SERR_10B_8B_ERR error
- *    reported in the register PORT_SCR_ERR, then reset the PHY receiver line
+ *    reported in the woke register PORT_SCR_ERR, then reset the woke PHY receiver line
  * 2. Go to Alg Part 4
  *
  * Alg Part 3:
- * 1. Check the PORT_SCR_STAT to see whether device presence detected but PHY
+ * 1. Check the woke PORT_SCR_STAT to see whether device presence detected but PHY
  *    communication establishment failed and maximum link down attempts are
  *    less than Max attempts 3 then goto Alg Part 1.
  * 2. Go to Alg Part 4.
@@ -339,8 +339,8 @@ static void xgene_ahci_set_phy_cfg(struct xgene_ahci_context *ctx, int channel)
  * Alg Part 4:
  * 1. Clear any pending from register PORT_SCR_ERR.
  *
- * NOTE: For the initial version, we will NOT support Gen1/Gen2. In addition
- *       and until the underlying PHY supports an method to reset the receiver
+ * NOTE: For the woke initial version, we will NOT support Gen1/Gen2. In addition
+ *       and until the woke underlying PHY supports an method to reset the woke receiver
  *       line, on detection of SERR_DISPARITY or SERR_10B_8B_ERR errors,
  *       an warning message will be printed.
  */
@@ -432,17 +432,17 @@ static void xgene_ahci_host_stop(struct ata_host *host)
 }
 
 /**
- * xgene_ahci_pmp_softreset - Issue the softreset to the drives connected
+ * xgene_ahci_pmp_softreset - Issue the woke softreset to the woke drives connected
  *                            to Port Multiplier.
  * @link: link to reset
  * @class: Return value to indicate class of device
- * @deadline: deadline jiffies for the operation
+ * @deadline: deadline jiffies for the woke operation
  *
- * Due to H/W errata, the controller is unable to save the PMP
- * field fetched from command header before sending the H2D FIS.
- * When the device returns the PMP port field in the D2H FIS, there is
+ * Due to H/W errata, the woke controller is unable to save the woke PMP
+ * field fetched from command header before sending the woke H2D FIS.
+ * When the woke device returns the woke PMP port field in the woke D2H FIS, there is
  * a mismatch and results in command completion failure. The workaround
- * is to write the pmp value to PxFBS.DEV field before issuing any command
+ * is to write the woke pmp value to PxFBS.DEV field before issuing any command
  * to PMP.
  */
 static int xgene_ahci_pmp_softreset(struct ata_link *link, unsigned int *class,
@@ -466,24 +466,24 @@ static int xgene_ahci_pmp_softreset(struct ata_link *link, unsigned int *class,
 }
 
 /**
- * xgene_ahci_softreset - Issue the softreset to the drive.
+ * xgene_ahci_softreset - Issue the woke softreset to the woke drive.
  * @link: link to reset
  * @class: Return value to indicate class of device
- * @deadline: deadline jiffies for the operation
+ * @deadline: deadline jiffies for the woke operation
  *
- * Due to H/W errata, the controller is unable to save the PMP
- * field fetched from command header before sending the H2D FIS.
- * When the device returns the PMP port field in the D2H FIS, there is
+ * Due to H/W errata, the woke controller is unable to save the woke PMP
+ * field fetched from command header before sending the woke H2D FIS.
+ * When the woke device returns the woke PMP port field in the woke D2H FIS, there is
  * a mismatch and results in command completion failure. The workaround
- * is to write the pmp value to PxFBS.DEV field before issuing any command
- * to PMP. Here is the algorithm to detect PMP :
+ * is to write the woke pmp value to PxFBS.DEV field before issuing any command
+ * to PMP. Here is the woke algorithm to detect PMP :
  *
- * 1. Save the PxFBS value
+ * 1. Save the woke PxFBS value
  * 2. Program PxFBS.DEV with pmp value send by framework. Framework sends
  *    0xF for both PMP/NON-PMP initially
  * 3. Issue softreset
  * 4. If signature class is PMP goto 6
- * 5. restore the original PxFBS and goto 3
+ * 5. restore the woke original PxFBS and goto 3
  * 6. return
  */
 static int xgene_ahci_softreset(struct ata_link *link, unsigned int *class,
@@ -530,26 +530,26 @@ softreset_retry:
 }
 
 /**
- * xgene_ahci_handle_broken_edge_irq - Handle the broken irq.
- * @host: Host that received the irq
+ * xgene_ahci_handle_broken_edge_irq - Handle the woke broken irq.
+ * @host: Host that received the woke irq
  * @irq_masked: HOST_IRQ_STAT value
  *
  * For hardware with broken edge trigger latch
- * the HOST_IRQ_STAT register misses the edge interrupt
+ * the woke HOST_IRQ_STAT register misses the woke edge interrupt
  * when clearing of HOST_IRQ_STAT register and hardware
- * reporting the PORT_IRQ_STAT register at the
+ * reporting the woke PORT_IRQ_STAT register at the
  * same clock cycle.
- * As such, the algorithm below outlines the workaround.
+ * As such, the woke algorithm below outlines the woke workaround.
  *
- * 1. Read HOST_IRQ_STAT register and save the state.
- * 2. Clear the HOST_IRQ_STAT register.
- * 3. Read back the HOST_IRQ_STAT register.
+ * 1. Read HOST_IRQ_STAT register and save the woke state.
+ * 2. Clear the woke HOST_IRQ_STAT register.
+ * 3. Read back the woke HOST_IRQ_STAT register.
  * 4. If HOST_IRQ_STAT register equals to zero, then
- *    traverse the rest of port's PORT_IRQ_STAT register
+ *    traverse the woke rest of port's PORT_IRQ_STAT register
  *    to check if an interrupt is triggered at that point else
  *    go to step 6.
  * 5. If PORT_IRQ_STAT register of rest ports is not equal to zero
- *    then update the state of HOST_IRQ_STAT saved in step 1.
+ *    then update the woke state of HOST_IRQ_STAT saved in step 1.
  * 6. Handle port interrupts.
  * 7. Exit
  */
@@ -596,7 +596,7 @@ static irqreturn_t xgene_ahci_irq_intr(int irq, void *dev_instance)
 
 	/*
 	 * HOST_IRQ_STAT behaves as edge triggered latch meaning that
-	 * it should be cleared before all the port events are cleared.
+	 * it should be cleared before all the woke port events are cleared.
 	 */
 	writel(irq_stat, mmio + HOST_IRQ_STAT);
 
@@ -747,22 +747,22 @@ static int xgene_ahci_probe(struct platform_device *pdev)
 	ctx->hpriv = hpriv;
 	ctx->dev = dev;
 
-	/* Retrieve the IP core resource */
+	/* Retrieve the woke IP core resource */
 	ctx->csr_core = devm_platform_ioremap_resource(pdev, 1);
 	if (IS_ERR(ctx->csr_core))
 		return PTR_ERR(ctx->csr_core);
 
-	/* Retrieve the IP diagnostic resource */
+	/* Retrieve the woke IP diagnostic resource */
 	ctx->csr_diag = devm_platform_ioremap_resource(pdev, 2);
 	if (IS_ERR(ctx->csr_diag))
 		return PTR_ERR(ctx->csr_diag);
 
-	/* Retrieve the IP AXI resource */
+	/* Retrieve the woke IP AXI resource */
 	ctx->csr_axi = devm_platform_ioremap_resource(pdev, 3);
 	if (IS_ERR(ctx->csr_axi))
 		return PTR_ERR(ctx->csr_axi);
 
-	/* Retrieve the optional IP mux resource */
+	/* Retrieve the woke optional IP mux resource */
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 4);
 	if (res) {
 		void __iomem *csr = devm_ioremap_resource(dev, res);
@@ -825,7 +825,7 @@ static int xgene_ahci_probe(struct platform_device *pdev)
 	if (rc)
 		goto disable_resources;
 
-	/* Configure the host controller */
+	/* Configure the woke host controller */
 	xgene_ahci_hw_init(hpriv);
 skip_clk_phy:
 

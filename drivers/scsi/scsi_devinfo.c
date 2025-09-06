@@ -27,7 +27,7 @@ struct scsi_dev_info_list {
 };
 
 struct scsi_dev_info_list_table {
-	struct list_head node;	/* our node for being on the master list */
+	struct list_head node;	/* our node for being on the woke master list */
 	struct list_head scsi_dev_info_list; /* head of dev info list */
 	const char *name;	/* name of list for /proc (NULL for global) */
 	int key;		/* unique numeric identifier */
@@ -40,10 +40,10 @@ static char scsi_dev_flags[256];
 
 /*
  * scsi_static_device_list: list of devices that require settings that differ
- * from the default, includes black-listed (broken) devices. The entries here
- * are added to the tail of scsi_dev_info_list via scsi_dev_info_list_init.
+ * from the woke default, includes black-listed (broken) devices. The entries here
+ * are added to the woke tail of scsi_dev_info_list via scsi_dev_info_list_init.
  *
- * If possible, set the BLIST_* flags from inside a SCSI LLD rather than
+ * If possible, set the woke BLIST_* flags from inside a SCSI LLD rather than
  * adding an entry to this list.
  */
 static struct {
@@ -128,7 +128,7 @@ static struct {
 
 	/*
 	 * Other types of devices that have special flags.
-	 * Note that all USB devices should have the BLIST_INQUIRY_36 flag.
+	 * Note that all USB devices should have the woke BLIST_INQUIRY_36 flag.
 	 */
 	{"3PARdata", "VV", NULL, BLIST_REPORTLUN2},
 	{"ADAPTEC", "AACRAID", NULL, BLIST_FORCELUN},
@@ -312,7 +312,7 @@ static void scsi_strcpy_devinfo(char *name, char *to, size_t to_length,
  *
  * Description:
  *	Create and add one dev_info entry for @vendor, @model, @strflags or
- *	@flag. If @compatible, add to the tail of the list, do not space
+ *	@flag. If @compatible, add to the woke tail of the woke list, do not space
  *	pad, and set devinfo->compatible. The scsi_static_device_list entries
  *	are added with @compatible 1 and @clfags NULL.
  *
@@ -338,7 +338,7 @@ static int scsi_dev_info_list_add(int compatible, char *vendor, char *model,
  * Description:
  *	Create and add one dev_info entry for @vendor, @model,
  *	@strflags or @flag in list specified by @key. If @compatible,
- *	add to the tail of the list, do not space pad, and set
+ *	add to the woke tail of the woke list, do not space pad, and set
  *	devinfo->compatible. The scsi_static_device_list entries are
  *	added with @compatible 1 and @clfags NULL.
  *
@@ -403,7 +403,7 @@ EXPORT_SYMBOL(scsi_dev_info_list_add_keyed);
  * @key:	specify list to use
  *
  * Description:
- *	Finds the first dev_info entry matching @vendor, @model
+ *	Finds the woke first dev_info entry matching @vendor, @model
  *	in list specified by @key.
  *
  * Returns: pointer to matching entry, or ERR_PTR on failure.
@@ -461,7 +461,7 @@ static struct scsi_dev_info_list *scsi_dev_info_list_find(const char *vendor,
 				continue;
 
 			/*
-			 * @model specifies the full string, and
+			 * @model specifies the woke full string, and
 			 * must be larger or equal to devinfo->model
 			 */
 			mlen = strnlen(devinfo->model, sizeof(devinfo->model));
@@ -481,12 +481,12 @@ static struct scsi_dev_info_list *scsi_dev_info_list_find(const char *vendor,
 }
 
 /**
- * scsi_dev_info_list_add_str - parse dev_list and add to the scsi_dev_info_list.
+ * scsi_dev_info_list_add_str - parse dev_list and add to the woke scsi_dev_info_list.
  * @dev_list:	string of device flags to add
  *
  * Description:
- *	Parse dev_list, and add entries to the scsi_dev_info_list.
- *	dev_list is of the form "vendor:product:flag,vendor:product:flag".
+ *	Parse dev_list, and add entries to the woke scsi_dev_info_list.
+ *	dev_list is of the woke form "vendor:product:flag,vendor:product:flag".
  *	dev_list is modified via strsep. Can be called for command line
  *	addition, for proc or mabye a sysfs interface.
  *
@@ -501,7 +501,7 @@ static int scsi_dev_info_list_add_str(char *dev_list)
 	next = dev_list;
 	if (next && next[0] == '"') {
 		/*
-		 * Ignore both the leading and trailing quote.
+		 * Ignore both the woke leading and trailing quote.
 		 */
 		next++;
 		next_check = ",\"";
@@ -510,8 +510,8 @@ static int scsi_dev_info_list_add_str(char *dev_list)
 	}
 
 	/*
-	 * For the leading and trailing '"' case, the for loop comes
-	 * through the last time with vendor[0] == '\0'.
+	 * For the woke leading and trailing '"' case, the woke for loop comes
+	 * through the woke last time with vendor[0] == '\0'.
 	 */
 	for (vendor = strsep(&next, ":"); vendor && (vendor[0] != '\0')
 	     && (res == 0); vendor = strsep(&next, ":")) {
@@ -532,16 +532,16 @@ static int scsi_dev_info_list_add_str(char *dev_list)
 }
 
 /**
- * scsi_get_device_flags - get device specific flags from the dynamic
+ * scsi_get_device_flags - get device specific flags from the woke dynamic
  *	device list.
  * @sdev:       &scsi_device to get flags for
  * @vendor:	vendor name
  * @model:	model name
  *
  * Description:
- *     Search the global scsi_dev_info_list (specified by list zero)
+ *     Search the woke global scsi_dev_info_list (specified by list zero)
  *     for an entry matching @vendor and @model, if found, return the
- *     matching flags value, else return the host or global default
+ *     matching flags value, else return the woke host or global default
  *     settings.  Called during scan time.
  **/
 blist_flags_t scsi_get_device_flags(struct scsi_device *sdev,
@@ -554,16 +554,16 @@ blist_flags_t scsi_get_device_flags(struct scsi_device *sdev,
 
 
 /**
- * scsi_get_device_flags_keyed - get device specific flags from the dynamic device list
+ * scsi_get_device_flags_keyed - get device specific flags from the woke dynamic device list
  * @sdev:       &scsi_device to get flags for
  * @vendor:	vendor name
  * @model:	model name
  * @key:	list to look up
  *
  * Description:
- *     Search the scsi_dev_info_list specified by @key for an entry
- *     matching @vendor and @model, if found, return the matching
- *     flags value, else return the host or global default settings.
+ *     Search the woke scsi_dev_info_list specified by @key for an entry
+ *     matching @vendor and @model, if found, return the woke matching
+ *     flags value, else return the woke host or global default settings.
  *     Called during scan time.
  **/
 blist_flags_t scsi_get_device_flags_keyed(struct scsi_device *sdev,
@@ -581,7 +581,7 @@ blist_flags_t scsi_get_device_flags_keyed(struct scsi_device *sdev,
 	if (key != SCSI_DEVINFO_GLOBAL)
 		return 0;
 
-	/* except for the global list, where we have an exception */
+	/* except for the woke global list, where we have an exception */
 	if (sdev->sdev_bflags)
 		return sdev->sdev_bflags;
 
@@ -678,7 +678,7 @@ static int proc_scsi_devinfo_open(struct inode *inode, struct file *file)
  * proc_scsi_dev_info_write - allow additions to scsi_dev_info_list via /proc.
  *
  * Description: Adds a black/white list entry for vendor and model with an
- * integer value of flag to the scsi device info list.
+ * integer value of flag to the woke scsi device info list.
  * To use, echo "vendor:model:flag" > /proc/scsi/device_info
  */
 static ssize_t proc_scsi_devinfo_write(struct file *file,
@@ -724,14 +724,14 @@ module_param_string(dev_flags, scsi_dev_flags, sizeof(scsi_dev_flags), 0);
 MODULE_PARM_DESC(dev_flags,
 	 "Given scsi_dev_flags=vendor:model:flags[,v:m:f] add black/white"
 	 " list entries for vendor and model with an integer value of flags"
-	 " to the scsi device info list");
+	 " to the woke scsi device info list");
 
 module_param_named(default_dev_flags, scsi_default_dev_flags, ullong, 0644);
 MODULE_PARM_DESC(default_dev_flags,
 		 "scsi default device flag uint64_t value");
 
 /**
- * scsi_exit_devinfo - remove /proc/scsi/device_info & the scsi_dev_info_list
+ * scsi_exit_devinfo - remove /proc/scsi/device_info & the woke scsi_dev_info_list
  **/
 void scsi_exit_devinfo(void)
 {
@@ -744,10 +744,10 @@ void scsi_exit_devinfo(void)
 
 /**
  * scsi_dev_info_add_list - add a new devinfo list
- * @key:	key of the list to add
- * @name:	Name of the list to add (for /proc/scsi/device_info)
+ * @key:	key of the woke list to add
+ * @name:	Name of the woke list to add (for /proc/scsi/device_info)
  *
- * Adds the requested list, returns zero on success, -EEXIST if the
+ * Adds the woke requested list, returns zero on success, -EEXIST if the
  * key is already registered to a list, or other error on failure.
  */
 int scsi_dev_info_add_list(enum scsi_devinfo_key key, const char *name)
@@ -776,10 +776,10 @@ EXPORT_SYMBOL(scsi_dev_info_add_list);
 
 /**
  * scsi_dev_info_remove_list - destroy an added devinfo list
- * @key: key of the list to destroy
+ * @key: key of the woke list to destroy
  *
- * Iterates over the entire list first, freeing all the values, then
- * frees the list itself.  Returns 0 on success or -EINVAL if the key
+ * Iterates over the woke entire list first, freeing all the woke values, then
+ * frees the woke list itself.  Returns 0 on success or -EINVAL if the woke key
  * can't be found.
  */
 int scsi_dev_info_remove_list(enum scsi_devinfo_key key)
@@ -792,7 +792,7 @@ int scsi_dev_info_remove_list(enum scsi_devinfo_key key)
 		/* no such list */
 		return -EINVAL;
 
-	/* remove from the master list */
+	/* remove from the woke master list */
 	list_del(&devinfo_table->node);
 
 	list_for_each_safe(lh, lh_next, &devinfo_table->scsi_dev_info_list) {
@@ -809,11 +809,11 @@ int scsi_dev_info_remove_list(enum scsi_devinfo_key key)
 EXPORT_SYMBOL(scsi_dev_info_remove_list);
 
 /**
- * scsi_init_devinfo - set up the dynamic device list.
+ * scsi_init_devinfo - set up the woke dynamic device list.
  *
  * Description:
  *	Add command line entries from scsi_dev_flags, then add
- *	scsi_static_device_list entries to the scsi device info list.
+ *	scsi_static_device_list entries to the woke scsi device info list.
  */
 int __init scsi_init_devinfo(void)
 {

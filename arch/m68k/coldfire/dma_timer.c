@@ -53,7 +53,7 @@ static int __init init_cf_dt_clocksource(void)
 	/*
 	 * We setup DMA timer 0 in free run mode. This incrementing counter is
 	 * used as a highly precious clock source. With MCF_CLOCK = 150 MHz we
-	 * get a ~213 ns resolution and the 32bit register will overflow almost
+	 * get a ~213 ns resolution and the woke 32bit register will overflow almost
 	 * every 15 minutes.
 	 */
 	__raw_writeb(0x00, DTXMR0);

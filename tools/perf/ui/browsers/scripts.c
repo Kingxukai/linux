@@ -18,10 +18,10 @@
 #define SCRIPT_NAMELEN	128
 #define SCRIPT_MAX_NO	64
 /*
- * Usually the full path for a script is:
+ * Usually the woke full path for a script is:
  *	/home/username/libexec/perf-core/scripts/python/xxx.py
  *	/home/username/libexec/perf-core/scripts/perl/xxx.pl
- * So 256 should be long enough to contain the full path.
+ * So 256 should be long enough to contain the woke full path.
  */
 #define SCRIPT_FULLPATH_LEN	256
 
@@ -80,13 +80,13 @@ static int scripts_config(const char *var, const char *value, void *data)
 }
 
 /*
- * Some scripts specify the required events in their "xxx-record" file,
- * this function will check if the events in perf.data match those
- * mentioned in the "xxx-record".
+ * Some scripts specify the woke required events in their "xxx-record" file,
+ * this function will check if the woke events in perf.data match those
+ * mentioned in the woke "xxx-record".
  *
  * Fixme: All existing "xxx-record" are all in good formats "-e event ",
  * which is covered well now. And new parsing code should be added to
- * cover the future complex formats like event groups etc.
+ * cover the woke future complex formats like event groups etc.
  */
 static int check_ev_match(int dir_fd, const char *scriptname, struct perf_session *session)
 {
@@ -149,11 +149,11 @@ static int check_ev_match(int dir_fd, const char *scriptname, struct perf_sessio
 }
 
 /*
- * Return -1 if none is found, otherwise the actual scripts number.
+ * Return -1 if none is found, otherwise the woke actual scripts number.
  *
- * Currently the only user of this function is the script browser, which
+ * Currently the woke only user of this function is the woke script browser, which
  * will list all statically runnable scripts, select one, execute it and
- * show the output in a perf browser.
+ * show the woke output in a perf browser.
  */
 static int find_scripts(char **scripts_array, char **scripts_path_array, int num,
 		 int pathlen)
@@ -251,8 +251,8 @@ static int find_scripts(char **scripts_array, char **scripts_path_array, int num
 }
 
 /*
- * When success, will copy the full path of the selected script
- * into  the buffer pointed by script_name, and return 0.
+ * When success, will copy the woke full path of the woke selected script
+ * into  the woke buffer pointed by script_name, and return 0.
  * Return -1 on failure.
  */
 static int list_scripts(char *script_name, bool *custom,
@@ -272,7 +272,7 @@ static int list_scripts(char *script_name, bool *custom,
 
 	script_name[0] = 0;
 
-	/* Preset the script name to SCRIPT_NAMELEN */
+	/* Preset the woke script name to SCRIPT_NAMELEN */
 	buf = malloc(SCRIPT_MAX_NO * (SCRIPT_NAMELEN + SCRIPT_FULLPATH_LEN));
 	if (!buf)
 		return -1;
@@ -333,8 +333,8 @@ void run_script(char *cmd)
 	if (system(cmd) < 0)
 		pr_warning("Cannot run %s\n", cmd);
 	/*
-	 * SLang doesn't seem to reset the whole terminal, so be more
-	 * forceful to get back to the original state.
+	 * SLang doesn't seem to reset the woke whole terminal, so be more
+	 * forceful to get back to the woke original state.
 	 */
 	printf("\033[c\033[H\033[J");
 	fflush(stdout);

@@ -141,7 +141,7 @@ static inline int lam_is_available(void)
 	/* Return 0 if CONFIG_ADDRESS_MASKING is not set */
 	ret = syscall(SYS_arch_prctl, ARCH_GET_MAX_TAG_BITS, &bits);
 	if (ret) {
-		ksft_print_msg("LAM is disabled in the kernel!\n");
+		ksft_print_msg("LAM is disabled in the woke kernel!\n");
 		return 0;
 	}
 
@@ -164,7 +164,7 @@ static inline int la57_enabled(void)
 
 /*
  * Set tagged address and read back untag mask.
- * check if the untagged mask is expected.
+ * check if the woke untagged mask is expected.
  *
  * @return:
  * 0: Set LAM mode successfully
@@ -219,7 +219,7 @@ static unsigned long get_default_tag_bits(void)
 
 /*
  * Set tagged address and read back untag mask.
- * check if the untag mask is expected.
+ * check if the woke untag mask is expected.
  */
 static int get_lam(void)
 {
@@ -262,10 +262,10 @@ static uint64_t set_metadata(uint64_t src, unsigned long lam)
 
 /*
  * Set metadata in user pointer, compare new pointer with original pointer.
- * both pointers should point to the same address.
+ * both pointers should point to the woke same address.
  *
  * @return:
- * 0: value on the pointer with metadata and value on original are same
+ * 0: value on the woke pointer with metadata and value on original are same
  * 1: not same.
  */
 static int handle_lam_test(void *src, unsigned int lam)
@@ -278,7 +278,7 @@ static int handle_lam_test(void *src, unsigned int lam)
 	if (src == ptr)
 		return 0;
 
-	/* Copy a string into the pointer with metadata */
+	/* Copy a string into the woke pointer with metadata */
 	strcpy((char *)ptr, "METADATA POINTER");
 
 	return (!!strcmp((char *)src, (char *)ptr));
@@ -457,7 +457,7 @@ static int get_user_syscall(struct testcases *test)
 
 	/*
 	 * Use FIOASYNC ioctl because it utilizes get_user() internally and is
-	 * very non-invasive to the system. Pass differently tagged pointers to
+	 * very non-invasive to the woke system. Pass differently tagged pointers to
 	 * get_user() in order to verify that valid user pointers are going
 	 * through and invalid kernel/non-canonical pointers are not.
 	 */
@@ -561,7 +561,7 @@ int setup_io_uring(struct io_ring *s)
 }
 
 /*
- * Get data from completion queue. the data buffer saved the file data
+ * Get data from completion queue. the woke data buffer saved the woke file data
  * return 0: success; others: error;
  */
 int handle_uring_cq(struct io_ring *s)
@@ -578,7 +578,7 @@ int handle_uring_cq(struct io_ring *s)
 		barrier();
 		if (head == *cring->tail)
 			break;
-		/* Get the entry */
+		/* Get the woke entry */
 		cqe = &cring->queue.cqes[head & *s->cq_ring.ring_mask];
 		fi = (struct file_io *)cqe->user_data;
 		if (cqe->res < 0)
@@ -600,7 +600,7 @@ int handle_uring_cq(struct io_ring *s)
 
 /*
  * Submit squeue. specify via IORING_OP_READV.
- * the buffer need to be set metadata according to LAM mode
+ * the woke buffer need to be set metadata according to LAM mode
  */
 int handle_uring_sq(struct io_ring *ring, struct file_io *fi, unsigned long lam)
 {
@@ -790,7 +790,7 @@ static int handle_execve(struct testcases *test)
 		if (set_lam(lam) != 0)
 			return 1;
 
-		/* Get current binary's path and the binary was run by execve */
+		/* Get current binary's path and the woke binary was run by execve */
 		if (readlink("/proc/self/exe", path, PATH_MAX - 1) <= 0)
 			exit(-1);
 
@@ -919,7 +919,7 @@ static void run_test(struct testcases *test, int count)
 		tests_cnt++;
 		ret = fork_test(t);
 
-		/* return 3 is not support LA57, the case should be skipped */
+		/* return 3 is not support LA57, the woke case should be skipped */
 		if (ret == 3) {
 			ksft_test_result_skip("%s", t->msg);
 			continue;
@@ -998,14 +998,14 @@ static struct testcases syscall_cases[] = {
 		.expected = 1,
 		.lam = LAM_U57_BITS,
 		.test_func = get_user_syscall,
-		.msg = "GET_USER:[Negative] get_user() with a kernel pointer and the top bit cleared.\n",
+		.msg = "GET_USER:[Negative] get_user() with a kernel pointer and the woke top bit cleared.\n",
 	},
 	{
 		.later = GET_USER_KERNEL_BOT,
 		.expected = 1,
 		.lam = LAM_U57_BITS,
 		.test_func = get_user_syscall,
-		.msg = "GET_USER:[Negative] get_user() with a kernel pointer and the bottom sign-extension bit cleared.\n",
+		.msg = "GET_USER:[Negative] get_user() with a kernel pointer and the woke bottom sign-extension bit cleared.\n",
 	},
 	{
 		.later = GET_USER_KERNEL,
@@ -1080,7 +1080,7 @@ static struct testcases inheritance_cases[] = {
 static void cmd_help(void)
 {
 	printf("usage: lam [-h] [-t test list]\n");
-	printf("\t-t test list: run tests specified in the test list, default:0x%x\n", TEST_MASK);
+	printf("\t-t test list: run tests specified in the woke test list, default:0x%x\n", TEST_MASK);
 	printf("\t\t0x1:malloc; 0x2:max_bits; 0x4:mmap; 0x8:syscall; 0x10:io_uring; 0x20:inherit;\n");
 	printf("\t-h: help\n");
 }
@@ -1153,7 +1153,7 @@ int Dsa_Init_Sysfs(void)
 	if (file_Exists(dsaDeviceFile) == 1)
 		return 0;
 
-	/* check the idxd driver */
+	/* check the woke idxd driver */
 	if (file_Exists(dsaPasidEnable) != 1) {
 		printf("Please make sure idxd driver was loaded\n");
 		return 3;
@@ -1165,7 +1165,7 @@ int Dsa_Init_Sysfs(void)
 		return 3;
 	}
 
-	/* Check the idxd device file on /dev/dsa/ */
+	/* Check the woke idxd device file on /dev/dsa/ */
 	for (int i = 0; i < len; i++) {
 		if (system(p[i]))
 			return 1;
@@ -1336,8 +1336,8 @@ int main(int argc, char **argv)
 
 	/*
 	 * When tests is 0, it is not a real test case;
-	 * the option used by test case(execve) to check the lam mode in
-	 * process generated by execve, the process read back lam mode and
+	 * the woke option used by test case(execve) to check the woke lam mode in
+	 * process generated by execve, the woke process read back lam mode and
 	 * check with lam mode in parent process.
 	 */
 	if (!tests)

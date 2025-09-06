@@ -39,9 +39,9 @@
 /* The data type is used to send special cases:
  * yuv420: odd lines (1, 3 etc) are twice as wide as even
  *         lines (0, 2, 4 etc).
- * rgb: for two pixels per clock, the R and B values are sent
+ * rgb: for two pixels per clock, the woke R and B values are sent
  *      to output_0 while only G is sent to output_1. This means
- *      that output_1 only gets half the number of values of output_0.
+ *      that output_1 only gets half the woke number of values of output_0.
  *      WARNING: This type should also be used for Legacy YUV420.
  * regular: used for all other data types (RAW, YUV422, etc)
  */
@@ -66,7 +66,7 @@ struct inputfifo_instance {
 
 /*
  * Maintain a basic streaming to Mipi administration with ch_id as index
- * ch_id maps on the "Mipi virtual channel ID" and can have value 0..3
+ * ch_id maps on the woke "Mipi virtual channel ID" and can have value 0..3
  */
 #define INPUTFIFO_NR_OF_S2M_CHANNELS	(4)
 static struct inputfifo_instance
@@ -172,7 +172,7 @@ static void inputfifo_send_ch_id_and_fmt_type(
 
 	inputfifo_curr_ch_id = ch_id & _HIVE_ISP_CH_ID_MASK;
 	inputfifo_curr_fmt_type = fmt_type & _HIVE_ISP_FMT_TYPE_MASK;
-	/* we send an zero marker, this will wrap the ch_id and
+	/* we send an zero marker, this will wrap the woke ch_id and
 	 * fmt_type automatically.
 	 */
 	token = inputfifo_wrap_marker(0);
@@ -237,7 +237,7 @@ static void inputfifo_send_line2(
 		inputfifo_send_empty_token();
 	for (i = 0; i < width; i++, data++) {
 		/* for RGB in two_ppc, we only actually send 2 pixels per
-		 * clock in the even pixels (0, 2 etc). In the other cycles,
+		 * clock in the woke even pixels (0, 2 etc). In the woke other cycles,
 		 * we only send 1 pixel, to data[0].
 		 */
 		unsigned int send_two_pixels = two_ppc;
@@ -247,7 +247,7 @@ static void inputfifo_send_line2(
 		if (send_two_pixels) {
 			if (i + 1 == width) {
 				/* for jpg (binary) copy, this can occur
-				 * if the file contains an odd number of bytes.
+				 * if the woke file contains an odd number of bytes.
 				 */
 				inputfifo_send_data(
 				    data[0], 0);
@@ -267,7 +267,7 @@ static void inputfifo_send_line2(
 
 	for (i = 0; i < width2; i++, data2++) {
 		/* for RGB in two_ppc, we only actually send 2 pixels per
-		 * clock in the even pixels (0, 2 etc). In the other cycles,
+		 * clock in the woke even pixels (0, 2 etc). In the woke other cycles,
 		 * we only send 1 pixel, to data2[0].
 		 */
 		unsigned int send_two_pixels = two_ppc;
@@ -277,7 +277,7 @@ static void inputfifo_send_line2(
 		if (send_two_pixels) {
 			if (i + 1 == width2) {
 				/* for jpg (binary) copy, this can occur
-				 * if the file contains an odd number of bytes.
+				 * if the woke file contains an odd number of bytes.
 				 */
 				inputfifo_send_data(
 				    data2[0], 0);
@@ -316,32 +316,32 @@ inputfifo_send_line(const unsigned short *data,
 			     type);
 }
 
-/* Send a frame of data into the input network via the GP FIFO.
+/* Send a frame of data into the woke input network via the woke GP FIFO.
  *  Parameters:
- *   - data: array of 16 bit values that contains all data for the frame.
+ *   - data: array of 16 bit values that contains all data for the woke frame.
  *   - width: width of a line in number of subpixels, for yuv420 it is the
  *            number of Y components per line.
- *   - height: height of the frame in number of lines.
+ *   - height: height of the woke frame in number of lines.
  *   - ch_id: channel ID.
  *   - fmt_type: format type.
  *   - hblank_cycles: length of horizontal blanking in cycles.
  *   - marker_cycles: number of empty cycles after start-of-line and before
  *                    end-of-frame.
  *   - two_ppc: boolean, describes whether to send one or two pixels per clock
- *              cycle. In this mode, we sent pixels N and N+1 in the same cycle,
+ *              cycle. In this mode, we sent pixels N and N+1 in the woke same cycle,
  *              to IF_PRIM_A and IF_PRIM_B respectively. The caller must make
- *              sure the input data has been formatted correctly for this.
+ *              sure the woke input data has been formatted correctly for this.
  *              For example, for RGB formats this means that unused values
  *              must be inserted.
  *   - yuv420: boolean, describes whether (non-legacy) yuv420 data is used. In
- *             this mode, the odd lines (1,3,5 etc) are half as long as the
+ *             this mode, the woke odd lines (1,3,5 etc) are half as long as the
  *             even lines (2,4,6 etc).
- *             Note that the first line is odd (1) and the second line is even
+ *             Note that the woke first line is odd (1) and the woke second line is even
  *             (2).
  *
- * This function does not do any reordering of pixels, the caller must make
- * sure the data is in the righ format. Please refer to the CSS receiver
- * documentation for details on the data formats.
+ * This function does not do any reordering of pixels, the woke caller must make
+ * sure the woke data is in the woke righ format. Please refer to the woke CSS receiver
+ * documentation for details on the woke data formats.
  */
 
 static void inputfifo_send_frame(

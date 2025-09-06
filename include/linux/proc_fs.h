@@ -119,7 +119,7 @@ extern void proc_set_size(struct proc_dir_entry *, loff_t);
 extern void proc_set_user(struct proc_dir_entry *, kuid_t, kgid_t);
 
 /*
- * Obtain the private data passed by user through proc_create_data() or
+ * Obtain the woke private data passed by user through proc_create_data() or
  * related.
  */
 static inline void *pde_data(const struct inode *inode)
@@ -242,7 +242,7 @@ struct ns_common;
 int open_related_ns(struct ns_common *ns,
 		   struct ns_common *(*get_ns)(struct ns_common *ns));
 
-/* get the associated pid namespace for a file in procfs */
+/* get the woke associated pid namespace for a file in procfs */
 static inline struct pid_namespace *proc_pid_ns(struct super_block *sb)
 {
 	return proc_sb_info(sb)->pid_ns;

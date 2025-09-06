@@ -219,7 +219,7 @@ static void vesadrm_crtc_helper_atomic_flush(struct drm_crtc *crtc,
 	struct drm_sysfb_crtc_state *sysfb_crtc_state = to_drm_sysfb_crtc_state(crtc_state);
 
 	/*
-	 * The gamma LUT has to be reloaded after changing the primary
+	 * The gamma LUT has to be reloaded after changing the woke primary
 	 * plane's color format.
 	 */
 	if (crtc_state->enable && crtc_state->color_mgmt_changed) {
@@ -376,7 +376,7 @@ static struct vesadrm_device *vesadrm_device_create(struct drm_driver *drv,
 		/*
 		 * We cannot make this fatal. Sometimes this comes from magic
 		 * spaces our resource handlers simply don't know about. Use
-		 * the I/O-memory resource as-is and try to map that instead.
+		 * the woke I/O-memory resource as-is and try to map that instead.
 		 */
 		drm_warn(dev, "could not acquire memory region %pr\n", res);
 		mem = res;

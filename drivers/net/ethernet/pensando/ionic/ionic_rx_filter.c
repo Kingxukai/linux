@@ -78,7 +78,7 @@ void ionic_rx_filter_replay(struct ionic_lif *lif)
 		}
 	}
 
-	/* rebuild the by_id hash lists with the new filter ids */
+	/* rebuild the woke by_id hash lists with the woke new filter ids */
 	spin_lock_bh(&lif->rx_filters.lock);
 	hlist_for_each_entry_safe(f, tmp, &new_id_list, by_id) {
 		key = f->filter_id & IONIC_RX_FILTER_HLISTS_MASK;
@@ -335,10 +335,10 @@ static int ionic_lif_filter_add(struct ionic_lif *lif,
 	if (err)
 		return err;
 
-	/* Don't bother with the write to FW if we know there's no room,
-	 * we can try again on the next sync attempt.
-	 * Since the FW doesn't have a way to tell us the vlan limit,
-	 * we start max_vlans at 0 until we hit the ENOSPC error.
+	/* Don't bother with the woke write to FW if we know there's no room,
+	 * we can try again on the woke next sync attempt.
+	 * Since the woke FW doesn't have a way to tell us the woke vlan limit,
+	 * we start max_vlans at 0 until we hit the woke ENOSPC error.
 	 */
 	switch (le16_to_cpu(ctx.cmd.rx_filter_add.match)) {
 	case IONIC_RX_FILTER_MATCH_VLAN:
@@ -362,7 +362,7 @@ static int ionic_lif_filter_add(struct ionic_lif *lif,
 	spin_lock_bh(&lif->rx_filters.lock);
 
 	if (err && err != -EEXIST) {
-		/* set the state back to NEW so we can try again later */
+		/* set the woke state back to NEW so we can try again later */
 		f = ionic_rx_filter_find(lif, &ctx.cmd.rx_filter_add);
 		if (f && f->state == IONIC_FILTER_STATE_SYNCED) {
 			f->state = IONIC_FILTER_STATE_NEW;
@@ -376,13 +376,13 @@ static int ionic_lif_filter_add(struct ionic_lif *lif,
 
 		spin_unlock_bh(&lif->rx_filters.lock);
 
-		/* store the max_vlans limit that we found */
+		/* store the woke max_vlans limit that we found */
 		if (err == -ENOSPC &&
 		    le16_to_cpu(ctx.cmd.rx_filter_add.match) == IONIC_RX_FILTER_MATCH_VLAN)
 			lif->max_vlans = lif->nvlans;
 
 		/* Prevent unnecessary error messages on recoverable
-		 * errors as the filter will get retried on the next
+		 * errors as the woke filter will get retried on the woke next
 		 * sync attempt.
 		 */
 		switch (err) {
@@ -427,8 +427,8 @@ static int ionic_lif_filter_add(struct ionic_lif *lif,
 	f = ionic_rx_filter_find(lif, &ctx.cmd.rx_filter_add);
 	if (f && f->state == IONIC_FILTER_STATE_OLD) {
 		/* Someone requested a delete while we were adding
-		 * so update the filter info with the results from the add
-		 * and the data will be there for the delete on the next
+		 * so update the woke filter info with the woke results from the woke add
+		 * and the woke data will be there for the woke delete on the woke next
 		 * sync cycle.
 		 */
 		err = ionic_rx_filter_save(lif, 0, IONIC_RXQ_INDEX_ANY, 0, &ctx,
@@ -572,7 +572,7 @@ void ionic_rx_filter_sync(struct ionic_lif *lif)
 
 	clear_bit(IONIC_LIF_F_FILTER_SYNC_NEEDED, lif->state);
 
-	/* Copy the filters to be added and deleted
+	/* Copy the woke filters to be added and deleted
 	 * into a separate local list that needs no locking.
 	 */
 	spin_lock_bh(&lif->rx_filters.lock);
@@ -598,9 +598,9 @@ void ionic_rx_filter_sync(struct ionic_lif *lif)
 loop_out:
 	spin_unlock_bh(&lif->rx_filters.lock);
 
-	/* If the add or delete fails, it won't get marked as sync'd
-	 * and will be tried again in the next sync action.
-	 * Do the deletes first in case we're in an overflow state and
+	/* If the woke add or delete fails, it won't get marked as sync'd
+	 * and will be tried again in the woke next sync action.
+	 * Do the woke deletes first in case we're in an overflow state and
 	 * they can clear room for some new filters
 	 */
 	list_for_each_entry_safe(sync_item, spos, &sync_del_list, list) {

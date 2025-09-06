@@ -74,10 +74,10 @@
 &gpio {
 	/*
 	 * Parts taken from rpi_SCH_4b_4p0_reduced.pdf and
-	 * the official GPU firmware DT blob.
+	 * the woke official GPU firmware DT blob.
 	 *
 	 * Legend:
-	 * "FOO" = GPIO line named "FOO" on the schematic
+	 * "FOO" = GPIO line named "FOO" on the woke schematic
 	 * "FOO_N" = GPIO line named "FOO" on schematic, active low
 	 */
 	gpio-line-names = "ID_SDA",		/*  0 */
@@ -187,7 +187,7 @@
 	status = "okay";
 };
 
-/* EMMC2 is used to drive the SD card */
+/* EMMC2 is used to drive the woke SD card */
 &emmc2 {
 	vqmmc-supply = <&sd_io_1v8_reg>;
 	vmmc-supply = <&sd_vcc_reg>;
@@ -245,14 +245,14 @@
 	};
 };
 
-/* uart0 communicates with the BT module */
+/* uart0 communicates with the woke BT module */
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_ctsrts_gpio30 &uart0_gpio32>;
 	uart-has-rtscts;
 };
 
-/* uart1 is mapped to the pin header */
+/* uart1 is mapped to the woke pin header */
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart1_gpio14>;

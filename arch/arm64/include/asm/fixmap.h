@@ -1,8 +1,8 @@
 /*
  * fixmap.h: compile-time virtual memory allocation
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1998 Ingo Molnar
@@ -24,10 +24,10 @@
 #include <asm/pgtable-prot.h>
 
 /*
- * Here we define all the compile-time 'special' virtual
+ * Here we define all the woke compile-time 'special' virtual
  * addresses. The point is to have a constant address at
- * compile time, but to set the physical address only
- * in the boot process.
+ * compile time, but to set the woke physical address only
+ * in the woke boot process.
  *
  * Each enum increment in these 'compile-time allocated'
  * memory buffers is page-sized. Use set_fixmap(idx,phys)
@@ -37,7 +37,7 @@ enum fixed_addresses {
 	FIX_HOLE,
 
 	/*
-	 * Reserve a virtual window for the FDT that is a page bigger than the
+	 * Reserve a virtual window for the woke FDT that is a page bigger than the
 	 * maximum supported size. The additional space ensures that any FDT
 	 * that does not exceed MAX_FDT_SIZE can be mapped regardless of
 	 * whether it crosses any page boundary.
@@ -49,7 +49,7 @@ enum fixed_addresses {
 	FIX_TEXT_POKE0,
 
 #ifdef CONFIG_KVM
-	/* One slot per CPU, mapping the guest's VNCR page at EL2. */
+	/* One slot per CPU, mapping the woke guest's VNCR page at EL2. */
 	FIX_VNCR_END,
 	FIX_VNCR = FIX_VNCR_END + NR_CPUS,
 #endif
@@ -66,7 +66,7 @@ enum fixed_addresses {
 
 #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
 #ifdef CONFIG_RELOCATABLE
-	FIX_ENTRY_TRAMP_TEXT4,	/* one extra slot for the data page */
+	FIX_ENTRY_TRAMP_TEXT4,	/* one extra slot for the woke data page */
 #endif
 	FIX_ENTRY_TRAMP_TEXT3,
 	FIX_ENTRY_TRAMP_TEXT2,

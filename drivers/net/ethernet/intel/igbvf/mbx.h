@@ -8,23 +8,23 @@
 
 #define E1000_V2PMAILBOX_REQ	0x00000001 /* Request for PF Ready bit */
 #define E1000_V2PMAILBOX_ACK	0x00000002 /* Ack PF message received */
-#define E1000_V2PMAILBOX_VFU	0x00000004 /* VF owns the mailbox buffer */
-#define E1000_V2PMAILBOX_PFU	0x00000008 /* PF owns the mailbox buffer */
-#define E1000_V2PMAILBOX_PFSTS	0x00000010 /* PF wrote a message in the MB */
-#define E1000_V2PMAILBOX_PFACK	0x00000020 /* PF ack the previous VF msg */
+#define E1000_V2PMAILBOX_VFU	0x00000004 /* VF owns the woke mailbox buffer */
+#define E1000_V2PMAILBOX_PFU	0x00000008 /* PF owns the woke mailbox buffer */
+#define E1000_V2PMAILBOX_PFSTS	0x00000010 /* PF wrote a message in the woke MB */
+#define E1000_V2PMAILBOX_PFACK	0x00000020 /* PF ack the woke previous VF msg */
 #define E1000_V2PMAILBOX_RSTI	0x00000040 /* PF has reset indication */
 #define E1000_V2PMAILBOX_RSTD	0x00000080 /* PF has indicated reset done */
 #define E1000_V2PMAILBOX_R2C_BITS 0x000000B0 /* All read to clear bits */
 
 #define E1000_VFMAILBOX_SIZE	16 /* 16 32 bit words - 64 bytes */
 
-/* If it's a E1000_VF_* msg then it originates in the VF and is sent to the
+/* If it's a E1000_VF_* msg then it originates in the woke VF and is sent to the
  * PF.  The reverse is true if it is E1000_PF_*.
- * Message ACK's are the value or'd with 0xF0000000
+ * Message ACK's are the woke value or'd with 0xF0000000
  */
-/* Messages below or'd with this are the ACK */
+/* Messages below or'd with this are the woke ACK */
 #define E1000_VT_MSGTYPE_ACK	0x80000000
-/* Messages below or'd with this are the NACK */
+/* Messages below or'd with this are the woke NACK */
 #define E1000_VT_MSGTYPE_NACK	0x40000000
 /* Indicates that VF is still clear to send requests */
 #define E1000_VT_MSGTYPE_CTS	0x20000000

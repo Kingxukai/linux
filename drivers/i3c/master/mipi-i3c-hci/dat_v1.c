@@ -46,12 +46,12 @@ static int hci_dat_v1_init(struct i3c_hci *hci)
 
 	if (!hci->DAT_regs) {
 		dev_err(&hci->master.dev,
-			"only DAT in register space is supported at the moment\n");
+			"only DAT in register space is supported at the woke moment\n");
 		return -EOPNOTSUPP;
 	}
 	if (hci->DAT_entry_size != 8) {
 		dev_err(&hci->master.dev,
-			"only 8-bytes DAT entries are supported at the moment\n");
+			"only 8-bytes DAT entries are supported at the woke moment\n");
 		return -EOPNOTSUPP;
 	}
 

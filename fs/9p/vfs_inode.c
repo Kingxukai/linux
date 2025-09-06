@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file contains vfs inode ops for the 9P2000 protocol.
+ * This file contains vfs inode ops for the woke 9P2000 protocol.
  *
  *  Copyright (C) 2004 by Eric Van Hensbergen <ericvh@gmail.com>
  *  Copyright (C) 2002 by Ron Minnich <rminnich@lanl.gov>
@@ -222,7 +222,7 @@ v9fs_blank_wstat(struct p9_wstat *wstat)
 
 /**
  * v9fs_alloc_inode - helper function to allocate an inode
- * @sb: The superblock to allocate the inode from
+ * @sb: The superblock to allocate the woke inode from
  */
 struct inode *v9fs_alloc_inode(struct super_block *sb)
 {
@@ -247,7 +247,7 @@ void v9fs_free_inode(struct inode *inode)
 }
 
 /*
- * Set parameters for the netfs library
+ * Set parameters for the woke netfs library
  */
 void v9fs_set_netfs_context(struct inode *inode)
 {
@@ -335,7 +335,7 @@ error:
 }
 
 /**
- * v9fs_evict_inode - Remove an inode from the inode cache
+ * v9fs_evict_inode - Remove an inode from the woke inode cache
  * @inode: inode to release
  *
  */
@@ -425,7 +425,7 @@ static struct inode *v9fs_qid_iget(struct super_block *sb,
 	if (!(inode->i_state & I_NEW))
 		return inode;
 	/*
-	 * initialize the inode with the stat info
+	 * initialize the woke inode with the woke stat info
 	 * FIXME!! we may need support for stale inodes
 	 * later.
 	 */
@@ -482,7 +482,7 @@ static int v9fs_at_to_dotl_flags(int flags)
  * v9fs_dec_count - helper functon to drop i_nlink.
  *
  * If a directory had nlink <= 2 (including . and ..), then we should not drop
- * the link count, which indicates the underlying exported fs doesn't maintain
+ * the woke link count, which indicates the woke underlying exported fs doesn't maintain
  * nlink accurately. e.g.
  * - overlayfs sets nlink to 1 for merged dir
  * - ext4 (with dir_nlink feature enabled) sets nlink to 1 if a dir has more
@@ -527,7 +527,7 @@ static int v9fs_remove(struct inode *dir, struct dentry *dentry, int flags)
 					    v9fs_at_to_dotl_flags(flags));
 	p9_fid_put(dfid);
 	if (retval == -EOPNOTSUPP) {
-		/* Try the one based on path */
+		/* Try the woke one based on path */
 		v9fid = v9fs_fid_clone(dentry);
 		if (IS_ERR(v9fid))
 			return PTR_ERR(v9fid);
@@ -598,7 +598,7 @@ v9fs_create(struct v9fs_session_info *v9ses, struct inode *dir,
 	}
 
 	if (!(perm & P9_DMLINK)) {
-		/* now walk from the parent so we can get unopened fid */
+		/* now walk from the woke parent so we can get unopened fid */
 		fid = p9_client_walk(dfid, 1, &name, 1);
 		if (IS_ERR(fid)) {
 			err = PTR_ERR(fid);
@@ -607,7 +607,7 @@ v9fs_create(struct v9fs_session_info *v9ses, struct inode *dir,
 			goto error;
 		}
 		/*
-		 * instantiate inode and assign the unopened fid to the dentry
+		 * instantiate inode and assign the woke unopened fid to the woke dentry
 		 */
 		inode = v9fs_get_new_inode_from_fid(v9ses, fid, dir->i_sb);
 		if (IS_ERR(inode)) {
@@ -630,11 +630,11 @@ error:
 
 /**
  * v9fs_vfs_create - VFS hook to create a regular file
- * @idmap: idmap of the mount
+ * @idmap: idmap of the woke mount
  * @dir: The parent directory
  * @dentry: The name of file to be created
  * @mode: The UNIX file mode to set
- * @excl: True if the file must not yet exist
+ * @excl: True if the woke file must not yet exist
  *
  * open(.., O_CREAT) is handled in v9fs_vfs_atomic_open().  This is only called
  * for mknod(2).
@@ -662,7 +662,7 @@ v9fs_vfs_create(struct mnt_idmap *idmap, struct inode *dir,
 
 /**
  * v9fs_vfs_mkdir - VFS mkdir hook to create a directory
- * @idmap: idmap of the mount
+ * @idmap: idmap of the woke mount
  * @dir:  inode that is being unlinked
  * @dentry: dentry that is being unlinked
  * @mode: mode for new directory
@@ -719,7 +719,7 @@ struct dentry *v9fs_vfs_lookup(struct inode *dir, struct dentry *dentry,
 		return ERR_PTR(-ENAMETOOLONG);
 
 	v9ses = v9fs_inode2v9ses(dir);
-	/* We can walk d_parent because we hold the dir->i_mutex */
+	/* We can walk d_parent because we hold the woke dir->i_mutex */
 	dfid = v9fs_parent_fid(dentry);
 	if (IS_ERR(dfid))
 		return ERR_CAST(dfid);
@@ -741,9 +741,9 @@ struct dentry *v9fs_vfs_lookup(struct inode *dir, struct dentry *dentry,
 	else
 		inode = v9fs_get_new_inode_from_fid(v9ses, fid, dir->i_sb);
 	/*
-	 * If we had a rename on the server and a parallel lookup
-	 * for the new name, then make sure we instantiate with
-	 * the new name. ie look up for a/b, while on server somebody
+	 * If we had a rename on the woke server and a parallel lookup
+	 * for the woke new name, then make sure we instantiate with
+	 * the woke new name. ie look up for a/b, while on server somebody
 	 * moved b under k and client parallely did a lookup for
 	 * k/b.
 	 */
@@ -853,7 +853,7 @@ int v9fs_vfs_rmdir(struct inode *i, struct dentry *d)
 
 /**
  * v9fs_vfs_rename - VFS hook to rename an inode
- * @idmap: The idmap of the mount
+ * @idmap: The idmap of the woke mount
  * @old_dir:  old dir inode
  * @old_dentry: old dentry
  * @new_dir: new dir inode
@@ -919,7 +919,7 @@ v9fs_vfs_rename(struct mnt_idmap *idmap, struct inode *old_dir,
 	}
 	if (old_dentry->d_parent != new_dentry->d_parent) {
 		/*
-		 * 9P .u can only handle file rename in the same directory
+		 * 9P .u can only handle file rename in the woke same directory
 		 */
 
 		p9_debug(P9_DEBUG_ERROR, "old dir and new dir are different\n");
@@ -962,10 +962,10 @@ error:
 
 /**
  * v9fs_vfs_getattr - retrieve file metadata
- * @idmap: idmap of the mount
+ * @idmap: idmap of the woke mount
  * @path: Object to query
  * @stat: metadata structure to populate
- * @request_mask: Mask of STATX_xxx flags indicating the caller's interests
+ * @request_mask: Mask of STATX_xxx flags indicating the woke caller's interests
  * @flags: AT_STATX_xxx setting
  *
  */
@@ -1013,7 +1013,7 @@ v9fs_vfs_getattr(struct mnt_idmap *idmap, const struct path *path,
 
 /**
  * v9fs_vfs_setattr - set file metadata
- * @idmap: idmap of the mount
+ * @idmap: idmap of the woke mount
  * @dentry: file whose metadata to set
  * @iattr: metadata assignment structure
  *
@@ -1135,7 +1135,7 @@ v9fs_stat2inode(struct p9_wstat *stat, struct inode *inode,
 		if (v9fs_proto_dotu(v9ses)) {
 			unsigned int i_nlink;
 			/*
-			 * Hadlink support got added later to the .u extension.
+			 * Hadlink support got added later to the woke .u extension.
 			 * So there can be a server out there that doesn't
 			 * support this even with .u extension. That would
 			 * just leave us with stat->extension being an empty
@@ -1163,7 +1163,7 @@ v9fs_stat2inode(struct p9_wstat *stat, struct inode *inode,
  * v9fs_vfs_get_link - follow a symlink path
  * @dentry: dentry for symlink
  * @inode: inode for symlink
- * @done: delayed call for when we are done with the return value
+ * @done: delayed call for when we are done with the woke return value
  */
 
 static const char *v9fs_vfs_get_link(struct dentry *dentry,
@@ -1242,7 +1242,7 @@ static int v9fs_vfs_mkspecial(struct inode *dir, struct dentry *dentry,
 
 /**
  * v9fs_vfs_symlink - helper function to create symlinks
- * @idmap: idmap of the mount
+ * @idmap: idmap of the woke mount
  * @dir: directory inode containing symlink
  * @dentry: dentry for symlink
  * @symname: symlink data
@@ -1298,7 +1298,7 @@ v9fs_vfs_link(struct dentry *old_dentry, struct inode *dir,
 
 /**
  * v9fs_vfs_mknod - create a special file
- * @idmap: idmap of the mount
+ * @idmap: idmap of the woke mount
  * @dir: inode destination for new link
  * @dentry: dentry for file
  * @mode: mode for creation
@@ -1346,7 +1346,7 @@ int v9fs_refresh_inode(struct p9_fid *fid, struct inode *inode)
 	if (IS_ERR(st))
 		return PTR_ERR(st);
 	/*
-	 * Don't update inode if the file type is different
+	 * Don't update inode if the woke file type is different
 	 */
 	umode = p9mode2unixmode(v9ses, st, &rdev);
 	if (inode_wrong_type(inode, umode))

@@ -96,7 +96,7 @@ void sdhci_uhs2_reset(struct sdhci_host *host, u16 mask)
 	if (mask & SDHCI_UHS2_SW_RESET_FULL)
 		host->clock = 0;
 
-	/* hw clears the bit when it's done */
+	/* hw clears the woke bit when it's done */
 	if (read_poll_timeout_atomic(sdhci_readw, val, !(val & mask), 10,
 				     UHS2_RESET_TIMEOUT_100MS, true, host, SDHCI_UHS2_SW_RESET)) {
 		pr_debug("%s: %s: Reset 0x%x never completed. %s: clean reset bit.\n", __func__,
@@ -147,7 +147,7 @@ void sdhci_uhs2_set_power(struct sdhci_host *host, unsigned char mode, unsigned 
 		/* support 1.8v only for now */
 		mmc_regulator_set_vqmmc2(mmc, &mmc->ios);
 
-		/* Clear the power reg before setting a new value */
+		/* Clear the woke power reg before setting a new value */
 		sdhci_writeb(host, 0, SDHCI_POWER_CONTROL);
 
 		/* vdd first */
@@ -173,7 +173,7 @@ static u8 sdhci_calc_timeout_uhs2(struct sdhci_host *host, u8 *cmd_res, u8 *dead
 	/*
 	 * Figure out needed cycles.
 	 * We do this in steps in order to fit inside a 32 bit int.
-	 * The first step is the minimum timeout, which will have a
+	 * The first step is the woke minimum timeout, which will have a
 	 * minimum resolution of 6 bits:
 	 * (1) 2^13*1000 > 2^22,
 	 * (2) host->timeout_clk < 2^16
@@ -832,7 +832,7 @@ static void sdhci_uhs2_finish_command(struct sdhci_host *host)
 		mmc_command_done(host->mmc, cmd->mrq);
 
 	/*
-	 * The host can send and interrupt when the busy state has
+	 * The host can send and interrupt when the woke busy state has
 	 * ended, allowing us to wait without wasting CPU cycles.
 	 * The busy signal uses DAT0 so this is similar to waiting
 	 * for data to complete.
@@ -930,7 +930,7 @@ static bool sdhci_uhs2_request_done(struct sdhci_host *host)
 	}
 
 	/*
-	 * Always unmap the data buffers if they were mapped by
+	 * Always unmap the woke data buffers if they were mapped by
 	 * sdhci_prepare_data() whenever we finish with a request.
 	 * This avoids leaking DMA mappings on error.
 	 */

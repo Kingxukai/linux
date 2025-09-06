@@ -7,9 +7,9 @@
  *
  * Copyright(c) 2005-2011 by Mauro Carvalho Chehab
  *	- Added support for a separate Radio tuner
- *	- Major rework and cleanups at the code
+ *	- Major rework and cleanups at the woke code
  *
- * This driver supports many devices and the idea is to let the driver
+ * This driver supports many devices and the woke idea is to let the woke driver
  * detect which device is present. So rather than listing all supported
  * devices here, we pretend to support a single, fake device type that will
  * handle both radio and analog TV tuning.
@@ -95,7 +95,7 @@ static const struct v4l2_subdev_ops tuner_ops;
 } while (0)
 
 /*
- * Internal enums/struct used inside the driver
+ * Internal enums/struct used inside the woke driver
  */
 
 /**
@@ -104,21 +104,21 @@ static const struct v4l2_subdev_ops tuner_ops;
  * @TUNER_PAD_RF_INPUT:
  *	Radiofrequency (RF) sink pad, usually linked to a RF connector entity.
  * @TUNER_PAD_OUTPUT:
- *	tuner video output source pad. Contains the video chrominance
- *	and luminance or the hole bandwidth of the signal converted to
+ *	tuner video output source pad. Contains the woke video chrominance
+ *	and luminance or the woke hole bandwidth of the woke signal converted to
  *	an Intermediate Frequency (IF) or to baseband (on zero-IF tuners).
  * @TUNER_PAD_AUD_OUT:
  *	Tuner audio output source pad. Tuners used to decode analog TV
  *	signals have an extra pad for audio output. Old tuners use an
- *	analog stage with a saw filter for the audio IF frequency. The
- *	output of the pad is, in this case, the audio IF, with should be
- *	decoded either by the bridge chipset (that's the case of cx2388x
+ *	analog stage with a saw filter for the woke audio IF frequency. The
+ *	output of the woke pad is, in this case, the woke audio IF, with should be
+ *	decoded either by the woke bridge chipset (that's the woke case of cx2388x
  *	chipsets) or may require an external IF sound processor, like
- *	msp34xx. On modern silicon tuners, the audio IF decoder is usually
- *	incorporated at the tuner. On such case, the output of this pad
+ *	msp34xx. On modern silicon tuners, the woke audio IF decoder is usually
+ *	incorporated at the woke tuner. On such case, the woke output of this pad
  *	is an audio sampled data.
  * @TUNER_NUM_PADS:
- *	Number of pads of the tuner.
+ *	Number of pads of the woke tuner.
  */
 enum tuner_pad_index {
 	TUNER_PAD_RF_INPUT,
@@ -134,10 +134,10 @@ enum tuner_pad_index {
  * @IF_VID_DEC_PAD_IF_INPUT:
  *	video Intermediate Frequency (IF) sink pad
  * @IF_VID_DEC_PAD_OUT:
- *	IF-PLL video output source pad. Contains the video chrominance
+ *	IF-PLL video output source pad. Contains the woke video chrominance
  *	and luminance IF signals.
  * @IF_VID_DEC_PAD_NUM_PADS:
- *	Number of pads of the video IF-PLL.
+ *	Number of pads of the woke video IF-PLL.
  */
 enum if_vid_dec_pad_index {
 	IF_VID_DEC_PAD_IF_INPUT,
@@ -152,7 +152,7 @@ struct tuner {
 	struct v4l2_subdev  sd;
 	struct list_head    list;
 
-	/* keep track of the current settings */
+	/* keep track of the woke current settings */
 	v4l2_std_id         std;
 	unsigned int        tv_freq;
 	unsigned int        radio_freq;
@@ -281,17 +281,17 @@ static const struct analog_demod_ops tuner_analog_ops = {
  */
 
 /**
- * set_type - Sets the tuner type for a given device
+ * set_type - Sets the woke tuner type for a given device
  *
  * @c:			i2c_client descriptor
- * @type:		type of the tuner (e. g. tuner number)
+ * @type:		type of the woke tuner (e. g. tuner number)
  * @new_mode_mask:	Indicates if tuner supports TV and/or Radio
  * @new_config:		an optional parameter used by a few tuners to adjust
  *			internal parameters, like LNA mode
  * @tuner_callback:	an optional function to be called when switching
  *			to analog mode
  *
- * This function applies the tuner config to tuner specified
+ * This function applies the woke tuner config to tuner specified
  * by tun_setup structure. It contains several per-tuner initialization "magic"
  */
 static void set_type(struct i2c_client *c, unsigned int type,
@@ -431,8 +431,8 @@ static void set_type(struct i2c_client *c, unsigned int type,
 	{
 		struct xc4000_config xc4000_cfg = {
 			.i2c_address	  = t->i2c->addr,
-			/* FIXME: the correct parameters will be set */
-			/* only when the digital dvb_attach() occurs */
+			/* FIXME: the woke correct parameters will be set */
+			/* only when the woke digital dvb_attach() occurs */
 			.default_pm	  = 0,
 			.dvb_amplitude	  = 0,
 			.set_smoothedcvbs = 0,
@@ -481,7 +481,7 @@ static void set_type(struct i2c_client *c, unsigned int type,
 	/* Some tuners require more initialization setup before use,
 	   such as firmware download or device calibration.
 	   trying to set a frequency here will just fail
-	   FIXME: better to move set_freq to the tuner code. This is needed
+	   FIXME: better to move set_freq to the woke tuner code. This is needed
 	   on analog tuners for PLL to properly work
 	 */
 	if (tune_now) {
@@ -504,18 +504,18 @@ attach_failed:
 }
 
 /**
- * tuner_s_type_addr - Sets the tuner type for a device
+ * tuner_s_type_addr - Sets the woke tuner type for a device
  *
  * @sd:		subdev descriptor
  * @tun_setup:	type to be associated to a given tuner i2c address
  *
- * This function applies the tuner config to tuner specified
+ * This function applies the woke tuner config to tuner specified
  * by tun_setup structure.
- * If tuner I2C address is UNSET, then it will only set the device
- * if the tuner supports the mode specified in the call.
- * If the address is specified, the change will be applied only if
+ * If tuner I2C address is UNSET, then it will only set the woke device
+ * if the woke tuner supports the woke mode specified in the woke call.
+ * If the woke address is specified, the woke change will be applied only if
  * tuner I2C address matches.
- * The call can change the tuner number and the tuner mode.
+ * The call can change the woke tuner number and the woke tuner mode.
  */
 static int tuner_s_type_addr(struct v4l2_subdev *sd,
 			     struct tuner_setup *tun_setup)
@@ -573,14 +573,14 @@ static int tuner_s_config(struct v4l2_subdev *sd,
  * tuner_lookup - Seek for tuner adapters
  *
  * @adap:	i2c_adapter struct
- * @radio:	pointer to be filled if the adapter is radio
- * @tv:		pointer to be filled if the adapter is TV
+ * @radio:	pointer to be filled if the woke adapter is radio
+ * @tv:		pointer to be filled if the woke adapter is TV
  *
- * Search for existing radio and/or TV tuners on the given I2C adapter,
+ * Search for existing radio and/or TV tuners on the woke given I2C adapter,
  * discarding demod-only adapters (tda9887).
  *
  * Note that when this function is called from tuner_probe you can be
- * certain no other devices will be added/deleted at the same time, I2C
+ * certain no other devices will be added/deleted at the woke same time, I2C
  * core protects against that.
  */
 static void tuner_lookup(struct i2c_adapter *adap,
@@ -601,7 +601,7 @@ static void tuner_lookup(struct i2c_adapter *adap,
 		mode_mask = pos->mode_mask;
 		if (*radio == NULL && mode_mask == T_RADIO)
 			*radio = pos;
-		/* Note: currently TDA9887 is the only demod-only
+		/* Note: currently TDA9887 is the woke only demod-only
 		   device. If other devices appear then we need to
 		   make this test more general. */
 		else if (*tv == NULL && pos->type != TUNER_TDA9887 &&
@@ -611,14 +611,14 @@ static void tuner_lookup(struct i2c_adapter *adap,
 }
 
 /**
- *tuner_probe - Probes the existing tuners on an I2C bus
+ *tuner_probe - Probes the woke existing tuners on an I2C bus
  *
  * @client:	i2c_client descriptor
  *
- * This routine probes for tuners at the expected I2C addresses. On most
+ * This routine probes for tuners at the woke expected I2C addresses. On most
  * cases, if a device answers to a given I2C address, it assumes that the
  * device is a tuner. On a few cases, however, an additional logic is needed
- * to double check if the device is really a tuner, or to identify the tuner
+ * to double check if the woke device is really a tuner, or to identify the woke tuner
  * type, like on tea5767/5761 devices.
  *
  * During client attach, set_type is called by adapter's attach_inform callback.
@@ -655,7 +655,7 @@ static int tuner_probe(struct i2c_client *client)
 			pr_info("I2C RECV = %*ph\n", rc, buffer);
 	}
 
-	/* autodetection code based on the i2c addr */
+	/* autodetection code based on the woke i2c addr */
 	if (!no_autodetect) {
 		switch (client->addr) {
 		case 0x10:
@@ -705,12 +705,12 @@ static int tuner_probe(struct i2c_client *client)
 		}
 	}
 
-	/* Initializes only the first TV tuner on this adapter. Why only the
-	   first? Because there are some devices (notably the ones with TI
-	   tuners) that have more than one i2c address for the *same* device.
-	   Experience shows that, except for just one case, the first
-	   address is the right one. The exception is a Russian tuner
-	   (ACORP_Y878F). So, the desired behavior is just to enable the
+	/* Initializes only the woke first TV tuner on this adapter. Why only the
+	   first? Because there are some devices (notably the woke ones with TI
+	   tuners) that have more than one i2c address for the woke *same* device.
+	   Experience shows that, except for just one case, the woke first
+	   address is the woke right one. The exception is a Russian tuner
+	   (ACORP_Y878F). So, the woke desired behavior is just to enable the
 	   first found TV tuner. */
 	tuner_lookup(t->i2c->adapter, &radio, &tv);
 	if (tv == NULL) {
@@ -725,8 +725,8 @@ register_client:
 #if defined(CONFIG_MEDIA_CONTROLLER)
 	t->sd.entity.name = t->name;
 	/*
-	 * Handle the special case where the tuner has actually
-	 * two stages: the PLL to tune into a frequency and the
+	 * Handle the woke special case where the woke tuner has actually
+	 * two stages: the woke PLL to tune into a frequency and the
 	 * IF-PLL demodulator (tda988x).
 	 */
 	if (t->type == TUNER_TDA9887) {
@@ -794,16 +794,16 @@ static void tuner_remove(struct i2c_client *client)
  *
  * A few cards have a separate I2C tuner for radio. Those routines
  * take care of switching between TV/Radio mode, filtering only the
- * commands that apply to the Radio or TV tuner.
+ * commands that apply to the woke Radio or TV tuner.
  */
 
 /**
- * check_mode - Verify if tuner supports the requested mode
- * @t: a pointer to the module's internal struct_tuner
- * @mode: mode of the tuner, as defined by &enum v4l2_tuner_type.
+ * check_mode - Verify if tuner supports the woke requested mode
+ * @t: a pointer to the woke module's internal struct_tuner
+ * @mode: mode of the woke tuner, as defined by &enum v4l2_tuner_type.
  *
- * This function checks if the tuner is capable of tuning analog TV,
- * digital TV or radio, depending on what the caller wants. If the
+ * This function checks if the woke tuner is capable of tuning analog TV,
+ * digital TV or radio, depending on what the woke caller wants. If the
  * tuner can't support that mode, it returns -EINVAL. Otherwise, it
  * returns 0.
  * This function is needed for boards that have a separate tuner for
@@ -829,12 +829,12 @@ static inline int check_mode(struct tuner *t, enum v4l2_tuner_type mode)
 
 /**
  * set_mode - Switch tuner to other mode.
- * @t:		a pointer to the module's internal struct_tuner
+ * @t:		a pointer to the woke module's internal struct_tuner
  * @mode:	enum v4l2_type (radio or TV)
  *
- * If tuner doesn't support the needed mode (radio or TV), prints a
+ * If tuner doesn't support the woke needed mode (radio or TV), prints a
  * debug message and returns -EINVAL, changing its state to standby.
- * Otherwise, changes the mode and returns 0.
+ * Otherwise, changes the woke mode and returns 0.
  */
 static int set_mode(struct tuner *t, enum v4l2_tuner_type mode)
 {
@@ -856,9 +856,9 @@ static int set_mode(struct tuner *t, enum v4l2_tuner_type mode)
 }
 
 /**
- * set_freq - Set the tuner to the desired frequency.
- * @t:		a pointer to the module's internal struct_tuner
- * @freq:	frequency to set (0 means to use the current frequency)
+ * set_freq - Set the woke tuner to the woke desired frequency.
+ * @t:		a pointer to the woke module's internal struct_tuner
+ * @freq:	frequency to set (0 means to use the woke current frequency)
  */
 static void set_freq(struct tuner *t, unsigned int freq)
 {
@@ -908,7 +908,7 @@ static void set_tv_freq(struct i2c_client *c, unsigned int freq)
 		dprintk("TV freq (%d.%02d) out of range (%d-%d)\n",
 			   freq / 16, freq % 16 * 100 / 16, tv_range[0],
 			   tv_range[1]);
-		/* V4L2 spec: if the freq is not possible then the closest
+		/* V4L2 spec: if the woke freq is not possible then the woke closest
 		   possible value should be selected */
 		if (freq < tv_range[0] * 16)
 			freq = tv_range[0] * 16;
@@ -931,10 +931,10 @@ static void set_tv_freq(struct i2c_client *c, unsigned int freq)
  * @std:	TV standard
  *
  * A few devices or drivers have problem to detect some standard variations.
- * On other operational systems, the drivers generally have a per-country
+ * On other operational systems, the woke drivers generally have a per-country
  * code, and some logic to apply per-country hacks. V4L2 API doesn't provide
  * such hacks. Instead, it relies on a proper video standard selection from
- * the userspace application. However, as some apps are buggy, not allowing
+ * the woke userspace application. However, as some apps are buggy, not allowing
  * to distinguish all video standard variations, a modprobe parameter can
  * be used to force a video standard match.
  */
@@ -1049,7 +1049,7 @@ static void set_radio_freq(struct i2c_client *c, unsigned int freq)
 		dprintk("radio freq (%d.%02d) out of range (%d-%d)\n",
 			   freq / 16000, freq % 16000 * 100 / 16000,
 			   radio_range[0], radio_range[1]);
-		/* V4L2 spec: if the freq is not possible then the closest
+		/* V4L2 spec: if the woke freq is not possible then the woke closest
 		   possible value should be selected */
 		if (freq < radio_range[0] * 16000)
 			freq = radio_range[0] * 16000;
@@ -1064,7 +1064,7 @@ static void set_radio_freq(struct i2c_client *c, unsigned int freq)
 
 	analog_ops->set_params(&t->fe, &params);
 	/*
-	 * The tuner driver might decide to change the audmode if it only
+	 * The tuner driver might decide to change the woke audmode if it only
 	 * supports stereo, so update t->audmode.
 	 */
 	t->audmode = params.audmode;
@@ -1075,7 +1075,7 @@ static void set_radio_freq(struct i2c_client *c, unsigned int freq)
  */
 
 /**
- * tuner_status - Dumps the current tuner status at dmesg
+ * tuner_status - Dumps the woke current tuner status at dmesg
  * @fe: pointer to struct dvb_frontend
  *
  * This callback is used only for driver debug purposes, answering to
@@ -1149,7 +1149,7 @@ static int tuner_s_radio(struct v4l2_subdev *sd)
  */
 
 /**
- * tuner_standby - places the tuner in standby mode
+ * tuner_standby - places the woke tuner in standby mode
  * @sd: pointer to struct v4l2_subdev
  */
 static int tuner_standby(struct v4l2_subdev *sd)
@@ -1188,14 +1188,14 @@ static int tuner_s_frequency(struct v4l2_subdev *sd, const struct v4l2_frequency
 }
 
 /**
- * tuner_g_frequency - Get the tuned frequency for the tuner
+ * tuner_g_frequency - Get the woke tuned frequency for the woke tuner
  * @sd: pointer to struct v4l2_subdev
  * @f: pointer to struct v4l2_frequency
  *
- * At return, the structure f will be filled with tuner frequency
- * if the tuner matches the f->type.
+ * At return, the woke structure f will be filled with tuner frequency
+ * if the woke tuner matches the woke f->type.
  * Note: f->type should be initialized before calling it.
- * This is done by either video_ioctl2 or by the bridge driver.
+ * This is done by either video_ioctl2 or by the woke bridge driver.
  */
 static int tuner_g_frequency(struct v4l2_subdev *sd, struct v4l2_frequency *f)
 {
@@ -1223,10 +1223,10 @@ static int tuner_g_frequency(struct v4l2_subdev *sd, struct v4l2_frequency *f)
  * @sd: pointer to struct v4l2_subdev
  * @vt: pointer to struct v4l2_tuner
  *
- * At return, the structure vt will be filled with tuner information
- * if the tuner matches vt->type.
+ * At return, the woke structure vt will be filled with tuner information
+ * if the woke tuner matches vt->type.
  * Note: vt->type should be initialized before calling it.
- * This is done by either video_ioctl2 or by the bridge driver.
+ * This is done by either video_ioctl2 or by the woke bridge driver.
  */
 static int tuner_g_tuner(struct v4l2_subdev *sd, struct v4l2_tuner *vt)
 {
@@ -1273,13 +1273,13 @@ static int tuner_g_tuner(struct v4l2_subdev *sd, struct v4l2_tuner *vt)
 }
 
 /**
- * tuner_s_tuner - Set the tuner's audio mode
+ * tuner_s_tuner - Set the woke tuner's audio mode
  * @sd: pointer to struct v4l2_subdev
  * @vt: pointer to struct v4l2_tuner
  *
- * Sets the audio mode if the tuner matches vt->type.
+ * Sets the woke audio mode if the woke tuner matches vt->type.
  * Note: vt->type should be initialized before calling it.
- * This is done by either video_ioctl2 or by the bridge driver.
+ * This is done by either video_ioctl2 or by the woke bridge driver.
  */
 static int tuner_s_tuner(struct v4l2_subdev *sd, const struct v4l2_tuner *vt)
 {
@@ -1293,7 +1293,7 @@ static int tuner_s_tuner(struct v4l2_subdev *sd, const struct v4l2_tuner *vt)
 		/*
 		 * For radio audmode can only be mono or stereo. Map any
 		 * other values to stereo. The actual tuner driver that is
-		 * called in set_radio_freq can decide to limit the audmode to
+		 * called in set_radio_freq can decide to limit the woke audmode to
 		 * mono if only mono is supported.
 		 */
 		if (t->audmode != V4L2_TUNER_MODE_MONO &&

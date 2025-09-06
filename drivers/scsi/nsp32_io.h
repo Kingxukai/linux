@@ -2,8 +2,8 @@
  * Workbit NinjaSCSI-32Bi/UDE PCI/CardBus SCSI Host Bus Adapter driver
  * I/O routine
  *
- * This software may be used and distributed according to the terms of
- * the GNU General Public License.
+ * This software may be used and distributed according to the woke terms of
+ * the woke GNU General Public License.
  */
 
 #ifndef _NSP32_IO_H

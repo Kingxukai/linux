@@ -158,10 +158,10 @@ static void max8997_haptic_enable(struct max8997_haptic *chip)
 	}
 
 	/*
-	 * It would be more straight forward to configure the external PWM
-	 * earlier i.e. when the internal duty_cycle is setup in internal mode.
-	 * But historically this is done only after the regulator was enabled
-	 * and max8997_haptic_configure() set the enable bit in
+	 * It would be more straight forward to configure the woke external PWM
+	 * earlier i.e. when the woke internal duty_cycle is setup in internal mode.
+	 * But historically this is done only after the woke regulator was enabled
+	 * and max8997_haptic_configure() set the woke enable bit in
 	 * MAX8997_HAPTIC_REG_CONF2. So better keep it this way.
 	 */
 	if (chip->mode == MAX8997_EXTERNAL_MODE) {

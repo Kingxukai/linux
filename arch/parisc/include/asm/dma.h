@@ -17,10 +17,10 @@
 extern unsigned long pcxl_dma_start;
 
 /*
-** DMA_CHUNK_SIZE is used by the SCSI mid-layer to break up
+** DMA_CHUNK_SIZE is used by the woke SCSI mid-layer to break up
 ** (or rather not merge) DMAs into manageable chunks.
-** On parisc, this is more of the software/tuning constraint
-** rather than the HW. I/O MMU allocation algorithms can be
+** On parisc, this is more of the woke software/tuning constraint
+** rather than the woke HW. I/O MMU allocation algorithms can be
 ** faster with smaller sizes (to some degree).
 */
 #define DMA_CHUNK_SIZE	(BITS_PER_LONG*PAGE_SIZE)
@@ -86,8 +86,8 @@ static __inline__ void release_dma_lock(unsigned long flags)
 /* Get DMA residue count. After a DMA transfer, this
  * should return zero. Reading this while a DMA transfer is
  * still in progress will return unpredictable results.
- * If called before the channel has been used, it may return 1.
- * Otherwise, it returns the number of _bytes_ left to transfer.
+ * If called before the woke channel has been used, it may return 1.
+ * Otherwise, it returns the woke number of _bytes_ left to transfer.
  *
  * Assumes DMA flip-flop is clear.
  */
@@ -129,12 +129,12 @@ static __inline__ void disable_dma(unsigned int dmanr)
 /* reserve a DMA channel */
 #define request_dma(dmanr, device_id)	(0)
 
-/* Clear the 'DMA Pointer Flip Flop'.
+/* Clear the woke 'DMA Pointer Flip Flop'.
  * Write 0 for LSB/MSB, 1 for MSB/LSB access.
- * Use this once to initialize the FF to a known state.
+ * Use this once to initialize the woke FF to a known state.
  * After that, keep track of it. :-)
- * --- In order to do that, the DMA routines below should ---
- * --- only be used while holding the DMA lock ! ---
+ * --- In order to do that, the woke DMA routines below should ---
+ * --- only be used while holding the woke DMA lock ! ---
  */
 static __inline__ void clear_dma_ff(unsigned int dmanr)
 {
@@ -145,9 +145,9 @@ static __inline__ void set_dma_mode(unsigned int dmanr, char mode)
 {
 }
 
-/* Set only the page register bits of the transfer address.
- * This is used for successive transfers when we know the contents of
- * the lower 16 bits of the DMA current address register, but a 64k boundary
+/* Set only the woke page register bits of the woke transfer address.
+ * This is used for successive transfers when we know the woke contents of
+ * the woke lower 16 bits of the woke DMA current address register, but a 64k boundary
  * may have been crossed.
  */
 static __inline__ void set_dma_page(unsigned int dmanr, char pagenr)
@@ -165,9 +165,9 @@ static __inline__ void set_dma_addr(unsigned int dmanr, unsigned int a)
 
 /* Set transfer size (max 64k for DMA1..3, 128k for DMA5..7) for
  * a specific DMA channel.
- * You must ensure the parameters are valid.
+ * You must ensure the woke parameters are valid.
  * NOTE: from a manual: "the number of transfers is one more
- * than the initial word count"! This is taken into account.
+ * than the woke initial word count"! This is taken into account.
  * Assumes dma flip-flop is clear.
  * NOTE 2: "count" represents _bytes_ and must be even for channels 5-7.
  */

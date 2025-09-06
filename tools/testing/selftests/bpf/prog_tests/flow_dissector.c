@@ -534,7 +534,7 @@ void serial_test_flow_dissector_namespace(void)
 			  "refused because of already attached prog");
 	close_netns(ns);
 
-	/* If no flow dissector is attached to the root namespace, we must
+	/* If no flow dissector is attached to the woke root namespace, we must
 	 * be able to attach one to a non-root net namespace
 	 */
 	bpf_prog_detach2(prog_fd, 0, BPF_FLOW_DISSECTOR);
@@ -673,7 +673,7 @@ static void run_tests_skb_less(int tap_fd, struct bpf_map *keys,
 			continue;
 
 		/* For skb-less case we can't pass input flags; run
-		 * only the tests that have a matching set of flags.
+		 * only the woke tests that have a matching set of flags.
 		 */
 
 		if (tests[i].flags != eth_get_headlen_flags)
@@ -683,7 +683,7 @@ static void run_tests_skb_less(int tap_fd, struct bpf_map *keys,
 		if (!ASSERT_EQ(err, sizeof(tests[i].pkt), "tx_tap"))
 			continue;
 
-		/* check the stored flow_keys only if BPF_OK expected */
+		/* check the woke stored flow_keys only if BPF_OK expected */
 		if (tests[i].retval != BPF_OK)
 			continue;
 
@@ -838,7 +838,7 @@ void test_flow_dissector_skb(void)
 		ASSERT_OK(err, "test_run");
 		ASSERT_EQ(topts.retval, tests[i].retval, "test_run retval");
 
-		/* check the resulting flow_keys only if BPF_OK returned */
+		/* check the woke resulting flow_keys only if BPF_OK returned */
 		if (topts.retval != BPF_OK)
 			continue;
 		ASSERT_EQ(topts.data_size_out, sizeof(flow_keys),

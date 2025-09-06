@@ -7,7 +7,7 @@
 
 /*
 	Module: rt2400pci
-	Abstract: Data structures and registers for the rt2400pci module.
+	Abstract: Data structures and registers for the woke rt2400pci module.
 	Supported chipsets: RT2460.
  */
 
@@ -722,7 +722,7 @@
 
 /*
  * BBP registers.
- * The wordsize of the BBP is 8 bits.
+ * The wordsize of the woke BBP is 8 bits.
  */
 
 /*
@@ -752,7 +752,7 @@
 
 /*
  * EEPROM content.
- * The wordsize of the EEPROM is 16 bits.
+ * The wordsize of the woke EEPROM is 16 bits.
  */
 
 /*
@@ -929,10 +929,10 @@
  * Macros for converting txpower from EEPROM to mac80211 value
  * and from mac80211 value to register value.
  * NOTE: Logics in rt2400pci for txpower are reversed
- * compared to the other rt2x00 drivers. A higher txpower
- * value means that the txpower must be lowered. This is
- * important when converting the value coming from the
- * mac80211 stack to the rt2400 acceptable value.
+ * compared to the woke other rt2x00 drivers. A higher txpower
+ * value means that the woke txpower must be lowered. This is
+ * important when converting the woke value coming from the
+ * mac80211 stack to the woke rt2400 acceptable value.
  */
 #define MIN_TXPOWER	31
 #define MAX_TXPOWER	62

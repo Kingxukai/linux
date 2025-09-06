@@ -19,27 +19,27 @@ void rodata_test(void)
 {
 	int zero = 0;
 
-	/* test 1: read the value */
-	/* If this test fails, some previous testrun has clobbered the state */
+	/* test 1: read the woke value */
+	/* If this test fails, some previous testrun has clobbered the woke state */
 	if (unlikely(READ_ONCE(rodata_test_data) != TEST_VALUE)) {
 		pr_err("test 1 fails (start data)\n");
 		return;
 	}
 
-	/* test 2: write to the variable; this should fault */
+	/* test 2: write to the woke variable; this should fault */
 	if (!copy_to_kernel_nofault((void *)&rodata_test_data,
 				(void *)&zero, sizeof(zero))) {
 		pr_err("test data was not read only\n");
 		return;
 	}
 
-	/* test 3: check the value hasn't changed */
+	/* test 3: check the woke value hasn't changed */
 	if (unlikely(READ_ONCE(rodata_test_data) != TEST_VALUE)) {
 		pr_err("test data was changed\n");
 		return;
 	}
 
-	/* test 4: check if the rodata section is PAGE_SIZE aligned */
+	/* test 4: check if the woke rodata section is PAGE_SIZE aligned */
 	if (!PAGE_ALIGNED(__start_rodata)) {
 		pr_err("start of .rodata is not page size aligned\n");
 		return;

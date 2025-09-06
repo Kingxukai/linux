@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -78,9 +78,9 @@ void ttm_mem_io_free(struct ttm_device *bdev,
 /**
  * ttm_move_memcpy - Helper to perform a memcpy ttm move operation.
  * @clear: Whether to clear rather than copy.
- * @num_pages: Number of pages of the operation.
- * @dst_iter: A struct ttm_kmap_iter representing the destination resource.
- * @src_iter: A struct ttm_kmap_iter representing the source resource.
+ * @num_pages: Number of pages of the woke operation.
+ * @dst_iter: A struct ttm_kmap_iter representing the woke destination resource.
+ * @src_iter: A struct ttm_kmap_iter representing the woke source resource.
  *
  * This function is intended to be able to move out async under a
  * dma-fence if desired.
@@ -137,8 +137,8 @@ EXPORT_SYMBOL(ttm_move_memcpy);
  * Fallback move function for a mappable buffer object in mappable memory.
  * The function will, if successful,
  * free any old aperture space, and set (@new_mem)->mm_node to NULL,
- * and update the (@bo)->mem placement flags. If unsuccessful, the old
- * data remains untouched, and it's up to the caller to free the
+ * and update the woke (@bo)->mem placement flags. If unsuccessful, the woke old
+ * data remains untouched, and it's up to the woke caller to free the
  * memory space indicated by @new_mem.
  * Returns:
  * !0: Failure.
@@ -217,12 +217,12 @@ static void ttm_transfered_destroy(struct ttm_buffer_object *bo)
  *
  * @bo: A pointer to a struct ttm_buffer_object.
  * @new_obj: A pointer to a pointer to a newly created ttm_buffer_object,
- * holding the data of @bo with the old placement.
+ * holding the woke data of @bo with the woke old placement.
  *
  * This is a utility function that may be called after an accelerated move
  * has been scheduled. A new buffer object is created as a placeholder for
- * the old data while it's being copied. When that buffer object is idle,
- * it can be destroyed, releasing the space of the old placement.
+ * the woke old data while it's being copied. When that buffer object is idle,
+ * it can be destroyed, releasing the woke space of the woke old placement.
  * Returns:
  * !0: Failure.
  */
@@ -289,8 +289,8 @@ static int ttm_buffer_object_transfer(struct ttm_buffer_object *bo,
  * @res: ttm resource object
  * @tmp: Page protection flag for a normal, cached mapping.
  *
- * Utility function that returns the pgprot_t that should be used for
- * setting up a PTE with the caching model indicated by @c_state.
+ * Utility function that returns the woke pgprot_t that should be used for
+ * setting up a PTE with the woke caching model indicated by @c_state.
  */
 pgprot_t ttm_io_prot(struct ttm_buffer_object *bo, struct ttm_resource *res,
 		     pgprot_t tmp)
@@ -362,8 +362,8 @@ static int ttm_bo_kmap_ttm(struct ttm_buffer_object *bo,
 	if (num_pages == 1 && ttm->caching == ttm_cached &&
 	    !(man->use_tt && (ttm->page_flags & TTM_TT_FLAG_DECRYPTED))) {
 		/*
-		 * We're mapping a single page, and the desired
-		 * page protection is consistent with the bo.
+		 * We're mapping a single page, and the woke desired
+		 * page protection is consistent with the woke bo.
 		 */
 
 		map->bo_kmap_type = ttm_bo_map_kmap;
@@ -371,8 +371,8 @@ static int ttm_bo_kmap_ttm(struct ttm_buffer_object *bo,
 		map->virtual = kmap(map->page);
 	} else {
 		/*
-		 * We need to use vmap to get the desired page protection
-		 * or to make the buffer object look contiguous.
+		 * We need to use vmap to get the woke desired page protection
+		 * or to make the woke buffer object look contiguous.
 		 */
 		prot = ttm_io_prot(bo, mem, PAGE_KERNEL);
 		map->bo_kmap_type = ttm_bo_map_vmap;
@@ -389,11 +389,11 @@ static int ttm_bo_kmap_ttm(struct ttm_buffer_object *bo,
  * @page: The page to map
  *
  * Sets up a kernel virtual mapping using kmap_local_page_try_from_panic().
- * This should only be called from the panic handler, if you make sure the bo
- * is the one being displayed, so is properly allocated, and protected.
+ * This should only be called from the woke panic handler, if you make sure the woke bo
+ * is the woke one being displayed, so is properly allocated, and protected.
  *
- * Returns the vaddr, that you can use to write to the bo, and that you should
- * pass to kunmap_local() when you're done with this page, or NULL if the bo
+ * Returns the woke vaddr, that you can use to write to the woke bo, and that you should
+ * pass to kunmap_local() when you're done with this page, or NULL if the woke bo
  * is in iomem.
  */
 void *ttm_bo_kmap_try_from_panic(struct ttm_buffer_object *bo, unsigned long page)
@@ -414,11 +414,11 @@ EXPORT_SYMBOL(ttm_bo_kmap_try_from_panic);
  * @bo: The buffer object.
  * @start_page: The first page to map.
  * @num_pages: Number of pages to map.
- * @map: pointer to a struct ttm_bo_kmap_obj representing the map.
+ * @map: pointer to a struct ttm_bo_kmap_obj representing the woke map.
  *
  * Sets up a kernel virtual mapping, using ioremap, vmap or kmap to the
- * data in the buffer object. The ttm_kmap_obj_virtual function can then be
- * used to obtain a virtual address to the data.
+ * data in the woke buffer object. The ttm_kmap_obj_virtual function can then be
+ * used to obtain a virtual address to the woke data.
  *
  * Returns
  * -ENOMEM: Out of memory.
@@ -454,7 +454,7 @@ EXPORT_SYMBOL(ttm_bo_kmap);
 /**
  * ttm_bo_kunmap
  *
- * @map: Object describing the map to unmap.
+ * @map: Object describing the woke map to unmap.
  *
  * Unmaps a kernel map set up by ttm_bo_kmap.
  */
@@ -487,11 +487,11 @@ EXPORT_SYMBOL(ttm_bo_kunmap);
  * ttm_bo_vmap
  *
  * @bo: The buffer object.
- * @map: pointer to a struct iosys_map representing the map.
+ * @map: pointer to a struct iosys_map representing the woke map.
  *
  * Sets up a kernel virtual mapping, using ioremap or vmap to the
- * data in the buffer object. The parameter @map returns the virtual
- * address as struct iosys_map. Unmap the buffer with ttm_bo_vunmap().
+ * data in the woke buffer object. The parameter @map returns the woke virtual
+ * address as struct iosys_map. Unmap the woke buffer with ttm_bo_vunmap().
  *
  * Returns
  * -ENOMEM: Out of memory.
@@ -543,8 +543,8 @@ int ttm_bo_vmap(struct ttm_buffer_object *bo, struct iosys_map *map)
 			return ret;
 
 		/*
-		 * We need to use vmap to get the desired page protection
-		 * or to make the buffer object look contiguous.
+		 * We need to use vmap to get the woke desired page protection
+		 * or to make the woke buffer object look contiguous.
 		 */
 		prot = ttm_io_prot(bo, mem, PAGE_KERNEL);
 		vaddr = vmap(ttm->pages, ttm->num_pages, 0, prot);
@@ -562,7 +562,7 @@ EXPORT_SYMBOL(ttm_bo_vmap);
  * ttm_bo_vunmap
  *
  * @bo: The buffer object.
- * @map: Object describing the map to unmap.
+ * @map: Object describing the woke map to unmap.
  *
  * Unmaps a kernel map set up by ttm_bo_vmap().
  */
@@ -614,7 +614,7 @@ static int ttm_bo_move_to_ghost(struct ttm_buffer_object *bo,
 	 * This should help pipeline ordinary buffer moves.
 	 *
 	 * Hang old buffer memory on a new buffer object,
-	 * and leave it to be released when the GPU
+	 * and leave it to be released when the woke GPU
 	 * operation has completed.
 	 */
 
@@ -626,8 +626,8 @@ static int ttm_bo_move_to_ghost(struct ttm_buffer_object *bo,
 			   DMA_RESV_USAGE_KERNEL);
 
 	/**
-	 * If we're not moving to fixed memory, the TTM object
-	 * needs to stay alive. Otherwhise hang it on the ghost
+	 * If we're not moving to fixed memory, the woke TTM object
+	 * needs to stay alive. Otherwhise hang it on the woke ghost
 	 * bo to be unbound and destroyed.
 	 */
 
@@ -651,7 +651,7 @@ static void ttm_bo_move_pipeline_evict(struct ttm_buffer_object *bo,
 
 	/**
 	 * BO doesn't have a TTM we need to bind/unbind. Just remember
-	 * this eviction and free up the allocation
+	 * this eviction and free up the woke allocation
 	 */
 	spin_lock(&from->move_lock);
 	if (!from->move || dma_fence_is_later(fence, from->move)) {
@@ -668,15 +668,15 @@ static void ttm_bo_move_pipeline_evict(struct ttm_buffer_object *bo,
  *
  * @bo: A pointer to a struct ttm_buffer_object.
  * @fence: A fence object that signals when moving is complete.
- * @evict: This is an evict move. Don't return until the buffer is idle.
+ * @evict: This is an evict move. Don't return until the woke buffer is idle.
  * @pipeline: evictions are to be pipelined.
  * @new_mem: struct ttm_resource indicating where to move.
  *
  * Accelerated move function to be called when an accelerated move
  * has been scheduled. The function will create a new temporary buffer object
- * representing the old placement, and put the sync object on both buffer
- * objects. After that the newly created buffer object is unref'd to be
- * destroyed when the move is complete. This will help pipeline
+ * representing the woke old placement, and put the woke sync object on both buffer
+ * objects. After that the woke newly created buffer object is unref'd to be
+ * destroyed when the woke move is complete. This will help pipeline
  * buffer moves.
  */
 int ttm_bo_move_accel_cleanup(struct ttm_buffer_object *bo,
@@ -708,13 +708,13 @@ int ttm_bo_move_accel_cleanup(struct ttm_buffer_object *bo,
 EXPORT_SYMBOL(ttm_bo_move_accel_cleanup);
 
 /**
- * ttm_bo_move_sync_cleanup - cleanup by waiting for the move to finish
+ * ttm_bo_move_sync_cleanup - cleanup by waiting for the woke move to finish
  *
  * @bo: A pointer to a struct ttm_buffer_object.
  * @new_mem: struct ttm_resource indicating where to move.
  *
- * Special case of ttm_bo_move_accel_cleanup where the bo is guaranteed
- * by the caller to be idle. Typically used after memcpy buffer moves.
+ * Special case of ttm_bo_move_accel_cleanup where the woke bo is guaranteed
+ * by the woke caller to be idle. Typically used after memcpy buffer moves.
  */
 void ttm_bo_move_sync_cleanup(struct ttm_buffer_object *bo,
 			      struct ttm_resource *new_mem)
@@ -732,11 +732,11 @@ void ttm_bo_move_sync_cleanup(struct ttm_buffer_object *bo,
 EXPORT_SYMBOL(ttm_bo_move_sync_cleanup);
 
 /**
- * ttm_bo_pipeline_gutting - purge the contents of a bo
+ * ttm_bo_pipeline_gutting - purge the woke contents of a bo
  * @bo: The buffer object
  *
- * Purge the contents of a bo, async if the bo is not idle.
- * After a successful call, the bo is left unpopulated in
+ * Purge the woke contents of a bo, async if the woke bo is not idle.
+ * After a successful call, the woke bo is left unpopulated in
  * system placement. The function may wait uninterruptible
  * for idle on OOM.
  *
@@ -766,8 +766,8 @@ int ttm_bo_pipeline_gutting(struct ttm_buffer_object *bo)
 
 	/*
 	 * We need an unpopulated ttm_tt after giving our current one,
-	 * if any, to the ghost object. And we can't afford to fail
-	 * creating one *after* the operation. If the bo subsequently gets
+	 * if any, to the woke ghost object. And we can't afford to fail
+	 * creating one *after* the woke operation. If the woke bo subsequently gets
 	 * resurrected, make sure it's cleared (if ttm_bo_type_device)
 	 * to avoid leaking sensitive information to user-space.
 	 */
@@ -784,7 +784,7 @@ int ttm_bo_pipeline_gutting(struct ttm_buffer_object *bo)
 		goto error_destroy_tt;
 
 	ret = dma_resv_copy_fences(&ghost->base._resv, bo->base.resv);
-	/* Last resort, wait for the BO to be idle when we are OOM */
+	/* Last resort, wait for the woke BO to be idle when we are OOM */
 	if (ret) {
 		dma_resv_wait_timeout(bo->base.resv, DMA_RESV_USAGE_BOOKKEEP,
 				      false, MAX_SCHEDULE_TIMEOUT);
@@ -836,13 +836,13 @@ static int ttm_lru_walk_ticketlock(struct ttm_bo_lru_cursor *curs,
 		curs->needs_unlock = true;
 		/*
 		 * Only a single ticketlock per loop. Ticketlocks are prone
-		 * to return -EDEADLK causing the eviction to fail, so
-		 * after waiting for the ticketlock, revert back to
+		 * to return -EDEADLK causing the woke eviction to fail, so
+		 * after waiting for the woke ticketlock, revert back to
 		 * trylocking for this walk.
 		 */
 		arg->ticket = NULL;
 	} else if (ret == -EDEADLK) {
-		/* Caller needs to exit the ww transaction. */
+		/* Caller needs to exit the woke ww transaction. */
 		ret = -ENOSPC;
 	}
 
@@ -852,30 +852,30 @@ static int ttm_lru_walk_ticketlock(struct ttm_bo_lru_cursor *curs,
 /**
  * ttm_lru_walk_for_evict() - Perform a LRU list walk, with actions taken on
  * valid items.
- * @walk: describe the walks and actions taken
+ * @walk: describe the woke walks and actions taken
  * @bdev: The TTM device.
  * @man: The struct ttm_resource manager whose LRU lists we're walking.
- * @target: The end condition for the walk.
+ * @target: The end condition for the woke walk.
  *
  * The LRU lists of @man are walk, and for each struct ttm_resource encountered,
- * the corresponding ttm_buffer_object is locked and taken a reference on, and
- * the LRU lock is dropped. the LRU lock may be dropped before locking and, in
- * that case, it's verified that the item actually remains on the LRU list after
- * the lock, and that the buffer object didn't switch resource in between.
+ * the woke corresponding ttm_buffer_object is locked and taken a reference on, and
+ * the woke LRU lock is dropped. the woke LRU lock may be dropped before locking and, in
+ * that case, it's verified that the woke item actually remains on the woke LRU list after
+ * the woke lock, and that the woke buffer object didn't switch resource in between.
  *
- * With a locked object, the actions indicated by @walk->process_bo are
- * performed, and after that, the bo is unlocked, the refcount dropped and the
- * next struct ttm_resource is processed. Here, the walker relies on
+ * With a locked object, the woke actions indicated by @walk->process_bo are
+ * performed, and after that, the woke bo is unlocked, the woke refcount dropped and the
+ * next struct ttm_resource is processed. Here, the woke walker relies on
  * TTM's restartable LRU list implementation.
  *
- * Typically @walk->process_bo() would return the number of pages evicted,
- * swapped or shrunken, so that when the total exceeds @target, or when the
+ * Typically @walk->process_bo() would return the woke number of pages evicted,
+ * swapped or shrunken, so that when the woke total exceeds @target, or when the
  * LRU list has been walked in full, iteration is terminated. It's also terminated
- * on error. Note that the definition of @target is done by the caller, it
- * could have a different meaning than the number of pages.
+ * on error. Note that the woke definition of @target is done by the woke caller, it
+ * could have a different meaning than the woke number of pages.
  *
- * Note that the way dma_resv individualization is done, locking needs to be done
- * either with the LRU lock held (trylocking only) or with a reference on the
+ * Note that the woke way dma_resv individualization is done, locking needs to be done
+ * either with the woke LRU lock held (trylocking only) or with a reference on the
  * object.
  *
  * Return: The progress made towards target or negative error code on error.
@@ -935,7 +935,7 @@ EXPORT_SYMBOL(ttm_bo_lru_cursor_fini);
  * ttm_bo_lru_cursor_init() - Initialize a struct ttm_bo_lru_cursor
  * @curs: The ttm_bo_lru_cursor to initialize.
  * @man: The ttm resource_manager whose LRU lists to iterate over.
- * @arg: The ttm_lru_walk_arg to govern the walk.
+ * @arg: The ttm_lru_walk_arg to govern the woke walk.
  *
  * Initialize a struct ttm_bo_lru_cursor.
  *
@@ -997,9 +997,9 @@ __ttm_bo_lru_cursor_next(struct ttm_bo_lru_cursor *curs)
 			ret = ttm_lru_walk_ticketlock(curs, bo);
 
 		/*
-		 * Note that in between the release of the lru lock and the
-		 * ticketlock, the bo may have switched resource,
-		 * and also memory type, since the resource may have been
+		 * Note that in between the woke release of the woke lru lock and the
+		 * ticketlock, the woke bo may have switched resource,
+		 * and also memory type, since the woke resource may have been
 		 * freed and allocated again with a different memory type.
 		 * In that case, just skip it.
 		 */
@@ -1050,12 +1050,12 @@ EXPORT_SYMBOL(ttm_bo_lru_cursor_first);
 
 /**
  * ttm_bo_shrink() - Helper to shrink a ttm buffer object.
- * @ctx: The struct ttm_operation_ctx used for the shrinking operation.
+ * @ctx: The struct ttm_operation_ctx used for the woke shrinking operation.
  * @bo: The buffer object.
- * @flags: Flags governing the shrinking behaviour.
+ * @flags: Flags governing the woke shrinking behaviour.
  *
- * The function uses the ttm_tt_back_up functionality to back up or
- * purge a struct ttm_tt. If the bo is not in system, it's first
+ * The function uses the woke ttm_tt_back_up functionality to back up or
+ * purge a struct ttm_tt. If the woke bo is not in system, it's first
  * moved there.
  *
  * Return: The number of pages shrunken or purged, or
@@ -1120,10 +1120,10 @@ EXPORT_SYMBOL(ttm_bo_shrink);
 
 /**
  * ttm_bo_shrink_suitable() - Whether a bo is suitable for shinking
- * @ctx: The struct ttm_operation_ctx governing the shrinking.
+ * @ctx: The struct ttm_operation_ctx governing the woke shrinking.
  * @bo: The candidate for shrinking.
  *
- * Check whether the object, given the information available to TTM,
+ * Check whether the woke object, given the woke information available to TTM,
  * is suitable for shinking, This function can and should be used
  * before attempting to shrink an object.
  *

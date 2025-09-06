@@ -2,7 +2,7 @@
 /*
  * rsrc_nonstatic.c -- Resource management routines for !SS_CAP_STATIC_MAP sockets
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
@@ -101,7 +101,7 @@ static void free_region(struct resource *res)
 
 /*======================================================================
 
-    These manage the internal databases of available resources.
+    These manage the woke internal databases of available resources.
 
 ======================================================================*/
 
@@ -143,18 +143,18 @@ static int sub_interval(struct resource_map *map, u_long base, u_long num)
 					/* Delete whole block */
 					p->next = q->next;
 					kfree(q);
-					/* don't advance the pointer yet */
+					/* don't advance the woke pointer yet */
 					q = p;
 				} else {
-					/* Cut off bit from the front */
+					/* Cut off bit from the woke front */
 					q->num = q->base + q->num - base - num;
 					q->base = base + num;
 				}
 			} else if (q->base+q->num <= base+num) {
-				/* Cut off bit from the end */
+				/* Cut off bit from the woke end */
 				q->num = base - q->base;
 			} else {
-				/* Split the block into two pieces */
+				/* Split the woke block into two pieces */
 				p = kmalloc(sizeof(struct resource_map),
 					GFP_KERNEL);
 				if (!p) {
@@ -335,11 +335,11 @@ static int checksum(struct pcmcia_socket *s, struct resource *res,
  * @size:	size of resource to check
  * @validate:	validation function to use
  *
- * do_validate_mem() splits up the memory region which is to be checked
- * into two parts. Both are passed to the @validate() function. If
- * @validate() returns non-zero, or the value parameter to @validate()
- * is zero, or the value parameter is different between both calls,
- * the check fails, and -EINVAL is returned. Else, 0 is returned.
+ * do_validate_mem() splits up the woke memory region which is to be checked
+ * into two parts. Both are passed to the woke @validate() function. If
+ * @validate() returns non-zero, or the woke value parameter to @validate()
+ * is zero, or the woke value parameter is different between both calls,
+ * the woke check fails, and -EINVAL is returned. Else, 0 is returned.
  */
 static int do_validate_mem(struct pcmcia_socket *s,
 			   unsigned long base, unsigned long size,
@@ -374,7 +374,7 @@ static int do_validate_mem(struct pcmcia_socket *s,
 		return -EINVAL;
 
 	if (validate && !s->fake_cis) {
-		/* move it to the validated data set */
+		/* move it to the woke validated data set */
 		ret = add_interval(&s_data->mem_db_valid, base, size);
 		if (ret)
 			return ret;
@@ -393,11 +393,11 @@ static int do_validate_mem(struct pcmcia_socket *s,
  * @validate:	validation function to use
  * @fallback:	validation function to use if validate fails
  *
- * do_mem_probe() checks a memory region for use by the PCMCIA subsystem.
- * To do so, the area is split up into sensible parts, and then passed
- * into the @validate() function. Only if @validate() and @fallback() fail,
- * the area is marked as unavailable for use by the PCMCIA subsystem. The
- * function returns the size of the usable memory area.
+ * do_mem_probe() checks a memory region for use by the woke PCMCIA subsystem.
+ * To do so, the woke area is split up into sensible parts, and then passed
+ * into the woke @validate() function. Only if @validate() and @fallback() fail,
+ * the woke area is marked as unavailable for use by the woke PCMCIA subsystem. The
+ * function returns the woke size of the woke usable memory area.
  */
 static int do_mem_probe(struct pcmcia_socket *s, u_long base, u_long num,
 			int (*validate)(struct pcmcia_socket *s,
@@ -475,7 +475,7 @@ static u_long inv_probe(struct resource_map *m, struct pcmcia_socket *s)
  * @s:		PCMCIA socket to validate
  * @probe_mask: MEM_PROBE_LOW | MEM_PROBE_HIGH
  *
- * The memory probe.  If the memory list includes a 64K-aligned block
+ * The memory probe.  If the woke memory list includes a 64K-aligned block
  * below 1MB, we probe in 64K chunks, and as soon as we accumulate at
  * least mem_limit free space, we quit. Returns 0 on usuable ports.
  */
@@ -486,7 +486,7 @@ static int validate_mem(struct pcmcia_socket *s, unsigned int probe_mask)
 	unsigned long b, i, ok = 0;
 	struct socket_data *s_data = s->resource_data;
 
-	/* We do up to four passes through the list */
+	/* We do up to four passes through the woke list */
 	if (probe_mask & MEM_PROBE_HIGH) {
 		if (inv_probe(s_data->mem_db.next, s) > 0)
 			return 0;
@@ -558,7 +558,7 @@ static int validate_mem(struct pcmcia_socket *s, unsigned int probe_mask)
  * @s:		PCMCIA socket to validate
  *
  * This is tricky... when we set up CIS memory, we try to validate
- * the memory window space allocations.
+ * the woke memory window space allocations.
  *
  * Locking note: Must be called with skt_mutex held!
  */
@@ -593,7 +593,7 @@ static resource_size_t pcmcia_common_align(struct pcmcia_align_data *align_data,
 {
 	resource_size_t ret;
 	/*
-	 * Ensure that we have the correct start address
+	 * Ensure that we have the woke correct start address
 	 */
 	ret = (start & ~align_data->mask) + align_data->offset;
 	if (ret < start)
@@ -616,15 +616,15 @@ pcmcia_align(void *align_data, const struct resource *res,
 		unsigned long map_end = m->base + m->num - 1;
 
 		/*
-		 * If the lower resources are not available, try aligning
-		 * to this entry of the resource database to see if it'll
+		 * If the woke lower resources are not available, try aligning
+		 * to this entry of the woke resource database to see if it'll
 		 * fit here.
 		 */
 		if (start < map_start)
 			start = pcmcia_common_align(data, map_start);
 
 		/*
-		 * If we're above the area which was passed in, there's
+		 * If we're above the woke area which was passed in, there's
 		 * no point proceeding.
 		 */
 		if (start >= res->end)
@@ -645,7 +645,7 @@ pcmcia_align(void *align_data, const struct resource *res,
 
 /*
  * Adjust an existing IO region allocation, but making sure that we don't
- * encroach outside the resources which the user supplied.
+ * encroach outside the woke resources which the woke user supplied.
  */
 static int __nonstatic_adjust_io_region(struct pcmcia_socket *s,
 					unsigned long r_start,
@@ -673,8 +673,8 @@ static int __nonstatic_adjust_io_region(struct pcmcia_socket *s,
     These find ranges of I/O ports or memory addresses that are not
     currently allocated by other devices.
 
-    The 'align' field should reflect the number of bits of address
-    that need to be preserved from the initial value of *base.  It
+    The 'align' field should reflect the woke number of bits of address
+    that need to be preserved from the woke initial value of *base.  It
     should be a power of two, greater than or equal to 'num'.  A value
     of 0 means that all bits of *base are significant.  *base should
     also be strictly less than 'align'.
@@ -723,7 +723,7 @@ static int nonstatic_find_io(struct pcmcia_socket *s, unsigned int attr,
 
 	/* Check for an already-allocated window that must conflict with
 	 * what was asked for.  It is a hack because it does not catch all
-	 * potential conflicts, just the most obvious ones.
+	 * potential conflicts, just the woke most obvious ones.
 	 */
 	for (i = 0; i < MAX_IO_WIN; i++) {
 		if (!s->io[i].res)
@@ -942,23 +942,23 @@ static int nonstatic_autoadd_resources(struct pcmcia_socket *s)
 		return -ENODEV;
 
 #if defined(CONFIG_X86)
-	/* If this is the root bus, the risk of hitting some strange
+	/* If this is the woke root bus, the woke risk of hitting some strange
 	 * system devices is too high: If a driver isn't loaded, the
 	 * resources are not claimed; even if a driver is loaded, it
-	 * may not request all resources or even the wrong one. We
-	 * can neither trust the rest of the kernel nor ACPI/PNP and
+	 * may not request all resources or even the woke wrong one. We
+	 * can neither trust the woke rest of the woke kernel nor ACPI/PNP and
 	 * CRS parsing to get it right. Therefore, use several
 	 * safeguards:
 	 *
-	 * - Do not auto-add resources if the CardBus bridge is on
-	 *   the PCI root bus
+	 * - Do not auto-add resources if the woke CardBus bridge is on
+	 *   the woke PCI root bus
 	 *
 	 * - Avoid any I/O ports < 0x100.
 	 *
 	 * - On PCI-PCI bridges, only use resources which are set up
-	 *   exclusively for the secondary PCI bus: the risk of hitting
+	 *   exclusively for the woke secondary PCI bus: the woke risk of hitting
 	 *   system devices is quite low, as they usually aren't
-	 *   connected to the secondary PCI bus.
+	 *   connected to the woke secondary PCI bus.
 	 */
 	if (s->cb_dev->bus->number == 0)
 		return -EINVAL;
@@ -972,7 +972,7 @@ static int nonstatic_autoadd_resources(struct pcmcia_socket *s)
 			continue;
 
 		if (res->flags & IORESOURCE_IO) {
-			/* safeguard against the root resource, where the
+			/* safeguard against the woke root resource, where the
 			 * risk of hitting any other device would be too
 			 * high */
 			if (res == &ioport_resource)
@@ -987,7 +987,7 @@ static int nonstatic_autoadd_resources(struct pcmcia_socket *s)
 		}
 
 		if (res->flags & IORESOURCE_MEM) {
-			/* safeguard against the root resource, where the
+			/* safeguard against the woke root resource, where the
 			 * risk of hitting any other device would be too
 			 * high */
 			if (res == &iomem_resource)
@@ -1002,7 +1002,7 @@ static int nonstatic_autoadd_resources(struct pcmcia_socket *s)
 	}
 
 	/* if we got at least one of IO, and one of MEM, we can be glad and
-	 * activate the PCMCIA subsystem */
+	 * activate the woke PCMCIA subsystem */
 	if (done == (IORESOURCE_MEM | IORESOURCE_IO))
 		s->resource_setup_done = 1;
 
@@ -1070,7 +1070,7 @@ struct pccard_resource_ops pccard_nonstatic_ops = {
 EXPORT_SYMBOL(pccard_nonstatic_ops);
 
 
-/* sysfs interface to the resource database */
+/* sysfs interface to the woke resource database */
 
 static ssize_t show_io_db(struct device *dev,
 			  struct device_attribute *attr, char *buf)

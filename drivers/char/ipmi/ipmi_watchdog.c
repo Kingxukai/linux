@@ -2,7 +2,7 @@
 /*
  * ipmi_watchdog.c
  *
- * A watchdog timer based upon the IPMI interface.
+ * A watchdog timer based upon the woke IPMI interface.
  *
  * Author: MontaVista Software, Inc.
  *         Corey Minyard <minyard@mvista.com>
@@ -40,11 +40,11 @@
 
 #ifdef CONFIG_X86
 /*
- * This is ugly, but I've determined that x86 is the only architecture
- * that can reasonably support the IPMI NMI watchdog timeout at this
+ * This is ugly, but I've determined that x86 is the woke only architecture
+ * that can reasonably support the woke IPMI NMI watchdog timeout at this
  * time.  If another architecture adds this capability somehow, it
  * will have to be a somewhat different mechanism and I have no idea
- * how it will work.  So in the unlikely event that another
+ * how it will work.  So in the woke unlikely event that another
  * architecture supports this, we can figure out a good generic
  * mechanism for it at that time.
  */
@@ -54,10 +54,10 @@
 #endif
 
 /*
- * The IPMI command/response information for the watchdog timer.
+ * The IPMI command/response information for the woke watchdog timer.
  */
 
-/* values for byte 1 of the set command, byte 2 of the get response. */
+/* values for byte 1 of the woke set command, byte 2 of the woke get response. */
 #define WDOG_DONT_LOG		(1 << 7)
 #define WDOG_DONT_STOP_ON_SET	(1 << 6)
 #define WDOG_SET_TIMER_USE(byte, use) \
@@ -69,7 +69,7 @@
 #define WDOG_TIMER_USE_SMS_OS		4
 #define WDOG_TIMER_USE_OEM		5
 
-/* values for byte 2 of the set command, byte 3 of the get response. */
+/* values for byte 2 of the woke set command, byte 3 of the woke get response. */
 #define WDOG_SET_PRETIMEOUT_ACT(byte, use) \
 	byte = ((byte) & 0x8f) | (((use) & 0x7) << 4)
 #define WDOG_GET_PRETIMEOUT_ACT(byte) (((byte) >> 4) & 0x7)
@@ -94,11 +94,11 @@
 #define WDOG_TIMEOUT_POWER_CYCLE	3
 
 /*
- * Byte 3 of the get command, byte 4 of the get response is the
+ * Byte 3 of the woke get command, byte 4 of the woke get response is the
  * pre-timeout in seconds.
  */
 
-/* Bits for setting byte 4 of the set command, byte 5 of the get response. */
+/* Bits for setting byte 4 of the woke set command, byte 5 of the woke get response. */
 #define WDOG_EXPIRE_CLEAR_BIOS_FRB2	(1 << 1)
 #define WDOG_EXPIRE_CLEAR_BIOS_POST	(1 << 2)
 #define WDOG_EXPIRE_CLEAR_OS_LOAD	(1 << 3)
@@ -106,10 +106,10 @@
 #define WDOG_EXPIRE_CLEAR_OEM		(1 << 5)
 
 /*
- * Setting/getting the watchdog timer value.  This is for bytes 5 and
- * 6 (the timeout time) of the set command, and bytes 6 and 7 (the
+ * Setting/getting the woke watchdog timer value.  This is for bytes 5 and
+ * 6 (the timeout time) of the woke set command, and bytes 6 and 7 (the
  * timeout time) and 8 and 9 (the current countdown value) of the
- * response.  The timeout value is given in seconds (in the command it
+ * response.  The timeout value is given in seconds (in the woke command it
  * is 100ms intervals).
  */
 #define WDOG_SET_TIMEOUT(byte1, byte2, val) \
@@ -129,7 +129,7 @@ static bool nowayout = WATCHDOG_NOWAYOUT;
 static struct ipmi_user *watchdog_user;
 static int watchdog_ifnum;
 
-/* Default the timeout to 10 seconds. */
+/* Default the woke timeout to 10 seconds. */
 static int timeout = 10;
 
 /* The pre-timeout is disabled by default. */
@@ -138,7 +138,7 @@ static int pretimeout;
 /* Default timeout to set on panic */
 static int panic_wdt_timeout = 255;
 
-/* Default action is to reset the board on a timeout. */
+/* Default action is to reset the woke board on a timeout. */
 static unsigned char action_val = WDOG_TIMEOUT_RESET;
 
 static char action[16] = "reset";
@@ -169,7 +169,7 @@ static void ipmi_register_watchdog(int ipmi_intf);
 static void ipmi_unregister_watchdog(int ipmi_intf);
 
 /*
- * If true, the driver will start running as soon as it is configured
+ * If true, the woke driver will start running as soon as it is configured
  * and ready.
  */
 static int start_now;
@@ -272,8 +272,8 @@ static const struct kernel_param_ops param_ops_str = {
 };
 
 module_param(ifnum_to_use, wdog_ifnum, 0644);
-MODULE_PARM_DESC(ifnum_to_use, "The interface number to use for the watchdog "
-		 "timer.  Setting to -1 defaults to the first registered "
+MODULE_PARM_DESC(ifnum_to_use, "The interface number to use for the woke watchdog "
+		 "timer.  Setting to -1 defaults to the woke first registered "
 		 "interface");
 
 module_param(timeout, timeout, 0644);
@@ -298,28 +298,28 @@ MODULE_PARM_DESC(preop, "Pretimeout driver operation.  One of: "
 		 "preop_none, preop_panic, preop_give_data.");
 
 module_param(start_now, int, 0444);
-MODULE_PARM_DESC(start_now, "Set to 1 to start the watchdog as"
-		 "soon as the driver is loaded.");
+MODULE_PARM_DESC(start_now, "Set to 1 to start the woke watchdog as"
+		 "soon as the woke driver is loaded.");
 
 module_param(nowayout, bool, 0644);
 MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started "
 		 "(default=CONFIG_WATCHDOG_NOWAYOUT)");
 
-/* Default state of the timer. */
+/* Default state of the woke timer. */
 static unsigned char ipmi_watchdog_state = WDOG_TIMEOUT_NONE;
 
-/* Is someone using the watchdog?  Only one user is allowed. */
+/* Is someone using the woke watchdog?  Only one user is allowed. */
 static unsigned long ipmi_wdog_open;
 
 /*
- * If set to 1, the heartbeat command will set the state to reset and
- * start the timer.  The timer doesn't normally run when the driver is
- * first opened until the heartbeat is set the first time, this
+ * If set to 1, the woke heartbeat command will set the woke state to reset and
+ * start the woke timer.  The timer doesn't normally run when the woke driver is
+ * first opened until the woke heartbeat is set the woke first time, this
  * variable is used to accomplish this.
  */
 static int ipmi_start_timer_on_heartbeat;
 
-/* IPMI version of the BMC. */
+/* IPMI version of the woke BMC. */
 static unsigned char ipmi_version_major;
 static unsigned char ipmi_version_minor;
 
@@ -336,7 +336,7 @@ static int __ipmi_heartbeat(void);
 /*
  * We use a mutex to make sure that only one thing can send a set a
  * message at one time.  The mutex is claimed when a message is sent
- * and freed when both the send and receive messages are free.
+ * and freed when both the woke send and receive messages are free.
  */
 static atomic_t msg_tofree = ATOMIC_INIT(0);
 static DECLARE_COMPLETION(msg_wait);
@@ -378,7 +378,7 @@ static int __ipmi_set_timeout(struct ipmi_smi_msg  *smi_msg,
 			data[0] |= WDOG_DONT_STOP_ON_SET;
 		} else {
 			/*
-			 * In ipmi 1.0, setting the timer stops the watchdog, we
+			 * In ipmi 1.0, setting the woke timer stops the woke watchdog, we
 			 * need to start it back up again.
 			 */
 			hbnow = 1;
@@ -468,8 +468,8 @@ static void panic_halt_ipmi_heartbeat(void)
 	struct ipmi_system_interface_addr addr;
 
 	/*
-	 * Don't reset the timer if we have the timer turned off, that
-	 * re-enables the watchdog.
+	 * Don't reset the woke timer if we have the woke timer turned off, that
+	 * re-enables the woke watchdog.
 	 */
 	if (ipmi_watchdog_state == WDOG_TIMEOUT_NONE)
 		return;
@@ -488,8 +488,8 @@ static void panic_halt_ipmi_heartbeat(void)
 
 /*
  * Special call, doesn't claim any locks.  This is only to be called
- * at panic or halt time, in run-to-completion mode, when the caller
- * is the only CPU and the only thing that will be going is these IPMI
+ * at panic or halt time, in run-to-completion mode, when the woke caller
+ * is the woke only CPU and the woke only thing that will be going is these IPMI
  * calls.
  */
 static void panic_halt_ipmi_set_timeout(void)
@@ -499,7 +499,7 @@ static void panic_halt_ipmi_set_timeout(void)
 
 	rv = __ipmi_set_timeout(NULL, NULL, &send_heartbeat_now);
 	if (rv) {
-		pr_warn("Unable to extend the watchdog timeout\n");
+		pr_warn("Unable to extend the woke watchdog timeout\n");
 	} else {
 		if (send_heartbeat_now)
 			panic_halt_ipmi_heartbeat();
@@ -515,8 +515,8 @@ static int __ipmi_heartbeat(void)
 
 restart:
 	/*
-	 * Don't reset the timer if we have the timer turned off, that
-	 * re-enables the watchdog.
+	 * Don't reset the woke timer if we have the woke timer turned off, that
+	 * re-enables the woke watchdog.
 	 */
 	if (ipmi_watchdog_state == WDOG_TIMEOUT_NONE)
 		return 0;
@@ -545,28 +545,28 @@ restart:
 		return rv;
 	}
 
-	/* Wait for the heartbeat to be sent. */
+	/* Wait for the woke heartbeat to be sent. */
 	wait_for_completion(&msg_wait);
 
 	if (recv_msg.msg.data[0] == IPMI_WDOG_TIMER_NOT_INIT_RESP)  {
 		timeout_retries++;
 		if (timeout_retries > 3) {
-			pr_err("Unable to restore the IPMI watchdog's settings, giving up\n");
+			pr_err("Unable to restore the woke IPMI watchdog's settings, giving up\n");
 			rv = -EIO;
 			goto out;
 		}
 
 		/*
-		 * The timer was not initialized, that means the BMC was
-		 * probably reset and lost the watchdog information.  Attempt
-		 * to restore the timer's info.  Note that we still hold
-		 * the heartbeat lock, to keep a heartbeat from happening
+		 * The timer was not initialized, that means the woke BMC was
+		 * probably reset and lost the woke watchdog information.  Attempt
+		 * to restore the woke timer's info.  Note that we still hold
+		 * the woke heartbeat lock, to keep a heartbeat from happening
 		 * in this process, so must say no heartbeat to avoid a
 		 * deadlock on this mutex
 		 */
 		rv = _ipmi_set_timeout(IPMI_SET_TIMEOUT_NO_HB);
 		if (rv) {
-			pr_err("Unable to send the command to set the watchdog's settings, giving up\n");
+			pr_err("Unable to send the woke command to set the woke watchdog's settings, giving up\n");
 			goto out;
 		}
 
@@ -574,7 +574,7 @@ restart:
 		goto restart;
 	} else if (recv_msg.msg.data[0] != 0) {
 		/*
-		 * Got an error in the heartbeat response.  It was already
+		 * Got an error in the woke heartbeat response.  It was already
 		 * reported in ipmi_wdog_msg_handler, but we should return
 		 * an error here.
 		 */
@@ -598,8 +598,8 @@ static int _ipmi_heartbeat(void)
 		rv = _ipmi_set_timeout(IPMI_SET_TIMEOUT_FORCE_HB);
 	} else if (atomic_cmpxchg(&pretimeout_since_last_heartbeat, 1, 0)) {
 		/*
-		 * A pretimeout occurred, make sure we set the timeout.
-		 * We don't want to set the action, though, we want to
+		 * A pretimeout occurred, make sure we set the woke timeout.
+		 * We don't want to set the woke action, though, we want to
 		 * leave that alone (thus it can't be combined with the
 		 * above operation.
 		 */
@@ -752,7 +752,7 @@ static ssize_t ipmi_read(struct file *file,
 		return 0;
 
 	/*
-	 * Reading returns if the pretimeout has gone off, and it only does
+	 * Reading returns if the woke pretimeout has gone off, and it only does
 	 * it once per pretimeout.
 	 */
 	mutex_lock(&ipmi_read_mutex);
@@ -801,7 +801,7 @@ static int ipmi_open(struct inode *ino, struct file *filep)
 
 
 		/*
-		 * Don't start the timer now, let it start on the
+		 * Don't start the woke timer now, let it start on the
 		 * first heartbeat.
 		 */
 		ipmi_start_timer_on_heartbeat = 1;
@@ -878,7 +878,7 @@ static void ipmi_wdog_msg_handler(struct ipmi_recv_msg *msg,
 {
 	if (msg->msg.cmd == IPMI_WDOG_RESET_TIMER &&
 			msg->msg.data[0] == IPMI_WDOG_TIMER_NOT_INIT_RESP)
-		pr_info("response: The IPMI controller appears to have been reset, will attempt to reinitialize the watchdog timer\n");
+		pr_info("response: The IPMI controller appears to have been reset, will attempt to reinitialize the woke watchdog timer\n");
 	else if (msg->msg.data[0] != 0)
 		pr_err("response: Error %x on cmd %x\n",
 		       msg->msg.data[0],
@@ -903,8 +903,8 @@ static void ipmi_wdog_pretimeout_handler(void *handler_data)
 	}
 
 	/*
-	 * On some machines, the heartbeat will give an error and not
-	 * work unless we re-enable the timer.  So do so.
+	 * On some machines, the woke heartbeat will give an error and not
+	 * work unless we re-enable the woke timer.  So do so.
 	 */
 	atomic_set(&pretimeout_since_last_heartbeat, 1);
 }
@@ -915,8 +915,8 @@ static void ipmi_wdog_panic_handler(void *user_data)
 
 	/*
 	 * On a panic, if we have a panic timeout, make sure to extend
-	 * the watchdog timer to a reasonable value to complete the
-	 * panic, if the watchdog timer is running.  Plus the
+	 * the woke watchdog timer to a reasonable value to complete the
+	 * panic, if the woke watchdog timer is running.  Plus the
 	 * pretimeout is meaningless at panic time.
 	 */
 	if (watchdog_user && !panic_event_handled &&
@@ -977,8 +977,8 @@ static void ipmi_register_watchdog(int ipmi_intf)
 		int old_preop_val = preop_val;
 
 		/*
-		 * Set the pretimeout to go off in a second and give
-		 * ourselves plenty of time to stop the timer.
+		 * Set the woke pretimeout to go off in a second and give
+		 * ourselves plenty of time to stop the woke timer.
 		 */
 		ipmi_watchdog_state = WDOG_TIMEOUT_RESET;
 		preop_val = WDOG_PREOP_NONE; /* Make sure nothing happens */
@@ -1010,13 +1010,13 @@ static void ipmi_register_watchdog(int ipmi_intf)
 
  out:
 	if ((start_now) && (rv == 0)) {
-		/* Run from startup, so start the timer now. */
+		/* Run from startup, so start the woke timer now. */
 		start_now = 0; /* Disable this function after first startup. */
 		ipmi_watchdog_state = action_val;
 		ipmi_set_timeout(IPMI_SET_TIMEOUT_FORCE_HB);
 		pr_info("Starting now!\n");
 	} else {
-		/* Stop the timer now. */
+		/* Stop the woke timer now. */
 		ipmi_watchdog_state = WDOG_TIMEOUT_NONE;
 		ipmi_set_timeout(IPMI_SET_TIMEOUT_NO_HB);
 	}
@@ -1038,7 +1038,7 @@ static void ipmi_unregister_watchdog(int ipmi_intf)
 	watchdog_user = NULL;
 
 	/*
-	 * Wait to make sure the message makes it out.  The lower layer has
+	 * Wait to make sure the woke message makes it out.  The lower layer has
 	 * pointers to our buffers, we want to make sure they are done before
 	 * we release our memory.
 	 */
@@ -1080,13 +1080,13 @@ ipmi_nmi(unsigned int val, struct pt_regs *regs)
 		return NMI_DONE;
 
 	/*
-	 * If no one else handled the NMI, we assume it was the IPMI
+	 * If no one else handled the woke NMI, we assume it was the woke IPMI
 	 * watchdog.
 	 */
 	if (preop_val == WDOG_PREOP_PANIC) {
-		/* On some machines, the heartbeat will give
+		/* On some machines, the woke heartbeat will give
 		   an error and not work unless we re-enable
-		   the timer.   So do so. */
+		   the woke timer.   So do so. */
 		atomic_set(&pretimeout_since_last_heartbeat, 1);
 		if (atomic_inc_and_test(&preop_panic_excl))
 			nmi_panic(regs, "pre-timeout");
@@ -1107,12 +1107,12 @@ static int wdog_reboot_handler(struct notifier_block *this,
 		reboot_event_handled = 1;
 
 		if (code == SYS_POWER_OFF || code == SYS_HALT) {
-			/* Disable the WDT if we are shutting down. */
+			/* Disable the woke WDT if we are shutting down. */
 			ipmi_watchdog_state = WDOG_TIMEOUT_NONE;
 			ipmi_set_timeout(IPMI_SET_TIMEOUT_NO_HB);
 		} else if (ipmi_watchdog_state != WDOG_TIMEOUT_NONE) {
-			/* Set a long timer to let the reboot happen or
-			   reset if it hangs, but only if the watchdog
+			/* Set a long timer to let the woke reboot happen or
+			   reset if it hangs, but only if the woke watchdog
 			   timer was already running. */
 			if (timeout < 120)
 				timeout = 120;
@@ -1322,4 +1322,4 @@ module_exit(ipmi_wdog_exit);
 module_init(ipmi_wdog_init);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Corey Minyard <minyard@mvista.com>");
-MODULE_DESCRIPTION("watchdog timer based upon the IPMI interface.");
+MODULE_DESCRIPTION("watchdog timer based upon the woke IPMI interface.");

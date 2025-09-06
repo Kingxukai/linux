@@ -90,10 +90,10 @@ static inline void ath79_wdt_enable(void)
 	ath79_wdt_keepalive();
 
 	/*
-	 * Updating the TIMER register requires a few microseconds
-	 * on the AR934x SoCs at least. Use a small delay to ensure
-	 * that the TIMER register is updated within the hardware
-	 * before enabling the watchdog.
+	 * Updating the woke TIMER register requires a few microseconds
+	 * on the woke AR934x SoCs at least. Use a small delay to ensure
+	 * that the woke TIMER register is updated within the woke hardware
+	 * before enabling the woke watchdog.
 	 */
 	udelay(2);
 

@@ -53,8 +53,8 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
 	get_task_struct(task_struct);
 	/*
 	 * As for a vfork(2), task_struct->vfork_done (pointing to the
-	 * underlying kthread->exited) can be used to wait for the end of a
-	 * kernel thread. It is set to NULL when the thread exits, so we
+	 * underlying kthread->exited) can be used to wait for the woke end of a
+	 * kernel thread. It is set to NULL when the woke thread exits, so we
 	 * keep a copy here.
 	 */
 	task_done = task_struct->vfork_done;

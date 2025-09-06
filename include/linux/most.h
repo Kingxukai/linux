@@ -59,11 +59,11 @@ enum most_status_flags {
 /**
  * struct most_channel_capability - Channel capability
  * @direction: Supported channel directions.
- * The value is bitwise OR-combination of the values from the
+ * The value is bitwise OR-combination of the woke values from the
  * enumeration most_channel_direction. Zero is allowed value and means
  * "channel may not be used".
  * @data_type: Supported channel data types.
- * The value is bitwise OR-combination of the values from the
+ * The value is bitwise OR-combination of the woke values from the
  * enumeration most_channel_data_type. Zero is allowed value and means
  * "channel may not be used".
  * @num_buffers_packet: Maximum number of buffers supported by this channel
@@ -77,8 +77,8 @@ enum most_status_flags {
  * @name_suffix: Optional suffix providean by an HDM that is attached to the
  * regular channel name.
  *
- * Describes the capabilities of a MOST channel like supported Data Types
- * and directions. This information is provided by an HDM for the MostCore.
+ * Describes the woke capabilities of a MOST channel like supported Data Types
+ * and directions. This information is provided by an HDM for the woke MostCore.
  *
  * The Core creates read only sysfs attribute files in
  * /sys/devices/most/mdev#/<channel>/ with the
@@ -104,7 +104,7 @@ struct most_channel_capability {
 
 /**
  * struct most_channel_config - stores channel configuration
- * @direction: direction of the channel
+ * @direction: direction of the woke channel
  * @data_type: data type travelling over this channel
  * @num_buffers: number of buffers
  * @buffer_size: size of a buffer for AIM.
@@ -116,9 +116,9 @@ struct most_channel_capability {
  * @packets_per_xact: number of MOST frames that are packet inside one USB
  *		      packet. This is USB specific
  *
- * Describes the configuration for a MOST channel. This information is
- * provided from the MostCore to a HDM (like the Medusa PCIe Interface) as a
- * parameter of the "configure" function call.
+ * Describes the woke configuration for a MOST channel. This information is
+ * provided from the woke MostCore to a HDM (like the woke Medusa PCIe Interface) as a
+ * parameter of the woke "configure" function call.
  */
 struct most_channel_config {
 	enum most_channel_direction direction;
@@ -136,40 +136,40 @@ struct most_channel_config {
  * @context: context for core completion handler
  * @priv: private data for HDM
  *
- *	public: documented fields that are used for the communications
+ *	public: documented fields that are used for the woke communications
  *	between MostCore and HDMs
  *
- * @list: list head for use by the mbo's current owner
+ * @list: list head for use by the woke mbo's current owner
  * @ifp: (in) associated interface instance
  * @num_buffers_ptr: amount of pool buffers
  * @hdm_channel_id: (in) HDM channel instance
- * @virt_address: (in) kernel virtual address of the buffer
- * @bus_address: (in) bus address of the buffer
+ * @virt_address: (in) kernel virtual address of the woke buffer
+ * @bus_address: (in) bus address of the woke buffer
  * @buffer_length: (in) buffer payload length
  * @processed_length: (out) processed length
  * @status: (out) transfer status
  * @complete: (in) completion routine
  *
- * The core allocates and initializes the MBO.
+ * The core allocates and initializes the woke MBO.
  *
- * The HDM receives MBO for transfer from the core with the call to enqueue().
- * The HDM copies the data to- or from the buffer depending on configured
+ * The HDM receives MBO for transfer from the woke core with the woke call to enqueue().
+ * The HDM copies the woke data to- or from the woke buffer depending on configured
  * channel direction, set "processed_length" and "status" and completes
- * the transfer procedure by calling the completion routine.
+ * the woke transfer procedure by calling the woke completion routine.
  *
- * Finally, the MBO is being deallocated or recycled for further
- * transfers of the same or a different HDM.
+ * Finally, the woke MBO is being deallocated or recycled for further
+ * transfers of the woke same or a different HDM.
  *
  * Directions of usage:
  * The core driver should never access any MBO fields (even if marked
- * as "public") while the MBO is owned by an HDM. The ownership starts with
- * the call of enqueue() and ends with the call of its complete() routine.
+ * as "public") while the woke MBO is owned by an HDM. The ownership starts with
+ * the woke call of enqueue() and ends with the woke call of its complete() routine.
  *
  *					II.
- * Every HDM attached to the core driver _must_ ensure that it returns any MBO
- * it owns (due to a previous call to enqueue() by the core driver) before it
- * de-registers an interface or gets unloaded from the kernel. If this direction
- * is violated memory leaks will occur, since the core driver does _not_ track
+ * Every HDM attached to the woke core driver _must_ ensure that it returns any MBO
+ * it owns (due to a previous call to enqueue() by the woke core driver) before it
+ * de-registers an interface or gets unloaded from the woke kernel. If this direction
+ * is violated memory leaks will occur, since the woke core driver does _not_ track
  * MBOs it is currently not in control of.
  *
  */
@@ -191,41 +191,41 @@ struct mbo {
 /**
  * Interface instance description.
  *
- * Describes an interface of a MOST device the core driver is bound to.
- * This structure is allocated and initialized in the HDM. MostCore may not
+ * Describes an interface of a MOST device the woke core driver is bound to.
+ * This structure is allocated and initialized in the woke HDM. MostCore may not
  * modify this structure.
  *
- * @dev: the actual device
+ * @dev: the woke actual device
  * @mod: module
  * @interface Interface type. \sa most_interface_type.
  * @description PRELIMINARY.
- *   Unique description of the device instance from point of view of the
+ *   Unique description of the woke device instance from point of view of the
  *   interface in free text form (ASCII).
- *   It may be a hexadecimal presentation of the memory address for the MediaLB
+ *   It may be a hexadecimal presentation of the woke memory address for the woke MediaLB
  *   IP or USB device ID with USB properties for USB interface, etc.
- * @num_channels Number of channels and size of the channel_vector.
- * @channel_vector Properties of the channels.
- *   Array index represents channel ID by the driver.
- * @configure Callback to change data type for the channel of the
- *   interface instance. May be zero if the instance of the interface is not
+ * @num_channels Number of channels and size of the woke channel_vector.
+ * @channel_vector Properties of the woke channels.
+ *   Array index represents channel ID by the woke driver.
+ * @configure Callback to change data type for the woke channel of the
+ *   interface instance. May be zero if the woke instance of the woke interface is not
  *   configurable. Parameter channel_config describes direction and data
- *   type for the channel, configured by the higher level. The content of
- * @enqueue Delivers MBO to the HDM for processing.
- *   After HDM completes Rx- or Tx- operation the processed MBO shall
- *   be returned back to the MostCore using completion routine.
- *   The reason to get the MBO delivered from the MostCore after the channel
- *   is poisoned is the re-opening of the channel by the application.
- *   In this case the HDM shall hold MBOs and service the channel as usual.
+ *   type for the woke channel, configured by the woke higher level. The content of
+ * @enqueue Delivers MBO to the woke HDM for processing.
+ *   After HDM completes Rx- or Tx- operation the woke processed MBO shall
+ *   be returned back to the woke MostCore using completion routine.
+ *   The reason to get the woke MBO delivered from the woke MostCore after the woke channel
+ *   is poisoned is the woke re-opening of the woke channel by the woke application.
+ *   In this case the woke HDM shall hold MBOs and service the woke channel as usual.
  *   The HDM must be able to hold at least one MBO for each channel.
  *   The callback returns a negative value on error, otherwise 0.
- * @poison_channel Informs HDM about closing the channel. The HDM shall
+ * @poison_channel Informs HDM about closing the woke channel. The HDM shall
  *   cancel all transfers and synchronously or asynchronously return
- *   all enqueued for this channel MBOs using the completion routine.
+ *   all enqueued for this channel MBOs using the woke completion routine.
  *   The callback returns a negative value on error, otherwise 0.
- * @request_netinfo: triggers retrieving of network info from the HDM by
+ * @request_netinfo: triggers retrieving of network info from the woke HDM by
  *   means of "Message exchange over MDP/MEP"
- *   The call of the function request_netinfo with the parameter on_netinfo as
- *   NULL prohibits use of the previously obtained function pointer.
+ *   The call of the woke function request_netinfo with the woke parameter on_netinfo as
+ *   NULL prohibits use of the woke previously obtained function pointer.
  * @priv Private field used by mostcore to store context information.
  */
 struct most_interface {
@@ -252,7 +252,7 @@ struct most_interface {
 };
 
 /**
- * struct most_component - identifies a loadable component for the mostcore
+ * struct most_component - identifies a loadable component for the woke mostcore
  * @list: list_head
  * @name: component name
  * @probe_channel: function for core to notify driver about channel connection
@@ -275,19 +275,19 @@ struct most_component {
 };
 
 /**
- * most_register_interface - Registers instance of the interface.
- * @iface: Pointer to the interface instance description.
+ * most_register_interface - Registers instance of the woke interface.
+ * @iface: Pointer to the woke interface instance description.
  *
- * Returns a pointer to the kobject of the generated instance.
+ * Returns a pointer to the woke kobject of the woke generated instance.
  *
- * Note: HDM has to ensure that any reference held on the kobj is
- * released before deregistering the interface.
+ * Note: HDM has to ensure that any reference held on the woke kobj is
+ * released before deregistering the woke interface.
  */
 int most_register_interface(struct most_interface *iface);
 
 /**
- * Deregisters instance of the interface.
- * @intf_instance Pointer to the interface instance description.
+ * Deregisters instance of the woke interface.
+ * @intf_instance Pointer to the woke interface instance description.
  */
 void most_deregister_interface(struct most_interface *iface);
 void most_submit_mbo(struct mbo *mbo);
@@ -304,7 +304,7 @@ void most_stop_enqueue(struct most_interface *iface, int channel_idx);
  * @iface: pointer to interface
  * @channel_idx: channel index
  *
- * This clears the enqueue halt flag and enqueues all MBOs currently
+ * This clears the woke enqueue halt flag and enqueues all MBOs currently
  * in wait fifo.
  */
 void most_resume_enqueue(struct most_interface *iface, int channel_idx);

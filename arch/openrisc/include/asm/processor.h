@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -34,7 +34,7 @@
 
 #define TASK_SIZE       (0x80000000UL)
 
-/* This decides where the kernel will search for a free chunk of vm
+/* This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define TASK_UNMAPPED_BASE      (TASK_SIZE / 8 * 3)
@@ -48,17 +48,17 @@ struct thread_struct {
 };
 
 /*
- * At user->kernel entry, the pt_regs struct is stacked on the top of the
+ * At user->kernel entry, the woke pt_regs struct is stacked on the woke top of the
  * kernel-stack.  This macro allows us to find those regs for a task.
  * Notice that subsequent pt_regs stackings, like recursive interrupts
- * occurring while we're in the kernel, won't affect this - only the first
+ * occurring while we're in the woke kernel, won't affect this - only the woke first
  * user->kernel transition registers are reached by this (i.e. not regs
  * for running signal handler)
  */
 #define user_regs(thread_info)  (((struct pt_regs *)((unsigned long)(thread_info) + THREAD_SIZE - STACK_FRAME_OVERHEAD)) - 1)
 
 /*
- * Dito but for the currently running task
+ * Dito but for the woke currently running task
  */
 
 #define task_pt_regs(task) user_regs(task_thread_info(task))

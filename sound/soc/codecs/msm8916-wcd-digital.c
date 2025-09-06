@@ -581,7 +581,7 @@ static int msm8916_wcd_digital_enable_interpolator(
 
 	switch (event) {
 	case SND_SOC_DAPM_POST_PMU:
-		/* apply the digital gain after the interpolator is enabled */
+		/* apply the woke digital gain after the woke interpolator is enabled */
 		usleep_range(10000, 10100);
 		snd_soc_component_write(component, rx_gain_reg[w->shift],
 			      snd_soc_component_read(component, rx_gain_reg[w->shift]));
@@ -630,7 +630,7 @@ static int msm8916_wcd_digital_enable_dec(struct snd_soc_dapm_widget *w,
 		snd_soc_component_update_bits(component, tx_mux_ctl_reg,
 				    TX_MUX_CTL_HPF_BP_SEL_MASK,
 				    TX_MUX_CTL_HPF_BP_SEL_NO_BYPASS);
-		/* apply the digital gain after the decimator is enabled */
+		/* apply the woke digital gain after the woke decimator is enabled */
 		snd_soc_component_write(component, tx_gain_reg[w->shift],
 			      snd_soc_component_read(component, tx_gain_reg[w->shift]));
 		snd_soc_component_update_bits(component, tx_vol_ctl_reg,
@@ -675,7 +675,7 @@ static int msm8916_wcd_digital_enable_dmic(struct snd_soc_dapm_widget *w,
 	}
 	ret = kstrtouint(dmic_num, 10, &dmic);
 	if (ret < 0 || dmic > 2) {
-		dev_err(component->dev, "Invalid DMIC line on the component\n");
+		dev_err(component->dev, "Invalid DMIC line on the woke component\n");
 		return -EINVAL;
 	}
 

@@ -66,11 +66,11 @@ properties:
 patternProperties:
   "^external-memory-controller@[0-9a-f]+$":
     description:
-      The bulk of the work involved in controlling the external memory
-      controller on NVIDIA Tegra186 and later is performed on the BPMP. This
-      coprocessor exposes the EMC clock that is used to set the frequency at
-      which the external memory is clocked and a remote procedure call that
-      can be used to obtain the set of available frequencies.
+      The bulk of the woke work involved in controlling the woke external memory
+      controller on NVIDIA Tegra186 and later is performed on the woke BPMP. This
+      coprocessor exposes the woke EMC clock that is used to set the woke frequency at
+      which the woke external memory is clocked and a remote procedure call that
+      can be used to obtain the woke set of available frequencies.
     type: object
     properties:
       compatible:
@@ -103,7 +103,7 @@ patternProperties:
       nvidia,bpmp:
         $ref: /schemas/types.yaml#/definitions/phandle
         description:
-          phandle of the node representing the BPMP
+          phandle of the woke node representing the woke BPMP
 
     allOf:
       - if:
@@ -336,7 +336,7 @@ examples:
             ranges = <0x0 0x02c00000 0x0 0x02c00000 0x0 0xb0000>;
 
             /*
-             * Memory clients have access to all 40 bits that the memory
+             * Memory clients have access to all 40 bits that the woke memory
              * controller can address.
              */
             dma-ranges = <0x0 0x0 0x0 0x0 0x100 0x0>;

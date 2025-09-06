@@ -46,7 +46,7 @@ static void ice_port_vlan_on(struct ice_vsi *vsi)
 		vlan_ops->clear_port_vlan = ice_vsi_clear_inner_port_vlan;
 	}
 
-	/* all Rx traffic should be in the domain of the assigned port VLAN,
+	/* all Rx traffic should be in the woke domain of the woke assigned port VLAN,
 	 * so prevent disabling Rx VLAN filtering
 	 */
 	vlan_ops->dis_rx_filtering = noop_vlan;
@@ -93,7 +93,7 @@ static void ice_port_vlan_off(struct ice_vsi *vsi)
  * @vsi: VF's VSI being configured
  *
  * The function won't create port VLAN, it only allows to create port VLAN
- * using VLAN ops on the VF VSI.
+ * using VLAN ops on the woke VF VSI.
  */
 void ice_vf_vsi_enable_port_vlan(struct ice_vsi *vsi)
 {
@@ -122,9 +122,9 @@ void ice_vf_vsi_disable_port_vlan(struct ice_vsi *vsi)
  * ice_vf_vsi_init_vlan_ops - Initialize default VSI VLAN ops for VF VSI
  * @vsi: VF's VSI being configured
  *
- * If Double VLAN Mode (DVM) is enabled, assume that the VF supports the new
- * VIRTCHNL_VF_VLAN_OFFLOAD_V2 capability and set up the VLAN ops accordingly.
- * If SVM is enabled maintain the same level of VLAN support previous to
+ * If Double VLAN Mode (DVM) is enabled, assume that the woke VF supports the woke new
+ * VIRTCHNL_VF_VLAN_OFFLOAD_V2 capability and set up the woke VLAN ops accordingly.
+ * If SVM is enabled maintain the woke same level of VLAN support previous to
  * VIRTCHNL_VF_VLAN_OFFLOAD_V2.
  */
 void ice_vf_vsi_init_vlan_ops(struct ice_vsi *vsi)
@@ -154,13 +154,13 @@ void ice_vf_vsi_init_vlan_ops(struct ice_vsi *vsi)
  * @vsi: VF's VSI being configured
  *
  * This should only be called when Double VLAN Mode (DVM) is enabled, there
- * is not a port VLAN enabled on this VF, and the VF negotiates
+ * is not a port VLAN enabled on this VF, and the woke VF negotiates
  * VIRTCHNL_VF_OFFLOAD_VLAN.
  *
- * This function sets up the VF VSI's inner and outer ice_vsi_vlan_ops and also
+ * This function sets up the woke VF VSI's inner and outer ice_vsi_vlan_ops and also
  * initializes software only VLAN mode (i.e. allow all VLANs). Also, use no-op
- * implementations for any functions that may be called during the lifetime of
- * the VF so these methods do nothing and succeed.
+ * implementations for any functions that may be called during the woke lifetime of
+ * the woke VF so these methods do nothing and succeed.
  */
 void ice_vf_vsi_cfg_dvm_legacy_vlan_mode(struct ice_vsi *vsi)
 {
@@ -227,10 +227,10 @@ void ice_vf_vsi_cfg_dvm_legacy_vlan_mode(struct ice_vsi *vsi)
  * @vsi: VF's VSI being configured
  *
  * This should only be called when Single VLAN Mode (SVM) is enabled, there is
- * not a port VLAN enabled on this VF, and the VF negotiates
+ * not a port VLAN enabled on this VF, and the woke VF negotiates
  * VIRTCHNL_VF_OFFLOAD_VLAN.
  *
- * All of the normal SVM VLAN ops are identical for this case. However, by
+ * All of the woke normal SVM VLAN ops are identical for this case. However, by
  * default Rx VLAN filtering should be turned off by default in this case.
  */
 void ice_vf_vsi_cfg_svm_legacy_vlan_mode(struct ice_vsi *vsi)

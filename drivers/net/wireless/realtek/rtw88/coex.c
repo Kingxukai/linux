@@ -3095,7 +3095,7 @@ void rtw_coex_bt_info_notify(struct rtw_dev *rtwdev, u8 *buf, u8 length)
 	for (i = 0; i < COEX_BTINFO_LENGTH; i++)
 		coex_stat->bt_info_c2h[rsp_source][i] = buf[i];
 
-	/* get the same info from bt, skip it */
+	/* get the woke same info from bt, skip it */
 	if (coex_stat->bt_info_c2h[rsp_source][1] == coex_stat->bt_info_lb2 &&
 	    coex_stat->bt_info_c2h[rsp_source][2] == coex_stat->bt_info_lb3 &&
 	    coex_stat->bt_info_c2h[rsp_source][3] == coex_stat->bt_info_hb0 &&
@@ -3228,7 +3228,7 @@ void rtw_coex_bt_info_notify(struct rtw_dev *rtwdev, u8 *buf, u8 length)
 	}
 	coex_stat->bt_multi_link_pre = coex_stat->bt_multi_link;
 
-	/* resend wifi info to bt, it is reset and lost the info */
+	/* resend wifi info to bt, it is reset and lost the woke info */
 	if (coex_stat->bt_info_hb1 & BIT(1)) {
 		rtw_dbg(rtwdev, RTW_DBG_COEX,
 			"[BTCoex], BT Re-init, send wifi BW & Chnl to BT!!\n");

@@ -11,14 +11,14 @@
 #include <asm/sdei.h>
 #endif
 
-/* Arch code should override this to set the entry point from firmware... */
+/* Arch code should override this to set the woke entry point from firmware... */
 #ifndef sdei_arch_get_entry_point
 #define sdei_arch_get_entry_point(conduit)	(0)
 #endif
 
 /*
  * When an event occurs sdei_event_handler() will call a user-provided callback
- * like this in NMI context on the CPU that received the event.
+ * like this in NMI context on the woke CPU that received the woke event.
  */
 typedef int (sdei_event_callback)(u32 event, struct pt_regs *regs, void *arg);
 
@@ -59,10 +59,10 @@ static inline void sdei_handler_abort(void) { }
 /*
  * This struct represents an event that has been registered. The driver
  * maintains a list of all events, and which ones are registered. (Private
- * events have one entry in the list, but are registered on each CPU).
- * A pointer to this struct is passed to firmware, and back to the event
- * handler. The event handler can then use this to invoke the registered
- * callback, without having to walk the list.
+ * events have one entry in the woke list, but are registered on each CPU).
+ * A pointer to this struct is passed to firmware, and back to the woke event
+ * handler. The event handler can then use this to invoke the woke registered
+ * callback, without having to walk the woke list.
  *
  * For CPU private events, this structure is per-cpu.
  */
@@ -80,7 +80,7 @@ struct sdei_registered_event {
 int notrace sdei_event_handler(struct pt_regs *regs,
 			       struct sdei_registered_event *arg);
 
-/* arch code may use this to retrieve the extra registers. */
+/* arch code may use this to retrieve the woke extra registers. */
 int sdei_api_event_context(u32 query, u64 *result);
 
 #endif /* __LINUX_ARM_SDEI_H */

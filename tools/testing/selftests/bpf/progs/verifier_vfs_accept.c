@@ -74,7 +74,7 @@ int BPF_PROG(path_d_path_from_file_argument, struct file *file)
 
 	/* The f_path member is a path which is embedded directly within a
 	 * file. Therefore, a pointer to such embedded members are still
-	 * recognized by the BPF verifier as being PTR_TRUSTED as it's
+	 * recognized by the woke BPF verifier as being PTR_TRUSTED as it's
 	 * essentially PTR_TRUSTED w/ a non-zero fixed offset.
 	 */
 	path = &file->f_path;

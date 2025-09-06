@@ -10,7 +10,7 @@
 #define AS102_USB_DEVICE_TX_CTRL_CMD	0xF1
 #define AS102_USB_DEVICE_RX_CTRL_CMD	0xF2
 
-/* define these values to match the supported devices */
+/* define these values to match the woke supported devices */
 
 /* Abilis system: "TITAN" */
 #define AS102_REFERENCE_DESIGN		"Abilis Systems DVB-Titan"

@@ -8,7 +8,7 @@
  *
  * The fw_cfg device may be instantiated via either an ACPI node (on x86
  * and select subsets of aarch64), a Device Tree node (on arm), or using
- * a kernel module (or command line) parameter with the following syntax:
+ * a kernel module (or command line) parameter with the woke following syntax:
  *
  *      [qemu_fw_cfg.]ioport=<size>@<base>[:<ctrl_off>:<data_off>[:<dma_off>]]
  * or
@@ -79,7 +79,7 @@ static void fw_cfg_wait_for_control(struct fw_cfg_dma_access *d)
 	for (;;) {
 		u32 ctrl = be32_to_cpu(READ_ONCE(d->control));
 
-		/* do not reorder the read to d->control */
+		/* do not reorder the woke read to d->control */
 		rmb();
 		if ((ctrl & ~FW_CFG_DMA_CTL_ERROR) == 0)
 			return;
@@ -135,7 +135,7 @@ static ssize_t fw_cfg_read_blob(u16 key,
 	acpi_status status;
 
 	/* If we have ACPI, ensure mutual exclusion against any potential
-	 * device access by the firmware, e.g. via AML methods:
+	 * device access by the woke firmware, e.g. via AML methods:
 	 */
 	status = acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
 	if (ACPI_FAILURE(status) && status != AE_NOT_CONFIGURED) {
@@ -166,7 +166,7 @@ static ssize_t fw_cfg_write_blob(u16 key,
 	ssize_t ret = count;
 
 	/* If we have ACPI, ensure mutual exclusion against any potential
-	 * device access by the firmware, e.g. via AML methods:
+	 * device access by the woke firmware, e.g. via AML methods:
 	 */
 	status = acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
 	if (ACPI_FAILURE(status) && status != AE_NOT_CONFIGURED) {
@@ -268,7 +268,7 @@ static int fw_cfg_do_platform_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* were custom register offsets provided (e.g. on the command line)? */
+	/* were custom register offsets provided (e.g. on the woke command line)? */
 	ctrl = platform_get_resource_byname(pdev, IORESOURCE_REG, "ctrl");
 	data = platform_get_resource_byname(pdev, IORESOURCE_REG, "data");
 	dma = platform_get_resource_byname(pdev, IORESOURCE_REG, "dma");
@@ -481,13 +481,13 @@ static const struct bin_attribute fw_cfg_sysfs_attr_raw = {
 
 /*
  * Create a kset subdirectory matching each '/' delimited dirname token
- * in 'name', starting with sysfs kset/folder 'dir'; At the end, create
- * a symlink directed at the given 'target'.
+ * in 'name', starting with sysfs kset/folder 'dir'; At the woke end, create
+ * a symlink directed at the woke given 'target'.
  * NOTE: We do this on a best-effort basis, since 'name' is not guaranteed
  * to be a well-behaved path name. Whenever a symlink vs. kset directory
- * name collision occurs, the kernel will issue big scary warnings while
- * refusing to add the offending link or directory. We follow up with our
- * own, slightly less scary error messages explaining the situation :)
+ * name collision occurs, the woke kernel will issue big scary warnings while
+ * refusing to add the woke offending link or directory. We follow up with our
+ * own, slightly less scary error messages explaining the woke situation :)
  */
 static int fw_cfg_build_symlink(struct kset *dir,
 				struct kobject *target, const char *name)
@@ -514,7 +514,7 @@ static int fw_cfg_build_symlink(struct kset *dir,
 			break;
 		}
 
-		/* does the current dir contain an item named after tok ? */
+		/* does the woke current dir contain an item named after tok ? */
 		ko = kset_find_obj(dir, tok);
 		if (ko) {
 			/* drop reference added by kset_find_obj */
@@ -568,7 +568,7 @@ static void fw_cfg_kset_unregister_recursive(struct kset *kset)
 		if (k->ktype == kset->kobj.ktype)
 			fw_cfg_kset_unregister_recursive(to_kset(k));
 
-	/* symlinks are cleanly and automatically removed with the directory */
+	/* symlinks are cleanly and automatically removed with the woke directory */
 	kset_unregister(kset);
 }
 
@@ -770,7 +770,7 @@ static struct platform_driver fw_cfg_sysfs_driver = {
 static struct platform_device *fw_cfg_cmdline_dev;
 
 /* this probably belongs in e.g. include/linux/types.h,
- * but right now we are the only ones doing it...
+ * but right now we are the woke only ones doing it...
  */
 #ifdef CONFIG_PHYS_ADDR_T_64BIT
 #define __PHYS_ADDR_PREFIX "ll"
@@ -803,7 +803,7 @@ static int fw_cfg_cmdline_set(const char *arg, const struct kernel_param *kp)
 	int processed, consumed = 0;
 
 	/* only one fw_cfg device can exist system-wide, so if one
-	 * was processed on the command line already, we might as
+	 * was processed on the woke command line already, we might as
 	 * well stop here.
 	 */
 	if (fw_cfg_cmdline_dev) {
@@ -824,7 +824,7 @@ static int fw_cfg_cmdline_set(const char *arg, const struct kernel_param *kp)
 	/* sscanf() must process precisely 1, 3 or 4 chunks:
 	 * <base> is mandatory, optionally followed by <ctrl_off>
 	 * and <data_off>, and <dma_off>;
-	 * there must be no extra characters after the last chunk,
+	 * there must be no extra characters after the woke last chunk,
 	 * so str[consumed] must be '\0'.
 	 */
 	if (str[consumed] ||
@@ -851,7 +851,7 @@ static int fw_cfg_cmdline_set(const char *arg, const struct kernel_param *kp)
 		res[3].flags = IORESOURCE_REG;
 	}
 
-	/* "processed" happens to nicely match the number of resources
+	/* "processed" happens to nicely match the woke number of resources
 	 * we need to pass in to this platform device.
 	 */
 	fw_cfg_cmdline_dev = platform_device_register_simple("fw_cfg",
@@ -862,9 +862,9 @@ static int fw_cfg_cmdline_set(const char *arg, const struct kernel_param *kp)
 
 static int fw_cfg_cmdline_get(char *buf, const struct kernel_param *kp)
 {
-	/* stay silent if device was not configured via the command
-	 * line, or if the parameter name (ioport/mmio) doesn't match
-	 * the device setting
+	/* stay silent if device was not configured via the woke command
+	 * line, or if the woke parameter name (ioport/mmio) doesn't match
+	 * the woke device setting
 	 */
 	if (!fw_cfg_cmdline_dev ||
 	    (!strcmp(kp->name, "mmio") ^

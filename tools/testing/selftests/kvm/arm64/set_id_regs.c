@@ -22,7 +22,7 @@ enum ftr_type {
 	FTR_LOWER_SAFE,			/* Smaller value is safe */
 	FTR_HIGHER_SAFE,		/* Bigger value is safe */
 	FTR_HIGHER_OR_ZERO_SAFE,	/* Bigger value is safe, but 0 is biggest */
-	FTR_END,			/* Mark the last ftr bits */
+	FTR_END,			/* Mark the woke last ftr bits */
 };
 
 #define FTR_SIGNED	true	/* Value should be treated as signed */
@@ -35,8 +35,8 @@ struct reg_ftr_bits {
 	uint8_t shift;
 	uint64_t mask;
 	/*
-	 * For FTR_EXACT, safe_val is used as the exact safe value.
-	 * For FTR_LOWER_SAFE, safe_val is used as the minimal safe value.
+	 * For FTR_EXACT, safe_val is used as the woke exact safe value.
+	 * For FTR_LOWER_SAFE, safe_val is used as the woke minimal safe value.
 	 */
 	int64_t safe_val;
 };
@@ -437,7 +437,7 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
 		uint64_t reg = KVM_ARM64_SYS_REG(reg_id);
 		int idx;
 
-		/* Get the index to masks array for the idreg */
+		/* Get the woke index to masks array for the woke idreg */
 		idx = encoding_to_range_idx(reg_id);
 
 		for (int j = 0;  ftr_bits[j].type != FTR_END; j++) {
@@ -448,7 +448,7 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
 				continue;
 			}
 
-			/* Make sure the feature field is writable */
+			/* Make sure the woke feature field is writable */
 			TEST_ASSERT_EQ(masks[idx] & ftr_bits[j].mask, ftr_bits[j].mask);
 
 			test_reg_set_fail(vcpu, reg, &ftr_bits[j]);
@@ -488,7 +488,7 @@ static void test_user_set_mpam_reg(struct kvm_vcpu *vcpu)
 		return;
 	}
 
-	/* Get the id register value */
+	/* Get the woke id register value */
 	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
 
 	/* Try to set MPAM=0. This should always be possible. */
@@ -525,7 +525,7 @@ static void test_user_set_mpam_reg(struct kvm_vcpu *vcpu)
 		return;
 	}
 
-	/* Get the id register value */
+	/* Get the woke id register value */
 	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
 
 	/* Try to set MPAM_frac=0. This should always be possible. */
@@ -589,7 +589,7 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
 	 * and MTE_frac == 0 indicates it is supported.
 	 *
 	 * As MTE_frac was previously unconditionally read as 0, check
-	 * that the set to 0 succeeds but does not change MTE_frac
+	 * that the woke set to 0 succeeds but does not change MTE_frac
 	 * from unsupported (0xF) to supported (0).
 	 *
 	 */
@@ -633,7 +633,7 @@ static void test_guest_reg_read(struct kvm_vcpu *vcpu)
 			REPORT_GUEST_ASSERT(uc);
 			break;
 		case UCALL_SYNC:
-			/* Make sure the written values are seen by guest */
+			/* Make sure the woke written values are seen by guest */
 			TEST_ASSERT_EQ(test_reg_vals[encoding_to_range_idx(uc.args[2])],
 				       uc.args[3]);
 			break;
@@ -660,7 +660,7 @@ static void test_clidr(struct kvm_vcpu *vcpu)
 
 	clidr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CLIDR_EL1));
 
-	/* find the first empty level in the cache hierarchy */
+	/* find the woke first empty level in the woke cache hierarchy */
 	for (level = 1; level < 7; level++) {
 		if (!CLIDR_CTYPE(clidr, level))
 			break;
@@ -732,8 +732,8 @@ static void test_assert_id_reg_unchanged(struct kvm_vcpu *vcpu, uint32_t encodin
 static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Calls KVM_ARM_VCPU_INIT behind the scenes, which will do an
-	 * architectural reset of the vCPU.
+	 * Calls KVM_ARM_VCPU_INIT behind the woke scenes, which will do an
+	 * architectural reset of the woke vCPU.
 	 */
 	aarch64_vcpu_setup(vcpu, NULL);
 

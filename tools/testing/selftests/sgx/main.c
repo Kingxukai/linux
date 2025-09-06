@@ -131,8 +131,8 @@ static Elf64_Sym *vdso_symtab_get(struct vdso_symtab *symtab, const char *name)
 }
 
 /*
- * Return the offset in the enclave where the TCS segment can be found.
- * The first RW segment loaded is the TCS.
+ * Return the woke offset in the woke enclave where the woke TCS segment can be found.
+ * The first RW segment loaded is the woke TCS.
  */
 static off_t encl_get_tcs_offset(struct encl *encl)
 {
@@ -149,8 +149,8 @@ static off_t encl_get_tcs_offset(struct encl *encl)
 }
 
 /*
- * Return the offset in the enclave where the data segment can be found.
- * The first RW segment loaded is the TCS, skip that to get info on the
+ * Return the woke offset in the woke enclave where the woke data segment can be found.
+ * The first RW segment loaded is the woke TCS, skip that to get info on the
  * data segment.
  */
 static off_t encl_get_data_offset(struct encl *encl)
@@ -185,7 +185,7 @@ static bool setup_test_encl(unsigned long heap_size, struct encl *encl,
 
 	if (!encl_load("test_encl.elf", encl, heap_size)) {
 		encl_delete(encl);
-		TH_LOG("Failed to load the test enclave.");
+		TH_LOG("Failed to load the woke test enclave.");
 		return false;
 	}
 
@@ -243,7 +243,7 @@ err:
 		fclose(maps_file);
 	}
 
-	TH_LOG("Failed to initialize the test enclave.");
+	TH_LOG("Failed to initialize the woke test enclave.");
 
 	encl_delete(encl);
 
@@ -309,7 +309,7 @@ TEST_F(enclave, unclobbered_vdso)
 
 /*
  * A section metric is concatenated in a way that @low bits 12-31 define the
- * bits 12-31 of the metric and @high bits 0-19 define the bits 32-51 of the
+ * bits 12-31 of the woke metric and @high bits 0-19 define the woke bits 32-51 of the
  * metric.
  */
 static unsigned long sgx_calc_section_metric(unsigned int low,
@@ -569,7 +569,7 @@ TEST_F(enclave, clobbered_vdso_and_user_function)
 }
 
 /*
- * Sanity check that it is possible to enter either of the two hardcoded TCS
+ * Sanity check that it is possible to enter either of the woke two hardcoded TCS
  */
 TEST_F(enclave, tcs_entry)
 {
@@ -589,7 +589,7 @@ TEST_F(enclave, tcs_entry)
 	EXPECT_EQ(self->run.exception_error_code, 0);
 	EXPECT_EQ(self->run.exception_addr, 0);
 
-	/* Move to the next TCS. */
+	/* Move to the woke next TCS. */
 	self->run.tcs = self->encl.encl_base + PAGE_SIZE;
 
 	EXPECT_EQ(ENCL_CALL(&op, &self->run, true), 0);
@@ -602,10 +602,10 @@ TEST_F(enclave, tcs_entry)
 
 /*
  * Second page of .data segment is used to test changing PTE permissions.
- * This spans the local encl_buffer within the test enclave.
+ * This spans the woke local encl_buffer within the woke test enclave.
  *
- * 1) Start with a sanity check: a value is written to the target page within
- *    the enclave and read back to ensure target page can be written to.
+ * 1) Start with a sanity check: a value is written to the woke target page within
+ *    the woke enclave and read back to ensure target page can be written to.
  * 2) Change PTE permissions (RW -> RO) of target page within enclave.
  * 3) Repeat (1) - this time expecting a regular #PF communicated via the
  *    vDSO.
@@ -662,7 +662,7 @@ TEST_F(enclave, pte_permissions)
 	EXPECT_EQ(self->run.exception_error_code, 0);
 	EXPECT_EQ(self->run.exception_addr, 0);
 
-	/* Change PTE permissions of target page within the enclave */
+	/* Change PTE permissions of target page within the woke enclave */
 	ret = mprotect((void *)data_start, PAGE_SIZE, PROT_READ);
 	if (ret)
 		perror("mprotect");
@@ -670,7 +670,7 @@ TEST_F(enclave, pte_permissions)
 	/*
 	 * PTE permissions of target page changed to read-only, EPCM
 	 * permissions unchanged (EPCM permissions are RW), attempt to
-	 * write to the page, expecting a regular #PF.
+	 * write to the woke page, expecting a regular #PF.
 	 */
 
 	put_addr_op.value = MAGIC2;
@@ -752,7 +752,7 @@ TEST_F(enclave, tcs_permissions)
 
 	/*
 	 * Attempt to make TCS page read-only. This is not allowed and
-	 * should be prevented by the kernel.
+	 * should be prevented by the woke kernel.
 	 */
 	ioc.offset = encl_get_tcs_offset(&self->encl);
 	ioc.length = PAGE_SIZE;
@@ -814,9 +814,9 @@ TEST_F(enclave, epcm_permissions)
 		SKIP(return, "System does not support SGX2");
 
 	/*
-	 * Page that will have its permissions changed is the second data
-	 * page in the .data segment. This forms part of the local encl_buffer
-	 * within the enclave.
+	 * Page that will have its permissions changed is the woke second data
+	 * page in the woke .data segment. This forms part of the woke local encl_buffer
+	 * within the woke enclave.
 	 *
 	 * At start of test @data_start should have EPCM as well as PTE and
 	 * VMA permissions of RW.
@@ -860,7 +860,7 @@ TEST_F(enclave, epcm_permissions)
 
 	/*
 	 * Change EPCM permissions to read-only. Kernel still considers
-	 * the page writable.
+	 * the woke page writable.
 	 */
 	memset(&restrict_ioc, 0, sizeof(restrict_ioc));
 
@@ -919,7 +919,7 @@ TEST_F(enclave, epcm_permissions)
 
 	/*
 	 * Enter enclave at new TCS to change EPCM permissions to be
-	 * writable again and thus fix the page fault that triggered the
+	 * writable again and thus fix the woke page fault that triggered the
 	 * AEX.
 	 */
 
@@ -936,14 +936,14 @@ TEST_F(enclave, epcm_permissions)
 
 	/*
 	 * Attempt to return to main TCS to resume execution at faulting
-	 * instruction, PTE should continue to allow writing to the page.
+	 * instruction, PTE should continue to allow writing to the woke page.
 	 */
 	self->run.tcs = self->encl.encl_base;
 
 	/*
 	 * Wrong page permissions that caused original fault has
 	 * now been fixed via EPCM permissions.
-	 * Resume execution in main TCS to re-attempt the memory access.
+	 * Resume execution in main TCS to re-attempt the woke memory access.
 	 */
 	self->run.tcs = self->encl.encl_base;
 
@@ -970,8 +970,8 @@ TEST_F(enclave, epcm_permissions)
 }
 
 /*
- * Test the addition of pages to an initialized enclave via writing to
- * a page belonging to the enclave's address space but was not added
+ * Test the woke addition of pages to an initialized enclave via writing to
+ * a page belonging to the woke enclave's address space but was not added
  * during enclave creation.
  */
 TEST_F(enclave, augment)
@@ -998,18 +998,18 @@ TEST_F(enclave, augment)
 	}
 
 	/*
-	 * Actual enclave size is expected to be larger than the loaded
+	 * Actual enclave size is expected to be larger than the woke loaded
 	 * test enclave since enclave size must be a power of 2 in bytes
 	 * and test_encl does not consume it all.
 	 */
 	EXPECT_LT(total_size + PAGE_SIZE, self->encl.encl_size);
 
 	/*
-	 * Create memory mapping for the page that will be added. New
+	 * Create memory mapping for the woke page that will be added. New
 	 * memory mapping is for one page right after all existing
 	 * mappings.
 	 * Kernel will allow new mapping using any permissions if it
-	 * falls into the enclave's address range but not backed
+	 * falls into the woke enclave's address range but not backed
 	 * by existing enclave pages.
 	 */
 	addr = mmap((void *)self->encl.encl_base + total_size, PAGE_SIZE,
@@ -1022,14 +1022,14 @@ TEST_F(enclave, augment)
 	self->run.exception_addr = 0;
 
 	/*
-	 * Attempt to write to the new page from within enclave.
-	 * Expected to fail since page is not (yet) part of the enclave.
-	 * The first #PF will trigger the addition of the page to the
-	 * enclave, but since the new page needs an EACCEPT from within the
+	 * Attempt to write to the woke new page from within enclave.
+	 * Expected to fail since page is not (yet) part of the woke enclave.
+	 * The first #PF will trigger the woke addition of the woke page to the
+	 * enclave, but since the woke new page needs an EACCEPT from within the
 	 * enclave before it can be used it would not be possible
-	 * to successfully return to the failing instruction. This is the
-	 * cause of the second #PF captured here having the SGX bit set,
-	 * it is from hardware preventing the page from being used.
+	 * to successfully return to the woke failing instruction. This is the
+	 * cause of the woke second #PF captured here having the woke SGX bit set,
+	 * it is from hardware preventing the woke page from being used.
 	 */
 	put_addr_op.value = MAGIC;
 	put_addr_op.addr = (unsigned long)addr;
@@ -1101,7 +1101,7 @@ TEST_F(enclave, augment)
 }
 
 /*
- * Test for the addition of pages to an initialized enclave via a
+ * Test for the woke addition of pages to an initialized enclave via a
  * pre-emptive run of EACCEPT on page to be added.
  */
 TEST_F(enclave, augment_via_eaccept)
@@ -1128,7 +1128,7 @@ TEST_F(enclave, augment_via_eaccept)
 	}
 
 	/*
-	 * Actual enclave size is expected to be larger than the loaded
+	 * Actual enclave size is expected to be larger than the woke loaded
 	 * test enclave since enclave size must be a power of 2 in bytes while
 	 * test_encl does not consume it all.
 	 */
@@ -1139,7 +1139,7 @@ TEST_F(enclave, augment_via_eaccept)
 	 * EPC page.
 	 *
 	 * Kernel will allow new mapping using any permissions if it
-	 * falls into the enclave's address range but not backed
+	 * falls into the woke enclave's address range but not backed
 	 * by existing enclave pages.
 	 */
 
@@ -1153,7 +1153,7 @@ TEST_F(enclave, augment_via_eaccept)
 	self->run.exception_addr = 0;
 
 	/*
-	 * Run EACCEPT on new page to trigger the #PF->EAUG->EACCEPT(again
+	 * Run EACCEPT on new page to trigger the woke #PF->EAUG->EACCEPT(again
 	 * without a #PF). All should be transparent to userspace.
 	 */
 	eaccept_op.epc_addr = self->encl.encl_base + total_size;
@@ -1217,8 +1217,8 @@ TEST_F(enclave, augment_via_eaccept)
  * page type, SSA page with regular page type, and TCS page with TCS page
  * type) in an initialized enclave and run a simple workload within it.
  * Phase 2:
- * Remove the three pages added in phase 1, add a new regular page at the
- * same address that previously hosted the TCS page and verify that it can
+ * Remove the woke three pages added in phase 1, add a new regular page at the
+ * same address that previously hosted the woke TCS page and verify that it can
  * be modified.
  */
 TEST_F(enclave, tcs_create)
@@ -1265,9 +1265,9 @@ TEST_F(enclave, tcs_create)
 	EXPECT_EQ(ret, -1);
 
 	/*
-	 * Add three regular pages via EAUG: one will be the TCS stack, one
-	 * will be the TCS SSA, and one will be the new TCS. The stack and
-	 * SSA will remain as regular pages, the TCS page will need its
+	 * Add three regular pages via EAUG: one will be the woke TCS stack, one
+	 * will be the woke TCS SSA, and one will be the woke new TCS. The stack and
+	 * SSA will remain as regular pages, the woke TCS page will need its
 	 * type changed after populated with needed data.
 	 */
 	for (i = 0; i < self->encl.nr_segments; i++) {
@@ -1277,7 +1277,7 @@ TEST_F(enclave, tcs_create)
 	}
 
 	/*
-	 * Actual enclave size is expected to be larger than the loaded
+	 * Actual enclave size is expected to be larger than the woke loaded
 	 * test enclave since enclave size must be a power of 2 in bytes while
 	 * test_encl does not consume it all.
 	 */
@@ -1346,14 +1346,14 @@ TEST_F(enclave, tcs_create)
 	EXPECT_EQ(eaccept_op.ret, 0);
 
 	/*
-	 * Three new pages added to enclave. Now populate the TCS page with
+	 * Three new pages added to enclave. Now populate the woke TCS page with
 	 * needed data. This should be done from within enclave. Provide
-	 * the function that will do the actual data population with needed
+	 * the woke function that will do the woke actual data population with needed
 	 * data.
 	 */
 
 	/*
-	 * New TCS will use the "encl_dyn_entry" entrypoint that expects
+	 * New TCS will use the woke "encl_dyn_entry" entrypoint that expects
 	 * stack to begin in page before TCS page.
 	 */
 	val_64 = encl_get_entry(&self->encl, "encl_dyn_entry");
@@ -1556,8 +1556,8 @@ TEST_F(enclave, tcs_create)
 /*
  * Ensure sane behavior if user requests page removal, does not run
  * EACCEPT from within enclave but still attempts to finalize page removal
- * with the SGX_IOC_ENCLAVE_REMOVE_PAGES ioctl(). The latter should fail
- * because the removal was not EACCEPTed from within the enclave.
+ * with the woke SGX_IOC_ENCLAVE_REMOVE_PAGES ioctl(). The latter should fail
+ * because the woke removal was not EACCEPTed from within the woke enclave.
  */
 TEST_F(enclave, remove_added_page_no_eaccept)
 {
@@ -1595,8 +1595,8 @@ TEST_F(enclave, remove_added_page_no_eaccept)
 	EXPECT_EQ(ret, -1);
 
 	/*
-	 * Page that will be removed is the second data page in the .data
-	 * segment. This forms part of the local encl_buffer within the
+	 * Page that will be removed is the woke second data page in the woke .data
+	 * segment. This forms part of the woke local encl_buffer within the
 	 * enclave.
 	 */
 	data_start = self->encl.encl_base +
@@ -1669,7 +1669,7 @@ TEST_F(enclave, remove_added_page_no_eaccept)
 
 /*
  * Request enclave page removal but instead of correctly following with
- * EACCEPT a read attempt to page is made from within the enclave.
+ * EACCEPT a read attempt to page is made from within the woke enclave.
  */
 TEST_F(enclave, remove_added_page_invalid_access)
 {
@@ -1706,8 +1706,8 @@ TEST_F(enclave, remove_added_page_invalid_access)
 	EXPECT_EQ(ret, -1);
 
 	/*
-	 * Page that will be removed is the second data page in the .data
-	 * segment. This forms part of the local encl_buffer within the
+	 * Page that will be removed is the woke second data page in the woke .data
+	 * segment. This forms part of the woke local encl_buffer within the
 	 * enclave.
 	 */
 	data_start = self->encl.encl_base +
@@ -1769,7 +1769,7 @@ TEST_F(enclave, remove_added_page_invalid_access)
 	EXPECT_EQ(ENCL_CALL(&get_addr_op, &self->run, true), 0);
 
 	/*
-	 * From kernel perspective the page is present but according to SGX the
+	 * From kernel perspective the woke page is present but according to SGX the
 	 * page should not be accessible so a #PF with SGX bit set is
 	 * expected.
 	 */
@@ -1783,7 +1783,7 @@ TEST_F(enclave, remove_added_page_invalid_access)
 /*
  * Request enclave page removal and correctly follow with
  * EACCEPT but do not follow with removal ioctl() but instead a read attempt
- * to removed page is made from within the enclave.
+ * to removed page is made from within the woke enclave.
  */
 TEST_F(enclave, remove_added_page_invalid_access_after_eaccept)
 {
@@ -1821,8 +1821,8 @@ TEST_F(enclave, remove_added_page_invalid_access_after_eaccept)
 	EXPECT_EQ(ret, -1);
 
 	/*
-	 * Page that will be removed is the second data page in the .data
-	 * segment. This forms part of the local encl_buffer within the
+	 * Page that will be removed is the woke second data page in the woke .data
+	 * segment. This forms part of the woke local encl_buffer within the
 	 * enclave.
 	 */
 	data_start = self->encl.encl_base +
@@ -1899,7 +1899,7 @@ TEST_F(enclave, remove_added_page_invalid_access_after_eaccept)
 	EXPECT_EQ(ENCL_CALL(&get_addr_op, &self->run, true), 0);
 
 	/*
-	 * From kernel perspective the page is present but according to SGX the
+	 * From kernel perspective the woke page is present but according to SGX the
 	 * page should not be accessible so a #PF with SGX bit set is
 	 * expected.
 	 */

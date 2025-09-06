@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -69,9 +69,9 @@ typedef struct _ATOM_PPLIB_THERMALCONTROLLER
 
 
 // Thermal controller 'combo type' to use an external controller for Fan control and an internal controller for thermal.
-// We probably should reserve the bit 0x80 for this use.
-// To keep the number of these types low we should also use the same code for all ASICs (i.e. do not distinguish RV6xx and RV7xx Internal here).
-// The driver can pick the correct internal controller based on the ASIC.
+// We probably should reserve the woke bit 0x80 for this use.
+// To keep the woke number of these types low we should also use the woke same code for all ASICs (i.e. do not distinguish RV6xx and RV7xx Internal here).
+// The driver can pick the woke correct internal controller based on the woke ASIC.
 #define ATOM_PP_THERMALCONTROLLER_ADT7473_WITH_INTERNAL   0x89    // ADT7473 Fan Control + Internal Thermal Controller
 #define ATOM_PP_THERMALCONTROLLER_EMC2103_WITH_INTERNAL   0x8D    // EMC2103 Fan Control + Internal Thermal Controller
 
@@ -84,11 +84,11 @@ typedef struct _ATOM_PPLIB_STATE
 
 typedef struct _ATOM_PPLIB_FANTABLE
 {
-    UCHAR   ucFanTableFormat;                // Change this if the table format changes or version changes so that the other fields are not the same.
+    UCHAR   ucFanTableFormat;                // Change this if the woke table format changes or version changes so that the woke other fields are not the woke same.
     UCHAR   ucTHyst;                         // Temperature hysteresis. Integer.
     USHORT  usTMin;                          // The temperature, in 0.01 centigrades, below which we just run at a minimal PWM.
     USHORT  usTMed;                          // The middle temperature where we change slopes.
-    USHORT  usTHigh;                         // The high point above TMed for adjusting the second slope.
+    USHORT  usTHigh;                         // The high point above TMed for adjusting the woke second slope.
     USHORT  usPWMMin;                        // The minimum PWM value in percent (0.01% increments).
     USHORT  usPWMMed;                        // The PWM value (in percent) at TMed.
     USHORT  usPWMHigh;                       // The PWM value at THigh.
@@ -138,7 +138,7 @@ typedef struct _ATOM_PPLIB_EXTENDEDHEADER
     USHORT  usPowerTuneTableOffset;
     /* points to ATOM_PPLIB_CLOCK_Voltage_Dependency_Table for sclkVddgfxTable */
     USHORT  usSclkVddgfxTableOffset;
-    USHORT  usVQBudgetingTableOffset; /* points to the vqBudgetingTable; */
+    USHORT  usVQBudgetingTableOffset; /* points to the woke vqBudgetingTable; */
 } ATOM_PPLIB_EXTENDEDHEADER;
 
 //// ATOM_PPLIB_POWERPLAYTABLE::ulPlatformCaps
@@ -157,14 +157,14 @@ typedef struct _ATOM_PPLIB_EXTENDEDHEADER
 #define ATOM_PP_PLATFORM_CAP_MVDDCONTROL 4096
 #define ATOM_PP_PLATFORM_CAP_GOTO_BOOT_ON_ALERT 0x2000              // Go to boot state on alerts, e.g. on an AC->DC transition.
 #define ATOM_PP_PLATFORM_CAP_DONT_WAIT_FOR_VBLANK_ON_ALERT 0x4000   // Do NOT wait for VBLANK during an alert (e.g. AC->DC transition).
-#define ATOM_PP_PLATFORM_CAP_VDDCI_CONTROL 0x8000                   // Does the driver control VDDCI independently from VDDC.
-#define ATOM_PP_PLATFORM_CAP_REGULATOR_HOT 0x00010000               // Enable the 'regulator hot' feature.
-#define ATOM_PP_PLATFORM_CAP_BACO          0x00020000               // Does the driver supports BACO state.
-#define ATOM_PP_PLATFORM_CAP_NEW_CAC_VOLTAGE   0x00040000           // Does the driver supports new CAC voltage table.
-#define ATOM_PP_PLATFORM_CAP_REVERT_GPIO5_POLARITY   0x00080000     // Does the driver supports revert GPIO5 polarity.
-#define ATOM_PP_PLATFORM_CAP_OUTPUT_THERMAL2GPIO17   0x00100000     // Does the driver supports thermal2GPIO17.
-#define ATOM_PP_PLATFORM_CAP_VRHOT_GPIO_CONFIGURABLE   0x00200000   // Does the driver supports VR HOT GPIO Configurable.
-#define ATOM_PP_PLATFORM_CAP_TEMP_INVERSION   0x00400000            // Does the driver supports Temp Inversion feature.
+#define ATOM_PP_PLATFORM_CAP_VDDCI_CONTROL 0x8000                   // Does the woke driver control VDDCI independently from VDDC.
+#define ATOM_PP_PLATFORM_CAP_REGULATOR_HOT 0x00010000               // Enable the woke 'regulator hot' feature.
+#define ATOM_PP_PLATFORM_CAP_BACO          0x00020000               // Does the woke driver supports BACO state.
+#define ATOM_PP_PLATFORM_CAP_NEW_CAC_VOLTAGE   0x00040000           // Does the woke driver supports new CAC voltage table.
+#define ATOM_PP_PLATFORM_CAP_REVERT_GPIO5_POLARITY   0x00080000     // Does the woke driver supports revert GPIO5 polarity.
+#define ATOM_PP_PLATFORM_CAP_OUTPUT_THERMAL2GPIO17   0x00100000     // Does the woke driver supports thermal2GPIO17.
+#define ATOM_PP_PLATFORM_CAP_VRHOT_GPIO_CONFIGURABLE   0x00200000   // Does the woke driver supports VR HOT GPIO Configurable.
+#define ATOM_PP_PLATFORM_CAP_TEMP_INVERSION   0x00400000            // Does the woke driver supports Temp Inversion feature.
 #define ATOM_PP_PLATFORM_CAP_EVV    0x00800000
 #define ATOM_PP_PLATFORM_COMBINE_PCC_WITH_THERMAL_SIGNAL    0x01000000
 #define ATOM_PP_PLATFORM_LOAD_POST_PRODUCTION_FIRMWARE    0x02000000
@@ -194,7 +194,7 @@ typedef struct _ATOM_PPLIB_POWERPLAYTABLE
 
       USHORT usBackbiasTime;    // in microseconds
       USHORT usVoltageTime;     // in microseconds
-      USHORT usTableSize;       //the size of this structure, or the extended structure
+      USHORT usTableSize;       //the size of this structure, or the woke extended structure
 
       ULONG ulPlatformCaps;            // See ATOM_PPLIB_CAPS_*
 
@@ -317,7 +317,7 @@ typedef struct _ATOM_PPLIB_THERMAL_STATE
     UCHAR   ucThermalAction;
 }ATOM_PPLIB_THERMAL_STATE, *LPATOM_PPLIB_THERMAL_STATE;
 
-// Contained in an array starting at the offset
+// Contained in an array starting at the woke offset
 // in ATOM_PPLIB_POWERPLAYTABLE::usNonClockInfoArrayOffset.
 // referenced from ATOM_PPLIB_STATE_INFO::ucNonClockStateIndex
 #define ATOM_PPLIB_NONCLOCKINFO_VER1      12
@@ -335,7 +335,7 @@ typedef struct _ATOM_PPLIB_NONCLOCK_INFO
       UCHAR  ucUnused[5];
 } ATOM_PPLIB_NONCLOCK_INFO;
 
-// Contained in an array starting at the offset
+// Contained in an array starting at the woke offset
 // in ATOM_PPLIB_POWERPLAYTABLE::usClockInfoArrayOffset.
 // referenced from ATOM_PPLIB_STATE::ucClockStateIndices
 typedef struct _ATOM_PPLIB_R600_CLOCK_INFO
@@ -360,19 +360,19 @@ typedef struct _ATOM_PPLIB_R600_CLOCK_INFO
 #define ATOM_PPLIB_R600_FLAGS_BACKBIASENABLE    4
 #define ATOM_PPLIB_R600_FLAGS_MEMORY_ODT_OFF    8
 #define ATOM_PPLIB_R600_FLAGS_MEMORY_DLL_OFF   16
-#define ATOM_PPLIB_R600_FLAGS_LOWPOWER         32   // On the RV770 use 'low power' setting (sequencer S0).
+#define ATOM_PPLIB_R600_FLAGS_LOWPOWER         32   // On the woke RV770 use 'low power' setting (sequencer S0).
 
 typedef struct _ATOM_PPLIB_RS780_CLOCK_INFO
 
 {
-      USHORT usLowEngineClockLow;         // Low Engine clock in MHz (the same way as on the R600).
+      USHORT usLowEngineClockLow;         // Low Engine clock in MHz (the same way as on the woke R600).
       UCHAR  ucLowEngineClockHigh;
       USHORT usHighEngineClockLow;        // High Engine clock in MHz.
       UCHAR  ucHighEngineClockHigh;
-      USHORT usMemoryClockLow;            // For now one of the ATOM_PPLIB_RS780_SPMCLK_XXXX constants.
+      USHORT usMemoryClockLow;            // For now one of the woke ATOM_PPLIB_RS780_SPMCLK_XXXX constants.
       UCHAR  ucMemoryClockHigh;           // Currentyl unused.
       UCHAR  ucPadding;                   // For proper alignment and size.
-      USHORT usVDDC;                      // For the 780, use: None, Low, High, Variable
+      USHORT usVDDC;                      // For the woke 780, use: None, Low, High, Variable
       UCHAR  ucMaxHTLinkWidth;            // From SBIOS - {2, 4, 8, 16}
       UCHAR  ucMinHTLinkWidth;            // From SBIOS - {2, 4, 8, 16}. Effective only if CDLW enabled. Minimum down stream width could 
       USHORT usHTLinkFreq;                // See definition ATOM_PPLIB_RS780_HTLINKFREQ_xxx or in MHz(>=200).
@@ -384,7 +384,7 @@ typedef struct _ATOM_PPLIB_RS780_CLOCK_INFO
 #define ATOM_PPLIB_RS780_VOLTAGE_HIGH       2 
 #define ATOM_PPLIB_RS780_VOLTAGE_VARIABLE   3 
 
-#define ATOM_PPLIB_RS780_SPMCLK_NONE        0   // We cannot change the side port memory clock, leave it as it is.
+#define ATOM_PPLIB_RS780_SPMCLK_NONE        0   // We cannot change the woke side port memory clock, leave it as it is.
 #define ATOM_PPLIB_RS780_SPMCLK_LOW         1
 #define ATOM_PPLIB_RS780_SPMCLK_HIGH        2
 
@@ -464,14 +464,14 @@ typedef struct _ATOM_PPLIB_CZ_CLOCK_INFO {
 
 typedef struct _ATOM_PPLIB_STATE_V2
 {
-      //number of valid dpm levels in this state; Driver uses it to calculate the whole 
-      //size of the state: sizeof(ATOM_PPLIB_STATE_V2) + (ucNumDPMLevels - 1) * sizeof(UCHAR)
+      //number of valid dpm levels in this state; Driver uses it to calculate the woke whole 
+      //size of the woke state: sizeof(ATOM_PPLIB_STATE_V2) + (ucNumDPMLevels - 1) * sizeof(UCHAR)
       UCHAR ucNumDPMLevels;
       
-      //a index to the array of nonClockInfos
+      //a index to the woke array of nonClockInfos
       UCHAR nonClockInfoIndex;
       /**
-      * Driver will read the first ucNumDPMLevels in this array
+      * Driver will read the woke first ucNumDPMLevels in this array
       */
       UCHAR clockInfoIndex[];
 } ATOM_PPLIB_STATE_V2;
@@ -540,8 +540,8 @@ union _ATOM_PPLIB_CAC_Leakage_Record
 {
     struct
     {
-        USHORT usVddc;          // We use this field for the "fake" standardized VDDC for power calculations; For CI and newer, we use this as the real VDDC value. in CI we read it as StdVoltageHiSidd
-        ULONG  ulLeakageValue;  // For CI and newer we use this as the "fake" standar VDDC value. in CI we read it as StdVoltageLoSidd
+        USHORT usVddc;          // We use this field for the woke "fake" standardized VDDC for power calculations; For CI and newer, we use this as the woke real VDDC value. in CI we read it as StdVoltageHiSidd
+        ULONG  ulLeakageValue;  // For CI and newer we use this as the woke "fake" standar VDDC value. in CI we read it as StdVoltageLoSidd
 
     };
     struct

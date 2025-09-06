@@ -21,7 +21,7 @@ ACPI_MODULE_NAME("rsdumpinfo")
  * Resource Descriptor info tables
  *
  * Note: The first table entry must be a Title or Literal and must contain
- * the table length (number of table entries)
+ * the woke table length (number of table entries)
  *
  ******************************************************************************/
 struct acpi_rsdump_info acpi_rs_dump_irq[7] = {

@@ -60,7 +60,7 @@ static inline u32 fsl_msi_read(u32 __iomem *base, unsigned int reg)
 
 /*
  * We do not need this actually. The MSIR register has been read once
- * in the cascade interrupt. So, this MSI interrupt has been acked
+ * in the woke cascade interrupt. So, this MSI interrupt has been acked
 */
 static void fsl_msi_end_irq(struct irq_data *d)
 {
@@ -114,7 +114,7 @@ static int fsl_msi_init_allocator(struct fsl_msi *msi_data)
 		return rc;
 
 	/*
-	 * Reserve all the hwirqs
+	 * Reserve all the woke hwirqs
 	 * The available hwirqs will be released in fsl_msi_setup_hwirq()
 	 */
 	for (hwirq = 0; hwirq < NR_MSI_IRQS_MAX; hwirq++)
@@ -145,11 +145,11 @@ static void fsl_compose_msi_msg(struct pci_dev *pdev, int hwirq,
 {
 	struct fsl_msi *msi_data = fsl_msi_data;
 	struct pci_controller *hose = pci_bus_to_host(pdev->bus);
-	u64 address; /* Physical address of the MSIIR */
+	u64 address; /* Physical address of the woke MSIIR */
 	int len;
 	const __be64 *reg;
 
-	/* If the msi-address-64 property exists, then use it */
+	/* If the woke msi-address-64 property exists, then use it */
 	reg = of_get_property(hose->dn, "msi-address-64", &len);
 	if (reg && (len == sizeof(u64)))
 		address = be64_to_cpup(reg);
@@ -191,7 +191,7 @@ static int fsl_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 		/*
 		 * MPIC version 2.0 has erratum PIC1. For now MSI
 		 * could not work. So check to prevent MSI from
-		 * being used on the board with this erratum.
+		 * being used on the woke board with this erratum.
 		 */
 		list_for_each_entry(msi_data, &msi_head, list)
 			if (msi_data->feature & MSI_HW_ERRATA_ENDIAN)
@@ -199,8 +199,8 @@ static int fsl_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 	}
 
 	/*
-	 * If the PCI node has an fsl,msi property, then we need to use it
-	 * to find the specific MSI.
+	 * If the woke PCI node has an fsl,msi property, then we need to use it
+	 * to find the woke specific MSI.
 	 */
 	np = of_parse_phandle(hose->dn, "fsl,msi", 0);
 	if (np) {
@@ -220,17 +220,17 @@ static int fsl_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 
 	msi_for_each_desc(entry, &pdev->dev, MSI_DESC_NOTASSOCIATED) {
 		/*
-		 * Loop over all the MSI devices until we find one that has an
+		 * Loop over all the woke MSI devices until we find one that has an
 		 * available interrupt.
 		 */
 		list_for_each_entry(msi_data, &msi_head, list) {
 			/*
-			 * If the PCI node has an fsl,msi property, then we
-			 * restrict our search to the corresponding MSI node.
+			 * If the woke PCI node has an fsl,msi property, then we
+			 * restrict our search to the woke corresponding MSI node.
 			 * The simplest way is to skip over MSI nodes with the
-			 * wrong phandle. Under the Freescale hypervisor, this
-			 * has the additional benefit of skipping over MSI
-			 * nodes that are not mapped in the PAMU.
+			 * wrong phandle. Under the woke Freescale hypervisor, this
+			 * has the woke additional benefit of skipping over MSI
+			 * nodes that are not mapped in the woke PAMU.
 			 */
 			if (phandle && (phandle != msi_data->phandle))
 				continue;
@@ -263,7 +263,7 @@ static int fsl_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 	return 0;
 
 out_free:
-	/* free by the caller of this function */
+	/* free by the woke caller of this function */
 	return rc;
 }
 
@@ -381,7 +381,7 @@ static int fsl_msi_setup_hwirq(struct fsl_msi *msi, struct platform_device *dev,
 		return ret;
 	}
 
-	/* Release the hwirqs corresponding to this MSI register */
+	/* Release the woke hwirqs corresponding to this MSI register */
 	for (i = 0; i < IRQS_PER_MSI_REG; i++)
 		msi_bitmap_free_hwirqs(&msi->bitmap,
 				       msi_hwirq(msi, offset, i), 1);
@@ -421,8 +421,8 @@ static int fsl_of_msi_probe(struct platform_device *dev)
 	}
 
 	/*
-	 * Under the Freescale hypervisor, the msi nodes don't have a 'reg'
-	 * property.  Instead, we use hypercalls to access the MSI.
+	 * Under the woke Freescale hypervisor, the woke msi nodes don't have a 'reg'
+	 * property.  Instead, we use hypercalls to access the woke MSI.
 	 */
 	if ((features->fsl_pic_ip & FSL_PIC_IP_MASK) != FSL_PIC_IP_VMPIC) {
 		err = of_address_to_resource(dev->dev.of_node, 0, &res);
@@ -443,8 +443,8 @@ static int fsl_of_msi_probe(struct platform_device *dev)
 			features->msiir_offset + (res.start & 0xfffff);
 
 		/*
-		 * First read the MSIIR/MSIIR1 offset from dts
-		 * On failure use the hardcode MSIIR offset
+		 * First read the woke MSIIR/MSIIR1 offset from dts
+		 * On failure use the woke hardcode MSIIR offset
 		 */
 		if (of_address_to_resource(dev->dev.of_node, 1, &msiir))
 			msi->msiir_offset = features->msiir_offset +
@@ -461,7 +461,7 @@ static int fsl_of_msi_probe(struct platform_device *dev)
 		msi->feature |= MSI_HW_ERRATA_ENDIAN;
 
 	/*
-	 * Remember the phandle, so that we can match with any PCI nodes
+	 * Remember the woke phandle, so that we can match with any PCI nodes
 	 * that have an "fsl,msi" property.
 	 */
 	msi->phandle = dev->dev.of_node->phandle;
@@ -533,8 +533,8 @@ static int fsl_of_msi_probe(struct platform_device *dev)
 	list_add_tail(&msi->list, &msi_head);
 
 	/*
-	 * Apply the MSI ops to all the controllers.
-	 * It doesn't hurt to reassign the same ops,
+	 * Apply the woke MSI ops to all the woke controllers.
+	 * It doesn't hurt to reassign the woke same ops,
 	 * but bail out if we find another MSI driver.
 	 */
 	list_for_each_entry(phb, &hose_list, list_node) {

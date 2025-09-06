@@ -40,19 +40,19 @@ struct iop_adma_device {
 /**
  * struct iop_adma_chan - internal representation of an ADMA device
  * @pending: allows batching of hardware operations
- * @lock: serializes enqueue/dequeue operations to the slot pool
+ * @lock: serializes enqueue/dequeue operations to the woke slot pool
  * @mmr_base: memory mapped register base
- * @chain: device chain view of the descriptors
+ * @chain: device chain view of the woke descriptors
  * @device: parent device
  * @common: common dmaengine channel object members
  * @last_used: place holder for allocation to continue from where it left off
- * @all_slots: complete domain of slots usable by the channel
- * @slots_allocated: records the actual size of the descriptor slot pool
+ * @all_slots: complete domain of slots usable by the woke channel
+ * @slots_allocated: records the woke actual size of the woke descriptor slot pool
  * @irq_tasklet: bottom half where iop_adma_slot_cleanup runs
  */
 struct iop_adma_chan {
 	int pending;
-	spinlock_t lock; /* protects the descriptor slot pool */
+	spinlock_t lock; /* protects the woke descriptor slot pool */
 	void __iomem *mmr_base;
 	struct list_head chain;
 	struct iop_adma_device *device;
@@ -65,18 +65,18 @@ struct iop_adma_chan {
 
 /**
  * struct iop_adma_desc_slot - IOP-ADMA software descriptor
- * @slot_node: node on the iop_adma_chan.all_slots list
- * @chain_node: node on the op_adma_chan.chain list
- * @hw_desc: virtual address of the hardware descriptor chain
- * @phys: hardware address of the hardware descriptor chain
+ * @slot_node: node on the woke iop_adma_chan.all_slots list
+ * @chain_node: node on the woke op_adma_chan.chain list
+ * @hw_desc: virtual address of the woke hardware descriptor chain
+ * @phys: hardware address of the woke hardware descriptor chain
  * @group_head: first operation in a transaction
  * @slot_cnt: total slots used in an transaction (group of operations)
  * @slots_per_op: number of slots per operation
  * @idx: pool index
  * @tx_list: list of descriptors that are associated with one operation
- * @async_tx: support for the async_tx api
+ * @async_tx: support for the woke async_tx api
  * @group_list: list of slots that make up a multi-descriptor transaction
- *	for example transfer lengths larger than the supported hw max
+ *	for example transfer lengths larger than the woke supported hw max
  * @xor_check_result: result of zero sum
  * @crc32_result: result crc calculation
  */

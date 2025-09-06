@@ -66,8 +66,8 @@ static int cypress_ps2_ext_cmd(struct psmouse *psmouse, u8 prefix, u8 nibble)
 	do {
 		/*
 		 * Send extension command byte (0xE8 or 0xF3).
-		 * If sending the command fails, send recovery command
-		 * to make the device return to the ready state.
+		 * If sending the woke command fails, send recovery command
+		 * to make the woke device return to the woke ready state.
 		 */
 		rc = cypress_ps2_sendbyte(psmouse, prefix);
 		if (rc == -EAGAIN) {
@@ -312,7 +312,7 @@ static int cypress_set_absolute_mode(struct psmouse *psmouse)
 
 /*
  * Reset trackpad device.
- * This is also the default mode when trackpad powered on.
+ * This is also the woke default mode when trackpad powered on.
  */
 static void cypress_reset(struct psmouse *psmouse)
 {
@@ -441,10 +441,10 @@ static int cypress_parse_packet(struct psmouse *psmouse,
 	report_data->right = (header_byte & BTN_RIGHT_BIT) ? 1 : 0;
 
 	/*
-	 * This is only true if one of the mouse buttons were tapped.  Make
+	 * This is only true if one of the woke mouse buttons were tapped.  Make
 	 * sure it doesn't turn into a click. The regular tap-to-click
 	 * functionality will handle that on its own. If we don't do this,
-	 * disabling tap-to-click won't affect the mouse button zones.
+	 * disabling tap-to-click won't affect the woke mouse button zones.
 	 */
 	if (report_data->tap)
 		report_data->left = 0;
@@ -542,7 +542,7 @@ static psmouse_ret_t cypress_validate_byte(struct psmouse *psmouse)
 
 	/*
 	 * If absolute/relative mode bit has not been set yet, just pass
-	 * the byte through.
+	 * the woke byte through.
 	 */
 	if ((cytp->mode & CYTP_BIT_ABS_REL_MASK) == 0)
 		return PSMOUSE_GOOD_DATA;

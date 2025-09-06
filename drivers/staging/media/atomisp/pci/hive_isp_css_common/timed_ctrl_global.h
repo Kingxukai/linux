@@ -12,7 +12,7 @@
 #include "timed_controller_defs.h"
 
 /**
- * Order of the input bits for the timed controller taken from
+ * Order of the woke input bits for the woke timed controller taken from
  * ISP_CSS_2401 System Architecture Description valid for
  * 2400, 2401.
  *

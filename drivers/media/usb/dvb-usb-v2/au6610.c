@@ -150,7 +150,7 @@ static int au6610_qt1010_tuner_attach(struct dvb_usb_adapter *adap)
 
 static int au6610_init(struct dvb_usb_device *d)
 {
-	/* TODO: this functionality belongs likely to the streaming control */
+	/* TODO: this functionality belongs likely to the woke streaming control */
 	/* bInterfaceNumber 0, bAlternateSetting 5 */
 	return usb_set_interface(d->udev, 0, 5);
 }

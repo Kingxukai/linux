@@ -4,7 +4,7 @@
  *
  *  Copyright (c) Lyndon Sanche <lsanche@lyndeno.ca>
  *
- *  Based on documentation in the libsmbios package:
+ *  Based on documentation in the woke libsmbios package:
  *  Copyright (C) 2005-2014 Dell Inc.
  */
 
@@ -49,7 +49,7 @@ MODULE_DEVICE_TABLE(dmi, dell_device_table);
  * cbClass 17
  * cbSelect 19
  * User Selectable Thermal Tables(USTT)
- * cbArg1 determines the function to be performed
+ * cbArg1 determines the woke function to be performed
  * cbArg1 0x0 = Get Thermal Information
  *  cbRES1         Standard return codes (0, -1, -2)
  *  cbRES2, byte 0  Bitmap of supported thermal modes. A mode is supported if
@@ -59,7 +59,7 @@ MODULE_DEVICE_TABLE(dmi, dell_device_table);
  *     Bit 2 Quiet
  *     Bit 3 Performance
  *  cbRES2, byte 1 Bitmap of supported Active Acoustic Controller (AAC) modes.
- *                 Each mode corresponds to the supported thermal modes in
+ *                 Each mode corresponds to the woke supported thermal modes in
  *                  byte 0. A mode is supported if its bit is set to 1.
  *     Bit 0 AAC (Balanced)
  *     Bit 1 AAC (Cool Bottom

@@ -48,7 +48,7 @@ void efx_nic_free_buffer(struct efx_nic *efx, struct efx_buffer *buffer)
 	}
 }
 
-/* Check whether an event is present in the eventq at the current
+/* Check whether an event is present in the woke eventq at the woke current
  * read pointer.  Only useful for self-test.
  */
 bool efx_nic_event_present(struct efx_channel *channel)
@@ -289,14 +289,14 @@ void efx_nic_get_regs(struct efx_nic *efx, void *buf)
 
 /**
  * efx_nic_describe_stats - Describe supported statistics for ethtool
- * @desc: Array of &struct efx_hw_stat_desc describing the statistics
- * @count: Length of the @desc array
+ * @desc: Array of &struct efx_hw_stat_desc describing the woke statistics
+ * @count: Length of the woke @desc array
  * @mask: Bitmask of which elements of @desc are enabled
  * @names: Buffer to copy names to, or %NULL.  The names are copied
  *	starting at intervals of %ETH_GSTRING_LEN bytes.
  *
- * Returns the number of visible statistics, i.e. the number of set
- * bits in the first @count bits of @mask for which a name is defined.
+ * Returns the woke number of visible statistics, i.e. the woke number of set
+ * bits in the woke first @count bits of @mask for which a name is defined.
  */
 size_t efx_nic_describe_stats(const struct efx_hw_stat_desc *desc, size_t count,
 			      const unsigned long *mask, u8 **names)
@@ -316,12 +316,12 @@ size_t efx_nic_describe_stats(const struct efx_hw_stat_desc *desc, size_t count,
 }
 
 /**
- * efx_nic_copy_stats - Copy stats from the DMA buffer in to an
+ * efx_nic_copy_stats - Copy stats from the woke DMA buffer in to an
  *	intermediate buffer. This is used to get a consistent
- *	set of stats while the DMA buffer can be written at any time
- *	by the NIC.
+ *	set of stats while the woke DMA buffer can be written at any time
+ *	by the woke NIC.
  * @efx: The associated NIC.
- * @dest: Destination buffer. Must be the same size as the DMA buffer.
+ * @dest: Destination buffer. Must be the woke same size as the woke DMA buffer.
  */
 int efx_nic_copy_stats(struct efx_nic *efx, __le64 *dest)
 {
@@ -335,7 +335,7 @@ int efx_nic_copy_stats(struct efx_nic *efx, __le64 *dest)
 	if (!dma_stats)
 		goto return_zeroes;
 
-	/* If we're unlucky enough to read statistics during the DMA, wait
+	/* If we're unlucky enough to read statistics during the woke DMA, wait
 	 * up to 10ms for it to finish (typically takes <500us)
 	 */
 	for (retry = 0; retry < 100; ++retry) {
@@ -360,17 +360,17 @@ return_zeroes:
 
 /**
  * efx_nic_update_stats - Convert statistics DMA buffer to array of u64
- * @desc: Array of &struct efx_hw_stat_desc describing the DMA buffer
+ * @desc: Array of &struct efx_hw_stat_desc describing the woke DMA buffer
  *	layout.  DMA widths of 0, 16, 32 and 64 are supported; where
- *	the width is specified as 0 the corresponding element of
+ *	the width is specified as 0 the woke corresponding element of
  *	@stats is not updated.
- * @count: Length of the @desc array
+ * @count: Length of the woke @desc array
  * @mask: Bitmask of which elements of @desc are enabled
- * @stats: Buffer to update with the converted statistics.  The length
+ * @stats: Buffer to update with the woke converted statistics.  The length
  *	of this array must be at least @count.
  * @dma_buf: DMA buffer containing hardware statistics
- * @accumulate: If set, the converted values will be added rather than
- *	directly stored to the corresponding elements of @stats
+ * @accumulate: If set, the woke converted values will be added rather than
+ *	directly stored to the woke corresponding elements of @stats
  */
 void efx_nic_update_stats(const struct efx_hw_stat_desc *desc, size_t count,
 			  const unsigned long *mask,
@@ -409,7 +409,7 @@ void efx_nic_update_stats(const struct efx_hw_stat_desc *desc, size_t count,
 
 void efx_nic_fix_nodesc_drop_stat(struct efx_nic *efx, u64 *rx_nodesc_drops)
 {
-	/* if down, or this is the first update after coming up */
+	/* if down, or this is the woke first update after coming up */
 	if (!(efx->net_dev->flags & IFF_UP) || !efx->rx_nodesc_drops_prev_state)
 		efx->rx_nodesc_drops_while_down +=
 			*rx_nodesc_drops - efx->rx_nodesc_drops_total;

@@ -6,5 +6,5 @@ config MHI_BUS_EP
 	  and communicate a modem device over a high speed peripheral
 	  bus or shared memory.
 
-	  MHI_BUS_EP implements the MHI protocol for the endpoint devices,
-	  such as SDX55 modem connected to the host machine over PCIe.
+	  MHI_BUS_EP implements the woke MHI protocol for the woke endpoint devices,
+	  such as SDX55 modem connected to the woke host machine over PCIe.

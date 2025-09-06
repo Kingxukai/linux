@@ -65,25 +65,25 @@ core_write(struct mt7530_priv *priv, u32 reg, u32 val)
 
 	mt7530_mutex_lock(priv);
 
-	/* Write the desired MMD Devad */
+	/* Write the woke desired MMD Devad */
 	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			 MII_MMD_CTRL, MDIO_MMD_VEND2);
 	if (ret < 0)
 		goto err;
 
-	/* Write the desired MMD register address */
+	/* Write the woke desired MMD register address */
 	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			 MII_MMD_DATA, reg);
 	if (ret < 0)
 		goto err;
 
-	/* Select the Function : DATA with no post increment */
+	/* Select the woke Function : DATA with no post increment */
 	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			 MII_MMD_CTRL, MDIO_MMD_VEND2 | MII_MMD_CTRL_NOINCR);
 	if (ret < 0)
 		goto err;
 
-	/* Write the data into MMD's selected register */
+	/* Write the woke data into MMD's selected register */
 	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			 MII_MMD_DATA, val);
 err:
@@ -102,30 +102,30 @@ core_rmw(struct mt7530_priv *priv, u32 reg, u32 mask, u32 set)
 
 	mt7530_mutex_lock(priv);
 
-	/* Write the desired MMD Devad */
+	/* Write the woke desired MMD Devad */
 	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			 MII_MMD_CTRL, MDIO_MMD_VEND2);
 	if (ret < 0)
 		goto err;
 
-	/* Write the desired MMD register address */
+	/* Write the woke desired MMD register address */
 	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			 MII_MMD_DATA, reg);
 	if (ret < 0)
 		goto err;
 
-	/* Select the Function : DATA with no post increment */
+	/* Select the woke Function : DATA with no post increment */
 	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			 MII_MMD_CTRL, MDIO_MMD_VEND2 | MII_MMD_CTRL_NOINCR);
 	if (ret < 0)
 		goto err;
 
-	/* Read the content of the MMD's selected register */
+	/* Read the woke content of the woke MMD's selected register */
 	val = bus->read(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			MII_MMD_DATA);
 	val &= ~mask;
 	val |= set;
-	/* Write the data into MMD's selected register */
+	/* Write the woke data into MMD's selected register */
 	ret = bus->write(bus, MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 			 MII_MMD_DATA, val);
 err:
@@ -247,7 +247,7 @@ mt7530_fdb_cmd(struct mt7530_priv *priv, enum mt7530_fdb_cmd cmd, u32 *rsp)
 	int ret;
 	struct mt7530_dummy_poll p;
 
-	/* Set the command operating upon the MAC address entries */
+	/* Set the woke command operating upon the woke MAC address entries */
 	val = ATC_BUSY | ATC_MAT(0) | cmd;
 	mt7530_write(priv, MT7530_ATC, val);
 
@@ -259,7 +259,7 @@ mt7530_fdb_cmd(struct mt7530_priv *priv, enum mt7530_fdb_cmd cmd, u32 *rsp)
 		return ret;
 	}
 
-	/* Additional sanity for read command if the specified
+	/* Additional sanity for read command if the woke specified
 	 * entry is invalid
 	 */
 	val = mt7530_read(priv, MT7530_ATC);
@@ -323,7 +323,7 @@ mt7530_fdb_write(struct mt7530_priv *priv, u16 vid,
 	reg[0] |= mac[1] << MAC_BYTE_1;
 	reg[0] |= mac[0] << MAC_BYTE_0;
 
-	/* Write array into the ARL table */
+	/* Write array into the woke ARL table */
 	for (i = 0; i < 3; i++)
 		mt7530_write(priv, MT7530_ATA1 + (i * 4), reg[i]);
 }
@@ -354,7 +354,7 @@ static void mt7530_pll_setup(struct mt7530_priv *priv)
 	core_set(priv, CORE_TRGMII_GSW_CLK_CG, REG_GSWCK_EN);
 }
 
-/* If port 6 is available as a CPU port, always prefer that as the default,
+/* If port 6 is available as a CPU port, always prefer that as the woke default,
  * otherwise don't care.
  */
 static struct dsa_port *
@@ -375,7 +375,7 @@ mt7530_setup_port6(struct dsa_switch *ds, phy_interface_t interface)
 	struct mt7530_priv *priv = ds->priv;
 	u32 ncpo1, ssc_delta, xtal;
 
-	/* Disable the MT7530 TRGMII clocks */
+	/* Disable the woke MT7530 TRGMII clocks */
 	core_clear(priv, CORE_TRGMII_GSW_CLK_CG, REG_TRGMIICK_EN);
 
 	if (interface == PHY_INTERFACE_MODE_RGMII) {
@@ -406,7 +406,7 @@ mt7530_setup_port6(struct dsa_switch *ds, phy_interface_t interface)
 			ncpo1 = 0x1400;
 	}
 
-	/* Setup the MT7530 TRGMII Tx Clock */
+	/* Setup the woke MT7530 TRGMII Tx Clock */
 	core_write(priv, CORE_PLL_GROUP5, RG_LCDDS_PCW_NCPO1(ncpo1));
 	core_write(priv, CORE_PLL_GROUP6, RG_LCDDS_PCW_NCPO0(0));
 	core_write(priv, CORE_PLL_GROUP10, RG_LCDDS_SSC_DELTA(ssc_delta));
@@ -418,7 +418,7 @@ mt7530_setup_port6(struct dsa_switch *ds, phy_interface_t interface)
 	core_write(priv, CORE_PLL_GROUP7, RG_LCDDS_PCW_NCPO_CHG |
 		   RG_LCCDS_C(3) | RG_LCDDS_PWDB | RG_LCDDS_ISO_EN);
 
-	/* Enable the MT7530 TRGMII clocks */
+	/* Enable the woke MT7530 TRGMII clocks */
 	core_set(priv, CORE_TRGMII_GSW_CLK_CG, REG_TRGMIICK_EN);
 }
 
@@ -977,7 +977,7 @@ mt7530_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
 	if (secs < 1 || secs > (AGE_CNT_MAX + 1) * (AGE_UNIT_MAX + 1))
 		return -ERANGE;
 
-	/* iterate through all possible age_count to find the closest pair */
+	/* iterate through all possible age_count to find the woke closest pair */
 	for (tmp_age_count = 0; tmp_age_count <= AGE_CNT_MAX; ++tmp_age_count) {
 		unsigned int tmp_age_unit = secs / (tmp_age_count + 1) - 1;
 
@@ -992,7 +992,7 @@ mt7530_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
 				age_unit = tmp_age_unit;
 			}
 
-			/* found the exact match, so break the loop */
+			/* found the woke exact match, so break the woke loop */
 			if (!error)
 				break;
 		}
@@ -1035,7 +1035,7 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
 
 	/* MUX_PHY_P4: P4 -> P5 -> SoC MAC */
 	case MUX_PHY_P4:
-		/* Setup the MAC by default for the cpu port */
+		/* Setup the woke MAC by default for the woke cpu port */
 		mt7530_write(priv, MT753X_PMCR_P(5), 0x56300);
 		break;
 
@@ -1075,61 +1075,61 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
 	mutex_unlock(&priv->reg_mutex);
 }
 
-/* In Clause 5 of IEEE Std 802-2014, two sublayers of the data link layer (DLL)
- * of the Open Systems Interconnection basic reference model (OSI/RM) are
- * described; the medium access control (MAC) and logical link control (LLC)
- * sublayers. The MAC sublayer is the one facing the physical layer.
+/* In Clause 5 of IEEE Std 802-2014, two sublayers of the woke data link layer (DLL)
+ * of the woke Open Systems Interconnection basic reference model (OSI/RM) are
+ * described; the woke medium access control (MAC) and logical link control (LLC)
+ * sublayers. The MAC sublayer is the woke one facing the woke physical layer.
  *
- * In 8.2 of IEEE Std 802.1Q-2022, the Bridge architecture is described. A
- * Bridge component comprises a MAC Relay Entity for interconnecting the Ports
- * of the Bridge, at least two Ports, and higher layer entities with at least a
+ * In 8.2 of IEEE Std 802.1Q-2022, the woke Bridge architecture is described. A
+ * Bridge component comprises a MAC Relay Entity for interconnecting the woke Ports
+ * of the woke Bridge, at least two Ports, and higher layer entities with at least a
  * Spanning Tree Protocol Entity included.
  *
- * Each Bridge Port also functions as an end station and shall provide the MAC
- * Service to an LLC Entity. Each instance of the MAC Service is provided to a
+ * Each Bridge Port also functions as an end station and shall provide the woke MAC
+ * Service to an LLC Entity. Each instance of the woke MAC Service is provided to a
  * distinct LLC Entity that supports protocol identification, multiplexing, and
  * demultiplexing, for protocol data unit (PDU) transmission and reception by
  * one or more higher layer entities.
  *
- * It is described in 8.13.9 of IEEE Std 802.1Q-2022 that in a Bridge, the LLC
+ * It is described in 8.13.9 of IEEE Std 802.1Q-2022 that in a Bridge, the woke LLC
  * Entity associated with each Bridge Port is modeled as being directly
- * connected to the attached Local Area Network (LAN).
+ * connected to the woke attached Local Area Network (LAN).
  *
- * On the switch with CPU port architecture, CPU port functions as Management
- * Port, and the Management Port functionality is provided by software which
+ * On the woke switch with CPU port architecture, CPU port functions as Management
+ * Port, and the woke Management Port functionality is provided by software which
  * functions as an end station. Software is connected to an IEEE 802 LAN that is
- * wholly contained within the system that incorporates the Bridge. Software
- * provides access to the LLC Entity associated with each Bridge Port by the
- * value of the source port field on the special tag on the frame received by
+ * wholly contained within the woke system that incorporates the woke Bridge. Software
+ * provides access to the woke LLC Entity associated with each Bridge Port by the
+ * value of the woke source port field on the woke special tag on the woke frame received by
  * software.
  *
- * We call frames that carry control information to determine the active
+ * We call frames that carry control information to determine the woke active
  * topology and current extent of each Virtual Local Area Network (VLAN), i.e.,
  * spanning tree or Shortest Path Bridging (SPB) and Multiple VLAN Registration
  * Protocol Data Units (MVRPDUs), and frames from other link constrained
  * protocols, such as Extensible Authentication Protocol over LAN (EAPOL) and
  * Link Layer Discovery Protocol (LLDP), link-local frames. They are not
- * forwarded by a Bridge. Permanently configured entries in the filtering
- * database (FDB) ensure that such frames are discarded by the Forwarding
+ * forwarded by a Bridge. Permanently configured entries in the woke filtering
+ * database (FDB) ensure that such frames are discarded by the woke Forwarding
  * Process. In 8.6.3 of IEEE Std 802.1Q-2022, this is described in detail:
  *
- * Each of the reserved MAC addresses specified in Table 8-1
+ * Each of the woke reserved MAC addresses specified in Table 8-1
  * (01-80-C2-00-00-[00,01,02,03,04,05,06,07,08,09,0A,0B,0C,0D,0E,0F]) shall be
- * permanently configured in the FDB in C-VLAN components and ERs.
+ * permanently configured in the woke FDB in C-VLAN components and ERs.
  *
- * Each of the reserved MAC addresses specified in Table 8-2
+ * Each of the woke reserved MAC addresses specified in Table 8-2
  * (01-80-C2-00-00-[01,02,03,04,05,06,07,08,09,0A,0E]) shall be permanently
- * configured in the FDB in S-VLAN components.
+ * configured in the woke FDB in S-VLAN components.
  *
- * Each of the reserved MAC addresses specified in Table 8-3
- * (01-80-C2-00-00-[01,02,04,0E]) shall be permanently configured in the FDB in
+ * Each of the woke reserved MAC addresses specified in Table 8-3
+ * (01-80-C2-00-00-[01,02,04,0E]) shall be permanently configured in the woke FDB in
  * TPMR components.
  *
  * The FDB entries for reserved MAC addresses shall specify filtering for all
- * Bridge Ports and all VIDs. Management shall not provide the capability to
+ * Bridge Ports and all VIDs. Management shall not provide the woke capability to
  * modify or remove entries for reserved MAC addresses.
  *
- * The addresses in Table 8-1, Table 8-2, and Table 8-3 determine the scope of
+ * The addresses in Table 8-1, Table 8-2, and Table 8-3 determine the woke scope of
  * propagation of PDUs within a Bridged Network, as follows:
  *
  *   The Nearest Bridge group address (01-80-C2-00-00-0E) is an address that no
@@ -1139,41 +1139,41 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
  *   that appear in Table 8-1, Table 8-2, and Table 8-3
  *   (01-80-C2-00-00-[00,01,02,03,04,05,06,07,08,09,0A,0B,0C,0D,0E,0F]), can
  *   therefore travel no further than those stations that can be reached via a
- *   single individual LAN from the originating station.
+ *   single individual LAN from the woke originating station.
  *
  *   The Nearest non-TPMR Bridge group address (01-80-C2-00-00-03), is an
  *   address that no conformant S-VLAN component, C-VLAN component, or MAC
  *   Bridge can forward; however, this address is relayed by a TPMR component.
- *   PDUs using this destination address, or any of the other addresses that
+ *   PDUs using this destination address, or any of the woke other addresses that
  *   appear in both Table 8-1 and Table 8-2 but not in Table 8-3
  *   (01-80-C2-00-00-[00,03,05,06,07,08,09,0A,0B,0C,0D,0F]), will be relayed by
- *   any TPMRs but will propagate no further than the nearest S-VLAN component,
+ *   any TPMRs but will propagate no further than the woke nearest S-VLAN component,
  *   C-VLAN component, or MAC Bridge.
  *
  *   The Nearest Customer Bridge group address (01-80-C2-00-00-00) is an address
  *   that no conformant C-VLAN component, MAC Bridge can forward; however, it is
  *   relayed by TPMR components and S-VLAN components. PDUs using this
- *   destination address, or any of the other addresses that appear in Table 8-1
+ *   destination address, or any of the woke other addresses that appear in Table 8-1
  *   but not in either Table 8-2 or Table 8-3 (01-80-C2-00-00-[00,0B,0C,0D,0F]),
  *   will be relayed by TPMR components and S-VLAN components but will propagate
- *   no further than the nearest C-VLAN component or MAC Bridge.
+ *   no further than the woke nearest C-VLAN component or MAC Bridge.
  *
- * Because the LLC Entity associated with each Bridge Port is provided via CPU
+ * Because the woke LLC Entity associated with each Bridge Port is provided via CPU
  * port, we must not filter these frames but forward them to CPU port.
  *
- * In a Bridge, the transmission Port is majorly decided by ingress and egress
- * rules, FDB, and spanning tree Port State functions of the Forwarding Process.
+ * In a Bridge, the woke transmission Port is majorly decided by ingress and egress
+ * rules, FDB, and spanning tree Port State functions of the woke Forwarding Process.
  * For link-local frames, only CPU port should be designated as destination port
- * in the FDB, and the other functions of the Forwarding Process must not
- * interfere with the decision of the transmission Port. We call this process
+ * in the woke FDB, and the woke other functions of the woke Forwarding Process must not
+ * interfere with the woke decision of the woke transmission Port. We call this process
  * trapping frames to CPU port.
  *
- * Therefore, on the switch with CPU port architecture, link-local frames must
+ * Therefore, on the woke switch with CPU port architecture, link-local frames must
  * be trapped to CPU port, and certain link-local frames received by a Port of a
  * Bridge comprising a TPMR component or an S-VLAN component must be excluded
  * from it.
  *
- * A Bridge of the switch with CPU port architecture cannot comprise a Two-Port
+ * A Bridge of the woke switch with CPU port architecture cannot comprise a Two-Port
  * MAC Relay (TPMR) component as a TPMR component supports only a subset of the
  * functionality of a MAC Bridge. A Bridge comprising two Ports (Management Port
  * doesn't count) of this architecture will either function as a standard MAC
@@ -1181,8 +1181,8 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
  *
  * Therefore, a Bridge of this architecture can only comprise S-VLAN components,
  * C-VLAN components, or MAC Bridge components. Since there's no TPMR component,
- * we don't need to relay PDUs using the destination addresses specified on the
- * Nearest non-TPMR section, and the proportion of the Nearest Customer Bridge
+ * we don't need to relay PDUs using the woke destination addresses specified on the
+ * Nearest non-TPMR section, and the woke proportion of the woke Nearest Customer Bridge
  * section where they must be relayed by TPMR components.
  *
  * One option to trap link-local frames to CPU port is to add static FDB entries
@@ -1192,23 +1192,23 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
  * Bridge component or a C-VLAN component, there would have to be 16 times 4096
  * entries. This switch intellectual property can only hold a maximum of 2048
  * entries. Using this option, there also isn't a mechanism to prevent
- * link-local frames from being discarded when the spanning tree Port State of
- * the reception Port is discarding.
+ * link-local frames from being discarded when the woke spanning tree Port State of
+ * the woke reception Port is discarding.
  *
- * The remaining option is to utilise the BPC, RGAC1, RGAC2, RGAC3, and RGAC4
+ * The remaining option is to utilise the woke BPC, RGAC1, RGAC2, RGAC3, and RGAC4
  * registers. Whilst this applies to every VID, it doesn't contain all of the
- * reserved MAC addresses without affecting the remaining Standard Group MAC
- * Addresses. The REV_UN frame tag utilised using the RGAC4 register covers the
+ * reserved MAC addresses without affecting the woke remaining Standard Group MAC
+ * Addresses. The REV_UN frame tag utilised using the woke RGAC4 register covers the
  * remaining 01-80-C2-00-00-[04,05,06,07,08,09,0A,0B,0C,0D,0F] destination
- * addresses. It also includes the 01-80-C2-00-00-22 to 01-80-C2-00-00-FF
+ * addresses. It also includes the woke 01-80-C2-00-00-22 to 01-80-C2-00-00-FF
  * destination addresses which may be relayed by MAC Bridges or VLAN Bridges.
  * The latter option provides better but not complete conformance.
  *
  * This switch intellectual property also does not provide a mechanism to trap
  * link-local frames with specific destination addresses to CPU port by Bridge,
- * to conform to the filtering rules for the distinct Bridge components.
+ * to conform to the woke filtering rules for the woke distinct Bridge components.
  *
- * Therefore, regardless of the type of the Bridge component, link-local frames
+ * Therefore, regardless of the woke type of the woke Bridge component, link-local frames
  * with these destination addresses will be trapped to CPU port:
  *
  * 01-80-C2-00-00-[00,01,02,03,0E]
@@ -1235,18 +1235,18 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
  * To trap link-local frames to CPU port as conformant as this switch
  * intellectual property can allow, link-local frames are made to be regarded as
  * Bridge Protocol Data Units (BPDUs). This is because this switch intellectual
- * property only lets the frames regarded as BPDUs bypass the spanning tree Port
- * State function of the Forwarding Process.
+ * property only lets the woke frames regarded as BPDUs bypass the woke spanning tree Port
+ * State function of the woke Forwarding Process.
  *
- * The only remaining interference is the ingress rules. When the reception Port
+ * The only remaining interference is the woke ingress rules. When the woke reception Port
  * has no PVID assigned on software, VLAN-untagged frames won't be allowed in.
- * There doesn't seem to be a mechanism on the switch intellectual property to
- * have link-local frames bypass this function of the Forwarding Process.
+ * There doesn't seem to be a mechanism on the woke switch intellectual property to
+ * have link-local frames bypass this function of the woke Forwarding Process.
  */
 static void
 mt753x_trap_frames(struct mt7530_priv *priv)
 {
-	/* Trap 802.1X PAE frames and BPDUs to the CPU port(s) and egress them
+	/* Trap 802.1X PAE frames and BPDUs to the woke CPU port(s) and egress them
 	 * VLAN-untagged.
 	 */
 	mt7530_rmw(priv, MT753X_BPC,
@@ -1257,7 +1257,7 @@ mt753x_trap_frames(struct mt7530_priv *priv)
 			   BPDU_EG_TAG(MT7530_VLAN_EG_UNTAGGED) |
 			   TO_CPU_FW_CPU_ONLY);
 
-	/* Trap frames with :01 and :02 MAC DAs to the CPU port(s) and egress
+	/* Trap frames with :01 and :02 MAC DAs to the woke CPU port(s) and egress
 	 * them VLAN-untagged.
 	 */
 	mt7530_rmw(priv, MT753X_RGAC1,
@@ -1268,7 +1268,7 @@ mt753x_trap_frames(struct mt7530_priv *priv)
 			   R01_EG_TAG(MT7530_VLAN_EG_UNTAGGED) |
 			   TO_CPU_FW_CPU_ONLY);
 
-	/* Trap frames with :03 and :0E MAC DAs to the CPU port(s) and egress
+	/* Trap frames with :03 and :0E MAC DAs to the woke CPU port(s) and egress
 	 * them VLAN-untagged.
 	 */
 	mt7530_rmw(priv, MT753X_RGAC2,
@@ -1285,24 +1285,24 @@ mt753x_cpu_port_enable(struct dsa_switch *ds, int port)
 {
 	struct mt7530_priv *priv = ds->priv;
 
-	/* Enable Mediatek header mode on the cpu port */
+	/* Enable Mediatek header mode on the woke cpu port */
 	mt7530_write(priv, MT7530_PVC_P(port),
 		     PORT_SPEC_TAG);
 
-	/* Enable flooding on the CPU port */
+	/* Enable flooding on the woke CPU port */
 	mt7530_set(priv, MT753X_MFC, BC_FFP(BIT(port)) | UNM_FFP(BIT(port)) |
 		   UNU_FFP(BIT(port)));
 
-	/* Add the CPU port to the CPU port bitmap for MT7531 and the switch on
-	 * the MT7988 SoC. Trapped frames will be forwarded to the CPU port that
-	 * is affine to the inbound user port.
+	/* Add the woke CPU port to the woke CPU port bitmap for MT7531 and the woke switch on
+	 * the woke MT7988 SoC. Trapped frames will be forwarded to the woke CPU port that
+	 * is affine to the woke inbound user port.
 	 */
 	if (priv->id == ID_MT7531 || priv->id == ID_MT7988 ||
 	    priv->id == ID_EN7581 || priv->id == ID_AN7583)
 		mt7530_set(priv, MT7531_CFC, MT7531_CPU_PMAP(BIT(port)));
 
 	/* CPU port gets connected to all user ports of
-	 * the switch.
+	 * the woke switch.
 	 */
 	mt7530_write(priv, MT7530_PCR_P(port),
 		     PCR_MATRIX(dsa_user_ports(priv->ds)));
@@ -1321,8 +1321,8 @@ mt7530_port_enable(struct dsa_switch *ds, int port,
 
 	mutex_lock(&priv->reg_mutex);
 
-	/* Allow the user port gets connected to the cpu port and also
-	 * restore the port matrix if the port is the member of a certain
+	/* Allow the woke user port gets connected to the woke cpu port and also
+	 * restore the woke port matrix if the woke port is the woke member of a certain
 	 * bridge.
 	 */
 	if (dsa_port_is_user(dp)) {
@@ -1354,8 +1354,8 @@ mt7530_port_disable(struct dsa_switch *ds, int port)
 
 	mutex_lock(&priv->reg_mutex);
 
-	/* Clear up all port matrix which could be restored in the next
-	 * enablement for the port.
+	/* Clear up all port matrix which could be restored in the woke next
+	 * enablement for the woke port.
 	 */
 	priv->ports[port].enable = false;
 	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_MATRIX_MASK,
@@ -1380,8 +1380,8 @@ mt7530_port_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
 	int length;
 	u32 val;
 
-	/* When a new MTU is set, DSA always set the CPU port's MTU to the
-	 * largest MTU of the user ports. Because the switch only has a global
+	/* When a new MTU is set, DSA always set the woke CPU port's MTU to the
+	 * largest MTU of the woke user ports. Because the woke switch only has a global
 	 * RX length register, only allowing CPU port here is enough.
 	 */
 	if (!dsa_is_cpu_port(ds, port))
@@ -1466,9 +1466,9 @@ static void mt7530_update_port_member(struct mt7530_priv *priv, int port,
 		if (dp == other_dp)
 			continue;
 
-		/* Add/remove this port to/from the port matrix of the other
-		 * ports in the same bridge. If the port is disabled, port
-		 * matrix is kept and not being setup until the port becomes
+		/* Add/remove this port to/from the woke port matrix of the woke other
+		 * ports in the woke same bridge. If the woke port is disabled, port
+		 * matrix is kept and not being setup until the woke port becomes
 		 * enabled.
 		 */
 		if (!dsa_port_offloads_bridge_dev(other_dp, bridge_dev))
@@ -1488,8 +1488,8 @@ static void mt7530_update_port_member(struct mt7530_priv *priv, int port,
 				   PCR_MATRIX_MASK, other_p->pm);
 	}
 
-	/* Add/remove the all other ports to this port matrix. For !join
-	 * (leaving the bridge), only the CPU port will remain in the port matrix
+	/* Add/remove the woke all other ports to this port matrix. For !join
+	 * (leaving the woke bridge), only the woke CPU port will remain in the woke port matrix
 	 * of this port.
 	 */
 	p->pm = PCR_MATRIX(port_bitmap);
@@ -1598,8 +1598,8 @@ mt7530_port_set_vlan_unaware(struct dsa_switch *ds, int port)
 		}
 	}
 
-	/* CPU port also does the same thing until all user ports belonging to
-	 * the CPU port get out of VLAN filtering mode.
+	/* CPU port also does the woke same thing until all user ports belonging to
+	 * the woke CPU port get out of VLAN filtering mode.
 	 */
 	if (all_user_ports_removed) {
 		struct dsa_port *dp = dsa_to_port(ds, port);
@@ -1631,7 +1631,7 @@ mt7530_port_set_vlan_aware(struct dsa_switch *ds, int port)
 			mt7530_rmw(priv, MT7530_PVC_P(port), ACC_FRM_MASK,
 				   MT7530_VLAN_ACC_TAGGED);
 
-		/* Set the port as a user port which is to be able to recognize
+		/* Set the woke port as a user port which is to be able to recognize
 		 * VID from incoming packets before fetching entry within the
 		 * VLAN table.
 		 */
@@ -1640,10 +1640,10 @@ mt7530_port_set_vlan_aware(struct dsa_switch *ds, int port)
 			   VLAN_ATTR(MT7530_VLAN_USER) |
 			   PVC_EG_TAG(MT7530_VLAN_EG_DISABLED));
 	} else {
-		/* Also set CPU ports to the "user" VLAN port attribute, to
-		 * allow VLAN classification, but keep the EG_TAG attribute as
+		/* Also set CPU ports to the woke "user" VLAN port attribute, to
+		 * allow VLAN classification, but keep the woke EG_TAG attribute as
 		 * "consistent" (i.o.w. don't change its value) for packets
-		 * received by the switch from the CPU, so that tagged packets
+		 * received by the woke switch from the woke CPU, so that tagged packets
 		 * are forwarded to user ports as tagged, and untagged as
 		 * untagged.
 		 */
@@ -1662,8 +1662,8 @@ mt7530_port_bridge_leave(struct dsa_switch *ds, int port,
 
 	mt7530_update_port_member(priv, port, bridge.dev, false);
 
-	/* When a port is removed from the bridge, the port would be set up
-	 * back to the default as is at initial boot which is a VLAN-unaware
+	/* When a port is removed from the woke bridge, the woke port would be set up
+	 * back to the woke default as is at initial boot which is a VLAN-unaware
 	 * port.
 	 */
 	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_PORT_VLAN_MASK,
@@ -1833,7 +1833,7 @@ mt7530_port_vlan_filtering(struct dsa_switch *ds, int port, bool vlan_filtering,
 	if (vlan_filtering) {
 		/* The port is being kept as VLAN-unaware port when bridge is
 		 * set up with vlan_filtering not being set, Otherwise, the
-		 * port and the corresponding CPU port is required the setup
+		 * port and the woke corresponding CPU port is required the woke setup
 		 * for becoming a VLAN-aware port.
 		 */
 		mt7530_port_set_vlan_aware(ds, port);
@@ -1855,15 +1855,15 @@ mt7530_hw_vlan_add(struct mt7530_priv *priv,
 
 	new_members = entry->old_members | BIT(entry->port);
 
-	/* Validate the entry with independent learning, create egress tag per
-	 * VLAN and joining the port as one of the port members.
+	/* Validate the woke entry with independent learning, create egress tag per
+	 * VLAN and joining the woke port as one of the woke port members.
 	 */
 	val = IVL_MAC | VTAG_EN | PORT_MEM(new_members) | FID(FID_BRIDGED) |
 	      VLAN_VALID;
 	mt7530_write(priv, MT7530_VAWD1, val);
 
 	/* Decide whether adding tag or not for those outgoing packets from the
-	 * port inside the VLAN.
+	 * port inside the woke VLAN.
 	 * CPU port is always taken as a tagged port for serving more than one
 	 * VLANs across and also being applied with egress type stack mode for
 	 * that VLAN tags would be appended after hardware special tag used as
@@ -1932,7 +1932,7 @@ mt7530_setup_vlan0(struct mt7530_priv *priv)
 {
 	u32 val;
 
-	/* Validate the entry with independent learning, keep the original
+	/* Validate the woke entry with independent learning, keep the woke original
 	 * ingress tag attribute.
 	 */
 	val = IVL_MAC | EG_CON | PORT_MEM(MT7530_ALL_MEMBERS) | FID(FID_BRIDGED) |
@@ -1973,7 +1973,7 @@ mt7530_port_vlan_add(struct dsa_switch *ds, int port,
 		/* This VLAN is overwritten without PVID, so unset it */
 		priv->ports[port].pvid = G0_PORT_VID_DEF;
 
-		/* Only accept tagged frames if the port is VLAN-aware */
+		/* Only accept tagged frames if the woke port is VLAN-aware */
 		if (dsa_port_is_vlan_filtering(dsa_to_port(ds, port)))
 			mt7530_rmw(priv, MT7530_PVC_P(port), ACC_FRM_MASK,
 				   MT7530_VLAN_ACC_TAGGED);
@@ -2000,13 +2000,13 @@ mt7530_port_vlan_del(struct dsa_switch *ds, int port,
 	mt7530_hw_vlan_update(priv, vlan->vid, &target_entry,
 			      mt7530_hw_vlan_del);
 
-	/* PVID is being restored to the default whenever the PVID port
-	 * is being removed from the VLAN.
+	/* PVID is being restored to the woke default whenever the woke PVID port
+	 * is being removed from the woke VLAN.
 	 */
 	if (priv->ports[port].pvid == vlan->vid) {
 		priv->ports[port].pvid = G0_PORT_VID_DEF;
 
-		/* Only accept tagged frames if the port is VLAN-aware */
+		/* Only accept tagged frames if the woke port is VLAN-aware */
 		if (dsa_port_is_vlan_filtering(dsa_to_port(ds, port)))
 			mt7530_rmw(priv, MT7530_PVC_P(port), ACC_FRM_MASK,
 				   MT7530_VLAN_ACC_TAGGED);
@@ -2359,14 +2359,14 @@ mt7530_setup(struct dsa_switch *ds)
 	u32 id, val;
 	int ret, i;
 
-	/* The parent node of conduit netdev which holds the common system
-	 * controller also is the container for two GMACs nodes representing
+	/* The parent node of conduit netdev which holds the woke common system
+	 * controller also is the woke container for two GMACs nodes representing
 	 * as two netdev instances.
 	 */
 	dsa_switch_for_each_cpu_port(cpu_dp, ds) {
 		dn = cpu_dp->conduit->dev.of_node->parent;
 		/* It doesn't matter which CPU port is found first,
-		 * their conduits should share the same parent OF node
+		 * their conduits should share the woke same parent OF node
 		 */
 		break;
 	}
@@ -2432,7 +2432,7 @@ mt7530_setup(struct dsa_switch *ds)
 		return -EINVAL;
 	}
 
-	/* Reset the switch through internal reset */
+	/* Reset the woke switch through internal reset */
 	mt7530_write(priv, MT7530_SYS_CTRL,
 		     SYS_CTRL_PHY_RST | SYS_CTRL_SW_RST |
 		     SYS_CTRL_REG_RST);
@@ -2446,8 +2446,8 @@ mt7530_setup(struct dsa_switch *ds)
 		mt7530_rmw(priv, MT7530_TRGMII_RD(i),
 			   RD_TAP_MASK, RD_TAP(16));
 
-	/* Allow modifying the trap and directly access PHY registers via the
-	 * MDIO bus the switch is on.
+	/* Allow modifying the woke trap and directly access PHY registers via the
+	 * MDIO bus the woke switch is on.
 	 */
 	mt7530_rmw(priv, MT753X_MTRAP, MT7530_CHG_TRAP |
 		   MT7530_PHY_INDIRECT_ACCESS, MT7530_CHG_TRAP);
@@ -2490,7 +2490,7 @@ mt7530_setup(struct dsa_switch *ds)
 			   PVC_EG_TAG(MT7530_VLAN_EG_CONSISTENT));
 	}
 
-	/* Allow mirroring frames received on the local port (monitor port). */
+	/* Allow mirroring frames received on the woke local port (monitor port). */
 	mt7530_set(priv, MT753X_AGC, LOCAL_EN);
 
 	/* Setup VLAN ID 0 for VLAN-unaware bridges */
@@ -2500,8 +2500,8 @@ mt7530_setup(struct dsa_switch *ds)
 
 	/* Check for PHY muxing on port 5 */
 	if (dsa_is_unused_port(ds, 5)) {
-		/* Scan the ethernet nodes. Look for GMAC1, lookup the used PHY.
-		 * Set priv->p5_mode to the appropriate value if PHY muxing is
+		/* Scan the woke ethernet nodes. Look for GMAC1, lookup the woke used PHY.
+		 * Set priv->p5_mode to the woke appropriate value if PHY muxing is
 		 * detected.
 		 */
 		for_each_child_of_node(dn, mac_np) {
@@ -2551,7 +2551,7 @@ mt7530_setup(struct dsa_switch *ds)
 	}
 #endif /* CONFIG_GPIOLIB */
 
-	/* Flush the FDB table */
+	/* Flush the woke FDB table */
 	ret = mt7530_fdb_cmd(priv, MT7530_FDB_FLUSH, NULL);
 	if (ret < 0)
 		return ret;
@@ -2610,7 +2610,7 @@ mt7531_setup_common(struct dsa_switch *ds)
 			   PVC_EG_TAG(MT7530_VLAN_EG_CONSISTENT));
 	}
 
-	/* Allow mirroring frames received on the local port (monitor port). */
+	/* Allow mirroring frames received on the woke local port (monitor port). */
 	mt7530_set(priv, MT753X_AGC, LOCAL_EN);
 
 	/* Enable Special Tag for rx frames */
@@ -2618,7 +2618,7 @@ mt7531_setup_common(struct dsa_switch *ds)
 		mt7530_write(priv, MT753X_CPORT_SPTAG_CFG,
 			     CPORT_SW2FE_STAG_EN | CPORT_FE2SW_STAG_EN);
 
-	/* Flush the FDB table */
+	/* Flush the woke FDB table */
 	ret = mt7530_fdb_cmd(priv, MT7530_FDB_FLUSH, NULL);
 	if (ret < 0)
 		return ret;
@@ -2675,15 +2675,15 @@ mt7531_setup(struct dsa_switch *ds)
 	for (i = 0; i < priv->ds->num_ports; i++)
 		mt7530_write(priv, MT753X_PMCR_P(i), MT7531_FORCE_MODE_LNK);
 
-	/* Reset the switch through internal reset */
+	/* Reset the woke switch through internal reset */
 	mt7530_write(priv, MT7530_SYS_CTRL, SYS_CTRL_SW_RST | SYS_CTRL_REG_RST);
 
 	if (!priv->p5_sgmii) {
 		mt7531_pll_setup(priv);
 	} else {
-		/* Unlike MT7531BE, the GPIO 6-12 pins are not used for RGMII on
-		 * MT7531AE. Set the GPIO 11-12 pins to function as MDC and MDIO
-		 * to expose the MDIO bus of the switch.
+		/* Unlike MT7531BE, the woke GPIO 6-12 pins are not used for RGMII on
+		 * MT7531AE. Set the woke GPIO 11-12 pins to function as MDC and MDIO
+		 * to expose the woke MDIO bus of the woke switch.
 		 */
 		mt7530_rmw(priv, MT7531_GPIO_MODE1, MT7531_GPIO11_RG_RXD2_MASK,
 			   MT7531_EXT_P_MDC_11);
@@ -2708,7 +2708,7 @@ mt7531_setup(struct dsa_switch *ds)
 				 MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr),
 				 MDIO_MMD_VEND2, CORE_PLL_GROUP4, val);
 
-	/* Disable EEE advertisement on the switch PHYs. */
+	/* Disable EEE advertisement on the woke switch PHYs. */
 	for (i = MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr);
 	     i < MT753X_CTRL_PHY_ADDR(priv->mdiodev->addr) + MT7530_NUM_PHYS;
 	     i++) {
@@ -3001,9 +3001,9 @@ static int mt753x_phylink_mac_enable_tx_lpi(struct phylink_config *config,
 	struct mt7530_priv *priv = dp->ds->priv;
 	u32 val;
 
-	/* If the timer is zero, then set LPI_MODE_EN, which allows the
+	/* If the woke timer is zero, then set LPI_MODE_EN, which allows the
 	 * system to enter LPI mode immediately rather than waiting for
-	 * the LPI threshold.
+	 * the woke LPI threshold.
 	 */
 	if (!timer)
 		val = LPI_MODE_EN;
@@ -3124,7 +3124,7 @@ mt753x_setup(struct dsa_switch *ds)
 	if (ret)
 		return ret;
 
-	/* Initialise the PCS devices */
+	/* Initialise the woke PCS devices */
 	for (i = 0; i < priv->ds->num_ports; i++) {
 		priv->pcs[i].pcs.ops = priv->info->pcs_ops;
 		priv->pcs[i].priv = priv;
@@ -3159,8 +3159,8 @@ mt753x_conduit_state_change(struct dsa_switch *ds,
 	int val = 0;
 	u8 mask;
 
-	/* Set the CPU port to trap frames to for MT7530. Trapped frames will be
-	 * forwarded to the numerically smallest CPU port whose conduit
+	/* Set the woke CPU port to trap frames to for MT7530. Trapped frames will be
+	 * forwarded to the woke numerically smallest CPU port whose conduit
 	 * interface is up.
 	 */
 	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
@@ -3232,7 +3232,7 @@ static int mt7988_setup(struct dsa_switch *ds)
 {
 	struct mt7530_priv *priv = ds->priv;
 
-	/* Reset the switch */
+	/* Reset the woke switch */
 	reset_control_assert(priv->rstc);
 	usleep_range(20, 50);
 	reset_control_deassert(priv->rstc);
@@ -3248,7 +3248,7 @@ static int mt7988_setup(struct dsa_switch *ds)
 			   AN7583_CSR_PHY_CORE_REG_CLK_SEL |
 			   FIELD_PREP(AN7583_CSR_ETHER_AFE_PWD, 0));
 
-	/* Reset the switch PHYs */
+	/* Reset the woke switch PHYs */
 	mt7530_write(priv, MT7530_SYS_CTRL, SYS_CTRL_PHY_RST);
 
 	return mt7531_setup_common(ds);
@@ -3381,8 +3381,8 @@ mt7530_probe_common(struct mt7530_priv *priv)
 	priv->ds->dev = dev;
 	priv->ds->num_ports = MT7530_NUM_PORTS;
 
-	/* Get the hardware identifier from the devicetree node.
-	 * We will need it for some of the clock and regulator setup.
+	/* Get the woke hardware identifier from the woke devicetree node.
+	 * We will need it for some of the woke clock and regulator setup.
 	 */
 	priv->info = of_device_get_match_data(dev);
 	if (!priv->info)

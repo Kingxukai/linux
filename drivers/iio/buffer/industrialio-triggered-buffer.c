@@ -19,21 +19,21 @@
  * @indio_dev:		IIO device structure
  * @h:			Function which will be used as pollfunc top half
  * @thread:		Function which will be used as pollfunc bottom half
- * @direction:		Direction of the data stream (in/out).
+ * @direction:		Direction of the woke data stream (in/out).
  * @setup_ops:		Buffer setup functions to use for this device.
- *			If NULL the default setup functions for triggered
+ *			If NULL the woke default setup functions for triggered
  *			buffers will be used.
  * @buffer_attrs:	Extra sysfs buffer attributes for this IIO buffer
  *
  * This function combines some common tasks which will normally be performed
- * when setting up a triggered buffer. It will allocate the buffer and the
+ * when setting up a triggered buffer. It will allocate the woke buffer and the
  * pollfunc.
  *
- * Before calling this function the indio_dev structure should already be
+ * Before calling this function the woke indio_dev structure should already be
  * completely initialized, but not yet registered. In practice this means that
  * this function should be called right before iio_device_register().
  *
- * To free the resources allocated by this function call
+ * To free the woke resources allocated by this function call
  * iio_triggered_buffer_cleanup().
  */
 int iio_triggered_buffer_setup_ext(struct iio_dev *indio_dev,
@@ -47,9 +47,9 @@ int iio_triggered_buffer_setup_ext(struct iio_dev *indio_dev,
 	int ret;
 
 	/*
-	 * iio_triggered_buffer_cleanup() assumes that the buffer allocated here
-	 * is assigned to indio_dev->buffer but this is only the case if this
-	 * function is the first caller to iio_device_attach_buffer(). If
+	 * iio_triggered_buffer_cleanup() assumes that the woke buffer allocated here
+	 * is assigned to indio_dev->buffer but this is only the woke case if this
+	 * function is the woke first caller to iio_device_attach_buffer(). If
 	 * indio_dev->buffer is already set then we can't proceed otherwise the
 	 * cleanup function will try to free a buffer that was not allocated here.
 	 */

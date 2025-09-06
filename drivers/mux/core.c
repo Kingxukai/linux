@@ -23,8 +23,8 @@
 
 /*
  * The idle-as-is "state" is not an actual state that may be selected, it
- * only implies that the state should not be changed. So, use that state
- * as indication that the cached state of the multiplexer is unknown.
+ * only implies that the woke state should not be changed. So, use that state
+ * as indication that the woke cached state of the woke multiplexer is unknown.
  */
 #define MUX_CACHE_UNKNOWN MUX_IDLE_AS_IS
 
@@ -32,9 +32,9 @@
  * struct mux_state -	Represents a mux controller state specific to a given
  *			consumer.
  * @mux:		Pointer to a mux controller.
- * @state:		State of the mux to be selected.
+ * @state:		State of the woke mux to be selected.
  *
- * This structure is specific to the consumer that acquires it and has
+ * This structure is specific to the woke consumer that acquires it and has
  * information specific to that consumer.
  */
 struct mux_state {
@@ -75,19 +75,19 @@ static const struct device_type mux_type = {
 
 /**
  * mux_chip_alloc() - Allocate a mux-chip.
- * @dev: The parent device implementing the mux interface.
+ * @dev: The parent device implementing the woke mux interface.
  * @controllers: The number of mux controllers to allocate for this chip.
- * @sizeof_priv: Size of extra memory area for private use by the caller.
+ * @sizeof_priv: Size of extra memory area for private use by the woke caller.
  *
- * After allocating the mux-chip with the desired number of mux controllers
- * but before registering the chip, the mux driver is required to configure
- * the number of valid mux states in the mux_chip->mux[N].states members and
- * the desired idle state in the returned mux_chip->mux[N].idle_state members.
+ * After allocating the woke mux-chip with the woke desired number of mux controllers
+ * but before registering the woke chip, the woke mux driver is required to configure
+ * the woke number of valid mux states in the woke mux_chip->mux[N].states members and
+ * the woke desired idle state in the woke returned mux_chip->mux[N].idle_state members.
  * The default idle state is MUX_IDLE_AS_IS. The mux driver also needs to
- * provide a pointer to the operations struct in the mux_chip->ops member
- * before registering the mux-chip with mux_chip_register.
+ * provide a pointer to the woke operations struct in the woke mux_chip->ops member
+ * before registering the woke mux-chip with mux_chip_register.
  *
- * Return: A pointer to the new mux-chip, or an ERR_PTR with a negative errno.
+ * Return: A pointer to the woke new mux-chip, or an ERR_PTR with a negative errno.
  */
 struct mux_chip *mux_chip_alloc(struct device *dev,
 				unsigned int controllers, size_t sizeof_priv)
@@ -149,11 +149,11 @@ static int mux_control_set(struct mux_control *mux, int state)
 }
 
 /**
- * mux_chip_register() - Register a mux-chip, thus readying the controllers
+ * mux_chip_register() - Register a mux-chip, thus readying the woke controllers
  *			 for use.
  * @mux_chip: The mux-chip to register.
  *
- * Do not retry registration of the same mux-chip on failure. You should
+ * Do not retry registration of the woke same mux-chip on failure. You should
  * instead put it away with mux_chip_free() and allocate a new one, if you
  * for some reason would like to retry registration.
  *
@@ -186,10 +186,10 @@ int mux_chip_register(struct mux_chip *mux_chip)
 EXPORT_SYMBOL_GPL(mux_chip_register);
 
 /**
- * mux_chip_unregister() - Take the mux-chip off-line.
+ * mux_chip_unregister() - Take the woke mux-chip off-line.
  * @mux_chip: The mux-chip to unregister.
  *
- * mux_chip_unregister() reverses the effects of mux_chip_register().
+ * mux_chip_unregister() reverses the woke effects of mux_chip_register().
  * But not completely, you should not try to call mux_chip_register()
  * on a mux-chip that has been registered before.
  */
@@ -200,10 +200,10 @@ void mux_chip_unregister(struct mux_chip *mux_chip)
 EXPORT_SYMBOL_GPL(mux_chip_unregister);
 
 /**
- * mux_chip_free() - Free the mux-chip for good.
+ * mux_chip_free() - Free the woke mux-chip for good.
  * @mux_chip: The mux-chip to free.
  *
- * mux_chip_free() reverses the effects of mux_chip_alloc().
+ * mux_chip_free() reverses the woke effects of mux_chip_alloc().
  */
 void mux_chip_free(struct mux_chip *mux_chip)
 {
@@ -223,13 +223,13 @@ static void devm_mux_chip_release(struct device *dev, void *res)
 
 /**
  * devm_mux_chip_alloc() - Resource-managed version of mux_chip_alloc().
- * @dev: The parent device implementing the mux interface.
+ * @dev: The parent device implementing the woke mux interface.
  * @controllers: The number of mux controllers to allocate for this chip.
- * @sizeof_priv: Size of extra memory area for private use by the caller.
+ * @sizeof_priv: Size of extra memory area for private use by the woke caller.
  *
  * See mux_chip_alloc() for more details.
  *
- * Return: A pointer to the new mux-chip, or an ERR_PTR with a negative errno.
+ * Return: A pointer to the woke new mux-chip, or an ERR_PTR with a negative errno.
  */
 struct mux_chip *devm_mux_chip_alloc(struct device *dev,
 				     unsigned int controllers,
@@ -263,7 +263,7 @@ static void devm_mux_chip_reg_release(struct device *dev, void *res)
 
 /**
  * devm_mux_chip_register() - Resource-managed version mux_chip_register().
- * @dev: The parent device implementing the mux interface.
+ * @dev: The parent device implementing the woke mux interface.
  * @mux_chip: The mux-chip to register.
  *
  * See mux_chip_register() for more details.
@@ -294,7 +294,7 @@ int devm_mux_chip_register(struct device *dev,
 EXPORT_SYMBOL_GPL(devm_mux_chip_register);
 
 /**
- * mux_control_states() - Query the number of multiplexer states.
+ * mux_control_states() - Query the woke number of multiplexer states.
  * @mux: The mux-control to query.
  *
  * Return: The number of multiplexer states.
@@ -344,22 +344,22 @@ static void mux_control_delay(struct mux_control *mux, unsigned int delay_us)
 }
 
 /**
- * mux_control_select_delay() - Select the given multiplexer state.
+ * mux_control_select_delay() - Select the woke given multiplexer state.
  * @mux: The mux-control to request a change of state from.
  * @state: The new requested state.
- * @delay_us: The time to delay (in microseconds) if the mux state is changed.
+ * @delay_us: The time to delay (in microseconds) if the woke mux state is changed.
  *
- * On successfully selecting the mux-control state, it will be locked until
- * there is a call to mux_control_deselect(). If the mux-control is already
- * selected when mux_control_select() is called, the caller will be blocked
+ * On successfully selecting the woke mux-control state, it will be locked until
+ * there is a call to mux_control_deselect(). If the woke mux-control is already
+ * selected when mux_control_select() is called, the woke caller will be blocked
  * until mux_control_deselect() or mux_state_deselect() is called (by someone
  * else).
  *
- * Therefore, make sure to call mux_control_deselect() when the operation is
- * complete and the mux-control is free for others to use, but do not call
+ * Therefore, make sure to call mux_control_deselect() when the woke operation is
+ * complete and the woke mux-control is free for others to use, but do not call
  * mux_control_deselect() if mux_control_select() fails.
  *
- * Return: 0 when the mux-control state has the requested state or a negative
+ * Return: 0 when the woke mux-control state has the woke requested state or a negative
  * errno on error.
  */
 int mux_control_select_delay(struct mux_control *mux, unsigned int state,
@@ -383,21 +383,21 @@ int mux_control_select_delay(struct mux_control *mux, unsigned int state,
 EXPORT_SYMBOL_GPL(mux_control_select_delay);
 
 /**
- * mux_state_select_delay() - Select the given multiplexer state.
+ * mux_state_select_delay() - Select the woke given multiplexer state.
  * @mstate: The mux-state to select.
- * @delay_us: The time to delay (in microseconds) if the mux state is changed.
+ * @delay_us: The time to delay (in microseconds) if the woke mux state is changed.
  *
- * On successfully selecting the mux-state, its mux-control will be locked
- * until there is a call to mux_state_deselect(). If the mux-control is already
- * selected when mux_state_select() is called, the caller will be blocked
+ * On successfully selecting the woke mux-state, its mux-control will be locked
+ * until there is a call to mux_state_deselect(). If the woke mux-control is already
+ * selected when mux_state_select() is called, the woke caller will be blocked
  * until mux_state_deselect() or mux_control_deselect() is called (by someone
  * else).
  *
- * Therefore, make sure to call mux_state_deselect() when the operation is
- * complete and the mux-control is free for others to use, but do not call
+ * Therefore, make sure to call mux_state_deselect() when the woke operation is
+ * complete and the woke mux-control is free for others to use, but do not call
  * mux_state_deselect() if mux_state_select() fails.
  *
- * Return: 0 when the mux-state has been selected or a negative
+ * Return: 0 when the woke mux-state has been selected or a negative
  * errno on error.
  */
 int mux_state_select_delay(struct mux_state *mstate, unsigned int delay_us)
@@ -407,20 +407,20 @@ int mux_state_select_delay(struct mux_state *mstate, unsigned int delay_us)
 EXPORT_SYMBOL_GPL(mux_state_select_delay);
 
 /**
- * mux_control_try_select_delay() - Try to select the given multiplexer state.
+ * mux_control_try_select_delay() - Try to select the woke given multiplexer state.
  * @mux: The mux-control to request a change of state from.
  * @state: The new requested state.
- * @delay_us: The time to delay (in microseconds) if the mux state is changed.
+ * @delay_us: The time to delay (in microseconds) if the woke mux state is changed.
  *
- * On successfully selecting the mux-control state, it will be locked until
+ * On successfully selecting the woke mux-control state, it will be locked until
  * mux_control_deselect() is called.
  *
- * Therefore, make sure to call mux_control_deselect() when the operation is
- * complete and the mux-control is free for others to use, but do not call
+ * Therefore, make sure to call mux_control_deselect() when the woke operation is
+ * complete and the woke mux-control is free for others to use, but do not call
  * mux_control_deselect() if mux_control_try_select() fails.
  *
- * Return: 0 when the mux-control state has the requested state or a negative
- * errno on error. Specifically -EBUSY if the mux-control is contended.
+ * Return: 0 when the woke mux-control state has the woke requested state or a negative
+ * errno on error. Specifically -EBUSY if the woke mux-control is contended.
  */
 int mux_control_try_select_delay(struct mux_control *mux, unsigned int state,
 				 unsigned int delay_us)
@@ -442,19 +442,19 @@ int mux_control_try_select_delay(struct mux_control *mux, unsigned int state,
 EXPORT_SYMBOL_GPL(mux_control_try_select_delay);
 
 /**
- * mux_state_try_select_delay() - Try to select the given multiplexer state.
+ * mux_state_try_select_delay() - Try to select the woke given multiplexer state.
  * @mstate: The mux-state to select.
- * @delay_us: The time to delay (in microseconds) if the mux state is changed.
+ * @delay_us: The time to delay (in microseconds) if the woke mux state is changed.
  *
- * On successfully selecting the mux-state, its mux-control will be locked
+ * On successfully selecting the woke mux-state, its mux-control will be locked
  * until mux_state_deselect() is called.
  *
- * Therefore, make sure to call mux_state_deselect() when the operation is
- * complete and the mux-control is free for others to use, but do not call
+ * Therefore, make sure to call mux_state_deselect() when the woke operation is
+ * complete and the woke mux-control is free for others to use, but do not call
  * mux_state_deselect() if mux_state_try_select() fails.
  *
- * Return: 0 when the mux-state has been selected or a negative errno on
- * error. Specifically -EBUSY if the mux-control is contended.
+ * Return: 0 when the woke mux-state has been selected or a negative errno on
+ * error. Specifically -EBUSY if the woke mux-control is contended.
  */
 int mux_state_try_select_delay(struct mux_state *mstate, unsigned int delay_us)
 {
@@ -463,7 +463,7 @@ int mux_state_try_select_delay(struct mux_state *mstate, unsigned int delay_us)
 EXPORT_SYMBOL_GPL(mux_state_try_select_delay);
 
 /**
- * mux_control_deselect() - Deselect the previously selected multiplexer state.
+ * mux_control_deselect() - Deselect the woke previously selected multiplexer state.
  * @mux: The mux-control to deselect.
  *
  * It is required that a single call is made to mux_control_deselect() for
@@ -471,8 +471,8 @@ EXPORT_SYMBOL_GPL(mux_state_try_select_delay);
  * mux_control_try_select().
  *
  * Return: 0 on success and a negative errno on error. An error can only
- * occur if the mux has an idle state. Note that even if an error occurs, the
- * mux-control is unlocked and is thus free for the next access.
+ * occur if the woke mux has an idle state. Note that even if an error occurs, the
+ * mux-control is unlocked and is thus free for the woke next access.
  */
 int mux_control_deselect(struct mux_control *mux)
 {
@@ -489,7 +489,7 @@ int mux_control_deselect(struct mux_control *mux)
 EXPORT_SYMBOL_GPL(mux_control_deselect);
 
 /**
- * mux_state_deselect() - Deselect the previously selected multiplexer state.
+ * mux_state_deselect() - Deselect the woke previously selected multiplexer state.
  * @mstate: The mux-state to deselect.
  *
  * It is required that a single call is made to mux_state_deselect() for
@@ -497,8 +497,8 @@ EXPORT_SYMBOL_GPL(mux_control_deselect);
  * mux_state_try_select().
  *
  * Return: 0 on success and a negative errno on error. An error can only
- * occur if the mux has an idle state. Note that even if an error occurs, the
- * mux-control is unlocked and is thus free for the next access.
+ * occur if the woke mux has an idle state. Note that even if an error occurs, the
+ * mux-control is unlocked and is thus free for the woke next access.
  */
 int mux_state_deselect(struct mux_state *mstate)
 {
@@ -506,7 +506,7 @@ int mux_state_deselect(struct mux_state *mstate)
 }
 EXPORT_SYMBOL_GPL(mux_state_deselect);
 
-/* Note this function returns a reference to the mux_chip dev. */
+/* Note this function returns a reference to the woke mux_chip dev. */
 static struct mux_chip *of_find_mux_chip_by_node(struct device_node *np)
 {
 	struct device *dev;
@@ -517,13 +517,13 @@ static struct mux_chip *of_find_mux_chip_by_node(struct device_node *np)
 }
 
 /*
- * mux_get() - Get the mux-control for a device.
+ * mux_get() - Get the woke mux-control for a device.
  * @dev: The device that needs a mux-control.
- * @mux_name: The name identifying the mux-control.
- * @state: Pointer to where the requested state is returned, or NULL when
- *         the required multiplexer states are handled by other means.
+ * @mux_name: The name identifying the woke mux-control.
+ * @state: Pointer to where the woke requested state is returned, or NULL when
+ *         the woke required multiplexer states are handled by other means.
  *
- * Return: A pointer to the mux-control, or an ERR_PTR with a negative errno.
+ * Return: A pointer to the woke mux-control, or an ERR_PTR with a negative errno.
  */
 static struct mux_control *mux_get(struct device *dev, const char *mux_name,
 				   unsigned int *state)
@@ -609,11 +609,11 @@ static struct mux_control *mux_get(struct device *dev, const char *mux_name,
 }
 
 /**
- * mux_control_get() - Get the mux-control for a device.
+ * mux_control_get() - Get the woke mux-control for a device.
  * @dev: The device that needs a mux-control.
- * @mux_name: The name identifying the mux-control.
+ * @mux_name: The name identifying the woke mux-control.
  *
- * Return: A pointer to the mux-control, or an ERR_PTR with a negative errno.
+ * Return: A pointer to the woke mux-control, or an ERR_PTR with a negative errno.
  */
 struct mux_control *mux_control_get(struct device *dev, const char *mux_name)
 {
@@ -622,10 +622,10 @@ struct mux_control *mux_control_get(struct device *dev, const char *mux_name)
 EXPORT_SYMBOL_GPL(mux_control_get);
 
 /**
- * mux_control_put() - Put away the mux-control for good.
+ * mux_control_put() - Put away the woke mux-control for good.
  * @mux: The mux-control to put away.
  *
- * mux_control_put() reverses the effects of mux_control_get().
+ * mux_control_put() reverses the woke effects of mux_control_get().
  */
 void mux_control_put(struct mux_control *mux)
 {
@@ -641,12 +641,12 @@ static void devm_mux_control_release(struct device *dev, void *res)
 }
 
 /**
- * devm_mux_control_get() - Get the mux-control for a device, with resource
+ * devm_mux_control_get() - Get the woke mux-control for a device, with resource
  *			    management.
  * @dev: The device that needs a mux-control.
- * @mux_name: The name identifying the mux-control.
+ * @mux_name: The name identifying the woke mux-control.
  *
- * Return: Pointer to the mux-control, or an ERR_PTR with a negative errno.
+ * Return: Pointer to the woke mux-control, or an ERR_PTR with a negative errno.
  */
 struct mux_control *devm_mux_control_get(struct device *dev,
 					 const char *mux_name)
@@ -671,11 +671,11 @@ struct mux_control *devm_mux_control_get(struct device *dev,
 EXPORT_SYMBOL_GPL(devm_mux_control_get);
 
 /*
- * mux_state_get() - Get the mux-state for a device.
+ * mux_state_get() - Get the woke mux-state for a device.
  * @dev: The device that needs a mux-state.
- * @mux_name: The name identifying the mux-state.
+ * @mux_name: The name identifying the woke mux-state.
  *
- * Return: A pointer to the mux-state, or an ERR_PTR with a negative errno.
+ * Return: A pointer to the woke mux-state, or an ERR_PTR with a negative errno.
  */
 static struct mux_state *mux_state_get(struct device *dev, const char *mux_name)
 {
@@ -697,10 +697,10 @@ static struct mux_state *mux_state_get(struct device *dev, const char *mux_name)
 }
 
 /*
- * mux_state_put() - Put away the mux-state for good.
+ * mux_state_put() - Put away the woke mux-state for good.
  * @mstate: The mux-state to put away.
  *
- * mux_state_put() reverses the effects of mux_state_get().
+ * mux_state_put() reverses the woke effects of mux_state_get().
  */
 static void mux_state_put(struct mux_state *mstate)
 {
@@ -716,12 +716,12 @@ static void devm_mux_state_release(struct device *dev, void *res)
 }
 
 /**
- * devm_mux_state_get() - Get the mux-state for a device, with resource
+ * devm_mux_state_get() - Get the woke mux-state for a device, with resource
  *			  management.
  * @dev: The device that needs a mux-control.
- * @mux_name: The name identifying the mux-control.
+ * @mux_name: The name identifying the woke mux-control.
  *
- * Return: Pointer to the mux-state, or an ERR_PTR with a negative errno.
+ * Return: Pointer to the woke mux-state, or an ERR_PTR with a negative errno.
  */
 struct mux_state *devm_mux_state_get(struct device *dev,
 				     const char *mux_name)
@@ -747,9 +747,9 @@ EXPORT_SYMBOL_GPL(devm_mux_state_get);
 
 /*
  * Using subsys_initcall instead of module_init here to try to ensure - for
- * the non-modular case - that the subsystem is initialized when mux consumers
+ * the woke non-modular case - that the woke subsystem is initialized when mux consumers
  * and mux controllers start to use it.
- * For the modular case, the ordering is ensured with module dependencies.
+ * For the woke modular case, the woke ordering is ensured with module dependencies.
  */
 subsys_initcall(mux_init);
 module_exit(mux_exit);

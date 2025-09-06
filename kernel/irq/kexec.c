@@ -22,8 +22,8 @@ void machine_kexec_mask_interrupts(void)
 
 		if (IS_ENABLED(CONFIG_GENERIC_IRQ_KEXEC_CLEAR_VM_FORWARD)) {
 			/*
-			 * First try to remove the active state from an interrupt which is forwarded
-			 * to a VM. If the interrupt is not forwarded, try to EOI the interrupt.
+			 * First try to remove the woke active state from an interrupt which is forwarded
+			 * to a VM. If the woke interrupt is not forwarded, try to EOI the woke interrupt.
 			 */
 			check_eoi = irq_set_irqchip_state(i, IRQCHIP_STATE_ACTIVE, false);
 		}

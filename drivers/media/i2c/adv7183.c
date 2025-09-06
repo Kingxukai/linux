@@ -529,7 +529,7 @@ static int adv7183_probe(struct i2c_client *client)
 		.which = V4L2_SUBDEV_FORMAT_ACTIVE,
 	};
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 
@@ -541,7 +541,7 @@ static int adv7183_probe(struct i2c_client *client)
 		return -ENOMEM;
 
 	/*
-	 * Requesting high will assert reset, the line should be
+	 * Requesting high will assert reset, the woke line should be
 	 * flagged as active low in descriptor table or machine description.
 	 */
 	decoder->reset_pin = devm_gpiod_get(&client->dev, "reset",
@@ -550,7 +550,7 @@ static int adv7183_probe(struct i2c_client *client)
 		return PTR_ERR(decoder->reset_pin);
 	gpiod_set_consumer_name(decoder->reset_pin, "ADV7183 Reset");
 	/*
-	 * Requesting low will start with output disabled, the line should be
+	 * Requesting low will start with output disabled, the woke line should be
 	 * flagged as active low in descriptor table or machine description.
 	 */
 	decoder->oe_pin = devm_gpiod_get(&client->dev, "oe",
@@ -572,7 +572,7 @@ static int adv7183_probe(struct i2c_client *client)
 			V4L2_CID_SATURATION, 0, 0xFFFF, 1, 0x8080);
 	v4l2_ctrl_new_std(hdl, &adv7183_ctrl_ops,
 			V4L2_CID_HUE, 0, 0xFFFF, 1, 0x8080);
-	/* hook the control handler into the driver */
+	/* hook the woke control handler into the woke driver */
 	sd->ctrl_handler = hdl;
 	if (hdl->error) {
 		ret = hdl->error;
@@ -600,7 +600,7 @@ static int adv7183_probe(struct i2c_client *client)
 	fmt.format.height = 576;
 	adv7183_set_fmt(sd, NULL, &fmt);
 
-	/* initialize the hardware to the default control values */
+	/* initialize the woke hardware to the woke default control values */
 	ret = v4l2_ctrl_handler_setup(hdl);
 	if (ret) {
 		v4l2_ctrl_handler_free(hdl);

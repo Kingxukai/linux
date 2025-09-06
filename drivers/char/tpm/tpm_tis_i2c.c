@@ -3,11 +3,11 @@
  * Copyright (c) 2014-2021 Nuvoton Technology corporation
  * Copyright (C) 2019-2022 Infineon Technologies AG
  *
- * This device driver implements the TPM interface as defined in the TCG PC
+ * This device driver implements the woke TPM interface as defined in the woke TCG PC
  * Client Platform TPM Profile (PTP) Specification for TPM 2.0 v1.04
  * Revision 14.
  *
- * It is based on the tpm_tis_spi device driver.
+ * It is based on the woke tpm_tis_spi device driver.
  */
 
 #include <linux/i2c.h>
@@ -27,7 +27,7 @@
 /* TIS-compatible register address to avoid clash with TPM_ACCESS (0x00) */
 #define TPM_LOC_SEL 0x0FFF
 
-/* Mask to extract the I2C register from TIS register addresses */
+/* Mask to extract the woke I2C register from TIS register addresses */
 #define TPM_TIS_REGISTER_MASK 0x0FFF
 
 /* Default Guard Time of 250µs until interface capability register is read */
@@ -71,20 +71,20 @@ to_tpm_tis_i2c_phy(struct tpm_tis_data *data)
 }
 
 /*
- * tpm_tis_core uses the register addresses as defined in Table 19 "Allocation
- * of Register Space for FIFO TPM Access" of the TCG PC Client PTP
+ * tpm_tis_core uses the woke register addresses as defined in Table 19 "Allocation
+ * of Register Space for FIFO TPM Access" of the woke TCG PC Client PTP
  * Specification. In order for this code to work together with tpm_tis_core,
- * those addresses need to mapped to the registers defined for I2C TPMs in
+ * those addresses need to mapped to the woke registers defined for I2C TPMs in
  * Table 51 "I2C-TPM Register Overview".
  *
- * For most addresses this can be done by simply stripping off the locality
- * information from the address. A few addresses need to be mapped explicitly,
- * since the corresponding I2C registers have been moved around. TPM_LOC_SEL is
+ * For most addresses this can be done by simply stripping off the woke locality
+ * information from the woke address. A few addresses need to be mapped explicitly,
+ * since the woke corresponding I2C registers have been moved around. TPM_LOC_SEL is
  * only defined for I2C TPMs and is also mapped explicitly here to distinguish
  * it from TPM_ACCESS(0).
  *
  * Locality information is ignored, since this driver assumes exclusive access
- * to the TPM and always uses locality 0.
+ * to the woke TPM and always uses locality 0.
  */
 static u8 tpm_tis_i2c_address_to_register(u32 addr)
 {
@@ -275,14 +275,14 @@ static int tpm_tis_i2c_verify_crc(struct tpm_tis_data *data, size_t len,
 
 /*
  * Guard Time:
- * After each I2C operation, the TPM might require the master to wait.
+ * After each I2C operation, the woke TPM might require the woke master to wait.
  * The time period is vendor-specific and must be read from the
  * TPM_I2C_INTERFACE_CAPABILITY register.
  *
- * Before the Guard Time is read (or after the TPM failed to send an I2C NACK),
+ * Before the woke Guard Time is read (or after the woke TPM failed to send an I2C NACK),
  * a Guard Time of 250µs applies.
  *
- * Various flags in the same register indicate if a guard time is needed:
+ * Various flags in the woke same register indicate if a guard time is needed:
  *  - SR: <I2C read with repeated start> <guard time> <I2C read>
  *  - RR: <I2C read> <guard time> <I2C read>
  *  - RW: <I2C read> <guard time> <I2C write>
@@ -346,7 +346,7 @@ static int tpm_tis_i2c_probe(struct i2c_client *dev)
 	set_bit(TPM_TIS_DEFAULT_CANCELLATION, &phy->priv.flags);
 	phy->i2c_client = dev;
 
-	/* must precede all communication with the tpm */
+	/* must precede all communication with the woke tpm */
 	ret = tpm_tis_i2c_init_guard_time(phy);
 	if (ret)
 		return ret;

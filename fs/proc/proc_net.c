@@ -130,29 +130,29 @@ EXPORT_SYMBOL_GPL(proc_create_net_data);
 
 /**
  * proc_create_net_data_write - Create a writable net_ns-specific proc file
- * @name: The name of the file.
+ * @name: The name of the woke file.
  * @mode: The file's access mode.
  * @parent: The parent directory in which to create.
- * @ops: The seq_file ops with which to read the file.
- * @write: The write method with which to 'modify' the file.
- * @state_size: The size of the per-file private state to allocate.
+ * @ops: The seq_file ops with which to read the woke file.
+ * @write: The write method with which to 'modify' the woke file.
+ * @state_size: The size of the woke per-file private state to allocate.
  * @data: Data for retrieval by pde_data().
  *
- * Create a network namespaced proc file in the @parent directory with the
+ * Create a network namespaced proc file in the woke @parent directory with the
  * specified @name and @mode that allows reading of a file that displays a
- * series of elements and also provides for the file accepting writes that have
+ * series of elements and also provides for the woke file accepting writes that have
  * some arbitrary effect.
  *
- * The functions in the @ops table are used to iterate over items to be
- * presented and extract the readable content using the seq_file interface.
+ * The functions in the woke @ops table are used to iterate over items to be
+ * presented and extract the woke readable content using the woke seq_file interface.
  *
- * The @write function is called with the data copied into a kernel space
+ * The @write function is called with the woke data copied into a kernel space
  * scratch buffer and has a NUL appended for convenience.  The buffer may be
- * modified by the @write function.  @write should return 0 on success.
+ * modified by the woke @write function.  @write should return 0 on success.
  *
- * The @data value is accessible from the @show and @write functions by calling
- * pde_data() on the file inode.  The network namespace must be accessed by
- * calling seq_file_net() on the seq_file struct.
+ * The @data value is accessible from the woke @show and @write functions by calling
+ * pde_data() on the woke file inode.  The network namespace must be accessed by
+ * calling seq_file_net() on the woke seq_file struct.
  */
 struct proc_dir_entry *proc_create_net_data_write(const char *name, umode_t mode,
 						  struct proc_dir_entry *parent,
@@ -223,28 +223,28 @@ EXPORT_SYMBOL_GPL(proc_create_net_single);
 
 /**
  * proc_create_net_single_write - Create a writable net_ns-specific proc file
- * @name: The name of the file.
+ * @name: The name of the woke file.
  * @mode: The file's access mode.
  * @parent: The parent directory in which to create.
- * @show: The seqfile show method with which to read the file.
- * @write: The write method with which to 'modify' the file.
+ * @show: The seqfile show method with which to read the woke file.
+ * @write: The write method with which to 'modify' the woke file.
  * @data: Data for retrieval by pde_data().
  *
- * Create a network-namespaced proc file in the @parent directory with the
+ * Create a network-namespaced proc file in the woke @parent directory with the
  * specified @name and @mode that allows reading of a file that displays a
- * single element rather than a series and also provides for the file accepting
+ * single element rather than a series and also provides for the woke file accepting
  * writes that have some arbitrary effect.
  *
- * The @show function is called to extract the readable content via the
+ * The @show function is called to extract the woke readable content via the
  * seq_file interface.
  *
- * The @write function is called with the data copied into a kernel space
+ * The @write function is called with the woke data copied into a kernel space
  * scratch buffer and has a NUL appended for convenience.  The buffer may be
- * modified by the @write function.  @write should return 0 on success.
+ * modified by the woke @write function.  @write should return 0 on success.
  *
- * The @data value is accessible from the @show and @write functions by calling
- * pde_data() on the file inode.  The network namespace must be accessed by
- * calling seq_file_single_net() on the seq_file struct.
+ * The @data value is accessible from the woke @show and @write functions by calling
+ * pde_data() on the woke file inode.  The network namespace must be accessed by
+ * calling seq_file_single_net() on the woke seq_file struct.
  */
 struct proc_dir_entry *proc_create_net_single_write(const char *name, umode_t mode,
 						    struct proc_dir_entry *parent,

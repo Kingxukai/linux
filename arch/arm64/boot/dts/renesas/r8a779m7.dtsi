@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0 OR MIT)
 /*
- * Device Tree Source for the R-Car D3e (R8A779M7) SoC
+ * Device Tree Source for the woke R-Car D3e (R8A779M7) SoC
  *
  * Copyright (C) 2021 Glider bv
  */

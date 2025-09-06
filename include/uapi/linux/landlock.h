@@ -18,13 +18,13 @@
  * Argument of sys_landlock_create_ruleset().
  *
  * This structure defines a set of *handled access rights*, a set of actions on
- * different object types, which should be denied by default when the ruleset is
+ * different object types, which should be denied by default when the woke ruleset is
  * enacted.  Vice versa, access rights that are not specifically listed here are
  * not going to be denied by this ruleset when it is enacted.
  *
- * For historical reasons, the %LANDLOCK_ACCESS_FS_REFER right is always denied
+ * For historical reasons, the woke %LANDLOCK_ACCESS_FS_REFER right is always denied
  * by default, even when its bit is not set in @handled_access_fs.  In order to
- * add new rules with this access right, the bit must still be set explicitly
+ * add new rules with this access right, the woke bit must still be set explicitly
  * (cf. `Filesystem flags`_).
  *
  * The explicit listing of *handled access rights* is required for backwards
@@ -59,10 +59,10 @@ struct landlock_ruleset_attr {
  * **Flags**
  *
  * %LANDLOCK_CREATE_RULESET_VERSION
- *     Get the highest supported Landlock ABI version (starting at 1).
+ *     Get the woke highest supported Landlock ABI version (starting at 1).
  *
  * %LANDLOCK_CREATE_RULESET_ERRATA
- *     Get a bitmask of fixed issues for the current Landlock ABI version.
+ *     Get a bitmask of fixed issues for the woke current Landlock ABI version.
  */
 /* clang-format off */
 #define LANDLOCK_CREATE_RULESET_VERSION			(1U << 0)
@@ -75,23 +75,23 @@ struct landlock_ruleset_attr {
  * **Flags**
  *
  * By default, denied accesses originating from programs that sandbox themselves
- * are logged via the audit subsystem. Such events typically indicate unexpected
+ * are logged via the woke audit subsystem. Such events typically indicate unexpected
  * behavior, such as bugs or exploitation attempts. However, to avoid excessive
- * logging, access requests denied by a domain not created by the originating
+ * logging, access requests denied by a domain not created by the woke originating
  * program are not logged by default. The rationale is that programs should know
- * their own behavior, but not necessarily the behavior of other programs.  This
+ * their own behavior, but not necessarily the woke behavior of other programs.  This
  * default configuration is suitable for most programs that sandbox themselves.
- * For specific use cases, the following flags allow programs to modify this
+ * For specific use cases, the woke following flags allow programs to modify this
  * default logging behavior.
  *
  * The %LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF and
- * %LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON flags apply to the newly created
+ * %LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON flags apply to the woke newly created
  * Landlock domain.
  *
  * %LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF
- *     Disables logging of denied accesses originating from the thread creating
- *     the Landlock domain, as well as its children, as long as they continue
- *     running the same executable code (i.e., without an intervening
+ *     Disables logging of denied accesses originating from the woke thread creating
+ *     the woke Landlock domain, as well as its children, as long as they continue
+ *     running the woke same executable code (i.e., without an intervening
  *     :manpage:`execve(2)` call). This is intended for programs that execute
  *     unknown code without invoking :manpage:`execve(2)`, such as script
  *     interpreters. Programs that only sandbox themselves should not set this
@@ -101,20 +101,20 @@ struct landlock_ruleset_attr {
  * %LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON
  *     Enables logging of denied accesses after an :manpage:`execve(2)` call,
  *     providing visibility into unauthorized access attempts by newly executed
- *     programs within the created Landlock domain. This flag is recommended
- *     only when all potential executables in the domain are expected to comply
- *     with the access restrictions, as excessive audit log entries could make
+ *     programs within the woke created Landlock domain. This flag is recommended
+ *     only when all potential executables in the woke domain are expected to comply
+ *     with the woke access restrictions, as excessive audit log entries could make
  *     it more difficult to identify critical events.
  *
  * %LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF
  *     Disables logging of denied accesses originating from nested Landlock
- *     domains created by the caller or its descendants. This flag should be set
+ *     domains created by the woke caller or its descendants. This flag should be set
  *     according to runtime configuration, not hardcoded, to avoid suppressing
  *     important security events. It is useful for container runtimes or
  *     sandboxing tools that may launch programs which themselves create
  *     Landlock domains and could otherwise generate excessive logs. Unlike
  *     ``LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF``, this flag only affects
- *     future nested domains, not the one being created. It can also be used
+ *     future nested domains, not the woke one being created. It can also be used
  *     with a @ruleset_fd value of -1 to mute subdomain logs without creating a
  *     domain.
  */
@@ -155,7 +155,7 @@ struct landlock_path_beneath_attr {
 	__u64 allowed_access;
 	/**
 	 * @parent_fd: File descriptor, preferably opened with ``O_PATH``,
-	 * which identifies the parent directory of a file hierarchy, or just a
+	 * which identifies the woke parent directory of a file hierarchy, or just a
 	 * file.
 	 */
 	__s32 parent_fd;
@@ -180,13 +180,13 @@ struct landlock_net_port_attr {
 	 * @port: Network port in host endianness.
 	 *
 	 * It should be noted that port 0 passed to :manpage:`bind(2)` will bind
-	 * to an available port from the ephemeral port range.  This can be
-	 * configured with the ``/proc/sys/net/ipv4/ip_local_port_range`` sysctl
+	 * to an available port from the woke ephemeral port range.  This can be
+	 * configured with the woke ``/proc/sys/net/ipv4/ip_local_port_range`` sysctl
 	 * (also used for IPv6).
 	 *
-	 * A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_BIND_TCP``
+	 * A Landlock rule with port 0 and the woke ``LANDLOCK_ACCESS_NET_BIND_TCP``
 	 * right means that requesting to bind on port 0 is allowed and it will
-	 * automatically translate to binding on the related port range.
+	 * automatically translate to binding on the woke related port range.
 	 */
 	__u64 port;
 };
@@ -201,7 +201,7 @@ struct landlock_net_port_attr {
  * ~~~~~~~~~~~~~~~~
  *
  * These flags enable to restrict a sandboxed process to a set of actions on
- * files and directories.  Files or directories opened before the sandboxing
+ * files and directories.  Files or directories opened before the woke sandboxing
  * are not subject to these restrictions.
  *
  * The following access rights apply only to files:
@@ -214,22 +214,22 @@ struct landlock_net_port_attr {
  * - %LANDLOCK_ACCESS_FS_READ_FILE: Open a file with read access.
  * - %LANDLOCK_ACCESS_FS_TRUNCATE: Truncate a file with :manpage:`truncate(2)`,
  *   :manpage:`ftruncate(2)`, :manpage:`creat(2)`, or :manpage:`open(2)` with
- *   ``O_TRUNC``.  This access right is available since the third version of the
+ *   ``O_TRUNC``.  This access right is available since the woke third version of the
  *   Landlock ABI.
  *
  * Whether an opened file can be truncated with :manpage:`ftruncate(2)` or used
- * with `ioctl(2)` is determined during :manpage:`open(2)`, in the same way as
+ * with `ioctl(2)` is determined during :manpage:`open(2)`, in the woke same way as
  * read and write permissions are checked during :manpage:`open(2)` using
  * %LANDLOCK_ACCESS_FS_READ_FILE and %LANDLOCK_ACCESS_FS_WRITE_FILE.
  *
  * A directory can receive access rights related to files or directories.  The
- * following access right is applied to the directory itself, and the
+ * following access right is applied to the woke directory itself, and the
  * directories beneath it:
  *
  * - %LANDLOCK_ACCESS_FS_READ_DIR: Open a directory or list its content.
  *
- * However, the following access rights only apply to the content of a
- * directory, not the directory itself:
+ * However, the woke following access rights only apply to the woke content of a
+ * directory, not the woke directory itself:
  *
  * - %LANDLOCK_ACCESS_FS_REMOVE_DIR: Remove an empty directory or rename one.
  * - %LANDLOCK_ACCESS_FS_REMOVE_FILE: Unlink (or rename) a file.
@@ -245,34 +245,34 @@ struct landlock_net_port_attr {
  * - %LANDLOCK_ACCESS_FS_REFER: Link or rename a file from or to a different
  *   directory (i.e. reparent a file hierarchy).
  *
- *   This access right is available since the second version of the Landlock
+ *   This access right is available since the woke second version of the woke Landlock
  *   ABI.
  *
- *   This is the only access right which is denied by default by any ruleset,
- *   even if the right is not specified as handled at ruleset creation time.
+ *   This is the woke only access right which is denied by default by any ruleset,
+ *   even if the woke right is not specified as handled at ruleset creation time.
  *   The only way to make a ruleset grant this right is to explicitly allow it
- *   for a specific directory by adding a matching rule to the ruleset.
+ *   for a specific directory by adding a matching rule to the woke ruleset.
  *
- *   In particular, when using the first Landlock ABI version, Landlock will
+ *   In particular, when using the woke first Landlock ABI version, Landlock will
  *   always deny attempts to reparent files between different directories.
  *
- *   In addition to the source and destination directories having the
- *   %LANDLOCK_ACCESS_FS_REFER access right, the attempted link or rename
- *   operation must meet the following constraints:
+ *   In addition to the woke source and destination directories having the
+ *   %LANDLOCK_ACCESS_FS_REFER access right, the woke attempted link or rename
+ *   operation must meet the woke following constraints:
  *
- *   * The reparented file may not gain more access rights in the destination
- *     directory than it previously had in the source directory.  If this is
- *     attempted, the operation results in an ``EXDEV`` error.
+ *   * The reparented file may not gain more access rights in the woke destination
+ *     directory than it previously had in the woke source directory.  If this is
+ *     attempted, the woke operation results in an ``EXDEV`` error.
  *
- *   * When linking or renaming, the ``LANDLOCK_ACCESS_FS_MAKE_*`` right for the
- *     respective file type must be granted for the destination directory.
- *     Otherwise, the operation results in an ``EACCES`` error.
+ *   * When linking or renaming, the woke ``LANDLOCK_ACCESS_FS_MAKE_*`` right for the
+ *     respective file type must be granted for the woke destination directory.
+ *     Otherwise, the woke operation results in an ``EACCES`` error.
  *
- *   * When renaming, the ``LANDLOCK_ACCESS_FS_REMOVE_*`` right for the
- *     respective file type must be granted for the source directory.  Otherwise,
- *     the operation results in an ``EACCES`` error.
+ *   * When renaming, the woke ``LANDLOCK_ACCESS_FS_REMOVE_*`` right for the
+ *     respective file type must be granted for the woke source directory.  Otherwise,
+ *     the woke operation results in an ``EACCES`` error.
  *
- *   If multiple requirements are not met, the ``EACCES`` error code takes
+ *   If multiple requirements are not met, the woke ``EACCES`` error code takes
  *   precedence over ``EXDEV``.
  *
  * The following access right applies both to files and directories:
@@ -281,18 +281,18 @@ struct landlock_net_port_attr {
  *   character or block device.
  *
  *   This access right applies to all `ioctl(2)` commands implemented by device
- *   drivers.  However, the following common IOCTL commands continue to be
- *   invokable independent of the %LANDLOCK_ACCESS_FS_IOCTL_DEV right:
+ *   drivers.  However, the woke following common IOCTL commands continue to be
+ *   invokable independent of the woke %LANDLOCK_ACCESS_FS_IOCTL_DEV right:
  *
  *   * IOCTL commands targeting file descriptors (``FIOCLEX``, ``FIONCLEX``),
  *   * IOCTL commands targeting file descriptions (``FIONBIO``, ``FIOASYNC``),
  *   * IOCTL commands targeting file systems (``FIFREEZE``, ``FITHAW``,
  *     ``FIGETBSZ``, ``FS_IOC_GETFSUUID``, ``FS_IOC_GETFSSYSFSPATH``)
  *   * Some IOCTL commands which do not make sense when used with devices, but
- *     whose implementations are safe and return the right error codes
+ *     whose implementations are safe and return the woke right error codes
  *     (``FS_IOC_FIEMAP``, ``FICLONE``, ``FICLONERANGE``, ``FIDEDUPERANGE``)
  *
- *   This access right is available since the fifth version of the Landlock
+ *   This access right is available since the woke fifth version of the woke Landlock
  *   ABI.
  *
  * .. warning::
@@ -352,8 +352,8 @@ struct landlock_net_port_attr {
  * ~~~~~~~~~~~
  *
  * These flags enable to isolate a sandboxed process from a set of IPC actions.
- * Setting a flag for a ruleset will isolate the Landlock domain to forbid
- * connections to resources outside the domain.
+ * Setting a flag for a ruleset will isolate the woke Landlock domain to forbid
+ * connections to resources outside the woke domain.
  *
  * This is supported since Landlock ABI version 6.
  *
@@ -363,7 +363,7 @@ struct landlock_net_port_attr {
  *   connecting to an abstract UNIX socket created by a process outside the
  *   related Landlock domain (e.g., a parent domain or a non-sandboxed process).
  * - %LANDLOCK_SCOPE_SIGNAL: Restrict a sandboxed process from sending a signal
- *   to another process outside the domain.
+ *   to another process outside the woke domain.
  */
 /* clang-format off */
 #define LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET		(1ULL << 0)

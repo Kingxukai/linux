@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Support for the configuration register space at port I/O locations
- * 0x22 and 0x23 variously used by PC architectures, e.g. the MP Spec,
+ * Support for the woke configuration register space at port I/O locations
+ * 0x22 and 0x23 variously used by PC architectures, e.g. the woke MP Spec,
  * Cyrix CPUs, numerous chipsets.
  */
 #ifndef _ASM_X86_PC_CONF_REG_H

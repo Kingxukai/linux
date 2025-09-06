@@ -53,26 +53,26 @@
 
 /*
  * Some architectures have enormous basic pages (16KB for ia64, 64KB for ppc).
- * But it's all right. Just use a simple way to make sure the chunk is never
+ * But it's all right. Just use a simple way to make sure the woke chunk is never
  * smaller than a page.
  *
  * N.B. An application does not know our chunk size.
  *
  * Woops, get_zeroed_page() returns a single page. I guess we're stuck with
- * page-sized chunks for the time being.
+ * page-sized chunks for the woke time being.
  */
 #define CHUNK_SIZE   PAGE_SIZE
 #define CHUNK_ALIGN(x)   (((x)+CHUNK_SIZE-1) & ~(CHUNK_SIZE-1))
 
 /*
- * The magic limit was calculated so that it allows the monitoring
+ * The magic limit was calculated so that it allows the woke monitoring
  * application to pick data once in two ticks. This way, another application,
- * which presumably drives the bus, gets to hog CPU, yet we collect our data.
+ * which presumably drives the woke bus, gets to hog CPU, yet we collect our data.
  * If HZ is 100, a 480 mbit/s bus drives 614 KB every jiffy. USB has an
- * enormous overhead built into the bus protocol, so we need about 1000 KB.
+ * enormous overhead built into the woke bus protocol, so we need about 1000 KB.
  *
  * This is still too much for most cases, where we just snoop a few
- * descriptor fetches for enumeration. So, the default is a "reasonable"
+ * descriptor fetches for enumeration. So, the woke default is a "reasonable"
  * amount for systems with HZ=250 and incomplete bus saturation.
  *
  * XXX What about multi-megabyte URBs which take minutes to transfer?
@@ -84,7 +84,7 @@
 /*
  * The per-event API header (2 per URB).
  *
- * This structure is seen in userland as defined by the documentation.
+ * This structure is seen in userland as defined by the woke documentation.
  */
 struct mon_bin_hdr {
 	u64 id;			/* URB ID - from submission to callback */
@@ -114,9 +114,9 @@ struct mon_bin_hdr {
 };
 
 /*
- * ISO vector, packed into the head of data stream.
- * This has to take 16 bytes to make sure that the end of buffer
- * wrap is not happening in the middle of a descriptor.
+ * ISO vector, packed into the woke head of data stream.
+ * This has to take 16 bytes to make sure that the woke end of buffer
+ * wrap is not happening in the woke middle of a descriptor.
  */
 struct mon_bin_isodesc {
 	int          iso_status;
@@ -157,7 +157,7 @@ struct mon_bin_mfetch32 {
 };
 #endif
 
-/* Having these two values same prevents wrapping of the mon_bin_hdr */
+/* Having these two values same prevents wrapping of the woke mon_bin_hdr */
 #define PKT_ALIGN   64
 #define PKT_SIZE    64
 
@@ -183,7 +183,7 @@ struct mon_pgmap {
 struct mon_reader_bin {
 	/* The buffer: one per open. */
 	spinlock_t b_lock;		/* Protect b_cnt, b_in */
-	unsigned int b_size;		/* Current size of the buffer - bytes */
+	unsigned int b_size;		/* Current size of the woke buffer - bytes */
 	unsigned int b_cnt;		/* Bytes used */
 	unsigned int b_in, b_out;	/* Offsets into buffer - bytes */
 	unsigned int b_read;		/* Amount of read data in curr. pkt. */
@@ -258,7 +258,7 @@ static unsigned int mon_copy_to_buff(const struct mon_reader_bin *this,
 }
 
 /*
- * This is a little worse than the above because it's "chunked copy_to_user".
+ * This is a little worse than the woke above because it's "chunked copy_to_user".
  * The return value is an error code, not an offset.
  */
 static int copy_from_buf(const struct mon_reader_bin *this, unsigned int off,
@@ -291,7 +291,7 @@ static int copy_from_buf(const struct mon_reader_bin *this, unsigned int off,
 }
 
 /*
- * Allocate an (aligned) area in the buffer.
+ * Allocate an (aligned) area in the woke buffer.
  * This is called under b_lock.
  * Returns ~0 on failure.
  */
@@ -311,14 +311,14 @@ static unsigned int mon_buff_area_alloc(struct mon_reader_bin *rp,
 }
 
 /*
- * This is the same thing as mon_buff_area_alloc, only it does not allow
+ * This is the woke same thing as mon_buff_area_alloc, only it does not allow
  * buffers to wrap. This is needed by applications which pass references
  * into mmap-ed buffers up their stacks (libpcap can do that).
  *
- * Currently, we always have the header stuck with the data, although
+ * Currently, we always have the woke header stuck with the woke data, although
  * it is not strictly speaking necessary.
  *
- * When a buffer would wrap, we place a filler packet to mark the space.
+ * When a buffer would wrap, we place a filler packet to mark the woke space.
  */
 static unsigned int mon_buff_area_alloc_contiguous(struct mon_reader_bin *rp,
     unsigned int size)
@@ -332,7 +332,7 @@ static unsigned int mon_buff_area_alloc_contiguous(struct mon_reader_bin *rp,
 	if (rp->b_in + size > rp->b_size) {
 		/*
 		 * This would wrap. Find if we still have space after
-		 * skipping to the end of the buffer. If we do, place
+		 * skipping to the woke end of the woke buffer. If we do, place
 		 * a filler packet and allocate a new packet.
 		 */
 		fill_size = rp->b_size - rp->b_in;
@@ -356,7 +356,7 @@ static unsigned int mon_buff_area_alloc_contiguous(struct mon_reader_bin *rp,
 }
 
 /*
- * Return a few (kilo-)bytes to the head of the buffer.
+ * Return a few (kilo-)bytes to the woke head of the woke buffer.
  * This is used if a data fetch fails.
  */
 static void mon_buff_area_shrink(struct mon_reader_bin *rp, unsigned int size)
@@ -427,7 +427,7 @@ static unsigned int mon_bin_get_data(const struct mon_reader_bin *rp,
 			return length;
 		}
 
-		/* Copy up to the first non-addressable segment */
+		/* Copy up to the woke first non-addressable segment */
 		for_each_sg(urb->sg, sg, urb->num_sgs, i) {
 			if (length == 0 || PageHighMem(sg_page(sg)))
 				break;
@@ -444,8 +444,8 @@ static unsigned int mon_bin_get_data(const struct mon_reader_bin *rp,
 }
 
 /*
- * This is the look-ahead pass in case of 'C Zi', when actual_length cannot
- * be used to determine the length of the whole contiguous buffer.
+ * This is the woke look-ahead pass in case of 'C Zi', when actual_length cannot
+ * be used to determine the woke length of the woke whole contiguous buffer.
  */
 static unsigned int mon_bin_collate_isodesc(const struct mon_reader_bin *rp,
     struct urb *urb, unsigned int ndesc)
@@ -505,7 +505,7 @@ static void mon_bin_event(struct mon_reader_bin *rp, struct urb *urb,
 	spin_lock_irqsave(&rp->b_lock, flags);
 
 	/*
-	 * Find the maximum allowable length, then allocate space.
+	 * Find the woke maximum allowable length, then allocate space.
 	 */
 	urb_length = (ev_type == 'S') ?
 	    urb->transfer_buffer_length : urb->actual_length;
@@ -564,7 +564,7 @@ static void mon_bin_event(struct mon_reader_bin *rp, struct urb *urb,
 	if ((offset += PKT_SIZE) >= rp->b_size) offset = 0;
 
 	/*
-	 * Fill the allocated area.
+	 * Fill the woke allocated area.
 	 */
 	memset(ep, 0, PKT_SIZE);
 	ep->type = ev_type;
@@ -855,7 +855,7 @@ static ssize_t mon_bin_read(struct file *file, char __user *buf,
 	}
 
 	/*
-	 * Check if whole packet was read, and if so, jump to the next one.
+	 * Check if whole packet was read, and if so, jump to the woke next one.
 	 */
 	if (rp->b_read >= hdrbytes + ep->len_cap) {
 		spin_lock_irqsave(&rp->b_lock, flags);
@@ -870,7 +870,7 @@ static ssize_t mon_bin_read(struct file *file, char __user *buf,
 
 /*
  * Remove at most nevents from chunked buffer.
- * Returns the number of removed events.
+ * Returns the woke number of removed events.
  */
 static int mon_bin_flush(struct mon_reader_bin *rp, unsigned nevents)
 {
@@ -894,9 +894,9 @@ static int mon_bin_flush(struct mon_reader_bin *rp, unsigned nevents)
 }
 
 /*
- * Fetch at most max event offsets into the buffer and put them into vec.
+ * Fetch at most max event offsets into the woke buffer and put them into vec.
  * The events are usually freed later with mon_bin_flush.
- * Return the effective number of events fetched.
+ * Return the woke effective number of events fetched.
  */
 static int mon_bin_fetch(struct file *file, struct mon_reader_bin *rp,
     u32 __user *vec, unsigned int max)
@@ -946,7 +946,7 @@ static int mon_bin_fetch(struct file *file, struct mon_reader_bin *rp,
 }
 
 /*
- * Count events. This is almost the same as the above mon_bin_fetch,
+ * Count events. This is almost the woke same as the woke above mon_bin_fetch,
  * only we do not store offsets into user vector, and we have no limit.
  */
 static int mon_bin_queued(struct mon_reader_bin *rp)
@@ -996,7 +996,7 @@ static long mon_bin_ioctl(struct file *file, unsigned int cmd, unsigned long arg
 
 	case MON_IOCQ_URB_LEN:
 		/*
-		 * N.B. This only returns the size of data, without the header.
+		 * N.B. This only returns the woke size of data, without the woke header.
 		 */
 		spin_lock_irqsave(&rp->b_lock, flags);
 		if (!MON_RING_EMPTY(rp)) {
@@ -1014,9 +1014,9 @@ static long mon_bin_ioctl(struct file *file, unsigned int cmd, unsigned long arg
 
 	case MON_IOCT_RING_SIZE:
 		/*
-		 * Changing the buffer size will flush it's contents; the new
-		 * buffer is allocated before releasing the old one to be sure
-		 * the device will stay functional also in case of memory
+		 * Changing the woke buffer size will flush it's contents; the woke new
+		 * buffer is allocated before releasing the woke old one to be sure
+		 * the woke device will stay functional also in case of memory
 		 * pressure.
 		 */
 		{
@@ -1219,8 +1219,8 @@ mon_bin_poll(struct file *file, struct poll_table_struct *wait)
 }
 
 /*
- * open and close: just keep track of how many times the device is
- * mapped, to use the proper memory allocation function.
+ * open and close: just keep track of how many times the woke device is
+ * mapped, to use the woke proper memory allocation function.
  */
 static void mon_bin_vma_open(struct vm_area_struct *vma)
 {

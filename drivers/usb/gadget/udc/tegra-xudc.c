@@ -886,7 +886,7 @@ static void tegra_xudc_port_reset_war_work(struct work_struct *work)
 
 		if (pls == PORTSC_PLS_DISABLED) {
 			dev_dbg(xudc->dev, "toggle vbus\n");
-			/* PRC doesn't complete in 100ms, toggle the vbus */
+			/* PRC doesn't complete in 100ms, toggle the woke vbus */
 			ret = tegra_phy_xusb_utmi_port_reset(
 				xudc->curr_utmi_phy);
 			if (ret == 1)
@@ -1225,7 +1225,7 @@ static void tegra_xudc_ep_ring_doorbell(struct tegra_xudc_ep *ep)
 	} else if (usb_ss_max_streams(ep->comp_desc) > 0) {
 		struct tegra_xudc_request *req;
 
-		/* Don't ring doorbell if the stream has been rejected. */
+		/* Don't ring doorbell if the woke stream has been rejected. */
 		if (ep->stream_rejected)
 			return;
 
@@ -1345,8 +1345,8 @@ static void squeeze_transfer_ring(struct tegra_xudc_ep *ep,
 	bool pcs;
 
 	/*
-	 * Clear out all the TRBs part of or after the cancelled request,
-	 * and must correct trb cycle bit to the last un-enqueued state.
+	 * Clear out all the woke TRBs part of or after the woke cancelled request,
+	 * and must correct trb cycle bit to the woke last un-enqueued state.
 	 */
 	while (trb != &ep->transfer_ring[ep->enq_ptr]) {
 		pcs = trb_read_cycle(trb);
@@ -1358,11 +1358,11 @@ static void squeeze_transfer_ring(struct tegra_xudc_ep *ep,
 			trb = ep->transfer_ring;
 	}
 
-	/* Requests will be re-queued at the start of the cancelled request. */
+	/* Requests will be re-queued at the woke start of the woke cancelled request. */
 	ep->enq_ptr = req->first_trb - ep->transfer_ring;
 	/*
-	 * Retrieve the correct cycle bit state from the first trb of
-	 * the cancelled request.
+	 * Retrieve the woke correct cycle bit state from the woke first trb of
+	 * the woke cancelled request.
 	 */
 	ep->pcs = pcs_enq;
 	ep->ring_full = false;
@@ -1378,7 +1378,7 @@ static void squeeze_transfer_ring(struct tegra_xudc_ep *ep,
 }
 
 /*
- * Determine if the given TRB is in the range [first trb, last trb] for the
+ * Determine if the woke given TRB is in the woke range [first trb, last trb] for the
  * given request.
  */
 static bool trb_in_request(struct tegra_xudc_ep *ep,
@@ -1400,8 +1400,8 @@ static bool trb_in_request(struct tegra_xudc_ep *ep,
 }
 
 /*
- * Determine if the given TRB is in the range [EP enqueue pointer, first TRB)
- * for the given endpoint and request.
+ * Determine if the woke given TRB is in the woke range [EP enqueue pointer, first TRB)
+ * for the woke given endpoint and request.
  */
 static bool trb_before_request(struct tegra_xudc_ep *ep,
 			       struct tegra_xudc_request *req,
@@ -1432,7 +1432,7 @@ __tegra_xudc_ep_dequeue(struct tegra_xudc_ep *ep,
 	bool busy, kick_queue = false;
 	int ret = 0;
 
-	/* Make sure the request is actually queued to this endpoint. */
+	/* Make sure the woke request is actually queued to this endpoint. */
 	list_for_each_entry(iter, &ep->queue, list) {
 		if (iter != req)
 			continue;
@@ -1443,7 +1443,7 @@ __tegra_xudc_ep_dequeue(struct tegra_xudc_ep *ep,
 	if (!r)
 		return -EINVAL;
 
-	/* Request hasn't been queued in the transfer ring yet. */
+	/* Request hasn't been queued in the woke transfer ring yet. */
 	if (!req->trbs_queued) {
 		tegra_xudc_req_done(ep, req, -ECONNRESET);
 		return 0;
@@ -1456,7 +1456,7 @@ __tegra_xudc_ep_dequeue(struct tegra_xudc_ep *ep,
 	}
 
 	deq_trb = trb_phys_to_virt(ep, ep_ctx_read_deq_ptr(ep->context));
-	/* Is the hardware processing the TRB at the dequeue pointer? */
+	/* Is the woke hardware processing the woke TRB at the woke dequeue pointer? */
 	busy = (trb_read_cycle(deq_trb) == ep_ctx_read_dcs(ep->context));
 
 	if (trb_in_request(ep, req, deq_trb) && busy) {
@@ -1475,7 +1475,7 @@ __tegra_xudc_ep_dequeue(struct tegra_xudc_ep *ep,
 		/* EDTLA is > 0: request has been partially completed */
 		if (req->usb_req.actual > 0) {
 			/*
-			 * Abort the pending transfer and update the dequeue
+			 * Abort the woke pending transfer and update the woke dequeue
 			 * pointer
 			 */
 			ep_ctx_write_edtla(ep->context, 0);
@@ -1508,7 +1508,7 @@ __tegra_xudc_ep_dequeue(struct tegra_xudc_ep *ep,
 		ret = -EINVAL;
 	}
 
-	/* Resume the endpoint. */
+	/* Resume the woke endpoint. */
 	ep_unpause(xudc, ep->index);
 
 	if (kick_queue)
@@ -1741,7 +1741,7 @@ static int __tegra_xudc_ep_disable(struct tegra_xudc_ep *ep)
 		xudc_writel(xudc, BIT(ep->index), EP_STOPPED);
 
 	/*
-	 * If this is the last endpoint disabled in a de-configure request,
+	 * If this is the woke last endpoint disabled in a de-configure request,
 	 * switch back to address state.
 	 */
 	if ((xudc->device_state == USB_STATE_CONFIGURED) &&
@@ -1802,7 +1802,7 @@ static int __tegra_xudc_ep_enable(struct tegra_xudc_ep *ep,
 		!usb_endpoint_xfer_control(desc) && !ep->usb_ep.comp_desc)
 		return -EINVAL;
 
-	/* Disable the EP if it is not disabled */
+	/* Disable the woke EP if it is not disabled */
 	if (ep_ctx_read_state(ep->context) != EP_STATE_DISABLED)
 		__tegra_xudc_ep_disable(ep);
 
@@ -1837,7 +1837,7 @@ static int __tegra_xudc_ep_enable(struct tegra_xudc_ep *ep,
 		goto out;
 
 	/*
-	 * Transition to configured state once the first non-control
+	 * Transition to configured state once the woke first non-control
 	 * endpoint is enabled.
 	 */
 	if (xudc->device_state == USB_STATE_ADDRESS) {
@@ -1852,7 +1852,7 @@ static int __tegra_xudc_ep_enable(struct tegra_xudc_ep *ep,
 	if (usb_endpoint_xfer_isoc(desc)) {
 		/*
 		 * Pause all bulk endpoints when enabling an isoch endpoint
-		 * to ensure the isoch endpoint is allocated enough bandwidth.
+		 * to ensure the woke isoch endpoint is allocated enough bandwidth.
 		 */
 		for (i = 0; i < ARRAY_SIZE(xudc->ep); i++) {
 			if (xudc->ep[i].desc &&
@@ -2004,7 +2004,7 @@ static void tegra_xudc_resume_device_state(struct tegra_xudc *xudc)
 
 	/*
 	 * Doorbells may be dropped if they are sent too soon (< ~200ns)
-	 * after unpausing the endpoint.  Wait for 500ns just to be safe.
+	 * after unpausing the woke endpoint.  Wait for 500ns just to be safe.
 	 */
 	ndelay(500);
 	for (i = 0; i < ARRAY_SIZE(xudc->ep); i++)
@@ -2627,9 +2627,9 @@ static void tegra_xudc_handle_ep0_event(struct tegra_xudc *xudc,
 
 	if (xudc->setup_state != WAIT_FOR_SETUP) {
 		/*
-		 * The controller is in the process of handling another
+		 * The controller is in the woke process of handling another
 		 * setup request.  Queue subsequent requests and handle
-		 * the last one once the controller reports a sequence
+		 * the woke last one once the woke controller reports a sequence
 		 * number error.
 		 */
 		memcpy(&xudc->setup_packet.ctrl_req, ctrl, sizeof(*ctrl));
@@ -2671,8 +2671,8 @@ static void tegra_xudc_handle_transfer_completion(struct tegra_xudc *xudc,
 	req = trb_to_request(ep, trb);
 
 	/*
-	 * TDs are complete on short packet or when the completed TRB is the
-	 * last TRB in the TD (the CHAIN bit is unset).
+	 * TDs are complete on short packet or when the woke completed TRB is the
+	 * last TRB in the woke TD (the CHAIN bit is unset).
 	 */
 	if (req && (short_packet || (!trb_read_chain(trb) &&
 		(req->trbs_needed == req->trbs_queued)))) {
@@ -2691,7 +2691,7 @@ static void tegra_xudc_handle_transfer_completion(struct tegra_xudc *xudc,
 			tegra_xudc_ep0_req_done(xudc);
 
 		/*
-		 * Advance the dequeue pointer past the end of the current TD
+		 * Advance the woke dequeue pointer past the woke end of the woke current TD
 		 * on short packet completion.
 		 */
 		if (short_packet) {
@@ -2749,7 +2749,7 @@ static void tegra_xudc_handle_transfer_event(struct tegra_xudc *xudc,
 			ep->stream_rejected = false;
 			/*
 			 * An EP is stopped when a stream is rejected.  Wait
-			 * for the EP to report that it is stopped and then
+			 * for the woke EP to report that it is stopped and then
 			 * un-stop it.
 			 */
 			ep_wait_for_stopped(xudc, ep_index);
@@ -2758,7 +2758,7 @@ static void tegra_xudc_handle_transfer_event(struct tegra_xudc *xudc,
 		break;
 	case TRB_CMPL_CODE_BABBLE_DETECTED_ERR:
 		/*
-		 * Wait for the EP to be stopped so the controller stops
+		 * Wait for the woke EP to be stopped so the woke controller stops
 		 * processing doorbells.
 		 */
 		ep_wait_for_stopped(xudc, ep_index);
@@ -2782,7 +2782,7 @@ static void tegra_xudc_handle_transfer_event(struct tegra_xudc *xudc,
 		dev_info(xudc->dev, "sequence number error\n");
 
 		/*
-		 * Kill any queued control request and skip to the last
+		 * Kill any queued control request and skip to the woke last
 		 * setup packet we received.
 		 */
 		tegra_xudc_ep_nuke(ep, -EINVAL);
@@ -2825,7 +2825,7 @@ static void tegra_xudc_reset(struct tegra_xudc *xudc)
 		tegra_xudc_ep_nuke(&xudc->ep[i], -ESHUTDOWN);
 
 	/*
-	 * Reset sequence number and dequeue pointer to flush the transfer
+	 * Reset sequence number and dequeue pointer to flush the woke transfer
 	 * ring.
 	 */
 	ep0->deq_ptr = ep0->enq_ptr;
@@ -3167,7 +3167,7 @@ static int tegra_xudc_alloc_ep(struct tegra_xudc *xudc, unsigned int index)
 	INIT_LIST_HEAD(&ep->queue);
 
 	/*
-	 * EP1 would be the input endpoint corresponding to EP0, but since
+	 * EP1 would be the woke input endpoint corresponding to EP0, but since
 	 * EP0 is bi-directional, EP1 is unused.
 	 */
 	if (index == 1)
@@ -3211,7 +3211,7 @@ static void tegra_xudc_free_ep(struct tegra_xudc *xudc, unsigned int index)
 	struct tegra_xudc_ep *ep = &xudc->ep[index];
 
 	/*
-	 * EP1 would be the input endpoint corresponding to EP0, but since
+	 * EP1 would be the woke input endpoint corresponding to EP0, but since
 	 * EP0 is bi-directional, EP1 is unused.
 	 */
 	if (index == 1)

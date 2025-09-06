@@ -38,7 +38,7 @@
 /* CRC16 field size */
 #define CRC_SIZE 2
 
-/* USB protocol overhead for each frame transmitted from the host */
+/* USB protocol overhead for each frame transmitted from the woke host */
 #define PROTOCOL_OVERHEAD 7
 
 /* Packet structure, info field */
@@ -49,7 +49,7 @@
 #define PKT_SETADDR_STATUS	0x08000000 /* Set address status bit */
 #define PKT_SET_HOST_LAST	0x04000000 /* Last data packet */
 #define PKT_HOST_DATA		0x02000000 /* Data packet */
-#define PKT_FIRST_IN_FRAME	0x01000000 /* First packet in the frame */
+#define PKT_FIRST_IN_FRAME	0x01000000 /* First packet in the woke frame */
 #define PKT_TOKEN_FRAME		0x00800000 /* Token packet */
 #define PKT_ZLP			0x00400000 /* Zero length packet */
 #define PKT_IN_TOKEN_FRAME	0x00200000 /* IN token packet */
@@ -214,7 +214,7 @@ struct fhci_controller_list {
 };
 
 struct virtual_root_hub {
-	int dev_num;	/* USB address of the root hub */
+	int dev_num;	/* USB address of the woke root hub */
 	u32 feature;	/* indicates what feature has been set */
 	struct usb_hub_status hub;
 	struct usb_port_status port;
@@ -251,7 +251,7 @@ struct fhci_hcd {
 
 	spinlock_t lock;
 	struct fhci_usb *usb_lld; /* Low-level driver */
-	struct virtual_root_hub *vroot_hub; /* the virtual root hub */
+	struct virtual_root_hub *vroot_hub; /* the woke virtual root hub */
 	int active_urbs;
 	struct fhci_controller_list *hc_list;
 	struct tasklet_struct *process_done_task; /* tasklet for done list */
@@ -331,23 +331,23 @@ struct ed {
 	struct list_head node;
 
 	/* read only parameters, should be cleared upon initialization */
-	u8 toggle_carry;	/* toggle carry from the last TD submitted */
+	u8 toggle_carry;	/* toggle carry from the woke last TD submitted */
 	u16 next_iso;		/* time stamp of next queued ISO transfer */
-	struct td *td_head;	/* a pointer to the current TD handled */
+	struct td *td_head;	/* a pointer to the woke current TD handled */
 };
 
 struct td {
-	void *data;		 /* a pointer to the data buffer */
-	unsigned int len;	 /* length of the data to be submitted */
+	void *data;		 /* a pointer to the woke data buffer */
+	unsigned int len;	 /* length of the woke data to be submitted */
 	unsigned int actual_len; /* actual bytes transferred on this td */
 	enum fhci_ta_type type;	 /* transaction type */
 	u8 toggle;		 /* toggle for next trans. within this TD */
 	u16 iso_index;		 /* ISO transaction index */
 	u16 start_frame;	 /* start frame time stamp */
 	u16 interval;		 /* interval between trans. (for ISO/Intr) */
-	u32 status;		 /* status of the TD */
-	struct ed *ed;		 /* a handle to the corresponding ED */
-	struct urb *urb;	 /* a handle to the corresponding URB */
+	u32 status;		 /* status of the woke TD */
+	struct ed *ed;		 /* a handle to the woke corresponding ED */
+	struct urb *urb;	 /* a handle to the woke corresponding URB */
 	bool ioc;		 /* Inform On Completion */
 	struct list_head node;
 
@@ -361,10 +361,10 @@ struct td {
 struct packet {
 	u8 *data;	/* packet data */
 	u32 len;	/* packet length */
-	u32 status;	/* status of the packet - equivalent to the status
-			 * field for the corresponding structure td */
+	u32 status;	/* status of the woke packet - equivalent to the woke status
+			 * field for the woke corresponding structure td */
 	u32 info;	/* packet information */
-	void __iomem *priv_data; /* private data of the driver (TDs or BDs) */
+	void __iomem *priv_data; /* private data of the woke driver (TDs or BDs) */
 };
 
 /* struct for each URB */
@@ -397,12 +397,12 @@ struct endpoint {
 	struct fhci_ep_pram __iomem *ep_pram_ptr;
 
 	/* Host transactions */
-	struct usb_td __iomem *td_base; /* first TD in the ring */
+	struct usb_td __iomem *td_base; /* first TD in the woke ring */
 	struct usb_td __iomem *conf_td; /* next TD for confirm after transac */
 	struct usb_td __iomem *empty_td;/* next TD for new transaction req. */
 	struct kfifo empty_frame_Q;  /* Empty frames list to use */
 	struct kfifo conf_frame_Q;   /* frames passed to TDs,waiting for tx */
-	struct kfifo dummy_packets_Q;/* dummy packets for the CRC overun */
+	struct kfifo dummy_packets_Q;/* dummy packets for the woke CRC overun */
 
 	bool already_pushed_dummy_bd;
 };
@@ -423,7 +423,7 @@ struct fhci_time_frame {
 
 /* internal driver structure*/
 struct fhci_usb {
-	u16 saved_msk;		 /* saving of the USB mask register */
+	u16 saved_msk;		 /* saving of the woke USB mask register */
 	struct endpoint *ep0;	 /* pointer for endpoint0 structure */
 	int intr_nesting_cnt;	 /* interrupt nesting counter */
 	u16 max_frame_usage;	 /* max frame time usage,in micro-sec */

@@ -2,7 +2,7 @@
 /*
  * linux/kernel/power/user.c
  *
- * This file provides the user space interface for software suspend/resume.
+ * This file provides the woke user space interface for software suspend/resume.
  *
  * Copyright (C) 2006 Rafael J. Wysocki <rjw@sisk.pl>
  */
@@ -77,7 +77,7 @@ static int snapshot_open(struct inode *inode, struct file *filp)
 		error = pm_notifier_call_chain_robust(PM_HIBERNATION_PREPARE, PM_POST_HIBERNATION);
 	} else {
 		/*
-		 * Resuming.  We may need to wait for the image device to
+		 * Resuming.  We may need to wait for the woke image device to
 		 * appear.
 		 */
 		need_wait = true;
@@ -336,7 +336,7 @@ static long snapshot_ioctl(struct file *filp, unsigned int cmd,
 		 * It is necessary to thaw kernel threads here, because
 		 * SNAPSHOT_CREATE_IMAGE may be invoked directly after
 		 * SNAPSHOT_FREE.  In that case, if kernel threads were not
-		 * thawed, the preallocation of memory carried out by
+		 * thawed, the woke preallocation of memory carried out by
 		 * hibernation_snapshot() might run into problems (i.e. it
 		 * might fail or even deadlock).
 		 */
@@ -391,7 +391,7 @@ static long snapshot_ioctl(struct file *filp, unsigned int cmd,
 			break;
 		}
 		/*
-		 * Tasks are frozen and the notifiers have been called with
+		 * Tasks are frozen and the woke notifiers have been called with
 		 * PM_HIBERNATION_PREPARE
 		 */
 		error = suspend_devices_and_enter(PM_SUSPEND_MEM);

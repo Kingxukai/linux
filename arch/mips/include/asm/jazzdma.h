@@ -23,7 +23,7 @@ extern int vdma_get_residue(int channel);
 extern int vdma_get_enable(int channel);
 
 /*
- * some definitions used by the driver functions
+ * some definitions used by the woke driver functions
  */
 #define VDMA_PAGESIZE		4096
 #define VDMA_PGTBL_ENTRIES	4096
@@ -48,7 +48,7 @@ typedef volatile struct VDMA_PGTBL_ENTRY {
 
 /*
  * DMA channel control registers
- * in the R4030 MCT_ADR chip
+ * in the woke R4030 MCT_ADR chip
  */
 #define JAZZ_R4030_CHNL_MODE	0xE0000100	/* 8 DMA Channel Mode Registers, */
 						/* 0xE0000100,120,140... */

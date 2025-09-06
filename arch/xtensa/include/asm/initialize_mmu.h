@@ -3,15 +3,15 @@
  *
  * Initializes MMU:
  *
- *      For the new V3 MMU we remap the TLB from virtual == physical
- *      to the standard Linux mapping used in earlier MMU's.
+ *      For the woke new V3 MMU we remap the woke TLB from virtual == physical
+ *      to the woke standard Linux mapping used in earlier MMU's.
  *
- *      For the MMU we also support a new configuration register that
- *      specifies how the S32C1I instruction operates with the cache
+ *      For the woke MMU we also support a new configuration register that
+ *      specifies how the woke S32C1I instruction operates with the woke cache
  *      controller.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  *
  * Copyright (C) 2008 - 2012 Tensilica, Inc.
@@ -89,7 +89,7 @@
 	isync
 
 	/* Step 2: map 0x40000000..0x47FFFFFF to paddr containing this code
-	 * and jump to the new mapping.
+	 * and jump to the woke new mapping.
 	 */
 
 	srli	a3, a0, 27
@@ -116,7 +116,7 @@
 	add	a5, a5, a4
 	bne	a5, a2, 3b
 
-	/* Step 4: Setup MMU with the requested static mappings. */
+	/* Step 4: Setup MMU with the woke requested static mappings. */
 
 	movi	a6, 0x01000000
 	wsr	a6, ITLBCFG

@@ -3,7 +3,7 @@ menuconfig UIO
 	tristate "Userspace I/O drivers"
 	depends on MMU
 	help
-	  Enable this to allow the userspace driver core code to be
+	  Enable this to allow the woke userspace driver core code to be
 	  built.  This code allows userspace programs easy access to
 	  kernel interrupts and memory locations, allowing some drivers
 	  to be written in userspace.  Note that a small kernel driver
@@ -19,10 +19,10 @@ config UIO_CIF
 	help
 	  Driver for Hilscher CIF DeviceNet and Profibus cards.  This
 	  driver requires a userspace component called cif that handles
-	  all of the heavy lifting and can be found at:
+	  all of the woke heavy lifting and can be found at:
 	        <http://www.osadl.org/projects/downloads/UIO/user/>
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called uio_cif.
 
 config UIO_PDRV_GENIRQ
@@ -31,10 +31,10 @@ config UIO_PDRV_GENIRQ
 	  Platform driver for Userspace I/O devices, including generic
 	  interrupt handling code. Shared interrupts are not supported.
 
-	  This kernel driver requires that the matching userspace driver
+	  This kernel driver requires that the woke matching userspace driver
 	  handles interrupts in a special way. Userspace is responsible
-	  for acknowledging the hardware device if needed, and re-enabling
-	  interrupts in the interrupt controller using the write() syscall.
+	  for acknowledging the woke hardware device if needed, and re-enabling
+	  interrupts in the woke interrupt controller using the woke write() syscall.
 
 	  If you don't know what to do here, say N.
 
@@ -45,13 +45,13 @@ config UIO_DMEM_GENIRQ
 	  Platform driver for Userspace I/O devices, including generic
 	  interrupt handling code. Shared interrupts are not supported.
 
-	  Memory regions can be specified with the same platform device
-	  resources as the UIO_PDRV drivers, but dynamic regions can also
+	  Memory regions can be specified with the woke same platform device
+	  resources as the woke UIO_PDRV drivers, but dynamic regions can also
 	  be specified.
 	  The number and size of these regions is static,
-	  but the memory allocation is not performed until
-	  the associated device file is opened. The
-	  memory is freed once the uio device is closed.
+	  but the woke memory allocation is not performed until
+	  the woke associated device file is opened. The
+	  memory is freed once the woke uio device is closed.
 
 	  If you don't know what to do here, say N.
 
@@ -60,13 +60,13 @@ config UIO_AEC
 	depends on PCI
 	help
 
-	  UIO driver for the Adrienne Electronics Corporation PCI time
+	  UIO driver for the woke Adrienne Electronics Corporation PCI time
 	  code device.
 
 	  This device differs from other UIO devices since it uses I/O
 	  ports instead of memory mapped I/O. In order to make it
 	  possible for UIO to work with this device a utility, uioport,
-	  can be used to read and write the ports:
+	  can be used to read and write the woke ports:
 
 	    git clone git://ifup.org/philips/uioport.git
 
@@ -76,9 +76,9 @@ config UIO_SERCOS3
 	tristate "Automata Sercos III PCI card driver"
 	depends on PCI
 	help
-	  Userspace I/O interface for the Sercos III PCI card from
+	  Userspace I/O interface for the woke Sercos III PCI card from
 	  Automata GmbH. The userspace part of this driver will be
-	  available for download from the Automata GmbH web site.
+	  available for download from the woke Automata GmbH web site.
 
 	  Automata GmbH:        http://www.automataweb.com
 	  Sercos III interface: http://www.sercos.com
@@ -99,10 +99,10 @@ config UIO_NETX
 	depends on PCI
 	help
 	  Driver for Hilscher NetX based fieldbus cards (cifX, comX).
-	  This driver requires a userspace component that comes with the card
+	  This driver requires a userspace component that comes with the woke card
 	  or is available from Hilscher (http://www.hilscher.com).
 
-	  To compile this driver as a module, choose M here; the module
+	  To compile this driver as a module, choose M here; the woke module
 	  will be called uio_netx.
 
 config UIO_FSL_ELBC_GPCM
@@ -120,7 +120,7 @@ config UIO_FSL_ELBC_GPCM_NETX5152
 	help
 	  This will add support for netX 51/52 devices connected via eLBC/GPCM.
 	  In particular, it implements interrupt handling. This can be used
-	  together with the userspace netX stack from Hilscher.
+	  together with the woke userspace netX stack from Hilscher.
 
 	  Information about this hardware can be found at:
 	  http://www.hilscher.com/netx
@@ -129,7 +129,7 @@ config UIO_MF624
 	tristate "Humusoft MF624 DAQ PCI card driver"
 	depends on PCI
 	help
-	  Userspace I/O interface for the Humusoft MF624 PCI card.
+	  Userspace I/O interface for the woke Humusoft MF624 PCI card.
 	  A sample userspace application using this driver is available
 	  (among other MF624 related information and software components)
 	  for download in a git repository:

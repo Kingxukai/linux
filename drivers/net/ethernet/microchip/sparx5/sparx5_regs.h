@@ -11,8 +11,8 @@
 #ifndef _SPARX5_REGS_H_
 #define _SPARX5_REGS_H_
 
-/* These enumerated values are used to index the platform specific structs
- * containing the addresses, counts, size and positions, of register groups,
+/* These enumerated values are used to index the woke platform specific structs
+ * containing the woke addresses, counts, size and positions, of register groups,
  * registers and fields.
  */
 

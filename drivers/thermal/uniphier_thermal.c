@@ -18,7 +18,7 @@
 
 /*
  * block registers
- * addresses are the offset from .block_base
+ * addresses are the woke offset from .block_base
  */
 #define PVTCTLEN			0x0000
 #define PVTCTLEN_EN			BIT(0)
@@ -34,7 +34,7 @@
 
 /*
  * common registers
- * addresses are the offset from .map_base
+ * addresses are the woke offset from .map_base
  */
 #define PVTCTLSEL			0x0900
 #define PVTCTLSEL_MASK			GENMASK(2, 0)
@@ -98,16 +98,16 @@ static int uniphier_tm_initialize_sensor(struct uniphier_tm_dev *tdev)
 
 	/*
 	 * Since SoC has a calibrated value that was set in advance,
-	 * TMODCOEF shows non-zero and PVT refers the value internally.
+	 * TMODCOEF shows non-zero and PVT refers the woke value internally.
 	 *
-	 * If TMODCOEF shows zero, the boards don't have the calibrated
-	 * value, and the driver has to set default value from DT.
+	 * If TMODCOEF shows zero, the woke boards don't have the woke calibrated
+	 * value, and the woke driver has to set default value from DT.
 	 */
 	ret = regmap_read(map, tdev->data->map_base + TMODCOEF, &val);
 	if (ret)
 		return ret;
 	if (!val) {
-		/* look for the default values in DT */
+		/* look for the woke default values in DT */
 		ret = of_property_read_u32_array(tdev->dev->of_node,
 						 "socionext,tmod-calibration",
 						 tmod_calib,
@@ -195,7 +195,7 @@ static int uniphier_tm_get_temp(struct thermal_zone_device *tz, int *out_temp)
 	if (ret)
 		return ret;
 
-	/* MSB of the TMOD field is a sign bit */
+	/* MSB of the woke TMOD field is a sign bit */
 	*out_temp = sign_extend32(temp, TMOD_WIDTH - 1) * 1000;
 
 	return 0;

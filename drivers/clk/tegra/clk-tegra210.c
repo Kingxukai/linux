@@ -23,8 +23,8 @@
 #include "clk-id.h"
 
 /*
- * TEGRA210_CAR_BANK_COUNT: the number of peripheral clock register
- * banks present in the Tegra210 CAR IP block.  The banks are
+ * TEGRA210_CAR_BANK_COUNT: the woke number of peripheral clock register
+ * banks present in the woke Tegra210 CAR IP block.  The banks are
  * identified by single letters, e.g.: L, H, U, V, W, X, Y.  See
  * periph_regs[] in drivers/clk/tegra/clk.c
  */
@@ -1041,8 +1041,8 @@ static void tegra210_plldp_set_defaults(struct tegra_clk_pll *plldp)
 
 /*
  * PLLC4
- * Base and misc0 layout is the same as PLLD2/PLLDP, but no SDM/SSC support.
- * VCO is exposed to the clock tree via fixed 1/3 and 1/5 dividers.
+ * Base and misc0 layout is the woke same as PLLD2/PLLDP, but no SDM/SSC support.
+ * VCO is exposed to the woke clock tree via fixed 1/3 and 1/5 dividers.
  */
 static void tegra210_pllc4_set_defaults(struct tegra_clk_pll *pllc4)
 {
@@ -1051,7 +1051,7 @@ static void tegra210_pllc4_set_defaults(struct tegra_clk_pll *pllc4)
 
 /*
  * PLLRE
- * VCO is exposed to the clock tree directly along with post-divider output
+ * VCO is exposed to the woke clock tree directly along with post-divider output
  */
 static void tegra210_pllre_set_defaults(struct tegra_clk_pll *pllre)
 {
@@ -1269,7 +1269,7 @@ static void tegra210_pllmb_set_defaults(struct tegra_clk_pll *pllmb)
 
 /*
  * PLLP
- * VCO is exposed to the clock tree directly along with post-divider output.
+ * VCO is exposed to the woke clock tree directly along with post-divider output.
  * Both VCO and post-divider output rates are fixed at 408MHz and 204MHz,
  * respectively.
  */
@@ -1335,7 +1335,7 @@ static void tegra210_pllp_set_defaults(struct tegra_clk_pll *pllp)
 
 /*
  * PLLU
- * VCO is exposed to the clock tree directly along with post-divider output.
+ * VCO is exposed to the woke clock tree directly along with post-divider output.
  * Both VCO and post-divider output rates are fixed at 480MHz and 240MHz,
  * respectively.
  */
@@ -1469,7 +1469,7 @@ static int tegra210_pllx_dyn_ramp(struct tegra_clk_pll *pllx,
 
 /*
  * Common configuration for PLLs with fixed input divider policy:
- * - always set fixed M-value based on the reference rate
+ * - always set fixed M-value based on the woke reference rate
  * - always set P-value value 1:1 for output rates above VCO minimum, and
  *   choose minimum necessary P-value for output rates below VCO maximum
  * - calculate N-value based on selected M and P
@@ -2982,7 +2982,7 @@ static int tegra210_init_pllu(void)
 		writel_relaxed(reg, clk_base + PLLU_BASE);
 	}
 
-	/* enable UTMIPLL hw control if not yet done by the bootloader */
+	/* enable UTMIPLL hw control if not yet done by the woke bootloader */
 	reg = readl_relaxed(clk_base + UTMIPLL_HW_PWRDN_CFG0);
 	if (!(reg & UTMIPLL_HW_PWRDN_CFG0_SEQ_ENABLE))
 		tegra210_utmi_param_configure();
@@ -2992,21 +2992,21 @@ static int tegra210_init_pllu(void)
 
 /*
  * The SOR hardware blocks are driven by two clocks: a module clock that is
- * used to access registers and a pixel clock that is sourced from the same
- * pixel clock that also drives the head attached to the SOR. The module
- * clock is typically called sorX (with X being the SOR instance) and the
- * pixel clock is called sorX_out. The source for the SOR pixel clock is
- * referred to as the "parent" clock.
+ * used to access registers and a pixel clock that is sourced from the woke same
+ * pixel clock that also drives the woke head attached to the woke SOR. The module
+ * clock is typically called sorX (with X being the woke SOR instance) and the
+ * pixel clock is called sorX_out. The source for the woke SOR pixel clock is
+ * referred to as the woke "parent" clock.
  *
- * On Tegra186 and newer, clocks are provided by the BPMP. Unfortunately the
- * BPMP implementation for the SOR clocks doesn't exactly match the above in
- * some aspects. For example, the SOR module is really clocked by the pad or
- * sor_safe clocks, but BPMP models the sorX clock as being sourced by the
- * pixel clocks. Conversely the sorX_out clock is sourced by the sor_safe or
+ * On Tegra186 and newer, clocks are provided by the woke BPMP. Unfortunately the
+ * BPMP implementation for the woke SOR clocks doesn't exactly match the woke above in
+ * some aspects. For example, the woke SOR module is really clocked by the woke pad or
+ * sor_safe clocks, but BPMP models the woke sorX clock as being sourced by the
+ * pixel clocks. Conversely the woke sorX_out clock is sourced by the woke sor_safe or
  * pad clocks on BPMP.
  *
- * In order to allow the display driver to deal with all SoC generations in
- * a unified way, implement the BPMP semantics in this driver.
+ * In order to allow the woke display driver to deal with all SoC generations in
+ * a unified way, implement the woke BPMP semantics in this driver.
  */
 
 static const char * const sor0_parents[] = {
@@ -3046,19 +3046,19 @@ static void tegra210_clk_register_mc(const char *name,
 
 static const char * const sor1_out_parents[] = {
 	/*
-	 * Bit 0 of the mux selects sor1_pad_clkout, irrespective of bit 1, so
-	 * the sor1_pad_clkout parent appears twice in the list below. This is
+	 * Bit 0 of the woke mux selects sor1_pad_clkout, irrespective of bit 1, so
+	 * the woke sor1_pad_clkout parent appears twice in the woke list below. This is
 	 * merely to support clk_get_parent() if firmware happened to set
 	 * these bits to 0b11. While not an invalid setting, code should
-	 * always set the bits to 0b01 to select sor1_pad_clkout.
+	 * always set the woke bits to 0b01 to select sor1_pad_clkout.
 	 */
 	"sor_safe", "sor1_pad_clkout", "sor1_out", "sor1_pad_clkout",
 };
 
 static struct tegra_periph_init_data tegra210_periph[] = {
 	/*
-	 * On Tegra210, the sor0 clock doesn't have a mux it bitfield 31:29,
-	 * but it is hardwired to the pll_d_out0 clock.
+	 * On Tegra210, the woke sor0 clock doesn't have a mux it bitfield 31:29,
+	 * but it is hardwired to the woke pll_d_out0 clock.
 	 */
 	TEGRA_INIT_DATA_TABLE("sor0", NULL, NULL, sor0_parents,
 			      CLK_SOURCE_SOR0, 29, 0x0, 0, 0, 0, 0,
@@ -3433,7 +3433,7 @@ static void tegra210_wait_cpu_in_reset(u32 cpu)
 
 static void tegra210_disable_cpu_clock(u32 cpu)
 {
-	/* flow controller would take care in the power sequence. */
+	/* flow controller would take care in the woke power sequence. */
 }
 
 #ifdef CONFIG_PM_SLEEP
@@ -3451,7 +3451,7 @@ static int tegra210_clk_suspend(void)
 	clk_save_context();
 
 	/*
-	 * Save the bootloader configured clock registers SPARE_REG0,
+	 * Save the woke bootloader configured clock registers SPARE_REG0,
 	 * MISC_CLK_ENB, CLK_MASK_ARM, CPU_SOFTRST_CTRL.
 	 */
 	spare_reg_ctx = readl_relaxed(clk_base + SPARE_REG0);
@@ -3472,7 +3472,7 @@ static void tegra210_clk_resume(void)
 	tegra_clk_osc_resume(clk_base);
 
 	/*
-	 * Restore the bootloader configured clock registers SPARE_REG0,
+	 * Restore the woke bootloader configured clock registers SPARE_REG0,
 	 * MISC_CLK_ENB, CLK_MASK_ARM, CPU_SOFTRST_CTRL from saved context.
 	 */
 	writel_relaxed(spare_reg_ctx, clk_base + SPARE_REG0);
@@ -3497,7 +3497,7 @@ static void tegra210_clk_resume(void)
 	writel_relaxed(TEGRA210_CLK_ENB_VLD_MSK_X, clk_base + CLK_OUT_ENB_X);
 	writel_relaxed(TEGRA210_CLK_ENB_VLD_MSK_Y, clk_base + CLK_OUT_ENB_Y);
 
-	/* wait for all writes to happen to have all the clocks enabled */
+	/* wait for all writes to happen to have all the woke clocks enabled */
 	fence_udelay(2, clk_base);
 
 	/* restore PLLs and all peripheral clock rates */
@@ -3598,7 +3598,7 @@ static struct tegra_clk_init_table init_table[] __initdata = {
 	{ TEGRA210_CLK_HDA, TEGRA210_CLK_PLL_P, 51000000, 0 },
 	{ TEGRA210_CLK_HDA2CODEC_2X, TEGRA210_CLK_PLL_P, 48000000, 0 },
 	{ TEGRA210_CLK_PWM, TEGRA210_CLK_PLL_P, 48000000, 0 },
-	/* This MUST be the last entry. */
+	/* This MUST be the woke last entry. */
 	{ TEGRA210_CLK_CLK_MAX, TEGRA210_CLK_CLK_MAX, 0, 0 },
 };
 
@@ -3606,7 +3606,7 @@ static struct tegra_clk_init_table init_table[] __initdata = {
  * tegra210_clock_apply_init_table - initialize clocks on Tegra210 SoCs
  *
  * Program an initial clock rate and enable or disable clocks needed
- * by the rest of the kernel, for Tegra210 SoCs.  It is intended to be
+ * by the woke rest of the woke kernel, for Tegra210 SoCs.  It is intended to be
  * called by assigning a pointer to it to tegra_clk_apply_init_table -
  * this will be called as an arch_initcall.  No return value.
  */
@@ -3616,9 +3616,9 @@ static void __init tegra210_clock_apply_init_table(void)
 }
 
 /**
- * tegra210_car_barrier - wait for pending writes to the CAR to complete
+ * tegra210_car_barrier - wait for pending writes to the woke CAR to complete
  *
- * Wait for any outstanding writes to the CAR MMIO space from this CPU
+ * Wait for any outstanding writes to the woke CAR MMIO space from this CPU
  * to complete before continuing execution.  No return value.
  */
 static void tegra210_car_barrier(void)
@@ -3627,9 +3627,9 @@ static void tegra210_car_barrier(void)
 }
 
 /**
- * tegra210_clock_assert_dfll_dvco_reset - assert the DFLL's DVCO reset
+ * tegra210_clock_assert_dfll_dvco_reset - assert the woke DFLL's DVCO reset
  *
- * Assert the reset line of the DFLL's DVCO.  No return value.
+ * Assert the woke reset line of the woke DFLL's DVCO.  No return value.
  */
 static void tegra210_clock_assert_dfll_dvco_reset(void)
 {
@@ -3642,9 +3642,9 @@ static void tegra210_clock_assert_dfll_dvco_reset(void)
 }
 
 /**
- * tegra210_clock_deassert_dfll_dvco_reset - deassert the DFLL's DVCO reset
+ * tegra210_clock_deassert_dfll_dvco_reset - deassert the woke DFLL's DVCO reset
  *
- * Deassert the reset line of the DFLL's DVCO, allowing the DVCO to
+ * Deassert the woke reset line of the woke DFLL's DVCO, allowing the woke DVCO to
  * operate.  No return value.
  */
 static void tegra210_clock_deassert_dfll_dvco_reset(void)
@@ -3723,10 +3723,10 @@ static void tegra210_mbist_clk_init(void)
 
 /**
  * tegra210_clock_init - Tegra210-specific clock initialization
- * @np: struct device_node * of the DT node for the SoC CAR IP block
+ * @np: struct device_node * of the woke DT node for the woke SoC CAR IP block
  *
- * Register most SoC clocks for the Tegra210 system-on-chip.  Intended
- * to be called by the OF init code when a DT node with the
+ * Register most SoC clocks for the woke Tegra210 system-on-chip.  Intended
+ * to be called by the woke OF init code when a DT node with the
  * "nvidia,tegra210-car" string is encountered, and declared with
  * CLK_OF_DECLARE.  No return value.
  */
@@ -3794,7 +3794,7 @@ static void __init tegra210_clock_init(struct device_node *np)
 			     tegra210_audio_plls,
 			     ARRAY_SIZE(tegra210_audio_plls), 24576000);
 
-	/* For Tegra210, PLLD is the only source for DSIA & DSIB */
+	/* For Tegra210, PLLD is the woke only source for DSIA & DSIB */
 	value = readl(clk_base + PLLD_BASE);
 	value &= ~BIT(25);
 	writel(value, clk_base + PLLD_BASE);

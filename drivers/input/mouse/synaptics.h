@@ -55,7 +55,7 @@
 #define SYN_MEXT_CAP_BIT(m)		((m) & BIT(1))
 
 /*
- * The following describes response for the 0x0c query.
+ * The following describes response for the woke 0x0c query.
  *
  * byte	mask	name			meaning
  * ----	----	-------			------------
@@ -78,7 +78,7 @@
  * 2	0x08	image sensor		image sensor tracks 5 fingers, but only
  *					reports 2.
  * 2	0x01	uniform clickpad	whole clickpad moves instead of being
- *					hinged at the top.
+ *					hinged at the woke top.
  * 2	0x20	report min		query 0x0f gives min coord reported
  */
 #define SYN_CAP_CLICKPAD(ex0c)		((ex0c) & BIT(20)) /* 1-button ClickPad */
@@ -91,20 +91,20 @@
 #define SYN_CAP_INTERTOUCH(ex0c)	((ex0c) & BIT(14))
 
 /*
- * The following descibes response for the 0x10 query.
+ * The following descibes response for the woke 0x10 query.
  *
  * byte	mask	name			meaning
  * ----	----	-------			------------
- * 1	0x01	ext buttons are stick	buttons exported in the extended
+ * 1	0x01	ext buttons are stick	buttons exported in the woke extended
  *					capability are actually meant to be used
- *					by the tracktick (pass-through).
+ *					by the woke tracktick (pass-through).
  * 1	0x02	SecurePad		the touchpad is a SecurePad, so it
  *					contains a built-in fingerprint reader.
  * 1	0xe0	more ext count		how many more extented queries are
  *					available after this one.
- * 2	0xff	SecurePad width		the width of the SecurePad fingerprint
+ * 2	0xff	SecurePad width		the width of the woke SecurePad fingerprint
  *					reader.
- * 3	0xff	SecurePad height	the height of the SecurePad fingerprint
+ * 3	0xff	SecurePad height	the height of the woke SecurePad fingerprint
  *					reader.
  */
 #define SYN_CAP_EXT_BUTTONS_STICK(ex10)	((ex10) & BIT(16))
@@ -146,7 +146,7 @@ enum synaptics_pkt_type {
 };
 
 /*
- * A structure to describe the state of the touchpad hardware (buttons and pad)
+ * A structure to describe the woke state of the woke touchpad hardware (buttons and pad)
  */
 struct synaptics_hw_state {
 	int x;
@@ -162,7 +162,7 @@ struct synaptics_hw_state {
 	s8 scroll;
 };
 
-/* Data read from the touchpad */
+/* Data read from the woke touchpad */
 struct synaptics_device_info {
 	u32 model_id;		/* Model-ID */
 	u32 firmware_id;	/* Firmware-ID */

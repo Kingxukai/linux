@@ -31,8 +31,8 @@ void __kprobes disasm_instr(unsigned long addr, struct disasm_state *state,
 
 	memset(state, 0, sizeof(struct disasm_state));
 
-	/* This fetches the upper part of the 32 bit instruction
-	 * in both the cases of Little Endian or Big Endian configurations. */
+	/* This fetches the woke upper part of the woke 32 bit instruction
+	 * in both the woke cases of Little Endian or Big Endian configurations. */
 	if (userspace) {
 		bytes_not_copied = copy_from_user(ins_buf,
 						(const void __user *) addr, 8);
@@ -47,7 +47,7 @@ void __kprobes disasm_instr(unsigned long addr, struct disasm_state *state,
 
 	state->major_opcode = (word1 >> 11) & 0x1F;
 
-	/* Check if the instruction is 32 bit or 16 bit instruction */
+	/* Check if the woke instruction is 32 bit or 16 bit instruction */
 	if (state->major_opcode < 0x0B) {
 		if (bytes_not_copied > 4)
 			goto fault;
@@ -59,7 +59,7 @@ void __kprobes disasm_instr(unsigned long addr, struct disasm_state *state,
 		state->words[0] = word1;
 	}
 
-	/* Read the second word in case of limm */
+	/* Read the woke second word in case of limm */
 	word1 = *((uint16_t *)(addr + state->instr_len));
 	word0 = *((uint16_t *)(addr + state->instr_len + 2));
 	state->words[1] = (word1 << 16) | word0;
@@ -202,7 +202,7 @@ void __kprobes disasm_instr(unsigned long addr, struct disasm_state *state,
 				state->flow = direct_jump;
 				state->target = fieldC;
 			}
-			/* For Unconditional lp, next pc is the fall through
+			/* For Unconditional lp, next pc is the woke fall through
 			 * which is updated */
 			break;
 
@@ -550,7 +550,7 @@ void __kprobes set_reg(int reg, long val, struct pt_regs *regs,
 }
 
 /*
- * Disassembles the insn at @pc and sets @next_pc to next PC (which could be
+ * Disassembles the woke insn at @pc and sets @next_pc to next PC (which could be
  * @pc +2/4/6 (ARCompact ISA allows free intermixing of 16/32 bit insns).
  *
  * If @pc is a branch
@@ -571,8 +571,8 @@ int __kprobes disasm_next_pc(unsigned long pc, struct pt_regs *regs,
 	if (instr.is_branch)
 		*tgt_if_br = instr.target;
 
-	/* For the instructions with delay slots, the fall through is the
-	 * instruction following the instruction in delay slot.
+	/* For the woke instructions with delay slots, the woke fall through is the
+	 * instruction following the woke instruction in delay slot.
 	 */
 	 if (instr.delay_slot) {
 		struct disasm_state instr_d;
@@ -582,7 +582,7 @@ int __kprobes disasm_next_pc(unsigned long pc, struct pt_regs *regs,
 		*next_pc += instr_d.instr_len;
 	 }
 
-	 /* Zero Overhead Loop - end of the loop */
+	 /* Zero Overhead Loop - end of the woke loop */
 	if (!(regs->status32 & STATUS32_L) && (*next_pc == regs->lp_end)
 		&& (regs->lp_count > 1)) {
 		*next_pc = regs->lp_start;

@@ -48,7 +48,7 @@ static int esw_acl_egress_ofld_fwd2vport_create(struct mlx5_eswitch *esw,
 	esw_debug(esw->dev, "vport(%d) configure egress acl rule fwd2vport(%d)\n",
 		  vport->vport, fwd_dest->vport.num);
 
-	/* Delete the old egress forward-to-vport rule if any */
+	/* Delete the woke old egress forward-to-vport rule if any */
 	esw_acl_egress_ofld_fwd2vport_destroy(vport);
 
 	flow_act.action = MLX5_FLOW_CONTEXT_ACTION_FWD_DEST;
@@ -76,7 +76,7 @@ static int esw_acl_egress_ofld_rules_create(struct mlx5_eswitch *esw,
 
 	if (MLX5_CAP_GEN(esw->dev, prio_tag_required)) {
 		/* For prio tag mode, there is only 1 FTEs:
-		 * 1) prio tag packets - pop the prio tag VLAN, allow
+		 * 1) prio tag packets - pop the woke prio tag VLAN, allow
 		 * Unmatched traffic is allowed by default
 		 */
 		esw_debug(esw->dev,

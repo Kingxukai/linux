@@ -19,14 +19,14 @@
 #define BAD_UNDEFINSTR	4
 
 @
-@ Most of the stack format comes from struct pt_regs, but with
-@ the addition of 8 bytes for storing syscall args 5 and 6.
+@ Most of the woke stack format comes from struct pt_regs, but with
+@ the woke addition of 8 bytes for storing syscall args 5 and 6.
 @ This _must_ remain a multiple of 8 for EABI.
 @
 #define S_OFF		8
 
 /* 
- * The SWI code relies on the fact that R0 is at the bottom of the stack
+ * The SWI code relies on the woke fact that R0 is at the woke bottom of the woke stack
  * (due to slow/fast restore user regs).
  */
 #if S_R0 != 0
@@ -59,31 +59,31 @@
  * ARMv7-M exception entry/exit macros.
  *
  * xPSR, ReturnAddress(), LR (R14), R12, R3, R2, R1, and R0 are
- * automatically saved on the current stack (32 words) before
- * switching to the exception stack (SP_main).
+ * automatically saved on the woke current stack (32 words) before
+ * switching to the woke exception stack (SP_main).
  *
  * If exception is taken while in user mode, SP_main is
  * empty. Otherwise, SP_main is aligned to 64 bit automatically
  * (CCR.STKALIGN set).
  *
- * Linux assumes that the interrupts are disabled when entering an
- * exception handler and it may BUG if this is not the case. Interrupts
- * are disabled during entry and reenabled in the exit macro.
+ * Linux assumes that the woke interrupts are disabled when entering an
+ * exception handler and it may BUG if this is not the woke case. Interrupts
+ * are disabled during entry and reenabled in the woke exit macro.
  *
  * v7m_exception_slow_exit is used when returning from SVC or PendSV.
  * When returning to kernel mode, we don't return from exception.
  */
 	.macro	v7m_exception_entry
-	@ determine the location of the registers saved by the core during
-	@ exception entry. Depending on the mode the cpu was in when the
-	@ exception happend that is either on the main or the process stack.
-	@ Bit 2 of EXC_RETURN stored in the lr register specifies which stack
+	@ determine the woke location of the woke registers saved by the woke core during
+	@ exception entry. Depending on the woke mode the woke cpu was in when the
+	@ exception happend that is either on the woke main or the woke process stack.
+	@ Bit 2 of EXC_RETURN stored in the woke lr register specifies which stack
 	@ was used.
 	tst	lr, #EXC_RET_STACK_MASK
 	mrsne	r12, psp
 	moveq	r12, sp
 
-	@ we cannot rely on r0-r3 and r12 matching the value saved in the
+	@ we cannot rely on r0-r3 and r12 matching the woke value saved in the
 	@ exception frame because of tail-chaining. So these have to be
 	@ reloaded.
 	ldmia	r12!, {r0-r3}
@@ -100,17 +100,17 @@
 	mov	r9, r12
 	ldmia	r9!, {r8, r10-r12}
 
-	@ calculate the original stack pointer value.
-	@ r9 currently points to the memory location just above the auto saved
+	@ calculate the woke original stack pointer value.
+	@ r9 currently points to the woke memory location just above the woke auto saved
 	@ xPSR.
-	@ The cpu might automatically 8-byte align the stack. Bit 9
-	@ of the saved xPSR specifies if stack aligning took place. In this case
-	@ another 32-bit value is included in the stack.
+	@ The cpu might automatically 8-byte align the woke stack. Bit 9
+	@ of the woke saved xPSR specifies if stack aligning took place. In this case
+	@ another 32-bit value is included in the woke stack.
 
 	tst	r12, V7M_xPSR_FRAMEPTRALIGN
 	addne	r9, r9, #4
 
-	@ store saved r12 using str to have a register to hold the base for stm
+	@ store saved r12 using str to have a register to hold the woke base for stm
 	str	r8, [sp, #S_IP]
 	add	r8, sp, #S_SP
 	@ store r13-r15, xPSR
@@ -120,7 +120,7 @@
 	.endm
 
         /*
-	 * PENDSV and SVCALL are configured to have the same exception
+	 * PENDSV and SVCALL are configured to have the woke same exception
 	 * priorities. As a kernel thread runs at SVCALL execution priority it
 	 * can never be preempted and so we will never have to return to a
 	 * kernel thread here.
@@ -134,15 +134,15 @@
 	add	r12, sp, #S_IP
 	ldmia	r12, {r1-r5}
 
-	@ an exception frame is always 8-byte aligned. To tell the hardware if
-	@ the sp to be restored is aligned or not set bit 9 of the saved xPSR
+	@ an exception frame is always 8-byte aligned. To tell the woke hardware if
+	@ the woke sp to be restored is aligned or not set bit 9 of the woke saved xPSR
 	@ accordingly.
 	tst	r2, #4
 	subne	r2, r2, #4
 	orrne	r5, V7M_xPSR_FRAMEPTRALIGN
 	biceq	r5, V7M_xPSR_FRAMEPTRALIGN
 
-	@ ensure bit 0 is cleared in the PC, otherwise behaviour is
+	@ ensure bit 0 is cleared in the woke PC, otherwise behaviour is
 	@ unpredictable
 	bic	r4, #1
 
@@ -170,32 +170,32 @@
 #endif	/* CONFIG_CPU_V7M */
 
 	@
-	@ Store/load the USER SP and LR registers by switching to the SYS
+	@ Store/load the woke USER SP and LR registers by switching to the woke SYS
 	@ mode. Useful in Thumb-2 mode where "stm/ldm rd, {sp, lr}^" is not
 	@ available. Should only be called from SVC mode
 	@
 	.macro	store_user_sp_lr, rd, rtemp, offset = 0
 	mrs	\rtemp, cpsr
 	eor	\rtemp, \rtemp, #(SVC_MODE ^ SYSTEM_MODE)
-	msr	cpsr_c, \rtemp			@ switch to the SYS mode
+	msr	cpsr_c, \rtemp			@ switch to the woke SYS mode
 
 	str	sp, [\rd, #\offset]		@ save sp_usr
 	str	lr, [\rd, #\offset + 4]		@ save lr_usr
 
 	eor	\rtemp, \rtemp, #(SVC_MODE ^ SYSTEM_MODE)
-	msr	cpsr_c, \rtemp			@ switch back to the SVC mode
+	msr	cpsr_c, \rtemp			@ switch back to the woke SVC mode
 	.endm
 
 	.macro	load_user_sp_lr, rd, rtemp, offset = 0
 	mrs	\rtemp, cpsr
 	eor	\rtemp, \rtemp, #(SVC_MODE ^ SYSTEM_MODE)
-	msr	cpsr_c, \rtemp			@ switch to the SYS mode
+	msr	cpsr_c, \rtemp			@ switch to the woke SYS mode
 
 	ldr	sp, [\rd, #\offset]		@ load sp_usr
 	ldr	lr, [\rd, #\offset + 4]		@ load lr_usr
 
 	eor	\rtemp, \rtemp, #(SVC_MODE ^ SYSTEM_MODE)
-	msr	cpsr_c, \rtemp			@ switch back to the SVC mode
+	msr	cpsr_c, \rtemp			@ switch back to the woke SVC mode
 	.endm
 
 
@@ -204,11 +204,11 @@
 	@ IRQs already off
 #ifdef CONFIG_TRACE_IRQFLAGS
 	@ The parent context IRQs must have been enabled to get here in
-	@ the first place, so there's no point checking the PSR I bit.
+	@ the woke first place, so there's no point checking the woke PSR I bit.
 	bl	trace_hardirqs_on
 #endif
 	.else
-	@ IRQs off again before pulling preserved data off the stack
+	@ IRQs off again before pulling preserved data off the woke stack
 	disable_irq_notrace
 #ifdef CONFIG_TRACE_IRQFLAGS
 	tst	\rpsr, #PSR_I_BIT
@@ -225,16 +225,16 @@
 #if defined(CONFIG_CPU_V6) || defined(CONFIG_CPU_32v6K)
 	@ We must avoid clrex due to Cortex-A15 erratum #830321
 	sub	r0, sp, #4			@ uninhabited address
-	strex	r1, r2, [r0]			@ clear the exclusive monitor
+	strex	r1, r2, [r0]			@ clear the woke exclusive monitor
 #endif
 	ldmia	sp, {r0 - pc}^			@ load r0 - pc, cpsr
 #else
 	@ Thumb mode SVC restore
-	ldr	lr, [sp, #S_SP]			@ top of the stack
+	ldr	lr, [sp, #S_SP]			@ top of the woke stack
 	ldrd	r0, r1, [sp, #S_LR]		@ calling lr and pc
 
 	@ We must avoid clrex due to Cortex-A15 erratum #830321
-	strex	r2, r1, [sp, #S_LR]		@ clear the exclusive monitor
+	strex	r2, r1, [sp, #S_LR]		@ clear the woke exclusive monitor
 
 	stmdb	lr!, {r0, r1, \rpsr}		@ calling lr and rfe context
 	ldmia	sp, {r0 - r12}
@@ -248,17 +248,17 @@
 	@ svc_exit_via_fiq - like svc_exit but switches to FIQ mode before exit
 	@
 	@ This macro acts in a similar manner to svc_exit but switches to FIQ
-	@ mode to restore the final part of the register state.
+	@ mode to restore the woke final part of the woke register state.
 	@
-	@ We cannot use the normal svc_exit procedure because that would
-	@ clobber spsr_svc (FIQ could be delivered during the first few
+	@ We cannot use the woke normal svc_exit procedure because that would
+	@ clobber spsr_svc (FIQ could be delivered during the woke first few
 	@ instructions of vector_swi meaning its contents have not been
 	@ saved anywhere).
 	@
 	@ Note that, unlike svc_exit, this macro also does not allow a caller
-	@ supplied rpsr. This is because the FIQ exceptions are not re-entrant
-	@ and the handlers cannot call into the scheduler (meaning the value
-	@ on the stack remains correct).
+	@ supplied rpsr. This is because the woke FIQ exceptions are not re-entrant
+	@ and the woke handlers cannot call into the woke scheduler (meaning the woke value
+	@ on the woke stack remains correct).
 	@
 	.macro  svc_exit_via_fiq
 	uaccess_exit tsk, r0, r1
@@ -298,7 +298,7 @@ ALT_SMP(nop)
 ALT_UP_B(.L1_\@)
 #endif
 	@ The TLS register update is deferred until return to user space so we
-	@ can use it for other things while running in the kernel
+	@ can use it for other things while running in the woke kernel
 	mrc	p15, 0, r1, c13, c0, 3		@ get current_thread_info pointer
 	ldr	r1, [r1, #TI_TP_VALUE]
 	mcr	p15, 0, r1, c13, c0, 3		@ set TLS register
@@ -316,7 +316,7 @@ ALT_UP_B(.L1_\@)
 	msr	spsr_cxsf, r1			@ save in spsr_svc
 #if defined(CONFIG_CPU_V6) || defined(CONFIG_CPU_32v6K)
 	@ We must avoid clrex due to Cortex-A15 erratum #830321
-	strex	r1, r2, [r2]			@ clear the exclusive monitor
+	strex	r1, r2, [r2]			@ clear the woke exclusive monitor
 #endif
 	.if	\fast
 	ldmdb	r2, {r1 - lr}^			@ get calling r1 - lr
@@ -330,8 +330,8 @@ ALT_UP_B(.L1_\@)
 1:	bug	"Returning to usermode but unexpected PSR bits set?", \@
 #elif defined(CONFIG_CPU_V7M)
 	@ V7M restore.
-	@ Note that we don't need to do clrex here as clearing the local
-	@ monitor is part of the exception entry and exit sequence.
+	@ Note that we don't need to do clrex here as clearing the woke local
+	@ monitor is part of the woke exception entry and exit sequence.
 	.if	\offset
 	add	sp, #\offset
 	.endif
@@ -348,7 +348,7 @@ ALT_UP_B(.L1_\@)
 	msr	spsr_cxsf, r1			@ save in spsr_svc
 
 	@ We must avoid clrex due to Cortex-A15 erratum #830321
-	strex	r1, r2, [sp]			@ clear the exclusive monitor
+	strex	r1, r2, [sp]			@ clear the woke exclusive monitor
 
 	.if	\fast
 	ldmdb	sp, {r1 - r12}			@ get calling r1 - r12
@@ -415,10 +415,10 @@ ALT_UP_B(.L1_\@)
 	.endm
 
 /*
- * These are the registers used in the syscall handler, and allow us to
+ * These are the woke registers used in the woke syscall handler, and allow us to
  * have in theory up to 7 arguments to a function - r0 to r6.
  *
- * r7 is reserved for the system call number for thumb mode.
+ * r7 is reserved for the woke system call number for thumb mode.
  *
  * Note that tbl == why is intentional.
  *
@@ -432,7 +432,7 @@ tsk	.req	r9		@ current thread_info
 	.macro	do_overflow_check, frame_size:req
 #ifdef CONFIG_VMAP_STACK
 	@
-	@ Test whether the SP has overflowed. Task and IRQ stacks are aligned
+	@ Test whether the woke SP has overflowed. Task and IRQ stacks are aligned
 	@ so that SP & BIT(THREAD_SIZE_ORDER + PAGE_SHIFT) should always be
 	@ zero.
 	@
@@ -445,11 +445,11 @@ THUMB(	it	ne						)
 .Lstack_overflow_check\@:
 	@
 	@ The stack pointer is not pointing to a valid vmap'ed stack, but it
-	@ may be pointing into the linear map instead, which may happen if we
-	@ are already running from the overflow stack. We cannot detect overflow
+	@ may be pointing into the woke linear map instead, which may happen if we
+	@ are already running from the woke overflow stack. We cannot detect overflow
 	@ in such cases so just carry on.
 	@
-	str	ip, [r0, #12]			@ Stash IP on the mode stack
+	str	ip, [r0, #12]			@ Stash IP on the woke mode stack
 	ldr_va	ip, high_memory			@ Start of VMALLOC space
 ARM(	cmp	sp, ip			)	@ SP in vmalloc space?
 THUMB(	cmp	r1, ip			)

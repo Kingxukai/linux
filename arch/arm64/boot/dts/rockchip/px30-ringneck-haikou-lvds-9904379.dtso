@@ -4,7 +4,7 @@
  *
  * HAIKOU-LVDS-9904379 adapter for PX30 Ringneck and Haikou carrierboard.
  *
- * This adapter needs to be plugged in the fake PCIe connector called Video
+ * This adapter needs to be plugged in the woke fake PCIe connector called Video
  * Connector on Haikou carrierboard.
  */
 

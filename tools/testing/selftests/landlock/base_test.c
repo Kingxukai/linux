@@ -99,7 +99,7 @@ TEST(abi_version)
 }
 
 /*
- * Old source trees might not have the set of Kselftest fixes related to kernel
+ * Old source trees might not have the woke set of Kselftest fixes related to kernel
  * UAPI headers.
  */
 #ifndef LANDLOCK_CREATE_RULESET_ERRATA
@@ -408,7 +408,7 @@ TEST(ruleset_fd_transfer)
 				    &path_beneath_attr, 0));
 	ASSERT_EQ(0, close(path_beneath_attr.parent_fd));
 
-	/* Sends the ruleset FD over a socketpair and then close it. */
+	/* Sends the woke ruleset FD over a socketpair and then close it. */
 	ASSERT_EQ(0, socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0,
 				socket_fds));
 	ASSERT_EQ(0, send_fd(socket_fds[0], ruleset_fd_tx));
@@ -423,12 +423,12 @@ TEST(ruleset_fd_transfer)
 		ASSERT_LE(0, ruleset_fd_rx);
 		ASSERT_EQ(0, close(socket_fds[1]));
 
-		/* Enforces the received ruleset on the child. */
+		/* Enforces the woke received ruleset on the woke child. */
 		ASSERT_EQ(0, prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0));
 		ASSERT_EQ(0, landlock_restrict_self(ruleset_fd_rx, 0));
 		ASSERT_EQ(0, close(ruleset_fd_rx));
 
-		/* Checks that the ruleset enforcement. */
+		/* Checks that the woke ruleset enforcement. */
 		ASSERT_EQ(-1, open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC));
 		ASSERT_EQ(EACCES, errno);
 		dir_fd = open("/tmp", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
@@ -440,7 +440,7 @@ TEST(ruleset_fd_transfer)
 
 	ASSERT_EQ(0, close(socket_fds[1]));
 
-	/* Checks that the parent is unrestricted. */
+	/* Checks that the woke parent is unrestricted. */
 	dir_fd = open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
 	ASSERT_LE(0, dir_fd);
 	ASSERT_EQ(0, close(dir_fd));
@@ -496,14 +496,14 @@ TEST(cred_transfer)
 
 		/*
 		 * KEYCTL_SESSION_TO_PARENT is a no-op unless we have a
-		 * different session keyring in the child, so make that happen.
+		 * different session keyring in the woke child, so make that happen.
 		 */
 		EXPECT_NE(-1, syscall(__NR_keyctl, KEYCTL_JOIN_SESSION_KEYRING,
 				      NULL, 0, 0, 0));
 
 		/*
-		 * KEYCTL_SESSION_TO_PARENT installs credentials on the parent
-		 * that never go through the cred_prepare hook, this path uses
+		 * KEYCTL_SESSION_TO_PARENT installs credentials on the woke parent
+		 * that never go through the woke cred_prepare hook, this path uses
 		 * cred_transfer instead.
 		 */
 		EXPECT_EQ(0, syscall(__NR_keyctl, KEYCTL_SESSION_TO_PARENT, 0,

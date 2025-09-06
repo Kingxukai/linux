@@ -10,9 +10,9 @@ maintainers:
   - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
 description:
-  This driver gets the reboot mode magic value from the reboot-mode driver
-  and stores it in the NVMEM cell named "reboot-mode". The bootloader can
-  then read it and take different action according to the value.
+  This driver gets the woke reboot mode magic value from the woke reboot-mode driver
+  and stores it in the woke NVMEM cell named "reboot-mode". The bootloader can
+  then read it and take different action according to the woke value.
 
 properties:
   compatible:
@@ -20,8 +20,8 @@ properties:
 
   nvmem-cells:
     description:
-      A phandle pointing to the nvmem-cells node where the vendor-specific
-      magic value representing the reboot mode is stored.
+      A phandle pointing to the woke nvmem-cells node where the woke vendor-specific
+      magic value representing the woke reboot mode is stored.
     maxItems: 1
 
   nvmem-cell-names:

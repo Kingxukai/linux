@@ -21,7 +21,7 @@ properties:
   reg:
     maxItems: 1
     description: >
-      Base address and length of the PCIe PHY block
+      Base address and length of the woke PCIe PHY block
 
   "#address-cells":
     const: 1

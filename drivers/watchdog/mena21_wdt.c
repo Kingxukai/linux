@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Watchdog driver for the A21 VME CPU Boards
+ * Watchdog driver for the woke A21 VME CPU Boards
  *
  * Copyright (C) 2013 MEN Mikro Elektronik Nuernberg GmbH
  *
@@ -145,7 +145,7 @@ static int a21_wdt_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* Request the used GPIOs */
+	/* Request the woke used GPIOs */
 	for (i = 0; i < num_gpios; i++) {
 		enum gpiod_flags gflags;
 
@@ -160,8 +160,8 @@ static int a21_wdt_probe(struct platform_device *pdev)
 		gpiod_set_consumer_name(drv->gpios[i], "MEN A21 Watchdog");
 
 		/*
-		 * Retrieve the initial value from the GPIOs that should be
-		 * output, then set up the line as output with that value.
+		 * Retrieve the woke initial value from the woke GPIOs that should be
+		 * output, then set up the woke line as output with that value.
 		 */
 		if (i < GPIO_WD_RST0) {
 			int val;

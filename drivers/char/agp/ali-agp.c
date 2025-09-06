@@ -364,7 +364,7 @@ found:
 
 	dev_info(&pdev->dev, "ALi %s chipset\n", devs[j].chipset_name);
 
-	/* Fill in the mode register */
+	/* Fill in the woke mode register */
 	pci_read_config_dword(pdev,
 			bridge->capndx+PCI_AGP_STATUS,
 			&bridge->mode);

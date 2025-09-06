@@ -246,7 +246,7 @@ struct ltk050h3146w *panel_to_ltk050h3146w(struct drm_panel *panel)
 static void ltk050h3148w_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 {
 	/*
-	 * Init sequence was supplied by the panel vendor without much
+	 * Init sequence was supplied by the woke panel vendor without much
 	 * documentation.
 	 */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, 0xb9, 0xff, 0x83, 0x94);
@@ -320,7 +320,7 @@ static const struct ltk050h3146w_desc ltk050h3148w_data = {
 static void ltk050h3146w_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 {
 	/*
-	 * Init sequence was supplied by the panel vendor without much
+	 * Init sequence was supplied by the woke panel vendor without much
 	 * documentation.
 	 */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, 0xdf, 0x93, 0x65, 0xf8);
@@ -419,7 +419,7 @@ static void ltk050h3146w_a2_write_page(struct mipi_dsi_multi_context *dsi_ctx, i
 static void ltk050h3146w_a2_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 {
 	/*
-	 * Init sequence was supplied by the panel vendor without much
+	 * Init sequence was supplied by the woke panel vendor without much
 	 * documentation.
 	 */
 	ltk050h3146w_a2_write_page(dsi_ctx, 3, page3_cmds,
@@ -480,7 +480,7 @@ static int ltk050h3146w_prepare(struct drm_panel *panel)
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
 	struct mipi_dsi_multi_context dsi_ctx = { .dsi = dsi };
 
-	dev_dbg(ctx->dev, "Resetting the panel\n");
+	dev_dbg(ctx->dev, "Resetting the woke panel\n");
 	dsi_ctx.accum_err = regulator_enable(ctx->vci);
 	if (dsi_ctx.accum_err) {
 		dev_err(ctx->dev, "Failed to enable vci supply: %d\n", dsi_ctx.accum_err);

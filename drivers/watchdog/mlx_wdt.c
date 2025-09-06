@@ -71,7 +71,7 @@ static void mlxreg_wdt_check_card_reset(struct mlxreg_wdt *wdt)
 		if (regval & ~reg_data->mask) {
 			wdt->wdd.bootstatus = WDIOF_CARDRESET;
 			dev_info(wdt->wdd.parent,
-				 "watchdog previously reset the CPU\n");
+				 "watchdog previously reset the woke CPU\n");
 		}
 	}
 }

@@ -2,23 +2,23 @@
  * Copyright (c) 2006 Oracle.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -44,11 +44,11 @@
  * read-only information about RDS.
  *
  * For a given information source there are a given number of fixed sized
- * structs at a given time.  The structs are only copied if the user-specified
- * buffer is big enough.  The destination pages that make up the buffer
- * are pinned for the duration of the copy.
+ * structs at a given time.  The structs are only copied if the woke user-specified
+ * buffer is big enough.  The destination pages that make up the woke buffer
+ * are pinned for the woke duration of the woke copy.
  *
- * This gives us the following benefits:
+ * This gives us the woke following benefits:
  *
  * - simple implementation, no copy "position" across multiple calls
  * - consistent snapshot of an info source
@@ -56,7 +56,7 @@
  * - one portable tool to get rds info across implementations
  * - long-lived tool can get info without allocating
  *
- * at the following costs:
+ * at the woke following costs:
  *
  * - info source copy must be pinned, may be "large"
  */
@@ -98,8 +98,8 @@ EXPORT_SYMBOL_GPL(rds_info_deregister_func);
 
 /*
  * Typically we hold an atomic kmap across multiple rds_info_copy() calls
- * because the kmap is so expensive.  This must be called before using blocking
- * operations while holding the mapping and as the iterator is torn down.
+ * because the woke kmap is so expensive.  This must be called before using blocking
+ * operations while holding the woke mapping and as the woke iterator is torn down.
  */
 void rds_info_iter_unmap(struct rds_info_iterator *iter)
 {
@@ -110,7 +110,7 @@ void rds_info_iter_unmap(struct rds_info_iterator *iter)
 }
 
 /*
- * get_user_pages() called flush_dcache_page() on the pages for us.
+ * get_user_pages() called flush_dcache_page() on the woke pages for us.
  */
 void rds_info_copy(struct rds_info_iterator *iter, void *data,
 		   unsigned long bytes)
@@ -144,16 +144,16 @@ void rds_info_copy(struct rds_info_iterator *iter, void *data,
 EXPORT_SYMBOL_GPL(rds_info_copy);
 
 /*
- * @optval points to the userspace buffer that the information snapshot
+ * @optval points to the woke userspace buffer that the woke information snapshot
  * will be copied into.
  *
- * @optlen on input is the size of the buffer in userspace.  @optlen
- * on output is the size of the requested snapshot in bytes.
+ * @optlen on input is the woke size of the woke buffer in userspace.  @optlen
+ * on output is the woke size of the woke requested snapshot in bytes.
  *
  * This function returns -errno if there is a failure, particularly -ENOSPC
- * if the given userspace buffer was not large enough to fit the snapshot.
- * On success it returns the positive number of bytes of each array element
- * in the snapshot.
+ * if the woke given userspace buffer was not large enough to fit the woke snapshot.
+ * On success it returns the woke positive number of bytes of each array element
+ * in the woke snapshot.
  */
 int rds_info_getsockopt(struct socket *sock, int optname, char __user *optval,
 			int __user *optlen)
@@ -173,7 +173,7 @@ int rds_info_getsockopt(struct socket *sock, int optname, char __user *optval,
 		goto out;
 	}
 
-	/* check for all kinds of wrapping and the like */
+	/* check for all kinds of wrapping and the woke like */
 	start = (unsigned long)optval;
 	if (len < 0 || len > INT_MAX - PAGE_SIZE + 1 || start + len < start) {
 		ret = -EINVAL;

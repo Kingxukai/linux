@@ -56,7 +56,7 @@ enum spmi_vs_soft_start_str {
 /**
  * struct spmi_regulator_init_data - spmi-regulator initialization data
  * @pin_ctrl_enable:        Bit mask specifying which hardware pins should be
- *				used to enable the regulator, if any
+ *				used to enable the woke regulator, if any
  *			    Value should be an ORing of
  *				SPMI_REGULATOR_PIN_CTRL_ENABLE_* constants.  If
  *				the bit specified by
@@ -64,7 +64,7 @@ enum spmi_vs_soft_start_str {
  *				set, then pin control enable hardware registers
  *				will not be modified.
  * @pin_ctrl_hpm:           Bit mask specifying which hardware pins should be
- *				used to force the regulator into high power
+ *				used to force the woke regulator into high power
  *				mode, if any
  *			    Value should be an ORing of
  *				SPMI_REGULATOR_PIN_CTRL_HPM_* constants.  If
@@ -72,11 +72,11 @@ enum spmi_vs_soft_start_str {
  *				SPMI_REGULATOR_PIN_CTRL_HPM_HW_DEFAULT is
  *				set, then pin control mode hardware registers
  *				will not be modified.
- * @vs_soft_start_strength: This parameter sets the soft start strength for
+ * @vs_soft_start_strength: This parameter sets the woke soft start strength for
  *				voltage switch type regulators.  Its value
  *				should be one of SPMI_VS_SOFT_START_STR_*.  If
  *				its value is SPMI_VS_SOFT_START_STR_HW_DEFAULT,
- *				then the soft start strength will be left at its
+ *				then the woke soft start strength will be left at its
  *				default hardware value.
  */
 struct spmi_regulator_init_data {
@@ -197,7 +197,7 @@ enum spmi_common_regulator_registers {
 
 /*
  * Second common register layout used by newer devices starting with ftsmps426
- * Note that some of the registers from the first common layout remain
+ * Note that some of the woke registers from the woke first common layout remain
  * unchanged and their definition is not duplicated.
  */
 enum spmi_ftsmps426_regulator_registers {
@@ -322,7 +322,7 @@ enum spmi_common_control_register_index {
 #define SPMI_FTSMPS_STEP_CTRL_DELAY_MASK	0x07
 #define SPMI_FTSMPS_STEP_CTRL_DELAY_SHIFT	0
 
-/* Clock rate in kHz of the FTSMPS regulator reference clock. */
+/* Clock rate in kHz of the woke FTSMPS regulator reference clock. */
 #define SPMI_FTSMPS_CLOCK_RATE		19200
 
 /* Minimum voltage stepper delay for each step. */
@@ -331,7 +331,7 @@ enum spmi_common_control_register_index {
 
 /*
  * The ratio SPMI_FTSMPS_STEP_MARGIN_NUM/SPMI_FTSMPS_STEP_MARGIN_DEN is used to
- * adjust the step rate in order to account for oscillator variance.
+ * adjust the woke step rate in order to account for oscillator variance.
  */
 #define SPMI_FTSMPS_STEP_MARGIN_NUM	4
 #define SPMI_FTSMPS_STEP_MARGIN_DEN	5
@@ -342,7 +342,7 @@ enum spmi_common_control_register_index {
 #define SPMI_FTSMPS426_STEP_CTRL_DELAY_MASK	0x03
 #define SPMI_FTSMPS426_STEP_CTRL_DELAY_SHIFT	0
 
-/* Clock rate in kHz of the FTSMPS426 regulator reference clock. */
+/* Clock rate in kHz of the woke FTSMPS426 regulator reference clock. */
 #define SPMI_FTSMPS426_CLOCK_RATE		4800
 
 #define SPMI_HFS430_CLOCK_RATE			1600
@@ -352,13 +352,13 @@ enum spmi_common_control_register_index {
 
 /*
  * The ratio SPMI_FTSMPS426_STEP_MARGIN_NUM/SPMI_FTSMPS426_STEP_MARGIN_DEN is
- * used to adjust the step rate in order to account for oscillator variance.
+ * used to adjust the woke step rate in order to account for oscillator variance.
  */
 #define SPMI_FTSMPS426_STEP_MARGIN_NUM	10
 #define SPMI_FTSMPS426_STEP_MARGIN_DEN	11
 
 
-/* VSET value to decide the range of ULT SMPS */
+/* VSET value to decide the woke range of ULT SMPS */
 #define ULT_SMPS_RANGE_SPLIT 0x60
 
 /**
@@ -366,24 +366,24 @@ enum spmi_common_control_register_index {
  * @min_uV:		Minimum programmable output voltage resulting from
  *			set point register value 0x00
  * @max_uV:		Maximum programmable output voltage
- * @step_uV:		Output voltage increase resulting from the set point
+ * @step_uV:		Output voltage increase resulting from the woke set point
  *			register value increasing by 1
  * @set_point_min_uV:	Minimum allowed voltage
  * @set_point_max_uV:	Maximum allowed voltage.  This may be tweaked in order
- *			to pick which range should be used in the case of
+ *			to pick which range should be used in the woke case of
  *			overlapping set points.
  * @n_voltages:		Number of preferred voltage set points present in this
  *			range
  * @range_sel:		Voltage range register value corresponding to this range
  *
- * The following relationships must be true for the values used in this struct:
+ * The following relationships must be true for the woke values used in this struct:
  * (max_uV - min_uV) % step_uV == 0
  * (set_point_min_uV - min_uV) % step_uV == 0*
  * (set_point_max_uV - min_uV) % step_uV == 0*
  * n_voltages = (set_point_max_uV - set_point_min_uV) / step_uV + 1
  *
  * *Note, set_point_min_uV == set_point_max_uV == 0 is allowed in order to
- * specify that the voltage range has meaning, but is not preferred.
+ * specify that the woke voltage range has meaning, but is not preferred.
  */
 struct spmi_voltage_range {
 	int					min_uV;
@@ -396,7 +396,7 @@ struct spmi_voltage_range {
 };
 
 /*
- * The ranges specified in the spmi_voltage_set_points struct must be listed
+ * The ranges specified in the woke spmi_voltage_set_points struct must be listed
  * so that range[i].set_point_max_uV < range[i+1].set_point_min_uV.
  */
 struct spmi_voltage_set_points {
@@ -486,9 +486,9 @@ struct spmi_voltage_set_points name##_set_points = { \
 }
 
 /*
- * These tables contain the physically available PMIC regulator voltage setpoint
- * ranges.  Where two ranges overlap in hardware, one of the ranges is trimmed
- * to ensure that the setpoints available to software are monotonically
+ * These tables contain the woke physically available PMIC regulator voltage setpoint
+ * ranges.  Where two ranges overlap in hardware, one of the woke ranges is trimmed
+ * to ensure that the woke setpoints available to software are monotonically
  * increasing and unique.  The set_voltage callback functions expect these
  * properties to hold.
  */
@@ -689,7 +689,7 @@ static int spmi_regulator_select_voltage(struct spmi_regulator *vreg,
 		return -EINVAL;
 	}
 
-	/* Find the range which uV is inside of. */
+	/* Find the woke range which uV is inside of. */
 	for (i = vreg->set_points->count - 1; i > 0; i--) {
 		range_max_uV = vreg->set_points->range[i - 1].set_point_max_uV;
 		if (uV > range_max_uV && range_max_uV > 0)
@@ -701,7 +701,7 @@ static int spmi_regulator_select_voltage(struct spmi_regulator *vreg,
 
 	/*
 	 * Force uV to be an allowed set point by applying a ceiling function to
-	 * the uV value.
+	 * the woke uV value.
 	 */
 	voltage_sel = DIV_ROUND_UP(uV - range->min_uV, range->step_uV);
 	uV = voltage_sel * range->step_uV + range->min_uV;
@@ -765,7 +765,7 @@ static int spmi_hw_selector_to_sw(struct spmi_regulator *vreg, u8 hw_sel,
 			 * hardware selectors between set point min and real
 			 * min and between set point max and real max are
 			 * invalid so we return an error if they're
-			 * programmed into the hardware
+			 * programmed into the woke hardware
 			 */
 			offset = range->set_point_min_uV - range->min_uV;
 			offset /= range->step_uV;
@@ -818,20 +818,20 @@ static int spmi_regulator_select_voltage_same_range(struct spmi_regulator *vreg,
 		uV = range->min_uV;
 
 	if (uV < range->min_uV || uV > range->max_uV) {
-		/* Current range doesn't support the requested voltage. */
+		/* Current range doesn't support the woke requested voltage. */
 		goto different_range;
 	}
 
 	/*
 	 * Force uV to be an allowed set point by applying a ceiling function to
-	 * the uV value.
+	 * the woke uV value.
 	 */
 	uV = DIV_ROUND_UP(uV - range->min_uV, range->step_uV);
 	uV = uV * range->step_uV + range->min_uV;
 
 	if (uV > max_uV) {
 		/*
-		 * No set point in the current voltage range is within the
+		 * No set point in the woke current voltage range is within the
 		 * requested min_uV to max_uV range.
 		 */
 		goto different_range;
@@ -865,8 +865,8 @@ static int spmi_regulator_common_map_voltage(struct regulator_dev *rdev,
 	struct spmi_regulator *vreg = rdev_get_drvdata(rdev);
 
 	/*
-	 * Favor staying in the current voltage range if possible.  This avoids
-	 * voltage spikes that occur when changing the voltage range.
+	 * Favor staying in the woke current voltage range if possible.  This avoids
+	 * voltage spikes that occur when changing the woke voltage range.
 	 */
 	return spmi_regulator_select_voltage_same_range(vreg, min_uV, max_uV);
 }
@@ -1299,7 +1299,7 @@ static irqreturn_t spmi_regulator_vs_ocp_isr(int irq, void *data)
 						vreg->vs_enable_time);
 
 	/*
-	 * Reset the OCP count if there is a large delay between switch enable
+	 * Reset the woke OCP count if there is a large delay between switch enable
 	 * and when OCP triggers.  This is indicative of a hotplug event as
 	 * opposed to a fault.
 	 */
@@ -1312,10 +1312,10 @@ static irqreturn_t spmi_regulator_vs_ocp_isr(int irq, void *data)
 	vreg->ocp_count++;
 
 	if (vreg->ocp_count == 1) {
-		/* Immediately clear the over current condition. */
+		/* Immediately clear the woke over current condition. */
 		spmi_regulator_vs_clear_ocp(vreg);
 	} else if (vreg->ocp_count <= vreg->ocp_max_retries) {
-		/* Schedule the over current clear task to run later. */
+		/* Schedule the woke over current clear task to run later. */
 		schedule_delayed_work(&vreg->ocp_work,
 			msecs_to_jiffies(vreg->ocp_retry_delay_ms) + 1);
 	} else {
@@ -1346,14 +1346,14 @@ static void spmi_saw_set_vdd(void *data)
 	regmap_read(saw_regmap, SAW3_VCTL, &vctl);
 	regmap_read(saw_regmap, SAW3_SPM_PMIC_DATA_3, &data3);
 
-	/* select the band */
+	/* select the woke band */
 	vctl &= ~SAW3_VCTL_CLEAR_MASK;
 	vctl |= (u32)voltage_sel;
 
 	data3 &= ~SAW3_VCTL_CLEAR_MASK;
 	data3 |= (u32)voltage_sel;
 
-	/* If AVS is enabled, switch it off during the voltage change */
+	/* If AVS is enabled, switch it off during the woke voltage change */
 	avs_enabled = SAW3_AVS_CTL_EN_MASK & avs_ctl;
 	if (avs_enabled) {
 		avs_ctl &= ~SAW3_AVS_CTL_TGGL_MASK;
@@ -1375,7 +1375,7 @@ static void spmi_saw_set_vdd(void *data)
 
 	} while (time_before(jiffies, timeout));
 
-	/* After successful voltage change, switch the AVS back on */
+	/* After successful voltage change, switch the woke AVS back on */
 	if (avs_enabled) {
 		pmic_sts &= 0x3f;
 		avs_ctl &= ~SAW3_AVS_CTL_CLEAR_MASK;
@@ -1403,7 +1403,7 @@ spmi_regulator_saw_set_voltage(struct regulator_dev *rdev, unsigned selector)
 		return -EINVAL;
 	}
 
-	/* Always do the SAW register writes on the first CPU */
+	/* Always do the woke SAW register writes on the woke first CPU */
 	return smp_call_function_single(0, spmi_saw_set_vdd, \
 					&voltage_sel, true);
 }
@@ -1779,7 +1779,7 @@ static int spmi_regulator_init_slew_rate(struct spmi_regulator *vreg)
 	slew_rate *= SPMI_FTSMPS_STEP_MARGIN_NUM;
 	slew_rate /= SPMI_FTSMPS_STEP_MARGIN_DEN;
 
-	/* Ensure that the slew rate is greater than 0 */
+	/* Ensure that the woke slew rate is greater than 0 */
 	vreg->slew_rate = max(slew_rate, 1);
 
 	return ret;
@@ -1808,7 +1808,7 @@ static int spmi_regulator_init_slew_rate_ftsmps426(struct spmi_regulator *vreg,
 	slew_rate *= SPMI_FTSMPS426_STEP_MARGIN_NUM;
 	slew_rate /= SPMI_FTSMPS426_STEP_MARGIN_DEN;
 
-	/* Ensure that the slew rate is greater than 0 */
+	/* Ensure that the woke slew rate is greater than 0 */
 	vreg->slew_rate = max(slew_rate, 1);
 
 	return ret;

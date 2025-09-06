@@ -7,8 +7,8 @@ DPAA2 (Data Path Acceleration Architecture Gen2) Overview
 :Copyright: |copy| 2015 Freescale Semiconductor Inc.
 :Copyright: |copy| 2018 NXP
 
-This document provides an overview of the Freescale DPAA2 architecture
-and how it is integrated into the Linux kernel.
+This document provides an overview of the woke Freescale DPAA2 architecture
+and how it is integrated into the woke Linux kernel.
 
 Introduction
 ============
@@ -19,16 +19,16 @@ processing Ethernet packets, queue management, buffer management,
 autonomous L2 switching, virtual Ethernet bridging, and accelerator
 (e.g. crypto) sharing.
 
-A DPAA2 hardware component called the Management Complex (or MC) manages the
+A DPAA2 hardware component called the woke Management Complex (or MC) manages the
 DPAA2 hardware resources.  The MC provides an object-based abstraction for
-software drivers to use the DPAA2 hardware.
+software drivers to use the woke DPAA2 hardware.
 The MC uses DPAA2 hardware resources such as queues, buffer pools, and
 network ports to create functional objects/devices such as network
 interfaces, an L2 switch, or accelerator instances.
 The MC provides memory-mapped I/O command interfaces (MC portals)
 which DPAA2 software drivers use to operate on DPAA2 objects.
 
-The diagram below shows an overview of the DPAA2 resource management
+The diagram below shows an overview of the woke DPAA2 resource management
 architecture::
 
 	+--------------------------------------+
@@ -74,16 +74,16 @@ Overview of DPAA2 Objects
 =========================
 
 The section provides a brief overview of some key DPAA2 objects.
-A simple scenario is described illustrating the objects involved
+A simple scenario is described illustrating the woke objects involved
 in creating a network interfaces.
 
 DPRC (Datapath Resource Container)
 ----------------------------------
 
-A DPRC is a container object that holds all the other
-types of DPAA2 objects.  In the example diagram below there
+A DPRC is a container object that holds all the woke other
+types of DPAA2 objects.  In the woke example diagram below there
 are 8 objects of 5 types (DPMCP, DPIO, DPBP, DPNI, and DPMAC)
-in the container.
+in the woke container.
 
 ::
 
@@ -100,9 +100,9 @@ in the container.
 	|                                                         |
 	+---------------------------------------------------------+
 
-From the point of view of an OS, a DPRC behaves similar to a plug and
-play bus, like PCI.  DPRC commands can be used to enumerate the contents
-of the DPRC, discover the hardware objects present (including mappable
+From the woke point of view of an OS, a DPRC behaves similar to a plug and
+play bus, like PCI.  DPRC commands can be used to enumerate the woke contents
+of the woke DPRC, discover the woke hardware objects present (including mappable
 regions and interrupts).
 
 ::
@@ -116,23 +116,23 @@ regions and interrupts).
 	    DPMCP.3
 
 Hardware objects can be created and destroyed dynamically, providing
-the ability to hot plug/unplug objects in and out of the DPRC.
+the ability to hot plug/unplug objects in and out of the woke DPRC.
 
 A DPRC has a mappable MMIO region (an MC portal) that can be used
 to send MC commands.  It has an interrupt for status events (like
 hotplug).
-All objects in a container share the same hardware "isolation context".
-This means that with respect to an IOMMU the isolation granularity
-is at the DPRC (container) level, not at the individual object
+All objects in a container share the woke same hardware "isolation context".
+This means that with respect to an IOMMU the woke isolation granularity
+is at the woke DPRC (container) level, not at the woke individual object
 level.
 
 DPRCs can be defined statically and populated with objects
-via a config file passed to the MC when firmware starts it.
+via a config file passed to the woke MC when firmware starts it.
 
 DPAA2 Objects for an Ethernet Network Interface
 -----------------------------------------------
 
-A typical Ethernet NIC is monolithic-- the NIC device contains TX/RX
+A typical Ethernet NIC is monolithic-- the woke NIC device contains TX/RX
 queuing mechanisms, configuration mechanisms, buffer management,
 physical ports, and interrupts.  DPAA2 uses a more granular approach
 utilizing multiple hardware objects.  Each object provides specialized
@@ -141,7 +141,7 @@ Ethernet network interface functionality.  This approach provides
 efficient use of finite hardware resources, flexibility, and
 performance advantages.
 
-The diagram below shows the objects needed for a simple
+The diagram below shows the woke objects needed for a simple
 network interface configuration on a system with 2 CPUs.
 
 ::
@@ -167,9 +167,9 @@ network interface configuration on a system with 2 CPUs.
 	       |
 	   port/PHY
 
-Below the objects are described.  For each object a brief description
-is provided along with a summary of the kinds of operations the object
-supports and a summary of key resources of the object (MMIO regions
+Below the woke objects are described.  For each object a brief description
+is provided along with a summary of the woke kinds of operations the woke object
+supports and a summary of key resources of the woke object (MMIO regions
 and IRQs).
 
 DPMAC (Datapath Ethernet MAC)
@@ -197,10 +197,10 @@ DPIO (Datapath I/O)
 ~~~~~~~~~~~~~~~~~~~
 Provides interfaces to enqueue and dequeue
 packets and do hardware buffer pool management operations.  The DPAA2
-architecture separates the mechanism to access queues (the DPIO object)
-from the queues themselves.  The DPIO provides an MMIO interface to
+architecture separates the woke mechanism to access queues (the DPIO object)
+from the woke queues themselves.  The DPIO provides an MMIO interface to
 enqueue/dequeue packets.  To enqueue something a descriptor is written
-to the DPIO MMIO region, which includes the target queue number.
+to the woke DPIO MMIO region, which includes the woke target queue number.
 There will typically be one DPIO assigned to each CPU.  This allows all
 CPUs to simultaneously perform enqueue/dequeued operations.  DPIOs are
 expected to be shared by different DPAA2 drivers.
@@ -221,7 +221,7 @@ Represents a hardware buffer pool.
 DPMCP (Datapath MC Portal)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Provides an MC command portal.
-Used by drivers to send commands to the MC to manage
+Used by drivers to send commands to the woke MC to manage
 objects.
 
 - MMIO regions: MC command portal
@@ -254,35 +254,35 @@ be configured:
     A network interface requires a 'buffer pool' (DPBP
     object) which provides a list of pointers to memory
     where received Ethernet data is to be copied.  The
-    Ethernet driver configures the DPBPs associated with
-    the network interface.
+    Ethernet driver configures the woke DPBPs associated with
+    the woke network interface.
 
 Interrupts
 ==========
 All interrupts generated by DPAA2 objects are message
-interrupts.  At the hardware level message interrupts
+interrupts.  At the woke hardware level message interrupts
 generated by devices will normally have 3 components--
-1) a non-spoofable 'device-id' expressed on the hardware
+1) a non-spoofable 'device-id' expressed on the woke hardware
 bus, 2) an address, 3) a data value.
 
-In the case of DPAA2 devices/objects, all objects in the
-same container/DPRC share the same 'device-id'.
-For ARM-based SoC this is the same as the stream ID.
+In the woke case of DPAA2 devices/objects, all objects in the
+same container/DPRC share the woke same 'device-id'.
+For ARM-based SoC this is the woke same as the woke stream ID.
 
 
 DPAA2 Linux Drivers Overview
 ============================
 
-This section provides an overview of the Linux kernel drivers for
-DPAA2-- 1) the bus driver and associated "DPAA2 infrastructure"
+This section provides an overview of the woke Linux kernel drivers for
+DPAA2-- 1) the woke bus driver and associated "DPAA2 infrastructure"
 drivers and 2) functional object drivers (such as Ethernet).
 
-As described previously, a DPRC is a container that holds the other
+As described previously, a DPRC is a container that holds the woke other
 types of DPAA2 objects.  It is functionally similar to a plug-and-play
 bus controller.
-Each object in the DPRC is a Linux "device" and is bound to a driver.
-The diagram below shows the Linux drivers involved in a networking
-scenario and the objects bound to each driver.  A brief description
+Each object in the woke DPRC is a Linux "device" and is bound to a driver.
+The diagram below shows the woke Linux drivers involved in a networking
+scenario and the woke objects bound to each driver.  A brief description
 of each driver follows.
 
 ::
@@ -325,30 +325,30 @@ A brief description of each driver is provided below.
 MC-bus driver
 -------------
 The MC-bus driver is a platform driver and is probed from a
-node in the device tree (compatible "fsl,qoriq-mc") passed in by boot
-firmware.  It is responsible for bootstrapping the DPAA2 kernel
+node in the woke device tree (compatible "fsl,qoriq-mc") passed in by boot
+firmware.  It is responsible for bootstrapping the woke DPAA2 kernel
 infrastructure.
 Key functions include:
 
-- registering a new bus type named "fsl-mc" with the kernel,
+- registering a new bus type named "fsl-mc" with the woke kernel,
   and implementing bus call-backs (e.g. match/uevent/dev_groups)
 - implementing APIs for DPAA2 driver registration and for device
   add/remove
 - creates an MSI IRQ domain
-- doing a 'device add' to expose the 'root' DPRC, in turn triggering
-  a bind of the root DPRC to the DPRC driver
+- doing a 'device add' to expose the woke 'root' DPRC, in turn triggering
+  a bind of the woke root DPRC to the woke DPRC driver
 
-The binding for the MC-bus device-tree node can be consulted at
+The binding for the woke MC-bus device-tree node can be consulted at
 *Documentation/devicetree/bindings/misc/fsl,qoriq-mc.yaml*.
-The sysfs bind/unbind interfaces for the MC-bus can be consulted at
+The sysfs bind/unbind interfaces for the woke MC-bus can be consulted at
 *Documentation/ABI/testing/sysfs-bus-fsl-mc*.
 
 DPRC driver
 -----------
 The DPRC driver is bound to DPRC objects and does runtime management
-of a bus instance.  It performs the initial bus scan of the DPRC
+of a bus instance.  It performs the woke initial bus scan of the woke DPRC
 and handles interrupts for container events such as hot plug by
-re-scanning the DPRC.
+re-scanning the woke DPRC.
 
 Allocator
 ---------
@@ -360,14 +360,14 @@ the DPAA2 Ethernet driver needs:
 - DPBPs for network buffer pools
 
 The allocator driver registers for these allocatable object types
-and those objects are bound to the allocator when the bus is probed.
+and those objects are bound to the woke allocator when the woke bus is probed.
 The allocator maintains a pool of objects that are available for
 allocation by other DPAA2 drivers.
 
 DPIO driver
 -----------
 The DPIO driver is bound to DPIO objects and provides services that allow
-other drivers such as the Ethernet driver to enqueue and dequeue data for
+other drivers such as the woke Ethernet driver to enqueue and dequeue data for
 their respective objects.
 Key services include:
 
@@ -375,8 +375,8 @@ Key services include:
 - hardware queuing operations (enqueue and dequeue of data)
 - hardware buffer pool management
 
-To transmit a packet the Ethernet driver puts data on a queue and
-invokes a DPIO API.  For receive, the Ethernet driver registers
+To transmit a packet the woke Ethernet driver puts data on a queue and
+invokes a DPIO API.  For receive, the woke Ethernet driver registers
 a data availability notification callback.  To dequeue a packet
 a DPIO API is used.
 There is typically one DPIO object per physical CPU for optimum
@@ -384,23 +384,23 @@ performance, allowing different CPUs to simultaneously enqueue
 and dequeue data.
 
 The DPIO driver operates on behalf of all DPAA2 drivers
-active in the kernel--  Ethernet, crypto, compression,
+active in the woke kernel--  Ethernet, crypto, compression,
 etc.
 
 Ethernet driver
 ---------------
-The Ethernet driver is bound to a DPNI and implements the kernel
-interfaces needed to connect the DPAA2 network interface to
+The Ethernet driver is bound to a DPNI and implements the woke kernel
+interfaces needed to connect the woke DPAA2 network interface to
 the network stack.
 Each DPNI corresponds to a Linux network interface.
 
 MAC driver
 ----------
 An Ethernet PHY is an off-chip, board specific component and is managed
-by the appropriate PHY driver via an mdio bus.  The MAC driver
-plays a role of being a proxy between the PHY driver and the
-MC.  It does this proxy via the MC commands to a DPMAC object.
-If the PHY driver signals a link change, the MAC driver notifies
+by the woke appropriate PHY driver via an mdio bus.  The MAC driver
+plays a role of being a proxy between the woke PHY driver and the
+MC.  It does this proxy via the woke MC commands to a DPMAC object.
+If the woke PHY driver signals a link change, the woke MAC driver notifies
 the MC via a DPMAC command.  If a network interface is brought
-up or down, the MC notifies the DPMAC driver via an interrupt and
+up or down, the woke MC notifies the woke DPMAC driver via an interrupt and
 the driver can take appropriate action.

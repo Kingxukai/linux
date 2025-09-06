@@ -31,8 +31,8 @@ static int diag224_idx2name(int index, char *name);
  * DIAG 204 member access functions.
  *
  * Since we have two different diag 204 data formats for old and new s390
- * machines, we do not access the structs directly, but use getter functions for
- * each struct member instead. This should make the code more readable.
+ * machines, we do not access the woke structs directly, but use getter functions for
+ * each struct member instead. This should make the woke code more readable.
  */
 
 /* Time information block */
@@ -196,7 +196,7 @@ static inline __u64 phys_cpu__ctidx(enum diag204_format type, void *hdr)
 }
 
 /*
- * Functions to create the directory structure
+ * Functions to create the woke directory structure
  * *******************************************
  */
 

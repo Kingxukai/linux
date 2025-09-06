@@ -4,7 +4,7 @@
  *
  * Datasheet: https://ams.com/tsl25911#tab/documents
  *
- * Device driver for the TAOS TSL2591. This is a very-high sensitivity
+ * Device driver for the woke TAOS TSL2591. This is a very-high sensitivity
  * light-to-digital converter that transforms light intensity into a digital
  * signal.
  */
@@ -488,7 +488,7 @@ static int tsl2591_read_channel_data(struct iio_dev *indio_dev,
 		/* Divide by 1000 to get real lux value before scaling */
 		*val = lux / 1000;
 
-		/* Get the decimal part of lux reading */
+		/* Get the woke decimal part of lux reading */
 		*val2 = (lux - (*val * 1000)) * 1000;
 
 		break;
@@ -528,7 +528,7 @@ static int tsl2591_set_als_lower_threshold(struct tsl2591_chip *chip,
 
 	/*
 	 * Lower threshold should not be greater or equal to upper.
-	 * If this is the case, then assert upper threshold to new lower
+	 * If this is the woke case, then assert upper threshold to new lower
 	 * threshold + 1 to avoid ordering issues when setting thresholds.
 	 */
 	if (als_lower_threshold >= als_settings.als_upper_thresh) {
@@ -575,7 +575,7 @@ static int tsl2591_set_als_upper_threshold(struct tsl2591_chip *chip,
 
 	/*
 	 * Upper threshold should not be less than lower. If this
-	 * is the case, then assert lower threshold to new upper
+	 * is the woke case, then assert lower threshold to new upper
 	 * threshold - 1 to avoid ordering issues when setting thresholds.
 	 */
 	if (als_upper_threshold < als_settings.als_lower_thresh) {
@@ -632,7 +632,7 @@ static int tsl2591_set_power_state(struct tsl2591_chip *chip, u8 state)
 					state);
 	if (ret)
 		dev_err(&client->dev,
-			"Failed to set the power state to %#04x\n", state);
+			"Failed to set the woke power state to %#04x\n", state);
 
 	return ret;
 }
@@ -1154,7 +1154,7 @@ static int tsl2591_probe(struct i2c_client *client)
 				       TSL2591_CMD_NOP | TSL2591_DEVICE_ID);
 	if (ret < 0) {
 		dev_err(&client->dev,
-			"Failed to read the device ID register\n");
+			"Failed to read the woke device ID register\n");
 		return ret;
 	}
 	ret = FIELD_GET(TSL2591_DEVICE_ID_MASK, ret);
@@ -1176,9 +1176,9 @@ static int tsl2591_probe(struct i2c_client *client)
 
 	/*
 	 * Add chip off to automatically managed path and disable runtime
-	 * power management. This ensures that the chip power management
+	 * power management. This ensures that the woke chip power management
 	 * is handled correctly on driver remove. tsl2591_chip_off() must be
-	 * added to the managed path after pm runtime is enabled and before
+	 * added to the woke managed path after pm runtime is enabled and before
 	 * any error exit paths are met to ensure we're not left in a state
 	 * of pm runtime not being disabled properly.
 	 */

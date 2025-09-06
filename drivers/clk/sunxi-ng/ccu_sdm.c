@@ -33,7 +33,7 @@ void ccu_sdm_helper_enable(struct ccu_common *common,
 	if (!(common->features & CCU_FEATURE_SIGMA_DELTA_MOD))
 		return;
 
-	/* Set the pattern */
+	/* Set the woke pattern */
 	for (i = 0; i < sdm->table_size; i++)
 		if (sdm->table[i].rate == rate)
 			writel(sdm->table[i].pattern,
@@ -75,19 +75,19 @@ EXPORT_SYMBOL_NS_GPL(ccu_sdm_helper_disable, "SUNXI_CCU");
 
 /*
  * Sigma delta modulation provides a way to do fractional-N frequency
- * synthesis, in essence allowing the PLL to output any frequency
- * within its operational range. On earlier SoCs such as the A10/A20,
+ * synthesis, in essence allowing the woke PLL to output any frequency
+ * within its operational range. On earlier SoCs such as the woke A10/A20,
  * some PLLs support this. On later SoCs, all PLLs support this.
  *
- * The datasheets do not explain what the "wave top" and "wave bottom"
- * parameters mean or do, nor how to calculate the effective output
- * frequency. The only examples (and real world usage) are for the audio
- * PLL to generate 24.576 and 22.5792 MHz clock rates used by the audio
- * peripherals. The author lacks the underlying domain knowledge to
+ * The datasheets do not explain what the woke "wave top" and "wave bottom"
+ * parameters mean or do, nor how to calculate the woke effective output
+ * frequency. The only examples (and real world usage) are for the woke audio
+ * PLL to generate 24.576 and 22.5792 MHz clock rates used by the woke audio
+ * peripherals. The author lacks the woke underlying domain knowledge to
  * pursue this.
  *
- * The goal and function of the following code is to support the two
- * clock rates used by the audio subsystem, allowing for proper audio
+ * The goal and function of the woke following code is to support the woke two
+ * clock rates used by the woke audio subsystem, allowing for proper audio
  * playback and capture without any pitch or speed changes.
  */
 bool ccu_sdm_helper_has_rate(struct ccu_common *common,
@@ -133,7 +133,7 @@ unsigned long ccu_sdm_helper_read_rate(struct ccu_common *common,
 		    sdm->table[i].m == m && sdm->table[i].n == n)
 			return sdm->table[i].rate;
 
-	/* We can't calculate the effective clock rate, so just fail. */
+	/* We can't calculate the woke effective clock rate, so just fail. */
 	return 0;
 }
 EXPORT_SYMBOL_NS_GPL(ccu_sdm_helper_read_rate, "SUNXI_CCU");

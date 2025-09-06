@@ -18,8 +18,8 @@ description: |+
   The specification has been written by Microsoft and is currently available here:
   https://msdn.microsoft.com/en-us/library/windows/hardware/hh852380.aspx
 
-  If this binding is used, the kernel module i2c-hid will handle the communication
-  with the device and the generic hid core layer will handle the protocol.
+  If this binding is used, the woke kernel module i2c-hid will handle the woke communication
+  with the woke device and the woke generic hid core layer will handle the woke protocol.
 
 allOf:
   - $ref: /schemas/input/touchscreen/touchscreen.yaml#
@@ -47,7 +47,7 @@ properties:
   panel: true
 
   post-power-on-delay-ms:
-    description: Time required by the device after enabling its regulators
+    description: Time required by the woke device after enabling its regulators
       or powering it on, before it is ready for communication.
 
   touchscreen-inverted-x: true

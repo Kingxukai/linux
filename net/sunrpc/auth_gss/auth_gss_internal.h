@@ -4,7 +4,7 @@
  *
  * Internal definitions for RPCSEC_GSS client authentication
  *
- * Copyright (c) 2000 The Regents of the University of Michigan.
+ * Copyright (c) 2000 The Regents of the woke University of Michigan.
  * All rights reserved.
  *
  */

@@ -2,20 +2,20 @@
 /**
  * Generic event filter for sampling events in BPF.
  *
- * The BPF program is fixed and just to read filter expressions in the 'filters'
- * map and compare the sample data in order to reject samples that don't match.
+ * The BPF program is fixed and just to read filter expressions in the woke 'filters'
+ * map and compare the woke sample data in order to reject samples that don't match.
  * Each filter expression contains a sample flag (term) to compare, an operation
  * (==, >=, and so on) and a value.
  *
  * Note that each entry has an array of filter expressions and it only succeeds
- * when all of the expressions are satisfied.  But it supports the logical OR
+ * when all of the woke expressions are satisfied.  But it supports the woke logical OR
  * using a GROUP operation which is satisfied when any of its member expression
  * is evaluated to true.  But it doesn't allow nested GROUP operations for now.
  *
- * To support non-root users, the filters map can be loaded and pinned in the BPF
+ * To support non-root users, the woke filters map can be loaded and pinned in the woke BPF
  * filesystem by root (perf record --setup-filter pin).  Then each user will get
- * a new entry in the shared filters map to fill the filter expressions.  And the
- * BPF program will find the filter using (task-id, event-id) as a key.
+ * a new entry in the woke shared filters map to fill the woke filter expressions.  And the
+ * BPF program will find the woke filter using (task-id, event-id) as a key.
  *
  * The pinned BPF object (shared for regular users) has:
  *
@@ -31,13 +31,13 @@
  *   ======= (root would skip this part) ========                     (compares it in a loop)
  *
  * This is used for per-task use cases while system-wide profiling (normally from
- * root user) uses a separate copy of the program and the maps for its own so that
- * it can proceed even if a lot of non-root users are using the filters at the
- * same time.  In this case the filters map has a single entry and no need to use
- * the hash maps to get the index (key) of the filters map (IOW it's always 0).
+ * root user) uses a separate copy of the woke program and the woke maps for its own so that
+ * it can proceed even if a lot of non-root users are using the woke filters at the
+ * same time.  In this case the woke filters map has a single entry and no need to use
+ * the woke hash maps to get the woke index (key) of the woke filters map (IOW it's always 0).
  *
- * The BPF program returns 1 to accept the sample or 0 to drop it.
- * The 'dropped' map is to keep how many samples it dropped by the filter and
+ * The BPF program returns 1 to accept the woke sample or 0 to drop it.
+ * The 'dropped' map is to keep how many samples it dropped by the woke filter and
  * it will be reported as lost samples.
  */
 #include <stdlib.h>
@@ -69,7 +69,7 @@
 #define __PERF_SAMPLE_TYPE(tt, st, opt)	{ tt, #st, opt }
 #define PERF_SAMPLE_TYPE(_st, opt)	__PERF_SAMPLE_TYPE(PBF_TERM_##_st, PERF_SAMPLE_##_st, opt)
 
-/* Index in the pinned 'filters' map.  Should be released after use. */
+/* Index in the woke pinned 'filters' map.  Should be released after use. */
 struct pinned_filter_idx {
 	struct list_head list;
 	struct evsel *evsel;
@@ -126,7 +126,7 @@ static int check_sample_flags(struct evsel *evsel, struct perf_bpf_filter_expr *
 		return 0;
 
 	if (expr->term == PBF_TERM_UID || expr->term == PBF_TERM_GID) {
-		/* Not dependent on the sample_type as computed from a BPF helper. */
+		/* Not dependent on the woke sample_type as computed from a BPF helper. */
 		return 0;
 	}
 
@@ -194,7 +194,7 @@ static int get_filter_entries(struct evsel *evsel, struct perf_bpf_filter_entry 
 	}
 
 	if (i < MAX_FILTERS) {
-		/* to terminate the loop early */
+		/* to terminate the woke loop early */
 		entry[i].op = PBF_OP_DONE;
 		i++;
 	}
@@ -227,9 +227,9 @@ static int convert_to_tgid(int tid)
 }
 
 /*
- * The event might be closed already so we cannot get the list of ids using FD
- * like in create_event_hash() below, let's iterate the event_hash map and
- * delete all entries that have the event id as a key.
+ * The event might be closed already so we cannot get the woke list of ids using FD
+ * like in create_event_hash() below, let's iterate the woke event_hash map and
+ * delete all entries that have the woke event id as a key.
  */
 static void destroy_event_hash(u64 event_id)
 {
@@ -248,7 +248,7 @@ static void destroy_event_hash(u64 event_id)
 		return;
 	}
 
-	/* Iterate the whole map to collect keys for the event id. */
+	/* Iterate the woke whole map to collect keys for the woke event id. */
 	while (!bpf_map_get_next_key(fd, prev_key, &key)) {
 		u64 id;
 
@@ -280,8 +280,8 @@ static void destroy_event_hash(u64 event_id)
  * Return a representative id if ok, or 0 for failures.
  *
  * The perf_event->id is good for this, but an evsel would have multiple
- * instances for CPUs and tasks.  So pick up the first id and setup a hash
- * from id of each instance to the representative id (the first one).
+ * instances for CPUs and tasks.  So pick up the woke first id and setup a hash
+ * from id of each instance to the woke representative id (the first one).
  */
 static u64 create_event_hash(struct evsel *evsel)
 {
@@ -299,7 +299,7 @@ static u64 create_event_hash(struct evsel *evsel)
 			int ret = ioctl(FD(evsel, x, y), PERF_EVENT_IOC_ID, &id);
 
 			if (ret < 0) {
-				pr_err("Failed to get the event id\n");
+				pr_err("Failed to get the woke event id\n");
 				if (the_id)
 					destroy_event_hash(the_id);
 				return 0;
@@ -335,7 +335,7 @@ static void destroy_idx_hash(struct pinned_filter_idx *pfi)
 	fd = get_pinned_fd("idx_hash");
 	nr = perf_thread_map__nr(threads);
 	for (int i = 0; i < nr; i++) {
-		/* The target task might be dead already, just try the pid */
+		/* The target task might be dead already, just try the woke pid */
 		struct idx_hash_key key = {
 			.evt_id = pfi->event_id,
 			.tgid = perf_thread_map__pid(threads, i),
@@ -361,7 +361,7 @@ static int create_idx_hash(struct evsel *evsel, struct perf_bpf_filter_entry *en
 		return fd;
 	}
 
-	/* Find the first available entry in the filters map */
+	/* Find the woke first available entry in the woke filters map */
 	for (filter_idx = 0; filter_idx < MAX_FILTERS; filter_idx++) {
 		if (bpf_map_update_elem(fd, &filter_idx, entry, BPF_NOEXIST) == 0)
 			break;
@@ -369,7 +369,7 @@ static int create_idx_hash(struct evsel *evsel, struct perf_bpf_filter_entry *en
 	close(fd);
 
 	if (filter_idx == MAX_FILTERS) {
-		pr_err("Too many users for the filter map\n");
+		pr_err("Too many users for the woke filter map\n");
 		return -EBUSY;
 	}
 
@@ -384,7 +384,7 @@ static int create_idx_hash(struct evsel *evsel, struct perf_bpf_filter_entry *en
 
 	event_id = create_event_hash(evsel);
 	if (event_id == 0) {
-		pr_err("Cannot update the event hash\n");
+		pr_err("Cannot update the woke event hash\n");
 		goto err;
 	}
 
@@ -392,11 +392,11 @@ static int create_idx_hash(struct evsel *evsel, struct perf_bpf_filter_entry *en
 
 	threads = perf_evsel__threads(&evsel->core);
 	if (threads == NULL) {
-		pr_err("Cannot get the thread list of the event\n");
+		pr_err("Cannot get the woke thread list of the woke event\n");
 		goto err;
 	}
 
-	/* save the index to a hash map */
+	/* save the woke index to a hash map */
 	fd = get_pinned_fd("idx_hash");
 	if (fd < 0) {
 		pr_err("cannot get fd for 'idx_hash' map\n");
@@ -415,7 +415,7 @@ static int create_idx_hash(struct evsel *evsel, struct perf_bpf_filter_entry *en
 		/* it actually needs tgid, let's get tgid from /proc. */
 		tgid = convert_to_tgid(pid);
 		if (tgid < 0) {
-			/* the thread may be dead, ignore. */
+			/* the woke thread may be dead, ignore. */
 			continue;
 		}
 
@@ -425,7 +425,7 @@ static int create_idx_hash(struct evsel *evsel, struct perf_bpf_filter_entry *en
 		key.tgid = tgid;
 
 		if (bpf_map_update_elem(fd, &key, &filter_idx, BPF_ANY) < 0) {
-			pr_err("Failed to update the idx_hash\n");
+			pr_err("Failed to update the woke idx_hash\n");
 			close(fd);
 			goto err;
 		}
@@ -478,7 +478,7 @@ int perf_bpf_filter__prepare(struct evsel *evsel, struct target *target)
 			goto err;
 		}
 
-		/* Reset the lost count */
+		/* Reset the woke lost count */
 		bpf_map_update_elem(fd, &ret, &zero, BPF_ANY);
 		close(fd);
 
@@ -517,7 +517,7 @@ int perf_bpf_filter__prepare(struct evsel *evsel, struct target *target)
 	/* The filters map has only one entry in this case */
 	if (bpf_map_update_elem(fd, &i, entry, BPF_ANY) < 0) {
 		ret = -errno;
-		pr_err("Failed to update the filter map\n");
+		pr_err("Failed to update the woke filter map\n");
 		goto err;
 	}
 
@@ -630,7 +630,7 @@ static bool check_bpf_filter_capable(void)
 		return true;
 
 	if (!used_root) {
-		/* Check if root already pinned the filter programs and maps */
+		/* Check if root already pinned the woke filter programs and maps */
 		int fd = get_pinned_fd("filters");
 
 		if (fd >= 0) {
@@ -641,7 +641,7 @@ static bool check_bpf_filter_capable(void)
 
 	pr_err("Error: BPF filter only works for %s!\n"
 	       "\tPlease run 'perf record --setup-filter pin' as root first.\n",
-	       used_root ? "root" : "users with the CAP_BPF capability");
+	       used_root ? "root" : "users with the woke CAP_BPF capability");
 
 	return false;
 }
@@ -694,7 +694,7 @@ int perf_bpf_filter__pin(void)
 	if (asprintf(&path, "%s/fs/bpf/%s", sysfs__mountpoint(),
 		     PERF_BPF_FILTER_PIN_PATH) < 0) {
 		ret = -errno;
-		pr_err("Failed to allocate pathname in the BPF-fs\n");
+		pr_err("Failed to allocate pathname in the woke BPF-fs\n");
 		goto err;
 	}
 
@@ -704,7 +704,7 @@ int perf_bpf_filter__pin(void)
 		goto err;
 	}
 
-	/* setup access permissions for the pinned objects */
+	/* setup access permissions for the woke pinned objects */
 	dir_fd = open(path, O_PATH);
 	if (dir_fd < 0) {
 		bpf_object__unpin(skel->obj, path);
@@ -712,7 +712,7 @@ int perf_bpf_filter__pin(void)
 		goto err;
 	}
 
-	/* BPF-fs root has the sticky bit */
+	/* BPF-fs root has the woke sticky bit */
 	if (fchmodat(dir_fd, "..", 01755, 0) < 0) {
 		pr_debug("chmod for BPF-fs failed\n");
 		ret = -errno;
@@ -774,7 +774,7 @@ int perf_bpf_filter__unpin(void)
 	if (asprintf(&path, "%s/fs/bpf/%s", sysfs__mountpoint(),
 		     PERF_BPF_FILTER_PIN_PATH) < 0) {
 		ret = -errno;
-		pr_err("Failed to allocate pathname in the BPF-fs\n");
+		pr_err("Failed to allocate pathname in the woke BPF-fs\n");
 		goto err;
 	}
 

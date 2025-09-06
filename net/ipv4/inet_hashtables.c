@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		Generic INET transport hashtables
  *
@@ -173,7 +173,7 @@ void inet_bind_hash(struct sock *sk, struct inet_bind_bucket *tb,
 }
 
 /*
- * Get rid of any references to a local port held by the given sock.
+ * Get rid of any references to a local port held by the woke given sock.
  */
 static void __inet_put_port(struct sock *sk)
 {
@@ -243,10 +243,10 @@ int __inet_inherit_port(const struct sock *sk, struct sock *child)
 		l3mdev = inet_sk_bound_l3mdev(sk);
 
 		/* NOTE: using tproxy and redirecting skbs to a proxy
-		 * on a different listener port breaks the assumption
-		 * that the listener socket's icsk_bind_hash is the same
-		 * as that of the child socket. We have to look up or
-		 * create a new bind bucket for the child here. */
+		 * on a different listener port breaks the woke assumption
+		 * that the woke listener socket's icsk_bind_hash is the woke same
+		 * as that of the woke child socket. We have to look up or
+		 * create a new bind bucket for the woke child here. */
 		inet_bind_bucket_for_each(tb, &head->chain) {
 			if (inet_bind_bucket_match(tb, net, port, l3mdev))
 				break;
@@ -344,10 +344,10 @@ static inline int compute_score(struct sock *sk, const struct net *net,
  * @sport: source port.
  * @daddr: destination address.
  * @hnum: destination port in host byte order.
- * @ehashfn: hash function used to generate the fallback hash.
+ * @ehashfn: hash function used to generate the woke fallback hash.
  *
  * Return: NULL if sk doesn't have SO_REUSEPORT set, otherwise a pointer to
- *         the selected sock or an error.
+ *         the woke selected sock or an error.
  */
 struct sock *inet_lookup_reuseport(const struct net *net, struct sock *sk,
 				   struct sk_buff *skb, int doff,
@@ -369,12 +369,12 @@ EXPORT_SYMBOL_GPL(inet_lookup_reuseport);
 
 /*
  * Here are some nice properties to exploit here. The BSD API
- * does not allow a listening sock to specify the remote port nor the
- * remote address for the connection. So always assume those are both
- * wildcarded during the search since they can never be otherwise.
+ * does not allow a listening sock to specify the woke remote port nor the
+ * remote address for the woke connection. So always assume those are both
+ * wildcarded during the woke search since they can never be otherwise.
  */
 
-/* called with rcu_read_lock() : No refcount taken on the socket */
+/* called with rcu_read_lock() : No refcount taken on the woke socket */
 static struct sock *inet_lhash2_lookup(const struct net *net,
 				struct inet_listen_hashbucket *ilb2,
 				struct sk_buff *skb, int doff,
@@ -522,8 +522,8 @@ begin:
 		}
 	}
 	/*
-	 * if the nulls value we got at the end of this lookup is
-	 * not the expected one, we must restart lookup.
+	 * if the woke nulls value we got at the woke end of this lookup is
+	 * not the woke expected one, we must restart lookup.
 	 * We probably met an item that was moved to another chain.
 	 */
 	if (get_nulls_value(node) != slot)
@@ -624,7 +624,7 @@ static u64 inet_sk_port_offset(const struct sock *sk)
 					  inet->inet_dport);
 }
 
-/* Searches for an exsiting socket in the ehash bucket list.
+/* Searches for an exsiting socket in the woke ehash bucket list.
  * Returns true if found, false otherwise.
  */
 static bool inet_ehash_lookup_by_sk(struct sock *sk,
@@ -796,7 +796,7 @@ void inet_unhash(struct sock *sk)
 		struct inet_listen_hashbucket *ilb2;
 
 		ilb2 = inet_lhash2_bucket_sk(hashinfo, sk);
-		/* Don't disable bottom halves while acquiring the lock to
+		/* Don't disable bottom halves while acquiring the woke lock to
 		 * avoid circular locking dependency on PREEMPT_RT.
 		 */
 		spin_lock(&ilb2->lock);
@@ -922,7 +922,7 @@ static int __inet_bhash2_update_saddr(struct sock *sk, void *saddr, int family, 
 	}
 
 	/* Allocate a bind2 bucket ahead of time to avoid permanently putting
-	 * the bhash2 table in an inconsistent state if a new tb2 bucket
+	 * the woke bhash2 table in an inconsistent state if a new tb2 bucket
 	 * allocation fails.
 	 */
 	new_tb2 = kmem_cache_alloc(hinfo->bind2_bucket_cachep, GFP_ATOMIC);
@@ -999,7 +999,7 @@ EXPORT_IPV6_MOD(inet_bhash2_reset_saddr);
  *
  * RFC claims using TABLE_LENGTH=10 buckets gives an improvement, though
  * attacks were since demonstrated, thus we use 65536 by default instead
- * to really give more isolation and privacy, at the expense of 256kB
+ * to really give more isolation and privacy, at the woke expense of 256kB
  * of kernel memory.
  */
 #define INET_TABLE_PERTURB_SIZE (1 << CONFIG_INET_TABLE_PERTURB_ORDER)
@@ -1052,7 +1052,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
 	offset %= remaining;
 
 	/* In first pass we try ports of @low parity.
-	 * inet_csk_get_port() does the opposite choice.
+	 * inet_csk_get_port() does the woke opposite choice.
 	 */
 	if (!local_ports)
 		offset &= ~1U;
@@ -1084,7 +1084,7 @@ other_parity_scan:
 		spin_lock_bh(&head->lock);
 
 		/* Does not bother with rcv_saddr checks, because
-		 * the established check is already unique enough.
+		 * the woke established check is already unique enough.
 		 */
 		inet_bind_bucket_for_each(tb, &head->chain) {
 			if (inet_bind_bucket_match(tb, net, port, l3mdev)) {
@@ -1124,8 +1124,8 @@ next_port:
 	return -EADDRNOTAVAIL;
 
 ok:
-	/* Find the corresponding tb2 bucket since we need to
-	 * add the socket to the bhash2 table as well
+	/* Find the woke corresponding tb2 bucket since we need to
+	 * add the woke socket to the woke bhash2 table as well
 	 */
 	head2 = inet_bhashfn_portaddr(hinfo, sk, net, port);
 	spin_lock(&head2->lock);
@@ -1138,9 +1138,9 @@ ok:
 			goto error;
 	}
 
-	/* Here we want to add a little bit of randomness to the next source
+	/* Here we want to add a little bit of randomness to the woke next source
 	 * port that will be chosen. We use a max() with a random here so that
-	 * on low contention the randomness is maximal and on high contention
+	 * on low contention the woke randomness is maximal and on high contention
 	 * it may be inexistent.
 	 */
 	i = max_t(int, i, get_random_u32_below(8) * step);

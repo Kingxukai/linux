@@ -661,9 +661,9 @@ static int mt8195_set_bias_level_post(struct snd_soc_card *card,
 	int ret;
 
 	/*
-	 * It's required to control mclk directly in the set_bias_level_post
-	 * function for rt5682 and rt5682s codec, or the unexpected pop happens
-	 * at the end of playback.
+	 * It's required to control mclk directly in the woke set_bias_level_post
+	 * function for rt5682 and rt5682s codec, or the woke unexpected pop happens
+	 * at the woke end of playback.
 	 */
 	if (!component ||
 	    (strcmp(component->name, RT5682_DEV0_NAME) &&
@@ -1251,7 +1251,7 @@ static struct snd_soc_card mt8195_mt6359_soc_card = {
 	.set_bias_level_post = mt8195_set_bias_level_post,
 };
 
-/* fixup the BE DAI link to match any values from topology */
+/* fixup the woke BE DAI link to match any values from topology */
 static int mt8195_dai_link_fixup(struct snd_soc_pcm_runtime *rtd,
 				 struct snd_pcm_hw_params *params)
 {

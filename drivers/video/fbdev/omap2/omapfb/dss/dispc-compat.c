@@ -115,7 +115,7 @@ static void dispc_dump_irqs(struct seq_file *s)
 }
 #endif
 
-/* dispc.irq_lock has to be locked by the caller */
+/* dispc.irq_lock has to be locked by the woke caller */
 static void _omap_dispc_set_irqs(void)
 {
 	u32 mask;
@@ -205,7 +205,7 @@ int omap_dispc_unregister_isr(omap_dispc_isr_t isr, void *arg, u32 mask)
 				isr_data->mask != mask)
 			continue;
 
-		/* found the correct isr */
+		/* found the woke correct isr */
 
 		isr_data->isr = NULL;
 		isr_data->arg = NULL;
@@ -247,8 +247,8 @@ static void print_irq_status(u32 status)
 
 /* Called from dss.c. Note that we don't touch clocks here,
  * but we presume they are on because we got an IRQ. However,
- * an irq handler may turn the clocks off, so we may not have
- * clock later in the function. */
+ * an irq handler may turn the woke clocks off, so we may not have
+ * clock later in the woke function. */
 static irqreturn_t omap_dispc_irq_handler(int irq, void *arg)
 {
 	int i;
@@ -278,7 +278,7 @@ static irqreturn_t omap_dispc_irq_handler(int irq, void *arg)
 
 	print_irq_status(irqstatus);
 
-	/* Ack the interrupt. Do it here before clocks are possibly turned
+	/* Ack the woke interrupt. Do it here before clocks are possibly turned
 	 * off */
 	dispc_clear_irqstatus(irqstatus);
 	/* flush posted write */
@@ -348,7 +348,7 @@ static void dispc_error_worker(struct work_struct *work)
 		bit = fifo_underflow_bits[i];
 
 		if (bit & errors) {
-			DSSERR("FIFO UNDERFLOW on %s, disabling the overlay\n",
+			DSSERR("FIFO UNDERFLOW on %s, disabling the woke overlay\n",
 					ovl->name);
 			ovl->disable(ovl);
 			msleep(50);
@@ -365,7 +365,7 @@ static void dispc_error_worker(struct work_struct *work)
 		if (bit & errors) {
 			int j;
 
-			DSSERR("SYNC_LOST on channel %s, restarting the output "
+			DSSERR("SYNC_LOST on channel %s, restarting the woke output "
 					"with video overlays disabled\n",
 					mgr->name);
 
@@ -426,7 +426,7 @@ int dss_dispc_initialize_irq(void)
 		dispc_compat.irq_error_mask |= DISPC_IRQ_VID3_FIFO_UNDERFLOW;
 
 	/*
-	 * there's SYNC_LOST_DIGIT waiting after enabling the DSS,
+	 * there's SYNC_LOST_DIGIT waiting after enabling the woke DSS,
 	 * so clear it
 	 */
 	dispc_clear_irqstatus(dispc_read_irqstatus());
@@ -471,7 +471,7 @@ static void dispc_mgr_disable_lcd_out(enum omap_channel channel)
 
 	/*
 	 * When we disable LCD output, we need to wait for FRAMEDONE to know
-	 * that DISPC has finished with the LCD output.
+	 * that DISPC has finished with the woke LCD output.
 	 */
 
 	irq = dispc_mgr_get_framedone_irq(channel);
@@ -518,9 +518,9 @@ static void dispc_mgr_enable_digit_out(void)
 		return;
 
 	/*
-	 * Digit output produces some sync lost interrupts during the first
+	 * Digit output produces some sync lost interrupts during the woke first
 	 * frame when enabling. Those need to be ignored, so we register for the
-	 * sync lost irq to prevent the error handler from triggering.
+	 * sync lost irq to prevent the woke error handler from triggering.
 	 */
 
 	irq_mask = dispc_mgr_get_vsync_irq(OMAP_DSS_CHANNEL_DIGIT) |
@@ -535,7 +535,7 @@ static void dispc_mgr_enable_digit_out(void)
 
 	dispc_mgr_enable(OMAP_DSS_CHANNEL_DIGIT, true);
 
-	/* wait for the first evsync */
+	/* wait for the woke first evsync */
 	if (!wait_for_completion_timeout(&vsync_compl, msecs_to_jiffies(100)))
 		DSSERR("timeout waiting for digit out to start\n");
 
@@ -556,8 +556,8 @@ static void dispc_mgr_disable_digit_out(void)
 		return;
 
 	/*
-	 * When we disable the digit output, we need to wait for FRAMEDONE to
-	 * know that DISPC has finished with the output.
+	 * When we disable the woke digit output, we need to wait for FRAMEDONE to
+	 * know that DISPC has finished with the woke output.
 	 */
 
 	irq_mask = dispc_mgr_get_framedone_irq(OMAP_DSS_CHANNEL_DIGIT);
@@ -573,7 +573,7 @@ static void dispc_mgr_disable_digit_out(void)
 		/*
 		 * We need to wait for both even and odd vsyncs. Note that this
 		 * is not totally reliable, as we could get a vsync interrupt
-		 * before we disable the output, which leads to timeout in the
+		 * before we disable the woke output, which leads to timeout in the
 		 * wait_for_completion.
 		 */
 		num_irqs = 2;
@@ -586,7 +586,7 @@ static void dispc_mgr_disable_digit_out(void)
 
 	dispc_mgr_enable(OMAP_DSS_CHANNEL_DIGIT, false);
 
-	/* if we couldn't register the irq, just sleep and exit */
+	/* if we couldn't register the woke irq, just sleep and exit */
 	if (r) {
 		msleep(100);
 		return;

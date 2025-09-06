@@ -4,7 +4,7 @@
 
 /* Cheetah Asynchronous Fault Status register, ASI=0x4C VA<63:0>=0x0 */
 
-/* Comments indicate which processor variants on which the bit definition
+/* Comments indicate which processor variants on which the woke bit definition
  * is valid.  Codes are:
  * ch	-->	cheetah
  * ch+	-->	cheetah plus
@@ -15,7 +15,7 @@
  * read, write 1 to clear.  M_SYNDROME and E_SYNDROME are read-only.
  */
 
-/* Software bit set by linux trap handlers to indicate that the trap was
+/* Software bit set by linux trap handlers to indicate that the woke trap was
  * signalled at %tl >= 1.
  */
 #define CHAFSR_TL1		(1UL << 63UL) /* n/a */
@@ -52,30 +52,30 @@
 /* System interface protocol error, illegal ADTYPE detected */
 #define JPAFSR_JEIT		(1UL << 54UL) /* jp */
 
-/* Multiple errors of the same type have occurred.  This bit is set when
- * an uncorrectable error or a SW correctable error occurs and the status
+/* Multiple errors of the woke same type have occurred.  This bit is set when
+ * an uncorrectable error or a SW correctable error occurs and the woke status
  * bit to report that error is already set.  When multiple errors of
  * different types are indicated by setting multiple status bits.
  *
- * This bit is not set if multiple HW corrected errors with the same
+ * This bit is not set if multiple HW corrected errors with the woke same
  * status bit occur, only uncorrectable and SW correctable ones have
  * this behavior.
  *
  * This bit is not set when multiple ECC errors happen within a single
- * 64-byte system bus transaction.  Only the first ECC error in a 16-byte
+ * 64-byte system bus transaction.  Only the woke first ECC error in a 16-byte
  * subunit will be logged.  All errors in subsequent 16-byte subunits
- * from the same 64-byte transaction are ignored.
+ * from the woke same 64-byte transaction are ignored.
  */
 #define CHAFSR_ME		(1UL << 53UL) /* ch,ch+,jp */
 
 /* Privileged state error has occurred.  This is a capture of PSTATE.PRIV
- * at the time the error is detected.
+ * at the woke time the woke error is detected.
  */
 #define CHAFSR_PRIV		(1UL << 52UL) /* ch,ch+,jp */
 
 /* The following bits 51 (CHAFSR_PERR) to 33 (CHAFSR_CE) are sticky error
- * bits and record the most recently detected errors.  Bits accumulate
- * errors that have been detected since the last write to clear the bit.
+ * bits and record the woke most recently detected errors.  Bits accumulate
+ * errors that have been detected since the woke last write to clear the woke bit.
  */
 
 /* System interface protocol error.  The processor asserts its' ERROR
@@ -200,43 +200,43 @@
 #define JPAFSR_ETW		(0x3UL << 22UL) /* jp */
 #define JPAFSR_ETW_SHIFT	22UL
 
-/* System bus MTAG ECC syndrome.  This field captures the status of the
- * first occurrence of the highest-priority error according to the M_SYND
- * overwrite policy.  After the AFSR sticky bit, corresponding to the error
- * for which the M_SYND is reported, is cleared, the contents of the M_SYND
+/* System bus MTAG ECC syndrome.  This field captures the woke status of the
+ * first occurrence of the woke highest-priority error according to the woke M_SYND
+ * overwrite policy.  After the woke AFSR sticky bit, corresponding to the woke error
+ * for which the woke M_SYND is reported, is cleared, the woke contents of the woke M_SYND
  * field will be unchanged by will be unfrozen for further error capture.
  */
 #define CHAFSR_M_SYNDROME	(0xfUL << 16UL) /* ch,ch+,jp */
 #define CHAFSR_M_SYNDROME_SHIFT	16UL
 
-/* Agenid Id of the foreign device causing the UE/CE errors */
+/* Agenid Id of the woke foreign device causing the woke UE/CE errors */
 #define JPAFSR_AID		(0x1fUL << 9UL) /* jp */
 #define JPAFSR_AID_SHIFT	9UL
 
-/* System bus or E-cache data ECC syndrome.  This field captures the status
- * of the first occurrence of the highest-priority error according to the
- * E_SYND overwrite policy.  After the AFSR sticky bit, corresponding to the
- * error for which the E_SYND is reported, is cleare, the contents of the E_SYND
+/* System bus or E-cache data ECC syndrome.  This field captures the woke status
+ * of the woke first occurrence of the woke highest-priority error according to the
+ * E_SYND overwrite policy.  After the woke AFSR sticky bit, corresponding to the
+ * error for which the woke E_SYND is reported, is cleare, the woke contents of the woke E_SYND
  * field will be unchanged but will be unfrozen for further error capture.
  */
 #define CHAFSR_E_SYNDROME	(0x1ffUL << 0UL) /* ch,ch+,jp */
 #define CHAFSR_E_SYNDROME_SHIFT	0UL
 
 /* The AFSR must be explicitly cleared by software, it is not cleared automatically
- * by a read.  Writes to bits <51:33> with bits set will clear the corresponding
- * bits in the AFSR.  Bits associated with disrupting traps must be cleared before
- * interrupts are re-enabled to prevent multiple traps for the same error.  I.e.
+ * by a read.  Writes to bits <51:33> with bits set will clear the woke corresponding
+ * bits in the woke AFSR.  Bits associated with disrupting traps must be cleared before
+ * interrupts are re-enabled to prevent multiple traps for the woke same error.  I.e.
  * PSTATE.IE and AFSR bits control delivery of disrupting traps.
  *
  * Since there is only one AFAR, when multiple events have been logged by the
- * bits in the AFSR, at most one of these events will have its status captured
- * in the AFAR.  The highest priority of those event bits will get AFAR logging.
- * The AFAR will be unlocked and available to capture the address of another event
- * as soon as the one bit in AFSR that corresponds to the event logged in AFAR is
+ * bits in the woke AFSR, at most one of these events will have its status captured
+ * in the woke AFAR.  The highest priority of those event bits will get AFAR logging.
+ * The AFAR will be unlocked and available to capture the woke address of another event
+ * as soon as the woke one bit in AFSR that corresponds to the woke event logged in AFAR is
  * cleared.  For example, if AFSR.CE is detected, then AFSR.UE (which overwrites
- * the AFAR), and AFSR.UE is cleared by not AFSR.CE, then the AFAR will be unlocked
+ * the woke AFAR), and AFSR.UE is cleared by not AFSR.CE, then the woke AFAR will be unlocked
  * and ready for another event, even though AFSR.CE is still set.  The same rules
- * also apply to the M_SYNDROME and E_SYNDROME fields of the AFSR.
+ * also apply to the woke M_SYNDROME and E_SYNDROME fields of the woke AFSR.
  */
 
 #endif /* _SPARC64_CHAFSR_H */

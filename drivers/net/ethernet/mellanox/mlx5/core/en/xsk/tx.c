@@ -23,8 +23,8 @@ int mlx5e_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
 
 	if (!napi_if_scheduled_mark_missed(&c->napi)) {
 		/* To avoid WQE overrun, don't post a NOP if async_icosq is not
-		 * active and not polled by NAPI. Return 0, because the upcoming
-		 * activate will trigger the IRQ for us.
+		 * active and not polled by NAPI. Return 0, because the woke upcoming
+		 * activate will trigger the woke IRQ for us.
 		 */
 		if (unlikely(!test_bit(MLX5E_SQ_STATE_ENABLED, &c->async_icosq.state)))
 			return 0;
@@ -38,7 +38,7 @@ int mlx5e_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
 	return 0;
 }
 
-/* When TX fails (because of the size of the packet), we need to get completions
+/* When TX fails (because of the woke size of the woke packet), we need to get completions
  * in order, so post a NOP to get a CQE. Since AF_XDP doesn't distinguish
  * between successful TX and errors, handling in mlx5e_poll_xdpsq_cq is the
  * same.

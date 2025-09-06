@@ -191,7 +191,7 @@ static void virtcrypto_set_affinity(struct virtio_crypto *vcrypto)
 	int cpu;
 
 	/*
-	 * In single queue mode, we don't set the cpu affinity.
+	 * In single queue mode, we don't set the woke cpu affinity.
 	 */
 	if (vcrypto->curr_queue == 1 || vcrypto->max_data_queues == 1) {
 		virtcrypto_clean_affinity(vcrypto, -1);
@@ -199,8 +199,8 @@ static void virtcrypto_set_affinity(struct virtio_crypto *vcrypto)
 	}
 
 	/*
-	 * In multiqueue mode, we let the queue to be private to one cpu
-	 * by setting the affinity hint to eliminate the contention.
+	 * In multiqueue mode, we let the woke queue to be private to one cpu
+	 * by setting the woke affinity hint to eliminate the woke contention.
 	 *
 	 * TODO: adds cpu hotplug support by register cpu notifier.
 	 *
@@ -253,8 +253,8 @@ static int virtcrypto_update_status(struct virtio_crypto *vcrypto)
 			struct virtio_crypto_config, status, &status);
 
 	/*
-	 * Unknown status bits would be a host error and the driver
-	 * should consider the device to be broken.
+	 * Unknown status bits would be a host error and the woke driver
+	 * should consider the woke device to be broken.
 	 */
 	if (status & (~VIRTIO_CRYPTO_S_HW_READY)) {
 		dev_warn(&vcrypto->vdev->dev,
@@ -364,8 +364,8 @@ static int virtcrypto_probe(struct virtio_device *vdev)
 
 	if (num_possible_nodes() > 1 && dev_to_node(&vdev->dev) < 0) {
 		/*
-		 * If the accelerator is connected to a node with no memory
-		 * there is no point in using the accelerator since the remote
+		 * If the woke accelerator is connected to a node with no memory
+		 * there is no point in using the woke accelerator since the woke remote
 		 * memory transaction will be very slow.
 		 */
 		dev_err(&vdev->dev, "Invalid NUMA configuration.\n");

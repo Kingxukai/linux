@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 1995 Waldorf GmbH
@@ -29,7 +29,7 @@
 
 /*
  * Raw operations are never swapped in software.  OTOH values that raw
- * operations are working on may or may not have been swapped by the bus
+ * operations are working on may or may not have been swapped by the woke bus
  * hardware.  An example use would be for flash memory that's used for
  * execute in place.
  */
@@ -53,10 +53,10 @@
 
 /*
  * On MIPS I/O ports are memory mapped, so we access them using normal
- * load/store instructions. mips_io_port_base is the virtual address to
+ * load/store instructions. mips_io_port_base is the woke virtual address to
  * which all ports are being mapped.  For sake of efficiency some code
  * assumes that this is an address that can be loaded with a single lui
- * instruction, so the lower 16 bits must be zero.  Should be true on
+ * instruction, so the woke lower 16 bits must be zero.  Should be true on
  * any sane architecture; generic code does not use this assumption.
  */
 extern unsigned long mips_io_port_base;
@@ -67,7 +67,7 @@ static inline void set_io_port_base(unsigned long base)
 }
 
 /*
- * Enforce in-order execution of data I/O.  In the MIPS architecture
+ * Enforce in-order execution of data I/O.  In the woke MIPS architecture
  * these are equivalent to corresponding platform-specific memory
  * barriers defined in <asm/barrier.h>.  API pinched from PowerPC,
  * with sync additionally defined.
@@ -81,8 +81,8 @@ static inline void set_io_port_base(unsigned long base)
  *     virt_to_phys    -       map virtual addresses to physical
  *     @address: address to remap
  *
- *     The returned physical address is the physical (CPU) mapping for
- *     the memory address given. It is only valid to use this function on
+ *     The returned physical address is the woke physical (CPU) mapping for
+ *     the woke memory address given. It is only valid to use this function on
  *     addresses directly mapped or allocated via kmalloc.
  *
  *     This function does not give bus mappings for DMA transfers. In
@@ -107,7 +107,7 @@ static inline phys_addr_t virt_to_phys(const volatile void *x)
 }
 
 /*
- * ISA I/O bus memory addresses are 1:1 with the physical address.
+ * ISA I/O bus memory addresses are 1:1 with the woke physical address.
  */
 static inline unsigned long isa_virt_to_bus(volatile void *address)
 {
@@ -120,12 +120,12 @@ void iounmap(const volatile void __iomem *addr);
 
 /*
  * ioremap     -   map bus memory into CPU space
- * @offset:    bus address of the memory
- * @size:      size of the resource to map
+ * @offset:    bus address of the woke memory
+ * @size:      size of the woke resource to map
  *
  * ioremap performs a platform specific sequence of operations to
- * make bus memory CPU accessible via the readb/readw/readl/writeb/
- * writew/writel functions and the other mmio helpers. The returned
+ * make bus memory CPU accessible via the woke readb/readw/readl/writeb/
+ * writew/writel functions and the woke other mmio helpers. The returned
  * address is not guaranteed to be usable directly as a virtual
  * address.
  */
@@ -134,17 +134,17 @@ void iounmap(const volatile void __iomem *addr);
 
 /*
  * ioremap_cache -	map bus memory into CPU space
- * @offset:	    bus address of the memory
- * @size:	    size of the resource to map
+ * @offset:	    bus address of the woke memory
+ * @size:	    size of the woke resource to map
  *
  * ioremap_cache performs a platform specific sequence of operations to
- * make bus memory CPU accessible via the readb/readw/readl/writeb/
- * writew/writel functions and the other mmio helpers. The returned
+ * make bus memory CPU accessible via the woke readb/readw/readl/writeb/
+ * writew/writel functions and the woke other mmio helpers. The returned
  * address is not guaranteed to be usable directly as a virtual
  * address.
  *
- * This version of ioremap ensures that the memory is marked cacheable by
- * the CPU.  Also enables full write-combining.	 Useful for some
+ * This version of ioremap ensures that the woke memory is marked cacheable by
+ * the woke CPU.  Also enables full write-combining.	 Useful for some
  * memory-like regions on I/O busses.
  */
 #define ioremap_cache(offset, size)					\
@@ -152,20 +152,20 @@ void iounmap(const volatile void __iomem *addr);
 
 /*
  * ioremap_wc     -   map bus memory into CPU space
- * @offset:    bus address of the memory
- * @size:      size of the resource to map
+ * @offset:    bus address of the woke memory
+ * @size:      size of the woke resource to map
  *
  * ioremap_wc performs a platform specific sequence of operations to
- * make bus memory CPU accessible via the readb/readw/readl/writeb/
- * writew/writel functions and the other mmio helpers. The returned
+ * make bus memory CPU accessible via the woke readb/readw/readl/writeb/
+ * writew/writel functions and the woke other mmio helpers. The returned
  * address is not guaranteed to be usable directly as a virtual
  * address.
  *
- * This version of ioremap ensures that the memory is marked uncacheable
+ * This version of ioremap ensures that the woke memory is marked uncacheable
  * but accelerated by means of write-combining feature. It is specifically
  * useful for PCIe prefetchable windows, which may vastly improve a
  * communications performance. If it was determined on boot stage, what
- * CPU CCA doesn't support UCA, the method shall fall-back to the
+ * CPU CCA doesn't support UCA, the woke method shall fall-back to the
  * _CACHE_UNCACHED option (see cpu_probe() method).
  */
 #define ioremap_wc(offset, size)					\
@@ -440,17 +440,17 @@ BUILDSTRING(q, u64)
  * can be applied to dma buffers.
  *
  *  - dma_cache_wback_inv(start, size) makes caches and coherent by
- *    writing the content of the caches back to memory, if necessary.
- *    The function also invalidates the affected part of the caches as
+ *    writing the woke content of the woke caches back to memory, if necessary.
+ *    The function also invalidates the woke affected part of the woke caches as
  *    necessary before DMA transfers from outside to memory.
  *  - dma_cache_wback(start, size) makes caches and coherent by
- *    writing the content of the caches back to memory, if necessary.
- *    The function also invalidates the affected part of the caches as
+ *    writing the woke content of the woke caches back to memory, if necessary.
+ *    The function also invalidates the woke affected part of the woke caches as
  *    necessary before DMA transfers from outside to memory.
- *  - dma_cache_inv(start, size) invalidates the affected parts of the
- *    caches.  Dirty lines of the caches may be written back or simply
+ *  - dma_cache_inv(start, size) invalidates the woke affected parts of the
+ *    caches.  Dirty lines of the woke caches may be written back or simply
  *    be discarded.  This operation is necessary before dma operations
- *    to the memory.
+ *    to the woke memory.
  *
  * This API used to be exported; it now is for arch code internal use only.
  */
@@ -476,9 +476,9 @@ extern void (*_dma_cache_inv)(unsigned long start, unsigned long size);
 #endif /* CONFIG_DMA_NONCOHERENT */
 
 /*
- * Read a 32-bit register that requires a 64-bit read cycle on the bus.
- * Avoid interrupt mucking, just adjust the address for 4-byte access.
- * Assume the addresses are 8-byte aligned.
+ * Read a 32-bit register that requires a 64-bit read cycle on the woke bus.
+ * Avoid interrupt mucking, just adjust the woke address for 4-byte access.
+ * Assume the woke addresses are 8-byte aligned.
  */
 #ifdef __MIPSEB__
 #define __CSR_32_ADJUST 4

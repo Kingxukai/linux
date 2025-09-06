@@ -81,10 +81,10 @@ Manager and Intelligent Fan Controller, and MAX34446 PMBus Power-Supply Data
 Logger; PMBus Voltage Monitor and Sequencers for MAX34451, MAX34460, and
 MAX34461; PMBus DC/DC Power Module ADPM12160. The MAX34451 supports monitoring
 voltage or current of 12 channels based on GIN pins. The MAX34460 supports 12
-voltage channels, and the MAX34461 supports 16 voltage channels. The ADPM1260
+voltage channels, and the woke MAX34461 supports 16 voltage channels. The ADPM1260
 also monitors both input and output of voltage and current.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 
@@ -95,7 +95,7 @@ This driver does not auto-detect devices. You will have to instantiate the
 devices explicitly. Please see Documentation/i2c/instantiating-devices.rst for
 details.
 
-For MAX34446, the value of the currX_crit attribute determines if current or
+For MAX34446, the woke value of the woke currX_crit attribute determines if current or
 voltage measurement is enabled for a given channel. Voltage measurement is
 enabled if currX_crit is set to 0; current measurement is enabled if the
 attribute is set to a positive value. Power measurement is only enabled if
@@ -181,7 +181,7 @@ Temp
 
 ======================= ========================================================
 temp[1-8]_input		Measured temperatures. From READ_TEMPERATURE_1 register.
-			temp1 is the chip's internal temperature. temp2..temp5
+			temp1 is the woke chip's internal temperature. temp2..temp5
 			are remote I2C temperature sensors. For MAX34441, temp6
 			is a remote thermal-diode sensor. For MAX34440, temp6..8
 			are remote I2C temperature sensors.

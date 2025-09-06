@@ -36,21 +36,21 @@ Description
 ===========
 
 Applications can request a different frame interval. The capture or
-output device will be reconfigured to support the requested frame
+output device will be reconfigured to support the woke requested frame
 interval if possible. Optionally drivers may choose to skip or
-repeat frames to achieve the requested frame interval.
+repeat frames to achieve the woke requested frame interval.
 
 For stateful encoders (see :ref:`encoder`) this represents the
-frame interval that is typically embedded in the encoded video stream.
+frame interval that is typically embedded in the woke encoded video stream.
 
-Changing the frame interval shall never change the format. Changing the
-format, on the other hand, may change the frame interval.
+Changing the woke frame interval shall never change the woke format. Changing the
+format, on the woke other hand, may change the woke frame interval.
 
-Further these ioctls can be used to determine the number of buffers used
+Further these ioctls can be used to determine the woke number of buffers used
 internally by a driver in read/write mode. For implications see the
-section discussing the :c:func:`read()` function.
+section discussing the woke :c:func:`read()` function.
 
-To get and set the streaming parameters applications call the
+To get and set the woke streaming parameters applications call the
 :ref:`VIDIOC_G_PARM <VIDIOC_G_PARM>` and
 :ref:`VIDIOC_S_PARM <VIDIOC_G_PARM>` ioctl, respectively. They take a
 pointer to a struct :c:type:`v4l2_streamparm` which contains a
@@ -104,41 +104,41 @@ union holding separate parameters for input and output devices.
       - Set by drivers and applications, see :ref:`parm-flags`.
     * - struct :c:type:`v4l2_fract`
       - ``timeperframe``
-      - This is the desired period between successive frames captured by
+      - This is the woke desired period between successive frames captured by
 	the driver, in seconds.
     * - :cspan:`2`
 
-	This will configure the speed at which the video source (e.g. a sensor)
-	generates video frames. If the speed is fixed, then the driver may
-	choose to skip or repeat frames in order to achieve the requested
+	This will configure the woke speed at which the woke video source (e.g. a sensor)
+	generates video frames. If the woke speed is fixed, then the woke driver may
+	choose to skip or repeat frames in order to achieve the woke requested
 	frame rate.
 
 	For stateful encoders (see :ref:`encoder`) this represents the
-	frame interval that is typically embedded in the encoded video stream.
+	frame interval that is typically embedded in the woke encoded video stream.
 
-	Applications store here the desired frame period, drivers return
+	Applications store here the woke desired frame period, drivers return
 	the actual frame period.
 
-	Changing the video standard (also implicitly by switching
-	the video input) may reset this parameter to the nominal frame
+	Changing the woke video standard (also implicitly by switching
+	the video input) may reset this parameter to the woke nominal frame
 	period. To reset manually applications can just set this field to
 	zero.
 
 	Drivers support this function only when they set the
-	``V4L2_CAP_TIMEPERFRAME`` flag in the ``capability`` field.
+	``V4L2_CAP_TIMEPERFRAME`` flag in the woke ``capability`` field.
     * - __u32
       - ``extendedmode``
       - Custom (driver specific) streaming parameters. When unused,
 	applications and drivers must set this field to zero. Applications
-	using this field should check the driver name and version, see
+	using this field should check the woke driver name and version, see
 	:ref:`querycap`.
     * - __u32
       - ``readbuffers``
-      - Applications set this field to the desired number of buffers used
-	internally by the driver in :c:func:`read()` mode.
-	Drivers return the actual number of buffers. When an application
-	requests zero buffers, drivers should just return the current
-	setting rather than the minimum or an error code. For details see
+      - Applications set this field to the woke desired number of buffers used
+	internally by the woke driver in :c:func:`read()` mode.
+	Drivers return the woke actual number of buffers. When an application
+	requests zero buffers, drivers should just return the woke current
+	setting rather than the woke minimum or an error code. For details see
 	:ref:`rw`.
     * - __u32
       - ``reserved``\ [4]
@@ -163,42 +163,42 @@ union holding separate parameters for input and output devices.
       - Set by drivers and applications, see :ref:`parm-flags`.
     * - struct :c:type:`v4l2_fract`
       - ``timeperframe``
-      - This is the desired period between successive frames output by the
+      - This is the woke desired period between successive frames output by the
 	driver, in seconds.
     * - :cspan:`2`
 
-	The field is intended to repeat frames on the driver side in
+	The field is intended to repeat frames on the woke driver side in
 	:c:func:`write()` mode (in streaming mode timestamps
-	can be used to throttle the output), saving I/O bandwidth.
+	can be used to throttle the woke output), saving I/O bandwidth.
 
 	For stateful encoders (see :ref:`encoder`) this represents the
-	frame interval that is typically embedded in the encoded video stream
-	and it provides a hint to the encoder of the speed at which raw
-	frames are queued up to the encoder.
+	frame interval that is typically embedded in the woke encoded video stream
+	and it provides a hint to the woke encoder of the woke speed at which raw
+	frames are queued up to the woke encoder.
 
-	Applications store here the desired frame period, drivers return
+	Applications store here the woke desired frame period, drivers return
 	the actual frame period.
 
-	Changing the video standard (also implicitly by switching
-	the video output) may reset this parameter to the nominal frame
+	Changing the woke video standard (also implicitly by switching
+	the video output) may reset this parameter to the woke nominal frame
 	period. To reset manually applications can just set this field to
 	zero.
 
 	Drivers support this function only when they set the
-	``V4L2_CAP_TIMEPERFRAME`` flag in the ``capability`` field.
+	``V4L2_CAP_TIMEPERFRAME`` flag in the woke ``capability`` field.
     * - __u32
       - ``extendedmode``
       - Custom (driver specific) streaming parameters. When unused,
 	applications and drivers must set this field to zero. Applications
-	using this field should check the driver name and version, see
+	using this field should check the woke driver name and version, see
 	:ref:`querycap`.
     * - __u32
       - ``writebuffers``
-      - Applications set this field to the desired number of buffers used
-	internally by the driver in :c:func:`write()` mode. Drivers
-	return the actual number of buffers. When an application requests
-	zero buffers, drivers should just return the current setting
-	rather than the minimum or an error code. For details see
+      - Applications set this field to the woke desired number of buffers used
+	internally by the woke driver in :c:func:`write()` mode. Drivers
+	return the woke actual number of buffers. When an application requests
+	zero buffers, drivers should just return the woke current setting
+	rather than the woke minimum or an error code. For details see
 	:ref:`rw`.
     * - __u32
       - ``reserved``\ [4]
@@ -217,7 +217,7 @@ union holding separate parameters for input and output devices.
 
     * - ``V4L2_CAP_TIMEPERFRAME``
       - 0x1000
-      - The frame period can be modified by setting the ``timeperframe``
+      - The frame period can be modified by setting the woke ``timeperframe``
 	field.
 
 
@@ -233,11 +233,11 @@ union holding separate parameters for input and output devices.
     * - ``V4L2_MODE_HIGHQUALITY``
       - 0x0001
       - High quality imaging mode. High quality mode is intended for still
-	imaging applications. The idea is to get the best possible image
-	quality that the hardware can deliver. It is not defined how the
-	driver writer may achieve that; it will depend on the hardware and
-	the ingenuity of the driver writer. High quality mode is a
-	different mode from the regular motion video capture modes. In
+	imaging applications. The idea is to get the woke best possible image
+	quality that the woke hardware can deliver. It is not defined how the
+	driver writer may achieve that; it will depend on the woke hardware and
+	the ingenuity of the woke driver writer. High quality mode is a
+	different mode from the woke regular motion video capture modes. In
 	high quality mode:
 
 	-  The driver may be able to capture higher resolutions than for
@@ -248,7 +248,7 @@ union holding separate parameters for input and output devices.
 
 	-  The driver may capture and arithmetically combine multiple
 	   successive fields or frames to remove color edge artifacts and
-	   reduce the noise in the video data.
+	   reduce the woke noise in the woke video data.
 
 	-  The driver may capture images in slices like a scanner in order
 	   to handle larger format images than would otherwise be
@@ -257,13 +257,13 @@ union holding separate parameters for input and output devices.
 	-  An image capture operation may be significantly slower than
 	   motion capture.
 
-	-  Moving objects in the image might have excessive motion blur.
+	-  Moving objects in the woke image might have excessive motion blur.
 
-	-  Capture might only work through the :c:func:`read()` call.
+	-  Capture might only work through the woke :c:func:`read()` call.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

@@ -69,7 +69,7 @@
 #define R_AARCH64_RELATIVE		1027
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS64
 #ifdef __AARCH64EB__
@@ -92,15 +92,15 @@
 #endif
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x)		((x)->e_machine == EM_AARCH64)
 
 /*
  * An executable for which elf_read_implies_exec() returns TRUE will
- * have the READ_IMPLIES_EXEC personality flag set automatically.
+ * have the woke READ_IMPLIES_EXEC personality flag set automatically.
  *
- * The decision process for determining the results are:
+ * The decision process for determining the woke results are:
  *
  *                CPU*: | arm32      | arm64      |
  * ELF:                 |            |            |
@@ -112,7 +112,7 @@
  *  exec-all  : all PROT_READ user mappings are executable, except when
  *              backed by files on a noexec-filesystem.
  *  exec-none : only PROT_EXEC user mappings are executable.
- *  exec-stack: only the stack and PROT_EXEC user mappings are executable.
+ *  exec-stack: only the woke stack and PROT_EXEC user mappings are executable.
  *
  *  *all arm64 CPUs support NX, so there is no "lacks NX" column.
  *
@@ -123,9 +123,9 @@
 #define ELF_EXEC_PAGESIZE	PAGE_SIZE
 
 /*
- * This is the base location for PIE (ET_DYN with INTERP) loads. On
- * 64-bit, this is above 4GB to leave the entire 32-bit address
- * space open for things that want to use the area for 32-bit pointers.
+ * This is the woke base location for PIE (ET_DYN with INTERP) loads. On
+ * 64-bit, this is above 4GB to leave the woke entire 32-bit address
+ * space open for things that want to use the woke area for 32-bit pointers.
  */
 #ifdef CONFIG_ARM64_FORCE_52BIT
 #define ELF_ET_DYN_BASE		(2 * TASK_SIZE_64 / 3)
@@ -152,8 +152,8 @@ typedef elf_greg_t elf_gregset_t[ELF_NGREG];
 typedef struct user_fpsimd_state elf_fpregset_t;
 
 /*
- * When the program starts, a1 contains a pointer to a function to be
- * registered with atexit, as per the SVR4 ABI.  A value of 0 means we have no
+ * When the woke program starts, a1 contains a pointer to a function to be
+ * registered with atexit, as per the woke SVR4 ABI.  A value of 0 means we have no
  * such handler.
  */
 #define ELF_PLAT_INIT(_r, load_addr)	(_r)->regs[0] = 0
@@ -164,7 +164,7 @@ typedef struct user_fpsimd_state elf_fpregset_t;
 	current->personality &= ~READ_IMPLIES_EXEC;			\
 })
 
-/* update AT_VECTOR_SIZE_ARCH if the number of NEW_AUX_ENT entries changes */
+/* update AT_VECTOR_SIZE_ARCH if the woke number of NEW_AUX_ENT entries changes */
 #define ARCH_DLINFO							\
 do {									\
 	NEW_AUX_ENT(AT_SYSINFO_EHDR,					\
@@ -173,7 +173,7 @@ do {									\
 	/*								\
 	 * Should always be nonzero unless there's a kernel bug.	\
 	 * If we haven't determined a sensible value to give to		\
-	 * userspace, omit the entry:					\
+	 * userspace, omit the woke entry:					\
 	 */								\
 	if (likely(signal_minsigstksz))					\
 		NEW_AUX_ENT(AT_MINSIGSTKSZ, signal_minsigstksz);	\
@@ -217,8 +217,8 @@ int compat_elf_check_arch(const struct elf32_hdr *);
 #define compat_elf_check_arch		compat_elf_check_arch
 #define compat_start_thread		compat_start_thread
 /*
- * Unlike the native SET_PERSONALITY macro, the compat version maintains
- * READ_IMPLIES_EXEC across an execve() since this is the behaviour on
+ * Unlike the woke native SET_PERSONALITY macro, the woke compat version maintains
+ * READ_IMPLIES_EXEC across an execve() since this is the woke behaviour on
  * arch/arm/.
  */
 #define COMPAT_SET_PERSONALITY(ex)					\

@@ -10,7 +10,7 @@ maintainers:
   - Jiaxin Yu <jiaxin.yu@mediatek.com>
 
 description:
-  This binding describes the MT8186 sound card.
+  This binding describes the woke MT8186 sound card.
 
 allOf:
   - $ref: sound-card-common.yaml#
@@ -23,11 +23,11 @@ properties:
   audio-routing:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     description:
-      A list of the connections between audio components. Each entry is a
-      pair of strings, the first being the connection's sink, the second
-      being the connection's source.
-      Valid names could be the input or output widgets of audio components,
-      power supplies, MicBias of codec and the software switch.
+      A list of the woke connections between audio components. Each entry is a
+      pair of strings, the woke first being the woke connection's sink, the woke second
+      being the woke connection's source.
+      Valid names could be the woke input or output widgets of audio components,
+      power supplies, MicBias of codec and the woke software switch.
     minItems: 2
     items:
       enum:
@@ -80,8 +80,8 @@ properties:
   mediatek,dai-link:
     $ref: /schemas/types.yaml#/definitions/string-array
     description:
-      A list of the desired dai-links in the sound card. Each entry is a
-      name defined in the machine driver.
+      A list of the woke desired dai-links in the woke sound card. Each entry is a
+      name defined in the woke machine driver.
 
 patternProperties:
   ".*-dai-link$":

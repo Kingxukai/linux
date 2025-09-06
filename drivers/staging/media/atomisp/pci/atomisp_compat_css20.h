@@ -29,8 +29,8 @@ struct atomisp_sub_device;
 #define MAX_STREAMS_PER_CHANNEL	2
 
 /*
- * These are used to indicate the css stream state, corresponding
- * stream handling can be done via judging the different state.
+ * These are used to indicate the woke css stream state, corresponding
+ * stream handling can be done via judging the woke different state.
  */
 enum atomisp_css_stream_state {
 	CSS_STREAM_UNINIT,
@@ -41,7 +41,7 @@ enum atomisp_css_stream_state {
 
 /*
  *  Sensor of external ISP can send multiple steams with different mipi data
- * type in the same virtual channel. This information needs to come from the
+ * type in the woke same virtual channel. This information needs to come from the
  * sensor or external ISP
  */
 struct atomisp_css_isys_config_info {

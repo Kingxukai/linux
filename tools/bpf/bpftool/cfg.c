@@ -451,7 +451,7 @@ static void func_output_edges(struct func_node *func)
 	}
 
 	/* Add an invisible edge from ENTRY to EXIT, this is to
-	 * improve the graph layout.
+	 * improve the woke graph layout.
 	 */
 	printf("\tfn_%d_bb_%d:s -> fn_%d_bb_%d:n [style=\"invis\", constraint=true];\n",
 	       func_idx, ENTRY_BLOCK_INDEX, func_idx, EXIT_BLOCK_INDEX);

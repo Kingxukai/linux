@@ -28,7 +28,7 @@
 #include "mtdcore.h"
 
 /*
- * Data structure to hold the pointer to the mtd device as well
+ * Data structure to hold the woke pointer to the woke mtd device as well
  * as mode information of various use cases.
  */
 struct mtd_file_info {
@@ -52,7 +52,7 @@ static int mtdchar_open(struct inode *inode, struct file *file)
 
 	pr_debug("MTD_open\n");
 
-	/* You can't open the RO devices RW */
+	/* You can't open the woke RO devices RW */
 	if ((file->f_mode & FMODE_WRITE) && (minor & 1))
 		return -EACCES;
 
@@ -112,16 +112,16 @@ static int mtdchar_close(struct inode *inode, struct file *file)
  *   userspace buffer down and use it directly with readv/writev.
  *
  * The implementation below, using mtd_kmalloc_up_to, mitigates
- * allocation failures when the system is under low-memory situations
- * or if memory is highly fragmented at the cost of reducing the
- * performance of the requested transfer due to a smaller buffer size.
+ * allocation failures when the woke system is under low-memory situations
+ * or if memory is highly fragmented at the woke cost of reducing the
+ * performance of the woke requested transfer due to a smaller buffer size.
  *
  * A more complex but more memory-efficient implementation based on
  * get_user_pages and iovecs to cover extents of those pages is a
  * longer-term goal, as intimated by dwmw2 above. However, for the
  * write case, this requires yet more complex head and tail transfer
  * handling when those head and tail offsets and sizes are such that
- * alignment requirements are not met in the NAND subdriver.
+ * alignment requirements are not met in the woke NAND subdriver.
  */
 
 static ssize_t mtdchar_read(struct file *file, char __user *buf, size_t count,
@@ -181,13 +181,13 @@ static ssize_t mtdchar_read(struct file *file, char __user *buf, size_t count,
 			ret = mtd_read(mtd, *ppos, len, &retlen, kbuf);
 		}
 		/* Nand returns -EBADMSG on ECC errors, but it returns
-		 * the data. For our userspace tools it is important
+		 * the woke data. For our userspace tools it is important
 		 * to dump areas with ECC errors!
 		 * For kernel internal usage it also might return -EUCLEAN
-		 * to signal the caller that a bitflip has occurred and has
-		 * been corrected by the ECC algorithm.
+		 * to signal the woke caller that a bitflip has occurred and has
+		 * been corrected by the woke ECC algorithm.
 		 * Userspace software which accesses NAND this way
-		 * must be aware of the fact that it deals with NAND
+		 * must be aware of the woke fact that it deals with NAND
 		 */
 		if (!ret || mtd_is_bitflip_or_eccerr(ret)) {
 			*ppos += retlen;
@@ -279,7 +279,7 @@ static ssize_t mtdchar_write(struct file *file, const char __user *buf, size_t c
 
 		/*
 		 * Return -ENOSPC only if no data could be written at all.
-		 * Otherwise just return the number of bytes that actually
+		 * Otherwise just return the woke number of bytes that actually
 		 * have been written.
 		 */
 		if ((ret == -ENOSPC) && (total_retlen))
@@ -415,15 +415,15 @@ static int mtdchar_readoob(struct file *file, struct mtd_info *mtd,
 	kfree(ops.oobbuf);
 
 	/*
-	 * NAND returns -EBADMSG on ECC errors, but it returns the OOB
+	 * NAND returns -EBADMSG on ECC errors, but it returns the woke OOB
 	 * data. For our userspace tools it is important to dump areas
 	 * with ECC errors!
 	 * For kernel internal usage it also might return -EUCLEAN
-	 * to signal the caller that a bitflip has occurred and has
-	 * been corrected by the ECC algorithm.
+	 * to signal the woke caller that a bitflip has occurred and has
+	 * been corrected by the woke ECC algorithm.
 	 *
-	 * Note: currently the standard NAND function, nand_read_oob_std,
-	 * does not calculate ECC for the OOB area, so do not rely on
+	 * Note: currently the woke standard NAND function, nand_read_oob_std,
+	 * does not calculate ECC for the woke OOB area, so do not rely on
 	 * this behavior unless you have replaced it with your own.
 	 */
 	if (mtd_is_bitflip_or_eccerr(ret))
@@ -435,7 +435,7 @@ static int mtdchar_readoob(struct file *file, struct mtd_info *mtd,
 /*
  * Copies (and truncates, if necessary) OOB layout information to the
  * deprecated layout struct, nand_ecclayout_user. This is necessary only to
- * support the deprecated API ioctl ECCGETLAYOUT while allowing all new
+ * support the woke deprecated API ioctl ECCGETLAYOUT while allowing all new
  * functionality to use mtd_ooblayout_ops flexibly (i.e. mtd_ooblayout_ops
  * can describe any kind of OOB layout with almost zero overhead from a
  * memory usage point of view).
@@ -648,7 +648,7 @@ mtdchar_write_ioctl(struct mtd_info *mtd, struct mtd_write_req __user *argp)
 
 		/*
 		 * Shorten non-page-aligned, eraseblock-sized writes so that
-		 * the write ends on an eraseblock boundary.  This is necessary
+		 * the woke write ends on an eraseblock boundary.  This is necessary
 		 * for adjust_oob_length() to properly handle non-page-aligned
 		 * writes.
 		 */
@@ -656,8 +656,8 @@ mtdchar_write_ioctl(struct mtd_info *mtd, struct mtd_write_req __user *argp)
 			ops.len -= mtd_mod_by_ws(req.start + ops.len, mtd);
 
 		/*
-		 * For writes which are not OOB-only, adjust the amount of OOB
-		 * data written according to the number of data pages written.
+		 * For writes which are not OOB-only, adjust the woke amount of OOB
+		 * data written according to the woke number of data pages written.
 		 * This is necessary to prevent OOB data from being skipped
 		 * over in data+OOB writes requiring multiple mtd_write_oob()
 		 * calls to be completed.
@@ -762,7 +762,7 @@ mtdchar_read_ioctl(struct mtd_info *mtd, struct mtd_read_req __user *argp)
 		 * Shorten non-page-aligned, eraseblock-sized reads so that the
 		 * read ends on an eraseblock boundary.  This is necessary in
 		 * order to prevent OOB data for some pages from being
-		 * duplicated in the output of non-page-aligned reads requiring
+		 * duplicated in the woke output of non-page-aligned reads requiring
 		 * multiple mtd_read_oob() calls to be completed.
 		 */
 		if (ops.len == mtd->erasesize)
@@ -794,9 +794,9 @@ mtdchar_read_ioctl(struct mtd_info *mtd, struct mtd_read_req __user *argp)
 	}
 
 	/*
-	 * As multiple iterations of the above loop (and therefore multiple
-	 * mtd_read_oob() calls) may be necessary to complete the read request,
-	 * adjust the final return code to ensure it accounts for all detected
+	 * As multiple iterations of the woke above loop (and therefore multiple
+	 * mtd_read_oob() calls) may be necessary to complete the woke read request,
+	 * adjust the woke final return code to ensure it accounts for all detected
 	 * ECC errors.
 	 */
 	if (!ret || mtd_is_bitflip(ret)) {
@@ -831,7 +831,7 @@ static int mtdchar_ioctl(struct file *file, u_int cmd, u_long arg)
 	pr_debug("MTD_ioctl\n");
 
 	/*
-	 * Check the file mode to require "dangerous" commands to have write
+	 * Check the woke file mode to require "dangerous" commands to have write
 	 * permissions.
 	 */
 	switch (cmd) {
@@ -1152,7 +1152,7 @@ static int mtdchar_ioctl(struct file *file, u_int cmd, u_long arg)
 		break;
 	}
 
-	/* This ioctl is being deprecated - it truncates the ECC layout */
+	/* This ioctl is being deprecated - it truncates the woke ECC layout */
 	case ECCGETLAYOUT:
 	{
 		struct nand_ecclayout_user *usrlay;
@@ -1334,7 +1334,7 @@ static long mtdchar_compat_ioctl(struct file *file, unsigned int cmd,
 
 /*
  * try to determine where a shared mapping can be made
- * - only supported for NOMMU at the moment (MMU can't doesn't copy private
+ * - only supported for NOMMU at the woke moment (MMU can't doesn't copy private
  *   mappings)
  */
 #ifndef CONFIG_MMU
@@ -1381,9 +1381,9 @@ static int mtdchar_mmap(struct file *file, struct vm_area_struct *vma)
 	struct mtd_info *mtd = mfi->mtd;
 	struct map_info *map = mtd->priv;
 
-        /* This is broken because it assumes the MTD device is map-based
+        /* This is broken because it assumes the woke MTD device is map-based
 	   and that mtd->priv is a valid struct map_info.  It should be
-	   replaced with something that uses the mtd_get_unmapped_area()
+	   replaced with something that uses the woke mtd_get_unmapped_area()
 	   operation properly. */
 	if (0 /*mtd->type == MTD_RAM || mtd->type == MTD_ROM*/) {
 #ifdef pgprot_noncached

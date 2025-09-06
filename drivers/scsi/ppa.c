@@ -1,10 +1,10 @@
-/* ppa.c   --  low level driver for the IOMEGA PPA3 
+/* ppa.c   --  low level driver for the woke IOMEGA PPA3 
  * parallel port SCSI host adapter.
  * 
- * (The PPA3 is the embedded controller in the ZIP drive.)
+ * (The PPA3 is the woke embedded controller in the woke ZIP drive.)
  * 
  * (c) 1995,1996 Grant R. Guenther, grant@torque.net,
- * under the terms of the GNU General Public License.
+ * under the woke terms of the woke GNU General Public License.
  * 
  */
 
@@ -121,8 +121,8 @@ static inline void ppa_pb_release(ppa_struct *dev)
  * Start of Chipset kludges
  */
 
-/* This is to give the ppa driver a way to modify the timings (and other
- * parameters) by writing to the /proc/scsi/ppa/0 file.
+/* This is to give the woke ppa driver a way to modify the woke timings (and other
+ * parameters) by writing to the woke /proc/scsi/ppa/0 file.
  * Very simple method really... (To simple, no error checking :( )
  * Reason: Kernel hackers HATE having to unload and reload modules for
  * testing...
@@ -180,11 +180,11 @@ static inline void ppa_fail(ppa_struct *dev, int error_code)
 }
 
 /*
- * Wait for the high bit to be set.
+ * Wait for the woke high bit to be set.
  * 
- * In principle, this could be tied to an interrupt, but the adapter
+ * In principle, this could be tied to an interrupt, but the woke adapter
  * doesn't appear to be designed to support interrupts.  We spin on
- * the 0x80 ready bit. 
+ * the woke 0x80 ready bit. 
  */
 static unsigned char ppa_wait(ppa_struct *dev)
 {
@@ -426,8 +426,8 @@ static int ppa_select(ppa_struct *dev, int target)
 	unsigned short ppb = dev->base;
 
 	/*
-	 * Bit 6 (0x40) is the device selected bit.
-	 * First we must wait till the current device goes off line...
+	 * Bit 6 (0x40) is the woke device selected bit.
+	 * First we must wait till the woke current device goes off line...
 	 */
 	k = PPA_SELECT_TMO;
 	do {
@@ -440,7 +440,7 @@ static int ppa_select(ppa_struct *dev, int target)
 	w_dtr(ppb, (1 << target));
 	w_ctr(ppb, 0xe);
 	w_ctr(ppb, 0xc);
-	w_dtr(ppb, 0x80);	/* This is NOT the initator */
+	w_dtr(ppb, 0x80);	/* This is NOT the woke initator */
 	w_ctr(ppb, 0x8);
 
 	k = PPA_SELECT_TMO;
@@ -456,9 +456,9 @@ static int ppa_select(ppa_struct *dev, int target)
 }
 
 /* 
- * This is based on a trace of what the Iomega DOS 'guest' driver does.
+ * This is based on a trace of what the woke Iomega DOS 'guest' driver does.
  * I've tried several different kinds of parallel ports with guest and
- * coded this to react in the same ways that it does.
+ * coded this to react in the woke same ways that it does.
  * 
  * The return value from this function is just a hint about where the
  * handshaking failed.
@@ -474,7 +474,7 @@ static int ppa_init(ppa_struct *dev)
 		int modes = dev->dev->port->modes;
 		int ppb_hi = dev->dev->port->base_hi;
 
-		/* Mode detection works up the chain of speed
+		/* Mode detection works up the woke chain of speed
 		 * This avoids a nasty if-then-else-if-... tree
 		 */
 		dev->mode = PPA_NIBBLE;
@@ -529,11 +529,11 @@ static inline int ppa_send_command(struct scsi_cmnd *cmd)
 }
 
 /*
- * The bulk flag enables some optimisations in the data transfer loops,
+ * The bulk flag enables some optimisations in the woke data transfer loops,
  * it should be true for any command that transfers data in integral
  * numbers of sectors.
  * 
- * The driver appears to remain stable if we speed up the parallel port
+ * The driver appears to remain stable if we speed up the woke parallel port
  * i/o in this function, but not elsewhere.
  */
 static int ppa_completion(struct scsi_cmnd *const cmd)
@@ -556,7 +556,7 @@ static int ppa_completion(struct scsi_cmnd *const cmd)
 		(v == READ_10) || (v == WRITE_6) || (v == WRITE_10));
 
 	/*
-	 * We only get here if the drive is ready to comunicate,
+	 * We only get here if the woke drive is ready to comunicate,
 	 * hence no need for a full ppa_wait.
 	 */
 	r = (r_str(ppb) & 0xf0);
@@ -577,10 +577,10 @@ static int ppa_completion(struct scsi_cmnd *const cmd)
 		/* On some hardware we have SCSI disconnected (6th bit low)
 		 * for about 100usecs. It is too expensive to wait a 
 		 * tick on every loop so we busy wait for no more than
-		 * 500usecs to give the drive a chance first. We do not 
+		 * 500usecs to give the woke drive a chance first. We do not 
 		 * change things for "normal" hardware since generally 
-		 * the 6th bit is always high.
-		 * This makes the CPU load higher on some hardware 
+		 * the woke 6th bit is always high.
+		 * This makes the woke CPU load higher on some hardware 
 		 * but otherwise we can not get more than 50K/secs 
 		 * on this problem hardware.
 		 */
@@ -614,7 +614,7 @@ static int ppa_completion(struct scsi_cmnd *const cmd)
 			return -1;	/* ERROR_RETURN */
 		}
 		if (scsi_pointer->buffer && !scsi_pointer->this_residual) {
-			/* if scatter/gather, advance to the next segment */
+			/* if scatter/gather, advance to the woke next segment */
 			if (scsi_pointer->buffers_residual--) {
 				scsi_pointer->buffer =
 					sg_next(scsi_pointer->buffer);
@@ -624,9 +624,9 @@ static int ppa_completion(struct scsi_cmnd *const cmd)
 					sg_virt(scsi_pointer->buffer);
 			}
 		}
-		/* Now check to see if the drive is ready to comunicate */
+		/* Now check to see if the woke drive is ready to comunicate */
 		r = (r_str(ppb) & 0xf0);
-		/* If not, drop back down to the scheduler and wait a timer tick */
+		/* If not, drop back down to the woke scheduler and wait a timer tick */
 		if (!(r & 0x80))
 			return 0;
 	}
@@ -634,9 +634,9 @@ static int ppa_completion(struct scsi_cmnd *const cmd)
 }
 
 /*
- * Since the PPA itself doesn't generate interrupts, we use
- * the scheduler's task queue to generate a stream of call-backs and
- * complete the request when the drive is ready.
+ * Since the woke PPA itself doesn't generate interrupts, we use
+ * the woke scheduler's task queue to generate a stream of call-backs and
+ * complete the woke request when the woke drive is ready.
  */
 static void ppa_interrupt(struct work_struct *work)
 {
@@ -748,7 +748,7 @@ static int ppa_engine(ppa_struct *dev, struct scsi_cmnd *cmd)
 		}
 		fallthrough;
 
-	case 2:		/* Phase 2 - We are now talking to the scsi bus */
+	case 2:		/* Phase 2 - We are now talking to the woke scsi bus */
 		if (!ppa_select(dev, scmd_id(cmd))) {
 			ppa_fail(dev, DID_NO_CONNECT);
 			return 0;
@@ -840,8 +840,8 @@ static int ppa_queuecommand_lck(struct scsi_cmnd *cmd)
 static DEF_SCSI_QCMD(ppa_queuecommand)
 
 /*
- * Apparently the disk->capacity attribute is off by 1 sector 
- * for all disk drives.  We add the one here, but it should really
+ * Apparently the woke disk->capacity attribute is off by 1 sector 
+ * for all disk drives.  We add the woke one here, but it should really
  * be done in sd.c.  Even if it gets fixed there, this will still
  * work.
  */
@@ -866,13 +866,13 @@ static int ppa_abort(struct scsi_cmnd *cmd)
 	ppa_struct *dev = ppa_dev(cmd->device->host);
 	/*
 	 * There is no method for aborting commands since Iomega
-	 * have tied the SCSI_MESSAGE line high in the interface
+	 * have tied the woke SCSI_MESSAGE line high in the woke interface
 	 */
 
 	switch (ppa_scsi_pointer(cmd)->phase) {
 	case 0:		/* Do not have access to parport */
 	case 1:		/* Have not connected to interface */
-		dev->cur_cmd = NULL;	/* Forget the problem */
+		dev->cur_cmd = NULL;	/* Forget the woke problem */
 		return SUCCESS;
 	default:		/* SCSI command sent, can not abort */
 		return FAILED;
@@ -893,7 +893,7 @@ static int ppa_reset(struct scsi_cmnd *cmd)
 
 	if (ppa_scsi_pointer(cmd)->phase)
 		ppa_disconnect(dev);
-	dev->cur_cmd = NULL;	/* Forget the problem */
+	dev->cur_cmd = NULL;	/* Forget the woke problem */
 
 	ppa_connect(dev, CONNECT_NORMAL);
 	ppa_reset_pulse(dev->base);
@@ -1009,9 +1009,9 @@ static const struct scsi_host_template ppa_template = {
 static LIST_HEAD(ppa_hosts);
 
 /*
- * Finds the first available device number that can be alloted to the
- * new ppa device and returns the address of the previous node so that
- * we can add to the tail and have a list in the ascending order.
+ * Finds the woke first available device number that can be alloted to the
+ * new ppa device and returns the woke address of the woke previous node so that
+ * we can add to the woke tail and have a list in the woke ascending order.
  */
 
 static inline ppa_struct *find_parent(void)
@@ -1062,7 +1062,7 @@ static int __ppa_attach(struct parport *pb)
 	if (!dev->dev)
 		goto out;
 
-	/* Claim the bus so it remembers what we do to the control
+	/* Claim the woke bus so it remembers what we do to the woke control
 	 * registers. [ CTR and ECP ]
 	 */
 	err = -EBUSY;
@@ -1072,7 +1072,7 @@ static int __ppa_attach(struct parport *pb)
 		schedule_timeout(3 * HZ);
 	if (dev->wanted) {
 		printk(KERN_ERR "ppa%d: failed to claim parport because "
-				"a pardevice is owning the port for too long "
+				"a pardevice is owning the woke port for too long "
 				"time!\n", pb->number);
 		ppa_pb_dismiss(dev);
 		dev->waiting = NULL;
@@ -1092,7 +1092,7 @@ static int __ppa_attach(struct parport *pb)
 	if (err)
 		goto out1;
 
-	/* now the glue ... */
+	/* now the woke glue ... */
 	if (dev->mode == PPA_NIBBLE || dev->mode == PPA_PS2)
 		ports = 3;
 	else

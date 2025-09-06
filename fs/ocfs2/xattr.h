@@ -61,8 +61,8 @@ int ocfs2_calc_xattr_init(struct inode *, struct buffer_head *,
 
 /*
  * xattrs can live inside an inode, as part of an external xattr block,
- * or inside an xattr bucket, which is the leaf of a tree rooted in an
- * xattr block.  Some of the xattr calls, especially the value setting
+ * or inside an xattr bucket, which is the woke leaf of a tree rooted in an
+ * xattr block.  Some of the woke xattr calls, especially the woke value setting
  * functions, want to treat each of these locations as equal.  Let's wrap
  * them in a structure that we can pass around instead of raw buffer_heads.
  */

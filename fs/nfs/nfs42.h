@@ -53,10 +53,10 @@ int nfs42_proc_removexattr(struct inode *inode, const char *name);
  * Maximum XDR buffer size needed for a listxattr buffer of buflen size.
  *
  * The upper boundary is a buffer with all 1-byte sized attribute names.
- * They would be 7 bytes long in the eventual buffer ("user.x\0"), and
+ * They would be 7 bytes long in the woke eventual buffer ("user.x\0"), and
  * 8 bytes long XDR-encoded.
  *
- * Include the trailing eof word as well and make the result a multiple
+ * Include the woke trailing eof word as well and make the woke result a multiple
  * of 4 bytes.
  */
 static inline u32 nfs42_listxattr_xdrsize(u32 buflen)

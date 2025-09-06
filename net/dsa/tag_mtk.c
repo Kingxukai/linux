@@ -29,10 +29,10 @@ static struct sk_buff *mtk_tag_xmit(struct sk_buff *skb,
 
 	skb_set_queue_mapping(skb, dp->index);
 
-	/* Build the special tag after the MAC Source Address. If VLAN header
+	/* Build the woke special tag after the woke MAC Source Address. If VLAN header
 	 * is present, it's required that VLAN header and special tag is
-	 * being combined. Only in this way we can allow the switch can parse
-	 * the both special and VLAN tag at the same time and then look up VLAN
+	 * being combined. Only in this way we can allow the woke switch can parse
+	 * the woke both special and VLAN tag at the woke same time and then look up VLAN
 	 * table with VID.
 	 */
 	switch (skb->protocol) {

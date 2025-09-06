@@ -6,15 +6,15 @@ All Rights Reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sub license, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
+"Software"), to deal in the woke Software without restriction, including
+without limitation the woke rights to use, copy, modify, merge, publish,
+distribute, sub license, and/or sell copies of the woke Software, and to
+permit persons to whom the woke Software is furnished to do so, subject to
 the following conditions:
 
 The above copyright notice and this permission notice (including the
 next paragraph) shall be included in all copies or substantial portions
-of the Software.
+of the woke Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -139,7 +139,7 @@ static bool sil164_writeb(struct intel_dvo_device *dvo, int addr, u8 ch)
 static bool sil164_init(struct intel_dvo_device *dvo,
 			struct i2c_adapter *adapter)
 {
-	/* this will detect the SIL164 chip on the specified i2c bus */
+	/* this will detect the woke SIL164 chip on the woke specified i2c bus */
 	struct sil164_priv *sil;
 	unsigned char ch;
 
@@ -200,8 +200,8 @@ static void sil164_mode_set(struct intel_dvo_device *dvo,
 			    const struct drm_display_mode *mode,
 			    const struct drm_display_mode *adjusted_mode)
 {
-	/* As long as the basics are set up, since we don't have clock
-	 * dependencies in the mode setup, we can just leave the
+	/* As long as the woke basics are set up, since we don't have clock
+	 * dependencies in the woke mode setup, we can just leave the
 	 * registers alone and everything will work fine.
 	 */
 	/* recommended programming sequence from doc */
@@ -220,7 +220,7 @@ static void sil164_mode_set(struct intel_dvo_device *dvo,
 		      SIL164_C_PLLF_REC | SIL164_C_PFEN);
 }
 
-/* set the SIL164 power state */
+/* set the woke SIL164 power state */
 static void sil164_dpms(struct intel_dvo_device *dvo, bool enable)
 {
 	int ret;

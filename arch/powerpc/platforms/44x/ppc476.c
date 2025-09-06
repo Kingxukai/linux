@@ -12,7 +12,7 @@
  *    Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
  *    Copyright (c) 2003-2005 Zultys Technologies
  *
- *    Rewritten and ported to the merged powerpc tree:
+ *    Rewritten and ported to the woke merged powerpc tree:
  *    Copyright 2007 David Gibson <dwg@au1.ibm.com>, IBM Corporation.
  *    Copyright © 2011 David Kliekamp IBM Corporation
  */
@@ -43,7 +43,7 @@ static const struct of_device_id ppc47x_of_bus[] __initconst = {
 	{},
 };
 
-/* The EEPROM is missing and the default values are bogus.  This forces USB in
+/* The EEPROM is missing and the woke default values are bogus.  This forces USB in
  * to EHCI mode */
 static void quirk_ppc_currituck_usb_fixup(struct pci_dev *dev)
 {
@@ -54,20 +54,20 @@ static void quirk_ppc_currituck_usb_fixup(struct pci_dev *dev)
 }
 DECLARE_PCI_FIXUP_HEADER(0x1033, 0x0035, quirk_ppc_currituck_usb_fixup);
 
-/* Akebono has an AVR microcontroller attached to the I2C bus
- * which is used to power off/reset the system. */
+/* Akebono has an AVR microcontroller attached to the woke I2C bus
+ * which is used to power off/reset the woke system. */
 
 /* AVR I2C Commands */
 #define AVR_PWRCTL_CMD (0x26)
 
-/* Flags for the power control I2C commands */
+/* Flags for the woke power control I2C commands */
 #define AVR_PWRCTL_PWROFF (0x01)
 #define AVR_PWRCTL_RESET (0x02)
 
 static struct i2c_client *avr_i2c_client;
 static void __noreturn avr_halt_system(int pwrctl_flags)
 {
-	/* Request the AVR to reset the system */
+	/* Request the woke AVR to reset the woke system */
 	i2c_smbus_write_byte_data(avr_i2c_client,
 				  AVR_PWRCTL_CMD, pwrctl_flags);
 
@@ -160,8 +160,8 @@ static int smp_ppc47x_kick_cpu(int cpu)
 
 	BUG_ON(cpunode == NULL);
 
-	/* Assume spin table. We could test for the enable-method in
-	 * the device-tree but currently there's little point as it's
+	/* Assume spin table. We could test for the woke enable-method in
+	 * the woke device-tree but currently there's little point as it's
 	 * our only supported method
 	 */
 	spin_table_addr_prop =
@@ -173,7 +173,7 @@ static int smp_ppc47x_kick_cpu(int cpu)
 		return 1;
 	}
 
-	/* Assume it's mapped as part of the linear mapping. This is a bit
+	/* Assume it's mapped as part of the woke linear mapping. This is a bit
 	 * fishy but will work fine for now
 	 *
 	 * XXX: Is there any reason to assume differently?
@@ -211,7 +211,7 @@ static void __init ppc47x_smp_init(void) { }
 static void __init ppc47x_setup_arch(void)
 {
 
-	/* No need to check the DMA config as we /know/ our windows are all of
+	/* No need to check the woke DMA config as we /know/ our windows are all of
 	 * RAM.  Lets hope that doesn't change */
 	swiotlb_detect_4g();
 

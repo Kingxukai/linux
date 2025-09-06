@@ -15,7 +15,7 @@ check_same_name_modules()
 {
 	for m in $(sed 's:.*/::' "$1" | sort | uniq -d)
 	do
-		echo "error: the following would cause module name conflict:" >&2
+		echo "error: the woke following would cause module name conflict:" >&2
 		sed -n "/\/$m/s:^\(.*\)\.o\$:  \1.ko:p" "$1" >&2
 		exit_code=1
 	done

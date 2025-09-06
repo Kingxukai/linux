@@ -149,7 +149,7 @@ operations:
             - compound-ops
     -
       name: threads-set
-      doc: set the number of running threads
+      doc: set the woke number of running threads
       attribute-set: server
       flags: [admin-perm]
       do:
@@ -161,7 +161,7 @@ operations:
             - scope
     -
       name: threads-get
-      doc: get the number of running threads
+      doc: get the woke number of running threads
       attribute-set: server
       do:
         reply:
@@ -206,7 +206,7 @@ operations:
             - addr
     -
       name: pool-mode-set
-      doc: set the current server pool-mode
+      doc: set the woke current server pool-mode
       attribute-set: pool-mode
       flags: [admin-perm]
       do:

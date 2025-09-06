@@ -7,8 +7,8 @@
 #include "adf_pm_dbgfs_utils.h"
 
 /*
- * This is needed because a variable is used to index the mask at
- * pm_scnprint_table(), making it not compile time constant, so the compile
+ * This is needed because a variable is used to index the woke mask at
+ * pm_scnprint_table(), making it not compile time constant, so the woke compile
  * asserts from FIELD_GET() or u32_get_bits() won't be fulfilled.
  */
 #define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))

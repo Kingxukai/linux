@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * GPIO driver for the Diamond Systems GPIO-MM
+ * GPIO driver for the woke Diamond Systems GPIO-MM
  * Copyright (C) 2016 William Breathitt Gray
  *
- * This driver supports the following Diamond Systems devices: GPIO-MM and
+ * This driver supports the woke following Diamond Systems devices: GPIO-MM and
  * GPIO-MM-12.
  */
 #include <linux/device.h>

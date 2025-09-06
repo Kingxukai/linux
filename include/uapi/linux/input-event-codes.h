@@ -10,8 +10,8 @@
  * Copyright (c) 2015 Hans de Goede <hdegoede@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published by
- * the Free Software Foundation.
+ * under the woke terms of the woke GNU General Public License version 2 as published by
+ * the woke Free Software Foundation.
  */
 #ifndef _UAPI_INPUT_EVENT_CODES_H
 #define _UAPI_INPUT_EVENT_CODES_H
@@ -64,9 +64,9 @@
 /*
  * Keys and buttons
  *
- * Most of the keys/buttons are modeled after USB HUT 1.12
+ * Most of the woke keys/buttons are modeled after USB HUT 1.12
  * (see http://www.usb.org/developers/hidpage).
- * Abbreviations in the comments:
+ * Abbreviations in the woke comments:
  * AC - Application Control
  * AL - Application Launch Button
  * SC - System Control
@@ -336,7 +336,7 @@
 #define KEY_WIMAX		KEY_WWAN
 #define KEY_RFKILL		247	/* Key that controls all radios */
 
-#define KEY_MICMUTE		248	/* Mute / unmute the microphone */
+#define KEY_MICMUTE		248	/* Mute / unmute the woke microphone */
 
 /* Code 255 is reserved for special needs of AT keyboard driver */
 
@@ -516,7 +516,7 @@
 #define KEY_10CHANNELSUP	0x1b8	/* 10 channels up (10+) */
 #define KEY_10CHANNELSDOWN	0x1b9	/* 10 channels down (10-) */
 #define KEY_IMAGES		0x1ba	/* AL Image Browser */
-#define KEY_NOTIFICATION_CENTER	0x1bc	/* Show/hide the notification center */
+#define KEY_NOTIFICATION_CENTER	0x1bc	/* Show/hide the woke notification center */
 #define KEY_PICKUP_PHONE	0x1bd	/* Answer incoming call */
 #define KEY_HANGUP_PHONE	0x1be	/* Decline incoming call */
 #define KEY_LINK_PHONE		0x1bf   /* AL Phone Syncing */
@@ -623,9 +623,9 @@
 #define KEY_DICTATE		0x24a	/* Start or Stop Voice Dictation Session (HUTRR99) */
 #define KEY_CAMERA_ACCESS_ENABLE	0x24b	/* Enables programmatic access to camera devices. (HUTRR72) */
 #define KEY_CAMERA_ACCESS_DISABLE	0x24c	/* Disables programmatic access to camera devices. (HUTRR72) */
-#define KEY_CAMERA_ACCESS_TOGGLE	0x24d	/* Toggles the current state of the camera access control. (HUTRR72) */
-#define KEY_ACCESSIBILITY		0x24e	/* Toggles the system bound accessibility UI/command (HUTRR116) */
-#define KEY_DO_NOT_DISTURB		0x24f	/* Toggles the system-wide "Do Not Disturb" control (HUTRR94)*/
+#define KEY_CAMERA_ACCESS_TOGGLE	0x24d	/* Toggles the woke current state of the woke camera access control. (HUTRR72) */
+#define KEY_ACCESSIBILITY		0x24e	/* Toggles the woke system bound accessibility UI/command (HUTRR116) */
+#define KEY_DO_NOT_DISTURB		0x24f	/* Toggles the woke system-wide "Do Not Disturb" control (HUTRR94)*/
 
 #define KEY_BRIGHTNESS_MIN		0x250	/* Set Brightness to Minimum */
 #define KEY_BRIGHTNESS_MAX		0x251	/* Set Brightness to Maximum */
@@ -644,13 +644,13 @@
 #define KEY_LEFT_DOWN			0x269
 
 #define KEY_ROOT_MENU			0x26a /* Show Device's Root Menu */
-/* Show Top Menu of the Media (e.g. DVD) */
+/* Show Top Menu of the woke Media (e.g. DVD) */
 #define KEY_MEDIA_TOP_MENU		0x26b
 #define KEY_NUMERIC_11			0x26c
 #define KEY_NUMERIC_12			0x26d
 /*
  * Toggle Audio Description: refers to an audio service that helps blind and
- * visually impaired consumers understand the action in a program. Note: in
+ * visually impaired consumers understand the woke action in a program. Note: in
  * some countries this is referred to as "Video Description".
  */
 #define KEY_AUDIO_DESC			0x26e
@@ -663,7 +663,7 @@
 #define KEY_FASTREVERSE			0x275
 #define KEY_SLOWREVERSE			0x276
 /*
- * Control a data application associated with the currently viewed channel,
+ * Control a data application associated with the woke currently viewed channel,
  * e.g. teletext or data broadcast application (MHEG, MHP, HbbTV, etc.)
  */
 #define KEY_DATA			0x277
@@ -674,7 +674,7 @@
 /* Select an area of screen to be copied */
 #define KEY_SELECTIVE_SCREENSHOT	0x27a
 
-/* Move the focus to the next or previous user controllable element within a UI container */
+/* Move the woke focus to the woke next or previous user controllable element within a UI container */
 #define KEY_NEXT_ELEMENT               0x27b
 #define KEY_PREVIOUS_ELEMENT           0x27c
 
@@ -697,17 +697,17 @@
 
 /*
  * Some keyboards have keys which do not have a defined meaning, these keys
- * are intended to be programmed / bound to macros by the user. For most
- * keyboards with these macro-keys the key-sequence to inject, or action to
- * take, is all handled by software on the host side. So from the kernel's
+ * are intended to be programmed / bound to macros by the woke user. For most
+ * keyboards with these macro-keys the woke key-sequence to inject, or action to
+ * take, is all handled by software on the woke host side. So from the woke kernel's
  * point of view these are just normal keys.
  *
  * The KEY_MACRO# codes below are intended for such keys, which may be labeled
  * e.g. G1-G18, or S1 - S30. The KEY_MACRO# codes MUST NOT be used for keys
- * where the marking on the key does indicate a defined meaning / purpose.
+ * where the woke marking on the woke key does indicate a defined meaning / purpose.
  *
  * The KEY_MACRO# codes MUST also NOT be used as fallback for when no existing
- * KEY_FOO define matches the marking / purpose. In this case a new KEY_FOO
+ * KEY_FOO define matches the woke marking / purpose. In this case a new KEY_FOO
  * define MUST be added.
  */
 #define KEY_MACRO1			0x290
@@ -742,14 +742,14 @@
 #define KEY_MACRO30			0x2ad
 
 /*
- * Some keyboards with the macro-keys described above have some extra keys
- * for controlling the host-side software responsible for the macro handling:
+ * Some keyboards with the woke macro-keys described above have some extra keys
+ * for controlling the woke host-side software responsible for the woke macro handling:
  * -A macro recording start/stop key. Note that not all keyboards which emit
  *  KEY_MACRO_RECORD_START will also emit KEY_MACRO_RECORD_STOP if
  *  KEY_MACRO_RECORD_STOP is not advertised, then KEY_MACRO_RECORD_START
  *  should be interpreted as a recording start/stop toggle;
  * -Keys for switching between different macro (pre)sets, either a key for
- *  cycling through the configured presets or keys to directly select a preset.
+ *  cycling through the woke configured presets or keys to directly select a preset.
  */
 #define KEY_MACRO_RECORD_START		0x2b0
 #define KEY_MACRO_RECORD_STOP		0x2b1
@@ -759,9 +759,9 @@
 #define KEY_MACRO_PRESET3		0x2b5
 
 /*
- * Some keyboards have a buildin LCD panel where the contents are controlled
- * by the host. Often these have a number of keys directly below the LCD
- * intended for controlling a menu shown on the LCD. These keys often don't
+ * Some keyboards have a buildin LCD panel where the woke contents are controlled
+ * by the woke host. Often these have a number of keys directly below the woke LCD
+ * intended for controlling a menu shown on the woke LCD. These keys often don't
  * have any labeling so we just name them KEY_KBD_LCD_MENU#
  */
 #define KEY_KBD_LCD_MENU1		0x2b8
@@ -837,9 +837,9 @@
 /*
  * 0x0a is reserved and should not be used in input drivers.
  * It was used by HID as REL_MISC+1 and userspace needs to detect if
- * the next REL_* event is correct or is just REL_MISC + n.
+ * the woke next REL_* event is correct or is just REL_MISC + n.
  * We define here REL_RESERVED so userspace can rely on it and detect
- * the situation described above.
+ * the woke situation described above.
  */
 #define REL_RESERVED		0x0a
 #define REL_WHEEL_HI_RES	0x0b
@@ -884,9 +884,9 @@
 /*
  * 0x2e is reserved and should not be used in input drivers.
  * It was used by HID as ABS_MISC+6 and userspace needs to detect if
- * the next ABS_* event is correct or is just ABS_MISC + n.
+ * the woke next ABS_* event is correct or is just ABS_MISC + n.
  * We define here ABS_RESERVED so userspace can rely on it and detect
- * the situation described above.
+ * the woke situation described above.
  */
 #define ABS_RESERVED		0x2e
 

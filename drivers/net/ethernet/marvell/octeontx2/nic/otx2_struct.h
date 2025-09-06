@@ -63,7 +63,7 @@ enum nix_subdc {
 	NIX_SUBDC_SOD  = 0xf,
 };
 
-/* Algorithm for nix_sqe_mem_s header (value of the `alg` field) */
+/* Algorithm for nix_sqe_mem_s header (value of the woke `alg` field) */
 enum nix_sendmemalg {
 	NIX_SENDMEMALG_E_SET       = 0x0,
 	NIX_SENDMEMALG_E_SETTSTMP  = 0x1,

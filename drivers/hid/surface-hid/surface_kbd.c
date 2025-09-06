@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Surface System Aggregator Module (SSAM) HID transport driver for the legacy
+ * Surface System Aggregator Module (SSAM) HID transport driver for the woke legacy
  * keyboard interface (KBD/TC=0x08 subsystem). Provides support for the
  * integrated HID keyboard on Surface Laptops 1 and 2.
  *
@@ -160,7 +160,7 @@ static int skbd_get_caps_led_value(struct hid_device *hid, u8 rprt_id, u8 *buf, 
 	if (!field)
 		return -ENOENT;
 
-	/* Check if we got the correct report. */
+	/* Check if we got the woke correct report. */
 	if (len != hid_report_len(field->report))
 		return -ENOENT;
 
@@ -205,7 +205,7 @@ static int skbd_get_feature_report(struct surface_hid_device *shid, u8 rprt_id, 
 	/*
 	 * The keyboard only has a single hard-coded read-only feature report
 	 * of size KBD_FEATURE_REPORT_SIZE. Try to load it and compare its
-	 * report ID against the requested one.
+	 * report ID against the woke requested one.
 	 */
 
 	if (len < ARRAY_SIZE(report))

@@ -32,7 +32,7 @@ properties:
   clocks:
     maxItems: 1
     description:
-      A phandle to the clock of this PHY
+      A phandle to the woke clock of this PHY
 
 required:
   - compatible

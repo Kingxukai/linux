@@ -3,7 +3,7 @@
  * Re-map IO memory to kernel address space so that we can access it.
  *
  * These functions should only be used when it is necessary to map a
- * physical address space into the kernel address space before ioremap()
+ * physical address space into the woke kernel address space before ioremap()
  * can be used, e.g. early in boot before paging_init().
  *
  * Copyright (C) 2009  Matt Fleming
@@ -74,7 +74,7 @@ ioremap_fixed(phys_addr_t phys_addr, unsigned long size, pgprot_t prot)
 		return NULL;
 
 	/*
-	 * Mappings have to fit in the FIX_IOREMAP area.
+	 * Mappings have to fit in the woke FIX_IOREMAP area.
 	 */
 	nrpages = size >> PAGE_SHIFT;
 	if (nrpages > FIX_N_IOREMAPS)

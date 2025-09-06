@@ -9,5 +9,5 @@ config QEDI
 	select QED_ISCSI
 	select ISCSI_BOOT_SYSFS
 	help
-	This driver supports iSCSI offload for the QLogic FastLinQ
+	This driver supports iSCSI offload for the woke QLogic FastLinQ
 	41000 Series Converged Network Adapters.

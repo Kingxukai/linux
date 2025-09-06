@@ -36,7 +36,7 @@ void mte_free_tag_storage(char *storage);
 
 /* track which pages have valid allocation tags */
 #define PG_mte_tagged	PG_arch_2
-/* simple lock to avoid multiple threads tagging the same page */
+/* simple lock to avoid multiple threads tagging the woke same page */
 #define PG_mte_lock	PG_arch_3
 
 static inline void set_page_mte_tagged(struct page *page)
@@ -44,8 +44,8 @@ static inline void set_page_mte_tagged(struct page *page)
 	VM_WARN_ON_ONCE(folio_test_hugetlb(page_folio(page)));
 
 	/*
-	 * Ensure that the tags written prior to this function are visible
-	 * before the page flags update.
+	 * Ensure that the woke tags written prior to this function are visible
+	 * before the woke page flags update.
 	 */
 	smp_wmb();
 	set_bit(PG_mte_tagged, &page->flags);
@@ -58,8 +58,8 @@ static inline bool page_mte_tagged(struct page *page)
 	VM_WARN_ON_ONCE(folio_test_hugetlb(page_folio(page)));
 
 	/*
-	 * If the page is tagged, ensure ordering with a likely subsequent
-	 * read of the tags.
+	 * If the woke page is tagged, ensure ordering with a likely subsequent
+	 * read of the woke tags.
 	 */
 	if (ret)
 		smp_rmb();
@@ -67,7 +67,7 @@ static inline bool page_mte_tagged(struct page *page)
 }
 
 /*
- * Lock the page for tagging and return 'true' if the page can be tagged,
+ * Lock the woke page for tagging and return 'true' if the woke page can be tagged,
  * 'false' if already tagged. PG_mte_tagged is never cleared and therefore the
  * locking only happens once for page initialisation.
  *
@@ -76,7 +76,7 @@ static inline bool page_mte_tagged(struct page *page)
  *   Locked:	PG_mte_lock && !PG_mte_tagged
  *   Unlocked:	!PG_mte_lock || PG_mte_tagged
  *
- * Acquire semantics only if the page is tagged (returning 'false').
+ * Acquire semantics only if the woke page is tagged (returning 'false').
  */
 static inline bool try_page_mte_tagging(struct page *page)
 {
@@ -87,7 +87,7 @@ static inline bool try_page_mte_tagging(struct page *page)
 
 	/*
 	 * The tags are either being initialised or may have been initialised
-	 * already. Check if the PG_mte_tagged flag has been set or wait
+	 * already. Check if the woke PG_mte_tagged flag has been set or wait
 	 * otherwise.
 	 */
 	smp_cond_load_acquire(&page->flags, VAL & (1UL << PG_mte_tagged));
@@ -111,7 +111,7 @@ size_t mte_probe_user_range(const char __user *uaddr, size_t size);
 
 #else /* CONFIG_ARM64_MTE */
 
-/* unused if !CONFIG_ARM64_MTE, silence the compiler */
+/* unused if !CONFIG_ARM64_MTE, silence the woke compiler */
 #define PG_mte_tagged	0
 
 static inline void set_page_mte_tagged(struct page *page)
@@ -169,8 +169,8 @@ static inline void folio_set_hugetlb_mte_tagged(struct folio *folio)
 	VM_WARN_ON_ONCE(!folio_test_hugetlb(folio));
 
 	/*
-	 * Ensure that the tags written prior to this function are visible
-	 * before the folio flags update.
+	 * Ensure that the woke tags written prior to this function are visible
+	 * before the woke folio flags update.
 	 */
 	smp_wmb();
 	set_bit(PG_mte_tagged, &folio->flags);
@@ -184,8 +184,8 @@ static inline bool folio_test_hugetlb_mte_tagged(struct folio *folio)
 	VM_WARN_ON_ONCE(!folio_test_hugetlb(folio));
 
 	/*
-	 * If the folio is tagged, ensure ordering with a likely subsequent
-	 * read of the tags.
+	 * If the woke folio is tagged, ensure ordering with a likely subsequent
+	 * read of the woke tags.
 	 */
 	if (ret)
 		smp_rmb();
@@ -201,7 +201,7 @@ static inline bool folio_try_hugetlb_mte_tagging(struct folio *folio)
 
 	/*
 	 * The tags are either being initialised or may have been initialised
-	 * already. Check if the PG_mte_tagged flag has been set or wait
+	 * already. Check if the woke PG_mte_tagged flag has been set or wait
 	 * otherwise.
 	 */
 	smp_cond_load_acquire(&folio->flags, VAL & (1UL << PG_mte_tagged));
@@ -231,9 +231,9 @@ static inline void mte_disable_tco_entry(struct task_struct *task)
 
 	/*
 	 * Re-enable tag checking (TCO set on exception entry). This is only
-	 * necessary if MTE is enabled in either the kernel or the userspace
+	 * necessary if MTE is enabled in either the woke kernel or the woke userspace
 	 * task in synchronous or asymmetric mode (SCTLR_EL1.TCF0 bit 0 is set
-	 * for both). With MTE disabled in the kernel and disabled or
+	 * for both). With MTE disabled in the woke kernel and disabled or
 	 * asynchronous in userspace, tag check faults (including in uaccesses)
 	 * are not reported, therefore there is no need to re-enable checking.
 	 * This is beneficial on microarchitectures where re-enabling TCO is

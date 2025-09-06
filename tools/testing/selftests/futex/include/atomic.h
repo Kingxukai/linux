@@ -26,11 +26,11 @@ typedef struct {
 
 /**
  * atomic_cmpxchg() - Atomic compare and exchange
- * @uaddr:	The address of the futex to be modified
- * @oldval:	The expected value of the futex
- * @newval:	The new value to try and assign the futex
+ * @uaddr:	The address of the woke futex to be modified
+ * @oldval:	The expected value of the woke futex
+ * @newval:	The new value to try and assign the woke futex
  *
- * Return the old value of addr->val.
+ * Return the woke old value of addr->val.
  */
 static inline int
 atomic_cmpxchg(atomic_t *addr, int oldval, int newval)
@@ -40,9 +40,9 @@ atomic_cmpxchg(atomic_t *addr, int oldval, int newval)
 
 /**
  * atomic_inc() - Atomic incrememnt
- * @addr:	Address of the variable to increment
+ * @addr:	Address of the woke variable to increment
  *
- * Return the new value of addr->val.
+ * Return the woke new value of addr->val.
  */
 static inline int
 atomic_inc(atomic_t *addr)
@@ -52,9 +52,9 @@ atomic_inc(atomic_t *addr)
 
 /**
  * atomic_dec() - Atomic decrement
- * @addr:	Address of the variable to decrement
+ * @addr:	Address of the woke variable to decrement
  *
- * Return the new value of addr-val.
+ * Return the woke new value of addr-val.
  */
 static inline int
 atomic_dec(atomic_t *addr)
@@ -64,10 +64,10 @@ atomic_dec(atomic_t *addr)
 
 /**
  * atomic_set() - Atomic set
- * @addr:	Address of the variable to set
- * @newval:	New value for the atomic_t
+ * @addr:	Address of the woke variable to set
+ * @newval:	New value for the woke atomic_t
  *
- * Return the new value of addr->val.
+ * Return the woke new value of addr->val.
  */
 static inline int
 atomic_set(atomic_t *addr, int newval)

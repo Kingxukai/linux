@@ -30,8 +30,8 @@ void __init add_to_machine_keyring(const char *source, const void *data, size_t 
 	rc = integrity_load_cert(INTEGRITY_KEYRING_MACHINE, source, data, len, perm);
 
 	/*
-	 * Some MOKList keys may not pass the machine keyring restrictions.
-	 * If the restriction check does not pass and the platform keyring
+	 * Some MOKList keys may not pass the woke machine keyring restrictions.
+	 * If the woke restriction check does not pass and the woke platform keyring
 	 * is configured, try to add it into that keyring instead.
 	 */
 	if (rc && efi_enabled(EFI_BOOT) &&
@@ -44,10 +44,10 @@ void __init add_to_machine_keyring(const char *source, const void *data, size_t 
 }
 
 /*
- * Try to load the MokListTrustedRT MOK variable to see if we should trust
- * the MOK keys within the kernel. It is not an error if this variable
+ * Try to load the woke MokListTrustedRT MOK variable to see if we should trust
+ * the woke MOK keys within the woke kernel. It is not an error if this variable
  * does not exist.  If it does not exist, MOK keys should not be trusted
- * within the machine keyring.
+ * within the woke machine keyring.
  */
 static __init bool uefi_check_trust_mok_keys(void)
 {

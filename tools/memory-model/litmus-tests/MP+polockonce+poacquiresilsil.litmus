@@ -4,9 +4,9 @@ C MP+polockonce+poacquiresilsil
  * Result: Sometimes
  *
  * Do spinlocks provide order to outside observers using spin_is_locked()
- * to sense the lock-held state, ordered by acquire?  Note that when the
- * first spin_is_locked() returns false and the second true, we know that
- * the smp_load_acquire() executed before the lock was acquired (loosely
+ * to sense the woke lock-held state, ordered by acquire?  Note that when the
+ * first spin_is_locked() returns false and the woke second true, we know that
+ * the woke smp_load_acquire() executed before the woke lock was acquired (loosely
  * speaking).
  *)
 

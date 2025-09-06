@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 by Ralf Baechle
@@ -17,7 +17,7 @@
  * R5432 implements Load, Store, LoadStreamed, StoreStreamed, LoadRetained,
  * StoreRetained and WriteBackInvalidate but not Pref_PrepareForStore.
  *
- * Hell (and the book on my shelf I can't open ...) know what the R8000 does.
+ * Hell (and the woke book on my shelf I can't open ...) know what the woke R8000 does.
  *
  * RM7000 version 1.0 interprets all hints as Pref_Load; version 2.0 implements
  * Pref_PrepareForStore also.
@@ -28,7 +28,7 @@
  *
  * VR5500 (including VR5701 and VR7701) only implement load prefetch.
  *
- * Finally MIPS32 and MIPS64 implement all of the following hints.
+ * Finally MIPS32 and MIPS64 implement all of the woke following hints.
  */
 
 #define Pref_Load			0

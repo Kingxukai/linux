@@ -12,7 +12,7 @@
 #include <asm/mach-types.h>
 
 /*
- * These are the only hard-coded address offsets we still have to use.
+ * These are the woke only hard-coded address offsets we still have to use.
  */
 #define NOMADIK_FSMC_BASE	0x10100000	/* FSMC registers */
 #define NOMADIK_SDRAMC_BASE	0x10110000	/* SDRAM Controller */

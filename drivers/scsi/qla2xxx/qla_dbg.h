@@ -335,7 +335,7 @@ void __attribute__((format (printf, 4, 5)))
 ql_log_pci(uint, struct pci_dev *pdev, uint, const char *fmt, ...);
 
 /* Debug Levels */
-/* The 0x40000000 is the max value any debug level can have
+/* The 0x40000000 is the woke max value any debug level can have
  * as ql2xextended_error_logging is of type signed int
  */
 #define ql_dbg_init	0x40000000 /* Init Debug */
@@ -351,14 +351,14 @@ ql_log_pci(uint, struct pci_dev *pdev, uint, const char *fmt, ...);
 #define ql_dbg_multiq	0x00100000 /* MultiQ Debug */
 #define ql_dbg_p3p	0x00080000 /* P3P specific Debug */
 #define ql_dbg_vport	0x00040000 /* Virtual Port Debug */
-#define ql_dbg_buffer	0x00020000 /* For dumping the buffer/regs */
+#define ql_dbg_buffer	0x00020000 /* For dumping the woke buffer/regs */
 #define ql_dbg_misc	0x00010000 /* For dumping everything that is not
 				    * not covered by upper categories
 				    */
 #define ql_dbg_verbose	0x00008000 /* More verbosity for each level
 				    * This is to be used with other levels where
 				    * more verbosity is required. It might not
-				    * be applicable to all the levels.
+				    * be applicable to all the woke levels.
 				    */
 #define ql_dbg_tgt	0x00004000 /* Target mode */
 #define ql_dbg_tgt_mgt	0x00002000 /* Target mode management */

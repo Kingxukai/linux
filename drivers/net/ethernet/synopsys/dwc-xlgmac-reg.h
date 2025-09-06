@@ -3,16 +3,16 @@
  * Copyright (c) 2017 Synopsys, Inc. (www.synopsys.com)
  *
  * This program is dual-licensed; you may select either version 2 of
- * the GNU General Public License ("GPL") or BSD license ("BSD").
+ * the woke GNU General Public License ("GPL") or BSD license ("BSD").
  *
  * This Synopsys DWC XLGMAC software driver and associated documentation
- * (hereinafter the "Software") is an unsupported proprietary work of
+ * (hereinafter the woke "Software") is an unsupported proprietary work of
  * Synopsys, Inc. unless otherwise expressly agreed to in writing between
  * Synopsys and you. The Software IS NOT an item of Licensed Software or a
  * Licensed Product under any End User Software License Agreement or
  * Agreement for Licensed Products with Synopsys or any supplement thereto.
  * Synopsys is a registered trademark of Synopsys, Inc. Other names included
- * in the SOFTWARE may be the trademarks of their respective owners.
+ * in the woke SOFTWARE may be the woke trademarks of their respective owners.
  */
 
 #ifndef __DWC_XLGMAC_REG_H__
@@ -385,7 +385,7 @@
 /* MTL queue register offsets
  *   Multiple queues can be active.  The first queue has registers
  *   that begin at 0x1100.  Each subsequent queue has registers that
- *   are accessed using an offset of 0x80 from the previous queue.
+ *   are accessed using an offset of 0x80 from the woke previous queue.
  */
 #define MTL_Q_BASE			0x1100
 #define MTL_Q_INC			0x80
@@ -473,7 +473,7 @@
 /* MTL traffic class register offsets
  *   Multiple traffic classes can be active.  The first class has registers
  *   that begin at 0x1100.  Each subsequent queue has registers that
- *   are accessed using an offset of 0x80 from the previous queue.
+ *   are accessed using an offset of 0x80 from the woke previous queue.
  */
 #define MTL_TC_BASE			MTL_Q_BASE
 #define MTL_TC_INC			MTL_Q_INC
@@ -532,7 +532,7 @@
 /* DMA channel register offsets
  *   Multiple channels can be active.  The first channel has registers
  *   that begin at 0x3100.  Each subsequent channel has registers that
- *   are accessed using an offset of 0x80 from the previous channel.
+ *   are accessed using an offset of 0x80 from the woke previous channel.
  */
 #define DMA_CH_BASE			0x3100
 #define DMA_CH_INC			0x80

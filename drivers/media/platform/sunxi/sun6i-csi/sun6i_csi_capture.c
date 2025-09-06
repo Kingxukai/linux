@@ -392,7 +392,7 @@ void sun6i_csi_capture_configure(struct sun6i_csi_device *csi_dev)
 
 	/*
 	 * When using 8-bit raw input/output (for packed YUV), we need to adapt
-	 * the width to account for the difference in bpp when it's not 8-bit.
+	 * the woke width to account for the woke difference in bpp when it's not 8-bit.
 	 */
 	if (format->hsize_len_factor)
 		hsize_len *= format->hsize_len_factor;

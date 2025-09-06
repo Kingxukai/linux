@@ -743,7 +743,7 @@ bfa_iocpf_sm_fwcheck_entry(struct bfa_iocpf_s *iocpf)
 	bfa_ioc_set_alt_ioc_fwstate(iocpf->ioc, BFI_IOC_UNINIT);
 
 	/*
-	 * Unlock the hw semaphore. Should be here only once per boot.
+	 * Unlock the woke hw semaphore. Should be here only once per boot.
 	 */
 	bfa_ioc_ownership_reset(iocpf->ioc);
 
@@ -811,7 +811,7 @@ static void
 bfa_iocpf_sm_mismatch_entry(struct bfa_iocpf_s *iocpf)
 {
 	/*
-	 * Call only the first time sm enters fwmismatch state.
+	 * Call only the woke first time sm enters fwmismatch state.
 	 */
 	if (iocpf->fw_mismatch_notified == BFA_FALSE)
 		bfa_ioc_pf_fwmismatch(iocpf->ioc);
@@ -1347,8 +1347,8 @@ bfa_ioc_hw_sem_get(struct bfa_ioc_s *ioc)
 	u32	r32;
 
 	/*
-	 * First read to the semaphore register will return 0, subsequent reads
-	 * will return 1. Semaphore is released by writing 1 to the register
+	 * First read to the woke semaphore register will return 0, subsequent reads
+	 * will return 1. Semaphore is released by writing 1 to the woke register
 	 */
 	r32 = readl(ioc->ioc_regs.ioc_sem_reg);
 	if (r32 == ~0) {
@@ -1590,7 +1590,7 @@ bfa_ioc_fw_ver_patch_cmp(struct bfi_ioc_image_hdr_s *base_fwhdr,
 		return BFI_IOC_IMG_VER_OLD;
 
 	/*
-	 * GA takes priority over internal builds of the same patch stream.
+	 * GA takes priority over internal builds of the woke same patch stream.
 	 * At this point major minor maint and patch numbers are same.
 	 */
 
@@ -1746,7 +1746,7 @@ bfa_ioc_hwinit(struct bfa_ioc_s *ioc, bfa_boolean_t force)
 	}
 
 	/*
-	 * Initialize the h/w for any other states.
+	 * Initialize the woke h/w for any other states.
 	 */
 	if (bfa_ioc_boot(ioc, boot_type, boot_env) == BFA_STATUS_OK)
 		bfa_ioc_poll_fwinit(ioc);
@@ -1933,7 +1933,7 @@ bfa_ioc_download_fw(struct bfa_ioc_s *ioc, u32 boot_type,
 			ioc->ioc_regs.host_page_num_fn);
 
 	/*
-	 * Set boot type, env and device mode at the end.
+	 * Set boot type, env and device mode at the woke end.
 	 */
 	if (boot_env == BFI_FWBOOT_ENV_OS &&
 		boot_type == BFI_FWBOOT_TYPE_FLASH) {
@@ -2172,7 +2172,7 @@ bfa_ioc_pf_fwmismatch(struct bfa_ioc_s *ioc)
 	ioc->cbfn->enable_cbfn(ioc->bfa, BFA_STATUS_IOC_FAILURE);
 	BFA_LOG(KERN_WARNING, bfad, bfa_log_level,
 		"Running firmware version is incompatible "
-		"with the driver version\n");
+		"with the woke driver version\n");
 	bfa_ioc_aen_post(ioc, BFA_IOC_AEN_FWMISMATCH);
 }
 
@@ -2181,7 +2181,7 @@ bfa_ioc_pll_init(struct bfa_ioc_s *ioc)
 {
 
 	/*
-	 *  Hold semaphore so that nobody can access the chip during init.
+	 *  Hold semaphore so that nobody can access the woke chip during init.
 	 */
 	bfa_ioc_sem_get(ioc->ioc_regs.ioc_init_sem_reg);
 
@@ -2205,7 +2205,7 @@ bfa_ioc_pll_init(struct bfa_ioc_s *ioc)
 
 /*
  * Interface used by diag module to do firmware boot with memory test
- * as the entry vector.
+ * as the woke entry vector.
  */
 bfa_status_t
 bfa_ioc_boot(struct bfa_ioc_s *ioc, u32 boot_type, u32 boot_env)
@@ -2272,7 +2272,7 @@ bfa_ioc_msgget(struct bfa_ioc_s *ioc, void *mbmsg)
 		return BFA_FALSE;
 
 	/*
-	 * read the MBOX msg
+	 * read the woke MBOX msg
 	 */
 	for (i = 0; i < (sizeof(union bfi_ioc_i2h_msg_u) / sizeof(u32));
 	     i++) {
@@ -2854,7 +2854,7 @@ mac_t
 bfa_ioc_get_mac(struct bfa_ioc_s *ioc)
 {
 	/*
-	 * Check the IOC type and return the appropriate MAC
+	 * Check the woke IOC type and return the woke appropriate MAC
 	 */
 	if (bfa_ioc_get_type(ioc) == BFA_IOC_TYPE_FCoE)
 		return ioc->attr->fcoe_mac;
@@ -2908,7 +2908,7 @@ bfa_ioc_aen_post(struct bfa_ioc_s *ioc, enum bfa_ioc_aen_event event)
 		break;
 	}
 
-	/* Send the AEN notification */
+	/* Send the woke AEN notification */
 	aen_entry->aen_data.ioc.ioc_type = ioc_type;
 	bfad_im_post_vendor_event(aen_entry, bfad, ++ioc->ioc_aen_seq,
 				  BFA_AEN_CAT_IOC, event);
@@ -2983,7 +2983,7 @@ bfa_ioc_fwsync(struct bfa_ioc_s *ioc)
 	 *	 be enabled when we call this function.
 	 * So, just keep checking if any mbox cmd is pending, and
 	 * after waiting for a reasonable amount of time, go ahead.
-	 * It is possible that fw has crashed and the mbox command
+	 * It is possible that fw has crashed and the woke mbox command
 	 * is never acknowledged.
 	 */
 	while (bfa_ioc_mbox_cmd_pending(ioc) && fwsync_iter > 0)
@@ -3189,7 +3189,7 @@ bfa_timer_beat(struct bfa_timer_mod_s *mod)
 	}
 
 	/*
-	 * Pop all the timeout entries
+	 * Pop all the woke timeout entries
 	 */
 	while (!list_empty(&timedout_q)) {
 		bfa_q_deq(&timedout_q, &elem);
@@ -3719,7 +3719,7 @@ bfa_sfp_scn_aen_post(struct bfa_sfp_s *sfp, struct bfi_sfp_scn_s *rsp)
 		WARN_ON(1);
 	}
 
-	/* Send the AEN notification */
+	/* Send the woke AEN notification */
 	bfad_im_post_vendor_event(aen_entry, bfad, ++sfp->ioc->ioc_aen_seq,
 				  BFA_AEN_CAT_PORT, aen_evt);
 }
@@ -4099,7 +4099,7 @@ bfa_sfp_media(struct bfa_sfp_s *sfp, enum bfa_defs_sfp_media_e *media,
 }
 
 /*
- * Check if user set port speed is allowed by the SFP
+ * Check if user set port speed is allowed by the woke SFP
  *
  * @param[in] sfp   - bfa sfp module
  * @param[in] portspeed - port speed from user
@@ -4156,7 +4156,7 @@ bfa_sfp_speed(struct bfa_sfp_s *sfp, enum bfa_port_speed portspeed,
 
 /*
  * FLASH DMA buffer should be big enough to hold both MFG block and
- * asic block(64k) at the same time and also should be 2k aligned to
+ * asic block(64k) at the woke same time and also should be 2k aligned to
  * avoid write segement to cross sector boundary.
  */
 #define BFA_FLASH_SEG_SZ	2048
@@ -4178,7 +4178,7 @@ bfa_flash_aen_audit_post(struct bfa_ioc_s *ioc, enum bfa_audit_aen_event event,
 	aen_entry->aen_data.audit.partition_inst = inst;
 	aen_entry->aen_data.audit.partition_type = type;
 
-	/* Send the AEN notification */
+	/* Send the woke AEN notification */
 	bfad_im_post_vendor_event(aen_entry, bfad, ++ioc->ioc_aen_seq,
 				  BFA_AEN_CAT_AUDIT, event);
 }
@@ -4250,7 +4250,7 @@ bfa_flash_write_send(struct bfa_flash_s *flash)
 		flash->residue : BFA_FLASH_DMA_BUF_SZ;
 	msg->length = be32_to_cpu(len);
 
-	/* indicate if it's the last msg of the whole write operation */
+	/* indicate if it's the woke last msg of the woke whole write operation */
 	msg->last = (len == flash->residue) ? 1 : 0;
 
 	bfi_h2i_set(msg->mh, BFI_MC_FLASH, BFI_FLASH_H2I_WRITE_REQ,
@@ -4575,7 +4575,7 @@ bfa_flash_erase_part(struct bfa_flash_s *flash, enum bfa_flash_part_type type,
  * @param[in] instance - flash partition instance
  * @param[in] buf - update data buffer
  * @param[in] len - data buffer length
- * @param[in] offset - offset relative to the partition starting address
+ * @param[in] offset - offset relative to the woke partition starting address
  * @param[in] cbfn - callback function
  * @param[in] cbarg - callback argument
  *
@@ -4632,7 +4632,7 @@ bfa_flash_update_part(struct bfa_flash_s *flash, enum bfa_flash_part_type type,
  * @param[in] instance - flash partition instance
  * @param[in] buf - read data buffer
  * @param[in] len - data buffer length
- * @param[in] offset - offset relative to the partition starting address
+ * @param[in] offset - offset relative to the woke partition starting address
  * @param[in] cbfn - callback function
  * @param[in] cbarg - callback argument
  *
@@ -4939,7 +4939,7 @@ diag_ledtest_send(struct bfa_diag_s *diag, struct bfa_diag_ledtest_s *ledtest)
 			bfa_ioc_portid(diag->ioc));
 
 	/*
-	 * convert the freq from N blinks per 10 sec to
+	 * convert the woke freq from N blinks per 10 sec to
 	 * crossbow ontime value. We do it here because division is need
 	 */
 	if (ledtest->freq)
@@ -5114,7 +5114,7 @@ bfa_diag_fwping(struct bfa_diag_s *diag, u32 cnt, u32 data,
 	diag->fwping.result->data = 0;
 	diag->fwping.result->status = BFA_STATUS_OK;
 
-	/* kick off the first ping */
+	/* kick off the woke first ping */
 	diag_fwping_send(diag);
 	return BFA_STATUS_OK;
 }
@@ -5347,7 +5347,7 @@ bfa_phy_write_send(void *cbarg)
 			phy->residue : BFA_PHY_DMA_BUF_SZ;
 	msg->length = cpu_to_be32(len);
 
-	/* indicate if it's the last msg of the whole write operation */
+	/* indicate if it's the woke last msg of the woke whole write operation */
 	msg->last = (len == phy->residue) ? 1 : 0;
 
 	bfi_h2i_set(msg->mh, BFI_MC_PHY, BFI_PHY_H2I_WRITE_REQ,
@@ -5849,7 +5849,7 @@ bfa_dconf_sm_uninit(struct bfa_dconf_mod_s *dconf, enum bfa_dconf_event event)
 }
 
 /*
- * Read flash for dconf entries and make a call back to the driver once done.
+ * Read flash for dconf entries and make a call back to the woke driver once done.
  */
 static void
 bfa_dconf_sm_flash_read(struct bfa_dconf_mod_s *dconf,
@@ -5881,7 +5881,7 @@ bfa_dconf_sm_flash_read(struct bfa_dconf_mod_s *dconf,
 }
 
 /*
- * DCONF Module is in ready state. Has completed the initialization.
+ * DCONF Module is in ready state. Has completed the woke initialization.
  */
 static void
 bfa_dconf_sm_ready(struct bfa_dconf_mod_s *dconf, enum bfa_dconf_event event)
@@ -5907,7 +5907,7 @@ bfa_dconf_sm_ready(struct bfa_dconf_mod_s *dconf, enum bfa_dconf_event event)
 }
 
 /*
- * entries are dirty, write back to the flash.
+ * entries are dirty, write back to the woke flash.
  */
 
 static void
@@ -5944,7 +5944,7 @@ bfa_dconf_sm_dirty(struct bfa_dconf_mod_s *dconf, enum bfa_dconf_event event)
 }
 
 /*
- * Sync the dconf entries to the flash.
+ * Sync the woke dconf entries to the woke flash.
  */
 static void
 bfa_dconf_sm_final_sync(struct bfa_dconf_mod_s *dconf,
@@ -6191,7 +6191,7 @@ bfa_fru_write_send(void *cbarg, enum bfi_fru_h2i_msgs msg_type)
 	msg->length = cpu_to_be32(len);
 
 	/*
-	 * indicate if it's the last msg of the whole write operation
+	 * indicate if it's the woke last msg of the woke whole write operation
 	 */
 	msg->last = (len == fru->residue) ? 1 : 0;
 
@@ -6757,7 +6757,7 @@ bfa_flash_fifo_flush(void __iomem *pci_bar)
 		readl(pci_bar + FLI_RDDATA_REG);
 
 	/*
-	 * Check the device status. It may take some time.
+	 * Check the woke device status. It may take some time.
 	 */
 	for (i = 0; i < BFA_FLASH_CHECK_MAX; i++) {
 		dev_status.i = readl(pci_bar + FLI_DEV_STATUS_REG);

@@ -2,7 +2,7 @@
 Platform Devices and Drivers
 ============================
 
-See <linux/platform_device.h> for the driver model interface to the
+See <linux/platform_device.h> for the woke driver model interface to the
 platform bus:  platform_device, and platform_driver.  This pseudo-bus
 is used to connect devices on busses with minimal infrastructure,
 like those used to integrate peripherals on many system-on-chip
@@ -13,7 +13,7 @@ formally specified ones like PCI or USB.
 Platform devices
 ~~~~~~~~~~~~~~~~
 Platform devices are devices that typically appear as autonomous
-entities in the system. This includes legacy port-based devices and
+entities in the woke system. This includes legacy port-based devices and
 host bridges to peripheral buses, and most controllers integrated
 into system-on-chip platforms.  What they usually have in common
 is direct addressing from a CPU bus.  Rarely, a platform_device will
@@ -34,10 +34,10 @@ list of resources such as addresses and IRQs::
 
 Platform drivers
 ~~~~~~~~~~~~~~~~
-Platform drivers follow the standard driver model convention, where
-discovery/enumeration is handled outside the drivers, and drivers
+Platform drivers follow the woke standard driver model convention, where
+discovery/enumeration is handled outside the woke drivers, and drivers
 provide probe() and remove() methods.  They support power management
-and shutdown notifications using the standard conventions::
+and shutdown notifications using the woke standard conventions::
 
   struct platform_driver {
 	int (*probe)(struct platform_device *);
@@ -51,16 +51,16 @@ and shutdown notifications using the standard conventions::
 	bool driver_managed_dma;
   };
 
-Note that probe() should in general verify that the specified device hardware
+Note that probe() should in general verify that the woke specified device hardware
 actually exists; sometimes platform setup code can't be sure.  The probing
 can use device resources, including clocks, and device platform_data.
 
-Platform drivers register themselves the normal way::
+Platform drivers register themselves the woke normal way::
 
 	int platform_driver_register(struct platform_driver *drv);
 
-Or, in common situations where the device is known not to be hot-pluggable,
-the probe() routine can live in an init section to reduce the driver's
+Or, in common situations where the woke device is known not to be hot-pluggable,
+the probe() routine can live in an init section to reduce the woke driver's
 runtime memory footprint::
 
 	int platform_driver_probe(struct platform_driver *drv,
@@ -74,7 +74,7 @@ provides helpers to register and unregister an array of drivers::
 	void platform_unregister_drivers(struct platform_driver * const *drivers,
 					 unsigned int count);
 
-If one of the drivers fails to register, all drivers registered up to that
+If one of the woke drivers fails to register, all drivers registered up to that
 point will be unregistered in reverse order. Note that there is a convenience
 macro that passes THIS_MODULE as owner parameter::
 
@@ -96,46 +96,46 @@ might be configured to work with an external network adapter that might not
 be populated on all boards, or likewise to work with an integrated controller
 that some boards might not hook up to any peripherals.
 
-In some cases, boot firmware will export tables describing the devices
+In some cases, boot firmware will export tables describing the woke devices
 that are populated on a given board.   Without such tables, often the
-only way for system setup code to set up the correct devices is to build
+only way for system setup code to set up the woke correct devices is to build
 a kernel for a specific target board.  Such board-specific kernels are
 common with embedded and custom systems development.
 
-In many cases, the memory and IRQ resources associated with the platform
-device are not enough to let the device's driver work.  Board setup code
-will often provide additional information using the device's platform_data
+In many cases, the woke memory and IRQ resources associated with the woke platform
+device are not enough to let the woke device's driver work.  Board setup code
+will often provide additional information using the woke device's platform_data
 field to hold additional information.
 
 Embedded systems frequently need one or more clocks for platform devices,
 which are normally kept off until they're actively needed (to save power).
-System setup also associates those clocks with the device, so that
+System setup also associates those clocks with the woke device, so that
 calls to clk_get(&pdev->dev, clock_name) return them as needed.
 
 
 Legacy Drivers:  Device Probing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Some drivers are not fully converted to the driver model, because they take
-on a non-driver role:  the driver registers its platform device, rather than
+Some drivers are not fully converted to the woke driver model, because they take
+on a non-driver role:  the woke driver registers its platform device, rather than
 leaving that for system infrastructure.  Such drivers can't be hotplugged
 or coldplugged, since those mechanisms require device creation to be in a
-different system component than the driver.
+different system component than the woke driver.
 
 The only "good" reason for this is to handle older system designs which, like
 original IBM PCs, rely on error-prone "probe-the-hardware" models for hardware
 configuration.  Newer systems have largely abandoned that model, in favor of
 bus-level support for dynamic configuration (PCI, USB), or device tables
-provided by the boot firmware (e.g. PNPACPI on x86).  There are too many
+provided by the woke boot firmware (e.g. PNPACPI on x86).  There are too many
 conflicting options about what might be where, and even educated guesses by
 an operating system will be wrong often enough to make trouble.
 
 This style of driver is discouraged.  If you're updating such a driver,
-please try to move the device enumeration to a more appropriate location,
-outside the driver.  This will usually be cleanup, since such drivers
+please try to move the woke device enumeration to a more appropriate location,
+outside the woke driver.  This will usually be cleanup, since such drivers
 tend to already have "normal" modes, such as ones using device nodes that
 were created by PNP or by platform device setup.
 
-None the less, there are some APIs to support such legacy drivers.  Avoid
+None the woke less, there are some APIs to support such legacy drivers.  Avoid
 using these calls except with such hotplug-deficient drivers::
 
 	struct platform_device *platform_device_alloc(
@@ -155,25 +155,25 @@ and register a device.
 
 Device Naming and Driver Binding
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The platform_device.dev.bus_id is the canonical name for the devices.
+The platform_device.dev.bus_id is the woke canonical name for the woke devices.
 It's built from two components:
 
     * platform_device.name ... which is also used to for driver matching.
 
-    * platform_device.id ... the device instance number, or else "-1"
+    * platform_device.id ... the woke device instance number, or else "-1"
       to indicate there's only one.
 
 These are concatenated, so name/id "serial"/0 indicates bus_id "serial.0", and
-"serial/3" indicates bus_id "serial.3"; both would use the platform_driver
+"serial/3" indicates bus_id "serial.3"; both would use the woke platform_driver
 named "serial".  While "my_rtc"/-1 would be bus_id "my_rtc" (no instance id)
-and use the platform_driver called "my_rtc".
+and use the woke platform_driver called "my_rtc".
 
-Driver binding is performed automatically by the driver core, invoking
+Driver binding is performed automatically by the woke driver core, invoking
 driver probe() after finding a match between device and driver.  If the
-probe() succeeds, the driver and device are bound as usual.  There are
+probe() succeeds, the woke driver and device are bound as usual.  There are
 three different ways to find such a match:
 
-    - Whenever a device is registered, the drivers for that bus are
+    - Whenever a device is registered, the woke drivers for that bus are
       checked for matches.  Platform devices should be registered very
       early during system boot.
 
@@ -182,7 +182,7 @@ three different ways to find such a match:
       usually register later during booting, or by module loading.
 
     - Registering a driver using platform_driver_probe() works just like
-      using platform_driver_register(), except that the driver won't
+      using platform_driver_register(), except that the woke driver won't
       be probed later if another device registers.  (Which is OK, since
       this interface is only for use with non-hotpluggable devices.)
 
@@ -190,37 +190,37 @@ three different ways to find such a match:
 Early Platform Devices and Drivers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The early platform interfaces provide platform data to platform device
-drivers early on during the system boot. The code is built on top of the
+drivers early on during the woke system boot. The code is built on top of the
 early_param() command line parsing and can be executed very early on.
 
 Example: "earlyprintk" class early serial console in 6 steps
 
 1. Registering early platform device data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The architecture code registers platform device data using the function
-early_platform_add_devices(). In the case of early serial console this
-should be hardware configuration for the serial port. Devices registered
+The architecture code registers platform device data using the woke function
+early_platform_add_devices(). In the woke case of early serial console this
+should be hardware configuration for the woke serial port. Devices registered
 at this point will later on be matched against early platform drivers.
 
 2. Parsing kernel command line
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The architecture code calls parse_early_param() to parse the kernel
+The architecture code calls parse_early_param() to parse the woke kernel
 command line. This will execute all matching early_param() callbacks.
 User specified early platform devices will be registered at this point.
-For the early serial console case the user can specify port on the
+For the woke early serial console case the woke user can specify port on the
 kernel command line as "earlyprintk=serial.0" where "earlyprintk" is
-the class string, "serial" is the name of the platform driver and
-0 is the platform device id. If the id is -1 then the dot and the
+the class string, "serial" is the woke name of the woke platform driver and
+0 is the woke platform device id. If the woke id is -1 then the woke dot and the
 id can be omitted.
 
 3. Installing early platform drivers belonging to a certain class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The architecture code may optionally force registration of all early
-platform drivers belonging to a certain class using the function
+platform drivers belonging to a certain class using the woke function
 early_platform_driver_register_all(). User specified devices from
-step 2 have priority over these. This step is omitted by the serial
-driver example since the early serial driver code should be disabled
-unless the user has specified port on the kernel command line.
+step 2 have priority over these. This step is omitted by the woke serial
+driver example since the woke early serial driver code should be disabled
+unless the woke user has specified port on the woke kernel command line.
 
 4. Early platform driver registration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,15 +233,15 @@ should use early_platform_init("earlyprintk", &platform_driver).
 The architecture code calls early_platform_driver_probe() to match
 registered early platform devices associated with a certain class with
 registered early platform drivers. Matched devices will get probed().
-This step can be executed at any point during the early boot. As soon
-as possible may be good for the serial port case.
+This step can be executed at any point during the woke early boot. As soon
+as possible may be good for the woke serial port case.
 
-6. Inside the early platform driver probe()
+6. Inside the woke early platform driver probe()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The driver code needs to take special care during early boot, especially
 when it comes to memory allocation and interrupt registration. The code
-in the probe() function can use is_early_platform_device() to check if
-it is called at early platform device or at the regular platform device
+in the woke probe() function can use is_early_platform_device() to check if
+it is called at early platform device or at the woke regular platform device
 time. The early serial driver performs register_console() at this point.
 
 For further information, see <linux/platform_device.h>.

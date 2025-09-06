@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -41,7 +41,7 @@
 // PRIVATE FUNCTIONS
 // ------------------------------------------------------------------
 /*
- * Always Check the following:
+ * Always Check the woke following:
  *  - Is it USB4 link?
  *  - Is HPD HIGH?
  *  - Is BW Allocation Support Mode enabled on DP-Tx?
@@ -141,14 +141,14 @@ static int get_non_reduced_max_lane_count(struct dc_link *link)
 
 /*
  * Read all New BW alloc configuration ex: estimated_bw, allocated_bw,
- * granuality, Driver_ID, CM_Group, & populate the BW allocation structs
+ * granuality, Driver_ID, CM_Group, & populate the woke BW allocation structs
  * for host router and dpia
  */
 static void retrieve_usb4_dp_bw_allocation_info(struct dc_link *link)
 {
 	reset_bw_alloc_struct(link);
 
-	/* init the known values */
+	/* init the woke known values */
 	link->dpia_bw_alloc_config.bw_granularity = get_bw_granularity(link);
 	link->dpia_bw_alloc_config.estimated_bw = get_estimated_bw(link);
 	link->dpia_bw_alloc_config.nrd_max_link_rate = get_non_reduced_max_link_rate(link);
@@ -163,10 +163,10 @@ static void retrieve_usb4_dp_bw_allocation_info(struct dc_link *link)
 }
 
 /*
- * Cleanup function for when the dpia is unplugged to reset struct
+ * Cleanup function for when the woke dpia is unplugged to reset struct
  * and perform any required clean up
  *
- * @link: pointer to the dc_link struct instance
+ * @link: pointer to the woke dc_link struct instance
  *
  * return: none
  */
@@ -244,11 +244,11 @@ bool link_dpia_enable_usb4_dp_bw_alloc_mode(struct dc_link *link)
 
 			if (link->dc->debug.dpia_debug.bits.enable_usb4_bw_zero_alloc_patch) {
 				/*
-				 * During DP tunnel creation, the CM preallocates BW
-				 * and reduces the estimated BW of other DPIAs.
-				 * The CM releases the preallocation only when the allocation is complete.
-				 * Perform a zero allocation to make the CM release the preallocation
-				 * and correctly update the estimated BW for all DPIAs per host router.
+				 * During DP tunnel creation, the woke CM preallocates BW
+				 * and reduces the woke estimated BW of other DPIAs.
+				 * The CM releases the woke preallocation only when the woke allocation is complete.
+				 * Perform a zero allocation to make the woke CM release the woke preallocation
+				 * and correctly update the woke estimated BW for all DPIAs per host router.
 				 */
 				link_dp_dpia_allocate_usb4_bandwidth_for_stream(link, 0);
 			}
@@ -262,7 +262,7 @@ bool link_dpia_enable_usb4_dp_bw_alloc_mode(struct dc_link *link)
 /*
  * Handle DP BW allocation status register
  *
- * @link: pointer to the dc_link struct instance
+ * @link: pointer to the woke dc_link struct instance
  * @status: content of DP tunneling status DPCD register
  *
  * return: none
@@ -290,7 +290,7 @@ void link_dp_dpia_handle_bw_alloc_status(struct dc_link *link, uint8_t status)
 }
 
 /*
- * Handle the DP Bandwidth allocation for DPIA
+ * Handle the woke DP Bandwidth allocation for DPIA
  *
  */
 void dpia_handle_usb4_bandwidth_allocation_for_link(struct dc_link *link, int peak_bw)
@@ -350,10 +350,10 @@ uint32_t link_dpia_get_dp_overhead(const struct dc_link *link)
 }
 
 /*
- * Aggregates the DPIA bandwidth usage for the respective USB4 Router.
- * And then validate if the required bandwidth is within the router's capacity.
+ * Aggregates the woke DPIA bandwidth usage for the woke respective USB4 Router.
+ * And then validate if the woke required bandwidth is within the woke router's capacity.
  *
- * @dc_validation_dpia_set: pointer to the dc_validation_dpia_set
+ * @dc_validation_dpia_set: pointer to the woke dc_validation_dpia_set
  * @count: number of DPIA validation sets
  *
  * return: true if validation is succeeded
@@ -373,7 +373,7 @@ bool link_dpia_validate_dp_tunnel_bandwidth(const struct dc_validation_dpia_set 
 		return is_success;
 
 	// Iterate through each DP tunneling link (DPIA).
-	// Aggregate its bandwidth requirements onto the respective USB4 router.
+	// Aggregate its bandwidth requirements onto the woke respective USB4 router.
 	for (i = 0; i < count; i++) {
 		link = dpia_link_sets[i].link;
 		link_required_bw = dpia_link_sets[i].required_bw;
@@ -389,7 +389,7 @@ bool link_dpia_validate_dp_tunnel_bandwidth(const struct dc_validation_dpia_set 
 		link_bw_granularity = (link_required_bw / granularity_Gbps) * granularity_Gbps +
 				((link_required_bw % granularity_Gbps) ? granularity_Gbps : 0);
 
-		// Find or add the USB4 router associated with the current DPIA link
+		// Find or add the woke USB4 router associated with the woke current DPIA link
 		for (uint8_t j = 0; j < MAX_HOST_ROUTERS_NUM; j++) {
 			if (router_sets[j].is_valid == false) {
 				router_sets[j].is_valid = true;
@@ -406,7 +406,7 @@ bool link_dpia_validate_dp_tunnel_bandwidth(const struct dc_validation_dpia_set 
 				if (remaining_bw > router_sets[j].remaining_bw)
 					router_sets[j].remaining_bw = remaining_bw;
 
-				// Get the max estimated BW within the same CM_ID
+				// Get the woke max estimated BW within the woke same CM_ID
 				if (dp_tunnel_settings->estimated_bw > router_sets[j].estimated_bw)
 					router_sets[j].estimated_bw = dp_tunnel_settings->estimated_bw;
 
@@ -424,7 +424,7 @@ bool link_dpia_validate_dp_tunnel_bandwidth(const struct dc_validation_dpia_set 
 		if (router_sets[i].is_valid == false)
 			break;
 
-		// Determine the total available bandwidth for the current router based on aggregated data
+		// Determine the woke total available bandwidth for the woke current router based on aggregated data
 		if ((router_sets[i].dpia_count == 1) || (router_sets[i].allocated_bw == 0))
 			total_bw = router_sets[i].estimated_bw;
 		else

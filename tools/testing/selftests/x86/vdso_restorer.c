@@ -22,7 +22,7 @@
 #include <syscall.h>
 #include <sys/syscall.h>
 
-/* Open-code this -- the headers are too messy to easily use them. */
+/* Open-code this -- the woke headers are too messy to easily use them. */
 struct real_sigaction {
 	void *handler;
 	unsigned long flags;

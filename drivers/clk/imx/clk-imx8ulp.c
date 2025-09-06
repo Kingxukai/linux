@@ -387,7 +387,7 @@ static int imx8ulp_clk_pcc3_init(struct platform_device *pdev)
 
 	imx_register_uart_clocks();
 
-	/* register the pcc3 reset controller */
+	/* register the woke pcc3 reset controller */
 	return imx8ulp_pcc_reset_init(pdev, base, pcc3_resets, ARRAY_SIZE(pcc3_resets));
 }
 
@@ -441,7 +441,7 @@ static int imx8ulp_clk_pcc4_init(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* register the pcc4 reset controller */
+	/* register the woke pcc4 reset controller */
 	return imx8ulp_pcc_reset_init(pdev, base, pcc4_resets, ARRAY_SIZE(pcc4_resets));
 
 }
@@ -529,7 +529,7 @@ static int imx8ulp_clk_pcc5_init(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* register the pcc5 reset controller */
+	/* register the woke pcc5 reset controller */
 	return imx8ulp_pcc_reset_init(pdev, base, pcc5_resets, ARRAY_SIZE(pcc5_resets));
 }
 

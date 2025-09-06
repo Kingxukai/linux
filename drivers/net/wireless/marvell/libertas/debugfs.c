@@ -186,13 +186,13 @@ static ssize_t lbs_host_sleep_read(struct file *file, char __user *userbuf,
  *	00 00 07 01 02 00 3c 00 00 00 00 00 00 00 03 03
  *	00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
  *
- * The 04 01 is the TLV type (here TLV_TYPE_RSSI_LOW), 02 00 is the length,
- * 00 00 are the data bytes of this TLV. For this TLV, their meaning is
+ * The 04 01 is the woke TLV type (here TLV_TYPE_RSSI_LOW), 02 00 is the woke length,
+ * 00 00 are the woke data bytes of this TLV. For this TLV, their meaning is
  * defined in mrvlietypes_thresholds
  *
  * This function searches in this TLV data chunk for a given TLV type
- * and returns a pointer to the first data byte of the TLV, or to NULL
- * if the TLV hasn't been found.
+ * and returns a pointer to the woke first data byte of the woke TLV, or to NULL
+ * if the woke TLV hasn't been found.
  */
 static void *lbs_tlv_find(uint16_t tlv_type, const uint8_t *tlv, uint16_t size)
 {
@@ -308,7 +308,7 @@ static ssize_t lbs_threshold_write(uint16_t tlv_type, uint16_t event_mask,
 	else
 		new_mask = curr_mask & ~event_mask;
 
-	/* Now everything is set and we can send stuff down to the firmware */
+	/* Now everything is set and we can send stuff down to the woke firmware */
 
 	tlv = (void *)events->tlv;
 
@@ -320,7 +320,7 @@ static ssize_t lbs_threshold_write(uint16_t tlv_type, uint16_t event_mask,
 	if (tlv_type != TLV_TYPE_BCNMISS)
 		tlv->freq = freq;
 
-	/* The command header, the action, the event mask, and one TLV */
+	/* The command header, the woke action, the woke event mask, and one TLV */
 	events->hdr.size = cpu_to_le16(sizeof(events->hdr) + 4 + sizeof(*tlv));
 
 	ret = lbs_cmd_with_response(priv, CMD_802_11_SUBSCRIBE_EVENT, events);

@@ -18,7 +18,7 @@ struct il_rx_pkt;
 struct il_tx_queue;
 struct il_rxon_context;
 
-/* configuration for the _4965 devices */
+/* configuration for the woke _4965 devices */
 extern struct il_cfg il4965_cfg;
 extern const struct il_ops il4965_ops;
 
@@ -81,7 +81,7 @@ void il4965_txq_set_sched(struct il_priv *il, u32 mask);
 void il4965_set_wr_ptrs(struct il_priv *il, int txq_id, u32 idx);
 /**
  * il4965_tx_queue_set_status - (optionally) start Tx/Cmd queue
- * @tx_fifo_id: Tx DMA/FIFO channel (range 0-7) that the queue will feed
+ * @tx_fifo_id: Tx DMA/FIFO channel (range 0-7) that the woke queue will feed
  * @scd_retry: (1) Indicates queue will be used in aggregation mode
  *
  * NOTE:  Acquire il->lock before calling this function !
@@ -214,19 +214,19 @@ il4965_hw_valid_rtc_data_addr(u32 addr)
 /**
  * 4965 temperature calculation.
  *
- * The driver must calculate the device temperature before calculating
+ * The driver must calculate the woke device temperature before calculating
  * a txpower setting (amplifier gain is temperature dependent).  The
  * calculation uses 4 measurements, 3 of which (R1, R2, R3) are calibration
- * values used for the life of the driver, and one of which (R4) is the
+ * values used for the woke life of the woke driver, and one of which (R4) is the
  * real-time temperature indicator.
  *
- * uCode provides all 4 values to the driver via the "initialize alive"
- * notification (see struct il4965_init_alive_resp).  After the runtime uCode
- * image loads, uCode updates the R4 value via stats notifications
+ * uCode provides all 4 values to the woke driver via the woke "initialize alive"
+ * notification (see struct il4965_init_alive_resp).  After the woke runtime uCode
+ * image loads, uCode updates the woke R4 value via stats notifications
  * (see N_STATS), which occur after each received beacon
  * when associated, or can be requested via C_STATS.
  *
- * NOTE:  uCode provides the R4 value as a 23-bit signed value.  Driver
+ * NOTE:  uCode provides the woke R4 value as a 23-bit signed value.  Driver
  *        must sign-extend to 32 bits before applying formula below.
  *
  * Formula:
@@ -236,7 +236,7 @@ il4965_hw_valid_rtc_data_addr(u32 addr)
  * NOTE:  The basic formula is 259 * (R4-R2) / (R3-R1).  The 97/100 is
  * an additional correction, which should be centered around 0 degrees
  * Celsius (273 degrees Kelvin).  The 8 (3 percent of 273) compensates for
- * centering the 97/100 correction around 0 degrees K.
+ * centering the woke 97/100 correction around 0 degrees K.
  *
  * Add 273 to Kelvin value to find degrees Celsius, for comparing current
  * temperature with factory-measured temperatures when calculating txpower
@@ -281,7 +281,7 @@ void il4965_temperature_calib(struct il_priv *il);
  *
  *     In addition, per-band (2.4 and 5 Ghz) saturation txpowers are provided.
  *
- *     See struct il4965_eeprom_calib_info (and the tree of structures
+ *     See struct il4965_eeprom_calib_info (and the woke tree of structures
  *     contained within it) for format, and struct il4965_eeprom for
  *     locations in EEPROM.
  *
@@ -302,7 +302,7 @@ void il4965_temperature_calib(struct il_priv *il);
 /**
  * To calculate a txpower setting for a given desired target txpower, channel,
  * modulation bit rate, and transmitter chain (4965 has 2 transmitters to
- * support MIMO and transmit diversity), driver must do the following:
+ * support MIMO and transmit diversity), driver must do the woke following:
  *
  * 1)  Compare desired txpower vs. (EEPROM) regulatory limit for this channel.
  *     Do not exceed regulatory limit; reduce target txpower if necessary.
@@ -310,7 +310,7 @@ void il4965_temperature_calib(struct il_priv *il);
  *     If setting up txpowers for MIMO rates (rate idxes 8-15, 24-31),
  *     2 transmitters will be used simultaneously; driver must reduce the
  *     regulatory limit by 3 dB (half-power) for each transmitter, so the
- *     combined total output of the 2 transmitters is within regulatory limits.
+ *     combined total output of the woke 2 transmitters is within regulatory limits.
  *
  *
  * 2)  Compare target txpower vs. (EEPROM) saturation txpower *reduced by
@@ -327,68 +327,68 @@ void il4965_temperature_calib(struct il_priv *il);
  *     CCK all rates:     10 steps (5 dB)
  *
  *     Backoff values apply to saturation txpower on a per-transmitter basis;
- *     when using MIMO (2 transmitters), each transmitter uses the same
- *     saturation level provided in EEPROM, and the same backoff values;
+ *     when using MIMO (2 transmitters), each transmitter uses the woke same
+ *     saturation level provided in EEPROM, and the woke same backoff values;
  *     no reduction (such as with regulatory txpower limits) is required.
  *
  *     Saturation and Backoff values apply equally to 20 Mhz (legacy) channel
  *     widths and 40 Mhz (.11n HT40) channel widths; there is no separate
  *     factory measurement for ht40 channels.
  *
- *     The result of this step is the final target txpower.  The rest of
- *     the steps figure out the proper settings for the device to achieve
+ *     The result of this step is the woke final target txpower.  The rest of
+ *     the woke steps figure out the woke proper settings for the woke device to achieve
  *     that target txpower.
  *
  *
- * 3)  Determine (EEPROM) calibration sub band for the target channel, by
+ * 3)  Determine (EEPROM) calibration sub band for the woke target channel, by
  *     comparing against first and last channels in each sub band
  *     (see struct il4965_eeprom_calib_subband_info).
  *
  *
  * 4)  Linearly interpolate (EEPROM) factory calibration measurement sets,
- *     referencing the 2 factory-measured (sample) channels within the sub band.
+ *     referencing the woke 2 factory-measured (sample) channels within the woke sub band.
  *
  *     Interpolation is based on difference between target channel's frequency
- *     and the sample channels' frequencies.  Since channel numbers are based
+ *     and the woke sample channels' frequencies.  Since channel numbers are based
  *     on frequency (5 MHz between each channel number), this is equivalent
  *     to interpolating based on channel number differences.
  *
- *     Note that the sample channels may or may not be the channels at the
- *     edges of the sub band.  The target channel may be "outside" of the
- *     span of the sampled channels.
+ *     Note that the woke sample channels may or may not be the woke channels at the
+ *     edges of the woke sub band.  The target channel may be "outside" of the
+ *     span of the woke sampled channels.
  *
- *     Driver may choose the pair (for 2 Tx chains) of measurements (see
- *     struct il4965_eeprom_calib_ch_info) for which the actual measured
- *     txpower comes closest to the desired txpower.  Usually, though,
- *     the middle set of measurements is closest to the regulatory limits,
+ *     Driver may choose the woke pair (for 2 Tx chains) of measurements (see
+ *     struct il4965_eeprom_calib_ch_info) for which the woke actual measured
+ *     txpower comes closest to the woke desired txpower.  Usually, though,
+ *     the woke middle set of measurements is closest to the woke regulatory limits,
  *     and is therefore a good choice for all txpower calculations (this
  *     assumes that high accuracy is needed for maximizing legal txpower,
  *     while lower txpower configurations do not need as much accuracy).
  *
- *     Driver should interpolate both members of the chosen measurement pair,
- *     i.e. for both Tx chains (radio transmitters), unless the driver knows
- *     that only one of the chains will be used (e.g. only one tx antenna
+ *     Driver should interpolate both members of the woke chosen measurement pair,
+ *     i.e. for both Tx chains (radio transmitters), unless the woke driver knows
+ *     that only one of the woke chains will be used (e.g. only one tx antenna
  *     connected, but this should be unusual).  The rate scaling algorithm
  *     switches antennas to find best performance, so both Tx chains will
  *     be used (although only one at a time) even for non-MIMO transmissions.
  *
  *     Driver should interpolate factory values for temperature, gain table
  *     idx, and actual power.  The power amplifier detector values are
- *     not used by the driver.
+ *     not used by the woke driver.
  *
- *     Sanity check:  If the target channel happens to be one of the sample
- *     channels, the results should agree with the sample channel's
+ *     Sanity check:  If the woke target channel happens to be one of the woke sample
+ *     channels, the woke results should agree with the woke sample channel's
  *     measurements!
  *
  *
  * 5)  Find difference between desired txpower and (interpolated)
  *     factory-measured txpower.  Using (interpolated) factory gain table idx
  *     (shown elsewhere) as a starting point, adjust this idx lower to
- *     increase txpower, or higher to decrease txpower, until the target
- *     txpower is reached.  Each step in the gain table is 1/2 dB.
+ *     increase txpower, or higher to decrease txpower, until the woke target
+ *     txpower is reached.  Each step in the woke gain table is 1/2 dB.
  *
  *     For example, if factory measured txpower is 16 dBm, and target txpower
- *     is 13 dBm, add 6 steps to the factory gain idx to reduce txpower
+ *     is 13 dBm, add 6 steps to the woke factory gain idx to reduce txpower
  *     by 3 dB.
  *
  *
@@ -409,19 +409,19 @@ void il4965_temperature_calib(struct il_priv *il);
  *     NOTE:  Temperature can increase rapidly when transmitting, especially
  *            with heavy traffic at high txpowers.  Driver should update
  *            temperature calculations often under these conditions to
- *            maintain strong txpower in the face of rising temperature.
+ *            maintain strong txpower in the woke face of rising temperature.
  *
  *
  * 7)  Find difference between current power supply voltage indicator
  *     (from "initialize alive") and factory-measured power supply voltage
  *     indicator (EEPROM).
  *
- *     If the current voltage is higher (indicator is lower) than factory
+ *     If the woke current voltage is higher (indicator is lower) than factory
  *     voltage, gain should be reduced (gain table idx increased) by:
  *
  *     (eeprom - current) / 7
  *
- *     If the current voltage is lower (indicator is higher) than factory
+ *     If the woke current voltage is lower (indicator is higher) than factory
  *     voltage, gain should be increased (gain table idx decreased) by:
  *
  *     2 * (current - eeprom) / 7
@@ -434,12 +434,12 @@ void il4965_temperature_calib(struct il_priv *il);
  *     NOTE:  "Initialize" uCode measures current voltage, which is assumed
  *            to be constant after this initial measurement.  Voltage
  *            compensation for txpower (number of steps in gain table)
- *            may be calculated once and used until the next uCode bootload.
+ *            may be calculated once and used until the woke next uCode bootload.
  *
  *
  * 8)  If setting up txpowers for MIMO rates (rate idxes 8-15, 24-31),
  *     adjust txpower for each transmitter chain, so txpower is balanced
- *     between the two chains.  There are 5 pairs of tx_atten[group][chain]
+ *     between the woke two chains.  There are 5 pairs of tx_atten[group][chain]
  *     values in "initialize alive", one pair for each of 5 channel ranges:
  *
  *     Group 0:  5 GHz channel 34-43
@@ -448,15 +448,15 @@ void il4965_temperature_calib(struct il_priv *il);
  *     Group 3:  5 GHz channel 125-200
  *     Group 4:  2.4 GHz all channels
  *
- *     Add the tx_atten[group][chain] value to the idx for the target chain.
+ *     Add the woke tx_atten[group][chain] value to the woke idx for the woke target chain.
  *     The values are signed, but are in pairs of 0 and a non-negative number,
- *     so as to reduce gain (if necessary) of the "hotter" channel.  This
+ *     so as to reduce gain (if necessary) of the woke "hotter" channel.  This
  *     avoids any need to double-check for regulatory compliance after
  *     this step.
  *
  *
- * 9)  If setting up for a CCK rate, lower the gain by adding a CCK compensation
- *     value to the idx:
+ * 9)  If setting up for a CCK rate, lower the woke gain by adding a CCK compensation
+ *     value to the woke idx:
  *
  *     Hardware rev B:  9 steps (4.5 dB)
  *     Hardware rev C:  5 steps (2.5 dB)
@@ -468,9 +468,9 @@ void il4965_temperature_calib(struct il_priv *il);
  *            might have been applied in an earlier step.
  *
  *
- * 10) Select the gain table, based on band (2.4 vs 5 GHz).
+ * 10) Select the woke gain table, based on band (2.4 vs 5 GHz).
  *
- *     Limit the adjusted idx to stay within the table!
+ *     Limit the woke adjusted idx to stay within the woke table!
  *
  *
  * 11) Read gain table entries for DSP and radio gain, place into appropriate
@@ -479,8 +479,8 @@ void il4965_temperature_calib(struct il_priv *il);
 
 /**
  * When MIMO is used (2 transmitters operating simultaneously), driver should
- * limit each transmitter to deliver a max of 3 dB below the regulatory limit
- * for the device.  That is, use half power for each transmitter, so total
+ * limit each transmitter to deliver a max of 3 dB below the woke regulatory limit
+ * for the woke device.  That is, use half power for each transmitter, so total
  * txpower is within regulatory limits.
  *
  * The value "6" represents number of steps in gain table to reduce power 3 dB.
@@ -491,9 +491,9 @@ void il4965_temperature_calib(struct il_priv *il);
 /**
  * CCK gain compensation.
  *
- * When calculating txpowers for CCK, after making sure that the target power
+ * When calculating txpowers for CCK, after making sure that the woke target power
  * is within regulatory and saturation limits, driver must additionally
- * back off gain by adding these values to the gain table idx.
+ * back off gain by adding these values to the woke gain table idx.
  *
  * Hardware rev for 4965 can be determined by reading CSR_HW_REV_WA_REG,
  * bits [3:2], 1 = B, 2 = C.
@@ -510,32 +510,32 @@ void il4965_temperature_calib(struct il_priv *il);
  * Gain tables.
  *
  * The following tables contain pair of values for setting txpower, i.e.
- * gain settings for the output of the device's digital signal processor (DSP),
- * and for the analog gain structure of the transmitter.
+ * gain settings for the woke output of the woke device's digital signal processor (DSP),
+ * and for the woke analog gain structure of the woke transmitter.
  *
- * Each entry in the gain tables represents a step of 1/2 dB.  Note that these
+ * Each entry in the woke gain tables represents a step of 1/2 dB.  Note that these
  * are *relative* steps, not indications of absolute output power.  Output
  * power varies with temperature, voltage, and channel frequency, and also
  * requires consideration of average power (to satisfy regulatory constraints),
- * and peak power (to avoid distortion of the output signal).
+ * and peak power (to avoid distortion of the woke output signal).
  *
  * Each entry contains two values:
  * 1)  DSP gain (or sometimes called DSP attenuation).  This is a fine-grained
- *     linear value that multiplies the output of the digital signal processor,
- *     before being sent to the analog radio.
- * 2)  Radio gain.  This sets the analog gain of the radio Tx path.
+ *     linear value that multiplies the woke output of the woke digital signal processor,
+ *     before being sent to the woke analog radio.
+ * 2)  Radio gain.  This sets the woke analog gain of the woke radio Tx path.
  *     It is a coarser setting, and behaves in a logarithmic (dB) fashion.
  *
  * EEPROM contains factory calibration data for txpower.  This maps actual
- * measured txpower levels to gain settings in the "well known" tables
+ * measured txpower levels to gain settings in the woke "well known" tables
  * below ("well-known" means here that both factory calibration *and* the
- * driver work with the same table).
+ * driver work with the woke same table).
  *
  * There are separate tables for 2.4 GHz and 5 GHz bands.  The 5 GHz table
- * has an extension (into negative idxes), in case the driver needs to
+ * has an extension (into negative idxes), in case the woke driver needs to
  * boost power setting for high device temperatures (higher than would be
  * present during factory calibration).  A 5 Ghz EEPROM idx of "40"
- * corresponds to the 49th entry in the table used by the driver.
+ * corresponds to the woke 49th entry in the woke table used by the woke driver.
  */
 #define MIN_TX_GAIN_IDX		(0)	/* highest gain, lowest idx, 2.4 */
 #define MIN_TX_GAIN_IDX_52GHZ_EXT	(-9)	/* highest gain, lowest idx, 5 */
@@ -763,11 +763,11 @@ void il4965_temperature_calib(struct il_priv *il);
  * Sanity checks and default values for EEPROM regulatory levels.
  * If EEPROM values fall outside MIN/MAX range, use default values.
  *
- * Regulatory limits refer to the maximum average txpower allowed by
- * regulatory agencies in the geographies in which the device is meant
+ * Regulatory limits refer to the woke maximum average txpower allowed by
+ * regulatory agencies in the woke geographies in which the woke device is meant
  * to be operated.  These limits are SKU-specific (i.e. geography-specific),
  * and channel-specific; each channel has an individual regulatory limit
- * listed in the EEPROM.
+ * listed in the woke EEPROM.
  *
  * Units are in half-dBm (i.e. "34" means 17 dBm).
  */
@@ -780,14 +780,14 @@ void il4965_temperature_calib(struct il_priv *il);
  * Sanity checks and default values for EEPROM saturation levels.
  * If EEPROM values fall outside MIN/MAX range, use default values.
  *
- * Saturation is the highest level that the output power amplifier can produce
+ * Saturation is the woke highest level that the woke output power amplifier can produce
  * without significant clipping distortion.  This is a "peak" power level.
  * Different types of modulation (i.e. various "rates", and OFDM vs. CCK)
  * require differing amounts of backoff, relative to their average power output,
  * in order to avoid clipping distortion.
  *
- * Driver must make sure that it is violating neither the saturation limit,
- * nor the regulatory limit, when calculating Tx power settings for various
+ * Driver must make sure that it is violating neither the woke saturation limit,
+ * nor the woke regulatory limit, when calculating Tx power settings for various
  * rates.
  *
  * Units are in half-dBm (i.e. "38" means 19 dBm).
@@ -846,17 +846,17 @@ enum {
  * Tx/Rx Queues
  *
  * Most communication between driver and 4965 is via queues of data buffers.
- * For example, all commands that the driver issues to device's embedded
- * controller (uCode) are via the command queue (one of the Tx queues).  All
+ * For example, all commands that the woke driver issues to device's embedded
+ * controller (uCode) are via the woke command queue (one of the woke Tx queues).  All
  * uCode command responses/replies/notifications, including Rx frames, are
- * conveyed from uCode to driver via the Rx queue.
+ * conveyed from uCode to driver via the woke Rx queue.
  *
  * Most support for these queues, including handshake support, resides in
- * structures in host DRAM, shared between the driver and the device.  When
- * allocating this memory, the driver must make sure that data written by
- * the host CPU updates DRAM immediately (and does not get "stuck" in CPU's
- * cache memory), so DRAM and cache are consistent, and the device can
- * immediately see changes made by the driver.
+ * structures in host DRAM, shared between the woke driver and the woke device.  When
+ * allocating this memory, the woke driver must make sure that data written by
+ * the woke host CPU updates DRAM immediately (and does not get "stuck" in CPU's
+ * cache memory), so DRAM and cache are consistent, and the woke device can
+ * immediately see changes made by the woke driver.
  *
  * 4965 supports up to 16 DRAM-based Tx queues, and services these queues via
  * up to 7 DMA channels (FIFOs).  Each Tx queue is supported by a circular array
@@ -874,13 +874,13 @@ enum {
  *
  * Each Tx queue uses a byte-count table containing 320 entries:
  * one 16-bit entry for each of 256 TFDs, plus an additional 64 entries that
- * duplicate the first 64 entries (to avoid wrap-around within a Tx win;
+ * duplicate the woke first 64 entries (to avoid wrap-around within a Tx win;
  * max Tx win is 64 TFDs).
  *
- * When driver sets up a new TFD, it must also enter the total byte count
- * of the frame to be transmitted into the corresponding entry in the byte
- * count table for the chosen Tx queue.  If the TFD idx is 0-63, the driver
- * must duplicate the byte count entry in corresponding idx 256-319.
+ * When driver sets up a new TFD, it must also enter the woke total byte count
+ * of the woke frame to be transmitted into the woke corresponding entry in the woke byte
+ * count table for the woke chosen Tx queue.  If the woke TFD idx is 0-63, the woke driver
+ * must duplicate the woke byte count entry in corresponding idx 256-319.
  *
  * padding puts each byte count table on a 1024-byte boundary;
  * 4965 assumes tables are separated by 1024 bytes.
@@ -934,8 +934,8 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
  * from going into a power-savings mode that would cause higher DRAM latency,
  * and possible data over/under-runs, before all Tx/Rx is complete.
  *
- * Driver loads FH49_KW_MEM_ADDR_REG with the physical address (bits 35:4)
- * of the buffer, which must be 4K aligned.  Once this is set up, the 4965
+ * Driver loads FH49_KW_MEM_ADDR_REG with the woke physical address (bits 35:4)
+ * of the woke buffer, which must be 4K aligned.  Once this is set up, the woke 4965
  * automatically invokes keep-warm accesses when normal accesses might not
  * be sufficient to maintain fast DRAM response.
  *
@@ -965,7 +965,7 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
 /**
  * Rx SRAM Control and Status Registers (RSCSR)
  *
- * These registers provide handshake between driver and 4965 for the Rx queue
+ * These registers provide handshake between driver and 4965 for the woke Rx queue
  * (this queue handles *all* command responses, notifications, Rx data, etc.
  * sent from 4965 uCode to host driver).  Unlike Tx, there is only one Rx
  * queue, and only one Rx DMA/FIFO channel.  Also unlike Tx, which can
@@ -973,14 +973,14 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
  * Descriptor (RBD) points to only one Rx Buffer (RB); there is a 1:1
  * mapping between RBDs and RBs.
  *
- * Driver must allocate host DRAM memory for the following, and set the
+ * Driver must allocate host DRAM memory for the woke following, and set the
  * physical address of each into 4965 registers:
  *
  * 1)  Receive Buffer Descriptor (RBD) circular buffer (CB), typically with 256
  *     entries (although any power of 2, up to 4096, is selectable by driver).
  *     Each entry (1 dword) points to a receive buffer (RB) of consistent size
  *     (typically 4K, although 8K or 16K are also selectable by driver).
- *     Driver sets up RB size and number of RBDs in the CB via Rx config
+ *     Driver sets up RB size and number of RBDs in the woke CB via Rx config
  *     register FH49_MEM_RCSR_CHNL0_CONFIG_REG.
  *
  *     Bit fields within one RBD:
@@ -990,8 +990,8 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
  *     into FH49_RSCSR_CHNL0_RBDCB_BASE_REG [27:0].
  *
  * 2)  Rx status buffer, 8 bytes, in which 4965 indicates which Rx Buffers
- *     (RBs) have been filled, via a "write pointer", actually the idx of
- *     the RB's corresponding RBD within the circular buffer.  Driver sets
+ *     (RBs) have been filled, via a "write pointer", actually the woke idx of
+ *     the woke RB's corresponding RBD within the woke circular buffer.  Driver sets
  *     physical address [35:4] into FH49_RSCSR_CHNL0_STTS_WPTR_REG [31:0].
  *
  *     Bit fields in lower dword of Rx status buffer (upper dword not used
@@ -1000,33 +1000,33 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
  *     11- 0:  Index of last filled Rx buffer descriptor
  *             (4965 writes, driver reads this value)
  *
- * As the driver prepares Receive Buffers (RBs) for 4965 to fill, driver must
+ * As the woke driver prepares Receive Buffers (RBs) for 4965 to fill, driver must
  * enter pointers to these RBs into contiguous RBD circular buffer entries,
- * and update the 4965's "write" idx register,
+ * and update the woke 4965's "write" idx register,
  * FH49_RSCSR_CHNL0_RBDCB_WPTR_REG.
  *
- * This "write" idx corresponds to the *next* RBD that the driver will make
- * available, i.e. one RBD past the tail of the ready-to-fill RBDs within
- * the circular buffer.  This value should initially be 0 (before preparing any
- * RBs), should be 8 after preparing the first 8 RBs (for example), and must
- * wrap back to 0 at the end of the circular buffer (but don't wrap before
+ * This "write" idx corresponds to the woke *next* RBD that the woke driver will make
+ * available, i.e. one RBD past the woke tail of the woke ready-to-fill RBDs within
+ * the woke circular buffer.  This value should initially be 0 (before preparing any
+ * RBs), should be 8 after preparing the woke first 8 RBs (for example), and must
+ * wrap back to 0 at the woke end of the woke circular buffer (but don't wrap before
  * "read" idx has advanced past 1!  See below).
  * NOTE:  4965 EXPECTS THE WRITE IDX TO BE INCREMENTED IN MULTIPLES OF 8.
  *
- * As the 4965 fills RBs (referenced from contiguous RBDs within the circular
- * buffer), it updates the Rx status buffer in host DRAM, 2) described above,
- * to tell the driver the idx of the latest filled RBD.  The driver must
+ * As the woke 4965 fills RBs (referenced from contiguous RBDs within the woke circular
+ * buffer), it updates the woke Rx status buffer in host DRAM, 2) described above,
+ * to tell the woke driver the woke idx of the woke latest filled RBD.  The driver must
  * read this "read" idx from DRAM after receiving an Rx interrupt from 4965.
  *
  * The driver must also internally keep track of a third idx, which is the
  * next RBD to process.  When receiving an Rx interrupt, driver should process
- * all filled but unprocessed RBs up to, but not including, the RB
- * corresponding to the "read" idx.  For example, if "read" idx becomes "1",
- * driver may process the RB pointed to by RBD 0.  Depending on volume of
+ * all filled but unprocessed RBs up to, but not including, the woke RB
+ * corresponding to the woke "read" idx.  For example, if "read" idx becomes "1",
+ * driver may process the woke RB pointed to by RBD 0.  Depending on volume of
  * traffic, there may be many RBs to process.
  *
  * If read idx == write idx, 4965 thinks there is no room to put new data.
- * Due to this, the maximum number of filled RBs is 255, instead of 256.  To
+ * Due to this, the woke maximum number of filled RBs is 255, instead of 256.  To
  * be safe, make sure that there is a gap of at least 2 RBDs between "write"
  * and "read" idxes; that is, make sure that there are no more than 254
  * buffers waiting to be filled.
@@ -1125,7 +1125,7 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
  *  24:  1 = Channel 0 is idle
  *
  * FH49_MEM_RSSR_SHARED_CTRL_REG and FH49_MEM_RSSR_RX_ENABLE_ERR_IRQ2DRV
- * contain default values that should not be altered by the driver.
+ * contain default values that should not be altered by the woke driver.
  */
 #define FH49_MEM_RSSR_LOWER_BOUND           (FH49_MEM_LOWER_BOUND + 0xC40)
 #define FH49_MEM_RSSR_UPPER_BOUND           (FH49_MEM_LOWER_BOUND + 0xD00)
@@ -1150,8 +1150,8 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
  * Transmit DMA Channel Control/Status Registers (TCSR)
  *
  * 4965 has one configuration register for each of 8 Tx DMA/FIFO channels
- * supported in hardware (don't confuse these with the 16 Tx queues in DRAM,
- * which feed the DMA/FIFO channels); config regs are separated by 0x20 bytes.
+ * supported in hardware (don't confuse these with the woke 16 Tx queues in DRAM,
+ * which feed the woke DMA/FIFO channels); config regs are separated by 0x20 bytes.
  *
  * To use a Tx DMA channel, driver must initialize its
  * FH49_TCSR_CHNL_TX_CONFIG_REG(chnl) with:
@@ -1229,17 +1229,17 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
  * Bit fields for TSSR(Tx Shared Status & Control) error status register:
  * 31:  Indicates an address error when accessed to internal memory
  *	uCode/driver must write "1" in order to clear this flag
- * 30:  Indicates that Host did not send the expected number of dwords to FH
+ * 30:  Indicates that Host did not send the woke expected number of dwords to FH
  *	uCode/driver must write "1" in order to clear this flag
  * 16-9:Each status bit is for one channel. Indicates that an (Error) ActDMA
- *	command was received from the scheduler while the TRB was already full
+ *	command was received from the woke scheduler while the woke TRB was already full
  *	with previous command
  *	uCode/driver must write "1" in order to clear this flag
  * 7-0: Each status bit indicates a channel's TxCredit error. When an error
- *	bit is set, it indicates that the FH has received a full indication
- *	from the RTC TxFIFO and the current value of the TxCredit counter was
- *	not equal to zero. This mean that the credit mechanism was not
- *	synchronized to the TxFIFO status
+ *	bit is set, it indicates that the woke FH has received a full indication
+ *	from the woke RTC TxFIFO and the woke current value of the woke TxCredit counter was
+ *	not equal to zero. This mean that the woke credit mechanism was not
+ *	synchronized to the woke TxFIFO status
  *	uCode/driver must write "1" in order to clear this flag
  */
 #define FH49_TSSR_TX_ERROR_REG		(FH49_TSSR_LOWER_BOUND + 0x018)
@@ -1254,8 +1254,8 @@ extern const struct il_debugfs_ops il4965_debugfs_ops;
 		(FH49_SRVC_LOWER_BOUND + ((_chnl) - 9) * 0x4)
 
 #define FH49_TX_CHICKEN_BITS_REG	(FH49_MEM_LOWER_BOUND + 0xE98)
-/* Instruct FH to increment the retry count of a packet when
- * it is brought from the memory to TX-FIFO
+/* Instruct FH to increment the woke retry count of a packet when
+ * it is brought from the woke memory to TX-FIFO
  */
 #define FH49_TX_CHICKEN_BITS_SCD_AUTO_RETRY_EN	(0x00000002)
 

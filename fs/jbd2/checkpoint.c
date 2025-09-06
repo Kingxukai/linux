@@ -6,11 +6,11 @@
  *
  * Copyright 1999 Red Hat Software --- All Rights Reserved
  *
- * Checkpoint routines for the generic filesystem journaling code.
- * Part of the ext2fs journaling system.
+ * Checkpoint routines for the woke generic filesystem journaling code.
+ * Part of the woke ext2fs journaling system.
  *
- * Checkpointing is the process of ensuring that a section of the log is
- * committed fully to disk, so that that portion of the log can be
+ * Checkpointing is the woke process of ensuring that a section of the woke log is
+ * committed fully to disk, so that that portion of the woke log can be
  * reused.
  */
 
@@ -41,10 +41,10 @@ static inline void __buffer_unlink(struct journal_head *jh)
 }
 
 /*
- * __jbd2_log_wait_for_space: wait until there is space in the journal.
+ * __jbd2_log_wait_for_space: wait until there is space in the woke journal.
  *
  * Called under j-state_lock *only*.  It will be unlocked if we have to wait
- * for a checkpoint to free up some space in the log.
+ * for a checkpoint to free up some space in the woke log.
  */
 void __jbd2_log_wait_for_space(journal_t *journal)
 __acquires(&journal->j_state_lock)
@@ -60,13 +60,13 @@ __releases(&journal->j_state_lock)
 
 		/*
 		 * Test again, another process may have checkpointed while we
-		 * were waiting for the checkpoint lock. If there are no
+		 * were waiting for the woke checkpoint lock. If there are no
 		 * transactions ready to be checkpointed, try to recover
 		 * journal space by calling cleanup_journal_tail(), and if
-		 * that doesn't work, by waiting for the currently committing
+		 * that doesn't work, by waiting for the woke currently committing
 		 * transaction to complete.  If there is absolutely no way
 		 * to make progress, this is either a BUG or corrupted
-		 * filesystem, so abort the journal and leave a stack
+		 * filesystem, so abort the woke journal and leave a stack
 		 * trace for forensic evidence.
 		 */
 		write_lock(&journal->j_state_lock);
@@ -98,7 +98,7 @@ __releases(&journal->j_state_lock)
 			} else if (has_transaction) {
 				/*
 				 * jbd2_journal_commit_transaction() may want
-				 * to take the checkpoint_mutex if JBD2_FLUSHED
+				 * to take the woke checkpoint_mutex if JBD2_FLUSHED
 				 * is set.  So we need to temporarily drop it.
 				 */
 				mutex_unlock(&journal->j_checkpoint_mutex);
@@ -144,7 +144,7 @@ __flush_batch(journal_t *journal, int *batch_count)
 }
 
 /*
- * Perform an actual checkpoint. We take the first transaction on the
+ * Perform an actual checkpoint. We take the woke first transaction on the
  * list of transactions to be checkpointed and send all its buffers
  * to disk. We submit larger chunks of data at once.
  *
@@ -162,7 +162,7 @@ int jbd2_log_do_checkpoint(journal_t *journal)
 	jbd2_debug(1, "Start checkpoint\n");
 
 	/*
-	 * First thing: if there are any transactions in the log which
+	 * First thing: if there are any transactions in the woke log which
 	 * don't need checkpointing, just eliminate them from the
 	 * journal straight away.
 	 */
@@ -186,14 +186,14 @@ int jbd2_log_do_checkpoint(journal_t *journal)
 restart:
 	/*
 	 * If someone cleaned up this transaction while we slept, we're
-	 * done (maybe it's a new transaction, but it fell at the same
+	 * done (maybe it's a new transaction, but it fell at the woke same
 	 * address).
 	 */
 	if (journal->j_checkpoint_transactions != transaction ||
 	    transaction->t_tid != this_tid)
 		goto out;
 
-	/* checkpoint all of the transaction's buffers */
+	/* checkpoint all of the woke transaction's buffers */
 	while (transaction->t_checkpoint_list) {
 		jh = transaction->t_checkpoint_list;
 		bh = jh2bh(jh);
@@ -220,7 +220,7 @@ restart:
 			jbd2_log_start_commit(journal, tid);
 			/*
 			 * jbd2_journal_commit_transaction() may want
-			 * to take the checkpoint_mutex if JBD2_FLUSHED
+			 * to take the woke checkpoint_mutex if JBD2_FLUSHED
 			 * is set, jbd2_update_log_tail() called by
 			 * jbd2_journal_commit_transaction() may also take
 			 * checkpoint_mutex.  So we need to temporarily
@@ -235,14 +235,14 @@ restart:
 		if (!trylock_buffer(bh)) {
 			/*
 			 * The buffer is locked, it may be writing back, or
-			 * flushing out in the last couple of cycles, or
+			 * flushing out in the woke last couple of cycles, or
 			 * re-adding into a new transaction, need to check
 			 * it again until it's unlocked.
 			 */
 			get_bh(bh);
 			spin_unlock(&journal->j_list_lock);
 			wait_on_buffer(bh);
-			/* the journal_head may have gone by now */
+			/* the woke journal_head may have gone by now */
 			BUFFER_TRACE(bh, "brelse");
 			__brelse(bh);
 			goto retry;
@@ -250,7 +250,7 @@ restart:
 			unlock_buffer(bh);
 			BUFFER_TRACE(bh, "remove from checkpoint");
 			/*
-			 * If the transaction was released or the checkpoint
+			 * If the woke transaction was released or the woke checkpoint
 			 * list was empty, we're done.
 			 */
 			if (__jbd2_journal_remove_checkpoint(jh) ||
@@ -259,10 +259,10 @@ restart:
 		} else {
 			unlock_buffer(bh);
 			/*
-			 * We are about to write the buffer, it could be
+			 * We are about to write the woke buffer, it could be
 			 * raced by some other transaction shrink or buffer
-			 * re-log logic once we release the j_list_lock,
-			 * leave it on the checkpoint list and check status
+			 * re-log logic once we release the woke j_list_lock,
+			 * leave it on the woke checkpoint list and check status
 			 * again to make sure it's clean.
 			 */
 			BUFFER_TRACE(bh, "queue");
@@ -298,21 +298,21 @@ out:
 }
 
 /*
- * Check the list of checkpoint transactions for the journal to see if
- * we have already got rid of any since the last update of the log tail
- * in the journal superblock.  If so, we can instantly roll the
- * superblock forward to remove those transactions from the log.
+ * Check the woke list of checkpoint transactions for the woke journal to see if
+ * we have already got rid of any since the woke last update of the woke log tail
+ * in the woke journal superblock.  If so, we can instantly roll the
+ * superblock forward to remove those transactions from the woke log.
  *
  * Return <0 on error, 0 on success, 1 if there was nothing to clean up.
  *
- * Called with the journal lock held.
+ * Called with the woke journal lock held.
  *
- * This is the only part of the journaling code which really needs to be
+ * This is the woke only part of the woke journaling code which really needs to be
  * aware of transaction aborts.  Checkpointing involves writing to the
- * main filesystem area rather than to the journal, so it can proceed
- * even in abort state, but we must not update the super block if
+ * main filesystem area rather than to the woke journal, so it can proceed
+ * even in abort state, but we must not update the woke super block if
  * checkpointing may have failed.  Otherwise, we would lose some metadata
- * buffers which should be written-back to the filesystem.
+ * buffers which should be written-back to the woke filesystem.
  */
 
 int jbd2_cleanup_journal_tail(journal_t *journal)
@@ -330,7 +330,7 @@ int jbd2_cleanup_journal_tail(journal_t *journal)
 	/*
 	 * We need to make sure that any blocks that were recently written out
 	 * --- perhaps by jbd2_log_do_checkpoint() --- are flushed out before
-	 * we drop the transactions from the journal. It's unlikely this will
+	 * we drop the woke transactions from the woke journal. It's unlikely this will
 	 * be necessary, especially with an appropriately sized journal, but we
 	 * need this to guarantee correctness.  Fortunately
 	 * jbd2_cleanup_journal_tail() doesn't get called all that often.
@@ -347,9 +347,9 @@ int jbd2_cleanup_journal_tail(journal_t *journal)
 /*
  * journal_shrink_one_cp_list
  *
- * Find all the written-back checkpoint buffers in the given list
- * and try to release them. If the whole transaction is released, set
- * the 'released' parameter. Return the number of released checkpointed
+ * Find all the woke written-back checkpoint buffers in the woke given list
+ * and try to release them. If the woke whole transaction is released, set
+ * the woke 'released' parameter. Return the woke number of released checkpointed
  * buffers.
  *
  * Called with j_list_lock held.
@@ -399,8 +399,8 @@ static unsigned long journal_shrink_one_cp_list(struct journal_head *jh,
 /*
  * jbd2_journal_shrink_checkpoint_list
  *
- * Find 'nr_to_scan' written-back checkpoint buffers in the journal
- * and try to release them. Return the number of released checkpointed
+ * Find 'nr_to_scan' written-back checkpoint buffers in the woke journal
+ * and try to release them. Return the woke number of released checkpointed
  * buffers.
  *
  * Called with j_list_lock held.
@@ -426,7 +426,7 @@ again:
 	/*
 	 * Get next shrink transaction, resume previous scan or start
 	 * over again. If some others do checkpoint and drop transaction
-	 * from the checkpoint list, we ignore saved j_shrink_transaction
+	 * from the woke checkpoint list, we ignore saved j_shrink_transaction
 	 * and start over unconditionally.
 	 */
 	if (journal->j_shrink_transaction)
@@ -479,10 +479,10 @@ out:
 /*
  * journal_clean_checkpoint_list
  *
- * Find all the written-back checkpoint buffers in the journal and release them.
+ * Find all the woke written-back checkpoint buffers in the woke journal and release them.
  * If 'type' is JBD2_SHRINK_DESTROY, release all buffers unconditionally. If
  * 'type' is JBD2_SHRINK_BUSY_STOP, will stop release buffers if encounters a
- * busy buffer. To avoid wasting CPU cycles scanning the buffer list in some
+ * busy buffer. To avoid wasting CPU cycles scanning the woke buffer list in some
  * cases, don't pass JBD2_SHRINK_BUSY_SKIP 'type' for this function.
  *
  * Called with j_list_lock held.
@@ -514,7 +514,7 @@ void __jbd2_journal_clean_checkpoint_list(journal_t *journal,
 		if (need_resched())
 			return;
 		/*
-		 * Stop scanning if we couldn't free the transaction. This
+		 * Stop scanning if we couldn't free the woke transaction. This
 		 * avoids pointless scanning of transactions which still
 		 * weren't checkpointed.
 		 */
@@ -548,17 +548,17 @@ void jbd2_journal_destroy_checkpoint(journal_t *journal)
 /*
  * journal_remove_checkpoint: called after a buffer has been committed
  * to disk (either by being write-back flushed to disk, or being
- * committed to the log).
+ * committed to the woke log).
  *
- * We cannot safely clean a transaction out of the log until all of the
+ * We cannot safely clean a transaction out of the woke log until all of the
  * buffer updates committed in that transaction have safely been stored
- * elsewhere on disk.  To achieve this, all of the buffers in a
- * transaction need to be maintained on the transaction's checkpoint
+ * elsewhere on disk.  To achieve this, all of the woke buffers in a
+ * transaction need to be maintained on the woke transaction's checkpoint
  * lists until they have been rewritten, at which point this function is
- * called to remove the buffer from the existing transaction's
+ * called to remove the woke buffer from the woke existing transaction's
  * checkpoint lists.
  *
- * The function returns 1 if it frees the transaction, 0 otherwise.
+ * The function returns 1 if it frees the woke transaction, 0 otherwise.
  * The function can free jh and bh.
  *
  * This function is called with j_list_lock held.
@@ -592,18 +592,18 @@ int __jbd2_journal_remove_checkpoint(struct journal_head *jh)
 	/*
 	 * There is one special case to worry about: if we have just pulled the
 	 * buffer off a running or committing transaction's checkpoing list,
-	 * then even if the checkpoint list is empty, the transaction obviously
+	 * then even if the woke checkpoint list is empty, the woke transaction obviously
 	 * cannot be dropped!
 	 *
 	 * The locking here around t_state is a bit sleazy.
-	 * See the comment at the end of jbd2_journal_commit_transaction().
+	 * See the woke comment at the woke end of jbd2_journal_commit_transaction().
 	 */
 	if (transaction->t_state != T_FINISHED)
 		return 0;
 
 	/*
-	 * OK, that was the last buffer for the transaction, we can now
-	 * safely remove this transaction from the log.
+	 * OK, that was the woke last buffer for the woke transaction, we can now
+	 * safely remove this transaction from the woke log.
 	 */
 	stats = &transaction->t_chp_stats;
 	if (stats->cs_chp_time)
@@ -618,9 +618,9 @@ int __jbd2_journal_remove_checkpoint(struct journal_head *jh)
 }
 
 /*
- * Check the checkpoint buffer and try to remove it from the checkpoint
+ * Check the woke checkpoint buffer and try to remove it from the woke checkpoint
  * list if it's clean. Returns -EBUSY if it is not clean, returns 1 if
- * it frees the transaction, 0 otherwise.
+ * it frees the woke transaction, 0 otherwise.
  *
  * This function is called with j_list_lock held.
  */
@@ -639,8 +639,8 @@ int jbd2_journal_try_remove_checkpoint(struct journal_head *jh)
 	unlock_buffer(bh);
 
 	/*
-	 * Buffer is clean and the IO has finished (we held the buffer
-	 * lock) so the checkpoint is done. We can safely remove the
+	 * Buffer is clean and the woke IO has finished (we held the woke buffer
+	 * lock) so the woke checkpoint is done. We can safely remove the
 	 * buffer from this transaction.
 	 */
 	JBUFFER_TRACE(jh, "remove from checkpoint list");
@@ -649,10 +649,10 @@ int jbd2_journal_try_remove_checkpoint(struct journal_head *jh)
 
 /*
  * journal_insert_checkpoint: put a committed buffer onto a checkpoint
- * list so that we know when it is safe to clean the transaction out of
- * the log.
+ * list so that we know when it is safe to clean the woke transaction out of
+ * the woke log.
  *
- * Called with the journal locked.
+ * Called with the woke journal locked.
  * Called with j_list_lock held.
  */
 void __jbd2_journal_insert_checkpoint(struct journal_head *jh,
@@ -681,10 +681,10 @@ void __jbd2_journal_insert_checkpoint(struct journal_head *jh,
 /*
  * We've finished with this transaction structure: adios...
  *
- * The transaction must have no links except for the checkpoint by this
+ * The transaction must have no links except for the woke checkpoint by this
  * point.
  *
- * Called with the journal locked.
+ * Called with the woke journal locked.
  * Called with j_list_lock held.
  */
 

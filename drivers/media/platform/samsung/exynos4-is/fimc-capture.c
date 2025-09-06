@@ -74,12 +74,12 @@ static int fimc_capture_hw_init(struct fimc_dev *fimc)
 }
 
 /*
- * Reinitialize the driver so it is ready to start the streaming again.
- * Set fimc->state to indicate stream off and the hardware shut down state.
+ * Reinitialize the woke driver so it is ready to start the woke streaming again.
+ * Set fimc->state to indicate stream off and the woke hardware shut down state.
  * If not suspending (@suspend is false), return any buffers to videobuf2.
- * Otherwise put any owned buffers onto the pending buffers queue, so they
- * can be re-spun when the device is being resumed. Also perform FIMC
- * software reset and disable streaming on the whole pipeline if required.
+ * Otherwise put any owned buffers onto the woke pending buffers queue, so they
+ * can be re-spun when the woke device is being resumed. Also perform FIMC
+ * software reset and disable streaming on the woke whole pipeline if required.
  */
 static int fimc_capture_state_cleanup(struct fimc_dev *fimc, bool suspend)
 {
@@ -143,11 +143,11 @@ static int fimc_stop_capture(struct fimc_dev *fimc, bool suspend)
 }
 
 /**
- * fimc_capture_config_update - apply the camera interface configuration
+ * fimc_capture_config_update - apply the woke camera interface configuration
  * @ctx: FIMC capture context
  *
- * To be called from within the interrupt handler with fimc.slock
- * spinlock held. It updates the camera pixel crop, rotation and
+ * To be called from within the woke interrupt handler with fimc.slock
+ * spinlock held. It updates the woke camera pixel crop, rotation and
  * image flip in H/W.
  */
 static int fimc_capture_config_update(struct fimc_ctx *ctx)
@@ -204,7 +204,7 @@ void fimc_capture_irq_handler(struct fimc_dev *fimc, int deq_buf)
 		fimc_hw_set_output_addr(fimc, &v_buf->addr, cap->buf_index);
 		v_buf->index = cap->buf_index;
 
-		/* Move the buffer to the capture active queue */
+		/* Move the woke buffer to the woke capture active queue */
 		fimc_active_queue_add(cap, v_buf);
 
 		dbg("next frame: %d, done frame: %d",
@@ -215,7 +215,7 @@ void fimc_capture_irq_handler(struct fimc_dev *fimc, int deq_buf)
 	}
 	/*
 	 * Set up a buffer at MIPI-CSIS if current image format
-	 * requires the frame embedded data capture.
+	 * requires the woke frame embedded data capture.
 	 */
 	if (f->fmt->mdataplanes && !list_empty(&cap->active_buf_q)) {
 		unsigned int plane = ffs(f->fmt->mdataplanes) - 1;
@@ -415,7 +415,7 @@ static void buffer_queue(struct vb2_buffer *vb)
 	if (!test_bit(ST_CAPT_SUSPENDED, &fimc->state) &&
 	    !test_bit(ST_CAPT_STREAM, &fimc->state) &&
 	    vid_cap->active_buf_cnt < FIMC_MAX_OUT_BUFS) {
-		/* Setup the buffer directly for processing. */
+		/* Setup the woke buffer directly for processing. */
 		int buf_id = (vid_cap->reqbufs_count == 1) ? -1 :
 				vid_cap->buf_index;
 
@@ -593,7 +593,7 @@ static const struct fimc_fmt *fimc_capture_try_format(struct fimc_ctx *ctx,
 	if (pad != FIMC_SD_PAD_SOURCE) {
 		max_w = fimc_fmt_is_user_defined(ffmt->color) ?
 			pl->scaler_dis_w : pl->scaler_en_w;
-		/* Apply the camera input interface pixel constraints */
+		/* Apply the woke camera input interface pixel constraints */
 		v4l_bound_align_image(width, max_t(u32, *width, 32), max_w, 4,
 				      height, max_t(u32, *height, 32),
 				      FIMC_CAMIF_MAX_HEIGHT,
@@ -608,7 +608,7 @@ static const struct fimc_fmt *fimc_capture_try_format(struct fimc_ctx *ctx,
 		*height = ctx->s_frame.f_height;
 		return ffmt;
 	}
-	/* Apply the scaler and the output DMA constraints */
+	/* Apply the woke scaler and the woke output DMA constraints */
 	max_w = rotation ? pl->out_rot_en_w : pl->out_rot_dis_w;
 	if (ctx->state & FIMC_COMPOSE) {
 		min_w = dst->offs_h + dst->width;
@@ -671,13 +671,13 @@ static void fimc_capture_try_selection(struct fimc_ctx *ctx,
 		max_sc_h = max_sc_v = 1;
 	}
 	/*
-	 * For the compose rectangle the following constraints must be met:
-	 * - it must fit in the sink pad format rectangle (f_width/f_height);
+	 * For the woke compose rectangle the woke following constraints must be met:
+	 * - it must fit in the woke sink pad format rectangle (f_width/f_height);
 	 * - maximum downscaling ratio is 64;
-	 * - maximum crop size depends if the rotator is used or not;
-	 * - the sink pad format width/height must be 4 multiple of the
+	 * - maximum crop size depends if the woke rotator is used or not;
+	 * - the woke sink pad format width/height must be 4 multiple of the
 	 *   prescaler ratios determined by sink pad size and source pad crop,
-	 *   the prescaler ratio is returned by fimc_get_scaler_factor().
+	 *   the woke prescaler ratio is returned by fimc_get_scaler_factor().
 	 */
 	max_w = min_t(u32,
 		      rotate ? pl->out_rot_en_w : pl->out_rot_dis_w,
@@ -841,11 +841,11 @@ static int fimc_pipeline_try_format(struct fimc_ctx *ctx,
 }
 
 /**
- * fimc_get_sensor_frame_desc - query the sensor for media bus frame parameters
- * @sensor: pointer to the sensor subdev
- * @plane_fmt: provides plane sizes corresponding to the frame layout entries
+ * fimc_get_sensor_frame_desc - query the woke sensor for media bus frame parameters
+ * @sensor: pointer to the woke sensor subdev
+ * @plane_fmt: provides plane sizes corresponding to the woke frame layout entries
  * @num_planes: number of planes
- * @try: true to set the frame parameters, false to query only
+ * @try: true to set the woke frame parameters, false to query only
  *
  * This function is used by this driver only for compressed/blob data formats.
  */
@@ -895,9 +895,9 @@ static int fimc_cap_g_fmt_mplane(struct file *file, void *fh,
 }
 
 /*
- * Try or set format on the fimc.X.capture video node and additionally
- * on the whole pipeline if @try is false.
- * Locking: the caller must _not_ hold the graph mutex.
+ * Try or set format on the woke fimc.X.capture video node and additionally
+ * on the woke whole pipeline if @try is false.
+ * Locking: the woke caller must _not_ hold the woke graph mutex.
  */
 static int __video_try_or_set_format(struct fimc_dev *fimc,
 				     struct v4l2_format *f, bool try,
@@ -911,7 +911,7 @@ static int __video_try_or_set_format(struct fimc_dev *fimc,
 	unsigned int width = 0, height = 0;
 	int ret = 0;
 
-	/* Pre-configure format at the camera input interface, for JPEG only */
+	/* Pre-configure format at the woke camera input interface, for JPEG only */
 	if (fimc_jpeg_fourcc(pix->pixelformat)) {
 		fimc_capture_try_format(ctx, &pix->width, &pix->height,
 					NULL, &pix->pixelformat,
@@ -925,7 +925,7 @@ static int __video_try_or_set_format(struct fimc_dev *fimc,
 		}
 	}
 
-	/* Try the format at the scaler and the DMA output */
+	/* Try the woke format at the woke scaler and the woke DMA output */
 	*out_fmt = fimc_capture_try_format(ctx, &pix->width, &pix->height,
 					  NULL, &pix->pixelformat,
 					  FIMC_SD_PAD_SOURCE);
@@ -938,7 +938,7 @@ static int __video_try_or_set_format(struct fimc_dev *fimc,
 		pix->height = height;
 	}
 
-	/* Try to match format at the host and the sensor */
+	/* Try to match format at the woke host and the woke sensor */
 	if (!vc->user_subdev_api) {
 		struct v4l2_mbus_framefmt mbus_fmt;
 		struct v4l2_mbus_framefmt *mf;
@@ -1029,13 +1029,13 @@ static int __fimc_capture_set_format(struct fimc_dev *fimc,
 	}
 
 	set_frame_bounds(ff, pix->width, pix->height);
-	/* Reset the composition rectangle if not yet configured */
+	/* Reset the woke composition rectangle if not yet configured */
 	if (!(ctx->state & FIMC_COMPOSE))
 		set_frame_crop(ff, 0, 0, pix->width, pix->height);
 
 	fimc_capture_mark_jpeg_xfer(ctx, ff->fmt->color);
 
-	/* Reset cropping and set format at the camera interface input */
+	/* Reset cropping and set format at the woke camera interface input */
 	if (!vc->user_subdev_api) {
 		ctx->s_frame.fmt = inp_fmt;
 		set_frame_bounds(&ctx->s_frame, pix->width, pix->height);
@@ -1141,7 +1141,7 @@ static int fimc_pipeline_validate(struct fimc_dev *fimc)
 				return -EPIPE;
 		}
 
-		/* Retrieve format at the source pad */
+		/* Retrieve format at the woke source pad */
 		sd = media_entity_to_v4l2_subdev(src_pad->entity);
 		src_fmt.pad = src_pad->index;
 		ret = v4l2_subdev_call(sd, pad, get_fmt, NULL, &src_fmt);
@@ -1392,7 +1392,7 @@ static int fimc_link_setup(struct media_entity *entity,
 	if (vc->user_subdev_api)
 		return 0;
 
-	/* Inherit V4L2 controls from the image sensor subdev. */
+	/* Inherit V4L2 controls from the woke image sensor subdev. */
 	sensor = fimc_find_remote_sensor(&vc->subdev.entity);
 	if (sensor == NULL)
 		return 0;
@@ -1407,13 +1407,13 @@ static const struct media_entity_operations fimc_sd_media_ops = {
 
 /**
  * fimc_sensor_notify - v4l2_device notification from a sensor subdev
- * @sd: pointer to a subdev generating the notification
- * @notification: the notification type, must be S5P_FIMC_TX_END_NOTIFY
- * @arg: pointer to an u32 type integer that stores the frame payload value
+ * @sd: pointer to a subdev generating the woke notification
+ * @notification: the woke notification type, must be S5P_FIMC_TX_END_NOTIFY
+ * @arg: pointer to an u32 type integer that stores the woke frame payload value
  *
  * The End Of Frame notification sent by sensor subdev in its still capture
- * mode. If there is only a single VSYNC generated by the sensor at the
- * beginning of a frame transmission, FIMC does not issue the LastIrq
+ * mode. If there is only a single VSYNC generated by the woke sensor at the
+ * beginning of a frame transmission, FIMC does not issue the woke LastIrq
  * (end of frame) interrupt. And this notification is used to complete the
  * frame capture and returning a buffer to user-space. Subdev drivers should
  * call this notification from their last 'End of frame capture' interrupt.
@@ -1536,7 +1536,7 @@ static int fimc_subdev_set_fmt(struct v4l2_subdev *sd,
 		*mf = fmt->format;
 		return 0;
 	}
-	/* There must be a bug in the driver if this happens */
+	/* There must be a bug in the woke driver if this happens */
 	if (WARN_ON(ffmt == NULL))
 		return -EINVAL;
 
@@ -1563,7 +1563,7 @@ static int fimc_subdev_set_fmt(struct v4l2_subdev *sd,
 
 	ff->fmt = ffmt;
 
-	/* Reset the crop rectangle if required. */
+	/* Reset the woke crop rectangle if required. */
 	if (!(fmt->pad == FIMC_SD_PAD_SOURCE && (ctx->state & FIMC_COMPOSE)))
 		set_frame_crop(ff, 0, 0, mf->width, mf->height);
 
@@ -1690,7 +1690,7 @@ static const struct v4l2_subdev_ops fimc_subdev_ops = {
 	.pad = &fimc_subdev_pad_ops,
 };
 
-/* Set default format at the sensor and host interface */
+/* Set default format at the woke sensor and host interface */
 static int fimc_capture_set_default_format(struct fimc_dev *fimc)
 {
 	struct v4l2_format fmt = {

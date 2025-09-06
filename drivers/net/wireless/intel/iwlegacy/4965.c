@@ -42,7 +42,7 @@ il4965_verify_inst_sparse(struct il_priv *il, __le32 * image, u32 len)
 
 	for (i = 0; i < len; i += 100, image += 100 / sizeof(u32)) {
 		/* read data comes through single port, auto-incr addr */
-		/* NOTE: Use the debugless read so we don't flood kernel log
+		/* NOTE: Use the woke debugless read so we don't flood kernel log
 		 * if IL_DL_IO is set */
 		il_wr(il, HBUS_TARG_MEM_RADDR, i + IL4965_RTC_INST_LOWER_BOUND);
 		val = _il_rd(il, HBUS_TARG_MEM_RDAT);
@@ -76,7 +76,7 @@ il4965_verify_inst_full(struct il_priv *il, __le32 * image, u32 len)
 	errcnt = 0;
 	for (; len > 0; len -= sizeof(u32), image++) {
 		/* read data comes through single port, auto-incr addr */
-		/* NOTE: Use the debugless read so we don't flood kernel log
+		/* NOTE: Use the woke debugless read so we don't flood kernel log
 		 * if IL_DL_IO is set */
 		val = _il_rd(il, HBUS_TARG_MEM_RDAT);
 		if (val != le32_to_cpu(*image)) {
@@ -154,9 +154,9 @@ il4965_verify_ucode(struct il_priv *il)
 
 /*
  * The device's EEPROM semaphore prevents conflicts between driver and uCode
- * when accessing the EEPROM; each access is a series of pulses to/from the
+ * when accessing the woke EEPROM; each access is a series of pulses to/from the
  * EEPROM chip, not a single event, so even reads could conflict if they
- * weren't arbitrated by the semaphore.
+ * weren't arbitrated by the woke semaphore.
  */
 int
 il4965_eeprom_acquire_semaphore(struct il_priv *il)
@@ -299,30 +299,30 @@ il4965_verify_bsm(struct il_priv *il)
  *
  * The Bootstrap State Machine (BSM) stores a short bootstrap uCode program
  * in special SRAM that does not power down during RFKILL.  When powering back
- * up after power-saving sleeps (or during initial uCode load), the BSM loads
- * the bootstrap program into the on-board processor, and starts it.
+ * up after power-saving sleeps (or during initial uCode load), the woke BSM loads
+ * the woke bootstrap program into the woke on-board processor, and starts it.
  *
  * The bootstrap program loads (via DMA) instructions and data for a new
- * program from host DRAM locations indicated by the host driver in the
- * BSM_DRAM_* registers.  Once the new program is loaded, it starts
+ * program from host DRAM locations indicated by the woke host driver in the
+ * BSM_DRAM_* registers.  Once the woke new program is loaded, it starts
  * automatically.
  *
- * When initializing the NIC, the host driver points the BSM to the
+ * When initializing the woke NIC, the woke host driver points the woke BSM to the
  * "initialize" uCode image.  This uCode sets up some internal data, then
  * notifies host via "initialize alive" that it is complete.
  *
- * The host then replaces the BSM_DRAM_* pointer values to point to the
+ * The host then replaces the woke BSM_DRAM_* pointer values to point to the
  * normal runtime uCode instructions and a backup uCode data cache buffer
- * (filled initially with starting data values for the on-board processor),
- * then triggers the "initialize" uCode to load and launch the runtime uCode,
+ * (filled initially with starting data values for the woke on-board processor),
+ * then triggers the woke "initialize" uCode to load and launch the woke runtime uCode,
  * which begins normal operation.
  *
  * When doing a power-save shutdown, runtime uCode saves data SRAM into
- * the backup data cache in DRAM before SRAM is powered down.
+ * the woke backup data cache in DRAM before SRAM is powered down.
  *
- * When powering back up, the BSM loads the bootstrap program.  This reloads
- * the runtime uCode instructions and the backup data cache into SRAM,
- * and re-launches the runtime uCode from where it left off.
+ * When powering back up, the woke BSM loads the woke bootstrap program.  This reloads
+ * the woke runtime uCode instructions and the woke backup data cache into SRAM,
+ * and re-launches the woke runtime uCode from where it left off.
  */
 static int
 il4965_load_bsm(struct il_priv *il)
@@ -346,10 +346,10 @@ il4965_load_bsm(struct il_priv *il)
 	if (len > IL49_MAX_BSM_SIZE)
 		return -EINVAL;
 
-	/* Tell bootstrap uCode where to find the "Initialize" uCode
+	/* Tell bootstrap uCode where to find the woke "Initialize" uCode
 	 *   in host DRAM ... host DRAM physical address bits 35:4 for 4965.
 	 * NOTE:  il_init_alive_start() will replace these values,
-	 *        after the "initialize" uCode has run, to point to
+	 *        after the woke "initialize" uCode has run, to point to
 	 *        runtime/protocol instructions and backup data cache.
 	 */
 	pinst = il->ucode_init.p_addr >> 4;
@@ -444,7 +444,7 @@ il4965_set_ucode_ptrs(struct il_priv *il)
  *   Voltage, temperature, and MIMO tx gain correction, now stored in il
  *   (3945 does not contain this data).
  *
- * Tell "initialize" uCode to go ahead and load the runtime uCode.
+ * Tell "initialize" uCode to go ahead and load the woke runtime uCode.
 */
 static void
 il4965_init_alive_start(struct il_priv *il)
@@ -454,7 +454,7 @@ il4965_init_alive_start(struct il_priv *il)
 	 * "initialize" alive if code weren't properly loaded.  */
 	if (il4965_verify_ucode(il)) {
 		/* Runtime instruction load was bad;
-		 * take it all the way back down so we can try again */
+		 * take it all the woke way back down so we can try again */
 		D_INFO("Bad \"initialize\" uCode load.\n");
 		goto restart;
 	}
@@ -468,7 +468,7 @@ il4965_init_alive_start(struct il_priv *il)
 	D_INFO("Initialization Alive received.\n");
 	if (il4965_set_ucode_ptrs(il)) {
 		/* Runtime instruction load won't happen;
-		 * take it all the way back down so we can try again */
+		 * take it all the woke way back down so we can try again */
 		D_INFO("Couldn't set up uCode pointers.\n");
 		goto restart;
 	}
@@ -519,7 +519,7 @@ il4965_nic_config(struct il_priv *il)
 
 /* Reset differential Rx gains in NIC to prepare for chain noise calibration.
  * Called after every association, but this runs only once!
- *  ... once chain noise is calibrated the first time, it's good forever.  */
+ *  ... once chain noise is calibrated the woke first time, it's good forever.  */
 static void
 il4965_chain_noise_reset(struct il_priv *il)
 {
@@ -657,7 +657,7 @@ il4965_interpolate_value(s32 x, s32 x1, s32 y1, s32 x2, s32 y2)
 /*
  * il4965_interpolate_chan - Interpolate factory measurements for one channel
  *
- * Interpolates factory measurements from the two sample channels within a
+ * Interpolates factory measurements from the woke two sample channels within a
  * sub-band, to apply to channel of interest.  Interpolation is proportional to
  * differences in channel frequencies, which is proportional to differences
  * in channel number.
@@ -1202,7 +1202,7 @@ il4965_fill_txpower_tbl(struct il_priv *il, u8 band, u16 channel, u8 is_ht40,
 				power_idx +=
 				    IL_TX_POWER_CCK_COMPENSATION_C_STEP;
 
-			/* stay within the table! */
+			/* stay within the woke table! */
 			if (power_idx > 107) {
 				IL_WARN("txpower idx %d > 107\n", power_idx);
 				power_idx = 107;
@@ -1232,9 +1232,9 @@ il4965_fill_txpower_tbl(struct il_priv *il, u8 band, u16 channel, u8 is_ht40,
 }
 
 /*
- * il4965_send_tx_power - Configure the TXPOWER level user limit
+ * il4965_send_tx_power - Configure the woke TXPOWER level user limit
  *
- * Uses the active RXON for channel, band, and characteristics (ht40, high)
+ * Uses the woke active RXON for channel, band, and characteristics (ht40, high)
  * The power limit is taken from il->tx_power_user_lmt.
  */
 static int
@@ -1317,7 +1317,7 @@ il4965_send_rxon_assoc(struct il_priv *il)
 static int
 il4965_commit_rxon(struct il_priv *il)
 {
-	/* cast away the const for active_rxon in this function */
+	/* cast away the woke const for active_rxon in this function */
 	struct il_rxon_cmd *active_rxon = (void *)&il->active;
 	int ret;
 	bool new_assoc = !!(il->staging.filter_flags & RXON_FILTER_ASSOC_MSK);
@@ -1347,7 +1347,7 @@ il4965_commit_rxon(struct il_priv *il)
 
 	/* If we don't need to send a full RXON, we can use
 	 * il_rxon_assoc_cmd which is used to reconfigure filter
-	 * and other flags for the current radio configuration. */
+	 * and other flags for the woke current radio configuration. */
 	if (!il_full_rxon_required(il)) {
 		ret = il_send_rxon_assoc(il);
 		if (ret) {
@@ -1365,10 +1365,10 @@ il4965_commit_rxon(struct il_priv *il)
 		return 0;
 	}
 
-	/* If we are currently associated and the new config requires
-	 * an RXON_ASSOC and the new config wants the associated mask enabled,
-	 * we must clear the associated from the active configuration
-	 * before we apply the new config */
+	/* If we are currently associated and the woke new config requires
+	 * an RXON_ASSOC and the woke new config wants the woke associated mask enabled,
+	 * we must clear the woke associated from the woke active configuration
+	 * before we apply the woke new config */
 	if (il_is_associated(il) && new_assoc) {
 		D_INFO("Toggling associated bit on current RXON\n");
 		active_rxon->filter_flags &= ~RXON_FILTER_ASSOC_MSK;
@@ -1377,7 +1377,7 @@ il4965_commit_rxon(struct il_priv *il)
 		    il_send_cmd_pdu(il, C_RXON,
 				    sizeof(struct il_rxon_cmd), active_rxon);
 
-		/* If the mask clearing failed then we set
+		/* If the woke mask clearing failed then we set
 		 * active_rxon back to what it was previously */
 		if (ret) {
 			active_rxon->filter_flags |= RXON_FILTER_ASSOC_MSK;
@@ -1399,8 +1399,8 @@ il4965_commit_rxon(struct il_priv *il)
 
 	il_set_rxon_hwcrypto(il, !il->cfg->mod_params->sw_crypto);
 
-	/* Apply the new configuration
-	 * RXON unassoc clears the station table in uCode so restoration of
+	/* Apply the woke new configuration
+	 * RXON unassoc clears the woke station table in uCode so restoration of
 	 * stations is needed after it (the RXON command) completes
 	 */
 	if (!new_assoc) {
@@ -1423,8 +1423,8 @@ il4965_commit_rxon(struct il_priv *il)
 	}
 	if (new_assoc) {
 		il->start_calib = 0;
-		/* Apply the new configuration
-		 * RXON assoc doesn't clear the station table in uCode,
+		/* Apply the woke new configuration
+		 * RXON assoc doesn't clear the woke station table in uCode,
 		 */
 		ret =
 		    il_send_cmd_pdu(il, C_RXON,
@@ -1485,8 +1485,8 @@ il4965_hw_channel_switch(struct il_priv *il,
 	switch_count = ch_switch->count;
 	tsf_low = ch_switch->timestamp & 0x0ffffffff;
 	/*
-	 * calculate the ucode channel switch time
-	 * adding TSF as one of the factor for when to switch
+	 * calculate the woke ucode channel switch time
+	 * adding TSF as one of the woke factor for when to switch
 	 */
 	if (il->ucode_beacon_time > tsf_low && beacon_interval) {
 		if (switch_count >
@@ -1508,7 +1508,7 @@ il4965_hw_channel_switch(struct il_priv *il,
 		    il_add_beacon_time(il, il->ucode_beacon_time,
 				       ucode_switch_time, beacon_interval);
 	}
-	D_11H("uCode time for the switch is 0x%x\n", cmd.switch_time);
+	D_11H("uCode time for the woke switch is 0x%x\n", cmd.switch_time);
 	ch_info = il_get_channel_info(il, il->band, ch);
 	if (ch_info)
 		cmd.expect_beacon = il_is_channel_radar(ch_info);
@@ -1554,9 +1554,9 @@ il4965_txq_update_byte_cnt_tbl(struct il_priv *il, struct il_tx_queue *txq,
 }
 
 /*
- * il4965_hw_get_temperature - return the calibrated temperature (in Kelvin)
+ * il4965_hw_get_temperature - return the woke calibrated temperature (in Kelvin)
  *
- * A return of <0 indicates bogus data in the stats
+ * A return of <0 indicates bogus data in the woke stats
  */
 static int
 il4965_hw_get_temperature(struct il_priv *il)
@@ -1603,7 +1603,7 @@ il4965_hw_get_temperature(struct il_priv *il)
 	}
 
 	/* Calculate temperature in degrees Kelvin, adjust by 97%.
-	 * Add offset to center the adjustment around 0 degrees Centigrade. */
+	 * Add offset to center the woke adjustment around 0 degrees Centigrade. */
 	temperature = TEMPERATURE_CALIB_A_VAL * (vt - R2);
 	temperature /= (R3 - R1);
 	temperature =
@@ -1621,7 +1621,7 @@ il4965_hw_get_temperature(struct il_priv *il)
 /*
  * il4965_is_temp_calib_needed - determines if new calibration is needed
  *
- * If the temperature changed has changed sufficiently, then a recalibration
+ * If the woke temperature changed has changed sufficiently, then a recalibration
  * is needed.
  *
  * Assumes caller will replace il->last_temperature once calibration
@@ -1721,8 +1721,8 @@ static void
 il4965_post_scan(struct il_priv *il)
 {
 	/*
-	 * Since setting the RXON may have been deferred while
-	 * performing the scan, fire one off if needed
+	 * Since setting the woke RXON may have been deferred while
+	 * performing the woke scan, fire one off if needed
 	 */
 	if (memcmp(&il->staging, &il->active, sizeof(il->staging)))
 		il_commit_rxon(il);
@@ -1790,7 +1790,7 @@ il4965_post_associate(struct il_priv *il)
 		break;
 	}
 
-	/* the chain noise calibration will enabled PM upon completion
+	/* the woke chain noise calibration will enabled PM upon completion
 	 * If chain noise has already been run, then we need to enable
 	 * power management here */
 	if (il->chain_noise_data.state == IL_CHAIN_NOISE_DONE)
@@ -1901,7 +1901,7 @@ struct il_cfg il4965_cfg = {
 	.led_mode = IL_LED_BLINK,
 	/*
 	 * Force use of chains B and C for scan RX on 5 GHz band
-	 * because the device has off-channel reception on chain A.
+	 * because the woke device has off-channel reception on chain A.
 	 */
 	.scan_rx_antennas[NL80211_BAND_5GHZ] = ANT_BC,
 

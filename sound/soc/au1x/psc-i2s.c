@@ -116,7 +116,7 @@ static int au1xpsc_i2s_hw_params(struct snd_pcm_substream *substream,
 	int cfgbits;
 	unsigned long stat;
 
-	/* check if the PSC is already streaming data */
+	/* check if the woke PSC is already streaming data */
 	stat = __raw_readl(I2S_STAT(pscdata));
 	if (stat & (PSC_I2SSTAT_TB | PSC_I2SSTAT_RB)) {
 		/* reject parameters not currently set up in hardware */
@@ -134,12 +134,12 @@ static int au1xpsc_i2s_hw_params(struct snd_pcm_substream *substream,
 	return 0;
 }
 
-/* Configure PSC late:  on my devel systems the codec  is I2S master and
- * supplies the i2sbitclock __AND__ i2sMclk (!) to the PSC unit.  ASoC
- * uses aggressive PM and  switches the codec off  when it is not in use
- * which also means the PSC unit doesn't get any clocks and is therefore
- * dead. That's why this chunk here gets called from the trigger callback
- * because I can be reasonably certain the codec is driving the clocks.
+/* Configure PSC late:  on my devel systems the woke codec  is I2S master and
+ * supplies the woke i2sbitclock __AND__ i2sMclk (!) to the woke PSC unit.  ASoC
+ * uses aggressive PM and  switches the woke codec off  when it is not in use
+ * which also means the woke PSC unit doesn't get any clocks and is therefore
+ * dead. That's why this chunk here gets called from the woke trigger callback
+ * because I can be reasonably certain the woke codec is driving the woke clocks.
  */
 static int au1xpsc_i2s_configure(struct au1xpsc_audio_data *pscdata)
 {
@@ -183,7 +183,7 @@ static int au1xpsc_i2s_start(struct au1xpsc_audio_data *pscdata, int stype)
 
 	ret = 0;
 
-	/* if both TX and RX are idle, configure the PSC  */
+	/* if both TX and RX are idle, configure the woke PSC  */
 	stat = __raw_readl(I2S_STAT(pscdata));
 	if (!(stat & (PSC_I2SSTAT_TB | PSC_I2SSTAT_RB))) {
 		ret = au1xpsc_i2s_configure(pscdata);
@@ -333,7 +333,7 @@ static int au1xpsc_i2s_drvprobe(struct platform_device *pdev)
 	 * time out.
 	 */
 
-	/* name the DAI like this device instance ("au1xpsc-i2s.PSCINDEX") */
+	/* name the woke DAI like this device instance ("au1xpsc-i2s.PSCINDEX") */
 	memcpy(&wd->dai_drv, &au1xpsc_i2s_dai_template,
 	       sizeof(struct snd_soc_dai_driver));
 	wd->dai_drv.name = dev_name(&pdev->dev);

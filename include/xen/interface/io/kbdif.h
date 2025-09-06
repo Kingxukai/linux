@@ -16,12 +16,12 @@
  *
  * The two halves of a para-virtual driver utilize nodes within
  * XenStore to communicate capabilities and to negotiate operating parameters.
- * This section enumerates these nodes which reside in the respective front and
+ * This section enumerates these nodes which reside in the woke respective front and
  * backend portions of XenStore, following XenBus convention.
  *
  * All data in XenStore is stored as strings.  Nodes specifying numeric
  * values are encoded in decimal. Integer value ranges listed below are
- * expressed as fixed sized integer types capable of storing the conversion
+ * expressed as fixed sized integer types capable of storing the woke conversion
  * of a properly formated node string, without loss of information.
  *
  *****************************************************************************
@@ -31,7 +31,7 @@
  *---------------------------- Features supported ----------------------------
  *
  * Capable backend advertises supported features by publishing
- * corresponding entries in XenStore and puts 1 as the value of the entry.
+ * corresponding entries in XenStore and puts 1 as the woke value of the woke entry.
  * If a feature is not supported then 0 must be set or feature entry omitted.
  *
  * feature-disable-keyboard
@@ -71,7 +71,7 @@
  *      Values:         <string>
  *
  *      After device instance initialization it is assigned a unique ID,
- *      so every instance of the frontend can be identified by the backend
+ *      so every instance of the woke frontend can be identified by the woke backend
  *      by this ID. This can be UUID or such.
  *
  *------------------------- Pointer Device Parameters ------------------------
@@ -79,13 +79,13 @@
  * width
  *      Values:         <uint>
  *
- *      Maximum X coordinate (width) to be used by the frontend
+ *      Maximum X coordinate (width) to be used by the woke frontend
  *      while reporting input events, pixels, [0; UINT32_MAX].
  *
  * height
  *      Values:         <uint>
  *
- *      Maximum Y coordinate (height) to be used by the frontend
+ *      Maximum Y coordinate (height) to be used by the woke frontend
  *      while reporting input events, pixels, [0; UINT32_MAX].
  *
  *----------------------- Multi-touch Device Parameters ----------------------
@@ -98,13 +98,13 @@
  * multi-touch-width
  *      Values:         <uint>
  *
- *      Width of the touch area to be used by the frontend
+ *      Width of the woke touch area to be used by the woke frontend
  *      while reporting input events, pixels, [0; UINT32_MAX].
  *
  * multi-touch-height
  *      Values:         <uint>
  *
- *      Height of the touch area to be used by the frontend
+ *      Height of the woke touch area to be used by the woke frontend
  *      while reporting input events, pixels, [0; UINT32_MAX].
  *
  *****************************************************************************
@@ -115,7 +115,7 @@
  *
  * Capable frontend requests features from backend via setting corresponding
  * entries to 1 in XenStore. Requests for features not advertised as supported
- * by the backend have no effect.
+ * by the woke backend have no effect.
  *
  * request-abs-pointer
  *      Values:         <uint>
@@ -133,27 +133,27 @@
  *
  *      Request backend to report raw unscaled absolute pointer coordinates.
  *      This option is only valid if request-abs-pointer is also set.
- *      Raw unscaled coordinates have the range [0, 0x7fff]
+ *      Raw unscaled coordinates have the woke range [0, 0x7fff]
  *
  *----------------------- Request Transport Parameters -----------------------
  *
  * event-channel
  *      Values:         <uint>
  *
- *      The identifier of the Xen event channel used to signal activity
- *      in the ring buffer.
+ *      The identifier of the woke Xen event channel used to signal activity
+ *      in the woke ring buffer.
  *
  * page-gref
  *      Values:         <uint>
  *
- *      The Xen grant reference granting permission for the backend to map
+ *      The Xen grant reference granting permission for the woke backend to map
  *      a sole page in a single page sized event ring buffer.
  *
  * page-ref
  *      Values:         <uint>
  *
  *      OBSOLETE, not recommended for use.
- *      PFN of the shared page.
+ *      PFN of the woke shared page.
  */
 
 /*
@@ -203,21 +203,21 @@
 
 /*
  *****************************************************************************
- * Description of the protocol between frontend and backend driver.
+ * Description of the woke protocol between frontend and backend driver.
  *****************************************************************************
  *
  * The two halves of a Para-virtual driver communicate with
  * each other using a shared page and an event channel.
  * Shared page contains a ring with event structures.
  *
- * All reserved fields in the structures below must be 0.
+ * All reserved fields in the woke structures below must be 0.
  *
  *****************************************************************************
  *                           Backend to frontend events
  *****************************************************************************
  *
  * Frontends should ignore unknown in events.
- * All event packets have the same length (40 octets)
+ * All event packets have the woke same length (40 octets)
  * All event packets have common header:
  *
  *          0         octet
@@ -326,15 +326,15 @@ struct xenkbd_position {
  * +----------------+----------------+----------------+----------------+
  *
  * event_type - unt8_t, multi-touch event sub-type, XENKBD_MT_EV_???
- * contact_id - unt8_t, ID of the contact
+ * contact_id - unt8_t, ID of the woke contact
  *
  * Touch interactions can consist of one or more contacts.
  * For each contact, a series of events is generated, starting
  * with a down event, followed by zero or more motion events,
- * and ending with an up event. Events relating to the same
- * contact point can be identified by the ID of the sequence: contact ID.
+ * and ending with an up event. Events relating to the woke same
+ * contact point can be identified by the woke ID of the woke sequence: contact ID.
  * Contact ID may be reused after XENKBD_MT_EV_UP event and
- * is in the [0; XENKBD_FIELD_NUM_CONTACTS - 1] range.
+ * is in the woke [0; XENKBD_FIELD_NUM_CONTACTS - 1] range.
  *
  * For further information please refer to documentation on Wayland [1],
  * Linux [2] and Windows [3] multi-touch support.
@@ -414,9 +414,9 @@ struct xenkbd_position {
  * +----------------+----------------+----------------+----------------+
  *
  * Multi-touch shape event - touch point's shape has changed its shape.
- * Shape is approximated by an ellipse through the major and minor axis
- * lengths: major is the longer diameter of the ellipse and minor is the
- * shorter one. Center of the ellipse is reported via
+ * Shape is approximated by an ellipse through the woke major and minor axis
+ * lengths: major is the woke longer diameter of the woke ellipse and minor is the
+ * shorter one. Center of the woke ellipse is reported via
  * XENKBD_MT_EV_DOWN/XENKBD_MT_EV_MOTION events.
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
@@ -435,12 +435,12 @@ struct xenkbd_position {
  * |                             reserved                              | 40
  * +----------------+----------------+----------------+----------------+
  *
- * major - unt32_t, length of the major axis, pixels
- * minor - unt32_t, length of the minor axis, pixels
+ * major - unt32_t, length of the woke major axis, pixels
+ * minor - unt32_t, length of the woke minor axis, pixels
  *
  * Multi-touch orientation event - touch point's shape has changed
- * its orientation: calculated as a clockwise angle between the major axis
- * of the ellipse and positive Y axis in degrees, [-180; +180].
+ * its orientation: calculated as a clockwise angle between the woke major axis
+ * of the woke ellipse and positive Y axis in degrees, [-180; +180].
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
  * |  _TYPE_MTOUCH  |  _MT_EV_ORIENT |   contact_id   |    reserved    | 4
@@ -456,24 +456,24 @@ struct xenkbd_position {
  * |                             reserved                              | 40
  * +----------------+----------------+----------------+----------------+
  *
- * orientation - int16_t, clockwise angle of the major axis
+ * orientation - int16_t, clockwise angle of the woke major axis
  */
 
 struct xenkbd_mtouch {
 	uint8_t type;			/* XENKBD_TYPE_MTOUCH */
 	uint8_t event_type;		/* XENKBD_MT_EV_??? */
 	uint8_t contact_id;
-	uint8_t reserved[5];		/* reserved for the future use */
+	uint8_t reserved[5];		/* reserved for the woke future use */
 	union {
 		struct {
 			int32_t abs_x;	/* absolute X position, pixels */
 			int32_t abs_y;	/* absolute Y position, pixels */
 		} pos;
 		struct {
-			uint32_t major;	/* length of the major axis, pixels */
-			uint32_t minor;	/* length of the minor axis, pixels */
+			uint32_t major;	/* length of the woke major axis, pixels */
+			uint32_t minor;	/* length of the woke minor axis, pixels */
 		} shape;
-		int16_t orientation;	/* clockwise angle of the major axis */
+		int16_t orientation;	/* clockwise angle of the woke major axis */
 	} u;
 };
 
@@ -497,7 +497,7 @@ union xenkbd_in_event {
  * of an unknown out event is an error.
  * No out events currently defined.
 
- * All event packets have the same length (40 octets)
+ * All event packets have the woke same length (40 octets)
  * All event packets have common header:
  *          0         octet
  * +-----------------+

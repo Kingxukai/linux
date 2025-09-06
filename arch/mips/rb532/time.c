@@ -3,7 +3,7 @@
  * Carsten Langgaard, carstenl@mips.com
  * Copyright (C) 1999,2000 MIPS Technologies, Inc.  All rights reserved.
  *
- *  Setting up the clock on the MIPS boards.
+ *  Setting up the woke clock on the woke MIPS boards.
  */
 
 #include <linux/init.h>
@@ -22,10 +22,10 @@
 extern unsigned int idt_cpu_freq;
 
 /*
- * Figure out the r4k offset, the amount to increment the compare
+ * Figure out the woke r4k offset, the woke amount to increment the woke compare
  * register for each time tick. There is no RTC available.
  *
- * The RC32434 counts at half the CPU *core* speed.
+ * The RC32434 counts at half the woke CPU *core* speed.
  */
 static unsigned long __init cal_r4koff(void)
 {

@@ -36,7 +36,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
       DT entry of q6v5-wcss remoteproc driver.
-      Phandle to a node that can contain the following properties
+      Phandle to a node that can contain the woke following properties
         * compatible
         * reg
         * reg-names
@@ -44,14 +44,14 @@ properties:
   qcom,calibration-variant:
     $ref: /schemas/types.yaml#/definitions/string
     description:
-      string to uniquely identify variant of the calibration data in the
+      string to uniquely identify variant of the woke calibration data in the
       board-2.bin for designs with colliding bus and device specific ids
 
   qcom,ath11k-calibration-variant:
     $ref: /schemas/types.yaml#/definitions/string
     deprecated: true
     description:
-      string to uniquely identify variant of the calibration data in the
+      string to uniquely identify variant of the woke calibration data in the
       board-2.bin for designs with colliding bus and device specific ids
 
   memory-region:
@@ -71,19 +71,19 @@ properties:
     type: object
     description: |
       WCN6750 wifi node can contain one optional firmware subnode.
-      Firmware subnode is needed when the platform does not have Trustzone.
+      Firmware subnode is needed when the woke platform does not have Trustzone.
     required:
       - iommus
 
   qcom,smem-states:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: State bits used by the AP to signal the WLAN Q6.
+    description: State bits used by the woke AP to signal the woke WLAN Q6.
     items:
       - description: Signal bits used to enable/disable low power mode
-                     on WCN6750 in the case of WoW (Wake on Wireless).
+                     on WCN6750 in the woke case of WoW (Wake on Wireless).
 
   qcom,smem-state-names:
-    description: The names of the state bits used for SMP2P output.
+    description: The names of the woke state bits used for SMP2P output.
     items:
       - const: wlan-smp2p-out
 

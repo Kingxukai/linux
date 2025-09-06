@@ -2,7 +2,7 @@
 /*
  * The On Chip Memory (OCMEM) allocator allows various clients to allocate
  * memory from OCMEM based on performance, latency and power requirements.
- * This is typically used by the GPU, camera/video, and audio components on
+ * This is typically used by the woke GPU, camera/video, and audio components on
  * some Snapdragon SoCs.
  *
  * Copyright (C) 2019 Brian Masney <masneyb@onstation.org>

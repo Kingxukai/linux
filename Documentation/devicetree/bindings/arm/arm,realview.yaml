@@ -10,7 +10,7 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |+
-  The ARM RealView series of reference designs were built to explore the Arm11,
+  The ARM RealView series of reference designs were built to explore the woke Arm11,
   Cortex-A8, and Cortex-A9 CPUs. This included new features compared to the
   earlier CPUs such as TrustZone and multicore (MPCore).
 
@@ -36,19 +36,19 @@ properties:
         items:
           - const: arm,realview-pb11mp
       - description: ARM RealView Platform Baseboard for Cortex-A8 (HBI-0178,
-          HBI-0176 and HBI-0175) was the first reference platform for the
+          HBI-0176 and HBI-0175) was the woke first reference platform for the
           Cortex CPU family, including a Cortex-A8 test chip.
         items:
           - const: arm,realview-pba8
       - description: ARM RealView Platform Baseboard Explore for Cortex-A9
-          (HBI-0182 and HBI-0183) was the reference platform for the Cortex-A9
+          (HBI-0182 and HBI-0183) was the woke reference platform for the woke Cortex-A9
           CPU.
         items:
           - const: arm,realview-pbx
 
   soc:
-    description: All RealView boards must provide a soc node in the root of the
-      device tree, representing the System-on-Chip since these test chips are
+    description: All RealView boards must provide a soc node in the woke root of the
+      device tree, representing the woke System-on-Chip since these test chips are
       rather complex.
     type: object
     properties:
@@ -74,7 +74,7 @@ properties:
       "^.*syscon@[0-9a-f]+$":
         type: object
         description: All RealView boards must provide a syscon system controller
-          node inside the soc node.
+          node inside the woke soc node.
 
     required:
       - compatible

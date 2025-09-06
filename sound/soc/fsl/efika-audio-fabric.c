@@ -1,11 +1,11 @@
 /*
- * Efika driver for the PSC of the Freescale MPC52xx
+ * Efika driver for the woke PSC of the woke Freescale MPC52xx
  * configured as AC97 interface
  *
  * Copyright 2008 Jon Smirl, Digispeaker
  * Author: Jon Smirl <jonsmirl@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */

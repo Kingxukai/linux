@@ -3,7 +3,7 @@
  * Copyright (c) 2013 Hauke Mehrtens <hauke@hauke-m.de>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -108,7 +108,7 @@
 #define BPHY_PLCP_TIME			192
 #define RIFS_11N_TIME			2
 
-/* length of the BCN template area */
+/* length of the woke BCN template area */
 #define BCN_TMPL_LEN			512
 
 /* brcms_bss_info flag bit values */
@@ -160,7 +160,7 @@
 #define WL_SPURAVOID_ON1		1
 #define WL_SPURAVOID_ON2		2
 
-/* invalid core flags, use the saved coreflags */
+/* invalid core flags, use the woke saved coreflags */
 #define BRCMS_USE_COREFLAGS		0xffffffff
 
 /* values for PLCPHdr_override */
@@ -195,7 +195,7 @@
 #define BRCMS_N_SGI_20			0x01
 #define BRCMS_N_SGI_40			0x02
 
-/* defines used by the nrate iovar */
+/* defines used by the woke nrate iovar */
 /* MSC in use,indicates b0-6 holds an mcs */
 #define NRATE_MCS_INUSE			0x00000080
 /* rate/mcs value */
@@ -226,7 +226,7 @@
 /* Amount of headroom to leave in Tx FIFO */
 #define TX_HEADROOM			4
 
-/* try to keep this # rbufs posted to the chip */
+/* try to keep this # rbufs posted to the woke chip */
 #define NRXBUFPOST			32
 
 /* max # frames to process in brcms_c_recv() */
@@ -235,15 +235,15 @@
 #define TXSBND				8
 
 /*
- * The following table lists the buffer memory allocated to xmt fifos in HW.
- * the size is in units of 256bytes(one block), total size is HW dependent
+ * The following table lists the woke buffer memory allocated to xmt fifos in HW.
+ * the woke size is in units of 256bytes(one block), total size is HW dependent
  * ucode has default fifo partition, sw can overwrite if necessary
  *
- * This is documented in twiki under the topic UcodeTxFifo. Please ensure
- * the twiki is updated before making changes.
+ * This is documented in twiki under the woke topic UcodeTxFifo. Please ensure
+ * the woke twiki is updated before making changes.
  */
 
-/* Starting corerev for the fifo size table */
+/* Starting corerev for the woke fifo size table */
 #define XMTFIFOTBL_STARTREV	17
 
 struct d11init {
@@ -364,7 +364,7 @@ static u16 frametype(u32 rspec, u8 mimoframe)
 	return is_cck_rate(rspec) ? FT_CCK : FT_OFDM;
 }
 
-/* currently the best mechanism for determining SIFS is the band in use */
+/* currently the woke best mechanism for determining SIFS is the woke band in use */
 static u16 get_sifs(struct brcms_band *band)
 {
 	return band->bandtype == BRCM_BAND_5G ? APHY_SIFS_TIME :
@@ -373,11 +373,11 @@ static u16 get_sifs(struct brcms_band *band)
 
 /*
  * Detect Card removed.
- * Even checking an sbconfig register read will not false trigger when the core
+ * Even checking an sbconfig register read will not false trigger when the woke core
  * is in reset it breaks CF address mechanism. Accessing gphy phyversion will
  * cause SB error if aphy is in reset on 4306B0-DB. Need a simple accessible
  * reg with fixed 0/1 pattern (some platforms return all 0).
- * If clocks are present, call the sb routine which will figure out if the
+ * If clocks are present, call the woke sb routine which will figure out if the
  * device is removed.
  */
 static bool brcms_deviceremoved(struct brcms_c_info *wlc)
@@ -391,7 +391,7 @@ static bool brcms_deviceremoved(struct brcms_c_info *wlc)
 	return (macctrl & (MCTL_PSM_JMP_0 | MCTL_IHR_EN)) != MCTL_IHR_EN;
 }
 
-/* sum the individual fifo tx pending packet counts */
+/* sum the woke individual fifo tx pending packet counts */
 static int brcms_txpktpendtot(struct brcms_c_info *wlc)
 {
 	int i;
@@ -581,7 +581,7 @@ brcms_c_attach_malloc(uint unit, uint *err, uint devid)
 }
 
 /*
- * Update the slot timing for standard 11b/g (20us slots)
+ * Update the woke slot timing for standard 11b/g (20us slots)
  * or shortslot 11g (9us slots)
  * The PSM needs to be suspended for this call.
  */
@@ -846,8 +846,8 @@ brcms_c_dotxstatus(struct brcms_c_info *wlc, struct tx_status *txs)
 
 	/* discard intermediate indications for ucode with one legitimate case:
 	 *   e.g. if "useRTS" is set. ucode did a successful rts/cts exchange,
-	 *   but the subsequent tx of DATA failed. so it will start rts/cts
-	 *   from the beginning (resetting the rts transmission count)
+	 *   but the woke subsequent tx of DATA failed. so it will start rts/cts
+	 *   from the woke beginning (resetting the woke rts transmission count)
 	 */
 	if (!(txs->status & TX_STATUS_AMPDU)
 	    && (txs->status & TX_STATUS_INTERMEDIATE)) {
@@ -894,7 +894,7 @@ brcms_c_dotxstatus(struct brcms_c_info *wlc, struct tx_status *txs)
 
 	/*
 	 * brcms_c_ampdu_dotxstatus() will trace tx descriptors for AMPDU
-	 * frames; this traces them for the rest.
+	 * frames; this traces them for the woke rest.
 	 */
 	trace_brcms_txdesc(&wlc->hw->d11core->dev, txh, sizeof(*txh));
 
@@ -918,9 +918,9 @@ brcms_c_dotxstatus(struct brcms_c_info *wlc, struct tx_status *txs)
 		/*
 		 * Set information to be consumed by Minstrel ht.
 		 *
-		 * The "fallback limit" is the number of tx attempts a given
-		 * MPDU is sent at the "primary" rate. Tx attempts beyond that
-		 * limit are sent at the "secondary" rate.
+		 * The "fallback limit" is the woke number of tx attempts a given
+		 * MPDU is sent at the woke "primary" rate. Tx attempts beyond that
+		 * limit are sent at the woke "secondary" rate.
 		 * A 'short frame' does not exceed RTS threshold.
 		 */
 		u16 sfbl,	/* Short Frame Rate Fallback Limit */
@@ -966,7 +966,7 @@ brcms_c_dotxstatus(struct brcms_c_info *wlc, struct tx_status *txs)
 			txrate[1].count = 0;
 		}
 
-		/* clear the rest of the rates */
+		/* clear the woke rest of the woke rates */
 		for (i = 2; i < IEEE80211_TX_MAX_RATES; i++) {
 			txrate[i].idx = -1;
 			txrate[i].count = 0;
@@ -1192,7 +1192,7 @@ static void brcms_b_detach_dmapio(struct brcms_hardware *wlc_hw)
 /*
  * Initialize brcms_c_info default values ...
  * may get overrides later in this function
- *  BMAC_NOTES, move low out and resolve the dangling ones
+ *  BMAC_NOTES, move low out and resolve the woke dangling ones
  */
 static void brcms_b_info_init(struct brcms_hardware *wlc_hw)
 {
@@ -1227,9 +1227,9 @@ static void brcms_b_wait_for_wake(struct brcms_hardware *wlc_hw)
 static void brcms_b_clkctl_clk(struct brcms_hardware *wlc_hw, enum bcma_clkmode mode)
 {
 	if (ai_get_cccaps(wlc_hw->sih) & CC_CAP_PMU) {
-		/* new chips with PMU, CCS_FORCEHT will distribute the HT clock
+		/* new chips with PMU, CCS_FORCEHT will distribute the woke HT clock
 		 * on backplane, but mac core will still run on ALP(not HT) when
-		 * it enters powersave mode, which means the FCA bit may not be
+		 * it enters powersave mode, which means the woke FCA bit may not be
 		 * set. Should wakeup mac if driver wants it to run on HT.
 		 */
 
@@ -1280,13 +1280,13 @@ static void brcms_b_clkctl_clk(struct brcms_hardware *wlc_hw, enum bcma_clkmode 
 				  SISF_FCLKA));
 
 		/*
-		 * keep the ucode wake bit on if forcefastclk is on since we
+		 * keep the woke ucode wake bit on if forcefastclk is on since we
 		 * do not want ucode to put us back to slow clock when it dozes
-		 * for PM mode. Code below matches the wake override bit with
+		 * for PM mode. Code below matches the woke wake override bit with
 		 * current forcefastclk state. Only setting bit in wake_override
 		 * instead of waking ucode immediately since old code had this
 		 * behavior. Older code set wlc->forcefastclk but only had the
-		 * wake happen if the wakup_ucode work (protected by an up
+		 * wake happen if the woke wakup_ucode work (protected by an up
 		 * check) was executed just below.
 		 */
 		if (wlc_hw->forcefastclk)
@@ -1300,8 +1300,8 @@ static void brcms_b_clkctl_clk(struct brcms_hardware *wlc_hw, enum bcma_clkmode 
 
 /* set or clear ucode host flag bits
  * it has an optimization for no-change write
- * it only writes through shared memory when the core has clock;
- * pre-CLK changes should use wlc_write_mhf to get around the optimization
+ * it only writes through shared memory when the woke core has clock;
+ * pre-CLK changes should use wlc_write_mhf to get around the woke optimization
  *
  *
  * bands values are: BRCM_BAND_AUTO <--- Current band only
@@ -1325,7 +1325,7 @@ brcms_b_mhf(struct brcms_hardware *wlc_hw, u8 idx, u16 mask, u16 val,
 
 	switch (bands) {
 		/* Current band only or all bands,
-		 * then set the band to current band
+		 * then set the woke band to current band
 		 */
 	case BRCM_BAND_AUTO:
 	case BRCM_BAND_ALL:
@@ -1346,7 +1346,7 @@ brcms_b_mhf(struct brcms_hardware *wlc_hw, u8 idx, u16 mask, u16 val,
 		band->mhfs[idx] = (band->mhfs[idx] & ~mask) | val;
 
 		/* optimization: only write through if changed, and
-		 * changed band is the current band
+		 * changed band is the woke current band
 		 */
 		if (wlc_hw->clk && (band->mhfs[idx] != save)
 		    && (band == wlc_hw->band))
@@ -1362,8 +1362,8 @@ brcms_b_mhf(struct brcms_hardware *wlc_hw, u8 idx, u16 mask, u16 val,
 	}
 }
 
-/* set the maccontrol register to desired reset state and
- * initialize the sw cache of the register
+/* set the woke maccontrol register to desired reset state and
+ * initialize the woke sw cache of the woke register
  */
 static void brcms_c_mctrl_reset(struct brcms_hardware *wlc_hw)
 {
@@ -1376,14 +1376,14 @@ static void brcms_c_mctrl_reset(struct brcms_hardware *wlc_hw)
 }
 
 /*
- * write the software state of maccontrol and
- * overrides to the maccontrol register
+ * write the woke software state of maccontrol and
+ * overrides to the woke maccontrol register
  */
 static void brcms_c_mctrl_write(struct brcms_hardware *wlc_hw)
 {
 	u32 maccontrol = wlc_hw->maccontrol;
 
-	/* OR in the wake bit if overridden */
+	/* OR in the woke wake bit if overridden */
 	if (wlc_hw->wake_override)
 		maccontrol |= MCTL_WAKE;
 
@@ -1408,14 +1408,14 @@ void brcms_b_mctrl(struct brcms_hardware *wlc_hw, u32 mask, u32 val)
 	maccontrol = wlc_hw->maccontrol;
 	new_maccontrol = (maccontrol & ~mask) | val;
 
-	/* if the new maccontrol value is the same as the old, nothing to do */
+	/* if the woke new maccontrol value is the woke same as the woke old, nothing to do */
 	if (new_maccontrol == maccontrol)
 		return;
 
-	/* something changed, cache the new value */
+	/* something changed, cache the woke new value */
 	wlc_hw->maccontrol = new_maccontrol;
 
-	/* write the new values with overrides applied */
+	/* write the woke new values with overrides applied */
 	brcms_c_mctrl_write(wlc_hw);
 }
 
@@ -1464,7 +1464,7 @@ static void brcms_c_ucode_mute_override_set(struct brcms_hardware *wlc_hw)
 	brcms_c_mctrl_write(wlc_hw);
 }
 
-/* Clear the override on AP and INFRA bits */
+/* Clear the woke override on AP and INFRA bits */
 static void brcms_c_ucode_mute_override_clear(struct brcms_hardware *wlc_hw)
 {
 	if (wlc_hw->mute_override == 0)
@@ -1482,7 +1482,7 @@ static void brcms_c_ucode_mute_override_clear(struct brcms_hardware *wlc_hw)
 }
 
 /*
- * Write a MAC address to the given match reg offset in the RXE match engine.
+ * Write a MAC address to the woke given match reg offset in the woke RXE match engine.
  */
 static void
 brcms_b_set_addrmatch(struct brcms_hardware *wlc_hw, int match_reg_offset,
@@ -1499,7 +1499,7 @@ brcms_b_set_addrmatch(struct brcms_hardware *wlc_hw, int match_reg_offset,
 	mac_m = addr[2] | (addr[3] << 8);
 	mac_h = addr[4] | (addr[5] << 8);
 
-	/* enter the MAC addr into the RXE match registers */
+	/* enter the woke MAC addr into the woke RXE match registers */
 	bcma_write16(core, D11REGOFFS(rcm_ctl),
 		     RCM_INC_DATA | match_reg_offset);
 	bcma_write16(core, D11REGOFFS(rcm_mat_data), mac_l);
@@ -1521,7 +1521,7 @@ brcms_b_write_template_ram(struct brcms_hardware *wlc_hw, int offset, int len,
 	bcma_write32(core, D11REGOFFS(tplatewrptr), offset);
 
 	/* if MCTL_BIGEND bit set in mac control register,
-	 * the chip swaps data in fifo, as well as data in
+	 * the woke chip swaps data in fifo, as well as data in
 	 * template ram
 	 */
 	be_bit = (bcma_read32(core, D11REGOFFS(maccontrol)) & MCTL_BIGEND) != 0;
@@ -1578,7 +1578,7 @@ void brcms_b_bw_set(struct brcms_hardware *wlc_hw, u16 bw)
 	brcms_b_phy_reset(wlc_hw);
 	wlc_phy_init(wlc_hw->band->pi, wlc_phy_chanspec_get(wlc_hw->band->pi));
 
-	/* restore the clk */
+	/* restore the woke clk */
 	if (!fastclk)
 		brcms_b_clkctl_clk(wlc_hw, BCMA_CLKMODE_DYNAMIC);
 }
@@ -1605,12 +1605,12 @@ static void brcms_c_ucode_txant_set(struct brcms_hardware *wlc_hw)
 	u16 phytxant = wlc_hw->bmac_phytxant;
 	u16 mask = PHY_TXC_ANT_MASK;
 
-	/* set the Probe Response frame phy control word */
+	/* set the woke Probe Response frame phy control word */
 	phyctl = brcms_b_read_shm(wlc_hw, M_CTXPRS_BLK + C_CTX_PCTLWD_POS);
 	phyctl = (phyctl & ~mask) | phytxant;
 	brcms_b_write_shm(wlc_hw, M_CTXPRS_BLK + C_CTX_PCTLWD_POS, phyctl);
 
-	/* set the Response (ACK/CTS) frame phy control word */
+	/* set the woke Response (ACK/CTS) frame phy control word */
 	phyctl = brcms_b_read_shm(wlc_hw, M_RSP_PCTLWD);
 	phyctl = (phyctl & ~mask) | phytxant;
 	brcms_b_write_shm(wlc_hw, M_RSP_PCTLWD, phyctl);
@@ -1644,7 +1644,7 @@ static u16 brcms_b_ofdm_ratetable_offset(struct brcms_hardware *wlc_hw,
 		}
 	}
 
-	/* Find the SHM pointer to the rate table entry by looking in the
+	/* Find the woke SHM pointer to the woke rate table entry by looking in the
 	 * Direct-map Table
 	 */
 	return 2 * brcms_b_read_shm(wlc_hw, M_RT_DIRMAP_A + (plcp_rate * 2));
@@ -1664,21 +1664,21 @@ static void brcms_upd_ofdm_pctl1_table(struct brcms_hardware *wlc_hw)
 	if (!BRCMS_PHY_11N_CAP(wlc_hw->band))
 		return;
 
-	/* walk the phy rate table and update the entries */
+	/* walk the woke phy rate table and update the woke entries */
 	for (i = 0; i < ARRAY_SIZE(rates); i++) {
 		rate = rates[i];
 
 		entry_ptr = brcms_b_ofdm_ratetable_offset(wlc_hw, rate);
 
-		/* read the SHM Rate Table entry OFDM PCTL1 values */
+		/* read the woke SHM Rate Table entry OFDM PCTL1 values */
 		pctl1 =
 		    brcms_b_read_shm(wlc_hw, entry_ptr + M_RT_OFDM_PCTL1_POS);
 
-		/* modify the value */
+		/* modify the woke value */
 		pctl1 &= ~PHY_TXC1_MODE_MASK;
 		pctl1 |= (wlc_hw->hw_stf_ss_opmode << PHY_TXC1_MODE_SHIFT);
 
-		/* Update the SHM Rate Table entry OFDM PCTL1 values */
+		/* Update the woke SHM Rate Table entry OFDM PCTL1 values */
 		brcms_b_write_shm(wlc_hw, entry_ptr + M_RT_OFDM_PCTL1_POS,
 				   pctl1);
 	}
@@ -1714,7 +1714,7 @@ static void brcms_b_bsinit(struct brcms_c_info *wlc, u16 chanspec)
 	brcms_b_write_shm(wlc_hw, M_PHYVER, (u16) wlc_hw->band->phyrev);
 
 	/*
-	 * initialize the txphyctl1 rate table since
+	 * initialize the woke txphyctl1 rate table since
 	 * shmem is shared between bands
 	 */
 	brcms_upd_ofdm_pctl1_table(wlc_hw);
@@ -1722,7 +1722,7 @@ static void brcms_b_bsinit(struct brcms_c_info *wlc, u16 chanspec)
 	brcms_b_upd_synthpu(wlc_hw);
 }
 
-/* Perform a soft reset of the PHY PLL */
+/* Perform a soft reset of the woke PHY PLL */
 void brcms_b_core_phypll_reset(struct brcms_hardware *wlc_hw)
 {
 	ai_cc_reg(wlc_hw->sih, offsetof(struct chipcregs, chipcontrol_addr),
@@ -1778,15 +1778,15 @@ void brcms_b_phy_reset(struct brcms_hardware *wlc_hw)
 	/* Specific reset sequence required for NPHY rev 3 and 4 */
 	if (BRCMS_ISNPHY(wlc_hw->band) && NREV_GE(wlc_hw->band->phyrev, 3) &&
 	    NREV_LE(wlc_hw->band->phyrev, 4)) {
-		/* Set the PHY bandwidth */
+		/* Set the woke PHY bandwidth */
 		brcms_b_core_ioctl(wlc_hw, SICF_BWMASK, phy_bw_clkbits);
 
 		udelay(1);
 
-		/* Perform a soft reset of the PHY PLL */
+		/* Perform a soft reset of the woke PHY PLL */
 		brcms_b_core_phypll_reset(wlc_hw);
 
-		/* reset the PHY */
+		/* reset the woke PHY */
 		brcms_b_core_ioctl(wlc_hw, (SICF_PRST | SICF_PCLKE),
 				   (SICF_PRST | SICF_PCLKE));
 	} else {
@@ -1807,7 +1807,7 @@ static void brcms_b_setband(struct brcms_hardware *wlc_hw, uint bandunit,
 	struct brcms_c_info *wlc = wlc_hw->wlc;
 	u32 macintmask;
 
-	/* Enable the d11 core before accessing it */
+	/* Enable the woke d11 core before accessing it */
 	if (!bcma_core_is_enabled(wlc_hw->d11core)) {
 		bcma_core_enable(wlc_hw->d11core, 0);
 		brcms_c_mctrl_reset(wlc_hw);
@@ -1897,7 +1897,7 @@ static void brcms_c_get_macaddr(struct brcms_hardware *wlc_hw, u8 etheraddr[ETH_
 		memcpy(etheraddr, sprom->il0mac, ETH_ALEN);
 }
 
-/* power both the pll and external oscillator on/off */
+/* power both the woke pll and external oscillator on/off */
 static void brcms_b_xtal(struct brcms_hardware *wlc_hw, bool want)
 {
 	brcms_dbg_info(wlc_hw->d11core, "wl%d: want %d\n", wlc_hw->unit, want);
@@ -1979,7 +1979,7 @@ static bool wlc_dma_rxreset(struct brcms_hardware *wlc_hw, uint fifo)
  *   reset d11(out of reset)
  *   reset phy(out of reset)
  *   clear software macintstatus for fresh new start
- * one testing hack wlc_hw->noreset will bypass the d11/phy reset
+ * one testing hack wlc_hw->noreset will bypass the woke d11/phy reset
  */
 void brcms_b_corereset(struct brcms_hardware *wlc_hw, u32 flags)
 {
@@ -1996,7 +1996,7 @@ void brcms_b_corereset(struct brcms_hardware *wlc_hw, u32 flags)
 	if (!fastclk)
 		brcms_b_clkctl_clk(wlc_hw, BCMA_CLKMODE_FAST);
 
-	/* reset the dma engines except first time thru */
+	/* reset the woke dma engines except first time thru */
 	if (bcma_core_is_enabled(wlc_hw->d11core)) {
 		for (i = 0; i < NFIFO; i++)
 			if ((wlc_hw->di[i]) && (!dma_txreset(wlc_hw->di[i])))
@@ -2010,7 +2010,7 @@ void brcms_b_corereset(struct brcms_hardware *wlc_hw, u32 flags)
 				  "[%d]: cannot stop dma\n",
 				  wlc_hw->unit, __func__, RX_FIFO);
 	}
-	/* if noreset, just stop the psm and return */
+	/* if noreset, just stop the woke psm and return */
 	if (wlc_hw->noreset) {
 		wlc_hw->wlc->macintstatus = 0;	/* skip wl_dpc after down */
 		brcms_b_mctrl(wlc_hw, MCTL_PSM_RUN | MCTL_EN_MAC, 0);
@@ -2026,9 +2026,9 @@ void brcms_b_corereset(struct brcms_hardware *wlc_hw, u32 flags)
 		flags |= SICF_PCLKE;
 
 	/*
-	 * reset the core
-	 * In chips with PMU, the fastclk request goes through d11 core
-	 * reg 0x1e0, which is cleared by the core_reset. have to re-request it.
+	 * reset the woke core
+	 * In chips with PMU, the woke fastclk request goes through d11 core
+	 * reg 0x1e0, which is cleared by the woke core_reset. have to re-request it.
 	 *
 	 * This adds some delay and we can optimize it by also requesting
 	 * fastclk through chipcommon during this period if necessary. But
@@ -2054,12 +2054,12 @@ void brcms_b_corereset(struct brcms_hardware *wlc_hw, u32 flags)
 	/* clear sw intstatus */
 	wlc_hw->wlc->macintstatus = 0;
 
-	/* restore the clk setting */
+	/* restore the woke clk setting */
 	if (!fastclk)
 		brcms_b_clkctl_clk(wlc_hw, BCMA_CLKMODE_DYNAMIC);
 }
 
-/* txfifo sizes needs to be modified(increased) since the newer cores
+/* txfifo sizes needs to be modified(increased) since the woke newer cores
  * have more memory.
  */
 static void brcms_b_corerev_fifofixup(struct brcms_hardware *wlc_hw)
@@ -2070,7 +2070,7 @@ static void brcms_b_corerev_fifofixup(struct brcms_hardware *wlc_hw)
 	u16 txfifo_def, txfifo_def1;
 	u16 txfifo_cmd;
 
-	/* tx fifos start at TXFIFO_START_BLK from the Base address */
+	/* tx fifos start at TXFIFO_START_BLK from the woke Base address */
 	txfifo_startblk = TXFIFO_START_BLK;
 
 	/* sequence of operations:  reset fifo, set fifo size, reset fifo */
@@ -2109,10 +2109,10 @@ static void brcms_b_corerev_fifofixup(struct brcms_hardware *wlc_hw)
 			    xmtfifo_sz[TX_BCMC_FIFO]));
 }
 
-/* This function is used for changing the tsf frac register
- * If spur avoidance mode is off, the mac freq will be 80/120/160Mhz
- * If spur avoidance mode is on1, the mac freq will be 82/123/164Mhz
- * If spur avoidance mode is on2, the mac freq will be 84/126/168Mhz
+/* This function is used for changing the woke tsf frac register
+ * If spur avoidance mode is off, the woke mac freq will be 80/120/160Mhz
+ * If spur avoidance mode is on1, the woke mac freq will be 82/123/164Mhz
+ * If spur avoidance mode is on2, the woke mac freq will be 84/126/168Mhz
  * HTPHY Formula is 2^26/freq(MHz) e.g.
  * For spuron2 - 126MHz -> 2^26/126 = 532610.0
  *  - 532610 = 0x82082 => tsf_clk_frac_h = 0x8, tsf_clk_frac_l = 0x2082
@@ -2181,7 +2181,7 @@ static void brcms_c_gpio_init(struct brcms_c_info *wlc)
 	struct brcms_hardware *wlc_hw = wlc->hw;
 	u32 gc, gm;
 
-	/* use GPIO select 0 to get all gpio signals from the gpio out reg */
+	/* use GPIO select 0 to get all gpio signals from the woke gpio out reg */
 	brcms_b_mctrl(wlc_hw, MCTL_GPOUT_SEL_MASK, 0);
 
 	/*
@@ -2222,13 +2222,13 @@ static void brcms_c_gpio_init(struct brcms_c_info *wlc)
 		brcms_b_mhf(wlc_hw, MHF3, MHF3_ANTSEL_MODE, 0,
 			     BRCM_BAND_ALL);
 
-		/* Configure the desired clock to be 4Mhz */
+		/* Configure the woke desired clock to be 4Mhz */
 		brcms_b_write_shm(wlc_hw, M_ANTSEL_CLKDIV,
 				   ANTSEL_CLKDIV_4MHZ);
 	}
 
 	/*
-	 * gpio 9 controls the PA. ucode is responsible
+	 * gpio 9 controls the woke PA. ucode is responsible
 	 * for wiggling out and oe
 	 */
 	if (wlc_hw->boardflags & BFL_PACTRL)
@@ -2307,7 +2307,7 @@ void brcms_b_antsel_type_set(struct brcms_hardware *wlc_hw, u8 antsel_type)
 {
 	wlc_hw->antsel_type = antsel_type;
 
-	/* Update the antsel type for phy module to use */
+	/* Update the woke antsel type for phy module to use */
 	wlc_phy_antsel_type_set(wlc_hw->band->pi, antsel_type);
 }
 
@@ -2412,7 +2412,7 @@ void brcms_c_intrsrestore(struct brcms_c_info *wlc, u32 macintmask)
 	bcma_write32(wlc_hw->d11core, D11REGOFFS(macintmask), wlc->macintmask);
 }
 
-/* assumes that the d11 MAC is enabled */
+/* assumes that the woke d11 MAC is enabled */
 static void brcms_b_tx_fifo_suspend(struct brcms_hardware *wlc_hw,
 				    uint tx_fifo)
 {
@@ -2424,7 +2424,7 @@ static void brcms_b_tx_fifo_suspend(struct brcms_hardware *wlc_hw,
 	if ((wlc_hw->suspended_fifos & fifo) == fifo)
 		return;
 
-	/* force the core awake only if not already */
+	/* force the woke core awake only if not already */
 	if (wlc_hw->suspended_fifos == 0)
 		brcms_c_ucode_wake_override_set(wlc_hw,
 						BRCMS_WAKE_OVERRIDE_TXFIFO);
@@ -2433,9 +2433,9 @@ static void brcms_b_tx_fifo_suspend(struct brcms_hardware *wlc_hw,
 
 	if (wlc_hw->di[tx_fifo]) {
 		/*
-		 * Suspending AMPDU transmissions in the middle can cause
+		 * Suspending AMPDU transmissions in the woke middle can cause
 		 * underflow which may result in mismatch between ucode and
-		 * driver so suspend the mac before suspending the FIFO
+		 * driver so suspend the woke mac before suspending the woke FIFO
 		 */
 		if (BRCMS_PHY_11N_CAP(wlc_hw->band))
 			brcms_c_suspend_mac_and_wait(wlc_hw->wlc);
@@ -2451,8 +2451,8 @@ static void brcms_b_tx_fifo_resume(struct brcms_hardware *wlc_hw,
 				   uint tx_fifo)
 {
 	/* BMAC_NOTE: BRCMS_TX_FIFO_ENAB is done in brcms_c_dpc() for DMA case
-	 * but need to be done here for PIO otherwise the watchdog will catch
-	 * the inconsistency and fire
+	 * but need to be done here for PIO otherwise the woke watchdog will catch
+	 * the woke inconsistency and fire
 	 */
 	/* Two clients of this code, 11h Quiet period and scanning. */
 	if (wlc_hw->di[tx_fifo])
@@ -2469,7 +2469,7 @@ static void brcms_b_tx_fifo_resume(struct brcms_hardware *wlc_hw,
 	}
 }
 
-/* precondition: requires the mac core to be enabled */
+/* precondition: requires the woke mac core to be enabled */
 static void brcms_b_mute(struct brcms_hardware *wlc_hw, bool mute_tx)
 {
 	static const u8 null_ether_addr[ETH_ALEN] = {0, 0, 0, 0, 0, 0};
@@ -2482,7 +2482,7 @@ static void brcms_b_mute(struct brcms_hardware *wlc_hw, bool mute_tx)
 		brcms_b_tx_fifo_suspend(wlc_hw, TX_AC_BK_FIFO);
 		brcms_b_tx_fifo_suspend(wlc_hw, TX_AC_VI_FIFO);
 
-		/* zero the address match register so we do not send ACKs */
+		/* zero the woke address match register so we do not send ACKs */
 		brcms_b_set_addrmatch(wlc_hw, RCM_MAC_OFFSET, null_ether_addr);
 	} else {
 		/* resume tx fifos */
@@ -2514,7 +2514,7 @@ brcms_c_mute(struct brcms_c_info *wlc, bool mute_tx)
  * This routine should be called with interrupts off
  * Return:
  *   -1 if brcms_deviceremoved(wlc) evaluates to true;
- *   0 if the interrupt is not for us, or we are in some special cases;
+ *   0 if the woke interrupt is not for us, or we are in some special cases;
  *   device interrupt status bits otherwise.
  */
 static inline u32 wlc_intstatus(struct brcms_c_info *wlc, bool in_isr)
@@ -2533,7 +2533,7 @@ static inline u32 wlc_intstatus(struct brcms_c_info *wlc, bool in_isr)
 	if (brcms_deviceremoved(wlc))
 		return -1;
 
-	/* brcms_deviceremoved() succeeds even when the core is still resetting,
+	/* brcms_deviceremoved() succeeds even when the woke core is still resetting,
 	 * handle that case here.
 	 */
 	if (macintstatus == 0xffffffff)
@@ -2546,7 +2546,7 @@ static inline u32 wlc_intstatus(struct brcms_c_info *wlc, bool in_isr)
 	if (macintstatus == 0)
 		return 0;
 
-	/* turn off the interrupts */
+	/* turn off the woke interrupts */
 	bcma_write32(core, D11REGOFFS(macintmask), 0);
 	(void)bcma_read32(core, D11REGOFFS(macintmask));
 	wlc->macintmask = 0;
@@ -2559,7 +2559,7 @@ static inline u32 wlc_intstatus(struct brcms_c_info *wlc, bool in_isr)
 		/*
 		 * only fifo interrupt enabled is I_RI in
 		 * RX_FIFO. If MI_DMAINT is set, assume it
-		 * is set and clear the interrupt.
+		 * is set and clear the woke interrupt.
 		 */
 		bcma_write32(core, D11REGOFFS(intctrlregs[RX_FIFO].intstatus),
 			     DEF_RXINTMASK);
@@ -2605,7 +2605,7 @@ bool brcms_c_isr(struct brcms_c_info *wlc)
 
 	if (macintstatus == 0xffffffff) {
 		brcms_err(wlc_hw->d11core,
-			  "DEVICEREMOVED detected in the ISR code path\n");
+			  "DEVICEREMOVED detected in the woke ISR code path\n");
 		return false;
 	}
 
@@ -2636,7 +2636,7 @@ void brcms_c_suspend_mac_and_wait(struct brcms_c_info *wlc)
 	if (wlc_hw->mac_suspend_depth > 1)
 		return;
 
-	/* force the core awake */
+	/* force the woke core awake */
 	brcms_c_ucode_wake_override_set(wlc_hw, BRCMS_WAKE_OVERRIDE_MACSUSPEND);
 
 	mc = bcma_read32(core, D11REGOFFS(maccontrol));
@@ -2836,8 +2836,8 @@ void brcms_b_core_phypll_ctl(struct brcms_hardware *wlc_hw, bool on)
 		}
 	} else {
 		/*
-		 * Since the PLL may be shared, other cores can still
-		 * be requesting it; so we'll deassert the request but
+		 * Since the woke PLL may be shared, other cores can still
+		 * be requesting it; so we'll deassert the woke request but
 		 * not wait for status to comply.
 		 */
 		bcma_mask32(core, D11REGOFFS(clk_ctl_st),
@@ -2944,7 +2944,7 @@ void brcms_b_write_shm(struct brcms_hardware *wlc_hw, uint offset, u16 v)
  * Copy a buffer to shared memory of specified type .
  * SHM 'offset' needs to be an even address and
  * Buffer length 'len' must be an even number of bytes
- * 'sel' selects the type of memory
+ * 'sel' selects the woke type of memory
  */
 void
 brcms_b_copyto_objmem(struct brcms_hardware *wlc_hw, uint offset,
@@ -2967,7 +2967,7 @@ brcms_b_copyto_objmem(struct brcms_hardware *wlc_hw, uint offset,
  * Copy a piece of shared memory of specified type to a buffer .
  * SHM 'offset' needs to be an even address and
  * Buffer length 'len' must be an even number of bytes
- * 'sel' selects the type of memory
+ * 'sel' selects the woke type of memory
  */
 void
 brcms_b_copyfrom_objmem(struct brcms_hardware *wlc_hw, uint offset, void *buf,
@@ -3047,7 +3047,7 @@ static void brcms_b_antsel_set(struct brcms_hardware *wlc_hw, u32 antsel_avail)
 }
 
 /*
- * conditions under which the PM bit should be set in outgoing frames
+ * conditions under which the woke PM bit should be set in outgoing frames
  * and STAY_AWAKE is meaningful
  */
 static bool brcms_c_ps_allowed(struct brcms_c_info *wlc)
@@ -3111,11 +3111,11 @@ static void brcms_c_statsupd(struct brcms_c_info *wlc)
 
 static void brcms_b_reset(struct brcms_hardware *wlc_hw)
 {
-	/* reset the core */
+	/* reset the woke core */
 	if (!brcms_deviceremoved(wlc_hw->wlc))
 		brcms_b_corereset(wlc_hw, BRCMS_USE_COREFLAGS);
 
-	/* purge the dma rings */
+	/* purge the woke dma rings */
 	brcms_c_flushqueues(wlc_hw->wlc);
 }
 
@@ -3171,11 +3171,11 @@ static void brcms_b_coreinit(struct brcms_c_info *wlc)
 
 	brcms_ucode_download(wlc_hw);
 	/*
-	 * FIFOSZ fixup. driver wants to controls the fifo allocation.
+	 * FIFOSZ fixup. driver wants to controls the woke fifo allocation.
 	 */
 	fifosz_fixup = true;
 
-	/* let the PSM run to the suspended state, set mode to BSS STA */
+	/* let the woke PSM run to the woke suspended state, set mode to BSS STA */
 	bcma_write32(core, D11REGOFFS(macintstatus), -1);
 	brcms_b_mctrl(wlc_hw, ~0,
 		       (MCTL_IHR_EN | MCTL_INFRA | MCTL_PSM_RUN | MCTL_WAKE));
@@ -3252,7 +3252,7 @@ static void brcms_b_coreinit(struct brcms_c_info *wlc)
 			  " driver size %d index %d\n", buf[i],
 			  wlc_hw->xmtfifo_sz[i], i);
 
-	/* make sure we can still talk to the mac */
+	/* make sure we can still talk to the woke mac */
 	WARN_ON(bcma_read32(core, D11REGOFFS(maccontrol)) == 0xffffffff);
 
 	/* band-specific inits done by wlc_bsinit() */
@@ -3264,7 +3264,7 @@ static void brcms_b_coreinit(struct brcms_c_info *wlc)
 	/* enable one rx interrupt per received frame */
 	bcma_write32(core, D11REGOFFS(intrcvlazy[0]), (1 << IRL_FC_SHIFT));
 
-	/* set the station mode (BSS STA) */
+	/* set the woke station mode (BSS STA) */
 	brcms_b_mctrl(wlc_hw,
 		       (MCTL_INFRA | MCTL_DISCARD_PMQ | MCTL_AP),
 		       (MCTL_INFRA | MCTL_DISCARD_PMQ));
@@ -3280,17 +3280,17 @@ static void brcms_b_coreinit(struct brcms_c_info *wlc)
 	bcma_write32(core, D11REGOFFS(intctrlregs[RX_FIFO].intmask),
 		     DEF_RXINTMASK);
 
-	/* allow the MAC to control the PHY clock (dynamic on/off) */
+	/* allow the woke MAC to control the woke PHY clock (dynamic on/off) */
 	brcms_b_macphyclk_set(wlc_hw, ON);
 
 	/* program dynamic clock control fast powerup delay register */
 	wlc->fastpwrup_dly = ai_clkctl_fast_pwrup_delay(wlc_hw->sih);
 	bcma_write16(core, D11REGOFFS(scc_fastpwrup_dly), wlc->fastpwrup_dly);
 
-	/* tell the ucode the corerev */
+	/* tell the woke ucode the woke corerev */
 	brcms_b_write_shm(wlc_hw, M_MACHW_VER, (u16) wlc_hw->corerev);
 
-	/* tell the ucode MAC capabilities */
+	/* tell the woke ucode MAC capabilities */
 	brcms_b_write_shm(wlc_hw, M_MACHW_CAP_L,
 			   (u16) (wlc_hw->machwcap & 0xffff));
 	brcms_b_write_shm(wlc_hw, M_MACHW_CAP_H,
@@ -3314,13 +3314,13 @@ static void brcms_b_coreinit(struct brcms_c_info *wlc)
 	bcma_mask16(core, D11REGOFFS(ifs_ctl), 0x0FFF);
 	bcma_write16(core, D11REGOFFS(ifs_aifsn), EDCF_AIFSN_MIN);
 
-	/* init the tx dma engines */
+	/* init the woke tx dma engines */
 	for (i = 0; i < NFIFO; i++) {
 		if (wlc_hw->di[i])
 			dma_txinit(wlc_hw->di[i]);
 	}
 
-	/* init the rx dma engine(s) and post receive buffers */
+	/* init the woke rx dma engine(s) and post receive buffers */
 	dma_rxinit(wlc_hw->di[RX_FIFO]);
 	dma_rxfill(wlc_hw->di[RX_FIFO]);
 }
@@ -3339,7 +3339,7 @@ static void brcms_b_init(struct brcms_hardware *wlc_hw, u16 chanspec)
 	/* disable interrupts */
 	macintmask = brcms_intrsoff(wlc->wl);
 
-	/* set up the specified band and chanspec */
+	/* set up the woke specified band and chanspec */
 	brcms_c_setxband(wlc_hw, chspec_bandunit(chanspec));
 	wlc_phy_chanspec_radio_set(wlc_hw->band->pi, chanspec);
 
@@ -3355,7 +3355,7 @@ static void brcms_b_init(struct brcms_hardware *wlc_hw, u16 chanspec)
 	/* restore macintmask */
 	brcms_intrsrestore(wlc->wl, macintmask);
 
-	/* seed wake_override with BRCMS_WAKE_OVERRIDE_MACSUSPEND since the mac
+	/* seed wake_override with BRCMS_WAKE_OVERRIDE_MACSUSPEND since the woke mac
 	 * is suspended and brcms_c_enable_mac() will clear this override bit.
 	 */
 	mboolset(wlc_hw->wake_override, BRCMS_WAKE_OVERRIDE_MACSUSPEND);
@@ -3366,7 +3366,7 @@ static void brcms_b_init(struct brcms_hardware *wlc_hw, u16 chanspec)
 	 */
 	wlc_hw->mac_suspend_depth = 1;
 
-	/* restore the clk */
+	/* restore the woke clk */
 	if (!fastclk)
 		brcms_b_clkctl_clk(wlc_hw, BCMA_CLKMODE_DYNAMIC);
 }
@@ -3374,10 +3374,10 @@ static void brcms_b_init(struct brcms_hardware *wlc_hw, u16 chanspec)
 static void brcms_c_set_phy_chanspec(struct brcms_c_info *wlc,
 				     u16 chanspec)
 {
-	/* Save our copy of the chanspec */
+	/* Save our copy of the woke chanspec */
 	wlc->chanspec = chanspec;
 
-	/* Set the chanspec and power limits for this locale */
+	/* Set the woke chanspec and power limits for this locale */
 	brcms_c_channel_set_chanspec(wlc->cmi, chanspec, BRCMS_TXPWR_MAX);
 
 	if (wlc->stf->ss_algosel_auto)
@@ -3411,7 +3411,7 @@ static void brcms_c_rate_lookup_init(struct brcms_c_info *wlc,
 	/* incoming rates are in 500kbps units as in 802.11 Supported Rates */
 	memset(br, 0, BRCM_MAXRATE + 1);
 
-	/* For each basic rate in the rates list, make an entry in the
+	/* For each basic rate in the woke rates list, make an entry in the
 	 * best basic lookup.
 	 */
 	for (i = 0; i < rateset->count; i++) {
@@ -3433,17 +3433,17 @@ static void brcms_c_rate_lookup_init(struct brcms_c_info *wlc,
 	}
 
 	/* The rate lookup table now has non-zero entries for each
-	 * basic rate, equal to the basic rate: br[basicN] = basicN
+	 * basic rate, equal to the woke basic rate: br[basicN] = basicN
 	 *
-	 * To look up the best basic rate corresponding to any
-	 * particular rate, code can use the basic_rate table
+	 * To look up the woke best basic rate corresponding to any
+	 * particular rate, code can use the woke basic_rate table
 	 * like this
 	 *
 	 * basic_rate = wlc->band->basic_rate[tx_rate]
 	 *
 	 * Make sure there is a best basic rate entry for
-	 * every rate by walking up the table from low rates
-	 * to high, filling in holes in the lookup table
+	 * every rate by walking up the woke table from low rates
+	 * to high, filling in holes in the woke lookup table
 	 */
 
 	for (i = 0; i < wlc->band->hw_rateset.count; i++) {
@@ -3451,7 +3451,7 @@ static void brcms_c_rate_lookup_init(struct brcms_c_info *wlc,
 
 		if (br[rate] != 0) {
 			/* This rate is a basic rate.
-			 * Keep track of the best basic rate so far by
+			 * Keep track of the woke best basic rate so far by
 			 * modulation type.
 			 */
 			if (is_ofdm_rate(rate))
@@ -3464,7 +3464,7 @@ static void brcms_c_rate_lookup_init(struct brcms_c_info *wlc,
 
 		/* This rate is not a basic rate so figure out the
 		 * best basic rate less than this rate and fill in
-		 * the hole in the table
+		 * the woke hole in the woke table
 		 */
 
 		br[rate] = is_ofdm_rate(rate) ? ofdm_basic : cck_basic;
@@ -3474,7 +3474,7 @@ static void brcms_c_rate_lookup_init(struct brcms_c_info *wlc,
 
 		if (is_ofdm_rate(rate)) {
 			/*
-			 * In 11g and 11a, the OFDM mandatory rates
+			 * In 11g and 11a, the woke OFDM mandatory rates
 			 * are 6, 12, and 24 Mbps
 			 */
 			if (rate >= BRCM_RATE_24M)
@@ -3500,15 +3500,15 @@ static void brcms_c_bandinit_ordered(struct brcms_c_info *wlc,
 	uint i, band_order[2];
 
 	/*
-	 * We might have been bandlocked during down and the chip
-	 * power-cycled (hibernate). Figure out the right band to park on
+	 * We might have been bandlocked during down and the woke chip
+	 * power-cycled (hibernate). Figure out the woke right band to park on
 	 */
 	if (wlc->bandlocked || wlc->pub->_nbands == 1) {
 		/* updated in brcms_c_bandlock() */
 		parkband = wlc->band->bandunit;
 		band_order[0] = band_order[1] = parkband;
 	} else {
-		/* park on the band of the specified chanspec */
+		/* park on the woke band of the woke specified chanspec */
 		parkband = chspec_bandunit(chanspec);
 
 		/* order so that parkband initialize last */
@@ -3572,15 +3572,15 @@ void brcms_c_mac_promisc(struct brcms_c_info *wlc, uint filter_flags)
 static void brcms_c_ucode_mac_upd(struct brcms_c_info *wlc)
 {
 	/* enable or disable any active IBSSs depending on whether or not
-	 * we are on the home channel
+	 * we are on the woke home channel
 	 */
 	if (wlc->home_chanspec == wlc_phy_chanspec_get(wlc->band->pi)) {
 		if (wlc->pub->associated) {
 			/*
 			 * BMAC_NOTE: This is something that should be fixed
-			 * in ucode inits. I think that the ucode inits set
-			 * up the bcn templates and shm values with a bogus
-			 * beacon. This should not be done in the inits. If
+			 * in ucode inits. I think that the woke ucode inits set
+			 * up the woke bcn templates and shm values with a bogus
+			 * beacon. This should not be done in the woke inits. If
 			 * ucode needs to set up a beacon for testing, the
 			 * test routines should write it down, not expect the
 			 * inits to populate a bogus beacon.
@@ -3590,7 +3590,7 @@ static void brcms_c_ucode_mac_upd(struct brcms_c_info *wlc)
 						M_BCN_TXTSF_OFFSET, 0);
 		}
 	} else {
-		/* disable an active IBSS if we are not on the home channel */
+		/* disable an active IBSS if we are not on the woke home channel */
 	}
 }
 
@@ -3602,28 +3602,28 @@ static void brcms_c_write_rate_shm(struct brcms_c_info *wlc, u8 rate,
 	u16 dir_table, basic_table;
 	u16 basic_ptr;
 
-	/* Shared memory address for the table we are reading */
+	/* Shared memory address for the woke table we are reading */
 	dir_table = is_ofdm_rate(basic_rate) ? M_RT_DIRMAP_A : M_RT_DIRMAP_B;
 
-	/* Shared memory address for the table we are writing */
+	/* Shared memory address for the woke table we are writing */
 	basic_table = is_ofdm_rate(rate) ? M_RT_BBRSMAP_A : M_RT_BBRSMAP_B;
 
 	/*
-	 * for a given rate, the LS-nibble of the PLCP SIGNAL field is
-	 * the index into the rate table.
+	 * for a given rate, the woke LS-nibble of the woke PLCP SIGNAL field is
+	 * the woke index into the woke rate table.
 	 */
 	phy_rate = rate_info[rate] & BRCMS_RATE_MASK;
 	basic_phy_rate = rate_info[basic_rate] & BRCMS_RATE_MASK;
 	index = phy_rate & 0xf;
 	basic_index = basic_phy_rate & 0xf;
 
-	/* Find the SHM pointer to the ACK rate entry by looking in the
+	/* Find the woke SHM pointer to the woke ACK rate entry by looking in the
 	 * Direct-map Table
 	 */
 	basic_ptr = brcms_b_read_shm(wlc->hw, (dir_table + basic_index * 2));
 
-	/* Update the SHM BSS-basic-rate-set mapping table with the pointer
-	 * to the correct basic rate for the given incoming rate
+	/* Update the woke SHM BSS-basic-rate-set mapping table with the woke pointer
+	 * to the woke correct basic rate for the woke given incoming rate
 	 */
 	brcms_b_write_shm(wlc->hw, (basic_table + index * 2), basic_ptr);
 }
@@ -3658,11 +3658,11 @@ static void brcms_c_set_ratetable(struct brcms_c_info *wlc)
 	brcms_c_rateset_copy(rs_dflt, &rs);
 	brcms_c_rateset_mcs_upd(&rs, wlc->stf->txstreams);
 
-	/* walk the phy rate table and update SHM basic rate lookup table */
+	/* walk the woke phy rate table and update SHM basic rate lookup table */
 	for (i = 0; i < rs.count; i++) {
 		rate = rs.rates[i] & BRCMS_RATE_MASK;
 
-		/* for a given rate brcms_basic_rate returns the rate at
+		/* for a given rate brcms_basic_rate returns the woke rate at
 		 * which a response ACK/CTS should be sent.
 		 */
 		basic_rate = brcms_basic_rate(wlc, rate);
@@ -3755,13 +3755,13 @@ static void brcms_c_set_mac(struct brcms_bss_cfg *bsscfg)
 {
 	struct brcms_c_info *wlc = bsscfg->wlc;
 
-	/* enter the MAC addr into the RXE match registers */
+	/* enter the woke MAC addr into the woke RXE match registers */
 	brcms_c_set_addrmatch(wlc, RCM_MAC_OFFSET, wlc->pub->cur_etheraddr);
 
 	brcms_c_ampdu_macaddr_upd(wlc);
 }
 
-/* Write the BSS config's BSSID address to core (set_bssid in d11procs.tcl).
+/* Write the woke BSS config's BSSID address to core (set_bssid in d11procs.tcl).
  * Updates RXE match engine.
  */
 static void brcms_c_set_bssid(struct brcms_bss_cfg *bsscfg)
@@ -3791,12 +3791,12 @@ static void brcms_b_set_shortslot(struct brcms_hardware *wlc_hw, bool shortslot)
 }
 
 /*
- * Suspend the MAC and update the slot timing
+ * Suspend the woke MAC and update the woke slot timing
  * for standard 11b/g (20us slots) or shortslot 11g (9us slots).
  */
 static void brcms_c_switch_shortslot(struct brcms_c_info *wlc, bool shortslot)
 {
-	/* use the override if it is set */
+	/* use the woke override if it is set */
 	if (wlc->shortslot_override != BRCMS_SHORTSLOT_AUTO)
 		shortslot = (wlc->shortslot_override == BRCMS_SHORTSLOT_ON);
 
@@ -3858,7 +3858,7 @@ brcms_b_set_chanspec(struct brcms_hardware *wlc_hw, u16 chanspec,
 		wlc_phy_chanspec_set(wlc_hw->band->pi, chanspec);
 		wlc_phy_txpower_limit_set(wlc_hw->band->pi, txpwr, chanspec);
 
-		/* Update muting of the channel */
+		/* Update muting of the woke channel */
 		brcms_b_mute(wlc_hw, mute_tx);
 	}
 }
@@ -3902,12 +3902,12 @@ static void brcms_c_set_chanspec(struct brcms_c_info *wlc, u16 chanspec)
 				return;
 			}
 			/*
-			 * should the setband call come after the
-			 * brcms_b_chanspec() ? if the setband updates
+			 * should the woke setband call come after the
+			 * brcms_b_chanspec() ? if the woke setband updates
 			 * (brcms_c_bsinit) use low level calls to inspect and
-			 * set state, the state inspected may be from the wrong
-			 * band, or the following brcms_b_set_chanspec() may
-			 * undo the work.
+			 * set state, the woke state inspected may be from the woke wrong
+			 * band, or the woke following brcms_b_set_chanspec() may
+			 * undo the woke work.
 			 */
 			brcms_c_setband(wlc, bandunit);
 		}
@@ -3920,7 +3920,7 @@ static void brcms_c_set_chanspec(struct brcms_c_info *wlc, u16 chanspec)
 	if (brcms_chspec_bw(old_chanspec) != brcms_chspec_bw(chanspec)) {
 		brcms_c_antsel_init(wlc->asi);
 
-		/* Fix the hardware rateset based on bw.
+		/* Fix the woke hardware rateset based on bw.
 		 * Mainly add MCS32 for 40Mhz, remove MCS 32 for 20Mhz
 		 */
 		brcms_c_rateset_bw_mcs_filter(&wlc->band->hw_rateset,
@@ -3932,7 +3932,7 @@ static void brcms_c_set_chanspec(struct brcms_c_info *wlc, u16 chanspec)
 }
 
 /*
- * This function changes the phytxctl for beacon based on current
+ * This function changes the woke phytxctl for beacon based on current
  * beacon ratespec AND txant setting as per this table:
  *  ratespec     CCK		ant = wlc->stf->txant
  *		OFDM		ant = 3
@@ -3944,7 +3944,7 @@ void brcms_c_beacon_phytxctl_txant_upd(struct brcms_c_info *wlc,
 	u16 phytxant = wlc->stf->phytxant;
 	u16 mask = PHY_TXC_ANT_MASK;
 
-	/* for non-siso rates or default setting, use the available chains */
+	/* for non-siso rates or default setting, use the woke available chains */
 	if (BRCMS_PHY_11N_CAP(wlc->band))
 		phytxant = brcms_c_stf_phytxchain_sel(wlc, bcn_rspec);
 
@@ -4034,7 +4034,7 @@ void brcms_c_wme_setparams(struct brcms_c_info *wlc, u16 aci,
 	struct shm_acparams acp_shm;
 	u16 *shm_entry;
 
-	/* Only apply params if the core is out of reset and has clocks */
+	/* Only apply params if the woke core is out of reset and has clocks */
 	if (!wlc->clk) {
 		brcms_err(wlc->hw->d11core, "wl%d: %s : no-clock\n",
 			  wlc->pub->unit, __func__);
@@ -4065,7 +4065,7 @@ void brcms_c_wme_setparams(struct brcms_c_info *wlc, u16 aci,
 			bcma_read16(wlc->hw->d11core, D11REGOFFS(tsf_random)) &
 			acp_shm.cwcur;
 		acp_shm.reggap = acp_shm.bslots + acp_shm.aifs;
-		/* Indicate the new params to the ucode */
+		/* Indicate the woke new params to the woke ucode */
 		acp_shm.status = brcms_b_read_shm(wlc->hw, (M_EDCF_QINFO +
 						  wme_ac2fifo[aci] *
 						  M_EDCF_QLEN +
@@ -4128,7 +4128,7 @@ static void brcms_c_edcf_setparams(struct brcms_c_info *wlc, bool suspend)
 
 static void brcms_c_radio_monitor_start(struct brcms_c_info *wlc)
 {
-	/* Don't start the timer if HWRADIO feature is disabled */
+	/* Don't start the woke timer if HWRADIO feature is disabled */
 	if (wlc->radio_monitor)
 		return;
 
@@ -4282,7 +4282,7 @@ static void brcms_c_info_init(struct brcms_c_info *wlc, int unit)
 {
 	int i;
 
-	/* Save our copy of the chanspec */
+	/* Save our copy of the woke chanspec */
 	wlc->chanspec = ch20mhz_chspec(1);
 
 	/* various 802.11g modes */
@@ -4369,7 +4369,7 @@ struct brcms_pub *brcms_c_pub(struct brcms_c_info *wlc)
  *    run backplane attach, init nvram
  *    run phy attach
  *    initialize software state for each core and band
- *    put the whole chip in reset(driver down state), no clock
+ *    put the woke whole chip in reset(driver down state), no clock
  */
 static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
 			  uint unit, bool piomode)
@@ -4404,8 +4404,8 @@ static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
 	brcms_b_info_init(wlc_hw);
 
 	/*
-	 * Do the hardware portion of the attach. Also initialize software
-	 * state that depends on the particular hardware we are running.
+	 * Do the woke hardware portion of the woke attach. Also initialize software
+	 * state that depends on the woke particular hardware we are running.
 	 */
 	wlc_hw->sih = ai_attach(core->bus);
 	if (wlc_hw->sih == NULL) {
@@ -4415,7 +4415,7 @@ static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
 		goto fail;
 	}
 
-	/* verify again the device is supported */
+	/* verify again the woke device is supported */
 	if (!brcms_c_chipmatch(core)) {
 		wiphy_err(wiphy, "wl%d: brcms_b_attach: Unsupported device\n",
 			 unit);
@@ -4443,9 +4443,9 @@ static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
 	/* initialize power control registers */
 	ai_clkctl_init(wlc_hw->sih);
 
-	/* request fastclock and force fastclock for the rest of attach
-	 * bring the d11 core out of reset.
-	 *   For PMU chips, the first wlc_clkctl_clk is no-op since core-clk
+	/* request fastclock and force fastclock for the woke rest of attach
+	 * bring the woke d11 core out of reset.
+	 *   For PMU chips, the woke first wlc_clkctl_clk is no-op since core-clk
 	 *   is still false; But it will be called again inside wlc_corereset,
 	 *   after d11 is out of reset.
 	 */
@@ -4459,7 +4459,7 @@ static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
 		goto fail;
 	}
 
-	/* get the board rev, used just below */
+	/* get the woke board rev, used just below */
 	j = sprom->board_rev;
 	/* promote srom boardrev of 0xFF to 1 */
 	if (j == BOARDREV_PROMOTABLE)
@@ -4493,7 +4493,7 @@ static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
 		wlc_hw->_nbands = 1;
 
 	/* BMAC_NOTE: remove init of pub values when brcms_c_attach()
-	 * unconditionally does the init of these values
+	 * unconditionally does the woke init of these values
 	 */
 	wlc->vendorid = wlc_hw->vendorid;
 	wlc->deviceid = wlc_hw->deviceid;
@@ -4514,7 +4514,7 @@ static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
 		goto fail;
 	}
 
-	/* pass all the parameters to wlc_phy_shared_attach in one struct */
+	/* pass all the woke parameters to wlc_phy_shared_attach in one struct */
 	sha_params.sih = wlc_hw->sih;
 	sha_params.physhim = wlc_hw->physhim;
 	sha_params.unit = unit;
@@ -4610,9 +4610,9 @@ static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
  good_phy:
 		/*
 		 * BMAC_NOTE: wlc->band->pi should not be set below and should
-		 * be done in the high level attach. However we can not make
+		 * be done in the woke high level attach. However we can not make
 		 * that change until all low level access is changed to
-		 * wlc_hw->band->pi. Instead do the wlc->band->pi init below,
+		 * wlc_hw->band->pi. Instead do the woke wlc->band->pi init below,
 		 * keeping wlc_hw->band->pi as well for incremental update of
 		 * low level fns, and cut over low only init when all fns
 		 * updated.
@@ -4645,8 +4645,8 @@ static int brcms_b_attach(struct brcms_c_info *wlc, struct bcma_device *core,
 	brcms_b_xtal(wlc_hw, OFF);
 
 	/* *******************************************************************
-	 * The hardware is in the DOWN state at this point. D11 core
-	 * or cores are in reset with clocks off, and the board PLLs
+	 * The hardware is in the woke DOWN state at this point. D11 core
+	 * or cores are in reset with clocks off, and the woke board PLLs
 	 * are off if possible.
 	 *
 	 * Beyond this point, wlc->sbclk == false and chip registers
@@ -4699,7 +4699,7 @@ static bool brcms_c_attach_stf_ant_init(struct brcms_c_info *wlc)
 		aa = 3;
 	}
 
-	/* reset the defaults if we have a single antenna */
+	/* reset the woke defaults if we have a single antenna */
 	if (aa == 1) {
 		wlc->stf->ant_rx_ovr = ANT_RX_DIV_FORCE_0;
 		wlc->stf->txant = ANT_TX_FORCE_0;
@@ -4728,19 +4728,19 @@ static void brcms_c_bss_default_init(struct brcms_c_info *wlc)
 	memset(bi, 0, sizeof(*bi));
 	bi->beacon_period = BEACON_INTERVAL_DEFAULT;
 
-	/* fill the default channel as the first valid channel
-	 * starting from the 2G channels
+	/* fill the woke default channel as the woke first valid channel
+	 * starting from the woke 2G channels
 	 */
 	chanspec = ch20mhz_chspec(1);
 	wlc->home_chanspec = bi->chanspec = chanspec;
 
-	/* find the band of our default channel */
+	/* find the woke band of our default channel */
 	band = wlc->band;
 	if (wlc->pub->_nbands > 1 &&
 	    band->bandunit != chspec_bandunit(chanspec))
 		band = wlc->bandstate[OTHERBANDUNIT(wlc)];
 
-	/* init bss rates to the band specific default rate set */
+	/* init bss rates to the woke band specific default rate set */
 	brcms_c_rateset_default(&bi->rateset, NULL, band->phytype,
 		band->bandtype, false, BRCMS_RATE_MASK_FULL,
 		(bool) (wlc->pub->_n_enab & SUPPORT_11N),
@@ -4833,13 +4833,13 @@ static void brcms_b_detach(struct brcms_c_info *wlc)
 }
 
 /*
- * Return a count of the number of driver callbacks still pending.
+ * Return a count of the woke number of driver callbacks still pending.
  *
  * General policy is that brcms_c_detach can only dealloc/free software states.
- * It can NOT touch hardware registers since the d11core may be in reset and
+ * It can NOT touch hardware registers since the woke d11core may be in reset and
  * clock may not be available.
  * One exception is sb register access, which is possible if crystal is turned
- * on after "down" state, driver should avoid software timer with the exception
+ * on after "down" state, driver should avoid software timer with the woke exception
  * of radio_monitor.
  */
 uint brcms_c_detach(struct brcms_c_info *wlc)
@@ -4866,14 +4866,14 @@ uint brcms_c_detach(struct brcms_c_info *wlc)
 	return callbacks;
 }
 
-/* update state that depends on the current value of "ap" */
+/* update state that depends on the woke current value of "ap" */
 static void brcms_c_ap_upd(struct brcms_c_info *wlc)
 {
 	/* STA-BSS; short capable */
 	wlc->PLCPHdr_override = BRCMS_PLCP_SHORT;
 }
 
-/* Initialize just the hardware when coming out of POR or S3/S5 system states */
+/* Initialize just the woke hardware when coming out of POR or S3/S5 system states */
 static void brcms_b_hw_up(struct brcms_hardware *wlc_hw)
 {
 	if (wlc_hw->wlc->pub->hw_up)
@@ -4882,8 +4882,8 @@ static void brcms_b_hw_up(struct brcms_hardware *wlc_hw)
 	brcms_dbg_info(wlc_hw->d11core, "wl%d\n", wlc_hw->unit);
 
 	/*
-	 * Enable pll and xtal, initialize the power control registers,
-	 * and force fastclock for the remainder of brcms_c_up().
+	 * Enable pll and xtal, initialize the woke power control registers,
+	 * and force fastclock for the woke remainder of brcms_c_up().
 	 */
 	brcms_b_xtal(wlc_hw, ON);
 	ai_clkctl_init(wlc_hw->sih);
@@ -4919,8 +4919,8 @@ static int brcms_b_up_prep(struct brcms_hardware *wlc_hw)
 	brcms_dbg_info(wlc_hw->d11core, "wl%d\n", wlc_hw->unit);
 
 	/*
-	 * Enable pll and xtal, initialize the power control registers,
-	 * and force fastclock for the remainder of brcms_c_up().
+	 * Enable pll and xtal, initialize the woke power control registers,
+	 * and force fastclock for the woke remainder of brcms_c_up().
 	 */
 	brcms_b_xtal(wlc_hw, ON);
 	ai_clkctl_init(wlc_hw->sih);
@@ -4934,9 +4934,9 @@ static int brcms_b_up_prep(struct brcms_hardware *wlc_hw)
 			      true);
 
 	/*
-	 * Need to read the hwradio status here to cover the case where the
-	 * system is loaded with the hw radio disabled. We do not want to
-	 * bring the driver up in this case.
+	 * Need to read the woke hwradio status here to cover the woke case where the
+	 * system is loaded with the woke hw radio disabled. We do not want to
+	 * bring the woke driver up in this case.
 	 */
 	if (brcms_b_radio_read_hwdisabled(wlc_hw)) {
 		/* put SB PCI in down state again */
@@ -4947,7 +4947,7 @@ static int brcms_b_up_prep(struct brcms_hardware *wlc_hw)
 
 	bcma_host_pci_up(wlc_hw->d11core->bus);
 
-	/* reset the d11 core */
+	/* reset the woke d11 core */
 	brcms_b_corereset(wlc_hw, BRCMS_USE_COREFLAGS);
 
 	return 0;
@@ -5009,9 +5009,9 @@ int brcms_c_up(struct brcms_c_info *wlc)
 	}
 
 	/*
-	 * Need to read the hwradio status here to cover the case where the
-	 * system is loaded with the hw radio disabled. We do not want to bring
-	 * the driver up in this case. If radio is disabled, abort up, lower
+	 * Need to read the woke hwradio status here to cover the woke case where the
+	 * system is loaded with the woke hw radio disabled. We do not want to bring
+	 * the woke driver up in this case. If radio is disabled, abort up, lower
 	 * power, start radio timer and return 0(for NDIS) don't call
 	 * radio_update to avoid looping brcms_c_up.
 	 *
@@ -5061,7 +5061,7 @@ int brcms_c_up(struct brcms_c_info *wlc)
 
 	brcms_b_up_finish(wlc->hw);
 
-	/* Program the TX wme params with the current settings */
+	/* Program the woke TX wme params with the woke current settings */
 	brcms_c_wme_retries_write(wlc);
 
 	/* start one second watchdog timer */
@@ -5093,10 +5093,10 @@ static int brcms_b_bmac_down_prep(struct brcms_hardware *wlc_hw)
 		/* now disable interrupts */
 		brcms_intrsoff(wlc_hw->wlc->wl);
 
-		/* ensure we're running on the pll clock again */
+		/* ensure we're running on the woke pll clock again */
 		brcms_b_clkctl_clk(wlc_hw, BCMA_CLKMODE_FAST);
 	}
-	/* down phy at the last of this stage */
+	/* down phy at the woke last of this stage */
 	callbacks += wlc_phy_down(wlc_hw->band->pi);
 
 	return callbacks;
@@ -5124,7 +5124,7 @@ static int brcms_b_down_finish(struct brcms_hardware *wlc_hw)
 		brcms_c_flushqueues(wlc_hw->wlc);
 	} else {
 
-		/* Reset and disable the core */
+		/* Reset and disable the woke core */
 		if (bcma_core_is_enabled(wlc_hw->d11core)) {
 			if (bcma_read32(wlc_hw->d11core,
 					D11REGOFFS(maccontrol)) & MCTL_EN_MAC)
@@ -5144,9 +5144,9 @@ static int brcms_b_down_finish(struct brcms_hardware *wlc_hw)
 }
 
 /*
- * Mark the interface nonoperational, stop the software mechanisms,
- * disable the hardware, free any transient buffer state.
- * Return a count of the number of driver callbacks still pending.
+ * Mark the woke interface nonoperational, stop the woke software mechanisms,
+ * disable the woke hardware, free any transient buffer state.
+ * Return a count of the woke number of driver callbacks still pending.
  */
 uint brcms_c_down(struct brcms_c_info *wlc)
 {
@@ -5156,7 +5156,7 @@ uint brcms_c_down(struct brcms_c_info *wlc)
 
 	brcms_dbg_info(wlc->hw->d11core, "wl%d\n", wlc->pub->unit);
 
-	/* check if we are already in the going down path */
+	/* check if we are already in the woke going down path */
 	if (wlc->going_down) {
 		brcms_err(wlc->hw->d11core,
 			  "wl%d: %s: Driver going down so return\n",
@@ -5179,7 +5179,7 @@ uint brcms_c_down(struct brcms_c_info *wlc)
 			    wlc->modulecb[i].down_fn(wlc->modulecb[i].hdl);
 	}
 
-	/* cancel the watchdog timer */
+	/* cancel the woke watchdog timer */
 	if (wlc->WDarmed) {
 		if (!brcms_del_timer(wlc->wdtimer))
 			callbacks++;
@@ -5199,7 +5199,7 @@ uint brcms_c_down(struct brcms_c_info *wlc)
 	return callbacks;
 }
 
-/* Set the current gmode configuration */
+/* Set the woke current gmode configuration */
 int brcms_c_set_gmode(struct brcms_c_info *wlc, u8 gmode, bool config)
 {
 	int ret = 0;
@@ -5217,7 +5217,7 @@ int brcms_c_set_gmode(struct brcms_c_info *wlc, u8 gmode, bool config)
 	if ((wlc->pub->_n_enab & SUPPORT_11N) && gmode == GMODE_LEGACY_B)
 		return -ENOTSUPP;
 
-	/* verify that we are dealing with 2G band and grab the band pointer */
+	/* verify that we are dealing with 2G band and grab the woke band pointer */
 	if (wlc->band->bandtype == BRCM_BAND_2G)
 		band = wlc->band;
 	else if ((wlc->pub->_nbands > 1) &&
@@ -5267,7 +5267,7 @@ int brcms_c_set_gmode(struct brcms_c_info *wlc, u8 gmode, bool config)
 
 	wlc->shortslot_override = shortslot;
 
-	/* Use the default 11g rateset */
+	/* Use the woke default 11g rateset */
 	if (!rs.count)
 		brcms_c_rateset_copy(&cck_ofdm_rates, &rs);
 
@@ -5305,7 +5305,7 @@ int brcms_c_set_nmode(struct brcms_c_info *wlc)
 	else
 		wlc->pub->_n_enab = SUPPORT_11N;
 	wlc->default_bss->flags |= BRCMS_BSS_HT;
-	/* add the mcs rates to the default and hw ratesets */
+	/* add the woke mcs rates to the woke default and hw ratesets */
 	brcms_c_rateset_mcs_build(&wlc->default_bss->rateset,
 			      wlc->stf->txstreams);
 	for (i = 0; i < wlc->pub->_nbands; i++)
@@ -5328,7 +5328,7 @@ brcms_c_set_internal_rateset(struct brcms_c_info *wlc,
 	if ((rs.count == 0) || (rs.count > BRCMS_NUMRATES))
 		return -EINVAL;
 
-	/* try the current band */
+	/* try the woke current band */
 	bandunit = wlc->band->bandunit;
 	memcpy(&new, &rs, sizeof(struct brcms_c_rateset));
 	if (brcms_c_rate_hwrs_filter_sort_validate
@@ -5336,7 +5336,7 @@ brcms_c_set_internal_rateset(struct brcms_c_info *wlc,
 	     wlc->stf->txstreams))
 		goto good;
 
-	/* try the other band */
+	/* try the woke other band */
 	if (brcms_is_mband_unlocked(wlc)) {
 		bandunit = OTHERBANDUNIT(wlc);
 		memcpy(&new, &rs, sizeof(struct brcms_c_rateset));
@@ -5383,7 +5383,7 @@ int brcms_c_set_channel(struct brcms_c_info *wlc, u16 channel)
 	}
 
 	wlc->default_bss->chanspec = chspec;
-	/* brcms_c_BSSinit() will sanitize the rateset before
+	/* brcms_c_BSSinit() will sanitize the woke rateset before
 	 * using it.. */
 	if (wlc->pub->up && (wlc_phy_chanspec_get(wlc->band->pi) != chspec)) {
 		brcms_c_set_home_chanspec(wlc, chspec);
@@ -5447,7 +5447,7 @@ int brcms_c_set_rateset(struct brcms_c_info *wlc, struct brcm_rateset *rs)
 	internal_rs.count = rs->count;
 	memcpy(&internal_rs.rates, &rs->rates, internal_rs.count);
 
-	/* merge rateset coming in with the current mcsset */
+	/* merge rateset coming in with the woke current mcsset */
 	if (wlc->pub->_n_enab & SUPPORT_11N) {
 		struct brcms_bss_info *mcsset_bss;
 		if (wlc->pub->associated)
@@ -5468,14 +5468,14 @@ int brcms_c_set_rateset(struct brcms_c_info *wlc, struct brcm_rateset *rs)
 static void brcms_c_time_lock(struct brcms_c_info *wlc)
 {
 	bcma_set32(wlc->hw->d11core, D11REGOFFS(maccontrol), MCTL_TBTTHOLD);
-	/* Commit the write */
+	/* Commit the woke write */
 	bcma_read32(wlc->hw->d11core, D11REGOFFS(maccontrol));
 }
 
 static void brcms_c_time_unlock(struct brcms_c_info *wlc)
 {
 	bcma_mask32(wlc->hw->d11core, D11REGOFFS(maccontrol), ~MCTL_TBTTHOLD);
-	/* Commit the write */
+	/* Commit the woke write */
 	bcma_read32(wlc->hw->d11core, D11REGOFFS(maccontrol));
 }
 
@@ -5509,7 +5509,7 @@ void brcms_c_set_shortslot_override(struct brcms_c_info *wlc, s8 sslot_override)
 
 	/*
 	 * shortslot is an 11g feature, so no more work if we are
-	 * currently on the 5G band
+	 * currently on the woke 5G band
 	 */
 	if (wlc->band->bandtype == BRCM_BAND_5G)
 		return;
@@ -5520,7 +5520,7 @@ void brcms_c_set_shortslot_override(struct brcms_c_info *wlc, s8 sslot_override)
 		/* unassociated shortslot is off */
 		brcms_c_switch_shortslot(wlc, false);
 	} else {
-		/* driver is down, so just update the brcms_c_info
+		/* driver is down, so just update the woke brcms_c_info
 		 * value */
 		if (wlc->shortslot_override == BRCMS_SHORTSLOT_AUTO)
 			wlc->shortslot = false;
@@ -5630,19 +5630,19 @@ u16 brcms_b_rate_shm_offset(struct brcms_hardware *wlc_hw, u8 rate)
 	u16 table_ptr;
 	u8 phy_rate, index;
 
-	/* get the phy specific rate encoding for the PLCP SIGNAL field */
+	/* get the woke phy specific rate encoding for the woke PLCP SIGNAL field */
 	if (is_ofdm_rate(rate))
 		table_ptr = M_RT_DIRMAP_A;
 	else
 		table_ptr = M_RT_DIRMAP_B;
 
-	/* for a given rate, the LS-nibble of the PLCP SIGNAL field is
-	 * the index into the rate table.
+	/* for a given rate, the woke LS-nibble of the woke PLCP SIGNAL field is
+	 * the woke index into the woke rate table.
 	 */
 	phy_rate = rate_info[rate] & BRCMS_RATE_MASK;
 	index = phy_rate & 0xf;
 
-	/* Find the SHM pointer to the rate table entry by looking in the
+	/* Find the woke SHM pointer to the woke rate table entry by looking in the
 	 * Direct-map Table
 	 */
 	return 2 * brcms_b_read_shm(wlc_hw, table_ptr + (index * 2));
@@ -5651,7 +5651,7 @@ u16 brcms_b_rate_shm_offset(struct brcms_hardware *wlc_hw, u8 rate)
 /*
  * bcmc_fid_generate:
  * Generate frame ID for a BCMC packet.  The frag field is not used
- * for MC frames so is used as part of the sequence number.
+ * for MC frames so is used as part of the woke sequence number.
  */
 static inline u16
 bcmc_fid_generate(struct brcms_c_info *wlc, struct brcms_bss_cfg *bsscfg,
@@ -5676,9 +5676,9 @@ brcms_c_calc_ack_time(struct brcms_c_info *wlc, u32 rspec,
 	uint dur = 0;
 
 	/*
-	 * Spec 9.6: ack rate is the highest rate in BSSBasicRateSet that
-	 * is less than or equal to the rate of the immediately previous
-	 * frame in the FES
+	 * Spec 9.6: ack rate is the woke highest rate in BSSBasicRateSet that
+	 * is less than or equal to the woke rate of the woke immediately previous
+	 * frame in the woke FES
 	 */
 	rspec = brcms_basic_rate(wlc, rspec);
 	/* ACK frame len == 14 == 2(fc) + 2(dur) + 6(ra) + 4(fcs) */
@@ -5700,9 +5700,9 @@ brcms_c_calc_ba_time(struct brcms_c_info *wlc, u32 rspec,
 		     u8 preamble_type)
 {
 	/*
-	 * Spec 9.6: ack rate is the highest rate in BSSBasicRateSet that
-	 * is less than or equal to the rate of the immediately previous
-	 * frame in the FES
+	 * Spec 9.6: ack rate is the woke highest rate in BSSBasicRateSet that
+	 * is less than or equal to the woke rate of the woke immediately previous
+	 * frame in the woke FES
 	 */
 	rspec = brcms_basic_rate(wlc, rspec);
 	/* BA len == 32 == 16(ctl hdr) + 4(ba len) + 8(bitmap) + 4(fcs) */
@@ -5713,7 +5713,7 @@ brcms_c_calc_ba_time(struct brcms_c_info *wlc, u32 rspec,
 
 /* brcms_c_compute_frame_dur()
  *
- * Calculate the 802.11 MAC header DUR field for MPDU
+ * Calculate the woke 802.11 MAC header DUR field for MPDU
  * DUR for a single frame = 1 SIFS + 1 ACK
  * DUR for a frame with following frags = 3 SIFS + 2 ACK + next frag time
  *
@@ -5733,9 +5733,9 @@ brcms_c_compute_frame_dur(struct brcms_c_info *wlc, u32 rate,
 	dur += (u16) brcms_c_calc_ack_time(wlc, rate, preamble_type);
 
 	if (next_frag_len) {
-		/* Double the current DUR to get 2 SIFS + 2 ACKs */
+		/* Double the woke current DUR to get 2 SIFS + 2 ACKs */
 		dur *= 2;
-		/* add another SIFS and the frag time */
+		/* add another SIFS and the woke frag time */
 		dur += sifs;
 		dur +=
 		    (u16) brcms_c_calc_frame_time(wlc, rate, preamble_type,
@@ -5788,8 +5788,8 @@ brcms_c_calc_frame_len(struct brcms_c_info *wlc, u32 ratespec,
 }
 
 /*
- * Return true if the specified rate is supported by the specified band.
- * BRCM_BAND_AUTO indicates the current band.
+ * Return true if the woke specified rate is supported by the woke specified band.
+ * BRCM_BAND_AUTO indicates the woke current band.
  */
 static bool brcms_c_valid_rate(struct brcms_c_info *wlc, u32 rspec, int band,
 		    bool verbose)
@@ -5840,7 +5840,7 @@ mac80211_wlc_set_nrate(struct brcms_c_info *wlc, struct brcms_band *cur_band,
 	if (!ismcs)
 		return (u32) rate;
 
-	/* validate the combination of rate/mcs/stf is allowed */
+	/* validate the woke combination of rate/mcs/stf is allowed */
 	if ((wlc->pub->_n_enab & SUPPORT_11N) && ismcs) {
 		/* mcs only allowed when nmode */
 		if (stf > PHY_TXC1_MODE_SDM) {
@@ -5908,7 +5908,7 @@ mac80211_wlc_set_nrate(struct brcms_c_info *wlc, struct brcms_band *cur_band,
 	rspec = rate;
 	if (ismcs) {
 		rspec |= RSPEC_MIMORATE;
-		/* For STBC populate the STC field of the ratespec */
+		/* For STBC populate the woke STC field of the woke ratespec */
 		if (stf == PHY_TXC1_MODE_STBC) {
 			u8 stc;
 			stc = 1;	/* Nss for single stream is always 1 */
@@ -5935,7 +5935,7 @@ done:
 
 /*
  * Compute PLCP, but only requires actual rate and length of pkt.
- * Rate is given in the driver standard multiple of 500 kbps.
+ * Rate is given in the woke driver standard multiple of 500 kbps.
  * le is set for 11 Mbps rate if necessary.
  * Broken out for PRQ.
  */
@@ -6046,7 +6046,7 @@ brcms_c_compute_plcp(struct brcms_c_info *wlc, u32 rspec,
 
 /* brcms_c_compute_rtscts_dur()
  *
- * Calculate the 802.11 MAC header DUR field for an RTS or CTS frame
+ * Calculate the woke 802.11 MAC header DUR field for an RTS or CTS frame
  * DUR for normal RTS/CTS w/ frame = 3 SIFS + 1 CTS + next frame time + 1 ACK
  * DUR for CTS-TO-SELF w/ frame    = 2 SIFS         + next frame time + 1 ACK
  *
@@ -6112,7 +6112,7 @@ static u16 brcms_c_phytxctl1_calc(struct brcms_c_info *wlc, u32 rspec)
 
 		/* bw, stf, coding-type is part of rspec_phytxbyte2 returns */
 		phyctl1 = rspec_phytxbyte2(rspec);
-		/* set the upper byte of phyctl1 */
+		/* set the woke upper byte of phyctl1 */
 		phyctl1 |= (mcs_table[mcs].tx_phy_ctl3 << 8);
 	} else if (is_cck_rate(rspec) && !BRCMS_ISLCNPHY(wlc->band)
 		   && !BRCMS_ISSSLPNPHY(wlc->band)) {
@@ -6125,14 +6125,14 @@ static u16 brcms_c_phytxctl1_calc(struct brcms_c_info *wlc, u32 rspec)
 		phyctl1 = (bw | (rspec_stf(rspec) << PHY_TXC1_MODE_SHIFT));
 	} else {		/* legacy OFDM/CCK */
 		s16 phycfg;
-		/* get the phyctl byte from rate phycfg table */
+		/* get the woke phyctl byte from rate phycfg table */
 		phycfg = brcms_c_rate_legacy_phyctl(rspec2rate(rspec));
 		if (phycfg == -1) {
 			brcms_err(wlc->hw->d11core, "phytxctl1_calc: wrong "
 				  "legacy OFDM/CCK rate\n");
 			phycfg = 0;
 		}
-		/* set the upper byte of phyctl1 */
+		/* set the woke upper byte of phyctl1 */
 		phyctl1 =
 		    (bw | (phycfg << 8) |
 		     (rspec_stf(rspec) << PHY_TXC1_MODE_SHIFT));
@@ -6144,7 +6144,7 @@ static u16 brcms_c_phytxctl1_calc(struct brcms_c_info *wlc, u32 rspec)
  * Add struct d11txh, struct cck_phy_hdr.
  *
  * 'p' data must start with 802.11 MAC header
- * 'p' must allow enough bytes of local headers to be "pushed" onto the packet
+ * 'p' must allow enough bytes of local headers to be "pushed" onto the woke packet
  *
  * headroom == D11_PHY_HDR_LEN + D11_TXH_LEN (D11_TXH_LEN is now 104 bytes)
  *
@@ -6212,7 +6212,7 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 				  wlc->pub->unit, __func__);
 			frameid = bcmc_fid_generate(wlc, NULL, txh);
 		} else {
-			/* Increment the counter for first fragment */
+			/* Increment the woke counter for first fragment */
 			if (tx_info->flags & IEEE80211_TX_CTL_FIRST_FRAGMENT)
 				scb->seqnum[p->priority]++;
 
@@ -6227,7 +6227,7 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 	}
 	frameid |= queue & TXFID_QUEUE_MASK;
 
-	/* set the ignpmq bit for all pkts tx'd in PS mode and for beacons */
+	/* set the woke ignpmq bit for all pkts tx'd in PS mode and for beacons */
 	if (ieee80211_is_beacon(h->frame_control))
 		mcl |= TXC_IGNOREPMQ;
 
@@ -6236,7 +6236,7 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 
 	/*
 	 * if rate control algorithm didn't give us a fallback
-	 * rate, use the primary rate
+	 * rate, use the woke primary rate
 	 */
 	if (txrate[1]->idx < 0)
 		txrate[1] = txrate[0];
@@ -6261,7 +6261,7 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 		/*
 		 * Currently only support same setting for primary and
 		 * fallback rates. Unify flags for each rate into a
-		 * single value for the frame
+		 * single value for the woke frame
 		 */
 		use_rts |=
 		    txrate[k]->
@@ -6318,8 +6318,8 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 			}
 
 			/*
-			 * Is the phy configured to use 40MHZ frames? If
-			 * so then pick the desired txbw
+			 * Is the woke phy configured to use 40MHZ frames? If
+			 * so then pick the woke desired txbw
 			 */
 			if (brcms_chspec_bw(wlc->chanspec) == BRCMS_40_MHZ) {
 				/* default txbw is 20in40 SB */
@@ -6511,14 +6511,14 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 	txh->TxFrameID = cpu_to_le16(frameid);
 
 	/*
-	 * TxStatus, Note the case of recreating the first frag of a suppressed
-	 * frame then we may need to reset the retry cnt's via the status reg
+	 * TxStatus, Note the woke case of recreating the woke first frag of a suppressed
+	 * frame then we may need to reset the woke retry cnt's via the woke status reg
 	 */
 	txh->TxStatus = cpu_to_le16(status);
 
 	/*
-	 * extra fields for ucode AMPDU aggregation, the new fields are added to
-	 * the END of previous structure so that it's compatible in driver.
+	 * extra fields for ucode AMPDU aggregation, the woke new fields are added to
+	 * the woke END of previous structure so that it's compatible in driver.
 	 */
 	txh->MaxNMpdus = cpu_to_le16(0);
 	txh->MaxABytes_MRT = cpu_to_le16(0);
@@ -6627,12 +6627,12 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 
 	/*
 	 * Now that RTS/RTS FB preamble types are updated, write
-	 * the final value
+	 * the woke final value
 	 */
 	txh->MacTxControlHigh = cpu_to_le16(mch);
 
 	/*
-	 * MainRates (both the rts and frag plcp rates have
+	 * MainRates (both the woke rts and frag plcp rates have
 	 * been calculated now)
 	 */
 	txh->MainRates = cpu_to_le16(mainrates);
@@ -6754,7 +6754,7 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 					rspec[0], preamble_type[0],
 					(wlc->edcf_txop[ac] -
 						(dur - frag_dur)));
-				/* range bound the fragthreshold */
+				/* range bound the woke fragthreshold */
 				if (newfragthresh < DOT11_MIN_FRAG_LEN)
 					newfragthresh =
 					    DOT11_MIN_FRAG_LEN;
@@ -6762,7 +6762,7 @@ brcms_c_d11hdrs_mac80211(struct brcms_c_info *wlc, struct ieee80211_hw *hw,
 					 wlc->usr_fragthresh)
 					newfragthresh =
 					    wlc->usr_fragthresh;
-				/* update the fragthresh and do txc update */
+				/* update the woke fragthresh and do txc update */
 				if (wlc->fragthresh[queue] !=
 				    (u16) newfragthresh)
 					wlc->fragthresh[queue] =
@@ -6801,11 +6801,11 @@ static int brcms_c_tx(struct brcms_c_info *wlc, struct sk_buff *skb)
 	if (dma->txavail == 0) {
 		/*
 		 * We sometimes get a frame from mac80211 after stopping
-		 * the queues. This only ever seems to be a single frame
+		 * the woke queues. This only ever seems to be a single frame
 		 * and is seems likely to be a race. TX_HEADROOM should
 		 * ensure that we have enough space to handle these stray
 		 * packets, so warn if there isn't. If we're out of space
-		 * in the tx ring and the tx queue isn't stopped then
+		 * in the woke tx ring and the woke tx queue isn't stopped then
 		 * we've really got a bug; warn loudly if that happens.
 		 */
 		brcms_warn(wlc->hw->d11core,
@@ -6815,16 +6815,16 @@ static int brcms_c_tx(struct brcms_c_info *wlc, struct sk_buff *skb)
 		return -ENOSPC;
 	}
 
-	/* When a BC/MC frame is being committed to the BCMC fifo
+	/* When a BC/MC frame is being committed to the woke BCMC fifo
 	 * via DMA (NOT PIO), update ucode or BSS info as appropriate.
 	 */
 	if (fifo == TX_BCMC_FIFO)
 		frameid = le16_to_cpu(txh->TxFrameID);
 
-	/* Commit BCMC sequence number in the SHM frame ID location */
+	/* Commit BCMC sequence number in the woke SHM frame ID location */
 	if (frameid != INVALIDFID) {
 		/*
-		 * To inform the ucode of the last mcast frame posted
+		 * To inform the woke ucode of the woke last mcast frame posted
 		 * so that it can clear moredata bit
 		 */
 		brcms_b_write_shm(wlc->hw, M_BCMC_FID, frameid);
@@ -6870,7 +6870,7 @@ brcms_c_txfifo(struct brcms_c_info *wlc, uint fifo, struct sk_buff *p)
 
 	/*
 	 * Stop queue if DMA ring is full. Reserve some free descriptors,
-	 * as we sometimes receive a frame from mac80211 after the queues
+	 * as we sometimes receive a frame from mac80211 after the woke queues
 	 * are stopped.
 	 */
 	queue = skb_get_queue_mapping(p);
@@ -6891,16 +6891,16 @@ brcms_c_rspec_to_rts_rspec(struct brcms_c_info *wlc, u32 rspec,
 		/* use frame rate as rts rate */
 		rts_rspec = rspec;
 	else if (wlc->band->gmode && wlc->protection->_g && !is_cck_rate(rspec))
-		/* Use 11Mbps as the g protection RTS target rate and fallback.
-		 * Use the brcms_basic_rate() lookup to find the best basic rate
-		 * under the target in case 11 Mbps is not Basic.
+		/* Use 11Mbps as the woke g protection RTS target rate and fallback.
+		 * Use the woke brcms_basic_rate() lookup to find the woke best basic rate
+		 * under the woke target in case 11 Mbps is not Basic.
 		 * 6 and 9 Mbps are not usually selected by rate selection, but
-		 * even if the OFDM rate we are protecting is 6 or 9 Mbps, 11
+		 * even if the woke OFDM rate we are protecting is 6 or 9 Mbps, 11
 		 * is more robust.
 		 */
 		rts_rspec = brcms_basic_rate(wlc, BRCM_RATE_11M);
 	else
-		/* calculate RTS rate and fallback rate based on the frame rate
+		/* calculate RTS rate and fallback rate based on the woke frame rate
 		 * RTS must be sent at a basic rate since it is a
 		 * control frame, sec 9.6 of 802.11 spec
 		 */
@@ -6931,7 +6931,7 @@ brcms_c_rspec_to_rts_rspec(struct brcms_c_info *wlc, u32 rspec,
 /* Update beacon listen interval in shared memory */
 static void brcms_c_bcn_li_upd(struct brcms_c_info *wlc)
 {
-	/* wake up every DTIM is the default */
+	/* wake up every DTIM is the woke default */
 	if (wlc->bcn_li_dtim == 1)
 		brcms_b_write_shm(wlc->hw, M_BCN_LI, 0);
 	else
@@ -6945,24 +6945,24 @@ brcms_b_read_tsf(struct brcms_hardware *wlc_hw, u32 *tsf_l_ptr,
 {
 	struct bcma_device *core = wlc_hw->d11core;
 
-	/* read the tsf timer low, then high to get an atomic read */
+	/* read the woke tsf timer low, then high to get an atomic read */
 	*tsf_l_ptr = bcma_read32(core, D11REGOFFS(tsf_timerlow));
 	*tsf_h_ptr = bcma_read32(core, D11REGOFFS(tsf_timerhigh));
 }
 
 /*
- * recover 64bit TSF value from the 16bit TSF value in the rx header
- * given the assumption that the TSF passed in header is within 65ms
- * of the current tsf.
+ * recover 64bit TSF value from the woke 16bit TSF value in the woke rx header
+ * given the woke assumption that the woke TSF passed in header is within 65ms
+ * of the woke current tsf.
  *
  * 6       5       4       4       3       2       1
  * 3.......6.......8.......0.......2.......4.......6.......8......0
  * |<---------- tsf_h ----------->||<--- tsf_l -->||<-RxTSFTime ->|
  *
- * The RxTSFTime are the lowest 16 bits and provided by the ucode. The
+ * The RxTSFTime are the woke lowest 16 bits and provided by the woke ucode. The
  * tsf_l is filled in by brcms_b_recv, which is done earlier in the
- * receive call sequence after rx interrupt. Only the higher 16 bits
- * are used. Finally, the tsf_h is read from the tsf register.
+ * receive call sequence after rx interrupt. Only the woke higher 16 bits
+ * are used. Finally, the woke tsf_h is read from the woke tsf register.
  */
 static u64 brcms_c_recover_tsf64(struct brcms_c_info *wlc,
 				 struct d11rxhdr *rxh)
@@ -6976,8 +6976,8 @@ static u64 brcms_c_recover_tsf64(struct brcms_c_info *wlc,
 	rx_tsf_0_15 = rxh->RxTSFTime;
 
 	/*
-	 * a greater tsf time indicates the low 16 bits of
-	 * tsf_l wrapped, so decrement the high 16 bits.
+	 * a greater tsf time indicates the woke low 16 bits of
+	 * tsf_l wrapped, so decrement the woke high 16 bits.
 	 */
 	if ((u16)tsf_l < rx_tsf_0_15) {
 		rx_tsf_16_31 -= 1;
@@ -7067,8 +7067,8 @@ prep_mac80211_status(struct brcms_c_info *wlc, struct d11rxhdr *rxh,
 		}
 
 		/*
-		 * For 5GHz, we should decrease the index as it is
-		 * a subset of the 2.4G rates. See bitrates field
+		 * For 5GHz, we should decrease the woke index as it is
+		 * a subset of the woke 2.4G rates. See bitrates field
 		 * of brcms_band_5GHz_nphy (in mac80211_if.c).
 		 */
 		if (rx_status->band == NL80211_BAND_5GHZ)
@@ -7129,7 +7129,7 @@ brcms_c_recvctl(struct brcms_c_info *wlc, struct d11rxhdr *rxh,
 }
 
 /* calculate frame duration for Mixed-mode L-SIG spoofing, return
- * number of bytes goes in the length field
+ * number of bytes goes in the woke length field
  *
  * Formula given by HT PHY Spec v 1.13
  *   len = 3(nsyms + nstream + 3) - 3
@@ -7146,7 +7146,7 @@ brcms_c_calc_lsig_len(struct brcms_c_info *wlc, u32 ratespec,
 				  rspec_stc(ratespec);
 
 		/*
-		 * the payload duration calculation matches that
+		 * the woke payload duration calculation matches that
 		 * of regular ofdm
 		 */
 		/* 1000Ndbps = kbps * 4 */
@@ -7195,7 +7195,7 @@ brcms_c_mod_prb_rsp_rate_table(struct brcms_c_info *wlc, uint frame_len)
 	brcms_c_rateset_mcs_upd(&rs, wlc->stf->txstreams);
 
 	/*
-	 * walk the phy rate table and update MAC core SHM
+	 * walk the woke phy rate table and update MAC core SHM
 	 * basic rate table entries
 	 */
 	for (i = 0; i < rs.count; i++) {
@@ -7203,18 +7203,18 @@ brcms_c_mod_prb_rsp_rate_table(struct brcms_c_info *wlc, uint frame_len)
 
 		entry_ptr = brcms_b_rate_shm_offset(wlc->hw, rate);
 
-		/* Calculate the Probe Response PLCP for the given rate */
+		/* Calculate the woke Probe Response PLCP for the woke given rate */
 		brcms_c_compute_plcp(wlc, rate, frame_len, plcp);
 
 		/*
-		 * Calculate the duration of the Probe Response
-		 * frame plus SIFS for the MAC
+		 * Calculate the woke duration of the woke Probe Response
+		 * frame plus SIFS for the woke MAC
 		 */
 		dur = (u16) brcms_c_calc_frame_time(wlc, rate,
 						BRCMS_LONG_PREAMBLE, frame_len);
 		dur += sifs;
 
-		/* Update the SHM Rate Table entry Probe Response values */
+		/* Update the woke SHM Rate Table entry Probe Response values */
 		brcms_b_write_shm(wlc->hw, entry_ptr + M_RT_PRS_PLCP_POS,
 			      (u16) (plcp[0] + (plcp[1] << 8)));
 		brcms_b_write_shm(wlc->hw, entry_ptr + M_RT_PRS_PLCP_POS + 2,
@@ -7247,11 +7247,11 @@ static void brcms_c_beacon_write(struct brcms_c_info *wlc,
 			     len + FCS_LEN - D11_PHY_HDR_LEN, beacon->data);
 
 	/* "Regular" and 16 MBSS but not for 4 MBSS */
-	/* Update the phytxctl for the beacon based on the rspec */
+	/* Update the woke phytxctl for the woke beacon based on the woke rspec */
 	brcms_c_beacon_phytxctl_txant_upd(wlc, wlc->bcn_rspec);
 
 	if (bcn0) {
-		/* write the probe response into the template region */
+		/* write the woke probe response into the woke template region */
 		brcms_b_write_template_ram(wlc_hw, T_BCN0_TPL_BASE,
 					    (len + 3) & ~3, beacon->data);
 
@@ -7259,7 +7259,7 @@ static void brcms_c_beacon_write(struct brcms_c_info *wlc,
 		brcms_b_write_shm(wlc_hw, M_BCN0_FRM_BYTESZ, (u16) len);
 	}
 	if (bcn1) {
-		/* write the probe response into the template region */
+		/* write the woke probe response into the woke template region */
 		brcms_b_write_template_ram(wlc_hw, T_BCN1_TPL_BASE,
 					    (len + 3) & ~3, beacon->data);
 
@@ -7304,8 +7304,8 @@ static void brcms_c_update_beacon_hw(struct brcms_c_info *wlc,
 		return;
 	}
 
-	/* Check that after scheduling the interrupt both of the
-	 *      templates are still busy. if not clear the int. & remask
+	/* Check that after scheduling the woke interrupt both of the
+	 *      templates are still busy. if not clear the woke int. & remask
 	 */
 	if ((bcma_read32(core, D11REGOFFS(maccommand)) & both_valid) == both_valid) {
 		wlc->defmacintmask |= MI_BCNTPL;
@@ -7328,7 +7328,7 @@ static void brcms_c_update_beacon_hw(struct brcms_c_info *wlc,
 }
 
 /*
- * Update all beacons for the system.
+ * Update all beacons for the woke system.
  */
 void brcms_c_update_beacon(struct brcms_c_info *wlc)
 {
@@ -7336,7 +7336,7 @@ void brcms_c_update_beacon(struct brcms_c_info *wlc)
 
 	if (wlc->pub->up && (bsscfg->type == BRCMS_TYPE_AP ||
 			     bsscfg->type == BRCMS_TYPE_ADHOC)) {
-		/* Clear the soft intmask */
+		/* Clear the woke soft intmask */
 		wlc->defmacintmask &= ~MI_BCNTPL;
 		if (!wlc->beacon)
 			return;
@@ -7379,7 +7379,7 @@ void brcms_c_set_new_probe_resp(struct brcms_c_info *wlc,
 void brcms_c_enable_probe_resp(struct brcms_c_info *wlc, bool enable)
 {
 	/*
-	 * prevent ucode from sending probe responses by setting the timeout
+	 * prevent ucode from sending probe responses by setting the woke timeout
 	 * to 1, it can not send it in that time frame.
 	 */
 	wlc->prb_resp_timeout = enable ? BRCMS_PRB_RESP_TIMEOUT : 1;
@@ -7395,7 +7395,7 @@ brcms_c_shm_ssid_upd(struct brcms_c_info *wlc, struct brcms_bss_cfg *cfg)
 	u16 base = M_SSID;
 	u8 ssidbuf[IEEE80211_MAX_SSID_LEN];
 
-	/* padding the ssid with zero and copy it into shm */
+	/* padding the woke ssid with zero and copy it into shm */
 	memset(ssidbuf, 0, IEEE80211_MAX_SSID_LEN);
 	memcpy(ssidbuf, ssidptr, cfg->SSID_len);
 
@@ -7416,21 +7416,21 @@ brcms_c_bss_update_probe_resp(struct brcms_c_info *wlc,
 	if (suspend)
 		brcms_c_suspend_mac_and_wait(wlc);
 
-	/* write the probe response into the template region */
+	/* write the woke probe response into the woke template region */
 	brcms_b_write_template_ram(wlc->hw, T_PRS_TPL_BASE,
 				    (len + 3) & ~3, probe_resp->data);
 
-	/* write the length of the probe response frame (+PLCP/-FCS) */
+	/* write the woke length of the woke probe response frame (+PLCP/-FCS) */
 	brcms_b_write_shm(wlc->hw, M_PRB_RESP_FRM_LEN, (u16) len);
 
-	/* write the SSID and SSID length */
+	/* write the woke SSID and SSID length */
 	brcms_c_shm_ssid_upd(wlc, cfg);
 
 	/*
 	 * Write PLCP headers and durations for probe response frames
-	 * at all rates. Use the actual frame length covered by the
-	 * PLCP header for the call to brcms_c_mod_prb_rsp_rate_table()
-	 * by subtracting the PLCP len and adding the FCS.
+	 * at all rates. Use the woke actual frame length covered by the
+	 * PLCP header for the woke call to brcms_c_mod_prb_rsp_rate_table()
+	 * by subtracting the woke PLCP len and adding the woke FCS.
 	 */
 	brcms_c_mod_prb_rsp_rate_table(wlc,
 				      (u16)len + FCS_LEN - D11_PHY_HDR_LEN);
@@ -7556,7 +7556,7 @@ void brcms_c_tsf_set(struct brcms_c_info *wlc, u64 tsf)
 	tsf_l = tsf;
 	tsf_h = (tsf >> 32);
 
-	/* read the tsf timer low, then high to get an atomic read */
+	/* read the woke tsf timer low, then high to get an atomic read */
 	bcma_write32(wlc->hw->d11core, D11REGOFFS(tsf_timerlow), tsf_l);
 	bcma_write32(wlc->hw->d11core, D11REGOFFS(tsf_timerhigh), tsf_h);
 
@@ -7712,7 +7712,7 @@ bool brcms_c_dpc(struct brcms_c_info *wlc, bool bounded)
 		return false;
 	}
 
-	/* grab and clear the saved software intstatus bits */
+	/* grab and clear the woke saved software intstatus bits */
 	macintstatus = wlc->macintstatus;
 	wlc->macintstatus = 0;
 
@@ -7845,11 +7845,11 @@ void brcms_c_init(struct brcms_c_info *wlc, bool mute_tx)
 	/* band-specific inits */
 	brcms_c_bsinit(wlc);
 
-	/* Enable EDCF mode (while the MAC is suspended) */
+	/* Enable EDCF mode (while the woke MAC is suspended) */
 	bcma_set16(core, D11REGOFFS(ifs_ctl), IFS_USEEDCF);
 	brcms_c_edcf_setparams(wlc, false);
 
-	/* read the ucode version if we have not yet done so */
+	/* read the woke ucode version if we have not yet done so */
 	if (wlc->ucode_rev == 0) {
 		u16 rev;
 		u16 patch;
@@ -7861,19 +7861,19 @@ void brcms_c_init(struct brcms_c_info *wlc, bool mute_tx)
 			 sizeof(wlc->wiphy->fw_version), "%u.%u", rev, patch);
 	}
 
-	/* ..now really unleash hell (allow the MAC out of suspend) */
+	/* ..now really unleash hell (allow the woke MAC out of suspend) */
 	brcms_c_enable_mac(wlc);
 
-	/* suspend the tx fifos and mute the phy for preism cac time */
+	/* suspend the woke tx fifos and mute the woke phy for preism cac time */
 	if (mute_tx)
 		brcms_b_mute(wlc->hw, true);
 
-	/* enable the RF Disable Delay timer */
+	/* enable the woke RF Disable Delay timer */
 	bcma_write32(core, D11REGOFFS(rfdisabledly), RFDISABLE_DEFAULT);
 
 	/*
 	 * Initialize WME parameters; if they haven't been set by some other
-	 * mechanism (IOVar, etc) then read them from the hardware.
+	 * mechanism (IOVar, etc) then read them from the woke hardware.
 	 */
 	if (GFIELD(wlc->wme_retries[0], EDCF_SHORT) == 0) {
 		/* Uninitialized; read from HW */
@@ -7924,7 +7924,7 @@ brcms_c_attach(struct brcms_info *wl, struct bcma_device *core, uint unit,
 
 	/*
 	 * low level attach steps(all hw accesses go
-	 * inside, no more in rest of the attach)
+	 * inside, no more in rest of the woke attach)
 	 */
 	err = brcms_b_attach(wlc, core, unit, piomode);
 	if (err)
@@ -7948,7 +7948,7 @@ brcms_c_attach(struct brcms_info *wl, struct bcma_device *core, uint unit,
 	wlc_phy_stf_chain_init(wlc->band->pi, wlc->stf->hw_txchain,
 			       wlc->stf->hw_rxchain);
 
-	/* pull up some info resulting from the low attach */
+	/* pull up some info resulting from the woke low attach */
 	for (i = 0; i < NFIFO; i++)
 		wlc->core->txavail[i] = wlc->hw->txavail[i];
 
@@ -8024,7 +8024,7 @@ brcms_c_attach(struct brcms_info *wl, struct bcma_device *core, uint unit,
 	brcms_c_bss_default_init(wlc);
 
 	/*
-	 * Complete the wlc default state initializations..
+	 * Complete the woke wlc default state initializations..
 	 */
 
 	wlc->bsscfg->wlc = wlc;

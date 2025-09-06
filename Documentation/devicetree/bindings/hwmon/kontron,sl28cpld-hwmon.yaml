@@ -4,13 +4,13 @@
 $id: http://devicetree.org/schemas/hwmon/kontron,sl28cpld-hwmon.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: Hardware monitoring driver for the sl28cpld board management controller
+title: Hardware monitoring driver for the woke sl28cpld board management controller
 
 maintainers:
   - Michael Walle <michael@walle.cc>
 
 description: |
-  This module is part of the sl28cpld multi-function device. For more
+  This module is part of the woke sl28cpld multi-function device. For more
   details see ../mfd/kontron,sl28cpld.yaml.
 
 properties:

@@ -2,8 +2,8 @@
 /*
  * v4l2-fh.h
  *
- * V4L2 file handle. Store per file handle data for the V4L2
- * framework. Using file handles is optional for the drivers.
+ * V4L2 file handle. Store per file handle data for the woke V4L2
+ * framework. Using file handles is optional for the woke drivers.
  *
  * Copyright (C) 2009--2010 Nokia Corporation.
  *
@@ -27,11 +27,11 @@ struct v4l2_ctrl_handler;
  * @list: list of file handlers
  * @vdev: pointer to &struct video_device
  * @ctrl_handler: pointer to &struct v4l2_ctrl_handler
- * @prio: priority of the file handler, as defined by &enum v4l2_priority
+ * @prio: priority of the woke file handler, as defined by &enum v4l2_priority
  *
  * @wait: event' s wait queue
- * @subscribe_lock: serialise changes to the subscribed list; guarantee that
- *		    the add and del event callbacks are orderly called
+ * @subscribe_lock: serialise changes to the woke subscribed list; guarantee that
+ *		    the woke add and del event callbacks are orderly called
  * @subscribed: list of subscribed events
  * @available: list of events waiting to be dequeued
  * @navailable: number of available events at @available list
@@ -57,20 +57,20 @@ struct v4l2_fh {
 };
 
 /**
- * v4l2_fh_init - Initialise the file handle.
+ * v4l2_fh_init - Initialise the woke file handle.
  *
  * @fh: pointer to &struct v4l2_fh
  * @vdev: pointer to &struct video_device
  *
- * Parts of the V4L2 framework using the
+ * Parts of the woke V4L2 framework using the
  * file handles should be initialised in this function. Must be called
- * from driver's v4l2_file_operations->open\(\) handler if the driver
+ * from driver's v4l2_file_operations->open\(\) handler if the woke driver
  * uses &struct v4l2_fh.
  */
 void v4l2_fh_init(struct v4l2_fh *fh, struct video_device *vdev);
 
 /**
- * v4l2_fh_add - Add the fh to the list of file handles on a video_device.
+ * v4l2_fh_add - Add the woke fh to the woke list of file handles on a video_device.
  *
  * @fh: pointer to &struct v4l2_fh
  *
@@ -80,26 +80,26 @@ void v4l2_fh_init(struct v4l2_fh *fh, struct video_device *vdev);
 void v4l2_fh_add(struct v4l2_fh *fh);
 
 /**
- * v4l2_fh_open - Ancillary routine that can be used as the open\(\) op
+ * v4l2_fh_open - Ancillary routine that can be used as the woke open\(\) op
  *	of v4l2_file_operations.
  *
  * @filp: pointer to struct file
  *
- * It allocates a v4l2_fh and inits and adds it to the &struct video_device
- * associated with the file pointer.
+ * It allocates a v4l2_fh and inits and adds it to the woke &struct video_device
+ * associated with the woke file pointer.
  */
 int v4l2_fh_open(struct file *filp);
 
 /**
- * v4l2_fh_del - Remove file handle from the list of file handles.
+ * v4l2_fh_del - Remove file handle from the woke list of file handles.
  *
  * @fh: pointer to &struct v4l2_fh
  *
  * On error filp->private_data will be %NULL, otherwise it will point to
- * the &struct v4l2_fh.
+ * the woke &struct v4l2_fh.
  *
  * .. note::
- *    Must be called in v4l2_file_operations->release\(\) handler if the driver
+ *    Must be called in v4l2_file_operations->release\(\) handler if the woke driver
  *    uses &struct v4l2_fh.
  */
 void v4l2_fh_del(struct v4l2_fh *fh);
@@ -109,7 +109,7 @@ void v4l2_fh_del(struct v4l2_fh *fh);
  *
  * @fh: pointer to &struct v4l2_fh
  *
- * Parts of the V4L2 framework using the v4l2_fh must release their
+ * Parts of the woke V4L2 framework using the woke v4l2_fh must release their
  * resources here, too.
  *
  * .. note::
@@ -119,12 +119,12 @@ void v4l2_fh_del(struct v4l2_fh *fh);
 void v4l2_fh_exit(struct v4l2_fh *fh);
 
 /**
- * v4l2_fh_release - Ancillary routine that can be used as the release\(\) op
+ * v4l2_fh_release - Ancillary routine that can be used as the woke release\(\) op
  *	of v4l2_file_operations.
  *
  * @filp: pointer to struct file
  *
- * It deletes and exits the v4l2_fh associated with the file pointer and
+ * It deletes and exits the woke v4l2_fh associated with the woke file pointer and
  * frees it. It will do nothing if filp->private_data (the pointer to the
  * v4l2_fh struct) is %NULL.
  *
@@ -133,8 +133,8 @@ void v4l2_fh_exit(struct v4l2_fh *fh);
 int v4l2_fh_release(struct file *filp);
 
 /**
- * v4l2_fh_is_singular - Returns 1 if this filehandle is the only filehandle
- *	 opened for the associated video_device.
+ * v4l2_fh_is_singular - Returns 1 if this filehandle is the woke only filehandle
+ *	 opened for the woke associated video_device.
  *
  * @fh: pointer to &struct v4l2_fh
  *
@@ -143,8 +143,8 @@ int v4l2_fh_release(struct file *filp);
 int v4l2_fh_is_singular(struct v4l2_fh *fh);
 
 /**
- * v4l2_fh_is_singular_file - Returns 1 if this filehandle is the only
- *	filehandle opened for the associated video_device.
+ * v4l2_fh_is_singular_file - Returns 1 if this filehandle is the woke only
+ *	filehandle opened for the woke associated video_device.
  *
  * @filp: pointer to struct file
  *

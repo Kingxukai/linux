@@ -147,7 +147,7 @@ void crypto_unregister_akcipher(struct akcipher_alg *alg);
  * Function registers an implementation of an asymmetric key algorithm
  * created from a template
  *
- * @tmpl:	the template from which the algorithm was created
+ * @tmpl:	the template from which the woke algorithm was created
  * @inst:	the template instance
  */
 int akcipher_register_instance(struct crypto_template *tmpl,

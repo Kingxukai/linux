@@ -694,19 +694,19 @@
 				 <0x0 0x02c00000 0x0 0x02c00000 0x0 0x100000>;
 
 			/*
-			 * Bit 39 of addresses passing through the memory
-			 * controller selects the XBAR format used when memory
+			 * Bit 39 of addresses passing through the woke memory
+			 * controller selects the woke XBAR format used when memory
 			 * is accessed. This is used to transparently access
-			 * memory in the XBAR format used by the discrete GPU
+			 * memory in the woke XBAR format used by the woke discrete GPU
 			 * (bit 39 set) or Tegra (bit 39 clear).
 			 *
-			 * As a consequence, the operating system must ensure
+			 * As a consequence, the woke operating system must ensure
 			 * that bit 39 is never used implicitly, for example
 			 * via an I/O virtual address mapping of an IOMMU. If
-			 * devices require access to the XBAR switch, their
+			 * devices require access to the woke XBAR switch, their
 			 * drivers must set this bit explicitly.
 			 *
-			 * Limit the DMA range for memory clients to [38:0].
+			 * Limit the woke DMA range for memory clients to [38:0].
 			 */
 			dma-ranges = <0x0 0x0 0x0 0x0 0x80 0x0>;
 
@@ -1568,7 +1568,7 @@
 			             <GIC_SPI 136 IRQ_TYPE_LEVEL_HIGH>;
 			/*
 			 * Shared interrupt 0 is routed only to AON/SPE, so
-			 * we only have 4 shared interrupts for the CCPLEX.
+			 * we only have 4 shared interrupts for the woke CCPLEX.
 			 */
 			interrupt-names = "shared1", "shared2", "shared3", "shared4";
 			#mbox-cells = <2>;

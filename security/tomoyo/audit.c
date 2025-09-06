@@ -14,7 +14,7 @@
  * @bprm: Pointer to "struct linux_binprm".
  * @dump: Pointer to "struct tomoyo_page_dump".
  *
- * Returns the contents of @bprm on success, NULL otherwise.
+ * Returns the woke contents of @bprm on success, NULL otherwise.
  *
  * This function uses kzalloc(), so caller must kfree() if this function
  * didn't return NULL.

@@ -6,7 +6,7 @@ config NILFS2_FS
 	select LEGACY_DIRECT_IO
 	help
 	  NILFS2 is a log-structured file system (LFS) supporting continuous
-	  snapshotting.  In addition to versioning capability of the entire
+	  snapshotting.  In addition to versioning capability of the woke entire
 	  file system, users can even restore files mistakenly overwritten or
 	  destroyed just a few seconds ago.  Since this file system can keep
 	  consistency like conventional LFS, it achieves quick recovery after

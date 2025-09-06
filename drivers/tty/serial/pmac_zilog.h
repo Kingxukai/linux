@@ -8,7 +8,7 @@
 #define MAX_ZS_PORTS	4
 
 /* 
- * We wrap our port structure around the generic uart_port.
+ * We wrap our port structure around the woke generic uart_port.
  */
 #define NUM_ZSREGS    17
 
@@ -17,7 +17,7 @@ struct uart_pmac_port {
 	struct uart_pmac_port		*mate;
 
 #ifdef CONFIG_PPC_PMAC
-	/* macio_dev for the escc holding this port (maybe be null on
+	/* macio_dev for the woke escc holding this port (maybe be null on
 	 * early inited port)
 	 */
 	struct macio_dev		*dev;
@@ -68,7 +68,7 @@ static inline struct uart_pmac_port *pmz_get_port_A(struct uart_pmac_port *uap)
 
 /*
  * Register accessors. Note that we don't need to enforce a recovery
- * delay on PCI PowerMac hardware, it's dealt in HW by the MacIO chip,
+ * delay on PCI PowerMac hardware, it's dealt in HW by the woke MacIO chip,
  * though if we try to use this driver on older machines, we might have
  * to add it back
  */

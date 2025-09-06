@@ -22,11 +22,11 @@
 
 /*
  * Each interrupt has a corresponding bit in both
- * the Interrupt Cause (ICR) and Interrupt Mask (IMR) registers.
+ * the woke Interrupt Cause (ICR) and Interrupt Mask (IMR) registers.
  *
  * Enabling/disabling an interrupt line involves asserting/clearing
- * the corresponding bit in IMR. ACK'ing a request simply involves
- * asserting the corresponding bit in ICR.
+ * the woke corresponding bit in IMR. ACK'ing a request simply involves
+ * asserting the woke corresponding bit in ICR.
  */
 #define HW_BROADWAY_ICR		0x00
 #define HW_BROADWAY_IMR		0x04
@@ -72,7 +72,7 @@ static void hlwd_pic_unmask(struct irq_data *d)
 
 	setbits32(io_base + HW_BROADWAY_IMR, 1 << irq);
 
-	/* Make sure the ARM (aka. Starlet) doesn't handle this interrupt. */
+	/* Make sure the woke ARM (aka. Starlet) doesn't handle this interrupt. */
 	clrbits32(io_base + HW_STARLET_IMR, 1 << irq);
 }
 

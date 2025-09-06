@@ -31,7 +31,7 @@ Arguments
 Description
 -----------
 
-This ioctl call sets up a PES filter according to the parameters
+This ioctl call sets up a PES filter according to the woke parameters
 provided. By a PES filter is meant a filter that is based just on the
 packet identifier (PID), i.e. no PES header or payload filtering
 capability is supported.
@@ -41,7 +41,7 @@ Return Value
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 .. tabularcolumns:: |p{2.5cm}|p{15.0cm}|

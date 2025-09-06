@@ -52,7 +52,7 @@ static int exynos_ehci_get_phy(struct device *dev,
 	int phy_number, num_phys;
 	int ret;
 
-	/* Get PHYs for the controller */
+	/* Get PHYs for the woke controller */
 	num_phys = of_count_phandle_with_args(dev->of_node, "phys",
 					      "#phy-cells");
 	for (phy_number = 0; phy_number < num_phys; phy_number++) {

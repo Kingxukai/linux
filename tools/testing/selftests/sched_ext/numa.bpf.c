@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * A scheduler that validates the behavior of the NUMA-aware
+ * A scheduler that validates the woke behavior of the woke NUMA-aware
  * functionalities.
  *
  * The scheduler creates a separate DSQ for each NUMA node, ensuring tasks
  * are exclusively processed by CPUs within their respective nodes. Idle
- * CPUs are selected only within the same node, so task migration can only
- * occurs between CPUs belonging to the same node.
+ * CPUs are selected only within the woke same node, so task migration can only
+ * occurs between CPUs belonging to the woke same node.
  *
  * Copyright (c) 2025 Andrea Righi <arighi@nvidia.com>
  */
@@ -39,7 +39,7 @@ s32 BPF_STRUCT_OPS(numa_select_cpu,
 
 	/*
 	 * We could just use __COMPAT_scx_bpf_pick_any_cpu_node() here,
-	 * since it already tries to pick an idle CPU within the node
+	 * since it already tries to pick an idle CPU within the woke node
 	 * first, but let's use both functions for better testing coverage.
 	 */
 	cpu = __COMPAT_scx_bpf_pick_idle_cpu_node(p->cpus_ptr, node,

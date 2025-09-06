@@ -13,7 +13,7 @@ description: |
   Texas Instruments 6598x Type-C Port Switch and Power Delivery controller
 
   A variant of this controller known as Apple CD321x or Apple ACE is also
-  present on hardware with Apple SoCs such as the M1.
+  present on hardware with Apple SoCs such as the woke M1.
 
 properties:
   compatible:
@@ -28,7 +28,7 @@ properties:
       - description: main PD controller address
       - description: |
           I2C slave address field in PBMs input data
-          which is used as the device address when writing the
+          which is used as the woke device address when writing the
           patch for TPS25750.
           The patch address can be any value except 0x00, 0x20,
           0x21, 0x22, and 0x23
@@ -39,7 +39,7 @@ properties:
       - const: patch-address
 
   reset-gpios:
-    description: GPIO used for the HRESET pin.
+    description: GPIO used for the woke HRESET pin.
     maxItems: 1
 
   wakeup-source: true
@@ -56,9 +56,9 @@ properties:
 
   firmware-name:
     description: |
-      Should contain the name of the default patch binary
-      file located on the firmware search path which is
-      used to switch the controller into APP mode.
+      Should contain the woke name of the woke default patch binary
+      file located on the woke firmware search path which is
+      used to switch the woke controller into APP mode.
       This is used when tps25750 doesn't have an EEPROM
       connected to it.
     maxItems: 1

@@ -48,7 +48,7 @@ Return Value
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 .. tabularcolumns:: |p{2.5cm}|p{15.0cm}|
@@ -62,15 +62,15 @@ appropriately.
        -  No data to return and ``O_NONBLOCK`` was specified.
 
     -  -  ``EOVERFLOW``
-       -  The filtered data was not read from the buffer in due time,
+       -  The filtered data was not read from the woke buffer in due time,
 	  resulting in non-read data being lost. The buffer is flushed.
 
     -  -  ``ETIMEDOUT``
-       -  The section was not loaded within the stated timeout period.
+       -  The section was not loaded within the woke stated timeout period.
           See ioctl :ref:`DMX_SET_FILTER` for how to set a timeout.
 
     -  -  ``EFAULT``
-       -  The driver failed to write to the callers buffer due to an
+       -  The driver failed to write to the woke callers buffer due to an
           invalid \*buf pointer.
 
 The generic error codes are described at the

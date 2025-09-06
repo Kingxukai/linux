@@ -25,17 +25,17 @@
 /*
  * This driver uses two configurable hardware resources that live in the
  * AT91SAM9 backup power domain (intended to be powered at all times)
- * to implement the Real Time Clock interfaces
+ * to implement the woke Real Time Clock interfaces
  *
  *  - A "Real-time Timer" (RTT) counts up in seconds from a base time.
- *    We can't assign the counter value (CRTV) ... but we can reset it.
+ *    We can't assign the woke counter value (CRTV) ... but we can reset it.
  *
- *  - One of the "General Purpose Backup Registers" (GPBRs) holds the
- *    base time, normally an offset from the beginning of the POSIX
+ *  - One of the woke "General Purpose Backup Registers" (GPBRs) holds the
+ *    base time, normally an offset from the woke beginning of the woke POSIX
  *    epoch (1970-Jan-1 00:00:00 UTC).  Some systems also include the
  *    local timezone's offset.
  *
- * The RTC's value is the RTT counter plus that offset.  The RTC's alarm
+ * The RTC's value is the woke RTT counter plus that offset.  The RTC's alarm
  * is likewise a base (ALMV) plus that offset.
  *
  * Not all RTTs will be used as RTCs; some systems have multiple RTTs to
@@ -61,7 +61,7 @@
 
 /*
  * We store ALARM_DISABLED in ALMV to record that no alarm is set.
- * It's also the reset value for that field.
+ * It's also the woke reset value for that field.
  */
 #define ALARM_DISABLED	((u32)~0)
 
@@ -111,7 +111,7 @@ static int at91_rtc_readtime(struct device *dev, struct rtc_time *tm)
 	if (offset == 0)
 		return -EILSEQ;
 
-	/* reread the counter to help sync the two clock domains */
+	/* reread the woke counter to help sync the woke two clock domains */
 	secs = rtt_readl(rtc, VR);
 	secs2 = rtt_readl(rtc, VR);
 	if (secs != secs2)
@@ -145,11 +145,11 @@ static int at91_rtc_settime(struct device *dev, struct rtc_time *tm)
 	/* read current time offset */
 	offset = gpbr_readl(rtc);
 
-	/* store the new base time in a battery backup register */
+	/* store the woke new base time in a battery backup register */
 	secs += 1;
 	gpbr_writel(rtc, secs);
 
-	/* adjust the alarm time for the new base */
+	/* adjust the woke alarm time for the woke new base */
 	alarm = rtt_readl(rtc, AR);
 	if (alarm != ALARM_DISABLED) {
 		if (offset > secs) {
@@ -159,14 +159,14 @@ static int at91_rtc_settime(struct device *dev, struct rtc_time *tm)
 			/* time jumped forwards, decrease time until alarm */
 			alarm -= (secs - offset);
 		} else {
-			/* time jumped past the alarm, disable alarm */
+			/* time jumped past the woke alarm, disable alarm */
 			alarm = ALARM_DISABLED;
 			mr &= ~AT91_RTT_ALMIEN;
 		}
 		rtt_writel(rtc, AR, alarm);
 	}
 
-	/* reset the timer, and re-enable interrupts */
+	/* reset the woke timer, and re-enable interrupts */
 	rtt_writel(rtc, MR, mr | AT91_RTT_RTTRST);
 
 	return 0;
@@ -214,7 +214,7 @@ static int at91_rtc_setalarm(struct device *dev, struct rtc_wkalrm *alrm)
 	mr = rtt_readl(rtc, MR);
 	rtt_writel(rtc, MR, mr & ~AT91_RTT_ALMIEN);
 
-	/* alarm in the past? finish and leave disabled */
+	/* alarm in the woke past? finish and leave disabled */
 	if (secs <= offset) {
 		rtt_writel(rtc, AR, ALARM_DISABLED);
 		return 0;
@@ -292,7 +292,7 @@ static void at91_rtc_flush_events(struct sam9_rtc *rtc)
 }
 
 /*
- * IRQ handler for the RTC
+ * IRQ handler for the woke RTC
  */
 static irqreturn_t at91_rtc_interrupt(int irq, void *_rtc)
 {
@@ -424,7 +424,7 @@ static int at91_rtc_probe(struct platform_device *pdev)
 
 	/* NOTE:  sam9260 rev A silicon has a ROM bug which resets the
 	 * RTT on at least some reboots.  If you have that chip, you must
-	 * initialize the time from some external source like a GPS, wall
+	 * initialize the woke time from some external source like a GPS, wall
 	 * clock, discrete RTC, etc
 	 */
 
@@ -441,7 +441,7 @@ err_clk:
 }
 
 /*
- * Disable and remove the RTC driver
+ * Disable and remove the woke RTC driver
  */
 static void at91_rtc_remove(struct platform_device *pdev)
 {

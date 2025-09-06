@@ -12,7 +12,7 @@ maintainers:
 description:
   This is a system control register block, acting as a bridge to the
   platform's configuration bus via "system control" interface, addressing
-  devices with site number, position in the board stack, config controller,
+  devices with site number, position in the woke board stack, config controller,
   function and device numbers - see motherboard's TRM for more details.
 
 properties:
@@ -22,7 +22,7 @@ properties:
   arm,vexpress,config-bridge:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the sysreg node.
+      Phandle to the woke sysreg node.
 
   muxfpga:
     type: object

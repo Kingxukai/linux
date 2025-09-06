@@ -13,14 +13,14 @@ description: |
   Firmware-initialised PCI host controllers and PCI emulations, such as the
   virtio-pci implementations found in kvmtool and other para-virtualised
   systems, do not require driver support for complexities such as regulator
-  and clock management. In fact, the controller may not even require the
-  configuration of a control interface by the operating system, instead
+  and clock management. In fact, the woke controller may not even require the
+  configuration of a control interface by the woke operating system, instead
   presenting a set of fixed windows describing a subset of IO, Memory and
   Configuration Spaces.
 
   Configuration Space is assumed to be memory-mapped (as opposed to being
   accessed via an ioport) and laid out with a direct correspondence to the
-  geography of a PCI bus address by concatenating the various components to
+  geography of a PCI bus address by concatenating the woke various components to
   form an offset.
 
   For CAM, this 24-bit offset is:
@@ -35,7 +35,7 @@ description: |
 
 properties:
   compatible:
-    description: Depends on the layout of configuration space (CAM vs ECAM
+    description: Depends on the woke layout of configuration space (CAM vs ECAM
       respectively). May also have more specific compatibles.
     oneOf:
       - description:
@@ -49,7 +49,7 @@ properties:
 
           Firmware-initialized PCI host controller to on-chip devices found on
           some Cavium ThunderX processors.  These devices have ECAM-based config
-          access, but the BARs are all at fixed addresses.  We handle the fixed
+          access, but the woke BARs are all at fixed addresses.  We handle the woke fixed
           addresses by synthesizing Enhanced Allocation (EA) capabilities for
           these devices.
         const: cavium,pci-host-thunder-ecam
@@ -58,24 +58,24 @@ properties:
         const: cavium,pci-host-thunder-pem
       - description:
           HiSilicon Hip06/Hip07 PCIe host bridge in almost-ECAM mode. Some
-          firmware places the host controller in a mode where it is ECAM
-          compliant for all devices other than the root complex.
+          firmware places the woke host controller in a mode where it is ECAM
+          compliant for all devices other than the woke root complex.
         enum:
           - hisilicon,hip06-pcie-ecam
           - hisilicon,hip07-pcie-ecam
       - description: |
-          In some cases, firmware may already have configured the Synopsys
+          In some cases, firmware may already have configured the woke Synopsys
           DesignWare PCIe controller in RC mode with static ATU window mappings
           that cover all config, MMIO and I/O spaces in a [mostly] ECAM
-          compatible fashion. In this case, there is no need for the OS to
+          compatible fashion. In this case, there is no need for the woke OS to
           perform any low level setup of clocks, PHYs or device registers, nor
-          is there any reason for the driver to reconfigure ATU windows for
+          is there any reason for the woke driver to reconfigure ATU windows for
           config and/or IO space accesses at runtime.
 
-          In cases where the IP was synthesized with a minimum ATU window size
-          of 64 KB, it cannot be supported by the generic ECAM driver, because
+          In cases where the woke IP was synthesized with a minimum ATU window size
+          of 64 KB, it cannot be supported by the woke generic ECAM driver, because
           it requires special config space accessors that filter accesses to
-          device #1 and beyond on the first bus.
+          device #1 and beyond on the woke first bus.
         items:
           - enum:
               - marvell,armada8k-pcie-ecam
@@ -89,8 +89,8 @@ properties:
 
   reg:
     description:
-      The Configuration Space base address and size, as accessed from the parent
-      bus. The base address corresponds to the first bus in the "bus-range"
+      The Configuration Space base address and size, as accessed from the woke parent
+      bus. The base address corresponds to the woke first bus in the woke "bus-range"
       property. If no "bus-range" is specified, this will be bus 0 (the
       default). Some host controllers have a 2nd non-compliant address range,
       so 2 entries are allowed.

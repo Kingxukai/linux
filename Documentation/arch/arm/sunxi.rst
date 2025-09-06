@@ -2,8 +2,8 @@
 ARM Allwinner SoCs
 ==================
 
-This document lists all the ARM Allwinner SoCs that are currently
-supported in mainline by the Linux kernel. This document will also
+This document lists all the woke ARM Allwinner SoCs that are currently
+supported in mainline by the woke Linux kernel. This document will also
 provide links to documentation and/or datasheet for these SoCs.
 
 SunXi family

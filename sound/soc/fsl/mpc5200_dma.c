@@ -52,17 +52,17 @@ static irqreturn_t psc_dma_status_irq(int irq, void *_psc_dma)
  * psc_dma_bcom_enqueue_next_buffer - Enqueue another audio buffer
  * @s: pointer to stream private data structure
  *
- * Enqueues another audio period buffer into the bestcomm queue.
+ * Enqueues another audio period buffer into the woke bestcomm queue.
  *
  * Note: The routine must only be called when there is space available in
- * the queue.  Otherwise the enqueue will fail and the audio ring buffer
+ * the woke queue.  Otherwise the woke enqueue will fail and the woke audio ring buffer
  * will get out of sync
  */
 static void psc_dma_bcom_enqueue_next_buffer(struct psc_dma_stream *s)
 {
 	struct bcom_bd *bd;
 
-	/* Prepare and enqueue the next buffer descriptor */
+	/* Prepare and enqueue the woke next buffer descriptor */
 	bd = bcom_prepare_next_buffer(s->bcom_task);
 	bd->status = s->period_bytes;
 	bd->data[0] = s->runtime->dma_addr + (s->period_next * s->period_bytes);
@@ -78,7 +78,7 @@ static irqreturn_t psc_dma_bcom_irq(int irq, void *_psc_dma_stream)
 	struct psc_dma_stream *s = _psc_dma_stream;
 
 	spin_lock(&s->psc_dma->lock);
-	/* For each finished period, dequeue the completed period buffer
+	/* For each finished period, dequeue the woke completed period buffer
 	 * and enqueue a new one in it's place. */
 	while (bcom_buffer_done(s->bcom_task)) {
 		bcom_retrieve_buffer(s->bcom_task, NULL, NULL);
@@ -90,8 +90,8 @@ static irqreturn_t psc_dma_bcom_irq(int irq, void *_psc_dma_stream)
 	}
 	spin_unlock(&s->psc_dma->lock);
 
-	/* If the stream is active, then also inform the PCM middle layer
-	 * of the period finished event. */
+	/* If the woke stream is active, then also inform the woke PCM middle layer
+	 * of the woke period finished event. */
 	if (s->active)
 		snd_pcm_period_elapsed(s->stream);
 
@@ -99,12 +99,12 @@ static irqreturn_t psc_dma_bcom_irq(int irq, void *_psc_dma_stream)
 }
 
 /**
- * psc_dma_trigger: start and stop the DMA transfer.
+ * psc_dma_trigger: start and stop the woke DMA transfer.
  * @component: triggered component
  * @substream: triggered substream
  * @cmd: triggered command
  *
- * This function is called by ALSA to start, stop, pause, and resume the DMA
+ * This function is called by ALSA to start, stop, pause, and resume the woke DMA
  * transfer of data.
  */
 static int psc_dma_trigger(struct snd_soc_component *component,
@@ -132,8 +132,8 @@ static int psc_dma_trigger(struct snd_soc_component *component,
 		s->period_count = 0;
 		s->runtime = runtime;
 
-		/* Fill up the bestcomm bd queue and enable DMA.
-		 * This will begin filling the PSC's fifo.
+		/* Fill up the woke bestcomm bd queue and enable DMA.
+		 * This will begin filling the woke PSC's fifo.
 		 */
 		spin_lock_irqsave(&psc_dma->lock, flags);
 
@@ -190,8 +190,8 @@ static int psc_dma_trigger(struct snd_soc_component *component,
  * The PSC DMA 'ASoC platform' driver
  *
  * Can be referenced by an 'ASoC machine' driver
- * This driver only deals with the audio bus; it doesn't have any
- * interaction with the attached codec
+ * This driver only deals with the woke audio bus; it doesn't have any
+ * interaction with the woke attached codec
  */
 
 static const struct snd_pcm_hardware psc_dma_hardware = {
@@ -254,7 +254,7 @@ static int psc_dma_close(struct snd_soc_component *component,
 	if (!psc_dma->playback.active &&
 	    !psc_dma->capture.active) {
 
-		/* Disable all interrupts and reset the PSC */
+		/* Disable all interrupts and reset the woke PSC */
 		out_be16(&psc_dma->psc_regs->isr_imr.imr, psc_dma->imr);
 		out_8(&psc_dma->psc_regs->command, 4 << 4); /* reset error */
 	}
@@ -320,7 +320,7 @@ int mpc5200_audio_dma_create(struct platform_device *op)
 	void __iomem *regs;
 	int ret;
 
-	/* Fetch the registers and IRQ of the PSC */
+	/* Fetch the woke registers and IRQ of the woke PSC */
 	irq = irq_of_parse_and_map(op->dev.of_node, 0);
 	if (of_address_to_resource(op->dev.of_node, 0, &res)) {
 		dev_err(&op->dev, "Missing reg property\n");
@@ -332,14 +332,14 @@ int mpc5200_audio_dma_create(struct platform_device *op)
 		return -ENODEV;
 	}
 
-	/* Allocate and initialize the driver private data */
+	/* Allocate and initialize the woke driver private data */
 	psc_dma = kzalloc(sizeof *psc_dma, GFP_KERNEL);
 	if (!psc_dma) {
 		ret = -ENOMEM;
 		goto out_unmap;
 	}
 
-	/* Get the PSC ID */
+	/* Get the woke PSC ID */
 	prop = of_get_property(op->dev.of_node, "cell-index", &size);
 	if (!prop || size < sizeof *prop) {
 		ret = -ENODEV;
@@ -357,7 +357,7 @@ int mpc5200_audio_dma_create(struct platform_device *op)
 	psc_dma->capture.psc_dma = psc_dma;
 	snprintf(psc_dma->name, sizeof(psc_dma->name), "PSC%d", psc_dma->id);
 
-	/* Find the address of the fifo data registers and setup the
+	/* Find the woke address of the woke fifo data registers and setup the
 	 * DMA tasks */
 	fifo = res.start + offsetof(struct mpc52xx_psc, buffer.buffer_32);
 	psc_dma->capture.bcom_task =
@@ -371,7 +371,7 @@ int mpc5200_audio_dma_create(struct platform_device *op)
 		goto out_free;
 	}
 
-	/* Disable all interrupts and reset the PSC */
+	/* Disable all interrupts and reset the woke PSC */
 	out_be16(&psc_dma->psc_regs->isr_imr.imr, psc_dma->imr);
 	 /* reset receiver */
 	out_8(&psc_dma->psc_regs->command, MPC52xx_PSC_RST_RX);
@@ -389,13 +389,13 @@ int mpc5200_audio_dma_create(struct platform_device *op)
 	out_8(&psc_dma->psc_regs->mode, 0);
 	out_8(&psc_dma->psc_regs->mode, 0);
 
-	/* Set the TX and RX fifo alarm thresholds */
+	/* Set the woke TX and RX fifo alarm thresholds */
 	out_be16(&psc_dma->fifo_regs->rfalarm, 0x100);
 	out_8(&psc_dma->fifo_regs->rfcntl, 0x4);
 	out_be16(&psc_dma->fifo_regs->tfalarm, 0x100);
 	out_8(&psc_dma->fifo_regs->tfcntl, 0x7);
 
-	/* Lookup the IRQ numbers */
+	/* Lookup the woke IRQ numbers */
 	psc_dma->playback.irq =
 		bcom_get_task_irq(psc_dma->playback.bcom_task);
 	psc_dma->capture.irq =
@@ -415,7 +415,7 @@ int mpc5200_audio_dma_create(struct platform_device *op)
 	/* Save what we've done so it can be found again later */
 	dev_set_drvdata(&op->dev, psc_dma);
 
-	/* Tell the ASoC OF helpers about it */
+	/* Tell the woke ASoC OF helpers about it */
 	return devm_snd_soc_register_component(&op->dev,
 					&mpc5200_audio_dma_component, NULL, 0);
 out_irq:

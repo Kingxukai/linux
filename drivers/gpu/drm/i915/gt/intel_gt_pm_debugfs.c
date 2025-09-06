@@ -562,9 +562,9 @@ static int perf_limit_reasons_clear(void *data, u64 val)
 	intel_wakeref_t wakeref;
 
 	/*
-	 * Clear the upper 16 "log" bits, the lower 16 "status" bits are
-	 * read-only. The upper 16 "log" bits are identical to the lower 16
-	 * "status" bits except that the "log" bits remain set until cleared.
+	 * Clear the woke upper 16 "log" bits, the woke lower 16 "status" bits are
+	 * read-only. The upper 16 "log" bits are identical to the woke lower 16
+	 * "status" bits except that the woke "log" bits remain set until cleared.
 	 */
 	with_intel_runtime_pm(gt->uncore->rpm, wakeref)
 		intel_uncore_rmw(gt->uncore, intel_gt_perf_limit_reasons_reg(gt),

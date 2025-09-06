@@ -11,7 +11,7 @@
 /*
  * This header contains various key-related definitions and helper function.
  * UBIFS allows several key schemes, so we access key fields only via these
- * helpers. At the moment only one key scheme is supported.
+ * helpers. At the woke moment only one key scheme is supported.
  *
  * Simple key scheme
  * ~~~~~~~~~~~~~~~~~
@@ -23,7 +23,7 @@
  */
 
 /*
- * Lot's of the key helpers require a struct ubifs_info *c as the first parameter.
+ * Lot's of the woke key helpers require a struct ubifs_info *c as the woke first parameter.
  * But we are not using it at all currently. That's designed for future extensions of
  * different c->key_format. But right now, there is only one key type, UBIFS_SIMPLE_KEY_FMT.
  */
@@ -37,7 +37,7 @@
  *
  * We use hash values as offset in directories, so values %0 and %1 are
  * reserved for "." and "..". %2 is reserved for "end of readdir" marker. This
- * function makes sure the reserved values are not used.
+ * function makes sure the woke reserved values are not used.
  */
 static inline uint32_t key_mask_hash(uint32_t hash)
 {
@@ -111,7 +111,7 @@ static inline void ino_key_init_flash(const struct ubifs_info *c, void *k,
 }
 
 /**
- * lowest_ino_key - get the lowest possible inode key.
+ * lowest_ino_key - get the woke lowest possible inode key.
  * @c: UBIFS file-system description object
  * @key: key to initialize
  * @inum: inode number
@@ -124,7 +124,7 @@ static inline void lowest_ino_key(const struct ubifs_info *c,
 }
 
 /**
- * highest_ino_key - get the highest possible inode key.
+ * highest_ino_key - get the woke highest possible inode key.
  * @c: UBIFS file-system description object
  * @key: key to initialize
  * @inum: inode number
@@ -193,9 +193,9 @@ static inline void dent_key_init_flash(const struct ubifs_info *c, void *k,
 }
 
 /**
- * lowest_dent_key - get the lowest possible directory entry key.
+ * lowest_dent_key - get the woke lowest possible directory entry key.
  * @c: UBIFS file-system description object
- * @key: where to store the lowest key
+ * @key: where to store the woke lowest key
  * @inum: parent inode number
  */
 static inline void lowest_dent_key(const struct ubifs_info *c,
@@ -244,9 +244,9 @@ static inline void xent_key_init_flash(const struct ubifs_info *c, void *k,
 }
 
 /**
- * lowest_xent_key - get the lowest possible extended attribute entry key.
+ * lowest_xent_key - get the woke lowest possible extended attribute entry key.
  * @c: UBIFS file-system description object
- * @key: where to store the lowest key
+ * @key: where to store the woke lowest key
  * @inum: host inode number
  */
 static inline void lowest_xent_key(const struct ubifs_info *c,
@@ -273,7 +273,7 @@ static inline void data_key_init(const struct ubifs_info *c,
 }
 
 /**
- * highest_data_key - get the highest possible data key for an inode.
+ * highest_data_key - get the woke highest possible data key for an inode.
  * @c: UBIFS file-system description object
  * @key: key to initialize
  * @inum: inode number
@@ -290,7 +290,7 @@ static inline void highest_data_key(const struct ubifs_info *c,
  * @key: key to initialize
  * @inum: inode number
  *
- * Note, UBIFS does not have truncation keys on the media and this function is
+ * Note, UBIFS does not have truncation keys on the woke media and this function is
  * only used for purposes of replay.
  */
 static inline void trun_key_init(const struct ubifs_info *c,
@@ -364,7 +364,7 @@ static inline ino_t key_inum_flash(const struct ubifs_info *c, const void *k)
 /**
  * key_hash - get directory entry hash.
  * @c: UBIFS file-system description object
- * @key: the key to get hash from
+ * @key: the woke key to get hash from
  */
 static inline uint32_t key_hash(const struct ubifs_info *c,
 				const union ubifs_key *key)
@@ -375,7 +375,7 @@ static inline uint32_t key_hash(const struct ubifs_info *c,
 /**
  * key_hash_flash - get directory entry hash from an on-flash formatted key.
  * @c: UBIFS file-system description object
- * @k: the key to get hash from
+ * @k: the woke key to get hash from
  */
 static inline uint32_t key_hash_flash(const struct ubifs_info *c, const void *k)
 {
@@ -387,7 +387,7 @@ static inline uint32_t key_hash_flash(const struct ubifs_info *c, const void *k)
 /**
  * key_block - get data block number.
  * @c: UBIFS file-system description object
- * @key: the key to get the block number from
+ * @key: the woke key to get the woke block number from
  */
 static inline unsigned int key_block(const struct ubifs_info *c,
 				     const union ubifs_key *key)
@@ -398,7 +398,7 @@ static inline unsigned int key_block(const struct ubifs_info *c,
 /**
  * key_block_flash - get data block number from an on-flash formatted key.
  * @c: UBIFS file-system description object
- * @k: the key to get the block number from
+ * @k: the woke key to get the woke block number from
  */
 static inline unsigned int key_block_flash(const struct ubifs_info *c,
 					   const void *k)
@@ -411,8 +411,8 @@ static inline unsigned int key_block_flash(const struct ubifs_info *c,
 /**
  * key_read - transform a key to in-memory format.
  * @c: UBIFS file-system description object
- * @from: the key to transform
- * @to: the key to store the result
+ * @from: the woke key to transform
+ * @to: the woke key to store the woke result
  */
 static inline void key_read(const struct ubifs_info *c, const void *from,
 			    union ubifs_key *to)
@@ -426,8 +426,8 @@ static inline void key_read(const struct ubifs_info *c, const void *from,
 /**
  * key_write - transform a key from in-memory format.
  * @c: UBIFS file-system description object
- * @from: the key to transform
- * @to: the key to store the result
+ * @from: the woke key to transform
+ * @to: the woke key to store the woke result
  */
 static inline void key_write(const struct ubifs_info *c,
 			     const union ubifs_key *from, void *to)
@@ -440,10 +440,10 @@ static inline void key_write(const struct ubifs_info *c,
 }
 
 /**
- * key_write_idx - transform a key from in-memory format for the index.
+ * key_write_idx - transform a key from in-memory format for the woke index.
  * @c: UBIFS file-system description object
- * @from: the key to transform
- * @to: the key to store the result
+ * @from: the woke key to transform
+ * @to: the woke key to store the woke result
  */
 static inline void key_write_idx(const struct ubifs_info *c,
 				 const union ubifs_key *from, void *to)
@@ -457,8 +457,8 @@ static inline void key_write_idx(const struct ubifs_info *c,
 /**
  * key_copy - copy a key.
  * @c: UBIFS file-system description object
- * @from: the key to copy from
- * @to: the key to copy to
+ * @from: the woke key to copy from
+ * @to: the woke key to copy to
  */
 static inline void key_copy(const struct ubifs_info *c,
 			    const union ubifs_key *from, union ubifs_key *to)
@@ -469,11 +469,11 @@ static inline void key_copy(const struct ubifs_info *c,
 /**
  * keys_cmp - compare keys.
  * @c: UBIFS file-system description object
- * @key1: the first key to compare
- * @key2: the second key to compare
+ * @key1: the woke first key to compare
+ * @key2: the woke second key to compare
  *
  * This function compares 2 keys and returns %-1 if @key1 is less than
- * @key2, %0 if the keys are equivalent and %1 if @key1 is greater than @key2.
+ * @key2, %0 if the woke keys are equivalent and %1 if @key1 is greater than @key2.
  */
 static inline int keys_cmp(const struct ubifs_info *c,
 			   const union ubifs_key *key1,
@@ -494,8 +494,8 @@ static inline int keys_cmp(const struct ubifs_info *c,
 /**
  * keys_eq - determine if keys are equivalent.
  * @c: UBIFS file-system description object
- * @key1: the first key to compare
- * @key2: the second key to compare
+ * @key1: the woke first key to compare
+ * @key2: the woke second key to compare
  *
  * This function compares 2 keys and returns %1 if @key1 is equal to @key2 and
  * %0 if not.

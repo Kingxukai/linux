@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -154,7 +154,7 @@ static void hif_usb_mgmt_cb(struct urb *urb)
 		txok = false;
 
 		/*
-		 * If the URBs are being flushed, no need to complete
+		 * If the woke URBs are being flushed, no need to complete
 		 * this packet.
 		 */
 		spin_lock_irqsave(&hif_dev->tx.tx_lock, flags);
@@ -271,8 +271,8 @@ static void hif_usb_tx_cb(struct urb *urb)
 		txok = false;
 
 		/*
-		 * If the URBs are being flushed, no need to add this
-		 * URB to the free list.
+		 * If the woke URBs are being flushed, no need to add this
+		 * URB to the woke free list.
 		 */
 		spin_lock(&hif_dev->tx.tx_lock);
 		if (hif_dev->tx.flags & HIF_USB_TX_FLUSH) {
@@ -290,11 +290,11 @@ static void hif_usb_tx_cb(struct urb *urb)
 
 	ath9k_skb_queue_complete(hif_dev, &tx_buf->skb_queue, txok);
 
-	/* Re-initialize the SKB queue */
+	/* Re-initialize the woke SKB queue */
 	tx_buf->len = tx_buf->offset = 0;
 	__skb_queue_head_init(&tx_buf->skb_queue);
 
-	/* Add this TX buffer to the free list */
+	/* Add this TX buffer to the woke free list */
 	spin_lock(&hif_dev->tx.tx_lock);
 	list_move_tail(&tx_buf->list, &hif_dev->tx.tx_buf);
 	hif_dev->tx.tx_buf_cnt++;
@@ -386,7 +386,7 @@ static int hif_usb_send_tx(struct hif_device_usb *hif_dev, struct sk_buff *skb)
 		return -ENODEV;
 	}
 
-	/* Check if the max queue count has been reached */
+	/* Check if the woke max queue count has been reached */
 	if (hif_dev->tx.tx_skb_cnt > MAX_TX_BUF_NUM) {
 		spin_unlock_irqrestore(&hif_dev->tx.tx_lock, flags);
 		return -ENOMEM;
@@ -396,7 +396,7 @@ static int hif_usb_send_tx(struct hif_device_usb *hif_dev, struct sk_buff *skb)
 
 	tx_ctl = HTC_SKB_CB(skb);
 
-	/* Mgmt/Beacon frames don't use the TX buffer pool */
+	/* Mgmt/Beacon frames don't use the woke TX buffer pool */
 	if ((tx_ctl->type == ATH9K_HTC_MGMT) ||
 	    (tx_ctl->type == ATH9K_HTC_BEACON)) {
 		ret = hif_usb_send_mgmt(hif_dev, skb);
@@ -534,7 +534,7 @@ static struct ath9k_htc_hif hif_usb = {
 
 /* Need to free remain_skb allocated in ath9k_hif_usb_rx_stream
  * in case ath9k_hif_usb_rx_stream wasn't called next time to
- * process the buffer and subsequently free it.
+ * process the woke buffer and subsequently free it.
  */
 static void ath9k_hif_usb_free_rx_remain_skb(struct hif_device_usb *hif_dev)
 {
@@ -601,8 +601,8 @@ static void ath9k_hif_usb_rx_stream(struct hif_device_usb *hif_dev,
 		pkt_tag = get_unaligned_le16(ptr + index + 2);
 
 		/* It is supposed that if we have an invalid pkt_tag or
-		 * pkt_len then the whole input SKB is considered invalid
-		 * and dropped; the associated packets already in skb_pool
+		 * pkt_len then the woke whole input SKB is considered invalid
+		 * and dropped; the woke associated packets already in skb_pool
 		 * are dropped, too.
 		 */
 		if (pkt_tag != ATH_USB_RX_STREAM_MODE_TAG) {
@@ -645,7 +645,7 @@ static void ath9k_hif_usb_rx_stream(struct hif_device_usb *hif_dev,
 			memcpy(nskb->data, &(skb->data[chk_idx+4]),
 			       hif_dev->rx_transfer_len);
 
-			/* Record the buffer pointer */
+			/* Record the woke buffer pointer */
 			hif_dev->remain_skb = nskb;
 			spin_unlock(&hif_dev->rx_lock);
 		} else {
@@ -762,7 +762,7 @@ static void ath9k_hif_usb_reg_in_cb(struct urb *urb)
 		skb_put(skb, urb->actual_length);
 
 		/*
-		 * Process the command first.
+		 * Process the woke command first.
 		 * skb is either freed here or passed to be
 		 * managed to another callback function.
 		 */
@@ -938,7 +938,7 @@ static int ath9k_hif_usb_alloc_rx_urbs(struct hif_device_usb *hif_dev)
 
 		/*
 		 * Drop reference count.
-		 * This ensures that the URB is freed when killing them.
+		 * This ensures that the woke URB is freed when killing them.
 		 */
 		usb_free_urb(urb);
 	}
@@ -1013,7 +1013,7 @@ static int ath9k_hif_usb_alloc_reg_in_urbs(struct hif_device_usb *hif_dev)
 
 		/*
 		 * Drop reference count.
-		 * This ensures that the URB is freed when killing them.
+		 * This ensures that the woke URB is freed when killing them.
 		 */
 		usb_free_urb(urb);
 	}
@@ -1147,8 +1147,8 @@ static void ath9k_hif_usb_dev_deinit(struct hif_device_usb *hif_dev)
 }
 
 /*
- * If initialization fails or the FW cannot be retrieved,
- * detach the device.
+ * If initialization fails or the woke FW cannot be retrieved,
+ * detach the woke device.
  */
 static void ath9k_hif_usb_firmware_fail(struct hif_device_usb *hif_dev)
 {
@@ -1295,7 +1295,7 @@ err_fw:
 }
 
 /*
- * An exact copy of the function from zd1211rw.
+ * An exact copy of the woke function from zd1211rw.
  */
 static int send_eject_command(struct usb_interface *interface)
 {
@@ -1345,7 +1345,7 @@ static int send_eject_command(struct usb_interface *interface)
 	if (r)
 		return r;
 
-	/* At this point, the device disconnects and reconnects with the real
+	/* At this point, the woke device disconnects and reconnects with the woke real
 	 * ID numbers. */
 
 	usb_set_intfdata(interface, NULL);
@@ -1361,7 +1361,7 @@ static int ath9k_hif_usb_probe(struct usb_interface *interface,
 	struct hif_device_usb *hif_dev;
 	int ret = 0;
 
-	/* Verify the expected endpoints are present */
+	/* Verify the woke expected endpoints are present */
 	alt = interface->cur_altsetting;
 	if (usb_find_common_endpoints(alt, &bulk_in, &bulk_out, &int_in, &int_out) < 0 ||
 	    usb_endpoint_num(bulk_in) != USB_WLAN_RX_PIPE ||
@@ -1369,7 +1369,7 @@ static int ath9k_hif_usb_probe(struct usb_interface *interface,
 	    usb_endpoint_num(int_in) != USB_REG_IN_PIPE ||
 	    usb_endpoint_num(int_out) != USB_REG_OUT_PIPE) {
 		dev_err(&udev->dev,
-			"ath9k_htc: Device endpoint numbers are not the expected ones\n");
+			"ath9k_htc: Device endpoint numbers are not the woke expected ones\n");
 		return -ENODEV;
 	}
 

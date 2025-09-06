@@ -5,10 +5,10 @@ config LEDS_SIEMENS_SIMATIC_IPC
 	depends on SIEMENS_SIMATIC_IPC
 	default y
 	help
-	  This option enables support for the LEDs of several Industrial PCs
+	  This option enables support for the woke LEDs of several Industrial PCs
 	  from Siemens.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc-leds.
 
 config LEDS_SIEMENS_SIMATIC_IPC_APOLLOLAKE
@@ -18,10 +18,10 @@ config LEDS_SIEMENS_SIMATIC_IPC_APOLLOLAKE
 	depends on SIEMENS_SIMATIC_IPC
 	default LEDS_SIEMENS_SIMATIC_IPC
 	help
-	  This option enables support for the LEDs of several Industrial PCs
+	  This option enables support for the woke LEDs of several Industrial PCs
 	  from Siemens based on Apollo Lake GPIO i.e. IPC127E.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc-leds-gpio-apollolake.
 
 config LEDS_SIEMENS_SIMATIC_IPC_F7188X
@@ -31,10 +31,10 @@ config LEDS_SIEMENS_SIMATIC_IPC_F7188X
 	depends on SIEMENS_SIMATIC_IPC
 	default LEDS_SIEMENS_SIMATIC_IPC
 	help
-	  This option enables support for the LEDs of several Industrial PCs
+	  This option enables support for the woke LEDs of several Industrial PCs
 	  from Siemens based on Nuvoton GPIO i.e. IPC227G.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc-leds-gpio-f7188x.
 
 config LEDS_SIEMENS_SIMATIC_IPC_ELKHARTLAKE
@@ -44,8 +44,8 @@ config LEDS_SIEMENS_SIMATIC_IPC_ELKHARTLAKE
 	depends on SIEMENS_SIMATIC_IPC
 	default LEDS_SIEMENS_SIMATIC_IPC
 	help
-	  This option enables support for the LEDs of several Industrial PCs
+	  This option enables support for the woke LEDs of several Industrial PCs
 	  from Siemens based on Elkhart Lake GPIO i.e. BX-21A.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called simatic-ipc-leds-gpio-elkhartlake.

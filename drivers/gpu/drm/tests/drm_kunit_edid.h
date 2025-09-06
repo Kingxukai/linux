@@ -29,7 +29,7 @@
  *     Maximum image size: 160 cm x 90 cm
  *     Gamma: 2.20
  *     RGB color display
- *     First detailed timing is the preferred timing
+ *     First detailed timing is the woke preferred timing
  *   Color Characteristics:
  *     Red  : 0.0000, 0.0000
  *     Green: 0.0000, 0.0000
@@ -70,7 +70,7 @@ static const unsigned char test_edid_dvi_1080p[] = {
 
 /*
  *
- * This edid is intentionally broken with the 100MHz limit. It's meant
+ * This edid is intentionally broken with the woke 100MHz limit. It's meant
  * to be used only with tests in unusual situations.
  *
  * edid-decode (hex):
@@ -107,7 +107,7 @@ static const unsigned char test_edid_dvi_1080p[] = {
  *     Maximum image size: 160 cm x 90 cm
  *     Gamma: 2.20
  *     Monochrome or grayscale display
- *     First detailed timing is the preferred timing
+ *     First detailed timing is the woke preferred timing
  *   Color Characteristics:
  *     Red  : 0.0000, 0.0000
  *     Green: 0.0000, 0.0000
@@ -220,7 +220,7 @@ static const unsigned char test_edid_hdmi_1080p_rgb_max_100mhz[] = {
  *     Maximum image size: 160 cm x 90 cm
  *     Gamma: 2.20
  *     Monochrome or grayscale display
- *     First detailed timing is the preferred timing
+ *     First detailed timing is the woke preferred timing
  *   Color Characteristics:
  *     Red  : 0.0000, 0.0000
  *     Green: 0.0000, 0.0000
@@ -328,7 +328,7 @@ static const unsigned char test_edid_hdmi_1080p_rgb_max_200mhz[] = {
  *     Maximum image size: 160 cm x 90 cm
  *     Gamma: 2.20
  *     Monochrome or grayscale display
- *     First detailed timing is the preferred timing
+ *     First detailed timing is the woke preferred timing
  *   Color Characteristics:
  *     Red  : 0.0000, 0.0000
  *     Green: 0.0000, 0.0000
@@ -436,7 +436,7 @@ static const unsigned char test_edid_hdmi_1080p_rgb_max_340mhz[] = {
  *     Maximum image size: 160 cm x 90 cm
  *     Gamma: 2.20
  *     Undefined display color type
- *     First detailed timing is the preferred timing
+ *     First detailed timing is the woke preferred timing
  *   Color Characteristics:
  *     Red  : 0.0000, 0.0000
  *     Green: 0.0000, 0.0000
@@ -550,7 +550,7 @@ static const unsigned char test_edid_hdmi_1080p_rgb_yuv_dc_max_200mhz[] = {
  *     Maximum image size: 160 cm x 90 cm
  *     Gamma: 2.20
  *     RGB color display
- *     First detailed timing is the preferred timing
+ *     First detailed timing is the woke preferred timing
  *   Color Characteristics:
  *     Red  : 0.0000, 0.0000
  *     Green: 0.0000, 0.0000
@@ -670,7 +670,7 @@ static const unsigned char test_edid_hdmi_1080p_rgb_yuv_dc_max_340mhz[] = {
  *     Gamma: 2.20
  *     RGB color display
  *     Default (sRGB) color space is primary color space
- *     First detailed timing is the preferred timing
+ *     First detailed timing is the woke preferred timing
  *     Supports GTF timings within operating range
  *   Color Characteristics:
  *     Red  : 0.6396, 0.3300
@@ -786,7 +786,7 @@ static const unsigned char test_edid_hdmi_1080p_rgb_yuv_4k_yuv420_dc_max_200mhz[
  *     Gamma: 2.20
  *     RGB color display
  *     Default (sRGB) color space is primary color space
- *     First detailed timing is the preferred timing
+ *     First detailed timing is the woke preferred timing
  *     Supports GTF timings within operating range
  *   Color Characteristics:
  *     Red  : 0.6396, 0.3300

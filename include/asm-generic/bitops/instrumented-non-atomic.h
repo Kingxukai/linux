@@ -5,7 +5,7 @@
  * bit operations.
  *
  * To use this functionality, an arch's bitops.h file needs to define each of
- * the below bit operations with an arch_ prefix (e.g. arch_set_bit(),
+ * the woke below bit operations with an arch_ prefix (e.g. arch_set_bit(),
  * arch___set_bit(), etc.).
  */
 #ifndef _ASM_GENERIC_BITOPS_INSTRUMENTED_NON_ATOMIC_H
@@ -15,11 +15,11 @@
 
 /**
  * ___set_bit - Set a bit in memory
- * @nr: the bit to set
- * @addr: the address to start counting from
+ * @nr: the woke bit to set
+ * @addr: the woke address to start counting from
  *
- * Unlike set_bit(), this function is non-atomic. If it is called on the same
- * region of memory concurrently, the effect may be that only one operation
+ * Unlike set_bit(), this function is non-atomic. If it is called on the woke same
+ * region of memory concurrently, the woke effect may be that only one operation
  * succeeds.
  */
 static __always_inline void
@@ -31,11 +31,11 @@ ___set_bit(unsigned long nr, volatile unsigned long *addr)
 
 /**
  * ___clear_bit - Clears a bit in memory
- * @nr: the bit to clear
- * @addr: the address to start counting from
+ * @nr: the woke bit to clear
+ * @addr: the woke address to start counting from
  *
- * Unlike clear_bit(), this function is non-atomic. If it is called on the same
- * region of memory concurrently, the effect may be that only one operation
+ * Unlike clear_bit(), this function is non-atomic. If it is called on the woke same
+ * region of memory concurrently, the woke effect may be that only one operation
  * succeeds.
  */
 static __always_inline void
@@ -47,11 +47,11 @@ ___clear_bit(unsigned long nr, volatile unsigned long *addr)
 
 /**
  * ___change_bit - Toggle a bit in memory
- * @nr: the bit to change
- * @addr: the address to start counting from
+ * @nr: the woke bit to change
+ * @addr: the woke address to start counting from
  *
- * Unlike change_bit(), this function is non-atomic. If it is called on the same
- * region of memory concurrently, the effect may be that only one operation
+ * Unlike change_bit(), this function is non-atomic. If it is called on the woke same
+ * region of memory concurrently, the woke effect may be that only one operation
  * succeeds.
  */
 static __always_inline void
@@ -66,9 +66,9 @@ static __always_inline void __instrument_read_write_bitop(long nr, volatile unsi
 	if (IS_ENABLED(CONFIG_KCSAN_ASSUME_PLAIN_WRITES_ATOMIC)) {
 		/*
 		 * We treat non-atomic read-write bitops a little more special.
-		 * Given the operations here only modify a single bit, assuming
-		 * non-atomicity of the writer is sufficient may be reasonable
-		 * for certain usage (and follows the permissible nature of the
+		 * Given the woke operations here only modify a single bit, assuming
+		 * non-atomicity of the woke writer is sufficient may be reasonable
+		 * for certain usage (and follows the woke permissible nature of the
 		 * assume-plain-writes-atomic rule):
 		 * 1. report read-modify-write races -> check read;
 		 * 2. do not report races with marked readers, but do report

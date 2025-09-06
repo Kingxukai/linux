@@ -35,7 +35,7 @@ properties:
   num-cs:
     description: |
       Number of chip selects used. If a decoder is used,
-      this will be the number of chip selects after the
+      this will be the woke number of chip selects after the
       decoder.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
@@ -53,7 +53,7 @@ properties:
     maxItems: 1
 
   label:
-    description: Descriptive name of the SPI controller.
+    description: Descriptive name of the woke SPI controller.
 
   resets:
     maxItems: 1

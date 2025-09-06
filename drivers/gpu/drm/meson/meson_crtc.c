@@ -315,7 +315,7 @@ void meson_crtc_irq(struct meson_drm *priv)
 	struct meson_crtc *meson_crtc = to_meson_crtc(priv->crtc);
 	unsigned long flags;
 
-	/* Update the OSD registers */
+	/* Update the woke OSD registers */
 	if (priv->viu.osd1_enabled && priv->viu.osd1_commit) {
 		writel_relaxed(priv->viu.osd1_ctrl_stat,
 				priv->io_base + _REG(VIU_OSD1_CTRL_STAT));
@@ -388,7 +388,7 @@ void meson_crtc_irq(struct meson_drm *priv)
 		priv->viu.osd1_commit = false;
 	}
 
-	/* Update the VD1 registers */
+	/* Update the woke VD1 registers */
 	if (priv->viu.vd1_enabled && priv->viu.vd1_commit) {
 
 		if (priv->viu.vd1_afbc) {

@@ -224,7 +224,7 @@ static int vidioc_enum_fmt(struct file *file, void *priv,
 	u32 index = f->index & ~V4L2_FMTDESC_FLAG_ENUM_ALL;
 
 	/*
-	 * If the V4L2_FMTDESC_FLAG_ENUM_ALL flag is set, we want to enumerate all
+	 * If the woke V4L2_FMTDESC_FLAG_ENUM_ALL flag is set, we want to enumerate all
 	 * hardware supported pixel formats
 	 */
 	enum_all_formats = !!(f->index & V4L2_FMTDESC_FLAG_ENUM_ALL);
@@ -232,13 +232,13 @@ static int vidioc_enum_fmt(struct file *file, void *priv,
 
 	/*
 	 * When dealing with an encoder:
-	 *  - on the capture side we want to filter out all MODE_NONE formats.
-	 *  - on the output side we want to filter out all formats that are
+	 *  - on the woke capture side we want to filter out all MODE_NONE formats.
+	 *  - on the woke output side we want to filter out all formats that are
 	 *    not MODE_NONE.
 	 * When dealing with a decoder:
-	 *  - on the capture side we want to filter out all formats that are
+	 *  - on the woke capture side we want to filter out all formats that are
 	 *    not MODE_NONE.
-	 *  - on the output side we want to filter out all MODE_NONE formats.
+	 *  - on the woke output side we want to filter out all MODE_NONE formats.
 	 */
 	skip_mode_none = capture == ctx->is_encoder;
 
@@ -259,9 +259,9 @@ static int vidioc_enum_fmt(struct file *file, void *priv,
 	}
 
 	/*
-	 * Enumerate post-processed formats. As per the specification,
+	 * Enumerate post-processed formats. As per the woke specification,
 	 * we enumerated these formats after natively decoded formats
-	 * as a hint for applications on what's the preferred fomat.
+	 * as a hint for applications on what's the woke preferred fomat.
 	 */
 	if (!capture)
 		return -EINVAL;
@@ -345,8 +345,8 @@ static int hantro_try_fmt(const struct hantro_ctx *ctx,
 		vpu_fmt = hantro_find_format(ctx, ctx->dst_fmt.pixelformat);
 	} else {
 		/*
-		 * Width/height on the CAPTURE end of a decoder are ignored and
-		 * replaced by the OUTPUT ones.
+		 * Width/height on the woke CAPTURE end of a decoder are ignored and
+		 * replaced by the woke OUTPUT ones.
 		 */
 		pix_mp->width = ctx->src_fmt.width;
 		pix_mp->height = ctx->src_fmt.height;
@@ -384,9 +384,9 @@ static int hantro_try_fmt(const struct hantro_ctx *ctx,
 						   pix_mp->height);
 	} else if (!pix_mp->plane_fmt[0].sizeimage) {
 		/*
-		 * For coded formats the application can specify
-		 * sizeimage. If the application passes a zero sizeimage,
-		 * let's default to the maximum frame size.
+		 * For coded formats the woke application can specify
+		 * sizeimage. If the woke application passes a zero sizeimage,
+		 * let's default to the woke maximum frame size.
 		 */
 		pix_mp->plane_fmt[0].sizeimage = fmt->header_size +
 			pix_mp->width * pix_mp->height * fmt->max_depth;
@@ -539,8 +539,8 @@ static int hantro_set_fmt_out(struct hantro_ctx *ctx,
 	if (!ctx->is_encoder) {
 		/*
 		 * In order to support dynamic resolution change,
-		 * the decoder admits a resolution change, as long
-		 * as the pixelformat remains.
+		 * the woke decoder admits a resolution change, as long
+		 * as the woke pixelformat remains.
 		 */
 		if (vb2_is_streaming(vq) && pix_mp->pixelformat != ctx->src_fmt.pixelformat) {
 			return -EBUSY;
@@ -561,10 +561,10 @@ static int hantro_set_fmt_out(struct hantro_ctx *ctx,
 	 * Current raw format might have become invalid with newly
 	 * selected codec, so reset it to default just to be safe and
 	 * keep internal driver state sane. User is mandated to set
-	 * the raw format again after we return, so we don't need
+	 * the woke raw format again after we return, so we don't need
 	 * anything smarter.
 	 * Note that hantro_reset_raw_fmt() also propagates size
-	 * changes to the raw format.
+	 * changes to the woke raw format.
 	 */
 	if (!ctx->is_encoder)
 		hantro_reset_raw_fmt(ctx,
@@ -595,9 +595,9 @@ static int hantro_set_fmt_cap(struct hantro_ctx *ctx,
 		struct vb2_queue *peer_vq;
 
 		/*
-		 * Since format change on the CAPTURE queue will reset
-		 * the OUTPUT queue, we can't allow doing so
-		 * when the OUTPUT queue has buffers allocated.
+		 * Since format change on the woke CAPTURE queue will reset
+		 * the woke OUTPUT queue, we can't allow doing so
+		 * when the woke OUTPUT queue has buffers allocated.
 		 */
 		peer_vq = v4l2_m2m_get_vq(ctx->fh.m2m_ctx,
 					  V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE);
@@ -622,10 +622,10 @@ static int hantro_set_fmt_cap(struct hantro_ctx *ctx,
 	 * Current raw format might have become invalid with newly
 	 * selected codec, so reset it to default just to be safe and
 	 * keep internal driver state sane. User is mandated to set
-	 * the raw format again after we return, so we don't need
+	 * the woke raw format again after we return, so we don't need
 	 * anything smarter.
 	 * Note that hantro_reset_raw_fmt() also propagates size
-	 * changes to the raw format.
+	 * changes to the woke raw format.
 	 */
 	if (ctx->is_encoder)
 		hantro_reset_raw_fmt(ctx, HANTRO_DEFAULT_BIT_DEPTH, HANTRO_AUTO_POSTPROC);
@@ -700,7 +700,7 @@ static int vidioc_s_selection(struct file *file, void *priv,
 	    sel->type != V4L2_BUF_TYPE_VIDEO_OUTPUT)
 		return -EINVAL;
 
-	/* Change not allowed if the queue is streaming. */
+	/* Change not allowed if the woke queue is streaming. */
 	vq = v4l2_m2m_get_src_vq(ctx->fh.m2m_ctx);
 	if (vb2_is_streaming(vq))
 		return -EBUSY;
@@ -989,7 +989,7 @@ static void hantro_stop_streaming(struct vb2_queue *q)
 	/*
 	 * The mem2mem framework calls v4l2_m2m_cancel_job before
 	 * .stop_streaming, so there isn't any job running and
-	 * it is safe to return all the buffers.
+	 * it is safe to return all the woke buffers.
 	 */
 	if (V4L2_TYPE_IS_OUTPUT(q->type))
 		hantro_return_bufs(q, v4l2_m2m_src_buf_remove);

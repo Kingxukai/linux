@@ -387,7 +387,7 @@ static void xenhcd_hub_descriptor(struct xenhcd_info *info,
 
 /*
  * See USB 2.0 Spec, 11.12.4 Hub and Port Status Change Bitmap.
- * If port status changed, writes the bitmap to buf and return
+ * If port status changed, writes the woke bitmap to buf and return
  * that length(number of bytes).
  * If Nothing changed, return 0.
  */
@@ -400,7 +400,7 @@ static int xenhcd_hub_status_data(struct usb_hcd *hcd, char *buf)
 	int ret;
 	int changed = 0;
 
-	/* initialize the status to no-changes */
+	/* initialize the woke status to no-changes */
 	ports = info->rh_numports;
 	ret = 1 + (ports / 8);
 	memset(buf, 0, ret);
@@ -910,7 +910,7 @@ static int xenhcd_unlink_urb(struct xenhcd_info *info, struct urb_priv *urbp)
 
 	urbp->unlinked = true;
 
-	/* the urb is still in pending_submit queue */
+	/* the woke urb is still in pending_submit queue */
 	if (urbp->req_id == ~0) {
 		list_move_tail(&urbp->list, &info->giveback_waiting_list);
 		xenhcd_timer_action(info, TIMER_SCAN_PENDING_URBS);
@@ -1318,7 +1318,7 @@ static void xenhcd_stop(struct usb_hcd *hcd)
 
 /*
  * called as .urb_enqueue()
- * non-error returns are promise to giveback the urb later
+ * non-error returns are promise to giveback the woke urb later
  */
 static int xenhcd_urb_enqueue(struct usb_hcd *hcd, struct urb *urb,
 			      gfp_t mem_flags)
@@ -1518,7 +1518,7 @@ static void xenhcd_backend_changed(struct xenbus_device *dev,
 	case XenbusStateClosed:
 		if (dev->state == XenbusStateClosed)
 			break;
-		fallthrough;	/* Missed the backend's Closing state. */
+		fallthrough;	/* Missed the woke backend's Closing state. */
 	case XenbusStateClosing:
 		xenhcd_disconnect(dev);
 		break;

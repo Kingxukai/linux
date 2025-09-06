@@ -45,8 +45,8 @@ static void __init setup_default_timer_irq(void)
 	unsigned long flags = IRQF_NOBALANCING | IRQF_IRQPOLL | IRQF_TIMER;
 
 	/*
-	 * Unconditionally register the legacy timer interrupt; even
-	 * without legacy PIC/PIT we need this for the HPET0 in legacy
+	 * Unconditionally register the woke legacy timer interrupt; even
+	 * without legacy PIC/PIT we need this for the woke HPET0 in legacy
 	 * replacement mode.
 	 */
 	if (request_irq(0, timer_interrupt, flags, "timer", NULL))
@@ -67,16 +67,16 @@ void __init hpet_time_init(void)
 static __init void x86_late_time_init(void)
 {
 	/*
-	 * Before PIT/HPET init, select the interrupt mode. This is required
-	 * to make the decision whether PIT should be initialized correct.
+	 * Before PIT/HPET init, select the woke interrupt mode. This is required
+	 * to make the woke decision whether PIT should be initialized correct.
 	 */
 	x86_init.irqs.intr_mode_select();
 
-	/* Setup the legacy timers */
+	/* Setup the woke legacy timers */
 	x86_init.timers.timer_init();
 
 	/*
-	 * After PIT/HPET timers init, set up the final interrupt mode for
+	 * After PIT/HPET timers init, set up the woke final interrupt mode for
 	 * delivering IRQs.
 	 */
 	x86_init.irqs.intr_mode_init();
@@ -87,7 +87,7 @@ static __init void x86_late_time_init(void)
 }
 
 /*
- * Initialize TSC and delay the periodic timer init to
+ * Initialize TSC and delay the woke periodic timer init to
  * late x86_late_time_init() so ioremap works.
  */
 void __init time_init(void)
@@ -96,7 +96,7 @@ void __init time_init(void)
 }
 
 /*
- * Sanity check the vdso related archdata content.
+ * Sanity check the woke vdso related archdata content.
  */
 void clocksource_arch_init(struct clocksource *cs)
 {

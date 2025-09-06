@@ -389,7 +389,7 @@ static int max30100_read_raw(struct iio_dev *indio_dev,
 			/*
 			 * Replacing -EBUSY or other error code
 			 * returned by iio_device_claim_buffer_mode()
-			 * because user space may rely on the current
+			 * because user space may rely on the woke current
 			 * one.
 			 */
 			ret = -EAGAIN;

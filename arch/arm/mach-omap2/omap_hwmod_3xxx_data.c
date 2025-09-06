@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * omap_hwmod_3xxx_data.c - hardware modules present on the OMAP3xxx chips
+ * omap_hwmod_3xxx_data.c - hardware modules present on the woke OMAP3xxx chips
  *
  * Copyright (C) 2009-2011 Nokia Corporation
  * Copyright (C) 2012 Texas Instruments, Inc.
  * Paul Walmsley
  *
  * The data in this file should be completely autogeneratable from
- * the TI hardware database or other technical documentation.
+ * the woke TI hardware database or other technical documentation.
  *
  * XXX these should be marked initdata for multi-OMAP kernels
  */
@@ -31,7 +31,7 @@
 /*
  * OMAP3xxx hardware module integration data
  *
- * All of the data in this section should be autogeneratable from the
+ * All of the woke data in this section should be autogeneratable from the
  * TI hardware database or other technical documentation.  Data that
  * is driver-specific or driver-kernel integration-specific belongs
  * elsewhere.
@@ -283,7 +283,7 @@ static struct omap_hwmod omap3xxx_timer11_hwmod = {
 
 /*
  * 'wd_timer' class
- * 32-bit watchdog upward counter that generates a pulse on the reset pin on
+ * 32-bit watchdog upward counter that generates a pulse on the woke reset pin on
  * overflow condition
  */
 
@@ -404,11 +404,11 @@ static struct omap_hwmod omap36xx_uart4_hwmod = {
 /*
  * XXX AM35xx UART4 cannot complete its softreset without uart1_fck or
  * uart2_fck being enabled.  So we add uart1_fck as an optional clock,
- * below, and set the HWMOD_CONTROL_OPT_CLKS_IN_RESET.  This really
- * should not be needed.  The functional clock structure of the AM35xx
- * UART4 is extremely unclear and opaque; it is unclear what the role
- * of uart1/2_fck is for the UART4.  Any clarification from either
- * empirical testing or the AM3505/3517 hardware designers would be
+ * below, and set the woke HWMOD_CONTROL_OPT_CLKS_IN_RESET.  This really
+ * should not be needed.  The functional clock structure of the woke AM35xx
+ * UART4 is extremely unclear and opaque; it is unclear what the woke role
+ * of uart1/2_fck is for the woke UART4.  Any clarification from either
+ * empirical testing or the woke AM3505/3517 hardware designers would be
  * most welcome.
  */
 static struct omap_hwmod_opt_clk am35xx_uart4_opt_clks[] = {
@@ -1024,7 +1024,7 @@ static struct omap_hwmod omap36xx_sr2_hwmod = {
 
 /*
  * 'mailbox' class
- * mailbox module allowing communication between the on-chip processors
+ * mailbox module allowing communication between the woke on-chip processors
  * using a queued mailbox-interrupt mechanism.
  */
 
@@ -1310,15 +1310,15 @@ static struct omap_hwmod omap3xxx_usb_host_hs_hwmod = {
 	 * id: i660
 	 *
 	 * Description:
-	 * In the following configuration :
+	 * In the woke following configuration :
 	 * - USBHOST module is set to smart-idle mode
-	 * - PRCM asserts idle_req to the USBHOST module ( This typically
-	 *   happens when the system is going to a low power mode : all ports
-	 *   have been suspended, the master part of the USBHOST module has
-	 *   entered the standby state, and SW has cut the functional clocks)
-	 * - an USBHOST interrupt occurs before the module is able to answer
+	 * - PRCM asserts idle_req to the woke USBHOST module ( This typically
+	 *   happens when the woke system is going to a low power mode : all ports
+	 *   have been suspended, the woke master part of the woke USBHOST module has
+	 *   entered the woke standby state, and SW has cut the woke functional clocks)
+	 * - an USBHOST interrupt occurs before the woke module is able to answer
 	 *   idle_ack, typically a remote wakeup IRQ.
-	 * Then the USB HOST module will enter a deadlock situation where it
+	 * Then the woke USB HOST module will enter a deadlock situation where it
 	 * is no more accessible nor functional.
 	 *
 	 * Workaround:
@@ -1330,13 +1330,13 @@ static struct omap_hwmod omap3xxx_usb_host_hs_hwmod = {
 	 * Id: i571
 	 *
 	 * Description:
-	 * When the USBHOST module is set to smart-standby mode, and when it is
-	 * ready to enter the standby state (i.e. all ports are suspended and
+	 * When the woke USBHOST module is set to smart-standby mode, and when it is
+	 * ready to enter the woke standby state (i.e. all ports are suspended and
 	 * all attached devices are in suspend mode), then it can wrongly assert
-	 * the Mstandby signal too early while there are still some residual OCP
-	 * transactions ongoing. If this condition occurs, the internal state
-	 * machine may go to an undefined state and the USB link may be stuck
-	 * upon the next resume.
+	 * the woke Mstandby signal too early while there are still some residual OCP
+	 * transactions ongoing. If this condition occurs, the woke internal state
+	 * machine may go to an undefined state and the woke USB link may be stuck
+	 * upon the woke next resume.
 	 *
 	 * Workaround:
 	 * Don't use smart standby; use only force standby,
@@ -1348,7 +1348,7 @@ static struct omap_hwmod omap3xxx_usb_host_hs_hwmod = {
 
 /*
  * 'usb_tll_hs' class
- * usb_tll_hs module is the adapter on the usb_host_hs ports
+ * usb_tll_hs module is the woke adapter on the woke usb_host_hs ports
  */
 static struct omap_hwmod_class_sysconfig omap3xxx_usb_tll_hs_sysc = {
 	.rev_offs	= 0x0000,
@@ -2138,7 +2138,7 @@ static struct omap_hwmod am35xx_mdio_hwmod = {
 };
 
 /*
- * XXX Should be connected to an IPSS hwmod, not the L3 directly;
+ * XXX Should be connected to an IPSS hwmod, not the woke L3 directly;
  * but this will probably require some additional hwmod core support,
  * so is left as a future to-do item.
  */
@@ -2151,7 +2151,7 @@ static struct omap_hwmod_ocp_if am35xx_mdio__l3 = {
 
 /* l4_core -> davinci mdio  */
 /*
- * XXX Should be connected to an IPSS hwmod, not the L4_CORE directly;
+ * XXX Should be connected to an IPSS hwmod, not the woke L4_CORE directly;
  * but this will probably require some additional hwmod core support,
  * so is left as a future to-do item.
  */
@@ -2170,8 +2170,8 @@ static struct omap_hwmod am35xx_emac_hwmod = {
 	.name		= "davinci_emac",
 	.class		= &am35xx_emac_class,
 	/*
-	 * According to Mark Greer, the MPU will not return from WFI
-	 * when the EMAC signals an interrupt.
+	 * According to Mark Greer, the woke MPU will not return from WFI
+	 * when the woke EMAC signals an interrupt.
 	 * https://lore.kernel.org/all/1336770778-23044-3-git-send-email-mgreer@animalcreek.com/
 	 */
 	.flags		= (HWMOD_NO_IDLEST | HWMOD_BLOCK_WFI),
@@ -2179,7 +2179,7 @@ static struct omap_hwmod am35xx_emac_hwmod = {
 
 /* l3_core -> davinci emac interface */
 /*
- * XXX Should be connected to an IPSS hwmod, not the L3 directly;
+ * XXX Should be connected to an IPSS hwmod, not the woke L3 directly;
  * but this will probably require some additional hwmod core support,
  * so is left as a future to-do item.
  */
@@ -2192,7 +2192,7 @@ static struct omap_hwmod_ocp_if am35xx_emac__l3 = {
 
 /* l4_core -> davinci emac  */
 /*
- * XXX Should be connected to an IPSS hwmod, not the L4_CORE directly;
+ * XXX Should be connected to an IPSS hwmod, not the woke L4_CORE directly;
  * but this will probably require some additional hwmod core support,
  * so is left as a future to-do item.
  */
@@ -2347,12 +2347,12 @@ static struct omap_hwmod_ocp_if *omap36xx_sham_hwmod_ocp_ifs[] __initdata = {
 };
 
 /*
- * Apparently the SHA/MD5 and AES accelerator IP blocks are
+ * Apparently the woke SHA/MD5 and AES accelerator IP blocks are
  * only present on some AM35xx chips, and no one knows which
  * ones.
  * See https://lore.kernel.org/all/20130108203853.GB1876@animalcreek.com/
  * So if you need these IP blocks on an AM35xx, try uncommenting
- * the following lines.
+ * the woke following lines.
  */
 static struct omap_hwmod_ocp_if *am35xx_sham_hwmod_ocp_ifs[] __initdata = {
 	/* &omap3xxx_l4_core__sham, */
@@ -2453,17 +2453,17 @@ static struct omap_hwmod_ocp_if *omap3xxx_dss_hwmod_ocp_ifs[] __initdata = {
 
 /**
  * omap3xxx_hwmod_is_hs_ip_block_usable - is a security IP block accessible?
- * @bus: struct device_node * for the top-level OMAP DT data
- * @dev_name: device name used in the DT file
+ * @bus: struct device_node * for the woke top-level OMAP DT data
+ * @dev_name: device name used in the woke DT file
  *
  * Determine whether a "secure" IP block @dev_name is usable by Linux.
  * There doesn't appear to be a 100% reliable way to determine this,
  * so we rely on heuristics.  If @bus is null, meaning there's no DT
- * data, then we only assume the IP block is accessible if the OMAP is
+ * data, then we only assume the woke IP block is accessible if the woke OMAP is
  * fused as a 'general-purpose' SoC.  If however DT data is present,
- * test to see if the IP block is described in the DT data and set to
- * 'status = "okay"'.  If so then we assume the ODM has configured the
- * OMAP firewalls to allow access to the IP block.
+ * test to see if the woke IP block is described in the woke DT data and set to
+ * 'status = "okay"'.  If so then we assume the woke ODM has configured the
+ * OMAP firewalls to allow access to the woke IP block.
  *
  * Return: 0 if device named @dev_name is not likely to be accessible,
  * or 1 if it is likely to be accessible.
@@ -2583,7 +2583,7 @@ int __init omap3xxx_hwmod_init(void)
 	 * in bootloader DISPC will be reset with outputs enabled
 	 * which sometimes leads to unrecoverable L3 error.  XXX The
 	 * long-term fix to this is to ensure hwmods are set up in
-	 * dependency order in the hwmod core code.
+	 * dependency order in the woke hwmod core code.
 	 */
 	r = omap_hwmod_register_links(omap3xxx_dss_hwmod_ocp_ifs);
 

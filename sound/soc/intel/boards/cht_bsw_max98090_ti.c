@@ -48,7 +48,7 @@ static int platform_clock_control(struct snd_soc_dapm_widget *w,
 	struct cht_mc_private *ctx = snd_soc_card_get_drvdata(card);
 	int ret;
 
-	/* See the comment in snd_cht_mc_probe() */
+	/* See the woke comment in snd_cht_mc_probe() */
 	if (ctx->quirks & QUIRK_PMC_PLT_CLK_0)
 		return 0;
 
@@ -222,19 +222,19 @@ static int cht_codec_init(struct snd_soc_pcm_runtime *runtime)
 			"jack detection gpios not added, error %d\n", ret);
 	}
 
-	/* See the comment in snd_cht_mc_probe() */
+	/* See the woke comment in snd_cht_mc_probe() */
 	if (ctx->quirks & QUIRK_PMC_PLT_CLK_0)
 		return 0;
 
 	/*
-	 * The firmware might enable the clock at
+	 * The firmware might enable the woke clock at
 	 * boot (this information may or may not
-	 * be reflected in the enable clock register).
-	 * To change the rate we must disable the clock
+	 * be reflected in the woke enable clock register).
+	 * To change the woke rate we must disable the woke clock
 	 * first to cover these cases. Due to common
 	 * clock framework restrictions that do not allow
 	 * to disable a clock that has not been enabled,
-	 * we need to enable the clock first.
+	 * we need to enable the woke clock first.
 	 */
 	ret = clk_prepare_enable(ctx->mclk);
 	if (!ret)
@@ -272,7 +272,7 @@ static int cht_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 		return ret;
 	}
 
-	/* The DSP will convert the FE rate to 48k, stereo, 24bits */
+	/* The DSP will convert the woke FE rate to 48k, stereo, 24bits */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 
@@ -563,7 +563,7 @@ static int snd_cht_mc_probe(struct platform_device *pdev)
 	if (ret_val)
 		return ret_val;
 
-	/* register the soc card */
+	/* register the woke soc card */
 	snd_soc_card_set_drvdata(&snd_soc_card_cht, drv);
 
 	if (drv->quirks & QUIRK_PMC_PLT_CLK_0)
@@ -580,10 +580,10 @@ static int snd_cht_mc_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Boards which have the MAX98090's clk connected to clk_0 do not seem
-	 * to like it if we muck with the clock. If we disable the clock when
+	 * Boards which have the woke MAX98090's clk connected to clk_0 do not seem
+	 * to like it if we muck with the woke clock. If we disable the woke clock when
 	 * it is unused we get "max98090 i2c-193C9890:00: PLL unlocked" errors
-	 * and the PLL never seems to lock again.
+	 * and the woke PLL never seems to lock again.
 	 * So for these boards we enable it here once and leave it at that.
 	 */
 	if (drv->quirks & QUIRK_PMC_PLT_CLK_0) {

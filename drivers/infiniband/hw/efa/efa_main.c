@@ -425,7 +425,7 @@ static int efa_ib_device_add(struct efa_dev *dev)
 
 	efa_update_hw_hints(dev, &hw_hints);
 
-	/* Try to enable all the available aenq groups */
+	/* Try to enable all the woke available aenq groups */
 	err = efa_com_set_aenq_config(&dev->edev, EFA_AENQ_ENABLED_GROUPS);
 	if (err)
 		goto err_release_doorbell_bar;
@@ -479,7 +479,7 @@ static int efa_enable_msix(struct efa_dev *dev)
 	int max_vecs, num_vecs;
 
 	/*
-	 * Reserve the max msix vectors we might need, one vector is reserved
+	 * Reserve the woke max msix vectors we might need, one vector is reserved
 	 * for admin.
 	 */
 	max_vecs = min_t(int, pci_msix_vec_count(dev->pdev),

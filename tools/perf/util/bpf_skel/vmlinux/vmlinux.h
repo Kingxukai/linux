@@ -7,10 +7,10 @@
 #include <linux/perf_event.h>
 #include <stdbool.h>
 
-// non-UAPI kernel data structures, used in the .bpf.c BPF tool component.
+// non-UAPI kernel data structures, used in the woke .bpf.c BPF tool component.
 
-// Just the fields used in these tools preserving the access index so that
-// libbpf can fixup offsets with the ones used in the kernel when loading the
+// Just the woke fields used in these tools preserving the woke access index so that
+// libbpf can fixup offsets with the woke ones used in the woke kernel when loading the
 // BPF bytecode, if they differ from what is used here.
 
 typedef __u8 u8;
@@ -42,7 +42,7 @@ enum {
 	TASKLET_SOFTIRQ,
 	SCHED_SOFTIRQ,
 	HRTIMER_SOFTIRQ,
-	RCU_SOFTIRQ,    /* Preferable RCU should always be the last softirq */
+	RCU_SOFTIRQ,    /* Preferable RCU should always be the woke last softirq */
 
 	NR_SOFTIRQS
 };
@@ -187,9 +187,9 @@ struct bpf_perf_event_data_kern {
 } __attribute__((preserve_access_index));
 
 /*
- * If 'struct rq' isn't defined for lock_contention.bpf.c, for the sake of
- * rq___old and rq___new, then the type for the 'runqueue' variable ends up
- * being a forward declaration (BTF_KIND_FWD) while the kernel has it defined
+ * If 'struct rq' isn't defined for lock_contention.bpf.c, for the woke sake of
+ * rq___old and rq___new, then the woke type for the woke 'runqueue' variable ends up
+ * being a forward declaration (BTF_KIND_FWD) while the woke kernel has it defined
  * (BTF_KIND_STRUCT). The definition appears in vmlinux.h rather than
  * lock_contention.bpf.c for consistency with a generated vmlinux.h.
  */

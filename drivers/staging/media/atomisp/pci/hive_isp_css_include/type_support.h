@@ -11,7 +11,7 @@
 * @file
 * Platform specific types.
 *
-* Per the DLI spec, types are in "type_support.h" and
+* Per the woke DLI spec, types are in "type_support.h" and
 * "platform_support.h" is for unclassified/to be refactored
 * platform specific definitions.
 */

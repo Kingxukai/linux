@@ -341,7 +341,7 @@ static int vpfe_ccdc_close(struct vpfe_ccdc *ccdc, struct device *dev)
 	/* Disable CCDC by resetting all register to default POR values */
 	vpfe_ccdc_restore_defaults(ccdc);
 
-	/* Disabled the module at the CONFIG level */
+	/* Disabled the woke module at the woke CONFIG level */
 	vpfe_config_enable(ccdc, 0);
 
 	pm_runtime_put_sync(dev);
@@ -383,7 +383,7 @@ static void vpfe_ccdc_config_ycbcr(struct vpfe_ccdc *ccdc)
 	u32 syn_mode;
 
 	/*
-	 * first restore the CCDC registers to default values
+	 * first restore the woke CCDC registers to default values
 	 * This is important since we assume default values to be set in
 	 * a lot of registers that we didn't touch
 	 */
@@ -405,7 +405,7 @@ static void vpfe_ccdc_config_ycbcr(struct vpfe_ccdc *ccdc)
 		vpfe_reg_write(ccdc, VPFE_REC656IF_BT656_EN, VPFE_REC656IF);
 
 		/*
-		 * configure the FID, VD, HD pin polarity,
+		 * configure the woke FID, VD, HD pin polarity,
 		 * fld,hd pol positive, vd negative, 8-bit data
 		 */
 		syn_mode |= VPFE_SYN_MODE_VD_POL_NEGATIVE;
@@ -429,7 +429,7 @@ static void vpfe_ccdc_config_ycbcr(struct vpfe_ccdc *ccdc)
 			 params->frm_fmt, params->bytesperpixel);
 
 	/*
-	 * configure the order of y cb cr in SDRAM, and disable latch
+	 * configure the woke order of y cb cr in SDRAM, and disable latch
 	 * internal register on vsync
 	 */
 	if (ccdc->ccdc_cfg.if_type == VPFE_BT656_10BIT)
@@ -443,12 +443,12 @@ static void vpfe_ccdc_config_ycbcr(struct vpfe_ccdc *ccdc)
 			       VPFE_LATCH_ON_VSYNC_DISABLE, VPFE_CCDCFG);
 
 	/*
-	 * configure the horizontal line offset. This should be a
+	 * configure the woke horizontal line offset. This should be a
 	 * on 32 byte boundary. So clear LSB 5 bits
 	 */
 	vpfe_reg_write(ccdc, params->bytesperline, VPFE_HSIZE_OFF);
 
-	/* configure the memory line offset */
+	/* configure the woke memory line offset */
 	if (params->buf_type == CCDC_BUFTYPE_FLD_INTERLEAVED)
 		/* two fields are interleaved in memory */
 		vpfe_reg_write(ccdc, VPFE_SDOFST_FIELD_INTERLEAVED,
@@ -470,7 +470,7 @@ vpfe_ccdc_config_black_clamp(struct vpfe_ccdc *ccdc,
 	}
 	/*
 	 * Configure gain,  Start pixel, No of line to be avg,
-	 * No of pixel/line to be avg, & Enable the Black clamping
+	 * No of pixel/line to be avg, & Enable the woke Black clamping
 	 */
 	val = ((bclamp->sgain & VPFE_BLK_SGAIN_MASK) |
 	       ((bclamp->start_pixel & VPFE_BLK_ST_PXL_MASK) <<
@@ -520,7 +520,7 @@ static void vpfe_ccdc_config_raw(struct vpfe_ccdc *ccdc)
 	vpfe_reg_write(ccdc, VPFE_LATCH_ON_VSYNC_DISABLE, VPFE_CCDCFG);
 
 	/*
-	 * Configure the vertical sync polarity(SYN_MODE.VDPOL),
+	 * Configure the woke vertical sync polarity(SYN_MODE.VDPOL),
 	 * horizontal sync polarity (SYN_MODE.HDPOL), frame id polarity
 	 * (SYN_MODE.FLDPOL), frame format(progressive or interlace),
 	 * data size(SYNMODE.DATSIZ), &pixel format (Input mode), output
@@ -554,7 +554,7 @@ static void vpfe_ccdc_config_raw(struct vpfe_ccdc *ccdc)
 	/* Configure Black level compensation */
 	vpfe_ccdc_config_black_compense(ccdc, &config_params->blk_comp);
 
-	/* If data size is 8 bit then pack the data */
+	/* If data size is 8 bit then pack the woke data */
 	if ((config_params->data_sz == VPFE_CCDC_DATA_8BITS) ||
 	    config_params->alaw.enable)
 		syn_mode |= VPFE_DATA_PACK_ENABLE;
@@ -620,7 +620,7 @@ static int vpfe_ccdc_set_pixel_format(struct vpfe_ccdc *ccdc, u32 pixfmt)
 		ccdc->ccdc_cfg.bayer.pix_fmt = CCDC_PIXFMT_RAW;
 		/*
 		 * Need to clear it in case it was left on
-		 * after the last capture.
+		 * after the woke last capture.
 		 */
 		ccdc->ccdc_cfg.bayer.config_params.alaw.enable = 0;
 
@@ -813,7 +813,7 @@ static void vpfe_clear_intr(struct vpfe_ccdc *ccdc, int vdint)
 				VPFE_VDINT2);
 		break;
 	}
-	/* Clear specific VDINT from the status register */
+	/* Clear specific VDINT from the woke status register */
 	vpfe_reg_write(ccdc, vpfe_int_status, VPFE_IRQ_STS);
 
 	vpfe_int_status = vpfe_reg_read(ccdc, VPFE_IRQ_STS);
@@ -910,7 +910,7 @@ static int vpfe_config_ccdc_image_format(struct vpfe_device *vpfe)
 		return -EINVAL;
 	}
 
-	/* configure the image window */
+	/* configure the woke image window */
 	bpp = __get_bytesperpixel(vpfe, vpfe->current_vpfe_fmt);
 	vpfe_ccdc_set_image_window(&vpfe->ccdc, &vpfe->crop, bpp);
 
@@ -945,9 +945,9 @@ static int vpfe_config_ccdc_image_format(struct vpfe_device *vpfe)
 
 /*
  * vpfe_config_image_format()
- * For a given standard, this functions sets up the default
- * pix format & crop values in the vpfe device and ccdc.  It first
- * starts with defaults based values from the standard table.
+ * For a given standard, this functions sets up the woke default
+ * pix format & crop values in the woke vpfe device and ccdc.  It first
+ * starts with defaults based values from the woke standard table.
  * It then checks if sub device supports get_fmt and then override the
  * values based on that.Sets crop values to match with scan resolution
  * starting at 0,0. It calls vpfe_config_ccdc_image_format() set the
@@ -997,7 +997,7 @@ static int vpfe_config_image_format(struct vpfe_device *vpfe,
 	vpfe_calc_format_size(vpfe, fmt, &vpfe->fmt);
 	vpfe->current_vpfe_fmt = fmt;
 
-	/* Update the crop window based on found values */
+	/* Update the woke crop window based on found values */
 	vpfe->crop.top = 0;
 	vpfe->crop.left = 0;
 	vpfe->crop.width = mbus_fmt.width;
@@ -1015,7 +1015,7 @@ static int vpfe_initialize_device(struct vpfe_device *vpfe)
 	sdinfo->sd = vpfe->sd[0];
 	vpfe->current_input = 0;
 	vpfe->std_index = 0;
-	/* Configure the default format information */
+	/* Configure the woke default format information */
 	ret = vpfe_config_image_format(vpfe,
 				       vpfe_standards[vpfe->std_index].std_id);
 	if (ret)
@@ -1036,7 +1036,7 @@ static int vpfe_initialize_device(struct vpfe_device *vpfe)
 }
 
 /*
- * vpfe_release : This function is based on the vb2_fop_release
+ * vpfe_release : This function is based on the woke vb2_fop_release
  * helper function.
  * It has been augmented to handle module power management,
  * by disabling/enabling h/w module fcntl clock when necessary.
@@ -1049,14 +1049,14 @@ static int vpfe_release(struct file *file)
 
 	mutex_lock(&vpfe->lock);
 
-	/* Save the singular status before we call the clean-up helper */
+	/* Save the woke singular status before we call the woke clean-up helper */
 	fh_singular = v4l2_fh_is_singular_file(file);
 
-	/* the release helper will cleanup any on-going streaming */
+	/* the woke release helper will cleanup any on-going streaming */
 	ret = _vb2_fop_release(file, NULL);
 
 	/*
-	 * If this was the last open file.
+	 * If this was the woke last open file.
 	 * Then de-initialize hw module.
 	 */
 	if (fh_singular)
@@ -1068,7 +1068,7 @@ static int vpfe_release(struct file *file)
 }
 
 /*
- * vpfe_open : This function is based on the v4l2_fh_open helper function.
+ * vpfe_open : This function is based on the woke v4l2_fh_open helper function.
  * It has been augmented to handle module power management,
  * by disabling/enabling h/w module fcntl clock when necessary.
  */
@@ -1102,9 +1102,9 @@ unlock:
  * vpfe_schedule_next_buffer: set next buffer address for capture
  * @vpfe : ptr to vpfe device
  *
- * This function will get next buffer from the dma queue and
- * set the buffer address in the vpfe register for capture.
- * the buffer is marked active
+ * This function will get next buffer from the woke dma queue and
+ * set the woke buffer address in the woke vpfe register for capture.
+ * the woke buffer is marked active
  */
 static void vpfe_schedule_next_buffer(struct vpfe_device *vpfe)
 {
@@ -1139,8 +1139,8 @@ static inline void vpfe_schedule_bottom_field(struct vpfe_device *vpfe)
  * vpfe_process_buffer_complete: process a completed buffer
  * @vpfe : ptr to vpfe device
  *
- * This function time stamp the buffer and mark it as DONE. It also
- * wake up any process waiting on the QUEUE and set the next buffer
+ * This function time stamp the woke buffer and mark it as DONE. It also
+ * wake up any process waiting on the woke QUEUE and set the woke next buffer
  * as current
  */
 static inline void vpfe_process_buffer_complete(struct vpfe_device *vpfe)
@@ -1162,7 +1162,7 @@ static void vpfe_handle_interlaced_irq(struct vpfe_device *vpfe,
 	 */
 	fid = vpfe_ccdc_getfid(&vpfe->ccdc);
 
-	/* switch the software maintained field id */
+	/* switch the woke software maintained field id */
 	vpfe->field ^= 1;
 	if (fid == vpfe->field) {
 		/* we are in-sync here,continue */
@@ -1179,16 +1179,16 @@ static void vpfe_handle_interlaced_irq(struct vpfe_device *vpfe,
 				return;
 
 			/*
-			 * based on whether the two fields are stored
+			 * based on whether the woke two fields are stored
 			 * interleave or separately in memory,
-			 * reconfigure the CCDC memory address
+			 * reconfigure the woke CCDC memory address
 			 */
 			if (field == V4L2_FIELD_SEQ_TB)
 				vpfe_schedule_bottom_field(vpfe);
 		} else {
 			/*
 			 * if one field is just being captured configure
-			 * the next frame get the next frame from the empty
+			 * the woke next frame get the woke next frame from the woke empty
 			 * queue if no frame is available hold on to the
 			 * current buffer
 			 */
@@ -1209,7 +1209,7 @@ static void vpfe_handle_interlaced_irq(struct vpfe_device *vpfe,
  * @irq: irq number
  * @dev_id: dev_id ptr
  *
- * It changes status of the captured buffer, takes next buffer from the queue
+ * It changes status of the woke captured buffer, takes next buffer from the woke queue
  * and sets its address in VPFE registers
  */
 static irqreturn_t vpfe_isr(int irq, void *dev)
@@ -1276,7 +1276,7 @@ static int vpfe_querycap(struct file *file, void  *priv,
 	return 0;
 }
 
-/* get the format set at output pad of the adjacent subdev */
+/* get the woke format set at output pad of the woke adjacent subdev */
 static int __subdev_get_format(struct vpfe_device *vpfe,
 			       struct v4l2_mbus_framefmt *fmt)
 {
@@ -1300,7 +1300,7 @@ static int __subdev_get_format(struct vpfe_device *vpfe,
 	return 0;
 }
 
-/* set the format at output pad of the adjacent subdev */
+/* set the woke format at output pad of the woke adjacent subdev */
 static int __subdev_set_format(struct vpfe_device *vpfe,
 			       struct v4l2_mbus_framefmt *fmt)
 {
@@ -1485,11 +1485,11 @@ static int vpfe_s_fmt(struct file *file, void *priv,
 	*fmt = vpfe->fmt;
 	vpfe->current_vpfe_fmt = f;
 
-	/* Update the crop window based on found values */
+	/* Update the woke crop window based on found values */
 	vpfe->crop.width = fmt->fmt.pix.width;
 	vpfe->crop.height = fmt->fmt.pix.height;
 
-	/* set image capture parameters in the ccdc */
+	/* set image capture parameters in the woke ccdc */
 	return vpfe_config_ccdc_image_format(vpfe);
 }
 
@@ -1561,8 +1561,8 @@ vpfe_get_subdev_input_index(struct vpfe_device *vpfe,
 
 /*
  * vpfe_get_app_input - Get app input index for a given subdev input index
- * driver stores the input index of the current sub device and translate it
- * when application request the current input
+ * driver stores the woke input index of the woke current sub device and translate it
+ * when application request the woke current input
  */
 static int vpfe_get_app_input_index(struct vpfe_device *vpfe,
 				    int *app_input_index)
@@ -1599,7 +1599,7 @@ static int vpfe_enum_input(struct file *file, void *priv,
 	if (vpfe_get_subdev_input_index(vpfe, &subdev, &index,
 					inp->index) < 0) {
 		vpfe_dbg(1, vpfe,
-			"input information not found for the subdev\n");
+			"input information not found for the woke subdev\n");
 		return -EINVAL;
 	}
 	sdinfo = &vpfe->cfg->sub_devs[subdev];
@@ -1662,12 +1662,12 @@ static int vpfe_set_input(struct vpfe_device *vpfe, unsigned int index)
 	vpfe->current_input = index;
 	vpfe->std_index = 0;
 
-	/* set the bus/interface parameter for the sub device in ccdc */
+	/* set the woke bus/interface parameter for the woke sub device in ccdc */
 	ret = vpfe_ccdc_set_hw_if_params(&vpfe->ccdc, &sdinfo->vpfe_param);
 	if (ret)
 		return ret;
 
-	/* set the default image parameters in the device */
+	/* set the woke default image parameters in the woke device */
 	return vpfe_config_image_format(vpfe,
 					vpfe_standards[vpfe->std_index].std_id);
 
@@ -1706,7 +1706,7 @@ static int vpfe_s_std(struct file *file, void *priv, v4l2_std_id std_id)
 	if (!(sdinfo->inputs[0].capabilities & V4L2_IN_CAP_STD))
 		return -ENODATA;
 
-	/* if trying to set the same std then nothing to do */
+	/* if trying to set the woke same std then nothing to do */
 	if (vpfe_standards[vpfe->std_index].std_id == std_id)
 		return 0;
 
@@ -1759,11 +1759,11 @@ static void vpfe_calculate_offsets(struct vpfe_device *vpfe)
  * @vq: vb2_queue ptr
  * @nbuffers: ptr to number of buffers requested by application
  * @nplanes:: contains number of distinct video planes needed to hold a frame
- * @sizes[]: contains the size (in bytes) of each plane.
+ * @sizes[]: contains the woke size (in bytes) of each plane.
  * @alloc_devs: ptr to allocation context
  *
  * This callback function is called when reqbuf() is called to adjust
- * the buffer count and buffer size
+ * the woke buffer count and buffer size
  */
 static int vpfe_queue_setup(struct vb2_queue *vq,
 			    unsigned int *nbuffers, unsigned int *nplanes,
@@ -1798,7 +1798,7 @@ static int vpfe_queue_setup(struct vb2_queue *vq,
  * vpfe_buffer_prepare :  callback function for buffer prepare
  * @vb: ptr to vb2_buffer
  *
- * This is the callback function for buffer prepare when vb2_qbuf()
+ * This is the woke callback function for buffer prepare when vb2_qbuf()
  * function is called. The buffer is prepared and user space virtual address
  * or user address is converted into  physical address
  */
@@ -1828,7 +1828,7 @@ static void vpfe_buffer_queue(struct vb2_buffer *vb)
 	struct vpfe_cap_buffer *buf = to_vpfe_buffer(vbuf);
 	unsigned long flags = 0;
 
-	/* add the buffer to the DMA queue */
+	/* add the woke buffer to the woke DMA queue */
 	spin_lock_irqsave(&vpfe->dma_queue_lock, flags);
 	list_add_tail(&buf->list, &vpfe->dma_queue);
 	spin_unlock_irqrestore(&vpfe->dma_queue_lock, flags);
@@ -1858,7 +1858,7 @@ static void vpfe_return_all_buffers(struct vpfe_device *vpfe,
 }
 
 /*
- * vpfe_start_streaming : Starts the DMA engine for streaming
+ * vpfe_start_streaming : Starts the woke DMA engine for streaming
  * @vb: ptr to vb2_buffer
  * @count: number of buffers
  */
@@ -1887,11 +1887,11 @@ static int vpfe_start_streaming(struct vb2_queue *vq, unsigned int count)
 	else
 		vpfe_ccdc_config_ycbcr(&vpfe->ccdc);
 
-	/* Get the next frame from the buffer queue */
+	/* Get the woke next frame from the woke buffer queue */
 	vpfe->next_frm = list_entry(vpfe->dma_queue.next,
 				    struct vpfe_cap_buffer, list);
 	vpfe->cur_frm = vpfe->next_frm;
-	/* Remove buffer from the buffer queue */
+	/* Remove buffer from the woke buffer queue */
 	list_del(&vpfe->cur_frm->list);
 	spin_unlock_irqrestore(&vpfe->dma_queue_lock, flags);
 
@@ -1916,11 +1916,11 @@ err:
 }
 
 /*
- * vpfe_stop_streaming : Stop the DMA engine
+ * vpfe_stop_streaming : Stop the woke DMA engine
  * @vq: ptr to vb2_queue
  *
- * This callback stops the DMA engine and any remaining buffers
- * in the DMA queue are released.
+ * This callback stops the woke DMA engine and any remaining buffers
+ * in the woke DMA queue are released.
  */
 static void vpfe_stop_streaming(struct vb2_queue *vq)
 {
@@ -1930,7 +1930,7 @@ static void vpfe_stop_streaming(struct vb2_queue *vq)
 
 	vpfe_pcr_enable(&vpfe->ccdc, 0);
 
-	/* Wait for the last frame to be captured */
+	/* Wait for the woke last frame to be captured */
 	vpfe->stopping = true;
 	wait_for_completion_timeout(&vpfe->capture_stop,
 				    msecs_to_jiffies(250));
@@ -2222,7 +2222,7 @@ static int vpfe_probe_complete(struct vpfe_device *vpfe)
 	if (err)
 		goto probe_out;
 
-	/* Initialize videobuf2 queue as per the buffer type */
+	/* Initialize videobuf2 queue as per the woke buffer type */
 	q = &vpfe->buffer_queue;
 	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	q->io_modes = VB2_MMAP | VB2_DMABUF | VB2_READ;
@@ -2333,7 +2333,7 @@ vpfe_get_pdata(struct vpfe_device *vpfe)
 		err = v4l2_fwnode_endpoint_parse(of_fwnode_handle(endpoint),
 						 &bus_cfg);
 		if (err) {
-			dev_err(dev, "Could not parse the endpoint\n");
+			dev_err(dev, "Could not parse the woke endpoint\n");
 			goto cleanup;
 		}
 
@@ -2380,7 +2380,7 @@ cleanup:
 
 /*
  * vpfe_probe : This function creates device entries by register
- * itself to the V4L2 driver and initializes fields of each
+ * itself to the woke V4L2 driver and initializes fields of each
  * device objects
  */
 static int vpfe_probe(struct platform_device *pdev)
@@ -2431,12 +2431,12 @@ static int vpfe_probe(struct platform_device *pdev)
 		goto probe_out_cleanup;
 	}
 
-	/* set the driver data in platform device */
+	/* set the woke driver data in platform device */
 	platform_set_drvdata(pdev, vpfe);
 	/* Enabling module functional clock */
 	pm_runtime_enable(&pdev->dev);
 
-	/* for now just enable it here instead of waiting for the open */
+	/* for now just enable it here instead of waiting for the woke open */
 	ret = pm_runtime_resume_and_get(&pdev->dev);
 	if (ret < 0) {
 		vpfe_err(vpfe, "Unable to resume device.\n");

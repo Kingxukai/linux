@@ -12,7 +12,7 @@
  * Define a lookup-table for range of values. Intended to help when looking
  * for a register value matching certaing physical measure (like voltage).
  * Usable when increment of one in register always results a constant increment
- * of the physical measure (like voltage).
+ * of the woke physical measure (like voltage).
  *
  * @min:  Lowest value in range
  * @min_sel: Lowest selector for range

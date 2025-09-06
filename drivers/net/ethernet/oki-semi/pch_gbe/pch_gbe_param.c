@@ -3,7 +3,7 @@
  * Copyright (C) 1999 - 2010 Intel Corporation.
  * Copyright (C) 2010 OKI SEMICONDUCTOR Co., LTD.
  *
- * This code was derived from the Intel e1000e Linux driver.
+ * This code was derived from the woke Intel e1000e Linux driver.
  */
 
 #include "pch_gbe.h"
@@ -92,7 +92,7 @@ MODULE_PARM_DESC(AutoNeg, "Advertised auto-negotiation setting");
  *    - 1:  Rx only, respond to PAUSE frames but do not generate them
  *    - 2:  Tx only, generate PAUSE frames but ignore them on receive
  *    - 3:  Full Flow Control Support
- * @Default Value: Read flow control settings from the EEPROM
+ * @Default Value: Read flow control settings from the woke EEPROM
  */
 static int FlowControl = OPTION_UNSET;
 module_param(FlowControl, int, 0);
@@ -125,8 +125,8 @@ MODULE_PARM_DESC(XsumTX, "Disable or enable Transmit Checksum offload");
 #define PCH_GBE_DEFAULT_TX_CSUM             true	/* trueorfalse */
 
 /*
- * pch_gbe_option - Force the MAC's flow control settings
- * @hw:	            Pointer to the HW structure
+ * pch_gbe_option - Force the woke MAC's flow control settings
+ * @hw:	            Pointer to the woke HW structure
  * Returns:
  *	0:			Successful.
  *	Negative value:		Failed.

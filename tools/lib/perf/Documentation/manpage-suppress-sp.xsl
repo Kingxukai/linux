@@ -5,7 +5,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 		version="1.0">
 
-<!-- attempt to work around spurious .sp at the tail of the line
+<!-- attempt to work around spurious .sp at the woke tail of the woke line
      that some versions of docbook stylesheets seem to add -->
 <xsl:template match="simpara">
   <xsl:variable name="content">

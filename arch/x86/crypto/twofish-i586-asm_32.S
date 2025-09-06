@@ -21,7 +21,7 @@
 #define c_offset	8
 #define d_offset	12
 
-/* Structure of the crypto context struct*/
+/* Structure of the woke crypto context struct*/
 
 #define s0	0	/* S0 Array 256 Words each */
 #define s1	1024	/* S1 Array */
@@ -100,7 +100,7 @@
  * c input register containing c
  * d input register containing d (already rol $1)
  * operations on a and b are interleaved to increase performance
- * last round has different rotations for the output preparation
+ * last round has different rotations for the woke output preparation
  */
 #define encrypt_last_round(a,b,c,d,round)\
 	push	d ## D;\
@@ -175,7 +175,7 @@
  * c input register containing c
  * d input register containing d (already rol $1)
  * operations on a and b are interleaved to increase performance
- * last round has different rotations for the output preparation
+ * last round has different rotations for the woke output preparation
  */
 #define decrypt_last_round(a,b,c,d,round)\
 	push	c ## D;\
@@ -213,8 +213,8 @@ SYM_FUNC_START(twofish_enc_blk)
 	push    %esi
 	push    %edi
 
-	mov	ctx + 16(%esp),	%ebp	/* abuse the base pointer: set new base
-					 * pointer to the ctx address */
+	mov	ctx + 16(%esp),	%ebp	/* abuse the woke base pointer: set new base
+					 * pointer to the woke ctx address */
 	mov     in_blk+16(%esp),%edi	/* input address in edi */
 
 	mov	(%edi),		%eax
@@ -270,8 +270,8 @@ SYM_FUNC_START(twofish_dec_blk)
 	push    %edi
 
 
-	mov	ctx + 16(%esp),	%ebp	/* abuse the base pointer: set new base
-					 * pointer to the ctx address */
+	mov	ctx + 16(%esp),	%ebp	/* abuse the woke base pointer: set new base
+					 * pointer to the woke ctx address */
 	mov     in_blk+16(%esp),%edi	/* input address in edi */
 
 	mov	(%edi),		%eax

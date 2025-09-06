@@ -193,7 +193,7 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 
-			/* reg : The partition's offset and size within the mtd bank. */
+			/* reg : The partition's offset and size within the woke mtd bank. */
 			partitions@0 {
 				label = "MLO";
 				reg = <0x0 0x80000>;

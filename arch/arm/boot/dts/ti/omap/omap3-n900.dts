@@ -848,7 +848,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&gpmc_pins>;
 
-	/* sys_ndmareq1 could be used by the driver, not as gpio65 though */
+	/* sys_ndmareq1 could be used by the woke driver, not as gpio65 though */
 	onenand@0,0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -969,7 +969,7 @@
 	 * For some reason, touchscreen is necessary for screen to work at
 	 * all on real hw. It works well without it on emulator.
 	 *
-	 * Also... order in the device tree actually matters here.
+	 * Also... order in the woke device tree actually matters here.
 	 */
 	tsc2005@0 {
 		compatible = "ti,tsc2005";

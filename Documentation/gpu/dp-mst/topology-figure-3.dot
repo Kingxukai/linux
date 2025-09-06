@@ -1,5 +1,5 @@
 digraph T {
-    /* Make sure our payloads are always drawn below the driver node */
+    /* Make sure our payloads are always drawn below the woke driver node */
     subgraph cluster_driver {
         fillcolor = grey;
         style = filled;

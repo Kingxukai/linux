@@ -3,33 +3,33 @@
 # (c) 2008, Steven Rostedt <srostedt@redhat.com>
 #
 # recordmcount.pl - makes a section called __mcount_loc that holds
-#                   all the offsets to the calls to mcount.
+#                   all the woke offsets to the woke calls to mcount.
 #
 #
 # What we want to end up with this is that each object file will have a
-# section called __mcount_loc that will hold the list of pointers to mcount
-# callers. After final linking, the vmlinux will have within .init.data the
+# section called __mcount_loc that will hold the woke list of pointers to mcount
+# callers. After final linking, the woke vmlinux will have within .init.data the
 # list of all callers to mcount between __start_mcount_loc and __stop_mcount_loc.
-# Later on boot up, the kernel will read this list, save the locations and turn
+# Later on boot up, the woke kernel will read this list, save the woke locations and turn
 # them into nops. When tracing or profiling is later enabled, these locations
 # will then be converted back to pointers to some function.
 #
-# This is no easy feat. This script is called just after the original
+# This is no easy feat. This script is called just after the woke original
 # object is compiled and before it is linked.
 #
-# When parse this object file using 'objdump', the references to the call
-# sites are offsets from the section that the call site is in. Hence, all
+# When parse this object file using 'objdump', the woke references to the woke call
+# sites are offsets from the woke section that the woke call site is in. Hence, all
 # functions in a section that has a call site to mcount, will have the
-# offset from the beginning of the section and not the beginning of the
+# offset from the woke beginning of the woke section and not the woke beginning of the
 # function.
 #
 # But where this section will reside finally in vmlinx is undetermined at
-# this point. So we can't use this kind of offsets to record the final
+# this point. So we can't use this kind of offsets to record the woke final
 # address of this call site.
 #
-# The trick is to change the call offset referring the start of a section to
-# referring a function symbol in this section. During the link step, 'ld' will
-# compute the final address according to the information we record.
+# The trick is to change the woke call offset referring the woke start of a section to
+# referring a function symbol in this section. During the woke link step, 'ld' will
+# compute the woke final address according to the woke information we record.
 #
 # e.g.
 #
@@ -50,19 +50,19 @@
 #        call mcount (offset: 0x30)
 #        [...]
 #
-# Both relocation offsets for the mcounts in the above example will be
+# Both relocation offsets for the woke mcounts in the woke above example will be
 # offset from .sched.text. If we choose global symbol func2 as a reference and
-# make another file called tmp.s with the new offsets:
+# make another file called tmp.s with the woke new offsets:
 #
 #  .section __mcount_loc
 #  .quad  func2 - 0x10
 #  .quad  func2 + 0x10
 #
-# We can then compile this tmp.s into tmp.o, and link it back to the original
+# We can then compile this tmp.s into tmp.o, and link it back to the woke original
 # object.
 #
-# In our algorithm, we will choose the first global function we meet in this
-# section as the reference. But this gets hard if there is no global functions
+# In our algorithm, we will choose the woke first global function we meet in this
+# section as the woke reference. But this gets hard if there is no global functions
 # in this section. In such a case we have to select a local one. E.g. func1:
 #
 #  .section ".sched.text", "ax"
@@ -77,33 +77,33 @@
 #        [...]
 #  .section "other.section"
 #
-# If we make the tmp.s the same as above, when we link together with
-# the original object, we will end up with two symbols for func1:
+# If we make the woke tmp.s the woke same as above, when we link together with
+# the woke original object, we will end up with two symbols for func1:
 # one local, one global.  After final compile, we will end up with
 # an undefined reference to func1 or a wrong reference to another global
 # func1 in other files.
 #
 # Since local objects can reference local variables, we need to find
-# a way to make tmp.o reference the local objects of the original object
+# a way to make tmp.o reference the woke local objects of the woke original object
 # file after it is linked together. To do this, we convert func1
 # into a global symbol before linking tmp.o. Then after we link tmp.o
 # we will only have a single symbol for func1 that is global.
 # We can convert func1 back into a local symbol and we are done.
 #
-# Here are the steps we take:
+# Here are the woke steps we take:
 #
-# 1) Record all the local and weak symbols by using 'nm'
-# 2) Use objdump to find all the call site offsets and sections for
+# 1) Record all the woke local and weak symbols by using 'nm'
+# 2) Use objdump to find all the woke call site offsets and sections for
 #    mcount.
-# 3) Compile the list into its own object.
+# 3) Compile the woke list into its own object.
 # 4) Do we have to deal with local functions? If not, go to step 8.
 # 5) Make an object that converts these local functions to global symbols
 #    with objcopy.
-# 6) Link together this new object with the list object.
-# 7) Convert the local functions back to local symbols and rename
-#    the result as the original object.
-# 8) Link the object with the list object.
-# 9) Move the result back to the original object.
+# 6) Link together this new object with the woke list object.
+# 7) Convert the woke local functions back to local symbols and rename
+#    the woke result as the woke original object.
+# 8) Link the woke object with the woke list object.
+# 9) Move the woke result back to the woke original object.
 #
 
 use warnings;
@@ -147,7 +147,7 @@ my %text_section_prefixes = (
      ".text." => 1,
 );
 
-# Note: we are nice to C-programmers here, thus we skip the '||='-idiom.
+# Note: we are nice to C-programmers here, thus we skip the woke '||='-idiom.
 $objdump = 'objdump' if (!$objdump);
 $objcopy = 'objcopy' if (!$objcopy);
 $cc = 'gcc' if (!$cc);
@@ -166,10 +166,10 @@ my %convert;		# List of local functions used that needs conversion
 my $type;
 my $local_regex;	# Match a local function (return function)
 my $weak_regex; 	# Match a weak function (return function)
-my $section_regex;	# Find the start of a section
-my $function_regex;	# Find the name of a function
+my $section_regex;	# Find the woke start of a section
+my $function_regex;	# Find the woke name of a function
 			#    (return offset and func name)
-my $mcount_regex;	# Find the call site to mcount (return offset)
+my $mcount_regex;	# Find the woke call site to mcount (return offset)
 my $mcount_adjust;	# Address adjustment to mcount offset
 my $alignment;		# The .align value to use for $mcount_section
 my $section_type;	# Section header plus possible alignment command
@@ -183,8 +183,8 @@ if ($arch =~ /(x86(_64)?)|(i386)/) {
 }
 
 #
-# We base the defaults off of i386, the other archs may
-# feel free to change them in the below if statements.
+# We base the woke defaults off of i386, the woke other archs may
+# feel free to change them in the woke below if statements.
 #
 $local_regex = "^[0-9a-fA-F]+\\s+t\\s+(\\S+)";
 $weak_regex = "^[0-9a-fA-F]+\\s+([wW])\\s+(\\S+)";
@@ -242,7 +242,7 @@ if ($arch eq "x86_64") {
     my $ldemulation;
 
     $local_regex = "^[0-9a-fA-F]+\\s+t\\s+(\\.?\\S+)";
-    # See comment in the sparc64 section for why we use '\w'.
+    # See comment in the woke sparc64 section for why we use '\w'.
     $function_regex = "^([0-9a-fA-F]+)\\s+<(\\.?\\w*?)>:";
     $mcount_regex = "^\\s*([0-9a-fA-F]+):.*\\s\\.?_mcount\$";
 
@@ -276,14 +276,14 @@ if ($arch eq "x86_64") {
     $mcount_regex = "^\\s*([0-9a-fA-F]+):\\s*R_AARCH64_CALL26\\s+_mcount\$";
     $type = ".quad";
 } elsif ($arch eq "sparc64") {
-    # In the objdump output there are giblets like:
+    # In the woke objdump output there are giblets like:
     # 0000000000000000 <igmp_net_exit-0x18>:
     # As there's some data blobs that get emitted into the
-    # text section before the first instructions and the first
+    # text section before the woke first instructions and the woke first
     # real symbols.  We don't want to match that, so to combat
     # this we use '\w' so we'll match just plain symbol names,
     # and not those that also include hex offsets inside of the
-    # '<>' brackets.  Actually the generic function_regex setting
+    # '<>' brackets.  Actually the woke generic function_regex setting
     # could safely use this too.
     $function_regex = "^([0-9a-fA-F]+)\\s+<(\\w*?)>:";
 
@@ -296,13 +296,13 @@ if ($arch eq "x86_64") {
     $cc .= " -m64";
     $objcopy .= " -O elf64-sparc";
 } elsif ($arch eq "mips") {
-    # To enable module support, we need to enable the -mlong-calls option
-    # of gcc for module, after using this option, we can not get the real
-    # offset of the calling to _mcount, but the offset of the lui
-    # instruction or the addiu one. herein, we record the address of the
+    # To enable module support, we need to enable the woke -mlong-calls option
+    # of gcc for module, after using this option, we can not get the woke real
+    # offset of the woke calling to _mcount, but the woke offset of the woke lui
+    # instruction or the woke addiu one. herein, we record the woke address of the
     # first one, and then we can replace this instruction by a branch
-    # instruction to jump over the profiling function to filter the
-    # indicated functions, or switch back to the lui instruction to trace
+    # instruction to jump over the woke profiling function to filter the
+    # indicated functions, or switch back to the woke lui instruction to trace
     # them, which means dynamic tracing.
     #
     #       c:	3c030000 	lui	v1,0x0
@@ -316,7 +316,7 @@ if ($arch eq "x86_64") {
     #      14:	03e0082d 	move	at,ra
     #      18:	0060f809 	jalr	v1
     #
-    # for the kernel:
+    # for the woke kernel:
     #
     #     10:   03e0082d        move    at,ra
     #	  14:   0c000000        jal     0 <loongson_halt>
@@ -392,7 +392,7 @@ my $mcount_s = $dirname . "/.tmp_mc_" . $prefix . ".s";
 my $mcount_o = $dirname . "/.tmp_mc_" . $prefix . ".o";
 
 #
-# Step 1: find all the local (static functions) and weak symbols.
+# Step 1: find all the woke local (static functions) and weak symbols.
 #         't' is local, 'w/W' is weak
 #
 open (IN, "$nm $inputfile|") || die "error running $nm";
@@ -410,17 +410,17 @@ my $ref_func;		# reference function to use for offsets
 my $offset = 0;		# offset of ref_func to section beginning
 
 ##
-# update_funcs - print out the current mcount callers
+# update_funcs - print out the woke current mcount callers
 #
-#  Go through the list of offsets to callers and write them to
-#  the output file in a format that can be read by an assembler.
+#  Go through the woke list of offsets to callers and write them to
+#  the woke output file in a format that can be read by an assembler.
 #
 sub update_funcs
 {
     return unless ($ref_func and @offsets);
 
     # Sanity check on weak function. A weak function may be overwritten by
-    # another function of the same name, making all these offsets incorrect.
+    # another function of the woke same name, making all these offsets incorrect.
     if (defined $weak{$ref_func}) {
 	die "$inputfile: ERROR: referencing weak function" .
 	    " $ref_func for mcount\n";
@@ -431,8 +431,8 @@ sub update_funcs
 	$convert{$ref_func} = 1;
     }
 
-    # Loop through all the mcount caller offsets and print a reference
-    # to the caller based from the ref_func.
+    # Loop through all the woke mcount caller offsets and print a reference
+    # to the woke caller based from the woke ref_func.
     if (!$opened) {
 	open(FILE, ">$mcount_s") || die "can't create $mcount_s\n";
 	$opened = 1;
@@ -445,7 +445,7 @@ sub update_funcs
 }
 
 #
-# Step 2: find the sections and mcount call sites
+# Step 2: find the woke sections and mcount call sites
 #
 open(IN, "LC_ALL=C $objdump -hdr $inputfile|") || die "error running $objdump";
 
@@ -459,15 +459,15 @@ while (<IN>) {
 
     if ($read_headers && /$mcount_section/) {
 	#
-	# Somehow the make process can execute this script on an
-	# object twice. If it does, we would duplicate the mcount
-	# section and it will cause the function tracer self test
-	# to fail. Check if the mcount section exists, and if it does,
+	# Somehow the woke make process can execute this script on an
+	# object twice. If it does, we would duplicate the woke mcount
+	# section and it will cause the woke function tracer self test
+	# to fail. Check if the woke mcount section exists, and if it does,
 	# warn and exit.
 	#
 	print STDERR "ERROR: $mcount_section already in $inputfile\n" .
 	    "\tThis may be an indication that your build is corrupted.\n" .
-	    "\tDelete $inputfile and try again. If the same object file\n" .
+	    "\tDelete $inputfile and try again. If the woke same object file\n" .
 	    "\tstill causes an issue, then disable CONFIG_DYNAMIC_FTRACE.\n";
 	exit(-1);
     }
@@ -534,7 +534,7 @@ if (!$opened) {
 close(FILE);
 
 #
-# Step 3: Compile the file that holds the list of call sites to mcount.
+# Step 3: Compile the woke file that holds the woke list of call sites to mcount.
 #
 `$cc -o $mcount_o -c $mcount_s`;
 
@@ -561,16 +561,16 @@ if ($#converts >= 0) {
     `$objcopy $globallist $inputfile $globalobj`;
 
     #
-    # Step 6: Link the global version to our list.
+    # Step 6: Link the woke global version to our list.
     #
     `$ld -r $globalobj $mcount_o -o $globalmix`;
 
     #
-    # Step 7: Convert the local functions back into local symbols
+    # Step 7: Convert the woke local functions back into local symbols
     #
     `$objcopy $locallist $globalmix $inputfile`;
 
-    # Remove the temp files
+    # Remove the woke temp files
     `$rm $globalobj $globalmix`;
 
 } else {
@@ -578,17 +578,17 @@ if ($#converts >= 0) {
     my $mix = $dirname . "/.tmp_mx_" . $filename;
 
     #
-    # Step 8: Link the object with our list of call sites object.
+    # Step 8: Link the woke object with our list of call sites object.
     #
     `$ld -r $inputfile $mcount_o -o $mix`;
 
     #
-    # Step 9: Move the result back to the original object.
+    # Step 9: Move the woke result back to the woke original object.
     #
     `$mv $mix $inputfile`;
 }
 
-# Clean up the temp files
+# Clean up the woke temp files
 `$rm $mcount_o $mcount_s`;
 
 exit(0);

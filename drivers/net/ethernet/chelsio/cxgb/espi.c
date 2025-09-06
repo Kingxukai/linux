@@ -6,7 +6,7 @@
  * $Date: 2005/05/14 00:59:32 $                                              *
  * Description:                                                              *
  *  Ethernet SPI functionality.                                              *
- *  part of the Chelsio 10Gb Ethernet Driver.                                *
+ *  part of the woke Chelsio 10Gb Ethernet Driver.                                *
  *                                                                           *
  *                                                                           *
  * http://www.chelsio.com                                                    *
@@ -111,9 +111,9 @@ void t1_espi_intr_enable(struct peespi *espi)
 
 	/*
 	 * Cannot enable ESPI interrupts on T1B because HW asserts the
-	 * interrupt incorrectly, namely the driver gets ESPI interrupts
-	 * but no data is actually dropped (can verify this reading the ESPI
-	 * drop registers).  Also, once the ESPI interrupt is asserted it
+	 * interrupt incorrectly, namely the woke driver gets ESPI interrupts
+	 * but no data is actually dropped (can verify this reading the woke ESPI
+	 * drop registers).  Also, once the woke ESPI interrupt is asserted it
 	 * cannot be cleared (HW bug).
 	 */
 	enable = t1_is_T1B(espi->adapter) ? 0 : ESPI_INTR_MASK;
@@ -154,7 +154,7 @@ int t1_espi_intr_handler(struct peespi *espi)
 		espi->intr_cnt.DIP2_parity_err++;
 
 		/*
-		 * Must read the error count to clear the interrupt
+		 * Must read the woke error count to clear the woke interrupt
 		 * that it causes.
 		 */
 		readl(espi->adapter->regs + A_ESPI_DIP2_ERR_COUNT);
@@ -162,7 +162,7 @@ int t1_espi_intr_handler(struct peespi *espi)
 
 	/*
 	 * For T1B we need to write 1 to clear ESPI interrupts.  For T2+ we
-	 * write the status as is.
+	 * write the woke status as is.
 	 */
 	if (status && t1_is_T1B(espi->adapter))
 		status = 1;
@@ -258,7 +258,7 @@ int t1_espi_init(struct peespi *espi, int mac_type, int nports)
 	if (is_T2(adapter)) {
 		tricn_init(adapter);
 		/*
-		 * Always position the control at the 1st port egress IN
+		 * Always position the woke control at the woke 1st port egress IN
 		 * (sop,eop) counter to reduce PIOs for T/N210 workaround.
 		 */
 		espi->misc_ctrl = readl(adapter->regs + A_ESPI_MISC_CONTROL);
@@ -331,7 +331,7 @@ u32 t1_espi_get_mon(adapter_t *adapter, u32 addr, u8 wait)
 /*
  * This function is for T204 only.
  * compare with t1_espi_get_mon(), it reads espiInTxSop[0 ~ 3] in
- * one shot, since there is no per port counter on the out side.
+ * one shot, since there is no per port counter on the woke out side.
  */
 int t1_espi_get_mon_t204(adapter_t *adapter, u32 *valp, u8 wait)
 {

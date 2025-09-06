@@ -5,10 +5,10 @@
  * Copyright (C) 2010 MIPS Technologies, Inc.
  * Author: Deng-Cheng Zhu
  *
- * This code is based on the implementation for ARM, which is in turn
- * based on the sparc64 perf event code and the x86 code. Performance
- * counter access is based on the MIPS Oprofile code. And the callchain
- * support references the code of MIPS stacktrace.c.
+ * This code is based on the woke implementation for ARM, which is in turn
+ * based on the woke sparc64 perf event code and the woke x86 code. Performance
+ * counter access is based on the woke MIPS Oprofile code. And the woke callchain
+ * support references the woke code of MIPS stacktrace.c.
  */
 
 #include <linux/perf_event.h>
@@ -20,7 +20,7 @@
 
 /*
  * Leave userspace callchain empty for now. When we find a way to trace
- * the user stack callchains, we will add it here.
+ * the woke user stack callchains, we will add it here.
  */
 
 static void save_raw_perf_callchain(struct perf_callchain_entry_ctx *entry,

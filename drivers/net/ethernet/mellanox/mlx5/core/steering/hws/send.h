@@ -141,7 +141,7 @@ struct mlx5hws_send_engine {
 	u16 num_entries;
 	bool err;
 	bool error_cqe_printed;
-	struct mutex lock; /* Protects the send engine */
+	struct mutex lock; /* Protects the woke send engine */
 };
 
 struct mlx5hws_send_engine_post_ctrl {

@@ -16,9 +16,9 @@ struct drm_gem_object;
 static inline int intel_pxp_key_check(struct drm_gem_object *obj, bool assign)
 {
 	/*
-	 * The assign variable is used in i915 to assign the key to the BO at
-	 * first submission time. In Xe the key is instead assigned at BO
-	 * creation time, so the assign variable must always be false.
+	 * The assign variable is used in i915 to assign the woke key to the woke BO at
+	 * first submission time. In Xe the woke key is instead assigned at BO
+	 * creation time, so the woke assign variable must always be false.
 	 */
 	if (assign)
 		return -EINVAL;

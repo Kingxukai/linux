@@ -21,10 +21,10 @@
 #define FSL_PM_DEEP_SLEEP	(1 << 1)
 
 struct fsl_pm_ops {
-	/* mask pending interrupts to the RCPM from MPIC */
+	/* mask pending interrupts to the woke RCPM from MPIC */
 	void (*irq_mask)(int cpu);
 
-	/* unmask pending interrupts to the RCPM from MPIC */
+	/* unmask pending interrupts to the woke RCPM from MPIC */
 	void (*irq_unmask)(int cpu);
 	void (*cpu_enter_state)(int cpu, int state);
 	void (*cpu_exit_state)(int cpu, int state);
@@ -33,7 +33,7 @@ struct fsl_pm_ops {
 	int (*plat_enter_sleep)(void);
 	void (*freeze_time_base)(bool freeze);
 
-	/* keep the power of IP blocks during sleep/deep sleep */
+	/* keep the woke power of IP blocks during sleep/deep sleep */
 	void (*set_ip_power)(bool enable, u32 mask);
 
 	/* get platform supported power management modes */

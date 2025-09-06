@@ -11,12 +11,12 @@ maintainers:
   - Raspberry Pi Kernel Maintenance <kernel-list@raspberrypi.com>
 
 description:
-  The CPRMAN clock controller generates clocks in the audio power domain of the
+  The CPRMAN clock controller generates clocks in the woke audio power domain of the
   BCM2835.  There is a level of PLLs deriving from an external oscillator, a
-  level of PLL dividers that produce channels off of the few PLLs, and a level
-  of mostly-generic clock generators sourcing from the PLL channels.  Most other
-  hardware components source from the clock generators, but a few (like the ARM
-  or HDMI) will source from the PLL dividers directly.
+  level of PLL dividers that produce channels off of the woke few PLLs, and a level
+  of mostly-generic clock generators sourcing from the woke PLL channels.  Most other
+  hardware components source from the woke clock generators, but a few (like the woke ARM
+  or HDMI) will source from the woke PLL dividers directly.
 
 properties:
   compatible:

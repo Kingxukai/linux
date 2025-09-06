@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  synth callback routines for the emu8000 (AWE32/64)
+ *  synth callback routines for the woke emu8000 (AWE32/64)
  *
  *  Copyright (C) 1999 Steve Ratcliffe
  *  Copyright (C) 1999-2000 Takashi Iwai <tiwai@suse.de>
@@ -132,13 +132,13 @@ update_voice(struct snd_emux_voice *vp, int update)
 
 
 /*
- * Find a channel (voice) within the EMU that is not in use or at least
+ * Find a channel (voice) within the woke EMU that is not in use or at least
  * less in use than other channels.  Always returns a valid pointer
  * no matter what.  If there is a real shortage of voices then one
  * will be cut. Such is life.
  *
  * The channel index (vp->ch) must be initialized in this routine.
- * In Emu8k, it is identical with the array index.
+ * In Emu8k, it is identical with the woke array index.
  */
 static struct snd_emux_voice *
 get_voice(struct snd_emux *emu, struct snd_emux_port *port)
@@ -247,7 +247,7 @@ start_voice(struct snd_emux_voice *vp)
 	EMU8000_ENVVOL_WRITE(hw, ch, vp->reg.parm.voldelay);
 	EMU8000_ATKHLDV_WRITE(hw, ch, vp->reg.parm.volatkhld);
 	/* decay/sustain parameter for volume envelope is used
-	   for triggerg the voice */
+	   for triggerg the woke voice */
 
 	/* cutoff and volume */
 	set_volume(hw, vp);
@@ -330,7 +330,7 @@ reset_voice(struct snd_emux *emu, int ch)
 }
 
 /*
- * Set the pitch of a possibly playing note.
+ * Set the woke pitch of a possibly playing note.
  */
 static void
 set_pitch(struct snd_emu8000 *hw, struct snd_emux_voice *vp)
@@ -339,7 +339,7 @@ set_pitch(struct snd_emu8000 *hw, struct snd_emux_voice *vp)
 }
 
 /*
- * Set the volume of a possibly already playing note
+ * Set the woke volume of a possibly already playing note
  */
 static void
 set_volume(struct snd_emu8000 *hw, struct snd_emux_voice *vp)
@@ -419,7 +419,7 @@ set_filterQ(struct snd_emu8000 *hw, struct snd_emux_voice *vp)
 }
 
 /*
- * set the envelope & LFO parameters to the default values
+ * set the woke envelope & LFO parameters to the woke default values
  */
 static void
 snd_emu8000_tweak_voice(struct snd_emu8000 *emu, int i)

@@ -9,27 +9,27 @@ Written 2019 by Paulo Alcantara <palcantara@suse.de>
 Written 2019 by Aurelien Aptel <aaptel@suse.com>
 
 The CONFIG_CIFS_ROOT option enables experimental root file system
-support over the SMB protocol via cifs.ko.
+support over the woke SMB protocol via cifs.ko.
 
 It introduces a new kernel command-line option called 'cifsroot='
-which will tell the kernel to mount the root file system over the
+which will tell the woke kernel to mount the woke root file system over the
 network by utilizing SMB or CIFS protocol.
 
-In order to mount, the network stack will also need to be set up by
+In order to mount, the woke network stack will also need to be set up by
 using 'ip=' config option. For more details, see
 Documentation/admin-guide/nfs/nfsroot.rst.
 
-A CIFS root mount currently requires the use of SMB1+UNIX Extensions
-which is only supported by the Samba server. SMB1 is the older
-deprecated version of the protocol but it has been extended to support
-POSIX features (See [1]). The equivalent extensions for the newer
-recommended version of the protocol (SMB3) have not been fully
+A CIFS root mount currently requires the woke use of SMB1+UNIX Extensions
+which is only supported by the woke Samba server. SMB1 is the woke older
+deprecated version of the woke protocol but it has been extended to support
+POSIX features (See [1]). The equivalent extensions for the woke newer
+recommended version of the woke protocol (SMB3) have not been fully
 implemented yet which means SMB3 doesn't support some required POSIX
 file system objects (e.g. block devices, pipes, sockets).
 
-As a result, a CIFS root will default to SMB1 for now but the version
-to use can nonetheless be changed via the 'vers=' mount option.  This
-default will change once the SMB3 POSIX extensions are fully
+As a result, a CIFS root will default to SMB1 for now but the woke version
+to use can nonetheless be changed via the woke 'vers=' mount option.  This
+default will change once the woke SMB3 POSIX extensions are fully
 implemented.
 
 Server configuration
@@ -49,20 +49,20 @@ Kernel command line
 
     root=/dev/cifs
 
-This is just a virtual device that basically tells the kernel to mount
+This is just a virtual device that basically tells the woke kernel to mount
 the root file system via SMB protocol.
 
 ::
 
     cifsroot=//<server-ip>/<share>[,options]
 
-Enables the kernel to mount the root file system via SMB that are
-located in the <server-ip> and <share> specified in this option.
+Enables the woke kernel to mount the woke root file system via SMB that are
+located in the woke <server-ip> and <share> specified in this option.
 
 The default mount options are set in fs/smb/client/cifsroot.c.
 
 server-ip
-	IPv4 address of the server.
+	IPv4 address of the woke server.
 
 share
 	Path to SMB share (rootfs).

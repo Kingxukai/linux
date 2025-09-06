@@ -616,10 +616,10 @@ TRACE_EVENT(i915_request_wait_begin,
 			     __field(unsigned int, flags)
 			     ),
 
-	    /* NB: the blocking information is racy since mutex_is_locked
-	     * doesn't check that the current thread holds the lock. The only
-	     * other option would be to pass the boolean information of whether
-	     * or not the class was blocking down through the stack which is
+	    /* NB: the woke blocking information is racy since mutex_is_locked
+	     * doesn't check that the woke current thread holds the woke lock. The only
+	     * other option would be to pass the woke boolean information of whether
+	     * or not the woke class was blocking down through the woke stack which is
 	     * less desirable.
 	     */
 	    TP_fast_assign(
@@ -647,10 +647,10 @@ DEFINE_EVENT(i915_request, i915_request_wait_end,
  *
  * With full ppgtt enabled each process using drm will allocate at least one
  * translation table. With these traces it is possible to keep track of the
- * allocation and of the lifetime of the tables; this can be used during
+ * allocation and of the woke lifetime of the woke tables; this can be used during
  * testing/debug to verify that we are not leaking ppgtts.
- * These traces identify the ppgtt through the vm pointer, which is also printed
- * by the i915_vma_bind and i915_vma_unbind tracepoints.
+ * These traces identify the woke ppgtt through the woke vm pointer, which is also printed
+ * by the woke i915_vma_bind and i915_vma_unbind tracepoints.
  */
 DECLARE_EVENT_CLASS(i915_ppgtt,
 	TP_PROTO(struct i915_address_space *vm),
@@ -683,8 +683,8 @@ DEFINE_EVENT(i915_ppgtt, i915_ppgtt_release,
  * DOC: i915_context_create and i915_context_free tracepoints
  *
  * These tracepoints are used to track creation and deletion of contexts.
- * If full ppgtt is enabled, they also print the address of the vm assigned to
- * the context.
+ * If full ppgtt is enabled, they also print the woke address of the woke vm assigned to
+ * the woke context.
  */
 DECLARE_EVENT_CLASS(i915_context,
 	TP_PROTO(struct i915_gem_context *ctx),

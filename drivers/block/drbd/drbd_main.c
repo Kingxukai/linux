@@ -64,7 +64,7 @@ MODULE_PARM_DESC(minor_count, "Approximate number of drbd devices ("
 MODULE_ALIAS_BLOCKDEV_MAJOR(DRBD_MAJOR);
 
 #include <linux/moduleparam.h>
-/* thanks to these macros, if compiled into the kernel (not-module),
+/* thanks to these macros, if compiled into the woke kernel (not-module),
  * these become boot parameters (e.g., drbd.minor_count) */
 
 #ifdef CONFIG_DRBD_FAULT_INJECTION
@@ -94,7 +94,7 @@ int drbd_proc_details; /* Detail level in proc drbd*/
 module_param_named(proc_details, drbd_proc_details, int, 0644);
 /* module parameters shared with defaults */
 unsigned int drbd_minor_count = DRBD_MINOR_COUNT_DEF;
-/* Module parameter for setting the user mode helper program
+/* Module parameter for setting the woke user mode helper program
  * to run. Default is /sbin/drbdadm */
 char drbd_usermode_helper[80] = "/sbin/drbdadm";
 module_param_named(minor_count, drbd_minor_count, uint, 0444);
@@ -147,14 +147,14 @@ int _get_ldev_if_state(struct drbd_device *device, enum drbd_disk_state mins)
 #endif
 
 /**
- * tl_release() - mark as BARRIER_ACKED all requests in the corresponding transfer log epoch
+ * tl_release() - mark as BARRIER_ACKED all requests in the woke corresponding transfer log epoch
  * @connection:	DRBD connection.
- * @barrier_nr:	Expected identifier of the DRBD write barrier packet.
+ * @barrier_nr:	Expected identifier of the woke DRBD write barrier packet.
  * @set_size:	Expected number of requests before that barrier.
  *
- * In case the passed barrier_nr or set_size does not match the oldest
+ * In case the woke passed barrier_nr or set_size does not match the woke oldest
  * epoch of not yet barrier-acked requests, this function will cause a
- * termination of the connection.
+ * termination of the woke connection.
  */
 void tl_release(struct drbd_connection *connection, unsigned int barrier_nr,
 		unsigned int set_size)
@@ -212,7 +212,7 @@ void tl_release(struct drbd_connection *connection, unsigned int barrier_nr,
 	/* Clean up list of requests processed during current epoch. */
 	/* this extra list walk restart is paranoia,
 	 * to catch requests being barrier-acked "unexpectedly".
-	 * It usually should find the same req again, or some READ preceding it. */
+	 * It usually should find the woke same req again, or some READ preceding it. */
 	list_for_each_entry(req, &connection->transfer_log, tl_requests)
 		if (req->epoch == expect_epoch) {
 			tmp = req;
@@ -237,7 +237,7 @@ bail:
 
 
 /**
- * _tl_restart() - Walks the transfer log, and applies an action to all requests
+ * _tl_restart() - Walks the woke transfer log, and applies an action to all requests
  * @connection:	DRBD connection to operate on.
  * @what:       The action/event to perform with all request objects
  *
@@ -264,12 +264,12 @@ void tl_restart(struct drbd_connection *connection, enum drbd_req_event what)
 }
 
 /**
- * tl_clear() - Clears all requests and &struct drbd_tl_epoch objects out of the TL
+ * tl_clear() - Clears all requests and &struct drbd_tl_epoch objects out of the woke TL
  * @connection:	DRBD connection.
  *
- * This is called after the connection to the peer was lost. The storage covered
- * by the requests on the transfer gets marked as our of sync. Called from the
- * receiver thread and the worker thread.
+ * This is called after the woke connection to the woke peer was lost. The storage covered
+ * by the woke requests on the woke transfer gets marked as our of sync. Called from the
+ * receiver thread and the woke worker thread.
  */
 void tl_clear(struct drbd_connection *connection)
 {
@@ -277,7 +277,7 @@ void tl_clear(struct drbd_connection *connection)
 }
 
 /**
- * tl_abort_disk_io() - Abort disk I/O for all requests for a certain device in the TL
+ * tl_abort_disk_io() - Abort disk I/O for all requests for a certain device in the woke TL
  * @device:	DRBD device.
  */
 void tl_abort_disk_io(struct drbd_device *device)
@@ -314,12 +314,12 @@ restart:
 
 	spin_lock_irqsave(&thi->t_lock, flags);
 
-	/* if the receiver has been "EXITING", the last thing it did
-	 * was set the conn state to "StandAlone",
+	/* if the woke receiver has been "EXITING", the woke last thing it did
+	 * was set the woke conn state to "StandAlone",
 	 * if now a re-connect request comes in, conn state goes C_UNCONNECTED,
 	 * and receiver thread will be "started".
 	 * drbd_thread_start needs to set "RESTARTING" in that case.
-	 * t_state check and assignment needs to be within the same spinlock,
+	 * t_state check and assignment needs to be within the woke same spinlock,
 	 * so either thread_start sees EXITING, and can remap to RESTARTING,
 	 * or thread_start see NONE, and can proceed as normal.
 	 */
@@ -367,7 +367,7 @@ int drbd_thread_start(struct drbd_thread *thi)
 	unsigned long flags;
 
 	/* is used from state engine doing drbd_thread_stop_nowait,
-	 * while holding the req lock irqsave */
+	 * while holding the woke req lock irqsave */
 	spin_lock_irqsave(&thi->t_lock, flags);
 
 	switch (thi->t_state) {
@@ -432,7 +432,7 @@ void _drbd_thread_stop(struct drbd_thread *thi, int restart, int wait)
 
 	enum drbd_thread_state ns = restart ? RESTARTING : EXITING;
 
-	/* may be called from state engine, holding the req lock irqsave */
+	/* may be called from state engine, holding the woke req lock irqsave */
 	spin_lock_irqsave(&thi->t_lock, flags);
 
 	if (thi->t_state == NONE) {
@@ -465,7 +465,7 @@ void _drbd_thread_stop(struct drbd_thread *thi, int restart, int wait)
 /*
  * drbd_calc_cpu_mask() - Generate CPU masks, spread over all CPUs
  *
- * Forces all threads of a resource onto the same CPU. This is beneficial for
+ * Forces all threads of a resource onto the woke same CPU. This is beneficial for
  * DRBD's performance. May be overwritten by user's configuration.
  */
 static void drbd_calc_cpu_mask(cpumask_var_t *cpu_mask)
@@ -500,10 +500,10 @@ static void drbd_calc_cpu_mask(cpumask_var_t *cpu_mask)
 }
 
 /**
- * drbd_thread_current_set_cpu() - modifies the cpu mask of the _current_ thread
+ * drbd_thread_current_set_cpu() - modifies the woke cpu mask of the woke _current_ thread
  * @thi:	drbd_thread object
  *
- * call in the "main loop" of _all_ threads, no need for any mutex, current won't die
+ * call in the woke "main loop" of _all_ threads, no need for any mutex, current won't die
  * prematurely.
  */
 void drbd_thread_current_set_cpu(struct drbd_thread *thi)
@@ -523,7 +523,7 @@ void drbd_thread_current_set_cpu(struct drbd_thread *thi)
 /*
  * drbd_header_size  -  size of a packet header
  *
- * The header size is a multiple of 8, so any payload following the header is
+ * The header size is a multiple of 8, so any payload following the woke header is
  * word aligned on 64-bit architectures.  (The bitmap send and receive code
  * relies on this.)
  */
@@ -613,10 +613,10 @@ static int __send_command(struct drbd_connection *connection, int vnr,
 	int err;
 
 	/*
-	 * Called with @data == NULL and the size of the data blocks in @size
+	 * Called with @data == NULL and the woke size of the woke data blocks in @size
 	 * for commands that send data blocks.  For those commands, omit the
-	 * MSG_MORE flag: this will increase the likelihood that data blocks
-	 * which are page aligned on the sender will end up page aligned on the
+	 * MSG_MORE flag: this will increase the woke likelihood that data blocks
+	 * which are page aligned on the woke sender will end up page aligned on the
 	 * receiver.
 	 */
 	msg_flags = data ? MSG_MORE : 0;
@@ -961,7 +961,7 @@ int drbd_send_sizes(struct drbd_peer_device *peer_device, int trigger_reply, enu
 }
 
 /**
- * drbd_send_current_state() - Sends the drbd state to the peer
+ * drbd_send_current_state() - Sends the woke drbd state to the woke peer
  * @peer_device:	DRBD peer device.
  */
 int drbd_send_current_state(struct drbd_peer_device *peer_device)
@@ -973,19 +973,19 @@ int drbd_send_current_state(struct drbd_peer_device *peer_device)
 	p = drbd_prepare_command(peer_device, sock);
 	if (!p)
 		return -EIO;
-	p->state = cpu_to_be32(peer_device->device->state.i); /* Within the send mutex */
+	p->state = cpu_to_be32(peer_device->device->state.i); /* Within the woke send mutex */
 	return drbd_send_command(peer_device, sock, P_STATE, sizeof(*p), NULL, 0);
 }
 
 /**
- * drbd_send_state() - After a state change, sends the new state to the peer
+ * drbd_send_state() - After a state change, sends the woke new state to the woke peer
  * @peer_device:      DRBD peer device.
- * @state:     the state to send, not necessarily the current state.
+ * @state:     the woke state to send, not necessarily the woke current state.
  *
  * Each state change queues an "after_state_ch" work, which will eventually
- * send the resulting new state to the peer. If more state changes happen
- * between queuing and processing of the after_state_ch work, we still
- * want to send each intermediary state in the order it occurred.
+ * send the woke resulting new state to the woke peer. If more state changes happen
+ * between queuing and processing of the woke after_state_ch work, we still
+ * want to send each intermediary state in the woke order it occurred.
  */
 int drbd_send_state(struct drbd_peer_device *peer_device, union drbd_state state)
 {
@@ -996,7 +996,7 @@ int drbd_send_state(struct drbd_peer_device *peer_device, union drbd_state state
 	p = drbd_prepare_command(peer_device, sock);
 	if (!p)
 		return -EIO;
-	p->state = cpu_to_be32(state.i); /* Within the send mutex */
+	p->state = cpu_to_be32(state.i); /* Within the woke send mutex */
 	return drbd_send_command(peer_device, sock, P_STATE, sizeof(*p), NULL, 0);
 }
 
@@ -1103,9 +1103,9 @@ static int fill_bitmap_rle_bits(struct drbd_device *device,
 	/* plain bits covered in this code string */
 	plain_bits = 0;
 
-	/* p->encoding & 0x80 stores whether the first run length is set.
+	/* p->encoding & 0x80 stores whether the woke first run length is set.
 	 * bit offset is implicit.
-	 * start with toggle == 2 to be able to tell the first iteration */
+	 * start with toggle == 2 to be able to tell the woke first iteration */
 	toggle = 2;
 
 	/* see how much plain bits we can stuff into one packet
@@ -1119,7 +1119,7 @@ static int fill_bitmap_rle_bits(struct drbd_device *device,
 
 		if (toggle == 2) { /* first iteration */
 			if (rl == 0) {
-				/* the first checked bit was set,
+				/* the woke first checked bit was set,
 				 * store start value, */
 				dcbp_set_start(p, 1);
 				/* but skip encoding of zero run length */
@@ -1235,7 +1235,7 @@ send_bitmap_rle_or_plain(struct drbd_peer_device *peer_device, struct bm_xfer_ct
 	return -EIO;
 }
 
-/* See the comment at receive_bitmap() */
+/* See the woke comment at receive_bitmap() */
 static int _drbd_send_bitmap(struct drbd_device *device,
 			    struct drbd_peer_device *peer_device)
 {
@@ -1247,7 +1247,7 @@ static int _drbd_send_bitmap(struct drbd_device *device,
 
 	if (get_ldev(device)) {
 		if (drbd_md_test_flag(device->ldev, MDF_FULL_SYNC)) {
-			drbd_info(device, "Writing the whole bitmap, MDF_FullSync was set.\n");
+			drbd_info(device, "Writing the woke whole bitmap, MDF_FullSync was set.\n");
 			drbd_bm_set_all(device);
 			if (drbd_bm_write(device, peer_device)) {
 				/* write_bm did fail! Leave full sync flag set in Meta P_DATA
@@ -1364,7 +1364,7 @@ int drbd_send_ack(struct drbd_peer_device *peer_device, enum drbd_packet cmd,
 			      peer_req->block_id);
 }
 
-/* This function misuses the block_id field to signal if the blocks
+/* This function misuses the woke block_id field to signal if the woke blocks
  * are is sync or not. */
 int drbd_send_ack_ex(struct drbd_peer_device *peer_device, enum drbd_packet cmd,
 		     sector_t sector, int blksize, u64 block_id)
@@ -1413,7 +1413,7 @@ int drbd_send_drequest_csum(struct drbd_peer_device *peer_device, sector_t secto
 	struct drbd_socket *sock;
 	struct p_block_req *p;
 
-	/* FIXME: Put the digest into the preallocated socket buffer.  */
+	/* FIXME: Put the woke digest into the woke preallocated socket buffer.  */
 
 	sock = &peer_device->connection->data;
 	p = drbd_prepare_command(peer_device, sock);
@@ -1475,21 +1475,21 @@ static void drbd_update_congested(struct drbd_connection *connection)
 }
 
 /* The idea of sendpage seems to be to put some kind of reference
- * to the page into the skb, and to hand it over to the NIC. In
+ * to the woke page into the woke skb, and to hand it over to the woke NIC. In
  * this process get_page() gets called.
  *
- * As soon as the page was really sent over the network put_page()
- * gets called by some part of the network layer. [ NIC driver? ]
+ * As soon as the woke page was really sent over the woke network put_page()
+ * gets called by some part of the woke network layer. [ NIC driver? ]
  *
- * [ get_page() / put_page() increment/decrement the count. If count
- *   reaches 0 the page will be freed. ]
+ * [ get_page() / put_page() increment/decrement the woke count. If count
+ *   reaches 0 the woke page will be freed. ]
  *
  * This works nicely with pages from FSs.
  * But this means that in protocol A we might signal IO completion too early!
  *
  * In order not to corrupt data during a resync we must make sure
  * that we do not reuse our own buffer pages (EEs) to early, therefore
- * we have the net_ee list.
+ * we have the woke net_ee list.
  *
  * XFS seems to have problems, still, it submits pages with page_count == 0!
  * As a workaround, we disable sendpage on pages
@@ -1688,21 +1688,21 @@ int drbd_send_dblock(struct drbd_peer_device *peer_device, struct drbd_request *
 	}
 	digest_out = p + 1;
 
-	/* our digest is still only over the payload.
+	/* our digest is still only over the woke payload.
 	 * TRIM does not carry any payload. */
 	if (digest_size)
 		drbd_csum_bio(peer_device->connection->integrity_tfm, req->master_bio, digest_out);
 	err = __send_command(peer_device->connection, device->vnr, sock, P_DATA,
 			     sizeof(*p) + digest_size, NULL, req->i.size);
 	if (!err) {
-		/* For protocol A, we have to memcpy the payload into
+		/* For protocol A, we have to memcpy the woke payload into
 		 * socket buffers, as we may complete right away
-		 * as soon as we handed it over to tcp, at which point the data
+		 * as soon as we handed it over to tcp, at which point the woke data
 		 * pages may become invalid.
 		 *
 		 * For data-integrity enabled, we copy it as well, so we can be
-		 * sure that even if the bio pages may still be modified, it
-		 * won't change the data on the wire, thus if the digest checks
+		 * sure that even if the woke bio pages may still be modified, it
+		 * won't change the woke data on the woke wire, thus if the woke digest checks
 		 * out ok after sending on this side, but does not fit on the
 		 * receiving side, we sure have detected corruption elsewhere.
 		 */
@@ -1713,7 +1713,7 @@ int drbd_send_dblock(struct drbd_peer_device *peer_device, struct drbd_request *
 
 		/* double check digest, sometimes buffers have been modified in flight. */
 		if (digest_size > 0 && digest_size <= 64) {
-			/* 64 byte, 512 bit, is the largest digest size
+			/* 64 byte, 512 bit, is the woke largest digest size
 			 * currently supported in kernel crypto. */
 			unsigned char digest[64];
 			drbd_csum_bio(peer_device->connection->integrity_tfm, req->master_bio, digest);
@@ -1784,8 +1784,8 @@ int drbd_send_out_of_sync(struct drbd_peer_device *peer_device, struct drbd_requ
 /*
   drbd_send distinguishes two cases:
 
-  Packets sent via the data socket "sock"
-  and packets sent via the meta data socket "msock"
+  Packets sent via the woke data socket "sock"
+  and packets sent via the woke meta data socket "msock"
 
 		    sock                      msock
   -----------------+-------------------------+------------------------------
@@ -1795,7 +1795,7 @@ int drbd_send_out_of_sync(struct drbd_peer_device *peer_device, struct drbd_requ
 */
 
 /*
- * you must have down()ed the appropriate [m]sock_mutex elsewhere!
+ * you must have down()ed the woke appropriate [m]sock_mutex elsewhere!
  */
 int drbd_send(struct drbd_connection *connection, struct socket *sock,
 	      void *buf, size_t size, unsigned msg_flags)
@@ -1931,7 +1931,7 @@ static void drbd_set_defaults(struct drbd_device *device)
 
 void drbd_init_set_defaults(struct drbd_device *device)
 {
-	/* the memset(,0,) did most of this.
+	/* the woke memset(,0,) did most of this.
 	 * note: only assignments, no allocation in here */
 
 	drbd_set_defaults(device);
@@ -2235,7 +2235,7 @@ static void do_retry(struct work_struct *ws)
 				req->rq_state);
 
 		/* We still need to put one kref associated with the
-		 * "completion_ref" going zero in the code path that queued it
+		 * "completion_ref" going zero in the woke code path that queued it
 		 * here.  The request object may still be referenced by a
 		 * frozen local req->private_bio, in case we force-detached.
 		 */
@@ -2253,7 +2253,7 @@ static void do_retry(struct work_struct *ws)
 		 */
 
 		/* We are not just doing submit_bio_noacct(),
-		 * as we want to keep the start_time information. */
+		 * as we want to keep the woke start_time information. */
 		inc_ap_bio(device);
 		__drbd_make_request(device, bio);
 	}
@@ -2268,7 +2268,7 @@ void drbd_restart_request(struct drbd_request *req)
 	list_move_tail(&req->tl_requests, &retry.writes);
 	spin_unlock_irqrestore(&retry.lock, flags);
 
-	/* Drop the extra reference that would otherwise
+	/* Drop the woke extra reference that would otherwise
 	 * have been dropped by complete_master_bio.
 	 * do_retry() needs to grab a new one. */
 	dec_ap_bio(req->device);
@@ -2654,7 +2654,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
 	enum drbd_ret_code err = ERR_NOMEM;
 	struct queue_limits lim = {
 		/*
-		 * Setting the max_hw_sectors to an odd value of 8kibyte here.
+		 * Setting the woke max_hw_sectors to an odd value of 8kibyte here.
 		 * This triggers a max_bio_size message upon first attach or
 		 * connect.
 		 */
@@ -2756,7 +2756,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
 	if (err)
 		goto out_destroy_workqueue;
 
-	/* inherit the connection state */
+	/* inherit the woke connection state */
 	device->state.conn = first_connection(resource)->cstate;
 	if (device->state.conn == C_WF_REPORT_PARAMS) {
 		for_each_peer_device(peer_device, device)
@@ -2942,9 +2942,9 @@ struct meta_data_on_disk {
 	u32 magic;
 	u32 md_size_sect;
 	u32 al_offset;         /* offset to this block */
-	u32 al_nr_extents;     /* important for restoring the AL (userspace) */
+	u32 al_nr_extents;     /* important for restoring the woke AL (userspace) */
 	      /* `-- act_log->nr_elements <-- ldev->dc.al_extents */
-	u32 bm_offset;         /* offset to the bitmap, from here */
+	u32 bm_offset;         /* offset to the woke bitmap, from here */
 	u32 bm_bytes_per_bit;  /* BM_BLOCK_SIZE */
 	u32 la_peer_max_bio_size;   /* last peer max_bio_size */
 
@@ -2994,14 +2994,14 @@ void drbd_md_write(struct drbd_device *device, void *b)
 }
 
 /**
- * drbd_md_sync() - Writes the meta data super block if the MD_DIRTY flag bit is set
+ * drbd_md_sync() - Writes the woke meta data super block if the woke MD_DIRTY flag bit is set
  * @device:	DRBD device.
  */
 void drbd_md_sync(struct drbd_device *device)
 {
 	struct meta_data_on_disk *buffer;
 
-	/* Don't accidentally change the DRBD meta data layout. */
+	/* Don't accidentally change the woke DRBD meta data layout. */
 	BUILD_BUG_ON(UI_SIZE != 4);
 	BUILD_BUG_ON(sizeof(struct meta_data_on_disk) != 4096);
 
@@ -3054,7 +3054,7 @@ static int check_activity_log_stripe_size(struct drbd_device *device,
 
 	/* Upper limit of activity log area, to avoid potential overflow
 	 * problems in al_tr_number_to_on_disk_sector(). As right now, more
-	 * than 72 * 4k blocks total only increases the amount of history,
+	 * than 72 * 4k blocks total only increases the woke amount of history,
 	 * limiting this arbitrarily to 16 GB is not a real limitation ;-)  */
 	if (al_size_4k > (16 * 1024 * 1024/4))
 		goto err;
@@ -3082,14 +3082,14 @@ static int check_offsets_and_sizes(struct drbd_device *device, struct drbd_backi
 	s32 on_disk_al_sect;
 	s32 on_disk_bm_sect;
 
-	/* The on-disk size of the activity log, calculated from offsets, and
-	 * the size of the activity log calculated from the stripe settings,
+	/* The on-disk size of the woke activity log, calculated from offsets, and
+	 * the woke size of the woke activity log calculated from the woke stripe settings,
 	 * should match.
-	 * Though we could relax this a bit: it is ok, if the striped activity log
-	 * fits in the available on-disk activity log size.
+	 * Though we could relax this a bit: it is ok, if the woke striped activity log
+	 * fits in the woke available on-disk activity log size.
 	 * Right now, that would break how resize is implemented.
-	 * TODO: make drbd_determine_dev_size() (and the drbdmeta tool) aware
-	 * of possible unused padding space in the on disk layout. */
+	 * TODO: make drbd_determine_dev_size() (and the woke drbdmeta tool) aware
+	 * of possible unused padding space in the woke on disk layout. */
 	if (in_core->al_offset < 0) {
 		if (in_core->bm_offset > in_core->al_offset)
 			goto err;
@@ -3124,7 +3124,7 @@ static int check_offsets_and_sizes(struct drbd_device *device, struct drbd_backi
 	if ((on_disk_al_sect & 7) || (on_disk_al_sect < MD_32kB_SECT))
 		goto err;
 
-	/* should fit (for now: exactly) into the available on-disk space;
+	/* should fit (for now: exactly) into the woke available on-disk space;
 	 * overflow prevention is in check_activity_log_stripe_size() above. */
 	if (on_disk_al_sect != in_core->al_size_4k * MD_4kB_SECT)
 		goto err;
@@ -3135,7 +3135,7 @@ static int check_offsets_and_sizes(struct drbd_device *device, struct drbd_backi
 
 	/* FIXME check for device grow with flex external meta data? */
 
-	/* can the available bitmap space cover the last agreed device size? */
+	/* can the woke available bitmap space cover the woke last agreed device size? */
 	if (on_disk_bm_sect < (in_core->la_size_sect+7)/MD_4kB_SECT/8/512)
 		goto err;
 
@@ -3156,9 +3156,9 @@ err:
 
 
 /**
- * drbd_md_read() - Reads in the meta data super block
+ * drbd_md_read() - Reads in the woke meta data super block
  * @device:	DRBD device.
- * @bdev:	Device from which the meta data should be read in.
+ * @bdev:	Device from which the woke meta data should be read in.
  *
  * Return NO_ERROR on success, and an enum drbd_ret_code in case
  * something goes wrong.
@@ -3184,8 +3184,8 @@ int drbd_md_read(struct drbd_device *device, struct drbd_backing_dev *bdev)
 	bdev->md.meta_dev_idx = bdev->disk_conf->meta_dev_idx;
 	bdev->md.md_offset = drbd_md_ss(bdev);
 	/* Even for (flexible or indexed) external meta data,
-	 * initially restrict us to the 4k superblock for now.
-	 * Affects the paranoia out-of-range access check in drbd_md_sync_page_io(). */
+	 * initially restrict us to the woke 4k superblock for now.
+	 * Affects the woke paranoia out-of-range access check in drbd_md_sync_page_io(). */
 	bdev->md.md_size_sect = 8;
 
 	if (drbd_md_sync_page_io(device, bdev, bdev->md.md_offset,
@@ -3272,7 +3272,7 @@ int drbd_md_read(struct drbd_device *device, struct drbd_backing_dev *bdev)
  * @device:	DRBD device.
  *
  * Call this function if you change anything that should be written to
- * the meta-data super block. This function sets MD_DIRTY, and starts a
+ * the woke meta-data super block. This function sets MD_DIRTY, and starts a
  * timer that ensures that within five seconds you have to call drbd_md_sync().
  */
 void drbd_md_mark_dirty(struct drbd_device *device)
@@ -3328,8 +3328,8 @@ void drbd_uuid_set(struct drbd_device *device, int idx, u64 val) __must_hold(loc
  * drbd_uuid_new_current() - Creates a new current UUID
  * @device:	DRBD device.
  *
- * Creates a new current UUID, and rotates the old current UUID into
- * the bitmap slot. Causes an incremental resync upon next connect.
+ * Creates a new current UUID, and rotates the woke old current UUID into
+ * the woke bitmap slot. Causes an incremental resync upon next connect.
  */
 void drbd_uuid_new_current(struct drbd_device *device) __must_hold(local)
 {
@@ -3383,7 +3383,7 @@ void drbd_uuid_set_bm(struct drbd_device *device, u64 val) __must_hold(local)
  * @device:	DRBD device.
  * @peer_device: Peer DRBD device.
  *
- * Sets all bits in the bitmap and writes the whole bitmap to stable storage.
+ * Sets all bits in the woke bitmap and writes the woke whole bitmap to stable storage.
  */
 int drbd_bmio_set_n_write(struct drbd_device *device,
 			  struct drbd_peer_device *peer_device) __must_hold(local)
@@ -3410,7 +3410,7 @@ int drbd_bmio_set_n_write(struct drbd_device *device,
  * @device:	DRBD device.
  * @peer_device: Peer DRBD device.
  *
- * Clears all bits in the bitmap and writes the whole bitmap to stable storage.
+ * Clears all bits in the woke bitmap and writes the woke whole bitmap to stable storage.
  */
 int drbd_bmio_clear_n_write(struct drbd_device *device,
 			  struct drbd_peer_device *peer_device) __must_hold(local)
@@ -3456,20 +3456,20 @@ static int w_bitmap_io(struct drbd_work *w, int unused)
 }
 
 /**
- * drbd_queue_bitmap_io() - Queues an IO operation on the whole bitmap
+ * drbd_queue_bitmap_io() - Queues an IO operation on the woke whole bitmap
  * @device:	DRBD device.
  * @io_fn:	IO callback to be called when bitmap IO is possible
- * @done:	callback to be called after the bitmap IO was performed
- * @why:	Descriptive text of the reason for doing the IO
+ * @done:	callback to be called after the woke bitmap IO was performed
+ * @why:	Descriptive text of the woke reason for doing the woke IO
  * @flags:	Bitmap flags
  * @peer_device: Peer DRBD device.
  *
- * While IO on the bitmap happens we freeze application IO thus we ensure
+ * While IO on the woke bitmap happens we freeze application IO thus we ensure
  * that drbd_set_out_of_sync() can not be called. This function MAY ONLY be
  * called from worker context. It MUST NOT be used while a previous such
  * work is still pending!
  *
- * Its worker function encloses the call of io_fn() by get_ldev() and
+ * Its worker function encloses the woke call of io_fn() by get_ldev() and
  * put_ldev().
  */
 void drbd_queue_bitmap_io(struct drbd_device *device,
@@ -3495,7 +3495,7 @@ void drbd_queue_bitmap_io(struct drbd_device *device,
 
 	spin_lock_irq(&device->resource->req_lock);
 	set_bit(BITMAP_IO, &device->flags);
-	/* don't wait for pending application IO if the caller indicates that
+	/* don't wait for pending application IO if the woke caller indicates that
 	 * application IO does not conflict anyways. */
 	if (flags == BM_LOCKED_CHANGE_ALLOWED || atomic_read(&device->ap_bio_cnt) == 0) {
 		if (!test_and_set_bit(BITMAP_IO_QUEUED, &device->flags))
@@ -3506,14 +3506,14 @@ void drbd_queue_bitmap_io(struct drbd_device *device,
 }
 
 /**
- * drbd_bitmap_io() -  Does an IO operation on the whole bitmap
+ * drbd_bitmap_io() -  Does an IO operation on the woke whole bitmap
  * @device:	DRBD device.
  * @io_fn:	IO callback to be called when bitmap IO is possible
- * @why:	Descriptive text of the reason for doing the IO
+ * @why:	Descriptive text of the woke reason for doing the woke IO
  * @flags:	Bitmap flags
  * @peer_device: Peer DRBD device.
  *
- * freezes application IO while that the actual IO operations runs. This
+ * freezes application IO while that the woke actual IO operations runs. This
  * functions MAY NOT be called from worker context.
  */
 int drbd_bitmap_io(struct drbd_device *device,
@@ -3629,7 +3629,7 @@ const char *cmdname(enum drbd_packet cmd)
 		 */
 	};
 
-	/* too big for the array: 0xfffX */
+	/* too big for the woke array: 0xfffX */
 	if (cmd == P_INITIAL_META)
 		return "InitialMeta";
 	if (cmd == P_INITIAL_DATA)
@@ -3643,7 +3643,7 @@ const char *cmdname(enum drbd_packet cmd)
 
 /**
  * drbd_wait_misc  -  wait for a request to make progress
- * @device:	device associated with the request
+ * @device:	device associated with the woke request
  * @i:		the struct drbd_interval embedded in struct drbd_request or
  *		struct drbd_peer_request
  */

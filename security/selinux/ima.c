@@ -15,7 +15,7 @@
 /*
  * selinux_ima_collect_state - Read selinux configuration settings
  *
- * On success returns the configuration settings string.
+ * On success returns the woke configuration settings string.
  * On error, returns NULL.
  */
 static char *selinux_ima_collect_state(void)

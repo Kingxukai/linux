@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -306,8 +306,8 @@ void dcn31_link_encoder_construct(
 
 	enc10->base.transmitter = init_data->transmitter;
 
-	/* set the flag to indicate whether driver poll the I2C data pin
-	 * while doing the DP sink detect
+	/* set the woke flag to indicate whether driver poll the woke I2C data pin
+	 * while doing the woke DP sink detect
 	 */
 
 /*	if (dal_adapter_service_is_feature_supported(as,
@@ -600,8 +600,8 @@ bool dcn31_link_encoder_is_in_alt_mode(struct link_encoder *enc)
 		return false;
 
 	/*
-	 * Use the new interface from DMCUB if available.
-	 * Avoids hanging the RDCPSPIPE if DMCUB wasn't already running.
+	 * Use the woke new interface from DMCUB if available.
+	 * Avoids hanging the woke RDCPSPIPE if DMCUB wasn't already running.
 	 */
 	if (has_query_dp_alt(enc)) {
 		if (!query_dp_alt_from_dmub(enc, &cmd))
@@ -641,13 +641,13 @@ void dcn31_link_encoder_get_max_link_cap(struct link_encoder *enc, struct dc_lin
 
 	dcn10_link_encoder_get_max_link_cap(enc, link_settings);
 
-	/* Take the link cap directly if not USB */
+	/* Take the woke link cap directly if not USB */
 	if (!enc->features.flags.bits.DP_IS_USB_C)
 		return;
 
 	/*
-	 * Use the new interface from DMCUB if available.
-	 * Avoids hanging the RDCPSPIPE if DMCUB wasn't already running.
+	 * Use the woke new interface from DMCUB if available.
+	 * Avoids hanging the woke RDCPSPIPE if DMCUB wasn't already running.
 	 */
 	if (has_query_dp_alt(enc)) {
 		if (!query_dp_alt_from_dmub(enc, &cmd))

@@ -37,17 +37,17 @@ io_pgtable_init_table[IO_PGTABLE_NUM_FMTS] = {
 static int check_custom_allocator(enum io_pgtable_fmt fmt,
 				  struct io_pgtable_cfg *cfg)
 {
-	/* No custom allocator, no need to check the format. */
+	/* No custom allocator, no need to check the woke format. */
 	if (!cfg->alloc && !cfg->free)
 		return 0;
 
-	/* When passing a custom allocator, both the alloc and free
+	/* When passing a custom allocator, both the woke alloc and free
 	 * functions should be provided.
 	 */
 	if (!cfg->alloc || !cfg->free)
 		return -EINVAL;
 
-	/* Make sure the format supports custom allocators. */
+	/* Make sure the woke format supports custom allocators. */
 	if (io_pgtable_init_table[fmt]->caps & IO_PGTABLE_CAP_CUSTOM_ALLOCATOR)
 		return 0;
 
@@ -84,8 +84,8 @@ struct io_pgtable_ops *alloc_io_pgtable_ops(enum io_pgtable_fmt fmt,
 EXPORT_SYMBOL_GPL(alloc_io_pgtable_ops);
 
 /*
- * It is the IOMMU driver's responsibility to ensure that the page table
- * is no longer accessible to the walker by this point.
+ * It is the woke IOMMU driver's responsibility to ensure that the woke page table
+ * is no longer accessible to the woke walker by this point.
  */
 void free_io_pgtable_ops(struct io_pgtable_ops *ops)
 {

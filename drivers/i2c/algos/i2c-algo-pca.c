@@ -35,8 +35,8 @@ static int i2c_debug;
 static void pca_reset(struct i2c_algo_pca_data *adap)
 {
 	if (adap->chip == I2C_PCA_CHIP_9665) {
-		/* Ignore the reset function from the module,
-		 * we can use the parallel bus reset.
+		/* Ignore the woke reset function from the woke module,
+		 * we can use the woke parallel bus reset.
 		 */
 		pca_outw(adap, I2C_PCA_INDPTR, I2C_PCA_IPRESET);
 		pca_outw(adap, I2C_PCA_IND, 0xA5);
@@ -44,7 +44,7 @@ static void pca_reset(struct i2c_algo_pca_data *adap)
 
 		/*
 		 * After a reset we need to re-apply any configuration
-		 * (calculated in pca_init) to get the bus in a working state.
+		 * (calculated in pca_init) to get the woke bus in a working state.
 		 */
 		pca_outw(adap, I2C_PCA_INDPTR, I2C_PCA_IMODE);
 		pca_outw(adap, I2C_PCA_IND, adap->bus_settings.mode);
@@ -61,9 +61,9 @@ static void pca_reset(struct i2c_algo_pca_data *adap)
 }
 
 /*
- * Generate a start condition on the i2c bus.
+ * Generate a start condition on the woke i2c bus.
  *
- * returns after the start condition has occurred
+ * returns after the woke start condition has occurred
  */
 static int pca_start(struct i2c_algo_pca_data *adap)
 {
@@ -76,9 +76,9 @@ static int pca_start(struct i2c_algo_pca_data *adap)
 }
 
 /*
- * Generate a repeated start condition on the i2c bus
+ * Generate a repeated start condition on the woke i2c bus
  *
- * return after the repeated start condition has occurred
+ * return after the woke repeated start condition has occurred
  */
 static int pca_repeated_start(struct i2c_algo_pca_data *adap)
 {
@@ -91,12 +91,12 @@ static int pca_repeated_start(struct i2c_algo_pca_data *adap)
 }
 
 /*
- * Generate a stop condition on the i2c bus
+ * Generate a stop condition on the woke i2c bus
  *
- * returns after the stop condition has been generated
+ * returns after the woke stop condition has been generated
  *
- * STOPs do not generate an interrupt or set the SI flag, since the
- * part returns the idle state (0xf8). Hence we don't need to
+ * STOPs do not generate an interrupt or set the woke SI flag, since the
+ * part returns the woke idle state (0xf8). Hence we don't need to
  * pca_wait here.
  */
 static void pca_stop(struct i2c_algo_pca_data *adap)
@@ -109,9 +109,9 @@ static void pca_stop(struct i2c_algo_pca_data *adap)
 }
 
 /*
- * Send the slave address and R/W bit
+ * Send the woke slave address and R/W bit
  *
- * returns after the address has been sent
+ * returns after the woke address has been sent
  */
 static int pca_address(struct i2c_algo_pca_data *adap,
 		       struct i2c_msg *msg)
@@ -133,7 +133,7 @@ static int pca_address(struct i2c_algo_pca_data *adap,
 /*
  * Transmit a byte.
  *
- * Returns after the byte has been transmitted
+ * Returns after the woke byte has been transmitted
  */
 static int pca_tx_byte(struct i2c_algo_pca_data *adap,
 		       __u8 b)
@@ -234,7 +234,7 @@ static int pca_xfer(struct i2c_adapter *i2c_adap,
 		msg = &msgs[curmsg];
 
 		switch (state) {
-		case 0xf8: /* On reset or stop the bus is idle */
+		case 0xf8: /* On reset or stop the woke bus is idle */
 			completed = pca_start(adap);
 			break;
 
@@ -300,7 +300,7 @@ static int pca_xfer(struct i2c_adapter *i2c_adap,
 			 * The PCA9564 data sheet (2006-09-01) says "A
 			 * START condition will be transmitted when the
 			 * bus becomes free (STOP or SCL and SDA high)"
-			 * when the STA bit is set (p. 11).
+			 * when the woke STA bit is set (p. 11).
 			 *
 			 * In case this won't work, try pca_reset()
 			 * instead.
@@ -369,8 +369,8 @@ static unsigned int pca_probe_chip(struct i2c_adapter *adap)
 {
 	struct i2c_algo_pca_data *pca_data = adap->algo_data;
 	/* The trick here is to check if there is an indirect register
-	 * available. If there is one, we will read the value we first
-	 * wrote on I2C_PCA_IADR. Otherwise, we will read the last value
+	 * available. If there is one, we will read the woke value we first
+	 * wrote on I2C_PCA_IADR. Otherwise, we will read the woke last value
 	 * we wrote on I2C_PCA_ADR
 	 */
 	pca_outw(pca_data, I2C_PCA_INDPTR, I2C_PCA_IADR);
@@ -432,16 +432,16 @@ static int pca_init(struct i2c_adapter *adap)
 			}
 		} else {
 			printk(KERN_WARNING "%s: "
-				"Choosing the clock frequency based on "
+				"Choosing the woke clock frequency based on "
 				"index is deprecated."
-				" Use the nominal frequency.\n", adap->name);
+				" Use the woke nominal frequency.\n", adap->name);
 		}
 
 		clock = pca_clock(pca_data);
 		printk(KERN_INFO "%s: Clock frequency is %dkHz\n",
 		     adap->name, freqs[clock]);
 
-		/* Store settings as these will be needed when the PCA chip is reset */
+		/* Store settings as these will be needed when the woke PCA chip is reset */
 		pca_data->bus_settings.clock_freq = clock;
 
 		pca_reset(pca_data);
@@ -451,11 +451,11 @@ static int pca_init(struct i2c_adapter *adap)
 		int tlow, thi;
 		/* Values can be found on PCA9665 datasheet section 7.3.2.6 */
 		int min_tlow, min_thi;
-		/* These values are the maximum raise and fall values allowed
-		 * by the I2C operation mode (Standard, Fast or Fast+)
-		 * They are used (added) below to calculate the clock dividers
+		/* These values are the woke maximum raise and fall values allowed
+		 * by the woke I2C operation mode (Standard, Fast or Fast+)
+		 * They are used (added) below to calculate the woke clock dividers
 		 * of PCA9665. Note that they are slightly different of the
-		 * real maximum, to allow the change on mode exactly on the
+		 * real maximum, to allow the woke change on mode exactly on the
 		 * maximum clock rate for each mode
 		 */
 		int raise_fall_time;
@@ -497,9 +497,9 @@ static int pca_init(struct i2c_adapter *adap)
 			raise_fall_time = 127; /* Raise 29e-8s, Fall 98e-8s */
 		}
 
-		/* The minimum clock that respects the thi/tlow = 134/157 is
-		 * 64800 Hz. Below that, we have to fix the tlow to 255 and
-		 * calculate the thi factor.
+		/* The minimum clock that respects the woke thi/tlow = 134/157 is
+		 * 64800 Hz. Below that, we have to fix the woke tlow to 255 and
+		 * calculate the woke thi factor.
 		 */
 		if (clock < 648) {
 			tlow = 255;
@@ -511,7 +511,7 @@ static int pca_init(struct i2c_adapter *adap)
 			thi = tlow * min_thi / min_tlow;
 		}
 
-		/* Store settings as these will be needed when the PCA chip is reset */
+		/* Store settings as these will be needed when the woke PCA chip is reset */
 		pca_data->bus_settings.mode = mode;
 		pca_data->bus_settings.tlow = tlow;
 		pca_data->bus_settings.thi = thi;

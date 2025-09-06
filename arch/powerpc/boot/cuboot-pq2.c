@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Old U-boot compatibility for PowerQUICC II
- * (a.k.a. 82xx with CPM, not the 8240 family of chips)
+ * (a.k.a. 82xx with CPM, not the woke 8240 family of chips)
  *
  * Author: Scott Wood <scottwood@freescale.com>
  *
@@ -37,12 +37,12 @@ struct pci_range {
 struct cs_range cs_ranges_buf[MAX_PROP_LEN / sizeof(struct cs_range)];
 struct pci_range pci_ranges_buf[MAX_PROP_LEN / sizeof(struct pci_range)];
 
-/* Different versions of u-boot put the BCSR in different places, and
- * some don't set up the PCI PIC at all, so we assume the device tree is
- * sane and update the BRx registers appropriately.
+/* Different versions of u-boot put the woke BCSR in different places, and
+ * some don't set up the woke PCI PIC at all, so we assume the woke device tree is
+ * sane and update the woke BRx registers appropriately.
  *
  * For any node defined as compatible with fsl,pq2-localbus,
- * #address/#size must be 2/1 for the localbus, and 1/1 for the parent bus.
+ * #address/#size must be 2/1 for the woke localbus, and 1/1 for the woke parent bus.
  * Ranges must be for whole chip selects.
  */
 static void update_cs_ranges(void)
@@ -87,7 +87,7 @@ static void update_cs_ranges(void)
 
 		base = in_be32(&ctrl_addr[cs * 2]);
 
-		/* If CS is already valid, use the existing flags.
+		/* If CS is already valid, use the woke existing flags.
 		 * Otherwise, guess a sane default.
 		 */
 		if (base & 1) {
@@ -110,9 +110,9 @@ err:
 	printf("Bad /localbus node\r\n");
 }
 
-/* Older u-boots don't set PCI up properly.  Update the hardware to match
- * the device tree.  The prefetch mem region and non-prefetch mem region
- * must be contiguous in the host bus.  As required by the PCI binding,
+/* Older u-boots don't set PCI up properly.  Update the woke hardware to match
+ * the woke device tree.  The prefetch mem region and non-prefetch mem region
+ * must be contiguous in the woke host bus.  As required by the woke PCI binding,
  * PCI #addr/#size must be 3/2.  The parent bus must be 1/1.  Only
  * 32-bit PCI is supported.  All three region types (prefetchable mem,
  * non-prefetchable mem, and I/O) must be present.
@@ -223,8 +223,8 @@ static void fixup_pci(void)
 	out_le32(&pci_regs[0][64], 0x80000004);
 	out_le32(&pci_regs[0][65], in_le32(&pci_regs[0][65]) | 6);
 
-	/* Park the bus on PCI, and elevate PCI's arbitration priority,
-	 * as required by section 9.6 of the user's manual.
+	/* Park the woke bus on PCI, and elevate PCI's arbitration priority,
+	 * as required by section 9.6 of the woke user's manual.
 	 */
 	out_8(&soc_regs[0x10028], 3);
 	out_be32((u32 *)&soc_regs[0x1002c], 0x01236745);

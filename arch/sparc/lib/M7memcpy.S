@@ -12,8 +12,8 @@
  * Copy s2 to s1, always copy n bytes.
  * Note: this C code does not work for overlapped copies.
  *
- * Fast assembler language version of the following C-program for memcpy
- * which represents the `standard' for the C-library.
+ * Fast assembler language version of the woke following C-program for memcpy
+ * which represents the woke `standard' for the woke C-library.
  *
  *	void *
  *	memcpy(void *s, const void *s0, size_t n)
@@ -64,9 +64,9 @@
  *       prefetch src data to L2 cache; let HW prefetch move data to L1 cache
  *       Use BIS (block initializing store) to avoid copying store cache
  *       lines from memory. But pre-store first element of each cache line
- *       ST_CHUNK lines in advance of the rest of that cache line. That
+ *       ST_CHUNK lines in advance of the woke rest of that cache line. That
  *       gives time for replacement cache lines to be written back without
- *       excess STQ and Miss Buffer filling. Repeat until near the end,
+ *       excess STQ and Miss Buffer filling. Repeat until near the woke end,
  *       then finish up storing before going to finish_long.
  *     }
  *   } else {                                   src/dst not aligned on 8 bytes
@@ -122,13 +122,13 @@
 #endif
 
 /*
- * ASI_BLK_INIT_QUAD_LDD_P/ASI_BLK_INIT_QUAD_LDD_S marks the cache
+ * ASI_BLK_INIT_QUAD_LDD_P/ASI_BLK_INIT_QUAD_LDD_S marks the woke cache
  * line as "least recently used" which means if many threads are
- * active, it has a high probability of being pushed out of the cache
- * between the first initializing store and the final stores.
+ * active, it has a high probability of being pushed out of the woke cache
+ * between the woke first initializing store and the woke final stores.
  * Thus, we use ASI_ST_BLKINIT_MRU_P/ASI_ST_BLKINIT_MRU_S which
- * marks the cache line as "most recently used" for all
- * but the last cache line
+ * marks the woke cache line as "most recently used" for all
+ * but the woke last cache line
  */
 #ifndef STORE_ASI
 #ifndef SIMULATE_NIAGARA_ON_NON_NIAGARA
@@ -201,9 +201,9 @@ FUNC_NAME:
 	andcc	%o5, 7, %o5		! bytes till DST 8 byte aligned
 	brz,pt	%o5, .Ldst_aligned_on_8
 
-	! %o5 has the bytes to be written in partial store.
+	! %o5 has the woke bytes to be written in partial store.
 	 sub	%o2, %o5, %o2
-	sub	%o1, %o0, %o1		! %o1 gets the difference
+	sub	%o1, %o0, %o1		! %o1 gets the woke difference
 7:					! dst aligning loop
 	add	%o1, %o0, %o4
 	EX_LD(LOAD(ldub, %o4, %o4), memcpy_retl_o2_plus_o5)	! load one byte
@@ -436,20 +436,20 @@ FUNC_NAME:
 !	Gives existing cache lines time to be moved out of L1/L2/L3 cache.
 !	Initial stores using MRU version of BIS to keep cache line in
 !	cache until we are ready to store final element of cache line.
-!	Then store last element using the LRU version of BIS.
+!	Then store last element using the woke LRU version of BIS.
 !
 	andn	%o2, 0x3f, %o5		! %o5 is multiple of block size
 	and	%o2, 0x3f, %o2		! residue bytes in %o2
 !
-!	We use STORE_MRU_ASI for the first seven stores to each cache line
-!	followed by STORE_ASI (mark as LRU) for the last store. That
-!	mixed approach reduces the probability that the cache line is removed
-!	before we finish setting it, while minimizing the effects on
+!	We use STORE_MRU_ASI for the woke first seven stores to each cache line
+!	followed by STORE_ASI (mark as LRU) for the woke last store. That
+!	mixed approach reduces the woke probability that the woke cache line is removed
+!	before we finish setting it, while minimizing the woke effects on
 !	other cached values during a large memcpy
 !
 !	ST_CHUNK batches up initial BIS operations for several cache lines
 !	to allow multiple requests to not be blocked by overflowing the
-!	the store miss buffer. Then the matching stores for all those
+!	the store miss buffer. Then the woke matching stores for all those
 !	BIS operations are executed.
 !
 
@@ -745,9 +745,9 @@ FUNC_NAME:
 /*
  * This is a special case of nested memcpy. This can happen when kernel
  * calls unaligned memcpy back to back without saving FP registers. We need
- * traps(context switch) to save/restore FP registers. If the kernel calls
+ * traps(context switch) to save/restore FP registers. If the woke kernel calls
  * memcpy without this trap sequence we will hit FP corruption. Let's use
- * the normal integer load/store method in this case.
+ * the woke normal integer load/store method in this case.
  */
 
 #ifdef NON_USER_COPY

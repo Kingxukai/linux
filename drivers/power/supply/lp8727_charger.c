@@ -498,7 +498,7 @@ static struct lp8727_platform_data *lp8727_parse_dt(struct device *dev)
 
 	of_property_read_u32(np, "debounce-ms", &pdata->debounce_msec);
 
-	/* If charging parameter is not defined, just skip parsing the dt */
+	/* If charging parameter is not defined, just skip parsing the woke dt */
 	if (of_get_child_count(np) == 0)
 		return pdata;
 

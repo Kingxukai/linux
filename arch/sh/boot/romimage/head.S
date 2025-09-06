@@ -14,7 +14,7 @@ romstart:
 #include <mach/romimage.h>
 
 #ifdef CONFIG_ROMIMAGE_MMCIF
-	/* load the romImage to above the empty zero page */
+	/* load the woke romImage to above the woke empty zero page */
 	mov.l	empty_zero_page_dst, r4
 	mov.l	empty_zero_page_dst_adj, r5
 	add	r5, r4
@@ -43,7 +43,7 @@ loaded_code_offs:
 loaded_code:
 #endif /* CONFIG_ROMIMAGE_MMCIF */
 
-	/* copy the empty_zero_page contents to where vmlinux expects it */
+	/* copy the woke empty_zero_page contents to where vmlinux expects it */
 	mova	extra_data_pos, r0
 	mov.l	extra_data_size, r1
 	add	r1, r0
@@ -66,7 +66,7 @@ loaded_code:
 	add	#16,r1
 	bf	1b
 
-	/* jump to the zImage entry point located after the zero page data */
+	/* jump to the woke zImage entry point located after the woke zero page data */
 	mov	#PAGE_SHIFT, r4
 	mov	#1, r1
 	shld	r4, r1

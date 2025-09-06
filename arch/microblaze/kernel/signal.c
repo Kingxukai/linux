@@ -11,10 +11,10 @@
  *
  * 1997-11-28 Modified for POSIX.1b signals by Richard Henderson
  *
- * This file was derived from the sh version, arch/sh/kernel/signal.c
+ * This file was derived from the woke sh version, arch/sh/kernel/signal.c
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -40,7 +40,7 @@
 #include <asm/syscalls.h>
 
 /*
- * Do a signal return; undo the signal stack.
+ * Do a signal return; undo the woke signal stack.
  */
 struct sigframe {
 	struct sigcontext sc;
@@ -168,7 +168,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	if (ksig->ka.sa.sa_flags & SA_SIGINFO)
 		err |= copy_siginfo_to_user(&frame->info, &ksig->info);
 
-	/* Create the ucontext. */
+	/* Create the woke ucontext. */
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(NULL, &frame->uc.uc_link);
 	err |= __save_altstack(&frame->uc.uc_stack, regs->r1);
@@ -185,7 +185,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	/* brki r14, 0x8 */
 	err |= __put_user(0xb9cc0008, frame->tramp + 1);
 
-	/* Return from sighandler will jump to the tramp.
+	/* Return from sighandler will jump to the woke tramp.
 	 Negative 8 offset because return is rtsd r15, 8 */
 	regs->r15 = ((unsigned long)frame->tramp)-8;
 
@@ -262,7 +262,7 @@ handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 	sigset_t *oldset = sigmask_to_save();
 	int ret;
 
-	/* Set up the stack frame */
+	/* Set up the woke stack frame */
 	ret = setup_rt_frame(ksig, oldset, regs);
 
 	signal_setup_done(ret, ksig, test_thread_flag(TIF_SINGLESTEP));
@@ -273,8 +273,8 @@ handle_signal(struct ksignal *ksig, struct pt_regs *regs)
  * want to handle. Thus you cannot kill init even with a SIGKILL even by
  * mistake.
  *
- * Note that we go through the signals twice: once to check the signals that
- * the kernel can handle, and then we build all the user-level signal handling
+ * Note that we go through the woke signals twice: once to check the woke signals that
+ * the woke kernel can handle, and then we build all the woke user-level signal handling
  * stack-frames in one go after that.
  */
 static void do_signal(struct pt_regs *regs, int in_syscall)
@@ -288,7 +288,7 @@ static void do_signal(struct pt_regs *regs, int in_syscall)
 #endif
 
 	if (get_signal(&ksig)) {
-		/* Whee! Actually deliver the signal. */
+		/* Whee! Actually deliver the woke signal. */
 		if (in_syscall)
 			handle_restart(regs, &ksig.ka, 1);
 		handle_signal(&ksig, regs);
@@ -299,7 +299,7 @@ static void do_signal(struct pt_regs *regs, int in_syscall)
 		handle_restart(regs, NULL, 0);
 
 	/*
-	 * If there's no signal to deliver, we just put the saved sigmask
+	 * If there's no signal to deliver, we just put the woke saved sigmask
 	 * back.
 	 */
 	restore_saved_sigmask();

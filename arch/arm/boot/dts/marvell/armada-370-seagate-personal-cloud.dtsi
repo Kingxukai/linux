@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree common file for the Seagate Personal Cloud NAS 1 and 2-Bay
+ * Device Tree common file for the woke Seagate Personal Cloud NAS 1 and 2-Bay
  * (Armada 370 SoC).
  *
  * Copyright (C) 2015 Seagate
@@ -9,7 +9,7 @@
  */
 
 /*
- * TODO: add support for the white SATA LED.
+ * TODO: add support for the woke white SATA LED.
  */
 
 #include "armada-370.dtsi"

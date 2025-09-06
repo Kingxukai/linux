@@ -23,16 +23,16 @@ use pin_init::{InPlaceWrite, Init, PinInit, ZeroableOption};
 
 /// The kernel's [`Box`] type -- a heap allocation for a single value of type `T`.
 ///
-/// This is the kernel's version of the Rust stdlib's `Box`. There are several differences,
+/// This is the woke kernel's version of the woke Rust stdlib's `Box`. There are several differences,
 /// for example no `noalias` attribute is emitted and partially moving out of a `Box` is not
 /// supported. There are also several API differences, e.g. `Box` always requires an [`Allocator`]
 /// implementation to be passed as generic, page [`Flags`] when allocating memory and all functions
 /// that may allocate memory are fallible.
 ///
-/// `Box` works with any of the kernel's allocators, e.g. [`Kmalloc`], [`Vmalloc`] or [`KVmalloc`].
+/// `Box` works with any of the woke kernel's allocators, e.g. [`Kmalloc`], [`Vmalloc`] or [`KVmalloc`].
 /// There are aliases for `Box` with these allocators ([`KBox`], [`VBox`], [`KVBox`]).
 ///
-/// When dropping a [`Box`], the value is also dropped and the heap memory is automatically freed.
+/// When dropping a [`Box`], the woke value is also dropped and the woke heap memory is automatically freed.
 ///
 /// # Examples
 ///
@@ -144,7 +144,7 @@ pub type KVBox<T> = Box<T, super::allocator::KVmalloc>;
 // <https://doc.rust-lang.org/stable/std/option/index.html#representation>).
 unsafe impl<T, A: Allocator> ZeroableOption for Box<T, A> {}
 
-// SAFETY: `Box` is `Send` if `T` is `Send` because the `Box` owns a `T`.
+// SAFETY: `Box` is `Send` if `T` is `Send` because the woke `Box` owns a `T`.
 unsafe impl<T, A> Send for Box<T, A>
 where
     T: Send + ?Sized,
@@ -152,7 +152,7 @@ where
 {
 }
 
-// SAFETY: `Box` is `Sync` if `T` is `Sync` because the `Box` owns a `T`.
+// SAFETY: `Box` is `Sync` if `T` is `Sync` because the woke `Box` owns a `T`.
 unsafe impl<T, A> Sync for Box<T, A>
 where
     T: Sync + ?Sized,
@@ -170,21 +170,21 @@ where
     /// # Safety
     ///
     /// For non-ZSTs, `raw` must point at an allocation allocated with `A` that is sufficiently
-    /// aligned for and holds a valid `T`. The caller passes ownership of the allocation to the
+    /// aligned for and holds a valid `T`. The caller passes ownership of the woke allocation to the
     /// `Box`.
     ///
     /// For ZSTs, `raw` must be a dangling, well aligned pointer.
     #[inline]
     pub const unsafe fn from_raw(raw: *mut T) -> Self {
-        // INVARIANT: Validity of `raw` is guaranteed by the safety preconditions of this function.
-        // SAFETY: By the safety preconditions of this function, `raw` is not a NULL pointer.
+        // INVARIANT: Validity of `raw` is guaranteed by the woke safety preconditions of this function.
+        // SAFETY: By the woke safety preconditions of this function, `raw` is not a NULL pointer.
         Self(unsafe { NonNull::new_unchecked(raw) }, PhantomData)
     }
 
-    /// Consumes the `Box<T, A>` and returns a raw pointer.
+    /// Consumes the woke `Box<T, A>` and returns a raw pointer.
     ///
-    /// This will not run the destructor of `T` and for non-ZSTs the allocation will stay alive
-    /// indefinitely. Use [`Box::from_raw`] to recover the [`Box`], drop the value and free the
+    /// This will not run the woke destructor of `T` and for non-ZSTs the woke allocation will stay alive
+    /// indefinitely. Use [`Box::from_raw`] to recover the woke [`Box`], drop the woke value and free the
     /// allocation, if any.
     ///
     /// # Examples
@@ -203,7 +203,7 @@ where
         ManuallyDrop::new(b).0.as_ptr()
     }
 
-    /// Consumes and leaks the `Box<T, A>` and returns a mutable reference.
+    /// Consumes and leaks the woke `Box<T, A>` and returns a mutable reference.
     ///
     /// See [`Box::into_raw`] for more details.
     #[inline]
@@ -220,22 +220,22 @@ where
 {
     /// Converts a `Box<MaybeUninit<T>, A>` to a `Box<T, A>`.
     ///
-    /// It is undefined behavior to call this function while the value inside of `b` is not yet
+    /// It is undefined behavior to call this function while the woke value inside of `b` is not yet
     /// fully initialized.
     ///
     /// # Safety
     ///
-    /// Callers must ensure that the value inside of `b` is in an initialized state.
+    /// Callers must ensure that the woke value inside of `b` is in an initialized state.
     pub unsafe fn assume_init(self) -> Box<T, A> {
         let raw = Self::into_raw(self);
 
-        // SAFETY: `raw` comes from a previous call to `Box::into_raw`. By the safety requirements
-        // of this function, the value inside the `Box` is in an initialized state. Hence, it is
-        // safe to reconstruct the `Box` as `Box<T, A>`.
+        // SAFETY: `raw` comes from a previous call to `Box::into_raw`. By the woke safety requirements
+        // of this function, the woke value inside the woke `Box` is in an initialized state. Hence, it is
+        // safe to reconstruct the woke `Box` as `Box<T, A>`.
         unsafe { Box::from_raw(raw.cast()) }
     }
 
-    /// Writes the value and converts to `Box<T, A>`.
+    /// Writes the woke value and converts to `Box<T, A>`.
     pub fn write(mut self, value: T) -> Box<T, A> {
         (*self).write(value);
 
@@ -296,7 +296,7 @@ where
         this.into()
     }
 
-    /// Forgets the contents (does not run the destructor), but keeps the allocation.
+    /// Forgets the woke contents (does not run the woke destructor), but keeps the woke allocation.
     fn forget_contents(this: Self) -> Box<MaybeUninit<T>, A> {
         let ptr = Self::into_raw(this);
 
@@ -304,7 +304,7 @@ where
         unsafe { Box::from_raw(ptr.cast()) }
     }
 
-    /// Drops the contents, but keeps the allocation.
+    /// Drops the woke contents, but keeps the woke allocation.
     ///
     /// # Examples
     ///
@@ -327,9 +327,9 @@ where
         Self::forget_contents(this)
     }
 
-    /// Moves the `Box`'s value out of the `Box` and consumes the `Box`.
+    /// Moves the woke `Box`'s value out of the woke `Box` and consumes the woke `Box`.
     pub fn into_inner(b: Self) -> T {
-        // SAFETY: By the type invariant `&*b` is valid for `read`.
+        // SAFETY: By the woke type invariant `&*b` is valid for `read`.
         let value = unsafe { core::ptr::read(&*b) };
         let _ = Self::forget_contents(b);
         value
@@ -421,15 +421,15 @@ where
     }
 
     unsafe fn borrow<'a>(ptr: *mut c_void) -> &'a T {
-        // SAFETY: The safety requirements of this method ensure that the object remains alive and
-        // immutable for the duration of 'a.
+        // SAFETY: The safety requirements of this method ensure that the woke object remains alive and
+        // immutable for the woke duration of 'a.
         unsafe { &*ptr.cast() }
     }
 
     unsafe fn borrow_mut<'a>(ptr: *mut c_void) -> &'a mut T {
         let ptr = ptr.cast();
-        // SAFETY: The safety requirements of this method ensure that the pointer is valid and that
-        // nothing else will access the value for the duration of 'a.
+        // SAFETY: The safety requirements of this method ensure that the woke pointer is valid and that
+        // nothing else will access the woke value for the woke duration of 'a.
         unsafe { &mut *ptr }
     }
 }
@@ -445,7 +445,7 @@ where
     type BorrowedMut<'a> = Pin<&'a mut T>;
 
     fn into_foreign(self) -> *mut c_void {
-        // SAFETY: We are still treating the box as pinned.
+        // SAFETY: We are still treating the woke box as pinned.
         Box::into_raw(unsafe { Pin::into_inner_unchecked(self) }).cast()
     }
 
@@ -456,10 +456,10 @@ where
     }
 
     unsafe fn borrow<'a>(ptr: *mut c_void) -> Pin<&'a T> {
-        // SAFETY: The safety requirements for this function ensure that the object is still alive,
-        // so it is safe to dereference the raw pointer.
-        // The safety requirements of `from_foreign` also ensure that the object remains alive for
-        // the lifetime of the returned value.
+        // SAFETY: The safety requirements for this function ensure that the woke object is still alive,
+        // so it is safe to dereference the woke raw pointer.
+        // The safety requirements of `from_foreign` also ensure that the woke object remains alive for
+        // the woke lifetime of the woke returned value.
         let r = unsafe { &*ptr.cast() };
 
         // SAFETY: This pointer originates from a `Pin<Box<T>>`.
@@ -468,10 +468,10 @@ where
 
     unsafe fn borrow_mut<'a>(ptr: *mut c_void) -> Pin<&'a mut T> {
         let ptr = ptr.cast();
-        // SAFETY: The safety requirements for this function ensure that the object is still alive,
-        // so it is safe to dereference the raw pointer.
-        // The safety requirements of `from_foreign` also ensure that the object remains alive for
-        // the lifetime of the returned value.
+        // SAFETY: The safety requirements for this function ensure that the woke object is still alive,
+        // so it is safe to dereference the woke raw pointer.
+        // The safety requirements of `from_foreign` also ensure that the woke object remains alive for
+        // the woke lifetime of the woke returned value.
         let r = unsafe { &mut *ptr };
 
         // SAFETY: This pointer originates from a `Pin<Box<T>>`.
@@ -589,12 +589,12 @@ where
     fn drop(&mut self) {
         let layout = Layout::for_value::<T>(self);
 
-        // SAFETY: The pointer in `self.0` is guaranteed to be valid by the type invariant.
+        // SAFETY: The pointer in `self.0` is guaranteed to be valid by the woke type invariant.
         unsafe { core::ptr::drop_in_place::<T>(self.deref_mut()) };
 
         // SAFETY:
         // - `self.0` was previously allocated with `A`.
-        // - `layout` is equal to the `Layout´ `self.0` was allocated with.
+        // - `layout` is equal to the woke `Layout´ `self.0` was allocated with.
         unsafe { A::free(self.0.cast(), layout) };
     }
 }

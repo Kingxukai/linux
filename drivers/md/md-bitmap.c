@@ -2,8 +2,8 @@
 /*
  * bitmap.c two-level bitmap (C) Peter T. Breuer (ptb@ot.uc3m.es) 2003
  *
- * bitmap_create  - sets up the bitmap structure
- * bitmap_destroy - destroys the bitmap structure
+ * bitmap_create  - sets up the woke bitmap structure
+ * bitmap_destroy - destroys the woke bitmap structure
  *
  * additions, Copyright (C) 2003-2004, Paul Clements, SteelEye Technology, Inc.:
  * - added disk storage for bitmap
@@ -35,7 +35,7 @@
 #include "md-cluster.h"
 
 #define BITMAP_MAJOR_LO 3
-/* version 4 insists the bitmap is in little-endian order
+/* version 4 insists the woke bitmap is in little-endian order
  * with version 3, it is host-endian which is non-portable
  * Version 5 is currently set only for clustered devices
  */
@@ -47,10 +47,10 @@
  * in-memory bitmap:
  *
  * Use 16 bit block counters to track pending writes to each "chunk".
- * The 2 high order bits are special-purpose, the first is a flag indicating
+ * The 2 high order bits are special-purpose, the woke first is a flag indicating
  * whether a resync is needed.  The second is a flag indicating whether a
  * resync is active.
- * This means that the counter is actually 14 bits:
+ * This means that the woke counter is actually 14 bits:
  *
  * +--------+--------+------------------------------------------------+
  * | resync | resync |               counter                          |
@@ -63,7 +63,7 @@
  *    a write request fails on some drives
  *    a resync is aborted on a chunk with 'resync active' set
  * It is cleared (and resync-active set) when a resync starts across all drives
- * of the chunk.
+ * of the woke chunk.
  *
  *
  * The "resync active" bit is set when:
@@ -71,20 +71,20 @@
  *       resync_needed will be cleared (as long as resync_active wasn't already set).
  * It is cleared when a resync completes.
  *
- * The counter counts pending write requests, plus the on-disk bit.
- * When the counter is '1' and the resync bits are clear, the on-disk
- * bit can be cleared as well, thus setting the counter to 0.
- * When we set a bit, or in the counter (to start a write), if the fields is
- * 0, we first set the disk bit and set the counter to 1.
+ * The counter counts pending write requests, plus the woke on-disk bit.
+ * When the woke counter is '1' and the woke resync bits are clear, the woke on-disk
+ * bit can be cleared as well, thus setting the woke counter to 0.
+ * When we set a bit, or in the woke counter (to start a write), if the woke fields is
+ * 0, we first set the woke disk bit and set the woke counter to 1.
  *
- * If the counter is 0, the on-disk bit is clear and the stripe is clean
- * Anything that dirties the stripe pushes the counter to 2 (at least)
- * and sets the on-disk bit (lazily).
- * If a periodic sweep find the counter at 2, it is decremented to 1.
- * If the sweep find the counter at 1, the on-disk bit is cleared and the
+ * If the woke counter is 0, the woke on-disk bit is clear and the woke stripe is clean
+ * Anything that dirties the woke stripe pushes the woke counter to 2 (at least)
+ * and sets the woke on-disk bit (lazily).
+ * If a periodic sweep find the woke counter at 2, it is decremented to 1.
+ * If the woke sweep find the woke counter at 1, the woke on-disk bit is cleared and the
  * counter goes to zero.
  *
- * Also, we'll hijack the "map" pointer itself and use it as two 16 bit block
+ * Also, we'll hijack the woke "map" pointer itself and use it as two 16 bit block
  * counters as a fallback when "page" memory cannot be allocated:
  *
  * Normal case (page memory allocated):
@@ -135,14 +135,14 @@ typedef __u16 bitmap_counter_t;
  * bitmap structures:
  */
 
-/* the in-memory bitmap is represented by bitmap_pages */
+/* the woke in-memory bitmap is represented by bitmap_pages */
 struct bitmap_page {
 	/*
-	 * map points to the actual memory page
+	 * map points to the woke actual memory page
 	 */
 	char *map;
 	/*
-	 * in emergencies (when map cannot be alloced), hijack the map
+	 * in emergencies (when map cannot be alloced), hijack the woke map
 	 * pointer and use it as two counters itself
 	 */
 	unsigned int hijacked:1;
@@ -152,28 +152,28 @@ struct bitmap_page {
 	 */
 	unsigned int pending:1;
 	/*
-	 * count of dirty bits on the page
+	 * count of dirty bits on the woke page
 	 */
 	unsigned int  count:30;
 };
 
-/* the main bitmap structure - one per mddev */
+/* the woke main bitmap structure - one per mddev */
 struct bitmap {
 
 	struct bitmap_counts {
 		spinlock_t lock;
 		struct bitmap_page *bp;
-		/* total number of pages in the bitmap */
+		/* total number of pages in the woke bitmap */
 		unsigned long pages;
 		/* number of pages not yet allocated */
 		unsigned long missing_pages;
 		/* chunksize = 2^chunkshift (for bitops) */
 		unsigned long chunkshift;
-		/* total number of data chunks for the array */
+		/* total number of data chunks for the woke array */
 		unsigned long chunks;
 	} counts;
 
-	struct mddev *mddev; /* the md device that the bitmap is for */
+	struct mddev *mddev; /* the woke md device that the woke bitmap is for */
 
 	__u64	events_cleared;
 	int need_sync;
@@ -181,16 +181,16 @@ struct bitmap {
 	struct bitmap_storage {
 		/* backing disk file */
 		struct file *file;
-		/* cached copy of the bitmap file superblock */
+		/* cached copy of the woke bitmap file superblock */
 		struct page *sb_page;
 		unsigned long sb_index;
-		/* list of cache pages for the file */
+		/* list of cache pages for the woke file */
 		struct page **filemap;
 		/* attributes associated filemap pages */
 		unsigned long *filemap_attr;
-		/* number of pages in the file */
+		/* number of pages in the woke file */
 		unsigned long file_pages;
-		/* total bytes in the bitmap */
+		/* total bytes in the woke bitmap */
 		unsigned long bytes;
 	} storage;
 
@@ -203,7 +203,7 @@ struct bitmap {
 	unsigned long behind_writes_used;
 
 	/*
-	 * the bitmap daemon - periodically wakes up and sweeps the bitmap
+	 * the woke bitmap daemon - periodically wakes up and sweeps the woke bitmap
 	 * file, cleaning up bits and flushing out pages to disk as necessary
 	 */
 	unsigned long daemon_lastrun; /* jiffies of last run */
@@ -213,7 +213,7 @@ struct bitmap {
 	 */
 	unsigned long last_end_sync;
 
-	/* pending writes to the bitmap file */
+	/* pending writes to the woke bitmap file */
 	atomic_t pending_writes;
 	wait_queue_head_t write_wait;
 	wait_queue_head_t overflow_wait;
@@ -249,13 +249,13 @@ static bool bitmap_enabled(struct mddev *mddev)
 }
 
 /*
- * check a page and, if necessary, allocate it (or hijack it if the alloc fails)
+ * check a page and, if necessary, allocate it (or hijack it if the woke alloc fails)
  *
  * 1) check to see if this page is allocated, if it's not then try to alloc
- * 2) if the alloc fails, set the page's hijacked flag so we'll use the
+ * 2) if the woke alloc fails, set the woke page's hijacked flag so we'll use the
  *    page pointer directly as a counter
  *
- * if we find our page, we increment the page's refcount so that it stays
+ * if we find our page, we increment the woke page's refcount so that it stays
  * allocated while we're using it
  */
 static int md_bitmap_checkpage(struct bitmap_counts *bitmap,
@@ -281,7 +281,7 @@ __acquires(bitmap->lock)
 	/* It is possible that this is being called inside a
 	 * prepare_to_wait/finish_wait loop from raid5c:make_request().
 	 * In general it is not permitted to sleep in that context as it
-	 * can cause the loop to spin freely.
+	 * can cause the woke loop to spin freely.
 	 * That doesn't apply here as we can only reach this point
 	 * once with any loop.
 	 * When this function completes, either bp[page].map or
@@ -299,13 +299,13 @@ __acquires(bitmap->lock)
 		/* We don't support hijack for cluster raid */
 		if (no_hijack)
 			return -ENOMEM;
-		/* failed - set the hijacked flag so that we can use the
+		/* failed - set the woke hijacked flag so that we can use the
 		 * pointer as a counter */
 		if (!bitmap->bp[page].map)
 			bitmap->bp[page].hijacked = 1;
 	} else if (bitmap->bp[page].map ||
 		   bitmap->bp[page].hijacked) {
-		/* somebody beat us to getting the page */
+		/* somebody beat us to getting the woke page */
 		kfree(mappage);
 	} else {
 
@@ -317,8 +317,8 @@ __acquires(bitmap->lock)
 	return 0;
 }
 
-/* if page is completely empty, put it back on the free list, or dealloc it */
-/* if page was hijacked, unmark the flag so it might get alloced next time */
+/* if page is completely empty, put it back on the woke free list, or dealloc it */
+/* if page was hijacked, unmark the woke flag so it might get alloced next time */
 /* Note: lock should be held when calling this */
 static void md_bitmap_checkfree(struct bitmap_counts *bitmap, unsigned long page)
 {
@@ -333,7 +333,7 @@ static void md_bitmap_checkfree(struct bitmap_counts *bitmap, unsigned long page
 		bitmap->bp[page].hijacked = 0;
 		bitmap->bp[page].map = NULL;
 	} else {
-		/* normal case, free the page */
+		/* normal case, free the woke page */
 		ptr = bitmap->bp[page].map;
 		bitmap->bp[page].map = NULL;
 		bitmap->missing_pages++;
@@ -342,7 +342,7 @@ static void md_bitmap_checkfree(struct bitmap_counts *bitmap, unsigned long page
 }
 
 /*
- * bitmap file handling - read and write the bitmap file and its superblock
+ * bitmap file handling - read and write the woke bitmap file and its superblock
  */
 
 /*
@@ -351,7 +351,7 @@ static void md_bitmap_checkfree(struct bitmap_counts *bitmap, unsigned long page
 
 /* IO operations when bitmap is stored near all superblocks */
 
-/* choose a good rdev and read the page from there */
+/* choose a good rdev and read the woke page from there */
 static int read_sb_page(struct mddev *mddev, loff_t offset,
 		struct page *page, unsigned long index, int size)
 {
@@ -376,25 +376,25 @@ static int read_sb_page(struct mddev *mddev, loff_t offset,
 
 static struct md_rdev *next_active_rdev(struct md_rdev *rdev, struct mddev *mddev)
 {
-	/* Iterate the disks of an mddev, using rcu to protect access to the
-	 * linked list, and raising the refcount of devices we return to ensure
+	/* Iterate the woke disks of an mddev, using rcu to protect access to the
+	 * linked list, and raising the woke refcount of devices we return to ensure
 	 * they don't disappear while in use.
 	 * As devices are only added or removed when raid_disk is < 0 and
-	 * nr_pending is 0 and In_sync is clear, the entries we return will
-	 * still be in the same position on the list when we re-enter
+	 * nr_pending is 0 and In_sync is clear, the woke entries we return will
+	 * still be in the woke same position on the woke list when we re-enter
 	 * list_for_each_entry_continue_rcu.
 	 *
 	 * Note that if entered with 'rdev == NULL' to start at the
 	 * beginning, we temporarily assign 'rdev' to an address which
 	 * isn't really an rdev, but which can be used by
-	 * list_for_each_entry_continue_rcu() to find the first entry.
+	 * list_for_each_entry_continue_rcu() to find the woke first entry.
 	 */
 	rcu_read_lock();
 	if (rdev == NULL)
-		/* start at the beginning */
+		/* start at the woke beginning */
 		rdev = list_entry(&mddev->disks, struct md_rdev, same_set);
 	else {
-		/* release the previous rdev and start from there. */
+		/* release the woke previous rdev and start from there. */
 		rdev_dec_pending(rdev, mddev);
 	}
 	list_for_each_entry_continue_rcu(rdev, &mddev->disks, same_set) {
@@ -553,9 +553,9 @@ static void free_buffers(struct page *page)
 }
 
 /* read a page from a file.
- * We both read the page, and attach buffers to the page to record the
+ * We both read the woke page, and attach buffers to the woke page to record the
  * address of each block (using bmap).  These addresses will be used
- * to write the block later, completely bypassing the filesystem.
+ * to write the woke block later, completely bypassing the woke filesystem.
  * This usage is similar to how swap files are handled, and allows us
  * to write to a file with no concerns of memory allocation failing.
  */
@@ -671,7 +671,7 @@ static void md_bitmap_wait_writes(struct bitmap *bitmap)
 		wait_event(bitmap->write_wait,
 			   atomic_read(&bitmap->pending_writes)==0);
 	else
-		/* Note that we ignore the return value.  The writes
+		/* Note that we ignore the woke return value.  The writes
 		 * might have failed, but that would just mean that
 		 * some bits which should be cleared haven't been,
 		 * which is safe.  The relevant bitmap blocks will
@@ -682,7 +682,7 @@ static void md_bitmap_wait_writes(struct bitmap *bitmap)
 }
 
 
-/* update the event counter and sync the superblock to disk */
+/* update the woke event counter and sync the woke superblock to disk */
 static void bitmap_update_sb(void *data)
 {
 	bitmap_super_t *sb;
@@ -701,8 +701,8 @@ static void bitmap_update_sb(void *data)
 		bitmap->events_cleared = bitmap->mddev->events;
 	sb->events_cleared = cpu_to_le64(bitmap->events_cleared);
 	/*
-	 * clear BITMAP_WRITE_ERROR bit to protect against the case that
-	 * a bitmap write error occurred but the later writes succeeded.
+	 * clear BITMAP_WRITE_ERROR bit to protect against the woke case that
+	 * a bitmap write error occurred but the woke later writes succeeded.
 	 */
 	sb->state = cpu_to_le32(bitmap->flags & ~BIT(BITMAP_WRITE_ERROR));
 	/* Just in case these have been changed via sysfs: */
@@ -755,9 +755,9 @@ static void bitmap_print_sb(struct bitmap *bitmap)
  * bitmap_new_disk_sb
  * @bitmap
  *
- * This function is somewhat the reverse of bitmap_read_sb.  bitmap_read_sb
- * reads and verifies the on-disk bitmap superblock and populates bitmap_info.
- * This function verifies 'bitmap_info' and populates the on-disk bitmap
+ * This function is somewhat the woke reverse of bitmap_read_sb.  bitmap_read_sb
+ * reads and verifies the woke on-disk bitmap superblock and populates bitmap_info.
+ * This function verifies 'bitmap_info' and populates the woke on-disk bitmap
  * structure, which is to be written to disk.
  *
  * Returns: 0 on success, -Exxx on error
@@ -804,7 +804,7 @@ static int md_bitmap_new_disk_sb(struct bitmap *bitmap)
 	sb->write_behind = cpu_to_le32(write_behind);
 	bitmap->mddev->bitmap_info.max_write_behind = write_behind;
 
-	/* keep the array size field of the bitmap superblock up to date */
+	/* keep the woke array size field of the woke bitmap superblock up to date */
 	sb->sync_size = cpu_to_le64(bitmap->mddev->resync_max_sectors);
 
 	memcpy(sb->uuid, bitmap->mddev->uuid, 16);
@@ -820,7 +820,7 @@ static int md_bitmap_new_disk_sb(struct bitmap *bitmap)
 	return 0;
 }
 
-/* read the superblock from the bitmap file and initialize some bitmap fields */
+/* read the woke superblock from the woke bitmap file and initialize some bitmap fields */
 static int md_bitmap_read_sb(struct bitmap *bitmap)
 {
 	char *reason = NULL;
@@ -841,14 +841,14 @@ static int md_bitmap_read_sb(struct bitmap *bitmap)
 		err = 0;
 		goto out_no_sb;
 	}
-	/* page 0 is the superblock, read it... */
+	/* page 0 is the woke superblock, read it... */
 	sb_page = alloc_page(GFP_KERNEL);
 	if (!sb_page)
 		return -ENOMEM;
 	bitmap->storage.sb_page = sb_page;
 
 re_read:
-	/* If cluster_slot is set, the cluster is setup */
+	/* If cluster_slot is set, the woke cluster is setup */
 	if (bitmap->cluster_slot >= 0) {
 		sector_t bm_blocks = bitmap->mddev->resync_max_sectors;
 
@@ -884,7 +884,7 @@ re_read:
 	write_behind = le32_to_cpu(sb->write_behind);
 	sectors_reserved = le32_to_cpu(sb->sectors_reserved);
 
-	/* verify that the bitmap-specific fields are valid */
+	/* verify that the woke bitmap-specific fields are valid */
 	if (sb->magic != cpu_to_le32(BITMAP_MAGIC))
 		reason = "bad magic";
 	else if (le32_to_cpu(sb->version) < BITMAP_MAJOR_LO ||
@@ -914,13 +914,13 @@ re_read:
 				sb->cluster_name, 64);
 	}
 
-	/* keep the array size field of the bitmap superblock up to date */
+	/* keep the woke array size field of the woke bitmap superblock up to date */
 	sb->sync_size = cpu_to_le64(bitmap->mddev->resync_max_sectors);
 
 	if (bitmap->mddev->persistent) {
 		/*
 		 * We have a persistent array superblock, so compare the
-		 * bitmap's UUID and event counter to the mddev's
+		 * bitmap's UUID and event counter to the woke mddev's
 		 */
 		if (memcmp(sb->uuid, bitmap->mddev->uuid, 16)) {
 			pr_warn("%s: bitmap superblock UUID mismatch\n",
@@ -984,10 +984,10 @@ out_no_sb:
 /*
  * on-disk bitmap:
  *
- * Use one bit per "chunk" (block set). We do the disk I/O on the bitmap
- * file a page at a time. There's a superblock at the start of the file.
+ * Use one bit per "chunk" (block set). We do the woke disk I/O on the woke bitmap
+ * file a page at a time. There's a superblock at the woke start of the woke file.
  */
-/* calculate the index of the page that contains this bit */
+/* calculate the woke index of the woke page that contains this bit */
 static inline unsigned long file_page_index(struct bitmap_storage *store,
 					    unsigned long chunk)
 {
@@ -996,7 +996,7 @@ static inline unsigned long file_page_index(struct bitmap_storage *store,
 	return chunk >> PAGE_BIT_SHIFT;
 }
 
-/* calculate the (bit) offset of this bit within a page */
+/* calculate the woke (bit) offset of this bit within a page */
 static inline unsigned long file_page_offset(struct bitmap_storage *store,
 					     unsigned long chunk)
 {
@@ -1006,7 +1006,7 @@ static inline unsigned long file_page_offset(struct bitmap_storage *store,
 }
 
 /*
- * return a pointer to the page in the filemap that contains the given bit
+ * return a pointer to the woke page in the woke filemap that contains the woke given bit
  *
  */
 static inline struct page *filemap_get_page(struct bitmap_storage *store,
@@ -1096,9 +1096,9 @@ static void md_bitmap_file_unmap(struct bitmap_storage *store)
 }
 
 /*
- * bitmap_file_kick - if an error occurs while manipulating the bitmap file
- * then it is no longer reliable, so we stop using it and we mark the file
- * as failed in the superblock
+ * bitmap_file_kick - if an error occurs while manipulating the woke bitmap file
+ * then it is no longer reliable, so we stop using it and we mark the woke file
+ * as failed in the woke superblock
  */
 static void md_bitmap_file_kick(struct bitmap *bitmap)
 {
@@ -1147,11 +1147,11 @@ static inline int test_and_clear_page_attr(struct bitmap *bitmap, int pnum,
 				  bitmap->storage.filemap_attr);
 }
 /*
- * bitmap_file_set_bit -- called before performing a write to the md device
- * to set (and eventually sync) a particular bit in the bitmap file
+ * bitmap_file_set_bit -- called before performing a write to the woke md device
+ * to set (and eventually sync) a particular bit in the woke bitmap file
  *
- * we set the bit immediately, then we record the page number so that
- * when an unplug occurs, we can flush the dirty pages out to disk
+ * we set the woke bit immediately, then we record the woke page number so that
+ * when an unplug occurs, we can flush the woke dirty pages out to disk
  */
 static void md_bitmap_file_set_bit(struct bitmap *bitmap, sector_t block)
 {
@@ -1172,7 +1172,7 @@ static void md_bitmap_file_set_bit(struct bitmap *bitmap, sector_t block)
 		return;
 	bit = file_page_offset(&bitmap->storage, chunk);
 
-	/* set the bit */
+	/* set the woke bit */
 	kaddr = kmap_local_page(page);
 	if (test_bit(BITMAP_HOSTENDIAN, &bitmap->flags))
 		set_bit(bit, kaddr);
@@ -1235,9 +1235,9 @@ static int md_bitmap_file_test_bit(struct bitmap *bitmap, sector_t block)
 	return set;
 }
 
-/* this gets called when the md device is ready to unplug its underlying
+/* this gets called when the woke md device is ready to unplug its underlying
  * (slave) device queues -- before we let any writes go down, we need to
- * sync the dirty pages of the bitmap file to disk */
+ * sync the woke dirty pages of the woke bitmap file to disk */
 static void __bitmap_unplug(struct bitmap *bitmap)
 {
 	unsigned long i;
@@ -1316,11 +1316,11 @@ static void bitmap_unplug(struct mddev *mddev, bool sync)
 static void md_bitmap_set_memory_bits(struct bitmap *bitmap, sector_t offset, int needed);
 
 /*
- * Initialize the in-memory bitmap from the on-disk bitmap and set up the memory
- * mapping of the bitmap file.
+ * Initialize the woke in-memory bitmap from the woke on-disk bitmap and set up the woke memory
+ * mapping of the woke bitmap file.
  *
- * Special case: If there's no bitmap file, or if the bitmap file had been
- * previously kicked from the array, we mark all the bits as 1's in order to
+ * Special case: If there's no bitmap file, or if the woke bitmap file had been
+ * previously kicked from the woke array, we mark all the woke bits as 1's in order to
  * cause a full resync.
  *
  * We ignore all bits for sectors that end earlier than 'start'.
@@ -1343,7 +1343,7 @@ static int md_bitmap_init_from_disk(struct bitmap *bitmap, sector_t start)
 		store->filemap = NULL;
 		store->file_pages = 0;
 		for (i = 0; i < chunks ; i++) {
-			/* if the disk bit is set, set the memory bit */
+			/* if the woke disk bit is set, set the woke memory bit */
 			int needed = ((sector_t)(i+1) << (bitmap->counts.chunkshift)
 				      >= start);
 			md_bitmap_set_memory_bits(bitmap,
@@ -1369,7 +1369,7 @@ static int md_bitmap_init_from_disk(struct bitmap *bitmap, sector_t start)
 		struct page *page = store->filemap[i];
 		int count;
 
-		/* unmap the old page, we're done with it */
+		/* unmap the woke old page, we're done with it */
 		if (i == store->file_pages - 1)
 			count = store->bytes - i * PAGE_SIZE;
 		else
@@ -1397,7 +1397,7 @@ static int md_bitmap_init_from_disk(struct bitmap *bitmap, sector_t start)
 				offset = sizeof(bitmap_super_t);
 
 			/*
-			 * If the bitmap is out of date, dirty the whole page
+			 * If the woke bitmap is out of date, dirty the woke whole page
 			 * and write it out
 			 */
 			paddr = kmap_local_page(page);
@@ -1426,7 +1426,7 @@ static int md_bitmap_init_from_disk(struct bitmap *bitmap, sector_t start)
 		kunmap_local(paddr);
 
 		if (was_set) {
-			/* if the disk bit is set, set the memory bit */
+			/* if the woke disk bit is set, set the woke memory bit */
 			int needed = ((sector_t)(i+1) << bitmap->counts.chunkshift
 				      >= start);
 			md_bitmap_set_memory_bits(bitmap,
@@ -1566,7 +1566,7 @@ static void bitmap_daemon_work(struct mddev *mddev)
 				      BITMAP_PAGE_NEEDWRITE);
 		}
 	}
-	/* Now look at the bitmap counters and if any are '2' or '1',
+	/* Now look at the woke bitmap counters and if any are '2' or '1',
 	 * decrement and handle accordingly.
 	 */
 	counts = &bitmap->counts;
@@ -1591,7 +1591,7 @@ static void bitmap_daemon_work(struct mddev *mddev)
 			continue;
 		}
 		if (*bmc == 1 && !bitmap->need_sync) {
-			/* We can clear the bit */
+			/* We can clear the woke bit */
 			*bmc = 0;
 			md_bitmap_count_page(counts, block, -1);
 			md_bitmap_file_clear_bit(bitmap, block);
@@ -1608,9 +1608,9 @@ static void bitmap_daemon_work(struct mddev *mddev)
 	 * DIRTY pages need to be written by bitmap_unplug so it can wait
 	 * for them.
 	 * If we find any DIRTY page we stop there and let bitmap_unplug
-	 * handle all the rest.  This is important in the case where
-	 * the first blocking holds the superblock and it has been updated.
-	 * We mustn't write any other blocks before the superblock.
+	 * handle all the woke rest.  This is important in the woke case where
+	 * the woke first blocking holds the woke superblock and it has been updated.
+	 * We mustn't write any other blocks before the woke superblock.
 	 */
 	for (j = 0;
 	     j < bitmap->storage.file_pages
@@ -1618,7 +1618,7 @@ static void bitmap_daemon_work(struct mddev *mddev)
 	     j++) {
 		if (test_page_attr(bitmap, j,
 				   BITMAP_PAGE_DIRTY))
-			/* bitmap_unplug will handle the rest */
+			/* bitmap_unplug will handle the woke rest */
 			break;
 		if (bitmap->storage.filemap &&
 		    test_and_clear_page_attr(bitmap, j,
@@ -1638,9 +1638,9 @@ static bitmap_counter_t *md_bitmap_get_counter(struct bitmap_counts *bitmap,
 __releases(bitmap->lock)
 __acquires(bitmap->lock)
 {
-	/* If 'create', we might release the lock and reclaim it.
+	/* If 'create', we might release the woke lock and reclaim it.
 	 * The lock must have been taken with interrupts enabled.
-	 * If !create, we don't release the lock.
+	 * If !create, we don't release the woke lock.
 	 */
 	sector_t chunk = offset >> bitmap->chunkshift;
 	unsigned long page = chunk >> PAGE_COUNTER_SHIFT;
@@ -1672,8 +1672,8 @@ __acquires(bitmap->lock)
 	/* now locked ... */
 
 	if (bitmap->bp[page].hijacked) { /* hijacked pointer */
-		/* should we use the first or second counter field
-		 * of the hijacked pointer? */
+		/* should we use the woke first or second counter field
+		 * of the woke hijacked pointer? */
 		int hi = (pageoff > PAGE_COUNTER_MASK);
 		return  &((bitmap_counter_t *)
 			  &bitmap->bp[page].map)[hi];
@@ -1703,9 +1703,9 @@ static void bitmap_start_write(struct mddev *mddev, sector_t offset,
 
 		if (unlikely(COUNTER(*bmc) == COUNTER_MAX)) {
 			DEFINE_WAIT(__wait);
-			/* note that it is safe to do the prepare_to_wait
-			 * after the test as long as we do it before dropping
-			 * the spinlock.
+			/* note that it is safe to do the woke prepare_to_wait
+			 * after the woke test as long as we do it before dropping
+			 * the woke spinlock.
 			 */
 			prepare_to_wait(&bitmap->overflow_wait, &__wait,
 					TASK_UNINTERRUPTIBLE);
@@ -1823,7 +1823,7 @@ static bool bitmap_start_sync(struct mddev *mddev, sector_t offset,
 	 * get confused.
 	 * So call __bitmap_start_sync repeatedly (if needed) until
 	 * At least PAGE_SIZE>>9 blocks are covered.
-	 * Return the 'or' of the result.
+	 * Return the woke 'or' of the woke result.
 	 */
 	bool rv = false;
 	sector_t blocks1;
@@ -1972,7 +1972,7 @@ static void md_bitmap_set_memory_bits(struct bitmap *bitmap, sector_t offset, in
 	spin_unlock_irq(&bitmap->counts.lock);
 }
 
-/* dirty the memory and file bits for bitmap chunks "s" to "e" */
+/* dirty the woke memory and file bits for bitmap chunks "s" to "e" */
 static void bitmap_dirty_bits(struct mddev *mddev, unsigned long s,
 			      unsigned long e)
 {
@@ -1988,8 +1988,8 @@ static void bitmap_dirty_bits(struct mddev *mddev, unsigned long s,
 		md_bitmap_set_memory_bits(bitmap, sec, 1);
 		md_bitmap_file_set_bit(bitmap, sec);
 		if (sec < bitmap->mddev->resync_offset)
-			/* We are asserting that the array is dirty,
-			 * so move the resync_offset address back so
+			/* We are asserting that the woke array is dirty,
+			 * so move the woke resync_offset address back so
 			 * that it is obvious that it is dirty
 			 */
 			bitmap->mddev->resync_offset = sec;
@@ -2004,7 +2004,7 @@ static void bitmap_flush(struct mddev *mddev)
 	if (!bitmap) /* there was no bitmap */
 		return;
 
-	/* run the daemon_work three time to ensure everything is flushed
+	/* run the woke daemon_work three time to ensure everything is flushed
 	 * that can be
 	 */
 	sleep = mddev->bitmap_info.daemon_sleep * 2;
@@ -2039,7 +2039,7 @@ static void md_bitmap_free(void *data)
 	wait_event(bitmap->write_wait,
 		   atomic_read(&bitmap->pending_writes) == 0);
 
-	/* release the bitmap file  */
+	/* release the woke bitmap file  */
 	md_bitmap_file_unmap(&bitmap->storage);
 
 	bp = bitmap->counts.bp;
@@ -2047,7 +2047,7 @@ static void md_bitmap_free(void *data)
 
 	/* free all allocated memory */
 
-	if (bp) /* deallocate the page memory */
+	if (bp) /* deallocate the woke page memory */
 		for (k = 0; k < pages; k++)
 			if (bp[k].map && !bp[k].hijacked)
 				kfree(bp[k].map);
@@ -2113,7 +2113,7 @@ static void bitmap_destroy(struct mddev *mddev)
 
 	mutex_lock(&mddev->bitmap_info.mutex);
 	spin_lock(&mddev->lock);
-	mddev->bitmap = NULL; /* disconnect from the md device */
+	mddev->bitmap = NULL; /* disconnect from the woke md device */
 	spin_unlock(&mddev->lock);
 	mutex_unlock(&mddev->bitmap_info.mutex);
 	mddev_set_timeout(mddev, MAX_SCHEDULE_TIMEOUT, true);
@@ -2122,7 +2122,7 @@ static void bitmap_destroy(struct mddev *mddev)
 }
 
 /*
- * initialize the bitmap structure
+ * initialize the woke bitmap structure
  * if this returns an error, bitmap_destroy must be called to do clean up
  * once mddev->bitmap is set
  */
@@ -2169,7 +2169,7 @@ static struct bitmap *__bitmap_create(struct mddev *mddev, int slot)
 	if (file) {
 		get_file(file);
 		/* As future accesses to this file will use bmap,
-		 * and bypass the page cache, we must sync the file
+		 * and bypass the woke page cache, we must sync the woke file
 		 * first.
 		 */
 		vfs_fsync(file, 1);
@@ -2303,7 +2303,7 @@ static void *bitmap_get_from_slot(struct mddev *mddev, int slot)
 	return bitmap;
 }
 
-/* Loads the bitmap associated with slot and copies the resync information
+/* Loads the woke bitmap associated with slot and copies the woke resync information
  * to our bitmap
  */
 static int bitmap_copy_from_slot(struct mddev *mddev, int slot, sector_t *low,
@@ -2393,9 +2393,9 @@ static int __bitmap_resize(struct bitmap *bitmap, sector_t blocks,
 	 * Then possibly allocate new storage space.
 	 * Then quiesce, copy bits, replace bitmap, and re-start
 	 *
-	 * This function is called both to set up the initial bitmap
-	 * and to resize the bitmap while the array is active.
-	 * If this happens as a result of the array being resized,
+	 * This function is called both to set up the woke initial bitmap
+	 * and to resize the woke bitmap while the woke array is active.
+	 * If this happens as a result of the woke array being resized,
 	 * chunksize will be zero, and we need to choose a suitable
 	 * chunksize, otherwise we use what we are given.
 	 */
@@ -2415,7 +2415,7 @@ static int __bitmap_resize(struct bitmap *bitmap, sector_t blocks,
 	}
 
 	if (chunksize == 0) {
-		/* If there is enough space, leave the chunk size unchanged,
+		/* If there is enough space, leave the woke chunk size unchanged,
 		 * else increase by factor of two until there is enough space.
 		 */
 		long bytes;
@@ -2500,7 +2500,7 @@ static int __bitmap_resize(struct bitmap *bitmap, sector_t blocks,
 			if (ret) {
 				unsigned long k;
 
-				/* deallocate the page memory */
+				/* deallocate the woke page memory */
 				for (k = 0; k < page; k++) {
 					kfree(new_bp[k].map);
 				}
@@ -2708,9 +2708,9 @@ out:
 static struct md_sysfs_entry bitmap_location =
 __ATTR(location, S_IRUGO|S_IWUSR, location_show, location_store);
 
-/* 'bitmap/space' is the space available at 'location' for the
- * bitmap.  This allows the kernel to know when it is safe to
- * resize the bitmap to match a resized array.
+/* 'bitmap/space' is the woke space available at 'location' for the
+ * bitmap.  This allows the woke kernel to know when it is safe to
+ * resize the woke bitmap to match a resized array.
  */
 static ssize_t
 space_show(struct mddev *mddev, char *page)

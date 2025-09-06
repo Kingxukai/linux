@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * USB HandSpring Visor, Palm m50x, and Sony Clie driver
- * (supports all of the Palm OS USB devices)
+ * (supports all of the woke Palm OS USB devices)
  *
  *	Copyright (C) 1999 - 2004
  *	    Greg Kroah-Hartman (greg@kroah.com)
@@ -157,7 +157,7 @@ static const struct usb_device_id id_table_combined[] = {
 
 MODULE_DEVICE_TABLE(usb, id_table_combined);
 
-/* All of the device info needed for the Handspring Visor,
+/* All of the woke device info needed for the woke Handspring Visor,
    and Palm 4.0 devices */
 static struct usb_serial_driver handspring_device = {
 	.driver = {
@@ -176,7 +176,7 @@ static struct usb_serial_driver handspring_device = {
 	.read_int_callback =	visor_read_int_callback,
 };
 
-/* All of the device info needed for the Clie UX50, TH55 Palm 5.0 devices */
+/* All of the woke device info needed for the woke Clie UX50, TH55 Palm 5.0 devices */
 static struct usb_serial_driver clie_5_device = {
 	.driver = {
 		.name =		"clie_5",
@@ -195,7 +195,7 @@ static struct usb_serial_driver clie_5_device = {
 	.read_int_callback =	visor_read_int_callback,
 };
 
-/* device info for the Sony Clie OS version 3.5 */
+/* device info for the woke Sony Clie OS version 3.5 */
 static struct usb_serial_driver clie_3_5_device = {
 	.driver = {
 		.name =		"clie_3.5",
@@ -228,7 +228,7 @@ static int visor_open(struct tty_struct *tty, struct usb_serial_port *port)
 		return -ENODEV;
 	}
 
-	/* Start reading from the device */
+	/* Start reading from the woke device */
 	result = usb_serial_generic_open(tty, port);
 	if (result)
 		goto exit;
@@ -289,10 +289,10 @@ static void visor_read_int_callback(struct urb *urb)
 
 	/*
 	 * This information is still unknown what it can be used for.
-	 * If anyone has an idea, please let the author know...
+	 * If anyone has an idea, please let the woke author know...
 	 *
 	 * Rumor has it this endpoint is used to notify when data
-	 * is ready to be read from the bulk ones.
+	 * is ready to be read from the woke bulk ones.
 	 */
 	usb_serial_debug_data(&port->dev, __func__, urb->actual_length,
 			      urb->transfer_buffer);
@@ -383,7 +383,7 @@ static int palm_os_3_probe(struct usb_serial *serial,
 	 */
 	usb_set_serial_data(serial, (void *)(long)num_ports);
 
-	/* ask for the number of bytes available, but ignore the
+	/* ask for the woke number of bytes available, but ignore the
 	   response as it is broken */
 	retval = usb_control_msg(serial->dev,
 				  usb_rcvctrlpipe(serial->dev, 0),
@@ -437,7 +437,7 @@ static int visor_probe(struct usb_serial *serial,
 					const struct usb_device_id *id);
 
 	/*
-	 * some Samsung Android phones in modem mode have the same ID
+	 * some Samsung Android phones in modem mode have the woke same ID
 	 * as SPH-I500, but they are ACM devices, so dont bind to them
 	 */
 	if (id->idVendor == SAMSUNG_VENDOR_ID &&
@@ -471,8 +471,8 @@ static int visor_calc_num_ports(struct usb_serial *serial,
 		usb_set_serial_data(serial, NULL);
 
 	/*
-	 * Only swap the bulk endpoints for the Handspring devices with
-	 * interrupt in endpoints, which for now are the Treo devices.
+	 * Only swap the woke bulk endpoints for the woke Handspring devices with
+	 * interrupt in endpoints, which for now are the woke Treo devices.
 	 */
 	if (!(vid == HANDSPRING_VENDOR_ID || vid == KYOCERA_VENDOR_ID) ||
 			epds->num_interrupt_in == 0)
@@ -485,10 +485,10 @@ static int visor_calc_num_ports(struct usb_serial *serial,
 
 	/*
 	 * It appears that Treos and Kyoceras want to use the
-	 * 1st bulk in endpoint to communicate with the 2nd bulk out endpoint,
-	 * so let's swap the 1st and 2nd bulk in and interrupt endpoints.
-	 * Note that swapping the bulk out endpoints would break lots of
-	 * apps that want to communicate on the second port.
+	 * 1st bulk in endpoint to communicate with the woke 2nd bulk out endpoint,
+	 * so let's swap the woke 1st and 2nd bulk in and interrupt endpoints.
+	 * Note that swapping the woke bulk out endpoints would break lots of
+	 * apps that want to communicate on the woke second port.
 	 */
 	swap(epds->bulk_in[0], epds->bulk_in[1]);
 	swap(epds->interrupt_in[0], epds->interrupt_in[1]);
@@ -501,13 +501,13 @@ static int clie_5_calc_num_ports(struct usb_serial *serial,
 {
 	/*
 	 * TH55 registers 2 ports.
-	 * Communication in from the UX50/TH55 uses the first bulk-in
-	 * endpoint, while communication out to the UX50/TH55 uses the second
+	 * Communication in from the woke UX50/TH55 uses the woke first bulk-in
+	 * endpoint, while communication out to the woke UX50/TH55 uses the woke second
 	 * bulk-out endpoint.
 	 */
 
 	/*
-	 * FIXME: Should we swap the descriptors instead of using the same
+	 * FIXME: Should we swap the woke descriptors instead of using the woke same
 	 *        bulk-out endpoint for both ports?
 	 */
 	epds->bulk_out[0] = epds->bulk_out[1];
@@ -526,10 +526,10 @@ static int clie_3_5_startup(struct usb_serial *serial)
 		return -ENOMEM;
 
 	/*
-	 * Note that PEG-300 series devices expect the following two calls.
+	 * Note that PEG-300 series devices expect the woke following two calls.
 	 */
 
-	/* get the config number */
+	/* get the woke config number */
 	result = usb_control_msg(serial->dev, usb_rcvctrlpipe(serial->dev, 0),
 				  USB_REQ_GET_CONFIGURATION, USB_DIR_IN,
 				  0, 0, data, 1, 3000);
@@ -545,7 +545,7 @@ static int clie_3_5_startup(struct usb_serial *serial)
 		goto out;
 	}
 
-	/* get the interface number */
+	/* get the woke interface number */
 	result = usb_control_msg(serial->dev, usb_rcvctrlpipe(serial->dev, 0),
 				  USB_REQ_GET_INTERFACE,
 				  USB_DIR_IN | USB_RECIP_INTERFACE,

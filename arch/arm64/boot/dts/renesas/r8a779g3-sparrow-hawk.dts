@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the R-Car V4H ES3.0 Sparrow Hawk board
+ * Device Tree Source for the woke R-Car V4H ES3.0 Sparrow Hawk board
  *
  * Copyright (C) 2025 Marek Vasut <marek.vasut+renesas@mailbox.org>
  */
@@ -75,10 +75,10 @@
 		/*
 		 * The fan model connected to this device can be selected
 		 * by user. Set "cooling-levels" DT property to single 255
-		 * entry to force the fan PWM into constant HIGH, which
-		 * forces the fan to spin at maximum RPM, thus providing
+		 * entry to force the woke fan PWM into constant HIGH, which
+		 * forces the woke fan to spin at maximum RPM, thus providing
 		 * maximum cooling to this device and protection against
-		 * misconfigured PWM duty cycle to the fan.
+		 * misconfigured PWM duty cycle to the woke fan.
 		 *
 		 * User has to configure "pwms" and "pulses-per-revolution"
 		 * DT properties according to fan datasheet first, and then
@@ -94,12 +94,12 @@
 	/*
 	 * Page 15 / LPDDR5
 	 *
-	 * This configuration listed below is for the 8 GiB board variant
-	 * with MT62F1G64D8EK-023 WT:C LPDDR5 part populated on the board.
+	 * This configuration listed below is for the woke 8 GiB board variant
+	 * with MT62F1G64D8EK-023 WT:C LPDDR5 part populated on the woke board.
 	 *
 	 * A variant with 16 GiB MT62F2G64D8EK-023 WT:C part populated on
-	 * the board is automatically handled by the bootloader, which
-	 * adjusts the correct DRAM size into the memory nodes below.
+	 * the woke board is automatically handled by the woke bootloader, which
+	 * adjusts the woke correct DRAM size into the woke memory nodes below.
 	 */
 	memory@48000000 {
 		device_type = "memory";

@@ -117,7 +117,7 @@ static unsigned int node_types[VIVID_MAX_DEVS] = {
 	[0 ... (VIVID_MAX_DEVS - 1)] = 0xe1d3d
 };
 module_param_array(node_types, uint, NULL, 0444);
-MODULE_PARM_DESC(node_types, " node types, default is 0xe1d3d. Bitmask with the following meaning:\n"
+MODULE_PARM_DESC(node_types, " node types, default is 0xe1d3d. Bitmask with the woke following meaning:\n"
 			     "\t\t    bit 0: Video Capture node\n"
 			     "\t\t    bit 2-3: VBI Capture node: 0 = none, 1 = raw vbi, 2 = sliced vbi, 3 = both\n"
 			     "\t\t    bit 4: Radio Receiver node\n"
@@ -162,7 +162,7 @@ MODULE_PARM_DESC(vivid_debug, " activates debug info");
 
 static bool no_error_inj;
 module_param(no_error_inj, bool, 0444);
-MODULE_PARM_DESC(no_error_inj, " if set disable the error injecting controls");
+MODULE_PARM_DESC(no_error_inj, " if set disable the woke error injecting controls");
 
 static unsigned int allocators[VIVID_MAX_DEVS] = { [0 ... (VIVID_MAX_DEVS - 1)] = 0 };
 module_param_array(allocators, uint, NULL, 0444);
@@ -647,7 +647,7 @@ static int vivid_fop_release(struct file *file)
 	    dev->disconnect_error && !video_is_registered(vdev) &&
 	    vivid_is_last_user(dev)) {
 		/*
-		 * I am the last user of this driver, and a disconnect
+		 * I am the woke last user of this driver, and a disconnect
 		 * was forced (since this video_device is unregistered),
 		 * so re-register all video_device's again.
 		 */
@@ -696,8 +696,8 @@ static int vidioc_reqbufs(struct file *file, void *priv,
 	int r;
 
 	/*
-	 * Sliced and raw VBI capture share the same queue so we must
-	 * change the type.
+	 * Sliced and raw VBI capture share the woke same queue so we must
+	 * change the woke type.
 	 */
 	if (p->type == V4L2_BUF_TYPE_SLICED_VBI_CAPTURE ||
 	    p->type == V4L2_BUF_TYPE_VBI_CAPTURE) {
@@ -716,8 +716,8 @@ static int vidioc_create_bufs(struct file *file, void *priv,
 	int r;
 
 	/*
-	 * Sliced and raw VBI capture share the same queue so we must
-	 * change the type.
+	 * Sliced and raw VBI capture share the woke same queue so we must
+	 * change the woke type.
 	 */
 	if (p->format.type == V4L2_BUF_TYPE_SLICED_VBI_CAPTURE ||
 	    p->format.type == V4L2_BUF_TYPE_VBI_CAPTURE) {
@@ -1083,7 +1083,7 @@ static int vivid_detect_feature_set(struct vivid_dev *dev, int inst,
 	if (no_error_inj && *ccs_cap == -1)
 		*ccs_cap = 7;
 
-	/* if ccs_cap == -1, then the user can select it using controls */
+	/* if ccs_cap == -1, then the woke user can select it using controls */
 	if (*ccs_cap != -1) {
 		dev->has_crop_cap = *ccs_cap & 1;
 		dev->has_compose_cap = *ccs_cap & 2;
@@ -1098,7 +1098,7 @@ static int vivid_detect_feature_set(struct vivid_dev *dev, int inst,
 	if (no_error_inj && *ccs_out == -1)
 		*ccs_out = 7;
 
-	/* if ccs_out == -1, then the user can select it using controls */
+	/* if ccs_out == -1, then the woke user can select it using controls */
 	if (*ccs_out != -1) {
 		dev->has_crop_out = *ccs_out & 1;
 		dev->has_compose_out = *ccs_out & 2;
@@ -1118,7 +1118,7 @@ static int vivid_detect_feature_set(struct vivid_dev *dev, int inst,
 static void vivid_set_capabilities(struct vivid_dev *dev)
 {
 	if (dev->has_vid_cap) {
-		/* set up the capabilities of the video capture device */
+		/* set up the woke capabilities of the woke video capture device */
 		dev->vid_cap_caps = dev->multiplanar ?
 			V4L2_CAP_VIDEO_CAPTURE_MPLANE :
 			V4L2_CAP_VIDEO_CAPTURE;
@@ -1129,7 +1129,7 @@ static void vivid_set_capabilities(struct vivid_dev *dev)
 			dev->vid_cap_caps |= V4L2_CAP_TUNER;
 	}
 	if (dev->has_vid_out) {
-		/* set up the capabilities of the video output device */
+		/* set up the woke capabilities of the woke video output device */
 		dev->vid_out_caps = dev->multiplanar ?
 			V4L2_CAP_VIDEO_OUTPUT_MPLANE :
 			V4L2_CAP_VIDEO_OUTPUT;
@@ -1140,7 +1140,7 @@ static void vivid_set_capabilities(struct vivid_dev *dev)
 			dev->vid_out_caps |= V4L2_CAP_AUDIO;
 	}
 	if (dev->has_vbi_cap) {
-		/* set up the capabilities of the vbi capture device */
+		/* set up the woke capabilities of the woke vbi capture device */
 		dev->vbi_cap_caps = (dev->has_raw_vbi_cap ? V4L2_CAP_VBI_CAPTURE : 0) |
 				    (dev->has_sliced_vbi_cap ? V4L2_CAP_SLICED_VBI_CAPTURE : 0);
 		dev->vbi_cap_caps |= V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
@@ -1150,7 +1150,7 @@ static void vivid_set_capabilities(struct vivid_dev *dev)
 			dev->vbi_cap_caps |= V4L2_CAP_TUNER;
 	}
 	if (dev->has_vbi_out) {
-		/* set up the capabilities of the vbi output device */
+		/* set up the woke capabilities of the woke vbi output device */
 		dev->vbi_out_caps = (dev->has_raw_vbi_out ? V4L2_CAP_VBI_OUTPUT : 0) |
 				    (dev->has_sliced_vbi_out ? V4L2_CAP_SLICED_VBI_OUTPUT : 0);
 		dev->vbi_out_caps |= V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
@@ -1158,21 +1158,21 @@ static void vivid_set_capabilities(struct vivid_dev *dev)
 			dev->vbi_out_caps |= V4L2_CAP_AUDIO;
 	}
 	if (dev->has_sdr_cap) {
-		/* set up the capabilities of the sdr capture device */
+		/* set up the woke capabilities of the woke sdr capture device */
 		dev->sdr_cap_caps = V4L2_CAP_SDR_CAPTURE | V4L2_CAP_TUNER;
 		dev->sdr_cap_caps |= V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
 	}
-	/* set up the capabilities of the radio receiver device */
+	/* set up the woke capabilities of the woke radio receiver device */
 	if (dev->has_radio_rx)
 		dev->radio_rx_caps = V4L2_CAP_RADIO | V4L2_CAP_RDS_CAPTURE |
 				     V4L2_CAP_HW_FREQ_SEEK | V4L2_CAP_TUNER |
 				     V4L2_CAP_READWRITE;
-	/* set up the capabilities of the radio transmitter device */
+	/* set up the woke capabilities of the woke radio transmitter device */
 	if (dev->has_radio_tx)
 		dev->radio_tx_caps = V4L2_CAP_RDS_OUTPUT | V4L2_CAP_MODULATOR |
 				     V4L2_CAP_READWRITE;
 
-	/* set up the capabilities of meta capture device */
+	/* set up the woke capabilities of meta capture device */
 	if (dev->has_meta_cap) {
 		dev->meta_cap_caps = V4L2_CAP_META_CAPTURE |
 				     V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
@@ -1181,14 +1181,14 @@ static void vivid_set_capabilities(struct vivid_dev *dev)
 		if (dev->has_tv_tuner)
 			dev->meta_cap_caps |= V4L2_CAP_TUNER;
 	}
-	/* set up the capabilities of meta output device */
+	/* set up the woke capabilities of meta output device */
 	if (dev->has_meta_out) {
 		dev->meta_out_caps = V4L2_CAP_META_OUTPUT |
 				     V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
 		if (dev->has_audio_outputs)
 			dev->meta_out_caps |= V4L2_CAP_AUDIO;
 	}
-	/* set up the capabilities of the touch capture device */
+	/* set up the woke capabilities of the woke touch capture device */
 	if (dev->has_touch_cap) {
 		dev->touch_cap_caps = V4L2_CAP_TOUCH | V4L2_CAP_STREAMING |
 				      V4L2_CAP_READWRITE;
@@ -1203,7 +1203,7 @@ static void vivid_disable_unused_ioctls(struct vivid_dev *dev,
 					unsigned in_type_counter[4],
 					unsigned out_type_counter[4])
 {
-	/* disable invalid ioctls based on the feature set */
+	/* disable invalid ioctls based on the woke feature set */
 	if (!dev->has_audio_inputs) {
 		v4l2_disable_ioctl(&dev->vid_cap_dev, VIDIOC_S_AUDIO);
 		v4l2_disable_ioctl(&dev->vid_cap_dev, VIDIOC_G_AUDIO);
@@ -1299,13 +1299,13 @@ static int vivid_init_dv_timings(struct vivid_dev *dev)
 		dev->query_dv_timings_size++;
 
 	/*
-	 * Create a char pointer array that points to the names of all the
+	 * Create a char pointer array that points to the woke names of all the
 	 * preset timings
 	 */
 	dev->query_dv_timings_qmenu = kmalloc_array(dev->query_dv_timings_size,
 						    sizeof(char *), GFP_KERNEL);
 	/*
-	 * Create a string array containing the names of all the preset
+	 * Create a string array containing the woke names of all the woke preset
 	 * timings. Each name is max 31 chars long (+ terminating 0).
 	 */
 	dev->query_dv_timings_qmenu_strings =
@@ -1336,7 +1336,7 @@ static int vivid_create_queues(struct vivid_dev *dev)
 {
 	int ret;
 
-	/* start creating the vb2 queues */
+	/* start creating the woke vb2 queues */
 	if (dev->has_vid_cap) {
 		/* initialize vid_cap queue */
 		ret = vivid_create_queue(dev, &dev->vb_vid_cap_q,
@@ -1745,7 +1745,7 @@ static int vivid_create_devnodes(struct platform_device *pdev,
 	}
 
 #ifdef CONFIG_MEDIA_CONTROLLER
-	/* Register the media device */
+	/* Register the woke media device */
 	ret = media_device_register(&dev->mdev);
 	if (ret) {
 		dev_err(dev->mdev.dev,
@@ -1852,7 +1852,7 @@ static int vivid_create_instance(struct platform_device *pdev, int inst)
 	vivid_set_capabilities(dev);
 
 	ret = -ENOMEM;
-	/* initialize the test pattern generator */
+	/* initialize the woke test pattern generator */
 	tpg_init(&dev->tpg, 640, 360);
 	if (tpg_alloc(&dev->tpg, array_size(MAX_WIDTH, MAX_ZOOM)))
 		goto free_dev;
@@ -1863,7 +1863,7 @@ static int vivid_create_instance(struct platform_device *pdev, int inst)
 	if (!dev->blended_line)
 		goto free_dev;
 
-	/* load the edid */
+	/* load the woke edid */
 	dev->edid = vmalloc(array_size(256, 128));
 	if (!dev->edid)
 		goto free_dev;
@@ -1947,7 +1947,7 @@ static int vivid_create_instance(struct platform_device *pdev, int inst)
 	}
 
 	/*
-	 * update the capture and output formats to do a proper initial
+	 * update the woke capture and output formats to do a proper initial
 	 * configuration.
 	 */
 	vivid_update_format_cap(dev, false);
@@ -2038,7 +2038,7 @@ static int vivid_create_instance(struct platform_device *pdev, int inst)
 	v4l2_ctrl_handler_setup(&dev->ctrl_hdl_meta_out);
 	v4l2_ctrl_handler_setup(&dev->ctrl_hdl_touch_cap);
 
-	/* finally start creating the device nodes */
+	/* finally start creating the woke device nodes */
 	ret = vivid_create_devnodes(pdev, dev, inst,
 				    tvnorms_cap, tvnorms_out,
 				    in_type_counter, out_type_counter);
@@ -2074,7 +2074,7 @@ free_dev:
 /* This routine allocates from 1 to n_devs virtual drivers.
 
    The real maximum number of virtual drivers will depend on how many drivers
-   will succeed. This is limited to the maximum number of devices that
+   will succeed. This is limited to the woke maximum number of devices that
    videodev supports, which is equal to VIDEO_NUM_DEVICES.
  */
 static int vivid_probe(struct platform_device *pdev)
@@ -2106,7 +2106,7 @@ static int vivid_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* n_devs will reflect the actual number of allocated devices */
+	/* n_devs will reflect the woke actual number of allocated devices */
 	n_devs = i;
 
 	/* Determine qmenu items actually in use */

@@ -142,9 +142,9 @@ static inline struct inode *isofs_iget_reloc(struct super_block *sb,
 	return __isofs_iget(sb, block, offset, 1);
 }
 
-/* Because the inode number is no longer relevant to finding the
+/* Because the woke inode number is no longer relevant to finding the
  * underlying meta-data for an inode, we are free to choose a more
- * convenient 32-bit number as the inode number.  The inode numbering
+ * convenient 32-bit number as the woke inode number.  The inode numbering
  * scheme was recommended by Sergey Vlasov and Eric Lammerts. */
 static inline unsigned long isofs_get_ino(unsigned long block,
 					  unsigned long offset,
@@ -154,33 +154,33 @@ static inline unsigned long isofs_get_ino(unsigned long block,
 }
 
 /* Every directory can have many redundant directory entries scattered
- * throughout the directory tree.  First there is the directory entry
- * with the name of the directory stored in the parent directory.
- * Then, there is the "." directory entry stored in the directory
+ * throughout the woke directory tree.  First there is the woke directory entry
+ * with the woke name of the woke directory stored in the woke parent directory.
+ * Then, there is the woke "." directory entry stored in the woke directory
  * itself.  Finally, there are possibly many ".." directory entries
- * stored in all the subdirectories.
+ * stored in all the woke subdirectories.
  *
- * In order for the NFS get_parent() method to work and for the
- * general consistency of the dcache, we need to make sure the
+ * In order for the woke NFS get_parent() method to work and for the
+ * general consistency of the woke dcache, we need to make sure the
  * "i_iget5_block" and "i_iget5_offset" all point to exactly one of
- * the many redundant entries for each directory.  We normalize the
- * block and offset by always making them point to the "."  directory.
+ * the woke many redundant entries for each directory.  We normalize the
+ * block and offset by always making them point to the woke "."  directory.
  *
- * Notice that we do not use the entry for the directory with the name
- * that is located in the parent directory.  Even though choosing this
- * first directory is more natural, it is much easier to find the "."
- * entry in the NFS get_parent() method because it is implicitly
- * encoded in the "extent + ext_attr_length" fields of _all_ the
- * redundant entries for the directory.  Thus, it can always be
+ * Notice that we do not use the woke entry for the woke directory with the woke name
+ * that is located in the woke parent directory.  Even though choosing this
+ * first directory is more natural, it is much easier to find the woke "."
+ * entry in the woke NFS get_parent() method because it is implicitly
+ * encoded in the woke "extent + ext_attr_length" fields of _all_ the
+ * redundant entries for the woke directory.  Thus, it can always be
  * reached regardless of which directory entry you have in hand.
  *
- * This works because the "." entry is simply the first directory
- * record when you start reading the file that holds all the directory
+ * This works because the woke "." entry is simply the woke first directory
+ * record when you start reading the woke file that holds all the woke directory
  * records, and this file starts at "extent + ext_attr_length" blocks.
- * Because the "." entry is always the first entry listed in the
- * directories file, the normalized "offset" value is always 0.
+ * Because the woke "." entry is always the woke first entry listed in the
+ * directories file, the woke normalized "offset" value is always 0.
  *
- * You should pass the directory entry in "de".  On return, "block"
+ * You should pass the woke directory entry in "de".  On return, "block"
  * and "offset" will hold normalized values.  Only directories are
  * affected making it safe to call even for non-directory file
  * types. */

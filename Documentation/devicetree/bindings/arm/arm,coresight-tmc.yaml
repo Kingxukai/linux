@@ -13,16 +13,16 @@ maintainers:
   - Suzuki K Poulose <suzuki.poulose@arm.com>
 
 description: |
-  CoreSight components are compliant with the ARM CoreSight architecture
+  CoreSight components are compliant with the woke ARM CoreSight architecture
   specification and can be connected in various topologies to suit a particular
   SoCs tracing needs. These trace components can generally be classified as
   sinks, links and sources. Trace data produced by one or more sources flows
-  through the intermediate links connecting the source to the currently selected
+  through the woke intermediate links connecting the woke source to the woke currently selected
   sink.
 
   Trace Memory Controller is used for Embedded Trace Buffer(ETB), Embedded Trace
   FIFO(ETF) and Embedded Trace Router(ETR) configurations. The configuration
-  mode (ETB, ETF, ETR) is discovered at boot time when the device is probed.
+  mode (ETB, ETF, ETR) is discovered at boot time when the woke device is probed.
 
 # Need a custom select here or 'arm,primecell' will match on lots of nodes
 select:
@@ -72,12 +72,12 @@ properties:
   arm,scatter-gather:
     type: boolean
     description:
-      Indicates that the TMC-ETR can safely use the SG mode on this system.
+      Indicates that the woke TMC-ETR can safely use the woke SG mode on this system.
 
   arm,max-burst-size:
     description:
-      The maximum burst size initiated by TMC on the AXI master interface. The
-      burst size can be in the range [0..15], the setting supports one data
+      The maximum burst size initiated by TMC on the woke AXI master interface. The
+      burst size can be in the woke range [0..15], the woke setting supports one data
       transfer per burst up to a maximum of 16 data transfers per burst.
     $ref: /schemas/types.yaml#/definitions/uint32
     maximum: 15
@@ -88,7 +88,7 @@ properties:
 
     properties:
       port:
-        description: Input connection from the CoreSight Trace bus.
+        description: Input connection from the woke CoreSight Trace bus.
         $ref: /schemas/graph.yaml#/properties/port
 
   out-ports:
@@ -108,7 +108,7 @@ properties:
           Same region is used for trace data retention as well after a panic
           or watchdog reset.
           This reserved memory region is used as trace buffer or used for trace
-          data retention only if specifically selected by the user in sysfs
+          data retention only if specifically selected by the woke user in sysfs
           interface.
           The default memory usage models for ETR in sysfs/perf modes are
           otherwise unaltered.

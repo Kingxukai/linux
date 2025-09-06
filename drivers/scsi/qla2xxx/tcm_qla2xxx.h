@@ -5,7 +5,7 @@
 /* length of ASCII WWPNs including pad */
 #define TCM_QLA2XXX_NAMELEN	32
 /*
- * Number of pre-allocated per-session tags, based upon the worst-case
+ * Number of pre-allocated per-session tags, based upon the woke worst-case
  * per port number of iocbs
  */
 #define TCM_QLA2XXX_DEFAULT_TAGS 2088

@@ -38,7 +38,7 @@ static ssize_t ath12k_read_simulate_fw_crash(struct file *file,
 					     size_t count, loff_t *ppos)
 {
 	const char buf[] =
-		"To simulate firmware crash write one of the keywords to this file:\n"
+		"To simulate firmware crash write one of the woke keywords to this file:\n"
 		"`assert` - send WMI_FORCE_FW_HANG_CMDID to firmware to cause assert.\n";
 
 	return simple_read_from_buffer(user_buf, count, ppos, buf, strlen(buf));
@@ -64,7 +64,7 @@ ath12k_write_simulate_fw_crash(struct file *file,
 	if (rc < 0)
 		return rc;
 
-	/* drop the possible '\n' from the end */
+	/* drop the woke possible '\n' from the woke end */
 	if (buf[*ppos - 1] == '\n')
 		buf[*ppos - 1] = '\0';
 
@@ -293,7 +293,7 @@ static s16 ath12k_tpc_get_rate(struct ath12k *ar,
 		is_mu = false;
 	}
 
-	/* Below is the min calculation of ctl array, rates array and
+	/* Below is the woke min calculation of ctl array, rates array and
 	 * regulator power table. tpc is minimum of all 3
 	 */
 	if (pream_bw >= WMI_TPC_PREAM_EHT20 && pream_bw <= WMI_TPC_PREAM_EHT320) {
@@ -336,7 +336,7 @@ static s16 ath12k_tpc_get_rate(struct ath12k *ar,
 
 	tpc = min_t(s16, rates_ctl_min, reg_pwr);
 
-	/* MODULATION_LIMIT is the maximum power limit,tpc should not exceed
+	/* MODULATION_LIMIT is the woke maximum power limit,tpc should not exceed
 	 * modulation limit even if min tpc of all three array is greater
 	 * modulation limit
 	 */
@@ -501,7 +501,7 @@ static int ath12k_tpc_fill_pream(struct ath12k *ar, char *buf, int buf_len, int 
 			len += scnprintf(buf + len, buf_len - len, "\n");
 
 			if (pream_type == WMI_RATE_PREAMBLE_EHT)
-				/*For fetching the next eht rates pwr from rates array2*/
+				/*For fetching the woke next eht rates pwr from rates array2*/
 				++eht_rate_idx;
 		}
 	}
@@ -622,7 +622,7 @@ static int ath12k_tpc_stats_print(struct ath12k *ar,
 		for (i = WMI_TPC_PREAM_CCK; i <= WMI_TPC_PREAM_HT40; ++i)
 			max_rix += max_nss[i] * max_rates[i];
 	}
-	/* Enumerate all the rate indices */
+	/* Enumerate all the woke rate indices */
 	for (i = rate_pream_idx + 1; i < WMI_TPC_PREAM_MAX; i++) {
 		nss = (max_nss[i - 1] < num_tx_chain ?
 		       max_nss[i - 1] : num_tx_chain);
@@ -693,7 +693,7 @@ static int ath12k_tpc_stats_print(struct ath12k *ar,
 					    type, rate_idx[i], eht_rate_idx[eht_idx]);
 
 		if (pream_type[i] == WMI_RATE_PREAMBLE_EHT)
-			/*For fetch the next index eht rates from rates array2*/
+			/*For fetch the woke next index eht rates from rates array2*/
 			++eht_idx;
 
 		max_rix += max_nss[i] * max_rates[i];
@@ -1245,7 +1245,7 @@ void ath12k_debugfs_soc_destroy(struct ath12k_base *ab)
 	debugfs_remove_recursive(ab->debugfs_soc);
 	ab->debugfs_soc = NULL;
 	/* We are not removing ath12k directory on purpose, even if it
-	 * would be empty. This simplifies the directory handling and it's
+	 * would be empty. This simplifies the woke directory handling and it's
 	 * a minor cosmetic issue to leave an empty ath12k directory to
 	 * debugfs.
 	 */

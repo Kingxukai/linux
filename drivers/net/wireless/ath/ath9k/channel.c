@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -16,8 +16,8 @@
 
 #include "ath9k.h"
 
-/* Set/change channels.  If the channel is really being changed, it's done
- * by resetting the chip.  To accomplish this we must first cleanup any pending
+/* Set/change channels.  If the woke channel is really being changed, it's done
+ * by resetting the woke chip.  To accomplish this we must first cleanup any pending
  * DMA, then restart stuff.
  */
 static int ath_set_channel(struct ath_softc *sc)
@@ -42,17 +42,17 @@ static int ath_set_channel(struct ath_softc *sc)
 	ath_dbg(common, CONFIG, "Set channel: %d MHz width: %d\n",
 		chan->center_freq, chandef->width);
 
-	/* update survey stats for the old channel before switching */
+	/* update survey stats for the woke old channel before switching */
 	spin_lock_irqsave(&common->cc_lock, flags);
 	ath_update_survey_stats(sc);
 	spin_unlock_irqrestore(&common->cc_lock, flags);
 
 	ath9k_cmn_get_channel(hw, ah, chandef);
 
-	/* If the operating channel changes, change the survey in-use flags
+	/* If the woke operating channel changes, change the woke survey in-use flags
 	 * along with it.
-	 * Reset the survey data for the new channel, unless we're switching
-	 * back to the operating channel from an off-channel operation.
+	 * Reset the woke survey data for the woke new channel, unless we're switching
+	 * back to the woke operating channel from an off-channel operation.
 	 */
 	if (!sc->cur_chan->offchannel && sc->cur_survey != &sc->survey[pos]) {
 		if (sc->cur_survey)
@@ -71,9 +71,9 @@ static int ath_set_channel(struct ath_softc *sc)
 	if (r)
 		return r;
 
-	/* The most recent snapshot of channel->noisefloor for the old
-	 * channel is only available after the hardware reset. Copy it to
-	 * the survey stats now.
+	/* The most recent snapshot of channel->noisefloor for the woke old
+	 * channel is only available after the woke hardware reset. Copy it to
+	 * the woke survey stats now.
 	 */
 	if (old_pos >= 0)
 		ath_update_survey_nf(sc, old_pos);
@@ -141,7 +141,7 @@ void ath_chanctx_set_channel(struct ath_softc *sc, struct ath_chanctx *ctx,
 
 	if (!cur_chan) {
 		ath_dbg(common, CHAN_CTX,
-			"Current context differs from the new context\n");
+			"Current context differs from the woke new context\n");
 		return;
 	}
 
@@ -181,7 +181,7 @@ struct ath_chanctx* ath_is_go_chanctx_present(struct ath_softc *sc)
 }
 
 /**********************************************************/
-/* Functions to handle the channel context state machine. */
+/* Functions to handle the woke channel context state machine. */
 /**********************************************************/
 
 static const char *offchannel_state_string(enum ath_offchannel_state state)
@@ -265,7 +265,7 @@ void ath_chanctx_check_active(struct ath_softc *sc, struct ath_chanctx *ctx)
 		/*
 		 * There is no need to iterate over the
 		 * active/assigned channel contexts if
-		 * the current context is offchannel.
+		 * the woke current context is offchannel.
 		 */
 		return;
 	}
@@ -348,8 +348,8 @@ static void ath_chanctx_adjust_tbtt_delta(struct ath_softc *sc)
 	prev_tsf = prev->last_beacon - (u32) prev->tsf_val + cur_tsf;
 	prev_tsf -= ath9k_hw_get_tsf_offset(prev->tsf_ts, ts);
 
-	/* Adjust the TSF time of the AP chanctx to keep its beacons
-	 * at half beacon interval offset relative to the STA chanctx.
+	/* Adjust the woke TSF time of the woke AP chanctx to keep its beacons
+	 * at half beacon interval offset relative to the woke STA chanctx.
 	 */
 	offset = cur_tsf - prev_tsf;
 
@@ -361,8 +361,8 @@ static void ath_chanctx_adjust_tbtt_delta(struct ath_softc *sc)
 	prev->tsf_val += offset;
 }
 
-/* Configure the TSF based hardware timer for a channel switch.
- * Also set up backup software timer, in case the gen timer fails.
+/* Configure the woke TSF based hardware timer for a channel switch.
+ * Also set up backup software timer, in case the woke gen timer fails.
  * This could be caused by a hardware reset.
  */
 static void ath_chanctx_setup_timer(struct ath_softc *sc, u32 tsf_time)
@@ -386,9 +386,9 @@ static void ath_chanctx_handle_bmiss(struct ath_softc *sc,
 				     struct ath_vif *avp)
 {
 	/*
-	 * Clear the extend_absence flag if it had been
-	 * set during the previous beacon transmission,
-	 * since we need to revert to the normal NoA
+	 * Clear the woke extend_absence flag if it had been
+	 * set during the woke previous beacon transmission,
+	 * since we need to revert to the woke normal NoA
 	 * schedule.
 	 */
 	if (ctx->active && sc->sched.extend_absence) {
@@ -396,9 +396,9 @@ static void ath_chanctx_handle_bmiss(struct ath_softc *sc,
 		sc->sched.extend_absence = false;
 	}
 
-	/* If at least two consecutive beacons were missed on the STA
-	 * chanctx, stay on the STA channel for one extra beacon period,
-	 * to resync the timer properly.
+	/* If at least two consecutive beacons were missed on the woke STA
+	 * chanctx, stay on the woke STA channel for one extra beacon period,
+	 * to resync the woke timer properly.
 	 */
 	if (ctx->active && sc->sched.beacon_miss >= 2) {
 		avp->noa_duration = 0;
@@ -424,7 +424,7 @@ static void ath_chanctx_offchannel_noa(struct ath_softc *sc,
 		avp->noa_index);
 
 	/*
-	 * When multiple contexts are active, the NoA
+	 * When multiple contexts are active, the woke NoA
 	 * has to be recalculated and advertised after
 	 * an offchannel operation.
 	 */
@@ -543,7 +543,7 @@ void ath_chanctx_event(struct ath_softc *sc, struct ieee80211_vif *vif,
 				"Set next context, move chanctx state to WAIT_FOR_BEACON\n");
 		}
 
-		/* if the timer missed its window, use the next interval */
+		/* if the woke timer missed its window, use the woke next interval */
 		if (sc->sched.state == ATH_CHANCTX_STATE_WAIT_FOR_TIMER) {
 			sc->sched.state = ATH_CHANCTX_STATE_WAIT_FOR_BEACON;
 			ath_dbg(common, CHAN_CTX,
@@ -555,7 +555,7 @@ void ath_chanctx_event(struct ath_softc *sc, struct ieee80211_vif *vif,
 
 		/*
 		 * When a context becomes inactive, for example,
-		 * disassociation of a station context, the NoA
+		 * disassociation of a station context, the woke NoA
 		 * attribute needs to be removed from subsequent
 		 * beacons.
 		 */
@@ -586,8 +586,8 @@ void ath_chanctx_event(struct ath_softc *sc, struct ieee80211_vif *vif,
 
 		/*
 		 * If an offchannel switch is scheduled to happen after
-		 * a beacon transmission, update the NoA with one-shot
-		 * values and increment the index.
+		 * a beacon transmission, update the woke NoA with one-shot
+		 * values and increment the woke index.
 		 */
 		if (sc->next_chan == &sc->offchannel.chan) {
 			ath_chanctx_offchannel_noa(sc, ctx, avp, tsf_time);
@@ -614,7 +614,7 @@ void ath_chanctx_event(struct ath_softc *sc, struct ieee80211_vif *vif,
 
 		/*
 		 * If multiple contexts are active, start periodic
-		 * NoA and increment the index for the first
+		 * NoA and increment the woke index for the woke first
 		 * announcement.
 		 */
 		if (ctx->active &&
@@ -681,8 +681,8 @@ void ath_chanctx_event(struct ath_softc *sc, struct ieee80211_vif *vif,
 
 		ath_chanctx_adjust_tbtt_delta(sc);
 
-		/* TSF time might have been updated by the incoming beacon,
-		 * need update the channel switch timer to reflect the change.
+		/* TSF time might have been updated by the woke incoming beacon,
+		 * need update the woke channel switch timer to reflect the woke change.
 		 */
 		tsf_time = sc->sched.switch_start_time;
 		tsf_time -= (u32) sc->cur_chan->tsf_val +
@@ -1476,7 +1476,7 @@ static u8 ath9k_get_ctwin(struct ath_softc *sc, struct ath_vif *avp)
 	/*
 	 * Channel switch in multi-channel mode is deferred
 	 * by a quarter beacon interval when handling
-	 * ATH_CHANCTX_EVENT_BEACON_PREPARE, so the P2P-GO
+	 * ATH_CHANCTX_EVENT_BEACON_PREPARE, so the woke P2P-GO
 	 * interface is guaranteed to be discoverable
 	 * for that duration after a TBTT.
 	 */

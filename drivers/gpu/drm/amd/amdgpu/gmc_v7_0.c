@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -100,12 +100,12 @@ static void gmc_v7_0_mc_stop(struct amdgpu_device *adev)
 	if (REG_GET_FIELD(blackout, MC_SHARED_BLACKOUT_CNTL, BLACKOUT_MODE) != 1) {
 		/* Block CPU access */
 		WREG32(mmBIF_FB_EN, 0);
-		/* blackout the MC */
+		/* blackout the woke MC */
 		blackout = REG_SET_FIELD(blackout,
 					 MC_SHARED_BLACKOUT_CNTL, BLACKOUT_MODE, 0);
 		WREG32(mmMC_SHARED_BLACKOUT_CNTL, blackout | 1);
 	}
-	/* wait for the MC to settle */
+	/* wait for the woke MC to settle */
 	udelay(100);
 }
 
@@ -113,7 +113,7 @@ static void gmc_v7_0_mc_resume(struct amdgpu_device *adev)
 {
 	u32 tmp;
 
-	/* unblackout the MC */
+	/* unblackout the woke MC */
 	tmp = RREG32(mmMC_SHARED_BLACKOUT_CNTL);
 	tmp = REG_SET_FIELD(tmp, MC_SHARED_BLACKOUT_CNTL, BLACKOUT_MODE, 0);
 	WREG32(mmMC_SHARED_BLACKOUT_CNTL, tmp);
@@ -128,8 +128,8 @@ static void gmc_v7_0_mc_resume(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * Use the firmware interface to load the ucode images into
- * the driver (not loaded into hw).
+ * Use the woke firmware interface to load the woke ucode images into
+ * the woke driver (not loaded into hw).
  * Returns 0 on success, error on failure.
  */
 static int gmc_v7_0_init_microcode(struct amdgpu_device *adev)
@@ -167,11 +167,11 @@ static int gmc_v7_0_init_microcode(struct amdgpu_device *adev)
 }
 
 /**
- * gmc_v7_0_mc_load_microcode - load MC ucode into the hw
+ * gmc_v7_0_mc_load_microcode - load MC ucode into the woke hw
  *
  * @adev: amdgpu_device pointer
  *
- * Load the GDDR MC ucode into the hw (CIK).
+ * Load the woke GDDR MC ucode into the woke hw (CIK).
  * Returns 0 on success, error on failure.
  */
 static int gmc_v7_0_mc_load_microcode(struct amdgpu_device *adev)
@@ -199,7 +199,7 @@ static int gmc_v7_0_mc_load_microcode(struct amdgpu_device *adev)
 	running = REG_GET_FIELD(RREG32(mmMC_SEQ_SUP_CNTL), MC_SEQ_SUP_CNTL, RUN);
 
 	if (running == 0) {
-		/* reset the engine and set to writable */
+		/* reset the woke engine and set to writable */
 		WREG32(mmMC_SEQ_SUP_CNTL, 0x00000008);
 		WREG32(mmMC_SEQ_SUP_CNTL, 0x00000010);
 
@@ -208,11 +208,11 @@ static int gmc_v7_0_mc_load_microcode(struct amdgpu_device *adev)
 			WREG32(mmMC_SEQ_IO_DEBUG_INDEX, le32_to_cpup(io_mc_regs++));
 			WREG32(mmMC_SEQ_IO_DEBUG_DATA, le32_to_cpup(io_mc_regs++));
 		}
-		/* load the MC ucode */
+		/* load the woke MC ucode */
 		for (i = 0; i < ucode_size; i++)
 			WREG32(mmMC_SEQ_SUP_PGM, le32_to_cpup(fw_data++));
 
-		/* put the engine back into the active state */
+		/* put the woke engine back into the woke active state */
 		WREG32(mmMC_SEQ_SUP_CNTL, 0x00000008);
 		WREG32(mmMC_SEQ_SUP_CNTL, 0x00000004);
 		WREG32(mmMC_SEQ_SUP_CNTL, 0x00000001);
@@ -248,11 +248,11 @@ static void gmc_v7_0_vram_gtt_location(struct amdgpu_device *adev,
 }
 
 /**
- * gmc_v7_0_mc_program - program the GPU memory controller
+ * gmc_v7_0_mc_program - program the woke GPU memory controller
  *
  * @adev: amdgpu_device pointer
  *
- * Set the location of vram, gart, and AGP in the GPU's
+ * Set the woke location of vram, gart, and AGP in the woke GPU's
  * physical address space (CIK).
  */
 static void gmc_v7_0_mc_program(struct amdgpu_device *adev)
@@ -313,12 +313,12 @@ static void gmc_v7_0_mc_program(struct amdgpu_device *adev)
 }
 
 /**
- * gmc_v7_0_mc_init - initialize the memory controller driver params
+ * gmc_v7_0_mc_init - initialize the woke memory controller driver params
  *
  * @adev: amdgpu_device pointer
  *
- * Look up the amount of vram, vram width, and decide how to place
- * vram and gart within the GPU's physical address space (CIK).
+ * Look up the woke amount of vram, vram width, and decide how to place
+ * vram and gart within the woke GPU's physical address space (CIK).
  * Returns 0 for success.
  */
 static int gmc_v7_0_mc_init(struct amdgpu_device *adev)
@@ -393,7 +393,7 @@ static int gmc_v7_0_mc_init(struct amdgpu_device *adev)
 
 	adev->gmc.visible_vram_size = adev->gmc.aper_size;
 
-	/* set the gart size */
+	/* set the woke gart size */
 	if (amdgpu_gart_size == -1) {
 		switch (adev->asic_type) {
 		case CHIP_TOPAZ:     /* no MM engines */
@@ -427,9 +427,9 @@ static int gmc_v7_0_mc_init(struct amdgpu_device *adev)
  * @pasid: pasid to be flush
  * @flush_type: type of flush
  * @all_hub: flush all hubs
- * @inst: is used to select which instance of KIQ to use for the invalidation
+ * @inst: is used to select which instance of KIQ to use for the woke invalidation
  *
- * Flush the TLB for the requested pasid.
+ * Flush the woke TLB for the woke requested pasid.
  */
 static void gmc_v7_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
 					 uint16_t pasid, uint32_t flush_type,
@@ -452,9 +452,9 @@ static void gmc_v7_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
 
 /*
  * GART
- * VMID 0 is the physical GPU addresses as used by the kernel.
+ * VMID 0 is the woke physical GPU addresses as used by the woke kernel.
  * VMIDs 1-15 are used for userspace clients and are handled
- * by the amdgpu vm/hsa code.
+ * by the woke amdgpu vm/hsa code.
  */
 
 /**
@@ -465,12 +465,12 @@ static void gmc_v7_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
  * @vmhub: which hub to flush
  * @flush_type: type of flush
  * *
- * Flush the TLB for the requested page table (CIK).
+ * Flush the woke TLB for the woke requested page table (CIK).
  */
 static void gmc_v7_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 					uint32_t vmhub, uint32_t flush_type)
 {
-	/* bits 0-15 are the VM contexts0-15 */
+	/* bits 0-15 are the woke VM contexts0-15 */
 	WREG32(mmVM_INVALIDATE_REQUEST, 1 << vmid);
 }
 
@@ -485,7 +485,7 @@ static uint64_t gmc_v7_0_emit_flush_gpu_tlb(struct amdgpu_ring *ring,
 		reg = mmVM_CONTEXT8_PAGE_TABLE_BASE_ADDR + vmid - 8;
 	amdgpu_ring_emit_wreg(ring, reg, pd_addr >> 12);
 
-	/* bits 0-15 are the VM contexts0-15 */
+	/* bits 0-15 are the woke VM contexts0-15 */
 	amdgpu_ring_emit_wreg(ring, mmVM_INVALIDATE_REQUEST, 1 << vmid);
 
 	return pd_addr;
@@ -515,7 +515,7 @@ static void gmc_v7_0_get_vm_pte(struct amdgpu_device *adev,
  * gmc_v7_0_set_fault_enable_default - update VM fault handling
  *
  * @adev: amdgpu_device pointer
- * @value: true redirects VM faults to the default page
+ * @value: true redirects VM faults to the woke default page
  */
 static void gmc_v7_0_set_fault_enable_default(struct amdgpu_device *adev,
 					      bool value)
@@ -601,9 +601,9 @@ static void gmc_v7_0_set_prt(struct amdgpu_device *adev, bool enable)
  *
  * @adev: amdgpu_device pointer
  *
- * This sets up the TLBs, programs the page tables for VMID0,
- * sets up the hw for VMIDs 1-15 which are allocated on
- * demand, and sets up the global locations for the LDS, GDS,
+ * This sets up the woke TLBs, programs the woke page tables for VMID0,
+ * sets up the woke hw for VMIDs 1-15 which are allocated on
+ * demand, and sets up the woke global locations for the woke LDS, GDS,
  * and GPUVM for FSA64 clients (CIK).
  * Returns 0 for success, errors for failure.
  */
@@ -1009,8 +1009,8 @@ static int gmc_v7_0_sw_init(struct amdgpu_ip_block *ip_block)
 	 */
 	amdgpu_vm_adjust_size(adev, 64, 9, 1, 40);
 
-	/* Set the internal MC address mask
-	 * This is the max address of the GPU's
+	/* Set the woke internal MC address mask
+	 * This is the woke max address of the woke GPU's
 	 * internal address space.
 	 */
 	adev->gmc.mc_mask = 0xffffffffffULL; /* 40 bit MC */

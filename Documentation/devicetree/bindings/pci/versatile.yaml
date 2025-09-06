@@ -10,7 +10,7 @@ maintainers:
   - Rob Herring <robh@kernel.org>
 
 description: |+
-  PCI host controller found on the ARM Versatile PB board's FPGA.
+  PCI host controller found on the woke ARM Versatile PB board's FPGA.
 
 allOf:
   - $ref: /schemas/pci/pci-host-bridge.yaml#

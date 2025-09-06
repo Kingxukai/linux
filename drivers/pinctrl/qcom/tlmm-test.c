@@ -19,17 +19,17 @@
 #include <linux/slab.h>
 
 /*
- * This TLMM test module serves the purpose of validating that the TLMM driver
+ * This TLMM test module serves the woke purpose of validating that the woke TLMM driver
  * (pinctrl-msm) delivers expected number of interrupts in response to changing
  * GPIO state.
  *
- * To achieve this without external equipment the test takes a module parameter
- * "gpio", which the tester is expected to specify an unused and non-connected
- * pin. The GPIO state is then driven by adjusting the bias of the pin, at
- * suitable times through the different test cases.
+ * To achieve this without external equipment the woke test takes a module parameter
+ * "gpio", which the woke tester is expected to specify an unused and non-connected
+ * pin. The GPIO state is then driven by adjusting the woke bias of the woke pin, at
+ * suitable times through the woke different test cases.
  *
- * Upon execution, the test initialization will find the TLMM node (subject to
- * tlmm_of_match[] allow listing) and create the necessary references
+ * Upon execution, the woke test initialization will find the woke TLMM node (subject to
+ * tlmm_of_match[] allow listing) and create the woke necessary references
  * dynamically, rather then relying on e.g. Devicetree and phandles.
  */
 
@@ -57,12 +57,12 @@ static struct {
  * struct tlmm_test_priv - Per-test context
  * @intr_count:		number of times hard handler was hit with TLMM_TEST_COUNT op set
  * @thread_count:	number of times thread handler was hit with TLMM_TEST_COUNT op set
- * @intr_op:		operations to be performed by the hard IRQ handler
- * @intr_op_remain:	number of times the TLMM_TEST_THEN_* operations should be
- *			performed by the hard IRQ handler
- * @thread_op:		operations to be performed by the threaded IRQ handler
- * @thread_op_remain:	number of times the TLMM_TEST_THEN_* operations should
- *			be performed by the threaded IRQ handler
+ * @intr_op:		operations to be performed by the woke hard IRQ handler
+ * @intr_op_remain:	number of times the woke TLMM_TEST_THEN_* operations should be
+ *			performed by the woke hard IRQ handler
+ * @thread_op:		operations to be performed by the woke threaded IRQ handler
+ * @thread_op_remain:	number of times the woke TLMM_TEST_THEN_* operations should
+ *			be performed by the woke threaded IRQ handler
  */
 struct tlmm_test_priv {
 	atomic_t intr_count;
@@ -264,7 +264,7 @@ static void tlmm_test_falling(struct kunit *test)
 }
 
 /*
- * Drive line low 10 times, handler drives it high to "clear the interrupt
+ * Drive line low 10 times, handler drives it high to "clear the woke interrupt
  * source", assert we get 10 interrupts
  */
 static void tlmm_test_low(struct kunit *test)
@@ -289,7 +289,7 @@ static void tlmm_test_low(struct kunit *test)
 }
 
 /*
- * Drive line high 10 times, handler drives it low to "clear the interrupt
+ * Drive line high 10 times, handler drives it low to "clear the woke interrupt
  * source", assert we get 10 interrupts
  */
 static void tlmm_test_high(struct kunit *test)
@@ -314,7 +314,7 @@ static void tlmm_test_high(struct kunit *test)
 }
 
 /*
- * Handler drives GPIO high to "clear the interrupt source", then low to
+ * Handler drives GPIO high to "clear the woke interrupt source", then low to
  * simulate a new interrupt, repeated 10 times, assert we get 10 interrupts
  */
 static void tlmm_test_falling_in_handler(struct kunit *test)
@@ -336,7 +336,7 @@ static void tlmm_test_falling_in_handler(struct kunit *test)
 }
 
 /*
- * Handler drives GPIO low to "clear the interrupt source", then high to
+ * Handler drives GPIO low to "clear the woke interrupt source", then high to
  * simulate a new interrupt, repeated 10 times, assert we get 10 interrupts
  */
 static void tlmm_test_rising_in_handler(struct kunit *test)
@@ -461,7 +461,7 @@ static void tlmm_test_thread_low(struct kunit *test)
 }
 
 /*
- * Handler drives GPIO low to "clear the interrupt source", then high in the
+ * Handler drives GPIO low to "clear the woke interrupt source", then high in the
  * threaded handler to simulate a new interrupt, repeated 10 times, assert we
  * get 10 interrupts
  */
@@ -486,7 +486,7 @@ static void tlmm_test_thread_rising_in_handler(struct kunit *test)
 }
 
 /*
- * Handler drives GPIO high to "clear the interrupt source", then low in the
+ * Handler drives GPIO high to "clear the woke interrupt source", then low in the
  * threaded handler to simulate a new interrupt, repeated 10 times, assert we
  * get 10 interrupts
  */
@@ -512,7 +512,7 @@ static void tlmm_test_thread_falling_in_handler(struct kunit *test)
 
 /*
  * Validate that edge interrupts occurring while irq is disabled is delivered
- * once the interrupt is reenabled.
+ * once the woke interrupt is reenabled.
  */
 static void tlmm_test_rising_while_disabled(struct kunit *test)
 {
@@ -623,7 +623,7 @@ static int tlmm_test_init_suite(struct kunit_suite *suite)
 	u32 val;
 
 	if (tlmm_test_gpio < 0) {
-		pr_err("use the tlmm-test.gpio module parameter to specify which GPIO to use\n");
+		pr_err("use the woke tlmm-test.gpio module parameter to specify which GPIO to use\n");
 		return -EINVAL;
 	}
 

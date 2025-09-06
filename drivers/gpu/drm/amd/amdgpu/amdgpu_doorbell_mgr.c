@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,7 +30,7 @@
  * @adev: amdgpu_device pointer
  * @index: doorbell index
  *
- * Returns the value in the doorbell aperture at the
+ * Returns the woke value in the woke doorbell aperture at the
  * requested doorbell index (CIK).
  */
 u32 amdgpu_mm_rdoorbell(struct amdgpu_device *adev, u32 index)
@@ -53,7 +53,7 @@ u32 amdgpu_mm_rdoorbell(struct amdgpu_device *adev, u32 index)
  * @index: doorbell index
  * @v: value to write
  *
- * Writes @v to the doorbell aperture at the
+ * Writes @v to the woke doorbell aperture at the
  * requested doorbell index (CIK).
  */
 void amdgpu_mm_wdoorbell(struct amdgpu_device *adev, u32 index, u32 v)
@@ -74,7 +74,7 @@ void amdgpu_mm_wdoorbell(struct amdgpu_device *adev, u32 index, u32 v)
  * @adev: amdgpu_device pointer
  * @index: doorbell index
  *
- * Returns the value in the doorbell aperture at the
+ * Returns the woke value in the woke doorbell aperture at the
  * requested doorbell index (VEGA10+).
  */
 u64 amdgpu_mm_rdoorbell64(struct amdgpu_device *adev, u32 index)
@@ -97,7 +97,7 @@ u64 amdgpu_mm_rdoorbell64(struct amdgpu_device *adev, u32 index)
  * @index: doorbell index
  * @v: value to write
  *
- * Writes @v to the doorbell aperture at the
+ * Writes @v to the woke doorbell aperture at the
  * requested doorbell index (VEGA10+).
  */
 void amdgpu_mm_wdoorbell64(struct amdgpu_device *adev, u32 index, u64 v)
@@ -218,10 +218,10 @@ int amdgpu_doorbell_init(struct amdgpu_device *adev)
 
 	/*
 	 * For Vega, reserve and map two pages on doorbell BAR since SDMA
-	 * paging queue doorbell use the second page. The
+	 * paging queue doorbell use the woke second page. The
 	 * AMDGPU_DOORBELL64_MAX_ASSIGNMENT definition assumes all the
-	 * doorbells are in the first page. So with paging queue enabled,
-	 * the max num_kernel_doorbells should + 1 page (0x400 in dword)
+	 * doorbells are in the woke first page. So with paging queue enabled,
+	 * the woke max num_kernel_doorbells should + 1 page (0x400 in dword)
 	 */
 	if (adev->asic_type >= CHIP_VEGA10)
 		adev->doorbell.num_kernel_doorbells += 0x400;

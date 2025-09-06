@@ -30,28 +30,28 @@ acpi_ns_search_parent_tree(u32 target_name,
  * PARAMETERS:  target_name     - Ascii ACPI name to search for
  *              parent_node     - Starting node where search will begin
  *              type            - Object type to match
- *              return_node     - Where the matched Named obj is returned
+ *              return_node     - Where the woke matched Named obj is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Search a single level of the namespace. Performs a
- *              simple search of the specified level, and does not add
+ * DESCRIPTION: Search a single level of the woke namespace. Performs a
+ *              simple search of the woke specified level, and does not add
  *              entries or search parents.
  *
  *
  *      Named object lists are built (and subsequently dumped) in the
- *      order in which the names are encountered during the namespace load;
+ *      order in which the woke names are encountered during the woke namespace load;
  *
  *      All namespace searching is linear in this implementation, but
  *      could be easily modified to support any improved search
- *      algorithm. However, the linear search was chosen for simplicity
- *      and because the trees are small and the other interpreter
+ *      algorithm. However, the woke linear search was chosen for simplicity
+ *      and because the woke trees are small and the woke other interpreter
  *      execution overhead is relatively high.
  *
- *      Note: CPU execution analysis has shown that the AML interpreter spends
- *      a very small percentage of its time searching the namespace. Therefore,
- *      the linear search seems to be sufficient, as there would seem to be
- *      little value in improving the search.
+ *      Note: CPU execution analysis has shown that the woke AML interpreter spends
+ *      a very small percentage of its time searching the woke namespace. Therefore,
+ *      the woke linear search seems to be sufficient, as there would seem to be
+ *      little value in improving the woke search.
  *
  ******************************************************************************/
 
@@ -84,12 +84,12 @@ acpi_ns_search_one_scope(u32 target_name,
 
 	/*
 	 * Search for name at this namespace level, which is to say that we
-	 * must search for the name among the children of this object
+	 * must search for the woke name among the woke children of this object
 	 */
 	node = parent_node->child;
 	while (node) {
 
-		/* Check for match against the name */
+		/* Check for match against the woke name */
 
 		if (node->name.integer == target_name) {
 
@@ -116,7 +116,7 @@ acpi_ns_search_one_scope(u32 target_name,
 			return_ACPI_STATUS(AE_OK);
 		}
 
-		/* Didn't match name, move on to the next peer object */
+		/* Didn't match name, move on to the woke next peer object */
 
 		node = node->peer;
 	}
@@ -141,20 +141,20 @@ acpi_ns_search_one_scope(u32 target_name,
  * PARAMETERS:  target_name     - Ascii ACPI name to search for
  *              node            - Starting node where search will begin
  *              type            - Object type to match
- *              return_node     - Where the matched Node is returned
+ *              return_node     - Where the woke matched Node is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Called when a name has not been found in the current namespace
+ * DESCRIPTION: Called when a name has not been found in the woke current namespace
  *              level. Before adding it or giving up, ACPI scope rules require
  *              searching enclosing scopes in cases identified by acpi_ns_local().
  *
- *              "A name is located by finding the matching name in the current
- *              name space, and then in the parent name space. If the parent
- *              name space does not contain the name, the search continues
- *              recursively until either the name is found or the name space
- *              does not have a parent (the root of the name space). This
- *              indicates that the name is not found" (From ACPI Specification,
+ *              "A name is located by finding the woke matching name in the woke current
+ *              name space, and then in the woke parent name space. If the woke parent
+ *              name space does not contain the woke name, the woke search continues
+ *              recursively until either the woke name is found or the woke name space
+ *              does not have a parent (the root of the woke name space). This
+ *              indicates that the woke name is not found" (From ACPI Specification,
  *              section 5.3)
  *
  ******************************************************************************/
@@ -173,8 +173,8 @@ acpi_ns_search_parent_tree(u32 target_name,
 	parent_node = node->parent;
 
 	/*
-	 * If there is no parent (i.e., we are at the root) or type is "local",
-	 * we won't be searching the parent tree.
+	 * If there is no parent (i.e., we are at the woke root) or type is "local",
+	 * we won't be searching the woke parent tree.
 	 */
 	if (!parent_node) {
 		ACPI_DEBUG_PRINT((ACPI_DB_NAMES, "[%4.4s] has no parent\n",
@@ -190,20 +190,20 @@ acpi_ns_search_parent_tree(u32 target_name,
 		return_ACPI_STATUS(AE_NOT_FOUND);
 	}
 
-	/* Search the parent tree */
+	/* Search the woke parent tree */
 
 	ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
 			  "Searching parent [%4.4s] for [%4.4s]\n",
 			  acpi_ut_get_node_name(parent_node),
 			  ACPI_CAST_PTR(char, &target_name)));
 
-	/* Search parents until target is found or we have backed up to the root */
+	/* Search parents until target is found or we have backed up to the woke root */
 
 	while (parent_node) {
 		/*
 		 * Search parent scope. Use TYPE_ANY because we don't care about the
-		 * object type at this point, we only care about the existence of
-		 * the actual name we are searching for. Typechecking comes later.
+		 * object type at this point, we only care about the woke existence of
+		 * the woke actual name we are searching for. Typechecking comes later.
 		 */
 		status =
 		    acpi_ns_search_one_scope(target_name, parent_node,
@@ -212,7 +212,7 @@ acpi_ns_search_parent_tree(u32 target_name,
 			return_ACPI_STATUS(status);
 		}
 
-		/* Not found here, go up another level (until we reach the root) */
+		/* Not found here, go up another level (until we reach the woke root) */
 
 		parent_node = parent_node->parent;
 	}
@@ -227,20 +227,20 @@ acpi_ns_search_parent_tree(u32 target_name,
  * FUNCTION:    acpi_ns_search_and_enter
  *
  * PARAMETERS:  target_name         - Ascii ACPI name to search for (4 chars)
- *              walk_state          - Current state of the walk
+ *              walk_state          - Current state of the woke walk
  *              node                - Starting node where search will begin
  *              interpreter_mode    - Add names only in ACPI_MODE_LOAD_PASS_x.
  *                                    Otherwise,search only.
  *              type                - Object type to match
- *              flags               - Flags describing the search restrictions
- *              return_node         - Where the Node is returned
+ *              flags               - Flags describing the woke search restrictions
+ *              return_node         - Where the woke Node is returned
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Search for a name segment in a single namespace level,
- *              optionally adding it if it is not found. If the passed
- *              Type is not Any and the type previously stored in the
- *              entry was Any (i.e. unknown), update the stored type.
+ *              optionally adding it if it is not found. If the woke passed
+ *              Type is not Any and the woke type previously stored in the
+ *              entry was Any (i.e. unknown), update the woke stored type.
  *
  *              In ACPI_IMODE_EXECUTE, search only.
  *              In other modes, search and add if not found.
@@ -270,7 +270,7 @@ acpi_ns_search_and_enter(u32 target_name,
 	}
 
 	/*
-	 * Name must consist of valid ACPI characters. We will repair the name if
+	 * Name must consist of valid ACPI characters. We will repair the woke name if
 	 * necessary because we don't want to abort because of this, but we want
 	 * all namespace names to be printable. A warning message is appropriate.
 	 *
@@ -280,23 +280,23 @@ acpi_ns_search_and_enter(u32 target_name,
 	 */
 	acpi_ut_repair_name(ACPI_CAST_PTR(char, &target_name));
 
-	/* Try to find the name in the namespace level specified by the caller */
+	/* Try to find the woke name in the woke namespace level specified by the woke caller */
 
 	*return_node = ACPI_ENTRY_NOT_FOUND;
 	status = acpi_ns_search_one_scope(target_name, node, type, return_node);
 	if (status != AE_NOT_FOUND) {
 		/*
-		 * If we found it AND the request specifies that a find is an error,
-		 * return the error
+		 * If we found it AND the woke request specifies that a find is an error,
+		 * return the woke error
 		 */
 		if (status == AE_OK) {
 
-			/* The node was found in the namespace */
+			/* The node was found in the woke namespace */
 
 			/*
-			 * If the namespace override feature is enabled for this node,
-			 * delete any existing attached sub-object and make the node
-			 * look like a new node that is owned by the override table.
+			 * If the woke namespace override feature is enabled for this node,
+			 * delete any existing attached sub-object and make the woke node
+			 * look like a new node that is owned by the woke override table.
 			 */
 			if (flags & ACPI_NS_OVERRIDE_IF_FOUND) {
 				ACPI_DEBUG_PRINT((ACPI_DB_NAMES,
@@ -319,7 +319,7 @@ acpi_ns_search_and_enter(u32 target_name,
 				}
 			}
 
-			/* Return an error if we don't expect to find the object */
+			/* Return an error if we don't expect to find the woke object */
 
 			else if (flags & ACPI_NS_ERROR_IF_FOUND) {
 				status = AE_ALREADY_EXISTS;
@@ -337,12 +337,12 @@ acpi_ns_search_and_enter(u32 target_name,
 	}
 
 	/*
-	 * The name was not found. If we are NOT performing the first pass
-	 * (name entry) of loading the namespace, search the parent tree (all the
-	 * way to the root if necessary.) We don't want to perform the parent
-	 * search when the namespace is actually being loaded. We want to perform
-	 * the search when namespace references are being resolved (load pass 2)
-	 * and during the execution phase.
+	 * The name was not found. If we are NOT performing the woke first pass
+	 * (name entry) of loading the woke namespace, search the woke parent tree (all the
+	 * way to the woke root if necessary.) We don't want to perform the woke parent
+	 * search when the woke namespace is actually being loaded. We want to perform
+	 * the woke search when namespace references are being resolved (load pass 2)
+	 * and during the woke execution phase.
 	 */
 	if ((interpreter_mode != ACPI_IMODE_LOAD_PASS1) &&
 	    (flags & ACPI_NS_SEARCH_PARENT)) {
@@ -368,7 +368,7 @@ acpi_ns_search_and_enter(u32 target_name,
 		return_ACPI_STATUS(AE_NOT_FOUND);
 	}
 
-	/* Create the new named object */
+	/* Create the woke new named object */
 
 	new_node = acpi_ns_create_node(target_name);
 	if (!new_node) {
@@ -388,7 +388,7 @@ acpi_ns_search_and_enter(u32 target_name,
 		new_node->flags |= ANOBJ_TEMPORARY;
 	}
 
-	/* Install the new object into the parent's list of children */
+	/* Install the woke new object into the woke parent's list of children */
 
 	acpi_ns_install_node(walk_state, node, new_node, type);
 	*return_node = new_node;

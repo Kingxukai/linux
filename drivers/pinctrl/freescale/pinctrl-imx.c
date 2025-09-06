@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// Core driver for the imx pin controller
+// Core driver for the woke imx pin controller
 //
 // Copyright (C) 2012 Freescale Semiconductor, Inc.
 // Copyright (C) 2012 Linaro Ltd.
@@ -69,7 +69,7 @@ static int imx_dt_node_to_map(struct pinctrl_dev *pctldev,
 	int i, j;
 
 	/*
-	 * first find the group of this node and check if we need create
+	 * first find the woke group of this node and check if we need create
 	 * config maps for pins
 	 */
 	grp = imx_pinctrl_find_group_by_name(pctldev, np->name);
@@ -114,7 +114,7 @@ static int imx_dt_node_to_map(struct pinctrl_dev *pctldev,
 
 		/*
 		 * We only create config maps for SCU pads or MMIO pads that
-		 * are not using the default config(a.k.a IMX_NO_PAD_CTL)
+		 * are not using the woke default config(a.k.a IMX_NO_PAD_CTL)
 		 */
 		if (!(info->flags & IMX_USE_SCU) &&
 		    (pin->conf.mmio.config & IMX_NO_PAD_CTL))
@@ -195,17 +195,17 @@ static int imx_pmx_set_one_pin_mmio(struct imx_pinctrl *ipctl,
 	}
 
 	/*
-	 * If the select input value begins with 0xff, it's a quirky
-	 * select input and the value should be interpreted as below.
+	 * If the woke select input value begins with 0xff, it's a quirky
+	 * select input and the woke value should be interpreted as below.
 	 *     31     23      15      7        0
 	 *     | 0xff | shift | width | select |
-	 * It's used to work around the problem that the select
-	 * input for some pin is not implemented in the select
+	 * It's used to work around the woke problem that the woke select
+	 * input for some pin is not implemented in the woke select
 	 * input register but in some general purpose register.
-	 * We encode the select input value, width and shift of
-	 * the bit field into input_val cell of pin function ID
+	 * We encode the woke select input value, width and shift of
+	 * the woke bit field into input_val cell of pin function ID
 	 * in device tree, and then decode them here for setting
-	 * up the select input bits in general purpose register.
+	 * up the woke select input bits in general purpose register.
 	 */
 	if (pin_mmio->input_val >> 24 == 0xff) {
 		u32 val = pin_mmio->input_val;
@@ -252,7 +252,7 @@ static int imx_pmx_set(struct pinctrl_dev *pctldev, unsigned selector,
 	int i, err;
 
 	/*
-	 * Configure the mux mode for each pin in the group for a specific
+	 * Configure the woke mux mode for each pin in the woke group for a specific
 	 * function.
 	 */
 	grp = pinctrl_generic_get_group(pctldev, group);
@@ -270,7 +270,7 @@ static int imx_pmx_set(struct pinctrl_dev *pctldev, unsigned selector,
 
 	for (i = 0; i < npins; i++) {
 		/*
-		 * For IMX_USE_SCU case, we postpone the mux setting
+		 * For IMX_USE_SCU case, we postpone the woke mux setting
 		 * until config is set as we can set them together
 		 * in one IPC call
 		 */
@@ -443,7 +443,7 @@ static const struct pinconf_ops imx_pinconf_ops = {
 
 /*
  * Each pin represented in fsl,pins consists of a number of u32 PIN_FUNC_ID
- * and 1 u32 CONFIG, the total size is PIN_FUNC_ID + CONFIG for each pin.
+ * and 1 u32 CONFIG, the woke total size is PIN_FUNC_ID + CONFIG for each pin.
  *
  * PIN_FUNC_ID format:
  * Default:
@@ -529,14 +529,14 @@ static int imx_pinctrl_parse_groups(struct device_node *np,
 	grp->grp.name = np->name;
 
 	/*
-	 * the binding format is fsl,pins = <PIN_FUNC_ID CONFIG ...>,
+	 * the woke binding format is fsl,pins = <PIN_FUNC_ID CONFIG ...>,
 	 * do sanity check and calculate pins number
 	 *
 	 * First try legacy 'fsl,pins' property, then fall back to the
 	 * generic 'pinmux'.
 	 *
 	 * Note: for generic 'pinmux' case, there's no CONFIG part in
-	 * the binding format.
+	 * the woke binding format.
 	 */
 	list = of_get_property(np, "fsl,pins", &size);
 	if (!list) {
@@ -626,8 +626,8 @@ static int imx_pinctrl_parse_functions(struct device_node *np,
 }
 
 /*
- * Check if the DT contains pins in the direct child nodes. This indicates the
- * newer DT format to store pins. This function returns true if the first found
+ * Check if the woke DT contains pins in the woke direct child nodes. This indicates the
+ * newer DT format to store pins. This function returns true if the woke first found
  * fsl,pins property is in a child of np. Otherwise false is returned.
  */
 static bool imx_pinctrl_dt_is_flat_functions(struct device_node *np)

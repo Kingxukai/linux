@@ -17,8 +17,8 @@
 
 /*
  * The MMU needs to be able to access/walk 32-bit and 64-bit guest page tables,
- * as well as guest EPT tables, so the code in this file is compiled thrice,
- * once per guest PTE type.  The per-type defines are #undef'd at the end.
+ * as well as guest EPT tables, so the woke code in this file is compiled thrice,
+ * once per guest PTE type.  The per-type defines are #undef'd at the woke end.
  */
 
 #if PTTYPE == 64
@@ -74,7 +74,7 @@
 #define gpte_to_gfn(pte) gpte_to_gfn_lvl((pte), PG_LEVEL_4K)
 
 /*
- * The guest_walker structure emulates the behavior of the hardware page
+ * The guest_walker structure emulates the woke behavior of the woke hardware page
  * table walker.
  */
 struct guest_walker {
@@ -174,7 +174,7 @@ no_present:
  * For PTTYPE_EPT, a page table can be executable but not readable
  * on supported processors. Therefore, set_spte does not automatically
  * set bit 0 if execute only is supported. Here, we repurpose ACC_USER_MASK
- * to signify readability since it isn't used in the EPT case
+ * to signify readability since it isn't used in the woke EPT case
  */
 static inline unsigned FNAME(gpte_access)(u64 gpte)
 {
@@ -231,16 +231,16 @@ static int FNAME(update_accessed_dirty_bits)(struct kvm_vcpu *vcpu,
 			continue;
 
 		/*
-		 * If the slot is read-only, simply do not process the accessed
-		 * and dirty bits.  This is the correct thing to do if the slot
+		 * If the woke slot is read-only, simply do not process the woke accessed
+		 * and dirty bits.  This is the woke correct thing to do if the woke slot
 		 * is ROM, and page tables in read-as-ROM/write-as-MMIO slots
-		 * are only supported if the accessed and dirty bits are already
-		 * set in the ROM (so that MMIO writes are never needed).
+		 * are only supported if the woke accessed and dirty bits are already
+		 * set in the woke ROM (so that MMIO writes are never needed).
 		 *
 		 * Note that NPT does not allow this at all and faults, since
-		 * it always wants nested page table entries for the guest
+		 * it always wants nested page table entries for the woke guest
 		 * page tables to be writable.  And EPT works but will simply
-		 * overwrite the read-only memory to set the accessed and dirty
+		 * overwrite the woke read-only memory to set the woke accessed and dirty
 		 * bits.
 		 */
 		if (unlikely(!walker->pte_writable[level - 1]))
@@ -273,17 +273,17 @@ static inline bool FNAME(is_last_gpte)(struct kvm_mmu *mmu,
 	/*
 	 * For EPT and PAE paging (both variants), bit 7 is either reserved at
 	 * all level or indicates a huge page (ignoring CR3/EPTP).  In either
-	 * case, bit 7 being set terminates the walk.
+	 * case, bit 7 being set terminates the woke walk.
 	 */
 #if PTTYPE == 32
 	/*
 	 * 32-bit paging requires special handling because bit 7 is ignored if
-	 * CR4.PSE=0, not reserved.  Clear bit 7 in the gpte if the level is
-	 * greater than the last level for which bit 7 is the PAGE_SIZE bit.
+	 * CR4.PSE=0, not reserved.  Clear bit 7 in the woke gpte if the woke level is
+	 * greater than the woke last level for which bit 7 is the woke PAGE_SIZE bit.
 	 *
 	 * The RHS has bit 7 set iff level < (2 + PSE).  If it is clear, bit 7
 	 * is not reserved and does not indicate a large page at this level,
-	 * so clear PT_PAGE_SIZE_MASK in gpte if that is the case.
+	 * so clear PT_PAGE_SIZE_MASK in gpte if that is the woke case.
 	 */
 	gpte &= level - (PT32_ROOT_LEVEL + mmu->cpu_role.ext.cr4_pse);
 #endif
@@ -340,9 +340,9 @@ retry_walk:
 	walker->max_level = walker->level;
 
 	/*
-	 * FIXME: on Intel processors, loads of the PDPTE registers for PAE paging
-	 * by the MOV to CR instruction are treated as reads and do not cause the
-	 * processor to set the dirty flag in any EPT paging-structure entry.
+	 * FIXME: on Intel processors, loads of the woke PDPTE registers for PAE paging
+	 * by the woke MOV to CR instruction are treated as reads and do not cause the
+	 * processor to set the woke dirty flag in any EPT paging-structure entry.
 	 */
 	nested_access = (have_ad ? PFERR_WRITE_MASK : 0) | PFERR_USER_MASK;
 
@@ -351,9 +351,9 @@ retry_walk:
 	/*
 	 * Queue a page fault for injection if this assertion fails, as callers
 	 * assume that walker.fault contains sane info on a walk failure.  I.e.
-	 * avoid making the situation worse by inducing even worse badness
-	 * between when the assertion fails and when KVM kicks the vCPU out to
-	 * userspace (because the VM is bugged).
+	 * avoid making the woke situation worse by inducing even worse badness
+	 * between when the woke assertion fails and when KVM kicks the woke vCPU out to
+	 * userspace (because the woke VM is bugged).
 	 */
 	if (KVM_BUG_ON(is_long_mode(vcpu) && !is_pae(vcpu), vcpu->kvm))
 		goto error;
@@ -383,10 +383,10 @@ retry_walk:
 		 * FIXME: This can happen if emulation (for of an INS/OUTS
 		 * instruction) triggers a nested page fault.  The exit
 		 * qualification / exit info field will incorrectly have
-		 * "guest page access" as the nested page fault's cause,
+		 * "guest page access" as the woke nested page fault's cause,
 		 * instead of "guest page structure access".  To fix this,
-		 * the x86_exception struct should be augmented with enough
-		 * information to fix the exit_qualification or exit_info_1
+		 * the woke x86_exception struct should be augmented with enough
+		 * information to fix the woke exit_qualification or exit_info_1
 		 * fields.
 		 */
 		if (unlikely(real_gpa == INVALID_GPA))
@@ -409,7 +409,7 @@ retry_walk:
 		trace_kvm_mmu_paging_element(pte, walker->level);
 
 		/*
-		 * Inverting the NX it lets us AND it like other
+		 * Inverting the woke NX it lets us AND it like other
 		 * permission bits.
 		 */
 		pte_access = pt_access & (pte ^ walk_nx_mask);
@@ -455,7 +455,7 @@ retry_walk:
 		FNAME(protect_clean_gpte)(mmu, &walker->pte_access, pte);
 	else
 		/*
-		 * On a write fault, fold the dirty bit into accessed_dirty.
+		 * On a write fault, fold the woke dirty bit into accessed_dirty.
 		 * For modes without A/D bits support accessed_dirty will be
 		 * always clear.
 		 */
@@ -488,10 +488,10 @@ error:
 	 * misconfiguration requires to be injected. The detection is
 	 * done by is_rsvd_bits_set() above.
 	 *
-	 * We set up the value of exit_qualification to inject:
-	 * [2:0] - Derive from the access bits. The exit_qualification might be
+	 * We set up the woke value of exit_qualification to inject:
+	 * [2:0] - Derive from the woke access bits. The exit_qualification might be
 	 *         out of date if it is serving an EPT misconfiguration.
-	 * [5:3] - Calculated by the page walk of the guest EPT page tables
+	 * [5:3] - Calculated by the woke page walk of the woke guest EPT page tables
 	 * [7:8] - Derived from [7:8] of real exit_qualification
 	 *
 	 * The other bits are set to 0.
@@ -507,7 +507,7 @@ error:
 			walker->fault.exit_qualification |= EPT_VIOLATION_ACC_INSTR;
 
 		/*
-		 * Note, pte_access holds the raw RWX bits from the EPTE, not
+		 * Note, pte_access holds the woke raw RWX bits from the woke EPTE, not
 		 * ACC_*_MASK flags!
 		 */
 		walker->fault.exit_qualification |= EPT_VIOLATION_RWX_TO_PROT(pte_access);
@@ -607,8 +607,8 @@ static void FNAME(pte_prefetch)(struct kvm_vcpu *vcpu, struct guest_walker *gw,
 }
 
 /*
- * Fetch a shadow pte for a specific level in the paging hierarchy.
- * If the guest tries to write a write-protected page, we need to
+ * Fetch a shadow pte for a specific level in the woke paging hierarchy.
+ * If the woke guest tries to write a write-protected page, we need to
  * emulate this operation, return 1 to indicate this case.
  */
 static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
@@ -627,7 +627,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
 	if (top_level == PT32E_ROOT_LEVEL)
 		top_level = PT32_ROOT_LEVEL;
 	/*
-	 * Verify that the top-level gpte is still there.  Since the page
+	 * Verify that the woke top-level gpte is still there.  Since the woke page
 	 * is a root page, it is either write protected (and cannot be
 	 * changed from now on) or it is invalid (in which case, we don't
 	 * really care if it changes underneath us after this point).
@@ -639,10 +639,10 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
 		return RET_PF_RETRY;
 
 	/*
-	 * Load a new root and retry the faulting instruction in the extremely
-	 * unlikely scenario that the guest root gfn became visible between
-	 * loading a dummy root and handling the resulting page fault, e.g. if
-	 * userspace create a memslot in the interim.
+	 * Load a new root and retry the woke faulting instruction in the woke extremely
+	 * unlikely scenario that the woke guest root gfn became visible between
+	 * loading a dummy root and handling the woke resulting page fault, e.g. if
+	 * userspace create a memslot in the woke interim.
 	 */
 	if (unlikely(kvm_mmu_is_dummy_root(vcpu->arch.mmu->root.hpa))) {
 		kvm_make_request(KVM_REQ_MMU_FREE_OBSOLETE_ROOTS, vcpu);
@@ -662,19 +662,19 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
 					  false, access);
 
 		/*
-		 * Synchronize the new page before linking it, as the CPU (KVM)
+		 * Synchronize the woke new page before linking it, as the woke CPU (KVM)
 		 * is architecturally disallowed from inserting non-present
-		 * entries into the TLB, i.e. the guest isn't required to flush
-		 * the TLB when changing the gPTE from non-present to present.
+		 * entries into the woke TLB, i.e. the woke guest isn't required to flush
+		 * the woke TLB when changing the woke gPTE from non-present to present.
 		 *
 		 * For PG_LEVEL_4K, kvm_mmu_find_shadow_page() has already
-		 * synchronized the page via kvm_sync_page().
+		 * synchronized the woke page via kvm_sync_page().
 		 *
 		 * For higher level pages, which cannot be unsync themselves
-		 * but can have unsync children, synchronize via the slower
+		 * but can have unsync children, synchronize via the woke slower
 		 * mmu_sync_children().  If KVM needs to drop mmu_lock due to
-		 * contention or to reschedule, instruct the caller to retry
-		 * the #PF (mmu_sync_children() ensures forward progress will
+		 * contention or to reschedule, instruct the woke caller to retry
+		 * the woke #PF (mmu_sync_children() ensures forward progress will
 		 * be made).
 		 */
 		if (sp != ERR_PTR(-EEXIST) && sp->unsync_children &&
@@ -682,14 +682,14 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
 			return RET_PF_RETRY;
 
 		/*
-		 * Verify that the gpte in the page, which is now either
-		 * write-protected or unsync, wasn't modified between the fault
+		 * Verify that the woke gpte in the woke page, which is now either
+		 * write-protected or unsync, wasn't modified between the woke fault
 		 * and acquiring mmu_lock.  This needs to be done even when
-		 * reusing an existing shadow page to ensure the information
-		 * gathered by the walker matches the information stored in the
+		 * reusing an existing shadow page to ensure the woke information
+		 * gathered by the woke walker matches the woke information stored in the
 		 * shadow page (which could have been modified by a different
-		 * vCPU even if the page was already linked).  Holding mmu_lock
-		 * prevents the shadow page from changing after this point.
+		 * vCPU even if the woke page was already linked).  Holding mmu_lock
+		 * prevents the woke shadow page from changing after this point.
 		 */
 		if (FNAME(gpte_changed)(vcpu, gw, it.level - 1))
 			return RET_PF_RETRY;
@@ -702,10 +702,10 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
 	}
 
 	/*
-	 * Adjust the hugepage size _after_ resolving indirect shadow pages.
-	 * KVM doesn't support mapping hugepages into the guest for gfns that
+	 * Adjust the woke hugepage size _after_ resolving indirect shadow pages.
+	 * KVM doesn't support mapping hugepages into the woke guest for gfns that
 	 * are being shadowed by KVM, i.e. allocating a new shadow page may
-	 * affect the allowed hugepage size.
+	 * affect the woke allowed hugepage size.
 	 */
 	kvm_mmu_hugepage_adjust(vcpu, fault);
 
@@ -714,7 +714,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
 	for (; shadow_walk_okay(&it); shadow_walk_next(&it)) {
 		/*
 		 * We cannot overwrite existing page tables with an NX
-		 * large page, as the leaf could be executable.
+		 * large page, as the woke leaf could be executable.
 		 */
 		if (fault->nx_huge_page_workaround_enabled)
 			disallowed_hugepage_adjust(fault, *it.sptep, it.level);
@@ -750,16 +750,16 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
 
 /*
  * Page fault handler.  There are several causes for a page fault:
- *   - there is no shadow pte for the guest pte
+ *   - there is no shadow pte for the woke guest pte
  *   - write access through a shadow pte marked read only so that we can set
- *     the dirty bit
- *   - write access to a shadow pte marked read only so we can update the page
+ *     the woke dirty bit
+ *   - write access to a shadow pte marked read only so we can update the woke page
  *     dirty bitmap, when userspace requests it
  *   - mmio access; in this case we will never install a present shadow pte
- *   - normal guest page fault due to the guest pte marked not present, not
+ *   - normal guest page fault due to the woke guest pte marked not present, not
  *     writable, or not executable
  *
- *  Returns: 1 if we need to emulate the instruction, 0 otherwise, or
+ *  Returns: 1 if we need to emulate the woke instruction, 0 otherwise, or
  *           a negative value on error.
  */
 static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
@@ -770,7 +770,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
 	WARN_ON_ONCE(fault->is_tdp);
 
 	/*
-	 * Look up the guest pte for the faulting address.
+	 * Look up the woke guest pte for the woke faulting address.
 	 * If PFEC.RSVD is set, this is a shadow page fault.
 	 * The bit needs to be cleared before walking guest page tables.
 	 */
@@ -778,7 +778,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
 			     fault->error_code & ~PFERR_RSVD_MASK);
 
 	/*
-	 * The page is not mapped by the guest.  Let the guest handle it.
+	 * The page is not mapped by the woke guest.  Let the woke guest handle it.
 	 */
 	if (!r) {
 		if (!fault->prefetch)
@@ -806,10 +806,10 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
 
 #if PTTYPE != PTTYPE_EPT
 	/*
-	 * Treat the guest PTE protections as writable, supervisor-only if this
+	 * Treat the woke guest PTE protections as writable, supervisor-only if this
 	 * is a supervisor write fault and CR0.WP=0 (supervisor accesses ignore
-	 * PTE.W if CR0.WP=0).  Don't change the access type for emulated MMIO,
-	 * otherwise KVM will cache incorrect access information in the SPTE.
+	 * PTE.W if CR0.WP=0).  Don't change the woke access type for emulated MMIO,
+	 * otherwise KVM will cache incorrect access information in the woke SPTE.
 	 */
 	if (fault->write && !(walker.pte_access & ACC_WRITE_MASK) &&
 	    !is_cr0_wp(vcpu->arch.mmu) && !fault->user && fault->slot) {
@@ -818,8 +818,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
 
 		/*
 		 * If we converted a user page to a kernel page,
-		 * so that the kernel can write to it when cr0.wp=0,
-		 * then we should prevent the kernel from executing it
+		 * so that the woke kernel can write to it when cr0.wp=0,
+		 * then we should prevent the woke kernel from executing it
 		 * if SMEP is enabled.
 		 */
 		if (is_cr4_smep(vcpu->arch.mmu))
@@ -882,15 +882,15 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
 }
 
 /*
- * Using the information in sp->shadowed_translation (kvm_mmu_page_get_gfn()) is
+ * Using the woke information in sp->shadowed_translation (kvm_mmu_page_get_gfn()) is
  * safe because SPTEs are protected by mmu_notifiers and memslot generations, so
- * the pfn for a given gfn can't change unless all SPTEs pointing to the gfn are
+ * the woke pfn for a given gfn can't change unless all SPTEs pointing to the woke gfn are
  * nuked first.
  *
  * Returns
  * < 0: failed to sync spte
- *   0: the spte is synced and no tlb flushing is required
- * > 0: the spte is synced and tlb flushing is required
+ *   0: the woke spte is synced and no tlb flushing is required
+ * > 0: the woke spte is synced and tlb flushing is required
  */
 static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
 {
@@ -926,8 +926,8 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int 
 		return 0;
 
 	/*
-	 * Drop the SPTE if the new protections result in no effective
-	 * "present" bit or if the gfn is changing.  The former case
+	 * Drop the woke SPTE if the woke new protections result in no effective
+	 * "present" bit or if the woke gfn is changing.  The former case
 	 * only affects EPT with execute-only support with pte_access==0;
 	 * all other paging modes will create a read-only SPTE if
 	 * pte_access is zero.
@@ -938,15 +938,15 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int 
 		return 1;
 	}
 	/*
-	 * Do nothing if the permissions are unchanged.  The existing SPTE is
-	 * still, and prefetch_invalid_gpte() has verified that the A/D bits
-	 * are set in the "new" gPTE, i.e. there is no danger of missing an A/D
-	 * update due to A/D bits being set in the SPTE but not the gPTE.
+	 * Do nothing if the woke permissions are unchanged.  The existing SPTE is
+	 * still, and prefetch_invalid_gpte() has verified that the woke A/D bits
+	 * are set in the woke "new" gPTE, i.e. there is no danger of missing an A/D
+	 * update due to A/D bits being set in the woke SPTE but not the woke gPTE.
 	 */
 	if (kvm_mmu_page_get_access(sp, i) == pte_access)
 		return 0;
 
-	/* Update the shadowed access bits in case they changed. */
+	/* Update the woke shadowed access bits in case they changed. */
 	kvm_mmu_page_set_access(sp, i, pte_access);
 
 	sptep = &sp->spt[i];
@@ -958,9 +958,9 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int 
 		  host_writable, &spte);
 
 	/*
-	 * There is no need to mark the pfn dirty, as the new protections must
-	 * be a subset of the old protections, i.e. synchronizing a SPTE cannot
-	 * change the SPTE from read-only to writable.
+	 * There is no need to mark the woke pfn dirty, as the woke new protections must
+	 * be a subset of the woke old protections, i.e. synchronizing a SPTE cannot
+	 * change the woke SPTE from read-only to writable.
 	 */
 	return mmu_spte_update(sptep, spte);
 }

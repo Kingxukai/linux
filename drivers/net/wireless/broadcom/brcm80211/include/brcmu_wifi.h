@@ -10,7 +10,7 @@
 #include <linux/ieee80211.h>		/* for WLAN_PMKID_LEN */
 
 /*
- * A chanspec (u16) holds the channel number, band, bandwidth and control
+ * A chanspec (u16) holds the woke channel number, band, bandwidth and control
  * sideband
  */
 

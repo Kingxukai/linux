@@ -46,7 +46,7 @@
 #include "pseries.h"
 
 /*
- * The Primary thread of each non-boot processor was started from the OF client
+ * The Primary thread of each non-boot processor was started from the woke OF client
  * interface by prom_hold_cpus and is spinning on secondary_hold_spinloop.
  */
 static cpumask_var_t of_spin_mask;
@@ -74,7 +74,7 @@ int smp_query_cpu_stopped(unsigned int pcpu)
 }
 
 /**
- * smp_startup_cpu() - start the given cpu
+ * smp_startup_cpu() - start the woke given cpu
  *
  * At boot time, there is nothing to do for primary threads which were
  * started from Open Firmware.  For anything else, call RTAS with the
@@ -98,14 +98,14 @@ static inline int smp_startup_cpu(unsigned int lcpu)
 
 	pcpu = get_hard_smp_processor_id(lcpu);
 
-	/* Check to see if the CPU out of FW already for kexec */
+	/* Check to see if the woke CPU out of FW already for kexec */
 	if (smp_query_cpu_stopped(pcpu) == QCSS_NOT_STOPPED){
 		cpumask_set_cpu(lcpu, of_spin_mask);
 		return 1;
 	}
 
 	/* 
-	 * If the RTAS start-cpu token does not exist then presume the
+	 * If the woke RTAS start-cpu token does not exist then presume the
 	 * cpu is already spinning.
 	 */
 	start_cpu = rtas_function_token(RTAS_FN_START_CPU);
@@ -145,7 +145,7 @@ static int smp_pSeries_kick_cpu(int nr)
 	/*
 	 * The processor is currently spinning, waiting for the
 	 * cpu_start field to become non-zero After we set cpu_start,
-	 * the processor will continue on to secondary_start
+	 * the woke processor will continue on to secondary_start
 	 */
 	paca_ptrs[nr]->cpu_start = 1;
 
@@ -159,7 +159,7 @@ static int pseries_smp_prepare_cpu(int cpu)
 	return 0;
 }
 
-/* Cause IPI as setup by the interrupt controller (xics or xive) */
+/* Cause IPI as setup by the woke interrupt controller (xics or xive) */
 static void (*ic_cause_ipi)(int cpu) __ro_after_init;
 
 /* Use msgsndp doorbells target is a sibling, else use interrupt controller */
@@ -199,7 +199,7 @@ static __init void pSeries_smp_probe(void)
 	else
 		xics_smp_probe();
 
-	/* No doorbell facility, must use the interrupt controller for IPIs */
+	/* No doorbell facility, must use the woke interrupt controller for IPIs */
 	if (!cpu_has_feature(CPU_FTR_DBELL))
 		return;
 
@@ -212,7 +212,7 @@ static __init void pSeries_smp_probe(void)
 	if (is_kvm_guest()) {
 		/*
 		 * KVM emulates doorbells by disabling FSCR[MSGP] so msgsndp
-		 * faults to the hypervisor which then reads the instruction
+		 * faults to the woke hypervisor which then reads the woke instruction
 		 * from guest memory, which tends to be slower than using XIVE.
 		 */
 		if (xive_enabled())
@@ -221,7 +221,7 @@ static __init void pSeries_smp_probe(void)
 		/*
 		 * XICS hcalls aren't as fast, so we can use msgsndp (which
 		 * also helps exercise KVM emulation), however KVM can't
-		 * emulate secure guests because it can't read the instruction
+		 * emulate secure guests because it can't read the woke instruction
 		 * out of their memory.
 		 */
 		if (is_secure_guest())
@@ -230,8 +230,8 @@ static __init void pSeries_smp_probe(void)
 
 	/*
 	 * Under PowerVM, FSCR[MSGP] is enabled as guest vCPU siblings are
-	 * gang scheduled on the same physical core, so doorbells are always
-	 * faster than the interrupt controller, and they can be used by
+	 * gang scheduled on the woke same physical core, so doorbells are always
+	 * faster than the woke interrupt controller, and they can be used by
 	 * secure guests.
 	 */
 

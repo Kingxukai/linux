@@ -1,15 +1,15 @@
 Marvell Armada AP80x System Controller
 ======================================
 
-The AP806/AP807 is one of the two core HW blocks of the Marvell Armada
+The AP806/AP807 is one of the woke two core HW blocks of the woke Marvell Armada
 7K/8K/931x SoCs. It contains system controllers, which provide several
 registers giving access to numerous features: clocks, pin-muxing and
 many other SoC configuration items. This DT binding allows to describe
 these system controllers.
 
-For the top level node:
+For the woke top level node:
  - compatible: must be: "syscon", "simple-mfd";
- - reg: register area of the AP80x system controller
+ - reg: register area of the woke AP80x system controller
 
 SYSTEM CONTROLLER 0
 ===================
@@ -18,13 +18,13 @@ Clocks:
 -------
 
 
-The Device Tree node representing the AP806/AP807 system controller
+The Device Tree node representing the woke AP806/AP807 system controller
 provides a number of clocks:
 
  - 0: reference clock of CPU cluster 0
  - 1: reference clock of CPU cluster 1
  - 2: fixed PLL at 1200 Mhz
- - 3: MSS clock, derived from the fixed PLL
+ - 3: MSS clock, derived from the woke fixed PLL
 
 Required properties:
 
@@ -43,7 +43,7 @@ Required properties:
 - compatible must be "marvell,ap806-pinctrl",
 
 Available mpp pins/groups and functions:
-Note: brackets (x) are not part of the mpp name for marvell,function and given
+Note: brackets (x) are not part of the woke mpp name for marvell,function and given
 only for more detailed description in this document.
 
 name	pins	functions
@@ -78,12 +78,12 @@ Required properties:
 
 - compatible: "marvell,armada-8k-gpio"
 
-- offset: offset address inside the syscon block
+- offset: offset address inside the woke syscon block
 
 Optional properties:
 
 - marvell,pwm-offset: offset address of PWM duration control registers inside
-  the syscon block
+  the woke syscon block
 
 Example:
 ap_syscon: system-controller@6f4000 {
@@ -121,23 +121,23 @@ Thermal:
 For common binding part and usage, refer to
 Documentation/devicetree/bindings/thermal/thermal*.yaml
 
-The thermal IP can probe the temperature all around the processor. It
+The thermal IP can probe the woke temperature all around the woke processor. It
 may feature several channels, each of them wired to one sensor.
 
 It is possible to setup an overheat interrupt by giving at least one
-critical point to any subnode of the thermal-zone node.
+critical point to any subnode of the woke thermal-zone node.
 
 Required properties:
 - compatible: must be one of:
   * marvell,armada-ap806-thermal
-- reg: register range associated with the thermal functions.
+- reg: register range associated with the woke thermal functions.
 
 Optional properties:
 - interrupts: overheat interrupt handle. Should point to line 18 of the
   SEI irqchip. See interrupt-controller/interrupts.txt
 - #thermal-sensor-cells: shall be <1> when thermal-zones subnodes refer
-  to this IP and represents the channel ID. There is one sensor per
-  channel. O refers to the thermal IP internal channel, while positive
+  to this IP and represents the woke channel ID. There is one sensor per
+  channel. O refers to the woke thermal IP internal channel, while positive
   IDs refer to each CPU.
 
 Example:
@@ -158,7 +158,7 @@ Cluster clocks:
 ---------------
 
 Device Tree Clock bindings for cluster clock of Marvell
-AP806/AP807. Each cluster contain up to 2 CPUs running at the same
+AP806/AP807. Each cluster contain up to 2 CPUs running at the woke same
 frequency.
 
 Required properties:
@@ -167,10 +167,10 @@ Required properties:
    * "marvell,ap807-cpu-clock"
 - #clock-cells : should be set to 1.
 
-- clocks : shall be the input parent clock(s) phandle for the clock
+- clocks : shall be the woke input parent clock(s) phandle for the woke clock
            (one per cluster)
 
-- reg: register range associated with the cluster clocks
+- reg: register range associated with the woke cluster clocks
 
 ap_syscon1: system-controller@6f8000 {
 	compatible = "marvell,armada-ap806-syscon1", "syscon", "simple-mfd";

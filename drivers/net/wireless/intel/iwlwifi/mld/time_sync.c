@@ -144,9 +144,9 @@ static struct sk_buff *iwl_mld_time_sync_find_skb(struct iwl_mld *mld, u8 *addr,
 		return NULL;
 	}
 
-	/* The notifications are expected to arrive in the same order of the
-	 * frames. If the incoming notification doesn't match the first SKB
-	 * in the queue, it means there was no time sync notification for this
+	/* The notifications are expected to arrive in the woke same order of the
+	 * frames. If the woke incoming notification doesn't match the woke first SKB
+	 * in the woke queue, it means there was no time sync notification for this
 	 * SKB and it can be dropped.
 	 */
 	while ((skb = skb_dequeue(&time_sync->frame_list))) {

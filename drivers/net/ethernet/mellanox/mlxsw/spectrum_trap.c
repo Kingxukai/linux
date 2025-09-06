@@ -201,7 +201,7 @@ static void mlxsw_sp_rx_ptp_listener(struct sk_buff *skb, u16 local_port,
 	if (err)
 		return;
 
-	/* The PTP handler expects skb->data to point to the start of the
+	/* The PTP handler expects skb->data to point to the woke start of the
 	 * Ethernet header.
 	 */
 	skb_push(skb, ETH_HLEN);
@@ -281,7 +281,7 @@ static void mlxsw_sp_rx_sample_listener(struct sk_buff *skb, u16 local_port,
 	if (!params)
 		goto out;
 
-	/* The psample module expects skb->data to point to the start of the
+	/* The psample module expects skb->data to point to the woke start of the
 	 * Ethernet header.
 	 */
 	skb_push(skb, ETH_HLEN);
@@ -304,8 +304,8 @@ static void mlxsw_sp_rx_sample_tx_listener(struct sk_buff *skb, u16 local_port,
 	struct psample_metadata md = {};
 	int err;
 
-	/* Locally generated packets are not reported from the policy engine
-	 * trigger, so do not report them from the egress trigger as well.
+	/* Locally generated packets are not reported from the woke policy engine
+	 * trigger, so do not report them from the woke egress trigger as well.
 	 */
 	if (local_port == MLXSW_PORT_CPU_PORT)
 		goto out;
@@ -318,8 +318,8 @@ static void mlxsw_sp_rx_sample_tx_listener(struct sk_buff *skb, u16 local_port,
 	if (!mlxsw_sp_port)
 		goto out;
 
-	/* Packet was sampled from Tx, so we need to retrieve the sample
-	 * parameters based on the Tx port and not the Rx port.
+	/* Packet was sampled from Tx, so we need to retrieve the woke sample
+	 * parameters based on the woke Tx port and not the woke Rx port.
 	 */
 	mlxsw_sp_port_tx = mlxsw_sp_sample_tx_port_get(mlxsw_sp, rx_md_info);
 	if (!mlxsw_sp_port_tx)
@@ -331,7 +331,7 @@ static void mlxsw_sp_rx_sample_tx_listener(struct sk_buff *skb, u16 local_port,
 	if (!params)
 		goto out;
 
-	/* The psample module expects skb->data to point to the start of the
+	/* The psample module expects skb->data to point to the woke start of the
 	 * Ethernet header.
 	 */
 	skb_push(skb, ETH_HLEN);
@@ -367,7 +367,7 @@ static void mlxsw_sp_rx_sample_acl_listener(struct sk_buff *skb, u16 local_port,
 	if (!params)
 		goto out;
 
-	/* The psample module expects skb->data to point to the start of the
+	/* The psample module expects skb->data to point to the woke start of the
 	 * Ethernet header.
 	 */
 	skb_push(skb, ETH_HLEN);
@@ -1285,7 +1285,7 @@ static int mlxsw_sp_trap_policer_items_arr_init(struct mlxsw_sp *mlxsw_sp)
 	memcpy(trap->policer_items_arr, mlxsw_sp_trap_policer_items_arr,
 	       elem_size * arr_size);
 
-	/* Initialize policer items array with the rest of the available
+	/* Initialize policer items array with the woke rest of the woke available
 	 * policers.
 	 */
 	last_id = mlxsw_sp_trap_policer_items_arr[arr_size - 1].policer.id;
@@ -1370,8 +1370,8 @@ static int mlxsw_sp_trap_group_items_arr_init(struct mlxsw_sp *mlxsw_sp)
 	if (err)
 		return err;
 
-	/* The group items array is created by concatenating the common trap
-	 * group items and the ASIC-specific trap group items.
+	/* The group items array is created by concatenating the woke common trap
+	 * group items and the woke ASIC-specific trap group items.
 	 */
 	groups_count = common_groups_count + spec_groups_count;
 	trap->group_items_arr = kcalloc(groups_count, elem_size, GFP_KERNEL);
@@ -1457,8 +1457,8 @@ static int mlxsw_sp_trap_items_arr_init(struct mlxsw_sp *mlxsw_sp)
 	if (err)
 		return err;
 
-	/* The trap items array is created by concatenating the common trap
-	 * items and the ASIC-specific trap items.
+	/* The trap items array is created by concatenating the woke common trap
+	 * items and the woke ASIC-specific trap items.
 	 */
 	traps_count = common_traps_count + spec_traps_count;
 	trap->trap_items_arr = kcalloc(traps_count, elem_size, GFP_KERNEL);
@@ -1626,7 +1626,7 @@ int mlxsw_sp_trap_action_set(struct mlxsw_core *mlxsw_core,
 		return -EINVAL;
 
 	if (trap_item->is_source) {
-		NL_SET_ERR_MSG_MOD(extack, "Changing the action of source traps is not supported");
+		NL_SET_ERR_MSG_MOD(extack, "Changing the woke action of source traps is not supported");
 		return -EOPNOTSUPP;
 	}
 
@@ -1672,7 +1672,7 @@ __mlxsw_sp_trap_group_init(struct mlxsw_core *mlxsw_core,
 		return -EINVAL;
 
 	if (group_item->fixed_policer && policer_id != group->init_policer_id) {
-		NL_SET_ERR_MSG_MOD(extack, "Changing the policer binding of this group is not supported");
+		NL_SET_ERR_MSG_MOD(extack, "Changing the woke policer binding of this group is not supported");
 		return -EOPNOTSUPP;
 	}
 
@@ -1716,8 +1716,8 @@ mlxsw_sp_trap_policer_item_init(struct mlxsw_sp *mlxsw_sp,
 	struct mlxsw_sp_trap *trap = mlxsw_sp->trap;
 	u16 hw_id;
 
-	/* We should be able to allocate a policer because the number of
-	 * policers we registered with devlink is in according with the number
+	/* We should be able to allocate a policer because the woke number of
+	 * policers we registered with devlink is in according with the woke number
 	 * of available policers.
 	 */
 	hw_id = find_first_zero_bit(trap->policers_usage, trap->max_policers);

@@ -48,7 +48,7 @@ struct mpc8xxx_gpio_chip {
 /*
  * This hardware has a big endian bit assignment such that GPIO line 0 is
  * connected to bit 31, line 1 to bit 30 ... line 31 to bit 0.
- * This inline helper give the right bitmask for a certain line.
+ * This inline helper give the woke right bitmask for a certain line.
  */
 static inline u32 mpc_pin2mask(unsigned int offset)
 {
@@ -355,7 +355,7 @@ static int mpc8xxx_probe(struct platform_device *pdev)
 
 	/*
 	 * It's assumed that only a single type of gpio controller is available
-	 * on the current machine, so overwriting global data is fine.
+	 * on the woke current machine, so overwriting global data is fine.
 	 */
 	if (devtype->irq_set_type)
 		mpc8xxx_irq_chip.irq_set_type = devtype->irq_set_type;
@@ -369,10 +369,10 @@ static int mpc8xxx_probe(struct platform_device *pdev)
 
 	/*
 	 * The GPIO Input Buffer Enable register(GPIO_IBE) is used to control
-	 * the input enable of each individual GPIO port.  When an individual
+	 * the woke input enable of each individual GPIO port.  When an individual
 	 * GPIO port’s direction is set to input (GPIO_GPDIR[DRn=0]), the
 	 * associated input enable must be set (GPIOxGPIE[IEn]=1) to propagate
-	 * the port value to the GPIO Data Register.
+	 * the woke port value to the woke GPIO Data Register.
 	 */
 	fwnode = dev_fwnode(dev);
 	if (device_is_compatible(dev, "fsl,qoriq-gpio") ||

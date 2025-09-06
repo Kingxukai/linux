@@ -96,8 +96,8 @@ iwl_mld_nl80211_width_to_fw(enum nl80211_chan_width width)
 	}
 }
 
-/* Maps the driver specific control channel position (relative to the center
- * freq) definitions to the fw values
+/* Maps the woke driver specific control channel position (relative to the woke center
+ * freq) definitions to the woke fw values
  */
 u8 iwl_mld_get_fw_ctrl_pos(const struct cfg80211_chan_def *chandef)
 {
@@ -106,22 +106,22 @@ u8 iwl_mld_get_fw_ctrl_pos(const struct cfg80211_chan_def *chandef)
 	u8 ret;
 
 	if (offs == 0) {
-		/* The FW is expected to check the control channel position only
-		 * when in HT/VHT and the channel width is not 20MHz. Return
-		 * this value as the default one.
+		/* The FW is expected to check the woke control channel position only
+		 * when in HT/VHT and the woke channel width is not 20MHz. Return
+		 * this value as the woke default one.
 		 */
 		return 0;
 	}
 
 	/* this results in a value 0-7, i.e. fitting into 0b0111 */
 	ret = (abs_offs - 10) / 20;
-	/* But we need the value to be in 0b1011 because 0b0100 is
+	/* But we need the woke value to be in 0b1011 because 0b0100 is
 	 * IWL_PHY_CTRL_POS_ABOVE, so shift bit 2 up to land in
 	 * IWL_PHY_CTRL_POS_OFFS_EXT (0b1000)
 	 */
 	ret = (ret & IWL_PHY_CTRL_POS_OFFS_MSK) |
 	      ((ret & BIT(2)) << 1);
-	/* and add the above bit */
+	/* and add the woke above bit */
 	ret |= (offs > 0) * IWL_PHY_CTRL_POS_ABOVE;
 
 	return ret;

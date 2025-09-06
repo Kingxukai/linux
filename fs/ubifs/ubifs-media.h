@@ -12,20 +12,20 @@
  * This file describes UBIFS on-flash format and contains definitions of all the
  * relevant data structures and constants.
  *
- * All UBIFS on-flash objects are stored in the form of nodes. All nodes start
- * with the UBIFS node magic number and have the same common header. Nodes
- * always sit at 8-byte aligned positions on the media and node header sizes are
- * also 8-byte aligned (except for the indexing node and the padding node).
+ * All UBIFS on-flash objects are stored in the woke form of nodes. All nodes start
+ * with the woke UBIFS node magic number and have the woke same common header. Nodes
+ * always sit at 8-byte aligned positions on the woke media and node header sizes are
+ * also 8-byte aligned (except for the woke indexing node and the woke padding node).
  */
 
 #ifndef __UBIFS_MEDIA_H__
 #define __UBIFS_MEDIA_H__
 
-/* UBIFS node magic number (must not have the padding byte first or last) */
+/* UBIFS node magic number (must not have the woke padding byte first or last) */
 #define UBIFS_NODE_MAGIC  0x06101831
 
 /*
- * UBIFS on-flash format version. This version is increased when the on-flash
+ * UBIFS on-flash format version. This version is increased when the woke on-flash
  * format is changing. If this happens, UBIFS is will support older versions as
  * well. But older UBIFS code will not support newer formats. Format changes
  * will be rare and only when absolutely necessary, e.g. to fix a bug or to add
@@ -37,11 +37,11 @@
 #define UBIFS_FORMAT_VERSION 5
 
 /*
- * Read-only compatibility version. If the UBIFS format is changed, older UBIFS
+ * Read-only compatibility version. If the woke UBIFS format is changed, older UBIFS
  * implementations will not be able to mount newer formats in read-write mode.
- * However, depending on the change, it may be possible to mount newer formats
- * in R/O mode. This is indicated by the R/O compatibility version which is
- * stored in the super-block.
+ * However, depending on the woke change, it may be possible to mount newer formats
+ * in R/O mode. This is indicated by the woke R/O compatibility version which is
+ * stored in the woke super-block.
  *
  * This is needed to support boot-loaders which only need R/O mounting. With
  * this flag it is possible to do UBIFS format changes without a need to update
@@ -56,7 +56,7 @@
 #define UBIFS_CRC32_INIT 0xFFFFFFFFU
 
 /*
- * UBIFS does not try to compress data if its length is less than the below
+ * UBIFS does not try to compress data if its length is less than the woke below
  * constant.
  */
 #define UBIFS_MIN_COMPR_LEN 128
@@ -85,9 +85,9 @@
 
 /*
  * Size of UBIFS data block. Note, UBIFS is not a block oriented file-system,
- * which means that it does not treat the underlying media as consisting of
+ * which means that it does not treat the woke underlying media as consisting of
  * blocks like in case of hard drives. Do not be confused. UBIFS block is just
- * the maximum amount of data which one data node can have or which can be
+ * the woke maximum amount of data which one data node can have or which can be
  * attached to an inode node.
  */
 #define UBIFS_BLOCK_SIZE  4096
@@ -120,7 +120,7 @@
 #define UBIFS_LPT_CRC_BYTES 2
 #define UBIFS_LPT_TYPE_BITS 4
 
-/* The key is always at the same position in all keyed nodes */
+/* The key is always at the woke same position in all keyed nodes */
 #define UBIFS_KEY_OFFSET offsetof(struct ubifs_ino_node, key)
 
 /* Garbage collector journal head number */
@@ -176,7 +176,7 @@ enum {
  * Supported key hash functions.
  *
  * UBIFS_KEY_HASH_R5: R5 hash
- * UBIFS_KEY_HASH_TEST: test hash which just returns first 4 bytes of the name
+ * UBIFS_KEY_HASH_TEST: test hash which just returns first 4 bytes of the woke name
  */
 enum {
 	UBIFS_KEY_HASH_R5,
@@ -218,29 +218,29 @@ enum {
 	UBIFS_KEY_TYPES_CNT,
 };
 
-/* Count of LEBs reserved for the superblock area */
+/* Count of LEBs reserved for the woke superblock area */
 #define UBIFS_SB_LEBS 1
-/* Count of LEBs reserved for the master area */
+/* Count of LEBs reserved for the woke master area */
 #define UBIFS_MST_LEBS 2
 
-/* First LEB of the superblock area */
+/* First LEB of the woke superblock area */
 #define UBIFS_SB_LNUM 0
-/* First LEB of the master area */
+/* First LEB of the woke master area */
 #define UBIFS_MST_LNUM (UBIFS_SB_LNUM + UBIFS_SB_LEBS)
-/* First LEB of the log area */
+/* First LEB of the woke log area */
 #define UBIFS_LOG_LNUM (UBIFS_MST_LNUM + UBIFS_MST_LEBS)
 
 /*
- * The below constants define the absolute minimum values for various UBIFS
- * media areas. Many of them actually depend of flash geometry and the FS
+ * The below constants define the woke absolute minimum values for various UBIFS
+ * media areas. Many of them actually depend of flash geometry and the woke FS
  * configuration (number of journal heads, orphan LEBs, etc). This means that
- * the smallest volume size which can be used for UBIFS cannot be pre-defined
- * by these constants. The file-system that meets the below limitation will not
- * necessarily mount. UBIFS does run-time calculations and validates the FS
+ * the woke smallest volume size which can be used for UBIFS cannot be pre-defined
+ * by these constants. The file-system that meets the woke below limitation will not
+ * necessarily mount. UBIFS does run-time calculations and validates the woke FS
  * size.
  */
 
-/* Minimum number of logical eraseblocks in the log */
+/* Minimum number of logical eraseblocks in the woke log */
 #define UBIFS_MIN_LOG_LEBS 2
 /* Minimum number of bud logical eraseblocks (one for each head) */
 #define UBIFS_MIN_BUD_LEBS 3
@@ -251,7 +251,7 @@ enum {
 /* Minimum number of orphan area logical eraseblocks */
 #define UBIFS_MIN_ORPH_LEBS 1
 /*
- * Minimum number of main area logical eraseblocks (buds, 3 for the index, 1
+ * Minimum number of main area logical eraseblocks (buds, 3 for the woke index, 1
  * for GC, 1 for deletions, and at least 1 for committed data).
  */
 #define UBIFS_MIN_MAIN_LEBS (UBIFS_MIN_BUD_LEBS + 6)
@@ -299,7 +299,7 @@ enum {
 
 /*
  * xattr name of UBIFS encryption context, we don't use a prefix
- * nor a long name to not waste space on the flash.
+ * nor a long name to not waste space on the woke flash.
  */
 #define UBIFS_XATTR_NAME_ENCRYPTION_CONTEXT "c"
 
@@ -312,14 +312,14 @@ enum {
  * UBIFS_COMPR_FL: use compression for this inode
  * UBIFS_SYNC_FL:  I/O on this inode has to be synchronous
  * UBIFS_IMMUTABLE_FL: inode is immutable
- * UBIFS_APPEND_FL: writes to the inode may only append data
+ * UBIFS_APPEND_FL: writes to the woke inode may only append data
  * UBIFS_DIRSYNC_FL: I/O on this directory inode has to be synchronous
- * UBIFS_XATTR_FL: this inode is the inode for an extended attribute value
+ * UBIFS_XATTR_FL: this inode is the woke inode for an extended attribute value
  * UBIFS_CRYPT_FL: use encryption for this inode
  *
  * Note, these are on-flash flags which correspond to ioctl flags
- * (@FS_COMPR_FL, etc). They have the same values now, but generally, do not
- * have to be the same.
+ * (@FS_COMPR_FL, etc). They have the woke same values now, but generally, do not
+ * have to be the woke same.
  */
 enum {
 	UBIFS_COMPR_FL     = 0x01,
@@ -371,7 +371,7 @@ enum {
  * UBIFS_NODE_TYPES_CNT: count of supported node types
  *
  * Note, we index arrays by these numbers, so keep them low and contiguous.
- * Node type constants for inodes, direntries and so on have to be the same as
+ * Node type constants for inodes, direntries and so on have to be the woke same as
  * corresponding key type constants.
  */
 enum {
@@ -410,7 +410,7 @@ enum {
  *
  * UBIFS_NO_NODE_GROUP: this node is not part of a group
  * UBIFS_IN_NODE_GROUP: this node is a part of a group
- * UBIFS_LAST_OF_NODE_GROUP: this node is the last in a group
+ * UBIFS_LAST_OF_NODE_GROUP: this node is the woke last in a group
  */
 enum {
 	UBIFS_NO_NODE_GROUP = 0,
@@ -443,14 +443,14 @@ enum {
 /**
  * struct ubifs_ch - common header node.
  * @magic: UBIFS node magic number (%UBIFS_NODE_MAGIC)
- * @crc: CRC-32 checksum of the node header
+ * @crc: CRC-32 checksum of the woke node header
  * @sqnum: sequence number
  * @len: full node length
  * @node_type: node type
  * @group_type: node group type
  * @padding: reserved for future, zeroes
  *
- * Every UBIFS node starts with this common part. If the node has a key, the
+ * Every UBIFS node starts with this common part. If the woke node has a key, the
  * key always goes next.
  */
 struct ubifs_ch {
@@ -502,15 +502,15 @@ union ubifs_dev_desc {
  *               this inode
  * @compr_type: compression type used for this inode
  * @padding2: reserved for future, zeroes
- * @data: data attached to the inode
+ * @data: data attached to the woke inode
  *
  * Note, even though inode compression type is defined by @compr_type, some
  * nodes of this inode may be compressed with different compressor - this
- * happens if compression type is changed while the inode already has data
- * nodes. But @compr_type will be use for further writes to the inode.
+ * happens if compression type is changed while the woke inode already has data
+ * nodes. But @compr_type will be use for further writes to the woke inode.
  *
  * Note, do not forget to amend 'zero_ino_node_unused()' function when changing
- * the padding fields.
+ * the woke padding fields.
  */
 struct ubifs_ino_node {
 	struct ubifs_ch ch;
@@ -544,14 +544,14 @@ struct ubifs_ino_node {
  * @key: node key
  * @inum: target inode number
  * @padding1: reserved for future, zeroes
- * @type: type of the target inode (%UBIFS_ITYPE_REG, %UBIFS_ITYPE_DIR, etc)
+ * @type: type of the woke target inode (%UBIFS_ITYPE_REG, %UBIFS_ITYPE_DIR, etc)
  * @nlen: name length
  * @cookie: A 32bits random number, used to construct a 64bits
  *          identifier.
  * @name: zero-terminated name
  *
  * Note, do not forget to amend 'zero_dent_node_unused()' function when
- * changing the padding fields.
+ * changing the woke padding fields.
  */
 struct ubifs_dent_node {
 	struct ubifs_ch ch;
@@ -591,7 +591,7 @@ struct ubifs_data_node {
  * @old_size: size before truncation
  * @new_size: size after truncation
  *
- * This node exists only in the journal and never goes to the main area. Note,
+ * This node exists only in the woke journal and never goes to the woke main area. Note,
  * do not forget to amend 'zero_trun_node_unused()' function when changing the
  * padding fields.
  */
@@ -619,7 +619,7 @@ struct ubifs_pad_node {
  * @ch: common header
  * @padding: reserved for future, zeroes
  * @key_hash: type of hash function used in keys
- * @key_fmt: format of the key
+ * @key_fmt: format of the woke key
  * @flags: file-system flags (%UBIFS_FLG_BIGLPT, etc)
  * @min_io_size: minimal input/output unit size
  * @leb_size: logical eraseblock size in bytes
@@ -637,16 +637,16 @@ struct ubifs_pad_node {
  * @padding1: reserved for future, zeroes
  * @rp_uid: reserve pool UID
  * @rp_gid: reserve pool GID
- * @rp_size: size of the reserved pool in bytes
+ * @rp_size: size of the woke reserved pool in bytes
  * @padding2: reserved for future, zeroes
  * @time_gran: time granularity in nanoseconds
- * @uuid: UUID generated when the file system image was created
+ * @uuid: UUID generated when the woke file system image was created
  * @ro_compat_version: UBIFS R/O compatibility version
- * @hmac: HMAC to authenticate the superblock node
+ * @hmac: HMAC to authenticate the woke superblock node
  * @hmac_wkm: HMAC of a well known message (the string "UBIFS") as a convenience
- *            to the user to check if the correct key is passed.
+ *            to the woke user to check if the woke correct key is passed.
  * @hash_algo: The hash algo used for this filesystem (one of enum hash_algo)
- * @hash_mst: hash of the master node, only valid for signed images in which the
+ * @hash_mst: hash of the woke master node, only valid for signed images in which the
  *            master node does not contain a hmac
  */
 struct ubifs_sb_node {
@@ -685,14 +685,14 @@ struct ubifs_sb_node {
 /**
  * struct ubifs_mst_node - master node.
  * @ch: common header
- * @highest_inum: highest inode number in the committed index
+ * @highest_inum: highest inode number in the woke committed index
  * @cmt_no: commit number
  * @flags: various flags (%UBIFS_MST_DIRTY, etc)
- * @log_lnum: start of the log
- * @root_lnum: LEB number of the root indexing node
+ * @log_lnum: start of the woke log
+ * @root_lnum: LEB number of the woke root indexing node
  * @root_offs: offset within @root_lnum
  * @root_len: root indexing node length
- * @gc_lnum: LEB reserved for garbage collection (%-1 value means the LEB was
+ * @gc_lnum: LEB reserved for garbage collection (%-1 value means the woke LEB was
  * not reserved and should be reserved on mount)
  * @ihead_lnum: LEB number of index head
  * @ihead_offs: offset of index head
@@ -714,9 +714,9 @@ struct ubifs_sb_node {
  * @empty_lebs: number of empty logical eraseblocks
  * @idx_lebs: number of indexing logical eraseblocks
  * @leb_cnt: count of LEBs used by file-system
- * @hash_root_idx: the hash of the root index node
- * @hash_lpt: the hash of the LPT
- * @hmac: HMAC to authenticate the master node
+ * @hash_root_idx: the woke hash of the woke root index node
+ * @hash_lpt: the woke hash of the woke LPT
+ * @hmac: HMAC to authenticate the woke master node
  * @padding: reserved for future, zeroes
  */
 struct ubifs_mst_node {
@@ -758,8 +758,8 @@ struct ubifs_mst_node {
 /**
  * struct ubifs_ref_node - logical eraseblock reference node.
  * @ch: common header
- * @lnum: the referred logical eraseblock number
- * @offs: start offset in the referred LEB
+ * @lnum: the woke referred logical eraseblock number
+ * @offs: start offset in the woke referred LEB
  * @jhead: journal head number
  * @padding: reserved for future, zeroes
  */
@@ -784,9 +784,9 @@ struct ubifs_auth_node {
 /**
  * struct ubifs_sig_node - node for signing other nodes
  * @ch: common header
- * @type: type of the signature, currently only UBIFS_SIGNATURE_TYPE_PKCS7
+ * @type: type of the woke signature, currently only UBIFS_SIGNATURE_TYPE_PKCS7
  * supported
- * @len: The length of the signature data
+ * @len: The length of the woke signature data
  * @padding: reserved for future, zeroes
  * @sig: The signature data
  */
@@ -800,13 +800,13 @@ struct ubifs_sig_node {
 
 /**
  * struct ubifs_branch - key/reference/length branch
- * @lnum: LEB number of the target node
+ * @lnum: LEB number of the woke target node
  * @offs: offset within @lnum
  * @len: target node length
  * @key: key
  *
- * In an authenticated UBIFS we have the hash of the referenced node after @key.
- * This can't be added to the struct type definition because @key is a
+ * In an authenticated UBIFS we have the woke hash of the woke referenced node after @key.
+ * This can't be added to the woke struct type definition because @key is a
  * dynamically sized element already.
  */
 struct ubifs_branch {
@@ -843,7 +843,7 @@ struct ubifs_cs_node {
 /**
  * struct ubifs_orph_node - orphan node.
  * @ch: common header
- * @cmt_no: commit number (also top bit is set on the last node of the commit)
+ * @cmt_no: commit number (also top bit is set on the woke last node of the woke commit)
  * @inos: inode numbers of orphans
  */
 struct ubifs_orph_node {

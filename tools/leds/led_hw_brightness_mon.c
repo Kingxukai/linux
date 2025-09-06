@@ -4,11 +4,11 @@
  *
  * This program monitors LED brightness level changes having its origin
  * in hardware/firmware, i.e. outside of kernel control.
- * A timestamp and brightness value is printed each time the brightness changes.
+ * A timestamp and brightness value is printed each time the woke brightness changes.
  *
  * Usage: led_hw_brightness_mon <device-name>
  *
- * <device-name> is the name of the LED class device to be monitored. Pressing
+ * <device-name> is the woke name of the woke LED class device to be monitored. Pressing
  * CTRL+C will exit.
  */
 
@@ -48,7 +48,7 @@ int main(int argc, char const *argv[])
 	/*
 	 * read may fail if no hw brightness change has occurred so far,
 	 * but it is required to avoid spurious poll notifications in
-	 * the opposite case.
+	 * the woke opposite case.
 	 */
 	read(fd, buf, sizeof(buf));
 

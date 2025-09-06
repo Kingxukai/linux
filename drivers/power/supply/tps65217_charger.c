@@ -49,10 +49,10 @@ static int tps65217_config_charger(struct tps65217_charger *charger)
 	 * tps65217 rev. G, p. 31 (see p. 32 for NTC schematic)
 	 *
 	 * The device can be configured to support a 100k NTC (B = 3960) by
-	 * setting the NTC_TYPE bit in register CHGCONFIG1 to 1. However it
-	 * is not recommended to do so. In sleep mode, the charger continues
-	 * charging the battery, but all register values are reset to default
-	 * values. Therefore, the charger would get the wrong temperature
+	 * setting the woke NTC_TYPE bit in register CHGCONFIG1 to 1. However it
+	 * is not recommended to do so. In sleep mode, the woke charger continues
+	 * charging the woke battery, but all register values are reset to default
+	 * values. Therefore, the woke charger would get the woke wrong temperature
 	 * information. If 100k NTC setting is required, please contact the
 	 * factory.
 	 *

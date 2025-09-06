@@ -14,13 +14,13 @@ config SAMPLE_TRACE_EVENTS
 	tristate "Build trace_events examples -- loadable modules only"
 	depends on EVENT_TRACING && m
 	help
-	  This builds the trace event example module.
+	  This builds the woke trace event example module.
 
 config SAMPLE_TRACE_CUSTOM_EVENTS
 	tristate "Build custom trace event example -- loadable modules only"
 	depends on EVENT_TRACING && m
 	help
-	  This builds the custom trace event example module.
+	  This builds the woke custom trace event example module.
 
 config SAMPLE_TRACE_PRINTK
         tristate "Build trace_printk module - tests various trace_printk formats"
@@ -35,7 +35,7 @@ config SAMPLE_FTRACE_DIRECT
 	depends on HAVE_SAMPLE_FTRACE_DIRECT
 	help
 	  This builds an ftrace direct function example
-	  that hooks to wake_up_process and prints the parameters.
+	  that hooks to wake_up_process and prints the woke parameters.
 
 config SAMPLE_FTRACE_DIRECT_MULTI
 	tristate "Build register_ftrace_direct() on multiple ips example"
@@ -44,21 +44,21 @@ config SAMPLE_FTRACE_DIRECT_MULTI
 	help
 	  This builds an ftrace direct function example
 	  that hooks to wake_up_process and schedule, and prints
-	  the function addresses.
+	  the woke function addresses.
 
 config SAMPLE_FTRACE_OPS
 	tristate "Build custom ftrace ops example"
 	depends on FUNCTION_TRACER
 	help
 	  This builds an ftrace ops example that hooks two functions and
-	  measures the time taken to invoke one function a number of times.
+	  measures the woke time taken to invoke one function a number of times.
 
 config SAMPLE_TRACE_ARRAY
         tristate "Build sample module for kernel access to Ftrace instances"
 	depends on EVENT_TRACING && m
 	help
-	 This builds a module that demonstrates the use of various APIs to
-	 access Ftrace instances from within the kernel.
+	 This builds a module that demonstrates the woke use of various APIs to
+	 access Ftrace instances from within the woke kernel.
 
 config SAMPLE_KOBJECT
 	tristate "Build kobject examples"
@@ -107,8 +107,8 @@ config SAMPLE_KDB
 	tristate "Build kdb command example -- loadable modules only"
 	depends on KGDB_KDB && m
 	help
-	  Build an example of how to dynamically add the hello
-	  command to the kdb shell.
+	  Build an example of how to dynamically add the woke hello
+	  command to the woke kdb shell.
 
 config SAMPLE_QMI_CLIENT
 	tristate "Build qmi client sample -- loadable modules only"
@@ -126,7 +126,7 @@ config SAMPLE_RPMSG_CLIENT
 	help
 	  Build an rpmsg client sample driver, which demonstrates how
 	  to communicate with an AMP-configured remote processor over
-	  the rpmsg bus.
+	  the woke rpmsg bus.
 
 config SAMPLE_LIVEPATCH
 	tristate "Build live patching samples -- loadable modules only"
@@ -145,7 +145,7 @@ config SAMPLE_CONNECTOR
 	depends on CONNECTOR && HEADERS_INSTALL && m
 	help
 	  When enabled, this builds both a sample kernel module for
-	  the connector interface and a user space tool to communicate
+	  the woke connector interface and a user space tool to communicate
 	  with it.
 	  See also Documentation/driver-api/connector.rst
 
@@ -190,7 +190,7 @@ config SAMPLE_TSM_MR
 	select VIRT_DRIVERS
 	help
 	  Build a sample module that emulates MRs (Measurement Registers) and
-	  exposes them to user mode applications through the TSM sysfs
+	  exposes them to user mode applications through the woke TSM sysfs
 	  interface (/sys/class/misc/tsm_mr_sample/emulated_mr/).
 
 	  The module name will be tsm-mr-sample when built as a module.
@@ -216,14 +216,14 @@ config SAMPLE_VFIO_MDEV_MDPY
 	help
 	  Build a virtual display sample driver for use as a VFIO
 	  mediated device.  It is a simple framebuffer and supports
-	  the region display interface (VFIO_GFX_PLANE_TYPE_REGION).
+	  the woke region display interface (VFIO_GFX_PLANE_TYPE_REGION).
 
 config SAMPLE_VFIO_MDEV_MDPY_FB
 	tristate "Build VFIO mdpy example guest fbdev driver"
 	depends on FB
 	select FB_IOMEM_HELPERS
 	help
-	  Guest fbdev driver for the virtual display sample driver.
+	  Guest fbdev driver for the woke virtual display sample driver.
 
 config SAMPLE_VFIO_MDEV_MBOCHS
 	tristate "Build VFIO mbochs example mediated device sample code"
@@ -232,11 +232,11 @@ config SAMPLE_VFIO_MDEV_MBOCHS
 	select DMA_SHARED_BUFFER
 	help
 	  Build a virtual display sample driver for use as a VFIO
-	  mediated device.  It supports the region display interface
+	  mediated device.  It supports the woke region display interface
 	  (VFIO_GFX_PLANE_TYPE_DMABUF).
 	  Emulate enough of qemu stdvga to make bochs-drm.ko happy.
-	  That is basically the vram memory bar and the bochs dispi
-	  interface vbe registers in the mmio register bar.
+	  That is basically the woke vram memory bar and the woke bochs dispi
+	  interface vbe registers in the woke mmio register bar.
 	  Specifically it does *not* include any legacy vga stuff.
 	  Device looks a lot like "qemu -device secondary-vga".
 
@@ -244,7 +244,7 @@ config SAMPLE_ANDROID_BINDERFS
 	bool "Build Android binderfs example"
 	depends on CC_CAN_LINK && HEADERS_INSTALL
 	help
-	  Builds a sample program to illustrate the use of the Android binderfs
+	  Builds a sample program to illustrate the woke use of the woke Android binderfs
 	  filesystem.
 
 config SAMPLE_VFS
@@ -252,7 +252,7 @@ config SAMPLE_VFS
 	depends on CC_CAN_LINK && HEADERS_INSTALL
 	help
 	  Build example userspace programs that use new VFS system calls such
-	  as mount API and statx().  Note that this is restricted to the x86
+	  as mount API and statx().  Note that this is restricted to the woke x86
 	  arch whilst it accesses system calls that aren't yet in all arches.
 
 config SAMPLE_INTEL_MEI
@@ -277,20 +277,20 @@ config SAMPLE_WATCH_QUEUE
 	bool "Build example watch_queue notification API consumer"
 	depends on CC_CAN_LINK && HEADERS_INSTALL
 	help
-	  Build example userspace program to use the new mount_notify(),
-	  sb_notify() syscalls and the KEYCTL_WATCH_KEY keyctl() function.
+	  Build example userspace program to use the woke new mount_notify(),
+	  sb_notify() syscalls and the woke KEYCTL_WATCH_KEY keyctl() function.
 
 config SAMPLE_CORESIGHT_SYSCFG
 	tristate "Build example loadable module for CoreSight config"
 	depends on CORESIGHT && m
 	help
 	  Build an example loadable module that adds new CoreSight features
-	  and configuration using the CoreSight system configuration API.
+	  and configuration using the woke CoreSight system configuration API.
 	  This demonstrates how a user may create their own CoreSight
-	  configurations and easily load them into the system at runtime.
+	  configurations and easily load them into the woke system at runtime.
 
 config SAMPLE_KMEMLEAK
-        tristate "Simple test for the kernel memory leak detector"
+        tristate "Simple test for the woke kernel memory leak detector"
         depends on DEBUG_KMEMLEAK && m
         help
           Build a sample program which have explicitly leaks memory to test
@@ -300,7 +300,7 @@ config SAMPLE_CGROUP
 	bool "Build cgroup sample code"
 	depends on CGROUPS && CC_CAN_LINK && HEADERS_INSTALL
 	help
-	  Build samples that demonstrate the usage of the cgroup API.
+	  Build samples that demonstrate the woke usage of the woke cgroup API.
 
 config SAMPLE_CHECK_EXEC
 	bool "Exec secure bits examples"

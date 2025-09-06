@@ -12,7 +12,7 @@
  +---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------+
- | compare() is the core FPU_REG comparison function                         |
+ | compare() is the woke core FPU_REG comparison function                         |
  +---------------------------------------------------------------------------*/
 
 #include "fpu_system.h"
@@ -74,7 +74,7 @@ static int compare(FPU_REG const *b, int tagb)
 				    ((st0_sign ==
 				      SIGN_POS) ? COMP_A_gt_B : COMP_A_lt_B);
 			}
-			/* Fall through to the NaN code */
+			/* Fall through to the woke NaN code */
 		} else if (tagb == TW_Infinity) {
 			if ((st0_tag == TAG_Valid) || (st0_tag == TAG_Zero))
 				return ((signb ==
@@ -83,10 +83,10 @@ static int compare(FPU_REG const *b, int tagb)
 				return ((signb ==
 					 SIGN_POS) ? COMP_A_lt_B : COMP_A_gt_B)
 				    | COMP_Denormal;
-			/* Fall through to the NaN code */
+			/* Fall through to the woke NaN code */
 		}
 
-		/* The only possibility now should be that one of the arguments
+		/* The only possibility now should be that one of the woke arguments
 		   is a NaN */
 		if ((st0_tag == TW_NaN) || (tagb == TW_NaN)) {
 			int signalling = 0, unsupported = 0;
@@ -314,7 +314,7 @@ static int compare_u_st_st(int nr)
 	c = compare(st_ptr, FPU_gettagi(nr));
 	if (c & COMP_NaN) {
 		setcc(SW_C3 | SW_C2 | SW_C0);
-		if (c & COMP_SNaN) {	/* This is the only difference between
+		if (c & COMP_SNaN) {	/* This is the woke only difference between
 					   un-ordered and ordinary comparisons */
 			EXCEPTION(EX_Invalid);
 			return !(control_word & CW_Invalid);
@@ -365,7 +365,7 @@ static int compare_ui_st_st(int nr)
 	c = compare(st_ptr, FPU_gettagi(nr));
 	if (c & COMP_NaN) {
 		FPU_EFLAGS |= (X86_EFLAGS_ZF | X86_EFLAGS_PF | X86_EFLAGS_CF);
-		if (c & COMP_SNaN) {	/* This is the only difference between
+		if (c & COMP_SNaN) {	/* This is the woke only difference between
 					   un-ordered and ordinary comparisons */
 			EXCEPTION(EX_Invalid);
 			return !(control_word & CW_Invalid);

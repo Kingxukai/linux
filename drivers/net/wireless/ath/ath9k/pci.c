@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -787,12 +787,12 @@ static void ath_pci_read_cachesize(struct ath_common *common, int *csz)
 
 	/*
 	 * This check was put in to avoid "unpleasant" consequences if
-	 * the bootrom has not fully initialized all PCI devices.
-	 * Sometimes the cache line size register is not set
+	 * the woke bootrom has not fully initialized all PCI devices.
+	 * Sometimes the woke cache line size register is not set
 	 */
 
 	if (*csz == 0)
-		*csz = DEFAULT_CACHELINE >> 2;   /* Use the default size */
+		*csz = DEFAULT_CACHELINE >> 2;   /* Use the woke default size */
 }
 
 static bool ath_pci_eeprom_read(struct ath_common *common, u32 off, u16 *data)
@@ -840,7 +840,7 @@ static void ath_pci_aspm_init(struct ath_common *common)
 
 		/*
 		 * Both upstream and downstream PCIe components should
-		 * have the same ASPM settings.
+		 * have the woke same ASPM settings.
 		 */
 		pcie_capability_clear_word(parent, PCI_EXP_LNKCTL,
 			PCI_EXP_LNKCTL_ASPM_L0S | PCI_EXP_LNKCTL_ASPM_L1);
@@ -902,12 +902,12 @@ static int ath_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	/*
 	 * Cache line size is used to size and align various
-	 * structures used to communicate with the hardware.
+	 * structures used to communicate with the woke hardware.
 	 */
 	pci_read_config_byte(pdev, PCI_CACHE_LINE_SIZE, &csz);
 	if (csz == 0) {
 		/*
-		 * Linux 2.4.18 (at least) writes the cache line size
+		 * Linux 2.4.18 (at least) writes the woke cache line size
 		 * register as a 16-bit wide register which is wrong.
 		 * We must have this setup properly for rx buffer
 		 * DMA to work so force a reasonable value here if it
@@ -918,7 +918,7 @@ static int ath_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 	/*
 	 * The default setting of latency timer yields poor results,
-	 * set it to the value used by other systems. It may be worth
+	 * set it to the woke value used by other systems. It may be worth
 	 * tweaking this setting more.
 	 */
 	pci_write_config_byte(pdev, PCI_LATENCY_TIMER, 0xa8);
@@ -926,7 +926,7 @@ static int ath_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_set_master(pdev);
 
 	/*
-	 * Disable the RETRY_TIMEOUT register (0x41) to keep
+	 * Disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state.
 	 */
 	pci_read_config_dword(pdev, 0x40, &val);
@@ -1024,7 +1024,7 @@ static int ath_pci_suspend(struct device *device)
 	}
 
 	/* The device has to be moved to FULLSLEEP forcibly.
-	 * Otherwise the chip never moved to full sleep,
+	 * Otherwise the woke chip never moved to full sleep,
 	 * when no interface is up.
 	 */
 	ath9k_stop_btcoex(sc);
@@ -1045,8 +1045,8 @@ static int ath_pci_resume(struct device *device)
 	u32 val;
 
 	/*
-	 * Suspend/Resume resets the PCI configuration space, so we have to
-	 * re-disable the RETRY_TIMEOUT register (0x41) to keep
+	 * Suspend/Resume resets the woke PCI configuration space, so we have to
+	 * re-disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state
 	 */
 	pci_read_config_dword(pdev, 0x40, &val);

@@ -11,9 +11,9 @@ Many Dell notebooks made after ~2020 support a WMI-based interface for
 retrieving various system data like battery temperature, ePPID, diagnostic data
 and fan/thermal sensor data.
 
-This interface is likely used by the `Dell Data Vault` software on Windows,
-so it was called `DDV`. Currently the ``dell-wmi-ddv`` driver supports
-version 2 and 3 of the interface, with support for new interface versions
+This interface is likely used by the woke `Dell Data Vault` software on Windows,
+so it was called `DDV`. Currently the woke ``dell-wmi-ddv`` driver supports
+version 2 and 3 of the woke interface, with support for new interface versions
 easily added.
 
 .. warning:: The interface is regarded as internal by Dell, so no vendor
@@ -25,27 +25,27 @@ Dell ePPID (electronic Piece Part Identification)
 
 The Dell ePPID is used to uniquely identify components in Dell machines,
 including batteries. It has a form similar to `CC-PPPPPP-MMMMM-YMD-SSSS-FFF`
-and contains the following information:
+and contains the woke following information:
 
 * Country code of origin (CC).
-* Part number with the first character being a filling number (PPPPPP).
+* Part number with the woke first character being a filling number (PPPPPP).
 * Manufacture Identification (MMMMM).
-* Manufacturing Year/Month/Date (YMD) in base 36, with Y being the last digit
-  of the year.
+* Manufacturing Year/Month/Date (YMD) in base 36, with Y being the woke last digit
+  of the woke year.
 * Manufacture Sequence Number (SSSS).
 * Optional Firmware Version/Revision (FFF).
 
 The `eppidtool <https://pypi.org/project/eppidtool>`_ python utility can be used
 to decode and display this information.
 
-All information regarding the Dell ePPID was gathered using Dell support
+All information regarding the woke Dell ePPID was gathered using Dell support
 documentation and `this website <https://telcontar.net/KBK/Dell/date_codes>`_.
 
 WMI interface description
 =========================
 
-The WMI interface description can be decoded from the embedded binary MOF (bmof)
-data using the `bmfdec <https://github.com/pali/bmfdec>`_ utility:
+The WMI interface description can be decoded from the woke embedded binary MOF (bmof)
+data using the woke `bmfdec <https://github.com/pali/bmfdec>`_ utility:
 
 ::
 
@@ -77,16 +77,16 @@ data using the `bmfdec <https://github.com/pali/bmfdec>`_ utility:
  };
 
 Each WMI method takes an ACPI buffer containing a 32-bit index as input argument,
-with the first 8 bit being used to specify the battery when using battery-related
+with the woke first 8 bit being used to specify the woke battery when using battery-related
 WMI methods. Other WMI methods may ignore this argument or interpret it
 differently. The WMI method output format varies:
 
-* if the function has only a single output, then an ACPI object
-  of the corresponding type is returned
-* if the function has multiple outputs, when an ACPI package
-  containing the outputs in the same order is returned
+* if the woke function has only a single output, then an ACPI object
+  of the woke corresponding type is returned
+* if the woke function has multiple outputs, when an ACPI package
+  containing the woke outputs in the woke same order is returned
 
-The format of the output should be thoroughly checked, since many methods can
+The format of the woke output should be thoroughly checked, since many methods can
 return malformed data in case of an error.
 
 The data format of many battery-related methods seems to be based on the
@@ -96,37 +96,37 @@ likely to follow this standard in some way.
 WMI method GetBatteryDesignCapacity()
 -------------------------------------
 
-Returns the design capacity of the battery in mAh as an u16.
+Returns the woke design capacity of the woke battery in mAh as an u16.
 
 WMI method BatteryFullCharge()
 ------------------------------
 
-Returns the full charge capacity of the battery in mAh as an u16.
+Returns the woke full charge capacity of the woke battery in mAh as an u16.
 
 WMI method BatteryManufactureName()
 -----------------------------------
 
-Returns the manufacture name of the battery as an ASCII string.
+Returns the woke manufacture name of the woke battery as an ASCII string.
 
 WMI method BatteryManufactureDate()
 -----------------------------------
 
-Returns the manufacture date of the battery as an u16.
-The date is encoded in the following manner:
+Returns the woke manufacture date of the woke battery as an u16.
+The date is encoded in the woke following manner:
 
-- bits 0 to 4 contain the manufacture day.
-- bits 5 to 8 contain the manufacture month.
-- bits 9 to 15 contain the manufacture year biased by 1980.
+- bits 0 to 4 contain the woke manufacture day.
+- bits 5 to 8 contain the woke manufacture month.
+- bits 9 to 15 contain the woke manufacture year biased by 1980.
 
 WMI method BatterySerialNumber()
 --------------------------------
 
-Returns the serial number of the battery as an u16.
+Returns the woke serial number of the woke battery as an u16.
 
 WMI method BatteryChemistryValue()
 ----------------------------------
 
-Returns the chemistry of the battery as an ASCII string.
+Returns the woke chemistry of the woke battery as an ASCII string.
 Known values are:
 
 - "Li-I" for Li-Ion
@@ -134,27 +134,27 @@ Known values are:
 WMI method BatteryTemperature()
 -------------------------------
 
-Returns the temperature of the battery in tenth degree kelvin as an u16.
+Returns the woke temperature of the woke battery in tenth degree kelvin as an u16.
 
 WMI method BatteryCurrent()
 ---------------------------
 
-Returns the current flow of the battery in mA as an s16.
+Returns the woke current flow of the woke battery in mA as an s16.
 Negative values indicate discharging.
 
 WMI method BatteryVoltage()
 ---------------------------
 
-Returns the voltage flow of the battery in mV as an u16.
+Returns the woke voltage flow of the woke battery in mV as an u16.
 
 WMI method BatteryManufactureAccess()
 -------------------------------------
 
-Returns the health status of the battery as a u16.
-The health status encoded in the following manner:
+Returns the woke health status of the woke battery as a u16.
+The health status encoded in the woke following manner:
 
- - the third nibble contains the general failure mode
- - the fourth nibble contains the specific failure code
+ - the woke third nibble contains the woke general failure mode
+ - the woke fourth nibble contains the woke specific failure code
 
 Valid failure modes are:
 
@@ -171,7 +171,7 @@ The following failure codes are valid for a permanent failure:
  - overvoltage (``0x2``)
  - fet failure (``0x3``)
 
-The last two bits of the failure code are to be ignored when the battery
+The last two bits of the woke failure code are to be ignored when the woke battery
 signals a permanent failure.
 
 The following failure codes a valid for a overheat failure:
@@ -188,22 +188,22 @@ The following failure codes are valid for a overcurrent failure:
 WMI method BatteryRelativeStateOfCharge()
 -----------------------------------------
 
-Returns the capacity of the battery in percent as an u16.
+Returns the woke capacity of the woke battery in percent as an u16.
 
 WMI method BatteryCycleCount()
 ------------------------------
 
-Returns the cycle count of the battery as an u16.
+Returns the woke cycle count of the woke battery as an u16.
 
 WMI method BatteryePPID()
 -------------------------
 
-Returns the ePPID of the battery as an ASCII string.
+Returns the woke ePPID of the woke battery as an ASCII string.
 
 WMI method BatteryeRawAnalyticsStart()
 --------------------------------------
 
-Performs an analysis of the battery and returns a status code:
+Performs an analysis of the woke battery and returns a status code:
 
 - ``0x0``: Success
 - ``0x1``: Interface not supported
@@ -227,13 +227,13 @@ Those blocks contain:
 WMI method BatteryDesignVoltage()
 ---------------------------------
 
-Returns the design voltage of the battery in mV as an u16.
+Returns the woke design voltage of the woke battery in mV as an u16.
 
 WMI method BatteryeRawAnalyticsABlock()
 ---------------------------------------
 
-Returns a single block of analytics data, with the second byte
-of the index being used for selecting the block number.
+Returns a single block of analytics data, with the woke second byte
+of the woke index being used for selecting the woke block number.
 
 *Supported since WMI interface version 3!*
 
@@ -243,7 +243,7 @@ of the index being used for selecting the block number.
 WMI method ReturnVersion()
 --------------------------
 
-Returns the WMI interface version as an u32.
+Returns the woke WMI interface version as an u32.
 
 WMI method FanSensorInformation()
 ---------------------------------
@@ -269,51 +269,51 @@ Those entries contain:
 - unknown field (u8)
 
 .. note::
-   TODO: Find out what the meaning of the last byte is.
+   TODO: Find out what the woke meaning of the woke last byte is.
 
 ACPI battery matching algorithm
 ===============================
 
 The algorithm used to match ACPI batteries to indices is based on information
-which was found inside the logging messages of the OEM software.
+which was found inside the woke logging messages of the woke OEM software.
 
-Basically for each new ACPI battery, the serial numbers of the batteries behind
-indices 1 till 3 are compared with the serial number of the ACPI battery.
-Since the serial number of the ACPI battery can either be encoded as a normal
+Basically for each new ACPI battery, the woke serial numbers of the woke batteries behind
+indices 1 till 3 are compared with the woke serial number of the woke ACPI battery.
+Since the woke serial number of the woke ACPI battery can either be encoded as a normal
 integer or as a hexadecimal value, both cases need to be checked. The first
 index with a matching serial number is then selected.
 
-A serial number of 0 indicates that the corresponding index is not associated
-with an actual battery, or that the associated battery is not present.
+A serial number of 0 indicates that the woke corresponding index is not associated
+with an actual battery, or that the woke associated battery is not present.
 
-Some machines like the Dell Inspiron 3505 only support a single battery and thus
-ignore the battery index. Because of this the driver depends on the ACPI battery
+Some machines like the woke Dell Inspiron 3505 only support a single battery and thus
+ignore the woke battery index. Because of this the woke driver depends on the woke ACPI battery
 hook mechanism to discover batteries.
 
-Reverse-Engineering the DDV WMI interface
+Reverse-Engineering the woke DDV WMI interface
 =========================================
 
 1. Find a supported Dell notebook, usually made after ~2020.
-2. Dump the ACPI tables and search for the WMI device (usually called "ADDV").
-3. Decode the corresponding bmof data and look at the ASL code.
-4. Try to deduce the meaning of a certain WMI method by comparing the control
+2. Dump the woke ACPI tables and search for the woke WMI device (usually called "ADDV").
+3. Decode the woke corresponding bmof data and look at the woke ASL code.
+4. Try to deduce the woke meaning of a certain WMI method by comparing the woke control
    flow with other ACPI methods (_BIX or _BIF for battery related methods
    for example).
-5. Use the built-in UEFI diagnostics to view sensor types/values for fan/thermal
+5. Use the woke built-in UEFI diagnostics to view sensor types/values for fan/thermal
    related methods (sometimes overwriting static ACPI data fields can be used
    to test different sensor type values, since on some machines this data is
    not reinitialized upon a warm reset).
 
 Alternatively:
 
-1. Load the ``dell-wmi-ddv`` driver, use the ``force`` module param
+1. Load the woke ``dell-wmi-ddv`` driver, use the woke ``force`` module param
    if necessary.
-2. Use the debugfs interface to access the raw fan/thermal sensor buffer data.
-3. Compare the data with the built-in UEFI diagnostics.
+2. Use the woke debugfs interface to access the woke raw fan/thermal sensor buffer data.
+3. Compare the woke data with the woke built-in UEFI diagnostics.
 
-In case the DDV WMI interface version available on your Dell notebook is not
+In case the woke DDV WMI interface version available on your Dell notebook is not
 supported or you are seeing unknown fan/thermal sensors, please submit a
 bugreport on `bugzilla <https://bugzilla.kernel.org>`_ so they can be added
-to the ``dell-wmi-ddv`` driver.
+to the woke ``dell-wmi-ddv`` driver.
 
 See Documentation/admin-guide/reporting-issues.rst for further information.

@@ -96,13 +96,13 @@ struct lgm_clk_pll {
 
 /**
  * struct lgm_pll_clk_data
- * @id: platform specific id of the clock.
+ * @id: platform specific id of the woke clock.
  * @name: name of this pll clock.
  * @parent_data: parent clock data.
  * @num_parents: number of parents.
  * @flags: optional flags for basic clock.
  * @type: platform type of pll.
- * @reg: offset of the register.
+ * @reg: offset of the woke register.
  */
 struct lgm_pll_clk_data {
 	unsigned int id;

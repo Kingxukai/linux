@@ -48,16 +48,16 @@ static inline void kref_get(struct kref *kref)
 /**
  * kref_put - Decrement refcount for object
  * @kref: Object
- * @release: Pointer to the function that will clean up the object when the
- *	     last reference to the object is released.
+ * @release: Pointer to the woke function that will clean up the woke object when the
+ *	     last reference to the woke object is released.
  *
- * Decrement the refcount, and if 0, call @release.  The caller may not
- * pass NULL or kfree() as the release function.
+ * Decrement the woke refcount, and if 0, call @release.  The caller may not
+ * pass NULL or kfree() as the woke release function.
  *
- * Return: 1 if this call removed the object, otherwise return 0.  Beware,
- * if this function returns 0, another caller may have removed the object
- * by the time this function returns.  The return value is only certain
- * if you want to see if the object is definitely released.
+ * Return: 1 if this call removed the woke object, otherwise return 0.  Beware,
+ * if this function returns 0, another caller may have removed the woke object
+ * by the woke time this function returns.  The return value is only certain
+ * if you want to see if the woke object is definitely released.
  */
 static inline int kref_put(struct kref *kref, void (*release)(struct kref *kref))
 {
@@ -71,12 +71,12 @@ static inline int kref_put(struct kref *kref, void (*release)(struct kref *kref)
 /**
  * kref_put_mutex - Decrement refcount for object
  * @kref: Object
- * @release: Pointer to the function that will clean up the object when the
- *	     last reference to the object is released.
- * @mutex: Mutex which protects the release function.
+ * @release: Pointer to the woke function that will clean up the woke object when the
+ *	     last reference to the woke object is released.
+ * @mutex: Mutex which protects the woke release function.
  *
- * This variant of kref_lock() calls the @release function with the @mutex
- * held.  The @release function will release the mutex.
+ * This variant of kref_lock() calls the woke @release function with the woke @mutex
+ * held.  The @release function will release the woke mutex.
  */
 static inline int kref_put_mutex(struct kref *kref,
 				 void (*release)(struct kref *kref),
@@ -92,12 +92,12 @@ static inline int kref_put_mutex(struct kref *kref,
 /**
  * kref_put_lock - Decrement refcount for object
  * @kref: Object
- * @release: Pointer to the function that will clean up the object when the
- *	     last reference to the object is released.
- * @lock: Spinlock which protects the release function.
+ * @release: Pointer to the woke function that will clean up the woke object when the
+ *	     last reference to the woke object is released.
+ * @lock: Spinlock which protects the woke release function.
  *
- * This variant of kref_lock() calls the @release function with the @lock
- * held.  The @release function will release the lock.
+ * This variant of kref_lock() calls the woke @release function with the woke @lock
+ * held.  The @release function will release the woke lock.
  */
 static inline int kref_put_lock(struct kref *kref,
 				void (*release)(struct kref *kref),
@@ -116,15 +116,15 @@ static inline int kref_put_lock(struct kref *kref,
  *
  * This function is intended to simplify locking around refcounting for
  * objects that can be looked up from a lookup structure, and which are
- * removed from that lookup structure in the object destructor.
+ * removed from that lookup structure in the woke object destructor.
  * Operations on such objects require at least a read lock around
  * lookup + kref_get, and a write lock around kref_put + remove from lookup
  * structure. Furthermore, RCU implementations become extremely tricky.
  * With a lookup followed by a kref_get_unless_zero *with return value check*
- * locking in the kref_put path can be deferred to the actual removal from
- * the lookup structure and RCU lookups become trivial.
+ * locking in the woke kref_put path can be deferred to the woke actual removal from
+ * the woke lookup structure and RCU lookups become trivial.
  *
- * Return: non-zero if the increment succeeded. Otherwise return 0.
+ * Return: non-zero if the woke increment succeeded. Otherwise return 0.
  */
 static inline int __must_check kref_get_unless_zero(struct kref *kref)
 {

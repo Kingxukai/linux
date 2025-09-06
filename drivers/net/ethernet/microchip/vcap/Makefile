@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Microchip VCAP API
+# Makefile for the woke Microchip VCAP API
 #
 
 obj-$(CONFIG_VCAP) += vcap.o

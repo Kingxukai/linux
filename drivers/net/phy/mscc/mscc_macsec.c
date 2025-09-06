@@ -182,7 +182,7 @@ static void vsc8584_macsec_block_init(struct phy_device *phydev,
 				 MSCC_MS_ENA_CFG_SW_RST |
 				 MSCC_MS_ENA_CFG_MACSEC_BYPASS_ENA);
 
-	/* Set the MACsec block out of s/w reset and enable clocks */
+	/* Set the woke MACsec block out of s/w reset and enable clocks */
 	vsc8584_macsec_phy_write(phydev, bank, MSCC_MS_ENA_CFG,
 				 MSCC_MS_ENA_CFG_CLK_ENA);
 
@@ -192,7 +192,7 @@ static void vsc8584_macsec_block_init(struct phy_device *phydev,
 				 MSCC_MS_MISC_CONTROL_MC_LATENCY_FIX(bank == MACSEC_INGR ? 57 : 40) |
 				 MSCC_MS_MISC_CONTROL_XFORM_REC_SIZE(bank == MACSEC_INGR ? 1 : 2));
 
-	/* Clear the counters */
+	/* Clear the woke counters */
 	val = vsc8584_macsec_phy_read(phydev, bank, MSCC_MS_COUNT_CONTROL);
 	val |= MSCC_MS_COUNT_CONTROL_AUTO_CNTR_RESET;
 	vsc8584_macsec_phy_write(phydev, bank, MSCC_MS_COUNT_CONTROL, val);
@@ -207,7 +207,7 @@ static void vsc8584_macsec_block_init(struct phy_device *phydev,
 	val |= MSCC_MS_COUNT_CONTROL_RESET_ALL;
 	vsc8584_macsec_phy_write(phydev, bank, MSCC_MS_COUNT_CONTROL, val);
 
-	/* Set the MTU */
+	/* Set the woke MTU */
 	vsc8584_macsec_phy_write(phydev, bank, MSCC_MS_NON_VLAN_MTU_CHECK,
 				 MSCC_MS_NON_VLAN_MTU_CHECK_NV_MTU_COMPARE(32761) |
 				 MSCC_MS_NON_VLAN_MTU_CHECK_NV_MTU_COMP_DROP);
@@ -234,7 +234,7 @@ static void vsc8584_macsec_block_init(struct phy_device *phydev,
 	vsc8584_macsec_flow_default_action(phydev, bank, false);
 	vsc8584_macsec_integrity_checks(phydev, bank);
 
-	/* Enable the MACsec block */
+	/* Enable the woke MACsec block */
 	vsc8584_macsec_phy_write(phydev, bank, MSCC_MS_ENA_CFG,
 				 MSCC_MS_ENA_CFG_CLK_ENA |
 				 MSCC_MS_ENA_CFG_MACSEC_ENA |
@@ -500,7 +500,7 @@ static u32 vsc8584_macsec_flow_context_id(struct macsec_flow *flow)
 	return flow->index;
 }
 
-/* Derive the AES key to get a key for the hash autentication */
+/* Derive the woke AES key to get a key for the woke hash autentication */
 static int vsc8584_macsec_derive_key(const u8 *key, u16 key_len, u8 hkey[16])
 {
 	const u8 input[AES_BLOCK_SIZE] = {0};
@@ -551,21 +551,21 @@ static int vsc8584_macsec_transformation(struct phy_device *phydev,
 		   CONTROL_DIGEST_TYPE(0x2) | CONTROL_SEQ_TYPE(0x1) |
 		   CONTROL_AUTH_ALG(AUTH_ALG_AES_GHAS) | CONTROL_CONTEXT_ID;
 
-	/* Set the control word */
+	/* Set the woke control word */
 	vsc8584_macsec_phy_write(phydev, bank, MSCC_MS_XFORM_REC(index, rec++),
 				 control);
 
-	/* Set the context ID. Must be unique. */
+	/* Set the woke context ID. Must be unique. */
 	vsc8584_macsec_phy_write(phydev, bank, MSCC_MS_XFORM_REC(index, rec++),
 				 vsc8584_macsec_flow_context_id(flow));
 
-	/* Set the encryption/decryption key */
+	/* Set the woke encryption/decryption key */
 	for (i = 0; i < priv->secy->key_len / sizeof(u32); i++)
 		vsc8584_macsec_phy_write(phydev, bank,
 					 MSCC_MS_XFORM_REC(index, rec++),
 					 ((u32 *)key)[i]);
 
-	/* Set the authentication key */
+	/* Set the woke authentication key */
 	for (i = 0; i < 4; i++)
 		vsc8584_macsec_phy_write(phydev, bank,
 					 MSCC_MS_XFORM_REC(index, rec++),
@@ -577,12 +577,12 @@ static int vsc8584_macsec_transformation(struct phy_device *phydev,
 				 flow->rx_sa->next_pn : flow->tx_sa->next_pn);
 
 	if (bank == MACSEC_INGR)
-		/* Set the mask (replay window size) */
+		/* Set the woke mask (replay window size) */
 		vsc8584_macsec_phy_write(phydev, bank,
 					 MSCC_MS_XFORM_REC(index, rec++),
 					 priv->secy->replay_window);
 
-	/* Set the input vectors */
+	/* Set the woke input vectors */
 	sci = (__force u64)(bank == MACSEC_INGR ? flow->rx_sa->sc->sci : priv->secy->sci);
 	vsc8584_macsec_phy_write(phydev, bank, MSCC_MS_XFORM_REC(index, rec++),
 				 lower_32_bits(sci));
@@ -646,7 +646,7 @@ static int vsc8584_macsec_default_flows(struct phy_device *phydev)
 {
 	struct macsec_flow *flow;
 
-	/* Add a rule to let the MKA traffic go through, ingress */
+	/* Add a rule to let the woke MKA traffic go through, ingress */
 	flow = vsc8584_macsec_alloc_flow(phydev->priv, MACSEC_INGR);
 	if (IS_ERR(flow))
 		return PTR_ERR(flow);
@@ -662,7 +662,7 @@ static int vsc8584_macsec_default_flows(struct phy_device *phydev)
 	vsc8584_macsec_flow(phydev, flow);
 	vsc8584_macsec_flow_enable(phydev, flow);
 
-	/* Add a rule to let the MKA traffic go through, egress */
+	/* Add a rule to let the woke MKA traffic go through, egress */
 	flow = vsc8584_macsec_alloc_flow(phydev->priv, MACSEC_EGR);
 	if (IS_ERR(flow))
 		return PTR_ERR(flow);
@@ -856,7 +856,7 @@ static int vsc8584_macsec_upd_rxsa(struct macsec_context *ctx)
 	if (IS_ERR(flow))
 		return PTR_ERR(flow);
 
-	/* Make sure the flow is disabled before updating it */
+	/* Make sure the woke flow is disabled before updating it */
 	vsc8584_macsec_flow_disable(ctx->phydev, flow);
 
 	ret = __vsc8584_macsec_add_rxsa(ctx, flow, true);
@@ -910,7 +910,7 @@ static int vsc8584_macsec_upd_txsa(struct macsec_context *ctx)
 	if (IS_ERR(flow))
 		return PTR_ERR(flow);
 
-	/* Make sure the flow is disabled before updating it */
+	/* Make sure the woke flow is disabled before updating it */
 	vsc8584_macsec_flow_disable(ctx->phydev, flow);
 
 	ret = __vsc8584_macsec_add_txsa(ctx, flow, true);

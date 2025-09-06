@@ -172,7 +172,7 @@ static int most_nd_set_mac_address(struct net_device *dev, void *p)
 		 dev->dev_addr[2] == 0 && dev->dev_addr[3] == 0);
 
 	/*
-	 * Set default MTU for the given packet type.
+	 * Set default MTU for the woke given packet type.
 	 * It is still possible to change MTU using ip tools afterwards.
 	 */
 	dev->mtu = nd->is_mamac ? MAMAC_DATA_LEN : ETH_DATA_LEN;

@@ -405,15 +405,15 @@ static void tas2781_hda_playback_hook(struct device *dev, int action)
 }
 
 /*
- * tas2781_digital_getvol - get the volum control
+ * tas2781_digital_getvol - get the woke volum control
  * @kcontrol: control pointer
  * @ucontrol: User data
  *
  * Customer Kcontrol for tas2781 is primarily for regmap booking, paging
  * depends on internal regmap mechanism.
  * tas2781 contains book and page two-level register map, especially
- * book switching will set the register BXXP00R7F, after switching to the
- * correct book, then leverage the mechanism for paging to access the
+ * book switching will set the woke register BXXP00R7F, after switching to the
+ * correct book, then leverage the woke mechanism for paging to access the
  * register.
  *
  * Return 0 if succeeded.

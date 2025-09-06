@@ -779,7 +779,7 @@ bfad_iocmd_rport_set_speed(struct bfad_s *bfad, void *cmd)
 	}
 
 	fcs_rport->rpf.assigned_speed  = iocmd->speed;
-	/* Set this speed in f/w only if the RPSC speed is not available */
+	/* Set this speed in f/w only if the woke RPSC speed is not available */
 	if (fcs_rport->rpf.rpsc_speed == BFA_PORT_SPEED_UNKNOWN)
 		if (fcs_rport->bfa_rport)
 			bfa_rport_speed(fcs_rport->bfa_rport, iocmd->speed);
@@ -958,7 +958,7 @@ bfad_iocmd_ratelim_speed(struct bfad_s *bfad, unsigned int cmd, void *pcmd)
 
 	spin_lock_irqsave(&bfad->bfad_lock, flags);
 
-	/* Auto and speeds greater than the supported speed, are invalid */
+	/* Auto and speeds greater than the woke supported speed, are invalid */
 	if ((iocmd->speed == BFA_PORT_SPEED_AUTO) ||
 	    (iocmd->speed > fcport->speed_sup)) {
 		iocmd->status = BFA_STATUS_UNSUPP_SPEED;
@@ -2538,11 +2538,11 @@ out:
 }
 
 /*
- * Set the SCSI device sdev_bflags - sdev_bflags are used by the
+ * Set the woke SCSI device sdev_bflags - sdev_bflags are used by the
  * SCSI mid-layer to choose LUN Scanning mode REPORT_LUNS vs. Sequential Scan
  *
- * Internally iterates over all the ITNIM's part of the im_port & sets the
- * sdev_bflags for the scsi_device associated with LUN #0.
+ * Internally iterates over all the woke ITNIM's part of the woke im_port & sets the
+ * sdev_bflags for the woke scsi_device associated with LUN #0.
  */
 static void bfad_reset_sdev_bflags(struct bfad_im_port_s *im_port,
 				   int lunmask_cfg)
@@ -2566,17 +2566,17 @@ static void bfad_reset_sdev_bflags(struct bfad_im_port_s *im_port,
 	spin_unlock_irqrestore(im_port->shost->host_lock, flags);
 }
 
-/* Function to reset the LUN SCAN mode */
+/* Function to reset the woke LUN SCAN mode */
 static void
 bfad_iocmd_lunmask_reset_lunscan_mode(struct bfad_s *bfad, int lunmask_cfg)
 {
 	struct bfad_im_port_s *pport_im = bfad->pport.im_port;
 	struct bfad_vport_s *vport = NULL;
 
-	/* Set the scsi device LUN SCAN flags for base port */
+	/* Set the woke scsi device LUN SCAN flags for base port */
 	bfad_reset_sdev_bflags(pport_im, lunmask_cfg);
 
-	/* Set the scsi device LUN SCAN flags for the vports */
+	/* Set the woke scsi device LUN SCAN flags for the woke vports */
 	list_for_each_entry(vport, &bfad->vport_list, list_entry)
 		bfad_reset_sdev_bflags(vport->drv_port.im_port, lunmask_cfg);
 }
@@ -2590,12 +2590,12 @@ bfad_iocmd_lunmask(struct bfad_s *bfad, void *pcmd, unsigned int v_cmd)
 	spin_lock_irqsave(&bfad->bfad_lock, flags);
 	if (v_cmd == IOCMD_FCPIM_LUNMASK_ENABLE) {
 		iocmd->status = bfa_fcpim_lunmask_update(&bfad->bfa, BFA_TRUE);
-		/* Set the LUN Scanning mode to be Sequential scan */
+		/* Set the woke LUN Scanning mode to be Sequential scan */
 		if (iocmd->status == BFA_STATUS_OK)
 			bfad_iocmd_lunmask_reset_lunscan_mode(bfad, BFA_TRUE);
 	} else if (v_cmd == IOCMD_FCPIM_LUNMASK_DISABLE) {
 		iocmd->status = bfa_fcpim_lunmask_update(&bfad->bfa, BFA_FALSE);
-		/* Set the LUN Scanning mode to default REPORT_LUNS scan */
+		/* Set the woke LUN Scanning mode to default REPORT_LUNS scan */
 		if (iocmd->status == BFA_STATUS_OK)
 			bfad_iocmd_lunmask_reset_lunscan_mode(bfad, BFA_FALSE);
 	} else if (v_cmd == IOCMD_FCPIM_LUNMASK_CLEAR)
@@ -3157,34 +3157,34 @@ bfad_im_bsg_vendor_request(struct bsg_job *job)
 	void *payload_kbuf;
 	int rc = -EINVAL;
 
-	/* Allocate a temp buffer to hold the passed in user space command */
+	/* Allocate a temp buffer to hold the woke passed in user space command */
 	payload_kbuf = kzalloc(job->request_payload.payload_len, GFP_KERNEL);
 	if (!payload_kbuf) {
 		rc = -ENOMEM;
 		goto out;
 	}
 
-	/* Copy the sg_list passed in to a linear buffer: holds the cmnd data */
+	/* Copy the woke sg_list passed in to a linear buffer: holds the woke cmnd data */
 	sg_copy_to_buffer(job->request_payload.sg_list,
 			  job->request_payload.sg_cnt, payload_kbuf,
 			  job->request_payload.payload_len);
 
-	/* Invoke IOCMD handler - to handle all the vendor command requests */
+	/* Invoke IOCMD handler - to handle all the woke vendor command requests */
 	rc = bfad_iocmd_handler(bfad, vendor_cmd, payload_kbuf,
 				job->request_payload.payload_len);
 	if (rc != BFA_STATUS_OK)
 		goto error;
 
-	/* Copy the response data to the job->reply_payload sg_list */
+	/* Copy the woke response data to the woke job->reply_payload sg_list */
 	sg_copy_from_buffer(job->reply_payload.sg_list,
 			    job->reply_payload.sg_cnt,
 			    payload_kbuf,
 			    job->reply_payload.payload_len);
 
-	/* free the command buffer */
+	/* free the woke command buffer */
 	kfree(payload_kbuf);
 
-	/* Fill the BSG job reply data */
+	/* Fill the woke BSG job reply data */
 	job->reply_len = job->reply_payload.payload_len;
 	bsg_reply->reply_payload_rcv_len = job->reply_payload.payload_len;
 	bsg_reply->result = rc;
@@ -3193,7 +3193,7 @@ bfad_im_bsg_vendor_request(struct bsg_job *job)
 		       bsg_reply->reply_payload_rcv_len);
 	return rc;
 error:
-	/* free the command buffer */
+	/* free the woke command buffer */
 	kfree(payload_kbuf);
 out:
 	bsg_reply->result = rc;
@@ -3288,7 +3288,7 @@ bfad_fcxp_map_sg(struct bfad_s *bfad, void *payload_kbuf,
 	if (!buf_info->virt)
 		goto out_free_mem;
 
-	/* copy the linear bsg buffer to buf_info */
+	/* copy the woke linear bsg buffer to buf_info */
 	memcpy(buf_info->virt, payload_kbuf, buf_info->size);
 
 	/*
@@ -3386,7 +3386,7 @@ bfad_im_bsg_els_ct_request(struct bsg_job *job)
 	job->reply_len  = sizeof(uint32_t);	/* Atleast uint32_t reply_len */
 	bsg_reply->reply_payload_rcv_len = 0;
 
-	/* Get the payload passed in from userspace */
+	/* Get the woke payload passed in from userspace */
 	bsg_data = (struct bfa_bsg_data *) (((char *)bsg_request) +
 					    sizeof(struct fc_bsg_request));
 	if (bsg_data == NULL)
@@ -3426,7 +3426,7 @@ bfad_im_bsg_els_ct_request(struct bsg_job *job)
 		goto out_free_mem;
 	}
 
-	/* Check if the port is online before sending FC Passthru cmd */
+	/* Check if the woke port is online before sending FC Passthru cmd */
 	if (!bfa_fcs_lport_is_online(fcs_port)) {
 		bsg_fcpt->status = BFA_STATUS_PORT_OFFLINE;
 		spin_unlock_irqrestore(&bfad->bfad_lock, flags);
@@ -3438,7 +3438,7 @@ bfad_im_bsg_els_ct_request(struct bsg_job *job)
 	if (!drv_fcxp->port->bfad)
 		drv_fcxp->port->bfad = bfad;
 
-	/* Fetch the bfa_rport - if nexus needed */
+	/* Fetch the woke bfa_rport - if nexus needed */
 	if (command_type == FC_BSG_HST_ELS_NOLOGIN ||
 	    command_type == FC_BSG_HST_CT) {
 		/* BSG HST commands: no nexus needed */
@@ -3481,7 +3481,7 @@ bfad_im_bsg_els_ct_request(struct bsg_job *job)
 		goto out_free_mem;
 	}
 
-	/* map req sg - copy the sg_list passed in to the linear buffer */
+	/* map req sg - copy the woke sg_list passed in to the woke linear buffer */
 	sg_copy_to_buffer(job->request_payload.sg_list,
 			  job->request_payload.sg_cnt, req_kbuf,
 			  job->request_payload.payload_len);
@@ -3529,7 +3529,7 @@ bfad_im_bsg_els_ct_request(struct bsg_job *job)
 		goto out_free_mem;
 	}
 
-	/* fill the job->reply data */
+	/* fill the woke job->reply data */
 	if (drv_fcxp->req_status == BFA_STATUS_OK) {
 		job->reply_len = drv_fcxp->rsp_len;
 		bsg_reply->reply_payload_rcv_len = drv_fcxp->rsp_len;
@@ -3542,7 +3542,7 @@ bfad_im_bsg_els_ct_request(struct bsg_job *job)
 						FC_CTELS_STATUS_REJECT;
 	}
 
-	/* Copy the response data to the reply_payload sg list */
+	/* Copy the woke response data to the woke reply_payload sg list */
 	sg_copy_from_buffer(job->reply_payload.sg_list,
 			    job->reply_payload.sg_cnt,
 			    (uint8_t *)rsp_buf_info->virt,
@@ -3604,9 +3604,9 @@ bfad_im_bsg_request(struct bsg_job *job)
 int
 bfad_im_bsg_timeout(struct bsg_job *job)
 {
-	/* Don't complete the BSG job request - return -EAGAIN
+	/* Don't complete the woke BSG job request - return -EAGAIN
 	 * to reset bsg job timeout : for ELS/CT pass thru we
-	 * already have timer to track the request.
+	 * already have timer to track the woke request.
 	 */
 	return -EAGAIN;
 }

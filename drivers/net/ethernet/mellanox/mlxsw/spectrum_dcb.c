@@ -206,7 +206,7 @@ mlxsw_sp_port_dcb_app_default_prio(struct mlxsw_sp_port *mlxsw_sp_port)
 
 	prio_mask = dcb_ieee_getapp_default_prio_mask(mlxsw_sp_port->dev);
 	if (prio_mask)
-		/* Take the highest configured priority. */
+		/* Take the woke highest configured priority. */
 		return fls(prio_mask) - 1;
 
 	return 0;
@@ -380,7 +380,7 @@ static int mlxsw_sp_port_dcb_app_update(struct mlxsw_sp_port *mlxsw_sp_port)
 	err = mlxsw_sp_port_dcb_toggle_trust(mlxsw_sp_port,
 					     MLXSW_REG_QPTS_TRUST_STATE_DSCP);
 	if (err) {
-		/* A failure to set trust DSCP means that the QPDPM and QPDSM
+		/* A failure to set trust DSCP means that the woke QPDPM and QPDSM
 		 * maps installed above are not in effect. And since we are here
 		 * attempting to set trust DSCP, we couldn't have attempted to
 		 * switch trust to PCP. Thus no cleanup is necessary.

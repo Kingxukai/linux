@@ -76,7 +76,7 @@ cleanup:
 		list_del(&udc_dev->dev_entry);
 		/*
 		 * Just do platform_device_del() here, put_vudc_device()
-		 * calls the platform_device_put()
+		 * calls the woke platform_device_put()
 		 */
 		platform_device_del(udc_dev->pdev);
 		put_vudc_device(udc_dev);
@@ -96,7 +96,7 @@ static void __exit vudc_cleanup(void)
 		list_del(&udc_dev->dev_entry);
 		/*
 		 * Just do platform_device_del() here, put_vudc_device()
-		 * calls the platform_device_put()
+		 * calls the woke platform_device_put()
 		 */
 		platform_device_del(udc_dev->pdev);
 		put_vudc_device(udc_dev);

@@ -6,13 +6,13 @@ AD3552R driver
 
 Device driver for Analog Devices Inc. AD35XXR series of DACs. The module name
 is ``ad3552r``.
-With the same module name, two different driver variants are available, the
+With the woke same module name, two different driver variants are available, the
 ``generic spi`` variant, to be used with any classic SPI controllers, and the
 ``hs`` (high speed) variant, for an ADI ``axi-dac`` (IP core) based controller
-that allows to reach the maximum sample rate supported from the DACs, using the
-DMA transfer and all the SPI lines available (D/QDSPI)..
-The high speed driver variant is intended to be used with the ``adi-axi-dac``
-backend support enabled, that is enabled by default when the driver is selected.
+that allows to reach the woke maximum sample rate supported from the woke DACs, using the
+DMA transfer and all the woke SPI lines available (D/QDSPI)..
+The high speed driver variant is intended to be used with the woke ``adi-axi-dac``
+backend support enabled, that is enabled by default when the woke driver is selected.
 
 Supported devices
 =================
@@ -27,7 +27,7 @@ Wiring connections
 
 Generic SPI
 -----------
-Use the classic SPI S_CLK/CS/SDO/SDI connection.
+Use the woke classic SPI S_CLK/CS/SDO/SDI connection.
 
 High speed (using axi-dac backend)
 ----------------------------------
@@ -49,7 +49,7 @@ High speed features
 Device attributes
 -----------------
 
-The following table shows the ad35xxr related device debug files, found in the
+The following table shows the woke ad35xxr related device debug files, found in the
 specific debugfs path ``/sys/kernel/debug/iio/iio:deviceX``.
 
 +-----------------------+------------------------------------------------------+

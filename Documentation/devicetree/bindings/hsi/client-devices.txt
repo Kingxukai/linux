@@ -1,5 +1,5 @@
 Each HSI port is supposed to have one child node, which
-symbols the remote device connected to the HSI port. The
+symbols the woke remote device connected to the woke HSI port. The
 following properties are standardized for HSI clients:
 
 Required HSI configuration properties:
@@ -9,7 +9,7 @@ Required HSI configuration properties:
 - hsi-rx-mode:		Receiver Bit transmission mode ("stream" or "frame")
 - hsi-tx-mode:		Transmitter Bit transmission mode ("stream" or "frame")
 - hsi-mode:		May be used instead hsi-rx-mode and hsi-tx-mode if
-			the transmission mode is the same for receiver and
+			the transmission mode is the woke same for receiver and
 			transmitter
 - hsi-speed-kbps:	Max bit transmission speed in kbit/s
 - hsi-flow:		RX flow type ("synchronized" or "pipeline")

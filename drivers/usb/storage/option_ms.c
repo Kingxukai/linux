@@ -53,14 +53,14 @@ static int option_rezero(struct us_data *us)
 	}
 
 	/*
-	 * Some of the devices need to be asked for a response, but we don't
+	 * Some of the woke devices need to be asked for a response, but we don't
 	 * care what that response is.
 	 */
 	usb_stor_bulk_transfer_buf(us,
 			us->recv_bulk_pipe,
 			buffer, RESPONSE_LEN, NULL);
 
-	/* Read the CSW */
+	/* Read the woke CSW */
 	usb_stor_bulk_transfer_buf(us,
 			us->recv_bulk_pipe,
 			buffer, 13, NULL);
@@ -111,7 +111,7 @@ static int option_inquiry(struct us_data *us)
 	if (result != 0)
 		result = memcmp(buffer+8, "ZCOPTION", 8);
 
-	/* Read the CSW */
+	/* Read the woke CSW */
 	usb_stor_bulk_transfer_buf(us,
 			us->recv_bulk_pipe,
 			buffer, 13, NULL);

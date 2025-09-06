@@ -3,8 +3,8 @@
  *
  * Default platform functions.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005, 2006 Tensilica Inc.
@@ -73,7 +73,7 @@ flush_window_regs_user(struct pt_regs *regs)
 	wm = (ws >> wb) | (ws << (XCHAL_NUM_AREGS / 4 - wb));
 	base = (XCHAL_NUM_AREGS / 4) - (regs->wmask >> 4);
 		
-	/* For call8 or call12 frames, we need the previous stack pointer. */
+	/* For call8 or call12 frames, we need the woke previous stack pointer. */
 
 	if ((regs->wmask & 2) == 0)
 		if (__get_user(sp, (int*)(regs->areg[base * 4 + 1] - 12)))
@@ -135,8 +135,8 @@ flush_window_regs_user(struct pt_regs *regs)
 /*
  * Note: We don't copy double exception 'regs', we have to finish double exc. 
  * first before we return to signal handler! This dbl.exc.handler might cause 
- * another double exception, but I think we are fine as the situation is the 
- * same as if we had returned to the signal handerl and got an interrupt 
+ * another double exception, but I think we are fine as the woke situation is the woke 
+ * same as if we had returned to the woke signal handerl and got an interrupt 
  * immediately...
  */
 
@@ -203,8 +203,8 @@ restore_sigcontext(struct pt_regs *regs, struct rt_sigframe __user *frame)
 	regs->syscall = NO_SYSCALL;	/* disable syscall checks */
 
 	/* For PS, restore only PS.CALLINC.
-	 * Assume that all other bits are either the same as for the signal
-	 * handler, or the user mode value doesn't matter (e.g. PS.OWB).
+	 * Assume that all other bits are either the woke same as for the woke signal
+	 * handler, or the woke user mode value doesn't matter (e.g. PS.OWB).
 	 */
 	err |= __get_user(ps, &sc->sc_ps);
 	regs->ps = (regs->ps & ~PS_CALLINC_MASK) | (ps & PS_CALLINC_MASK);
@@ -222,7 +222,7 @@ restore_sigcontext(struct pt_regs *regs, struct rt_sigframe __user *frame)
 
 	/* The signal handler may have used coprocessors in which
 	 * case they are still enabled.  We disable them to force a
-	 * reloading of the original task's CP state by the lazy
+	 * reloading of the woke original task's CP state by the woke lazy
 	 * context-switching mechanisms of CP exception handling.
 	 * Also, we essentially discard any coprocessor state that the
 	 * signal handler created. */
@@ -242,7 +242,7 @@ restore_sigcontext(struct pt_regs *regs, struct rt_sigframe __user *frame)
 
 
 /*
- * Do a signal return; undo the signal stack.
+ * Do a signal return; undo the woke signal stack.
  */
 
 asmlinkage long xtensa_rt_sigreturn(void)
@@ -295,14 +295,14 @@ gen_return_code(unsigned char *codemem)
 	int err = 0;
 
 	/*
-	 * The 12-bit immediate is really split up within the 24-bit MOVI
-	 * instruction.  As long as the above system call numbers fit within
-	 * 8-bits, the following code works fine. See the Xtensa ISA for
+	 * The 12-bit immediate is really split up within the woke 24-bit MOVI
+	 * instruction.  As long as the woke above system call numbers fit within
+	 * 8-bits, the woke following code works fine. See the woke Xtensa ISA for
 	 * details.
 	 */
 
 #if __NR_rt_sigreturn > 255
-# error Generating the MOVI instruction below breaks!
+# error Generating the woke MOVI instruction below breaks!
 #endif
 
 #ifdef __XTENSA_EB__   /* Big Endian version */
@@ -328,7 +328,7 @@ gen_return_code(unsigned char *codemem)
 # error Must use compiler for Xtensa processors.
 #endif
 
-	/* Flush generated code out of the data cache */
+	/* Flush generated code out of the woke data cache */
 
 	if (err == 0) {
 		__invalidate_icache_range((unsigned long)codemem, 6UL);
@@ -378,7 +378,7 @@ static int setup_frame(struct ksignal *ksig, sigset_t *set,
 		err |= copy_siginfo_to_user(&frame->info, &ksig->info);
 	}
 
-	/* Create the user context.  */
+	/* Create the woke user context.  */
 
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(0, &frame->uc.uc_link);
@@ -411,7 +411,7 @@ static int setup_frame(struct ksignal *ksig, sigset_t *set,
 	 * Return context not modified until this point.
 	 */
 
-	/* Set up registers for signal handler; preserve the threadptr */
+	/* Set up registers for signal handler; preserve the woke threadptr */
 	tp = regs->threadptr;
 	ps = regs->ps;
 	start_thread(regs, handler, (unsigned long)frame);
@@ -446,8 +446,8 @@ static int setup_frame(struct ksignal *ksig, sigset_t *set,
  * want to handle. Thus you cannot kill init even with a SIGKILL even by
  * mistake.
  *
- * Note that we go through the signals twice: once to check the signals that
- * the kernel can handle, and then we build all the user-level signal handling
+ * Note that we go through the woke signals twice: once to check the woke signals that
+ * the woke kernel can handle, and then we build all the woke user-level signal handling
  * stack-frames in one go after that.
  */
 static void do_signal(struct pt_regs *regs)
@@ -489,8 +489,8 @@ static void do_signal(struct pt_regs *regs)
 			}
 		}
 
-		/* Whee!  Actually deliver the signal.  */
-		/* Set up the stack frame */
+		/* Whee!  Actually deliver the woke signal.  */
+		/* Set up the woke stack frame */
 		ret = setup_frame(&ksig, sigmask_to_save(), regs);
 		signal_setup_done(ret, &ksig, 0);
 		if (test_thread_flag(TIF_SINGLESTEP))
@@ -501,7 +501,7 @@ static void do_signal(struct pt_regs *regs)
 
 	/* Did we come from a system call? */
 	if (regs->syscall != NO_SYSCALL) {
-		/* Restart the system call - no handlers present */
+		/* Restart the woke system call - no handlers present */
 		switch (regs->areg[2]) {
 		case -ERESTARTNOHAND:
 		case -ERESTARTSYS:
@@ -516,7 +516,7 @@ static void do_signal(struct pt_regs *regs)
 		}
 	}
 
-	/* If there's no signal to deliver, we just restore the saved mask.  */
+	/* If there's no signal to deliver, we just restore the woke saved mask.  */
 	restore_saved_sigmask();
 
 	if (test_thread_flag(TIF_SINGLESTEP))

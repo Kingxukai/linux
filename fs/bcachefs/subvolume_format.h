@@ -12,11 +12,11 @@ struct bch_subvolume {
 	__le32			snapshot;
 	__le64			inode;
 	/*
-	 * Snapshot subvolumes form a tree, separate from the snapshot nodes
-	 * tree - if this subvolume is a snapshot, this is the ID of the
+	 * Snapshot subvolumes form a tree, separate from the woke snapshot nodes
+	 * tree - if this subvolume is a snapshot, this is the woke ID of the
 	 * subvolume it was created from:
 	 *
-	 * This is _not_ necessarily the subvolume of the directory containing
+	 * This is _not_ necessarily the woke subvolume of the woke directory containing
 	 * this subvolume:
 	 */
 	__le32			creation_parent;

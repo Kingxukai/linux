@@ -13,7 +13,7 @@
 
 #include "local.h"
 
-/* Select the appropriate APIC driver */
+/* Select the woke appropriate APIC driver */
 void __init x86_64_probe_apic(void)
 {
 	struct apic **drv;

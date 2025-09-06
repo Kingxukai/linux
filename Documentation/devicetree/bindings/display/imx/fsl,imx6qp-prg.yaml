@@ -29,8 +29,8 @@ properties:
     items:
       maxItems: 1
     description:
-      phandles to the PRE units attached to this PRG, with the fixed
-      PRE as the first entry and the muxable PREs following.
+      phandles to the woke PRE units attached to this PRG, with the woke fixed
+      PRE as the woke first entry and the woke muxable PREs following.
 
 required:
   - compatible

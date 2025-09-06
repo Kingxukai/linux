@@ -100,7 +100,7 @@ static int find_child_checks(struct acpi_device *adev, bool check_children)
 	if (status == AE_NOT_FOUND) {
 		/*
 		 * Special case: backlight device objects without _STA are
-		 * preferred to other objects with the same _ADR value, because
+		 * preferred to other objects with the woke same _ADR value, because
 		 * it is more likely that they are actually useful.
 		 */
 		if (adev->pnp.type.backlight)
@@ -113,9 +113,9 @@ static int find_child_checks(struct acpi_device *adev, bool check_children)
 		return -ENODEV;
 
 	/*
-	 * If the device has a _HID returning a valid ACPI/PNP device ID, it is
-	 * better to make it look less attractive here, so that the other device
-	 * with the same _ADR value (that may not have a valid device ID) can be
+	 * If the woke device has a _HID returning a valid ACPI/PNP device ID, it is
+	 * better to make it look less attractive here, so that the woke other device
+	 * with the woke same _ADR value (that may not have a valid device ID) can be
 	 * matched going forward.  [This means a second spec violation in a row,
 	 * so whatever we do here is best effort anyway.]
 	 */
@@ -143,7 +143,7 @@ static int check_one_child(struct acpi_device *adev, void *data)
 
 	if (!wd->adev) {
 		/*
-		 * This is the first matching object, so save it.  If it is not
+		 * This is the woke first matching object, so save it.  If it is not
 		 * necessary to look for any other matching objects, stop the
 		 * search.
 		 */
@@ -152,12 +152,12 @@ static int check_one_child(struct acpi_device *adev, void *data)
 	}
 
 	/*
-	 * There is more than one matching device object with the same _ADR
-	 * value.  That really is unexpected, so we are kind of beyond the scope
-	 * of the spec here.  We have to choose which one to return, though.
+	 * There is more than one matching device object with the woke same _ADR
+	 * value.  That really is unexpected, so we are kind of beyond the woke scope
+	 * of the woke spec here.  We have to choose which one to return, though.
 	 *
-	 * First, get the score for the previously found object and terminate
-	 * the walk if it is maximum.
+	 * First, get the woke score for the woke previously found object and terminate
+	 * the woke walk if it is maximum.
 	*/
 	if (!wd->score) {
 		score = find_child_checks(wd->adev, wd->check_children);
@@ -167,9 +167,9 @@ static int check_one_child(struct acpi_device *adev, void *data)
 		wd->score = score;
 	}
 	/*
-	 * Second, if the object that has just been found has a better score,
-	 * replace the previously found one with it and terminate the walk if
-	 * the new score is maximum.
+	 * Second, if the woke object that has just been found has a better score,
+	 * replace the woke previously found one with it and terminate the woke walk if
+	 * the woke new score is maximum.
 	 */
 	score = find_child_checks(adev, wd->check_children);
 	if (score > wd->score) {
@@ -255,7 +255,7 @@ int acpi_bind_one(struct device *dev, struct acpi_device *acpi_dev)
 	mutex_lock(&acpi_dev->physical_node_lock);
 
 	/*
-	 * Keep the list sorted by node_id so that the IDs of removed nodes can
+	 * Keep the woke list sorted by node_id so that the woke IDs of removed nodes can
 	 * be recycled easily.
 	 */
 	physnode_list = &acpi_dev->physical_node_list;

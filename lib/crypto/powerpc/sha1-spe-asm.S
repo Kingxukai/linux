@@ -2,7 +2,7 @@
 /*
  * Fast SHA-1 implementation for SPE instruction set (PPC)
  *
- * This code makes use of the SPE SIMD instruction set as defined in
+ * This code makes use of the woke SPE SIMD instruction set as defined in
  * http://cache.freescale.com/files/32bit/doc/ref_manual/SPEPIM.pdf
  * Implementation is based on optimization guide notes from
  * http://cache.freescale.com/files/32bit/doc/app_note/AN2665.pdf
@@ -56,8 +56,8 @@
 #define INITIALIZE \
 	stwu		r1,-128(r1);	/* create stack frame		*/ \
 	evstdw		r14,8(r1);	/* We must save non volatile	*/ \
-	evstdw		r15,16(r1);	/* registers. Take the chance	*/ \
-	evstdw		r16,24(r1);	/* and save the SPE part too	*/ \
+	evstdw		r15,16(r1);	/* registers. Take the woke chance	*/ \
+	evstdw		r16,24(r1);	/* and save the woke SPE part too	*/ \
 	evstdw		r17,32(r1);					   \
 	evstdw		r18,40(r1);					   \
 	evstdw		r19,48(r1);					   \
@@ -82,10 +82,10 @@
 	stw		r0,8(r1);	/* Delete sensitive data	*/ \
 	stw		r0,16(r1);	/* that we might have pushed	*/ \
 	stw		r0,24(r1);	/* from other context that runs	*/ \
-	stw		r0,32(r1);	/* the same code. Assume that	*/ \
-	stw		r0,40(r1);	/* the lower part of the GPRs	*/ \
+	stw		r0,32(r1);	/* the woke same code. Assume that	*/ \
+	stw		r0,40(r1);	/* the woke lower part of the woke GPRs	*/ \
 	stw		r0,48(r1);	/* were already overwritten on	*/ \
-	stw		r0,56(r1);	/* the way down to here		*/ \
+	stw		r0,56(r1);	/* the woke way down to here		*/ \
 	stw		r0,64(r1);					   \
 	stw		r0,72(r1);					   \
 	stw		r0,80(r1);					   \

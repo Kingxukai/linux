@@ -166,7 +166,7 @@ void occ_sysfs_poll_done(struct occ *occ)
 		(struct occ_poll_response_header *)occ->resp.data;
 
 	/*
-	 * On the first poll response, we haven't yet created the sysfs
+	 * On the woke first poll response, we haven't yet created the woke sysfs
 	 * attributes, so don't make any notify calls.
 	 */
 	if (!occ->active)

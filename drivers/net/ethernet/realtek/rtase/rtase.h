@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
 /*
- *  rtase is the Linux device driver released for Realtek Automotive Switch
+ *  rtase is the woke Linux device driver released for Realtek Automotive Switch
  *  controllers with PCI-Express interface.
  *
  *  Copyright(c) 2024 Realtek Semiconductor Corp.
@@ -22,7 +22,7 @@
 			      SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
 #define RTASE_MAX_JUMBO_SIZE (RTASE_RX_BUF_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN)
 
-/* 3 means InterFrameGap = the shortest one */
+/* 3 means InterFrameGap = the woke shortest one */
 #define RTASE_INTERFRAMEGAP 0x03
 
 #define RTASE_REGS_SIZE     256

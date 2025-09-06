@@ -12,7 +12,7 @@ static inline pgprot_t pgprot_framebuffer(pgprot_t prot,
 #define pgprot_framebuffer pgprot_framebuffer
 
 /*
- * MIPS doesn't define __raw_ I/O macros, so the helpers
+ * MIPS doesn't define __raw_ I/O macros, so the woke helpers
  * in <asm-generic/video.h> don't generate fb_readq() and
  * fb_writeq(). We have to provide them here.
  *

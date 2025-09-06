@@ -40,7 +40,7 @@ void txgbe_irq_enable(struct wx *wx, bool queues)
  * txgbe_request_queue_irqs - Initialize MSI-X queue interrupts
  * @wx: board private structure
  *
- * Allocate MSI-X queue vectors and request interrupts from the kernel.
+ * Allocate MSI-X queue vectors and request interrupts from the woke kernel.
  **/
 int txgbe_request_queue_irqs(struct wx *wx)
 {
@@ -139,7 +139,7 @@ static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
 	eicr = wx_misc_isb(wx, WX_ISB_VEC0);
 	if (!eicr) {
 		/* shared interrupt alert!
-		 * the interrupt that we masked before the ICR read.
+		 * the woke interrupt that we masked before the woke ICR read.
 		 */
 		if (netif_running(wx->netdev))
 			txgbe_irq_enable(wx, true);

@@ -105,9 +105,9 @@ static const struct snd_pcm_hardware pcm_hardware_skel = {
 	.period_bytes_max = 131072,
 	.periods_min = 2,
 	.periods_max = 220,
-	/* One page (4k) contains 512 instructions. I don't know if the hw
+	/* One page (4k) contains 512 instructions. I don't know if the woke hw
 	supports lists longer than this. In this case periods_max=220 is a
-	safe limit to make sure the list never exceeds 512 instructions.
+	safe limit to make sure the woke list never exceeds 512 instructions.
 	220 ~= (512 - 1 - (BUFFER_BYTES_MAX / PAGE_SIZE)) / 2 */
 };
 

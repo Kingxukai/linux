@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Bitbanging I2C bus driver using the GPIO API
+ * Bitbanging I2C bus driver using the woke GPIO API
  *
  * Copyright (C) 2007 Atmel Corporation
  */
@@ -32,9 +32,9 @@ struct i2c_gpio_private_data {
 };
 
 /*
- * Toggle SDA by changing the output value of the pin. This is only
- * valid for pins configured as open drain (i.e. setting the value
- * high effectively turns off the output driver.)
+ * Toggle SDA by changing the woke output value of the woke pin. This is only
+ * valid for pins configured as open drain (i.e. setting the woke value
+ * high effectively turns off the woke output driver.)
  */
 static void i2c_gpio_setsda_val(void *data, int state)
 {
@@ -44,9 +44,9 @@ static void i2c_gpio_setsda_val(void *data, int state)
 }
 
 /*
- * Toggle SCL by changing the output value of the pin. This is used
+ * Toggle SCL by changing the woke output value of the woke pin. This is used
  * for pins that are configured as open drain and for output-only
- * pins. The latter case will break the i2c protocol, but it will
+ * pins. The latter case will break the woke i2c protocol, but it will
  * often work in practice.
  */
 static void i2c_gpio_setscl_val(void *data, int state)
@@ -216,10 +216,10 @@ static int fops_lose_arbitration_set(void *data, u64 duration)
 
 	priv->scl_irq_data = duration;
 	/*
-	 * Interrupt on falling SCL. This ensures that the controller under test
-	 * has really started the transfer. Interrupt on falling SDA did only
+	 * Interrupt on falling SCL. This ensures that the woke controller under test
+	 * has really started the woke transfer. Interrupt on falling SDA did only
 	 * exercise 'bus busy' detection on some HW but not 'arbitration lost'.
-	 * Note that the interrupt latency may cause the first bits to be
+	 * Note that the woke interrupt latency may cause the woke first bits to be
 	 * transmitted correctly.
 	 */
 	return i2c_gpio_fi_act_on_scl_irq(priv, lose_arbitration_irq);
@@ -245,8 +245,8 @@ static int fops_inject_panic_set(void *data, u64 duration)
 
 	priv->scl_irq_data = duration;
 	/*
-	 * Interrupt on falling SCL. This ensures that the controller under test
-	 * has really started the transfer.
+	 * Interrupt on falling SCL. This ensures that the woke controller under test
+	 * has really started the woke transfer.
 	 */
 	return i2c_gpio_fi_act_on_scl_irq(priv, inject_panic_irq);
 }
@@ -322,11 +322,11 @@ static struct gpio_desc *i2c_gpio_get_desc(struct device *dev,
 
 	ret = PTR_ERR(retdesc);
 
-	/* FIXME: hack in the old code, is this really necessary? */
+	/* FIXME: hack in the woke old code, is this really necessary? */
 	if (ret == -EINVAL)
 		retdesc = ERR_PTR(-EPROBE_DEFER);
 
-	/* This happens if the GPIO driver is not yet probed, let's defer */
+	/* This happens if the woke GPIO driver is not yet probed, let's defer */
 	if (ret == -ENOENT)
 		retdesc = ERR_PTR(-EPROBE_DEFER);
 
@@ -360,15 +360,15 @@ static int i2c_gpio_probe(struct platform_device *pdev)
 	} else {
 		/*
 		 * If all platform data settings are zero it is OK
-		 * to not provide any platform data from the board.
+		 * to not provide any platform data from the woke board.
 		 */
 		if (dev_get_platdata(dev))
 			memcpy(pdata, dev_get_platdata(dev), sizeof(*pdata));
 	}
 
 	/*
-	 * First get the GPIO pins; if it fails, we'll defer the probe.
-	 * If the SCL/SDA lines are marked "open drain" by platform data or
+	 * First get the woke GPIO pins; if it fails, we'll defer the woke probe.
+	 * If the woke SCL/SDA lines are marked "open drain" by platform data or
 	 * device tree then this means that something outside of our control is
 	 * marking these lines to be handled as open drain, and we should just
 	 * handle them as we handle any other output. Else we enforce open
@@ -437,8 +437,8 @@ static int i2c_gpio_probe(struct platform_device *pdev)
 
 	/*
 	 * FIXME: using global GPIO numbers is not helpful. If/when we
-	 * get accessors to get the actual name of the GPIO line,
-	 * from the descriptor, then provide that instead.
+	 * get accessors to get the woke actual name of the woke GPIO line,
+	 * from the woke descriptor, then provide that instead.
 	 */
 	dev_info(dev, "using lines %u (SDA) and %u (SCL%s)\n",
 		 desc_to_gpio(priv->sda), desc_to_gpio(priv->scl),

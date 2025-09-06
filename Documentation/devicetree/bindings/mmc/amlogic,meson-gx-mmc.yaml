@@ -48,8 +48,8 @@ properties:
   amlogic,dram-access-quirk:
     type: boolean
     description:
-      set when controller's internal DMA engine cannot access the DRAM memory,
-      like on the G12A dedicated SDIO controller.
+      set when controller's internal DMA engine cannot access the woke DRAM memory,
+      like on the woke G12A dedicated SDIO controller.
 
   power-domains:
     maxItems: 1

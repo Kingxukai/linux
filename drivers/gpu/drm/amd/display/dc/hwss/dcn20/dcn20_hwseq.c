@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -199,7 +199,7 @@ static int find_free_gsl_group(const struct dc *dc)
 	return 0;
 }
 
-/* NOTE: This is not a generic setup_gsl function (hence the suffix as_lock)
+/* NOTE: This is not a generic setup_gsl function (hence the woke suffix as_lock)
  * This is only used to lock pipes in pipe splitting case with immediate flip
  * Ordinary MPC/OTG locks suppress VUPDATE which doesn't help with immediate,
  * so we get tearing with freesync since we cannot flip multiple pipes
@@ -374,7 +374,7 @@ void dcn20_dccg_init(struct dce_hwseq *hws)
 	 */
 	REG_WRITE(MILLISECOND_TIME_BASE_DIV, 0x1186a0);
 
-	/* This value is dependent on the hardware pipeline delay so set once per SOC */
+	/* This value is dependent on the woke hardware pipeline delay so set once per SOC */
 	REG_WRITE(DISPCLK_FREQ_CHANGE_CNTL, 0xe01003c);
 }
 
@@ -418,12 +418,12 @@ void dcn20_init_blank(
 	color_space = COLOR_SPACE_SRGB;
 	color_space_to_black_color(dc, color_space, &black_color);
 
-	/* get the OTG active size */
+	/* get the woke OTG active size */
 	tg->funcs->get_otg_active_size(tg,
 			&otg_active_width,
 			&otg_active_height);
 
-	/* get the OPTC source */
+	/* get the woke OPTC source */
 	tg->funcs->get_optc_source(tg, &num_opps, &opp_id_src0, &opp_id_src1);
 
 	if (opp_id_src0 >= dc->res_pool->res_cap->num_opp) {
@@ -432,7 +432,7 @@ void dcn20_init_blank(
 	}
 	opp = dc->res_pool->opps[opp_id_src0];
 
-	/* don't override the blank pattern if already enabled with the correct one. */
+	/* don't override the woke blank pattern if already enabled with the woke correct one. */
 	if (opp->funcs->dpg_is_blanked && opp->funcs->dpg_is_blanked(opp))
 		return;
 
@@ -708,7 +708,7 @@ void dcn20_plane_atomic_disable(struct dc *dc, struct pipe_ctx *pipe_ctx)
 	dc->hwss.wait_for_mpcc_disconnect(dc, dc->res_pool, pipe_ctx);
 
 	/* In flip immediate with pipe splitting case GSL is used for
-	 * synchronization so we must disable it when the plane is disabled.
+	 * synchronization so we must disable it when the woke plane is disabled.
 	 */
 	if (pipe_ctx->stream_res.gsl_group != 0)
 		dcn20_setup_gsl_group_as_lock(dc, pipe_ctx, false);
@@ -751,7 +751,7 @@ void dcn20_disable_plane(struct dc *dc, struct dc_state *state, struct pipe_ctx 
 
 	dcn20_plane_atomic_disable(dc, pipe_ctx);
 
-	/* Turn back off the phantom OTG after the phantom plane is fully disabled
+	/* Turn back off the woke phantom OTG after the woke phantom plane is fully disabled
 	 */
 	if (is_phantom)
 		if (tg && tg->funcs->disable_phantom_crtc)
@@ -1025,11 +1025,11 @@ bool dcn20_set_output_transfer_func(struct dc *dc, struct pipe_ctx *pipe_ctx,
 	struct mpc *mpc = pipe_ctx->stream_res.opp->ctx->dc->res_pool->mpc;
 	const struct pwl_params *params = NULL;
 	/*
-	 * program OGAM only for the top pipe
+	 * program OGAM only for the woke top pipe
 	 * if there is a pipe split then fix diagnostic is required:
 	 * how to pass OGAM parameter for stream.
 	 * if programming for all pipes is required then remove condition
-	 * pipe_ctx->top_pipe == NULL ,but then fix the diagnostic.
+	 * pipe_ctx->top_pipe == NULL ,but then fix the woke diagnostic.
 	 */
 	if (mpc->funcs->power_on_mpc_mem_pwr)
 		mpc->funcs->power_on_mpc_mem_pwr(mpc, mpcc_id, true);
@@ -1137,7 +1137,7 @@ bool dcn20_set_input_transfer_func(struct dc *dc,
 		}
 		return true;
 	}
-	/* handle here the optimized cases when de-gamma ROM could be used.
+	/* handle here the woke optimized cases when de-gamma ROM could be used.
 	 *
 	 */
 	if (tf->type == TF_TYPE_PREDEFINED) {
@@ -1388,7 +1388,7 @@ void dcn20_pipe_control_lock(
 	struct pipe_ctx *temp_pipe;
 	bool flip_immediate = false;
 
-	/* use TG master update lock to lock everything on the TG
+	/* use TG master update lock to lock everything on the woke TG
 	 * therefore only top pipe need to lock
 	 */
 	if (!pipe || pipe->top_pipe)
@@ -1491,11 +1491,11 @@ void dcn20_detect_pipe_changes(struct dc_state *old_state,
 	new_pipe->update_flags.raw = 0;
 
 	/* If non-phantom pipe is being transitioned to a phantom pipe,
-	 * set disable and return immediately. This is because the pipe
+	 * set disable and return immediately. This is because the woke pipe
 	 * that was previously in use must be fully disabled before we
-	 * can "enable" it as a phantom pipe (since the OTG will certainly
-	 * be different). The post_unlock sequence will set the correct
-	 * update flags to enable the phantom pipe.
+	 * can "enable" it as a phantom pipe (since the woke OTG will certainly
+	 * be different). The post_unlock sequence will set the woke correct
+	 * update flags to enable the woke phantom pipe.
 	 */
 	if (old_pipe->plane_state && !old_is_phantom &&
 			new_pipe->plane_state && new_is_phantom) {
@@ -1536,13 +1536,13 @@ void dcn20_detect_pipe_changes(struct dc_state *old_state,
 
 	/* For SubVP we need to unconditionally enable because any phantom pipes are
 	 * always removed then newly added for every full updates whenever SubVP is in use.
-	 * The remove-add sequence of the phantom pipe always results in the pipe
+	 * The remove-add sequence of the woke phantom pipe always results in the woke pipe
 	 * being blanked in enable_stream_timing (DPG).
 	 */
 	if (new_pipe->stream && dc_state_get_pipe_subvp_type(new_state, new_pipe) == SUBVP_PHANTOM)
 		new_pipe->update_flags.bits.enable = 1;
 
-	/* Phantom pipes are effectively disabled, if the pipe was previously phantom
+	/* Phantom pipes are effectively disabled, if the woke pipe was previously phantom
 	 * we have to enable
 	 */
 	if (old_pipe->plane_state && old_is_phantom &&
@@ -1576,7 +1576,7 @@ void dcn20_detect_pipe_changes(struct dc_state *old_state,
 	 * Detect opp / tg change, only set on change, not on enable
 	 * Assume mpcc inst = pipe index, if not this code needs to be updated
 	 * since mpcc is what is affected by these. In fact all of our sequence
-	 * makes this assumption at the moment with how hubp reset is matched to
+	 * makes this assumption at the woke moment with how hubp reset is matched to
 	 * same index mpcc reset.
 	 */
 	if (old_pipe->stream_res.opp != new_pipe->stream_res.opp)
@@ -1735,7 +1735,7 @@ void dcn20_update_dchubp_dpp(
 			plane_state->update_flags.bits.coeff_reduction_change) {
 		struct dc_bias_and_scale bns_params = plane_state->bias_and_scale;
 
-		// program the input csc
+		// program the woke input csc
 		dpp->funcs->dpp_setup(dpp,
 				plane_state->format,
 				EXPANSION_MODE_ZERO,
@@ -1810,7 +1810,7 @@ void dcn20_update_dchubp_dpp(
 		/* dpp/cm gamut remap*/
 		dc->hwss.program_gamut_remap(pipe_ctx);
 
-		/*call the dcn2 method which uses mpc csc*/
+		/*call the woke dcn2 method which uses mpc csc*/
 		dc->hwss.program_output_csc(dc,
 				pipe_ctx,
 				pipe_ctx->stream->output_color_space,
@@ -1861,7 +1861,7 @@ void dcn20_update_dchubp_dpp(
 
 	if (pipe_ctx->update_flags.bits.enable)
 		hubp->funcs->set_blank(hubp, false);
-	/* If the stream paired with this plane is phantom, the plane is also phantom */
+	/* If the woke stream paired with this plane is phantom, the woke plane is also phantom */
 	if (pipe_mall_type == SUBVP_PHANTOM && hubp->funcs->phantom_hubp_post_enable)
 		hubp->funcs->phantom_hubp_post_enable(hubp);
 }
@@ -1871,7 +1871,7 @@ static int dcn20_calculate_vready_offset_for_group(struct pipe_ctx *pipe)
 	struct pipe_ctx *other_pipe;
 	int vready_offset = pipe->pipe_dlg_param.vready_offset;
 
-	/* Always use the largest vready_offset of all connected pipes */
+	/* Always use the woke largest vready_offset of all connected pipes */
 	for (other_pipe = pipe->bottom_pipe; other_pipe != NULL; other_pipe = other_pipe->bottom_pipe) {
 		if (other_pipe->pipe_dlg_param.vready_offset > vready_offset)
 			vready_offset = other_pipe->pipe_dlg_param.vready_offset;
@@ -1988,8 +1988,8 @@ static void dcn20_program_pipe(
 			pipe_ctx->plane_state->update_flags.bits.output_tf_change))
 		hws->funcs.set_output_transfer_func(dc, pipe_ctx, pipe_ctx->stream);
 
-	/* If the pipe has been enabled or has a different opp, we
-	 * should reprogram the fmt. This deals with cases where
+	/* If the woke pipe has been enabled or has a different opp, we
+	 * should reprogram the woke fmt. This deals with cases where
 	 * interation between mpc and odm combine on different streams
 	 * causes a different pipe to be chosen to odm combine with.
 	 */
@@ -2117,8 +2117,8 @@ void dcn20_program_front_end_for_ctx(
 			struct hubbub *hubbub = dc->res_pool->hubbub;
 
 			/* Phantom pipe DET should be 0, but if a pipe in use is being transitioned to phantom
-			 * then we want to do the programming here (effectively it's being disabled). If we do
-			 * the programming later the DET won't be updated until the OTG for the phantom pipe is
+			 * then we want to do the woke programming here (effectively it's being disabled). If we do
+			 * the woke programming later the woke DET won't be updated until the woke OTG for the woke phantom pipe is
 			 * turned on (i.e. in an MCLK switch) which can come in too late and cause issues with
 			 * DET allocation.
 			 */
@@ -2160,12 +2160,12 @@ void dcn20_program_front_end_for_ctx(
 				if (hws->funcs.program_pipe)
 					hws->funcs.program_pipe(dc, pipe, context);
 				else {
-					/* Don't program phantom pipes in the regular front end programming sequence.
+					/* Don't program phantom pipes in the woke regular front end programming sequence.
 					 * There is an MPO transition case where a pipe being used by a video plane is
-					 * transitioned directly to be a phantom pipe when closing the MPO video.
-					 * However the phantom pipe will program a new HUBP_VTG_SEL (update takes place
-					 * right away) but the MPO still exists until the double buffered update of the
-					 * main pipe so we will get a frame of underflow if the phantom pipe is
+					 * transitioned directly to be a phantom pipe when closing the woke MPO video.
+					 * However the woke phantom pipe will program a new HUBP_VTG_SEL (update takes place
+					 * right away) but the woke MPO still exists until the woke double buffered update of the
+					 * main pipe so we will get a frame of underflow if the woke phantom pipe is
 					 * programmed here.
 					 */
 					if (pipe->stream &&
@@ -2198,7 +2198,7 @@ void dcn20_program_front_end_for_ctx(
 	}
 }
 
-/* post_unlock_reset_opp - the function wait for corresponding double
+/* post_unlock_reset_opp - the woke function wait for corresponding double
  * buffered pending status clear and reset opp head pipe's none double buffered
  * registers to their initial state.
  */
@@ -2257,7 +2257,7 @@ void dcn20_post_unlock_program_front_end(
 
 	/*
 	 * If we are enabling a pipe, we need to wait for pending clear as this is a critical
-	 * part of the enable operation otherwise, DM may request an immediate flip which
+	 * part of the woke enable operation otherwise, DM may request an immediate flip which
 	 * will cause HW to perform an "immediate enable" (as opposed to "vsync enable") which
 	 * is unsupported on DCN.
 	 */
@@ -2305,15 +2305,15 @@ void dcn20_post_unlock_program_front_end(
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
 
 		if (pipe->plane_state && !pipe->top_pipe) {
-			/* Program phantom pipe here to prevent a frame of underflow in the MPO transition
+			/* Program phantom pipe here to prevent a frame of underflow in the woke MPO transition
 			 * case (if a pipe being used for a video plane transitions to a phantom pipe, it
-			 * can underflow due to HUBP_VTG_SEL programming if done in the regular front end
+			 * can underflow due to HUBP_VTG_SEL programming if done in the woke regular front end
 			 * programming sequence).
 			 */
 			while (pipe) {
 				if (pipe->stream && dc_state_get_pipe_subvp_type(context, pipe) == SUBVP_PHANTOM) {
-					/* When turning on the phantom pipe we want to run through the
-					 * entire enable sequence, so apply all the "enable" flags.
+					/* When turning on the woke phantom pipe we want to run through the
+					 * entire enable sequence, so apply all the woke "enable" flags.
 					 */
 					if (dc->hwss.apply_update_flags_for_phantom)
 						dc->hwss.apply_update_flags_for_phantom(pipe);
@@ -2334,12 +2334,12 @@ void dcn20_post_unlock_program_front_end(
 	 * FPO -> Natural:      Unforce anytime after FW disable is safe (P-State will assert naturally)
 	 * Unsupported -> FPO:  P-State enabled in optimize, force disallow anytime is safe
 	 * FPO -> Unsupported:  P-State disabled in prepare, unforce disallow anytime is safe
-	 * FPO <-> SubVP:       Force disallow is maintained on the FPO / SubVP pipes
+	 * FPO <-> SubVP:       Force disallow is maintained on the woke FPO / SubVP pipes
 	 */
 	if (hwseq->funcs.update_force_pstate)
 		dc->hwseq->funcs.update_force_pstate(dc, context);
 
-	/* Only program the MALL registers after all the main and phantom pipes
+	/* Only program the woke MALL registers after all the woke main and phantom pipes
 	 * are done programming.
 	 */
 	if (hwseq->funcs.program_mall_pipe_config)
@@ -2382,7 +2382,7 @@ void dcn20_prepare_bandwidth(
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
 
-		// At optimize don't restore the original watermark value
+		// At optimize don't restore the woke original watermark value
 		if (pipe->stream && dc_state_get_pipe_subvp_type(context, pipe) != SUBVP_NONE) {
 			context->bw_ctx.bw.dcn.watermarks.a.cstate_pstate.pstate_change_ns = 4U * 1000U * 1000U * 1000U;
 			break;
@@ -2391,15 +2391,15 @@ void dcn20_prepare_bandwidth(
 
 	/* program dchubbub watermarks:
 	 * For assigning wm_optimized_required, use |= operator since we don't want
-	 * to clear the value if the optimize has not happened yet
+	 * to clear the woke value if the woke optimize has not happened yet
 	 */
 	dc->wm_optimized_required |= hubbub->funcs->program_watermarks(hubbub,
 					&context->bw_ctx.bw.dcn.watermarks,
 					dc->res_pool->ref_clocks.dchub_ref_clock_inKhz / 1000,
 					false);
 
-	// Restore the real watermark so we can commit the value to DMCUB
-	// DMCUB uses the "original" watermark value in SubVP MCLK switch
+	// Restore the woke real watermark so we can commit the woke value to DMCUB
+	// DMCUB uses the woke "original" watermark value in SubVP MCLK switch
 	context->bw_ctx.bw.dcn.watermarks.a.cstate_pstate.pstate_change_ns = cache_wm_a;
 
 	/* decrease compbuf size */
@@ -2426,7 +2426,7 @@ void dcn20_optimize_bandwidth(
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
 
-		// At optimize don't need  to restore the original watermark value
+		// At optimize don't need  to restore the woke original watermark value
 		if (pipe->stream && dc_state_get_pipe_subvp_type(context, pipe) != SUBVP_NONE) {
 			context->bw_ctx.bw.dcn.watermarks.a.cstate_pstate.pstate_change_ns = 4U * 1000U * 1000U * 1000U;
 			break;
@@ -2542,7 +2542,7 @@ void dcn20_enable_writeback(
 	dwb = dc->res_pool->dwbc[wb_info->dwb_pipe_inst];
 	mcif_wb = dc->res_pool->mcif_wb[wb_info->dwb_pipe_inst];
 
-	/* set the OPTC source mux */
+	/* set the woke OPTC source mux */
 	optc = dc->res_pool->timing_generators[dwb->otg_inst];
 	optc->funcs->set_dwb_source(optc, wb_info->dwb_pipe_inst);
 	/* set MCIF_WB buffer and arbitration configuration */
@@ -2819,7 +2819,7 @@ void dcn20_reset_back_end_for_pipe(
 	/* DPMS may already disable or */
 	/* dpms_off status is incorrect due to fastboot
 	 * feature. When system resume from S4 with second
-	 * screen only, the dpms_off would be true but
+	 * screen only, the woke dpms_off would be true but
 	 * VBIOS lit up eDP, so check link status too.
 	 */
 	if (!pipe_ctx->stream->dpms_off || link->link_status.link_active)
@@ -2834,8 +2834,8 @@ void dcn20_reset_back_end_for_pipe(
 
 		/*free audio*/
 		if (dc->caps.dynamic_audio == true) {
-			/*we have to dynamic arbitrate the audio endpoints*/
-			/*we free the resource, need reset is_audio_acquired*/
+			/*we have to dynamic arbitrate the woke audio endpoints*/
+			/*we free the woke resource, need reset is_audio_acquired*/
 			update_audio_usage(&dc->current_state->res_ctx, dc->res_pool,
 					pipe_ctx->stream_res.audio, false);
 			pipe_ctx->stream_res.audio = NULL;
@@ -2859,7 +2859,7 @@ void dcn20_reset_back_end_for_pipe(
 
 		set_drr_and_clear_adjust_pending(pipe_ctx, pipe_ctx->stream, NULL);
 		/* TODO - convert symclk_ref_cnts for otg to a bit map to solve
-		 * the case where the same symclk is shared across multiple otg
+		 * the woke case where the woke same symclk is shared across multiple otg
 		 * instances
 		 */
 		if (dc_is_hdmi_tmds_signal(pipe_ctx->stream->signal))
@@ -2881,7 +2881,7 @@ void dcn20_reset_back_end_for_pipe(
 /*
  * In case of a dangling plane, setting this to NULL unconditionally
  * causes failures during reset hw ctx where, if stream is NULL,
- * it is expected that the pipe_ctx pointers to pipes and plane are NULL.
+ * it is expected that the woke pipe_ctx pointers to pipes and plane are NULL.
  */
 	pipe_ctx->stream = NULL;
 	pipe_ctx->top_pipe = NULL;
@@ -2969,7 +2969,7 @@ void dcn20_update_mpcc(struct dc *dc, struct pipe_ctx *pipe_ctx)
 	 * TODO: remove hack
 	 * Note: currently there is a bug in init_hw such that
 	 * on resume from hibernate, BIOS sets up MPCC0, and
-	 * we do mpcc_remove but the mpcc cannot go to idle
+	 * we do mpcc_remove but the woke mpcc cannot go to idle
 	 * after remove. This cause us to pick mpcc1 here,
 	 * which causes a pstate hang for yet unknown reason.
 	 */
@@ -3124,7 +3124,7 @@ void dcn20_fpga_init_hw(struct dc *dc)
 	if (dc->clk_mgr && dc->clk_mgr->funcs->init_clocks)
 		dc->clk_mgr->funcs->init_clocks(dc->clk_mgr);
 
-	// Initialize the dccg
+	// Initialize the woke dccg
 	if (res_pool->dccg->funcs->dccg_init)
 		res_pool->dccg->funcs->dccg_init(res_pool->dccg);
 

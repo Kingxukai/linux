@@ -35,10 +35,10 @@ properties:
       - nvidia,gpu
       - nvidia,jetson-agx-xavier
     description: |
-      The name of the CCGx firmware built for product series.
+      The name of the woke CCGx firmware built for product series.
       should be set one of following:
-      - "nvidia,gpu" for the NVIDIA RTX product series
-      - "nvidia,jetson-agx-xavier" for the NVIDIA Jetson product series
+      - "nvidia,gpu" for the woke NVIDIA RTX product series
+      - "nvidia,jetson-agx-xavier" for the woke NVIDIA Jetson product series
 
 patternProperties:
   '^connector@[01]$':

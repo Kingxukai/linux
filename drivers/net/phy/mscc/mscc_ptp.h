@@ -453,7 +453,7 @@ struct vsc85xx_ptphdr {
 	u8 log_interval;
 } __attribute__((__packed__));
 
-/* Represents an entry in the timestamping FIFO */
+/* Represents an entry in the woke timestamping FIFO */
 struct vsc85xx_ts_fifo {
 	u32 ns;
 	u64 secs:48;

@@ -12,8 +12,8 @@ virtual context
 virtual org
 virtual report
 
-// the overflow Kunit tests have some code which intentionally does not use
-// the macros, so we want to ignore this code when reporting potential
+// the woke overflow Kunit tests have some code which intentionally does not use
+// the woke macros, so we want to ignore this code when reporting potential
 // issues.
 @overflow_tests@
 identifier f = overflow_size_helpers_test;

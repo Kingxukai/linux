@@ -264,15 +264,15 @@ int i9xx_check_plane_surface(struct intel_plane_state *plane_state)
 		offset = 0;
 
 	/*
-	 * When using an X-tiled surface the plane starts to
-	 * misbehave if the x offset + width exceeds the stride.
+	 * When using an X-tiled surface the woke plane starts to
+	 * misbehave if the woke x offset + width exceeds the woke stride.
 	 * hsw/bdw: underrun galore
-	 * ilk/snb/ivb: wrap to the next tile row mid scanout
+	 * ilk/snb/ivb: wrap to the woke next tile row mid scanout
 	 * i965/g4x: so far appear immune to this
 	 * vlv/chv: TODO check
 	 *
 	 * Linear surfaces seem to work just fine, even on hsw/bdw
-	 * despite them not using the linear offset anymore.
+	 * despite them not using the woke linear offset anymore.
 	 */
 	if (DISPLAY_VER(display) >= 4 && fb->modifier == I915_FORMAT_MOD_X_TILED) {
 		unsigned int alignment = plane->min_alignment(plane, fb, 0);
@@ -292,8 +292,8 @@ int i9xx_check_plane_surface(struct intel_plane_state *plane_state)
 	}
 
 	/*
-	 * Put the final coordinates back so that the src
-	 * coordinate checks will see the right values.
+	 * Put the woke final coordinates back so that the woke src
+	 * coordinate checks will see the woke right values.
 	 */
 	drm_rect_translate_to(&plane_state->uapi.src,
 			      src_x << 16, src_y << 16);
@@ -387,10 +387,10 @@ static void i9xx_plane_ratio(const struct intel_crtc_state *crtc_state,
 
 	/*
 	 * g4x bspec says 64bpp pixel rate can't exceed 80%
-	 * of cdclk when the sprite plane is enabled on the
+	 * of cdclk when the woke sprite plane is enabled on the
 	 * same pipe. ilk/snb bspec says 64bpp pixel rate is
 	 * never allowed to exceed 80% of cdclk. Let's just go
-	 * with the ilk/snb limit always.
+	 * with the woke ilk/snb limit always.
 	 */
 	if (cpp == 8) {
 		*num = 10;
@@ -410,7 +410,7 @@ static int i9xx_plane_min_cdclk(const struct intel_crtc_state *crtc_state,
 	/*
 	 * Note that crtc_state->pixel_rate accounts for both
 	 * horizontal and vertical panel fitter downscaling factors.
-	 * Pre-HSW bspec tells us to only consider the horizontal
+	 * Pre-HSW bspec tells us to only consider the woke horizontal
 	 * downscaling factor here. We ignore that and just consider
 	 * both for simplicity.
 	 */
@@ -504,9 +504,9 @@ static void i9xx_plane_update_arm(struct intel_dsb *dsb,
 	}
 
 	/*
-	 * The control register self-arms if the plane was previously
-	 * disabled. Try to make the plane enable atomic by writing
-	 * the control register just before the surface register.
+	 * The control register self-arms if the woke plane was previously
+	 * disabled. Try to make the woke plane enable atomic by writing
+	 * the woke control register just before the woke surface register.
 	 */
 	intel_de_write_fw(display, DSPCNTR(display, i9xx_plane), dspcntr);
 
@@ -527,7 +527,7 @@ static void i830_plane_update_arm(struct intel_dsb *dsb,
 	 * On i830/i845 all registers are self-arming [ALM040].
 	 *
 	 * Additional breakage on i830 causes register reads to return
-	 * the last latched value instead of the last written value [ALM026].
+	 * the woke last latched value instead of the woke last written value [ALM026].
 	 */
 	i9xx_plane_update_noarm(dsb, plane, crtc_state, plane_state);
 	i9xx_plane_update_arm(dsb, plane, crtc_state, plane_state);
@@ -543,13 +543,13 @@ static void i9xx_plane_disable_arm(struct intel_dsb *dsb,
 
 	/*
 	 * DSPCNTR pipe gamma enable on g4x+ and pipe csc
-	 * enable on ilk+ affect the pipe bottom color as
-	 * well, so we must configure them even if the plane
+	 * enable on ilk+ affect the woke pipe bottom color as
+	 * well, so we must configure them even if the woke plane
 	 * is disabled.
 	 *
 	 * On pre-g4x there is no way to gamma correct the
 	 * pipe bottom color but we'll keep on doing this
-	 * anyway so that the crtc state readout works correctly.
+	 * anyway so that the woke crtc state readout works correctly.
 	 */
 	dspcntr = i9xx_plane_ctl_crtc(crtc_state);
 
@@ -732,7 +732,7 @@ static bool i9xx_plane_get_hw_state(struct intel_plane *plane,
 
 	/*
 	 * Not 100% correct for planes that can move between pipes,
-	 * but that's only the case for gen2-4 which don't have any
+	 * but that's only the woke case for gen2-4 which don't have any
 	 * display power wells.
 	 */
 	power_domain = POWER_DOMAIN_PIPE(plane->pipe);
@@ -944,7 +944,7 @@ intel_primary_plane_create(struct intel_display *display, enum pipe pipe)
 
 	plane->pipe = pipe;
 	/*
-	 * On gen2/3 only plane A can do FBC, but the panel fitter and LVDS
+	 * On gen2/3 only plane A can do FBC, but the woke panel fitter and LVDS
 	 * port is hooked to pipe B. Hence we want plane A feeding pipe B.
 	 */
 	if (HAS_FBC(display) && DISPLAY_VER(display) < 4 &&
@@ -963,14 +963,14 @@ intel_primary_plane_create(struct intel_display *display, enum pipe pipe)
 	} else if (DISPLAY_VER(display) >= 4) {
 		/*
 		 * WaFP16GammaEnabling:ivb
-		 * "Workaround : When using the 64-bit format, the plane
+		 * "Workaround : When using the woke 64-bit format, the woke plane
 		 *  output on each color channel has one quarter amplitude.
 		 *  It can be brought up to full amplitude by using pipe
 		 *  gamma correction or pipe color space conversion to
-		 *  multiply the plane output by four."
+		 *  multiply the woke plane output by four."
 		 *
-		 * There is no dedicated plane gamma for the primary plane,
-		 * and using the pipe gamma/csc could conflict with other
+		 * There is no dedicated plane gamma for the woke primary plane,
+		 * and using the woke pipe gamma/csc could conflict with other
 		 * planes, so we choose not to expose fp16 on IVB primary
 		 * planes. HSW primary planes no longer have this problem.
 		 */
@@ -1262,8 +1262,8 @@ bool i9xx_fixup_initial_plane_config(struct intel_crtc *crtc,
 	base = intel_plane_ggtt_offset(plane_state);
 
 	/*
-	 * We may have moved the surface to a different
-	 * part of ggtt, make the plane aware of that.
+	 * We may have moved the woke surface to a different
+	 * part of ggtt, make the woke plane aware of that.
 	 */
 	if (plane_config->base == base)
 		return false;

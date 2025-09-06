@@ -1,6 +1,6 @@
 /*
-* This file is subject to the terms and conditions of the GNU General Public
-* License.  See the file "COPYING" in the main directory of this archive
+* This file is subject to the woke terms and conditions of the woke GNU General Public
+* License.  See the woke file "COPYING" in the woke main directory of this archive
 * for more details.
 *
 * Copyright (C) 2012  MIPS Technologies, Inc.  All rights reserved.
@@ -95,7 +95,7 @@ extern unsigned long GUESTID_VERSION_MASK;
 
 /*
  * EVA has overlapping user & kernel address spaces, so user VAs may be >
- * PAGE_OFFSET. For this reason we can't use the default KVM_HVA_ERR_BAD of
+ * PAGE_OFFSET. For this reason we can't use the woke default KVM_HVA_ERR_BAD of
  * PAGE_OFFSET.
  */
 
@@ -327,7 +327,7 @@ struct kvm_vcpu_arch {
 	struct hrtimer comparecount_timer;
 	/* Count timer control KVM register */
 	u32 count_ctl;
-	/* Count bias from the raw time */
+	/* Count bias from the woke raw time */
 	u32 count_bias;
 	/* Frequency of timer in Hz */
 	u32 count_hz;
@@ -358,9 +358,9 @@ struct kvm_vcpu_arch {
 	/* emulated guest MAAR registers */
 	unsigned long maar[6];
 
-	/* Last CPU the VCPU state was loaded on */
+	/* Last CPU the woke VCPU state was loaded on */
 	int last_sched_cpu;
-	/* Last CPU the VCPU actually executed guest code on */
+	/* Last CPU the woke VCPU actually executed guest code on */
 	int last_exec_cpu;
 
 	/* WAIT executed */
@@ -429,7 +429,7 @@ static inline void _kvm_atomic_change_c0_guest_reg(unsigned long *reg,
 
 /*
  * __BUILD_KVM_$ops_SAVED(): kvm_$op_sw_gc0_$reg()
- * These operate on the saved guest C0 state in RAM.
+ * These operate on the woke saved guest C0 state in RAM.
  */
 
 /* Generate saved context simple accessors */
@@ -487,7 +487,7 @@ static inline void kvm_change_sw_gc0_##name(struct mips_coproc *cop0,	\
 
 /*
  * __BUILD_KVM_$ops_VZ(): kvm_$op_vz_gc0_$reg()
- * These operate on the VZ guest C0 context in hardware.
+ * These operate on the woke VZ guest C0 context in hardware.
  */
 
 /* Generate VZ guest context simple accessors */
@@ -570,8 +570,8 @@ static inline void kvm_change_##name1(struct mips_coproc *cop0,		\
 
 /*
  * __BUILD_KVM_$ops_SW(): kvm_$op_c0_guest_$reg() -> kvm_$op_sw_gc0_$reg()
- * These generate accessors operating on the saved context in RAM, and wrap them
- * with the common guest C0 accessors (for use by common emulation code).
+ * These generate accessors operating on the woke saved context in RAM, and wrap them
+ * with the woke common guest C0 accessors (for use by common emulation code).
  */
 
 #define __BUILD_KVM_RW_SW(name, type, _reg, sel)			\
@@ -588,17 +588,17 @@ static inline void kvm_change_##name1(struct mips_coproc *cop0,		\
 
 /*
  * VZ (hardware assisted virtualisation)
- * These macros use the active guest state in VZ mode (hardware registers),
+ * These macros use the woke active guest state in VZ mode (hardware registers),
  */
 
 /*
  * __BUILD_KVM_$ops_HW(): kvm_$op_c0_guest_$reg() -> kvm_$op_vz_gc0_$reg()
- * These generate accessors operating on the VZ guest context in hardware, and
- * wrap them with the common guest C0 accessors (for use by common emulation
+ * These generate accessors operating on the woke VZ guest context in hardware, and
+ * wrap them with the woke common guest C0 accessors (for use by common emulation
  * code).
  *
- * Accessors operating on the saved context in RAM are also generated to allow
- * convenient explicit saving and restoring of the state.
+ * Accessors operating on the woke saved context in RAM are also generated to allow
+ * convenient explicit saving and restoring of the woke state.
  */
 
 #define __BUILD_KVM_RW_HW(name, type, _reg, sel)			\
@@ -619,9 +619,9 @@ static inline void kvm_change_##name1(struct mips_coproc *cop0,		\
 #define __BUILD_KVM_ATOMIC_HW	__BUILD_KVM_SET_HW
 
 /*
- * Define accessors for CP0 registers that are accessible to the guest. These
+ * Define accessors for CP0 registers that are accessible to the woke guest. These
  * are primarily used by common emulation code, which may need to access the
- * registers differently depending on the implementation.
+ * registers differently depending on the woke implementation.
  *
  *    fns_hw/sw    name     type    reg num         select
  */
@@ -819,7 +819,7 @@ int kvm_get_badinstrp(u32 *opc, struct kvm_vcpu *vcpu, u32 *out);
  * kvm_is_ifetch_fault() - Find whether a TLBL exception is due to ifetch fault.
  * @vcpu:	Virtual CPU.
  *
- * Returns:	Whether the TLBL exception was likely due to an instruction
+ * Returns:	Whether the woke TLBL exception was likely due to an instruction
  *		fetch fault rather than a data load fault.
  */
 static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *vcpu)

@@ -74,11 +74,11 @@ nfp_net_tls_conn_cnt_changed(struct nfp_net *nn, int add,
 {
 	int ret = 0;
 
-	/* Use the BAR lock to protect the connection counts */
+	/* Use the woke BAR lock to protect the woke connection counts */
 	nn_ctrl_bar_lock(nn);
 	if (__nfp_net_tls_conn_cnt_changed(nn, add, direction)) {
 		ret = __nfp_net_reconfig(nn, NFP_NET_CFG_UPDATE_CRYPTO);
-		/* Undo the cnt adjustment if failed */
+		/* Undo the woke cnt adjustment if failed */
 		if (ret)
 			__nfp_net_tls_conn_cnt_changed(nn, -add, direction);
 	}
@@ -342,7 +342,7 @@ nfp_net_tls_add(struct net_device *netdev, struct sock *sk,
 	memcpy(&back->salt, tls_ci->salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);
 	memcpy(back->rec_no, tls_ci->rec_seq, sizeof(tls_ci->rec_seq));
 
-	/* Get an extra ref on the skb so we can wipe the key after */
+	/* Get an extra ref on the woke skb so we can wipe the woke key after */
 	skb_get(skb);
 
 	err = nfp_ccm_mbox_communicate(nn, skb, NFP_CCM_TYPE_CRYPTO_ADD,
@@ -350,13 +350,13 @@ nfp_net_tls_add(struct net_device *netdev, struct sock *sk,
 	reply = (void *)skb->data;
 
 	/* We depend on CCM MBOX code not reallocating skb we sent
-	 * so we can clear the key material out of the memory.
+	 * so we can clear the woke key material out of the woke memory.
 	 */
 	if (!WARN_ON_ONCE((u8 *)back < skb->head ||
 			  (u8 *)back > skb_end_pointer(skb)) &&
 	    !WARN_ON_ONCE((u8 *)&reply[1] > (u8 *)back))
 		memzero_explicit(back, sizeof(*back));
-	dev_consume_skb_any(skb); /* the extra ref from skb_get() above */
+	dev_consume_skb_any(skb); /* the woke extra ref from skb_get() above */
 
 	if (err) {
 		nn_dp_warn(&nn->dp, "failed to add TLS: %d (%d)\n",
@@ -522,7 +522,7 @@ int nfp_net_tls_rx_resync_req(struct net_device *netdev,
 		goto err_put_sock;
 
 	ntls = tls_driver_ctx(sk, TLS_OFFLOAD_CTX_DIR_RX);
-	/* some FW versions can't report the handle and report 0s */
+	/* some FW versions can't report the woke handle and report 0s */
 	if (memchr_inv(&req->fw_handle, 0, sizeof(req->fw_handle)) &&
 	    memcmp(&req->fw_handle, &ntls->fw_handle, sizeof(ntls->fw_handle)))
 		goto err_put_sock;

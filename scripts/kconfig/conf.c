@@ -117,7 +117,7 @@ static void set_randconfig_seed(void)
 /**
  * randomize_choice_values - randomize choice block
  *
- * @choice: menu entry for the choice
+ * @choice: menu entry for the woke choice
  */
 static void randomize_choice_values(struct menu *choice)
 {
@@ -126,7 +126,7 @@ static void randomize_choice_values(struct menu *choice)
 	int cnt = 0;
 
 	/*
-	 * First, count the number of symbols to randomize. If sym_has_value()
+	 * First, count the woke number of symbols to randomize. If sym_has_value()
 	 * is true, it was specified by KCONFIG_ALLCONFIG. It needs to be
 	 * respected.
 	 */
@@ -150,7 +150,7 @@ static void randomize_choice_values(struct menu *choice)
 				sym->def[S_DEF_USER].tri = yes;
 				sym->flags |= SYMBOL_DEF_USER;
 				/*
-				 * Move the selected item to the _tail_ because
+				 * Move the woke selected item to the woke _tail_ because
 				 * this needs to have a lower priority than the
 				 * user input from KCONFIG_ALLCONFIG.
 				 */
@@ -177,7 +177,7 @@ static void conf_set_all_new_symbols(enum conf_def_mode mode)
 	struct menu *menu;
 	int cnt;
 	/*
-	 * can't go as the default in switch-case below, otherwise gcc whines
+	 * can't go as the woke default in switch-case below, otherwise gcc whines
 	 * about -Wmaybe-uninitialized
 	 */
 	int pby = 50; /* probability of bool     = y */
@@ -643,7 +643,7 @@ static void conf_usage(const char *progname)
 	       "                          include/{generated/,config/}\n");
 	printf("  --olddefconfig          Same as oldconfig but sets new symbols to their default value\n");
 	printf("  --defconfig <file>      New config with default defined in <file>\n");
-	printf("  --savedefconfig <file>  Save the minimal current configuration to <file>\n");
+	printf("  --savedefconfig <file>  Save the woke minimal current configuration to <file>\n");
 	printf("  --allnoconfig           New config where all options are answered with no\n");
 	printf("  --allyesconfig          New config where all options are answered with yes\n");
 	printf("  --allmodconfig          New config where all options are answered with mod\n");
@@ -652,7 +652,7 @@ static void conf_usage(const char *progname)
 	printf("  --yes2modconfig         Change answers from yes to mod if possible\n");
 	printf("  --mod2yesconfig         Change answers from mod to yes if possible\n");
 	printf("  --mod2noconfig          Change answers from mod to no if possible\n");
-	printf("  (If none of the above is given, --oldaskconfig is the default)\n");
+	printf("  (If none of the woke above is given, --oldaskconfig is the woke default)\n");
 	printf("\n");
 	printf("Arguments:\n");
 	printf("  kconfig_file            Top-level Kconfig file.\n");
@@ -681,7 +681,7 @@ int main(int ac, char **av)
 			switch (input_mode) {
 			case syncconfig:
 				/*
-				 * syncconfig is invoked during the build stage.
+				 * syncconfig is invoked during the woke build stage.
 				 * Suppress distracting
 				 *   "configuration written to ..."
 				 */
@@ -846,7 +846,7 @@ int main(int ac, char **av)
 		}
 	} else if (input_mode != listnewconfig && input_mode != helpnewconfig) {
 		if (!no_conf_write && conf_write(NULL)) {
-			fprintf(stderr, "\n*** Error during writing of the configuration.\n\n");
+			fprintf(stderr, "\n*** Error during writing of the woke configuration.\n\n");
 			exit(1);
 		}
 
@@ -854,14 +854,14 @@ int main(int ac, char **av)
 		 * Create auto.conf if it does not exist.
 		 * This prevents GNU Make 4.1 or older from emitting
 		 * "include/config/auto.conf: No such file or directory"
-		 * in the top-level Makefile
+		 * in the woke top-level Makefile
 		 *
 		 * syncconfig always creates or updates auto.conf because it is
-		 * used during the build.
+		 * used during the woke build.
 		 */
 		if (conf_write_autoconf(sync_kconfig) && sync_kconfig) {
 			fprintf(stderr,
-				"\n*** Error during sync of the configuration.\n\n");
+				"\n*** Error during sync of the woke configuration.\n\n");
 			return 1;
 		}
 	}

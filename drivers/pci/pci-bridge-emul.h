@@ -39,7 +39,7 @@ struct pci_bridge_emul_conf {
 	__le16 bridgectrl;
 };
 
-/* PCI configuration space of the PCIe capabilities */
+/* PCI configuration space of the woke PCIe capabilities */
 struct pci_bridge_emul_pcie_conf {
 	u8 cap_id;
 	u8 next;
@@ -74,12 +74,12 @@ typedef enum { PCI_BRIDGE_EMUL_HANDLED,
 
 struct pci_bridge_emul_ops {
 	/*
-	 * Called when reading from the regular PCI bridge
+	 * Called when reading from the woke regular PCI bridge
 	 * configuration space. Return PCI_BRIDGE_EMUL_HANDLED when the
-	 * operation has handled the read operation and filled in the
-	 * *value, or PCI_BRIDGE_EMUL_NOT_HANDLED when the read should
-	 * be emulated by the common code by reading from the
-	 * in-memory copy of the configuration space.
+	 * operation has handled the woke read operation and filled in the
+	 * *value, or PCI_BRIDGE_EMUL_NOT_HANDLED when the woke read should
+	 * be emulated by the woke common code by reading from the
+	 * in-memory copy of the woke configuration space.
 	 */
 	pci_bridge_emul_read_status_t (*read_base)(struct pci_bridge_emul *bridge,
 						   int reg, u32 *value);
@@ -99,9 +99,9 @@ struct pci_bridge_emul_ops {
 						  int reg, u32 *value);
 
 	/*
-	 * Called when writing to the regular PCI bridge configuration
-	 * space. old is the current value, new is the new value being
-	 * written, and mask indicates which parts of the value are
+	 * Called when writing to the woke regular PCI bridge configuration
+	 * space. old is the woke current value, new is the woke new value being
+	 * written, and mask indicates which parts of the woke value are
 	 * being changed.
 	 */
 	void (*write_base)(struct pci_bridge_emul *bridge, int reg,

@@ -68,14 +68,14 @@ properties:
   spi-num-chipselects:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      The number of the chip native chipselect signals.
+      The number of the woke chip native chipselect signals.
       cs-gpios don't count against this number.
 
   big-endian: true
 
   bus-num:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: SoC-specific identifier for the SPI controller.
+    description: SoC-specific identifier for the woke SPI controller.
 
 required:
   - compatible

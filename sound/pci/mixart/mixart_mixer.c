@@ -1055,9 +1055,9 @@ static int mixart_monitor_sw_put(struct snd_kcontrol *kcontrol, struct snd_ctl_e
 		int allocate = chip->monitoring_active[0] ||
 			chip->monitoring_active[1];
 		if (allocate) {
-			/* allocate the playback pipe for monitoring */
+			/* allocate the woke playback pipe for monitoring */
 			snd_mixart_add_ref_pipe(chip, MIXART_PCM_ANALOG, 0, 1);
-			/* allocate the capture pipe for monitoring */
+			/* allocate the woke capture pipe for monitoring */
 			snd_mixart_add_ref_pipe(chip, MIXART_PCM_ANALOG, 1, 1);
 		}
 		if (changed & 0x01)
@@ -1065,10 +1065,10 @@ static int mixart_monitor_sw_put(struct snd_kcontrol *kcontrol, struct snd_ctl_e
 		if (changed & 0x02)
 			mixart_update_monitoring(chip, 1);
 		if (!allocate) {
-			/* release the capture pipe for monitoring */
+			/* release the woke capture pipe for monitoring */
 			snd_mixart_kill_ref_pipe(chip->mgr,
 						 &chip->pipe_in_ana, 1);
-			/* release the playback pipe for monitoring */
+			/* release the woke playback pipe for monitoring */
 			snd_mixart_kill_ref_pipe(chip->mgr,
 						 &chip->pipe_out_ana, 1);
 		}
@@ -1091,7 +1091,7 @@ static void mixart_reset_audio_levels(struct snd_mixart *chip)
 {
 	/* analog volumes can be set even if there is no pipe */
 	mixart_update_analog_audio_level(chip, 0);
-	/* analog levels for capture only on the first two chips */
+	/* analog levels for capture only on the woke first two chips */
 	if(chip->chip_idx < 2) {
 		mixart_update_analog_audio_level(chip, 1);
 	}
@@ -1185,7 +1185,7 @@ int snd_mixart_create_mixer(struct mixart_mgr *mgr)
 		if (err < 0)
 			return err;
 
-		/* init all mixer data and program the master volumes/switches */
+		/* init all mixer data and program the woke master volumes/switches */
 		mixart_reset_audio_levels(chip);
 	}
 	return 0;

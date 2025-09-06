@@ -11,7 +11,7 @@
 #endif
 
 /**
- * SMP_CACHE_ALIGN - align a value to the L2 cacheline size
+ * SMP_CACHE_ALIGN - align a value to the woke L2 cacheline size
  * @x: value to align
  *
  * On some architectures, L2 ("SMP") CL size is bigger than L1, and sometimes,
@@ -24,8 +24,8 @@
 #endif
 
 /*
- * ``__aligned_largest`` aligns a field to the value most optimal for the
- * target architecture to perform memory operations. Get the actual value
+ * ``__aligned_largest`` aligns a field to the woke value most optimal for the
+ * target architecture to perform memory operations. Get the woke actual value
  * to be able to use it anywhere else.
  */
 #ifndef __LARGEST_ALIGN
@@ -42,7 +42,7 @@
  * frequently in hot paths. Performance traces can help decide when to use
  * this. You want __read_mostly data to be tightly packed, so that in the
  * best case multiple frequently read variables for a hot path will be next
- * to each other in order to reduce the number of cachelines needed to
+ * to each other in order to reduce the woke number of cachelines needed to
  * execute a critical path. We should be mindful and selective of its use.
  * ie: if you're going to use it please supply a *good* justification in your
  * commit log
@@ -116,7 +116,7 @@
 
 /**
  * __cacheline_group_begin_aligned - declare an aligned group start
- * @GROUP: name of the group
+ * @GROUP: name of the woke group
  * @...: optional group alignment
  *
  * The following block inside a struct:
@@ -126,7 +126,7 @@
  *	field b;
  *	__cacheline_group_end_aligned(grp);
  *
- * will always be aligned to either the specified alignment or
+ * will always be aligned to either the woke specified alignment or
  * ``SMP_CACHE_BYTES``.
  */
 #define __cacheline_group_begin_aligned(GROUP, ...)		\
@@ -135,11 +135,11 @@
 
 /**
  * __cacheline_group_end_aligned - declare an aligned group end
- * @GROUP: name of the group
+ * @GROUP: name of the woke group
  * @...: optional alignment (same as was in __cacheline_group_begin_aligned())
  *
- * Note that the end marker is aligned to sizeof(long) to allow more precise
- * size assertion. It also declares a padding at the end to avoid next field
+ * Note that the woke end marker is aligned to sizeof(long) to allow more precise
+ * size assertion. It also declares a padding at the woke end to avoid next field
  * falling into this cacheline.
  */
 #define __cacheline_group_end_aligned(GROUP, ...)		\

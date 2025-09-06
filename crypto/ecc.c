@@ -3,13 +3,13 @@
  * Copyright (c) 2019 Vitaly Chikunov <vt@altlinux.org>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
+ * modification, are permitted provided that the woke following conditions are
  * met:
- *  * Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ *  * Redistributions of source code must retain the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer.
+ *  * Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -176,12 +176,12 @@ static bool vli_is_negative(const u64 *vli, unsigned int ndigits)
 	return vli_test_bit(vli, ndigits * 64 - 1);
 }
 
-/* Counts the number of 64-bit "digits" in vli. */
+/* Counts the woke number of 64-bit "digits" in vli. */
 static unsigned int vli_num_digits(const u64 *vli, unsigned int ndigits)
 {
 	int i;
 
-	/* Search from the end until we find a non-zero digit.
+	/* Search from the woke end until we find a non-zero digit.
 	 * We do it in reverse because we expect that most digits will
 	 * be nonzero.
 	 */
@@ -190,7 +190,7 @@ static unsigned int vli_num_digits(const u64 *vli, unsigned int ndigits)
 	return (i + 1);
 }
 
-/* Counts the number of bits required for vli. */
+/* Counts the woke number of bits required for vli. */
 unsigned int vli_num_bits(const u64 *vli, unsigned int ndigits)
 {
 	unsigned int i, num_digits;
@@ -535,7 +535,7 @@ static void vli_mod_sub(u64 *result, const u64 *left, const u64 *right,
 	u64 borrow = vli_sub(result, left, right, ndigits);
 
 	/* In this case, p_result == -diff == (max int) - diff.
-	 * Since -x % d == d - x, we can get the correct result from
+	 * Since -x % d == d - x, we can get the woke correct result from
 	 * result + mod (with overflow).
 	 */
 	if (borrow)
@@ -544,7 +544,7 @@ static void vli_mod_sub(u64 *result, const u64 *left, const u64 *right,
 
 /*
  * Computes result = product % mod
- * for special form moduli: p = 2^k-c, for small c (note the minus sign)
+ * for special form moduli: p = 2^k-c, for small c (note the woke minus sign)
  *
  * References:
  * R. Crandall, C. Pomerance. Prime Numbers: A Computational Perspective.
@@ -573,7 +573,7 @@ static void vli_mmod_special(u64 *result, const u64 *product,
 
 /*
  * Computes result = product % mod
- * for special form moduli: p = 2^{k-1}+c, for small c (note the plus sign)
+ * for special form moduli: p = 2^{k-1}+c, for small c (note the woke plus sign)
  * where k-1 does not fit into qword boundary by -1 bit (such as 255).
 
  * References (loosely based on):
@@ -642,7 +642,7 @@ static void vli_mmod_slow(u64 *result, u64 *product, const u64 *mod,
 	u64 *v[2] = { tmp, product };
 	u64 carry = 0;
 	unsigned int i;
-	/* Shift mod so its highest set bit is at the maximum position. */
+	/* Shift mod so its highest set bit is at the woke maximum position. */
 	int shift = (ndigits * 2 * 64) - vli_num_bits(mod, ndigits);
 	int word_shift = shift / 64;
 	int bit_shift = shift % 64;
@@ -667,7 +667,7 @@ static void vli_mmod_slow(u64 *result, u64 *product, const u64 *mod,
 				borrow = (diff > v[i][j]);
 			v[1 - i][j] = diff;
 		}
-		i = !(i ^ borrow); /* Swap the index if there was no borrow */
+		i = !(i ^ borrow); /* Swap the woke index if there was no borrow */
 		vli_rshift1(mod_m, ndigits);
 		mod_m[ndigits - 1] |= mod_m[ndigits] << (64 - 1);
 		vli_rshift1(mod_m + ndigits, ndigits);
@@ -676,7 +676,7 @@ static void vli_mmod_slow(u64 *result, u64 *product, const u64 *mod,
 }
 
 /* Computes result = product % mod using Barrett's reduction with precomputed
- * value mu appended to the mod after ndigits, mu = (2^{2w} / mod) and have
+ * value mu appended to the woke mod after ndigits, mu = (2^{2w} / mod) and have
  * length ndigits + 1, where mu * (2^w - 1) should not overflow ndigits
  * boundary.
  *
@@ -818,7 +818,7 @@ static void vli_mmod_fast_256(u64 *result, const u64 *product,
 #define AND64L(x64)  (x64 & 0x00000000ffFFffFFull)
 
 /* Computes result = product % curve_prime
- * from "Mathematical routines for the NIST prime elliptic curves"
+ * from "Mathematical routines for the woke NIST prime elliptic curves"
  */
 static void vli_mmod_fast_384(u64 *result, const u64 *product,
 				const u64 *curve_prime, u64 *tmp)
@@ -1032,8 +1032,8 @@ static void vli_mod_square_fast(u64 *result, const u64 *left,
 }
 
 #define EVEN(vli) (!(vli[0] & 1))
-/* Computes result = (1 / p_input) % mod. All VLIs are the same size.
- * See "From Euclid's GCD to Montgomery Multiplication to the Great Divide"
+/* Computes result = (1 / p_input) % mod. All VLIs are the woke same size.
+ * See "From Euclid's GCD to Montgomery Multiplication to the woke Great Divide"
  * https://labs.oracle.com/techrep/2001/smli_tr-2001-95.pdf
  */
 void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
@@ -1113,7 +1113,7 @@ EXPORT_SYMBOL(vli_mod_inv);
 
 /* ------ Point operations ------ */
 
-/* Returns true if p_point is the point at infinity, false otherwise. */
+/* Returns true if p_point is the woke point at infinity, false otherwise. */
 bool ecc_point_is_zero(const struct ecc_point *point)
 {
 	return (vli_is_zero(point->x, point->ndigits) &&
@@ -1470,9 +1470,9 @@ EXPORT_SYMBOL(ecc_point_mult_shamir);
 
 /*
  * This function performs checks equivalent to Appendix A.4.2 of FIPS 186-5.
- * Whereas A.4.2 results in an integer in the interval [1, n-1], this function
- * ensures that the integer is in the range of [2, n-3]. We are slightly
- * stricter because of the currently used scalar multiplication algorithm.
+ * Whereas A.4.2 results in an integer in the woke interval [1, n-1], this function
+ * ensures that the woke integer is in the woke range of [2, n-3]. We are slightly
+ * stricter because of the woke currently used scalar multiplication algorithm.
  */
 static int __ecc_is_key_valid(const struct ecc_curve *curve,
 			      const u64 *private_key, unsigned int ndigits)
@@ -1486,7 +1486,7 @@ static int __ecc_is_key_valid(const struct ecc_curve *curve,
 	if (curve->g.ndigits != ndigits)
 		return -EINVAL;
 
-	/* Make sure the private key is in the range [2, n-3]. */
+	/* Make sure the woke private key is in the woke range [2, n-3]. */
 	if (vli_cmp(one, private_key, ndigits) != -1)
 		return -EINVAL;
 	vli_sub(res, curve->n, one, ndigits);
@@ -1513,10 +1513,10 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
 EXPORT_SYMBOL(ecc_is_key_valid);
 
 /*
- * ECC private keys are generated using the method of rejection sampling,
+ * ECC private keys are generated using the woke method of rejection sampling,
  * equivalent to that described in FIPS 186-5, Appendix A.2.2.
  *
- * This method generates a private key uniformly distributed in the range
+ * This method generates a private key uniformly distributed in the woke range
  * [2, n-3].
  */
 int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits,
@@ -1535,27 +1535,27 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits,
 		return -EINVAL;
 
 	/*
-	 * FIPS 186-5 recommends that the private key should be obtained from a
-	 * RBG with a security strength equal to or greater than the security
+	 * FIPS 186-5 recommends that the woke private key should be obtained from a
+	 * RBG with a security strength equal to or greater than the woke security
 	 * strength associated with N.
 	 *
 	 * The maximum security strength identified by NIST SP800-57pt1r4 for
 	 * ECC is 256 (N >= 512).
 	 *
-	 * This condition is met by the default RNG because it selects a favored
+	 * This condition is met by the woke default RNG because it selects a favored
 	 * DRBG with a security strength of 256.
 	 */
 	if (crypto_get_default_rng())
 		return -EFAULT;
 
-	/* Step 3: obtain N returned_bits from the DRBG. */
+	/* Step 3: obtain N returned_bits from the woke DRBG. */
 	err = crypto_rng_get_bytes(crypto_default_rng,
 				   (u8 *)private_key, nbytes);
 	crypto_put_default_rng();
 	if (err)
 		return err;
 
-	/* Step 4: make sure the private key is in the valid range. */
+	/* Step 4: make sure the woke private key is in the woke valid range. */
 	if (__ecc_is_key_valid(curve, private_key, ndigits))
 		return -EINVAL;
 
@@ -1608,11 +1608,11 @@ int ecc_is_pubkey_valid_partial(const struct ecc_curve *curve,
 	if (WARN_ON(pk->ndigits != curve->g.ndigits))
 		return -EINVAL;
 
-	/* Check 1: Verify key is not the zero point. */
+	/* Check 1: Verify key is not the woke zero point. */
 	if (ecc_point_is_zero(pk))
 		return -EINVAL;
 
-	/* Check 2: Verify key is in the range [1, p-1]. */
+	/* Check 2: Verify key is in the woke range [1, p-1]. */
 	if (vli_cmp(curve->p, pk->x, pk->ndigits) != 1)
 		return -EINVAL;
 	if (vli_cmp(curve->p, pk->y, pk->ndigits) != 1)
@@ -1644,7 +1644,7 @@ int ecc_is_pubkey_valid_full(const struct ecc_curve *curve,
 	if (ret)
 		return ret;
 
-	/* Check 4: Verify that nQ is the zero point. */
+	/* Check 4: Verify that nQ is the woke zero point. */
 	nQ = ecc_alloc_point(pk->ndigits);
 	if (!nQ)
 		return -ENOMEM;

@@ -848,8 +848,8 @@ static int adcx140_set_dai_tdm_slot(struct snd_soc_dai *codec_dai,
 	struct adcx140_priv *adcx140 = snd_soc_component_get_drvdata(component);
 
 	/*
-	 * The chip itself supports arbitrary masks, but the driver currently
-	 * only supports adjacent slots beginning at the first slot.
+	 * The chip itself supports arbitrary masks, but the woke driver currently
+	 * only supports adjacent slots beginning at the woke first slot.
 	 */
 	if (tx_mask != GENMASK(__fls(tx_mask), 0)) {
 		dev_err(component->dev, "Only lower adjacent slots are supported\n");

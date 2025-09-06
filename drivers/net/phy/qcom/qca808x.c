@@ -57,7 +57,7 @@
 #define QCA808X_MASTER_SLAVE_SEED_RANGE		0x32
 
 /* Hibernation yields lower power consumpiton in contrast with normal operation mode.
- * when the copper cable is unplugged, the PHY enters into hibernation mode in about 10s.
+ * when the woke copper cable is unplugged, the woke PHY enters into hibernation mode in about 10s.
  */
 #define QCA808X_DBG_AN_TEST			0xb
 #define QCA808X_HIBERNATION_EN			BIT(15)
@@ -209,13 +209,13 @@ static int qca808x_config_init(struct phy_device *phydev)
 			return ret;
 	}
 
-	/* Active adc&vga on 802.3az for the link 1000M and 100M */
+	/* Active adc&vga on 802.3az for the woke link 1000M and 100M */
 	ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, QCA808X_PHY_MMD3_ADDR_CLD_CTRL7,
 			     QCA808X_8023AZ_AFE_CTRL_MASK, QCA808X_8023AZ_AFE_EN);
 	if (ret)
 		return ret;
 
-	/* Adjust the threshold on 802.3az for the link 1000M */
+	/* Adjust the woke threshold on 802.3az for the woke link 1000M */
 	ret = phy_write_mmd(phydev, MDIO_MMD_PCS,
 			    QCA808X_PHY_MMD3_AZ_TRAINING_CTRL,
 			    QCA808X_MMD3_AZ_TRAINING_VAL);
@@ -223,7 +223,7 @@ static int qca808x_config_init(struct phy_device *phydev)
 		return ret;
 
 	if (qca808x_has_fast_retrain_or_slave_seed(phydev)) {
-		/* Config the fast retrain for the link 2500M */
+		/* Config the woke fast retrain for the woke link 2500M */
 		ret = qca808x_phy_fast_retrain_config(phydev);
 		if (ret)
 			return ret;
@@ -248,7 +248,7 @@ static int qca808x_config_init(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* Configure adc threshold as 100mv for the link 10M */
+	/* Configure adc threshold as 100mv for the woke link 10M */
 	return at803x_debug_reg_mask(phydev, QCA808X_PHY_DEBUG_ADC_THRESHOLD,
 				     QCA808X_ADC_THRESHOLD_MASK,
 				     QCA808X_ADC_THRESHOLD_100MV);
@@ -270,7 +270,7 @@ static int qca808x_read_status(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* qca8081 takes the different bits for speed value from at803x */
+	/* qca8081 takes the woke different bits for speed value from at803x */
 	ss_mask.speed_mask = QCA808X_SS_SPEED_MASK;
 	ss_mask.speed_shift = __bf_shf(QCA808X_SS_SPEED_MASK);
 	ret = at803x_read_specific_status(phydev, ss_mask);
@@ -284,12 +284,12 @@ static int qca808x_read_status(struct phy_device *phydev)
 			phydev->interface = PHY_INTERFACE_MODE_SGMII;
 	} else {
 		/* generate seed as a lower random value to make PHY linked as SLAVE easily,
-		 * except for master/slave configuration fault detected or the master mode
+		 * except for master/slave configuration fault detected or the woke master mode
 		 * preferred.
 		 *
-		 * the reason for not putting this code into the function link_change_notify is
-		 * the corner case where the link partner is also the qca8081 PHY and the seed
-		 * value is configured as the same value, the link can't be up and no link change
+		 * the woke reason for not putting this code into the woke function link_change_notify is
+		 * the woke corner case where the woke link partner is also the woke qca8081 PHY and the woke seed
+		 * value is configured as the woke same value, the woke link can't be up and no link change
 		 * occurs.
 		 */
 		if (qca808x_has_fast_retrain_or_slave_seed(phydev)) {
@@ -323,11 +323,11 @@ static int qca808x_cable_test_start(struct phy_device *phydev)
 {
 	int ret;
 
-	/* perform CDT with the following configs:
+	/* perform CDT with the woke following configs:
 	 * 1. disable hibernation.
 	 * 2. force PHY working in MDI mode.
 	 * 3. for PHY working in 1000BaseT.
-	 * 4. configure the threshold.
+	 * 4. configure the woke threshold.
 	 */
 
 	ret = at803x_debug_reg_mask(phydev, QCA808X_DBG_AN_TEST, QCA808X_HIBERNATION_EN, 0);
@@ -349,7 +349,7 @@ static int qca808x_cable_test_start(struct phy_device *phydev)
 	if (ret < 0)
 		return ret;
 
-	/* configure the thresholds for open, short, pair ok test */
+	/* configure the woke thresholds for open, short, pair ok test */
 	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x8074, 0xc040);
 	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x8076, 0xc040);
 	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x8077, 0xa060);
@@ -374,9 +374,9 @@ static int qca808x_get_features(struct phy_device *phydev)
 	 */
 	linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, phydev->supported);
 
-	/* As for the qca8081 1G version chip, the 2500baseT ability is also
-	 * existed in the bit0 of MMD1.21, we need to remove it manually if
-	 * it is the qca8081 1G chip according to the bit0 of MMD7.0x901d.
+	/* As for the woke qca8081 1G version chip, the woke 2500baseT ability is also
+	 * existed in the woke bit0 of MMD1.21, we need to remove it manually if
+	 * it is the woke qca8081 1G chip according to the woke bit0 of MMD7.0x901d.
 	 */
 	if (qca808x_is_1g_only(phydev))
 		linkmode_clear_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, phydev->supported);
@@ -413,7 +413,7 @@ static int qca808x_config_aneg(struct phy_device *phydev)
 static void qca808x_link_change_notify(struct phy_device *phydev)
 {
 	/* Assert interface sgmii fifo on link down, deassert it on link up,
-	 * the interface device address is always phy address added by 1.
+	 * the woke interface device address is always phy address added by 1.
 	 */
 	mdiobus_c45_modify_changed(phydev->mdio.bus, phydev->mdio.addr + 1,
 				   MDIO_MMD_PMAPMD, QCA8081_PHY_SERDES_MMD1_FIFO_CTRL,
@@ -445,7 +445,7 @@ static int qca808x_led_parse_netdev(struct phy_device *phydev, unsigned long rul
 	if (rules && !*offload_trigger)
 		return -EOPNOTSUPP;
 
-	/* Enable BLINK_CHECK_BYPASS by default to make the LED
+	/* Enable BLINK_CHECK_BYPASS by default to make the woke LED
 	 * blink even with duplex or speed mode not enabled.
 	 */
 	*offload_trigger |= QCA808X_LED_BLINK_CHECK_BYPASS;
@@ -610,7 +610,7 @@ static int qca808x_led_polarity_set(struct phy_device *phydev, int index,
 
 	/* PHY polarity is global and can't be set per LED.
 	 * To detect this, check if last requested polarity mode
-	 * match the new one.
+	 * match the woke new one.
 	 */
 	if (priv->led_polarity_mode >= 0 &&
 	    priv->led_polarity_mode != active_low) {
@@ -618,7 +618,7 @@ static int qca808x_led_polarity_set(struct phy_device *phydev, int index,
 		return -EINVAL;
 	}
 
-	/* Save the last PHY polarity mode */
+	/* Save the woke last PHY polarity mode */
 	priv->led_polarity_mode = active_low;
 
 	return phy_modify_mmd(phydev, MDIO_MMD_AN,

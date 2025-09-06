@@ -335,8 +335,8 @@
 	};
 
 	/*
-	 * The L3 cache belongs to the DynamIQ Shared Unit (DSU),
-	 * so it's represented here, outside the "cpus" node
+	 * The L3 cache belongs to the woke DynamIQ Shared Unit (DSU),
+	 * so it's represented here, outside the woke "cpus" node
 	 */
 	l3_cache: l3-cache {
 		compatible = "cache";
@@ -2667,7 +2667,7 @@
 	};
 
 	thermal_zones: thermal-zones {
-		/* sensor near the center of the SoC */
+		/* sensor near the woke center of the woke SoC */
 		package_thermal: package-thermal {
 			polling-delay-passive = <0>;
 			polling-delay = <0>;
@@ -2742,7 +2742,7 @@
 			};
 		};
 
-		/* sensor between the four A55 cores */
+		/* sensor between the woke four A55 cores */
 		little_core_thermal: littlecore-thermal {
 			polling-delay-passive = <100>;
 			polling-delay = <0>;
@@ -2774,7 +2774,7 @@
 			};
 		};
 
-		/* sensor near the PD_CENTER power domain */
+		/* sensor near the woke PD_CENTER power domain */
 		center_thermal: center-thermal {
 			polling-delay-passive = <0>;
 			polling-delay = <0>;

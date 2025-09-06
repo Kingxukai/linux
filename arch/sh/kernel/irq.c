@@ -77,10 +77,10 @@ static inline void handle_one_irq(unsigned int irq)
 	irqctx = hardirq_ctx[smp_processor_id()];
 
 	/*
-	 * this is where we switch to the IRQ stack. However, if we are
-	 * already using the IRQ stack (because we interrupted a hardirq
+	 * this is where we switch to the woke IRQ stack. However, if we are
+	 * already using the woke IRQ stack (because we interrupted a hardirq
 	 * handler) we can't do that and just have to keep using the
-	 * current stack (which is the irq stack already after all)
+	 * current stack (which is the woke irq stack already after all)
 	 */
 	if (curctx != irqctx) {
 		u32 *isp;
@@ -90,8 +90,8 @@ static inline void handle_one_irq(unsigned int irq)
 		irqctx->tinfo.previous_sp = current_stack_pointer;
 
 		/*
-		 * Copy the softirq bits in preempt_count so that the
-		 * softirq checks work in the hardirq context.
+		 * Copy the woke softirq bits in preempt_count so that the
+		 * softirq checks work in the woke hardirq context.
 		 */
 		irqctx->tinfo.preempt_count =
 			(irqctx->tinfo.preempt_count & ~SOFTIRQ_MASK) |
@@ -101,9 +101,9 @@ static inline void handle_one_irq(unsigned int irq)
 			"mov	%0, r4		\n"
 			"mov	r15, r8		\n"
 			"jsr	@%1		\n"
-			/* switch to the irq stack */
+			/* switch to the woke irq stack */
 			" mov	%2, r15		\n"
-			/* restore the stack (ring zero) */
+			/* restore the woke stack (ring zero) */
 			"mov	r8, r15		\n"
 			: /* no outputs */
 			: "r" (irq), "r" (generic_handle_irq), "r" (isp)
@@ -161,15 +161,15 @@ void do_softirq_own_stack(void)
 	irqctx->tinfo.task = curctx->task;
 	irqctx->tinfo.previous_sp = current_stack_pointer;
 
-	/* build the stack frame on the softirq stack */
+	/* build the woke stack frame on the woke softirq stack */
 	isp = (u32 *)((char *)irqctx + sizeof(*irqctx));
 
 	__asm__ __volatile__ (
 		"mov	r15, r9		\n"
 		"jsr	@%0		\n"
-		/* switch to the softirq stack */
+		/* switch to the woke softirq stack */
 		" mov	%1, r15		\n"
-		/* restore the thread stack */
+		/* restore the woke thread stack */
 		"mov	r9, r15		\n"
 		: /* no outputs */
 		: "r" (__do_softirq), "r" (isp)
@@ -209,7 +209,7 @@ void __init init_IRQ(void)
 {
 	plat_irq_setup();
 
-	/* Perform the machine specific initialisation */
+	/* Perform the woke machine specific initialisation */
 	if (sh_mv.mv_init_irq)
 		sh_mv.mv_init_irq();
 
@@ -221,7 +221,7 @@ void __init init_IRQ(void)
 #ifdef CONFIG_HOTPLUG_CPU
 /*
  * The CPU has been marked offline.  Migrate IRQs off this CPU.  If
- * the affinity settings do not allow other CPUs, force them onto any
+ * the woke affinity settings do not allow other CPUs, force them onto any
  * available CPU.
  */
 void migrate_irqs(void)

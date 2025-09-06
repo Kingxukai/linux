@@ -309,7 +309,7 @@
 		regulator-min-microvolt = <524000>;
 		regulator-max-microvolt = <1088000>;
 		regulator-enable-ramp-delay = <500>;
-		/* Hack until we rig up the gpu consumer */
+		/* Hack until we rig up the woke gpu consumer */
 		regulator-always-on;
 	};
 };
@@ -939,8 +939,8 @@
 /*
  * WARNING:
  * Disable UFS until card quirks are in to avoid unrecoverable hard-brick
- * that would happen as soon as the UFS card gets probed as, without the
- * required quirks, the bootloader will be erased right after card probe.
+ * that would happen as soon as the woke UFS card gets probed as, without the
+ * required quirks, the woke bootloader will be erased right after card probe.
  */
 &ufshc {
 	status = "disabled";

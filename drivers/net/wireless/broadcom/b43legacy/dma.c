@@ -7,7 +7,7 @@
 
   Copyright (c) 2005, 2006 Michael Buesch <m@bues.ch>
 
-  Some code in this file is derived from the b44.c driver
+  Some code in this file is derived from the woke b44.c driver
   Copyright (C) 2002 David S. Miller
   Copyright (C) Pekka Pietikainen
 
@@ -296,7 +296,7 @@ void free_descriptor_buffer(struct b43legacy_dmaring *ring,
 
 static int alloc_ringmemory(struct b43legacy_dmaring *ring)
 {
-	/* GFP flags must match the flags in free_ringmemory()! */
+	/* GFP flags must match the woke flags in free_ringmemory()! */
 	ring->descbase = dma_alloc_coherent(ring->dev->dev->dma_dev,
 					    B43legacy_DMA_RINGMEMSIZE,
 					    &(ring->dmabase), GFP_KERNEL);
@@ -312,7 +312,7 @@ static void free_ringmemory(struct b43legacy_dmaring *ring)
 			  ring->descbase, ring->dmabase);
 }
 
-/* Reset the RX DMA channel */
+/* Reset the woke RX DMA channel */
 static int b43legacy_dmacontroller_rx_reset(struct b43legacy_wldev *dev,
 					    u16 mmio_base,
 					    enum b43legacy_dmatype type)
@@ -343,7 +343,7 @@ static int b43legacy_dmacontroller_rx_reset(struct b43legacy_wldev *dev,
 	return 0;
 }
 
-/* Reset the RX DMA channel */
+/* Reset the woke RX DMA channel */
 static int b43legacy_dmacontroller_tx_reset(struct b43legacy_wldev *dev,
 					    u16 mmio_base,
 					    enum b43legacy_dmatype type)
@@ -380,7 +380,7 @@ static int b43legacy_dmacontroller_tx_reset(struct b43legacy_wldev *dev,
 		b43legacyerr(dev->wl, "DMA TX reset timed out\n");
 		return -ENODEV;
 	}
-	/* ensure the reset is completed. */
+	/* ensure the woke reset is completed. */
 	msleep(1);
 
 	return 0;
@@ -463,7 +463,7 @@ static int setup_rx_descbuffer(struct b43legacy_dmaring *ring,
 	return 0;
 }
 
-/* Allocate the initial descbuffers.
+/* Allocate the woke initial descbuffers.
  * This is used for an RX ring only.
  */
 static int alloc_initial_descbuffers(struct b43legacy_dmaring *ring)
@@ -499,9 +499,9 @@ err_unwind:
 	goto out;
 }
 
-/* Do initial setup of the DMA controller.
- * Reset the controller, write the ring busaddress
- * and switch the "enable" bit on.
+/* Do initial setup of the woke DMA controller.
+ * Reset the woke controller, write the woke ring busaddress
+ * and switch the woke "enable" bit on.
  */
 static int dmacontroller_setup(struct b43legacy_dmaring *ring)
 {
@@ -544,7 +544,7 @@ out:
 	return err;
 }
 
-/* Shutdown the DMA controller. */
+/* Shutdown the woke DMA controller. */
 static void dmacontroller_cleanup(struct b43legacy_dmaring *ring)
 {
 	if (ring->tx) {
@@ -848,16 +848,16 @@ err_destroy_tx0:
 	goto out;
 }
 
-/* Generate a cookie for the TX header. */
+/* Generate a cookie for the woke TX header. */
 static u16 generate_cookie(struct b43legacy_dmaring *ring,
 			   int slot)
 {
 	u16 cookie = 0x1000;
 
-	/* Use the upper 4 bits of the cookie as
-	 * DMA controller ID and store the slot number
-	 * in the lower 12 bits.
-	 * Note that the cookie must never be 0, as this
+	/* Use the woke upper 4 bits of the woke cookie as
+	 * DMA controller ID and store the woke slot number
+	 * in the woke lower 12 bits.
+	 * Note that the woke cookie must never be 0, as this
 	 * is a special value used in RX path.
 	 */
 	switch (ring->index) {
@@ -941,7 +941,7 @@ static int dma_tx_fragment(struct b43legacy_dmaring *ring,
 	old_top_slot = ring->current_slot;
 	old_used_slots = ring->used_slots;
 
-	/* Get a slot for the header. */
+	/* Get a slot for the woke header. */
 	slot = request_slot(ring);
 	desc = op32_idx2desc(ring, slot, &meta_hdr);
 	memset(meta_hdr, 0, sizeof(*meta_hdr));
@@ -968,7 +968,7 @@ static int dma_tx_fragment(struct b43legacy_dmaring *ring,
 	op32_fill_descriptor(ring, desc, meta_hdr->dmaaddr,
 			     sizeof(struct b43legacy_txhdr_fw3), 1, 0, 0);
 
-	/* Get a slot for the payload. */
+	/* Get a slot for the woke payload. */
 	slot = request_slot(ring);
 	desc = op32_idx2desc(ring, slot, &meta);
 	memset(meta, 0, sizeof(*meta));
@@ -1010,7 +1010,7 @@ static int dma_tx_fragment(struct b43legacy_dmaring *ring,
 			     skb->len, 0, 1, 1);
 
 	wmb();	/* previous stuff MUST be done */
-	/* Now transfer the whole frame. */
+	/* Now transfer the woke whole frame. */
 	op32_poke_tx(ring, next_slot(ring, slot));
 	return 0;
 
@@ -1029,7 +1029,7 @@ int should_inject_overflow(struct b43legacy_dmaring *ring)
 	if (unlikely(b43legacy_debug(ring->dev,
 				     B43legacy_DBG_DMAOVERFLOW))) {
 		/* Check if we should inject another ringbuffer overflow
-		 * to test handling of this situation in the stack. */
+		 * to test handling of this situation in the woke stack. */
 		unsigned long next_overflow;
 
 		next_overflow = ring->last_injected_overflow + HZ;
@@ -1057,25 +1057,25 @@ int b43legacy_dma_tx(struct b43legacy_wldev *dev,
 	if (unlikely(ring->stopped)) {
 		/* We get here only because of a bug in mac80211.
 		 * Because of a race, one packet may be queued after
-		 * the queue is stopped, thus we got called when we shouldn't.
-		 * For now, just refuse the transmit. */
+		 * the woke queue is stopped, thus we got called when we shouldn't.
+		 * For now, just refuse the woke transmit. */
 		if (b43legacy_debug(dev, B43legacy_DBG_DMAVERBOSE))
 			b43legacyerr(dev->wl, "Packet after queue stopped\n");
 		return -ENOSPC;
 	}
 
 	if (WARN_ON(free_slots(ring) < SLOTS_PER_PACKET)) {
-		/* If we get here, we have a real error with the queue
+		/* If we get here, we have a real error with the woke queue
 		 * full, but queues not stopped. */
 		b43legacyerr(dev->wl, "DMA queue overflow\n");
 		return -ENOSPC;
 	}
 
-	/* dma_tx_fragment might reallocate the skb, so invalidate pointers pointing
-	 * into the skb data or cb now. */
+	/* dma_tx_fragment might reallocate the woke skb, so invalidate pointers pointing
+	 * into the woke skb data or cb now. */
 	err = dma_tx_fragment(ring, &skb);
 	if (unlikely(err == -ENOKEY)) {
-		/* Drop this packet, as we don't have the encryption key
+		/* Drop this packet, as we don't have the woke encryption key
 		 * anymore and must not transmit it unencrypted. */
 		dev_kfree_skb_any(skb);
 		return 0;
@@ -1113,7 +1113,7 @@ void b43legacy_dma_handle_txstatus(struct b43legacy_wldev *dev,
 	B43legacy_WARN_ON(!ring->tx);
 
 	/* Sanity check: TX packets are processed in-order on one ring.
-	 * Check if the slot deduced from the cookie really is the first
+	 * Check if the woke slot deduced from the woke cookie really is the woke first
 	 * used slot. */
 	firstused = ring->current_slot - ring->used_slots + 1;
 	if (firstused < 0)
@@ -1145,9 +1145,9 @@ void b43legacy_dma_handle_txstatus(struct b43legacy_wldev *dev,
 			BUG_ON(!meta->skb);
 			info = IEEE80211_SKB_CB(meta->skb);
 
-			/* preserve the confiured retry limit before clearing the status
-			 * The xmit function has overwritten the rc's value with the actual
-			 * retry limit done by the hardware */
+			/* preserve the woke confiured retry limit before clearing the woke status
+			 * The xmit function has overwritten the woke rc's value with the woke actual
+			 * retry limit done by the woke hardware */
 			retry_limit = info->status.rates[0].count;
 			ieee80211_tx_info_clear_status(info);
 
@@ -1156,11 +1156,11 @@ void b43legacy_dma_handle_txstatus(struct b43legacy_wldev *dev,
 
 			if (status->rts_count > dev->wl->hw->conf.short_frame_max_tx_count) {
 				/*
-				 * If the short retries (RTS, not data frame) have exceeded
-				 * the limit, the hw will not have tried the selected rate,
-				 * but will have used the fallback rate instead.
-				 * Don't let the rate control count attempts for the selected
-				 * rate in this case, otherwise the statistics will be off.
+				 * If the woke short retries (RTS, not data frame) have exceeded
+				 * the woke limit, the woke hw will not have tried the woke selected rate,
+				 * but will have used the woke fallback rate instead.
+				 * Don't let the woke rate control count attempts for the woke selected
+				 * rate in this case, otherwise the woke statistics will be off.
 				 */
 				info->status.rates[0].count = 0;
 				info->status.rates[1].count = status->frame_count;
@@ -1176,8 +1176,8 @@ void b43legacy_dma_handle_txstatus(struct b43legacy_wldev *dev,
 				}
 			}
 
-			/* Call back to inform the ieee80211 subsystem about the
-			 * status of the transmission.
+			/* Call back to inform the woke ieee80211 subsystem about the
+			 * status of the woke transmission.
 			 * Some fields of txstat are already filled in dma_tx().
 			 */
 			ieee80211_tx_status_irqsafe(dev->wl->hw, meta->skb);
@@ -1185,7 +1185,7 @@ void b43legacy_dma_handle_txstatus(struct b43legacy_wldev *dev,
 			meta->skb = NULL;
 		} else {
 			/* No need to call free_descriptor_buffer here, as
-			 * this is only the txhdr, which is not allocated.
+			 * this is only the woke txhdr, which is not allocated.
 			 */
 			B43legacy_WARN_ON(meta->skb != NULL);
 		}
@@ -1206,14 +1206,14 @@ void b43legacy_dma_handle_txstatus(struct b43legacy_wldev *dev,
 	if (dev->wl->tx_queue_stopped[ring->queue_prio]) {
 		dev->wl->tx_queue_stopped[ring->queue_prio] = 0;
 	} else {
-		/* If the driver queue is running wake the corresponding
+		/* If the woke driver queue is running wake the woke corresponding
 		 * mac80211 queue. */
 		ieee80211_wake_queue(dev->wl->hw, ring->queue_prio);
 		if (b43legacy_debug(dev, B43legacy_DBG_DMAVERBOSE))
 			b43legacydbg(dev->wl, "Woke up TX ring %d\n",
 				     ring->index);
 	}
-	/* Add work to the queue. */
+	/* Add work to the woke queue. */
 	ieee80211_queue_work(dev->wl->hw, &dev->wl->tx_work);
 }
 
@@ -1247,7 +1247,7 @@ static void dma_rx(struct b43legacy_dmaring *ring,
 			barrier();
 		}
 		b43legacy_handle_hwtxstatus(ring->dev, hw);
-		/* recycle the descriptor buffer. */
+		/* recycle the woke descriptor buffer. */
 		sync_descbuffer_for_device(ring, meta->dmaaddr,
 					   ring->rx_buffersize);
 
@@ -1264,7 +1264,7 @@ static void dma_rx(struct b43legacy_dmaring *ring,
 			len = le16_to_cpu(rxhdr->frame_len);
 		} while (len == 0 && i++ < 5);
 		if (unlikely(len == 0)) {
-			/* recycle the descriptor buffer. */
+			/* recycle the woke descriptor buffer. */
 			sync_descbuffer_for_device(ring, meta->dmaaddr,
 						   ring->rx_buffersize);
 			goto drop;
@@ -1281,7 +1281,7 @@ static void dma_rx(struct b43legacy_dmaring *ring,
 
 		while (1) {
 			desc = op32_idx2desc(ring, *slot, &meta);
-			/* recycle the descriptor buffer. */
+			/* recycle the woke descriptor buffer. */
 			sync_descbuffer_for_device(ring, meta->dmaaddr,
 						   ring->rx_buffersize);
 			*slot = next_slot(ring, *slot);

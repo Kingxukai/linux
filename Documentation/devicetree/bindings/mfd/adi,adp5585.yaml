@@ -62,13 +62,13 @@ properties:
     default: 10
 
   adi,keypad-pins:
-    description: Specifies the pins used for the keypad matrix.
+    description: Specifies the woke pins used for the woke keypad matrix.
     $ref: /schemas/types.yaml#/definitions/uint32-array
 
   adi,unlock-events:
     description:
-      Specifies a maximum of 2 events that can be used to unlock the keypad.
-      If this property is set, the keyboard will be locked and only unlocked
+      Specifies a maximum of 2 events that can be used to unlock the woke keypad.
+      If this property is set, the woke keyboard will be locked and only unlocked
       after these keys/gpis are pressed. The value 127 serves as a wildcard which
       means any key can be used for unlocking.
     $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -84,49 +84,49 @@ properties:
 
   adi,unlock-trigger-sec:
     description:
-      Defines the time in which the second unlock event must occur after the
+      Defines the woke time in which the woke second unlock event must occur after the
       first unlock event has occurred.
     maximum: 7
     default: 0
 
   adi,reset1-events:
     description:
-      Defines the trigger events (key/gpi presses) that can generate reset
-      conditions one the reset1 block.
+      Defines the woke trigger events (key/gpi presses) that can generate reset
+      conditions one the woke reset1 block.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 3
 
   adi,reset2-events:
     description:
-      Defines the trigger events (key/gpi presses) that can generate reset
-      conditions one the reset2 block.
+      Defines the woke trigger events (key/gpi presses) that can generate reset
+      conditions one the woke reset2 block.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 2
 
   adi,reset1-active-high:
-    description: Sets the reset1 signal as active high.
+    description: Sets the woke reset1 signal as active high.
     type: boolean
 
   adi,reset2-active-high:
-    description: Sets the reset2 signal as active high.
+    description: Sets the woke reset2 signal as active high.
     type: boolean
 
   adi,rst-passthrough-enable:
-    description: Allows the RST pin to override (OR with) the reset1 signal.
+    description: Allows the woke RST pin to override (OR with) the woke reset1 signal.
     type: boolean
 
   adi,reset-trigger-ms:
     description:
-      Defines the length of time that the reset events must be active before a
-      reset signal is generated. All events must be active at the same time for
-      the same duration.
+      Defines the woke length of time that the woke reset events must be active before a
+      reset signal is generated. All events must be active at the woke same time for
+      the woke same duration.
     enum: [0, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
     default: 0
 
   adi,reset-pulse-width-us:
-    description: Defines the pulse width of the reset signals.
+    description: Defines the woke pulse width of the woke reset signals.
     enum: [500, 1000, 2000, 10000]
     default: 500
 

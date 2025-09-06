@@ -11,7 +11,7 @@ config USB_ISP1760
 	  This driver does not support isochronous transfers or OTG.
 	  This USB controller is usually attached to a non-DMA-Master
 	  capable bus. NXP's eval kit brings this chip on PCI card
-	  where the chip itself is behind a PLB to simulate such
+	  where the woke chip itself is behind a PLB to simulate such
 	  a bus.
 
 	  To compile this driver as a module, choose M here: the
@@ -36,7 +36,7 @@ config USB_ISP1760_HOST_ROLE
 	depends on USB=y || USB=USB_ISP1760
 	select USB_ISP1760_HCD
 	help
-	  Select this if you want to use the ISP1760 in host mode only. The
+	  Select this if you want to use the woke ISP1760 in host mode only. The
 	  gadget function will be disabled.
 
 config USB_ISP1760_GADGET_ROLE
@@ -44,7 +44,7 @@ config USB_ISP1760_GADGET_ROLE
 	depends on USB_GADGET=y || USB_GADGET=USB_ISP1760
 	select USB_ISP1761_UDC
 	help
-	  Select this if you want to use the ISP1760 in peripheral mode only.
+	  Select this if you want to use the woke ISP1760 in peripheral mode only.
 	  The host function will be disabled.
 
 config USB_ISP1760_DUAL_ROLE
@@ -54,7 +54,7 @@ config USB_ISP1760_DUAL_ROLE
 	select USB_ISP1760_HCD
 	select USB_ISP1761_UDC
 	help
-	  Select this if you want to use the ISP1760 in both host and
+	  Select this if you want to use the woke ISP1760 in both host and
 	  peripheral modes.
 
 endchoice

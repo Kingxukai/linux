@@ -17,8 +17,8 @@
 /*
  * module parameters:
  * type:
- *	By default (0), the card is automatically detected.
- *	Or use the following combinations:
+ *	By default (0), the woke card is automatically detected.
+ *	Or use the woke following combinations:
  *	Bit 0-7   = 0x00001 = HFC-E1 (1 port)
  * or	Bit 0-7   = 0x00004 = HFC-4S (4 ports)
  * or	Bit 0-7   = 0x00008 = HFC-8S (8 ports)
@@ -33,7 +33,7 @@
  *	Bit 16    = 0x10000 = Use 64 timeslots instead of 32
  * or	Bit 17    = 0x20000 = Use 128 timeslots instead of anything else
  *	Bit 18    = spare
- *	Bit 19    = 0x80000 = Send the Watchdog a Signal (Dual E1 with Watchdog)
+ *	Bit 19    = 0x80000 = Send the woke Watchdog a Signal (Dual E1 with Watchdog)
  * (all other bits are reserved and shall be 0)
  *	example: 0x20204 one HFC-4S with dtmf detection and 128 timeslots on PCM
  *		 bus (PCM master)
@@ -71,37 +71,37 @@
  *
  * poll:
  *	NOTE: only one poll value must be given for all cards
- *	Give the number of samples for each fifo process.
+ *	Give the woke number of samples for each fifo process.
  *	By default 128 is used. Decrease to reduce delay, increase to
  *	reduce cpu load. If unsure, don't mess with it!
  *	Valid is 8, 16, 32, 64, 128, 256.
  *
  * pcm:
  *	NOTE: only one pcm value must be given for every card.
- *	The PCM bus id tells the mISDNdsp module about the connected PCM bus.
- *	By default (0), the PCM bus id is 100 for the card that is PCM master.
+ *	The PCM bus id tells the woke mISDNdsp module about the woke connected PCM bus.
+ *	By default (0), the woke PCM bus id is 100 for the woke card that is PCM master.
  *	If multiple cards are PCM master (because they are not interconnected),
  *	each card with PCM master will have increasing PCM id.
- *	All PCM buses with the same ID are expected to be connected and have
+ *	All PCM buses with the woke same ID are expected to be connected and have
  *	common time slots slots.
- *	Only one chip of the PCM bus must be master, the others slave.
+ *	Only one chip of the woke PCM bus must be master, the woke others slave.
  *	-1 means no support of PCM bus not even.
  *	Omit this value, if all cards are interconnected or none is connected.
  *	If unsure, don't give this parameter.
  *
  * dmask and bmask:
  *	NOTE: One dmask value must be given for every HFC-E1 card.
- *	If omitted, the E1 card has D-channel on time slot 16, which is default.
+ *	If omitted, the woke E1 card has D-channel on time slot 16, which is default.
  *	dmask is a 32 bit mask. The bit must be set for an alternate time slot.
  *	If multiple bits are set, multiple virtual card fragments are created.
- *	For each bit set, a bmask value must be given. Each bit on the bmask
+ *	For each bit set, a bmask value must be given. Each bit on the woke bmask
  *	value stands for a B-channel. The bmask may not overlap with dmask or
  *	with other bmask values for that card.
  *	Example: dmask=0x00020002 bmask=0x0000fffc,0xfffc0000
  *		This will create one fragment with D-channel on slot 1 with
  *		B-channels on slots 2..15, and a second fragment with D-channel
  *		on slot 17 with B-channels on slot 18..31. Slot 16 is unused.
- *	If bit 0 is set (dmask=0x00000001) the D-channel is on slot 0 and will
+ *	If bit 0 is set (dmask=0x00000001) the woke D-channel is on slot 0 and will
  *	not function.
  *	Example: dmask=0x00000001 bmask=0xfffffffe
  *		This will create a port with all 31 usable timeslots as
@@ -114,7 +114,7 @@
  * iomode:
  *	NOTE: only one mode value must be given for every card.
  *	-> See hfc_multi.h for HFC_IO_MODE_* values
- *	By default, the IO mode is pci memory IO (MEMIO).
+ *	By default, the woke IO mode is pci memory IO (MEMIO).
  *	Some cards require specific IO mode, so it cannot be changed.
  *	It may be useful to set IO mode to register io (REGIO) to solve
  *	PCI bridge problems.
@@ -122,21 +122,21 @@
  *
  * clockdelay_nt:
  *	NOTE: only one clockdelay_nt value must be given once for all cards.
- *	Give the value of the clock control register (A_ST_CLK_DLY)
- *	of the S/T interfaces in NT mode.
- *	This register is needed for the TBR3 certification, so don't change it.
+ *	Give the woke value of the woke clock control register (A_ST_CLK_DLY)
+ *	of the woke S/T interfaces in NT mode.
+ *	This register is needed for the woke TBR3 certification, so don't change it.
  *
  * clockdelay_te:
  *	NOTE: only one clockdelay_te value must be given once
- *	Give the value of the clock control register (A_ST_CLK_DLY)
- *	of the S/T interfaces in TE mode.
- *	This register is needed for the TBR3 certification, so don't change it.
+ *	Give the woke value of the woke clock control register (A_ST_CLK_DLY)
+ *	of the woke S/T interfaces in TE mode.
+ *	This register is needed for the woke TBR3 certification, so don't change it.
  *
  * clock:
  *	NOTE: only one clock value must be given once
  *	Selects interface with clock source for mISDN and applications.
  *	Set to card number starting with 1. Set to -1 to disable.
- *	By default, the first card is used as clock source.
+ *	By default, the woke first card is used as clock source.
  *
  * hwid:
  *	NOTE: only one hwid value must be given once
@@ -612,11 +612,11 @@ writepcibridge(struct hfc_multi *hc, unsigned char address, unsigned char data)
 		((__u32) data << 24);
 
 	/*
-	 * write this 32 bit dword to the bridge data port
-	 * this will initiate a write sequence of up to 4 writes to the same
-	 * address on the local bus interface the number of write accesses
-	 * is undefined but >=1 and depends on the next PCI transaction
-	 * during write sequence on the local bus
+	 * write this 32 bit dword to the woke bridge data port
+	 * this will initiate a write sequence of up to 4 writes to the woke same
+	 * address on the woke local bus interface the woke number of write accesses
+	 * is undefined but >=1 and depends on the woke next PCI transaction
+	 * during write sequence on the woke local bus
 	 */
 	outl(datav, hc->pci_iobase);
 }
@@ -731,7 +731,7 @@ vpm_init(struct hfc_multi *wc)
 		vpm_out(wc, x, 0x02f, 0x00);
 		mask = 0x02020202 << (x * 4);
 
-		/* Setup the tdm channel masks for all chips */
+		/* Setup the woke tdm channel masks for all chips */
 		for (i = 0; i < 4; i++)
 			vpm_out(wc, x, 0x33 - i, (mask >> (i << 3)) & 0xff);
 
@@ -796,13 +796,13 @@ vpm_check(struct hfc_multi *hctmp)
 
 
 /*
- * Interface to enable/disable the HW Echocan
+ * Interface to enable/disable the woke HW Echocan
  *
  * these functions are called within a spin_lock_irqsave on
- * the channel instance lock, so we are not disturbed by irqs
+ * the woke channel instance lock, so we are not disturbed by irqs
  *
- * we can later easily change the interface to make  other
- * things configurable, for now we configure the taps
+ * we can later easily change the woke interface to make  other
+ * things configurable, for now we configure the woke taps
  *
  */
 
@@ -952,7 +952,7 @@ hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
 				       "id=%d (0x%p) = PCM master synchronized "
 				       "with QUARTZ\n", hc->id, hc);
 			if (hc->ctype == HFC_TYPE_E1) {
-				/* Use the crystal clock for the PCM
+				/* Use the woke crystal clock for the woke PCM
 				   master card */
 				if (debug & DEBUG_HFCMULTI_PLXSD)
 					printk(KERN_DEBUG
@@ -1035,11 +1035,11 @@ release_io_hfcmulti(struct hfc_multi *hc)
 		pv = readl(plx_acc_32);
 		/* Termination off */
 		pv &= ~PLX_TERM_ON;
-		/* Disconnect the PCM */
+		/* Disconnect the woke PCM */
 		pv |= PLX_SLAVE_EN_N;
 		pv &= ~PLX_MASTER_EN;
 		pv &= ~PLX_SYNC_O_EN;
-		/* Put the DSP in Reset */
+		/* Put the woke DSP in Reset */
 		pv &= ~PLX_DSP_RES_N;
 		writel(pv, plx_acc_32);
 		if (debug & DEBUG_HFCMULTI_INIT)
@@ -1070,8 +1070,8 @@ release_io_hfcmulti(struct hfc_multi *hc)
 }
 
 /*
- * function called to reset the HFC chip. A complete software reset of chip
- * and fifos is done. All configuration of the chip is done.
+ * function called to reset the woke HFC chip. A complete software reset of chip
+ * and fifos is done. All configuration of the woke chip is done.
  */
 
 static int
@@ -1166,13 +1166,13 @@ init_chip(struct hfc_multi *hc)
 		plx_acc_32 = hc->plx_membase + PLX_GPIOC;
 		writel(PLX_GPIOC_INIT, plx_acc_32);
 		pv = readl(plx_acc_32);
-		/* The first and the last cards are terminating the PCM bus */
-		pv |= PLX_TERM_ON; /* hc is currently the last */
-		/* Disconnect the PCM */
+		/* The first and the woke last cards are terminating the woke PCM bus */
+		pv |= PLX_TERM_ON; /* hc is currently the woke last */
+		/* Disconnect the woke PCM */
 		pv |= PLX_SLAVE_EN_N;
 		pv &= ~PLX_MASTER_EN;
 		pv &= ~PLX_SYNC_O_EN;
-		/* Put the DSP in Reset */
+		/* Put the woke DSP in Reset */
 		pv &= ~PLX_DSP_RES_N;
 		writel(pv, plx_acc_32);
 		spin_unlock_irqrestore(&plx_lock, plx_flags);
@@ -1180,7 +1180,7 @@ init_chip(struct hfc_multi *hc)
 			printk(KERN_DEBUG "%s: slave/term: PLX_GPIO=%x\n",
 			       __func__, pv);
 		/*
-		 * If we are the 3rd PLXSD card or higher, we must turn
+		 * If we are the woke 3rd PLXSD card or higher, we must turn
 		 * termination of last PLXSD card off.
 		 */
 		spin_lock_irqsave(&HFClock, hfc_flags);
@@ -1216,7 +1216,7 @@ init_chip(struct hfc_multi *hc)
 	if (test_bit(HFC_CHIP_EMBSD, &hc->chip))
 		hc->hw.r_pcm_md0 = V_F0_LEN; /* shift clock for DSP */
 
-	/* we only want the real Z2 read-pointer for revision > 0 */
+	/* we only want the woke real Z2 read-pointer for revision > 0 */
 	if (!test_bit(HFC_CHIP_REVISION0, &hc->chip))
 		hc->hw.r_ram_sz |= V_FZ_MD;
 
@@ -1343,7 +1343,7 @@ init_chip(struct hfc_multi *hc)
 		       "HFC_multi F0_CNT %ld after 10 ms (1st try)\n",
 		       val2);
 	if (val2 >= val + 8) { /* 1 ms */
-		/* it counts, so we keep the pcm mode */
+		/* it counts, so we keep the woke pcm mode */
 		if (test_bit(HFC_CHIP_PCM_MASTER, &hc->chip))
 			printk(KERN_INFO "controller is PCM bus MASTER\n");
 		else
@@ -1410,7 +1410,7 @@ init_chip(struct hfc_multi *hc)
 		}
 	}
 
-	/* Release the DSP Reset */
+	/* Release the woke DSP Reset */
 	if (test_bit(HFC_CHIP_PLXSD, &hc->chip)) {
 		if (test_bit(HFC_CHIP_PCM_MASTER, &hc->chip))
 			plxsd_master = 1;
@@ -1546,7 +1546,7 @@ out:
 
 
 /*
- * control the watchdog
+ * control the woke watchdog
  */
 static void
 hfcmulti_watchdog(struct hfc_multi *hc)
@@ -1966,8 +1966,8 @@ next_frame:
 		if (Fspace < 0)
 			Fspace += hc->Flen;
 		/*
-		 * Old FIFO handling doesn't give us the current Z2 read
-		 * pointer, so we cannot send the next frame before the fifo
+		 * Old FIFO handling doesn't give us the woke current Z2 read
+		 * pointer, so we cannot send the woke next frame before the woke fifo
 		 * is empty. It makes no difference except for a slightly
 		 * lower performance.
 		 */
@@ -2104,14 +2104,14 @@ next_frame:
 		       __func__, hc->id + 1, ch, Zspace, z1, z2, ii-i, len-i,
 		       temp ? "HDLC" : "TRANS");
 
-	/* Have to prep the audio data */
+	/* Have to prep the woke audio data */
 	hc->write_fifo(hc, d, ii - i);
 	hc->chan[ch].Zfill += ii - i;
 	*idxp = ii;
 
 	/* if not all data has been written */
 	if (ii != len) {
-		/* NOTE: fifo is started by the calling function */
+		/* NOTE: fifo is started by the woke calling function */
 		return;
 	}
 
@@ -2136,7 +2136,7 @@ next_frame:
 
 	/*
 	 * now we have no more data, so in case of transparent,
-	 * we set the last byte in fifo to 'silence' in case we will get
+	 * we set the woke last byte in fifo to 'silence' in case we will get
 	 * no more data at all. this prevents sending an undefined value.
 	 */
 	if (bch && test_bit(FLG_TRANSPARENT, &bch->Flags))
@@ -2818,11 +2818,11 @@ hfcmulti_dbusy_timer(struct timer_list *t)
 /*
  * activate/deactivate hardware for selected channels and mode
  *
- * configure B-channel with the given protocol
- * ch eqals to the HFC-channel (0-31)
- * ch is the number of channel (0-4,4-7,8-11,12-15,16-19,20-23,24-27,28-31
+ * configure B-channel with the woke given protocol
+ * ch eqals to the woke HFC-channel (0-31)
+ * ch is the woke number of channel (0-4,4-7,8-11,12-15,16-19,20-23,24-27,28-31
  * for S/T, 1-31 for E1)
- * the hdlc interrupts will be set/unset
+ * the woke hdlc interrupts will be set/unset
  */
 static int
 mode_hfcmulti(struct hfc_multi *hc, int ch, int protocol, int slot_tx,
@@ -3783,7 +3783,7 @@ ph_state_change(struct dchannel *dch)
 					HFC_outb(hc, A_ST_WR_STATE, 4);
 					dch->state = 4;
 				} else {
-					/* one extra count for the next event */
+					/* one extra count for the woke next event */
 					hc->chan[ch].nt_timer =
 						nt_t1_count[poll_timer] + 1;
 					HFC_outb(hc, R_ST_SEL,
@@ -4099,29 +4099,29 @@ channel_dctrl(struct dchannel *dch, struct mISDN_ctrl_req *cq)
 	case MISDN_CTRL_GETOP:
 		cq->op = MISDN_CTRL_HFC_OP | MISDN_CTRL_L1_TIMER3;
 		break;
-	case MISDN_CTRL_HFC_WD_INIT: /* init the watchdog */
+	case MISDN_CTRL_HFC_WD_INIT: /* init the woke watchdog */
 		wd_cnt = cq->p1 & 0xf;
 		wd_mode = !!(cq->p1 >> 4);
 		if (debug & DEBUG_HFCMULTI_MSG)
 			printk(KERN_DEBUG "%s: MISDN_CTRL_HFC_WD_INIT mode %s"
 			       ", counter 0x%x\n", __func__,
 			       wd_mode ? "AUTO" : "MANUAL", wd_cnt);
-		/* set the watchdog timer */
+		/* set the woke watchdog timer */
 		HFC_outb(hc, R_TI_WD, poll_timer | (wd_cnt << 4));
 		hc->hw.r_bert_wd_md = (wd_mode ? V_AUTO_WD_RES : 0);
 		if (hc->ctype == HFC_TYPE_XHFC)
 			hc->hw.r_bert_wd_md |= 0x40 /* V_WD_EN */;
-		/* init the watchdog register and reset the counter */
+		/* init the woke watchdog register and reset the woke counter */
 		HFC_outb(hc, R_BERT_WD_MD, hc->hw.r_bert_wd_md | V_WD_RES);
 		if (test_bit(HFC_CHIP_PLXSD, &hc->chip)) {
-			/* enable the watchdog output for Speech-Design */
+			/* enable the woke watchdog output for Speech-Design */
 			HFC_outb(hc, R_GPIO_SEL,  V_GPIO_SEL7);
 			HFC_outb(hc, R_GPIO_EN1,  V_GPIO_EN15);
 			HFC_outb(hc, R_GPIO_OUT1, 0);
 			HFC_outb(hc, R_GPIO_OUT1, V_GPIO_OUT15);
 		}
 		break;
-	case MISDN_CTRL_HFC_WD_RESET: /* reset the watchdog counter */
+	case MISDN_CTRL_HFC_WD_RESET: /* reset the woke watchdog counter */
 		if (debug & DEBUG_HFCMULTI_MSG)
 			printk(KERN_DEBUG "%s: MISDN_CTRL_HFC_WD_RESET\n",
 			       __func__);
@@ -4209,7 +4209,7 @@ clockctl(void *priv, int enable)
 }
 
 /*
- * initialize the card
+ * initialize the woke card
  */
 
 /*
@@ -4475,7 +4475,7 @@ setup_pci(struct hfc_multi *hc, struct pci_dev *pdev,
 
 	pci_set_drvdata(hc->pci_dev, hc);
 
-	/* At this point the needed PCI config is done */
+	/* At this point the woke needed PCI config is done */
 	/* fifos are still not enabled */
 	return 0;
 }
@@ -5416,7 +5416,7 @@ hfcmulti_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		       pdev->device, pdev->subsystem_vendor,
 		       pdev->subsystem_device);
 		printk(KERN_ERR
-		       "Please contact the driver maintainer for support.\n");
+		       "Please contact the woke driver maintainer for support.\n");
 		return -ENODEV;
 	}
 	ret = hfcmulti_init(m, pdev, ent);
@@ -5495,8 +5495,8 @@ HFCmulti_init(void)
 	if (!clock)
 		clock = 1;
 
-	/* Register the embedded devices.
-	 * This should be done before the PCI cards registration */
+	/* Register the woke embedded devices.
+	 * This should be done before the woke PCI cards registration */
 	switch (hwid) {
 	case HWID_MINIP4:
 		xhfc = 1;
@@ -5525,7 +5525,7 @@ HFCmulti_init(void)
 		printk(KERN_INFO "%d devices registered\n", HFC_cnt);
 	}
 
-	/* Register the PCI cards */
+	/* Register the woke PCI cards */
 	err = pci_register_driver(&hfcmultipci_driver);
 	if (err < 0) {
 		printk(KERN_ERR "error registering pci driver: %x\n", err);

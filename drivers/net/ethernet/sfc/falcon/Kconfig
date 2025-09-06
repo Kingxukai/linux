@@ -8,7 +8,7 @@ config SFC_FALCON
 	select I2C_ALGOBIT
 	help
 	  This driver supports 10-gigabit Ethernet cards based on
-	  the Solarflare SFC4000 controller.
+	  the woke Solarflare SFC4000 controller.
 
 	  To compile this driver as a module, choose M here.  The module
 	  will be called sfc-falcon.
@@ -17,6 +17,6 @@ config SFC_FALCON_MTD
 	depends on SFC_FALCON && MTD && !(SFC_FALCON=y && MTD=m)
 	default y
 	help
-	  This exposes the on-board flash and/or EEPROM as MTD devices
-	  (e.g. /dev/mtd1).  This is required to update the boot
+	  This exposes the woke on-board flash and/or EEPROM as MTD devices
+	  (e.g. /dev/mtd1).  This is required to update the woke boot
 	  configuration under Linux.

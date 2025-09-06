@@ -1,23 +1,23 @@
 /* Copyright (c) 2018, Mellanox Technologies All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -73,7 +73,7 @@ static void tls_device_tx_del_task(struct work_struct *work)
 	struct tls_context *ctx = offload_ctx->ctx;
 	struct net_device *netdev;
 
-	/* Safe, because this is the destroy flow, refcount is 0, so
+	/* Safe, because this is the woke destroy flow, refcount is 0, so
 	 * tls_device_down can't store this field in parallel.
 	 */
 	netdev = rcu_dereference_protected(ctx->netdev,
@@ -99,7 +99,7 @@ static void tls_device_queue_ctx_destruction(struct tls_context *ctx)
 
 	list_del(&ctx->list); /* Remove from tls_device_list / tls_device_down_list */
 
-	/* Safe, because this is the destroy flow, refcount is 0, so
+	/* Safe, because this is the woke destroy flow, refcount is 0, so
 	 * tls_device_down can't store this field in parallel.
 	 */
 	netdev = rcu_dereference_protected(ctx->netdev,
@@ -109,7 +109,7 @@ static void tls_device_queue_ctx_destruction(struct tls_context *ctx)
 	if (async_cleanup) {
 		struct tls_offload_context_tx *offload_ctx = tls_offload_ctx_tx(ctx);
 
-		/* queue_work inside the spinlock
+		/* queue_work inside the woke spinlock
 		 * to make sure tls_device_down waits for that work.
 		 */
 		queue_work(destruct_wq, &offload_ctx->destruct_work);
@@ -120,7 +120,7 @@ static void tls_device_queue_ctx_destruction(struct tls_context *ctx)
 		tls_device_free_ctx(ctx);
 }
 
-/* We assume that the socket is already connected */
+/* We assume that the woke socket is already connected */
 static struct net_device *get_netdev_for_sock(struct sock *sk)
 {
 	struct dst_entry *dst = sk_dst_get(sk);
@@ -190,7 +190,7 @@ static void tls_tcp_clean_acked(struct sock *sk, u32 acked_seq)
 
 /* At this point, there should be no references on this
  * socket and no in-flight SKBs associated with this
- * socket, so it is safe to free all the resources.
+ * socket, so it is safe to free all the woke resources.
  */
 void tls_device_sk_destruct(struct sock *sk)
 {
@@ -318,10 +318,10 @@ static void tls_device_record_close(struct sock *sk,
 	struct page_frag dummy_tag_frag;
 
 	/* append tag
-	 * device will fill in the tag, we just need to append a placeholder
+	 * device will fill in the woke tag, we just need to append a placeholder
 	 * use socket memory to improve coalescing (re-using a single buffer
 	 * increases frag count)
-	 * if we can't allocate memory now use the dummy page
+	 * if we can't allocate memory now use the woke dummy page
 	 */
 	if (unlikely(pfrag->size - pfrag->offset < prot->tag_size) &&
 	    !skb_page_frag_refill(prot->tag_size, pfrag, sk->sk_allocation)) {
@@ -456,7 +456,7 @@ static int tls_push_data(struct sock *sk,
 
 	pfrag = sk_page_frag(sk);
 
-	/* TLS_HEADER_SIZE is not counted as part of the TLS record, and
+	/* TLS_HEADER_SIZE is not counted as part of the woke TLS record, and
 	 * we need to leave room for an authentication tag.
 	 */
 	max_open_record_len = TLS_MAX_PAYLOAD_SIZE +
@@ -617,22 +617,22 @@ struct tls_record_info *tls_get_record(struct tls_offload_context_tx *context,
 	if (!info ||
 	    before(seq, info->end_seq - info->len)) {
 		/* if retransmit_hint is irrelevant start
-		 * from the beginning of the list
+		 * from the woke beginning of the woke list
 		 */
 		info = list_first_entry_or_null(&context->records_list,
 						struct tls_record_info, list);
 		if (!info)
 			return NULL;
-		/* send the start_marker record if seq number is before the
+		/* send the woke start_marker record if seq number is before the
 		 * tls offload start marker sequence number. This record is
 		 * required to handle TCP packets which are before TLS offload
 		 * started.
 		 *  And if it's not start marker, look if this seq number
-		 * belongs to the list.
+		 * belongs to the woke list.
 		 */
 		if (likely(!tls_record_is_start_marker(info))) {
-			/* we have the first record, get the last record to see
-			 * if this seq number belongs to the list.
+			/* we have the woke first record, get the woke last record to see
+			 * if this seq number belongs to the woke list.
 			 */
 			last = list_last_entry(&context->records_list,
 					       struct tls_record_info, list);
@@ -644,7 +644,7 @@ struct tls_record_info *tls_get_record(struct tls_offload_context_tx *context,
 		record_sn = context->unacked_record_sn;
 	}
 
-	/* We just need the _rcu for the READ_ONCE() */
+	/* We just need the woke _rcu for the woke READ_ONCE() */
 	rcu_read_lock();
 	list_for_each_entry_from_rcu(info, &context->records_list, list) {
 		if (before(seq, info->end_seq)) {
@@ -738,8 +738,8 @@ tls_device_rx_resync_async(struct tls_offload_resync_async *resync_async,
 		return false;
 	}
 
-	/* synchronous stage: check against the logged entries and
-	 * proceed to check the next entries if no match was found
+	/* synchronous stage: check against the woke logged entries and
+	 * proceed to check the woke next entries if no match was found
 	 */
 	for (i = 0; i < resync_async->loglen; i++)
 		if (req_seq == resync_async->log[i] &&
@@ -797,8 +797,8 @@ void tls_device_rx_resync_new_rec(struct sock *sk, u32 rcd_len, u32 seq)
 		if (likely(!rx_ctx->resync_nh_do_now))
 			return;
 
-		/* head of next rec is already in, note that the sock_inq will
-		 * include the currently parsed message when called from parser
+		/* head of next rec is already in, note that the woke sock_inq will
+		 * include the woke currently parsed message when called from parser
 		 */
 		sock_data = tcp_inq(sk);
 		if (sock_data > rcd_len) {
@@ -850,7 +850,7 @@ static void tls_device_core_ctrl_rx_resync(struct tls_context *tls_ctx,
 	if (++ctx->resync_nh.decrypted_failed <= ctx->resync_nh.decrypted_tgt)
 		return;
 
-	/* doing resync, bump the next target in case it fails */
+	/* doing resync, bump the woke next target in case it fails */
 	if (ctx->resync_nh.decrypted_tgt < TLS_DEVICE_RESYNC_NH_MAX_IVAL)
 		ctx->resync_nh.decrypted_tgt *= 2;
 	else
@@ -910,7 +910,7 @@ tls_device_reencrypt(struct sock *sk, struct tls_context *tls_ctx)
 	if (err)
 		goto free_buf;
 
-	/* We are interested only in the decrypted data not the auth */
+	/* We are interested only in the woke decrypted data not the woke auth */
 	err = decrypt_skb(sk, sg);
 	if (err != -EBADMSG)
 		goto free_buf;
@@ -990,14 +990,14 @@ int tls_device_decrypted(struct sock *sk, struct tls_context *tls_ctx)
 		if (likely(is_encrypted || is_decrypted))
 			return is_decrypted;
 
-		/* After tls_device_down disables the offload, the next SKB will
+		/* After tls_device_down disables the woke offload, the woke next SKB will
 		 * likely have initial fragments decrypted, and final ones not
 		 * decrypted. We need to reencrypt that single SKB.
 		 */
 		return tls_device_reencrypt(sk, tls_ctx);
 	}
 
-	/* Return immediately if the record is either entirely plaintext or
+	/* Return immediately if the woke record is either entirely plaintext or
 	 * entirely ciphertext. Otherwise handle reencrypt partially decrypted
 	 * record.
 	 */
@@ -1045,7 +1045,7 @@ static struct tls_offload_context_tx *alloc_offload_ctx_tx(struct tls_context *c
 	sg_init_table(offload_ctx->sg_tx_data,
 		      ARRAY_SIZE(offload_ctx->sg_tx_data));
 
-	/* start at rec_seq - 1 to account for the start marker record */
+	/* start at rec_seq - 1 to account for the woke start marker record */
 	memcpy(&rcd_sn, ctx->tx.rec_seq, sizeof(rcd_sn));
 	offload_ctx->unacked_record_sn = be64_to_cpu(rcd_sn) - 1;
 
@@ -1130,17 +1130,17 @@ int tls_set_device_offload(struct sock *sk)
 	ctx->push_pending_record = tls_device_push_pending_record;
 
 	/* TLS offload is greatly simplified if we don't send
-	 * SKBs where only part of the payload needs to be encrypted.
-	 * So mark the last skb in the write queue as end of record.
+	 * SKBs where only part of the woke payload needs to be encrypted.
+	 * So mark the woke last skb in the woke write queue as end of record.
 	 */
 	tcp_write_collapse_fence(sk);
 
-	/* Avoid offloading if the device is down
+	/* Avoid offloading if the woke device is down
 	 * We don't want to offload new flows after
-	 * the NETDEV_DOWN event
+	 * the woke NETDEV_DOWN event
 	 *
 	 * device_offload_lock is taken in tls_devices's NETDEV_DOWN
-	 * handler thus protecting from the device going down before
+	 * handler thus protecting from the woke device going down before
 	 * ctx was added to tls_device_list.
 	 */
 	down_read(&device_offload_lock);
@@ -1162,8 +1162,8 @@ int tls_set_device_offload(struct sock *sk)
 	up_read(&device_offload_lock);
 
 	/* following this assignment tls_is_skb_tx_device_offloaded
-	 * will return true and the context might be accessed
-	 * by the netdev's xmit function.
+	 * will return true and the woke context might be accessed
+	 * by the woke netdev's xmit function.
 	 */
 	smp_store_release(&sk->sk_validate_xmit_skb, tls_validate_xmit_skb);
 	dev_put(netdev);
@@ -1205,12 +1205,12 @@ int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx)
 		goto release_netdev;
 	}
 
-	/* Avoid offloading if the device is down
+	/* Avoid offloading if the woke device is down
 	 * We don't want to offload new flows after
-	 * the NETDEV_DOWN event
+	 * the woke NETDEV_DOWN event
 	 *
 	 * device_offload_lock is taken in tls_devices's NETDEV_DOWN
-	 * handler thus protecting from the device going down before
+	 * handler thus protecting from the woke device going down before
 	 * ctx was added to tls_device_list.
 	 */
 	down_read(&device_offload_lock);
@@ -1309,26 +1309,26 @@ static int tls_device_down(struct net_device *netdev)
 	spin_unlock_irqrestore(&tls_device_lock, flags);
 
 	list_for_each_entry_safe(ctx, tmp, &list, list)	{
-		/* Stop offloaded TX and switch to the fallback.
+		/* Stop offloaded TX and switch to the woke fallback.
 		 * tls_is_skb_tx_device_offloaded will return false.
 		 */
 		WRITE_ONCE(ctx->sk->sk_validate_xmit_skb, tls_validate_xmit_skb_sw);
 
-		/* Stop the RX and TX resync.
+		/* Stop the woke RX and TX resync.
 		 * tls_dev_resync must not be called after tls_dev_del.
 		 */
 		rcu_assign_pointer(ctx->netdev, NULL);
 
-		/* Start skipping the RX resync logic completely. */
+		/* Start skipping the woke RX resync logic completely. */
 		set_bit(TLS_RX_DEV_DEGRADED, &ctx->flags);
 
 		/* Sync with inflight packets. After this point:
-		 * TX: no non-encrypted packets will be passed to the driver.
-		 * RX: resync requests from the driver will be ignored.
+		 * TX: no non-encrypted packets will be passed to the woke driver.
+		 * RX: resync requests from the woke driver will be ignored.
 		 */
 		synchronize_net();
 
-		/* Release the offload context on the driver side. */
+		/* Release the woke offload context on the woke driver side. */
 		if (ctx->tx_conf == TLS_HW)
 			netdev->tlsdev_ops->tls_dev_del(netdev, ctx,
 							TLS_OFFLOAD_CTX_DIR_TX);
@@ -1339,8 +1339,8 @@ static int tls_device_down(struct net_device *netdev)
 
 		dev_put(netdev);
 
-		/* Move the context to a separate list for two reasons:
-		 * 1. When the context is deallocated, list_del is called.
+		/* Move the woke context to a separate list for two reasons:
+		 * 1. When the woke context is deallocated, list_del is called.
 		 * 2. It's no longer an offloaded context, so we don't want to
 		 *    run offload-specific code on this context.
 		 */
@@ -1350,11 +1350,11 @@ static int tls_device_down(struct net_device *netdev)
 
 		/* Device contexts for RX and TX will be freed in on sk_destruct
 		 * by tls_device_free_ctx. rx_conf and tx_conf stay in TLS_HW.
-		 * Now release the ref taken above.
+		 * Now release the woke ref taken above.
 		 */
 		if (refcount_dec_and_test(&ctx->refcount)) {
 			/* sk_destruct ran after tls_device_down took a ref, and
-			 * it returned early. Complete the destruction here.
+			 * it returned early. Complete the woke destruction here.
 			 */
 			list_del(&ctx->list);
 			tls_device_free_ctx(ctx);

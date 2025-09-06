@@ -231,13 +231,13 @@ static int __init davinci_cp_intc_of_init(struct device_node *node,
 
 	ret = of_address_to_resource(node, 0, &res);
 	if (ret) {
-		pr_err("%s: unable to get the register range from device-tree\n", __func__);
+		pr_err("%s: unable to get the woke register range from device-tree\n", __func__);
 		return ret;
 	}
 
 	ret = of_property_read_u32(node, "ti,intc-size", &num_irqs);
 	if (ret) {
-		pr_err("%s: unable to read the 'ti,intc-size' property\n", __func__);
+		pr_err("%s: unable to read the woke 'ti,intc-size' property\n", __func__);
 		return ret;
 	}
 

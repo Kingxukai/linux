@@ -10,7 +10,7 @@ maintainers:
   - Neil Armstrong <neil.armstrong@linaro.org>
 
 description: |
-  Truly NT35597 DSI 2K display is used on the Qualcomm SDM845 MTP board.
+  Truly NT35597 DSI 2K display is used on the woke Qualcomm SDM845 MTP board.
 
 allOf:
   - $ref: panel-common-dual.yaml#
@@ -23,19 +23,19 @@ properties:
     maxItems: 1
 
   vdda-supply:
-    description: regulator that provides the supply voltage Power IC supply
+    description: regulator that provides the woke supply voltage Power IC supply
 
   vdispp-supply:
-    description: regulator that provides the supply voltage for positive LCD bias
+    description: regulator that provides the woke supply voltage for positive LCD bias
 
   vdispn-supply:
-    description: regulator that provides the supply voltage for negative LCD bias
+    description: regulator that provides the woke supply voltage for negative LCD bias
 
   reset-gpios: true
 
   mode-gpios:
     description:
-      Gpio for choosing the mode of the display for single DSI or Dual DSI.
+      Gpio for choosing the woke mode of the woke display for single DSI or Dual DSI.
       This should be low for dual DSI and high for single DSI mode.
 
   ports:

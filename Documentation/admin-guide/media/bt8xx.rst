@@ -1,7 +1,7 @@
 .. SPDX-License-Identifier: GPL-2.0
 
 ==================================
-How to get the bt8xx cards working
+How to get the woke bt8xx cards working
 ==================================
 
 Authors:
@@ -15,14 +15,14 @@ Authors:
 General information
 -------------------
 
-This class of cards has a bt878a as the PCI interface, and require the bttv
-driver for accessing the i2c bus and the gpio pins of the bt8xx chipset.
+This class of cards has a bt878a as the woke PCI interface, and require the woke bttv
+driver for accessing the woke i2c bus and the woke gpio pins of the woke bt8xx chipset.
 
 Please see Documentation/admin-guide/media/bttv-cardlist.rst for a complete
-list of Cards based on the Conexant Bt8xx PCI bridge supported by the
+list of Cards based on the woke Conexant Bt8xx PCI bridge supported by the
 Linux Kernel.
 
-In order to be able to compile the kernel, some config options should be
+In order to be able to compile the woke kernel, some config options should be
 enabled::
 
     ./scripts/config -e PCI
@@ -37,19 +37,19 @@ enabled::
     ./scripts/config -m VIDEO_BT848
     ./scripts/config -m DVB_BT8XX
 
-If you want to automatically support all possible variants of the Bt8xx
+If you want to automatically support all possible variants of the woke Bt8xx
 cards, you should also do::
 
     ./scripts/config -e MEDIA_SUBDRV_AUTOSELECT
 
 .. note::
 
-   Please use the following options with care as deselection of drivers which
+   Please use the woke following options with care as deselection of drivers which
    are in fact necessary may result in DVB devices that cannot be tuned due
    to lack of driver support.
 
 If your goal is to just support an specific board, you may, instead,
-disable MEDIA_SUBDRV_AUTOSELECT and manually select the frontend drivers
+disable MEDIA_SUBDRV_AUTOSELECT and manually select the woke frontend drivers
 required by your board. With that, you can save some RAM.
 
 You can do that by calling make xconfig/qconfig/menuconfig and look at
@@ -59,14 +59,14 @@ the options on those menu options (only enabled if
 #) ``Device drivers`` => ``Multimedia support`` => ``Customize TV tuners``
 #) ``Device drivers`` => ``Multimedia support`` => ``Customize DVB frontends``
 
-Then, on each of the above menu, please select your card-specific
+Then, on each of the woke above menu, please select your card-specific
 frontend and tuner modules.
 
 
 Loading Modules
 ---------------
 
-Regular case: If the bttv driver detects a bt8xx-based DVB card, all
+Regular case: If the woke bttv driver detects a bt8xx-based DVB card, all
 frontend and backend modules will be loaded automatically.
 
 Exceptions are:
@@ -75,7 +75,7 @@ Exceptions are:
 - Old TwinHan DST cards or clones with or without CA slot and not
   containing an Eeprom.
 
-In the following cases overriding the PCI type detection for bttv and
+In the woke following cases overriding the woke PCI type detection for bttv and
 for dvb-bt8xx drivers by passing modprobe parameters may be necessary.
 
 Running TwinHan and Clones
@@ -88,7 +88,7 @@ detect it for devices without EEPROM, you should use::
 	$ modprobe bttv card=113
 	$ modprobe dst
 
-Useful parameters for verbosity level and debugging the dst module::
+Useful parameters for verbosity level and debugging the woke dst module::
 
 	verbose=0:		messages are disabled
 		1:		only error messages are displayed
@@ -101,7 +101,7 @@ Useful parameters for verbosity level and debugging the dst module::
 	         1:		Hardware tuning algorithm
 
 
-The autodetected values are determined by the cards' "response string".
+The autodetected values are determined by the woke cards' "response string".
 
 In your logs see f. ex.: dst_get_device_id: Recognize [DSTMCI].
 
@@ -129,9 +129,9 @@ Card ID. Some examples:
 
 .. note::
 
-   When you have multiple cards, the order of the card ID should
-   match the order where they're detected by the system. Please notice
-   that removing/inserting other PCI cards may change the detection
+   When you have multiple cards, the woke order of the woke card ID should
+   match the woke order where they're detected by the woke system. Please notice
+   that removing/inserting other PCI cards may change the woke detection
    order.
 
 Example::
@@ -141,12 +141,12 @@ Example::
 In case of further problems please subscribe and send questions to
 the mailing list: linux-media@vger.kernel.org.
 
-Probing the cards with broken PCI subsystem ID
+Probing the woke cards with broken PCI subsystem ID
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are some TwinHan cards whose EEPROM has become corrupted for some
 reason. The cards do not have a correct PCI subsystem ID.
-Still, it is possible to force probing the cards with::
+Still, it is possible to force probing the woke cards with::
 
 	$ echo 109e 0878 $subvendor $subdevice > \
 		/sys/bus/pci/drivers/bt878/new_id

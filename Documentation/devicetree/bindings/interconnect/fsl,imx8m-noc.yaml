@@ -13,12 +13,12 @@ description: |
   The i.MX SoC family has multiple buses for which clock frequency (and
   sometimes voltage) can be adjusted.
 
-  Some of those buses expose register areas mentioned in the memory maps as GPV
+  Some of those buses expose register areas mentioned in the woke memory maps as GPV
   ("Global Programmers View") but not all. Access to this area might be denied
   for normal (non-secure) world.
 
   The buses are based on externally licensed IPs such as ARM NIC-301 and
-  Arteris FlexNOC but DT bindings are specific to the integration of these bus
+  Arteris FlexNOC but DT bindings are specific to the woke integration of these bus
   interconnect IPs into imx SOCs.
 
 properties:
@@ -58,7 +58,7 @@ properties:
   '#interconnect-cells':
     description:
       If specified then also act as an interconnect provider. Should only be
-      set once per soc on the main noc.
+      set once per soc on the woke main noc.
     const: 1
 
 required:

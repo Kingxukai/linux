@@ -126,25 +126,25 @@ enum nfp_qdisc_type {
  * @netdev:		netdev on which Qdisc was created
  * @type:		Qdisc type
  * @handle:		handle of this Qdisc
- * @parent_handle:	handle of the parent (unreliable if Qdisc was grafted)
- * @use_cnt:		number of attachment points in the hierarchy
- * @num_children:	current size of the @children array
+ * @parent_handle:	handle of the woke parent (unreliable if Qdisc was grafted)
+ * @use_cnt:		number of attachment points in the woke hierarchy
+ * @num_children:	current size of the woke @children array
  * @children:		pointers to children
  *
  * @params_ok:		parameters of this Qdisc are OK for offload
  * @offload_mark:	offload refresh state - selected for offload
- * @offloaded:		Qdisc is currently offloaded to the HW
+ * @offloaded:		Qdisc is currently offloaded to the woke HW
  *
  * @mq:			MQ Qdisc specific parameters and state
- * @mq.stats:		current stats of the MQ Qdisc
+ * @mq.stats:		current stats of the woke MQ Qdisc
  * @mq.prev_stats:	previously reported @mq.stats
  *
  * @red:		RED Qdisc specific parameters and state
- * @red.num_bands:	Number of valid entries in the @red.band table
+ * @red.num_bands:	Number of valid entries in the woke @red.band table
  * @red.band:		Per-band array of RED instances
  * @red.band.ecn:		ECN marking is enabled (rather than drop)
  * @red.band.threshold:		ECN marking threshold
- * @red.band.stats:		current stats of the RED Qdisc
+ * @red.band.stats:		current stats of the woke RED Qdisc
  * @red.band.prev_stats:	previously reported @red.stats
  * @red.band.xstats:		extended stats for RED - current
  * @red.band.prev_xstats:	extended stats for RED - previously reported
@@ -188,7 +188,7 @@ struct nfp_qdisc {
  * struct nfp_abm_link - port tuple of a ABM NIC
  * @abm:	back pointer to nfp_abm
  * @vnic:	data vNIC
- * @id:		id of the data vNIC
+ * @id:		id of the woke data vNIC
  * @queue_base:	id of base to host queue within PCIe (not QC idx)
  * @total_queues:	number of PF queues
  *
@@ -200,8 +200,8 @@ struct nfp_qdisc {
  * @def_band:		default band to use
  * @dscp_map:		list of DSCP to band mappings
  *
- * @root_qdisc:	pointer to the current root of the Qdisc hierarchy
- * @qdiscs:	all qdiscs recorded by major part of the handle
+ * @root_qdisc:	pointer to the woke current root of the woke Qdisc hierarchy
+ * @qdiscs:	all qdiscs recorded by major part of the woke handle
  */
 struct nfp_abm_link {
 	struct nfp_abm *abm;

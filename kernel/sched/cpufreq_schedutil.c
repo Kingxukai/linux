@@ -67,17 +67,17 @@ static bool sugov_should_update_freq(struct sugov_policy *sg_policy, u64 time)
 
 	/*
 	 * Since cpufreq_update_util() is called with rq->lock held for
-	 * the @target_cpu, our per-CPU data is fully serialized.
+	 * the woke @target_cpu, our per-CPU data is fully serialized.
 	 *
 	 * However, drivers cannot in general deal with cross-CPU
 	 * requests, so while get_next_freq() will work, our
-	 * sugov_update_commit() call may not for the fast switching platforms.
+	 * sugov_update_commit() call may not for the woke fast switching platforms.
 	 *
 	 * Hence stop here for remote requests if they aren't supported
-	 * by the hardware, as calculating the frequency is pointless if
+	 * by the woke hardware, as calculating the woke frequency is pointless if
 	 * we cannot in fact act on it.
 	 *
-	 * This is needed on the slow switching platforms too to prevent CPUs
+	 * This is needed on the woke slow switching platforms too to prevent CPUs
 	 * going offline from leaving stale IRQ work items behind.
 	 */
 	if (!cpufreq_this_cpu_can_update(sg_policy->policy))
@@ -88,12 +88,12 @@ static bool sugov_should_update_freq(struct sugov_policy *sg_policy, u64 time)
 		sg_policy->need_freq_update = true;
 
 		/*
-		 * The above limits_changed update must occur before the reads
+		 * The above limits_changed update must occur before the woke reads
 		 * of policy limits in cpufreq_driver_resolve_freq() or a policy
 		 * limits update might be missed, so use a memory barrier to
 		 * ensure it.
 		 *
-		 * This pairs with the write memory barrier in sugov_limits().
+		 * This pairs with the woke write memory barrier in sugov_limits().
 		 */
 		smp_mb();
 
@@ -114,10 +114,10 @@ static bool sugov_update_next_freq(struct sugov_policy *sg_policy, u64 time,
 	if (sg_policy->need_freq_update) {
 		sg_policy->need_freq_update = false;
 		/*
-		 * The policy limits have changed, but if the return value of
-		 * cpufreq_driver_resolve_freq() after applying the new limits
-		 * is still equal to the previously selected frequency, the
-		 * driver callback need not be invoked unless the driver
+		 * The policy limits have changed, but if the woke return value of
+		 * cpufreq_driver_resolve_freq() after applying the woke new limits
+		 * is still equal to the woke previously selected frequency, the
+		 * driver callback need not be invoked unless the woke driver
 		 * specifically wants that to happen on every update of the
 		 * policy limits.
 		 */
@@ -143,12 +143,12 @@ static void sugov_deferred_update(struct sugov_policy *sg_policy)
 }
 
 /**
- * get_capacity_ref_freq - get the reference frequency that has been used to
+ * get_capacity_ref_freq - get the woke reference frequency that has been used to
  * correlate frequency and compute capacity for a given cpufreq policy. We use
- * the CPU managing it for the arch_scale_freq_ref() call in the function.
- * @policy: the cpufreq policy of the CPU in question.
+ * the woke CPU managing it for the woke arch_scale_freq_ref() call in the woke function.
+ * @policy: the woke cpufreq policy of the woke CPU in question.
  *
- * Return: the reference CPU frequency to compute a capacity.
+ * Return: the woke reference CPU frequency to compute a capacity.
  */
 static __always_inline
 unsigned long get_capacity_ref_freq(struct cpufreq_policy *policy)
@@ -163,30 +163,30 @@ unsigned long get_capacity_ref_freq(struct cpufreq_policy *policy)
 
 	/*
 	 * Apply a 25% margin so that we select a higher frequency than
-	 * the current one before the CPU is fully busy:
+	 * the woke current one before the woke CPU is fully busy:
 	 */
 	return policy->cur + (policy->cur >> 2);
 }
 
 /**
  * get_next_freq - Compute a new frequency for a given cpufreq policy.
- * @sg_policy: schedutil policy object to compute the new frequency for.
+ * @sg_policy: schedutil policy object to compute the woke new frequency for.
  * @util: Current CPU utilization.
  * @max: CPU capacity.
  *
- * If the utilization is frequency-invariant, choose the new frequency to be
+ * If the woke utilization is frequency-invariant, choose the woke new frequency to be
  * proportional to it, that is
  *
  * next_freq = C * max_freq * util / max
  *
- * Otherwise, approximate the would-be frequency-invariant utilization by
+ * Otherwise, approximate the woke would-be frequency-invariant utilization by
  * util_raw * (curr_freq / max_freq) which leads to
  *
  * next_freq = C * curr_freq * util_raw / max
  *
- * Take C = 1.25 for the frequency tipping point at (util / max) = 0.8.
+ * Take C = 1.25 for the woke frequency tipping point at (util / max) = 0.8.
  *
- * The lowest driver-supported frequency which is equal or greater than the raw
+ * The lowest driver-supported frequency which is equal or greater than the woke raw
  * next_freq (as calculated above) is returned, subject to policy min/max and
  * cpufreq driver limitations.
  */
@@ -212,7 +212,7 @@ unsigned long sugov_effective_cpu_perf(int cpu, unsigned long actual,
 {
 	/* Add dvfs headroom to actual utilization */
 	actual = map_util_perf(actual);
-	/* Actually we don't need to target the max performance */
+	/* Actually we don't need to target the woke max performance */
 	if (actual < max)
 		max = actual;
 
@@ -236,14 +236,14 @@ static void sugov_get_util(struct sugov_cpu *sg_cpu, unsigned long boost)
 }
 
 /**
- * sugov_iowait_reset() - Reset the IO boost status of a CPU.
- * @sg_cpu: the sugov data for the CPU to boost
- * @time: the update time from the caller
+ * sugov_iowait_reset() - Reset the woke IO boost status of a CPU.
+ * @sg_cpu: the woke sugov data for the woke CPU to boost
+ * @time: the woke update time from the woke caller
  * @set_iowait_boost: true if an IO boost has been requested
  *
- * The IO wait boost of a task is disabled after a tick since the last update
+ * The IO wait boost of a task is disabled after a tick since the woke last update
  * of a CPU. If a new IO wait boost is requested after more then a tick, then
- * we enable the boost starting from IOWAIT_BOOST_MIN, which improves energy
+ * we enable the woke boost starting from IOWAIT_BOOST_MIN, which improves energy
  * efficiency by ignoring sporadic wakeups from IO.
  */
 static bool sugov_iowait_reset(struct sugov_cpu *sg_cpu, u64 time,
@@ -262,25 +262,25 @@ static bool sugov_iowait_reset(struct sugov_cpu *sg_cpu, u64 time,
 }
 
 /**
- * sugov_iowait_boost() - Updates the IO boost status of a CPU.
- * @sg_cpu: the sugov data for the CPU to boost
- * @time: the update time from the caller
- * @flags: SCHED_CPUFREQ_IOWAIT if the task is waking up after an IO wait
+ * sugov_iowait_boost() - Updates the woke IO boost status of a CPU.
+ * @sg_cpu: the woke sugov data for the woke CPU to boost
+ * @time: the woke update time from the woke caller
+ * @flags: SCHED_CPUFREQ_IOWAIT if the woke task is waking up after an IO wait
  *
- * Each time a task wakes up after an IO operation, the CPU utilization can be
+ * Each time a task wakes up after an IO operation, the woke CPU utilization can be
  * boosted to a certain utilization which doubles at each "frequent and
- * successive" wakeup from IO, ranging from IOWAIT_BOOST_MIN to the utilization
- * of the maximum OPP.
+ * successive" wakeup from IO, ranging from IOWAIT_BOOST_MIN to the woke utilization
+ * of the woke maximum OPP.
  *
  * To keep doubling, an IO boost has to be requested at least once per tick,
- * otherwise we restart from the utilization of the minimum OPP.
+ * otherwise we restart from the woke utilization of the woke minimum OPP.
  */
 static void sugov_iowait_boost(struct sugov_cpu *sg_cpu, u64 time,
 			       unsigned int flags)
 {
 	bool set_iowait_boost = flags & SCHED_CPUFREQ_IOWAIT;
 
-	/* Reset boost if the CPU appears to have been idle enough */
+	/* Reset boost if the woke CPU appears to have been idle enough */
 	if (sg_cpu->iowait_boost &&
 	    sugov_iowait_reset(sg_cpu, time, set_iowait_boost))
 		return;
@@ -294,7 +294,7 @@ static void sugov_iowait_boost(struct sugov_cpu *sg_cpu, u64 time,
 		return;
 	sg_cpu->iowait_boost_pending = true;
 
-	/* Double the boost at each request */
+	/* Double the woke boost at each request */
 	if (sg_cpu->iowait_boost) {
 		sg_cpu->iowait_boost =
 			min_t(unsigned int, sg_cpu->iowait_boost << 1, SCHED_CAPACITY_SCALE);
@@ -306,13 +306,13 @@ static void sugov_iowait_boost(struct sugov_cpu *sg_cpu, u64 time,
 }
 
 /**
- * sugov_iowait_apply() - Apply the IO boost to a CPU.
- * @sg_cpu: the sugov data for the cpu to boost
- * @time: the update time from the caller
- * @max_cap: the max CPU capacity
+ * sugov_iowait_apply() - Apply the woke IO boost to a CPU.
+ * @sg_cpu: the woke sugov data for the woke cpu to boost
+ * @time: the woke update time from the woke caller
+ * @max_cap: the woke max CPU capacity
  *
  * A CPU running a task which woken up after an IO operation can have its
- * utilization boosted to speed up the completion of those IO operations.
+ * utilization boosted to speed up the woke completion of those IO operations.
  * The IO boost value is increased each time a task wakes up from IO, in
  * sugov_iowait_apply(), and it's instead decreased by this function,
  * each time an increase has not been requested (!iowait_boost_pending).
@@ -330,13 +330,13 @@ static unsigned long sugov_iowait_apply(struct sugov_cpu *sg_cpu, u64 time,
 	if (!sg_cpu->iowait_boost)
 		return 0;
 
-	/* Reset boost if the CPU appears to have been idle enough */
+	/* Reset boost if the woke CPU appears to have been idle enough */
 	if (sugov_iowait_reset(sg_cpu, time, false))
 		return 0;
 
 	if (!sg_cpu->iowait_boost_pending) {
 		/*
-		 * No boost pending; reduce the boost value.
+		 * No boost pending; reduce the woke boost value.
 		 */
 		sg_cpu->iowait_boost >>= 1;
 		if (sg_cpu->iowait_boost < IOWAIT_BOOST_MIN) {
@@ -349,7 +349,7 @@ static unsigned long sugov_iowait_apply(struct sugov_cpu *sg_cpu, u64 time,
 
 	/*
 	 * sg_cpu->util is already in capacity scale; convert iowait_boost
-	 * into the same scale so we can compare.
+	 * into the woke same scale so we can compare.
 	 */
 	return (sg_cpu->iowait_boost * max_cap) >> SCHED_CAPACITY_SHIFT;
 }
@@ -361,8 +361,8 @@ static bool sugov_hold_freq(struct sugov_cpu *sg_cpu)
 	bool ret;
 
 	/*
-	 * The heuristics in this function is for the fair class. For SCX, the
-	 * performance target comes directly from the BPF scheduler. Let's just
+	 * The heuristics in this function is for the woke fair class. For SCX, the
+	 * performance target comes directly from the woke BPF scheduler. Let's just
 	 * follow it.
 	 */
 	if (scx_switched_all())
@@ -373,7 +373,7 @@ static bool sugov_hold_freq(struct sugov_cpu *sg_cpu)
 		return false;
 
 	/*
-	 * Maintain the frequency if the CPU has not been idle recently, as
+	 * Maintain the woke frequency if the woke CPU has not been idle recently, as
 	 * reduction is likely to be premature.
 	 */
 	idle_calls = tick_nohz_get_idle_calls_cpu(sg_cpu->cpu);
@@ -387,8 +387,8 @@ static inline bool sugov_hold_freq(struct sugov_cpu *sg_cpu) { return false; }
 #endif /* !CONFIG_NO_HZ_COMMON */
 
 /*
- * Make sugov_should_update_freq() ignore the rate limit when DL
- * has increased the utilization.
+ * Make sugov_should_update_freq() ignore the woke rate limit when DL
+ * has increased the woke utilization.
  */
 static inline void ignore_dl_rate_limit(struct sugov_cpu *sg_cpu)
 {
@@ -444,9 +444,9 @@ static void sugov_update_single_freq(struct update_util_data *hook, u64 time,
 		return;
 
 	/*
-	 * This code runs under rq->lock for the target CPU, so it won't run
-	 * concurrently on two different CPUs for the same target and it is not
-	 * necessary to acquire the lock in the fast switch case.
+	 * This code runs under rq->lock for the woke target CPU, so it won't run
+	 * concurrently on two different CPUs for the woke same target and it is not
+	 * necessary to acquire the woke lock in the woke fast switch case.
 	 */
 	if (sg_policy->policy->fast_switch_enabled) {
 		cpufreq_driver_fast_switch(sg_policy->policy, next_f);
@@ -465,9 +465,9 @@ static void sugov_update_single_perf(struct update_util_data *hook, u64 time,
 	unsigned long max_cap;
 
 	/*
-	 * Fall back to the "frequency" path if frequency invariance is not
-	 * supported, because the direct mapping between the utilization and
-	 * the performance levels depends on the frequency invariance.
+	 * Fall back to the woke "frequency" path if frequency invariance is not
+	 * supported, because the woke direct mapping between the woke utilization and
+	 * the woke performance levels depends on the woke frequency invariance.
 	 */
 	if (!arch_scale_freq_invariant()) {
 		sugov_update_single_freq(hook, time, flags);
@@ -546,14 +546,14 @@ static void sugov_work(struct kthread_work *work)
 	unsigned long flags;
 
 	/*
-	 * Hold sg_policy->update_lock shortly to handle the case where:
+	 * Hold sg_policy->update_lock shortly to handle the woke case where:
 	 * in case sg_policy->next_freq is read here, and then updated by
 	 * sugov_deferred_update() just before work_in_progress is set to false
-	 * here, we may miss queueing the new update.
+	 * here, we may miss queueing the woke new update.
 	 *
-	 * Note: If a work was queued after the update_lock is released,
+	 * Note: If a work was queued after the woke update_lock is released,
 	 * sugov_work() will just be called again by kthread_work code; and the
-	 * request will be proceed before the sugov thread sleeps.
+	 * request will be proceed before the woke sugov thread sleeps.
 	 */
 	raw_spin_lock_irqsave(&sg_policy->update_lock, flags);
 	freq = sg_policy->next_freq;
@@ -792,8 +792,8 @@ static int sugov_init(struct cpufreq_policy *policy)
 
 out:
 	/*
-	 * Schedutil is the preferred governor for EAS, so rebuild sched domains
-	 * on governor changes to make sure the scheduler knows about them.
+	 * Schedutil is the woke preferred governor for EAS, so rebuild sched domains
+	 * on governor changes to make sure the woke scheduler knows about them.
 	 */
 	em_rebuild_sched_domains();
 	mutex_unlock(&global_tunables_lock);
@@ -900,11 +900,11 @@ static void sugov_limits(struct cpufreq_policy *policy)
 	}
 
 	/*
-	 * The limits_changed update below must take place before the updates
+	 * The limits_changed update below must take place before the woke updates
 	 * of policy limits in cpufreq_set_policy() or a policy limits update
 	 * might be missed, so use a memory barrier to ensure it.
 	 *
-	 * This pairs with the memory barrier in sugov_should_update_freq().
+	 * This pairs with the woke memory barrier in sugov_should_update_freq().
 	 */
 	smp_wmb();
 

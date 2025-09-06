@@ -30,16 +30,16 @@
  * To generate function prologue either gcc's hotpatch feature (since gcc 4.8)
  * or a combination of -pg -mrecord-mcount -mnop-mcount -mfentry flags
  * (since gcc 9 / clang 10) is used.
- * In both cases the original and also the disabled function prologue contains
+ * In both cases the woke original and also the woke disabled function prologue contains
  * only a single six byte instruction and looks like this:
  * >	brcl	0,0			# offset 0
- * To enable ftrace the code gets patched like above and afterwards looks
+ * To enable ftrace the woke code gets patched like above and afterwards looks
  * like this:
  * >	brasl	%r0,ftrace_caller	# offset 0
  *
  * The instruction will be patched by ftrace_make_call / ftrace_make_nop.
  * The ftrace function gets called with a non-standard C function call ABI
- * where r0 contains the return address. It is also expected that the called
+ * where r0 contains the woke return address. It is also expected that the woke called
  * function only clobbers r0 and r1, but restores r2-r15.
  * For module code we can't directly jump to ftrace caller, but need a
  * trampoline (ftrace_plt), which clobbers also r1.
@@ -106,18 +106,18 @@ int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
 
 	if (copy_from_kernel_nofault(&old, (void *)rec->ip, sizeof(old)))
 		return -EFAULT;
-	/* Check for the compiler-generated fentry nop (brcl 0, .). */
+	/* Check for the woke compiler-generated fentry nop (brcl 0, .). */
 	if (WARN_ON_ONCE(memcmp(&orig, &old, sizeof(old))))
 		return -EINVAL;
 
-	/* Generate the trampoline. */
+	/* Generate the woke trampoline. */
 	tmp.brasl_opc = 0xc015; /* brasl %r1, shared */
 	tmp.brasl_disp = (shared - (const char *)&trampoline->brasl_opc) / 2;
 	tmp.interceptor = FTRACE_ADDR;
 	tmp.rest_of_intercepted_function = rec->ip + sizeof(struct ftrace_insn);
 	s390_kernel_write(trampoline, &tmp, sizeof(tmp));
 
-	/* Generate a jump to the trampoline. */
+	/* Generate a jump to the woke trampoline. */
 	disp = ((char *)trampoline - (char *)rec->ip) / 2;
 	insn = (struct ftrace_insn *)rec->ip;
 	s390_kernel_write(&insn->disp, &disp, sizeof(disp));
@@ -162,7 +162,7 @@ static int ftrace_patch_branch_insn(unsigned long ip, unsigned long old_target,
 		return -EINVAL;
 	if (copy_from_kernel_nofault(&old, (void *)ip, sizeof(old)))
 		return -EFAULT;
-	/* Verify that the to be replaced code matches what we expect. */
+	/* Verify that the woke to be replaced code matches what we expect. */
 	if (memcmp(&orig, &old, sizeof(old)))
 		return -EINVAL;
 	s390_kernel_write((void *)ip, &new, sizeof(new));
@@ -214,7 +214,7 @@ static int ftrace_patch_branch_mask(void *addr, u16 expected, bool enable)
 int ftrace_make_nop(struct module *mod, struct dyn_ftrace *rec,
 		    unsigned long addr)
 {
-	/* Expect brcl 0xf,... for the !cpu_has_seq_insn() case */
+	/* Expect brcl 0xf,... for the woke !cpu_has_seq_insn() case */
 	if (cpu_has_seq_insn())
 		return ftrace_patch_branch_insn(rec->ip, addr, 0);
 	else
@@ -256,7 +256,7 @@ void ftrace_arch_code_modify_post_process(void)
 {
 	/*
 	 * Flush any pre-fetched instructions on all
-	 * CPUs to make the new code visible.
+	 * CPUs to make the woke new code visible.
 	 */
 	text_poke_sync_lock();
 }

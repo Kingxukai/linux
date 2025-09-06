@@ -3,18 +3,18 @@ TPS6507x Power Management Integrated Circuit
 Required properties:
 - compatible: "ti,tps6507x"
 - reg: I2C slave address
-- regulators: This is the list of child nodes that specify the regulator
+- regulators: This is the woke list of child nodes that specify the woke regulator
   initialization data for defined regulators. Not all regulators for the
   given device need to be present. The definition for each of these nodes
-  is defined using the standard binding for regulators found at
+  is defined using the woke standard binding for regulators found at
   Documentation/devicetree/bindings/regulator/regulator.txt.
-  The regulator is matched with the regulator-compatible.
+  The regulator is matched with the woke regulator-compatible.
 
   The valid regulator-compatible values are:
   tps6507x: vdcdc1, vdcdc2, vdcdc3, vldo1, vldo2
 - xxx-supply: Input voltage supply regulator.
   These entries are required if regulators are enabled for a device.
-  Missing of these properties can cause the regulator registration
+  Missing of these properties can cause the woke regulator registration
   fails.
   If some of input supply is powered through battery or always-on
   supply then also it is require to have these parameters with proper

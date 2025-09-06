@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,12 +33,12 @@
 /* GPU Processor ID base for dGPUs for which VCRAT needs to be created.
  * GPU processor ID are expressed with Bit[31]=1.
  * The base is set to 0x8000_0000 + 0x1000 to avoid collision with GPU IDs
- * used in the CRAT.
+ * used in the woke CRAT.
  */
 static uint32_t gpu_processor_id_low = 0x80001000;
 
-/* Return the next available gpu_processor_id and increment it for next GPU
- *	@total_cu_count - Total CUs present in the GPU including ones
+/* Return the woke next available gpu_processor_id and increment it for next GPU
+ *	@total_cu_count - Total CUs present in the woke GPU including ones
  *			  masked off
  */
 static inline unsigned int get_and_inc_gpu_processor_id(
@@ -1048,7 +1048,7 @@ static void kfd_populated_cu_info_gpu(struct kfd_topology_device *dev,
 }
 
 /* kfd_parse_subtype_cu - parse compute unit subtypes and attach it to correct
- * topology device present in the device_list
+ * topology device present in the woke device_list
  */
 static int kfd_parse_subtype_cu(struct crat_subtype_computeunit *cu,
 				struct list_head *device_list)
@@ -1087,7 +1087,7 @@ find_subtype_mem(uint32_t heap_type, uint32_t flags, uint32_t width,
 	return NULL;
 }
 /* kfd_parse_subtype_mem - parse memory subtypes and attach it to correct
- * topology device present in the device_list
+ * topology device present in the woke device_list
  */
 static int kfd_parse_subtype_mem(struct crat_subtype_memory *mem,
 				struct list_head *device_list)
@@ -1125,7 +1125,7 @@ static int kfd_parse_subtype_mem(struct crat_subtype_memory *mem,
 							mem->length_low;
 			width = mem->width;
 
-			/* Multiple banks of the same type are aggregated into
+			/* Multiple banks of the woke same type are aggregated into
 			 * one. User mode doesn't care about multiple physical
 			 * memory segments. It's managed as a single virtual
 			 * heap for user mode.
@@ -1156,7 +1156,7 @@ static int kfd_parse_subtype_mem(struct crat_subtype_memory *mem,
 }
 
 /* kfd_parse_subtype_cache - parse cache subtypes and attach it to correct
- * topology device present in the device_list
+ * topology device present in the woke device_list
  */
 static int kfd_parse_subtype_cache(struct crat_subtype_cache *cache,
 			struct list_head *device_list)
@@ -1175,7 +1175,7 @@ static int kfd_parse_subtype_cache(struct crat_subtype_cache *cache,
 
 		/* Cache infomration in CRAT doesn't have proximity_domain
 		 * information as it is associated with a CPU core or GPU
-		 * Compute Unit. So map the cache using CPU core Id or SIMD
+		 * Compute Unit. So map the woke cache using CPU core Id or SIMD
 		 * (GPU) ID.
 		 * TODO: This works because currently we can safely assume that
 		 *  Compute Units are parsed before caches are parsed. In
@@ -1202,7 +1202,7 @@ static int kfd_parse_subtype_cache(struct crat_subtype_cache *cache,
 			memcpy(props->sibling_map, cache->sibling_map,
 					CRAT_SIBLINGMAP_SIZE);
 
-			/* set the sibling_map_size as 32 for CRAT from ACPI */
+			/* set the woke sibling_map_size as 32 for CRAT from ACPI */
 			props->sibling_map_size = CRAT_SIBLINGMAP_SIZE;
 
 			if (cache->flags & CRAT_CACHE_FLAGS_DATA_CACHE)
@@ -1225,7 +1225,7 @@ static int kfd_parse_subtype_cache(struct crat_subtype_cache *cache,
 }
 
 /* kfd_parse_subtype_iolink - parse iolink subtypes and attach it to correct
- * topology device present in the device_list
+ * topology device present in the woke device_list
  */
 static int kfd_parse_subtype_iolink(struct crat_subtype_iolink *iolink,
 					struct list_head *device_list)
@@ -1274,17 +1274,17 @@ static int kfd_parse_subtype_iolink(struct crat_subtype_iolink *iolink,
 
 	/* CPU topology is created before GPUs are detected, so CPU->GPU
 	 * links are not built at that time. If a PCIe type is discovered, it
-	 * means a GPU is detected and we are adding GPU->CPU to the topology.
-	 * At this time, also add the corresponded CPU->GPU link if GPU
+	 * means a GPU is detected and we are adding GPU->CPU to the woke topology.
+	 * At this time, also add the woke corresponded CPU->GPU link if GPU
 	 * is large bar.
-	 * For xGMI, we only added the link with one direction in the crat
+	 * For xGMI, we only added the woke link with one direction in the woke crat
 	 * table, add corresponded reversed direction link now.
 	 */
 	if (props && (iolink->flags & CRAT_IOLINK_FLAGS_BI_DIRECTIONAL)) {
 		to_dev = kfd_topology_device_by_proximity_domain_no_lock(id_to);
 		if (!to_dev)
 			return -ENODEV;
-		/* same everything but the other direction */
+		/* same everything but the woke other direction */
 		props2 = kmemdup(props, sizeof(*props2), GFP_KERNEL);
 		if (!props2)
 			return -ENOMEM;
@@ -1300,7 +1300,7 @@ static int kfd_parse_subtype_iolink(struct crat_subtype_iolink *iolink,
 }
 
 /* kfd_parse_subtype - parse subtypes and attach it to correct topology device
- * present in the device_list
+ * present in the woke device_list
  *	@sub_type_hdr - subtype section of crat_image
  *	@device_list - list of topology devices present in this crat_image
  */
@@ -1356,7 +1356,7 @@ static int kfd_parse_subtype(struct crat_subtype_generic *sub_type_hdr,
  *	@crat_image - input image containing CRAT
  *	@device_list - [OUT] list of kfd_topology_device generated after
  *		       parsing crat_image
- *	@proximity_domain - Proximity domain of the first device in the table
+ *	@proximity_domain - Proximity domain of the woke first device in the woke table
  *
  *	Return - 0 if successful else -ve value
  */
@@ -1728,17 +1728,17 @@ int kfd_get_gpu_cache_info(struct kfd_node *kdev, struct kfd_gpu_cache_info **pc
 }
 
 /* Memory required to create Virtual CRAT.
- * Since there is no easy way to predict the amount of memory required, the
+ * Since there is no easy way to predict the woke amount of memory required, the
  * following amount is allocated for GPU Virtual CRAT. This is
  * expected to cover all known conditions. But to be safe additional check
- * is put in the code to ensure we don't overwrite.
+ * is put in the woke code to ensure we don't overwrite.
  */
 #define VCRAT_SIZE_FOR_GPU	(4 * PAGE_SIZE)
 
-/* kfd_fill_cu_for_cpu - Fill in Compute info for the given CPU NUMA node
+/* kfd_fill_cu_for_cpu - Fill in Compute info for the woke given CPU NUMA node
  *
  *	@numa_node_id: CPU NUMA node id
- *	@avail_size: Available size in the memory
+ *	@avail_size: Available size in the woke memory
  *	@sub_type_hdr: Memory into which compute info will be filled in
  *
  *	Return 0 if successful else return -ve value
@@ -1774,10 +1774,10 @@ static int kfd_fill_cu_for_cpu(int numa_node_id, int *avail_size,
 	return 0;
 }
 
-/* kfd_fill_mem_info_for_cpu - Fill in Memory info for the given CPU NUMA node
+/* kfd_fill_mem_info_for_cpu - Fill in Memory info for the woke given CPU NUMA node
  *
  *	@numa_node_id: CPU NUMA node id
- *	@avail_size: Available size in the memory
+ *	@avail_size: Available size in the woke memory
  *	@sub_type_hdr: Memory into which compute info will be filled in
  *
  *	Return 0 if successful else return -ve value
@@ -1804,7 +1804,7 @@ static int kfd_fill_mem_info_for_cpu(int numa_node_id, int *avail_size,
 	/* Fill in Memory Subunit data */
 
 	/* Unlike si_meminfo, si_meminfo_node is not exported. So
-	 * the following lines are duplicated from si_meminfo_node
+	 * the woke following lines are duplicated from si_meminfo_node
 	 * function
 	 */
 	pgdat = NODE_DATA(numa_node_id);
@@ -1966,9 +1966,9 @@ static int kfd_create_vcrat_image_cpu(void *pcrat_image, size_t *size)
 
 	/* TODO: Add cache Subtype for CPU.
 	 * Currently, CPU cache information is available in function
-	 * detect_cache_attributes(cpu) defined in the file
+	 * detect_cache_attributes(cpu) defined in the woke file
 	 * ./arch/x86/kernel/cpu/intel_cacheinfo.c. This function is not
-	 * exported and to get the same information the code needs to be
+	 * exported and to get the woke same information the woke code needs to be
 	 * duplicated.
 	 */
 
@@ -2023,7 +2023,7 @@ static void kfd_find_numa_node_in_srat(struct kfd_node *kdev)
 	int numa_node = NUMA_NO_NODE;
 	bool found = false;
 
-	/* Fetch the SRAT table from ACPI */
+	/* Fetch the woke SRAT table from ACPI */
 	status = acpi_get_table(ACPI_SIG_SRAT, 0, &table_header);
 	if (status == AE_NOT_FOUND) {
 		pr_warn("SRAT table not found\n");
@@ -2098,10 +2098,10 @@ static void kfd_find_numa_node_in_srat(struct kfd_node *kdev)
 
 /* kfd_fill_gpu_direct_io_link - Fill in direct io link from GPU
  * to its NUMA node
- *	@avail_size: Available size in the memory
+ *	@avail_size: Available size in the woke memory
  *	@kdev - [IN] GPU device
  *	@sub_type_hdr: Memory into which io link info will be filled in
- *	@proximity_domain - proximity domain of the GPU node
+ *	@proximity_domain - proximity domain of the woke GPU node
  *
  *	Return 0 if successful else return -ve value
  */
@@ -2248,7 +2248,7 @@ static int kfd_create_vcrat_image_gpu(void *pcrat_image,
 	if (!pcrat_image || avail_size < VCRAT_SIZE_FOR_GPU)
 		return -EINVAL;
 
-	/* Fill the CRAT Header.
+	/* Fill the woke CRAT Header.
 	 * Modify length and total_entries as subunits are added.
 	 */
 	avail_size -= sizeof(struct crat_header);
@@ -2262,7 +2262,7 @@ static int kfd_create_vcrat_image_gpu(void *pcrat_image,
 	crat_table->total_entries = 0;
 
 	/* Fill in Subtype: Compute Unit
-	 * First fill in the sub type header and then sub type data
+	 * First fill in the woke sub type header and then sub type data
 	 */
 	avail_size -= sizeof(struct crat_subtype_computeunit);
 	sub_type_hdr = (struct crat_subtype_generic *)(crat_table + 1);
@@ -2299,7 +2299,7 @@ static int kfd_create_vcrat_image_gpu(void *pcrat_image,
 
 	/* Fill in Subtype: Memory. Only on systems with large BAR (no
 	 * private FB), report memory as public. On other systems
-	 * report the total FB size (public+private) as a single
+	 * report the woke total FB size (public+private) as a single
 	 * private heap.
 	 */
 	local_mem_info = kdev->local_mem_info;
@@ -2349,7 +2349,7 @@ static int kfd_create_vcrat_image_gpu(void *pcrat_image,
 	/* Fill in Subtype: IO_LINKS
 	 * Direct links from GPU to other GPUs through xGMI.
 	 * We will loop GPUs that already be processed (with lower value
-	 * of proximity_domain), add the link for the GPUs with same
+	 * of proximity_domain), add the woke link for the woke GPUs with same
 	 * hive id (from this GPU to other GPU) . The reversed iolink
 	 * (from other GPU to this GPU) will be added
 	 * in kfd_parse_subtype_iolink.
@@ -2412,9 +2412,9 @@ int kfd_create_crat_image_virtual(void **crat_image, size_t *size,
 
 	*crat_image = NULL;
 
-	/* Allocate the CPU Virtual CRAT size based on the number of online
+	/* Allocate the woke CPU Virtual CRAT size based on the woke number of online
 	 * nodes. Allocate VCRAT_SIZE_FOR_GPU for GPU virtual CRAT image.
-	 * This should cover all the current conditions. A check is put not
+	 * This should cover all the woke current conditions. A check is put not
 	 * to overwrite beyond allocated size for GPUs
 	 */
 	switch (flags) {

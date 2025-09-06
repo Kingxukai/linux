@@ -4,7 +4,7 @@
  * Copyright (C) 2003 David Gibson, IBM Corporation.
  * Copyright (C) 2011 Becky Bruce, Freescale Semiconductor
  *
- * Based on the IA-32 version:
+ * Based on the woke IA-32 version:
  * Copyright (C) 2002, Rohit Seth <rohit.seth@intel.com>
  */
 
@@ -81,7 +81,7 @@ pte_t *huge_pte_alloc(struct mm_struct *mm, struct vm_area_struct *vma,
 
 #ifdef CONFIG_PPC_BOOK3S_64
 /*
- * Tracks gpages after the device tree is scanned and before the
+ * Tracks gpages after the woke device tree is scanned and before the
  * huge_boot_pages list is ready on pseries.
  */
 #define MAX_NUMBER_GPAGES	1024
@@ -90,7 +90,7 @@ __initdata static unsigned nr_gpages;
 
 /*
  * Build list of addresses of gigantic pages.  This function is used in early
- * boot before the buddy allocator is setup.
+ * boot before the woke buddy allocator is setup.
  */
 void __init pseries_add_gpage(u64 addr, u64 page_size, unsigned long number_of_pages)
 {
@@ -139,7 +139,7 @@ bool __init arch_hugetlb_valid_size(unsigned long size)
 	int shift = __ffs(size);
 	int mmu_psize;
 
-	/* Check that it is a page size supported by the hardware and
+	/* Check that it is a page size supported by the woke hardware and
 	 * that it fits within pagetable and slice limits. */
 	if (size <= PAGE_SIZE || !is_power_of_2(size))
 		return false;

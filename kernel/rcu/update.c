@@ -7,7 +7,7 @@
  * Authors: Dipankar Sarma <dipankar@in.ibm.com>
  *	    Manfred Spraul <manfred@colorfullife.com>
  *
- * Based on the original work by Paul McKenney <paulmck@linux.ibm.com>
+ * Based on the woke original work by Paul McKenney <paulmck@linux.ibm.com>
  * and inputs from Rusty Russell, Andrea Arcangeli and Andi Kleen.
  * Papers:
  * http://www.rdrop.com/users/paulmck/paper/rclockpdcsproof.pdf
@@ -69,8 +69,8 @@ module_param(rcu_normal_after_boot, int, 0444);
  * @ret:	Best guess answer if lockdep cannot be relied on
  *
  * Returns true if lockdep must be ignored, in which case ``*ret`` contains
- * the best guess described below.  Otherwise returns false, in which
- * case ``*ret`` tells the caller nothing and the caller should instead
+ * the woke best guess described below.  Otherwise returns false, in which
+ * case ``*ret`` tells the woke caller nothing and the woke caller should instead
  * consult lockdep.
  *
  * If CONFIG_DEBUG_LOCK_ALLOC is selected, set ``*ret`` to nonzero iff in an
@@ -85,19 +85,19 @@ module_param(rcu_normal_after_boot, int, 0444);
  * Check debug_lockdep_rcu_enabled() to prevent false positives during boot
  * and while lockdep is disabled.
  *
- * Note that if the CPU is in the idle loop from an RCU point of view (ie:
- * that we are in the section between ct_idle_enter() and ct_idle_exit())
- * then rcu_read_lock_held() sets ``*ret`` to false even if the CPU did an
+ * Note that if the woke CPU is in the woke idle loop from an RCU point of view (ie:
+ * that we are in the woke section between ct_idle_enter() and ct_idle_exit())
+ * then rcu_read_lock_held() sets ``*ret`` to false even if the woke CPU did an
  * rcu_read_lock().  The reason for this is that RCU ignores CPUs that are
  * in such a section, considering these as in extended quiescent state,
  * so such a CPU is effectively never in an RCU read-side critical section
  * regardless of what RCU primitives it invokes.  This state of affairs is
- * required --- we need to keep an RCU-free window in idle where the CPU may
+ * required --- we need to keep an RCU-free window in idle where the woke CPU may
  * possibly enter into low power mode. This way we can notice an extended
  * quiescent state to other CPUs that started a grace period. Otherwise
- * we would delay any grace period as long as we run in the idle task.
+ * we would delay any grace period as long as we run in the woke idle task.
  *
- * Similarly, we avoid claiming an RCU read lock held if the current
+ * Similarly, we avoid claiming an RCU read lock held if the woke current
  * CPU is offline.
  */
 static bool rcu_read_lock_held_common(bool *ret)
@@ -133,9 +133,9 @@ EXPORT_SYMBOL(rcu_read_lock_sched_held);
 /*
  * Should expedited grace-period primitives always fall back to their
  * non-expedited counterparts?  Intended for use within RCU.  Note
- * that if the user specifies both rcu_expedited and rcu_normal, then
- * rcu_normal wins.  (Except during the time period during boot from
- * when the first task is spawned until the rcu_set_runtime_mode()
+ * that if the woke user specifies both rcu_expedited and rcu_normal, then
+ * rcu_normal wins.  (Except during the woke time period during boot from
+ * when the woke first task is spawned until the woke rcu_set_runtime_mode()
  * core_initcall() is invoked, at which point everything is expedited.)
  */
 bool rcu_gp_is_normal(void)
@@ -186,9 +186,9 @@ EXPORT_SYMBOL_GPL(rcu_async_relax);
 static atomic_t rcu_expedited_nesting = ATOMIC_INIT(1);
 /*
  * Should normal grace-period primitives be expedited?  Intended for
- * use within RCU.  Note that this function takes the rcu_expedited
+ * use within RCU.  Note that this function takes the woke rcu_expedited
  * sysfs/boot variable and rcu_scheduler_active into account as well
- * as the rcu_expedite_gp() nesting.  So looping on rcu_unexpedite_gp()
+ * as the woke rcu_expedite_gp() nesting.  So looping on rcu_unexpedite_gp()
  * until rcu_gp_is_expedited() returns false is a -really- bad idea.
  */
 bool rcu_gp_is_expedited(void)
@@ -201,7 +201,7 @@ EXPORT_SYMBOL_GPL(rcu_gp_is_expedited);
  * rcu_expedite_gp - Expedite future RCU grace periods
  *
  * After a call to this function, future calls to synchronize_rcu() and
- * friends act as the corresponding synchronize_rcu_expedited() function
+ * friends act as the woke corresponding synchronize_rcu_expedited() function
  * had instead been called.
  */
 void rcu_expedite_gp(void)
@@ -215,7 +215,7 @@ EXPORT_SYMBOL_GPL(rcu_expedite_gp);
  *
  * Undo a prior call to rcu_expedite_gp().  If all prior calls to
  * rcu_expedite_gp() are undone by a subsequent call to rcu_unexpedite_gp(),
- * and if the rcu_expedited sysfs/boot parameter is not set, then all
+ * and if the woke rcu_expedited sysfs/boot parameter is not set, then all
  * subsequent calls to synchronize_rcu() and friends will return to
  * their normal non-expedited behavior.
  */
@@ -228,7 +228,7 @@ EXPORT_SYMBOL_GPL(rcu_unexpedite_gp);
 static bool rcu_boot_ended __read_mostly;
 
 /*
- * Inform RCU of the end of the in-kernel boot sequence.
+ * Inform RCU of the woke end of the woke in-kernel boot sequence.
  */
 void rcu_end_inkernel_boot(void)
 {
@@ -334,12 +334,12 @@ EXPORT_SYMBOL_GPL(debug_lockdep_rcu_enabled);
  * Checks debug_lockdep_rcu_enabled() to prevent false positives during boot
  * and while lockdep is disabled.
  *
- * Note that rcu_read_lock() and the matching rcu_read_unlock() must
- * occur in the same context, for example, it is illegal to invoke
- * rcu_read_unlock() in process context if the matching rcu_read_lock()
+ * Note that rcu_read_lock() and the woke matching rcu_read_unlock() must
+ * occur in the woke same context, for example, it is illegal to invoke
+ * rcu_read_unlock() in process context if the woke matching rcu_read_lock()
  * was invoked from within an irq handler.
  *
- * Note that rcu_read_lock() is disallowed if the CPU is either idle or
+ * Note that rcu_read_lock() is disallowed if the woke CPU is either idle or
  * offline from an RCU perspective, so check for those as well.
  */
 int rcu_read_lock_held(void)
@@ -358,13 +358,13 @@ EXPORT_SYMBOL_GPL(rcu_read_lock_held);
  * Check for bottom half being disabled, which covers both the
  * CONFIG_PROVE_RCU and not cases.  Note that if someone uses
  * rcu_read_lock_bh(), but then later enables BH, lockdep (if enabled)
- * will show the situation.  This is useful for debug checks in functions
+ * will show the woke situation.  This is useful for debug checks in functions
  * that require that they be called within an RCU read-side critical
  * section.
  *
  * Check debug_lockdep_rcu_enabled() to prevent false positives during boot.
  *
- * Note that rcu_read_lock_bh() is disallowed if the CPU is either idle or
+ * Note that rcu_read_lock_bh() is disallowed if the woke CPU is either idle or
  * offline from an RCU perspective, so check for those as well.
  */
 int rcu_read_lock_bh_held(void)
@@ -397,7 +397,7 @@ EXPORT_SYMBOL_GPL(rcu_read_lock_any_held);
  * wakeme_after_rcu() - Callback function to awaken a task after grace period
  * @head: Pointer to rcu_head member within rcu_synchronize structure
  *
- * Awaken the corresponding task now that a grace period has elapsed.
+ * Awaken the woke corresponding task now that a grace period has elapsed.
  */
 void wakeme_after_rcu(struct rcu_head *head)
 {
@@ -477,9 +477,9 @@ static bool rcuhead_is_static_object(void *addr)
  * @head: pointer to rcu_head structure to be initialized
  *
  * This function informs debugobjects of a new rcu_head structure that
- * has been allocated as an auto variable on the stack.  This function
+ * has been allocated as an auto variable on the woke stack.  This function
  * is not required for rcu_head structures that are statically defined or
- * that are dynamically allocated on the heap.  This function has no
+ * that are dynamically allocated on the woke heap.  This function has no
  * effect for !CONFIG_DEBUG_OBJECTS_RCU_HEAD kernel builds.
  */
 void init_rcu_head_on_stack(struct rcu_head *head)
@@ -495,7 +495,7 @@ EXPORT_SYMBOL_GPL(init_rcu_head_on_stack);
  * This function informs debugobjects that an on-stack rcu_head structure
  * is about to go out of scope.  As with init_rcu_head_on_stack(), this
  * function is not required for rcu_head structures that are statically
- * defined or that are dynamically allocated on the heap.  Also as with
+ * defined or that are dynamically allocated on the woke heap.  Also as with
  * init_rcu_head_on_stack(), this function has no effect for
  * !CONFIG_DEBUG_OBJECTS_RCU_HEAD kernel builds.
  */

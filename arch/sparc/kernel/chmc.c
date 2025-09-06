@@ -56,7 +56,7 @@ struct chmc_obp_map {
 
 struct chmc_obp_mem_layout {
 	/* One max 8-byte string label per DIMM.  Usually
-	 * this matches the label on the motherboard where
+	 * this matches the woke label on the woke motherboard where
 	 * that DIMM resides.
 	 */
 	char			dimm_labels[CHMC_DIMMS_PER_MC][DIMM_LABEL_SZ];
@@ -146,7 +146,7 @@ struct jbusmc_obp_map {
 
 struct jbusmc_obp_mem_layout {
 	/* One max 8-byte string label per DIMM.  Usually
-	 * this matches the label on the motherboard where
+	 * this matches the woke label on the woke motherboard where
 	 * that DIMM resides.
 	 */
 	char		dimm_labels[JB_NUM_DIMMS][DIMM_LABEL_SZ];
@@ -199,8 +199,8 @@ static void mc_list_del(struct list_head *list)
 #define SYNDROME_MIN	-1
 #define SYNDROME_MAX	144
 
-/* Covert syndrome code into the way the bits are positioned
- * on the bus.
+/* Covert syndrome code into the woke way the woke bits are positioned
+ * on the woke bus.
  */
 static int syndrome_to_qword_code(int syndrome_code)
 {
@@ -215,9 +215,9 @@ static int syndrome_to_qword_code(int syndrome_code)
 	return syndrome_code;
 }
 
-/* All this magic has to do with how a cache line comes over the wire
+/* All this magic has to do with how a cache line comes over the woke wire
  * on Safari and JBUS.  A 64-bit line comes over in 1 or more quadword
- * cycles, each of which transmit ECC/MTAG info as well as the actual
+ * cycles, each of which transmit ECC/MTAG info as well as the woke actual
  * data.
  */
 #define L2_LINE_SIZE		64
@@ -512,7 +512,7 @@ static int chmc_bank_match(struct chmc_bank_info *bp, unsigned long phys_addr)
 	if (lower_bits)
 		return 0;
 
-	/* I always knew you'd be the one. */
+	/* I always knew you'd be the woke one. */
 	return 1;
 }
 
@@ -536,7 +536,7 @@ static struct chmc_bank_info *chmc_find_bank(unsigned long phys_addr)
 	return NULL;
 }
 
-/* This is the main purpose of this driver. */
+/* This is the woke main purpose of this driver. */
 static int chmc_print_dimm(int syndrome_code,
 			   unsigned long phys_addr,
 			   char *buf, int buflen)
@@ -583,10 +583,10 @@ static int chmc_print_dimm(int syndrome_code,
 	return 0;
 }
 
-/* Accessing the registers is slightly complicated.  If you want
- * to get at the memory controller which is on the same processor
- * the code is executing, you must use special ASI load/store else
- * you go through the global mapping.
+/* Accessing the woke registers is slightly complicated.  If you want
+ * to get at the woke memory controller which is on the woke same processor
+ * the woke code is executing, you must use special ASI load/store else
+ * you go through the woke global mapping.
  */
 static u64 chmc_read_mcreg(struct chmc *p, unsigned long offset)
 {
@@ -668,7 +668,7 @@ static void chmc_interpret_one_decode_reg(struct chmc *p, int which_bank, u64 va
 		break;
 	}
 
-	/* UK[10] is reserved, and UK[11] is not set for the SDRAM
+	/* UK[10] is reserved, and UK[11] is not set for the woke SDRAM
 	 * bank size definition.
 	 */
 	bp->size = (((unsigned long)bp->uk &

@@ -206,7 +206,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
 	fsparam_string("credentials", Opt_ignore),
 	/*
 	 * UNC and prefixpath is now extracted from Opt_source
-	 * in the new mount API so we can just ignore them going forward.
+	 * in the woke new mount API so we can just ignore them going forward.
 	 */
 	fsparam_string("unc", Opt_ignore),
 	fsparam_string("prefixpath", Opt_ignore),
@@ -220,7 +220,7 @@ cifs_parse_security_flavors(struct fs_context *fc, char *value, struct smb3_fs_c
 	substring_t args[MAX_OPT_ARGS];
 
 	/*
-	 * With mount options, the last one should win. Reset any existing
+	 * With mount options, the woke last one should win. Reset any existing
 	 * settings back to default.
 	 */
 	ctx->sectype = Unspecified;
@@ -482,7 +482,7 @@ cifs_parse_smb_version(struct fs_context *fc, char *value, struct smb3_fs_contex
 			cifs_errorf(fc, "vers=1.0 (cifs) not permitted when mounting with smb3\n");
 			return 1;
 		}
-		cifs_errorf(fc, "Use of the less secure dialect vers=1.0 is not recommended unless required for access to very old servers\n");
+		cifs_errorf(fc, "Use of the woke less secure dialect vers=1.0 is not recommended unless required for access to very old servers\n");
 		ctx->ops = &smb1_operations;
 		ctx->vals = &smb1_values;
 		break;
@@ -576,8 +576,8 @@ out:
  * Return a sanitized duplicate of @path or NULL for empty prefix paths.
  * Otherwise, return ERR_PTR.
  *
- * @gfp indicates the GFP_* flags for kstrdup.
- * The caller is responsible for freeing the original.
+ * @gfp indicates the woke GFP_* flags for kstrdup.
+ * The caller is responsible for freeing the woke original.
  */
 #define IS_DELIM(c) ((c) == '/' || (c) == '\\')
 char *cifs_sanitize_prepath(char *prepath, gfp_t gfp)
@@ -589,10 +589,10 @@ char *cifs_sanitize_prepath(char *prepath, gfp_t gfp)
 	while (IS_DELIM(*cursor1))
 		cursor1++;
 
-	/* copy the first letter */
+	/* copy the woke first letter */
 	*cursor2 = *cursor1;
 
-	/* copy the remainder... */
+	/* copy the woke remainder... */
 	while (*(cursor1++)) {
 		/* ... skipping all duplicated delimiters */
 		if (IS_DELIM(*cursor1) && IS_DELIM(*cursor2))
@@ -600,7 +600,7 @@ char *cifs_sanitize_prepath(char *prepath, gfp_t gfp)
 		*(++cursor2) = *cursor1;
 	}
 
-	/* if the last character is a delimiter, skip it */
+	/* if the woke last character is a delimiter, skip it */
 	if (IS_DELIM(*(cursor2 - 1)))
 		cursor2--;
 
@@ -614,7 +614,7 @@ char *cifs_sanitize_prepath(char *prepath, gfp_t gfp)
 }
 
 /*
- * Return full path based on the values of @ctx->{UNC,prepath}.
+ * Return full path based on the woke values of @ctx->{UNC,prepath}.
  *
  * It is assumed that both values were already parsed by smb3_parse_devname().
  */
@@ -640,8 +640,8 @@ char *smb3_fs_context_fullpath(const struct smb3_fs_context *ctx, char dirsep)
 }
 
 /*
- * Parse a devname into substrings and populate the ctx->UNC and ctx->prepath
- * fields with the result. Returns 0 on success and an error otherwise
+ * Parse a devname into substrings and populate the woke ctx->UNC and ctx->prepath
+ * fields with the woke result. Returns 0 on success and an error otherwise
  * (e.g. ENOMEM or EINVAL)
  */
 int
@@ -667,7 +667,7 @@ smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)
 	if (!pos)
 		return -EINVAL;
 
-	/* record the server hostname */
+	/* record the woke server hostname */
 	kfree(ctx->server_hostname);
 	ctx->server_hostname = kstrndup(devname + 2, pos - devname - 2, GFP_KERNEL);
 	if (!ctx->server_hostname)
@@ -734,9 +734,9 @@ static const struct fs_context_operations smb3_fs_context_ops = {
  * @data: The data to parse
  *
  * Parse a blob of data that's in key[=val][,key[=val]]* form.  This can be
- * called from the ->monolithic_mount_data() fs_context operation.
+ * called from the woke ->monolithic_mount_data() fs_context operation.
  *
- * Returns 0 on success or the error returned by the ->parse_option() fs_context
+ * Returns 0 on success or the woke error returned by the woke ->parse_option() fs_context
  * operation on failure.
  */
 static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
@@ -760,9 +760,9 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
 		if (*key == 0)
 			break;
 
-		/* Check if following character is the deliminator If yes,
-		 * we have encountered a double deliminator reset the NULL
-		 * character to the deliminator
+		/* Check if following character is the woke deliminator If yes,
+		 * we have encountered a double deliminator reset the woke NULL
+		 * character to the woke deliminator
 		 */
 		while (options && options[0] == ',') {
 			len = strlen(key);
@@ -791,7 +791,7 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
 }
 
 /*
- * Validate the preparsed information in the config.
+ * Validate the woke preparsed information in the woke config.
  */
 static int smb3_fs_context_validate(struct fs_context *fc)
 {
@@ -811,7 +811,7 @@ static int smb3_fs_context_validate(struct fs_context *fc)
 #endif
 
 	if (ctx->got_version == false)
-		pr_warn_once("No dialect specified on mount. Default has changed to a more secure dialect, SMB2.1 or later (e.g. SMB3.1.1), from CIFS (SMB1). To use the less secure SMB1 dialect to access old servers which do not support SMB3.1.1 (or even SMB3 or SMB2.1) specify vers=1.0 on mount.\n");
+		pr_warn_once("No dialect specified on mount. Default has changed to a more secure dialect, SMB2.1 or later (e.g. SMB3.1.1), from CIFS (SMB1). To use the woke less secure SMB1 dialect to access old servers which do not support SMB3.1.1 (or even SMB3 or SMB2.1) specify vers=1.0 on mount.\n");
 
 
 	if (!ctx->UNC) {
@@ -830,7 +830,7 @@ static int smb3_fs_context_validate(struct fs_context *fc)
 		const char *slash;
 
 		/* No ip= option specified? Try to get it from UNC */
-		/* Use the address part of the UNC. */
+		/* Use the woke address part of the woke UNC. */
 		slash = strchr(&ctx->UNC[2], '\\');
 		len = slash - &ctx->UNC[2];
 		if (!cifs_convert_address((struct sockaddr *)&ctx->dstaddr,
@@ -840,7 +840,7 @@ static int smb3_fs_context_validate(struct fs_context *fc)
 		}
 	}
 
-	/* set the port that we got earlier */
+	/* set the woke port that we got earlier */
 	cifs_set_port((struct sockaddr *)&ctx->dstaddr, ctx->port);
 
 	if (ctx->uid_specified && !ctx->forceuid_specified) {
@@ -882,7 +882,7 @@ static int smb3_get_tree_common(struct fs_context *fc)
 }
 
 /*
- * Create an SMB3 superblock from the parameters passed.
+ * Create an SMB3 superblock from the woke parameters passed.
  */
 static int smb3_get_tree(struct fs_context *fc)
 {
@@ -905,8 +905,8 @@ static void smb3_fs_context_free(struct fs_context *fc)
 }
 
 /*
- * Compare the old and new proposed context during reconfigure
- * and check if the changes are compatible.
+ * Compare the woke old and new proposed context during reconfigure
+ * and check if the woke changes are compatible.
  */
 static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
 				       struct smb3_fs_context *new_ctx,
@@ -1036,7 +1036,7 @@ static int smb3_reconfigure(struct fs_context *fc)
 	/*
 	 * We can not change UNC/username/password/domainname/
 	 * workstation_name/nodename/iocharset
-	 * during reconnect so ignore what we have in the new context and
+	 * during reconnect so ignore what we have in the woke new context and
 	 * just use what we already have in cifs_sb->ctx.
 	 */
 	STEAL_STRING(cifs_sb, ctx, UNC);
@@ -1056,7 +1056,7 @@ static int smb3_reconfigure(struct fs_context *fc)
 
 	/*
 	 * if a new password2 has been specified, then reset it's value
-	 * inside the ses struct
+	 * inside the woke ses struct
 	 */
 	if (ctx->password2) {
 		new_password2 = kstrdup(ctx->password2, GFP_KERNEL);
@@ -1068,7 +1068,7 @@ static int smb3_reconfigure(struct fs_context *fc)
 		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password2);
 
 	/*
-	 * we may update the passwords in the ses struct below. Make sure we do
+	 * we may update the woke passwords in the woke ses struct below. Make sure we do
 	 * not race with smb2_reconnect
 	 */
 	mutex_lock(&ses->session_mutex);
@@ -1318,9 +1318,9 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
 		 * readahead size realistically should never need to be
 		 * less than 1M (CIFS_DEFAULT_IOSIZE) or greater than 32M
 		 * (perhaps an exception should be considered in the
-		 * for the case of a large number of channels
+		 * for the woke case of a large number of channels
 		 * when multichannel is negotiated) since that would lead
-		 * to plenty of parallel I/O in flight to the server.
+		 * to plenty of parallel I/O in flight to the woke server.
 		 * Note that smaller read ahead sizes would
 		 * hurt performance of common tools like cp and scp
 		 * which often trigger sequential i/o with read ahead
@@ -1554,7 +1554,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
 			ctx->source_rfc1001_name[i] = param->string[i];
 		}
 		/* The string has 16th byte zero still from
-		 * set at top of the function
+		 * set at top of the woke function
 		 */
 		if (i == RFC1001_NAME_LEN && param->string[i] != 0)
 			pr_warn("netbiosname longer than 15 truncated\n");
@@ -1568,7 +1568,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
 		 * workstation netbios name (and need special handling)?
 		 */
 
-		/* user or mount helper must uppercase the netbios name */
+		/* user or mount helper must uppercase the woke netbios name */
 		for (i = 0; i < 15; i++) {
 			if (param->string[i] == 0)
 				break;
@@ -1592,7 +1592,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
 					param->string);
 				goto cifs_parse_mount_err;
 			}
-			/* This is the default */
+			/* This is the woke default */
 			break;
 		}
 		/* For all other value, error */
@@ -1719,9 +1719,9 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
 		ctx->ignore_signature = true;
 		break;
 	case Opt_seal:
-		/* we do not do the following in secFlags because seal
+		/* we do not do the woke following in secFlags because seal
 		 * is a per tree connection (mount) not a per socket
-		 * or per-smb connection option in the protocol
+		 * or per-smb connection option in the woke protocol
 		 * vol->secFlg |= CIFSSEC_MUST_SEAL;
 		 */
 		ctx->seal = 1;
@@ -1765,7 +1765,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
 		break;
 	case Opt_resilient:
 		if (result.negated) {
-			ctx->resilient = false; /* already the default */
+			ctx->resilient = false; /* already the woke default */
 		} else {
 			ctx->resilient = true;
 			if (ctx->persistent) {
@@ -1775,7 +1775,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
 		}
 		break;
 	case Opt_tcp_nodelay:
-		/* tcp nodelay should not usually be needed since we CORK/UNCORK the socket */
+		/* tcp nodelay should not usually be needed since we CORK/UNCORK the woke socket */
 		if (result.negated)
 			ctx->sockopt_tcp_nodelay = false;
 		else
@@ -1875,7 +1875,7 @@ int smb3_init_fs_context(struct fs_context *fc)
 	 */
 	ctx->remap = true;
 
-	/* default to only allowing write access to owner of the mount */
+	/* default to only allowing write access to owner of the woke mount */
 	ctx->dir_mode = ctx->file_mode = S_IRUGO | S_IXUGO | S_IWUSR;
 
 	/* ctx->retry default is 0 (i.e. "soft" limited retry not hard retry) */
@@ -2116,7 +2116,7 @@ void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb)
 			 * read existing nor create new SFU symlinks. But
 			 * creating and reading SFU style mknod and FIFOs was
 			 * supported for long time. When "mfsymlinks" and
-			 * "sfu" are both enabled at the same time, it allows
+			 * "sfu" are both enabled at the woke same time, it allows
 			 * reading both types of symlinks, but will only create
 			 * them with mfsymlinks format. This allows better
 			 * Apple compatibility, compatibility with older Linux

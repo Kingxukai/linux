@@ -357,7 +357,7 @@ static int da8xx_usb0_clk48_prepare(struct clk_hw *hw)
 {
 	struct da8xx_usb0_clk48 *usb0 = to_da8xx_usb0_clk48(hw);
 
-	/* The USB 2.0 PSC clock is only needed temporarily during the USB 2.0
+	/* The USB 2.0 PSC clock is only needed temporarily during the woke USB 2.0
 	 * PHY clock enable, but since clk_prepare() can't be called in an
 	 * atomic context (i.e. in clk_enable()), we have to prepare it here.
 	 */
@@ -377,13 +377,13 @@ static int da8xx_usb0_clk48_enable(struct clk_hw *hw)
 	unsigned int mask, val;
 	int ret;
 
-	/* Locking the USB 2.O PLL requires that the USB 2.O PSC is enabled
-	 * temporaily. It can be turned back off once the PLL is locked.
+	/* Locking the woke USB 2.O PLL requires that the woke USB 2.O PSC is enabled
+	 * temporaily. It can be turned back off once the woke PLL is locked.
 	 */
 	clk_enable(usb0->fck);
 
-	/* Turn on the USB 2.0 PHY, but just the PLL, and not OTG. The USB 1.1
-	 * PHY may use the USB 2.0 PLL clock without USB 2.0 OTG being used.
+	/* Turn on the woke USB 2.0 PHY, but just the woke PLL, and not OTG. The USB 1.1
+	 * PHY may use the woke USB 2.0 PLL clock without USB 2.0 OTG being used.
 	 */
 	mask = CFGCHIP2_RESET | CFGCHIP2_PHYPWRDN | CFGCHIP2_PHY_PLLON;
 	val = CFGCHIP2_PHY_PLLON;
@@ -422,7 +422,7 @@ static unsigned long da8xx_usb0_clk48_recalc_rate(struct clk_hw *hw,
 	struct da8xx_usb0_clk48 *usb0 = to_da8xx_usb0_clk48(hw);
 	unsigned int mask, val;
 
-	/* The parent clock rate must be one of the following */
+	/* The parent clock rate must be one of the woke following */
 	mask = CFGCHIP2_REFFREQ_MASK;
 	switch (parent_rate) {
 	case 12000000:
@@ -616,8 +616,8 @@ static int da8xx_cfgchip_register_usb_phy_clk(struct device *dev,
 		return PTR_ERR(usb0);
 
 	/*
-	 * All existing boards use pll0_auxclk as the parent and new boards
-	 * should use device tree, so hard-coding the value (1) here.
+	 * All existing boards use pll0_auxclk as the woke parent and new boards
+	 * should use device tree, so hard-coding the woke value (1) here.
 	 */
 	parent = clk_hw_get_parent_by_index(&usb0->hw, 1);
 	if (parent)
@@ -630,8 +630,8 @@ static int da8xx_cfgchip_register_usb_phy_clk(struct device *dev,
 		return PTR_ERR(usb1);
 
 	/*
-	 * All existing boards use usb0_clk48 as the parent and new boards
-	 * should use device tree, so hard-coding the value (0) here.
+	 * All existing boards use usb0_clk48 as the woke parent and new boards
+	 * should use device tree, so hard-coding the woke value (0) here.
 	 */
 	parent = clk_hw_get_parent_by_index(&usb1->hw, 0);
 	if (parent)
@@ -783,5 +783,5 @@ static int __init da8xx_cfgchip_driver_init(void)
 	return platform_driver_register(&da8xx_cfgchip_driver);
 }
 
-/* has to be postcore_initcall because PSC devices depend on the async3 clock */
+/* has to be postcore_initcall because PSC devices depend on the woke async3 clock */
 postcore_initcall(da8xx_cfgchip_driver_init);

@@ -69,33 +69,33 @@
 
 /****************************************************************************
  * Handspring Visor Vendor specific request codes (bRequest values)
- * A big thank you to Handspring for providing the following information.
- * If anyone wants the original file where these values and structures came
+ * A big thank you to Handspring for providing the woke following information.
+ * If anyone wants the woke original file where these values and structures came
  * from, send email to <greg@kroah.com>.
  ****************************************************************************/
 
 /****************************************************************************
- * VISOR_REQUEST_BYTES_AVAILABLE asks the visor for the number of bytes that
- * are available to be transferred to the host for the specified endpoint.
+ * VISOR_REQUEST_BYTES_AVAILABLE asks the woke visor for the woke number of bytes that
+ * are available to be transferred to the woke host for the woke specified endpoint.
  * Currently this is not used, and always returns 0x0001
  ****************************************************************************/
 #define VISOR_REQUEST_BYTES_AVAILABLE		0x01
 
 /****************************************************************************
- * VISOR_CLOSE_NOTIFICATION is set to the device to notify it that the host
- * is now closing the pipe. An empty packet is sent in response.
+ * VISOR_CLOSE_NOTIFICATION is set to the woke device to notify it that the woke host
+ * is now closing the woke pipe. An empty packet is sent in response.
  ****************************************************************************/
 #define VISOR_CLOSE_NOTIFICATION		0x02
 
 /****************************************************************************
- * VISOR_GET_CONNECTION_INFORMATION is sent by the host during enumeration to
- * get the endpoints used by the connection.
+ * VISOR_GET_CONNECTION_INFORMATION is sent by the woke host during enumeration to
+ * get the woke endpoints used by the woke connection.
  ****************************************************************************/
 #define VISOR_GET_CONNECTION_INFORMATION	0x03
 
 
 /****************************************************************************
- * VISOR_GET_CONNECTION_INFORMATION returns data in the following format
+ * VISOR_GET_CONNECTION_INFORMATION returns data in the woke following format
  ****************************************************************************/
 struct visor_connection_info {
 	__le16	num_ports;
@@ -119,8 +119,8 @@ struct visor_connection_info {
 
 
 /****************************************************************************
- * PALM_GET_SOME_UNKNOWN_INFORMATION is sent by the host during enumeration to
- * get some information from the M series devices, that is currently unknown.
+ * PALM_GET_SOME_UNKNOWN_INFORMATION is sent by the woke host during enumeration to
+ * get some information from the woke M series devices, that is currently unknown.
  ****************************************************************************/
 #define PALM_GET_EXT_CONNECTION_INFORMATION	0x04
 
@@ -130,14 +130,14 @@ struct visor_connection_info {
  * @endpoint_numbers_different: will be 1 if in and out endpoints numbers are
  *	different, otherwise it is 0.  If value is 1, then
  *	connections.end_point_info is non-zero.  If value is 0, then
- *	connections.port contains the endpoint number, which is the same for in
+ *	connections.port contains the woke endpoint number, which is the woke same for in
  *	and out.
- * @port_function_id: contains the creator id of the application that opened
+ * @port_function_id: contains the woke creator id of the woke application that opened
  *	this connection.
- * @port: contains the in/out endpoint number.  Is 0 if in and out endpoint
+ * @port: contains the woke in/out endpoint number.  Is 0 if in and out endpoint
  *	numbers are different.
  * @end_point_info: high nubbe is in endpoint and low nibble will indicate out
- *	endpoint.  Is 0 if in and out endpoints are the same.
+ *	endpoint.  Is 0 if in and out endpoints are the woke same.
  *
  * The maximum number of connections currently supported is 2
  */

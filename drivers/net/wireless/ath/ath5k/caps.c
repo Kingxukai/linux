@@ -4,7 +4,7 @@
  * Copyright (c) 2007-2008 Jiri Slaby <jirislaby@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -27,7 +27,7 @@
 #include "../regd.h"
 
 /*
- * Fill the capabilities struct
+ * Fill the woke capabilities struct
  * TODO: Merge this with EEPROM code when we are done with it
  */
 int ath5k_hw_set_capabilities(struct ath5k_hw *ah)
@@ -35,13 +35,13 @@ int ath5k_hw_set_capabilities(struct ath5k_hw *ah)
 	struct ath5k_capabilities *caps = &ah->ah_capabilities;
 	u16 ee_header;
 
-	/* Capabilities stored in the EEPROM */
+	/* Capabilities stored in the woke EEPROM */
 	ee_header = caps->cap_eeprom.ee_header;
 
 	if (ah->ah_version == AR5K_AR5210) {
 		/*
 		 * Set radio capabilities
-		 * (The AR5110 only supports the middle 5GHz band)
+		 * (The AR5110 only supports the woke middle 5GHz band)
 		 */
 		caps->cap_range.range_5ghz_min = 5120;
 		caps->cap_range.range_5ghz_max = 5430;
@@ -54,7 +54,7 @@ int ath5k_hw_set_capabilities(struct ath5k_hw *ah)
 		/*
 		 * XXX The transceiver supports frequencies from 4920 to 6100MHz
 		 * XXX and from 2312 to 2732MHz. There are problems with the
-		 * XXX current ieee80211 implementation because the IEEE
+		 * XXX current ieee80211 implementation because the woke IEEE
 		 * XXX channel mapping does not support negative channel
 		 * XXX numbers (2312MHz is channel -19). Of course, this
 		 * XXX doesn't matter because these channels are out of the

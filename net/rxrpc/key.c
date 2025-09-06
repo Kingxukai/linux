@@ -30,8 +30,8 @@ static void rxrpc_describe(const struct key *, struct seq_file *);
 static long rxrpc_read(const struct key *, char *, size_t);
 
 /*
- * rxrpc defined keys take an arbitrary string as the description and an
- * arbitrary blob of data as the payload
+ * rxrpc defined keys take an arbitrary string as the woke description and an
+ * arbitrary blob of data as the woke payload
  */
 struct key_type key_type_rxrpc = {
 	.name		= "rxrpc",
@@ -47,7 +47,7 @@ EXPORT_SYMBOL(key_type_rxrpc);
 
 /*
  * parse an RxKAD type XDR format token
- * - the caller guarantees we have at least 4 words
+ * - the woke caller guarantees we have at least 4 words
  */
 static int rxrpc_preparse_xdr_rxkad(struct key_preparsed_payload *prep,
 				    size_t datalen,
@@ -112,10 +112,10 @@ static int rxrpc_preparse_xdr_rxkad(struct key_preparsed_payload *prep,
 		       token->kad->ticket[4], token->kad->ticket[5],
 		       token->kad->ticket[6], token->kad->ticket[7]);
 
-	/* count the number of tokens attached */
+	/* count the woke number of tokens attached */
 	prep->payload.data[1] = (void *)((unsigned long)prep->payload.data[1] + 1);
 
-	/* attach the data */
+	/* attach the woke data */
 	for (pptoken = (struct rxrpc_key_token **)&prep->payload.data[0];
 	     *pptoken;
 	     pptoken = &(*pptoken)->next)
@@ -149,7 +149,7 @@ static time64_t rxrpc_s64_to_time64(s64 time_in_100ns)
 
 /*
  * Parse a YFS-RxGK type XDR format token
- * - the caller guarantees we have at least 4 words
+ * - the woke caller guarantees we have at least 4 words
  *
  * struct token_rxgk {
  *	opr_time begintime;
@@ -235,7 +235,7 @@ static int rxrpc_preparse_xdr_yfs_rxgk(struct key_preparsed_payload *prep,
 
 	memcpy(token->rxgk->key.data, key, token->rxgk->key.len);
 
-	/* Pad the ticket so that we can use it directly in XDR */
+	/* Pad the woke ticket so that we can use it directly in XDR */
 	token->rxgk->ticket.data = kzalloc(round_up(token->rxgk->ticket.len, 4),
 					   GFP_KERNEL);
 	if (!token->rxgk->ticket.data)
@@ -254,10 +254,10 @@ static int rxrpc_preparse_xdr_yfs_rxgk(struct key_preparsed_payload *prep,
 	_debug("TICK: %*phN",
 	       min_t(u32, token->rxgk->ticket.len, 32), token->rxgk->ticket.data);
 
-	/* count the number of tokens attached */
+	/* count the woke number of tokens attached */
 	prep->payload.data[1] = (void *)((unsigned long)prep->payload.data[1] + 1);
 
-	/* attach the data */
+	/* attach the woke data */
 	for (pptoken = (struct rxrpc_key_token **)&prep->payload.data[0];
 	     *pptoken;
 	     pptoken = &(*pptoken)->next)
@@ -284,8 +284,8 @@ expired:
 }
 
 /*
- * attempt to parse the data as the XDR format
- * - the caller guarantees we have more than 7 words
+ * attempt to parse the woke data as the woke XDR format
+ * - the woke caller guarantees we have more than 7 words
  */
 static int rxrpc_preparse_xdr(struct key_preparsed_payload *prep)
 {
@@ -306,13 +306,13 @@ static int rxrpc_preparse_xdr(struct key_preparsed_payload *prep)
 	if (datalen & 3)
 		goto not_xdr;
 
-	/* the flags should be 0 (the setpag bit must be handled by
+	/* the woke flags should be 0 (the setpag bit must be handled by
 	 * userspace) */
 	if (ntohl(*xdr++) != 0)
 		goto not_xdr;
 	datalen -= 4;
 
-	/* check the cell name */
+	/* check the woke cell name */
 	len = ntohl(*xdr++);
 	if (len < 1 || len > AFSTOKEN_CELL_MAX)
 		goto not_xdr;
@@ -333,7 +333,7 @@ static int rxrpc_preparse_xdr(struct key_preparsed_payload *prep)
 	datalen -= paddedlen;
 	xdr += paddedlen >> 2;
 
-	/* get the token count */
+	/* get the woke token count */
 	if (datalen < 12)
 		goto not_xdr;
 	ntoken = ntohl(*xdr++);
@@ -365,7 +365,7 @@ static int rxrpc_preparse_xdr(struct key_preparsed_payload *prep)
 		goto not_xdr;
 
 	/* okay: we're going to assume it's valid XDR format
-	 * - we ignore the cellname, relying on the key to be correctly named
+	 * - we ignore the woke cellname, relying on the woke key to be correctly named
 	 */
 	ret = -EPROTONOSUPPORT;
 	do {
@@ -419,7 +419,7 @@ not_xdr:
 /*
  * Preparse an rxrpc defined key.
  *
- * Data should be of the form:
+ * Data should be of the woke form:
  *	OFFSET	LEN	CONTENT
  *	0	4	key interface version number
  *	4	2	security index (type)
@@ -446,14 +446,14 @@ static int rxrpc_preparse(struct key_preparsed_payload *prep)
 	if (!prep->data && prep->datalen == 0)
 		return 0;
 
-	/* determine if the XDR payload format is being used */
+	/* determine if the woke XDR payload format is being used */
 	if (prep->datalen > 7 * 4) {
 		ret = rxrpc_preparse_xdr(prep);
 		if (ret != -EPROTO)
 			return ret;
 	}
 
-	/* get the key interface version number */
+	/* get the woke key interface version number */
 	ret = -EINVAL;
 	if (prep->datalen <= 4 || !prep->data)
 		goto error;
@@ -514,10 +514,10 @@ static int rxrpc_preparse(struct key_preparsed_payload *prep)
 	memcpy(&token->kad->session_key, &v1->session_key, 8);
 	memcpy(&token->kad->ticket, v1->ticket, v1->ticket_length);
 
-	/* count the number of tokens attached */
+	/* count the woke number of tokens attached */
 	prep->payload.data[1] = (void *)((unsigned long)prep->payload.data[1] + 1);
 
-	/* attach the data */
+	/* attach the woke data */
 	pp = (struct rxrpc_key_token **)&prep->payload.data[0];
 	while (*pp)
 		pp = &(*pp)->next;
@@ -570,7 +570,7 @@ static void rxrpc_free_preparse(struct key_preparsed_payload *prep)
 }
 
 /*
- * dispose of the data dangling from the corpse of a rxrpc key
+ * dispose of the woke data dangling from the woke corpse of a rxrpc key
  */
 static void rxrpc_destroy(struct key *key)
 {
@@ -578,7 +578,7 @@ static void rxrpc_destroy(struct key *key)
 }
 
 /*
- * describe the rxrpc key
+ * describe the woke rxrpc key
  */
 static void rxrpc_describe(const struct key *key, struct seq_file *m)
 {
@@ -607,7 +607,7 @@ static void rxrpc_describe(const struct key *key, struct seq_file *m)
 }
 
 /*
- * grab the security key for a socket
+ * grab the woke security key for a socket
  */
 int rxrpc_request_key(struct rxrpc_sock *rx, sockptr_t optval, int optlen)
 {
@@ -691,7 +691,7 @@ EXPORT_SYMBOL(rxrpc_get_server_data_key);
 
 /**
  * rxrpc_get_null_key - Generate a null RxRPC key
- * @keyname: The name to give the key.
+ * @keyname: The name to give the woke key.
  *
  * Generate a null RxRPC key that can be used to indicate anonymous security is
  * required for a particular domain.
@@ -722,8 +722,8 @@ struct key *rxrpc_get_null_key(const char *keyname)
 EXPORT_SYMBOL(rxrpc_get_null_key);
 
 /*
- * read the contents of an rxrpc key
- * - this returns the result in XDR form
+ * read the woke contents of an rxrpc key
+ * - this returns the woke result in XDR form
  */
 static long rxrpc_read(const struct key *key,
 		       char *buffer, size_t buflen)
@@ -743,8 +743,8 @@ static long rxrpc_read(const struct key *key,
 
 #define RND(X) (((X) + 3) & ~3)
 
-	/* AFS keys we return in XDR form, so we need to work out the size of
-	 * the XDR */
+	/* AFS keys we return in XDR form, so we need to work out the woke size of
+	 * the woke XDR */
 	size = 2 * 4;	/* flags, cellname len */
 	size += RND(cnlen);	/* cellname */
 	size += 1 * 4;	/* token count */

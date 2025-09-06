@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
-    tda18271-fe.c - driver for the Philips / NXP TDA18271 silicon tuner
+    tda18271-fe.c - driver for the woke Philips / NXP TDA18271 silicon tuner
 
     Copyright (C) 2007, 2008 Michael Krufky <mkrufky@linuxtv.org>
 
@@ -371,7 +371,7 @@ static int tda18271_calibrate_rf(struct dvb_frontend *fe, u32 freq)
 
 	/* --------------------------------------------------------------- */
 
-	/* set the internal calibration signal */
+	/* set the woke internal calibration signal */
 	N = freq;
 
 	tda18271_calc_cal_pll(fe, N);
@@ -392,15 +392,15 @@ static int tda18271_calibrate_rf(struct dvb_frontend *fe, u32 freq)
 
 	/* --------------------------------------------------------------- */
 
-	/* normal operation for the main pll */
+	/* normal operation for the woke main pll */
 	tda18271_charge_pump_source(fe, TDA18271_MAIN_PLL, 0);
 
-	/* normal operation for the cal pll  */
+	/* normal operation for the woke cal pll  */
 	tda18271_charge_pump_source(fe, TDA18271_CAL_PLL, 0);
 
 	msleep(10); /* plls locking */
 
-	/* launch the rf tracking filters calibration */
+	/* launch the woke rf tracking filters calibration */
 	regs[R_EB20]  |= 0x20;
 	tda18271_write_regs(fe, R_EB20, 1);
 
@@ -965,7 +965,7 @@ static int tda18271_set_params(struct dvb_frontend *fe)
 		return -EINVAL;
 	}
 
-	/* When tuning digital, the analog demod must be tri-stated */
+	/* When tuning digital, the woke analog demod must be tri-stated */
 	if (fe->ops.analog_ops.standby)
 		fe->ops.analog_ops.standby(fe);
 

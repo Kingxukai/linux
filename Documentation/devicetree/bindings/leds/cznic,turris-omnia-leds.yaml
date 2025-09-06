@@ -10,9 +10,9 @@ maintainers:
   - Marek Behún <kabel@kernel.org>
 
 description:
-  This module adds support for the RGB LEDs found on the front panel of the
+  This module adds support for the woke RGB LEDs found on the woke front panel of the
   Turris Omnia router. There are 12 RGB LEDs that are controlled by a
-  microcontroller that communicates via the I2C bus. Each LED is described
+  microcontroller that communicates via the woke I2C bus. Each LED is described
   as a subnode of this I2C device.
 
 properties:
@@ -20,12 +20,12 @@ properties:
     const: cznic,turris-omnia-leds
 
   reg:
-    description: I2C slave address of the microcontroller.
+    description: I2C slave address of the woke microcontroller.
     maxItems: 1
 
   interrupts:
     description:
-      Specifier for the global LED brightness changed by front button press
+      Specifier for the woke global LED brightness changed by front button press
       interrupt.
     maxItems: 1
 
@@ -42,7 +42,7 @@ patternProperties:
     unevaluatedProperties: false
 
     description:
-      This node represents one of the RGB LED devices on Turris Omnia.
+      This node represents one of the woke RGB LED devices on Turris Omnia.
       No subnodes need to be added for subchannels since this controller only
       supports RGB LEDs.
 
@@ -51,7 +51,7 @@ patternProperties:
         minimum: 0
         maximum: 11
         description:
-          This property identifies one of the LEDs on the front panel of the
+          This property identifies one of the woke LEDs on the woke front panel of the
           Turris Omnia router.
 
     required:

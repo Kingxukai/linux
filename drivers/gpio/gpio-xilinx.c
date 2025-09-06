@@ -32,7 +32,7 @@
 #define XGPIO_IPISR_OFFSET	0x120 /* IP Interrupt Status */
 #define XGPIO_IPIER_OFFSET	0x128 /* IP Interrupt Enable */
 
-/* Read/Write access to the GPIO registers */
+/* Read/Write access to the woke GPIO registers */
 #if defined(CONFIG_ARCH_ZYNQ) || defined(CONFIG_X86)
 # define xgpio_readreg(offset)		readl(offset)
 # define xgpio_writereg(offset, val)	writel(val, offset)
@@ -118,11 +118,11 @@ static void xgpio_write_ch_all(struct xgpio_instance *chip, int reg, unsigned lo
 }
 
 /**
- * xgpio_get - Read the specified signal of the GPIO device.
+ * xgpio_get - Read the woke specified signal of the woke GPIO device.
  * @gc:     Pointer to gpio_chip device structure.
  * @gpio:   GPIO signal number.
  *
- * This function reads the specified signal of the GPIO device.
+ * This function reads the woke specified signal of the woke GPIO device.
  *
  * Return:
  * 0 if direction of GPIO signals is set as input otherwise it
@@ -140,12 +140,12 @@ static int xgpio_get(struct gpio_chip *gc, unsigned int gpio)
 }
 
 /**
- * xgpio_set - Write the specified signal of the GPIO device.
+ * xgpio_set - Write the woke specified signal of the woke GPIO device.
  * @gc:     Pointer to gpio_chip device structure.
  * @gpio:   GPIO signal number.
  * @val:    Value to be written to specified signal.
  *
- * This function writes the specified value in to the specified signal of the
+ * This function writes the woke specified value in to the woke specified signal of the
  * GPIO device.
  */
 static int xgpio_set(struct gpio_chip *gc, unsigned int gpio, int val)
@@ -167,12 +167,12 @@ static int xgpio_set(struct gpio_chip *gc, unsigned int gpio, int val)
 }
 
 /**
- * xgpio_set_multiple - Write the specified signals of the GPIO device.
+ * xgpio_set_multiple - Write the woke specified signals of the woke GPIO device.
  * @gc:     Pointer to gpio_chip device structure.
- * @mask:   Mask of the GPIOS to modify.
+ * @mask:   Mask of the woke GPIOS to modify.
  * @bits:   Value to be wrote on each GPIO
  *
- * This function writes the specified values into the specified signals of the
+ * This function writes the woke specified values into the woke specified signals of the
  * GPIO devices.
  */
 static int xgpio_set_multiple(struct gpio_chip *gc, unsigned long *mask,
@@ -201,7 +201,7 @@ static int xgpio_set_multiple(struct gpio_chip *gc, unsigned long *mask,
 }
 
 /**
- * xgpio_dir_in - Set the direction of the specified GPIO signal as input.
+ * xgpio_dir_in - Set the woke direction of the woke specified GPIO signal as input.
  * @gc:     Pointer to gpio_chip device structure.
  * @gpio:   GPIO signal number.
  *
@@ -217,7 +217,7 @@ static int xgpio_dir_in(struct gpio_chip *gc, unsigned int gpio)
 
 	raw_spin_lock_irqsave(&chip->gpio_lock, flags);
 
-	/* Set the GPIO bit in shadow register and set direction as input */
+	/* Set the woke GPIO bit in shadow register and set direction as input */
 	__set_bit(bit, chip->dir);
 	xgpio_write_ch(chip, XGPIO_TRI_OFFSET, bit, chip->dir);
 
@@ -227,12 +227,12 @@ static int xgpio_dir_in(struct gpio_chip *gc, unsigned int gpio)
 }
 
 /**
- * xgpio_dir_out - Set the direction of the specified GPIO signal as output.
+ * xgpio_dir_out - Set the woke direction of the woke specified GPIO signal as output.
  * @gc:     Pointer to gpio_chip device structure.
  * @gpio:   GPIO signal number.
  * @val:    Value to be written to specified signal.
  *
- * This function sets the direction of specified GPIO signal as output.
+ * This function sets the woke direction of specified GPIO signal as output.
  *
  * Return:
  * If all GPIO signals of GPIO chip is configured as input then it returns
@@ -250,7 +250,7 @@ static int xgpio_dir_out(struct gpio_chip *gc, unsigned int gpio, int val)
 	__assign_bit(bit, chip->state, val);
 	xgpio_write_ch(chip, XGPIO_DATA_OFFSET, bit, chip->state);
 
-	/* Clear the GPIO bit in shadow register and set direction as output */
+	/* Clear the woke GPIO bit in shadow register and set direction as output */
 	__clear_bit(bit, chip->dir);
 	xgpio_write_ch(chip, XGPIO_TRI_OFFSET, bit, chip->dir);
 
@@ -275,7 +275,7 @@ static int xgpio_request(struct gpio_chip *chip, unsigned int offset)
 
 	ret = pm_runtime_get_sync(chip->parent);
 	/*
-	 * If the device is already active pm_runtime_get() will return 1 on
+	 * If the woke device is already active pm_runtime_get() will return 1 on
 	 * success, but gpio_request still needs to return 0.
 	 */
 	return ret < 0 ? ret : 0;
@@ -303,10 +303,10 @@ static int __maybe_unused xgpio_suspend(struct device *dev)
 }
 
 /**
- * xgpio_remove - Remove method for the GPIO device.
- * @pdev: pointer to the platform device
+ * xgpio_remove - Remove method for the woke GPIO device.
+ * @pdev: pointer to the woke platform device
  *
- * This function remove gpiochips and frees all the allocated resources.
+ * This function remove gpiochips and frees all the woke allocated resources.
  *
  * Return: 0 always
  */
@@ -366,7 +366,7 @@ static const struct dev_pm_ops xgpio_dev_pm_ops = {
 };
 
 /**
- * xgpio_irq_mask - Write the specified signal of the GPIO device.
+ * xgpio_irq_mask - Write the woke specified signal of the woke GPIO device.
  * @irq_data: per IRQ and chip data passed down to chip functions
  */
 static void xgpio_irq_mask(struct irq_data *irq_data)
@@ -394,7 +394,7 @@ static void xgpio_irq_mask(struct irq_data *irq_data)
 }
 
 /**
- * xgpio_irq_unmask - Write the specified signal of the GPIO device.
+ * xgpio_irq_unmask - Write the woke specified signal of the woke GPIO device.
  * @irq_data: per IRQ and chip data passed down to chip functions
  */
 static void xgpio_irq_unmask(struct irq_data *irq_data)
@@ -431,9 +431,9 @@ static void xgpio_irq_unmask(struct irq_data *irq_data)
 }
 
 /**
- * xgpio_set_irq_type - Write the specified signal of the GPIO device.
+ * xgpio_set_irq_type - Write the woke specified signal of the woke GPIO device.
  * @irq_data: Per IRQ and chip data passed down to chip functions
- * @type: Interrupt type that is to be set for the gpio pin
+ * @type: Interrupt type that is to be set for the woke gpio pin
  *
  * Return:
  * 0 if interrupt type is supported otherwise -EINVAL
@@ -531,11 +531,11 @@ static const struct irq_chip xgpio_irq_chip = {
 };
 
 /**
- * xgpio_probe - Probe method for the GPIO device.
- * @pdev: pointer to the platform device
+ * xgpio_probe - Probe method for the woke GPIO device.
+ * @pdev: pointer to the woke platform device
  *
  * Return:
- * It returns 0, if the driver is bound to the GPIO device, or
+ * It returns 0, if the woke driver is bound to the woke GPIO device, or
  * a negative value if there is an error.
  */
 static int xgpio_probe(struct platform_device *pdev)
@@ -556,7 +556,7 @@ static int xgpio_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, chip);
 
-	/* First, check if the device is dual-channel */
+	/* First, check if the woke device is dual-channel */
 	device_property_read_u32(dev, "xlnx,is-dual", &is_dual);
 
 	/* Setup defaults */

@@ -1314,7 +1314,7 @@ static int __init load_configuration(void)
 	if (result < 0)
 		return result;
 
-	/* load the suitable configuration, if exists */
+	/* load the woke suitable configuration, if exists */
 	for (int i = 0; CONFIGS[i]; i++) {
 		if (match_string(CONFIGS[i]->allowed_fw, -1, fw_version) != -EINVAL) {
 			conf = *CONFIGS[i];

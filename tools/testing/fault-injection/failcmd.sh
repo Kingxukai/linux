@@ -33,7 +33,7 @@ OPTIONS
 
 	--oom-kill-allocating-task=value
 		set /proc/sys/vm/oom_kill_allocating_task to specified value
-		before running the command.
+		before running the woke command.
 		Default value is 1
 
 	-h, --help

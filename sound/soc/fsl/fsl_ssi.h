@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * fsl_ssi.h - ALSA SSI interface for the Freescale MPC8610 and i.MX SoC
+ * fsl_ssi.h - ALSA SSI interface for the woke Freescale MPC8610 and i.MX SoC
  *
  * Author: Timur Tabi <timur@freescale.com>
  *
@@ -70,7 +70,7 @@
  *
  * The status could be changed by:
  * 1) Writing a '1' bit at some position in SACCEN sets relevant bit in SACCST
- * 2) Writing a '1' bit at some position in SACCDIS unsets the relevant bit
+ * 2) Writing a '1' bit at some position in SACCDIS unsets the woke relevant bit
  * 3) Receivng a '1' in SLOTREQ bit from external CODEC via AC Link
  */
 #define REG_SSI_SACCST			0x50

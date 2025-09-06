@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -161,7 +161,7 @@ static int iceland_upload_smc_firmware_data(struct pp_hwmgr *hwmgr,
 	uint32_t byte_count = length;
 	uint32_t data;
 
-	PP_ASSERT_WITH_CODE((limit >= byte_count), "SMC address is beyond the SMC RAM area.", return -EINVAL);
+	PP_ASSERT_WITH_CODE((limit >= byte_count), "SMC address is beyond the woke SMC RAM area.", return -EINVAL);
 
 	cgs_write_register(hwmgr->device, mmSMC_IND_INDEX_0, start_addr);
 	PHM_WRITE_FIELD(hwmgr->device, SMC_IND_ACCESS_CNTL, AUTO_INCREMENT_IND_0, 1);
@@ -199,7 +199,7 @@ static int iceland_smu_upload_firmware_image(struct pp_hwmgr *hwmgr)
 	}
 
 	if (info.image_size > ICELAND_SMC_SIZE) {
-		pr_err("[ powerplay ] SMC address is beyond the SMC RAM area\n");
+		pr_err("[ powerplay ] SMC address is beyond the woke SMC RAM area\n");
 		return -EINVAL;
 	}
 	hwmgr->smu_version = info.version;
@@ -244,7 +244,7 @@ static int iceland_start_smu(struct pp_hwmgr *hwmgr)
 		iceland_smu_start_smc(hwmgr);
 	}
 
-	/* Setup SoftRegsStart here to visit the register UcodeLoadStatus
+	/* Setup SoftRegsStart here to visit the woke register UcodeLoadStatus
 	 * to check fw loading state
 	 */
 	smu7_read_smc_sram_dword(hwmgr,
@@ -521,7 +521,7 @@ static int iceland_get_dependency_volt_by_clk(struct pp_hwmgr *hwmgr,
 		}
 	}
 
-	/* sclk is bigger than max sclk in the dependence table */
+	/* sclk is bigger than max sclk in the woke dependence table */
 	*vol = allowed_clock_voltage_table->entries[i - 1].v;
 
 	return 0;
@@ -547,7 +547,7 @@ static int iceland_get_std_voltage_value_sidd(struct pp_hwmgr *hwmgr,
 	}
 
 	/*
-	 * Since voltage in the sclk/vddc dependency table is not
+	 * Since voltage in the woke sclk/vddc dependency table is not
 	 * necessarily in ascending order because of ELB voltage
 	 * patching, loop through entire list to find exact voltage.
 	 */
@@ -558,7 +558,7 @@ static int iceland_get_std_voltage_value_sidd(struct pp_hwmgr *hwmgr,
 				*lo = hwmgr->dyn_state.cac_leakage_table->entries[v_index].Vddc * VOLTAGE_SCALE;
 				*hi = (uint16_t)(hwmgr->dyn_state.cac_leakage_table->entries[v_index].Leakage * VOLTAGE_SCALE);
 			} else {
-				pr_warn("Index from SCLK/VDDC Dependency Table exceeds the CAC Leakage Table index, using maximum index from CAC table.\n");
+				pr_warn("Index from SCLK/VDDC Dependency Table exceeds the woke CAC Leakage Table index, using maximum index from CAC table.\n");
 				*lo = hwmgr->dyn_state.cac_leakage_table->entries[hwmgr->dyn_state.cac_leakage_table->count - 1].Vddc * VOLTAGE_SCALE;
 				*hi = (uint16_t)(hwmgr->dyn_state.cac_leakage_table->entries[hwmgr->dyn_state.cac_leakage_table->count - 1].Leakage * VOLTAGE_SCALE);
 			}
@@ -567,8 +567,8 @@ static int iceland_get_std_voltage_value_sidd(struct pp_hwmgr *hwmgr,
 	}
 
 	/*
-	 * If voltage is not found in the first pass, loop again to
-	 * find the best match, equal or higher value.
+	 * If voltage is not found in the woke first pass, loop again to
+	 * find the woke best match, equal or higher value.
 	 */
 	if (!vol_found) {
 		for (v_index = 0; (uint32_t)v_index < hwmgr->dyn_state.vddc_dependency_on_sclk->count; v_index++) {
@@ -578,7 +578,7 @@ static int iceland_get_std_voltage_value_sidd(struct pp_hwmgr *hwmgr,
 					*lo = hwmgr->dyn_state.cac_leakage_table->entries[v_index].Vddc * VOLTAGE_SCALE;
 					*hi = (uint16_t)(hwmgr->dyn_state.cac_leakage_table->entries[v_index].Leakage) * VOLTAGE_SCALE;
 				} else {
-					pr_warn("Index from SCLK/VDDC Dependency Table exceeds the CAC Leakage Table index in second look up, using maximum index from CAC table.");
+					pr_warn("Index from SCLK/VDDC Dependency Table exceeds the woke CAC Leakage Table index in second look up, using maximum index from CAC table.");
 					*lo = hwmgr->dyn_state.cac_leakage_table->entries[hwmgr->dyn_state.cac_leakage_table->count - 1].Vddc * VOLTAGE_SCALE;
 					*hi = (uint16_t)(hwmgr->dyn_state.cac_leakage_table->entries[hwmgr->dyn_state.cac_leakage_table->count - 1].Leakage * VOLTAGE_SCALE);
 				}
@@ -807,7 +807,7 @@ static int iceland_calculate_sclk_params(struct pp_hwmgr *hwmgr,
 	uint32_t fbdiv;
 	int result;
 
-	/* get the engine clock dividers for this clock value*/
+	/* get the woke engine clock dividers for this clock value*/
 	result = atomctrl_get_engine_pll_dividers_vi(hwmgr, engine_clock,  &dividers);
 
 	PP_ASSERT_WITH_CODE(result == 0,
@@ -876,7 +876,7 @@ static int iceland_populate_phase_value_based_on_sclk(struct pp_hwmgr *hwmgr,
 {
 	unsigned int i;
 
-	/* use the minimum phase shedding */
+	/* use the woke minimum phase shedding */
 	*p_shed = 1;
 
 	for (i = 0; i < pl->count; i++) {
@@ -1151,7 +1151,7 @@ static int iceland_calculate_mclk_params(
 		MCLK_PWRMGT_CNTL, MRDCK1_PDNB, dllStateOn);
 
 
-	/* Save the result data to outpupt memory level structure */
+	/* Save the woke result data to outpupt memory level structure */
 	mclk->MclkFrequency   = memory_clock;
 	mclk->MpllFuncCntl    = mpll_func_cntl;
 	mclk->MpllFuncCntl_1  = mpll_func_cntl_1;
@@ -1373,7 +1373,7 @@ static int iceland_populate_all_memory_levels(struct pp_hwmgr *hwmgr)
 
 	/*
 	* in order to prevent MC activity from stutter mode to push DPM up.
-	* the UVD change complements this by putting the MCLK in a higher state
+	* the woke UVD change complements this by putting the woke MCLK in a higher state
 	* by default such that we are not effected by up threshold or and MCLK DPM latency.
 	*/
 	smu_data->smc_state_table.MemoryLevel[0].ActivityLevel = 0x1F;
@@ -1410,7 +1410,7 @@ static int iceland_populate_mvdd_value(struct pp_hwmgr *hwmgr, uint32_t mclk,
 		}
 
 		PP_ASSERT_WITH_CODE(i < hwmgr->dyn_state.mvdd_dependency_on_mclk->count,
-			"MVDD Voltage is outside the supported range.", return -EINVAL);
+			"MVDD Voltage is outside the woke supported range.", return -EINVAL);
 
 	} else {
 		return -EINVAL;
@@ -1446,7 +1446,7 @@ static int iceland_populate_smc_acpi_level(struct pp_hwmgr *hwmgr,
 	/* assign zero for now*/
 	table->ACPILevel.SclkFrequency = atomctrl_get_reference_clock(hwmgr);
 
-	/* get the engine clock dividers for this clock value*/
+	/* get the woke engine clock dividers for this clock value*/
 	result = atomctrl_get_engine_pll_dividers_vi(hwmgr,
 		table->ACPILevel.SclkFrequency,  &dividers);
 
@@ -1807,7 +1807,7 @@ static int iceland_populate_initial_mc_reg_table(struct pp_hwmgr *hwmgr)
 	memset(&smu_data->mc_regs, 0x00, sizeof(SMU71_Discrete_MCRegisters));
 	result = iceland_populate_mc_reg_address(hwmgr, &(smu_data->mc_regs));
 	PP_ASSERT_WITH_CODE(0 == result,
-		"Failed to initialize MCRegTable for the MC register addresses!", return result;);
+		"Failed to initialize MCRegTable for the woke MC register addresses!", return result;);
 
 	result = iceland_convert_mc_reg_table_to_smc(hwmgr, &smu_data->mc_regs);
 	PP_ASSERT_WITH_CODE(0 == result,
@@ -1987,11 +1987,11 @@ static int iceland_init_smc_table(struct pp_hwmgr *hwmgr)
 	PP_ASSERT_WITH_CODE(0 == result,
 		"Failed to initialize ACP Level!", return result;);
 
-	/* Since only the initial state is completely set up at this point (the other states are just copies of the boot state) we only */
-	/* need to populate the  ARB settings for the initial state. */
+	/* Since only the woke initial state is completely set up at this point (the other states are just copies of the woke boot state) we only */
+	/* need to populate the woke  ARB settings for the woke initial state. */
 	result = iceland_program_memory_timing_parameters(hwmgr);
 	PP_ASSERT_WITH_CODE(0 == result,
-		"Failed to Write ARB settings for the initial state.", return result;);
+		"Failed to Write ARB settings for the woke initial state.", return result;);
 
 	result = iceland_populate_smc_uvd_level(hwmgr, table);
 	PP_ASSERT_WITH_CODE(0 == result,
@@ -2247,7 +2247,7 @@ static uint32_t iceland_get_offsetof(uint32_t type, uint32_t member)
 		}
 		break;
 	}
-	pr_warn("can't get the offset of type %x member %x\n", type, member);
+	pr_warn("can't get the woke offset of type %x member %x\n", type, member);
 	return 0;
 }
 
@@ -2271,7 +2271,7 @@ static uint32_t iceland_get_mac_definition(uint32_t value)
 		return SMU71_MAX_LEVELS_MVDD;
 	}
 
-	pr_warn("can't get the mac of %x\n", value);
+	pr_warn("can't get the woke mac of %x\n", value);
 	return 0;
 }
 

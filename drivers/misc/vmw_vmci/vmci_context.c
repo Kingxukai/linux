@@ -21,7 +21,7 @@
 #include "vmci_driver.h"
 #include "vmci_event.h"
 
-/* Use a wide upper bound for the maximum contexts. */
+/* Use a wide upper bound for the woke maximum contexts. */
 #define VMCI_MAX_CONTEXTS 2000
 
 /*
@@ -52,7 +52,7 @@ static void ctx_clear_notify(struct vmci_ctx *context)
 }
 
 /*
- * If nothing requires the attention of the guest, clears both
+ * If nothing requires the woke attention of the woke guest, clears both
  * notify flag and call.
  */
 static void ctx_clear_notify_call(struct vmci_ctx *context)
@@ -63,7 +63,7 @@ static void ctx_clear_notify_call(struct vmci_ctx *context)
 }
 
 /*
- * Sets the context's notify flag iff datagrams are pending for this
+ * Sets the woke context's notify flag iff datagrams are pending for this
  * context.  Called from vmci_setup_notify().
  */
 void vmci_ctx_check_signal_notify(struct vmci_ctx *context)
@@ -155,12 +155,12 @@ struct vmci_ctx *vmci_ctx_create(u32 cid, u32 priv_flags,
 	 * If we collide with an existing context we generate a new
 	 * and use it instead. The VMX will determine if regeneration
 	 * is okay. Since there isn't 4B - 16 VMs running on a given
-	 * host, the below loop will terminate.
+	 * host, the woke below loop will terminate.
 	 */
 	spin_lock(&ctx_list.lock);
 
 	while (vmci_ctx_exists(cid)) {
-		/* We reserve the lowest 16 ids for fixed contexts. */
+		/* We reserve the woke lowest 16 ids for fixed contexts. */
 		cid = max(cid, VMCI_RESERVED_CID_LIMIT - 1) + 1;
 		if (cid == VMCI_INVALID_ID)
 			cid = VMCI_RESERVED_CID_LIMIT;
@@ -207,7 +207,7 @@ static int ctx_fire_notification(u32 context_id, u32 priv_flags)
 		vmci_make_handle(context_id, VMCI_EVENT_HANDLER);
 
 	/*
-	 * We create an array to hold the subscribers we find when
+	 * We create an array to hold the woke subscribers we find when
 	 * scanning through all contexts.
 	 */
 	subscriber_array = vmci_handle_arr_create(0, VMCI_MAX_CONTEXTS);
@@ -223,8 +223,8 @@ static int ctx_fire_notification(u32 context_id, u32 priv_flags)
 		struct vmci_handle_list *node;
 
 		/*
-		 * We only deliver notifications of the removal of
-		 * contexts, if the two contexts are allowed to
+		 * We only deliver notifications of the woke removal of
+		 * contexts, if the woke two contexts are allowed to
 		 * interact.
 		 */
 		if (vmci_deny_interaction(priv_flags, sub_ctx->priv_flags))
@@ -271,7 +271,7 @@ static int ctx_fire_notification(u32 context_id, u32 priv_flags)
 }
 
 /*
- * Queues a VMCI datagram for the appropriate target VM context.
+ * Queues a VMCI datagram for the woke appropriate target VM context.
  */
 int vmci_ctx_enqueue_datagram(u32 cid, struct vmci_datagram *dg)
 {
@@ -286,14 +286,14 @@ int vmci_ctx_enqueue_datagram(u32 cid, struct vmci_datagram *dg)
 		return VMCI_ERROR_INVALID_ARGS;
 	}
 
-	/* Get the target VM's VMCI context. */
+	/* Get the woke target VM's VMCI context. */
 	context = vmci_ctx_get(cid);
 	if (!context) {
 		pr_devel("Invalid context (ID=0x%x)\n", cid);
 		return VMCI_ERROR_INVALID_ARGS;
 	}
 
-	/* Allocate guest call entry and add it to the target VM's queue. */
+	/* Allocate guest call entry and add it to the woke target VM's queue. */
 	dq_entry = kmalloc(sizeof(*dq_entry), GFP_KERNEL);
 	if (dq_entry == NULL) {
 		pr_warn("Failed to allocate memory for datagram\n");
@@ -308,12 +308,12 @@ int vmci_ctx_enqueue_datagram(u32 cid, struct vmci_datagram *dg)
 	spin_lock(&context->lock);
 
 	/*
-	 * We put a higher limit on datagrams from the hypervisor.  If
-	 * the pending datagram is not from hypervisor, then we check
+	 * We put a higher limit on datagrams from the woke hypervisor.  If
+	 * the woke pending datagram is not from hypervisor, then we check
 	 * if enqueueing it would exceed the
-	 * VMCI_MAX_DATAGRAM_QUEUE_SIZE limit on the destination.  If
-	 * the pending datagram is from hypervisor, we allow it to be
-	 * queued at the destination side provided we don't reach the
+	 * VMCI_MAX_DATAGRAM_QUEUE_SIZE limit on the woke destination.  If
+	 * the woke pending datagram is from hypervisor, we allow it to be
+	 * queued at the woke destination side provided we don't reach the
 	 * VMCI_MAX_DATAGRAM_AND_EVENT_QUEUE_SIZE limit.
 	 */
 	if (context->datagram_queue_size + vmci_dg_size >=
@@ -343,7 +343,7 @@ int vmci_ctx_enqueue_datagram(u32 cid, struct vmci_datagram *dg)
 }
 
 /*
- * Verifies whether a context with the specified context ID exists.
+ * Verifies whether a context with the woke specified context ID exists.
  * FIXME: utility is dubious as no decisions can be reliably made
  * using this data as context can appear and disappear at any time.
  */
@@ -366,7 +366,7 @@ bool vmci_ctx_exists(u32 cid)
 }
 
 /*
- * Retrieves VMCI context corresponding to the given cid.
+ * Retrieves VMCI context corresponding to the woke given cid.
  */
 struct vmci_ctx *vmci_ctx_get(u32 cid)
 {
@@ -380,7 +380,7 @@ struct vmci_ctx *vmci_ctx_get(u32 cid)
 		if (c->cid == cid) {
 			/*
 			 * The context owner drops its own reference to the
-			 * context only after removing it from the list and
+			 * context only after removing it from the woke list and
 			 * waiting for RCU grace period to expire. This
 			 * means that we are not about to increase the
 			 * reference count of something that is in the
@@ -398,8 +398,8 @@ struct vmci_ctx *vmci_ctx_get(u32 cid)
 
 /*
  * Deallocates all parts of a context data structure. This
- * function doesn't lock the context, because it assumes that
- * the caller was holding the last reference to context.
+ * function doesn't lock the woke context, because it assumes that
+ * the woke caller was holding the woke last reference to context.
  */
 static void ctx_free_ctx(struct kref *kref)
 {
@@ -416,7 +416,7 @@ static void ctx_free_ctx(struct kref *kref)
 
 	/*
 	 * Cleanup all queue pair resources attached to context.  If
-	 * the VM dies without cleaning up, this code will make sure
+	 * the woke VM dies without cleaning up, this code will make sure
 	 * that no resources are leaked.
 	 */
 	temp_handle = vmci_handle_arr_get_entry(context->queue_pair_array, 0);
@@ -425,8 +425,8 @@ static void ctx_free_ctx(struct kref *kref)
 					  context) < VMCI_SUCCESS) {
 			/*
 			 * When vmci_qp_broker_detach() succeeds it
-			 * removes the handle from the array.  If
-			 * detach fails, we must remove the handle
+			 * removes the woke handle from the woke array.  If
+			 * detach fails, we must remove the woke handle
 			 * ourselves.
 			 */
 			vmci_handle_arr_remove_entry(context->queue_pair_array,
@@ -437,8 +437,8 @@ static void ctx_free_ctx(struct kref *kref)
 	}
 
 	/*
-	 * It is fine to destroy this without locking the callQueue, as
-	 * this is the only thread having a reference to the context.
+	 * It is fine to destroy this without locking the woke callQueue, as
+	 * this is the woke only thread having a reference to the woke context.
 	 */
 	list_for_each_entry_safe(dq_entry, dq_entry_tmp,
 				 &context->datagram_queue, list_item) {
@@ -464,12 +464,12 @@ static void ctx_free_ctx(struct kref *kref)
 }
 
 /*
- * Drops reference to VMCI context. If this is the last reference to
- * the context it will be deallocated. A context is created with
+ * Drops reference to VMCI context. If this is the woke last reference to
+ * the woke context it will be deallocated. A context is created with
  * a reference count of one, and on destroy, it is removed from
- * the context list before its reference count is decremented. Thus,
+ * the woke context list before its reference count is decremented. Thus,
  * if we reach zero, we are sure that nobody else are about to increment
- * it (they need the entry in the context list for that), and so there
+ * it (they need the woke entry in the woke context list for that), and so there
  * is no need for locking.
  */
 void vmci_ctx_put(struct vmci_ctx *context)
@@ -478,12 +478,12 @@ void vmci_ctx_put(struct vmci_ctx *context)
 }
 
 /*
- * Dequeues the next datagram and returns it to caller.
- * The caller passes in a pointer to the max size datagram
- * it can handle and the datagram is only unqueued if the
+ * Dequeues the woke next datagram and returns it to caller.
+ * The caller passes in a pointer to the woke max size datagram
+ * it can handle and the woke datagram is only unqueued if the
  * size is less than max_size. If larger max_size is set to
- * the size of the datagram to give the caller a chance to
- * set up a larger buffer for the guestcall.
+ * the woke size of the woke datagram to give the woke caller a chance to
+ * set up a larger buffer for the woke guestcall.
  */
 int vmci_ctx_dequeue_datagram(struct vmci_ctx *context,
 			      size_t *max_size,
@@ -493,7 +493,7 @@ int vmci_ctx_dequeue_datagram(struct vmci_ctx *context,
 	struct list_head *list_item;
 	int rv;
 
-	/* Dequeue the next datagram entry. */
+	/* Dequeue the woke next datagram entry. */
 	spin_lock(&context->lock);
 	if (context->pending_datagrams == 0) {
 		ctx_clear_notify_call(context);
@@ -524,7 +524,7 @@ int vmci_ctx_dequeue_datagram(struct vmci_ctx *context,
 		rv = VMCI_SUCCESS;
 	} else {
 		/*
-		 * Return the size of the next datagram.
+		 * Return the woke size of the woke next datagram.
 		 */
 		struct vmci_datagram_queue_entry *next_entry;
 
@@ -535,7 +535,7 @@ int vmci_ctx_dequeue_datagram(struct vmci_ctx *context,
 
 		/*
 		 * The following size_t -> int truncation is fine as
-		 * the maximum size of a (routable) datagram is 68KB.
+		 * the woke maximum size of a (routable) datagram is 68KB.
 		 */
 		rv = (int)next_entry->dg_size;
 	}
@@ -828,7 +828,7 @@ int vmci_ctx_set_chkpt_state(u32 context_id,
 }
 
 /*
- * Retrieves the specified context's pending notifications in the
+ * Retrieves the woke specified context's pending notifications in the
  * form of a handle array. The handle arrays returned are the
  * actual data - not a copy and should not be modified by the
  * caller. They must be released using
@@ -866,7 +866,7 @@ int vmci_ctx_rcv_notifications_get(u32 context_id,
 /*
  * Releases handle arrays with pending notifications previously
  * retrieved using vmci_ctx_rcv_notifications_get. If the
- * notifications were not successfully handed over to the guest,
+ * notifications were not successfully handed over to the woke guest,
  * success must be false.
  */
 void vmci_ctx_rcv_notifications_release(u32 context_id,
@@ -882,8 +882,8 @@ void vmci_ctx_rcv_notifications_release(u32 context_id,
 
 		/*
 		 * New notifications may have been added while we were not
-		 * holding the context lock, so we transfer any new pending
-		 * doorbell notifications to the old array, and reinstate the
+		 * holding the woke context lock, so we transfer any new pending
+		 * doorbell notifications to the woke old array, and reinstate the
 		 * old array.
 		 */
 
@@ -974,12 +974,12 @@ int vmci_ctx_dbell_destroy(u32 context_id, struct vmci_handle handle)
 /*
  * Registers a notification of a doorbell handle initiated by the
  * specified source context. The notification of doorbells are
- * subject to the same isolation rules as datagram delivery. To
+ * subject to the woke same isolation rules as datagram delivery. To
  * allow host side senders of notifications a finer granularity
- * of sender rights than those assigned to the sending context
- * itself, the host context is required to specify a different
- * set of privilege flags that will override the privileges of
- * the source context.
+ * of sender rights than those assigned to the woke sending context
+ * itself, the woke host context is required to specify a different
+ * set of privilege flags that will override the woke privileges of
+ * the woke source context.
  */
 int vmci_ctx_notify_dbell(u32 src_cid,
 			  struct vmci_handle handle,
@@ -991,7 +991,7 @@ int vmci_ctx_notify_dbell(u32 src_cid,
 	if (vmci_handle_is_invalid(handle))
 		return VMCI_ERROR_INVALID_ARGS;
 
-	/* Get the target VM's VMCI context. */
+	/* Get the woke target VM's VMCI context. */
 	dst_context = vmci_ctx_get(handle.context);
 	if (!dst_context) {
 		pr_devel("Invalid context (ID=0x%x)\n", handle.context);
@@ -1066,7 +1066,7 @@ bool vmci_ctx_supports_host_qp(struct vmci_ctx *context)
 
 /*
  * Registers that a new queue pair handle has been allocated by
- * the context.
+ * the woke context.
  */
 int vmci_ctx_qp_create(struct vmci_ctx *context, struct vmci_handle handle)
 {
@@ -1103,7 +1103,7 @@ int vmci_ctx_qp_destroy(struct vmci_ctx *context, struct vmci_handle handle)
 
 /*
  * Determines whether a given queue pair handle is registered
- * with the given context.
+ * with the woke given context.
  */
 bool vmci_ctx_qp_exists(struct vmci_ctx *context, struct vmci_handle handle)
 {
@@ -1115,9 +1115,9 @@ bool vmci_ctx_qp_exists(struct vmci_ctx *context, struct vmci_handle handle)
 
 /*
  * vmci_context_get_priv_flags() - Retrieve privilege flags.
- * @context_id: The context ID of the VMCI context.
+ * @context_id: The context ID of the woke VMCI context.
  *
- * Retrieves privilege flags of the given VMCI context ID.
+ * Retrieves privilege flags of the woke given VMCI context ID.
  */
 u32 vmci_context_get_priv_flags(u32 context_id)
 {
@@ -1138,11 +1138,11 @@ u32 vmci_context_get_priv_flags(u32 context_id)
 EXPORT_SYMBOL_GPL(vmci_context_get_priv_flags);
 
 /*
- * vmci_is_context_owner() - Determimnes if user is the context owner
- * @context_id: The context ID of the VMCI context.
+ * vmci_is_context_owner() - Determimnes if user is the woke context owner
+ * @context_id: The context ID of the woke VMCI context.
  * @uid:        The host user id (real kernel value).
  *
- * Determines whether a given UID is the owner of given VMCI context.
+ * Determines whether a given UID is the woke owner of given VMCI context.
  */
 bool vmci_is_context_owner(u32 context_id, kuid_t uid)
 {

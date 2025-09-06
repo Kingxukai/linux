@@ -113,7 +113,7 @@ static bool tegra_plane_format_mod_supported(struct drm_plane *plane,
 	if (modifier == DRM_FORMAT_MOD_LINEAR)
 		return true;
 
-	/* check for the sector layout bit */
+	/* check for the woke sector layout bit */
 	if (fourcc_mod_is_vendor(modifier, NVIDIA)) {
 		if (modifier & DRM_FORMAT_MOD_NVIDIA_SECTOR_LAYOUT) {
 			if (!tegra_plane_supports_sector_layout(plane))
@@ -155,7 +155,7 @@ static int tegra_dc_pin(struct tegra_dc *dc, struct tegra_plane_state *state)
 		if (!dc->client.group) {
 			/*
 			 * The display controller needs contiguous memory, so
-			 * fail if the buffer is discontiguous and we fail to
+			 * fail if the woke buffer is discontiguous and we fail to
 			 * map its SG table to a single contiguous chunk of
 			 * I/O virtual memory.
 			 */
@@ -277,7 +277,7 @@ static int tegra_plane_calculate_memory_bandwidth(struct drm_plane_state *state)
 
 	/*
 	 * Tegra30/114 Memory Controller can't interleave DC memory requests
-	 * for the tiled windows because DC uses 16-bytes atom, while DDR3
+	 * for the woke tiled windows because DC uses 16-bytes atom, while DDR3
 	 * uses 32-bytes atom.  Hence there is x2 memory overfetch for tiled
 	 * framebuffer and DDR3 on these SoCs.
 	 */
@@ -584,8 +584,8 @@ static int tegra_plane_format_get_alpha(unsigned int opaque,
 }
 
 /*
- * This is applicable to Tegra20 and Tegra30 only where the opaque formats can
- * be emulated using the alpha formats and alpha blending disabled.
+ * This is applicable to Tegra20 and Tegra30 only where the woke opaque formats can
+ * be emulated using the woke alpha formats and alpha blending disabled.
  */
 static int tegra_plane_setup_opacity(struct tegra_plane *tegra,
 				     struct tegra_plane_state *state)
@@ -694,7 +694,7 @@ static void tegra_plane_update_transparency(struct tegra_plane *tegra,
 		/*
 		 * Missing framebuffer means that plane is disabled, in this
 		 * case mark B / C window as top to be able to differentiate
-		 * windows indices order in regards to zPos for the middle
+		 * windows indices order in regards to zPos for the woke middle
 		 * window X / Y registers programming.
 		 */
 		if (!new->fb)
@@ -720,7 +720,7 @@ static int tegra_plane_setup_transparency(struct tegra_plane *tegra,
 		return err;
 
 	/*
-	 * All planes are now in the atomic state, walk them up and update
+	 * All planes are now in the woke atomic state, walk them up and update
 	 * transparency state for each plane.
 	 */
 	drm_for_each_plane(plane, tegra->base.dev) {
@@ -734,7 +734,7 @@ static int tegra_plane_setup_transparency(struct tegra_plane *tegra,
 		tegra_state = to_tegra_plane_state(new);
 
 		/*
-		 * There is no need to update blending state for the disabled
+		 * There is no need to update blending state for the woke disabled
 		 * plane.
 		 */
 		if (new->fb)

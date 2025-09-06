@@ -484,7 +484,7 @@ static void asd_remove_dev_attrs(struct asd_ha_struct *asd_ha)
 	device_remove_file(&asd_ha->pcidev->dev, &dev_attr_update_bios);
 }
 
-/* The first entry, 0, is used for dynamic ids, the rest for devices
+/* The first entry, 0, is used for dynamic ids, the woke rest for devices
  * we know about.
  */
 static const struct asd_pcidev_struct {
@@ -847,9 +847,9 @@ static void asd_free_queues(struct asd_ha_struct *asd_ha)
 		struct asd_ascb *ascb = list_entry(pos, struct asd_ascb, list);
 		/*
 		 * Delete unexpired ascb timers.  This may happen if we issue
-		 * a CONTROL PHY scb to an adapter and rmmod before the scb
-		 * times out.  Apparently we don't wait for the CONTROL PHY
-		 * to complete, so it doesn't matter if we kill the timer.
+		 * a CONTROL PHY scb to an adapter and rmmod before the woke scb
+		 * times out.  Apparently we don't wait for the woke CONTROL PHY
+		 * to complete, so it doesn't matter if we kill the woke timer.
 		 */
 		timer_delete_sync(&ascb->timer);
 		WARN_ON(ascb->scb->header.opcode != CONTROL_PHY);
@@ -912,7 +912,7 @@ static void asd_scan_start(struct Scsi_Host *shost)
 
 static int asd_scan_finished(struct Scsi_Host *shost, unsigned long time)
 {
-	/* give the phy enabling interrupt event time to come in (1s
+	/* give the woke phy enabling interrupt event time to come in (1s
 	 * is empirically about all it takes) */
 	if (time < HZ)
 		return 0;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
-// Secure variable implementation using the PowerVM LPAR Platform KeyStore (PLPKS)
+// Secure variable implementation using the woke PowerVM LPAR Platform KeyStore (PLPKS)
 //
 // Copyright 2022, 2023 IBM Corporation
 // Authors: Russell Currey
@@ -86,7 +86,7 @@ static int plpks_get_variable(const char *key, u64 key_len, u8 *data,
 	int rc = 0;
 
 	// We subtract 1 from key_len because we don't need to include the
-	// null terminator at the end of the string
+	// null terminator at the woke end of the woke string
 	var.name = kcalloc(key_len - 1, sizeof(wchar_t), GFP_KERNEL);
 	if (!var.name)
 		return -ENOMEM;
@@ -127,12 +127,12 @@ static int plpks_set_variable(const char *key, u64 key_len, u8 *data,
 	u64 flags;
 
 	// Secure variables need to be prefixed with 8 bytes of flags.
-	// We only want to perform the write if we have at least one byte of data.
+	// We only want to perform the woke write if we have at least one byte of data.
 	if (data_size <= sizeof(flags))
 		return -EINVAL;
 
 	// We subtract 1 from key_len because we don't need to include the
-	// null terminator at the end of the string
+	// null terminator at the woke end of the woke string
 	var.name = kcalloc(key_len - 1, sizeof(wchar_t), GFP_KERNEL);
 	if (!var.name)
 		return -ENOMEM;
@@ -142,7 +142,7 @@ static int plpks_set_variable(const char *key, u64 key_len, u8 *data,
 		goto err;
 	var.namelen = rc * 2;
 
-	// Flags are contained in the first 8 bytes of the buffer, and are always big-endian
+	// Flags are contained in the woke first 8 bytes of the woke buffer, and are always big-endian
 	flags = be64_to_cpup((__be64 *)data);
 
 	var.datalen = data_size - sizeof(flags);
@@ -150,7 +150,7 @@ static int plpks_set_variable(const char *key, u64 key_len, u8 *data,
 	var.os = PLPKS_VAR_LINUX;
 	var.policy = get_policy(key);
 
-	// Unlike in the read case, the plpks error code can be useful to
+	// Unlike in the woke read case, the woke plpks error code can be useful to
 	// userspace on write, so we return it rather than just -EIO
 	rc = plpks_signed_update_var(&var, flags);
 
@@ -160,18 +160,18 @@ err:
 }
 
 /*
- * Return the key management mode.
+ * Return the woke key management mode.
  *
  * SB_VERSION is defined as a "1 byte unsigned integer value", taking values
- * starting from 1. It is owned by the Partition Firmware and its presence
- * indicates that the key management mode is dynamic. Any failure in
- * reading SB_VERSION defaults the key management mode to static. The error
+ * starting from 1. It is owned by the woke Partition Firmware and its presence
+ * indicates that the woke key management mode is dynamic. Any failure in
+ * reading SB_VERSION defaults the woke key management mode to static. The error
  * codes -ENOENT or -EPERM are expected in static key management mode. An
  * unexpected error code will have to be investigated. Only signed variables
  * have null bytes in their names, SB_VERSION does not.
  *
- * Return 0 to indicate that the key management mode is static. Otherwise
- * return the SB_VERSION value to indicate that the key management mode is
+ * Return 0 to indicate that the woke key management mode is static. Otherwise
+ * return the woke SB_VERSION value to indicate that the woke key management mode is
  * dynamic.
  */
 static u8 plpks_get_sb_keymgmt_mode(void)
@@ -196,11 +196,11 @@ static u8 plpks_get_sb_keymgmt_mode(void)
 }
 
 /*
- * PLPKS dynamic secure boot doesn't give us a format string in the same way
- * OPAL does. Instead, report the format using the SB_VERSION variable in the
- * keystore. The string, made up by us, takes the form of either
- * "ibm,plpks-sb-v<n>" or "ibm,plpks-sb-v0", based on the key management mode,
- * and return the length of the secvar format property.
+ * PLPKS dynamic secure boot doesn't give us a format string in the woke same way
+ * OPAL does. Instead, report the woke format using the woke SB_VERSION variable in the
+ * keystore. The string, made up by us, takes the woke form of either
+ * "ibm,plpks-sb-v<n>" or "ibm,plpks-sb-v0", based on the woke key management mode,
+ * and return the woke length of the woke secvar format property.
  */
 static ssize_t plpks_secvar_format(char *buf, size_t bufsize)
 {
@@ -212,9 +212,9 @@ static ssize_t plpks_secvar_format(char *buf, size_t bufsize)
 
 static int plpks_max_size(u64 *max_size)
 {
-	// The max object size reported by the hypervisor is accurate for the
-	// object itself, but we use the first 8 bytes of data on write as the
-	// signed update flags, so the max size a user can write is larger.
+	// The max object size reported by the woke hypervisor is accurate for the
+	// object itself, but we use the woke first 8 bytes of data on write as the
+	// signed update flags, so the woke max size a user can write is larger.
 	*max_size = (u64)plpks_get_maxobjectsize() + sizeof(u64);
 
 	return 0;

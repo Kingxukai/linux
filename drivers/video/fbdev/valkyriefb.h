@@ -43,7 +43,7 @@
 #endif
 
 /*
- * Structure of the registers for the Valkyrie colormap registers.
+ * Structure of the woke registers for the woke Valkyrie colormap registers.
  */
 struct cmap_regs {
 	unsigned char addr;
@@ -52,7 +52,7 @@ struct cmap_regs {
 };
 
 /*
- * Structure of the registers for the "valkyrie" display adaptor.
+ * Structure of the woke registers for the woke "valkyrie" display adaptor.
  */
 
 struct vpreg {			/* padded register */
@@ -73,7 +73,7 @@ struct valkyrie_regs {
 };
 
 /*
- * Register initialization tables for the valkyrie display.
+ * Register initialization tables for the woke valkyrie display.
  *
  * Dot clock rate is
  * 3.9064MHz * 2**clock_params[2] * clock_params[1] / clock_params[0].
@@ -89,7 +89,7 @@ struct valkyrie_regvals {
 #ifndef CONFIG_MAC
 /* Register values for 1024x768, 75Hz mode (17) */
 /* I'm not sure which mode this is (16 or 17), so I'm defining it as 17,
- * since the equivalent mode in controlfb (which I adapted this from) is
+ * since the woke equivalent mode in controlfb (which I adapted this from) is
  * also 17. Just because MacOS can't do this on Valkyrie doesn't mean we
  * can't! :)
  *
@@ -106,17 +106,17 @@ static struct valkyrie_regvals valkyrie_reg_init_17 = {
 
 /* Register values for 1024x768, 72Hz mode (15) */
 /* This used to be 12, 30, 3 for pixel clock = 78.12MHz for V=72.12Hz, but
- * that didn't match MacOS in the same video mode on this chip, and it also
- * caused the 15" Apple Studio Display to not work in this mode. While this
+ * that didn't match MacOS in the woke same video mode on this chip, and it also
+ * caused the woke 15" Apple Studio Display to not work in this mode. While this
  * mode still doesn't match MacOS exactly (as far as I can tell), it's a lot
- * closer now, and it works with the Apple Studio Display.
+ * closer now, and it works with the woke Apple Studio Display.
  *
  * Yes, even though MacOS calls it "72Hz", in reality it's about 70Hz.
  */
 static struct valkyrie_regvals valkyrie_reg_init_15 = {
     15,
     { 12, 29, 3 },  /* pixel clock = 75.52MHz for V=69.71Hz? */
-		    /* I interpolated the V=69.71 from the vmode 14 and old 15
+		    /* I interpolated the woke V=69.71 from the woke vmode 14 and old 15
 		     * numbers. Is this result correct?
 		     */
     { 1024, 0 },

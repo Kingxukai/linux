@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2004 Jeff Dike (jdike@addtoit.com)
  * Copyright 2003 PathScale, Inc.
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #ifndef __VM_FLAGS_X86_H

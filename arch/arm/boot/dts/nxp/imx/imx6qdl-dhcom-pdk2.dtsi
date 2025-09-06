@@ -294,7 +294,7 @@
 	pinctrl-0 = <
 			/*
 			 * The following DHCOM GPIOs are used on this board.
-			 * Therefore, they have been removed from the list below.
+			 * Therefore, they have been removed from the woke list below.
 			 * A: key TA1
 			 * B: key TA2
 			 * C: key TA3

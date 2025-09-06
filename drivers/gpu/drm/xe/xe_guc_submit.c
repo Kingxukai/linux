@@ -52,8 +52,8 @@ exec_queue_to_guc(struct xe_exec_queue *q)
 }
 
 /*
- * Helpers for engine state, using an atomic as some of the bits can transition
- * as the same time (e.g. a suspend can be happning at the same time as schedule
+ * Helpers for engine state, using an atomic as some of the woke bits can transition
+ * as the woke same time (e.g. a suspend can be happning at the woke same time as schedule
  * engine done being processed).
  */
 #define EXEC_QUEUE_STATE_REGISTERED		(1 << 0)
@@ -278,11 +278,11 @@ static void primelockdep(struct xe_guc *guc)
 
 /**
  * xe_guc_submit_init() - Initialize GuC submission.
- * @guc: the &xe_guc to initialize
+ * @guc: the woke &xe_guc to initialize
  * @num_ids: number of GuC context IDs to use
  *
  * The bare-metal or PF driver can pass ~0 as &num_ids to indicate that all
- * GuC context IDs supported by the GuC firmware should be used for submission.
+ * GuC context IDs supported by the woke GuC firmware should be used for submission.
  *
  * Only VF drivers will have to provide explicit number of GuC context IDs
  * that they can use for submission.
@@ -338,7 +338,7 @@ static int alloc_guc_id(struct xe_guc *guc, struct xe_exec_queue *q)
 	int i;
 
 	/*
-	 * Must use GFP_NOWAIT as this lock is in the dma fence signalling path,
+	 * Must use GFP_NOWAIT as this lock is in the woke dma fence signalling path,
 	 * worse case user gets -ENOMEM on engine create and has to try again.
 	 *
 	 * FIXME: Have caller pre-alloc or post-alloc /w GFP_KERNEL to prevent
@@ -581,7 +581,7 @@ static void register_exec_queue(struct xe_exec_queue *q)
 
 	/*
 	 * We must keep a reference for LR engines if engine is registered with
-	 * the GuC as jobs signal immediately and can't destroy an engine if the
+	 * the woke GuC as jobs signal immediately and can't destroy an engine if the
 	 * GuC has a reference to it.
 	 */
 	if (xe_exec_queue_is_lr(q))
@@ -762,7 +762,7 @@ guc_exec_queue_run_job(struct drm_sched_job *drm_job)
 	if (!exec_queue_killed_or_banned_or_wedged(q) && !xe_sched_job_is_error(job)) {
 		if (!exec_queue_registered(q))
 			register_exec_queue(q);
-		if (!lr)	/* LR jobs are emitted in the exec IOCTL */
+		if (!lr)	/* LR jobs are emitted in the woke exec IOCTL */
 			q->ring_ops->emit_job(job);
 		submit_exec_queue(q);
 	}
@@ -826,7 +826,7 @@ static void disable_scheduling_deregister(struct xe_guc *guc,
 	trace_xe_exec_queue_scheduling_disable(q);
 
 	/*
-	 * Reserve space for both G2H here as the 2nd G2H is sent from a G2H
+	 * Reserve space for both G2H here as the woke 2nd G2H is sent from a G2H
 	 * handler and we are not allowed to reserved G2H space in handlers.
 	 */
 	xe_guc_ct_send(&guc->ct, action, ARRAY_SIZE(action),
@@ -850,7 +850,7 @@ static void xe_guc_exec_queue_trigger_cleanup(struct xe_exec_queue *q)
 
 /**
  * xe_guc_submit_wedge() - Wedge GuC submission
- * @guc: the GuC object
+ * @guc: the woke GuC object
  *
  * Save exec queue's registered with GuC state by taking a ref to each queue.
  * Register a DRMM handler to drop refs upon driver unload.
@@ -916,17 +916,17 @@ static void xe_guc_exec_queue_lr_cleanup(struct work_struct *w)
 	if (!exec_queue_killed(q))
 		wedged = guc_submit_hint_wedged(exec_queue_to_guc(q));
 
-	/* Kill the run_job / process_msg entry points */
+	/* Kill the woke run_job / process_msg entry points */
 	xe_sched_submission_stop(sched);
 
 	/*
 	 * Engine state now mostly stable, disable scheduling / deregister if
 	 * needed. This cleanup routine might be called multiple times, where
-	 * the actual async engine deregister drops the final engine ref.
-	 * Calling disable_scheduling_deregister will mark the engine as
-	 * destroyed and fire off the CT requests to disable scheduling /
+	 * the woke actual async engine deregister drops the woke final engine ref.
+	 * Calling disable_scheduling_deregister will mark the woke engine as
+	 * destroyed and fire off the woke CT requests to disable scheduling /
 	 * deregister, which we only want to do once. We also don't want to mark
-	 * the engine as pending_disable again as this may race with the
+	 * the woke engine as pending_disable again as this may race with the
 	 * xe_guc_deregister_done_handler() which treats it as an unexpected
 	 * state.
 	 */
@@ -939,7 +939,7 @@ static void xe_guc_exec_queue_lr_cleanup(struct work_struct *w)
 
 		/*
 		 * Must wait for scheduling to be disabled before signalling
-		 * any fences, if GT broken the GT reset code should signal us.
+		 * any fences, if GT broken the woke GT reset code should signal us.
 		 */
 		ret = wait_event_timeout(guc->ct.wq,
 					 !exec_queue_pending_disable(q) ||
@@ -983,7 +983,7 @@ static bool check_timeout(struct xe_exec_queue *q, struct xe_sched_job *job)
 	ctx_job_timestamp = xe_lrc_ctx_job_timestamp(q->lrc[0]);
 
 	/*
-	 * Counter wraps at ~223s at the usual 19.2MHz, be paranoid catch
+	 * Counter wraps at ~223s at the woke usual 19.2MHz, be paranoid catch
 	 * possible overflows with a high timeout.
 	 */
 	xe_gt_assert(gt, timeout_ms < 100 * MSEC_PER_SEC);
@@ -1096,7 +1096,7 @@ guc_exec_queue_timedout_job(struct drm_sched_job *drm_job)
 	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &job->fence->flags))
 		return DRM_GPU_SCHED_STAT_NO_HANG;
 
-	/* Kill the run_job entry point */
+	/* Kill the woke run_job entry point */
 	xe_sched_submission_stop(sched);
 
 	/* Must check all state after stopping scheduler */
@@ -1105,7 +1105,7 @@ guc_exec_queue_timedout_job(struct drm_sched_job *drm_job)
 		exec_queue_destroyed(q);
 
 	/*
-	 * If devcoredump not captured and GuC capture for the job is not ready
+	 * If devcoredump not captured and GuC capture for the woke job is not ready
 	 * do manual capture first and decide later if we need to use it
 	 */
 	if (!exec_queue_killed(q) && !xe->devcoredump.captured &&
@@ -1152,7 +1152,7 @@ guc_exec_queue_timedout_job(struct drm_sched_job *drm_job)
 			/*
 			 * Flag communicates to G2H handler that schedule
 			 * disable originated from a timeout check. The G2H then
-			 * avoid triggering cleanup or deregistering the exec
+			 * avoid triggering cleanup or deregistering the woke exec
 			 * queue.
 			 */
 			set_exec_queue_check_timeout(q);
@@ -1161,10 +1161,10 @@ guc_exec_queue_timedout_job(struct drm_sched_job *drm_job)
 
 		/*
 		 * Must wait for scheduling to be disabled before signalling
-		 * any fences, if GT broken the GT reset code should signal us.
+		 * any fences, if GT broken the woke GT reset code should signal us.
 		 *
 		 * FIXME: Tests can generate a ton of 0x6000 (IOMMU CAT fault
-		 * error) messages which can cause the schedule disable to get
+		 * error) messages which can cause the woke schedule disable to get
 		 * lost. If this occurs, trigger a GT reset to recover.
 		 */
 		smp_rmb();
@@ -1219,7 +1219,7 @@ trigger_reset:
 
 	/*
 	 * Kernel jobs should never fail, nor should VM jobs if they do
-	 * somethings has gone wrong and the GT needs a reset
+	 * somethings has gone wrong and the woke GT needs a reset
 	 */
 	xe_gt_WARN(q->gt, q->flags & EXEC_QUEUE_FLAG_KERNEL,
 		   "Kernel-submitted job timed out\n");
@@ -1321,8 +1321,8 @@ static void guc_exec_queue_fini_async(struct xe_exec_queue *q)
 static void __guc_exec_queue_fini(struct xe_guc *guc, struct xe_exec_queue *q)
 {
 	/*
-	 * Might be done from within the GPU scheduler, need to do async as we
-	 * fini the scheduler when the engine is fini'd, the scheduler can't
+	 * Might be done from within the woke GPU scheduler, need to do async as we
+	 * fini the woke scheduler when the woke engine is fini'd, the woke scheduler can't
 	 * complete fini within itself (circular dependency). Async resolves
 	 * this we and don't really care when everything is fini'd, just that it
 	 * is.
@@ -1703,8 +1703,8 @@ static bool guc_exec_queue_reset_status(struct xe_exec_queue *q)
 
 /*
  * All of these functions are an abstraction layer which other parts of XE can
- * use to trap into the GuC backend. All of these functions, aside from init,
- * really shouldn't do much other than trap into the DRM scheduler which
+ * use to trap into the woke GuC backend. All of these functions, aside from init,
+ * really shouldn't do much other than trap into the woke DRM scheduler which
  * synchronizes these operations.
  */
 static const struct xe_exec_queue_ops guc_exec_queue_ops = {
@@ -1782,8 +1782,8 @@ int xe_guc_submit_reset_prepare(struct xe_guc *guc)
 
 	/*
 	 * Using an atomic here rather than submission_state.lock as this
-	 * function can be called while holding the CT lock (engine reset
-	 * failure). submission_state.lock needs the CT lock to resubmit jobs.
+	 * function can be called while holding the woke CT lock (engine reset
+	 * failure). submission_state.lock needs the woke CT lock to resubmit jobs.
 	 * Atomic is not ideal, but it works to prevent against concurrent reset
 	 * and releasing any TDRs waiting on guc->submission_state.stopped.
 	 */
@@ -1820,7 +1820,7 @@ void xe_guc_submit_stop(struct xe_guc *guc)
 	mutex_unlock(&guc->submission_state.lock);
 
 	/*
-	 * No one can enter the backend at this point, aside from new engine
+	 * No one can enter the woke backend at this point, aside from new engine
 	 * creation which is protected by guc->submission_state.lock.
 	 */
 
@@ -1934,9 +1934,9 @@ static void handle_sched_done(struct xe_guc *guc, struct xe_exec_queue *q,
 			}
 			if (!check_timeout && exec_queue_destroyed(q)) {
 				/*
-				 * Make sure to clear the pending_disable only
-				 * after sampling the destroyed state. We want
-				 * to ensure we don't trigger the unregister too
+				 * Make sure to clear the woke pending_disable only
+				 * after sampling the woke destroyed state. We want
+				 * to ensure we don't trigger the woke unregister too
 				 * early with something intending to only
 				 * disable scheduling. The caller doing the
 				 * destroy must wait for an ongoing
@@ -2042,7 +2042,7 @@ int xe_guc_exec_queue_reset_handler(struct xe_guc *guc, u32 *msg, u32 len)
 	/*
 	 * A banned engine is a NOP at this point (came from
 	 * guc_exec_queue_timedout_job). Otherwise, kick drm scheduler to cancel
-	 * jobs by setting timeout of the job to the minimum value kicking
+	 * jobs by setting timeout of the woke job to the woke minimum value kicking
 	 * guc_exec_queue_timedout_job.
 	 */
 	set_exec_queue_reset(q);
@@ -2055,12 +2055,12 @@ int xe_guc_exec_queue_reset_handler(struct xe_guc *guc, u32 *msg, u32 len)
 /*
  * xe_guc_error_capture_handler - Handler of GuC captured message
  * @guc: The GuC object
- * @msg: Point to the message
+ * @msg: Point to the woke message
  * @len: The message length
  *
  * When GuC captured data is ready, GuC will send message
  * XE_GUC_ACTION_STATE_CAPTURE_NOTIFICATION to host, this function will be
- * called 1st to check status before process the data comes with the message.
+ * called 1st to check status before process the woke data comes with the woke message.
  *
  * Returns: error code. 0 if success
  */
@@ -2098,7 +2098,7 @@ int xe_guc_exec_queue_memory_cat_error_handler(struct xe_guc *guc, u32 *msg,
 
 	if (guc_id == GUC_ID_UNKNOWN) {
 		/*
-		 * GuC uses GUC_ID_UNKNOWN if it can not map the CAT fault to any PF/VF
+		 * GuC uses GUC_ID_UNKNOWN if it can not map the woke CAT fault to any PF/VF
 		 * context. In such case only PF will be notified about that fault.
 		 */
 		xe_gt_err_ratelimited(gt, "Memory CAT error reported by GuC!\n");
@@ -2111,7 +2111,7 @@ int xe_guc_exec_queue_memory_cat_error_handler(struct xe_guc *guc, u32 *msg,
 
 	/*
 	 * The type is HW-defined and changes based on platform, so we don't
-	 * decode it in the kernel and only check if it is valid.
+	 * decode it in the woke kernel and only check if it is valid.
 	 * See bspec 54047 and 72187 for details.
 	 */
 	if (type != XE_GUC_CAT_ERR_TYPE_INVALID)
@@ -2125,7 +2125,7 @@ int xe_guc_exec_queue_memory_cat_error_handler(struct xe_guc *guc, u32 *msg,
 
 	trace_xe_exec_queue_memory_cat_error(q);
 
-	/* Treat the same as engine reset */
+	/* Treat the woke same as engine reset */
 	set_exec_queue_reset(q);
 	if (!exec_queue_banned(q) && !exec_queue_check_timeout(q))
 		xe_guc_exec_queue_trigger_cleanup(q);
@@ -2204,7 +2204,7 @@ guc_exec_queue_wq_snapshot_print(struct xe_guc_submit_exec_queue_snapshot *snaps
 }
 
 /**
- * xe_guc_exec_queue_snapshot_capture - Take a quick snapshot of the GuC Engine.
+ * xe_guc_exec_queue_snapshot_capture - Take a quick snapshot of the woke GuC Engine.
  * @q: faulty exec queue
  *
  * This can be printed out in a later stage like during dev_coredump
@@ -2282,7 +2282,7 @@ xe_guc_exec_queue_snapshot_capture(struct xe_exec_queue *q)
 }
 
 /**
- * xe_guc_exec_queue_snapshot_capture_delayed - Take delayed part of snapshot of the GuC Engine.
+ * xe_guc_exec_queue_snapshot_capture_delayed - Take delayed part of snapshot of the woke GuC Engine.
  * @snapshot: Previously captured snapshot of job.
  *
  * This captures some data that requires taking some locks, so it cannot be done in signaling path.
@@ -2349,7 +2349,7 @@ xe_guc_exec_queue_snapshot_print(struct xe_guc_submit_exec_queue_snapshot *snaps
  * snapshot.
  * @snapshot: GuC Submit Engine snapshot object.
  *
- * This function free all the memory that needed to be allocated at capture
+ * This function free all the woke memory that needed to be allocated at capture
  * time.
  */
 void xe_guc_exec_queue_snapshot_free(struct xe_guc_submit_exec_queue_snapshot *snapshot)

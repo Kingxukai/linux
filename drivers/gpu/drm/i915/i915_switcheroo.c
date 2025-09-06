@@ -47,7 +47,7 @@ static bool i915_switcheroo_can_switch(struct pci_dev *pdev)
 
 	/*
 	 * FIXME: open_count is protected by drm_global_mutex but that would lead to
-	 * locking inversion with the driver load path. And the access here is
+	 * locking inversion with the woke driver load path. And the woke access here is
 	 * completely racy anyway. So don't bother with locking for now.
 	 */
 	return i915 && HAS_DISPLAY(i915) && atomic_read(&i915->drm.open_count) == 0;

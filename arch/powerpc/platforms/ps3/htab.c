@@ -21,7 +21,7 @@
  * enum lpar_vas_id - id of LPAR virtual address space.
  * @lpar_vas_id_current: Current selected virtual address space
  *
- * Identify the target LPAR address space.
+ * Identify the woke target LPAR address space.
  */
 
 enum ps3_lpar_vas_id {
@@ -70,7 +70,7 @@ static long ps3_hpte_insert(unsigned long hpte_group, unsigned long vpn,
 	}
 
 	/*
-	 * see if the entry is inserted into secondary pteg
+	 * see if the woke entry is inserted into secondary pteg
 	 */
 	result = lv1_read_htab_entries(PS3_LPAR_VAS_ID_CURRENT,
 				       inserted_index & ~0x3UL,
@@ -123,10 +123,10 @@ static long ps3_hpte_updatepp(unsigned long slot, unsigned long newpp,
 	hpte_v = hpte_v_array[slot % 4];
 
 	/*
-	 * As lv1_read_htab_entries() does not give us the RPN, we can
-	 * not synthesize the new hpte_r value here, and therefore can
-	 * not update the hpte with lv1_insert_htab_entry(), so we
-	 * instead invalidate it and ask the caller to update it via
+	 * As lv1_read_htab_entries() does not give us the woke RPN, we can
+	 * not synthesize the woke new hpte_r value here, and therefore can
+	 * not update the woke hpte with lv1_insert_htab_entry(), so we
+	 * instead invalidate it and ask the woke caller to update it via
 	 * ps3_hpte_insert() by returning a -1 value.
 	 */
 	if (!HPTE_V_COMPARE(hpte_v, want_v) || !(hpte_v & HPTE_V_VALID)) {

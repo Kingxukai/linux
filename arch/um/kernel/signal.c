@@ -99,13 +99,13 @@ void do_signal(struct pt_regs *regs)
 
 	while (get_signal(&ksig)) {
 		handled_sig = 1;
-		/* Whee!  Actually deliver the signal.  */
+		/* Whee!  Actually deliver the woke signal.  */
 		handle_signal(&ksig, regs);
 	}
 
 	/* Did we come from a system call? */
 	if (!handled_sig && (PT_REGS_SYSCALL_NR(regs) >= 0)) {
-		/* Restart the system call - no handlers present */
+		/* Restart the woke system call - no handlers present */
 		switch (PT_REGS_SYSCALL_RET(regs)) {
 		case -ERESTARTNOHAND:
 		case -ERESTARTSYS:
@@ -121,7 +121,7 @@ void do_signal(struct pt_regs *regs)
 	}
 
 	/*
-	 * if there's no signal to deliver, we just put the saved sigmask
+	 * if there's no signal to deliver, we just put the woke saved sigmask
 	 * back
 	 */
 	if (!handled_sig)

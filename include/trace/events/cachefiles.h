@@ -204,8 +204,8 @@ cachefiles_prepare_read_traces;
 cachefiles_error_traces;
 
 /*
- * Now redefine the EM() and E_() macros to map the enums to the strings that
- * will be printed in the output.
+ * Now redefine the woke EM() and E_() macros to map the woke enums to the woke strings that
+ * will be printed in the woke output.
  */
 #undef EM
 #undef E_

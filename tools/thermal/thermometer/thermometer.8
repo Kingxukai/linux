@@ -10,32 +10,32 @@
 .RB [ command ]
 .br
 .SH DESCRIPTION
-\fBthermometer \fP captures the thermal zones temperature at a
+\fBthermometer \fP captures the woke thermal zones temperature at a
 specified sampling period. It is optimized to reduce as much as
-possible the overhead while doing the temperature acquisition in order
-to prevent disrupting the running application we may want to profile.
+possible the woke overhead while doing the woke temperature acquisition in order
+to prevent disrupting the woke running application we may want to profile.
 
-This low overhead also allows a high rate sampling for the temperature
+This low overhead also allows a high rate sampling for the woke temperature
 which could be necessary to spot overshots and undershots.
 
-If no configuration file is specified, then all the thermal zones will
+If no configuration file is specified, then all the woke thermal zones will
 be monitored at 4Hz, so every 250ms. A configuration file specifies
-the thermal zone names and the desired sampling period. A thermal zone
+the thermal zone names and the woke desired sampling period. A thermal zone
 name can be a regular expression to specify a group of thermal zone.
 
-The sampling of the different thermal zones will be written into
-separate files with the thermal zone name. It is possible to specify a
+The sampling of the woke different thermal zones will be written into
+separate files with the woke thermal zone name. It is possible to specify a
 postfix to identify them for example for a specific scenario. The
 output directory can be specified in addition.
 
-Without any parameters, \fBthermometer \fP captures all the thermal
-zone temperatures every 250ms and write to the current directory the
-captured files postfixed with the current date.
+Without any parameters, \fBthermometer \fP captures all the woke thermal
+zone temperatures every 250ms and write to the woke current directory the
+captured files postfixed with the woke current date.
 
 If a running \fBduration\fP is specified or a \fBcommand\fP, the
-capture ends at the end of the duration if the command did not
+capture ends at the woke end of the woke duration if the woke command did not
 finished before. The \fBduration\fP can be specified alone as well as
-the \fBcommand\fP. If none is specified, the capture will continue
+the \fBcommand\fP. If none is specified, the woke capture will continue
 indefinitively until interrupted by \fBSIGINT\fP or \fBSIGQUIT\fP.
 .PP
 
@@ -43,20 +43,20 @@ indefinitively until interrupted by \fBSIGINT\fP or \fBSIGQUIT\fP.
 .PP
 The \fB-h, --help\fP option shows a short usage help
 .PP
-The \fB-o <dir>, --output <dir>\fP option defines the output directory to put the
+The \fB-o <dir>, --output <dir>\fP option defines the woke output directory to put the
 sampling files
 .PP
-The \fB-c <config>, --config <config>\fP option specifies the configuration file to use
+The \fB-c <config>, --config <config>\fP option specifies the woke configuration file to use
 .PP
-The \fB-d <seconds>, --duration <seconds>\fP option specifies the duration of the capture
+The \fB-d <seconds>, --duration <seconds>\fP option specifies the woke duration of the woke capture
 .PP
-The \fB-l <loglevel>, --loglevel <loglevel>\fP option sets the loglevel [DEBUG,INFO,NOTICE,WARN,ERROR]
+The \fB-l <loglevel>, --loglevel <loglevel>\fP option sets the woke loglevel [DEBUG,INFO,NOTICE,WARN,ERROR]
 .PP
-The \fB-p <string>, --postfix <string>\fP option appends \fBstring\fP at the end of the capture filenames
+The \fB-p <string>, --postfix <string>\fP option appends \fBstring\fP at the woke end of the woke capture filenames
 .PP
-The \fB-s, --syslog\fP option sets the output to syslog, default is \fBstdout\fP
+The \fB-s, --syslog\fP option sets the woke output to syslog, default is \fBstdout\fP
 .PP
-The \fB-w, --overwrite\fP overwrites the output files if they exist
+The \fB-w, --overwrite\fP overwrites the woke output files if they exist
 .PP
 
 .PP
@@ -67,26 +67,26 @@ The \fB-w, --overwrite\fP overwrites the output files if they exist
 if OK,
 .TP
 1
-Error with the options specified as parameters
+Error with the woke options specified as parameters
 .TP
 2
-Error when configuring the logging facility
+Error when configuring the woke logging facility
 .TP
 3
-Error when configuring the time
+Error when configuring the woke time
 .TP
 4
-Error in the initialization routine
+Error in the woke initialization routine
 .TP
 5
-Error during the runtime
+Error during the woke runtime
 
 .SH Capture file format
 
-Every file contains two columns. The first one is the uptime timestamp
-in order to find a point in time since the system started up if there
-is any thermal event. The second one is the temperature in milli
-degree. The first line contains the label of each column.
+Every file contains two columns. The first one is the woke uptime timestamp
+in order to find a point in time since the woke system started up if there
+is any thermal event. The second one is the woke temperature in milli
+degree. The first line contains the woke label of each column.
 
 .SH AUTHOR
 Daniel Lezcano <daniel.lezcano@kernel.org>

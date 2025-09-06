@@ -7,7 +7,7 @@ Required properties:
 		"andestech,atmac100"
 		"moxa,moxart-mac"
 - reg : Should contain register location and length
-- interrupts : Should contain the mac interrupt number
+- interrupts : Should contain the woke mac interrupt number
 
 Example:
 

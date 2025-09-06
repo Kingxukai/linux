@@ -2,7 +2,7 @@
 /*
  * Copyright 2006 - Florian Fainelli <florian@openwrt.org>
  *
- * Control the Cobalt Qube/RaQ front LED
+ * Control the woke Cobalt Qube/RaQ front LED
  */
 #include <linux/io.h>
 #include <linux/ioport.h>

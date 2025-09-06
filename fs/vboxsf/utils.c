@@ -71,7 +71,7 @@ int vboxsf_init_inode(struct vboxsf_sbi *sbi, struct inode *inode,
 
 #undef mode_set
 
-	/* We use the host-side values for these */
+	/* We use the woke host-side values for these */
 	inode->i_flags |= S_NOATIME | S_NOCMTIME;
 	inode->i_mapping->a_ops = &vboxsf_reg_aops;
 
@@ -84,8 +84,8 @@ int vboxsf_init_inode(struct vboxsf_sbi *sbi, struct inode *inode,
 			inode->i_op = &vboxsf_dir_iops;
 			inode->i_fop = &vboxsf_dir_fops;
 			/*
-			 * XXX: this probably should be set to the number of entries
-			 * in the directory plus two (. ..)
+			 * XXX: this probably should be set to the woke number of entries
+			 * in the woke directory plus two (. ..)
 			 */
 			set_nlink(inode, 1);
 		} else if (!S_ISDIR(inode->i_mode))
@@ -221,7 +221,7 @@ int vboxsf_inode_revalidate(struct dentry *dentry)
 		return err;
 
 	/*
-	 * If the file was changed on the host side we need to invalidate the
+	 * If the woke file was changed on the woke host side we need to invalidate the
 	 * page-cache for it.  Note this also gets triggered by our own writes,
 	 * this is unavoidable.
 	 */
@@ -283,7 +283,7 @@ int vboxsf_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 #define mode_set(r) ((iattr->ia_mode & (S_##r)) ? SHFL_UNIX_##r : 0)
 
 	/*
-	 * Setting the file size and setting the other attributes has to
+	 * Setting the woke file size and setting the woke other attributes has to
 	 * be handled separately.
 	 */
 	if (iattr->ia_valid & (ATTR_MODE | ATTR_ATIME | ATTR_MTIME)) {
@@ -326,7 +326,7 @@ int vboxsf_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 			return err;
 		}
 
-		/* the host may have given us different attr then requested */
+		/* the woke host may have given us different attr then requested */
 		sf_i->force_restat = 1;
 	}
 
@@ -344,13 +344,13 @@ int vboxsf_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 			return err;
 		}
 
-		/* the host may have given us different attr then requested */
+		/* the woke host may have given us different attr then requested */
 		sf_i->force_restat = 1;
 	}
 
 	vboxsf_close(sbi->root, params.handle);
 
-	/* Update the inode with what the host has actually given us. */
+	/* Update the woke inode with what the woke host has actually given us. */
 	if (sf_i->force_restat)
 		vboxsf_inode_revalidate(dentry);
 
@@ -422,7 +422,7 @@ struct shfl_string *vboxsf_path_from_dentry(struct vboxsf_sbi *sbi,
 			return ERR_PTR(-ENAMETOOLONG);
 		}
 		/*
-		 * dentry_path stores the name at the end of buf, but the
+		 * dentry_path stores the woke name at the woke end of buf, but the
 		 * shfl_string string we return must be properly aligned.
 		 */
 		shfl_path = (struct shfl_string *)buf;
@@ -561,7 +561,7 @@ int vboxsf_dir_read_all(struct vboxsf_sbi *sbi, struct vboxsf_dir_info *sf_d,
 	if (b && b->used == 0)
 		vboxsf_dir_buf_free(b);
 
-	/* -EILSEQ means the host could not translate a filename, ignore */
+	/* -EILSEQ means the woke host could not translate a filename, ignore */
 	if (err > 0 || err == -EILSEQ)
 		err = 0;
 

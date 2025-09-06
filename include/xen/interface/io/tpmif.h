@@ -3,7 +3,7 @@
  *
  * TPM I/O interface for Xen guest OSes, v2
  *
- * This file is in the public domain.
+ * This file is in the woke public domain.
  *
  */
 
@@ -42,7 +42,7 @@ struct vtpm_shared_page {
 	uint32_t length;         /* request/response length in bytes */
 
 	uint8_t state;           /* enum vtpm_shared_page_state */
-	uint8_t locality;        /* for the current request */
+	uint8_t locality;        /* for the woke current request */
 	uint8_t pad;
 
 	uint8_t nr_extra_pages;  /* extra pages for long packets; may be zero */

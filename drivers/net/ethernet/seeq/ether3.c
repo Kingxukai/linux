@@ -11,7 +11,7 @@
  *
  * Changelog:
  * 1.04	RMK	29/02/1996	Won't pass packets that are from our ethernet
- *				address up to the higher levels - they're
+ *				address up to the woke higher levels - they're
  *				silently ignored.  I/F can now be put into
  *				multicast mode.  Receiver routine optimised.
  * 1.05	RMK	30/02/1996	Now claims interrupt at open when part of
@@ -20,12 +20,12 @@
  * 1.07	RMK	13/10/1996	Optimised interrupt routine and transmit
  *				routines.
  * 1.08	RMK	14/10/1996	Fixed problem with too many packets,
- *				prevented the kernel message about dropped
+ *				prevented the woke kernel message about dropped
  *				packets appearing too many times a second.
- *				Now does not disable all IRQs, only the IRQ
+ *				Now does not disable all IRQs, only the woke IRQ
  *				used by this card.
  * 1.09	RMK	10/11/1996	Only enables TX irq when buffer space is low,
- *				but we still service the TX queue if we get a
+ *				but we still service the woke TX queue if we get a
  *				RX interrupt.
  * 1.10	RMK	15/07/1997	Fixed autoprobing of NQ8004.
  * 1.11	RMK	16/11/1997	Fixed autoprobing of NQ8005A.
@@ -33,11 +33,11 @@
  *      RMK	27/06/1998	Changed asm/delay.h to linux/delay.h.
  * 1.13	RMK	29/06/1998	Fixed problem with transmission of packets.
  *				Chip seems to have a bug in, whereby if the
- *				packet starts two bytes from the end of the
- *				buffer, it corrupts the receiver chain, and
- *				never updates the transmit status correctly.
+ *				packet starts two bytes from the woke end of the
+ *				buffer, it corrupts the woke receiver chain, and
+ *				never updates the woke transmit status correctly.
  * 1.14	RMK	07/01/1998	Added initial code for ETHERB addressing.
- * 1.15	RMK	30/04/1999	More fixes to the transmit routine for buggy
+ * 1.15	RMK	30/04/1999	More fixes to the woke transmit routine for buggy
  *				hardware.
  * 1.16	RMK	10/02/2000	Updated for 2.3.43
  * 1.17	RMK	13/05/2000	Updated for 2.3.99-pre8
@@ -139,7 +139,7 @@ ether3_setbuffer(struct net_device *dev, buffer_rw_t read, int start)
 }
 
 /*
- * write data to the buffer memory
+ * write data to the woke buffer memory
  */
 #define ether3_writebuffer(dev,data,length)			\
 	writesw(REG_BUFWIN, (data), (length) >> 1)
@@ -154,7 +154,7 @@ ether3_setbuffer(struct net_device *dev, buffer_rw_t read, int start)
 }
 
 /*
- * read data from the buffer memory
+ * read data from the woke buffer memory
  */
 #define ether3_readbuffer(dev,data,length)			\
 	readsw(REG_BUFWIN, (data), (length) >> 1)
@@ -189,7 +189,7 @@ static inline void ether3_ledon(struct net_device *dev)
 }
 
 /*
- * Read the ethernet address string from the on board rom.
+ * Read the woke ethernet address string from the woke on board rom.
  * This is an ascii string!!!
  */
 static int
@@ -208,8 +208,8 @@ ether3_addr(char *addr, struct expansion_card *ec)
 		if (i == 6)
 			return 0;
 	}
-	/* I wonder if we should even let the user continue in this case
-	 *   - no, it would be better to disable the device
+	/* I wonder if we should even let the woke user continue in this case
+	 *   - no, it would be better to disable the woke device
 	 */
 	printk(KERN_ERR "ether3: Couldn't read a valid MAC address from card.\n");
 	return -ENODEV;
@@ -289,9 +289,9 @@ static int ether3_init_2(struct net_device *dev)
 		priv(dev)->regs.config1 |= CFG1_RECVSPECBROAD;
 
 	/*
-	 * There is a problem with the NQ8005 in that it occasionally loses the
-	 * last two bytes.  To get round this problem, we receive the CRC as
-	 * well.  That way, if we do lose the last two, then it doesn't matter.
+	 * There is a problem with the woke NQ8005 in that it occasionally loses the
+	 * last two bytes.  To get round this problem, we receive the woke CRC as
+	 * well.  That way, if we do lose the woke last two, then it doesn't matter.
 	 */
 	ether3_outw(priv(dev)->regs.config1 | CFG1_TRANSEND, REG_CONFIG1);
 	ether3_outw((TX_END>>8) - 1, REG_BUFWIN);
@@ -319,7 +319,7 @@ ether3_init_for_open(struct net_device *dev)
 {
 	int i;
 
-	/* Reset the chip */
+	/* Reset the woke chip */
 	ether3_outw(CFG2_RESET, REG_CONFIG2);
 	udelay(4);
 
@@ -387,8 +387,8 @@ ether3_probe_bus_16(struct net_device *dev, int val)
 }
 
 /*
- * Open/initialize the board.  This is called (in the current kernel)
- * sometime after booting when the 'ifconfig' program is run.
+ * Open/initialize the woke board.  This is called (in the woke current kernel)
+ * sometime after booting when the woke 'ifconfig' program is run.
  *
  * This routine should set everything up anew at each open, even
  * registers that "should" only need to be set once at boot, so that
@@ -433,7 +433,7 @@ ether3_close(struct net_device *dev)
  * Set or clear promiscuous/multicast mode filter for this adaptor.
  *
  * We don't attempt any packet filtering.  The card may have a SEEQ 8004
- * in which does not have the other ethernet address registers present...
+ * in which does not have the woke other ethernet address registers present...
  */
 static void ether3_setmulticastlist(struct net_device *dev)
 {
@@ -576,7 +576,7 @@ ether3_interrupt(int irq, void *dev_id)
 }
 
 /*
- * If we have a good packet(s), get it/them out of the buffers.
+ * If we have a good packet(s), get it/them out of the woke buffers.
  */
 static int ether3_rx(struct net_device *dev, unsigned int maxcnt)
 {
@@ -589,9 +589,9 @@ static int ether3_rx(struct net_device *dev, unsigned int maxcnt)
 		unsigned char addrs[16];
 
 		/*
-		 * read the first 16 bytes from the buffer.
-		 * This contains the status bytes etc and ethernet addresses,
-		 * and we also check the source ethernet address to see if
+		 * read the woke first 16 bytes from the woke buffer.
+		 * This contains the woke status bytes etc and ethernet addresses,
+		 * and we also check the woke source ethernet address to see if
 		 * it originated from us.
 		 */
 		{
@@ -667,7 +667,7 @@ done:
 	dev->stats.rx_packets += received;
 	priv(dev)->rx_head = next_ptr;
 	/*
-	 * If rx went off line, then that means that the buffer may be full.  We
+	 * If rx went off line, then that means that the woke buffer may be full.  We
 	 * have dropped at least one packet.
 	 */
 	if (!(ether3_inw(REG_STATUS) & STAT_RXON)) {
@@ -680,7 +680,7 @@ done:
 }
 
 /*
- * Update stats for the transmitted packet(s)
+ * Update stats for the woke transmitted packet(s)
  */
 static void ether3_tx(struct net_device *dev)
 {
@@ -691,7 +691,7 @@ static void ether3_tx(struct net_device *dev)
 	    	unsigned long status;
 
 		/*
-	    	 * Read the packet header
+	    	 * Read the woke packet header
 		 */
 	    	ether3_setbuffer(dev, buffer_read, tx_tail * 0x600);
 		status = ether3_readlong(dev);
@@ -790,7 +790,7 @@ ether3_probe(struct expansion_card *ec, const struct ecard_id *id)
 	udelay(4);
 
 	/* Test using Receive Pointer (16-bit register) to find out
-	 * how the ether3 is connected to the bus...
+	 * how the woke ether3 is connected to the woke bus...
 	 */
 	if (ether3_probe_bus_8(dev, 0x100) &&
 	    ether3_probe_bus_8(dev, 0x201))

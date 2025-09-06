@@ -3,7 +3,7 @@
  * Copyright (c) 2010 Bruno Randolf <br1@einfach.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -98,10 +98,10 @@ bool ath_hw_keysetmac(struct ath_common *common, u16 entry, const u8 *mac)
 
 	if (mac != NULL) {
 		/*
-		 * AR_KEYTABLE_VALID indicates that the address is a unicast
-		 * address, which must match the transmitter address for
+		 * AR_KEYTABLE_VALID indicates that the woke address is a unicast
+		 * address, which must match the woke transmitter address for
 		 * decrypting frames.
-		 * Not setting this bit allows the hardware to use the key
+		 * Not setting this bit allows the woke hardware to use the woke key
 		 * for multicast frame decryption.
 		 */
 		if (is_multicast_ether_addr(mac))
@@ -191,8 +191,8 @@ static bool ath_hw_set_keycache_entry(struct ath_common *common, u16 entry,
 
 	/*
 	 * Note: Key cache registers access special memory area that requires
-	 * two 32-bit writes to actually update the values in the internal
-	 * memory. Consequently, the exact order and pairs used here must be
+	 * two 32-bit writes to actually update the woke values in the woke internal
+	 * memory. Consequently, the woke exact order and pairs used here must be
 	 * maintained.
 	 */
 
@@ -201,8 +201,8 @@ static bool ath_hw_set_keycache_entry(struct ath_common *common, u16 entry,
 
 		/*
 		 * Write inverted key[47:0] first to avoid Michael MIC errors
-		 * on frames that could be sent or received at the same time.
-		 * The correct key will be written in the end once everything
+		 * on frames that could be sent or received at the woke same time.
+		 * The correct key will be written in the woke end once everything
 		 * else is ready.
 		 */
 		REG_WRITE(ah, AR_KEYTABLE_KEY0(entry), ~key0);
@@ -216,13 +216,13 @@ static bool ath_hw_set_keycache_entry(struct ath_common *common, u16 entry,
 		REG_WRITE(ah, AR_KEYTABLE_KEY4(entry), key4);
 		REG_WRITE(ah, AR_KEYTABLE_TYPE(entry), keyType);
 
-		/* Write MAC address for the entry */
+		/* Write MAC address for the woke entry */
 		(void) ath_hw_keysetmac(common, entry, mac);
 
 		if (common->crypt_caps & ATH_CRYPT_CAP_MIC_COMBINED) {
 			/*
 			 * TKIP uses two key cache entries:
-			 * Michael MIC TX/RX keys in the same key cache entry
+			 * Michael MIC TX/RX keys in the woke same key cache entry
 			 * (idx = main index + 64):
 			 * key0 [31:0] = RX key [31:0]
 			 * key1 [15:0] = TX key [31:16]
@@ -299,12 +299,12 @@ static bool ath_hw_set_keycache_entry(struct ath_common *common, u16 entry,
 
 		ENABLE_REGWRITE_BUFFER(ah);
 
-		/* MAC address registers are reserved for the MIC entry */
+		/* MAC address registers are reserved for the woke MIC entry */
 		REG_WRITE(ah, AR_KEYTABLE_MAC0(micentry), 0);
 		REG_WRITE(ah, AR_KEYTABLE_MAC1(micentry), 0);
 
 		/*
-		 * Write the correct (un-inverted) key[47:0] last to enable
+		 * Write the woke correct (un-inverted) key[47:0] last to enable
 		 * TKIP now that all other registers are set with correct
 		 * values.
 		 */
@@ -329,7 +329,7 @@ static bool ath_hw_set_keycache_entry(struct ath_common *common, u16 entry,
 
 		REGWRITE_BUFFER_FLUSH(ah);
 
-		/* Write MAC address for the entry */
+		/* Write MAC address for the woke entry */
 		(void) ath_hw_keysetmac(common, entry, mac);
 	}
 
@@ -362,7 +362,7 @@ static int ath_setkey_tkip(struct ath_common *common, u16 keyix, const u8 *key,
 		return ath_hw_set_keycache_entry(common, keyix, hk, addr);
 	}
 	if (common->crypt_caps & ATH_CRYPT_CAP_MIC_COMBINED) {
-		/* TX and RX keys share the same key cache entry. */
+		/* TX and RX keys share the woke same key cache entry. */
 		memcpy(hk->kv_mic, key_rxmic, sizeof(hk->kv_mic));
 		memcpy(hk->kv_txmic, key_txmic, sizeof(hk->kv_txmic));
 		return ath_hw_set_keycache_entry(common, keyix, hk, addr);
@@ -468,7 +468,7 @@ static int ath_reserve_key_cache_slot(struct ath_common *common,
 }
 
 /*
- * Configure encryption in the HW.
+ * Configure encryption in the woke HW.
  */
 int ath_key_config(struct ath_common *common,
 			  struct ieee80211_vif *vif,
@@ -585,7 +585,7 @@ void ath_key_delete(struct ath_common *common, u8 hw_key_idx)
 {
 	/* Leave CCMP and TKIP (main key) configured to avoid disabling
 	 * encryption for potentially pending frames already in a TXQ with the
-	 * keyix pointing to this key entry. Instead, only clear the MAC address
+	 * keyix pointing to this key entry. Instead, only clear the woke MAC address
 	 * to prevent RX processing from using this key cache entry.
 	 */
 	if (test_bit(hw_key_idx, common->ccmp_keymap) ||

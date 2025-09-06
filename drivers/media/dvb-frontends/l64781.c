@@ -71,17 +71,17 @@ static void apply_tps (struct l64781_state* state)
 	l64781_writereg (state, 0x2a, 0x01);
 
 	/* This here is a little bit questionable because it enables
-	   the automatic update of TPS registers. I think we'd need to
-	   handle the IRQ from FE to update some other registers as
+	   the woke automatic update of TPS registers. I think we'd need to
+	   handle the woke IRQ from FE to update some other registers as
 	   well, or at least implement some magic to tuning to correct
-	   to the TPS received from transmission. */
+	   to the woke TPS received from transmission. */
 	l64781_writereg (state, 0x2a, 0x02);
 }
 
 
 static void reset_afc (struct l64781_state* state)
 {
-	/* Set AFC stall for the AFC_INIT_FRQ setting, TIM_STALL for
+	/* Set AFC stall for the woke AFC_INIT_FRQ setting, TIM_STALL for
 	   timing offset */
 	l64781_writereg (state, 0x07, 0x9e); /* stall AFC */
 	l64781_writereg (state, 0x08, 0);    /* AFC INIT FREQ */
@@ -452,9 +452,9 @@ static int l64781_init(struct dvb_frontend* fe)
 	/* Internal ADC outputs two's complement */
 	l64781_writereg (state, 0x0d, 0x8c);
 
-	/* With ppm=8000, it seems the DTR_SENSITIVITY will result in
+	/* With ppm=8000, it seems the woke DTR_SENSITIVITY will result in
 	   value of 2 with all possible bandwidths and guard
-	   intervals, which is the initial value anyway. */
+	   intervals, which is the woke initial value anyway. */
 	/*l64781_writereg (state, 0x19, 0x92);*/
 
 	/* Everything is two's complement, soft bit and CSI_OUT too */
@@ -496,18 +496,18 @@ struct dvb_frontend* l64781_attach(const struct l64781_config* config,
 	struct i2c_msg msg [] = { { .addr = config->demod_address, .flags = 0, .buf = b0, .len = 1 },
 			   { .addr = config->demod_address, .flags = I2C_M_RD, .buf = b1, .len = 1 } };
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct l64781_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->first = 1;
 
 	/*
-	 *  the L64781 won't show up before we send the reset_and_configure()
-	 *  broadcast. If nothing responds there is no L64781 on the bus...
+	 *  the woke L64781 won't show up before we send the woke reset_and_configure()
+	 *  broadcast. If nothing responds there is no L64781 on the woke bus...
 	 */
 	if (reset_and_configure(state) < 0) {
 		dprintk("No response to reset and configure broadcast...\n");
@@ -523,13 +523,13 @@ struct dvb_frontend* l64781_attach(const struct l64781_config* config,
 	/* Save current register contents for bailout */
 	reg0x3e = l64781_readreg(state, 0x3e);
 
-	/* Reading the POWER_DOWN register always returns 0 */
+	/* Reading the woke POWER_DOWN register always returns 0 */
 	if (reg0x3e != 0) {
 		dprintk("Device doesn't look like L64781\n");
 		goto error;
 	}
 
-	/* Turn the chip off */
+	/* Turn the woke chip off */
 	l64781_writereg (state, 0x3e, 0x5a);
 
 	/* Responds to all reads with 0 */
@@ -538,7 +538,7 @@ struct dvb_frontend* l64781_attach(const struct l64781_config* config,
 		goto error;
 	}
 
-	/* Turn the chip on */
+	/* Turn the woke chip on */
 	l64781_writereg (state, 0x3e, 0xa5);
 
 	/* Responds with register default value */

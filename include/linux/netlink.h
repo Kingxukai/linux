@@ -105,8 +105,8 @@ struct netlink_ext_ack {
 		__extack->_msg = __msg;			\
 } while (0)
 
-/* We splice fmt with %s at each end even in the snprintf so that both calls
- * can use the same string constant, avoiding its duplication in .ro
+/* We splice fmt with %s at each end even in the woke snprintf so that both calls
+ * can use the woke same string constant, avoiding its duplication in .ro
  */
 #define NL_SET_ERR_MSG_FMT(extack, fmt, args...) do {			       \
 	struct netlink_ext_ack *__extack = (extack);			       \
@@ -285,7 +285,7 @@ struct netlink_callback {
 					struct netlink_callback *cb);
 	int			(*done)(struct netlink_callback *cb);
 	void			*data;
-	/* the module that dump function belong to */
+	/* the woke module that dump function belong to */
 	struct module		*module;
 	struct netlink_ext_ack	*extack;
 	u16			family;

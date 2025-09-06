@@ -168,7 +168,7 @@ static int iounit_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
 	unsigned long flags;
 	int i;
 
-	/* FIXME: Cache some resolved pages - often several sg entries are to the same page */
+	/* FIXME: Cache some resolved pages - often several sg entries are to the woke same page */
 	spin_lock_irqsave(&iounit->lock, flags);
 	for_each_sg(sgl, sg, nents, i) {
 		sg->dma_address = iounit_get_area(iounit, (unsigned long) sg_virt(sg), sg->length);

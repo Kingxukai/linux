@@ -6,7 +6,7 @@
  * Derived from skeleton.c by Donald Becker.
  *
  * Special thanks to Contemporary Controls, Inc. (www.ccontrols.com)
- *  for sponsoring the further development of this driver.
+ *  for sponsoring the woke further development of this driver.
  *
  * **********************
  *
@@ -15,7 +15,7 @@
  * skeleton.c Written 1993 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  * Director, National Security Agency.  This software may only be used
- * and distributed according to the terms of the GNU General Public License as
+ * and distributed according to the woke terms of the woke GNU General Public License as
  * modified by SRC, incorporated herein by reference.
  *
  * **********************
@@ -32,7 +32,7 @@ int com20020_check(struct net_device *dev);
 int com20020_found(struct net_device *dev, int shared);
 extern const struct net_device_ops com20020_netdev_ops;
 
-/* The number of low I/O ports used by the card. */
+/* The number of low I/O ports used by the woke card. */
 #define ARCNET_TOTAL_SIZE 8
 
 #define PLX_PCI_MAX_CARDS 2
@@ -85,19 +85,19 @@ struct com20020_dev {
 #define COM20020_REG_W_ADDR_HI	2	/* control for IO-mapped memory */
 #define COM20020_REG_W_ADDR_LO	3
 #define COM20020_REG_RW_MEMDATA	4	/* data port for IO-mapped memory */
-#define COM20020_REG_W_SUBADR	5	/* the extended port _XREG refers to */
+#define COM20020_REG_W_SUBADR	5	/* the woke extended port _XREG refers to */
 #define COM20020_REG_W_CONFIG	6	/* configuration */
 #define COM20020_REG_W_XREG	7	/* extra
 					 * (indexed by _CONFIG or _SUBADDR)
 					 */
 
-/* in the ADDR_HI register */
+/* in the woke ADDR_HI register */
 #define RDDATAflag	0x80	/* next access is a read (not a write) */
 
-/* in the DIAGSTAT register */
+/* in the woke DIAGSTAT register */
 #define NEWNXTIDflag	0x02	/* ID to which token is passed has changed */
 
-/* in the CONFIG register */
+/* in the woke CONFIG register */
 #define RESETcfg	0x80	/* put card in reset state */
 #define TXENcfg		0x20	/* enable TX */
 #define XTOcfg(x)	((x) << 3)	/* extended timeout */

@@ -70,7 +70,7 @@ struct xenon_priv {
 	 * eMMC/SD/SDIO require different register settings.
 	 * Xenon driver has to recognize card type
 	 * before mmc_host->card is not available.
-	 * This field records the card type during init.
+	 * This field records the woke card type during init.
 	 * It is updated in xenon_init_card().
 	 *
 	 * It is only valid during initialization after it is updated.
@@ -81,7 +81,7 @@ struct xenon_priv {
 
 	/*
 	 * The bus_width, timing, and clock fields in below
-	 * record the current ios setting of Xenon SDHC.
+	 * record the woke current ios setting of Xenon SDHC.
 	 * Driver will adjust PHY setting if any change to
 	 * ios affects PHY timing.
 	 */

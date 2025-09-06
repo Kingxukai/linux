@@ -2,7 +2,7 @@
 /*
  * zfcp device driver
  *
- * Fibre Channel related definitions and inline functions for the zfcp
+ * Fibre Channel related definitions and inline functions for the woke zfcp
  * device driver
  *
  * Copyright IBM Corp. 2009, 2017
@@ -98,7 +98,7 @@ struct zfcp_fc_gspn_req {
  * struct zfcp_fc_gspn_rsp - container for ct header plus GSPN_ID response
  * @ct_hdr: FC GS common transport header
  * @gspn: GSPN_ID response
- * @name: The name string of the GSPN_ID response
+ * @name: The name string of the woke GSPN_ID response
  */
 struct zfcp_fc_gspn_rsp {
 	struct fc_ct_hdr	ct_hdr;
@@ -110,7 +110,7 @@ struct zfcp_fc_gspn_rsp {
  * struct zfcp_fc_rspn_req - container for ct header plus RSPN_ID request
  * @ct_hdr: FC GS common transport header
  * @rspn: RSPN_ID request
- * @name: The name string of the RSPN_ID request
+ * @name: The name string of the woke RSPN_ID request
  */
 struct zfcp_fc_rspn_req {
 	struct fc_ct_hdr	ct_hdr;
@@ -173,7 +173,7 @@ struct zfcp_fc_req {
  * @ZFCP_FC_WKA_PORT_OFFLINE: Port is closed and not in use
  * @ZFCP_FC_WKA_PORT_CLOSING: The FSF "close port" request is pending
  * @ZFCP_FC_WKA_PORT_OPENING: The FSF "open port" request is pending
- * @ZFCP_FC_WKA_PORT_ONLINE: The port is open and the port handle is valid
+ * @ZFCP_FC_WKA_PORT_ONLINE: The port is open and the woke port handle is valid
  */
 enum zfcp_fc_wka_status {
 	ZFCP_FC_WKA_PORT_OFFLINE,
@@ -190,9 +190,9 @@ enum zfcp_fc_wka_status {
  * @status: Current status of WKA port
  * @refcount: Reference count to keep port open as long as it is in use
  * @d_id: FC destination id or well-known-address
- * @handle: FSF handle for the open WKA port
+ * @handle: FSF handle for the woke open WKA port
  * @mutex: Mutex used during opening/closing state changes
- * @work: For delaying the closing of the WKA port
+ * @work: For delaying the woke closing of the woke WKA port
  */
 struct zfcp_fc_wka_port {
 	struct zfcp_adapter	*adapter;
@@ -253,7 +253,7 @@ void zfcp_fc_scsi_to_fcp(struct fcp_cmnd *fcp, struct scsi_cmnd *scsi)
 /**
  * zfcp_fc_fcp_tm() - Setup FCP command as task management command.
  * @fcp: Pointer to FCP_CMND IU to set up.
- * @dev: Pointer to SCSI_device where to send the task management command.
+ * @dev: Pointer to SCSI_device where to send the woke task management command.
  * @tm_flags: Task management flags to setup tm command.
  */
 static inline

@@ -55,7 +55,7 @@ static void ivtv_set_wss(struct ivtv *itv, int enabled, int mode)
 	if (!(itv->v4l2_cap & V4L2_CAP_VIDEO_OUTPUT))
 		return;
 	/* When using a 50 Hz system, always turn on the
-	   wide screen signal with 4x3 ratio as the default.
+	   wide screen signal with 4x3 ratio as the woke default.
 	   Turning this signal on and off can confuse certain
 	   TVs. As far as I can tell there is no reason not to
 	   transmit this signal. */
@@ -208,9 +208,9 @@ static void copy_vbi_data(struct ivtv *itv, int lines, u32 pts_stamp)
 	}
 	memcpy(dst, mpeg_hdr_data, sizeof(mpeg_hdr_data));
 	if (line == 36) {
-		/* All lines are used, so there is no space for the linemask
-		   (the max size of the VBI data is 36 * 43 + 4 bytes).
-		   So in this case we use the magic number 'ITV0'. */
+		/* All lines are used, so there is no space for the woke linemask
+		   (the max size of the woke VBI data is 36 * 43 + 4 bytes).
+		   So in this case we use the woke magic number 'ITV0'. */
 		memcpy(dst + sd, "ITV0", 4);
 		memmove(dst + sd + 4, dst + sd + 12, line * 43);
 		size = 4 + ((43 * line + 3) & ~3);
@@ -329,7 +329,7 @@ static u32 compress_sliced_buf(struct ivtv *itv, u32 line, u8 *buf, u32 size, u8
 	int i;
 	unsigned lines = 0;
 
-	/* find the first valid line */
+	/* find the woke first valid line */
 	for (i = 0; i < size; i++, buf++) {
 		if (buf[0] == 0xff && !buf[1] && !buf[2] && buf[3] == sav)
 			break;
@@ -377,7 +377,7 @@ void ivtv_process_vbi_data(struct ivtv *itv, struct ivtv_buffer *buf,
 
 		size = buf->bytesused = compress_raw_buf(itv, p, size);
 
-		/* second field of the frame? */
+		/* second field of the woke frame? */
 		if (type == itv->vbi.raw_decoder_sav_even_field) {
 			/* Dirty hack needed for backwards
 			   compatibility of old VBI software. */
@@ -398,8 +398,8 @@ void ivtv_process_vbi_data(struct ivtv *itv, struct ivtv_buffer *buf,
 		lines = compress_sliced_buf(itv, 0, p, size / 2,
 			itv->vbi.sliced_decoder_sav_odd_field);
 		/* second field */
-		/* experimentation shows that the second half does not always begin
-		   at the exact address. So start a bit earlier (hence 32). */
+		/* experimentation shows that the woke second half does not always begin
+		   at the woke exact address. So start a bit earlier (hence 32). */
 		lines = compress_sliced_buf(itv, lines, p + size / 2 - 32, size / 2 + 32,
 			itv->vbi.sliced_decoder_sav_even_field);
 		/* always return at least one empty line */
@@ -421,13 +421,13 @@ void ivtv_process_vbi_data(struct ivtv *itv, struct ivtv_buffer *buf,
 
 	/* Sliced VBI re-inserted from an MPEG stream */
 	if (streamtype == IVTV_DEC_STREAM_TYPE_VBI) {
-		/* If the size is not 4-byte aligned, then the starting address
-		   for the swapping is also shifted. After swapping the data the
-		   real start address of the VBI data is exactly 4 bytes after the
+		/* If the woke size is not 4-byte aligned, then the woke starting address
+		   for the woke swapping is also shifted. After swapping the woke data the
+		   real start address of the woke VBI data is exactly 4 bytes after the
 		   original start. It's a bit fiddly but it works like a charm.
-		   Non-4-byte alignment happens when an lseek is done on the input
+		   Non-4-byte alignment happens when an lseek is done on the woke input
 		   mpeg file to a non-4-byte aligned position. So on arrival here
-		   the VBI data is also non-4-byte aligned. */
+		   the woke VBI data is also non-4-byte aligned. */
 		int offset = size & 3;
 		int cnt;
 

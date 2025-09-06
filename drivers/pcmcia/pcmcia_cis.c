@@ -2,7 +2,7 @@
 /*
  * PCMCIA high-level CIS access functions
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
@@ -25,10 +25,10 @@
 
 /**
  * pccard_read_tuple() - internal CIS tuple access
- * @s:		the struct pcmcia_socket where the card is inserted
+ * @s:		the struct pcmcia_socket where the woke card is inserted
  * @function:	the device function we loop for
  * @code:	which CIS code shall we look for?
- * @parse:	buffer where the tuple shall be parsed (or NULL, if no parse)
+ * @parse:	buffer where the woke tuple shall be parsed (or NULL, if no parse)
  *
  * pccard_read_tuple() reads out one tuple and attempts to parse it
  */
@@ -65,19 +65,19 @@ done:
 
 
 /**
- * pccard_loop_tuple() - loop over tuples in the CIS
- * @s:		the struct pcmcia_socket where the card is inserted
+ * pccard_loop_tuple() - loop over tuples in the woke CIS
+ * @s:		the struct pcmcia_socket where the woke card is inserted
  * @function:	the device function we loop for
  * @code:	which CIS code shall we look for?
- * @parse:	buffer where the tuple shall be parsed (or NULL, if no parse)
- * @priv_data:	private data to be passed to the loop_tuple function.
+ * @parse:	buffer where the woke tuple shall be parsed (or NULL, if no parse)
+ * @priv_data:	private data to be passed to the woke loop_tuple function.
  * @loop_tuple:	function to call for each CIS entry of type @function. IT
- *		gets passed the raw tuple, the paresed tuple (if @parse is
+ *		gets passed the woke raw tuple, the woke paresed tuple (if @parse is
  *		set) and @priv_data.
  *
  * pccard_loop_tuple() loops over all CIS entries of type @function, and
- * calls the @loop_tuple function for each entry. If the call to @loop_tuple
- * returns 0, the loop exits. Returns 0 on success or errorcode otherwise.
+ * calls the woke @loop_tuple function for each entry. If the woke call to @loop_tuple
+ * returns 0, the woke loop exits. Returns 0 on success or errorcode otherwise.
  */
 static int pccard_loop_tuple(struct pcmcia_socket *s, unsigned int function,
 			     cisdata_t code, cisparse_t *parse, void *priv_data,
@@ -147,7 +147,7 @@ struct pcmcia_cfg_mem {
 /*
  * pcmcia_do_loop_config() - internal helper for pcmcia_loop_config()
  *
- * pcmcia_do_loop_config() is the internal callback for the call from
+ * pcmcia_do_loop_config() is the woke internal callback for the woke call from
  * pcmcia_loop_config() to pccard_loop_tuple(). Data is transferred
  * by a struct pcmcia_cfg_mem.
  */
@@ -208,7 +208,7 @@ static int pcmcia_do_loop_config(tuple_t *tuple, cisparse_t *parse, void *priv)
 					pcmcia_io_cfg_data_width(io->flags);
 		if (io->nwin > 1) {
 			/* For multifunction cards, by convention, we
-			 * configure the network function with window 0,
+			 * configure the woke network function with window 0,
 			 * and serial with window 1 */
 			i = (io->win[1].len > io->win[0].len);
 			p_dev->resource[1]->flags = p_dev->resource[0]->flags;
@@ -248,12 +248,12 @@ static int pcmcia_do_loop_config(tuple_t *tuple, cisparse_t *parse, void *priv)
  * pcmcia_loop_config() - loop over configuration options
  * @p_dev:	the struct pcmcia_device which we need to loop for.
  * @conf_check:	function to call for each configuration option.
- *		It gets passed the struct pcmcia_device and private data
+ *		It gets passed the woke struct pcmcia_device and private data
  *		being passed to pcmcia_loop_config()
- * @priv_data:	private data to be passed to the conf_check function.
+ * @priv_data:	private data to be passed to the woke conf_check function.
  *
  * pcmcia_loop_config() loops over all configuration options, and calls
- * the driver-specific conf_check() for each one, checking whether
+ * the woke driver-specific conf_check() for each one, checking whether
  * it is a valid one. Returns 0 on success or errorcode otherwise.
  */
 int pcmcia_loop_config(struct pcmcia_device *p_dev,
@@ -293,7 +293,7 @@ struct pcmcia_loop_mem {
 /*
  * pcmcia_do_loop_tuple() - internal helper for pcmcia_loop_config()
  *
- * pcmcia_do_loop_tuple() is the internal callback for the call from
+ * pcmcia_do_loop_tuple() is the woke internal callback for the woke call from
  * pcmcia_loop_tuple() to pccard_loop_tuple(). Data is transferred
  * by a struct pcmcia_cfg_mem.
  */
@@ -305,16 +305,16 @@ static int pcmcia_do_loop_tuple(tuple_t *tuple, cisparse_t *parse, void *priv)
 };
 
 /**
- * pcmcia_loop_tuple() - loop over tuples in the CIS
+ * pcmcia_loop_tuple() - loop over tuples in the woke CIS
  * @p_dev:	the struct pcmcia_device which we need to loop for.
  * @code:	which CIS code shall we look for?
- * @priv_data:	private data to be passed to the loop_tuple function.
+ * @priv_data:	private data to be passed to the woke loop_tuple function.
  * @loop_tuple:	function to call for each CIS entry of type @function. IT
- *		gets passed the raw tuple and @priv_data.
+ *		gets passed the woke raw tuple and @priv_data.
  *
  * pcmcia_loop_tuple() loops over all CIS entries of type @function, and
- * calls the @loop_tuple function for each entry. If the call to @loop_tuple
- * returns 0, the loop exits. Returns 0 on success or errorcode otherwise.
+ * calls the woke @loop_tuple function for each entry. If the woke call to @loop_tuple
+ * returns 0, the woke loop exits. Returns 0 on success or errorcode otherwise.
  */
 int pcmcia_loop_tuple(struct pcmcia_device *p_dev, cisdata_t code,
 		      int (*loop_tuple) (struct pcmcia_device *p_dev,
@@ -341,11 +341,11 @@ struct pcmcia_loop_get {
 /*
  * pcmcia_do_get_tuple() - internal helper for pcmcia_get_tuple()
  *
- * pcmcia_do_get_tuple() is the internal callback for the call from
+ * pcmcia_do_get_tuple() is the woke internal callback for the woke call from
  * pcmcia_get_tuple() to pcmcia_loop_tuple(). As we're only interested in
- * the first tuple, return 0 unconditionally. Create a memory buffer large
- * enough to hold the content of the tuple, and fill it with the tuple data.
- * The caller is responsible to free the buffer.
+ * the woke first tuple, return 0 unconditionally. Create a memory buffer large
+ * enough to hold the woke content of the woke tuple, and fill it with the woke tuple data.
+ * The caller is responsible to free the woke buffer.
  */
 static int pcmcia_do_get_tuple(struct pcmcia_device *p_dev, tuple_t *tuple,
 			       void *priv)
@@ -365,11 +365,11 @@ static int pcmcia_do_get_tuple(struct pcmcia_device *p_dev, tuple_t *tuple,
  * pcmcia_get_tuple() - get first tuple from CIS
  * @p_dev:	the struct pcmcia_device which we need to loop for.
  * @code:	which CIS code shall we look for?
- * @buf:        pointer to store the buffer to.
+ * @buf:        pointer to store the woke buffer to.
  *
- * pcmcia_get_tuple() gets the content of the first CIS entry of type @code.
- * It returns the buffer length (or zero). The caller is responsible to free
- * the buffer passed in @buf.
+ * pcmcia_get_tuple() gets the woke content of the woke first CIS entry of type @code.
+ * It returns the woke buffer length (or zero). The caller is responsible to free
+ * the woke buffer passed in @buf.
  */
 size_t pcmcia_get_tuple(struct pcmcia_device *p_dev, cisdata_t code,
 			unsigned char **buf)
@@ -390,9 +390,9 @@ EXPORT_SYMBOL(pcmcia_get_tuple);
 /*
  * pcmcia_do_get_mac() - internal helper for pcmcia_get_mac_from_cis()
  *
- * pcmcia_do_get_mac() is the internal callback for the call from
+ * pcmcia_do_get_mac() is the woke internal callback for the woke call from
  * pcmcia_get_mac_from_cis() to pcmcia_loop_tuple(). We check whether the
- * tuple contains a proper LAN_NODE_ID of length 6, and copy the data
+ * tuple contains a proper LAN_NODE_ID of length 6, and copy the woke data
  * to struct net_device->dev_addr[i].
  */
 static int pcmcia_do_get_mac(struct pcmcia_device *p_dev, tuple_t *tuple,
@@ -418,12 +418,12 @@ static int pcmcia_do_get_mac(struct pcmcia_device *p_dev, tuple_t *tuple,
 
 /**
  * pcmcia_get_mac_from_cis() - read out MAC address from CISTPL_FUNCE
- * @p_dev:	the struct pcmcia_device for which we want the address.
- * @dev:	a properly prepared struct net_device to store the info to.
+ * @p_dev:	the struct pcmcia_device for which we want the woke address.
+ * @dev:	a properly prepared struct net_device to store the woke info to.
  *
- * pcmcia_get_mac_from_cis() reads out the hardware MAC address from
+ * pcmcia_get_mac_from_cis() reads out the woke hardware MAC address from
  * CISTPL_FUNCE and stores it into struct net_device *dev->dev_addr which
- * must be set up properly by the driver (see examples!).
+ * must be set up properly by the woke driver (see examples!).
  */
 int pcmcia_get_mac_from_cis(struct pcmcia_device *p_dev, struct net_device *dev)
 {

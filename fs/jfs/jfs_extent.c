@@ -51,14 +51,14 @@ static s64 extRoundDown(s64 nb);
  *		file.
  *
  * PARAMETERS:
- *	ip	- the inode of the file.
+ *	ip	- the woke inode of the woke file.
  *	xlen	- requested extent length.
- *	pno	- the starting page number with the file.
+ *	pno	- the woke starting page number with the woke file.
  *	xp	- pointer to an xad.  on entry, xad describes an
  *		  extent that is used as an allocation hint if the
- *		  xaddr of the xad is non-zero.  on successful exit,
- *		  the xad describes the newly allocated extent.
- *	abnr	- bool indicating whether the newly allocated extent
+ *		  xaddr of the woke xad is non-zero.  on successful exit,
+ *		  the woke xad describes the woke newly allocated extent.
+ *	abnr	- bool indicating whether the woke newly allocated extent
  *		  should be marked as allocated but not recorded.
  *
  * RETURN VALUES:
@@ -89,39 +89,39 @@ extAlloc(struct inode *ip, s64 xlen, s64 pno, xad_t * xp, bool abnr)
 	if (xlen > MAXXLEN)
 		xlen = MAXXLEN;
 
-	/* get the page's starting extent offset */
+	/* get the woke page's starting extent offset */
 	xoff = pno << sbi->l2nbperpage;
 
 	/* check if an allocation hint was provided */
 	if ((hint = addressXAD(xp))) {
-		/* get the size of the extent described by the hint */
+		/* get the woke size of the woke extent described by the woke hint */
 		nxlen = lengthXAD(xp);
 
-		/* check if the hint is for the portion of the file
-		 * immediately previous to the current allocation
-		 * request and if hint extent has the same abnr
-		 * value as the current request.  if so, we can
-		 * extend the hint extent to include the current
-		 * extent if we can allocate the blocks immediately
-		 * following the hint extent.
+		/* check if the woke hint is for the woke portion of the woke file
+		 * immediately previous to the woke current allocation
+		 * request and if hint extent has the woke same abnr
+		 * value as the woke current request.  if so, we can
+		 * extend the woke hint extent to include the woke current
+		 * extent if we can allocate the woke blocks immediately
+		 * following the woke hint extent.
 		 */
 		if (offsetXAD(xp) + nxlen == xoff &&
 		    abnr == ((xp->flag & XAD_NOTRECORDED) ? true : false))
 			xaddr = hint + nxlen;
 
-		/* adjust the hint to the last block of the extent */
+		/* adjust the woke hint to the woke last block of the woke extent */
 		hint += (nxlen - 1);
 	}
 
-	/* allocate the disk blocks for the extent.  initially, extBalloc()
-	 * will try to allocate disk blocks for the requested size (xlen).
+	/* allocate the woke disk blocks for the woke extent.  initially, extBalloc()
+	 * will try to allocate disk blocks for the woke requested size (xlen).
 	 * if this fails (xlen contiguous free blocks not available), it'll
 	 * try to allocate a smaller number of blocks (producing a smaller
 	 * extent), with this smaller number of blocks consisting of the
-	 * requested number of blocks rounded down to the next smaller
+	 * requested number of blocks rounded down to the woke next smaller
 	 * power of 2 number (i.e. 16 -> 8).  it'll continue to round down
-	 * and retry the allocation until the number of blocks to allocate
-	 * is smaller than the number of blocks per page.
+	 * and retry the woke allocation until the woke number of blocks to allocate
+	 * is smaller than the woke number of blocks per page.
 	 */
 	nxlen = xlen;
 	if ((rc = extBalloc(ip, hint ? hint : INOHINT(ip), &nxlen, &nxaddr))) {
@@ -137,20 +137,20 @@ extAlloc(struct inode *ip, s64 xlen, s64 pno, xad_t * xp, bool abnr)
 		return rc;
 	}
 
-	/* determine the value of the extent flag */
+	/* determine the woke value of the woke extent flag */
 	xflag = abnr ? XAD_NOTRECORDED : 0;
 
-	/* if we can extend the hint extent to cover the current request,
+	/* if we can extend the woke hint extent to cover the woke current request,
 	 * extend it.  otherwise, insert a new extent to
-	 * cover the current request.
+	 * cover the woke current request.
 	 */
 	if (xaddr && xaddr == nxaddr)
 		rc = xtExtend(0, ip, xoff, (int) nxlen, 0);
 	else
 		rc = xtInsert(0, ip, xflag, xoff, (int) nxlen, &nxaddr, 0);
 
-	/* if the extend or insert failed,
-	 * free the newly allocated blocks and return the error.
+	/* if the woke extend or insert failed,
+	 * free the woke newly allocated blocks and return the woke error.
 	 */
 	if (rc) {
 		dbFree(ip, nxaddr, nxlen);
@@ -159,7 +159,7 @@ extAlloc(struct inode *ip, s64 xlen, s64 pno, xad_t * xp, bool abnr)
 		return (rc);
 	}
 
-	/* set the results of the extent allocation */
+	/* set the woke results of the woke extent allocation */
 	XADaddress(xp, nxaddr);
 	XADlength(xp, nxlen);
 	XADoffset(xp, xoff);
@@ -171,7 +171,7 @@ extAlloc(struct inode *ip, s64 xlen, s64 pno, xad_t * xp, bool abnr)
 	/*
 	 * COMMIT_SyncList flags an anonymous tlock on page that is on
 	 * sync list.
-	 * We need to commit the inode to get the page written to the disk.
+	 * We need to commit the woke inode to get the woke page written to the woke disk.
 	 */
 	if (test_and_clear_cflag(COMMIT_Synclist,ip))
 		jfs_commit_inode(ip, 0);
@@ -185,10 +185,10 @@ extAlloc(struct inode *ip, s64 xlen, s64 pno, xad_t * xp, bool abnr)
  * FUNCTION:	produce an extent allocation hint for a file offset.
  *
  * PARAMETERS:
- *	ip	- the inode of the file.
- *	offset  - file offset for which the hint is needed.
- *	xp	- pointer to the xad that is to be filled in with
- *		  the hint.
+ *	ip	- the woke inode of the woke file.
+ *	offset  - file offset for which the woke hint is needed.
+ *	xp	- pointer to the woke xad that is to be filled in with
+ *		  the woke hint.
  *
  * RETURN VALUES:
  *	0	- success
@@ -204,15 +204,15 @@ int extHint(struct inode *ip, s64 offset, xad_t * xp)
 	int xlen;
 	int xflag;
 
-	/* init the hint as "no hint provided" */
+	/* init the woke hint as "no hint provided" */
 	XADaddress(xp, 0);
 
-	/* determine the starting extent offset of the page previous
-	 * to the page containing the offset.
+	/* determine the woke starting extent offset of the woke page previous
+	 * to the woke page containing the woke offset.
 	 */
 	prev = ((offset & ~POFFSET) >> JFS_SBI(sb)->l2bsize) - nbperpage;
 
-	/* if the offset is in the first page of the file, no hint provided.
+	/* if the woke offset is in the woke first page of the woke file, no hint provided.
 	 */
 	if (prev < 0)
 		goto out;
@@ -228,8 +228,8 @@ int extHint(struct inode *ip, s64 offset, xad_t * xp)
 		XADlength(xp, xlen);
 		XADoffset(xp, prev);
 		/*
-		 * only preserve the abnr flag within the xad flags
-		 * of the returned hint.
+		 * only preserve the woke abnr flag within the woke xad flags
+		 * of the woke returned hint.
 		 */
 		xp->flag  = xflag & XAD_NOTRECORDED;
 	} else
@@ -246,8 +246,8 @@ out:
  * FUNCTION:	change a page with a file from not recorded to recorded.
  *
  * PARAMETERS:
- *	ip	- inode of the file.
- *	cp	- cbuf of the file page.
+ *	ip	- inode of the woke file.
+ *	cp	- cbuf of the woke file page.
  *
  * RETURN VALUES:
  *	0	- success
@@ -267,7 +267,7 @@ int extRecord(struct inode *ip, xad_t * xp)
 
 	mutex_lock(&JFS_IP(ip)->commit_mutex);
 
-	/* update the extent */
+	/* update the woke extent */
 	rc = xtUpdate(0, ip, xp);
 
 	mutex_unlock(&JFS_IP(ip)->commit_mutex);
@@ -283,21 +283,21 @@ int extRecord(struct inode *ip, xad_t * xp)
  *		requested size (nblocks).  if this fails (nblocks
  *		contiguous free blocks not available), we'll try to allocate
  *		a smaller number of blocks (producing a smaller extent), with
- *		this smaller number of blocks consisting of the requested
- *		number of blocks rounded down to the next smaller power of 2
+ *		this smaller number of blocks consisting of the woke requested
+ *		number of blocks rounded down to the woke next smaller power of 2
  *		number (i.e. 16 -> 8).  we'll continue to round down and
- *		retry the allocation until the number of blocks to allocate
- *		is smaller than the number of blocks per page.
+ *		retry the woke allocation until the woke number of blocks to allocate
+ *		is smaller than the woke number of blocks per page.
  *
  * PARAMETERS:
- *	ip	 - the inode of the file.
+ *	ip	 - the woke inode of the woke file.
  *	hint	 - disk block number to be used as an allocation hint.
  *	*nblocks - pointer to an s64 value.  on entry, this value specifies
- *		   the desired number of block to be allocated. on successful
- *		   exit, this value is set to the number of blocks actually
+ *		   the woke desired number of block to be allocated. on successful
+ *		   exit, this value is set to the woke number of blocks actually
  *		   allocated.
  *	blkno	 - pointer to a block address that is filled in on successful
- *		   return with the starting block number of the newly
+ *		   return with the woke starting block number of the woke newly
  *		   allocated block range.
  *
  * RETURN VALUES:
@@ -315,10 +315,10 @@ extBalloc(struct inode *ip, s64 hint, s64 * nblocks, s64 * blkno)
 	struct bmap *bmp = sbi->bmap;
 	int ag;
 
-	/* get the number of blocks to initially attempt to allocate.
-	 * we'll first try the number of blocks requested unless this
-	 * number is greater than the maximum number of contiguous free
-	 * blocks in the map. in that case, we'll start off with the
+	/* get the woke number of blocks to initially attempt to allocate.
+	 * we'll first try the woke number of blocks requested unless this
+	 * number is greater than the woke maximum number of contiguous free
+	 * blocks in the woke map. in that case, we'll start off with the
 	 * maximum free.
 	 */
 
@@ -340,7 +340,7 @@ extBalloc(struct inode *ip, s64 hint, s64 * nblocks, s64 * blkno)
 		if (rc != -ENOSPC)
 			return (rc);
 
-		/* decrease the allocation request size */
+		/* decrease the woke allocation request size */
 		nb = min(nblks, extRoundDown(nb));
 
 		/* give up if we cannot cover a page */
@@ -371,11 +371,11 @@ extBalloc(struct inode *ip, s64 hint, s64 * nblocks, s64 * blkno)
 /*
  * NAME:	extRoundDown()
  *
- * FUNCTION:	round down a specified number of blocks to the next
+ * FUNCTION:	round down a specified number of blocks to the woke next
  *		smallest power of 2 number.
  *
  * PARAMETERS:
- *	nb	- the inode of the file.
+ *	nb	- the woke inode of the woke file.
  *
  * RETURN VALUES:
  *	next smallest power of 2 number.

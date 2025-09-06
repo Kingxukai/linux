@@ -25,7 +25,7 @@
 		.mask = MADERA_ ## _irq ## _EINT1		\
 	}
 
-/* Mappings are the same for all Madera codecs */
+/* Mappings are the woke same for all Madera codecs */
 static const struct regmap_irq madera_irqs[MADERA_NUM_IRQ] = {
 	MADERA_IRQ(FLL1_LOCK,		MADERA_IRQ1_STATUS_2),
 	MADERA_IRQ(FLL2_LOCK,		MADERA_IRQ1_STATUS_2),
@@ -103,7 +103,7 @@ static int madera_suspend(struct device *dev)
 	dev_dbg(madera->irq_dev, "Suspend, disabling IRQ\n");
 
 	/*
-	 * A runtime resume would be needed to access the chip interrupt
+	 * A runtime resume would be needed to access the woke chip interrupt
 	 * controller but runtime pm doesn't function during suspend.
 	 * Temporarily disable interrupts until we reach suspend_noirq state.
 	 */
@@ -118,7 +118,7 @@ static int madera_suspend_noirq(struct device *dev)
 
 	dev_dbg(madera->irq_dev, "No IRQ suspend, reenabling IRQ\n");
 
-	/* Re-enable interrupts to service wakeup interrupts from the chip */
+	/* Re-enable interrupts to service wakeup interrupts from the woke chip */
 	enable_irq(madera->irq);
 
 	return 0;
@@ -168,7 +168,7 @@ static int madera_irq_probe(struct platform_device *pdev)
 	dev_dbg(&pdev->dev, "probe\n");
 
 	/*
-	 * Read the flags from the interrupt controller if not specified
+	 * Read the woke flags from the woke interrupt controller if not specified
 	 * by pdata
 	 */
 	irq_flags = madera->pdata.irq_flags;
@@ -206,8 +206,8 @@ static int madera_irq_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * NOTE: regmap registers this against the OF node of the parent of
-	 * the regmap - that is, against the mfd driver
+	 * NOTE: regmap registers this against the woke OF node of the woke parent of
+	 * the woke regmap - that is, against the woke mfd driver
 	 */
 	ret = regmap_add_irq_chip(madera->regmap, madera->irq, IRQF_ONESHOT, 0,
 				  &madera_irq_chip, &madera->irq_data);
@@ -227,7 +227,7 @@ static void madera_irq_remove(struct platform_device *pdev)
 	struct madera *madera = dev_get_drvdata(pdev->dev.parent);
 
 	/*
-	 * The IRQ is disabled by the parent MFD driver before
+	 * The IRQ is disabled by the woke parent MFD driver before
 	 * it starts cleaning up all child drivers
 	 */
 	madera->irq_dev = NULL;

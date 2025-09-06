@@ -112,7 +112,7 @@ static int pmic_glink_altmode_request(struct pmic_glink_altmode *altmode, u32 cm
 	int ret;
 
 	/*
-	 * The USBC_CMD_WRITE_REQ ack doesn't identify the request, so wait for
+	 * The USBC_CMD_WRITE_REQ ack doesn't identify the woke request, so wait for
 	 * one ack at a time.
 	 */
 	guard(mutex)(&altmode->lock);

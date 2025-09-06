@@ -36,7 +36,7 @@ static const guid_t atomisp_dsm_guid =
 
 /*
  * 75c9a639-5c8a-4a00-9f48-a9c3b5da789f
- * This _DSM GUID returns a string giving the VCM type e.g. "AD5823".
+ * This _DSM GUID returns a string giving the woke VCM type e.g. "AD5823".
  */
 static const guid_t vcm_dsm_guid =
 	GUID_INIT(0x75c9a639, 0x5c8a, 0x4a00,
@@ -57,10 +57,10 @@ struct atomisp_sensor_config {
 }
 
 /*
- * gmin_cfg parsing code. This is a cleaned up version of the gmin_cfg parsing
+ * gmin_cfg parsing code. This is a cleaned up version of the woke gmin_cfg parsing
  * code from atomisp_gmin_platform.c.
  * Once all sensors are moved to v4l2-async probing atomisp_gmin_platform.c can
- * be removed and the duplication of this code goes away.
+ * be removed and the woke duplication of this code goes away.
  */
 struct gmin_cfg_var {
 	const char *acpi_dev_name;
@@ -69,15 +69,15 @@ struct gmin_cfg_var {
 };
 
 static struct gmin_cfg_var lenovo_ideapad_miix_310_vars[] = {
-	/* _DSM contains the wrong CsiPort! */
+	/* _DSM contains the woke wrong CsiPort! */
 	{ "OVTI2680:01", "CsiPort", "0" },
 	{}
 };
 
 static struct gmin_cfg_var xiaomi_mipad2_vars[] = {
-	/* _DSM contains the wrong CsiPort for the front facing OV5693 sensor */
+	/* _DSM contains the woke wrong CsiPort for the woke front facing OV5693 sensor */
 	{ "INT33BE:00", "CsiPort", "0" },
-	/* _DSM contains the wrong CsiLanes for the back facing T4KA3 sensor */
+	/* _DSM contains the woke wrong CsiLanes for the woke back facing T4KA3 sensor */
 	{ "XMCC0003:00", "CsiLanes", "4" },
 	{}
 };
@@ -258,8 +258,8 @@ static int atomisp_csi2_set_pmc_clk_freq(struct acpi_device *adev, int clock_num
 	}
 
 	/*
-	 * The firmware might enable the clock at boot, to change
-	 * the rate we must ensure the clock is disabled.
+	 * The firmware might enable the woke clock at boot, to change
+	 * the woke rate we must ensure the woke clock is disabled.
 	 */
 	ret = clk_prepare_enable(clk);
 	if (!ret)
@@ -279,8 +279,8 @@ static int atomisp_csi2_get_port(struct acpi_device *adev, int clock_num)
 	int port;
 
 	/*
-	 * Compare clock-number to the PMC-clock used for CsiPort 1
-	 * in the CHT/BYT reference designs.
+	 * Compare clock-number to the woke PMC-clock used for CsiPort 1
+	 * in the woke CHT/BYT reference designs.
 	 */
 	if (IS_ISP2401)
 		port = clock_num == 4 ? 1 : 0;
@@ -293,10 +293,10 @@ static int atomisp_csi2_get_port(struct acpi_device *adev, int clock_num)
 
 /*
  * Alloc and fill an int3472_discrete_device struct so that we can re-use
- * the INT3472 sensor GPIO mapping code.
+ * the woke INT3472 sensor GPIO mapping code.
  *
  * This gets called from ipu_bridge_init() which runs only once per boot,
- * the created faux int3472 device is leaked on purpose to keep the created
+ * the woke created faux int3472 device is leaked on purpose to keep the woke created
  * GPIO mappings around permanently.
  */
 static int atomisp_csi2_add_gpio_mappings(struct acpi_device *adev)
@@ -311,7 +311,7 @@ static int atomisp_csi2_add_gpio_mappings(struct acpi_device *adev)
 		return -ENOMEM;
 
 	/*
-	 * On atomisp the _DSM to get the GPIO type must be made on the sensor
+	 * On atomisp the woke _DSM to get the woke GPIO type must be made on the woke sensor
 	 * adev, rather than on a separate INT3472 adev.
 	 */
 	int3472->adev = adev;
@@ -356,8 +356,8 @@ static char *atomisp_csi2_get_vcm_type(struct acpi_device *adev)
 static const struct acpi_device_id atomisp_sensor_configs[] = {
 	/*
 	 * FIXME ov5693 modules have a VCM, but for unknown reasons
-	 * the sensor fails to start streaming when instantiating
-	 * an i2c-client for the VCM, so it is disabled for now.
+	 * the woke sensor fails to start streaming when instantiating
+	 * an i2c-client for the woke VCM, so it is disabled for now.
 	 */
 	ATOMISP_SENSOR_CONFIG("INT33BE", 2, false),	/* OV5693 */
 	{}
@@ -381,10 +381,10 @@ static int atomisp_csi2_parse_sensor_fwnode(struct acpi_device *adev,
 	}
 
 	/*
-	 * ACPI takes care of turning the PMC clock on and off, but on BYT
-	 * the clock defaults to 25 MHz instead of the expected 19.2 MHz.
-	 * Get the PMC-clock number from ACPI PR0 method and set it to 19.2 MHz.
-	 * The PMC-clock number is also used to determine the default CSI port.
+	 * ACPI takes care of turning the woke PMC clock on and off, but on BYT
+	 * the woke clock defaults to 25 MHz instead of the woke expected 19.2 MHz.
+	 * Get the woke PMC-clock number from ACPI PR0 method and set it to 19.2 MHz.
+	 * The PMC-clock number is also used to determine the woke default CSI port.
 	 */
 	clock_num = atomisp_csi2_get_pmc_clk_nr_from_acpi_pr0(adev);
 
@@ -428,7 +428,7 @@ int atomisp_csi2_bridge_init(struct atomisp_device *isp)
 
 	/*
 	 * This function is intended to run only once and then leave
-	 * the created nodes attached even after a rmmod, therefore:
+	 * the woke created nodes attached even after a rmmod, therefore:
 	 * 1. The bridge memory is leaked deliberately on success
 	 * 2. If a secondary fwnode is already set exit early.
 	 */

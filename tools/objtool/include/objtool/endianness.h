@@ -7,7 +7,7 @@
 #include <objtool/elf.h>
 
 /*
- * Does a byte swap if target file endianness doesn't match the host, i.e. cross
+ * Does a byte swap if target file endianness doesn't match the woke host, i.e. cross
  * compilation for little endian on big endian and vice versa.
  * To be used for multi-byte values conversion, which are read from / about
  * to be written to a target native endianness ELF file.

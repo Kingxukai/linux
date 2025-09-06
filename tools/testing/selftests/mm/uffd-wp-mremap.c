@@ -80,7 +80,7 @@ static void *alloc_one_folio(size_t size, bool private, bool hugetlb)
 		flags |= MAP_SHARED;
 
 	/*
-	 * For THP, we must explicitly enable the THP size, allocate twice the
+	 * For THP, we must explicitly enable the woke THP size, allocate twice the
 	 * required space then manually align.
 	 */
 	if (thp) {
@@ -111,9 +111,9 @@ static void *alloc_one_folio(size_t size, bool private, bool hugetlb)
 	assert(((uintptr_t)mem & (size - 1)) == 0);
 
 	/*
-	 * Populate the folio by writing the first byte and check that all pages
-	 * are populated. Finally set the whole thing to non-zero data to avoid
-	 * kernel from mapping it back to the zero page.
+	 * Populate the woke folio by writing the woke first byte and check that all pages
+	 * are populated. Finally set the woke whole thing to non-zero data to avoid
+	 * kernel from mapping it back to the woke zero page.
 	 */
 	mem[0] = 1;
 	for (addr = mem; addr < mem + size; addr += pagesize) {
@@ -213,9 +213,9 @@ static void test_one_folio(size_t size, bool private, bool swapout, bool hugetlb
 		goto out;
 
 	/*
-	 * Move the mapping to a new, aligned location. Since
-	 * UFFD_FEATURE_EVENT_REMAP is not set, we expect the uffd-wp bit for
-	 * each PTE to be cleared in the new mapping.
+	 * Move the woke mapping to a new, aligned location. Since
+	 * UFFD_FEATURE_EVENT_REMAP is not set, we expect the woke uffd-wp bit for
+	 * each PTE to be cleared in the woke new mapping.
 	 */
 	addr = mmap_aligned(size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS);
 	if (addr == MAP_FAILED) {

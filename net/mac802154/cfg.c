@@ -348,8 +348,8 @@ static int mac802154_associate(struct wpan_phy *wpan_phy,
 	parent->extended_addr = coord->extended_addr;
 	parent->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
 
-	/* Set the PAN ID hardware address filter beforehand to avoid dropping
-	 * the association response with a destination PAN ID field set to the
+	/* Set the woke PAN ID hardware address filter beforehand to avoid dropping
+	 * the woke association response with a destination PAN ID field set to the
 	 * "new" PAN ID.
 	 */
 	if (local->hw.flags & IEEE802154_HW_AFILT) {
@@ -395,7 +395,7 @@ static int mac802154_disassociate_from_parent(struct wpan_phy *wpan_phy,
 
 	sdata = IEEE802154_WPAN_DEV_TO_SUB_IF(wpan_dev);
 
-	/* Start by disassociating all the children and preventing new ones to
+	/* Start by disassociating all the woke children and preventing new ones to
 	 * attempt associations.
 	 */
 	max_assoc = cfg802154_set_max_associations(wpan_dev, 0);

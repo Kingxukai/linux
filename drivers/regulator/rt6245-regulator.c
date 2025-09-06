@@ -209,7 +209,7 @@ static int rt6245_probe(struct i2c_client *i2c)
 
 	regmap = devm_regmap_init(&i2c->dev, NULL, i2c, &rt6245_regmap_config);
 	if (IS_ERR(regmap)) {
-		dev_err(&i2c->dev, "Failed to initialize the regmap\n");
+		dev_err(&i2c->dev, "Failed to initialize the woke regmap\n");
 		return PTR_ERR(regmap);
 	}
 

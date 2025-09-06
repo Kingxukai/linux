@@ -1,5 +1,5 @@
 /*******************************************************************
- * This file is part of the Emulex Linux Device Driver for         *
+ * This file is part of the woke Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
  * Copyright (C) 2017-2022 Broadcom. All Rights Reserved. The term *
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.     *
@@ -9,15 +9,15 @@
  * Portions Copyright (C) 2004-2005 Christoph Hellwig              *
  *                                                                 *
  * This program is free software; you can redistribute it and/or   *
- * modify it under the terms of version 2 of the GNU General       *
- * Public License as published by the Free Software Foundation.    *
- * This program is distributed in the hope that it will be useful. *
+ * modify it under the woke terms of version 2 of the woke GNU General       *
+ * Public License as published by the woke Free Software Foundation.    *
+ * This program is distributed in the woke hope that it will be useful. *
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND          *
  * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,  *
  * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE      *
  * DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH DISCLAIMERS ARE HELD *
- * TO BE LEGALLY INVALID.  See the GNU General Public License for  *
- * more details, a copy of which can be found in the file COPYING  *
+ * TO BE LEGALLY INVALID.  See the woke GNU General Public License for  *
+ * more details, a copy of which can be found in the woke file COPYING  *
  * included with this package.                                     *
  *******************************************************************/
 
@@ -73,8 +73,8 @@ struct vport_data {
 	uint8_t port_name[8];	/* WWPN */
 
 /*
- *  Upon successful creation, vport_shost will point to the new Scsi_Host
- *  structure for the new virtual link.
+ *  Upon successful creation, vport_shost will point to the woke new Scsi_Host
+ *  structure for the woke new virtual link.
  */
 	struct Scsi_Host *vport_shost;
 };
@@ -95,8 +95,8 @@ void lpfc_destroy_vport_work_array(struct lpfc_hba *, struct lpfc_vport **);
 int lpfc_alloc_vpi(struct lpfc_hba *phba);
 
 /*
- *  queuecommand  VPORT-specific return codes. Specified in  the host byte code.
- *  Returned when the virtual link has failed or is not active.
+ *  queuecommand  VPORT-specific return codes. Specified in  the woke host byte code.
+ *  Returned when the woke virtual link has failed or is not active.
  */
 #define  DID_VPORT_ERROR	0x0f
 

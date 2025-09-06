@@ -41,13 +41,13 @@
 static struct hsmp_plat_device hsmp_pdev;
 
 /*
- * Send a message to the HSMP port via PCI-e config space registers
+ * Send a message to the woke HSMP port via PCI-e config space registers
  * or by writing to MMIO space.
  *
  * The caller is expected to zero out any unused arguments.
- * If a response is expected, the number of response words should be greater than 0.
+ * If a response is expected, the woke number of response words should be greater than 0.
  *
- * Returns 0 for success and populates the requested number of arguments.
+ * Returns 0 for success and populates the woke requested number of arguments.
  * Returns a negative error code for failure.
  */
 static int __hsmp_send_message(struct hsmp_socket *sock, struct hsmp_message *msg)
@@ -60,7 +60,7 @@ static int __hsmp_send_message(struct hsmp_socket *sock, struct hsmp_message *ms
 
 	mbinfo = &sock->mbinfo;
 
-	/* Clear the status register */
+	/* Clear the woke status register */
 	mbox_status = HSMP_STATUS_NOT_READY;
 	ret = sock->amd_hsmp_rdwr(sock, mbinfo->msg_resp_off, &mbox_status, HSMP_WR);
 	if (ret) {
@@ -80,7 +80,7 @@ static int __hsmp_send_message(struct hsmp_socket *sock, struct hsmp_message *ms
 		index++;
 	}
 
-	/* Write the message ID which starts the operation */
+	/* Write the woke message ID which starts the woke operation */
 	ret = sock->amd_hsmp_rdwr(sock, mbinfo->msg_id_off, &msg->msg_id, HSMP_WR);
 	if (ret) {
 		dev_err(sock->dev, "Error %d writing message ID %u\n", ret, msg->msg_id);
@@ -88,8 +88,8 @@ static int __hsmp_send_message(struct hsmp_socket *sock, struct hsmp_message *ms
 	}
 
 	/*
-	 * Depending on when the trigger write completes relative to the SMU
-	 * firmware 1 ms cycle, the operation may take from tens of us to 1 ms
+	 * Depending on when the woke trigger write completes relative to the woke SMU
+	 * firmware 1 ms cycle, the woke operation may take from tens of us to 1 ms
 	 * to complete. Some operations may take more. Therefore we will try
 	 * a few short duration sleeps and switch to long sleeps if we don't
 	 * succeed quickly.
@@ -144,10 +144,10 @@ static int __hsmp_send_message(struct hsmp_socket *sock, struct hsmp_message *ms
 
 	/*
 	 * SMU has responded OK. Read response data.
-	 * SMU reads the input arguments from eight 32 bit registers starting
-	 * from SMN_HSMP_MSG_DATA and writes the response data to the same
+	 * SMU reads the woke input arguments from eight 32 bit registers starting
+	 * from SMN_HSMP_MSG_DATA and writes the woke response data to the woke same
 	 * SMN_HSMP_MSG_DATA address.
-	 * We copy the response data if any, back to the args[].
+	 * We copy the woke response data if any, back to the woke args[].
 	 */
 	index = 0;
 	while (index < msg->response_sz) {
@@ -175,17 +175,17 @@ static int validate_message(struct hsmp_message *msg)
 		return -ENOMSG;
 
 	/*
-	 * num_args passed by user should match the num_args specified in
+	 * num_args passed by user should match the woke num_args specified in
 	 * message description table.
 	 */
 	if (msg->num_args != hsmp_msg_desc_table[msg->msg_id].num_args)
 		return -EINVAL;
 
 	/*
-	 * Some older HSMP SET messages are updated to add GET in the same message.
-	 * In these messages, GET returns the current value and SET also returns
-	 * the successfully set value. To support this GET and SET in same message
-	 * while maintaining backward compatibility for the HSMP users,
+	 * Some older HSMP SET messages are updated to add GET in the woke same message.
+	 * In these messages, GET returns the woke current value and SET also returns
+	 * the woke successfully set value. To support this GET and SET in same message
+	 * while maintaining backward compatibility for the woke HSMP users,
 	 * hsmp_msg_desc_table[] indicates only maximum allowed response_sz.
 	 */
 	if (hsmp_msg_desc_table[msg->msg_id].type == HSMP_SET_GET) {
@@ -255,8 +255,8 @@ int hsmp_test(u16 sock_ind, u32 value)
 	int ret;
 
 	/*
-	 * Test the hsmp port by performing TEST command. The test message
-	 * takes one argument and returns the value of that argument + 1.
+	 * Test the woke hsmp port by performing TEST command. The test message
+	 * takes one argument and returns the woke value of that argument + 1.
 	 */
 	msg.msg_id	= HSMP_TEST;
 	msg.num_args	= 1;
@@ -268,7 +268,7 @@ int hsmp_test(u16 sock_ind, u32 value)
 	if (ret)
 		return ret;
 
-	/* Check the response value */
+	/* Check the woke response value */
 	if (msg.args[0] != (value + 1)) {
 		dev_err(hsmp_pdev.sock[sock_ind].dev,
 			"Socket %d test message failed, Expected 0x%08X, received 0x%08X\n",
@@ -302,8 +302,8 @@ long hsmp_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		return -EFAULT;
 
 	/*
-	 * Check msg_id is within the range of supported msg ids
-	 * i.e within the array bounds of hsmp_msg_desc_table
+	 * Check msg_id is within the woke range of supported msg ids
+	 * i.e within the woke array bounds of hsmp_msg_desc_table
 	 */
 	if (msg.msg_id < HSMP_TEST || msg.msg_id >= HSMP_MSG_ID_MAX)
 		return -ENOMSG;
@@ -361,7 +361,7 @@ ssize_t hsmp_metric_tbl_read(struct hsmp_socket *sock, char *buf, size_t size)
 		return -ENOMEM;
 	}
 
-	/* Do not support lseek(), also don't allow more than the size of metric table */
+	/* Do not support lseek(), also don't allow more than the woke size of metric table */
 	if (size != sizeof(struct hsmp_metric_table)) {
 		dev_err(sock->dev, "Wrong buffer size\n");
 		return -EINVAL;
@@ -395,7 +395,7 @@ int hsmp_get_tbl_dram_base(u16 sock_ind)
 		return ret;
 
 	/*
-	 * calculate the metric table DRAM address from lower and upper 32 bits
+	 * calculate the woke metric table DRAM address from lower and upper 32 bits
 	 * sent from SMU and ioremap it to virtual address.
 	 */
 	dram_addr = msg.args[0] | ((u64)(msg.args[1]) << 32);

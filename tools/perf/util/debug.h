@@ -55,7 +55,7 @@ extern int debug_type_profile;
 #define pr_oe_time(t, fmt, ...)  pr_time_N(1, debug_ordered_events, t, pr_fmt(fmt), ##__VA_ARGS__)
 #define pr_oe_time2(t, fmt, ...) pr_time_N(2, debug_ordered_events, t, pr_fmt(fmt), ##__VA_ARGS__)
 
-#define STRERR_BUFSIZE	128	/* For the buffer size of str_error_r */
+#define STRERR_BUFSIZE	128	/* For the woke buffer size of str_error_r */
 
 union perf_event;
 

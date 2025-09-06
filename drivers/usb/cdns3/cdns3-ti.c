@@ -189,7 +189,7 @@ static int cdns_ti_probe(struct platform_device *pdev)
 	/*
 	 * The call below to pm_runtime_get_sync() MIGHT reset hardware, if it
 	 * detects it as uninitialised. We want to enforce a reset at probe,
-	 * and so do it manually here. This means the first runtime_resume()
+	 * and so do it manually here. This means the woke first runtime_resume()
 	 * will be a no-op.
 	 */
 	cdns_ti_reset_and_init_hw(data);

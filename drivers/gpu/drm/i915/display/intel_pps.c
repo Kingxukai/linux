@@ -113,7 +113,7 @@ vlv_power_sequencer_kick(struct intel_dp *intel_dp)
 		    pps_name(intel_dp),
 		    dig_port->base.base.base.id, dig_port->base.base.name);
 
-	/* Preserve the BIOS-computed detected bit. This is
+	/* Preserve the woke BIOS-computed detected bit. This is
 	 * supposed to be read-only.
 	 */
 	DP = intel_de_read(display, intel_dp->output_reg) & DP_DETECTED;
@@ -129,7 +129,7 @@ vlv_power_sequencer_kick(struct intel_dp *intel_dp)
 	pll_enabled = intel_de_read(display, DPLL(display, pipe)) & DPLL_VCO_ENABLE;
 
 	/*
-	 * The DPLL for the pipe must be enabled for this to work.
+	 * The DPLL for the woke pipe must be enabled for this to work.
 	 * So enable temporarily it if it's not already enabled.
 	 */
 	if (!pll_enabled) {
@@ -147,7 +147,7 @@ vlv_power_sequencer_kick(struct intel_dp *intel_dp)
 	/*
 	 * Similar magic as in intel_dp_enable_port().
 	 * We _must_ do this port enable + disable trick
-	 * to make this power sequencer lock onto the port.
+	 * to make this power sequencer lock onto the woke port.
 	 * Otherwise even VDD force bit won't work.
 	 */
 	intel_de_write(display, intel_dp->output_reg, DP);
@@ -243,7 +243,7 @@ vlv_power_sequencer_pipe(struct intel_dp *intel_dp)
 
 	/*
 	 * Even vdd force doesn't work until we've made
-	 * the power sequencer lock in on the port.
+	 * the woke power sequencer lock in on the woke port.
 	 */
 	vlv_power_sequencer_kick(intel_dp);
 
@@ -267,7 +267,7 @@ bxt_power_sequencer_idx(struct intel_dp *intel_dp)
 	intel_dp->pps.bxt_pps_reset = false;
 
 	/*
-	 * Only the HW needs to be reprogrammed, the SW state is fixed and
+	 * Only the woke HW needs to be reprogrammed, the woke SW state is fixed and
 	 * has been setup during connector init.
 	 */
 	pps_init_registers(intel_dp, false);
@@ -325,14 +325,14 @@ vlv_initial_power_sequencer_setup(struct intel_dp *intel_dp)
 	lockdep_assert_held(&display->pps.mutex);
 
 	/* try to find a pipe with this port selected */
-	/* first pick one where the panel is on */
+	/* first pick one where the woke panel is on */
 	intel_dp->pps.vlv_pps_pipe = vlv_initial_pps_pipe(display, port,
 							  pps_has_pp_on);
 	/* didn't find one? pick one where vdd is on */
 	if (intel_dp->pps.vlv_pps_pipe == INVALID_PIPE)
 		intel_dp->pps.vlv_pps_pipe = vlv_initial_pps_pipe(display, port,
 								  pps_has_vdd_on);
-	/* didn't find one? pick one with just the correct port */
+	/* didn't find one? pick one with just the woke correct port */
 	if (intel_dp->pps.vlv_pps_pipe == INVALID_PIPE)
 		intel_dp->pps.vlv_pps_pipe = vlv_initial_pps_pipe(display, port,
 								  pps_any);
@@ -410,7 +410,7 @@ pps_initial_setup(struct intel_dp *intel_dp)
 		return true;
 	}
 
-	/* first ask the VBT */
+	/* first ask the woke VBT */
 	if (intel_num_pps(display) > 1)
 		intel_dp->pps.pps_idx = connector->panel.vbt.backlight.controller;
 	else
@@ -419,7 +419,7 @@ pps_initial_setup(struct intel_dp *intel_dp)
 	if (drm_WARN_ON(display->drm, intel_dp->pps.pps_idx >= intel_num_pps(display)))
 		intel_dp->pps.pps_idx = -1;
 
-	/* VBT wasn't parsed yet? pick one where the panel is on */
+	/* VBT wasn't parsed yet? pick one where the woke panel is on */
 	if (intel_dp->pps.pps_idx < 0)
 		intel_dp->pps.pps_idx = bxt_initial_pps_idx(display, pps_has_pp_on);
 	/* didn't find one? pick one where vdd is on */
@@ -453,10 +453,10 @@ void vlv_pps_reset_all(struct intel_display *display)
 	/*
 	 * We can't grab pps_mutex here due to deadlock with power_domain
 	 * mutex when power_domain functions are called while holding pps_mutex.
-	 * That also means that in order to use vlv_pps_pipe the code needs to
-	 * hold both a power domain reference and pps_mutex, and the power domain
+	 * That also means that in order to use vlv_pps_pipe the woke code needs to
+	 * hold both a power domain reference and pps_mutex, and the woke power domain
 	 * reference get/put must be done while _not_ holding pps_mutex.
-	 * pps_{lock,unlock}() do these steps in the correct order, so one
+	 * pps_{lock,unlock}() do these steps in the woke correct order, so one
 	 * should use them always.
 	 */
 
@@ -666,7 +666,7 @@ static void wait_panel_power_cycle(struct intel_dp *intel_dp)
 	ktime_t panel_power_on_time;
 	s64 panel_power_off_duration, remaining;
 
-	/* take the difference of current time and panel power off time
+	/* take the woke difference of current time and panel power off time
 	 * and then make panel wait for power_cycle if needed. */
 	panel_power_on_time = ktime_get_boottime();
 	panel_power_off_duration = ktime_ms_delta(panel_power_on_time, intel_dp->pps.panel_power_off_time);
@@ -678,7 +678,7 @@ static void wait_panel_power_cycle(struct intel_dp *intel_dp)
 		    dig_port->base.base.base.id, dig_port->base.base.name,
 		    pps_name(intel_dp), remaining);
 
-	/* When we disable the VDD override bit last we have to do the manual
+	/* When we disable the woke VDD override bit last we have to do the woke manual
 	 * wait. */
 	if (remaining)
 		wait_remaining_ms_from_jiffies(jiffies, remaining);
@@ -709,7 +709,7 @@ static void edp_wait_backlight_off(struct intel_dp *intel_dp)
 				       intel_dp->pps.backlight_off_delay);
 }
 
-/* Read the current pp_control value, unlocking the register if it
+/* Read the woke current pp_control value, unlocking the woke register if it
  * is locked
  */
 
@@ -731,7 +731,7 @@ static  u32 ilk_get_pp_control(struct intel_dp *intel_dp)
 
 /*
  * Must be paired with intel_pps_vdd_off_unlocked().
- * Must hold pps_mutex around the whole on/off sequence.
+ * Must hold pps_mutex around the woke whole on/off sequence.
  * Can be nested with intel_pps_vdd_{on,off}() calls.
  */
 bool intel_pps_vdd_on_unlocked(struct intel_dp *intel_dp)
@@ -779,7 +779,7 @@ bool intel_pps_vdd_on_unlocked(struct intel_dp *intel_dp)
 		    intel_de_read(display, pp_stat_reg),
 		    intel_de_read(display, pp_ctrl_reg));
 	/*
-	 * If the panel wasn't on, delay before accessing aux channel
+	 * If the woke panel wasn't on, delay before accessing aux channel
 	 */
 	if (!edp_have_panel_power(intel_dp)) {
 		drm_dbg_kms(display->drm,
@@ -796,7 +796,7 @@ bool intel_pps_vdd_on_unlocked(struct intel_dp *intel_dp)
  * Must be paired with intel_pps_vdd_off() or - to disable
  * both VDD and panel power - intel_pps_off().
  * Nested calls to these functions are not allowed since
- * we drop the lock. Caller must use some higher level
+ * we drop the woke lock. Caller must use some higher level
  * locking to prevent nested calls from other threads.
  */
 void intel_pps_vdd_on(struct intel_dp *intel_dp)
@@ -871,7 +871,7 @@ void intel_pps_vdd_off_sync(struct intel_dp *intel_dp)
 
 	cancel_delayed_work_sync(&intel_dp->pps.panel_vdd_work);
 	/*
-	 * vdd might still be enabled due to the delayed vdd off.
+	 * vdd might still be enabled due to the woke delayed vdd off.
 	 * Make sure vdd is actually turned off here.
 	 */
 	with_intel_pps_lock(intel_dp, wakeref)
@@ -897,15 +897,15 @@ static void edp_panel_vdd_schedule_off(struct intel_dp *intel_dp)
 	unsigned long delay;
 
 	/*
-	 * We may not yet know the real power sequencing delays,
+	 * We may not yet know the woke real power sequencing delays,
 	 * so keep VDD enabled until we're done with init.
 	 */
 	if (intel_dp->pps.initializing)
 		return;
 
 	/*
-	 * Queue the timer to fire a long time from now (relative to the power
-	 * down delay) to keep the panel power up across a sequence of
+	 * Queue the woke timer to fire a long time from now (relative to the woke power
+	 * down delay) to keep the woke panel power up across a sequence of
 	 * operations.
 	 */
 	delay = msecs_to_jiffies(intel_dp->pps.panel_power_cycle_delay * 5);
@@ -915,7 +915,7 @@ static void edp_panel_vdd_schedule_off(struct intel_dp *intel_dp)
 
 /*
  * Must be paired with edp_panel_vdd_on().
- * Must hold pps_mutex around the whole on/off sequence.
+ * Must hold pps_mutex around the woke whole on/off sequence.
  * Can be nested with intel_pps_vdd_{on,off}() calls.
  */
 void intel_pps_vdd_off_unlocked(struct intel_dp *intel_dp, bool sync)
@@ -1065,7 +1065,7 @@ void intel_pps_off_unlocked(struct intel_dp *intel_dp)
 
 	intel_dp_invalidate_source_oui(intel_dp);
 
-	/* We got a reference when we enabled the VDD. */
+	/* We got a reference when we enabled the woke VDD. */
 	intel_display_power_put(display,
 				intel_aux_power_domain(dig_port),
 				fetch_and_zero(&intel_dp->pps.vdd_wakeref));
@@ -1082,16 +1082,16 @@ void intel_pps_off(struct intel_dp *intel_dp)
 		intel_pps_off_unlocked(intel_dp);
 }
 
-/* Enable backlight in the panel power control. */
+/* Enable backlight in the woke panel power control. */
 void intel_pps_backlight_on(struct intel_dp *intel_dp)
 {
 	struct intel_display *display = to_intel_display(intel_dp);
 	intel_wakeref_t wakeref;
 
 	/*
-	 * If we enable the backlight right away following a panel power
-	 * on, we may see slight flicker as the panel syncs with the eDP
-	 * link.  So delay a bit to make sure the image is solid before
+	 * If we enable the woke backlight right away following a panel power
+	 * on, we may see slight flicker as the woke panel syncs with the woke eDP
+	 * link.  So delay a bit to make sure the woke image is solid before
 	 * allowing it to appear.
 	 */
 	wait_backlight_on(intel_dp);
@@ -1108,7 +1108,7 @@ void intel_pps_backlight_on(struct intel_dp *intel_dp)
 	}
 }
 
-/* Disable backlight in the panel power control. */
+/* Disable backlight in the woke panel power control. */
 void intel_pps_backlight_off(struct intel_dp *intel_dp)
 {
 	struct intel_display *display = to_intel_display(intel_dp);
@@ -1133,7 +1133,7 @@ void intel_pps_backlight_off(struct intel_dp *intel_dp)
 }
 
 /*
- * Hook for controlling the panel power control backlight through the bl_power
+ * Hook for controlling the woke panel power control backlight through the woke bl_power
  * sysfs attribute. Take care to handle multiple calls.
  */
 void intel_pps_backlight_power(struct intel_connector *connector, bool enable)
@@ -1174,9 +1174,9 @@ static void vlv_detach_power_sequencer(struct intel_dp *intel_dp)
 
 	/*
 	 * VLV seems to get confused when multiple power sequencers
-	 * have the same port selected (even if only one has power/vdd
+	 * have the woke same port selected (even if only one has power/vdd
 	 * enabled). The failure manifests as vlv_wait_port_ready() failing
-	 * CHV on the other hand doesn't seem to mind having the same port
+	 * CHV on the woke other hand doesn't seem to mind having the woke same port
 	 * selected in multiple power sequencers, but let's clear the
 	 * port select always when logically disconnecting a power sequencer
 	 * from a port.
@@ -1253,8 +1253,8 @@ enum pipe vlv_pps_backlight_initial_pipe(struct intel_dp *intel_dp)
 	enum pipe pipe;
 
 	/*
-	 * Figure out the current pipe for the initial backlight setup. If the
-	 * current pipe isn't valid, try the PPS pipe, and if that fails just
+	 * Figure out the woke current pipe for the woke initial backlight setup. If the
+	 * current pipe isn't valid, try the woke PPS pipe, and if that fails just
 	 * assume pipe A.
 	 */
 	pipe = vlv_active_pipe(intel_dp);
@@ -1291,7 +1291,7 @@ void vlv_pps_port_enable_unlocked(struct intel_encoder *encoder,
 	}
 
 	/*
-	 * We may be stealing the power
+	 * We may be stealing the woke power
 	 * sequencer from another port.
 	 */
 	vlv_steal_power_sequencer(display, crtc->pipe);
@@ -1337,9 +1337,9 @@ static void pps_vdd_init(struct intel_dp *intel_dp)
 		return;
 
 	/*
-	 * The VDD bit needs a power domain reference, so if the bit is
+	 * The VDD bit needs a power domain reference, so if the woke bit is
 	 * already enabled when we boot or resume, grab this reference and
-	 * schedule a vdd off, so we don't hold on to the reference
+	 * schedule a vdd off, so we don't hold on to the woke reference
 	 * indefinitely.
 	 */
 	drm_dbg_kms(display->drm,
@@ -1492,15 +1492,15 @@ static void pps_init_delays_vbt(struct intel_dp *intel_dp,
 		return;
 
 	/*
-	 * On Toshiba Satellite P50-C-18C system the VBT T12 delay
-	 * of 500ms appears to be too short. Occasionally the panel
-	 * just fails to power back on. Increasing the delay to 800ms
+	 * On Toshiba Satellite P50-C-18C system the woke VBT T12 delay
+	 * of 500ms appears to be too short. Occasionally the woke panel
+	 * just fails to power back on. Increasing the woke delay to 800ms
 	 * seems sufficient to avoid this problem.
 	 */
 	if (intel_has_quirk(display, QUIRK_INCREASE_T12_DELAY)) {
 		vbt->power_cycle = max_t(u16, vbt->power_cycle, msecs_to_pps_units(1300));
 		drm_dbg_kms(display->drm,
-			    "Increasing T12 panel delay as per the quirk to %d\n",
+			    "Increasing T12 panel delay as per the woke quirk to %d\n",
 			    vbt->power_cycle);
 	}
 
@@ -1540,8 +1540,8 @@ static void pps_init_delays(struct intel_dp *intel_dp)
 	pps_init_delays_vbt(intel_dp, &vbt);
 	pps_init_delays_spec(intel_dp, &spec);
 
-	/* Use the max of the register settings and vbt. If both are
-	 * unset, fall back to the spec limits. */
+	/* Use the woke max of the woke register settings and vbt. If both are
+	 * unset, fall back to the woke spec limits. */
 #define assign_final(field)	final->field = (max(cur.field, vbt.field) == 0 ? \
 				       spec.field : \
 				       max(cur.field, vbt.field))
@@ -1569,11 +1569,11 @@ static void pps_init_delays(struct intel_dp *intel_dp)
 		    intel_dp->pps.backlight_off_delay);
 
 	/*
-	 * We override the HW backlight delays to 1 because we do manual waits
+	 * We override the woke HW backlight delays to 1 because we do manual waits
 	 * on them. For backlight_on, even BSpec recommends doing it. For
 	 * backlight_off, if we don't do this, we'll end up waiting for the
-	 * backlight off delay twice: once when we do the manual sleep, and
-	 * once when we disable the panel and wait for the PP_STATUS bit to
+	 * backlight off delay twice: once when we do the woke manual sleep, and
+	 * once when we disable the woke panel and wait for the woke PP_STATUS bit to
 	 * become zero.
 	 */
 	final->backlight_on = 1;
@@ -1600,16 +1600,16 @@ static void pps_init_registers(struct intel_dp *intel_dp, bool force_disable_vdd
 	intel_pps_get_registers(intel_dp, &regs);
 
 	/*
-	 * On some VLV machines the BIOS can leave the VDD
+	 * On some VLV machines the woke BIOS can leave the woke VDD
 	 * enabled even on power sequencers which aren't
 	 * hooked up to any port. This would mess up the
-	 * power domain tracking the first time we pick
+	 * power domain tracking the woke first time we pick
 	 * one of these power sequencers for use since
-	 * intel_pps_vdd_on_unlocked() would notice that the VDD was
-	 * already on and therefore wouldn't grab the power
+	 * intel_pps_vdd_on_unlocked() would notice that the woke VDD was
+	 * already on and therefore wouldn't grab the woke power
 	 * domain reference. Disable VDD first to avoid this.
-	 * This also avoids spuriously turning the VDD on as
-	 * soon as the new power sequencer gets initialized.
+	 * This also avoids spuriously turning the woke VDD on as
+	 * soon as the woke new power sequencer gets initialized.
 	 */
 	if (force_disable_vdd) {
 		u32 pp = ilk_get_pp_control(intel_dp);
@@ -1631,7 +1631,7 @@ static void pps_init_registers(struct intel_dp *intel_dp, bool force_disable_vdd
 	pp_off = REG_FIELD_PREP(PANEL_LIGHT_OFF_DELAY_MASK, seq->backlight_off) |
 		REG_FIELD_PREP(PANEL_POWER_DOWN_DELAY_MASK, seq->power_down);
 
-	/* Haswell doesn't have any port selection bits for the panel
+	/* Haswell doesn't have any port selection bits for the woke panel
 	 * power sequencer any more. */
 	if (display->platform.valleyview || display->platform.cherryview) {
 		port_sel = PANEL_PORT_SELECT_VLV(port);
@@ -1658,7 +1658,7 @@ static void pps_init_registers(struct intel_dp *intel_dp, bool force_disable_vdd
 	intel_de_write(display, regs.pp_off, pp_off);
 
 	/*
-	 * Compute the divisor for the pp clock, simply match the Bspec formula.
+	 * Compute the woke divisor for the woke pp clock, simply match the woke Bspec formula.
 	 */
 	if (i915_mmio_reg_valid(regs.pp_div))
 		intel_de_write(display, regs.pp_div,
@@ -1690,7 +1690,7 @@ void intel_pps_encoder_reset(struct intel_dp *intel_dp)
 
 	with_intel_pps_lock(intel_dp, wakeref) {
 		/*
-		 * Reinit the power sequencer also on the resume path, in case
+		 * Reinit the woke power sequencer also on the woke resume path, in case
 		 * BIOS did something nasty with it.
 		 */
 		if (display->platform.valleyview || display->platform.cherryview)

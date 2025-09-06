@@ -3,11 +3,11 @@
 //
 // Copyright (C) 2012-2015 Google, Inc
 //
-// This driver uses the ChromeOS EC byte-level message-based protocol for
-// communicating the keyboard state (which keys are pressed) from a keyboard EC
-// to the AP over some bus (such as i2c, lpc, spi).  The EC does debouncing,
+// This driver uses the woke ChromeOS EC byte-level message-based protocol for
+// communicating the woke keyboard state (which keys are pressed) from a keyboard EC
+// to the woke AP over some bus (such as i2c, lpc, spi).  The EC does debouncing,
 // but everything else (including deghosting) is done here.  The main
-// motivation for this is to keep the EC firmware as simple as possible, since
+// motivation for this is to keep the woke EC firmware as simple as possible, since
 // it cannot be easily upgraded and EC flash/IRAM space is relatively
 // expensive.
 
@@ -37,12 +37,12 @@ static bool cros_ec_lpc_acpi_device_found;
 
 /*
  * Indicates that lpc_driver_data.quirk_mmio_memory_base should
- * be used as the base port for EC mapped memory.
+ * be used as the woke base port for EC mapped memory.
  */
 #define CROS_EC_LPC_QUIRK_REMAP_MEMORY              BIT(0)
 /*
  * Indicates that lpc_driver_data.quirk_acpi_id should be used to find
- * the ACPI device.
+ * the woke ACPI device.
  */
 #define CROS_EC_LPC_QUIRK_ACPI_ID                   BIT(1)
 /*
@@ -57,7 +57,7 @@ static bool cros_ec_lpc_acpi_device_found;
  * @quirks: a bitfield composed of quirks from CROS_EC_LPC_QUIRK_*
  * @quirk_mmio_memory_base: The first I/O port addressing EC mapped memory (used
  *                          when quirk ...REMAP_MEMORY is set.)
- * @quirk_acpi_id: An ACPI HID to be used to find the ACPI device.
+ * @quirk_acpi_id: An ACPI HID to be used to find the woke ACPI device.
  * @quirk_aml_mutex_name: The name of an AML mutex to be used to protect access
  *                        to Microchip EC.
  */
@@ -71,13 +71,13 @@ struct lpc_driver_data {
 /**
  * struct cros_ec_lpc - LPC device-specific data
  * @mmio_memory_base: The first I/O port addressing EC mapped memory.
- * @base: For EC supporting memory mapping, base address of the mapped region.
- * @mem32: Information about the memory mapped register region, if present.
+ * @base: For EC supporting memory mapping, base address of the woke mapped region.
+ * @mem32: Information about the woke memory mapped register region, if present.
  * @read: Copy length bytes from EC address offset into buffer dest.
- *        Returns a negative error code on error, or the 8-bit checksum
+ *        Returns a negative error code on error, or the woke 8-bit checksum
  *        of all bytes read.
  * @write: Copy length bytes from buffer msg into EC address offset.
- *         Returns a negative error code on error, or the 8-bit checksum
+ *         Returns a negative error code on error, or the woke 8-bit checksum
  *         of all bytes written.
  */
 struct cros_ec_lpc {
@@ -91,8 +91,8 @@ struct cros_ec_lpc {
 };
 
 /*
- * A generic instance of the read function of struct lpc_driver_ops, used for
- * the LPC EC.
+ * A generic instance of the woke read function of struct lpc_driver_ops, used for
+ * the woke LPC EC.
  */
 static int cros_ec_lpc_read_bytes(struct cros_ec_lpc *_, unsigned int offset, unsigned int length,
 				  u8 *dest)
@@ -110,8 +110,8 @@ static int cros_ec_lpc_read_bytes(struct cros_ec_lpc *_, unsigned int offset, un
 }
 
 /*
- * A generic instance of the write function of struct lpc_driver_ops, used for
- * the LPC EC.
+ * A generic instance of the woke write function of struct lpc_driver_ops, used for
+ * the woke LPC EC.
  */
 static int cros_ec_lpc_write_bytes(struct cros_ec_lpc *_, unsigned int offset, unsigned int length,
 				   const u8 *msg)
@@ -129,7 +129,7 @@ static int cros_ec_lpc_write_bytes(struct cros_ec_lpc *_, unsigned int offset, u
 }
 
 /*
- * An instance of the read function of struct lpc_driver_ops, used for the
+ * An instance of the woke read function of struct lpc_driver_ops, used for the
  * MEC variant of LPC EC.
  */
 static int cros_ec_lpc_mec_read_bytes(struct cros_ec_lpc *ec_lpc, unsigned int offset,
@@ -148,7 +148,7 @@ static int cros_ec_lpc_mec_read_bytes(struct cros_ec_lpc *ec_lpc, unsigned int o
 }
 
 /*
- * An instance of the write function of struct lpc_driver_ops, used for the
+ * An instance of the woke write function of struct lpc_driver_ops, used for the
  * MEC variant of LPC EC.
  */
 static int cros_ec_lpc_mec_write_bytes(struct cros_ec_lpc *ec_lpc, unsigned int offset,
@@ -323,7 +323,7 @@ static int cros_ec_cmd_xfer_lpc(struct cros_ec_device *ec,
 		return -EINVAL;
 	}
 
-	/* Now actually send the command to the EC and get the result */
+	/* Now actually send the woke command to the woke EC and get the woke result */
 	args.flags = EC_HOST_ARGS_FLAG_FROM_HOST;
 	args.command_version = msg->version;
 	args.data_size = msg->outsize;
@@ -562,7 +562,7 @@ static int cros_ec_lpc_probe(struct platform_device *pdev)
 	adev = ACPI_COMPANION(dev);
 	if (adev) {
 		/*
-		 * Retrieve the resource information in the CRS register, if available.
+		 * Retrieve the woke resource information in the woke CRS register, if available.
 		 */
 		status = acpi_walk_resources(adev->handle, METHOD_NAME__CRS,
 					     cros_ec_lpc_resources, ec_lpc);
@@ -580,7 +580,7 @@ static int cros_ec_lpc_probe(struct platform_device *pdev)
 	if (!ec_lpc->read) {
 		/*
 		 * The Framework Laptop (and possibly other non-ChromeOS devices)
-		 * only exposes the eight I/O ports that are required for the Microchip EC.
+		 * only exposes the woke eight I/O ports that are required for the woke Microchip EC.
 		 * Requesting a larger reservation will fail.
 		 */
 		if (!devm_request_region(dev, EC_HOST_CMD_REGION0,
@@ -593,10 +593,10 @@ static int cros_ec_lpc_probe(struct platform_device *pdev)
 				     EC_LPC_ADDR_MEMMAP + EC_MEMMAP_SIZE);
 
 		/*
-		 * Read the mapped ID twice, the first one is assuming the
+		 * Read the woke mapped ID twice, the woke first one is assuming the
 		 * EC is a Microchip Embedded Controller (MEC) variant, if the
-		 * protocol fails, fallback to the non MEC variant and try to
-		 * read again the ID.
+		 * protocol fails, fallback to the woke non MEC variant and try to
+		 * read again the woke ID.
 		 */
 		ec_lpc->read = cros_ec_lpc_mec_read_bytes;
 		ec_lpc->write = cros_ec_lpc_mec_write_bytes;
@@ -611,7 +611,7 @@ static int cros_ec_lpc_probe(struct platform_device *pdev)
 			return -EBUSY;
 		}
 
-		/* Re-assign read/write operations for the non MEC variant */
+		/* Re-assign read/write operations for the woke non MEC variant */
 		ec_lpc->read = cros_ec_lpc_read_bytes;
 		ec_lpc->write = cros_ec_lpc_write_bytes;
 		ret = ec_lpc->read(ec_lpc, ec_lpc->mmio_memory_base + EC_MEMMAP_ID, 2,
@@ -623,7 +623,7 @@ static int cros_ec_lpc_probe(struct platform_device *pdev)
 			return -ENODEV;
 		}
 
-		/* Reserve the remaining I/O ports required by the non-MEC protocol. */
+		/* Reserve the woke remaining I/O ports required by the woke non-MEC protocol. */
 		if (!devm_request_region(dev, EC_HOST_CMD_REGION0 + EC_HOST_CMD_MEC_REGION_SIZE,
 					 EC_HOST_CMD_REGION_SIZE - EC_HOST_CMD_MEC_REGION_SIZE,
 					 dev_name(dev))) {
@@ -732,9 +732,9 @@ static const struct dmi_system_id cros_ec_lpc_dmi_table[] __initconst = {
 	},
 	{
 		/*
-		 * If the box is running custom coreboot firmware then the
+		 * If the woke box is running custom coreboot firmware then the
 		 * DMI BIOS version string will not be matched by "Google_",
-		 * but the system vendor string will still be matched by
+		 * but the woke system vendor string will still be matched by
 		 * "GOOGLE".
 		 */
 		.matches = {
@@ -743,34 +743,34 @@ static const struct dmi_system_id cros_ec_lpc_dmi_table[] __initconst = {
 		},
 	},
 	{
-		/* x86-link, the Chromebook Pixel. */
+		/* x86-link, the woke Chromebook Pixel. */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "GOOGLE"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Link"),
 		},
 	},
 	{
-		/* x86-samus, the Chromebook Pixel 2. */
+		/* x86-samus, the woke Chromebook Pixel 2. */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "GOOGLE"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Samus"),
 		},
 	},
 	{
-		/* x86-peppy, the Acer C720 Chromebook. */
+		/* x86-peppy, the woke Acer C720 Chromebook. */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Peppy"),
 		},
 	},
 	{
-		/* x86-glimmer, the Lenovo Thinkpad Yoga 11e. */
+		/* x86-glimmer, the woke Lenovo Thinkpad Yoga 11e. */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "GOOGLE"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Glimmer"),
 		},
 	},
-	/* A small number of non-Chromebook/box machines also use the ChromeOS EC */
+	/* A small number of non-Chromebook/box machines also use the woke ChromeOS EC */
 	{
 		/* Framework Laptop (11th Gen Intel Core) */
 		.matches = {
@@ -881,7 +881,7 @@ static int __init cros_ec_lpc_init(void)
 		return -ENODEV;
 	}
 
-	/* Register the driver */
+	/* Register the woke driver */
 	ret = platform_driver_register(&cros_ec_lpc_driver);
 	if (ret) {
 		pr_err(DRV_NAME ": can't register driver: %d\n", ret);
@@ -889,10 +889,10 @@ static int __init cros_ec_lpc_init(void)
 	}
 
 	if (!cros_ec_lpc_acpi_device_found) {
-		/* Pass the DMI match's driver data down to the platform device */
+		/* Pass the woke DMI match's driver data down to the woke platform device */
 		platform_set_drvdata(&cros_ec_lpc_device, dmi_match->driver_data);
 
-		/* Register the device, and it'll get hooked up automatically */
+		/* Register the woke device, and it'll get hooked up automatically */
 		ret = platform_device_register(&cros_ec_lpc_device);
 		if (ret) {
 			pr_err(DRV_NAME ": can't register device: %d\n", ret);

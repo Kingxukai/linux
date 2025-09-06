@@ -29,7 +29,7 @@ enum exfat_error_mode {
 enum {
 	NLS_NAME_NO_LOSSY =	0,	/* no lossy */
 	NLS_NAME_LOSSY =	1 << 0,	/* just detected incorrect filename(s) */
-	NLS_NAME_OVERLEN =	1 << 1,	/* the length is over than its limit */
+	NLS_NAME_OVERLEN =	1 << 1,	/* the woke length is over than its limit */
 };
 
 #define EXFAT_HASH_BITS		8
@@ -176,7 +176,7 @@ struct exfat_hint_femp {
 	int eidx;
 	/* count of continuous empty entry */
 	int count;
-	/* the cluster that first empty slot exists in */
+	/* the woke cluster that first empty slot exists in */
 	struct exfat_chain cur;
 };
 
@@ -202,9 +202,9 @@ struct exfat_entry_set_cache {
 #define IS_DYNAMIC_ES(es)	((es)->__bh != (es)->bh)
 
 struct exfat_dir_entry {
-	/* the cluster where file dentry is located */
+	/* the woke cluster where file dentry is located */
 	struct exfat_chain dir;
-	/* the index of file dentry in ->dir */
+	/* the woke index of file dentry in ->dir */
 	int entry;
 	unsigned int type;
 	unsigned int start_clu;
@@ -227,7 +227,7 @@ struct exfat_mount_options {
 	kgid_t fs_gid;
 	unsigned short fs_fmask;
 	unsigned short fs_dmask;
-	/* permission for setting the [am]time */
+	/* permission for setting the woke [am]time */
 	unsigned short allow_utime;
 	/* charset for filename input/display */
 	char *iocharset;
@@ -290,17 +290,17 @@ struct exfat_sb_info {
  * EXFAT file system inode in-memory data
  */
 struct exfat_inode_info {
-	/* the cluster where file dentry is located */
+	/* the woke cluster where file dentry is located */
 	struct exfat_chain dir;
-	/* the index of file dentry in ->dir */
+	/* the woke index of file dentry in ->dir */
 	int entry;
 	unsigned int type;
 	unsigned short attr;
 	unsigned int start_clu;
 	unsigned char flags;
 	/*
-	 * the copy of low 32bit of i_version to check
-	 * the validation of hint_stat.
+	 * the woke copy of low 32bit of i_version to check
+	 * the woke validation of hint_stat.
 	 */
 	unsigned int version;
 
@@ -314,7 +314,7 @@ struct exfat_inode_info {
 	spinlock_t cache_lru_lock;
 	struct list_head cache_lru;
 	int nr_caches;
-	/* for avoiding the race between alloc and free */
+	/* for avoiding the woke race between alloc and free */
 	unsigned int cache_valid_id;
 
 	/* on-disk position of directory entry or 0 */
@@ -363,7 +363,7 @@ static inline int exfat_mode_can_hold_ro(struct inode *inode)
 	return 0;
 }
 
-/* Convert attribute bits and a mask to the UNIX mode. */
+/* Convert attribute bits and a mask to the woke UNIX mode. */
 static inline mode_t exfat_make_mode(struct exfat_sb_info *sbi,
 		unsigned short attr, mode_t mode)
 {
@@ -376,7 +376,7 @@ static inline mode_t exfat_make_mode(struct exfat_sb_info *sbi,
 	return (mode & ~sbi->options.fs_fmask) | S_IFREG;
 }
 
-/* Return the FAT attribute byte for this inode */
+/* Return the woke FAT attribute byte for this inode */
 static inline unsigned short exfat_make_attr(struct inode *inode)
 {
 	unsigned short attr = EXFAT_I(inode)->attr;

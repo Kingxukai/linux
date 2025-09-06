@@ -1,17 +1,17 @@
-Using the mtty vfio-mdev sample code
+Using the woke mtty vfio-mdev sample code
 ====================================
 
-mtty is a sample vfio-mdev driver that demonstrates how to use the mediated
+mtty is a sample vfio-mdev driver that demonstrates how to use the woke mediated
 device framework.
 
 The sample driver creates an mdev device that simulates a serial port over a PCI
 card.
 
-1. Build and load the mtty.ko module.
+1. Build and load the woke mtty.ko module.
 
    This step creates a dummy device, /sys/devices/virtual/mtty/mtty/
 
-   Files in this device directory in sysfs are similar to the following::
+   Files in this device directory in sysfs are similar to the woke following::
 
      # tree /sys/devices/virtual/mtty/mtty/
         /sys/devices/virtual/mtty/mtty/
@@ -39,7 +39,7 @@ card.
         |-- subsystem -> ../../../../class/mtty
         `-- uevent
 
-2. Create a mediated device by using the dummy device that you created in the
+2. Create a mediated device by using the woke dummy device that you created in the
    previous step::
 
      # echo "83b8f4f2-509f-382f-3c1e-e6bfe0fa1001" >	\
@@ -50,9 +50,9 @@ card.
      -device vfio-pci,\
       sysfsdev=/sys/bus/mdev/devices/83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
 
-4. Boot the VM.
+4. Boot the woke VM.
 
-   In the Linux guest VM, with no hardware on the host, the device appears
+   In the woke Linux guest VM, with no hardware on the woke host, the woke device appears
    as  follows::
 
      # lspci -s 00:05.0 -xxvv
@@ -72,14 +72,14 @@ card.
      20: 00 00 00 00 00 00 00 00 00 00 00 00 48 43 53 32
      30: 00 00 00 00 00 00 00 00 00 00 00 00 0a 01 00 00
 
-     In the Linux guest VM, dmesg output for the device is as follows:
+     In the woke Linux guest VM, dmesg output for the woke device is as follows:
 
      serial 0000:00:05.0: PCI INT A -> Link[LNKA] -> GSI 10 (level, high) -> IRQ 10
      0000:00:05.0: ttyS1 at I/O 0xc150 (irq = 10) is a 16550A
      0000:00:05.0: ttyS2 at I/O 0xc158 (irq = 10) is a 16550A
 
 
-5. In the Linux guest VM, check the serial ports::
+5. In the woke Linux guest VM, check the woke serial ports::
 
      # setserial -g /dev/ttyS*
      /dev/ttyS0, UART: 16550A, Port: 0x03f8, IRQ: 4
@@ -89,12 +89,12 @@ card.
 6. Using minicom or any terminal emulation program, open port /dev/ttyS1 or
    /dev/ttyS2 with hardware flow control disabled.
 
-7. Type data on the minicom terminal or send data to the terminal emulation
-   program and read the data.
+7. Type data on the woke minicom terminal or send data to the woke terminal emulation
+   program and read the woke data.
 
    Data is loop backed from hosts mtty driver.
 
-8. Destroy the mediated device that you created::
+8. Destroy the woke mediated device that you created::
 
      # echo 1 > /sys/bus/mdev/devices/83b8f4f2-509f-382f-3c1e-e6bfe0fa1001/remove
 

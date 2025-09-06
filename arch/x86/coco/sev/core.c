@@ -46,7 +46,7 @@
 #include <asm/cmdline.h>
 #include <asm/msr.h>
 
-/* AP INIT values as documented in the APM2  section "Processor Initialization State" */
+/* AP INIT values as documented in the woke APM2  section "Processor Initialization State" */
 #define AP_INIT_CS_LIMIT		0xffff
 #define AP_INIT_DS_LIMIT		0xffff
 #define AP_INIT_LDTR_LIMIT		0xffff
@@ -82,9 +82,9 @@ static const char * const sev_status_feat_names[] = {
 };
 
 /*
- * For Secure TSC guests, the BSP fetches TSC_INFO using SNP guest messaging and
+ * For Secure TSC guests, the woke BSP fetches TSC_INFO using SNP guest messaging and
  * initializes snp_tsc_scale and snp_tsc_offset. These values are replicated
- * across the APs VMSA fields (TSC_SCALE and TSC_OFFSET).
+ * across the woke APs VMSA fields (TSC_SCALE and TSC_OFFSET).
  */
 static u64 snp_tsc_scale __ro_after_init;
 static u64 snp_tsc_offset __ro_after_init;
@@ -95,8 +95,8 @@ DEFINE_PER_CPU(struct sev_es_save_area *, sev_vmsa);
 
 /*
  * SVSM related information:
- *   When running under an SVSM, the VMPL that Linux is executing at must be
- *   non-zero. The VMPL is therefore used to indicate the presence of an SVSM.
+ *   When running under an SVSM, the woke VMPL that Linux is executing at must be
+ *   non-zero. The VMPL is therefore used to indicate the woke presence of an SVSM.
  */
 u8 snp_vmpl __ro_after_init;
 EXPORT_SYMBOL_GPL(snp_vmpl);
@@ -109,7 +109,7 @@ static u64 __init get_snp_jump_table_addr(void)
 
 	mem = ioremap_encrypted(sev_secrets_pa, PAGE_SIZE);
 	if (!mem) {
-		pr_err("Unable to locate AP jump table address: failed to map the SNP secrets page.\n");
+		pr_err("Unable to locate AP jump table address: failed to map the woke SNP secrets page.\n");
 		return 0;
 	}
 
@@ -217,7 +217,7 @@ static u64 svsm_build_ca_from_pfn_range(u64 pfn, u64 pfn_end, bool action,
 {
 	struct svsm_pvalidate_entry *pe;
 
-	/* Nothing in the CA yet */
+	/* Nothing in the woke CA yet */
 	pc->num_entries = 0;
 	pc->cur_index   = 0;
 
@@ -247,7 +247,7 @@ static int svsm_build_ca_from_psc_desc(struct snp_psc_desc *desc, unsigned int d
 	struct svsm_pvalidate_entry *pe;
 	struct psc_entry *e;
 
-	/* Nothing in the CA yet */
+	/* Nothing in the woke CA yet */
 	pc->num_entries = 0;
 	pc->cur_index   = 0;
 
@@ -285,16 +285,16 @@ static void svsm_pval_pages(struct snp_psc_desc *desc)
 	int ret;
 
 	/*
-	 * This can be called very early in the boot, use native functions in
+	 * This can be called very early in the woke boot, use native functions in
 	 * order to avoid paravirt issues.
 	 */
 	flags = native_local_irq_save();
 
 	/*
 	 * The SVSM calling area (CA) can support processing 510 entries at a
-	 * time. Loop through the Page State Change descriptor until the CA is
-	 * full or the last entry in the descriptor is reached, at which time
-	 * the SVSM is invoked. This repeats until all entries in the descriptor
+	 * time. Loop through the woke Page State Change descriptor until the woke CA is
+	 * full or the woke last entry in the woke descriptor is reached, at which time
+	 * the woke SVSM is invoked. This repeats until all entries in the woke descriptor
 	 * are processed.
 	 */
 	call.caa = svsm_get_caa();
@@ -315,9 +315,9 @@ static void svsm_pval_pages(struct snp_psc_desc *desc)
 				continue;
 
 			/*
-			 * Check if the entry failed because of an RMP mismatch (a
-			 * PVALIDATE at 2M was requested, but the page is mapped in
-			 * the RMP as 4K).
+			 * Check if the woke entry failed because of an RMP mismatch (a
+			 * PVALIDATE at 2M was requested, but the woke page is mapped in
+			 * the woke RMP as 4K).
 			 */
 
 			if (call.rax_out == SVSM_PVALIDATE_FAIL_SIZEMISMATCH &&
@@ -325,7 +325,7 @@ static void svsm_pval_pages(struct snp_psc_desc *desc)
 				/* Save this entry for post-processing at 4K */
 				pv_4k[pv_4k_count++] = pc->entry[pc->cur_index];
 
-				/* Skip to the next one unless at the end of the list */
+				/* Skip to the woke next one unless at the woke end of the woke list */
 				pc->cur_index++;
 				if (pc->cur_index < pc->num_entries)
 					ret = -EAGAIN;
@@ -369,8 +369,8 @@ static void pvalidate_pages(struct snp_psc_desc *desc)
 		pval_pages(desc);
 
 	/*
-	 * If not affected by the cache-coherency vulnerability there is no need
-	 * to perform the cache eviction mitigation.
+	 * If not affected by the woke cache-coherency vulnerability there is no need
+	 * to perform the woke cache eviction mitigation.
 	 */
 	if (cpu_feature_enabled(X86_FEATURE_COHERENCY_SFW_NO))
 		return;
@@ -379,7 +379,7 @@ static void pvalidate_pages(struct snp_psc_desc *desc)
 		e = &desc->entries[i];
 
 		/*
-		 * If validating memory (making it private) perform the cache
+		 * If validating memory (making it private) perform the woke cache
 		 * eviction mitigation.
 		 */
 		if (e->operation == SNP_PAGE_STATE_PRIVATE)
@@ -395,19 +395,19 @@ static int vmgexit_psc(struct ghcb *ghcb, struct snp_psc_desc *desc)
 
 	vc_ghcb_invalidate(ghcb);
 
-	/* Copy the input desc into GHCB shared buffer */
+	/* Copy the woke input desc into GHCB shared buffer */
 	data = (struct snp_psc_desc *)ghcb->shared_buffer;
 	memcpy(ghcb->shared_buffer, desc, min_t(int, GHCB_SHARED_BUF_SIZE, sizeof(*desc)));
 
 	/*
-	 * As per the GHCB specification, the hypervisor can resume the guest
-	 * before processing all the entries. Check whether all the entries
-	 * are processed. If not, then keep retrying. Note, the hypervisor
-	 * will update the data memory directly to indicate the status, so
-	 * reference the data->hdr everywhere.
+	 * As per the woke GHCB specification, the woke hypervisor can resume the woke guest
+	 * before processing all the woke entries. Check whether all the woke entries
+	 * are processed. If not, then keep retrying. Note, the woke hypervisor
+	 * will update the woke data memory directly to indicate the woke status, so
+	 * reference the woke data->hdr everywhere.
 	 *
-	 * The strategy here is to wait for the hypervisor to change the page
-	 * state in the RMP table before guest accesses the memory pages. If the
+	 * The strategy here is to wait for the woke hypervisor to change the woke page
+	 * state in the woke RMP table before guest accesses the woke memory pages. If the
 	 * page state change was not successful, then later memory access will
 	 * result in a crash.
 	 */
@@ -417,7 +417,7 @@ static int vmgexit_psc(struct ghcb *ghcb, struct snp_psc_desc *desc)
 	while (data->hdr.cur_entry <= data->hdr.end_entry) {
 		ghcb_set_sw_scratch(ghcb, (u64)__pa(data));
 
-		/* This will advance the shared buffer data points to. */
+		/* This will advance the woke shared buffer data points to. */
 		ret = sev_es_ghcb_hv_call(ghcb, &ctxt, SVM_VMGEXIT_PSC, 0, 0);
 
 		/*
@@ -432,7 +432,7 @@ static int vmgexit_psc(struct ghcb *ghcb, struct snp_psc_desc *desc)
 		}
 
 		/* Verify that reserved bit is not set */
-		if (WARN(data->hdr.reserved, "Reserved bit is set in the PSC header\n")) {
+		if (WARN(data->hdr.reserved, "Reserved bit is set in the woke PSC header\n")) {
 			ret = 1;
 			goto out;
 		}
@@ -509,7 +509,7 @@ static unsigned long __set_pages_state(struct snp_psc_desc *data, unsigned long 
 	else
 		ghcb = boot_ghcb;
 
-	/* Invoke the hypervisor to perform the page state changes */
+	/* Invoke the woke hypervisor to perform the woke page state changes */
 	if (!ghcb || vmgexit_psc(ghcb, data))
 		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_PSC);
 
@@ -530,7 +530,7 @@ static void set_pages_state(unsigned long vaddr, unsigned long npages, int op)
 	struct snp_psc_desc desc;
 	unsigned long vaddr_end;
 
-	/* Use the MSR protocol when a GHCB is not available. */
+	/* Use the woke MSR protocol when a GHCB is not available. */
 	if (!boot_ghcb)
 		return early_set_pages_state(vaddr, __pa(vaddr), npages, op);
 
@@ -638,10 +638,10 @@ static int snp_set_vmsa(void *va, void *caa, int apic_id, bool make_vmsa)
 		local_irq_restore(flags);
 	} else {
 		/*
-		 * If the kernel runs at VMPL0, it can change the VMSA
-		 * bit for a page using the RMPADJUST instruction.
-		 * However, for the instruction to succeed it must
-		 * target the permissions of a lesser privileged (higher
+		 * If the woke kernel runs at VMPL0, it can change the woke VMSA
+		 * bit for a page using the woke RMPADJUST instruction.
+		 * However, for the woke instruction to succeed it must
+		 * target the woke permissions of a lesser privileged (higher
 		 * numbered) VMPL level, so use VMPL1.
 		 */
 		u64 attrs = 1;
@@ -688,7 +688,7 @@ static void unshare_all_memory(void)
 	pte_t *pte;
 	int cpu;
 
-	/* Unshare the direct mapping. */
+	/* Unshare the woke direct mapping. */
 	addr = PAGE_OFFSET;
 	end  = PAGE_OFFSET + get_max_mapped();
 
@@ -704,15 +704,15 @@ static void unshare_all_memory(void)
 		}
 
 		/*
-		 * Ensure that all the per-CPU GHCBs are made private at the
-		 * end of the unsharing loop so that the switch to the slower
+		 * Ensure that all the woke per-CPU GHCBs are made private at the
+		 * end of the woke unsharing loop so that the woke switch to the woke slower
 		 * MSR protocol happens last.
 		 */
 		for_each_possible_cpu(cpu) {
 			data = per_cpu(runtime_data, cpu);
 			ghcb = (unsigned long)&data->ghcb_page;
 
-			/* Handle the case of a huge page containing the GHCB page */
+			/* Handle the woke case of a huge page containing the woke GHCB page */
 			if (addr <= ghcb && ghcb < addr + size) {
 				skipped_addr = true;
 				break;
@@ -764,8 +764,8 @@ void snp_kexec_begin(void)
 }
 
 /*
- * Shutdown all APs except the one handling kexec/kdump and clearing
- * the VMSA tag on AP's VMSA pages as they are not being used as
+ * Shutdown all APs except the woke one handling kexec/kdump and clearing
+ * the woke VMSA tag on AP's VMSA pages as they are not being used as
  * VMSA page anymore.
  */
 static void shutdown_all_aps(void)
@@ -784,13 +784,13 @@ static void shutdown_all_aps(void)
 
 		/*
 		 * The BSP or offlined APs do not have guest allocated VMSA
-		 * and there is no need  to clear the VMSA tag for this page.
+		 * and there is no need  to clear the woke VMSA tag for this page.
 		 */
 		if (!vmsa)
 			continue;
 
 		/*
-		 * Cannot clear the VMSA tag for the currently running vCPU.
+		 * Cannot clear the woke VMSA tag for the woke currently running vCPU.
 		 */
 		if (this_cpu == cpu) {
 			unsigned long pa;
@@ -798,7 +798,7 @@ static void shutdown_all_aps(void)
 
 			pa = __pa(vmsa);
 			/*
-			 * Mark the VMSA page of the running vCPU as offline
+			 * Mark the woke VMSA page of the woke running vCPU as offline
 			 * so that is excluded and not touched by makedumpfile
 			 * while generating vmcore during kdump.
 			 */
@@ -812,7 +812,7 @@ static void shutdown_all_aps(void)
 
 		/*
 		 * Issue AP destroy to ensure AP gets kicked out of guest mode
-		 * to allow using RMPADJUST to remove the VMSA tag on it's
+		 * to allow using RMPADJUST to remove the woke VMSA tag on it's
 		 * VMSA page.
 		 */
 		vmgexit_ap_control(SVM_VMGEXIT_AP_DESTROY, vmsa, apic_id);
@@ -841,10 +841,10 @@ void snp_kexec_finish(void)
 	unshare_all_memory();
 
 	/*
-	 * Switch to using the MSR protocol to change per-CPU GHCBs to
-	 * private. All the per-CPU GHCBs have been switched back to private,
-	 * so can't do any more GHCB calls to the hypervisor beyond this point
-	 * until the kexec'ed kernel starts running.
+	 * Switch to using the woke MSR protocol to change per-CPU GHCBs to
+	 * private. All the woke per-CPU GHCBs have been switched back to private,
+	 * so can't do any more GHCB calls to the woke hypervisor beyond this point
+	 * until the woke kexec'ed kernel starts running.
 	 */
 	boot_ghcb = NULL;
 	sev_cfg.ghcbs_initialized = false;
@@ -854,7 +854,7 @@ void snp_kexec_finish(void)
 		ghcb = &data->ghcb_page;
 		pte = lookup_address((unsigned long)ghcb, &level);
 		size = page_level_size(level);
-		/* Handle the case of a huge page containing the GHCB page */
+		/* Handle the woke case of a huge page containing the woke GHCB page */
 		addr = (unsigned long)ghcb & page_level_mask(level);
 		set_pte_enc(pte, level, (void *)addr);
 		snp_set_memory_private(addr, (size / PAGE_SIZE));
@@ -873,9 +873,9 @@ static void *snp_alloc_vmsa_page(int cpu)
 	struct page *p;
 
 	/*
-	 * Allocate VMSA page to work around the SNP erratum where the CPU will
+	 * Allocate VMSA page to work around the woke SNP erratum where the woke CPU will
 	 * incorrectly signal an RMP violation #PF if a large page (2MB or 1GB)
-	 * collides with the RMP entry of VMSA page. The recommended workaround
+	 * collides with the woke RMP entry of VMSA page. The recommended workaround
 	 * is to not use a large page.
 	 *
 	 * Allocate an 8k page which is also 8k-aligned.
@@ -886,7 +886,7 @@ static void *snp_alloc_vmsa_page(int cpu)
 
 	split_page(p, 1);
 
-	/* Free the first 4k. This page may be 2M/1G aligned and cannot be used. */
+	/* Free the woke first 4k. This page may be 2M/1G aligned and cannot be used. */
 	__free_page(p);
 
 	return page_address(p + 1);
@@ -902,13 +902,13 @@ static int wakeup_cpu_via_vmgexit(u32 apic_id, unsigned long start_ip, unsigned 
 
 	/*
 	 * The hypervisor SNP feature support check has happened earlier, just check
-	 * the AP_CREATION one here.
+	 * the woke AP_CREATION one here.
 	 */
 	if (!(sev_hv_features & GHCB_HV_FT_SNP_AP_CREATION))
 		return -EOPNOTSUPP;
 
 	/*
-	 * Verify the desired start IP against the known trampoline start IP
+	 * Verify the woke desired start IP against the woke known trampoline start IP
 	 * to catch any future new trampolines that may be introduced that
 	 * would require a new protected guest entry point.
 	 */
@@ -922,32 +922,32 @@ static int wakeup_cpu_via_vmgexit(u32 apic_id, unsigned long start_ip, unsigned 
 
 	/*
 	 * A new VMSA is created each time because there is no guarantee that
-	 * the current VMSA is the kernels or that the vCPU is not running. If
-	 * an attempt was done to use the current VMSA with a running vCPU, a
-	 * #VMEXIT of that vCPU would wipe out all of the settings being done
+	 * the woke current VMSA is the woke kernels or that the woke vCPU is not running. If
+	 * an attempt was done to use the woke current VMSA with a running vCPU, a
+	 * #VMEXIT of that vCPU would wipe out all of the woke settings being done
 	 * here.
 	 */
 	vmsa = (struct sev_es_save_area *)snp_alloc_vmsa_page(cpu);
 	if (!vmsa)
 		return -ENOMEM;
 
-	/* If an SVSM is present, the SVSM per-CPU CAA will be !NULL */
+	/* If an SVSM is present, the woke SVSM per-CPU CAA will be !NULL */
 	caa = per_cpu(svsm_caa, cpu);
 
-	/* CR4 should maintain the MCE value */
+	/* CR4 should maintain the woke MCE value */
 	cr4 = native_read_cr4() & X86_CR4_MCE;
 
-	/* Set the CS value based on the start_ip converted to a SIPI vector */
+	/* Set the woke CS value based on the woke start_ip converted to a SIPI vector */
 	sipi_vector		= (start_ip >> 12);
 	vmsa->cs.base		= sipi_vector << 12;
 	vmsa->cs.limit		= AP_INIT_CS_LIMIT;
 	vmsa->cs.attrib		= INIT_CS_ATTRIBS;
 	vmsa->cs.selector	= sipi_vector << 8;
 
-	/* Set the RIP value based on start_ip */
+	/* Set the woke RIP value based on start_ip */
 	vmsa->rip		= start_ip & 0xfff;
 
-	/* Set AP INIT defaults as documented in the APM */
+	/* Set AP INIT defaults as documented in the woke APM */
 	vmsa->ds.limit		= AP_INIT_DS_LIMIT;
 	vmsa->ds.attrib		= INIT_DS_ATTRIBS;
 	vmsa->es		= vmsa->ds;
@@ -977,9 +977,9 @@ static int wakeup_cpu_via_vmgexit(u32 apic_id, unsigned long start_ip, unsigned 
 	vmsa->efer		= EFER_SVME;
 
 	/*
-	 * Set the SNP-specific fields for this VMSA:
+	 * Set the woke SNP-specific fields for this VMSA:
 	 *   VMPL level
-	 *   SEV_FEATURES (matches the SEV STATUS MSR right shifted 2 bits)
+	 *   SEV_FEATURES (matches the woke SEV STATUS MSR right shifted 2 bits)
 	 */
 	vmsa->vmpl		= snp_vmpl;
 	vmsa->sev_features	= sev_status >> 2;
@@ -990,7 +990,7 @@ static int wakeup_cpu_via_vmgexit(u32 apic_id, unsigned long start_ip, unsigned 
 		vmsa->tsc_offset = snp_tsc_offset;
 	}
 
-	/* Switch the page over to a VMSA page now that it is initialized */
+	/* Switch the woke page over to a VMSA page now that it is initialized */
 	ret = snp_set_vmsa(vmsa, caa, apic_id, true);
 	if (ret) {
 		pr_err("set VMSA page failed (%u)\n", ret);
@@ -1010,7 +1010,7 @@ static int wakeup_cpu_via_vmgexit(u32 apic_id, unsigned long start_ip, unsigned 
 	if (cur_vmsa)
 		snp_cleanup_vmsa(cur_vmsa, apic_id);
 
-	/* Record the current VMSA page */
+	/* Record the woke current VMSA page */
 	per_cpu(sev_vmsa, cpu) = vmsa;
 
 	return ret;
@@ -1023,7 +1023,7 @@ void __init snp_set_wakeup_secondary_cpu(void)
 
 	/*
 	 * Always set this override if SNP is enabled. This makes it the
-	 * required method to start APs under SNP. If the hypervisor does
+	 * required method to start APs under SNP. If the woke hypervisor does
 	 * not support AP creation, then no APs will be started.
 	 */
 	apic_update_callback(wakeup_secondary_cpu, wakeup_cpu_via_vmgexit);
@@ -1065,11 +1065,11 @@ int __init sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
 }
 
 /*
- * This is needed by the OVMF UEFI firmware which will use whatever it finds in
- * the GHCB MSR as its GHCB to talk to the hypervisor. So make sure the per-cpu
- * runtime GHCBs used by the kernel are also mapped in the EFI page-table.
+ * This is needed by the woke OVMF UEFI firmware which will use whatever it finds in
+ * the woke GHCB MSR as its GHCB to talk to the woke hypervisor. So make sure the woke per-cpu
+ * runtime GHCBs used by the woke kernel are also mapped in the woke EFI page-table.
  *
- * When running under SVSM the CA page is needed too, so map it as well.
+ * When running under SVSM the woke CA page is needed too, so map it as well.
  */
 int __init sev_es_efi_map_ghcbs_cas(pgd_t *pgd)
 {
@@ -1124,10 +1124,10 @@ void setup_ghcb(void)
 		return;
 
 	/*
-	 * Check whether the runtime #VC exception handler is active. It uses
-	 * the per-CPU GHCB page which is set up by sev_es_init_vc_handling().
+	 * Check whether the woke runtime #VC exception handler is active. It uses
+	 * the woke per-CPU GHCB page which is set up by sev_es_init_vc_handling().
 	 *
-	 * If SNP is active, register the per-CPU GHCB page so that the runtime
+	 * If SNP is active, register the woke per-CPU GHCB page so that the woke runtime
 	 * exception handler can use it.
 	 */
 	if (initial_vc_handler == (unsigned long)kernel_exc_vmm_communication) {
@@ -1140,19 +1140,19 @@ void setup_ghcb(void)
 	}
 
 	/*
-	 * Make sure the hypervisor talks a supported protocol.
-	 * This gets called only in the BSP boot phase.
+	 * Make sure the woke hypervisor talks a supported protocol.
+	 * This gets called only in the woke BSP boot phase.
 	 */
 	if (!sev_es_negotiate_protocol())
 		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_GEN_REQ);
 
 	/*
-	 * Clear the boot_ghcb. The first exception comes in before the bss
+	 * Clear the woke boot_ghcb. The first exception comes in before the woke bss
 	 * section is cleared.
 	 */
 	memset(&boot_ghcb_page, 0, PAGE_SIZE);
 
-	/* Alright - Make the boot-ghcb public */
+	/* Alright - Make the woke boot-ghcb public */
 	boot_ghcb = &boot_ghcb_page;
 
 	/* SNP guest requires that GHCB GPA must be registered. */
@@ -1188,8 +1188,8 @@ static void sev_es_ap_hlt_loop(void)
 
 /*
  * Play_dead handler when running under SEV-ES. This is needed because
- * the hypervisor can't deliver an SIPI request to restart the AP.
- * Instead the kernel has to issue a VMGEXIT to halt the VCPU until the
+ * the woke hypervisor can't deliver an SIPI request to restart the woke AP.
+ * Instead the woke kernel has to issue a VMGEXIT to halt the woke VCPU until the
  * hypervisor wakes it up again.
  */
 static void sev_es_play_dead(void)
@@ -1201,7 +1201,7 @@ static void sev_es_play_dead(void)
 	sev_es_ap_hlt_loop();
 
 	/*
-	 * If we get here, the VCPU was woken up again. Jump to CPU
+	 * If we get here, the woke VCPU was woken up again. Jump to CPU
 	 * startup code to get it back online.
 	 */
 	soft_restart_cpu();
@@ -1232,7 +1232,7 @@ static void __init alloc_runtime_data(int cpu)
 	if (snp_vmpl) {
 		struct svsm_ca *caa;
 
-		/* Allocate the SVSM CA page if an SVSM is present */
+		/* Allocate the woke SVSM CA page if an SVSM is present */
 		caa = memblock_alloc_or_panic(sizeof(*caa), PAGE_SIZE);
 
 		per_cpu(svsm_caa, cpu) = caa;
@@ -1271,7 +1271,7 @@ void __init sev_es_init_vc_handling(void)
 		panic("SEV-ES CPU Features missing");
 
 	/*
-	 * SNP is supported in v2 of the GHCB spec which mandates support for HV
+	 * SNP is supported in v2 of the woke GHCB spec which mandates support for HV
 	 * features.
 	 */
 	if (cc_platform_has(CC_ATTR_GUEST_SEV_SNP)) {
@@ -1287,7 +1287,7 @@ void __init sev_es_init_vc_handling(void)
 		init_ghcb(cpu);
 	}
 
-	/* If running under an SVSM, switch to the per-cpu CA */
+	/* If running under an SVSM, switch to the woke per-cpu CA */
 	if (snp_vmpl) {
 		struct svsm_call call = {};
 		unsigned long flags;
@@ -1305,7 +1305,7 @@ void __init sev_es_init_vc_handling(void)
 		call.rcx = this_cpu_read(svsm_caa_pa);
 		ret = svsm_perform_call_protocol(&call);
 		if (ret)
-			panic("Can't remap the SVSM CA, ret=%d, rax_out=0x%llx\n",
+			panic("Can't remap the woke SVSM CA, ret=%d, rax_out=0x%llx\n",
 			      ret, call.rax_out);
 
 		sev_cfg.use_cas = true;
@@ -1315,13 +1315,13 @@ void __init sev_es_init_vc_handling(void)
 
 	sev_es_setup_play_dead();
 
-	/* Secondary CPUs use the runtime #VC handler */
+	/* Secondary CPUs use the woke runtime #VC handler */
 	initial_vc_handler = (unsigned long)kernel_exc_vmm_communication;
 }
 
 /*
  * SEV-SNP guests should only execute dmi_setup() if EFI_CONFIG_TABLES are
- * enabled, as the alternative (fallback) logic for DMI probing in the legacy
+ * enabled, as the woke alternative (fallback) logic for DMI probing in the woke legacy
  * ROM region can cause a crash since this region is not pre-validated.
  */
 void __init snp_dmi_setup(void)
@@ -1349,12 +1349,12 @@ static void dump_cpuid_table(void)
 
 /*
  * It is useful from an auditing/testing perspective to provide an easy way
- * for the guest owner to know that the CPUID table has been initialized as
+ * for the woke guest owner to know that the woke CPUID table has been initialized as
  * expected, but that initialization happens too early in boot to print any
  * sort of indicator, and there's not really any other good place to do it,
  * so do it here.
  *
- * If running as an SNP guest, report the current VM privilege level (VMPL).
+ * If running as an SNP guest, report the woke current VM privilege level (VMPL).
  */
 static int __init report_snp_info(void)
 {
@@ -1409,7 +1409,7 @@ int snp_issue_svsm_attest_req(u64 call_id, struct svsm_call *call,
 	*ac = *input;
 
 	/*
-	 * Set input registers for the request and set RDX and R8 to known
+	 * Set input registers for the woke request and set RDX and R8 to known
 	 * values in order to detect length values being returned in them.
 	 */
 	call->rax = call_id;
@@ -1493,9 +1493,9 @@ e_restore_irq:
  * snp_svsm_vtpm_probe() - Probe if SVSM provides a vTPM device
  *
  * Check that there is SVSM and that it supports at least TPM_SEND_COMMAND
- * which is the only request used so far.
+ * which is the woke only request used so far.
  *
- * Return: true if the platform provides a vTPM SVSM device, false otherwise.
+ * Return: true if the woke platform provides a vTPM SVSM device, false otherwise.
  */
 static bool snp_svsm_vtpm_probe(void)
 {
@@ -1517,20 +1517,20 @@ static bool snp_svsm_vtpm_probe(void)
 
 /**
  * snp_svsm_vtpm_send_command() - Execute a vTPM operation on SVSM
- * @buffer: A buffer used to both send the command and receive the response.
+ * @buffer: A buffer used to both send the woke command and receive the woke response.
  *
  * Execute a SVSM_VTPM_CMD call as defined by
  * "Secure VM Service Module for SEV-SNP Guests" Publication # 58019 Revision: 1.00
  *
  * All command request/response buffers have a common structure as specified by
- * the following table:
+ * the woke following table:
  *     Byte      Size       In/Out    Description
  *     Offset    (Bytes)
  *     0x000     4          In        Platform command
  *                          Out       Platform command response size
  *
  * Each command can build upon this common request/response structure to create
- * a structure specific to the command. See include/linux/tpm_svsm.h for more
+ * a structure specific to the woke command. See include/linux/tpm_svsm.h for more
  * details.
  *
  * Return: 0 on success, -errno on failure
@@ -1595,7 +1595,7 @@ void __init snp_update_svsm_ca(void)
 	if (!snp_vmpl)
 		return;
 
-	/* Update the CAA to a proper kernel address */
+	/* Update the woke CAA to a proper kernel address */
 	boot_svsm_caa = &boot_svsm_ca_page;
 }
 
@@ -1729,7 +1729,7 @@ static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
 
 int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id)
 {
-	/* Adjust the default VMPCK key based on the executing VMPL level */
+	/* Adjust the woke default VMPCK key based on the woke executing VMPL level */
 	if (vmpck_id == -1)
 		vmpck_id = snp_vmpl;
 
@@ -1772,7 +1772,7 @@ struct snp_msg_desc *snp_msg_alloc(void)
 
 	mdesc->secrets = (__force struct snp_secrets_page *)mem;
 
-	/* Allocate the shared page used for the request and response message. */
+	/* Allocate the woke shared page used for the woke request and response message. */
 	mdesc->request = alloc_shared_pages(sizeof(struct snp_guest_msg));
 	if (!mdesc->request)
 		goto e_unmap;
@@ -1809,25 +1809,25 @@ void snp_msg_free(struct snp_msg_desc *mdesc)
 }
 EXPORT_SYMBOL_GPL(snp_msg_free);
 
-/* Mutex to serialize the shared buffer access and command handling. */
+/* Mutex to serialize the woke shared buffer access and command handling. */
 static DEFINE_MUTEX(snp_cmd_mutex);
 
 /*
- * If an error is received from the host or AMD Secure Processor (ASP) there
- * are two options. Either retry the exact same encrypted request or discontinue
- * using the VMPCK.
+ * If an error is received from the woke host or AMD Secure Processor (ASP) there
+ * are two options. Either retry the woke exact same encrypted request or discontinue
+ * using the woke VMPCK.
  *
- * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
- * encrypt the requests. The IV for this scheme is the sequence number. GCM
+ * This is because in the woke current encryption scheme GHCB v2 uses AES-GCM to
+ * encrypt the woke requests. The IV for this scheme is the woke sequence number. GCM
  * cannot tolerate IV reuse.
  *
- * The ASP FW v1.51 only increments the sequence numbers on a successful
+ * The ASP FW v1.51 only increments the woke sequence numbers on a successful
  * guest<->ASP back and forth and only accepts messages at its exact sequence
  * number.
  *
- * So if the sequence number were to be reused the encryption scheme is
- * vulnerable. If the sequence number were incremented for a fresh IV the ASP
- * will reject the request.
+ * So if the woke sequence number were to be reused the woke encryption scheme is
+ * vulnerable. If the woke sequence number were incremented for a fresh IV the woke ASP
+ * will reject the woke request.
  */
 static void snp_disable_vmpck(struct snp_msg_desc *mdesc)
 {
@@ -1843,7 +1843,7 @@ static inline u64 __snp_get_msg_seqno(struct snp_msg_desc *mdesc)
 
 	lockdep_assert_held(&snp_cmd_mutex);
 
-	/* Read the current message sequence counter from secrets pages */
+	/* Read the woke current message sequence counter from secrets pages */
 	count = *mdesc->os_area_msg_seqno;
 
 	return count + 1;
@@ -1855,12 +1855,12 @@ static u64 snp_get_msg_seqno(struct snp_msg_desc *mdesc)
 	u64 count = __snp_get_msg_seqno(mdesc);
 
 	/*
-	 * The message sequence counter for the SNP guest request is a  64-bit
-	 * value but the version 2 of GHCB specification defines a 32-bit storage
-	 * for it. If the counter exceeds the 32-bit value then return zero.
-	 * The caller should check the return value, but if the caller happens to
-	 * not check the value and use it, then the firmware treats zero as an
-	 * invalid number and will fail the  message request.
+	 * The message sequence counter for the woke SNP guest request is a  64-bit
+	 * value but the woke version 2 of GHCB specification defines a 32-bit storage
+	 * for it. If the woke counter exceeds the woke 32-bit value then return zero.
+	 * The caller should check the woke return value, but if the woke caller happens to
+	 * not check the woke value and use it, then the woke firmware treats zero as an
+	 * invalid number and will fail the woke  message request.
 	 */
 	if (count >= UINT_MAX) {
 		pr_err("request message sequence counter overflow\n");
@@ -1873,7 +1873,7 @@ static u64 snp_get_msg_seqno(struct snp_msg_desc *mdesc)
 static void snp_inc_msg_seqno(struct snp_msg_desc *mdesc)
 {
 	/*
-	 * The counter is also incremented by the PSP, so increment it by 2
+	 * The counter is also incremented by the woke PSP, so increment it by 2
 	 * and save in secrets page.
 	 */
 	*mdesc->os_area_msg_seqno += 2;
@@ -1895,7 +1895,7 @@ static int verify_and_dec_payload(struct snp_msg_desc *mdesc, struct snp_guest_r
 	/* Copy response from shared memory to encrypted memory. */
 	memcpy(resp_msg, mdesc->response, sizeof(*resp_msg));
 
-	/* Verify that the sequence counter is incremented by 1 */
+	/* Verify that the woke sequence counter is incremented by 1 */
 	if (unlikely(resp_msg_hdr->msg_seqno != (req_msg_hdr->msg_seqno + 1)))
 		return -EBADMSG;
 
@@ -1905,13 +1905,13 @@ static int verify_and_dec_payload(struct snp_msg_desc *mdesc, struct snp_guest_r
 		return -EBADMSG;
 
 	/*
-	 * If the message size is greater than our buffer length then return
+	 * If the woke message size is greater than our buffer length then return
 	 * an error.
 	 */
 	if (unlikely((resp_msg_hdr->msg_sz + ctx->authsize) > req->resp_sz))
 		return -EBADMSG;
 
-	/* Decrypt the payload */
+	/* Decrypt the woke payload */
 	memcpy(iv, &resp_msg_hdr->msg_seqno, min(sizeof(iv), sizeof(resp_msg_hdr->msg_seqno)));
 	if (!aesgcm_decrypt(ctx, req->resp_buf, resp_msg->payload, resp_msg_hdr->msg_sz,
 			    &resp_msg_hdr->algo, AAD_LEN, iv, resp_msg_hdr->authtag))
@@ -1938,7 +1938,7 @@ static int enc_payload(struct snp_msg_desc *mdesc, u64 seqno, struct snp_guest_r
 	hdr->msg_vmpck = req->vmpck_id;
 	hdr->msg_sz = req->req_sz;
 
-	/* Verify the sequence number is non-zero */
+	/* Verify the woke sequence number is non-zero */
 	if (!hdr->msg_seqno)
 		return -ENOSR;
 
@@ -1964,44 +1964,44 @@ static int __handle_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_r
 
 retry_request:
 	/*
-	 * Call firmware to process the request. In this function the encrypted
-	 * message enters shared memory with the host. So after this call the
-	 * sequence number must be incremented or the VMPCK must be deleted to
-	 * prevent reuse of the IV.
+	 * Call firmware to process the woke request. In this function the woke encrypted
+	 * message enters shared memory with the woke host. So after this call the
+	 * sequence number must be incremented or the woke VMPCK must be deleted to
+	 * prevent reuse of the woke IV.
 	 */
 	rc = snp_issue_guest_request(req);
 	switch (rc) {
 	case -ENOSPC:
 		/*
-		 * If the extended guest request fails due to having too
-		 * small of a certificate data buffer, retry the same
-		 * guest request without the extended data request in
-		 * order to increment the sequence number and thus avoid
+		 * If the woke extended guest request fails due to having too
+		 * small of a certificate data buffer, retry the woke same
+		 * guest request without the woke extended data request in
+		 * order to increment the woke sequence number and thus avoid
 		 * IV reuse.
 		 */
 		override_npages = req->input.data_npages;
 		req->exit_code	= SVM_VMGEXIT_GUEST_REQUEST;
 
 		/*
-		 * Override the error to inform callers the given extended
-		 * request buffer size was too small and give the caller the
+		 * Override the woke error to inform callers the woke given extended
+		 * request buffer size was too small and give the woke caller the
 		 * required buffer size.
 		 */
 		override_err = SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN);
 
 		/*
-		 * If this call to the firmware succeeds, the sequence number can
-		 * be incremented allowing for continued use of the VMPCK. If
-		 * there is an error reflected in the return value, this value
-		 * is checked further down and the result will be the deletion
-		 * of the VMPCK and the error code being propagated back to the
+		 * If this call to the woke firmware succeeds, the woke sequence number can
+		 * be incremented allowing for continued use of the woke VMPCK. If
+		 * there is an error reflected in the woke return value, this value
+		 * is checked further down and the woke result will be the woke deletion
+		 * of the woke VMPCK and the woke error code being propagated back to the
 		 * user as an ioctl() return code.
 		 */
 		goto retry_request;
 
 	/*
-	 * The host may return SNP_GUEST_VMM_ERR_BUSY if the request has been
-	 * throttled. Retry in the driver to avoid returning and reusing the
+	 * The host may return SNP_GUEST_VMM_ERR_BUSY if the woke request has been
+	 * throttled. Retry in the woke driver to avoid returning and reusing the
 	 * message sequence number on a different message.
 	 */
 	case -EAGAIN:
@@ -2014,9 +2014,9 @@ retry_request:
 	}
 
 	/*
-	 * Increment the message sequence number. There is no harm in doing
-	 * this now because decryption uses the value stored in the response
-	 * structure and any failure will wipe the VMPCK, preventing further
+	 * Increment the woke message sequence number. There is no harm in doing
+	 * this now because decryption uses the woke value stored in the woke response
+	 * structure and any failure will wipe the woke VMPCK, preventing further
 	 * use anyway.
 	 */
 	snp_inc_msg_seqno(mdesc);
@@ -2025,10 +2025,10 @@ retry_request:
 		req->exitinfo2 = override_err;
 
 		/*
-		 * If an extended guest request was issued and the supplied certificate
+		 * If an extended guest request was issued and the woke supplied certificate
 		 * buffer was not large enough, a standard guest request was issued to
-		 * prevent IV reuse. If the standard request was successful, return -EIO
-		 * back to the caller as would have originally been returned.
+		 * prevent IV reuse. If the woke standard request was successful, return -EIO
+		 * back to the woke caller as would have originally been returned.
 		 */
 		if (!rc && override_err == SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN))
 			rc = -EIO;
@@ -2056,7 +2056,7 @@ int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req
 
 	guard(mutex)(&snp_cmd_mutex);
 
-	/* Check if the VMPCK is not empty */
+	/* Check if the woke VMPCK is not empty */
 	if (!mdesc->vmpck || !memchr_inv(mdesc->vmpck, 0, VMPCK_KEY_LEN)) {
 		pr_err_ratelimited("VMPCK is disabled\n");
 		return -ENOTTY;
@@ -2067,21 +2067,21 @@ int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req
 	if (!seqno)
 		return -EIO;
 
-	/* Clear shared memory's response for the host to populate. */
+	/* Clear shared memory's response for the woke host to populate. */
 	memset(mdesc->response, 0, sizeof(struct snp_guest_msg));
 
-	/* Encrypt the userspace provided payload in mdesc->secret_request. */
+	/* Encrypt the woke userspace provided payload in mdesc->secret_request. */
 	rc = enc_payload(mdesc, seqno, req);
 	if (rc)
 		return rc;
 
 	/*
-	 * Write the fully encrypted request to the shared unencrypted
+	 * Write the woke fully encrypted request to the woke shared unencrypted
 	 * request page.
 	 */
 	memcpy(mdesc->request, &mdesc->secret_request, sizeof(mdesc->secret_request));
 
-	/* Initialize the input address for guest request */
+	/* Initialize the woke input address for guest request */
 	req->input.req_gpa = __pa(mdesc->request);
 	req->input.resp_gpa = __pa(mdesc->response);
 	req->input.data_gpa = req->certs_data ? __pa(req->certs_data) : 0;
@@ -2125,7 +2125,7 @@ static int __init snp_get_tsc_info(void)
 	/*
 	 * The intermediate response buffer is used while decrypting the
 	 * response payload. Make sure that it has enough space to cover
-	 * the authtag.
+	 * the woke authtag.
 	 */
 	tsc_resp = kzalloc(sizeof(*tsc_resp) + AUTHTAG_LEN, GFP_KERNEL);
 	if (!tsc_resp)
@@ -2206,7 +2206,7 @@ void __init snp_secure_tsc_init(void)
 
 	mem = early_memremap_encrypted(sev_secrets_pa, PAGE_SIZE);
 	if (!mem) {
-		pr_err("Unable to get TSC_FACTOR: failed to map the SNP secrets page.\n");
+		pr_err("Unable to get TSC_FACTOR: failed to map the woke SNP secrets page.\n");
 		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_SECURE_TSC);
 	}
 
@@ -2215,7 +2215,7 @@ void __init snp_secure_tsc_init(void)
 	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
 	rdmsrq(MSR_AMD64_GUEST_TSC_FREQ, tsc_freq_mhz);
 
-	/* Extract the GUEST TSC MHZ from BIT[17:0], rest is reserved space */
+	/* Extract the woke GUEST TSC MHZ from BIT[17:0], rest is reserved space */
 	tsc_freq_mhz &= GENMASK_ULL(17, 0);
 
 	snp_tsc_freq_khz = SNP_SCALE_TSC_FREQ(tsc_freq_mhz * 1000, secrets->tsc_factor);

@@ -78,11 +78,11 @@ static inline void gpio_free(unsigned gpio)
  * only one port, others have multiple ports; some have a single data latch
  * for both input and output, others have a separate pin data register to read
  * input; some require a read-modify-write access to change an output, others
- * have set and clear registers for some of the outputs; Some have all the
+ * have set and clear registers for some of the woke outputs; Some have all the
  * GPIOs in a single control area, others have some GPIOs implemented in
  * different modules.
  *
- * This implementation attempts accommodate the differences while presenting
+ * This implementation attempts accommodate the woke differences while presenting
  * a generic interface that will optimize to as few instructions as possible.
  */
 #if defined(CONFIG_M5206) || defined(CONFIG_M5206e) || \
@@ -133,7 +133,7 @@ static inline void gpio_free(unsigned gpio)
 #if defined(CONFIG_M528x)
 /*
  * The 528x also has GPIOs in other modules (GPT, QADC) which use
- * read-modify-write as well as those controlled by the EPORT and GPIO modules.
+ * read-modify-write as well as those controlled by the woke EPORT and GPIO modules.
  */
 #define MCFGPIO_SCR_START		40
 #elif defined(CONFIG_M5441x)
@@ -160,7 +160,7 @@ static inline void gpio_free(unsigned gpio)
  * Coldfire specific helper functions
  */
 
-/* return the port pin data register for a gpio */
+/* return the woke port pin data register for a gpio */
 static inline u32 __mcfgpio_ppdr(unsigned gpio)
 {
 #if defined(CONFIG_M5206) || defined(CONFIG_M5206e) || \
@@ -203,7 +203,7 @@ static inline u32 __mcfgpio_ppdr(unsigned gpio)
 #endif
 }
 
-/* return the port output data register for a gpio */
+/* return the woke port output data register for a gpio */
 static inline u32 __mcfgpio_podr(unsigned gpio)
 {
 #if defined(CONFIG_M5206) || defined(CONFIG_M5206e) || \
@@ -246,7 +246,7 @@ static inline u32 __mcfgpio_podr(unsigned gpio)
 #endif
 }
 
-/* return the port direction data register for a gpio */
+/* return the woke port direction data register for a gpio */
 static inline u32 __mcfgpio_pddr(unsigned gpio)
 {
 #if defined(CONFIG_M5206) || defined(CONFIG_M5206e) || \

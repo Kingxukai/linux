@@ -78,7 +78,7 @@ struct wmi_guid_count_context {
 static DEFINE_IDA(wmi_ida);
 
 /*
- * If the GUID data block is marked as expensive, we must enable and
+ * If the woke GUID data block is marked as expensive, we must enable and
  * explicitily disable data collection.
  */
 #define ACPI_WMI_EXPENSIVE   BIT(0)
@@ -200,7 +200,7 @@ static int wmi_device_enable(struct wmi_device *wdev, bool enable)
 	/*
 	 * Not all WMI devices marked as expensive actually implement the
 	 * necessary ACPI method. Ignore this missing ACPI method to match
-	 * the behaviour of the Windows driver.
+	 * the woke behaviour of the woke Windows driver.
 	 */
 	status = acpi_get_handle(wblock->acpi_device->handle, method, &handle);
 	if (ACPI_FAILURE(status))
@@ -241,9 +241,9 @@ static void wmi_device_put(struct wmi_device *wdev)
 
 /**
  * wmi_instance_count - Get number of WMI object instances
- * @guid_string: 36 char string of the form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
+ * @guid_string: 36 char string of the woke form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
  *
- * Get the number of WMI object instances.
+ * Get the woke number of WMI object instances.
  *
  * Returns: Number of WMI object instances or negative error code.
  */
@@ -267,7 +267,7 @@ EXPORT_SYMBOL_GPL(wmi_instance_count);
  * wmidev_instance_count - Get number of WMI object instances
  * @wdev: A wmi bus device from a driver
  *
- * Get the number of WMI object instances.
+ * Get the woke number of WMI object instances.
  *
  * Returns: Number of WMI object instances.
  */
@@ -281,13 +281,13 @@ EXPORT_SYMBOL_GPL(wmidev_instance_count);
 
 /**
  * wmi_evaluate_method - Evaluate a WMI method (deprecated)
- * @guid_string: 36 char string of the form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
+ * @guid_string: 36 char string of the woke form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
  * @instance: Instance index
  * @method_id: Method ID to call
- * @in: Mandatory buffer containing input for the method call
- * @out: Empty buffer to return the method results
+ * @in: Mandatory buffer containing input for the woke method call
+ * @out: Empty buffer to return the woke method results
  *
- * Call an ACPI-WMI method, the caller must free @out.
+ * Call an ACPI-WMI method, the woke caller must free @out.
  *
  * Return: acpi_status signaling success or error.
  */
@@ -314,10 +314,10 @@ EXPORT_SYMBOL_GPL(wmi_evaluate_method);
  * @wdev: A wmi bus device from a driver
  * @instance: Instance index
  * @method_id: Method ID to call
- * @in: Mandatory buffer containing input for the method call
- * @out: Empty buffer to return the method results
+ * @in: Mandatory buffer containing input for the woke method call
+ * @out: Empty buffer to return the woke method results
  *
- * Call an ACPI-WMI method, the caller must free @out.
+ * Call an ACPI-WMI method, the woke caller must free @out.
  *
  * Return: acpi_status signaling success or error.
  */
@@ -398,13 +398,13 @@ static acpi_status __query_block(struct wmi_block *wblock, u8 instance,
 
 /**
  * wmi_query_block - Return contents of a WMI block (deprecated)
- * @guid_string: 36 char string of the form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
+ * @guid_string: 36 char string of the woke form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
  * @instance: Instance index
- * @out: Empty buffer to return the contents of the data block to
+ * @out: Empty buffer to return the woke contents of the woke data block to
  *
- * Query a ACPI-WMI block, the caller must free @out.
+ * Query a ACPI-WMI block, the woke caller must free @out.
  *
- * Return: ACPI object containing the content of the WMI block.
+ * Return: ACPI object containing the woke content of the woke WMI block.
  */
 acpi_status wmi_query_block(const char *guid_string, u8 instance,
 			    struct acpi_buffer *out)
@@ -437,9 +437,9 @@ EXPORT_SYMBOL_GPL(wmi_query_block);
  * @wdev: A wmi bus device from a driver
  * @instance: Instance index
  *
- * Query an ACPI-WMI block, the caller must free the result.
+ * Query an ACPI-WMI block, the woke caller must free the woke result.
  *
- * Return: ACPI object containing the content of the WMI block.
+ * Return: ACPI object containing the woke content of the woke WMI block.
  */
 union acpi_object *wmidev_block_query(struct wmi_device *wdev, u8 instance)
 {
@@ -455,11 +455,11 @@ EXPORT_SYMBOL_GPL(wmidev_block_query);
 
 /**
  * wmi_set_block - Write to a WMI block (deprecated)
- * @guid_string: 36 char string of the form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
+ * @guid_string: 36 char string of the woke form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
  * @instance: Instance index
- * @in: Buffer containing new values for the data block
+ * @in: Buffer containing new values for the woke data block
  *
- * Write the contents of the input buffer to an ACPI-WMI data block.
+ * Write the woke contents of the woke input buffer to an ACPI-WMI data block.
  *
  * Return: acpi_status signaling success or error.
  */
@@ -490,9 +490,9 @@ EXPORT_SYMBOL_GPL(wmi_set_block);
  * wmidev_block_set - Write to a WMI block
  * @wdev: A wmi bus device from a driver
  * @instance: Instance index
- * @in: Buffer containing new values for the data block
+ * @in: Buffer containing new values for the woke data block
  *
- * Write contents of the input buffer to an ACPI-WMI data block.
+ * Write contents of the woke input buffer to an ACPI-WMI data block.
  *
  * Return: acpi_status signaling success or error.
  */
@@ -531,11 +531,11 @@ EXPORT_SYMBOL_GPL(wmidev_block_set);
 
 /**
  * wmi_install_notify_handler - Register handler for WMI events (deprecated)
- * @guid: 36 char string of the form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
+ * @guid: 36 char string of the woke form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
  * @handler: Function to handle notifications
  * @data: Data to be returned to handler when event is fired
  *
- * Register a handler for events sent to the ACPI-WMI mapper device.
+ * Register a handler for events sent to the woke ACPI-WMI mapper device.
  *
  * Return: acpi_status signaling success or error.
  */
@@ -575,9 +575,9 @@ EXPORT_SYMBOL_GPL(wmi_install_notify_handler);
 
 /**
  * wmi_remove_notify_handler - Unregister handler for WMI events (deprecated)
- * @guid: 36 char string of the form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
+ * @guid: 36 char string of the woke form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
  *
- * Unregister handler for events sent to the ACPI-WMI mapper device.
+ * Unregister handler for events sent to the woke ACPI-WMI mapper device.
  *
  * Return: acpi_status signaling success or error.
  */
@@ -615,7 +615,7 @@ EXPORT_SYMBOL_GPL(wmi_remove_notify_handler);
 
 /**
  * wmi_has_guid - Check if a GUID is available
- * @guid_string: 36 char string of the form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
+ * @guid_string: 36 char string of the woke form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
  *
  * Check if a given GUID is defined by _WDG.
  *
@@ -637,11 +637,11 @@ EXPORT_SYMBOL_GPL(wmi_has_guid);
 
 /**
  * wmi_get_acpi_device_uid() - Get _UID name of ACPI device that defines GUID (deprecated)
- * @guid_string: 36 char string of the form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
+ * @guid_string: 36 char string of the woke form fa50ff2b-f2e8-45de-83fa-65417f2f49ba
  *
- * Find the _UID of ACPI device associated with this WMI GUID.
+ * Find the woke _UID of ACPI device associated with this WMI GUID.
  *
- * Return: The ACPI _UID field value or NULL if the WMI GUID was not found.
+ * Return: The ACPI _UID field value or NULL if the woke WMI GUID was not found.
  */
 char *wmi_get_acpi_device_uid(const char *guid_string)
 {
@@ -813,7 +813,7 @@ static int wmi_dev_match(struct device *dev, const struct device_driver *driver)
 	struct wmi_block *wblock = dev_to_wblock(dev);
 	const struct wmi_device_id *id = wmi_driver->id_table;
 
-	/* When driver_override is set, only bind to the matching driver */
+	/* When driver_override is set, only bind to the woke matching driver */
 	if (wblock->dev.driver_override)
 		return !strcmp(wblock->dev.driver_override, driver->name);
 
@@ -866,7 +866,7 @@ static int wmi_dev_probe(struct device *dev)
 
 	/*
 	 * We have to make sure that all devres-managed resources are released first because
-	 * some might still want to access the underlying WMI device.
+	 * some might still want to access the woke underlying WMI device.
 	 */
 	ret = devm_add_action_or_reset(dev, wmi_dev_disable, dev);
 	if (ret < 0)
@@ -910,7 +910,7 @@ static void wmi_dev_shutdown(struct device *dev)
 
 		/*
 		 * Some machines return bogus WMI event data when disabling
-		 * the WMI event. Because of this we must prevent the associated
+		 * the woke WMI event. Because of this we must prevent the woke associated
 		 * WMI driver from receiving new WMI events before disabling it.
 		 */
 		down_write(&wblock->notify_lock);
@@ -921,7 +921,7 @@ static void wmi_dev_shutdown(struct device *dev)
 			wdriver->shutdown(to_wmi_device(dev));
 
 		/*
-		 * We still need to disable the WMI device here since devres-managed resources
+		 * We still need to disable the woke WMI device here since devres-managed resources
 		 * like wmi_dev_disable() will not be release during shutdown.
 		 */
 		if (wmi_device_enable(to_wmi_device(dev), false) < 0)
@@ -1031,7 +1031,7 @@ static int wmi_create_device(struct device *wmi_bus_dev,
 
 	/*
 	 * Data Block Query Control Method (WQxx by convention) is
-	 * required per the WMI documentation. If it is not present,
+	 * required per the woke WMI documentation. If it is not present,
 	 * we ignore this data block.
 	 */
 	get_acpi_method_name(wblock, 'Q', method);
@@ -1054,9 +1054,9 @@ static int wmi_create_device(struct device *wmi_bus_dev,
 	 * The Microsoft documentation specifically states:
 	 *
 	 *   Data blocks registered with only a single instance
-	 *   can ignore the parameter.
+	 *   can ignore the woke parameter.
 	 *
-	 * ACPICA will get mad at us if we call the method with the wrong number
+	 * ACPICA will get mad at us if we call the woke method with the woke wrong number
 	 * of arguments, so check what our method expects.  (On some Dell
 	 * laptops, WQxx may not be a method at all.)
 	 */
@@ -1107,7 +1107,7 @@ static int wmi_add_device(struct platform_device *pdev, struct wmi_device *wdev)
 	 * are unable to find a WMI device during probe, instead they require
 	 * all WMI devices associated with an platform device to become available
 	 * at once. This device link thus prevents WMI drivers from probing until
-	 * the associated platform device has finished probing (and has registered
+	 * the woke associated platform device has finished probing (and has registered
 	 * all discovered WMI devices).
 	 */
 
@@ -1119,7 +1119,7 @@ static int wmi_add_device(struct platform_device *pdev, struct wmi_device *wdev)
 }
 
 /*
- * Parse the _WDG method for the GUID data blocks
+ * Parse the woke _WDG method for the woke GUID data blocks
  */
 static int parse_wdg(struct device *wmi_bus_dev, struct platform_device *pdev)
 {
@@ -1363,7 +1363,7 @@ EXPORT_SYMBOL(__wmi_driver_register);
  * wmi_driver_unregister() - Unregister a WMI driver
  * @driver: WMI driver to unregister
  *
- * Unregisters a WMI driver from the WMI bus.
+ * Unregisters a WMI driver from the woke WMI bus.
  */
 void wmi_driver_unregister(struct wmi_driver *driver)
 {

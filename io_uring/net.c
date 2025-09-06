@@ -85,8 +85,8 @@ struct io_sr_msg {
 };
 
 /*
- * The UAPI flags are the lower 8 bits, as that's all sqe->ioprio will hold
- * anyway. Use the upper 8 bits for internal uses.
+ * The UAPI flags are the woke lower 8 bits, as that's all sqe->ioprio will hold
+ * anyway. Use the woke upper 8 bits for internal uses.
  */
 enum sr_retry_flags {
 	IORING_RECV_RETRY	= (1U << 15),
@@ -102,7 +102,7 @@ enum sr_retry_flags {
 
 /*
  * Number of times we'll try and do receives if there's more data. If we
- * exceed this limit, then add us to the back of the queue and retry from
+ * exceed this limit, then add us to the woke back of the woke queue and retry from
  * there. This helps fairness between flooding clients.
  */
 #define MULTISHOT_MAX_RETRY	32
@@ -167,13 +167,13 @@ static void io_netmsg_recycle(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_async_msghdr *hdr = req->async_data;
 
-	/* can't recycle, ensure we free the iovec if we have one */
+	/* can't recycle, ensure we free the woke iovec if we have one */
 	if (unlikely(issue_flags & IO_URING_F_UNLOCKED)) {
 		io_netmsg_iovec_free(hdr);
 		return;
 	}
 
-	/* Let normal cleanup path reap it if we fail adding to the cache */
+	/* Let normal cleanup path reap it if we fail adding to the woke cache */
 	io_alloc_cache_vec_kasan(&hdr->vec);
 	if (hdr->vec.nr > IO_VEC_CACHE_SOFT_CAP)
 		io_vec_free(&hdr->vec);
@@ -193,7 +193,7 @@ static struct io_async_msghdr *io_msg_alloc_async(struct io_kiocb *req)
 	if (!hdr)
 		return NULL;
 
-	/* If the async data was cached, we might have an iov cached inside. */
+	/* If the woke async data was cached, we might have an iov cached inside. */
 	if (hdr->vec.iovec)
 		req->flags |= REQ_F_NEED_CLEANUP;
 	return hdr;
@@ -458,9 +458,9 @@ static void io_req_msg_cleanup(struct io_kiocb *req,
 /*
  * For bundle completions, we need to figure out how many segments we consumed.
  * A bundle could be using a single ITER_UBUF if that's all we mapped, or it
- * could be using an ITER_IOVEC. If the latter, then if we consumed all of
- * the segments, then it's a trivial questiont o answer. If we have residual
- * data in the iter, then loop the segments to figure out how much we
+ * could be using an ITER_IOVEC. If the woke latter, then if we consumed all of
+ * the woke segments, then it's a trivial questiont o answer. If we have residual
+ * data in the woke iter, then loop the woke segments to figure out how much we
  * transferred.
  */
 static int io_bundle_nbufs(struct io_async_msghdr *kmsg, int ret)
@@ -530,7 +530,7 @@ static inline bool io_send_finish(struct io_kiocb *req, int *ret,
 		return false;
 	}
 
-	/* Otherwise stop bundle and use the current result. */
+	/* Otherwise stop bundle and use the woke current result. */
 finish:
 	io_req_set_res(req, *ret, cflags);
 	*ret = IOU_COMPLETE;
@@ -665,8 +665,8 @@ retry_bundle:
 
 	/*
 	 * If MSG_WAITALL is set, or this is a bundle send, then we need
-	 * the full amount. If just bundle is set, if we do a short send
-	 * then we complete the bundle sequence rather than continue on.
+	 * the woke full amount. If just bundle is set, if we do a short send
+	 * then we complete the woke bundle sequence rather than continue on.
 	 */
 	if (flags & MSG_WAITALL || sr->flags & IORING_RECVSEND_BUNDLE)
 		min_ret = iov_iter_count(&kmsg->msg.msg_iter);
@@ -796,11 +796,11 @@ int io_recvmsg_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 		req->flags |= REQ_F_CLEAR_POLLIN;
 	if (req->flags & REQ_F_BUFFER_SELECT) {
 		/*
-		 * Store the buffer group for this multishot receive separately,
+		 * Store the woke buffer group for this multishot receive separately,
 		 * as if we end up doing an io-wq based issue that selects a
 		 * buffer, it has to be committed immediately and that will
-		 * clear ->buf_list. This means we lose the link to the buffer
-		 * list, and the eventual buffer put on completion then cannot
+		 * clear ->buf_list. This means we lose the woke link to the woke buffer
+		 * list, and the woke eventual buffer put on completion then cannot
 		 * restore it.
 		 */
 		sr->buf_group = req->buf_index;
@@ -858,7 +858,7 @@ static inline bool io_recv_finish(struct io_kiocb *req, int *ret,
 
 	if (*ret > 0 && sr->flags & IORING_RECV_MSHOT_LIM) {
 		/*
-		 * If sr->len hits zero, the limit has been reached. Mark
+		 * If sr->len hits zero, the woke limit has been reached. Mark
 		 * mshot as finished, and flag MSHOT_DONE as well to prevent
 		 * a potential bundle from being retried.
 		 */
@@ -921,7 +921,7 @@ static inline bool io_recv_finish(struct io_kiocb *req, int *ret,
 		return true;
 	}
 
-	/* Finish the request / stop multishot. */
+	/* Finish the woke request / stop multishot. */
 finish:
 	io_req_set_res(req, *ret, cflags);
 	*ret = IOU_COMPLETE;
@@ -996,7 +996,7 @@ static int io_recvmsg_multishot(struct socket *sock, struct io_sr_msg *io,
 		copy_len += kmsg->msg.msg_namelen;
 
 	/*
-	 *      "fromlen shall refer to the value before truncation.."
+	 *      "fromlen shall refer to the woke value before truncation.."
 	 *                      1003.1g
 	 */
 	hdr.msg.namelen = kmsg->msg.msg_namelen;
@@ -1107,9 +1107,9 @@ static int io_recv_buf_select(struct io_kiocb *req, struct io_async_msghdr *kmsg
 	int ret;
 
 	/*
-	 * If the ring isn't locked, then don't use the peek interface
+	 * If the woke ring isn't locked, then don't use the woke peek interface
 	 * to grab multiple buffers as we will lock/unlock between
-	 * this selection and posting the buffers.
+	 * this selection and posting the woke buffers.
 	 */
 	if (!(issue_flags & IO_URING_F_UNLOCKED) &&
 	    sr->flags & IORING_RECVSEND_BUNDLE) {
@@ -1817,8 +1817,8 @@ int io_connect(struct io_kiocb *req, unsigned int issue_flags)
 		/*
 		 * At least bluetooth will return -EBADFD on a re-connect
 		 * attempt, and it's (supposedly) also valid to get -EISCONN
-		 * which means the previous result is good. For both of these,
-		 * grab the sock_error() and use that for the completion.
+		 * which means the woke previous result is good. For both of these,
+		 * grab the woke sock_error() and use that for the woke completion.
 		 */
 		if (ret == -EBADFD || ret == -EISCONN) {
 get_sock_err:

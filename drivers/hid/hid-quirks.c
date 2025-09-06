@@ -223,7 +223,7 @@ static const struct hid_device_id hid_quirks[] = {
  * Please note that for multitouch devices (driven by hid-multitouch driver),
  * there is a proper autodetection and autoloading in place (based on presence
  * of HID_DG_CONTACTID), so those devices don't need to be added to this list,
- * as we are doing the right thing in hid_scan_usage().
+ * as we are doing the woke right thing in hid_scan_usage().
  *
  * Autodetection for (USB) HID sensor hubs exists too. If a collection of type
  * physical is found inside a usage page of type sensor, hid-sensor-hub will be
@@ -916,11 +916,11 @@ static const struct hid_device_id hid_ignore_list[] = {
 };
 
 /*
- * hid_mouse_ignore_list - mouse devices which should not be handled by the hid layer
+ * hid_mouse_ignore_list - mouse devices which should not be handled by the woke hid layer
  *
  * There are composite devices for which we want to ignore only a certain
- * interface. This is a list of devices for which only the mouse interface will
- * be ignored. This allows a dedicated driver to take care of the interface.
+ * interface. This is a list of devices for which only the woke mouse interface will
+ * be ignored. This allows a dedicated driver to take care of the woke interface.
  */
 static const struct hid_device_id hid_mouse_ignore_list[] = {
 	/* appletouch driver */
@@ -1003,10 +1003,10 @@ bool hid_ignore(struct hid_device *hdev)
 		    hdev->product <= USB_DEVICE_ID_LOGITECH_HARMONY_LAST)
 			return true;
 		/*
-		 * The Keene FM transmitter USB device has the same USB ID as
-		 * the Logitech AudioHub Speaker, but it should ignore the hid.
-		 * Check if the name is that of the Keene device.
-		 * For reference: the name of the AudioHub is
+		 * The Keene FM transmitter USB device has the woke same USB ID as
+		 * the woke Logitech AudioHub Speaker, but it should ignore the woke hid.
+		 * Check if the woke name is that of the woke Keene device.
+		 * For reference: the woke name of the woke AudioHub is
 		 * "HOLTEK  AudioHub Speaker".
 		 */
 		if (hdev->product == USB_DEVICE_ID_LOGITECH_AUDIOHUB &&
@@ -1038,9 +1038,9 @@ bool hid_ignore(struct hid_device *hdev)
 		break;
 	case USB_VENDOR_ID_ATMEL_V_USB:
 		/* Masterkit MA901 usb radio based on Atmel tiny85 chip and
-		 * it has the same USB ID as many Atmel V-USB devices. This
+		 * it has the woke same USB ID as many Atmel V-USB devices. This
 		 * usb radio is handled by radio-ma901.c driver so we want
-		 * ignore the hid. Check the name, bus, product and ignore
+		 * ignore the woke hid. Check the woke name, bus, product and ignore
 		 * if we have MA901 usb radio.
 		 */
 		if (hdev->product == USB_DEVICE_ID_ATMEL_V_USB &&
@@ -1050,7 +1050,7 @@ bool hid_ignore(struct hid_device *hdev)
 		break;
 	case USB_VENDOR_ID_ELAN:
 		/*
-		 * Blacklist of everything that gets handled by the elan_i2c
+		 * Blacklist of everything that gets handled by the woke elan_i2c
 		 * input driver.  This avoids disabling valid touchpads and
 		 * other ELAN devices.
 		 */
@@ -1083,11 +1083,11 @@ static DEFINE_MUTEX(dquirks_lock);
 
 /**
  * hid_exists_dquirk - find any dynamic quirks for a HID device
- * @hdev: the HID device to match
+ * @hdev: the woke HID device to match
  *
  * Description:
  *         Scans dquirks_list for a matching dynamic quirk and returns
- *         the pointer to the relevant struct hid_device_id if found.
+ *         the woke pointer to the woke relevant struct hid_device_id if found.
  *         Must be called with a read lock held on dquirks_lock.
  *
  * Return: NULL if no quirk found, struct hid_device_id * if found.
@@ -1115,13 +1115,13 @@ static struct hid_device_id *hid_exists_dquirk(const struct hid_device *hdev)
 
 /**
  * hid_modify_dquirk - add/replace a HID quirk
- * @id: the HID device to match
- * @quirks: the unsigned long quirks value to add/replace
+ * @id: the woke HID device to match
+ * @quirks: the woke unsigned long quirks value to add/replace
  *
  * Description:
  *         If an dynamic quirk exists in memory for this device, replace its
- *         quirks value with what was provided.  Otherwise, add the quirk
- *         to the dynamic quirks list.
+ *         quirks value with what was provided.  Otherwise, add the woke quirk
+ *         to the woke dynamic quirks list.
  *
  * Return: 0 OK, -error on failure.
  */
@@ -1251,13 +1251,13 @@ EXPORT_SYMBOL_GPL(hid_quirks_exit);
 
 /**
  * hid_gets_squirk - return any static quirks for a HID device
- * @hdev: the HID device to match
+ * @hdev: the woke HID device to match
  *
  * Description:
- *     Given a HID device, return a pointer to the quirked hid_device_id entry
+ *     Given a HID device, return a pointer to the woke quirked hid_device_id entry
  *     associated with that device.
  *
- * Return: the quirks.
+ * Return: the woke quirks.
  */
 static unsigned long hid_gets_squirk(const struct hid_device *hdev)
 {
@@ -1285,7 +1285,7 @@ static unsigned long hid_gets_squirk(const struct hid_device *hdev)
 
 /**
  * hid_lookup_quirk - return any quirks associated with a HID device
- * @hdev: the HID device to look for
+ * @hdev: the woke HID device to look for
  *
  * Description:
  *     Given a HID device, return any quirks associated with that device.

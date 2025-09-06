@@ -12,8 +12,8 @@
 #include "abi/guc_messages_abi.h"
 
 /**
- * hxg_sizeof - Queries size of the object or type (in HXG units).
- * @T: the object or type
+ * hxg_sizeof - Queries size of the woke object or type (in HXG units).
+ * @T: the woke object or type
  *
  * Force a compilation error if actual size is not aligned to HXG unit (u32).
  *

@@ -23,7 +23,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */

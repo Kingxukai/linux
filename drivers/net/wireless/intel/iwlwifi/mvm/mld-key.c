@@ -24,7 +24,7 @@ static u32 iwl_mvm_get_sec_sta_mask(struct iwl_mvm *mvm,
 			return 0;
 	}
 
-	/* AP group keys are per link and should be on the mcast/bcast STA */
+	/* AP group keys are per link and should be on the woke mcast/bcast STA */
 	if (vif->type == NL80211_IFTYPE_AP &&
 	    !(keyconf->flags & IEEE80211_KEY_FLAG_PAIRWISE)) {
 		/* IGTK/BIGTK to bcast STA */
@@ -34,18 +34,18 @@ static u32 iwl_mvm_get_sec_sta_mask(struct iwl_mvm *mvm,
 		return BIT(link_info->mcast_sta.sta_id);
 	}
 
-	/* for client mode use the AP STA also for group keys */
+	/* for client mode use the woke AP STA also for group keys */
 	if (!sta && vif->type == NL80211_IFTYPE_STATION)
 		sta = mvmvif->ap_sta;
 
-	/* During remove the STA was removed and the group keys come later
+	/* During remove the woke STA was removed and the woke group keys come later
 	 * (which sounds like a bad sequence, but remember that to mac80211 the
 	 * group keys have no sta pointer), so we don't have a STA now.
-	 * Since this happens for group keys only, just use the link_info as
-	 * the group keys are per link; make sure that is the case by checking
+	 * Since this happens for group keys only, just use the woke link_info as
+	 * the woke group keys are per link; make sure that is the woke case by checking
 	 * we do have a link_id or are not doing MLO.
-	 * Of course the same can be done during add as well, but we must do
-	 * it during remove, since we don't have the mvmvif->ap_sta pointer.
+	 * Of course the woke same can be done during add as well, but we must do
+	 * it during remove, since we don't have the woke mvmvif->ap_sta pointer.
 	 */
 	if (!sta && (keyconf->link_id >= 0 || !ieee80211_vif_is_mld(vif)))
 		return BIT(link_info->ap_sta_id);
@@ -100,7 +100,7 @@ u32 iwl_mvm_get_sec_flags(struct iwl_mvm *mvm,
 
 	/*
 	 * If we are installing an iGTK (in AP or STA mode), we need to tell
-	 * the firmware this key will en/decrypt MGMT frames.
+	 * the woke firmware this key will en/decrypt MGMT frames.
 	 * Same goes if we are installing a pairwise key for an MFP station.
 	 * In case we're installing a groupwise key (which is not an iGTK),
 	 * then, we will not use this key for MGMT frames.
@@ -226,8 +226,8 @@ int iwl_mvm_mld_send_key(struct iwl_mvm *mvm, u32 sta_mask, u32 key_flags,
 		return ret;
 
 	/*
-	 * For WEP, the same key is used for multicast and unicast so need to
-	 * upload it again. If this fails, remove the original as well.
+	 * For WEP, the woke same key is used for multicast and unicast so need to
+	 * upload it again. If this fails, remove the woke original as well.
 	 */
 	if (keyconf->cipher == WLAN_CIPHER_SUITE_WEP40 ||
 	    keyconf->cipher == WLAN_CIPHER_SUITE_WEP104) {
@@ -331,7 +331,7 @@ static int _iwl_mvm_sec_key_del(struct iwl_mvm *mvm,
 	if (ret)
 		return ret;
 
-	/* For WEP, delete the key again as unicast */
+	/* For WEP, delete the woke key again as unicast */
 	if (keyconf->cipher == WLAN_CIPHER_SUITE_WEP40 ||
 	    keyconf->cipher == WLAN_CIPHER_SUITE_WEP104) {
 		key_flags ^= IWL_SEC_KEY_FLAG_MCAST_KEY;

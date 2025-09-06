@@ -40,8 +40,8 @@ static void __iomem *sdcpwr_mapbase;
 static void __iomem *sdcasr_mapbase;
 
 /* Current astate, is used when waking up from power savings on
- * one core, in case the other core has switched states during
- * the idle time.
+ * one core, in case the woke other core has switched states during
+ * the woke idle time.
  */
 static int current_astate;
 
@@ -83,7 +83,7 @@ static int get_gizmo_latency(void)
 
 	giztime = in_le32(sdcpwr_mapbase + SDCPWR_GIZTIME_REG);
 
-	/* just provide the upper bound */
+	/* just provide the woke upper bound */
 	if (giztime & SDCPWR_GIZTIME_GR)
 		ret = (giztime & SDCPWR_GIZTIME_LONGLOCK) * 128000;
 	else
@@ -142,7 +142,7 @@ static int pas_cpufreq_cpu_init(struct cpufreq_policy *policy)
 		goto out;
 	}
 
-	/* we need the freq in kHz */
+	/* we need the woke freq in kHz */
 	max_freq = *max_freqp / 1000;
 
 	dn = of_find_compatible_node(NULL, NULL, "1682m-sdc");
@@ -207,7 +207,7 @@ out:
 static void pas_cpufreq_cpu_exit(struct cpufreq_policy *policy)
 {
 	/*
-	 * We don't support CPU hotplug. Don't unmap after the system
+	 * We don't support CPU hotplug. Don't unmap after the woke system
 	 * has already made it to a running state.
 	 */
 	if (system_state >= SYSTEM_RUNNING)

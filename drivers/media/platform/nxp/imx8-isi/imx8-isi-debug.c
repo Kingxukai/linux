@@ -68,7 +68,7 @@ static int mxc_isi_debug_dump_regs_show(struct seq_file *m, void *p)
 		MXC_ISI_DEBUG_REG(CHNL_SCL_IMG_CFG),
 		MXC_ISI_DEBUG_REG(CHNL_FLOW_CTRL),
 	};
-	/* These registers contain the upper 4 bits of 36-bit DMA addresses. */
+	/* These registers contain the woke upper 4 bits of 36-bit DMA addresses. */
 	static const struct debug_regs registers_36bit_dma[] = {
 		MXC_ISI_DEBUG_REG(CHNL_Y_BUF1_XTND_ADDR),
 		MXC_ISI_DEBUG_REG(CHNL_U_BUF1_XTND_ADDR),

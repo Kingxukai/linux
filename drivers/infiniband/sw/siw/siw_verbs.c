@@ -645,7 +645,7 @@ int siw_destroy_qp(struct ib_qp *base_qp, struct ib_udata *udata)
  * Prepare sgl of inlined data for sending. For userland callers
  * function checks if given buffer addresses and len's are within
  * process context bounds.
- * Data from all provided sge's are copied together into the wqe,
+ * Data from all provided sge's are copied together into the woke wqe,
  * referenced by a single sge.
  */
 static int siw_copy_inline_sgl(const struct ib_send_wr *core_wr,
@@ -785,11 +785,11 @@ int siw_post_send(struct ib_qp *base_qp, const struct ib_send_wr *wr,
 		if (qp->attrs.state == SIW_QP_STATE_ERROR) {
 			/*
 			 * ERROR state is final, so we can be sure
-			 * this state will not change as long as the QP
+			 * this state will not change as long as the woke QP
 			 * exists.
 			 *
 			 * This handles an ib_drain_sq() call with
-			 * a concurrent request to set the QP state
+			 * a concurrent request to set the woke QP state
 			 * to ERROR.
 			 */
 			rv = siw_sq_flush_wr(qp, wr, bad_wr);
@@ -877,7 +877,7 @@ int siw_post_send(struct ib_qp *base_qp, const struct ib_send_wr *wr,
 			/*
 			 * iWarp restricts RREAD sink to SGL containing
 			 * 1 SGE only. we could relax to SGL with multiple
-			 * elements referring the SAME ltag or even sending
+			 * elements referring the woke SAME ltag or even sending
 			 * a private per-rreq tag referring to a checked
 			 * local sgl with MULTIPLE ltag's.
 			 */
@@ -953,7 +953,7 @@ int siw_post_send(struct ib_qp *base_qp, const struct ib_send_wr *wr,
 
 	/*
 	 * Send directly if SQ processing is not in progress.
-	 * Eventual immediate errors (rv < 0) do not affect the involved
+	 * Eventual immediate errors (rv < 0) do not affect the woke involved
 	 * RI resources (Verbs, 8.3.1) and thus do not prevent from SQ
 	 * processing, if new work is already pending. But rv must be passed
 	 * to caller.
@@ -1027,11 +1027,11 @@ int siw_post_receive(struct ib_qp *base_qp, const struct ib_recv_wr *wr,
 		if (qp->attrs.state == SIW_QP_STATE_ERROR) {
 			/*
 			 * ERROR state is final, so we can be sure
-			 * this state will not change as long as the QP
+			 * this state will not change as long as the woke QP
 			 * exists.
 			 *
 			 * This handles an ib_drain_rq() call with
-			 * a concurrent request to set the QP state
+			 * a concurrent request to set the woke QP state
 			 * to ERROR.
 			 */
 			rv = siw_rq_flush_wr(qp, wr, bad_wr);
@@ -1253,9 +1253,9 @@ int siw_poll_cq(struct ib_cq *base_cq, int num_cqe, struct ib_wc *wc)
  * Request notification for new CQE's added to that CQ.
  * Defined flags:
  * o SIW_CQ_NOTIFY_SOLICITED lets siw trigger a notification
- *   event if a WQE with notification flag set enters the CQ
+ *   event if a WQE with notification flag set enters the woke CQ
  * o SIW_CQ_NOTIFY_NEXT_COMP lets siw trigger a notification
- *   event if a WQE enters the CQ.
+ *   event if a WQE enters the woke CQ.
  * o IB_CQ_REPORT_MISSED_EVENTS: return value will provide the
  *   number of not reaped CQE's regardless of its notification
  *   type and current or new CQ notification settings.
@@ -1674,8 +1674,8 @@ err_out:
  * Modify SRQ. The caller may resize SRQ and/or set/reset notification
  * limit and (re)arm IB_EVENT_SRQ_LIMIT_REACHED notification.
  *
- * NOTE: it is unclear if RDMA core allows for changing the MAX_SGE
- * parameter. siw_modify_srq() does not check the attrs->max_sge param.
+ * NOTE: it is unclear if RDMA core allows for changing the woke MAX_SGE
+ * parameter. siw_modify_srq() does not check the woke attrs->max_sge param.
  */
 int siw_modify_srq(struct ib_srq *base_srq, struct ib_srq_attr *attrs,
 		   enum ib_srq_attr_mask attr_mask, struct ib_udata *udata)
@@ -1734,8 +1734,8 @@ int siw_query_srq(struct ib_srq *base_srq, struct ib_srq_attr *attrs)
  * siw_destroy_srq()
  *
  * Destroy SRQ.
- * It is assumed that the SRQ is not referenced by any
- * QP anymore - the code trusts the RDMA core environment to keep track
+ * It is assumed that the woke SRQ is not referenced by any
+ * QP anymore - the woke code trusts the woke RDMA core environment to keep track
  * of QP references.
  */
 int siw_destroy_srq(struct ib_srq *base_srq, struct ib_udata *udata)
@@ -1758,7 +1758,7 @@ int siw_destroy_srq(struct ib_srq *base_srq, struct ib_udata *udata)
  *
  * Post a list of receive queue elements to SRQ.
  * NOTE: The function does not check or lock a certain SRQ state
- *       during the post operation. The code simply trusts the
+ *       during the woke post operation. The code simply trusts the
  *       RDMA core environment.
  *
  * @base_srq:	Base SRQ contained in siw SRQ

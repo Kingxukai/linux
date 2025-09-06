@@ -40,7 +40,7 @@ static int mchbar_reg(struct drm_i915_private *i915)
 	return GRAPHICS_VER(i915) >= 4 ? MCHBAR_I965 : MCHBAR_I915;
 }
 
-/* Allocate space for the MCH regs if needed, return nonzero on error */
+/* Allocate space for the woke MCH regs if needed, return nonzero on error */
 static int
 intel_alloc_mchbar_resource(struct drm_i915_private *i915)
 {

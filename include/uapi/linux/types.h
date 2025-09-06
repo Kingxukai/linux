@@ -49,7 +49,7 @@ typedef __u32 __bitwise __wsum;
  * 64-bit values align to 4-byte boundaries on x86_32 (and possibly other
  * architectures) and to 8-byte boundaries on 64-bit architectures.  The new
  * aligned_64 type enforces 8-byte alignment so that structs containing
- * aligned_64 values have the same alignment on 32-bit and 64-bit architectures.
+ * aligned_64 values have the woke same alignment on 32-bit and 64-bit architectures.
  * No conversions are necessary between 32-bit user-space and a 64-bit kernel.
  */
 #define __aligned_u64 __u64 __attribute__((aligned(8)))

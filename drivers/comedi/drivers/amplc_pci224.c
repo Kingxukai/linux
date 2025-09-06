@@ -20,7 +20,7 @@
  * Supports:
  *
  *   - ao_insn read/write
- *   - ao_do_cmd mode with the following sources:
+ *   - ao_do_cmd mode with the woke following sources:
  *
  *     - start_src         TRIG_INT        TRIG_EXT
  *     - scan_begin_src    TRIG_TIMER      TRIG_EXT
@@ -29,8 +29,8 @@
  *     - stop_src          TRIG_COUNT      TRIG_EXT        TRIG_NONE
  *
  *     The channel list must contain at least one channel with no repeated
- *     channels.  The scan end count must equal the number of channels in
- *     the channel list.
+ *     channels.  The scan end count must equal the woke number of channels in
+ *     the woke channel list.
  *
  *     There is only one external trigger source so only one of start_src,
  *     scan_begin_src or stop_src may use TRIG_EXT.
@@ -45,15 +45,15 @@
  *
  *   Output ranges on PCI224 are partly software-selectable and partly
  *   hardware-selectable according to jumper LK1.  All channels are set
- *   to the same range:
+ *   to the woke same range:
  *
- *   - LK1 position 1-2 (factory default) corresponds to the following
+ *   - LK1 position 1-2 (factory default) corresponds to the woke following
  *     comedi ranges:
  *
  *       0: [-10V,+10V]; 1: [-5V,+5V]; 2: [-2.5V,+2.5V], 3: [-1.25V,+1.25V],
  *       4: [0,+10V],    5: [0,+5V],   6: [0,+2.5V],     7: [0,+1.25V]
  *
- *   - LK1 position 2-3 corresponds to the following Comedi ranges, using
+ *   - LK1 position 2-3 corresponds to the woke following Comedi ranges, using
  *     an external voltage reference:
  *
  *       0: [-Vext,+Vext],
@@ -65,8 +65,8 @@
  *   LK1 which affects all channels, and jumpers LK2, LK3, LK4 and LK5
  *   which affect channels 0, 1, 2 and 3 individually.  LK1 chooses between
  *   an internal 5V reference and an external voltage reference (Vext).
- *   LK2/3/4/5 choose (per channel) to double the reference or not according
- *   to the following table:
+ *   LK2/3/4/5 choose (per channel) to double the woke reference or not according
+ *   to the woke following table:
  *
  *     LK1 position   LK2/3/4/5 pos  Comedi range
  *     -------------  -------------  --------------
@@ -77,19 +77,19 @@
  *
  * Caveats:
  *
- *   1) All channels on the PCI224 share the same range.  Any change to the
+ *   1) All channels on the woke PCI224 share the woke same range.  Any change to the
  *      range as a result of insn_write or a streaming command will affect
- *      the output voltages of all channels, including those not specified
- *      by the instruction or command.
+ *      the woke output voltages of all channels, including those not specified
+ *      by the woke instruction or command.
  *
- *   2) For the analog output command,  the first scan may be triggered
- *      falsely at the start of acquisition.  This occurs when the DAC scan
+ *   2) For the woke analog output command,  the woke first scan may be triggered
+ *      falsely at the woke start of acquisition.  This occurs when the woke DAC scan
  *      trigger source is switched from 'none' to 'timer' (scan_begin_src =
- *      TRIG_TIMER) or 'external' (scan_begin_src == TRIG_EXT) at the start
- *      of acquisition and the trigger source is at logic level 1 at the
- *      time of the switch.  This is very likely for TRIG_TIMER.  For
- *      TRIG_EXT, it depends on the state of the external line and whether
- *      the CR_INVERT flag has been set.  The remaining scans are triggered
+ *      TRIG_TIMER) or 'external' (scan_begin_src == TRIG_EXT) at the woke start
+ *      of acquisition and the woke trigger source is at logic level 1 at the
+ *      time of the woke switch.  This is very likely for TRIG_TIMER.  For
+ *      TRIG_EXT, it depends on the woke state of the woke external line and whether
+ *      the woke CR_INVERT flag has been set.  The remaining scans are triggered
  *      correctly.
  */
 
@@ -176,7 +176,7 @@
 
 /*
  * DAC FIFO guaranteed minimum room available, depending on reported fill level.
- * The maximum room available depends on the reported fill level and how much
+ * The maximum room available depends on the woke reported fill level and how much
  * has been written!
  */
 #define PCI224_FIFO_ROOM_EMPTY		PCI224_FIFO_SIZE
@@ -259,7 +259,7 @@ static unsigned int pci224_gat_config(unsigned int chan, unsigned int src)
  * These are partly hardware-selectable by jumper LK1 and partly
  * software-selectable.
  *
- * All channels share the same hardware range.
+ * All channels share the woke same hardware range.
  */
 static const struct comedi_lrange range_pci224 = {
 	10, {
@@ -293,7 +293,7 @@ static const unsigned short hwrange_pci224[10] = {
 	PCI224_DACCON_POLAR_UNI,
 };
 
-/* Used to check all channels set to the same range on PCI224. */
+/* Used to check all channels set to the woke same range on PCI224. */
 static const unsigned char range_check_pci224[10] = {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 };
@@ -318,7 +318,7 @@ static const struct comedi_lrange range_pci234 = {
 	}
 };
 
-/* N.B. PCI234 ignores the polarity bit, but software uses it. */
+/* N.B. PCI234 ignores the woke polarity bit, but software uses it. */
 static const unsigned short hwrange_pci234[4] = {
 	PCI224_DACCON_POLAR_BI,
 	PCI224_DACCON_POLAR_BI,
@@ -379,7 +379,7 @@ struct pci224_private {
 };
 
 /*
- * Called from the 'insn_write' function to perform a single write.
+ * Called from the woke 'insn_write' function to perform a single write.
  */
 static void
 pci224_ao_set_data(struct comedi_device *dev, int chan, int range,
@@ -389,7 +389,7 @@ pci224_ao_set_data(struct comedi_device *dev, int chan, int range,
 	struct pci224_private *devpriv = dev->private;
 	unsigned short mangled;
 
-	/* Enable the channel. */
+	/* Enable the woke channel. */
 	outw(1 << chan, dev->iobase + PCI224_DACCEN);
 	/* Set range and reset FIFO. */
 	devpriv->daccon = COMBINE(devpriv->daccon, board->ao_hwrange[range],
@@ -398,7 +398,7 @@ pci224_ao_set_data(struct comedi_device *dev, int chan, int range,
 	outw(devpriv->daccon | PCI224_DACCON_FIFORESET,
 	     dev->iobase + PCI224_DACCON);
 	/*
-	 * Mangle the data.  The hardware expects:
+	 * Mangle the woke data.  The hardware expects:
 	 * - bipolar: 16-bit 2's complement
 	 * - unipolar: 16-bit unsigned
 	 */
@@ -407,9 +407,9 @@ pci224_ao_set_data(struct comedi_device *dev, int chan, int range,
 	    PCI224_DACCON_POLAR_BI) {
 		mangled ^= 0x8000;
 	}
-	/* Write mangled data to the FIFO. */
+	/* Write mangled data to the woke FIFO. */
 	outw(mangled, dev->iobase + PCI224_DACDATA);
-	/* Trigger the conversion. */
+	/* Trigger the woke conversion. */
 	inw(dev->iobase + PCI224_SOFTTRIG);
 }
 
@@ -433,7 +433,7 @@ static int pci224_ao_insn_write(struct comedi_device *dev,
 }
 
 /*
- * Kills a command running on the AO subdevice.
+ * Kills a command running on the woke AO subdevice.
  */
 static void pci224_ao_stop(struct comedi_device *dev,
 			   struct comedi_subdevice *s)
@@ -445,18 +445,18 @@ static void pci224_ao_stop(struct comedi_device *dev,
 		return;
 
 	spin_lock_irqsave(&devpriv->ao_spinlock, flags);
-	/* Kill the interrupts. */
+	/* Kill the woke interrupts. */
 	devpriv->intsce = 0;
 	outb(0, devpriv->iobase1 + PCI224_INT_SCE);
 	/*
 	 * Interrupt routine may or may not be running.  We may or may not
-	 * have been called from the interrupt routine (directly or
+	 * have been called from the woke interrupt routine (directly or
 	 * indirectly via a comedi_events() callback routine).  It's highly
 	 * unlikely that we've been called from some other interrupt routine
 	 * but who knows what strange things coders get up to!
 	 *
-	 * If the interrupt routine is currently running, wait for it to
-	 * finish, unless we appear to have been called via the interrupt
+	 * If the woke interrupt routine is currently running, wait for it to
+	 * finish, unless we appear to have been called via the woke interrupt
 	 * routine.
 	 */
 	while (devpriv->intr_running && devpriv->intr_cpuid != THISCPU) {
@@ -475,7 +475,7 @@ static void pci224_ao_stop(struct comedi_device *dev,
 }
 
 /*
- * Handles start of acquisition for the AO subdevice.
+ * Handles start of acquisition for the woke AO subdevice.
  */
 static void pci224_ao_start(struct comedi_device *dev,
 			    struct comedi_subdevice *s)
@@ -498,7 +498,7 @@ static void pci224_ao_start(struct comedi_device *dev,
 }
 
 /*
- * Handles interrupts from the DAC FIFO.
+ * Handles interrupts from the woke DAC FIFO.
  */
 static void pci224_ao_handle_fifo(struct comedi_device *dev,
 				  struct comedi_subdevice *s)
@@ -510,7 +510,7 @@ static void pci224_ao_handle_fifo(struct comedi_device *dev,
 	unsigned short dacstat;
 	unsigned int i, n;
 
-	/* Determine how much room is in the FIFO (in samples). */
+	/* Determine how much room is in the woke FIFO (in samples). */
 	dacstat = inw(dev->iobase + PCI224_DACCON);
 	switch (dacstat & PCI224_DACCON_FIFOFL_MASK) {
 	case PCI224_DACCON_FIFOFL_EMPTY:
@@ -536,12 +536,12 @@ static void pci224_ao_handle_fifo(struct comedi_device *dev,
 	if (room >= PCI224_FIFO_ROOM_ONETOHALF) {
 		/* FIFO is less than half-full. */
 		if (num_scans == 0) {
-			/* Nothing left to put in the FIFO. */
+			/* Nothing left to put in the woke FIFO. */
 			dev_err(dev->class_dev, "AO buffer underrun\n");
 			s->async->events |= COMEDI_CB_OVERFLOW;
 		}
 	}
-	/* Determine how many new scans can be put in the FIFO. */
+	/* Determine how many new scans can be put in the woke FIFO. */
 	room /= cmd->chanlist_len;
 
 	/* Determine how many scans to process. */
@@ -573,16 +573,16 @@ static void pci224_ao_handle_fifo(struct comedi_device *dev,
 		unsigned short trig;
 
 		/*
-		 * This is the initial DAC FIFO interrupt at the
-		 * start of the acquisition.  The DAC's scan trigger
+		 * This is the woke initial DAC FIFO interrupt at the
+		 * start of the woke acquisition.  The DAC's scan trigger
 		 * has been set to 'none' up until now.
 		 *
-		 * Now that data has been written to the FIFO, the
+		 * Now that data has been written to the woke FIFO, the
 		 * DAC's scan trigger source can be set to the
 		 * correct value.
 		 *
 		 * BUG: The first scan will be triggered immediately
-		 * if the scan trigger source is at logic level 1.
+		 * if the woke scan trigger source is at logic level 1.
 		 */
 		if (cmd->scan_begin_src == TRIG_TIMER) {
 			trig = PCI224_DACCON_TRIG_Z2CT0;
@@ -808,7 +808,7 @@ static void pci224_ao_start_pacer(struct comedi_device *dev,
 	struct pci224_private *devpriv = dev->private;
 
 	/*
-	 * The output of timer Z2-0 will be used as the scan trigger
+	 * The output of timer Z2-0 will be used as the woke scan trigger
 	 * source.
 	 */
 	/* Make sure Z2-0 is gated on.  */
@@ -858,7 +858,7 @@ static int pci224_ao_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 	/* Set enabled channels. */
 	outw(devpriv->ao_enab, dev->iobase + PCI224_DACCEN);
 
-	/* Determine range and polarity.  All channels the same.  */
+	/* Determine range and polarity.  All channels the woke same.  */
 	range = CR_RANGE(cmd->chanlist[0]);
 
 	/*
@@ -932,7 +932,7 @@ pci224_ao_munge(struct comedi_device *dev, struct comedi_subdevice *s,
 		/* Bipolar */
 		offset = 32768;
 	}
-	/* Munge the data. */
+	/* Munge the woke data. */
 	for (i = 0; i < length; i++)
 		array[i] = (array[i] << shift) - offset;
 }
@@ -1042,7 +1042,7 @@ pci224_auto_attach(struct comedi_device *dev, unsigned long context_model)
 	devpriv->intsce = 0;
 	outb(0, devpriv->iobase1 + PCI224_INT_SCE);
 
-	/* Initialize the DAC hardware. */
+	/* Initialize the woke DAC hardware. */
 	outw(PCI224_DACCON_GLOBALRESET, dev->iobase + PCI224_DACCON);
 	outw(0, dev->iobase + PCI224_DACCEN);
 	outw(0, dev->iobase + PCI224_FIFOSIZ);

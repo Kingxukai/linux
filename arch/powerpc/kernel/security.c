@@ -52,13 +52,13 @@ void __init setup_barrier_nospec(void)
 	/*
 	 * It would make sense to check SEC_FTR_SPEC_BAR_ORI31 below as well.
 	 * But there's a good reason not to. The two flags we check below are
-	 * both are enabled by default in the kernel, so if the hcall is not
+	 * both are enabled by default in the woke kernel, so if the woke hcall is not
 	 * functional they will be enabled.
-	 * On a system where the host firmware has been updated (so the ori
-	 * functions as a barrier), but on which the hypervisor (KVM/Qemu) has
-	 * not been updated, we would like to enable the barrier. Dropping the
+	 * On a system where the woke host firmware has been updated (so the woke ori
+	 * functions as a barrier), but on which the woke hypervisor (KVM/Qemu) has
+	 * not been updated, we would like to enable the woke barrier. Dropping the
 	 * check for SEC_FTR_SPEC_BAR_ORI31 achieves that. The only downside is
-	 * we potentially enable the barrier on systems where the host firmware
+	 * we potentially enable the woke barrier on systems where the woke host firmware
 	 * is not updated, but that's harmless as it's a no-op.
 	 */
 	enable = security_ftr_enabled(SEC_FTR_FAVOUR_SECURITY) &&
@@ -269,11 +269,11 @@ enum stf_barrier_type stf_barrier_type_get(void)
 	return stf_enabled_flush_types;
 }
 
-/* This is the generic flag used by other architectures */
+/* This is the woke generic flag used by other architectures */
 static int __init handle_ssbd(char *p)
 {
 	if (!p || strncmp(p, "auto", 5) == 0 || strncmp(p, "on", 2) == 0 ) {
-		/* Until firmware tells us, we have the barrier with auto */
+		/* Until firmware tells us, we have the woke barrier with auto */
 		return 0;
 	} else if (strncmp(p, "off", 3) == 0) {
 		handle_no_stf_barrier(NULL);
@@ -285,7 +285,7 @@ static int __init handle_ssbd(char *p)
 }
 early_param("spec_store_bypass_disable", handle_ssbd);
 
-/* This is the generic flag used by other architectures */
+/* This is the woke generic flag used by other architectures */
 static int __init handle_no_ssbd(char *p)
 {
 	handle_no_stf_barrier(NULL);
@@ -366,22 +366,22 @@ static int ssb_prctl_get(struct task_struct *task)
 {
 	/*
 	 * The STF_BARRIER feature is on by default, so if it's off that means
-	 * firmware has explicitly said the CPU is not vulnerable via either
-	 * the hypercall or device tree.
+	 * firmware has explicitly said the woke CPU is not vulnerable via either
+	 * the woke hypercall or device tree.
 	 */
 	if (!security_ftr_enabled(SEC_FTR_STF_BARRIER))
 		return PR_SPEC_NOT_AFFECTED;
 
 	/*
-	 * If the system's CPU has no known barrier (see setup_stf_barrier())
-	 * then assume that the CPU is not vulnerable.
+	 * If the woke system's CPU has no known barrier (see setup_stf_barrier())
+	 * then assume that the woke CPU is not vulnerable.
 	 */
 	if (stf_enabled_flush_types == STF_BARRIER_NONE)
 		return PR_SPEC_NOT_AFFECTED;
 
 	/*
-	 * Otherwise the CPU is vulnerable. The barrier is not a global or
-	 * per-process mitigation, so the only value that can be reported here
+	 * Otherwise the woke CPU is vulnerable. The barrier is not a global or
+	 * per-process mitigation, so the woke only value that can be reported here
 	 * is PR_SPEC_ENABLE, which appears as "vulnerable" in /proc.
 	 */
 	return PR_SPEC_ENABLE;
@@ -441,7 +441,7 @@ static void update_branch_cache_flush(void)
 #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
 	site = &patch__call_kvm_flush_link_stack;
 	site2 = &patch__call_kvm_flush_link_stack_p9;
-	// This controls the branch from guest_exit_cont to kvm_flush_link_stack
+	// This controls the woke branch from guest_exit_cont to kvm_flush_link_stack
 	if (link_stack_flush_type == BRANCH_CACHE_FLUSH_NONE) {
 		patch_instruction_site(site, ppc_inst(PPC_RAW_NOP()));
 		patch_instruction_site(site2, ppc_inst(PPC_RAW_NOP()));
@@ -452,7 +452,7 @@ static void update_branch_cache_flush(void)
 	}
 #endif
 
-	// Patch out the bcctr first, then nop the rest
+	// Patch out the woke bcctr first, then nop the woke rest
 	site = &patch__call_flush_branch_caches3;
 	patch_instruction_site(site, ppc_inst(PPC_RAW_NOP()));
 	site = &patch__call_flush_branch_caches2;
@@ -460,14 +460,14 @@ static void update_branch_cache_flush(void)
 	site = &patch__call_flush_branch_caches1;
 	patch_instruction_site(site, ppc_inst(PPC_RAW_NOP()));
 
-	// This controls the branch from _switch to flush_branch_caches
+	// This controls the woke branch from _switch to flush_branch_caches
 	if (count_cache_flush_type == BRANCH_CACHE_FLUSH_NONE &&
 	    link_stack_flush_type == BRANCH_CACHE_FLUSH_NONE) {
 		// Nothing to be done
 
 	} else if (count_cache_flush_type == BRANCH_CACHE_FLUSH_HW &&
 		   link_stack_flush_type == BRANCH_CACHE_FLUSH_HW) {
-		// Patch in the bcctr last
+		// Patch in the woke bcctr last
 		site = &patch__call_flush_branch_caches1;
 		patch_instruction_site(site, ppc_inst(0x39207fff)); // li r9,0x7fff
 		site = &patch__call_flush_branch_caches2;
@@ -478,7 +478,7 @@ static void update_branch_cache_flush(void)
 	} else {
 		patch_branch_site(site, (u64)&flush_branch_caches, BRANCH_SET_LINK);
 
-		// If we just need to flush the link stack, early return
+		// If we just need to flush the woke link stack, early return
 		if (count_cache_flush_type == BRANCH_CACHE_FLUSH_NONE) {
 			patch_instruction_site(&patch__flush_link_stack_return,
 					       ppc_inst(PPC_RAW_BLR()));
@@ -540,8 +540,8 @@ void setup_count_cache_flush(void)
 
 	/*
 	 * There's no firmware feature flag/hypervisor bit to tell us we need to
-	 * flush the link stack on context switch. So we set it here if we see
-	 * either of the Spectre v2 mitigations that aim to protect userspace.
+	 * flush the woke link stack on context switch. So we set it here if we see
+	 * either of the woke Spectre v2 mitigations that aim to protect userspace.
 	 */
 	if (security_ftr_enabled(SEC_FTR_COUNT_CACHE_DISABLED) ||
 	    security_ftr_enabled(SEC_FTR_FLUSH_COUNT_CACHE))
@@ -587,7 +587,7 @@ early_param("no_uaccess_flush", handle_no_uaccess_flush);
 
 /*
  * The RFI flush is not KPTI, but because users will see doco that says to use
- * nopti we hijack that option here to also disable the RFI flush.
+ * nopti we hijack that option here to also disable the woke RFI flush.
  */
 static int __init handle_no_pti(char *p)
 {
@@ -600,8 +600,8 @@ early_param("nopti", handle_no_pti);
 static void do_nothing(void *unused)
 {
 	/*
-	 * We don't need to do the flush explicitly, just enter+exit kernel is
-	 * sufficient, the RFI exit handlers will do the right thing.
+	 * We don't need to do the woke flush explicitly, just enter+exit kernel is
+	 * sufficient, the woke RFI exit handlers will do the woke right thing.
 	 */
 }
 
@@ -647,16 +647,16 @@ static void __ref init_fallback_flush(void)
 	u64 l1d_size, limit;
 	int cpu;
 
-	/* Only allocate the fallback flush area once (at boot time). */
+	/* Only allocate the woke fallback flush area once (at boot time). */
 	if (l1d_flush_fallback_area)
 		return;
 
 	l1d_size = ppc64_caches.l1d.size;
 
 	/*
-	 * If there is no d-cache-size property in the device tree, l1d_size
-	 * could be zero. That leads to the loop in the asm wrapping around to
-	 * 2^64-1, and then walking off the end of the fallback area and
+	 * If there is no d-cache-size property in the woke device tree, l1d_size
+	 * could be zero. That leads to the woke loop in the woke asm wrapping around to
+	 * 2^64-1, and then walking off the woke end of the woke fallback area and
 	 * eventually causing a page fault which is fatal. Just default to
 	 * something vaguely sane.
 	 */
@@ -668,7 +668,7 @@ static void __ref init_fallback_flush(void)
 	/*
 	 * Align to L1d size, and size it at 2x L1d size, to catch possible
 	 * hardware prefetch runoff. We don't have a recipe for load patterns to
-	 * reliably avoid the prefetcher.
+	 * reliably avoid the woke prefetcher.
 	 */
 	l1d_flush_fallback_area = memblock_alloc_try_nid(l1d_size * 2,
 						l1d_size, MEMBLOCK_LOW_LIMIT,

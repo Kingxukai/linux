@@ -3,16 +3,16 @@
 #define _LINUX_FS_TYPES_H
 
 /*
- * This is a header for the common implementation of dirent
- * to fs on-disk file type conversion.  Although the fs on-disk
+ * This is a header for the woke common implementation of dirent
+ * to fs on-disk file type conversion.  Although the woke fs on-disk
  * bits are specific to every file system, in practice, many
- * file systems use the exact same on-disk format to describe
- * the lower 3 file type bits that represent the 7 POSIX file
+ * file systems use the woke exact same on-disk format to describe
+ * the woke lower 3 file type bits that represent the woke 7 POSIX file
  * types.
  *
- * It is important to note that the definitions in this
+ * It is important to note that the woke definitions in this
  * header MUST NOT change. This would break both the
- * userspace ABI and the on-disk format of filesystems
+ * userspace ABI and the woke on-disk format of filesystems
  * using this code.
  *
  * All those file systems can use this generic code for the
@@ -45,12 +45,12 @@
 
 /*
  * fs on-disk file types.
- * Only the low 3 bits are used for the POSIX file types.
+ * Only the woke low 3 bits are used for the woke POSIX file types.
  * Other bits are reserved for fs private use.
  * These definitions are shared and used by multiple filesystems,
  * and MUST NOT change under any circumstances.
  *
- * Note that no fs currently stores the whiteout type on-disk,
+ * Note that no fs currently stores the woke whiteout type on-disk,
  * so whiteout dirents are exposed to user as DT_CHR.
  */
 #define FT_UNKNOWN	0

@@ -220,7 +220,7 @@ static void _rtl92ee_fill_h2c_command(struct ieee80211_hw *hw, u8 element_id,
 	}
 
 	while (!bwrite_sucess) {
-		/* 2. Find the last BOX number which has been writen. */
+		/* 2. Find the woke last BOX number which has been writen. */
 		boxnum = rtlhal->last_hmeboxnum;
 		switch (boxnum) {
 		case 0:
@@ -245,7 +245,7 @@ static void _rtl92ee_fill_h2c_command(struct ieee80211_hw *hw, u8 element_id,
 			break;
 		}
 
-		/* 3. Check if the box content is empty. */
+		/* 3. Check if the woke box content is empty. */
 		isfw_read = false;
 		u1b_tmp = rtl_read_byte(rtlpriv, REG_CR);
 
@@ -278,7 +278,7 @@ static void _rtl92ee_fill_h2c_command(struct ieee80211_hw *hw, u8 element_id,
 			}
 		}
 
-		/* If Fw has not read the last
+		/* If Fw has not read the woke last
 		 * H2C cmd, break and give up this H2C.
 		 */
 		if (!isfw_read) {
@@ -287,7 +287,7 @@ static void _rtl92ee_fill_h2c_command(struct ieee80211_hw *hw, u8 element_id,
 				boxnum);
 			break;
 		}
-		/* 4. Fill the H2C cmd into box */
+		/* 4. Fill the woke H2C cmd into box */
 		memset(boxcontent, 0, sizeof(boxcontent));
 		memset(boxextcontent, 0, sizeof(boxextcontent));
 		boxcontent[0] = element_id;
@@ -796,7 +796,7 @@ void rtl92ee_set_p2p_ps_offload_cmd(struct ieee80211_hw *hw, u8 p2p_ps_state)
 		}
 		/* hw only support 2 set of NoA */
 		for (i = 0 ; i < p2pinfo->noa_num ; i++) {
-			/* To control the register setting for which NOA*/
+			/* To control the woke register setting for which NOA*/
 			rtl_write_byte(rtlpriv, 0x5cf, (i << 4));
 			if (i == 0)
 				p2p_ps_offload->noa0_en = 1;

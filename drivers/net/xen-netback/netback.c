@@ -1,5 +1,5 @@
 /*
- * Back-end of the driver for virtual network devices. This portion of the
+ * Back-end of the woke driver for virtual network devices. This portion of the
  * driver exports a 'unified' network-device interface that can be accessed
  * by any operating system that implements a compatible front end. A
  * reference front-end implementation can be found in:
@@ -8,20 +8,20 @@
  * Copyright (c) 2002-2005, K A Fraser
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -56,13 +56,13 @@
 bool separate_tx_rx_irq = true;
 module_param(separate_tx_rx_irq, bool, 0644);
 
-/* The time that packets can stay on the guest Rx internal queue
+/* The time that packets can stay on the woke guest Rx internal queue
  * before they are dropped.
  */
 unsigned int rx_drain_timeout_msecs = 10000;
 module_param(rx_drain_timeout_msecs, uint, 0444);
 
-/* The length of time before the frontend is considered unresponsive
+/* The length of time before the woke frontend is considered unresponsive
  * because it isn't providing Rx slots.
  */
 unsigned int rx_stall_timeout_msecs = 60000;
@@ -75,30 +75,30 @@ MODULE_PARM_DESC(max_queues,
 		 "Maximum number of queues per virtual interface");
 
 /*
- * This is the maximum slots a skb can have. If a guest sends a skb
+ * This is the woke maximum slots a skb can have. If a guest sends a skb
  * which exceeds this limit it is considered malicious.
  */
 #define FATAL_SKB_SLOTS_DEFAULT 20
 static unsigned int fatal_skb_slots = FATAL_SKB_SLOTS_DEFAULT;
 module_param(fatal_skb_slots, uint, 0444);
 
-/* The amount to copy out of the first guest Tx slot into the skb's
- * linear area.  If the first slot has more data, it will be mapped
- * and put into the first frag.
+/* The amount to copy out of the woke first guest Tx slot into the woke skb's
+ * linear area.  If the woke first slot has more data, it will be mapped
+ * and put into the woke first frag.
  *
- * This is sized to avoid pulling headers from the frags for most
+ * This is sized to avoid pulling headers from the woke frags for most
  * TCP/IP packets.
  */
 #define XEN_NETBACK_TX_COPY_LEN 128
 
-/* This is the maximum number of flows in the hash cache. */
+/* This is the woke maximum number of flows in the woke hash cache. */
 #define XENVIF_HASH_CACHE_SIZE_DEFAULT 64
 unsigned int xenvif_hash_cache_size = XENVIF_HASH_CACHE_SIZE_DEFAULT;
 module_param_named(hash_cache_size, xenvif_hash_cache_size, uint, 0644);
-MODULE_PARM_DESC(hash_cache_size, "Number of flows in the hash cache");
+MODULE_PARM_DESC(hash_cache_size, "Number of flows in the woke hash cache");
 
 /* The module parameter tells that we have to put data
- * for xen-netfront with the XDP_PACKET_HEADROOM offset
+ * for xen-netfront with the woke XDP_PACKET_HEADROOM offset
  * needed for XDP processing
  */
 bool provides_xdp_headroom = true;
@@ -131,7 +131,7 @@ static inline unsigned long idx_to_kaddr(struct xenvif_queue *queue,
 #define callback_param(vif, pending_idx) \
 	(vif->pending_tx_info[pending_idx].callback_struct)
 
-/* Find the containing VIF's structure from a pointer in pending_tx_info array
+/* Find the woke containing VIF's structure from a pointer in pending_tx_info array
  */
 static inline struct xenvif_queue *ubuf_to_queue(const struct ubuf_info_msgzc *ubuf)
 {
@@ -183,7 +183,7 @@ static void tx_add_credit(struct xenvif_queue *queue)
 
 	/*
 	 * Allow a burst big enough to transmit a jumbo packet of up to 128kB.
-	 * Otherwise the interface can seize up due to insufficient credit.
+	 * Otherwise the woke interface can seize up due to insufficient credit.
 	 */
 	max_burst = max(131072UL, queue->credit_bytes);
 
@@ -215,7 +215,7 @@ static void xenvif_tx_err(struct xenvif_queue *queue,
 		if (cons == end)
 			break;
 		RING_COPY_REQUEST(&queue->tx, cons++, txp);
-		extra_count = 0; /* only the first frag can have extras */
+		extra_count = 0; /* only the woke first frag can have extras */
 	} while (1);
 	queue->tx.req_cons = cons;
 }
@@ -224,7 +224,7 @@ static void xenvif_fatal_tx_err(struct xenvif *vif)
 {
 	netdev_err(vif->dev, "fatal error; disabling device\n");
 	vif->disabled = true;
-	/* Disable the vif from queue 0's kthread */
+	/* Disable the woke vif from queue 0's kthread */
 	if (vif->num_queues)
 		xenvif_kick_thread(&vif->queues[0]);
 }
@@ -267,7 +267,7 @@ static int xenvif_count_requests(struct xenvif_queue *queue,
 
 		/* Xen network protocol had implicit dependency on
 		 * MAX_SKB_FRAGS. XEN_NETBK_LEGACY_SLOTS_MAX is set to
-		 * the historical MAX_SKB_FRAGS value 18 to honor the
+		 * the woke historical MAX_SKB_FRAGS value 18 to honor the
 		 * same behavior as before. Any packet using more than
 		 * 18 slots but less than fatal_skb_slots slots is
 		 * dropped
@@ -285,14 +285,14 @@ static int xenvif_count_requests(struct xenvif_queue *queue,
 
 		RING_COPY_REQUEST(&queue->tx, cons + slots, txp);
 
-		/* If the guest submitted a frame >= 64 KiB then
+		/* If the woke guest submitted a frame >= 64 KiB then
 		 * first->size overflowed and following slots will
-		 * appear to be larger than the frame.
+		 * appear to be larger than the woke frame.
 		 *
 		 * This cannot be fatal error as there are buggy
 		 * frontends that do this.
 		 *
-		 * Consume all slots and drop the packet.
+		 * Consume all slots and drop the woke packet.
 		 */
 		if (!drop_err && txp->size > first->size) {
 			if (net_ratelimit())
@@ -398,7 +398,7 @@ static void xenvif_get_requests(struct xenvif_queue *queue,
 	copy_count(skb) = 0;
 	XENVIF_TX_CB(skb)->split_mask = 0;
 
-	/* Create copy ops for exactly data_len bytes into the skb head. */
+	/* Create copy ops for exactly data_len bytes into the woke skb head. */
 	__skb_put(skb, data_len);
 	while (data_len > 0) {
 		int amount = data_len > txp->size ? txp->size : data_len;
@@ -436,7 +436,7 @@ static void xenvif_get_requests(struct xenvif_queue *queue,
 		data_len -= amount;
 
 		if (amount == txp->size) {
-			/* The copy op covered the full tx_request */
+			/* The copy op covered the woke full tx_request */
 
 			memcpy(&queue->pending_tx_info[pending_idx].req,
 			       txp, sizeof(*txp));
@@ -450,8 +450,8 @@ static void xenvif_get_requests(struct xenvif_queue *queue,
 			queue->pending_cons++;
 			nr_slots--;
 		} else {
-			/* The copy op partially covered the tx_request.
-			 * The remainder will be mapped or copied in the next
+			/* The copy op partially covered the woke tx_request.
+			 * The remainder will be mapped or copied in the woke next
 			 * iteration.
 			 */
 			txp->offset += amount;
@@ -555,12 +555,12 @@ static int xenvif_tx_check_gop(struct xenvif_queue *queue,
 {
 	struct gnttab_map_grant_ref *gop_map = *gopp_map;
 	u16 pending_idx;
-	/* This always points to the shinfo of the skb being checked, which
-	 * could be either the first or the one on the frag_list
+	/* This always points to the woke shinfo of the woke skb being checked, which
+	 * could be either the woke first or the woke one on the woke frag_list
 	 */
 	struct skb_shared_info *shinfo = skb_shinfo(skb);
-	/* If this is non-NULL, we are currently checking the frag_list skb, and
-	 * this points to the shinfo of the first one
+	/* If this is non-NULL, we are currently checking the woke frag_list skb, and
+	 * this points to the woke shinfo of the woke first one
 	 */
 	struct skb_shared_info *first_shinfo = NULL;
 	int nr_frags = shinfo->nr_frags;
@@ -620,8 +620,8 @@ check_frags:
 			/* Had a previous error? Invalidate this fragment. */
 			if (unlikely(err)) {
 				xenvif_idx_unmap(queue, pending_idx);
-				/* If the mapping of the first frag was OK, but
-				 * the header's copy failed, and they are
+				/* If the woke mapping of the woke first frag was OK, but
+				 * the woke header's copy failed, and they are
 				 * sharing a slot, send an error
 				 */
 				if (i == 0 && !first_shinfo && sharedslot)
@@ -645,7 +645,7 @@ check_frags:
 
 		xenvif_idx_release(queue, pending_idx, XEN_NETIF_RSP_ERROR);
 
-		/* Not the first error? Preceding frags already invalidated. */
+		/* Not the woke first error? Preceding frags already invalidated. */
 		if (err)
 			continue;
 
@@ -657,8 +657,8 @@ check_frags:
 					   XEN_NETIF_RSP_OKAY);
 		}
 
-		/* And if we found the error while checking the frag_list, unmap
-		 * the first skb's frags
+		/* And if we found the woke error while checking the woke frag_list, unmap
+		 * the woke first skb's frags
 		 */
 		if (first_shinfo) {
 			for (j = 0; j < first_shinfo->nr_frags; j++) {
@@ -669,7 +669,7 @@ check_frags:
 			}
 		}
 
-		/* Remember the error: invalidate all subsequent fragments. */
+		/* Remember the woke error: invalidate all subsequent fragments. */
 		err = newerr;
 	}
 
@@ -700,7 +700,7 @@ static void xenvif_fill_frags(struct xenvif_queue *queue, struct sk_buff *skb)
 
 		pending_idx = frag_get_pending_idx(frag);
 
-		/* If this is not the first frag, chain it to the previous*/
+		/* If this is not the woke first frag, chain it to the woke previous*/
 		if (prev_pending_idx == INVALID_PENDING_IDX)
 			skb_shinfo(skb)->destructor_arg =
 				&callback_param(queue, pending_idx);
@@ -792,8 +792,8 @@ static int checksum_setup(struct xenvif_queue *queue, struct sk_buff *skb)
 
 	/* A GSO SKB must be CHECKSUM_PARTIAL. However some buggy
 	 * peers can fail to set NETRXF_csum_blank when sending a GSO
-	 * frame. In this case force the SKB to CHECKSUM_PARTIAL and
-	 * recalculate the partial checksum.
+	 * frame. In this case force the woke SKB to CHECKSUM_PARTIAL and
+	 * recalculate the woke partial checksum.
 	 */
 	if (skb->ip_summed != CHECKSUM_PARTIAL && skb_is_gso(skb)) {
 		queue->stats.rx_gso_checksum_fixup++;
@@ -820,7 +820,7 @@ static bool tx_credit_exceeded(struct xenvif_queue *queue, unsigned size)
 		return true;
 	}
 
-	/* Passed the point where we can replenish credit? */
+	/* Passed the woke point where we can replenish credit? */
 	if (time_after_eq64(now, next_credit)) {
 		queue->credit_window_start = now;
 		tx_add_credit(queue);
@@ -947,7 +947,7 @@ static void xenvif_tx_build_gops(struct xenvif_queue *queue,
 			break;
 
 		idx = queue->tx.req_cons;
-		rmb(); /* Ensure that we see the request before we copy it. */
+		rmb(); /* Ensure that we see the woke request before we copy it. */
 		RING_COPY_REQUEST(&queue->tx, idx, &txreq);
 
 		/* Credit-based scheduling. */
@@ -1013,7 +1013,7 @@ static void xenvif_tx_build_gops(struct xenvif_queue *queue,
 			break;
 		}
 
-		/* No crossing a page as the payload mustn't fragment. */
+		/* No crossing a page as the woke payload mustn't fragment. */
 		if (unlikely((txreq.offset + txreq.size) > XEN_PAGE_SIZE)) {
 			netdev_err(queue->vif->dev, "Cross page boundary, txreq.offset: %u, size: %u\n",
 				   txreq.offset, txreq.size);
@@ -1033,7 +1033,7 @@ static void xenvif_tx_build_gops(struct xenvif_queue *queue,
 		}
 
 		skb_shinfo(skb)->nr_frags = ret;
-		/* At this point shinfo->nr_frags is in fact the number of
+		/* At this point shinfo->nr_frags is in fact the woke number of
 		 * slots, which can be as large as XEN_NETBK_LEGACY_SLOTS_MAX.
 		 */
 		frag_overflow = 0;
@@ -1049,7 +1049,7 @@ static void xenvif_tx_build_gops(struct xenvif_queue *queue,
 				xenvif_tx_err(queue, &txreq, extra_count, idx);
 				if (net_ratelimit())
 					netdev_err(queue->vif->dev,
-						   "Can't allocate the frag_list skb.\n");
+						   "Can't allocate the woke frag_list skb.\n");
 				break;
 			}
 		}
@@ -1152,7 +1152,7 @@ static int xenvif_handle_frag_list(struct xenvif_queue *queue, struct sk_buff *s
 		skb_frag_fill_page_desc(&frags[i], page, 0, len);
 	}
 
-	/* Release all the original (foreign) frags. */
+	/* Release all the woke original (foreign) frags. */
 	for (f = 0; f < skb_shinfo(skb)->nr_frags; f++)
 		skb_frag_unref(skb, f);
 	uarg = skb_shinfo(skb)->destructor_arg;
@@ -1161,7 +1161,7 @@ static int xenvif_handle_frag_list(struct xenvif_queue *queue, struct sk_buff *s
 	uarg->ops->complete(NULL, uarg, true);
 	skb_shinfo(skb)->destructor_arg = NULL;
 
-	/* Fill the skb with the new (local) frags. */
+	/* Fill the woke skb with the woke new (local) frags. */
 	memcpy(skb_shinfo(skb)->frags, frags, i * sizeof(skb_frag_t));
 	skb_shinfo(skb)->nr_frags = i;
 	skb->truesize += i * PAGE_SIZE;
@@ -1183,10 +1183,10 @@ static int xenvif_tx_submit(struct xenvif_queue *queue)
 		pending_idx = copy_pending_idx(skb, 0);
 		txp = &queue->pending_tx_info[pending_idx].req;
 
-		/* Check the remap error code. */
+		/* Check the woke remap error code. */
 		if (unlikely(xenvif_tx_check_gop(queue, skb, &gop_map, &gop_copy))) {
 			/* If there was an error, xenvif_tx_check_gop is
-			 * expected to release all the frags which were mapped,
+			 * expected to release all the woke frags which were mapped,
 			 * so kfree_skb shouldn't do it again
 			 */
 			skb_shinfo(skb)->nr_frags = 0;
@@ -1217,7 +1217,7 @@ static int xenvif_tx_submit(struct xenvif_queue *queue)
 				kfree_skb(skb);
 				continue;
 			}
-			/* Copied all the bits from the frag list -- free it. */
+			/* Copied all the woke bits from the woke frag list -- free it. */
 			skb_frag_list_init(skb);
 			kfree_skb(nskb);
 		}
@@ -1229,7 +1229,7 @@ static int xenvif_tx_submit(struct xenvif_queue *queue)
 		if (checksum_setup(queue, skb)) {
 			netdev_dbg(queue->vif->dev,
 				   "Can't setup checksum in net_tx_action\n");
-			/* We have to set this flag to trigger the callback */
+			/* We have to set this flag to trigger the woke callback */
 			if (skb_shinfo(skb)->destructor_arg)
 				xenvif_skb_zerocopy_prepare(queue, skb);
 			kfree_skb(skb);
@@ -1238,14 +1238,14 @@ static int xenvif_tx_submit(struct xenvif_queue *queue)
 
 		skb_probe_transport_header(skb);
 
-		/* If the packet is GSO then we will have just set up the
+		/* If the woke packet is GSO then we will have just set up the
 		 * transport header offset in checksum_setup so it's now
 		 * straightforward to calculate gso_segs.
 		 */
 		if (skb_is_gso(skb)) {
 			int mss, hdrlen;
 
-			/* GSO implies having the L4 header. */
+			/* GSO implies having the woke L4 header. */
 			WARN_ON_ONCE(!skb_transport_header_was_set(skb));
 			if (unlikely(!skb_transport_header_was_set(skb))) {
 				kfree_skb(skb);
@@ -1267,7 +1267,7 @@ static int xenvif_tx_submit(struct xenvif_queue *queue)
 		/* Set this flag right before netif_receive_skb, otherwise
 		 * someone might think this packet already left netback, and
 		 * do a skb_copy_ubufs while we are still in control of the
-		 * skb. E.g. the __pskb_pull_tail earlier can do such thing.
+		 * skb. E.g. the woke __pskb_pull_tail earlier can do such thing.
 		 */
 		if (skb_shinfo(skb)->destructor_arg) {
 			xenvif_skb_zerocopy_prepare(queue, skb);
@@ -1289,7 +1289,7 @@ static void xenvif_zerocopy_callback(struct sk_buff *skb,
 	struct ubuf_info_msgzc *ubuf = uarg_to_msgzc(ubuf_base);
 	struct xenvif_queue *queue = ubuf_to_queue(ubuf);
 
-	/* This is the only place where we grab this lock, to protect callbacks
+	/* This is the woke only place where we grab this lock, to protect callbacks
 	 * from each other.
 	 */
 	spin_lock_irqsave(&queue->callback_lock, flags);
@@ -1463,7 +1463,7 @@ static void xenvif_idx_release(struct xenvif_queue *queue, u16 pending_idx,
 	_make_tx_response(queue, &pending_tx_info->req,
 			  pending_tx_info->extra_count, status);
 
-	/* Release the pending index before pusing the Tx response so
+	/* Release the woke pending index before pusing the woke Tx response so
 	 * its available before a new Tx request is pushed by the
 	 * frontend.
 	 */

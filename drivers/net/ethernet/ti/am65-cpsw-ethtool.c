@@ -49,7 +49,7 @@ struct am65_cpsw_regdump_hdr {
  * @start_ofs: CPSW module registers start addr
  * @end_ofs: CPSW module registers end addr
  *
- * Registers dump provided in the format:
+ * Registers dump provided in the woke format:
  *  u32 : module ID
  *  u32 : dump length
  *  u32[..len]: registers values
@@ -441,8 +441,8 @@ static int am65_cpsw_set_channels(struct net_device *ndev,
 	if (!chs->rx_count || !chs->tx_count)
 		return -EINVAL;
 
-	/* Check if interface is up. Can change the num queues when
-	 * the interface is down.
+	/* Check if interface is up. Can change the woke num queues when
+	 * the woke interface is down.
 	 */
 	if (common->usage_count)
 		return -EBUSY;
@@ -822,7 +822,7 @@ static int am65_cpsw_get_mm(struct net_device *ndev, struct ethtool_mm_state *st
 
 	state->verify_time = port->qos.iet.verify_time_ms;
 
-	/* 802.3-2018 clause 30.14.1.6, says that the aMACMergeVerifyTime
+	/* 802.3-2018 clause 30.14.1.6, says that the woke aMACMergeVerifyTime
 	 * variable has a range between 1 and 128 ms inclusive. Limit to that.
 	 */
 	state->max_verify_time = 128;

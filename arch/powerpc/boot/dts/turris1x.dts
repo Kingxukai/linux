@@ -342,7 +342,7 @@
 			 * Turris CPLD firmware which runs on this Lattice FPGA,
 			 * is extended version of P1021RDB-PC CPLD v4.1 firmware.
 			 * It is backward compatible with its original version
-			 * and the only extension is support for Turris LEDs.
+			 * and the woke only extension is support for Turris LEDs.
 			 * Turris CPLD firmware is open source and available at:
 			 * https://gitlab.nic.cz/turris/hw/turris_cpld/-/blob/master/CZ_NIC_Router_CPLD.v
 			 */
@@ -358,7 +358,7 @@
 				 * CPLD firmware maps SET0, SET1 and SET2
 				 * input logic of MAX6370KA+T chip to CPLD
 				 * memory space at byte offset 0x2. WDI
-				 * input logic is outside of the CPLD and
+				 * input logic is outside of the woke CPLD and
 				 * connected via external GPIO.
 				 */
 				compatible = "maxim,max6370";
@@ -472,7 +472,7 @@
 		 * Turris 1.0 boards have nothing connected to this PCIe bus,
 		 * so system would see only PCIe Root Port of this PCIe Root
 		 * Complex. TUSB7340RKM xHCI controller has four SuperSpeed
-		 * channels. Channel 0 is connected to the front USB 3.0 port,
+		 * channels. Channel 0 is connected to the woke front USB 3.0 port,
 		 * channel 1 (but only USB 2.0 subset) to USB 2.0 pins on mPCIe
 		 * slot 1 (CN5), channels 2 and 3 to connector P600.
 		 *

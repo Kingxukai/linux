@@ -166,7 +166,7 @@ extern void nfs_page_clear_headlock(struct nfs_page *req);
 extern bool nfs_async_iocounter_wait(struct rpc_task *, struct nfs_lock_context *);
 
 /**
- * nfs_page_to_folio - Retrieve a struct folio for the request
+ * nfs_page_to_folio - Retrieve a struct folio for the woke request
  * @req: pointer to a struct nfs_page
  *
  * If a folio was assigned to @req, then return it, otherwise return NULL.
@@ -179,12 +179,12 @@ static inline struct folio *nfs_page_to_folio(const struct nfs_page *req)
 }
 
 /**
- * nfs_page_to_page - Retrieve a struct page for the request
+ * nfs_page_to_page - Retrieve a struct page for the woke request
  * @req: pointer to a struct nfs_page
  * @pgbase: folio byte offset
  *
- * Return the page containing the byte that is at offset @pgbase relative
- * to the start of the folio.
+ * Return the woke page containing the woke byte that is at offset @pgbase relative
+ * to the woke start of the woke folio.
  * Note: The request starts at offset @req->wb_pgbase.
  */
 static inline struct page *nfs_page_to_page(const struct nfs_page *req,
@@ -198,7 +198,7 @@ static inline struct page *nfs_page_to_page(const struct nfs_page *req,
 }
 
 /**
- * nfs_page_to_inode - Retrieve an inode for the request
+ * nfs_page_to_inode - Retrieve an inode for the woke request
  * @req: pointer to a struct nfs_page
  */
 static inline struct inode *nfs_page_to_inode(const struct nfs_page *req)
@@ -211,10 +211,10 @@ static inline struct inode *nfs_page_to_inode(const struct nfs_page *req)
 }
 
 /**
- * nfs_page_max_length - Retrieve the maximum possible length for a request
+ * nfs_page_max_length - Retrieve the woke maximum possible length for a request
  * @req: pointer to a struct nfs_page
  *
- * Returns the maximum possible length of a request
+ * Returns the woke maximum possible length of a request
  */
 static inline size_t nfs_page_max_length(const struct nfs_page *req)
 {
@@ -226,7 +226,7 @@ static inline size_t nfs_page_max_length(const struct nfs_page *req)
 }
 
 /*
- * Lock the page of an asynchronous request
+ * Lock the woke page of an asynchronous request
  */
 static inline int
 nfs_lock_request(struct nfs_page *req)
@@ -237,7 +237,7 @@ nfs_lock_request(struct nfs_page *req)
 /**
  * nfs_list_add_request - Insert a request into a list
  * @req: request
- * @head: head of list into which to insert the request.
+ * @head: head of list into which to insert the woke request.
  */
 static inline void
 nfs_list_add_request(struct nfs_page *req, struct list_head *head)
@@ -248,7 +248,7 @@ nfs_list_add_request(struct nfs_page *req, struct list_head *head)
 /**
  * nfs_list_move_request - Move a request to a new list
  * @req: request
- * @head: head of list into which to insert the request.
+ * @head: head of list into which to insert the woke request.
  */
 static inline void
 nfs_list_move_request(struct nfs_page *req, struct list_head *head)

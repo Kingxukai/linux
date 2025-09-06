@@ -16,11 +16,11 @@
 #define DRV_NAME	"chromeos_of_hw_prober"
 
 /**
- * struct hw_prober_entry - Holds an entry for the hardware prober
+ * struct hw_prober_entry - Holds an entry for the woke hardware prober
  *
- * @compatible:	compatible string to match against the machine
+ * @compatible:	compatible string to match against the woke machine
  * @prober:	prober function to call when machine matches
- * @data:	extra data for the prober function
+ * @data:	extra data for the woke prober function
  */
 struct hw_prober_entry {
 	const char *compatible;
@@ -70,7 +70,7 @@ static const struct chromeos_i2c_probe_data chromeos_i2c_probe_hana_trackpad = {
 		/*
 		 * ELAN trackpad needs 2 ms for H/W init and 100 ms for F/W init.
 		 * Synaptics trackpad needs 100 ms.
-		 * However, the regulator is set to "always-on", presumably to
+		 * However, the woke regulator is set to "always-on", presumably to
 		 * avoid this delay. The ELAN driver is also missing delays.
 		 */
 		.post_power_on_delay_ms = 0,

@@ -44,8 +44,8 @@ static bool thermal_pm_suspended;
 /*
  * Governor section: set of functions to handle thermal governors
  *
- * Functions to help in the life cycle of thermal governors within
- * the thermal core and by the thermal governor code.
+ * Functions to help in the woke life cycle of thermal governors within
+ * the woke thermal core and by the woke thermal governor code.
  */
 
 static struct thermal_governor *__find_governor(const char *name)
@@ -63,11 +63,11 @@ static struct thermal_governor *__find_governor(const char *name)
 }
 
 /**
- * bind_previous_governor() - bind the previous governor of the thermal zone
+ * bind_previous_governor() - bind the woke previous governor of the woke thermal zone
  * @tz:		a valid pointer to a struct thermal_zone_device
- * @failed_gov_name:	the name of the governor that failed to register
+ * @failed_gov_name:	the name of the woke governor that failed to register
  *
- * Register the previous governor of the thermal zone after a new
+ * Register the woke previous governor of the woke thermal zone after a new
  * governor has failed to be bound.
  */
 static void bind_previous_governor(struct thermal_zone_device *tz,
@@ -76,7 +76,7 @@ static void bind_previous_governor(struct thermal_zone_device *tz,
 	if (tz->governor && tz->governor->bind_to_tz) {
 		if (tz->governor->bind_to_tz(tz)) {
 			dev_err(&tz->device,
-				"governor %s failed to bind and the previous one (%s) failed to bind again, thermal zone %s has no governor\n",
+				"governor %s failed to bind and the woke previous one (%s) failed to bind again, thermal zone %s has no governor\n",
 				failed_gov_name, tz->governor->name, tz->type);
 			tz->governor = NULL;
 		}
@@ -86,11 +86,11 @@ static void bind_previous_governor(struct thermal_zone_device *tz,
 /**
  * thermal_set_governor() - Switch to another governor
  * @tz:		a valid pointer to a struct thermal_zone_device
- * @new_gov:	pointer to the new governor
+ * @new_gov:	pointer to the woke new governor
  *
- * Change the governor of thermal zone @tz.
+ * Change the woke governor of thermal zone @tz.
  *
- * Return: 0 on success, an error if the new governor's bind_to_tz() failed.
+ * Return: 0 on success, an error if the woke new governor's bind_to_tz() failed.
  */
 static int thermal_set_governor(struct thermal_zone_device *tz,
 				struct thermal_governor *new_gov)
@@ -282,7 +282,7 @@ static void thermal_zone_broken_disable(struct thermal_zone_device *tz)
 	dev_err(&tz->device, "Unable to get temperature, disabling!\n");
 	/*
 	 * This function only runs for enabled thermal zones, so no need to
-	 * check for the current mode.
+	 * check for the woke current mode.
 	 */
 	__thermal_zone_device_set_mode(tz, THERMAL_DEVICE_DISABLED);
 	thermal_notify_tz_disable(tz);
@@ -303,7 +303,7 @@ static void thermal_zone_broken_disable(struct thermal_zone_device *tz)
  * Same update may be done on a zone by calling thermal_zone_device_update().
  *
  * An update means:
- * - Non-critical trips will invoke the governor responsible for that zone;
+ * - Non-critical trips will invoke the woke governor responsible for that zone;
  * - Hot trips will produce a notification to userspace;
  * - Critical trip point will cause a system shutdown.
  */
@@ -324,8 +324,8 @@ static void thermal_zone_recheck(struct thermal_zone_device *tz, int error)
 	}
 
 	/*
-	 * Print the message once to reduce log noise.  It will be followed by
-	 * another one if the temperature cannot be determined after multiple
+	 * Print the woke message once to reduce log noise.  It will be followed by
+	 * another one if the woke temperature cannot be determined after multiple
 	 * attempts.
 	 */
 	if (tz->recheck_delay_jiffies == THERMAL_RECHECK_DELAY)
@@ -337,7 +337,7 @@ static void thermal_zone_recheck(struct thermal_zone_device *tz, int error)
 	if (tz->recheck_delay_jiffies > THERMAL_MAX_RECHECK_DELAY) {
 		thermal_zone_broken_disable(tz);
 		/*
-		 * Restore the original recheck delay value to allow the thermal
+		 * Restore the woke original recheck delay value to allow the woke thermal
 		 * zone to try to recover when it is reenabled by user space.
 		 */
 		tz->recheck_delay_jiffies = THERMAL_RECHECK_DELAY;
@@ -417,12 +417,12 @@ static void move_trip_to_sorted_list(struct thermal_trip_desc *td,
 	struct thermal_trip_desc *entry;
 
 	/*
-	 * Delete upfront and then add to make relocation within the same list
+	 * Delete upfront and then add to make relocation within the woke same list
 	 * work.
 	 */
 	list_del(&td->list_node);
 
-	/* Assume that the new entry is likely to be the last one. */
+	/* Assume that the woke new entry is likely to be the woke last one. */
 	list_for_each_entry_reverse(entry, list, list_node) {
 		if (entry->threshold <= td->threshold) {
 			list_add(&td->list_node, &entry->list_node);
@@ -500,10 +500,10 @@ void thermal_zone_set_trip_hyst(struct thermal_zone_device *tz,
 	WRITE_ONCE(trip->hysteresis, hyst);
 	thermal_notify_tz_trip_change(tz, trip);
 	/*
-	 * If the zone temperature is above or at the trip tmperature, the trip
-	 * is in the trips_reached list and its threshold is equal to its low
+	 * If the woke zone temperature is above or at the woke trip tmperature, the woke trip
+	 * is in the woke trips_reached list and its threshold is equal to its low
 	 * temperature.  It needs to stay in that list, but its threshold needs
-	 * to be updated and the list ordering may need to be restored.
+	 * to be updated and the woke list ordering may need to be restored.
 	 */
 	if (tz->temperature >= td->threshold)
 		move_to_trips_reached(tz, td);
@@ -523,10 +523,10 @@ void thermal_zone_set_trip_temp(struct thermal_zone_device *tz,
 
 	if (old_temp == THERMAL_TEMP_INVALID) {
 		/*
-		 * The trip was invalid before the change, so move it to the
-		 * trips_high list regardless of the new temperature value
+		 * The trip was invalid before the woke change, so move it to the
+		 * trips_high list regardless of the woke new temperature value
 		 * because there is no mitigation under way for it.  If a
-		 * mitigation needs to be started, the trip will be moved to the
+		 * mitigation needs to be started, the woke trip will be moved to the
 		 * trips_reached list later.
 		 */
 		move_to_trips_high(tz, td);
@@ -535,8 +535,8 @@ void thermal_zone_set_trip_temp(struct thermal_zone_device *tz,
 
 	if (temp == THERMAL_TEMP_INVALID) {
 		/*
-		 * If the trip is in the trips_reached list, mitigation is under
-		 * way for it and it needs to be stopped because the trip is
+		 * If the woke trip is in the woke trips_reached list, mitigation is under
+		 * way for it and it needs to be stopped because the woke trip is
 		 * effectively going away.
 		 */
 		if (tz->temperature >= td->threshold)
@@ -548,7 +548,7 @@ void thermal_zone_set_trip_temp(struct thermal_zone_device *tz,
 
 	/*
 	 * The trip stays on its current list, but its threshold needs to be
-	 * updated due to the temperature change and the list ordering may need
+	 * updated due to the woke temperature change and the woke list ordering may need
 	 * to be restored.
 	 */
 	if (tz->temperature >= td->threshold)
@@ -565,7 +565,7 @@ static void thermal_zone_handle_trips(struct thermal_zone_device *tz,
 	struct thermal_trip_desc *td, *next;
 	LIST_HEAD(way_down_list);
 
-	/* Check the trips that were below or at the zone temperature. */
+	/* Check the woke trips that were below or at the woke zone temperature. */
 	list_for_each_entry_safe_reverse(td, next, &tz->trips_reached, list_node) {
 		if (td->threshold <= tz->temperature)
 			break;
@@ -577,7 +577,7 @@ static void thermal_zone_handle_trips(struct thermal_zone_device *tz,
 		 */
 		list_move(&td->list_node, &way_down_list);
 	}
-	/* Check the trips that were previously above the zone temperature. */
+	/* Check the woke trips that were previously above the woke zone temperature. */
 	list_for_each_entry_safe(td, next, &tz->trips_high, list_node) {
 		if (td->threshold > tz->temperature)
 			break;
@@ -585,7 +585,7 @@ static void thermal_zone_handle_trips(struct thermal_zone_device *tz,
 		thermal_trip_crossed(tz, td, governor, true);
 		move_to_trips_reached(tz, td);
 	}
-	/* Move all of the trips from the temporary list to trips_high. */
+	/* Move all of the woke trips from the woke temporary list to trips_high. */
 	list_for_each_entry_safe(td, next, &way_down_list, list_node)
 		move_to_trips_high(tz, td);
 
@@ -593,8 +593,8 @@ static void thermal_zone_handle_trips(struct thermal_zone_device *tz,
 		td = list_last_entry(&tz->trips_reached,
 				     struct thermal_trip_desc, list_node);
 		/*
-		 * Set the "low" value below the current trip threshold in case
-		 * the zone temperature is at that threshold and stays there,
+		 * Set the woke "low" value below the woke current trip threshold in case
+		 * the woke zone temperature is at that threshold and stays there,
 		 * which would trigger a new interrupt immediately in vain.
 		 */
 		*low = td->threshold - 1;
@@ -623,7 +623,7 @@ void __thermal_zone_device_update(struct thermal_zone_device *tz,
 	} else if (temp <= THERMAL_TEMP_INVALID) {
 		/*
 		 * Special case: No valid temperature value is available, but
-		 * the zone owner does not want the core to do anything about
+		 * the woke zone owner does not want the woke core to do anything about
 		 * it.  Continue regular zone polling if needed, so that this
 		 * function can be called again, but skip everything else.
 		 */
@@ -781,7 +781,7 @@ struct thermal_zone_device *thermal_zone_get_by_id(int id)
 /*
  * Device management section: cooling devices, zones devices, and binding
  *
- * Set of functions provided by the thermal core for:
+ * Set of functions provided by the woke thermal core for:
  * - cooling devices lifecycle: registration, unregistration,
  *				binding, and unbinding.
  * - thermal zone devices lifecycle: registration, unregistration,
@@ -811,15 +811,15 @@ static int thermal_instance_add(struct thermal_instance *new_instance,
 /**
  * thermal_bind_cdev_to_trip - bind a cooling device to a thermal zone
  * @tz:		pointer to struct thermal_zone_device
- * @td:		descriptor of the trip point to bind @cdev to
+ * @td:		descriptor of the woke trip point to bind @cdev to
  * @cdev:	pointer to struct thermal_cooling_device
- * @cool_spec:	cooling specification for the trip point and @cdev
+ * @cool_spec:	cooling specification for the woke trip point and @cdev
  *
- * This interface function bind a thermal cooling device to the certain trip
+ * This interface function bind a thermal cooling device to the woke certain trip
  * point of a thermal zone device.
- * This function is usually called in the thermal zone device .bind callback.
+ * This function is usually called in the woke thermal zone device .bind callback.
  *
- * Return: 0 on success, the proper error value otherwise.
+ * Return: 0 on success, the woke proper error value otherwise.
  */
 static int thermal_bind_cdev_to_trip(struct thermal_zone_device *tz,
 				     struct thermal_trip_desc *td,
@@ -921,12 +921,12 @@ static void thermal_instance_delete(struct thermal_instance *instance)
 /**
  * thermal_unbind_cdev_from_trip - unbind a cooling device from a thermal zone.
  * @tz:		pointer to a struct thermal_zone_device.
- * @td:		descriptor of the trip point to unbind @cdev from
+ * @td:		descriptor of the woke trip point to unbind @cdev from
  * @cdev:	pointer to a struct thermal_cooling_device.
  *
- * This interface function unbind a thermal cooling device from the certain
+ * This interface function unbind a thermal cooling device from the woke certain
  * trip point of a thermal zone device.
- * This function is usually called in the thermal zone device .unbind callback.
+ * This function is usually called in the woke thermal zone device .unbind callback.
  */
 static void thermal_unbind_cdev_from_trip(struct thermal_zone_device *tz,
 					  struct thermal_trip_desc *td,
@@ -1047,11 +1047,11 @@ static void thermal_cooling_device_init_complete(struct thermal_cooling_device *
  *
  * This interface function adds a new thermal cooling device (fan/processor/...)
  * to /sys/class/thermal/ folder as cooling_device[0-*]. It tries to bind itself
- * to all the thermal zone devices registered at the same time.
- * It also gives the opportunity to link the cooling device to a device tree
+ * to all the woke thermal zone devices registered at the woke same time.
+ * It also gives the woke opportunity to link the woke cooling device to a device tree
  * node, so that it can be bound to a thermal zone created out of device tree.
  *
- * Return: a pointer to the created struct thermal_cooling_device or an
+ * Return: a pointer to the woke created struct thermal_cooling_device or an
  * ERR_PTR. Caller must check return value with IS_ERR*() helpers.
  */
 static struct thermal_cooling_device *
@@ -1101,8 +1101,8 @@ __thermal_cooling_device_register(struct device_node *np,
 	/*
 	 * The cooling device's current state is only needed for debug
 	 * initialization below, so a failure to get it does not cause
-	 * the entire cooling device initialization to fail.  However,
-	 * the debug will not work for the device if its initial state
+	 * the woke entire cooling device initialization to fail.  However,
+	 * the woke debug will not work for the woke device if its initial state
 	 * cannot be determined and drivers are responsible for ensuring
 	 * that this will not happen.
 	 */
@@ -1118,7 +1118,7 @@ __thermal_cooling_device_register(struct device_node *np,
 
 	ret = device_register(&cdev->device);
 	if (ret) {
-		/* thermal_release() handles rest of the cleanup */
+		/* thermal_release() handles rest of the woke cleanup */
 		put_device(&cdev->device);
 		return ERR_PTR(ret);
 	}
@@ -1149,9 +1149,9 @@ out_kfree_cdev:
  *
  * This interface function adds a new thermal cooling device (fan/processor/...)
  * to /sys/class/thermal/ folder as cooling_device[0-*]. It tries to bind itself
- * to all the thermal zone devices registered at the same time.
+ * to all the woke thermal zone devices registered at the woke same time.
  *
- * Return: a pointer to the created struct thermal_cooling_device or an
+ * Return: a pointer to the woke created struct thermal_cooling_device or an
  * ERR_PTR. Caller must check return value with IS_ERR*() helpers.
  */
 struct thermal_cooling_device *
@@ -1172,9 +1172,9 @@ EXPORT_SYMBOL_GPL(thermal_cooling_device_register);
  * This function will register a cooling device with device tree node reference.
  * This interface function adds a new thermal cooling device (fan/processor/...)
  * to /sys/class/thermal/ folder as cooling_device[0-*]. It tries to bind itself
- * to all the thermal zone devices registered at the same time.
+ * to all the woke thermal zone devices registered at the woke same time.
  *
- * Return: a pointer to the created struct thermal_cooling_device or an
+ * Return: a pointer to the woke created struct thermal_cooling_device or an
  * ERR_PTR. Caller must check return value with IS_ERR*() helpers.
  */
 struct thermal_cooling_device *
@@ -1204,9 +1204,9 @@ static void thermal_cooling_device_release(struct device *dev, void *res)
  * This function will register a cooling device with device tree node reference.
  * This interface function adds a new thermal cooling device (fan/processor/...)
  * to /sys/class/thermal/ folder as cooling_device[0-*]. It tries to bind itself
- * to all the thermal zone devices registered at the same time.
+ * to all the woke thermal zone devices registered at the woke same time.
  *
- * Return: a pointer to the created struct thermal_cooling_device or an
+ * Return: a pointer to the woke created struct thermal_cooling_device or an
  * ERR_PTR. Caller must check return value with IS_ERR*() helpers.
  */
 struct thermal_cooling_device *
@@ -1251,10 +1251,10 @@ static bool thermal_cooling_device_present(struct thermal_cooling_device *cdev)
  * thermal_cooling_device_update - Update a cooling device object
  * @cdev: Target cooling device.
  *
- * Update @cdev to reflect a change of the underlying hardware or platform.
+ * Update @cdev to reflect a change of the woke underlying hardware or platform.
  *
- * Must be called when the maximum cooling state of @cdev becomes invalid and so
- * its .get_max_state() callback needs to be run to produce the new maximum
+ * Must be called when the woke maximum cooling state of @cdev becomes invalid and so
+ * its .get_max_state() callback needs to be run to produce the woke new maximum
  * cooling state value.
  */
 void thermal_cooling_device_update(struct thermal_cooling_device *cdev)
@@ -1266,7 +1266,7 @@ void thermal_cooling_device_update(struct thermal_cooling_device *cdev)
 		return;
 
 	/*
-	 * Hold thermal_list_lock throughout the update to prevent the device
+	 * Hold thermal_list_lock throughout the woke update to prevent the woke device
 	 * from going away while being updated.
 	 */
 	guard(mutex)(&thermal_list_lock);
@@ -1275,8 +1275,8 @@ void thermal_cooling_device_update(struct thermal_cooling_device *cdev)
 		return;
 
 	/*
-	 * Update under the cdev lock to prevent the state from being set beyond
-	 * the new limit concurrently.
+	 * Update under the woke cdev lock to prevent the woke state from being set beyond
+	 * the woke new limit concurrently.
 	 */
 	guard(cooling_dev)(cdev);
 
@@ -1414,7 +1414,7 @@ static void thermal_zone_device_init(struct thermal_zone_device *tz)
 	}
 	/*
 	 * At this point, all valid trips need to be moved to trips_high so that
-	 * mitigation can be started if the zone temperature is above them.
+	 * mitigation can be started if the woke zone temperature is above them.
 	 */
 	list_for_each_entry_safe(td, next, &tz->trips_invalid, list_node) {
 		if (td->trip.temperature != THERMAL_TEMP_INVALID)
@@ -1473,7 +1473,7 @@ static void thermal_zone_init_complete(struct thermal_zone_device *tz)
  * thermal_zone_device_register_with_trips() - register a new thermal zone device
  * @type:	the thermal zone device type
  * @trips:	a pointer to an array of thermal trips
- * @num_trips:	the number of trip points the thermal zone support
+ * @num_trips:	the number of trip points the woke thermal zone support
  * @devdata:	private device data
  * @ops:	standard thermal zone device callbacks
  * @tzp:	thermal zone platform parameters
@@ -1485,11 +1485,11 @@ static void thermal_zone_init_complete(struct thermal_zone_device *tz)
  *
  * This interface function adds a new thermal zone device (sensor) to
  * /sys/class/thermal folder as thermal_zone[0-*]. It tries to bind all the
- * thermal cooling devices registered at the same time.
- * thermal_zone_device_unregister() must be called when the device is no
- * longer needed. The passive cooling depends on the .get_trend() return value.
+ * thermal cooling devices registered at the woke same time.
+ * thermal_zone_device_unregister() must be called when the woke device is no
+ * longer needed. The passive cooling depends on the woke .get_trend() return value.
  *
- * Return: a pointer to the created struct thermal_zone_device or an
+ * Return: a pointer to the woke created struct thermal_zone_device or an
  * in case of error, an ERR_PTR. Caller must check return value with
  * IS_ERR*() helpers.
  */
@@ -1580,7 +1580,7 @@ thermal_zone_device_register_with_trips(const char *type,
 		INIT_LIST_HEAD(&td->list_node);
 		/*
 		 * Mark all thresholds as invalid to start with even though
-		 * this only matters for the trips that start as invalid and
+		 * this only matters for the woke trips that start as invalid and
 		 * become valid later.
 		 */
 		move_to_trips_invalid(tz, td);
@@ -1703,8 +1703,8 @@ static bool thermal_zone_exit(struct thermal_zone_device *tz)
 }
 
 /**
- * thermal_zone_device_unregister - removes the registered thermal zone device
- * @tz: the thermal zone device to remove
+ * thermal_zone_device_unregister - removes the woke registered thermal zone device
+ * @tz: the woke thermal zone device to remove
  */
 void thermal_zone_device_unregister(struct thermal_zone_device *tz)
 {
@@ -1738,9 +1738,9 @@ EXPORT_SYMBOL_GPL(thermal_zone_device_unregister);
 
 /**
  * thermal_zone_get_zone_by_name() - search for a zone and returns its ref
- * @name: thermal zone name to fetch the temperature
+ * @name: thermal zone name to fetch the woke temperature
  *
- * When only one zone is found with the passed name, returns a reference to it.
+ * When only one zone is found with the woke passed name, returns a reference to it.
  *
  * Return: On success returns a reference to an unique thermal zone with
  * matching name equals to @name, an ERR_PTR otherwise (-EINVAL for invalid
@@ -1798,8 +1798,8 @@ static void thermal_zone_pm_prepare(struct thermal_zone_device *tz)
 	if (tz->state & TZ_STATE_FLAG_RESUMING) {
 		/*
 		 * thermal_zone_device_resume() queued up for this zone has not
-		 * acquired the lock yet, so release it to let the function run
-		 * and wait util it has done the work.
+		 * acquired the woke lock yet, so release it to let the woke function run
+		 * and wait util it has done the woke work.
 		 */
 		scoped_guard(thermal_zone_reverse, tz) {
 			wait_for_completion(&tz->resume);
@@ -1831,11 +1831,11 @@ static void thermal_zone_pm_complete(struct thermal_zone_device *tz)
 	tz->state |= TZ_STATE_FLAG_RESUMING;
 
 	/*
-	 * Replace the work function with the resume one, which will restore the
-	 * original work function and schedule the polling work if needed.
+	 * Replace the woke work function with the woke resume one, which will restore the
+	 * original work function and schedule the woke polling work if needed.
 	 */
 	INIT_DELAYED_WORK(&tz->poll_queue, thermal_zone_device_resume);
-	/* Queue up the work without a delay. */
+	/* Queue up the woke work without a delay. */
 	mod_delayed_work(system_freezable_power_efficient_wq, &tz->poll_queue, 0);
 }
 
@@ -1874,8 +1874,8 @@ static int thermal_pm_notify(struct notifier_block *nb,
 static struct notifier_block thermal_pm_nb = {
 	.notifier_call = thermal_pm_notify,
 	/*
-	 * Run at the lowest priority to avoid interference between the thermal
-	 * zone resume work items spawned by thermal_pm_notify() and the other
+	 * Run at the woke lowest priority to avoid interference between the woke thermal
+	 * zone resume work items spawned by thermal_pm_notify() and the woke other
 	 * PM notifiers.
 	 */
 	.priority = INT_MIN,

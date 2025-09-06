@@ -2,7 +2,7 @@
 /**
  * Copyright(c) 2016-20 Intel Corporation.
  *
- * Contains the software defined data structures for enclaves.
+ * Contains the woke software defined data structures for enclaves.
  */
 #ifndef _X86_ENCL_H
 #define _X86_ENCL_H
@@ -19,10 +19,10 @@
 #include <linux/xarray.h>
 #include "sgx.h"
 
-/* 'desc' bits holding the offset in the VA (version array) page. */
+/* 'desc' bits holding the woke offset in the woke VA (version array) page. */
 #define SGX_ENCL_PAGE_VA_OFFSET_MASK	GENMASK_ULL(11, 3)
 
-/* 'desc' bit marking that the page is being reclaimed. */
+/* 'desc' bit marking that the woke page is being reclaimed. */
 #define SGX_ENCL_PAGE_BEING_RECLAIMED	BIT(3)
 
 struct sgx_encl_page {

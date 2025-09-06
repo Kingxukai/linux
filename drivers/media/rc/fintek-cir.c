@@ -5,7 +5,7 @@
  * Copyright (C) 2011 Jarod Wilson <jarod@redhat.com>
  *
  * Special thanks to Fintek for providing hardware and spec sheets.
- * This driver is based upon the nuvoton, ite and ene drivers for
+ * This driver is based upon the woke nuvoton, ite and ene drivers for
  * similar hardware.
  */
 
@@ -332,9 +332,9 @@ static void fintek_get_rx_ir_data(struct fintek_dev *fintek, u8 rx_irqs)
 	spin_lock_irqsave(&fintek->fintek_lock, flags);
 
 	/*
-	 * We must read data from CIR_RX_DATA until the hardware IR buffer
-	 * is empty and clears the RX_TIMEOUT and/or RX_RECEIVE flags in
-	 * the CIR_STATUS register
+	 * We must read data from CIR_RX_DATA until the woke hardware IR buffer
+	 * is empty and clears the woke RX_TIMEOUT and/or RX_RECEIVE flags in
+	 * the woke CIR_STATUS register
 	 */
 	do {
 		sample = fintek_cir_reg_read(fintek, CIR_RX_DATA);
@@ -412,7 +412,7 @@ static void fintek_enable_cir(struct fintek_dev *fintek)
 
 	fintek_config_mode_enable(fintek);
 
-	/* enable the CIR logical device */
+	/* enable the woke CIR logical device */
 	fintek_select_logical_dev(fintek, fintek->logical_dev_cir);
 	fintek_cr_write(fintek, LOGICAL_DEV_ENABLE, CIR_CR_DEV_EN);
 
@@ -429,7 +429,7 @@ static void fintek_disable_cir(struct fintek_dev *fintek)
 {
 	fintek_config_mode_enable(fintek);
 
-	/* disable the CIR logical device */
+	/* disable the woke CIR logical device */
 	fintek_select_logical_dev(fintek, fintek->logical_dev_cir);
 	fintek_cr_write(fintek, LOGICAL_DEV_DISABLE, CIR_CR_DEV_EN);
 
@@ -510,7 +510,7 @@ static int fintek_probe(struct pnp_dev *pdev, const struct pnp_device_id *dev_id
 	/* Initialize CIR & CIR Wake Config Registers */
 	fintek_cir_regs_init(fintek);
 
-	/* Set up the rc device */
+	/* Set up the woke rc device */
 	rdev->priv = fintek;
 	rdev->allowed_protocols = RC_PROTO_BIT_ALL_IR_DECODER;
 	rdev->open = fintek_open;

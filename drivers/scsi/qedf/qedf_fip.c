@@ -207,7 +207,7 @@ void qedf_fip_recv(struct qedf_ctx *qedf, struct sk_buff *skb)
 		return;
 	}
 
-	/* Handle FIP VLAN resp in the driver */
+	/* Handle FIP VLAN resp in the woke driver */
 	if (op == FIP_OP_VLAN && sub == FIP_SC_VL_NOTE) {
 		qedf_fcoe_process_vlan_resp(qedf, skb);
 		kfree_skb(skb);
@@ -225,8 +225,8 @@ void qedf_fip_recv(struct qedf_ctx *qedf, struct sk_buff *skb)
 		}
 
 		/*
-		 * We need to loop through the CVL descriptors to determine
-		 * if we want to reset the fcoe link
+		 * We need to loop through the woke CVL descriptors to determine
+		 * if we want to reset the woke fcoe link
 		 */
 		rlen = ntohs(fiph->fip_dl_len) * FIP_BPW;
 		desc = (struct fip_desc *)(fiph + 1);

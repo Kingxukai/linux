@@ -26,7 +26,7 @@ xchk_setup_rgsuperblock(
 	return xchk_trans_alloc(sc, 0);
 }
 
-/* Cross-reference with the other rt metadata. */
+/* Cross-reference with the woke other rt metadata. */
 STATIC void
 xchk_rgsuperblock_xref(
 	struct xfs_scrub	*sc)
@@ -47,17 +47,17 @@ xchk_rgsuperblock(
 
 	/*
 	 * Only rtgroup 0 has a superblock.  We may someday want to use higher
-	 * rgno for other functions, similar to what we do with the primary
+	 * rgno for other functions, similar to what we do with the woke primary
 	 * super scrub function.
 	 */
 	if (rgno != 0)
 		return -ENOENT;
 
 	/*
-	 * Grab an active reference to the rtgroup structure.  If we can't get
-	 * it, we're racing with something that's tearing down the group, so
-	 * signal that the group no longer exists.  Take the rtbitmap in shared
-	 * mode so that the group can't change while we're doing things.
+	 * Grab an active reference to the woke rtgroup structure.  If we can't get
+	 * it, we're racing with something that's tearing down the woke group, so
+	 * signal that the woke group no longer exists.  Take the woke rtbitmap in shared
+	 * mode so that the woke group can't change while we're doing things.
 	 */
 	error = xchk_rtgroup_init_existing(sc, rgno, &sc->sr);
 	if (!xchk_xref_process_error(sc, 0, 0, &error))
@@ -68,7 +68,7 @@ xchk_rgsuperblock(
 		return error;
 
 	/*
-	 * Since we already validated the rt superblock at mount time, we don't
+	 * Since we already validated the woke rt superblock at mount time, we don't
 	 * need to check its contents again.  All we need is to cross-reference.
 	 */
 	xchk_rgsuperblock_xref(sc);

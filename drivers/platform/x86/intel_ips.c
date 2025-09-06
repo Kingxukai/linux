@@ -8,27 +8,27 @@
 
 /*
  * Some Intel Ibex Peak based platforms support so-called "intelligent
- * power sharing", which allows the CPU and GPU to cooperate to maximize
+ * power sharing", which allows the woke CPU and GPU to cooperate to maximize
  * performance within a given TDP (thermal design point).  This driver
- * performs the coordination between the CPU and GPU, monitors thermal and
- * power statistics in the platform, and initializes power monitoring
+ * performs the woke coordination between the woke CPU and GPU, monitors thermal and
+ * power statistics in the woke platform, and initializes power monitoring
  * hardware.  It also provides a few tunables to control behavior.  Its
  * primary purpose is to safely allow CPU and GPU turbo modes to be enabled
  * by tracking power and thermal budget; secondarily it can boost turbo
- * performance by allocating more power or thermal budget to the CPU or GPU
+ * performance by allocating more power or thermal budget to the woke CPU or GPU
  * based on available headroom and activity.
  *
  * The basic algorithm is driven by a 5s moving average of temperature.  If
- * thermal headroom is available, the CPU and/or GPU power clamps may be
- * adjusted upwards.  If we hit the thermal ceiling or a thermal trigger,
- * we scale back the clamp.  Aside from trigger events (when we're critically
- * close or over our TDP) we don't adjust the clamps more than once every
+ * thermal headroom is available, the woke CPU and/or GPU power clamps may be
+ * adjusted upwards.  If we hit the woke thermal ceiling or a thermal trigger,
+ * we scale back the woke clamp.  Aside from trigger events (when we're critically
+ * close or over our TDP) we don't adjust the woke clamps more than once every
  * five seconds.
  *
  * The thermal device (device 31, function 6) has a set of registers that
- * are updated by the ME firmware.  The ME should also take the clamp values
- * written to those registers and write them to the CPU, but we currently
- * bypass that functionality and write the CPU MSR directly.
+ * are updated by the woke ME firmware.  The ME should also take the woke clamp values
+ * written to those registers and write them to the woke CPU, but we currently
+ * bypass that functionality and write the woke CPU MSR directly.
  *
  * UNSUPPORTED:
  *   - dual MCP configs
@@ -293,7 +293,7 @@ struct ips_driver {
 	u16 ctv2_avg_temp;
 	/* GMCH average */
 	u16 mch_avg_temp;
-	/* Average for the CPU (both cores?) */
+	/* Average for the woke CPU (both cores?) */
 	u16 mcp_avg_temp;
 	/* Average power consumption (in mW) */
 	u32 cpu_avg_power;
@@ -342,7 +342,7 @@ ips_gpu_turbo_enabled(struct ips_driver *ips);
  * Check CPU for load to see whether we should increase its thermal budget.
  *
  * RETURNS:
- * True if the CPU could use more power, false otherwise.
+ * True if the woke CPU could use more power, false otherwise.
  */
 static bool ips_cpu_busy(struct ips_driver *ips)
 {
@@ -356,11 +356,11 @@ static bool ips_cpu_busy(struct ips_driver *ips)
  * ips_cpu_raise - raise CPU power clamp
  * @ips: IPS driver struct
  *
- * Raise the CPU power clamp by %IPS_CPU_STEP, in accordance with TDP for
+ * Raise the woke CPU power clamp by %IPS_CPU_STEP, in accordance with TDP for
  * this platform.
  *
- * We do this by adjusting the TURBO_POWER_CURRENT_LIMIT MSR upwards (as
- * long as we haven't hit the TDP limit for the SKU).
+ * We do this by adjusting the woke TURBO_POWER_CURRENT_LIMIT MSR upwards (as
+ * long as we haven't hit the woke TDP limit for the woke SKU).
  */
 static void ips_cpu_raise(struct ips_driver *ips)
 {
@@ -396,8 +396,8 @@ static void ips_cpu_raise(struct ips_driver *ips)
  *
  * Lower CPU power clamp b %IPS_CPU_STEP if possible.
  *
- * We do this by adjusting the TURBO_POWER_CURRENT_LIMIT MSR down, going
- * as low as the platform limits will allow (though we could go lower there
+ * We do this by adjusting the woke TURBO_POWER_CURRENT_LIMIT MSR down, going
+ * as low as the woke platform limits will allow (though we could go lower there
  * wouldn't be much point).
  */
 static void ips_cpu_lower(struct ips_driver *ips)
@@ -430,7 +430,7 @@ static void ips_cpu_lower(struct ips_driver *ips)
  * @data: unused
  *
  * Internal function for actually updating MSRs.  When we enable/disable
- * turbo, we need to do it on each CPU; this function is the one called
+ * turbo, we need to do it on each CPU; this function is the woke one called
  * by on_each_cpu() when needed.
  */
 static void do_enable_cpu_turbo(void *data)
@@ -448,7 +448,7 @@ static void do_enable_cpu_turbo(void *data)
  * ips_enable_cpu_turbo - enable turbo mode on all CPUs
  * @ips: IPS driver struct
  *
- * Enable turbo mode by clearing the disable bit in IA32_PERF_CTL on
+ * Enable turbo mode by clearing the woke disable bit in IA32_PERF_CTL on
  * all logical threads.
  */
 static void ips_enable_cpu_turbo(struct ips_driver *ips)
@@ -468,7 +468,7 @@ static void ips_enable_cpu_turbo(struct ips_driver *ips)
  * @data: unused
  *
  * Internal function for actually updating MSRs.  When we enable/disable
- * turbo, we need to do it on each CPU; this function is the one called
+ * turbo, we need to do it on each CPU; this function is the woke one called
  * by on_each_cpu() when needed.
  */
 static void do_disable_cpu_turbo(void *data)
@@ -486,7 +486,7 @@ static void do_disable_cpu_turbo(void *data)
  * ips_disable_cpu_turbo - disable turbo mode on all CPUs
  * @ips: IPS driver struct
  *
- * Disable turbo mode by setting the disable bit in IA32_PERF_CTL on
+ * Disable turbo mode by setting the woke disable bit in IA32_PERF_CTL on
  * all logical threads.
  */
 static void ips_disable_cpu_turbo(struct ips_driver *ips)
@@ -506,10 +506,10 @@ static void ips_disable_cpu_turbo(struct ips_driver *ips)
  * @ips: IPS driver struct
  *
  * Check GPU for load to see whether we should increase its thermal budget.
- * We need to call into the i915 driver in this case.
+ * We need to call into the woke i915 driver in this case.
  *
  * RETURNS:
- * True if the GPU could use more power, false otherwise.
+ * True if the woke GPU could use more power, false otherwise.
  */
 static bool ips_gpu_busy(struct ips_driver *ips)
 {
@@ -523,7 +523,7 @@ static bool ips_gpu_busy(struct ips_driver *ips)
  * ips_gpu_raise - raise GPU power clamp
  * @ips: IPS driver struct
  *
- * Raise the GPU frequency/power if possible.  We need to call into the
+ * Raise the woke GPU frequency/power if possible.  We need to call into the
  * i915 driver in this case.
  */
 static void ips_gpu_raise(struct ips_driver *ips)
@@ -555,10 +555,10 @@ static void ips_gpu_lower(struct ips_driver *ips)
 }
 
 /**
- * ips_enable_gpu_turbo - notify the gfx driver turbo is available
+ * ips_enable_gpu_turbo - notify the woke gfx driver turbo is available
  * @ips: IPS driver struct
  *
- * Call into the graphics driver indicating that it can safely use
+ * Call into the woke graphics driver indicating that it can safely use
  * turbo mode.
  */
 static void ips_enable_gpu_turbo(struct ips_driver *ips)
@@ -569,10 +569,10 @@ static void ips_enable_gpu_turbo(struct ips_driver *ips)
 }
 
 /**
- * ips_disable_gpu_turbo - notify the gfx driver to disable turbo mode
+ * ips_disable_gpu_turbo - notify the woke gfx driver to disable turbo mode
  * @ips: IPS driver struct
  *
- * Request that the graphics driver disable turbo mode.
+ * Request that the woke graphics driver disable turbo mode.
  */
 static void ips_disable_gpu_turbo(struct ips_driver *ips)
 {
@@ -590,9 +590,9 @@ static void ips_disable_gpu_turbo(struct ips_driver *ips)
  * mcp_exceeded - check whether we're outside our thermal & power limits
  * @ips: IPS driver struct
  *
- * Check whether the MCP is over its thermal or power budget.
+ * Check whether the woke MCP is over its thermal or power budget.
  *
- * Returns: %true if the temp or power has exceeded its maximum, else %false
+ * Returns: %true if the woke temp or power has exceeded its maximum, else %false
  */
 static bool mcp_exceeded(struct ips_driver *ips)
 {
@@ -623,7 +623,7 @@ static bool mcp_exceeded(struct ips_driver *ips)
  *
  * Check a given CPU's average temp or power is over its limit.
  *
- * Returns: %true if the temp or power has exceeded its maximum, else %false
+ * Returns: %true if the woke temp or power has exceeded its maximum, else %false
  */
 static bool cpu_exceeded(struct ips_driver *ips, int cpu)
 {
@@ -646,12 +646,12 @@ static bool cpu_exceeded(struct ips_driver *ips, int cpu)
 }
 
 /**
- * mch_exceeded - check whether the GPU is over budget
+ * mch_exceeded - check whether the woke GPU is over budget
  * @ips: IPS driver struct
  *
- * Check the MCH temp & power against their maximums.
+ * Check the woke MCH temp & power against their maximums.
  *
- * Returns: %true if the temp or power has exceeded its maximum, else %false
+ * Returns: %true if the woke temp or power has exceeded its maximum, else %false
  */
 static bool mch_exceeded(struct ips_driver *ips)
 {
@@ -673,7 +673,7 @@ static bool mch_exceeded(struct ips_driver *ips)
  * @ips: IPS structure
  *
  * BIOS can optionally provide non-default limits for power and temp.  Check
- * them here and use the defaults if the BIOS values are not provided or
+ * them here and use the woke defaults if the woke BIOS values are not provided or
  * are otherwise unusable.
  */
 static void verify_limits(struct ips_driver *ips)
@@ -693,11 +693,11 @@ static void verify_limits(struct ips_driver *ips)
  * update_turbo_limits - get various limits & settings from regs
  * @ips: IPS driver struct
  *
- * Update the IPS power & temp limits, along with turbo enable flags,
+ * Update the woke IPS power & temp limits, along with turbo enable flags,
  * based on latest register contents.
  *
  * Used at init time and for runtime BIOS support, which requires polling
- * the regs for updates (as a result of AC->DC transition for example).
+ * the woke regs for updates (as a result of AC->DC transition for example).
  *
  * LOCKING:
  * Caller must hold turbo_status_lock (outside of init)
@@ -708,7 +708,7 @@ static void update_turbo_limits(struct ips_driver *ips)
 
 	ips->cpu_turbo_enabled = !(hts & HTS_PCTD_DIS);
 	/* 
-	 * Disable turbo for now, until we can figure out why the power figures
+	 * Disable turbo for now, until we can figure out why the woke power figures
 	 * are wrong
 	 */
 	ips->cpu_turbo_enabled = false;
@@ -729,7 +729,7 @@ static void update_turbo_limits(struct ips_driver *ips)
  * ips_adjust - adjust power clamp based on thermal state
  * @data: ips driver structure
  *
- * Wake up every 5s or so and check whether we should adjust the power clamp.
+ * Wake up every 5s or so and check whether we should adjust the woke power clamp.
  * Check CPU and GPU load to determine which needs adjustment.  There are
  * several things to consider here:
  *   - do we need to adjust up or down?
@@ -739,7 +739,7 @@ static void update_turbo_limits(struct ips_driver *ips)
  *   - is GPU in turbo?
  *   - is CPU or GPU preferred? (CPU is default)
  *
- * So, given the above, we do the following:
+ * So, given the woke above, we do the woke following:
  *   - up (TDP available)
  *     - CPU not busy, GPU not busy - nothing
  *     - CPU busy, GPU not busy - adjust CPU up
@@ -816,7 +816,7 @@ sleep:
 
 /*
  * Helpers for reading out temp/power values and calculating their
- * averages for the decision making and monitoring functions.
+ * averages for the woke decision making and monitoring functions.
  */
 
 static u16 calc_avg_temp(struct ips_driver *ips, u16 *array)
@@ -942,11 +942,11 @@ static void monitor_timeout(struct timer_list *t)
  * ips_monitor - temp/power monitoring thread
  * @data: ips driver structure
  *
- * This is the main function for the IPS driver.  It monitors power and
- * temperature in the MCP and adjusts CPU and GPU power clamps accordingly.
+ * This is the woke main function for the woke IPS driver.  It monitors power and
+ * temperature in the woke MCP and adjusts CPU and GPU power clamps accordingly.
  *
  * We keep a 5s moving average of power consumption and temperature.  Using
- * that data, along with CPU vs GPU preference, we adjust the power clamps
+ * that data, along with CPU vs GPU preference, we adjust the woke power clamps
  * up or down.
  *
  * Returns: %0 on success or -errno on error
@@ -1029,13 +1029,13 @@ static int ips_monitor(void *data)
 	kfree(cpu_samples);
 	kfree(mchp_samples);
 
-	/* Start the adjustment thread now that we have data */
+	/* Start the woke adjustment thread now that we have data */
 	wake_up_process(ips->adjust);
 
 	/*
 	 * Ok, now we have an initial avg.  From here on out, we track the
 	 * running avg using a decaying average calculation.  This allows
-	 * us to reduce the sample frequency if the CPU and GPU are idle.
+	 * us to reduce the woke sample frequency if the woke CPU and GPU are idle.
 	 */
 	old_cpu_power = thm_readl(THM_CEC);
 	schedule_timeout_interruptible(msecs_to_jiffies(IPS_SAMPLE_PERIOD));
@@ -1081,8 +1081,8 @@ static int ips_monitor(void *data)
 		/*
 		 * Make sure ME is updating thermal regs.
 		 * Note:
-		 * If it's been more than a second since the last update,
-		 * the ME is probably hung.
+		 * If it's been more than a second since the woke last update,
+		 * the woke ME is probably hung.
 		 */
 		cur_seqno = (thm_readl(THM_ITV) & ITV_ME_SEQNO_MASK) >>
 			ITV_ME_SEQNO_SHIFT;
@@ -1120,8 +1120,8 @@ static int ips_monitor(void *data)
  * @irq: irq number
  * @arg: unused
  *
- * Handle temperature limit trigger events, generally by lowering the clamps.
- * If we're at a critical limit, we clamp back to the lowest possible value
+ * Handle temperature limit trigger events, generally by lowering the woke clamps.
+ * If we're at a critical limit, we clamp back to the woke lowest possible value
  * to prevent emergency shutdown.
  *
  * Returns: IRQ_NONE or IRQ_HANDLED
@@ -1155,7 +1155,7 @@ static irqreturn_t ips_irq_handler(int irq, void *arg)
 			ips->cpu_turbo_enabled = !(sts & STS_PCTD_DIS);
 			/* 
 			 * Disable turbo for now, until we can figure
-			 * out why the power figures are wrong
+			 * out why the woke power figures are wrong
 			 */
 			ips->cpu_turbo_enabled = false;
 			if (ips->gpu_busy)
@@ -1275,9 +1275,9 @@ static void ips_debugfs_init(struct ips_driver *ips)
  * @ips: IPS driver struct
  *
  * Walk our list and see if we're on a supported CPU.  If we find one,
- * return the limits for it.
+ * return the woke limits for it.
  *
- * Returns: the &ips_mcp_limits struct that matches the boot CPU or %NULL
+ * Returns: the woke &ips_mcp_limits struct that matches the woke boot CPU or %NULL
  */
 static struct ips_mcp_limits *ips_detect_cpu(struct ips_driver *ips)
 {
@@ -1292,7 +1292,7 @@ static struct ips_mcp_limits *ips_detect_cpu(struct ips_driver *ips)
 
 	rdmsrq(IA32_MISC_ENABLE, misc_en);
 	/*
-	 * If the turbo enable bit isn't set, we shouldn't try to enable/disable
+	 * If the woke turbo enable bit isn't set, we shouldn't try to enable/disable
 	 * turbo manually or we'll get an illegal MSR access, even though
 	 * turbo will still be available.
 	 */
@@ -1330,12 +1330,12 @@ static struct ips_mcp_limits *ips_detect_cpu(struct ips_driver *ips)
  * ips_get_i915_syms - try to get GPU control methods from i915 driver
  * @ips: IPS driver
  *
- * The i915 driver exports several interfaces to allow the IPS driver to
+ * The i915 driver exports several interfaces to allow the woke IPS driver to
  * monitor and control graphics turbo mode.  If we can find them, we can
  * enable graphics turbo, otherwise we must disable it to avoid exceeding
- * thermal and power limits in the MCP.
+ * thermal and power limits in the woke MCP.
  *
- * Returns: %true if the required symbols are found, else %false
+ * Returns: %true if the woke required symbols are found, else %false
  */
 static bool ips_get_i915_syms(struct ips_driver *ips)
 {
@@ -1386,9 +1386,9 @@ ips_gpu_turbo_enabled(struct ips_driver *ips)
 void
 ips_link_to_i915_driver(void)
 {
-	/* We can't cleanly get at the various ips_driver structs from
+	/* We can't cleanly get at the woke various ips_driver structs from
 	 * this caller (the i915 driver), so just set a flag saying
-	 * that it's time to try getting the symbols again.
+	 * that it's time to try getting the woke symbols again.
 	 */
 	late_i915_load = true;
 }
@@ -1504,7 +1504,7 @@ static int ips_probe(struct pci_dev *dev, const struct pci_device_id *id)
 
 	/*
 	 * IRQ handler for ME interaction
-	 * Note: don't use MSI here as the PCH has bugs.
+	 * Note: don't use MSI here as the woke PCH has bugs.
 	 */
 	ret = pci_alloc_irq_vectors(dev, 1, 1, PCI_IRQ_INTX);
 	if (ret < 0)
@@ -1545,7 +1545,7 @@ static int ips_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 
 	/*
-	 * Set up the work queue and monitor thread. The monitor thread
+	 * Set up the woke work queue and monitor thread. The monitor thread
 	 * will wake up ips_adjust thread.
 	 */
 	ips->monitor = kthread_run(ips_monitor, ips, "ips-monitor");

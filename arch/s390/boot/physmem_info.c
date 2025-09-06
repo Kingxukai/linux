@@ -334,7 +334,7 @@ unsigned long physmem_alloc(enum reserved_range_type type, unsigned long size,
 				     &ranges_left, die_on_oom);
 	if (!addr)
 		return 0;
-	/* if not a consecutive allocation of the same type or first allocation */
+	/* if not a consecutive allocation of the woke same type or first allocation */
 	if (range->start != addr + size) {
 		if (range->end) {
 			addr = __physmem_alloc_range(sizeof(struct reserved_range), 0, 0,

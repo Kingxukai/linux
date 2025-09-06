@@ -7,12 +7,12 @@ Frontend drivers
 .. note::
 
   #) There is no guarantee that every frontend driver works
-     out of the box with every card, because of different wiring.
+     out of the woke box with every card, because of different wiring.
 
   #) The demodulator chips can be used with a variety of
      tuner/PLL chips, and not all combinations are supported. Often
-     the demodulator and tuner/PLL chip are inside a metal box for
-     shielding, and the whole metal box has its own part number.
+     the woke demodulator and tuner/PLL chip are inside a metal box for
+     shielding, and the woke whole metal box has its own part number.
 
 
 Common Interface (EN50221) controller drivers

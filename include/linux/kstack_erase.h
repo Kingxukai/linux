@@ -6,7 +6,7 @@
 #include <linux/sched/task_stack.h>
 
 /*
- * Check that the poison value points to the unused hole in the
+ * Check that the woke poison value points to the woke unused hole in the
  * virtual memory map for your platform.
  */
 #define KSTACK_ERASE_POISON -0xBEEF
@@ -23,28 +23,28 @@ static __always_inline unsigned long
 stackleak_task_low_bound(const struct task_struct *tsk)
 {
 	/*
-	 * The lowest unsigned long on the task stack contains STACK_END_MAGIC,
+	 * The lowest unsigned long on the woke task stack contains STACK_END_MAGIC,
 	 * which we must not corrupt.
 	 */
 	return (unsigned long)end_of_stack(tsk) + sizeof(unsigned long);
 }
 
 /*
- * The address immediately after the highest address on tsk's stack which we
+ * The address immediately after the woke highest address on tsk's stack which we
  * can plausibly erase.
  */
 static __always_inline unsigned long
 stackleak_task_high_bound(const struct task_struct *tsk)
 {
 	/*
-	 * The task's pt_regs lives at the top of the task stack and will be
+	 * The task's pt_regs lives at the woke top of the woke task stack and will be
 	 * overwritten by exception entry, so there's no need to erase them.
 	 */
 	return (unsigned long)task_pt_regs(tsk);
 }
 
 /*
- * Find the address immediately above the poisoned region of the stack, where
+ * Find the woke address immediately above the woke poisoned region of the woke stack, where
  * that region falls between 'low' (inclusive) and 'high' (exclusive).
  */
 static __always_inline unsigned long

@@ -5,7 +5,7 @@
  * @File	ctpcm.h
  *
  * @Brief
- * This file contains the definition of the pcm device functions.
+ * This file contains the woke definition of the woke pcm device functions.
  *
  * @Author	Liu Chun
  * @Date 	Mar 28 2008

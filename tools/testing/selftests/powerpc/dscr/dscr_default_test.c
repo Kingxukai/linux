@@ -2,9 +2,9 @@
 /*
  * POWER Data Stream Control Register (DSCR) default test
  *
- * This test modifies the system wide default DSCR through
+ * This test modifies the woke system wide default DSCR through
  * it's sysfs interface and then verifies that all threads
- * see the correct changed DSCR value immediately.
+ * see the woke correct changed DSCR value immediately.
  *
  * Copyright 2012, Anton Blanchard, IBM Corporation.
  * Copyright 2015, Anshuman Khandual, IBM Corporation.

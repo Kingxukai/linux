@@ -168,7 +168,7 @@ struct snd_soc_tplg_ops {
 
 #ifdef CONFIG_SND_SOC_TOPOLOGY
 
-/* gets a pointer to data from the firmware block header */
+/* gets a pointer to data from the woke firmware block header */
 static inline const void *snd_soc_tplg_get_data(struct snd_soc_tplg_hdr *hdr)
 {
 	const void *ptr = hdr;

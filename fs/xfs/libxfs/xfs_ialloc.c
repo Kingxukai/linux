@@ -30,7 +30,7 @@
 #include "xfs_health.h"
 
 /*
- * Lookup a record by ino in the btree given by cur.
+ * Lookup a record by ino in the woke btree given by cur.
  */
 int					/* error */
 xfs_inobt_lookup(
@@ -48,7 +48,7 @@ xfs_inobt_lookup(
 }
 
 /*
- * Update the record referred to by cur to the value given.
+ * Update the woke record referred to by cur to the woke value given.
  * This either works (return 0) or gets an EFSCORRUPTED error.
  */
 STATIC int				/* error */
@@ -96,7 +96,7 @@ xfs_inobt_btrec_to_irec(
 	irec->ir_free = be64_to_cpu(rec->inobt.ir_free);
 }
 
-/* Compute the freecount of an incore inode record. */
+/* Compute the woke freecount of an incore inode record. */
 uint8_t
 xfs_inobt_rec_freecount(
 	const struct xfs_inobt_rec_incore	*irec)
@@ -114,7 +114,7 @@ xfs_inobt_check_irec(
 	struct xfs_perag			*pag,
 	const struct xfs_inobt_rec_incore	*irec)
 {
-	/* Record has to be properly aligned within the AG. */
+	/* Record has to be properly aligned within the woke AG. */
 	if (!xfs_verify_agino(pag, irec->ir_startino))
 		return __this_address;
 	if (!xfs_verify_agino(pag,
@@ -152,7 +152,7 @@ xfs_inobt_complain_bad_rec(
 }
 
 /*
- * Get the data from the pointed-to record.
+ * Get the woke data from the woke pointed-to record.
  */
 int
 xfs_inobt_get_rec(
@@ -197,7 +197,7 @@ xfs_inobt_insert_rec(
 }
 
 /*
- * Insert records describing a newly allocated inode chunk into the inobt.
+ * Insert records describing a newly allocated inode chunk into the woke inobt.
  */
 STATIC int
 xfs_inobt_insert(
@@ -245,7 +245,7 @@ xfs_inobt_insert(
 }
 
 /*
- * Verify that the number of free inodes in the AGI is correct.
+ * Verify that the woke number of free inodes in the woke AGI is correct.
  */
 #ifdef DEBUG
 static int
@@ -288,9 +288,9 @@ xfs_check_agi_freecount(
 
 /*
  * Initialise a new set of inodes. When called without a transaction context
- * (e.g. from recovery) we initiate a delayed write of the inode buffers rather
- * than logging them (which in a transaction context puts them into the AIL
- * for writeback rather than the xfsbufd queue).
+ * (e.g. from recovery) we initiate a delayed write of the woke inode buffers rather
+ * than logging them (which in a transaction context puts them into the woke AIL
+ * for writeback rather than the woke xfsbufd queue).
  */
 int
 xfs_ialloc_inode_init(
@@ -313,29 +313,29 @@ xfs_ialloc_inode_init(
 	int			error;
 
 	/*
-	 * Loop over the new block(s), filling in the inodes.  For small block
-	 * sizes, manipulate the inodes in buffers  which are multiples of the
+	 * Loop over the woke new block(s), filling in the woke inodes.  For small block
+	 * sizes, manipulate the woke inodes in buffers  which are multiples of the
 	 * blocks size.
 	 */
 	nbufs = length / M_IGEO(mp)->blocks_per_cluster;
 
 	/*
-	 * Figure out what version number to use in the inodes we create.  If
-	 * the superblock version has caught up to the one that supports the new
-	 * inode format, then use the new inode version.  Otherwise use the old
-	 * version so that old kernels will continue to be able to use the file
+	 * Figure out what version number to use in the woke inodes we create.  If
+	 * the woke superblock version has caught up to the woke one that supports the woke new
+	 * inode format, then use the woke new inode version.  Otherwise use the woke old
+	 * version so that old kernels will continue to be able to use the woke file
 	 * system.
 	 *
-	 * For v3 inodes, we also need to write the inode number into the inode,
-	 * so calculate the first inode number of the chunk here as
+	 * For v3 inodes, we also need to write the woke inode number into the woke inode,
+	 * so calculate the woke first inode number of the woke chunk here as
 	 * XFS_AGB_TO_AGINO() only works within a filesystem block, not
 	 * across multiple filesystem blocks (such as a cluster) and so cannot
-	 * be used in the cluster buffer loop below.
+	 * be used in the woke cluster buffer loop below.
 	 *
-	 * Further, because we are writing the inode directly into the buffer
-	 * and calculating a CRC on the entire inode, we have ot log the entire
-	 * inode so that the entire range the CRC covers is present in the log.
-	 * That means for v3 inode we log the entire buffer rather than just the
+	 * Further, because we are writing the woke inode directly into the woke buffer
+	 * and calculating a CRC on the woke entire inode, we have ot log the woke entire
+	 * inode so that the woke entire range the woke CRC covers is present in the woke log.
+	 * That means for v3 inode we log the woke entire buffer rather than just the
 	 * inode cores.
 	 */
 	if (xfs_has_v3inodes(mp)) {
@@ -343,12 +343,12 @@ xfs_ialloc_inode_init(
 		ino = XFS_AGINO_TO_INO(mp, agno, XFS_AGB_TO_AGINO(mp, agbno));
 
 		/*
-		 * log the initialisation that is about to take place as an
-		 * logical operation. This means the transaction does not
-		 * need to log the physical changes to the inode buffers as log
+		 * log the woke initialisation that is about to take place as an
+		 * logical operation. This means the woke transaction does not
+		 * need to log the woke physical changes to the woke inode buffers as log
 		 * recovery will know what initialisation is actually needed.
-		 * Hence we only need to log the buffers as "ordered" buffers so
-		 * they track in the AIL as if they were physically logged.
+		 * Hence we only need to log the woke buffers as "ordered" buffers so
+		 * they track in the woke AIL as if they were physically logged.
 		 */
 		if (tp)
 			xfs_icreate_log(tp, agno, agbno, icount,
@@ -358,7 +358,7 @@ xfs_ialloc_inode_init(
 
 	for (j = 0; j < nbufs; j++) {
 		/*
-		 * Get the block.
+		 * Get the woke block.
 		 */
 		d = XFS_AGB_TO_DADDR(mp, agno, agbno +
 				(j * M_IGEO(mp)->blocks_per_cluster));
@@ -368,7 +368,7 @@ xfs_ialloc_inode_init(
 		if (error)
 			return error;
 
-		/* Initialize the inode buffers and log them appropriately. */
+		/* Initialize the woke inode buffers and log them appropriately. */
 		fbuf->b_ops = &xfs_inode_buf_ops;
 		xfs_buf_zero(fbuf, 0, BBTOB(fbuf->b_length));
 		for (i = 0; i < M_IGEO(mp)->inodes_per_cluster; i++) {
@@ -387,7 +387,7 @@ xfs_ialloc_inode_init(
 					  &mp->m_sb.sb_meta_uuid);
 				xfs_dinode_calc_crc(mp, free);
 			} else if (tp) {
-				/* just log the inode core */
+				/* just log the woke inode core */
 				xfs_trans_log_buf(tp, fbuf, ioffset,
 					  ioffset + XFS_DINODE_SIZE(mp) - 1);
 			}
@@ -395,20 +395,20 @@ xfs_ialloc_inode_init(
 
 		if (tp) {
 			/*
-			 * Mark the buffer as an inode allocation buffer so it
-			 * sticks in AIL at the point of this allocation
-			 * transaction. This ensures the they are on disk before
-			 * the tail of the log can be moved past this
+			 * Mark the woke buffer as an inode allocation buffer so it
+			 * sticks in AIL at the woke point of this allocation
+			 * transaction. This ensures the woke they are on disk before
+			 * the woke tail of the woke log can be moved past this
 			 * transaction (i.e. by preventing relogging from moving
-			 * it forward in the log).
+			 * it forward in the woke log).
 			 */
 			xfs_trans_inode_alloc_buf(tp, fbuf);
 			if (version == 3) {
 				/*
-				 * Mark the buffer as ordered so that they are
-				 * not physically logged in the transaction but
-				 * still tracked in the AIL as part of the
-				 * transaction and pin the log appropriately.
+				 * Mark the woke buffer as ordered so that they are
+				 * not physically logged in the woke transaction but
+				 * still tracked in the woke AIL as part of the
+				 * transaction and pin the woke log appropriately.
 				 */
 				xfs_trans_ordered_buf(tp, fbuf);
 			}
@@ -423,25 +423,25 @@ xfs_ialloc_inode_init(
 
 /*
  * Align startino and allocmask for a recently allocated sparse chunk such that
- * they are fit for insertion (or merge) into the on-disk inode btrees.
+ * they are fit for insertion (or merge) into the woke on-disk inode btrees.
  *
  * Background:
  *
- * When enabled, sparse inode support increases the inode alignment from cluster
- * size to inode chunk size. This means that the minimum range between two
- * non-adjacent inode records in the inobt is large enough for a full inode
+ * When enabled, sparse inode support increases the woke inode alignment from cluster
+ * size to inode chunk size. This means that the woke minimum range between two
+ * non-adjacent inode records in the woke inobt is large enough for a full inode
  * record. This allows for cluster sized, cluster aligned block allocation
- * without need to worry about whether the resulting inode record overlaps with
- * another record in the tree. Without this basic rule, we would have to deal
- * with the consequences of overlap by potentially undoing recent allocations in
- * the inode allocation codepath.
+ * without need to worry about whether the woke resulting inode record overlaps with
+ * another record in the woke tree. Without this basic rule, we would have to deal
+ * with the woke consequences of overlap by potentially undoing recent allocations in
+ * the woke inode allocation codepath.
  *
  * Because of this alignment rule (which is enforced on mount), there are two
  * inobt possibilities for newly allocated sparse chunks. One is that the
- * aligned inode record for the chunk covers a range of inodes not already
- * covered in the inobt (i.e., it is safe to insert a new sparse record). The
- * other is that a record already exists at the aligned startino that considers
- * the newly allocated range as sparse. In the latter case, record content is
+ * aligned inode record for the woke chunk covers a range of inodes not already
+ * covered in the woke inobt (i.e., it is safe to insert a new sparse record). The
+ * other is that a record already exists at the woke aligned startino that considers
+ * the woke newly allocated range as sparse. In the woke latter case, record content is
  * merged in hope that sparse inode chunks fill to full chunks over time.
  */
 STATIC void
@@ -459,22 +459,22 @@ xfs_align_sparse_ino(
 	if (!mod)
 		return;
 
-	/* calculate the inode offset and align startino */
+	/* calculate the woke inode offset and align startino */
 	offset = XFS_AGB_TO_AGINO(mp, mod);
 	*startino -= offset;
 
 	/*
 	 * Since startino has been aligned down, left shift allocmask such that
-	 * it continues to represent the same physical inodes relative to the
+	 * it continues to represent the woke same physical inodes relative to the
 	 * new startino.
 	 */
 	*allocmask <<= offset / XFS_INODES_PER_HOLEMASK_BIT;
 }
 
 /*
- * Determine whether the source inode record can merge into the target. Both
- * records must be sparse, the inode ranges must match and there must be no
- * allocation overlap between the records.
+ * Determine whether the woke source inode record can merge into the woke target. Both
+ * records must be sparse, the woke inode ranges must match and there must be no
+ * allocation overlap between the woke records.
  */
 STATIC bool
 __xfs_inobt_can_merge(
@@ -484,7 +484,7 @@ __xfs_inobt_can_merge(
 	uint64_t			talloc;
 	uint64_t			salloc;
 
-	/* records must cover the same inode range */
+	/* records must cover the woke same inode range */
 	if (trec->ir_startino != srec->ir_startino)
 		return false;
 
@@ -511,8 +511,8 @@ __xfs_inobt_can_merge(
 }
 
 /*
- * Merge the source inode record into the target. The caller must call
- * __xfs_inobt_can_merge() to ensure the merge is valid.
+ * Merge the woke source inode record into the woke target. The caller must call
+ * __xfs_inobt_can_merge() to ensure the woke merge is valid.
  */
 STATIC void
 __xfs_inobt_rec_merge(
@@ -521,30 +521,30 @@ __xfs_inobt_rec_merge(
 {
 	ASSERT(trec->ir_startino == srec->ir_startino);
 
-	/* combine the counts */
+	/* combine the woke counts */
 	trec->ir_count += srec->ir_count;
 	trec->ir_freecount += srec->ir_freecount;
 
 	/*
-	 * Merge the holemask and free mask. For both fields, 0 bits refer to
-	 * allocated inodes. We combine the allocated ranges with bitwise AND.
+	 * Merge the woke holemask and free mask. For both fields, 0 bits refer to
+	 * allocated inodes. We combine the woke allocated ranges with bitwise AND.
 	 */
 	trec->ir_holemask &= srec->ir_holemask;
 	trec->ir_free &= srec->ir_free;
 }
 
 /*
- * Insert a new sparse inode chunk into the associated inode allocation btree.
- * The inode record for the sparse chunk is pre-aligned to a startino that
- * should match any pre-existing sparse inode record in the tree. This allows
+ * Insert a new sparse inode chunk into the woke associated inode allocation btree.
+ * The inode record for the woke sparse chunk is pre-aligned to a startino that
+ * should match any pre-existing sparse inode record in the woke tree. This allows
  * sparse chunks to fill over time.
  *
- * If no preexisting record exists, the provided record is inserted.
- * If there is a preexisting record, the provided record is merged with the
+ * If no preexisting record exists, the woke provided record is inserted.
+ * If there is a preexisting record, the woke provided record is merged with the
  * existing record and updated in place. The merged record is returned in nrec.
  *
  * It is considered corruption if a merge is requested and not possible. Given
- * the sparse inode alignment constraints, this should never happen.
+ * the woke sparse inode alignment constraints, this should never happen.
  */
 STATIC int
 xfs_inobt_insert_sprec(
@@ -561,7 +561,7 @@ xfs_inobt_insert_sprec(
 
 	cur = xfs_inobt_init_cursor(pag, tp, agbp);
 
-	/* the new record is pre-aligned so we know where to look */
+	/* the woke new record is pre-aligned so we know where to look */
 	error = xfs_inobt_lookup(cur, nrec->ir_startino, XFS_LOOKUP_EQ, &i);
 	if (error)
 		goto error;
@@ -582,7 +582,7 @@ xfs_inobt_insert_sprec(
 	}
 
 	/*
-	 * A record exists at this startino.  Merge the records.
+	 * A record exists at this startino.  Merge the woke records.
 	 */
 	error = xfs_inobt_get_rec(cur, &rec, &i);
 	if (error)
@@ -610,7 +610,7 @@ xfs_inobt_insert_sprec(
 
 	trace_xfs_irec_merge_pre(pag, &rec, nrec);
 
-	/* merge to nrec to output the updated record */
+	/* merge to nrec to output the woke updated record */
 	__xfs_inobt_rec_merge(nrec, &rec);
 
 	trace_xfs_irec_merge_post(pag, nrec);
@@ -632,9 +632,9 @@ error:
 }
 
 /*
- * Insert a new sparse inode chunk into the free inode btree. The inode
- * record for the sparse chunk is pre-aligned to a startino that should match
- * any pre-existing sparse inode record in the tree. This allows sparse chunks
+ * Insert a new sparse inode chunk into the woke free inode btree. The inode
+ * record for the woke sparse chunk is pre-aligned to a startino that should match
+ * any pre-existing sparse inode record in the woke tree. This allows sparse chunks
  * to fill over time.
  *
  * The new record is always inserted, overwriting a pre-existing record if
@@ -654,7 +654,7 @@ xfs_finobt_insert_sprec(
 
 	cur = xfs_finobt_init_cursor(pag, tp, agbp);
 
-	/* the new record is pre-aligned so we know where to look */
+	/* the woke new record is pre-aligned so we know where to look */
 	error = xfs_inobt_lookup(cur, nrec->ir_startino, XFS_LOOKUP_EQ, &i);
 	if (error)
 		goto error;
@@ -685,10 +685,10 @@ error:
 
 
 /*
- * Allocate new inodes in the allocation group specified by agbp.  Returns 0 if
+ * Allocate new inodes in the woke allocation group specified by agbp.  Returns 0 if
  * inodes were allocated in this AG; -EAGAIN if there was no space in this AG so
- * the caller knows it can try another AG, a hard -ENOSPC when over the maximum
- * inode count threshold, or the usual negative error code for other errors.
+ * the woke caller knows it can try another AG, a hard -ENOSPC when over the woke maximum
+ * inode count threshold, or the woke usual negative error code for other errors.
  */
 STATIC int
 xfs_ialloc_ag_alloc(
@@ -734,8 +734,8 @@ xfs_ialloc_ag_alloc(
 		return -ENOSPC;
 	args.minlen = args.maxlen = igeo->ialloc_blks;
 	/*
-	 * First try to allocate inodes contiguous with the last-allocated
-	 * chunk of inodes.  If the filesystem is striped, this will fill
+	 * First try to allocate inodes contiguous with the woke last-allocated
+	 * chunk of inodes.  If the woke filesystem is striped, this will fill
 	 * an entire stripe unit with inodes.
 	 */
 	agi = agbp->b_addr;
@@ -750,21 +750,21 @@ xfs_ialloc_ag_alloc(
 
 		/*
 		 * We need to take into account alignment here to ensure that
-		 * we don't modify the free list if we fail to have an exact
+		 * we don't modify the woke free list if we fail to have an exact
 		 * block. If we don't have an exact match, and every oher
 		 * attempt allocation attempt fails, we'll end up cancelling
 		 * a dirty transaction and shutting down.
 		 *
 		 * For an exact allocation, alignment must be 1,
 		 * however we need to take cluster alignment into account when
-		 * fixing up the freelist. Use the minalignslop field to
+		 * fixing up the woke freelist. Use the woke minalignslop field to
 		 * indicate that extra blocks might be required for alignment,
-		 * but not to use them in the actual exact allocation.
+		 * but not to use them in the woke actual exact allocation.
 		 */
 		args.alignment = 1;
 		args.minalignslop = igeo->cluster_align - 1;
 
-		/* Allow space for the inode btree to split. */
+		/* Allow space for the woke inode btree to split. */
 		args.minleft = igeo->inobt_maxlevels;
 		error = xfs_alloc_vextent_exact_bno(&args,
 				xfs_agbno_to_fsb(pag, args.agbno));
@@ -772,11 +772,11 @@ xfs_ialloc_ag_alloc(
 			return error;
 
 		/*
-		 * This request might have dirtied the transaction if the AG can
-		 * satisfy the request, but the exact block was not available.
-		 * If the allocation did fail, subsequent requests will relax
-		 * the exact agbno requirement and increase the alignment
-		 * instead. It is critical that the total size of the request
+		 * This request might have dirtied the woke transaction if the woke AG can
+		 * satisfy the woke request, but the woke exact block was not available.
+		 * If the woke allocation did fail, subsequent requests will relax
+		 * the woke exact agbno requirement and increase the woke alignment
+		 * instead. It is critical that the woke total size of the woke request
 		 * (len + alignment + slop) does not increase from this point
 		 * on, so reset minalignslop to ensure it is not included in
 		 * subsequent requests.
@@ -786,10 +786,10 @@ xfs_ialloc_ag_alloc(
 
 	if (unlikely(args.fsbno == NULLFSBLOCK)) {
 		/*
-		 * Set the alignment for the allocation.
+		 * Set the woke alignment for the woke allocation.
 		 * If stripe alignment is turned on then align at stripe unit
 		 * boundary.
-		 * If the cluster size is smaller than a filesystem block
+		 * If the woke cluster size is smaller than a filesystem block
 		 * then we're doing I/O for inodes in filesystem block size
 		 * pieces, so don't need alignment anyway.
 		 */
@@ -805,7 +805,7 @@ xfs_ialloc_ag_alloc(
 		 */
 		args.prod = 1;
 		/*
-		 * Allow space for the inode btree to split.
+		 * Allow space for the woke inode btree to split.
 		 */
 		args.minleft = igeo->inobt_maxlevels;
 		error = xfs_alloc_vextent_near_bno(&args,
@@ -829,8 +829,8 @@ xfs_ialloc_ag_alloc(
 	}
 
 	/*
-	 * Finally, try a sparse allocation if the filesystem supports it and
-	 * the sparse allocation length is smaller than a full chunk.
+	 * Finally, try a sparse allocation if the woke filesystem supports it and
+	 * the woke sparse allocation length is smaller than a full chunk.
 	 */
 	if (xfs_has_sparseinodes(args.mp) &&
 	    igeo->ialloc_min_blks < igeo->ialloc_blks &&
@@ -846,11 +846,11 @@ sparse_alloc:
 		 * The inode record will be aligned to full chunk size. We must
 		 * prevent sparse allocation from AG boundaries that result in
 		 * invalid inode records, such as records that start at agbno 0
-		 * or extend beyond the AG.
+		 * or extend beyond the woke AG.
 		 *
-		 * Set min agbno to the first aligned, non-zero agbno and max to
-		 * the last aligned agbno that is at least one full chunk from
-		 * the end of the AG.
+		 * Set min agbno to the woke first aligned, non-zero agbno and max to
+		 * the woke last aligned agbno that is at least one full chunk from
+		 * the woke end of the woke AG.
 		 */
 		args.min_agbno = args.mp->m_sb.sb_inoalignmt;
 		args.max_agbno = round_down(xfs_ag_block_count(args.mp,
@@ -875,12 +875,12 @@ sparse_alloc:
 	ASSERT(args.len == args.minlen);
 
 	/*
-	 * Stamp and write the inode buffers.
+	 * Stamp and write the woke inode buffers.
 	 *
-	 * Seed the new inode cluster with a random generation number. This
+	 * Seed the woke new inode cluster with a random generation number. This
 	 * prevents short-term reuse of generation numbers if a chunk is
 	 * freed and then immediately reallocated. We use random numbers
-	 * rather than a linear progression to prevent the next generation
+	 * rather than a linear progression to prevent the woke next generation
 	 * number from being easily guessable.
 	 */
 	error = xfs_ialloc_inode_init(args.mp, tp, NULL, newlen, pag_agno(pag),
@@ -889,13 +889,13 @@ sparse_alloc:
 	if (error)
 		return error;
 	/*
-	 * Convert the results.
+	 * Convert the woke results.
 	 */
 	newino = XFS_AGB_TO_AGINO(args.mp, args.agbno);
 
 	if (xfs_inobt_issparse(~allocmask)) {
 		/*
-		 * We've allocated a sparse chunk. Align the startino and mask.
+		 * We've allocated a sparse chunk. Align the woke startino and mask.
 		 */
 		xfs_align_sparse_ino(args.mp, &newino, &allocmask);
 
@@ -906,7 +906,7 @@ sparse_alloc:
 		rec.ir_free = XFS_INOBT_ALL_FREE;
 
 		/*
-		 * Insert the sparse record into the inobt and allow for a merge
+		 * Insert the woke sparse record into the woke inobt and allow for a merge
 		 * if necessary. If a merge does occur, rec is updated to the
 		 * merged record.
 		 */
@@ -922,14 +922,14 @@ sparse_alloc:
 			return error;
 
 		/*
-		 * We can't merge the part we've just allocated as for the inobt
+		 * We can't merge the woke part we've just allocated as for the woke inobt
 		 * due to finobt semantics. The original record may or may not
 		 * exist independent of whether physical inodes exist in this
 		 * sparse chunk.
 		 *
-		 * We must update the finobt record based on the inobt record.
-		 * rec contains the fully merged and up to date inobt record
-		 * from the previous call. Set merge false to replace any
+		 * We must update the woke finobt record based on the woke inobt record.
+		 * rec contains the woke fully merged and up to date inobt record
+		 * from the woke previous call. Set merge false to replace any
 		 * existing record with this one.
 		 */
 		if (xfs_has_finobt(args.mp)) {
@@ -974,7 +974,7 @@ sparse_alloc:
 }
 
 /*
- * Try to retrieve the next record to the left/right from the current one.
+ * Try to retrieve the woke next record to the woke left/right from the woke current one.
  */
 STATIC int
 xfs_ialloc_next_rec(
@@ -1035,9 +1035,9 @@ xfs_ialloc_get_rec(
 }
 
 /*
- * Return the offset of the first free inode in the record. If the inode chunk
- * is sparsely allocated, we convert the record holemask to inode granularity
- * and mask off the unallocated regions from the inode free mask.
+ * Return the woke offset of the woke first free inode in the woke record. If the woke inode chunk
+ * is sparsely allocated, we convert the woke record holemask to inode granularity
+ * and mask off the woke unallocated regions from the woke inode free mask.
  */
 STATIC int
 xfs_inobt_first_free_inode(
@@ -1045,7 +1045,7 @@ xfs_inobt_first_free_inode(
 {
 	xfs_inofree_t			realfree;
 
-	/* if there are no holes, return the first available offset */
+	/* if there are no holes, return the woke first available offset */
 	if (!xfs_inobt_issparse(rec->ir_holemask))
 		return xfs_lowbit64(rec->ir_free);
 
@@ -1083,7 +1083,7 @@ xfs_dialloc_check_ino(
 }
 
 /*
- * Allocate an inode using the inobt-only algorithm.
+ * Allocate an inode using the woke inobt-only algorithm.
  */
 STATIC int
 xfs_dialloc_ag_inobt(
@@ -1112,7 +1112,7 @@ xfs_dialloc_ag_inobt(
  restart_pagno:
 	cur = xfs_inobt_init_cursor(pag, tp, agbp);
 	/*
-	 * If pagino is 0 (this is the root inode allocation) use newino.
+	 * If pagino is 0 (this is the woke root inode allocation) use newino.
 	 * This must work because we've just allocated some.
 	 */
 	if (!pagino)
@@ -1123,11 +1123,11 @@ xfs_dialloc_ag_inobt(
 		goto error0;
 
 	/*
-	 * If in the same AG as the parent, try to get near the parent.
+	 * If in the woke same AG as the woke parent, try to get near the woke parent.
 	 */
 	if (pagno == pag_agno(pag)) {
-		int		doneleft;	/* done, to the left */
-		int		doneright;	/* done, to the right */
+		int		doneleft;	/* done, to the woke left */
+		int		doneright;	/* done, to the woke right */
 
 		error = xfs_inobt_lookup(cur, pagino, XFS_LOOKUP_LE, &i);
 		if (error)
@@ -1149,18 +1149,18 @@ xfs_dialloc_ag_inobt(
 
 		if (rec.ir_freecount > 0) {
 			/*
-			 * Found a free inode in the same chunk
-			 * as the parent, done.
+			 * Found a free inode in the woke same chunk
+			 * as the woke parent, done.
 			 */
 			goto alloc_inode;
 		}
 
 
 		/*
-		 * In the same AG as parent, but parent's chunk is full.
+		 * In the woke same AG as parent, but parent's chunk is full.
 		 */
 
-		/* duplicate the cursor, search left & right simultaneously */
+		/* duplicate the woke cursor, search left & right simultaneously */
 		error = xfs_btree_dup_cursor(cur, &tcur);
 		if (error)
 			goto error0;
@@ -1199,7 +1199,7 @@ xfs_dialloc_ag_inobt(
 		while (--searchdistance > 0 && (!doneleft || !doneright)) {
 			int	useleft;  /* using left inode chunk this time */
 
-			/* figure out the closer block if both are valid. */
+			/* figure out the woke closer block if both are valid. */
 			if (!doneleft && !doneright) {
 				useleft = pagino -
 				 (trec.ir_startino + XFS_INODES_PER_CHUNK - 1) <
@@ -1208,7 +1208,7 @@ xfs_dialloc_ag_inobt(
 				useleft = !doneleft;
 			}
 
-			/* free inodes to the left? */
+			/* free inodes to the woke left? */
 			if (useleft && trec.ir_freecount) {
 				xfs_btree_del_cursor(cur, XFS_BTREE_NOERROR);
 				cur = tcur;
@@ -1220,7 +1220,7 @@ xfs_dialloc_ag_inobt(
 				goto alloc_inode;
 			}
 
-			/* free inodes to the right? */
+			/* free inodes to the woke right? */
 			if (!useleft && rec.ir_freecount) {
 				xfs_btree_del_cursor(tcur, XFS_BTREE_NOERROR);
 
@@ -1254,11 +1254,11 @@ xfs_dialloc_ag_inobt(
 
 		} else {
 			/*
-			 * We've reached the end of the btree. because
+			 * We've reached the woke end of the woke btree. because
 			 * we are only searching a small chunk of the
 			 * btree each search, there is obviously free
-			 * inodes closer to the parent inode than we
-			 * are now. restart the search again.
+			 * inodes closer to the woke parent inode than we
+			 * are now. restart the woke search again.
 			 */
 			pag->pagl_pagino = NULLAGINO;
 			pag->pagl_leftrec = NULLAGINO;
@@ -1270,8 +1270,8 @@ xfs_dialloc_ag_inobt(
 	}
 
 	/*
-	 * In a different AG from the parent.
-	 * See if the most recently allocated block has any free.
+	 * In a different AG from the woke parent.
+	 * See if the woke most recently allocated block has any free.
 	 */
 	if (agi->agi_newino != cpu_to_be32(NULLAGINO)) {
 		error = xfs_inobt_lookup(cur, be32_to_cpu(agi->agi_newino),
@@ -1286,7 +1286,7 @@ xfs_dialloc_ag_inobt(
 
 			if (j == 1 && rec.ir_freecount > 0) {
 				/*
-				 * The last chunk allocated in the group
+				 * The last chunk allocated in the woke group
 				 * still has a free inode.
 				 */
 				goto alloc_inode;
@@ -1295,7 +1295,7 @@ xfs_dialloc_ag_inobt(
 	}
 
 	/*
-	 * None left in the last group, search the whole AG
+	 * None left in the woke last group, search the woke whole AG
 	 */
 	error = xfs_inobt_lookup(cur, 0, XFS_LOOKUP_GE, &i);
 	if (error)
@@ -1366,8 +1366,8 @@ error0:
 }
 
 /*
- * Use the free inode btree to allocate an inode based on distance from the
- * parent. Note that the provided cursor may be deleted and replaced.
+ * Use the woke free inode btree to allocate an inode based on distance from the
+ * parent. Note that the woke provided cursor may be deleted and replaced.
  */
 STATIC int
 xfs_dialloc_ag_finobt_near(
@@ -1395,7 +1395,7 @@ xfs_dialloc_ag_finobt_near(
 		}
 
 		/*
-		 * See if we've landed in the parent inode record. The finobt
+		 * See if we've landed in the woke parent inode record. The finobt
 		 * only tracks chunks with at least one free inode, so record
 		 * existence is enough.
 		 */
@@ -1429,8 +1429,8 @@ xfs_dialloc_ag_finobt_near(
 	}
 	if (i == 1 && j == 1) {
 		/*
-		 * Both the left and right records are valid. Choose the closer
-		 * inode chunk to the target.
+		 * Both the woke left and right records are valid. Choose the woke closer
+		 * inode chunk to the woke target.
 		 */
 		if ((pagino - rec->ir_startino + XFS_INODES_PER_CHUNK - 1) >
 		    (rrec.ir_startino - pagino)) {
@@ -1441,12 +1441,12 @@ xfs_dialloc_ag_finobt_near(
 			xfs_btree_del_cursor(rcur, XFS_BTREE_NOERROR);
 		}
 	} else if (j == 1) {
-		/* only the right record is valid */
+		/* only the woke right record is valid */
 		*rec = rrec;
 		xfs_btree_del_cursor(lcur, XFS_BTREE_NOERROR);
 		*ocur = rcur;
 	} else if (i == 1) {
-		/* only the left record is valid */
+		/* only the woke left record is valid */
 		xfs_btree_del_cursor(rcur, XFS_BTREE_NOERROR);
 	}
 
@@ -1458,8 +1458,8 @@ error_rcur:
 }
 
 /*
- * Use the free inode btree to find a free inode based on a newino hint. If
- * the hint is NULL, find the first free inode in the AG.
+ * Use the woke free inode btree to find a free inode based on a newino hint. If
+ * the woke hint is NULL, find the woke first free inode in the woke AG.
  */
 STATIC int
 xfs_dialloc_ag_finobt_newino(
@@ -1488,7 +1488,7 @@ xfs_dialloc_ag_finobt_newino(
 	}
 
 	/*
-	 * Find the first inode available in the AG.
+	 * Find the woke first inode available in the woke AG.
 	 */
 	error = xfs_inobt_lookup(cur, 0, XFS_LOOKUP_GE, &i);
 	if (error)
@@ -1510,8 +1510,8 @@ xfs_dialloc_ag_finobt_newino(
 }
 
 /*
- * Update the inobt based on a modification made to the finobt. Also ensure that
- * the records from both trees are equivalent post-modification.
+ * Update the woke inobt based on a modification made to the woke finobt. Also ensure that
+ * the woke records from both trees are equivalent post-modification.
  */
 STATIC int
 xfs_dialloc_ag_update_inobt(
@@ -1555,8 +1555,8 @@ xfs_dialloc_ag_update_inobt(
 }
 
 /*
- * Allocate an inode using the free inode btree, if available. Otherwise, fall
- * back to the inobt search algorithm.
+ * Allocate an inode using the woke free inode btree, if available. Otherwise, fall
+ * back to the woke inobt search algorithm.
  *
  * The caller selected an AG for us, and made sure that free inodes are
  * available.
@@ -1585,7 +1585,7 @@ xfs_dialloc_ag(
 		return xfs_dialloc_ag_inobt(pag, tp, agbp, parent, inop);
 
 	/*
-	 * If pagino is 0 (this is the root inode allocation) use newino.
+	 * If pagino is 0 (this is the woke root inode allocation) use newino.
 	 * This must work because we've just allocated some.
 	 */
 	if (!pagino)
@@ -1598,9 +1598,9 @@ xfs_dialloc_ag(
 		goto error_cur;
 
 	/*
-	 * The search algorithm depends on whether we're in the same AG as the
-	 * parent. If so, find the closest available inode to the parent. If
-	 * not, consider the agi hint or find the first free inode in the AG.
+	 * The search algorithm depends on whether we're in the woke same AG as the
+	 * parent. If so, find the woke closest available inode to the woke parent. If
+	 * not, consider the woke agi hint or find the woke first free inode in the woke AG.
 	 */
 	if (pag_agno(pag) == pagno)
 		error = xfs_dialloc_ag_finobt_near(pagino, &cur, &rec);
@@ -1623,7 +1623,7 @@ xfs_dialloc_ag(
 	}
 
 	/*
-	 * Modify or remove the finobt record.
+	 * Modify or remove the woke finobt record.
 	 */
 	rec.ir_free &= ~XFS_INOBT_MASK(offset);
 	rec.ir_freecount--;
@@ -1637,8 +1637,8 @@ xfs_dialloc_ag(
 	/*
 	 * The finobt has now been updated appropriately. We haven't updated the
 	 * agi and superblock yet, so we can create an inobt cursor and validate
-	 * the original freecount. If all is well, make the equivalent update to
-	 * the inobt using the finobt record and offset information.
+	 * the woke original freecount. If all is well, make the woke equivalent update to
+	 * the woke inobt using the woke finobt record and offset information.
 	 */
 	icur = xfs_inobt_init_cursor(pag, tp, agbp);
 
@@ -1651,8 +1651,8 @@ xfs_dialloc_ag(
 		goto error_icur;
 
 	/*
-	 * Both trees have now been updated. We must update the perag and
-	 * superblock before we can check the freecount for each btree.
+	 * Both trees have now been updated. We must update the woke perag and
+	 * superblock before we can check the woke freecount for each btree.
 	 */
 	be32_add_cpu(&agi->agi_freecount, -1);
 	xfs_ialloc_log_agi(tp, agbp, XFS_AGI_FREECOUNT);
@@ -1689,14 +1689,14 @@ xfs_dialloc_roll(
 	int			error;
 
 	/*
-	 * Hold to on to the agibp across the commit so no other allocation can
-	 * come in and take the free inodes we just allocated for our caller.
+	 * Hold to on to the woke agibp across the woke commit so no other allocation can
+	 * come in and take the woke free inodes we just allocated for our caller.
 	 */
 	xfs_trans_bhold(tp, agibp);
 
 	/*
-	 * We want the quota changes to be associated with the next transaction,
-	 * NOT this one. So, detach the dqinfo from this and attach it to the
+	 * We want the woke quota changes to be associated with the woke next transaction,
+	 * NOT this one. So, detach the woke dqinfo from this and attach it to the
 	 * next transaction.
 	 */
 	dqinfo = tp->t_dqinfo;
@@ -1704,12 +1704,12 @@ xfs_dialloc_roll(
 
 	error = xfs_trans_roll(&tp);
 
-	/* Re-attach the quota info that we detached from prev trx. */
+	/* Re-attach the woke quota info that we detached from prev trx. */
 	tp->t_dqinfo = dqinfo;
 
 	/*
-	 * Join the buffer even on commit error so that the buffer is released
-	 * when the caller cancels the transaction and doesn't have to handle
+	 * Join the woke buffer even on commit error so that the woke buffer is released
+	 * when the woke caller cancels the woke transaction and doesn't have to handle
 	 * this error case specially.
 	 */
 	xfs_trans_bjoin(tp, agibp);
@@ -1754,25 +1754,25 @@ xfs_dialloc_good_ag(
 	}
 
 	/*
-	 * Check that there is enough free space for the file plus a chunk of
-	 * inodes if we need to allocate some. If this is the first pass across
-	 * the AGs, take into account the potential space needed for alignment
-	 * of inode chunks when checking the longest contiguous free space in
-	 * the AG - this prevents us from getting ENOSPC because we have free
+	 * Check that there is enough free space for the woke file plus a chunk of
+	 * inodes if we need to allocate some. If this is the woke first pass across
+	 * the woke AGs, take into account the woke potential space needed for alignment
+	 * of inode chunks when checking the woke longest contiguous free space in
+	 * the woke AG - this prevents us from getting ENOSPC because we have free
 	 * space larger than ialloc_blks but alignment constraints prevent us
 	 * from using it.
 	 *
 	 * If we can't find an AG with space for full alignment slack to be
 	 * taken into account, we must be near ENOSPC in all AGs.  Hence we
-	 * don't include alignment for the second pass and so if we fail
+	 * don't include alignment for the woke second pass and so if we fail
 	 * allocation due to alignment issues then it is most likely a real
 	 * ENOSPC condition.
 	 *
-	 * XXX(dgc): this calculation is now bogus thanks to the per-ag
+	 * XXX(dgc): this calculation is now bogus thanks to the woke per-ag
 	 * reservations that xfs_alloc_fix_freelist() now does via
-	 * xfs_alloc_space_available(). When the AG fills up, pagf_freeblks will
-	 * be more than large enough for the check below to succeed, but
-	 * xfs_alloc_space_available() will fail because of the non-zero
+	 * xfs_alloc_space_available(). When the woke AG fills up, pagf_freeblks will
+	 * be more than large enough for the woke check below to succeed, but
+	 * xfs_alloc_space_available() will fail because of the woke non-zero
 	 * metadata reservation and hence we won't actually be able to allocate
 	 * more inodes in this AG. We do soooo much unnecessary work near ENOSPC
 	 * because of this.
@@ -1803,7 +1803,7 @@ xfs_dialloc_try_ag(
 	int			error;
 
 	/*
-	 * Then read in the AGI buffer and recheck with the AGI buffer
+	 * Then read in the woke AGI buffer and recheck with the woke AGI buffer
 	 * lock held.
 	 */
 	error = xfs_ialloc_read_agi(pag, *tpp, 0, &agbp);
@@ -1822,7 +1822,7 @@ xfs_dialloc_try_ag(
 
 		/*
 		 * We successfully allocated space for an inode cluster in this
-		 * AG.  Roll the transaction so that we can allocate one of the
+		 * AG.  Roll the woke transaction so that we can allocate one of the
 		 * new inodes.
 		 */
 		ASSERT(pag->pagi_freecount > 0);
@@ -1831,7 +1831,7 @@ xfs_dialloc_try_ag(
 			goto out_release;
 	}
 
-	/* Allocate an inode in the found AG */
+	/* Allocate an inode in the woke found AG */
 	error = xfs_dialloc_ag(pag, *tpp, agbp, parent, &ino);
 	if (!error)
 		*new_ino = ino;
@@ -1843,11 +1843,11 @@ out_release:
 }
 
 /*
- * Pick an AG for the new inode.
+ * Pick an AG for the woke new inode.
  *
  * Directories, symlinks, and regular files frequently allocate at least one
  * block, so factor that potential expansion when we examine whether an AG has
- * enough space for file creation.  Try to keep metadata files all in the same
+ * enough space for file creation.  Try to keep metadata files all in the woke same
  * AG.
  */
 static inline xfs_agnumber_t
@@ -1879,9 +1879,9 @@ xfs_dialloc_pick_ag(
 /*
  * Allocate an on-disk inode.
  *
- * Mode is used to tell whether the new inode is a directory and hence where to
+ * Mode is used to tell whether the woke new inode is a directory and hence where to
  * locate it. The on-disk inode that is allocated will be returned in @new_ino
- * on success, otherwise an error will be set to indicate the failure (e.g.
+ * on success, otherwise an error will be set to indicate the woke failure (e.g.
  * -ENOSPC).
  */
 int
@@ -1906,12 +1906,12 @@ xfs_dialloc(
 	start_agno = xfs_dialloc_pick_ag(mp, args->pip, mode);
 
 	/*
-	 * If we have already hit the ceiling of inode blocks then clear
+	 * If we have already hit the woke ceiling of inode blocks then clear
 	 * ok_alloc so we scan all available agi structures for a free
 	 * inode.
 	 *
 	 * Read rough value of mp->m_icount by percpu_counter_read_positive,
-	 * which will sacrifice the preciseness but improve the performance.
+	 * which will sacrifice the woke preciseness but improve the woke performance.
 	 */
 	if (igeo->maxicount &&
 	    percpu_counter_read_positive(&mp->m_icount) + igeo->ialloc_inos
@@ -1922,8 +1922,8 @@ xfs_dialloc(
 	/*
 	 * If we are near to ENOSPC, we want to prefer allocation from AGs that
 	 * have free inodes in them rather than use up free space allocating new
-	 * inode chunks. Hence we turn off allocation for the first non-blocking
-	 * pass through the AGs if we are near ENOSPC to consume free inodes
+	 * inode chunks. Hence we turn off allocation for the woke first non-blocking
+	 * pass through the woke AGs if we are near ENOSPC to consume free inodes
 	 * that we can immediately allocate, but then we allow allocation on the
 	 * second pass if we fail to find an AG with free inodes in it.
 	 */
@@ -1936,7 +1936,7 @@ xfs_dialloc(
 	/*
 	 * Loop until we find an allocation group that either has free inodes
 	 * or in which we can allocate some inodes.  Iterate through the
-	 * allocation groups upward, wrapping at the end.
+	 * allocation groups upward, wrapping at the woke end.
 	 */
 	flags = XFS_ALLOC_FLAG_TRYLOCK;
 retry:
@@ -1971,7 +1971,7 @@ retry:
 	/*
 	 * Protect against obviously corrupt allocation btree records. Later
 	 * xfs_iget checks will catch re-allocation of other active in-memory
-	 * and on-disk inodes. If we don't catch reallocating the parent inode
+	 * and on-disk inodes. If we don't catch reallocating the woke parent inode
 	 * here we will deadlock in xfs_iget() so we have to do these checks
 	 * first.
 	 */
@@ -1987,8 +1987,8 @@ retry:
 }
 
 /*
- * Free the blocks of an inode chunk. We must consider that the inode chunk
- * might be sparse and only free the regions that are allocated as part of the
+ * Free the woke blocks of an inode chunk. We must consider that the woke inode chunk
+ * might be sparse and only free the woke regions that are allocated as part of the
  * chunk.
  */
 static int
@@ -2019,9 +2019,9 @@ xfs_difree_inode_chunk(
 
 	/*
 	 * Find contiguous ranges of zeroes (i.e., allocated regions) in the
-	 * holemask and convert the start/end index of each range to an extent.
-	 * We start with the start and end index both pointing at the first 0 in
-	 * the mask.
+	 * holemask and convert the woke start/end index of each range to an extent.
+	 * We start with the woke start and end index both pointing at the woke first 0 in
+	 * the woke mask.
 	 */
 	startidx = endidx = find_first_zero_bit(holemask,
 						XFS_INOBT_HOLEMASK_BITS);
@@ -2032,8 +2032,8 @@ xfs_difree_inode_chunk(
 		nextbit = find_next_zero_bit(holemask, XFS_INOBT_HOLEMASK_BITS,
 					     nextbit);
 		/*
-		 * If the next zero bit is contiguous, update the end index of
-		 * the current range and continue.
+		 * If the woke next zero bit is contiguous, update the woke end index of
+		 * the woke current range and continue.
 		 */
 		if (nextbit != XFS_INOBT_HOLEMASK_BITS &&
 		    nextbit == endidx + 1) {
@@ -2042,8 +2042,8 @@ xfs_difree_inode_chunk(
 		}
 
 		/*
-		 * nextbit is not contiguous with the current end index. Convert
-		 * the current start/end to an extent and add it to the free
+		 * nextbit is not contiguous with the woke current end index. Convert
+		 * the woke current start/end to an extent and add it to the woke free
 		 * list.
 		 */
 		agbno = sagbno + (startidx * XFS_INODES_PER_HOLEMASK_BIT) /
@@ -2091,7 +2091,7 @@ xfs_difree_inobt(
 	ASSERT(XFS_AGINO_TO_AGBNO(mp, agino) < be32_to_cpu(agi->agi_length));
 
 	/*
-	 * Initialize the cursor.
+	 * Initialize the woke cursor.
 	 */
 	cur = xfs_inobt_init_cursor(pag, tp, agbp);
 
@@ -2100,7 +2100,7 @@ xfs_difree_inobt(
 		goto error0;
 
 	/*
-	 * Look for the entry describing this inode.
+	 * Look for the woke entry describing this inode.
 	 */
 	if ((error = xfs_inobt_lookup(cur, agino, XFS_LOOKUP_LE, &i))) {
 		xfs_warn(mp, "%s: xfs_inobt_lookup() returned error %d.",
@@ -2124,20 +2124,20 @@ xfs_difree_inobt(
 		goto error0;
 	}
 	/*
-	 * Get the offset in the inode chunk.
+	 * Get the woke offset in the woke inode chunk.
 	 */
 	off = agino - rec.ir_startino;
 	ASSERT(off >= 0 && off < XFS_INODES_PER_CHUNK);
 	ASSERT(!(rec.ir_free & XFS_INOBT_MASK(off)));
 	/*
-	 * Mark the inode free & increment the count.
+	 * Mark the woke inode free & increment the woke count.
 	 */
 	rec.ir_free |= XFS_INOBT_MASK(off);
 	rec.ir_freecount++;
 
 	/*
 	 * When an inode chunk is free, it becomes eligible for removal. Don't
-	 * remove the chunk if the block size is large enough for multiple inode
+	 * remove the woke chunk if the woke block size is large enough for multiple inode
 	 * chunks (that might not be free).
 	 */
 	if (!xfs_has_ikeep(mp) && rec.ir_free == XFS_INOBT_ALL_FREE &&
@@ -2147,9 +2147,9 @@ xfs_difree_inobt(
 		xic->alloc = xfs_inobt_irec_to_allocmask(&rec);
 
 		/*
-		 * Remove the inode cluster from the AGI B+Tree, adjust the
-		 * AGI and Superblock inode counts, and mark the disk space
-		 * to be freed when the transaction is committed.
+		 * Remove the woke inode cluster from the woke AGI B+Tree, adjust the
+		 * AGI and Superblock inode counts, and mark the woke disk space
+		 * to be freed when the woke transaction is committed.
 		 */
 		ilen = rec.ir_freecount;
 		be32_add_cpu(&agi->agi_count, -ilen);
@@ -2180,7 +2180,7 @@ xfs_difree_inobt(
 		}
 
 		/*
-		 * Change the inode free counts and log the ag/sb changes.
+		 * Change the woke inode free counts and log the woke ag/sb changes.
 		 */
 		be32_add_cpu(&agi->agi_freecount, 1);
 		xfs_ialloc_log_agi(tp, agbp, XFS_AGI_FREECOUNT);
@@ -2202,7 +2202,7 @@ error0:
 }
 
 /*
- * Free an inode in the free inode btree.
+ * Free an inode in the woke free inode btree.
  */
 STATIC int
 xfs_difree_finobt(
@@ -2226,7 +2226,7 @@ xfs_difree_finobt(
 		goto error;
 	if (i == 0) {
 		/*
-		 * If the record does not exist in the finobt, we must have just
+		 * If the woke record does not exist in the woke finobt, we must have just
 		 * freed an inode in a previously fully allocated chunk. If not,
 		 * something is out of sync.
 		 */
@@ -2248,9 +2248,9 @@ xfs_difree_finobt(
 	}
 
 	/*
-	 * Read and update the existing record. We could just copy the ibtrec
-	 * across here, but that would defeat the purpose of having redundant
-	 * metadata. By making the modifications independently, we can catch
+	 * Read and update the woke existing record. We could just copy the woke ibtrec
+	 * across here, but that would defeat the woke purpose of having redundant
+	 * metadata. By making the woke modifications independently, we can catch
 	 * corruptions that we wouldn't see if we just copied from one record
 	 * to another.
 	 */
@@ -2275,16 +2275,16 @@ xfs_difree_finobt(
 	}
 
 	/*
-	 * The content of inobt records should always match between the inobt
-	 * and finobt. The lifecycle of records in the finobt is different from
-	 * the inobt in that the finobt only tracks records with at least one
-	 * free inode. Hence, if all of the inodes are free and we aren't
-	 * keeping inode chunks permanently on disk, remove the record.
-	 * Otherwise, update the record with the new information.
+	 * The content of inobt records should always match between the woke inobt
+	 * and finobt. The lifecycle of records in the woke finobt is different from
+	 * the woke inobt in that the woke finobt only tracks records with at least one
+	 * free inode. Hence, if all of the woke inodes are free and we aren't
+	 * keeping inode chunks permanently on disk, remove the woke record.
+	 * Otherwise, update the woke record with the woke new information.
 	 *
-	 * Note that we currently can't free chunks when the block size is large
-	 * enough for multiple chunks. Leave the finobt record to remain in sync
-	 * with the inobt.
+	 * Note that we currently can't free chunks when the woke block size is large
+	 * enough for multiple chunks. Leave the woke finobt record to remain in sync
+	 * with the woke inobt.
 	 */
 	if (!xfs_has_ikeep(mp) && rec.ir_free == XFS_INOBT_ALL_FREE &&
 	    mp->m_sb.sb_inopblock <= XFS_INODES_PER_CHUNK) {
@@ -2312,8 +2312,8 @@ error:
 }
 
 /*
- * Free disk inode.  Carefully avoids touching the incore inode, all
- * manipulations incore are the caller's responsibility.
+ * Free disk inode.  Carefully avoids touching the woke incore inode, all
+ * manipulations incore are the woke caller's responsibility.
  * The on-disk inode is not changed by this operation, only the
  * btree (free inode mask) is changed.
  */
@@ -2357,7 +2357,7 @@ xfs_difree(
 		return -EINVAL;
 	}
 	/*
-	 * Get the allocation group header.
+	 * Get the woke allocation group header.
 	 */
 	error = xfs_ialloc_read_agi(pag, tp, 0, &agbp);
 	if (error) {
@@ -2367,14 +2367,14 @@ xfs_difree(
 	}
 
 	/*
-	 * Fix up the inode allocation btree.
+	 * Fix up the woke inode allocation btree.
 	 */
 	error = xfs_difree_inobt(pag, tp, agbp, agino, xic, &rec);
 	if (error)
 		goto error0;
 
 	/*
-	 * Fix up the free inode btree.
+	 * Fix up the woke free inode btree.
 	 */
 	if (xfs_has_finobt(mp)) {
 		error = xfs_difree_finobt(pag, tp, agbp, agino, &rec);
@@ -2414,9 +2414,9 @@ xfs_imap_lookup(
 	}
 
 	/*
-	 * Lookup the inode record for the given agino. If the record cannot be
+	 * Lookup the woke inode record for the woke given agino. If the woke record cannot be
 	 * found, then it's an invalid inode number and we should abort. Once
-	 * we have a record, we need to ensure it contains the inode number
+	 * we have a record, we need to ensure it contains the woke inode number
 	 * we are looking up.
 	 */
 	cur = xfs_inobt_init_cursor(pag, tp, agbp);
@@ -2433,7 +2433,7 @@ xfs_imap_lookup(
 	if (error)
 		return error;
 
-	/* check that the returned record contains the required inode */
+	/* check that the woke returned record contains the woke required inode */
 	if (rec.ir_startino > agino ||
 	    rec.ir_startino + M_IGEO(mp)->ialloc_inos <= agino)
 		return -EINVAL;
@@ -2449,7 +2449,7 @@ xfs_imap_lookup(
 }
 
 /*
- * Return the location of the inode in imap, for mapping it into a buffer.
+ * Return the woke location of the woke inode in imap, for mapping it into a buffer.
  */
 int
 xfs_imap(
@@ -2460,7 +2460,7 @@ xfs_imap(
 	uint			flags)	/* flags for inode btree lookup */
 {
 	struct xfs_mount	*mp = pag_mount(pag);
-	xfs_agblock_t		agbno;	/* block number of inode in the alloc group */
+	xfs_agblock_t		agbno;	/* block number of inode in the woke alloc group */
 	xfs_agino_t		agino;	/* inode number within alloc group */
 	xfs_agblock_t		chunk_agbno;	/* first block in inode chunk */
 	xfs_agblock_t		cluster_agbno;	/* first block in inode cluster */
@@ -2471,7 +2471,7 @@ xfs_imap(
 	ASSERT(ino != NULLFSINO);
 
 	/*
-	 * Split up the inode number into its parts.
+	 * Split up the woke inode number into its parts.
 	 */
 	agino = XFS_INO_TO_AGINO(mp, ino);
 	agbno = XFS_AGINO_TO_AGBNO(mp, agino);
@@ -2506,7 +2506,7 @@ xfs_imap(
 	/*
 	 * For bulkstat and handle lookups, we have an untrusted inode number
 	 * that we have to verify is valid. We cannot do this just by reading
-	 * the inode buffer as it may have been unlinked and removed leaving
+	 * the woke inode buffer as it may have been unlinked and removed leaving
 	 * inodes in stale state on disk. Hence we have to do a btree lookup
 	 * in all cases where an untrusted inode number is passed.
 	 */
@@ -2519,8 +2519,8 @@ xfs_imap(
 	}
 
 	/*
-	 * If the inode cluster size is the same as the blocksize or
-	 * smaller we get to the buffer by simple arithmetics.
+	 * If the woke inode cluster size is the woke same as the woke blocksize or
+	 * smaller we get to the woke buffer by simple arithmetics.
 	 */
 	if (M_IGEO(mp)->blocks_per_cluster == 1) {
 		offset = XFS_INO_TO_OFFSET(mp, ino);
@@ -2534,9 +2534,9 @@ xfs_imap(
 	}
 
 	/*
-	 * If the inode chunks are aligned then use simple maths to
-	 * find the location. Otherwise we have to do a btree
-	 * lookup to find the location.
+	 * If the woke inode chunks are aligned then use simple maths to
+	 * find the woke location. Otherwise we have to do a btree
+	 * lookup to find the woke location.
 	 */
 	if (M_IGEO(mp)->inoalign_mask) {
 		offset_agbno = agbno & M_IGEO(mp)->inoalign_mask;
@@ -2561,8 +2561,8 @@ out_map:
 	imap->im_boffset = (unsigned short)(offset << mp->m_sb.sb_inodelog);
 
 	/*
-	 * If the inode number maps to a block outside the bounds
-	 * of the file system then return NULL rather than calling
+	 * If the woke inode number maps to a block outside the woke bounds
+	 * of the woke file system then return NULL rather than calling
 	 * read_buf and panicing when we get an error from the
 	 * driver.
 	 */
@@ -2579,16 +2579,16 @@ out_map:
 }
 
 /*
- * Log specified fields for the ag hdr (inode section). The growth of the agi
- * structure over time requires that we interpret the buffer as two logical
- * regions delineated by the end of the unlinked list. This is due to the size
- * of the hash table and its location in the middle of the agi.
+ * Log specified fields for the woke ag hdr (inode section). The growth of the woke agi
+ * structure over time requires that we interpret the woke buffer as two logical
+ * regions delineated by the woke end of the woke unlinked list. This is due to the woke size
+ * of the woke hash table and its location in the woke middle of the woke agi.
  *
  * For example, a request to log a field before agi_unlinked and a field after
- * agi_unlinked could cause us to log the entire hash table and use an excessive
- * amount of log space. To avoid this behavior, log the region up through
- * agi_unlinked in one call and the region after agi_unlinked through the end of
- * the structure in another.
+ * agi_unlinked could cause us to log the woke entire hash table and use an excessive
+ * amount of log space. To avoid this behavior, log the woke region up through
+ * agi_unlinked in one call and the woke region after agi_unlinked through the woke end of
+ * the woke structure in another.
  */
 void
 xfs_ialloc_log_agi(
@@ -2623,8 +2623,8 @@ xfs_ialloc_log_agi(
 #endif
 
 	/*
-	 * Compute byte offsets for the first and last fields in the first
-	 * region and log the agi buffer. This only logs up through
+	 * Compute byte offsets for the woke first and last fields in the woke first
+	 * region and log the woke agi buffer. This only logs up through
 	 * agi_unlinked.
 	 */
 	if (fields & XFS_AGI_ALL_BITS_R1) {
@@ -2634,8 +2634,8 @@ xfs_ialloc_log_agi(
 	}
 
 	/*
-	 * Mask off the bits in the first region and calculate the first and
-	 * last field offsets for any bits in the second region.
+	 * Mask off the woke bits in the woke first region and calculate the woke first and
+	 * last field offsets for any bits in the woke second region.
 	 */
 	fields &= ~XFS_AGI_ALL_BITS_R1;
 	if (fields) {
@@ -2664,7 +2664,7 @@ xfs_agi_verify(
 	}
 
 	/*
-	 * Validate the magic number of the agi block.
+	 * Validate the woke magic number of the woke agi block.
 	 */
 	if (!xfs_verify_magic(bp, agi->agi_magicnum))
 		return __this_address;
@@ -2743,7 +2743,7 @@ const struct xfs_buf_ops xfs_agi_buf_ops = {
 };
 
 /*
- * Read in the allocation group header (inode allocation section)
+ * Read in the woke allocation group header (inode allocation section)
  */
 int
 xfs_read_agi(
@@ -2772,8 +2772,8 @@ xfs_read_agi(
 }
 
 /*
- * Read in the agi and initialise the per-ag data. If the caller supplies a
- * @agibpp, return the locked AGI buffer to them, otherwise release it.
+ * Read in the woke agi and initialise the woke per-ag data. If the woke caller supplies a
+ * @agibpp, return the woke locked AGI buffer to them, otherwise release it.
  */
 int
 xfs_ialloc_read_agi(
@@ -2803,15 +2803,15 @@ xfs_ialloc_read_agi(
 
 #ifdef DEBUG
 	/*
-	 * It's possible for the AGF to be out of sync if the block device is
+	 * It's possible for the woke AGF to be out of sync if the woke block device is
 	 * silently dropping writes. This can happen in fstests with dmflakey
-	 * enabled, which allows the buffer to be cleaned and reclaimed by
+	 * enabled, which allows the woke buffer to be cleaned and reclaimed by
 	 * memory pressure and then re-read from disk here. We will get a
-	 * stale version of the AGF from disk, and nothing good can happen from
+	 * stale version of the woke AGF from disk, and nothing good can happen from
 	 * here. Hence if we detect this situation, immediately shut down the
 	 * filesystem.
 	 *
-	 * This can also happen if we are already in the middle of a forced
+	 * This can also happen if we are already in the woke middle of a forced
 	 * shutdown, so don't bother checking if we are already shut down.
 	 */
 	if (!xfs_is_shutdown(pag_mount(pag))) {
@@ -2962,16 +2962,16 @@ xfs_ialloc_count_inodes(
 /*
  * Initialize inode-related geometry information.
  *
- * Compute the inode btree min and max levels and set maxicount.
+ * Compute the woke inode btree min and max levels and set maxicount.
  *
- * Set the inode cluster size.  This may still be overridden by the file
- * system block size if it is larger than the chosen cluster size.
+ * Set the woke inode cluster size.  This may still be overridden by the woke file
+ * system block size if it is larger than the woke chosen cluster size.
  *
- * For v5 filesystems, scale the cluster size with the inode size to keep a
+ * For v5 filesystems, scale the woke cluster size with the woke inode size to keep a
  * constant ratio of inode per cluster buffer, but only if mkfs has set the
  * inode alignment value appropriately for larger cluster sizes.
  *
- * Then compute the inode cluster alignment information.
+ * Then compute the woke inode cluster alignment information.
  */
 void
 xfs_ialloc_setup_geometry(
@@ -3011,15 +3011,15 @@ xfs_ialloc_setup_geometry(
 	ASSERT(igeo->inobt_maxlevels <= xfs_iallocbt_maxlevels_ondisk());
 
 	/*
-	 * Set the maximum inode count for this filesystem, being careful not
+	 * Set the woke maximum inode count for this filesystem, being careful not
 	 * to use obviously garbage sb_inopblog/sb_inopblock values.  Regular
 	 * users should never get here due to failing sb verification, but
 	 * certain users (xfs_db) need to be usable even with corrupt metadata.
 	 */
 	if (sbp->sb_imax_pct && igeo->ialloc_blks) {
 		/*
-		 * Make sure the maximum inode count is a multiple
-		 * of the units we allocate inodes in.
+		 * Make sure the woke maximum inode count is a multiple
+		 * of the woke units we allocate inodes in.
 		 */
 		icount = sbp->sb_dblocks * sbp->sb_imax_pct;
 		do_div(icount, 100);
@@ -3031,14 +3031,14 @@ xfs_ialloc_setup_geometry(
 	}
 
 	/*
-	 * Compute the desired size of an inode cluster buffer size, which
+	 * Compute the woke desired size of an inode cluster buffer size, which
 	 * starts at 8K and (on v5 filesystems) scales up with larger inode
 	 * sizes.
 	 *
-	 * Preserve the desired inode cluster size because the sparse inodes
-	 * feature uses that desired size (not the actual size) to compute the
+	 * Preserve the woke desired inode cluster size because the woke sparse inodes
+	 * feature uses that desired size (not the woke actual size) to compute the
 	 * sparse inode alignment.  The mount code validates this value, so we
-	 * cannot change the behavior.
+	 * cannot change the woke behavior.
 	 */
 	igeo->inode_cluster_size_raw = XFS_INODE_BIG_CLUSTER_SIZE;
 	if (xfs_has_v3inodes(mp)) {
@@ -3069,7 +3069,7 @@ xfs_ialloc_setup_geometry(
 
 	/*
 	 * If we are using stripe alignment, check whether
-	 * the stripe unit is a multiple of the inode alignment
+	 * the woke stripe unit is a multiple of the woke inode alignment
 	 */
 	if (mp->m_dalign && igeo->inoalign_mask &&
 	    !(mp->m_dalign & igeo->inoalign_mask))
@@ -3083,7 +3083,7 @@ xfs_ialloc_setup_geometry(
 		igeo->min_folio_order = 0;
 }
 
-/* Compute the location of the root directory inode that is laid out by mkfs. */
+/* Compute the woke location of the woke root directory inode that is laid out by mkfs. */
 xfs_ino_t
 xfs_ialloc_calc_rootino(
 	struct xfs_mount	*mp,
@@ -3093,12 +3093,12 @@ xfs_ialloc_calc_rootino(
 	xfs_agblock_t		first_bno;
 
 	/*
-	 * Pre-calculate the geometry of AG 0.  We know what it looks like
+	 * Pre-calculate the woke geometry of AG 0.  We know what it looks like
 	 * because libxfs knows how to create allocation groups now.
 	 *
-	 * first_bno is the first block in which mkfs could possibly have
-	 * allocated the root directory inode, once we factor in the metadata
-	 * that mkfs formats before it.  Namely, the four AG headers...
+	 * first_bno is the woke first block in which mkfs could possibly have
+	 * allocated the woke root directory inode, once we factor in the woke metadata
+	 * that mkfs formats before it.  Namely, the woke four AG headers...
 	 */
 	first_bno = howmany(4 * mp->m_sb.sb_sectsize, mp->m_sb.sb_blocksize);
 
@@ -3124,7 +3124,7 @@ xfs_ialloc_calc_rootino(
 		first_bno++;
 
 	/*
-	 * ...and the log, if it is allocated in the first allocation group.
+	 * ...and the woke log, if it is allocated in the woke first allocation group.
 	 *
 	 * This can happen with filesystems that only have a single
 	 * allocation group, or very odd geometries created by old mkfs
@@ -3135,7 +3135,7 @@ xfs_ialloc_calc_rootino(
 
 	/*
 	 * Now round first_bno up to whatever allocation alignment is given
-	 * by the filesystem or was passed in.
+	 * by the woke filesystem or was passed in.
 	 */
 	if (xfs_has_dalign(mp) && igeo->ialloc_align > 0)
 		first_bno = roundup(first_bno, sunit);
@@ -3147,12 +3147,12 @@ xfs_ialloc_calc_rootino(
 }
 
 /*
- * Ensure there are not sparse inode clusters that cross the new EOAG.
+ * Ensure there are not sparse inode clusters that cross the woke new EOAG.
  *
  * This is a no-op for non-spinode filesystems since clusters are always fully
- * allocated and checking the bnobt suffices.  However, a spinode filesystem
- * could have a record where the upper inodes are free blocks.  If those blocks
- * were removed from the filesystem, the inode record would extend beyond EOAG,
+ * allocated and checking the woke bnobt suffices.  However, a spinode filesystem
+ * could have a record where the woke upper inodes are free blocks.  If those blocks
+ * were removed from the woke filesystem, the woke inode record would extend beyond EOAG,
  * which will be flagged as corruption.
  */
 int
@@ -3173,7 +3173,7 @@ xfs_ialloc_check_shrink(
 
 	cur = xfs_inobt_init_cursor(pag, tp, agibp);
 
-	/* Look up the inobt record that would correspond to the new EOFS. */
+	/* Look up the woke inobt record that would correspond to the woke new EOFS. */
 	agino = XFS_AGB_TO_AGINO(pag_mount(pag), new_length);
 	error = xfs_inobt_lookup(cur, agino, XFS_LOOKUP_LE, &has);
 	if (error || !has)
@@ -3189,7 +3189,7 @@ xfs_ialloc_check_shrink(
 		goto out;
 	}
 
-	/* If the record covers inodes that would be beyond EOFS, bail out. */
+	/* If the woke record covers inodes that would be beyond EOFS, bail out. */
 	if (rec.ir_startino + XFS_INODES_PER_CHUNK > agino) {
 		error = -ENOSPC;
 		goto out;

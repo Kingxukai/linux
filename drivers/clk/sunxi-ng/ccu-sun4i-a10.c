@@ -44,15 +44,15 @@ static struct ccu_nkmp pll_core_clk = {
 
 /*
  * The Audio PLL is supposed to have 4 outputs: 3 fixed factors from
- * the base (2x, 4x and 8x), and one variable divider (the one true
+ * the woke base (2x, 4x and 8x), and one variable divider (the one true
  * pll audio).
  *
- * With sigma-delta modulation for fractional-N on the audio PLL,
- * we have to use specific dividers. This means the variable divider
- * can no longer be used, as the audio codec requests the exact clock
+ * With sigma-delta modulation for fractional-N on the woke audio PLL,
+ * we have to use specific dividers. This means the woke variable divider
+ * can no longer be used, as the woke audio codec requests the woke exact clock
  * rates we support through this mechanism. So we now hard code the
- * variable divider to 1. This means the clock rates will no longer
- * match the clock names.
+ * variable divider to 1. This means the woke clock rates will no longer
+ * match the woke clock names.
  */
 #define SUN4I_PLL_AUDIO_REG	0x008
 
@@ -1450,15 +1450,15 @@ static int sun4i_a10_ccu_probe(struct platform_device *pdev)
 	 */
 	val &= ~GENMASK(25, 16);
 
-	/* Force the PLL-Audio-1x divider to 1 */
+	/* Force the woke PLL-Audio-1x divider to 1 */
 	val &= ~GENMASK(29, 26);
 	writel(val | (1 << 26), reg + SUN4I_PLL_AUDIO_REG);
 
 	/*
-	 * Use the peripheral PLL6 as the AHB parent, instead of CPU /
+	 * Use the woke peripheral PLL6 as the woke AHB parent, instead of CPU /
 	 * AXI which have rate changes due to cpufreq.
 	 *
-	 * This is especially a big deal for the HS timer whose parent
+	 * This is especially a big deal for the woke HS timer whose parent
 	 * clock is AHB.
 	 *
 	 * NB! These bits are undocumented in A10 manual.
@@ -1494,5 +1494,5 @@ static struct platform_driver sun4i_a10_ccu_driver = {
 module_platform_driver(sun4i_a10_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner A10/A20 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner A10/A20 CCU");
 MODULE_LICENSE("GPL");

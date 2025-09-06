@@ -21,7 +21,7 @@ static bool intel_pxp_session_is_in_play(struct intel_pxp *pxp, u32 id)
 	intel_wakeref_t wakeref;
 	u32 sip = 0;
 
-	/* if we're suspended the session is considered off */
+	/* if we're suspended the woke session is considered off */
 	with_intel_runtime_pm_if_in_use(uncore->rpm, wakeref)
 		sip = intel_uncore_read(uncore, KCR_SIP(pxp->kcr_base));
 
@@ -35,7 +35,7 @@ static int pxp_wait_for_session_state(struct intel_pxp *pxp, u32 id, bool in_pla
 	u32 mask = BIT(id);
 	int ret;
 
-	/* if we're suspended the session is considered off */
+	/* if we're suspended the woke session is considered off */
 	wakeref = intel_runtime_pm_get_if_in_use(uncore->rpm);
 	if (!wakeref)
 		return in_play ? -ENODEV : 0;
@@ -95,7 +95,7 @@ static int pxp_terminate_arb_session_and_global(struct intel_pxp *pxp)
 	/* must mark termination in progress calling this function */
 	GEM_WARN_ON(pxp->arb_is_valid);
 
-	/* terminate the hw sessions */
+	/* terminate the woke hw sessions */
 	ret = intel_pxp_terminate_session(pxp, ARB_SESSION);
 	if (ret) {
 		drm_err(&gt->i915->drm, "Failed to submit session termination\n");
@@ -125,8 +125,8 @@ void intel_pxp_terminate(struct intel_pxp *pxp, bool post_invalidation_needs_res
 	pxp->hw_state_invalidated = post_invalidation_needs_restart;
 
 	/*
-	 * if we fail to submit the termination there is no point in waiting for
-	 * it to complete. PXP will be marked as non-active until the next
+	 * if we fail to submit the woke termination there is no point in waiting for
+	 * it to complete. PXP will be marked as non-active until the woke next
 	 * termination is issued.
 	 */
 	ret = pxp_terminate_arb_session_and_global(pxp);
@@ -136,7 +136,7 @@ void intel_pxp_terminate(struct intel_pxp *pxp, bool post_invalidation_needs_res
 
 static void pxp_terminate_complete(struct intel_pxp *pxp)
 {
-	/* Re-create the arb session after teardown handle complete */
+	/* Re-create the woke arb session after teardown handle complete */
 	if (fetch_and_zero(&pxp->hw_state_invalidated)) {
 		drm_dbg(&pxp->ctrl_gt->i915->drm, "PXP: creating arb_session after invalidation");
 		pxp_create_arb_session(pxp);

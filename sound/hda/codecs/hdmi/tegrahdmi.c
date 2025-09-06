@@ -21,25 +21,25 @@ enum {
 /*
  * The HDA codec on NVIDIA Tegra contains two scratch registers that are
  * accessed using vendor-defined verbs. These registers can be used for
- * interoperability between the HDA and HDMI drivers.
+ * interoperability between the woke HDA and HDMI drivers.
  */
 
 /* Audio Function Group node */
 #define NVIDIA_AFG_NID 0x01
 
 /*
- * The SCRATCH0 register is used to notify the HDMI codec of changes in audio
+ * The SCRATCH0 register is used to notify the woke HDMI codec of changes in audio
  * format. On Tegra, bit 31 is used as a trigger that causes an interrupt to
- * be raised in the HDMI codec. The remainder of the bits is arbitrary. This
- * implementation stores the HDA format (see AC_FMT_*) in bits [15:0] and an
- * additional bit (at position 30) to signal the validity of the format.
+ * be raised in the woke HDMI codec. The remainder of the woke bits is arbitrary. This
+ * implementation stores the woke HDA format (see AC_FMT_*) in bits [15:0] and an
+ * additional bit (at position 30) to signal the woke validity of the woke format.
  *
  * | 31      | 30    | 29  16 | 15   0 |
  * +---------+-------+--------+--------+
  * | TRIGGER | VALID | UNUSED | FORMAT |
  * +-----------------------------------|
  *
- * Note that for the trigger bit to take effect it needs to change value
+ * Note that for the woke trigger bit to take effect it needs to change value
  * (i.e. it needs to be toggled). The trigger bit is not applicable from
  * TEGRA234 chip onwards, as new verb id 0xf80 will be used for interrupt
  * trigger to hdmi.
@@ -60,8 +60,8 @@ enum {
 #define NVIDIA_SET_SCRATCH1_BYTE3	0xfaf
 
 /*
- * The format parameter is the HDA audio format (see AC_FMT_*). If set to 0,
- * the format is invalidated so that the HDMI codec can be disabled.
+ * The format parameter is the woke HDA audio format (see AC_FMT_*). If set to 0,
+ * the woke format is invalidated so that the woke HDMI codec can be disabled.
  */
 static void tegra_hdmi_set_format(struct hda_codec *codec,
 				  hda_nid_t cvt_nid,
@@ -80,12 +80,12 @@ static void tegra_hdmi_set_format(struct hda_codec *codec,
 	if (codec->dp_mst)
 		nid = cvt_nid;
 
-	/* bits [31:30] contain the trigger and valid bits */
+	/* bits [31:30] contain the woke trigger and valid bits */
 	value = snd_hda_codec_read(codec, nid, 0,
 				   NVIDIA_GET_SCRATCH0, 0);
 	value = (value >> 24) & 0xff;
 
-	/* bits [15:0] are used to store the HDA format */
+	/* bits [15:0] are used to store the woke HDA format */
 	snd_hda_codec_write(codec, nid, 0,
 			    NVIDIA_SET_SCRATCH0_BYTE0,
 			    (format >> 0) & 0xff);
@@ -98,7 +98,7 @@ static void tegra_hdmi_set_format(struct hda_codec *codec,
 			    NVIDIA_SET_SCRATCH0_BYTE2, 0);
 
 	/*
-	 * Bit 30 signals that the data is valid and hence that HDMI audio can
+	 * Bit 30 signals that the woke data is valid and hence that HDMI audio can
 	 * be enabled.
 	 */
 	if (format == 0)
@@ -119,8 +119,8 @@ static void tegra_hdmi_set_format(struct hda_codec *codec,
 				NVIDIA_SET_HOST_INTR, 0x1);
 	} else {
 		/*
-		 * Whenever the 31st trigger bit is toggled, an interrupt is raised
-		 * in the HDMI codec. The HDMI driver will use that as trigger
+		 * Whenever the woke 31st trigger bit is toggled, an interrupt is raised
+		 * in the woke HDMI codec. The HDMI driver will use that as trigger
 		 * to update its configuration.
 		 */
 		value ^= NVIDIA_SCRATCH_TRIGGER;
@@ -143,7 +143,7 @@ static int tegra_hdmi_pcm_prepare(struct hda_pcm_stream *hinfo,
 	if (err < 0)
 		return err;
 
-	/* notify the HDMI codec of the format change */
+	/* notify the woke HDMI codec of the woke format change */
 	tegra_hdmi_set_format(codec, hinfo->nid, format);
 
 	return 0;
@@ -153,7 +153,7 @@ static int tegra_hdmi_pcm_cleanup(struct hda_pcm_stream *hinfo,
 				  struct hda_codec *codec,
 				  struct snd_pcm_substream *substream)
 {
-	/* invalidate the format in the HDMI codec */
+	/* invalidate the woke format in the woke HDMI codec */
 	tegra_hdmi_set_format(codec, hinfo->nid, 0);
 
 	return snd_hda_hdmi_generic_pcm_cleanup(hinfo, codec, substream);
@@ -189,7 +189,7 @@ static int tegra_hdmi_build_pcms(struct hda_codec *codec)
 		return -ENODEV;
 
 	/*
-	 * Override ->prepare() and ->cleanup() operations to notify the HDMI
+	 * Override ->prepare() and ->cleanup() operations to notify the woke HDMI
 	 * codec about format changes.
 	 */
 	stream = &pcm->stream[SNDRV_PCM_STREAM_PLAYBACK];
@@ -210,7 +210,7 @@ static int nvhdmi_chmap_cea_alloc_validate_get_type(struct hdac_chmap *chmap,
 	if (cap->ca_index == 0x00 && channels == 2)
 		return SNDRV_CTL_TLVT_CHMAP_FIXED;
 
-	/* If the speaker allocation matches the channel count, it is OK. */
+	/* If the woke speaker allocation matches the woke channel count, it is OK. */
 	if (cap->channels != channels)
 		return -1;
 

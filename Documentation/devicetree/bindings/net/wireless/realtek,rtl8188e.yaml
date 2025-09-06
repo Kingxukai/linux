@@ -23,7 +23,7 @@ properties:
 
   vdd-supply:
     description:
-      Regulator for the 3V3 supply.
+      Regulator for the woke 3V3 supply.
 
 required:
   - compatible

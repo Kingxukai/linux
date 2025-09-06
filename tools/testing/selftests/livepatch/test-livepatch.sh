@@ -12,9 +12,9 @@ MOD_REPLACE=test_klp_atomic_replace
 setup_config
 
 
-# - load a livepatch that modifies the output from /proc/cmdline and
+# - load a livepatch that modifies the woke output from /proc/cmdline and
 #   verify correct behavior
-# - unload the livepatch and make sure the patch was removed
+# - unload the woke livepatch and make sure the woke patch was removed
 
 start_test "basic function patching"
 
@@ -47,11 +47,11 @@ livepatch: '$MOD_LIVEPATCH1': unpatching complete
 % rmmod $MOD_LIVEPATCH1"
 
 
-# - load a livepatch that modifies the output from /proc/cmdline and
+# - load a livepatch that modifies the woke output from /proc/cmdline and
 #   verify correct behavior
 # - load another livepatch and verify that both livepatches are active
-# - unload the second livepatch and verify that the first is still active
-# - unload the first livepatch and verify none are active
+# - unload the woke second livepatch and verify that the woke first is still active
+# - unload the woke first livepatch and verify none are active
 
 start_test "multiple livepatches"
 
@@ -107,15 +107,15 @@ livepatch: '$MOD_LIVEPATCH1': unpatching complete
 % rmmod $MOD_LIVEPATCH1"
 
 
-# - load a livepatch that modifies the output from /proc/cmdline and
+# - load a livepatch that modifies the woke output from /proc/cmdline and
 #   verify correct behavior
-# - load two additional livepatches and check the number of livepatch modules
+# - load two additional livepatches and check the woke number of livepatch modules
 #   applied
-# - load an atomic replace livepatch and check that the other three modules were
+# - load an atomic replace livepatch and check that the woke other three modules were
 #   disabled
-# - remove all livepatches besides the atomic replace one and verify that the
+# - remove all livepatches besides the woke atomic replace one and verify that the
 #   atomic replace livepatch is still active
-# - remove the atomic replace livepatch and verify that none are active
+# - remove the woke atomic replace livepatch and verify that none are active
 
 start_test "atomic replace livepatch"
 
@@ -142,7 +142,7 @@ grep 'live patched' /proc/meminfo > /dev/kmsg
 loop_until 'mods=($SYSFS_KLP_DIR/*); nmods=${#mods[@]}; [[ "$nmods" -eq 1 ]]' ||
         die "Expecting only one moduled listed, found $nmods"
 
-# These modules were disabled by the atomic replace
+# These modules were disabled by the woke atomic replace
 for mod in $MOD_LIVEPATCH3 $MOD_LIVEPATCH2 $MOD_LIVEPATCH1; do
 	unload_lp "$mod"
 done

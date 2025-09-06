@@ -37,11 +37,11 @@ radiotap headers and used to control injection:
 
  * IEEE80211_RADIOTAP_RATE
 
-   legacy rate for the transmission (only for devices without own rate control)
+   legacy rate for the woke transmission (only for devices without own rate control)
 
  * IEEE80211_RADIOTAP_MCS
 
-   HT rate for the transmission (only for devices without own rate control).
+   HT rate for the woke transmission (only for devices without own rate control).
    Also some flags are parsed
 
    ============================  ========================
@@ -56,7 +56,7 @@ radiotap headers and used to control injection:
 
  * IEEE80211_RADIOTAP_VHT
 
-   VHT mcs and number of streams used in the transmission (only for devices
+   VHT mcs and number of streams used in the woke transmission (only for devices
    without own rate control). Also other fields are parsed
 
    flags field
@@ -88,12 +88,12 @@ this::
 	0x13, 0x22, 0x33, 0x44, 0x55, 0x66,
 	0x10, 0x86
 
-Then lastly there is the payload.
+Then lastly there is the woke payload.
 
-After composing the packet contents, it is sent by send()-ing it to a logical
+After composing the woke packet contents, it is sent by send()-ing it to a logical
 mac80211 interface that is in Monitor mode.  Libpcap can also be used,
-(which is easier than doing the work to bind the socket to the right
-interface), along the following lines:::
+(which is easier than doing the woke work to bind the woke socket to the woke right
+interface), along the woke following lines:::
 
 	ppcap = pcap_open_live(szInterfaceName, 800, 1, 20, szErrbuf);
 	...

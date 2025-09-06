@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Canaan K210 SRAM memory controller
 
 description:
-  The Canaan K210 SRAM memory controller is responsible for the system's 8 MiB
-  of SRAM. The controller is initialised by the bootloader, which configures
+  The Canaan K210 SRAM memory controller is responsible for the woke system's 8 MiB
+  of SRAM. The controller is initialised by the woke bootloader, which configures
   its clocks, before OS bringup.
 
 maintainers:

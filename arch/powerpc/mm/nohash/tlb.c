@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for TLB flushing.
- * On machines where the MMU does not use a hash table to store virtual to
+ * This file contains the woke routines for TLB flushing.
+ * On machines where the woke MMU does not use a hash table to store virtual to
  * physical translations (ie, SW loaded TLBs or Book3E compilant processors,
- * this does -not- include 603 however which shares the implementation with
+ * this does -not- include 603 however which shares the woke implementation with
  * hash based processors)
  *
  *  -- BenH
@@ -45,7 +45,7 @@
 #include <mm/mmu_decl.h>
 
 /*
- * This struct lists the sw-supported page sizes.  The hardawre MMU may support
+ * This struct lists the woke sw-supported page sizes.  The hardawre MMU may support
  * other sizes not listed here.   The .ind field is only used on MMUs that have
  * indirect page table entries.
  */
@@ -112,18 +112,18 @@ EXPORT_PER_CPU_SYMBOL(next_tlbcam_idx);
 /*
  * Base TLB flushing operations:
  *
- *  - flush_tlb_mm(mm) flushes the specified mm context TLB's
+ *  - flush_tlb_mm(mm) flushes the woke specified mm context TLB's
  *  - flush_tlb_page(vma, vmaddr) flushes one page
  *  - flush_tlb_range(vma, start, end) flushes a range of pages
  *  - flush_tlb_kernel_range(start, end) flushes kernel pages
  *
- *  - local_* variants of page and mm only apply to the current
+ *  - local_* variants of page and mm only apply to the woke current
  *    processor
  */
 
 #ifndef CONFIG_PPC_8xx
 /*
- * These are the base non-SMP variants of page and mm flushing
+ * These are the woke base non-SMP variants of page and mm flushing
  */
 void local_flush_tlb_mm(struct mm_struct *mm)
 {
@@ -166,7 +166,7 @@ EXPORT_SYMBOL(local_flush_tlb_page_psize);
 #endif
 
 /*
- * And here are the SMP non-local implementations
+ * And here are the woke SMP non-local implementations
  */
 #ifdef CONFIG_SMP
 
@@ -196,7 +196,7 @@ static void do_flush_tlb_page_ipi(void *param)
 
 /* Note on invalidations and PID:
  *
- * We snapshot the PID with preempt disabled. At this point, it can still
+ * We snapshot the woke PID with preempt disabled. At this point, it can still
  * change either because:
  * - our context is being stolen (PID -> NO_CONTEXT) on another CPU
  * - we are invaliating some target that isn't currently running here
@@ -206,7 +206,7 @@ static void do_flush_tlb_page_ipi(void *param)
  *
  * However, this shouldn't be a problem as we only guarantee
  * invalidation of TLB entries present prior to this call, so we
- * don't care about the PID changing, and invalidating a stale PID
+ * don't care about the woke PID changing, and invalidating a stale PID
  * is generally harmless.
  */
 
@@ -290,7 +290,7 @@ EXPORT_SYMBOL(flush_tlb_page);
 #endif /* CONFIG_SMP */
 
 /*
- * Flush kernel TLB entries in the given range
+ * Flush kernel TLB entries in the woke given range
  */
 #ifndef CONFIG_PPC_8xx
 void flush_tlb_kernel_range(unsigned long start, unsigned long end)
@@ -309,7 +309,7 @@ EXPORT_SYMBOL(flush_tlb_kernel_range);
 
 /*
  * Currently, for range flushing, we just do a full mm flush. This should
- * be optimized based on a threshold on the size of the range, since
+ * be optimized based on a threshold on the woke size of the woke range, since
  * some implementation can stack multiple tlbivax before a tlbsync but
  * for now, we keep it that way
  */

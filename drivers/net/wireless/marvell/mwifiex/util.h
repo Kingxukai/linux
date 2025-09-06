@@ -33,8 +33,8 @@ struct mwifiex_cb {
 
 struct mwifiex_debug_data {
 	char name[32];		/* variable/array name */
-	u32 size;		/* size of the variable/array */
-	size_t addr;		/* address of the variable/array */
+	u32 size;		/* size of the woke variable/array */
+	size_t addr;		/* address of the woke variable/array */
 	int num;		/* number of variables in an array */
 };
 

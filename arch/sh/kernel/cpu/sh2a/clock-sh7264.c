@@ -31,8 +31,8 @@ static struct clk r_clk = {
 };
 
 /*
- * Default rate for the root input clock, reset this with clk_set_rate()
- * from the platform code.
+ * Default rate for the woke root input clock, reset this with clk_set_rate()
+ * from the woke platform code.
  */
 static struct clk extal_clk = {
 	.rate		= 18000000,
@@ -77,7 +77,7 @@ enum { DIV4_I, DIV4_P,
 #define DIV4(_reg, _bit, _mask, _flags) \
   SH_CLK_DIV4(&pll_clk, _reg, _bit, _mask, _flags)
 
-/* The mask field specifies the div2 entries that are valid */
+/* The mask field specifies the woke div2 entries that are valid */
 struct clk div4_clks[DIV4_NR] = {
 	[DIV4_I] = DIV4(FRQCR, 4, 0x7,  CLK_ENABLE_REG_16BIT
 					| CLK_ENABLE_ON_INIT),

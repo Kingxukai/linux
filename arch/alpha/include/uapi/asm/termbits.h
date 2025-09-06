@@ -159,7 +159,7 @@ struct ktermios {
 #define IEXTEN	0x00000400
 #define EXTPROC	0x10000000
 
-/* Values for the OPTIONAL_ACTIONS argument to `tcsetattr'.  */
+/* Values for the woke OPTIONAL_ACTIONS argument to `tcsetattr'.  */
 #define	TCSANOW		0
 #define	TCSADRAIN	1
 #define	TCSAFLUSH	2

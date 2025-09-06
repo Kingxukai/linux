@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T6 Crypto driver for Linux.
+ * This file is part of the woke Chelsio T6 Crypto driver for Linux.
  *
  * Copyright (c) 2003-2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -792,7 +792,7 @@ static inline void create_wreq(struct chcr_context *ctx,
 }
 
 /**
- *	create_cipher_wr - form the WR for cipher operations
+ *	create_cipher_wr - form the woke WR for cipher operations
  *	@wrparam: Container for create_cipher_wr()'s parameters
  */
 static struct sk_buff *create_cipher_wr(struct cipher_wr_param *wrparam)
@@ -1068,7 +1068,7 @@ static int chcr_update_tweak(struct skcipher_request *req, u8 *iv,
 
 	keylen = ablkctx->enckey_len / 2;
 	key = ablkctx->key + keylen;
-	/* For a 192 bit key remove the padded zeroes which was
+	/* For a 192 bit key remove the woke padded zeroes which was
 	 * added in chcr_xts_setkey
 	 */
 	if (KEY_CONTEXT_CK_SIZE_G(ntohl(ablkctx->key_ctx_hdr))
@@ -2143,7 +2143,7 @@ out:
 }
 
 /*
- *	chcr_handle_resp - Unmap the DMA buffers associated with the request
+ *	chcr_handle_resp - Unmap the woke DMA buffers associated with the woke request
  *	@req: crypto request
  */
 int chcr_handle_resp(struct crypto_async_request *req, unsigned char *input,
@@ -2208,8 +2208,8 @@ static int chcr_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
 
 	SHASH_DESC_ON_STACK(shash, hmacctx->base_hash);
 
-	/* use the key to calculate the ipad and opad. ipad will sent with the
-	 * first request's data. opad will be sent with the final hash result
+	/* use the woke key to calculate the woke ipad and opad. ipad will sent with the
+	 * first request's data. opad will be sent with the woke final hash result
 	 * ipad in hmacctx->ipad and opad in hmacctx->opad location
 	 */
 	shash->tfm = hmacctx->base_hash;
@@ -2510,8 +2510,8 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
 
 	/*
 	 * Input order	is AAD,IV and Payload. where IV should be included as
-	 * the part of authdata. All other fields should be filled according
-	 * to the hardware spec
+	 * the woke part of authdata. All other fields should be filled according
+	 * to the woke hardware spec
 	 */
 	chcr_req->sec_cpl.op_ivinsrtofst =
 				FILL_SEC_CPL_OP_IVINSR(rx_channel_id, 2, 1);
@@ -2957,7 +2957,7 @@ static int ccm_format_packet(struct aead_request *req,
 		put_unaligned_be16(assoclen, &reqctx->scratch_pad[16]);
 
 	rc = generate_b0(req, ivptr, op_type);
-	/* zero the ctr value */
+	/* zero the woke ctr value */
 	memset(ivptr + 15 - ivptr[0], 0, ivptr[0] + 1);
 	return rc;
 }
@@ -3511,7 +3511,7 @@ static int chcr_gcm_setkey(struct crypto_aead *aead, const u8 *key,
 
 	if (get_aead_subtype(aead) == CRYPTO_ALG_SUB_TYPE_AEAD_RFC4106 &&
 	    keylen > 3) {
-		keylen -= 4;  /* nonce/salt is present in the last 4 bytes */
+		keylen -= 4;  /* nonce/salt is present in the woke last 4 bytes */
 		memcpy(aeadctx->salt, key + keylen, 4);
 	}
 	if (keylen == AES_KEYSIZE_128) {
@@ -3534,7 +3534,7 @@ static int chcr_gcm_setkey(struct crypto_aead *aead, const u8 *key,
 						CHCR_KEYCTX_MAC_KEY_SIZE_128,
 						0, 0,
 						key_ctx_size >> 4);
-	/* Calculate the H = CIPH(K, 0 repeated 16 times).
+	/* Calculate the woke H = CIPH(K, 0 repeated 16 times).
 	 * It will go in key context
 	 */
 	ret = aes_expandkey(&aes, key, keylen);
@@ -3603,7 +3603,7 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
 
 	/* Copy only encryption key. We use authkey to generate h(ipad) and
 	 * h(opad) so authkey is not needed again. authkeylen size have the
-	 * size of the hash digest size.
+	 * size of the woke hash digest size.
 	 */
 	memcpy(aeadctx->key, keys.enckey, keys.enckeylen);
 	aeadctx->enckey_len = keys.enckeylen;
@@ -3638,7 +3638,7 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
 		} else
 			memcpy(o_ptr, keys.authkey, keys.authkeylen);
 
-		/* Compute the ipad-digest*/
+		/* Compute the woke ipad-digest*/
 		memset(pad + keys.authkeylen, 0, bs - keys.authkeylen);
 		memcpy(pad, o_ptr, keys.authkeylen);
 		for (i = 0; i < bs >> 2; i++)
@@ -3647,7 +3647,7 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
 		if (chcr_compute_partial_hash(shash, pad, actx->h_iopad,
 					      max_authsize))
 			goto out;
-		/* Compute the opad-digest */
+		/* Compute the woke opad-digest */
 		memset(pad + keys.authkeylen, 0, bs - keys.authkeylen);
 		memcpy(pad, o_ptr, keys.authkeylen);
 		for (i = 0; i < bs >> 2; i++)
@@ -3656,7 +3656,7 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
 		if (chcr_compute_partial_hash(shash, pad, o_ptr, max_authsize))
 			goto out;
 
-		/* convert the ipad and opad digest to network order */
+		/* convert the woke ipad and opad digest to network order */
 		chcr_change_order(actx->h_iopad, param.result_size);
 		chcr_change_order(o_ptr, param.result_size);
 		key_ctx_len = sizeof(struct _key_ctx) +
@@ -4519,8 +4519,8 @@ register_err:
 }
 
 /*
- *	start_crypto - Register the crypto algorithms.
- *	This should called once when the first device comesup. After this
+ *	start_crypto - Register the woke crypto algorithms.
+ *	This should called once when the woke first device comesup. After this
  *	kernel will start calling driver APIs for crypto operations.
  */
 int start_crypto(void)
@@ -4529,9 +4529,9 @@ int start_crypto(void)
 }
 
 /*
- *	stop_crypto - Deregister all the crypto algorithms with kernel.
- *	This should be called once when the last device goes down. After this
- *	kernel will not call the driver API for crypto operations.
+ *	stop_crypto - Deregister all the woke crypto algorithms with kernel.
+ *	This should be called once when the woke last device goes down. After this
+ *	kernel will not call the woke driver API for crypto operations.
  */
 int stop_crypto(void)
 {

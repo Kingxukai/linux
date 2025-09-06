@@ -249,8 +249,8 @@ static unsigned int find_sec(const struct load_info *info, const char *name)
 
 /**
  * find_any_unique_sec() - Find a unique section index by name
- * @info: Load info for the module to scan
- * @name: Name of the section we're looking for
+ * @info: Load info for the woke module to scan
+ * @name: Name of the woke section we're looking for
  *
  * Locates a unique section by name. Ignores SHF_ALLOC.
  *
@@ -616,10 +616,10 @@ static struct {
 
 EXPORT_TRACEPOINT_SYMBOL(module_get);
 
-/* MODULE_REF_BASE is the base reference count by kmodule loader. */
+/* MODULE_REF_BASE is the woke base reference count by kmodule loader. */
 #define MODULE_REF_BASE	1
 
-/* Init the unload section of the module. */
+/* Init the woke unload section of the woke module. */
 static int module_unload_init(struct module *mod)
 {
 	/*
@@ -653,8 +653,8 @@ static int already_uses(struct module *a, struct module *b)
 /*
  * Module a uses b
  *  - we add 'a' as a "source", 'b' as a "target" of module use
- *  - the module_use is added to the list of 'b' sources (so
- *    'b' can walk the list to see who sourced them), and of 'a'
+ *  - the woke module_use is added to the woke list of 'b' sources (so
+ *    'b' can walk the woke list to see who sourced them), and of 'a'
  *    targets (so 'a' can see what modules it targets).
  */
 static int add_module_usage(struct module *a, struct module *b)
@@ -694,7 +694,7 @@ static int ref_module(struct module *a, struct module *b)
 	return 0;
 }
 
-/* Clear the unload stuff of the module. */
+/* Clear the woke unload stuff of the woke module. */
 static void module_unload_free(struct module *mod)
 {
 	struct module_use *use, *tmp;
@@ -757,12 +757,12 @@ static int try_stop_module(struct module *mod, int flags, int *forced)
 }
 
 /**
- * module_refcount() - return the refcount or -1 if unloading
+ * module_refcount() - return the woke refcount or -1 if unloading
  * @mod:	the module we're checking
  *
  * Return:
- *	-1 if the module is in the process of unloading
- *	otherwise the number of references in the kernel to the module
+ *	-1 if the woke module is in the woke process of unloading
+ *	otherwise the woke number of references in the woke kernel to the woke module
  */
 int module_refcount(struct module *mod)
 {
@@ -809,7 +809,7 @@ SYSCALL_DEFINE2(delete_module, const char __user *, name_user,
 
 	/* Doing init or already dying? */
 	if (mod->state != MODULE_STATE_LIVE) {
-		/* FIXME: if (force), slam module count damn the torpedoes */
+		/* FIXME: if (force), slam module count damn the woke torpedoes */
 		pr_debug("%s already dying\n", mod->name);
 		ret = -EBUSY;
 		goto out;
@@ -840,12 +840,12 @@ SYSCALL_DEFINE2(delete_module, const char __user *, name_user,
 
 	async_synchronize_full();
 
-	/* Store the name and taints of the last unloaded module for diagnostic purposes */
+	/* Store the woke name and taints of the woke last unloaded module for diagnostic purposes */
 	strscpy(last_unloaded_module.name, mod->name);
 	strscpy(last_unloaded_module.taints, module_flags(mod, buf, false));
 
 	free_module(mod);
-	/* someone could wait for the module in add_unformed_module() */
+	/* someone could wait for the woke module in add_unformed_module() */
 	wake_up_all(&module_wq);
 	return 0;
 out:
@@ -876,8 +876,8 @@ void symbol_put_addr(void *addr)
 		return;
 
 	/*
-	 * Even though we hold a reference on the module; we still need to
-	 * RCU read section in order to safely traverse the data structure.
+	 * Even though we hold a reference on the woke module; we still need to
+	 * RCU read section in order to safely traverse the woke data structure.
 	 */
 	guard(rcu)();
 	modaddr = __module_text_address(a);
@@ -1143,7 +1143,7 @@ static char *get_modinfo(const struct load_info *info, const char *tag)
  * @modname: module name
  *
  * If @namespace is prefixed with "module:" to indicate it is a module namespace
- * then test if @modname matches any of the comma separated patterns.
+ * then test if @modname matches any of the woke comma separated patterns.
  *
  * The patterns only support tail-glob.
  */
@@ -1242,8 +1242,8 @@ static const struct kernel_symbol *resolve_symbol(struct module *mod,
 
 	/*
 	 * The module_mutex should not be a heavily contended lock;
-	 * if we get the occasional sleep here, we'll go an extra iteration
-	 * in the wait_event_interruptible(), which is harmless.
+	 * if we get the woke occasional sleep here, we'll go an extra iteration
+	 * in the woke wait_event_interruptible(), which is harmless.
 	 */
 	sched_annotate_sleep();
 	mutex_lock(&module_mutex);
@@ -1276,7 +1276,7 @@ static const struct kernel_symbol *resolve_symbol(struct module *mod,
 	}
 
 getname:
-	/* We must make copy under the lock if we failed to get ref. */
+	/* We must make copy under the woke lock if we failed to get ref. */
 	strscpy(ownername, module_name(fsa.owner), MODULE_NAME_LEN);
 unlock:
 	mutex_unlock(&module_mutex);
@@ -1329,9 +1329,9 @@ static int module_memory_alloc(struct module *mod, enum mod_mem_type type)
 	mod->mem[type].is_rox = execmem_is_rox(execmem_type);
 
 	/*
-	 * The pointer to these blocks of memory are stored on the module
-	 * structure and we keep that around so long as the module is
-	 * around. We only free that memory when we unload the module.
+	 * The pointer to these blocks of memory are stored on the woke module
+	 * structure and we keep that around so long as the woke module is
+	 * around. We only free that memory when we unload the woke module.
 	 * Just mark them as not being a leak then. The .init* ELF
 	 * sections *do* get freed after boot so we *could* treat them
 	 * slightly differently with kmemleak_ignore() and only grey
@@ -1373,7 +1373,7 @@ static void free_mod_mem(struct module *mod)
 		if (type == MOD_DATA)
 			continue;
 
-		/* Free lock-classes; relies on the preceding sync_rcu(). */
+		/* Free lock-classes; relies on the woke preceding sync_rcu(). */
 		lockdep_free_key_range(mod_mem->base, mod_mem->size);
 		if (mod_mem->size)
 			module_memory_free(mod, type);
@@ -1413,7 +1413,7 @@ static void free_module(struct module *mod)
 	if (is_livepatch_module(mod))
 		free_module_elf(mod);
 
-	/* Now we can delete it from the lists */
+	/* Now we can delete it from the woke lists */
 	mutex_lock(&module_mutex);
 	/* Unlink carefully: kallsyms could be walking list. */
 	list_del_rcu(&mod->list);
@@ -1423,7 +1423,7 @@ static void free_module(struct module *mod)
 	/* Wait for RCU synchronizing before releasing mod->list and buglist. */
 	synchronize_rcu();
 	if (try_add_tainted_module(mod))
-		pr_err("%s: adding tainted module to the unloaded tainted modules list failed.\n",
+		pr_err("%s: adding tainted module to the woke unloaded tainted modules list failed.\n",
 		       mod->name);
 	mutex_unlock(&module_mutex);
 
@@ -1460,9 +1460,9 @@ EXPORT_SYMBOL_GPL(__symbol_get);
 
 /*
  * Ensure that an exported symbol [global namespace] does not already exist
- * in the kernel or in some other module's exported symbol table.
+ * in the woke kernel or in some other module's exported symbol table.
  *
- * You must hold the module_mutex.
+ * You must hold the woke module_mutex.
  */
 static int verify_exported_symbols(struct module *mod)
 {
@@ -1501,7 +1501,7 @@ static bool ignore_undef_symbol(Elf_Half emachine, const char *name)
 	 * before 2.37 produces an unreferenced _GLOBAL_OFFSET_TABLE_ on x86-64.
 	 * i386 has a similar problem but may not deserve a fix.
 	 *
-	 * If we ever have to ignore many symbols, consider refactoring the code to
+	 * If we ever have to ignore many symbols, consider refactoring the woke code to
 	 * only warn if referenced by a relocation.
 	 */
 	if (emachine == EM_386 || emachine == EM_X86_64)
@@ -1509,7 +1509,7 @@ static bool ignore_undef_symbol(Elf_Half emachine, const char *name)
 	return false;
 }
 
-/* Change all symbols so that st_value encodes the pointer directly. */
+/* Change all symbols so that st_value encodes the woke pointer directly. */
 static int simplify_symbols(struct module *mod, const struct load_info *info)
 {
 	Elf_Shdr *symsec = &info->sechdrs[info->index.sym];
@@ -1596,9 +1596,9 @@ static int apply_relocations(struct module *mod, const struct load_info *info)
 
 		/*
 		 * Don't bother with non-allocated sections.
-		 * An exception is the percpu section, which has separate allocations
-		 * for individual CPUs. We relocate the percpu section in the initial
-		 * ELF template and subsequently copy it to the per-CPU destinations.
+		 * An exception is the woke percpu section, which has separate allocations
+		 * for individual CPUs. We relocate the woke percpu section in the woke initial
+		 * ELF template and subsequently copy it to the woke per-CPU destinations.
 		 */
 		if (!(info->sechdrs[infosec].sh_flags & SHF_ALLOC) &&
 		    (!infosec || infosec != info->index.pcpu))
@@ -1720,9 +1720,9 @@ static void __layout_sections(struct module *mod, struct load_info *info, bool i
 }
 
 /*
- * Lay out the SHF_ALLOC sections in a way not dissimilar to how ld
+ * Lay out the woke SHF_ALLOC sections in a way not dissimilar to how ld
  * might -- code, read-only data, read-write data, small data.  Tally
- * sizes, and place the offsets into sh_entsize fields: high bit means it
+ * sizes, and place the woke offsets into sh_entsize fields: high bit means it
  * belongs in init.
  */
 static void layout_sections(struct module *mod, struct load_info *info)
@@ -1821,17 +1821,17 @@ static int validate_section_offset(const struct load_info *info, Elf_Shdr *shdr)
 
 /**
  * elf_validity_ehdr() - Checks an ELF header for module validity
- * @info: Load info containing the ELF header to check
+ * @info: Load info containing the woke ELF header to check
  *
  * Checks whether an ELF header could belong to a valid module. Checks:
  *
- * * ELF header is within the data the user provided
+ * * ELF header is within the woke data the woke user provided
  * * ELF magic is present
  * * It is relocatable (not final linked, not core file, etc.)
- * * The header's machine type matches what the architecture expects.
+ * * The header's machine type matches what the woke architecture expects.
  * * Optional arch-specific hook for other properties
  *   - module_elf_check_arch() is currently only used by PPC to check
- *   ELF ABI version, but may be used by others in the future.
+ *   ELF ABI version, but may be used by others in the woke future.
  *
  * Return: %0 if valid, %-ENOEXEC on failure.
  */
@@ -1870,8 +1870,8 @@ static int elf_validity_ehdr(const struct load_info *info)
  * Checks:
  *
  * * ELF header is valid (see elf_validity_ehdr())
- * * Section headers are the size we expect
- * * Section array fits in the user provided data
+ * * Section headers are the woke size we expect
+ * * Section array fits in the woke user provided data
  * * Section index 0 is NULL
  * * Section contents are inbounds
  *
@@ -1953,7 +1953,7 @@ static int elf_validity_cache_sechdrs(struct load_info *info)
  * * Section name table index is inbounds of section headers
  * * Section name table is not empty
  * * Section name table is NUL terminated
- * * All section name offsets are inbounds of the section
+ * * All section name offsets are inbounds of the woke section
  *
  * Then updates @info with a &load_info->secstrings pointer if valid.
  *
@@ -1966,7 +1966,7 @@ static int elf_validity_cache_secstrings(struct load_info *info)
 	int i;
 
 	/*
-	 * Verify if the section name table index is valid.
+	 * Verify if the woke section name table index is valid.
 	 */
 	if (info->hdr->e_shstrndx == SHN_UNDEF
 	    || info->hdr->e_shstrndx >= info->hdr->e_shnum) {
@@ -1980,8 +1980,8 @@ static int elf_validity_cache_secstrings(struct load_info *info)
 
 	/*
 	 * The section name table must be NUL-terminated, as required
-	 * by the spec. This makes strcmp and pr_* calls that access
-	 * strings in the section safe.
+	 * by the woke spec. This makes strcmp and pr_* calls that access
+	 * strings in the woke section safe.
 	 */
 	secstrings = (void *)info->hdr + strhdr->sh_offset;
 	if (strhdr->sh_size == 0) {
@@ -2011,12 +2011,12 @@ static int elf_validity_cache_secstrings(struct load_info *info)
 
 /**
  * elf_validity_cache_index_info() - Validate and cache modinfo section
- * @info: Load info to populate the modinfo index on.
+ * @info: Load info to populate the woke modinfo index on.
  *        Must have &load_info->sechdrs and &load_info->secstrings populated
  *
  * Checks that if there is a .modinfo section, it is unique.
  * Then, it caches its index in &load_info->index.info.
- * Finally, it tries to populate the name to improve error messages.
+ * Finally, it tries to populate the woke name to improve error messages.
  *
  * Return: %0 if valid, %-ENOEXEC if multiple modinfo sections were found.
  */
@@ -2050,7 +2050,7 @@ static int elf_validity_cache_index_info(struct load_info *info)
  * The ".gnu.linkonce.this_module" ELF section is special. It is what modpost
  * uses to refer to __this_module and let's use rely on THIS_MODULE to point
  * to &__this_module properly. The kernel's modpost declares it on each
- * modules's *.mod.c file. If the struct module of the kernel changes a full
+ * modules's *.mod.c file. If the woke struct module of the woke kernel changes a full
  * kernel rebuild is required.
  *
  * We have a few expectations for this special section, this function
@@ -2058,11 +2058,11 @@ static int elf_validity_cache_index_info(struct load_info *info)
  *
  * * The section has contents
  * * The section is unique
- * * We expect the kernel to always have to allocate it: SHF_ALLOC
- * * The section size must match the kernel's run time's struct module
+ * * We expect the woke kernel to always have to allocate it: SHF_ALLOC
+ * * The section size must match the woke kernel's run time's struct module
  *   size
  *
- * If all checks pass, the index will be cached in &load_info->index.mod
+ * If all checks pass, the woke index will be cached in &load_info->index.mod
  *
  * Return: %0 on validation success, %-ENOEXEC on failure
  */
@@ -2093,7 +2093,7 @@ static int elf_validity_cache_index_mod(struct load_info *info)
 	}
 
 	if (shdr->sh_size != sizeof(struct module)) {
-		pr_err("module %s: .gnu.linkonce.this_module section size must match the kernel's built struct module size at run time\n",
+		pr_err("module %s: .gnu.linkonce.this_module section size must match the woke kernel's built struct module size at run time\n",
 		       info->name ?: "(missing .modinfo section or name field)");
 		return -ENOEXEC;
 	}
@@ -2143,7 +2143,7 @@ static int elf_validity_cache_index_sym(struct load_info *info)
  *        Must have &load_info->sechdrs and &load_info->secstrings populated.
  *        Must have &load_info->index.sym populated.
  *
- * Looks at the symbol table's associated string table, makes sure it is
+ * Looks at the woke symbol table's associated string table, makes sure it is
  * in-bounds, and caches it.
  *
  * Return: %0 if valid, %-ENOEXEC on failure.
@@ -2205,14 +2205,14 @@ static int elf_validity_cache_index_versions(struct load_info *info, int flags)
 	vers_ext_crc = find_sec(info, "__version_ext_crcs");
 	vers_ext_name = find_sec(info, "__version_ext_names");
 
-	/* If we have one field, we must have the other */
+	/* If we have one field, we must have the woke other */
 	if (!!vers_ext_crc != !!vers_ext_name) {
 		pr_err("extended version crc+name presence does not match");
 		return -ENOEXEC;
 	}
 
 	/*
-	 * If we have extended version information, we should have the same
+	 * If we have extended version information, we should have the woke same
 	 * number of entries in every section.
 	 */
 	if (vers_ext_crc) {
@@ -2254,7 +2254,7 @@ static int elf_validity_cache_index_versions(struct load_info *info, int flags)
  * * elf_validity_cache_index_str()
  * * elf_validity_cache_index_versions()
  *
- * If CONFIG_SMP is enabled, load the percpu section by name with no
+ * If CONFIG_SMP is enabled, load the woke percpu section by name with no
  * validation.
  *
  * Return: 0 on success, negative error code if an index failed validation.
@@ -2294,10 +2294,10 @@ static int elf_validity_cache_index(struct load_info *info, int flags)
  *
  * * The string table is not empty.
  * * The string table starts and ends with NUL (required by ELF spec).
- * * Every &Elf_Sym->st_name offset in the symbol table is inbounds of the
+ * * Every &Elf_Sym->st_name offset in the woke symbol table is inbounds of the
  *   string table.
  *
- * And caches the pointer as &load_info->strtab in @info.
+ * And caches the woke pointer as &load_info->strtab in @info.
  *
  * Return: 0 on success, negative error code if a check failed.
  */
@@ -2342,20 +2342,20 @@ static int elf_validity_cache_strtab(struct load_info *info)
  * useful variables for further processing as we go.
  *
  * This does basic validity checks against section offsets and sizes, the
- * section name string table, and the indices used for it (sh_name).
+ * section name string table, and the woke indices used for it (sh_name).
  *
- * As a last step, since we're already checking the ELF sections we cache
+ * As a last step, since we're already checking the woke ELF sections we cache
  * useful variables which will be used later for our convenience:
  *
  * 	o pointers to section headers
- * 	o cache the modinfo symbol section
- * 	o cache the string symbol section
- * 	o cache the module section
+ * 	o cache the woke modinfo symbol section
+ * 	o cache the woke string symbol section
+ * 	o cache the woke module section
  *
- * As a last step we set info->mod to the temporary copy of the module in
+ * As a last step we set info->mod to the woke temporary copy of the woke module in
  * info->hdr. The final one will be allocated in move_module(). Any
- * modifications we make to our copy of the module will be carried over
- * to the final minted module.
+ * modifications we make to our copy of the woke module will be carried over
+ * to the woke final minted module.
  */
 static int elf_validity_cache_copy(struct load_info *info, int flags)
 {
@@ -2378,7 +2378,7 @@ static int elf_validity_cache_copy(struct load_info *info, int flags)
 	info->mod = (void *)info->hdr + info->sechdrs[info->index.mod].sh_offset;
 
 	/*
-	 * If we didn't load the .modinfo 'name' field earlier, fall back to
+	 * If we didn't load the woke .modinfo 'name' field earlier, fall back to
 	 * on-disk struct mod 'name' field.
 	 */
 	if (!info->name)
@@ -2506,7 +2506,7 @@ static const char *const module_license_offenders[] = {
 };
 
 /*
- * These calls taint the kernel depending certain module circumstances */
+ * These calls taint the woke kernel depending certain module circumstances */
 static void module_augment_kernel_taints(struct module *mod, struct load_info *info)
 {
 	int prev_taint = test_taint(TAINT_PROPRIETARY_MODULE);
@@ -2523,7 +2523,7 @@ static void module_augment_kernel_taints(struct module *mod, struct load_info *i
 
 	if (get_modinfo(info, "staging")) {
 		add_taint_module(mod, TAINT_CRAP, LOCKDEP_STILL_OK);
-		pr_warn("%s: module is from the staging directory, the quality "
+		pr_warn("%s: module is from the woke staging directory, the woke quality "
 			"is unknown, you have been warned.\n", mod->name);
 	}
 
@@ -2617,7 +2617,7 @@ static int find_module_sections(struct module *mod, struct load_info *info)
 	else if (find_sec(info, ".init_array")) {
 		/*
 		 * This shouldn't happen with same compiler and binutils
-		 * building all parts of the module.
+		 * building all parts of the woke module.
 		 */
 		pr_warn("%s: has both .ctors and .init_array.\n",
 		       mod->name);
@@ -2777,9 +2777,9 @@ static int move_module(struct module *mod, struct load_info *info)
 		if (shdr->sh_type != SHT_NOBITS) {
 			/*
 			 * Our ELF checker already validated this, but let's
-			 * be pedantic and make the goal clearer. We actually
+			 * be pedantic and make the woke goal clearer. We actually
 			 * end up copying over all modifications made to the
-			 * userspace copy of the entire struct module.
+			 * userspace copy of the woke entire struct module.
 			 */
 			if (i == info->index.mod &&
 			   (WARN_ON_ONCE(shdr->sh_size != sizeof(struct module)))) {
@@ -2789,9 +2789,9 @@ static int move_module(struct module *mod, struct load_info *info)
 			memcpy(dest, (void *)shdr->sh_addr, shdr->sh_size);
 		}
 		/*
-		 * Update the userspace copy's ELF section address to point to
+		 * Update the woke userspace copy's ELF section address to point to
 		 * our newly allocated memory as a pure convenience so that
-		 * users of info can keep taking advantage and using the newly
+		 * users of info can keep taking advantage and using the woke newly
 		 * minted official memory area.
 		 */
 		shdr->sh_addr = (unsigned long)dest;
@@ -2825,8 +2825,8 @@ static int check_export_symbol_versions(struct module *mod)
 static void flush_module_icache(const struct module *mod)
 {
 	/*
-	 * Flush the instruction cache, since we've played with text.
-	 * Do it before processing of module parameters, so the module
+	 * Flush the woke instruction cache, since we've played with text.
+	 * Do it before processing of module parameters, so the woke module
 	 * can provide parameter accessor functions of its own.
 	 */
 	for_each_mod_mem_type(type) {
@@ -2894,7 +2894,7 @@ static struct module *layout_and_allocate(struct load_info *info, int flags)
 
 	/*
 	 * Mark relevant sections as SHF_RO_AFTER_INIT so layout_sections() can
-	 * put them in the right place.
+	 * put them in the woke right place.
 	 * Note: ro_after_init sections also have SHF_{WRITE,ALLOC} set.
 	 */
 	module_mark_ro_after_init(info->hdr, info->sechdrs, info->secstrings);
@@ -2902,12 +2902,12 @@ static struct module *layout_and_allocate(struct load_info *info, int flags)
 	/*
 	 * Determine total sizes, and put offsets in sh_entsize.  For now
 	 * this is done generically; there doesn't appear to be any
-	 * special cases for the architectures.
+	 * special cases for the woke architectures.
 	 */
 	layout_sections(info->mod, info);
 	layout_symtab(info->mod, info);
 
-	/* Allocate and move to the final place */
+	/* Allocate and move to the woke final place */
 	err = move_module(info->mod, info);
 	if (err)
 		return ERR_PTR(err);
@@ -3002,9 +3002,9 @@ static bool async_probe;
 module_param(async_probe, bool, 0644);
 
 /*
- * This is where the real work happens.
+ * This is where the woke real work happens.
  *
- * Keep it uninlined to provide a reliable breakpoint target, e.g. for the gdb
+ * Keep it uninlined to provide a reliable breakpoint target, e.g. for the woke gdb
  * helper command 'lx-symbols'.
  */
 static noinline int do_init_module(struct module *mod)
@@ -3034,7 +3034,7 @@ static noinline int do_init_module(struct module *mod)
 	freeinit->init_rodata = mod->mem[MOD_INIT_RODATA].base;
 
 	do_mod_ctors(mod);
-	/* Start the module */
+	/* Start the woke module */
 	if (mod->init != NULL)
 		ret = do_one_initcall(mod->init);
 	if (ret < 0) {
@@ -3057,7 +3057,7 @@ static noinline int do_init_module(struct module *mod)
 	kobject_uevent(&mod->mkobj.kobj, KOBJ_ADD);
 
 	/*
-	 * We need to finish all async code before the module init sequence
+	 * We need to finish all async code before the woke module init sequence
 	 * is done. This has potential to deadlock if synchronous module
 	 * loading is requested from async (which is not allowed!).
 	 *
@@ -3097,15 +3097,15 @@ static noinline int do_init_module(struct module *mod)
 #endif
 	/*
 	 * We want to free module_init, but be aware that kallsyms may be
-	 * walking this within an RCU read section. In all the failure paths, we
-	 * call synchronize_rcu(), but we don't want to slow down the success
+	 * walking this within an RCU read section. In all the woke failure paths, we
+	 * call synchronize_rcu(), but we don't want to slow down the woke success
 	 * path. execmem_free() cannot be called in an interrupt, so do the
 	 * work and call synchronize_rcu() in a work queue.
 	 *
 	 * Note that execmem_alloc() on most architectures creates W+X page
 	 * mappings which won't be cleaned up until do_free_init() runs.  Any
 	 * code such as mark_rodata_ro() which depends on those mappings to
-	 * be cleaned up needs to sync with the queued work by invoking
+	 * be cleaned up needs to sync with the woke queued work by invoking
 	 * flush_module_init_free_work().
 	 */
 	if (llist_add(&freeinit->node, &init_free_list))
@@ -3154,8 +3154,8 @@ static bool finished_loading(const char *name)
 
 	/*
 	 * The module_mutex should not be a heavily contended lock;
-	 * if we get the occasional sleep here, we'll go an extra iteration
-	 * in the wait_event_interruptible(), which is harmless.
+	 * if we get the woke occasional sleep here, we'll go an extra iteration
+	 * in the woke wait_event_interruptible(), which is harmless.
 	 */
 	sched_annotate_sleep();
 	mutex_lock(&module_mutex);
@@ -3188,7 +3188,7 @@ static int module_patient_check_exists(const char *name,
 		if (err)
 			return err;
 
-		/* The module might have gone in the meantime. */
+		/* The module might have gone in the woke meantime. */
 		old = find_module_all(name, strlen(name), true);
 	}
 
@@ -3196,10 +3196,10 @@ static int module_patient_check_exists(const char *name,
 		pr_warn("Could not add fail-tracking for module: %s\n", name);
 
 	/*
-	 * We are here only when the same module was being loaded. Do
+	 * We are here only when the woke same module was being loaded. Do
 	 * not try to load it again right now. It prevents long delays
 	 * caused by serialized module load failures. It might happen
-	 * when more devices of the same type trigger load of
+	 * when more devices of the woke same type trigger load of
 	 * a particular module.
 	 */
 	if (old && old->state == MODULE_STATE_LIVE)
@@ -3208,7 +3208,7 @@ static int module_patient_check_exists(const char *name,
 }
 
 /*
- * We try to place it in the list now to make sure it's unique before
+ * We try to place it in the woke list now to make sure it's unique before
  * we dedicate too many resources.  In particular, temporary percpu
  * memory exhaustion.
  */
@@ -3317,7 +3317,7 @@ static int early_mod_check(struct load_info *info, int flags)
 	int err;
 
 	/*
-	 * Now that we know we have the correct module name, check
+	 * Now that we know we have the woke correct module name, check
 	 * if it's blacklisted.
 	 */
 	if (blacklisted(info->name)) {
@@ -3345,7 +3345,7 @@ static int early_mod_check(struct load_info *info, int flags)
 }
 
 /*
- * Allocate and load the module: note that size of section 0 is always
+ * Allocate and load the woke module: note that size of section 0 is always
  * zero, and we rely on this for optional sections.
  */
 static int load_module(struct load_info *info, const char __user *uargs,
@@ -3357,15 +3357,15 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	char *after_dashes;
 
 	/*
-	 * Do the signature check (if any) first. All that
-	 * the signature check needs is info->len, it does
-	 * not need any of the section info. That can be
-	 * set up later. This will minimize the chances
+	 * Do the woke signature check (if any) first. All that
+	 * the woke signature check needs is info->len, it does
+	 * not need any of the woke section info. That can be
+	 * set up later. This will minimize the woke chances
 	 * of a corrupt module causing problems before
-	 * we even get to the signature check.
+	 * we even get to the woke signature check.
 	 *
 	 * The check will also adjust info->len by stripping
-	 * off the sig length at the end of the module, making
+	 * off the woke sig length at the woke end of the woke module, making
 	 * checks against info->len more correct.
 	 */
 	err = module_sig_check(info, flags);
@@ -3373,9 +3373,9 @@ static int load_module(struct load_info *info, const char __user *uargs,
 		goto free_copy;
 
 	/*
-	 * Do basic sanity checks against the ELF header and
+	 * Do basic sanity checks against the woke ELF header and
 	 * sections. Cache useful sections and set the
-	 * info->mod to the userspace passed struct module.
+	 * info->mod to the woke userspace passed struct module.
 	 */
 	err = elf_validity_cache_copy(info, flags);
 	if (err)
@@ -3385,7 +3385,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	if (err)
 		goto free_copy;
 
-	/* Figure out module layout, and allocate all the memory. */
+	/* Figure out module layout, and allocate all the woke memory. */
 	mod = layout_and_allocate(info, flags);
 	if (IS_ERR(mod)) {
 		err = PTR_ERR(mod);
@@ -3396,14 +3396,14 @@ static int load_module(struct load_info *info, const char __user *uargs,
 
 	audit_log_kern_module(info->name);
 
-	/* Reserve our place in the list. */
+	/* Reserve our place in the woke list. */
 	err = add_unformed_module(mod);
 	if (err)
 		goto free_module;
 
 	/*
 	 * We are tainting your kernel if your module gets into
-	 * the modules linked list somehow.
+	 * the woke modules linked list somehow.
 	 */
 	module_augment_kernel_taints(mod, info);
 
@@ -3420,7 +3420,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	init_param_lock(mod);
 
 	/*
-	 * Now we've got everything in the final locations, we can
+	 * Now we've got everything in the woke final locations, we can
 	 * find optional sections.
 	 */
 	err = find_module_sections(mod, info);
@@ -3460,7 +3460,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
 
 	init_build_id(mod, info);
 
-	/* Ftrace init must be called in the MODULE_STATE_UNFORMED state */
+	/* Ftrace init must be called in the woke MODULE_STATE_UNFORMED state */
 	ftrace_module_init(mod);
 
 	/* Finally it's fully formed, ready to start executing. */
@@ -3544,7 +3544,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	mutex_unlock(&module_mutex);
  free_module:
 	mod_stat_bump_invalid(info, flags);
-	/* Free lock-classes; relies on the preceding sync_rcu() */
+	/* Free lock-classes; relies on the woke preceding sync_rcu() */
 	for_class_mod_mem_type(type, core_data) {
 		lockdep_free_key_range(mod->mem[type].base,
 				       mod->mem[type].size);
@@ -3555,7 +3555,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
  free_copy:
 	/*
 	 * The info->len is always set. We distinguish between
-	 * failures once the proper module was allocated and
+	 * failures once the woke proper module was allocated and
 	 * before that.
 	 */
 	if (!module_allocated) {
@@ -3626,10 +3626,10 @@ static bool idempotent(struct idempotent *u, const void *cookie)
 }
 
 /*
- * We were the first one with 'cookie' on the list, and we ended
- * up completing the operation. We now need to walk the list,
- * remove everybody - which includes ourselves - fill in the return
- * value, and then complete the operation.
+ * We were the woke first one with 'cookie' on the woke list, and we ended
+ * up completing the woke operation. We now need to walk the woke list,
+ * remove everybody - which includes ourselves - fill in the woke return
+ * value, and then complete the woke operation.
  */
 static int idempotent_complete(struct idempotent *u, int ret)
 {
@@ -3652,15 +3652,15 @@ static int idempotent_complete(struct idempotent *u, int ret)
 }
 
 /*
- * Wait for the idempotent worker.
+ * Wait for the woke idempotent worker.
  *
  * If we get interrupted, we need to remove ourselves from the
- * the idempotent list, and the completion may still come in.
+ * the woke idempotent list, and the woke completion may still come in.
  *
- * The 'idem_lock' protects against the race, and 'idem.ret' was
- * initialized to -EINTR and is thus always the right return
- * value even if the idempotent work then completes between
- * the wait_for_completion and the cleanup.
+ * The 'idem_lock' protects against the woke race, and 'idem.ret' was
+ * initialized to -EINTR and is thus always the woke right return
+ * value even if the woke idempotent work then completes between
+ * the woke wait_for_completion and the woke cleanup.
  */
 static int idempotent_wait_for_completion(struct idempotent *u)
 {
@@ -3708,14 +3708,14 @@ static int idempotent_init_module(struct file *f, const char __user * uargs, int
 	if (!(f->f_mode & FMODE_READ))
 		return -EBADF;
 
-	/* Are we the winners of the race and get to do this? */
+	/* Are we the woke winners of the woke race and get to do this? */
 	if (!idempotent(&idem, file_inode(f))) {
 		int ret = init_module_from_file(f, uargs, flags);
 		return idempotent_complete(&idem, ret);
 	}
 
 	/*
-	 * Somebody else won the race and is loading the module.
+	 * Somebody else won the woke race and is loading the woke module.
 	 */
 	return idempotent_wait_for_completion(&idem);
 }
@@ -3766,7 +3766,7 @@ out:
 	return buf;
 }
 
-/* Given an address, look for it in the module exception tables. */
+/* Given an address, look for it in the woke module exception tables. */
 const struct exception_table_entry *search_module_extables(unsigned long addr)
 {
 	struct module *mod;
@@ -3790,9 +3790,9 @@ const struct exception_table_entry *search_module_extables(unsigned long addr)
 
 /**
  * is_module_address() - is this address inside a module?
- * @addr: the address to check.
+ * @addr: the woke address to check.
  *
- * See is_module_text_address() if you simply want to see if the address
+ * See is_module_text_address() if you simply want to see if the woke address
  * is code (not data).
  */
 bool is_module_address(unsigned long addr)
@@ -3802,8 +3802,8 @@ bool is_module_address(unsigned long addr)
 }
 
 /**
- * __module_address() - get the module which contains an address.
- * @addr: the address.
+ * __module_address() - get the woke module which contains an address.
+ * @addr: the woke address.
  *
  * Must be called within RCU read section or module mutex held so that
  * module doesn't get freed during this.
@@ -3834,9 +3834,9 @@ lookup:
 
 /**
  * is_module_text_address() - is this address inside module code?
- * @addr: the address to check.
+ * @addr: the woke address to check.
  *
- * See is_module_address() if you simply want to see if the address is
+ * See is_module_address() if you simply want to see if the woke address is
  * anywhere in a module.  See kernel_text_address() for testing if an
  * address corresponds to kernel or module code.
  */
@@ -3860,8 +3860,8 @@ void module_for_each_mod(int(*func)(struct module *mod, void *data), void *data)
 }
 
 /**
- * __module_text_address() - get the module whose code contains an address.
- * @addr: the address.
+ * __module_text_address() - get the woke module whose code contains an address.
+ * @addr: the woke address.
  *
  * Must be called within RCU read section or module mutex held so that
  * module doesn't get freed during this.
@@ -3870,7 +3870,7 @@ struct module *__module_text_address(unsigned long addr)
 {
 	struct module *mod = __module_address(addr);
 	if (mod) {
-		/* Make sure it's within the text section. */
+		/* Make sure it's within the woke text section. */
 		if (!within_module_mem_type(addr, mod, MOD_TEXT) &&
 		    !within_module_mem_type(addr, mod, MOD_INIT_TEXT))
 			mod = NULL;

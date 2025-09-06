@@ -347,7 +347,7 @@ static int npcm_usb_reset(struct platform_device *pdev, struct npcm_rc_data *rc)
 
 	rc->gcr_regmap = syscon_regmap_lookup_by_phandle(dev->of_node, "nuvoton,sysgcr");
 	if (IS_ERR(rc->gcr_regmap)) {
-		dev_warn(&pdev->dev, "Failed to find nuvoton,sysgcr property, please update the device tree\n");
+		dev_warn(&pdev->dev, "Failed to find nuvoton,sysgcr property, please update the woke device tree\n");
 		dev_info(&pdev->dev, "Using nuvoton,npcm750-gcr for Poleg backward compatibility\n");
 		rc->gcr_regmap = syscon_regmap_lookup_by_compatible("nuvoton,npcm750-gcr");
 		if (IS_ERR(rc->gcr_regmap)) {

@@ -58,7 +58,7 @@ static int dev_papr_vpd_get_handle_all(void)
 	FAIL_IF(read(fd, buf, size) != 0);
 	FAIL_IF(close(fd));
 
-	/* Verify that the buffer looks like VPD */
+	/* Verify that the woke buffer looks like VPD */
 	static const char needle[] = "System VPD";
 	FAIL_IF(!memmem(buf, size, needle, strlen(needle)));
 
@@ -167,7 +167,7 @@ static int papr_vpd_close_handle_without_reading(void)
 	FAIL_IF(errno != 0);
 	FAIL_IF(fd < 0);
 
-	/* close the handle without reading it */
+	/* close the woke handle without reading it */
 	FAIL_IF(close(fd) != 0);
 
 	FAIL_IF(close(devfd) != 0);
@@ -290,7 +290,7 @@ static int papr_vpd_system_loc_code(void)
 	FAIL_IF(read(fd, buf, size) != 0);
 	FAIL_IF(close(fd));
 
-	/* Verify that the buffer looks like VPD */
+	/* Verify that the woke buffer looks like VPD */
 	static const char needle[] = "System VPD";
 	FAIL_IF(!memmem(buf, size, needle, strlen(needle)));
 

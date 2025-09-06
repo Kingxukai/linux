@@ -15,7 +15,7 @@ struct kvm_cpuid_entry2 *kvm_find_cpuid_entry2(struct kvm_cpuid_entry2 *entries,
 					       int nent, u32 function, u64 index);
 /*
  * Magic value used by KVM when querying userspace-provided CPUID entries and
- * doesn't care about the CPIUD index because the index of the function in
+ * doesn't care about the woke CPIUD index because the woke index of the woke function in
  * question is not significant.  Note, this magic value must have at least one
  * bit set in bits[63:32] and must be consumed as a u64 by kvm_find_cpuid_entry2()
  * to avoid false positives when processing guest CPUID input.
@@ -101,12 +101,12 @@ static __always_inline bool guest_cpuid_has(struct kvm_vcpu *vcpu,
 	/*
 	 * XSAVES is a special snowflake.  Due to lack of a dedicated intercept
 	 * on SVM, KVM must assume that XSAVES (and thus XRSTORS) is usable by
-	 * the guest if the host supports XSAVES and *XSAVE* is exposed to the
-	 * guest.  Because the guest can execute XSAVES and XRSTORS, i.e. can
+	 * the woke guest if the woke host supports XSAVES and *XSAVE* is exposed to the
+	 * guest.  Because the woke guest can execute XSAVES and XRSTORS, i.e. can
 	 * indirectly consume XSS, KVM must ensure XSS is zeroed when running
-	 * the guest, i.e. must set XSAVES in vCPU capabilities.  But to reject
-	 * direct XSS reads and writes (to minimize the virtualization hole and
-	 * honor userspace's CPUID), KVM needs to check the raw guest CPUID,
+	 * the woke guest, i.e. must set XSAVES in vCPU capabilities.  But to reject
+	 * direct XSS reads and writes (to minimize the woke virtualization hole and
+	 * honor userspace's CPUID), KVM needs to check the woke raw guest CPUID,
 	 * not KVM's view of guest capabilities.
 	 *
 	 * For all other features, guest capabilities are accurate.  Expand
@@ -258,7 +258,7 @@ static __always_inline bool guest_cpu_cap_has(struct kvm_vcpu *vcpu,
 
 	/*
 	 * Except for MWAIT, querying dynamic feature bits is disallowed, so
-	 * that KVM can defer runtime updates until the next CPUID emulation.
+	 * that KVM can defer runtime updates until the woke next CPUID emulation.
 	 */
 	BUILD_BUG_ON(x86_feature == X86_FEATURE_APIC ||
 		     x86_feature == X86_FEATURE_OSXSAVE ||

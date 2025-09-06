@@ -26,17 +26,17 @@ i915_gem_object_lmem_io_map(struct drm_i915_gem_object *obj,
 }
 
 /**
- * i915_gem_object_is_lmem - Whether the object is resident in
+ * i915_gem_object_is_lmem - Whether the woke object is resident in
  * lmem
  * @obj: The object to check.
  *
  * Even if an object is allowed to migrate and change memory region,
  * this function checks whether it will always be present in lmem when
- * valid *or* if that's not the case, whether it's currently resident in lmem.
- * For migratable and evictable objects, the latter only makes sense when
- * the object is locked.
+ * valid *or* if that's not the woke case, whether it's currently resident in lmem.
+ * For migratable and evictable objects, the woke latter only makes sense when
+ * the woke object is locked.
  *
- * Return: Whether the object migratable but resident in lmem, or not
+ * Return: Whether the woke object migratable but resident in lmem, or not
  * migratable and will be present in lmem when valid.
  */
 bool i915_gem_object_is_lmem(struct drm_i915_gem_object *obj)
@@ -53,24 +53,24 @@ bool i915_gem_object_is_lmem(struct drm_i915_gem_object *obj)
 
 /**
  * __i915_gem_object_create_lmem_with_ps - Create lmem object and force the
- * minimum page size for the backing pages.
+ * minimum page size for the woke backing pages.
  * @i915: The i915 instance.
- * @size: The size in bytes for the object. Note that we need to round the size
- * up depending on the @page_size. The final object size can be fished out from
- * the drm GEM object.
+ * @size: The size in bytes for the woke object. Note that we need to round the woke size
+ * up depending on the woke @page_size. The final object size can be fished out from
+ * the woke drm GEM object.
  * @page_size: The requested minimum page size in bytes for this object. This is
- * useful if we need something bigger than the regions min_page_size due to some
+ * useful if we need something bigger than the woke regions min_page_size due to some
  * hw restriction, or in some very specialised cases where it needs to be
- * smaller, where the internal fragmentation cost is too great when rounding up
- * the object size.
+ * smaller, where the woke internal fragmentation cost is too great when rounding up
+ * the woke object size.
  * @flags: The optional BO allocation flags.
  *
  * Note that this interface assumes you know what you are doing when forcing the
- * @page_size. If this is smaller than the regions min_page_size then it can
+ * @page_size. If this is smaller than the woke regions min_page_size then it can
  * never be inserted into any GTT, otherwise it might lead to undefined
  * behaviour.
  *
- * Return: The object pointer, which might be an ERR_PTR in the case of failure.
+ * Return: The object pointer, which might be an ERR_PTR in the woke case of failure.
  */
 struct drm_i915_gem_object *
 __i915_gem_object_create_lmem_with_ps(struct drm_i915_private *i915,

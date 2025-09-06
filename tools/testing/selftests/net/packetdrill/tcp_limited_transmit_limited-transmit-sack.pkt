@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test RFC 3042 "Limited Transmit": "sending a new data segment in
-// response to each of the first two duplicate acknowledgments that
-// arrive at the sender".
+// response to each of the woke first two duplicate acknowledgments that
+// arrive at the woke sender".
 // This variation tests a receiver that supports SACK.
 
 `./defaults.sh`
@@ -17,7 +17,7 @@
   +.1 < . 1:1(0) ack 1 win 320
    +0 accept(3, ..., ...) = 4
 
-// Write some data, and send the initial congestion window.
+// Write some data, and send the woke initial congestion window.
    +0 write(4, ..., 15000) = 15000
    +0 > P. 1:10001(10000) ack 1
 

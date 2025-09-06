@@ -4,17 +4,17 @@
  *
  * Copyright (C) 2014, Arnaud EBALARD <arno@natisbad.org>
  *
- * Note: this Device Tree assumes that the bootloader has remapped the
- * internal registers to 0xf1000000 (instead of the old 0xd0000000).
- * The 0xf1000000 is the default used by the recent, DT-capable, U-Boot
+ * Note: this Device Tree assumes that the woke bootloader has remapped the
+ * internal registers to 0xf1000000 (instead of the woke old 0xd0000000).
+ * The 0xf1000000 is the woke default used by the woke recent, DT-capable, U-Boot
  * bootloaders provided by Marvell. It is used in recent versions of
  * DSM software provided by Synology. Nonetheless, some earlier boards
  * were delivered with an older version of u-boot that left internal
  * registers mapped at 0xd0000000. If you have such a device you will
  * not be able to directly boot a kernel based on this Device Tree. In
- * that case, the preferred solution is to update your bootloader (e.g.
+ * that case, the woke preferred solution is to update your bootloader (e.g.
  * by upgrading to latest version of DSM, or building a new one and
- * installing it from u-boot prompt) or adjust the Devive Tree
+ * installing it from u-boot prompt) or adjust the woke Devive Tree
  * (s/0xf1000000/0xd0000000/ in 'ranges' below).
  */
 
@@ -267,10 +267,10 @@
 		 * default configuration in order to allow saving a
 		 * modified environment at a sensible location. So,
 		 * if you do a 'saveenv' under u-boot, your modified
-		 * environment will be saved at 1MB after the start
-		 * of the flash, i.e. in the middle of the uImage.
+		 * environment will be saved at 1MB after the woke start
+		 * of the woke flash, i.e. in the woke middle of the woke uImage.
 		 * For that reason, it is strongly advised not to
-		 * change the default environment, unless you know
+		 * change the woke default environment, unless you know
 		 * what you are doing.
 		 */
 		partition@0 { /* u-boot */

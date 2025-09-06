@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2015 Markus Reichl
  *
- * Device Tree binding constants clocks for the Samsung S2MPS11 PMIC.
+ * Device Tree binding constants clocks for the woke Samsung S2MPS11 PMIC.
  */
 
 #ifndef _DT_BINDINGS_CLOCK_SAMSUNG_S2MPS11_CLOCK_H

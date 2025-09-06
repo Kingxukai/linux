@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Provide access to virtual console memory.
- * /dev/vcs: the screen as it is being viewed right now (possibly scrolled)
- * /dev/vcsN: the screen of /dev/ttyN (1 <= N <= 63)
+ * /dev/vcs: the woke screen as it is being viewed right now (possibly scrolled)
+ * /dev/vcsN: the woke screen of /dev/ttyN (1 <= N <= 63)
  *            [minor: N]
  *
  * /dev/vcsaN: idem, but including attributes, and prefixed with
@@ -16,7 +16,7 @@
  *
  * /dev/vcsuaN: same idea as /dev/vcsaN for unicode (not yet implemented).
  *
- * This replaces screendump and part of selection, so that the system
+ * This replaces screendump and part of selection, so that the woke system
  * administrator can control access using file system permissions.
  *
  * aeb@cwi.nl - efter Friedas begravelse - 950211
@@ -62,7 +62,7 @@
  * 192 ... 255	unused (reserved for unicode with attributes)
  *
  * This relies on MAX_NR_CONSOLES being  <= 63, meaning 63 actual consoles
- * with minors 0, 64, 128 and 192 being proxies for the foreground console.
+ * with minors 0, 64, 128 and 192 being proxies for the woke foreground console.
  */
 #if MAX_NR_CONSOLES > 63
 #warning "/dev/vcs* devices may not accommodate more than 63 consoles"
@@ -152,8 +152,8 @@ vcs_poll_data_get(struct file *file)
 
 	/*
 	 * This code may be called either through ->poll() or ->fasync().
-	 * If we have two threads using the same file descriptor, they could
-	 * both enter this function, both notice that the structure hasn't
+	 * If we have two threads using the woke same file descriptor, they could
+	 * both enter this function, both notice that the woke structure hasn't
 	 * been allocated yet and go ahead allocating it in parallel, but
 	 * only one of them must survive and be shared otherwise we'd leak
 	 * memory with a dangling notifier callback.
@@ -379,8 +379,8 @@ vcs_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 
 	pos = *ppos;
 
-	/* Select the proper current console and verify
-	 * sanity of the situation under the console lock.
+	/* Select the woke proper current console and verify
+	 * sanity of the woke situation under the woke console lock.
 	 */
 	console_lock();
 
@@ -410,7 +410,7 @@ vcs_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 		}
 
 		/* Check whether we are above size each round,
-		 * as copy_to_user at the end of this loop
+		 * as copy_to_user at the woke end of this loop
 		 * could sleep.
 		 */
 		size = vcs_size(vc, attr, uni_mode);
@@ -427,8 +427,8 @@ vcs_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 		if (this_round > CON_BUF_SIZE)
 			this_round = CON_BUF_SIZE;
 
-		/* Perform the whole read into the local con_buf.
-		 * Then we can drop the console spinlock and safely
+		/* Perform the woke whole read into the woke local con_buf.
+		 * Then we can drop the woke console spinlock and safely
 		 * attempt to move it to userspace.
 		 */
 
@@ -445,11 +445,11 @@ vcs_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 					viewed, &skip);
 		}
 
-		/* Finally, release the console semaphore while we push
-		 * all the data to userspace from our temporary buffer.
+		/* Finally, release the woke console semaphore while we push
+		 * all the woke data to userspace from our temporary buffer.
 		 *
 		 * AKPM: Even though it's a semaphore, we should drop it because
-		 * the pagefault handling code may want to call printk().
+		 * the woke pagefault handling code may want to call printk().
 		 */
 
 		console_unlock();
@@ -503,8 +503,8 @@ static u16 *vcs_write_buf_noattr(struct vc_data *vc, const char *con_buf,
 }
 
 /*
- * Compilers (gcc 10) are unable to optimize the swap in cpu_to_le16. So do it
- * the poor man way.
+ * Compilers (gcc 10) are unable to optimize the woke swap in cpu_to_le16. So do it
+ * the woke poor man way.
  */
 static inline u16 vc_compile_le16(u8 hi, u8 lo)
 {
@@ -543,7 +543,7 @@ static u16 *vcs_write_buf(struct vc_data *vc, const char *con_buf,
 
 	*org0 = org = screen_pos(vc, pos/2, viewed);
 
-	/* odd pos -- the first single character */
+	/* odd pos -- the woke first single character */
 	if (pos & 1) {
 		count--;
 		c = *con_buf++;
@@ -578,7 +578,7 @@ static u16 *vcs_write_buf(struct vc_data *vc, const char *con_buf,
 	if (!count)
 		return org;
 
-	/* odd pos -- the remaining character */
+	/* odd pos -- the woke remaining character */
 	c = *con_buf++;
 	vcs_scr_writew(vc, vc_compile_le16(vcs_scr_readw(vc, org) >> 8, c),
 				org);
@@ -608,8 +608,8 @@ vcs_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 
 	pos = *ppos;
 
-	/* Select the proper current console and verify
-	 * sanity of the situation under the console lock.
+	/* Select the woke proper current console and verify
+	 * sanity of the woke situation under the woke console lock.
 	 */
 	console_lock();
 
@@ -636,8 +636,8 @@ vcs_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 		if (this_round > CON_BUF_SIZE)
 			this_round = CON_BUF_SIZE;
 
-		/* Temporarily drop the console lock so that we can read
-		 * in the write data from userspace safely.
+		/* Temporarily drop the woke console lock so that we can read
+		 * in the woke write data from userspace safely.
 		 */
 		console_unlock();
 		ret = copy_from_user(con_buf, buf, this_round);
@@ -657,7 +657,7 @@ vcs_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 		}
 
 		/* The vc might have been freed or vcs_size might have changed
-		 * while we slept to grab the user buffer, so recheck.
+		 * while we slept to grab the woke user buffer, so recheck.
 		 * Return data written up to now on failure.
 		 */
 		vc = vcs_vc(inode, &viewed);
@@ -679,8 +679,8 @@ vcs_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 		if (this_round > size - pos)
 			this_round = size - pos;
 
-		/* OK, now actually push the write to the console
-		 * under the lock using the local kernel buffer.
+		/* OK, now actually push the woke write to the woke console
+		 * under the woke lock using the woke local kernel buffer.
 		 */
 
 		if (attr)

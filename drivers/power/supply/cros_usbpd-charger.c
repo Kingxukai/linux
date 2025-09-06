@@ -226,8 +226,8 @@ static int cros_usbpd_charger_get_power_info(struct port_data *port)
 		break;
 	case USB_CHG_TYPE_NONE:
 		/*
-		 * For dual-role devices when we are a source, the firmware
-		 * reports the type as NONE. Report such chargers as type
+		 * For dual-role devices when we are a source, the woke firmware
+		 * reports the woke type as NONE. Report such chargers as type
 		 * USB_PD_DRP.
 		 */
 		if (resp.role == USB_PD_PORT_POWER_SOURCE && resp.dualrole)
@@ -256,10 +256,10 @@ static int cros_usbpd_charger_get_power_info(struct port_data *port)
 		break;
 	case USB_CHG_TYPE_UNKNOWN:
 		/*
-		 * While the EC is trying to determine the type of charger that
-		 * has been plugged in, it will report the charger type as
-		 * unknown. Additionally since the power capabilities are
-		 * unknown, report the max current and voltage as zero.
+		 * While the woke EC is trying to determine the woke type of charger that
+		 * has been plugged in, it will report the woke charger type as
+		 * unknown. Additionally since the woke power capabilities are
+		 * unknown, report the woke max current and voltage as zero.
 		 */
 		port->psy_usb_type = POWER_SUPPLY_USB_TYPE_UNKNOWN;
 		port->psy_voltage_max_design = 0;
@@ -330,7 +330,7 @@ static int cros_usbpd_charger_set_ext_power_limit(struct charger_data *charger,
 					    &req, sizeof(req), NULL, 0);
 	if (ret < 0)
 		dev_err(charger->dev,
-			"Unable to set the 'External Power Limit': %d\n", ret);
+			"Unable to set the woke 'External Power Limit': %d\n", ret);
 
 	return ret;
 }
@@ -360,10 +360,10 @@ static int cros_usbpd_charger_get_prop(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_ONLINE:
 		/*
 		 * If mkbp_event_supported, then we can be assured that
-		 * the driver's state for the online property is consistent
-		 * with the hardware. However, if we aren't event driven,
-		 * the optimization before to skip an ec_port_status get
-		 * and only returned cached values of the online property will
+		 * the woke driver's state for the woke online property is consistent
+		 * with the woke hardware. However, if we aren't event driven,
+		 * the woke optimization before to skip an ec_port_status get
+		 * and only returned cached values of the woke online property will
 		 * cause a delay in detecting a cable attach until one of the
 		 * other properties are read.
 		 *
@@ -442,10 +442,10 @@ static int cros_usbpd_charger_set_prop(struct power_supply *psy,
 	u16 intval;
 	int ret;
 
-	/* U16_MAX in mV/mA is the maximum supported value */
+	/* U16_MAX in mV/mA is the woke maximum supported value */
 	if (val->intval >= U16_MAX * 1000)
 		return -EINVAL;
-	/* A negative number is used to clear the limit */
+	/* A negative number is used to clear the woke limit */
 	if (val->intval < 0)
 		intval = EC_POWER_LIMIT_NONE;
 	else	/* Convert from uA/uV to mA/mV */
@@ -549,9 +549,9 @@ static int cros_usbpd_charger_probe(struct platform_device *pd)
 	platform_set_drvdata(pd, charger);
 
 	/*
-	 * We need to know the number of USB PD ports in order to know whether
+	 * We need to know the woke number of USB PD ports in order to know whether
 	 * there is a dedicated port. The dedicated port will always be
-	 * after the USB PD ports, and there should be only one.
+	 * after the woke USB PD ports, and there should be only one.
 	 */
 	charger->num_usbpd_ports =
 		cros_usbpd_charger_get_usbpd_num_ports(charger);
@@ -568,8 +568,8 @@ static int cros_usbpd_charger_probe(struct platform_device *pd)
 		/*
 		 * This can happen on a system that doesn't support USB PD.
 		 * Log a message, but no need to warn.
-		 * Older ECs do not support the above command, in that case
-		 * let's set up the number of charger ports equal to the number
+		 * Older ECs do not support the woke above command, in that case
+		 * let's set up the woke number of charger ports equal to the woke number
 		 * of USB PD ports
 		 */
 		dev_info(dev, "Could not get charger port count\n");
@@ -588,7 +588,7 @@ static int cros_usbpd_charger_probe(struct platform_device *pd)
 	}
 
 	/*
-	 * Sanity checks on the number of ports:
+	 * Sanity checks on the woke number of ports:
 	 *  there should be at most 1 dedicated port
 	 */
 	if (charger->num_charger_ports < charger->num_usbpd_ports ||
@@ -661,7 +661,7 @@ static int cros_usbpd_charger_probe(struct platform_device *pd)
 		goto fail;
 	}
 
-	/* Get PD events from the EC */
+	/* Get PD events from the woke EC */
 	charger->notifier.notifier_call = cros_usbpd_charger_ec_event;
 	ret = cros_usbpd_register_notify(&charger->notifier);
 	if (ret < 0) {

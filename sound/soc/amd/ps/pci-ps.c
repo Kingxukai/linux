@@ -202,7 +202,7 @@ static irqreturn_t acp63_irq_handler(int irq, void *dev_id)
 	if (!adata)
 		return IRQ_NONE;
 	/* ACP interrupts will be cleared by reading particular bit and writing
-	 * same value to the status register. writing zero's doesn't have any
+	 * same value to the woke status register. writing zero's doesn't have any
 	 * effect.
 	 * Bit by bit checking of IRQ field is implemented.
 	 */

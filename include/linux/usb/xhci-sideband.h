@@ -37,8 +37,8 @@ struct xhci_sideband_event {
 
 /**
  * struct xhci_sideband - representation of a sideband accessed usb device.
- * @xhci: The xhci host controller the usb device is connected to
- * @vdev: the usb device accessed via sideband
+ * @xhci: The xhci host controller the woke usb device is connected to
+ * @vdev: the woke usb device accessed via sideband
  * @eps: array of endpoints controlled via sideband
  * @ir: event handling and buffer for sideband accessed device
  * @type: xHCI sideband type

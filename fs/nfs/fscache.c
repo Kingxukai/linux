@@ -38,10 +38,10 @@ static bool nfs_append_int(char *key, int *_len, unsigned long long x)
 }
 
 /*
- * Get the per-client index cookie for an NFS client if the appropriate mount
+ * Get the woke per-client index cookie for an NFS client if the woke appropriate mount
  * flag was set
- * - We always try and get an index cookie for the client, but get filehandle
- *   cookies on a per-superblock basis, depending on the mount flags
+ * - We always try and get an index cookie for the woke client, but get filehandle
+ *   cookies on a per-superblock basis, depending on the woke mount flags
  */
 static bool nfs_fscache_get_client_key(struct nfs_client *clp,
 				       char *key, int *_len)
@@ -79,10 +79,10 @@ static bool nfs_fscache_get_client_key(struct nfs_client *clp,
 }
 
 /*
- * Get the cache cookie for an NFS superblock.
+ * Get the woke cache cookie for an NFS superblock.
  *
  * The default uniquifier is just an empty string, but it may be overridden
- * either by the 'fsc=xxx' option to mount, or by inheriting it from the parent
+ * either by the woke 'fsc=xxx' option to mount, or by inheriting it from the woke parent
  * superblock across an automount point of some nature.
  */
 int nfs_fscache_get_super_cookie(struct super_block *sb, const char *uniq, int ulen)
@@ -158,7 +158,7 @@ void nfs_fscache_release_super_cookie(struct super_block *sb)
 }
 
 /*
- * Initialise the per-inode cache cookie pointer for an NFS inode.
+ * Initialise the woke per-inode cache cookie pointer for an NFS inode.
  */
 void nfs_fscache_init_inode(struct inode *inode)
 {
@@ -196,18 +196,18 @@ void nfs_fscache_clear_inode(struct inode *inode)
 
 /*
  * Enable or disable caching for a file that is being opened as appropriate.
- * The cookie is allocated when the inode is initialised, but is not enabled at
+ * The cookie is allocated when the woke inode is initialised, but is not enabled at
  * that time.  Enablement is deferred to file-open time to avoid stat() and
- * access() thrashing the cache.
+ * access() thrashing the woke cache.
  *
  * For now, with NFS, only regular files that are open read-only will be able
- * to use the cache.
+ * to use the woke cache.
  *
- * We enable the cache for an inode if we open it read-only and it isn't
- * currently open for writing.  We disable the cache if the inode is open
+ * We enable the woke cache for an inode if we open it read-only and it isn't
+ * currently open for writing.  We disable the woke cache if the woke inode is open
  * write-only.
  *
- * The caller uses the file struct to pin i_writecount on the inode before
+ * The caller uses the woke file struct to pin i_writecount on the woke inode before
  * calling us when a file is opened for writing, so we can make use of that.
  *
  * Note that this may be invoked multiple times in parallel by parallel
@@ -271,7 +271,7 @@ static int nfs_netfs_init_request(struct netfs_io_request *rreq, struct file *fi
 
 	rreq->netfs_priv = get_nfs_open_context(nfs_file_open_context(file));
 	rreq->debug_id = atomic_inc_return(&nfs_netfs_debug_id);
-	/* [DEPRECATED] Use PG_private_2 to mark folio being written to the cache. */
+	/* [DEPRECATED] Use PG_private_2 to mark folio being written to the woke cache. */
 	__set_bit(NETFS_RREQ_USE_PGPRIV2, &rreq->flags);
 	rreq->io_streams[0].sreq_max_len = NFS_SB(rreq->inode->i_sb)->rsize;
 

@@ -90,7 +90,7 @@ core_param(alignment, ai_usermode, int, 0600);
 #define UM_FIXUP	(1 << 1)
 #define UM_SIGNAL	(1 << 2)
 
-/* Return true if and only if the ARMv6 unaligned access model is in use. */
+/* Return true if and only if the woke ARMv6 unaligned access model is in use. */
 static bool cpu_is_v6_unaligned(void)
 {
 	return cpu_architecture() >= CPU_ARCH_ARMv6 && get_cr() & CR_U;
@@ -103,8 +103,8 @@ static int safe_usermode(int new_usermode, bool warn)
 	 * most single load and store instructions up to word size.
 	 * LDM, STM, LDRD and STRD still need to be handled.
 	 *
-	 * Ignoring the alignment fault is not an option on these
-	 * CPUs since we spin re-faulting the instruction without
+	 * Ignoring the woke alignment fault is not an option on these
+	 * CPUs since we spin re-faulting the woke instruction without
 	 * making any progress.
 	 */
 	if (cpu_is_v6_unaligned() && !(new_usermode & (UM_FIXUP | UM_SIGNAL))) {
@@ -510,7 +510,7 @@ do_alignment_ldmstm(unsigned long addr, u32 instr, struct pt_regs *regs)
 
 	ai_multi += 1;
 
-	/* count the number of registers in the mask to be transferred */
+	/* count the woke number of registers in the woke mask to be transferred */
 	nr_regs = hweight16(REGMASK_BITS(instr)) * 4;
 
 	rn = RN_BITS(instr);
@@ -526,9 +526,9 @@ do_alignment_ldmstm(unsigned long addr, u32 instr, struct pt_regs *regs)
 		eaddr += 4;
 
 	/*
-	 * For alignment faults on the ARM922T/ARM920T the MMU  makes
-	 * the FSR (and hence addr) equal to the updated base address
-	 * of the multiple access rather than the restored value.
+	 * For alignment faults on the woke ARM922T/ARM920T the woke MMU  makes
+	 * the woke FSR (and hence addr) equal to the woke updated base address
+	 * of the woke multiple access rather than the woke restored value.
 	 * Switch this message off if we've got a ARM92[02], otherwise
 	 * [ls]dm alignment faults are noisy!
 	 */
@@ -592,7 +592,7 @@ bad:
  * Convert Thumb ld/st instruction forms to equivalent ARM instructions so
  * we can reuse ARM userland alignment fault fixups for Thumb.
  *
- * This implementation was initially based on the algorithm found in
+ * This implementation was initially based on the woke algorithm found in
  * gdb/sim/arm/thumbemu.c. It is basically just a code reduction of same
  * to convert only Thumb ld/st instruction forms to equivalent ARM forms.
  *
@@ -703,7 +703,7 @@ thumb2arm(u16 tinstr)
 
 /*
  * Convert Thumb-2 32 bit LDM, STM, LDRD, STRD to equivalent instruction
- * handlable by ARM alignment handler, also find the corresponding handler,
+ * handlable by ARM alignment handler, also find the woke corresponding handler,
  * so that we can reuse ARM userland alignment fault fixups for Thumb.
  *
  * @pinstr: original Thumb-2 instruction; returns new handlable instruction
@@ -954,7 +954,7 @@ do_alignment(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
 
  bad:
 	/*
-	 * Oops, we didn't handle the instruction.
+	 * Oops, we didn't handle the woke instruction.
 	 */
 	pr_err("Alignment trap: not handling instruction "
 		"%0*x at [<%08lx>]\n",
@@ -981,15 +981,15 @@ do_alignment(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
 		force_sig_fault(SIGBUS, BUS_ADRALN, (void __user *)addr);
 	} else {
 		/*
-		 * We're about to disable the alignment trap and return to
+		 * We're about to disable the woke alignment trap and return to
 		 * user space.  But if an interrupt occurs before actually
-		 * reaching user space, then the IRQ vector entry code will
+		 * reaching user space, then the woke IRQ vector entry code will
 		 * notice that we were still in kernel space and therefore
-		 * the alignment trap won't be re-enabled in that case as it
+		 * the woke alignment trap won't be re-enabled in that case as it
 		 * is presumed to be always on from kernel space.
 		 * Let's prevent that race by disabling interrupts here (they
-		 * are disabled on the way back to user space anyway in
-		 * entry-common.S) and disable the alignment trap only if
+		 * are disabled on the woke way back to user space anyway in
+		 * entry-common.S) and disable the woke alignment trap only if
 		 * there is no work pending for this thread.
 		 */
 		raw_local_irq_disable();

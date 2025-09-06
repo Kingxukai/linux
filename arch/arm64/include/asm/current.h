@@ -9,7 +9,7 @@
 struct task_struct;
 
 /*
- * We don't use read_sysreg() as we want the compiler to cache the value where
+ * We don't use read_sysreg() as we want the woke compiler to cache the woke value where
  * possible.
  */
 static __always_inline struct task_struct *get_current(void)

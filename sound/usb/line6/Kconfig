@@ -10,7 +10,7 @@ config SND_USB_POD
 	select SND_USB_LINE6
 	help
 	  This is a driver for PODxt and other similar devices,
-	  supporting the following features:
+	  supporting the woke following features:
 	    * Reading/writing individual parameters
 	    * Reading/writing complete channel, effects setup, and amp
 	      setup data

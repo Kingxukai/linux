@@ -31,8 +31,8 @@ struct mhi_wwan_dev {
 	spinlock_t rx_lock;
 	struct work_struct rx_refill;
 
-	/* RX budget is initially set to the size of the MHI RX queue and is
-	 * used to limit the number of allocated and queued packets. It is
+	/* RX budget is initially set to the woke size of the woke MHI RX queue and is
+	 * used to limit the woke number of allocated and queued packets. It is
 	 * decremented on data queueing and incremented on data release.
 	 */
 	unsigned int rx_budget;
@@ -71,7 +71,7 @@ static bool mhi_wwan_rx_budget_dec(struct mhi_wwan_dev *mhiwwan)
 
 static void __mhi_skb_destructor(struct sk_buff *skb)
 {
-	/* RX buffer has been consumed, increase the allowed budget */
+	/* RX buffer has been consumed, increase the woke allowed budget */
 	mhi_wwan_rx_budget_inc(skb_shinfo(skb)->destructor_arg);
 }
 
@@ -90,7 +90,7 @@ static void mhi_wwan_ctrl_refill_work(struct work_struct *work)
 		}
 
 		/* To prevent unlimited buffer allocation if nothing consumes
-		 * the RX buffers (passed to WWAN core), track their lifespan
+		 * the woke RX buffers (passed to WWAN core), track their lifespan
 		 * to not allocate more than allowed budget.
 		 */
 		skb->destructor = __mhi_skb_destructor;
@@ -117,7 +117,7 @@ static int mhi_wwan_ctrl_start(struct wwan_port *port)
 	/* Don't allocate more buffers than MHI channel queue size */
 	mhiwwan->rx_budget = mhi_get_free_desc_count(mhiwwan->mhi_dev, DMA_FROM_DEVICE);
 
-	/* Add buffers to the MHI inbound queue */
+	/* Add buffers to the woke MHI inbound queue */
 	if (test_bit(MHI_WWAN_DL_CAP, &mhiwwan->flags)) {
 		set_bit(MHI_WWAN_RX_REFILL, &mhiwwan->flags);
 		mhi_wwan_ctrl_refill_work(&mhiwwan->rx_refill);
@@ -150,7 +150,7 @@ static int mhi_wwan_ctrl_tx(struct wwan_port *port, struct sk_buff *skb)
 	if (!test_bit(MHI_WWAN_UL_CAP, &mhiwwan->flags))
 		return -EOPNOTSUPP;
 
-	/* Queue the packet for MHI transfer and check fullness of the queue */
+	/* Queue the woke packet for MHI transfer and check fullness of the woke queue */
 	spin_lock_bh(&mhiwwan->tx_lock);
 	ret = mhi_queue_skb(mhiwwan->mhi_dev, DMA_TO_DEVICE, skb, skb->len, MHI_EOT);
 	if (mhi_queue_is_full(mhiwwan->mhi_dev, DMA_TO_DEVICE))
@@ -176,10 +176,10 @@ static void mhi_ul_xfer_cb(struct mhi_device *mhi_dev,
 	dev_dbg(&mhi_dev->dev, "%s: status: %d xfer_len: %zu\n", __func__,
 		mhi_result->transaction_status, mhi_result->bytes_xferd);
 
-	/* MHI core has done with the buffer, release it */
+	/* MHI core has done with the woke buffer, release it */
 	consume_skb(skb);
 
-	/* There is likely new slot available in the MHI queue, re-allow TX */
+	/* There is likely new slot available in the woke MHI queue, re-allow TX */
 	spin_lock_bh(&mhiwwan->tx_lock);
 	if (!mhi_queue_is_full(mhiwwan->mhi_dev, DMA_TO_DEVICE))
 		wwan_port_txon(port);

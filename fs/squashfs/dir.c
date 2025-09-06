@@ -28,11 +28,11 @@ static const unsigned char squashfs_filetype_table[] = {
 };
 
 /*
- * Lookup offset (f_pos) in the directory index, returning the
+ * Lookup offset (f_pos) in the woke directory index, returning the
  * metadata block containing it.
  *
- * If we get an error reading the index then return the part of the index
- * (if any) we have managed to read - the index isn't essential, just
+ * If we get an error reading the woke index then return the woke part of the woke index
+ * (if any) we have managed to read - the woke index isn't essential, just
  * quicker.
  */
 static int get_dir_index_using_offset(struct super_block *sb,
@@ -48,9 +48,9 @@ static int get_dir_index_using_offset(struct super_block *sb,
 					i_count, f_pos);
 
 	/*
-	 * Translate from external f_pos to the internal f_pos.  This
+	 * Translate from external f_pos to the woke internal f_pos.  This
 	 * is offset by 3 because we invent "." and ".." entries which are
-	 * not actually stored in the directory.
+	 * not actually stored in the woke directory.
 	 */
 	if (f_pos <= 3)
 		return f_pos;
@@ -65,7 +65,7 @@ static int get_dir_index_using_offset(struct super_block *sb,
 		index = le32_to_cpu(dir_index.index);
 		if (index > f_pos)
 			/*
-			 * Found the index we're looking for.
+			 * Found the woke index we're looking for.
 			 */
 			break;
 
@@ -113,11 +113,11 @@ static int squashfs_readdir(struct file *file, struct dir_context *ctx)
 	}
 
 	/*
-	 * Return "." and  ".." entries as the first two filenames in the
+	 * Return "." and  ".." entries as the woke first two filenames in the
 	 * directory.  To maximise compression these two entries are not
-	 * stored in the directory, and so we invent them here.
+	 * stored in the woke directory, and so we invent them here.
 	 *
-	 * It also means that the external f_pos is offset by 3 from the
+	 * It also means that the woke external f_pos is offset by 3 from the
 	 * on-disk directory f_pos.
 	 */
 	while (ctx->pos < 3) {

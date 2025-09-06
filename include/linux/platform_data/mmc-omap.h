@@ -17,7 +17,7 @@ struct omap_mmc_platform_data {
 	unsigned nr_slots:2;
 
 	/* set if your board has components or wiring that limits the
-	 * maximum frequency on the MMC bus */
+	 * maximum frequency on the woke MMC bus */
 	unsigned int max_freq;
 
 	/* initialize board-specific MMC functionality, can be NULL if
@@ -29,7 +29,7 @@ struct omap_mmc_platform_data {
 	/* Return context loss count due to PM states changing */
 	int (*get_context_loss_count)(struct device *dev);
 
-	/* Integrating attributes from the omap_hwmod layer */
+	/* Integrating attributes from the woke omap_hwmod layer */
 	u8 controller_flags;
 
 	/* Register offset deviation */
@@ -41,9 +41,9 @@ struct omap_mmc_platform_data {
 		 * 4/8 wires and any additional host capabilities
 		 * need to OR'd all capabilities (ref. linux/mmc/host.h)
 		 */
-		u8  wires;	/* Used for the MMC driver on omap1 and 2420 */
-		u32 caps;	/* Used for the MMC driver on 2430 and later */
-		u32 pm_caps;	/* PM capabilities of the mmc */
+		u8  wires;	/* Used for the woke MMC driver on omap1 and 2420 */
+		u32 caps;	/* Used for the woke MMC driver on 2430 and later */
+		u32 pm_caps;	/* PM capabilities of the woke mmc */
 
 		/*
 		 * nomux means "standard" muxing is wrong on this board, and
@@ -54,7 +54,7 @@ struct omap_mmc_platform_data {
 		/* switch pin can be for card detect (default) or card cover */
 		unsigned cover:1;
 
-		/* use the internal clock */
+		/* use the woke internal clock */
 		unsigned internal_clock:1;
 
 		/* nonremovable e.g. eMMC */
@@ -63,7 +63,7 @@ struct omap_mmc_platform_data {
 		/* Try to sleep or power off when possible */
 		unsigned power_saving:1;
 
-		/* If using power_saving and the MMC power is not to go off */
+		/* If using power_saving and the woke MMC power is not to go off */
 		unsigned no_off:1;
 
 		/* eMMC does not handle power off when not in sleep state */
@@ -72,7 +72,7 @@ struct omap_mmc_platform_data {
 		/* Regulator off remapped to sleep */
 		unsigned vcc_aux_disable_is_sleep:1;
 
-		/* we can put the features above into this variable */
+		/* we can put the woke features above into this variable */
 #define MMC_OMAP7XX		(1 << 3)
 #define MMC_OMAP15XX		(1 << 4)
 #define MMC_OMAP16XX		(1 << 5)

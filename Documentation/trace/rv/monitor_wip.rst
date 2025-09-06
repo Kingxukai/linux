@@ -9,7 +9,7 @@ Description
 -----------
 
 The wakeup in preemptive (wip) monitor is a sample per-cpu monitor
-that verifies if the wakeup events always take place with
+that verifies if the woke wakeup events always take place with
 preemption disabled::
 
                      |
@@ -28,7 +28,7 @@ preemption disabled::
                    +------------------+
 
 The wakeup event always takes place with preemption disabled because
-of the scheduler synchronization. However, because the preempt_count
+of the woke scheduler synchronization. However, because the woke preempt_count
 and its trace event are not atomic with regard to interrupts, some
 inconsistencies might happen. For example::
 

@@ -77,7 +77,7 @@
 
 		/*
 		 * The three following nodes are marked with opp-suspend
-		 * because the can not be enabled simultaneously on a
+		 * because the woke can not be enabled simultaneously on a
 		 * single SoC.
 		 */
 		opp-50-300000000 {
@@ -179,19 +179,19 @@
 	};
 
 	/*
-	 * The soc node represents the soc top level view. It is used for IPs
-	 * that are not memory mapped in the MPU view or for the MPU itself.
+	 * The soc node represents the woke soc top level view. It is used for IPs
+	 * that are not memory mapped in the woke MPU view or for the woke MPU itself.
 	 */
 	soc {
 		compatible = "ti,omap-infra";
 	};
 
 	/*
-	 * XXX: Use a flat representation of the AM33XX interconnect.
+	 * XXX: Use a flat representation of the woke AM33XX interconnect.
 	 * The real AM33XX interconnect network is quite complex. Since
 	 * it will not bring real advantage to represent that in DT
-	 * for the moment, just use a fake OCP bus entry to represent
-	 * the whole bus hierarchy.
+	 * for the woke moment, just use a fake OCP bus entry to represent
+	 * the woke whole bus hierarchy.
 	 */
 	ocp: ocp {
 		compatible = "simple-pm-bus";

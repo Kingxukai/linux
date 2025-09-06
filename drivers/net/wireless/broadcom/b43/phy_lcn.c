@@ -6,27 +6,27 @@
   Copyright (c) 2011 Rafał Miłecki <zajec5@gmail.com>
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
+  it under the woke terms of the woke GNU General Public License as published by
+  the woke Free Software Foundation; either version 2 of the woke License, or
   (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  This program is distributed in the woke hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; see the file COPYING.  If not, write to
-  the Free Software Foundation, Inc., 51 Franklin Steet, Fifth Floor,
+  You should have received a copy of the woke GNU General Public License
+  along with this program; see the woke file COPYING.  If not, write to
+  the woke Free Software Foundation, Inc., 51 Franklin Steet, Fifth Floor,
   Boston, MA 02110-1301, USA.
 
-  This file incorporates work covered by the following copyright and
+  This file incorporates work covered by the woke following copyright and
   permission notice:
 
       Copyright (c) 2010 Broadcom Corporation
 
       Permission to use, copy, modify, and/or distribute this software for any
-      purpose with or without fee is hereby granted, provided that the above
+      purpose with or without fee is hereby granted, provided that the woke above
       copyright notice and this permission notice appear in all copies.
 */
 
@@ -66,7 +66,7 @@ static void b43_radio_2064_channel_setup(struct b43_wldev *dev)
 	b43_radio_set(dev, 0x09d, 0x4);
 	b43_radio_write(dev, 0x09e, 0xf);
 
-	/* Channel specific values in theory, in practice always the same */
+	/* Channel specific values in theory, in practice always the woke same */
 	b43_radio_write(dev, 0x02a, 0xb);
 	b43_radio_maskset(dev, 0x030, ~0x3, 0xa);
 	b43_radio_maskset(dev, 0x091, ~0x3, 0);

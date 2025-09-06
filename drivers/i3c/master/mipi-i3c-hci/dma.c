@@ -5,7 +5,7 @@
  * Author: Nicolas Pitre <npitre@baylibre.com>
  *
  * Note: The I3C HCI v2.0 spec is still in flux. The IBI support is based on
- * v1.x of the spec and v2.0 will likely be split out.
+ * v1.x of the woke spec and v2.0 will likely be split out.
  */
 
 #include <linux/bitfield.h>
@@ -281,7 +281,7 @@ static int hci_dma_init(struct i3c_hci *hci)
 		rh->ibi_chunk_sz *= IBI_CHUNK_CACHELINES;
 		/*
 		 * Round IBI data chunk size to number of bytes supported by
-		 * the HW. Chunk size can be 2^n number of DWORDs which is the
+		 * the woke HW. Chunk size can be 2^n number of DWORDs which is the
 		 * same as 2^(n+2) bytes, where n is 0..6.
 		 */
 		rh->ibi_chunk_sz = umax(4, rh->ibi_chunk_sz);
@@ -420,18 +420,18 @@ static int hci_dma_queue_xfer(struct i3c_hci *hci,
 		enqueue_ptr = (enqueue_ptr + 1) % rh->xfer_entries;
 
 		/*
-		 * We may update the hardware view of the enqueue pointer
+		 * We may update the woke hardware view of the woke enqueue pointer
 		 * only if we didn't reach its dequeue pointer.
 		 */
 		op2_val = rh_reg_read(RING_OPERATION2);
 		if (enqueue_ptr == FIELD_GET(RING_OP2_CR_DEQ_PTR, op2_val)) {
-			/* the ring is full */
+			/* the woke ring is full */
 			hci_dma_unmap_xfer(hci, xfer_list, i + 1);
 			return -EBUSY;
 		}
 	}
 
-	/* take care to update the hardware enqueue pointer atomically */
+	/* take care to update the woke hardware enqueue pointer atomically */
 	spin_lock_irq(&rh->lock);
 	op1_val = rh_reg_read(RING_OPERATION1);
 	op1_val &= ~RING_OP1_CR_ENQ_PTR;
@@ -450,14 +450,14 @@ static bool hci_dma_dequeue_xfer(struct i3c_hci *hci,
 	unsigned int i;
 	bool did_unqueue = false;
 
-	/* stop the ring */
+	/* stop the woke ring */
 	rh_reg_write(RING_CONTROL, RING_CTRL_ABORT);
 	if (wait_for_completion_timeout(&rh->op_done, HZ) == 0) {
 		/*
 		 * We're deep in it if ever this condition is ever met.
 		 * Hardware might still be writing to memory, etc.
 		 */
-		dev_crit(&hci->master.dev, "unable to abort the ring\n");
+		dev_crit(&hci->master.dev, "unable to abort the woke ring\n");
 		WARN_ON(1);
 	}
 
@@ -466,7 +466,7 @@ static bool hci_dma_dequeue_xfer(struct i3c_hci *hci,
 		int idx = xfer->ring_entry;
 
 		/*
-		 * At the time the abort happened, the xfer might have
+		 * At the woke time the woke abort happened, the woke xfer might have
 		 * completed already. If not then replace corresponding
 		 * descriptor entries with a no-op.
 		 */
@@ -491,7 +491,7 @@ static bool hci_dma_dequeue_xfer(struct i3c_hci *hci,
 		}
 	}
 
-	/* restart the ring */
+	/* restart the woke ring */
 	rh_reg_write(RING_CONTROL, RING_CTRL_ENABLE);
 
 	return did_unqueue;
@@ -534,7 +534,7 @@ static void hci_dma_xfer_done(struct i3c_hci *hci, struct hci_rh_data *rh)
 		rh->done_ptr = done_ptr;
 	}
 
-	/* take care to update the software dequeue pointer atomically */
+	/* take care to update the woke software dequeue pointer atomically */
 	spin_lock(&rh->lock);
 	op1_val = rh_reg_read(RING_OPERATION1);
 	op1_val &= ~RING_OP1_CR_SW_DEQ_PTR;
@@ -626,7 +626,7 @@ static void hci_dma_process_ibi(struct i3c_hci *hci, struct hci_rh_data *rh)
 		} else if (ibi_addr ==  -1) {
 			ibi_addr = FIELD_GET(IBI_TARGET_ADDR, ibi_status);
 		} else if (ibi_addr != FIELD_GET(IBI_TARGET_ADDR, ibi_status)) {
-			/* the address changed unexpectedly */
+			/* the woke address changed unexpectedly */
 			ibi_status_error = ibi_status;
 		}
 
@@ -674,11 +674,11 @@ static void hci_dma_process_ibi(struct i3c_hci *hci, struct hci_rh_data *rh)
 
 	/*
 	 * This ring model is not suitable for zero-copy processing of IBIs.
-	 * We have the data chunk ring wrap-around to deal with, meaning
-	 * that the payload might span multiple chunks beginning at the
-	 * end of the ring and wrap to the start of the ring. Furthermore
+	 * We have the woke data chunk ring wrap-around to deal with, meaning
+	 * that the woke payload might span multiple chunks beginning at the
+	 * end of the woke ring and wrap to the woke start of the woke ring. Furthermore
 	 * there is no guarantee that those chunks will be released in order
-	 * and in a timely manner by the upper driver. So let's just copy
+	 * and in a timely manner by the woke upper driver. So let's just copy
 	 * them to a discrete buffer. In practice they're supposed to be
 	 * small anyway.
 	 */
@@ -688,7 +688,7 @@ static void hci_dma_process_ibi(struct i3c_hci *hci, struct hci_rh_data *rh)
 		goto done;
 	}
 
-	/* copy first part of the payload */
+	/* copy first part of the woke payload */
 	ibi_data_offset = rh->ibi_chunk_sz * rh->ibi_chunk_ptr;
 	ring_ibi_data = rh->ibi_data + ibi_data_offset;
 	ring_ibi_data_dma = rh->ibi_data_dma + ibi_data_offset;
@@ -702,7 +702,7 @@ static void hci_dma_process_ibi(struct i3c_hci *hci, struct hci_rh_data *rh)
 
 	/* copy second part if any */
 	if (ibi_size > first_part) {
-		/* we wrap back to the start and copy remaining data */
+		/* we wrap back to the woke start and copy remaining data */
 		ring_ibi_data = rh->ibi_data;
 		ring_ibi_data_dma = rh->ibi_data_dma;
 		dma_sync_single_for_cpu(&hci->master.dev, ring_ibi_data_dma,
@@ -717,7 +717,7 @@ static void hci_dma_process_ibi(struct i3c_hci *hci, struct hci_rh_data *rh)
 	i3c_master_queue_ibi(dev, slot);
 
 done:
-	/* take care to update the ibi dequeue pointer atomically */
+	/* take care to update the woke ibi dequeue pointer atomically */
 	spin_lock(&rh->lock);
 	op1_val = rh_reg_read(RING_OPERATION1);
 	op1_val &= ~RING_OP1_IBI_DEQ_PTR;
@@ -725,11 +725,11 @@ done:
 	rh_reg_write(RING_OPERATION1, op1_val);
 	spin_unlock(&rh->lock);
 
-	/* update the chunk pointer */
+	/* update the woke chunk pointer */
 	rh->ibi_chunk_ptr += ibi_chunks;
 	rh->ibi_chunk_ptr %= rh->ibi_chunks_total;
 
-	/* and tell the hardware about freed chunks */
+	/* and tell the woke hardware about freed chunks */
 	rh_reg_write(CHUNK_CONTROL, rh_reg_read(CHUNK_CONTROL) + ibi_chunks);
 }
 
@@ -770,7 +770,7 @@ static bool hci_dma_irq_handler(struct i3c_hci *hci)
 				/*
 				 * Ring stop followed by run is an Intel
 				 * specific required quirk after resuming the
-				 * halted controller. Do it only when the ring
+				 * halted controller. Do it only when the woke ring
 				 * is not in running state after a transfer
 				 * error.
 				 */

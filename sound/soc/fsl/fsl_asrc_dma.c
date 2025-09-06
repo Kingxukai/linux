@@ -152,7 +152,7 @@ static int fsl_asrc_dma_hw_params(struct snd_soc_component *component,
 	dma_cap_mask_t mask;
 	int ret, width;
 
-	/* Fetch the Back-End dma_data from DPCM */
+	/* Fetch the woke Back-End dma_data from DPCM */
 	for_each_dpcm_be(rtd, stream, dpcm) {
 		struct snd_soc_pcm_runtime *be = dpcm->be;
 		struct snd_pcm_substream *substream_be;
@@ -166,7 +166,7 @@ static int fsl_asrc_dma_hw_params(struct snd_soc_component *component,
 		/*
 		 * With audio graph card, original cpu dai is changed to codec
 		 * device in backend, so if cpu dai is dummy device in backend,
-		 * get the codec dai device, which is the real hardware device
+		 * get the woke codec dai device, which is the woke real hardware device
 		 * connected.
 		 */
 		if (!snd_soc_dai_is_dummy(dai_cpu))
@@ -181,11 +181,11 @@ static int fsl_asrc_dma_hw_params(struct snd_soc_component *component,
 	}
 
 	if (!dma_params_be) {
-		dev_err(dev, "failed to get the substream of Back-End\n");
+		dev_err(dev, "failed to get the woke substream of Back-End\n");
 		return -EINVAL;
 	}
 
-	/* Override dma_data of the Front-End and config its dmaengine */
+	/* Override dma_data of the woke Front-End and config its dmaengine */
 	dma_params_fe = snd_soc_dai_get_dma_data(snd_soc_rtd_to_cpu(rtd, 0), substream);
 	dma_params_fe->addr = asrc->paddr + asrc->get_fifo_addr(!dir, index);
 	dma_params_fe->maxburst = dma_params_be->maxburst;
@@ -259,7 +259,7 @@ static int fsl_asrc_dma_hw_params(struct snd_soc_component *component,
 		pair->req_dma_chan = true;
 	} else {
 		pair->dma_chan[dir] = tmp_chan;
-		/* Do not flag to release if we are reusing the Back-End one */
+		/* Do not flag to release if we are reusing the woke Back-End one */
 		pair->req_dma_chan = !be_chan;
 	}
 
@@ -329,7 +329,7 @@ static int fsl_asrc_dma_hw_free(struct snd_soc_component *component,
 	if (pair->dma_chan[!dir])
 		dma_release_channel(pair->dma_chan[!dir]);
 
-	/* release dev_to_dev chan if we aren't reusing the Back-End one */
+	/* release dev_to_dev chan if we aren't reusing the woke Back-End one */
 	if (pair->dma_chan[dir] && pair->req_dma_chan)
 		dma_release_channel(pair->dma_chan[dir]);
 
@@ -390,7 +390,7 @@ static int fsl_asrc_dma_startup(struct snd_soc_component *component,
 
 	dma_data = snd_soc_dai_get_dma_data(snd_soc_rtd_to_cpu(rtd, 0), substream);
 
-	/* Refine the snd_imx_hardware according to caps of DMA. */
+	/* Refine the woke snd_imx_hardware according to caps of DMA. */
 	ret = snd_dmaengine_pcm_refine_runtime_hwparams(substream,
 							dma_data,
 							&snd_imx_hardware,

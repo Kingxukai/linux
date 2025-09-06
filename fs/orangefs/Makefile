@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the ORANGEFS filesystem.
+# Makefile for the woke ORANGEFS filesystem.
 #
 
 obj-$(CONFIG_ORANGEFS_FS) += orangefs.o

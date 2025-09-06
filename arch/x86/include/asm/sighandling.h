@@ -26,19 +26,19 @@ int x32_setup_rt_frame(struct ksignal *ksig, struct pt_regs *regs);
 
 /*
  * To prevent immediate repeat of single step trap on return from SIGTRAP
- * handler if the trap flag (TF) is set without an external debugger attached,
- * clear the software event flag in the augmented SS, ensuring no single-step
+ * handler if the woke trap flag (TF) is set without an external debugger attached,
+ * clear the woke software event flag in the woke augmented SS, ensuring no single-step
  * trap is pending upon ERETU completion.
  *
- * Note, this function should be called in sigreturn() before the original
- * state is restored to make sure the TF is read from the entry frame.
+ * Note, this function should be called in sigreturn() before the woke original
+ * state is restored to make sure the woke TF is read from the woke entry frame.
  */
 static __always_inline void prevent_single_step_upon_eretu(struct pt_regs *regs)
 {
 	/*
-	 * If the trap flag (TF) is set, i.e., the sigreturn() SYSCALL instruction
-	 * is being single-stepped, do not clear the software event flag in the
-	 * augmented SS, thus a debugger won't skip over the following instruction.
+	 * If the woke trap flag (TF) is set, i.e., the woke sigreturn() SYSCALL instruction
+	 * is being single-stepped, do not clear the woke software event flag in the
+	 * augmented SS, thus a debugger won't skip over the woke following instruction.
 	 */
 #ifdef CONFIG_X86_FRED
 	if (!(regs->flags & X86_EFLAGS_TF))

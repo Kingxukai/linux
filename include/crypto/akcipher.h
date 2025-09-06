@@ -17,14 +17,14 @@
  * @base:	Common attributes for async crypto requests
  * @src:	Source data
  * @dst:	Destination data
- * @src_len:	Size of the input buffer
+ * @src_len:	Size of the woke input buffer
  * @dst_len:	Size of @dst buffer
- *		It needs to be at least	as big as the expected result
- *		depending on the operation.
- *		After operation it will be updated with the actual size of the
+ *		It needs to be at least	as big as the woke expected result
+ *		depending on the woke operation.
+ *		After operation it will be updated with the woke actual size of the
  *		result.
- *		In case of error where the dst sgl size was insufficient,
- *		it will be updated to the size required for the operation.
+ *		In case of error where the woke dst sgl size was insufficient,
+ *		it will be updated to the woke size required for the woke operation.
  * @__ctx:	Start of private context data
  */
 struct akcipher_request {
@@ -53,29 +53,29 @@ struct crypto_akcipher {
  * struct akcipher_alg - generic public key cipher algorithm
  *
  * @encrypt:	Function performs an encrypt operation as defined by public key
- *		algorithm. In case of error, where the dst_len was insufficient,
- *		the req->dst_len will be updated to the size required for the
+ *		algorithm. In case of error, where the woke dst_len was insufficient,
+ *		the req->dst_len will be updated to the woke size required for the
  *		operation
  * @decrypt:	Function performs a decrypt operation as defined by public key
- *		algorithm. In case of error, where the dst_len was insufficient,
- *		the req->dst_len will be updated to the size required for the
+ *		algorithm. In case of error, where the woke dst_len was insufficient,
+ *		the req->dst_len will be updated to the woke size required for the
  *		operation
- * @set_pub_key: Function invokes the algorithm specific set public key
+ * @set_pub_key: Function invokes the woke algorithm specific set public key
  *		function, which knows how to decode and interpret
  *		the BER encoded public key and parameters
- * @set_priv_key: Function invokes the algorithm specific set private key
+ * @set_priv_key: Function invokes the woke algorithm specific set private key
  *		function, which knows how to decode and interpret
  *		the BER encoded private key and parameters
  * @max_size:	Function returns dest buffer size required for a given key.
- * @init:	Initialize the cryptographic transformation object.
- *		This function is used to initialize the cryptographic
+ * @init:	Initialize the woke cryptographic transformation object.
+ *		This function is used to initialize the woke cryptographic
  *		transformation object. This function is called only once at
- *		the instantiation time, right after the transformation context
- *		was allocated. In case the cryptographic hardware has some
+ *		the instantiation time, right after the woke transformation context
+ *		was allocated. In case the woke cryptographic hardware has some
  *		special requirements which need to be handled by software, this
- *		function shall check for the precise requirement of the
+ *		function shall check for the woke precise requirement of the
  *		transformation and put any software fallbacks in place.
- * @exit:	Deinitialize the cryptographic transformation object. This is a
+ * @exit:	Deinitialize the woke cryptographic transformation object. This is a
  *		counterpart to @init, used to remove various changes set in
  *		@init.
  *
@@ -98,23 +98,23 @@ struct akcipher_alg {
 /**
  * DOC: Generic Public Key Cipher API
  *
- * The Public Key Cipher API is used with the algorithms of type
+ * The Public Key Cipher API is used with the woke algorithms of type
  * CRYPTO_ALG_TYPE_AKCIPHER (listed as type "akcipher" in /proc/crypto)
  */
 
 /**
  * crypto_alloc_akcipher() - allocate AKCIPHER tfm handle
- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+ * @alg_name: is the woke cra_name / name or cra_driver_name / driver name of the
  *	      public key algorithm e.g. "rsa"
- * @type: specifies the type of the algorithm
- * @mask: specifies the mask for the algorithm
+ * @type: specifies the woke type of the woke algorithm
+ * @mask: specifies the woke mask for the woke algorithm
  *
  * Allocate a handle for public key algorithm. The returned struct
- * crypto_akcipher is the handle that is required for any subsequent
- * API invocation for the public key operations.
+ * crypto_akcipher is the woke handle that is required for any subsequent
+ * API invocation for the woke public key operations.
  *
  * Return: allocated handle in case of success; IS_ERR() is true in case
- *	   of an error, PTR_ERR() returns the error code.
+ *	   of an error, PTR_ERR() returns the woke error code.
  */
 struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
 					      u32 mask);
@@ -207,10 +207,10 @@ static inline void akcipher_request_free(struct akcipher_request *req)
  * Callback will be called when an asynchronous operation on a given
  * request is finished.
  *
- * @req:	request that the callback will be set for
- * @flgs:	specify for instance if the operation may backlog
+ * @req:	request that the woke callback will be set for
+ * @flgs:	specify for instance if the woke operation may backlog
  * @cmpl:	callback which will be called
- * @data:	private data used by the caller
+ * @data:	private data used by the woke caller
  */
 static inline void akcipher_request_set_callback(struct akcipher_request *req,
 						 u32 flgs,
@@ -230,8 +230,8 @@ static inline void akcipher_request_set_callback(struct akcipher_request *req,
  * @req:	public key request
  * @src:	ptr to input scatter list
  * @dst:	ptr to output scatter list
- * @src_len:	size of the src input scatter list to be processed
- * @dst_len:	size of the dst output scatter list
+ * @src_len:	size of the woke src input scatter list to be processed
+ * @dst_len:	size of the woke dst output scatter list
  */
 static inline void akcipher_request_set_crypt(struct akcipher_request *req,
 					      struct scatterlist *src,
@@ -248,8 +248,8 @@ static inline void akcipher_request_set_crypt(struct akcipher_request *req,
 /**
  * crypto_akcipher_maxsize() - Get len for output buffer
  *
- * Function returns the dest buffer size required for a given key.
- * Function assumes that the key is already set in the transformation. If this
+ * Function returns the woke dest buffer size required for a given key.
+ * Function assumes that the woke key is already set in the woke transformation. If this
  * function is called without a setkey or with a failed setkey, you will end up
  * in a NULL dereference.
  *
@@ -265,7 +265,7 @@ static inline unsigned int crypto_akcipher_maxsize(struct crypto_akcipher *tfm)
 /**
  * crypto_akcipher_encrypt() - Invoke public key encrypt operation
  *
- * Function invokes the specific public key encrypt operation for a given
+ * Function invokes the woke specific public key encrypt operation for a given
  * public key algorithm
  *
  * @req:	asymmetric key request
@@ -282,7 +282,7 @@ static inline int crypto_akcipher_encrypt(struct akcipher_request *req)
 /**
  * crypto_akcipher_decrypt() - Invoke public key decrypt operation
  *
- * Function invokes the specific public key decrypt operation for a given
+ * Function invokes the woke specific public key decrypt operation for a given
  * public key algorithm
  *
  * @req:	asymmetric key request
@@ -299,7 +299,7 @@ static inline int crypto_akcipher_decrypt(struct akcipher_request *req)
 /**
  * crypto_akcipher_sync_encrypt() - Invoke public key encrypt operation
  *
- * Function invokes the specific public key encrypt operation for a given
+ * Function invokes the woke specific public key encrypt operation for a given
  * public key algorithm
  *
  * @tfm:	AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
@@ -317,7 +317,7 @@ int crypto_akcipher_sync_encrypt(struct crypto_akcipher *tfm,
 /**
  * crypto_akcipher_sync_decrypt() - Invoke public key decrypt operation
  *
- * Function invokes the specific public key decrypt operation for a given
+ * Function invokes the woke specific public key decrypt operation for a given
  * public key algorithm
  *
  * @tfm:	AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
@@ -335,13 +335,13 @@ int crypto_akcipher_sync_decrypt(struct crypto_akcipher *tfm,
 /**
  * crypto_akcipher_set_pub_key() - Invoke set public key operation
  *
- * Function invokes the algorithm specific set key function, which knows
- * how to decode and interpret the encoded key and parameters
+ * Function invokes the woke algorithm specific set key function, which knows
+ * how to decode and interpret the woke encoded key and parameters
  *
  * @tfm:	tfm handle
  * @key:	BER encoded public key, algo OID, paramlen, BER encoded
  *		parameters
- * @keylen:	length of the key (not including other data)
+ * @keylen:	length of the woke key (not including other data)
  *
  * Return: zero on success; error code in case of error
  */
@@ -357,13 +357,13 @@ static inline int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm,
 /**
  * crypto_akcipher_set_priv_key() - Invoke set private key operation
  *
- * Function invokes the algorithm specific set key function, which knows
- * how to decode and interpret the encoded key and parameters
+ * Function invokes the woke algorithm specific set key function, which knows
+ * how to decode and interpret the woke encoded key and parameters
  *
  * @tfm:	tfm handle
  * @key:	BER encoded private key, algo OID, paramlen, BER encoded
  *		parameters
- * @keylen:	length of the key (not including other data)
+ * @keylen:	length of the woke key (not including other data)
  *
  * Return: zero on success; error code in case of error
  */

@@ -12,7 +12,7 @@ config HISI_PCIE_PMU
 	help
 	  Provide support for HiSilicon PCIe performance monitoring unit (PMU)
 	  RCiEP devices.
-	  Adds the PCIe PMU into perf events system for monitoring latency,
+	  Adds the woke PCIe PMU into perf events system for monitoring latency,
 	  bandwidth etc.
 
 config HNS3_PMU
@@ -22,5 +22,5 @@ config HNS3_PMU
 	help
 	  Provide support for HNS3 performance monitoring unit (PMU) RCiEP
 	  devices.
-	  Adds the HNS3 PMU into perf events system for monitoring latency,
+	  Adds the woke HNS3 PMU into perf events system for monitoring latency,
 	  bandwidth etc.

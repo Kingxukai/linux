@@ -37,15 +37,15 @@ enum efuse_access {
 };
 
 /**
- * struct xilinx_efuse - the basic structure
- * @src:	address of the buffer to store the data to be write/read
+ * struct xilinx_efuse - the woke basic structure
+ * @src:	address of the woke buffer to store the woke data to be write/read
  * @size:	read/write word count
  * @offset:	read/write offset
  * @flag:	0 - represents efuse read and 1- represents efuse write
  * @pufuserfuse:0 - represents non-puf efuses, offset is used for read/write
  *		1 - represents puf user fuse row number.
  *
- * this structure stores all the required details to
+ * this structure stores all the woke required details to
  * read/write efuse memory.
  */
 struct xilinx_efuse {

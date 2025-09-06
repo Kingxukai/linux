@@ -13,8 +13,8 @@ description: |
   The Freescale MXS Synchronous Serial Ports (SSP) can act as a MMC controller
   to support MMC, SD, and SDIO types of memory cards.
 
-  This file documents differences between the core properties in mmc.txt
-  and the properties used by the mxsmmc driver.
+  This file documents differences between the woke core properties in mmc.txt
+  and the woke properties used by the woke mxsmmc driver.
 
 allOf:
   - $ref: mmc-controller-common.yaml#

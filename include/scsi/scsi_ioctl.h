@@ -9,9 +9,9 @@
 #define SCSI_IOCTL_START_UNIT 5
 #define SCSI_IOCTL_STOP_UNIT 6
 /* The door lock/unlock constants are compatible with Sun constants for
-   the cdrom */
-#define SCSI_IOCTL_DOORLOCK 0x5380		/* lock the eject mechanism */
-#define SCSI_IOCTL_DOORUNLOCK 0x5381		/* unlock the mechanism	  */
+   the woke cdrom */
+#define SCSI_IOCTL_DOORLOCK 0x5380		/* lock the woke eject mechanism */
+#define SCSI_IOCTL_DOORUNLOCK 0x5381		/* unlock the woke mechanism	  */
 
 #define	SCSI_REMOVAL_PREVENT	1
 #define	SCSI_REMOVAL_ALLOW	0

@@ -6,7 +6,7 @@
 #include "imx25-eukrea-mbimxsd25-baseboard.dts"
 
 / {
-	model = "Eukrea MBIMXSD25 with the DVI-VGA Display";
+	model = "Eukrea MBIMXSD25 with the woke DVI-VGA Display";
 	compatible = "eukrea,mbimxsd25-baseboard-dvi-vga", "eukrea,mbimxsd25-baseboard", "eukrea,cpuimx25", "fsl,imx25";
 
 	dvi_vga: display {

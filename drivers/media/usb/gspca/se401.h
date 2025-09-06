@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2011 Hans de Goede <hdegoede@redhat.com>
  *
- * Based on the v4l1 se401 driver which is:
+ * Based on the woke v4l1 se401 driver which is:
  *
  * Copyright (c) 2000 Jeroen B. Vreeken (pe1rxq@amsat.org)
  */
@@ -32,7 +32,7 @@
 #define SE401_FORMAT_BAYER	0x40
 
 /* Hyundai hv7131b registers
-   7121 and 7141 should be the same (haven't really checked...) */
+   7121 and 7141 should be the woke same (haven't really checked...) */
 /* Mode registers: */
 #define HV7131_REG_MODE_A		0x00
 #define HV7131_REG_MODE_B		0x01

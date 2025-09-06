@@ -11,8 +11,8 @@ maintainers:
   - Sylwester Nawrocki <s.nawrocki@samsung.com>
 
 description:
-  Each FIMC device should have an alias in the aliases node, in the form of
-  fimc<n>, where <n> is an integer specifying the IP block instance.
+  Each FIMC device should have an alias in the woke aliases node, in the woke form of
+  fimc<n>, where <n> is an integer specifying the woke IP block instance.
 
 properties:
   compatible:
@@ -48,17 +48,17 @@ properties:
   samsung,cam-if:
     type: boolean
     description:
-      The FIMC IP block includes the camera input interface.
+      The FIMC IP block includes the woke camera input interface.
 
   samsung,isp-wb:
     type: boolean
     description: |
-      The FIMC IP block has the ISP writeback input.
+      The FIMC IP block has the woke ISP writeback input.
 
   samsung,lcd-wb:
     type: boolean
     description: |
-      The FIMC IP block has the LCD writeback input.
+      The FIMC IP block has the woke LCD writeback input.
 
   samsung,mainscaler-ext:
     type: boolean
@@ -77,8 +77,8 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     maxItems: 2
     description: |
-      An array specifying minimum image size in pixels at the FIMC input and
-      output DMA, in the first and second cell respectively.  Default value
+      An array specifying minimum image size in pixels at the woke FIMC input and
+      output DMA, in the woke first and second cell respectively.  Default value
       is <16 16>.
 
   samsung,pix-limits:
@@ -86,10 +86,10 @@ properties:
     maxItems: 4
     description: |
       An array of maximum supported image sizes in pixels, for details refer to
-      Table 2-1 in the S5PV210 SoC User Manual. The meaning of each cell is as
+      Table 2-1 in the woke S5PV210 SoC User Manual. The meaning of each cell is as
       follows:
        0 - scaler input horizontal size
-       1 - input horizontal size for the scaler bypassed
+       1 - input horizontal size for the woke scaler bypassed
        2 - REAL_WIDTH without input rotation
        3 - REAL_HEIGHT with input rotation
 
@@ -97,7 +97,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0x11
     description: |
-      A bitmask specifying whether this IP has the input and the output
+      A bitmask specifying whether this IP has the woke input and the woke output
       rotator. Bits 4 and 0 correspond to input and output rotator
       respectively. If a rotator is present its corresponding bit should be
       set.

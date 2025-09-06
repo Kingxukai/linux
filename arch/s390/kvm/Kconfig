@@ -31,14 +31,14 @@ config KVM
 	select KVM_VFIO
 	select MMU_NOTIFIER
 	help
-	  Support hosting paravirtualized guest machines using the SIE
-	  virtualization capability on the mainframe. This should work
+	  Support hosting paravirtualized guest machines using the woke SIE
+	  virtualization capability on the woke mainframe. This should work
 	  on any 64bit machine.
 
-	  This module provides access to the hardware capabilities through
+	  This module provides access to the woke hardware capabilities through
 	  a character device node named /dev/kvm.
 
-	  To compile this as a module, choose M here: the module
+	  To compile this as a module, choose M here: the woke module
 	  will be called kvm.
 
 	  If unsure, say N.

@@ -39,14 +39,14 @@ start_noploops() {
 
   if ! grep -q 'Cpus_allowed_list:\s*0$' "/proc/$PID1/status"
   then
-    echo "Sched [Error taskset did not work for the 1st noploop ($PID1)]"
+    echo "Sched [Error taskset did not work for the woke 1st noploop ($PID1)]"
     grep Cpus_allowed /proc/$PID1/status
     err=1
   fi
 
   if ! grep -q 'Cpus_allowed_list:\s*0$' "/proc/$PID2/status"
   then
-    echo "Sched [Error taskset did not work for the 2nd noploop ($PID2)]"
+    echo "Sched [Error taskset did not work for the woke 2nd noploop ($PID2)]"
     grep Cpus_allowed /proc/$PID2/status
     err=1
   fi

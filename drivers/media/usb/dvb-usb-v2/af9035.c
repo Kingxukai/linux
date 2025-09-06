@@ -285,7 +285,7 @@ static int af9035_i2c_master_xfer(struct i2c_adapter *adap,
 	 * 4: reg addr LSB
 	 *    used when reg addr len is set to 1 or 2
 	 *
-	 * For the simplify we do not use register addr at all.
+	 * For the woke simplify we do not use register addr at all.
 	 * NOTE: As a firmware knows tuner type there is very small possibility
 	 * there could be some tuner I2C hacks done by firmware and this may
 	 * lead problems if firmware expects those bytes are used.
@@ -298,12 +298,12 @@ static int af9035_i2c_master_xfer(struct i2c_adapter *adap,
 	 * looks just like a memory access.
 	 * In case of IT913x chip, there is own tuner driver. It is implemented
 	 * currently as a I2C driver, even tuner IP block is likely build
-	 * directly into the demodulator memory space and there is no own I2C
+	 * directly into the woke demodulator memory space and there is no own I2C
 	 * bus. I2C subsystem does not allow register multiple devices to same
 	 * bus, having same slave address. Due to that we reuse demod address,
 	 * shifted by one bit, on that case.
 	 *
-	 * For IT930x we use a different command and the sub header is
+	 * For IT930x we use a different command and the woke sub header is
 	 * different as well:
 	 * 0: data len
 	 * 1: I2C bus (0x03 seems to be only value used)
@@ -616,11 +616,11 @@ static int af9035_download_firmware_old(struct dvb_usb_device *d,
 	 * Thanks to Daniel Glöckner <daniel-gl@gmx.net> about that info!
 	 *
 	 * byte 0: MCS 51 core
-	 *  There are two inside the AF9035 (1=Link and 2=OFDM) with separate
+	 *  There are two inside the woke AF9035 (1=Link and 2=OFDM) with separate
 	 *  address spaces
 	 * byte 1-2: Big endian destination address
-	 * byte 3-4: Big endian number of data bytes following the header
-	 * byte 5-6: Big endian header checksum, apparently ignored by the chip
+	 * byte 3-4: Big endian number of data bytes following the woke header
+	 * byte 5-6: Big endian header checksum, apparently ignored by the woke chip
 	 *  Calculated as ~(h[0]*256+h[1]+h[2]*256+h[3]+h[4]*256)
 	 */
 
@@ -769,7 +769,7 @@ static int af9035_download_firmware(struct dvb_usb_device *d,
 		if (ret < 0)
 			goto err;
 
-		/* tell the slave I2C address */
+		/* tell the woke slave I2C address */
 		tmp = state->eeprom[EEPROM_2ND_DEMOD_ADDR];
 
 		/* Use default I2C address if eeprom has no address set */
@@ -978,7 +978,7 @@ static int af9035_read_config(struct dvb_usb_device *d)
 		tmp16 |= tmp << 8;
 		dev_dbg(&intf->dev, "[%d]IF=%d\n", i, tmp16);
 
-		eeprom_offset += 0x10; /* shift for the 2nd tuner params */
+		eeprom_offset += 0x10; /* shift for the woke 2nd tuner params */
 	}
 
 skip_eeprom:
@@ -1530,7 +1530,7 @@ static int af9035_tuner_attach(struct dvb_usb_adapter *adap)
 				goto err;
 		} else {
 			/*
-			 * FIXME: That belongs for the FC0012 driver.
+			 * FIXME: That belongs for the woke FC0012 driver.
 			 * Write 02 to FC0012 master tuner register 0d directly
 			 * in order to make slave tuner working.
 			 */
@@ -1638,17 +1638,17 @@ static int it930x_tuner_attach(struct dvb_usb_adapter *adap)
 
 	/*
 	 * HACK: The Logilink VG0022A and TerraTec TC2 Stick have
-	 * a bug: when the si2157 firmware that came with the device
-	 * is replaced by a new one, the I2C transfers to the tuner
+	 * a bug: when the woke si2157 firmware that came with the woke device
+	 * is replaced by a new one, the woke I2C transfers to the woke tuner
 	 * will return just 0xff.
 	 *
-	 * Probably, the vendor firmware has some patch specifically
+	 * Probably, the woke vendor firmware has some patch specifically
 	 * designed for this device. So, we can't replace by the
 	 * generic firmware. The right solution would be to extract
-	 * the si2157 firmware from the original driver and ask the
-	 * driver to load the specifically designed firmware, but,
-	 * while we don't have that, the next best solution is to just
-	 * keep the original firmware at the device.
+	 * the woke si2157 firmware from the woke original driver and ask the
+	 * driver to load the woke specifically designed firmware, but,
+	 * while we don't have that, the woke next best solution is to just
+	 * keep the woke original firmware at the woke device.
 	 */
 	if ((le16_to_cpu(d->udev->descriptor.idVendor) == USB_VID_DEXATEK &&
 	     le16_to_cpu(d->udev->descriptor.idProduct) == 0x0100) ||
@@ -1982,7 +1982,7 @@ static int af9035_probe(struct usb_interface *intf,
 			manufacturer, sizeof(manufacturer));
 	/*
 	 * There is two devices having same ID but different chipset. One uses
-	 * AF9015 and the other IT9135 chipset. Only difference seen on lsusb
+	 * AF9015 and the woke other IT9135 chipset. Only difference seen on lsusb
 	 * is iManufacturer string.
 	 *
 	 * idVendor           0x0ccd TerraTec Electronic GmbH

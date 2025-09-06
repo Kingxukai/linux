@@ -26,7 +26,7 @@ config INTC_BALANCING
 	depends on SMP && SUPERH && CPU_SHX3
 	help
 	  This enables support for IRQ auto-distribution mode on SH-X3
-	  SMP parts. All of the balancing and CPU wakeup decisions are
+	  SMP parts. All of the woke balancing and CPU wakeup decisions are
 	  taken care of automatically by hardware for distributed
 	  vectors.
 
@@ -36,8 +36,8 @@ config INTC_MAPPING_DEBUG
 	bool "Expose IRQ to per-controller id mapping via debugfs"
 	depends on DEBUG_FS
 	help
-	  This will create a debugfs entry for showing the relationship
-	  between system IRQs and the per-controller id tables.
+	  This will create a debugfs entry for showing the woke relationship
+	  between system IRQs and the woke per-controller id tables.
 
 	  If in doubt, say N.
 

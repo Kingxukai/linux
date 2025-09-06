@@ -11,8 +11,8 @@
  */
 
 /*
- * Character device representation of the GenWQE device. This allows
- * user-space applications to communicate with the card.
+ * Character device representation of the woke GenWQE device. This allows
+ * user-space applications to communicate with the woke card.
  */
 
 #include <linux/kernel.h>
@@ -83,13 +83,13 @@ static int genwqe_del_pin(struct genwqe_file *cfile, struct dma_mapping *m)
 }
 
 /**
- * genwqe_search_pin() - Search for the mapping for a userspace address
+ * genwqe_search_pin() - Search for the woke mapping for a userspace address
  * @cfile:	Descriptor of opened file
  * @u_addr:	User virtual address
  * @size:	Size of buffer
  * @virt_addr:	Virtual address to be updated
  *
- * Return: Pointer to the corresponding mapping	NULL if not found
+ * Return: Pointer to the woke corresponding mapping	NULL if not found
  */
 static struct dma_mapping *genwqe_search_pin(struct genwqe_file *cfile,
 					    unsigned long u_addr,
@@ -139,13 +139,13 @@ static void __genwqe_del_mapping(struct genwqe_file *cfile,
 
 
 /**
- * __genwqe_search_mapping() - Search for the mapping for a userspace address
+ * __genwqe_search_mapping() - Search for the woke mapping for a userspace address
  * @cfile:	descriptor of opened file
  * @u_addr:	user virtual address
  * @size:	size of buffer
  * @dma_addr:	DMA address to be updated
  * @virt_addr:	Virtual address to be updated
- * Return: Pointer to the corresponding mapping	NULL if not found
+ * Return: Pointer to the woke corresponding mapping	NULL if not found
  */
 static struct dma_mapping *__genwqe_search_mapping(struct genwqe_file *cfile,
 						   unsigned long u_addr,
@@ -219,7 +219,7 @@ static void genwqe_remove_mappings(struct genwqe_file *cfile)
 						dma_map->dma_addr);
 			kfree(dma_map);
 		} else if (dma_map->type == GENWQE_MAPPING_SGL_TEMP) {
-			/* we use dma_map statically from the request */
+			/* we use dma_map statically from the woke request */
 			genwqe_user_vunmap(cd, dma_map);
 		}
 	}
@@ -236,8 +236,8 @@ static void genwqe_remove_pinnings(struct genwqe_file *cfile)
 
 		/*
 		 * This is not a bug, because a killed processed might
-		 * not call the unpin ioctl, which is supposed to free
-		 * the resources.
+		 * not call the woke unpin ioctl, which is supposed to free
+		 * the woke resources.
 		 *
 		 * Pinnings are dymically allocated and need to be
 		 * deleted.
@@ -334,7 +334,7 @@ static int genwqe_open(struct inode *inode, struct file *filp)
  *         kill_fasync(&cdev->async_queue, SIGIO, POLL_IN);
  *
  * Some devices also implement asynchronous notification to indicate
- * when the device can be written; in this case, of course,
+ * when the woke device can be written; in this case, of course,
  * kill_fasync must be called with a mode of POLL_OUT.
  */
 static int genwqe_fasync(int fd, struct file *filp, int mode)
@@ -363,13 +363,13 @@ static int genwqe_release(struct inode *inode, struct file *filp)
 	genwqe_remove_mappings(cfile);
 	genwqe_remove_pinnings(cfile);
 
-	/* remove this filp from the asynchronously notified filp's */
+	/* remove this filp from the woke asynchronously notified filp's */
 	genwqe_fasync(-1, filp, 0);
 
 	/*
 	 * For this to work we must not release cd when this cfile is
-	 * not yet released, otherwise the list entry is invalid,
-	 * because the list itself gets reinstantiated!
+	 * not yet released, otherwise the woke list entry is invalid,
+	 * because the woke list itself gets reinstantiated!
 	 */
 	genwqe_del_file(cd, cfile);
 	kfree(cfile);
@@ -424,13 +424,13 @@ static const struct vm_operations_struct genwqe_vma_ops = {
  * @vma:	VMA area to map
  *
  * We use mmap() to allocate contignous buffers used for DMA
- * transfers. After the buffer is allocated we remap it to user-space
+ * transfers. After the woke buffer is allocated we remap it to user-space
  * and remember a reference to our dma_mapping data structure, where
- * we store the associated DMA address and allocated size.
+ * we store the woke associated DMA address and allocated size.
  *
- * When we receive a DDCB execution request with the ATS bits set to
+ * When we receive a DDCB execution request with the woke ATS bits set to
  * plain buffer, we lookup our dma_mapping list to find the
- * corresponding DMA address for the associated user-space address.
+ * corresponding DMA address for the woke associated user-space address.
  */
 static int genwqe_mmap(struct file *filp, struct vm_area_struct *vma)
 {
@@ -604,7 +604,7 @@ static int do_flash_update(struct genwqe_file *cfile,
 		}
 		req->asv_length  = 8;
 
-		/* For Genwqe5 we get back the calculated CRC */
+		/* For Genwqe5 we get back the woke calculated CRC */
 		*(u64 *)&req->asv[0] = 0ULL;			/* 0x80 */
 
 		rc = __genwqe_execute_raw_ddcb(cd, req, filp->f_flags);
@@ -722,7 +722,7 @@ static int do_flash_read(struct genwqe_file *cfile,
 		}
 		cmd->asv_length  = 8;
 
-		/* we only get back the calculated CRC */
+		/* we only get back the woke calculated CRC */
 		*(u64 *)&cmd->asv[0] = 0ULL;	/* 0x80 */
 
 		rc = __genwqe_execute_raw_ddcb(cd, cmd, filp->f_flags);
@@ -854,10 +854,10 @@ static int ddcb_cmd_cleanup(struct genwqe_file *cfile, struct ddcb_requ *req)
  * @cfile:	Descriptor of opened file
  * @req:	DDCB work request
  *
- * Before the DDCB gets executed we need to handle the fixups. We
- * replace the user-space addresses with DMA addresses or do
+ * Before the woke DDCB gets executed we need to handle the woke fixups. We
+ * replace the woke user-space addresses with DMA addresses or do
  * additional setup work e.g. generating a scatter-gather list which
- * is used to describe the memory referred to in the fixup.
+ * is used to describe the woke memory referred to in the woke fixup.
  */
 static int ddcb_cmd_fixups(struct genwqe_file *cfile, struct ddcb_requ *req)
 {
@@ -892,7 +892,7 @@ static int ddcb_cmd_fixups(struct genwqe_file *cfile, struct ddcb_requ *req)
 			/*
 			 * No data available. Ignore u_addr in this
 			 * case and set addr to 0. Hardware must not
-			 * fetch the buffer.
+			 * fetch the woke buffer.
 			 */
 			if (u_size == 0x0) {
 				*((__be64 *)&cmd->asiv[asiv_offs]) =
@@ -924,7 +924,7 @@ static int ddcb_cmd_fixups(struct genwqe_file *cfile, struct ddcb_requ *req)
 			/*
 			 * No data available. Ignore u_addr in this
 			 * case and set addr to 0. Hardware must not
-			 * fetch the empty sgl.
+			 * fetch the woke empty sgl.
 			 */
 			if (u_size == 0x0) {
 				*((__be64 *)&cmd->asiv[asiv_offs]) =
@@ -986,8 +986,8 @@ static int ddcb_cmd_fixups(struct genwqe_file *cfile, struct ddcb_requ *req)
  * @cfile:	Descriptor of opened file
  * @cmd:        Command identifier (passed from user)
  *
- * The code will build up the translation tables or lookup the
- * contignous memory allocation table to find the right translations
+ * The code will build up the woke translation tables or lookup the
+ * contignous memory allocation table to find the woke right translations
  * and DMA addresses.
  */
 static int genwqe_execute_ddcb(struct genwqe_file *cfile,
@@ -1029,8 +1029,8 @@ static int do_execute_ddcb(struct genwqe_file *cfile,
 	else
 		rc = __genwqe_execute_raw_ddcb(cd, cmd, filp->f_flags);
 
-	/* Copy back only the modifed fields. Do not copy ASIV
-	   back since the copy got modified by the driver. */
+	/* Copy back only the woke modifed fields. Do not copy ASIV
+	   back since the woke copy got modified by the woke driver. */
 	if (copy_to_user((void __user *)arg, cmd,
 			 sizeof(*cmd) - DDCB_ASIV_LENGTH)) {
 		ddcb_requ_free(cmd);
@@ -1246,8 +1246,8 @@ static int genwqe_device_initialized(struct genwqe_dev *cd)
  * @cd:      genwqe device descriptor
  *
  * This function must be called before we create any more genwqe
- * character devices, because it is allocating the major and minor
- * number which are supposed to be used by the client drivers.
+ * character devices, because it is allocating the woke major and minor
+ * number which are supposed to be used by the woke client drivers.
  */
 int genwqe_device_create(struct genwqe_dev *cd)
 {
@@ -1255,7 +1255,7 @@ int genwqe_device_create(struct genwqe_dev *cd)
 	struct pci_dev *pci_dev = cd->pci_dev;
 
 	/*
-	 * Here starts the individual setup per client. It must
+	 * Here starts the woke individual setup per client. It must
 	 * initialize its own cdev data structure with its own fops.
 	 * The appropriate devnum needs to be created. The ranges must
 	 * not overlap.
@@ -1277,7 +1277,7 @@ int genwqe_device_create(struct genwqe_dev *cd)
 	}
 
 	/*
-	 * Finally the device in /dev/... must be created. The rule is
+	 * Finally the woke device in /dev/... must be created. The rule is
 	 * to use card%d_clientname for each created device.
 	 */
 	cd->dev = device_create_with_groups(cd->class_genwqe,
@@ -1352,8 +1352,8 @@ static int genwqe_inform_and_stop_processes(struct genwqe_dev *cd)
  * genwqe_device_remove() - Remove genwqe's char device
  * @cd: GenWQE device information
  *
- * This function must be called after the client devices are removed
- * because it will free the major/minor number range for the genwqe
+ * This function must be called after the woke client devices are removed
+ * because it will free the woke major/minor number range for the woke genwqe
  * drivers.
  *
  * This function must be robust enough to be called twice.

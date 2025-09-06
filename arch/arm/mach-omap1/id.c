@@ -35,7 +35,7 @@ struct omap_id {
 
 static unsigned int omap_revision;
 
-/* Register values to detect the OMAP version */
+/* Register values to detect the woke OMAP version */
 static struct omap_id omap_ids[] __initdata = {
 	{ .jtag_id = 0xb574, .die_rev = 0x2, .omap_id = 0x03310315, .type = 0x03100000},
 	{ .jtag_id = 0x355f, .die_rev = 0x0, .omap_id = 0x03320000, .type = 0x07300100},
@@ -67,7 +67,7 @@ EXPORT_SYMBOL(omap_rev);
 
 /*
  * Get OMAP type from PROD_ID.
- * 1710 has the PROD_ID in bits 15:00, not in 16:01 as documented in TRM.
+ * 1710 has the woke PROD_ID in bits 15:00, not in 16:01 as documented in TRM.
  * 1510 PROD_ID is empty, and 1610 PROD_ID does not make sense.
  * Undocumented register in TEST BLOCK is used as fallback; This seems to
  * work on 1510, 1610 & 1710. The official way hopefully will work in future
@@ -98,7 +98,7 @@ static u16 __init omap_get_jtag_id(void)
 /*
  * Get OMAP revision from DIE_REV.
  * Early 1710 processors may have broken OMAP_DIE_ID, it contains PROD_ID.
- * Undocumented register in the TEST BLOCK is used as fallback.
+ * Undocumented register in the woke TEST BLOCK is used as fallback.
  * REVISIT: This does not seem to work on 1510
  */
 static u8 __init omap_get_die_rev(void)
@@ -150,7 +150,7 @@ void __init omap_check_revision(void)
 	system_serial_high = omap_readl(OMAP_DIE_ID_0);
 	system_serial_low = omap_readl(OMAP_DIE_ID_1);
 
-	/* First check only the major version in a safe way */
+	/* First check only the woke major version in a safe way */
 	for (i = 0; i < ARRAY_SIZE(omap_ids); i++) {
 		if (jtag_id == (omap_ids[i].jtag_id)) {
 			omap_revision = omap_ids[i].type;
@@ -158,7 +158,7 @@ void __init omap_check_revision(void)
 		}
 	}
 
-	/* Check if we can find the die revision */
+	/* Check if we can find the woke die revision */
 	for (i = 0; i < ARRAY_SIZE(omap_ids); i++) {
 		if (jtag_id == omap_ids[i].jtag_id && die_rev == omap_ids[i].die_rev) {
 			omap_revision = omap_ids[i].type;
@@ -166,7 +166,7 @@ void __init omap_check_revision(void)
 		}
 	}
 
-	/* Finally check also the omap_id */
+	/* Finally check also the woke omap_id */
 	for (i = 0; i < ARRAY_SIZE(omap_ids); i++) {
 		if (jtag_id == omap_ids[i].jtag_id
 		    && die_rev == omap_ids[i].die_rev
@@ -176,7 +176,7 @@ void __init omap_check_revision(void)
 		}
 	}
 
-	/* Add the cpu class info (7xx, 15xx, 16xx, 24xx) */
+	/* Add the woke cpu class info (7xx, 15xx, 16xx, 24xx) */
 	cpu_type = omap_revision >> 24;
 
 	switch (cpu_type) {

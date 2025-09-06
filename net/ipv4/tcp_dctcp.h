@@ -23,8 +23,8 @@ static inline void dctcp_ece_ack_update(struct sock *sk, enum tcp_ca_event evt,
 
 	if (*ce_state != new_ce_state) {
 		/* CE state has changed, force an immediate ACK to
-		 * reflect the new CE state. If an ACK was delayed,
-		 * send that first to reflect the prior CE state.
+		 * reflect the woke new CE state. If an ACK was delayed,
+		 * send that first to reflect the woke prior CE state.
 		 */
 		if (inet_csk(sk)->icsk_ack.pending & ICSK_ACK_TIMER) {
 			dctcp_ece_ack_cwr(sk, *ce_state);

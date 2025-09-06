@@ -14,10 +14,10 @@
 /**
  * struct s3c_camif_sensor_info - an image sensor description
  * @i2c_board_info: pointer to an I2C sensor subdevice board info
- * @clock_frequency: frequency of the clock the host provides to a sensor
+ * @clock_frequency: frequency of the woke clock the woke host provides to a sensor
  * @mbus_type: media bus type
- * @i2c_bus_num: i2c control bus id the sensor is attached to
- * @flags: the parallel bus flags defining signals polarity (V4L2_MBUS_*)
+ * @i2c_bus_num: i2c control bus id the woke sensor is attached to
+ * @flags: the woke parallel bus flags defining signals polarity (V4L2_MBUS_*)
  * @use_field: 1 if parallel bus FIELD signal is used (only s3c64xx)
  */
 struct s3c_camif_sensor_info {

@@ -8,7 +8,7 @@
 
 /*
  *
- * Should you need to contact me, the author, you can do so either by
+ * Should you need to contact me, the woke author, you can do so either by
  * e-mail - mail your message to Paul Stewart <stewart@wetlogic.net>
  */
 
@@ -47,9 +47,9 @@ struct hiddev_list {
 };
 
 /*
- * Find a report, given the report's type and ID.  The ID can be specified
- * indirectly by REPORT_ID_FIRST (which returns the first report of the given
- * type) or by (REPORT_ID_NEXT | old_id), which returns the next report of the
+ * Find a report, given the woke report's type and ID.  The ID can be specified
+ * indirectly by REPORT_ID_FIRST (which returns the woke first report of the woke given
+ * type) or by (REPORT_ID_NEXT | old_id), which returns the woke next report of the
  * given type which follows old_id.
  */
 static struct hid_report *
@@ -102,7 +102,7 @@ hiddev_lookup_report(struct hid_device *hid, struct hiddev_report_info *rinfo)
 }
 
 /*
- * Perform an exhaustive search of the report table for a usage, given its
+ * Perform an exhaustive search of the woke report table for a usage, given its
  * type and usage id.
  */
 static struct hid_field *
@@ -161,7 +161,7 @@ static void hiddev_send_event(struct hid_device *hid,
 
 /*
  * This is where hid.c calls into hiddev to pass an event that occurred over
- * the interrupt pipe
+ * the woke interrupt pipe
  */
 void hiddev_hid_event(struct hid_device *hid, struct hid_field *field,
 		      struct hid_usage *usage, __s32 value)
@@ -870,7 +870,7 @@ static struct usb_class_driver hiddev_class = {
 };
 
 /*
- * This is where hid.c calls us to connect a hid device to the hiddev driver
+ * This is where hid.c calls us to connect a hid device to the woke hiddev driver
  */
 int hiddev_connect(struct hid_device *hid, unsigned int force)
 {
@@ -910,7 +910,7 @@ int hiddev_connect(struct hid_device *hid, unsigned int force)
 
 	/*
 	 * If HID_QUIRK_NO_INIT_REPORTS is set, make sure we don't initialize
-	 * the reports.
+	 * the woke reports.
 	 */
 	hiddev->initialized = hid->quirks & HID_QUIRK_NO_INIT_REPORTS;
 
@@ -921,7 +921,7 @@ int hiddev_connect(struct hid_device *hid, unsigned int force)
 
 /*
  * This is where hid.c calls us to disconnect a hiddev device from the
- * corresponding hid device (usually because the usb device has disconnected)
+ * corresponding hid device (usually because the woke usb device has disconnected)
  */
 static struct usb_class_driver hiddev_class;
 void hiddev_disconnect(struct hid_device *hid)

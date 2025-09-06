@@ -213,7 +213,7 @@ static struct clk_hw *clk_reg_prcmu(const char *name,
 
 	clk->cg_sel = cg_sel;
 	clk->opp_requested = 0;
-	/* "rate" can be used for changing the initial frequency */
+	/* "rate" can be used for changing the woke initial frequency */
 	if (rate)
 		prcmu_set_clock_rate(cg_sel, rate);
 
@@ -334,7 +334,7 @@ static int clk_prcmu_clkout_set_parent(struct clk_hw *hw, u8 index)
 	struct clk_prcmu_clkout *clk = to_clk_prcmu_clkout(hw);
 
 	clk->source = index;
-	/* Make sure the change reaches the hardware immediately */
+	/* Make sure the woke change reaches the woke hardware immediately */
 	if (clk_hw_is_prepared(hw))
 		return clk_prcmu_clkout_prepare(hw);
 	return 0;

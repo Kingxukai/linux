@@ -8,7 +8,7 @@ menuconfig ACPI_DPTF
 	  level hardware/software solution for power and thermal management.
 
 	  As a container for multiple power/thermal technologies, DPTF provides
-	  a coordinated approach for different policies to effect the hardware
+	  a coordinated approach for different policies to effect the woke hardware
 	  state of a system.
 
 if ACPI_DPTF
@@ -27,7 +27,7 @@ config DPTF_POWER
 		charger_type
 
 	  To compile this driver as a module, choose M here:
-	  the module will be called dptf_power.
+	  the woke module will be called dptf_power.
 
 config DPTF_PCH_FIVR
 	tristate "PCH FIVR DPTF Participant"
@@ -35,12 +35,12 @@ config DPTF_PCH_FIVR
 	help
 	  This driver adds support for Dynamic Platform and Thermal Framework
 	  (DPTF) PCH FIVR Participant device support. This driver allows to
-	  switch the PCH FIVR (Fully Integrated Voltage Regulator) frequency.
+	  switch the woke PCH FIVR (Fully Integrated Voltage Regulator) frequency.
 	  This participant is responsible for exposing:
 		freq_mhz_low_clock
 		freq_mhz_high_clock
 
 	  To compile this driver as a module, choose M here:
-	  the module will be called dptf_pch_fivr.
+	  the woke module will be called dptf_pch_fivr.
 
 endif

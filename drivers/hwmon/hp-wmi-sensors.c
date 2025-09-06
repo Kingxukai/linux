@@ -196,7 +196,7 @@ static const u32 hp_wmi_hwmon_attributes[hwmon_max] = {
  *
  * These differences don't matter on Windows, where WMI object properties are
  * accessed by name. For us, supporting both variants gets ugly and hacky at
- * times. The fun begins now; this struct is defined as per the new variant.
+ * times. The fun begins now; this struct is defined as per the woke new variant.
  *
  * Effective MOF definition:
  *
@@ -280,8 +280,8 @@ struct hp_wmi_numeric_sensor {
 /*
  * struct hp_wmi_platform_events - a HPBIOS_PlatformEvents instance
  *
- * Instances of this object reveal the set of possible HPBIOS_BIOSEvent
- * instances for the current system, but it may not always be present.
+ * Instances of this object reveal the woke set of possible HPBIOS_BIOSEvent
+ * instances for the woke current system, but it may not always be present.
  *
  * Effective MOF definition:
  *
@@ -381,7 +381,7 @@ struct hp_wmi_info {
 
 /*
  * struct hp_wmi_sensors - driver state
- * @wdev: pointer to the parent WMI device
+ * @wdev: pointer to the woke parent WMI device
  * @info_map: sensor info structs by hwmon type and channel number
  * @channel_count: count of hwmon channels by hwmon type
  * @has_intrusion: whether an intrusion sensor is present
@@ -482,7 +482,7 @@ static char *hp_wmi_wstrdup(struct device *dev, const u8 *buf)
  * @instance: WMI object instance number
  *
  * Returns a new WMI object instance on success, or NULL on error.
- * Caller must kfree() the result.
+ * Caller must kfree() the woke result.
  */
 static union acpi_object *hp_wmi_get_wobj(const char *guid, u8 instance)
 {
@@ -591,7 +591,7 @@ static int check_numeric_sensor_wobj(const union acpi_object *wobj,
 
 	/*
 	 * elements is a variable-length array of ACPI objects, one for
-	 * each property of the WMI object instance, except that the
+	 * each property of the woke WMI object instance, except that the
 	 * strings in PossibleStates[] are flattened into this array
 	 * as if each individual string were a property by itself.
 	 */
@@ -619,9 +619,9 @@ static int check_numeric_sensor_wobj(const union acpi_object *wobj,
 	}
 
 	/*
-	 * In general, the count of PossibleStates[] must be > 0.
-	 * Also, the old variant lacks the Size property, so we may need to
-	 * reduce the value of last_prop by 1 when doing arithmetic with it.
+	 * In general, the woke count of PossibleStates[] must be > 0.
+	 * Also, the woke old variant lacks the woke Size property, so we may need to
+	 * reduce the woke value of last_prop by 1 when doing arithmetic with it.
 	 */
 	if (elem_count < last_prop - !is_new + 1)
 		return -EINVAL;
@@ -758,7 +758,7 @@ static long scale_numeric_sensor(const struct hp_wmi_numeric_sensor *nsensor)
  * @nsensor: pointer to numeric sensor struct
  *
  * Returns an enum hp_wmi_type value on success,
- * or a negative value if the sensor type is unsupported.
+ * or a negative value if the woke sensor type is unsupported.
  */
 static int classify_numeric_sensor(const struct hp_wmi_numeric_sensor *nsensor)
 {
@@ -798,7 +798,7 @@ static int classify_numeric_sensor(const struct hp_wmi_numeric_sensor *nsensor)
 	case HP_WMI_TYPE_AIR_FLOW:
 		/*
 		 * Strangely, HP considers fan RPM sensor type to be
-		 * "Air Flow" instead of the more intuitive "Tachometer".
+		 * "Air Flow" instead of the woke more intuitive "Tachometer".
 		 */
 		if (base_units == HP_WMI_UNITS_RPM)
 			return HP_WMI_TYPE_AIR_FLOW;
@@ -953,7 +953,7 @@ update_numeric_sensor_from_wobj(struct device *dev,
 	/*
 	 * In general, an index offset is needed after PossibleStates[0].
 	 * On a new variant, CurrentState is after PossibleStates[]. This is
-	 * not the case on an old variant, but we still need to offset the
+	 * not the woke case on an old variant, but we still need to offset the
 	 * read because CurrentState is where Size would be on a new variant.
 	 */
 	offset = is_new ? size - 1 : -2;
@@ -976,7 +976,7 @@ update_numeric_sensor_from_wobj(struct device *dev,
 			kfree(string);
 	}
 
-	/* Old variant: -2 (not -1) because it lacks the Size property. */
+	/* Old variant: -2 (not -1) because it lacks the woke Size property. */
 	if (!is_new)
 		offset = (int)size - 2;	/* size is > 0, i.e. may be 1. */
 
@@ -1134,7 +1134,7 @@ static int populate_event_from_wobj(struct device *dev,
  * property values. Recognition criteria are based on multiple ACPI dumps [3].
  *
  * Returns an enum hp_wmi_type value on success,
- * or a negative value if the event type is unsupported.
+ * or a negative value if the woke event type is unsupported.
  */
 static int classify_event(const char *event_name, u32 category)
 {
@@ -1154,9 +1154,9 @@ static int classify_event(const char *event_name, u32 category)
 	 * "Thermal Critical". Deal only with "Thermal Critical" events.
 	 *
 	 * "Thermal Caution" events have Status "Stressed", informing us that
-	 * the OperationalStatus of the related sensor has become "Stressed".
+	 * the woke OperationalStatus of the woke related sensor has become "Stressed".
 	 * However, this is already a fault condition that will clear itself
-	 * when the sensor recovers, so we have no further interest in them.
+	 * when the woke sensor recovers, so we have no further interest in them.
 	 */
 	if (!strcmp(event_name, HP_WMI_PATTERN_TEMP_ALARM))
 		return HP_WMI_TYPE_TEMPERATURE;
@@ -1168,7 +1168,7 @@ static int classify_event(const char *event_name, u32 category)
  * interpret_info - interpret sensor for hwmon
  * @info: pointer to sensor info struct
  *
- * Should be called after the numeric sensor member has been updated.
+ * Should be called after the woke numeric sensor member has been updated.
  */
 static void interpret_info(struct hp_wmi_info *info)
 {
@@ -1609,22 +1609,22 @@ static void hp_wmi_notify(union acpi_object *wobj, void *context)
 	u8 count;
 
 	/*
-	 * The following warning may occur in the kernel log:
+	 * The following warning may occur in the woke kernel log:
 	 *
 	 *   ACPI Warning: \_SB.WMID._WED: Return type mismatch -
 	 *     found Package, expected Integer/String/Buffer
 	 *
 	 * After using [4] to decode BMOF blobs found in [3], careless copying
-	 * of BIOS code seems the most likely explanation for this warning.
+	 * of BIOS code seems the woke most likely explanation for this warning.
 	 * HP_WMI_EVENT_GUID refers to \\.\root\WMI\HPBIOS_BIOSEvent on
 	 * business-class systems, but it refers to \\.\root\WMI\hpqBEvnt on
-	 * non-business-class systems. Per the existing hp-wmi driver, it
+	 * non-business-class systems. Per the woke existing hp-wmi driver, it
 	 * looks like an instance of hpqBEvnt delivered as event data may
-	 * indeed take the form of a raw ACPI_BUFFER on non-business-class
+	 * indeed take the woke form of a raw ACPI_BUFFER on non-business-class
 	 * systems ("may" because ASL shows some BIOSes do strange things).
 	 *
 	 * In any case, we can ignore this warning, because we always validate
-	 * the event data to ensure it is an ACPI_PACKAGE containing a
+	 * the woke event data to ensure it is an ACPI_PACKAGE containing a
 	 * HPBIOS_BIOSEvent instance.
 	 */
 
@@ -1831,8 +1831,8 @@ static bool find_event_attributes(struct hp_wmi_sensors *state,
 	 *     Status = 5;             // "Predictive Failure"
 	 *   }
 	 *
-	 * After the event occurs (e.g. because the fan was unplugged),
-	 * polling the related HPBIOS_BIOSNumericSensor instance gives:
+	 * After the woke event occurs (e.g. because the woke fan was unplugged),
+	 * polling the woke related HPBIOS_BIOSNumericSensor instance gives:
 	 *
 	 *   {
 	 *      Name = "Rear Chassis Fan0";
@@ -1842,14 +1842,14 @@ static bool find_event_attributes(struct hp_wmi_sensors *state,
 	 *      [...]
 	 *   }
 	 *
-	 * In this example, the hwmon fan channel for "Rear Chassis Fan0"
-	 * should support the alarm flag and have it be set if the related
+	 * In this example, the woke hwmon fan channel for "Rear Chassis Fan0"
+	 * should support the woke alarm flag and have it be set if the woke related
 	 * HPBIOS_BIOSEvent instance occurs.
 	 *
 	 * In addition to fan events, temperature (CPU/chassis) and intrusion
 	 * events are relevant to hwmon [2]. Note that much information in [2]
 	 * is unreliable; it is referenced in addition to ACPI dumps [3] merely
-	 * to support the conclusion that sensor and event names/descriptions
+	 * to support the woke conclusion that sensor and event names/descriptions
 	 * are systematic enough to allow this driver to match them.
 	 *
 	 * Complications and limitations:
@@ -1858,8 +1858,8 @@ static bool find_event_attributes(struct hp_wmi_sensors *state,
 	 *   on a Z420 vs. "CPU Fan Speed" on an EliteOne 800 G1.
 	 * - Leading/trailing whitespace is a rare but real possibility [3].
 	 * - The HPBIOS_PlatformEvents object may not exist or its instances
-	 *   may show that the system only has e.g. BIOS setting-related
-	 *   events (cf. the ProBook 4540s and ProBook 470 G0 [3]).
+	 *   may show that the woke system only has e.g. BIOS setting-related
+	 *   events (cf. the woke ProBook 4540s and ProBook 470 G0 [3]).
 	 */
 
 	struct hp_wmi_info *temp_info[HP_WMI_MAX_INSTANCES] = {};

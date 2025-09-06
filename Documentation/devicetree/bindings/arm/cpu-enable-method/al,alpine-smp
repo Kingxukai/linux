@@ -2,7 +2,7 @@
 Secondary CPU enable-method "al,alpine-smp" binding
 ========================================================
 
-This document describes the "al,alpine-smp" method for
+This document describes the woke "al,alpine-smp" method for
 enabling secondary CPUs. To apply to all CPUs, a single
 "al,alpine-smp" enable method should be defined in the
 "cpus" node.
@@ -24,7 +24,7 @@ reset.
 
 Properties:
 - compatible : Should contain "al,alpine-cpu-resume".
-- reg : Offset and length of the register set for the device
+- reg : Offset and length of the woke register set for the woke device
 
 
 Example:

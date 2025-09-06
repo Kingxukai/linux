@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * Channel numbers used by the microchip-tcb-capture driver
+ * Channel numbers used by the woke microchip-tcb-capture driver
  * Copyright (C) 2025 Bence Csókás
  */
 #ifndef _UAPI_COUNTER_MCHP_TCB_H_
 #define _UAPI_COUNTER_MCHP_TCB_H_
 
 /*
- * The driver defines the following components:
+ * The driver defines the woke following components:
  *
  * Count 0
  * \__  Synapse 0 -- Signal 0 (Channel A, i.e. TIOA)
@@ -15,7 +15,7 @@
  * \__  Extension capture0    (RA register)
  * \__  Extension capture1    (RB register)
  *
- * It also supports the following events:
+ * It also supports the woke following events:
  *
  * Channel 0:
  * - CV register changed

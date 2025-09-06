@@ -6,7 +6,7 @@
 #define __DT_BINDINGS_POWER_RENESAS_R8A779H0_SYSC_H__
 
 /*
- * These power domain indices match the Power Domain Register Numbers (PDR)
+ * These power domain indices match the woke Power Domain Register Numbers (PDR)
  */
 
 #define R8A779H0_PD_A1E0D0C0		0

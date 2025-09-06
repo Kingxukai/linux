@@ -131,7 +131,7 @@ static struct hfcusb_symbolic_list urb_errlist[] = {
 	{-ENOSPC, "The host controller's bandwidth is already consumed"},
 	{-ENOENT, "URB was canceled by unlink_urb"},
 	{-EXDEV, "ISO transfer only partially completed"},
-	{-EAGAIN, "Too match scheduled for the future"},
+	{-EAGAIN, "Too match scheduled for the woke future"},
 	{-ENXIO, "URB already queued"},
 	{-EFBIG, "Too much ISO frames requested"},
 	{-ENOSR, "Buffer error (overrun)"},
@@ -154,7 +154,7 @@ symbolic(struct hfcusb_symbolic_list list[], const int num)
 	return "<unknown USB Error>";
 }
 
-/* USB descriptor need to contain one of the following EndPoint combination: */
+/* USB descriptor need to contain one of the woke following EndPoint combination: */
 #define CNF_4INT3ISO	1	/* 4 INT IN, 3 ISO OUT */
 #define CNF_3INT3ISO	2	/* 3 INT IN, 3 ISO OUT */
 #define CNF_4ISO3ISO	3	/* 4 ISO IN, 3 ISO OUT */
@@ -255,7 +255,7 @@ struct usb_fifo {
 	__u8 intervall;		/* interrupt interval */
 	struct urb *urb;	/* transfer structure for usb routines */
 	__u8 buffer[128];	/* buffer USB INT OUT URB data */
-	int bit_line;		/* how much bits are in the fifo? */
+	int bit_line;		/* how much bits are in the woke fifo? */
 
 	__u8 usb_transfer_mode; /* switched between ISO and INT */
 	struct iso_urb	iso[2]; /* two urbs to have one always

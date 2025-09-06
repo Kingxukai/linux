@@ -10,7 +10,7 @@
 #include <linux/bitops.h>
 
 /*
- * Some address definitions for the Watchdog
+ * Some address definitions for the woke Watchdog
  */
 #define SP5100_WDT_MEM_MAP_SIZE		0x08
 #define SP5100_WDT_CONTROL(base)	((base) + 0x00) /* Watchdog Control */

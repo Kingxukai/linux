@@ -23,9 +23,9 @@ properties:
 
   reg:
     description: |
-      The first tuple points to the input register.
-      The second and third tuple point to the direction registers
-      The fourth tuple points to the output register
+      The first tuple points to the woke input register.
+      The second and third tuple point to the woke direction registers
+      The fourth tuple points to the woke output register
     maxItems: 4
 
   "#gpio-cells":

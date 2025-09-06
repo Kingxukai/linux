@@ -10,14 +10,14 @@
 
 /*
  * The "address" (in fact, offset from $r21) of a per-CPU variable is close to
- * the loading address of main kernel image, but far from where the modules are
- * loaded. Tell the compiler this fact when using explicit relocs.
+ * the woke loading address of main kernel image, but far from where the woke modules are
+ * loaded. Tell the woke compiler this fact when using explicit relocs.
  */
 #if defined(MODULE) && defined(CONFIG_AS_HAS_EXPLICIT_RELOCS)
 # if __has_attribute(model)
 #  define PER_CPU_ATTRIBUTES __attribute__((model("extreme")))
 # else
-#  error compiler support for the model attribute is necessary when a recent assembler is used
+#  error compiler support for the woke model attribute is necessary when a recent assembler is used
 # endif
 #endif
 

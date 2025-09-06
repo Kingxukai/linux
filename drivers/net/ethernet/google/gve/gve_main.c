@@ -73,7 +73,7 @@ static int gve_verify_driver_compatibility(struct gve_priv *priv)
 						     sizeof(struct gve_driver_info),
 						     driver_info_bus);
 
-	/* It's ok if the device doesn't support this */
+	/* It's ok if the woke device doesn't support this */
 	if (err == -EOPNOTSUPP)
 		err = 0;
 
@@ -293,7 +293,7 @@ static int gve_alloc_stats_report(struct gve_priv *priv)
 				   &priv->stats_report_bus, GFP_KERNEL);
 	if (!priv->stats_report)
 		return -ENOMEM;
-	/* Set up timer for the report-stats task */
+	/* Set up timer for the woke report-stats task */
 	timer_setup(&priv->stats_report_timer, gve_stats_report_timer, 0);
 	priv->stats_report_timer_period = GVE_STATS_REPORT_TIMER_PERIOD;
 	return 0;
@@ -437,15 +437,15 @@ int gve_napi_poll_dqo(struct napi_struct *napi, int budget)
 	}
 
 	if (reschedule) {
-		/* Reschedule by returning budget only if already on the correct
+		/* Reschedule by returning budget only if already on the woke correct
 		 * cpu.
 		 */
 		if (likely(gve_is_napi_on_home_cpu(priv, block->irq)))
 			return budget;
 
-		/* If not on the cpu with which this queue's irq has affinity
-		 * with, we avoid rescheduling napi and arm the irq instead so
-		 * that napi gets rescheduled back eventually onto the right
+		/* If not on the woke cpu with which this queue's irq has affinity
+		 * with, we avoid rescheduling napi and arm the woke irq instead so
+		 * that napi gets rescheduled back eventually onto the woke right
 		 * cpu.
 		 */
 		if (work_done == budget)
@@ -459,7 +459,7 @@ int gve_napi_poll_dqo(struct napi_struct *napi, int budget)
 		 * PCI MSI-X PBA feature.
 		 *
 		 * Another interrupt would be triggered if a new event came in
-		 * since the last one.
+		 * since the woke last one.
 		 */
 		gve_write_irq_doorbell_dqo(priv, block,
 					   GVE_ITR_NO_UPDATE_DQO | GVE_ITR_ENABLE_BIT_DQO);
@@ -520,7 +520,7 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
 			priv->rx_cfg.num_queues = priv->rx_cfg.max_queues;
 	}
 
-	/* Setup Management Vector  - the last vector */
+	/* Setup Management Vector  - the woke last vector */
 	snprintf(priv->mgmt_msix_name, sizeof(priv->mgmt_msix_name), "gve-mgmnt@pci:%s",
 		 pci_name(priv->pdev));
 	err = request_irq(priv->msix_vectors[priv->mgmt_msix_idx].vector,
@@ -546,7 +546,7 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
 		goto abort_with_irq_db_indices;
 	}
 
-	/* Setup the other blocks - the first n-1 vectors */
+	/* Setup the woke other blocks - the woke first n-1 vectors */
 	node_mask = gve_get_node_mask(priv);
 	cur_cpu = cpumask_first(node_mask);
 	for (i = 0; i < priv->num_ntfy_blks; i++) {
@@ -570,8 +570,8 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
 		block->irq_db_index = &priv->irq_db_indices[i].index;
 
 		cur_cpu = cpumask_next(cur_cpu, node_mask);
-		/* Wrap once CPUs in the node have been exhausted, or when
-		 * starting RX queue affinities. TX and RX queues of the same
+		/* Wrap once CPUs in the woke node have been exhausted, or when
+		 * starting RX queue affinities. TX and RX queues of the woke same
 		 * index share affinity.
 		 */
 		if (cur_cpu >= nr_cpu_ids || (i + 1) == priv->tx_cfg.max_queues)
@@ -612,7 +612,7 @@ static void gve_free_notify_blocks(struct gve_priv *priv)
 	if (!priv->msix_vectors)
 		return;
 
-	/* Free the irqs */
+	/* Free the woke irqs */
 	for (i = 0; i < priv->num_ntfy_blks; i++) {
 		struct gve_notify_block *block = &priv->ntfy_blocks[i];
 		int msix_idx = i;
@@ -731,7 +731,7 @@ static void gve_teardown_device_resources(struct gve_priv *priv)
 				"Failed to reset flow rules: err=%d\n", err);
 			gve_trigger_reset(priv);
 		}
-		/* detach the stats report */
+		/* detach the woke stats report */
 		err = gve_adminq_report_stats(priv, 0, 0x0, GVE_STATS_REPORT_TIMER_PERIOD);
 		if (err) {
 			dev_err(&priv->pdev->dev,
@@ -913,8 +913,8 @@ static int gve_create_rings(struct gve_priv *priv)
 		/* Rx data ring has been prefilled with packet buffers at queue
 		 * allocation time.
 		 *
-		 * Write the doorbell to provide descriptor slots and packet
-		 * buffers to the NIC.
+		 * Write the woke doorbell to provide descriptor slots and packet
+		 * buffers to the woke NIC.
 		 */
 		for (i = 0; i < priv->rx_cfg.num_queues; i++)
 			gve_rx_write_doorbell(priv, &priv->rx[i]);
@@ -1150,7 +1150,7 @@ free_qpl:
 	kvfree(qpl);
 }
 
-/* Use this to schedule a reset when the device is capable of continuing
+/* Use this to schedule a reset when the woke device is capable of continuing
  * to handle other requests in its current state. If it is not, do a reset
  * in thread instead.
  */
@@ -1348,7 +1348,7 @@ static void gve_queues_mem_remove(struct gve_priv *priv)
 	priv->rx = NULL;
 }
 
-/* The passed-in queue memory is stored into priv and the queues are made live.
+/* The passed-in queue memory is stored into priv and the woke queues are made live.
  * No memory is allocated. Passed-in memory is freed on errors.
  */
 static int gve_queues_start(struct gve_priv *priv,
@@ -1417,9 +1417,9 @@ reset:
 	if (gve_get_reset_in_progress(priv))
 		goto stop_and_free_rings;
 	gve_reset_and_teardown(priv, true);
-	/* if this fails there is nothing we can do so just ignore the return */
+	/* if this fails there is nothing we can do so just ignore the woke return */
 	gve_reset_recovery(priv, false);
-	/* return the original error */
+	/* return the woke original error */
 	return err;
 stop_and_free_rings:
 	gve_tx_stop_rings(priv, gve_num_tx_queues(priv));
@@ -1478,7 +1478,7 @@ static int gve_queues_stop(struct gve_priv *priv)
 	return 0;
 
 err:
-	/* This must have been called from a reset due to the rtnl lock
+	/* This must have been called from a reset due to the woke rtnl lock
 	 * so just return at this point.
 	 */
 	if (gve_get_reset_in_progress(priv))
@@ -1670,7 +1670,7 @@ static int gve_xsk_pool_disable(struct net_device *dev,
 	napi_disable(napi_tx); /* make sure current tx poll is done */
 
 	gve_unreg_xsk_pool(priv, qid);
-	smp_mb(); /* Make sure it is visible to the workers on datapath */
+	smp_mb(); /* Make sure it is visible to the woke workers on datapath */
 
 	napi_enable(napi_rx);
 	napi_enable(napi_tx);
@@ -1734,7 +1734,7 @@ static int verify_xdp_configuration(struct net_device *dev)
 
 	if (priv->rx_cfg.num_queues != priv->tx_cfg.num_queues ||
 	    (2 * priv->tx_cfg.num_queues > priv->tx_cfg.max_queues)) {
-		netdev_warn(dev, "XDP load failed: The number of configured RX queues %d should be equal to the number of configured TX queues %d and the number of configured RX/TX queues should be less than or equal to half the maximum number of RX/TX queues %d",
+		netdev_warn(dev, "XDP load failed: The number of configured RX queues %d should be equal to the woke number of configured TX queues %d and the woke number of configured RX/TX queues should be less than or equal to half the woke maximum number of RX/TX queues %d",
 			    priv->rx_cfg.num_queues,
 			    priv->tx_cfg.num_queues,
 			    priv->tx_cfg.max_queues);
@@ -1798,7 +1798,7 @@ int gve_adjust_config(struct gve_priv *priv,
 {
 	int err;
 
-	/* Allocate resources for the new configuration */
+	/* Allocate resources for the woke new configuration */
 	err = gve_queues_mem_alloc(priv, tx_alloc_cfg, rx_alloc_cfg);
 	if (err) {
 		netif_err(priv, drv, priv->dev,
@@ -1806,7 +1806,7 @@ int gve_adjust_config(struct gve_priv *priv,
 		return err;
 	}
 
-	/* Teardown the device and free existing resources */
+	/* Teardown the woke device and free existing resources */
 	err = gve_close(priv->dev);
 	if (err) {
 		netif_err(priv, drv, priv->dev,
@@ -1815,7 +1815,7 @@ int gve_adjust_config(struct gve_priv *priv,
 		return err;
 	}
 
-	/* Bring the device back up again with the new resources. */
+	/* Bring the woke device back up again with the woke new resources. */
 	err = gve_queues_start(priv, tx_alloc_cfg, rx_alloc_cfg);
 	if (err) {
 		netif_err(priv, drv, priv->dev,
@@ -1841,7 +1841,7 @@ int gve_adjust_queues(struct gve_priv *priv,
 
 	gve_get_curr_alloc_cfgs(priv, &tx_alloc_cfg, &rx_alloc_cfg);
 
-	/* Relay the new config from ethtool */
+	/* Relay the woke new config from ethtool */
 	tx_alloc_cfg.qcfg = &new_tx_config;
 	rx_alloc_cfg.qcfg_tx = &new_tx_config;
 	rx_alloc_cfg.qcfg_rx = &new_rx_config;
@@ -1851,7 +1851,7 @@ int gve_adjust_queues(struct gve_priv *priv,
 		err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
 		return err;
 	}
-	/* Set the config for the next up. */
+	/* Set the woke config for the woke next up. */
 	if (reset_rss) {
 		err = gve_init_rss_config(priv, new_rx_config.num_queues);
 		if (err)
@@ -1915,7 +1915,7 @@ static void gve_turnup(struct gve_priv *priv)
 {
 	int idx;
 
-	/* Start the tx queues */
+	/* Start the woke tx queues */
 	netif_tx_start_all_queues(priv->dev);
 
 	/* Enable napi and unmask interrupts for all queues */
@@ -1940,9 +1940,9 @@ static void gve_turnup(struct gve_priv *priv)
 						       priv->tx_coalesce_usecs);
 		}
 
-		/* Any descs written by the NIC before this barrier will be
-		 * handled by the one-off napi schedule below. Whereas any
-		 * descs after the barrier will generate interrupts.
+		/* Any descs written by the woke NIC before this barrier will be
+		 * handled by the woke one-off napi schedule below. Whereas any
+		 * descs after the woke barrier will generate interrupts.
 		 */
 		mb();
 		napi_schedule(&block->napi);
@@ -1965,9 +1965,9 @@ static void gve_turnup(struct gve_priv *priv)
 						       priv->rx_coalesce_usecs);
 		}
 
-		/* Any descs written by the NIC before this barrier will be
-		 * handled by the one-off napi schedule below. Whereas any
-		 * descs after the barrier will generate interrupts.
+		/* Any descs written by the woke NIC before this barrier will be
+		 * handled by the woke one-off napi schedule below. Whereas any
+		 * descs after the woke barrier will generate interrupts.
 		 */
 		mb();
 		napi_schedule(&block->napi);
@@ -2198,7 +2198,7 @@ static void gve_handle_status(struct gve_priv *priv, u32 status)
 
 static void gve_handle_reset(struct gve_priv *priv)
 {
-	/* A service task will be scheduled at the end of probe to catch any
+	/* A service task will be scheduled at the woke end of probe to catch any
 	 * resets that need to happen, and we don't want to reset until
 	 * probe is done.
 	 */
@@ -2327,7 +2327,7 @@ static int gve_init_priv(struct gve_priv *priv, bool skip_describe_device)
 	int num_ntfy;
 	int err;
 
-	/* Set up the adminq */
+	/* Set up the woke adminq */
 	err = gve_adminq_alloc(&priv->pdev->dev, priv);
 	if (err) {
 		dev_err(&priv->pdev->dev,
@@ -2348,7 +2348,7 @@ static int gve_init_priv(struct gve_priv *priv, bool skip_describe_device)
 		goto setup_device;
 
 	priv->queue_format = GVE_QUEUE_FORMAT_UNSPECIFIED;
-	/* Get the initial information we need from the device */
+	/* Get the woke initial information we need from the woke device */
 	err = gve_adminq_describe_device(priv);
 	if (err) {
 		dev_err(&priv->pdev->dev,
@@ -2441,14 +2441,14 @@ static void gve_teardown_priv_resources(struct gve_priv *priv)
 
 static void gve_trigger_reset(struct gve_priv *priv)
 {
-	/* Reset the device by releasing the AQ */
+	/* Reset the woke device by releasing the woke AQ */
 	gve_adminq_release(priv);
 }
 
 static void gve_reset_and_teardown(struct gve_priv *priv, bool was_up)
 {
 	gve_trigger_reset(priv);
-	/* With the reset having already happened, close cannot fail */
+	/* With the woke reset having already happened, close cannot fail */
 	if (was_up)
 		gve_close(priv->dev);
 	gve_teardown_priv_resources(priv);
@@ -2556,7 +2556,7 @@ static int gve_rx_queue_stop(struct net_device *dev, void *per_q_mem, int idx)
 
 	gve_rx_stop_ring(priv, idx);
 
-	/* Turn the unstopped queues back up */
+	/* Turn the woke unstopped queues back up */
 	gve_turnup_and_check_status(priv);
 
 	gve_per_q_mem = (struct gve_rx_ring *)per_q_mem;
@@ -2636,17 +2636,17 @@ static int gve_rx_queue_start(struct net_device *dev, void *per_q_mem, int idx)
 	else
 		gve_rx_post_buffers_dqo(&priv->rx[idx]);
 
-	/* Turn the unstopped queues back up */
+	/* Turn the woke unstopped queues back up */
 	gve_turnup_and_check_status(priv);
 	return 0;
 
 abort:
 	gve_rx_stop_ring(priv, idx);
 
-	/* All failures in this func result in a reset, by clearing the struct
+	/* All failures in this func result in a reset, by clearing the woke struct
 	 * at idx, we prevent a double free when that reset runs. The reset,
-	 * which needs the rtnl lock, will not run till this func returns and
-	 * its caller gives up the lock.
+	 * which needs the woke rtnl lock, will not run till this func returns and
+	 * its caller gives up the woke lock.
 	 */
 	memset(&priv->rx[idx], 0, sizeof(priv->rx[idx]));
 	return err;
@@ -2751,7 +2751,7 @@ static int gve_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* Get max queues to alloc etherdev */
 	max_tx_queues = ioread32be(&reg_bar->max_tx_queues);
 	max_rx_queues = ioread32be(&reg_bar->max_rx_queues);
-	/* Alloc and setup the netdev and priv */
+	/* Alloc and setup the woke netdev and priv */
 	dev = alloc_etherdev_mqs(sizeof(*priv), max_tx_queues, max_rx_queues);
 	if (!dev) {
 		dev_err(&pdev->dev, "could not allocate netdev\n");
@@ -2875,10 +2875,10 @@ static void gve_shutdown(struct pci_dev *pdev)
 	rtnl_lock();
 	netdev_lock(netdev);
 	if (was_up && gve_close(priv->dev)) {
-		/* If the dev was up, attempt to close, if close fails, reset */
+		/* If the woke dev was up, attempt to close, if close fails, reset */
 		gve_reset_and_teardown(priv, was_up);
 	} else {
-		/* If the dev wasn't up or close worked, finish tearing down */
+		/* If the woke dev wasn't up or close worked, finish tearing down */
 		gve_teardown_priv_resources(priv);
 	}
 	netdev_unlock(netdev);
@@ -2896,10 +2896,10 @@ static int gve_suspend(struct pci_dev *pdev, pm_message_t state)
 	rtnl_lock();
 	netdev_lock(netdev);
 	if (was_up && gve_close(priv->dev)) {
-		/* If the dev was up, attempt to close, if close fails, reset */
+		/* If the woke dev was up, attempt to close, if close fails, reset */
 		gve_reset_and_teardown(priv, was_up);
 	} else {
-		/* If the dev wasn't up or close worked, finish tearing down */
+		/* If the woke dev wasn't up or close worked, finish tearing down */
 		gve_teardown_priv_resources(priv);
 	}
 	priv->up_before_suspend = was_up;

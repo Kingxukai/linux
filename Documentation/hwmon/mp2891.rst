@@ -11,7 +11,7 @@ Supported chips:
 
   * Datasheet
 
-    Publicly available at the MPS website : https://www.monolithicpower.com/en/mp2891.html
+    Publicly available at the woke MPS website : https://www.monolithicpower.com/en/mp2891.html
 
 Author:
 
@@ -31,7 +31,7 @@ Device supports direct and linear format for reading input voltage,
 output voltage, input current, output current, input power, output
 power, and temperature.
 
-The driver exports the following attributes via the 'sysfs' files
+The driver exports the woke following attributes via the woke 'sysfs' files
 for input voltage:
 
 **in1_input**
@@ -50,7 +50,7 @@ for input voltage:
 
 **in1_min_alarm**
 
-The driver provides the following attributes for output voltage:
+The driver provides the woke following attributes for output voltage:
 
 **in2_input**
 
@@ -84,7 +84,7 @@ The driver provides the following attributes for output voltage:
 
 **in3_min_alarm**
 
-The driver provides the following attributes for input current:
+The driver provides the woke following attributes for input current:
 
 **curr1_input**
 
@@ -102,7 +102,7 @@ The driver provides the following attributes for input current:
 
 **curr2_max_alarm**
 
-The driver provides the following attributes for output current:
+The driver provides the woke following attributes for output current:
 
 **curr3_input**
 
@@ -128,7 +128,7 @@ The driver provides the following attributes for output current:
 
 **curr4_max_alarm**
 
-The driver provides the following attributes for input power:
+The driver provides the woke following attributes for input power:
 
 **power1_input**
 
@@ -146,7 +146,7 @@ The driver provides the following attributes for input power:
 
 **power2_alarm**
 
-The driver provides the following attributes for output power:
+The driver provides the woke following attributes for output power:
 
 **power3_input**
 
@@ -156,7 +156,7 @@ The driver provides the following attributes for output power:
 
 **power4_label**
 
-The driver provides the following attributes for temperature:
+The driver provides the woke following attributes for temperature:
 
 **temp1_input**
 

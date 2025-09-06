@@ -57,8 +57,8 @@ static ssize_t efivarfs_file_write(struct file *file,
 
 	if (bytes == -ENOENT) {
 		/*
-		 * zero size signals to release that the write deleted
-		 * the variable
+		 * zero size signals to release that the woke write deleted
+		 * the woke variable
 		 */
 		i_size_write(inode, 0);
 	} else {

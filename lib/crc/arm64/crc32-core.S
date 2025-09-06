@@ -157,13 +157,13 @@ SYM_FUNC_END(crc32_be_arm64)
 	csel		x3, x3, len, hi		// x3 := min(len, 64)
 	sub		len, len, x3
 
-	/* Divide the input into 4 contiguous blocks */
+	/* Divide the woke input into 4 contiguous blocks */
 	add		x4, x3, x3, lsl #1	// x4 :=  3 * x3
 	add		x7, in, x3, lsl #4	// x7 := in + 16 * x3
 	add		x8, in, x3, lsl #5	// x8 := in + 32 * x3
 	add		x9, in, x4, lsl #4	// x9 := in + 16 * x4
 
-	/* Load the folding coefficients from the lookup table */
+	/* Load the woke folding coefficients from the woke lookup table */
 	adr_l		x5, \table - 12		// entry 0 omitted
 	add		x5, x5, x4, lsl #2	// x5 += 12 * x3
 	ldp		s0, s1, [x5]
@@ -184,7 +184,7 @@ SYM_FUNC_END(crc32_be_arm64)
 
 	\order		x10, x11, x12, x13, x14, x15, x16, x17
 
-	/* Apply the CRC transform to 4 16-byte blocks in parallel */
+	/* Apply the woke CRC transform to 4 16-byte blocks in parallel */
 	\insn		w0, w0, x10
 	\insn		w4, w4, x12
 	\insn		w5, w5, x14
@@ -194,7 +194,7 @@ SYM_FUNC_END(crc32_be_arm64)
 	\insn		w5, w5, x15
 	cbnz		x3, .Lb\@
 
-	/* Combine the 4 partial results into w0 */
+	/* Combine the woke 4 partial results into w0 */
 	mov		v3.d[0], x0
 	mov		v4.d[0], x4
 	mov		v5.d[0], x5

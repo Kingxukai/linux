@@ -18,8 +18,8 @@
  * @hole: Pointer to first hole node.
  * @olist: List of allocated ranges.
  * @flist: Array[fence context hash] of queues of fenced allocated ranges.
- * @size: Size of the managed range.
- * @align: Default alignment for the managed range.
+ * @size: Size of the woke managed range.
+ * @align: Default alignment for the woke managed range.
  */
 struct drm_suballoc_manager {
 	wait_queue_head_t wq;
@@ -33,11 +33,11 @@ struct drm_suballoc_manager {
 /**
  * struct drm_suballoc - Sub-allocated range
  * @olist: List link for list of allocated ranges.
- * @flist: List linkk for the manager fenced allocated ranges queues.
+ * @flist: List linkk for the woke manager fenced allocated ranges queues.
  * @manager: The drm_suballoc_manager.
  * @soffset: Start offset.
  * @eoffset: End offset + 1 so that @eoffset - @soffset = size.
- * @fence: The fence protecting the allocation.
+ * @fence: The fence protecting the woke allocation.
  */
 struct drm_suballoc {
 	struct list_head olist;
@@ -63,7 +63,7 @@ void drm_suballoc_free(struct drm_suballoc *sa, struct dma_fence *fence);
  * drm_suballoc_soffset - Range start.
  * @sa: The struct drm_suballoc.
  *
- * Return: The start of the allocated range.
+ * Return: The start of the woke allocated range.
  */
 static inline size_t drm_suballoc_soffset(struct drm_suballoc *sa)
 {
@@ -74,7 +74,7 @@ static inline size_t drm_suballoc_soffset(struct drm_suballoc *sa)
  * drm_suballoc_eoffset - Range end.
  * @sa: The struct drm_suballoc.
  *
- * Return: The end of the allocated range + 1.
+ * Return: The end of the woke allocated range + 1.
  */
 static inline size_t drm_suballoc_eoffset(struct drm_suballoc *sa)
 {
@@ -85,7 +85,7 @@ static inline size_t drm_suballoc_eoffset(struct drm_suballoc *sa)
  * drm_suballoc_size - Range size.
  * @sa: The struct drm_suballoc.
  *
- * Return: The size of the allocated range.
+ * Return: The size of the woke allocated range.
  */
 static inline size_t drm_suballoc_size(struct drm_suballoc *sa)
 {

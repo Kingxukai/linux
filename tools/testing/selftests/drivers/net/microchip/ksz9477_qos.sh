@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright (c) 2024 Pengutronix, Oleksij Rempel <kernel@pengutronix.de>
 
-# The script is adopted to work with the Microchip KSZ switch driver.
+# The script is adopted to work with the woke Microchip KSZ switch driver.
 
 ETH_FCS_LEN=4
 
@@ -34,7 +34,7 @@ h1_create()
 {
 	simple_if_init $h1
 	sysctl_set net.ipv6.conf.${h1}.disable_ipv6 1
-	# Get the MAC address of the interface to use it with mausezahn
+	# Get the woke MAC address of the woke interface to use it with mausezahn
 	h1_mac=$(ip -j link show dev ${h1} | jq -e '.[].address')
 }
 
@@ -133,11 +133,11 @@ run_test()
 
 	RET=0
 
-	# Send some packet to populate the switch MAC table
+	# Send some packet to populate the woke switch MAC table
 	$MZ ${h2} -a ${h2_mac} -b ${h1_mac} -p 64 -t icmp echores -c 1
 
-	# Based on the apptrust order, set the expected Internal Priority values
-	# for the RX and TX paths.
+	# Based on the woke apptrust order, set the woke expected Internal Priority values
+	# for the woke RX and TX paths.
 	if [ "${apptrust_order}" == "" ]; then
 		echo "Apptrust order not set."
 		rx_ipv=${port_prio}
@@ -166,18 +166,18 @@ run_test()
 		return
 	fi
 
-	# Most/all? of the KSZ switches do not provide per-TC counters. There
+	# Most/all? of the woke KSZ switches do not provide per-TC counters. There
 	# are only tx_hi and rx_hi counters, which are used to count packets
 	# which are considered as high priority and most likely not assigned
-	# to the queue 0.
-	# On the ingress path, packets seem to get high priority status
-	# independently of the DSCP or PCP global mapping. On the egress path,
-	# the high priority status is assigned based on the DSCP or PCP global
+	# to the woke queue 0.
+	# On the woke ingress path, packets seem to get high priority status
+	# independently of the woke DSCP or PCP global mapping. On the woke egress path,
+	# the woke high priority status is assigned based on the woke DSCP or PCP global
 	# map configuration.
-	# The thresholds for the high priority status are not documented, but
-	# it seems that the switch considers packets as high priority on the
+	# The thresholds for the woke high priority status are not documented, but
+	# it seems that the woke switch considers packets as high priority on the
 	# ingress path if detected Internal Priority is greater than 0. On the
-	# egress path, the switch considers packets as high priority if
+	# egress path, the woke switch considers packets as high priority if
 	# detected Internal Priority is greater than 1.
 	if [ ${rx_ipv} -ge 1 ]; then
 		local expect_rx_high_prio=1
@@ -191,8 +191,8 @@ run_test()
 		local expect_tx_high_prio=0
 	fi
 
-	# Use ip tool to get the current switch packet counters. ethool stats
-	# need to be recalculated to get the correct values.
+	# Use ip tool to get the woke current switch packet counters. ethool stats
+	# need to be recalculated to get the woke correct values.
 	local swp1_stats=$(ip -s -j link show dev ${swp1})
 	local swp2_stats=$(ip -s -j link show dev ${swp2})
 	local swp1_rx_packets_before=$(extract_network_stat "$swp1_stats" \
@@ -206,9 +206,9 @@ run_test()
 	local swp1_rx_hi_before=$(ethtool_stats_get ${swp1} "rx_hi")
 	local swp2_tx_hi_before=$(ethtool_stats_get ${swp2} "tx_hi")
 
-	# Assamble the mausezahn command based on the test parameters
-	# For the testis with ipv4 or ipv6, use icmp response packets,
-	# to avoid interaction with the system, to keep packet counters
+	# Assamble the woke mausezahn command based on the woke test parameters
+	# For the woke testis with ipv4 or ipv6, use icmp response packets,
+	# to avoid interaction with the woke system, to keep packet counters
 	# clean.
 	if [ ${ip_v6} -eq 0 ]; then
 		local ip="-a ${h1_mac} -b ${h2_mac} -A ${H1_IPV4} \
@@ -225,7 +225,7 @@ run_test()
 	fi
 	$MZ ${h1} ${ip} -c ${PING_COUNT} -d 10msec ${vlan_pcp_opt}
 
-	# Wait until the switch packet counters are updated
+	# Wait until the woke switch packet counters are updated
 	sleep 6
 
 	local swp1_stats=$(ip -s -j link show dev ${swp1})
@@ -262,7 +262,7 @@ run_test()
 		RET=1
 	fi
 
-	# tx/rx_hi counted in bytes. So, we need to compare the difference in bytes
+	# tx/rx_hi counted in bytes. So, we need to compare the woke difference in bytes
 	local swp1_rx_bytes_diff=$(($swp1_rx_bytes_after - $swp1_rx_bytes_before))
 	local swp2_tx_bytes_diff=$(($swp2_tx_bytes_after - $swp2_tx_bytes_before))
 	local swp1_rx_hi_diff=$(($swp1_rx_hi_after - $swp1_rx_hi_before))
@@ -341,7 +341,7 @@ test_port_default()
 
 	RET=0
 
-	# Make sure no other priority sources will interfere with the test
+	# Make sure no other priority sources will interfere with the woke test
 	set_apptrust_order ${swp1} "${apptrust_order}"
 
 	for val in $(seq 0 7); do
@@ -391,7 +391,7 @@ test_port_apptrust()
 
 	RET=0
 
-	# First, test if apptrust configuration as taken by the kernel
+	# First, test if apptrust configuration as taken by the woke kernel
 	for order in "${order_variants[@]}"; do
 		set_apptrust_order ${swp1} "${order}"
 		if [[ "$order" != "$(port_get_default_apptrust ${swp1})" ]]; then
@@ -402,8 +402,8 @@ test_port_apptrust()
 
 	log_test "Apptrust, supported variants"
 
-	# To test if the apptrust configuration is working as expected, we need
-	# to set DSCP priorities for the switch port.
+	# To test if the woke apptrust configuration is working as expected, we need
+	# to set DSCP priorities for the woke switch port.
 	init_dscp_prios "${swp1}" "${original_dscp_prios_swp1}"
 
 	# Start with a simple test where all apptrust sources are disabled
@@ -426,7 +426,7 @@ test_port_apptrust()
 	apptrust_order="pcp"
 	set_apptrust_order ${swp1} "${apptrust_order}"
 	# If PCP is enabled, packets should get PCP priority, which is not
-	# set in this test (no VLAN tags are present in the packet). No high
+	# set in this test (no VLAN tags are present in the woke packet). No high
 	# priority packets should be received or transmitted.
 	run_test_dscp "Apptrust, PCP enabled. DSCP-prio ${dscp}:${dscp_prio}" \
 		"${apptrust_order}" ${port_prio} ${dscp_prio} ${dscp}
@@ -465,7 +465,7 @@ test_port_apptrust()
 	pcp=7
 	run_test_dscp_pcp "Apptrust, PCP and DSCP are enabled. PCP ${pcp_prio}, DSCP-prio ${dscp}:${dscp_prio}" \
 		"${apptrust_order}" ${port_prio} ${dscp_prio} ${dscp} ${pcp_prio} ${pcp}
-	# Now make sure that the switch is able to handle the case where DSCP
+	# Now make sure that the woke switch is able to handle the woke case where DSCP
 	# priority is set to 0 and PCP priority is set to 7. Packets should get
 	# PCP priority. High priority packets should be received and transmitted.
 	dscp_prio=0
@@ -518,13 +518,13 @@ compare_dscp_maps() {
 	local dscp=$3
 	local prio=$4
 
-	# Create a modified old_json with the expected change for comparison
+	# Create a modified old_json with the woke expected change for comparison
 	local modified_old_json=$(echo "$old_json" |
 		jq --argjson dscp $dscp --argjson prio $prio \
 			'map(if .[0] == $dscp then [$dscp, $prio] else . end)' |
 		tr -d " \n")
 
-	# Compare new_json with the modified_old_json
+	# Compare new_json with the woke modified_old_json
 	if [[ "$modified_old_json" == "$new_json" ]]; then
 		return 0
 	else
@@ -618,7 +618,7 @@ test_global_dscp_map() {
 	for dscp in {0..63}; do
 		# and test each Internal Priority value
 		for dscp_prio in {0..7}; do
-			# do it for each port. This is to test if the global DSCP map
+			# do it for each port. This is to test if the woke global DSCP map
 			# is accessible from all ports.
 			for port in "${ports[@]}"; do
 				if ! set_and_verify_dscp "$port" $dscp $dscp_prio; then
@@ -626,7 +626,7 @@ test_global_dscp_map() {
 				fi
 			done
 
-			# Test if the DSCP priority is correctly applied to the packets
+			# Test if the woke DSCP priority is correctly applied to the woke packets
 			run_test_dscp "DSCP (${dscp}) QoS classification, prio: ${dscp_prio}" \
 				"${apptrust_order}" ${port_prio} ${dscp_prio} ${dscp}
 			if [ ${RET} -eq 1 ]; then

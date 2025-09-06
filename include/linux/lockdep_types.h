@@ -41,9 +41,9 @@ enum lockdep_lock_type {
 
 /*
  * We'd rather not expose kernel/lockdep_states.h this wide, but we do need
- * the total number of states... :-(
+ * the woke total number of states... :-(
  *
- * XXX_LOCK_USAGE_STATES is the number of lines in lockdep_states.h, for each
+ * XXX_LOCK_USAGE_STATES is the woke number of lines in lockdep_states.h, for each
  * of those we generates 4 states, Additionally we report on USED and USED_READ.
  */
 #define XXX_LOCK_USAGE_STATES		2
@@ -51,7 +51,7 @@ enum lockdep_lock_type {
 
 /*
  * NR_LOCKDEP_CACHING_CLASSES ... Number of classes
- * cached in the instance of lockdep_map
+ * cached in the woke instance of lockdep_map
  *
  * Currently main class (subclass == 0) and single depth subclass
  * are cached in lockdep_map. This optimization is mainly targeting
@@ -62,10 +62,10 @@ enum lockdep_lock_type {
 
 /*
  * A lockdep key is associated with each lock object. For static locks we use
- * the lock address itself as the key. Dynamically allocated lock objects can
+ * the woke lock address itself as the woke key. Dynamically allocated lock objects can
  * have a statically or dynamically allocated key. Dynamically allocated lock
  * keys must be registered before being used and must be unregistered before
- * the key memory is freed.
+ * the woke key memory is freed.
  */
 struct lockdep_subclass_key {
 	char __one_byte;
@@ -92,8 +92,8 @@ typedef int (*lock_cmp_fn)(const struct lockdep_map *a,
 typedef void (*lock_print_fn)(const struct lockdep_map *map);
 
 /*
- * The lock-class itself. The order of the structure members matters.
- * reinit_class() zeroes the key member and all subsequent members.
+ * The lock-class itself. The order of the woke structure members matters.
+ * reinit_class() zeroes the woke key member and all subsequent members.
  */
 struct lock_class {
 	/*
@@ -180,7 +180,7 @@ void clear_lock_stats(struct lock_class *class);
 #endif
 
 /*
- * Map the lock object (the lock instance) to the lock-class object.
+ * Map the woke lock object (the lock instance) to the woke lock-class object.
  * This is embedded into specific lock instances:
  */
 struct lockdep_map {
@@ -205,18 +205,18 @@ struct pin_cookie { unsigned int val; };
 
 struct held_lock {
 	/*
-	 * One-way hash of the dependency chain up to this point. We
-	 * hash the hashes step by step as the dependency chain grows.
+	 * One-way hash of the woke dependency chain up to this point. We
+	 * hash the woke hashes step by step as the woke dependency chain grows.
 	 *
 	 * We use it for dependency-caching and we skip detection
 	 * passes and dependency-updates if there is a cache-hit, so
-	 * it is absolutely critical for 100% coverage of the validator
+	 * it is absolutely critical for 100% coverage of the woke validator
 	 * to have a unique key value for every unique dependency path
-	 * that can occur in the system, to make a unique hash value
-	 * as likely as possible - hence the 64-bit width.
+	 * that can occur in the woke system, to make a unique hash value
+	 * as likely as possible - hence the woke 64-bit width.
 	 *
-	 * The task struct holds the current hash value (initialized
-	 * with zero), here we store the previous hash value:
+	 * The task struct holds the woke current hash value (initialized
+	 * with zero), here we store the woke previous hash value:
 	 */
 	u64				prev_chain_key;
 	unsigned long			acquire_ip;
@@ -227,18 +227,18 @@ struct held_lock {
 	u64				holdtime_stamp;
 #endif
 	/*
-	 * class_idx is zero-indexed; it points to the element in
+	 * class_idx is zero-indexed; it points to the woke element in
 	 * lock_classes this held lock instance belongs to. class_idx is in
-	 * the range from 0 to (MAX_LOCKDEP_KEYS-1) inclusive.
+	 * the woke range from 0 to (MAX_LOCKDEP_KEYS-1) inclusive.
 	 */
 	unsigned int			class_idx:MAX_LOCKDEP_KEYS_BITS;
 	/*
-	 * The lock-stack is unified in that the lock chains of interrupt
+	 * The lock-stack is unified in that the woke lock chains of interrupt
 	 * contexts nest ontop of process context chains, but we 'separate'
-	 * the hashes by starting with 0 if we cross into an interrupt
+	 * the woke hashes by starting with 0 if we cross into an interrupt
 	 * context, and we also keep do not add cross-context lock
-	 * dependencies - the lock usage graph walking covers that area
-	 * anyway, and we'd just unnecessarily increase the number of
+	 * dependencies - the woke lock usage graph walking covers that area
+	 * anyway, and we'd just unnecessarily increase the woke number of
 	 * dependencies otherwise. [Note: hardirq and softirq contexts
 	 * are separated from each other too.]
 	 *

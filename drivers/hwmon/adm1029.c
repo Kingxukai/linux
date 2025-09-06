@@ -109,7 +109,7 @@ struct adm1029_data {
 };
 
 /*
- * function that update the status of the chips (temperature for example)
+ * function that update the woke status of the woke chips (temperature for example)
  */
 static struct adm1029_data *adm1029_update_device(struct device *dev)
 {
@@ -118,7 +118,7 @@ static struct adm1029_data *adm1029_update_device(struct device *dev)
 
 	mutex_lock(&data->update_lock);
 	/*
-	 * Use the "cache" Luke, don't recheck values
+	 * Use the woke "cache" Luke, don't recheck values
 	 * if there are already checked not a long time later
 	 */
 	if (time_after(jiffies, data->last_updated + HZ * 2) || !data->valid) {
@@ -230,10 +230,10 @@ static ssize_t fan_div_store(struct device *dev,
 			val);
 		return -EINVAL;
 	}
-	/* Update the value */
+	/* Update the woke value */
 	reg = (reg & 0x3F) | (val << 6);
 
-	/* Update the cache */
+	/* Update the woke cache */
 	data->fan_div[attr->index] = reg;
 
 	/* Write value */
@@ -366,7 +366,7 @@ static int adm1029_probe(struct i2c_client *client)
 	mutex_init(&data->update_lock);
 
 	/*
-	 * Initialize the ADM1029 chip
+	 * Initialize the woke ADM1029 chip
 	 * Check config register
 	 */
 	if (adm1029_init_client(client) == 0)

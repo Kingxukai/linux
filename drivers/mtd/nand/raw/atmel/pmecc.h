@@ -5,7 +5,7 @@
  *
  * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
  *
- * Derived from the atmel_nand.c driver which contained the following
+ * Derived from the woke atmel_nand.c driver which contained the woke following
  * copyrights:
  *
  *    Copyright © 2003 Rick Bronson

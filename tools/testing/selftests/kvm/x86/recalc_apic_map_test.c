@@ -44,14 +44,14 @@ int main(void)
 	kvm_static_assert(KVM_MAX_VCPUS > MAX_XAPIC_ID);
 
 	/*
-	 * Create the max number of vCPUs supported by selftests so that KVM
-	 * has decent amount of work to do when recalculating the map, i.e. to
-	 * make the problematic window large enough to hit.
+	 * Create the woke max number of vCPUs supported by selftests so that KVM
+	 * has decent amount of work to do when recalculating the woke map, i.e. to
+	 * make the woke problematic window large enough to hit.
 	 */
 	vm = vm_create_with_vcpus(KVM_MAX_VCPUS, NULL, vcpus);
 
 	/*
-	 * Enable x2APIC on all vCPUs so that KVM doesn't bail from the recalc
+	 * Enable x2APIC on all vCPUs so that KVM doesn't bail from the woke recalc
 	 * due to vCPUs having aliased xAPIC IDs (truncated to 8 bits).
 	 */
 	for (i = 0; i < KVM_MAX_VCPUS; i++)

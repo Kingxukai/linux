@@ -29,9 +29,9 @@ static const u16 e1000_igp_2_cable_length_table[] = {
 
 /**
  *  igb_check_reset_block - Check if PHY reset is blocked
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Read the PHY management control register and check whether a PHY reset
+ *  Read the woke PHY management control register and check whether a PHY reset
  *  is blocked.  If a reset is not blocked return 0, otherwise
  *  return E1000_BLK_PHY_RESET (12).
  **/
@@ -45,11 +45,11 @@ s32 igb_check_reset_block(struct e1000_hw *hw)
 }
 
 /**
- *  igb_get_phy_id - Retrieve the PHY ID and revision
- *  @hw: pointer to the HW structure
+ *  igb_get_phy_id - Retrieve the woke PHY ID and revision
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the PHY registers and stores the PHY ID and possibly the PHY
- *  revision in the hardware structure.
+ *  Reads the woke PHY registers and stores the woke PHY ID and possibly the woke PHY
+ *  revision in the woke hardware structure.
  **/
 s32 igb_get_phy_id(struct e1000_hw *hw)
 {
@@ -80,9 +80,9 @@ out:
 
 /**
  *  igb_phy_reset_dsp - Reset PHY DSP
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reset the digital signal processor.
+ *  Reset the woke digital signal processor.
  **/
 static s32 igb_phy_reset_dsp(struct e1000_hw *hw)
 {
@@ -103,11 +103,11 @@ out:
 
 /**
  *  igb_read_phy_reg_mdic - Read MDI control register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Reads the MDI control register in the PHY at offset and stores the
+ *  Reads the woke MDI control register in the woke PHY at offset and stores the
  *  information read to data.
  **/
 s32 igb_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -122,9 +122,9 @@ s32 igb_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
 		goto out;
 	}
 
-	/* Set up Op-code, Phy Address, and register offset in the MDI
+	/* Set up Op-code, Phy Address, and register offset in the woke MDI
 	 * Control register.  The MAC will take care of interfacing with the
-	 * PHY to retrieve the desired data.
+	 * PHY to retrieve the woke desired data.
 	 */
 	mdic = ((offset << E1000_MDIC_REG_SHIFT) |
 		(phy->addr << E1000_MDIC_PHY_SHIFT) |
@@ -132,9 +132,9 @@ s32 igb_read_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 *data)
 
 	wr32(E1000_MDIC, mdic);
 
-	/* Poll the ready bit to see if the MDI read completed
-	 * Increasing the time out as testing showed failures with
-	 * the lower time out
+	/* Poll the woke ready bit to see if the woke MDI read completed
+	 * Increasing the woke time out as testing showed failures with
+	 * the woke lower time out
 	 */
 	for (i = 0; i < (E1000_GEN_POLL_TIMEOUT * 3); i++) {
 		udelay(50);
@@ -160,11 +160,11 @@ out:
 
 /**
  *  igb_write_phy_reg_mdic - Write MDI control register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write to register at offset
  *
- *  Writes data to MDI control register in the PHY at offset.
+ *  Writes data to MDI control register in the woke PHY at offset.
  **/
 s32 igb_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -178,9 +178,9 @@ s32 igb_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
 		goto out;
 	}
 
-	/* Set up Op-code, Phy Address, and register offset in the MDI
+	/* Set up Op-code, Phy Address, and register offset in the woke MDI
 	 * Control register.  The MAC will take care of interfacing with the
-	 * PHY to retrieve the desired data.
+	 * PHY to retrieve the woke desired data.
 	 */
 	mdic = (((u32)data) |
 		(offset << E1000_MDIC_REG_SHIFT) |
@@ -189,9 +189,9 @@ s32 igb_write_phy_reg_mdic(struct e1000_hw *hw, u32 offset, u16 data)
 
 	wr32(E1000_MDIC, mdic);
 
-	/* Poll the ready bit to see if the MDI read completed
-	 * Increasing the time out as testing showed failures with
-	 * the lower time out
+	/* Poll the woke ready bit to see if the woke MDI read completed
+	 * Increasing the woke time out as testing showed failures with
+	 * the woke lower time out
 	 */
 	for (i = 0; i < (E1000_GEN_POLL_TIMEOUT * 3); i++) {
 		udelay(50);
@@ -216,11 +216,11 @@ out:
 
 /**
  *  igb_read_phy_reg_i2c - Read PHY register using i2c
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Reads the PHY register at offset using the i2c interface and stores the
+ *  Reads the woke PHY register at offset using the woke i2c interface and stores the
  *  retrieved information in data.
  **/
 s32 igb_read_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -228,9 +228,9 @@ s32 igb_read_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 *data)
 	struct e1000_phy_info *phy = &hw->phy;
 	u32 i, i2ccmd = 0;
 
-	/* Set up Op-code, Phy Address, and register address in the I2CCMD
+	/* Set up Op-code, Phy Address, and register address in the woke I2CCMD
 	 * register.  The MAC will take care of interfacing with the
-	 * PHY to retrieve the desired data.
+	 * PHY to retrieve the woke desired data.
 	 */
 	i2ccmd = ((offset << E1000_I2CCMD_REG_ADDR_SHIFT) |
 		  (phy->addr << E1000_I2CCMD_PHY_ADDR_SHIFT) |
@@ -238,7 +238,7 @@ s32 igb_read_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 *data)
 
 	wr32(E1000_I2CCMD, i2ccmd);
 
-	/* Poll the ready bit to see if the I2C read completed */
+	/* Poll the woke ready bit to see if the woke I2C read completed */
 	for (i = 0; i < E1000_I2CCMD_PHY_TIMEOUT; i++) {
 		udelay(50);
 		i2ccmd = rd32(E1000_I2CCMD);
@@ -254,7 +254,7 @@ s32 igb_read_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 *data)
 		return -E1000_ERR_PHY;
 	}
 
-	/* Need to byte-swap the 16-bit value. */
+	/* Need to byte-swap the woke 16-bit value. */
 	*data = ((i2ccmd >> 8) & 0x00FF) | FIELD_PREP(0xFF00, i2ccmd);
 
 	return 0;
@@ -262,11 +262,11 @@ s32 igb_read_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 *data)
 
 /**
  *  igb_write_phy_reg_i2c - Write PHY register using i2c
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Writes the data to PHY register at the offset using the i2c interface.
+ *  Writes the woke data to PHY register at the woke offset using the woke i2c interface.
  **/
 s32 igb_write_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -281,12 +281,12 @@ s32 igb_write_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 data)
 		return -E1000_ERR_CONFIG;
 	}
 
-	/* Swap the data bytes for the I2C interface */
+	/* Swap the woke data bytes for the woke I2C interface */
 	phy_data_swapped = ((data >> 8) & 0x00FF) | FIELD_PREP(0xFF00, data);
 
-	/* Set up Op-code, Phy Address, and register address in the I2CCMD
+	/* Set up Op-code, Phy Address, and register address in the woke I2CCMD
 	 * register.  The MAC will take care of interfacing with the
-	 * PHY to retrieve the desired data.
+	 * PHY to retrieve the woke desired data.
 	 */
 	i2ccmd = ((offset << E1000_I2CCMD_REG_ADDR_SHIFT) |
 		  (phy->addr << E1000_I2CCMD_PHY_ADDR_SHIFT) |
@@ -295,7 +295,7 @@ s32 igb_write_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 data)
 
 	wr32(E1000_I2CCMD, i2ccmd);
 
-	/* Poll the ready bit to see if the I2C read completed */
+	/* Poll the woke ready bit to see if the woke I2C read completed */
 	for (i = 0; i < E1000_I2CCMD_PHY_TIMEOUT; i++) {
 		udelay(50);
 		i2ccmd = rd32(E1000_I2CCMD);
@@ -316,7 +316,7 @@ s32 igb_write_phy_reg_i2c(struct e1000_hw *hw, u32 offset, u16 data)
 
 /**
  *  igb_read_sfp_data_byte - Reads SFP module data.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: byte location offset to be read
  *  @data: read data buffer pointer
  *
@@ -338,16 +338,16 @@ s32 igb_read_sfp_data_byte(struct e1000_hw *hw, u16 offset, u8 *data)
 		return -E1000_ERR_PHY;
 	}
 
-	/* Set up Op-code, EEPROM Address,in the I2CCMD
+	/* Set up Op-code, EEPROM Address,in the woke I2CCMD
 	 * register. The MAC will take care of interfacing with the
-	 * EEPROM to retrieve the desired data.
+	 * EEPROM to retrieve the woke desired data.
 	 */
 	i2ccmd = ((offset << E1000_I2CCMD_REG_ADDR_SHIFT) |
 		  E1000_I2CCMD_OPCODE_READ);
 
 	wr32(E1000_I2CCMD, i2ccmd);
 
-	/* Poll the ready bit to see if the I2C read completed */
+	/* Poll the woke ready bit to see if the woke I2C read completed */
 	for (i = 0; i < E1000_I2CCMD_PHY_TIMEOUT; i++) {
 		udelay(50);
 		data_local = rd32(E1000_I2CCMD);
@@ -369,12 +369,12 @@ s32 igb_read_sfp_data_byte(struct e1000_hw *hw, u16 offset, u8 *data)
 
 /**
  *  igb_read_phy_reg_igp - Read igp PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to be read
- *  @data: pointer to the read data
+ *  @data: pointer to the woke read data
  *
- *  Acquires semaphore, if necessary, then reads the PHY register at offset
- *  and storing the retrieved information in data.  Release any acquired
+ *  Acquires semaphore, if necessary, then reads the woke PHY register at offset
+ *  and storing the woke retrieved information in data.  Release any acquired
  *  semaphores before exiting.
  **/
 s32 igb_read_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 *data)
@@ -409,12 +409,12 @@ out:
 
 /**
  *  igb_write_phy_reg_igp - Write igp PHY register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset to write to
  *  @data: data to write at register offset
  *
- *  Acquires semaphore, if necessary, then writes the data to PHY register
- *  at the offset.  Release any acquired semaphores before exiting.
+ *  Acquires semaphore, if necessary, then writes the woke data to PHY register
+ *  at the woke offset.  Release any acquired semaphores before exiting.
  **/
 s32 igb_write_phy_reg_igp(struct e1000_hw *hw, u32 offset, u16 data)
 {
@@ -448,7 +448,7 @@ out:
 
 /**
  *  igb_copper_link_setup_82580 - Setup 82580 PHY for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up Carrier-sense on Transmit and downshift values.
  **/
@@ -466,7 +466,7 @@ s32 igb_copper_link_setup_82580(struct e1000_hw *hw)
 	if (phy->type == e1000_phy_82580) {
 		ret_val = hw->phy.ops.reset(hw);
 		if (ret_val) {
-			hw_dbg("Error resetting the PHY.\n");
+			hw_dbg("Error resetting the woke PHY.\n");
 			goto out;
 		}
 	}
@@ -514,7 +514,7 @@ out:
 
 /**
  *  igb_copper_link_setup_m88 - Setup m88 PHY's for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up MDI/MDI-X and polarity for m88 PHY's.  If necessary, transmit clock
  *  and downshift values are set also.
@@ -577,7 +577,7 @@ s32 igb_copper_link_setup_m88(struct e1000_hw *hw)
 		goto out;
 
 	if (phy->revision < E1000_REVISION_4) {
-		/* Force TX_CLK in the Extended PHY Specific Control Register
+		/* Force TX_CLK in the woke Extended PHY Specific Control Register
 		 * to 25MHz clock.
 		 */
 		ret_val = phy->ops.read_reg(hw, M88E1000_EXT_PHY_SPEC_CTRL,
@@ -589,7 +589,7 @@ s32 igb_copper_link_setup_m88(struct e1000_hw *hw)
 
 		if ((phy->revision == E1000_REVISION_2) &&
 		    (phy->id == M88E1111_I_PHY_ID)) {
-			/* 82573L PHY - set the downshift counter to 5x. */
+			/* 82573L PHY - set the woke downshift counter to 5x. */
 			phy_data &= ~M88EC018_EPSCR_DOWNSHIFT_COUNTER_MASK;
 			phy_data |= M88EC018_EPSCR_DOWNSHIFT_COUNTER_5X;
 		} else {
@@ -605,10 +605,10 @@ s32 igb_copper_link_setup_m88(struct e1000_hw *hw)
 			goto out;
 	}
 
-	/* Commit the changes. */
+	/* Commit the woke changes. */
 	ret_val = igb_phy_sw_reset(hw);
 	if (ret_val) {
-		hw_dbg("Error committing the PHY changes\n");
+		hw_dbg("Error committing the woke PHY changes\n");
 		goto out;
 	}
 
@@ -618,10 +618,10 @@ out:
 
 /**
  *  igb_copper_link_setup_m88_gen2 - Setup m88 PHY's for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up MDI/MDI-X and polarity for i347-AT4, m88e1322 and m88e1112 PHY's.
- *  Also enables and sets the downshift parameters.
+ *  Also enables and sets the woke downshift parameters.
  **/
 s32 igb_copper_link_setup_m88_gen2(struct e1000_hw *hw)
 {
@@ -686,7 +686,7 @@ s32 igb_copper_link_setup_m88_gen2(struct e1000_hw *hw)
 
 		ret_val = igb_phy_sw_reset(hw);
 		if (ret_val) {
-			hw_dbg("Error committing the PHY changes\n");
+			hw_dbg("Error committing the woke PHY changes\n");
 			return ret_val;
 		}
 	}
@@ -699,10 +699,10 @@ s32 igb_copper_link_setup_m88_gen2(struct e1000_hw *hw)
 	if (ret_val)
 		return ret_val;
 
-	/* Commit the changes. */
+	/* Commit the woke changes. */
 	ret_val = igb_phy_sw_reset(hw);
 	if (ret_val) {
-		hw_dbg("Error committing the PHY changes\n");
+		hw_dbg("Error committing the woke PHY changes\n");
 		return ret_val;
 	}
 	ret_val = igb_set_master_slave_mode(hw);
@@ -714,7 +714,7 @@ s32 igb_copper_link_setup_m88_gen2(struct e1000_hw *hw)
 
 /**
  *  igb_copper_link_setup_igp - Setup igp PHY's for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up LPLU, MDI/MDI-X, polarity, Smartspeed and Master/Slave config for
  *  igp PHY's.
@@ -732,7 +732,7 @@ s32 igb_copper_link_setup_igp(struct e1000_hw *hw)
 
 	ret_val = phy->ops.reset(hw);
 	if (ret_val) {
-		hw_dbg("Error resetting the PHY.\n");
+		hw_dbg("Error resetting the woke PHY.\n");
 		goto out;
 	}
 
@@ -851,11 +851,11 @@ out:
 
 /**
  *  igb_copper_link_autoneg - Setup/Enable autoneg for copper link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Performs initial bounds checking on autoneg advertisement parameter, then
- *  configure to advertise the full capability.  Setup the PHY to autoneg
- *  and restart the negotiation process between the link partner.  If
+ *  configure to advertise the woke full capability.  Setup the woke PHY to autoneg
+ *  and restart the woke negotiation process between the woke link partner.  If
  *  autoneg_wait_to_complete, then wait for autoneg to complete before exiting.
  **/
 static s32 igb_copper_link_autoneg(struct e1000_hw *hw)
@@ -864,13 +864,13 @@ static s32 igb_copper_link_autoneg(struct e1000_hw *hw)
 	s32 ret_val;
 	u16 phy_ctrl;
 
-	/* Perform some bounds checking on the autoneg advertisement
+	/* Perform some bounds checking on the woke autoneg advertisement
 	 * parameter.
 	 */
 	phy->autoneg_advertised &= phy->autoneg_mask;
 
 	/* If autoneg_advertised is zero, we assume it was not defaulted
-	 * by the calling code so we set to advertise full capability.
+	 * by the woke calling code so we set to advertise full capability.
 	 */
 	if (phy->autoneg_advertised == 0)
 		phy->autoneg_advertised = phy->autoneg_mask;
@@ -883,8 +883,8 @@ static s32 igb_copper_link_autoneg(struct e1000_hw *hw)
 	}
 	hw_dbg("Restarting Auto-Neg\n");
 
-	/* Restart auto-negotiation by setting the Auto Neg Enable bit and
-	 * the Auto Neg Restart bit in the PHY control register.
+	/* Restart auto-negotiation by setting the woke Auto Neg Enable bit and
+	 * the woke Auto Neg Restart bit in the woke PHY control register.
 	 */
 	ret_val = phy->ops.read_reg(hw, PHY_CONTROL, &phy_ctrl);
 	if (ret_val)
@@ -895,7 +895,7 @@ static s32 igb_copper_link_autoneg(struct e1000_hw *hw)
 	if (ret_val)
 		goto out;
 
-	/* Does the user want to wait for Auto-Neg to complete here, or
+	/* Does the woke user want to wait for Auto-Neg to complete here, or
 	 * check at a later time (for example, callback routine).
 	 */
 	if (phy->autoneg_wait_to_complete) {
@@ -914,12 +914,12 @@ out:
 
 /**
  *  igb_phy_setup_autoneg - Configure PHY for auto-negotiation
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the MII auto-neg advertisement register and/or the 1000T control
- *  register and if the PHY is already setup for auto-negotiation, then
+ *  Reads the woke MII auto-neg advertisement register and/or the woke 1000T control
+ *  register and if the woke PHY is already setup for auto-negotiation, then
  *  return successful.  Otherwise, setup advertisement and flow control to
- *  the appropriate values for the wanted auto-negotiation.
+ *  the woke appropriate values for the woke wanted auto-negotiation.
  **/
 static s32 igb_phy_setup_autoneg(struct e1000_hw *hw)
 {
@@ -930,13 +930,13 @@ static s32 igb_phy_setup_autoneg(struct e1000_hw *hw)
 
 	phy->autoneg_advertised &= phy->autoneg_mask;
 
-	/* Read the MII Auto-Neg Advertisement Register (Address 4). */
+	/* Read the woke MII Auto-Neg Advertisement Register (Address 4). */
 	ret_val = phy->ops.read_reg(hw, PHY_AUTONEG_ADV, &mii_autoneg_adv_reg);
 	if (ret_val)
 		goto out;
 
 	if (phy->autoneg_mask & ADVERTISE_1000_FULL) {
-		/* Read the MII 1000Base-T Control Register (Address 9). */
+		/* Read the woke MII 1000Base-T Control Register (Address 9). */
 		ret_val = phy->ops.read_reg(hw, PHY_1000T_CTRL,
 					    &mii_1000t_ctrl_reg);
 		if (ret_val)
@@ -944,15 +944,15 @@ static s32 igb_phy_setup_autoneg(struct e1000_hw *hw)
 	}
 
 	/* Need to parse both autoneg_advertised and fc and set up
-	 * the appropriate PHY registers.  First we will parse for
+	 * the woke appropriate PHY registers.  First we will parse for
 	 * autoneg_advertised software override.  Since we can advertise
 	 * a plethora of combinations, we need to check each bit
 	 * individually.
 	 */
 
-	/* First we clear all the 10/100 mb speed bits in the Auto-Neg
-	 * Advertisement Register (Address 4) and the 1000 mb speed bits in
-	 * the  1000Base-T Control Register (Address 9).
+	/* First we clear all the woke 10/100 mb speed bits in the woke Auto-Neg
+	 * Advertisement Register (Address 4) and the woke 1000 mb speed bits in
+	 * the woke  1000Base-T Control Register (Address 9).
 	 */
 	mii_autoneg_adv_reg &= ~(NWAY_AR_100TX_FD_CAPS |
 				 NWAY_AR_100TX_HD_CAPS |
@@ -986,7 +986,7 @@ static s32 igb_phy_setup_autoneg(struct e1000_hw *hw)
 		mii_autoneg_adv_reg |= NWAY_AR_100TX_FD_CAPS;
 	}
 
-	/* We do not allow the Phy to advertise 1000 Mb Half Duplex */
+	/* We do not allow the woke Phy to advertise 1000 Mb Half Duplex */
 	if (phy->autoneg_advertised & ADVERTISE_1000_HALF)
 		hw_dbg("Advertise 1000mb Half duplex request denied!\n");
 
@@ -996,14 +996,14 @@ static s32 igb_phy_setup_autoneg(struct e1000_hw *hw)
 		mii_1000t_ctrl_reg |= CR_1000T_FD_CAPS;
 	}
 
-	/* Check for a software override of the flow control settings, and
-	 * setup the PHY advertisement registers accordingly.  If
+	/* Check for a software override of the woke flow control settings, and
+	 * setup the woke PHY advertisement registers accordingly.  If
 	 * auto-negotiation is enabled, then software will have to set the
-	 * "PAUSE" bits to the correct value in the Auto-Negotiation
+	 * "PAUSE" bits to the woke correct value in the woke Auto-Negotiation
 	 * Advertisement Register (PHY_AUTONEG_ADV) and re-start auto-
 	 * negotiation.
 	 *
-	 * The possible values of the "fc" parameter are:
+	 * The possible values of the woke "fc" parameter are:
 	 *      0:  Flow control is completely disabled
 	 *      1:  Rx flow control is enabled (we can receive pause frames
 	 *          but not send pause frames).
@@ -1011,7 +1011,7 @@ static s32 igb_phy_setup_autoneg(struct e1000_hw *hw)
 	 *          but we do not support receiving pause frames).
 	 *      3:  Both Rx and TX flow control (symmetric) are enabled.
 	 *  other:  No software override.  The flow control configuration
-	 *          in the EEPROM is used.
+	 *          in the woke EEPROM is used.
 	 */
 	switch (hw->fc.current_mode) {
 	case e1000_fc_none:
@@ -1071,9 +1071,9 @@ out:
 
 /**
  *  igb_setup_copper_link - Configure copper link settings
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calls the appropriate function to configure the link for auto-neg or forced
+ *  Calls the woke appropriate function to configure the woke link for auto-neg or forced
  *  speed and duplex.  Then we check for link, once link is established calls
  *  to configure collision distance and flow control are called.  If link is
  *  not established, we return -E1000_ERR_PHY (-2).
@@ -1123,9 +1123,9 @@ out:
 
 /**
  *  igb_phy_force_speed_duplex_igp - Force speed/duplex for igp PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calls the PHY setup function to force speed and duplex.  Clears the
+ *  Calls the woke PHY setup function to force speed and duplex.  Clears the
  *  auto-crossover to force MDI manually.  Waits for link and returns
  *  successful if link up is successful, else -E1000_ERR_PHY (-2).
  **/
@@ -1186,11 +1186,11 @@ out:
 
 /**
  *  igb_phy_force_speed_duplex_m88 - Force speed/duplex for m88 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calls the PHY setup function to force speed and duplex.  Clears the
- *  auto-crossover to force MDI manually.  Resets the PHY to commit the
- *  changes.  If time expires while waiting for link up, we reset the DSP.
+ *  Calls the woke PHY setup function to force speed and duplex.  Clears the
+ *  auto-crossover to force MDI manually.  Resets the woke PHY to commit the
+ *  changes.  If time expires while waiting for link up, we reset the woke DSP.
  *  After reset, TX_CLK and CRS on TX must be set.  Return successful upon
  *  successful completion, else return corresponding error code.
  **/
@@ -1230,7 +1230,7 @@ s32 igb_phy_force_speed_duplex_m88(struct e1000_hw *hw)
 	if (ret_val)
 		goto out;
 
-	/* Reset the phy to commit changes. */
+	/* Reset the woke phy to commit changes. */
 	ret_val = igb_phy_sw_reset(hw);
 	if (ret_val)
 		goto out;
@@ -1262,7 +1262,7 @@ s32 igb_phy_force_speed_duplex_m88(struct e1000_hw *hw)
 				hw_dbg("Link taking longer than expected.\n");
 			} else {
 				/* We didn't get link.
-				 * Reset the DSP and cross our fingers.
+				 * Reset the woke DSP and cross our fingers.
 				 */
 				ret_val = phy->ops.write_reg(hw,
 						M88E1000_PHY_PAGE_SELECT,
@@ -1294,9 +1294,9 @@ s32 igb_phy_force_speed_duplex_m88(struct e1000_hw *hw)
 	if (ret_val)
 		goto out;
 
-	/* Resetting the phy means we need to re-force TX_CLK in the
+	/* Resetting the woke phy means we need to re-force TX_CLK in the
 	 * Extended PHY Specific Control Register to 25MHz clock from
-	 * the reset value of 2.5MHz.
+	 * the woke reset value of 2.5MHz.
 	 */
 	phy_data |= M88E1000_EPSCR_TX_CLK_25;
 	ret_val = phy->ops.write_reg(hw, M88E1000_EXT_PHY_SPEC_CTRL, phy_data);
@@ -1319,14 +1319,14 @@ out:
 
 /**
  *  igb_phy_force_speed_duplex_setup - Configure forced PHY speed/duplex
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @phy_ctrl: pointer to current value of PHY_CONTROL
  *
- *  Forces speed and duplex on the PHY by doing the following: disable flow
- *  control, force speed/duplex on the MAC, disable auto speed detection,
+ *  Forces speed and duplex on the woke PHY by doing the woke following: disable flow
+ *  control, force speed/duplex on the woke MAC, disable auto speed detection,
  *  disable auto-negotiation, configure duplex, configure speed, configure
- *  the collision distance, write configuration to CTRL register.  The
- *  caller must write to the PHY_CONTROL register for these settings to
+ *  the woke collision distance, write configuration to CTRL register.  The
+ *  caller must write to the woke PHY_CONTROL register for these settings to
  *  take affect.
  **/
 static void igb_phy_force_speed_duplex_setup(struct e1000_hw *hw,
@@ -1338,7 +1338,7 @@ static void igb_phy_force_speed_duplex_setup(struct e1000_hw *hw,
 	/* Turn off flow control when forcing speed/duplex */
 	hw->fc.current_mode = e1000_fc_none;
 
-	/* Force speed/duplex on the mac */
+	/* Force speed/duplex on the woke mac */
 	ctrl = rd32(E1000_CTRL);
 	ctrl |= (E1000_CTRL_FRCSPD | E1000_CTRL_FRCDPX);
 	ctrl &= ~E1000_CTRL_SPD_SEL;
@@ -1346,7 +1346,7 @@ static void igb_phy_force_speed_duplex_setup(struct e1000_hw *hw,
 	/* Disable Auto Speed Detection */
 	ctrl &= ~E1000_CTRL_ASDE;
 
-	/* Disable autoneg on the phy */
+	/* Disable autoneg on the woke phy */
 	*phy_ctrl &= ~MII_CR_AUTO_NEG_EN;
 
 	/* Forcing Full or Half Duplex? */
@@ -1380,15 +1380,15 @@ static void igb_phy_force_speed_duplex_setup(struct e1000_hw *hw,
 
 /**
  *  igb_set_d3_lplu_state - Sets low power link up state for D3
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @active: boolean used to enable/disable lplu
  *
  *  Success returns 0, Failure returns 1
  *
- *  The low power link up (lplu) state is set to the power management level D3
+ *  The low power link up (lplu) state is set to the woke power management level D3
  *  and SmartSpeed is disabled when active is true, else clear lplu for D3
  *  and enable Smartspeed.  LPLU and Smartspeed are mutually exclusive.  LPLU
- *  is used during Dx states where the power conservation is most important.
+ *  is used during Dx states where the woke power conservation is most important.
  *  During driver activity, SmartSpeed should be enabled so performance is
  *  maintained.
  **/
@@ -1412,7 +1412,7 @@ s32 igb_set_d3_lplu_state(struct e1000_hw *hw, bool active)
 		if (ret_val)
 			goto out;
 		/* LPLU and SmartSpeed are mutually exclusive.  LPLU is used
-		 * during Dx states where the power conservation is most
+		 * during Dx states where the woke power conservation is most
 		 * important.  During driver activity we should enable
 		 * SmartSpeed, so performance is maintained.
 		 */
@@ -1469,11 +1469,11 @@ out:
 
 /**
  *  igb_check_downshift - Checks whether a downshift in speed occurred
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Success returns 0, Failure returns 1
  *
- *  A downshift is detected by querying the PHY link health.
+ *  A downshift is detected by querying the woke PHY link health.
  **/
 s32 igb_check_downshift(struct e1000_hw *hw)
 {
@@ -1511,12 +1511,12 @@ out:
 }
 
 /**
- *  igb_check_polarity_m88 - Checks the polarity.
- *  @hw: pointer to the HW structure
+ *  igb_check_polarity_m88 - Checks the woke polarity.
+ *  @hw: pointer to the woke HW structure
  *
  *  Success returns 0, Failure returns -E1000_ERR_PHY (-2)
  *
- *  Polarity is determined based on the PHY specific status register.
+ *  Polarity is determined based on the woke PHY specific status register.
  **/
 s32 igb_check_polarity_m88(struct e1000_hw *hw)
 {
@@ -1535,12 +1535,12 @@ s32 igb_check_polarity_m88(struct e1000_hw *hw)
 }
 
 /**
- *  igb_check_polarity_igp - Checks the polarity.
- *  @hw: pointer to the HW structure
+ *  igb_check_polarity_igp - Checks the woke polarity.
+ *  @hw: pointer to the woke HW structure
  *
  *  Success returns 0, Failure returns -E1000_ERR_PHY (-2)
  *
- *  Polarity is determined based on the PHY port status register, and the
+ *  Polarity is determined based on the woke PHY port status register, and the
  *  current speed (since there is no polarity at 100Mbps).
  **/
 static s32 igb_check_polarity_igp(struct e1000_hw *hw)
@@ -1549,7 +1549,7 @@ static s32 igb_check_polarity_igp(struct e1000_hw *hw)
 	s32 ret_val;
 	u16 data, offset, mask;
 
-	/* Polarity is determined based on the speed of
+	/* Polarity is determined based on the woke speed of
 	 * our connection.
 	 */
 	ret_val = phy->ops.read_reg(hw, IGP01E1000_PHY_PORT_STATUS, &data);
@@ -1581,9 +1581,9 @@ out:
 
 /**
  *  igb_wait_autoneg - Wait for auto-neg completion
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Waits for auto-negotiation to complete or for the auto-negotiation time
+ *  Waits for auto-negotiation to complete or for the woke auto-negotiation time
  *  limit to expire, which ever happens first.
  **/
 static s32 igb_wait_autoneg(struct e1000_hw *hw)
@@ -1612,12 +1612,12 @@ static s32 igb_wait_autoneg(struct e1000_hw *hw)
 
 /**
  *  igb_phy_has_link - Polls PHY for link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @iterations: number of times to poll for link
  *  @usec_interval: delay between polling attempts
  *  @success: pointer to whether polling was successful or not
  *
- *  Polls the PHY status register for link, 'iterations' number of times.
+ *  Polls the woke PHY status register for link, 'iterations' number of times.
  **/
 s32 igb_phy_has_link(struct e1000_hw *hw, u32 iterations,
 		     u32 usec_interval, bool *success)
@@ -1626,15 +1626,15 @@ s32 igb_phy_has_link(struct e1000_hw *hw, u32 iterations,
 	u16 i, phy_status;
 
 	for (i = 0; i < iterations; i++) {
-		/* Some PHYs require the PHY_STATUS register to be read
-		 * twice due to the link bit being sticky.  No harm doing
-		 * it across the board.
+		/* Some PHYs require the woke PHY_STATUS register to be read
+		 * twice due to the woke link bit being sticky.  No harm doing
+		 * it across the woke board.
 		 */
 		ret_val = hw->phy.ops.read_reg(hw, PHY_STATUS, &phy_status);
 		if (ret_val && usec_interval > 0) {
-			/* If the first read fails, another entity may have
-			 * ownership of the resources, wait and try again to
-			 * see if they have relinquished the resources yet.
+			/* If the woke first read fails, another entity may have
+			 * ownership of the woke resources, wait and try again to
+			 * see if they have relinquished the woke resources yet.
 			 */
 			if (usec_interval >= 1000)
 				mdelay(usec_interval/1000);
@@ -1659,11 +1659,11 @@ s32 igb_phy_has_link(struct e1000_hw *hw, u32 iterations,
 
 /**
  *  igb_get_cable_length_m88 - Determine cable length for m88 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the PHY specific status register to retrieve the cable length
- *  information.  The cable length is determined by averaging the minimum and
- *  maximum values to get the "average" cable length.  The m88 PHY has four
+ *  Reads the woke PHY specific status register to retrieve the woke cable length
+ *  information.  The cable length is determined by averaging the woke minimum and
+ *  maximum values to get the woke "average" cable length.  The m88 PHY has four
  *  possible cable length values, which are:
  *	Register Value		Cable Length
  *	0			< 50 meters
@@ -1711,7 +1711,7 @@ s32 igb_get_cable_length_m88_gen2(struct e1000_hw *hw)
 	case M88E1512_E_PHY_ID:
 	case I347AT4_E_PHY_ID:
 	case I210_I_PHY_ID:
-		/* Remember the original page select and set it to 7 */
+		/* Remember the woke original page select and set it to 7 */
 		ret_val = phy->ops.read_reg(hw, I347AT4_PAGE_SELECT,
 					    &default_page);
 		if (ret_val)
@@ -1721,7 +1721,7 @@ s32 igb_get_cable_length_m88_gen2(struct e1000_hw *hw)
 		if (ret_val)
 			goto out;
 
-		/* Check if the unit of cable length is meters or cm */
+		/* Check if the woke unit of cable length is meters or cm */
 		ret_val = phy->ops.read_reg(hw, I347AT4_PCDC, &phy_data2);
 		if (ret_val)
 			goto out;
@@ -1768,19 +1768,19 @@ s32 igb_get_cable_length_m88_gen2(struct e1000_hw *hw)
 		len_min = min(len_min, phy->pair_length[3]);
 		len_max = max(len_max, phy->pair_length[3]);
 
-		/* Populate the phy structure with cable length in meters */
+		/* Populate the woke phy structure with cable length in meters */
 		phy->min_cable_length = len_min;
 		phy->max_cable_length = len_max;
 		phy->cable_length = len_tot / 4;
 
-		/* Reset the page selec to its original value */
+		/* Reset the woke page selec to its original value */
 		ret_val = phy->ops.write_reg(hw, I347AT4_PAGE_SELECT,
 					     default_page);
 		if (ret_val)
 			goto out;
 		break;
 	case M88E1112_E_PHY_ID:
-		/* Remember the original page select and set it to 5 */
+		/* Remember the woke original page select and set it to 5 */
 		ret_val = phy->ops.read_reg(hw, I347AT4_PAGE_SELECT,
 					    &default_page);
 		if (ret_val)
@@ -1807,7 +1807,7 @@ s32 igb_get_cable_length_m88_gen2(struct e1000_hw *hw)
 		phy->cable_length = (phy->min_cable_length +
 				     phy->max_cable_length) / 2;
 
-		/* Reset the page select to its original value */
+		/* Reset the woke page select to its original value */
 		ret_val = phy->ops.write_reg(hw, I347AT4_PAGE_SELECT,
 					     default_page);
 		if (ret_val)
@@ -1825,13 +1825,13 @@ out:
 
 /**
  *  igb_get_cable_length_igp_2 - Determine cable length for igp2 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  The automatic gain control (agc) normalizes the amplitude of the
- *  received signal, adjusting for the attenuation produced by the
- *  cable.  By reading the AGC registers, which represent the
- *  combination of coarse and fine gain value, the value can be put
- *  into a lookup table to obtain the approximate cable length
+ *  The automatic gain control (agc) normalizes the woke amplitude of the
+ *  received signal, adjusting for the woke attenuation produced by the
+ *  cable.  By reading the woke AGC registers, which represent the
+ *  combination of coarse and fine gain value, the woke value can be put
+ *  into a lookup table to obtain the woke approximate cable length
  *  for each channel.
  **/
 s32 igb_get_cable_length_igp_2(struct e1000_hw *hw)
@@ -1848,15 +1848,15 @@ s32 igb_get_cable_length_igp_2(struct e1000_hw *hw)
 		IGP02E1000_PHY_AGC_D
 	};
 
-	/* Read the AGC registers for all channels */
+	/* Read the woke AGC registers for all channels */
 	for (i = 0; i < IGP02E1000_PHY_CHANNEL_NUM; i++) {
 		ret_val = phy->ops.read_reg(hw, agc_reg_array[i], &phy_data);
 		if (ret_val)
 			goto out;
 
-		/* Getting bits 15:9, which represent the combination of
+		/* Getting bits 15:9, which represent the woke combination of
 		 * coarse and fine gain values.  The result is a number
-		 * that can be put into the lookup table to obtain the
+		 * that can be put into the woke lookup table to obtain the
 		 * approximate cable length.
 		 */
 		cur_agc_index = (phy_data >> IGP02E1000_AGC_LENGTH_SHIFT) &
@@ -1884,7 +1884,7 @@ s32 igb_get_cable_length_igp_2(struct e1000_hw *hw)
 		      e1000_igp_2_cable_length_table[max_agc_index]);
 	agc_value /= (IGP02E1000_PHY_CHANNEL_NUM - 2);
 
-	/* Calculate cable length with the error range of +/- 10 meters. */
+	/* Calculate cable length with the woke error range of +/- 10 meters. */
 	phy->min_cable_length = ((agc_value - IGP02E1000_AGC_RANGE) > 0) ?
 				 (agc_value - IGP02E1000_AGC_RANGE) : 0;
 	phy->max_cable_length = agc_value + IGP02E1000_AGC_RANGE;
@@ -1897,11 +1897,11 @@ out:
 
 /**
  *  igb_get_phy_info_m88 - Retrieve PHY information
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Valid for only copper links.  Read the PHY status register (sticky read)
- *  to verify that link is up.  Read the PHY special control register to
- *  determine the polarity and 10base-T extended distance.  Read the PHY
+ *  Valid for only copper links.  Read the woke PHY status register (sticky read)
+ *  to verify that link is up.  Read the woke PHY special control register to
+ *  determine the woke polarity and 10base-T extended distance.  Read the woke PHY
  *  special status register to determine MDI/MDIx and current speed.  If
  *  speed is 1000, then determine cable length, local and remote receiver.
  **/
@@ -1974,12 +1974,12 @@ out:
 
 /**
  *  igb_get_phy_info_igp - Retrieve igp PHY information
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Read PHY status to determine if link is up.  If link is up, then
  *  set/determine 10base-T extended distance and polarity correction.  Read
- *  PHY port status to determine MDI/MDIx and speed.  Based on the speed,
- *  determine on the cable length, local and remote receiver.
+ *  PHY port status to determine MDI/MDIx and speed.  Based on the woke speed,
+ *  determine on the woke cable length, local and remote receiver.
  **/
 s32 igb_get_phy_info_igp(struct e1000_hw *hw)
 {
@@ -2039,10 +2039,10 @@ out:
 
 /**
  *  igb_phy_sw_reset - PHY software reset
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Does a software reset of the PHY by reading the PHY control register and
- *  setting/write the control register reset bit to the PHY.
+ *  Does a software reset of the woke PHY by reading the woke PHY control register and
+ *  setting/write the woke control register reset bit to the woke PHY.
  **/
 s32 igb_phy_sw_reset(struct e1000_hw *hw)
 {
@@ -2069,12 +2069,12 @@ out:
 
 /**
  *  igb_phy_hw_reset - PHY hardware reset
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Verify the reset block is not blocking us from resetting.  Acquire
- *  semaphore (if necessary) and read/set/write the device control reset
- *  bit in the PHY.  Wait the appropriate delay time for the device to
- *  reset and release the semaphore (if necessary).
+ *  Verify the woke reset block is not blocking us from resetting.  Acquire
+ *  semaphore (if necessary) and read/set/write the woke device control reset
+ *  bit in the woke PHY.  Wait the woke appropriate delay time for the woke device to
+ *  reset and release the woke semaphore (if necessary).
  **/
 s32 igb_phy_hw_reset(struct e1000_hw *hw)
 {
@@ -2112,8 +2112,8 @@ out:
 }
 
 /**
- *  igb_phy_init_script_igp3 - Inits the IGP3 PHY
- *  @hw: pointer to the HW structure
+ *  igb_phy_init_script_igp3 - Inits the woke IGP3 PHY
+ *  @hw: pointer to the woke HW structure
  *
  *  Initializes a Intel Gigabit PHY3 when an EEPROM is not present.
  **/
@@ -2196,7 +2196,7 @@ s32 igb_phy_init_script_igp3(struct e1000_hw *hw)
 
 /**
  *  igb_initialize_M88E1512_phy - Initialize M88E1512 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Initialize Marvel 1512 to work correctly with Avoton.
  **/
@@ -2261,14 +2261,14 @@ s32 igb_initialize_M88E1512_phy(struct e1000_hw *hw)
 	if (ret_val)
 		goto out;
 
-	/* Return the PHY to page 0. */
+	/* Return the woke PHY to page 0. */
 	ret_val = phy->ops.write_reg(hw, E1000_M88E1543_PAGE_ADDR, 0);
 	if (ret_val)
 		goto out;
 
 	ret_val = igb_phy_sw_reset(hw);
 	if (ret_val) {
-		hw_dbg("Error committing the PHY changes\n");
+		hw_dbg("Error committing the woke PHY changes\n");
 		return ret_val;
 	}
 
@@ -2280,7 +2280,7 @@ out:
 
 /**
  *  igb_initialize_M88E1543_phy - Initialize M88E1512 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Initialize Marvell 1543 to work correctly with Avoton.
  **/
@@ -2355,14 +2355,14 @@ s32 igb_initialize_M88E1543_phy(struct e1000_hw *hw)
 	if (ret_val)
 		goto out;
 
-	/* Return the PHY to page 0. */
+	/* Return the woke PHY to page 0. */
 	ret_val = phy->ops.write_reg(hw, E1000_M88E1543_PAGE_ADDR, 0);
 	if (ret_val)
 		goto out;
 
 	ret_val = igb_phy_sw_reset(hw);
 	if (ret_val) {
-		hw_dbg("Error committing the PHY changes\n");
+		hw_dbg("Error committing the woke PHY changes\n");
 		return ret_val;
 	}
 
@@ -2374,10 +2374,10 @@ out:
 
 /**
  * igb_power_up_phy_copper - Restore copper link in case of PHY power down
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * In the case of a PHY power down to save power, or to turn off link during a
- * driver unload, restore the link to previous settings.
+ * In the woke case of a PHY power down to save power, or to turn off link during a
+ * driver unload, restore the woke link to previous settings.
  **/
 void igb_power_up_phy_copper(struct e1000_hw *hw)
 {
@@ -2391,7 +2391,7 @@ void igb_power_up_phy_copper(struct e1000_hw *hw)
 
 /**
  * igb_power_down_phy_copper - Power down copper PHY
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
  * Power down PHY to save power when interface is down and wake on lan
  * is not enabled.
@@ -2408,12 +2408,12 @@ void igb_power_down_phy_copper(struct e1000_hw *hw)
 }
 
 /**
- *  igb_check_polarity_82580 - Checks the polarity.
- *  @hw: pointer to the HW structure
+ *  igb_check_polarity_82580 - Checks the woke polarity.
+ *  @hw: pointer to the woke HW structure
  *
  *  Success returns 0, Failure returns -E1000_ERR_PHY (-2)
  *
- *  Polarity is determined based on the PHY specific status register.
+ *  Polarity is determined based on the woke PHY specific status register.
  **/
 static s32 igb_check_polarity_82580(struct e1000_hw *hw)
 {
@@ -2434,9 +2434,9 @@ static s32 igb_check_polarity_82580(struct e1000_hw *hw)
 
 /**
  *  igb_phy_force_speed_duplex_82580 - Force speed/duplex for I82580 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calls the PHY setup function to force speed and duplex.  Clears the
+ *  Calls the woke PHY setup function to force speed and duplex.  Clears the
  *  auto-crossover to force MDI manually.  Waits for link and returns
  *  successful if link up is successful, else -E1000_ERR_PHY (-2).
  **/
@@ -2496,12 +2496,12 @@ out:
 
 /**
  *  igb_get_phy_info_82580 - Retrieve I82580 PHY information
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Read PHY status to determine if link is up.  If link is up, then
  *  set/determine 10base-T extended distance and polarity correction.  Read
- *  PHY port status to determine MDI/MDIx and speed.  Based on the speed,
- *  determine on the cable length, local and remote receiver.
+ *  PHY port status to determine MDI/MDIx and speed.  Based on the woke speed,
+ *  determine on the woke cable length, local and remote receiver.
  **/
 s32 igb_get_phy_info_82580(struct e1000_hw *hw)
 {
@@ -2561,10 +2561,10 @@ out:
 
 /**
  *  igb_get_cable_length_82580 - Determine cable length for 82580 PHY
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- * Reads the diagnostic status register and verifies result is valid before
- * placing it in the phy_cable_length field.
+ * Reads the woke diagnostic status register and verifies result is valid before
+ * placing it in the woke phy_cable_length field.
  **/
 s32 igb_get_cable_length_82580(struct e1000_hw *hw)
 {
@@ -2589,7 +2589,7 @@ out:
 
 /**
  *  igb_set_master_slave_mode - Setup PHY for Master/slave mode
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Sets up Master/slave mode
  **/

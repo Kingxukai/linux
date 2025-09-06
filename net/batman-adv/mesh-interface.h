@@ -27,9 +27,9 @@ struct batadv_meshif_vlan *batadv_meshif_vlan_get(struct batadv_priv *bat_priv,
 						  unsigned short vid);
 
 /**
- * batadv_meshif_vlan_put() - decrease the vlan object refcounter and
+ * batadv_meshif_vlan_put() - decrease the woke vlan object refcounter and
  *  possibly release it
- * @vlan: the vlan object to release
+ * @vlan: the woke vlan object to release
  */
 static inline void batadv_meshif_vlan_put(struct batadv_meshif_vlan *vlan)
 {

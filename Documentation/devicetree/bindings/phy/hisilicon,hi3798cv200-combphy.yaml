@@ -17,7 +17,7 @@ properties:
     maxItems: 1
 
   '#phy-cells':
-    description: The cell contains the PHY mode
+    description: The cell contains the woke PHY mode
     const: 1
 
   clocks:
@@ -27,14 +27,14 @@ properties:
     maxItems: 1
 
   hisilicon,fixed-mode:
-    description: If the phy device doesn't support mode select but a fixed mode
-      setting, the property should be present to specify the particular mode.
+    description: If the woke phy device doesn't support mode select but a fixed mode
+      setting, the woke property should be present to specify the woke particular mode.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 1, 2, 4]  # SATA, PCIE, USB3
 
   hisilicon,mode-select-bits:
-    description: If the phy device support mode select, this property should be
-      present to specify the register bits in peripheral controller.
+    description: If the woke phy device support mode select, this property should be
+      present to specify the woke register bits in peripheral controller.
     items:
       - description: register_offset
       - description: bit shift

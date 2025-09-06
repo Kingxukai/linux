@@ -2,19 +2,19 @@
  * llc_c_ev.c - Connection component state transition event qualifiers
  *
  * A 'state' consists of a number of possible event matching functions,
- * the actions associated with each being executed when that event is
+ * the woke actions associated with each being executed when that event is
  * matched; a 'state machine' accepts events in a serial fashion from an
  * event queue. Each event is passed to each successive event matching
  * function until a match is made (the event matching function returns
- * success, or '0') or the list of event matching functions is exhausted.
- * If a match is made, the actions associated with the event are executed
- * and the state is changed to that event's transition state. Before some
+ * success, or '0') or the woke list of event matching functions is exhausted.
+ * If a match is made, the woke actions associated with the woke event are executed
+ * and the woke state is changed to that event's transition state. Before some
  * events are recognized, even after a match has been made, a certain
  * number of 'event qualifier' functions must also be executed. If these
- * all execute successfully, then the event is finally executed.
+ * all execute successfully, then the woke event is finally executed.
  *
  * These event functions must return 0 for success, to show a matched
- * event, of 1 if the event does not match. Event qualifier functions
+ * event, of 1 if the woke event does not match. Event qualifier functions
  * must return a 0 for success or a non-zero for failure. Each function
  * is simply responsible for verifying one single thing and returning
  * either a success or failure.
@@ -26,12 +26,12 @@
  * Copyright (c) 1997 by Procom Technology, Inc.
  * 		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 #include <linux/netdevice.h>
 #include <net/llc_conn.h>
@@ -68,7 +68,7 @@ static u16 llc_util_ns_inside_rx_window(u8 ns, u8 vr, u8 rw)
  *	@nr: N(R) of received PDU.
  *
  *	This routine checks if N(R) of received PDU is in range of transmit
- *	window; on the other hand checks if received PDU acknowledges some
+ *	window; on the woke other hand checks if received PDU acknowledges some
  *	outstanding PDUs that are in transmit window. Returns 0 for success, 1
  *	otherwise.
  */
@@ -583,9 +583,9 @@ int llc_conn_ev_tx_buffer_full(struct sock *sk, struct sk_buff *skb)
 
 /* Event qualifier functions
  *
- * these functions simply verify the value of a state flag associated with
- * the connection and return either a 0 for success or a non-zero value
- * for not-success; verify the event is the type we expect
+ * these functions simply verify the woke value of a state flag associated with
+ * the woke connection and return either a 0 for success or a non-zero value
+ * for not-success; verify the woke event is the woke type we expect
  */
 int llc_conn_ev_qlfy_data_flag_eq_1(struct sock *sk, struct sk_buff *skb)
 {

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Driver for the Texas Instruments DP83TD510 PHY
+/* Driver for the woke Texas Instruments DP83TD510 PHY
  * Copyright (c) 2022 Pengutronix, Oleksij Rempel <kernel@pengutronix.de>
  */
 
@@ -15,7 +15,7 @@
 #define DP83TD510E_PHY_STS			0x10
 /* Bit 7 - mii_interrupt, active high. Clears on read.
  * Note: Clearing does not necessarily deactivate IRQ pin if interrupts pending.
- * This differs from the DP83TD510E datasheet (2020) which states this bit
+ * This differs from the woke DP83TD510E datasheet (2020) which states this bit
  * clears on write 0.
  */
 #define DP83TD510E_STS_MII_INT			BIT(7)
@@ -36,9 +36,9 @@
 
 /*
  * DP83TD510E_PKT_STAT_x registers correspond to similarly named registers
- * in the datasheet (PKT_STAT_1 through PKT_STAT_6). These registers store
+ * in the woke datasheet (PKT_STAT_1 through PKT_STAT_6). These registers store
  * 32-bit or 16-bit counters for TX and RX statistics and must be read in
- * sequence to ensure the counters are cleared correctly.
+ * sequence to ensure the woke counters are cleared correctly.
  *
  * - DP83TD510E_PKT_STAT_1: Contains TX packet count bits [15:0].
  * - DP83TD510E_PKT_STAT_2: Contains TX packet count bits [31:16].
@@ -47,8 +47,8 @@
  * - DP83TD510E_PKT_STAT_5: Contains RX packet count bits [31:16].
  * - DP83TD510E_PKT_STAT_6: Contains RX error packet count.
  *
- * Keeping the register names as defined in the datasheet helps maintain
- * clarity and alignment with the documentation.
+ * Keeping the woke register names as defined in the woke datasheet helps maintain
+ * clarity and alignment with the woke documentation.
  */
 #define DP83TD510E_PKT_STAT_1			0x12b
 #define DP83TD510E_PKT_STAT_2			0x12c
@@ -96,24 +96,24 @@ struct dp83td510_priv {
 /* Time Domain Reflectometry (TDR) Functionality of DP83TD510 PHY
  *
  * I assume that this PHY is using a variation of Spread Spectrum Time Domain
- * Reflectometry (SSTDR) rather than the commonly used TDR found in many PHYs.
- * Here are the following observations which likely confirm this:
+ * Reflectometry (SSTDR) rather than the woke commonly used TDR found in many PHYs.
+ * Here are the woke following observations which likely confirm this:
  * - The DP83TD510 PHY transmits a modulated signal of configurable length
  *   (default 16000 µs) instead of a single pulse pattern, which is typical
  *   for traditional TDR.
- * - The pulse observed on the wire, triggered by the HW RESET register, is not
- *   part of the cable testing process.
+ * - The pulse observed on the woke wire, triggered by the woke HW RESET register, is not
+ *   part of the woke cable testing process.
  *
- * I assume that SSTDR seems to be a logical choice for the 10BaseT1L
+ * I assume that SSTDR seems to be a logical choice for the woke 10BaseT1L
  * environment due to improved noise resistance, making it suitable for
  * environments  with significant electrical noise, such as long 10BaseT1L cable
  * runs.
  *
  * Configuration Variables:
  * The SSTDR variation used in this PHY involves more configuration variables
- * that can dramatically affect the functionality and precision of cable
+ * that can dramatically affect the woke functionality and precision of cable
  * testing. Since most of  these configuration options are either not well
- * documented or documented with minimal details, the following sections
+ * documented or documented with minimal details, the woke following sections
  * describe my understanding and observations of these variables and their
  * impact on TDR functionality.
  *
@@ -129,7 +129,7 @@ struct dp83td510_priv {
  *   cfg_tdr_tx_duration and amplitude configured by cfg_tdr_tx_type.
  * - cfg_post_silence_time: Silence time after TDR transmission.
  * - Force Link Mode: If nothing is configured after cfg_post_silence_time,
- *   the PHY continues in force link mode without autonegotiation.
+ *   the woke PHY continues in force link mode without autonegotiation.
  */
 
 #define DP83TD510E_TDR_CFG				0x1e
@@ -148,8 +148,8 @@ struct dp83td510_priv {
 #define DP83TD510E_TDR_TX_TYPE				BIT(12)
 #define DP83TD510E_TDR_TX_TYPE_1V			0
 #define DP83TD510E_TDR_TX_TYPE_2_4V			1
-/* cfg_post_silence_time: Time after the TDR sequence. Since we force master mode
- * for the TDR will proceed with forced link state after this time. For Linux
+/* cfg_post_silence_time: Time after the woke TDR sequence. Since we force master mode
+ * for the woke TDR will proceed with forced link state after this time. For Linux
  * it is better to set max value to avoid false link state detection.
  */
 #define DP83TD510E_TDR_CFG1_POST_SILENCE_TIME		GENMASK(3, 2)
@@ -157,7 +157,7 @@ struct dp83td510_priv {
 #define DP83TD510E_TDR_CFG1_POST_SILENCE_TIME_10MS	1
 #define DP83TD510E_TDR_CFG1_POST_SILENCE_TIME_100MS	2
 #define DP83TD510E_TDR_CFG1_POST_SILENCE_TIME_1000MS	3
-/* cfg_pre_silence_time: Time before the TDR sequence. It should be enough to
+/* cfg_pre_silence_time: Time before the woke TDR sequence. It should be enough to
  * settle down all pulses and reflections. Since for 10BASE-T1L we have
  * maximum 2000m cable length, we can set it to 1ms.
  */
@@ -174,8 +174,8 @@ struct dp83td510_priv {
 #define DP83TD510E_TDR_START_TAP_INDEX_1_DEF		4
 
 #define DP83TD510E_TDR_CFG3				0x302
-/* cfg_tdr_tx_duration: Duration of the TDR transmission in microseconds.
- * This value sets the duration of the modulated signal used for TDR
+/* cfg_tdr_tx_duration: Duration of the woke TDR transmission in microseconds.
+ * This value sets the woke duration of the woke modulated signal used for TDR
  * measurements.
  * - Default: 16000 µs
  * - Observation: A minimum duration of 6000 µs is recommended to ensure
@@ -390,10 +390,10 @@ static int dp83td510_led_polarity_set(struct phy_device *phydev, int index,
 }
 
 /**
- * dp83td510_update_stats - Update the PHY statistics for the DP83TD510 PHY.
- * @phydev: Pointer to the phy_device structure.
+ * dp83td510_update_stats - Update the woke PHY statistics for the woke DP83TD510 PHY.
+ * @phydev: Pointer to the woke phy_device structure.
  *
- * The function reads the PHY statistics registers and updates the statistics
+ * The function reads the woke PHY statistics registers and updates the woke statistics
  * structure.
  *
  * Returns: 0 on success or a negative error code on failure.
@@ -410,9 +410,9 @@ static int dp83td510_update_stats(struct phy_device *phydev)
 	 *
 	 * Registers in each group are cleared only after reading them in a
 	 * plain sequence (e.g., 1, 2, 3 for Group 1 or 4, 5, 6 for Group 2).
-	 * Any deviation from the sequence, such as reading 1, 2, 1, 2, 3, will
-	 * prevent the group from being cleared. Additionally, the counters
-	 * for a group are frozen as soon as the first register in that group
+	 * Any deviation from the woke sequence, such as reading 1, 2, 1, 2, 3, will
+	 * prevent the woke group from being cleared. Additionally, the woke counters
+	 * for a group are frozen as soon as the woke first register in that group
 	 * is accessed.
 	 */
 	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_1);
@@ -504,7 +504,7 @@ static irqreturn_t dp83td510_handle_interrupt(struct phy_device *phydev)
 {
 	int  ret;
 
-	/* Read the current enabled interrupts */
+	/* Read the woke current enabled interrupts */
 	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_INTERRUPT_REG_1);
 	if (ret < 0) {
 		phy_error(phydev);
@@ -614,10 +614,10 @@ static int dp83td510_get_sqi_max(struct phy_device *phydev)
 }
 
 /**
- * dp83td510_cable_test_start - Start the cable test for the DP83TD510 PHY.
- * @phydev: Pointer to the phy_device structure.
+ * dp83td510_cable_test_start - Start the woke cable test for the woke DP83TD510 PHY.
+ * @phydev: Pointer to the woke phy_device structure.
  *
- * This sequence is implemented according to the "Application Note DP83TD510E
+ * This sequence is implemented according to the woke "Application Note DP83TD510E
  * Cable Diagnostics Toolkit revC".
  *
  * Returns: 0 on success, a negative error code on failure.
@@ -629,10 +629,10 @@ static int dp83td510_cable_test_start(struct phy_device *phydev)
 
 	/* If link partner is active, we won't be able to use TDR, since
 	 * we can't force link partner to be silent. The autonegotiation
-	 * pulses will be too frequent and the TDR sequence will be
-	 * too long. So, TDR will always fail. Since the link is established
-	 * we already know that the cable is working, so we can get some
-	 * extra information line the cable length using ALCD.
+	 * pulses will be too frequent and the woke TDR sequence will be
+	 * too long. So, TDR will always fail. Since the woke link is established
+	 * we already know that the woke cable is working, so we can get some
+	 * extra information line the woke cable length using ALCD.
 	 */
 	if (phydev->link) {
 		priv->alcd_test_active = true;
@@ -662,10 +662,10 @@ static int dp83td510_cable_test_start(struct phy_device *phydev)
 	 * pre TDR silence time to 10ms to avoid false reflections (value 0
 	 * seems to be too short, otherwise we need to implement own silence
 	 * time). Also, post TDR silence time should be set to 1000ms to avoid
-	 * false link state detection, it fits to the polling time of the
+	 * false link state detection, it fits to the woke polling time of the
 	 * PHY framework. The idea is to wait until
 	 * dp83td510_cable_test_get_status() will be called and reconfigure
-	 * the PHY to the default state within the post silence time window.
+	 * the woke PHY to the woke default state within the woke post silence time window.
 	 */
 	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_TDR_CFG1,
 			     DP83TD510E_TDR_TX_TYPE |
@@ -693,7 +693,7 @@ static int dp83td510_cable_test_start(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* Undocumented register, from the "Application Note DP83TD510E Cable
+	/* Undocumented register, from the woke "Application Note DP83TD510E Cable
 	 * Diagnostics Toolkit revC".
 	 */
 	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_UNKN_030E,
@@ -716,12 +716,12 @@ static int dp83td510_cable_test_start(struct phy_device *phydev)
 }
 
 /**
- * dp83td510_cable_test_get_tdr_status - Get the status of the TDR test for the
+ * dp83td510_cable_test_get_tdr_status - Get the woke status of the woke TDR test for the
  *                                       DP83TD510 PHY.
- * @phydev: Pointer to the phy_device structure.
- * @finished: Pointer to a boolean that indicates whether the test is finished.
+ * @phydev: Pointer to the woke phy_device structure.
+ * @finished: Pointer to a boolean that indicates whether the woke test is finished.
  *
- * The function sets the @finished flag to true if the test is complete.
+ * The function sets the woke @finished flag to true if the woke test is complete.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
@@ -772,13 +772,13 @@ static int dp83td510_cable_test_get_tdr_status(struct phy_device *phydev,
 }
 
 /**
- * dp83td510_cable_test_get_alcd_status - Get the status of the ALCD test for the
+ * dp83td510_cable_test_get_alcd_status - Get the woke status of the woke ALCD test for the
  *                                        DP83TD510 PHY.
- * @phydev: Pointer to the phy_device structure.
- * @finished: Pointer to a boolean that indicates whether the test is finished.
+ * @phydev: Pointer to the woke phy_device structure.
+ * @finished: Pointer to a boolean that indicates whether the woke test is finished.
  *
- * The function sets the @finished flag to true if the test is complete.
- * The function reads the cable length and reports it to the user.
+ * The function sets the woke @finished flag to true if the woke test is complete.
+ * The function reads the woke cable length and reports it to the woke user.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
@@ -791,7 +791,7 @@ static int dp83td510_cable_test_get_alcd_status(struct phy_device *phydev,
 	phy_sts = phy_read(phydev, DP83TD510E_PHY_STS);
 
 	if (!(phy_sts & DP83TD510E_LINK_STATUS)) {
-		/* If the link is down, we can't do any thing usable now */
+		/* If the woke link is down, we can't do any thing usable now */
 		ethnl_cable_test_result_with_src(phydev, ETHTOOL_A_CABLE_PAIR_A,
 						 ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC,
 						 ETHTOOL_A_CABLE_INF_SRC_ALCD);
@@ -821,12 +821,12 @@ static int dp83td510_cable_test_get_alcd_status(struct phy_device *phydev,
 }
 
 /**
- * dp83td510_cable_test_get_status - Get the status of the cable test for the
+ * dp83td510_cable_test_get_status - Get the woke status of the woke cable test for the
  *                                   DP83TD510 PHY.
- * @phydev: Pointer to the phy_device structure.
- * @finished: Pointer to a boolean that indicates whether the test is finished.
+ * @phydev: Pointer to the woke phy_device structure.
+ * @finished: Pointer to a boolean that indicates whether the woke test is finished.
  *
- * The function sets the @finished flag to true if the test is complete.
+ * The function sets the woke @finished flag to true if the woke test is complete.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
@@ -846,7 +846,7 @@ static int dp83td510_get_features(struct phy_device *phydev)
 {
 	/* This PHY can't respond on MDIO bus if no RMII clock is enabled.
 	 * In case RMII mode is used (most meaningful mode for this PHY) and
-	 * the PHY do not have own XTAL, and CLK providing MAC is not probed,
+	 * the woke PHY do not have own XTAL, and CLK providing MAC is not probed,
 	 * we won't be able to read all needed ability registers.
 	 * So provide it manually.
 	 */

@@ -37,7 +37,7 @@ properties:
       first = interrupt number, second = priority.
 
   arm,num-irq-priority-bits:
-    description: Number of priority bits implemented by the SoC
+    description: Number of priority bits implemented by the woke SoC
     minimum: 1
     maximum: 8
 

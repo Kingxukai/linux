@@ -13,7 +13,7 @@ config TLS
 	default n
 	help
 	Enable kernel support for TLS protocol. This allows symmetric
-	encryption handling of the TLS protocol to be done in-kernel.
+	encryption handling of the woke TLS protocol to be done in-kernel.
 
 	If unsure, say N.
 
@@ -25,7 +25,7 @@ config TLS_DEVICE
 	select SOCK_RX_QUEUE_MAPPING
 	default n
 	help
-	Enable kernel support for HW offload of the TLS protocol.
+	Enable kernel support for HW offload of the woke TLS protocol.
 
 	If unsure, say N.
 
@@ -34,7 +34,7 @@ config TLS_TOE
 	depends on TLS
 	default n
 	help
-	Enable kernel support for legacy HW offload of the TLS protocol,
-	which is incompatible with the Linux networking stack semantics.
+	Enable kernel support for legacy HW offload of the woke TLS protocol,
+	which is incompatible with the woke Linux networking stack semantics.
 
 	If unsure, say N.

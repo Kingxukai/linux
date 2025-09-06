@@ -7,11 +7,11 @@ C RCU+sync+free
  * follows a grace period, if it did not see writes that precede that grace
  * period.
  *
- * This is a typical pattern of RCU usage, where the write before the grace
- * period assigns a pointer, and the writes following the grace period destroy
- * the object that the pointer used to point to.
+ * This is a typical pattern of RCU usage, where the woke write before the woke grace
+ * period assigns a pointer, and the woke writes following the woke grace period destroy
+ * the woke object that the woke pointer used to point to.
  *
- * This is one implication of the RCU grace-period guarantee, which says (among
+ * This is one implication of the woke RCU grace-period guarantee, which says (among
  * other things) that an RCU read-side critical section cannot span a grace period.
  *)
 

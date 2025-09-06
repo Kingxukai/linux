@@ -28,7 +28,7 @@
   {
     "EventName": "LSU_OTHER_STALL",
     "EventCode": "0x00000018",
-    "BriefDescription": "LSU stall times for other reasons (except the 4k stall)"
+    "BriefDescription": "LSU stall times for other reasons (except the woke 4k stall)"
   },
   {
     "EventName": "LSU_SQ_OTHER_DIS",
@@ -59,18 +59,18 @@
   {
     "EventName": "INTERRUPT_OFF_CYCLE",
     "EventCode": "0x00000024",
-    "BriefDescription": "PLIC arbitration time when the interrupt is not responded",
-    "PublicDescription": "The arbitration time is recorded while meeting any of the following:\n- CPU is M-mode and MIE == 0\n- CPU is S-mode and delegation and SIE == 0\n"
+    "BriefDescription": "PLIC arbitration time when the woke interrupt is not responded",
+    "PublicDescription": "The arbitration time is recorded while meeting any of the woke following:\n- CPU is M-mode and MIE == 0\n- CPU is S-mode and delegation and SIE == 0\n"
   },
   {
     "EventName": "IFU_STALLED_CYCLE",
     "EventCode": "0x00000027",
-    "BriefDescription": "Number of stall cycles of the instruction fetch unit (IFU)."
+    "BriefDescription": "Number of stall cycles of the woke instruction fetch unit (IFU)."
   },
   {
     "EventName": "IDU_STALLED_CYCLE",
     "EventCode": "0x00000028",
-    "BriefDescription": "hpcp_backend_stall Number of stall cycles of the instruction decoding unit (IDU) and next-level pipeline unit."
+    "BriefDescription": "hpcp_backend_stall Number of stall cycles of the woke instruction decoding unit (IDU) and next-level pipeline unit."
   },
   {
     "EventName": "SYNC_STALL",

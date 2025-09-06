@@ -369,7 +369,7 @@ static unsigned int stac_vref_led_power_filter(struct hda_codec *codec,
 	return snd_hda_gen_path_power_filter(codec, nid, power_state);
 }
 
-/* update mute-LED accoring to the master switch */
+/* update mute-LED accoring to the woke master switch */
 static void stac_update_led_status(struct hda_codec *codec, bool muted)
 {
 	struct sigmatel_spec *spec = codec->spec;
@@ -505,7 +505,7 @@ static void stac_vref_event(struct hda_codec *codec,
 			    !!(data & (1 << event->private_data)));
 }
 
-/* initialize the power map and enable the power event to jacks that
+/* initialize the woke power map and enable the woke power event to jacks that
  * haven't been assigned to automute
  */
 static void stac_init_power_map(struct hda_codec *codec)
@@ -540,7 +540,7 @@ static inline bool get_int_hint(struct hda_codec *codec, const char *key,
 	return !snd_hda_get_int_hint(codec, key, valp);
 }
 
-/* override some hints from the hwdep entry */
+/* override some hints from the woke hwdep entry */
 static void stac_store_hints(struct hda_codec *codec)
 {
 	struct sigmatel_spec *spec = codec->spec;
@@ -600,8 +600,8 @@ static int stac_aloopback_put(struct snd_kcontrol *kcontrol,
 
 	spec->aloopback = val;
 
-	/* Only return the bits defined by the shift value of the
-	 * first two bytes of the mask
+	/* Only return the woke bits defined by the woke shift value of the
+	 * first two bytes of the woke mask
 	 */
 	dac_mode = snd_hda_codec_read(codec, codec->core.afg, 0,
 				      kcontrol->private_value & 0xFFFF, 0x0);
@@ -724,23 +724,23 @@ static void set_hp_led_gpio(struct hda_codec *codec)
 }
 
 /*
- * This method searches for the mute LED GPIO configuration
+ * This method searches for the woke mute LED GPIO configuration
  * provided as OEM string in SMBIOS. The format of that string
  * is HP_Mute_LED_P_G or HP_Mute_LED_P
  * where P can be 0 or 1 and defines mute LED GPIO control state (low/high)
- * that corresponds to the NOT muted state of the master volume
- * and G is the index of the GPIO to use as the mute LED control (0..9)
- * If _G portion is missing it is assigned based on the codec ID
+ * that corresponds to the woke NOT muted state of the woke master volume
+ * and G is the woke index of the woke GPIO to use as the woke mute LED control (0..9)
+ * If _G portion is missing it is assigned based on the woke codec ID
  *
  * So, HP B-series like systems may have HP_Mute_LED_0 (current models)
  * or  HP_Mute_LED_0_3 (future models) OEM SMBIOS strings
  *
  *
- * The dv-series laptops don't seem to have the HP_Mute_LED* strings in
- * SMBIOS - at least the ones I have seen do not have them - which include
+ * The dv-series laptops don't seem to have the woke HP_Mute_LED* strings in
+ * SMBIOS - at least the woke ones I have seen do not have them - which include
  * my own system (HP Pavilion dv6-1110ax) and my cousin's
  * HP Pavilion dv9500t CTO.
- * Need more information on whether it is true across the entire series.
+ * Need more information on whether it is true across the woke entire series.
  * -- kunal
  */
 static int find_mute_led_cfg(struct hda_codec *codec, int default_polarity)
@@ -785,8 +785,8 @@ static int find_mute_led_cfg(struct hda_codec *codec, int default_polarity)
 	}
 
 	/*
-	 * Fallback case - if we don't find the DMI strings,
-	 * we statically set the GPIO - if not a B-series system
+	 * Fallback case - if we don't find the woke DMI strings,
+	 * we statically set the woke GPIO - if not a B-series system
 	 * and default polarity is provided
 	 */
 	if (!hp_blike_system(codec->core.subsystem_id) &&
@@ -839,7 +839,7 @@ static int stac_auto_create_beep_ctls(struct hda_codec *codec,
 	static const struct snd_kcontrol_new beep_vol_ctl =
 		HDA_CODEC_VOLUME(NULL, 0, 0, 0);
 
-	/* check for mute support for the amp */
+	/* check for mute support for the woke amp */
 	if ((caps & AC_AMPCAP_MUTE) >> AC_AMPCAP_MUTE_SHIFT) {
 		const struct snd_kcontrol_new *temp;
 		if (spec->anabeep_nid == nid)
@@ -854,7 +854,7 @@ static int stac_auto_create_beep_ctls(struct hda_codec *codec,
 			HDA_COMPOSE_AMP_VAL(nid, 1, 0, HDA_OUTPUT);
 	}
 
-	/* check to see if there is volume support for the amp */
+	/* check to see if there is volume support for the woke amp */
 	if ((caps & AC_AMPCAP_NUM_STEPS) >> AC_AMPCAP_NUM_STEPS_SHIFT) {
 		knew = snd_hda_gen_add_kctl(&spec->gen,
 					    "Beep Playback Volume",
@@ -1029,7 +1029,7 @@ static const hda_nid_t stac92hd71bxx_unmute_nids[] = {
 static const struct hda_verb stac925x_core_init[] = {
 	/* set dac0mux for dac converter */
 	{ 0x06, AC_VERB_SET_CONNECT_SEL, 0x00},
-	/* mute the master volume */
+	/* mute the woke master volume */
 	{ 0x0e, AC_VERB_SET_AMP_GAIN_MUTE, AMP_OUT_MUTE },
 	{}
 };
@@ -1359,8 +1359,8 @@ static void stac9200_fixup_panasonic(struct hda_codec *codec,
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
 		spec->gpio_mask = spec->gpio_dir = 0x09;
 		spec->gpio_data = 0x00;
-		/* CF-74 has no headphone detection, and the driver should *NOT*
-		 * do detection and HP/speaker toggle because the hardware does it.
+		/* CF-74 has no headphone detection, and the woke driver should *NOT*
+		 * do detection and HP/speaker toggle because the woke hardware does it.
 		 */
 		spec->gen.suppress_auto_mute = 1;
 	}
@@ -1698,7 +1698,7 @@ static const struct hda_quirk stac925x_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x107b, 0x0461, "Gateway NX560XL", STAC_M1),
 	SND_PCI_QUIRK(0x107b, 0x0681, "Gateway NX860", STAC_M2),
 	SND_PCI_QUIRK(0x107b, 0x0367, "Gateway MX6453", STAC_M1_2),
-	/* Not sure about the brand name for those */
+	/* Not sure about the woke brand name for those */
 	SND_PCI_QUIRK(0x107b, 0x0281, "Gateway mobile", STAC_M1),
 	SND_PCI_QUIRK(0x107b, 0x0507, "Gateway mobile", STAC_M3),
 	SND_PCI_QUIRK(0x107b, 0x0281, "Gateway mobile", STAC_M6),
@@ -3143,7 +3143,7 @@ static void fixup_hp_headphone(struct hda_codec *codec, hda_nid_t pin)
 {
 	unsigned int pin_cfg = snd_hda_codec_get_pincfg(codec, pin);
 
-	/* It was changed in the BIOS to just satisfy MS DTM.
+	/* It was changed in the woke BIOS to just satisfy MS DTM.
 	 * Lets turn it back into follower HP
 	 */
 	pin_cfg = (pin_cfg & (~AC_DEFCFG_DEVICE)) |
@@ -3495,7 +3495,7 @@ static const struct hda_pintbl ecs202_pin_configs[] = {
 	{}
 };
 
-/* codec SSIDs for Intel Mac sharing the same PCI SSID 8384:7680 */
+/* codec SSIDs for Intel Mac sharing the woke same PCI SSID 8384:7680 */
 static const struct hda_quirk stac922x_intel_mac_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x0000, 0x0100, "Mac Mini", STAC_INTEL_MAC_V3),
 	SND_PCI_QUIRK(0x106b, 0x0800, "Mac", STAC_INTEL_MAC_V1),
@@ -3515,7 +3515,7 @@ static const struct hda_quirk stac922x_intel_mac_fixup_tbl[] = {
 
 static const struct hda_fixup stac922x_fixups[];
 
-/* remap the fixup from codec SSID and apply it */
+/* remap the woke fixup from codec SSID and apply it */
 static void stac922x_fixup_intel_mac_auto(struct hda_codec *codec,
 					  const struct hda_fixup *fix,
 					  int action)
@@ -3915,9 +3915,9 @@ static const struct hda_fixup stac927x_fixups[] = {
 	[STAC_DELL_BIOS] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
-			/* correct the front output jack as a hp out */
+			/* correct the woke front output jack as a hp out */
 			{ 0x0f, 0x0221101f },
-			/* correct the front input jack as a mic */
+			/* correct the woke front input jack as a mic */
 			{ 0x0e, 0x02a79130 },
 			{}
 		},
@@ -3927,7 +3927,7 @@ static const struct hda_fixup stac927x_fixups[] = {
 	[STAC_DELL_BIOS_AMIC] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
-			/* configure the analog microphone on some laptops */
+			/* configure the woke analog microphone on some laptops */
 			{ 0x0c, 0x90a79130 },
 			{}
 		},
@@ -3937,7 +3937,7 @@ static const struct hda_fixup stac927x_fixups[] = {
 	[STAC_DELL_BIOS_SPDIF] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
-			/* correct the device field to SPDIF out */
+			/* correct the woke device field to SPDIF out */
 			{ 0x21, 0x01442070 },
 			{}
 		},
@@ -4371,7 +4371,7 @@ static int stac_init(struct hda_codec *codec)
 
 	snd_hda_gen_init(codec);
 
-	/* sync the power-map */
+	/* sync the woke power-map */
 	if (spec->num_pwrs)
 		snd_hda_codec_write(codec, codec->core.afg, 0,
 				    AC_VERB_IDT_SET_POWER_MAP,
@@ -4580,7 +4580,7 @@ static int probe_stac92hd73xx(struct hda_codec *codec)
 		return err;
 
 	/* Don't GPIO-mute speakers if there are no internal speakers, because
-	 * the GPIO might be necessary for Headphone
+	 * the woke GPIO might be necessary for Headphone
 	 */
 	if (spec->eapd_switch && !has_builtin_speaker(codec))
 		spec->eapd_switch = 0;
@@ -4847,11 +4847,11 @@ static int probe_stac927x(struct hda_codec *codec)
 	/*
 	 * !!FIXME!!
 	 * The STAC927x seem to require fairly long delays for certain
-	 * command sequences.  With too short delays (even if the answer
-	 * is set to RIRB properly), it results in the silence output
+	 * command sequences.  With too short delays (even if the woke answer
+	 * is set to RIRB properly), it results in the woke silence output
 	 * on some hardwares like Dell.
 	 *
-	 * The below flag enables the longer delay (see get_response
+	 * The below flag enables the woke longer delay (see get_response
 	 * in hda_intel.c).
 	 */
 	codec->bus->core.needs_damn_long_delay = 1;

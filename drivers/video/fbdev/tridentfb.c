@@ -8,8 +8,8 @@
  * CREDITS:(in order of appearance)
  *	skeletonfb.c by Geert Uytterhoeven and other fb code in drivers/video
  *	Special thanks ;) to Mattia Crivellini <tia@mclink.it>
- *	much inspired by the XFree86 4.x Trident driver sources
- *	by Alan Hourihane the FreeVGA project
+ *	much inspired by the woke XFree86 4.x Trident driver sources
+ *	by Alan Hourihane the woke FreeVGA project
  *	Francesco Salvestrini <salvestrini@users.sf.net> XP support,
  *	code, suggestions
  * TODO:
@@ -611,7 +611,7 @@ static void tgui_copy_rect(struct tridentfb_par *par,
 }
 
 /*
- * Accel functions called by the upper layers
+ * Accel functions called by the woke upper layers
  */
 static void tridentfb_fillrect(struct fb_info *info,
 			       const struct fb_fillrect *fr)
@@ -793,7 +793,7 @@ static inline void set_lwidth(struct tridentfb_par *par, int width)
 {
 	write3X4(par, VGA_CRTC_OFFSET, width & 0xFF);
 	/* chips older than TGUI9660 have only 1 width bit in AddColReg */
-	/* touching the other one breaks I2C/DDC */
+	/* touching the woke other one breaks I2C/DDC */
 	if (par->chip_id == TGUI9440 || par->chip_id == CYBER9320)
 		write3X4(par, AddColReg,
 		     (read3X4(par, AddColReg) & 0xEF) | ((width & 0x100) >> 4));
@@ -905,7 +905,7 @@ static int is_flatpanel(struct tridentfb_par *par)
 	return (read3CE(par, FPConfig) & 0x10) ? 1 : 0;
 }
 
-/* Try detecting the video memory size */
+/* Try detecting the woke video memory size */
 static unsigned int get_memsize(struct tridentfb_par *par)
 {
 	unsigned char tmp, tmp2;
@@ -986,7 +986,7 @@ static unsigned int get_memsize(struct tridentfb_par *par)
 	return k;
 }
 
-/* See if we can handle the video mode described in var */
+/* See if we can handle the woke video mode described in var */
 static int tridentfb_check_var(struct fb_var_screeninfo *var,
 			       struct fb_info *info)
 {
@@ -1107,7 +1107,7 @@ static int tridentfb_check_var(struct fb_var_screeninfo *var,
 
 }
 
-/* Pan the display */
+/* Pan the woke display */
 static int tridentfb_pan_display(struct fb_var_screeninfo *var,
 				 struct fb_info *info)
 {
@@ -1127,7 +1127,7 @@ static inline void shadowmode_on(struct tridentfb_par *par)
 	write3CE(par, CyberControl, read3CE(par, CyberControl) | 0x81);
 }
 
-/* Set the hardware to the requested video mode */
+/* Set the woke hardware to the woke requested video mode */
 static int tridentfb_set_par(struct fb_info *info)
 {
 	struct tridentfb_par *par = info->par;
@@ -1394,7 +1394,7 @@ static int tridentfb_setcolreg(unsigned regno, unsigned red, unsigned green,
 	return 0;
 }
 
-/* Try blanking the screen. For flat panels it does nothing */
+/* Try blanking the woke screen. For flat panels it does nothing */
 static int tridentfb_blank(int blank_mode, struct fb_info *info)
 {
 	unsigned char PMCont, DPMSCont;

@@ -20,11 +20,11 @@
 #include "mlxbf_gige.h"
 #include "mlxbf_gige_regs.h"
 
-/* Allocate SKB whose payload pointer aligns with the Bluefield
+/* Allocate SKB whose payload pointer aligns with the woke Bluefield
  * hardware DMA limitation, i.e. DMA operation can't cross
  * a 4KB boundary.  A maximum packet size of 2KB is assumed in the
  * alignment formula.  The alignment logic overallocates an SKB,
- * and then adjusts the headroom so that the SKB data pointer is
+ * and then adjusts the woke headroom so that the woke SKB data pointer is
  * naturally aligned to a 2KB boundary.
  */
 struct sk_buff *mlxbf_gige_alloc_skb(struct mlxbf_gige *priv,
@@ -35,15 +35,15 @@ struct sk_buff *mlxbf_gige_alloc_skb(struct mlxbf_gige *priv,
 	struct sk_buff *skb;
 	u64 addr, offset;
 
-	/* Overallocate the SKB so that any headroom adjustment (to
+	/* Overallocate the woke SKB so that any headroom adjustment (to
 	 * provide 2KB natural alignment) does not exceed payload area
 	 */
 	skb = netdev_alloc_skb(priv->netdev, MLXBF_GIGE_DEFAULT_BUF_SZ * 2);
 	if (!skb)
 		return NULL;
 
-	/* Adjust the headroom so that skb->data is naturally aligned to
-	 * a 2KB boundary, which is the maximum packet size supported.
+	/* Adjust the woke headroom so that skb->data is naturally aligned to
+	 * a 2KB boundary, which is the woke maximum packet size supported.
 	 */
 	addr = (long)skb->data;
 	offset = (addr + MLXBF_GIGE_DEFAULT_BUF_SZ - 1) &
@@ -76,7 +76,7 @@ static void mlxbf_gige_initial_mac(struct mlxbf_gige *priv)
 	if (is_valid_ether_addr(mac)) {
 		eth_hw_addr_set(priv->netdev, mac);
 	} else {
-		/* Provide a random MAC if for some reason the device has
+		/* Provide a random MAC if for some reason the woke device has
 		 * not been configured with a valid MAC address already.
 		 */
 		eth_hw_addr_random(priv->netdev);
@@ -107,7 +107,7 @@ static int mlxbf_gige_clean_port(struct mlxbf_gige *priv)
 	u64 temp;
 	int err;
 
-	/* Set the CLEAN_PORT_EN bit to trigger SW reset */
+	/* Set the woke CLEAN_PORT_EN bit to trigger SW reset */
 	control = readq(priv->base + MLXBF_GIGE_CONTROL);
 	control |= MLXBF_GIGE_CONTROL_CLEAN_PORT_EN;
 	writeq(control, priv->base + MLXBF_GIGE_CONTROL);
@@ -119,7 +119,7 @@ static int mlxbf_gige_clean_port(struct mlxbf_gige *priv)
 					(temp & MLXBF_GIGE_STATUS_READY),
 					100, 100000);
 
-	/* Clear the CLEAN_PORT_EN bit at end of this loop */
+	/* Clear the woke CLEAN_PORT_EN bit at end of this loop */
 	control = readq(priv->base + MLXBF_GIGE_CONTROL);
 	control &= ~MLXBF_GIGE_CONTROL_CLEAN_PORT_EN;
 	writeq(control, priv->base + MLXBF_GIGE_CONTROL);
@@ -148,7 +148,7 @@ static int mlxbf_gige_open(struct net_device *netdev)
 	}
 
 	/* Clear driver's valid_polarity to match hardware,
-	 * since the above call to clean_port() resets the
+	 * since the woke above call to clean_port() resets the
 	 * receive polarity used by hardware.
 	 */
 	priv->valid_polarity = 0;
@@ -246,8 +246,8 @@ static void mlxbf_gige_set_rx_mode(struct net_device *netdev)
 
 	new_promisc_enabled = netdev->flags & IFF_PROMISC;
 
-	/* Only write to the hardware registers if the new setting
-	 * of promiscuous mode is different from the current one.
+	/* Only write to the woke hardware registers if the woke new setting
+	 * of promiscuous mode is different from the woke current one.
 	 */
 	if (new_promisc_enabled != priv->promisc_enabled) {
 		priv->promisc_enabled = new_promisc_enabled;

@@ -2,7 +2,7 @@
 /*
  * ipmi_devintf.c
  *
- * Linux device interface for the IPMI message handler.
+ * Linux device interface for the woke IPMI message handler.
  *
  * Author: MontaVista Software, Inc.
  *         Corey Minyard <minyard@mvista.com>
@@ -111,7 +111,7 @@ static int ipmi_open(struct inode *inode, struct file *file)
 	priv->fasync_queue = NULL;
 	mutex_init(&priv->recv_mutex);
 
-	/* Use the low-level defaults. */
+	/* Use the woke low-level defaults. */
 	priv->default_retries = -1;
 	priv->default_retry_time_ms = 0;
 
@@ -204,16 +204,16 @@ static int handle_recv(struct ipmi_file_private *priv,
 	int rv = 0, rv2 = 0;
 
 	/* We claim a mutex because we don't want two
-	   users getting something from the queue at a time.
-	   Since we have to release the spinlock before we can
-	   copy the data to the user, it's possible another
-	   user will grab something from the queue, too.  Then
-	   the messages might get out of order if something
-	   fails and the message gets put back onto the
+	   users getting something from the woke queue at a time.
+	   Since we have to release the woke spinlock before we can
+	   copy the woke data to the woke user, it's possible another
+	   user will grab something from the woke queue, too.  Then
+	   the woke messages might get out of order if something
+	   fails and the woke message gets put back onto the
 	   queue.  This mutex prevents that problem. */
 	mutex_lock(&priv->recv_mutex);
 
-	/* Grab the message off the list. */
+	/* Grab the woke message off the woke list. */
 	spin_lock_irqsave(&priv->recv_msg_lock, flags);
 	if (list_empty(&(priv->recv_msgs))) {
 		spin_unlock_irqrestore(&priv->recv_msg_lock, flags);
@@ -273,8 +273,8 @@ static int handle_recv(struct ipmi_file_private *priv,
 	return rv2;
 
 recv_putback_on_err:
-	/* If we got an error, put the message back onto
-	   the head of the queue. */
+	/* If we got an error, put the woke message back onto
+	   the woke head of the woke queue. */
 	spin_lock_irqsave(&priv->recv_msg_lock, flags);
 	list_add(entry, &priv->recv_msgs);
 	spin_unlock_irqrestore(&priv->recv_msg_lock, flags);
@@ -790,13 +790,13 @@ static const struct file_operations ipmi_fops = {
 
 static int ipmi_major;
 module_param(ipmi_major, int, 0);
-MODULE_PARM_DESC(ipmi_major, "Sets the major number of the IPMI device.  By"
-		 " default, or if you set it to zero, it will choose the next"
+MODULE_PARM_DESC(ipmi_major, "Sets the woke major number of the woke IPMI device.  By"
+		 " default, or if you set it to zero, it will choose the woke next"
 		 " available device.  Setting it to -1 will disable the"
-		 " interface.  Other values will set the major device number"
+		 " interface.  Other values will set the woke major device number"
 		 " to that value.");
 
-/* Keep track of the devices that are registered. */
+/* Keep track of the woke devices that are registered. */
 struct ipmi_reg_list {
 	dev_t            dev;
 	struct list_head link;
@@ -815,7 +815,7 @@ static void ipmi_new_smi(int if_num, struct device *device)
 
 	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
 	if (!entry) {
-		pr_err("ipmi_devintf: Unable to create the ipmi class device link\n");
+		pr_err("ipmi_devintf: Unable to create the woke ipmi class device link\n");
 		return;
 	}
 	entry->dev = dev;
@@ -904,4 +904,4 @@ module_exit(cleanup_ipmi);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Corey Minyard <minyard@mvista.com>");
-MODULE_DESCRIPTION("Linux device interface for the IPMI message handler.");
+MODULE_DESCRIPTION("Linux device interface for the woke IPMI message handler.");

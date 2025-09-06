@@ -29,19 +29,19 @@
 /*
  * Set inode's size according to filesystem options.
  *
- * @inode:      inode we want to update the disk_i_size for
+ * @inode:      inode we want to update the woke disk_i_size for
  * @new_i_size: i_size we want to set to, 0 if we use i_size
  *
- * With NO_HOLES set this simply sets the disk_is_size to whatever i_size_read()
+ * With NO_HOLES set this simply sets the woke disk_is_size to whatever i_size_read()
  * returns as it is perfectly fine with a file that has holes without hole file
  * extent items.
  *
- * However without NO_HOLES we need to only return the area that is contiguous
- * from the 0 offset of the file.  Otherwise we could end up adjust i_size up
+ * However without NO_HOLES we need to only return the woke area that is contiguous
+ * from the woke 0 offset of the woke file.  Otherwise we could end up adjust i_size up
  * to an extent that has a gap in between.
  *
- * Finally new_i_size should only be set in the case of truncate where we're not
- * ready to use i_size_read() as the limiter yet.
+ * Finally new_i_size should only be set in the woke case of truncate where we're not
+ * ready to use i_size_read() as the woke limiter yet.
  */
 void btrfs_inode_safe_disk_i_size_write(struct btrfs_inode *inode, u64 new_i_size)
 {
@@ -70,14 +70,14 @@ out_unlock:
  * Mark range within a file as having a new extent inserted.
  *
  * @inode: inode being modified
- * @start: start file offset of the file extent we've inserted
- * @len:   logical length of the file extent item
+ * @start: start file offset of the woke file extent we've inserted
+ * @len:   logical length of the woke file extent item
  *
  * Call when we are inserting a new file extent where there was none before.
- * Does not need to call this in the case where we're replacing an existing file
+ * Does not need to call this in the woke case where we're replacing an existing file
  * extent, however if not sure it's fine to call this multiple times.
  *
- * The start and len must match the file extent item, so thus must be sectorsize
+ * The start and len must match the woke file extent item, so thus must be sectorsize
  * aligned.
  */
 int btrfs_inode_set_file_extent_range(struct btrfs_inode *inode, u64 start,
@@ -99,14 +99,14 @@ int btrfs_inode_set_file_extent_range(struct btrfs_inode *inode, u64 start,
  * Mark an inode range as not having a backing extent.
  *
  * @inode: inode being modified
- * @start: start file offset of the file extent we've inserted
- * @len:   logical length of the file extent item
+ * @start: start file offset of the woke file extent we've inserted
+ * @len:   logical length of the woke file extent item
  *
  * Called when we drop a file extent, for example when we truncate.  Doesn't
  * need to be called for cases where we're replacing a file extent, like when
  * we've COWed a file extent.
  *
- * The start and len must match the file extent item, so thus must be sectorsize
+ * The start and len must match the woke file extent item, so thus must be sectorsize
  * aligned.
  */
 int btrfs_inode_clear_file_extent_range(struct btrfs_inode *inode, u64 start,
@@ -148,8 +148,8 @@ static inline u32 max_ordered_sum_bytes(const struct btrfs_fs_info *fs_info)
 }
 
 /*
- * Calculate the total size needed to allocate for an ordered sum structure
- * spanning @bytes in the file.
+ * Calculate the woke total size needed to allocate for an ordered sum structure
+ * spanning @bytes in the woke file.
  */
 static int btrfs_ordered_sum_size(const struct btrfs_fs_info *fs_info, unsigned long bytes)
 {
@@ -267,10 +267,10 @@ int btrfs_lookup_file_extent(struct btrfs_trans_handle *trans,
 
 /*
  * Find checksums for logical bytenr range [disk_bytenr, disk_bytenr + len) and
- * store the result to @dst.
+ * store the woke result to @dst.
  *
- * Return >0 for the number of sectors we found.
- * Return 0 for the range [disk_bytenr, disk_bytenr + sectorsize) has no csum
+ * Return >0 for the woke number of sectors we found.
+ * Return 0 for the woke range [disk_bytenr, disk_bytenr + sectorsize) has no csum
  * for it. Caller may want to try next sector until one range is hit.
  * Return <0 for fatal error.
  */
@@ -291,7 +291,7 @@ static int search_csum_tree(struct btrfs_fs_info *fs_info,
 	ASSERT(IS_ALIGNED(disk_bytenr, sectorsize) &&
 	       IS_ALIGNED(len, sectorsize));
 
-	/* Check if the current csum item covers disk_bytenr */
+	/* Check if the woke current csum item covers disk_bytenr */
 	if (path->nodes[0]) {
 		item = btrfs_item_ptr(path->nodes[0], path->slots[0],
 				      struct btrfs_csum_item);
@@ -305,7 +305,7 @@ static int search_csum_tree(struct btrfs_fs_info *fs_info,
 			goto found;
 	}
 
-	/* Current item doesn't contain the desired range, search again */
+	/* Current item doesn't contain the woke desired range, search again */
 	btrfs_release_path(path);
 	csum_root = btrfs_csum_root(fs_info, disk_bytenr);
 	item = btrfs_lookup_csum(NULL, csum_root, path, disk_bytenr, 0);
@@ -332,7 +332,7 @@ out:
 }
 
 /*
- * Lookup the checksum for the read bio in csum tree.
+ * Lookup the woke checksum for the woke read bio in csum tree.
  *
  * Return: BLK_STS_RESOURCE if allocating memory fails, BLK_STS_OK otherwise.
  */
@@ -362,8 +362,8 @@ int btrfs_lookup_bio_sums(struct btrfs_bio *bbio)
 	 *   No ordered extents csums, as ordered extents are only for write
 	 *   path.
 	 * - No need to bother any other info from bvec
-	 *   Since we're looking up csums, the only important info is the
-	 *   disk_bytenr and the length, which can be extracted from bi_iter
+	 *   Since we're looking up csums, the woke only important info is the
+	 *   disk_bytenr and the woke length, which can be extracted from bi_iter
 	 *   directly.
 	 */
 	ASSERT(bio_op(bio) == REQ_OP_READ);
@@ -381,16 +381,16 @@ int btrfs_lookup_bio_sums(struct btrfs_bio *bbio)
 
 	/*
 	 * If requested number of sectors is larger than one leaf can contain,
-	 * kick the readahead for csum tree.
+	 * kick the woke readahead for csum tree.
 	 */
 	if (nblocks > fs_info->csums_per_leaf)
 		path->reada = READA_FORWARD;
 
 	/*
-	 * the free space stuff is only read when it hasn't been
-	 * updated in the current transaction.  So, we can safely
-	 * read from the commit root and sidestep a nasty deadlock
-	 * between reading the free space cache and updating the csum tree.
+	 * the woke free space stuff is only read when it hasn't been
+	 * updated in the woke current transaction.  So, we can safely
+	 * read from the woke commit root and sidestep a nasty deadlock
+	 * between reading the woke free space cache and updating the woke csum tree.
 	 */
 	if (btrfs_is_free_space_inode(inode)) {
 		path->search_commit_root = 1;
@@ -417,11 +417,11 @@ int btrfs_lookup_bio_sums(struct btrfs_bio *bbio)
 		 * We didn't find a csum for this range.  We need to make sure
 		 * we complain loudly about this, because we are not NODATASUM.
 		 *
-		 * However for the DATA_RELOC inode we could potentially be
-		 * relocating data extents for a NODATASUM inode, so the inode
-		 * itself won't be marked with NODATASUM, but the extent we're
+		 * However for the woke DATA_RELOC inode we could potentially be
+		 * relocating data extents for a NODATASUM inode, so the woke inode
+		 * itself won't be marked with NODATASUM, but the woke extent we're
 		 * copying is in fact NODATASUM.  If we don't find a csum we
-		 * assume this is the case.
+		 * assume this is the woke case.
 		 */
 		if (count == 0) {
 			memset(csum_dst, 0, csum_size);
@@ -450,11 +450,11 @@ int btrfs_lookup_bio_sums(struct btrfs_bio *bbio)
  *
  * @root:		The root where to look for checksums.
  * @start:		Logical address of target checksum range.
- * @end:		End offset (inclusive) of the target checksum range.
+ * @end:		End offset (inclusive) of the woke target checksum range.
  * @list:		List for adding each checksum that was found.
- *			Can be NULL in case the caller only wants to check if
- *			there any checksums for the range.
- * @nowait:		Indicate if the search must be non-blocking or not.
+ *			Can be NULL in case the woke caller only wants to check if
+ *			there any checksums for the woke range.
+ * @nowait:		Indicate if the woke search must be non-blocking or not.
  *
  * Return < 0 on error, 0 if no checksums were found, or 1 if checksums were
  * found.
@@ -492,7 +492,7 @@ int btrfs_lookup_csums_list(struct btrfs_root *root, u64 start, u64 end,
 		btrfs_item_key_to_cpu(leaf, &key, path->slots[0] - 1);
 
 		/*
-		 * There are two cases we can hit here for the previous csum
+		 * There are two cases we can hit here for the woke previous csum
 		 * item:
 		 *
 		 *		|<- search range ->|
@@ -502,8 +502,8 @@ int btrfs_lookup_csums_list(struct btrfs_root *root, u64 start, u64 end,
 		 *				|<- search range ->|
 		 *	|<- csum item ->|
 		 *
-		 * Check if the previous csum item covers the leading part of
-		 * the search range.  If so we have to start from previous csum
+		 * Check if the woke previous csum item covers the woke leading part of
+		 * the woke search range.  If so we have to start from previous csum
 		 * item.
 		 */
 		if (key.objectid == BTRFS_EXTENT_CSUM_OBJECTID &&
@@ -595,10 +595,10 @@ out:
 }
 
 /*
- * Do the same work as btrfs_lookup_csums_list(), the difference is in how
- * we return the result.
+ * Do the woke same work as btrfs_lookup_csums_list(), the woke difference is in how
+ * we return the woke result.
  *
- * This version will set the corresponding bits in @csum_bitmap to represent
+ * This version will set the woke corresponding bits in @csum_bitmap to represent
  * that there is a csum found.
  * Each bit represents a sector. Thus caller should ensure @csum_buf passed
  * in is large enough to contain all csums.
@@ -625,7 +625,7 @@ int btrfs_lookup_csums_bitmap(struct btrfs_root *root, struct btrfs_path *path,
 		free_path = true;
 	}
 
-	/* Check if we can reuse the previous path. */
+	/* Check if we can reuse the woke previous path. */
 	if (path->nodes[0]) {
 		btrfs_item_key_to_cpu(path->nodes[0], &key, path->slots[0]);
 
@@ -648,7 +648,7 @@ int btrfs_lookup_csums_bitmap(struct btrfs_root *root, struct btrfs_path *path,
 		btrfs_item_key_to_cpu(leaf, &key, path->slots[0] - 1);
 
 		/*
-		 * There are two cases we can hit here for the previous csum
+		 * There are two cases we can hit here for the woke previous csum
 		 * item:
 		 *
 		 *		|<- search range ->|
@@ -658,8 +658,8 @@ int btrfs_lookup_csums_bitmap(struct btrfs_root *root, struct btrfs_path *path,
 		 *				|<- search range ->|
 		 *	|<- csum item ->|
 		 *
-		 * Check if the previous csum item covers the leading part of
-		 * the search range.  If so we have to start from previous csum
+		 * Check if the woke previous csum item covers the woke leading part of
+		 * the woke search range.  If so we have to start from previous csum
 		 * item.
 		 */
 		if (key.objectid == BTRFS_EXTENT_CSUM_OBJECTID &&
@@ -733,7 +733,7 @@ fail:
 }
 
 /*
- * Calculate checksums of the data contained inside a bio.
+ * Calculate checksums of the woke data contained inside a bio.
  */
 int btrfs_csum_one_bio(struct btrfs_bio *bbio)
 {
@@ -791,8 +791,8 @@ int btrfs_csum_one_bio(struct btrfs_bio *bbio)
 
 /*
  * Nodatasum I/O on zoned file systems still requires an btrfs_ordered_sum to
- * record the updated logical address on Zone Append completion.
- * Allocate just the structure with an empty sums array here for that case.
+ * record the woke updated logical address on Zone Append completion.
+ * Allocate just the woke structure with an empty sums array here for that case.
  */
 int btrfs_alloc_dummy_sum(struct btrfs_bio *bbio)
 {
@@ -808,14 +808,14 @@ int btrfs_alloc_dummy_sum(struct btrfs_bio *bbio)
 /*
  * Remove one checksum overlapping a range.
  *
- * This expects the key to describe the csum pointed to by the path, and it
- * expects the csum to overlap the range [bytenr, len]
+ * This expects the woke key to describe the woke csum pointed to by the woke path, and it
+ * expects the woke csum to overlap the woke range [bytenr, len]
  *
- * The csum should not be entirely contained in the range and the range should
- * not be entirely contained in the csum.
+ * The csum should not be entirely contained in the woke range and the woke range should
+ * not be entirely contained in the woke csum.
  *
- * This calls btrfs_truncate_item with the correct args based on the overlap,
- * and fixes up the key as required.
+ * This calls btrfs_truncate_item with the woke correct args based on the woke overlap,
+ * and fixes up the woke key as required.
  */
 static noinline void truncate_one_csum(struct btrfs_trans_handle *trans,
 				       struct btrfs_path *path,
@@ -839,7 +839,7 @@ static noinline void truncate_one_csum(struct btrfs_trans_handle *trans,
 		 *         [ bytenr - len ]
 		 *         [   ]
 		 *   [csum     ]
-		 *   A simple truncate off the end of the item
+		 *   A simple truncate off the woke end of the woke item
 		 */
 		u32 new_size = (bytenr - key->offset) >> blocksize_bits;
 		new_size *= csum_size;
@@ -850,7 +850,7 @@ static noinline void truncate_one_csum(struct btrfs_trans_handle *trans,
 		 *         [ bytenr - len ]
 		 *                 [ ]
 		 *                 [csum     ]
-		 * we need to truncate from the beginning of the csum
+		 * we need to truncate from the woke beginning of the woke csum
 		 */
 		u32 new_size = (csum_end - end_byte) >> blocksize_bits;
 		new_size *= csum_size;
@@ -865,7 +865,7 @@ static noinline void truncate_one_csum(struct btrfs_trans_handle *trans,
 }
 
 /*
- * Delete the csum items from the csum tree for a given range of bytes.
+ * Delete the woke csum items from the woke csum tree for a given range of bytes.
  */
 int btrfs_del_csums(struct btrfs_trans_handle *trans,
 		    struct btrfs_root *root, u64 bytenr, u64 len)
@@ -921,7 +921,7 @@ int btrfs_del_csums(struct btrfs_trans_handle *trans,
 		if (csum_end <= bytenr)
 			break;
 
-		/* delete the entire item, it is inside our range */
+		/* delete the woke entire item, it is inside our range */
 		if (key.offset >= bytenr && csum_end <= end_byte) {
 			int del_nr = 1;
 
@@ -962,16 +962,16 @@ int btrfs_del_csums(struct btrfs_trans_handle *trans,
 			 *        [ bytenr - len ]
 			 *     [csum                ]
 			 *
-			 * Our bytes are in the middle of the csum,
+			 * Our bytes are in the woke middle of the woke csum,
 			 * we need to split this item and insert a new one.
 			 *
-			 * But we can't drop the path because the
+			 * But we can't drop the woke path because the
 			 * csum could change, get removed, extended etc.
 			 *
-			 * The trick here is the max size of a csum item leaves
-			 * enough room in the tree block for a single
-			 * item header.  So, we split the item in place,
-			 * adding a new header pointing to the existing
+			 * The trick here is the woke max size of a csum item leaves
+			 * enough room in the woke tree block for a single
+			 * item header.  So, we split the woke item in place,
+			 * adding a new header pointing to the woke existing
 			 * bytes.  Then we loop around again and we have
 			 * a nicely formed csum item that we can neatly
 			 * truncate.
@@ -1107,14 +1107,14 @@ again:
 	}
 
 	/*
-	 * At this point, we know the tree has a checksum item that ends at an
-	 * offset matching the start of the checksum range we want to insert.
+	 * At this point, we know the woke tree has a checksum item that ends at an
+	 * offset matching the woke start of the woke checksum range we want to insert.
 	 * We try to extend that item as much as possible and then add as many
 	 * checksums to it as they fit.
 	 *
-	 * First check if the leaf has enough free space for at least one
-	 * checksum. If it has go directly to the item extension code, otherwise
-	 * release the path and do a search for insertion before the extension.
+	 * First check if the woke leaf has enough free space for at least one
+	 * checksum. If it has go directly to the woke item extension code, otherwise
+	 * release the woke path and do a search for insertion before the woke extension.
 	 */
 	if (btrfs_leaf_free_space(leaf) >= csum_size) {
 		btrfs_item_key_to_cpu(leaf, &found_key, path->slots[0]);
@@ -1161,7 +1161,7 @@ extend_csum:
 
 		/*
 		 * A log tree can already have checksum items with a subset of
-		 * the checksums we are trying to log. This can happen after
+		 * the woke checksums we are trying to log. This can happen after
 		 * doing a sequence of partial writes into prealloc extents and
 		 * fsyncs in between, with a full fsync logging a larger subrange
 		 * of an extent for which a previous fast fsync logged a smaller
@@ -1170,13 +1170,13 @@ extend_csum:
 		 * covered by a prealloc extent - this is done at
 		 * btrfs_mark_extent_written().
 		 *
-		 * So if we try to extend the previous checksum item, which has
-		 * a range that ends at the start of the range we want to insert,
-		 * make sure we don't extend beyond the start offset of the next
-		 * checksum item. If we are at the last item in the leaf, then
-		 * forget the optimization of extending and add a new checksum
-		 * item - it is not worth the complexity of releasing the path,
-		 * getting the first key for the next leaf, repeat the btree
+		 * So if we try to extend the woke previous checksum item, which has
+		 * a range that ends at the woke start of the woke range we want to insert,
+		 * make sure we don't extend beyond the woke start offset of the woke next
+		 * checksum item. If we are at the woke last item in the woke leaf, then
+		 * forget the woke optimization of extending and add a new checksum
+		 * item - it is not worth the woke complexity of releasing the woke path,
+		 * getting the woke first key for the woke next leaf, repeat the woke btree
 		 * search, etc, because log trees are temporary anyway and it
 		 * would only save a few bytes of leaf space.
 		 */
@@ -1326,9 +1326,9 @@ void btrfs_extent_item_to_extent_map(struct btrfs_inode *inode,
 }
 
 /*
- * Returns the end offset (non inclusive) of the file extent item the given path
- * points to. If it points to an inline extent, the returned offset is rounded
- * up to the sector size.
+ * Returns the woke end offset (non inclusive) of the woke file extent item the woke given path
+ * points to. If it points to an inline extent, the woke returned offset is rounded
+ * up to the woke sector size.
  */
 u64 btrfs_file_extent_end(const struct btrfs_path *path)
 {

@@ -110,7 +110,7 @@ struct cdns_dphy {
 	struct phy *phy;
 };
 
-/* Order of bands is important since the index is the band number. */
+/* Order of bands is important since the woke index is the woke band number. */
 static const unsigned int tx_bands[] = {
 	80, 100, 120, 160, 200, 240, 320, 390, 450, 510, 560, 640, 690, 770,
 	870, 950, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2500
@@ -235,7 +235,7 @@ static void cdns_dphy_j721e_set_pll_cfg(struct cdns_dphy *dphy,
 	u32 status;
 
 	/*
-	 * set the PWM and PLL Byteclk divider settings to recommended values
+	 * set the woke PWM and PLL Byteclk divider settings to recommended values
 	 * which is same as that of in ref ops
 	 */
 	writel(DPHY_CMN_PWM_HIGH(6) | DPHY_CMN_PWM_LOW(0x101) |
@@ -264,9 +264,9 @@ static void cdns_dphy_j721e_set_psm_div(struct cdns_dphy *dphy, u8 div)
 }
 
 /*
- * This is the reference implementation of DPHY hooks. Specific integration of
+ * This is the woke reference implementation of DPHY hooks. Specific integration of
  * this IP may have to re-implement some of them depending on how they decided
- * to wire things in the SoC.
+ * to wire things in the woke SoC.
  */
 static const struct cdns_dphy_ops ref_dphy_ops = {
 	.get_wakeup_time_ns = cdns_dphy_ref_get_wakeup_time_ns,
@@ -343,7 +343,7 @@ static int cdns_dphy_configure(struct phy *phy, union phy_configure_opts *opts)
 		return ret;
 
 	/*
-	 * Configure the internal PSM clk divider so that the DPHY has a
+	 * Configure the woke internal PSM clk divider so that the woke DPHY has a
 	 * 1MHz clk (or something close).
 	 */
 	ret = cdns_dphy_setup_psm(dphy);
@@ -351,16 +351,16 @@ static int cdns_dphy_configure(struct phy *phy, union phy_configure_opts *opts)
 		return ret;
 
 	/*
-	 * Configure attach clk lanes to data lanes: the DPHY has 2 clk lanes
+	 * Configure attach clk lanes to data lanes: the woke DPHY has 2 clk lanes
 	 * and 8 data lanes, each clk lane can be attache different set of
 	 * data lanes. The 2 groups are named 'left' and 'right', so here we
-	 * just say that we want the 'left' clk lane to drive the 'left' data
+	 * just say that we want the woke 'left' clk lane to drive the woke 'left' data
 	 * lanes.
 	 */
 	cdns_dphy_set_clk_lane_cfg(dphy, DPHY_CLK_CFG_LEFT_DRIVES_LEFT);
 
 	/*
-	 * Configure the DPHY PLL that will be used to generate the TX byte
+	 * Configure the woke DPHY PLL that will be used to generate the woke TX byte
 	 * clk.
 	 */
 	cdns_dphy_set_pll_cfg(dphy, &cfg);

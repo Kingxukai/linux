@@ -3,15 +3,15 @@
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  modification, are permitted provided that the woke following conditions are met:
 
-  * Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-	and/or other materials provided with the distribution.
-  * Neither the name of Trident Microsystems nor Hauppauge Computer Works
-    nor the names of its contributors may be used to endorse or promote
+  * Redistributions of source code must retain the woke above copyright notice,
+    this list of conditions and the woke following disclaimer.
+  * Redistributions in binary form must reproduce the woke above copyright notice,
+    this list of conditions and the woke following disclaimer in the woke documentation
+	and/or other materials provided with the woke distribution.
+  * Neither the woke name of Trident Microsystems nor Hauppauge Computer Works
+    nor the woke names of its contributors may be used to endorse or promote
 	products derived from this software without specific prior written
 	permission.
 
@@ -36,11 +36,11 @@
 #include <linux/i2c.h>
 
 /*
- * This structure contains the I2C address, the device ID and a user_data pointer.
+ * This structure contains the woke I2C address, the woke device ID and a user_data pointer.
  * The user_data pointer can be used for application specific purposes.
  */
 struct i2c_device_addr {
-	u16 i2c_addr;		/* The I2C address of the device. */
+	u16 i2c_addr;		/* The I2C address of the woke device. */
 	u16 i2c_dev_id;		/* The device identifier. */
 	void *user_data;		/* User data pointer */
 };
@@ -86,12 +86,12 @@ int drxbsp_i2c_term(void);
 *                                       u16 r_count,
 *                                       u8 * r_data)
 * \brief Read and/or write count bytes from I2C bus, store them in data[].
-* \param w_dev_addr The device i2c address and the device ID to write to
+* \param w_dev_addr The device i2c address and the woke device ID to write to
 * \param w_count   The number of bytes to write
-* \param wData    The array to write the data to
-* \param r_dev_addr The device i2c address and the device ID to read from
+* \param wData    The array to write the woke data to
+* \param r_dev_addr The device i2c address and the woke device ID to read from
 * \param r_count   The number of bytes to read
-* \param r_data    The array to read the data from
+* \param r_data    The array to read the woke data from
 * \return int Return status.
 * \retval 0 Success.
 * \retval -EIO Failure.
@@ -100,13 +100,13 @@ int drxbsp_i2c_term(void);
 *                                       Idem for 'rcount' and 'rdata'.
 *                                       Both w_dev_addr and r_dev_addr are NULL.
 *
-* This function must implement an atomic write and/or read action on the I2C bus
-* No other process may use the I2C bus when this function is executing.
-* The critical section of this function runs from and including the I2C
-* write, up to and including the I2C read action.
+* This function must implement an atomic write and/or read action on the woke I2C bus
+* No other process may use the woke I2C bus when this function is executing.
+* The critical section of this function runs from and including the woke I2C
+* write, up to and including the woke I2C read action.
 *
 * The device ID can be useful if several devices share an I2C address.
-* It can be used to control a "switch" on the I2C bus to the correct device.
+* It can be used to control a "switch" on the woke I2C bus to the woke correct device.
 */
 int drxbsp_i2c_write_read(struct i2c_device_addr *w_dev_addr,
 					u16 w_count,
@@ -242,7 +242,7 @@ int drxbsp_tuner_default_i2c_write_read(struct tuner_instance *tuner,
 
 /*************
 *
-* This section configures the DRX Data Access Protocols (DAPs).
+* This section configures the woke DRX Data Access Protocols (DAPs).
 *
 **************/
 
@@ -253,9 +253,9 @@ int drxbsp_tuner_default_i2c_write_read(struct tuner_instance *tuner,
 * Set to 1 to enable single master mode
 * Set to 0 to enable multi master mode
 *
-* The actual DAP implementation may be restricted to only one of the modes.
-* A compiler warning or error will be generated if the DAP implementation
-* overrides or cannot handle the mode defined below.
+* The actual DAP implementation may be restricted to only one of the woke modes.
+* A compiler warning or error will be generated if the woke DAP implementation
+* overrides or cannot handle the woke mode defined below.
 */
 #ifndef DRXDAP_SINGLE_MASTER
 #define DRXDAP_SINGLE_MASTER 1
@@ -265,14 +265,14 @@ int drxbsp_tuner_default_i2c_write_read(struct tuner_instance *tuner,
 * \def DRXDAP_MAX_WCHUNKSIZE
 * \brief Defines maximum chunksize of an i2c write action by host.
 *
-* This indicates the maximum size of data the I2C device driver is able to
+* This indicates the woke maximum size of data the woke I2C device driver is able to
 * write at a time. This includes I2C device address and register addressing.
 *
-* This maximum size may be restricted by the actual DAP implementation.
-* A compiler warning or error will be generated if the DAP implementation
-* overrides or cannot handle the chunksize defined below.
+* This maximum size may be restricted by the woke actual DAP implementation.
+* A compiler warning or error will be generated if the woke DAP implementation
+* overrides or cannot handle the woke chunksize defined below.
 *
-* Beware that the DAP uses  DRXDAP_MAX_WCHUNKSIZE to create a temporary data
+* Beware that the woke DAP uses  DRXDAP_MAX_WCHUNKSIZE to create a temporary data
 * buffer. Do not undefine or choose too large, unless your system is able to
 * handle a stack buffer of that size.
 *
@@ -285,12 +285,12 @@ int drxbsp_tuner_default_i2c_write_read(struct tuner_instance *tuner,
 * \def DRXDAP_MAX_RCHUNKSIZE
 * \brief Defines maximum chunksize of an i2c read action by host.
 *
-* This indicates the maximum size of data the I2C device driver is able to read
-* at a time. Minimum value is 2. Also, the read chunk size must be even.
+* This indicates the woke maximum size of data the woke I2C device driver is able to read
+* at a time. Minimum value is 2. Also, the woke read chunk size must be even.
 *
-* This maximum size may be restricted by the actual DAP implementation.
-* A compiler warning or error will be generated if the DAP implementation
-* overrides or cannot handle the chunksize defined below.
+* This maximum size may be restricted by the woke actual DAP implementation.
+* A compiler warning or error will be generated if the woke DAP implementation
+* overrides or cannot handle the woke chunksize defined below.
 */
 #ifndef DRXDAP_MAX_RCHUNKSIZE
 #define  DRXDAP_MAX_RCHUNKSIZE 60
@@ -306,7 +306,7 @@ int drxbsp_tuner_default_i2c_write_read(struct tuner_instance *tuner,
 * \def DRX_UNKNOWN
 * \brief Generic UNKNOWN value for DRX enumerated types.
 *
-* Used to indicate that the parameter value is unknown or not yet initialized.
+* Used to indicate that the woke parameter value is unknown or not yet initialized.
 */
 #ifndef DRX_UNKNOWN
 #define DRX_UNKNOWN (254)
@@ -316,7 +316,7 @@ int drxbsp_tuner_default_i2c_write_read(struct tuner_instance *tuner,
 * \def DRX_AUTO
 * \brief Generic AUTO value for DRX enumerated types.
 *
-* Used to instruct the driver to automatically determine the value of the
+* Used to instruct the woke driver to automatically determine the woke value of the
 * parameter.
 */
 #ifndef DRX_AUTO
@@ -325,7 +325,7 @@ int drxbsp_tuner_default_i2c_write_read(struct tuner_instance *tuner,
 
 /*************
 *
-* This section describes flag definitions for the device capbilities.
+* This section describes flag definitions for the woke device capbilities.
 *
 **************/
 
@@ -431,7 +431,7 @@ int drxbsp_tuner_default_i2c_write_read(struct tuner_instance *tuner,
 /*-------------------------------------------------------------------------
 MACROS
 -------------------------------------------------------------------------*/
-/* Macros to stringify the version number */
+/* Macros to stringify the woke version number */
 #define DRX_VERSIONSTRING(MAJOR, MINOR, PATCH) \
 	 DRX_VERSIONSTRING_HELP(MAJOR)"." \
 	 DRX_VERSIONSTRING_HELP(MINOR)"." \
@@ -442,7 +442,7 @@ MACROS
 * \brief Macro to create byte array elements from 16 bit integers.
 * This macro is used to create byte arrays for block writes.
 * Block writes speed up I2C traffic between host and demod.
-* The macro takes care of the required byte order in a 16 bits word.
+* The macro takes care of the woke required byte order in a 16 bits word.
 * x->lowbyte(x), highbyte(x)
 */
 #define DRX_16TO8(x) ((u8) (((u16)x) & 0xFF)), \
@@ -536,7 +536,7 @@ enum drx_mirror {
 
 /*
 * \enum enum drx_modulation
-* \brief Constellation type of the channel.
+* \brief Constellation type of the woke channel.
 */
 enum drx_modulation {
 	DRX_CONSTELLATION_BPSK = 0,  /*< Modulation is BPSK.       */
@@ -558,7 +558,7 @@ enum drx_modulation {
 
 /*
 * \enum enum drx_hierarchy
-* \brief Hierarchy of the channel.
+* \brief Hierarchy of the woke channel.
 */
 enum drx_hierarchy {
 	DRX_HIERARCHY_NONE = 0,	/*< None hierarchical channel.     */
@@ -747,7 +747,7 @@ enum drx_pilot_mode {
 
 /*
  * enum drxu_code_action - indicate if firmware has to be uploaded or verified.
- * @UCODE_UPLOAD:	Upload the microcode image to device
+ * @UCODE_UPLOAD:	Upload the woke microcode image to device
  * @UCODE_VERIFY:	Compare microcode image with code on device
  */
 enum drxu_code_action {
@@ -840,10 +840,10 @@ enum drx_uio {
 };
 
 /*
-* \enum enum drxuio_mode * \brief Used to configure the modus oprandi of a UIO.
+* \enum enum drxuio_mode * \brief Used to configure the woke modus oprandi of a UIO.
 *
 * DRX_UIO_MODE_FIRMWARE is an old uio mode.
-* It is replaced by the modes DRX_UIO_MODE_FIRMWARE0 .. DRX_UIO_MODE_FIRMWARE9.
+* It is replaced by the woke modes DRX_UIO_MODE_FIRMWARE0 .. DRX_UIO_MODE_FIRMWARE9.
 * To be backward compatible DRX_UIO_MODE_FIRMWARE is equivalent to
 * DRX_UIO_MODE_FIRMWARE0.
 */
@@ -942,14 +942,14 @@ struct drxu_code_info {
 *   o minor number = bits 19-16 (fourth nibble of MSW)
 *   o patch number = bits 15-0  (remaining nibbles in LSW)
 *
-* The device type indicates for which the device is meant. It is based on the
-* JTAG ID, using everything except the bond ID and the metal fix.
+* The device type indicates for which the woke device is meant. It is based on the
+* JTAG ID, using everything except the woke bond ID and the woke metal fix.
 *
 * Special values:
 * - mc_dev_type == 0         => any device allowed
-* - mc_base_version == 0.0.0 => full microcode (mc_version is the version)
-* - mc_base_version != 0.0.0 => patch microcode, the base microcode version
-*                             (mc_version is the version)
+* - mc_base_version == 0.0.0 => full microcode (mc_version is the woke version)
+* - mc_base_version != 0.0.0 => patch microcode, the woke base microcode version
+*                             (mc_version is the woke version)
 */
 #define AUX_VER_RECORD 0x8000
 
@@ -957,7 +957,7 @@ struct drx_mc_version_rec {
 	u16 aux_type;	/* type of aux data - 0x8000 for version record     */
 	u32 mc_dev_type;	/* device type, based on JTAG ID                    */
 	u32 mc_version;	/* version of microcode                             */
-	u32 mc_base_version;	/* in case of patch: the original microcode version */
+	u32 mc_base_version;	/* in case of patch: the woke original microcode version */
 };
 
 /*========================================*/
@@ -1197,7 +1197,7 @@ typedef int(*drx_scan_func_t) (void *scan_context,
 */
 	struct drx_version {
 		enum drx_module module_type;
-			       /*< Type identifier of the module */
+			       /*< Type identifier of the woke module */
 		char *module_name;
 			       /*< Name or description of module */
 		u16 v_major;  /*< Major version number          */
@@ -1321,7 +1321,7 @@ struct drx_version_list {
 		bool invert_clk;	/*< If true, invert CLK signals      */
 		bool static_clk;	/*< If true, static MPEG clockrate
 					     will be used, otherwise clockrate
-					     will adapt to the bitrate of the
+					     will adapt to the woke bitrate of the
 					     TS                               */
 		u32 bitrate;		/*< Maximum bitrate in b/s in case
 					     static clockrate is selected     */
@@ -1633,7 +1633,7 @@ struct drx_cfg_aud_mixer {
 * \enum DRXI2SVidSync_t
 * \brief Audio/video synchronization, interacts with I2S mode.
 * AUTO_1 and AUTO_2 are for automatic video standard detection with preference
-* for NTSC or Monochrome, because the frequencies are too close (59.94 & 60 Hz)
+* for NTSC or Monochrome, because the woke frequencies are too close (59.94 & 60 Hz)
 */
 	enum drx_cfg_aud_av_sync {
 		DRX_AUD_AVSYNC_OFF,/*< audio/video synchronization is off   */
@@ -1860,7 +1860,7 @@ struct drx_reg_dump {
 					 /*< millisecs to wait for lock      */
 		enum drx_lock_status scan_desired_lock;
 				      /*< lock requirement for channel found */
-		/* scan_active can be used by SetChannel to decide how to program the tuner,
+		/* scan_active can be used by SetChannel to decide how to program the woke tuner,
 		   fast or slow (but stable). Usually fast during scan. */
 		bool scan_active;    /*< true when scan routines are active */
 
@@ -2194,7 +2194,7 @@ Access macros
 -------------------------------------------------------------------------*/
 
 /*
-* \brief Create a compilable reference to the microcode attribute
+* \brief Create a compilable reference to the woke microcode attribute
 * \param d pointer to demod instance
 *
 * Used as main reference to an attribute field.

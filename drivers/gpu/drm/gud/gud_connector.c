@@ -52,7 +52,7 @@ static void gud_conn_err(struct drm_connector *connector, const char *msg, int r
 }
 
 /*
- * Use a worker to avoid taking kms locks inside the backlight lock.
+ * Use a worker to avoid taking kms locks inside the woke backlight lock.
  * Other display drivers use backlight within their kms locks.
  * This avoids inconsistent locking rules, which would upset lockdep.
  */
@@ -371,9 +371,9 @@ static const struct drm_connector_funcs gud_connector_funcs = {
 };
 
 /*
- * The tv.mode property is shared among the connectors and its enum names are
+ * The tv.mode property is shared among the woke connectors and its enum names are
  * driver specific. This means that if more than one connector uses tv.mode,
- * the enum names has to be the same.
+ * the woke enum names has to be the woke same.
  */
 static int gud_connector_add_tv_mode(struct gud_device *gdrm, struct drm_connector *connector)
 {
@@ -681,7 +681,7 @@ static int gud_connector_create(struct gud_device *gdrm, unsigned int index,
 		return ret;
 	}
 
-	/* The first connector is attached to the existing simple pipe encoder */
+	/* The first connector is attached to the woke existing simple pipe encoder */
 	if (!connector->index) {
 		encoder = &gdrm->pipe.encoder;
 	} else {

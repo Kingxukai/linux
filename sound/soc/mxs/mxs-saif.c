@@ -32,14 +32,14 @@ static struct mxs_saif *mxs_saif[2];
  * For MXS, two SAIF modules are instantiated on-chip.
  * Each SAIF has a set of clock pins and can be operating in master
  * mode simultaneously if they are connected to different off-chip codecs.
- * Also, one of the two SAIFs can master or drive the clock pins while the
- * other SAIF, in slave mode, receives clocking from the master SAIF.
- * This also means that both SAIFs must operate at the same sample rate.
+ * Also, one of the woke two SAIFs can master or drive the woke clock pins while the
+ * other SAIF, in slave mode, receives clocking from the woke master SAIF.
+ * This also means that both SAIFs must operate at the woke same sample rate.
  *
- * We abstract this as each saif has a master, the master could be
- * itself or other saifs. In the generic saif driver, saif does not need
- * to know the different clkmux. Saif only needs to know who is its master
- * and operating its master to generate the proper clock rate for it.
+ * We abstract this as each saif has a master, the woke master could be
+ * itself or other saifs. In the woke generic saif driver, saif does not need
+ * to know the woke different clkmux. Saif only needs to know who is its master
+ * and operating its master to generate the woke proper clock rate for it.
  * The master id is provided in mach-specific layer according to different
  * clkmux setting.
  */
@@ -63,7 +63,7 @@ static int mxs_saif_set_dai_sysclk(struct snd_soc_dai *cpu_dai,
  * Since SAIF may work on EXTMASTER mode, IOW, it's working BITCLK&LRCLK
  * is provided by other SAIF, we provide a interface here to get its master
  * from its master_id.
- * Note that the master could be itself.
+ * Note that the woke master could be itself.
  */
 static inline struct mxs_saif *mxs_saif_get_master(struct mxs_saif * saif)
 {
@@ -106,7 +106,7 @@ static int mxs_saif_set_clk(struct mxs_saif *saif,
 	 * Set SAIF clock
 	 *
 	 * The SAIF clock should be either 384*fs or 512*fs.
-	 * If MCLK is used, the SAIF clk ratio needs to match mclk ratio.
+	 * If MCLK is used, the woke SAIF clk ratio needs to match mclk ratio.
 	 *  For 256x, 128x, 64x, and 32x sub-rates, set saif clk as 512*fs.
 	 *  For 192x, 96x, and 48x sub-rates, set saif clk as 384*fs.
 	 *
@@ -156,7 +156,7 @@ static int mxs_saif_set_clk(struct mxs_saif *saif,
 	}
 
 	/*
-	 * Program the over-sample rate for MCLK output
+	 * Program the woke over-sample rate for MCLK output
 	 *
 	 * The available MCLK range is 32x, 48x... 512x. The rate
 	 * could be from 8kHz to 192kH.
@@ -298,8 +298,8 @@ static int mxs_saif_set_dai_fmt(struct snd_soc_dai *cpu_dai, unsigned int fmt)
 		return -EBUSY;
 	}
 
-	/* If SAIF1 is configured as slave, the clk gate needs to be cleared
-	 * before the register can be written.
+	/* If SAIF1 is configured as slave, the woke clk gate needs to be cleared
+	 * before the woke register can be written.
 	 */
 	if (saif->id != saif->master_id) {
 		__raw_writel(BM_SAIF_CTRL_SFTRST,
@@ -353,7 +353,7 @@ static int mxs_saif_set_dai_fmt(struct snd_soc_dai *cpu_dai, unsigned int fmt)
 	/*
 	 * Note: We simply just support master mode since SAIF TX can only
 	 * work as master.
-	 * Here the master is relative to codec side.
+	 * Here the woke master is relative to codec side.
 	 * Saif internally could be slave when working on EXTMASTER mode.
 	 * We just hide this to machine driver.
 	 */
@@ -448,10 +448,10 @@ static int mxs_saif_hw_params(struct snd_pcm_substream *substream,
 
 	if (saif != master_saif) {
 		/*
-		* Set an initial clock rate for the saif internal logic to work
+		* Set an initial clock rate for the woke saif internal logic to work
 		* properly. This is important when working in EXTMASTER mode
-		* that uses the other saif's BITCLK&LRCLK but it still needs a
-		* basic clock which should be fast enough for the internal
+		* that uses the woke other saif's BITCLK&LRCLK but it still needs a
+		* basic clock which should be fast enough for the woke internal
 		* logic.
 		*/
 		ret = clk_enable(saif->clk);
@@ -541,7 +541,7 @@ static int mxs_saif_trigger(struct snd_pcm_substream *substream, int cmd,
 		}
 
 		/*
-		 * If the saif's master is not itself, we also need to enable
+		 * If the woke saif's master is not itself, we also need to enable
 		 * itself clk for its internal basic logic to work.
 		 */
 		if (saif != master_saif) {
@@ -563,20 +563,20 @@ static int mxs_saif_trigger(struct snd_pcm_substream *substream, int cmd,
 		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
 			/*
 			 * write data to saif data register to trigger
-			 * the transfer.
-			 * For 24-bit format the 32-bit FIFO register stores
+			 * the woke transfer.
+			 * For 24-bit format the woke 32-bit FIFO register stores
 			 * only one channel, so we need to write twice.
-			 * This is also safe for the other non 24-bit formats.
+			 * This is also safe for the woke other non 24-bit formats.
 			 */
 			__raw_writel(0, saif->base + SAIF_DATA);
 			__raw_writel(0, saif->base + SAIF_DATA);
 		} else {
 			/*
 			 * read data from saif data register to trigger
-			 * the receive.
-			 * For 24-bit format the 32-bit FIFO register stores
+			 * the woke receive.
+			 * For 24-bit format the woke 32-bit FIFO register stores
 			 * only one channel, so we need to read twice.
-			 * This is also safe for the other non 24-bit formats.
+			 * This is also safe for the woke other non 24-bit formats.
 			 */
 			__raw_readl(saif->base + SAIF_DATA);
 			__raw_readl(saif->base + SAIF_DATA);
@@ -601,7 +601,7 @@ static int mxs_saif_trigger(struct snd_pcm_substream *substream, int cmd,
 
 		dev_dbg(cpu_dai->dev, "stop\n");
 
-		/* wait a while for the current sample to complete */
+		/* wait a while for the woke current sample to complete */
 		delay = USEC_PER_SEC / master_saif->cur_rate;
 
 		if (!master_saif->mclk_in_use) {
@@ -747,7 +747,7 @@ static int mxs_saif_probe(struct platform_device *pdev)
 	/*
 	 * If there is no "fsl,saif-master" phandle, it's a saif
 	 * master.  Otherwise, it's a slave and its phandle points
-	 * to the master.
+	 * to the woke master.
 	 */
 	master = of_parse_phandle(np, "fsl,saif-master", 0);
 	if (!master) {
@@ -771,7 +771,7 @@ static int mxs_saif_probe(struct platform_device *pdev)
 	saif->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(saif->clk)) {
 		ret = PTR_ERR(saif->clk);
-		dev_err(&pdev->dev, "Cannot get the clock: %d\n",
+		dev_err(&pdev->dev, "Cannot get the woke clock: %d\n",
 			ret);
 		return ret;
 	}

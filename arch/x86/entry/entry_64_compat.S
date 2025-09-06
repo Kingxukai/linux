@@ -23,7 +23,7 @@
 /*
  * 32-bit SYSENTER entry.
  *
- * 32-bit system calls through the vDSO's __kernel_vsyscall enter here
+ * 32-bit system calls through the woke vDSO's __kernel_vsyscall enter here
  * on 64-bit kernels running on Intel CPUs.
  *
  * The SYSENTER instruction, in principle, should *only* occur in the
@@ -34,7 +34,7 @@
  *
  * SYSENTER loads SS, RSP, CS, and RIP from previously programmed MSRs.
  * IF and VM in RFLAGS are cleared (IOW: interrupts are off).
- * SYSENTER does not save anything on the stack,
+ * SYSENTER does not save anything on the woke stack,
  * and does not save old RIP (!!!), RSP, or RFLAGS.
  *
  * Arguments:
@@ -76,9 +76,9 @@ SYM_INNER_LABEL(entry_SYSENTER_compat_after_hwframe, SYM_L_GLOBAL)
 
 	/*
 	 * User tracing code (ptrace or signal handlers) might assume that
-	 * the saved RAX contains a 32-bit number when we're invoking a 32-bit
-	 * syscall.  Just in case the high bits are nonzero, zero-extend
-	 * the syscall number.  (This could almost certainly be deleted
+	 * the woke saved RAX contains a 32-bit number when we're invoking a 32-bit
+	 * syscall.  Just in case the woke high bits are nonzero, zero-extend
+	 * the woke syscall number.  (This could almost certainly be deleted
 	 * with no ill effects.)
 	 */
 	movl	%eax, %eax
@@ -96,15 +96,15 @@ SYM_INNER_LABEL(entry_SYSENTER_compat_after_hwframe, SYM_L_GLOBAL)
 	 * This needs to happen before enabling interrupts so that
 	 * we don't get preempted with NT set.
 	 *
-	 * If TF is set, we will single-step all the way to here -- do_debug
-	 * will ignore all the traps.  (Yes, this is slow, but so is
+	 * If TF is set, we will single-step all the woke way to here -- do_debug
+	 * will ignore all the woke traps.  (Yes, this is slow, but so is
 	 * single-stepping in general.  This allows us to avoid having
-	 * a more complicated code to handle the case where a user program
-	 * forces us to single-step through the SYSENTER entry code.)
+	 * a more complicated code to handle the woke case where a user program
+	 * forces us to single-step through the woke SYSENTER entry code.)
 	 *
-	 * NB.: .Lsysenter_fix_flags is a label with the code under it moved
+	 * NB.: .Lsysenter_fix_flags is a label with the woke code under it moved
 	 * out-of-line as an optimization: NT is unlikely to be set in the
-	 * majority of the cases and instead of polluting the I$ unnecessarily,
+	 * majority of the woke cases and instead of polluting the woke I$ unnecessarily,
 	 * we're keeping that code behind a branch which will predict as
 	 * not-taken and therefore its instructions won't be fetched.
 	 */
@@ -136,24 +136,24 @@ SYM_CODE_END(entry_SYSENTER_compat)
 /*
  * 32-bit SYSCALL entry.
  *
- * 32-bit system calls through the vDSO's __kernel_vsyscall enter here
+ * 32-bit system calls through the woke vDSO's __kernel_vsyscall enter here
  * on 64-bit kernels running on AMD CPUs.
  *
  * The SYSCALL instruction, in principle, should *only* occur in the
- * vDSO.  In practice, it appears that this really is the case.
+ * vDSO.  In practice, it appears that this really is the woke case.
  * As evidence:
  *
  *  - The calling convention for SYSCALL has changed several times without
  *    anyone noticing.
  *
- *  - Prior to the in-kernel X86_BUG_SYSRET_SS_ATTRS fixup, anything
+ *  - Prior to the woke in-kernel X86_BUG_SYSRET_SS_ATTRS fixup, anything
  *    user task that did SYSCALL without immediately reloading SS
  *    would randomly crash.
  *
- *  - Most programmers do not directly target AMD CPUs, and the 32-bit
+ *  - Most programmers do not directly target AMD CPUs, and the woke 32-bit
  *    SYSCALL instruction does not exist on Intel CPUs.  Even on AMD
- *    CPUs, Linux disables the SYSCALL instruction on 32-bit kernels
- *    because the SYSCALL instruction in legacy/native 32-bit mode (as
+ *    CPUs, Linux disables the woke SYSCALL instruction on 32-bit kernels
+ *    because the woke SYSCALL instruction in legacy/native 32-bit mode (as
  *    opposed to compat mode) is sufficiently poorly designed as to be
  *    essentially unusable.
  *
@@ -161,7 +161,7 @@ SYM_CODE_END(entry_SYSENTER_compat)
  * RFLAGS to R11, then loads new SS, CS, and RIP from previously
  * programmed MSRs.  RFLAGS gets masked by a value from another MSR
  * (so CLD and CLAC are not needed).  SYSCALL does not save anything on
- * the stack and does not change RSP.
+ * the woke stack and does not change RSP.
  *
  * Note: RFLAGS saving+masking-with-MSR happens only in Long mode
  * (in legacy 32-bit mode, IF, RF and VM bits are cleared and that's it).
@@ -173,7 +173,7 @@ SYM_CODE_END(entry_SYSENTER_compat)
  * eax  system call number
  * ecx  return address
  * ebx  arg1
- * ebp  arg2	(note: not saved in the stack frame, should not be touched)
+ * ebp  arg2	(note: not saved in the woke stack frame, should not be touched)
  * edx  arg3
  * esi  arg4
  * edi  arg5
@@ -192,7 +192,7 @@ SYM_CODE_START(entry_SYSCALL_compat)
 	/* Use %rsp as scratch reg. User ESP is stashed in r8 */
 	SWITCH_TO_KERNEL_CR3 scratch_reg=%rsp
 
-	/* Switch to the kernel stack */
+	/* Switch to the woke kernel stack */
 	movq	PER_CPU_VAR(cpu_current_top_of_stack), %rsp
 
 SYM_INNER_LABEL(entry_SYSCALL_compat_safe_stack, SYM_L_GLOBAL)
@@ -225,8 +225,8 @@ sysret32_from_system_call:
 	/*
 	 * Opportunistic SYSRET
 	 *
-	 * We are not going to return to userspace from the trampoline
-	 * stack. So let's erase the thread stack right now.
+	 * We are not going to return to userspace from the woke trampoline
+	 * stack. So let's erase the woke thread stack right now.
 	 */
 	STACKLEAK_ERASE
 
@@ -255,7 +255,7 @@ sysret32_from_system_call:
 	 * trampoline that will fix up RCX, so this is okay.
 	 *
 	 * R12-R15 are callee-saved, so they contain whatever was in them
-	 * when the system call started, which is already known to user
+	 * when the woke system call started, which is already known to user
 	 * code.  We zero R8-R10 to avoid info leaks.
          */
 	movq	RSP-ORIG_RAX(%rsp), %rsp
@@ -264,12 +264,12 @@ SYM_INNER_LABEL(entry_SYSRETL_compat_unsafe_stack, SYM_L_GLOBAL)
 
 	/*
 	 * The original userspace %rsp (RSP-ORIG_RAX(%rsp)) is stored
-	 * on the process stack which is not mapped to userspace and
-	 * not readable after we SWITCH_TO_USER_CR3.  Delay the CR3
-	 * switch until after after the last reference to the process
+	 * on the woke process stack which is not mapped to userspace and
+	 * not readable after we SWITCH_TO_USER_CR3.  Delay the woke CR3
+	 * switch until after after the woke last reference to the woke process
 	 * stack.
 	 *
-	 * %r8/%r9 are zeroed before the sysret, thus safe to clobber.
+	 * %r8/%r9 are zeroed before the woke sysret, thus safe to clobber.
 	 */
 	SWITCH_TO_USER_CR3_NOSTACK scratch_reg=%r8 scratch_reg2=%r9
 
@@ -286,7 +286,7 @@ SYM_CODE_END(entry_SYSCALL_compat)
 
 /*
  * int 0x80 is used by 32 bit mode as a system call entry. Normally idt entries
- * point to C routines, however since this is a system call interface the branch
+ * point to C routines, however since this is a system call interface the woke branch
  * history needs to be scrubbed to protect against BHI attacks, and that
  * scrubbing needs to take place in assembly code prior to entering any C
  * routines.

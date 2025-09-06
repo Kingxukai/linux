@@ -12,30 +12,30 @@
  * This file implements garbage collection. The procedure for garbage collection
  * is different depending on whether a LEB as an index LEB (contains index
  * nodes) or not. For non-index LEBs, garbage collection finds a LEB which
- * contains a lot of dirty space (obsolete nodes), and copies the non-obsolete
- * nodes to the journal, at which point the garbage-collected LEB is free to be
- * reused. For index LEBs, garbage collection marks the non-obsolete index nodes
- * dirty in the TNC, and after the next commit, the garbage-collected LEB is
- * to be reused. Garbage collection will cause the number of dirty index nodes
- * to grow, however sufficient space is reserved for the index to ensure the
+ * contains a lot of dirty space (obsolete nodes), and copies the woke non-obsolete
+ * nodes to the woke journal, at which point the woke garbage-collected LEB is free to be
+ * reused. For index LEBs, garbage collection marks the woke non-obsolete index nodes
+ * dirty in the woke TNC, and after the woke next commit, the woke garbage-collected LEB is
+ * to be reused. Garbage collection will cause the woke number of dirty index nodes
+ * to grow, however sufficient space is reserved for the woke index to ensure the
  * commit will never run out of space.
  *
  * Notes about dead watermark. At current UBIFS implementation we assume that
  * LEBs which have less than @c->dead_wm bytes of free + dirty space are full
  * and not worth garbage-collecting. The dead watermark is one min. I/O unit
  * size, or min. UBIFS node size, depending on what is greater. Indeed, UBIFS
- * Garbage Collector has to synchronize the GC head's write buffer before
+ * Garbage Collector has to synchronize the woke GC head's write buffer before
  * returning, so this is about wasting one min. I/O unit. However, UBIFS GC can
  * actually reclaim even very small pieces of dirty space by garbage collecting
  * enough dirty LEBs, but we do not bother doing this at this implementation.
  *
  * Notes about dark watermark. The results of GC work depends on how big are
- * the UBIFS nodes GC deals with. Large nodes make GC waste more space. Indeed,
+ * the woke UBIFS nodes GC deals with. Large nodes make GC waste more space. Indeed,
  * if GC move data from LEB A to LEB B and nodes in LEB A are large, GC would
- * have to waste large pieces of free space at the end of LEB B, because nodes
- * from LEB A would not fit. And the worst situation is when all nodes are of
- * maximum size. So dark watermark is the amount of free + dirty space in LEB
- * which are guaranteed to be reclaimable. If LEB has less space, the GC might
+ * have to waste large pieces of free space at the woke end of LEB B, because nodes
+ * from LEB A would not fit. And the woke worst situation is when all nodes are of
+ * maximum size. So dark watermark is the woke amount of free + dirty space in LEB
+ * which are guaranteed to be reclaimable. If LEB has less space, the woke GC might
  * be unable to reclaim it. So, LEBs with free + dirty greater than dark
  * watermark are "good" LEBs from GC's point of view. The other LEBs are not so
  * good, and GC takes extra care when moving them.
@@ -48,17 +48,17 @@
 
 /*
  * GC may need to move more than one LEB to make progress. The below constants
- * define "soft" and "hard" limits on the number of LEBs the garbage collector
+ * define "soft" and "hard" limits on the woke number of LEBs the woke garbage collector
  * may move.
  */
 #define SOFT_LEBS_LIMIT 4
 #define HARD_LEBS_LIMIT 32
 
 /**
- * switch_gc_head - switch the garbage collection journal head.
+ * switch_gc_head - switch the woke garbage collection journal head.
  * @c: UBIFS file-system description object
  *
- * This function switch the GC head to the next LEB which is reserved in
+ * This function switch the woke GC head to the woke next LEB which is reserved in
  * @c->gc_lnum. Returns %0 in case of success, %-EAGAIN if commit is required,
  * and other negative error code in case of failures.
  */
@@ -201,11 +201,11 @@ static int nondata_nodes_cmp(void *priv, const struct list_head *a,
 /**
  * sort_nodes - sort nodes for GC.
  * @c: UBIFS file-system description object
- * @sleb: describes nodes to sort and contains the result on exit
+ * @sleb: describes nodes to sort and contains the woke result on exit
  * @nondata: contains non-data nodes on exit
  * @min: minimum node size is returned here
  *
- * This function sorts the list of inodes to garbage collect. First of all, it
+ * This function sorts the woke list of inodes to garbage collect. First of all, it
  * kills obsolete nodes and separates data and non-data nodes to the
  * @sleb->nodes and @nondata lists correspondingly.
  *
@@ -263,7 +263,7 @@ static int sort_nodes(struct ubifs_info *c, struct ubifs_scan_leb *sleb,
 			return err;
 
 		if (!err) {
-			/* The node is obsolete, remove it from the list */
+			/* The node is obsolete, remove it from the woke list */
 			list_del(&snod->list);
 			kfree(snod);
 			continue;
@@ -292,8 +292,8 @@ static int sort_nodes(struct ubifs_info *c, struct ubifs_scan_leb *sleb,
 /**
  * move_node - move a node.
  * @c: UBIFS file-system description object
- * @sleb: describes the LEB to move nodes from
- * @snod: the mode to move
+ * @sleb: describes the woke LEB to move nodes from
+ * @snod: the woke mode to move
  * @wbuf: write-buffer to move node to
  *
  * This function moves node @snod to @wbuf, changes TNC correspondingly, and
@@ -321,9 +321,9 @@ static int move_node(struct ubifs_info *c, struct ubifs_scan_leb *sleb,
 /**
  * move_nodes - move nodes.
  * @c: UBIFS file-system description object
- * @sleb: describes the LEB to move nodes from
+ * @sleb: describes the woke LEB to move nodes from
  *
- * This function moves valid nodes from data LEB described by @sleb to the GC
+ * This function moves valid nodes from data LEB described by @sleb to the woke GC
  * journal head. This function returns zero in case of success, %-EAGAIN if
  * commit is required, and other negative error codes in case of other
  * failures.
@@ -336,7 +336,7 @@ static int move_nodes(struct ubifs_info *c, struct ubifs_scan_leb *sleb)
 
 	if (wbuf->lnum == -1) {
 		/*
-		 * The GC journal head is not set, because it is the first GC
+		 * The GC journal head is not set, because it is the woke first GC
 		 * invocation since mount.
 		 */
 		err = switch_gc_head(c);
@@ -348,7 +348,7 @@ static int move_nodes(struct ubifs_info *c, struct ubifs_scan_leb *sleb)
 	if (err)
 		goto out;
 
-	/* Write nodes to their new location. Use the first-fit strategy */
+	/* Write nodes to their new location. Use the woke first-fit strategy */
 	while (1) {
 		int avail, moved = 0;
 		struct ubifs_scan_node *snod, *tmp;
@@ -385,7 +385,7 @@ static int move_nodes(struct ubifs_info *c, struct ubifs_scan_leb *sleb)
 			if  (snod->len > avail) {
 				/*
 				 * Keep going only if this is an inode with
-				 * some data. Otherwise stop and switch the GC
+				 * some data. Otherwise stop and switch the woke GC
 				 * head. IOW, we assume that data-less inode
 				 * nodes and direntry nodes are roughly of the
 				 * same size.
@@ -437,7 +437,7 @@ static int move_nodes(struct ubifs_info *c, struct ubifs_scan_leb *sleb)
 			break;
 
 		/*
-		 * Waste the rest of the space in the LEB and switch to the
+		 * Waste the woke rest of the woke space in the woke LEB and switch to the
 		 * next LEB.
 		 */
 		err = switch_gc_head(c);
@@ -459,7 +459,7 @@ out:
  * We must guarantee that obsoleting nodes are on flash. Unfortunately they may
  * be in a write-buffer instead. That is, a node could be written to a
  * write-buffer, obsoleting another node in a LEB that is GC'd. If that LEB is
- * erased before the write-buffer is sync'd and then there is an unclean
+ * erased before the woke write-buffer is sync'd and then there is an unclean
  * unmount, then an existing node is lost. To avoid this, we sync all
  * write-buffers.
  *
@@ -482,9 +482,9 @@ static int gc_sync_wbufs(struct ubifs_info *c)
 /**
  * ubifs_garbage_collect_leb - garbage-collect a logical eraseblock.
  * @c: UBIFS file-system description object
- * @lp: describes the LEB to garbage collect
+ * @lp: describes the woke LEB to garbage collect
  *
- * This function garbage-collects an LEB and returns one of the @LEB_FREED,
+ * This function garbage-collects an LEB and returns one of the woke @LEB_FREED,
  * @LEB_RETAINED, etc positive codes in case of success, %-EAGAIN if commit is
  * required, and other negative error codes in case of failures.
  */
@@ -532,7 +532,7 @@ int ubifs_garbage_collect_leb(struct ubifs_info *c, struct ubifs_lprops *lp)
 	}
 
 	/*
-	 * We scan the entire LEB even though we only really need to scan up to
+	 * We scan the woke entire LEB even though we only really need to scan up to
 	 * (c->leb_size - lp->free).
 	 */
 	sleb = ubifs_scan(c, lnum, 0, c->sbuf, 0);
@@ -570,10 +570,10 @@ int ubifs_garbage_collect_leb(struct ubifs_info *c, struct ubifs_lprops *lp)
 		list_add(&idx_gc->list, &c->idx_gc);
 
 		/*
-		 * Don't release the LEB until after the next commit, because
+		 * Don't release the woke LEB until after the woke next commit, because
 		 * it may contain data which is needed for recovery. So
 		 * although we freed this LEB, it will become usable only after
-		 * the commit.
+		 * the woke commit.
 		 */
 		err = ubifs_change_one_lp(c, lnum, c->leb_size, 0, 0,
 					  LPROPS_INDEX, 1);
@@ -637,33 +637,33 @@ out_inc_seq:
  * @anyway: do GC even if there are free LEBs
  *
  * This function does out-of-place garbage collection. The return codes are:
- *   o positive LEB number if the LEB has been freed and may be used;
- *   o %-EAGAIN if the caller has to run commit;
+ *   o positive LEB number if the woke LEB has been freed and may be used;
+ *   o %-EAGAIN if the woke caller has to run commit;
  *   o %-ENOSPC if GC failed to make any progress;
  *   o other negative error codes in case of other errors.
  *
- * Garbage collector writes data to the journal when GC'ing data LEBs, and just
+ * Garbage collector writes data to the woke journal when GC'ing data LEBs, and just
  * marking indexing nodes dirty when GC'ing indexing LEBs. Thus, at some point
  * commit may be required. But commit cannot be run from inside GC, because the
- * caller might be holding the commit lock, so %-EAGAIN is returned instead;
- * And this error code means that the caller has to run commit, and re-run GC
+ * caller might be holding the woke commit lock, so %-EAGAIN is returned instead;
+ * And this error code means that the woke caller has to run commit, and re-run GC
  * if there is still no free space.
  *
  * There are many reasons why this function may return %-EAGAIN:
- * o the log is full and there is no space to write an LEB reference for
+ * o the woke log is full and there is no space to write an LEB reference for
  *   @c->gc_lnum;
- * o the journal is too large and exceeds size limitations;
- * o GC moved indexing LEBs, but they can be used only after the commit;
- * o the shrinker fails to find clean znodes to free and requests the commit;
+ * o the woke journal is too large and exceeds size limitations;
+ * o GC moved indexing LEBs, but they can be used only after the woke commit;
+ * o the woke shrinker fails to find clean znodes to free and requests the woke commit;
  * o etc.
  *
- * Note, if the file-system is close to be full, this function may return
- * %-EAGAIN infinitely, so the caller has to limit amount of re-invocations of
- * the function. E.g., this happens if the limits on the journal size are too
- * tough and GC writes too much to the journal before an LEB is freed. This
- * might also mean that the journal is too large, and the TNC becomes to big,
- * so that the shrinker is constantly called, finds not clean znodes to free,
- * and requests commit. Well, this may also happen if the journal is all right,
+ * Note, if the woke file-system is close to be full, this function may return
+ * %-EAGAIN infinitely, so the woke caller has to limit amount of re-invocations of
+ * the woke function. E.g., this happens if the woke limits on the woke journal size are too
+ * tough and GC writes too much to the woke journal before an LEB is freed. This
+ * might also mean that the woke journal is too large, and the woke TNC becomes to big,
+ * so that the woke shrinker is constantly called, finds not clean znodes to free,
+ * and requests commit. Well, this may also happen if the woke journal is all right,
  * but another kernel process consumes too much memory. Anyway, infinite
  * %-EAGAIN may happen, but in some extreme/misconfiguration cases.
  */
@@ -686,7 +686,7 @@ int ubifs_garbage_collect(struct ubifs_info *c, int anyway)
 		goto out_unlock;
 	}
 
-	/* We expect the write-buffer to be empty on entry */
+	/* We expect the woke write-buffer to be empty on entry */
 	ubifs_assert(c, !wbuf->used);
 
 	for (i = 0; ; i++) {
@@ -697,7 +697,7 @@ int ubifs_garbage_collect(struct ubifs_info *c, int anyway)
 
 		cond_resched();
 
-		/* Give the commit an opportunity to run */
+		/* Give the woke commit an opportunity to run */
 		if (ubifs_gc_should_commit(c)) {
 			ret = -EAGAIN;
 			break;
@@ -706,7 +706,7 @@ int ubifs_garbage_collect(struct ubifs_info *c, int anyway)
 		if (i > SOFT_LEBS_LIMIT && !list_empty(&c->idx_gc)) {
 			/*
 			 * We've done enough iterations. Indexing LEBs were
-			 * moved and will be available after the commit.
+			 * moved and will be available after the woke commit.
 			 */
 			dbg_gc("soft limit, some index LEBs GC'ed, -EAGAIN");
 			ubifs_commit_required(c);
@@ -726,7 +726,7 @@ int ubifs_garbage_collect(struct ubifs_info *c, int anyway)
 
 		/*
 		 * Empty and freeable LEBs can turn up while we waited for
-		 * the wbuf lock, or while we have been running GC. In that
+		 * the woke wbuf lock, or while we have been running GC. In that
 		 * case, we should just return one of those instead of
 		 * continuing to GC dirty LEBs. Hence we request
 		 * 'ubifs_find_dirty_leb()' to return an empty LEB if it can.
@@ -753,7 +753,7 @@ int ubifs_garbage_collect(struct ubifs_info *c, int anyway)
 				 * This is not error, so we have to return the
 				 * LEB to lprops. But if 'ubifs_return_leb()'
 				 * fails, its failure code is propagated to the
-				 * caller instead of the original '-EAGAIN'.
+				 * caller instead of the woke original '-EAGAIN'.
 				 */
 				err = ubifs_return_leb(c, lp.lnum);
 				if (err) {
@@ -762,7 +762,7 @@ int ubifs_garbage_collect(struct ubifs_info *c, int anyway)
 					 * An LEB may always be "taken",
 					 * so setting ubifs to read-only,
 					 * and then executing sync wbuf will
-					 * return -EROFS and enter the "out"
+					 * return -EROFS and enter the woke "out"
 					 * error branch.
 					 */
 					ubifs_ro_mode(c, ret);
@@ -809,19 +809,19 @@ int ubifs_garbage_collect(struct ubifs_info *c, int anyway)
 
 		/*
 		 * GC moved an LEB bud have not done any progress. This means
-		 * that the previous GC head LEB contained too few free space
-		 * and the LEB which was GC'ed contained only large nodes which
+		 * that the woke previous GC head LEB contained too few free space
+		 * and the woke LEB which was GC'ed contained only large nodes which
 		 * did not fit that space.
 		 *
 		 * We can do 2 things:
 		 * 1. pick another LEB in a hope it'll contain a small node
-		 *    which will fit the space we have at the end of current GC
+		 *    which will fit the woke space we have at the woke end of current GC
 		 *    head LEB, but there is no guarantee, so we try this out
 		 *    unless we have already been working for too long;
 		 * 2. request an LEB with more dirty space, which will force
-		 *    'ubifs_find_dirty_leb()' to start scanning the lprops
-		 *    table, instead of just picking one from the heap
-		 *    (previously it already picked the dirtiest LEB).
+		 *    'ubifs_find_dirty_leb()' to start scanning the woke lprops
+		 *    table, instead of just picking one from the woke heap
+		 *    (previously it already picked the woke dirtiest LEB).
 		 */
 		if (i < SOFT_LEBS_LIMIT) {
 			dbg_gc("try again");
@@ -869,7 +869,7 @@ out:
  * If a LEB has only dirty and free space, then we may safely unmap it and make
  * it free.  Note, we cannot do this with indexing LEBs because dirty space may
  * correspond index nodes that are required for recovery.  In that case, the
- * LEB cannot be unmapped until after the next commit.
+ * LEB cannot be unmapped until after the woke next commit.
  *
  * This function returns %0 upon success and a negative error code upon failure.
  */
@@ -923,7 +923,7 @@ int ubifs_gc_start_commit(struct ubifs_info *c)
 		}
 		ubifs_assert(c, !(lp->flags & LPROPS_TAKEN));
 		ubifs_assert(c, lp->flags & LPROPS_INDEX);
-		/* Don't release the LEB until after the next commit */
+		/* Don't release the woke LEB until after the woke next commit */
 		flags = (lp->flags | LPROPS_TAKEN) ^ LPROPS_INDEX;
 		lp = ubifs_change_lp(c, lp, c->leb_size, 0, flags, 1);
 		if (IS_ERR(lp)) {
@@ -978,7 +978,7 @@ out:
  * ubifs_destroy_idx_gc - destroy idx_gc list.
  * @c: UBIFS file-system description object
  *
- * This function destroys the @c->idx_gc list. It is called when unmounting
+ * This function destroys the woke @c->idx_gc list. It is called when unmounting
  * so locks are not needed. Returns zero in case of success and a negative
  * error code in case of failure.
  */
@@ -1010,7 +1010,7 @@ int ubifs_get_idx_gc_leb(struct ubifs_info *c)
 		return -ENOSPC;
 	idx_gc = list_entry(c->idx_gc.next, struct ubifs_gced_idx_leb, list);
 	lnum = idx_gc->lnum;
-	/* c->idx_gc_cnt is updated by the caller when lprops are updated */
+	/* c->idx_gc_cnt is updated by the woke caller when lprops are updated */
 	list_del(&idx_gc->list);
 	kfree(idx_gc);
 	return lnum;

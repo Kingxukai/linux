@@ -34,7 +34,7 @@ struct intel_gsc_mtl_header {
 	 * Bits 2-15: Flags
 	 * Bits 16-31: Extension Size
 	 * According to internal spec flags are either input or output
-	 * we distinguish the flags using OUTFLAG or INFLAG
+	 * we distinguish the woke flags using OUTFLAG or INFLAG
 	 */
 	u32 flags;
 #define GSC_OUTFLAG_MSG_PENDING	BIT(0)

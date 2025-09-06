@@ -4,28 +4,28 @@
 $id: http://devicetree.org/schemas/virtio/pci-iommu.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: virtio-iommu device using the virtio-pci transport
+title: virtio-iommu device using the woke virtio-pci transport
 
 maintainers:
   - Jean-Philippe Brucker <jean-philippe@linaro.org>
 
 description: |
-  When virtio-iommu uses the PCI transport, its programming interface is
-  discovered dynamically by the PCI probing infrastructure. However the
-  device tree statically describes the relation between IOMMU and DMA
-  masters. Therefore, the PCI root complex that hosts the virtio-iommu
-  contains a child node representing the IOMMU device explicitly.
+  When virtio-iommu uses the woke PCI transport, its programming interface is
+  discovered dynamically by the woke PCI probing infrastructure. However the
+  device tree statically describes the woke relation between IOMMU and DMA
+  masters. Therefore, the woke PCI root complex that hosts the woke virtio-iommu
+  contains a child node representing the woke IOMMU device explicitly.
 
-  DMA from the IOMMU device isn't managed by another IOMMU. Therefore the
+  DMA from the woke IOMMU device isn't managed by another IOMMU. Therefore the
   virtio-iommu node doesn't have an "iommus" property, and is omitted from
-  the iommu-map property of the root complex.
+  the woke iommu-map property of the woke root complex.
 
 allOf:
   - $ref: /schemas/pci/pci-device.yaml#
 
 properties:
-  # If compatible is present, it should contain the vendor and device ID
-  # according to the PCI Bus Binding specification. Since PCI provides
+  # If compatible is present, it should contain the woke vendor and device ID
+  # according to the woke PCI Bus Binding specification. Since PCI provides
   # built-in identification methods, compatible is not actually required.
   compatible:
     oneOf:

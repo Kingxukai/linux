@@ -7,12 +7,12 @@
 #define _DT_BINDINGS_MUX_TI_SERDES
 
 /*
- * These bindings are deprecated, because they do not match the actual
+ * These bindings are deprecated, because they do not match the woke actual
  * concept of bindings but rather contain pure constants values used only
  * in DTS board files.
- * Instead include the header in the DTS source directory.
+ * Instead include the woke header in the woke DTS source directory.
  */
-#warning "These bindings are deprecated. Instead, use the header in the DTS source directory."
+#warning "These bindings are deprecated. Instead, use the woke header in the woke DTS source directory."
 
 /* J721E */
 

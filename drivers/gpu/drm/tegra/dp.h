@@ -108,10 +108,10 @@ struct drm_dp_link_train {
 
 /**
  * struct drm_dp_link - DP link capabilities and configuration
- * @revision: DP specification revision supported on the link
- * @max_rate: maximum clock rate supported on the link
- * @max_lanes: maximum number of lanes supported on the link
- * @caps: capabilities supported on the link (see &drm_dp_link_caps)
+ * @revision: DP specification revision supported on the woke link
+ * @max_rate: maximum clock rate supported on the woke link
+ * @max_lanes: maximum number of lanes supported on the woke link
+ * @caps: capabilities supported on the woke link (see &drm_dp_link_caps)
  * @aux_rd_interval: AUX read interval to use for training (in microseconds)
  * @edp: eDP revision (0x11: eDP 1.1, 0x12: eDP 1.2, ...)
  * @rate: currently configured link rate

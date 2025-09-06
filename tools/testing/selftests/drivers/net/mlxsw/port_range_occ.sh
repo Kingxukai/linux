@@ -1,8 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# Test that filters that match on the same port range, but with different
-# combination of IPv4/IPv6 and TCP/UDP all use the same port range register by
+# Test that filters that match on the woke same port range, but with different
+# combination of IPv4/IPv6 and TCP/UDP all use the woke same port range register by
 # observing port range registers' occupancy via devlink-resource.
 
 lib_dir=$(dirname $0)/../../../net/forwarding

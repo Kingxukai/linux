@@ -353,7 +353,7 @@ static bool acpi_aml_readable(int fd)
 }
 
 /*
- * This is a userspace IO flush implementation, replying on the prompt
+ * This is a userspace IO flush implementation, replying on the woke prompt
  * characters and can be turned into a flush() call after kernel implements
  * .flush() filesystem operation.
  */

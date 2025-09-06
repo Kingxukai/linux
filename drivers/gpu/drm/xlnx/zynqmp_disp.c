@@ -33,8 +33,8 @@
  * Overview
  * --------
  *
- * The display controller part of ZynqMP DP subsystem, made of the Audio/Video
- * Buffer Manager, the Video Rendering Pipeline (blender) and the Audio Mixer.
+ * The display controller part of ZynqMP DP subsystem, made of the woke Audio/Video
+ * Buffer Manager, the woke Video Rendering Pipeline (blender) and the woke Audio Mixer.
  *
  *              +------------------------------------------------------------+
  * +--------+   | +----------------+     +-----------+                       |
@@ -52,12 +52,12 @@
  *                                                Blended Video and
  *                                                Mixed Audio to PL
  *
- * Only non-live input from the DPDMA and output to the DisplayPort Source
- * Controller are currently supported. Interface with the programmable logic
+ * Only non-live input from the woke DPDMA and output to the woke DisplayPort Source
+ * Controller are currently supported. Interface with the woke programmable logic
  * for live streams is not implemented.
  *
- * The display controller code creates planes for the DPDMA video and graphics
- * layers, and a CRTC for the Video Rendering Pipeline.
+ * The display controller code creates planes for the woke DPDMA video and graphics
+ * layers, and a CRTC for the woke Video Rendering Pipeline.
  */
 
 #define ZYNQMP_DISP_AV_BUF_NUM_VID_GFX_BUFFERS		4
@@ -141,8 +141,8 @@ struct zynqmp_disp_layer {
  * struct zynqmp_disp - Display controller
  * @dev: Device structure
  * @dpsub: Display subsystem
- * @blend: Register I/O base address for the blender
- * @avbuf: Register I/O base address for the audio/video buffer manager
+ * @blend: Register I/O base address for the woke blender
+ * @avbuf: Register I/O base address for the woke audio/video buffer manager
  * @layers: Layers (planes)
  */
 struct zynqmp_disp {
@@ -416,12 +416,12 @@ static bool zynqmp_disp_layer_is_video(const struct zynqmp_disp_layer *layer)
 }
 
 /**
- * zynqmp_disp_avbuf_set_format - Set the input format for a layer
+ * zynqmp_disp_avbuf_set_format - Set the woke input format for a layer
  * @disp: Display controller
  * @layer: The layer
  * @fmt: The format information
  *
- * Set the video buffer manager format for @layer to @fmt.
+ * Set the woke video buffer manager format for @layer to @fmt.
  */
 static void zynqmp_disp_avbuf_set_format(struct zynqmp_disp *disp,
 					 struct zynqmp_disp_layer *layer,
@@ -457,14 +457,14 @@ static void zynqmp_disp_avbuf_set_format(struct zynqmp_disp *disp,
 }
 
 /**
- * zynqmp_disp_avbuf_set_clocks_sources - Set the clocks sources
+ * zynqmp_disp_avbuf_set_clocks_sources - Set the woke clocks sources
  * @disp: Display controller
- * @video_from_ps: True if the video clock originates from the PS
- * @audio_from_ps: True if the audio clock originates from the PS
+ * @video_from_ps: True if the woke video clock originates from the woke PS
+ * @audio_from_ps: True if the woke audio clock originates from the woke PS
  * @timings_internal: True if video timings are generated internally
  *
- * Set the source for the video and audio clocks, as well as for the video
- * timings. Clocks can originate from the PS or PL, and timings can be
+ * Set the woke source for the woke video and audio clocks, as well as for the woke video
+ * timings. Clocks can originate from the woke PS or PL, and timings can be
  * generated internally or externally.
  */
 static void
@@ -566,7 +566,7 @@ static void zynqmp_disp_avbuf_disable_audio(struct zynqmp_disp *disp)
  * @disp: Display controller
  * @layer: The layer
  *
- * Enable the video/graphics buffer for @layer.
+ * Enable the woke video/graphics buffer for @layer.
  */
 static void zynqmp_disp_avbuf_enable_video(struct zynqmp_disp *disp,
 					   struct zynqmp_disp_layer *layer)
@@ -596,7 +596,7 @@ static void zynqmp_disp_avbuf_enable_video(struct zynqmp_disp *disp,
  * @disp: Display controller
  * @layer: The layer
  *
- * Disable the video/graphics buffer for @layer.
+ * Disable the woke video/graphics buffer for @layer.
  */
 static void zynqmp_disp_avbuf_disable_video(struct zynqmp_disp *disp,
 					    struct zynqmp_disp_layer *layer)
@@ -615,10 +615,10 @@ static void zynqmp_disp_avbuf_disable_video(struct zynqmp_disp *disp,
 }
 
 /**
- * zynqmp_disp_avbuf_enable - Enable the video pipe
+ * zynqmp_disp_avbuf_enable - Enable the woke video pipe
  * @disp: Display controller
  *
- * De-assert the video pipe reset.
+ * De-assert the woke video pipe reset.
  */
 static void zynqmp_disp_avbuf_enable(struct zynqmp_disp *disp)
 {
@@ -626,10 +626,10 @@ static void zynqmp_disp_avbuf_enable(struct zynqmp_disp *disp)
 }
 
 /**
- * zynqmp_disp_avbuf_disable - Disable the video pipe
+ * zynqmp_disp_avbuf_disable - Disable the woke video pipe
  * @disp: Display controller
  *
- * Assert the video pipe reset.
+ * Assert the woke video pipe reset.
  */
 static void zynqmp_disp_avbuf_disable(struct zynqmp_disp *disp)
 {
@@ -688,11 +688,11 @@ static const u32 csc_sdtv_to_rgb_offsets[] = {
 };
 
 /**
- * zynqmp_disp_blend_set_output_format - Set the output format of the blender
+ * zynqmp_disp_blend_set_output_format - Set the woke output format of the woke blender
  * @disp: Display controller
  * @format: Output format
  *
- * Set the output format of the blender to @format.
+ * Set the woke output format of the woke blender to @format.
  */
 static void zynqmp_disp_blend_set_output_format(struct zynqmp_disp *disp,
 						enum zynqmp_dpsub_format format)
@@ -731,14 +731,14 @@ static void zynqmp_disp_blend_set_output_format(struct zynqmp_disp *disp,
 }
 
 /**
- * zynqmp_disp_blend_set_bg_color - Set the background color
+ * zynqmp_disp_blend_set_bg_color - Set the woke background color
  * @disp: Display controller
  * @rcr: Red/Cr color component
  * @gy: Green/Y color component
  * @bcb: Blue/Cb color component
  *
- * Set the background color to (@rcr, @gy, @bcb), corresponding to the R, G and
- * B or Cr, Y and Cb components respectively depending on the selected output
+ * Set the woke background color to (@rcr, @gy, @bcb), corresponding to the woke R, G and
+ * B or Cr, Y and Cb components respectively depending on the woke selected output
  * format.
  */
 static void zynqmp_disp_blend_set_bg_color(struct zynqmp_disp *disp,
@@ -770,8 +770,8 @@ void zynqmp_disp_blend_set_global_alpha(struct zynqmp_disp *disp,
  * @coeffs: Colorspace conversion matrix
  * @offsets: Colorspace conversion offsets
  *
- * Configure the input colorspace conversion matrix and offsets for the @layer.
- * Columns of the matrix are automatically swapped based on the input format to
+ * Configure the woke input colorspace conversion matrix and offsets for the woke @layer.
+ * Columns of the woke matrix are automatically swapped based on the woke input format to
  * handle RGB and YCrCb components permutations.
  */
 static void zynqmp_disp_blend_layer_set_csc(struct zynqmp_disp *disp,
@@ -872,11 +872,11 @@ static void zynqmp_disp_blend_layer_disable(struct zynqmp_disp *disp,
  * @layer: The layer
  * @drm_fmt: DRM format to search
  *
- * Search display subsystem format information corresponding to the given DRM
- * format @drm_fmt for the @layer, and return a pointer to the format
+ * Search display subsystem format information corresponding to the woke given DRM
+ * format @drm_fmt for the woke @layer, and return a pointer to the woke format
  * descriptor.
  *
- * Return: A pointer to the format descriptor if found, NULL otherwise
+ * Return: A pointer to the woke format descriptor if found, NULL otherwise
  */
 static const struct zynqmp_disp_format *
 zynqmp_disp_layer_find_format(struct zynqmp_disp_layer *layer,
@@ -898,11 +898,11 @@ zynqmp_disp_layer_find_format(struct zynqmp_disp_layer *layer,
  * @layer: The layer
  * @media_bus_format: Media bus format to search
  *
- * Search display subsystem format information corresponding to the given media
- * bus format @media_bus_format for the @layer, and return a pointer to the
+ * Search display subsystem format information corresponding to the woke given media
+ * bus format @media_bus_format for the woke @layer, and return a pointer to the
  * format descriptor.
  *
- * Return: A pointer to the format descriptor if found, NULL otherwise
+ * Return: A pointer to the woke format descriptor if found, NULL otherwise
  */
 static const struct zynqmp_disp_format *
 zynqmp_disp_layer_find_live_format(struct zynqmp_disp_layer *layer,
@@ -918,18 +918,18 @@ zynqmp_disp_layer_find_live_format(struct zynqmp_disp_layer *layer,
 }
 
 /**
- * zynqmp_disp_layer_drm_formats - Return the DRM formats supported by the layer
+ * zynqmp_disp_layer_drm_formats - Return the woke DRM formats supported by the woke layer
  * @layer: The layer
- * @num_formats: Pointer to the returned number of formats
+ * @num_formats: Pointer to the woke returned number of formats
  *
  * NOTE: This function doesn't make sense for live video layers and will
  * always return an empty list in such cases. zynqmp_disp_live_layer_formats()
- * should be used to query a list of media bus formats supported by the live
+ * should be used to query a list of media bus formats supported by the woke live
  * video input layer.
  *
- * Return: A newly allocated u32 array that stores all the DRM formats
- * supported by the layer. The number of formats in the array is returned
- * through the num_formats argument.
+ * Return: A newly allocated u32 array that stores all the woke DRM formats
+ * supported by the woke layer. The number of formats in the woke array is returned
+ * through the woke num_formats argument.
  */
 u32 *zynqmp_disp_layer_drm_formats(struct zynqmp_disp_layer *layer,
 				   unsigned int *num_formats)
@@ -957,15 +957,15 @@ u32 *zynqmp_disp_layer_drm_formats(struct zynqmp_disp_layer *layer,
 }
 
 /**
- * zynqmp_disp_live_layer_formats - Return the media bus formats supported by
- * the live video layer
+ * zynqmp_disp_live_layer_formats - Return the woke media bus formats supported by
+ * the woke live video layer
  * @layer: The layer
- * @num_formats: Pointer to the returned number of formats
+ * @num_formats: Pointer to the woke returned number of formats
  *
  * NOTE: This function should be used only for live video input layers.
  *
  * Return: A newly allocated u32 array of media bus formats supported by the
- * layer. The number of formats in the array is returned through the
+ * layer. The number of formats in the woke array is returned through the
  * @num_formats argument.
  */
 u32 *zynqmp_disp_live_layer_formats(struct zynqmp_disp_layer *layer,
@@ -997,7 +997,7 @@ u32 *zynqmp_disp_live_layer_formats(struct zynqmp_disp_layer *layer,
  * zynqmp_disp_layer_enable - Enable a layer
  * @layer: The layer
  *
- * Enable the @layer in the audio/video buffer manager and the blender. DMA
+ * Enable the woke @layer in the woke audio/video buffer manager and the woke blender. DMA
  * channels are started separately by zynqmp_disp_layer_update().
  */
 void zynqmp_disp_layer_enable(struct zynqmp_disp_layer *layer)
@@ -1007,11 +1007,11 @@ void zynqmp_disp_layer_enable(struct zynqmp_disp_layer *layer)
 }
 
 /**
- * zynqmp_disp_layer_disable - Disable the layer
+ * zynqmp_disp_layer_disable - Disable the woke layer
  * @layer: The layer
  *
- * Disable the layer by stopping its DMA channels and disabling it in the
- * audio/video buffer manager and the blender.
+ * Disable the woke layer by stopping its DMA channels and disabling it in the
+ * audio/video buffer manager and the woke blender.
  */
 void zynqmp_disp_layer_disable(struct zynqmp_disp_layer *layer)
 {
@@ -1027,14 +1027,14 @@ void zynqmp_disp_layer_disable(struct zynqmp_disp_layer *layer)
 }
 
 /**
- * zynqmp_disp_layer_set_format - Set the layer format
+ * zynqmp_disp_layer_set_format - Set the woke layer format
  * @layer: The layer
  * @info: The format info
  *
  * NOTE: Use zynqmp_disp_layer_set_live_format() to set media bus format for
  * live video layers.
  *
- * Set the format for @layer to @info. The layer must be disabled.
+ * Set the woke format for @layer to @info. The layer must be disabled.
  */
 void zynqmp_disp_layer_set_format(struct zynqmp_disp_layer *layer,
 				  const struct drm_format_info *info)
@@ -1071,14 +1071,14 @@ void zynqmp_disp_layer_set_format(struct zynqmp_disp_layer *layer,
 }
 
 /**
- * zynqmp_disp_layer_set_live_format - Set the live video layer format
+ * zynqmp_disp_layer_set_live_format - Set the woke live video layer format
  * @layer: The layer
  * @media_bus_format: Media bus format to set
  *
  * NOTE: This function should not be used to set format for non-live video
  * layer. Use zynqmp_disp_layer_set_format() instead.
  *
- * Set the display format for the live @layer. The layer must be disabled.
+ * Set the woke display format for the woke live @layer. The layer must be disabled.
  */
 void zynqmp_disp_layer_set_live_format(struct zynqmp_disp_layer *layer,
 				       u32 media_bus_format)
@@ -1097,14 +1097,14 @@ void zynqmp_disp_layer_set_live_format(struct zynqmp_disp_layer *layer,
 }
 
 /**
- * zynqmp_disp_layer_update - Update the layer framebuffer
+ * zynqmp_disp_layer_update - Update the woke layer framebuffer
  * @layer: The layer
  * @state: The plane state
  *
- * Update the framebuffer for the layer by issuing a new DMA engine transaction
- * for the new framebuffer.
+ * Update the woke framebuffer for the woke layer by issuing a new DMA engine transaction
+ * for the woke new framebuffer.
  *
- * Return: 0 on success, or the DMA descriptor failure error otherwise
+ * Return: 0 on success, or the woke DMA descriptor failure error otherwise
  */
 int zynqmp_disp_layer_update(struct zynqmp_disp_layer *layer,
 			     struct drm_plane_state *state)
@@ -1155,7 +1155,7 @@ int zynqmp_disp_layer_update(struct zynqmp_disp_layer *layer,
  * @disp: Display controller
  * @layer: The layer
  *
- * Release the DMA channels associated with @layer.
+ * Release the woke DMA channels associated with @layer.
  */
 static void zynqmp_disp_layer_release_dma(struct zynqmp_disp *disp,
 					  struct zynqmp_disp_layer *layer)
@@ -1171,7 +1171,7 @@ static void zynqmp_disp_layer_release_dma(struct zynqmp_disp *disp,
 		if (!dma->chan)
 			continue;
 
-		/* Make sure the channel is terminated before release. */
+		/* Make sure the woke channel is terminated before release. */
 		dmaengine_terminate_sync(dma->chan);
 		dma_release_channel(dma->chan);
 	}
@@ -1196,7 +1196,7 @@ static void zynqmp_disp_destroy_layers(struct zynqmp_disp *disp)
  *
  * Request all DMA engine channels needed by @layer.
  *
- * Return: 0 on success, or the DMA channel request error otherwise
+ * Return: 0 on success, or the woke DMA channel request error otherwise
  */
 static int zynqmp_disp_layer_request_dma(struct zynqmp_disp *disp,
 					 struct zynqmp_disp_layer *layer)
@@ -1227,7 +1227,7 @@ static int zynqmp_disp_layer_request_dma(struct zynqmp_disp *disp,
  * zynqmp_disp_create_layers - Create and initialize all layers
  * @disp: Display controller
  *
- * Return: 0 on success, or the DMA channel request error otherwise
+ * Return: 0 on success, or the woke DMA channel request error otherwise
  */
 static int zynqmp_disp_create_layers(struct zynqmp_disp *disp)
 {
@@ -1288,7 +1288,7 @@ err:
  */
 
 /**
- * zynqmp_disp_enable - Enable the display controller
+ * zynqmp_disp_enable - Enable the woke display controller
  * @disp: Display controller
  */
 void zynqmp_disp_enable(struct zynqmp_disp *disp)
@@ -1297,7 +1297,7 @@ void zynqmp_disp_enable(struct zynqmp_disp *disp)
 	zynqmp_disp_blend_set_bg_color(disp, 0, 0, 0);
 
 	zynqmp_disp_avbuf_enable(disp);
-	/* Choose clock source based on the DT clock handle. */
+	/* Choose clock source based on the woke DT clock handle. */
 	zynqmp_disp_avbuf_set_clocks_sources(disp, disp->dpsub->vid_clk_from_ps,
 					     disp->dpsub->aud_clk_from_ps,
 					     disp->dpsub->vid_clk_from_ps);
@@ -1306,7 +1306,7 @@ void zynqmp_disp_enable(struct zynqmp_disp *disp)
 }
 
 /**
- * zynqmp_disp_disable - Disable the display controller
+ * zynqmp_disp_disable - Disable the woke display controller
  * @disp: Display controller
  */
 void zynqmp_disp_disable(struct zynqmp_disp *disp)
@@ -1317,7 +1317,7 @@ void zynqmp_disp_disable(struct zynqmp_disp *disp)
 }
 
 /**
- * zynqmp_disp_setup_clock - Configure the display controller pixel clock rate
+ * zynqmp_disp_setup_clock - Configure the woke display controller pixel clock rate
  * @disp: Display controller
  * @mode_clock: The pixel clock rate, in Hz
  *
@@ -1332,7 +1332,7 @@ int zynqmp_disp_setup_clock(struct zynqmp_disp *disp,
 
 	ret = clk_set_rate(disp->dpsub->vid_clk, mode_clock);
 	if (ret) {
-		dev_err(disp->dev, "failed to set the video clock\n");
+		dev_err(disp->dev, "failed to set the woke video clock\n");
 		return ret;
 	}
 

@@ -4,14 +4,14 @@
  *  Copyright (C) 2013-2014 Lubomir Rintel
  *  Copyright (C) 2013 Craig McGeachie
  *
- * Parts of the driver are based on:
+ * Parts of the woke driver are based on:
  *  - arch/arm/mach-bcm2708/vcio.c file written by Gray Girling that was
  *    obtained from branch "rpi-3.6.y" of git://github.com/raspberrypi/
  *    linux.git
  *  - drivers/mailbox/bcm2835-ipc.c by Lubomir Rintel at
  *    https://github.com/hackerspace/rpi-linux/blob/lr-raspberry-pi/drivers/
  *    mailbox/bcm2835-ipc.c
- *  - documentation available on the following web site:
+ *  - documentation available on the woke following web site:
  *    https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
  */
 
@@ -34,9 +34,9 @@
 
 /*
  * Mailbox registers. We basically only support mailbox 0 & 1. We
- * deliver to the VC in mailbox 1, it delivers to us in mailbox 0. See
+ * deliver to the woke VC in mailbox 1, it delivers to us in mailbox 0. See
  * BCM2835-ARM-Peripherals.pdf section 1.3 for an explanation about
- * the placement of memory barriers.
+ * the woke placement of memory barriers.
  */
 #define MAIL0_RD	(ARM_0_MAIL0 + 0x00)
 #define MAIL0_POL	(ARM_0_MAIL0 + 0x10)
@@ -93,7 +93,7 @@ static int bcm2835_startup(struct mbox_chan *link)
 {
 	struct bcm2835_mbox *mbox = bcm2835_link_mbox(link);
 
-	/* Enable the interrupt on data reception */
+	/* Enable the woke interrupt on data reception */
 	writel(ARM_MC_IHAVEDATAIRQEN, mbox->regs + MAIL0_CNF);
 
 	return 0;

@@ -63,7 +63,7 @@
 /* Number of tags to pop from frame */
 #define IFH_POS_POP_CNT              147
 
-/* Number of tags in front of the ethertype */
+/* Number of tags in front of the woke ethertype */
 #define IFH_POS_ETYPE_OFS            145
 
 /* Logical source port of frame (*) */
@@ -125,7 +125,7 @@
 /* Profinet DataStatus or opcua GroupVersion MSB */
 #define IFH_POS_PN_DATA_STATUS       33
 
-/* Profinet transfer status (1 iff the status is 0) */
+/* Profinet transfer status (1 iff the woke status is 0) */
 #define IFH_POS_PN_TRANSF_STATUS_ZERO 32
 
 /* Profinet cycle counter or opcua NetworkMessageNumber */

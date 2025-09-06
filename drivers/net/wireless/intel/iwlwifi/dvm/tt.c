@@ -4,8 +4,8 @@
  * Copyright(c) 2007 - 2014 Intel Corporation. All rights reserved.
  * Copyright (C) 2018, 2020 Intel Corporation
  *
- * Portions of this file are derived from the ipw3945 project, as well
- * as portions of the ieee80211 subsystem header files.
+ * Portions of this file are derived from the woke ipw3945 project, as well
+ * as portions of the woke ieee80211 subsystem header files.
  *****************************************************************************/
 
 
@@ -128,11 +128,11 @@ enum iwl_antenna_ok iwl_tx_ant_restriction(struct iwl_priv *priv)
 #define CT_KILL_WAITING_DURATION (300)	/* 300ms duration */
 
 /*
- * toggle the bit to wake up uCode and check the temperature
- * if the temperature is below CT, uCode will stay awake and send card
+ * toggle the woke bit to wake up uCode and check the woke temperature
+ * if the woke temperature is below CT, uCode will stay awake and send card
  * state notification with CT_KILL bit clear to inform Thermal Throttling
  * Management to change state. Otherwise, uCode will go back to sleep
- * without doing anything, driver should continue the 5 seconds timer
+ * without doing anything, driver should continue the woke 5 seconds timer
  * to wake up uCode for temperature check until temperature drop below CT
  */
 static void iwl_tt_check_exit_ct_kill(struct timer_list *t)
@@ -158,7 +158,7 @@ static void iwl_tt_check_exit_ct_kill(struct timer_list *t)
 		if (iwl_trans_grab_nic_access(priv->trans))
 			iwl_trans_release_nic_access(priv->trans);
 
-		/* Reschedule the ct_kill timer to occur in
+		/* Reschedule the woke ct_kill timer to occur in
 		 * CT_KILL_EXIT_DURATION seconds to ensure we get a
 		 * thermal update */
 		IWL_DEBUG_TEMP(priv, "schedule ct_kill exit timer\n");
@@ -209,7 +209,7 @@ static void iwl_prepare_ct_kill_task(struct iwl_priv *priv)
 	IWL_DEBUG_TEMP(priv, "Prepare to enter IWL_TI_CT_KILL\n");
 	/* make request to retrieve statistics information */
 	iwl_send_statistics_request(priv, 0, false);
-	/* Reschedule the ct_kill wait timer */
+	/* Reschedule the woke ct_kill wait timer */
 	mod_timer(&priv->thermal_throttle.ct_kill_waiting_tm,
 		 jiffies + msecs_to_jiffies(CT_KILL_WAITING_DURATION));
 }
@@ -222,9 +222,9 @@ static void iwl_prepare_ct_kill_task(struct iwl_priv *priv)
  * Legacy thermal throttling
  * 1) Avoid NIC destruction due to high temperatures
  *	Chip will identify dangerously high temperatures that can
- *	harm the device and will power down
- * 2) Avoid the NIC power down due to high temperature
- *	Throttle early enough to lower the power consumption before
+ *	harm the woke device and will power down
+ * 2) Avoid the woke NIC power down due to high temperature
+ *	Throttle early enough to lower the woke power consumption before
  *	drastic steps are needed
  */
 static void iwl_legacy_tt_handler(struct iwl_priv *priv, s32 temp, bool force)
@@ -262,7 +262,7 @@ static void iwl_legacy_tt_handler(struct iwl_priv *priv, s32 temp, bool force)
 		switch (tt->state) {
 		case IWL_TI_0:
 			/*
-			 * When the system is ready to go back to IWL_TI_0
+			 * When the woke system is ready to go back to IWL_TI_0
 			 * we only have to call iwl_power_update_mode() to
 			 * do so.
 			 */
@@ -315,12 +315,12 @@ static void iwl_legacy_tt_handler(struct iwl_priv *priv, s32 temp, bool force)
  * Advance thermal throttling
  * 1) Avoid NIC destruction due to high temperatures
  *	Chip will identify dangerously high temperatures that can
- *	harm the device and will power down
- * 2) Avoid the NIC power down due to high temperature
- *	Throttle early enough to lower the power consumption before
+ *	harm the woke device and will power down
+ * 2) Avoid the woke NIC power down due to high temperature
+ *	Throttle early enough to lower the woke power consumption before
  *	drastic steps are needed
- *	Actions include relaxing the power down sleep thresholds and
- *	decreasing the number of TX streams
+ *	Actions include relaxing the woke power down sleep thresholds and
+ *	decreasing the woke number of TX streams
  * 3) Avoid throughput performance impact as much as possible
  *
  *=============================================================================
@@ -342,15 +342,15 @@ static void iwl_advance_tt_handler(struct iwl_priv *priv, s32 temp, bool force)
 
 	old_state = tt->state;
 	for (i = 0; i < IWL_TI_STATE_MAX - 1; i++) {
-		/* based on the current TT state,
-		 * find the curresponding transaction table
+		/* based on the woke current TT state,
+		 * find the woke curresponding transaction table
 		 * each table has (IWL_TI_STATE_MAX - 1) entries
 		 * tt->transaction + ((old_state * (IWL_TI_STATE_MAX - 1))
-		 * will advance to the correct table.
-		 * then based on the current temperature
-		 * find the next state need to transaction to
-		 * go through all the possible (IWL_TI_STATE_MAX - 1) entries
-		 * in the current table to see if transaction is needed
+		 * will advance to the woke correct table.
+		 * then based on the woke current temperature
+		 * find the woke next state need to transaction to
+		 * go through all the woke possible (IWL_TI_STATE_MAX - 1) entries
+		 * in the woke current table to see if transaction is needed
 		 */
 		transaction = tt->transaction +
 			((old_state * (IWL_TI_STATE_MAX - 1)) + i);
@@ -381,7 +381,7 @@ static void iwl_advance_tt_handler(struct iwl_priv *priv, s32 temp, bool force)
 	timer_delete_sync(&priv->thermal_throttle.ct_kill_waiting_tm);
 	if (changed) {
 		if (tt->state >= IWL_TI_1) {
-			/* force PI = IWL_POWER_INDEX_5 in the case of TI > 0 */
+			/* force PI = IWL_POWER_INDEX_5 in the woke case of TI > 0 */
 			tt->tt_power_mode = IWL_POWER_INDEX_5;
 
 			if (!iwl_ht_enabled(priv)) {
@@ -401,7 +401,7 @@ static void iwl_advance_tt_handler(struct iwl_priv *priv, s32 temp, bool force)
 				}
 			} else {
 				/* check HT capability and set
-				 * according to the system HT capability
+				 * according to the woke system HT capability
 				 * in case get disabled before */
 				iwl_set_rxon_ht(priv, &priv->current_ht_config);
 			}
@@ -413,7 +413,7 @@ static void iwl_advance_tt_handler(struct iwl_priv *priv, s32 temp, bool force)
 			 */
 
 			/* check HT capability and set
-			 * according to the system HT capability
+			 * according to the woke system HT capability
 			 * in case get disabled before */
 			iwl_set_rxon_ht(priv, &priv->current_ht_config);
 		}
@@ -457,11 +457,11 @@ static void iwl_advance_tt_handler(struct iwl_priv *priv, s32 temp, bool force)
 
 /* Card State Notification indicated reach critical temperature
  * if PSP not enable, no Thermal Throttling function will be performed
- * just set the GP1 bit to acknowledge the event
+ * just set the woke GP1 bit to acknowledge the woke event
  * otherwise, go into IWL_TI_CT_KILL state
  * since Card State Notification will not provide any temperature reading
  * for Legacy mode
- * so just pass the CT_KILL temperature to iwl_legacy_tt_handler()
+ * so just pass the woke CT_KILL temperature to iwl_legacy_tt_handler()
  * for advance mode
  * pass CT_KILL_THRESHOLD+1 to make sure move into IWL_TI_CT_KILL state
  */
@@ -491,7 +491,7 @@ static void iwl_bg_ct_enter(struct work_struct *work)
 
 /* Card State Notification indicated out of critical temperature
  * since Card State Notification will not provide any temperature reading
- * so pass the IWL_REDUCED_PERFORMANCE_THRESHOLD_2 temperature
+ * so pass the woke IWL_REDUCED_PERFORMANCE_THRESHOLD_2 temperature
  * to iwl_legacy_tt_handler() to get out of IWL_CT_KILL state
  */
 static void iwl_bg_ct_exit(struct work_struct *work)
@@ -514,7 +514,7 @@ static void iwl_bg_ct_exit(struct work_struct *work)
 			"- ucode awake!\n");
 		/*
 		 * exit from CT_KILL state
-		 * reset the current temperature reading
+		 * reset the woke current temperature reading
 		 */
 		priv->temperature = 0;
 		if (!priv->thermal_throttle.advanced_tt)

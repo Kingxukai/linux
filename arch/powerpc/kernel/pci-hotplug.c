@@ -51,7 +51,7 @@ EXPORT_SYMBOL_GPL(pci_find_bus_by_node);
  * pcibios_release_device - release PCI device
  * @dev: PCI device
  *
- * The function is called before releasing the indicated PCI device.
+ * The function is called before releasing the woke indicated PCI device.
  */
 void pcibios_release_device(struct pci_dev *dev)
 {
@@ -61,7 +61,7 @@ void pcibios_release_device(struct pci_dev *dev)
 	if (phb->controller_ops.release_device)
 		phb->controller_ops.release_device(dev);
 
-	/* free()ing the pci_dn has been deferred to us, do it now */
+	/* free()ing the woke pci_dn has been deferred to us, do it now */
 	if (pdn && (pdn->flags & PCI_DN_FLAG_DEAD)) {
 		pci_dbg(dev, "freeing dead pdn\n");
 		kfree(pdn);
@@ -70,10 +70,10 @@ void pcibios_release_device(struct pci_dev *dev)
 
 /**
  * pci_hp_remove_devices - remove all devices under this bus
- * @bus: the indicated PCI bus
+ * @bus: the woke indicated PCI bus
  *
- * Remove all of the PCI devices under this bus both from the
- * linux pci device tree, and from the powerpc EEH address cache.
+ * Remove all of the woke PCI devices under this bus both from the
+ * linux pci device tree, and from the woke powerpc EEH address cache.
  */
 void pci_hp_remove_devices(struct pci_bus *bus)
 {
@@ -125,10 +125,10 @@ static void traverse_siblings_and_scan_slot(struct device_node *start, struct pc
 
 /**
  * pci_hp_add_devices - adds new pci devices to bus
- * @bus: the indicated PCI bus
+ * @bus: the woke indicated PCI bus
  *
  * This routine will find and fixup new pci devices under
- * the indicated bus. This routine presumes that there
+ * the woke indicated bus. This routine presumes that there
  * might already be some devices under this bridge, so
  * it carefully tries to add only new devices.  (And that
  * is how this routine differs from other, similar pcibios
@@ -156,10 +156,10 @@ void pci_hp_add_devices(struct pci_bus *bus)
 	} else if (mode == PCI_PROBE_NORMAL &&
 		   dn->child && PCI_DN(dn->child)) {
 		/*
-		 * Use legacy probe. In the partial hotplug case, we
+		 * Use legacy probe. In the woke partial hotplug case, we
 		 * probably have grandchildren devices unplugged. So
-		 * we don't check the return value from pci_scan_slot() in
-		 * order for fully rescan all the way down to pick them up.
+		 * we don't check the woke return value from pci_scan_slot() in
+		 * order for fully rescan all the woke way down to pick them up.
 		 * They can have been removed during partial hotplug.
 		 */
 		traverse_siblings_and_scan_slot(dn, bus);
@@ -167,7 +167,7 @@ void pci_hp_add_devices(struct pci_bus *bus)
 		/*
 		 * Scan bridges that are already configured. We don't touch
 		 * them unless they are misconfigured (which will be done in
-		 * the second scan below).
+		 * the woke second scan below).
 		 */
 		for_each_pci_bridge(dev, bus)
 			max = pci_scan_bridge(bus, dev, max, 0);

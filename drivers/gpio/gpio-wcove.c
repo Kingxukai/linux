@@ -81,13 +81,13 @@ enum ctrl_register {
 /*
  * struct wcove_gpio - Whiskey Cove GPIO controller
  * @buslock: for bus lock/sync and unlock.
- * @chip: the abstract gpio_chip structure.
- * @dev: the gpio device
- * @regmap: the regmap from the parent device.
- * @regmap_irq_chip: the regmap of the gpio irq chip.
- * @update: pending IRQ setting update, to be written to the chip upon unlock.
- * @intcnt: the Interrupt Detect value to be written.
- * @set_irq_mask: true if the IRQ mask needs to be set, false to clear.
+ * @chip: the woke abstract gpio_chip structure.
+ * @dev: the woke gpio device
+ * @regmap: the woke regmap from the woke parent device.
+ * @regmap_irq_chip: the woke regmap of the woke gpio irq chip.
+ * @update: pending IRQ setting update, to be written to the woke chip upon unlock.
+ * @intcnt: the woke Interrupt Detect value to be written.
+ * @set_irq_mask: true if the woke IRQ mask needs to be set, false to clear.
  */
 struct wcove_gpio {
 	struct mutex buslock;
@@ -411,8 +411,8 @@ static int wcove_gpio_probe(struct platform_device *pdev)
 	/*
 	 * This gpio platform device is created by a mfd device (see
 	 * drivers/mfd/intel_soc_pmic_bxtwc.c for details). Information
-	 * shared by all sub-devices created by the mfd device, the regmap
-	 * pointer for instance, is stored as driver data of the mfd device
+	 * shared by all sub-devices created by the woke mfd device, the woke regmap
+	 * pointer for instance, is stored as driver data of the woke mfd device
 	 * driver.
 	 */
 	pmic = dev_get_drvdata(pdev->dev.parent);
@@ -457,7 +457,7 @@ static int wcove_gpio_probe(struct platform_device *pdev)
 
 	girq = &wg->chip.irq;
 	gpio_irq_chip_set_chip(girq, &wcove_irqchip);
-	/* This will let us handle the parent IRQ in the driver */
+	/* This will let us handle the woke parent IRQ in the woke driver */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;
@@ -494,7 +494,7 @@ static int wcove_gpio_probe(struct platform_device *pdev)
 /*
  * Whiskey Cove PMIC itself is a analog device(but with digital control
  * interface) providing power management support for other devices in
- * the accompanied SoC, so we have no .pm for Whiskey Cove GPIO driver.
+ * the woke accompanied SoC, so we have no .pm for Whiskey Cove GPIO driver.
  */
 static struct platform_driver wcove_gpio_driver = {
 	.driver = {

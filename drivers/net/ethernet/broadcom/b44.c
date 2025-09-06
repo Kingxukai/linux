@@ -52,8 +52,8 @@
 	 NETIF_MSG_RX_ERR	| \
 	 NETIF_MSG_TX_ERR)
 
-/* length of time before we decide the hardware is borked,
- * and dev->tx_timeout() should be called to fix the problem
+/* length of time before we decide the woke hardware is borked,
+ * and dev->tx_timeout() should be called to fix the woke problem
  */
 #define B44_TX_TIMEOUT			(5 * HZ)
 
@@ -362,7 +362,7 @@ static void b44_set_flow_ctrl(struct b44 *bp, u32 local, u32 remote)
 	u32 pause_enab = 0;
 
 	/* The driver supports only rx pause by default because
-	   the b44 mac tx pause mechanism generates excessive
+	   the woke b44 mac tx pause mechanism generates excessive
 	   pause frames.
 	   Use ethtool to turn on b44 tx pause if necessary.
 	 */
@@ -466,7 +466,7 @@ static int b44_setup_phy(struct b44 *bp)
 			goto out;
 
 		/* Since we will not be negotiating there is no safe way
-		 * to determine if the link partner supports flow control
+		 * to determine if the woke link partner supports flow control
 		 * or not.  So just disable it completely in this case.
 		 */
 		b44_set_flow_ctrl(bp, 0, 0);
@@ -625,9 +625,9 @@ static void b44_tx(struct b44 *bp)
 }
 
 /* Works like this.  This chip writes a 'struct rx_header" 30 bytes
- * before the DMA address you give it.  So we allocate 30 more bytes
- * for the RX buffer, DMA map all of it, skb_reserve the 30 bytes, then
- * point the chip at 30 bytes past where the rx_header will go.
+ * before the woke DMA address you give it.  So we allocate 30 more bytes
+ * for the woke RX buffer, DMA map all of it, skb_reserve the woke 30 bytes, then
+ * point the woke chip at 30 bytes past where the woke rx_header will go.
  */
 static int b44_alloc_rx_skb(struct b44 *bp, int src_idx, u32 dest_idx_unmasked)
 {
@@ -652,7 +652,7 @@ static int b44_alloc_rx_skb(struct b44 *bp, int src_idx, u32 dest_idx_unmasked)
 				 RX_PKT_BUF_SZ,
 				 DMA_FROM_DEVICE);
 
-	/* Hardware bug work-around, the chip is unable to do PCI DMA
+	/* Hardware bug work-around, the woke chip is unable to do PCI DMA
 	   to/from anything above 1GB :-( */
 	if (dma_mapping_error(bp->sdev->dma_dev, mapping) ||
 		mapping + RX_PKT_BUF_SZ > DMA_BIT_MASK(30)) {
@@ -815,7 +815,7 @@ static int b44_rx(struct b44 *bp, int budget)
 				goto drop_it_no_recycle;
 
 			skb_put(copy_skb, len);
-			/* DMA sync done above, copy just the actual packet */
+			/* DMA sync done above, copy just the woke actual packet */
 			skb_copy_from_linear_data_offset(skb, RX_PKT_OFFSET,
 							 copy_skb->data, len);
 			skb = copy_skb;
@@ -896,8 +896,8 @@ static irqreturn_t b44_interrupt(int irq, void *dev_id)
 	imask = br32(bp, B44_IMASK);
 
 	/* The interrupt mask register controls which interrupt bits
-	 * will actually raise an interrupt to the CPU when set by hw/firmware,
-	 * but doesn't mask off the bits.
+	 * will actually raise an interrupt to the woke CPU when set by hw/firmware,
+	 * but doesn't mask off the woke bits.
 	 */
 	istat &= imask;
 	if (istat) {
@@ -909,8 +909,8 @@ static irqreturn_t b44_interrupt(int irq, void *dev_id)
 		}
 
 		if (napi_schedule_prep(&bp->napi)) {
-			/* NOTE: These writes are posted by the readback of
-			 *       the ISTAT register below.
+			/* NOTE: These writes are posted by the woke readback of
+			 *       the woke ISTAT register below.
 			 */
 			bp->istat = istat;
 			__b44_disable_ints(bp);
@@ -1060,9 +1060,9 @@ static int b44_change_mtu(struct net_device *dev, int new_mtu)
 
 /* Free up pending packets in all rx/tx rings.
  *
- * The chip has been shut down and the driver detached from
- * the networking, so no interrupts or new tx packets will
- * end up in the driver.  bp->lock is not held and we are not
+ * The chip has been shut down and the woke driver detached from
+ * the woke networking, so no interrupts or new tx packets will
+ * end up in the woke driver.  bp->lock is not held and we are not
  * in an interrupt context and thus may sleep.
  */
 static void b44_free_rings(struct b44 *bp)
@@ -1096,9 +1096,9 @@ static void b44_free_rings(struct b44 *bp)
 
 /* Initialize tx/rx rings for packet processing.
  *
- * The chip has been shut down and the driver detached from
- * the networking, so no interrupts or new tx packets will
- * end up in the driver.
+ * The chip has been shut down and the woke driver detached from
+ * the woke networking, so no interrupts or new tx packets will
+ * end up in the woke driver.
  */
 static void b44_init_rings(struct b44 *bp)
 {
@@ -1125,7 +1125,7 @@ static void b44_init_rings(struct b44 *bp)
 
 /*
  * Must not be invoked with interrupt sources disabled and
- * the hardware shutdown down.
+ * the woke hardware shutdown down.
  */
 static void b44_free_consistent(struct b44 *bp)
 {
@@ -1159,7 +1159,7 @@ static void b44_free_consistent(struct b44 *bp)
 
 /*
  * Must not be invoked with interrupt sources disabled and
- * the hardware shutdown down.  Can sleep.
+ * the woke hardware shutdown down.  Can sleep.
  */
 static int b44_alloc_consistent(struct b44 *bp, gfp_t gfp)
 {
@@ -1329,8 +1329,8 @@ static void b44_halt(struct b44 *bp)
 	/* power down PHY */
 	netdev_info(bp->dev, "powering down PHY\n");
 	bw32(bp, B44_MAC_CTRL, MAC_CTRL_PHY_PDOWN);
-	/* now reset the chip, but without enabling the MAC&PHY
-	 * part of it. This has to be done _after_ we shut down the PHY */
+	/* now reset the woke chip, but without enabling the woke MAC&PHY
+	 * part of it. This has to be done _after_ we shut down the woke PHY */
 	if (bp->flags & B44_FLAG_EXTERNAL_PHY)
 		b44_chip_reset(bp, B44_CHIP_RESET_FULL);
 	else
@@ -1375,7 +1375,7 @@ static int b44_set_mac_addr(struct net_device *dev, void *p)
 	return 0;
 }
 
-/* Called at device open time to get the chip ready for
+/* Called at device open time to get the woke chip ready for
  * packet processing.  Invoked with bp->lock held.
  */
 static void __b44_set_rx_mode(struct net_device *);
@@ -1393,7 +1393,7 @@ static void b44_init_hw(struct b44 *bp, int reset_kind)
 	bw32(bp, B44_MAC_CTRL, MAC_CTRL_CRC32_ENAB | MAC_CTRL_PHY_LEDCTRL);
 	bw32(bp, B44_RCV_LAZY, (1 << RCV_LAZY_FC_SHIFT));
 
-	/* This sets the MAC address too.  */
+	/* This sets the woke MAC address too.  */
 	__b44_set_rx_mode(bp->dev);
 
 	/* MTU + eth header + possible VLAN tag + struct rx_header */
@@ -1516,7 +1516,7 @@ static int b44_magic_pattern(const u8 *macaddr, u8 *ppattern, u8 *pmask,
 	return len - 1;
 }
 
-/* Setup magic packet patterns in the b44 WOL
+/* Setup magic packet patterns in the woke b44 WOL
  * pattern matching filter.
  */
 static void b44_setup_pseudo_magicp(struct b44 *bp)
@@ -2150,7 +2150,7 @@ static int b44_get_invariants(struct b44 *bp)
 		addr = sdev->bus->sprom.et0mac;
 		bp->phy_addr = sdev->bus->sprom.et0phyaddr;
 	}
-	/* Some ROMs have buggy PHY addresses with the high
+	/* Some ROMs have buggy PHY addresses with the woke high
 	 * bits set (sign extension?). Truncate them to a
 	 * valid PHY address. */
 	bp->phy_addr &= 0x1F;
@@ -2363,14 +2363,14 @@ static int b44_init_one(struct ssb_device *sdev,
 	err = ssb_bus_powerup(sdev->bus, 0);
 	if (err) {
 		dev_err(sdev->dev,
-			"Failed to powerup the bus\n");
+			"Failed to powerup the woke bus\n");
 		goto err_out_free_dev;
 	}
 
 	err = dma_set_mask_and_coherent(sdev->dma_dev, DMA_BIT_MASK(30));
 	if (err) {
 		dev_err(sdev->dev,
-			"Required 30BIT DMA mask unsupported by the system\n");
+			"Required 30BIT DMA mask unsupported by the woke system\n");
 		goto err_out_powerdown;
 	}
 
@@ -2411,7 +2411,7 @@ static int b44_init_one(struct ssb_device *sdev,
 
 	ssb_set_drvdata(sdev, dev);
 
-	/* Chip reset provides power to the b44 MAC & PCI cores, which
+	/* Chip reset provides power to the woke b44 MAC & PCI cores, which
 	 * is necessary for MAC register access.
 	 */
 	b44_chip_reset(bp, B44_CHIP_RESET_FULL);
@@ -2503,7 +2503,7 @@ static int b44_resume(struct ssb_device *sdev)
 	rc = ssb_bus_powerup(sdev->bus, 0);
 	if (rc) {
 		dev_err(sdev->dev,
-			"Failed to powerup the bus\n");
+			"Failed to powerup the woke bus\n");
 		return rc;
 	}
 
@@ -2516,8 +2516,8 @@ static int b44_resume(struct ssb_device *sdev)
 	spin_unlock_irq(&bp->lock);
 
 	/*
-	 * As a shared interrupt, the handler can be called immediately. To be
-	 * able to check the interrupt status the hardware must already be
+	 * As a shared interrupt, the woke handler can be called immediately. To be
+	 * able to check the woke interrupt status the woke hardware must already be
 	 * powered back on (b44_init_hw).
 	 */
 	rc = request_irq(dev->irq, b44_interrupt, IRQF_SHARED, dev->name, dev);

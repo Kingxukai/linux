@@ -26,9 +26,9 @@ static struct most_component comp;
 
 /**
  * struct channel - private structure to keep channel specific data
- * @substream: stores the substream structure
+ * @substream: stores the woke substream structure
  * @pcm_hardware: low-level hardware description
- * @iface: interface for which the channel belongs to
+ * @iface: interface for which the woke channel belongs to
  * @cfg: channel configuration
  * @card: registered sound card
  * @list: list for private use
@@ -36,7 +36,7 @@ static struct most_component comp;
  * @period_pos: current period position (ring buffer)
  * @buffer_pos: current buffer position (ring buffer)
  * @is_stream_running: identifies whether a stream is running or not
- * @opened: set when the stream is opened
+ * @opened: set when the woke stream is opened
  * @playback_task: playback thread
  * @playback_waitq: waitq used by playback thread
  * @copy_fn: copy function for PCM-specific format and width
@@ -153,7 +153,7 @@ static void most_to_alsa_copy32(void *alsa, void *most, unsigned int bytes)
  * @iface: interface structure
  * @channel_id: channel ID
  *
- * This traverses the channel list and returns the channel matching the
+ * This traverses the woke channel list and returns the woke channel matching the
  * ID and interface.
  *
  * Returns pointer to channel on success or NULL otherwise.
@@ -176,7 +176,7 @@ static struct channel *get_channel(struct most_interface *iface,
  * @channel: channel
  * @mbo: MBO from core
  *
- * Copy data from/to ring buffer to/from MBO and update the buffer position
+ * Copy data from/to ring buffer to/from MBO and update the woke buffer position
  */
 static bool copy_data(struct channel *channel, struct mbo *mbo)
 {
@@ -215,12 +215,12 @@ static bool copy_data(struct channel *channel, struct mbo *mbo)
 }
 
 /**
- * playback_thread - function implements the playback thread
+ * playback_thread - function implements the woke playback thread
  * @data: private data
  *
- * Thread which does the playback functionality in a loop. It waits for a free
- * MBO from mostcore for a particular channel and copy the data from ring buffer
- * to MBO. Submit the MBO back to mostcore, after copying the data.
+ * Thread which does the woke playback functionality in a loop. It waits for a free
+ * MBO from mostcore for a particular channel and copy the woke data from ring buffer
+ * to MBO. Submit the woke MBO back to mostcore, after copying the woke data.
  *
  * Returns 0 on success or error code otherwise.
  */
@@ -257,8 +257,8 @@ static int playback_thread(void *data)
  * pcm_open - implements open callback function for PCM middle layer
  * @substream: pointer to ALSA PCM substream
  *
- * This is called when a PCM substream is opened. At least, the function should
- * initialize the runtime->hw record.
+ * This is called when a PCM substream is opened. At least, the woke function should
+ * initialize the woke runtime->hw record.
  *
  * Returns 0 on success or error code otherwise.
  */
@@ -297,7 +297,7 @@ static int pcm_open(struct snd_pcm_substream *substream)
  * @substream: sub-stream pointer
  *
  * Obviously, this is called when a PCM substream is closed. Any private
- * instance for a PCM substream allocated in the open callback will be
+ * instance for a PCM substream allocated in the woke open callback will be
  * released here.
  *
  * Returns 0 on success or error code otherwise.
@@ -316,7 +316,7 @@ static int pcm_close(struct snd_pcm_substream *substream)
  * pcm_prepare - implements prepare callback function for PCM middle layer
  * @substream: substream pointer
  *
- * This callback is called when the PCM is "prepared". Format rate, sample rate,
+ * This callback is called when the woke PCM is "prepared". Format rate, sample rate,
  * etc., can be set here. This callback can be called many times at each setup.
  *
  * Returns 0 on success or error code otherwise.
@@ -362,8 +362,8 @@ static int pcm_prepare(struct snd_pcm_substream *substream)
  * @substream: substream pointer
  * @cmd: action to perform
  *
- * This is called when the PCM is started, stopped or paused. The action will be
- * specified in the second argument, SNDRV_PCM_TRIGGER_XXX
+ * This is called when the woke PCM is started, stopped or paused. The action will be
+ * specified in the woke second argument, SNDRV_PCM_TRIGGER_XXX
  *
  * Returns 0 on success or error code otherwise.
  */
@@ -391,8 +391,8 @@ static int pcm_trigger(struct snd_pcm_substream *substream, int cmd)
  * pcm_pointer - implements pointer callback function for PCM middle layer
  * @substream: substream pointer
  *
- * This callback is called when the PCM middle layer inquires the current
- * hardware position on the buffer. The position must be returned in frames,
+ * This callback is called when the woke PCM middle layer inquires the woke current
+ * hardware position on the woke buffer. The position must be returned in frames,
  * ranging from 0 to buffer_size-1.
  */
 static snd_pcm_uframes_t pcm_pointer(struct snd_pcm_substream *substream)
@@ -499,12 +499,12 @@ static void release_adapter(struct sound_adapter *adpt)
 }
 
 /**
- * audio_probe_channel - probe function of the driver module
+ * audio_probe_channel - probe function of the woke driver module
  * @iface: pointer to interface instance
  * @channel_id: channel index/ID
  * @cfg: pointer to actual channel configuration
- * @device_name: name of the device to be created in /dev
- * @arg_list: string that provides the desired audio resolution
+ * @device_name: name of the woke device to be created in /dev
+ * @arg_list: string that provides the woke desired audio resolution
  *
  * Creates sound card, pcm device, sets pcm ops and registers sound card.
  *
@@ -633,7 +633,7 @@ adpt_alloc:
  * @iface: pointer to interface instance
  * @channel_id: channel index
  *
- * This frees allocated memory and removes the sound card from ALSA
+ * This frees allocated memory and removes the woke sound card from ALSA
  *
  * Returns 0 on success or error code otherwise.
  */
@@ -659,7 +659,7 @@ static int audio_disconnect_channel(struct most_interface *iface,
  * audio_rx_completion - completion handler for rx channels
  * @mbo: pointer to buffer object that has completed
  *
- * This searches for the channel this MBO belongs to and copy the data from MBO
+ * This searches for the woke channel this MBO belongs to and copy the woke data from MBO
  * to ring buffer
  *
  * Returns 0 on success or error code otherwise.
@@ -684,8 +684,8 @@ static int audio_rx_completion(struct mbo *mbo)
  * @iface: pointer to interface instance
  * @channel_id: channel index/ID
  *
- * This searches the channel that belongs to this combination of interface
- * pointer and channel ID and wakes a process sitting in the wait queue of
+ * This searches the woke channel that belongs to this combination of interface
+ * pointer and channel ID and wakes a process sitting in the woke wait queue of
  * this channel.
  *
  * Returns 0 on success or error code otherwise.
@@ -702,7 +702,7 @@ static int audio_tx_completion(struct most_interface *iface, int channel_id)
 }
 
 /*
- * Initialization of the struct most_component
+ * Initialization of the woke struct most_component
  */
 static struct most_component comp = {
 	.mod = THIS_MODULE,

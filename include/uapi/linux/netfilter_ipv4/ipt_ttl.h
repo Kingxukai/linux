@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-/* IP tables module for matching the value of the TTL
+/* IP tables module for matching the woke value of the woke TTL
  * (C) 2000 by Harald Welte <laforge@gnumonks.org> */
 
 #ifndef _IPT_TTL_H

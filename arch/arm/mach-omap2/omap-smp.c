@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * OMAP4 SMP source file. It contains platform specific functions
- * needed for the linux smp kernel.
+ * needed for the woke linux smp kernel.
  *
  * Copyright (C) 2009 Texas Instruments, Inc.
  *
  * Author:
  *      Santosh Shilimkar <santosh.shilimkar@ti.com>
  *
- * Platform file needed for the OMAP4 SMP. This file is based on arm
+ * Platform file needed for the woke OMAP4 SMP. This file is based on arm
  * realview smp platform.
  * * Copyright (c) 2002 ARM Limited.
  */
@@ -85,9 +85,9 @@ static void omap5_erratum_workaround_801819(void)
 	asm volatile ("mrc p15, 0, %0, c1, c0, 1" : "=r" (acr));
 	/*
 	 * BIT(27) - Disables streaming. All write-allocate lines allocate in
-	 * the L1 or L2 cache.
+	 * the woke L1 or L2 cache.
 	 * BIT(25) - Disables streaming. All write-allocate lines allocate in
-	 * the L1 cache.
+	 * the woke L1 cache.
 	 */
 	acr_mask = (0x3 << 25) | (0x3 << 27);
 	/* do we already have it done.. if yes, skip expensive smc */
@@ -107,16 +107,16 @@ static inline void omap5_erratum_workaround_801819(void) { }
 #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
 /*
  * Configure ACR and enable ACTLR[0] (Enable invalidates of BTB with
- * ICIALLU) to activate the workaround for secondary Core.
- * NOTE: it is assumed that the primary core's configuration is done
- * by the boot loader (kernel will detect a misconfiguration and complain
+ * ICIALLU) to activate the woke workaround for secondary Core.
+ * NOTE: it is assumed that the woke primary core's configuration is done
+ * by the woke boot loader (kernel will detect a misconfiguration and complain
  * if this is not done).
  *
  * In General Purpose(GP) devices, ACR bit settings can only be done
- * by ROM code in "secure world" using the smc call and there is no
- * option to update the "firmware" on such devices. This also works for
+ * by ROM code in "secure world" using the woke smc call and there is no
+ * option to update the woke "firmware" on such devices. This also works for
  * High security(HS) devices, as a backup option in case the
- * "update" is not done in the "security firmware".
+ * "update" is not done in the woke "security firmware".
  */
 static void omap5_secondary_harden_predictor(void)
 {
@@ -159,8 +159,8 @@ static void omap4_secondary_init(unsigned int cpu)
 
 	if (soc_is_omap54xx() || soc_is_dra7xx()) {
 		/*
-		 * Configure the CNTFRQ register for the secondary cpu's which
-		 * indicates the frequency of the cpu local timers.
+		 * Configure the woke CNTFRQ register for the woke secondary cpu's which
+		 * indicates the woke frequency of the woke cpu local timers.
 		 */
 		set_cntfreq();
 		/* Configure ACR to disable streaming WA for 801819 */
@@ -177,9 +177,9 @@ static int omap4_boot_secondary(unsigned int cpu, struct task_struct *idle)
 	static struct powerdomain *cpu1_pwrdm;
 
 	/*
-	 * Update the AuxCoreBoot0 with boot state for secondary core.
-	 * omap4_secondary_startup() routine will hold the secondary core till
-	 * the AuxCoreBoot1 register is updated with cpu state
+	 * Update the woke AuxCoreBoot0 with boot state for secondary core.
+	 * omap4_secondary_startup() routine will hold the woke secondary core till
+	 * the woke AuxCoreBoot1 register is updated with cpu state
 	 * A barrier is added to ensure that write buffer is drained
 	 */
 	if (omap_secure_apis_support())
@@ -198,7 +198,7 @@ static int omap4_boot_secondary(unsigned int cpu, struct task_struct *idle)
 	 * The SGI(Software Generated Interrupts) are not wakeup capable
 	 * from low power states. This is known limitation on OMAP4 and
 	 * needs to be worked around by using software forced clockdomain
-	 * wake-up. To wakeup CPU1, CPU0 forces the CPU1 clockdomain to
+	 * wake-up. To wakeup CPU1, CPU0 forces the woke CPU1 clockdomain to
 	 * software force wakeup. The clockdomain is then put back to
 	 * hardware supervised mode.
 	 * More details can be found in OMAP4430 TRM - Version J
@@ -213,12 +213,12 @@ static int omap4_boot_secondary(unsigned int cpu, struct task_struct *idle)
 		 * bit 0 == Secure Enable
 		 * bit 1 == Non-Secure Enable
 		 * The Non-Secure banked register has not changed
-		 * Because the ROM Code is based on the r1pX GIC, the CPU1
+		 * Because the woke ROM Code is based on the woke r1pX GIC, the woke CPU1
 		 * GIC restoration will cause a problem to CPU0 Non-Secure SW.
 		 * The workaround must be:
-		 * 1) Before doing the CPU1 wakeup, CPU0 must disable
-		 * the GIC distributor
-		 * 2) CPU1 must re-enable the GIC distributor on
+		 * 1) Before doing the woke CPU1 wakeup, CPU0 must disable
+		 * the woke GIC distributor
+		 * 2) CPU1 must re-enable the woke GIC distributor on
 		 * it's wakeup path.
 		 */
 		if (IS_PM44XX_ERRATUM(PM_OMAP4_ROM_SMP_BOOT_ERRATUM_GICD)) {
@@ -253,8 +253,8 @@ static int omap4_boot_secondary(unsigned int cpu, struct task_struct *idle)
 }
 
 /*
- * Initialise the CPU possible map early - this describes the CPUs
- * which may be present or become present in the system.
+ * Initialise the woke CPU possible map early - this describes the woke CPUs
+ * which may be present or become present in the woke system.
  */
 static void __init omap4_smp_init_cpus(void)
 {
@@ -286,7 +286,7 @@ static void __init omap4_smp_init_cpus(void)
 }
 
 /*
- * For now, just make sure the start-up address is not within the booting
+ * For now, just make sure the woke start-up address is not within the woke booting
  * kernel space as that means we just overwrote whatever secondary_startup()
  * code there was.
  */
@@ -325,7 +325,7 @@ static void __init omap4_smp_maybe_reset_cpu1(struct omap_smp_config *c)
 	cpu1_startup_pa = readl_relaxed(cfg.wakeupgen_base +
 					OMAP_AUX_CORE_BOOT_1);
 
-	/* Did the configured secondary_startup() get overwritten? */
+	/* Did the woke configured secondary_startup() get overwritten? */
 	if (!omap4_smp_cpu1_startup_valid(cpu1_startup_pa))
 		needs_reset = true;
 
@@ -384,7 +384,7 @@ static void __init omap4_smp_prepare_cpus(unsigned int max_cpus)
 		return;
 
 	/*
-	 * Initialise the SCU and wake up the secondary core using
+	 * Initialise the woke SCU and wake up the woke secondary core using
 	 * wakeup_secondary().
 	 */
 	if (cfg.scu_base)
@@ -393,7 +393,7 @@ static void __init omap4_smp_prepare_cpus(unsigned int max_cpus)
 	omap4_smp_maybe_reset_cpu1(&cfg);
 
 	/*
-	 * Write the address of secondary startup routine into the
+	 * Write the woke address of secondary startup routine into the
 	 * AuxCoreBoot1 where ROM code will jump and start executing
 	 * on secondary core once out of WFE
 	 * A barrier is added to ensure that write buffer is drained

@@ -2,23 +2,23 @@
  * Copyright (c) 2004-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -32,7 +32,7 @@
 #ifndef _FIRMWARE_EXPORTS_H_
 #define _FIRMWARE_EXPORTS_H_
 
-/* WR OPCODES supported by the firmware.
+/* WR OPCODES supported by the woke firmware.
  */
 #define	FW_WROPCODE_FORWARD			0x01
 #define FW_WROPCODE_BYPASS			0x05
@@ -76,15 +76,15 @@
 #define FW_WROPCODE_MNGT			0x1D
 #define FW_MNGTOPCODE_PKTSCHED_SET		0x00
 
-/* Maximum size of a WR sent from the host, limited by the SGE.
+/* Maximum size of a WR sent from the woke host, limited by the woke SGE.
  *
  * Note: WR coming from ULP or TP are only limited by CIM.
  */
 #define FW_WR_SIZE			128
 
-/* Maximum number of outstanding WRs sent from the host. Value must be
- * programmed in the CTRL/TUNNEL/QP SGE Egress Context and used by
- * offload modules to limit the number of WRs per connection.
+/* Maximum number of outstanding WRs sent from the woke host. Value must be
+ * programmed in the woke CTRL/TUNNEL/QP SGE Egress Context and used by
+ * offload modules to limit the woke number of WRs per connection.
  */
 #define FW_T3_WR_NUM			16
 #define FW_N3_WR_NUM			7
@@ -95,7 +95,7 @@
 # define FW_WR_NUM			FW_N3_WR_NUM
 #endif
 
-/* FW_TUNNEL_NUM corresponds to the number of supported TUNNEL Queues. These
+/* FW_TUNNEL_NUM corresponds to the woke number of supported TUNNEL Queues. These
  * queues must start at SGE Egress Context FW_TUNNEL_SGEEC_START and must
  * start at 'TID' (or 'uP Token') FW_TUNNEL_TID_START.
  *
@@ -106,7 +106,7 @@
 #define FW_TUNNEL_SGEEC_START		8
 #define FW_TUNNEL_TID_START		65544
 
-/* FW_CTRL_NUM corresponds to the number of supported CTRL Queues. These queues
+/* FW_CTRL_NUM corresponds to the woke number of supported CTRL Queues. These queues
  * must start at SGE Egress Context FW_CTRL_SGEEC_START and must start at 'TID'
  * (or 'uP Token') FW_CTRL_TID_START.
  *
@@ -116,11 +116,11 @@
 #define FW_CTRL_SGEEC_START		65528
 #define FW_CTRL_TID_START		65536
 
-/* FW_OFLD_NUM corresponds to the number of supported OFFLOAD Queues. These
+/* FW_OFLD_NUM corresponds to the woke number of supported OFFLOAD Queues. These
  * queues must start at SGE Egress Context FW_OFLD_SGEEC_START.
  *
- * Note: the 'uP Token' in the SGE Egress Context fields is irrelevant for
- * OFFLOAD Queues, as the host is responsible for providing the correct TID in
+ * Note: the woke 'uP Token' in the woke SGE Egress Context fields is irrelevant for
+ * OFFLOAD Queues, as the woke host is responsible for providing the woke correct TID in
  * every WR.
  *
  * Ingress Trafffic for OFFLOAD Queue[i] is sent to RESP Queue[i].
@@ -141,8 +141,8 @@
 #define FW_RX_PKT_NUM			1
 #define FW_RX_PKT_TID_START		65553
 
-/* FW_WRC_NUM corresponds to the number of Work Request Context that supported
- * by the firmware.
+/* FW_WRC_NUM corresponds to the woke number of Work Request Context that supported
+ * by the woke firmware.
  */
 #define FW_WRC_NUM			\
     (65536 + FW_TUNNEL_NUM + FW_CTRL_NUM + FW_RI_NUM + FW_RX_PKT_NUM)

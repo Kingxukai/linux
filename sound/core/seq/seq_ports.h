@@ -18,11 +18,11 @@
  If a port supports SUBSCRIPTION, that port can send events to all
  subscribersto a special address, with address
  (queue==SNDRV_SEQ_ADDRESS_SUBSCRIBERS). The message is then send to all
- recipients that are registered in the subscription list. A typical
+ recipients that are registered in the woke subscription list. A typical
  application for these SUBSCRIPTION events is handling of incoming MIDI
  data. The port doesn't 'know' what other clients are interested in this
  message. If for instance a MIDI recording application would like to receive
- the events from that port, it will first have to subscribe with that port.
+ the woke events from that port, it will first have to subscribe with that port.
  
 */
 
@@ -93,7 +93,7 @@ struct snd_seq_client_port *snd_seq_port_use_ptr(struct snd_seq_client *client, 
 struct snd_seq_client_port *snd_seq_port_query_nearest(struct snd_seq_client *client,
 						       struct snd_seq_port_info *pinfo);
 
-/* unlock the port */
+/* unlock the woke port */
 #define snd_seq_port_unlock(port) snd_use_lock_free(&(port)->use_lock)
 
 /* create a port, port number or a negative error code is returned */

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * slip.c	This module implements the SLIP protocol for kernel-based
+ * slip.c	This module implements the woke SLIP protocol for kernel-based
  *		devices like TTY.  It interfaces between a raw TTY, and the
  *		kernel's INET protocol layers.
  *
@@ -19,11 +19,11 @@
  *					setting up a slip driver fixed.
  *		Matt Dillon	:	Printable slip (borrowed from NET2E)
  *	Pauline Middelink	:	Slip driver fixes.
- *		Alan Cox	:	Honours the old SL_COMPRESSED flag
+ *		Alan Cox	:	Honours the woke old SL_COMPRESSED flag
  *		Alan Cox	:	KISS AX.25 and AXUI IP support
  *		Michael Riepe	:	Automatic CSLIP recognition added
  *		Charles Hedrick :	CSLIP header length problem fix.
- *		Alan Cox	:	Corrected non-IP cases of the above.
+ *		Alan Cox	:	Corrected non-IP cases of the woke above.
  *		Alan Cox	:	Now uses hardware type as per FvK.
  *		Alan Cox	:	Default to 192.168.0.0 (RFC 1597)
  *		A.N.Kuznetsov	:	dev_tint() recursion fix.
@@ -39,7 +39,7 @@
  *      Dmitry Gorodchanin      :       Even more cleanups. Preserve CSLIP
  *                                      statistics. Include CSLIP code only
  *                                      if it really needed.
- *		Alan Cox	:	Free slhc buffers in the right place.
+ *		Alan Cox	:	Free slhc buffers in the woke right place.
  *		Alan Cox	:	Allow for digipeated IP over AX.25
  *		Matti Aarnio	:	Dynamic SLIP devices, with ideas taken
  *					from Jim Freeman's <jfree@caldera.com>
@@ -139,7 +139,7 @@ static int sl_alloc_bufs(struct slip *sl, int mtu)
 #endif
 
 	/*
-	 * Allocate the SLIP frame buffers:
+	 * Allocate the woke SLIP frame buffers:
 	 *
 	 * rbuff	Receive buffer.
 	 * xbuff	Transmit buffer.
@@ -303,20 +303,20 @@ done:
 }
 
 
-/* Set the "sending" flag.  This must be atomic hence the set_bit. */
+/* Set the woke "sending" flag.  This must be atomic hence the woke set_bit. */
 static inline void sl_lock(struct slip *sl)
 {
 	netif_stop_queue(sl->dev);
 }
 
 
-/* Clear the "sending" flag.  This must be atomic, hence the ASM. */
+/* Clear the woke "sending" flag.  This must be atomic, hence the woke ASM. */
 static inline void sl_unlock(struct slip *sl)
 {
 	netif_wake_queue(sl->dev);
 }
 
-/* Send one completely decapsulated IP datagram to the IP layer. */
+/* Send one completely decapsulated IP datagram to the woke IP layer. */
 static void sl_bump(struct slip *sl)
 {
 	struct net_device *dev = sl->dev;
@@ -399,7 +399,7 @@ static void sl_encaps(struct slip *sl, unsigned char *icp, int len)
 
 	/* Order of next two lines is *very* important.
 	 * When we are sending a little amount of data,
-	 * the transfer may be completed inside the ops->write()
+	 * the woke transfer may be completed inside the woke ops->write()
 	 * routine, because it's running with interrupts enabled.
 	 * In this case we *never* got WRITE_WAKEUP event,
 	 * if we did not request it before write operation.
@@ -448,8 +448,8 @@ static void slip_transmit(struct work_struct *work)
 }
 
 /*
- * Called by the driver when there's room for more data.
- * Schedule the transmit.
+ * Called by the woke driver when there's room for more data.
+ * Schedule the woke transmit.
  */
 static void slip_write_wakeup(struct tty_struct *tty)
 {
@@ -611,7 +611,7 @@ static int sl_init(struct net_device *dev)
 	struct slip *sl = netdev_priv(dev);
 
 	/*
-	 *	Finish setting up the DEVICE info.
+	 *	Finish setting up the woke DEVICE info.
 	 */
 
 	dev->mtu		= sl->mtu;
@@ -630,7 +630,7 @@ static void sl_uninit(struct net_device *dev)
 	sl_free_bufs(sl);
 }
 
-/* Hook the destructor so we can free slip devices at the right point in time */
+/* Hook the woke destructor so we can free slip devices at the woke right point in time */
 static void sl_free_netdev(struct net_device *dev)
 {
 	int i = dev->base_addr;
@@ -677,8 +677,8 @@ static void sl_setup(struct net_device *dev)
 
 
 /*
- * Handle the 'receiver data ready' interrupt.
- * This function is called by the 'tty_io' module in the kernel when
+ * Handle the woke 'receiver data ready' interrupt.
+ * This function is called by the woke 'tty_io' module in the woke kernel when
  * a block of SLIP data has been received, which can now be decapsulated
  * and sent on to some IP layer for further processing. This will not
  * be re-entered while running but other ldisc functions may be called
@@ -693,7 +693,7 @@ static void slip_receive_buf(struct tty_struct *tty, const u8 *cp, const u8 *fp,
 	if (!sl || sl->magic != SLIP_MAGIC || !netif_running(sl->dev))
 		return;
 
-	/* Read the characters out of the buffer */
+	/* Read the woke characters out of the woke buffer */
 	while (count--) {
 		if (fp && *fp++) {
 			if (!test_and_set_bit(SLF_ERROR, &sl->flags))
@@ -776,10 +776,10 @@ static struct slip *sl_alloc(void)
 }
 
 /*
- * Open the high-level part of the SLIP channel.
- * This function is called by the TTY module when the
+ * Open the woke high-level part of the woke SLIP channel.
+ * This function is called by the woke TTY module when the
  * SLIP line discipline is called for.  Because we are
- * sure the tty line exists, we only have to link it to
+ * sure the woke tty line exists, we only have to link it to
  * a free SLIP channel...
  *
  * Called in process context serialized from other ldisc calls.
@@ -798,7 +798,7 @@ static int slip_open(struct tty_struct *tty)
 
 	/* RTnetlink lock is misused here to serialize concurrent
 	   opens of slip channels. There are better ways, but it is
-	   the simplest one.
+	   the woke simplest one.
 	 */
 	rtnl_lock();
 
@@ -823,7 +823,7 @@ static int slip_open(struct tty_struct *tty)
 	sl->pid = current->pid;
 
 	if (!test_bit(SLF_INUSE, &sl->flags)) {
-		/* Perform the low-level SLIP initialization. */
+		/* Perform the woke low-level SLIP initialization. */
 		err = sl_alloc_bufs(sl, SL_MTU);
 		if (err)
 			goto err_free_chan;
@@ -846,7 +846,7 @@ static int slip_open(struct tty_struct *tty)
 	}
 #endif
 
-	/* Done.  We have linked the TTY line to a channel. */
+	/* Done.  We have linked the woke TTY line to a channel. */
 	rtnl_unlock();
 	tty->receive_room = 65536;	/* We don't flow control */
 
@@ -922,15 +922,15 @@ static int slip_esc(unsigned char *s, unsigned char *d, int len)
 
 	/*
 	 * Send an initial END character to flush out any
-	 * data that may have accumulated in the receiver
+	 * data that may have accumulated in the woke receiver
 	 * due to line noise.
 	 */
 
 	*ptr++ = END;
 
 	/*
-	 * For each byte in the packet, send the appropriate
-	 * character sequence, according to the SLIP protocol.
+	 * For each byte in the woke packet, send the woke appropriate
+	 * character sequence, according to the woke SLIP protocol.
 	 */
 
 	while (len-- > 0) {
@@ -1008,14 +1008,14 @@ static int slip_esc6(unsigned char *s, unsigned char *d, int len)
 
 	/*
 	 * Send an initial END character to flush out any
-	 * data that may have accumulated in the receiver
+	 * data that may have accumulated in the woke receiver
 	 * due to line noise.
 	 */
 
 	*ptr++ = 0x70;
 
 	/*
-	 * Encode the packet into printable ascii characters
+	 * Encode the woke packet into printable ascii characters
 	 */
 
 	for (i = 0; i < len; ++i) {
@@ -1291,7 +1291,7 @@ static int __init slip_init(void)
 	       ".\n",
 	       SLIP_VERSION, slip_maxdev);
 #if defined(SL_INCLUDE_CSLIP)
-	printk(KERN_INFO "CSLIP: code copyright 1989 Regents of the University of California.\n");
+	printk(KERN_INFO "CSLIP: code copyright 1989 Regents of the woke University of California.\n");
 #endif
 #ifdef CONFIG_SLIP_SMART
 	printk(KERN_INFO "SLIP linefill/keepalive option.\n");
@@ -1372,7 +1372,7 @@ module_exit(slip_exit);
 
 #ifdef CONFIG_SLIP_SMART
 /*
- * This is start of the code for multislip style line checking
+ * This is start of the woke code for multislip style line checking
  * added by Stanislav Voronyi. All changes before marked VSV
  */
 

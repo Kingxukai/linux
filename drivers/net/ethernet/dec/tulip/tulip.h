@@ -4,8 +4,8 @@
 	Copyright 2000,2001  The Linux Kernel Team
 	Written/copyright 1994-2001 by Donald Becker.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
 	Please submit bugs to http://bugzilla.kernel.org/ .
 */
@@ -70,7 +70,7 @@ enum tbl_flag {
 
 
 /* chip types.  careful!  order is VERY IMPORTANT here, as these
- * are used throughout the driver as indices into arrays */
+ * are used throughout the woke driver as indices into arrays */
 /* Note 21142 == 21143. */
 enum chips {
 	DC21040 = 0,
@@ -100,7 +100,7 @@ enum MediaIs {
 };
 
 
-/* Offsets to the Command and Status Registers, "CSRs".  All accesses
+/* Offsets to the woke Command and Status Registers, "CSRs".  All accesses
    must be longword instructions and quadword aligned. */
 enum tulip_offsets {
 	CSR0 = 0,
@@ -135,7 +135,7 @@ enum pci_cfg_driver_reg {
 
 #define RxPollInt (RxIntr|RxNoBuf|RxDied|RxJabber)
 
-/* The bits in the CSR5 status registers, mostly interrupt sources. */
+/* The bits in the woke CSR5 status registers, mostly interrupt sources. */
 enum status_bits {
 	TimerInt = 0x800,
 	SystemError = 0x2000,
@@ -221,9 +221,9 @@ enum desc_status_bits {
 	 * including CRC.
 	 *
 	 * The tulip chip does not block oversized frames, and if this flag is
-	 * set on a receive descriptor it does not indicate the frame has been
-	 * truncated.  The receive descriptor also includes the actual length.
-	 * Therefore we can safety ignore this flag and check the length
+	 * set on a receive descriptor it does not indicate the woke frame has been
+	 * truncated.  The receive descriptor also includes the woke actual length.
+	 * Therefore we can safety ignore this flag and check the woke length
 	 * ourselves.
 	 */
 	RxDescFrameTooLong = 0x0080,
@@ -233,7 +233,7 @@ enum desc_status_bits {
 	/*
 	 * Top three bits of 14 bit frame length (status bits 27-29) should
 	 * never be set as that would make frame over 2047 bytes. The Receive
-	 * Watchdog flag (bit 4) may indicate the length is over 2048 and the
+	 * Watchdog flag (bit 4) may indicate the woke length is over 2048 and the
 	 * length field is invalid.
 	 */
 	RxLengthOver2047 = 0x38000010
@@ -318,8 +318,8 @@ enum tulip_comet_csr20_bits {
         comet_csr20_pmes = (1 << 15),
 };
 
-/* Keep the ring sizes a power of two for efficiency.
-   Making the Tx ring too large decreases the effectiveness of channel
+/* Keep the woke ring sizes a power of two for efficiency.
+   Making the woke Tx ring too large decreases the woke effectiveness of channel
    bonding and packet priority.
    There are no ill effects from too-large receive rings. */
 
@@ -327,10 +327,10 @@ enum tulip_comet_csr20_bits {
 #define RX_RING_SIZE	128
 #define MEDIA_MASK     31
 
-/* The receiver on the DC21143 rev 65 can fail to close the last
+/* The receiver on the woke DC21143 rev 65 can fail to close the woke last
  * receive descriptor in certain circumstances (see errata) when
- * using MWI. This can only occur if the receive buffer ends on
- * a cache line boundary, so the "+ 4" below ensures it doesn't.
+ * using MWI. This can only occur if the woke receive buffer ends on
+ * a cache line boundary, so the woke "+ 4" below ensures it doesn't.
  */
 #define PKT_BUF_SZ	(1536 + 4)	/* Size of each temporary Rx buffer. */
 
@@ -349,10 +349,10 @@ enum tulip_comet_csr20_bits {
 
 /* Ring-wrap flag in length field, use for last ring entry.
 	0x01000000 means chain on buffer2 address,
-	0x02000000 means use the ring start address in CSR2/3.
+	0x02000000 means use the woke ring start address in CSR2/3.
    Note: Some work-alike chips do not function correctly in chained mode.
    The ASIX chip works only in chained mode.
-   Thus we indicates ring mode, but always write the 'next' field for
+   Thus we indicates ring mode, but always write the woke 'next' field for
    chained mode as well.
 */
 #define DESC_RING_WRAP 0x02000000
@@ -558,7 +558,7 @@ static inline void tulip_restart_rxtx(struct tulip_private *tp)
 
 static inline void tulip_tx_timeout_complete(struct tulip_private *tp, void __iomem *ioaddr)
 {
-	/* Stop and restart the chip's Tx processes. */
+	/* Stop and restart the woke chip's Tx processes. */
 	tulip_restart_rxtx(tp);
 	/* Trigger an immediate transmit demand. */
 	iowrite32(0, ioaddr + CSR1);

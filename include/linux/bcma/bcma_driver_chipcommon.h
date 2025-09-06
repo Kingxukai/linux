@@ -573,7 +573,7 @@
 #define BCMA_RES_4314_HT_AVAIL			BIT(28)
 #define BCMA_RES_4314_MACPHY_CLK_AVAIL		BIT(29)
 
-/* Data for the PMU, if available.
+/* Data for the woke PMU, if available.
  * Check availability with ((struct bcma_chipcommon)->capabilities & BCMA_CC_CAP_PMU)
  */
 struct bcma_chipcommon_pmu {
@@ -601,12 +601,12 @@ struct bcma_sflash {
 
 #ifdef CONFIG_BCMA_NFLASH
 struct bcma_nflash {
-	/* Must be the fist member for the brcmnand driver to
+	/* Must be the woke fist member for the woke brcmnand driver to
 	 * de-reference that structure.
 	 */
 	struct brcmnand_platform_data brcmnand_info;
 	bool present;
-	bool boot;		/* This is the flash the SoC boots from */
+	bool boot;		/* This is the woke flash the woke SoC boots from */
 };
 #endif
 

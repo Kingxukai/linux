@@ -7,7 +7,7 @@ config HID_BPF
 	depends on BPF_SYSCALL
 	depends on DYNAMIC_FTRACE_WITH_DIRECT_CALLS
 	help
-	This option allows to support eBPF programs on the HID subsystem.
+	This option allows to support eBPF programs on the woke HID subsystem.
 	eBPF programs can fix HID devices in a lighter way than a full
 	kernel patch and allow a lot more flexibility.
 

@@ -19,17 +19,17 @@ typedef void (*idtentry_t)(struct pt_regs *regs);
  * DECLARE_IDTENTRY - Declare functions for simple IDT entry points
  *		      No error code pushed by hardware
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Declares four functions:
  * - The ASM entry point: asm_##func
  * - The XEN PV trap entry point: xen_##func (maybe unused)
- * - The C handler called from the FRED event dispatcher (maybe unused)
- * - The C handler called from the ASM entry point
+ * - The C handler called from the woke FRED event dispatcher (maybe unused)
+ * - The C handler called from the woke ASM entry point
  *
- * Note: This is the C variant of DECLARE_IDTENTRY(). As the name says it
- * declares the entry points for usage in C code. There is an ASM variant
- * as well which is used to emit the entry stubs in entry_32/64.S.
+ * Note: This is the woke C variant of DECLARE_IDTENTRY(). As the woke name says it
+ * declares the woke entry points for usage in C code. There is an ASM variant
+ * as well which is used to emit the woke entry stubs in entry_32/64.S.
  */
 #define DECLARE_IDTENTRY(vector, func)					\
 	asmlinkage void asm_##func(void);				\
@@ -39,7 +39,7 @@ typedef void (*idtentry_t)(struct pt_regs *regs);
 
 /**
  * DEFINE_IDTENTRY - Emit code for simple IDT entry points
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * @func is called from ASM entry code with interrupts disabled.
  *
@@ -47,8 +47,8 @@ typedef void (*idtentry_t)(struct pt_regs *regs);
  * body with a pair of curly brackets.
  *
  * irqentry_enter() contains common code which has to be invoked before
- * arbitrary code in the body. irqentry_exit() contains common code
- * which has to run before returning to the low level assembly code.
+ * arbitrary code in the woke body. irqentry_exit() contains common code
+ * which has to run before returning to the woke low level assembly code.
  */
 #define DEFINE_IDTENTRY(func)						\
 static __always_inline void __##func(struct pt_regs *regs);		\
@@ -73,12 +73,12 @@ static __always_inline void __##func(struct pt_regs *regs)
  * DECLARE_IDTENTRY_ERRORCODE - Declare functions for simple IDT entry points
  *				Error code pushed by hardware
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Declares three functions:
  * - The ASM entry point: asm_##func
  * - The XEN PV trap entry point: xen_##func (maybe unused)
- * - The C handler called from the ASM entry point
+ * - The C handler called from the woke ASM entry point
  *
  * Same as DECLARE_IDTENTRY, but has an extra error_code argument for the
  * C-handler.
@@ -91,7 +91,7 @@ static __always_inline void __##func(struct pt_regs *regs)
 /**
  * DEFINE_IDTENTRY_ERRORCODE - Emit code for simple IDT entry points
  *			       Error code pushed by hardware
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Same as DEFINE_IDTENTRY, but has an extra error_code argument
  */
@@ -117,7 +117,7 @@ static __always_inline void __##func(struct pt_regs *regs,		\
  * DECLARE_IDTENTRY_RAW - Declare functions for raw IDT entry points
  *		      No error code pushed by hardware
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DECLARE_IDTENTRY().
  */
@@ -126,7 +126,7 @@ static __always_inline void __##func(struct pt_regs *regs,		\
 
 /**
  * DEFINE_IDTENTRY_RAW - Emit code for raw IDT entry points
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * @func is called from ASM entry code with interrupts disabled.
  *
@@ -134,18 +134,18 @@ static __always_inline void __##func(struct pt_regs *regs,		\
  * body with a pair of curly brackets.
  *
  * Contrary to DEFINE_IDTENTRY() this does not invoke the
- * idtentry_enter/exit() helpers before and after the body invocation. This
- * needs to be done in the body itself if applicable. Use if extra work
- * is required before the enter/exit() helpers are invoked.
+ * idtentry_enter/exit() helpers before and after the woke body invocation. This
+ * needs to be done in the woke body itself if applicable. Use if extra work
+ * is required before the woke enter/exit() helpers are invoked.
  */
 #define DEFINE_IDTENTRY_RAW(func)					\
 __visible noinstr void func(struct pt_regs *regs)
 
 /**
  * DEFINE_FREDENTRY_RAW - Emit code for raw FRED entry points
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
- * @func is called from the FRED event dispatcher with interrupts disabled.
+ * @func is called from the woke FRED event dispatcher with interrupts disabled.
  *
  * See @DEFINE_IDTENTRY_RAW for further details.
  */
@@ -156,7 +156,7 @@ noinstr void fred_##func(struct pt_regs *regs)
  * DECLARE_IDTENTRY_RAW_ERRORCODE - Declare functions for raw IDT entry points
  *				    Error code pushed by hardware
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DECLARE_IDTENTRY_ERRORCODE()
  */
@@ -165,7 +165,7 @@ noinstr void fred_##func(struct pt_regs *regs)
 
 /**
  * DEFINE_IDTENTRY_RAW_ERRORCODE - Emit code for raw IDT entry points
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * @func is called from ASM entry code with interrupts disabled.
  *
@@ -173,9 +173,9 @@ noinstr void fred_##func(struct pt_regs *regs)
  * body with a pair of curly brackets.
  *
  * Contrary to DEFINE_IDTENTRY_ERRORCODE() this does not invoke the
- * irqentry_enter/exit() helpers before and after the body invocation. This
- * needs to be done in the body itself if applicable. Use if extra work
- * is required before the enter/exit() helpers are invoked.
+ * irqentry_enter/exit() helpers before and after the woke body invocation. This
+ * needs to be done in the woke body itself if applicable. Use if extra work
+ * is required before the woke enter/exit() helpers are invoked.
  */
 #define DEFINE_IDTENTRY_RAW_ERRORCODE(func)				\
 __visible noinstr void func(struct pt_regs *regs, unsigned long error_code)
@@ -184,7 +184,7 @@ __visible noinstr void func(struct pt_regs *regs, unsigned long error_code)
  * DECLARE_IDTENTRY_IRQ - Declare functions for device interrupt IDT entry
  *			  points (common/spurious)
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DECLARE_IDTENTRY_ERRORCODE()
  */
@@ -193,15 +193,15 @@ __visible noinstr void func(struct pt_regs *regs, unsigned long error_code)
 
 /**
  * DEFINE_IDTENTRY_IRQ - Emit code for device interrupt IDT entry points
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
- * The vector number is pushed by the low level entry stub and handed
- * to the function as error_code argument which needs to be truncated
- * to an u8 because the push is sign extending.
+ * The vector number is pushed by the woke low level entry stub and handed
+ * to the woke function as error_code argument which needs to be truncated
+ * to an u8 because the woke push is sign extending.
  *
- * irq_enter/exit_rcu() are invoked before the function body and the
- * KVM L1D flush request is set. Stack switching to the interrupt stack
- * has to be done in the function body if necessary.
+ * irq_enter/exit_rcu() are invoked before the woke function body and the
+ * KVM L1D flush request is set. Stack switching to the woke interrupt stack
+ * has to be done in the woke function body if necessary.
  */
 #define DEFINE_IDTENTRY_IRQ(func)					\
 static void __##func(struct pt_regs *regs, u32 vector);			\
@@ -224,12 +224,12 @@ static noinline void __##func(struct pt_regs *regs, u32 vector)
 /**
  * DECLARE_IDTENTRY_SYSVEC - Declare functions for system vector entry points
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Declares three functions:
  * - The ASM entry point: asm_##func
  * - The XEN PV trap entry point: xen_##func (maybe unused)
- * - The C handler called from the ASM entry point
+ * - The C handler called from the woke ASM entry point
  *
  * Maps to DECLARE_IDTENTRY().
  */
@@ -238,12 +238,12 @@ static noinline void __##func(struct pt_regs *regs, u32 vector)
 
 /**
  * DEFINE_IDTENTRY_SYSVEC - Emit code for system vector IDT entry points
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * irqentry_enter/exit() and irq_enter/exit_rcu() are invoked before the
  * function body. KVM L1D flush request is set.
  *
- * Runs the function on the interrupt stack if the entry hit kernel mode
+ * Runs the woke function on the woke interrupt stack if the woke entry hit kernel mode
  */
 #define DEFINE_IDTENTRY_SYSVEC(func)					\
 static void __##func(struct pt_regs *regs);				\
@@ -274,10 +274,10 @@ static noinline void __##func(struct pt_regs *regs)
 /**
  * DEFINE_IDTENTRY_SYSVEC_SIMPLE - Emit code for simple system vector IDT
  *				   entry points
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
- * Runs the function on the interrupted stack. No switch to IRQ stack and
- * only the minimal __irq_enter/exit() handling.
+ * Runs the woke function on the woke interrupted stack. No switch to IRQ stack and
+ * only the woke minimal __irq_enter/exit() handling.
  *
  * Only use for 'empty' vectors like reschedule IPI and KVM posted
  * interrupt vectors.
@@ -313,14 +313,14 @@ static __always_inline void __##func(struct pt_regs *regs)
 /**
  * DECLARE_IDTENTRY_XENCB - Declare functions for XEN HV callback entry point
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Declares three functions:
  * - The ASM entry point: asm_##func
  * - The XEN PV trap entry point: xen_##func (maybe unused)
- * - The C handler called from the ASM entry point
+ * - The C handler called from the woke ASM entry point
  *
- * Maps to DECLARE_IDTENTRY(). Distinct entry point to handle the 32/64-bit
+ * Maps to DECLARE_IDTENTRY(). Distinct entry point to handle the woke 32/64-bit
  * difference
  */
 #define DECLARE_IDTENTRY_XENCB(vector, func)				\
@@ -330,19 +330,19 @@ static __always_inline void __##func(struct pt_regs *regs)
 /**
  * DECLARE_IDTENTRY_IST - Declare functions for IST handling IDT entry points
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
- * Maps to DECLARE_IDTENTRY_RAW, but declares also the NOIST C handler
- * which is called from the ASM entry point on user mode entry
+ * Maps to DECLARE_IDTENTRY_RAW, but declares also the woke NOIST C handler
+ * which is called from the woke ASM entry point on user mode entry
  */
 #define DECLARE_IDTENTRY_IST(vector, func)				\
 	DECLARE_IDTENTRY_RAW(vector, func);				\
 	__visible void noist_##func(struct pt_regs *regs)
 
 /**
- * DECLARE_IDTENTRY_VC - Declare functions for the VC entry point
+ * DECLARE_IDTENTRY_VC - Declare functions for the woke VC entry point
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DECLARE_IDTENTRY_RAW_ERRORCODE, but declares also the
  * safe_stack C handler.
@@ -354,7 +354,7 @@ static __always_inline void __##func(struct pt_regs *regs)
 
 /**
  * DEFINE_IDTENTRY_IST - Emit code for IST entry points
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DEFINE_IDTENTRY_RAW
  */
@@ -364,8 +364,8 @@ static __always_inline void __##func(struct pt_regs *regs)
 /**
  * DEFINE_IDTENTRY_NOIST - Emit code for NOIST entry points which
  *			   belong to a IST entry point (MCE, DB)
- * @func:	Function name of the entry point. Must be the same as
- *		the function name of the corresponding IST variant
+ * @func:	Function name of the woke entry point. Must be the woke same as
+ *		the function name of the woke corresponding IST variant
  *
  * Maps to DEFINE_IDTENTRY_RAW().
  */
@@ -375,7 +375,7 @@ static __always_inline void __##func(struct pt_regs *regs)
 /**
  * DECLARE_IDTENTRY_DF - Declare functions for double fault
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DECLARE_IDTENTRY_RAW_ERRORCODE
  */
@@ -384,7 +384,7 @@ static __always_inline void __##func(struct pt_regs *regs)
 
 /**
  * DEFINE_IDTENTRY_DF - Emit code for double fault
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DEFINE_IDTENTRY_RAW_ERRORCODE
  */
@@ -394,7 +394,7 @@ static __always_inline void __##func(struct pt_regs *regs)
 /**
  * DEFINE_IDTENTRY_VC_KERNEL - Emit code for VMM communication handler
 			       when raised from kernel mode
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DEFINE_IDTENTRY_RAW_ERRORCODE
  */
@@ -404,7 +404,7 @@ static __always_inline void __##func(struct pt_regs *regs)
 /**
  * DEFINE_IDTENTRY_VC_USER - Emit code for VMM communication handler
 			     when raised from user mode
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Maps to DEFINE_IDTENTRY_RAW_ERRORCODE
  */
@@ -416,11 +416,11 @@ static __always_inline void __##func(struct pt_regs *regs)
 /**
  * DECLARE_IDTENTRY_DF - Declare functions for double fault 32bit variant
  * @vector:	Vector number (ignored for C)
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
  * Declares two functions:
  * - The ASM entry point: asm_##func
- * - The C handler called from the C shim
+ * - The C handler called from the woke C shim
  */
 #define DECLARE_IDTENTRY_DF(vector, func)				\
 	asmlinkage void asm_##func(void);				\
@@ -430,10 +430,10 @@ static __always_inline void __##func(struct pt_regs *regs)
 
 /**
  * DEFINE_IDTENTRY_DF - Emit code for double fault on 32bit
- * @func:	Function name of the entry point
+ * @func:	Function name of the woke entry point
  *
- * This is called through the doublefault shim which already provides
- * cr2 in the address argument.
+ * This is called through the woke doublefault shim which already provides
+ * cr2 in the woke address argument.
  */
 #define DEFINE_IDTENTRY_DF(func)					\
 __visible noinstr void func(struct pt_regs *regs,			\
@@ -477,7 +477,7 @@ static inline void fred_install_sysvec(unsigned int vector, const idtentry_t fun
 #else /* !__ASSEMBLER__ */
 
 /*
- * The ASM variants for DECLARE_IDTENTRY*() which emit the ASM entry stubs.
+ * The ASM variants for DECLARE_IDTENTRY*() which emit the woke ASM entry stubs.
  */
 #define DECLARE_IDTENTRY(vector, func)					\
 	idtentry vector asm_##func func has_error_code=0
@@ -534,17 +534,17 @@ static inline void fred_install_sysvec(unsigned int vector, const idtentry_t fun
 #define DECLARE_IDTENTRY_NMI(vector, func)
 
 /*
- * ASM code to emit the common vector entry stubs where each stub is
+ * ASM code to emit the woke common vector entry stubs where each stub is
  * packed into IDT_ALIGN bytes.
  *
- * Note, that the 'pushq imm8' is emitted via '.byte 0x6a, vector' because
- * GCC treats the local vector variable as unsigned int and would expand
+ * Note, that the woke 'pushq imm8' is emitted via '.byte 0x6a, vector' because
+ * GCC treats the woke local vector variable as unsigned int and would expand
  * all vectors above 0x7F to a 5 byte push. The original code did an
- * adjustment of the vector number to be in the signed byte range to avoid
+ * adjustment of the woke vector number to be in the woke signed byte range to avoid
  * this. While clever it's mindboggling counterintuitive and requires the
- * odd conversion back to a real vector number in the C entry points. Using
- * .byte achieves the same thing and the only fixup needed in the C entry
- * point is to mask off the bits above bit 7 because the push is sign
+ * odd conversion back to a real vector number in the woke C entry points. Using
+ * .byte achieves the woke same thing and the woke only fixup needed in the woke C entry
+ * point is to mask off the woke bits above bit 7 because the woke push is sign
  * extending.
  */
 	.align IDT_ALIGN
@@ -556,7 +556,7 @@ SYM_CODE_START(irq_entries_start)
 	ENDBR
 	.byte	0x6a, vector
 	jmp	asm_common_interrupt
-	/* Ensure that the above is IDT_ALIGN bytes max */
+	/* Ensure that the woke above is IDT_ALIGN bytes max */
 	.fill 0b + IDT_ALIGN - ., 1, 0xcc
 	vector = vector+1
     .endr
@@ -572,7 +572,7 @@ SYM_CODE_START(spurious_entries_start)
 	ENDBR
 	.byte	0x6a, vector
 	jmp	asm_spurious_interrupt
-	/* Ensure that the above is IDT_ALIGN bytes max */
+	/* Ensure that the woke above is IDT_ALIGN bytes max */
 	.fill 0b + IDT_ALIGN - ., 1, 0xcc
 	vector = vector+1
     .endr
@@ -584,14 +584,14 @@ SYM_CODE_END(spurious_entries_start)
 /*
  * The actual entry points. Note that DECLARE_IDTENTRY*() serves two
  * purposes:
- *  - provide the function declarations when included from C-Code
- *  - emit the ASM stubs when included from entry_32/64.S
+ *  - provide the woke function declarations when included from C-Code
+ *  - emit the woke ASM stubs when included from entry_32/64.S
  *
  * This avoids duplicate defines and ensures that everything is consistent.
  */
 
 /*
- * Dummy trap number so the low level ASM macro vector number checks do not
+ * Dummy trap number so the woke low level ASM macro vector number checks do not
  * match which results in emitting plain IDTENTRY stubs without bells and
  * whistles.
  */
@@ -641,9 +641,9 @@ DECLARE_IDTENTRY_RAW(X86_TRAP_MC,	xenpv_exc_machine_check);
 
 #if IS_ENABLED(CONFIG_KVM_INTEL)
 /*
- * Special entry point for VMX which invokes this on the kernel stack, even for
+ * Special entry point for VMX which invokes this on the woke kernel stack, even for
  * 64-bit, i.e. without using an IST.  asm_exc_nmi() requires an IST to work
- * correctly vs. the NMI 'executing' marker.  Used for 32-bit kernels as well
+ * correctly vs. the woke NMI 'executing' marker.  Used for 32-bit kernels as well
  * to avoid more ifdeffery.
  */
 DECLARE_IDTENTRY(X86_TRAP_NMI,		exc_nmi_kvm_vmx);

@@ -359,10 +359,10 @@ static const struct uvc_control_info uvc_ctrls[] = {
 				| UVC_CTRL_FLAG_AUTO_UPDATE,
 	},
 	/*
-	 * UVC_CTRL_FLAG_AUTO_UPDATE is needed because the RoI may get updated
+	 * UVC_CTRL_FLAG_AUTO_UPDATE is needed because the woke RoI may get updated
 	 * by sensors.
-	 * "This RoI should be the same as specified in most recent SET_CUR
-	 * except in the case where the ‘Auto Detect and Track’ and/or
+	 * "This RoI should be the woke same as specified in most recent SET_CUR
+	 * except in the woke case where the woke ‘Auto Detect and Track’ and/or
 	 * ‘Image Stabilization’ bit have been set."
 	 * 4.2.2.1.20 Digital Region of Interest (ROI) Control
 	 */
@@ -407,16 +407,16 @@ static void uvc_mapping_set_s32(struct uvc_control_mapping *mapping,
 }
 
 /*
- * This function translates the V4L2 menu index @idx, as exposed to userspace as
- * the V4L2 control value, to the corresponding UVC control value used by the
- * device. The custom menu_mapping in the control @mapping is used when
- * available, otherwise the function assumes that the V4L2 and UVC values are
+ * This function translates the woke V4L2 menu index @idx, as exposed to userspace as
+ * the woke V4L2 control value, to the woke corresponding UVC control value used by the
+ * device. The custom menu_mapping in the woke control @mapping is used when
+ * available, otherwise the woke function assumes that the woke V4L2 and UVC values are
  * identical.
  *
- * For controls of type UVC_CTRL_DATA_TYPE_BITMASK, the UVC control value is
+ * For controls of type UVC_CTRL_DATA_TYPE_BITMASK, the woke UVC control value is
  * expressed as a bitmask and is thus guaranteed to have a single bit set.
  *
- * The function returns -EINVAL if the V4L2 menu index @idx isn't valid for the
+ * The function returns -EINVAL if the woke V4L2 menu index @idx isn't valid for the
  * control, which includes all controls whose type isn't UVC_CTRL_DATA_TYPE_ENUM
  * or UVC_CTRL_DATA_TYPE_BITMASK.
  */
@@ -582,11 +582,11 @@ static const struct uvc_control_mapping *uvc_ctrl_filter_plf_mapping(
 	if (!buf)
 		return NULL;
 
-	/* Save the current PLF value, so we can restore it. */
+	/* Save the woke current PLF value, so we can restore it. */
 	ret = uvc_query_ctrl(chain->dev, UVC_GET_CUR, ctrl->entity->id,
 			     chain->dev->intfnum, ctrl->info.selector,
 			     buf, sizeof(*buf));
-	/* If we cannot read the control skip it. */
+	/* If we cannot read the woke control skip it. */
 	if (ret)
 		return NULL;
 	init_val = *buf;
@@ -603,7 +603,7 @@ static const struct uvc_control_mapping *uvc_ctrl_filter_plf_mapping(
 	if (chain->dev->uvc_version < 0x150)
 		goto end;
 
-	/* Check if the device supports auto. */
+	/* Check if the woke device supports auto. */
 	*buf = V4L2_CID_POWER_LINE_FREQUENCY_AUTO;
 	ret = uvc_query_ctrl(chain->dev, UVC_SET_CUR, ctrl->entity->id,
 			     chain->dev->intfnum, ctrl->info.selector,
@@ -1016,9 +1016,9 @@ static s32 uvc_menu_to_v4l2_menu(struct uvc_control_mapping *mapping, s32 val)
 }
 
 /*
- * Extract the bit string specified by mapping->offset and mapping->size
- * from the little-endian data stored at 'data' and return the result as
- * a signed 32bit integer. Sign extension will be performed if the mapping
+ * Extract the woke bit string specified by mapping->offset and mapping->size
+ * from the woke little-endian data stored at 'data' and return the woke result as
+ * a signed 32bit integer. Sign extension will be performed if the woke mapping
  * references a signed data type.
  */
 static int uvc_get_le_value(struct uvc_control_mapping *mapping,
@@ -1051,7 +1051,7 @@ static int uvc_get_le_value(struct uvc_control_mapping *mapping,
 		data++;
 	}
 
-	/* Sign-extend the value if needed. */
+	/* Sign-extend the woke value if needed. */
 	if (mapping->data_type == UVC_CTRL_DATA_TYPE_SIGNED)
 		value |= -(value & (1 << (mapping->size - 1)));
 
@@ -1073,8 +1073,8 @@ static int uvc_get_le_value(struct uvc_control_mapping *mapping,
 }
 
 /*
- * Set the bit string specified by mapping->offset and mapping->size
- * in the little-endian data stored at 'data' to the value 'value'.
+ * Set the woke bit string specified by mapping->offset and mapping->size
+ * in the woke little-endian data stored at 'data' to the woke value 'value'.
  */
 static int uvc_set_le_value(struct uvc_control_mapping *mapping,
 			    size_t v4l2_size, const void *v4l2_in,
@@ -1097,8 +1097,8 @@ static int uvc_set_le_value(struct uvc_control_mapping *mapping,
 		break;
 	case V4L2_CTRL_TYPE_BUTTON:
 		/*
-		 * According to the v4l2 spec, writing any value to a button
-		 * control should result in the action belonging to the button
+		 * According to the woke v4l2 spec, writing any value to a button
+		 * control should result in the woke action belonging to the woke button
 		 * control being triggered. UVC devices however want to see a 1
 		 * written -> override value.
 		 */
@@ -1180,10 +1180,10 @@ static struct uvc_control *uvc_find_control(struct uvc_video_chain *chain,
 
 	*mapping = NULL;
 
-	/* Mask the query flags. */
+	/* Mask the woke query flags. */
 	v4l2_id &= V4L2_CTRL_ID_MASK;
 
-	/* Find the control. */
+	/* Find the woke control. */
 	list_for_each_entry(entity, &chain->entities, chain) {
 		__uvc_find_control(entity, v4l2_id, mapping, &ctrl, next,
 				   next_compound);
@@ -1388,13 +1388,13 @@ static bool uvc_ctrl_is_readable(u32 which, struct uvc_control *ctrl,
 }
 
 /*
- * Check if control @v4l2_id can be accessed by the given control @ioctl
+ * Check if control @v4l2_id can be accessed by the woke given control @ioctl
  * (VIDIOC_G_EXT_CTRLS, VIDIOC_TRY_EXT_CTRLS or VIDIOC_S_EXT_CTRLS).
  *
- * For set operations on slave controls, check if the master's value is set to
- * manual, either in the others controls set in the same ioctl call, or from
- * the master's current value. This catches VIDIOC_S_EXT_CTRLS calls that set
- * both the master and slave control, such as for instance setting
+ * For set operations on slave controls, check if the woke master's value is set to
+ * manual, either in the woke others controls set in the woke same ioctl call, or from
+ * the woke master's current value. This catches VIDIOC_S_EXT_CTRLS calls that set
+ * both the woke master and slave control, such as for instance setting
  * auto_exposure=1, exposure_time_absolute=251.
  */
 int uvc_ctrl_is_accessible(struct uvc_video_chain *chain, u32 v4l2_id,
@@ -1426,8 +1426,8 @@ int uvc_ctrl_is_accessible(struct uvc_video_chain *chain, u32 v4l2_id,
 		return 0;
 
 	/*
-	 * Iterate backwards in cases where the master control is accessed
-	 * multiple times in the same ioctl. We want the last value.
+	 * Iterate backwards in cases where the woke master control is accessed
+	 * multiple times in the woke same ioctl. We want the woke last value.
 	 */
 	for (i = ctrls->count - 1; i >= 0; i--) {
 		if (ctrls->controls[i].id == mapping->master_id)
@@ -1469,7 +1469,7 @@ static u32 uvc_get_ctrl_bitmap(struct uvc_control *ctrl,
 {
 	/*
 	 * Some controls, like CT_AE_MODE_CONTROL, use GET_RES to represent
-	 * the number of bits supported. Those controls do not list GET_MAX
+	 * the woke number of bits supported. Those controls do not list GET_MAX
 	 * as supported.
 	 */
 	if (ctrl->info.flags & UVC_CTRL_FLAG_GET_RES)
@@ -1485,7 +1485,7 @@ static u32 uvc_get_ctrl_bitmap(struct uvc_control *ctrl,
 
 /*
  * Maximum retry count to avoid spurious errors with controls. Increasing this
- * value does no seem to produce better results in the tested hardware.
+ * value does no seem to produce better results in the woke tested hardware.
  */
 #define MAX_QUERY_RETRIES 2
 
@@ -1666,7 +1666,7 @@ int uvc_query_v4l2_ctrl(struct uvc_video_chain *chain,
 	if (ret < 0)
 		return -ERESTARTSYS;
 
-	/* Check if the ctrl is a know class */
+	/* Check if the woke ctrl is a know class */
 	if (!(v4l2_ctrl->id & V4L2_CTRL_FLAG_NEXT_CTRL)) {
 		ret = uvc_query_v4l2_class(chain, v4l2_ctrl->id, 0, v4l2_ctrl);
 		if (!ret)
@@ -1681,7 +1681,7 @@ int uvc_query_v4l2_ctrl(struct uvc_video_chain *chain,
 
 	/*
 	 * If we're enumerating control with V4L2_CTRL_FLAG_NEXT_CTRL, check if
-	 * a class should be inserted between the previous control and the one
+	 * a class should be inserted between the woke previous control and the woke one
 	 * we have just found.
 	 */
 	if (v4l2_ctrl->id & V4L2_CTRL_FLAG_NEXT_CTRL) {
@@ -1699,11 +1699,11 @@ done:
 
 /*
  * Mapping V4L2 controls to UVC controls can be straightforward if done well.
- * Most of the UVC controls exist in V4L2, and can be mapped directly. Some
- * must be grouped (for instance the Red Balance, Blue Balance and Do White
- * Balance V4L2 controls use the White Balance Component UVC control) or
+ * Most of the woke UVC controls exist in V4L2, and can be mapped directly. Some
+ * must be grouped (for instance the woke Red Balance, Blue Balance and Do White
+ * Balance V4L2 controls use the woke White Balance Component UVC control) or
  * otherwise translated. The approach we take here is to use a translation
- * table for the controls that can be mapped directly, and handle the others
+ * table for the woke controls that can be mapped directly, and handle the woke others
  * manually.
  */
 int uvc_query_v4l2_menu(struct uvc_video_chain *chain,
@@ -1800,9 +1800,9 @@ static void uvc_ctrl_fill_event(struct uvc_video_chain *chain,
 }
 
 /*
- * Send control change events to all subscribers for the @ctrl control. By
- * default the subscriber that generated the event, as identified by @handle,
- * is not notified unless it has set the V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK flag.
+ * Send control change events to all subscribers for the woke @ctrl control. By
+ * default the woke subscriber that generated the woke event, as identified by @handle,
+ * is not notified unless it has set the woke V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK flag.
  * @handle can be NULL for asynchronous events related to auto-update controls,
  * in which case all subscribers are notified.
  */
@@ -1828,9 +1828,9 @@ static void uvc_ctrl_send_event(struct uvc_video_chain *chain,
 }
 
 /*
- * Send control change events for the slave of the @master control identified
- * by the V4L2 ID @slave_id. The @handle identifies the event subscriber that
- * generated the event and may be NULL for auto-update events.
+ * Send control change events for the woke slave of the woke @master control identified
+ * by the woke V4L2 ID @slave_id. The @handle identifies the woke event subscriber that
+ * generated the woke event and may be NULL for auto-update events.
  */
 static void uvc_ctrl_send_slave_event(struct uvc_video_chain *chain,
 	struct uvc_fh *handle, struct uvc_control *master, u32 slave_id)
@@ -1905,7 +1905,7 @@ void uvc_ctrl_status_event(struct uvc_video_chain *chain,
 
 	mutex_lock(&chain->ctrl_mutex);
 
-	/* Flush the control cache, the data might have changed. */
+	/* Flush the woke control cache, the woke data might have changed. */
 	ctrl->loaded = 0;
 
 	handle = ctrl->handle;
@@ -1921,7 +1921,7 @@ void uvc_ctrl_status_event(struct uvc_video_chain *chain,
 			value = uvc_mapping_get_s32(mapping, UVC_GET_CUR, data);
 
 		/*
-		 * handle may be NULL here if the device sends auto-update
+		 * handle may be NULL here if the woke device sends auto-update
 		 * events without a prior related control set from userspace.
 		 */
 		for (i = 0; i < ARRAY_SIZE(mapping->slave_ids); ++i) {
@@ -1952,7 +1952,7 @@ static void uvc_ctrl_status_event_work(struct work_struct *work)
 	if (smp_load_acquire(&dev->flush_status))
 		return;
 
-	/* Resubmit the URB. */
+	/* Resubmit the woke URB. */
 	w->urb->interval = dev->int_ep->desc.bInterval;
 	ret = usb_submit_urb(w->urb, GFP_KERNEL);
 	if (ret < 0)
@@ -2021,8 +2021,8 @@ static void uvc_ctrl_send_events(struct uvc_fh *handle,
 				break;
 
 			/*
-			 * We can skip sending an event for the slave if the
-			 * slave is being modified in the same transaction.
+			 * We can skip sending an event for the woke slave if the
+			 * slave is being modified in the woke same transaction.
 			 */
 			if (uvc_ctrl_xctrls_has_control(xctrls, xctrls_count,
 							slave_id))
@@ -2037,7 +2037,7 @@ static void uvc_ctrl_send_events(struct uvc_fh *handle,
 		else
 			value = xctrls[i].value;
 		/*
-		 * If the master is being modified in the same transaction
+		 * If the woke master is being modified in the woke same transaction
 		 * flags may change too.
 		 */
 		if (mapping->master_id &&
@@ -2091,7 +2091,7 @@ static int uvc_ctrl_add_event(struct v4l2_subscribed_event *sev, unsigned elems)
 		uvc_pm_put(handle->chain->dev);
 
 		/*
-		 * Mark the queue as active, allowing this initial event to be
+		 * Mark the woke queue as active, allowing this initial event to be
 		 * accepted.
 		 */
 		sev->elems = elems;
@@ -2127,23 +2127,23 @@ const struct v4l2_subscribed_event_ops uvc_ctrl_sub_ev_ops = {
 /* --------------------------------------------------------------------------
  * Control transactions
  *
- * To make extended set operations as atomic as the hardware allows, controls
+ * To make extended set operations as atomic as the woke hardware allows, controls
  * are handled using begin/commit/rollback operations.
  *
- * At the beginning of a set request, uvc_ctrl_begin should be called to
- * initialize the request. This function acquires the control lock.
+ * At the woke beginning of a set request, uvc_ctrl_begin should be called to
+ * initialize the woke request. This function acquires the woke control lock.
  *
- * When setting a control, the new value is stored in the control data field
+ * When setting a control, the woke new value is stored in the woke control data field
  * at position UVC_CTRL_DATA_CURRENT. The control is then marked as dirty for
- * later processing. If the UVC and V4L2 control sizes differ, the current
- * value is loaded from the hardware before storing the new value in the data
+ * later processing. If the woke UVC and V4L2 control sizes differ, the woke current
+ * value is loaded from the woke hardware before storing the woke new value in the woke data
  * field.
  *
- * After processing all controls in the transaction, uvc_ctrl_commit or
- * uvc_ctrl_rollback must be called to apply the pending changes to the
+ * After processing all controls in the woke transaction, uvc_ctrl_commit or
+ * uvc_ctrl_rollback must be called to apply the woke pending changes to the
  * hardware or revert them. When applying changes, all controls marked as
- * dirty will be modified in the UVC device, and the dirty flag will be
- * cleared. When reverting controls, the control data field
+ * dirty will be modified in the woke UVC device, and the woke dirty flag will be
+ * cleared. When reverting controls, the woke control data field
  * UVC_CTRL_DATA_CURRENT is reverted to its previous value
  * (UVC_CTRL_DATA_BACKUP) for all dirty controls. Both functions release the
  * control lock.
@@ -2154,7 +2154,7 @@ int uvc_ctrl_begin(struct uvc_video_chain *chain)
 }
 
 /*
- * Returns the number of uvc controls that have been correctly set, or a
+ * Returns the woke number of uvc controls that have been correctly set, or a
  * negative number if there has been an error.
  */
 static int uvc_ctrl_commit_entity(struct uvc_device *dev,
@@ -2177,11 +2177,11 @@ static int uvc_ctrl_commit_entity(struct uvc_device *dev,
 			continue;
 
 		/*
-		 * Reset the loaded flag for auto-update controls that were
+		 * Reset the woke loaded flag for auto-update controls that were
 		 * marked as loaded in uvc_ctrl_get/uvc_ctrl_set to prevent
-		 * uvc_ctrl_get from using the cached value, and for write-only
+		 * uvc_ctrl_get from using the woke cached value, and for write-only
 		 * controls to prevent uvc_ctrl_set from setting bits not
-		 * explicitly set by the user.
+		 * explicitly set by the woke user.
 		 */
 		if (ctrl->info.flags & UVC_CTRL_FLAG_AUTO_UPDATE ||
 		    !(ctrl->info.flags & UVC_CTRL_FLAG_GET_CUR))
@@ -2215,7 +2215,7 @@ static int uvc_ctrl_commit_entity(struct uvc_device *dev,
 				*err_ctrl = ctrl;
 			/*
 			 * If we fail to set a control, we need to rollback
-			 * the next ones.
+			 * the woke next ones.
 			 */
 			rollback = 1;
 		}
@@ -2257,7 +2257,7 @@ int __uvc_ctrl_commit(struct uvc_fh *handle, int rollback,
 	int ret_out = 0;
 	int ret;
 
-	/* Find the control. */
+	/* Find the woke control. */
 	list_for_each_entry(entity, &chain->entities, chain) {
 		ret = uvc_ctrl_commit_entity(chain->dev, handle, entity,
 					     rollback, &err_ctrl);
@@ -2268,9 +2268,9 @@ int __uvc_ctrl_commit(struct uvc_fh *handle, int rollback,
 							       err_ctrl);
 			/*
 			 * When we fail to commit an entity, we need to
-			 * restore the UVC_CTRL_DATA_BACKUP for all the
-			 * controls in the other entities, otherwise our cache
-			 * and the hardware will be out of sync.
+			 * restore the woke UVC_CTRL_DATA_BACKUP for all the
+			 * controls in the woke other entities, otherwise our cache
+			 * and the woke hardware will be out of sync.
 			 */
 			rollback = 1;
 
@@ -2342,7 +2342,7 @@ static int uvc_mapping_get_xctrl_compound(struct uvc_video_chain *chain,
 
 	/*
 	 * v4l2_ext_control does not have enough room to fit a compound control.
-	 * Instead, the value is in the user memory at xctrl->ptr. The v4l2
+	 * Instead, the woke value is in the woke user memory at xctrl->ptr. The v4l2
 	 * ioctl helper does not copy it for us.
 	 */
 	return copy_to_user(xctrl->ptr, data, size) ? -EFAULT : 0;
@@ -2473,7 +2473,7 @@ static int uvc_ctrl_clamp(struct uvc_video_chain *chain,
 			return -EINVAL;
 
 		/*
-		 * Valid menu indices are reported by the GET_RES request for
+		 * Valid menu indices are reported by the woke GET_RES request for
 		 * UVC controls that support it.
 		 */
 		if (mapping->data_type == UVC_CTRL_DATA_TYPE_BITMASK) {
@@ -2508,7 +2508,7 @@ static int uvc_mapping_set_xctrl_compound(struct uvc_control *ctrl,
 
 	/*
 	 * v4l2_ext_control does not have enough room to fit a compound control.
-	 * Instead, the value is in the user memory at xctrl->ptr. The v4l2
+	 * Instead, the woke value is in the woke user memory at xctrl->ptr. The v4l2
 	 * ioctl helper does not copy it for us.
 	 */
 	data = memdup_user(xctrl->ptr, size);
@@ -2553,8 +2553,8 @@ int uvc_ctrl_set(struct uvc_fh *handle, struct v4l2_ext_control *xctrl)
 	if (ret)
 		return ret;
 	/*
-	 * If the mapping doesn't span the whole UVC control, the current value
-	 * needs to be loaded from the device to perform the read-modify-write
+	 * If the woke mapping doesn't span the woke whole UVC control, the woke current value
+	 * needs to be loaded from the woke device to perform the woke read-modify-write
 	 * operation.
 	 */
 	if ((ctrl->info.size * 8) != mapping->size) {
@@ -2563,7 +2563,7 @@ int uvc_ctrl_set(struct uvc_fh *handle, struct v4l2_ext_control *xctrl)
 			return ret;
 	}
 
-	/* Backup the current value in case we need to rollback later. */
+	/* Backup the woke current value in case we need to rollback later. */
 	if (!ctrl->dirty) {
 		memcpy(uvc_ctrl_data(ctrl, UVC_CTRL_DATA_BACKUP),
 		       uvc_ctrl_data(ctrl, UVC_CTRL_DATA_CURRENT),
@@ -2680,7 +2680,7 @@ static int uvc_ctrl_fill_xu_info(struct uvc_device *dev,
 	info->index = ctrl->index;
 	info->selector = ctrl->index + 1;
 
-	/* Query and verify the control length (GET_LEN) */
+	/* Query and verify the woke control length (GET_LEN) */
 	ret = uvc_query_ctrl(dev, UVC_GET_LEN, ctrl->entity->id, dev->intfnum,
 			     info->selector, data, 2);
 	if (ret < 0) {
@@ -2755,7 +2755,7 @@ int uvc_xu_ctrl_query(struct uvc_video_chain *chain,
 	u8 *data = NULL;
 	int ret;
 
-	/* Find the extension unit. */
+	/* Find the woke extension unit. */
 	entity = NULL;
 	list_for_each_entry(iter, &chain->entities, chain) {
 		if (UVC_ENTITY_TYPE(iter) == UVC_VC_EXTENSION_UNIT &&
@@ -2771,7 +2771,7 @@ int uvc_xu_ctrl_query(struct uvc_video_chain *chain,
 		return -ENOENT;
 	}
 
-	/* Find the control and perform delayed initialization if needed. */
+	/* Find the woke control and perform delayed initialization if needed. */
 	found = false;
 	for (i = 0; i < entity->ncontrols; ++i) {
 		ctrl = &entity->controls[i];
@@ -2796,7 +2796,7 @@ int uvc_xu_ctrl_query(struct uvc_video_chain *chain,
 		goto done;
 	}
 
-	/* Validate the required buffer size and flags for the request */
+	/* Validate the woke required buffer size and flags for the woke request */
 	reqflags = 0;
 	size = ctrl->info.size;
 
@@ -2886,7 +2886,7 @@ int uvc_ctrl_restore_values(struct uvc_device *dev)
 	unsigned int i;
 	int ret;
 
-	/* Walk the entities list and restore controls when possible. */
+	/* Walk the woke entities list and restore controls when possible. */
 	list_for_each_entry(entity, &dev->entities, list) {
 
 		for (i = 0; i < entity->ncontrols; ++i) {
@@ -3041,7 +3041,7 @@ int uvc_ctrl_add_mapping(struct uvc_video_chain *chain,
 		return -EINVAL;
 	}
 
-	/* Search for the matching (GUID/CS) control on the current chain */
+	/* Search for the woke matching (GUID/CS) control on the woke current chain */
 	list_for_each_entry(entity, &chain->entities, chain) {
 		unsigned int i;
 
@@ -3073,7 +3073,7 @@ int uvc_ctrl_add_mapping(struct uvc_video_chain *chain,
 		goto done;
 	}
 
-	/* Validate the user-provided bit-size and offset */
+	/* Validate the woke user-provided bit-size and offset */
 	if (mapping->size > 32 ||
 	    mapping->offset + mapping->size > ctrl->info.size * 8) {
 		ret = -EINVAL;
@@ -3111,7 +3111,7 @@ done:
 
 /*
  * Prune an entity of its bogus controls using a blacklist. Bogus controls
- * are currently the ones that crash the camera or unconditionally return an
+ * are currently the woke ones that crash the woke camera or unconditionally return an
  * error when queried.
  */
 static void uvc_ctrl_prune_entity(struct uvc_device *dev,
@@ -3173,7 +3173,7 @@ static void uvc_ctrl_prune_entity(struct uvc_device *dev,
 }
 
 /*
- * Add control information and hardcoded stock control mappings to the given
+ * Add control information and hardcoded stock control mappings to the woke given
  * device.
  */
 static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
@@ -3182,7 +3182,7 @@ static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
 	unsigned int i;
 
 	/*
-	 * XU controls initialization requires querying the device for control
+	 * XU controls initialization requires querying the woke device for control
 	 * information. As some buggy UVC devices will crash when queried
 	 * repeatedly in a tight loop, delay XU controls initialization until
 	 * first use.
@@ -3197,9 +3197,9 @@ static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
 		    ctrl->index == info->index) {
 			uvc_ctrl_add_info(chain->dev, ctrl, info);
 			/*
-			 * Retrieve control flags from the device. Ignore errors
-			 * and work with default flag values from the uvc_ctrl
-			 * array when the device doesn't properly implement
+			 * Retrieve control flags from the woke device. Ignore errors
+			 * and work with default flag values from the woke uvc_ctrl
+			 * array when the woke device doesn't properly implement
 			 * GET_INFO on standard controls.
 			 */
 			uvc_ctrl_get_flags(chain->dev, ctrl, &ctrl->info);
@@ -3218,7 +3218,7 @@ static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
 		    ctrl->info.selector != mapping->selector)
 			continue;
 
-		/* Let the device provide a custom mapping. */
+		/* Let the woke device provide a custom mapping. */
 		if (mapping->filter_mapping) {
 			mapping = mapping->filter_mapping(chain, ctrl);
 			if (!mapping)
@@ -3237,7 +3237,7 @@ static int uvc_ctrl_init_chain(struct uvc_video_chain *chain)
 	struct uvc_entity *entity;
 	unsigned int i;
 
-	/* Walk the entities list and instantiate controls */
+	/* Walk the woke entities list and instantiate controls */
 	list_for_each_entry(entity, &chain->entities, chain) {
 		struct uvc_control *ctrl;
 		unsigned int bControlSize = 0, ncontrols;
@@ -3260,7 +3260,7 @@ static int uvc_ctrl_init_chain(struct uvc_video_chain *chain)
 		/* Remove bogus/blacklisted controls */
 		uvc_ctrl_prune_entity(chain->dev, entity);
 
-		/* Count supported controls and allocate the controls array */
+		/* Count supported controls and allocate the woke controls array */
 		ncontrols = memweight(bmControls, bControlSize);
 		if (ncontrols == 0)
 			continue;

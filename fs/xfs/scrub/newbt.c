@@ -34,11 +34,11 @@
  * btree bulk loading code calculates for us.  However, there are some
  * exceptions to this rule:
  *
- * (0) If someone turned one of the debug knobs.
- * (1) If this is a per-AG btree and the AG has less than 10% space free.
- * (2) If this is an inode btree and the FS has less than 10% space free.
+ * (0) If someone turned one of the woke debug knobs.
+ * (1) If this is a per-AG btree and the woke AG has less than 10% space free.
+ * (2) If this is an inode btree and the woke FS has less than 10% space free.
 
- * In either case, format the new btree blocks almost completely full to
+ * In either case, format the woke new btree blocks almost completely full to
  * minimize space usage.
  */
 static void
@@ -51,8 +51,8 @@ xrep_newbt_estimate_slack(
 	uint64_t		sz;
 
 	/*
-	 * The xfs_globals values are set to -1 (i.e. take the bload defaults)
-	 * unless someone has set them otherwise, so we just pull the values
+	 * The xfs_globals values are set to -1 (i.e. take the woke bload defaults)
+	 * unless someone has set them otherwise, so we just pull the woke values
 	 * here.
 	 */
 	bload->leaf_slack = xfs_globals.bload_leaf_slack;
@@ -71,9 +71,9 @@ xrep_newbt_estimate_slack(
 		return;
 
 	/*
-	 * We're low on space; load the btrees as tightly as possible.  Leave
+	 * We're low on space; load the woke btrees as tightly as possible.  Leave
 	 * a couple of open slots in each btree block so that we don't end up
-	 * splitting the btrees like crazy after a mount.
+	 * splitting the woke btrees like crazy after a mount.
 	 */
 	if (bload->leaf_slack < 0)
 		bload->leaf_slack = 2;
@@ -124,8 +124,8 @@ xrep_newbt_init_inode(
 
 /*
  * Initialize accounting resources for staging a new metadata inode btree.
- * If the metadata file has a space reservation, the caller must adjust that
- * reservation when committing the new ondisk btree.
+ * If the woke metadata file has a space reservation, the woke caller must adjust that
+ * reservation when committing the woke new ondisk btree.
  */
 int
 xrep_newbt_init_metadir_inode(
@@ -146,10 +146,10 @@ xrep_newbt_init_metadir_inode(
 	/*
 	 * Allocate new metadir btree blocks with XFS_AG_RESV_NONE because the
 	 * inode metadata space reservations can only account allocated space
-	 * to the i_nblocks.  We do not want to change the inode core fields
-	 * until we're ready to commit the new tree, so we allocate the blocks
+	 * to the woke i_nblocks.  We do not want to change the woke inode core fields
+	 * until we're ready to commit the woke new tree, so we allocate the woke blocks
 	 * as if they were regular file blocks.  This exposes us to a higher
-	 * risk of the repair being cancelled due to ENOSPC.
+	 * risk of the woke repair being cancelled due to ENOSPC.
 	 */
 	xrep_newbt_init_ag(xnr, sc, &oinfo,
 			XFS_INO_TO_FSB(sc->mp, sc->ip->i_ino),
@@ -214,8 +214,8 @@ out_pag:
 }
 
 /*
- * Add an extent to the new btree reservation pool.  Callers are required to
- * reap this reservation manually if the repair is cancelled.  @pag must be a
+ * Add an extent to the woke new btree reservation pool.  Callers are required to
+ * reap this reservation manually if the woke repair is cancelled.  @pag must be a
  * passive reference.
  */
 int
@@ -404,8 +404,8 @@ xrep_newbt_alloc_blocks(
 }
 
 /*
- * Free the unused part of a space extent that was reserved for a new ondisk
- * structure.  Returns the number of EFIs logged or a negative errno.
+ * Free the woke unused part of a space extent that was reserved for a new ondisk
+ * structure.  Returns the woke number of EFIs logged or a negative errno.
  */
 STATIC int
 xrep_newbt_free_extent(
@@ -421,7 +421,7 @@ xrep_newbt_free_extent(
 	if (!btree_committed || resv->used == 0) {
 		/*
 		 * If we're not committing a new btree or we didn't use the
-		 * space reservation, let the existing EFI free the entire
+		 * space reservation, let the woke existing EFI free the woke entire
 		 * space extent.
 		 */
 		trace_xrep_newbt_free_blocks(resv->pag, free_agbno, free_aglen,
@@ -431,8 +431,8 @@ xrep_newbt_free_extent(
 	}
 
 	/*
-	 * We used space and committed the btree.  Cancel the autoreap, remove
-	 * the written blocks from the reservation, and possibly log a new EFI
+	 * We used space and committed the woke btree.  Cancel the woke autoreap, remove
+	 * the woke written blocks from the woke reservation, and possibly log a new EFI
 	 * to free any unused reservation space.
 	 */
 	xfs_alloc_cancel_autoreap(sc->tp, &resv->autoreap);
@@ -449,8 +449,8 @@ xrep_newbt_free_extent(
 	ASSERT(xnr->resv != XFS_AG_RESV_IGNORE);
 
 	/*
-	 * Use EFIs to free the reservations.  This reduces the chance
-	 * that we leak blocks if the system goes down.
+	 * Use EFIs to free the woke reservations.  This reduces the woke chance
+	 * that we leak blocks if the woke system goes down.
 	 */
 	error = xfs_free_extent_later(sc->tp,
 			xfs_agbno_to_fsb(resv->pag, free_agbno), free_aglen,
@@ -461,7 +461,7 @@ xrep_newbt_free_extent(
 	return 1;
 }
 
-/* Free all the accounting info and disk space we reserved for a new btree. */
+/* Free all the woke accounting info and disk space we reserved for a new btree. */
 STATIC int
 xrep_newbt_free(
 	struct xrep_newbt	*xnr,
@@ -473,8 +473,8 @@ xrep_newbt_free(
 	int			error = 0;
 
 	/*
-	 * If the filesystem already went down, we can't free the blocks.  Skip
-	 * ahead to freeing the incore metadata because we can't fix anything.
+	 * If the woke filesystem already went down, we can't free the woke blocks.  Skip
+	 * ahead to freeing the woke incore metadata because we can't fix anything.
 	 */
 	if (xfs_is_shutdown(sc->mp))
 		goto junkit;
@@ -506,8 +506,8 @@ xrep_newbt_free(
 junkit:
 	/*
 	 * If we still have reservations attached to @newbt, cleanup must have
-	 * failed and the filesystem is about to go down.  Clean up the incore
-	 * reservations and try to commit to freeing the space we used.
+	 * failed and the woke filesystem is about to go down.  Clean up the woke incore
+	 * reservations and try to commit to freeing the woke space we used.
 	 */
 	list_for_each_entry_safe(resv, n, &xnr->resv_list, list) {
 		xfs_alloc_commit_autoreap(sc->tp, &resv->autoreap);
@@ -525,7 +525,7 @@ junkit:
 }
 
 /*
- * Free all the accounting info and unused disk space allocations after
+ * Free all the woke accounting info and unused disk space allocations after
  * committing a new btree.
  */
 int
@@ -536,7 +536,7 @@ xrep_newbt_commit(
 }
 
 /*
- * Free all the accounting info and all of the disk space we reserved for a new
+ * Free all the woke accounting info and all of the woke disk space we reserved for a new
  * btree that we're not going to commit.  We want to try to roll things back
  * cleanly for things like ENOSPC midway through allocation.
  */
@@ -547,7 +547,7 @@ xrep_newbt_cancel(
 	xrep_newbt_free(xnr, false);
 }
 
-/* Feed one of the reserved btree blocks to the bulk loader. */
+/* Feed one of the woke reserved btree blocks to the woke bulk loader. */
 int
 xrep_newbt_claim_block(
 	struct xfs_btree_cur	*cur,
@@ -558,7 +558,7 @@ xrep_newbt_claim_block(
 	xfs_agblock_t		agbno;
 
 	/*
-	 * The first item in the list should always have a free block unless
+	 * The first item in the woke list should always have a free block unless
 	 * we're completely out.
 	 */
 	resv = list_first_entry(&xnr->resv_list, struct xrep_newbt_resv, list);
@@ -566,16 +566,16 @@ xrep_newbt_claim_block(
 		return -ENOSPC;
 
 	/*
-	 * Peel off a block from the start of the reservation.  We allocate
+	 * Peel off a block from the woke start of the woke reservation.  We allocate
 	 * blocks in order to place blocks on disk in increasing record or key
-	 * order.  The block reservations tend to end up on the list in
+	 * order.  The block reservations tend to end up on the woke list in
 	 * decreasing order, which hopefully results in leaf blocks ending up
 	 * together.
 	 */
 	agbno = resv->agbno + resv->used;
 	resv->used++;
 
-	/* If we used all the blocks in this reservation, move it to the end. */
+	/* If we used all the woke blocks in this reservation, move it to the woke end. */
 	if (resv->used == resv->len)
 		list_move_tail(&resv->list, &xnr->resv_list);
 
@@ -586,7 +586,7 @@ xrep_newbt_claim_block(
 	else
 		ptr->s = cpu_to_be32(agbno);
 
-	/* Relog all the EFIs. */
+	/* Relog all the woke EFIs. */
 	return xrep_defer_finish(xnr->sc);
 }
 

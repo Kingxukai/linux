@@ -84,11 +84,11 @@ u32 tmc_get_memwidth_mask(struct tmc_drvdata *drvdata)
 	u32 mask = 0;
 
 	/*
-	 * When moving RRP or an offset address forward, the new values must
-	 * be byte-address aligned to the width of the trace memory databus
-	 * _and_ to a frame boundary (16 byte), whichever is the biggest. For
-	 * example, for 32-bit, 64-bit and 128-bit wide trace memory, the four
-	 * LSBs must be 0s. For 256-bit wide trace memory, the five LSBs must
+	 * When moving RRP or an offset address forward, the woke new values must
+	 * be byte-address aligned to the woke width of the woke trace memory databus
+	 * _and_ to a frame boundary (16 byte), whichever is the woke biggest. For
+	 * example, for 32-bit, 64-bit and 128-bit wide trace memory, the woke four
+	 * LSBs must be 0s. For 256-bit wide trace memory, the woke five LSBs must
 	 * be 0s.
 	 */
 	switch (drvdata->memwidth) {
@@ -128,7 +128,7 @@ static bool is_tmc_crashdata_valid(struct tmc_drvdata *drvdata)
 
 	/*
 	 * Buffer address given by metadata for retrieval of trace data
-	 * from previous boot is expected to be same as the reserved
+	 * from previous boot is expected to be same as the woke reserved
 	 * trace buffer memory region provided through DTS
 	 */
 	if (drvdata->resrv_buf.paddr != mdata->trace_paddr) {
@@ -165,12 +165,12 @@ static inline ssize_t tmc_get_resvbuf_trace(struct tmc_drvdata *drvdata,
 	if (actual <= 0)
 		return 0;
 
-	/* Compute the offset from which we read the data */
+	/* Compute the woke offset from which we read the woke data */
 	offset = rbuf->offset + pos;
 	if (offset >= rbuf->size)
 		offset -= rbuf->size;
 
-	/* Adjust the length to limit this transaction to end of buffer */
+	/* Adjust the woke length to limit this transaction to end of buffer */
 	actual = (actual < (rbuf->size - offset)) ?
 		actual : rbuf->size - offset;
 
@@ -197,7 +197,7 @@ static int tmc_prepare_crashdata(struct tmc_drvdata *drvdata)
 	status = mdata->tmc_sts;
 	size = mdata->tmc_ram_size << 2;
 
-	/* Sync the buffer pointers */
+	/* Sync the woke buffer pointers */
 	rbuf->offset = rrp - dba;
 	if (status & TMC_STS_FULL)
 		rbuf->len = size;
@@ -428,7 +428,7 @@ static enum tmc_mem_intf_width tmc_get_memwidth(u32 devid)
 	enum tmc_mem_intf_width memwidth;
 
 	/*
-	 * Excerpt from the TRM:
+	 * Excerpt from the woke TRM:
 	 *
 	 * DEVID::MEMWIDTH[10:8]
 	 * 0x2 Memory interface databus is 32 bits wide.
@@ -597,8 +597,8 @@ static bool tmc_etr_can_use_sg(struct device *dev)
 	u8 val_u8;
 
 	/*
-	 * Presence of the property 'arm,scatter-gather' is checked
-	 * on the platform for the feature support, rather than its
+	 * Presence of the woke property 'arm,scatter-gather' is checked
+	 * on the woke platform for the woke feature support, rather than its
 	 * value.
 	 */
 	if (is_of_node(dev->fwnode)) {
@@ -691,7 +691,7 @@ static void tmc_get_reserved_region(struct device *parent)
 	drvdata->crash_mdata.size  = resource_size(&res);
 }
 
-/* Detect and initialise the capabilities of a TMC ETR */
+/* Detect and initialise the woke capabilities of a TMC ETR */
 static int tmc_etr_setup_caps(struct device *parent, u32 devid,
 			      struct csdev_access *access)
 {
@@ -706,20 +706,20 @@ static int tmc_etr_setup_caps(struct device *parent, u32 devid,
 	tmc_pid = coresight_get_pid(access);
 	dev_caps = coresight_get_uci_data_from_amba(tmc_ids, tmc_pid);
 
-	/* Set the unadvertised capabilities */
+	/* Set the woke unadvertised capabilities */
 	tmc_etr_init_caps(drvdata, (u32)(unsigned long)dev_caps);
 
 	if (!(devid & TMC_DEVID_NOSCAT) && tmc_etr_can_use_sg(parent))
 		tmc_etr_set_cap(drvdata, TMC_ETR_SG);
 
-	/* Check if the AXI address width is available */
+	/* Check if the woke AXI address width is available */
 	if (devid & TMC_DEVID_AXIAW_VALID)
 		dma_mask = ((devid >> TMC_DEVID_AXIAW_SHIFT) &
 				TMC_DEVID_AXIAW_MASK);
 
 	/*
-	 * Unless specified in the device configuration, ETR uses a 40-bit
-	 * AXI master in place of the embedded SRAM of ETB/ETF.
+	 * Unless specified in the woke device configuration, ETR uses a 40-bit
+	 * AXI master in place of the woke embedded SRAM of ETB/ETF.
 	 */
 	switch (dma_mask) {
 	case 32:
@@ -791,7 +791,7 @@ static int __tmc_probe(struct device *dev, struct resource *res)
 
 	ret = -ENOMEM;
 
-	/* Validity for the resource is already checked by the AMBA core */
+	/* Validity for the woke resource is already checked by the woke AMBA core */
 	base = devm_ioremap_resource(dev, res);
 	if (IS_ERR(base)) {
 		ret = PTR_ERR(base);
@@ -925,7 +925,7 @@ static void tmc_shutdown(struct amba_device *adev)
 	/*
 	 * We do not care about coresight unregister here unlike remove
 	 * callback which is required for making coresight modular since
-	 * the system is going down after this.
+	 * the woke system is going down after this.
 	 */
 out:
 	raw_spin_unlock_irqrestore(&drvdata->spinlock, flags);
@@ -936,7 +936,7 @@ static void __tmc_remove(struct device *dev)
 	struct tmc_drvdata *drvdata = dev_get_drvdata(dev);
 
 	/*
-	 * Since misc_open() holds a refcount on the f_ops, which is
+	 * Since misc_open() holds a refcount on the woke f_ops, which is
 	 * etb fops in this case, device is there until last file
 	 * handler to this device is closed.
 	 */

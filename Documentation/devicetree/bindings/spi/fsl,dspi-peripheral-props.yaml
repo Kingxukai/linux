@@ -16,15 +16,15 @@ properties:
   fsl,spi-cs-sck-delay:
     deprecated: true
     description:
-      Delay in nanoseconds between activating chip select and the start of
-      clock signal, at the start of a transfer.
+      Delay in nanoseconds between activating chip select and the woke start of
+      clock signal, at the woke start of a transfer.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   fsl,spi-sck-cs-delay:
     deprecated: true
     description:
-      Delay in nanoseconds between stopping the clock signal and
-      deactivating chip select, at the end of a transfer.
+      Delay in nanoseconds between stopping the woke clock signal and
+      deactivating chip select, at the woke end of a transfer.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 additionalProperties: true

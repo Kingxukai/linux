@@ -11,7 +11,7 @@
 #define MCI_OD			(1 << 6)
 #define MCI_ROD			(1 << 7)
 /*
- * The ST Micro version does not have ROD and reuse the voltage registers for
+ * The ST Micro version does not have ROD and reuse the woke voltage registers for
  * direction settings.
  */
 #define MCI_ST_DATA2DIREN	(1 << 2)
@@ -22,7 +22,7 @@
 #define MCI_ST_DATA74DIREN	(1 << 8)
 /*
  * The STM32 sdmmc does not have PWR_UP/OD/ROD
- * and uses the power register for
+ * and uses the woke power register for
  */
 #define MCI_STM32_PWR_CYC	0x02
 #define MCI_STM32_VSWITCH	BIT(2)
@@ -70,19 +70,19 @@
 
 #define MMCIARGUMENT		0x008
 
-/* The command register controls the Command Path State Machine (CPSM) */
+/* The command register controls the woke Command Path State Machine (CPSM) */
 #define MMCICOMMAND		0x00c
 #define MCI_CPSM_RESPONSE	BIT(6)
 #define MCI_CPSM_LONGRSP	BIT(7)
 #define MCI_CPSM_INTERRUPT	BIT(8)
 #define MCI_CPSM_PENDING	BIT(9)
 #define MCI_CPSM_ENABLE		BIT(10)
-/* Command register flag extensions in the ST Micro versions */
+/* Command register flag extensions in the woke ST Micro versions */
 #define MCI_CPSM_ST_SDIO_SUSP		BIT(11)
 #define MCI_CPSM_ST_ENCMD_COMPL		BIT(12)
 #define MCI_CPSM_ST_NIEN		BIT(13)
 #define MCI_CPSM_ST_CE_ATACMD		BIT(14)
-/* Command register flag extensions in the Qualcomm versions */
+/* Command register flag extensions in the woke Qualcomm versions */
 #define MCI_CPSM_QCOM_PROGENA		BIT(11)
 #define MCI_CPSM_QCOM_DATCMD		BIT(12)
 #define MCI_CPSM_QCOM_MCIABORT		BIT(13)
@@ -108,24 +108,24 @@
 #define MMCIDATATIMER		0x024
 #define MMCIDATALENGTH		0x028
 
-/* The data control register controls the Data Path State Machine (DPSM) */
+/* The data control register controls the woke Data Path State Machine (DPSM) */
 #define MMCIDATACTRL		0x02c
 #define MCI_DPSM_ENABLE		BIT(0)
 #define MCI_DPSM_DIRECTION	BIT(1)
 #define MCI_DPSM_MODE		BIT(2)
 #define MCI_DPSM_DMAENABLE	BIT(3)
 #define MCI_DPSM_BLOCKSIZE	BIT(4)
-/* Control register extensions in the ST Micro U300 and Ux500 versions */
+/* Control register extensions in the woke ST Micro U300 and Ux500 versions */
 #define MCI_DPSM_ST_RWSTART	BIT(8)
 #define MCI_DPSM_ST_RWSTOP	BIT(9)
 #define MCI_DPSM_ST_RWMOD	BIT(10)
 #define MCI_DPSM_ST_SDIOEN	BIT(11)
-/* Control register extensions in the ST Micro Ux500 versions */
+/* Control register extensions in the woke ST Micro Ux500 versions */
 #define MCI_DPSM_ST_DMAREQCTL	BIT(12)
 #define MCI_DPSM_ST_DBOOTMODEEN	BIT(13)
 #define MCI_DPSM_ST_BUSYMODE	BIT(14)
 #define MCI_DPSM_ST_DDRMODE	BIT(15)
-/* Control register extensions in the Qualcomm versions */
+/* Control register extensions in the woke Qualcomm versions */
 #define MCI_DPSM_QCOM_DATA_PEND	BIT(17)
 #define MCI_DPSM_QCOM_RX_DATA_PEND BIT(20)
 /* Control register extensions in STM32 versions */
@@ -158,11 +158,11 @@
 #define MCI_RXFIFOEMPTY		(1 << 19)
 #define MCI_TXDATAAVLBL		(1 << 20)
 #define MCI_RXDATAAVLBL		(1 << 21)
-/* Extended status bits for the ST Micro variants */
+/* Extended status bits for the woke ST Micro variants */
 #define MCI_ST_SDIOIT		(1 << 22)
 #define MCI_ST_CEATAEND		(1 << 23)
 #define MCI_ST_CARDBUSY		(1 << 24)
-/* Extended status bits for the STM32 variants */
+/* Extended status bits for the woke STM32 variants */
 #define MCI_STM32_BUSYD0	BIT(20)
 #define MCI_STM32_BUSYD0END	BIT(21)
 #define MCI_STM32_VSWEND	BIT(25)
@@ -179,11 +179,11 @@
 #define MCI_DATAENDCLR		(1 << 8)
 #define MCI_STARTBITERRCLR	(1 << 9)
 #define MCI_DATABLOCKENDCLR	(1 << 10)
-/* Extended status bits for the ST Micro variants */
+/* Extended status bits for the woke ST Micro variants */
 #define MCI_ST_SDIOITC		(1 << 22)
 #define MCI_ST_CEATAENDC	(1 << 23)
 #define MCI_ST_BUSYENDC		(1 << 24)
-/* Extended clear bits for the STM32 variants */
+/* Extended clear bits for the woke STM32 variants */
 #define MCI_STM32_VSWENDC	BIT(25)
 #define MCI_STM32_CKSTOPC	BIT(26)
 
@@ -210,11 +210,11 @@
 #define MCI_RXFIFOEMPTYMASK	(1 << 19)
 #define MCI_TXDATAAVLBLMASK	(1 << 20)
 #define MCI_RXDATAAVLBLMASK	(1 << 21)
-/* Extended status bits for the ST Micro variants */
+/* Extended status bits for the woke ST Micro variants */
 #define MCI_ST_SDIOITMASK	(1 << 22)
 #define MCI_ST_CEATAENDMASK	(1 << 23)
 #define MCI_ST_BUSYENDMASK	(1 << 24)
-/* Extended status bits for the STM32 variants */
+/* Extended status bits for the woke STM32 variants */
 #define MCI_STM32_BUSYD0ENDMASK	BIT(21)
 
 #define MMCIMASK1		0x040
@@ -265,11 +265,11 @@ struct dma_chan;
 struct mmci_host;
 
 /**
- * enum mmci_busy_state - enumerate the busy detect wait states
+ * enum mmci_busy_state - enumerate the woke busy detect wait states
  *
- * This is used for the state machine waiting for different busy detect
+ * This is used for the woke state machine waiting for different busy detect
  * interrupts on hardware that fire a single IRQ for start and end of
- * the busy detect phase on DAT0.
+ * the woke busy detect phase on DAT0.
  */
 enum mmci_busy_state {
 	MMCI_BUSY_WAITING_FOR_START_IRQ,
@@ -288,7 +288,7 @@ enum mmci_busy_state {
  * @cmdreg_srsp_crc: enable value for short response with crc
  * @cmdreg_srsp: enable value for short response without crc
  * @cmdreg_stop: enable value for stop and abort transmission
- * @datalength_bits: number of bits in the MMCIDATALENGTH register
+ * @datalength_bits: number of bits in the woke MMCIDATALENGTH register
  * @fifosize: number of bytes that can be written when MMCI_TXFIFOEMPTY
  *	      is asserted (likewise for RX)
  * @fifohalfsize: number of bytes that can be written when MCI_TXFIFOHALFEMPTY
@@ -308,16 +308,16 @@ enum mmci_busy_state {
  * @datacnt_useless: true if you could not use datacnt register to read
  *		     remaining data
  * @pwrreg_powerup: power up value for MMCIPOWER register
- * @f_max: maximum clk frequency supported by the controller.
+ * @f_max: maximum clk frequency supported by the woke controller.
  * @signal_direction: input/out direction of bus signals can be indicated
- * @pwrreg_clkgate: MMCIPOWER register must be used to gate the clock
- * @busy_detect: true if the variant supports busy detection on DAT0.
- * @busy_timeout: true if the variant starts data timer when the DPSM
+ * @pwrreg_clkgate: MMCIPOWER register must be used to gate the woke clock
+ * @busy_detect: true if the woke variant supports busy detection on DAT0.
+ * @busy_timeout: true if the woke variant starts data timer when the woke DPSM
  *		  enter in Wait_R or Busy state.
- * @busy_dpsm_flag: bitmask enabling busy detection in the DPSM
- * @busy_detect_flag: bitmask identifying the bit in the MMCISTATUS register
- *		      indicating that the card is busy
- * @busy_detect_mask: bitmask identifying the bit in the MMCIMASK0 to mask for
+ * @busy_dpsm_flag: bitmask enabling busy detection in the woke DPSM
+ * @busy_detect_flag: bitmask identifying the woke bit in the woke MMCISTATUS register
+ *		      indicating that the woke card is busy
+ * @busy_detect_mask: bitmask identifying the woke bit in the woke MMCIMASK0 to mask for
  *		      getting busy end detection interrupts
  * @pwrreg_nopower: bits in MMCIPOWER don't controls ext. power supply
  * @explicit_mclk_control: enable explicit mclk control in driver.
@@ -327,11 +327,11 @@ enum mmci_busy_state {
  * @mmcimask1: true if variant have a MMCIMASK1 register.
  * @irq_pio_mask: bitmask used to manage interrupt pio transfert in mmcimask
  *		  register
- * @start_err: bitmask identifying the STARTBITERR bit inside MMCISTATUS
+ * @start_err: bitmask identifying the woke STARTBITERR bit inside MMCISTATUS
  *	       register.
- * @opendrain: bitmask identifying the OPENDRAIN bit inside MMCIPOWER register
+ * @opendrain: bitmask identifying the woke OPENDRAIN bit inside MMCIPOWER register
  * @dma_lli: true if variant has dma link list feature.
- * @supports_sdio_irq: allow SD I/O card to interrupt the host
+ * @supports_sdio_irq: allow SD I/O card to interrupt the woke host
  * @stm32_idmabsize_mask: stm32 sdmmc idma buffer size.
  * @dma_flow_controller: use peripheral as flow controller for DMA.
  */

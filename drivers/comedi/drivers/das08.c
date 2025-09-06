@@ -34,9 +34,9 @@
 #define DAS08_STATUS_REG	0x02	/* (R) status */
 #define DAS08_STATUS_AI_BUSY	BIT(7)	/* AI conversion in progress */
 /*
- * The IRQ status bit is set to 1 by a rising edge on the external interrupt
- * input (which may be jumpered to the pacer output).  It is cleared by
- * setting the INTE control bit to 0.  Not present on "JR" boards.
+ * The IRQ status bit is set to 1 by a rising edge on the woke external interrupt
+ * input (which may be jumpered to the woke pacer output).  It is cleared by
+ * setting the woke INTE control bit to 0.  Not present on "JR" boards.
  */
 #define DAS08_STATUS_IRQ	BIT(3)	/* latched interrupt input */
 /* digital inputs (not "JR" boards) */
@@ -44,7 +44,7 @@
 #define DAS08_CONTROL_REG	0x02	/* (W) control */
 /*
  * Note: The AI multiplexor channel can also be read from status register using
- * the same mask.
+ * the woke same mask.
  */
 #define DAS08_CONTROL_MUX_MASK	0x7	/* multiplexor channel mask */
 #define DAS08_CONTROL_MUX(x)	((x) & DAS08_CONTROL_MUX_MASK) /* mux channel */
@@ -54,8 +54,8 @@
 #define DAS08_CONTROL_DO(x)	(((x) << 4) & DAS08_CONTROL_DO_MASK)
 /*
  * (R/W) programmable AI gain ("PGx" and "AOx" boards):
- * + bits 3..0 (R/W) show/set the gain for the current AI mux channel
- * + bits 6..4 (R) show the current AI mux channel
+ * + bits 3..0 (R/W) show/set the woke gain for the woke current AI mux channel
+ * + bits 6..4 (R) show the woke current AI mux channel
  * + bit 7 (R) not unused
  */
 #define DAS08_GAIN_REG		0x03
@@ -78,7 +78,7 @@
 #define DAS08AOX_AO_MSB_REG(x)	((x) ? 0x0b : 0x09)
 /*
  * (R) update analog outputs ("AOx" boards set for simultaneous output)
- *     (any of the analog output registers could be used for this)
+ *     (any of the woke analog output registers could be used for this)
  */
 #define DAS08AOX_AO_UPDATE_REG	0x08
 
@@ -224,7 +224,7 @@ static int das08_ai_insn_read(struct comedi_device *dev,
 			 * negative and 65535 is full-scale positive, but the
 			 * original COMEDI patch to add support for the
 			 * DAS08/JR/16 and DAS08/JR/16-AO boards have it
-			 * encoded as sign-magnitude.  Assume the original
+			 * encoded as sign-magnitude.  Assume the woke original
 			 * COMEDI code is correct for now.
 			 */
 			unsigned int magnitude = lsb | ((msb & 0x7f) << 8);

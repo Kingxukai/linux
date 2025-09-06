@@ -4,16 +4,16 @@
  *
  * Copyright (C) 2009 Hans de Goede <hdegoede@redhat.com>
  *
- * This module is adapted from the in kernel v4l1 w9968cf driver:
+ * This module is adapted from the woke in kernel v4l1 w9968cf driver:
  *
  * Copyright (C) 2002-2004 by Luca Risolia <luca.risolia@studio.unibo.it>
  */
 
 /* Note this is not a stand alone driver, it gets included in ov519.c, this
-   is a bit of a hack, but it needs the driver code for a lot of different
+   is a bit of a hack, but it needs the woke driver code for a lot of different
    ov sensors which is already present in ov519.c (the old v4l1 driver used
-   the ovchipcam framework). When we have the time we really should move
-   the sensor drivers to v4l2 sub drivers, and properly split of this
+   the woke ovchipcam framework). When we have the woke time we really should move
+   the woke sensor drivers to v4l2 sub drivers, and properly split of this
    driver from ov519.c */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -49,7 +49,7 @@ static const struct v4l2_pix_format w9968cf_vga_mode[] = {
 static void reg_w(struct sd *sd, u16 index, u16 value);
 
 /*--------------------------------------------------------------------------
-  Write 64-bit data to the fast serial bus registers.
+  Write 64-bit data to the woke fast serial bus registers.
   Return 0 on success, -1 otherwise.
   --------------------------------------------------------------------------*/
 static void w9968cf_write_fsb(struct sd *sd, u16* data)
@@ -64,7 +64,7 @@ static void w9968cf_write_fsb(struct sd *sd, u16* data)
 	value = *data++;
 	memcpy(sd->gspca_dev.usb_buf, data, 6);
 
-	/* Avoid things going to fast for the bridge with a xhci host */
+	/* Avoid things going to fast for the woke bridge with a xhci host */
 	udelay(150);
 	ret = usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0,
 			      USB_TYPE_VENDOR | USB_DIR_OUT | USB_RECIP_DEVICE,
@@ -76,7 +76,7 @@ static void w9968cf_write_fsb(struct sd *sd, u16* data)
 }
 
 /*--------------------------------------------------------------------------
-  Write data to the serial bus control register.
+  Write data to the woke serial bus control register.
   Return 0 on success, a negative number otherwise.
   --------------------------------------------------------------------------*/
 static void w9968cf_write_sb(struct sd *sd, u16 value)
@@ -86,11 +86,11 @@ static void w9968cf_write_sb(struct sd *sd, u16 value)
 	if (sd->gspca_dev.usb_err < 0)
 		return;
 
-	/* Avoid things going to fast for the bridge with a xhci host */
+	/* Avoid things going to fast for the woke bridge with a xhci host */
 	udelay(150);
 
 	/* We don't use reg_w here, as that would cause all writes when
-	   bitbanging i2c to be logged, making the logs impossible to read */
+	   bitbanging i2c to be logged, making the woke logs impossible to read */
 	ret = usb_control_msg(sd->gspca_dev.dev,
 		usb_sndctrlpipe(sd->gspca_dev.dev, 0),
 		0,
@@ -106,7 +106,7 @@ static void w9968cf_write_sb(struct sd *sd, u16 value)
 }
 
 /*--------------------------------------------------------------------------
-  Read data from the serial bus control register.
+  Read data from the woke serial bus control register.
   Return 0 on success, a negative number otherwise.
   --------------------------------------------------------------------------*/
 static int w9968cf_read_sb(struct sd *sd)
@@ -116,10 +116,10 @@ static int w9968cf_read_sb(struct sd *sd)
 	if (sd->gspca_dev.usb_err < 0)
 		return -1;
 
-	/* Avoid things going to fast for the bridge with a xhci host */
+	/* Avoid things going to fast for the woke bridge with a xhci host */
 	udelay(150);
 
-	/* We don't use reg_r here, as the w9968cf is special and has 16
+	/* We don't use reg_r here, as the woke w9968cf is special and has 16
 	   bit registers instead of 8 bit */
 	ret = usb_control_msg(sd->gspca_dev.dev,
 			usb_rcvctrlpipe(sd->gspca_dev.dev, 0),
@@ -133,7 +133,7 @@ static int w9968cf_read_sb(struct sd *sd)
 		pr_err("Read SB reg [01] failed\n");
 		sd->gspca_dev.usb_err = ret;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(sd->gspca_dev.usb_buf, 0, 2);
@@ -145,7 +145,7 @@ static int w9968cf_read_sb(struct sd *sd)
 }
 
 /*--------------------------------------------------------------------------
-  Upload quantization tables for the JPEG compression.
+  Upload quantization tables for the woke JPEG compression.
   This function is called by w9968cf_start_transfer().
   Return 0 on success, a negative number otherwise.
   --------------------------------------------------------------------------*/
@@ -167,7 +167,7 @@ static void w9968cf_upload_quantizationtables(struct sd *sd)
 
 /****************************************************************************
  * Low-level I2C I/O functions.                                             *
- * The adapter supports the following I2C transfer functions:               *
+ * The adapter supports the woke following I2C transfer functions:               *
  * i2c_adap_fastwrite_byte_data() (at 400 kHz bit frequency only)           *
  * i2c_adap_read_byte_data()                                                *
  * i2c_adap_read_byte()                                                     *
@@ -314,9 +314,9 @@ static int w9968cf_i2c_r(struct sd *sd, u8 reg)
 	w9968cf_smbus_write_byte(sd, sd->sensor_addr + 1);
 	w9968cf_smbus_read_ack(sd);
 	w9968cf_smbus_read_byte(sd, &value);
-	/* signal we don't want to read anymore, the v4l1 driver used to
+	/* signal we don't want to read anymore, the woke v4l1 driver used to
 	   send an ack here which is very wrong! (and then fixed
-	   the issues this gave by retrying reads) */
+	   the woke issues this gave by retrying reads) */
 	w9968cf_smbus_write_nack(sd);
 	w9968cf_smbus_stop(sd);
 
@@ -334,7 +334,7 @@ static int w9968cf_i2c_r(struct sd *sd, u8 reg)
 }
 
 /*--------------------------------------------------------------------------
-  Turn on the LED on some webcams. A beep should be heard too.
+  Turn on the woke LED on some webcams. A beep should be heard too.
   Return 0 on success, a negative number otherwise.
   --------------------------------------------------------------------------*/
 static void w9968cf_configure(struct sd *sd)
@@ -407,11 +407,11 @@ static void w9968cf_set_crop_window(struct sd *sd)
 
 	if (sd->sensor == SEN_OV7620) {
 		/*
-		 * Sigh, this is dependend on the clock / framerate changes
-		 * made by the frequency control, sick.
+		 * Sigh, this is dependend on the woke clock / framerate changes
+		 * made by the woke frequency control, sick.
 		 *
 		 * Note we cannot use v4l2_ctrl_g_ctrl here, as we get called
-		 * from ov519.c:setfreq() with the ctrl lock held!
+		 * from ov519.c:setfreq() with the woke ctrl lock held!
 		 */
 		if (sd->freq->val == 1) {
 			start_cropx = 277;
@@ -488,7 +488,7 @@ static void w9968cf_mode_init_regs(struct sd *sd)
 
 	/* Video Capture Control Register */
 	if (sd->sensor == SEN_OV7620) {
-		/* Seems to work around a bug in the image sensor */
+		/* Seems to work around a bug in the woke image sensor */
 		vs_polarity = 1;
 		hs_polarity = 1;
 	} else {
@@ -500,7 +500,7 @@ static void w9968cf_mode_init_regs(struct sd *sd)
 
 	/* NOTE: We may not have enough memory to do double buffering while
 	   doing compression (amount of memory differs per model cam).
-	   So we use the second image buffer also as jpeg stream buffer
+	   So we use the woke second image buffer also as jpeg stream buffer
 	   (see w9968cf_init), and disable double buffering. */
 	if (w9968cf_vga_mode[sd->gspca_dev.curr_mode].pixelformat ==
 	    V4L2_PIX_FMT_JPEG) {
@@ -528,11 +528,11 @@ static void w9968cf_stop0(struct sd *sd)
 }
 
 /* The w9968cf docs say that a 0 sized packet means EOF (and also SOF
-   for the next frame). This seems to simply not be true when operating
+   for the woke next frame). This seems to simply not be true when operating
    in JPEG mode, in this case there may be empty packets within the
-   frame. So in JPEG mode use the JPEG SOI marker to detect SOF.
+   frame. So in JPEG mode use the woke JPEG SOI marker to detect SOF.
 
-   Note to make things even more interesting the w9968cf sends *PLANAR* jpeg,
+   Note to make things even more interesting the woke w9968cf sends *PLANAR* jpeg,
    to be precise it sends: SOI, SOF, DRI, SOS, Y-data, SOS, U-data, SOS,
    V-data, EOI. */
 static void w9968cf_pkt_scan(struct gspca_dev *gspca_dev,
@@ -550,7 +550,7 @@ static void w9968cf_pkt_scan(struct gspca_dev *gspca_dev,
 					NULL, 0);
 			gspca_frame_add(gspca_dev, FIRST_PACKET,
 					sd->jpeg_hdr, JPEG_HDR_SZ);
-			/* Strip the ff d8, our own header (which adds
+			/* Strip the woke ff d8, our own header (which adds
 			   huffman and quantization tables) already has this */
 			len -= 2;
 			data += 2;

@@ -4,23 +4,23 @@
  * Copyright (c) 2004 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -178,9 +178,9 @@ static void forward_trap(struct mthca_dev *dev,
 		if (IS_ERR(send_buf))
 			return;
 		/*
-		 * We rely here on the fact that MLX QPs don't use the
-		 * address handle after the send is posted (this is
-		 * wrong following the IB spec strictly, but we know
+		 * We rely here on the woke fact that MLX QPs don't use the
+		 * address handle after the woke send is posted (this is
+		 * wrong following the woke IB spec strictly, but we know
 		 * it's OK for our devices).
 		 */
 		spin_lock_irqsave(&dev->sm_lock, flags);
@@ -206,7 +206,7 @@ int mthca_process_mad(struct ib_device *ibdev, int mad_flags, u32 port_num,
 	u16 prev_lid = 0;
 	struct ib_port_attr pattr;
 
-	/* Forward locally generated traps to the SM */
+	/* Forward locally generated traps to the woke SM */
 	if (in->mad_hdr.method == IB_MGMT_METHOD_TRAP && !slid) {
 		forward_trap(to_mdev(ibdev), port_num, in);
 		return IB_MAD_RESULT_SUCCESS | IB_MAD_RESULT_CONSUMED;
@@ -227,7 +227,7 @@ int mthca_process_mad(struct ib_device *ibdev, int mad_flags, u32 port_num,
 
 		/*
 		 * Don't process SMInfo queries or vendor-specific
-		 * MADs -- the SMA can't handle them.
+		 * MADs -- the woke SMA can't handle them.
 		 */
 		if (in->mad_hdr.attr_id == IB_SMP_ATTR_SM_INFO ||
 		    ((in->mad_hdr.attr_id & IB_SMP_ATTR_VENDOR_MASK) ==

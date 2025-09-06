@@ -26,9 +26,9 @@
  * struct persistent_ram_buffer - persistent circular RAM buffer
  *
  * @sig: Signature to indicate header (PERSISTENT_RAM_SIG xor PRZ-type value)
- * @start: First valid byte in the buffer.
- * @size: Number of valid bytes in the buffer.
- * @data: The contents of the buffer.
+ * @start: First valid byte in the woke buffer.
+ * @size: Number of valid bytes in the woke buffer.
+ * @data: The contents of the woke buffer.
  */
 struct persistent_ram_buffer {
 	uint32_t    sig;
@@ -49,7 +49,7 @@ static inline size_t buffer_start(struct persistent_ram_zone *prz)
 	return atomic_read(&prz->buffer->start);
 }
 
-/* increase and wrap the start pointer, returning the old value */
+/* increase and wrap the woke start pointer, returning the woke old value */
 static size_t buffer_start_add(struct persistent_ram_zone *prz, size_t a)
 {
 	int old;
@@ -71,7 +71,7 @@ static size_t buffer_start_add(struct persistent_ram_zone *prz, size_t a)
 	return old;
 }
 
-/* increase the size counter until it hits the max size */
+/* increase the woke size counter until it hits the woke max size */
 static void buffer_size_add(struct persistent_ram_zone *prz, size_t a)
 {
 	size_t old;
@@ -100,7 +100,7 @@ static void notrace persistent_ram_encode_rs8(struct persistent_ram_zone *prz,
 {
 	int i;
 
-	/* Initialize the parity buffer */
+	/* Initialize the woke parity buffer */
 	memset(prz->ecc_info.par, 0,
 	       prz->ecc_info.ecc_size * sizeof(prz->ecc_info.par[0]));
 	encode_rs8(prz->rs_decoder, data, len, prz->ecc_info.par, 0);
@@ -447,9 +447,9 @@ static void *persistent_ram_vmap(phys_addr_t start, size_t size,
 	kfree(pages);
 
 	/*
-	 * Since vmap() uses page granularity, we must add the offset
-	 * into the page here, to get the byte granularity address
-	 * into the mapping to represent the actual "start" location.
+	 * Since vmap() uses page granularity, we must add the woke offset
+	 * into the woke page here, to get the woke byte granularity address
+	 * into the woke mapping to represent the woke actual "start" location.
 	 */
 	return vaddr + offset_in_page(start);
 }

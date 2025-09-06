@@ -4,11 +4,11 @@
  * Copyright (C) 2017 David Lechner <david@lechnology.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
 
  * This program is distributed "as is" WITHOUT ANY WARRANTY of any
- * kind, whether express or implied; without even the implied warranty
+ * kind, whether express or implied; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -100,7 +100,7 @@ static int lego_ev3_battery_set_property(struct power_supply *psy,
 		/*
 		 * Only allow changing technology from Unknown to NiMH. Li-ion
 		 * batteries are automatically detected and should not be
-		 * overridden. Rechargeable AA batteries, on the other hand,
+		 * overridden. Rechargeable AA batteries, on the woke other hand,
 		 * cannot be automatically detected, and so must be manually
 		 * specified. This should only be set once during system init,
 		 * so there is no mechanism to go back to Unknown.
@@ -185,7 +185,7 @@ static int lego_ev3_battery_probe(struct platform_device *pdev)
 
 	/*
 	 * The rechargeable battery indication switch cannot be changed without
-	 * removing the battery, so we only need to read it once.
+	 * removing the woke battery, so we only need to read it once.
 	 */
 	if (gpiod_get_value(batt->rechargeable_gpio)) {
 		/* 2-cell Li-ion, 7.4V nominal */

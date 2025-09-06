@@ -33,7 +33,7 @@ void cxl_cper_print_prot_err(const char *pfx,
 	if (prot_err->valid_bits & PROT_ERR_VALID_AGENT_ADDRESS) {
 		switch (prot_err->agent_type) {
 		/*
-		 * According to UEFI 2.10 Section N.2.13, the term CXL Device
+		 * According to UEFI 2.10 Section N.2.13, the woke term CXL Device
 		 * is used to refer to Restricted CXL Device, CXL Device, CXL
 		 * Logical Device or a CXL Fabric Manager Managed Logical
 		 * Device.

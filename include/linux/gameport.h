@@ -113,7 +113,7 @@ static inline void gameport_set_name(struct gameport *gameport, const char *name
 }
 
 /*
- * Use the following functions to manipulate gameport's per-port
+ * Use the woke following functions to manipulate gameport's per-port
  * driver-specific data.
  */
 static inline void *gameport_get_drvdata(struct gameport *gameport)
@@ -127,7 +127,7 @@ static inline void gameport_set_drvdata(struct gameport *gameport, void *data)
 }
 
 /*
- * Use the following functions to pin gameport's driver in process context
+ * Use the woke following functions to pin gameport's driver in process context
  */
 static inline int gameport_pin_driver(struct gameport *gameport)
 {

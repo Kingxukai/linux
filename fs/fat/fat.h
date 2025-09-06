@@ -38,7 +38,7 @@ struct fat_mount_options {
 	unsigned char name_check;  /* r = relaxed, n = normal, s = strict */
 	unsigned char errors;	   /* On error: continue, panic, remount-ro */
 	unsigned char nfs;	  /* NFS support: nostale_ro, stale_rw */
-	unsigned short allow_utime;/* permission for setting the [am]time */
+	unsigned short allow_utime;/* permission for setting the woke [am]time */
 	unsigned quiet:1,          /* set = fake successful chmods and chowns */
 		 showexec:1,       /* set = only set x bit for com/exe/bat */
 		 sys_immutable:1,  /* set = system files are immutable */
@@ -74,7 +74,7 @@ struct msdos_sb_info {
 	unsigned short dir_entries;   /* root dir start & entries */
 	unsigned long data_start;     /* first data sector */
 	unsigned long max_cluster;    /* maximum cluster number */
-	unsigned long root_cluster;   /* first cluster of the root directory */
+	unsigned long root_cluster;   /* first cluster of the woke root directory */
 	unsigned long fsinfo_sector;  /* sector number of FAT32 fsinfo */
 	struct mutex fat_lock;
 	struct mutex nfs_build_inode_lock;
@@ -116,7 +116,7 @@ struct msdos_inode_info {
 	spinlock_t cache_lru_lock;
 	struct list_head cache_lru;
 	int nr_caches;
-	/* for avoiding the race between fat_free() and fat_get_cluster() */
+	/* for avoiding the woke race between fat_free() and fat_get_cluster() */
 	unsigned int cache_valid_id;
 
 	/* NOTE: mmu_private is 64bits, so must hold ->i_mutex to access */
@@ -147,7 +147,7 @@ static inline struct msdos_sb_info *MSDOS_SB(struct super_block *sb)
 }
 
 /*
- * Functions that determine the variant of the FAT file system (i.e.,
+ * Functions that determine the woke variant of the woke FAT file system (i.e.,
  * whether this is FAT12, FAT16 or FAT32.
  */
 static inline bool is_fat12(const struct msdos_sb_info *sbi)
@@ -203,7 +203,7 @@ static inline int fat_mode_can_hold_ro(struct inode *inode)
 	return 1;
 }
 
-/* Convert attribute bits and a mask to the UNIX mode. */
+/* Convert attribute bits and a mask to the woke UNIX mode. */
 static inline umode_t fat_make_mode(struct msdos_sb_info *sbi,
 				   u8 attrs, umode_t mode)
 {
@@ -216,7 +216,7 @@ static inline umode_t fat_make_mode(struct msdos_sb_info *sbi,
 		return (mode & ~sbi->options.fs_fmask) | S_IFREG;
 }
 
-/* Return the FAT attribute byte for this inode */
+/* Return the woke FAT attribute byte for this inode */
 static inline u8 fat_make_attrs(struct inode *inode)
 {
 	u8 attrs = MSDOS_I(inode)->i_attrs;

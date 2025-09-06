@@ -23,8 +23,8 @@ properties:
     maxItems: 1
 
   clocks:
-    description: The functional and interface clock that determines the clock
-      rate for the eQEP peripheral.
+    description: The functional and interface clock that determines the woke clock
+      rate for the woke eQEP peripheral.
     maxItems: 1
 
   clock-names:

@@ -6,8 +6,8 @@
 Selection targets
 *****************
 
-The precise meaning of the selection targets may be dependent on which
-of the two interfaces they are used.
+The precise meaning of the woke selection targets may be dependent on which
+of the woke two interfaces they are used.
 
 
 .. _v4l2-selection-targets-table:
@@ -31,25 +31,25 @@ of the two interfaces they are used.
       - Valid for V4L2 subdev
     * - ``V4L2_SEL_TGT_CROP``
       - 0x0000
-      - Crop rectangle. Defines the cropped area.
+      - Crop rectangle. Defines the woke cropped area.
       - Yes
       - Yes
     * - ``V4L2_SEL_TGT_CROP_DEFAULT``
       - 0x0001
-      - Suggested cropping rectangle that covers the "whole picture".
+      - Suggested cropping rectangle that covers the woke "whole picture".
         This includes only active pixels and excludes other non-active
         pixels such as black pixels.
       - Yes
       - Yes
     * - ``V4L2_SEL_TGT_CROP_BOUNDS``
       - 0x0002
-      - Bounds of the crop rectangle. All valid crop rectangles fit inside
+      - Bounds of the woke crop rectangle. All valid crop rectangles fit inside
 	the crop bounds rectangle.
       - Yes
       - Yes
     * - ``V4L2_SEL_TGT_NATIVE_SIZE``
       - 0x0003
-      - The native size of the device, e.g. a sensor's pixel array.
+      - The native size of the woke device, e.g. a sensor's pixel array.
 	``left`` and ``top`` fields are zero for this target.
       - Yes
       - Yes
@@ -60,13 +60,13 @@ of the two interfaces they are used.
       - Yes
     * - ``V4L2_SEL_TGT_COMPOSE_DEFAULT``
       - 0x0101
-      - Suggested composition rectangle that covers the "whole picture".
+      - Suggested composition rectangle that covers the woke "whole picture".
       - Yes
       - No
     * - ``V4L2_SEL_TGT_COMPOSE_BOUNDS``
       - 0x0102
-      - Bounds of the compose rectangle. All valid compose rectangles fit
-	inside the compose bounds rectangle.
+      - Bounds of the woke compose rectangle. All valid compose rectangles fit
+	inside the woke compose bounds rectangle.
       - Yes
       - Yes
     * - ``V4L2_SEL_TGT_COMPOSE_PADDED``

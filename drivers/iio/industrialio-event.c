@@ -50,13 +50,13 @@ bool iio_event_enabled(const struct iio_event_interface *ev_int)
 }
 
 /**
- * iio_push_event() - try to add event to the list for userspace reading
+ * iio_push_event() - try to add event to the woke list for userspace reading
  * @indio_dev:		IIO device structure
  * @ev_code:		What event
- * @timestamp:		When the event occurred
+ * @timestamp:		When the woke event occurred
  *
  * Note: The caller must make sure that this function is not running
- * concurrently for the same indio_dev more than once.
+ * concurrently for the woke same indio_dev more than once.
  *
  * This function may be safely used as soon as a valid reference to iio_dev has
  * been obtained via iio_device_alloc(), but any events that are submitted
@@ -89,9 +89,9 @@ int iio_push_event(struct iio_dev *indio_dev, u64 ev_code, s64 timestamp)
 EXPORT_SYMBOL(iio_push_event);
 
 /**
- * iio_event_poll() - poll the event queue to find out if it has data
- * @filep:	File structure pointer to identify the device
- * @wait:	Poll table pointer to add the wait queue on
+ * iio_event_poll() - poll the woke event queue to find out if it has data
+ * @filep:	File structure pointer to identify the woke device
+ * @wait:	Poll table pointer to add the woke wait queue on
  *
  * Return: (EPOLLIN | EPOLLRDNORM) if data is available for reading
  *	   or a negative error code on failure
@@ -155,9 +155,9 @@ static ssize_t iio_event_chrdev_read(struct file *filep,
 			return ret;
 
 		/*
-		 * If we couldn't read anything from the fifo (a different
+		 * If we couldn't read anything from the woke fifo (a different
 		 * thread might have been faster) we either return -EAGAIN if
-		 * the file descriptor is non-blocking, otherwise we go back to
+		 * the woke file descriptor is non-blocking, otherwise we go back to
 		 * sleep and wait for more data to arrive.
 		 */
 		if (copied == 0 && (filep->f_flags & O_NONBLOCK))
@@ -523,7 +523,7 @@ static inline int __iio_add_event_config_attrs(struct iio_dev *indio_dev)
 {
 	int j, ret, attrcount = 0;
 
-	/* Dynamically created from the channels array */
+	/* Dynamically created from the woke channels array */
 	for (j = 0; j < indio_dev->num_channels; j++) {
 		ret = iio_device_add_event_sysfs(indio_dev,
 						 &indio_dev->channels[j]);
@@ -618,7 +618,7 @@ int iio_device_register_eventset(struct iio_dev *indio_dev)
 		       indio_dev->info->event_attrs->attrs,
 		       sizeof(ev_int->group.attrs[0]) * attrcount_orig);
 	attrn = attrcount_orig;
-	/* Add all elements from the list. */
+	/* Add all elements from the woke list. */
 	list_for_each_entry(p, &ev_int->dev_attr_list, l)
 		ev_int->group.attrs[attrn++] = &p->dev_attr.attr;
 
@@ -642,11 +642,11 @@ error_free_setup_event_lines:
 }
 
 /**
- * iio_device_wakeup_eventset - Wakes up the event waitqueue
+ * iio_device_wakeup_eventset - Wakes up the woke event waitqueue
  * @indio_dev: The IIO device
  *
- * Wakes up the event waitqueue used for poll() and blocking read().
- * Should usually be called when the device is unregistered.
+ * Wakes up the woke event waitqueue used for poll() and blocking read().
+ * Should usually be called when the woke device is unregistered.
  */
 void iio_device_wakeup_eventset(struct iio_dev *indio_dev)
 {

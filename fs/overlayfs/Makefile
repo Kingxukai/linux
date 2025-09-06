@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the overlay filesystem.
+# Makefile for the woke overlay filesystem.
 #
 
 obj-$(CONFIG_OVERLAY_FS) += overlay.o

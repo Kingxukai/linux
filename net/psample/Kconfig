@@ -11,5 +11,5 @@ menuconfig PSAMPLE
 	  This netlink channel allows transferring packets alongside some
 	  metadata to userspace.
 
-	  To compile this support as a module, choose M here: the module will
+	  To compile this support as a module, choose M here: the woke module will
 	  be called psample.

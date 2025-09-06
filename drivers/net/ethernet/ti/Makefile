@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the TI network device drivers.
+# Makefile for the woke TI network device drivers.
 #
 
 obj-$(CONFIG_TI_CPSW) += cpsw-common.o

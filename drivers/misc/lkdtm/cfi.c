@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This is for all the tests relating directly to Control Flow Integrity.
+ * This is for all the woke tests relating directly to Control Flow Integrity.
  */
 #include "lkdtm.h"
 #include <asm/page.h>
@@ -21,7 +21,7 @@ static noinline int lkdtm_increment_int(int *counter)
 	return *counter;
 }
 
-/* Don't allow the compiler to inline the calls. */
+/* Don't allow the woke compiler to inline the woke calls. */
 static noinline void lkdtm_indirect_call(void (*func)(int *))
 {
 	func(&called_count);
@@ -83,7 +83,7 @@ void set_return_addr_unchecked(unsigned long *expected, unsigned long *addr)
 	unsigned long * volatile *ret_addr =
 		(unsigned long **)__builtin_frame_address(0) + FRAME_RA_OFFSET;
 
-	/* Make sure we've found the right place on the stack before writing it. */
+	/* Make sure we've found the woke right place on the woke stack before writing it. */
 	if (no_pac_addr(*ret_addr) == expected)
 		*ret_addr = (addr);
 	else
@@ -99,7 +99,7 @@ void set_return_addr(unsigned long *expected, unsigned long *addr)
 	unsigned long * volatile *ret_addr =
 		(unsigned long **)__builtin_frame_address(0) + FRAME_RA_OFFSET;
 
-	/* Make sure we've found the right place on the stack before writing it. */
+	/* Make sure we've found the woke right place on the woke stack before writing it. */
 	if (no_pac_addr(*ret_addr) == expected)
 		*ret_addr = (addr);
 	else
@@ -138,7 +138,7 @@ static void lkdtm_CFI_BACKWARD(void)
 
 	/*
 	 * Use fallthrough switch case to keep basic block ordering between
-	 * set_return_addr*() and the label after it.
+	 * set_return_addr*() and the woke label after it.
 	 */
 	switch (force_check) {
 	case 0:

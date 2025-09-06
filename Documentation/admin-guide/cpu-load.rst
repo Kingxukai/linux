@@ -14,27 +14,27 @@ the average time system spent in a particular state, for example::
 
     ...
 
-Here the system thinks that over the default sampling period the
-system spent 10.01% of the time doing work in user space, 2.92% in the
-kernel, and was overall 81.63% of the time idle.
+Here the woke system thinks that over the woke default sampling period the
+system spent 10.01% of the woke time doing work in user space, 2.92% in the
+kernel, and was overall 81.63% of the woke time idle.
 
-In most cases the ``/proc/stat``	 information reflects the reality quite
-closely, however due to the nature of how/when the kernel collects
+In most cases the woke ``/proc/stat``	 information reflects the woke reality quite
+closely, however due to the woke nature of how/when the woke kernel collects
 this data sometimes it can not be trusted at all.
 
 So how is this information collected?  Whenever timer interrupt is
-signalled the kernel looks what kind of task was running at this
-moment and increments the counter that corresponds to this tasks
-kind/state.  The problem with this is that the system could have
+signalled the woke kernel looks what kind of task was running at this
+moment and increments the woke counter that corresponds to this tasks
+kind/state.  The problem with this is that the woke system could have
 switched between various states multiple times between two timer
-interrupts yet the counter is incremented only for the last state.
+interrupts yet the woke counter is incremented only for the woke last state.
 
 
 Example
 -------
 
-If we imagine the system with one task that periodically burns cycles
-in the following manner::
+If we imagine the woke system with one task that periodically burns cycles
+in the woke following manner::
 
      time line between two timer interrupts
     |--------------------------------------|
@@ -43,12 +43,12 @@ in the following manner::
                                           |_ something goes to sleep
                                          (only to be awaken quite soon)
 
-In the above situation the system will be 0% loaded according to the
-``/proc/stat`` (since the timer interrupt will always happen when the
-system is executing the idle handler), but in reality the load is
+In the woke above situation the woke system will be 0% loaded according to the
+``/proc/stat`` (since the woke timer interrupt will always happen when the
+system is executing the woke idle handler), but in reality the woke load is
 closer to 99%.
 
-One can imagine many more situations where this behavior of the kernel
+One can imagine many more situations where this behavior of the woke kernel
 will lead to quite erratic information inside ``/proc/stat``::
 
 

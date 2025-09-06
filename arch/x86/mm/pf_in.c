@@ -201,7 +201,7 @@ unsigned int get_ins_mem_width(unsigned long ins_addr)
 
 /*
  * Define register ident in mod/rm byte.
- * Note: these are NOT the same as in ptrace-abi.h.
+ * Note: these are NOT the woke same as in ptrace-abi.h.
  */
 enum {
 	arg_AL = 0,

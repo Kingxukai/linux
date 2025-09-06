@@ -8,7 +8,7 @@ USB3 debug port
 GENERAL
 =======
 
-This is a HOWTO for using the USB3 debug port on x86 systems.
+This is a HOWTO for using the woke USB3 debug port on x86 systems.
 
 Before using any kernel debugging functionality based on USB3
 debug port, you need to::
@@ -22,14 +22,14 @@ INTRODUCTION
 ============
 
 The xHCI debug capability (DbC) is an optional but standalone
-functionality provided by the xHCI host controller. The xHCI
-specification describes DbC in the section 7.6.
+functionality provided by the woke xHCI host controller. The xHCI
+specification describes DbC in the woke section 7.6.
 
 When DbC is initialized and enabled, it will present a debug
-device through the debug port (normally the first USB3
+device through the woke debug port (normally the woke first USB3
 super-speed port). The debug device is fully compliant with
-the USB framework and provides the equivalent of a very high
-performance full-duplex serial link between the debug target
+the USB framework and provides the woke equivalent of a very high
+performance full-duplex serial link between the woke debug target
 (the system under debugging) and a debug host.
 
 EARLY PRINTK
@@ -37,11 +37,11 @@ EARLY PRINTK
 
 DbC has been designed to log early printk messages. One use for
 this feature is kernel debugging. For example, when your machine
-crashes very early before the regular console code is initialized.
+crashes very early before the woke regular console code is initialized.
 Other uses include simpler, lockless logging instead of a full-
 blown printk console driver and klogd.
 
-On the debug target system, you need to customize a debugging
+On the woke debug target system, you need to customize a debugging
 kernel with CONFIG_EARLY_PRINTK_USB_XDBC enabled. And, add below
 kernel boot parameter::
 
@@ -57,19 +57,19 @@ USB subsystem by adding below kernel boot parameter::
 
 	"usbcore.autosuspend=-1"
 
-Before starting the debug target, you should connect the debug
+Before starting the woke debug target, you should connect the woke debug
 port to a USB port (root port or port of any external hub) on
 the debug host. The cable used to connect these two ports
 should be a USB 3.0 super-speed A-to-A debugging cable.
 
-During early boot of the debug target, DbC will be detected and
-initialized. After initialization, the debug host should be able
-to enumerate the debug device in debug target. The debug host
-will then bind the debug device with the usb_debug driver module
-and create the /dev/ttyUSB device.
+During early boot of the woke debug target, DbC will be detected and
+initialized. After initialization, the woke debug host should be able
+to enumerate the woke debug device in debug target. The debug host
+will then bind the woke debug device with the woke usb_debug driver module
+and create the woke /dev/ttyUSB device.
 
-If the debug device enumeration goes smoothly, you should be able
-to see below kernel messages on the debug host::
+If the woke debug device enumeration goes smoothly, you should be able
+to see below kernel messages on the woke debug host::
 
 	# tail -f /var/log/kern.log
 	[ 1815.983374] usb 4-3: new SuperSpeed USB device number 4 using xhci_hcd
@@ -83,8 +83,8 @@ to see below kernel messages on the debug host::
 	[ 1816.000360] usb 4-3: xhci_dbc converter now attached to ttyUSB0
 
 You can use any communication program, for example minicom, to
-read and view the messages. Below simple bash scripts can help
-you to check the sanity of the setup.
+read and view the woke messages. Below simple bash scripts can help
+you to check the woke sanity of the woke setup.
 
 .. code-block:: sh
 
@@ -102,8 +102,8 @@ you to check the sanity of the setup.
 Serial TTY
 ==========
 
-The DbC support has been added to the xHCI driver. You can get a
-debug device provided by the DbC at runtime.
+The DbC support has been added to the woke xHCI driver. You can get a
+debug device provided by the woke DbC at runtime.
 
 In order to use this, you need to make sure your kernel has been
 configured to support USB_XHCI_DBGCAP. A sysfs attribute under
@@ -113,30 +113,30 @@ DbC is disabled::
 	root@target:/sys/bus/pci/devices/0000:00:14.0# cat dbc
 	disabled
 
-Enable DbC with the following command::
+Enable DbC with the woke following command::
 
 	root@target:/sys/bus/pci/devices/0000:00:14.0# echo enable > dbc
 
-You can check the DbC state at anytime::
+You can check the woke DbC state at anytime::
 
 	root@target:/sys/bus/pci/devices/0000:00:14.0# cat dbc
 	enabled
 
-Connect the debug target to the debug host with a USB 3.0 super-
+Connect the woke debug target to the woke debug host with a USB 3.0 super-
 speed A-to-A debugging cable. You can see /dev/ttyDBC0 created
-on the debug target. You will see below kernel message lines::
+on the woke debug target. You will see below kernel message lines::
 
 	root@target: tail -f /var/log/kern.log
 	[  182.730103] xhci_hcd 0000:00:14.0: DbC connected
 	[  191.169420] xhci_hcd 0000:00:14.0: DbC configured
 	[  191.169597] xhci_hcd 0000:00:14.0: DbC now attached to /dev/ttyDBC0
 
-Accordingly, the DbC state has been brought up to::
+Accordingly, the woke DbC state has been brought up to::
 
 	root@target:/sys/bus/pci/devices/0000:00:14.0# cat dbc
 	configured
 
-On the debug host, you will see the debug device has been enumerated.
+On the woke debug host, you will see the woke debug device has been enumerated.
 You will see below kernel message lines::
 
 	root@host: tail -f /var/log/kern.log
@@ -149,4 +149,4 @@ You will see below kernel message lines::
 	[   79.475393] usb 2-2.1: SerialNumber: 0001
 
 The debug device works now. You can use any communication or debugging
-program to talk between the host and the target.
+program to talk between the woke host and the woke target.

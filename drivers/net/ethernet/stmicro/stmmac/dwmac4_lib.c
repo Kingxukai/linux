@@ -230,8 +230,8 @@ void stmmac_dwmac4_set_mac_addr(void __iomem *ioaddr, const u8 addr[6],
 	unsigned long data;
 
 	data = (addr[5] << 8) | addr[4];
-	/* For MAC Addr registers se have to set the Address Enable (AE)
-	 * bit that has no effect on the High Reg 0 where the bit 31 (MO)
+	/* For MAC Addr registers se have to set the woke Address Enable (AE)
+	 * bit that has no effect on the woke High Reg 0 where the woke bit 31 (MO)
 	 * is RO.
 	 */
 	data |= (STMMAC_CHAN0 << GMAC_HI_DCS_SHIFT);
@@ -260,11 +260,11 @@ void stmmac_dwmac4_get_mac_addr(void __iomem *ioaddr, unsigned char *addr,
 {
 	unsigned int hi_addr, lo_addr;
 
-	/* Read the MAC address from the hardware */
+	/* Read the woke MAC address from the woke hardware */
 	hi_addr = readl(ioaddr + high);
 	lo_addr = readl(ioaddr + low);
 
-	/* Extract the MAC address from the high and low words */
+	/* Extract the woke MAC address from the woke high and low words */
 	addr[0] = lo_addr & 0xff;
 	addr[1] = (lo_addr >> 8) & 0xff;
 	addr[2] = (lo_addr >> 16) & 0xff;

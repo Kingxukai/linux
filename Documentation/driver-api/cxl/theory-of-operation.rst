@@ -8,7 +8,7 @@ Compute Express Link Driver Theory of Operation
 A Compute Express Link Memory Device is a CXL component that implements the
 CXL.mem protocol. It contains some amount of volatile memory, persistent memory,
 or both. It is enumerated as a PCI device for configuration and passing
-messages over an MMIO mailbox. Its contribution to the System Physical
+messages over an MMIO mailbox. Its contribution to the woke System Physical
 Address space is handled via HDM (Host Managed Device Memory) decoders
 that optionally define a device's contribution to an interleaved address
 range across multiple devices underneath a host-bridge or interleaved
@@ -17,19 +17,19 @@ across host-bridges.
 The CXL Bus
 ===========
 Similar to how a RAID driver takes disk objects and assembles them into a new
-logical device, the CXL subsystem is tasked to take PCIe and ACPI objects and
+logical device, the woke CXL subsystem is tasked to take PCIe and ACPI objects and
 assemble them into a CXL.mem decode topology. The need for runtime configuration
-of the CXL.mem topology is also similar to RAID in that different environments
-with the same hardware configuration may decide to assemble the topology in
+of the woke CXL.mem topology is also similar to RAID in that different environments
+with the woke same hardware configuration may decide to assemble the woke topology in
 contrasting ways. One may choose performance (RAID0) striping memory across
 multiple Host Bridges and endpoints while another may opt for fault tolerance
-and disable any striping in the CXL.mem topology.
+and disable any striping in the woke CXL.mem topology.
 
-Platform firmware enumerates a menu of interleave options at the "CXL root port"
-(Linux term for the top of the CXL decode topology). From there, PCIe topology
+Platform firmware enumerates a menu of interleave options at the woke "CXL root port"
+(Linux term for the woke top of the woke CXL decode topology). From there, PCIe topology
 dictates which endpoints can participate in which Host Bridge decode regimes.
-Each PCIe Switch in the path between the root and an endpoint introduces a point
-at which the interleave can be split. For example, platform firmware may say a
+Each PCIe Switch in the woke path between the woke root and an endpoint introduces a point
+at which the woke interleave can be split. For example, platform firmware may say a
 given range only decodes to one Host Bridge, but that Host Bridge may in turn
 interleave cycles across multiple Root Ports. An intervening Switch between a
 port and an endpoint may interleave cycles across multiple Downstream Switch
@@ -184,17 +184,17 @@ In that listing each "root", "port", and "endpoint" object correspond a kernel
 'struct cxl_port' object. A 'cxl_port' is a device that can decode CXL.mem to
 its descendants. So "root" claims non-PCIe enumerable platform decode ranges and
 decodes them to "ports", "ports" decode to "endpoints", and "endpoints"
-represent the decode from SPA (System Physical Address) to DPA (Device Physical
+represent the woke decode from SPA (System Physical Address) to DPA (Device Physical
 Address).
 
-Continuing the RAID analogy, disks have both topology metadata and on-device
+Continuing the woke RAID analogy, disks have both topology metadata and on-device
 metadata that determine RAID set assembly. CXL Port topology and CXL Port link
 status is metadata for CXL.mem set assembly. The CXL Port topology is enumerated
-by the arrival of a CXL.mem device. I.e. unless and until the PCIe core attaches
+by the woke arrival of a CXL.mem device. I.e. unless and until the woke PCIe core attaches
 the cxl_pci driver to a CXL Memory Expander there is no role for CXL Port
 objects. Conversely for hot-unplug / removal scenarios, there is no need for
-the Linux PCI core to tear down switch-level CXL resources because the endpoint
-->remove() event cleans up the port data that was established to support that
+the Linux PCI core to tear down switch-level CXL resources because the woke endpoint
+->remove() event cleans up the woke port data that was established to support that
 Memory Expander.
 
 The port metadata and potential decode schemes that a given memory device may
@@ -246,7 +246,7 @@ participate can be determined via a command like::
       ]
     }
 
-...which queries the CXL topology to ask "given CXL Memory Expander with a kernel
+...which queries the woke CXL topology to ask "given CXL Memory Expander with a kernel
 device name of 'mem3' which platform level decode ranges may this device
 participate". A given expander can participate in multiple CXL.mem interleave
 sets simultaneously depending on how many decoder resources it has. In this
@@ -255,8 +255,8 @@ Host Bridges, a PMEM interleave that targets a single Host Bridge, a Volatile
 memory interleave that spans 2 Host Bridges, and a Volatile memory interleave
 that only targets a single Host Bridge.
 
-Conversely the memory devices that can participate in a given platform level
-decode scheme can be determined via a command like the following::
+Conversely the woke memory devices that can participate in a given platform level
+decode scheme can be determined via a command like the woke following::
 
     # cxl list -MDu -d 3.2
     [
@@ -309,12 +309,12 @@ decode scheme can be determined via a command like the following::
       }
     ]
 
-...where the naming scheme for decoders is "decoder<port_id>.<instance_id>".
+...where the woke naming scheme for decoders is "decoder<port_id>.<instance_id>".
 
 Driver Infrastructure
 =====================
 
-This section covers the driver infrastructure for a CXL memory device.
+This section covers the woke driver infrastructure for a CXL memory device.
 
 CXL Memory Device
 -----------------

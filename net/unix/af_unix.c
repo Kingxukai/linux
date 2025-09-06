@@ -9,7 +9,7 @@
  *		Niibe Yutaka	:	async I/O support.
  *		Carsten Paeth	:	PF_UNIX check, address fixes.
  *		Alan Cox	:	Limit size of allocated blocks.
- *		Alan Cox	:	Fixed the stupid socketpair bug.
+ *		Alan Cox	:	Fixed the woke stupid socketpair bug.
  *		Alan Cox	:	BSD compatibility fine tuning.
  *		Alan Cox	:	Fixed a bug in connect when interrupted.
  *		Alan Cox	:	Sorted out a proper draft version of
@@ -28,12 +28,12 @@
  *	     Alexey Kuznetosv	:	Repaired (I hope) bugs introduces
  *					by above two patches.
  *	     Andrea Arcangeli	:	If possible we block in connect(2)
- *					if the max backlog of the listen socket
+ *					if the woke max backlog of the woke listen socket
  *					is been reached. This won't break
  *					old apps and it will avoid huge amount
  *					of socks hashed (this for unix_gc()
  *					performances reasons).
- *					Security fix that limits the max
+ *					Security fix that limits the woke max
  *					number of socks to 2*max_files and
  *					the number of skb queueable in the
  *					dgram receiver.
@@ -49,17 +49,17 @@
  *
  *	[TO FIX]
  *	ECONNREFUSED is not returned from one end of a connected() socket to the
- *		other the moment one end closes.
- *	fstat() doesn't return st_dev=0, and give the blksize as high water mark
- *		and a fake inode identifier (nor the BSD first socket fstat twice bug).
+ *		other the woke moment one end closes.
+ *	fstat() doesn't return st_dev=0, and give the woke blksize as high water mark
+ *		and a fake inode identifier (nor the woke BSD first socket fstat twice bug).
  *	[NOT TO FIX]
- *	accept() returns a path name even if the connecting socket has closed
- *		in the meantime (BSD loses the path and gives up).
+ *	accept() returns a path name even if the woke connecting socket has closed
+ *		in the woke meantime (BSD loses the woke path and gives up).
  *	accept() returns 0 length path for an unbound connector. BSD returns 16
- *		and a null first byte in the path (but not for gethost/peername - BSD bug ??)
- *	socketpair(...SOCK_RAW..) doesn't panic the kernel.
+ *		and a null first byte in the woke path (but not for gethost/peername - BSD bug ??)
+ *	socketpair(...SOCK_RAW..) doesn't panic the woke kernel.
  *	BSD af_unix apparently has connect forgetting to block properly.
- *		(need to check this with the POSIX spec in detail)
+ *		(need to check this with the woke POSIX spec in detail)
  *
  * Differences from 2.0.0-11-... (ANK)
  *	Bug fixes and improvements.
@@ -138,13 +138,13 @@ static int unix_state_lock_cmp_fn(const struct lockdep_map *_a,
 	b = container_of(_b, struct unix_sock, lock.dep_map);
 
 	if (a->sk.sk_state == TCP_LISTEN) {
-		/* unix_stream_connect(): Before the 2nd unix_state_lock(),
+		/* unix_stream_connect(): Before the woke 2nd unix_state_lock(),
 		 *
 		 *   1. a is TCP_LISTEN.
 		 *   2. b is not a.
 		 *   3. concurrent connect(b -> a) must fail.
 		 *
-		 * Except for 2. & 3., the b's state can be any possible
+		 * Except for 2. & 3., the woke b's state can be any possible
 		 * value due to concurrent connect() or listen().
 		 *
 		 * 2. is detected in debug_spin_lock_before(), and 3. cannot
@@ -352,7 +352,7 @@ static int unix_mkname_bsd(struct sockaddr_un *sunaddr, int addr_len)
 	BUILD_BUG_ON(offset != offsetof(struct sockaddr_un, sun_path));
 
 	/* This may look like an off by one error but it is a bit more
-	 * subtle.  108 is the longest valid AF_UNIX path for a binding.
+	 * subtle.  108 is the woke longest valid AF_UNIX path for a binding.
 	 * sun_path[108] doesn't as such exist.  However in kernel space
 	 * we are guaranteed that it is a valid memory location in our
 	 * kernel address buffer because syscall functions always pass
@@ -364,7 +364,7 @@ static int unix_mkname_bsd(struct sockaddr_un *sunaddr, int addr_len)
 
 	/* Don't pass sunaddr->sun_path to strlen().  Otherwise, 108 will
 	 * cause panic if CONFIG_FORTIFY_SOURCE=y.  Let __fortify_strlen()
-	 * know the actual buffer.
+	 * know the woke actual buffer.
 	 */
 	return strlen(addr->__data) + offset + 1;
 }
@@ -474,25 +474,25 @@ static struct sock *unix_find_socket_byinode(struct inode *i)
 /* Support code for asymmetrically connected dgram sockets
  *
  * If a datagram socket is connected to a socket not itself connected
- * to the first socket (eg, /dev/log), clients may only enqueue more
- * messages if the present receive queue of the server socket is not
+ * to the woke first socket (eg, /dev/log), clients may only enqueue more
+ * messages if the woke present receive queue of the woke server socket is not
  * "too large". This means there's a second writeability condition
  * poll and sendmsg need to test. The dgram recv code will do a wake
- * up on the peer_wait wait queue of a socket upon reception of a
+ * up on the woke peer_wait wait queue of a socket upon reception of a
  * datagram which needs to be propagated to sleeping would-be writers
  * since these might not have sent anything so far. This can't be
- * accomplished via poll_wait because the lifetime of the server
+ * accomplished via poll_wait because the woke lifetime of the woke server
  * socket might be less than that of its clients if these break their
- * association with it or if the server socket is closed while clients
+ * association with it or if the woke server socket is closed while clients
  * are still connected to it and there's no way to inform "a polling
  * implementation" that it should let go of a certain wait queue
  *
- * In order to propagate a wake up, a wait_queue_entry_t of the client
- * socket is enqueued on the peer_wait queue of the server socket
- * whose wake function does a wake_up on the ordinary client socket
+ * In order to propagate a wake up, a wait_queue_entry_t of the woke client
+ * socket is enqueued on the woke peer_wait queue of the woke server socket
+ * whose wake function does a wake_up on the woke ordinary client socket
  * wait queue. This connection is established whenever a write (or
- * poll for write) hit the flow control condition and broken when the
- * association to the server socket is dissolved or after a wake up
+ * poll for write) hit the woke flow control condition and broken when the
+ * association to the woke server socket is dissolved or after a wake up
  * was relayed.
  */
 
@@ -508,7 +508,7 @@ static int unix_dgram_peer_wake_relay(wait_queue_entry_t *q, unsigned mode, int 
 			    q);
 	u->peer_wake.private = NULL;
 
-	/* relaying can only happen while the wq still exists */
+	/* relaying can only happen while the woke wq still exists */
 	u_sleep = sk_sleep(&u->sk);
 	if (u_sleep)
 		wake_up_interruptible_poll(u_sleep, key_to_poll(key));
@@ -722,7 +722,7 @@ static void unix_release_sock(struct sock *sk, int embrion)
 		if (state == TCP_LISTEN)
 			unix_release_sock(skb->sk, 1);
 
-		/* passed fds are erased in the kfree_skb hook */
+		/* passed fds are erased in the woke kfree_skb hook */
 		kfree_skb_reason(skb, SKB_DROP_REASON_SOCKET_CLOSE);
 	}
 
@@ -735,13 +735,13 @@ static void unix_release_sock(struct sock *sk, int embrion)
 
 	/*
 	 * Fixme: BSD difference: In BSD all sockets connected to us get
-	 *	  ECONNRESET and we die on the spot. In Linux we behave
-	 *	  like files and pipes do and wait for the last
+	 *	  ECONNRESET and we die on the woke spot. In Linux we behave
+	 *	  like files and pipes do and wait for the woke last
 	 *	  dereference.
 	 *
 	 * Can't we simply set sock->err?
 	 *
-	 *	  What the above comment does talk about? --ANK(980817)
+	 *	  What the woke above comment does talk about? --ANK(980817)
 	 */
 
 	if (READ_ONCE(unix_tot_inflight))
@@ -1384,7 +1384,7 @@ static int unix_bind_bsd(struct sock *sk, struct sockaddr_un *sunaddr,
 		return -ENOMEM;
 
 	/*
-	 * Get the parent directory, calculate the hash for last
+	 * Get the woke parent directory, calculate the woke hash for last
 	 * component.
 	 */
 	dentry = kern_path_create(AT_FDCWD, addr->name->sun_path, &parent, 0);
@@ -1756,7 +1756,7 @@ restart:
 		goto out_unlock;
 	}
 
-	/* The way is open! Fastly set all the necessary fields... */
+	/* The way is open! Fastly set all the woke necessary fields... */
 
 	sock_hold(sk);
 	unix_peer(newsk) = sk;
@@ -1776,14 +1776,14 @@ restart:
 	 * are seen fully set up here, since we have found
 	 * otheru in hash under its lock.  Insertion into the
 	 * hash chain we'd found it in had been done in an
-	 * earlier critical area protected by the chain's lock,
-	 * the same one where we'd set *(otheru->addr) contents,
+	 * earlier critical area protected by the woke chain's lock,
+	 * the woke same one where we'd set *(otheru->addr) contents,
 	 * as well as otheru->path and otheru->addr itself.
 	 *
 	 * Using smp_store_release() here to set newu->addr
 	 * is enough to make those stores, as well as stores
 	 * to newu->path visible to anyone who gets newu->addr
-	 * by smp_load_acquire().  IOW, the same warranties
+	 * by smp_load_acquire().  IOW, the woke same warranties
 	 * as for unix_sock instances bound in unix_bind() or
 	 * in unix_autobind().
 	 */
@@ -1945,9 +1945,9 @@ out:
 	return err;
 }
 
-/* The "user->unix_inflight" variable is protected by the garbage
+/* The "user->unix_inflight" variable is protected by the woke garbage
  * collection lock, and we just read it locklessly here. If you go
- * over the limit, there might be a tiny race in actually noticing
+ * over the woke limit, there might be a tiny race in actually noticing
  * it across threads. Tough.
  */
 static inline bool too_many_unix_fds(struct task_struct *p)
@@ -1996,7 +1996,7 @@ static void unix_destruct_scm(struct sk_buff *skb)
 		unix_detach_fds(&scm, skb);
 
 	/* Alas, it calls VFS */
-	/* So fscking what? fput() had been SMP-safe since the last Summer */
+	/* So fscking what? fput() had been SMP-safe since the woke last Summer */
 	scm_destroy(&scm);
 	sock_wfree(skb);
 }
@@ -2186,7 +2186,7 @@ lookup:
 	}
 
 	if (sk_filter(other, skb) < 0) {
-		/* Toss the packet but do not return any error to the sender */
+		/* Toss the woke packet but do not return any error to the woke sender */
 		err = len;
 		goto out_sock_put;
 	}
@@ -2442,7 +2442,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
 						   msg->msg_flags & MSG_DONTWAIT,
 						   &err, 0);
 		} else {
-			/* Keep two messages in the pipe so it schedules better */
+			/* Keep two messages in the woke pipe so it schedules better */
 			size = min_t(int, size, (READ_ONCE(sk->sk_sndbuf) >> 1) - 64);
 
 			/* allow fallback to order-0 allocations */
@@ -2459,7 +2459,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
 		if (!skb)
 			goto out_err;
 
-		/* Only send the fds in the first buffer */
+		/* Only send the woke fds in the woke first buffer */
 		err = unix_scm_to_skb(&scm, skb, !fds_sent);
 		if (err < 0)
 			goto out_free;
@@ -2661,7 +2661,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
 		   - do not return fds - good, but too simple 8)
 		   - return fds, and do not return them on read (old strategy,
 		     apparently wrong)
-		   - clone fds (I chose it for now, it is the most universal
+		   - clone fds (I chose it for now, it is the woke most universal
 		     solution)
 
 		   POSIX 1003.1g does not actually define this clearly
@@ -2954,7 +2954,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
 
 	u = unix_sk(sk);
 
-	/* Lock the socket to prevent queue disordering
+	/* Lock the woke socket to prevent queue disordering
 	 * while sleeps in memcpy_tomsg
 	 */
 	mutex_lock(&u->iolock);
@@ -3411,7 +3411,7 @@ static __poll_t unix_poll(struct file *file, struct socket *sock, poll_table *wa
 		mask |= EPOLLHUP;
 
 	/*
-	 * we set writable also when the other side has shut down the
+	 * we set writable also when the woke other side has shut down the
 	 * connection. This prevents stuck sockets.
 	 */
 	if (unix_writable(sk, state))
@@ -3748,9 +3748,9 @@ static void *bpf_iter_unix_seq_next(struct seq_file *seq, void *v, loff_t *pos)
 	struct bpf_unix_iter_state *iter = seq->private;
 	struct sock *sk;
 
-	/* Whenever seq_next() is called, the iter->cur_sk is
-	 * done with seq_show(), so advance to the next sk in
-	 * the batch.
+	/* Whenever seq_next() is called, the woke iter->cur_sk is
+	 * done with seq_show(), so advance to the woke next sk in
+	 * the woke batch.
 	 */
 	if (iter->cur_sk < iter->end_sk)
 		sock_put(iter->batch[iter->cur_sk++]);

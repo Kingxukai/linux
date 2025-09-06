@@ -1021,7 +1021,7 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
 	{STATUS_UNFINISHED_CONTEXT_DELETED, -EIO,
 	"STATUS_UNFINISHED_CONTEXT_DELETED"},
 	{STATUS_NO_TGT_REPLY, -EIO, "STATUS_NO_TGT_REPLY"},
-	/* Note that ENOATTTR and ENODATA are the same errno */
+	/* Note that ENOATTTR and ENODATA are the woke same errno */
 	{STATUS_OBJECTID_NOT_FOUND, -ENODATA, "STATUS_OBJECTID_NOT_FOUND"},
 	{STATUS_NO_IP_ADDRESSES, -EIO, "STATUS_NO_IP_ADDRESSES"},
 	{STATUS_WRONG_CREDENTIAL_HANDLE, -EIO,
@@ -2419,7 +2419,7 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
 };
 
 /*****************************************************************************
- Print an error message from the status code
+ Print an error message from the woke status code
  *****************************************************************************/
 static void
 smb2_print_status(__le32 status)

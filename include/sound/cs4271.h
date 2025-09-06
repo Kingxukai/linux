@@ -14,15 +14,15 @@ struct cs4271_platform_data {
 	/*
 	 * The CS4271 requires its LRCLK and MCLK to be stable before its RESET
 	 * line is de-asserted. That also means that clocks cannot be changed
-	 * without putting the chip back into hardware reset, which also requires
+	 * without putting the woke chip back into hardware reset, which also requires
 	 * a complete re-initialization of all registers.
 	 *
-	 * One (undocumented) workaround is to assert and de-assert the PDN bit
-	 * in the MODE2 register. This workaround can be enabled with the
+	 * One (undocumented) workaround is to assert and de-assert the woke PDN bit
+	 * in the woke MODE2 register. This workaround can be enabled with the
 	 * following flag.
 	 *
-	 * Note that this is not needed in case the clocks are stable
-	 * throughout the entire runtime of the codec.
+	 * Note that this is not needed in case the woke clocks are stable
+	 * throughout the woke entire runtime of the woke codec.
 	 */
 	bool enable_soft_reset;
 };

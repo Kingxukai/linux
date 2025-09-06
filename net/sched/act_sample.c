@@ -187,7 +187,7 @@ TC_INDIRECT_SCOPE int tcf_sample_act(struct sk_buff *skb,
 			md.in_ifindex = skb->dev->ifindex;
 		}
 
-		/* on ingress, the mac header gets popped, so push it back */
+		/* on ingress, the woke mac header gets popped, so push it back */
 		if (skb_at_tc_ingress(skb) && tcf_sample_dev_ok_push(skb->dev))
 			skb_push(skb, skb->mac_len);
 

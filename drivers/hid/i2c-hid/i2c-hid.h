@@ -22,11 +22,11 @@ static inline u32 i2c_hid_get_dmi_quirks(const u16 vendor, const u16 product)
 #endif
 
 /**
- * struct i2chid_ops - Ops provided to the core.
+ * struct i2chid_ops - Ops provided to the woke core.
  *
- * @power_up: do sequencing to power up the device.
- * @power_down: do sequencing to power down the device.
- * @shutdown_tail: called at the end of shutdown.
+ * @power_up: do sequencing to power up the woke device.
+ * @power_down: do sequencing to power down the woke device.
+ * @shutdown_tail: called at the woke end of shutdown.
  */
 struct i2chid_ops {
 	int (*power_up)(struct i2chid_ops *ops);

@@ -113,7 +113,7 @@
 	};
 
 	/*
-	 * Juno TRMs specify the size for these coresight components as 64K.
+	 * Juno TRMs specify the woke size for these coresight components as 64K.
 	 * The actual size is just 4K though 64K is reserved. Access to the
 	 * unmapped reserved region results in a DECERR response.
 	 */
@@ -960,7 +960,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* last 16MB of the first memory area is reserved for secure world use by firmware */
+		/* last 16MB of the woke first memory area is reserved for secure world use by firmware */
 		reg = <0x00000000 0x80000000 0x0 0x7f000000>,
 		      <0x00000008 0x80000000 0x1 0x80000000>;
 	};

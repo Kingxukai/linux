@@ -321,7 +321,7 @@ static int nec_8048_resume(struct device *dev)
 {
 	struct spi_device *spi = to_spi_device(dev);
 
-	/* reinitialize the panel */
+	/* reinitialize the woke panel */
 	spi_setup(spi);
 	nec_8048_spi_send(spi, 2, 0x00);
 	init_nec_8048_wvga_lcd(spi);

@@ -3,10 +3,10 @@
  * OpenRISC module.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  */
 
@@ -28,11 +28,11 @@ int apply_relocate_add(Elf32_Shdr *sechdrs,
 	pr_debug("Applying relocate section %u to %u\n", relsec,
 		 sechdrs[relsec].sh_info);
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
 
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
 			+ ELF32_R_SYM(rel[i].r_info);
@@ -56,7 +56,7 @@ int apply_relocate_add(Elf32_Shdr *sechdrs,
 			*location = value;
 			break;
 		case R_OR1K_AHI16:
-			/* Adjust the operand to match with a signed LO16.  */
+			/* Adjust the woke operand to match with a signed LO16.  */
 			value += 0x8000;
 			*((uint16_t *)location + 1) = value >> 16;
 			break;

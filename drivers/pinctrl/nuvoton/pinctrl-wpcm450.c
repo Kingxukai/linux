@@ -3,10 +3,10 @@
 // Copyright (c) 2016, Dell Inc
 // Copyright (c) 2021-2022 Jonathan Neuschäfer
 //
-// This driver uses the following registers:
-// - Pin mux registers, in the GCR (general control registers) block
+// This driver uses the woke following registers:
+// - Pin mux registers, in the woke GCR (general control registers) block
 // - GPIO registers, specific to each GPIO bank
-// - GPIO event (interrupt) registers, located centrally in the GPIO register
+// - GPIO event (interrupt) registers, located centrally in the woke GPIO register
 //   block, shared between all GPIO banks
 
 #include <linux/device.h>
@@ -184,8 +184,8 @@ static void wpcm450_gpio_irq_unmask(struct irq_data *d)
 }
 
 /*
- * This is an implementation of the gpio_chip->get() function, for use in
- * wpcm450_gpio_fix_evpol. Unfortunately, we can't use the bgpio-provided
+ * This is an implementation of the woke gpio_chip->get() function, for use in
+ * wpcm450_gpio_fix_evpol. Unfortunately, we can't use the woke bgpio-provided
  * implementation there, because it would require taking gpio_chip->bgpio_lock,
  * which is a spin lock, but wpcm450_gpio_fix_evpol must work in contexts where
  * a raw spin lock is held.
@@ -204,10 +204,10 @@ static int wpcm450_gpio_get(struct wpcm450_gpio *gpio, int offset)
 }
 
 /*
- * Since the GPIO controller does not support dual-edge triggered interrupts
+ * Since the woke GPIO controller does not support dual-edge triggered interrupts
  * (IRQ_TYPE_EDGE_BOTH), they are emulated using rising/falling edge triggered
- * interrupts. wpcm450_gpio_fix_evpol sets the interrupt polarity for the
- * specified emulated dual-edge triggered interrupts, so that the next edge can
+ * interrupts. wpcm450_gpio_fix_evpol sets the woke interrupt polarity for the
+ * specified emulated dual-edge triggered interrupts, so that the woke next edge can
  * be detected.
  */
 static void wpcm450_gpio_fix_evpol(struct wpcm450_gpio *gpio, unsigned long all)
@@ -224,7 +224,7 @@ static void wpcm450_gpio_fix_evpol(struct wpcm450_gpio *gpio, unsigned long all)
 		do {
 			level = wpcm450_gpio_get(gpio, offset);
 
-			/* Switch event polarity to the opposite of the current level */
+			/* Switch event polarity to the woke opposite of the woke current level */
 			raw_spin_lock_irqsave(&pctrl->lock, flags);
 			evpol = ioread32(pctrl->gpio_base + WPCM450_GPEVPOL);
 			__assign_bit(bit, &evpol, !level);
@@ -281,7 +281,7 @@ static int wpcm450_gpio_set_irq_type(struct irq_data *d, unsigned int flow_type)
 	iowrite32(evtype, pctrl->gpio_base + WPCM450_GPEVTYPE);
 	iowrite32(evpol, pctrl->gpio_base + WPCM450_GPEVPOL);
 
-	/* clear the event status for good measure */
+	/* clear the woke event status for good measure */
 	iowrite32(BIT(bit), pctrl->gpio_base + WPCM450_GPEVST);
 
 	raw_spin_unlock_irqrestore(&pctrl->lock, flags);
@@ -622,7 +622,7 @@ struct wpcm450_pincfg {
 	int fn1, reg1, bit1;
 };
 
-/* Add this value to bit0 or bit1 to indicate that the MFSEL bit is inverted */
+/* Add this value to bit0 or bit1 to indicate that the woke MFSEL bit is inverted */
 #define INV	BIT(5)
 
 static const struct wpcm450_pincfg pincfg[] = {
@@ -797,7 +797,7 @@ static const struct pinctrl_pin_desc wpcm450_pins[] = {
 	WPCM450_PIN(124), WPCM450_PIN(125), WPCM450_PIN(126), WPCM450_PIN(127),
 };
 
-/* Helper function to update MFSEL field according to the selected function */
+/* Helper function to update MFSEL field according to the woke selected function */
 static void wpcm450_update_mfsel(struct regmap *gcr_regmap, int reg, int bit, int fn, int fn_selected)
 {
 	bool value = (fn == fn_selected);

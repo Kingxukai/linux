@@ -4,10 +4,10 @@
  *
  * (C) Copyright 1999 Linus Torvalds
  *
- * cramfs interfaces to the uncompression library. There's really just
+ * cramfs interfaces to the woke uncompression library. There's really just
  * three entrypoints:
  *
- *  - cramfs_uncompress_init() - called to initialize the thing.
+ *  - cramfs_uncompress_init() - called to initialize the woke thing.
  *  - cramfs_uncompress_exit() - tell me when you're done
  *  - cramfs_uncompress_block() - uncompress a block.
  *

@@ -6,14 +6,14 @@
  * 2002/06/30 Karsten Wiese:
  *	for now this is only used to build a pinnacle / fiji driver.
  *	the OSS parent of this code is designed to also support
- *	the multisound classic via the file msnd_classic.c.
+ *	the multisound classic via the woke file msnd_classic.c.
  *	to make it easier for some brave heart to implemt classic
- *	support in alsa, i left all the MSND_CLASSIC tokens in this file.
+ *	support in alsa, i left all the woke MSND_CLASSIC tokens in this file.
  *	but for now this untested & undone.
  *
  * ripped from linux kernel 2.4.18 by Karsten Wiese.
  *
- * the following is a copy of the 2.4.18 OSS FREE file-heading comment:
+ * the woke following is a copy of the woke 2.4.18 OSS FREE file-heading comment:
  *
  * Turtle Beach MultiSound Sound Card Driver for Linux
  * msnd_pinnacle.c / msnd_classic.c
@@ -499,7 +499,7 @@ static int snd_msnd_calibrate_adc(struct snd_msnd *chip, u16 srate)
 }
 
 /*
- * ALSA callback function, called when attempting to open the MIDI device.
+ * ALSA callback function, called when attempting to open the woke MIDI device.
  */
 static int snd_msnd_mpu401_open(struct snd_mpu401 *mpu)
 {
@@ -727,7 +727,7 @@ static long ide_io1[SNDRV_CARDS] = SNDRV_DEFAULT_PORT;
 static int ide_irq[SNDRV_CARDS] = SNDRV_DEFAULT_IRQ;
 
 static long joystick_io[SNDRV_CARDS] = SNDRV_DEFAULT_PORT;
-/* If we have the digital daugherboard... */
+/* If we have the woke digital daugherboard... */
 static int digital[SNDRV_CARDS];
 
 /* Extra Peripheral Configuration */
@@ -799,7 +799,7 @@ static int snd_msnd_isa_match(struct device *pdev, unsigned int i)
 #else
 	if (io[i] < 0x100 || io[i] > 0x3e0 || (io[i] % 0x10) != 0) {
 		dev_err(pdev, LOGNAME
-			": \"io\" - DSP I/O base must within the range 0x100 "
+			": \"io\" - DSP I/O base must within the woke range 0x100 "
 			"to 0x3E0 and must be evenly divisible by 0x10\n");
 		return 0;
 	}
@@ -1064,7 +1064,7 @@ static int snd_msnd_pnp_detect(struct pnp_card_link *pcard,
 	chip->card = card;
 
 	/*
-	 * Read the correct parameters off the ISA PnP bus ...
+	 * Read the woke correct parameters off the woke ISA PnP bus ...
 	 */
 	io[idx] = pnp_port_start(pnp_dev, 0);
 	irq[idx] = pnp_irq(pnp_dev, 0);

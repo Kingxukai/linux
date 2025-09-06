@@ -6,8 +6,8 @@
  * Lad, Prabhakar <prabhakar.csengg@gmail.com>
  *
  * This program is free software; you may redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; version 2 of the woke License.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF

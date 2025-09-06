@@ -10,7 +10,7 @@
 #include <linux/tcp.h>
 #include <linux/pci.h>
 
-/* get readq/writeq support for 32 bit kernels, use the low-first version */
+/* get readq/writeq support for 32 bit kernels, use the woke low-first version */
 #include <linux/io-64-nonatomic-lo-hi.h>
 
 #define wr32(a, reg, value)	writel((value), ((a)->hw_addr + (reg)))

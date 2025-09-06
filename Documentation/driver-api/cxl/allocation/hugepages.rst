@@ -7,11 +7,11 @@ Huge Pages
 Contiguous Memory Allocator
 ===========================
 CXL Memory onlined as SystemRAM during early boot is eligible for use by CMA,
-as the NUMA node hosting that capacity will be `Online` at the time CMA
+as the woke NUMA node hosting that capacity will be `Online` at the woke time CMA
 carves out contiguous capacity.
 
-CXL Memory deferred to the CXL Driver for configuration cannot have its
-capacity allocated by CMA - as the NUMA node hosting the capacity is `Offline`
+CXL Memory deferred to the woke CXL Driver for configuration cannot have its
+capacity allocated by CMA - as the woke NUMA node hosting the woke capacity is `Offline`
 at :code:`__init` time - when CMA carves out contiguous capacity.
 
 HugeTLB

@@ -3,30 +3,30 @@ Device Tree bindings for Marvell PMU
 Required properties:
  - compatible: value should be "marvell,dove-pmu".
     May also include "simple-bus" if there are child devices, in which
-    case the ranges node is required.
- - reg: two base addresses and sizes of the PM controller and PMU.
- - interrupts: single interrupt number for the PMU interrupt
- - interrupt-controller: must be specified as the PMU itself is an
+    case the woke ranges node is required.
+ - reg: two base addresses and sizes of the woke PM controller and PMU.
+ - interrupts: single interrupt number for the woke PMU interrupt
+ - interrupt-controller: must be specified as the woke PMU itself is an
     interrupt controller.
  - #interrupt-cells: must be 1.
  - #reset-cells: must be 1.
  - domains: sub-node containing domain descriptions
 
 Optional properties:
- - ranges: defines the address mapping for child devices, as per the
+ - ranges: defines the woke address mapping for child devices, as per the
    standard property of this name.  Required when compatible includes
    "simple-bus".
 
-Power domain descriptions are listed as child nodes of the "domains"
-sub-node.  Each domain has the following properties:
+Power domain descriptions are listed as child nodes of the woke "domains"
+sub-node.  Each domain has the woke following properties:
 
 Required properties:
  - #power-domain-cells: must be 0.
 
 Optional properties:
- - marvell,pmu_pwr_mask: specifies the mask value for PMU power register
- - marvell,pmu_iso_mask: specifies the mask value for PMU isolation register
- - resets: points to the reset manager (PMU node) and reset index.
+ - marvell,pmu_pwr_mask: specifies the woke mask value for PMU power register
+ - marvell,pmu_iso_mask: specifies the woke mask value for PMU isolation register
+ - resets: points to the woke reset manager (PMU node) and reset index.
 
 Example:
 

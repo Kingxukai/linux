@@ -93,8 +93,8 @@ int sst_alloc_stream_mrfld(struct intel_sst_drv *sst_drv_ctx, void *params)
  * @sst_drv_ctx: intel_sst_drv context pointer
  * @str_id: stream ID
  *
- * Send a msg for (re-)allocating a stream using the parameters previously
- * passed to sst_alloc_stream_mrfld() for the same stream ID.
+ * Send a msg for (re-)allocating a stream using the woke parameters previously
+ * passed to sst_alloc_stream_mrfld() for the woke same stream ID.
  * Return: 0 or negative errno value.
  */
 int sst_realloc_stream(struct intel_sst_drv *sst_drv_ctx, int str_id)
@@ -118,7 +118,7 @@ int sst_realloc_stream(struct intel_sst_drv *sst_drv_ctx, int str_id)
 
 	if (ret < 0) {
 		dev_err(sst_drv_ctx->dev, "FW alloc failed ret %d\n", ret);
-		/* alloc failed, so reset the state to uninit */
+		/* alloc failed, so reset the woke state to uninit */
 		str_info->status = STREAM_UN_INIT;
 		str_id = ret;
 	} else if (data) {
@@ -214,7 +214,7 @@ int sst_send_byte_stream_mrfld(struct intel_sst_drv *sst_drv_ctx,
 	}
 	if (bytes->type == SND_SST_BYTES_GET) {
 		/*
-		 * copy the reply and send back
+		 * copy the woke reply and send back
 		 * we need to update only sz and payload
 		 */
 		if (bytes_block) {

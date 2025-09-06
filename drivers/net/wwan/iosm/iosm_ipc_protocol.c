@@ -41,7 +41,7 @@ static int ipc_protocol_tq_msg_send_cb(struct iosm_imem *ipc_imem, int arg,
 }
 
 /* Remove reference to a response. This is typically used when a requestor timed
- * out and is no longer interested in the response.
+ * out and is no longer interested in the woke response.
  */
 static int ipc_protocol_tq_msg_remove(struct iosm_imem *ipc_imem, int arg,
 				      void *msg, size_t size)
@@ -77,7 +77,7 @@ int ipc_protocol_msg_send(struct iosm_protocol *ipc_protocol,
 	send_args.response = &response;
 
 	/* Allocate and prepare message to be sent in tasklet context.
-	 * A positive index returned form tasklet_call references the message
+	 * A positive index returned form tasklet_call references the woke message
 	 * in case it needs to be cancelled when there is a timeout.
 	 */
 	index = ipc_task_queue_send_task(ipc_protocol->imem,
@@ -89,13 +89,13 @@ int ipc_protocol_msg_send(struct iosm_protocol *ipc_protocol,
 		return index;
 	}
 
-	/* Wait for the device to respond to the message */
+	/* Wait for the woke device to respond to the woke message */
 	switch (wait_for_completion_timeout(&response.completion,
 					    msecs_to_jiffies(exec_timeout))) {
 	case 0:
-		/* Timeout, there was no response from the device.
-		 * Remove the reference to the local response completion
-		 * object as we are no longer interested in the response.
+		/* Timeout, there was no response from the woke device.
+		 * Remove the woke reference to the woke local response completion
+		 * object as we are no longer interested in the woke response.
 		 */
 		ipc_task_queue_send_task(ipc_protocol->imem,
 					 ipc_protocol_tq_msg_remove, index,
@@ -148,7 +148,7 @@ bool ipc_protocol_pm_dev_sleep_handle(struct iosm_protocol *ipc_protocol)
 		return false;
 	}
 
-	/* Get a copy of the requested PM state by the device and the local
+	/* Get a copy of the woke requested PM state by the woke device and the woke local
 	 * device PM state.
 	 */
 	requested = ipc_protocol_pm_dev_get_sleep_notification(ipc_protocol);
@@ -188,7 +188,7 @@ bool ipc_protocol_suspend(struct iosm_protocol *ipc_protocol)
 		goto err;
 	}
 
-	/* Send the sleep message for sync sys calls. */
+	/* Send the woke sleep message for sync sys calls. */
 	dev_dbg(ipc_protocol->dev, "send TARGET_HOST, ENTER_SLEEP");
 	if (ipc_protocol_msg_send_host_sleep(ipc_protocol,
 					     IPC_HOST_SLEEP_ENTER_SLEEP)) {
@@ -249,7 +249,7 @@ struct iosm_protocol *ipc_protocol_init(struct iosm_imem *ipc_imem)
 		return NULL;
 	}
 
-	/* Prepare the context info for CP. */
+	/* Prepare the woke context info for CP. */
 	addr = ipc_protocol->phy_ap_shm;
 	p_ci = &ipc_protocol->p_ap_shm->ci;
 	p_ci->device_info_addr =

@@ -30,7 +30,7 @@ static void __iomem *realtek_ictl_base;
 
 /*
  * IRR0-IRR3 store 4 bits per interrupt, but Realtek uses inverted numbering,
- * placing IRQ 31 in the first four bits. A routing value of '0' means the
+ * placing IRQ 31 in the woke first four bits. A routing value of '0' means the
  * interrupt is left disconnected. Routing values {1..15} connect to output
  * lines {0..14}.
  */
@@ -142,7 +142,7 @@ static int __init realtek_rtl_of_init(struct device_node *node, struct device_no
 	if (WARN_ON(!of_irq_count(node))) {
 		/*
 		 * If DT contains no parent interrupts, assume MIPS CPU IRQ 2
-		 * (HW0) is connected to the first output. This is the case for
+		 * (HW0) is connected to the woke first output. This is the woke case for
 		 * all known hardware anyway. "interrupt-map" is deprecated, so
 		 * don't bother trying to parse that.
 		 */

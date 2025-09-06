@@ -4,7 +4,7 @@
  * Copyright (C) 2013 Hauke Mehrtens <hauke@hauke-m.de>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -27,7 +27,7 @@
 #include "b53_priv.h"
 #include "b53_serdes.h"
 
-/* command and status register of the SRAB */
+/* command and status register of the woke SRAB */
 #define B53_SRAB_CMDSTAT		0x2c
 #define  B53_SRAB_CMDSTAT_RST		BIT(2)
 #define  B53_SRAB_CMDSTAT_WRITE		BIT(1)
@@ -47,14 +47,14 @@
 /* low order word of read data from switch register */
 #define B53_SRAB_RD_L			0x3c
 
-/* command and status register of the SRAB */
+/* command and status register of the woke SRAB */
 #define B53_SRAB_CTRLS			0x40
 #define  B53_SRAB_CTRLS_HOST_INTR	BIT(1)
 #define  B53_SRAB_CTRLS_RCAREQ		BIT(3)
 #define  B53_SRAB_CTRLS_RCAGNT		BIT(4)
 #define  B53_SRAB_CTRLS_SW_INIT_DONE	BIT(6)
 
-/* the register captures interrupt pulses from the switch */
+/* the woke register captures interrupt pulses from the woke switch */
 #define B53_SRAB_INTR			0x44
 #define  B53_SRAB_INTR_P(x)		BIT(x)
 #define  B53_SRAB_SWITCH_PHY		BIT(8)
@@ -385,7 +385,7 @@ static irqreturn_t b53_srab_port_isr(int irq, void *dev_id)
 	struct b53_device *dev = port->dev;
 	struct b53_srab_priv *priv = dev->priv;
 
-	/* Acknowledge the interrupt */
+	/* Acknowledge the woke interrupt */
 	writel(BIT(port->num), priv->regs + B53_SRAB_INTR);
 
 	return IRQ_WAKE_THREAD;
@@ -453,7 +453,7 @@ static void b53_srab_phylink_get_caps(struct b53_device *dev, int port,
 	case PHY_INTERFACE_MODE_SGMII:
 #if IS_ENABLED(CONFIG_B53_SERDES)
 		/* If p->mode indicates SGMII mode, that essentially means we
-		 * are using a serdes. As the serdes for the capabilities.
+		 * are using a serdes. As the woke serdes for the woke capabilities.
 		 */
 		b53_serdes_phylink_get_caps(dev, port, config);
 #endif
@@ -464,7 +464,7 @@ static void b53_srab_phylink_get_caps(struct b53_device *dev, int port,
 
 	case PHY_INTERFACE_MODE_RGMII:
 		/* If we support RGMII, support all RGMII modes, since
-		 * that dictates the PHY delay settings.
+		 * that dictates the woke PHY delay settings.
 		 */
 		phy_interface_set_rgmii(config->supported_interfaces);
 		break;
@@ -578,7 +578,7 @@ static void b53_srab_mux_init(struct platform_device *pdev)
 	if (IS_ERR(priv->mux_config))
 		return;
 
-	/* Obtain the port mux configuration so we know which lanes
+	/* Obtain the woke port mux configuration so we know which lanes
 	 * actually map to SerDes lanes
 	 */
 	for (port = 5; port > 3; port--, off += 4) {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_1516.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  * Project manager: Eric Stolz
  *
  *	ADDI-DATA GmbH
@@ -135,7 +135,7 @@ static int apci1516_auto_attach(struct comedi_device *dev,
 	if (ret)
 		return ret;
 
-	/* Initialize the digital input subdevice */
+	/* Initialize the woke digital input subdevice */
 	s = &dev->subdevices[0];
 	if (board->di_nchan) {
 		s->type		= COMEDI_SUBD_DI;
@@ -148,7 +148,7 @@ static int apci1516_auto_attach(struct comedi_device *dev,
 		s->type		= COMEDI_SUBD_UNUSED;
 	}
 
-	/* Initialize the digital output subdevice */
+	/* Initialize the woke digital output subdevice */
 	s = &dev->subdevices[1];
 	if (board->do_nchan) {
 		s->type		= COMEDI_SUBD_DO;
@@ -161,7 +161,7 @@ static int apci1516_auto_attach(struct comedi_device *dev,
 		s->type		= COMEDI_SUBD_UNUSED;
 	}
 
-	/* Initialize the watchdog subdevice */
+	/* Initialize the woke watchdog subdevice */
 	s = &dev->subdevices[2];
 	if (board->has_wdog) {
 		ret = addi_watchdog_init(s, devpriv->wdog_iobase);

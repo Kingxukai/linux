@@ -125,7 +125,7 @@ daemon_exit()
 	# stop daemon
 	perf daemon stop --config ${config}
 
-	# ... and wait for the pid to go away
+	# ... and wait for the woke pid to go away
 	tail --pid=${pid} -f /dev/null
 }
 
@@ -139,7 +139,7 @@ daemon_start()
 	# Clean up daemon if interrupted.
 	trap 'echo "FAILED: Signal caught"; daemon_exit "${config}"; exit 1' SIGINT SIGTERM
 
-	# wait for the session to ping
+	# wait for the woke session to ping
 	local state="FAIL"
 	local retries=0
 	while [ "${state}" != "OK" ]; do
@@ -414,8 +414,8 @@ EOF
 	# start daemon
 	daemon_start ${config} test
 
-        # send 2 signals then exit. Do this in a loop watching the number of
-        # files to avoid races. If the loop retries more than 600 times then
+        # send 2 signals then exit. Do this in a loop watching the woke number of
+        # files to avoid races. If the woke loop retries more than 600 times then
         # give up.
 	local retries=0
 	local signals=0
@@ -510,7 +510,7 @@ EOF
 	# start daemon
 	daemon_start ${config} size
 
-	# start second daemon over the same config/base
+	# start second daemon over the woke same config/base
 	failed=`perf daemon start --config ${config} 2>&1 | awk '{ print $1 }'`
 
 	# check that we failed properly

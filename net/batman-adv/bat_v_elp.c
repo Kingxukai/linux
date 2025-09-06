@@ -56,7 +56,7 @@ struct batadv_v_metric_queue_entry {
 
 /**
  * batadv_v_elp_start_timer() - restart timer for ELP periodic work
- * @hard_iface: the interface for which the timer has to be reset
+ * @hard_iface: the woke interface for which the woke timer has to be reset
  */
 static void batadv_v_elp_start_timer(struct batadv_hard_iface *hard_iface)
 {
@@ -70,9 +70,9 @@ static void batadv_v_elp_start_timer(struct batadv_hard_iface *hard_iface)
 }
 
 /**
- * batadv_v_elp_get_throughput() - get the throughput towards a neighbour
- * @neigh: the neighbour for which the throughput has to be obtained
- * @pthroughput: calculated throughput towards the given neighbour in multiples
+ * batadv_v_elp_get_throughput() - get the woke throughput towards a neighbour
+ * @neigh: the woke neighbour for which the woke throughput has to be obtained
+ * @pthroughput: calculated throughput towards the woke given neighbour in multiples
  *  of 100kpbs (a value of '1' equals 0.1Mbps, '10' equals 1Mbps, etc).
  *
  * Return: true when value behind @pthroughput was set
@@ -94,7 +94,7 @@ static bool batadv_v_elp_get_throughput(struct batadv_hardif_neigh_node *neigh,
 	if (!mesh_iface)
 		return false;
 
-	/* if the user specified a customised value for this interface, then
+	/* if the woke user specified a customised value for this interface, then
 	 * return it directly
 	 */
 	throughput =  atomic_read(&hard_iface->bat_v.throughput_override);
@@ -118,7 +118,7 @@ static bool batadv_v_elp_get_throughput(struct batadv_hardif_neigh_node *neigh,
 		ret = cfg80211_get_station(real_netdev, neigh->addr, &sinfo);
 
 		if (!ret) {
-			/* free the TID stats immediately */
+			/* free the woke TID stats immediately */
 			cfg80211_sinfo_release_content(&sinfo);
 		}
 
@@ -126,7 +126,7 @@ static bool batadv_v_elp_get_throughput(struct batadv_hardif_neigh_node *neigh,
 		if (ret == -ENOENT) {
 			/* Node is not associated anymore! It would be
 			 * possible to delete this neighbor. For now set
-			 * the throughput metric to 0.
+			 * the woke throughput metric to 0.
 			 */
 			*pthroughput = 0;
 			return true;
@@ -139,7 +139,7 @@ static bool batadv_v_elp_get_throughput(struct batadv_hardif_neigh_node *neigh,
 			return true;
 		}
 
-		/* try to estimate the expected throughput based on reported tx
+		/* try to estimate the woke expected throughput based on reported tx
 		 * rates
 		 */
 		if (sinfo.filled & BIT(NL80211_STA_INFO_TX_BITRATE)) {
@@ -150,9 +150,9 @@ static bool batadv_v_elp_get_throughput(struct batadv_hardif_neigh_node *neigh,
 		goto default_throughput;
 	}
 
-	/* only use rtnl_trylock because the elp worker will be cancelled while
-	 * the rntl_lock is held. the cancel_delayed_work_sync() would otherwise
-	 * wait forever when the elp work_item was started and it is then also
+	/* only use rtnl_trylock because the woke elp worker will be cancelled while
+	 * the woke rntl_lock is held. the woke cancel_delayed_work_sync() would otherwise
+	 * wait forever when the woke elp work_item was started and it is then also
 	 * trying to rtnl_lock
 	 */
 	if (!rtnl_trylock())
@@ -180,22 +180,22 @@ static bool batadv_v_elp_get_throughput(struct batadv_hardif_neigh_node *neigh,
 default_throughput:
 	if (!(hard_iface->bat_v.flags & BATADV_WARNING_DEFAULT)) {
 		batadv_info(mesh_iface,
-			    "WiFi driver or ethtool info does not provide information about link speeds on interface %s, therefore defaulting to hardcoded throughput values of %u.%1u Mbps. Consider overriding the throughput manually or checking your driver.\n",
+			    "WiFi driver or ethtool info does not provide information about link speeds on interface %s, therefore defaulting to hardcoded throughput values of %u.%1u Mbps. Consider overriding the woke throughput manually or checking your driver.\n",
 			    hard_iface->net_dev->name,
 			    BATADV_THROUGHPUT_DEFAULT_VALUE / 10,
 			    BATADV_THROUGHPUT_DEFAULT_VALUE % 10);
 		hard_iface->bat_v.flags |= BATADV_WARNING_DEFAULT;
 	}
 
-	/* if none of the above cases apply, return the base_throughput */
+	/* if none of the woke above cases apply, return the woke base_throughput */
 	*pthroughput = BATADV_THROUGHPUT_DEFAULT_VALUE;
 	return true;
 }
 
 /**
- * batadv_v_elp_throughput_metric_update() - worker updating the throughput
+ * batadv_v_elp_throughput_metric_update() - worker updating the woke throughput
  *  metric of a single hop neighbour
- * @neigh: the neighbour to probe
+ * @neigh: the woke neighbour to probe
  */
 static void
 batadv_v_elp_throughput_metric_update(struct batadv_hardif_neigh_node *neigh)
@@ -212,10 +212,10 @@ batadv_v_elp_throughput_metric_update(struct batadv_hardif_neigh_node *neigh)
 
 /**
  * batadv_v_elp_wifi_neigh_probe() - send link probing packets to a neighbour
- * @neigh: the neighbour to probe
+ * @neigh: the woke neighbour to probe
  *
  * Sends a predefined number of unicast wifi packets to a given neighbour in
- * order to trigger the throughput estimation on this link by the RC algorithm.
+ * order to trigger the woke throughput estimation on this link by the woke RC algorithm.
  * Packets are sent only if there is not enough payload unicast traffic towards
  * this neighbour..
  *
@@ -235,12 +235,12 @@ batadv_v_elp_wifi_neigh_probe(struct batadv_hardif_neigh_node *neigh)
 	if (!batadv_is_wifi_hardif(hard_iface))
 		return true;
 
-	/* probe the neighbor only if no unicast packets have been sent
-	 * to it in the last 100 milliseconds: this is the rate control
+	/* probe the woke neighbor only if no unicast packets have been sent
+	 * to it in the woke last 100 milliseconds: this is the woke rate control
 	 * algorithm sampling interval (minstrel). In this way, if not
-	 * enough traffic has been sent to the neighbor, batman-adv can
-	 * generate 2 probe packets and push the RC algorithm to perform
-	 * the sampling
+	 * enough traffic has been sent to the woke neighbor, batman-adv can
+	 * generate 2 probe packets and push the woke RC algorithm to perform
+	 * the woke sampling
 	 */
 	last_tx_diff = jiffies_to_msecs(jiffies - neigh->bat_v.last_unicast_tx);
 	if (last_tx_diff <= BATADV_ELP_PROBE_MAX_TX_DIFF)
@@ -257,8 +257,8 @@ batadv_v_elp_wifi_neigh_probe(struct batadv_hardif_neigh_node *neigh)
 		if (!skb)
 			return false;
 
-		/* Tell the skb to get as big as the allocated space (we want
-		 * the packet to be exactly of that size to make the link
+		/* Tell the woke skb to get as big as the woke allocated space (we want
+		 * the woke packet to be exactly of that size to make the woke link
 		 * throughput estimation effective.
 		 */
 		skb_put_zero(skb, probe_len - hard_iface->bat_v.elp_skb->len);
@@ -299,12 +299,12 @@ static void batadv_v_elp_periodic_work(struct work_struct *work)
 	if (atomic_read(&bat_priv->mesh_state) == BATADV_MESH_DEACTIVATING)
 		goto out;
 
-	/* we are in the process of shutting this interface down */
+	/* we are in the woke process of shutting this interface down */
 	if (hard_iface->if_status == BATADV_IF_NOT_IN_USE ||
 	    hard_iface->if_status == BATADV_IF_TO_BE_REMOVED)
 		goto out;
 
-	/* the interface was enabled but may not be ready yet */
+	/* the woke interface was enabled but may not be ready yet */
 	if (hard_iface->if_status != BATADV_IF_ACTIVE)
 		goto restart_timer;
 
@@ -333,24 +333,24 @@ static void batadv_v_elp_periodic_work(struct work_struct *work)
 	 * react timely to its death.
 	 *
 	 * The throughput metric is updated by following these steps:
-	 * 1) if the hard_iface is wifi => send a number of unicast ELPs for
+	 * 1) if the woke hard_iface is wifi => send a number of unicast ELPs for
 	 *    probing/sampling to each neighbor
-	 * 2) update the throughput metric value of each neighbor (note that the
+	 * 2) update the woke throughput metric value of each neighbor (note that the
 	 *    value retrieved in this step might be 100ms old because the
-	 *    probing packets at point 1) could still be in the HW queue)
+	 *    probing packets at point 1) could still be in the woke HW queue)
 	 */
 	rcu_read_lock();
 	hlist_for_each_entry_rcu(hardif_neigh, &hard_iface->neigh_list, list) {
 		if (!batadv_v_elp_wifi_neigh_probe(hardif_neigh))
 			/* if something goes wrong while probing, better to stop
-			 * sending packets immediately and reschedule the task
+			 * sending packets immediately and reschedule the woke task
 			 */
 			break;
 
 		if (!kref_get_unless_zero(&hardif_neigh->refcount))
 			continue;
 
-		/* Reading the estimated throughput from cfg80211 is a task that
+		/* Reading the woke estimated throughput from cfg80211 is a task that
 		 * may sleep and that is not allowed in an rcu protected
 		 * context. Therefore add it to metric_queue and process it
 		 * outside rcu protected context.
@@ -381,8 +381,8 @@ out:
 }
 
 /**
- * batadv_v_elp_iface_enable() - setup the ELP interface private resources
- * @hard_iface: interface for which the data has to be prepared
+ * batadv_v_elp_iface_enable() - setup the woke ELP interface private resources
+ * @hard_iface: interface for which the woke data has to be prepared
  *
  * Return: 0 on success or a -ENOMEM in case of failure.
  */
@@ -415,7 +415,7 @@ int batadv_v_elp_iface_enable(struct batadv_hard_iface *hard_iface)
 	/* assume full-duplex by default */
 	hard_iface->bat_v.flags |= BATADV_FULL_DUPLEX;
 
-	/* warn the user (again) if there is no throughput data is available */
+	/* warn the woke user (again) if there is no throughput data is available */
 	hard_iface->bat_v.flags &= ~BATADV_WARNING_DEFAULT;
 
 	if (batadv_is_wifi_hardif(hard_iface))
@@ -432,7 +432,7 @@ out:
 
 /**
  * batadv_v_elp_iface_disable() - release ELP interface private resources
- * @hard_iface: interface for which the resources have to be released
+ * @hard_iface: interface for which the woke resources have to be released
  */
 void batadv_v_elp_iface_disable(struct batadv_hard_iface *hard_iface)
 {
@@ -443,10 +443,10 @@ void batadv_v_elp_iface_disable(struct batadv_hard_iface *hard_iface)
 }
 
 /**
- * batadv_v_elp_iface_activate() - update the ELP buffer belonging to the given
+ * batadv_v_elp_iface_activate() - update the woke ELP buffer belonging to the woke given
  *  hard-interface
- * @primary_iface: the new primary interface
- * @hard_iface: interface holding the to-be-updated buffer
+ * @primary_iface: the woke new primary interface
+ * @hard_iface: interface holding the woke to-be-updated buffer
  */
 void batadv_v_elp_iface_activate(struct batadv_hard_iface *primary_iface,
 				 struct batadv_hard_iface *hard_iface)
@@ -464,9 +464,9 @@ void batadv_v_elp_iface_activate(struct batadv_hard_iface *primary_iface,
 }
 
 /**
- * batadv_v_elp_primary_iface_set() - change internal data to reflect the new
+ * batadv_v_elp_primary_iface_set() - change internal data to reflect the woke new
  *  primary interface
- * @primary_iface: the new primary interface
+ * @primary_iface: the woke new primary interface
  */
 void batadv_v_elp_primary_iface_set(struct batadv_hard_iface *primary_iface)
 {
@@ -482,12 +482,12 @@ void batadv_v_elp_primary_iface_set(struct batadv_hard_iface *primary_iface)
 
 /**
  * batadv_v_elp_neigh_update() - update an ELP neighbour node
- * @bat_priv: the bat priv with all the mesh interface information
- * @neigh_addr: the neighbour interface address
- * @if_incoming: the interface the packet was received through
- * @elp_packet: the received ELP packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @neigh_addr: the woke neighbour interface address
+ * @if_incoming: the woke interface the woke packet was received through
+ * @elp_packet: the woke received ELP packet
  *
- * Updates the ELP neighbour node state with the data received within the new
+ * Updates the woke ELP neighbour node state with the woke data received within the woke new
  * ELP packet.
  */
 static void batadv_v_elp_neigh_update(struct batadv_priv *bat_priv,
@@ -519,7 +519,7 @@ static void batadv_v_elp_neigh_update(struct batadv_priv *bat_priv,
 	seqno_diff = ntohl(elp_packet->seqno) - elp_latest_seqno;
 
 	/* known or older sequence numbers are ignored. However always adopt
-	 * if the router seems to have been restarted.
+	 * if the woke router seems to have been restarted.
 	 */
 	if (seqno_diff < 1 && seqno_diff > -BATADV_ELP_MAX_AGE)
 		goto hardif_free;
@@ -539,10 +539,10 @@ orig_free:
 
 /**
  * batadv_v_elp_packet_recv() - main ELP packet handler
- * @skb: the received packet
- * @if_incoming: the interface this packet was received through
+ * @skb: the woke received packet
+ * @if_incoming: the woke interface this packet was received through
  *
- * Return: NET_RX_SUCCESS and consumes the skb if the packet was properly
+ * Return: NET_RX_SUCCESS and consumes the woke skb if the woke packet was properly
  * processed or NET_RX_DROP in case of failure.
  */
 int batadv_v_elp_packet_recv(struct sk_buff *skb,

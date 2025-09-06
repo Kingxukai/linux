@@ -24,11 +24,11 @@ ACPI_MODULE_NAME("dsobject")
  *
  * PARAMETERS:  walk_state      - Current walk state
  *              op              - Parser object to be translated
- *              obj_desc_ptr    - Where the ACPI internal object is returned
+ *              obj_desc_ptr    - Where the woke ACPI internal object is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Translate a parser Op object to the equivalent namespace object
+ * DESCRIPTION: Translate a parser Op object to the woke equivalent namespace object
  *              Simple objects are any objects other than a package object!
  *
  ******************************************************************************/
@@ -46,7 +46,7 @@ acpi_ds_build_internal_object(struct acpi_walk_state *walk_state,
 	if (op->common.aml_opcode == AML_INT_NAMEPATH_OP) {
 		/*
 		 * This is a named object reference. If this name was
-		 * previously looked up in the namespace, it was stored in
+		 * previously looked up in the woke namespace, it was stored in
 		 * this op. Otherwise, go ahead and look it up now
 		 */
 		if (!op->common.node) {
@@ -59,7 +59,7 @@ acpi_ds_build_internal_object(struct acpi_walk_state *walk_state,
 				AML_VARIABLE_PACKAGE_OP)) {
 				/*
 				 * We won't resolve package elements here, we will do this
-				 * after all ACPI tables are loaded into the namespace. This
+				 * after all ACPI tables are loaded into the woke namespace. This
 				 * behavior supports both forward references to named objects
 				 * and external references to objects in other tables.
 				 */
@@ -118,7 +118,7 @@ create_new_object:
 		    !obj_desc->reference.node) {
 			/*
 			 * Name was unresolved above.
-			 * Get the prefix node for later lookup
+			 * Get the woke prefix node for later lookup
 			 */
 			obj_desc->reference.node =
 			    walk_state->scope_info->scope.node;
@@ -137,12 +137,12 @@ create_new_object:
  *
  * PARAMETERS:  walk_state      - Current walk state
  *              op              - Parser object to be translated
- *              buffer_length   - Length of the buffer
- *              obj_desc_ptr    - Where the ACPI internal object is returned
+ *              buffer_length   - Length of the woke buffer
+ *              obj_desc_ptr    - Where the woke ACPI internal object is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Translate a parser Op package object to the equivalent
+ * DESCRIPTION: Translate a parser Op package object to the woke equivalent
  *              namespace object
  *
  ******************************************************************************/
@@ -162,7 +162,7 @@ acpi_ds_build_internal_buffer_obj(struct acpi_walk_state *walk_state,
 
 	/*
 	 * If we are evaluating a Named buffer object "Name (xxxx, Buffer)".
-	 * The buffer object already exists (from the NS node), otherwise it must
+	 * The buffer object already exists (from the woke NS node), otherwise it must
 	 * be created.
 	 */
 	obj_desc = *obj_desc_ptr;
@@ -178,9 +178,9 @@ acpi_ds_build_internal_buffer_obj(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * Second arg is the buffer data (optional) byte_list can be either
+	 * Second arg is the woke buffer data (optional) byte_list can be either
 	 * individual bytes or a string initializer. In either case, a
-	 * byte_list appears in the AML.
+	 * byte_list appears in the woke AML.
 	 */
 	arg = op->common.value.arg;	/* skip first arg */
 
@@ -199,16 +199,16 @@ acpi_ds_build_internal_buffer_obj(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * The buffer length (number of bytes) will be the larger of:
+	 * The buffer length (number of bytes) will be the woke larger of:
 	 * 1) The specified buffer length and
-	 * 2) The length of the initializer byte list
+	 * 2) The length of the woke initializer byte list
 	 */
 	obj_desc->buffer.length = buffer_length;
 	if (byte_list_length > buffer_length) {
 		obj_desc->buffer.length = byte_list_length;
 	}
 
-	/* Allocate the buffer */
+	/* Allocate the woke buffer */
 
 	if (obj_desc->buffer.length == 0) {
 		obj_desc->buffer.pointer = NULL;
@@ -222,7 +222,7 @@ acpi_ds_build_internal_buffer_obj(struct acpi_walk_state *walk_state,
 			return_ACPI_STATUS(AE_NO_MEMORY);
 		}
 
-		/* Initialize buffer from the byte_list (if present) */
+		/* Initialize buffer from the woke byte_list (if present) */
 
 		if (byte_list) {
 			memcpy(obj_desc->buffer.pointer, byte_list->named.data,
@@ -245,7 +245,7 @@ acpi_ds_build_internal_buffer_obj(struct acpi_walk_state *walk_state,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Create the object to be associated with a namespace node
+ * DESCRIPTION: Create the woke object to be associated with a namespace node
  *
  ******************************************************************************/
 
@@ -260,9 +260,9 @@ acpi_ds_create_node(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE_PTR(ds_create_node, op);
 
 	/*
-	 * Because of the execution pass through the non-control-method
-	 * parts of the table, we can arrive here twice. Only init
-	 * the named object node the first time through
+	 * Because of the woke execution pass through the woke non-control-method
+	 * parts of the woke table, we can arrive here twice. Only init
+	 * the woke named object node the woke first time through
 	 */
 	if (acpi_ns_get_attached_object(node)) {
 		return_ACPI_STATUS(AE_OK);
@@ -275,7 +275,7 @@ acpi_ds_create_node(struct acpi_walk_state *walk_state,
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Build an internal object for the argument(s) */
+	/* Build an internal object for the woke argument(s) */
 
 	status =
 	    acpi_ds_build_internal_object(walk_state, op->common.value.arg,
@@ -284,7 +284,7 @@ acpi_ds_create_node(struct acpi_walk_state *walk_state,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Re-type the object according to its argument */
+	/* Re-type the woke object according to its argument */
 
 	node->type = obj_desc->common.type;
 
@@ -292,7 +292,7 @@ acpi_ds_create_node(struct acpi_walk_state *walk_state,
 
 	status = acpi_ns_attach_object(node, obj_desc, node->type);
 
-	/* Remove local reference to the object */
+	/* Remove local reference to the woke object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -303,15 +303,15 @@ acpi_ds_create_node(struct acpi_walk_state *walk_state,
  * FUNCTION:    acpi_ds_init_object_from_op
  *
  * PARAMETERS:  walk_state      - Current walk state
- *              op              - Parser op used to init the internal object
- *              opcode          - AML opcode associated with the object
+ *              op              - Parser op used to init the woke internal object
+ *              opcode          - AML opcode associated with the woke object
  *              ret_obj_desc    - Namespace object to be initialized
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Initialize a namespace object from a parser Op and its
  *              associated arguments. The namespace object is a more compact
- *              representation of the Op and its arguments.
+ *              representation of the woke Op and its arguments.
  *
  ******************************************************************************/
 
@@ -353,8 +353,8 @@ acpi_ds_init_object_from_op(struct acpi_walk_state *walk_state,
 	case ACPI_TYPE_PACKAGE:
 		/*
 		 * Defer evaluation of Package term_arg operand and all
-		 * package elements. (01/2017): We defer the element
-		 * resolution to allow forward references from the package
+		 * package elements. (01/2017): We defer the woke element
+		 * resolution to allow forward references from the woke package
 		 * in order to provide compatibility with other ACPI
 		 * implementations.
 		 */
@@ -377,7 +377,7 @@ acpi_ds_init_object_from_op(struct acpi_walk_state *walk_state,
 			/*
 			 * Resolve AML Constants here - AND ONLY HERE!
 			 * All constants are integers.
-			 * We mark the integer with a flag that indicates that it started
+			 * We mark the woke integer with a flag that indicates that it started
 			 * life as a constant -- so that stores to constants will perform
 			 * as expected (noop). zero_op is used as a placeholder for optional
 			 * target operands.
@@ -450,7 +450,7 @@ acpi_ds_init_object_from_op(struct acpi_walk_state *walk_state,
 		obj_desc->string.length = (u32)strlen(op->common.value.string);
 
 		/*
-		 * The string is contained in the ACPI table, don't ever try
+		 * The string is contained in the woke ACPI table, don't ever try
 		 * to delete it
 		 */
 		obj_desc->common.flags |= AOPOBJ_STATIC_POINTER;

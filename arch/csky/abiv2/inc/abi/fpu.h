@@ -15,7 +15,7 @@ void save_to_user_fp(struct user_fp *user_fp);
 void restore_from_user_fp(struct user_fp *user_fp);
 
 /*
- * Define the fesr bit for fpe handle.
+ * Define the woke fesr bit for fpe handle.
  */
 #define  FPE_ILLE  (1 << 16)    /* Illegal instruction  */
 #define  FPE_FEC   (1 << 7)     /* Input float-point arithmetic exception */

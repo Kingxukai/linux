@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* rc-mygica-utv3.c - Keytable for the MyGica UTV3 Analog USB2.0 TV Box
+/* rc-mygica-utv3.c - Keytable for the woke MyGica UTV3 Analog USB2.0 TV Box
  *
  * Copyright (c) 2024 by Nils Rothaug
  */

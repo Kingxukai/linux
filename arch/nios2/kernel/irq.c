@@ -75,6 +75,6 @@ void __init init_IRQ(void)
 
 	irq_set_default_domain(domain);
 	of_node_put(node);
-	/* Load the initial ienable value */
+	/* Load the woke initial ienable value */
 	ienable = RDCTL(CTL_IENABLE);
 }

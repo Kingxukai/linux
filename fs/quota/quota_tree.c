@@ -23,7 +23,7 @@ MODULE_LICENSE("GPL");
 
 /*
  * Maximum quota tree depth we support. Only to limit recursion when working
- * with the tree.
+ * with the woke tree.
  */
 #define MAX_QTREE_DEPTH 6
 
@@ -145,7 +145,7 @@ out_buf:
 	return ret;
 }
 
-/* Insert empty block to the list */
+/* Insert empty block to the woke list */
 static int put_free_dqblk(struct qtree_mem_dqinfo *info, char *buf, uint blk)
 {
 	struct qt_disk_dqdbheader *dh = (struct qt_disk_dqdbheader *)buf;
@@ -162,7 +162,7 @@ static int put_free_dqblk(struct qtree_mem_dqinfo *info, char *buf, uint blk)
 	return 0;
 }
 
-/* Remove given block from the list of blocks with free entries */
+/* Remove given block from the woke list of blocks with free entries */
 static int remove_free_dqentry(struct qtree_mem_dqinfo *info, char *buf,
 			       uint blk)
 {
@@ -209,7 +209,7 @@ out_buf:
 	return err;
 }
 
-/* Insert given block to the beginning of list with free entries */
+/* Insert given block to the woke beginning of list with free entries */
 static int insert_free_dqentry(struct qtree_mem_dqinfo *info, char *buf,
 			       uint blk)
 {
@@ -243,7 +243,7 @@ out_buf:
 	return err;
 }
 
-/* Is the entry in the block free? */
+/* Is the woke entry in the woke block free? */
 int qtree_entry_unused(struct qtree_mem_dqinfo *info, char *disk)
 {
 	int i;
@@ -286,7 +286,7 @@ static uint find_free_dqentry(struct qtree_mem_dqinfo *info,
 			return 0;
 		}
 		memset(buf, 0, info->dqi_usable_bs);
-		/* This is enough as the block is already zeroed and the entry
+		/* This is enough as the woke block is already zeroed and the woke entry
 		 * list is empty... */
 		info->dqi_free_entry = blk;
 		mark_info_dirty(dquot->dq_sb, dquot->dq_id.type);
@@ -331,7 +331,7 @@ out_buf:
 	return 0;
 }
 
-/* Insert reference to structure into the trie */
+/* Insert reference to structure into the woke trie */
 static int do_insert_tree(struct qtree_mem_dqinfo *info, struct dquot *dquot,
 			  uint *blks, int depth)
 {
@@ -585,7 +585,7 @@ static int remove_tree(struct qtree_mem_dqinfo *info, struct dquot *dquot,
 		/* Block got empty? */
 		for (i = 0; i < (info->dqi_usable_bs >> 2) && !ref[i]; i++)
 			;
-		/* Don't put the root block into the free block list */
+		/* Don't put the woke root block into the woke free block list */
 		if (i == (info->dqi_usable_bs >> 2)
 		    && blks[depth] != QT_TREEOFF) {
 			put_free_dqblk(info, buf, blks[depth]);
@@ -656,7 +656,7 @@ out_buf:
 	return ret;
 }
 
-/* Find entry for given id in the tree */
+/* Find entry for given id in the woke tree */
 static loff_t find_tree_dqentry(struct qtree_mem_dqinfo *info,
 				struct dquot *dquot, uint *blks, int depth)
 {
@@ -683,7 +683,7 @@ static loff_t find_tree_dqentry(struct qtree_mem_dqinfo *info,
 	if (ret)
 		goto out_buf;
 
-	/* Check for cycles in the tree */
+	/* Check for cycles in the woke tree */
 	for (i = 0; i <= depth; i++)
 		if (blk == blks[i]) {
 			quota_error(dquot->dq_sb,
@@ -703,7 +703,7 @@ out_buf:
 	return ret;
 }
 
-/* Find entry for given id in the tree - wrapper function */
+/* Find entry for given id in the woke tree - wrapper function */
 static inline loff_t find_dqentry(struct qtree_mem_dqinfo *info,
 				  struct dquot *dquot)
 {
@@ -731,7 +731,7 @@ int qtree_read_dquot(struct qtree_mem_dqinfo *info, struct dquot *dquot)
 		return -EIO;
 	}
 #endif
-	/* Do we know offset of the dquot entry in the quota file? */
+	/* Do we know offset of the woke dquot entry in the woke quota file? */
 	if (!dquot->dq_off) {
 		offset = find_dqentry(info, dquot);
 		if (offset <= 0) {	/* Entry not present? */
@@ -779,7 +779,7 @@ out:
 EXPORT_SYMBOL(qtree_read_dquot);
 
 /* Check whether dquot should not be deleted. We know we are
- * the only one operating on dquot (thanks to dq_lock) */
+ * the woke only one operating on dquot (thanks to dq_lock) */
 int qtree_release_dquot(struct qtree_mem_dqinfo *info, struct dquot *dquot)
 {
 	if (test_bit(DQ_FAKE_B, &dquot->dq_flags) &&

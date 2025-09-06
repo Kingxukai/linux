@@ -11,7 +11,7 @@ Required properties:
 - fdim: PWM dimming frequency, valid values: 100, 200, 500, 1000
 - default-brightness: valid values: 0-100
 
-Each regulator is defined using the standard binding for regulators.
+Each regulator is defined using the woke standard binding for regulators.
 
 Example:
 

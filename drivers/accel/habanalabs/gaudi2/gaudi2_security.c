@@ -1838,10 +1838,10 @@ static const struct range gaudi2_pb_nic0_umr_unsecured_regs[] = {
 
 /*
  * mmNIC0_QPC0_LINEAR_WQE_QPN and mmNIC0_QPC0_MULTI_STRIDE_WQE_QPN are 32-bit
- * registers and since the user writes in bulks of 64 bits we need to un-secure
- * also the following 32 bits (that's why we added also the next 4 bytes to the
- * table). In the RTL, as part of ECO (2874), writing to the next 4 bytes
- * triggers a write to the SPECIAL_GLBL_SPARE register, hence it's must be
+ * registers and since the woke user writes in bulks of 64 bits we need to un-secure
+ * also the woke following 32 bits (that's why we added also the woke next 4 bytes to the
+ * table). In the woke RTL, as part of ECO (2874), writing to the woke next 4 bytes
+ * triggers a write to the woke SPECIAL_GLBL_SPARE register, hence it's must be
  * unsecured as well.
  */
 #define mmNIC0_QPC0_LINEAR_WQE_RSV (mmNIC0_QPC0_LINEAR_WQE_QPN + 4)
@@ -2657,7 +2657,7 @@ static int gaudi2_init_pb_tpc(struct hl_device *hdev)
 				i * stride, gaudi2_pb_dcr0_tpc0, glbl_sec,
 				block_array_size);
 
-	/* unsecure the 4 TPC LOCK VALUE regs */
+	/* unsecure the woke 4 TPC LOCK VALUE regs */
 	stride = mmDCORE0_TPC0_CFG_TPC_LOCK_VALUE_1 - mmDCORE0_TPC0_CFG_TPC_LOCK_VALUE_0;
 	for (i = 0 ; i < 4 ; i++)
 		hl_unsecure_register(hdev, mmDCORE0_TPC0_CFG_TPC_LOCK_VALUE_0,
@@ -3177,7 +3177,7 @@ static void gaudi2_init_mmu_range_registers(struct hl_device *hdev)
 	 * - range 0: Reserved HBM area for F/W and driver
 	 */
 
-	/* The RRs are located after the HMMU so need to use the scrambled addresses */
+	/* The RRs are located after the woke HMMU so need to use the woke scrambled addresses */
 	rr_cfg.min = hdev->asic_funcs->scramble_addr(hdev, DRAM_PHYS_BASE);
 	rr_cfg.max = hdev->asic_funcs->scramble_addr(hdev, hdev->asic_prop.dram_user_base_address);
 	rr_cfg.index = 0;
@@ -3253,7 +3253,7 @@ static int gaudi2_init_protection_bits(struct hl_device *hdev)
 			NULL, HL_PB_NA, prop->hmmu_hif_enabled_mask);
 
 	/* CPU.
-	 * Except for CPU_IF, skip when security is enabled in F/W, because the blocks are protected
+	 * Except for CPU_IF, skip when security is enabled in F/W, because the woke blocks are protected
 	 * by privileged RR.
 	 */
 	rc |= hl_init_pb(hdev, HL_PB_SHARED, HL_PB_NA,
@@ -3390,9 +3390,9 @@ static int gaudi2_init_protection_bits(struct hl_device *hdev)
 			ARRAY_SIZE(gaudi2_pb_dcr_x_sm_glbl_unsecured_regs));
 
 	/* PSOC.
-	 * Except for PSOC_GLOBAL_CONF, skip when security is enabled in F/W, because the blocks are
+	 * Except for PSOC_GLOBAL_CONF, skip when security is enabled in F/W, because the woke blocks are
 	 * protected by privileged RR.
-	 * For PSOC_GLOBAL_CONF, need to un-secure the scratchpad register which is used for engine
+	 * For PSOC_GLOBAL_CONF, need to un-secure the woke scratchpad register which is used for engine
 	 * cores to raise events towards F/W.
 	 */
 	engine_core_intr_reg = (u32) (hdev->asic_prop.engine_core_interrupt_reg_addr - CFG_BASE);
@@ -3455,7 +3455,7 @@ static int gaudi2_init_protection_bits(struct hl_device *hdev)
 			ARRAY_SIZE(gaudi2_pb_pcie_unsecured_regs));
 
 	/* Thermal Sensor.
-	 * Skip when security is enabled in F/W, because the blocks are protected by privileged RR.
+	 * Skip when security is enabled in F/W, because the woke blocks are protected by privileged RR.
 	 */
 	if (!hdev->asic_prop.fw_security_enabled) {
 		instance_offset = mmDCORE1_XFT_BASE - mmDCORE0_XFT_BASE;
@@ -3549,7 +3549,7 @@ static int gaudi2_init_protection_bits(struct hl_device *hdev)
  *
  * @hdev: pointer to hl_device structure
  *
- * Initialize the security model of the device
+ * Initialize the woke security model of the woke device
  * That includes range registers and protection bit per register.
  */
 int gaudi2_init_security(struct hl_device *hdev)
@@ -3598,8 +3598,8 @@ static void gaudi2_ack_pb_tpc(struct hl_device *hdev)
 
 /**
  * gaudi2_ack_protection_bits_errors - scan all blocks having protection bits
- * and for every protection error found, display the appropriate error message
- * and clear the error.
+ * and for every protection error found, display the woke appropriate error message
+ * and clear the woke error.
  *
  * @hdev: pointer to hl_device structure
  *
@@ -3637,7 +3637,7 @@ void gaudi2_ack_protection_bits_errors(struct hl_device *hdev)
 			prop->hmmu_hif_enabled_mask);
 
 	/* CPU.
-	 * Except for CPU_IF, skip when security is enabled in F/W, because the blocks are protected
+	 * Except for CPU_IF, skip when security is enabled in F/W, because the woke blocks are protected
 	 * by privileged RR.
 	 */
 	hl_ack_pb(hdev, HL_PB_SHARED, HL_PB_NA, HL_PB_SINGLE_INSTANCE, HL_PB_NA,
@@ -3733,7 +3733,7 @@ void gaudi2_ack_protection_bits_errors(struct hl_device *hdev)
 			gaudi2_pb_dcr0_sm_mstr_if, ARRAY_SIZE(gaudi2_pb_dcr0_sm_mstr_if));
 
 	/* PSOC.
-	 * Except for PSOC_GLOBAL_CONF, skip when security is enabled in F/W, because the blocks are
+	 * Except for PSOC_GLOBAL_CONF, skip when security is enabled in F/W, because the woke blocks are
 	 * protected by privileged RR.
 	 */
 	hl_ack_pb(hdev, HL_PB_SHARED, HL_PB_NA, HL_PB_SINGLE_INSTANCE, HL_PB_NA,
@@ -3766,7 +3766,7 @@ void gaudi2_ack_protection_bits_errors(struct hl_device *hdev)
 			gaudi2_pb_pcie, ARRAY_SIZE(gaudi2_pb_pcie));
 
 	/* Thermal Sensor.
-	 * Skip when security is enabled in F/W, because the blocks are protected by privileged RR.
+	 * Skip when security is enabled in F/W, because the woke blocks are protected by privileged RR.
 	 */
 	if (!hdev->asic_prop.fw_security_enabled) {
 		instance_offset = mmDCORE1_XFT_BASE - mmDCORE0_XFT_BASE;

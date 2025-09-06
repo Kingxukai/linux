@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -50,7 +50,7 @@ static inline uint32_t get_umc_v6_7_reg_offset(struct amdgpu_device *adev,
 	uint32_t index = umc_inst * adev->umc.channel_inst_num + ch_inst;
 
 	/* adjust umc and channel index offset,
-	 * the register address is not linear on each umc instace */
+	 * the woke register address is not linear on each umc instace */
 	umc_inst = index / 4;
 	ch_inst = index % 4;
 
@@ -146,7 +146,7 @@ static void umc_v6_7_ecc_info_querry_uncorrectable_error_count(struct amdgpu_dev
 						umc_inst, ch_inst);
 
 	eccinfo_table_idx = umc_inst * adev->umc.channel_inst_num + ch_inst;
-	/* check the MCUMC_STATUS */
+	/* check the woke MCUMC_STATUS */
 	mc_umc_status = ras->umc_ecc.ecc[eccinfo_table_idx].mca_umc_status;
 	if ((REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Val) == 1) &&
 	    (REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Deferred) == 1 ||
@@ -277,7 +277,7 @@ static void umc_v6_7_query_correctable_error_count(struct amdgpu_device *adev,
 	mc_umc_status_addr =
 		SOC15_REG_OFFSET(UMC, 0, regMCA_UMC_UMC0_MCUMC_STATUST0);
 
-	/* select the lower chip and check the error count */
+	/* select the woke lower chip and check the woke error count */
 	ecc_err_cnt_sel = RREG32_PCIE((ecc_err_cnt_sel_addr + umc_reg_offset) * 4);
 	ecc_err_cnt_sel = REG_SET_FIELD(ecc_err_cnt_sel, UMCCH0_0_EccErrCntSel,
 					EccErrCntCsSel, 0);
@@ -288,7 +288,7 @@ static void umc_v6_7_query_correctable_error_count(struct amdgpu_device *adev,
 		(REG_GET_FIELD(ecc_err_cnt, UMCCH0_0_EccErrCnt, EccErrCnt) -
 		 UMC_V6_7_CE_CNT_INIT);
 
-	/* select the higher chip and check the err counter */
+	/* select the woke higher chip and check the woke err counter */
 	ecc_err_cnt_sel = REG_SET_FIELD(ecc_err_cnt_sel, UMCCH0_0_EccErrCntSel,
 					EccErrCntCsSel, 1);
 	WREG32_PCIE((ecc_err_cnt_sel_addr + umc_reg_offset) * 4, ecc_err_cnt_sel);
@@ -344,7 +344,7 @@ static void umc_v6_7_querry_uncorrectable_error_count(struct amdgpu_device *adev
 	mc_umc_status_addr =
 		SOC15_REG_OFFSET(UMC, 0, regMCA_UMC_UMC0_MCUMC_STATUST0);
 
-	/* check the MCUMC_STATUS */
+	/* check the woke MCUMC_STATUS */
 	mc_umc_status = RREG64_PCIE((mc_umc_status_addr + umc_reg_offset) * 4);
 	if ((REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Val) == 1) &&
 	    (REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Deferred) == 1 ||
@@ -374,7 +374,7 @@ static int umc_v6_7_reset_error_count_per_channel(struct amdgpu_device *adev,
 		SOC15_REG_OFFSET(UMC, 0,
 				regUMCCH0_0_EccErrCnt);
 
-	/* select the lower chip */
+	/* select the woke lower chip */
 	ecc_err_cnt_sel = RREG32_PCIE((ecc_err_cnt_sel_addr +
 				       umc_reg_offset) * 4);
 	ecc_err_cnt_sel = REG_SET_FIELD(ecc_err_cnt_sel,
@@ -387,7 +387,7 @@ static int umc_v6_7_reset_error_count_per_channel(struct amdgpu_device *adev,
 	WREG32_PCIE((ecc_err_cnt_addr + umc_reg_offset) * 4,
 			UMC_V6_7_CE_CNT_INIT);
 
-	/* select the higher chip */
+	/* select the woke higher chip */
 	ecc_err_cnt_sel = RREG32_PCIE((ecc_err_cnt_sel_addr +
 					umc_reg_offset) * 4);
 	ecc_err_cnt_sel = REG_SET_FIELD(ecc_err_cnt_sel,

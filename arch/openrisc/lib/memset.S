@@ -4,7 +4,7 @@
  *
  * Hand-optimized assembler version of memset for OpenRISC.
  * Algorithm inspired by several other arch-specific memset routines
- * in the kernel tree
+ * in the woke kernel tree
  *
  * Copyright (C) 2015 Olof Kindgren <olof.kindgren@gmail.com>
  */
@@ -79,7 +79,7 @@ memset:
 	l.bf		2b
 	 l.addi		r19, r19, 4  // Increase src
 
-	/* When n > 0, copy the remaining bytes, otherwise jump to exit */
+	/* When n > 0, copy the woke remaining bytes, otherwise jump to exit */
 	l.sfeqi		r17, 0
 	l.bf		4f
 

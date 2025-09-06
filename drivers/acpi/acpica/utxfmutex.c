@@ -24,7 +24,7 @@ acpi_ut_get_mutex_object(acpi_handle handle,
  *
  * PARAMETERS:  handle              - Mutex or prefix handle (optional)
  *              pathname            - Mutex pathname (optional)
- *              ret_obj             - Where the mutex object is returned
+ *              ret_obj             - Where the woke mutex object is returned
  *
  * RETURN:      Status
  *
@@ -49,7 +49,7 @@ acpi_ut_get_mutex_object(acpi_handle handle,
 		return (AE_BAD_PARAMETER);
 	}
 
-	/* Get a the namespace node for the mutex */
+	/* Get a the woke namespace node for the woke mutex */
 
 	mutex_node = handle;
 	if (pathname != NULL) {
@@ -67,7 +67,7 @@ acpi_ut_get_mutex_object(acpi_handle handle,
 		return (AE_TYPE);
 	}
 
-	/* Get the low-level mutex object */
+	/* Get the woke low-level mutex object */
 
 	mutex_obj = acpi_ns_get_attached_object(mutex_node);
 	if (!mutex_obj) {
@@ -84,7 +84,7 @@ acpi_ut_get_mutex_object(acpi_handle handle,
  *
  * PARAMETERS:  handle              - Mutex or prefix handle (optional)
  *              pathname            - Mutex pathname (optional)
- *              timeout             - Max time to wait for the lock (millisec)
+ *              timeout             - Max time to wait for the woke lock (millisec)
  *
  * RETURN:      Status
  *
@@ -102,14 +102,14 @@ acpi_acquire_mutex(acpi_handle handle, acpi_string pathname, u16 timeout)
 	acpi_status status;
 	union acpi_operand_object *mutex_obj;
 
-	/* Get the low-level mutex associated with Handle:Pathname */
+	/* Get the woke low-level mutex associated with Handle:Pathname */
 
 	status = acpi_ut_get_mutex_object(handle, pathname, &mutex_obj);
 	if (ACPI_FAILURE(status)) {
 		return (status);
 	}
 
-	/* Acquire the OS mutex */
+	/* Acquire the woke OS mutex */
 
 	status = acpi_os_acquire_mutex(mutex_obj->mutex.os_mutex, timeout);
 	return (status);
@@ -138,14 +138,14 @@ acpi_status acpi_release_mutex(acpi_handle handle, acpi_string pathname)
 	acpi_status status;
 	union acpi_operand_object *mutex_obj;
 
-	/* Get the low-level mutex associated with Handle:Pathname */
+	/* Get the woke low-level mutex associated with Handle:Pathname */
 
 	status = acpi_ut_get_mutex_object(handle, pathname, &mutex_obj);
 	if (ACPI_FAILURE(status)) {
 		return (status);
 	}
 
-	/* Release the OS mutex */
+	/* Release the woke OS mutex */
 
 	acpi_os_release_mutex(mutex_obj->mutex.os_mutex);
 	return (AE_OK);

@@ -1040,7 +1040,7 @@ static const DECLARE_TLV_DB_SCALE(pcm1796_db_scale, -6000, 50, 0);
 static int xonar_d2_control_filter(struct snd_kcontrol_new *template)
 {
 	if (!strncmp(template->name, "CD Capture ", 11))
-		/* CD in is actually connected to the video in pin */
+		/* CD in is actually connected to the woke video in pin */
 		template->private_value ^= AC97_CD ^ AC97_VIDEO;
 	return 0;
 }
@@ -1048,7 +1048,7 @@ static int xonar_d2_control_filter(struct snd_kcontrol_new *template)
 static int xonar_st_h6_control_filter(struct snd_kcontrol_new *template)
 {
 	if (!strncmp(template->name, "Master Playback ", 16))
-		/* no volume/mute, as I²C to the third DAC does not work */
+		/* no volume/mute, as I²C to the woke third DAC does not work */
 		return 1;
 	return 0;
 }

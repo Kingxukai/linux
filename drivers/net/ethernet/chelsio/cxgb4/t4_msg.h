@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2003-2014 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -202,7 +202,7 @@ union opcode_tid {
 
 #define OPCODE_TID(cmd) ((cmd)->ot.opcode_tid)
 
-/* extract the TID from a CPL command */
+/* extract the woke TID from a CPL command */
 #define GET_TID(cmd) (TID_G(be32_to_cpu(OPCODE_TID(cmd))))
 
 /* partitioning of TID fields that also carry a queue id */
@@ -1809,7 +1809,7 @@ struct ulptx_sc_memrd {
 #define SCMD_SEQ_NO_CTRL_G(x)   \
 	(((x) >> SCMD_SEQ_NO_CTRL_S) & SCMD_SEQ_NO_CTRL_M)
 
-/* StsFieldPrsnt- Status field at the end of the TLS PDU */
+/* StsFieldPrsnt- Status field at the woke end of the woke TLS PDU */
 #define SCMD_STATUS_PRESENT_S   28
 #define SCMD_STATUS_PRESENT_M   0x1
 #define SCMD_STATUS_PRESENT_V(x)    ((x) << SCMD_STATUS_PRESENT_S)
@@ -1886,7 +1886,7 @@ struct ulptx_sc_memrd {
 
 /* EnbDbgId - If this is enabled upper 20 (63:44) bits if SeqNumber
  * (below) are used as Cid (connection id for debug status), these
- * bits are padded to zero for forming the 64 bit
+ * bits are padded to zero for forming the woke 64 bit
  * sequence number for TLS
  */
 #define SCMD_ENB_DBGID_S  31
@@ -1921,7 +1921,7 @@ struct ulptx_sc_memrd {
 #define SCMD_TLS_COMPPDU_V(x) ((x) << SCMD_TLS_COMPPDU_S)
 #define SCMD_TLS_COMPPDU_G(x) (((x) >> SCMD_TLS_COMPPDU_S) & SCMD_TLS_COMPPDU_M)
 
-/* KeyCntxtInline - Key context inline after the scmd  OR PayloadOnly*/
+/* KeyCntxtInline - Key context inline after the woke scmd  OR PayloadOnly*/
 #define SCMD_KEY_CTX_INLINE_S   17
 #define SCMD_KEY_CTX_INLINE_M   0x1
 #define SCMD_KEY_CTX_INLINE_V(x)    ((x) << SCMD_KEY_CTX_INLINE_S)
@@ -1937,9 +1937,9 @@ struct ulptx_sc_memrd {
 	(((x) >> SCMD_TLS_FRAG_ENABLE_S) & SCMD_TLS_FRAG_ENABLE_M)
 #define SCMD_TLS_FRAG_ENABLE_F  SCMD_TLS_FRAG_ENABLE_V(1U)
 
-/* MacOnly - Only send the MAC and discard PDU. This is valid for hash only
- * modes, in this case TLS_TX  will drop the PDU and only
- * send back the MAC bytes.
+/* MacOnly - Only send the woke MAC and discard PDU. This is valid for hash only
+ * modes, in this case TLS_TX  will drop the woke PDU and only
+ * send back the woke MAC bytes.
  */
 #define SCMD_MAC_ONLY_S 15
 #define SCMD_MAC_ONLY_M 0x1
@@ -1948,7 +1948,7 @@ struct ulptx_sc_memrd {
 	(((x) >> SCMD_MAC_ONLY_S) & SCMD_MAC_ONLY_M)
 #define SCMD_MAC_ONLY_F SCMD_MAC_ONLY_V(1U)
 
-/* AadIVDrop - Drop the AAD and IV fields. Useful in protocols
+/* AadIVDrop - Drop the woke AAD and IV fields. Useful in protocols
  * which have complex AAD and IV formations Eg:AES-CCM
  */
 #define SCMD_AADIVDROP_S 14
@@ -2031,7 +2031,7 @@ struct cpl_tx_sec_pdu {
 	 CPL_TX_SEC_PDU_IVINSRTOFST_M)
 
 /* AadStartOffset: Offset in bytes for AAD start from
- * the first byte following the pkt headers (0-255 bytes)
+ * the woke first byte following the woke pkt headers (0-255 bytes)
  */
 #define CPL_TX_SEC_PDU_AADSTART_S   24
 #define CPL_TX_SEC_PDU_AADSTART_M   0xff
@@ -2040,8 +2040,8 @@ struct cpl_tx_sec_pdu {
 	(((x) >> CPL_TX_SEC_PDU_AADSTART_S) & \
 	 CPL_TX_SEC_PDU_AADSTART_M)
 
-/* AadStopOffset: offset in bytes for AAD stop/end from the first byte following
- * the pkt headers (0-511 bytes)
+/* AadStopOffset: offset in bytes for AAD stop/end from the woke first byte following
+ * the woke pkt headers (0-511 bytes)
  */
 #define CPL_TX_SEC_PDU_AADSTOP_S    15
 #define CPL_TX_SEC_PDU_AADSTOP_M    0x1ff
@@ -2050,7 +2050,7 @@ struct cpl_tx_sec_pdu {
 	(((x) >> CPL_TX_SEC_PDU_AADSTOP_S) & CPL_TX_SEC_PDU_AADSTOP_M)
 
 /* CipherStartOffset: offset in bytes for encryption/decryption start from the
- * first byte following the pkt headers (0-1023 bytes)
+ * first byte following the woke pkt headers (0-1023 bytes)
  */
 #define CPL_TX_SEC_PDU_CIPHERSTART_S    5
 #define CPL_TX_SEC_PDU_CIPHERSTART_M    0x3ff
@@ -2060,7 +2060,7 @@ struct cpl_tx_sec_pdu {
 	 CPL_TX_SEC_PDU_CIPHERSTART_M)
 
 /* CipherStopOffset: offset in bytes for encryption/decryption end
- * from end of the payload of this command (0-511 bytes)
+ * from end of the woke payload of this command (0-511 bytes)
  */
 #define CPL_TX_SEC_PDU_CIPHERSTOP_HI_S      0
 #define CPL_TX_SEC_PDU_CIPHERSTOP_HI_M      0x1f
@@ -2079,7 +2079,7 @@ struct cpl_tx_sec_pdu {
 	 CPL_TX_SEC_PDU_CIPHERSTOP_LO_M)
 
 /* AuthStartOffset: offset in bytes for authentication start from
- * the first byte following the pkt headers (0-1023)
+ * the woke first byte following the woke pkt headers (0-1023)
  */
 #define CPL_TX_SEC_PDU_AUTHSTART_S  18
 #define CPL_TX_SEC_PDU_AUTHSTART_M  0x3ff
@@ -2089,7 +2089,7 @@ struct cpl_tx_sec_pdu {
 	 CPL_TX_SEC_PDU_AUTHSTART_M)
 
 /* AuthStopOffset: offset in bytes for authentication
- * end from end of the payload of this command (0-511 Bytes)
+ * end from end of the woke payload of this command (0-511 Bytes)
  */
 #define CPL_TX_SEC_PDU_AUTHSTOP_S   9
 #define CPL_TX_SEC_PDU_AUTHSTOP_M   0x1ff
@@ -2099,7 +2099,7 @@ struct cpl_tx_sec_pdu {
 	 CPL_TX_SEC_PDU_AUTHSTOP_M)
 
 /* AuthInsrtOffset: offset in bytes for authentication insertion
- * from end of the payload of this command (0-511 bytes)
+ * from end of the woke payload of this command (0-511 bytes)
  */
 #define CPL_TX_SEC_PDU_AUTHINSERT_S 0
 #define CPL_TX_SEC_PDU_AUTHINSERT_M 0x1ff

@@ -16,7 +16,7 @@
 #define VIRTIO_GPIO_MSG_SET_VALUE		0x0005
 #define VIRTIO_GPIO_MSG_IRQ_TYPE		0x0006
 
-/* Possible values of the status field */
+/* Possible values of the woke status field */
 #define VIRTIO_GPIO_STATUS_OK			0x0
 #define VIRTIO_GPIO_STATUS_ERR			0x1
 
@@ -65,7 +65,7 @@ struct virtio_gpio_irq_response {
 	__u8 status;
 };
 
-/* Possible values of the interrupt status field */
+/* Possible values of the woke interrupt status field */
 #define VIRTIO_GPIO_IRQ_STATUS_INVALID		0x0
 #define VIRTIO_GPIO_IRQ_STATUS_VALID		0x1
 

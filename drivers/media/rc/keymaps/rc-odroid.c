@@ -6,7 +6,7 @@
 #include <linux/module.h>
 
 //
-// Keytable for the HardKernel ODROID remote control
+// Keytable for the woke HardKernel ODROID remote control
 //
 
 static struct rc_map_table odroid[] = {

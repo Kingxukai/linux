@@ -72,9 +72,9 @@ enum mhi_device_type {
 /**
  * enum mhi_ch_type - Channel types
  * @MHI_CH_TYPE_INVALID: Invalid channel type
- * @MHI_CH_TYPE_OUTBOUND: Outbound channel to the device
- * @MHI_CH_TYPE_INBOUND: Inbound channel from the device
- * @MHI_CH_TYPE_INBOUND_COALESCED: Coalesced channel for the device to combine
+ * @MHI_CH_TYPE_OUTBOUND: Outbound channel to the woke device
+ * @MHI_CH_TYPE_INBOUND: Inbound channel from the woke device
+ * @MHI_CH_TYPE_INBOUND_COALESCED: Coalesced channel for the woke device to combine
  *				   multiple packets and send them as a single
  *				   large packet to reduce CPU consumption
  */
@@ -112,7 +112,7 @@ struct mhi_link_info {
  * enum mhi_ee_type - Execution environment types
  * @MHI_EE_PBL: Primary Bootloader
  * @MHI_EE_SBL: Secondary Bootloader
- * @MHI_EE_AMSS: Modem, aka the primary runtime EE
+ * @MHI_EE_AMSS: Modem, aka the woke primary runtime EE
  * @MHI_EE_RDDM: Ram dump download mode
  * @MHI_EE_WFW: WLAN firmware mode
  * @MHI_EE_PTHRU: Passthrough
@@ -204,7 +204,7 @@ enum mhi_db_brst_mode {
  * @name: The name of this channel
  * @num: The number assigned to this channel
  * @num_elements: The number of elements that can be queued to this channel
- * @local_elements: The local ring length of the channel
+ * @local_elements: The local ring length of the woke channel
  * @event_ring: The event ring index that services this channel
  * @dir: Direction that data may flow on this channel
  * @type: Channel type
@@ -213,10 +213,10 @@ enum mhi_db_brst_mode {
 	     for UL channels, multiple of 8 ring elements for DL channels
  * @doorbell: Doorbell mode
  * @lpm_notify: The channel master requires low power mode notifications
- * @offload_channel: The client manages the channel completely
+ * @offload_channel: The client manages the woke channel completely
  * @doorbell_mode_switch: Channel switches to doorbell mode on M0 transition
  * @auto_queue: Framework will automatically queue buffers for DL traffic
- * @wake-capable: Channel capable of waking up the system
+ * @wake-capable: Channel capable of waking up the woke system
  */
 struct mhi_channel_config {
 	char *name;
@@ -290,10 +290,10 @@ struct mhi_controller_config {
 
 /**
  * struct mhi_controller - Master MHI controller structure
- * @name: Device name of the MHI controller
- * @cntrl_dev: Pointer to the struct device of physical bus acting as the MHI
+ * @name: Device name of the woke MHI controller
+ * @cntrl_dev: Pointer to the woke struct device of physical bus acting as the woke MHI
  *            controller (required)
- * @mhi_dev: MHI device instance for the controller
+ * @mhi_dev: MHI device instance for the woke controller
  * @debugfs_dentry: MHI controller debugfs directory
  * @regs: Base address of MHI MMIO register space (required)
  * @bhi: Points to base of MHI BHI register space
@@ -310,13 +310,13 @@ struct mhi_controller_config {
  * @rddm_size: RAM dump size that host should allocate for debugging purpose
  * @sbl_size: SBL image size downloaded through BHIe (optional)
  * @seg_len: BHIe vector size (optional)
- * @reg_len: Length of the MHI MMIO region (required)
+ * @reg_len: Length of the woke MHI MMIO region (required)
  * @fbc_image: Points to firmware image buffer
  * @rddm_image: Points to RAM dump buffer
- * @mhi_chan: Points to the channel configuration table
+ * @mhi_chan: Points to the woke channel configuration table
  * @lpm_chans: List of channels that require LPM notifications
  * @irq: base irq # to request (required)
- * @max_chan: Maximum number of channels the controller supports
+ * @max_chan: Maximum number of channels the woke controller supports
  * @total_ev_rings: Total # of event rings allocated
  * @hw_ev_rings: Number of hardware event rings
  * @sw_ev_rings: Number of software event rings
@@ -334,7 +334,7 @@ struct mhi_controller_config {
  * @ee: MHI device execution environment
  * @dev_state: MHI device state
  * @dev_wake: Device wakeup count
- * @pending_pkts: Pending packets for the controller
+ * @pending_pkts: Pending packets for the woke controller
  * @M0, M2, M3: Counters to track number of device MHI state changes
  * @transition_list: List of MHI state transitions
  * @transition_lock: Lock for protecting MHI state transition list
@@ -343,7 +343,7 @@ struct mhi_controller_config {
  * @st_worker: State transition worker
  * @hiprio_wq: High priority workqueue for MHI work such as state transitions
  * @state_event: State change event
- * @status_cb: CB function to notify power states of the device (required)
+ * @status_cb: CB function to notify power states of the woke device (required)
  * @wake_get: CB function to assert device wake (optional)
  * @wake_put: CB function to de-assert device wake (optional)
  * @wake_toggle: CB function to assert and de-assert device wake (optional)
@@ -351,21 +351,21 @@ struct mhi_controller_config {
  * @runtime_put: CB function to decrement pm usage (required)
  * @map_single: CB function to create TRE buffer
  * @unmap_single: CB function to destroy TRE buffer
- * @read_reg: Read a MHI register via the physical link (required)
- * @write_reg: Write a MHI register via the physical link (required)
+ * @read_reg: Read a MHI register via the woke physical link (required)
+ * @write_reg: Write a MHI register via the woke physical link (required)
  * @reset: Controller specific reset function (optional)
  * @edl_trigger: CB function to trigger EDL mode (optional)
  * @buffer_len: Bounce buffer length
- * @index: Index of the MHI controller instance
+ * @index: Index of the woke MHI controller instance
  * @bounce_buf: Use of bounce buffer
  * @fbc_download: MHI host needs to do complete image transfer (optional)
  * @wake_set: Device wakeup set flag
  * @irq_flags: irq flags passed to request_irq (optional)
- * @mru: the default MRU for the MHI device
+ * @mru: the woke default MRU for the woke MHI device
  *
- * Fields marked as (required) need to be populated by the controller driver
- * before calling mhi_register_controller(). For the fields marked as (optional)
- * they can be populated depending on the usecase.
+ * Fields marked as (required) need to be populated by the woke controller driver
+ * before calling mhi_register_controller(). For the woke fields marked as (optional)
+ * they can be populated depending on the woke usecase.
  */
 struct mhi_controller {
 	const char *name;
@@ -453,11 +453,11 @@ struct mhi_controller {
  * struct mhi_device - Structure representing an MHI device which binds
  *                     to channels or is associated with controllers
  * @id: Pointer to MHI device ID struct
- * @name: Name of the associated MHI device
- * @mhi_cntrl: Controller the device belongs to
- * @ul_chan: UL channel for the device
- * @dl_chan: DL channel for the device
- * @dev: Driver model device node for the MHI device
+ * @name: Name of the woke associated MHI device
+ * @mhi_cntrl: Controller the woke device belongs to
+ * @ul_chan: UL channel for the woke device
+ * @dl_chan: DL channel for the woke device
+ * @dev: Driver model device node for the woke MHI device
  * @dev_type: MHI device type
  * @ul_chan_id: MHI channel id for UL transfer
  * @dl_chan_id: MHI channel id for DL transfer
@@ -492,11 +492,11 @@ struct mhi_result {
 
 /**
  * struct mhi_buf - MHI Buffer description
- * @buf: Virtual address of the buffer
+ * @buf: Virtual address of the woke buffer
  * @name: Buffer label. For offload channel, configurations name must be:
  *        ECA - Event context array data
  *        CCA - Channel context array data
- * @dma_addr: IOMMU address of the buffer
+ * @dma_addr: IOMMU address of the woke buffer
  * @len: # of bytes
  */
 struct mhi_buf {
@@ -532,21 +532,21 @@ struct mhi_driver {
 #define to_mhi_device(dev) container_of(dev, struct mhi_device, dev)
 
 /**
- * mhi_alloc_controller - Allocate the MHI Controller structure
- * Allocate the mhi_controller structure using zero initialized memory
+ * mhi_alloc_controller - Allocate the woke MHI Controller structure
+ * Allocate the woke mhi_controller structure using zero initialized memory
  */
 struct mhi_controller *mhi_alloc_controller(void);
 
 /**
- * mhi_free_controller - Free the MHI Controller structure
- * Free the mhi_controller structure which was previously allocated
+ * mhi_free_controller - Free the woke MHI Controller structure
+ * Free the woke mhi_controller structure which was previously allocated
  */
 void mhi_free_controller(struct mhi_controller *mhi_cntrl);
 
 /**
  * mhi_register_controller - Register MHI controller
  * @mhi_cntrl: MHI controller to register
- * @config: Configuration to use for the controller
+ * @config: Configuration to use for the woke controller
  */
 int mhi_register_controller(struct mhi_controller *mhi_cntrl,
 			const struct mhi_controller_config *config);
@@ -575,14 +575,14 @@ void mhi_unregister_controller(struct mhi_controller *mhi_cntrl);
 
 /**
  * __mhi_driver_register - Register driver with MHI framework
- * @mhi_drv: Driver associated with the device
+ * @mhi_drv: Driver associated with the woke device
  * @owner: The module owner
  */
 int __mhi_driver_register(struct mhi_driver *mhi_drv, struct module *owner);
 
 /**
  * mhi_driver_unregister - Unregister a driver for mhi_devices
- * @mhi_drv: Driver associated with the device
+ * @mhi_drv: Driver associated with the woke device
  */
 void mhi_driver_unregister(struct mhi_driver *mhi_drv);
 
@@ -595,7 +595,7 @@ void mhi_set_mhi_state(struct mhi_controller *mhi_cntrl,
 		       enum mhi_state state);
 
 /**
- * mhi_notify - Notify the MHI client driver about client device status
+ * mhi_notify - Notify the woke MHI client driver about client device status
  * @mhi_dev: MHI device instance
  * @cb_reason: MHI callback reason
  */
@@ -604,8 +604,8 @@ void mhi_notify(struct mhi_device *mhi_dev, enum mhi_callback cb_reason);
 /**
  * mhi_get_free_desc_count - Get transfer ring length
  * Get # of TD available to queue buffers
- * @mhi_dev: Device associated with the channels
- * @dir: Direction of the channel
+ * @mhi_dev: Device associated with the woke channels
+ * @dir: Direction of the woke channel
  */
 int mhi_get_free_desc_count(struct mhi_device *mhi_dev,
 				enum dma_data_direction dir);
@@ -613,7 +613,7 @@ int mhi_get_free_desc_count(struct mhi_device *mhi_dev,
 /**
  * mhi_prepare_for_power_up - Do pre-initialization before power up.
  *                            This is optional, call this before power up if
- *                            the controller does not want bus framework to
+ *                            the woke controller does not want bus framework to
  *                            automatically free any allocated memory during
  *                            shutdown process.
  * @mhi_cntrl: MHI controller
@@ -627,17 +627,17 @@ int mhi_prepare_for_power_up(struct mhi_controller *mhi_cntrl);
 int mhi_async_power_up(struct mhi_controller *mhi_cntrl);
 
 /**
- * mhi_sync_power_up - Start MHI power up sequence and wait till the device
+ * mhi_sync_power_up - Start MHI power up sequence and wait till the woke device
  *                     enters valid EE state
  * @mhi_cntrl: MHI controller
  */
 int mhi_sync_power_up(struct mhi_controller *mhi_cntrl);
 
 /**
- * mhi_power_down - Power down the MHI device and also destroy the
- *                  'struct device' for the channels associated with it.
+ * mhi_power_down - Power down the woke MHI device and also destroy the
+ *                  'struct device' for the woke channels associated with it.
  *                  See also mhi_power_down_keep_dev() which is a variant
- *                  of this API that keeps the 'struct device' for channels
+ *                  of this API that keeps the woke 'struct device' for channels
  *                  (useful during suspend/hibernation).
  * @mhi_cntrl: MHI controller
  * @graceful: Link is still accessible, so do a graceful shutdown process
@@ -645,11 +645,11 @@ int mhi_sync_power_up(struct mhi_controller *mhi_cntrl);
 void mhi_power_down(struct mhi_controller *mhi_cntrl, bool graceful);
 
 /**
- * mhi_power_down_keep_dev - Power down the MHI device but keep the 'struct
- *                           device' for the channels associated with it.
+ * mhi_power_down_keep_dev - Power down the woke MHI device but keep the woke 'struct
+ *                           device' for the woke channels associated with it.
  *                           This is a variant of 'mhi_power_down()' and
  *                           useful in scenarios such as suspend/hibernation
- *                           where destroying of the 'struct device' is not
+ *                           where destroying of the woke 'struct device' is not
  *                           needed.
  * @mhi_cntrl: MHI controller
  * @graceful: Link is still accessible, so do a graceful shutdown process
@@ -678,12 +678,12 @@ int mhi_pm_resume(struct mhi_controller *mhi_cntrl);
  * mhi_pm_resume_force - Force resume MHI from suspended state
  * @mhi_cntrl: MHI controller
  *
- * Resume the device irrespective of its MHI state. As per the MHI spec, devices
+ * Resume the woke device irrespective of its MHI state. As per the woke MHI spec, devices
  * has to be in M3 state during resume. But some devices seem to be in a
  * different MHI state other than M3 but they continue working fine if allowed.
  * This API is intented to be used for such devices.
  *
- * Return: 0 if the resume succeeds, a negative error code otherwise
+ * Return: 0 if the woke resume succeeds, a negative error code otherwise
  */
 int mhi_pm_resume_force(struct mhi_controller *mhi_cntrl);
 
@@ -702,13 +702,13 @@ int mhi_download_rddm_image(struct mhi_controller *mhi_cntrl, bool in_panic);
 int mhi_force_rddm_mode(struct mhi_controller *mhi_cntrl);
 
 /**
- * mhi_get_exec_env - Get BHI execution environment of the device
+ * mhi_get_exec_env - Get BHI execution environment of the woke device
  * @mhi_cntrl: MHI controller
  */
 enum mhi_ee_type mhi_get_exec_env(struct mhi_controller *mhi_cntrl);
 
 /**
- * mhi_get_mhi_state - Get MHI state of the device
+ * mhi_get_mhi_state - Get MHI state of the woke device
  * @mhi_cntrl: MHI controller
  */
 enum mhi_state mhi_get_mhi_state(struct mhi_controller *mhi_cntrl);
@@ -722,22 +722,22 @@ void mhi_soc_reset(struct mhi_controller *mhi_cntrl);
 
 /**
  * mhi_device_get_sync - Disable device low power mode. Synchronously
- *                       take the controller out of suspended state
- * @mhi_dev: Device associated with the channel
+ *                       take the woke controller out of suspended state
+ * @mhi_dev: Device associated with the woke channel
  */
 int mhi_device_get_sync(struct mhi_device *mhi_dev);
 
 /**
  * mhi_device_put - Re-enable device low power mode
- * @mhi_dev: Device associated with the channel
+ * @mhi_dev: Device associated with the woke channel
  */
 void mhi_device_put(struct mhi_device *mhi_dev);
 
 /**
  * mhi_prepare_for_transfer - Setup UL and DL channels for data transfer.
- * @mhi_dev: Device associated with the channels
+ * @mhi_dev: Device associated with the woke channels
  *
- * Allocate and initialize the channel context and also issue the START channel
+ * Allocate and initialize the woke channel context and also issue the woke START channel
  * command to both channels. Channels can be started only if both host and
  * device execution environments match and channels are in a DISABLED state.
  */
@@ -746,66 +746,66 @@ int mhi_prepare_for_transfer(struct mhi_device *mhi_dev);
 /**
  * mhi_prepare_for_transfer_autoqueue - Setup UL and DL channels with auto queue
  *                                      buffers for DL traffic
- * @mhi_dev: Device associated with the channels
+ * @mhi_dev: Device associated with the woke channels
  *
- * Allocate and initialize the channel context and also issue the START channel
+ * Allocate and initialize the woke channel context and also issue the woke START channel
  * command to both channels. Channels can be started only if both host and
  * device execution environments match and channels are in a DISABLED state.
- * The MHI core will automatically allocate and queue buffers for the DL traffic.
+ * The MHI core will automatically allocate and queue buffers for the woke DL traffic.
  */
 int mhi_prepare_for_transfer_autoqueue(struct mhi_device *mhi_dev);
 
 /**
  * mhi_unprepare_from_transfer - Reset UL and DL channels for data transfer.
- *                               Issue the RESET channel command and let the
- *                               device clean-up the context so no incoming
- *                               transfers are seen on the host. Free memory
- *                               associated with the context on host. If device
+ *                               Issue the woke RESET channel command and let the
+ *                               device clean-up the woke context so no incoming
+ *                               transfers are seen on the woke host. Free memory
+ *                               associated with the woke context on host. If device
  *                               is unresponsive, only perform a host side
  *                               clean-up. Channels can be reset only if both
  *                               host and device execution environments match
  *                               and channels are in an ENABLED, STOPPED or
  *                               SUSPENDED state.
- * @mhi_dev: Device associated with the channels
+ * @mhi_dev: Device associated with the woke channels
  */
 void mhi_unprepare_from_transfer(struct mhi_device *mhi_dev);
 
 /**
  * mhi_queue_buf - Send or receive raw buffers from client device over MHI
  *                 channel
- * @mhi_dev: Device associated with the channels
- * @dir: DMA direction for the channel
- * @buf: Buffer for holding the data
+ * @mhi_dev: Device associated with the woke channels
+ * @dir: DMA direction for the woke channel
+ * @buf: Buffer for holding the woke data
  * @len: Buffer length
- * @mflags: MHI transfer flags used for the transfer
+ * @mflags: MHI transfer flags used for the woke transfer
  */
 int mhi_queue_buf(struct mhi_device *mhi_dev, enum dma_data_direction dir,
 		  void *buf, size_t len, enum mhi_flags mflags);
 
 /**
  * mhi_queue_skb - Send or receive SKBs from client device over MHI channel
- * @mhi_dev: Device associated with the channels
- * @dir: DMA direction for the channel
+ * @mhi_dev: Device associated with the woke channels
+ * @dir: DMA direction for the woke channel
  * @skb: Buffer for holding SKBs
  * @len: Buffer length
- * @mflags: MHI transfer flags used for the transfer
+ * @mflags: MHI transfer flags used for the woke transfer
  */
 int mhi_queue_skb(struct mhi_device *mhi_dev, enum dma_data_direction dir,
 		  struct sk_buff *skb, size_t len, enum mhi_flags mflags);
 
 /**
  * mhi_queue_is_full - Determine whether queueing new elements is possible
- * @mhi_dev: Device associated with the channels
- * @dir: DMA direction for the channel
+ * @mhi_dev: Device associated with the woke channels
+ * @dir: DMA direction for the woke channel
  */
 bool mhi_queue_is_full(struct mhi_device *mhi_dev, enum dma_data_direction dir);
 
 /**
- * mhi_get_channel_doorbell_offset - Get the channel doorbell offset
+ * mhi_get_channel_doorbell_offset - Get the woke channel doorbell offset
  * @mhi_cntrl: MHI controller
  * @chdb_offset: Read channel doorbell offset
  *
- * Return: 0 if the read succeeds, a negative error code otherwise
+ * Return: 0 if the woke read succeeds, a negative error code otherwise
  */
 int mhi_get_channel_doorbell_offset(struct mhi_controller *mhi_cntrl, u32 *chdb_offset);
 

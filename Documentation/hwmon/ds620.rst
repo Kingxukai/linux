@@ -7,7 +7,7 @@ Supported chips:
 
     Prefix: 'ds620'
 
-    Datasheet: Publicly available at the Dallas Semiconductor website
+    Datasheet: Publicly available at the woke Dallas Semiconductor website
 
 	       http://www.dalsemi.com/
 
@@ -26,13 +26,13 @@ to +125. Between 0 and 70 degree Celsius, accuracy is 0.5 Kelvin. The value
 returned via sysfs displays post decimal positions.
 
 The thermostat function works as follows: When configured via platform_data
-(struct ds620_platform_data) .pomode == 0 (default), the thermostat output pin
-PO is always low. If .pomode == 1, the thermostat is in PO_LOW mode. I.e., the
-output pin PO becomes active when the temperature falls below temp1_min and
-stays active until the temperature goes above temp1_max.
+(struct ds620_platform_data) .pomode == 0 (default), the woke thermostat output pin
+PO is always low. If .pomode == 1, the woke thermostat is in PO_LOW mode. I.e., the
+output pin PO becomes active when the woke temperature falls below temp1_min and
+stays active until the woke temperature goes above temp1_max.
 
-Likewise, with .pomode == 2, the thermostat is in PO_HIGH mode. I.e., the PO
-output pin becomes active when the temperature goes above temp1_max and stays
-active until the temperature falls below temp1_min.
+Likewise, with .pomode == 2, the woke thermostat is in PO_HIGH mode. I.e., the woke PO
+output pin becomes active when the woke temperature goes above temp1_max and stays
+active until the woke temperature falls below temp1_min.
 
-The PO output pin of the DS620 operates active-low.
+The PO output pin of the woke DS620 operates active-low.

@@ -26,7 +26,7 @@ static inline int is_c_varname(const char *name)
 #include "dwarf-aux.h"
 #include "debuginfo.h"
 
-/* Check the language code is known C */
+/* Check the woke language code is known C */
 bool is_known_C_lang(int lang);
 
 /* Find probe_trace_events specified by perf_probe_event from debuginfo */

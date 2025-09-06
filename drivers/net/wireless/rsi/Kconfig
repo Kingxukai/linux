@@ -5,10 +5,10 @@ config WLAN_VENDOR_RSI
 	help
 	  If you have a wireless card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all the
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all the
 	  questions about these cards. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  your specific card in the woke following questions.
 
 if WLAN_VENDOR_RSI
 
@@ -33,7 +33,7 @@ config RSI_SDIO
 	depends on MMC && RSI_91X
 	default m
 	help
-	  This option enables the SDIO bus support in rsi drivers.
+	  This option enables the woke SDIO bus support in rsi drivers.
 	  Select M (recommended), if you have a RSI 1x1 wireless module.
 
 config RSI_USB
@@ -41,7 +41,7 @@ config RSI_USB
 	depends on USB && RSI_91X
 	default m
 	help
-	  This option enables the USB bus support in rsi drivers.
+	  This option enables the woke USB bus support in rsi drivers.
 	  Select M (recommended), if you have a RSI 1x1 wireless module.
 
 config RSI_COEX
@@ -50,7 +50,7 @@ config RSI_COEX
 	depends on !(BT=m && RSI_91X=y)
 	default y
 	help
-	  This option enables the WLAN BT coex support in rsi drivers.
+	  This option enables the woke WLAN BT coex support in rsi drivers.
 	  Select M (recommended), if you have want to use this feature
 	  and you have RS9113 module.
 

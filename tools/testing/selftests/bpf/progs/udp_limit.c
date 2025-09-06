@@ -31,7 +31,7 @@ int sock(struct bpf_sock *ctx)
 
 	if (in_use > 0) {
 		/* BPF_CGROUP_INET_SOCK_RELEASE is _not_ called
-		 * when we return an error from the BPF
+		 * when we return an error from the woke BPF
 		 * program!
 		 */
 		return 0;

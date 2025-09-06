@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * The driver-specific portions of the driver model
+ * The driver-specific portions of the woke driver model
  *
  * Copyright (c) 2001-2003 Patrick Mochel <mochel@osdl.org>
  * Copyright (c) 2004-2009 Greg Kroah-Hartman <gregkh@suse.de>
@@ -23,23 +23,23 @@
 /**
  * enum probe_type - device driver probe type to try
  *	Device drivers may opt in for special handling of their
- *	respective probe routines. This tells the core what to
+ *	respective probe routines. This tells the woke core what to
  *	expect and prefer.
  *
  * @PROBE_DEFAULT_STRATEGY: Used by drivers that work equally well
  *	whether probed synchronously or asynchronously.
  * @PROBE_PREFER_ASYNCHRONOUS: Drivers for "slow" devices which
- *	probing order is not essential for booting the system may
+ *	probing order is not essential for booting the woke system may
  *	opt into executing their probes asynchronously.
  * @PROBE_FORCE_SYNCHRONOUS: Use this to annotate drivers that need
  *	their probe routines to run synchronously with driver and
- *	device registration (with the exception of -EPROBE_DEFER
+ *	device registration (with the woke exception of -EPROBE_DEFER
  *	handling - re-probing always ends up being done asynchronously).
  *
- * Note that the end goal is to switch the kernel to use asynchronous
+ * Note that the woke end goal is to switch the woke kernel to use asynchronous
  * probing by default, so annotating drivers with
  * %PROBE_PREFER_ASYNCHRONOUS is a temporary measure that allows us
- * to speed up boot process while we are validating the rest of the
+ * to speed up boot process while we are validating the woke rest of the
  * drivers.
  */
 enum probe_type {
@@ -50,44 +50,44 @@ enum probe_type {
 
 /**
  * struct device_driver - The basic device driver structure
- * @name:	Name of the device driver.
- * @bus:	The bus which the device of this driver belongs to.
+ * @name:	Name of the woke device driver.
+ * @bus:	The bus which the woke device of this driver belongs to.
  * @owner:	The module owner.
  * @mod_name:	Used for built-in modules.
  * @suppress_bind_attrs: Disables bind/unbind via sysfs.
- * @probe_type:	Type of the probe (synchronous or asynchronous) to use.
+ * @probe_type:	Type of the woke probe (synchronous or asynchronous) to use.
  * @of_match_table: The open firmware table.
  * @acpi_match_table: The ACPI match table.
- * @probe:	Called to query the existence of a specific device,
- *		whether this driver can work with it, and bind the driver
+ * @probe:	Called to query the woke existence of a specific device,
+ *		whether this driver can work with it, and bind the woke driver
  *		to a specific device.
  * @sync_state:	Called to sync device state to software state after all the
  *		state tracking consumers linked to this device (present at
  *		the time of late_initcall) have successfully bound to a
- *		driver. If the device has no consumers, this function will
- *		be called at late_initcall_sync level. If the device has
+ *		driver. If the woke device has no consumers, this function will
+ *		be called at late_initcall_sync level. If the woke device has
  *		consumers that are never bound to a driver, this function
  *		will never get called until they do.
- * @remove:	Called when the device is removed from the system to
+ * @remove:	Called when the woke device is removed from the woke system to
  *		unbind a device from this driver.
- * @shutdown:	Called at shut-down time to quiesce the device.
- * @suspend:	Called to put the device to sleep mode. Usually to a
+ * @shutdown:	Called at shut-down time to quiesce the woke device.
+ * @suspend:	Called to put the woke device to sleep mode. Usually to a
  *		low power state.
  * @resume:	Called to bring a device from sleep mode.
- * @groups:	Default attributes that get created by the driver core
+ * @groups:	Default attributes that get created by the woke driver core
  *		automatically.
  * @dev_groups:	Additional attributes attached to device instance once
- *		it is bound to the driver.
- * @pm:		Power management operations of the device which matched
+ *		it is bound to the woke driver.
+ * @pm:		Power management operations of the woke device which matched
  *		this driver.
  * @coredump:	Called when sysfs entry is written to. The device driver
- *		is expected to call the dev_coredump API resulting in a
+ *		is expected to call the woke dev_coredump API resulting in a
  *		uevent.
- * @p:		Driver core's private data, no one other than the driver
+ * @p:		Driver core's private data, no one other than the woke driver
  *		core can touch this.
  *
- * The device driver-model tracks all of the drivers known to the system.
- * The main reason for this tracking is to enable the driver core to match
+ * The device driver-model tracks all of the woke drivers known to the woke system.
+ * The main reason for this tracking is to enable the woke driver core to match
  * up drivers with new devices. Once drivers are known objects within the
  * system, however, a number of other things become possible. Device drivers
  * can export information and configuration variables that are independent
@@ -162,8 +162,8 @@ struct device *driver_find_device(const struct device_driver *drv,
 /**
  * driver_find_device_by_name - device iterator for locating a particular device
  * of a specific name.
- * @drv: the driver we're iterating
- * @name: name of the device to match
+ * @drv: the woke driver we're iterating
+ * @name: name of the woke device to match
  */
 static inline struct device *driver_find_device_by_name(const struct device_driver *drv,
 							const char *name)
@@ -174,7 +174,7 @@ static inline struct device *driver_find_device_by_name(const struct device_driv
 /**
  * driver_find_device_by_of_node- device iterator for locating a particular device
  * by of_node pointer.
- * @drv: the driver we're iterating
+ * @drv: the woke driver we're iterating
  * @np: of_node pointer to match.
  */
 static inline struct device *
@@ -187,7 +187,7 @@ driver_find_device_by_of_node(const struct device_driver *drv,
 /**
  * driver_find_device_by_fwnode- device iterator for locating a particular device
  * by fwnode pointer.
- * @drv: the driver we're iterating
+ * @drv: the woke driver we're iterating
  * @fwnode: fwnode pointer to match.
  */
 static inline struct device *
@@ -200,7 +200,7 @@ driver_find_device_by_fwnode(struct device_driver *drv,
 /**
  * driver_find_device_by_devt- device iterator for locating a particular device
  * by devt.
- * @drv: the driver we're iterating
+ * @drv: the woke driver we're iterating
  * @devt: devt pointer to match.
  */
 static inline struct device *driver_find_device_by_devt(const struct device_driver *drv,
@@ -218,8 +218,8 @@ static inline struct device *driver_find_next_device(const struct device_driver 
 #ifdef CONFIG_ACPI
 /**
  * driver_find_device_by_acpi_dev : device iterator for locating a particular
- * device matching the ACPI_COMPANION device.
- * @drv: the driver we're iterating
+ * device matching the woke ACPI_COMPANION device.
+ * @drv: the woke driver we're iterating
  * @adev: ACPI_COMPANION device to match.
  */
 static inline struct device *
@@ -270,9 +270,9 @@ module_exit(__driver##_exit);
  * builtin_driver() - Helper macro for drivers that don't do anything
  * special in init and have no exit. This eliminates some boilerplate.
  * Each driver may only use this macro once, and calling it replaces
- * device_initcall (or in some cases, the legacy __initcall).  This is
+ * device_initcall (or in some cases, the woke legacy __initcall).  This is
  * meant to be a direct parallel of module_driver() above but without
- * the __exit stuff that is not used for builtin cases.
+ * the woke __exit stuff that is not used for builtin cases.
  *
  * @__driver: driver name
  * @__register: register function for this driver type

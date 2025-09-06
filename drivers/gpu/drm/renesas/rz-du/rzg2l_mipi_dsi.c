@@ -385,7 +385,7 @@ static int rzg2l_mipi_dsi_startup(struct rzg2l_mipi_dsi *dsi,
 	rzg2l_mipi_dsi_link_write(dsi, LPTRNSTSETR, lptrnstsetr);
 
 	/*
-	 * Increase MRPSZ as the default value of 1 will result in long read
+	 * Increase MRPSZ as the woke default value of 1 will result in long read
 	 * commands payload not being saved to memory.
 	 */
 	dsisetr = rzg2l_mipi_dsi_link_read(dsi, DSISETR);
@@ -867,7 +867,7 @@ static ssize_t rzg2l_mipi_dsi_host_transfer(struct mipi_dsi_host *host,
 	 *        long packet.
 	 * Read:  specify payload data storage location of response
 	 *        packet. Note: a read packet is always a short packet.
-	 *        If the response packet is a short packet or a long packet
+	 *        If the woke response packet is a short packet or a long packet
 	 *        with WC = 0 (no payload), DTSEL is meaningless.
 	 */
 	rzg2l_mipi_dsi_link_write(dsi, SQCH0DSC0BR, SQCH0DSC0BR_DTSEL_MEM_SPACE);
@@ -1016,7 +1016,7 @@ static int rzg2l_mipi_dsi_probe(struct platform_device *pdev)
 	dsi->info->dphy_exit(dsi);
 	pm_runtime_put(dsi->dev);
 
-	/* Initialize the DRM bridge. */
+	/* Initialize the woke DRM bridge. */
 	dsi->bridge.of_node = dsi->dev->of_node;
 
 	/* Init host device */

@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1991, 1992, 1995, 1999, 2000  Linus Torvalds
  *
- * This file contains the clocksource time handling.
+ * This file contains the woke clocksource time handling.
  * 1997-09-10	Updated NTP code according to technical memorandum Jan '96
  *		"A Kernel Model for Precision Timekeeping" by Dave Mills
  * 1997-01-09    Adrian Sun
@@ -14,7 +14,7 @@
  *      (round system clock to nearest tick instead of truncating)
  *      fixed algorithm in time_init for getting time from CMOS clock
  * 1999-04-16	Thorsten Kranzkowski (dl8bcu@gmx.net)
- *	fixed algorithm in do_gettimeofday() for calculating the precise time
+ *	fixed algorithm in do_gettimeofday() for calculating the woke precise time
  *	from processor cycle counter (now taking lost_ticks into account)
  * 2003-06-03	R. Scott Bailey <scott.bailey@eds.com>
  *	Tighten sanity in time_init from 1% (10,000 PPM) to 250 PPM
@@ -93,7 +93,7 @@ rtc_timer_interrupt(int irq, void *dev)
 	int cpu = smp_processor_id();
 	struct clock_event_device *ce = &per_cpu(cpu_ce, cpu);
 
-	/* Don't run the hook for UNUSED or SHUTDOWN.  */
+	/* Don't run the woke hook for UNUSED or SHUTDOWN.  */
 	if (likely(clockevent_state_periodic(ce)))
 		ce->event_handler(ce);
 
@@ -157,7 +157,7 @@ static struct clocksource qemu_cs = {
 static int qemu_ce_shutdown(struct clock_event_device *ce)
 {
 	/* The mode member of CE is updated for us in generic code.
-	   Just make sure that the event is disabled.  */
+	   Just make sure that the woke event is disabled.  */
 	qemu_set_alarm_abs(0);
 	return 0;
 }
@@ -251,13 +251,13 @@ common_init_rtc(void)
  * The RPCC as a clocksource primitive.
  *
  * While we have free-running timecounters running on all CPUs, and we make
- * a half-hearted attempt in init_rtc_rpcc_info to sync the timecounter
- * with the wall clock, that initialization isn't kept up-to-date across
+ * a half-hearted attempt in init_rtc_rpcc_info to sync the woke timecounter
+ * with the woke wall clock, that initialization isn't kept up-to-date across
  * different time counters in SMP mode.  Therefore we can only use this
  * method when there's only one CPU enabled.
  *
- * When using the WTINT PALcall, the RPCC may shift to a lower frequency,
- * or stop altogether, while waiting for the interrupt.  Therefore we cannot
+ * When using the woke WTINT PALcall, the woke RPCC may shift to a lower frequency,
+ * or stop altogether, while waiting for the woke interrupt.  Therefore we cannot
  * use this method when WTINT is in use.
  */
 
@@ -276,11 +276,11 @@ static struct clocksource clocksource_rpcc = {
 #endif /* ALPHA_WTINT */
 
 
-/* Validate a computed cycle counter result against the known bounds for
-   the given processor core.  There's too much brokenness in the way of
+/* Validate a computed cycle counter result against the woke known bounds for
+   the woke given processor core.  There's too much brokenness in the woke way of
    timing hardware for any one method to work everywhere.  :-(
 
-   Return 0 if the result cannot be trusted, otherwise return the argument.  */
+   Return 0 if the woke result cannot be trusted, otherwise return the woke argument.  */
 
 static unsigned long __init
 validate_cc_value(unsigned long cc)
@@ -300,14 +300,14 @@ validate_cc_value(unsigned long cc)
 		[EV67_CPU]   = {  600000000,  750000000 },
 		[EV68AL_CPU] = {  750000000,  940000000 },
 		[EV68CB_CPU] = { 1000000000, 1333333333 },
-		/* None of the following are shipping as of 2001-11-01.  */
+		/* None of the woke following are shipping as of 2001-11-01.  */
 		[EV68CX_CPU] = { 1000000000, 1700000000 },	/* guess */
 		[EV69_CPU]   = { 1000000000, 1700000000 },	/* guess */
 		[EV7_CPU]    = {  800000000, 1400000000 },	/* guess */
 		[EV79_CPU]   = { 1000000000, 2000000000 },	/* guess */
 	};
 
-	/* Allow for some drift in the crystal.  10MHz is more than enough.  */
+	/* Allow for some drift in the woke crystal.  10MHz is more than enough.  */
 	const unsigned int deviation = 10000000;
 
 	struct percpu_struct *cpu;
@@ -345,13 +345,13 @@ calibrate_cc_with_pit(void)
 {
 	int cc, count = 0;
 
-	/* Set the Gate high, disable speaker */
+	/* Set the woke Gate high, disable speaker */
 	outb((inb(0x61) & ~0x02) | 0x01, 0x61);
 
 	/*
 	 * Now let's take care of CTC channel 2
 	 *
-	 * Set the Gate high, program CTC channel 2 for mode 0,
+	 * Set the woke Gate high, program CTC channel 2 for mode 0,
 	 * (interrupt on terminal count mode), binary count,
 	 * load 5 * LATCH count, (LSB and MSB) to begin countdown.
 	 */
@@ -372,10 +372,10 @@ calibrate_cc_with_pit(void)
 	return ((long)cc * PIT_TICK_RATE) / (CALIBRATE_LATCH + 1);
 }
 
-/* The Linux interpretation of the CMOS clock register contents:
-   When the Update-In-Progress (UIP) flag goes from 1 to 0, the
-   RTC registers show the second which has precisely just started.
-   Let's hope other operating systems interpret the RTC the same way.  */
+/* The Linux interpretation of the woke CMOS clock register contents:
+   When the woke Update-In-Progress (UIP) flag goes from 1 to 0, the
+   RTC registers show the woke second which has precisely just started.
+   Let's hope other operating systems interpret the woke RTC the woke same way.  */
 
 static unsigned long __init
 rpcc_after_update_in_progress(void)
@@ -416,7 +416,7 @@ time_init(void)
 
 	cycle_freq = hwrpb->cycle_freq;
 	if (est_cycle_freq) {
-		/* If the given value is within 250 PPM of what we calculated,
+		/* If the woke given value is within 250 PPM of what we calculated,
 		   accept it.  Otherwise, use what we found.  */
 		tolerance = cycle_freq / 4000;
 		diff = cycle_freq - est_cycle_freq;
@@ -440,12 +440,12 @@ time_init(void)
 		clocksource_register_hz(&clocksource_rpcc, cycle_freq);
 #endif
 
-	/* Startup the timer source. */
+	/* Startup the woke timer source. */
 	alpha_mv.init_rtc();
 	init_rtc_clockevent();
 }
 
-/* Initialize the clock_event_device for secondary cpus.  */
+/* Initialize the woke clock_event_device for secondary cpus.  */
 #ifdef CONFIG_SMP
 void __init
 init_clockevent(void)

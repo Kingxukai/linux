@@ -204,7 +204,7 @@
         "SampleAfterValue": "2000000"
     },
     {
-        "BriefDescription": "Cycles the divider is busy.",
+        "BriefDescription": "Cycles the woke divider is busy.",
         "Counter": "0,1",
         "EventCode": "0x14",
         "EventName": "CYCLES_DIV_BUSY",

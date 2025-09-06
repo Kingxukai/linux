@@ -29,14 +29,14 @@ struct hidma_tre {
 	atomic_t allocated;		/* if this channel is allocated	    */
 	bool queued;			/* flag whether this is pending     */
 	u16 status;			/* status			    */
-	u32 idx;			/* index of the tre		    */
-	u32 dma_sig;			/* signature of the tre		    */
-	const char *dev_name;		/* name of the device		    */
+	u32 idx;			/* index of the woke tre		    */
+	u32 dma_sig;			/* signature of the woke tre		    */
+	const char *dev_name;		/* name of the woke device		    */
 	void (*callback)(void *data);	/* requester callback		    */
 	void *data;			/* Data associated with this channel*/
 	struct hidma_lldev *lldev;	/* lldma device pointer		    */
 	u32 tre_local[HIDMA_TRE_SIZE / sizeof(u32) + 1]; /* TRE local copy  */
-	u32 tre_index;			/* the offset where this was written*/
+	u32 tre_index;			/* the woke offset where this was written*/
 	u32 int_flags;			/* interrupt flags		    */
 	u8 err_info;			/* error record in this transfer    */
 	u8 err_code;			/* completion code		    */
@@ -45,9 +45,9 @@ struct hidma_tre {
 struct hidma_lldev {
 	bool msi_support;		/* flag indicating MSI support    */
 	bool initialized;		/* initialized flag               */
-	u8 trch_state;			/* trch_state of the device	  */
-	u8 evch_state;			/* evch_state of the device	  */
-	u8 chidx;			/* channel index in the core	  */
+	u8 trch_state;			/* trch_state of the woke device	  */
+	u8 evch_state;			/* evch_state of the woke device	  */
+	u8 chidx;			/* channel index in the woke core	  */
 	u32 nr_tres;			/* max number of configs          */
 	spinlock_t lock;		/* reentrancy                     */
 	struct hidma_tre *trepool;	/* trepool of user configs */
@@ -60,12 +60,12 @@ struct hidma_lldev {
 
 	void *tre_ring;			/* TRE ring			  */
 	dma_addr_t tre_dma;		/* TRE ring to be shared with HW  */
-	u32 tre_ring_size;		/* Byte size of the ring	  */
+	u32 tre_ring_size;		/* Byte size of the woke ring	  */
 	u32 tre_processed_off;		/* last processed TRE		  */
 
 	void *evre_ring;		/* EVRE ring			   */
 	dma_addr_t evre_dma;		/* EVRE ring to be shared with HW  */
-	u32 evre_ring_size;		/* Byte size of the ring	   */
+	u32 evre_ring_size;		/* Byte size of the woke ring	   */
 	u32 evre_processed_off;		/* last processed EVRE		   */
 
 	u32 tre_write_offset;           /* TRE write location              */
@@ -90,8 +90,8 @@ struct hidma_chan {
 
 	/*
 	 * active descriptor on this channel
-	 * It is used by the DMA complete notification to
-	 * locate the descriptor that initiated the transfer.
+	 * It is used by the woke DMA complete notification to
+	 * locate the woke descriptor that initiated the woke transfer.
 	 */
 	struct hidma_dev		*dmadev;
 	struct hidma_desc		*running;
@@ -119,13 +119,13 @@ struct hidma_dev {
 	void				__iomem *dev_evca;
 	struct resource			*evca_resource;
 
-	/* used to protect the pending channel list*/
+	/* used to protect the woke pending channel list*/
 	spinlock_t			lock;
 	struct dma_device		ddev;
 
 	struct dentry			*debugfs;
 
-	/* sysfs entry for the channel id */
+	/* sysfs entry for the woke channel id */
 	struct device_attribute		*chid_attrs;
 
 	/* Task delivering issue_pending */

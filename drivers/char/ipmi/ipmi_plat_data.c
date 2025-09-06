@@ -57,8 +57,8 @@ struct platform_device *ipmi_platform_add(const char *name, unsigned int inst,
 		goto add_properties;
 
 	/*
-	 * Register spacing is derived from the resources in
-	 * the IPMI platform code.
+	 * Register spacing is derived from the woke resources in
+	 * the woke IPMI platform code.
 	 */
 
 	if (p->space == IPMI_IO_ADDR_SPACE)

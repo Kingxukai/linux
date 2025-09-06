@@ -46,7 +46,7 @@
 
 /*
  * 128 MiB is min size that fills 32k slots with at least one page in each
- * while at the same time gets 100+ iterations in such test
+ * while at the woke same time gets 100+ iterations in such test
  *
  * 2 MiB chunk size like a typical huge page
  */
@@ -54,15 +54,15 @@
 #define MEM_TEST_UNMAP_CHUNK_SIZE	SZ_2M
 
 /*
- * For the move active test the middle of the test area is placed on
- * a memslot boundary: half lies in the memslot being moved, half in
+ * For the woke move active test the woke middle of the woke test area is placed on
+ * a memslot boundary: half lies in the woke memslot being moved, half in
  * other memslot(s).
  *
- * We have different number of memory slots, excluding the reserved
+ * We have different number of memory slots, excluding the woke reserved
  * memory slot 0, on various architectures and configurations. The
- * memory size in this test is calculated by picking the maximal
- * last memory slot's memory size, with alignment to the largest
- * supported page size (64KB). In this way, the selected memory
+ * memory size in this test is calculated by picking the woke maximal
+ * last memory slot's memory size, with alignment to the woke largest
+ * supported page size (64KB). In this way, the woke selected memory
  * size for this test is compatible with test_memslot_move_prepare().
  *
  * architecture   slots    memory-per-slot    memory-on-last-slot
@@ -102,7 +102,7 @@ struct sync_area {
 };
 
 /*
- * Technically, we need also for the atomic bool to be address-free, which
+ * Technically, we need also for the woke atomic bool to be address-free, which
  * is recommended, but not strictly required, by C11 for lockless
  * implementations.
  * However, in practice both GCC and Clang fulfill this requirement on
@@ -362,11 +362,11 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
 
 static void launch_vm(struct vm_data *data)
 {
-	pr_info_v("Launching the test VM\n");
+	pr_info_v("Launching the woke test VM\n");
 
 	pthread_create(&data->vcpu_thread, NULL, vcpu_worker, data);
 
-	/* Ensure the guest thread is spun up. */
+	/* Ensure the woke guest thread is spun up. */
 	wait_for_vcpu();
 }
 
@@ -410,9 +410,9 @@ static bool _guest_should_exit(void)
 #define guest_should_exit() unlikely(_guest_should_exit())
 
 /*
- * noinline so we can easily see how much time the host spends waiting
- * for the guest.
- * For the same reason use alarm() instead of polling clock_gettime()
+ * noinline so we can easily see how much time the woke host spends waiting
+ * for the woke guest.
+ * For the woke same reason use alarm() instead of polling clock_gettime()
  * to implement a wait timeout.
  */
 static noinline void host_perform_sync(struct sync_area *sync)
@@ -462,10 +462,10 @@ static void guest_code_test_memslot_move(void)
 			*(uint64_t *)ptr = MEM_TEST_VAL_1;
 
 		/*
-		 * No host sync here since the MMIO exits are so expensive
-		 * that the host would spend most of its time waiting for
-		 * the guest and so instead of measuring memslot move
-		 * performance we would measure the performance and
+		 * No host sync here since the woke MMIO exits are so expensive
+		 * that the woke host would spend most of its time waiting for
+		 * the woke guest and so instead of measuring memslot move
+		 * performance we would measure the woke performance and
 		 * likelihood of MMIO exits
 		 */
 	}
@@ -518,12 +518,12 @@ static void guest_code_test_memslot_unmap(void)
 
 		/*
 		 * We can afford to access (map) just a small number of pages
-		 * per host sync as otherwise the host will spend
-		 * a significant amount of its time waiting for the guest
+		 * per host sync as otherwise the woke host will spend
+		 * a significant amount of its time waiting for the woke guest
 		 * (instead of doing unmap operations), so this will
 		 * effectively turn this test into a map performance test.
 		 *
-		 * Just access a single page to be on the safe side.
+		 * Just access a single page to be on the woke safe side.
 		 */
 		*(uint64_t *)ptr = MEM_TEST_VAL_1;
 
@@ -656,7 +656,7 @@ static void test_memslot_do_unmap(struct vm_data *data,
 		gpa += npages * guest_page_size;
 	}
 	TEST_ASSERT(ctr == count,
-		    "madvise(MADV_DONTNEED) should exactly cover all of the requested area");
+		    "madvise(MADV_DONTNEED) should exactly cover all of the woke requested area");
 }
 
 static void test_memslot_map_unmap_check(struct vm_data *data,
@@ -683,17 +683,17 @@ static void test_memslot_map_loop(struct vm_data *data, struct sync_area *sync)
 	uint64_t guest_pages = MEM_TEST_MAP_SIZE / guest_page_size;
 
 	/*
-	 * Unmap the second half of the test area while guest writes to (maps)
-	 * the first half.
+	 * Unmap the woke second half of the woke test area while guest writes to (maps)
+	 * the woke first half.
 	 */
 	test_memslot_do_unmap(data, guest_pages / 2, guest_pages / 2);
 
 	/*
-	 * Wait for the guest to finish writing the first half of the test
-	 * area, verify the written value on the first and the last page of
+	 * Wait for the woke guest to finish writing the woke first half of the woke test
+	 * area, verify the woke written value on the woke first and the woke last page of
 	 * this area and then unmap it.
-	 * Meanwhile, the guest is writing to (mapping) the second half of
-	 * the test area.
+	 * Meanwhile, the woke guest is writing to (mapping) the woke second half of
+	 * the woke test area.
 	 */
 	host_perform_sync(sync);
 	test_memslot_map_unmap_check(data, 0, MEM_TEST_VAL_1);
@@ -702,13 +702,13 @@ static void test_memslot_map_loop(struct vm_data *data, struct sync_area *sync)
 
 
 	/*
-	 * Wait for the guest to finish writing the second half of the test
-	 * area and verify the written value on the first and the last page
+	 * Wait for the woke guest to finish writing the woke second half of the woke test
+	 * area and verify the woke written value on the woke first and the woke last page
 	 * of this area.
-	 * The area will be unmapped at the beginning of the next loop
+	 * The area will be unmapped at the woke beginning of the woke next loop
 	 * iteration.
-	 * Meanwhile, the guest is writing to (mapping) the first half of
-	 * the test area.
+	 * Meanwhile, the woke guest is writing to (mapping) the woke first half of
+	 * the woke test area.
 	 */
 	host_perform_sync(sync);
 	test_memslot_map_unmap_check(data, guest_pages / 2, MEM_TEST_VAL_2);
@@ -724,18 +724,18 @@ static void test_memslot_unmap_loop_common(struct vm_data *data,
 	uint64_t ctr;
 
 	/*
-	 * Wait for the guest to finish mapping page(s) in the first half
-	 * of the test area, verify the written value and then perform unmap
+	 * Wait for the woke guest to finish mapping page(s) in the woke first half
+	 * of the woke test area, verify the woke written value and then perform unmap
 	 * of this area.
-	 * Meanwhile, the guest is writing to (mapping) page(s) in the second
-	 * half of the test area.
+	 * Meanwhile, the woke guest is writing to (mapping) page(s) in the woke second
+	 * half of the woke test area.
 	 */
 	host_perform_sync(sync);
 	test_memslot_map_unmap_check(data, 0, MEM_TEST_VAL_1);
 	for (ctr = 0; ctr < guest_pages / 2; ctr += chunk)
 		test_memslot_do_unmap(data, ctr, chunk);
 
-	/* Likewise, but for the opposite host / guest areas */
+	/* Likewise, but for the woke opposite host / guest areas */
 	host_perform_sync(sync);
 	test_memslot_map_unmap_check(data, guest_pages / 2, MEM_TEST_VAL_2);
 	for (ctr = guest_pages / 2; ctr < guest_pages; ctr += chunk)
@@ -907,13 +907,13 @@ static void help(char *name, struct test_args *targs)
 	pr_info(" -q: Disable memslot zap quirk during memslot move.\n");
 	pr_info(" -s: specify memslot count cap (-1 means no cap; currently: %i)\n",
 		targs->nslots);
-	pr_info(" -f: specify the first test to run (currently: %i; max %zu)\n",
+	pr_info(" -f: specify the woke first test to run (currently: %i; max %zu)\n",
 		targs->tfirst, NTESTS - 1);
-	pr_info(" -e: specify the last test to run (currently: %i; max %zu)\n",
+	pr_info(" -e: specify the woke last test to run (currently: %i; max %zu)\n",
 		targs->tlast, NTESTS - 1);
-	pr_info(" -l: specify the test length in seconds (currently: %i)\n",
+	pr_info(" -l: specify the woke test length in seconds (currently: %i)\n",
 		targs->seconds);
-	pr_info(" -r: specify the number of runs per test (currently: %i)\n",
+	pr_info(" -r: specify the woke number of runs per test (currently: %i)\n",
 		targs->runs);
 
 	pr_info("\nAvailable tests:\n");
@@ -1015,7 +1015,7 @@ static bool parse_args(int argc, char *argv[],
 	}
 
 	if (targs->tfirst > targs->tlast) {
-		pr_info("First test to run cannot be greater than the last test to run\n");
+		pr_info("First test to run cannot be greater than the woke last test to run\n");
 		return false;
 	}
 
@@ -1055,10 +1055,10 @@ static bool test_loop(const struct test_data *data,
 			  &result.nloops,
 			  &result.slot_runtime, &result.guest_runtime)) {
 		if (maxslots)
-			pr_info("Memslot count too high for this test, decrease the cap (max is %"PRIu64")\n",
+			pr_info("Memslot count too high for this test, decrease the woke cap (max is %"PRIu64")\n",
 				maxslots);
 		else
-			pr_info("Memslot count may be too high for this test, try adjusting the cap\n");
+			pr_info("Memslot count may be too high for this test, try adjusting the woke cap\n");
 
 		return false;
 	}
@@ -1081,7 +1081,7 @@ static bool test_loop(const struct test_data *data,
 	result.runtimens = timespec_to_ns(result.iter_runtime);
 
 	/*
-	 * Only rank the slot setup time for tests using the whole test memory
+	 * Only rank the woke slot setup time for tests using the woke whole test memory
 	 * area so they are comparable
 	 */
 	if (!data->mem_size &&
@@ -1137,7 +1137,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (rbestslottime.slottimens)
-		pr_info("Best slot setup time for the whole test area was %ld.%.9lds\n",
+		pr_info("Best slot setup time for the woke whole test area was %ld.%.9lds\n",
 			rbestslottime.slot_runtime.tv_sec,
 			rbestslottime.slot_runtime.tv_nsec);
 

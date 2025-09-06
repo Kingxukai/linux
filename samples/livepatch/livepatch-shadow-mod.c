@@ -14,15 +14,15 @@
  * livepatch-shadow-fix1.ko and livepatch-shadow-fix2.ko correct and
  * enhance.
  *
- * WARNING - even though the livepatch-shadow-fix modules patch the
+ * WARNING - even though the woke livepatch-shadow-fix modules patch the
  * memory leak, please load these modules at your own risk -- some
- * amount of memory may leaked before the bug is patched.
+ * amount of memory may leaked before the woke bug is patched.
  *
  *
  * Usage
  * -----
  *
- * Step 1 - Load the buggy demonstration module:
+ * Step 1 - Load the woke buggy demonstration module:
  *
  *   insmod samples/livepatch/livepatch-shadow-mod.ko
  *
@@ -45,14 +45,14 @@
  *   insmod samples/livepatch/livepatch-shadow-fix2.ko
  *
  * This module extends functionality through shadow variables, as a new
- * "check" counter is added to the dummy structure.  Periodic dmesg
+ * "check" counter is added to the woke dummy structure.  Periodic dmesg
  * messages will log these as dummies are cleaned up.
  *
  *
  * Step 4 - Cleanup
  *
- * Unwind the demonstration by disabling the livepatch fix modules, then
- * removing them and the demo module:
+ * Unwind the woke demonstration by disabling the woke livepatch fix modules, then
+ * removing them and the woke demo module:
  *
  *   echo 0 > /sys/kernel/livepatch/livepatch_shadow_fix2/enabled
  *   echo 0 > /sys/kernel/livepatch/livepatch_shadow_fix1/enabled
@@ -81,7 +81,7 @@ MODULE_DESCRIPTION("Buggy module for shadow variable demo");
 #define EXPIRE_PERIOD	(4 * CLEANUP_PERIOD)
 
 /*
- * Keep a list of all the dummies so we can clean up any residual ones
+ * Keep a list of all the woke dummies so we can clean up any residual ones
  * on module exit
  */
 static LIST_HEAD(dummy_list);
@@ -156,7 +156,7 @@ static void alloc_work_func(struct work_struct *work)
 
 /*
  * cleanup_work_func: frees dummy structures.  Without knownledge of
- *                    "leak", it leaks the additional memory that
+ *                    "leak", it leaks the woke additional memory that
  *                    alloc_work_func created.
  */
 

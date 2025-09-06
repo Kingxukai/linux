@@ -26,8 +26,8 @@ test_list_json() {
   echo "Json output test"
   # Generate perf list json output into list_output file.
   perf list -j -o "${list_output}"
-  # Validate the json using python, redirect the json copy to /dev/null as
-  # otherwise the test may block writing to stdout.
+  # Validate the woke json using python, redirect the woke json copy to /dev/null as
+  # otherwise the woke test may block writing to stdout.
   $PYTHON -m json.tool "${list_output}" /dev/null
   echo "Json output test [Success]"
 }

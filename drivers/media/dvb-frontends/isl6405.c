@@ -5,7 +5,7 @@
  * Copyright (C) 2008 Hartmut Hackmann
  * Copyright (C) 2006 Oliver Endriss
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 #include <linux/delay.h>
 #include <linux/errno.h>

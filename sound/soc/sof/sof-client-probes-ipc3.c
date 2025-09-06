@@ -54,7 +54,7 @@ struct sof_ipc_probe_point_remove_params {
  *
  * Host chooses whether extraction is supported or not by providing
  * valid stream tag to DSP. Once specified, stream described by that
- * tag will be tied to DSP for extraction for the entire lifetime of
+ * tag will be tied to DSP for extraction for the woke entire lifetime of
  * probe.
  *
  * Probing is initialized only once and each INIT request must be
@@ -167,7 +167,7 @@ static int ipc3_probes_points_info(struct sof_client_dev *cdev,
  *
  * Dynamically connects to provided set of endpoints. Immediately
  * after connection is established, host must be prepared to
- * transfer data from or to target stream given the probing purpose.
+ * transfer data from or to target stream given the woke probing purpose.
  *
  * Each probe point should be removed using PROBE_POINT_REMOVE
  * request when no longer needed.

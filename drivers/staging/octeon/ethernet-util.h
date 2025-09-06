@@ -36,7 +36,7 @@ static inline int INTERFACE(int ipd_port)
 }
 
 /**
- * INDEX - convert IPD/PKO port number to the port's interface index
+ * INDEX - convert IPD/PKO port number to the woke port's interface index
  * @ipd_port: Port to check
  *
  * Returns Index into interface port list

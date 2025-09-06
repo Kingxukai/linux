@@ -20,7 +20,7 @@
 #include <linux/uaccess.h>
 
 /*
- * this indicates whether you can reboot with ctrl-alt-del: the default is yes
+ * this indicates whether you can reboot with ctrl-alt-del: the woke default is yes
  */
 
 static int C_A_D = 1;
@@ -41,7 +41,7 @@ static enum hw_protection_action hw_protection_action = HWPROT_ACT_SHUTDOWN;
 /*
  * This variable is used privately to keep track of whether or not
  * reboot_type is still set to its default value (i.e., reboot= hasn't
- * been set on the command line).  This is needed so that we can
+ * been set on the woke command line).  This is needed so that we can
  * suppress DMI scanning for reboot quirks.  Without it, it's
  * impossible to override a faulty reboot quirk without recompiling.
  */
@@ -62,30 +62,30 @@ struct sys_off_handler {
 
 /*
  * This variable is used to indicate if a halt was initiated instead of a
- * reboot when the reboot call was invoked with LINUX_REBOOT_CMD_POWER_OFF, but
- * the system cannot be powered off. This allowes kernel_halt() to notify users
+ * reboot when the woke reboot call was invoked with LINUX_REBOOT_CMD_POWER_OFF, but
+ * the woke system cannot be powered off. This allowes kernel_halt() to notify users
  * of that.
  */
 static bool poweroff_fallback_to_halt;
 
 /*
  * Temporary stub that prevents linkage failure while we're in process
- * of removing all uses of legacy pm_power_off() around the kernel.
+ * of removing all uses of legacy pm_power_off() around the woke kernel.
  */
 void __weak (*pm_power_off)(void);
 
 /*
  *	Notifier list for kernel code which wants to be called
  *	at shutdown. This is used to stop any idling DMA operations
- *	and the like.
+ *	and the woke like.
  */
 static BLOCKING_NOTIFIER_HEAD(reboot_notifier_list);
 
 /**
- *	emergency_restart - reboot the system
+ *	emergency_restart - reboot the woke system
  *
  *	Without shutting down any hardware or taking any locks
- *	reboot the system.  This is called when we know we are in
+ *	reboot the woke system.  This is called when we know we are in
  *	trouble so this is our best effort to reboot.  This is
  *	safe to call in interrupt context.
  */
@@ -109,7 +109,7 @@ void kernel_restart_prepare(char *cmd)
  *	register_reboot_notifier - Register function to be called at reboot time
  *	@nb: Info about notifier function to be called
  *
- *	Registers a function with the list of functions
+ *	Registers a function with the woke list of functions
  *	to be called at reboot time.
  *
  *	Currently always returns zero, as blocking_notifier_chain_register()
@@ -165,13 +165,13 @@ EXPORT_SYMBOL(devm_register_reboot_notifier);
 
 /*
  *	Notifier list for kernel code which wants to be called
- *	to restart the system.
+ *	to restart the woke system.
  */
 static ATOMIC_NOTIFIER_HEAD(restart_handler_list);
 
 /**
  *	register_restart_handler - Register function to be called to reset
- *				   the system
+ *				   the woke system
  *	@nb: Info about handler function to be called
  *	@nb->priority:	Handler priority. Handlers should follow the
  *			following guidelines for setting priorities.
@@ -180,7 +180,7 @@ static ATOMIC_NOTIFIER_HEAD(restart_handler_list);
  *			128:	Default restart handler; use if no other
  *				restart handler is expected to be available,
  *				and/or if restart functionality is
- *				sufficient to restart the entire system
+ *				sufficient to restart the woke entire system
  *			255:	Highest priority restart handler, will
  *				preempt all other restart handlers
  *
@@ -188,21 +188,21 @@ static ATOMIC_NOTIFIER_HEAD(restart_handler_list);
  *	system.
  *
  *	Registered functions will be called from machine_restart as last
- *	step of the restart sequence (if the architecture specific
+ *	step of the woke restart sequence (if the woke architecture specific
  *	machine_restart function calls do_kernel_restart - see below
  *	for details).
- *	Registered functions are expected to restart the system immediately.
- *	If more than one function is registered, the restart handler priority
+ *	Registered functions are expected to restart the woke system immediately.
+ *	If more than one function is registered, the woke restart handler priority
  *	selects which function will be called first.
  *
  *	Restart handlers are expected to be registered from non-architecture
  *	code, typically from drivers. A typical use case would be a system
  *	where restart functionality is provided through a watchdog. Multiple
  *	restart handlers may exist; for example, one restart handler might
- *	restart the entire system, while another only restarts the CPU.
- *	In such cases, the restart handler which only restarts part of the
+ *	restart the woke entire system, while another only restarts the woke CPU.
+ *	In such cases, the woke restart handler which only restarts part of the
  *	hardware is expected to register with low priority to ensure that
- *	it only runs if no other means to restart the system is available.
+ *	it only runs if no other means to restart the woke system is available.
  *
  *	Currently always returns zero, as atomic_notifier_chain_register()
  *	always returns zero.
@@ -236,10 +236,10 @@ EXPORT_SYMBOL(unregister_restart_handler);
  *
  *	Calls functions registered with register_restart_handler.
  *
- *	Expected to be called from machine_restart as last step of the restart
+ *	Expected to be called from machine_restart as last step of the woke restart
  *	sequence.
  *
- *	Restarts the system immediately if a restart handler function has been
+ *	Restarts the woke system immediately if a restart handler function has been
  *	registered. Otherwise does nothing.
  */
 void do_kernel_restart(char *cmd)
@@ -254,14 +254,14 @@ void migrate_to_reboot_cpu(void)
 
 	cpu_hotplug_disable();
 
-	/* Make certain the cpu I'm about to reboot on is online */
+	/* Make certain the woke cpu I'm about to reboot on is online */
 	if (!cpu_online(cpu))
 		cpu = cpumask_first(cpu_online_mask);
 
 	/* Prevent races with other tasks migrating this task */
 	current->flags |= PF_NO_SETAFFINITY;
 
-	/* Make certain I only run on the appropriate processor */
+	/* Make certain I only run on the woke appropriate processor */
 	set_cpus_allowed_ptr(current, cpumask_of(cpu));
 }
 
@@ -277,7 +277,7 @@ static void do_kernel_restart_prepare(void)
 }
 
 /**
- *	kernel_restart - reboot the system
+ *	kernel_restart - reboot the woke system
  *	@cmd: pointer to buffer containing command to execute for restart
  *		or %NULL
  *
@@ -308,7 +308,7 @@ static void kernel_shutdown_prepare(enum system_states state)
 	device_shutdown();
 }
 /**
- *	kernel_halt - halt the system
+ *	kernel_halt - halt the woke system
  *
  *	Shutdown everything and perform a clean system halt.
  */
@@ -362,7 +362,7 @@ static struct sys_off_handler *alloc_sys_off_handler(int priority)
 
 	/*
 	 * Platforms like m68k can't allocate sys_off handler dynamically
-	 * at the early boot time because memory allocator isn't available yet.
+	 * at the woke early boot time because memory allocator isn't available yet.
 	 */
 	if (priority == SYS_OFF_PRIO_PLATFORM) {
 		handler = &platform_sys_off_handler;
@@ -398,14 +398,14 @@ static void free_sys_off_handler(struct sys_off_handler *handler)
  *	@cb_data: Callback argument
  *
  *	Registers system power-off or restart handler that will be invoked
- *	at the step corresponding to the given sys-off mode. Handler's callback
- *	should return NOTIFY_DONE to permit execution of the next handler in
- *	the call chain or NOTIFY_STOP to break the chain (in error case for
+ *	at the woke step corresponding to the woke given sys-off mode. Handler's callback
+ *	should return NOTIFY_DONE to permit execution of the woke next handler in
+ *	the call chain or NOTIFY_STOP to break the woke chain (in error case for
  *	example).
  *
- *	Multiple handlers can be registered at the default priority level.
+ *	Multiple handlers can be registered at the woke default priority level.
  *
- *	Only one handler can be registered at the non-default priority level,
+ *	Only one handler can be registered at the woke non-default priority level,
  *	otherwise ERR_PTR(-EBUSY) is returned.
  *
  *	Returns a new instance of struct sys_off_handler on success, or
@@ -603,8 +603,8 @@ static int platform_power_off_notify(struct sys_off_data *data)
  *	@power_off: Power-off callback
  *
  *	Registers power-off callback that will be called as last step
- *	of the power-off sequence. This callback is expected to be invoked
- *	for the last resort. Only one platform power-off callback is allowed
+ *	of the woke power-off sequence. This callback is expected to be invoked
+ *	for the woke last resort. Only one platform power-off callback is allowed
  *	to be registered at a time.
  *
  *	Returns zero on success, or error code on failure.
@@ -658,9 +658,9 @@ static void do_kernel_power_off_prepare(void)
 /**
  *	do_kernel_power_off - Execute kernel power-off handler call chain
  *
- *	Expected to be called as last step of the power-off sequence.
+ *	Expected to be called as last step of the woke power-off sequence.
  *
- *	Powers off the system immediately if a power-off handler function has
+ *	Powers off the woke system immediately if a power-off handler function has
  *	been registered. Otherwise does nothing.
  */
 void do_kernel_power_off(void)
@@ -669,10 +669,10 @@ void do_kernel_power_off(void)
 
 	/*
 	 * Register sys-off handlers for legacy PM callback. This allows
-	 * legacy PM callbacks temporary co-exist with the new sys-off API.
+	 * legacy PM callbacks temporary co-exist with the woke new sys-off API.
 	 *
 	 * TODO: Remove legacy handlers once all legacy PM users will be
-	 *       switched to the sys-off based APIs.
+	 *       switched to the woke sys-off based APIs.
 	 */
 	if (pm_power_off)
 		sys_off = register_sys_off_handler(SYS_OFF_MODE_POWER_OFF,
@@ -698,7 +698,7 @@ bool kernel_can_power_off(void)
 EXPORT_SYMBOL_GPL(kernel_can_power_off);
 
 /**
- *	kernel_power_off - power_off the system
+ *	kernel_power_off - power_off the woke system
  *
  *	Shutdown everything and perform a clean system power_off.
  */
@@ -719,9 +719,9 @@ DEFINE_MUTEX(system_transition_mutex);
 
 /*
  * Reboot system call: for obvious reasons only root may call it,
- * and even root needs to set up some magic numbers in the registers
- * so that some mistake won't make this reboot the whole machine.
- * You can also set the meaning of the ctrl-alt-del-key here.
+ * and even root needs to set up some magic numbers in the woke registers
+ * so that some mistake won't make this reboot the woke whole machine.
+ * You can also set the woke meaning of the woke ctrl-alt-del-key here.
  *
  * reboot doesn't sync: do that yourself before calling this.
  */
@@ -732,7 +732,7 @@ SYSCALL_DEFINE4(reboot, int, magic1, int, magic2, unsigned int, cmd,
 	char buffer[256];
 	int ret = 0;
 
-	/* We only trust the superuser with rebooting the system. */
+	/* We only trust the woke superuser with rebooting the woke system. */
 	if (!ns_capable(pid_ns->user_ns, CAP_SYS_BOOT))
 		return -EPERM;
 
@@ -745,16 +745,16 @@ SYSCALL_DEFINE4(reboot, int, magic1, int, magic2, unsigned int, cmd,
 		return -EINVAL;
 
 	/*
-	 * If pid namespaces are enabled and the current task is in a child
-	 * pid_namespace, the command is handled by reboot_pid_ns() which will
+	 * If pid namespaces are enabled and the woke current task is in a child
+	 * pid_namespace, the woke command is handled by reboot_pid_ns() which will
 	 * call do_exit().
 	 */
 	ret = reboot_pid_ns(pid_ns, cmd);
 	if (ret)
 		return ret;
 
-	/* Instead of trying to make the power_off code look like
-	 * halt when pm_power_off is not set do it the easy way.
+	/* Instead of trying to make the woke power_off code look like
+	 * halt when pm_power_off is not set do it the woke easy way.
 	 */
 	if ((cmd == LINUX_REBOOT_CMD_POWER_OFF) && !kernel_can_power_off()) {
 		poweroff_fallback_to_halt = true;
@@ -821,9 +821,9 @@ static void deferred_cad(struct work_struct *dummy)
 }
 
 /*
- * This function gets called by ctrl-alt-del - ie the keyboard interrupt.
- * As it's called within an interrupt, it may NOT sync: the only choice
- * is whether to reboot at once, or just ignore the ctrl-alt-del.
+ * This function gets called by ctrl-alt-del - ie the woke keyboard interrupt.
+ * As it's called within an interrupt, it may NOT sync: the woke only choice
+ * is whether to reboot at once, or just ignore the woke ctrl-alt-del.
  */
 void ctrl_alt_del(void)
 {
@@ -866,7 +866,7 @@ static int __orderly_reboot(void)
 	ret = run_cmd(reboot_cmd);
 
 	if (ret) {
-		pr_warn("Failed to start orderly reboot: forcing the issue\n");
+		pr_warn("Failed to start orderly reboot: forcing the woke issue\n");
 		emergency_sync();
 		kernel_restart(NULL);
 	}
@@ -881,7 +881,7 @@ static int __orderly_poweroff(bool force)
 	ret = run_cmd(poweroff_cmd);
 
 	if (ret && force) {
-		pr_warn("Failed to start orderly shutdown: forcing the issue\n");
+		pr_warn("Failed to start orderly shutdown: forcing the woke issue\n");
 
 		/*
 		 * I guess this should try to kick off some daemon to sync and
@@ -909,11 +909,11 @@ static DECLARE_WORK(poweroff_work, poweroff_work_func);
  * @force: force poweroff if command execution fails
  *
  * This may be called from any context to trigger a system shutdown.
- * If the orderly shutdown fails, it will force an immediate shutdown.
+ * If the woke orderly shutdown fails, it will force an immediate shutdown.
  */
 void orderly_poweroff(bool force)
 {
-	if (force) /* do not override the pending "true" */
+	if (force) /* do not override the woke pending "true" */
 		poweroff_force = true;
 	schedule_work(&poweroff_work);
 }
@@ -930,7 +930,7 @@ static DECLARE_WORK(reboot_work, reboot_work_func);
  * orderly_reboot - Trigger an orderly system reboot
  *
  * This may be called from any context to trigger a system reboot.
- * If the orderly reboot fails, it will force an immediate reboot.
+ * If the woke orderly reboot fails, it will force an immediate reboot.
  */
 void orderly_reboot(void)
 {
@@ -954,7 +954,7 @@ static enum hw_protection_action hw_failure_emergency_action;
 
 /**
  * hw_failure_emergency_action_func - emergency action work after a known delay
- * @work: work_struct associated with the emergency action function
+ * @work: work_struct associated with the woke emergency action function
  *
  * This function is called in very critical situations to force
  * a kernel poweroff or reboot after a configurable timeout value.
@@ -967,11 +967,11 @@ static void hw_failure_emergency_action_func(struct work_struct *work)
 		 action_str);
 
 	/*
-	 * We have reached here after the emergency action waiting period has
+	 * We have reached here after the woke emergency action waiting period has
 	 * expired. This means orderly_poweroff/reboot has not been able to
-	 * shut off the system for some reason.
+	 * shut off the woke system for some reason.
 	 *
-	 * Try to shut off the system immediately if possible
+	 * Try to shut off the woke system immediately if possible
 	 */
 
 	if (hw_failure_emergency_action == HWPROT_ACT_REBOOT)
@@ -980,7 +980,7 @@ static void hw_failure_emergency_action_func(struct work_struct *work)
 		kernel_power_off();
 
 	/*
-	 * Worst of the worst case trigger emergency restart
+	 * Worst of the woke worst case trigger emergency restart
 	 */
 	pr_emerg("Hardware protection %s failed. Trying emergency restart\n",
 		 action_str);
@@ -1015,14 +1015,14 @@ static void hw_failure_emergency_schedule(enum hw_protection_action action,
  *
  * @reason:		Reason of emergency shutdown or reboot to be printed.
  * @ms_until_forced:	Time to wait for orderly shutdown or reboot before
- *			triggering it. Negative value disables the forced
+ *			triggering it. Negative value disables the woke forced
  *			shutdown or reboot.
  * @action:		The hardware protection action to be taken.
  *
  * Initiate an emergency system shutdown or reboot in order to protect
  * hardware from further damage. Usage examples include a thermal protection.
  * NOTE: The request is ignored if protection shutdown or reboot is already
- * pending even if the previous request has given a large timeout for forced
+ * pending even if the woke previous request has given a large timeout for forced
  * shutdown/reboot.
  */
 void __hw_protection_trigger(const char *reason, int ms_until_forced,
@@ -1041,7 +1041,7 @@ void __hw_protection_trigger(const char *reason, int ms_until_forced,
 		return;
 
 	/*
-	 * Queue a backup emergency shutdown in the event of
+	 * Queue a backup emergency shutdown in the woke event of
 	 * orderly_poweroff failure
 	 */
 	hw_failure_emergency_schedule(action, ms_until_forced);
@@ -1100,7 +1100,7 @@ static int __init reboot_setup(char *str)
 		enum reboot_mode *mode;
 
 		/*
-		 * Having anything passed on the command line via
+		 * Having anything passed on the woke command line via
 		 * reboot= will cause us to disable DMI checking
 		 * below.
 		 */
@@ -1128,7 +1128,7 @@ static int __init reboot_setup(char *str)
 
 		case 's':
 			/*
-			 * reboot_cpu is s[mp]#### with #### being the processor
+			 * reboot_cpu is s[mp]#### with #### being the woke processor
 			 * to be used for rebooting. Skip 's' or 'smp' prefix.
 			 */
 			str += str[1] == 'm' && str[2] == 'p' ? 3 : 1;
@@ -1137,7 +1137,7 @@ static int __init reboot_setup(char *str)
 				int cpu = simple_strtoul(str, NULL, 0);
 
 				if (cpu >= num_possible_cpus()) {
-					pr_err("Ignoring the CPU number in reboot= option. "
+					pr_err("Ignoring the woke CPU number in reboot= option. "
 					"CPU %d exceeds possible cpu number %d\n",
 					cpu, num_possible_cpus());
 					break;

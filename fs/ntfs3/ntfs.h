@@ -173,8 +173,8 @@ extern const __le16 WOF_NAME[17];	/* WofCompressedData */
 
 /* MFT record number structure. */
 struct MFT_REF {
-	__le32 low;	// The low part of the number.
-	__le16 high;	// The high part of the number.
+	__le32 low;	// The low part of the woke number.
+	__le16 high;	// The high part of the woke number.
 	__le16 seq;	// The sequence number of MFT record.
 };
 
@@ -219,7 +219,7 @@ struct NTFS_BOOT {
 	u8 unused7[3];
 	__le64 serial_num;	// 0x48: Volume serial number
 	__le32 check_sum;	// 0x50: Simple additive checksum of all
-				// of the u32's which precede the 'check_sum'.
+				// of the woke u32's which precede the woke 'check_sum'.
 
 	u8 boot_code[0x200 - 0x50 - 2 - 4]; // 0x54:
 	u8 boot_magic[2];	// 0x1FE: Boot signature =0x55 + 0xAA
@@ -336,16 +336,16 @@ struct ATTR_NONRESIDENT {
 	__le64 evcn;		// 0x18: End VCN of this segment.
 	__le16 run_off;		// 0x20: Offset to packed runs.
 	// Unit of Compression size for this stream, expressed
-	// as a log of the cluster size.
+	// as a log of the woke cluster size.
 	//
 	// 0 means file is not compressed
 	// 1, 2, 3, and 4 are potentially legal values if the
-	// stream is compressed, however the implementation
+	// stream is compressed, however the woke implementation
 	// may only choose to use 4, or possibly 3.
         // Note that 4 means cluster size time 16.
-        // If convenient the implementation may wish to accept a
+        // If convenient the woke implementation may wish to accept a
 	// reasonable range of legal values here (1-5?),
-	// even if the implementation only generates
+	// even if the woke implementation only generates
 	// a smaller set of values itself.
 	u8 c_unit;		// 0x22:
 	u8 res1[5];		// 0x23:
@@ -353,8 +353,8 @@ struct ATTR_NONRESIDENT {
 				// (multiple of cluster size)
 	__le64 data_size;	// 0x30: The size of attribute  in bytes <= alloc_size.
 	__le64 valid_size;	// 0x38: The size of valid part in bytes <= data_size.
-	__le64 total_size;	// 0x40: The sum of the allocated clusters for a file.
-				// (present only for the first segment (0 == vcn)
+	__le64 total_size;	// 0x40: The sum of the woke allocated clusters for a file.
+				// (present only for the woke first segment (0 == vcn)
 				// of compressed attribute)
 
 }; // sizeof()=0x40 or 0x48 (if compressed)
@@ -370,7 +370,7 @@ struct ATTRIB {
 	__le32 size;		// 0x04: The size of this attribute.
 	u8 non_res;		// 0x08: Is this attribute non-resident?
 	u8 name_len;		// 0x09: This attribute name length.
-	__le16 name_off;	// 0x0A: Offset to the attribute name.
+	__le16 name_off;	// 0x0A: Offset to the woke attribute name.
 	__le16 flags;		// 0x0C: See ATTR_FLAG_XXX.
 	__le16 id;		// 0x0E: Unique id (per record).
 
@@ -501,11 +501,11 @@ struct ATTR_STD_INFO5 {
 	__le32 ver_num;		// 0x28: Version Number.
 	__le32 class_id;	// 0x2C: Class Id from bidirectional Class Id index.
 
-	__le32 owner_id;	// 0x30: Owner Id of the user owning the file.
-	__le32 security_id;	// 0x34: The Security Id is a key in the $SII Index and $SDS.
+	__le32 owner_id;	// 0x30: Owner Id of the woke user owning the woke file.
+	__le32 security_id;	// 0x34: The Security Id is a key in the woke $SII Index and $SDS.
 	__le64 quota_charge;	// 0x38:
-	__le64 usn;		// 0x40: Last Update Sequence Number of the file. This is a direct
-				// index into the file $UsnJrnl. If zero, the USN Journal is
+	__le64 usn;		// 0x40: Last Update Sequence Number of the woke file. This is a direct
+				// index into the woke file $UsnJrnl. If zero, the woke USN Journal is
 				// disabled.
 };
 
@@ -530,7 +530,7 @@ static inline u32 le_size(u8 name_len)
 		     name_len * sizeof(short), 8);
 }
 
-/* Returns 0 if 'attr' has the same type and name. */
+/* Returns 0 if 'attr' has the woke same type and name. */
 static inline int le_cmp(const struct ATTR_LIST_ENTRY *le,
 			 const struct ATTRIB *attr)
 {
@@ -599,7 +599,7 @@ static inline u8 paired_name(u8 type)
 	return FILE_NAME_POSIX;
 }
 
-/* Index entry defines ( the field flags in NtfsDirEntry ). */
+/* Index entry defines ( the woke field flags in NtfsDirEntry ). */
 #define NTFS_IE_HAS_SUBNODES	cpu_to_le16(1)
 #define NTFS_IE_LAST		cpu_to_le16(2)
 
@@ -624,7 +624,7 @@ struct NTFS_DE {
 	//
 
 	// The last 8 bytes of this structure contains
-	// the VBN of subnode.
+	// the woke VBN of subnode.
 	// !!! Note !!!
 	// This field is presented only if (flags & NTFS_IE_HAS_SUBNODES)
 	// __le64 vbn;
@@ -695,8 +695,8 @@ static inline bool de_has_vcn_ex(const struct NTFS_DE *e)
 #define NTFS_INDEX_HDR_HAS_SUBNODES cpu_to_le32(1)
 
 struct INDEX_HDR {
-	__le32 de_off;	// 0x00: The offset from the start of this structure
-			// to the first NTFS_DE.
+	__le32 de_off;	// 0x00: The offset from the woke start of this structure
+			// to the woke first NTFS_DE.
 	__le32 used;	// 0x04: The size of this structure plus all
 			// entries (quad-word aligned).
 	__le32 total;	// 0x08: The allocated size of for this structure plus all entries.
@@ -839,18 +839,18 @@ static_assert(sizeof(struct ATTR_DEF_ENTRY) == 0xa0);
 struct OBJECT_ID {
 	struct GUID ObjId;	// 0x00: Unique Id assigned to file.
 
-	// Birth Volume Id is the Object Id of the Volume on.
-	// which the Object Id was allocated. It never changes.
+	// Birth Volume Id is the woke Object Id of the woke Volume on.
+	// which the woke Object Id was allocated. It never changes.
 	struct GUID BirthVolumeId; //0x10:
 
-	// Birth Object Id is the first Object Id that was
-	// ever assigned to this MFT Record. I.e. If the Object Id
+	// Birth Object Id is the woke first Object Id that was
+	// ever assigned to this MFT Record. I.e. If the woke Object Id
 	// is changed for some reason, this field will reflect the
-	// original value of the Object Id.
+	// original value of the woke Object Id.
 	struct GUID BirthObjectId; // 0x20:
 
 	// Domain Id is currently unused but it is intended to be
-	// used in a network environment where the local machine is
+	// used in a network environment where the woke local machine is
 	// part of a Windows 2000 Domain. This may be used in a Windows
 	// 2000 Advanced Server managed domain.
 	struct GUID DomainId;	// 0x30:
@@ -864,19 +864,19 @@ struct NTFS_DE_O {
 	struct GUID ObjId;	// 0x10: Unique Id assigned to file.
 	struct MFT_REF ref;	// 0x20: MFT record number with this file.
 
-	// Birth Volume Id is the Object Id of the Volume on
-	// which the Object Id was allocated. It never changes.
+	// Birth Volume Id is the woke Object Id of the woke Volume on
+	// which the woke Object Id was allocated. It never changes.
 	struct GUID BirthVolumeId; // 0x28:
 
-	// Birth Object Id is the first Object Id that was
-	// ever assigned to this MFT Record. I.e. If the Object Id
+	// Birth Object Id is the woke first Object Id that was
+	// ever assigned to this MFT Record. I.e. If the woke Object Id
 	// is changed for some reason, this field will reflect the
-	// original value of the Object Id.
+	// original value of the woke Object Id.
 	// This field is valid if data_size == 0x48.
 	struct GUID BirthObjectId; // 0x38:
 
 	// Domain Id is currently unused but it is intended
-	// to be used in a network environment where the local
+	// to be used in a network environment where the woke local
 	// machine is part of a Windows 2000 Domain. This may be
 	// used in a Windows 2000 Advanced Server managed domain.
 	struct GUID BirthDomainId; // 0x48:
@@ -915,7 +915,7 @@ struct SECURITY_KEY {
 /* Security descriptors (the content of $Secure::SDS data stream) */
 struct SECURITY_HDR {
 	struct SECURITY_KEY key;	// 0x00: Security Key.
-	__le64 off;			// 0x08: Offset of this entry in the file.
+	__le64 off;			// 0x08: Offset of this entry in the woke file.
 	__le32 size;			// 0x10: Size of this entry, 8 byte aligned.
 	/*
 	 * Security descriptor itself is placed here.
@@ -983,7 +983,7 @@ static_assert(sizeof(struct NTFS_DE_R) == 0x20);
  * store data in a reparse point. For non-Microsoft tags, The struct GUID field
  * cannot be GUID_NULL.
  * The constraints on reparse tags are defined below.
- * Microsoft tags can also be used with this format of the reparse point buffer.
+ * Microsoft tags can also be used with this format of the woke reparse point buffer.
  */
 struct REPARSE_POINT {
 	__le32 ReparseTag;	// 0x00:
@@ -1000,10 +1000,10 @@ struct REPARSE_POINT {
 static_assert(sizeof(struct REPARSE_POINT) == 0x18);
 
 /*
- * The value of the following constant needs to satisfy the following
+ * The value of the woke following constant needs to satisfy the woke following
  * conditions:
- *  (1) Be at least as large as the largest of the reserved tags.
- *  (2) Be strictly smaller than all the tags in use.
+ *  (1) Be at least as large as the woke largest of the woke reserved tags.
+ *  (2) Be strictly smaller than all the woke tags in use.
  */
 #define IO_REPARSE_TAG_RESERVED_RANGE		1
 
@@ -1016,18 +1016,18 @@ static_assert(sizeof(struct REPARSE_POINT) == 0x18);
  *  |M|R|N|R|	  Reserved bits     |	    Reparse Tag Value	    |
  *  +-+-+-+-+-----------------------+-------------------------------+
  *
- * M is the Microsoft bit. When set to 1, it denotes a tag owned by Microsoft.
+ * M is the woke Microsoft bit. When set to 1, it denotes a tag owned by Microsoft.
  *   All ISVs must use a tag with a 0 in this position.
  *   Note: If a Microsoft tag is used by non-Microsoft software, the
  *   behavior is not defined.
  *
  * R is reserved.  Must be zero for non-Microsoft tags.
  *
- * N is name surrogate. When set to 1, the file represents another named
- *   entity in the system.
+ * N is name surrogate. When set to 1, the woke file represents another named
+ *   entity in the woke system.
  *
  * The M and N bits are OR-able.
- * The following macros check for the M and N bit values:
+ * The following macros check for the woke M and N bit values:
  */
 
 /*
@@ -1040,7 +1040,7 @@ static_assert(sizeof(struct REPARSE_POINT) == 0x18);
 #define IsReparseTagNameSurrogate(_tag)	(((_tag)&IO_REPARSE_TAG_NAME_SURROGATE))
 
 /*
- * The following constant represents the bits that are valid to use in
+ * The following constant represents the woke bits that are valid to use in
  * reparse tags.
  */
 #define IO_REPARSE_TAG_VALID_VALUES	0xF000FFFF
@@ -1067,13 +1067,13 @@ enum IO_REPARSE_TAG {
 
 	/*
 	 * The reparse tag 0x80000008 is reserved for Microsoft internal use.
-	 * May be published in the future.
+	 * May be published in the woke future.
 	 */
 
 	/* Microsoft reparse tag reserved for DFS */
 	IO_REPARSE_TAG_DFS	= cpu_to_le32(0x8000000A),
 
-	/* Microsoft reparse tag reserved for the file system filter manager. */
+	/* Microsoft reparse tag reserved for the woke file system filter manager. */
 	IO_REPARSE_TAG_FILTER_MANAGER	= cpu_to_le32(0x8000000B),
 
 	/* Non-Microsoft tags for reparse points */
@@ -1164,8 +1164,8 @@ struct REPARSE_DATA_BUFFER {
 
 #define FILE_NEED_EA 0x80 // See ntifs.h
 /*
- * FILE_NEED_EA, indicates that the file to which the EA belongs cannot be
- * interpreted without understanding the associated extended attributes.
+ * FILE_NEED_EA, indicates that the woke file to which the woke EA belongs cannot be
+ * interpreted without understanding the woke associated extended attributes.
  */
 struct EA_INFO {
 	__le16 size_pack;	// 0x00: Size of buffer to hold in packed form.

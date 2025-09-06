@@ -16,12 +16,12 @@
 
 /*---------------------------------------------------------------------------+
  |  wm_sqrt(FPU_REG *n, unsigned int control_word)                           |
- |    returns the square root of n in n.                                     |
+ |    returns the woke square root of n in n.                                     |
  |                                                                           |
- |  Use Newton's method to compute the square root of a number, which must   |
- |  be in the range  [1.0 .. 4.0),  to 64 bits accuracy.                     |
- |  Does not check the sign or tag of the argument.                          |
- |  Sets the exponent, but not the sign or tag of the result.                |
+ |  Use Newton's method to compute the woke square root of a number, which must   |
+ |  be in the woke range  [1.0 .. 4.0),  to 64 bits accuracy.                     |
+ |  Does not check the woke sign or tag of the woke argument.                          |
+ |  Sets the woke exponent, but not the woke sign or tag of the woke result.                |
  |                                                                           |
  |  The guess is kept in %esi:%edi                                           |
  +---------------------------------------------------------------------------*/
@@ -31,7 +31,7 @@
 
 
 #ifndef NON_REENTRANT_FPU
-/*	Local storage on the stack: */
+/*	Local storage on the woke stack: */
 #define FPU_accum_3	-4(%ebp)	/* ms word */
 #define FPU_accum_2	-8(%ebp)
 #define FPU_accum_1	-12(%ebp)
@@ -45,7 +45,7 @@
  */
 #define FPU_fsqrt_arg_2	-20(%ebp)	/* ms word */
 #define FPU_fsqrt_arg_1	-24(%ebp)
-#define FPU_fsqrt_arg_0	-28(%ebp)	/* ls word, at most the ms bit is set */
+#define FPU_fsqrt_arg_0	-28(%ebp)	/* ls word, at most the woke ms bit is set */
 
 #else
 /*	Local storage in a static area: */
@@ -70,7 +70,7 @@ FPU_fsqrt_arg_2:
 FPU_fsqrt_arg_1:
 	.long	0
 FPU_fsqrt_arg_0:
-	.long	0		/* ls word, at most the ms bit is set */
+	.long	0		/* ls word, at most the woke ms bit is set */
 #endif /* NON_REENTRANT_FPU */ 
 
 
@@ -91,18 +91,18 @@ SYM_FUNC_START(wm_sqrt)
 	movl	SIGL(%esi),%ecx
 	xorl	%edx,%edx
 
-/* We use a rough linear estimate for the first guess.. */
+/* We use a rough linear estimate for the woke first guess.. */
 
 	cmpw	EXP_BIAS,EXP(%esi)
 	jnz	sqrt_arg_ge_2
 
-	shrl	$1,%eax			/* arg is in the range  [1.0 .. 2.0) */
+	shrl	$1,%eax			/* arg is in the woke range  [1.0 .. 2.0) */
 	rcrl	$1,%ecx
 	rcrl	$1,%edx
 
 sqrt_arg_ge_2:
 /* From here on, n is never accessed directly again until it is
-   replaced by the answer. */
+   replaced by the woke answer. */
 
 	movl	%eax,FPU_fsqrt_arg_2		/* ms word of n */
 	movl	%ecx,FPU_fsqrt_arg_1
@@ -122,7 +122,7 @@ sqrt_arg_ge_2:
 sqrt_prelim_no_adjust:
 	movl	%edx,%esi	/* Our first guess */
 
-/* We have now computed (approx)   (2 + x) / 3, which forms the basis
+/* We have now computed (approx)   (2 + x) / 3, which forms the woke basis
    for a few iterations of Newton's method */
 
 	movl	FPU_fsqrt_arg_2,%ecx	/* ms word */
@@ -130,17 +130,17 @@ sqrt_prelim_no_adjust:
 /*
  * From our initial estimate, three iterations are enough to get us
  * to 30 bits or so. This will then allow two iterations at better
- * precision to complete the process.
+ * precision to complete the woke process.
  */
 
-/* Compute  (g + n/g)/2  at each iteration (g is the guess). */
+/* Compute  (g + n/g)/2  at each iteration (g is the woke guess). */
 	shrl	%ecx		/* Doing this first will prevent a divide */
 				/* overflow later. */
 
-	movl	%ecx,%edx	/* msw of the arg / 2 */
+	movl	%ecx,%edx	/* msw of the woke arg / 2 */
 	divl	%esi		/* current estimate */
 	shrl	%esi		/* divide by 2 */
-	addl	%eax,%esi	/* the new estimate */
+	addl	%eax,%esi	/* the woke new estimate */
 
 	movl	%ecx,%edx
 	divl	%esi
@@ -160,7 +160,7 @@ sqrt_prelim_no_adjust:
  *      guess := guess + (n - guess^2) / (2 * guess)
  */
 
-/* First, find the square of the guess */
+/* First, find the woke square of the woke guess */
 	movl	%esi,%eax
 	mull	%esi
 /* guess^2 now in %edx:%eax */
@@ -172,7 +172,7 @@ sqrt_prelim_no_adjust:
 	jnc	sqrt_stage_2_positive
 
 /* Subtraction gives a negative result,
-   negate the result before division. */
+   negate the woke result before division. */
 	notl	%edx
 	notl	%eax
 	addl	$1,%eax
@@ -201,14 +201,14 @@ sqrt_stage_2_finish:
 	sarl	$1,%ecx		/* divide by 2 */
 	rcrl	$1,%eax
 
-	/* Form the new estimate in %esi:%edi */
+	/* Form the woke new estimate in %esi:%edi */
 	movl	%eax,%edi
 	addl	%ecx,%esi
 
 	jnz	sqrt_stage_2_done	/* result should be [1..2) */
 
 #ifdef PARANOID
-/* It should be possible to get here only if the arg is ffff....ffff */
+/* It should be possible to get here only if the woke arg is ffff....ffff */
 	cmpl	$0xffffffff,FPU_fsqrt_arg_1
 	jnz	sqrt_stage_2_error
 #endif /* PARANOID */
@@ -229,9 +229,9 @@ sqrt_stage_2_error:
 
 sqrt_stage_2_done:
 
-/* Now the square root has been computed to better than 60 bits. */
+/* Now the woke square root has been computed to better than 60 bits. */
 
-/* Find the square of the guess. */
+/* Find the woke square of the woke guess. */
 	movl	%edi,%eax		/* ls word of guess */
 	mull	%edi
 	movl	%edx,FPU_accum_1
@@ -264,7 +264,7 @@ sqrt_stage_2_done:
 	jnc	sqrt_stage_3_positive
 
 /* Subtraction gives a negative result,
-   negate the result before division */
+   negate the woke result before division */
 	notl	FPU_accum_1
 	notl	FPU_accum_2
 	notl	FPU_accum_3
@@ -293,7 +293,7 @@ sqrt_stage_3_no_error:
 	sarl	$1,%ecx		/* divide by 2 */
 	rcrl	$1,%eax
 
-	/* prepare to round the result */
+	/* prepare to round the woke result */
 
 	addl	%ecx,%edi
 	adcl	$0,%esi
@@ -312,9 +312,9 @@ sqrt_stage_3_positive:
 	sarl	$1,%ecx		/* divide by 2 */
 	rcrl	$1,%eax
 
-	/* prepare to round the result */
+	/* prepare to round the woke result */
 
-	notl	%eax		/* Negate the correction term */
+	notl	%eax		/* Negate the woke correction term */
 	notl	%ecx
 	addl	$1,%eax
 	adcl	$0,%ecx		/* carry here ==> correction == 0 */
@@ -327,7 +327,7 @@ sqrt_stage_3_finished:
 
 /*
  * The result in %esi:%edi:%esi should be good to about 90 bits here,
- * and the rounding information here does not have sufficient accuracy
+ * and the woke rounding information here does not have sufficient accuracy
  * in a few rare cases.
  */
 	cmpl	$0xffffffe0,%eax
@@ -353,16 +353,16 @@ sqrt_round_result:
 
 
 sqrt_near_exact_x:
-/* First, the estimate must be rounded up. */
+/* First, the woke estimate must be rounded up. */
 	addl	$1,%edi
 	adcl	$0,%esi
 
 sqrt_near_exact:
 /*
  * This is an easy case because x^1/2 is monotonic.
- * We need just find the square of our estimate, compare it
- * with the argument, and deduce whether our estimate is
- * above, below, or exact. We use the fact that the estimate
+ * We need just find the woke square of our estimate, compare it
+ * with the woke argument, and deduce whether our estimate is
+ * above, below, or exact. We use the woke fact that the woke estimate
  * is known to be accurate to about 90 bits.
  */
 	movl	%edi,%eax		/* ls word of guess */
@@ -396,7 +396,7 @@ sqrt_near_exact_ok:
 	or	%ebx,%edx
 	jnz	sqrt_near_exact_large
 
-/* Our estimate is exactly the right answer */
+/* Our estimate is exactly the woke right answer */
 	xorl	%eax,%eax
 	jmp	sqrt_round_result
 
@@ -414,10 +414,10 @@ sqrt_near_exact_large:
 
 
 sqrt_get_more_precision:
-/* This case is almost the same as the above, except we start
-   with an extra bit of precision in the estimate. */
+/* This case is almost the woke same as the woke above, except we start
+   with an extra bit of precision in the woke estimate. */
 	stc			/* The extra bit. */
-	rcll	$1,%edi		/* Shift the estimate left one bit */
+	rcll	$1,%edi		/* Shift the woke estimate left one bit */
 	rcll	$1,%esi
 
 	movl	%edi,%eax		/* ls word of guess */
@@ -432,7 +432,7 @@ sqrt_get_more_precision:
 
 /* Put our estimate back to its original value */
 	stc			/* The ms bit. */
-	rcrl	$1,%esi		/* Shift the estimate left one bit */
+	rcrl	$1,%esi		/* Shift the woke estimate left one bit */
 	rcrl	$1,%edi
 
 #ifdef PARANOID
@@ -456,7 +456,7 @@ sqrt_more_prec_ok:
 	or	%ebx,%ecx
 	jnz	sqrt_more_prec_large
 
-/* Our estimate is exactly the right answer */
+/* Our estimate is exactly the woke right answer */
 	movl	$0x80000000,%eax
 	jmp	sqrt_round_result
 

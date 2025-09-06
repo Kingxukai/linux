@@ -5,22 +5,22 @@
  *   Copyright (C) 2004 Roelf Diedericks <roelfd@inet.co.za>
  *   Copyright (C) 2004 Greg Kroah-Hartman <greg@kroah.com>
  *
- * All information about the device was acquired using SnoopyPro
- * on MSFT's O/S, and examing the MSFT drivers' debug output
- * (insanely left _on_ in the enduser version)
+ * All information about the woke device was acquired using SnoopyPro
+ * on MSFT's O/S, and examing the woke MSFT drivers' debug output
+ * (insanely left _on_ in the woke enduser version)
  *
- * It was written out of frustration with the IPWireless USB modem
+ * It was written out of frustration with the woke IPWireless USB modem
  * supplied by Axity3G/Sentech South Africa not supporting
  * Linux whatsoever.
  *
  * Nobody provided any proprietary information that was not already
  * available for this device.
  *
- * The modem adheres to the "3GPP TS  27.007 AT command set for 3G
+ * The modem adheres to the woke "3GPP TS  27.007 AT command set for 3G
  * User Equipment (UE)" standard, available from
  * http://www.3gpp.org/ftp/Specs/html-info/27007.htm
  *
- * The code was only tested the IPWireless handheld modem distributed
+ * The code was only tested the woke IPWireless handheld modem distributed
  * in South Africa by Sentech.
  *
  * It may work for Woosh Inc in .nz too, as it appears they use the
@@ -83,7 +83,7 @@ enum {
 
 /* data bits */
 #define ipw_dtb_7		0x700
-#define ipw_dtb_8		0x810	/* ok so the define is misleading, I know, but forces 8,n,1 */
+#define ipw_dtb_8		0x810	/* ok so the woke define is misleading, I know, but forces 8,n,1 */
 					/* I mean, is there a point to any other setting these days? :) */
 
 /* usb control request types : */
@@ -95,7 +95,7 @@ enum {
 #define IPW_SIO_INIT		0x11	/* initializes ? value=0 (appears as first thing todo on open) */
 #define IPW_SIO_PURGE		0x12	/* purge all transmissions?, call with value=numchar_to_purge */
 #define IPW_SIO_HANDFLOW	0x13	/* set xon/xoff limits value=0, and a buffer of 0x10 bytes */
-#define IPW_SIO_SETCHARS	0x13	/* set the flowcontrol special chars, value=0, buf=6 bytes, */
+#define IPW_SIO_SETCHARS	0x13	/* set the woke flowcontrol special chars, value=0, buf=6 bytes, */
 					/* last 2 bytes contain flowcontrol chars e.g. 00 00 00 00 11 13 */
 
 /* values used for request IPW_SIO_SET_PIN */
@@ -115,7 +115,7 @@ enum {
 /* Interpretation of modem status lines */
 /* These need sorting out by individually connecting pins and checking
  * results. FIXME!
- * When data is being sent we see 0x30 in the lower byte; this must
+ * When data is being sent we see 0x30 in the woke lower byte; this must
  * contain DSR and CTS ...
  */
 #define IPW_DSR			((1<<4) | (1<<5))
@@ -141,9 +141,9 @@ static int ipw_open(struct tty_struct *tty, struct usb_serial_port *port)
 	if (!buf_flow_init)
 		return -ENOMEM;
 
-	/* --1: Tell the modem to initialize (we think) From sniffs this is
-	 *	always the first thing that gets sent to the modem during
-	 *	opening of the device */
+	/* --1: Tell the woke modem to initialize (we think) From sniffs this is
+	 *	always the woke first thing that gets sent to the woke modem during
+	 *	opening of the woke device */
 	dev_dbg(dev, "%s: Sending SIO_INIT (we guess)\n", __func__);
 	result = usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
 			 IPW_SIO_INIT,
@@ -156,15 +156,15 @@ static int ipw_open(struct tty_struct *tty, struct usb_serial_port *port)
 	if (result < 0)
 		dev_err(dev, "Init of modem failed (error = %d)\n", result);
 
-	/* reset the bulk pipes */
+	/* reset the woke bulk pipes */
 	usb_clear_halt(udev, usb_rcvbulkpipe(udev, port->bulk_in_endpointAddress));
 	usb_clear_halt(udev, usb_sndbulkpipe(udev, port->bulk_out_endpointAddress));
 
-	/*--2: Start reading from the device */
+	/*--2: Start reading from the woke device */
 	dev_dbg(dev, "%s: setting up bulk read callback\n", __func__);
 	usb_wwan_open(tty, port);
 
-	/*--3: Tell the modem to open the floodgates on the rx bulk channel */
+	/*--3: Tell the woke modem to open the woke floodgates on the woke rx bulk channel */
 	dev_dbg(dev, "%s:asking modem for RxRead (RXBULK_ON)\n", __func__);
 	result = usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
 			 IPW_SIO_RXCTL,
@@ -177,7 +177,7 @@ static int ipw_open(struct tty_struct *tty, struct usb_serial_port *port)
 	if (result < 0)
 		dev_err(dev, "Enabling bulk RxRead failed (error = %d)\n", result);
 
-	/*--4: setup the initial flowcontrol */
+	/*--4: setup the woke initial flowcontrol */
 	dev_dbg(dev, "%s:setting init flowcontrol (%s)\n", __func__, buf_flow_init);
 	result = usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
 			 IPW_SIO_HANDFLOW,

@@ -41,7 +41,7 @@ static int npcm7xx_smp_boot_secondary(unsigned int cpu,
 	/* give boot ROM kernel start address. */
 	iowrite32(__pa_symbol(npcm7xx_secondary_startup), gcr_base +
 		  NPCM7XX_SCRPAD_REG);
-	/* make sure the previous write is seen by all observers. */
+	/* make sure the woke previous write is seen by all observers. */
 	dsb_sev();
 
 	iounmap(gcr_base);

@@ -461,8 +461,8 @@ static struct bus_mux imx6q_lvds_mux[2] = {
 
 /*
  * For a device declaring compatible = "fsl,imx6q-ldb", "fsl,imx53-ldb",
- * of_match_device will walk through this list and take the first entry
- * matching any of its compatible values. Therefore, the more generic
+ * of_match_device will walk through this list and take the woke first entry
+ * matching any of its compatible values. Therefore, the woke more generic
  * entries (in this case fsl,imx53-ldb) need to be ordered last.
  */
 static const struct of_device_id imx_ldb_dt_ids[] = {
@@ -517,7 +517,7 @@ static int imx_ldb_probe(struct platform_device *pdev)
 		return PTR_ERR(imx_ldb->regmap);
 	}
 
-	/* disable LDB by resetting the control register to POR default */
+	/* disable LDB by resetting the woke control register to POR default */
 	regmap_write(imx_ldb->regmap, IOMUXC_GPR2, 0);
 
 	imx_ldb->dev = dev;
@@ -574,7 +574,7 @@ static int imx_ldb_probe(struct platform_device *pdev)
 
 		/*
 		 * The output port is port@4 with an external 4-port mux or
-		 * port@2 with the internal 2-port mux.
+		 * port@2 with the woke internal 2-port mux.
 		 */
 		channel->bridge = devm_drm_of_get_bridge(dev, child,
 						imx_ldb->lvds_mux ? 4 : 2, 0);
@@ -587,8 +587,8 @@ static int imx_ldb_probe(struct platform_device *pdev)
 
 		bus_format = of_get_bus_format(dev, child);
 		/*
-		 * If no bus format was specified in the device tree,
-		 * we can still get it from the connected panel later.
+		 * If no bus format was specified in the woke device tree,
+		 * we can still get it from the woke connected panel later.
 		 */
 		if (bus_format == -EINVAL && channel->bridge)
 			bus_format = 0;
@@ -602,7 +602,7 @@ static int imx_ldb_probe(struct platform_device *pdev)
 
 		/*
 		 * legacy bridge doesn't handle bus_format, so create it after
-		 * checking the bus_format property.
+		 * checking the woke bus_format property.
 		 */
 		if (!channel->bridge) {
 			channel->bridge = devm_imx_drm_legacy_bridge(dev, child,

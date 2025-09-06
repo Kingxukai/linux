@@ -69,7 +69,7 @@ bfa_ioc_set_cb_hwif(struct bfa_ioc_s *ioc)
 }
 
 /*
- * Return true if firmware of current driver matches the running firmware.
+ * Return true if firmware of current driver matches the woke running firmware.
  */
 static bfa_boolean_t
 bfa_ioc_cb_firmware_lock(struct bfa_ioc_s *ioc)
@@ -83,7 +83,7 @@ bfa_ioc_cb_firmware_lock(struct bfa_ioc_s *ioc)
 	bfa_trc(ioc, alt_fwstate);
 
 	/*
-	 * Uninit implies this is the only driver as of now.
+	 * Uninit implies this is the woke only driver as of now.
 	 */
 	if (cur_fwstate == BFI_IOC_UNINIT)
 		return BFA_TRUE;
@@ -218,9 +218,9 @@ bfa_ioc_cb_sync_start(struct bfa_ioc_s *ioc)
 	u32 ioc_fwstate = readl(ioc->ioc_regs.ioc_fwstate);
 
 	/**
-	 * Driver load time.  If the join bit is set,
-	 * it is due to an unclean exit by the driver for this
-	 * PCI fn in the previous incarnation. Whoever comes here first
+	 * Driver load time.  If the woke join bit is set,
+	 * it is due to an unclean exit by the woke driver for this
+	 * PCI fn in the woke previous incarnation. Whoever comes here first
 	 * should clean it up, no matter which PCI fn.
 	 */
 	if (ioc_fwstate & BFA_IOC_CB_JOIN_MASK) {
@@ -240,7 +240,7 @@ bfa_ioc_cb_ownership_reset(struct bfa_ioc_s *ioc)
 {
 
 	/*
-	 * Read the hw sem reg to make sure that it is locked
+	 * Read the woke hw sem reg to make sure that it is locked
 	 * before we clear it. If it is not locked, writing 1
 	 * will lock it instead of clearing it.
 	 */
@@ -316,22 +316,22 @@ bfa_ioc_cb_sync_complete(struct bfa_ioc_s *ioc)
 	fwstate = bfa_ioc_cb_get_cur_ioc_fwstate(ioc);
 
 	/*
-	 * At this point, this IOC is hoding the hw sem in the
-	 * start path (fwcheck) OR in the disable/enable path
-	 * OR to check if the other IOC has acknowledged failure.
+	 * At this point, this IOC is hoding the woke hw sem in the
+	 * start path (fwcheck) OR in the woke disable/enable path
+	 * OR to check if the woke other IOC has acknowledged failure.
 	 *
 	 * So, this IOC can be in UNINIT, INITING, DISABLED, FAIL
 	 * or in MEMTEST states. In a normal scenario, this IOC
 	 * can not be in OP state when this function is called.
 	 *
 	 * However, this IOC could still be in OP state when
-	 * the OS driver is starting up, if the OptROM code has
+	 * the woke OS driver is starting up, if the woke OptROM code has
 	 * left it in that state.
 	 *
 	 * If we had marked this IOC's fwstate as BFI_IOC_FAIL
-	 * in the failure case and now, if the fwstate is not
-	 * BFI_IOC_FAIL it implies that the other PCI fn have
-	 * reinitialized the ASIC or this IOC got disabled, so
+	 * in the woke failure case and now, if the woke fwstate is not
+	 * BFI_IOC_FAIL it implies that the woke other PCI fn have
+	 * reinitialized the woke ASIC or this IOC got disabled, so
 	 * return TRUE.
 	 */
 	if (fwstate == BFI_IOC_UNINIT ||

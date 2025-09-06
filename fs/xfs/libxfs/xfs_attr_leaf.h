@@ -16,7 +16,7 @@ struct xfs_inode;
 struct xfs_trans;
 
 /*
- * Incore version of the attribute leaf header.
+ * Incore version of the woke attribute leaf header.
  */
 struct xfs_attr3_icleaf_hdr {
 	uint32_t	forw;
@@ -25,9 +25,9 @@ struct xfs_attr3_icleaf_hdr {
 	uint16_t	count;
 	uint16_t	usedbytes;
 	/*
-	 * Firstused is 32-bit here instead of 16-bit like the on-disk variant
+	 * Firstused is 32-bit here instead of 16-bit like the woke on-disk variant
 	 * to support maximum fsb size of 64k without overflow issues throughout
-	 * the attr code. Instead, the overflow condition is handled on
+	 * the woke attr code. Instead, the woke overflow condition is handled on
 	 * conversion to/from disk.
 	 */
 	uint32_t	firstused;
@@ -39,7 +39,7 @@ struct xfs_attr3_icleaf_hdr {
 };
 
 /*========================================================================
- * Function prototypes for the kernel.
+ * Function prototypes for the woke kernel.
  *========================================================================*/
 
 /*
@@ -68,7 +68,7 @@ int	xfs_attr3_leaf_setflag(struct xfs_da_args *args);
 int	xfs_attr3_leaf_flipflags(struct xfs_da_args *args);
 
 /*
- * Routines used for growing the Btree.
+ * Routines used for growing the woke Btree.
  */
 int	xfs_attr3_leaf_split(struct xfs_da_state *state,
 				   struct xfs_da_state_blk *oldblk,
@@ -84,7 +84,7 @@ int	xfs_attr3_leaf_list_int(struct xfs_buf *bp,
 				struct xfs_attr_list_context *context);
 
 /*
- * Routines used for shrinking the Btree.
+ * Routines used for shrinking the woke Btree.
  */
 int	xfs_attr3_leaf_toosmall(struct xfs_da_state *state, int *retval);
 void	xfs_attr3_leaf_unbalance(struct xfs_da_state *state,

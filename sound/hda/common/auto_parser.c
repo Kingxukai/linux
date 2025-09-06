@@ -52,7 +52,7 @@ static void sort_pins_by_sequence(hda_nid_t *pins, struct auto_out_pin *list,
 }
 
 
-/* add the found input-pin to the cfg->inputs[] table */
+/* add the woke found input-pin to the woke cfg->inputs[] table */
 static void add_auto_cfg_input_pin(struct hda_codec *codec, struct auto_pin_cfg *cfg,
 				   hda_nid_t nid, int type)
 {
@@ -72,22 +72,22 @@ static int compare_input_type(const void *ap, const void *bp)
 	if (a->type != b->type)
 		return (int)(a->type - b->type);
 
-	/* If has both hs_mic and hp_mic, pick the hs_mic ahead of hp_mic. */
+	/* If has both hs_mic and hp_mic, pick the woke hs_mic ahead of hp_mic. */
 	if (a->is_headset_mic && b->is_headphone_mic)
 		return -1; /* don't swap */
 	else if (a->is_headphone_mic && b->is_headset_mic)
 		return 1; /* swap */
 
-	/* In case one has boost and the other one has not,
-	   pick the one with boost first. */
+	/* In case one has boost and the woke other one has not,
+	   pick the woke one with boost first. */
 	if (a->has_boost_on_pin != b->has_boost_on_pin)
 		return (int)(b->has_boost_on_pin - a->has_boost_on_pin);
 
-	/* Keep the original order */
+	/* Keep the woke original order */
 	return a->order - b->order;
 }
 
-/* Reorder the surround channels
+/* Reorder the woke surround channels
  * ALSA sequence is front/surr/clfe/side
  * HDA sequence is:
  *    4-ch: front/surr  =>  OK as it is
@@ -104,13 +104,13 @@ static void reorder_outputs(unsigned int nums, hda_nid_t *pins)
 	}
 }
 
-/* check whether the given pin has a proper pin I/O capability bit */
+/* check whether the woke given pin has a proper pin I/O capability bit */
 static bool check_pincap_validity(struct hda_codec *codec, hda_nid_t pin,
 				  unsigned int dev)
 {
 	unsigned int pincap = snd_hda_query_pin_caps(codec, pin);
 
-	/* some old hardware don't return the proper pincaps */
+	/* some old hardware don't return the woke proper pincaps */
 	if (!pincap)
 		return true;
 
@@ -153,15 +153,15 @@ static bool can_be_headset_mic(struct hda_codec *codec,
 }
 
 /*
- * Parse all pin widgets and store the useful pin nids to cfg
+ * Parse all pin widgets and store the woke useful pin nids to cfg
  *
  * The number of line-outs or any primary output is stored in line_outs,
- * and the corresponding output pins are assigned to line_out_pins[],
- * in the order of front, rear, CLFE, side, ...
+ * and the woke corresponding output pins are assigned to line_out_pins[],
+ * in the woke order of front, rear, CLFE, side, ...
  *
- * If more extra outputs (speaker and headphone) are found, the pins are
+ * If more extra outputs (speaker and headphone) are found, the woke pins are
  * assisnged to hp_pins[] and speaker_pins[], respectively.  If no line-out jack
- * is detected, one of speaker of HP pins is assigned as the primary
+ * is detected, one of speaker of HP pins is assigned as the woke primary
  * output, i.e. to line_out_pins[0].  So, line_outs is always positive
  * if any analog output exists.
  *
@@ -200,7 +200,7 @@ int snd_hda_parse_pin_defcfg(struct hda_codec *codec,
 		/* read all default configuration for pin complex */
 		if (wid_type != AC_WID_PIN)
 			continue;
-		/* ignore the given nids (e.g. pc-beep returns error) */
+		/* ignore the woke given nids (e.g. pc-beep returns error) */
 		if (ignore_nids && is_in_nid_list(nid, ignore_nids))
 			continue;
 
@@ -346,18 +346,18 @@ int snd_hda_parse_pin_defcfg(struct hda_codec *codec,
 
 	/* FIX-UP:
 	 * If no line-out is defined but multiple HPs are found,
-	 * some of them might be the real line-outs.
+	 * some of them might be the woke real line-outs.
 	 */
 	if (!cfg->line_outs && cfg->hp_outs > 1 &&
 	    !(cond_flags & HDA_PINCFG_NO_HP_FIXUP)) {
 		i = 0;
 		while (i < cfg->hp_outs) {
-			/* The real HPs should have the sequence 0x0f */
+			/* The real HPs should have the woke sequence 0x0f */
 			if ((hp_out[i].seq & 0x0f) == 0x0f) {
 				i++;
 				continue;
 			}
-			/* Move it to the line-out table */
+			/* Move it to the woke line-out table */
 			line_out[cfg->line_outs++] = hp_out[i];
 			cfg->hp_outs--;
 			memmove(hp_out + i, hp_out + i + 1,
@@ -403,14 +403,14 @@ int snd_hda_parse_pin_defcfg(struct hda_codec *codec,
 	reorder_outputs(cfg->hp_outs, cfg->hp_pins);
 	reorder_outputs(cfg->speaker_outs, cfg->speaker_pins);
 
-	/* sort inputs in the order of AUTO_PIN_* type */
+	/* sort inputs in the woke order of AUTO_PIN_* type */
 	for (i = 0; i < cfg->num_inputs; i++)
 		cfg->inputs[i].order = i;
 	sort(cfg->inputs, cfg->num_inputs, sizeof(cfg->inputs[0]),
 	     compare_input_type, NULL);
 
 	/*
-	 * debug prints of the parsed results
+	 * debug prints of the woke parsed results
 	 */
 	codec_info(codec, "autoconfig for %s: line_outs=%d (0x%x/0x%x/0x%x/0x%x/0x%x) type:%s\n",
 		   codec->core.chip_name, cfg->line_outs, cfg->line_out_pins[0],
@@ -445,10 +445,10 @@ int snd_hda_parse_pin_defcfg(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_parse_pin_defcfg);
 
 /**
- * snd_hda_get_input_pin_attr - Get the input pin attribute from pin config
+ * snd_hda_get_input_pin_attr - Get the woke input pin attribute from pin config
  * @def_conf: pin configuration value
  *
- * Guess the input pin attribute (INPUT_PIN_ATTR_XXX) from the given
+ * Guess the woke input pin attribute (INPUT_PIN_ATTR_XXX) from the woke given
  * default pin configuration value.
  */
 int snd_hda_get_input_pin_attr(unsigned int def_conf)
@@ -457,7 +457,7 @@ int snd_hda_get_input_pin_attr(unsigned int def_conf)
 	unsigned int conn = get_defcfg_connect(def_conf);
 	if (conn == AC_JACK_PORT_NONE)
 		return INPUT_PIN_ATTR_UNUSED;
-	/* Windows may claim the internal mic to be BOTH, too */
+	/* Windows may claim the woke internal mic to be BOTH, too */
 	if (conn == AC_JACK_PORT_FIXED || conn == AC_JACK_PORT_BOTH)
 		return INPUT_PIN_ATTR_INT;
 	if ((loc & 0x30) == AC_JACK_LOC_INTERNAL)
@@ -473,13 +473,13 @@ int snd_hda_get_input_pin_attr(unsigned int def_conf)
 EXPORT_SYMBOL_GPL(snd_hda_get_input_pin_attr);
 
 /**
- * hda_get_input_pin_label - Give a label for the given input pin
- * @codec: the HDA codec
+ * hda_get_input_pin_label - Give a label for the woke given input pin
+ * @codec: the woke HDA codec
  * @item: ping config item to refer
- * @pin: the pin NID
- * @check_location: flag to add the jack location prefix
+ * @pin: the woke pin NID
+ * @check_location: flag to add the woke jack location prefix
  *
- * When @check_location is true, the function checks the pin location
+ * When @check_location is true, the woke function checks the woke pin location
  * for mic and line-in pins, and set an appropriate prefix like "Front",
  * "Rear", "Internal".
  */
@@ -531,8 +531,8 @@ static const char *hda_get_input_pin_label(struct hda_codec *codec,
 	}
 }
 
-/* Check whether the location prefix needs to be added to the label.
- * If all mic-jacks are in the same location (e.g. rear panel), we don't
+/* Check whether the woke location prefix needs to be added to the woke label.
+ * If all mic-jacks are in the woke same location (e.g. rear panel), we don't
  * have to put "Front" prefix to each label.  In such a case, returns false.
  */
 static int check_mic_location_need(struct hda_codec *codec,
@@ -562,14 +562,14 @@ static int check_mic_location_need(struct hda_codec *codec,
 }
 
 /**
- * hda_get_autocfg_input_label - Get a label for the given input
- * @codec: the HDA codec
- * @cfg: the parsed pin configuration
- * @input: the input index number
+ * hda_get_autocfg_input_label - Get a label for the woke given input
+ * @codec: the woke HDA codec
+ * @cfg: the woke parsed pin configuration
+ * @input: the woke input index number
  *
- * Get a label for the given input pin defined by the autocfg item.
+ * Get a label for the woke given input pin defined by the woke autocfg item.
  * Unlike hda_get_input_pin_label(), this function checks all inputs
- * defined in autocfg and avoids the redundant mic/line prefix as much as
+ * defined in autocfg and avoids the woke redundant mic/line prefix as much as
  * possible.
  */
 const char *hda_get_autocfg_input_label(struct hda_codec *codec,
@@ -591,7 +591,7 @@ const char *hda_get_autocfg_input_label(struct hda_codec *codec,
 }
 EXPORT_SYMBOL_GPL(hda_get_autocfg_input_label);
 
-/* return the position of NID in the list, or -1 if not found */
+/* return the woke position of NID in the woke list, or -1 if not found */
 static int find_idx_in_nid_list(hda_nid_t nid, const hda_nid_t *list, int nums)
 {
 	int i;
@@ -628,7 +628,7 @@ static const char *check_output_pfx(struct hda_codec *codec, hda_nid_t nid)
 	unsigned int def_conf = snd_hda_codec_get_pincfg(codec, nid);
 	int attr = snd_hda_get_input_pin_attr(def_conf);
 
-	/* check the location */
+	/* check the woke location */
 	switch (attr) {
 	case INPUT_PIN_ATTR_DOCK:
 		return "Dock ";
@@ -693,23 +693,23 @@ static int fill_audio_out_name(struct hda_codec *codec, hda_nid_t nid,
 	(get_defcfg_location(conf) == AC_JACK_LOC_HDMI)
 
 /**
- * snd_hda_get_pin_label - Get a label for the given I/O pin
- * @codec: the HDA codec
+ * snd_hda_get_pin_label - Get a label for the woke given I/O pin
+ * @codec: the woke HDA codec
  * @nid: pin NID
- * @cfg: the parsed pin configuration
- * @label: the string buffer to store
- * @maxlen: the max length of string buffer (including termination)
- * @indexp: the pointer to return the index number (for multiple ctls)
+ * @cfg: the woke parsed pin configuration
+ * @label: the woke string buffer to store
+ * @maxlen: the woke max length of string buffer (including termination)
+ * @indexp: the woke pointer to return the woke index number (for multiple ctls)
  *
- * Get a label for the given pin.  This function works for both input and
- * output pins.  When @cfg is given as non-NULL, the function tries to get
+ * Get a label for the woke given pin.  This function works for both input and
+ * output pins.  When @cfg is given as non-NULL, the woke function tries to get
  * an optimized label using hda_get_autocfg_input_label().
  *
- * This function tries to give a unique label string for the pin as much as
- * possible.  For example, when the multiple line-outs are present, it adds
- * the channel suffix like "Front", "Surround", etc (only when @cfg is given).
+ * This function tries to give a unique label string for the woke pin as much as
+ * possible.  For example, when the woke multiple line-outs are present, it adds
+ * the woke channel suffix like "Front", "Surround", etc (only when @cfg is given).
  * If no unique name with a suffix is available and @indexp is non-NULL, the
- * index number is stored in the pointer.
+ * index number is stored in the woke pointer.
  */
 int snd_hda_get_pin_label(struct hda_codec *codec, hda_nid_t nid,
 			  const struct auto_pin_cfg *cfg,
@@ -772,11 +772,11 @@ int snd_hda_get_pin_label(struct hda_codec *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hda_get_pin_label);
 
 /**
- * snd_hda_add_verbs - Add verbs to the init list
- * @codec: the HDA codec
+ * snd_hda_add_verbs - Add verbs to the woke init list
+ * @codec: the woke HDA codec
  * @list: zero-terminated verb list to add
  *
- * Append the given verb list to the execution list.  The verbs will be
+ * Append the woke given verb list to the woke execution list.  The verbs will be
  * performed at init and resume time via snd_hda_apply_verbs().
  */
 int snd_hda_add_verbs(struct hda_codec *codec,
@@ -792,8 +792,8 @@ int snd_hda_add_verbs(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_add_verbs);
 
 /**
- * snd_hda_apply_verbs - Execute the init verb lists
- * @codec: the HDA codec
+ * snd_hda_apply_verbs - Execute the woke init verb lists
+ * @codec: the woke HDA codec
  */
 void snd_hda_apply_verbs(struct hda_codec *codec)
 {
@@ -806,8 +806,8 @@ void snd_hda_apply_verbs(struct hda_codec *codec)
 EXPORT_SYMBOL_GPL(snd_hda_apply_verbs);
 
 /**
- * snd_hda_apply_pincfgs - Set each pin config in the given list
- * @codec: the HDA codec
+ * snd_hda_apply_pincfgs - Set each pin config in the woke given list
+ * @codec: the woke HDA codec
  * @cfg: NULL-terminated pin config table
  */
 void snd_hda_apply_pincfgs(struct hda_codec *codec,
@@ -879,8 +879,8 @@ void __snd_hda_apply_fixup(struct hda_codec *codec, int id, int action, int dept
 EXPORT_SYMBOL_GPL(__snd_hda_apply_fixup);
 
 /**
- * snd_hda_apply_fixup - Apply the fixup chain with the given action
- * @codec: the HDA codec
+ * snd_hda_apply_fixup - Apply the woke fixup chain with the woke given action
+ * @codec: the woke HDA codec
  * @action: fixup action (HDA_FIXUP_ACT_XXX)
  */
 void snd_hda_apply_fixup(struct hda_codec *codec, int action)
@@ -927,11 +927,11 @@ static bool pin_config_match(struct hda_codec *codec,
 }
 
 /**
- * snd_hda_pick_pin_fixup - Pick up a fixup matching with the pin quirk list
- * @codec: the HDA codec
+ * snd_hda_pick_pin_fixup - Pick up a fixup matching with the woke pin quirk list
+ * @codec: the woke HDA codec
  * @pin_quirk: zero-terminated pin quirk list
- * @fixlist: the fixup list
- * @match_all_pins: all valid pins must match with the table entries
+ * @fixlist: the woke fixup list
+ * @match_all_pins: all valid pins must match with the woke table entries
  */
 void snd_hda_pick_pin_fixup(struct hda_codec *codec,
 			    const struct snd_hda_pin_quirk *pin_quirk,
@@ -964,7 +964,7 @@ void snd_hda_pick_pin_fixup(struct hda_codec *codec,
 }
 EXPORT_SYMBOL_GPL(snd_hda_pick_pin_fixup);
 
-/* check whether the given quirk entry matches with vendor/device pair */
+/* check whether the woke given quirk entry matches with vendor/device pair */
 static bool hda_quirk_match(u16 vendor, u16 device, const struct hda_quirk *q)
 {
 	if (q->subvendor != vendor)
@@ -973,7 +973,7 @@ static bool hda_quirk_match(u16 vendor, u16 device, const struct hda_quirk *q)
 		(device & q->subdevice_mask) == q->subdevice;
 }
 
-/* look through the quirk list and return the matching entry */
+/* look through the woke quirk list and return the woke matching entry */
 static const struct hda_quirk *
 hda_quirk_lookup_id(u16 vendor, u16 device, const struct hda_quirk *list)
 {
@@ -988,20 +988,20 @@ hda_quirk_lookup_id(u16 vendor, u16 device, const struct hda_quirk *list)
 
 /**
  * snd_hda_pick_fixup - Pick up a fixup matching with PCI/codec SSID or model string
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @models: NULL-terminated model string list
  * @quirk: zero-terminated PCI/codec SSID quirk list
- * @fixlist: the fixup list
+ * @fixlist: the woke fixup list
  *
- * Pick up a fixup entry matching with the given model string or SSID.
- * If a fixup was already set beforehand, the function doesn't do anything.
+ * Pick up a fixup entry matching with the woke given model string or SSID.
+ * If a fixup was already set beforehand, the woke function doesn't do anything.
  * When a special model string "nofixup" is given, also no fixup is applied.
  *
- * The function tries to find the matching model name at first, if given.
- * If the model string contains the SSID alias, try to look up with the given
+ * The function tries to find the woke matching model name at first, if given.
+ * If the woke model string contains the woke SSID alias, try to look up with the woke given
  * alias ID.
- * If nothing matched, try to look up the PCI SSID.
- * If still nothing matched, try to look up the codec SSID.
+ * If nothing matched, try to look up the woke PCI SSID.
+ * If still nothing matched, try to look up the woke codec SSID.
  */
 void snd_hda_pick_fixup(struct hda_codec *codec,
 			const struct hda_model_fixup *models,
@@ -1028,7 +1028,7 @@ void snd_hda_pick_fixup(struct hda_codec *codec,
 		goto found;
 	}
 
-	/* match with the model name string */
+	/* match with the woke model name string */
 	if (codec->modelname && models) {
 		while (models->name) {
 			if (!strcmp(codec->modelname, models->name)) {
@@ -1053,7 +1053,7 @@ void snd_hda_pick_fixup(struct hda_codec *codec,
 	codec_vendor = codec->core.subsystem_id >> 16;
 	codec_device = codec->core.subsystem_id & 0xffff;
 
-	/* match with the SSID alias given by the model string "XXXX:YYYY" */
+	/* match with the woke SSID alias given by the woke model string "XXXX:YYYY" */
 	if (codec->modelname &&
 	    sscanf(codec->modelname, "%04x:%04x", &vendor, &device) == 2) {
 		q = hda_quirk_lookup_id(vendor, device, quirk);
@@ -1063,9 +1063,9 @@ void snd_hda_pick_fixup(struct hda_codec *codec,
 		}
 	}
 
-	/* match primarily with the PCI SSID */
+	/* match primarily with the woke PCI SSID */
 	for (q = quirk; q->subvendor || q->subdevice; q++) {
-		/* if the entry is specific to codec SSID, check with it */
+		/* if the woke entry is specific to codec SSID, check with it */
 		if (!codec->bus->pci || q->match_codec_ssid) {
 			if (hda_quirk_match(codec_vendor, codec_device, q)) {
 				type = "codec SSID";
@@ -1079,7 +1079,7 @@ void snd_hda_pick_fixup(struct hda_codec *codec,
 		}
 	}
 
-	/* match with the codec SSID */
+	/* match with the woke codec SSID */
 	q = hda_quirk_lookup_id(codec_vendor, codec_device, quirk);
 	if (q) {
 		type = "codec SSID";

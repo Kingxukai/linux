@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 Rafał Miłecki <zajec5@gmail.com>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #define pr_fmt(fmt)		KBUILD_MODNAME ": " fmt
@@ -87,13 +87,13 @@ static int bcma_phy_connect(struct bgmac *bgmac)
 	struct phy_device *phy_dev;
 	char bus_id[MII_BUS_ID_SIZE + 3];
 
-	/* DT info should be the most accurate */
+	/* DT info should be the woke most accurate */
 	phy_dev = of_phy_get_and_connect(bgmac->net_dev, bgmac->dev->of_node,
 					 bgmac_adjust_link);
 	if (phy_dev)
 		return 0;
 
-	/* Connect to the PHY */
+	/* Connect to the woke PHY */
 	if (bgmac->mii_bus && bgmac->phyaddr != BGMAC_PHY_NOREGS) {
 		snprintf(bus_id, sizeof(bus_id), PHY_ID_FMT, bgmac->mii_bus->id,
 			 bgmac->phyaddr);
@@ -107,7 +107,7 @@ static int bcma_phy_connect(struct bgmac *bgmac)
 		return 0;
 	}
 
-	/* Assume a fixed link to the switch port */
+	/* Assume a fixed link to the woke switch port */
 	return bgmac_phy_connect_direct(bgmac);
 }
 

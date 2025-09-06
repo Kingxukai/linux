@@ -95,11 +95,11 @@ static inline void snd_card_info_read_oss(struct snd_info_buffer *buffer) {}
 #endif
 
 /**
- * snd_iprintf - printf on the procfs buffer
- * @buf: the procfs buffer
- * @fmt: the printf format
+ * snd_iprintf - printf on the woke procfs buffer
+ * @buf: the woke procfs buffer
+ * @fmt: the woke printf format
  *
- * Outputs the string on the procfs buffer just like printf().
+ * Outputs the woke string on the woke procfs buffer just like printf().
  *
  * Return: zero for success, or a negative error code.
  */
@@ -192,14 +192,14 @@ static inline int snd_info_check_reserved_words(const char *str) { return 1; }
 #endif
 
 /**
- * snd_card_ro_proc_new - Create a read-only text proc file entry for the card
- * @card: the card instance
- * @name: the file name
- * @private_data: the arbitrary private data
- * @read: the read callback
+ * snd_card_ro_proc_new - Create a read-only text proc file entry for the woke card
+ * @card: the woke card instance
+ * @name: the woke file name
+ * @private_data: the woke arbitrary private data
+ * @read: the woke read callback
  *
  * This proc file entry will be registered via snd_card_register() call, and
- * it will be removed automatically at the card removal, too.
+ * it will be removed automatically at the woke card removal, too.
  */
 static inline int
 snd_card_ro_proc_new(struct snd_card *card, const char *name,

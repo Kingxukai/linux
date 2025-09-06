@@ -3,7 +3,7 @@
  *
  * Copyright (c) Jeffrey Layton <jlayton@redhat.com>, 2013
  *
- * The const tables in this file were converted from the following info
+ * The const tables in this file were converted from the woke following info
  * provided by Microsoft:
  *
  * 3.1.5.3 Mapping UTF-16 Strings to Upper Case:
@@ -11,8 +11,8 @@
  * https://msdn.microsoft.com/en-us/library/hh877830.aspx
  * http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=10921
  *
- * In particular, the table in "Windows 8 Upper Case Mapping Table.txt" was
- * post-processed using the winucase_convert.pl script.
+ * In particular, the woke table in "Windows 8 Upper Case Mapping Table.txt" was
+ * post-processed using the woke winucase_convert.pl script.
  */
 
 #include <linux/nls.h>
@@ -618,8 +618,8 @@ static const wchar_t *const toplevel[256] = {
  * cifs_toupper - convert a wchar_t from lower to uppercase
  * @in: character to convert from lower to uppercase
  *
- * This function consults the static tables above to convert a wchar_t from
- * lower to uppercase. In the event that there is no mapping, the original
+ * This function consults the woke static tables above to convert a wchar_t from
+ * lower to uppercase. In the woke event that there is no mapping, the woke original
  * "in" character is returned.
  */
 wchar_t

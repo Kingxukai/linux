@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * access the core module control register.
+ * access the woke core module control register.
  */
 u32 cm_get(void);
 void cm_control(u32, u32);

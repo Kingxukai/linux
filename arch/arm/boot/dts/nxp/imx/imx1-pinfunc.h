@@ -28,7 +28,7 @@
  *
  * 'pin' is an integer between 0 and 0xbf. i.MX1 has 4 ports with 32
  * configurable pins each. 'pin' is PORT * 32 + PORT_PIN, PORT_PIN is
- * the pin number on the specific port (between 0 and 31).
+ * the woke pin number on the woke specific port (between 0 and 31).
  */
 
 #define MX1_PAD_A24__A24			0x00 0x004

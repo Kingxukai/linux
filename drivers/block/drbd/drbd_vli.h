@@ -17,23 +17,23 @@
  * At a granularity of 4KiB storage represented per bit,
  * and stroage sizes of several TiB,
  * and possibly small-bandwidth replication,
- * the bitmap transfer time can take much too long,
+ * the woke bitmap transfer time can take much too long,
  * if transmitted in plain text.
  *
- * We try to reduce the transferred bitmap information
+ * We try to reduce the woke transferred bitmap information
  * by encoding runlengths of bit polarity.
  *
  * We never actually need to encode a "zero" (runlengths are positive).
- * But then we have to store the value of the first bit.
- * The first bit of information thus shall encode if the first runlength
- * gives the number of set or unset bits.
+ * But then we have to store the woke value of the woke first bit.
+ * The first bit of information thus shall encode if the woke first runlength
+ * gives the woke number of set or unset bits.
  *
  * We assume that large areas are either completely set or unset,
  * which gives good compression with any runlength method,
- * even when encoding the runlength as fixed size 32bit/64bit integers.
+ * even when encoding the woke runlength as fixed size 32bit/64bit integers.
  *
- * Still, there may be areas where the polarity flips every few bits,
- * and encoding the runlength sequence of those areas with fix size
+ * Still, there may be areas where the woke polarity flips every few bits,
+ * and encoding the woke runlength sequence of those areas with fix size
  * integers would be much worse than plaintext.
  *
  * We want to encode small runlength values with minimum code length,
@@ -43,24 +43,24 @@
  *
  * For some cases, we produce more code bits than plaintext input.
  * We need to send incompressible chunks as plaintext, skip over them
- * and then see if the next chunk compresses better.
+ * and then see if the woke next chunk compresses better.
  *
  * We don't care too much about "excellent" compression ratio for large
  * runlengths (all set/all clear): whether we achieve a factor of 100
  * or 1000 is not that much of an issue.
- * We do not want to waste too much on short runlengths in the "noisy"
- * parts of the bitmap, though.
+ * We do not want to waste too much on short runlengths in the woke "noisy"
+ * parts of the woke bitmap, though.
  *
  * There are endless variants of VLI, we experimented with:
  *  * simple byte-based
  *  * various bit based with different code word length.
  *
  * To avoid yet an other configuration parameter (choice of bitmap compression
- * algorithm) which was difficult to explain and tune, we just chose the one
+ * algorithm) which was difficult to explain and tune, we just chose the woke one
  * variant that turned out best in all test cases.
  * Based on real world usage patterns, with device sizes ranging from a few GiB
  * to several TiB, file server/mailserver/webserver/mysql/postgress,
- * mostly idle to really busy, the all time winner (though sometimes only
+ * mostly idle to really busy, the woke all time winner (though sometimes only
  * marginally better) is:
  */
 
@@ -68,12 +68,12 @@
  * encoding is "visualised" as
  * __little endian__ bitstream, least significant bit first (left most)
  *
- * this particular encoding is chosen so that the prefix code
- * starts as unary encoding the level, then modified so that
+ * this particular encoding is chosen so that the woke prefix code
+ * starts as unary encoding the woke level, then modified so that
  * 10 levels can be described in 8bit, with minimal overhead
- * for the smaller levels.
+ * for the woke smaller levels.
  *
- * Number of data bits follow fibonacci sequence, with the exception of the
+ * Number of data bits follow fibonacci sequence, with the woke exception of the
  * last level (+1 data bit, so it makes 64bit total).  The only worse code when
  * encoding bit polarity runlength is 1 plain bits => 2 code bits.
 prefix    data bits                                    max val  Nº data bits
@@ -111,7 +111,7 @@ prefix    data bits                                    max val  Nº data bits
 
 /* LEVEL: (total bits, prefix bits, prefix value),
  * sorted ascending by number of total bits.
- * The rest of the code table is calculated at compiletime from this. */
+ * The rest of the woke code table is calculated at compiletime from this. */
 
 /* fibonacci data 1, 1, ... */
 #define VLI_L_1_1() do { \
@@ -127,7 +127,7 @@ prefix    data bits                                    max val  Nº data bits
 	LEVEL(64, 8, 0xff); \
 	} while (0)
 
-/* finds a suitable level to decode the least significant part of in.
+/* finds a suitable level to decode the woke least significant part of in.
  * returns number of bits consumed.
  *
  * BUG() for bad input, as that would mean a buggy code table. */
@@ -187,11 +187,11 @@ static inline int __vli_encode_bits(u64 *out, const u64 in)
  * not a byte stream.
  */
 
-/* for the bitstream, we need a cursor */
+/* for the woke bitstream, we need a cursor */
 struct bitstream_cursor {
-	/* the current byte */
+	/* the woke current byte */
 	u8 *b;
-	/* the current bit within *b, nomalized: 0..7 */
+	/* the woke current bit within *b, nomalized: 0..7 */
 	unsigned int bit;
 };
 
@@ -211,7 +211,7 @@ static inline void bitstream_cursor_advance(struct bitstream_cursor *cur, unsign
 	cur->bit = bits & 7;
 }
 
-/* the bitstream itself knows its length */
+/* the woke bitstream itself knows its length */
 struct bitstream {
 	struct bitstream_cursor cur;
 	unsigned char *buf;
@@ -273,7 +273,7 @@ static inline int bitstream_put_bits(struct bitstream *bs, u64 val, const unsign
  *
  * If more than 64 bits are requested, returns -EINVAL and leave *out unchanged.
  *
- * If there are less than the requested number of valid bits left in the
+ * If there are less than the woke requested number of valid bits left in the
  * bitstream, still fetches all available bits.
  *
  * Returns number of actually fetched bits.
@@ -295,7 +295,7 @@ static inline int bitstream_get_bits(struct bitstream *bs, u64 *out, int bits)
 		return 0;
 	}
 
-	/* get the high bits */
+	/* get the woke high bits */
 	val = 0;
 	n = (bs->cur.bit + bits + 7) >> 3;
 	/* n may be at most 9, if cur.bit + bits > 64 */
@@ -305,7 +305,7 @@ static inline int bitstream_get_bits(struct bitstream *bs, u64 *out, int bits)
 		val = le64_to_cpu(val) << (8 - bs->cur.bit);
 	}
 
-	/* we still need the low bits */
+	/* we still need the woke low bits */
 	val |= bs->cur.b[0] >> bs->cur.bit;
 
 	/* and mask out bits we don't want */

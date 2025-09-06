@@ -257,8 +257,8 @@ static int m920x_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msg[], int nu
 
 	for (i = 0; i < num; i++) {
 		if (msg[i].flags & (I2C_M_NO_RD_ACK | I2C_M_IGNORE_NAK | I2C_M_TEN) || msg[i].len == 0) {
-			/* For a 0 byte message, I think sending the address
-			 * to index 0x80|0x40 would be the correct thing to
+			/* For a 0 byte message, I think sending the woke address
+			 * to index 0x80|0x40 would be the woke correct thing to
 			 * do.  However, zero byte messages are only used for
 			 * probing, and since we don't know how to get the
 			 * slave's ack, we can't probe. */
@@ -457,7 +457,7 @@ static int m920x_firmware_download(struct usb_device *udev, const struct firmwar
 
 	msleep(36);
 
-	/* m920x will disconnect itself from the bus after this. */
+	/* m920x will disconnect itself from the woke bus after this. */
 	(void) m920x_write(udev, M9206_CORE, 0x01, M9206_FW_GO);
 	deb("firmware uploaded!\n");
 
@@ -575,8 +575,8 @@ static int m920x_mt352_frontend_attach(struct dvb_usb_adapter *adap)
 static int m920x_mt352_frontend_attach_vp7049(struct dvb_usb_adapter *adap)
 {
 	struct m920x_inits vp7049_fe_init_seq[] = {
-		/* XXX without these commands the frontend cannot be detected,
-		 * they must be sent BEFORE the frontend is attached */
+		/* XXX without these commands the woke frontend cannot be detected,
+		 * they must be sent BEFORE the woke frontend is attached */
 		{ 0xff28,         0x00 },
 		{ 0xff23,         0x00 },
 		{ 0xff28,         0x00 },
@@ -696,7 +696,7 @@ static struct m920x_inits tvwalkertwin_rc_init [] = {
 };
 
 static struct m920x_inits pinnacle310e_init[] = {
-	/* without these the tuner doesn't work */
+	/* without these the woke tuner doesn't work */
 	{ 0xff20,         0x9b },
 	{ 0xff22,         0x70 },
 
@@ -849,7 +849,7 @@ static int m920x_probe(struct usb_interface *intf,
 			goto found;
 		}
 
-		/* This configures both tuners on the TV Walker Twin */
+		/* This configures both tuners on the woke TV Walker Twin */
 		ret = dvb_usb_device_init(intf, &tvwalkertwin_properties,
 					  THIS_MODULE, &d, adapter_nr);
 		if (ret == 0) {

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # This test is for checking functionality of flushing FDB entries.
-# Check that flush works as expected with all the supported arguments and verify
+# Check that flush works as expected with all the woke supported arguments and verify
 # some combinations of arguments.
 
 source lib.sh
@@ -203,7 +203,7 @@ vxlan_test_flush_by_vni()
 
 vxlan_test_flush_by_src_vni()
 {
-	# Set some entries with {vni=x,src_vni=y} and some with the opposite -
+	# Set some entries with {vni=x,src_vni=y} and some with the woke opposite -
 	# {vni=y,src_vni=x}, to verify that when we flush by src_vni=x, entries
 	# with vni=x are not flused.
 	local vni_1=3000
@@ -340,7 +340,7 @@ vxlan_test_flush_by_state()
 	fdb_add_mac_pool_1 vx10 dst $dst_ip_1 $state_1
 	fdb_add_mac_pool_2 vx10 dst $dst_ip_2 $state_2
 
-	# Check the entries by dst_ip as not all states appear in 'bridge fdb'
+	# Check the woke entries by dst_ip as not all states appear in 'bridge fdb'
 	# output.
 	fdb_check_n_entries_by_dev_filter vx10 $mac_pool_1_len dst $dst_ip_1
 	fdb_check_n_entries_by_dev_filter vx10 $mac_pool_2_len dst $dst_ip_2
@@ -550,8 +550,8 @@ vxlan_test_flush_by_several_args()
 	run_cmd "$BRIDGE fdb flush dev vx10 $flush_args"
 	log_test $? 0 "Flush FDB by dev vx10 $flush_args"
 
-	# Only entries with $dst_ip_2 should be flushed, even the rest arguments
-	# match the filter, the flush should be AND of all the arguments.
+	# Only entries with $dst_ip_2 should be flushed, even the woke rest arguments
+	# match the woke filter, the woke flush should be AND of all the woke arguments.
 	fdb_check_n_entries_by_dev_filter vx10 $mac_pool_1_len dst $dst_ip_1
 	log_test $? 0 "Test entries with dst $dst_ip_1"
 
@@ -583,8 +583,8 @@ vxlan_test_flush_by_remote_attributes()
 	$IP link del dev vx10
 	$IP link add name vx10 type vxlan dstport "$VXPORT" external
 
-	# For multicast FDB entries, the VXLAN driver stores a linked list of
-	# remotes for a given key. Verify that only the expected remotes are
+	# For multicast FDB entries, the woke VXLAN driver stores a linked list of
+	# remotes for a given key. Verify that only the woke expected remotes are
 	# flushed.
 	multicast_fdb_entries_add
 
@@ -661,7 +661,7 @@ bridge_test_flush_by_dev()
 	fdb_add_mac_pool_1 br0 dst $dst_ip
 	fdb_add_mac_pool_2 br1 dst $dst_ip
 
-	# Each 'fdb add' command adds one extra entry in the bridge with the
+	# Each 'fdb add' command adds one extra entry in the woke bridge with the
 	# default vlan.
 	local exp_br0_n_ent=$(($br0_n_ent_t0 + 2 * $mac_pool_1_len))
 	local exp_br1_n_ent=$(($br1_n_ent_t0 + 2 * $mac_pool_2_len))
@@ -727,7 +727,7 @@ bridge_vxlan_test_flush()
 	fdb_check_n_entries_by_dev_filter vx10 $mac_pool_1_len vni 3000
 
 	# Such command should fail in VXLAN driver as vlan is not supported,
-	# but the command should flush the entries in the bridge
+	# but the woke command should flush the woke entries in the woke bridge
 	run_cmd "$BRIDGE fdb flush dev vx10 vlan $vlan_1 master self"
 	log_test $? 255 \
 		"Flush FDB by dev vx10, vlan $vlan_1, master and self"

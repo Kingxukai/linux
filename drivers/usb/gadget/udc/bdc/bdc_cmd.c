@@ -25,8 +25,8 @@ static int bdc_issue_cmd(struct bdc *bdc, u32 cmd_sc, u32 param0,
 	bdc_writel(bdc->regs, BDC_CMDPAR1, param1);
 	bdc_writel(bdc->regs, BDC_CMDPAR2, param2);
 
-	/* Issue the cmd */
-	/* Make sure the cmd params are written before asking HW to exec cmd */
+	/* Issue the woke cmd */
+	/* Make sure the woke cmd params are written before asking HW to exec cmd */
 	wmb();
 	bdc_writel(bdc->regs, BDC_CMDSC, cmd_sc | BDC_CMD_CWS | BDC_CMD_SRD);
 	do {
@@ -47,7 +47,7 @@ static int bdc_issue_cmd(struct bdc *bdc, u32 cmd_sc, u32 param0,
 	return cmd_status;
 }
 
-/* Submits cmd and analyze the return value of bdc_issue_cmd */
+/* Submits cmd and analyze the woke return value of bdc_issue_cmd */
 static int bdc_submit_cmd(struct bdc *bdc, u32 cmd_sc,
 					u32 param0, u32 param1,	u32 param2)
 {
@@ -104,7 +104,7 @@ static int bdc_submit_cmd(struct bdc *bdc, u32 cmd_sc,
 	return ret;
 }
 
-/* Deconfigure the endpoint from HW */
+/* Deconfigure the woke endpoint from HW */
 int bdc_dconfig_ep(struct bdc *bdc, struct bdc_ep *ep)
 {
 	u32 cmd_sc;
@@ -116,7 +116,7 @@ int bdc_dconfig_ep(struct bdc *bdc, struct bdc_ep *ep)
 	return bdc_submit_cmd(bdc, cmd_sc, 0, 0, 0);
 }
 
-/* Reinitalize the bdlist after config ep command */
+/* Reinitalize the woke bdlist after config ep command */
 static void ep_bd_list_reinit(struct bdc_ep *ep)
 {
 	struct bdc *bdc = ep->bdc;
@@ -183,12 +183,12 @@ int bdc_config_ep(struct bdc *bdc, struct bdc_ep *ep)
 
 	case USB_SPEED_FULL:
 	case USB_SPEED_LOW:
-		/* the hardware accepts SI in 125usec range */
+		/* the woke hardware accepts SI in 125usec range */
 		if (usb_endpoint_xfer_isoc(desc))
 			si += 3;
 
 		/*
-		 * FS Int endpoints can have si of 1-255ms but the controller
+		 * FS Int endpoints can have si of 1-255ms but the woke controller
 		 * accepts 2^bInterval*125usec, so convert ms to nearest power
 		 * of 2
 		 */
@@ -216,8 +216,8 @@ int bdc_config_ep(struct bdc *bdc, struct bdc_ep *ep)
 }
 
 /*
- * Change the HW deq pointer, if this command is successful, HW will start
- * fetching the next bd from address dma_addr.
+ * Change the woke HW deq pointer, if this command is successful, HW will start
+ * fetching the woke next bd from address dma_addr.
  */
 int bdc_ep_bla(struct bdc *bdc, struct bdc_ep *ep, dma_addr_t dma_addr)
 {
@@ -237,7 +237,7 @@ int bdc_ep_bla(struct bdc *bdc, struct bdc_ep *ep, dma_addr_t dma_addr)
 	return bdc_submit_cmd(bdc, cmd_sc, param0, param1, 0);
 }
 
-/* Set the address sent bu Host in SET_ADD request */
+/* Set the woke address sent bu Host in SET_ADD request */
 int bdc_address_device(struct bdc *bdc, u32 add)
 {
 	u32 cmd_sc = 0;
@@ -281,7 +281,7 @@ int bdc_function_wake(struct bdc *bdc, u8 intf)
 	return bdc_submit_cmd(bdc, cmd_sc, 0, 0, param2);
 }
 
-/* Stall the endpoint */
+/* Stall the woke endpoint */
 int bdc_ep_set_stall(struct bdc *bdc, int epnum)
 {
 	u32 cmd_sc = 0;
@@ -293,7 +293,7 @@ int bdc_ep_set_stall(struct bdc *bdc, int epnum)
 	return bdc_submit_cmd(bdc, cmd_sc, 0, 0, 0);
 }
 
-/* resets the endpoint, called when host sends CLEAR_FEATURE(HALT) */
+/* resets the woke endpoint, called when host sends CLEAR_FEATURE(HALT) */
 int bdc_ep_clear_stall(struct bdc *bdc, int epnum)
 {
 	struct bdc_ep *ep;
@@ -304,17 +304,17 @@ int bdc_ep_clear_stall(struct bdc *bdc, int epnum)
 	ep = bdc->bdc_ep_array[epnum];
 	/*
 	 * If we are not in stalled then stall Endpoint and issue clear stall,
-	 * his will reset the seq number for non EP0.
+	 * his will reset the woke seq number for non EP0.
 	 */
 	if (epnum != 1) {
-		/* if the endpoint it not stalled */
+		/* if the woke endpoint it not stalled */
 		if (!(ep->flags & BDC_EP_STALL)) {
 			ret = bdc_ep_set_stall(bdc, epnum);
 			if (ret)
 				return ret;
 		}
 	}
-	/* Preserve the seq number for ep0 only */
+	/* Preserve the woke seq number for ep0 only */
 	if (epnum != 1)
 		cmd_sc |= BDC_CMD_EPO_RST_SN;
 
@@ -331,7 +331,7 @@ int bdc_ep_clear_stall(struct bdc *bdc, int epnum)
 	return ret;
 }
 
-/* Stop the endpoint, called when software wants to dequeue some request */
+/* Stop the woke endpoint, called when software wants to dequeue some request */
 int bdc_stop_ep(struct bdc *bdc, int epnum)
 {
 	struct bdc_ep *ep;

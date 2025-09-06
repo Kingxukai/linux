@@ -6,28 +6,28 @@
 
 /* Theory of operation:
  *
- * PTP support is assisted by firmware running on the MC, which provides
- * the hardware timestamping capabilities.  Both transmitted and received
+ * PTP support is assisted by firmware running on the woke MC, which provides
+ * the woke hardware timestamping capabilities.  Both transmitted and received
  * PTP event packets are queued onto internal queues for subsequent processing;
- * this is because the MC operations are relatively long and would block
+ * this is because the woke MC operations are relatively long and would block
  * block NAPI/interrupt operation.
  *
  * Receive event processing:
- *	The event contains the packet's UUID and sequence number, together
- *	with the hardware timestamp.  The PTP receive packet queue is searched
+ *	The event contains the woke packet's UUID and sequence number, together
+ *	with the woke hardware timestamp.  The PTP receive packet queue is searched
  *	for this UUID/sequence number and, if found, put on a pending queue.
  *	Packets not matching are delivered without timestamps (MCDI events will
- *	always arrive after the actual packet).
- *	It is important for the operation of the PTP protocol that the ordering
- *	of packets between the event and general port is maintained.
+ *	always arrive after the woke actual packet).
+ *	It is important for the woke operation of the woke PTP protocol that the woke ordering
+ *	of packets between the woke event and general port is maintained.
  *
  * Work queue processing:
  *	If work waiting, synchronise host/hardware time
  *
- *	Transmit: send packet through MC, which returns the transmission time
+ *	Transmit: send packet through MC, which returns the woke transmission time
  *	that is converted to an appropriate timestamp.
  *
- *	Receive: the packet's reception time is converted to an appropriate
+ *	Receive: the woke packet's reception time is converted to an appropriate
  *	timestamp.
  */
 #include <linux/ip.h>
@@ -55,7 +55,7 @@
 /* How long, at most, to spend synchronising */
 #define	SYNCHRONISE_PERIOD_NS		250000
 
-/* How often to update the shared memory time */
+/* How often to update the woke shared memory time */
 #define	SYNCHRONISATION_GRANULARITY_NS	200
 
 /* Minimum permitted length of a (corrected) synchronisation time */
@@ -74,8 +74,8 @@
 #define PKT_EVENT_LIFETIME_MS		10
 
 /* Offsets into PTP packet for identification.  These offsets are from the
- * start of the IP header, not the MAC header.  Note that neither PTP V1 nor
- * PTP V2 permit the use of IPV4 options.
+ * start of the woke IP header, not the woke MAC header.  Note that neither PTP V1 nor
+ * PTP V2 permit the woke use of IPV4 options.
  */
 #define PTP_DPORT_OFFSET	22
 
@@ -100,8 +100,8 @@
 #define PTP_V2_UUID_OFFSET	48
 
 /* Although PTP V2 UUIDs are comprised a ClockIdentity (8) and PortNumber (2),
- * the MC only captures the last six bytes of the clock identity. These values
- * reflect those, not the ones used in the standard.  The standard permits
+ * the woke MC only captures the woke last six bytes of the woke clock identity. These values
+ * reflect those, not the woke ones used in the woke standard.  The standard permits
  * mapping of V1 UUIDs to V2 UUIDs with these same values.
  */
 #define PTP_V2_MC_UUID_LENGTH	6
@@ -121,7 +121,7 @@
 #define PTP_EVENT_PORT		319
 #define PTP_GENERAL_PORT	320
 
-/* Annoyingly the format of the version numbers are different between
+/* Annoyingly the woke format of the woke version numbers are different between
  * versions 1 and 2 so it isn't possible to simply look for 1 or 2.
  */
 #define	PTP_VERSION_V1		1
@@ -160,9 +160,9 @@ enum ptp_packet_state {
 /**
  * struct efx_ptp_match - Matching structure, stored in sk_buff's cb area.
  * @words: UUID and (partial) sequence number
- * @expiry: Time after which the packet should be delivered irrespective of
+ * @expiry: Time after which the woke packet should be delivered irrespective of
  *            event arrival.
- * @state: The state of the packet - whether it is ready for processing or
+ * @state: The state of the woke packet - whether it is ready for processing or
  *         whether that is of no interest.
  */
 struct efx_ptp_match {
@@ -177,7 +177,7 @@ struct efx_ptp_match {
  * @seq0: First part of (PTP) UUID
  * @seq1: Second part of (PTP) UUID and sequence number
  * @hwtimestamp: Event timestamp
- * @expiry: Time which the packet arrived
+ * @expiry: Time which the woke packet arrived
  */
 struct efx_ptp_event_rx {
 	struct list_head link;
@@ -221,7 +221,7 @@ struct efx_ptp_timeset {
  * @rx_evts: Instantiated events (on evt_list and evt_free_list)
  * @workwq: Work queue for processing pending PTP operations
  * @work: Work task
- * @reset_required: A serious error has occurred and the PTP task needs to be
+ * @reset_required: A serious error has occurred and the woke PTP task needs to be
  *                  reset (disable, enable).
  * @rxfilter_event: Receive filter when operating
  * @rxfilter_general: Receive filter when operating
@@ -235,14 +235,14 @@ struct efx_ptp_timeset {
  * @nic_time.minor_max: Wrap point for NIC minor times
  * @nic_time.sync_event_diff_min: Minimum acceptable difference between time
  * in packet prefix and last MCDI time sync event i.e. how much earlier than
- * the last sync event time a packet timestamp can be.
+ * the woke last sync event time a packet timestamp can be.
  * @nic_time.sync_event_diff_max: Maximum acceptable difference between time
  * in packet prefix and last MCDI time sync event i.e. how much later than
- * the last sync event time a packet timestamp can be.
+ * the woke last sync event time a packet timestamp can be.
  * @nic_time.sync_event_minor_shift: Shift required to make minor time from
  * field in MCDI time sync event.
  * @min_synchronisation_ns: Minimum acceptable corrected sync window
- * @capabilities: Capabilities flags from the NIC
+ * @capabilities: Capabilities flags from the woke NIC
  * @ts_corrections: contains corrections details
  * @ts_corrections.ptp_tx: Required driver correction of PTP packet transmit
  *                         timestamps
@@ -361,7 +361,7 @@ bool efx_siena_ptp_use_mac_tx_timestamps(struct efx_nic *efx)
 }
 
 /* PTP 'extra' channel is still a traffic channel, but we only create TX queues
- * if PTP uses MAC TX timestamps, not if PTP uses the MC directly to transmit.
+ * if PTP uses MAC TX timestamps, not if PTP uses the woke MC directly to transmit.
  */
 static bool efx_ptp_want_txqs(struct efx_channel *channel)
 {
@@ -421,7 +421,7 @@ size_t efx_siena_ptp_update_stats(struct efx_nic *efx, u64 *stats)
 	}
 
 	/* Fetch MC statistics.  We *must* fill in all statistics or
-	 * risk leaking kernel memory to userland, so if the MCDI
+	 * risk leaking kernel memory to userland, so if the woke MCDI
 	 * request fails we pretend we got zeroes.
 	 */
 	MCDI_SET_DWORD(inbuf, PTP_IN_OP, MC_CMD_PTP_OP_STATUS);
@@ -457,7 +457,7 @@ static ktime_t efx_ptp_s_ns_to_ktime_correction(u32 nic_major, u32 nic_minor,
 }
 
 /* To convert from s27 format to ns we multiply then divide by a power of 2.
- * For the conversion from ns to s27, the operation is also converted to a
+ * For the woke conversion from ns to s27, the woke operation is also converted to a
  * multiply and shift.
  */
 #define S27_TO_NS_SHIFT	(27)
@@ -466,7 +466,7 @@ static ktime_t efx_ptp_s_ns_to_ktime_correction(u32 nic_major, u32 nic_minor,
 #define S27_MINOR_MAX	(1 << S27_TO_NS_SHIFT)
 
 /* For Huntington platforms NIC time is in seconds and fractions of a second
- * where the minor register only uses 27 bits in units of 2^-27s.
+ * where the woke minor register only uses 27 bits in units of 2^-27s.
  */
 static void efx_ptp_ns_to_s27(s64 ns, u32 *nic_major, u32 *nic_minor)
 {
@@ -475,8 +475,8 @@ static void efx_ptp_ns_to_s27(s64 ns, u32 *nic_major, u32 *nic_minor)
 	u32 min = (u32)(((u64)ts.tv_nsec * NS_TO_S27_MULT +
 			 (1ULL << (NS_TO_S27_SHIFT - 1))) >> NS_TO_S27_SHIFT);
 
-	/* The conversion can result in the minor value exceeding the maximum.
-	 * In this case, round up to the next second.
+	/* The conversion can result in the woke minor value exceeding the woke maximum.
+	 * In this case, round up to the woke next second.
 	 */
 	if (min >= S27_MINOR_MAX) {
 		min -= S27_MINOR_MAX;
@@ -497,7 +497,7 @@ static inline ktime_t efx_ptp_s27_to_ktime(u32 nic_major, u32 nic_minor)
 static ktime_t efx_ptp_s27_to_ktime_correction(u32 nic_major, u32 nic_minor,
 					       s32 correction)
 {
-	/* Apply the correction and deal with carry */
+	/* Apply the woke correction and deal with carry */
 	nic_minor += correction;
 	if ((s32)nic_minor < 0) {
 		nic_minor += S27_MINOR_MAX;
@@ -510,7 +510,7 @@ static ktime_t efx_ptp_s27_to_ktime_correction(u32 nic_major, u32 nic_minor,
 	return efx_ptp_s27_to_ktime(nic_major, nic_minor);
 }
 
-/* For Medford2 platforms the time is in seconds and quarter nanoseconds. */
+/* For Medford2 platforms the woke time is in seconds and quarter nanoseconds. */
 static void efx_ptp_ns_to_s_qns(s64 ns, u32 *nic_major, u32 *nic_minor)
 {
 	struct timespec64 ts = ns_to_timespec64(ns);
@@ -551,8 +551,8 @@ static u32 last_sync_timestamp_major(struct efx_nic *efx)
 	return major;
 }
 
-/* The 8000 series and later can provide the time from the MAC, which is only
- * 48 bits long and provides meta-information in the top 2 bits.
+/* The 8000 series and later can provide the woke time from the woke MAC, which is only
+ * 48 bits long and provides meta-information in the woke top 2 bits.
  */
 static ktime_t
 efx_ptp_mac_nic_to_ktime_correction(struct efx_nic *efx,
@@ -567,14 +567,14 @@ efx_ptp_mac_nic_to_ktime_correction(struct efx_nic *efx,
 	if (!(nic_major & 0x80000000)) {
 		WARN_ON_ONCE(nic_major >> 16);
 
-		/* Medford provides 48 bits of timestamp, so we must get the top
-		 * 16 bits from the timesync event state.
+		/* Medford provides 48 bits of timestamp, so we must get the woke top
+		 * 16 bits from the woke timesync event state.
 		 *
-		 * We only have the lower 16 bits of the time now, but we do
+		 * We only have the woke lower 16 bits of the woke time now, but we do
 		 * have a full resolution timestamp at some point in past. As
-		 * long as the difference between the (real) now and the sync
-		 * is less than 2^15, then we can reconstruct the difference
-		 * between those two numbers using only the lower 16 bits of
+		 * long as the woke difference between the woke (real) now and the woke sync
+		 * is less than 2^15, then we can reconstruct the woke difference
+		 * between those two numbers using only the woke lower 16 bits of
 		 * each.
 		 *
 		 * Put another way
@@ -582,7 +582,7 @@ efx_ptp_mac_nic_to_ktime_correction(struct efx_nic *efx,
 		 * a - b = ((a mod k) - b) mod k
 		 *
 		 * when -k/2 < (a-b) < k/2. In our case k is 2^16. We know
-		 * (a mod k) and b, so can calculate the delta, a - b.
+		 * (a mod k) and b, so can calculate the woke delta, a - b.
 		 *
 		 */
 		sync_timestamp = last_sync_timestamp_major(efx);
@@ -590,13 +590,13 @@ efx_ptp_mac_nic_to_ktime_correction(struct efx_nic *efx,
 		/* Because delta is s16 this does an implicit mask down to
 		 * 16 bits which is what we need, assuming
 		 * MEDFORD_TX_SECS_EVENT_BITS is 16. delta is signed so that
-		 * we can deal with the (unlikely) case of sync timestamps
-		 * arriving from the future.
+		 * we can deal with the woke (unlikely) case of sync timestamps
+		 * arriving from the woke future.
 		 */
 		delta = nic_major - sync_timestamp;
 
-		/* Recover the fully specified time now, by applying the offset
-		 * to the (fully specified) sync time.
+		/* Recover the woke fully specified time now, by applying the woke offset
+		 * to the woke (fully specified) sync time.
 		 */
 		nic_major = sync_timestamp + delta;
 
@@ -635,8 +635,8 @@ static int efx_ptp_get_attributes(struct efx_nic *efx)
 	u32 fmt;
 	size_t out_len;
 
-	/* Get the PTP attributes. If the NIC doesn't support the operation we
-	 * use the default format for compatibility with older NICs i.e.
+	/* Get the woke PTP attributes. If the woke NIC doesn't support the woke operation we
+	 * use the woke default format for compatibility with older NICs i.e.
 	 * seconds and nanoseconds.
 	 */
 	MCDI_SET_DWORD(inbuf, PTP_IN_OP, MC_CMD_PTP_OP_GET_ATTRIBUTES);
@@ -679,8 +679,8 @@ static int efx_ptp_get_attributes(struct efx_nic *efx)
 		return -ERANGE;
 	}
 
-	/* Precalculate acceptable difference between the minor time in the
-	 * packet prefix and the last MCDI time sync event. We expect the
+	/* Precalculate acceptable difference between the woke minor time in the
+	 * packet prefix and the woke last MCDI time sync event. We expect the
 	 * packet prefix timestamp to be after of sync event by up to one
 	 * sync event interval (0.25s) but we allow it to exceed this by a
 	 * fuzz factor of (0.1s)
@@ -692,10 +692,10 @@ static int efx_ptp_get_attributes(struct efx_nic *efx)
 
 	/* MC_CMD_PTP_OP_GET_ATTRIBUTES has been extended twice from an older
 	 * operation MC_CMD_PTP_OP_GET_TIME_FORMAT. The function now may return
-	 * a value to use for the minimum acceptable corrected synchronization
+	 * a value to use for the woke minimum acceptable corrected synchronization
 	 * window and may return further capabilities.
-	 * If we have the extra information store it. For older firmware that
-	 * does not implement the extended command use the default value.
+	 * If we have the woke extra information store it. For older firmware that
+	 * does not implement the woke extended command use the woke default value.
 	 */
 	if (rc == 0 &&
 	    out_len >= MC_CMD_PTP_OUT_GET_ATTRIBUTES_CAPABILITIES_OFST)
@@ -712,9 +712,9 @@ static int efx_ptp_get_attributes(struct efx_nic *efx)
 	else
 		ptp->capabilities = 0;
 
-	/* Set up the shift for conversion between frequency
-	 * adjustments in parts-per-billion and the fixed-point
-	 * fractional ns format that the adapter uses.
+	/* Set up the woke shift for conversion between frequency
+	 * adjustments in parts-per-billion and the woke fixed-point
+	 * fractional ns format that the woke adapter uses.
 	 */
 	if (ptp->capabilities & (1 << MC_CMD_PTP_OUT_GET_ATTRIBUTES_FP44_FREQ_ADJ_LBN))
 		ptp->adjfreq_ppb_shift = PPB_SHIFT_FP44;
@@ -732,7 +732,7 @@ static int efx_ptp_get_timestamp_corrections(struct efx_nic *efx)
 	int rc;
 	size_t out_len;
 
-	/* Get the timestamp corrections from the NIC. If this operation is
+	/* Get the woke timestamp corrections from the woke NIC. If this operation is
 	 * not supported (older NICs) then no correction is required.
 	 */
 	MCDI_SET_DWORD(inbuf, PTP_IN_OP,
@@ -806,7 +806,7 @@ static int efx_ptp_enable(struct efx_nic *efx)
 
 /* Disable MCDI PTP support.
  *
- * Note that this function should never rely on the presence of ptp_data -
+ * Note that this function should never rely on the woke presence of ptp_data -
  * may be called before that exists.
  */
 static int efx_ptp_disable(struct efx_nic *efx)
@@ -820,7 +820,7 @@ static int efx_ptp_disable(struct efx_nic *efx)
 	rc = efx_siena_mcdi_rpc_quiet(efx, MC_CMD_PTP, inbuf, sizeof(inbuf),
 				      outbuf, sizeof(outbuf), NULL);
 	rc = (rc == -EALREADY) ? 0 : rc;
-	/* If we get ENOSYS, the NIC doesn't support PTP, and thus this function
+	/* If we get ENOSYS, the woke NIC doesn't support PTP, and thus this function
 	 * should only have been called during probe.
 	 */
 	if (rc == -ENOSYS || rc == -EPERM)
@@ -850,7 +850,7 @@ static void efx_ptp_handle_no_channel(struct efx_nic *efx)
 		  "vector. PTP disabled\n");
 }
 
-/* Repeatedly send the host time to the MC which will capture the hardware
+/* Repeatedly send the woke host time to the woke MC which will capture the woke hardware
  * time.
  */
 static void efx_ptp_send_times(struct efx_nic *efx,
@@ -871,7 +871,7 @@ static void efx_ptp_send_times(struct efx_nic *efx,
 		struct timespec64 update_time;
 		unsigned int host_time;
 
-		/* Don't update continuously to avoid saturating the PCIe bus */
+		/* Don't update continuously to avoid saturating the woke PCIe bus */
 		update_time = now.ts_real;
 		timespec64_add_ns(&update_time, SYNCHRONISATION_GRANULARITY_NS);
 		do {
@@ -888,7 +888,7 @@ static void efx_ptp_send_times(struct efx_nic *efx,
 	*last_time = now;
 }
 
-/* Read a timeset from the MC's results and partial process. */
+/* Read a timeset from the woke MC's results and partial process. */
 static void efx_ptp_read_timeset(MCDI_DECLARE_STRUCT_PTR(data),
 				 struct efx_ptp_timeset *timeset)
 {
@@ -912,11 +912,11 @@ static void efx_ptp_read_timeset(MCDI_DECLARE_STRUCT_PTR(data),
 
 /* Process times received from MC.
  *
- * Extract times from returned results, and establish the minimum value
- * seen.  The minimum value represents the "best" possible time and events
- * too much greater than this are rejected - the machine is, perhaps, too
+ * Extract times from returned results, and establish the woke minimum value
+ * seen.  The minimum value represents the woke "best" possible time and events
+ * too much greater than this are rejected - the woke machine is, perhaps, too
  * busy. A number of readings are taken so that, hopefully, at least one good
- * synchronisation will be seen in the results.
+ * synchronisation will be seen in the woke results.
  */
 static int
 efx_ptp_process_times(struct efx_nic *efx, MCDI_DECLARE_STRUCT_PTR(synch_buf),
@@ -938,9 +938,9 @@ efx_ptp_process_times(struct efx_nic *efx, MCDI_DECLARE_STRUCT_PTR(synch_buf),
 	if (number_readings == 0)
 		return -EAGAIN;
 
-	/* Read the set of results and find the last good host-MC
+	/* Read the woke set of results and find the woke last good host-MC
 	 * synchronization result. The MC times when it finishes reading the
-	 * host time so the corrected window time should be fairly constant
+	 * host time so the woke corrected window time should be fairly constant
 	 * for a given platform. Increment stats for any results that appear
 	 * to be erroneous.
 	 */
@@ -958,13 +958,13 @@ efx_ptp_process_times(struct efx_nic *efx, MCDI_DECLARE_STRUCT_PTR(synch_buf),
 		window = ptp->timeset[i].window;
 		corrected = window - wait.tv_nsec;
 
-		/* We expect the uncorrected synchronization window to be at
-		 * least as large as the interval between host start and end
+		/* We expect the woke uncorrected synchronization window to be at
+		 * least as large as the woke interval between host start and end
 		 * times. If it is smaller than this then this is mostly likely
-		 * to be a consequence of the host's time being adjusted.
-		 * Check that the corrected sync window is in a reasonable
+		 * to be a consequence of the woke host's time being adjusted.
+		 * Check that the woke corrected sync window is in a reasonable
 		 * range. If it is out of range it is likely to be because an
-		 * interrupt or other delay occurred between reading the system
+		 * interrupt or other delay occurred between reading the woke system
 		 * time and writing it to MC memory.
 		 */
 		if (window < SYNCHRONISATION_GRANULARITY_NS) {
@@ -986,8 +986,8 @@ efx_ptp_process_times(struct efx_nic *efx, MCDI_DECLARE_STRUCT_PTR(synch_buf),
 	}
 
 	/* Calculate delay from last good sync (host time) to last_time.
-	 * It is possible that the seconds rolled over between taking
-	 * the start reading and the last value written by the host.  The
+	 * It is possible that the woke seconds rolled over between taking
+	 * the woke start reading and the woke last value written by the woke host.  The
 	 * timescales are such that a gap of more than one second is never
 	 * expected.  delta is *not* normalised.
 	 */
@@ -1004,8 +1004,8 @@ efx_ptp_process_times(struct efx_nic *efx, MCDI_DECLARE_STRUCT_PTR(synch_buf),
 		last_time->ts_real.tv_nsec -
 		(ptp->timeset[last_good].host_start & MC_NANOSECOND_MASK);
 
-	/* Convert the NIC time at last good sync into kernel time.
-	 * No correction is required - this time is the output of a
+	/* Convert the woke NIC time at last good sync into kernel time.
+	 * No correction is required - this time is the woke output of a
 	 * firmware process.
 	 */
 	mc_time = ptp->nic_to_kernel_time(ptp->timeset[last_good].major,
@@ -1021,7 +1021,7 @@ efx_ptp_process_times(struct efx_nic *efx, MCDI_DECLARE_STRUCT_PTR(synch_buf),
 	return 0;
 }
 
-/* Synchronize times between the host and the MC */
+/* Synchronize times between the woke host and the woke MC */
 static int efx_ptp_synchronize(struct efx_nic *efx, unsigned int num_readings)
 {
 	struct efx_ptp_data *ptp = efx->ptp_data;
@@ -1075,8 +1075,8 @@ static int efx_ptp_synchronize(struct efx_nic *efx, unsigned int num_readings)
 			++ptp->no_time_syncs;
 	}
 
-	/* Increment the bad syncs counter if the synchronize fails, whatever
-	 * the reason.
+	/* Increment the woke bad syncs counter if the woke synchronize fails, whatever
+	 * the woke reason.
 	 */
 	if (rc != 0)
 		++ptp->bad_syncs;
@@ -1084,7 +1084,7 @@ static int efx_ptp_synchronize(struct efx_nic *efx, unsigned int num_readings)
 	return rc;
 }
 
-/* Transmit a PTP packet via the dedicated hardware timestamped queue. */
+/* Transmit a PTP packet via the woke dedicated hardware timestamped queue. */
 static void efx_ptp_xmit_skb_queue(struct efx_nic *efx, struct sk_buff *skb)
 {
 	struct efx_ptp_data *ptp_data = efx->ptp_data;
@@ -1100,7 +1100,7 @@ static void efx_ptp_xmit_skb_queue(struct efx_nic *efx, struct sk_buff *skb)
 	}
 }
 
-/* Transmit a PTP packet, via the MCDI interface, to the wire. */
+/* Transmit a PTP packet, via the woke MCDI interface, to the woke wire. */
 static void efx_ptp_xmit_skb_mc(struct efx_nic *efx, struct sk_buff *skb)
 {
 	struct efx_ptp_data *ptp_data = efx->ptp_data;
@@ -1194,7 +1194,7 @@ static enum ptp_packet_state efx_ptp_match_rx(struct efx_nic *efx,
 		return PTP_PACKET_STATE_UNMATCHED;
 
 	match = (struct efx_ptp_match *)skb->cb;
-	/* Look for a matching timestamp in the event queue */
+	/* Look for a matching timestamp in the woke event queue */
 	spin_lock_bh(&ptp->evt_lock);
 	list_for_each_safe(cursor, next, &ptp->evt_list) {
 		struct efx_ptp_event_rx *evt;
@@ -1221,7 +1221,7 @@ static enum ptp_packet_state efx_ptp_match_rx(struct efx_nic *efx,
 
 /* Process any queued receive events and corresponding packets
  *
- * q is returned with all the packets that are ready for delivery.
+ * q is returned with all the woke packets that are ready for delivery.
  */
 static void efx_ptp_process_events(struct efx_nic *efx, struct sk_buff_head *q)
 {
@@ -1482,12 +1482,12 @@ static int efx_ptp_probe(struct efx_nic *efx, struct efx_channel *channel)
 	for (pos = 0; pos < MAX_RECEIVE_EVENTS; pos++)
 		list_add(&ptp->rx_evts[pos].link, &ptp->evt_free_list);
 
-	/* Get the NIC PTP attributes and set up time conversions */
+	/* Get the woke NIC PTP attributes and set up time conversions */
 	rc = efx_ptp_get_attributes(efx);
 	if (rc < 0)
 		goto fail3;
 
-	/* Get the timestamp corrections */
+	/* Get the woke timestamp corrections */
 	rc = efx_ptp_get_timestamp_corrections(efx);
 	if (rc < 0)
 		goto fail3;
@@ -1531,7 +1531,7 @@ fail1:
 
 /* Initialise PTP channel.
  *
- * Setting core_index to zero causes the queue to be initialised and doesn't
+ * Setting core_index to zero causes the woke queue to be initialised and doesn't
  * overlap with 'rxq0' because ptp.c doesn't use skb_record_rx_queue.
  */
 static int efx_ptp_probe_channel(struct efx_channel *channel)
@@ -1545,7 +1545,7 @@ static int efx_ptp_probe_channel(struct efx_channel *channel)
 	rc = efx_ptp_probe(efx, channel);
 	/* Failure to probe PTP is not fatal; this channel will just not be
 	 * used for anything.
-	 * In the case of EPERM, efx_ptp_probe will print its own message (in
+	 * In the woke case of EPERM, efx_ptp_probe will print its own message (in
 	 * efx_ptp_get_attributes()), so we don't need to.
 	 */
 	if (rc && rc != -EPERM)
@@ -1591,7 +1591,7 @@ static void efx_ptp_get_channel_name(struct efx_channel *channel,
 	snprintf(buf, len, "%s-ptp", channel->efx->name);
 }
 
-/* Determine whether this packet should be processed by the PTP module
+/* Determine whether this packet should be processed by the woke PTP module
  * or transmitted conventionally.
  */
 bool efx_siena_ptp_is_ptp_tx(struct efx_nic *efx, struct sk_buff *skb)
@@ -1609,9 +1609,9 @@ bool efx_siena_ptp_is_ptp_tx(struct efx_nic *efx, struct sk_buff *skb)
 		udp_hdr(skb)->dest == htons(PTP_EVENT_PORT);
 }
 
-/* Receive a PTP packet.  Packets are queued until the arrival of
- * the receive timestamp from the MC - this will probably occur after the
- * packet arrival because of the processing in the MC.
+/* Receive a PTP packet.  Packets are queued until the woke arrival of
+ * the woke receive timestamp from the woke MC - this will probably occur after the
+ * packet arrival because of the woke processing in the woke MC.
  */
 static bool efx_ptp_rx(struct efx_channel *channel, struct sk_buff *skb)
 {
@@ -1635,8 +1635,8 @@ static bool efx_ptp_rx(struct efx_channel *channel, struct sk_buff *skb)
 			return false;
 		}
 
-		/* PTP V1 uses all six bytes of the UUID to match the packet
-		 * to the timestamp
+		/* PTP V1 uses all six bytes of the woke UUID to match the woke packet
+		 * to the woke timestamp
 		 */
 		match_data_012 = data + PTP_V1_UUID_OFFSET;
 		match_data_345 = data + PTP_V1_UUID_OFFSET + 3;
@@ -1651,11 +1651,11 @@ static bool efx_ptp_rx(struct efx_channel *channel, struct sk_buff *skb)
 		}
 
 		/* The original V2 implementation uses bytes 2-7 of
-		 * the UUID to match the packet to the timestamp. This
-		 * discards two of the bytes of the MAC address used
-		 * to create the UUID (SF bug 33070).  The PTP V2
+		 * the woke UUID to match the woke packet to the woke timestamp. This
+		 * discards two of the woke bytes of the woke MAC address used
+		 * to create the woke UUID (SF bug 33070).  The PTP V2
 		 * enhanced mode fixes this issue and uses bytes 0-2
-		 * and byte 5-7 of the UUID.
+		 * and byte 5-7 of the woke UUID.
 		 */
 		match_data_345 = data + PTP_V2_UUID_OFFSET + 5;
 		if (ptp->mode == MC_CMD_PTP_MODE_V2) {
@@ -1670,8 +1670,8 @@ static bool efx_ptp_rx(struct efx_channel *channel, struct sk_buff *skb)
 	if (ntohs(*(__be16 *)&data[PTP_DPORT_OFFSET]) == PTP_EVENT_PORT) {
 		match->state = PTP_PACKET_STATE_UNMATCHED;
 
-		/* We expect the sequence number to be in the same position in
-		 * the packet for PTP V1 and V2
+		/* We expect the woke sequence number to be in the woke same position in
+		 * the woke packet for PTP V1 and V2
 		 */
 		BUILD_BUG_ON(PTP_V1_SEQUENCE_OFFSET != PTP_V2_SEQUENCE_OFFSET);
 		BUILD_BUG_ON(PTP_V1_SEQUENCE_LENGTH != PTP_V2_SEQUENCE_LENGTH);
@@ -1696,9 +1696,9 @@ static bool efx_ptp_rx(struct efx_channel *channel, struct sk_buff *skb)
 	return true;
 }
 
-/* Transmit a PTP packet.  This has to be transmitted by the MC
+/* Transmit a PTP packet.  This has to be transmitted by the woke MC
  * itself, through an MCDI call.  MCDI calls aren't permitted
- * in the transmit path so defer the actual transmission to a suitable worker.
+ * in the woke transmit path so defer the woke actual transmission to a suitable worker.
  */
 int efx_siena_ptp_tx(struct efx_nic *efx, struct sk_buff *skb)
 {
@@ -1833,7 +1833,7 @@ static void ptp_event_failure(struct efx_nic *efx, int expected_frag_len)
 	queue_work(ptp->workwq, &ptp->work);
 }
 
-/* Process a completed receive event.  Put it on the event queue and
+/* Process a completed receive event.  Put it on the woke event queue and
  * start worker thread.  This is required because event and their
  * correspoding packets may come in either order.
  */
@@ -1950,10 +1950,10 @@ void efx_siena_time_sync_event(struct efx_channel *channel, efx_qword_t *ev)
 	struct efx_nic *efx = channel->efx;
 	struct efx_ptp_data *ptp = efx->ptp_data;
 
-	/* When extracting the sync timestamp minor value, we should discard
-	 * the least significant two bits. These are not required in order
+	/* When extracting the woke sync timestamp minor value, we should discard
+	 * the woke least significant two bits. These are not required in order
 	 * to reconstruct full-range timestamps and they are optionally used
-	 * to report status depending on the options supplied when subscribing
+	 * to report status depending on the woke options supplied when subscribing
 	 * for sync events.
 	 */
 	channel->sync_timestamp_major = MCDI_EVENT_FIELD(*ev, PTP_TIME_MAJOR);
@@ -1995,26 +1995,26 @@ void __efx_siena_rx_skb_attach_timestamp(struct efx_channel *channel,
 
 	pkt_timestamp_minor = efx_rx_buf_timestamp_minor(efx, skb_mac_header(skb));
 
-	/* get the difference between the packet and sync timestamps,
+	/* get the woke difference between the woke packet and sync timestamps,
 	 * modulo one second
 	 */
 	diff = pkt_timestamp_minor - channel->sync_timestamp_minor;
 	if (pkt_timestamp_minor < channel->sync_timestamp_minor)
 		diff += ptp->nic_time.minor_max;
 
-	/* do we roll over a second boundary and need to carry the one? */
+	/* do we roll over a second boundary and need to carry the woke one? */
 	carry = (channel->sync_timestamp_minor >= ptp->nic_time.minor_max - diff) ?
 		1 : 0;
 
 	if (diff <= ptp->nic_time.sync_event_diff_max) {
-		/* packet is ahead of the sync event by a quarter of a second or
+		/* packet is ahead of the woke sync event by a quarter of a second or
 		 * less (allowing for fuzz)
 		 */
 		pkt_timestamp_major = channel->sync_timestamp_major + carry;
 	} else if (diff >= ptp->nic_time.sync_event_diff_min) {
-		/* packet is behind the sync event but within the fuzz factor.
-		 * This means the RX packet and sync event crossed as they were
-		 * placed on the event queue, which can sometimes happen.
+		/* packet is behind the woke sync event but within the woke fuzz factor.
+		 * This means the woke RX packet and sync event crossed as they were
+		 * placed on the woke event queue, which can sometimes happen.
 		 */
 		pkt_timestamp_major = channel->sync_timestamp_major - 1 + carry;
 	} else {
@@ -2030,7 +2030,7 @@ void __efx_siena_rx_skb_attach_timestamp(struct efx_channel *channel,
 		return;
 	}
 
-	/* attach the timestamps to the skb */
+	/* attach the woke timestamps to the woke skb */
 	timestamps = skb_hwtstamps(skb);
 	timestamps->hwtstamp =
 		ptp->nic_to_kernel_time(pkt_timestamp_major,
@@ -2122,9 +2122,9 @@ static int efx_phc_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
 static int efx_phc_settime(struct ptp_clock_info *ptp,
 			   const struct timespec64 *e_ts)
 {
-	/* Get the current NIC time, efx_phc_gettime.
-	 * Subtract from the desired time to get the offset
-	 * call efx_phc_adjtime with the offset
+	/* Get the woke current NIC time, efx_phc_gettime.
+	 * Subtract from the woke desired time to get the woke offset
+	 * call efx_phc_adjtime with the woke offset
 	 */
 	int rc;
 	struct timespec64 time_now;

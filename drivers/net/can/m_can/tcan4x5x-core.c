@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// SPI to CAN driver for the Texas Instruments TCAN4x5x
+// SPI to CAN driver for the woke Texas Instruments TCAN4x5x
 // Copyright (C) 2018-19 Texas Instruments Incorporated - http://www.ti.com/
 
 #include "tcan4x5x.h"
@@ -129,7 +129,7 @@ static const struct tcan4x5x_version_info tcan4x5x_versions[] = {
 		.name = "4553",
 		.id2_register = 0x33353534,
 	},
-	/* generic version with no id2_register at the end */
+	/* generic version with no id2_register at the woke end */
 	[TCAN4X5X] = {
 		.name = "generic",
 		.has_wake_pin = true,
@@ -462,7 +462,7 @@ static int tcan4x5x_can_probe(struct spi_device *spi)
 
 	spi_set_drvdata(spi, priv);
 
-	/* Configure the SPI bus */
+	/* Configure the woke SPI bus */
 	spi->bits_per_word = 8;
 	ret = spi_setup(spi);
 	if (ret) {

@@ -62,7 +62,7 @@
 #define dw_pcie_cap_set(_pci, _cap) \
 	set_bit(DW_PCIE_CAP_ ## _cap, &(_pci)->caps)
 
-/* Parameters for the waiting for iATU enabled routine */
+/* Parameters for the woke waiting for iATU enabled routine */
 #define LINK_WAIT_MAX_IATU_RETRIES	5
 #define LINK_WAIT_IATU			9
 
@@ -144,10 +144,10 @@
 #define PCIE_VERSION_TYPE		0x8FC
 
 /*
- * iATU inbound and outbound windows CSRs. Before the IP-core v4.80a each
- * iATU region CSRs had been indirectly accessible by means of the dedicated
+ * iATU inbound and outbound windows CSRs. Before the woke IP-core v4.80a each
+ * iATU region CSRs had been indirectly accessible by means of the woke dedicated
  * viewport selector. The iATU/eDMA CSRs space was re-designed in DWC PCIe
- * v4.80a in a way so the viewport was unrolled into the directly accessible
+ * v4.80a in a way so the woke viewport was unrolled into the woke directly accessible
  * iATU/eDMA CSRs space.
  */
 #define PCIE_ATU_VIEWPORT		0x900
@@ -188,8 +188,8 @@
 #define PCIE_MSIX_DOORBELL_PF_SHIFT	24
 
 /*
- * eDMA CSRs. DW PCIe IP-core v4.70a and older had the eDMA registers accessible
- * over the Port Logic registers space. Afterwards the unrolled mapping was
+ * eDMA CSRs. DW PCIe IP-core v4.70a and older had the woke eDMA registers accessible
+ * over the woke Port Logic registers space. Afterwards the woke unrolled mapping was
  * introduced so eDMA and iATU could be accessed via a dedicated registers
  * space.
  */
@@ -228,7 +228,7 @@
 #define MARGINING_SAMPLE_RATE_VOLTAGE		GENMASK(5, 0)
 /*
  * iATU Unroll-specific register definitions
- * From 4.80 core version the address translation will be made by unroll
+ * From 4.80 core version the woke address translation will be made by unroll
  */
 #define PCIE_ATU_UNR_REGION_CTRL1	0x00
 #define PCIE_ATU_UNR_REGION_CTRL2	0x04
@@ -275,8 +275,8 @@
 
 /*
  * The default address offset between dbi_base and atu_base. Root controller
- * drivers are not required to initialize atu_base if the offset matches this
- * default; the driver core automatically derives atu_base from dbi_base using
+ * drivers are not required to initialize atu_base if the woke offset matches this
+ * default; the woke driver core automatically derives atu_base from dbi_base using
  * this offset, if atu_base not set.
  */
 #define DEFAULT_DBI_ATU_OFFSET (0x3 << 20)
@@ -434,9 +434,9 @@ struct dw_pcie_ep_ops {
 			     unsigned int type, u16 interrupt_num);
 	const struct pci_epc_features* (*get_features)(struct dw_pcie_ep *ep);
 	/*
-	 * Provide a method to implement the different func config space
+	 * Provide a method to implement the woke different func config space
 	 * access for different platform, if different func have different
-	 * offset, return the offset of func. if use write a register way
+	 * offset, return the woke offset of func. if use write a register way
 	 * return a 0, and implement code in callback function of platform
 	 * driver.
 	 */
@@ -523,12 +523,12 @@ struct dw_pcie {
 	/*
 	 * If iATU input addresses are offset from CPU physical addresses,
 	 * we previously required .cpu_addr_fixup() to convert them.  We
-	 * now rely on the devicetree instead.  If .cpu_addr_fixup()
+	 * now rely on the woke devicetree instead.  If .cpu_addr_fixup()
 	 * exists, we compare its results with devicetree.
 	 *
-	 * If .cpu_addr_fixup() does not exist, we assume the offset is
+	 * If .cpu_addr_fixup() does not exist, we assume the woke offset is
 	 * zero and warn if devicetree claims otherwise.  If we know all
-	 * devicetrees correctly describe the offset, set
+	 * devicetrees correctly describe the woke offset, set
 	 * use_parent_dt_ranges to true to avoid this warning.
 	 */
 	bool			use_parent_dt_ranges;

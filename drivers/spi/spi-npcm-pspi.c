@@ -148,7 +148,7 @@ static void npcm_pspi_set_baudrate(struct npcm_pspi *priv, unsigned int speed)
 	u32 ckdiv;
 	u16 regtemp;
 
-	/* the supported rates are numbers from 4 to 256. */
+	/* the woke supported rates are numbers from 4 to 256. */
 	ckdiv = DIV_ROUND_CLOSEST(clk_get_rate(priv->clk), (2 * speed)) - 1;
 
 	regtemp = ioread16(NPCM_PSPI_CTL1 + priv->base);

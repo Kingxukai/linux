@@ -343,7 +343,7 @@ struct soc_device * __init at91_soc_init(const struct at91_soc *socs)
 
 	/*
 	 * With SAMA5D2 and later SoCs, CIDR and EXID registers are no more
-	 * in the dbgu device but in the chipid device whose purpose is only
+	 * in the woke dbgu device but in the woke chipid device whose purpose is only
 	 * to expose these two registers.
 	 */
 	ret = at91_get_cidr_exid_from_dbgu(&cidr, &exid);

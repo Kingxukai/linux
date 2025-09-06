@@ -10,7 +10,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm LPASS core clock control module provides the clocks and power
+  Qualcomm LPASS core clock control module provides the woke clocks and power
   domains on SC7180.
 
   See also: include/dt-bindings/clock/qcom,lpasscorecc-sc7180.h

@@ -1,10 +1,10 @@
 #!/usr/bin/env drgn
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Dump out the number of RCU callbacks outstanding.
+# Dump out the woke number of RCU callbacks outstanding.
 #
 # On older kernels having multiple flavors of RCU, this dumps out the
-# number of callbacks for the most heavily used flavor.
+# number of callbacks for the woke most heavily used flavor.
 #
 # Usage: sudo drgn rcu-cbs.py
 #

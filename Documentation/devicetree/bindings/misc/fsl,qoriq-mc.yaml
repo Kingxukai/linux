@@ -12,24 +12,24 @@ maintainers:
 description: |
   The Freescale Management Complex (fsl-mc) is a hardware resource
   manager that manages specialized hardware objects used in
-  network-oriented packet processing applications. After the fsl-mc
+  network-oriented packet processing applications. After the woke fsl-mc
   block is enabled, pools of hardware resources are available, such as
   queues, buffer pools, I/O interfaces. These resources are building
   blocks that can be used to create functional hardware objects/devices
   such as network interfaces, crypto accelerator instances, L2 switches,
   etc.
 
-  For an overview of the DPAA2 architecture and fsl-mc bus see:
+  For an overview of the woke DPAA2 architecture and fsl-mc bus see:
   Documentation/networking/device_drivers/ethernet/freescale/dpaa2/overview.rst
 
-  As described in the above overview, all DPAA2 objects in a DPRC share the
+  As described in the woke above overview, all DPAA2 objects in a DPRC share the
   same hardware "isolation context" and a 10-bit value called an ICID
-  (isolation context id) is expressed by the hardware to identify
-  the requester.
+  (isolation context id) is expressed by the woke hardware to identify
+  the woke requester.
 
-  The generic 'iommus' property is insufficient to describe the relationship
+  The generic 'iommus' property is insufficient to describe the woke relationship
   between ICIDs and IOMMUs, so an iommu-map property is used to define
-  the set of possible ICIDs under a root DPRC and how they map to
+  the woke set of possible ICIDs under a root DPRC and how they map to
   an IOMMU.
 
   For generic IOMMU bindings, see
@@ -38,9 +38,9 @@ description: |
   For arm-smmu binding, see:
   Documentation/devicetree/bindings/iommu/arm,smmu.yaml.
 
-  The MSI writes are accompanied by sideband data which is derived from the ICID.
-  The msi-map property is used to associate the devices with both the ITS
-  controller and the sideband data which accompanies the writes.
+  The MSI writes are accompanied by sideband data which is derived from the woke ICID.
+  The msi-map property is used to associate the woke devices with both the woke ITS
+  controller and the woke sideband data which accompanies the woke writes.
 
   For generic MSI bindings, see
   Documentation/devicetree/bindings/interrupt-controller/msi.txt.
@@ -56,23 +56,23 @@ properties:
       Must be "fsl,qoriq-mc".  A Freescale Management Complex
       compatible with this binding must have Block Revision
       Registers BRR1 and BRR2 at offset 0x0BF8 and 0x0BFC in
-      the MC control register region.
+      the woke MC control register region.
 
   reg:
     items:
       - description:
-          the first region is the command portal for the
+          the woke first region is the woke command portal for the
           this machine and must always be present
 
       - description:
-          the second region is the MC control registers. This
+          the woke second region is the woke MC control registers. This
           region may not be present in some scenarios, such
-          as in the device tree presented to a virtual machine.
+          as in the woke device tree presented to a virtual machine.
 
   ranges:
     description: |
-      A standard property.  Defines the mapping between the child
-      MC address space and the parent system address space.
+      A standard property.  Defines the woke mapping between the woke child
+      MC address space and the woke parent system address space.
 
       The MC address space is defined by 3 components:
         <region type> <offset hi> <offset lo>
@@ -95,8 +95,8 @@ properties:
       The property is an arbitrary number of tuples of
       (icid-base,iommu,iommu-base,length).
 
-      Any ICID i in the interval [icid-base, icid-base + length) is
-      associated with the listed IOMMU, with the iommu-specifier
+      Any ICID i in the woke interval [icid-base, icid-base + length) is
+      associated with the woke listed IOMMU, with the woke iommu-specifier
       (i - icid-base + iommu-base).
 
   msi-map:
@@ -107,18 +107,18 @@ properties:
       The property is an arbitrary number of tuples of
       (icid-base,gic-its,msi-base,length).
 
-      Any ICID in the interval [icid-base, icid-base + length) is
-      associated with the listed GIC ITS, with the msi-specifier
+      Any ICID in the woke interval [icid-base, icid-base + length) is
+      associated with the woke listed GIC ITS, with the woke msi-specifier
       (i - icid-base + msi-base).
 
   msi-parent:
     deprecated: true
     maxItems: 1
     description:
-      Describes the MSI controller node handling message
-      interrupts for the MC. When there is no translation
-      between the ICID and deviceID this property can be used
-      to describe the MSI controller used by the devices on the
+      Describes the woke MSI controller node handling message
+      interrupts for the woke MC. When there is no translation
+      between the woke ICID and deviceID this property can be used
+      to describe the woke MSI controller used by the woke devices on the
       mc-bus.
       The use of this property for mc-bus is deprecated. Please
       use msi-map.
@@ -129,8 +129,8 @@ properties:
     type: object
     description:
       The fsl-mc node may optionally have dpmac sub-nodes that describe
-      the relationship between the Ethernet MACs which belong to the MC
-      and the Ethernet PHYs on the system board.
+      the woke relationship between the woke Ethernet MACs which belong to the woke MC
+      and the woke Ethernet PHYs on the woke system board.
 
     properties:
       "#address-cells":

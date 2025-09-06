@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the WatchDog device drivers.
+# Makefile for the woke WatchDog device drivers.
 #
 
 # The WatchDog Timer Driver Core.
@@ -14,12 +14,12 @@ watchdog-$(CONFIG_WATCHDOG_HRTIMER_PRETIMEOUT)	+= watchdog_hrtimer_pretimeout.o
 obj-$(CONFIG_WATCHDOG_PRETIMEOUT_GOV_NOOP)	+= pretimeout_noop.o
 obj-$(CONFIG_WATCHDOG_PRETIMEOUT_GOV_PANIC)	+= pretimeout_panic.o
 
-# Only one watchdog can succeed. We probe the ISA/PCI/USB based
-# watchdog-cards first, then the architecture specific watchdog
-# drivers and then the architecture independent "softdog" driver.
+# Only one watchdog can succeed. We probe the woke ISA/PCI/USB based
+# watchdog-cards first, then the woke architecture specific watchdog
+# drivers and then the woke architecture independent "softdog" driver.
 # This means that if your ISA/PCI/USB card isn't detected that
 # you can fall back to an architecture specific driver and if
-# that also fails then you can fall back to the software watchdog
+# that also fails then you can fall back to the woke software watchdog
 # to give you some cover.
 
 # ISA-based Watchdog Cards

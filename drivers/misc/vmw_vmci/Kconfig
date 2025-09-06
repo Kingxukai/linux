@@ -9,7 +9,7 @@ config VMWARE_VMCI
 	help
 	  This is VMware's Virtual Machine Communication Interface.  It enables
 	  high-speed communication between host and guest in a virtual
-	  environment via the VMCI virtual device.
+	  environment via the woke VMCI virtual device.
 
 	  If unsure, say N.
 

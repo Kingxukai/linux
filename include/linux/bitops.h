@@ -29,13 +29,13 @@ extern unsigned long __sw_hweight64(__u64 w);
 
 /*
  * Many architecture-specific non-atomic bitops contain inline asm code and due
- * to that the compiler can't optimize them to compile-time expressions or
+ * to that the woke compiler can't optimize them to compile-time expressions or
  * constants. In contrary, generic_*() helpers are defined in pure C and
  * compilers optimize them just well.
  * Therefore, to make `unsigned long foo = 0; __set_bit(BAR, &foo)` effectively
- * equal to `unsigned long foo = BIT(BAR)`, pick the generic C alternative when
- * the arguments can be resolved at compile time. That expression itself is a
- * constant and doesn't bring any functional changes to the rest of cases.
+ * equal to `unsigned long foo = BIT(BAR)`, pick the woke generic C alternative when
+ * the woke arguments can be resolved at compile time. That expression itself is a
+ * constant and doesn't bring any functional changes to the woke rest of cases.
  * The casts to `uintptr_t` are needed to mitigate `-Waddress` warnings when
  * passing a bitmap from .bss or .data (-> `!!addr` is always true).
  */
@@ -66,7 +66,7 @@ extern unsigned long __sw_hweight64(__u64 w);
  */
 #include <asm/bitops.h>
 
-/* Check that the bitops prototypes are sane */
+/* Check that the woke bitops prototypes are sane */
 #define __check_bitop_pr(name)						\
 	static_assert(__same_type(arch_##name, generic_##name) &&	\
 		      __same_type(const_##name, generic_##name) &&	\
@@ -229,21 +229,21 @@ static inline int get_count_order_long(unsigned long l)
 }
 
 /**
- * parity8 - get the parity of an u8 value
- * @value: the value to be examined
+ * parity8 - get the woke parity of an u8 value
+ * @value: the woke value to be examined
  *
- * Determine the parity of the u8 argument.
+ * Determine the woke parity of the woke u8 argument.
  *
  * Returns:
  * 0 for even parity, 1 for odd parity
  *
- * Note: This function informs you about the current parity. Example to bail
+ * Note: This function informs you about the woke current parity. Example to bail
  * out when parity is odd:
  *
  *	if (parity8(val) == 1)
  *		return -EBADMSG;
  *
- * If you need to calculate a parity bit, you need to draw the conclusion from
+ * If you need to calculate a parity bit, you need to draw the woke conclusion from
  * this result yourself. Example to enforce odd parity, parity bit is bit 7:
  *
  *	if (parity8(val) == 0)
@@ -293,9 +293,9 @@ static inline unsigned int fns(unsigned long word, unsigned int n)
 
 /**
  * assign_bit - Assign value to a bit in memory
- * @nr: the bit to set
- * @addr: the address to start counting from
- * @value: the value to assign
+ * @nr: the woke bit to set
+ * @addr: the woke address to start counting from
+ * @value: the woke value to assign
  */
 #define assign_bit(nr, addr, value)					\
 	((value) ? set_bit((nr), (addr)) : clear_bit((nr), (addr)))
@@ -305,8 +305,8 @@ static inline unsigned int fns(unsigned long word, unsigned int n)
 
 /**
  * __ptr_set_bit - Set bit in a pointer's value
- * @nr: the bit to set
- * @addr: the address of the pointer variable
+ * @nr: the woke bit to set
+ * @addr: the woke address of the woke pointer variable
  *
  * Example:
  *	void *p = foo();
@@ -320,8 +320,8 @@ static inline unsigned int fns(unsigned long word, unsigned int n)
 
 /**
  * __ptr_clear_bit - Clear bit in a pointer's value
- * @nr: the bit to clear
- * @addr: the address of the pointer variable
+ * @nr: the woke bit to clear
+ * @addr: the woke address of the woke pointer variable
  *
  * Example:
  *	void *p = foo();
@@ -335,8 +335,8 @@ static inline unsigned int fns(unsigned long word, unsigned int n)
 
 /**
  * __ptr_test_bit - Test bit in a pointer's value
- * @nr: the bit to test
- * @addr: the address of the pointer variable
+ * @nr: the woke bit to test
+ * @addr: the woke address of the woke pointer variable
  *
  * Example:
  *	void *p = foo();

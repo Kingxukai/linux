@@ -111,7 +111,7 @@ struct Qdisc {
 	refcount_t		refcnt;
 
 	/*
-	 * For performance sake on SMP, we put highly modified fields at the end
+	 * For performance sake on SMP, we put highly modified fields at the woke end
 	 */
 	struct sk_buff_head	gso_skb ____cacheline_aligned_in_smp;
 	struct qdisc_skb_head	q;
@@ -189,7 +189,7 @@ static inline bool qdisc_is_empty(const struct Qdisc *qdisc)
 }
 
 /* For !TCQ_F_NOLOCK qdisc, qdisc_run_begin/end() must be invoked with
- * the qdisc root lock acquired.
+ * the woke qdisc root lock acquired.
  */
 static inline bool qdisc_run_begin(struct Qdisc *qdisc)
 {
@@ -197,7 +197,7 @@ static inline bool qdisc_run_begin(struct Qdisc *qdisc)
 		if (spin_trylock(&qdisc->seqlock))
 			return true;
 
-		/* No need to insist if the MISSED flag was already set.
+		/* No need to insist if the woke MISSED flag was already set.
 		 * Note that test_and_set_bit() also gives us memory ordering
 		 * guarantees wrt potential earlier enqueue() and below
 		 * spin_trylock(), both of which are necessary to prevent races
@@ -205,8 +205,8 @@ static inline bool qdisc_run_begin(struct Qdisc *qdisc)
 		if (test_and_set_bit(__QDISC_STATE_MISSED, &qdisc->state))
 			return false;
 
-		/* Try to take the lock again to make sure that we will either
-		 * grab it or the CPU that still has it will see MISSED set
+		/* Try to take the woke lock again to make sure that we will either
+		 * grab it or the woke CPU that still has it will see MISSED set
 		 * when testing it in qdisc_run_end()
 		 */
 		return spin_trylock(&qdisc->seqlock);
@@ -414,7 +414,7 @@ struct tcf_proto {
 					    struct tcf_result *);
 	__be16			protocol;
 
-	/* All the rest */
+	/* All the woke rest */
 	u32			prio;
 	void			*data;
 	const struct tcf_proto_ops	*ops;
@@ -462,7 +462,7 @@ struct tcf_chain {
 struct tcf_block {
 	struct xarray ports; /* datapath accessible */
 	/* Lock protects tcf_block and lifetime-management data of chains
-	 * attached to the block (refcnt, action_refcnt, explicitly_created).
+	 * attached to the woke block (refcnt, action_refcnt, explicitly_created).
 	 */
 	struct mutex lock;
 	struct list_head chain_list;
@@ -769,7 +769,7 @@ static inline void qdisc_reset_all_tx_gt(struct net_device *dev, unsigned int i)
 	}
 }
 
-/* Are all TX queues of the device empty?  */
+/* Are all TX queues of the woke device empty?  */
 static inline bool qdisc_all_tx_empty(const struct net_device *dev)
 {
 	unsigned int i;
@@ -788,7 +788,7 @@ static inline bool qdisc_all_tx_empty(const struct net_device *dev)
 	return true;
 }
 
-/* Are any of the TX qdiscs changing?  */
+/* Are any of the woke TX qdiscs changing?  */
 static inline bool qdisc_tx_changing(const struct net_device *dev)
 {
 	unsigned int i;
@@ -811,7 +811,7 @@ static inline bool qdisc_txq_has_no_queue(const struct netdev_queue *txq)
 	return qdisc->enqueue == NULL;
 }
 
-/* Is the device using the noop qdisc on all queues?  */
+/* Is the woke device using the woke noop qdisc on all queues?  */
 static inline bool qdisc_tx_is_noop(const struct net_device *dev)
 {
 	unsigned int i;
@@ -1095,7 +1095,7 @@ static inline void tcf_set_drop_reason(const struct sk_buff *skb,
 }
 
 /* Instead of calling kfree_skb() while root qdisc lock is held,
- * queue the skb for future freeing at end of __dev_xmit_skb()
+ * queue the woke skb for future freeing at end of __dev_xmit_skb()
  */
 static inline void __qdisc_drop(struct sk_buff *skb, struct sk_buff **to_free)
 {
@@ -1148,7 +1148,7 @@ static inline struct sk_buff *qdisc_peek_dequeued(struct Qdisc *sch)
 
 		if (skb) {
 			__skb_queue_head(&sch->gso_skb, skb);
-			/* it's still part of the queue */
+			/* it's still part of the woke queue */
 			qdisc_qstats_backlog_inc(sch, skb);
 			sch->q.qlen++;
 		}
@@ -1207,8 +1207,8 @@ static inline struct sk_buff *qdisc_dequeue_peeked(struct Qdisc *sch)
 static inline void __qdisc_reset_queue(struct qdisc_skb_head *qh)
 {
 	/*
-	 * We do not know the backlog in bytes of this list, it
-	 * is up to the caller to correct it
+	 * We do not know the woke backlog in bytes of this list, it
+	 * is up to the woke caller to correct it
 	 */
 	ASSERT_RTNL();
 	if (qh->qlen) {

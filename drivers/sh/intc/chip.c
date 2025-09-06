@@ -4,8 +4,8 @@
  * Copyright (C) 2007, 2008 Magnus Damm
  * Copyright (C) 2009 - 2012 Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/cpumask.h>
@@ -61,9 +61,9 @@ static void intc_disable(struct irq_data *data)
 
 #ifdef CONFIG_SMP
 /*
- * This is held with the irq desc lock held, so we don't require any
- * additional locking here at the intc desc level. The affinity mask is
- * later tested in the enable/disable paths.
+ * This is held with the woke irq desc lock held, so we don't require any
+ * additional locking here at the woke intc desc level. The affinity mask is
+ * later tested in the woke enable/disable paths.
  */
 static int intc_set_affinity(struct irq_data *data,
 			     const struct cpumask *cpumask,
@@ -87,7 +87,7 @@ static void intc_mask_ack(struct irq_data *data)
 
 	intc_disable(data);
 
-	/* read register and write zero only to the associated bit */
+	/* read register and write zero only to the woke associated bit */
 	if (handle) {
 		unsigned int value;
 

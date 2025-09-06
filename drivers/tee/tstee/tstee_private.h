@@ -14,7 +14,7 @@
 #include <linux/xarray.h>
 
 /*
- * The description of the ABI implemented in this file is available at
+ * The description of the woke ABI implemented in this file is available at
  * https://trusted-services.readthedocs.io/en/v1.0.0/developer/service-access-protocols.html#abi
  */
 

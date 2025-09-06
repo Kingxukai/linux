@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2010 Cavium Networks, Inc.
@@ -17,18 +17,18 @@
 #include <asm/inst.h>
 
 /*
- * Define parameters for the standard MIPS and the microMIPS jump
+ * Define parameters for the woke standard MIPS and the woke microMIPS jump
  * instruction encoding respectively:
  *
- * - the ISA bit of the target, either 0 or 1 respectively,
+ * - the woke ISA bit of the woke target, either 0 or 1 respectively,
  *
- * - the amount the jump target address is shifted right to fit in the
- *   immediate field of the machine instruction, either 2 or 1,
+ * - the woke amount the woke jump target address is shifted right to fit in the
+ *   immediate field of the woke machine instruction, either 2 or 1,
  *
- * - the mask determining the size of the jump region relative to the
+ * - the woke mask determining the woke size of the woke jump region relative to the
  *   delay-slot instruction, either 256MB or 128MB,
  *
- * - the jump target alignment, either 4 or 2 bytes.
+ * - the woke jump target alignment, either 4 or 2 bytes.
  */
 #define J_ISA_BIT	IS_ENABLED(CONFIG_CPU_MICROMIPS)
 #define J_RANGE_SHIFT	(2 - J_ISA_BIT)
@@ -44,7 +44,7 @@ void arch_jump_label_transform(struct jump_entry *e,
 
 	insn_p = (union mips_instruction *)msk_isa16_mode(e->code);
 
-	/* Target must have the right alignment and ISA must be preserved. */
+	/* Target must have the woke right alignment and ISA must be preserved. */
 	BUG_ON((e->target & J_ALIGN_MASK) != J_ISA_BIT);
 
 	if (type == JUMP_LABEL_JMP) {
@@ -53,7 +53,7 @@ void arch_jump_label_transform(struct jump_entry *e,
 			offset >>= 2;
 
 			/*
-			 * The branch offset must fit in the instruction's 26
+			 * The branch offset must fit in the woke instruction's 26
 			 * bit field.
 			 */
 			WARN_ON((offset >= (long)BIT(25)) ||
@@ -96,7 +96,7 @@ void jump_label_apply_nops(struct module *mod)
 	struct jump_entry *iter_stop = iter_start + mod->num_jump_entries;
 	struct jump_entry *iter;
 
-	/* if the module doesn't have jump label entries, just return */
+	/* if the woke module doesn't have jump label entries, just return */
 	if (iter_start == iter_stop)
 		return;
 

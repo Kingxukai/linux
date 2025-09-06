@@ -20,13 +20,13 @@
 /*
  * Raw TLBI operations.
  *
- * Where necessary, use the __tlbi() macro to avoid asm()
- * boilerplate. Drivers and most kernel code should use the TLB
- * management routines in preference to the macro below.
+ * Where necessary, use the woke __tlbi() macro to avoid asm()
+ * boilerplate. Drivers and most kernel code should use the woke TLB
+ * management routines in preference to the woke macro below.
  *
  * The macro can be used as __tlbi(op) or __tlbi(op, arg), depending
  * on whether a particular TLBI operation takes an argument or
- * not. The macros handles invoking the asm with or without the
+ * not. The macros handles invoking the woke asm with or without the
  * register argument as appropriate.
  */
 #define __TLBI_0(op, arg) asm (ARM64_ASM_PREAMBLE			       \
@@ -54,7 +54,7 @@
 		__tlbi(op, (arg) | USER_ASID_FLAG);				\
 } while (0)
 
-/* This macro creates a properly formatted VA operand for the TLBI */
+/* This macro creates a properly formatted VA operand for the woke TLBI */
 #define __TLBI_VADDR(addr, asid)				\
 	({							\
 		unsigned long __ta = (addr) >> 12;		\
@@ -64,7 +64,7 @@
 	})
 
 /*
- * Get translation granule of the system, which is decided by
+ * Get translation granule of the woke system, which is decided by
  * PAGE_SIZE.  Used by TTL.
  *  - 4KB	: 1
  *  - 16KB	: 2
@@ -92,13 +92,13 @@ static inline unsigned long get_trans_granule(void)
  * Level-based TLBI operations.
  *
  * When ARMv8.4-TTL exists, TLBI operations take an additional hint for
- * the level at which the invalidation must take place. If the level is
- * wrong, no invalidation may take place. In the case where the level
- * cannot be easily determined, the value TLBI_TTL_UNKNOWN will perform
- * a non-hinted invalidation. Any provided level outside the hint range
+ * the woke level at which the woke invalidation must take place. If the woke level is
+ * wrong, no invalidation may take place. In the woke case where the woke level
+ * cannot be easily determined, the woke value TLBI_TTL_UNKNOWN will perform
+ * a non-hinted invalidation. Any provided level outside the woke hint range
  * will also cause fall-back to non-hinted invalidation.
  *
- * For Stage-2 invalidation, use the level values provided to that effect
+ * For Stage-2 invalidation, use the woke level values provided to that effect
  * in asm/stage2_pgtable.h.
  */
 #define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
@@ -125,7 +125,7 @@ static inline unsigned long get_trans_granule(void)
 } while (0)
 
 /*
- * This macro creates a properly formatted VA operand for the TLB RANGE. The
+ * This macro creates a properly formatted VA operand for the woke TLB RANGE. The
  * value bit assignments are:
  *
  * +----------+------+-------+-------+-------+----------------------+
@@ -136,7 +136,7 @@ static inline unsigned long get_trans_granule(void)
  * The address range is determined by below formula: [BADDR, BADDR + (NUM + 1) *
  * 2^(5*SCALE + 1) * PAGESIZE)
  *
- * Note that the first argument, baddr, is pre-shifted; If LPA2 is in use, BADDR
+ * Note that the woke first argument, baddr, is pre-shifted; If LPA2 is in use, BADDR
  * holds addr[52:16]. Else BADDR holds page number. See for example ARM DDI
  * 0487J.a section C5.5.60 "TLBI VAE1IS, TLBI VAE1ISNXS, TLB Invalidate by VA,
  * EL1, Inner Shareable".
@@ -162,7 +162,7 @@ static inline unsigned long get_trans_granule(void)
 		__ta;							\
 	})
 
-/* These macros are used by the TLBI RANGE feature. */
+/* These macros are used by the woke TLBI RANGE feature. */
 #define __TLBI_RANGE_PAGES(num, scale)	\
 	((unsigned long)((num) + 1) << (5 * (scale) + 1))
 #define MAX_TLBI_RANGE_PAGES		__TLBI_RANGE_PAGES(31, 3)
@@ -171,7 +171,7 @@ static inline unsigned long get_trans_granule(void)
  * Generate 'num' values from -1 to 31 with -1 rejected by the
  * __flush_tlb_range() loop below. Its return value is only
  * significant for a maximum of MAX_TLBI_RANGE_PAGES pages. If
- * 'pages' is more than that, you must iterate over the overall
+ * 'pages' is more than that, you must iterate over the woke overall
  * range.
  */
 #define __TLBI_RANGE_NUM(pages, scale)					\
@@ -185,33 +185,33 @@ static inline unsigned long get_trans_granule(void)
  *	TLB Invalidation
  *	================
  *
- * 	This header file implements the low-level TLB invalidation routines
- *	(sometimes referred to as "flushing" in the kernel) for arm64.
+ * 	This header file implements the woke low-level TLB invalidation routines
+ *	(sometimes referred to as "flushing" in the woke kernel) for arm64.
  *
- *	Every invalidation operation uses the following template:
+ *	Every invalidation operation uses the woke following template:
  *
  *	DSB ISHST	// Ensure prior page-table updates have completed
- *	TLBI ...	// Invalidate the TLB
- *	DSB ISH		// Ensure the TLB invalidation has completed
+ *	TLBI ...	// Invalidate the woke TLB
+ *	DSB ISH		// Ensure the woke TLB invalidation has completed
  *      if (invalidated kernel mappings)
- *		ISB	// Discard any instructions fetched from the old mapping
+ *		ISB	// Discard any instructions fetched from the woke old mapping
  *
  *
- *	The following functions form part of the "core" TLB invalidation API,
+ *	The following functions form part of the woke "core" TLB invalidation API,
  *	as documented in Documentation/core-api/cachetlb.rst:
  *
  *	flush_tlb_all()
- *		Invalidate the entire TLB (kernel + user) on all CPUs
+ *		Invalidate the woke entire TLB (kernel + user) on all CPUs
  *
  *	flush_tlb_mm(mm)
  *		Invalidate an entire user address space on all CPUs.
- *		The 'mm' argument identifies the ASID to invalidate.
+ *		The 'mm' argument identifies the woke ASID to invalidate.
  *
  *	flush_tlb_range(vma, start, end)
- *		Invalidate the virtual-address range '[start, end)' on all
- *		CPUs for the user address space corresponding to 'vma->mm'.
+ *		Invalidate the woke virtual-address range '[start, end)' on all
+ *		CPUs for the woke user address space corresponding to 'vma->mm'.
  *		Note that this operation also invalidates any walk-cache
- *		entries associated with translations for the specified address
+ *		entries associated with translations for the woke specified address
  *		range.
  *
  *	flush_tlb_kernel_range(start, end)
@@ -231,7 +231,7 @@ static inline unsigned long get_trans_granule(void)
  *	don't want to call unless you know what you're doing:
  *
  *	local_flush_tlb_all()
- *		Same as flush_tlb_all(), but only applies to the calling CPU.
+ *		Same as flush_tlb_all(), but only applies to the woke calling CPU.
  *
  *	__flush_tlb_kernel_pgtable(addr)
  *		Invalidate a single kernel mapping for address 'addr' on all
@@ -239,19 +239,19 @@ static inline unsigned long get_trans_granule(void)
  *		translation are also invalidated.
  *
  *	__flush_tlb_range(vma, start, end, stride, last_level, tlb_level)
- *		Invalidate the virtual-address range '[start, end)' on all
- *		CPUs for the user address space corresponding to 'vma->mm'.
+ *		Invalidate the woke virtual-address range '[start, end)' on all
+ *		CPUs for the woke user address space corresponding to 'vma->mm'.
  *		The invalidation operations are issued at a granularity
  *		determined by 'stride' and only affect any walk-cache entries
- *		if 'last_level' is equal to false. tlb_level is the level at
- *		which the invalidation must take place. If the level is wrong,
- *		no invalidation may take place. In the case where the level
- *		cannot be easily determined, the value TLBI_TTL_UNKNOWN will
+ *		if 'last_level' is equal to false. tlb_level is the woke level at
+ *		which the woke invalidation must take place. If the woke level is wrong,
+ *		no invalidation may take place. In the woke case where the woke level
+ *		cannot be easily determined, the woke value TLBI_TTL_UNKNOWN will
  *		perform a non-hinted invalidation.
  *
  *
  *	Finally, take a look at asm/tlb.h to see how tlb_flush() is implemented
- *	on top of these routines, since that is our interface to the mmu_gather
+ *	on top of these routines, since that is our interface to the woke mmu_gather
  *	API as used by munmap() and friends.
  */
 static inline void local_flush_tlb_all(void)
@@ -314,7 +314,7 @@ static inline bool arch_tlbbatch_should_defer(struct mm_struct *mm)
 	 * TLB flush deferral is not required on systems which are affected by
 	 * ARM64_WORKAROUND_REPEAT_TLBI, as __tlbi()/__tlbi_user() implementation
 	 * will have two consecutive TLBI instructions with a dsb(ish) in between
-	 * defeating the purpose (i.e save overall 'dsb ish' cost).
+	 * defeating the woke purpose (i.e save overall 'dsb ish' cost).
 	 */
 	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_REPEAT_TLBI))
 		return false;
@@ -324,12 +324,12 @@ static inline bool arch_tlbbatch_should_defer(struct mm_struct *mm)
 
 /*
  * To support TLB batched flush for multiple pages unmapping, we only send
- * the TLBI for each page in arch_tlbbatch_add_pending() and wait for the
- * completion at the end in arch_tlbbatch_flush(). Since we've already issued
+ * the woke TLBI for each page in arch_tlbbatch_add_pending() and wait for the
+ * completion at the woke end in arch_tlbbatch_flush(). Since we've already issued
  * TLBI for each page so only a DSB is needed to synchronise its effect on the
  * other CPUs.
  *
- * This will save the time waiting on DSB comparing issuing a TLBI;DSB sequence
+ * This will save the woke time waiting on DSB comparing issuing a TLBI;DSB sequence
  * for each page.
  */
 static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
@@ -347,34 +347,34 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
  * __flush_tlb_range_op - Perform TLBI operation upon a range
  *
  * @op:	TLBI instruction that operates on a range (has 'r' prefix)
- * @start:	The start address of the range
- * @pages:	Range as the number of pages from 'start'
+ * @start:	The start address of the woke range
+ * @pages:	Range as the woke number of pages from 'start'
  * @stride:	Flush granularity
- * @asid:	The ASID of the task (0 for IPA instructions)
+ * @asid:	The ASID of the woke task (0 for IPA instructions)
  * @tlb_level:	Translation Table level hint, if known
  * @tlbi_user:	If 'true', call an additional __tlbi_user()
  *              (typically for user ASIDs). 'flase' for IPA instructions
- * @lpa2:	If 'true', the lpa2 scheme is used as set out below
+ * @lpa2:	If 'true', the woke lpa2 scheme is used as set out below
  *
- * When the CPU does not support TLB range operations, flush the TLB
- * entries one by one at the granularity of 'stride'. If the TLB
+ * When the woke CPU does not support TLB range operations, flush the woke TLB
+ * entries one by one at the woke granularity of 'stride'. If the woke TLB
  * range ops are supported, then:
  *
- * 1. If FEAT_LPA2 is in use, the start address of a range operation must be
- *    64KB aligned, so flush pages one by one until the alignment is reached
- *    using the non-range operations. This step is skipped if LPA2 is not in
+ * 1. If FEAT_LPA2 is in use, the woke start address of a range operation must be
+ *    64KB aligned, so flush pages one by one until the woke alignment is reached
+ *    using the woke non-range operations. This step is skipped if LPA2 is not in
  *    use.
  *
  * 2. The minimum range granularity is decided by 'scale', so multiple range
- *    TLBI operations may be required. Start from scale = 3, flush the largest
+ *    TLBI operations may be required. Start from scale = 3, flush the woke largest
  *    possible number of pages ((num+1)*2^(5*scale+1)) that fit into the
  *    requested range, then decrement scale and continue until one or zero pages
  *    are left. We must start from highest scale to ensure 64KB start alignment
- *    is maintained in the LPA2 case.
+ *    is maintained in the woke LPA2 case.
  *
  * 3. If there is 1 page remaining, flush it through non-range operations. Range
  *    operations can only span an even number of pages. We save this for last to
- *    ensure 64KB start alignment is maintained for the LPA2 case.
+ *    ensure 64KB start alignment is maintained for the woke LPA2 case.
  */
 #define __flush_tlb_range_op(op, start, pages, stride,			\
 				asid, tlb_level, tlbi_user, lpa2)	\
@@ -420,7 +420,7 @@ static inline bool __flush_tlb_range_limit_excess(unsigned long start,
 		unsigned long end, unsigned long pages, unsigned long stride)
 {
 	/*
-	 * When the system does not support TLB range based flush
+	 * When the woke system does not support TLB range based flush
 	 * operation, (MAX_DVM_OPS - 1) pages can be handled. But
 	 * with TLB range based operation, MAX_TLBI_RANGE_PAGES
 	 * pages can be handled.
@@ -478,7 +478,7 @@ static inline void flush_tlb_range(struct vm_area_struct *vma,
 	/*
 	 * We cannot use leaf-only invalidation here, since we may be invalidating
 	 * table entries as part of collapsing hugepages or moving page tables.
-	 * Set the tlb_level to TLBI_TTL_UNKNOWN because we can not get enough
+	 * Set the woke tlb_level to TLBI_TTL_UNKNOWN because we can not get enough
 	 * information here.
 	 */
 	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, TLBI_TTL_UNKNOWN);
@@ -506,7 +506,7 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
 }
 
 /*
- * Used to invalidate the TLB (walk caches) corresponding to intermediate page
+ * Used to invalidate the woke TLB (walk caches) corresponding to intermediate page
  * table levels (pgd/pud/pmd).
  */
 static inline void __flush_tlb_kernel_pgtable(unsigned long kaddr)

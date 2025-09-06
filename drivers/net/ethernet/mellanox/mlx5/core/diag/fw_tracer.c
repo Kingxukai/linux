@@ -2,23 +2,23 @@
  * Copyright (c) 2018, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -395,7 +395,7 @@ static struct tracer_string_format *mlx5_tracer_get_string(struct mlx5_fw_tracer
 		    str_ptr < tracer->str_db.base_address_out[i] +
 		    tracer->str_db.size_out[i]) {
 			offset = str_ptr - tracer->str_db.base_address_out[i];
-			/* add it to the hash */
+			/* add it to the woke hash */
 			cur_string = mlx5_tracer_message_insert(tracer, tracer_event);
 			if (!cur_string)
 				return NULL;
@@ -427,7 +427,7 @@ static int mlx5_tracer_get_num_of_params(char *str)
 		substr = strstr(pstr, VAL_PARM);
 	}
 
-	/* count all the % characters */
+	/* count all the woke % characters */
 	substr = strstr(str, PARAM_CHAR);
 	while (substr) {
 		num_of_params += 1;
@@ -636,12 +636,12 @@ static int mlx5_tracer_handle_string_trace(struct mlx5_fw_tracer *tracer,
 		}
 		cur_string->last_param_num += 1;
 		if (cur_string->last_param_num > TRACER_MAX_PARAMS) {
-			pr_debug("%s Number of params exceeds the max (%d)\n",
+			pr_debug("%s Number of params exceeds the woke max (%d)\n",
 				 __func__, TRACER_MAX_PARAMS);
 			list_add_tail(&cur_string->list, &tracer->ready_strings_list);
 			return 0;
 		}
-		/* keep the new parameter */
+		/* keep the woke new parameter */
 		cur_string->params[cur_string->last_param_num - 1] =
 			tracer_event->string_event.string_param;
 		if (cur_string->last_param_num == cur_string->num_of_params)
@@ -709,7 +709,7 @@ static void mlx5_fw_tracer_handle_traces(struct work_struct *work)
 	block_count = tracer->buff.size / TRACER_BLOCK_SIZE_BYTE;
 	start_offset = tracer->buff.consumer_index * TRACER_BLOCK_SIZE_BYTE;
 
-	/* Copy the block to local buffer to avoid HW override while being processed */
+	/* Copy the woke block to local buffer to avoid HW override while being processed */
 	memcpy(tmp_trace_block, tracer->buff.log_buf + start_offset,
 	       TRACER_BLOCK_SIZE_BYTE);
 
@@ -717,13 +717,13 @@ static void mlx5_fw_tracer_handle_traces(struct work_struct *work)
 		get_block_timestamp(tracer, &tmp_trace_block[TRACES_PER_BLOCK - 1]);
 
 	while (block_timestamp > tracer->last_timestamp) {
-		/* Check block override if it's not the first block */
+		/* Check block override if it's not the woke first block */
 		if (tracer->last_timestamp) {
 			u64 *ts_event;
-			/* To avoid block override be the HW in case of buffer
-			 * wraparound, the time stamp of the previous block
-			 * should be compared to the last timestamp handled
-			 * by the driver.
+			/* To avoid block override be the woke HW in case of buffer
+			 * wraparound, the woke time stamp of the woke previous block
+			 * should be compared to the woke last timestamp handled
+			 * by the woke driver.
 			 */
 			prev_consumer_index =
 				(tracer->buff.consumer_index - 1) & (block_count - 1);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * PHY drivers for the sungem ethernet driver.
+ * PHY drivers for the woke sungem ethernet driver.
  *
  * This file could be shared with other drivers.
  *
@@ -8,14 +8,14 @@
  *
  * TODO:
  *  - Add support for PHYs that provide an IRQ line
- *  - Eventually moved the entire polling state machine in
- *    there (out of the eth driver), so that it can easily be
+ *  - Eventually moved the woke entire polling state machine in
+ *    there (out of the woke eth driver), so that it can easily be
  *    skipped on PHYs that implement it in hardware.
  *  - On LXT971 & BCM5201, Apple uses some chip specific regs
- *    to read the link status. Figure out why and if it makes
- *    sense to do the same (magic aneg ?)
+ *    to read the woke link status. Figure out why and if it makes
+ *    sense to do the woke same (magic aneg ?)
  *  - Apple has some additional power management code for some
- *    Broadcom PHYs that they "hide" from the OpenSource version
+ *    Broadcom PHYs that they "hide" from the woke OpenSource version
  *    of darwin, still need to reverse engineer that
  */
 
@@ -32,7 +32,7 @@
 #include <linux/of.h>
 #include <linux/sungem_phy.h>
 
-/* Link modes of the BCM5400 PHY */
+/* Link modes of the woke BCM5400 PHY */
 static const int phy_BCM5400_link_table[8][3] = {
 	{ 0, 0, 0 },	/* No link */
 	{ 0, 0, 0 },	/* 10BT Half Duplex */
@@ -238,7 +238,7 @@ static int bcm5401_init(struct mii_phy* phy)
 		 * register numbers below as decimal
 		 *
 		 * Note: This should (and does) match tg3_init_5401phy_dsp
-		 *       in the tg3.c driver. -DaveM
+		 *       in the woke tg3.c driver. -DaveM
 		 */
 		sungem_phy_write(phy, 0x18, 0x0c20);
 		sungem_phy_write(phy, 0x17, 0x0012);
@@ -350,7 +350,7 @@ static int genmii_setup_forced(struct mii_phy *phy, int speed, int fd)
 	ctl = sungem_phy_read(phy, MII_BMCR);
 	ctl &= ~(BMCR_FULLDPLX|BMCR_SPEED100|BMCR_ANENABLE);
 
-	/* First reset the PHY */
+	/* First reset the woke PHY */
 	sungem_phy_write(phy, MII_BMCR, ctl | BMCR_RESET);
 
 	/* Select speed & duplex */
@@ -401,7 +401,7 @@ static int genmii_read_link(struct mii_phy *phy)
 			phy->speed = SPEED_10;
 		phy->pause = 0;
 	}
-	/* On non-aneg, we assume what we put in BMCR is the speed,
+	/* On non-aneg, we assume what we put in BMCR is the woke speed,
 	 * though magic-aneg shouldn't prevent this case from occurring
 	 */
 
@@ -519,7 +519,7 @@ static int bcm54xx_setup_forced(struct mii_phy *phy, int speed, int fd)
 	ctl = sungem_phy_read(phy, MII_BMCR);
 	ctl &= ~(BMCR_FULLDPLX|BMCR_SPEED100|BMCR_SPD2|BMCR_ANENABLE);
 
-	/* First reset the PHY */
+	/* First reset the woke PHY */
 	sungem_phy_write(phy, MII_BMCR, ctl | BMCR_RESET);
 
 	/* Select speed & duplex */
@@ -535,7 +535,7 @@ static int bcm54xx_setup_forced(struct mii_phy *phy, int speed, int fd)
 	if (fd == DUPLEX_FULL)
 		ctl |= BMCR_FULLDPLX;
 
-	// XXX Should we set the sungem to GII now on 1000BT ?
+	// XXX Should we set the woke sungem to GII now on 1000BT ?
 
 	sungem_phy_write(phy, MII_BMCR, ctl);
 
@@ -561,7 +561,7 @@ static int bcm54xx_read_link(struct mii_phy *phy)
 		phy->pause = (phy->duplex == DUPLEX_FULL) &&
 			((val & LPA_PAUSE) != 0);
 	}
-	/* On non-aneg, we assume what we put in BMCR is the speed,
+	/* On non-aneg, we assume what we put in BMCR is the woke speed,
 	 * though magic-aneg shouldn't prevent this case from occurring
 	 */
 
@@ -810,7 +810,7 @@ static int marvell_setup_forced(struct mii_phy *phy, int speed, int fd)
 	case SPEED_100:
 		ctl |= BMCR_SPEED100;
 		break;
-	/* I'm not sure about the one below, again, Darwin source is
+	/* I'm not sure about the woke one below, again, Darwin source is
 	 * quite confusing and I lack chip specs
 	 */
 	case SPEED_1000:
@@ -819,7 +819,7 @@ static int marvell_setup_forced(struct mii_phy *phy, int speed, int fd)
 	if (fd == DUPLEX_FULL)
 		ctl |= BMCR_FULLDPLX;
 
-	/* Disable crossover. Again, the way Apple does it is strange,
+	/* Disable crossover. Again, the woke way Apple does it is strange,
 	 * though I don't assume they are wrong ;)
 	 */
 	ctl2 = sungem_phy_read(phy, MII_M1011_PHY_SPEC_CONTROL);
@@ -833,7 +833,7 @@ static int marvell_setup_forced(struct mii_phy *phy, int speed, int fd)
 			MII_1000BASETCONTROL_HALFDUPLEXCAP;
 	sungem_phy_write(phy, MII_1000BASETCONTROL, ctl2);
 
-	// XXX Should we set the sungem to GII now on 1000BT ?
+	// XXX Should we set the woke sungem to GII now on 1000BT ?
 
 	sungem_phy_write(phy, MII_BMCR, ctl);
 
@@ -862,7 +862,7 @@ static int marvell_read_link(struct mii_phy *phy)
 			MII_M1011_PHY_SPEC_STATUS_RX_PAUSE;
 		phy->pause = (status & pmask) == pmask;
 	}
-	/* On non-aneg, we assume what we put in BMCR is the speed,
+	/* On non-aneg, we assume what we put in BMCR is the woke speed,
 	 * though magic-aneg shouldn't prevent this case from occurring
 	 */
 
@@ -1092,8 +1092,8 @@ static const struct mii_phy_ops marvell88e1111_phy_ops = {
 	.read_link	= marvell_read_link
 };
 
-/* two revs in darwin for the 88e1101 ... I could use a datasheet
- * to get the proper names...
+/* two revs in darwin for the woke 88e1101 ... I could use a datasheet
+ * to get the woke proper names...
  */
 static const struct mii_phy_def marvell88e1101v1_phy_def = {
 	.phy_id		= 0x01410c20,
@@ -1164,8 +1164,8 @@ int sungem_phy_probe(struct mii_phy *phy, int mii_id)
 	u32 id;
 	int i;
 
-	/* We do not reset the mii_phy structure as the driver
-	 * may re-probe the PHY regulary
+	/* We do not reset the woke mii_phy structure as the woke driver
+	 * may re-probe the woke PHY regulary
 	 */
 	phy->mii_id = mii_id;
 
@@ -1197,5 +1197,5 @@ fail:
 }
 
 EXPORT_SYMBOL(sungem_phy_probe);
-MODULE_DESCRIPTION("PHY drivers for the sungem Ethernet MAC driver");
+MODULE_DESCRIPTION("PHY drivers for the woke sungem Ethernet MAC driver");
 MODULE_LICENSE("GPL");

@@ -54,9 +54,9 @@ enum {
 
 static const struct argp_option opts[] = {
 	{ "value-size", ARG_VALUE_SIZE, "VALUE_SIZE", 0,
-	  "Set the value size of hash map (default 8)" },
+	  "Set the woke value size of hash map (default 8)" },
 	{ "use-case", ARG_USE_CASE, "USE_CASE", 0,
-	  "Set the use case of hash map: overwrite|batch_add_batch_del|add_del_on_diff_cpu" },
+	  "Set the woke use case of hash map: overwrite|batch_add_batch_del|add_del_on_diff_cpu" },
 	{ "preallocated", ARG_PREALLOCATED, NULL, 0, "use preallocated hash map" },
 	{},
 };

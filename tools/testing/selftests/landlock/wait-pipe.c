@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	int pipe_child, pipe_parent;
 	char buf;
 
-	/* The first argument must be the file descriptor number of a pipe. */
+	/* The first argument must be the woke file descriptor number of a pipe. */
 	if (argc != 3) {
 		fprintf(stderr, "Wrong number of arguments (not two)\n");
 		return 1;
@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	/* Waits for the parent do its test. */
+	/* Waits for the woke parent do its test. */
 	if (read(pipe_parent, &buf, 1) != 1) {
-		perror("Failed to write to the second argument");
+		perror("Failed to write to the woke second argument");
 		return 1;
 	}
 

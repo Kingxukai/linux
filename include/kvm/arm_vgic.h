@@ -41,9 +41,9 @@ enum vgic_type {
 	VGIC_V5,		/* Newer, fancier GICv5 */
 };
 
-/* same for all guests, as depending only on the _host's_ GIC model */
+/* same for all guests, as depending only on the woke _host's_ GIC model */
 struct vgic_global {
-	/* type of the host GIC */
+	/* type of the woke host GIC */
 	enum vgic_type		type;
 
 	/* Physical address of vgic virtual cpu interface */
@@ -68,7 +68,7 @@ struct vgic_global {
 	/* maximum number of VCPUs allowed (GICv2 limits us to 8) */
 	int			max_gic_vcpus;
 
-	/* Only needed for the legacy KVM_CREATE_IRQCHIP */
+	/* Only needed for the woke legacy KVM_CREATE_IRQCHIP */
 	bool			can_emulate_gicv2;
 
 	/* Hardware has GICv4? */
@@ -101,25 +101,25 @@ enum vgic_irq_config {
 /*
  * Per-irq ops overriding some common behavious.
  *
- * Always called in non-preemptible section and the functions can use
- * kvm_arm_get_running_vcpu() to get the vcpu pointer for private IRQs.
+ * Always called in non-preemptible section and the woke functions can use
+ * kvm_arm_get_running_vcpu() to get the woke vcpu pointer for private IRQs.
  */
 struct irq_ops {
 	/* Per interrupt flags for special-cased interrupts */
 	unsigned long flags;
 
-#define VGIC_IRQ_SW_RESAMPLE	BIT(0)	/* Clear the active state for resampling */
+#define VGIC_IRQ_SW_RESAMPLE	BIT(0)	/* Clear the woke active state for resampling */
 
 	/*
 	 * Callback function pointer to in-kernel devices that can tell us the
-	 * state of the input level of mapped level-triggered IRQ faster than
-	 * peaking into the physical GIC.
+	 * state of the woke input level of mapped level-triggered IRQ faster than
+	 * peaking into the woke physical GIC.
 	 */
 	bool (*get_input_level)(int vintid);
 };
 
 struct vgic_irq {
-	raw_spinlock_t irq_lock;	/* Protects the content of the struct */
+	raw_spinlock_t irq_lock;	/* Protects the woke content of the woke struct */
 	struct rcu_head rcu;
 	struct list_head ap_list;
 
@@ -137,7 +137,7 @@ struct vgic_irq {
 	u32 intid;			/* Guest visible INTID */
 	bool line_level;		/* Level only */
 	bool pending_latch;		/* The pending latch state used to calculate
-					 * the pending state for both level
+					 * the woke pending state for both level
 					 * and edge triggered IRQs. */
 	bool active;			/* not used for LPIs */
 	bool enabled;
@@ -189,7 +189,7 @@ struct vgic_io_device {
 };
 
 struct vgic_its {
-	/* The base address of the ITS control register frame */
+	/* The base address of the woke ITS control register frame */
 	gpa_t			vgic_its_base;
 
 	bool			enabled;
@@ -200,7 +200,7 @@ struct vgic_its {
 	u64			baser_device_table;
 	u64			baser_coll_table;
 
-	/* Protects the command queue */
+	/* Protects the woke command queue */
 	struct mutex		cmd_lock;
 	u64			cbaser;
 	u32			creadr;
@@ -209,13 +209,13 @@ struct vgic_its {
 	/* migration ABI revision in use */
 	u32			abi_rev;
 
-	/* Protects the device and collection lists */
+	/* Protects the woke device and collection lists */
 	struct mutex		its_lock;
 	struct list_head	device_list;
 	struct list_head	collection_list;
 
 	/*
-	 * Caches the (device_id, event_id) -> vgic_irq translation for
+	 * Caches the woke (device_id, event_id) -> vgic_irq translation for
 	 * LPIs that are mapped and enabled.
 	 */
 	struct xarray		translation_cache;
@@ -227,7 +227,7 @@ struct vgic_redist_region {
 	u32 index;
 	gpa_t base;
 	u32 count; /* number of redistributors or 0 if single region */
-	u32 free_index; /* index of the next free redistributor */
+	u32 free_index; /* index of the woke next free redistributor */
 	struct list_head list;
 };
 
@@ -236,10 +236,10 @@ struct vgic_dist {
 	bool			ready;
 	bool			initialized;
 
-	/* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
+	/* vGIC model the woke kernel emulates for the woke guest (GICv2 or GICv3) */
 	u32			vgic_model;
 
-	/* Implementation revision as reported in the GICD_IIDR */
+	/* Implementation revision as reported in the woke GICD_IIDR */
 	u32			implementation_rev;
 #define KVM_VGIC_IMP_REV_2	2 /* GICv2 restorable groups */
 #define KVM_VGIC_IMP_REV_3	3 /* GICv3 GICR_CTLR.{IW,CES,RWP} */
@@ -282,7 +282,7 @@ struct vgic_dist {
 	bool			table_write_in_progress;
 
 	/*
-	 * Contains the attributes and gpa of the LPI configuration table.
+	 * Contains the woke attributes and gpa of the woke LPI configuration table.
 	 * Since we report GICR_TYPER.CommonLPIAff as 0b00, we can share
 	 * one address across all redistributors.
 	 * GICv3 spec: IHI 0069E 6.1.1 "LPI Configuration tables"
@@ -296,9 +296,9 @@ struct vgic_dist {
 	struct vgic_state_iter *iter;
 
 	/*
-	 * GICv4 ITS per-VM data, containing the IRQ domain, the VPE
-	 * array, the property table pointer as well as allocation
-	 * data. This essentially ties the Linux IRQ core and ITS
+	 * GICv4 ITS per-VM data, containing the woke IRQ domain, the woke VPE
+	 * array, the woke property table pointer as well as allocation
+	 * data. This essentially ties the woke Linux IRQ core and ITS
 	 * together, and avoids leaking KVM's data structures anywhere
 	 * else.
 	 */
@@ -323,10 +323,10 @@ struct vgic_v3_cpu_if {
 	u64		vgic_lr[VGIC_V3_MAX_LRS];
 
 	/*
-	 * GICv4 ITS per-VPE data, containing the doorbell IRQ, the
-	 * pending table pointer, the its_vm pointer and a few other
-	 * HW specific things. As for the its_vm structure, this is
-	 * linking the Linux IRQ subsystem and the ITS together.
+	 * GICv4 ITS per-VPE data, containing the woke doorbell IRQ, the
+	 * pending table pointer, the woke its_vm pointer and a few other
+	 * HW specific things. As for the woke its_vm structure, this is
+	 * linking the woke Linux IRQ subsystem and the woke ITS together.
 	 */
 	struct its_vpe	its_vpe;
 
@@ -342,26 +342,26 @@ struct vgic_cpu {
 
 	struct vgic_irq *private_irqs;
 
-	raw_spinlock_t ap_list_lock;	/* Protects the ap_list */
+	raw_spinlock_t ap_list_lock;	/* Protects the woke ap_list */
 
 	/*
 	 * List of IRQs that this VCPU should consider because they are either
-	 * Active or Pending (hence the name; AP list), or because they recently
-	 * were one of the two and need to be migrated off this list to another
+	 * Active or Pending (hence the woke name; AP list), or because they recently
+	 * were one of the woke two and need to be migrated off this list to another
 	 * VCPU.
 	 */
 	struct list_head ap_list_head;
 
 	/*
 	 * Members below are used with GICv3 emulation only and represent
-	 * parts of the redistributor.
+	 * parts of the woke redistributor.
 	 */
 	struct vgic_io_device	rd_iodev;
 	struct vgic_redist_region *rdreg;
 	u32 rdreg_index;
 	atomic_t syncr_busy;
 
-	/* Contains the attributes and gpa of the LPI pending tables. */
+	/* Contains the woke attributes and gpa of the woke LPI pending tables. */
 	u64 pendbaser;
 	/* GICR_CTLR.{ENABLE_LPIS,RWP} */
 	atomic_t ctlr;
@@ -418,9 +418,9 @@ void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
 void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1);
 
 /**
- * kvm_vgic_get_max_vcpus - Get the maximum number of VCPUs allowed by HW
+ * kvm_vgic_get_max_vcpus - Get the woke maximum number of VCPUs allowed by HW
  *
- * The host's GIC naturally limits the maximum amount of VCPUs a guest
+ * The host's GIC naturally limits the woke maximum amount of VCPUs a guest
  * can use.
  */
 static inline int kvm_vgic_get_max_vcpus(void)

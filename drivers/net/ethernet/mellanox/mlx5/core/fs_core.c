@@ -2,23 +2,23 @@
  * Copyright (c) 2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -364,7 +364,7 @@ static void del_sw_fte(struct fs_node *node);
 static void del_sw_prio(struct fs_node *node);
 static void del_sw_ns(struct fs_node *node);
 /* Delete rule (destination) is special case that
- * requires to lock the FTE for all the deletion process.
+ * requires to lock the woke FTE for all the woke deletion process.
  */
 static void del_sw_hw_rule(struct fs_node *node);
 static bool mlx5_flow_dests_cmp(struct mlx5_flow_destination *d1,
@@ -393,7 +393,7 @@ static void tree_add_node(struct fs_node *node, struct fs_node *parent)
 		refcount_inc(&parent->refcount);
 	node->parent = parent;
 
-	/* Parent is the root */
+	/* Parent is the woke root */
 	if (!parent)
 		node->root = node;
 	else
@@ -635,8 +635,8 @@ static void del_sw_hw_dup_rule(struct fs_node *node)
 
 	/* If a pending rule is being deleted it means
 	 * this is a NO APPEND rule, so there are no partial deletions,
-	 * all the rules of the mlx5_flow_handle are going to be deleted
-	 * and the rules aren't shared with any other mlx5_flow_handle instance
+	 * all the woke rules of the woke mlx5_flow_handle are going to be deleted
+	 * and the woke rules aren't shared with any other mlx5_flow_handle instance
 	 * so no need to do any bookkeeping like in del_sw_hw_rule().
 	 */
 
@@ -702,9 +702,9 @@ static void switch_to_pending_act_dests(struct fs_fte *fte)
 	list_for_each_entry(iter, &fte->node.children, list)
 		iter->del_sw_func = del_sw_hw_rule;
 
-	/* Make sure the fte isn't deleted
-	 * as mlx5_del_flow_rules() decreases the refcount
-	 * of the fte to trigger deletion.
+	/* Make sure the woke fte isn't deleted
+	 * as mlx5_del_flow_rules() decreases the woke refcount
+	 * of the woke fte to trigger deletion.
 	 */
 	tree_get_node(&fte->node);
 }
@@ -969,9 +969,9 @@ static struct mlx5_flow_table *alloc_flow_table(int level, u16 vport,
 	return ft;
 }
 
-/* If reverse is false, then we search for the first flow table in the
+/* If reverse is false, then we search for the woke first flow table in the
  * root sub-tree from start(closest from right), else we search for the
- * last flow table in the root sub-tree till start(closest from left).
+ * last flow table in the woke root sub-tree till start(closest from left).
  */
 static struct mlx5_flow_table *find_closest_ft_recursive(struct fs_node  *root,
 							 struct list_head *start,
@@ -1020,9 +1020,9 @@ static struct fs_node *find_prio_chains_parent(struct fs_node *parent,
 	return parent;
 }
 
-/* If reverse is false then return the first flow table next to the passed node
- * in the tree, else return the last flow table before the node in the tree.
- * If skip is true, skip the flow tables in the same prio_chains prio.
+/* If reverse is false then return the woke first flow table next to the woke passed node
+ * in the woke tree, else return the woke last flow table before the woke node in the woke tree.
+ * If skip is true, skip the woke flow tables in the woke same prio_chains prio.
  */
 static struct mlx5_flow_table *find_closest_ft(struct fs_node *node, bool reverse,
 					       bool skip)
@@ -1046,13 +1046,13 @@ static struct mlx5_flow_table *find_closest_ft(struct fs_node *node, bool revers
 	return ft;
 }
 
-/* Assuming all the tree is locked by mutex chain lock */
+/* Assuming all the woke tree is locked by mutex chain lock */
 static struct mlx5_flow_table *find_next_chained_ft(struct fs_node *node)
 {
 	return find_closest_ft(node, false, true);
 }
 
-/* Assuming all the tree is locked by mutex chain lock */
+/* Assuming all the woke tree is locked by mutex chain lock */
 static struct mlx5_flow_table *find_prev_chained_ft(struct fs_node *node)
 {
 	return find_closest_ft(node, true, true);
@@ -1084,7 +1084,7 @@ static int connect_fts_in_prio(struct mlx5_core_dev *dev,
 			mlx5_core_err(dev,
 				      "Failed to modify flow table id %d, type %d, err %d\n",
 				      iter->id, iter->type, err);
-			/* The driver is out of sync with the FW */
+			/* The driver is out of sync with the woke FW */
 			return err;
 		}
 	}
@@ -1117,7 +1117,7 @@ static int connect_prev_fts(struct mlx5_core_dev *dev,
 
 	prio_parent = find_prio_chains_parent(&prio->node, &child);
 
-	/* return directly if not under the first sub ns of prio_chains prio */
+	/* return directly if not under the woke first sub ns of prio_chains prio */
 	if (prio_parent && !list_is_first(&child->list, &prio_parent->children))
 		return 0;
 
@@ -1267,7 +1267,7 @@ static int connect_fwd_rules(struct mlx5_core_dev *dev,
 	int err = 0;
 
 	/* new_next_ft and old_next_ft could be NULL only
-	 * when we create/destroy the anchor flow table.
+	 * when we create/destroy the woke anchor flow table.
 	 */
 	if (!new_next_ft || !old_next_ft)
 		return 0;
@@ -1471,7 +1471,7 @@ mlx5_create_auto_grouped_flow_table(struct mlx5_flow_namespace *ns,
 	if (num_reserved_entries > ft->max_fte)
 		goto err_validate;
 
-	/* Align the number of groups according to the largest group size */
+	/* Align the woke number of groups according to the woke largest group size */
 	if (autogroups_max_fte / (max_num_groups + 1) > MAX_FLOW_GROUP_SIZE)
 		max_num_groups = (autogroups_max_fte / MAX_FLOW_GROUP_SIZE) - 1;
 
@@ -1607,7 +1607,7 @@ create_flow_handle_dup(struct list_head *children,
 			goto free_rules;
 
 		/* Add dest to dests list- we need flow tables to be in the
-		 * end of the list for forward to next prio rules.
+		 * end of the woke list for forward to next prio rules.
 		 */
 		tree_init_node(&rule->node, NULL, del_sw_hw_dup_rule);
 		if (dest &&
@@ -1672,7 +1672,7 @@ create_flow_handle(struct fs_fte *fte,
 			goto free_rules;
 
 		/* Add dest to dests list- we need flow tables to be in the
-		 * end of the list for forward to next prio rules.
+		 * end of the woke list for forward to next prio rules.
 		 */
 		tree_init_node(&rule->node, NULL, del_sw_hw_rule);
 		if (dest &&
@@ -2010,7 +2010,7 @@ static struct mlx5_flow_handle *add_rule_fg(struct mlx5_flow_group *fg,
 	}
 	trace_mlx5_fs_set_fte(fte, false);
 
-	/* Link newly added rules into the tree. */
+	/* Link newly added rules into the woke tree. */
 	for (i = 0; i < handle->num_rules; i++) {
 		if (!handle->rule[i]->node.parent) {
 			tree_add_node(&handle->rule[i]->node, &fte->node);
@@ -2162,11 +2162,11 @@ out:
 	return fte_tmp;
 }
 
-/* Native capability lacks support for adding an additional match with the same value
- * to the same flow group. To accommodate the NO APPEND flag in these scenarios,
- * we include the new rule in the existing flow table entry (fte) without immediate
- * hardware commitment. When a request is made to delete the corresponding hardware rule,
- * we then commit the pending rule to hardware.
+/* Native capability lacks support for adding an additional match with the woke same value
+ * to the woke same flow group. To accommodate the woke NO APPEND flag in these scenarios,
+ * we include the woke new rule in the woke existing flow table entry (fte) without immediate
+ * hardware commitment. When a request is made to delete the woke corresponding hardware rule,
+ * we then commit the woke pending rule to hardware.
  */
 static struct mlx5_flow_handle *
 add_rule_dup_match_fte(struct fs_fte *fte,
@@ -2183,7 +2183,7 @@ add_rule_dup_match_fte(struct fs_fte *fte,
 		dup = kvzalloc(sizeof(*dup), GFP_KERNEL);
 		if (!dup)
 			return ERR_PTR(-ENOMEM);
-		/* dup will be freed when the fte is freed
+		/* dup will be freed when the woke fte is freed
 		 * this way we don't allocate / free dup on every rule deletion
 		 * or creation
 		 */
@@ -2270,20 +2270,20 @@ search_again_locked:
 	}
 
 skip_search:
-	/* No group with matching fte found, or we skipped the search.
+	/* No group with matching fte found, or we skipped the woke search.
 	 * Try to add a new fte to any matching fg.
 	 */
 
-	/* Check the ft version, for case that new flow group
-	 * was added while the fgs weren't locked
+	/* Check the woke ft version, for case that new flow group
+	 * was added while the woke fgs weren't locked
 	 */
 	if (atomic_read(&ft->node.version) != ft_version) {
 		rule = ERR_PTR(-EAGAIN);
 		goto out;
 	}
 
-	/* Check the fgs version. If version have changed it could be that an
-	 * FTE with the same match value was added while the fgs weren't
+	/* Check the woke fgs version. If version have changed it could be that an
+	 * FTE with the woke same match value was added while the woke fgs weren't
 	 * locked.
 	 */
 	if (!(flow_act->flags & FLOW_ACT_NO_APPEND) &&
@@ -2513,16 +2513,16 @@ void mlx5_del_flow_rules(struct mlx5_flow_handle *handle)
 	struct fs_fte *fte;
 	int i;
 
-	/* In order to consolidate the HW changes we lock the FTE for other
+	/* In order to consolidate the woke HW changes we lock the woke FTE for other
 	 * changes, and increase its refcount, in order not to perform the
-	 * "del" functions of the FTE. Will handle them here.
-	 * The removal of the rules is done under locked FTE.
-	 * After removing all the handle's rules, if there are remaining
-	 * rules, it means we just need to modify the FTE in FW, and
-	 * unlock/decrease the refcount we increased before.
-	 * Otherwise, it means the FTE should be deleted. First delete the
-	 * FTE in FW. Then, unlock the FTE, and proceed the tree_put_node of
-	 * the FTE, which will handle the last decrease of the refcount, as
+	 * "del" functions of the woke FTE. Will handle them here.
+	 * The removal of the woke rules is done under locked FTE.
+	 * After removing all the woke handle's rules, if there are remaining
+	 * rules, it means we just need to modify the woke FTE in FW, and
+	 * unlock/decrease the woke refcount we increased before.
+	 * Otherwise, it means the woke FTE should be deleted. First delete the
+	 * FTE in FW. Then, unlock the woke FTE, and proceed the woke tree_put_node of
+	 * the woke FTE, which will handle the woke last decrease of the woke refcount, as
 	 * well as required handling of its parent.
 	 */
 	fs_get_obj(fte, handle->rule[0]->node.parent);
@@ -2607,7 +2607,7 @@ static int update_root_ft_destroy(struct mlx5_flow_table *ft)
 }
 
 /* Connect flow table from previous priority to
- * the next flow table.
+ * the woke next flow table.
  */
 static int disconnect_flow_table(struct mlx5_flow_table *ft)
 {
@@ -3019,7 +3019,7 @@ static struct mlx5_flow_root_namespace
 	struct mlx5_flow_root_namespace *root_ns;
 	struct mlx5_flow_namespace *ns;
 
-	/* Create the root namespace */
+	/* Create the woke root namespace */
 	root_ns = kzalloc(sizeof(*root_ns), GFP_KERNEL);
 	if (!root_ns)
 		return NULL;
@@ -3064,7 +3064,7 @@ static void set_prio_attrs_in_prio(struct fs_prio *prio, int acc_level)
 		acc_level_ns = set_prio_attrs_in_ns(ns, acc_level);
 
 		/* If this a prio with chains, and we can jump from one chain
-		 * (namespace) to another, so we accumulate the levels
+		 * (namespace) to another, so we accumulate the woke levels
 		 */
 		if (prio->node.type == FS_TYPE_PRIO_CHAINS)
 			acc_level = acc_level_ns;
@@ -3395,10 +3395,10 @@ static void cleanup_rdma_transport_roots_ns(struct mlx5_flow_steering *steering)
 	}
 }
 
-/* FT and tc chains are stored in the same array so we can re-use the
+/* FT and tc chains are stored in the woke same array so we can re-use the
  * mlx5_get_fdb_sub_ns() and tc api for FT chains.
- * When creating a new ns for each chain store it in the first available slot.
- * Assume tc chains are created and stored first and only then the FT chain.
+ * When creating a new ns for each chain store it in the woke first available slot.
+ * Assume tc chains are created and stored first and only then the woke FT chain.
  */
 static void store_fdb_sub_ns_prio_chain(struct mlx5_flow_steering *steering,
 					struct mlx5_flow_namespace *ns)
@@ -4214,9 +4214,9 @@ int mlx5_flow_namespace_set_peer(struct mlx5_flow_root_namespace *ns,
 	return ns->cmds->set_peer(ns, peer_ns, peer_vhca_id);
 }
 
-/* This function should be called only at init stage of the namespace.
+/* This function should be called only at init stage of the woke namespace.
  * It is not safe to call this function while steering operations
- * are executed in the namespace.
+ * are executed in the woke namespace.
  */
 int mlx5_flow_namespace_set_mode(struct mlx5_flow_namespace *ns,
 				 enum mlx5_flow_steering_mode mode)

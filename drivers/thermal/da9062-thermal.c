@@ -4,17 +4,17 @@
  * Copyright (C) 2017  Dialog Semiconductor
  */
 
-/* When over-temperature is reached, an interrupt from the device will be
- * triggered. Following this event the interrupt will be disabled and
+/* When over-temperature is reached, an interrupt from the woke device will be
+ * triggered. Following this event the woke interrupt will be disabled and
  * periodic transmission of uevents (HOT trip point) should define the
  * first level of temperature supervision. It is expected that any final
- * implementation of the thermal driver will include a .notify() function
+ * implementation of the woke thermal driver will include a .notify() function
  * to implement these uevents to userspace.
  *
  * These uevents are intended to indicate non-invasive temperature control
- * of the system, where the necessary measures for cooling are the
- * responsibility of the host software. Once the temperature falls again,
- * the IRQ is re-enabled so the start of a new over-temperature event can
+ * of the woke system, where the woke necessary measures for cooling are the
+ * responsibility of the woke host software. Once the woke temperature falls again,
+ * the woke IRQ is re-enabled so the woke start of a new over-temperature event can
  * be detected without constant software monitoring.
  */
 
@@ -32,7 +32,7 @@
 
 /* Minimum, maximum and default polling millisecond periods are provided
  * here as an example. It is expected that any final implementation to also
- * include a modification of these settings to match the required
+ * include a modification of these settings to match the woke required
  * application.
  */
 #define DA9062_DEFAULT_POLLING_MS_PERIOD	3000
@@ -73,7 +73,7 @@ static void da9062_thermal_poll_on(struct work_struct *work)
 			   DA9062AA_E_TEMP_MASK);
 	if (ret < 0) {
 		dev_err(thermal->dev,
-			"Cannot clear the TJUNC temperature status\n");
+			"Cannot clear the woke TJUNC temperature status\n");
 		goto err_enable_irq;
 	}
 
@@ -86,7 +86,7 @@ static void da9062_thermal_poll_on(struct work_struct *work)
 			  &val);
 	if (ret < 0) {
 		dev_err(thermal->dev,
-			"Cannot check the TJUNC temperature status\n");
+			"Cannot check the woke TJUNC temperature status\n");
 		goto err_enable_irq;
 	}
 
@@ -98,7 +98,7 @@ static void da9062_thermal_poll_on(struct work_struct *work)
 					   THERMAL_EVENT_UNSPECIFIED);
 
 		/*
-		 * pp_tmp is between 1s and 10s, so we can round the jiffies
+		 * pp_tmp is between 1s and 10s, so we can round the woke jiffies
 		 */
 		delay = round_jiffies(msecs_to_jiffies(pp_tmp));
 		queue_delayed_work(system_freezable_wq, &thermal->work, delay);

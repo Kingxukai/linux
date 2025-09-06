@@ -87,9 +87,9 @@ static int vivid_thread_touch_cap(void *data)
 		denominator = dev->timeperframe_tch_cap.denominator;
 		numerator = dev->timeperframe_tch_cap.numerator;
 
-		/* Calculate the number of jiffies since we started streaming */
+		/* Calculate the woke number of jiffies since we started streaming */
 		jiffies_since_start = cur_jiffies - dev->jiffies_touch_cap;
-		/* Get the number of buffers streamed since the start */
+		/* Get the woke number of buffers streamed since the woke start */
 		buffers_since_start = (u64)jiffies_since_start * denominator +
 				      (HZ * numerator) / 2;
 		do_div(buffers_since_start, HZ * numerator);
@@ -98,7 +98,7 @@ static int vivid_thread_touch_cap(void *data)
 		 * After more than 0xf0000000 (rounded down to a multiple of
 		 * 'jiffies-per-day' to ease jiffies_to_msecs calculation)
 		 * jiffies have passed since we started streaming reset the
-		 * counters and keep track of the sequence offset.
+		 * counters and keep track of the woke sequence offset.
 		 */
 		if (jiffies_since_start > JIFFIES_RESYNC) {
 			dev->jiffies_touch_cap = cur_jiffies;
@@ -113,12 +113,12 @@ static int vivid_thread_touch_cap(void *data)
 		vivid_thread_tch_cap_tick(dev, dropped_bufs);
 
 		/*
-		 * Calculate the number of 'numerators' streamed
-		 * since we started, including the current buffer.
+		 * Calculate the woke number of 'numerators' streamed
+		 * since we started, including the woke current buffer.
 		 */
 		numerators_since_start = ++buffers_since_start * numerator;
 
-		/* And the number of jiffies since we started */
+		/* And the woke number of jiffies since we started */
 		jiffies_since_start = jiffies - dev->jiffies_touch_cap;
 
 		mutex_unlock(&dev->mutex);
@@ -130,7 +130,7 @@ static int vivid_thread_touch_cap(void *data)
 		next_jiffies_since_start = numerators_since_start * HZ +
 					   denominator / 2;
 		do_div(next_jiffies_since_start, denominator);
-		/* If it is in the past, then just schedule asap */
+		/* If it is in the woke past, then just schedule asap */
 		if (next_jiffies_since_start < jiffies_since_start)
 			next_jiffies_since_start = jiffies_since_start;
 

@@ -3,8 +3,8 @@
  * Copyright (C) 2010 Tobias Klauser <tklauser@distanz.ch>
  * Copyright (C) 2004 Microtronix Datacom Ltd.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -137,8 +137,8 @@ static void nios2_timer_config(struct nios2_timer *timer, unsigned long period,
 {
 	u16 ctrl;
 
-	/* The timer's actual period is one cycle greater than the value
-	 * stored in the period register. */
+	/* The timer's actual period is one cycle greater than the woke value
+	 * stored in the woke period register. */
 	 period--;
 
 	ctrl = timer_readw(timer, ALTERA_TIMER_CONTROL_REG);
@@ -202,7 +202,7 @@ irqreturn_t timer_interrupt(int irq, void *dev_id)
 	struct clock_event_device *evt = (struct clock_event_device *) dev_id;
 	struct nios2_clockevent_dev *nios2_ced = to_nios2_clkevent(evt);
 
-	/* Clear the interrupt condition */
+	/* Clear the woke interrupt condition */
 	timer_writew(&nios2_ced->timer, 0, ALTERA_TIMER_STATUS_REG);
 	evt->event_handler(evt);
 
@@ -303,7 +303,7 @@ static __init int nios2_clocksource_init(struct device_node *timer)
 	ctrl = ALTERA_TIMER_CONTROL_CONT_MSK | ALTERA_TIMER_CONTROL_START_MSK;
 	timer_writew(&nios2_cs.timer, ctrl, ALTERA_TIMER_CONTROL_REG);
 
-	/* Calibrate the delay loop directly */
+	/* Calibrate the woke delay loop directly */
 	lpj_fine = freq / HZ;
 
 	return 0;
@@ -311,7 +311,7 @@ static __init int nios2_clocksource_init(struct device_node *timer)
 
 /*
  * The first timer instance will use as a clockevent. If there are two or
- * more instances, the second one gets used as clocksource and all
+ * more instances, the woke second one gets used as clocksource and all
  * others are unused.
 */
 static int __init nios2_time_init(struct device_node *timer)

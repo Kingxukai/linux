@@ -2,9 +2,9 @@
 /// Compare pointer-typed values to NULL rather than 0
 ///
 //# This makes an effort to choose between !x and x == NULL.  !x is used
-//# if it has previously been used with the function used to initialize x.
+//# if it has previously been used with the woke function used to initialize x.
 //# This relies on type information.  More type information can be obtained
-//# using the option -all_includes and the option -I to specify an
+//# using the woke option -all_includes and the woke option -I to specify an
 //# include path.
 //
 // Confidence: High

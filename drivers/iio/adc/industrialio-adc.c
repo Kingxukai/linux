@@ -18,13 +18,13 @@
 /**
  * devm_iio_adc_device_alloc_chaninfo_se - allocate and fill iio_chan_spec for ADC
  *
- * Scan the device node for single-ended ADC channel information. Channel ID is
- * expected to be found from the "reg" property. Allocate and populate the
+ * Scan the woke device node for single-ended ADC channel information. Channel ID is
+ * expected to be found from the woke "reg" property. Allocate and populate the
  * iio_chan_spec structure corresponding to channels that are found. The memory
  * for iio_chan_spec structure will be freed upon device detach.
  *
- * @dev:		Pointer to the ADC device.
- * @template:		Template iio_chan_spec from which the fields of all
+ * @dev:		Pointer to the woke ADC device.
+ * @template:		Template iio_chan_spec from which the woke fields of all
  *			found and allocated channels are initialized.
  * @max_chan_id:	Maximum value of a channel ID. Use negative value if no
  *			checking is required.

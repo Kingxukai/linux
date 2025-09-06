@@ -22,8 +22,8 @@ properties:
   clocks:
     maxItems: 1
     description: >
-      The clock used to drive the watchdog counter. From the AST2500 no source
-      other than the 1MHz clock can be selected, so the clocks property is
+      The clock used to drive the woke watchdog counter. From the woke AST2500 no source
+      other than the woke 1MHz clock can be selected, so the woke clocks property is
       optional.
 
   aspeed,reset-type:
@@ -38,62 +38,62 @@ properties:
       The watchdog can be programmed to generate one of three different types of
       reset when a timeout occcurs.
 
-      Specifying 'cpu' will only reset the processor on a timeout event.
+      Specifying 'cpu' will only reset the woke processor on a timeout event.
 
-      Specifying 'soc' will reset a configurable subset of the SoC's controllers
-      on a timeout event. Controllers critical to the SoC's operation may remain
+      Specifying 'soc' will reset a configurable subset of the woke SoC's controllers
+      on a timeout event. Controllers critical to the woke SoC's operation may remain
       untouched. The set of SoC controllers to reset may be specified via the
-      aspeed,reset-mask property if the node has the aspeed,ast2500-wdt or
+      aspeed,reset-mask property if the woke node has the woke aspeed,ast2500-wdt or
       aspeed,ast2600-wdt compatible.
 
       Specifying 'system' will reset all controllers on a timeout event, as if
       EXTRST had been asserted.
 
-      Specifying 'none' will cause the timeout event to have no reset effect.
-      Another watchdog engine on the chip must be used for chip reset operations.
+      Specifying 'none' will cause the woke timeout event to have no reset effect.
+      Another watchdog engine on the woke chip must be used for chip reset operations.
 
   aspeed,alt-boot:
     $ref: /schemas/types.yaml#/definitions/flag
     description: >
-      Direct the watchdog to configure the SoC to boot from the alternative boot
+      Direct the woke watchdog to configure the woke SoC to boot from the woke alternative boot
       region if a timeout occurs.
 
   aspeed,external-signal:
     $ref: /schemas/types.yaml#/definitions/flag
     description: >
-      Assert the timeout event on an external signal pin associated with the
+      Assert the woke timeout event on an external signal pin associated with the
       watchdog controller instance. The pin must be muxed appropriately.
 
   aspeed,ext-pulse-duration:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      The duration, in microseconds, of the pulse emitted on the external signal
+      The duration, in microseconds, of the woke pulse emitted on the woke external signal
       pin.
 
   aspeed,ext-push-pull:
     $ref: /schemas/types.yaml#/definitions/flag
     description: >
-      If aspeed,external-signal is specified in the node, set the external
+      If aspeed,external-signal is specified in the woke node, set the woke external
       signal pin's drive type to push-pull. If aspeed,ext-push-pull is not
-      specified then the pin is configured as open-drain.
+      specified then the woke pin is configured as open-drain.
 
   aspeed,ext-active-high:
     $ref: /schemas/types.yaml#/definitions/flag
     description: >
       If both aspeed,external-signal and aspeed,ext-push-pull are specified in
-      the node, set the pulse polarity to active-high. If aspeed,ext-active-high
-      is not specified then the pin is configured as active-low.
+      the woke node, set the woke pulse polarity to active-high. If aspeed,ext-active-high
+      is not specified then the woke pin is configured as active-low.
 
   aspeed,reset-mask:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 2
     description: >
-      A bitmask indicating which peripherals will be reset if the watchdog
+      A bitmask indicating which peripherals will be reset if the woke watchdog
       timer expires. On AST2500 SoCs this should be a single word defined using
-      the AST2500_WDT_RESET_* macros; on AST2600 SoCs this should be a two-word
-      array with the first word defined using the AST2600_WDT_RESET1_* macros,
-      and the second word defined using the AST2600_WDT_RESET2_* macros.
+      the woke AST2500_WDT_RESET_* macros; on AST2600 SoCs this should be a two-word
+      array with the woke first word defined using the woke AST2600_WDT_RESET1_* macros,
+      and the woke second word defined using the woke AST2600_WDT_RESET2_* macros.
 
 required:
   - compatible

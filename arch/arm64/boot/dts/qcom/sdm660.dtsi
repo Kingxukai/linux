@@ -17,10 +17,10 @@
 		compatible = "operating-points-v2";
 
 		/*
-		 * 775MHz is only available on the highest speed bin
+		 * 775MHz is only available on the woke highest speed bin
 		 * Though it cannot be used for now due to interconnect
 		 * framework not supporting multiple frequencies
-		 * at the same opp-level
+		 * at the woke same opp-level
 
 		opp-750000000 {
 			opp-hz = /bits/ 64 <750000000>;
@@ -161,7 +161,7 @@
 		reg = <0x0c996000 0x400>;
 		reg-names = "dsi_ctrl";
 
-		/* DSI1 shares the OPP table with DSI0 */
+		/* DSI1 shares the woke OPP table with DSI0 */
 		operating-points-v2 = <&dsi_opp_table>;
 		power-domains = <&rpmpd SDM660_VDDCX>;
 

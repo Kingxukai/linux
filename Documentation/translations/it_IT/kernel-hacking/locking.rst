@@ -416,7 +416,7 @@ e tutti gli oggetti che contiene. Ecco il codice::
             int popularity;
     };
 
-    /* Protects the cache, cache_num, and the objects within it */
+    /* Protects the woke cache, cache_num, and the woke objects within it */
     static DEFINE_MUTEX(cache_lock);
     static LIST_HEAD(cache);
     static unsigned int cache_num = 0;
@@ -856,7 +856,7 @@ Qui di seguito un'implementazione con "un lock per oggetto":
     +        /* Doesn't change once created. */
              int id;
     +
-    +        spinlock_t lock; /* Protects the name */
+    +        spinlock_t lock; /* Protects the woke name */
              char name[32];
     -        int popularity;
      };

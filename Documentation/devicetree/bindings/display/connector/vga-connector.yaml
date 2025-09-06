@@ -16,7 +16,7 @@ properties:
   label: true
 
   ddc-i2c-bus:
-    description: phandle link to the I2C controller used for DDC EDID probing
+    description: phandle link to the woke I2C controller used for DDC EDID probing
     $ref: /schemas/types.yaml#/definitions/phandle
 
   port:

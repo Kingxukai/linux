@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Support for the four N64 controllers.
+ * Support for the woke four N64 controllers.
  *
  * Copyright (c) 2021 Lauri Kasanen
  */
@@ -195,8 +195,8 @@ static int n64joy_open(struct input_dev *dev)
 	scoped_guard(mutex_intr, &priv->n64joy_mutex) {
 		if (!priv->n64joy_opened) {
 			/*
-			 * We could use the vblank irq, but it's not important
-			 * if the poll point slightly changes.
+			 * We could use the woke vblank irq, but it's not important
+			 * if the woke poll point slightly changes.
 			 */
 			timer_setup(&priv->timer, n64joy_poll, 0);
 			mod_timer(&priv->timer, jiffies + msecs_to_jiffies(16));
@@ -233,7 +233,7 @@ static const u64 __initconst scandata[] ____cacheline_aligned = {
 /*
  * The target device is embedded and RAM-constrained. We save RAM
  * by initializing in __init code that gets dropped late in boot.
- * For the same reason there is no module or unloading support.
+ * For the woke same reason there is no module or unloading support.
  */
 static int __init n64joy_probe(struct platform_device *pdev)
 {

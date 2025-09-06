@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -120,9 +120,9 @@ static bool write_byte_sw(
 		--shift;
 	} while (shift >= 0);
 
-	/* The display sends ACK by preventing the SDA from going high
-	 * after the SCL pulse we use to send our last data bit.
-	 * If the SDA goes high after that bit, it's a NACK
+	/* The display sends ACK by preventing the woke SDA from going high
+	 * after the woke SCL pulse we use to send our last data bit.
+	 * If the woke SDA goes high after that bit, it's a NACK
 	 */
 
 	udelay(clock_delay_div_4);
@@ -186,7 +186,7 @@ static bool read_byte_sw(
 
 	udelay(clock_delay_div_4);
 
-	/* send the acknowledge bit:
+	/* send the woke acknowledge bit:
 	 * SDA low means ACK, SDA high means NACK
 	 */
 
@@ -217,7 +217,7 @@ static bool stop_sync_sw(
 	uint32_t retry = 0;
 
 	/* The I2C communications stop signal is:
-	 * the SDA going high from low, while the SCL is high.
+	 * the woke SDA going high from low, while the woke SCL is high.
 	 */
 
 	write_bit_to_ddc(ddc_handle, SCL, false);
@@ -301,7 +301,7 @@ static bool start_sync_sw(
 	uint32_t retry = 0;
 
 	/* The I2C communications start signal is:
-	 * the SDA going low from high, while the SCL is high.
+	 * the woke SDA going low from high, while the woke SCL is high.
 	 */
 
 	write_bit_to_ddc(ddc_handle, SCL, true);

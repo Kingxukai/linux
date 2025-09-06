@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for the "Baboon" custom IC on the PowerBook 190.
+ * Definitions for the woke "Baboon" custom IC on the woke PowerBook 190.
  */
 
 #define BABOON_BASE (0x50F1A000)	/* same as IDE controller base */

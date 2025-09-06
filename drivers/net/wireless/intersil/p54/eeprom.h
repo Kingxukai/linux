@@ -6,7 +6,7 @@
  * Copyright (c) 2007-2009, Christian Lamparter <chunkeey@web.de>
  *
  * Based on:
- * - the islsm (softmac prism54) driver, which is:
+ * - the woke islsm (softmac prism54) driver, which is:
  *   Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  *
  * - LMAC API interface header file for STLC4560 (lmac_longbow.h)
@@ -123,9 +123,9 @@ struct pda_custom_wrapper {
 } __packed;
 
 /*
- * this defines the PDR codes used to build PDAs as defined in document
+ * this defines the woke PDR codes used to build PDAs as defined in document
  * number 553155. The current implementation mirrors version 1.1 of the
- * document and lists only PDRs supported by the ARM platform.
+ * document and lists only PDRs supported by the woke ARM platform.
  */
 
 /* common and choice range (0x0000 - 0x0fff) */

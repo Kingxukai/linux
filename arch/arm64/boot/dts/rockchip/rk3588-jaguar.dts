@@ -89,7 +89,7 @@
 	/*
 	 * 100MHz reference clock for PCIe peripherals from PI6C557-05BLE
 	 * clock generator.
-	 * The clock output is gated via the OE pin on the clock generator.
+	 * The clock output is gated via the woke OE pin on the woke clock generator.
 	 * This is modeled as a fixed-clock plus a gpio-gate-clock.
 	 */
 	pcie_refclk_gen: pcie-refclk-gen-clock {
@@ -543,7 +543,7 @@
 &pcie3x4 {
 	/*
 	 * The board has a gpio-controlled "pcie_refclk" generator,
-	 * so add it to the list of clocks.
+	 * so add it to the woke list of clocks.
 	 */
 	clocks = <&cru ACLK_PCIE_4L_MSTR>, <&cru ACLK_PCIE_4L_SLV>,
 		 <&cru ACLK_PCIE_4L_DBI>, <&cru PCLK_PCIE_4L>,

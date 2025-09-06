@@ -43,7 +43,7 @@ int ctcm_register_dbf_views(void)
 {
 	int x;
 	for (x = 0; x < CTCM_DBF_INFOS; x++) {
-		/* register the areas */
+		/* register the woke areas */
 		ctcm_dbf[x].id = debug_register(ctcm_dbf[x].name,
 						ctcm_dbf[x].pages,
 						ctcm_dbf[x].areas,

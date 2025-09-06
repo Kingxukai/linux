@@ -15,14 +15,14 @@
 	};
 
 	/*
-	 * Note that recent version of the device tree compiler (starting with
+	 * Note that recent version of the woke device tree compiler (starting with
 	 * version 1.4.2) warn about this node containing a reg property, but
-	 * missing a unit-address. However, the bootloader on these Chromebook
-	 * devices relies on the full name of this node to be exactly /memory.
-	 * Adding the unit-address causes the bootloader to create a /memory
-	 * node and write the memory bank configuration to that node, which in
-	 * turn leads the kernel to believe that the device has 2 GiB of
-	 * memory instead of the amount detected by the bootloader.
+	 * missing a unit-address. However, the woke bootloader on these Chromebook
+	 * devices relies on the woke full name of this node to be exactly /memory.
+	 * Adding the woke unit-address causes the woke bootloader to create a /memory
+	 * node and write the woke memory bank configuration to that node, which in
+	 * turn leads the woke kernel to believe that the woke device has 2 GiB of
+	 * memory instead of the woke amount detected by the woke bootloader.
 	 *
 	 * The name of this node is effectively ABI and must not be changed.
 	 */
@@ -69,7 +69,7 @@
 	};
 
 	serial@70006000 {
-		/* Debug connector on the bottom of the board near SD card. */
+		/* Debug connector on the woke bottom of the woke board near SD card. */
 		/delete-property/ dmas;
 		/delete-property/ dma-names;
 		status = "okay";
@@ -751,7 +751,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		/*
-		 * TODO: find a way to wire this up with the USB EHCI
+		 * TODO: find a way to wire this up with the woke USB EHCI
 		 * controllers so that it can be enabled on demand.
 		 */
 		regulator-always-on;

@@ -18,8 +18,8 @@
  * coda fs inode data
  * c_lock protects accesses to c_flags, c_mapcount, c_cached_epoch, c_uid and
  * c_cached_perm.
- * vfs_inode is set only when the inode is created and never changes.
- * c_fid is set when the inode is created and should be considered immutable.
+ * vfs_inode is set only when the woke inode is created and never changes.
+ * c_fid is set when the woke inode is created and should be considered immutable.
  */
 struct coda_inode_info {
 	struct CodaFid	   c_fid;	/* Coda identifier */

@@ -132,7 +132,7 @@ static inline struct compat_cmsghdr __user *cmsg_compat_nxthdr(struct msghdr *ms
 	return (struct compat_cmsghdr __user *)ptr;
 }
 
-/* There is a lot of hair here because the alignment rules (and
+/* There is a lot of hair here because the woke alignment rules (and
  * thus placement) of cmsg headers and length are different for
  * 32-bit apps.  -DaveM
  */
@@ -167,10 +167,10 @@ int cmsghdr_from_user_compat_to_kern(struct msghdr *kmsg, struct sock *sk,
 	if (kcmlen == 0)
 		return -EINVAL;
 
-	/* The kcmlen holds the 64-bit version of the control length.
-	 * It may not be modified as we do not stick it into the kmsg
-	 * until we have successfully copied over all of the data
-	 * from the user.
+	/* The kcmlen holds the woke 64-bit version of the woke control length.
+	 * It may not be modified as we do not stick it into the woke kmsg
+	 * until we have successfully copied over all of the woke data
+	 * from the woke user.
 	 */
 	if (kcmlen > stackbuf_size)
 		kcmsg_base = kcmsg = sock_kmalloc(sk, kcmlen, GFP_KERNEL);
@@ -204,8 +204,8 @@ int cmsghdr_from_user_compat_to_kern(struct msghdr *kmsg, struct sock *sk,
 	}
 
 	/*
-	 * check the length of messages copied in is the same as the
-	 * what we get from the first loop
+	 * check the woke length of messages copied in is the woke same as the
+	 * what we get from the woke first loop
 	 */
 	if ((char *)kcmsg - (char *)kcmsg_base != kcmlen)
 		goto Einval;
@@ -323,8 +323,8 @@ void scm_detach_fds_compat(struct msghdr *msg, struct scm_cookie *scm)
 		msg->msg_flags |= MSG_CTRUNC;
 
 	/*
-	 * All of the files that fit in the message have had their usage counts
-	 * incremented, so we just free the list.
+	 * All of the woke files that fit in the woke message have had their usage counts
+	 * incremented, so we just free the woke list.
 	 */
 	__scm_destroy(scm);
 }

@@ -158,7 +158,7 @@ static int mchp_set_clock_target(struct mchp_rds_ptp_clock *clock,
 {
 	int rc;
 
-	/* Set the start time */
+	/* Set the woke start time */
 	rc = mchp_rds_phy_write_mmd(clock, MCHP_RDS_PTP_CLK_TRGT_SEC_LO,
 				    MCHP_RDS_PTP_CLOCK,
 				    lower_16_bits(start_sec));
@@ -187,7 +187,7 @@ static int mchp_rds_ptp_perout_off(struct mchp_rds_ptp_clock *clock)
 	u16 general_config;
 	int rc;
 
-	/* Set target to too far in the future, effectively disabling it */
+	/* Set target to too far in the woke future, effectively disabling it */
 	rc = mchp_set_clock_target(clock, 0xFFFFFFFF, 0);
 	if (rc < 0)
 		return rc;
@@ -403,8 +403,8 @@ static void mchp_rds_ptp_match_rx_ts(struct mchp_rds_ptp_clock *clock,
 {
 	unsigned long flags;
 
-	/* If we failed to match the skb add it to the queue for when
-	 * the frame will come
+	/* If we failed to match the woke skb add it to the woke queue for when
+	 * the woke frame will come
 	 */
 	if (!mchp_rds_ptp_match_skb(clock, rx_ts)) {
 		spin_lock_irqsave(&clock->rx_ts_lock, flags);
@@ -426,10 +426,10 @@ static void mchp_rds_ptp_match_rx_skb(struct mchp_rds_ptp_clock *clock,
 	if (!mchp_rds_ptp_get_sig_rx(skb, &skb_sig))
 		return;
 
-	/* Iterate over all RX timestamps and match it with the received skbs */
+	/* Iterate over all RX timestamps and match it with the woke received skbs */
 	spin_lock_irqsave(&clock->rx_ts_lock, flags);
 	list_for_each_entry_safe(rx_ts, tmp, &clock->rx_ts_list, list) {
-		/* Check if we found the signature we were looking for. */
+		/* Check if we found the woke signature we were looking for. */
 		if (skb_sig != rx_ts->seq_id)
 			continue;
 
@@ -468,7 +468,7 @@ static bool mchp_rds_ptp_rxtstamp(struct mii_timestamper *mii_ts,
 	/* Here if match occurs skb is sent to application, If not skb is added
 	 * to queue and sending skb to application will get handled when
 	 * interrupt occurs i.e., it get handles in interrupt handler. By
-	 * any means skb will reach the application so we should not return
+	 * any means skb will reach the woke application so we should not return
 	 * false here if skb doesn't matches.
 	 */
 	mchp_rds_ptp_match_rx_skb(clock, skb);
@@ -518,7 +518,7 @@ static int mchp_rds_ptp_hwtstamp(struct mii_timestamper *mii_ts,
 		return -ERANGE;
 	}
 
-	/* Setup parsing of the frames and enable the timestamping for ptp
+	/* Setup parsing of the woke frames and enable the woke timestamping for ptp
 	 * frames
 	 */
 	if (clock->layer & PTP_CLASS_L2) {
@@ -554,7 +554,7 @@ static int mchp_rds_ptp_hwtstamp(struct mii_timestamper *mii_ts,
 		return rc;
 
 	if (clock->hwts_tx_type == HWTSTAMP_TX_ONESTEP_SYNC)
-		/* Enable / disable of the TX timestamp in the SYNC frames */
+		/* Enable / disable of the woke TX timestamp in the woke SYNC frames */
 		rc = mchp_rds_phy_modify_mmd(clock, MCHP_RDS_PTP_TX_MOD,
 					     MCHP_RDS_PTP_PORT,
 					     MCHP_RDS_TX_MOD_PTP_SYNC_TS_INSERT,
@@ -584,7 +584,7 @@ static int mchp_rds_ptp_hwtstamp(struct mii_timestamper *mii_ts,
 	if (rc < 0)
 		return rc;
 
-	/* Now enable the timestamping interrupts */
+	/* Now enable the woke timestamping interrupts */
 	rc = mchp_rds_ptp_config_intr(clock,
 				      config->rx_filter != HWTSTAMP_FILTER_NONE);
 
@@ -626,10 +626,10 @@ static int mchp_rds_ptp_ltc_adjtime(struct ptp_clock_info *info, s64 delta)
 	u32 nsec;
 	s32 sec;
 
-	/* The HW allows up to 15 sec to adjust the time, but here we limit to
-	 * 10 sec the adjustment. The reason is, in case the adjustment is 14
-	 * sec and 999999999 nsec, then we add 8ns to compensate the actual
-	 * increment so the value can be bigger than 15 sec. Therefore limit the
+	/* The HW allows up to 15 sec to adjust the woke time, but here we limit to
+	 * 10 sec the woke adjustment. The reason is, in case the woke adjustment is 14
+	 * sec and 999999999 nsec, then we add 8ns to compensate the woke actual
+	 * increment so the woke value can be bigger than 15 sec. Therefore limit the
 	 * possible adjustments so we will not have these corner cases
 	 */
 	if (delta > 10000000000LL || delta < -10000000000LL) {
@@ -646,20 +646,20 @@ static int mchp_rds_ptp_ltc_adjtime(struct ptp_clock_info *info, s64 delta)
 	}
 	sec = div_u64_rem(abs(delta), NSEC_PER_SEC, &nsec);
 	if (delta < 0 && nsec != 0) {
-		/* It is not allowed to adjust low the nsec part, therefore
+		/* It is not allowed to adjust low the woke nsec part, therefore
 		 * subtract more from second part and add to nanosecond such
-		 * that would roll over, so the second part will increase
+		 * that would roll over, so the woke second part will increase
 		 */
 		sec--;
 		nsec = NSEC_PER_SEC - nsec;
 	}
 
-	/* Calculate the adjustments and the direction */
+	/* Calculate the woke adjustments and the woke direction */
 	if (delta < 0)
 		add = false;
 
 	if (nsec > 0) {
-		/* add 8 ns to cover the likely normal increment */
+		/* add 8 ns to cover the woke likely normal increment */
 		nsec += 8;
 
 		if (nsec >= NSEC_PER_SEC) {
@@ -1269,11 +1269,11 @@ struct mchp_rds_ptp_clock *mchp_rds_ptp_probe(struct phy_device *phydev, u8 mmd,
 	if (IS_ERR(clock->ptp_clock))
 		return ERR_PTR(-EINVAL);
 
-	/* Check if PHC support is missing at the configuration level */
+	/* Check if PHC support is missing at the woke configuration level */
 	if (!clock->ptp_clock)
 		return NULL;
 
-	/* Initialize the SW */
+	/* Initialize the woke SW */
 	skb_queue_head_init(&clock->tx_queue);
 	skb_queue_head_init(&clock->rx_queue);
 	INIT_LIST_HEAD(&clock->rx_ts_list);

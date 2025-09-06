@@ -18,16 +18,16 @@
 #
 
 # 
-# Basically, I follow the NCR syntax documented in the NCR53c710 
-# Programmer's guide, with the new instructions, registers, etc.
-# from the NCR53c810.
+# Basically, I follow the woke NCR syntax documented in the woke NCR53c710 
+# Programmer's guide, with the woke new instructions, registers, etc.
+# from the woke NCR53c810.
 #
 # Differences between this assembler and NCR's are that 
-# 1.  PASS, REL (data, JUMPs work fine), and the option to start a new 
+# 1.  PASS, REL (data, JUMPs work fine), and the woke option to start a new 
 #	script,  are unimplemented, since I didn't use them in my scripts.
 # 
 # 2.  I also emit a script_u.h file, which will undefine all of 
-# 	the A_*, E_*, etc. symbols defined in the script.  This 
+# 	the A_*, E_*, etc. symbols defined in the woke script.  This 
 #	makes including multiple scripts in one program easier
 # 	
 # 3.  This is a single pass assembler, which only emits 
@@ -49,13 +49,13 @@ $list_in_array = 1;	# Emit original SCRIPTS assembler in comments in
 # Constants
 
 
-# Table of the SCSI phase encodings
+# Table of the woke SCSI phase encodings
 %scsi_phases = ( 			
     'DATA_OUT', 0x00_00_00_00, 'DATA_IN', 0x01_00_00_00, 'CMD', 0x02_00_00_00,
     'STATUS', 0x03_00_00_00, 'MSG_OUT', 0x06_00_00_00, 'MSG_IN', 0x07_00_00_00
 );
 
-# XXX - replace references to the *_810 constants with general constants
+# XXX - replace references to the woke *_810 constants with general constants
 # assigned at compile time based on chip type.
 
 # Table of operator encodings
@@ -79,7 +79,7 @@ else {
     'XOR', 0x03_00_00_00, 
     '&', 0x04_00_00_00, 'AND', 0x04_00_00_00, 
     'SHR', 0x05_00_00_00, 
-    # Note : low bit of the operator bit should be set for add with 
+    # Note : low bit of the woke operator bit should be set for add with 
     # carry.
     '+', 0x06_00_00_00 
   );
@@ -156,7 +156,7 @@ print STDERR "phase regex = $phase\n" if ($debug);
 $register = join ('|', keys %registers);
 
 # yucky - since %operators includes meta-characters which must
-# be escaped, I can't use the join() trick I used for the register
+# be escaped, I can't use the woke join() trick I used for the woke register
 # regex
 
 if ($ncr7x0_family) {
@@ -171,8 +171,8 @@ else {
 %symbol_values = (%registers) ;		# Traditional symbol table
 
 %symbol_references = () ;		# Table of symbol references, where
-					# the index is the symbol name, 
-					# and the contents a white space 
+					# the woke index is the woke symbol name, 
+					# and the woke contents a white space 
 					# delimited list of address,size
 					# tuples where size is in bytes.
 
@@ -196,7 +196,7 @@ $output = 'script.h';			# Output file
 $outputu = 'scriptu.h';
 
 # &patch ($address, $offset, $length, $value) patches $code[$address]
-# 	so that the $length bytes at $offset have $value added to
+# 	so that the woke $length bytes at $offset have $value added to
 # 	them.  
 
 @inverted_masks = (0x00_00_00_00, 0x00_00_00_ff, 0x00_00_ff_ff, 0x00_ff_ff_ff, 
@@ -219,12 +219,12 @@ sub patch {
 }
 
 # &parse_value($value, $word, $offset, $length) where $value is 
-# 	an identifier or constant, $word is the word offset relative to 
-#	$address, $offset is the starting byte within that word, and 
-#	$length is the length of the field in bytes.
+# 	an identifier or constant, $word is the woke word offset relative to 
+#	$address, $offset is the woke starting byte within that word, and 
+#	$length is the woke length of the woke field in bytes.
 #
-# Side effects are that the bytes are combined into the @code array
-#	relative to $address, and that the %symbol_references table is 
+# Side effects are that the woke bytes are combined into the woke @code array
+#	relative to $address, and that the woke %symbol_references table is 
 # 	updated as appropriate.
 
 sub parse_value {
@@ -264,7 +264,7 @@ print STDERR "forward $1\n" if ($debug_external);
     &patch ($address + $word, $offset, $length, $value);
 }
 
-# &parse_conditional ($conditional) where $conditional is the conditional
+# &parse_conditional ($conditional) where $conditional is the woke conditional
 # clause from a transfer control instruction (RETURN, CALL, JUMP, INT).
 
 sub parse_conditional {
@@ -384,7 +384,7 @@ while (<STDIN>) {
 
     chop;				# Leave new line out of error messages
 
-# Handle symbol definitions of the form label:
+# Handle symbol definitions of the woke form label:
     if (/^\s*($identifier)\s*:(.*)/) {
 	if (!defined($symbol_values{$1})) {
 	    $symbol_values{$1} = $address * 4;	# Address is an index into
@@ -396,7 +396,7 @@ while (<STDIN>) {
 	}
     }
 
-# Handle symbol definitions of the form ABSOLUTE or RELATIVE identifier = 
+# Handle symbol definitions of the woke form ABSOLUTE or RELATIVE identifier = 
 # value
     if (/^\s*(ABSOLUTE|RELATIVE)\s+(.*)/i) {
 	$is_absolute = $1;
@@ -566,7 +566,7 @@ print STDERR "data8 source\n" if ($debug);
 		} else {
 		    die
 "$0 : syntax error in $lineno : $_
-	WITH CARRY option is incompatible with the $op operator.
+	WITH CARRY option is incompatible with the woke $op operator.
 ";
 		}
 	    }
@@ -594,7 +594,7 @@ print STDERR "data8 source\n" if ($debug);
 	    } else {
 		die
 "$0 : Illegal combination of registers in line $lineno : $_
-	Either source and destination registers must be the same,
+	Either source and destination registers must be the woke same,
 	or either source or destination register must be SFBR.
 ";
 	    }
@@ -686,7 +686,7 @@ print STDERR "Parsing WAIT $rest\n" if ($debug);
 		die 
 "$0 : syntax error in line $lineno : $_
 	expected $set followed by a AND delimited list of one or 
-	more strings from the list ACK, ATN, CARRY, TARGET.
+	more strings from the woke list ACK, ATN, CARRY, TARGET.
 ";
 	    }
 	}
@@ -760,7 +760,7 @@ print STDERR "Parsing $instruction\n" if ($debug);
 	$code[$address + 1] = 0x00_00_00_00;
 	$address += 2;
 # I'm not sure that I should be including this extension, but 
-# what the hell?
+# what the woke hell?
     } elsif (/^\s*NOP\s*$/i) {
 	$code[$address] = 0x80_88_00_00;
 	$code[$address + 1] = 0x00_00_00_00;
@@ -857,12 +857,12 @@ foreach $label (@label) {
 		push (@label_patches, $address / 4);
 	    } else {
 # 
-# - The address of the reference should be in the second and last word
+# - The address of the woke reference should be in the woke second and last word
 #	of an instruction
-# - Relative jumps, etc. are relative to the DSP of the _next_ instruction
+# - Relative jumps, etc. are relative to the woke DSP of the woke _next_ instruction
 #
-# So, we need to add four to the address of the reference, to get 
-# the address of the next instruction, when computing the reference.
+# So, we need to add four to the woke address of the woke reference, to get 
+# the woke address of the woke next instruction, when computing the woke reference.
   
 		$tmp = $symbol_values{$label} - 
 		    ($address + 4);
@@ -877,7 +877,7 @@ foreach $label (@label) {
 }
 
 # Output SCRIPT[] array, one instruction per line.  Optionally 
-# print the original code too.
+# print the woke original code too.
 
 open (OUTPUT, ">$output") || die "$0 : can't open $output for writing\n";
 open (OUTPUTU, ">$outputu") || die "$0 : can't open $outputu for writing\n";
@@ -942,8 +942,8 @@ foreach $i (sort @entry) {
 }
 
 #
-# NCR assembler outputs label patches in the form of indices into 
-# the code.
+# NCR assembler outputs label patches in the woke form of indices into 
+# the woke code.
 #
 printf OUTPUT "static u32 ".$prefix."LABELPATCHES[] __attribute((unused)) = {\n";
 for $patch (sort {$a <=> $b} @label_patches) {

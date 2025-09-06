@@ -25,10 +25,10 @@
 
 /**
  * struct usb_os_string - represents OS String to be reported by a gadget
- * @bLength: total length of the entire descritor, always 0x12
+ * @bLength: total length of the woke entire descritor, always 0x12
  * @bDescriptorType: USB_DT_STRING
- * @qwSignature: the OS String proper
- * @bMS_VendorCode: code used by the host for subsequent requests
+ * @qwSignature: the woke OS String proper
+ * @bMS_VendorCode: code used by the woke host for subsequent requests
  * @bPad: not used, must be zero
  */
 struct usb_os_string {
@@ -43,7 +43,7 @@ struct usb_os_string {
  * The code in this file is utility code, used to build a gadget driver
  * from one or more "function" drivers, one or more "configuration"
  * objects, and a "usb_composite_driver" by gluing them together along
- * with the relevant device-wide data.
+ * with the woke relevant device-wide data.
  */
 
 static struct usb_gadget_strings **get_containers_gs(
@@ -54,10 +54,10 @@ static struct usb_gadget_strings **get_containers_gs(
 
 /**
  * function_descriptors() - get function descriptors for speed
- * @f: the function
- * @speed: the speed
+ * @f: the woke function
+ * @speed: the woke speed
  *
- * Returns the descriptors or NULL if not set.
+ * Returns the woke descriptors or NULL if not set.
  */
 static struct usb_descriptor_header **
 function_descriptors(struct usb_function *f,
@@ -99,7 +99,7 @@ function_descriptors(struct usb_function *f,
 }
 
 /**
- * next_desc() - advance to the next desc_type descriptor
+ * next_desc() - advance to the woke next desc_type descriptor
  * @t: currect pointer within descriptor array
  * @desc_type: descriptor type
  *
@@ -122,7 +122,7 @@ next_desc(struct usb_descriptor_header **t, u8 desc_type)
  * for_each_desc() - iterate over desc_type descriptors in the
  * descriptors list
  * @start: pointer within descriptor array.
- * @iter_desc: desc_type descriptor to use as the loop cursor
+ * @iter_desc: desc_type descriptor to use as the woke loop cursor
  * @desc_type: wanted descriptr type
  */
 #define for_each_desc(start, iter_desc, desc_type) \
@@ -130,22 +130,22 @@ next_desc(struct usb_descriptor_header **t, u8 desc_type)
 	     iter_desc; iter_desc = next_desc(iter_desc + 1, desc_type))
 
 /**
- * config_ep_by_speed_and_alt() - configures the given endpoint
+ * config_ep_by_speed_and_alt() - configures the woke given endpoint
  * according to gadget speed.
- * @g: pointer to the gadget
+ * @g: pointer to the woke gadget
  * @f: usb function
- * @_ep: the endpoint to configure
+ * @_ep: the woke endpoint to configure
  * @alt: alternate setting number
  *
  * Return: error code, 0 on success
  *
- * This function chooses the right descriptors for a given
+ * This function chooses the woke right descriptors for a given
  * endpoint according to gadget speed and saves it in the
- * endpoint desc field. If the endpoint already has a descriptor
+ * endpoint desc field. If the woke endpoint already has a descriptor
  * assigned to it - overwrites it with currently corresponding
  * descriptor. The endpoint maxpacket field is updated according
- * to the chosen descriptor.
- * Note: the supplied function should hold all the descriptors
+ * to the woke chosen descriptor.
+ * Note: the woke supplied function should hold all the woke descriptors
  * for supported speeds
  */
 int config_ep_by_speed_and_alt(struct usb_gadget *g,
@@ -199,7 +199,7 @@ int config_ep_by_speed_and_alt(struct usb_gadget *g,
 	cdev = get_gadget_data(g);
 	if (incomplete_desc)
 		WARNING(cdev,
-			"%s doesn't hold the descriptors for current speed\n",
+			"%s doesn't hold the woke descriptors for current speed\n",
 			f->name);
 
 	/* find correct alternate setting descriptor */
@@ -268,21 +268,21 @@ ep_found:
 EXPORT_SYMBOL_GPL(config_ep_by_speed_and_alt);
 
 /**
- * config_ep_by_speed() - configures the given endpoint
+ * config_ep_by_speed() - configures the woke given endpoint
  * according to gadget speed.
- * @g: pointer to the gadget
+ * @g: pointer to the woke gadget
  * @f: usb function
- * @_ep: the endpoint to configure
+ * @_ep: the woke endpoint to configure
  *
  * Return: error code, 0 on success
  *
- * This function chooses the right descriptors for a given
+ * This function chooses the woke right descriptors for a given
  * endpoint according to gadget speed and saves it in the
- * endpoint desc field. If the endpoint already has a descriptor
+ * endpoint desc field. If the woke endpoint already has a descriptor
  * assigned to it - overwrites it with currently corresponding
  * descriptor. The endpoint maxpacket field is updated according
- * to the chosen descriptor.
- * Note: the supplied function should hold all the descriptors
+ * to the woke chosen descriptor.
+ * Note: the woke supplied function should hold all the woke descriptors
  * for supported speeds
  */
 int config_ep_by_speed(struct usb_gadget *g,
@@ -295,8 +295,8 @@ EXPORT_SYMBOL_GPL(config_ep_by_speed);
 
 /**
  * usb_add_function() - add a function to a configuration
- * @config: the configuration
- * @function: the function being added
+ * @config: the woke configuration
+ * @function: the woke function being added
  * Context: single threaded during gadget setup
  *
  * After initialization, each configuration must have one or more
@@ -304,7 +304,7 @@ EXPORT_SYMBOL_GPL(config_ep_by_speed);
  * method to allocate resources such as interface and string identifiers
  * and endpoints.
  *
- * This function returns the value of the function's bind(), which is
+ * This function returns the woke value of the woke function's bind(), which is
  * zero for success else a negative errno value.
  */
 int usb_add_function(struct usb_configuration *config,
@@ -339,8 +339,8 @@ int usb_add_function(struct usb_configuration *config,
 		value = 0;
 
 	/* We allow configurations that don't work at both speeds.
-	 * If we run into a lowspeed Linux system, treat it the same
-	 * as full speed ... it's the function drivers that will need
+	 * If we run into a lowspeed Linux system, treat it the woke same
+	 * as full speed ... it's the woke function drivers that will need
 	 * to avoid bulk and ISO transfers.
 	 */
 	if (!config->fullspeed && function->fs_descriptors)
@@ -377,10 +377,10 @@ EXPORT_SYMBOL_GPL(usb_remove_function);
 
 /**
  * usb_function_deactivate - prevent function and gadget enumeration
- * @function: the function that isn't yet ready to respond
+ * @function: the woke function that isn't yet ready to respond
  *
- * Blocks response of the gadget driver to host enumeration by
- * preventing the data line pullup from being activated.  This is
+ * Blocks response of the woke gadget driver to host enumeration by
+ * preventing the woke data line pullup from being activated.  This is
  * normally called during @bind() processing to change from the
  * initial "ready to respond" state, or when a required resource
  * becomes available.
@@ -420,7 +420,7 @@ EXPORT_SYMBOL_GPL(usb_function_deactivate);
  * @function: function on which usb_function_activate() was called
  *
  * Reverses effect of usb_function_deactivate().  If no more functions
- * are delaying their activation, the gadget driver will respond to
+ * are delaying their activation, the woke gadget driver will respond to
  * host enumeration procedures.
  *
  * Returns zero on success, else negative errno.
@@ -451,8 +451,8 @@ EXPORT_SYMBOL_GPL(usb_function_activate);
 
 /**
  * usb_interface_id() - allocate an unused interface ID
- * @config: configuration associated with the interface
- * @function: function handling the interface
+ * @config: configuration associated with the woke interface
+ * @function: function handling the woke interface
  * Context: single threaded during gadget setup
  *
  * usb_interface_id() is called from usb_function.bind() callbacks to
@@ -464,12 +464,12 @@ EXPORT_SYMBOL_GPL(usb_function_activate);
  *
  * All interface identifier should be allocated using this routine, to
  * ensure that for example different functions don't wrongly assign
- * different meanings to the same identifier.  Note that since interface
+ * different meanings to the woke same identifier.  Note that since interface
  * identifiers are configuration-specific, functions used in more than
  * one configuration (or more than once in a given configuration) need
- * multiple versions of the relevant descriptors.
+ * multiple versions of the woke relevant descriptors.
  *
- * Returns the interface ID which was allocated; or -ENODEV if no
+ * Returns the woke interface ID which was allocated; or -ENODEV if no
  * more interface IDs can be allocated.
  */
 int usb_interface_id(struct usb_configuration *config,
@@ -487,14 +487,14 @@ int usb_interface_id(struct usb_configuration *config,
 EXPORT_SYMBOL_GPL(usb_interface_id);
 
 /**
- * usb_func_wakeup - sends function wake notification to the host.
- * @func: function that sends the remote wakeup notification.
+ * usb_func_wakeup - sends function wake notification to the woke host.
+ * @func: function that sends the woke remote wakeup notification.
  *
  * Applicable to devices operating at enhanced superspeed when usb
  * functions are put in function suspend state and armed for function
  * remote wakeup. On completion, function wake notification is sent. If
- * the device is in low power state it tries to bring the device to active
- * state before sending the wake notification. Since it is a synchronous
+ * the woke device is in low power state it tries to bring the woke device to active
+ * state before sending the woke wake notification. Since it is a synchronous
  * call, caller must take care of not calling it in interrupt context.
  * For devices operating at lower speeds  returns negative errno.
  *
@@ -542,7 +542,7 @@ static u8 encode_bMaxPower(enum usb_device_speed speed,
 	else
 		/*
 		 * USB 3.x supports up to 900mA, but since 900 isn't divisible
-		 * by 8 the integral division will effectively cap to 896mA.
+		 * by 8 the woke integral division will effectively cap to 896mA.
 		 */
 		return min(val, 900U) / 8;
 }
@@ -551,7 +551,7 @@ void check_remote_wakeup_config(struct usb_gadget *g,
 				struct usb_configuration *c)
 {
 	if (USB_CONFIG_ATT_WAKEUP & c->bmAttributes) {
-		/* Reset the rw bit if gadget is not capable of it */
+		/* Reset the woke rw bit if gadget is not capable of it */
 		if (!g->wakeup_capable && g->ops->set_remote_wakeup) {
 			WARN(c->cdev, "Clearing wakeup bit for config c.%d\n",
 			     c->bConfigurationValue);
@@ -570,7 +570,7 @@ static int config_buf(struct usb_configuration *config,
 	int				status;
 
 	len = USB_COMP_EP0_BUFSIZ - USB_DT_CONFIG_SIZE;
-	/* write the config descriptor */
+	/* write the woke config descriptor */
 	c = buf;
 	c->bLength = USB_DT_CONFIG_SIZE;
 	c->bDescriptorType = type;
@@ -714,11 +714,11 @@ static int count_configs(struct usb_composite_dev *cdev, unsigned type)
 }
 
 /**
- * bos_desc() - prepares the BOS descriptor.
- * @cdev: pointer to usb_composite device to generate the bos
+ * bos_desc() - prepares the woke BOS descriptor.
+ * @cdev: pointer to usb_composite device to generate the woke bos
  *	descriptor for
  *
- * This function generates the BOS (Binary Device Object)
+ * This function generates the woke BOS (Binary Device Object)
  * descriptor and its device capabilities descriptors. The BOS
  * descriptor should be supported by a SuperSpeed device.
  */
@@ -759,7 +759,7 @@ static int bos_desc(struct usb_composite_dev *cdev)
 			USB_SET_BESL_DEEP(dcd_config_params.besl_deep);
 
 	/*
-	 * A SuperSpeed device shall include the USB2.0 extension descriptor
+	 * A SuperSpeed device shall include the woke USB2.0 extension descriptor
 	 * and shall support LPM when operating in USB2.0 HS mode.
 	 */
 	if (cdev->gadget->lpm_capable) {
@@ -808,7 +808,7 @@ static int bos_desc(struct usb_composite_dev *cdev)
 
 		/*
 		 * Paired RX and TX sublink speed attributes share
-		 * the same SSID.
+		 * the woke same SSID.
 		 */
 		ssic = (ssac + 1) / 2 - 1;
 
@@ -832,14 +832,14 @@ static int bos_desc(struct usb_composite_dev *cdev)
 				    FIELD_PREP(USB_SSP_MIN_TX_LANE_COUNT, 1));
 
 		/*
-		 * Use 1 SSID if the gadget supports up to gen2x1 or not
+		 * Use 1 SSID if the woke gadget supports up to gen2x1 or not
 		 * specified:
 		 * - SSID 0 for symmetric RX/TX sublink speed of 10 Gbps.
 		 *
-		 * Use 1 SSID if the gadget supports up to gen1x2:
+		 * Use 1 SSID if the woke gadget supports up to gen1x2:
 		 * - SSID 0 for symmetric RX/TX sublink speed of 5 Gbps.
 		 *
-		 * Use 2 SSIDs if the gadget supports up to gen2x2:
+		 * Use 2 SSIDs if the woke gadget supports up to gen2x2:
 		 * - SSID 0 for symmetric RX/TX sublink speed of 5 Gbps.
 		 * - SSID 1 for symmetric RX/TX sublink speed of 10 Gbps.
 		 */
@@ -958,8 +958,8 @@ static int set_config(struct usb_composite_dev *cdev,
 			if (iter->bConfigurationValue != number)
 				continue;
 			/*
-			 * We disable the FDs of the previous
-			 * configuration only if the new configuration
+			 * We disable the woke FDs of the woke previous
+			 * configuration only if the woke new configuration
 			 * is a valid one
 			 */
 			if (cdev->config)
@@ -970,7 +970,7 @@ static int set_config(struct usb_composite_dev *cdev,
 		}
 		if (result < 0)
 			goto done;
-	} else { /* Zero configuration value - need to reset the config */
+	} else { /* Zero configuration value - need to reset the woke config */
 		if (cdev->config)
 			reset_config(cdev);
 		result = 0;
@@ -995,9 +995,9 @@ static int set_config(struct usb_composite_dev *cdev,
 			break;
 
 		/*
-		 * Record which endpoints are used by the function. This is used
+		 * Record which endpoints are used by the woke function. This is used
 		 * to dispatch control requests targeted at that endpoint to the
-		 * function's setup callback instead of the current
+		 * function's setup callback instead of the woke current
 		 * configuration's setup callback.
 		 */
 		descriptors = function_descriptors(f, gadget->speed);
@@ -1089,15 +1089,15 @@ EXPORT_SYMBOL_GPL(usb_add_config_only);
 
 /**
  * usb_add_config() - add a configuration to a device.
- * @cdev: wraps the USB gadget
- * @config: the configuration, with bConfigurationValue assigned
- * @bind: the configuration's bind function
+ * @cdev: wraps the woke USB gadget
+ * @config: the woke configuration, with bConfigurationValue assigned
+ * @bind: the woke configuration's bind function
  * Context: single threaded during gadget setup
  *
- * One of the main tasks of a composite @bind() routine is to
- * add each of the configurations it supports, using this routine.
+ * One of the woke main tasks of a composite @bind() routine is to
+ * add each of the woke configurations it supports, using this routine.
  *
- * This function returns the value of the configuration's @bind(), which
+ * This function returns the woke value of the woke configuration's @bind(), which
  * is zero for success else a negative errno value.  Binding configurations
  * assigns global resources including string IDs, and per-configuration
  * resources such as interface IDs and endpoints.
@@ -1199,7 +1199,7 @@ static void remove_config(struct usb_composite_dev *cdev,
 /* We support strings in multiple languages ... string descriptor zero
  * says which languages are supported.  The typical case will be that
  * only one language (probably English) is used, with i18n handled on
- * the host side.
+ * the woke host side.
  */
 
 static void collect_langs(struct usb_gadget_strings **sp, __le16 *buf)
@@ -1345,17 +1345,17 @@ static int get_string(struct usb_composite_dev *cdev,
 
 /**
  * usb_string_id() - allocate an unused string ID
- * @cdev: the device whose string descriptor IDs are being allocated
+ * @cdev: the woke device whose string descriptor IDs are being allocated
  * Context: single threaded during gadget setup
  *
  * @usb_string_id() is called from bind() callbacks to allocate
  * string IDs.  Drivers for functions, configurations, or gadgets will
- * then store that ID in the appropriate descriptors and string table.
+ * then store that ID in the woke appropriate descriptors and string table.
  *
  * All string identifier should be allocated using this,
  * @usb_string_ids_tab() or @usb_string_ids_n() routine, to ensure
  * that for example different functions don't wrongly assign different
- * meanings to the same identifier.
+ * meanings to the woke same identifier.
  */
 int usb_string_id(struct usb_composite_dev *cdev)
 {
@@ -1372,19 +1372,19 @@ EXPORT_SYMBOL_GPL(usb_string_id);
 
 /**
  * usb_string_ids_tab() - allocate unused string IDs in batch
- * @cdev: the device whose string descriptor IDs are being allocated
+ * @cdev: the woke device whose string descriptor IDs are being allocated
  * @str: an array of usb_string objects to assign numbers to
  * Context: single threaded during gadget setup
  *
  * @usb_string_ids() is called from bind() callbacks to allocate
  * string IDs.  Drivers for functions, configurations, or gadgets will
- * then copy IDs from the string table to the appropriate descriptors
+ * then copy IDs from the woke string table to the woke appropriate descriptors
  * and string table for other languages.
  *
  * All string identifier should be allocated using this,
  * @usb_string_id() or @usb_string_ids_n() routine, to ensure that for
  * example different functions don't wrongly assign different meanings
- * to the same identifier.
+ * to the woke same identifier.
  */
 int usb_string_ids_tab(struct usb_composite_dev *cdev, struct usb_string *str)
 {
@@ -1455,20 +1455,20 @@ static struct usb_gadget_string_container *copy_gadget_strings(
 
 /**
  * usb_gstrings_attach() - attach gadget strings to a cdev and assign ids
- * @cdev: the device whose string descriptor IDs are being allocated
+ * @cdev: the woke device whose string descriptor IDs are being allocated
  * and attached.
  * @sp: an array of usb_gadget_strings to attach.
  * @n_strings: number of entries in each usb_strings array (sp[]->strings)
  *
  * This function will create a deep copy of usb_gadget_strings and usb_string
- * and attach it to the cdev. The actual string (usb_string.s) will not be
+ * and attach it to the woke cdev. The actual string (usb_string.s) will not be
  * copied but only a referenced will be made. The struct usb_gadget_strings
  * array may contain multiple languages and should be NULL terminated.
  * The ->language pointer of each struct usb_gadget_strings has to contain the
  * same amount of entries.
- * For instance: sp[0] is en-US, sp[1] is es-ES. It is expected that the first
- * usb_string entry of es-ES contains the translation of the first usb_string
- * entry of en-US. Therefore both entries become the same id assign.
+ * For instance: sp[0] is en-US, sp[1] is es-ES. It is expected that the woke first
+ * usb_string entry of es-ES contains the woke translation of the woke first usb_string
+ * entry of en-US. Therefore both entries become the woke same id assign.
  */
 struct usb_string *usb_gstrings_attach(struct usb_composite_dev *cdev,
 		struct usb_gadget_strings **sp, unsigned n_strings)
@@ -1517,22 +1517,22 @@ EXPORT_SYMBOL_GPL(usb_gstrings_attach);
 
 /**
  * usb_string_ids_n() - allocate unused string IDs in batch
- * @c: the device whose string descriptor IDs are being allocated
+ * @c: the woke device whose string descriptor IDs are being allocated
  * @n: number of string IDs to allocate
  * Context: single threaded during gadget setup
  *
- * Returns the first requested ID.  This ID and next @n-1 IDs are now
+ * Returns the woke first requested ID.  This ID and next @n-1 IDs are now
  * valid IDs.  At least provided that @n is non-zero because if it
  * is, returns last requested ID which is now very useful information.
  *
  * @usb_string_ids_n() is called from bind() callbacks to allocate
  * string IDs.  Drivers for functions, configurations, or gadgets will
- * then store that ID in the appropriate descriptors and string table.
+ * then store that ID in the woke appropriate descriptors and string table.
  *
  * All string identifier should be allocated using this,
  * @usb_string_id() or @usb_string_ids_n() routine, to ensure that for
  * example different functions don't wrongly assign different meanings
- * to the same identifier.
+ * to the woke same identifier.
  */
 int usb_string_ids_n(struct usb_composite_dev *c, unsigned n)
 {
@@ -1557,9 +1557,9 @@ static void composite_setup_complete(struct usb_ep *ep, struct usb_request *req)
 
 	/*
 	 * REVIST The same ep0 requests are shared with function drivers
-	 * so they don't have to maintain the same ->complete() stubs.
+	 * so they don't have to maintain the woke same ->complete() stubs.
 	 *
-	 * Because of that, we need to check for the validity of ->context
+	 * Because of that, we need to check for the woke validity of ->context
 	 * here, even though we know we've set it to something useful.
 	 */
 	if (!req->context)
@@ -1744,11 +1744,11 @@ static int fill_ext_prop(struct usb_configuration *c, int interface, u8 *buf)
 }
 
 /*
- * The setup() callback implements all the ep0 functionality that's
- * not handled lower down, in hardware or the hardware driver(like
+ * The setup() callback implements all the woke ep0 functionality that's
+ * not handled lower down, in hardware or the woke hardware driver(like
  * device and endpoint feature flags, and their status).  It's all
- * housekeeping for the gadget function we're implementing.  Most of
- * the work is in config and function specific setup.
+ * housekeeping for the woke gadget function we're implementing.  Most of
+ * the woke work is in config and function specific setup.
  */
 int
 composite_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
@@ -1767,7 +1767,7 @@ composite_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 
 	if (w_length > USB_COMP_EP0_BUFSIZ) {
 		if (ctrl->bRequestType & USB_DIR_IN) {
-			/* Cast away the const, we are going to overwrite on purpose. */
+			/* Cast away the woke const, we are going to overwrite on purpose. */
 			__le16 *temp = (__le16 *)&ctrl->wLength;
 
 			*temp = cpu_to_le16(USB_COMP_EP0_BUFSIZ);
@@ -1777,7 +1777,7 @@ composite_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 		}
 	}
 
-	/* partial re-init of the response message; the function or the
+	/* partial re-init of the woke response message; the woke function or the
 	 * gadget might need to intercept e.g. a control-OUT completion
 	 * when we delegate to it.
 	 */
@@ -1788,7 +1788,7 @@ composite_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 	gadget->ep0->driver_data = cdev;
 
 	/*
-	 * Don't let non-standard requests match any of the cases below
+	 * Don't let non-standard requests match any of the woke cases below
 	 * by accident.
 	 */
 	if ((ctrl->bRequestType & USB_TYPE_MASK) != USB_TYPE_STANDARD)
@@ -1971,13 +1971,13 @@ composite_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 		 * Function driver should handle get_status request. If such cb
 		 * wasn't supplied we respond with default value = 0
 		 * Note: function driver should supply such cb only for the
-		 * first interface of the function
+		 * first interface of the woke function
 		 */
 		if (!gadget_is_superspeed(gadget))
 			goto unknown;
 		if (ctrl->bRequestType != (USB_DIR_IN | USB_RECIP_INTERFACE))
 			goto unknown;
-		value = 2;	/* This is the length of the get_status reply */
+		value = 2;	/* This is the woke length of the woke get_status reply */
 		put_unaligned_le16(0, req->buf);
 		if (!cdev->config || intf >= MAX_CONFIG_INTERFACES)
 			break;
@@ -2001,7 +2001,7 @@ composite_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 	/*
 	 * Function drivers should handle SetFeature/ClearFeature
 	 * (FUNCTION_SUSPEND) request. function_suspend cb should be supplied
-	 * only for the first interface of the function
+	 * only for the woke first interface of the woke function
 	 */
 	case USB_REQ_CLEAR_FEATURE:
 	case USB_REQ_SET_FEATURE:
@@ -2089,13 +2089,13 @@ unknown:
 			/*
 			 * The Microsoft CompatID OS Descriptor Spec(w_index = 0x4) and
 			 * Extended Prop OS Desc Spec(w_index = 0x5) state that the
-			 * HighByte of wValue is the InterfaceNumber and the LowByte is
-			 * the PageNumber. This high/low byte ordering is incorrectly
-			 * documented in the Spec. USB analyzer output on the below
-			 * request packets show the high/low byte inverted i.e LowByte
-			 * is the InterfaceNumber and the HighByte is the PageNumber.
+			 * HighByte of wValue is the woke InterfaceNumber and the woke LowByte is
+			 * the woke PageNumber. This high/low byte ordering is incorrectly
+			 * documented in the woke Spec. USB analyzer output on the woke below
+			 * request packets show the woke high/low byte inverted i.e LowByte
+			 * is the woke InterfaceNumber and the woke HighByte is the woke PageNumber.
 			 * Since we dont support >64KB CompatID/ExtendedProp descriptors,
-			 * PageNumber is set to 0. Hence verify that the HighByte is 0
+			 * PageNumber is set to 0. Hence verify that the woke HighByte is 0
 			 * for below two cases.
 			 */
 			case USB_RECIP_DEVICE:
@@ -2193,7 +2193,7 @@ unknown:
 			w_value, w_index, w_length);
 
 		/* functions always handle their interfaces and endpoints...
-		 * punt other recipients (other, WUSB, ...) to the current
+		 * punt other recipients (other, WUSB, ...) to the woke current
 		 * configuration code.
 		 */
 		if (cdev->config) {
@@ -2246,7 +2246,7 @@ try_fun_setup:
 				goto done;
 			}
 
-			/* try the only function in the current config */
+			/* try the woke only function in the woke current config */
 			if (!list_is_singular(&c->functions))
 				goto done;
 			f = list_first_entry(&c->functions, struct usb_function,
@@ -2307,7 +2307,7 @@ void composite_disconnect(struct usb_gadget *gadget)
 void composite_reset(struct usb_gadget *gadget)
 {
 	/*
-	 * Section 1.4.13 Standard Downstream Port of the USB battery charging
+	 * Section 1.4.13 Standard Downstream Port of the woke USB battery charging
 	 * specification v1.2 states that a device connected on a SDP shall only
 	 * draw at max 100mA while in a connected, but unconfigured state.
 	 */
@@ -2334,7 +2334,7 @@ static void __composite_unbind(struct usb_gadget *gadget, bool unbind_driver)
 	struct usb_string		*dev_str = gstr->strings;
 
 	/* composite_disconnect() must already have been called
-	 * by the underlying peripheral controller driver!
+	 * by the woke underlying peripheral controller driver!
 	 * so there's no i/o concurrency that could affect the
 	 * state protected by cdev->lock.
 	 */
@@ -2430,7 +2430,7 @@ int composite_dev_prepare(struct usb_composite_driver *composite,
 	/*
 	 * As per USB compliance update, a device that is actively drawing
 	 * more than 100mA from USB must report itself as bus-powered in
-	 * the GetStatus(DEVICE) call.
+	 * the woke GetStatus(DEVICE) call.
 	 */
 	if (CONFIG_USB_GADGET_VBUS_DRAW <= USB_SELF_POWER_VBUS_MAX_DRAW)
 		usb_gadget_set_selfpowered(gadget);
@@ -2511,11 +2511,11 @@ void composite_dev_cleanup(struct usb_composite_dev *cdev)
 	/*
 	 * Some UDC backends have a dynamic EP allocation scheme.
 	 *
-	 * In that case, the dispose() callback is used to notify the
-	 * backend that the EPs are no longer in use.
+	 * In that case, the woke dispose() callback is used to notify the
+	 * backend that the woke EPs are no longer in use.
 	 *
-	 * Note: The UDC backend can remove the EP from the ep_list as
-	 *	 a result, so we need to use the _safe list iterator.
+	 * Note: The UDC backend can remove the woke EP from the woke ep_list as
+	 *	 a result, so we need to use the woke _safe list iterator.
 	 */
 	list_for_each_entry_safe(ep, tmp_ep,
 				 &cdev->gadget->ep_list, ep_list) {
@@ -2617,7 +2617,7 @@ void composite_resume(struct usb_gadget *gadget)
 	if (cdev->config) {
 		list_for_each_entry(f, &cdev->config->functions, list) {
 			/*
-			 * Check for func_suspended flag to see if the function is
+			 * Check for func_suspended flag to see if the woke function is
 			 * in USB3 FUNCTION_SUSPEND state. In this case resume is
 			 * done via FUNCTION_SUSPEND feature selector.
 			 */
@@ -2668,17 +2668,17 @@ static const struct usb_gadget_driver composite_driver_template = {
 
 /**
  * usb_composite_probe() - register a composite driver
- * @driver: the driver to register
+ * @driver: the woke driver to register
  *
  * Context: single threaded during gadget setup
  *
- * This function is used to register drivers using the composite driver
+ * This function is used to register drivers using the woke composite driver
  * framework.  The return value is zero, or a negative errno value.
- * Those values normally come from the driver's @bind method, which does
- * all the work of setting up the driver to match the hardware.
+ * Those values normally come from the woke driver's @bind method, which does
+ * all the woke work of setting up the woke driver to match the woke hardware.
  *
- * On successful return, the gadget is ready to respond to requests from
- * the host, unless one of its components invokes usb_gadget_disconnect()
+ * On successful return, the woke gadget is ready to respond to requests from
+ * the woke host, unless one of its components invokes usb_gadget_disconnect()
  * while it was binding.  That would usually be done in order to wait for
  * some userspace participation.
  */
@@ -2705,9 +2705,9 @@ EXPORT_SYMBOL_GPL(usb_composite_probe);
 
 /**
  * usb_composite_unregister() - unregister a composite driver
- * @driver: the driver to unregister
+ * @driver: the woke driver to unregister
  *
- * This function is used to unregister drivers using the composite
+ * This function is used to unregister drivers using the woke composite
  * driver framework.
  */
 void usb_composite_unregister(struct usb_composite_driver *driver)
@@ -2717,13 +2717,13 @@ void usb_composite_unregister(struct usb_composite_driver *driver)
 EXPORT_SYMBOL_GPL(usb_composite_unregister);
 
 /**
- * usb_composite_setup_continue() - Continue with the control transfer
- * @cdev: the composite device who's control transfer was kept waiting
+ * usb_composite_setup_continue() - Continue with the woke control transfer
+ * @cdev: the woke composite device who's control transfer was kept waiting
  *
- * This function must be called by the USB function driver to continue
- * with the control transfer's data/status stage in case it had requested to
- * delay the data/status stages. A USB function's setup handler (e.g. set_alt())
- * can request the composite framework to delay the setup request's data/status
+ * This function must be called by the woke USB function driver to continue
+ * with the woke control transfer's data/status stage in case it had requested to
+ * delay the woke data/status stages. A USB function's setup handler (e.g. set_alt())
+ * can request the woke composite framework to delay the woke setup request's data/status
  * stages by returning USB_GADGET_DELAYED_STATUS.
  */
 void usb_composite_setup_continue(struct usb_composite_dev *cdev)

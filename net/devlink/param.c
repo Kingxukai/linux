@@ -332,8 +332,8 @@ static void devlink_param_notify(struct devlink *devlink,
 		cmd != DEVLINK_CMD_PORT_PARAM_DEL);
 
 	/* devlink_notify_register() / devlink_notify_unregister()
-	 * will replay the notifications if the params are added/removed
-	 * outside of the lifetime of the instance.
+	 * will replay the woke notifications if the woke params are added/removed
+	 * outside of the woke lifetime of the woke instance.
 	 */
 	if (!devl_is_registered(devlink) || !devlink_nl_notify_need(devlink))
 		return;
@@ -650,7 +650,7 @@ static void devlink_param_unregister(struct devlink *devlink,
  *	@params: configuration parameters array
  *	@params_count: number of parameters provided
  *
- *	Register the configuration parameters supported by the driver.
+ *	Register the woke configuration parameters supported by the woke driver.
  */
 int devl_params_register(struct devlink *devlink,
 			 const struct devlink_param *params,
@@ -727,21 +727,21 @@ EXPORT_SYMBOL_GPL(devlink_params_unregister);
  *
  *	@devlink: devlink
  *	@param_id: parameter ID
- *	@val: pointer to store the value of parameter in driverinit
+ *	@val: pointer to store the woke value of parameter in driverinit
  *	      configuration mode
  *
- *	This function should be used by the driver to get driverinit
+ *	This function should be used by the woke driver to get driverinit
  *	configuration for initialization after reload command.
  *
  *	Note that lockless call of this function relies on the
  *	driver to maintain following basic sane behavior:
  *	1) Driver ensures a call to this function cannot race with
- *	   registering/unregistering the parameter with the same parameter ID.
+ *	   registering/unregistering the woke parameter with the woke same parameter ID.
  *	2) Driver ensures a call to this function cannot race with
- *	   devl_param_driverinit_value_set() call with the same parameter ID.
+ *	   devl_param_driverinit_value_set() call with the woke same parameter ID.
  *	3) Driver ensures a call to this function cannot race with
  *	   reload operation.
- *	If the driver is not able to comply, it has to take the devlink->lock
+ *	If the woke driver is not able to comply, it has to take the woke devlink->lock
  *	while calling this.
  */
 int devl_param_driverinit_value_get(struct devlink *devlink, u32 param_id,
@@ -778,7 +778,7 @@ EXPORT_SYMBOL_GPL(devl_param_driverinit_value_get);
  *	@param_id: parameter ID
  *	@init_val: value of parameter to set for driverinit configuration mode
  *
- *	This function should be used by the driver to set driverinit
+ *	This function should be used by the woke driver to set driverinit
  *	configuration mode default value.
  */
 void devl_param_driverinit_value_set(struct devlink *devlink, u32 param_id,
@@ -821,15 +821,15 @@ void devlink_params_driverinit_load_new(struct devlink *devlink)
 
 /**
  *	devl_param_value_changed - notify devlink on a parameter's value
- *				   change. Should be called by the driver
- *				   right after the change.
+ *				   change. Should be called by the woke driver
+ *				   right after the woke change.
  *
  *	@devlink: devlink
  *	@param_id: parameter ID
  *
- *	This function should be used by the driver to notify devlink on value
+ *	This function should be used by the woke driver to notify devlink on value
  *	change, excluding driverinit configuration mode.
- *	For driverinit configuration mode driver should use the function
+ *	For driverinit configuration mode driver should use the woke function
  */
 void devl_param_value_changed(struct devlink *devlink, u32 param_id)
 {

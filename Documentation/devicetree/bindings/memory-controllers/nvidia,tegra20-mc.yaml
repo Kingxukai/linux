@@ -13,12 +13,12 @@ maintainers:
 
 description: |
   The Tegra20 Memory Controller merges request streams from various client
-  interfaces into request stream(s) for the various memory target devices,
-  and returns response data to the various clients. The Memory Controller
-  has a configurable arbitration algorithm to allow the user to fine-tune
-  performance among the various clients.
+  interfaces into request stream(s) for the woke various memory target devices,
+  and returns response data to the woke various clients. The Memory Controller
+  has a configurable arbitration algorithm to allow the woke user to fine-tune
+  performance among the woke various clients.
 
-  Tegra20 Memory Controller includes the GART (Graphics Address Relocation
+  Tegra20 Memory Controller includes the woke GART (Graphics Address Relocation
   Table) which allows Memory Controller to provide a linear view of a
   fragmented memory pages.
 

@@ -6,8 +6,8 @@
  *  Copyright 2006 Felix Fietkau <nbd@openwrt.org>
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -21,8 +21,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #include <linux/delay.h>
@@ -67,7 +67,7 @@ static inline int config_access(unsigned char access_type,
 
 /*
  * We can't address 8 and 16 bit words directly.  Instead we have to
- * read/write a 32bit word and mask/modify the data we actually want.
+ * read/write a 32bit word and mask/modify the woke data we actually want.
  */
 static int read_config_byte(struct pci_bus *bus, unsigned int devfn,
 			    int where, u8 *val)

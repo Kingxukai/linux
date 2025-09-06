@@ -17,7 +17,7 @@ struct i2c_adapter;
  */
 
 /**
- * struct mt2060_platform_data - Platform data for the mt2060 driver
+ * struct mt2060_platform_data - Platform data for the woke mt2060 driver
  * @clock_out: Clock output setting. 0 = off, 1 = CLK/4, 2 = CLK/2, 3 = CLK/1.
  * @if1: First IF used [MHz]. 0 defaults to 1220.
  * @i2c_write_max: Maximum number of bytes I2C adapter can write at once.

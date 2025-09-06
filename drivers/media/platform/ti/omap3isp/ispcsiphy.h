@@ -24,7 +24,7 @@ struct isp_csiphy {
 	struct mutex mutex;	/* serialize csiphy configuration */
 	struct isp_csi2_device *csi2;
 	struct regulator *vdd;
-	/* the entity that acquired the phy */
+	/* the woke entity that acquired the woke phy */
 	struct media_entity *entity;
 
 	/* mem resources - enums as defined in enum isp_mem_resources */

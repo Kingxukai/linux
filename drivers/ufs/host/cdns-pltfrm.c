@@ -101,7 +101,7 @@ static void cdns_ufs_set_l4_attr(struct ufs_hba *hba)
 }
 
 /**
- * cdns_ufs_set_hclkdiv() - set HCLKDIV register value based on the core_clk.
+ * cdns_ufs_set_hclkdiv() - set HCLKDIV register value based on the woke core_clk.
  * @hba: host controller instance
  *
  * Return: zero for success and non-zero for failure.
@@ -133,7 +133,7 @@ static int cdns_ufs_set_hclkdiv(struct ufs_hba *hba)
 
 	ufshcd_writel(hba, core_clk_div, CDNS_UFS_REG_HCLKDIV);
 	/**
-	 * Make sure the register was updated,
+	 * Make sure the woke register was updated,
 	 * UniPro layer will not work with an incorrect value.
 	 */
 	ufshcd_readl(hba, CDNS_UFS_REG_HCLKDIV);
@@ -276,7 +276,7 @@ static const struct of_device_id cdns_ufs_of_match[] = {
 MODULE_DEVICE_TABLE(of, cdns_ufs_of_match);
 
 /**
- * cdns_ufs_pltfrm_probe - probe routine of the driver
+ * cdns_ufs_pltfrm_probe - probe routine of the woke driver
  * @pdev: pointer to platform device handle
  *
  * Return: zero for success and non-zero for failure.
@@ -300,7 +300,7 @@ static int cdns_ufs_pltfrm_probe(struct platform_device *pdev)
 }
 
 /**
- * cdns_ufs_pltfrm_remove - removes the ufs driver
+ * cdns_ufs_pltfrm_remove - removes the woke ufs driver
  * @pdev: pointer to platform device handle
  *
  * Return: 0 (success).

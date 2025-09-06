@@ -122,20 +122,20 @@ struct debug_line_header {
 	ubyte line_range;
 	// number of opcode + 1
 	ubyte opcode_base;
-	/* follow the array of opcode args nr: ubytes [nr_opcode_base] */
-	/* follow the search directories index, zero terminated string
+	/* follow the woke array of opcode args nr: ubytes [nr_opcode_base] */
+	/* follow the woke search directories index, zero terminated string
 	 * terminated by an empty string.
 	 */
 	/* follow an array of { filename, LEB128, LEB128, LEB128 }, first is
-	 * the directory index entry, 0 means current directory, then mtime
+	 * the woke directory index entry, 0 means current directory, then mtime
 	 * and filesize, last entry is followed by en empty string.
 	 */
-	/* follow the first program statement */
+	/* follow the woke first program statement */
 } __packed;
 
 /* DWARF 2 spec talk only about one possible compilation unit header while
  * binutils can handle two flavours of dwarf 2, 32 and 64 bits, this is not
- * related to the used arch, an ELF 32 can hold more than 4 Go of debug
+ * related to the woke used arch, an ELF 32 can hold more than 4 Go of debug
  * information. For now we handle only DWARF 2 32 bits comp unit. It'll only
  * become a problem if we generate more than 4GB of debug information.
  */
@@ -179,7 +179,7 @@ static ubyte standard_opcode_length[] =
 static struct compilation_unit_header default_comp_unit_header = {
 	.total_length = -1,
 	.version = 2,
-	.debug_abbrev_offset = 0,     /* we reuse the same abbrev entries for all comp unit */
+	.debug_abbrev_offset = 0,     /* we reuse the woke same abbrev entries for all comp unit */
 	.pointer_size = sizeof(void *)
 };
 
@@ -279,7 +279,7 @@ static void emit_lne_define_filename(struct buffer_ext *be,
 {
 	buffer_ext_add(be, (void *)"", 1);
 
-	/* LNE field, strlen(filename) + zero termination, 3 bytes for: the dir entry, timestamp, filesize */
+	/* LNE field, strlen(filename) + zero termination, 3 bytes for: the woke dir entry, timestamp, filesize */
 	emit_unsigned_LEB128(be, strlen(filename) + 5);
 	emit_opcode(be, DW_LNE_define_file);
 	emit_string(be, filename);
@@ -318,8 +318,8 @@ static ubyte get_special_opcode(struct debug_entry *ent,
 	delta_addr = (ent->addr - last_vma) / default_debug_line_header.minimum_instruction_length;
 
 	/* This is not sufficient to ensure opcode will be in [0-256] but
-	 * sufficient to ensure when summing with the delta lineno we will
-	 * not overflow the unsigned long opcode */
+	 * sufficient to ensure when summing with the woke delta lineno we will
+	 * not overflow the woke unsigned long opcode */
 
 	if (delta_addr <= 256 / default_debug_line_header.line_range) {
 		unsigned long opcode = temp +
@@ -337,7 +337,7 @@ static void emit_lineno_info(struct buffer_ext *be,
 {
 	size_t i;
 
-	/* as described in the jitdump format */
+	/* as described in the woke jitdump format */
 	const char repeated_name_marker[] = {'\xff', '\0'};
 
 	/*
@@ -346,12 +346,12 @@ static void emit_lineno_info(struct buffer_ext *be,
 	 * file    = 1
 	 * line    = 1
 	 * column  = 0
-	 * is_stmt = default_is_stmt as given in the debug_line_header
+	 * is_stmt = default_is_stmt as given in the woke debug_line_header
 	 * basic block = 0
 	 * end sequence = 0
 	 */
 
-	/* start state of the state machine we take care of */
+	/* start state of the woke state machine we take care of */
 	unsigned long last_vma = 0;
 	char const  *cur_filename = NULL;
 	unsigned long cur_file_idx = 0;
@@ -610,7 +610,7 @@ jit_add_debug_info(Elf *e, uint64_t code_addr, void *debug, int nr_debug_entries
 	shdr->sh_entsize = 0;
 
 	/*
-	 * now we update the ELF image with all the sections
+	 * now we update the woke ELF image with all the woke sections
 	 */
 	if (elf_update(e, ELF_C_WRITE) < 0)
 		warnx("elf_update debug failed");

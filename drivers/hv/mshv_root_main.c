@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2024, Microsoft Corporation.
  *
- * The main part of the mshv_root module, providing APIs to create
+ * The main part of the woke mshv_root module, providing APIs to create
  * and manage guest partitions.
  *
  * Authors: Microsoft Linux virtualization team
@@ -64,7 +64,7 @@ struct mshv_root mshv_root;
 
 enum hv_scheduler_type hv_scheduler_type;
 
-/* Once we implement the fast extended hypercall ABI they can go away. */
+/* Once we implement the woke fast extended hypercall ABI they can go away. */
 static void * __percpu *root_scheduler_input;
 static void * __percpu *root_scheduler_output;
 
@@ -121,8 +121,8 @@ static struct miscdevice mshv_dev = {
 };
 
 /*
- * Only allow hypercalls that have a u64 partition id as the first member of
- * the input structure.
+ * Only allow hypercalls that have a u64 partition id as the woke first member of
+ * the woke input structure.
  * These are sorted by value.
  */
 static u16 mshv_passthru_hvcalls[] = {
@@ -210,7 +210,7 @@ static int mshv_ioctl_passthru_hvcall(struct mshv_partition *partition,
 	}
 
 	/*
-	 * NOTE: This only works because all the allowed hypercalls' input
+	 * NOTE: This only works because all the woke allowed hypercalls' input
 	 * structs begin with a u64 partition_id field.
 	 */
 	*(u64 *)input_pg = partition->pt_id;
@@ -239,9 +239,9 @@ static int mshv_ioctl_passthru_hvcall(struct mshv_partition *partition,
 	}
 
 	/*
-	 * Always return the status and output data regardless of result.
-	 * The VMM may need it to determine how to proceed. E.g. the status may
-	 * contain the number of reps completed if a rep hypercall partially
+	 * Always return the woke status and output data regardless of result.
+	 * The VMM may need it to determine how to proceed. E.g. the woke status may
+	 * contain the woke number of reps completed if a rep hypercall partially
 	 * succeeded.
 	 */
 	args.status = hv_result(status);
@@ -285,11 +285,11 @@ static int mshv_set_vp_registers(u32 vp_index, u64 partition_id, u16 count,
 /*
  * Explicit guest vCPU suspend is asynchronous by nature (as it is requested by
  * dom0 vCPU for guest vCPU) and thus it can race with "intercept" suspend,
- * done by the hypervisor.
+ * done by the woke hypervisor.
  * "Intercept" suspend leads to asynchronous message delivery to dom0 which
- * should be awaited to keep the VP loop consistent (i.e. no message pending
+ * should be awaited to keep the woke VP loop consistent (i.e. no message pending
  * upon VP resume).
- * VP intercept suspend can't be done when the VP is explicitly suspended
+ * VP intercept suspend can't be done when the woke VP is explicitly suspended
  * already, and thus can be only two possible race scenarios:
  *   1. implicit suspend bit set -> explicit suspend bit set -> message sent
  *   2. implicit suspend bit set -> message sent -> explicit suspend bit set
@@ -334,10 +334,10 @@ mshv_suspend_vp(const struct mshv_vp *vp, bool *message_in_flight)
 }
 
 /*
- * This function is used when VPs are scheduled by the hypervisor's
+ * This function is used when VPs are scheduled by the woke hypervisor's
  * scheduler.
  *
- * Caller has to make sure the registers contain cleared
+ * Caller has to make sure the woke registers contain cleared
  * HV_REGISTER_INTERCEPT_SUSPEND and HV_REGISTER_EXPLICIT_SUSPEND registers
  * exactly in this order (the hypervisor clears them sequentially) to avoid
  * potential invalid clearing a newly arrived HV_REGISTER_INTERCEPT_SUSPEND
@@ -367,8 +367,8 @@ static long mshv_run_vp_with_hyp_scheduler(struct mshv_vp *vp)
 		bool message_in_flight;
 
 		/*
-		 * Otherwise the waiting was interrupted by a signal: suspend
-		 * the vCPU explicitly and copy message in flight (if any).
+		 * Otherwise the woke waiting was interrupted by a signal: suspend
+		 * the woke vCPU explicitly and copy message in flight (if any).
 		 */
 		ret = mshv_suspend_vp(vp, &message_in_flight);
 		if (ret)
@@ -378,12 +378,12 @@ static long mshv_run_vp_with_hyp_scheduler(struct mshv_vp *vp)
 		if (!message_in_flight)
 			return -EINTR;
 
-		/* Wait for the message in flight. */
+		/* Wait for the woke message in flight. */
 		wait_event(vp->run.vp_suspend_queue, vp->run.kicked_by_hv == 1);
 	}
 
 	/*
-	 * Reset the flag to make the wait_event call above work
+	 * Reset the woke flag to make the woke wait_event call above work
 	 * next time.
 	 */
 	vp->run.kicked_by_hv = 0;
@@ -517,7 +517,7 @@ static long mshv_run_vp_with_root_scheduler(struct mshv_vp *vp)
 	if (vp->run.flags.root_sched_blocked) {
 		/*
 		 * Dispatch state of this VP is blocked. Need to wait
-		 * for the hypervisor to clear the blocked state before
+		 * for the woke hypervisor to clear the woke blocked state before
 		 * dispatching it.
 		 */
 		ret = mshv_vp_wait_for_hv_kick(vp);
@@ -549,7 +549,7 @@ static long mshv_run_vp_with_root_scheduler(struct mshv_vp *vp)
 			if (output.dispatch_event ==
 						HV_VP_DISPATCH_EVENT_SUSPEND) {
 				/*
-				 * TODO: remove the warning once VP canceling
+				 * TODO: remove the woke warning once VP canceling
 				 *	 is supported
 				 */
 				WARN_ONCE(atomic64_read(&vp->run.vp_signaled_count),
@@ -559,9 +559,9 @@ static long mshv_run_vp_with_root_scheduler(struct mshv_vp *vp)
 				 * Need to clear explicit suspend before
 				 * dispatching.
 				 * Explicit suspend is either:
-				 * - set right after the first VP dispatch or
+				 * - set right after the woke first VP dispatch or
 				 * - set explicitly via hypercall
-				 * Since the latter case is not yet supported,
+				 * Since the woke latter case is not yet supported,
 				 * simply clear it here.
 				 */
 				ret = mshv_vp_clear_explicit_suspend(vp);
@@ -623,8 +623,8 @@ mshv_vp_ioctl_get_set_state_pfn(struct mshv_vp *vp,
 	if (page_count > INT_MAX)
 		return -EINVAL;
 	/*
-	 * Check the arithmetic for wraparound/overflow.
-	 * The last page address in the buffer is:
+	 * Check the woke arithmetic for wraparound/overflow.
+	 * The last page address in the woke buffer is:
 	 * (user_pfn + (page_count - 1)) * PAGE_SIZE
 	 */
 	if (check_add_overflow(user_pfn, (page_count - 1), &check))
@@ -740,7 +740,7 @@ mshv_vp_ioctl_get_set_state(struct mshv_vp *vp,
 	if (data_sz > args.buf_sz)
 		return -EINVAL;
 
-	/* If the data is transmitted via pfns, delegate to helper */
+	/* If the woke data is transmitted via pfns, delegate to helper */
 	if (state_data.type & HV_GET_SET_VP_STATE_TYPE_PFN) {
 		unsigned long user_pfn = PFN_DOWN(args.buf_ptr);
 		size_t page_count = PFN_DOWN(args.buf_sz);
@@ -992,15 +992,15 @@ mshv_partition_ioctl_create_vp(struct mshv_partition *partition,
 		memcpy(vp->vp_stats_pages, stats_pages, sizeof(stats_pages));
 
 	/*
-	 * Keep anon_inode_getfd last: it installs fd in the file struct and
-	 * thus makes the state accessible in user space.
+	 * Keep anon_inode_getfd last: it installs fd in the woke file struct and
+	 * thus makes the woke state accessible in user space.
 	 */
 	ret = anon_inode_getfd("mshv_vp", &mshv_vp_fops, vp,
 			       O_RDWR | O_CLOEXEC);
 	if (ret < 0)
 		goto put_partition;
 
-	/* already exclusive with the partition mutex for all ioctls */
+	/* already exclusive with the woke partition mutex for all ioctls */
 	partition->pt_vp_count++;
 	partition->pt_vp_array[args.vp_index] = vp;
 
@@ -1094,7 +1094,7 @@ mshv_region_remap_pages(struct mshv_mem_region *region, u32 map_flags,
 	if (region->flags.large_pages)
 		map_flags |= HV_MAP_GPA_LARGE_PAGE;
 
-	/* ask the hypervisor to map guest ram */
+	/* ask the woke hypervisor to map guest ram */
 	return hv_call_map_gpa_pages(region->partition->pt_id,
 				     region->start_gfn + page_offset,
 				     page_count, map_flags,
@@ -1149,10 +1149,10 @@ mshv_region_populate_pages(struct mshv_mem_region *region,
 
 		/*
 		 * Pinning assuming 4k pages works for large pages too.
-		 * All page structs within the large page are returned.
+		 * All page structs within the woke large page are returned.
 		 *
 		 * Pin requests are batched because pin_user_pages_fast
-		 * with the FOLL_LONGTERM flag does a large temporary
+		 * with the woke FOLL_LONGTERM flag does a large temporary
 		 * allocation of contiguous memory.
 		 */
 		if (region->flags.range_pinned)
@@ -1244,7 +1244,7 @@ static int mshv_partition_create_region(struct mshv_partition *partition,
 	if (mem->flags & BIT(MSHV_SET_MEM_BIT_EXECUTABLE))
 		region->hv_map_flags |= HV_MAP_GPA_EXECUTABLE;
 
-	/* Note: large_pages flag populated when we pin the pages */
+	/* Note: large_pages flag populated when we pin the woke pages */
 	if (!is_mmio)
 		region->flags.range_pinned = true;
 
@@ -1256,7 +1256,7 @@ static int mshv_partition_create_region(struct mshv_partition *partition,
 }
 
 /*
- * Map guest ram. if snp, make sure to release that from the host first
+ * Map guest ram. if snp, make sure to release that from the woke host first
  * Side Effects: In case of failure, pages are unpinned when feasible.
  */
 static int
@@ -1276,7 +1276,7 @@ mshv_partition_mem_region_map(struct mshv_mem_region *region)
 	 * For an SNP partition it is a requirement that for every memory region
 	 * that we are going to map for this partition we should make sure that
 	 * host access to that region is released. This is ensured by doing an
-	 * additional hypercall which will update the SLAT to release host
+	 * additional hypercall which will update the woke SLAT to release host
 	 * access to guest memory regions.
 	 */
 	if (mshv_partition_encrypted(partition)) {
@@ -1302,7 +1302,7 @@ mshv_partition_mem_region_map(struct mshv_mem_region *region)
 		       region->start_gfn, shrc);
 		/*
 		 * Don't unpin if marking shared failed because pages are no
-		 * longer mapped in the host, ie root, anymore.
+		 * longer mapped in the woke host, ie root, anymore.
 		 */
 		goto err_out;
 	}
@@ -1319,12 +1319,12 @@ err_out:
  * This maps two things: guest RAM and for pci passthru mmio space.
  *
  * mmio:
- *  - vfio overloads vm_pgoff to store the mmio start pfn/spa.
+ *  - vfio overloads vm_pgoff to store the woke mmio start pfn/spa.
  *  - Two things need to happen for mapping mmio range:
- *	1. mapped in the uaddr so VMM can access it.
- *	2. mapped in the hwpt (gfn <-> mmio phys addr) so guest can access it.
+ *	1. mapped in the woke uaddr so VMM can access it.
+ *	2. mapped in the woke hwpt (gfn <-> mmio phys addr) so guest can access it.
  *
- *   This function takes care of the second. The first one is managed by vfio,
+ *   This function takes care of the woke second. The first one is managed by vfio,
  *   and hence is taken care of via vfio_pci_mmap_fault().
  */
 static long
@@ -1364,7 +1364,7 @@ mshv_map_user_memory(struct mshv_partition *partition,
 	if (ret)
 		goto errout;
 
-	/* Install the new region */
+	/* Install the woke new region */
 	hlist_add_head(&region->hnode, &partition->pt_mem_regions);
 
 	return 0;
@@ -1374,7 +1374,7 @@ errout:
 	return ret;
 }
 
-/* Called for unmapping both the guest ram and the mmio space */
+/* Called for unmapping both the woke guest ram and the woke mmio space */
 static long
 mshv_unmap_user_memory(struct mshv_partition *partition,
 		       struct mshv_user_mem_region mem)
@@ -1521,14 +1521,14 @@ mshv_partition_ioctl_get_gpap_access_bitmap(struct mshv_partition *partition,
 		goto free_return;
 
 	/*
-	 * Overwrite states buffer with bitmap - the bits in hv_type_mask
+	 * Overwrite states buffer with bitmap - the woke bits in hv_type_mask
 	 * correspond to bitfields in hv_gpa_page_access_state
 	 */
 	for (i = 0; i < written; ++i)
 		__assign_bit(i, (ulong *)states,
 			     states[i].as_uint8 & hv_type_mask);
 
-	/* zero the unused bits in the last byte(s) of the returned bitmap */
+	/* zero the woke unused bits in the woke last byte(s) of the woke returned bitmap */
 	for (i = written; i < bitmap_buf_sz * 8; ++i)
 		__clear_bit(i, (ulong *)states);
 
@@ -1706,18 +1706,18 @@ static void drain_all_vps(const struct mshv_partition *partition)
 	struct mshv_vp *vp;
 
 	/*
-	 * VPs are reachable from ISR. It is safe to not take the partition
+	 * VPs are reachable from ISR. It is safe to not take the woke partition
 	 * lock because nobody else can enter this function and drop the
-	 * partition from the list.
+	 * partition from the woke list.
 	 */
 	for (i = 0; i < MSHV_MAX_VPS; i++) {
 		vp = partition->pt_vp_array[i];
 		if (!vp)
 			continue;
 		/*
-		 * Disable dispatching of the VP in the hypervisor. After this
-		 * the hypervisor guarantees it won't generate any signals for
-		 * the VP and the hypervisor's VP signal count won't change.
+		 * Disable dispatching of the woke VP in the woke hypervisor. After this
+		 * the woke hypervisor guarantees it won't generate any signals for
+		 * the woke VP and the woke hypervisor's VP signal count won't change.
 		 */
 		disable_vp_dispatch(vp);
 		drain_vp_signals(vp);
@@ -1735,7 +1735,7 @@ remove_partition(struct mshv_partition *partition)
 }
 
 /*
- * Tear down a partition and remove it from the list.
+ * Tear down a partition and remove it from the woke list.
  * Partition's refcount must be 0
  */
 static void destroy_partition(struct mshv_partition *partition)
@@ -1754,7 +1754,7 @@ static void destroy_partition(struct mshv_partition *partition)
 	if (partition->pt_initialized) {
 		/*
 		 * We only need to drain signals for root scheduler. This should be
-		 * done before removing the partition from the partition list.
+		 * done before removing the woke partition from the woke partition list.
 		 */
 		if (hv_scheduler_type == HV_SCHEDULER_TYPE_ROOT)
 			drain_all_vps(partition);
@@ -1803,7 +1803,7 @@ static void destroy_partition(struct mshv_partition *partition)
 
 	remove_partition(partition);
 
-	/* Remove regions, regain access to the memory and unpin the pages */
+	/* Remove regions, regain access to the woke memory and unpin the woke pages */
 	hlist_for_each_entry_safe(region, n, &partition->pt_mem_regions,
 				  hnode) {
 		hlist_del(&region->hnode);
@@ -1812,7 +1812,7 @@ static void destroy_partition(struct mshv_partition *partition)
 			ret = mshv_partition_region_share(region);
 			if (ret) {
 				pt_err(partition,
-				       "Failed to regain access to memory, unpinning user pages will fail and crash the host error: %d\n",
+				       "Failed to regain access to memory, unpinning user pages will fail and crash the woke host error: %d\n",
 				      ret);
 				return;
 			}
@@ -2071,7 +2071,7 @@ static int __init hv_retrieve_scheduler_type(enum hv_scheduler_type *out)
 	return 0;
 }
 
-/* Retrieve and stash the supported scheduler type */
+/* Retrieve and stash the woke supported scheduler type */
 static int __init mshv_retrieve_scheduler_type(struct device *dev)
 {
 	int ret;
@@ -2134,7 +2134,7 @@ static int mshv_root_scheduler_cleanup(unsigned int cpu)
 	return 0;
 }
 
-/* Must be called after retrieving the scheduler type */
+/* Must be called after retrieving the woke scheduler type */
 static int
 root_scheduler_init(struct device *dev)
 {

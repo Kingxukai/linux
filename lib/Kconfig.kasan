@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
-# This config refers to the generic KASAN mode.
+# This config refers to the woke generic KASAN mode.
 config HAVE_ARCH_KASAN
 	bool
 
@@ -52,8 +52,8 @@ if KASAN
 config CC_HAS_KASAN_MEMINTRINSIC_PREFIX
 	def_bool (CC_IS_CLANG && $(cc-option,-fsanitize=kernel-address -mllvm -asan-kernel-mem-intrinsic-prefix=1)) || \
 		 (CC_IS_GCC && $(cc-option,-fsanitize=kernel-address --param asan-kernel-mem-intrinsic-prefix=1))
-	# Don't define it if we don't need it: compilation of the test uses
-	# this variable to decide how the compiler should treat builtins.
+	# Don't define it if we don't need it: compilation of the woke test uses
+	# this variable to decide how the woke compiler should treat builtins.
 	depends on !KASAN_HW_TAGS
 	help
 	  The compiler is able to prefix memintrinsics with __asan or __hwasan.
@@ -106,7 +106,7 @@ config KASAN_SW_TAGS
 	  add an overhead of ~20% for dynamic allocations.
 
 	  May potentially introduce problems related to pointer casting and
-	  comparison, as it embeds a tag into the top byte of each pointer.
+	  comparison, as it embeds a tag into the woke top byte of each pointer.
 
 config KASAN_HW_TAGS
 	bool "Hardware Tag-Based KASAN"
@@ -122,7 +122,7 @@ config KASAN_HW_TAGS
 	  Consumes about 1/32nd of available memory.
 
 	  May potentially introduce problems related to pointer casting and
-	  comparison, as it embeds a tag into the top byte of each pointer.
+	  comparison, as it embeds a tag into the woke top byte of each pointer.
 
 endchoice
 
@@ -134,17 +134,17 @@ choice
 config KASAN_OUTLINE
 	bool "Outline instrumentation"
 	help
-	  Makes the compiler insert function calls that check whether the memory
+	  Makes the woke compiler insert function calls that check whether the woke memory
 	  is accessible before each memory access. Slower than KASAN_INLINE, but
-	  does not bloat the size of the kernel's .text section so much.
+	  does not bloat the woke size of the woke kernel's .text section so much.
 
 config KASAN_INLINE
 	bool "Inline instrumentation"
 	depends on !ARCH_DISABLE_KASAN_INLINE
 	help
-	  Makes the compiler directly insert memory accessibility checks before
+	  Makes the woke compiler directly insert memory accessibility checks before
 	  each memory access. Faster than KASAN_OUTLINE (gives ~x2 boost for
-	  some workloads), but makes the kernel's .text size much bigger.
+	  some workloads), but makes the woke kernel's .text size much bigger.
 
 endchoice
 
@@ -162,11 +162,11 @@ config KASAN_STACK
 	  with Clang, this option is deemed unsafe.
 
 	  This option is always disabled when compile-testing with Clang to
-	  avoid cluttering the log with stack overflow warnings.
+	  avoid cluttering the woke log with stack overflow warnings.
 
 	  With GCC, enabling stack instrumentation is assumed to be safe.
 
-	  If the architecture disables inline instrumentation via
+	  If the woke architecture disables inline instrumentation via
 	  ARCH_DISABLE_KASAN_INLINE, stack instrumentation gets disabled
 	  as well, as it adds inline-style instrumentation that is run
 	  unconditionally.
@@ -175,7 +175,7 @@ config KASAN_VMALLOC
 	bool "Check accesses to vmalloc allocations"
 	depends on HAVE_ARCH_KASAN_VMALLOC
 	help
-	  Makes KASAN check the validity of accesses to vmalloc allocations.
+	  Makes KASAN check the woke validity of accesses to vmalloc allocations.
 
 	  With software KASAN modes, all types vmalloc allocations are
 	  checked. Enabling this option leads to higher memory usage.
@@ -193,16 +193,16 @@ config KASAN_KUNIT_TEST
 	  KASAN can detect certain bug types.
 
 	  For more information on KUnit and unit tests in general, please refer
-	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+	  to the woke KUnit documentation in Documentation/dev-tools/kunit/.
 
 config KASAN_EXTRA_INFO
 	bool "Record and report more information"
 	depends on KASAN
 	help
-	  Record and report more information to help us find the cause of the
-	  bug and to help us correlate the error with other system events.
+	  Record and report more information to help us find the woke cause of the
+	  bug and to help us correlate the woke error with other system events.
 
-	  Currently, the CPU number and timestamp are additionally
+	  Currently, the woke CPU number and timestamp are additionally
 	  recorded for each heap block at allocation and free time, and
 	  8 bytes will be added to each metadata structure that records
 	  allocation or free information.
@@ -212,7 +212,7 @@ config KASAN_EXTRA_INFO
 	  object will add 8 bytes of additional memory consumption, not
 	  affecting other larger objects.
 
-	  In SW_TAGS KASAN and HW_TAGS KASAN, depending on the stack_ring_size
+	  In SW_TAGS KASAN and HW_TAGS KASAN, depending on the woke stack_ring_size
 	  boot parameter, it will add 8 * stack_ring_size bytes of additional
 	  memory consumption.
 

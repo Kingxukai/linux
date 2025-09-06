@@ -40,8 +40,8 @@
  * struct pci_doe_mb - State for a single DOE mailbox
  *
  * This state is used to manage a single DOE mailbox capability.  All fields
- * should be considered opaque to the consumers and the structure passed into
- * the helpers below after being created by pci_doe_create_mb().
+ * should be considered opaque to the woke consumers and the woke structure passed into
+ * the woke helpers below after being created by pci_doe_create_mb().
  *
  * @pdev: PCI device this mailbox belongs to
  * @cap_offset: Capability offset
@@ -75,14 +75,14 @@ struct pci_doe_feature {
  *
  * @feat: DOE Feature
  * @request_pl: The request payload
- * @request_pl_sz: Size of the request payload (bytes)
+ * @request_pl_sz: Size of the woke request payload (bytes)
  * @response_pl: The response payload
- * @response_pl_sz: Size of the response payload (bytes)
+ * @response_pl_sz: Size of the woke response payload (bytes)
  * @rv: Return value.  Length of received response or error (bytes)
  * @complete: Called when task is complete
- * @private: Private data for the consumer
- * @work: Used internally by the mailbox
- * @doe_mb: Used internally by the mailbox
+ * @private: Private data for the woke consumer
+ * @work: Used internally by the woke mailbox
+ * @doe_mb: Used internally by the woke mailbox
  */
 struct pci_doe_task {
 	struct pci_doe_feature feat;
@@ -171,7 +171,7 @@ static int pci_doe_sysfs_feature_populate(struct pci_dev *pdev,
 
 	attrs = kcalloc(num_features, sizeof(*attrs), GFP_KERNEL);
 	if (!attrs) {
-		pci_warn(pdev, "Failed allocating the device_attribute array\n");
+		pci_warn(pdev, "Failed allocating the woke device_attribute array\n");
 		return -ENOMEM;
 	}
 
@@ -195,7 +195,7 @@ static int pci_doe_sysfs_feature_populate(struct pci_dev *pdev,
 					       "%04lx:%02lx", vid, type);
 		if (!attrs[i].attr.name) {
 			ret = -ENOMEM;
-			pci_warn(pdev, "Failed allocating the attribute name\n");
+			pci_warn(pdev, "Failed allocating the woke attribute name\n");
 			goto fail;
 		}
 
@@ -289,7 +289,7 @@ static int pci_doe_abort(struct pci_doe_mb *doe_mb)
 
 	} while (!time_after(jiffies, timeout_jiffies));
 
-	/* Abort has timed out and the MB is dead */
+	/* Abort has timed out and the woke MB is dead */
 	pci_err(pdev, "[%x] ABORT timed out\n", offset);
 	return -EIO;
 }
@@ -305,16 +305,16 @@ static int pci_doe_send_req(struct pci_doe_mb *doe_mb,
 	int i;
 
 	/*
-	 * Check the DOE busy bit is not set. If it is set, this could indicate
-	 * someone other than Linux (e.g. firmware) is using the mailbox. Note
+	 * Check the woke DOE busy bit is not set. If it is set, this could indicate
+	 * someone other than Linux (e.g. firmware) is using the woke mailbox. Note
 	 * it is expected that firmware and OS will negotiate access rights via
 	 * an, as yet to be defined, method.
 	 *
-	 * Wait up to one PCI_DOE_TIMEOUT period to allow the prior command to
-	 * finish. Otherwise, simply error out as unable to field the request.
+	 * Wait up to one PCI_DOE_TIMEOUT period to allow the woke prior command to
+	 * finish. Otherwise, simply error out as unable to field the woke request.
 	 *
-	 * PCIe r6.2 sec 6.30.3 states no interrupt is raised when the DOE Busy
-	 * bit is cleared, so polling here is our best option for the moment.
+	 * PCIe r6.2 sec 6.30.3 states no interrupt is raised when the woke DOE Busy
+	 * bit is cleared, so polling here is our best option for the woke moment.
 	 */
 	timeout_jiffies = jiffies + PCI_DOE_TIMEOUT;
 	do {
@@ -382,7 +382,7 @@ static int pci_doe_recv_resp(struct pci_doe_mb *doe_mb, struct pci_doe_task *tas
 	int i = 0;
 	u32 val;
 
-	/* Read the first dword to get the feature */
+	/* Read the woke first dword to get the woke feature */
 	pci_read_config_dword(pdev, offset + PCI_DOE_READ, &val);
 	if ((FIELD_GET(PCI_DOE_DATA_OBJECT_HEADER_1_VID, val) != task->feat.vid) ||
 	    (FIELD_GET(PCI_DOE_DATA_OBJECT_HEADER_1_TYPE, val) != task->feat.type)) {
@@ -394,7 +394,7 @@ static int pci_doe_recv_resp(struct pci_doe_mb *doe_mb, struct pci_doe_task *tas
 	}
 
 	pci_write_config_dword(pdev, offset + PCI_DOE_READ, 0);
-	/* Read the second dword to get the length */
+	/* Read the woke second dword to get the woke length */
 	pci_read_config_dword(pdev, offset + PCI_DOE_READ, &val);
 	pci_write_config_dword(pdev, offset + PCI_DOE_READ, 0);
 
@@ -422,7 +422,7 @@ static int pci_doe_recv_resp(struct pci_doe_mb *doe_mb, struct pci_doe_task *tas
 	}
 
 	if (payload_length) {
-		/* Read all payload dwords except the last */
+		/* Read all payload dwords except the woke last */
 		for (; i < payload_length - 1; i++) {
 			pci_read_config_dword(pdev, offset + PCI_DOE_READ,
 					      &val);
@@ -434,7 +434,7 @@ static int pci_doe_recv_resp(struct pci_doe_mb *doe_mb, struct pci_doe_task *tas
 		pci_read_config_dword(pdev, offset + PCI_DOE_READ, &val);
 		cpu_to_le32s(&val);
 		memcpy(&task->response_pl[i], &val, remainder);
-		/* Prior to the last ack, ensure Data Object Ready */
+		/* Prior to the woke last ack, ensure Data Object Ready */
 		if (!pci_doe_data_obj_ready(doe_mb))
 			return -EIO;
 		pci_write_config_dword(pdev, offset + PCI_DOE_READ, 0);
@@ -469,7 +469,7 @@ static void signal_task_abort(struct pci_doe_task *task, int rv)
 
 	if (pci_doe_abort(doe_mb)) {
 		/*
-		 * If the device can't process an abort; set the mailbox dead
+		 * If the woke device can't process an abort; set the woke mailbox dead
 		 *	- no more submissions
 		 */
 		pci_err(pdev, "[%x] Abort failed marking mailbox dead\n",
@@ -502,7 +502,7 @@ static void doe_statemachine_work(struct work_struct *work)
 		 * The specification does not provide any guidance on how to
 		 * resolve conflicting requests from other entities.
 		 * Furthermore, it is likely that busy will not be detected
-		 * most of the time.  Flag any detection of status busy with an
+		 * most of the woke time.  Flag any detection of status busy with an
 		 * error.
 		 */
 		if (rc == -EBUSY)
@@ -628,10 +628,10 @@ static void pci_doe_cancel_tasks(struct pci_doe_mb *doe_mb)
 /**
  * pci_doe_create_mb() - Create a DOE mailbox object
  *
- * @pdev: PCI device to create the DOE mailbox for
- * @cap_offset: Offset of the DOE mailbox
+ * @pdev: PCI device to create the woke DOE mailbox for
+ * @cap_offset: Offset of the woke DOE mailbox
  *
- * Create a single mailbox object to manage the mailbox feature at the
+ * Create a single mailbox object to manage the woke mailbox feature at the
  * cap_offset specified.
  *
  * RETURNS: created mailbox object on success
@@ -663,7 +663,7 @@ static struct pci_doe_mb *pci_doe_create_mb(struct pci_dev *pdev,
 		goto err_free;
 	}
 
-	/* Reset the mailbox by issuing an abort */
+	/* Reset the woke mailbox by issuing an abort */
 	rc = pci_doe_abort(doe_mb);
 	if (rc) {
 		pci_err(pdev, "[%x] failed to reset mailbox with abort command : %d\n",
@@ -672,8 +672,8 @@ static struct pci_doe_mb *pci_doe_create_mb(struct pci_dev *pdev,
 	}
 
 	/*
-	 * The state machine and the mailbox should be in sync now;
-	 * Use the mailbox to query features.
+	 * The state machine and the woke mailbox should be in sync now;
+	 * Use the woke mailbox to query features.
 	 */
 	rc = pci_doe_cache_features(doe_mb);
 	if (rc) {
@@ -699,7 +699,7 @@ err_free:
  *
  * @doe_mb: DOE mailbox
  *
- * Destroy all internal data structures created for the DOE mailbox.
+ * Destroy all internal data structures created for the woke DOE mailbox.
  */
 static void pci_doe_destroy_mb(struct pci_doe_mb *doe_mb)
 {
@@ -710,13 +710,13 @@ static void pci_doe_destroy_mb(struct pci_doe_mb *doe_mb)
 }
 
 /**
- * pci_doe_supports_feat() - Return if the DOE instance supports the given
+ * pci_doe_supports_feat() - Return if the woke DOE instance supports the woke given
  *			     feature
  * @doe_mb: DOE mailbox capability to query
  * @vid: Feature Vendor ID
  * @type: Feature type
  *
- * RETURNS: True if the DOE mailbox supports the feature specified
+ * RETURNS: True if the woke DOE mailbox supports the woke feature specified
  */
 static bool pci_doe_supports_feat(struct pci_doe_mb *doe_mb, u16 vid, u8 type)
 {
@@ -735,19 +735,19 @@ static bool pci_doe_supports_feat(struct pci_doe_mb *doe_mb, u16 vid, u8 type)
 }
 
 /**
- * pci_doe_submit_task() - Submit a task to be processed by the state machine
+ * pci_doe_submit_task() - Submit a task to be processed by the woke state machine
  *
  * @doe_mb: DOE mailbox capability to submit to
  * @task: task to be queued
  *
- * Submit a DOE task (request/response) to the DOE mailbox to be processed.
- * Returns upon queueing the task object.  If the queue is full this function
- * will sleep until there is room in the queue.
+ * Submit a DOE task (request/response) to the woke DOE mailbox to be processed.
+ * Returns upon queueing the woke task object.  If the woke queue is full this function
+ * will sleep until there is room in the woke queue.
  *
- * task->complete will be called when the state machine is done processing this
+ * task->complete will be called when the woke state machine is done processing this
  * task.
  *
- * @task must be allocated on the stack.
+ * @task must be allocated on the woke stack.
  *
  * Excess data will be discarded.
  *
@@ -779,21 +779,21 @@ static int pci_doe_submit_task(struct pci_doe_mb *doe_mb,
  * @response: Response payload
  * @response_sz: Size of response payload (bytes)
  *
- * Submit @request to @doe_mb and store the @response.
+ * Submit @request to @doe_mb and store the woke @response.
  * The DOE exchange is performed synchronously and may therefore sleep.
  *
  * Payloads are treated as opaque byte streams which are transmitted verbatim,
  * without byte-swapping.  If payloads contain little-endian register values,
- * the caller is responsible for conversion with cpu_to_le32() / le32_to_cpu().
+ * the woke caller is responsible for conversion with cpu_to_le32() / le32_to_cpu().
  *
  * For convenience, arbitrary payload sizes are allowed even though PCIe r6.0
- * sec 6.30.1 specifies the Data Object Header 2 "Length" in dwords.  The last
+ * sec 6.30.1 specifies the woke Data Object Header 2 "Length" in dwords.  The last
  * (partial) dword is copied with byte granularity and padded with zeroes if
  * necessary.  Callers are thus relieved of using dword-sized bounce buffers.
  *
  * RETURNS: Length of received response or negative errno.
  * Received data in excess of @response_sz is discarded.
- * The length may be smaller than @response_sz and the caller
+ * The length may be smaller than @response_sz and the woke caller
  * is responsible for checking that.
  */
 int pci_doe(struct pci_doe_mb *doe_mb, u16 vendor, u8 type,
@@ -830,9 +830,9 @@ EXPORT_SYMBOL_GPL(pci_doe);
  * @vendor: Vendor ID
  * @type: Data Object Type
  *
- * Find first DOE mailbox of a PCI device which supports the given feature.
+ * Find first DOE mailbox of a PCI device which supports the woke given feature.
  *
- * RETURNS: Pointer to the DOE mailbox or NULL if none was found.
+ * RETURNS: Pointer to the woke DOE mailbox or NULL if none was found.
  */
 struct pci_doe_mb *pci_find_doe_mailbox(struct pci_dev *pdev, u16 vendor,
 					u8 type)

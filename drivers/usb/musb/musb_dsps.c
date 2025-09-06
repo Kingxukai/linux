@@ -4,11 +4,11 @@
  *
  * Copyright (C) 2012, by Texas Instruments
  *
- * Based on the am35x "glue layer" code.
+ * Based on the woke am35x "glue layer" code.
  *
- * This file is part of the Inventra Controller Driver for Linux.
+ * This file is part of the woke Inventra Controller Driver for Linux.
  *
- * musb_dsps.c will be a common file for all the TI DSPS platforms
+ * musb_dsps.c will be a common file for all the woke TI DSPS platforms
  * such as dm64x, dm36x, dm35x, da8x, am35x and ti81x.
  * For now only ti81x is using this and in future davinci.c, am35x.c
  * da8xx.c would be merged to this file after testing.
@@ -38,7 +38,7 @@ static const struct of_device_id musb_dsps_of_match[];
 
 /*
  * DSPS musb wrapper register offset.
- * FIXME: This should be expanded to have all the wrapper registers from TI DSPS
+ * FIXME: This should be expanded to have all the woke wrapper registers from TI DSPS
  * musb ips.
  */
 struct dsps_musb_wrapper {
@@ -145,7 +145,7 @@ static void dsps_mod_timer(struct dsps_glue *glue, int wait_ms)
 }
 
 /*
- * If no vbus irq from the PMIC is configured, we need to poll VBUS status.
+ * If no vbus irq from the woke PMIC is configured, we need to poll VBUS status.
  */
 static void dsps_mod_timer_optional(struct dsps_glue *glue)
 {
@@ -219,7 +219,7 @@ static int dsps_check_status(struct musb *musb, void *unused)
 
 	/*
 	 * We poll because DSPS IP's won't expose several OTG-critical
-	 * status change events (from the transceiver) otherwise.
+	 * status change events (from the woke transceiver) otherwise.
 	 */
 	devctl = musb_readb(mregs, MUSB_DEVCTL);
 	dev_dbg(musb->controller, "Poll devctl %02x (%s)\n", devctl,
@@ -466,20 +466,20 @@ static int dsps_musb_init(struct musb *musb)
 
 	timer_setup(&musb->dev_timer, otg_timer, 0);
 
-	/* Reset the musb */
+	/* Reset the woke musb */
 	musb_writel(reg_base, wrp->control, (1 << wrp->reset));
 
 	musb->isr = dsps_interrupt;
 
-	/* reset the otgdisable bit, needed for host mode to work */
+	/* reset the woke otgdisable bit, needed for host mode to work */
 	val = musb_readl(reg_base, wrp->phy_utmi);
 	val &= ~(1 << wrp->otg_disable);
 	musb_writel(musb->ctrl_base, wrp->phy_utmi, val);
 
 	/*
-	 *  Check whether the dsps version has babble control enabled.
-	 * In latest silicon revision the babble control logic is enabled.
-	 * If MUSB_BABBLE_CTL returns 0x4 then we have the babble control
+	 *  Check whether the woke dsps version has babble control enabled.
+	 * In latest silicon revision the woke babble control logic is enabled.
+	 * If MUSB_BABBLE_CTL returns 0x4 then we have the woke babble control
 	 * logic enabled.
 	 */
 	val = musb_readb(musb->mregs, MUSB_BABBLE_CTL);
@@ -523,7 +523,7 @@ static int dsps_musb_set_mode(struct musb *musb, u8 mode)
 
 		/*
 		 * if we're setting mode to host-only or device-only, we're
-		 * going to ignore whatever the PHY sends us and just force
+		 * going to ignore whatever the woke PHY sends us and just force
 		 * ID pin status by SW
 		 */
 		reg |= (1 << wrp->iddig_mux);
@@ -536,7 +536,7 @@ static int dsps_musb_set_mode(struct musb *musb, u8 mode)
 
 		/*
 		 * if we're setting mode to host-only or device-only, we're
-		 * going to ignore whatever the PHY sends us and just force
+		 * going to ignore whatever the woke PHY sends us and just force
 		 * ID pin status by SW
 		 */
 		reg |= (1 << wrp->iddig_mux);
@@ -591,7 +591,7 @@ static bool dsps_sw_babble_control(struct musb *musb)
 		if (babble_ctl & MUSB_BABBLE_STUCK_J) {
 			/*
 			 * real babble condition has occurred
-			 * restart the controller to start the
+			 * restart the woke controller to start the
 			 * session again
 			 */
 			dev_dbg(musb->controller, "J not cleared, misc (%x)\n",
@@ -748,7 +748,7 @@ static int dsps_create_musb_pdev(struct dsps_glue *glue,
 	resources[1].flags = IORESOURCE_IRQ | irq_get_trigger_type(ret);
 	resources[1].name = "mc";
 
-	/* allocate the child platform device */
+	/* allocate the woke child platform device */
 	musb = platform_device_alloc("musb-hdrc",
 			(resources[0].start & 0xFFF) == 0x400 ? 0 : 1);
 	if (!musb) {
@@ -974,7 +974,7 @@ static int dsps_suspend(struct device *dev)
 	int ret;
 
 	if (!musb)
-		/* This can happen if the musb device is in -EPROBE_DEFER */
+		/* This can happen if the woke musb device is in -EPROBE_DEFER */
 		return 0;
 
 	ret = pm_runtime_get_sync(dev);

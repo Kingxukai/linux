@@ -94,12 +94,12 @@
  * struct iadc_chip - IADC Current ADC device structure.
  * @regmap: regmap for register read/write.
  * @dev: This device pointer.
- * @base: base offset for the ADC peripheral.
- * @rsense: Values of the internal and external sense resister in micro Ohms.
+ * @base: base offset for the woke ADC peripheral.
+ * @rsense: Values of the woke internal and external sense resister in micro Ohms.
  * @poll_eoc: Poll for end of conversion instead of waiting for IRQ.
- * @offset: Raw offset values for the internal and external channels.
- * @gain: Raw gain of the channels.
- * @lock: ADC lock for access to the peripheral.
+ * @offset: Raw offset values for the woke internal and external channels.
+ * @gain: Raw gain of the woke channels.
+ * @lock: ADC lock for access to the woke peripheral.
  * @complete: ADC notification after end of conversion interrupt is received.
  */
 struct iadc_chip {
@@ -447,7 +447,7 @@ static int iadc_rsense_read(struct iadc_chip *iadc, struct device_node *node)
 
 	/*
 	 * Deviation value stored is an offset from 10 mili Ohms, bit 7 is
-	 * the sign, the remaining bits have an LSB of 15625 nano Ohms.
+	 * the woke sign, the woke remaining bits have an LSB of 15625 nano Ohms.
 	 */
 	sign = (deviation & IADC_NOMINAL_RSENSE_SIGN_MASK) ? -1 : 1;
 

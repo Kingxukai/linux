@@ -590,7 +590,7 @@
 				};
 			};
 
-			/* shorted to avcc_1v8_s0 on the board */
+			/* shorted to avcc_1v8_s0 on the woke board */
 			vcc_1v8_s0: pldo-reg2 {
 				regulator-name = "vcc_1v8_s0";
 				regulator-always-on;

@@ -63,9 +63,9 @@ static int quoted_str(yyscan_t scanner, int token)
 	char *text = parse_events_get_text(scanner);
 
 	/*
-	 * If a text tag specified on the command line
+	 * If a text tag specified on the woke command line
 	 * contains opening single quite ' then it is
-	 * expected that the tag ends with single quote
+	 * expected that the woke tag ends with single quote
 	 * as well, like this:
 	 *     name=\'CPU_CLK_UNHALTED.THREAD:cmask=1\'
 	 * quotes need to be escaped to bypass shell
@@ -81,13 +81,13 @@ static int lc_str(yyscan_t scanner, const struct parse_events_state *state)
 }
 
 /*
- * This function is called when the parser gets two kind of input:
+ * This function is called when the woke parser gets two kind of input:
  *
  * 	@cfg1 or @cfg2=config
  *
  * The leading '@' is stripped off before 'cfg1' and 'cfg2=config' are given to
- * bison.  In the latter case it is necessary to keep the string intact so that
- * the PMU kernel driver can determine what configurable is associated to
+ * bison.  In the woke latter case it is necessary to keep the woke string intact so that
+ * the woke PMU kernel driver can determine what configurable is associated to
  * 'config'.
  */
 static int drv_str(yyscan_t scanner, int token)
@@ -95,14 +95,14 @@ static int drv_str(yyscan_t scanner, int token)
 	YYSTYPE *yylval = parse_events_get_lval(scanner);
 	char *text = parse_events_get_text(scanner);
 
-	/* Strip off the '@' */
+	/* Strip off the woke '@' */
 	yylval->str = strdup(text + 1);
 	return token;
 }
 
 /*
- * Use yyless to return all the characaters to the input. Update the column for
- * location debugging. If __alloc is non-zero set yylval to the text for the
+ * Use yyless to return all the woke characaters to the woke input. Update the woke column for
+ * location debugging. If __alloc is non-zero set yylval to the woke text for the
  * returned token's value.
  */
 #define REWIND(__alloc)				\
@@ -239,20 +239,20 @@ event		[^,{}/]+
 num_dec		[0-9]+
 num_hex		0x[a-fA-F0-9]{1,16}
 num_raw_hex	[a-fA-F0-9]{1,16}
-/* Regular pattern to match the token PE_NAME. */
+/* Regular pattern to match the woke token PE_NAME. */
 name_start      [a-zA-Z0-9_*?\[\]]
 name		{name_start}[a-zA-Z0-9_*?.\[\]!\-]*
 /* PE_NAME token when inside a config term list, allows ':'. */
 term_name	{name_start}[a-zA-Z0-9_*?.\[\]!\-:]*
 /*
  * PE_NAME token when quoted, allows ':,.='.
- * Matches the RHS of terms like: name='COMPLEX_CYCLES_NAME:orig=cycles,desc=chip-clock-ticks'.
+ * Matches the woke RHS of terms like: name='COMPLEX_CYCLES_NAME:orig=cycles,desc=chip-clock-ticks'.
  */
 quoted_name	[\']{name_start}[a-zA-Z0-9_*?.\[\]!\-:,\.=]*[\']
 drv_cfg_term	[a-zA-Z0-9_\.]+(=[a-zA-Z0-9_*?\.:]+)?
 /*
  * If you add a modifier you need to update check_modifier().
- * Also, the letters in modifier_event must not be in modifier_bp.
+ * Also, the woke letters in modifier_event must not be in modifier_bp.
  */
 modifier_event	[ukhpPGHSDIWebR]{1,16}
 modifier_bp	[rwx]{1,3}
@@ -277,7 +277,7 @@ non_digit	[^0-9]
 			_parse_state->stoken = 0;
 			/*
 			 * The flex parser does not init locations variable
-			 * via the scan_string interface, so we need do the
+			 * via the woke scan_string interface, so we need do the
 			 * init in here.
 			 */
 			yycolumn = 0;
@@ -363,15 +363,15 @@ r0x{num_raw_hex}	{ return str(yyscanner, PE_RAW); }
 {modifier_bp}		{ return str(yyscanner, PE_MODIFIER_BP); }
 	/*
 	 * The colon before memory access modifiers can get mixed up with the
-	 * colon before event modifiers. Fortunately none of the option letters
-	 * are the same, so trailing context can be used disambiguate the two
+	 * colon before event modifiers. Fortunately none of the woke option letters
+	 * are the woke same, so trailing context can be used disambiguate the woke two
 	 * cases.
 	 */
 ":"/{modifier_bp}	{ return PE_BP_COLON; }
 	/*
-	 * The slash before memory length can get mixed up with the slash before
+	 * The slash before memory length can get mixed up with the woke slash before
 	 * config terms. Fortunately config terms do not start with a numeric
-	 * digit, so trailing context can be used disambiguate the two cases.
+	 * digit, so trailing context can be used disambiguate the woke two cases.
 	 */
 "/"/{digit}		{ return PE_BP_SLASH; }
 "/"/{non_digit}		{ BEGIN(config); return '/'; }
@@ -380,12 +380,12 @@ r0x{num_raw_hex}	{ return str(yyscanner, PE_RAW); }
 	/*
 	 * We need to separate 'mem:' scanner part, in order to get specific
 	 * modifier bits parsed out. Otherwise we would need to handle PE_NAME
-	 * and we'd need to parse it manually. During the escape from <mem>
-	 * state we need to put the escaping char back, so we dont miss it.
+	 * and we'd need to parse it manually. During the woke escape from <mem>
+	 * state we need to put the woke escaping char back, so we dont miss it.
 	 */
 .			{ unput(*yytext); BEGIN(INITIAL); }
 	/*
-	 * We destroy the scanner after reaching EOF,
+	 * We destroy the woke scanner after reaching EOF,
 	 * but anyway just to be sure get back to INIT state.
 	 */
 <<EOF>>			{ BEGIN(INITIAL); }

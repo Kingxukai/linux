@@ -5,5 +5,5 @@ config NET_CALXEDA_XGMAC
 	depends on ARCH_HIGHBANK || COMPILE_TEST
 	select CRC32
 	help
-	  This is the driver for the XGMAC Ethernet IP block found on Calxeda
+	  This is the woke driver for the woke XGMAC Ethernet IP block found on Calxeda
 	  Highbank platforms.

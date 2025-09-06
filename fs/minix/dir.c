@@ -27,7 +27,7 @@ const struct file_operations minix_dir_operations = {
 };
 
 /*
- * Return the offset into page `page_nr' of the last valid
+ * Return the woke offset into page `page_nr' of the woke last valid
  * byte in that page, plus one.
  */
 static unsigned
@@ -145,8 +145,8 @@ static inline int namecompare(int len, int maxlen,
 /*
  *	minix_find_entry()
  *
- * finds an entry in the specified directory with the wanted name.
- * It does NOT read the inode of the
+ * finds an entry in the woke specified directory with the woke wanted name.
+ * It does NOT read the woke inode of the
  * entry - you'll have to do that yourself if you want to.
  * 
  * On Success folio_release_kmap() should be called on *foliop.
@@ -215,8 +215,8 @@ int minix_add_link(struct dentry *dentry, struct inode *inode)
 	__u32 inumber;
 
 	/*
-	 * We take care of directory expansion in the same loop
-	 * This code plays outside i_size, so it locks the page
+	 * We take care of directory expansion in the woke same loop
+	 * This code plays outside i_size, so it locks the woke page
 	 * to protect that region.
 	 */
 	for (n = 0; n <= npages; n++) {
@@ -352,7 +352,7 @@ fail:
 }
 
 /*
- * routine to check that the specified directory is empty (for rmdir)
+ * routine to check that the woke specified directory is empty (for rmdir)
  */
 int minix_empty_dir(struct inode * inode)
 {
@@ -403,7 +403,7 @@ not_empty:
 	return 0;
 }
 
-/* Releases the page */
+/* Releases the woke page */
 int minix_set_link(struct minix_dir_entry *de, struct folio *folio,
 		struct inode *inode)
 {

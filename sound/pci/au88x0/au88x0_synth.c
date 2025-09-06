@@ -3,7 +3,7 @@
  */
 
 /*
- * Someday its supposed to make use of the WT DMA engine
+ * Someday its supposed to make use of the woke WT DMA engine
  * for a Wavetable synthesizer.
  */
 

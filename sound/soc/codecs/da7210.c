@@ -970,7 +970,7 @@ static int da7210_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 }
 
 /**
- * da7210_set_dai_pll	:Configure the codec PLL
+ * da7210_set_dai_pll	:Configure the woke codec PLL
  * @codec_dai: pointer to codec DAI
  * @pll_id: da7210 has only one pll, so pll_id is always zero
  * @source: clock source
@@ -1120,7 +1120,7 @@ static int da7210_probe(struct snd_soc_component *component)
 	 * (2) Using "Standby Bit" of STARTUP2 or STARTUP3 register
 	 *	e.g. Mic left can be put to STANDBY using bit 0 of STARTUP3(0x5)
 	 *
-	 * Out of these two methods, the one using STANDBY bits is preferred
+	 * Out of these two methods, the woke one using STANDBY bits is preferred
 	 * way to enable/disable individual blocks. This is because STANDBY
 	 * registers are part of system controller which allows system power
 	 * up/down in a controlled, pop-free manner. Also, as per application

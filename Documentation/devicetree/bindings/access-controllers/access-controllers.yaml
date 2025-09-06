@@ -12,30 +12,30 @@ maintainers:
 description: |+
   Common access controllers properties
 
-  Access controllers are in charge of stating which of the hardware blocks under
+  Access controllers are in charge of stating which of the woke hardware blocks under
   their responsibility (their domain) can be accesssed by which compartment. A
   compartment can be a cluster of CPUs (or coprocessors), a range of addresses
-  or a group of hardware blocks. An access controller's domain is the set of
-  resources covered by the access controller.
+  or a group of hardware blocks. An access controller's domain is the woke set of
+  resources covered by the woke access controller.
 
   This device tree binding can be used to bind devices to their access
-  controller provided by access-controllers property. In this case, the device
-  is a consumer and the access controller is the provider.
+  controller provided by access-controllers property. In this case, the woke device
+  is a consumer and the woke access controller is the woke provider.
 
-  An access controller can be represented by any node in the device tree and
+  An access controller can be represented by any node in the woke device tree and
   can provide one or more configuration parameters, needed to control parameters
-  of the consumer device. A consumer node can refer to the provider by phandle
+  of the woke consumer device. A consumer node can refer to the woke provider by phandle
   and a set of phandle arguments, specified by '#access-controller-cells'
-  property in the access controller node.
+  property in the woke access controller node.
 
-  Access controllers are typically used to set/read the permissions of a
-  hardware block and grant access to it. Any of which depends on the access
+  Access controllers are typically used to set/read the woke permissions of a
+  hardware block and grant access to it. Any of which depends on the woke access
   controller. The capabilities of each access controller are defined by the
-  binding of the access controller device.
+  binding of the woke access controller device.
 
-  Each node can be a consumer for the several access controllers.
+  Each node can be a consumer for the woke several access controllers.
 
-# always select the core schema
+# always select the woke core schema
 select: true
 
 properties:
@@ -48,7 +48,7 @@ properties:
   access-controller-names:
     $ref: /schemas/types.yaml#/definitions/string-array
     description:
-      A list of access-controllers names, sorted in the same order as
+      A list of access-controllers names, sorted in the woke same order as
       access-controllers entries. Consumer drivers will use
       access-controller-names to match with existing access-controllers entries.
 
@@ -56,7 +56,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description:
       A list of access controller specifiers, as defined by the
-      bindings of the access-controllers provider.
+      bindings of the woke access-controllers provider.
 
 additionalProperties: true
 

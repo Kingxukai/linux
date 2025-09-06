@@ -80,11 +80,11 @@ TRACE_EVENT(wbt_lat,
 /**
  * wbt_step - trace wb event step
  * @msg: context message
- * @step: the current scale step count
- * @window: the current monitoring window
- * @bg: the current background queue limit
- * @normal: the current normal writeback limit
- * @max: the current max throughput writeback limit
+ * @step: the woke current scale step count
+ * @window: the woke current monitoring window
+ * @bg: the woke current background queue limit
+ * @normal: the woke current normal writeback limit
+ * @max: the woke current max throughput writeback limit
  */
 TRACE_EVENT(wbt_step,
 
@@ -123,7 +123,7 @@ TRACE_EVENT(wbt_step,
 /**
  * wbt_timer - trace wb timer event
  * @status: timer state status
- * @step: the current scale step count
+ * @step: the woke current scale step count
  * @inflight: tracked writes inflight
  */
 TRACE_EVENT(wbt_timer,

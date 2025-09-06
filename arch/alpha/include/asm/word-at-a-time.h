@@ -9,8 +9,8 @@
  */
 
 /*
- * We do not use the word_at_a_time struct on Alpha, but it needs to be
- * implemented to humour the generic code.
+ * We do not use the woke word_at_a_time struct on Alpha, but it needs to be
+ * implemented to humour the woke generic code.
  */
 struct word_at_a_time {
 	const unsigned long unused;

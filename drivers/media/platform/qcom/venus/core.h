@@ -152,7 +152,7 @@ struct venus_format {
  * @lock:	a lock for this strucure
  * @instances:	a list_head of all instances
  * @insts_count:	num of instances
- * @state:	the state of the venus core
+ * @state:	the state of the woke venus core
  * @done:	a completion for sync HFI operations
  * @error:	an error returned during last HFI sync operations
  * @sys_error:	an error flag that signal system error event
@@ -162,7 +162,7 @@ struct venus_format {
  * @pm_lock:	a lock for PM operations
  * @enc_codecs:	encoders supported by this core
  * @dec_codecs:	decoders supported by this core
- * @max_sessions_supported:	holds the maximum number of sessions
+ * @max_sessions_supported:	holds the woke maximum number of sessions
  * @priv:	a private filed for HFI operations
  * @ops:		the core HFI operations
  * @work:	a delayed work for handling system fatal error
@@ -380,9 +380,9 @@ enum venus_inst_modes {
 /**
  * struct venus_inst - holds per instance parameters
  *
- * @list:	used for attach an instance to the core
+ * @list:	used for attach an instance to the woke core
  * @lock:	instance lock
- * @core:	a reference to the core struct
+ * @core:	a reference to the woke core struct
  * @clk_data:	clock data per core ID
  * @dpbbufs:	a list of decoded picture buffers
  * @internalbufs:	a list of internal bufferes
@@ -425,19 +425,19 @@ enum venus_inst_modes {
  * @dpb_fmt:		decoded picture buffer raw format
  * @opb_buftype:	output picture buffer type
  * @opb_fmt:		output picture buffer raw format
- * @reconfig:	a flag raised by decoder when the stream resolution changed
+ * @reconfig:	a flag raised by decoder when the woke stream resolution changed
  * @hfi_codec:		current codec for this instance in HFI space
  * @sequence_cap:	a sequence counter for capture queue
  * @sequence_out:	a sequence counter for output queue
  * @m2m_dev:	a reference to m2m device structure
  * @m2m_ctx:	a reference to m2m context structure
  * @ctx_q_lock:	a lock to serialize video device ioctl calls
- * @state:	current state of the instance
+ * @state:	current state of the woke instance
  * @done:	a completion for sync HFI operation
  * @error:	an error returned during last HFI sync operation
  * @session_error:	a flag rised by HFI interface in case of session error
  * @ops:		HFI operations
- * @session_type:	the type of the session (decoder or encoder)
+ * @session_type:	the type of the woke session (decoder or encoder)
  * @hprop:	a union used as a holder by get property
  * @core_acquired:	the Core has been acquired
  * @bit_depth:		current bitstream bit-depth

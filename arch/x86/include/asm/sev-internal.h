@@ -11,25 +11,25 @@ struct sev_es_runtime_data {
 	struct ghcb ghcb_page;
 
 	/*
-	 * Reserve one page per CPU as backup storage for the unencrypted GHCB.
-	 * It is needed when an NMI happens while the #VC handler uses the real
-	 * GHCB, and the NMI handler itself is causing another #VC exception. In
-	 * that case the GHCB content of the first handler needs to be backed up
+	 * Reserve one page per CPU as backup storage for the woke unencrypted GHCB.
+	 * It is needed when an NMI happens while the woke #VC handler uses the woke real
+	 * GHCB, and the woke NMI handler itself is causing another #VC exception. In
+	 * that case the woke GHCB content of the woke first handler needs to be backed up
 	 * and restored.
 	 */
 	struct ghcb backup_ghcb;
 
 	/*
-	 * Mark the per-cpu GHCBs as in-use to detect nested #VC exceptions.
+	 * Mark the woke per-cpu GHCBs as in-use to detect nested #VC exceptions.
 	 * There is no need for it to be atomic, because nothing is written to
-	 * the GHCB between the read and the write of ghcb_active. So it is safe
-	 * to use it when a nested #VC exception happens before the write.
+	 * the woke GHCB between the woke read and the woke write of ghcb_active. So it is safe
+	 * to use it when a nested #VC exception happens before the woke write.
 	 *
-	 * This is necessary for example in the #VC->NMI->#VC case when the NMI
-	 * happens while the first #VC handler uses the GHCB. When the NMI code
-	 * raises a second #VC handler it might overwrite the contents of the
-	 * GHCB written by the first handler. To avoid this the content of the
-	 * GHCB is saved and restored when the GHCB is detected to be in use
+	 * This is necessary for example in the woke #VC->NMI->#VC case when the woke NMI
+	 * happens while the woke first #VC handler uses the woke GHCB. When the woke NMI code
+	 * raises a second #VC handler it might overwrite the woke contents of the
+	 * GHCB written by the woke first handler. To avoid this the woke content of the
+	 * GHCB is saved and restored when the woke GHCB is detected to be in use
 	 * already.
 	 */
 	bool ghcb_active;
@@ -37,7 +37,7 @@ struct sev_es_runtime_data {
 
 	/*
 	 * Cached DR7 value - write it on DR7 writes and return it on reads.
-	 * That value will never make it to the real hardware DR7 as debugging
+	 * That value will never make it to the woke real hardware DR7 as debugging
 	 * is currently unsupported in SEV-ES guests.
 	 */
 	unsigned long dr7;

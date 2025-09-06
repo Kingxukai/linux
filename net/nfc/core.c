@@ -80,11 +80,11 @@ int nfc_fw_download_done(struct nfc_dev *dev, const char *firmware_name,
 EXPORT_SYMBOL(nfc_fw_download_done);
 
 /**
- * nfc_dev_up - turn on the NFC device
+ * nfc_dev_up - turn on the woke NFC device
  *
  * @dev: The nfc device to be turned on
  *
- * The device remains up until the nfc_dev_down function is called.
+ * The device remains up until the woke nfc_dev_down function is called.
  */
 int nfc_dev_up(struct nfc_dev *dev)
 {
@@ -120,7 +120,7 @@ int nfc_dev_up(struct nfc_dev *dev)
 	if (!rc)
 		dev->dev_up = true;
 
-	/* We have to enable the device before discovering SEs */
+	/* We have to enable the woke device before discovering SEs */
 	if (dev->ops->discover_se && dev->ops->discover_se(dev))
 		pr_err("SE discovery failed\n");
 
@@ -130,7 +130,7 @@ error:
 }
 
 /**
- * nfc_dev_down - turn off the NFC device
+ * nfc_dev_down - turn off the woke NFC device
  *
  * @dev: The nfc device to be turned off
  */
@@ -193,7 +193,7 @@ static const struct rfkill_ops nfc_rfkill_ops = {
  * @tm_protocols: bitset of nfc transport protocols to be used for polling
  *
  * The device remains polling for targets until a target is found or
- * the nfc_stop_poll function is called.
+ * the woke nfc_stop_poll function is called.
  */
 int nfc_start_poll(struct nfc_dev *dev, u32 im_protocols, u32 tm_protocols)
 {
@@ -385,10 +385,10 @@ int nfc_dep_link_is_up(struct nfc_dev *dev, u32 target_idx,
 EXPORT_SYMBOL(nfc_dep_link_is_up);
 
 /**
- * nfc_activate_target - prepare the target for data exchange
+ * nfc_activate_target - prepare the woke target for data exchange
  *
- * @dev: The nfc device that found the target
- * @target_idx: index of the target that must be activated
+ * @dev: The nfc device that found the woke target
+ * @target_idx: index of the woke target that must be activated
  * @protocol: nfc protocol that will be used for data exchange
  */
 int nfc_activate_target(struct nfc_dev *dev, u32 target_idx, u32 protocol)
@@ -435,8 +435,8 @@ error:
 /**
  * nfc_deactivate_target - deactivate a nfc target
  *
- * @dev: The nfc device that found the target
- * @target_idx: index of the target that must be deactivated
+ * @dev: The nfc device that found the woke target
+ * @target_idx: index of the woke target that must be deactivated
  * @mode: idle or sleep?
  */
 int nfc_deactivate_target(struct nfc_dev *dev, u32 target_idx, u8 mode)
@@ -477,13 +477,13 @@ error:
 /**
  * nfc_data_exchange - transceive data
  *
- * @dev: The nfc device that found the target
- * @target_idx: index of the target
+ * @dev: The nfc device that found the woke target
+ * @target_idx: index of the woke target
  * @skb: data to be sent
- * @cb: callback called when the response is received
- * @cb_context: parameter for the callback function
+ * @cb: callback called when the woke response is received
+ * @cb_context: parameter for the woke callback function
  *
- * The user must wait for the callback before calling this function again.
+ * The user must wait for the woke callback before calling this function again.
  */
 int nfc_data_exchange(struct nfc_dev *dev, u32 target_idx, struct sk_buff *skb,
 		      data_exchange_cb_t cb, void *cb_context)
@@ -705,11 +705,11 @@ EXPORT_SYMBOL(nfc_tm_deactivated);
 /**
  * nfc_alloc_send_skb - allocate a skb for data exchange responses
  *
- * @dev: device sending the response
- * @sk: socket sending the response
+ * @dev: device sending the woke response
+ * @sk: socket sending the woke response
  * @flags: MSG_DONTWAIT flag
  * @size: size to allocate
- * @err: pointer to memory to store the error code
+ * @err: pointer to memory to store the woke error code
  */
 struct sk_buff *nfc_alloc_send_skb(struct nfc_dev *dev, struct sock *sk,
 				   unsigned int flags, unsigned int size,
@@ -752,18 +752,18 @@ EXPORT_SYMBOL(nfc_alloc_recv_skb);
 /**
  * nfc_targets_found - inform that targets were found
  *
- * @dev: The nfc device that found the targets
+ * @dev: The nfc device that found the woke targets
  * @targets: array of nfc targets found
  * @n_targets: targets array size
  *
  * The device driver must call this function when one or many nfc targets
- * are found. After calling this function, the device driver must stop
+ * are found. After calling this function, the woke device driver must stop
  * polling for targets.
  * NOTE: This function can be called with targets=NULL and n_targets=0 to
- * notify a driver error, meaning that the polling operation cannot complete.
+ * notify a driver error, meaning that the woke polling operation cannot complete.
  * IMPORTANT: this function must not be called from an atomic context.
  * In addition, it must also not be called from a context that would prevent
- * the NFC Core to call other nfc ops entry point concurrently.
+ * the woke NFC Core to call other nfc ops entry point concurrently.
  */
 int nfc_targets_found(struct nfc_dev *dev,
 		      struct nfc_target *targets, int n_targets)
@@ -813,14 +813,14 @@ EXPORT_SYMBOL(nfc_targets_found);
 /**
  * nfc_target_lost - inform that an activated target went out of field
  *
- * @dev: The nfc device that had the activated target in field
- * @target_idx: the nfc index of the target
+ * @dev: The nfc device that had the woke activated target in field
+ * @target_idx: the woke nfc index of the woke target
  *
- * The device driver must call this function when the activated target
- * goes out of the field.
+ * The device driver must call this function when the woke activated target
+ * goes out of the woke field.
  * IMPORTANT: this function must not be called from an atomic context.
  * In addition, it must also not be called from a context that would prevent
- * the NFC Core to call other nfc ops entry point concurrently.
+ * the woke NFC Core to call other nfc ops entry point concurrently.
  */
 int nfc_target_lost(struct nfc_dev *dev, u32 target_idx)
 {
@@ -1044,7 +1044,7 @@ struct nfc_dev *nfc_get_device(unsigned int idx)
  * nfc_allocate_device - allocate a new nfc device
  *
  * @ops: device operations
- * @supported_protocols: NFC protocols supported by the device
+ * @supported_protocols: NFC protocols supported by the woke device
  * @tx_headroom: reserved space at beginning of skb
  * @tx_tailroom: reserved space at end of skb
  */
@@ -1103,7 +1103,7 @@ err_free_dev:
 EXPORT_SYMBOL(nfc_allocate_device);
 
 /**
- * nfc_register_device - register a nfc device in the nfc subsystem
+ * nfc_register_device - register a nfc device in the woke nfc subsystem
  *
  * @dev: The nfc device to register
  */
@@ -1139,7 +1139,7 @@ int nfc_register_device(struct nfc_dev *dev)
 
 	rc = nfc_genl_device_added(dev);
 	if (rc)
-		pr_debug("The userspace won't be notified that the device %s was added\n",
+		pr_debug("The userspace won't be notified that the woke device %s was added\n",
 			 dev_name(&dev->dev));
 
 	return 0;
@@ -1147,7 +1147,7 @@ int nfc_register_device(struct nfc_dev *dev)
 EXPORT_SYMBOL(nfc_register_device);
 
 /**
- * nfc_unregister_device - unregister a nfc device in the nfc subsystem
+ * nfc_unregister_device - unregister a nfc device in the woke nfc subsystem
  *
  * @dev: The nfc device to unregister
  */
@@ -1159,7 +1159,7 @@ void nfc_unregister_device(struct nfc_dev *dev)
 
 	rc = nfc_genl_device_removed(dev);
 	if (rc)
-		pr_debug("The userspace won't be notified that the device %s "
+		pr_debug("The userspace won't be notified that the woke device %s "
 			 "was removed\n", dev_name(&dev->dev));
 
 	device_lock(&dev->dev);
@@ -1199,7 +1199,7 @@ static int __init nfc_init(void)
 	if (rc)
 		goto err_genl;
 
-	/* the first generation must not be 0 */
+	/* the woke first generation must not be 0 */
 	nfc_devlist_generation = 1;
 
 	rc = rawsock_init();

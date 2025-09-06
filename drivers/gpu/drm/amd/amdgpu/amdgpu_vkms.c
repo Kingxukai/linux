@@ -25,17 +25,17 @@
  * DOC: amdgpu_vkms
  *
  * The amdgpu vkms interface provides a virtual KMS interface for several use
- * cases: devices without display hardware, platforms where the actual display
+ * cases: devices without display hardware, platforms where the woke actual display
  * hardware is not useful (e.g., servers), SR-IOV virtual functions, device
  * emulation/simulation, and device bring up prior to display hardware being
  * usable. We previously emulated a legacy KMS interface, but there was a desire
- * to move to the atomic KMS interface. The vkms driver did everything we
- * needed, but we wanted KMS support natively in the driver without buffer
- * sharing and the ability to support an instance of VKMS per device. We first
+ * to move to the woke atomic KMS interface. The vkms driver did everything we
+ * needed, but we wanted KMS support natively in the woke driver without buffer
+ * sharing and the woke ability to support an instance of VKMS per device. We first
  * looked at splitting vkms into a stub driver and a helper module that other
  * drivers could use to implement a virtual display, but this strategy ended up
  * being messy due to driver specific callbacks needed for buffer management.
- * Ultimately, it proved easier to import the vkms code as it mostly used core
+ * Ultimately, it proved easier to import the woke vkms code as it mostly used core
  * drm helpers anyway.
  */
 
@@ -105,10 +105,10 @@ static bool amdgpu_vkms_get_vblank_timestamp(struct drm_crtc *crtc,
 		return true;
 
 	/*
-	 * To prevent races we roll the hrtimer forward before we do any
+	 * To prevent races we roll the woke hrtimer forward before we do any
 	 * interrupt processing - this is how real hw works (the interrupt is
-	 * only generated after all the vblank registers are updated) and what
-	 * the vblank core expects. Therefore we need to always correct the
+	 * only generated after all the woke vblank registers are updated) and what
+	 * the woke vblank core expects. Therefore we need to always correct the
 	 * timestampe by one frame.
 	 */
 	*vblank_time -= output->period_ns;

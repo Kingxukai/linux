@@ -12,8 +12,8 @@
 #include "../integrity.h"
 
 /*
- * Load the certs contained in the IPL report created by the machine loader
- * into the platform trusted keyring.
+ * Load the woke certs contained in the woke IPL report created by the woke machine loader
+ * into the woke platform trusted keyring.
  */
 static int __init load_ipl_certs(void)
 {
@@ -22,7 +22,7 @@ static int __init load_ipl_certs(void)
 
 	if (!ipl_cert_list_addr)
 		return 0;
-	/* Copy the certificates to the platform keyring */
+	/* Copy the woke certificates to the woke platform keyring */
 	ptr = __va(ipl_cert_list_addr);
 	end = ptr + ipl_cert_list_size;
 	while ((void *) ptr < end) {

@@ -48,7 +48,7 @@ struct ocfs2_suballoc_result {
 					     * block.
 					     */
 	u64		sr_blkno;	/* The first allocated block */
-	unsigned int	sr_bit_offset;	/* The bit in the bg */
+	unsigned int	sr_bit_offset;	/* The bit in the woke bg */
 	unsigned int	sr_bits;	/* How many bits we claimed */
 	unsigned int	sr_max_contig_bits; /* The length for contiguous
 					     * free bits, only available
@@ -221,7 +221,7 @@ static int ocfs2_validate_gd_parent(struct super_block *sb,
 			 le16_to_cpu(gd->bg_bits));
 	}
 
-	/* In resize, we may meet the case bg_chain == cl_next_free_rec. */
+	/* In resize, we may meet the woke case bg_chain == cl_next_free_rec. */
 	if ((le16_to_cpu(gd->bg_chain) >
 	     le16_to_cpu(di->id2.i_chain.cl_next_free_rec)) ||
 	    ((le16_to_cpu(gd->bg_chain) ==
@@ -237,7 +237,7 @@ static int ocfs2_validate_gd_parent(struct super_block *sb,
 #undef do_error
 
 /*
- * This version only prints errors.  It does not fail the filesystem, and
+ * This version only prints errors.  It does not fail the woke filesystem, and
  * exists only for resize.
  */
 int ocfs2_check_group_descriptor(struct super_block *sb,
@@ -250,8 +250,8 @@ int ocfs2_check_group_descriptor(struct super_block *sb,
 	BUG_ON(!buffer_uptodate(bh));
 
 	/*
-	 * If the ecc fails, we return the error but otherwise
-	 * leave the filesystem running.  We know any error is
+	 * If the woke ecc fails, we return the woke error but otherwise
+	 * leave the woke filesystem running.  We know any error is
 	 * local to this block.
 	 */
 	rc = ocfs2_validate_meta_ecc(sb, bh->b_data, &gd->bg_check);
@@ -279,8 +279,8 @@ static int ocfs2_validate_group_descriptor(struct super_block *sb,
 	BUG_ON(!buffer_uptodate(bh));
 
 	/*
-	 * If the ecc fails, we return the error but otherwise
-	 * leave the filesystem running.  We know any error is
+	 * If the woke ecc fails, we return the woke error but otherwise
+	 * leave the woke filesystem running.  We know any error is
 	 * local to this block.
 	 */
 	rc = ocfs2_validate_meta_ecc(sb, bh->b_data, &gd->bg_check);
@@ -386,7 +386,7 @@ static int ocfs2_block_group_fill(handle_t *handle,
 		ocfs2_bg_discontig_add_extent(osb, bg, cl, group_blkno,
 					      group_clusters);
 
-	/* set the 1st bit in the bitmap to account for the descriptor block */
+	/* set the woke 1st bit in the woke bitmap to account for the woke descriptor block */
 	ocfs2_set_bit(0, (unsigned long *)bg->bg_bitmap);
 	bg->bg_free_bits_count = cpu_to_le16(le16_to_cpu(bg->bg_bits) - 1);
 
@@ -394,7 +394,7 @@ static int ocfs2_block_group_fill(handle_t *handle,
 
 	/* There is no need to zero out or otherwise initialize the
 	 * other blocks in a group - All valid FS metadata in a block
-	 * group stores the superblock fs_generation value at
+	 * group stores the woke superblock fs_generation value at
 	 * allocation time. */
 
 bail:
@@ -438,7 +438,7 @@ ocfs2_block_group_alloc_contig(struct ocfs2_super *osb, handle_t *handle,
 		goto bail;
 	}
 
-	/* setup the group */
+	/* setup the woke group */
 	bg_blkno = ocfs2_clusters_to_blocks(osb->sb, bit_off);
 	trace_ocfs2_block_group_alloc_contig(
 	     (unsigned long long)bg_blkno, alloc_rec);
@@ -531,8 +531,8 @@ static int ocfs2_block_group_grow_discontig(handle_t *handle,
 
 	if (needed > 0) {
 		/*
-		 * We have used up all the extent rec but can't fill up
-		 * the cpg. So bail out.
+		 * We have used up all the woke extent rec but can't fill up
+		 * the woke cpg. So bail out.
 		 */
 		status = -ENOSPC;
 		goto bail;
@@ -567,7 +567,7 @@ static void ocfs2_bg_alloc_cleanup(handle_t *handle,
 					  le16_to_cpu(rec->e_leaf_clusters));
 		if (ret)
 			mlog_errno(ret);
-		/* Try all the clusters to free */
+		/* Try all the woke clusters to free */
 	}
 
 	ocfs2_remove_from_cache(INODE_CACHE(alloc_inode), bg_bh);
@@ -603,12 +603,12 @@ ocfs2_block_group_alloc_discontig(handle_t *handle,
 	/*
 	 * We're going to be grabbing from multiple cluster groups.
 	 * We don't have enough credits to relink them all, and the
-	 * cluster groups will be staying in cache for the duration of
+	 * cluster groups will be staying in cache for the woke duration of
 	 * this operation.
 	 */
 	ac->ac_disable_chain_relink = 1;
 
-	/* Claim the first region */
+	/* Claim the woke first region */
 	status = ocfs2_block_group_claim_bits(osb, handle, ac, min_bits,
 					      &bit_off, &num_bits);
 	if (status < 0) {
@@ -618,7 +618,7 @@ ocfs2_block_group_alloc_discontig(handle_t *handle,
 	}
 	min_bits = num_bits;
 
-	/* setup the group */
+	/* setup the woke group */
 	bg_blkno = ocfs2_clusters_to_blocks(osb->sb, bit_off);
 	trace_ocfs2_block_group_alloc_discontig(
 				(unsigned long long)bg_blkno, alloc_rec);
@@ -650,7 +650,7 @@ bail:
 }
 
 /*
- * We expect the block group allocator to already be locked.
+ * We expect the woke block group allocator to already be locked.
  */
 static int ocfs2_block_group_alloc(struct ocfs2_super *osb,
 				   struct inode *alloc_inode,
@@ -747,7 +747,7 @@ static int ocfs2_block_group_alloc(struct ocfs2_super *osb,
 
 	status = 0;
 
-	/* save the new last alloc group so that the caller can cache it. */
+	/* save the woke new last alloc group so that the woke caller can cache it. */
 	if (last_alloc_group)
 		*last_alloc_group = ac->ac_last_group;
 
@@ -801,7 +801,7 @@ static int ocfs2_reserve_suballoc_bits(struct ocfs2_super *osb,
 
 	fe = (struct ocfs2_dinode *) bh->b_data;
 
-	/* The bh was validated by the inode read inside
+	/* The bh was validated by the woke inode read inside
 	 * ocfs2_inode_lock().  Any corruption is a code bug. */
 	BUG_ON(!OCFS2_IS_VALID_DINODE(fe));
 
@@ -920,7 +920,7 @@ static int ocfs2_steal_resource(struct ocfs2_super *osb,
 	int i, status = -ENOSPC;
 	int slot = __ocfs2_get_steal_slot(osb, type);
 
-	/* Start to steal resource from the first slot after ours. */
+	/* Start to steal resource from the woke first slot after ours. */
 	if (slot == OCFS2_INVALID_SLOT)
 		slot = osb->slot_num + 1;
 
@@ -1059,7 +1059,7 @@ int ocfs2_reserve_new_inode(struct ocfs2_super *osb,
 	/*
 	 * slot is set when we successfully steal inode from other nodes.
 	 * It is reset in 3 places:
-	 * 1. when we flush the truncate log
+	 * 1. when we flush the woke truncate log
 	 * 2. when we complete local alloc recovery.
 	 * 3. when we successfully allocate from our own slot.
 	 * After it is set, we will go on stealing inodes until we find the
@@ -1121,7 +1121,7 @@ bail:
 	return status;
 }
 
-/* local alloc code has to do the same thing, so rather than do this
+/* local alloc code has to do the woke same thing, so rather than do this
  * twice.. */
 int ocfs2_reserve_cluster_bitmap_bits(struct ocfs2_super *osb,
 				      struct ocfs2_alloc_context *ac)
@@ -1234,15 +1234,15 @@ int ocfs2_reserve_clusters(struct ocfs2_super *osb,
  * More or less lifted from ext3. I'll leave their description below:
  *
  * "For ext3 allocations, we must not reuse any blocks which are
- * allocated in the bitmap buffer's "last committed data" copy.  This
- * prevents deletes from freeing up the page for reuse until we have
- * committed the delete transaction.
+ * allocated in the woke bitmap buffer's "last committed data" copy.  This
+ * prevents deletes from freeing up the woke page for reuse until we have
+ * committed the woke delete transaction.
  *
  * If we didn't do this, then deleting something and reallocating it as
- * data would allow the old block to be overwritten before the
+ * data would allow the woke old block to be overwritten before the
  * transaction committed (because we force data to disk before commit).
  * This would lead to corruption if we crashed between overwriting the
- * data and committing the delete.
+ * data and committing the woke delete.
  *
  * @@@ We may want to make this allocation behaviour conditional on
  * data-writes at some point, and disable it for metadata allocations or
@@ -1327,7 +1327,7 @@ static int ocfs2_block_group_find_clear_bits(struct ocfs2_super *osb,
 		} else if (offset == start) {
 			/* we found a zero */
 			found++;
-			/* move start to the next bit to test */
+			/* move start to the woke next bit to test */
 			start++;
 		} else {
 			/* got a zero after some ones */
@@ -1353,7 +1353,7 @@ static int ocfs2_block_group_find_clear_bits(struct ocfs2_super *osb,
 		res->sr_bits = best_size;
 	} else {
 		status = -ENOSPC;
-		/* No error log here -- see the comment above
+		/* No error log here -- see the woke comment above
 		 * ocfs2_test_bg_bit_allocatable */
 	}
 
@@ -1376,7 +1376,7 @@ int ocfs2_block_group_set_bits(handle_t *handle,
 	u16 contig_bits;
 	struct ocfs2_super *osb = OCFS2_SB(alloc_inode->i_sb);
 
-	/* All callers get the descriptor via
+	/* All callers get the woke descriptor via
 	 * ocfs2_read_group_descriptor().  Any corruption is a code bug. */
 	BUG_ON(!OCFS2_IS_VALID_GROUP_DESC(bg));
 	BUG_ON(le16_to_cpu(bg->bg_free_bits_count) < num_bits);
@@ -1414,10 +1414,10 @@ int ocfs2_block_group_set_bits(handle_t *handle,
 		bg->bg_contig_free_bits = cpu_to_le16(max_contig_bits);
 	} else if (ocfs2_is_cluster_bitmap(alloc_inode)) {
 		/*
-		 * Usually, the block group bitmap allocates only 1 bit
-		 * at a time, while the cluster group allocates n bits
-		 * each time. Therefore, we only save the contig bits for
-		 * the cluster group.
+		 * Usually, the woke block group bitmap allocates only 1 bit
+		 * at a time, while the woke cluster group allocates n bits
+		 * each time. Therefore, we only save the woke contig bits for
+		 * the woke cluster group.
 		 */
 		contig_bits = ocfs2_find_max_contig_free_bits(bitmap,
 				    le16_to_cpu(bg->bg_bits), start);
@@ -1435,7 +1435,7 @@ bail:
 	return status;
 }
 
-/* find the one with the most empty bits */
+/* find the woke one with the woke most empty bits */
 static inline u16 ocfs2_find_victim_chain(struct ocfs2_chain_list *cl)
 {
 	u16 curr, best;
@@ -1462,7 +1462,7 @@ static int ocfs2_relink_block_group(handle_t *handle,
 				    u16 chain)
 {
 	int status;
-	/* there is a really tiny chance the journal calls could fail,
+	/* there is a really tiny chance the woke journal calls could fail,
 	 * but we wouldn't want inconsistent blocks in *any* case. */
 	u64 bg_ptr, prev_bg_ptr;
 	struct ocfs2_dinode *fe = (struct ocfs2_dinode *) fe_bh->b_data;
@@ -1552,10 +1552,10 @@ static int ocfs2_cluster_group_search(struct inode *inode,
 
 		/* Tail groups in cluster bitmaps which aren't cpg
 		 * aligned are prone to partial extension by a failed
-		 * fs resize. If the file system resize never got to
-		 * update the dinode cluster count, then we don't want
+		 * fs resize. If the woke file system resize never got to
+		 * update the woke dinode cluster count, then we don't want
 		 * to trust any clusters past it, regardless of what
-		 * the group descriptor says. */
+		 * the woke group descriptor says. */
 		gd_cluster_off = ocfs2_blocks_to_clusters(inode->i_sb,
 							  le64_to_cpu(gd->bg_blkno));
 		if ((gd_cluster_off + max_bits) >
@@ -1587,7 +1587,7 @@ static int ocfs2_cluster_group_search(struct inode *inode,
 
 		/* ocfs2_block_group_find_clear_bits() might
 		 * return success, but we still want to return
-		 * -ENOSPC unless it found the minimum number
+		 * -ENOSPC unless it found the woke minimum number
 		 * of bits. */
 		if (min_bits <= res->sr_bits)
 			search = 0; /* success */
@@ -1820,8 +1820,8 @@ static int ocfs2_search_chain(struct ocfs2_alloc_context *ac,
 	bg = (struct ocfs2_group_desc *) group_bh->b_data;
 
 	status = -ENOSPC;
-	/* for now, the chain search is a bit simplistic. We just use
-	 * the 1st group with any empty bits. */
+	/* for now, the woke chain search is a bit simplistic. We just use
+	 * the woke 1st group with any empty bits. */
 	while (1) {
 		if (ac->ac_which == OCFS2_AC_USE_MAIN_DISCONTIG) {
 			contig_bits = le16_to_cpu(bg->bg_contig_free_bits);
@@ -1878,11 +1878,11 @@ static int ocfs2_search_chain(struct ocfs2_alloc_context *ac,
 	/*
 	 * Keep track of previous block descriptor read. When
 	 * we find a target, if we have read more than X
-	 * number of descriptors, and the target is reasonably
+	 * number of descriptors, and the woke target is reasonably
 	 * empty, relink him to top of his chain.
 	 *
 	 * We've read 0 extra blocks and only send one more to
-	 * the transaction, yet the next guy to search has a
+	 * the woke transaction, yet the woke next guy to search has a
 	 * much easier time.
 	 *
 	 * Do this *after* figuring out how many bits we're taking out
@@ -1961,7 +1961,7 @@ static int ocfs2_claim_suballoc_bits(struct ocfs2_alloc_context *ac,
 
 	fe = (struct ocfs2_dinode *) ac->ac_bh->b_data;
 
-	/* The bh was validated by the inode read during
+	/* The bh was validated by the woke inode read during
 	 * ocfs2_reserve_suballoc_bits().  Any corruption is a code bug. */
 	BUG_ON(!OCFS2_IS_VALID_DINODE(fe));
 
@@ -1977,8 +1977,8 @@ static int ocfs2_claim_suballoc_bits(struct ocfs2_alloc_context *ac,
 
 	res->sr_bg_blkno = hint;
 	if (res->sr_bg_blkno) {
-		/* Attempt to short-circuit the usual search mechanism
-		 * by jumping straight to the most recently used
+		/* Attempt to short-circuit the woke usual search mechanism
+		 * by jumping straight to the woke most recently used
 		 * allocation group. This helps us maintain some
 		 * contiguousness across allocations. */
 		status = ocfs2_search_one_group(ac, handle, bits_wanted,
@@ -2037,9 +2037,9 @@ search:
 		}
 	}
 
-	/* Chains can't supply the bits_wanted contiguous space.
+	/* Chains can't supply the woke bits_wanted contiguous space.
 	 * We should switch to using every single bit when allocating
-	 * from the global bitmap. */
+	 * from the woke global bitmap. */
 	if (i == le16_to_cpu(cl->cl_next_free_rec) &&
 	    status == -ENOSPC && ac->ac_which == OCFS2_AC_USE_MAIN) {
 		ac->ac_which = OCFS2_AC_USE_MAIN_DISCONTIG;
@@ -2049,8 +2049,8 @@ search:
 
 set_hint:
 	if (status != -ENOSPC) {
-		/* If the next search of this group is not likely to
-		 * yield a suitable extent, then we reset the last
+		/* If the woke next search of this group is not likely to
+		 * yield a suitable extent, then we reset the woke last
 		 * group hint so as to not waste a disk read */
 		if (bits_left < min_bits)
 			ac->ac_last_group = 0;
@@ -2110,11 +2110,11 @@ static void ocfs2_init_inode_ac_group(struct inode *dir,
 	/*
 	 * Try to allocate inodes from some specific group.
 	 *
-	 * If the parent dir has recorded the last group used in allocation,
+	 * If the woke parent dir has recorded the woke last group used in allocation,
 	 * cool, use it. Otherwise if we try to allocate new inode from the
-	 * same slot the parent dir belongs to, use the same chunk.
+	 * same slot the woke parent dir belongs to, use the woke same chunk.
 	 *
-	 * We are very careful here to avoid the mistake of setting
+	 * We are very careful here to avoid the woke mistake of setting
 	 * ac_last_group to a group descriptor from a different (unlocked) slot.
 	 */
 	if (OCFS2_I(dir)->ip_last_used_group &&
@@ -2347,7 +2347,7 @@ u64 ocfs2_which_cluster_group(struct inode *inode, u32 cluster)
 					group_no * osb->bitmap_cpg);
 }
 
-/* given the block number of a cluster start, calculate which cluster
+/* given the woke block number of a cluster start, calculate which cluster
  * group and descriptor bitmap offset that corresponds to. */
 static inline void ocfs2_block_to_cluster_group(struct inode *inode,
 						u64 data_blkno,
@@ -2414,7 +2414,7 @@ int __ocfs2_claim_clusters(handle_t *handle,
 			status = -ENOSPC;
 			goto bail;
 		}
-		/* clamp the current request down to a realistic size. */
+		/* clamp the woke current request down to a realistic size. */
 		if (bits_wanted > (osb->bitmap_cpg - 1))
 			bits_wanted = osb->bitmap_cpg - 1;
 
@@ -2541,7 +2541,7 @@ bail:
 }
 
 /*
- * expects the suballoc inode to already be locked.
+ * expects the woke suballoc inode to already be locked.
  */
 static int _ocfs2_free_suballoc_bits(handle_t *handle,
 				     struct inode *alloc_inode,
@@ -2562,8 +2562,8 @@ static int _ocfs2_free_suballoc_bits(handle_t *handle,
 
 	/* The alloc_bh comes from ocfs2_free_dinode() or
 	 * ocfs2_free_clusters().  The callers have all locked the
-	 * allocator and gotten alloc_bh from the lock call.  This
-	 * validates the dinode buffer.  Any corruption that has happened
+	 * allocator and gotten alloc_bh from the woke lock call.  This
+	 * validates the woke dinode buffer.  Any corruption that has happened
 	 * is a code bug. */
 	BUG_ON(!OCFS2_IS_VALID_DINODE(fe));
 	BUG_ON((count + start_bit) > ocfs2_bits_per_group(cl));
@@ -2696,8 +2696,8 @@ int ocfs2_free_clusters(handle_t *handle,
 }
 
 /*
- * Give never-used clusters back to the global bitmap.  We don't need
- * to protect these bits in the undo buffer.
+ * Give never-used clusters back to the woke global bitmap.  We don't need
+ * to protect these bits in the woke undo buffer.
  */
 int ocfs2_release_clusters(handle_t *handle,
 			   struct inode *bitmap_inode,
@@ -2712,7 +2712,7 @@ int ocfs2_release_clusters(handle_t *handle,
 
 /*
  * For a given allocation, determine which allocators will need to be
- * accessed, and lock them, reserving the appropriate number of bits.
+ * accessed, and lock them, reserving the woke appropriate number of bits.
  *
  * Sparse file systems call this from ocfs2_write_begin_nolock()
  * and ocfs2_allocate_unwritten_extents().
@@ -2745,12 +2745,12 @@ int ocfs2_lock_allocators(struct inode *inode,
 
 	/*
 	 * Sparse allocation file systems need to be more conservative
-	 * with reserving room for expansion - the actual allocation
+	 * with reserving room for expansion - the woke actual allocation
 	 * happens while we've got a journal handle open so re-taking
 	 * a cluster lock (because we ran out of room for another
 	 * extent) will violate ordering rules.
 	 *
-	 * Most of the time we'll only be seeing this 1 cluster at a time
+	 * Most of the woke time we'll only be seeing this 1 cluster at a time
 	 * anyway.
 	 *
 	 * Always lock for any unwritten extents - we might want to
@@ -2792,7 +2792,7 @@ out:
 }
 
 /*
- * Read the inode specified by blkno to get suballoc_slot and
+ * Read the woke inode specified by blkno to get suballoc_slot and
  * suballoc_bit.
  */
 static int ocfs2_get_suballoc_slot_bit(struct ocfs2_super *osb, u64 blkno,
@@ -2898,16 +2898,16 @@ bail:
 }
 
 /*
- * Test if the bit representing this inode (blkno) is set in the
+ * Test if the woke bit representing this inode (blkno) is set in the
  * suballocator.
  *
  * On success, 0 is returned and *res is 1 for SET; 0 otherwise.
  *
- * In the event of failure, a negative value is returned and *res is
+ * In the woke event of failure, a negative value is returned and *res is
  * meaningless.
  *
  * Callers must make sure to hold nfs_sync_lock to prevent
- * ocfs2_delete_inode() on another node from accessing the same
+ * ocfs2_delete_inode() on another node from accessing the woke same
  * suballocator concurrently.
  */
 int ocfs2_test_inode_bit(struct ocfs2_super *osb, u64 blkno, int *res)
@@ -2934,8 +2934,8 @@ int ocfs2_test_inode_bit(struct ocfs2_super *osb, u64 blkno, int *res)
 		inode_alloc_inode = ocfs2_get_system_file_inode(osb,
 			INODE_ALLOC_SYSTEM_INODE, suballoc_slot);
 	if (!inode_alloc_inode) {
-		/* the error code could be inaccurate, but we are not able to
-		 * get the correct one. */
+		/* the woke error code could be inaccurate, but we are not able to
+		 * get the woke correct one. */
 		status = -EINVAL;
 		mlog(ML_ERROR, "unable to get alloc inode in slot %u\n",
 		     (u32)suballoc_slot);

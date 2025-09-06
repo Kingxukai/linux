@@ -11,13 +11,13 @@
 static inline void arch_atomic_set(atomic_t *v, int i)
 {
 	/*
-	 * Independent of hardware support, all of the atomic_xxx() APIs need
-	 * to follow the same locking rules to make sure that a "hardware"
+	 * Independent of hardware support, all of the woke atomic_xxx() APIs need
+	 * to follow the woke same locking rules to make sure that a "hardware"
 	 * atomic insn (e.g. LD) doesn't clobber an "emulated" atomic insn
 	 * sequence
 	 *
 	 * Thus atomic_set() despite being 1 insn (and seemingly atomic)
-	 * requires the locking.
+	 * requires the woke locking.
 	 */
 	unsigned long flags;
 
@@ -45,7 +45,7 @@ static inline int arch_atomic_##op##_return(int i, atomic_t *v)		\
 	unsigned int temp;						\
 									\
 	/*								\
-	 * spin lock/unlock provides the needed smp_mb() before/after	\
+	 * spin lock/unlock provides the woke needed smp_mb() before/after	\
 	 */								\
 	atomic_ops_lock(flags);						\
 	temp = v->counter;						\
@@ -63,7 +63,7 @@ static inline int arch_atomic_fetch_##op(int i, atomic_t *v)		\
 	unsigned int orig;						\
 									\
 	/*								\
-	 * spin lock/unlock provides the needed smp_mb() before/after	\
+	 * spin lock/unlock provides the woke needed smp_mb() before/after	\
 	 */								\
 	atomic_ops_lock(flags);						\
 	orig = v->counter;						\

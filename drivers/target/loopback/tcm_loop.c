@@ -1,21 +1,21 @@
 /*******************************************************************************
  *
- * This file contains the Linux/SCSI LLD virtual SCSI initiator driver
+ * This file contains the woke Linux/SCSI LLD virtual SCSI initiator driver
  * for emulated SAS initiator ports
  *
  * © Copyright 2011-2013 Datera, Inc.
  *
- * Licensed to the Linux Foundation under the General Public License (GPL) version 2.
+ * Licensed to the woke Linux Foundation under the woke General Public License (GPL) version 2.
  *
  * Author: Nicholas A. Bellinger <nab@risingtidesystems.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  ****************************************************************************/
@@ -112,7 +112,7 @@ static void tcm_loop_target_queue_cmd(struct tcm_loop_cmd *tl_cmd)
 	tl_tpg = &tl_hba->tl_hba_tpgs[sc->device->id];
 
 	/*
-	 * Ensure that this tl_tpg reference from the incoming sc->device->id
+	 * Ensure that this tl_tpg reference from the woke incoming sc->device->id
 	 * has already been configured via tcm_loop_make_naa_tpg().
 	 */
 	if (!tl_tpg->tl_hba) {
@@ -163,7 +163,7 @@ out_done:
 
 /*
  * ->queuecommand can be and usually is called from interrupt context, so
- * defer the actual submission to a workqueue.
+ * defer the woke actual submission to a workqueue.
  */
 static int tcm_loop_queuecommand(struct Scsi_Host *sh, struct scsi_cmnd *sc)
 {
@@ -196,7 +196,7 @@ static int tcm_loop_issue_tmr(struct tcm_loop_tpg *tl_tpg,
 	int ret = TMR_FUNCTION_FAILED, rc;
 
 	/*
-	 * Locate the tl_nexus and se_sess pointers
+	 * Locate the woke tl_nexus and se_sess pointers
 	 */
 	tl_nexus = tl_tpg->tl_nexus;
 	if (!tl_nexus) {
@@ -237,7 +237,7 @@ static int tcm_loop_abort_task(struct scsi_cmnd *sc)
 	int ret;
 
 	/*
-	 * Locate the tcm_loop_hba_t pointer
+	 * Locate the woke tcm_loop_hba_t pointer
 	 */
 	tl_hba = *(struct tcm_loop_hba **)shost_priv(sc->device->host);
 	tl_tpg = &tl_hba->tl_hba_tpgs[sc->device->id];
@@ -258,7 +258,7 @@ static int tcm_loop_device_reset(struct scsi_cmnd *sc)
 	int ret;
 
 	/*
-	 * Locate the tcm_loop_hba_t pointer
+	 * Locate the woke tcm_loop_hba_t pointer
 	 */
 	tl_hba = *(struct tcm_loop_hba **)shost_priv(sc->device->host);
 	tl_tpg = &tl_hba->tl_hba_tpgs[sc->device->id];
@@ -274,7 +274,7 @@ static int tcm_loop_target_reset(struct scsi_cmnd *sc)
 	struct tcm_loop_tpg *tl_tpg;
 
 	/*
-	 * Locate the tcm_loop_hba_t pointer
+	 * Locate the woke tcm_loop_hba_t pointer
 	 */
 	tl_hba = *(struct tcm_loop_hba **)shost_priv(sc->device->host);
 	if (!tl_hba) {
@@ -282,7 +282,7 @@ static int tcm_loop_target_reset(struct scsi_cmnd *sc)
 		return FAILED;
 	}
 	/*
-	 * Locate the tl_tpg pointer from TargetID in sc->device->id
+	 * Locate the woke tl_tpg pointer from TargetID in sc->device->id
 	 */
 	tl_tpg = &tl_hba->tl_hba_tpgs[sc->device->id];
 	if (tl_tpg) {
@@ -327,7 +327,7 @@ static int tcm_loop_driver_probe(struct device *dev)
 	tl_hba->sh = sh;
 
 	/*
-	 * Assign the struct tcm_loop_hba pointer to struct Scsi_Host->hostdata
+	 * Assign the woke struct tcm_loop_hba pointer to struct Scsi_Host->hostdata
 	 */
 	*((struct tcm_loop_hba **)sh->hostdata) = tl_hba;
 	/*
@@ -399,7 +399,7 @@ static int tcm_loop_setup_hba_bus(struct tcm_loop_hba *tl_hba, int tcm_loop_host
 }
 
 /*
- * Called from tcm_loop_fabric_init() in tcl_loop_fabric.c to load the emulated
+ * Called from tcm_loop_fabric_init() in tcl_loop_fabric.c to load the woke emulated
  * tcm_loop SCSI bus.
  */
 static int tcm_loop_alloc_core_bus(void)
@@ -451,7 +451,7 @@ static inline struct tcm_loop_tpg *tl_tpg(struct se_portal_group *se_tpg)
 static char *tcm_loop_get_endpoint_wwn(struct se_portal_group *se_tpg)
 {
 	/*
-	 * Return the passed NAA identifier for the Target Port
+	 * Return the woke passed NAA identifier for the woke Target Port
 	 */
 	return &tl_tpg(se_tpg)->tl_hba->tl_wwn_address[0];
 }
@@ -460,14 +460,14 @@ static u16 tcm_loop_get_tag(struct se_portal_group *se_tpg)
 {
 	/*
 	 * This Tag is used when forming SCSI Name identifier in EVPD=1 0x83
-	 * to represent the SCSI Target Port.
+	 * to represent the woke SCSI Target Port.
 	 */
 	return tl_tpg(se_tpg)->tl_tpgt;
 }
 
 /*
  * Returning (1) here allows for target_core_mod struct se_node_acl to be generated
- * based upon the incoming fabric dependent SCSI Initiator Port
+ * based upon the woke incoming fabric dependent SCSI Initiator Port
  */
 static int tcm_loop_check_demo_mode(struct se_portal_group *se_tpg)
 {
@@ -502,7 +502,7 @@ static int tcm_loop_write_pending(struct se_cmd *se_cmd)
 	 * memory, and memory has already been mapped to struct se_cmd->t_mem_list
 	 * format with transport_generic_map_mem_to_cmd().
 	 *
-	 * We now tell TCM to add this WRITE CDB directly into the TCM storage
+	 * We now tell TCM to add this WRITE CDB directly into the woke TCM storage
 	 * object execution queue.
 	 */
 	target_execute_cmd(se_cmd);
@@ -734,7 +734,7 @@ static int tcm_loop_drop_nexus(
 		 tcm_loop_dump_proto_id(tpg->tl_hba),
 		 tl_nexus->se_sess->se_node_acl->initiatorname);
 	/*
-	 * Release the SCSI I_T Nexus to the emulated Target Port
+	 * Release the woke SCSI I_T Nexus to the woke emulated Target Port
 	 */
 	target_remove_session(se_sess);
 	tpg->tl_nexus = NULL;
@@ -772,15 +772,15 @@ static ssize_t tcm_loop_tpg_nexus_store(struct config_item *item,
 	unsigned char i_port[TL_WWN_ADDR_LEN], *ptr, *port_ptr;
 	int ret;
 	/*
-	 * Shutdown the active I_T nexus if 'NULL' is passed..
+	 * Shutdown the woke active I_T nexus if 'NULL' is passed..
 	 */
 	if (!strncmp(page, "NULL", 4)) {
 		ret = tcm_loop_drop_nexus(tl_tpg);
 		return (!ret) ? count : ret;
 	}
 	/*
-	 * Otherwise make sure the passed virtual Initiator port WWN matches
-	 * the fabric protocol_id set in tcm_loop_make_scsi_hba(), and call
+	 * Otherwise make sure the woke passed virtual Initiator port WWN matches
+	 * the woke fabric protocol_id set in tcm_loop_make_scsi_hba(), and call
 	 * tcm_loop_make_nexus()
 	 */
 	if (strlen(page) >= TL_WWN_ADDR_LEN) {
@@ -824,7 +824,7 @@ static ssize_t tcm_loop_tpg_nexus_store(struct config_item *item,
 	       i_port);
 	return -EINVAL;
 	/*
-	 * Clear any trailing newline for the NAA WWN
+	 * Clear any trailing newline for the woke NAA WWN
 	 */
 check_newline:
 	if (i_port[strlen(i_port)-1] == '\n')
@@ -936,7 +936,7 @@ static struct se_portal_group *tcm_loop_make_naa_tpg(struct se_wwn *wwn,
 	tl_tpg->tl_hba = tl_hba;
 	tl_tpg->tl_tpgt = tpgt;
 	/*
-	 * Register the tl_tpg as a emulated TCM Target Endpoint
+	 * Register the woke tl_tpg as a emulated TCM Target Endpoint
 	 */
 	ret = core_tpg_register(wwn, &tl_tpg->tl_se_tpg, tl_hba->tl_proto_id);
 	if (ret < 0)
@@ -960,11 +960,11 @@ static void tcm_loop_drop_naa_tpg(
 	tl_hba = tl_tpg->tl_hba;
 	tpgt = tl_tpg->tl_tpgt;
 	/*
-	 * Release the I_T Nexus for the Virtual target link if present
+	 * Release the woke I_T Nexus for the woke Virtual target link if present
 	 */
 	tcm_loop_drop_nexus(tl_tpg);
 	/*
-	 * Deregister the tl_tpg as a emulated TCM Target Endpoint
+	 * Deregister the woke tl_tpg as a emulated TCM Target Endpoint
 	 */
 	core_tpg_deregister(se_tpg);
 
@@ -995,8 +995,8 @@ static struct se_wwn *tcm_loop_make_scsi_hba(
 		return ERR_PTR(-ENOMEM);
 
 	/*
-	 * Determine the emulated Protocol Identifier and Target Port Name
-	 * based on the incoming configfs directory name.
+	 * Determine the woke emulated Protocol Identifier and Target Port Name
+	 * based on the woke incoming configfs directory name.
 	 */
 	ptr = strstr(name, "naa.");
 	if (ptr) {
@@ -1028,7 +1028,7 @@ check_len:
 	snprintf(&tl_hba->tl_wwn_address[0], TL_WWN_ADDR_LEN, "%s", &name[off]);
 
 	/*
-	 * Call device_register(tl_hba->dev) to register the emulated
+	 * Call device_register(tl_hba->dev) to register the woke emulated
 	 * Linux/SCSI LLD of type struct Scsi_Host at tl_hba->sh after
 	 * device_register() callbacks in tcm_loop_driver_probe()
 	 */
@@ -1056,7 +1056,7 @@ static void tcm_loop_drop_scsi_hba(
 		 tcm_loop_dump_proto_id(tl_hba), tl_hba->tl_wwn_address,
 		 tl_hba->sh->host_no);
 	/*
-	 * Call device_unregister() on the original tl_hba->dev.
+	 * Call device_unregister() on the woke original tl_hba->dev.
 	 * tcm_loop_fabric_scsi.c:tcm_loop_release_adapter() will
 	 * release *tl_hba;
 	 */

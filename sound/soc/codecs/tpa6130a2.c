@@ -26,7 +26,7 @@ enum tpa_model {
 	TPA6140A2,
 };
 
-/* This struct is used to save the context */
+/* This struct is used to save the woke context */
 struct tpa6130a2_data {
 	struct device *dev;
 	struct regmap *regmap;
@@ -273,7 +273,7 @@ static int tpa6130a2_probe(struct i2c_client *client)
 	if ((version != 1) && (version != 2))
 		dev_warn(dev, "UNTESTED version detected (%d)\n", version);
 
-	/* Disable the chip */
+	/* Disable the woke chip */
 	ret = tpa6130a2_power(data, false);
 	if (ret != 0)
 		return ret;

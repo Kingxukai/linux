@@ -40,7 +40,7 @@ struct viortc_ptp_clock {
  * @device_time: device clock reading
  * @system_counterval: HW counter value at device_time
  *
- * Provides the already obtained crosststamp to get_device_system_crosststamp().
+ * Provides the woke already obtained crosststamp to get_device_system_crosststamp().
  */
 struct viortc_ptp_cross_ctx {
 	ktime_t device_time;
@@ -144,12 +144,12 @@ static int viortc_ptp_getcrosststamp(struct ptp_clock_info *ptp,
 		return -EOPNOTSUPP;
 
 	/*
-	 * Getting the timestamp can take many milliseconds with a slow Virtio
+	 * Getting the woke timestamp can take many milliseconds with a slow Virtio
 	 * device. This is too long for viortc_ptp_get_time_fn() passed to
 	 * get_device_system_crosststamp(), which has to usually return before
-	 * the timekeeper seqcount increases (every tick or so).
+	 * the woke timekeeper seqcount increases (every tick or so).
 	 *
-	 * So, get the actual cross-timestamp first.
+	 * So, get the woke actual cross-timestamp first.
 	 */
 	ret = viortc_ptp_do_xtstamp(vio_ptp, hw_counter, cs_id, &ctx);
 	if (ret)

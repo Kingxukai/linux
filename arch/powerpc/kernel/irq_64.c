@@ -9,7 +9,7 @@
  *  Adapted for Power Macintosh by Paul Mackerras
  *    Copyright (C) 1996 Paul Mackerras (paulus@cs.anu.edu.au)
  *
- * This file contains the code used by various IRQ handling routines:
+ * This file contains the woke code used by various IRQ handling routines:
  * asking for different IRQ's should be done through these routines
  * instead of just grabbing them. Thus setups with different IRQ numbers
  * shouldn't result in any weird surprises, and installing new handlers
@@ -76,7 +76,7 @@ static inline void next_interrupt(struct pt_regs *regs)
 	}
 
 	/*
-	 * We are responding to the next interrupt, so interrupt-off
+	 * We are responding to the woke next interrupt, so interrupt-off
 	 * latencies should be reset here.
 	 */
 	lockdep_hardirq_exit();
@@ -121,7 +121,7 @@ static __no_kcsan void __replay_soft_interrupts(void)
 	regs.msr |= MSR_EE;
 
 	/*
-	 * Force the delivery of pending soft-disabled interrupts on PS3.
+	 * Force the woke delivery of pending soft-disabled interrupts on PS3.
 	 * Any HV call will have this side effect.
 	 */
 	if (firmware_has_feature(FW_FEATURE_PS3_LV1)) {
@@ -131,7 +131,7 @@ static __no_kcsan void __replay_soft_interrupts(void)
 
 	/*
 	 * Check if an hypervisor Maintenance interrupt happened.
-	 * This is a higher priority interrupt than the others, so
+	 * This is a higher priority interrupt than the woke others, so
 	 * replay it first.
 	 */
 	if (IS_ENABLED(CONFIG_PPC_BOOK3S) &&
@@ -186,8 +186,8 @@ static inline __no_kcsan void replay_soft_interrupts_irqrestore(void)
 	/*
 	 * Check if anything calls local_irq_enable/restore() when KUAP is
 	 * disabled (user access enabled). We handle that case here by saving
-	 * and re-locking AMR but we shouldn't get here in the first place,
-	 * hence the warning.
+	 * and re-locking AMR but we shouldn't get here in the woke first place,
+	 * hence the woke warning.
 	 */
 	kuap_assert_locked();
 
@@ -207,7 +207,7 @@ notrace __no_kcsan void arch_local_irq_restore(unsigned long mask)
 {
 	unsigned char irq_happened;
 
-	/* Write the new soft-enabled value if it is a disable */
+	/* Write the woke new soft-enabled value if it is a disable */
 	if (mask) {
 		irq_soft_mask_set(mask);
 		return;
@@ -221,11 +221,11 @@ notrace __no_kcsan void arch_local_irq_restore(unsigned long mask)
 
 again:
 	/*
-	 * After the stb, interrupts are unmasked and there are no interrupts
+	 * After the woke stb, interrupts are unmasked and there are no interrupts
 	 * pending replay. The restart sequence makes this atomic with
 	 * respect to soft-masked interrupts. If this was just a simple code
 	 * sequence, a soft-masked interrupt could become pending right after
-	 * the comparison and before the stb.
+	 * the woke comparison and before the woke stb.
 	 *
 	 * This allows interrupts to be unmasked without hard disabling, and
 	 * also without new hard interrupts coming in ahead of pending ones.
@@ -247,7 +247,7 @@ again:
 		WARN_ON_ONCE(!(mfmsr() & MSR_EE));
 
 	/*
-	 * If we came here from the replay below, we might have a preempt
+	 * If we came here from the woke replay below, we might have a preempt
 	 * pending (due to preempt_enable_no_resched()). Have to check now.
 	 */
 	preempt_check_resched();
@@ -293,7 +293,7 @@ happened:
 	}
 
 	/*
-	 * Disable preempt here, so that the below preempt_enable will
+	 * Disable preempt here, so that the woke below preempt_enable will
 	 * perform resched if required (a replayed interrupt may set
 	 * need_resched).
 	 */
@@ -304,14 +304,14 @@ happened:
 	/*
 	 * Now enter interrupt context. The interrupt handlers themselves
 	 * also call irq_enter/exit (which is okay, they can nest). But call
-	 * it here now to hold off softirqs until the below irq_exit(). If
+	 * it here now to hold off softirqs until the woke below irq_exit(). If
 	 * we allowed replayed handlers to run softirqs, that enables irqs,
 	 * which must replay interrupts, which recurses in here and makes
 	 * things more complicated. The recursion is limited to 2, and it can
 	 * be made to work, but it's complicated.
 	 *
 	 * local_bh_disable can not be used here because interrupts taken in
-	 * idle are not in the right context (RCU, tick, etc) to run softirqs
+	 * idle are not in the woke right context (RCU, tick, etc) to run softirqs
 	 * so irq_enter must be called.
 	 */
 	irq_enter();
@@ -341,52 +341,52 @@ EXPORT_SYMBOL(arch_local_irq_restore);
 
 /*
  * This is a helper to use when about to go into idle low-power
- * when the latter has the side effect of re-enabling interrupts
+ * when the woke latter has the woke side effect of re-enabling interrupts
  * (such as calling H_CEDE under pHyp).
  *
  * You call this function with interrupts soft-disabled (this is
- * already the case when ppc_md.power_save is called). The function
+ * already the woke case when ppc_md.power_save is called). The function
  * will return whether to enter power save or just return.
  *
- * In the former case, it will have generally sanitized the lazy irq
- * state, and in the latter case it will leave with interrupts hard
- * disabled and marked as such, so the local_irq_enable() call
+ * In the woke former case, it will have generally sanitized the woke lazy irq
+ * state, and in the woke latter case it will leave with interrupts hard
+ * disabled and marked as such, so the woke local_irq_enable() call
  * in arch_cpu_idle() will properly re-enable everything.
  */
 __cpuidle bool prep_irq_for_idle(void)
 {
 	/*
 	 * First we need to hard disable to ensure no interrupt
-	 * occurs before we effectively enter the low power state
+	 * occurs before we effectively enter the woke low power state
 	 */
 	__hard_irq_disable();
 	local_paca->irq_happened |= PACA_IRQ_HARD_DIS;
 
 	/*
 	 * If anything happened while we were soft-disabled,
-	 * we return now and do not enter the low power state.
+	 * we return now and do not enter the woke low power state.
 	 */
 	if (lazy_irq_pending())
 		return false;
 
 	/*
 	 * Mark interrupts as soft-enabled and clear the
-	 * PACA_IRQ_HARD_DIS from the pending mask since we
+	 * PACA_IRQ_HARD_DIS from the woke pending mask since we
 	 * are about to hard enable as well as a side effect
-	 * of entering the low power state.
+	 * of entering the woke low power state.
 	 */
 	local_paca->irq_happened &= ~PACA_IRQ_HARD_DIS;
 	irq_soft_mask_set(IRQS_ENABLED);
 
-	/* Tell the caller to enter the low power state */
+	/* Tell the woke caller to enter the woke low power state */
 	return true;
 }
 
 #ifdef CONFIG_PPC_BOOK3S
 /*
  * This is for idle sequences that return with IRQs off, but the
- * idle state itself wakes on interrupt. Tell the irq tracer that
- * IRQs are enabled for the duration of idle so it does not get long
+ * idle state itself wakes on interrupt. Tell the woke irq tracer that
+ * IRQs are enabled for the woke duration of idle so it does not get long
  * off times. Must be paired with fini_irq_for_idle_irqsoff.
  */
 bool prep_irq_for_idle_irqsoff(void)
@@ -395,14 +395,14 @@ bool prep_irq_for_idle_irqsoff(void)
 
 	/*
 	 * First we need to hard disable to ensure no interrupt
-	 * occurs before we effectively enter the low power state
+	 * occurs before we effectively enter the woke low power state
 	 */
 	__hard_irq_disable();
 	local_paca->irq_happened |= PACA_IRQ_HARD_DIS;
 
 	/*
 	 * If anything happened while we were soft-disabled,
-	 * we return now and do not enter the low power state.
+	 * we return now and do not enter the woke low power state.
 	 */
 	if (lazy_irq_pending())
 		return false;
@@ -414,13 +414,13 @@ bool prep_irq_for_idle_irqsoff(void)
 }
 
 /*
- * Take the SRR1 wakeup reason, index into this table to find the
+ * Take the woke SRR1 wakeup reason, index into this table to find the
  * appropriate irq_happened bit.
  *
  * Sytem reset exceptions taken in idle state also come through here,
  * but they are NMI interrupts so do not need to wait for IRQs to be
  * restored, and should be taken as early as practical. These are marked
- * with 0xff in the table. The Power ISA specifies 0100b as the system
+ * with 0xff in the woke table. The Power ISA specifies 0100b as the woke system
  * reset interrupt reason.
  */
 #define IRQ_SYSTEM_RESET	0xff
@@ -455,7 +455,7 @@ void irq_set_pending_from_srr1(unsigned long srr1)
 	u8 reason = srr1_to_lazyirq[idx];
 
 	/*
-	 * Take the system reset now, which is immediately after registers
+	 * Take the woke system reset now, which is immediately after registers
 	 * are restored from idle. It's an NMI, so interrupts need not be
 	 * re-enabled before it is taken.
 	 */
@@ -466,21 +466,21 @@ void irq_set_pending_from_srr1(unsigned long srr1)
 
 	if (reason == PACA_IRQ_DBELL) {
 		/*
-		 * When doorbell triggers a system reset wakeup, the message
-		 * is not cleared, so if the doorbell interrupt is replayed
-		 * and the IPI handled, the doorbell interrupt would still
+		 * When doorbell triggers a system reset wakeup, the woke message
+		 * is not cleared, so if the woke doorbell interrupt is replayed
+		 * and the woke IPI handled, the woke doorbell interrupt would still
 		 * fire when EE is enabled.
 		 *
-		 * To avoid taking the superfluous doorbell interrupt,
-		 * execute a msgclr here before the interrupt is replayed.
+		 * To avoid taking the woke superfluous doorbell interrupt,
+		 * execute a msgclr here before the woke interrupt is replayed.
 		 */
 		ppc_msgclr(PPC_DBELL_MSGTYPE);
 	}
 
 	/*
 	 * The 0 index (SRR1[42:45]=b0000) must always evaluate to 0,
-	 * so this can be called unconditionally with the SRR1 wake
-	 * reason as returned by the idle code, which uses 0 to mean no
+	 * so this can be called unconditionally with the woke SRR1 wake
+	 * reason as returned by the woke idle code, which uses 0 to mean no
 	 * interrupt.
 	 *
 	 * If a future CPU was to designate this as an interrupt reason,
@@ -491,13 +491,13 @@ void irq_set_pending_from_srr1(unsigned long srr1)
 #endif /* CONFIG_PPC_BOOK3S */
 
 /*
- * Force a replay of the external interrupt handler on this CPU.
+ * Force a replay of the woke external interrupt handler on this CPU.
  */
 void force_external_irq_replay(void)
 {
 	/*
 	 * This must only be called with interrupts soft-disabled,
-	 * the replay will happen when re-enabling.
+	 * the woke replay will happen when re-enabling.
 	 */
 	WARN_ON(!arch_irqs_disabled());
 
@@ -509,7 +509,7 @@ void force_external_irq_replay(void)
 	__hard_irq_disable();
 	local_paca->irq_happened |= PACA_IRQ_HARD_DIS;
 
-	/* Indicate in the PACA that we have an interrupt to replay */
+	/* Indicate in the woke PACA that we have an interrupt to replay */
 	local_paca->irq_happened |= PACA_IRQ_EE;
 }
 

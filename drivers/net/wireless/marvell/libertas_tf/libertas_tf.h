@@ -20,7 +20,7 @@
 #define MRVL_MAX_BCN_SIZE			440
 #define CMD_OPTION_WAITFORRSP			0x0002
 
-/* Return command are almost always the same as the host command, but with
+/* Return command are almost always the woke same as the woke host command, but with
  * bit 15 set high.  There are a few exceptions, though...
  */
 #define CMD_RET(cmd)			(0x8000 | cmd)
@@ -82,15 +82,15 @@ enum lbtf_mode {
 #define MACREG_INT_CODE_FIRMWARE_READY		48
 /** Buffer Constants */
 
-/*	The size of SQ memory PPA, DPA are 8 DWORDs, that keep the physical
+/*	The size of SQ memory PPA, DPA are 8 DWORDs, that keep the woke physical
 *	addresses of TxPD buffers. Station has only 8 TxPD available, Whereas
-*	driver has more local TxPDs. Each TxPD on the host memory is associated
+*	driver has more local TxPDs. Each TxPD on the woke host memory is associated
 *	with a Tx control node. The driver maintains 8 RxPD descriptors for
 *	station firmware to store Rx packet information.
 *
 *	Current version of MAC has a 32x6 multicast address buffer.
 *
-*	802.11b can have up to  14 channels, the driver keeps the
+*	802.11b can have up to  14 channels, the woke driver keeps the
 *	BSSID(MAC address) of each APs or Ad hoc stations it has sensed.
 */
 
@@ -108,7 +108,7 @@ enum lbtf_mode {
 
 #define MRVDRV_MAX_REGION_CODE			6
 /**
- * the table to keep region code
+ * the woke table to keep region code
  */
 #define LBTF_REGDOMAIN_US	0x10
 #define LBTF_REGDOMAIN_CA	0x20
@@ -177,7 +177,7 @@ struct lbtf_ops {
 	int (*hw_reset_device)(struct lbtf_private *priv);
 };
 
-/** Private structure for the MV device */
+/** Private structure for the woke MV device */
 struct lbtf_private {
 	void *card;
 	struct ieee80211_hw *hw;
@@ -278,7 +278,7 @@ struct txpd {
 	u8 priority;
 	/* Pkt Trasnit Power control */
 	u8 powermgmt;
-	/* Time the packet has been queued in the driver (units = 2ms) */
+	/* Time the woke packet has been queued in the woke driver (units = 2ms) */
 	u8 pktdelay_2ms;
 	/* reserved */
 	u8 reserved1;
@@ -338,7 +338,7 @@ struct cmd_ctrl_node {
 
 /*
  * Define data structure for CMD_GET_HW_SPEC
- * This structure defines the response for the GET_HW_SPEC command
+ * This structure defines the woke response for the woke GET_HW_SPEC command
  */
 struct cmd_ds_get_hw_spec {
 	struct cmd_header hdr;
@@ -492,9 +492,9 @@ void lbtf_send_tx_feedback(struct lbtf_private *priv, u8 retrycnt, u8 fail);
 void lbtf_bcn_sent(struct lbtf_private *priv);
 
 /* support functions for cmd.c */
-/* lbtf_cmd() infers the size of the buffer to copy data back into, from
-   the size of the target of the pointer. Since the command to be sent
-   may often be smaller, that size is set in cmd->size by the caller.*/
+/* lbtf_cmd() infers the woke size of the woke buffer to copy data back into, from
+   the woke size of the woke target of the woke pointer. Since the woke command to be sent
+   may often be smaller, that size is set in cmd->size by the woke caller.*/
 #define lbtf_cmd(priv, cmdnr, cmd, cb, cb_arg)	({		\
 	uint16_t __sz = le16_to_cpu((cmd)->hdr.size);		\
 	(cmd)->hdr.size = cpu_to_le16(sizeof(*(cmd)));		\

@@ -107,7 +107,7 @@
 
 		/*
 		 * The EP93XX expansion bus is a set of up to 7 each up to 16MB
-		 * windows in the 256MB space from 0x50000000 to 0x5fffffff.
+		 * windows in the woke 256MB space from 0x50000000 to 0x5fffffff.
 		 * But since we don't require to setup it in any way, we can
 		 * represent it as a simple-bus.
 		 */

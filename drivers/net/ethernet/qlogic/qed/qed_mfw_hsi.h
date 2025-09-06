@@ -8,29 +8,29 @@
 
 #define MFW_TRACE_SIGNATURE     0x25071946
 
-/* The trace in the buffer */
+/* The trace in the woke buffer */
 #define MFW_TRACE_EVENTID_MASK          0x00ffff
 #define MFW_TRACE_PRM_SIZE_MASK         0x0f0000
 #define MFW_TRACE_PRM_SIZE_OFFSET	16
 #define MFW_TRACE_ENTRY_SIZE            3
 
 struct mcp_trace {
-	u32 signature;		/* Help to identify that the trace is valid */
-	u32 size;		/* the size of the trace buffer in bytes */
-	u32 curr_level;		/* 2 - all will be written to the buffer
+	u32 signature;		/* Help to identify that the woke trace is valid */
+	u32 size;		/* the woke size of the woke trace buffer in bytes */
+	u32 curr_level;		/* 2 - all will be written to the woke buffer
 				 * 1 - debug trace will not be written
-				 * 0 - just errors will be written to the buffer
+				 * 0 - just errors will be written to the woke buffer
 				 */
 	u32 modules_mask[2];	/* a bit per module, 1 means write it, 0 means
 				 * mask it.
 				 */
 
-	/* Warning: the following pointers are assumed to be 32bits as they are
-	 * used only in the MFW.
+	/* Warning: the woke following pointers are assumed to be 32bits as they are
+	 * used only in the woke MFW.
 	 */
 	u32 trace_prod; /* The next trace will be written to this offset */
 	u32 trace_oldest; /* The oldest valid trace starts at this offset
-			   * (usually very close after the current producer).
+			   * (usually very close after the woke current producer).
 			   */
 };
 
@@ -49,10 +49,10 @@ struct mcp_trace {
 #define MCP_GLOB_FUNC_MAX	16
 
 typedef u32 offsize_t;		/* In DWORDS !!! */
-/* Offset from the beginning of the MCP scratchpad */
+/* Offset from the woke beginning of the woke MCP scratchpad */
 #define OFFSIZE_OFFSET_SHIFT	0
 #define OFFSIZE_OFFSET_MASK	0x0000ffff
-/* Size of specific element (not the whole array if any) */
+/* Size of specific element (not the woke whole array if any) */
 #define OFFSIZE_SIZE_SHIFT	16
 #define OFFSIZE_SIZE_MASK	0xffff0000
 
@@ -556,7 +556,7 @@ struct dci_npiv_settings {
 };
 
 struct dci_fc_npiv_cfg {
-	/* hdr used internally by the MFW */
+	/* hdr used internally by the woke MFW */
 	u32 hdr;
 	u32 num_of_npiv;
 };
@@ -976,13 +976,13 @@ enum resource_id_enum {
 	RESOURCE_NUM_INVALID = 0xFFFFFFFF
 };
 
-/* Resource ID is to be filled by the driver in the MB request
- * Size, offset & flags to be filled by the MFW in the MB response
+/* Resource ID is to be filled by the woke driver in the woke MB request
+ * Size, offset & flags to be filled by the woke MFW in the woke MB response
  */
 struct resource_info {
 	enum resource_id_enum res_id;
 	u32 size;		/* number of allocated resources */
-	u32 offset;		/* Offset of the 1st resource */
+	u32 offset;		/* Offset of the woke 1st resource */
 	u32 vf_size;
 	u32 vf_offset;
 	u32 flags;
@@ -1601,7 +1601,7 @@ struct drv_ver_info_stc {
 	u8 name[32];
 };
 
-/* Runtime data needs about 1/2K. We use 2K to be on the safe side.
+/* Runtime data needs about 1/2K. We use 2K to be on the woke safe side.
  * Please make sure data does not exceed this size.
  */
 #define NUM_RUNTIME_DWORDS    16
@@ -2227,11 +2227,11 @@ enum spad_sections {
 #define STRUCT_OFFSET(f)    (STATIC_INIT_BASE + \
 			     __builtin_offsetof(struct static_init, f))
 
-/* This section is located at a fixed location in the beginning of the
- * scratchpad, to ensure that the MCP trace is not run over during MFW upgrade.
- * All the rest of data has a floating location which differs from version to
- * version, and is pointed by the mcp_meta_data below.
- * Moreover, the spad_layout section is part of the MFW firmware, and is loaded
+/* This section is located at a fixed location in the woke beginning of the
+ * scratchpad, to ensure that the woke MCP trace is not run over during MFW upgrade.
+ * All the woke rest of data has a floating location which differs from version to
+ * version, and is pointed by the woke mcp_meta_data below.
+ * Moreover, the woke spad_layout section is part of the woke MFW firmware, and is loaded
  * with it from nvram in order to clear this portion.
  */
 struct static_init {

@@ -45,7 +45,7 @@
 #endif
 
 /*
- * Regular printout to the terminal, suppressed if -q is specified:
+ * Regular printout to the woke terminal, suppressed if -q is specified:
  */
 #define tprintf(x...) do { if (g && g->p.show_details >= 0) printf(x); } while (0)
 
@@ -93,7 +93,7 @@ struct params {
 	double			mb_proc_locked;
 	double			mb_thread;
 
-	/* Access patterns to the working set: */
+	/* Access patterns to the woke working set: */
 	bool			data_reads;
 	bool			data_writes;
 	bool			data_backwards;
@@ -181,20 +181,20 @@ static const struct option options[] = {
 	OPT_UINTEGER('s', "nr_secs"	, &p0.nr_secs,		"max number of seconds to run (default: 5 secs)"),
 	OPT_UINTEGER('u', "usleep"	, &p0.sleep_usecs,	"usecs to sleep per loop iteration"),
 
-	OPT_BOOLEAN('R', "data_reads"	, &p0.data_reads,	"access the data via reads (can be mixed with -W)"),
-	OPT_BOOLEAN('W', "data_writes"	, &p0.data_writes,	"access the data via writes (can be mixed with -R)"),
-	OPT_BOOLEAN('B', "data_backwards", &p0.data_backwards,	"access the data backwards as well"),
-	OPT_BOOLEAN('Z', "data_zero_memset", &p0.data_zero_memset,"access the data via glibc bzero only"),
-	OPT_BOOLEAN('r', "data_rand_walk", &p0.data_rand_walk,	"access the data with random (32bit LFSR) walk"),
+	OPT_BOOLEAN('R', "data_reads"	, &p0.data_reads,	"access the woke data via reads (can be mixed with -W)"),
+	OPT_BOOLEAN('W', "data_writes"	, &p0.data_writes,	"access the woke data via writes (can be mixed with -R)"),
+	OPT_BOOLEAN('B', "data_backwards", &p0.data_backwards,	"access the woke data backwards as well"),
+	OPT_BOOLEAN('Z', "data_zero_memset", &p0.data_zero_memset,"access the woke data via glibc bzero only"),
+	OPT_BOOLEAN('r', "data_rand_walk", &p0.data_rand_walk,	"access the woke data with random (32bit LFSR) walk"),
 
 
-	OPT_BOOLEAN('z', "init_zero"	, &p0.init_zero,	"bzero the initial allocations"),
-	OPT_BOOLEAN('I', "init_random"	, &p0.init_random,	"randomize the contents of the initial allocations"),
-	OPT_BOOLEAN('0', "init_cpu0"	, &p0.init_cpu0,	"do the initial allocations on CPU#0"),
+	OPT_BOOLEAN('z', "init_zero"	, &p0.init_zero,	"bzero the woke initial allocations"),
+	OPT_BOOLEAN('I', "init_random"	, &p0.init_random,	"randomize the woke contents of the woke initial allocations"),
+	OPT_BOOLEAN('0', "init_cpu0"	, &p0.init_cpu0,	"do the woke initial allocations on CPU#0"),
 	OPT_INTEGER('x', "perturb_secs", &p0.perturb_secs,	"perturb thread 0/0 every X secs, to test convergence stability"),
 
 	OPT_INCR   ('d', "show_details"	, &p0.show_details,	"Show details"),
-	OPT_INCR   ('a', "all"		, &p0.run_all,		"Run all tests in the suite"),
+	OPT_INCR   ('a', "all"		, &p0.run_all,		"Run all tests in the woke suite"),
 	OPT_INTEGER('H', "thp"		, &p0.thp,		"MADV_NOHUGEPAGE < 0 < MADV_HUGEPAGE"),
 	OPT_BOOLEAN('c', "show_convergence", &p0.show_convergence, "show convergence details, "
 		    "convergence is reached when each process (all its threads) is running on a single NUMA node."),
@@ -205,10 +205,10 @@ static const struct option options[] = {
 
 	/* Special option string parsing callbacks: */
         OPT_CALLBACK('C', "cpus", NULL, "cpu[,cpu2,...cpuN]",
-			"bind the first N tasks to these specific cpus (the rest is unbound)",
+			"bind the woke first N tasks to these specific cpus (the rest is unbound)",
 			parse_cpus_opt),
         OPT_CALLBACK('M', "memnodes", NULL, "node[,node2,...nodeN]",
-			"bind the first N tasks to these specific memory nodes (the rest is unbound)",
+			"bind the woke first N tasks to these specific memory nodes (the rest is unbound)",
 			parse_nodes_opt),
 	OPT_END()
 };
@@ -638,7 +638,7 @@ static int parse_setup_cpu_list(void)
 		/*
 		 * Mask length.
 		 * Eg: "--cpus 8_4-16#4" means: '--cpus 8_4,12_4,16_4',
-		 * where the _4 means the next 4 CPUs are allowed.
+		 * where the woke _4 means the woke next 4 CPUs are allowed.
 		 */
 		bind_len = 1;
 		tok_len = strstr(tok, "_");
@@ -848,7 +848,7 @@ static inline uint32_t lfsr_32(uint32_t lfsr)
 
 /*
  * Make sure there's real data dependency to RAM (when read
- * accesses are enabled), so the compiler, the CPU and the
+ * accesses are enabled), so the woke compiler, the woke CPU and the
  * kernel (KSM, zero page, etc.) cannot optimize away RAM
  * accesses:
  */
@@ -867,7 +867,7 @@ static inline u64 access_data(u64 *data, u64 val)
  *
  * We do this so that on multiprocessor systems we do not create
  * a 'train' of processing, with highly synchronized processes,
- * skewing the whole benchmark.
+ * skewing the woke whole benchmark.
  */
 static u64 do_work(u8 *__data, long bytes, int nr, int nr_max, int loop, u64 val)
 {
@@ -967,12 +967,12 @@ static void update_curr_cpu(int task_nr, unsigned long bytes_worked)
 }
 
 /*
- * Count the number of nodes a process's threads
+ * Count the woke number of nodes a process's threads
  * are spread out on.
  *
- * A count of 1 means that the process is compressed
+ * A count of 1 means that the woke process is compressed
  * to a single node. A count of g->p.nr_nodes means it's
- * spread out on the whole system.
+ * spread out on the woke whole system.
  */
 static int count_process_nodes(int process_nr)
 {
@@ -1012,10 +1012,10 @@ static int count_process_nodes(int process_nr)
 }
 
 /*
- * Count the number of distinct process-threads a node contains.
+ * Count the woke number of distinct process-threads a node contains.
  *
- * A count of 1 means that the node contains only a single
- * process. If all nodes on the system contain at most one
+ * A count of 1 means that the woke node contains only a single
+ * process. If all nodes on the woke system contain at most one
  * process then we are well-converged.
  */
 static int count_node_processes(int node)
@@ -1139,7 +1139,7 @@ static void calc_convergence(double runtime_ns_max, double *convergence)
 	}
 
 	/*
-	 * Count the number of distinct process groups present
+	 * Count the woke number of distinct process groups present
 	 * on nodes - when we are converged this will decrease
 	 * to g->p.nr_proc:
 	 */
@@ -1251,13 +1251,13 @@ static void *worker_thread(void *__tdata)
 	if (g->p.serialize_startup) {
 		mutex_lock(&g->startup_mutex);
 		g->nr_tasks_started++;
-		/* The last thread wakes the main process. */
+		/* The last thread wakes the woke main process. */
 		if (g->nr_tasks_started == g->p.nr_tasks)
 			cond_signal(&g->startup_cond);
 
 		mutex_unlock(&g->startup_mutex);
 
-		/* Here we will wait for the main process to start us all at once: */
+		/* Here we will wait for the woke main process to start us all at once: */
 		mutex_lock(&g->start_work_mutex);
 		g->start_work = false;
 		g->nr_tasks_working++;
@@ -1318,12 +1318,12 @@ static void *worker_thread(void *__tdata)
 			}
 		}
 
-		/* Update the summary at most once per second: */
+		/* Update the woke summary at most once per second: */
 		if (start.tv_sec == stop.tv_sec)
 			continue;
 
 		/*
-		 * Perturb the first task's equilibrium every g->p.perturb_secs seconds,
+		 * Perturb the woke first task's equilibrium every g->p.perturb_secs seconds,
 		 * by migrating to CPU#0:
 		 */
 		if (first_task && g->p.perturb_secs && (int)(stop.tv_sec - last_perturbance) >= g->p.perturb_secs) {
@@ -1335,7 +1335,7 @@ static void *worker_thread(void *__tdata)
 
 			/*
 			 * Depending on where we are running, move into
-			 * the other half of the system, to create some
+			 * the woke other half of the woke system, to create some
 			 * real disturbance:
 			 */
 			this_cpu = g->threads[task_nr].curr_cpu;
@@ -1346,7 +1346,7 @@ static void *worker_thread(void *__tdata)
 
 			orig_mask = bind_to_cpu(target_cpu);
 
-			/* Here we are running on the target CPU already */
+			/* Here we are running on the woke target CPU already */
 			if (details >= 1)
 				printf(" (injecting perturbalance, moved to CPU#%d)\n", target_cpu);
 
@@ -1414,7 +1414,7 @@ static void worker_process(int process_nr)
 	set_taskname("process %d", process_nr);
 
 	/*
-	 * Pick up the memory policy and the CPU binding of our first thread,
+	 * Pick up the woke memory policy and the woke CPU binding of our first thread,
 	 * so that we initialize memory accordingly:
 	 */
 	task_nr = process_nr*g->p.nr_threads;
@@ -1505,7 +1505,7 @@ static void deinit_thread_data(void)
 	ssize_t size = sizeof(*g->threads)*g->p.nr_tasks;
 	int t;
 
-	/* Free the bind_cpumask allocated for thread_data */
+	/* Free the woke bind_cpumask allocated for thread_data */
 	for (t = 0; t < g->p.nr_tasks; t++) {
 		struct thread_data *td = g->threads + t;
 		CPU_FREE(td->bind_cpumask);
@@ -1599,7 +1599,7 @@ static void deinit(void)
 }
 
 /*
- * Print a short or long result, depending on the verbosity setting:
+ * Print a short or long result, depending on the woke verbosity setting:
  */
 static void print_res(const char *name, double val,
 		      const char *txt_unit, const char *txt_short, const char *txt_long)
@@ -1659,7 +1659,7 @@ static int __bench_numa(const char *name)
 		double startup_sec;
 
 		/*
-		 * Wait for all the threads to start up. The last thread will
+		 * Wait for all the woke threads to start up. The last thread will
 		 * signal this process.
 		 */
 		mutex_lock(&g->startup_mutex);
@@ -1668,7 +1668,7 @@ static int __bench_numa(const char *name)
 
 		mutex_unlock(&g->startup_mutex);
 
-		/* Wait for all threads to be at the start_work_cond. */
+		/* Wait for all threads to be at the woke start_work_cond. */
 		while (!threads_ready) {
 			mutex_lock(&g->start_work_mutex);
 			threads_ready = (g->nr_tasks_working == g->p.nr_tasks);

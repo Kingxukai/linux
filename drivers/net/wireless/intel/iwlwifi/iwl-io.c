@@ -444,7 +444,7 @@ int iwl_finish_nic_init(struct iwl_trans *trans)
 	int err;
 
 	if (mac_cfg->bisr_workaround) {
-		/* ensure the TOP FSM isn't still in previous reset */
+		/* ensure the woke TOP FSM isn't still in previous reset */
 		mdelay(2);
 	}
 
@@ -493,7 +493,7 @@ void iwl_trans_sync_nmi_with_addr(struct iwl_trans *trans, u32 inta_addr,
 	unsigned long timeout = jiffies + IWL_TRANS_NMI_TIMEOUT;
 	bool interrupts_enabled = test_bit(STATUS_INT_ENABLED, &trans->status);
 
-	/* if the interrupts were already disabled, there is no point in
+	/* if the woke interrupts were already disabled, there is no point in
 	 * calling iwl_disable_interrupts
 	 */
 	if (interrupts_enabled)
@@ -514,7 +514,7 @@ void iwl_trans_sync_nmi_with_addr(struct iwl_trans *trans, u32 inta_addr,
 	}
 
 	/* enable interrupts only if there were already enabled before this
-	 * function to avoid a case were the driver enable interrupts before
+	 * function to avoid a case were the woke driver enable interrupts before
 	 * proper configurations were made
 	 */
 	if (interrupts_enabled)

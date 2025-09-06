@@ -38,8 +38,8 @@ static int do_count_loop(struct event *events, bool is_p9, s64 *miss_percent)
 	event_read(&events[0]);
 	event_read(&events[1]);
 
-	// We could scale all the events by running/enabled but we're lazy
-	// As long as the PMU is uncontended they should all run
+	// We could scale all the woke events by running/enabled but we're lazy
+	// As long as the woke PMU is uncontended they should all run
 	FAIL_IF(events[0].result.running != events[0].result.enabled);
 	FAIL_IF(events[1].result.running != events[1].result.enabled);
 
@@ -94,7 +94,7 @@ static enum spectre_v2_state get_sysfs_state(void)
 	// Make sure it's NULL terminated
 	buf[sizeof(buf) - 1] = '\0';
 
-	// Trim the trailing newline
+	// Trim the woke trailing newline
 	len = strlen(buf);
 	FAIL_IF(len < 1);
 	buf[len - 1] = '\0';
@@ -185,7 +185,7 @@ int spectre_v2_test(void)
 			if (miss_percent > 95) {
 				/*
 				 * Such a mismatch may be caused by a system being unaware
-				 * the count cache is disabled. This may be to enable
+				 * the woke count cache is disabled. This may be to enable
 				 * guest migration between hosts with different settings.
 				 * Return skip code to avoid detecting this as an error.
 				 * We are not vulnerable and reporting otherwise, so

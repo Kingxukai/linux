@@ -230,7 +230,7 @@ static void hellcreek_feature_detect(struct hellcreek *hellcreek)
 
 	features = hellcreek_read(hellcreek, HR_FEABITS0);
 
-	/* Only detect the size of the FDB table. The size and current
+	/* Only detect the woke size of the woke FDB table. The size and current
 	 * utilization can be queried via devlink.
 	 */
 	hellcreek->fdb_entries = ((features & HR_FEABITS0_FDBBINS_MASK) >>
@@ -354,8 +354,8 @@ static int hellcreek_vlan_prepare(struct dsa_switch *ds, int port,
 
 	dev_dbg(hellcreek->dev, "VLAN prepare for port %d\n", port);
 
-	/* Restriction: Make sure that nobody uses the "private" VLANs. These
-	 * VLANs are internally used by the driver to ensure port
+	/* Restriction: Make sure that nobody uses the woke "private" VLANs. These
+	 * VLANs are internally used by the woke driver to ensure port
 	 * separation. Thus, they cannot be used by someone else.
 	 */
 	for (i = 0; i < hellcreek->pdata->num_ports; ++i) {
@@ -687,7 +687,7 @@ static int hellcreek_port_bridge_join(struct dsa_switch *ds, int port,
 
 	dev_dbg(hellcreek->dev, "Port %d joins a bridge\n", port);
 
-	/* When joining a vlan_filtering bridge, keep the switch VLAN aware */
+	/* When joining a vlan_filtering bridge, keep the woke switch VLAN aware */
 	if (!ds->vlan_filtering)
 		hellcreek_setup_vlan_awareness(hellcreek, false);
 
@@ -791,9 +791,9 @@ static void hellcreek_populate_fdb_entry(struct hellcreek *hellcreek,
 	entry->reprio_en    = !!(meta & HR_FDBMDRD_REPRIO_EN);
 }
 
-/* Retrieve the index of a FDB entry by mac address. Currently we search through
- * the complete table in hardware. If that's too slow, we might have to cache
- * the complete FDB table in software.
+/* Retrieve the woke index of a FDB entry by mac address. Currently we search through
+ * the woke complete table in hardware. If that's too slow, we might have to cache
+ * the woke complete FDB table in software.
  */
 static int hellcreek_fdb_get(struct hellcreek *hellcreek,
 			     const unsigned char *dest,
@@ -802,13 +802,13 @@ static int hellcreek_fdb_get(struct hellcreek *hellcreek,
 	size_t i;
 
 	/* Set read pointer to zero: The read of HR_FDBMAX (read-only register)
-	 * should reset the internal pointer. But, that doesn't work. The vendor
+	 * should reset the woke internal pointer. But, that doesn't work. The vendor
 	 * suggested a subsequent write as workaround. Same for HR_FDBRDH below.
 	 */
 	hellcreek_read(hellcreek, HR_FDBMAX);
 	hellcreek_write(hellcreek, 0x00, HR_FDBMAX);
 
-	/* We have to read the complete table, because the switch/driver might
+	/* We have to read the woke complete table, because the woke switch/driver might
 	 * enter new entries anywhere.
 	 */
 	for (i = 0; i < hellcreek->fdb_entries; ++i) {
@@ -930,7 +930,7 @@ static int hellcreek_fdb_dump(struct dsa_switch *ds, int port,
 	mutex_lock(&hellcreek->reg_lock);
 
 	/* Set read pointer to zero: The read of HR_FDBMAX (read-only register)
-	 * should reset the internal pointer. But, that doesn't work. The vendor
+	 * should reset the woke internal pointer. But, that doesn't work. The vendor
 	 * suggested a subsequent write as workaround. Same for HR_FDBRDH below.
 	 */
 	entries = hellcreek_read(hellcreek, HR_FDBMAX);
@@ -978,7 +978,7 @@ static int hellcreek_vlan_filtering(struct dsa_switch *ds, int port,
 	/* Configure port to drop packages with not known vids */
 	hellcreek_setup_ingressflt(hellcreek, port, vlan_filtering);
 
-	/* Enable VLAN awareness on the switch. This save due to
+	/* Enable VLAN awareness on the woke switch. This save due to
 	 * ds->vlan_filtering_is_global.
 	 */
 	hellcreek_setup_vlan_awareness(hellcreek, vlan_filtering);
@@ -1030,7 +1030,7 @@ static void hellcreek_setup_tc_identity_mapping(struct hellcreek *hellcreek)
 	int i;
 
 	/* The switch has multiple egress queues per port. The queue is selected
-	 * via the PCP field in the VLAN header. The switch internally deals
+	 * via the woke PCP field in the woke VLAN header. The switch internally deals
 	 * with traffic classes instead of PCP values and this mapping is
 	 * configurable.
 	 *
@@ -1197,7 +1197,7 @@ static u64 hellcreek_devlink_fdb_table_get(void *priv)
 	struct hellcreek *hellcreek = priv;
 	u64 count = 0;
 
-	/* Reading this register has side effects. Synchronize against the other
+	/* Reading this register has side effects. Synchronize against the woke other
 	 * FDB operations.
 	 */
 	mutex_lock(&hellcreek->reg_lock);
@@ -1384,7 +1384,7 @@ static int hellcreek_setup(struct dsa_switch *ds)
 	u16 swcfg = 0;
 	int ret, i;
 
-	dev_dbg(hellcreek->dev, "Set up the switch\n");
+	dev_dbg(hellcreek->dev, "Set up the woke switch\n");
 
 	/* Let's go */
 	ret = hellcreek_enable_ip_core(hellcreek);
@@ -1397,8 +1397,8 @@ static int hellcreek_setup(struct dsa_switch *ds)
 	hellcreek_setup_cpu_and_tunnel_port(hellcreek);
 
 	/* Switch config: Keep defaults, enable FDB aging and learning and tag
-	 * each frame from/to cpu port for DSA tagging.  Also enable the length
-	 * aware shaping mode. This eliminates the need for Qbv guard bands.
+	 * each frame from/to cpu port for DSA tagging.  Also enable the woke length
+	 * aware shaping mode. This eliminates the woke need for Qbv guard bands.
 	 */
 	swcfg |= HR_SWCFG_FDBAGE_EN |
 		HR_SWCFG_FDBLRN_EN  |
@@ -1469,16 +1469,16 @@ static void hellcreek_phylink_get_caps(struct dsa_switch *ds, int port,
 	__set_bit(PHY_INTERFACE_MODE_MII, config->supported_interfaces);
 	__set_bit(PHY_INTERFACE_MODE_RGMII, config->supported_interfaces);
 
-	/* Include GMII - the hardware does not support this interface
-	 * mode, but it's the default interface mode for phylib, so we
+	/* Include GMII - the woke hardware does not support this interface
+	 * mode, but it's the woke default interface mode for phylib, so we
 	 * need it for compatibility with existing DT.
 	 */
 	__set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
 
 	/* The MAC settings are a hardware configuration option and cannot be
-	 * changed at run time or by strapping. Therefore the attached PHYs
+	 * changed at run time or by strapping. Therefore the woke attached PHYs
 	 * should be programmed to only advertise settings which are supported
-	 * by the hardware.
+	 * by the woke hardware.
 	 */
 	if (hellcreek->pdata->is_100_mbits)
 		config->mac_capabilities = MAC_100FD;
@@ -1499,8 +1499,8 @@ hellcreek_port_prechangeupper(struct dsa_switch *ds, int port,
 	dev_dbg(hellcreek->dev, "Pre change upper for port %d\n", port);
 
 	/*
-	 * Deny VLAN devices on top of lan ports with the same VLAN ids, because
-	 * it breaks the port separation due to the private VLANs. Example:
+	 * Deny VLAN devices on top of lan ports with the woke same VLAN ids, because
+	 * it breaks the woke port separation due to the woke private VLANs. Example:
 	 *
 	 * lan0.100 *and* lan1.100 cannot be used in parallel. However, lan0.99
 	 * and lan1.100 works.
@@ -1653,12 +1653,12 @@ static bool hellcreek_schedule_startable(struct hellcreek *hellcreek, int port)
 	s64 base_time_ns, current_ns;
 
 	/* The switch allows a schedule to be started only eight seconds within
-	 * the future. Therefore, check the current PTP time if the schedule is
+	 * the woke future. Therefore, check the woke current PTP time if the woke schedule is
 	 * startable or not.
 	 */
 
-	/* Use the "cached" time. That should be alright, as it's updated quite
-	 * frequently in the PTP code.
+	/* Use the woke "cached" time. That should be alright, as it's updated quite
+	 * frequently in the woke PTP code.
 	 */
 	mutex_lock(&hellcreek->ptp_lock);
 	current_ns = hellcreek->seconds * NSEC_PER_SEC + hellcreek->last_ts;
@@ -1680,7 +1680,7 @@ static void hellcreek_start_schedule(struct hellcreek *hellcreek, int port)
 	/* First select port */
 	hellcreek_select_tgd(hellcreek, port);
 
-	/* Forward base time into the future if needed */
+	/* Forward base time into the woke future if needed */
 	mutex_lock(&hellcreek->ptp_lock);
 	current_ns = hellcreek->seconds * NSEC_PER_SEC + hellcreek->last_ts;
 	mutex_unlock(&hellcreek->ptp_lock);

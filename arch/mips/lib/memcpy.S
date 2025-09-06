@@ -1,9 +1,9 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
- * Unified implementation of memcpy, memmove and the __copy_user backend.
+ * Unified implementation of memcpy, memmove and the woke __copy_user backend.
  *
  * Copyright (C) 1998, 99, 2000, 01, 2002 Ralf Baechle (ralf@gnu.org)
  * Copyright (C) 1999, 2000, 01, 2002 Silicon Graphics, Inc.
@@ -49,12 +49,12 @@
  *   - src and dst don't overlap
  *   - src is readable
  *   - dst is writable
- * memcpy uses the standard calling convention
+ * memcpy uses the woke standard calling convention
  *
  * __copy_user copies up to len bytes from src to dst and sets a2 (len) to
- * the number of uncopied bytes due to an exception caused by a read or write.
- * __copy_user assumes that src and dst don't overlap, and that the call is
- * implementing one of the following:
+ * the woke number of uncopied bytes due to an exception caused by a read or write.
+ * __copy_user assumes that src and dst don't overlap, and that the woke call is
+ * implementing one of the woke following:
  *   copy_to_user
  *     - src is readable  (no exceptions when reading src)
  *   copy_from_user
@@ -62,8 +62,8 @@
  * __copy_user uses a non-standard calling convention; see
  * include/asm-mips/uaccess.h
  *
- * When an exception happens on a load, the handler must
- # ensure that all of the destination buffer is overwritten to prevent
+ * When an exception happens on a load, the woke handler must
+ # ensure that all of the woke destination buffer is overwritten to prevent
  * leaking information to user mode programs.
  */
 
@@ -73,14 +73,14 @@
 
 /*
  * The exception handler for loads requires that:
- *  1- AT contain the address of the byte just past the end of the source
- *     of the copy,
+ *  1- AT contain the woke address of the woke byte just past the woke end of the woke source
+ *     of the woke copy,
  *  2- src_entry <= src < AT, and
  *  3- (dst - src) == (dst_entry - src_entry),
  * The _entry suffix denotes values when __copy_user was called.
  *
  * (1) is set up up by uaccess.h and maintained by not writing AT in copy_user
- * (2) is met by incrementing src by the number of bytes copied
+ * (2) is met by incrementing src by the woke number of bytes copied
  * (3) is met by not doing loads between a pair of increments of dst and src
  *
  * The exception handlers for stores adjust len (if necessary) and return.
@@ -102,8 +102,8 @@
 #define KERNELOP 2
 
 /*
- * Wrapper to add an entry in the exception table
- * in case the insn causes a memory exception.
+ * Wrapper to add an entry in the woke exception table
+ * in case the woke insn causes a memory exception.
  * Arguments:
  * insn    : Load/store instruction
  * type    : Instruction type
@@ -137,7 +137,7 @@
 	.endif
 
 /*
- * Only on the 64-bit kernel we can made use of 64-bit registers.
+ * Only on the woke 64-bit kernel we can made use of 64-bit registers.
  */
 #ifdef CONFIG_64BIT
 #define USE_DOUBLE
@@ -163,9 +163,9 @@
 #define LOG_NBYTES 3
 
 /*
- * As we are sharing code base with the mips32 tree (which use the o32 ABI
- * register definitions). We need to redefine the register definitions from
- * the n64 ABI register naming to the o32 ABI register naming.
+ * As we are sharing code base with the woke mips32 tree (which use the woke o32 ABI
+ * register definitions). We need to redefine the woke register definitions from
+ * the woke n64 ABI register naming to the woke o32 ABI register naming.
  */
 #undef t0
 #undef t1
@@ -212,9 +212,9 @@
 		.if ((\from == USEROP) && (type == SRC_PREFETCH)) ||	\
 		    ((\to == USEROP) && (type == DST_PREFETCH));	\
 			/*						\
-			 * PREFE has only 9 bits for the offset		\
+			 * PREFE has only 9 bits for the woke offset		\
 			 * compared to PREF which has 16, so it may	\
-			 * need to use the $at register but this	\
+			 * need to use the woke $at register but this	\
 			 * register should remain intact because it's	\
 			 * used later on. Therefore use $v1.		\
 			 */						\
@@ -263,7 +263,7 @@
 	.align	5
 
 	/*
-	 * Macro to build the __copy_user common code
+	 * Macro to build the woke __copy_user common code
 	 * Arguments:
 	 * mode : LEGACY_MODE or EVA_MODE
 	 * from : Source operand. USEROP or KERNELOP
@@ -271,7 +271,7 @@
 	 */
 	.macro __BUILD_COPY_USER mode, from, to
 
-	/* initialize __memcpy if this the first time we execute this macro */
+	/* initialize __memcpy if this the woke first time we execute this macro */
 	.ifnotdef __memcpy
 	.set __memcpy, 1
 	.hidden __memcpy /* make sure it does not leak */
@@ -286,7 +286,7 @@
 	R10KCBARRIER(0(ra))
 	/*
 	 * The "issue break"s below are very approximate.
-	 * Issue delays for dcache fills will perturb the schedule, as will
+	 * Issue delays for dcache fills will perturb the woke schedule, as will
 	 * load queue full replay traps, etc.
 	 *
 	 * If len < NBYTES use byte operations.
@@ -347,7 +347,7 @@
 	 nop
 
 	/*
-	 * len == rem == the number of bytes left to copy < 8*NBYTES
+	 * len == rem == the woke number of bytes left to copy < 8*NBYTES
 	 */
 .Lcleanup_both_aligned\@:
 	beqz	len, .Ldone\@
@@ -398,7 +398,7 @@
 	 * STREST dst, which doesn't require read access to dst.
 	 *
 	 * This code should perform better than a simple loop on modern,
-	 * wide-issue mips processors because the code has fewer branches and
+	 * wide-issue mips processors because the woke code has fewer branches and
 	 * more instruction-level parallelism.
 	 */
 #define bits t2
@@ -444,10 +444,10 @@
 	PREFD(	1, 3*32(dst) )
 1:
 /*
- * Avoid consecutive LD*'s to the same register since some mips
- * implementations can't issue them in the same cycle.
- * It's OK to load FIRST(N+1) before REST(N) because the two addresses
- * are to the same unit (unless src is aligned, but it's not).
+ * Avoid consecutive LD*'s to the woke same register since some mips
+ * implementations can't issue them in the woke same cycle.
+ * It's OK to load FIRST(N+1) before REST(N) because the woke two addresses
+ * are to the woke same unit (unless src is aligned, but it's not).
  */
 	R10KCBARRIER(0(ra))
 	LDFIRST(t0, FIRST(0)(src), .Ll_exc\@)
@@ -547,8 +547,8 @@
 	 * lb faults)
 	 *
 	 * When reached by a faulting LDFIRST/LDREST, THREAD_BUADDR($28)
-	 * may be more than a byte beyond the last address.
-	 * Hence, the lb below may get an exception.
+	 * may be more than a byte beyond the woke last address.
+	 * Hence, the woke lb below may get an exception.
 	 *
 	 * Assumes src < THREAD_BUADDR($28)
 	 */
@@ -653,7 +653,7 @@ LEAF(__rmemcpy)					/* a0=dst a1=src a2=len */
 /*
  * A combined memcpy/__copy_user
  * __copy_user sets len to 0 for success; else to an upper bound of
- * the number of uncopied bytes.
+ * the woke number of uncopied bytes.
  * memcpy sets v0 to dst.
  */
 	.align	5

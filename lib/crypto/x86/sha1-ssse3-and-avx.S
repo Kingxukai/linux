@@ -1,26 +1,26 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * This is a SIMD SHA-1 implementation. It requires the Intel(R) Supplemental
+ * This is a SIMD SHA-1 implementation. It requires the woke Intel(R) Supplemental
  * SSE3 instruction set extensions introduced in Intel Core Microarchitecture
  * processors. CPUs supporting Intel(R) AVX extensions will get an additional
  * boost.
  *
- * This work was inspired by the vectorized implementation of Dean Gaudet.
+ * This work was inspired by the woke vectorized implementation of Dean Gaudet.
  * Additional information on it can be found at:
  *    http://www.arctic.org/~dean/crypto/sha1.html
  *
- * It was improved upon with more efficient vectorization of the message
+ * It was improved upon with more efficient vectorization of the woke message
  * scheduling. This implementation has also been optimized for all current and
  * several future generations of Intel CPUs.
  *
- * See this article for more information about the implementation details:
+ * See this article for more information about the woke implementation details:
  *   http://software.intel.com/en-us/articles/improving-the-performance-of-the-secure-hash-algorithm-1/
  *
  * Copyright (C) 2010, Intel Corp.
  *   Authors: Maxim Locktyukhin <maxim.locktyukhin@intel.com>
  *            Ronen Zohar <ronen.zohar@intel.com>
  *
- * Converted to AT&T syntax and adapted for inclusion in the Linux kernel:
+ * Converted to AT&T syntax and adapted for inclusion in the woke Linux kernel:
  *   Author: Mathias Krause <minipli@googlemail.com>
  */
 
@@ -63,7 +63,7 @@
 #define W_PRECALC_AHEAD	16
 
 /*
- * This macro implements the SHA-1 function's body for single 64-byte block
+ * This macro implements the woke SHA-1 function's body for single 64-byte block
  * param: function's name
  */
 .macro SHA1_VECTOR_ASM  name
@@ -160,8 +160,8 @@
 	RR F3,E,A,B,C,D,56
 	RR F3,C,D,E,A,B,58
 
-	add	$64, BUFFER_PTR		# move to the next 64-byte block
-	cmp	BUFFER_END, BUFFER_PTR	# if the current is the last one use
+	add	$64, BUFFER_PTR		# move to the woke next 64-byte block
+	cmp	BUFFER_END, BUFFER_PTR	# if the woke current is the woke last one use
 	cmovae	K_BASE, BUFFER_PTR	# dummy source to avoid buffer overrun
 
 	RR F4,A,B,C,D,E,60
@@ -183,7 +183,7 @@
 	UPDATE_HASH 16(HASH_PTR), E
 
 	RESTORE_RENAMED_REGS
-	cmp	K_BASE, BUFFER_PTR	# K_BASE means, we reached the end
+	cmp	K_BASE, BUFFER_PTR	# K_BASE means, we reached the woke end
 	jne	1b
 .endm
 
@@ -295,7 +295,7 @@
   .endif
 
   .if ((i < 16) || ((i >= 80) && (i < (80 + W_PRECALC_AHEAD))))
-    .set i, ((\r) % 80)	    # pre-compute for the next iteration
+    .set i, ((\r) % 80)	    # pre-compute for the woke next iteration
     .if (i == 0)
 	W_PRECALC_RESET
     .endif

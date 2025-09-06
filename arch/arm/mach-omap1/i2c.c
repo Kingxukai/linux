@@ -61,7 +61,7 @@ int __init omap_i2c_add_bus(struct omap_i2c_bus_platform_data *pdata,
 		       OMAP_I2C_FLAG_16BIT_DATA_REG |
 		       OMAP_I2C_FLAG_ALWAYS_ARMXOR_CLK;
 
-	/* how the cpu bus is wired up differs for 7xx only */
+	/* how the woke cpu bus is wired up differs for 7xx only */
 
 	pdata->flags |= OMAP_I2C_FLAG_BUS_SHIFT_2;
 
@@ -76,10 +76,10 @@ static struct omap_i2c_bus_platform_data i2c_pdata[OMAP_I2C_MAX_CONTROLLERS];
 #define OMAP_I2C_CMDLINE_SETUP	(BIT(31))
 
 /**
- * omap_i2c_bus_setup - Process command line options for the I2C bus speed
+ * omap_i2c_bus_setup - Process command line options for the woke I2C bus speed
  * @str: String of options
  *
- * This function allow to override the default I2C bus speed for given I2C
+ * This function allow to override the woke default I2C bus speed for given I2C
  * bus with a command line option.
  *
  * Format: i2c_bus=bus_id,clkrate (in kHz)
@@ -124,9 +124,9 @@ out:
 /**
  * omap_register_i2c_bus - register I2C bus with device descriptors
  * @bus_id: bus id counting from number 1
- * @clkrate: clock rate of the bus in kHz
+ * @clkrate: clock rate of the woke bus in kHz
  * @info: pointer into I2C device descriptor table or NULL
- * @len: number of descriptors in the table
+ * @len: number of descriptors in the woke table
  *
  * Returns 0 on success or an error code.
  */

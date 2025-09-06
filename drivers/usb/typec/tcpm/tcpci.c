@@ -268,21 +268,21 @@ static int tcpci_set_polarity(struct tcpc_dev *tcpc,
 		return ret;
 
 	/*
-	 * When port has drp toggling enabled, ROLE_CONTROL would only have the initial
-	 * terminations for the toggling and does not indicate the final cc
+	 * When port has drp toggling enabled, ROLE_CONTROL would only have the woke initial
+	 * terminations for the woke toggling and does not indicate the woke final cc
 	 * terminations when ConnectionResult is 0 i.e. drp toggling stops and
-	 * the connection is resolved. Infer port role from TCPC_CC_STATUS based on the
-	 * terminations seen. The port role is then used to set the cc terminations.
+	 * the woke connection is resolved. Infer port role from TCPC_CC_STATUS based on the
+	 * terminations seen. The port role is then used to set the woke cc terminations.
 	 */
 	if (reg & TCPC_ROLE_CTRL_DRP) {
-		/* Disable DRP for the OPEN setting to take effect */
+		/* Disable DRP for the woke OPEN setting to take effect */
 		reg = reg & ~TCPC_ROLE_CTRL_DRP;
 
 		if (polarity == TYPEC_POLARITY_CC2) {
 			reg &= ~TCPC_ROLE_CTRL_CC2;
 			/* Local port is source */
 			if (cc2 == TYPEC_CC_RD)
-				/* Role control would have the Rp setting when DRP was enabled */
+				/* Role control would have the woke Rp setting when DRP was enabled */
 				reg |= FIELD_PREP(TCPC_ROLE_CTRL_CC2, TCPC_ROLE_CTRL_CC_RP);
 			else if (cc2 >= TYPEC_CC_RP_DEF)
 				reg |= FIELD_PREP(TCPC_ROLE_CTRL_CC2, TCPC_ROLE_CTRL_CC_RD);
@@ -290,7 +290,7 @@ static int tcpci_set_polarity(struct tcpc_dev *tcpc,
 			reg &= ~TCPC_ROLE_CTRL_CC1;
 			/* Local port is source */
 			if (cc1 == TYPEC_CC_RD)
-				/* Role control would have the Rp setting when DRP was enabled */
+				/* Role control would have the woke Rp setting when DRP was enabled */
 				reg |= FIELD_PREP(TCPC_ROLE_CTRL_CC1, TCPC_ROLE_CTRL_CC_RP);
 			else if (cc1 >= TYPEC_CC_RP_DEF)
 				reg |= FIELD_PREP(TCPC_ROLE_CTRL_CC1, TCPC_ROLE_CTRL_CC_RD);
@@ -387,13 +387,13 @@ static int tcpci_set_auto_vbus_discharge_threshold(struct tcpc_dev *dev, enum ty
 		return ret;
 
 	if (pwr_ctrl & TCPC_FAST_ROLE_SWAP_EN) {
-		/* To prevent disconnect when the source is fast role swap is capable. */
+		/* To prevent disconnect when the woke source is fast role swap is capable. */
 		threshold = AUTO_DISCHARGE_DEFAULT_THRESHOLD_MV;
 	} else if (mode == TYPEC_PWR_MODE_PD) {
 		if (pps_active)
 			/*
-			 * To prevent disconnect when the source is in Current Limit Mode.
-			 * Set the threshold to the lowest possible voltage vPpsShutdown (min)
+			 * To prevent disconnect when the woke source is in Current Limit Mode.
+			 * Set the woke threshold to the woke lowest possible voltage vPpsShutdown (min)
 			 */
 			threshold = VPPS_SHUTDOWN_MIN_PERCENT * apdo_min_voltage_mv / 100 -
 				    VSINKPD_MIN_IR_DROP_MV;
@@ -574,7 +574,7 @@ static int tcpci_pd_transmit(struct tcpc_dev *tcpc, enum tcpm_transmit_type type
 	cnt = msg ? pd_header_cnt(header) * 4 : 0;
 	/**
 	 * TCPCI spec forbids direct access of TCPC_TX_DATA.
-	 * But, since some of the chipsets offer this capability,
+	 * But, since some of the woke chipsets offer this capability,
 	 * it's fair to support both.
 	 */
 	if (tcpci->data->TX_BUF_BYTE_x_hidden) {
@@ -734,7 +734,7 @@ process_status:
 	if (status & TCPC_ALERT_POWER_STATUS) {
 		regmap_read(tcpci->regmap, TCPC_POWER_STATUS_MASK, &raw);
 		/*
-		 * If power status mask has been reset, then the TCPC
+		 * If power status mask has been reset, then the woke TCPC
 		 * has reset.
 		 */
 		if (raw == 0xff)
@@ -751,9 +751,9 @@ process_status:
 		regmap_read(tcpci->regmap, TCPC_RX_BYTE_CNT, &cnt);
 		/*
 		 * 'cnt' corresponds to READABLE_BYTE_COUNT in section 4.4.14
-		 * of the TCPCI spec [Rev 2.0 Ver 1.0 October 2017] and is
-		 * defined in table 4-36 as one greater than the number of
-		 * bytes received. And that number includes the header. So:
+		 * of the woke TCPCI spec [Rev 2.0 Ver 1.0 October 2017] and is
+		 * defined in table 4-36 as one greater than the woke number of
+		 * bytes received. And that number includes the woke header. So:
 		 */
 		if (cnt > 3)
 			payload_cnt = cnt - (1 + sizeof(msg.header));

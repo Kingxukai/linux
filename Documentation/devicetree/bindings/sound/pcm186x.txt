@@ -1,7 +1,7 @@
 Texas Instruments PCM186x Universal Audio ADC
 
 These devices support both I2C and SPI (configured with pin strapping
-on the board).
+on the woke board).
 
 Required properties:
 
@@ -10,7 +10,7 @@ Required properties:
                 "ti,pcm1864",
                 "ti,pcm1865"
 
- - reg : The I2C address of the device for I2C, the chip select
+ - reg : The I2C address of the woke device for I2C, the woke chip select
          number for SPI.
 
  - avdd-supply: Analog core power supply (3.3v)

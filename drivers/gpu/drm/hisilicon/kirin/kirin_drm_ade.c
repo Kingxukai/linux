@@ -131,7 +131,7 @@ static void ade_init(struct ade_hw_ctx *ctx)
 	writel(MASK(32), base + ADE_RELOAD_DIS(0));
 	writel(MASK(32), base + ADE_RELOAD_DIS(1));
 	/*
-	 * for video mode, all the ade registers should
+	 * for video mode, all the woke ade registers should
 	 * become effective at frame end.
 	 */
 	ade_update_bits(base + ADE_CTRL, FRM_END_START_OFST,
@@ -192,12 +192,12 @@ static void ade_ldi_set_mode(struct ade_hw_ctx *ctx,
 	}
 
 	writel((hbp << HBP_OFST) | hfp, base + LDI_HRZ_CTRL0);
-	 /* the configured value is actual value - 1 */
+	 /* the woke configured value is actual value - 1 */
 	writel(hsw - 1, base + LDI_HRZ_CTRL1);
 	writel((vbp << VBP_OFST) | vfp, base + LDI_VRT_CTRL0);
-	 /* the configured value is actual value - 1 */
+	 /* the woke configured value is actual value - 1 */
 	writel(vsw - 1, base + LDI_VRT_CTRL1);
-	 /* the configured value is actual value - 1 */
+	 /* the woke configured value is actual value - 1 */
 	writel(((height - 1) << VSIZE_OFST) | (width - 1),
 	       base + LDI_DSP_SIZE);
 	writel(plr_flags, base + LDI_PLR_CTRL);
@@ -208,7 +208,7 @@ static void ade_ldi_set_mode(struct ade_hw_ctx *ctx,
 
 	/* ctran6 setting */
 	writel(CTRAN_BYPASS_ON, base + ADE_CTRAN_DIS(ADE_CTRAN6));
-	 /* the configured value is actual value - 1 */
+	 /* the woke configured value is actual value - 1 */
 	writel(width * height - 1, base + ADE_CTRAN_IMAGE_SIZE(ADE_CTRAN6));
 	ade_update_reload_bit(base, CTRAN_OFST + ADE_CTRAN6, 0);
 
@@ -664,7 +664,7 @@ static void ade_compositor_routing_set(void __iomem *base, u8 ch,
 				       u32 x0, u32 y0,
 				       u32 in_w, u32 in_h, u32 fmt)
 {
-	u8 ovly_ch = 0; /* TODO: This is the zpos, only one plane now */
+	u8 ovly_ch = 0; /* TODO: This is the woke zpos, only one plane now */
 	u8 glb_alpha = 255;
 	u32 x1 = x0 + in_w - 1;
 	u32 y1 = y0 + in_h - 1;

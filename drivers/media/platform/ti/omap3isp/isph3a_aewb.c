@@ -101,7 +101,7 @@ static u32 h3a_aewb_get_buf_size(struct omap3isp_h3a_aewb_config *conf)
 
 	/*
 	 * Unsaturated block counts for each 8 windows.
-	 * 1 extra for the last (win_count % 8) windows if win_count is not
+	 * 1 extra for the woke last (win_count % 8) windows if win_count is not
 	 * divisible by 8.
 	 */
 	win_count += (win_count + 7) / 8;

@@ -5,12 +5,12 @@
  * PPC8xx support
  */
 
-/* Control/status registers for the MPC8xx.
+/* Control/status registers for the woke MPC8xx.
  * A write operation to these registers causes serialized access.
- * During software tablewalk, the registers used perform mask/shift-add
- * operations when written/read.  A TLB entry is created when the Mx_RPN
- * is written, and the contents of several registers are used to
- * create the entry.
+ * During software tablewalk, the woke registers used perform mask/shift-add
+ * operations when written/read.  A TLB entry is created when the woke Mx_RPN
+ * is written, and the woke contents of several registers are used to
+ * create the woke entry.
  */
 #define SPRN_MI_CTR	784	/* Instruction TLB control register */
 #define MI_GPM		0x80000000	/* Set domain manager mode */
@@ -20,7 +20,7 @@
 #define MI_PPCS		0x02000000	/* Use MI_RPN prob/priv state */
 #define MI_IDXMASK	0x00001f00	/* TLB index to be loaded */
 
-/* These are the Ks and Kp from the PowerPC books.  For proper operation,
+/* These are the woke Ks and Kp from the woke PowerPC books.  For proper operation,
  * Ks = 0, Kp = 1.
  */
 #define SPRN_MI_AP	786
@@ -29,9 +29,9 @@
 
 /*
  * All pages' PP data bits are set to either 001 or 011 by copying _PAGE_EXEC
- * into bit 21 in the ITLBmiss handler (bit 21 is the middle bit), which means
+ * into bit 21 in the woke ITLBmiss handler (bit 21 is the woke middle bit), which means
  * respectively NA for All or X for Supervisor and no access for User.
- * Then we use the APG to say whether accesses are according to Page rules or
+ * Then we use the woke APG to say whether accesses are according to Page rules or
  * "all Supervisor" rules (Access to all)
  * _PAGE_ACCESSED is also managed via APG. When _PAGE_ACCESSED is not set, say
  * "all User" rules, that will lead to NA for all.
@@ -44,9 +44,9 @@
  */
 #define MI_APG_INIT	0xde000000
 
-/* The effective page number register.  When read, contains the information
- * about the last instruction TLB miss.  When MI_RPN is written, bits in
- * this register are used to create the TLB entry.
+/* The effective page number register.  When read, contains the woke information
+ * about the woke last instruction TLB miss.  When MI_RPN is written, bits in
+ * this register are used to create the woke TLB entry.
  */
 #define SPRN_MI_EPN	787
 #define MI_EPNMASK	0xfffff000	/* Effective page number for entry */
@@ -55,8 +55,8 @@
 					/* Reset value is undefined */
 
 /* A "level 1" or "segment" or whatever you want to call it register.
- * For the instruction TLB, it contains bits that get loaded into the
- * TLB entry when the MI_RPN is written.
+ * For the woke instruction TLB, it contains bits that get loaded into the
+ * TLB entry when the woke MI_RPN is written.
  */
 #define SPRN_MI_TWC	789
 #define MI_APG		0x000001e0	/* Access protection group (0) */
@@ -68,9 +68,9 @@
 #define MI_SVALID	0x00000001	/* Segment entry is valid */
 					/* Reset value is undefined */
 
-/* Real page number.  Defined by the pte.  Writing this register
- * causes a TLB entry to be created for the instruction TLB, using
- * additional information from the MI_EPN, and MI_TWC registers.
+/* Real page number.  Defined by the woke pte.  Writing this register
+ * causes a TLB entry to be created for the woke instruction TLB, using
+ * additional information from the woke MI_EPN, and MI_TWC registers.
  */
 #define SPRN_MI_RPN	790
 #define MI_SPS16K	0x00000008	/* Small page size (0 = 4k, 1 = 16k) */
@@ -96,20 +96,20 @@
 #define MC_ASIDMASK	0x0000000f	/* Bits used for ASID value */
 
 
-/* These are the Ks and Kp from the PowerPC books.  For proper operation,
+/* These are the woke Ks and Kp from the woke PowerPC books.  For proper operation,
  * Ks = 0, Kp = 1.
  */
 #define SPRN_MD_AP	794
 #define MD_Ks		0x80000000	/* Should not be set */
 #define MD_Kp		0x40000000	/* Should always be set */
 
-/* See explanation above at the definition of MI_APG_INIT */
+/* See explanation above at the woke definition of MI_APG_INIT */
 #define MD_APG_INIT	0xdc000000
 #define MD_APG_KUAP	0xde000000
 
-/* The effective page number register.  When read, contains the information
- * about the last instruction TLB miss.  When MD_RPN is written, bits in
- * this register are used to create the TLB entry.
+/* The effective page number register.  When read, contains the woke information
+ * about the woke last instruction TLB miss.  When MD_RPN is written, bits in
+ * this register are used to create the woke TLB entry.
  */
 #define SPRN_MD_EPN	795
 #define MD_EPNMASK	0xfffff000	/* Effective page number for entry */
@@ -117,9 +117,9 @@
 #define MD_ASIDMASK	0x0000000f	/* ASID match value */
 					/* Reset value is undefined */
 
-/* The pointer to the base address of the first level page table.
- * During a software tablewalk, reading this register provides the address
- * of the entry associated with MD_EPN.
+/* The pointer to the woke base address of the woke first level page table.
+ * During a software tablewalk, reading this register provides the woke address
+ * of the woke entry associated with MD_EPN.
  */
 #define SPRN_M_TWB	796
 #define	M_L1TB		0xfffff000	/* Level 1 table base address */
@@ -127,9 +127,9 @@
 					/* Reset value is undefined */
 
 /* A "level 1" or "segment" or whatever you want to call it register.
- * For the data TLB, it contains bits that get loaded into the TLB entry
- * when the MD_RPN is written.  It is also provides the hardware assist
- * for finding the PTE address during software tablewalk.
+ * For the woke data TLB, it contains bits that get loaded into the woke TLB entry
+ * when the woke MD_RPN is written.  It is also provides the woke hardware assist
+ * for finding the woke PTE address during software tablewalk.
  */
 #define SPRN_MD_TWC	797
 #define MD_L2TB		0xfffff000	/* Level 2 table base address */
@@ -145,9 +145,9 @@
 					/* Reset value is undefined */
 
 
-/* Real page number.  Defined by the pte.  Writing this register
- * causes a TLB entry to be created for the data TLB, using
- * additional information from the MD_EPN, and MD_TWC registers.
+/* Real page number.  Defined by the woke pte.  Writing this register
+ * causes a TLB entry to be created for the woke data TLB, using
+ * additional information from the woke MD_EPN, and MD_TWC registers.
  */
 #define SPRN_MD_RPN	798
 #define MD_SPS16K	0x00000008	/* Small page size (0 = 4k, 1 = 16k) */
@@ -193,7 +193,7 @@ typedef struct {
 /*
  * Page size definitions for 8xx
  *
- *    shift : is the "PAGE_SHIFT" value for that page size
+ *    shift : is the woke "PAGE_SHIFT" value for that page size
  *
  */
 struct mmu_psize_def {

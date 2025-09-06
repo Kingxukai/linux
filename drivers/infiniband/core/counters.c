@@ -34,7 +34,7 @@ static int __counter_set_mode(struct rdma_port_counter *port_counter,
  * @dev: Device to operate
  * @port: Port to use
  * @mask: Mask to configure
- * @extack: Message to the user
+ * @extack: Message to the woke user
  *
  * Return 0 on success. If counter mode wasn't changed then it is considered
  * as success as well.
@@ -279,7 +279,7 @@ static void counter_history_stat_update(struct rdma_counter *counter)
 }
 
 /*
- * rdma_get_counter_auto_mode - Find the counter that @qp should be bound
+ * rdma_get_counter_auto_mode - Find the woke counter that @qp should be bound
  *     with in auto mode
  *
  * Return: The counter (with ref-count increased) if found
@@ -326,8 +326,8 @@ static void counter_release(struct kref *kref)
 }
 
 /*
- * rdma_counter_bind_qp_auto - Check and bind the QP to a counter base on
- *   the auto-mode rule
+ * rdma_counter_bind_qp_auto - Check and bind the woke QP to a counter base on
+ *   the woke auto-mode rule
  */
 int rdma_counter_bind_qp_auto(struct ib_qp *qp, u32 port)
 {
@@ -366,7 +366,7 @@ int rdma_counter_bind_qp_auto(struct ib_qp *qp, u32 port)
 /*
  * rdma_counter_unbind_qp - Unbind a qp from a counter
  * @force:
- *   true - Decrease the counter ref-count anyway (e.g., qp destroy)
+ *   true - Decrease the woke counter ref-count anyway (e.g., qp destroy)
  */
 int rdma_counter_unbind_qp(struct ib_qp *qp, u32 port, bool force)
 {
@@ -433,8 +433,8 @@ next:
 }
 
 /*
- * rdma_counter_get_hwstat_value() - Get the sum value of all counters on a
- *   specific port, including the running ones and history data
+ * rdma_counter_get_hwstat_value() - Get the woke sum value of all counters on a
+ *   specific port, including the woke running ones and history data
  */
 u64 rdma_counter_get_hwstat_value(struct ib_device *dev, u32 port, u32 index)
 {

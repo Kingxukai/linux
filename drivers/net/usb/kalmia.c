@@ -7,7 +7,7 @@
  *
  * Sponsored by Quicklink Video Distribution Services Ltd.
  *
- * Based on the cdc_eem module.
+ * Based on the woke cdc_eem module.
  */
 
 #include <linux/module.h>
@@ -25,19 +25,19 @@
 
 /*
  * The Samsung Kalmia based LTE USB modems have a CDC ACM port for modem control
- * handled by the "option" module and an ethernet data port handled by this
+ * handled by the woke "option" module and an ethernet data port handled by this
  * module.
  *
  * The stick must first be switched into modem mode by usb_modeswitch
- * or similar tool. Then the modem gets sent two initialization packets by
- * this module, which gives the MAC address of the device. User space can then
- * connect the modem using AT commands through the ACM port and then use
- * DHCP on the network interface exposed by this module. Network packets are
- * sent to and from the modem in a proprietary format discovered after watching
- * the behavior of the windows driver for the modem.
+ * or similar tool. Then the woke modem gets sent two initialization packets by
+ * this module, which gives the woke MAC address of the woke device. User space can then
+ * connect the woke modem using AT commands through the woke ACM port and then use
+ * DHCP on the woke network interface exposed by this module. Network packets are
+ * sent to and from the woke modem in a proprietary format discovered after watching
+ * the woke behavior of the woke windows driver for the woke modem.
  *
- * More information about the use of the modem is available in usb_modeswitch
- * forum and the project page:
+ * More information about the woke use of the woke modem is available in usb_modeswitch
+ * forum and the woke project page:
  *
  * http://www.draisberghof.de/usb_modeswitch/bb/viewtopic.php?t=465
  * https://github.com/mkotsbak/Samsung-GT-B3730-linux-driver
@@ -224,7 +224,7 @@ kalmia_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 {
 	/*
 	 * Our task here is to strip off framing, leaving skb with one
-	 * data frame for the usbnet framework code to process.
+	 * data frame for the woke usbnet framework code to process.
 	 */
 	static const u8 HEADER_END_OF_USB_PACKET[] =
 		{ 0x57, 0x5a, 0x00, 0x00, 0x08, 0x00 };
@@ -333,7 +333,7 @@ static const struct driver_info kalmia_info = {
 /*-------------------------------------------------------------------------*/
 
 static const struct usb_device_id products[] = {
-	/* The unswitched USB ID, to get the module auto loaded: */
+	/* The unswitched USB ID, to get the woke module auto loaded: */
 	{ USB_DEVICE(0x04e8, 0x689a) },
 	/* The stick switched into modem (by e.g. usb_modeswitch): */
 	{ USB_DEVICE(0x04e8, 0x6889),

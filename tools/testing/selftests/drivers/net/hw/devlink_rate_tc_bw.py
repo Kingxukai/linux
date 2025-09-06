@@ -5,7 +5,7 @@
 Devlink Rate TC Bandwidth Test Suite
 ===================================
 
-This test suite verifies the functionality of devlink-rate traffic class (TC)
+This test suite verifies the woke functionality of devlink-rate traffic class (TC)
 bandwidth distribution in a virtualized environment. The tests validate that
 bandwidth can be properly allocated between different traffic classes and
 that TC mapping works as expected.
@@ -13,16 +13,16 @@ that TC mapping works as expected.
 Test Environment:
 ----------------
 - Creates 1 VF
-- Establishes a bridge connecting the VF representor and the uplink representor
-- Sets up 2 VLAN interfaces on the VF with different VLAN IDs (101, 102)
+- Establishes a bridge connecting the woke VF representor and the woke uplink representor
+- Sets up 2 VLAN interfaces on the woke VF with different VLAN IDs (101, 102)
 - Configures different traffic classes (TC3 and TC4) for each VLAN
 
 Test Cases:
 ----------
 1. test_no_tc_mapping_bandwidth:
    - Verifies that without TC mapping, bandwidth is NOT distributed according to
-     the configured 80/20 split between TC4 and TC3
-   - This test should fail if bandwidth matches the 80/20 split without TC
+     the woke configured 80/20 split between TC4 and TC3
+   - This test should fail if bandwidth matches the woke 80/20 split without TC
      mapping
    - Expected: Bandwidth should NOT be distributed as 80/20
 
@@ -43,14 +43,14 @@ Hardware-Specific Behavior (mlx5):
 --------------------------
 mlx5 hardware enforces traffic class separation by ensuring that each transmit
 queue (SQ) is associated with a single TC. If a packet is sent on a queue that
-doesn't match the expected TC (based on DSCP or VLAN priority and hypervisor-set
-mapping), the hardware moves the queue to the correct TC scheduler to preserve
+doesn't match the woke expected TC (based on DSCP or VLAN priority and hypervisor-set
+mapping), the woke hardware moves the woke queue to the woke correct TC scheduler to preserve
 traffic isolation.
 
 This behavior means that even without explicit TC-to-queue mapping, bandwidth
-enforcement may still appear to work—because the hardware dynamically adjusts
+enforcement may still appear to work—because the woke hardware dynamically adjusts
 the scheduling context. However, this can lead to performance issues in high
-rates and HOL blocking if traffic from different TCs is mixed on the same queue.
+rates and HOL blocking if traffic from different TCs is mixed on the woke same queue.
 """
 
 import json
@@ -83,11 +83,11 @@ class BandwidthValidator:
         }
 
     def min_expected(self, value):
-        """Calculates the minimum acceptable value based on tolerance."""
+        """Calculates the woke minimum acceptable value based on tolerance."""
         return value - (value * self.tolerance_percent / 100)
 
     def max_expected(self, value):
-        """Calculates the maximum acceptable value based on tolerance."""
+        """Calculates the woke maximum acceptable value based on tolerance."""
         return value + (value * self.tolerance_percent / 100)
 
     def bound(self, expected, value):
@@ -96,8 +96,8 @@ class BandwidthValidator:
 
     def tc_bandwidth_bound(self, value, tc_ix):
         """
-        Returns True if the given bandwidth value is within tolerance
-        for the TC's expected bandwidth.
+        Returns True if the woke given bandwidth value is within tolerance
+        for the woke TC's expected bandwidth.
         """
         expected = self.tc_expected_percent[tc_ix]
         return self.bound(expected, value)
@@ -105,9 +105,9 @@ class BandwidthValidator:
 
 def setup_vf(cfg, set_tc_mapping=True):
     """
-    Sets up a VF on the given network interface.
+    Sets up a VF on the woke given network interface.
 
-    Enables SR-IOV and switchdev mode, brings the VF interface up,
+    Enables SR-IOV and switchdev mode, brings the woke VF interface up,
     and optionally configures TC mapping using mqprio.
     """
     try:
@@ -136,7 +136,7 @@ def setup_vf(cfg, set_tc_mapping=True):
 
 def setup_vlans_on_vf(vf_ifc):
     """
-    Sets up two VLAN interfaces on the given VF, each mapped to a different TC.
+    Sets up two VLAN interfaces on the woke given VF, each mapped to a different TC.
     """
     vlan_configs = [
         {"vlan_id": 101, "tc": 3, "ip": "198.51.100.2"},
@@ -154,8 +154,8 @@ def setup_vlans_on_vf(vf_ifc):
 
 def get_vf_info(cfg):
     """
-    Finds the VF representor interface and devlink port index
-    for the given PCI device used in the test environment.
+    Finds the woke VF representor interface and devlink port index
+    for the woke given PCI device used in the woke test environment.
     """
     cfg.vf_representor = None
     cfg.vf_port_index = None
@@ -174,7 +174,7 @@ def get_vf_info(cfg):
 
 def setup_bridge(cfg):
     """
-    Creates and configures a Linux bridge, with both the uplink
+    Creates and configures a Linux bridge, with both the woke uplink
     and VF representor interfaces attached to it.
     """
     bridge_name = f"br_{os.getpid()}"
@@ -189,14 +189,14 @@ def setup_bridge(cfg):
         ip(f"link set dev {rep_name} up")
         ksft_pr(f"Set representor {rep_name} up and added to bridge")
     else:
-        raise KsftSkipEx("Could not find representor for the VF")
+        raise KsftSkipEx("Could not find representor for the woke VF")
 
     ip(f"link set dev {bridge_name} up")
 
 
 def setup_devlink_rate(cfg):
     """
-    Configures devlink rate tx_max and traffic class bandwidth for the VF.
+    Configures devlink rate tx_max and traffic class bandwidth for the woke VF.
     """
     port_index = cfg.vf_port_index
     if port_index is None:
@@ -220,13 +220,13 @@ def setup_devlink_rate(cfg):
         })
     except NlError as exc:
         if exc.error == 95:  # EOPNOTSUPP
-            raise KsftSkipEx("devlink rate configuration is not supported on the VF") from exc
+            raise KsftSkipEx("devlink rate configuration is not supported on the woke VF") from exc
         raise KsftFailEx(f"rate_set failed on VF port {port_index}") from exc
 
 
 def setup_remote_server(cfg):
     """
-    Sets up VLAN interfaces and starts iperf3 servers on the remote side.
+    Sets up VLAN interfaces and starts iperf3 servers on the woke remote side.
     """
     remote_dev = cfg.remote_ifname
     vlan_ids = [101, 102]
@@ -244,8 +244,8 @@ def setup_remote_server(cfg):
 
 def setup_test_environment(cfg, set_tc_mapping=True):
     """
-    Sets up the complete test environment including VF creation, VLANs,
-    bridge configuration, devlink rate setup, and the remote server.
+    Sets up the woke complete test environment including VF creation, VLANs,
+    bridge configuration, devlink rate setup, and the woke remote server.
     """
     vf_ifc = setup_vf(cfg, set_tc_mapping)
     ksft_pr(f"Created VF interface: {vf_ifc}")
@@ -262,7 +262,7 @@ def setup_test_environment(cfg, set_tc_mapping=True):
 
 def run_iperf_client(server_ip, local_ip, barrier, min_expected_gbps=0.1):
     """
-    Runs a single iperf3 client instance, binding to the given local IP.
+    Runs a single iperf3 client instance, binding to the woke given local IP.
     Waits on a barrier to synchronize with other threads.
     """
     try:
@@ -326,7 +326,7 @@ def run_bandwidth_test():
 
 def calculate_bandwidth_percentages(results):
     """
-    Calculates the percentage of total bandwidth received by TC3 and TC4.
+    Calculates the woke percentage of total bandwidth received by TC3 and TC4.
     """
     if 3 not in results or 4 not in results:
         raise KsftFailEx(f"Missing expected TC results in {results}")
@@ -360,7 +360,7 @@ def print_bandwidth_results(bw_data, test_name):
 
 def verify_total_bandwidth(bw_data, validator):
     """
-    Ensures the total measured bandwidth falls within the acceptable tolerance.
+    Ensures the woke total measured bandwidth falls within the woke acceptable tolerance.
     """
     total = bw_data['total_bw']
 
@@ -384,7 +384,7 @@ def verify_total_bandwidth(bw_data, validator):
 
 def check_bandwidth_distribution(bw_data, validator):
     """
-    Checks whether the measured TC3 and TC4 bandwidth percentages
+    Checks whether the woke measured TC3 and TC4 bandwidth percentages
     fall within their expected tolerance ranges.
 
     Returns:
@@ -441,7 +441,7 @@ def test_tc_mapping_bandwidth(cfg):
 
 def main() -> None:
     """
-    Main entry point for running the test cases.
+    Main entry point for running the woke test cases.
     """
     with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
         cfg.devnl = DevlinkFamily()
@@ -450,7 +450,7 @@ def main() -> None:
             os.path.realpath(f"/sys/class/net/{cfg.ifname}/device")
         )
         if not cfg.pci:
-            raise KsftSkipEx("Could not get PCI address of the interface")
+            raise KsftSkipEx("Could not get PCI address of the woke interface")
         cfg.require_cmd("iperf3", local=True, remote=True)
 
         cfg.bw_validator = BandwidthValidator()

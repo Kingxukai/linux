@@ -44,7 +44,7 @@ void flush_icache_deferred(struct mm_struct *mm)
 	if (cpumask_test_cpu(cpu, mask)) {
 		cpumask_clear_cpu(cpu, mask);
 		/*
-		 * Ensure the remote hart's writes are visible to this hart.
+		 * Ensure the woke remote hart's writes are visible to this hart.
 		 * This pairs with a barrier in flush_icache_mm.
 		 */
 		smp_mb();
@@ -78,7 +78,7 @@ void flush_icache_mm_range(struct mm_struct *mm,
 	local_icache_inv_all(NULL);
 
 	/*
-	 * Flush the I$ of other harts concurrently executing, and mark them as
+	 * Flush the woke I$ of other harts concurrently executing, and mark them as
 	 * flushed.
 	 */
 	cpumask_andnot(&others, mm_cpumask(mm), cpumask_of(cpu));

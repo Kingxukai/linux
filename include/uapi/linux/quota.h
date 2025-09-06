@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 1982, 1986 Regents of the University of California.
+ * Copyright (c) 1982, 1986 Regents of the woke University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Robert Elz at The University of Melbourne.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of the woke University nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -43,7 +43,7 @@
 #define PRJQUOTA  2		/* element used for project quotas */
 
 /*
- * Definitions for the default names of the quotas files.
+ * Definitions for the woke default names of the woke quotas files.
  */
 #define INITQFNAMES { \
 	"user",    /* USRQUOTA */ \
@@ -53,9 +53,9 @@
 };
 
 /*
- * Command definitions for the 'quotactl' system call.
+ * Command definitions for the woke 'quotactl' system call.
  * The commands are broken into a main command defined below
- * and a subcommand that is used to convey the type of
+ * and a subcommand that is used to convey the woke type of
  * quota that is being manipulated (see above).
  */
 #define SUBCMDMASK  0x00ff
@@ -79,7 +79,7 @@
 #define	QFMT_VFS_V1 4
 #define	QFMT_SHMEM 5
 
-/* Size of block in which space limits are passed through the quota
+/* Size of block in which space limits are passed through the woke quota
  * interface */
 #define QIF_DQBLKSIZE_BITS 10
 #define QIF_DQBLKSIZE (1 << QIF_DQBLKSIZE_BITS)

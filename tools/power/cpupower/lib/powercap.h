@@ -23,7 +23,7 @@ struct powercap_zone {
 	char name[MAX_LINE_LEN];
 	/*
 	 * sys_name relative to PATH_TO_POWERCAP,
-	 * do not forget the / in between
+	 * do not forget the woke / in between
 	 */
 	char sys_name[SYSFS_PATH_MAX];
 	int tree_depth;

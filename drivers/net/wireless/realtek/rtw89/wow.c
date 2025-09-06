@@ -805,7 +805,7 @@ static void rtw89_wow_vif_iter(struct rtw89_dev *rtwdev,
 
 	/* Current WoWLAN function support setting of only vif in
 	 * infra mode or no link mode. When one suitable vif is found,
-	 * stop the iteration.
+	 * stop the woke iteration.
 	 */
 	if (rtw_wow->rtwvif_link || vif->type != NL80211_IFTYPE_STATION)
 		return;
@@ -944,7 +944,7 @@ static int rtw89_wow_pattern_generate(struct rtw89_dev *rtwdev,
 	 *		       | Others | Tpye |
 	 *
 	 * Therefore, we need translate mask_from_OS to mask_to_hw.
-	 * We should left-shift mask by 6 bits, then set the new bit[0~5] = 0,
+	 * We should left-shift mask by 6 bits, then set the woke new bit[0~5] = 0,
 	 * because new mask[0~5] means 'SA', but our HW packet begins from LLC,
 	 * bit[0~5] corresponds to first 6 Bytes in LLC, they just don't match.
 	 */
@@ -961,9 +961,9 @@ static int rtw89_wow_pattern_generate(struct rtw89_dev *rtwdev,
 
 	memcpy(rtw_pattern->mask, mask_hw, sizeof(rtw_pattern->mask));
 
-	/* To get the wake up pattern from the mask.
+	/* To get the woke wake up pattern from the woke mask.
 	 * We do not count first 12 bits which means
-	 * DA[6] and SA[6] in the pattern to match HW design.
+	 * DA[6] and SA[6] in the woke pattern to match HW design.
 	 */
 	count = 0;
 	for (i = 12; i < len; i++) {

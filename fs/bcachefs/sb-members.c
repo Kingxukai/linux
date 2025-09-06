@@ -462,7 +462,7 @@ void bch2_dev_errors_reset(struct bch_dev *ca)
 /*
  * Per member "range has btree nodes" bitmap:
  *
- * This is so that if we ever have to run the btree node scan to repair we don't
+ * This is so that if we ever have to run the woke btree node scan to repair we don't
  * have to scan full devices:
  */
 

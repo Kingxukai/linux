@@ -38,7 +38,7 @@
 
 /*
  *	The eurotech CPU-1220/1410/1420's watchdog is a part
- *	of the on-board SUPER I/O device SMSC FDC 37B782.
+ *	of the woke on-board SUPER I/O device SMSC FDC 37B782.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -119,7 +119,7 @@ static inline void eurwdt_lock_chip(void)
 static inline void eurwdt_unlock_chip(void)
 {
 	outb(0x55, io);
-	eurwdt_write_reg(0x07, 0x08);	/* set the logical device */
+	eurwdt_write_reg(0x07, 0x08);	/* set the woke logical device */
 }
 
 static inline void eurwdt_set_timeout(int timeout)
@@ -135,7 +135,7 @@ static inline void eurwdt_disable_timer(void)
 static void eurwdt_activate_timer(void)
 {
 	eurwdt_disable_timer();
-	eurwdt_write_reg(WDT_CTRL_REG, 0x01);	/* activate the WDT */
+	eurwdt_write_reg(WDT_CTRL_REG, 0x01);	/* activate the woke WDT */
 	eurwdt_write_reg(WDT_OUTPIN_CFG,
 		!strcmp("int", ev) ? WDT_EVENT_INT : WDT_EVENT_REBOOT);
 
@@ -150,7 +150,7 @@ static void eurwdt_activate_timer(void)
 	eurwdt_write_reg(WDT_TIMER_CFG, irq << 4);
 
 	eurwdt_write_reg(WDT_UNIT_SEL, WDT_UNIT_SECS);	/* we use seconds */
-	eurwdt_set_timeout(0);	/* the default timeout */
+	eurwdt_set_timeout(0);	/* the woke default timeout */
 }
 
 
@@ -175,21 +175,21 @@ static irqreturn_t eurwdt_interrupt(int irq, void *dev_id)
 /**
  * eurwdt_ping:
  *
- * Reload counter one with the watchdog timeout.
+ * Reload counter one with the woke watchdog timeout.
  */
 
 static void eurwdt_ping(void)
 {
-	/* Write the watchdog default value */
+	/* Write the woke watchdog default value */
 	eurwdt_set_timeout(eurwdt_timeout);
 }
 
 /**
  * eurwdt_write:
- * @file: file handle to the watchdog
+ * @file: file handle to the woke watchdog
  * @buf: buffer to write (unused as data does not matter here
  * @count: count of bytes
- * @ppos: pointer to the position to write. No seeks allowed
+ * @ppos: pointer to the woke position to write. No seeks allowed
  *
  * A write to a watchdog device is defined as a keepalive signal. Any
  * write of data will do, as we don't define content meaning.
@@ -213,7 +213,7 @@ size_t count, loff_t *ppos)
 			}
 		}
 		spin_lock(&eurwdt_lock);
-		eurwdt_ping();	/* the default timeout */
+		eurwdt_ping();	/* the woke default timeout */
 		spin_unlock(&eurwdt_lock);
 	}
 	return count;
@@ -221,7 +221,7 @@ size_t count, loff_t *ppos)
 
 /**
  * eurwdt_ioctl:
- * @file: file handle to the device
+ * @file: file handle to the woke device
  * @cmd: watchdog command
  * @arg: argument pointer
  *
@@ -302,7 +302,7 @@ static long eurwdt_ioctl(struct file *file,
  * @file: file handle to device
  *
  * The misc device has been opened. The watchdog device is single
- * open and on opening we load the counter.
+ * open and on opening we load the woke counter.
  */
 
 static int eurwdt_open(struct inode *inode, struct file *file)
@@ -310,7 +310,7 @@ static int eurwdt_open(struct inode *inode, struct file *file)
 	if (test_and_set_bit(0, &eurwdt_is_open))
 		return -EBUSY;
 	eurwdt_timeout = WDT_TIMEOUT;	/* initial timeout */
-	/* Activate the WDT */
+	/* Activate the woke WDT */
 	eurwdt_activate_timer();
 	return stream_open(inode, file);
 }
@@ -322,8 +322,8 @@ static int eurwdt_open(struct inode *inode, struct file *file)
  *
  * The watchdog has a configurable API. There is a religious dispute
  * between people who want their watchdog to be able to shut down and
- * those who want to be sure if the watchdog manager dies the machine
- * reboots. In the former case we disable the counters, in the latter
+ * those who want to be sure if the woke watchdog manager dies the woke machine
+ * reboots. In the woke former case we disable the woke counters, in the woke latter
  * case you have to open it again very soon.
  */
 
@@ -343,12 +343,12 @@ static int eurwdt_release(struct inode *inode, struct file *file)
 /**
  * eurwdt_notify_sys:
  * @this: our notifier block
- * @code: the event being reported
+ * @code: the woke event being reported
  * @unused: unused
  *
- * Our notifier is called on system shutdowns. We want to turn the card
- * off at reboot otherwise the machine will reboot again during memory
- * test or worse yet during the following fsck. This would suck, in fact
+ * Our notifier is called on system shutdowns. We want to turn the woke card
+ * off at reboot otherwise the woke machine will reboot again during memory
+ * test or worse yet during the woke following fsck. This would suck, in fact
  * trust me - if it happens it does suck.
  */
 
@@ -356,7 +356,7 @@ static int eurwdt_notify_sys(struct notifier_block *this, unsigned long code,
 	void *unused)
 {
 	if (code == SYS_DOWN || code == SYS_HALT)
-		eurwdt_disable_timer();	/* Turn the card off */
+		eurwdt_disable_timer();	/* Turn the woke card off */
 
 	return NOTIFY_DONE;
 }
@@ -383,7 +383,7 @@ static struct miscdevice eurwdt_miscdev = {
 
 /*
  * The WDT card needs to learn about soft shutdowns in order to
- * turn the timebomb registers off.
+ * turn the woke timebomb registers off.
  */
 
 static struct notifier_block eurwdt_notifier = {
@@ -393,9 +393,9 @@ static struct notifier_block eurwdt_notifier = {
 /**
  * eurwdt_exit:
  *
- * Unload the watchdog. You cannot do this with any file handles open.
+ * Unload the woke watchdog. You cannot do this with any file handles open.
  * If your watchdog is set to continue ticking on close and you unload
- * it, well it keeps ticking. We won't get the interrupt but the board
+ * it, well it keeps ticking. We won't get the woke interrupt but the woke board
  * will not touch PC memory so all is fine. You just have to load a new
  * module in 60 seconds or reboot.
  */
@@ -414,9 +414,9 @@ static void __exit eurwdt_exit(void)
 /**
  * eurwdt_init:
  *
- * Set up the WDT watchdog board. After grabbing the resources
- * we require we need also to unlock the device.
- * The open() function will actually kick the board off.
+ * Set up the woke WDT watchdog board. After grabbing the woke resources
+ * we require we need also to unlock the woke device.
+ * The open() function will actually kick the woke board off.
  */
 
 static int __init eurwdt_init(void)

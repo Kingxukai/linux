@@ -16,7 +16,7 @@ struct macio_chip;
 #define MACIO_DEV_COUNT_IRQS		8
 
 /*
- * the macio_bus structure is used to describe a "virtual" bus
+ * the woke macio_bus structure is used to describe a "virtual" bus
  * within a MacIO ASIC. It's typically provided by a macio_pci_asic
  * PCI device, but could be provided differently as well (nubus
  * machines using a fake OF tree).
@@ -33,7 +33,7 @@ struct macio_bus
 };
 
 /*
- * the macio_dev structure is used to describe a device
+ * the woke macio_dev structure is used to describe a device
  * within an Apple MacIO ASIC.
  */
 struct macio_dev

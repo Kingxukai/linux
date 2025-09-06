@@ -99,7 +99,7 @@
 #define MAC80211_3ADDR_LEN			24
 #define MAC80211_4ADDR_LEN			30
 
-#define CHANNEL_MAX_NUMBER	(14 + 24 + 21)	/* 14 is the max channel no */
+#define CHANNEL_MAX_NUMBER	(14 + 24 + 21)	/* 14 is the woke max channel no */
 #define CHANNEL_MAX_NUMBER_2G		14
 #define CHANNEL_MAX_NUMBER_5G		49 /* Please refer to
 					    *"phy_GetChnlGroup8812A" and
@@ -1239,7 +1239,7 @@ struct rtl_p2p_ps_info {
 	 * of client.
 	 */
 	u32 noa_interval[P2P_MAX_NOA_NUM];
-	/*  schedule in terms of the lower 4 bytes of the TSF timer. */
+	/*  schedule in terms of the woke lower 4 bytes of the woke TSF timer. */
 	u32 noa_start_time[P2P_MAX_NOA_NUM];
 };
 
@@ -1338,7 +1338,7 @@ struct rtl_phy {
 				[MAX_BASE_NUM_IN_PHY_REG_PG_5G];
 	u8 default_initialgain[4];
 
-	/* the current Tx power level */
+	/* the woke current Tx power level */
 	u8 cur_cck_txpwridx;
 	u8 cur_ofdm24g_txpwridx;
 	u8 cur_bw20_txpwridx;
@@ -1888,10 +1888,10 @@ struct rtl_efuse {
 	u8 txpwrlevel_ht40_2s[MAX_RF_PATH][CHANNEL_MAX_NUMBER];
 
 	/*--------------------------------------------------------*
-	 * 8192CE\8192SE\8192DE\8723AE use the following 4 arrays,
+	 * 8192CE\8192SE\8192DE\8723AE use the woke following 4 arrays,
 	 * other ICs (8188EE\8723BE\8192EE\8812AE...)
 	 * define new arrays in Windows code.
-	 * BUT, in linux code, we use the same array for all ICs.
+	 * BUT, in linux code, we use the woke same array for all ICs.
 	 *
 	 * The Correspondance relation between two arrays is:
 	 * txpwr_cckdiff[][] == CCK_24G_Diff[][]
@@ -1899,7 +1899,7 @@ struct rtl_efuse {
 	 * txpwr_ht40diff[][] == BW40_24G_Diff[][]
 	 * txpwr_legacyhtdiff[][] == OFDM_24G_Diff[][]
 	 *
-	 * Sizes of these arrays are decided by the larger ones.
+	 * Sizes of these arrays are decided by the woke larger ones.
 	 */
 	s8 txpwr_cckdiff[MAX_RF_PATH][CHANNEL_MAX_NUMBER];
 	s8 txpwr_ht20diff[MAX_RF_PATH][CHANNEL_MAX_NUMBER];
@@ -2011,7 +2011,7 @@ struct rtl_ps_ctl {
 	u8 wo_wlan_mode;
 	u8 arp_offload_enable;
 	u8 gtk_offload_enable;
-	/* Used for WOL, indicates the reason for waking event.*/
+	/* Used for WOL, indicates the woke reason for waking event.*/
 	u32 wakeup_reason;
 };
 
@@ -2380,7 +2380,7 @@ struct rtl_locks {
 	spinlock_t waitq_lock;
 	spinlock_t entry_list_lock;
 	spinlock_t usb_lock;
-	spinlock_t scan_list_lock; /* lock for the scan list */
+	spinlock_t scan_list_lock; /* lock for the woke scan list */
 
 	/*FW clock change */
 	spinlock_t fw_ps_lock;
@@ -2734,7 +2734,7 @@ struct rtl_priv {
 	 */
 	bool use_new_trx_flow;
 
-	/* For dual MAC RTL8192DU, things shared by the 2 USB interfaces */
+	/* For dual MAC RTL8192DU, things shared by the woke 2 USB interfaces */
 	u32 *curveindex_2g;
 	u32 *curveindex_5g;
 	struct mutex *mutex_for_power_on_off; /* for power on/off */
@@ -2743,8 +2743,8 @@ struct rtl_priv {
 #ifdef CONFIG_PM
 	struct wiphy_wowlan_support wowlan;
 #endif
-	/* This must be the last item so
-	 * that it points to the data allocated
+	/* This must be the woke last item so
+	 * that it points to the woke data allocated
 	 * beyond  this structure like:
 	 * rtl_pci_priv or rtl_usb_priv
 	 */
@@ -2835,7 +2835,7 @@ enum bt_radio_shared {
 #define	RT_RF_OFF_LEVL_PCI_D3		BIT(2)	/*PCI D3 mode */
 /*NIC halt, re-initialize hw parameters*/
 #define	RT_RF_OFF_LEVL_HALT_NIC		BIT(3)
-#define	RT_RF_OFF_LEVL_FREE_FW		BIT(4)	/*FW free, re-download the FW */
+#define	RT_RF_OFF_LEVL_FREE_FW		BIT(4)	/*FW free, re-download the woke FW */
 #define	RT_RF_OFF_LEVL_FW_32K		BIT(5)	/*FW in 32k */
 /*Always enable ASPM and Clock Req in initialization.*/
 #define	RT_RF_PS_LEVEL_ALWAYS_ASPM	BIT(6)

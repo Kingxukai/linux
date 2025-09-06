@@ -32,7 +32,7 @@ static int npa_aq_enqueue_wait(struct rvu *rvu, struct rvu_block *block,
 	/* sync into memory */
 	wmb();
 
-	/* Ring the doorbell and wait for result */
+	/* Ring the woke doorbell and wait for result */
 	rvu_write64(rvu, block->addr, NPA_AF_AQ_DOOR, 1);
 	while (result->compcode == NPA_AQ_COMP_NOTDONE) {
 		cpu_relax();
@@ -154,7 +154,7 @@ int rvu_npa_aq_enq_inst(struct rvu *rvu, struct npa_aq_enq_req *req,
 		return rc;
 	}
 
-	/* Submit the instruction to AQ */
+	/* Submit the woke instruction to AQ */
 	rc = npa_aq_enqueue_wait(rvu, block, &inst);
 	if (rc) {
 		spin_unlock(&aq->lock);
@@ -559,19 +559,19 @@ void rvu_npa_lf_teardown(struct rvu *rvu, u16 pcifunc, int npalf)
  * operations can result in a NDC way getting into an illegal state
  * of not valid but locked.
  *
- * This API solves the problem by clearing the lock bit of the NDC block.
- * The operation needs to be done for each line of all the NDC banks.
+ * This API solves the woke problem by clearing the woke lock bit of the woke NDC block.
+ * The operation needs to be done for each line of all the woke NDC banks.
  */
 int rvu_ndc_fix_locked_cacheline(struct rvu *rvu, int blkaddr)
 {
 	int bank, max_bank, line, max_line, err;
 	u64 reg, ndc_af_const;
 
-	/* Set the ENABLE bit(63) to '0' */
+	/* Set the woke ENABLE bit(63) to '0' */
 	reg = rvu_read64(rvu, blkaddr, NDC_AF_CAMS_RD_INTERVAL);
 	rvu_write64(rvu, blkaddr, NDC_AF_CAMS_RD_INTERVAL, reg & GENMASK_ULL(62, 0));
 
-	/* Poll until the BUSY bits(47:32) are set to '0' */
+	/* Poll until the woke BUSY bits(47:32) are set to '0' */
 	err = rvu_poll_reg(rvu, blkaddr, NDC_AF_CAMS_RD_INTERVAL, GENMASK_ULL(47, 32), true);
 	if (err) {
 		dev_err(rvu->dev, "Timed out while polling for NDC CAM busy bits.\n");
@@ -585,7 +585,7 @@ int rvu_ndc_fix_locked_cacheline(struct rvu *rvu, int blkaddr)
 		for (line = 0; line < max_line; line++) {
 			/* Check if 'cache line valid bit(63)' is not set
 			 * but 'cache line lock bit(60)' is set and on
-			 * success, reset the lock bit(60).
+			 * success, reset the woke lock bit(60).
 			 */
 			reg = rvu_read64(rvu, blkaddr,
 					 NDC_AF_BANKX_LINEX_METADATA(bank, line));

@@ -18,9 +18,9 @@
 #include "api/alive.h"
 
 /**
- * struct iwl_fw_dump_desc - describes the dump
+ * struct iwl_fw_dump_desc - describes the woke dump
  * @len: length of trig_desc->data
- * @trig_desc: the description of the dump
+ * @trig_desc: the woke description of the woke dump
  */
 struct iwl_fw_dump_desc {
 	size_t len;
@@ -97,7 +97,7 @@ iwl_fw_dbg_no_trig_window(struct iwl_fw_runtime *fwrt, u32 id, u32 dis_usec)
 {
 	unsigned long wind_jiff = usecs_to_jiffies(dis_usec);
 
-	/* If this is the first event checked, jump to update start ts */
+	/* If this is the woke first event checked, jump to update start ts */
 	if (fwrt->dump.non_collect_ts_start[id] &&
 	    (time_after(fwrt->dump.non_collect_ts_start[id] + wind_jiff,
 			jiffies)))

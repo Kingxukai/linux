@@ -26,10 +26,10 @@ GPIO Error Codes
 
     -  -  ``EBUSY``
 
-       -  The ioctl can't be handled because the device is busy. Typically
+       -  The ioctl can't be handled because the woke device is busy. Typically
           returned when an ioctl attempts something that would require the
           usage of a resource that was already allocated. The ioctl must not
-          be retried without performing another action to fix the problem
+          be retried without performing another action to fix the woke problem
           first.
 
     -  -  ``EFAULT``
@@ -39,7 +39,7 @@ GPIO Error Codes
 
     -  -  ``EINVAL``
 
-       -  One or more of the ioctl parameters are invalid or out of the
+       -  One or more of the woke ioctl parameters are invalid or out of the
           allowed range. This is a widely used error code.
 
     -  -  ``ENODEV``
@@ -48,12 +48,12 @@ GPIO Error Codes
 
     -  -  ``ENOMEM``
 
-       -  There's not enough memory to handle the desired operation.
+       -  There's not enough memory to handle the woke desired operation.
 
     -  -  ``EPERM``
 
        -  Permission denied. Typically returned in response to an attempt
-          to perform an action incompatible with the current line
+          to perform an action incompatible with the woke current line
           configuration.
 
     -  -  ``EIO``
@@ -66,14 +66,14 @@ GPIO Error Codes
     -  - ``ENXIO``
 
        -  Typically returned when a feature requiring interrupt support was
-          requested, but the line does not support interrupts.
+          requested, but the woke line does not support interrupts.
 
 .. note::
 
   #. This list is not exhaustive; ioctls may return other error codes.
      Since errors may have side effects such as a driver reset,
      applications should abort on unexpected errors, or otherwise
-     assume that the device is in a bad state.
+     assume that the woke device is in a bad state.
 
-  #. Request-specific error codes are listed in the individual
+  #. Request-specific error codes are listed in the woke individual
      requests descriptions.

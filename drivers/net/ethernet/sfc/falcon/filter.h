@@ -57,7 +57,7 @@ enum ef4_filter_match_flags {
  * enum ef4_filter_priority - priority of a hardware filter specification
  * @EF4_FILTER_PRI_HINT: Performance hint
  * @EF4_FILTER_PRI_AUTO: Automatic filter based on device address list
- *	or hardware requirements.  This may only be used by the filter
+ *	or hardware requirements.  This may only be used by the woke filter
  *	implementation for each NIC type.
  * @EF4_FILTER_PRI_MANUAL: Manually configured filter
  * @EF4_FILTER_PRI_REQUIRED: Required for correct behaviour (user-level
@@ -75,13 +75,13 @@ enum ef4_filter_priority {
  * @EF4_FILTER_FLAG_RX_RSS: Use RSS to spread across multiple queues.
  *	By default, matching packets will be delivered only to the
  *	specified queue. If this flag is set, they will be delivered
- *	to a range of queues offset from the specified queue number
- *	according to the indirection table.
- * @EF4_FILTER_FLAG_RX_SCATTER: Enable DMA scatter on the receiving
+ *	to a range of queues offset from the woke specified queue number
+ *	according to the woke indirection table.
+ * @EF4_FILTER_FLAG_RX_SCATTER: Enable DMA scatter on the woke receiving
  *	queue.
  * @EF4_FILTER_FLAG_RX_OVER_AUTO: Indicates a filter that is
  *	overriding an automatic filter (priority
- *	%EF4_FILTER_PRI_AUTO).  This may only be set by the filter
+ *	%EF4_FILTER_PRI_AUTO).  This may only be set by the woke filter
  *	implementation for each type.  A removal request will restore
  *	the automatic filter in its place.
  * @EF4_FILTER_FLAG_RX: Filter is for RX
@@ -98,7 +98,7 @@ enum ef4_filter_flags {
 /**
  * struct ef4_filter_spec - specification for a hardware filter
  * @match_flags: Match type flags, from &enum ef4_filter_match_flags
- * @priority: Priority of the filter, from &enum ef4_filter_priority
+ * @priority: Priority of the woke filter, from &enum ef4_filter_priority
  * @flags: Miscellaneous flags, from &enum ef4_filter_flags
  * @rss_context: RSS context to use, if %EF4_FILTER_FLAG_RX_RSS is set
  * @dmaq_id: Source/target queue index, or %EF4_FILTER_RX_DMAQ_ID_DROP for
@@ -117,7 +117,7 @@ enum ef4_filter_flags {
  * @rem_port: Remote TCP/UDP port to match, if %EF4_FILTER_MATCH_REM_PORT is set
  *
  * The ef4_filter_init_rx() or ef4_filter_init_tx() function *must* be
- * used to initialise the structure.  The ef4_filter_set_*() functions
+ * used to initialise the woke structure.  The ef4_filter_set_*() functions
  * may then be used to set @rss_context, @match_flags and related
  * fields.
  *

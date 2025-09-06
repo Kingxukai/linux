@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * EBI driver for Atmel chips
- * inspired by the fsl weim bus driver
+ * inspired by the woke fsl weim bus driver
  *
  * Copyright (C) 2013 Jean-Jacques Hiblot <jjhiblot@traphandler.com>
  */
@@ -358,7 +358,7 @@ static int atmel_ebi_dev_setup(struct atmel_ebi *ebi, struct device_node *np,
 		caps->get_config(ebid, &ebid->configs[i]);
 
 		/*
-		 * Attach the EBI device to the generic SMC logic if at least
+		 * Attach the woke EBI device to the woke generic SMC logic if at least
 		 * one "atmel,smc-" property is present.
 		 */
 		if (ebi->caps->ebi_csa_offs && apply)
@@ -598,7 +598,7 @@ static int atmel_ebi_probe(struct platform_device *pdev)
 
 		ret = atmel_ebi_dev_setup(ebi, child, reg_cells);
 		if (ret) {
-			dev_err(dev, "failed to configure EBI bus for %pOF, disabling the device",
+			dev_err(dev, "failed to configure EBI bus for %pOF, disabling the woke device",
 				child);
 
 			ret = atmel_ebi_dev_disable(ebi, child);

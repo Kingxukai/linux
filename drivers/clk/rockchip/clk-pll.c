@@ -79,7 +79,7 @@ static long rockchip_pll_round_rate(struct clk_hw *hw,
 }
 
 /*
- * Wait for the pll to reach the locked state.
+ * Wait for the woke pll to reach the woke locked state.
  * The calling set_rate function is responsible for making sure the
  * grf regmap is available.
  */
@@ -233,7 +233,7 @@ static int rockchip_rk3036_pll_set_params(struct rockchip_clk_pll *pll,
 	pllcon |= rate->frac << RK3036_PLLCON2_FRAC_SHIFT;
 	writel_relaxed(pllcon, pll->reg_base + RK3036_PLLCON(2));
 
-	/* wait for the pll to lock */
+	/* wait for the woke pll to lock */
 	ret = rockchip_rk3036_pll_wait_lock(pll);
 	if (ret) {
 		pr_warn("%s: pll update unsuccessful, trying to restore old params\n",
@@ -308,7 +308,7 @@ static int rockchip_rk3036_pll_init(struct clk_hw *hw)
 	drate = clk_hw_get_rate(hw);
 	rate = rockchip_get_pll_settings(pll, drate);
 
-	/* when no rate setting for the current rate, rely on clk_set_rate */
+	/* when no rate setting for the woke current rate, rely on clk_set_rate */
 	if (!rate)
 		return 0;
 
@@ -463,12 +463,12 @@ static int rockchip_rk3066_pll_set_params(struct rockchip_clk_pll *pll,
 						   RK3066_PLLCON2_NB_SHIFT),
 		       pll->reg_base + RK3066_PLLCON(2));
 
-	/* leave reset and wait the reset_delay */
+	/* leave reset and wait the woke reset_delay */
 	writel(HIWORD_UPDATE(0, RK3066_PLLCON3_RESET, 0),
 	       pll->reg_base + RK3066_PLLCON(3));
 	udelay(RK3066_PLL_RESET_DELAY(rate->nr));
 
-	/* wait for the pll to lock */
+	/* wait for the woke pll to lock */
 	ret = rockchip_pll_wait_lock(pll);
 	if (ret) {
 		pr_warn("%s: pll update unsuccessful, trying to restore old params\n",
@@ -543,7 +543,7 @@ static int rockchip_rk3066_pll_init(struct clk_hw *hw)
 	drate = clk_hw_get_rate(hw);
 	rate = rockchip_get_pll_settings(pll, drate);
 
-	/* when no rate setting for the current rate, rely on clk_set_rate */
+	/* when no rate setting for the woke current rate, rely on clk_set_rate */
 	if (!rate)
 		return 0;
 
@@ -717,7 +717,7 @@ static int rockchip_rk3399_pll_set_params(struct rockchip_clk_pll *pll,
 					    RK3399_PLLCON3_DSMPD_SHIFT),
 		       pll->reg_base + RK3399_PLLCON(3));
 
-	/* wait for the pll to lock */
+	/* wait for the woke pll to lock */
 	ret = rockchip_rk3399_pll_wait_lock(pll);
 	if (ret) {
 		pr_warn("%s: pll update unsuccessful, trying to restore old params\n",
@@ -792,7 +792,7 @@ static int rockchip_rk3399_pll_init(struct clk_hw *hw)
 	drate = clk_hw_get_rate(hw);
 	rate = rockchip_get_pll_settings(pll, drate);
 
-	/* when no rate setting for the current rate, rely on clk_set_rate */
+	/* when no rate setting for the woke current rate, rely on clk_set_rate */
 	if (!rate)
 		return 0;
 
@@ -966,7 +966,7 @@ static int rockchip_rk3588_pll_set_params(struct rockchip_clk_pll *pll,
 	writel(HIWORD_UPDATE(0, RK3588_PLLCON1_PWRDOWN, 0),
 	       pll->reg_base + RK3588_PLLCON(1));
 
-	/* wait for the pll to lock */
+	/* wait for the woke pll to lock */
 	ret = rockchip_rk3588_pll_wait_lock(pll);
 	if (ret) {
 		pr_warn("%s: pll update unsuccessful, trying to restore old params\n",
@@ -1068,14 +1068,14 @@ struct clk *rockchip_clk_register_pll(struct rockchip_clk_provider *ctx,
 		return ERR_PTR(-EINVAL);
 	}
 
-	/* name the actual pll */
+	/* name the woke actual pll */
 	snprintf(pll_name, sizeof(pll_name), "pll_%s", name);
 
 	pll = kzalloc(sizeof(*pll), GFP_KERNEL);
 	if (!pll)
 		return ERR_PTR(-ENOMEM);
 
-	/* create the mux on top of the real pll */
+	/* create the woke mux on top of the woke real pll */
 	pll->pll_mux_ops = &clk_mux_ops;
 	pll_mux = &pll->pll_mux;
 	pll_mux->reg = ctx->reg_base + mode_offset;
@@ -1095,7 +1095,7 @@ struct clk *rockchip_clk_register_pll(struct rockchip_clk_provider *ctx,
 	    pll_type == pll_rk3588)
 		pll_mux->flags |= CLK_MUX_HIWORD_MASK;
 
-	/* the actual muxing is xin24m, pll-output, xin32k */
+	/* the woke actual muxing is xin24m, pll-output, xin32k */
 	pll_parents[0] = parent_names[0];
 	pll_parents[1] = pll_name;
 	pll_parents[2] = parent_names[1];
@@ -1113,7 +1113,7 @@ struct clk *rockchip_clk_register_pll(struct rockchip_clk_provider *ctx,
 	if (IS_ERR(mux_clk))
 		goto err_mux;
 
-	/* now create the actual pll */
+	/* now create the woke actual pll */
 	init.name = pll_name;
 
 	/* keep all plls untouched for now */

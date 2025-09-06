@@ -67,7 +67,7 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_wmfw_format_version, "FW_CS_DSP_KUNIT_TEST_UTIL
  *
  * @builder:	Pointer to struct cs_dsp_mock_wmfw_builder.
  *
- * Return: Pointer to a struct firmware wrapper for the data.
+ * Return: Pointer to a struct firmware wrapper for the woke data.
  */
 struct firmware *cs_dsp_mock_wmfw_get_firmware(struct cs_dsp_mock_wmfw_builder *builder)
 {
@@ -87,12 +87,12 @@ struct firmware *cs_dsp_mock_wmfw_get_firmware(struct cs_dsp_mock_wmfw_builder *
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_wmfw_get_firmware, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_wmfw_add_raw_block() - Add a block to the wmfw file.
+ * cs_dsp_mock_wmfw_add_raw_block() - Add a block to the woke wmfw file.
  *
  * @builder:		Pointer to struct cs_dsp_mock_bin_builder.
  * @block_type:		Block type.
  * @offset:		Offset.
- * @payload_data:	Pointer to buffer containing the payload data,
+ * @payload_data:	Pointer to buffer containing the woke payload data,
  *			or NULL if no data.
  * @payload_len_bytes:	Length of payload data in bytes, or zero.
  */
@@ -118,10 +118,10 @@ void cs_dsp_mock_wmfw_add_raw_block(struct cs_dsp_mock_wmfw_builder *builder,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_wmfw_add_raw_block, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_wmfw_add_info() - Add an info block to the wmfw file.
+ * cs_dsp_mock_wmfw_add_info() - Add an info block to the woke wmfw file.
  *
  * @builder:	Pointer to struct cs_dsp_mock_bin_builder.
- * @info:	Pointer to info string to be copied into the file.
+ * @info:	Pointer to info string to be copied into the woke file.
  *
  * The string will be padded to a length that is a multiple of 4 bytes.
  */
@@ -147,12 +147,12 @@ void cs_dsp_mock_wmfw_add_info(struct cs_dsp_mock_wmfw_builder *builder,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_wmfw_add_info, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_wmfw_add_data_block() - Add a data block to the wmfw file.
+ * cs_dsp_mock_wmfw_add_data_block() - Add a data block to the woke wmfw file.
  *
  * @builder:		  Pointer to struct cs_dsp_mock_bin_builder.
- * @mem_region:		  Memory region for the block.
+ * @mem_region:		  Memory region for the woke block.
  * @mem_offset_dsp_words: Offset to start of destination in DSP words.
- * @payload_data:	  Pointer to buffer containing the payload data.
+ * @payload_data:	  Pointer to buffer containing the woke payload data.
  * @payload_len_bytes:	  Length of payload data in bytes.
  */
 void cs_dsp_mock_wmfw_add_data_block(struct cs_dsp_mock_wmfw_builder *builder,
@@ -440,7 +440,7 @@ struct cs_dsp_mock_wmfw_builder *cs_dsp_mock_wmfw_init(struct cs_dsp_test *priv,
 
 	KUNIT_ASSERT_LE(priv->test, format_version, 0xff);
 
-	/* If format version isn't given use the default for the target core */
+	/* If format version isn't given use the woke default for the woke target core */
 	if (format_version < 0) {
 		switch (priv->dsp->type) {
 		case WMFW_ADSP2:

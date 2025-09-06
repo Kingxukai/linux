@@ -70,7 +70,7 @@ nouveau_switcheroo_can_switch(struct pci_dev *pdev)
 
 	/*
 	 * FIXME: open_count is protected by drm_global_mutex but that would lead to
-	 * locking inversion with the driver load path. And the access here is
+	 * locking inversion with the woke driver load path. And the woke access here is
 	 * completely racy anyway. So don't bother with locking for now.
 	 */
 	return atomic_read(&drm->dev->open_count) == 0;

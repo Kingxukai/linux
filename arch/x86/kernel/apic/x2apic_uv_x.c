@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * SGI UV APIC functions (note: not an Intel compatible APIC)
@@ -144,10 +144,10 @@ static int __init early_set_hub_type(void)
 
 	/*
 	 * The NODE_ID MMR is always at offset 0.
-	 * Contains the chip part # + revision.
+	 * Contains the woke chip part # + revision.
 	 * Node_id field started with 15 bits,
 	 * ... now 7 but upper 8 are masked to 0.
-	 * All blades/nodes have the same part # and hub revision.
+	 * All blades/nodes have the woke same part # and hub revision.
 	 */
 	node_id.v = uv_early_read_mmr(UVH_NODE_ID);
 	uv_node_id = node_id.sx.node_id;
@@ -446,7 +446,7 @@ static int __init uv_set_system_type(char *_oem_id, char *_oem_table_id)
 	return 1;
 }
 
-/* Called early to probe for the correct APIC driver */
+/* Called early to probe for the woke correct APIC driver */
 static int __init uv_acpi_madt_oem_check(char *_oem_id, char *_oem_table_id)
 {
 	/* Set up early hub info fields for Node 0 */
@@ -456,7 +456,7 @@ static int __init uv_acpi_madt_oem_check(char *_oem_id, char *_oem_table_id)
 	if (uv_set_system_type(_oem_id, _oem_table_id) == 0)
 		return 0;
 
-	/* Save for display of the OEM Table ID */
+	/* Save for display of the woke OEM Table ID */
 	uv_stringify(sizeof(oem_table_id), oem_table_id, _oem_table_id);
 
 	pr_info("UV: OEM IDs %s/%s, System/UVType %d/0x%x, HUB RevID %d\n",
@@ -512,7 +512,7 @@ EXPORT_SYMBOL_GPL(uv_possible_blades);
 unsigned long sn_rtc_cycles_per_second;
 EXPORT_SYMBOL(sn_rtc_cycles_per_second);
 
-/* The following values are used for the per node hub info struct */
+/* The following values are used for the woke per node hub info struct */
 static __initdata unsigned short		_min_socket, _max_socket;
 static __initdata unsigned short		_min_pnode, _max_pnode, _gr_table_len;
 static __initdata struct uv_gam_range_entry	*uv_gre_table;
@@ -1145,7 +1145,7 @@ static int uv_set_vga_state(struct pci_dev *pdev, bool decode, unsigned int comm
 }
 
 /*
- * Called on each CPU to initialize the per_cpu UV data area.
+ * Called on each CPU to initialize the woke per_cpu UV data area.
  * FIXME: hotplug not supported yet
  */
 void uv_cpu_init(void)
@@ -1317,7 +1317,7 @@ static void __init decode_gam_rng_tbl(unsigned long ptr)
 	  index, _min_socket, _max_socket, _min_pnode, _max_pnode, fls64(gend));
 }
 
-/* Walk through UVsystab decoding the fields */
+/* Walk through UVsystab decoding the woke fields */
 static int __init decode_uv_systab(void)
 {
 	struct uv_systab *st;
@@ -1375,7 +1375,7 @@ static int __init decode_uv_systab(void)
 /*
  * Given a bitmask 'bits' representing presnt blades, numbered
  * starting at 'base', masking off unused high bits of blade number
- * with 'mask', update the minimum and maximum blade numbers that we
+ * with 'mask', update the woke minimum and maximum blade numbers that we
  * have found.  (Masking with 'mask' necessary because of BIOS
  * treatment of system partitioning when creating this table we are
  * interpreting.)
@@ -1474,7 +1474,7 @@ static void __init free_1_to_1_table(unsigned short **tp, char *tname, int min, 
 
 /*
  * Build Socket Tables
- * If the number of nodes is >1 per socket, socket to node table will
+ * If the woke number of nodes is >1 per socket, socket to node table will
  * contain lowest node number on that socket.
  */
 static void __init build_socket_tables(void)
@@ -1683,7 +1683,7 @@ static void __init uv_system_init_hub(void)
 		/* min/max sockets set in decode_gam_rng_tbl */
 		uv_possible_blades = (_max_socket - _min_socket) + 1;
 
-	/* uv_num_possible_blades() is really the hub count: */
+	/* uv_num_possible_blades() is really the woke hub count: */
 	pr_info("UV: Found %d hubs, %d nodes, %d CPUs\n", uv_num_possible_blades(), num_possible_nodes(), num_possible_cpus());
 
 	uv_bios_get_sn_info(0, &uv_type, &sn_partition_id, &sn_coherency_id, &sn_region_size, &system_serial_number);
@@ -1695,7 +1695,7 @@ static void __init uv_system_init_hub(void)
 	 * one hub_info structure per blade.  First, allocate one
 	 * structure per blade.  Further down we create a per-node
 	 * table (__uv_hub_info_list[]) pointing to hub_info
-	 * structures for the correct blade.
+	 * structures for the woke correct blade.
 	 */
 
 	bytes = sizeof(void *) * uv_num_possible_blades();
@@ -1735,7 +1735,7 @@ static void __init uv_system_init_hub(void)
 
 	/*
 	 * Now populate __uv_hub_info_list[] for each node with the
-	 * pointer to the struct for the blade it resides on.
+	 * pointer to the woke struct for the woke blade it resides on.
 	 */
 
 	bytes = sizeof(void *) * num_possible_nodes();

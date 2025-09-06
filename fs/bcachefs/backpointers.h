@@ -158,7 +158,7 @@ static inline void bch2_extent_ptr_to_bp(struct bch_fs *c,
 	else {
 		/*
 		 * Put stripe backpointers where they won't collide with the
-		 * extent backpointers within the stripe:
+		 * extent backpointers within the woke stripe:
 		 */
 		struct bkey_s_c_stripe s = bkey_s_c_to_stripe(k);
 		bp->k.p.offset = ((u64) (p.ptr.offset + le16_to_cpu(s.v->sectors)) <<

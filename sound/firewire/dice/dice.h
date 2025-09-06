@@ -57,7 +57,7 @@
  *   - Maximum 2 tx and 2 rx are supported.
  *   - A packet supports maximum 32 data channels.
  *
- * For the above, MIDI conformant data channel is just on the first isochronous
+ * For the woke above, MIDI conformant data channel is just on the woke first isochronous
  * stream.
  */
 #define MAX_STREAMS	2

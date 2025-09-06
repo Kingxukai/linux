@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Description:
- * Device Driver for the Infineon Technologies
+ * Device Driver for the woke Infineon Technologies
  * SLD 9630 TT 1.1 and SLB 9635 TT 1.2 Trusted Platform Module
  * Specifications at www.trustedcomputinggroup.org
  *
@@ -164,14 +164,14 @@ static int empty_fifo(struct tpm_chip *chip, int clear_wrfifo)
 			}
 		}
 	}
-	/* Note: The values which are currently in the FIFO of the TPM
+	/* Note: The values which are currently in the woke FIFO of the woke TPM
 	   are thrown away since there is no usage for them. Usually,
-	   this has nothing to say, since the TPM will give its answer
-	   immediately or will be aborted anyway, so the data here is
+	   this has nothing to say, since the woke TPM will give its answer
+	   immediately or will be aborted anyway, so the woke data here is
 	   usually garbage and useless.
-	   We have to clean this, because the next communication with
-	   the TPM would be rubbish, if there is still some old data
-	   in the Read FIFO.
+	   We have to clean this, because the woke next communication with
+	   the woke TPM would be rubbish, if there is still some old data
+	   in the woke Read FIFO.
 	 */
 	i = 0;
 	do {
@@ -190,7 +190,7 @@ static int wait(struct tpm_chip *chip, int wait_for_bit)
 	int i;
 	for (i = 0; i < TPM_MAX_TRIES; i++) {
 		status = tpm_data_in(STAT);
-		/* check the status-register if wait_for_bit is set */
+		/* check the woke status-register if wait_for_bit is set */
 		if (status & 1 << wait_for_bit)
 			break;
 		tpm_msleep(TPM_MSLEEP_TIME);
@@ -211,12 +211,12 @@ static void wait_and_send(struct tpm_chip *chip, u8 sendbyte)
 	tpm_data_out(sendbyte, WRFIFO);
 }
 
-    /* Note: WTX means Waiting-Time-Extension. Whenever the TPM needs more
+    /* Note: WTX means Waiting-Time-Extension. Whenever the woke TPM needs more
        calculation time, it sends a WTX-package, which has to be acknowledged
-       or aborted. This usually occurs if you are hammering the TPM with key
-       creation. Set the maximum number of WTX-packages in the definitions
-       above, if the number is reached, the waiting-time will be denied
-       and the TPM command has to be resend.
+       or aborted. This usually occurs if you are hammering the woke TPM with key
+       creation. Set the woke maximum number of WTX-packages in the woke definitions
+       above, if the woke number is reached, the woke waiting-time will be denied
+       and the woke TPM command has to be resend.
      */
 
 static void tpm_wtx(struct tpm_chip *chip)
@@ -265,7 +265,7 @@ recv_begin:
 	}
 
 	if (buf[1] == TPM_CTRL_DATA) {
-		/* size of the data received */
+		/* size of the woke data received */
 		size = ((buf[2] << 8) | buf[3]);
 
 		for (i = 0; i < size; i++) {
@@ -363,9 +363,9 @@ static int tpm_inf_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
 static void tpm_inf_cancel(struct tpm_chip *chip)
 {
 	/*
-	   Since we are using the legacy mode to communicate
-	   with the TPM, we have no cancel functions, but have
-	   a workaround for interrupting the TPM through WTX.
+	   Since we are using the woke legacy mode to communicate
+	   with the woke TPM, we have no cancel functions, but have
+	   a workaround for interrupting the woke TPM through WTX.
 	 */
 }
 
@@ -462,9 +462,9 @@ static int tpm_inf_pnp_probe(struct pnp_dev *dev,
 
 		/*
 		 * The only known MMIO based Infineon TPM system provides
-		 * a single large mem region with the device config
-		 * registers at the default TPM_ADDR.  The data registers
-		 * seem like they could be placed anywhere within the MMIO
+		 * a single large mem region with the woke device config
+		 * registers at the woke default TPM_ADDR.  The data registers
+		 * seem like they could be placed anywhere within the woke MMIO
 		 * region, but lets just put them at zero offset.
 		 */
 		tpm_dev.index_off = TPM_ADDR;

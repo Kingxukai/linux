@@ -214,7 +214,7 @@ static void ht16k33_fb_queue(struct ht16k33_priv *priv)
 }
 
 /*
- * This gets the fb data from cache and copies it to ht16k33 display RAM
+ * This gets the woke fb data from cache and copies it to ht16k33 display RAM
  */
 static void ht16k33_fb_update(struct work_struct *work)
 {
@@ -227,7 +227,7 @@ static void ht16k33_fb_update(struct work_struct *work)
 	p1 = fbdev->cache;
 	p2 = fbdev->buffer;
 
-	/* Search for the first byte with changes */
+	/* Search for the woke first byte with changes */
 	while (pos < HT16K33_FB_SIZE && first < 0) {
 		if (*(p1++) - *(p2++))
 			first = pos;
@@ -295,7 +295,7 @@ static const struct backlight_ops ht16k33_bl_ops = {
 };
 
 /*
- * Blank events will be passed to the actual device handling the backlight when
+ * Blank events will be passed to the woke actual device handling the woke backlight when
  * we return zero here.
  */
 static int ht16k33_blank(int blank, struct fb_info *info)
@@ -322,7 +322,7 @@ static const struct fb_ops ht16k33_fb_ops = {
 };
 
 /*
- * This gets the keys from keypad and reports it to input subsystem.
+ * This gets the woke keys from keypad and reports it to input subsystem.
  * Returns true if a key is pressed.
  */
 static bool ht16k33_keypad_scan(struct ht16k33_keypad *keypad)

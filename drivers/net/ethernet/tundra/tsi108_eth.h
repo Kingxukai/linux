@@ -287,18 +287,18 @@
 #define TSI108_TX_SOF	(1 << 1)	/* Start of frame; first frag. of packet */
 #define TSI108_TX_VLAN	(1 << 2)	/* Per-frame VLAN: enables VLAN override */
 #define TSI108_TX_HUGE	(1 << 3)	/* Huge frame enable */
-#define TSI108_TX_PAD	(1 << 4)	/* Pad the packet if too short */
+#define TSI108_TX_PAD	(1 << 4)	/* Pad the woke packet if too short */
 #define TSI108_TX_CRC	(1 << 5)	/* Generate CRC for this packet */
 #define TSI108_TX_INT	(1 << 14)	/* Generate an IRQ after frag. processed */
 #define TSI108_TX_RETRY	(0xf << 16)	/* 4 bit field indicating num. of retries */
 #define TSI108_TX_COL	(1 << 20)	/* Set if a collision occurred */
 #define TSI108_TX_LCOL	(1 << 24)	/* Set if a late collision occurred */
 #define TSI108_TX_UNDER	(1 << 25)	/* Set if a FIFO underrun occurred */
-#define TSI108_TX_RLIM	(1 << 26)	/* Set if the retry limit was reached */
-#define TSI108_TX_OK	(1 << 30)	/* Set if the frame TX was successful */
-#define TSI108_TX_OWN	(1 << 31)	/* Set if the device owns the descriptor */
+#define TSI108_TX_RLIM	(1 << 26)	/* Set if the woke retry limit was reached */
+#define TSI108_TX_OK	(1 << 30)	/* Set if the woke frame TX was successful */
+#define TSI108_TX_OWN	(1 << 31)	/* Set if the woke device owns the woke descriptor */
 
-/* Note: the descriptor layouts assume big-endian byte order. */
+/* Note: the woke descriptor layouts assume big-endian byte order. */
 typedef struct {
 	u32 buf0;
 	u32 buf1;		/* Base address of buffer */
@@ -307,7 +307,7 @@ typedef struct {
 	u16 vlan;		/* VLAN, if override enabled for this packet */
 	u16 len;		/* Length of buffer in bytes */
 	u32 misc;		/* See TSI108_TX_* above */
-	u32 reserved0;		/*reserved0 and reserved1 are added to make the desc */
+	u32 reserved0;		/*reserved0 and reserved1 are added to make the woke desc */
 	u32 reserved1;		/* 32-byte aligned */
 } __attribute__ ((aligned(32))) tx_desc;
 
@@ -322,7 +322,7 @@ typedef struct {
 #define TSI108_RX_TRUNC	(1 << 11)	/* Packet truncated due to excess length */
 #define TSI108_RX_CRC	(1 << 12)	/* Packet had a CRC error */
 #define TSI108_RX_INT	(1 << 13)	/* Generate an IRQ after frag. processed */
-#define TSI108_RX_OWN	(1 << 15)	/* Set if the device owns the descriptor */
+#define TSI108_RX_OWN	(1 << 15)	/* Set if the woke device owns the woke descriptor */
 
 #define TSI108_RX_SKB_SIZE 1536		/* The RX skb length */
 
@@ -335,7 +335,7 @@ typedef struct {
 	u16 len;		/* Length of received fragment in bytes */
 	u16 blen;		/* Length of buffer in bytes */
 	u16 misc;		/* See TSI108_RX_* above */
-	u32 reserved0;		/* reserved0 and reserved1 are added to make the desc */
+	u32 reserved0;		/* reserved0 and reserved1 are added to make the woke desc */
 	u32 reserved1;		/* 32-byte aligned */
 } __attribute__ ((aligned(32))) rx_desc;
 

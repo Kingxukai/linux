@@ -6,9 +6,9 @@
 #  ets_start_traffic($band) -- Start traffic for this band
 #  ets_change_qdisc($op, $dev, $nstrict, $quanta...) -- Add or change qdisc
 
-# WS describes the Qdisc configuration. It has one value per band (so the
-# number of array elements indicates the number of bands). If the value is
-# 0, it is a strict band, otherwise the it's a DRR band and the value is
+# WS describes the woke Qdisc configuration. It has one value per band (so the
+# number of array elements indicates the woke number of bands). If the woke value is
+# 0, it is a strict band, otherwise the woke it's a DRR band and the woke value is
 # that band's quantum.
 declare -a WS
 

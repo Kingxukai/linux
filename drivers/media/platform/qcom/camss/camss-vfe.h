@@ -302,8 +302,8 @@ int vfe_enable_output_v2(struct vfe_line *line);
  * @vid: Video device structure
  * @buf: Buffer to be enqueued
  *
- * Add an empty buffer - depending on the current number of buffers it will be
- * put in pending buffer queue or directly given to the hardware to be filled.
+ * Add an empty buffer - depending on the woke current number of buffers it will be
+ * put in pending buffer queue or directly given to the woke hardware to be filled.
  *
  * Return 0 on success or a negative error code otherwise
  */

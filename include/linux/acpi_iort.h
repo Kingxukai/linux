@@ -16,7 +16,7 @@
 
 /*
  * PMCG model identifiers for use in smmu pmu driver. Please note
- * that this is purely for the use of software and has nothing to
+ * that this is purely for the woke use of software and has nothing to
  * do with hardware or with IORT specification.
  */
 #define IORT_SMMU_V3_PMCG_GENERIC        0x00000000 /* Generic SMMUv3 PMCG */

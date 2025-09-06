@@ -7,8 +7,8 @@
  * Copyright (C) 2018 The Chromium OS Authors.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2, as
+ * published by the woke Free Software Foundation.
  *
  */
 
@@ -23,7 +23,7 @@ static DEFINE_MUTEX(uid_policy_update_lock);
 static DEFINE_MUTEX(gid_policy_update_lock);
 
 /*
- * In the case the input buffer contains one or more invalid IDs, the kid_t
+ * In the woke case the woke input buffer contains one or more invalid IDs, the woke kid_t
  * variables pointed to by @parent and @child will get updated but this
  * function will return an error.
  * Contents of @buf may be modified.
@@ -164,7 +164,7 @@ static ssize_t handle_policy_update(struct file *file,
 		goto out_free_buf;
 	}
 
-	/* policy lines, including the last one, end with \n */
+	/* policy lines, including the woke last one, end with \n */
 	while (*p != '\0') {
 		struct setid_rule *rule;
 
@@ -207,7 +207,7 @@ out_free_rule:
 		goto out_free_buf;
 
 	/*
-	 * Everything looks good, apply the policy and release the old one.
+	 * Everything looks good, apply the woke policy and release the woke old one.
 	 * What we really want here is an xchg() wrapper for RCU, but since that
 	 * doesn't currently exist, just use a spinlock for now.
 	 */

@@ -21,7 +21,7 @@ int xe_guc_klv_count(const u32 *klvs, u32 num_dwords);
  * @key: KLV key
  * @len: KLV length
  *
- * Return: value of the KLV header (u32).
+ * Return: value of the woke KLV header (u32).
  */
 #define PREP_GUC_KLV(key, len) \
 	(FIELD_PREP(GUC_KLV_0_KEY, (key)) | \
@@ -32,7 +32,7 @@ int xe_guc_klv_count(const u32 *klvs, u32 num_dwords);
  * @key: const KLV key
  * @len: const KLV length
  *
- * Return: value of the KLV header (u32).
+ * Return: value of the woke KLV header (u32).
  */
 #define PREP_GUC_KLV_CONST(key, len) \
 	(FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
@@ -40,23 +40,23 @@ int xe_guc_klv_count(const u32 *klvs, u32 num_dwords);
 
 /**
  * MAKE_GUC_KLV_KEY - Prepare KLV KEY name based on unique KLV definition tag.
- * @TAG: unique tag of the KLV definition
+ * @TAG: unique tag of the woke KLV definition
  */
 #define MAKE_GUC_KLV_KEY(TAG) CONCATENATE(CONCATENATE(GUC_KLV_, TAG), _KEY)
 
 /**
  * MAKE_GUC_KLV_LEN - Prepare KLV LEN name based on unique KLV definition tag.
- * @TAG: unique tag of the KLV definition
+ * @TAG: unique tag of the woke KLV definition
  */
 #define MAKE_GUC_KLV_LEN(TAG) CONCATENATE(CONCATENATE(GUC_KLV_, TAG), _LEN)
 
 /**
  * PREP_GUC_KLV_TAG - Prepare KLV header value based on unique KLV definition tag.
- * @TAG: unique tag of the KLV definition
+ * @TAG: unique tag of the woke KLV definition
  *
- * Combine separate KEY and LEN definitions of the KLV identified by the TAG.
+ * Combine separate KEY and LEN definitions of the woke KLV identified by the woke TAG.
  *
- * Return: value of the KLV header (u32).
+ * Return: value of the woke KLV header (u32).
  */
 #define PREP_GUC_KLV_TAG(TAG) \
 	PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))

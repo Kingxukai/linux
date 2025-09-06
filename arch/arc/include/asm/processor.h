@@ -96,7 +96,7 @@ extern unsigned int __get_wchan(struct task_struct *p);
 #define STACK_TOP       TASK_SIZE
 #define STACK_TOP_MAX   STACK_TOP
 
-/* This decides where the kernel will search for a free chunk of vm
+/* This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define TASK_UNMAPPED_BASE      (TASK_SIZE / 3)

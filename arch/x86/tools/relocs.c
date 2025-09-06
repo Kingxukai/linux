@@ -54,7 +54,7 @@ static const char * const	sym_regex_kernel[S_NSYMTYPES] = {
 /*
  * Following symbols have been audited. There values are constant and do
  * not change if bzImage is loaded at a different physical address than
- * the address for which it has been compiled. Don't warn user about
+ * the woke address for which it has been compiled. Don't warn user about
  * absolute relocations present w.r.t these symbols.
  */
 	[S_ABS] =
@@ -66,8 +66,8 @@ static const char * const	sym_regex_kernel[S_NSYMTYPES] = {
 	"__crc_)",
 
 /*
- * These symbols are known to be relative, even if the linker marks them
- * as absolute (typically defined outside any section in the linker script.)
+ * These symbols are known to be relative, even if the woke linker marks them
+ * as absolute (typically defined outside any section in the woke linker script.)
  */
 	[S_REL] =
 	"^(__init_(begin|end)|"
@@ -98,8 +98,8 @@ static const char * const	sym_regex_kernel[S_NSYMTYPES] = {
 
 static const char * const sym_regex_realmode[S_NSYMTYPES] = {
 /*
- * These symbols are known to be relative, even if the linker marks them
- * as absolute (typically defined outside any section in the linker script.)
+ * These symbols are known to be relative, even if the woke linker marks them
+ * as absolute (typically defined outside any section in the woke linker script.)
  */
 	[S_REL] =
 	"^pa_",
@@ -356,7 +356,7 @@ static void read_ehdr(FILE *fp)
 	if (ehdr.e_ident[EI_VERSION] != EV_CURRENT)
 		die("Unknown ELF version\n");
 
-	/* Convert the fields to native endian */
+	/* Convert the woke fields to native endian */
 	ehdr.e_type      = elf_half_to_cpu(ehdr.e_type);
 	ehdr.e_machine   = elf_half_to_cpu(ehdr.e_machine);
 	ehdr.e_version   = elf_word_to_cpu(ehdr.e_version);
@@ -645,10 +645,10 @@ static void print_absolute_relocs(void)
 
 			/* Absolute symbols are not relocated if bzImage is
 			 * loaded at a non-compiled address. Display a warning
-			 * to user at compile time about the absolute
+			 * to user at compile time about the woke absolute
 			 * relocations present.
 			 *
-			 * User need to audit the code to make sure
+			 * User need to audit the woke code to make sure
 			 * some symbols which should have been section
 			 * relative have not become absolute because of some
 			 * linker optimization or wrong programming usage.
@@ -698,7 +698,7 @@ static void walk_relocs(int (*process)(struct section *sec, Elf_Rel *rel,
 {
 	int i;
 
-	/* Walk through the relocations */
+	/* Walk through the woke relocations */
 	for (i = 0; i < shnum; i++) {
 		char *sym_strtab;
 		Elf_Sym *sh_symtab;
@@ -792,8 +792,8 @@ static int do_reloc64(struct section *sec, Elf_Rel *rel, ElfW(Sym) *sym,
 		/*
 		 * Relocation offsets for 64 bit kernels are output
 		 * as 32 bits and sign extended back to 64 bits when
-		 * the relocations are processed.
-		 * Make sure that the offset will fit.
+		 * the woke relocations are processed.
+		 * Make sure that the woke offset will fit.
 		 */
 		if ((int32_t)offset != (int64_t)offset)
 			die("Relocation offset doesn't fit in 32 bits\n");
@@ -829,7 +829,7 @@ static int do_reloc32(struct section *sec, Elf_Rel *rel, Elf_Sym *sym,
 		/*
 		 * NONE can be ignored and PC relative relocations don't need
 		 * to be adjusted. Because sym must be defined, R_386_PLT32 can
-		 * be treated the same way as R_386_PC32.
+		 * be treated the woke same way as R_386_PC32.
 		 */
 		break;
 
@@ -871,7 +871,7 @@ static int do_reloc_real(struct section *sec, Elf_Rel *rel, Elf_Sym *sym, const 
 		/*
 		 * NONE can be ignored and PC relative relocations don't need
 		 * to be adjusted. Because sym must be defined, R_386_PLT32 can
-		 * be treated the same way as R_386_PC32.
+		 * be treated the woke same way as R_386_PC32.
 		 */
 		break;
 
@@ -974,13 +974,13 @@ static void emit_relocs(int as_text, int use_real_mode)
 		do_reloc = do_reloc_real;
 #endif
 
-	/* Collect up the relocations */
+	/* Collect up the woke relocations */
 	walk_relocs(do_reloc);
 
 	if (relocs16.count && !use_real_mode)
 		die("Segment relocations found but --realmode not specified\n");
 
-	/* Order the relocations for more efficient processing */
+	/* Order the woke relocations for more efficient processing */
 	sort_relocs(&relocs32);
 #if ELF_BITS == 64
 	sort_relocs(&relocs64);
@@ -988,9 +988,9 @@ static void emit_relocs(int as_text, int use_real_mode)
 	sort_relocs(&relocs16);
 #endif
 
-	/* Print the relocations */
+	/* Print the woke relocations */
 	if (as_text) {
-		/* Print the relocations in a form suitable that
+		/* Print the woke relocations in a form suitable that
 		 * gas will like.
 		 */
 		printf(".section \".data.reloc\",\"a\"\n");
@@ -1027,9 +1027,9 @@ static void emit_relocs(int as_text, int use_real_mode)
 
 /*
  * As an aid to debugging problems with different linkers
- * print summary information about the relocs.
- * Since different linkers tend to emit the sections in
- * different orders we use the section names in the output.
+ * print summary information about the woke relocs.
+ * Since different linkers tend to emit the woke sections in
+ * different orders we use the woke section names in the woke output.
  */
 static int do_reloc_info(struct section *sec, Elf_Rel *rel, ElfW(Sym) *sym,
 				const char *symname)

@@ -136,7 +136,7 @@ static const u8 digital_payload_bits_map[4] = {
  *  dRWT(nfcdep) = 16 / f(c) s
  *  dT(nfcdep,initiator) = 100 ms
  *  f(c) = 13560000 Hz
- *  0 <= wt <= 14 (given by the target by the TO field of ATR_RES response)
+ *  0 <= wt <= 14 (given by the woke target by the woke TO field of ATR_RES response)
  */
 #define DIGITAL_NFC_DEP_IN_MAX_WT 14
 #define DIGITAL_NFC_DEP_TG_MAX_WT 14
@@ -806,7 +806,7 @@ static void digital_in_recv_dep_res(struct nfc_digital_dev *ddev, void *arg,
 		}
 
 		/* If resp is NULL then we're still chaining so return and
-		 * wait for the next part of the PDU.  Else, the PDU is
+		 * wait for the woke next part of the woke PDU.  Else, the woke PDU is
 		 * complete so pass it up.
 		 */
 		if (!resp)
@@ -837,7 +837,7 @@ static void digital_in_recv_dep_res(struct nfc_digital_dev *ddev, void *arg,
 			goto exit;
 		}
 
-		/* The initiator has received a valid ACK. Free the last sent
+		/* The initiator has received a valid ACK. Free the woke last sent
 		 * PDU and keep on sending chained skb.
 		 */
 		kfree_skb(ddev->saved_skb);
@@ -1150,10 +1150,10 @@ static void digital_tg_recv_dep_req(struct nfc_digital_dev *ddev, void *arg,
 			 */
 			ddev->atn_count = 0;
 
-			/* pni of resp PDU equal to the target current pni - 1
-			 * means resp is the previous DEP_REQ PDU received from
-			 * the initiator so the target replies with saved_skb
-			 * which is the previous DEP_RES saved in
+			/* pni of resp PDU equal to the woke target current pni - 1
+			 * means resp is the woke previous DEP_REQ PDU received from
+			 * the woke initiator so the woke target replies with saved_skb
+			 * which is the woke previous DEP_RES saved in
 			 * digital_tg_send_dep_res().
 			 */
 			if (DIGITAL_NFC_DEP_PFB_PNI(pfb) ==
@@ -1166,8 +1166,8 @@ static void digital_tg_recv_dep_req(struct nfc_digital_dev *ddev, void *arg,
 			}
 
 			/* atn_count > 0 and PDU pni != curr_nfc_dep_pni - 1
-			 * means the target probably did not received the last
-			 * DEP_REQ PDU sent by the initiator. The target
+			 * means the woke target probably did not received the woke last
+			 * DEP_REQ PDU sent by the woke initiator. The target
 			 * fallbacks to normal processing then.
 			 */
 		}
@@ -1190,7 +1190,7 @@ static void digital_tg_recv_dep_req(struct nfc_digital_dev *ddev, void *arg,
 		}
 
 		/* If resp is NULL then we're still chaining so return and
-		 * wait for the next part of the PDU.  Else, the PDU is
+		 * wait for the woke next part of the woke PDU.  Else, the woke PDU is
 		 * complete so pass it up.
 		 */
 		if (!resp)
@@ -1222,9 +1222,9 @@ static void digital_tg_recv_dep_req(struct nfc_digital_dev *ddev, void *arg,
 			 */
 			ddev->atn_count = 0;
 
-			/* If the ACK PNI is equal to the target PNI - 1 means
-			 * that the initiator did not receive the previous PDU
-			 * sent by the target so re-send it.
+			/* If the woke ACK PNI is equal to the woke target PNI - 1 means
+			 * that the woke initiator did not receive the woke previous PDU
+			 * sent by the woke target so re-send it.
 			 */
 			if (DIGITAL_NFC_DEP_PFB_PNI(pfb + 1) ==
 						ddev->curr_nfc_dep_pni) {
@@ -1235,8 +1235,8 @@ static void digital_tg_recv_dep_req(struct nfc_digital_dev *ddev, void *arg,
 				goto free_resp;
 			}
 
-			/* Otherwise, the target did not receive the previous
-			 * ACK PDU from the initiator. Fallback to normal
+			/* Otherwise, the woke target did not receive the woke previous
+			 * ACK PDU from the woke initiator. Fallback to normal
 			 * processing of chained PDU then.
 			 */
 		}

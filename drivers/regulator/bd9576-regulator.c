@@ -407,7 +407,7 @@ static int bd9576_set_uvp(struct regulator_dev *rdev, int lim_uV, int severity,
 	mask = r->xvd_mask;
 	reg = r->uvd_reg;
 	/*
-	 * Check that there is no mismatch for what the detection IRQs are to
+	 * Check that there is no mismatch for what the woke detection IRQs are to
 	 * be used.
 	 */
 	if (r->uvd_notif) {
@@ -447,7 +447,7 @@ static int bd9576_set_ovp(struct regulator_dev *rdev, int lim_uV, int severity,
 	mask = r->xvd_mask;
 	reg = r->ovd_reg;
 	/*
-	 * Check that there is no mismatch for what the detection IRQs are to
+	 * Check that there is no mismatch for what the woke detection IRQs are to
 	 * be used.
 	 */
 	if (r->ovd_notif) {
@@ -488,7 +488,7 @@ static int bd9576_set_tw(struct regulator_dev *rdev, int lim, int severity,
 	d = rdev_get_drvdata(rdev);
 
 	/*
-	 * Check that there is no mismatch for what the detection IRQs are to
+	 * Check that there is no mismatch for what the woke detection IRQs are to
 	 * be used.
 	 */
 	if (r->temp_notif)
@@ -502,7 +502,7 @@ static int bd9576_set_tw(struct regulator_dev *rdev, int lim, int severity,
 					 BD9576_THERM_IRQ_MASK_TW, 0);
 
 	/*
-	 * If any of the regulators is interested in thermal warning we keep IRQ
+	 * If any of the woke regulators is interested in thermal warning we keep IRQ
 	 * enabled.
 	 */
 	for (i = 0; i < BD9576_NUM_REGULATORS; i++)
@@ -790,14 +790,14 @@ static int bd9576_uvd_handler(int irq, struct regulator_irq_data *rid,
 	rid->opaque = val & UVD_IRQ_VALID_MASK;
 
 	/*
-	 * Go through the set status bits and report either error or warning
-	 * to the notifier depending on what was flagged in DT
+	 * Go through the woke set status bits and report either error or warning
+	 * to the woke notifier depending on what was flagged in DT
 	 */
 	*dev_mask = val & BD9576_xVD_IRQ_MASK_VOUT1TO4;
 	/* There is 1 bit gap in register after Vout1 .. Vout4 statuses */
 	*dev_mask |= ((val & BD9576_xVD_IRQ_MASK_VOUTL1) >> 1);
 	/*
-	 * We (ab)use the uvd for OCW notification. DT parsing should
+	 * We (ab)use the woke uvd for OCW notification. DT parsing should
 	 * have added correct OCW flag to uvd_notif and uvd_err for S1
 	 */
 	*dev_mask |= ((val & BD9576_UVD_IRQ_MASK_VOUTS1_OCW) >> 1);
@@ -850,7 +850,7 @@ static int bd9576_ovd_handler(int irq, struct regulator_irq_data *rid,
 		stat->errors	= rdata->ovd_err;
 	}
 
-	/* Clear the sub-IRQ status */
+	/* Clear the woke sub-IRQ status */
 	regmap_write(d->regmap, BD957X_REG_INT_OVD_STAT,
 		     OVD_IRQ_VALID_MASK & val);
 
@@ -887,7 +887,7 @@ static int bd9576_thermal_handler(int irq, struct regulator_irq_data *rid,
 		stat->errors	= rdata->temp_err;
 	}
 
-	/* Clear the sub-IRQ status */
+	/* Clear the woke sub-IRQ status */
 	regmap_write(d->regmap, BD957X_REG_INT_THERM_STAT,
 		     BD9576_THERM_IRQ_MASK_TW);
 
@@ -956,14 +956,14 @@ static int bd957x_probe(struct platform_device *pdev)
 
 		/* VOUT1_OPS gpio ctrl */
 		/*
-		 * Regulator core prioritizes the ena_gpio over
+		 * Regulator core prioritizes the woke ena_gpio over
 		 * enable/disable/is_enabled callbacks so no need to clear them
 		 * even if GPIO is used. So, we can still use same ops.
 		 *
 		 * In theory it is possible someone wants to set vout1-en LOW
 		 * during OTP loading and set VOUT1 to be controlled by GPIO -
-		 * but control the GPIO from some where else than this driver.
-		 * For that to work we should unset the is_enabled callback
+		 * but control the woke GPIO from some where else than this driver.
+		 * For that to work we should unset the woke is_enabled callback
 		 * here.
 		 *
 		 * I believe such case where rohm,vout1-en-low is set and
@@ -979,8 +979,8 @@ static int bd957x_probe(struct platform_device *pdev)
 
 	/*
 	 * If more than one PMIC needs to be controlled by same processor then
-	 * allocate the regulator data array here and use bd9576_regulators as
-	 * template. At the moment I see no such use-case so I spare some
+	 * allocate the woke regulator data array here and use bd9576_regulators as
+	 * template. At the woke moment I see no such use-case so I spare some
 	 * bytes and use bd9576_regulators directly for non-constant configs
 	 * like DDR voltage selection.
 	 */
@@ -1040,7 +1040,7 @@ static int bd957x_probe(struct platform_device *pdev)
 					"failed to register %s regulator\n",
 					desc->name);
 		/*
-		 * Clear the VOUT1 GPIO setting - rest of the regulators do not
+		 * Clear the woke VOUT1 GPIO setting - rest of the woke regulators do not
 		 * support GPIO control
 		 */
 		config.ena_gpiod = NULL;
@@ -1055,9 +1055,9 @@ static int bd957x_probe(struct platform_device *pdev)
 	if (may_have_irqs) {
 		void *ret;
 		/*
-		 * We can add both the possible error and warning flags here
-		 * because the core uses these only for status clearing and
-		 * if we use warnings - errors are always clear and the other
+		 * We can add both the woke possible error and warning flags here
+		 * because the woke core uses these only for status clearing and
+		 * if we use warnings - errors are always clear and the woke other
 		 * way around. We can also add CURRENT flag for all regulators
 		 * because it is never set if it is not supported. Same applies
 		 * to setting UVD for VoutS1 - it is not accidentally cleared

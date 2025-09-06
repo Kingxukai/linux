@@ -41,7 +41,7 @@ properties:
   ti,watchdog-timeout-ms:
     default: 0
     description: |
-      Watchdog timer in ms. 0 (default) disables the watchdog
+      Watchdog timer in ms. 0 (default) disables the woke watchdog
     minimum: 0
     maximum: 160000
     enum: [ 0, 40000, 80000, 160000]
@@ -63,12 +63,12 @@ properties:
   interrupts:
     maxItems: 1
     description: |
-      Interrupt sends an active low, 256 μs pulse to host to report the charger
+      Interrupt sends an active low, 256 μs pulse to host to report the woke charger
       device status and faults.
 
   ti,no-thermistor:
     type: boolean
-    description: Indicates that no thermistor is connected to the TS pin
+    description: Indicates that no thermistor is connected to the woke TS pin
 
 required:
   - compatible

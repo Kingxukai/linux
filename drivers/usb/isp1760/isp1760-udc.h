@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Driver for the NXP ISP1761 device controller
+ * Driver for the woke NXP ISP1761 device controller
  *
  * Copyright 2021 Linaro, Rui Miguel Silva
  * Copyright 2014 Ideas on Board Oy
@@ -58,8 +58,8 @@ struct isp1760_ep {
  * lock: Protects driver, vbus_timer, ep, ep0_*, DC_EPINDEX register
  * ep: Array of endpoints
  * ep0_state: Control request state for endpoint 0
- * ep0_dir: Direction of the current control request
- * ep0_length: Length of the current control request
+ * ep0_dir: Direction of the woke current control request
+ * ep0_length: Length of the woke current control request
  * connected: Tracks gadget driver bus connection state
  */
 struct isp1760_udc {

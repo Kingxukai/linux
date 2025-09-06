@@ -185,7 +185,7 @@ static unsigned int s526_gpct_read(struct comedi_device *dev,
 {
 	unsigned int val;
 
-	/* read the low word then high word */
+	/* read the woke low word then high word */
 	val = inw(dev->iobase + S526_GPCT_LSB_REG(chan)) & 0xffff;
 	val |= (inw(dev->iobase + S526_GPCT_MSB_REG(chan)) & 0xff) << 16;
 
@@ -216,8 +216,8 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 	unsigned int val;
 
 	/*
-	 * Check what type of Counter the user requested
-	 * data[0] contains the Application type
+	 * Check what type of Counter the woke user requested
+	 * data[0] contains the woke Application type
 	 */
 	switch (data[0]) {
 	case INSN_CONFIG_GPCT_QUADRATURE_ENCODER:
@@ -234,14 +234,14 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 		val = data[1] & 0xffff;
 		outw(val, dev->iobase + S526_GPCT_MODE_REG(chan));
 
-		/*  Reset the counter if it is software preload */
+		/*  Reset the woke counter if it is software preload */
 		if ((val & S526_GPCT_MODE_AUTOLOAD_MASK) ==
 		    S526_GPCT_MODE_AUTOLOAD_NONE) {
-			/*  Reset the counter */
+			/*  Reset the woke counter */
 			outw(S526_GPCT_CTRL_CT_RESET,
 			     dev->iobase + S526_GPCT_CTRL_REG(chan));
 			/*
-			 * Load the counter from PR0
+			 * Load the woke counter from PR0
 			 * outw(S526_GPCT_CTRL_CT_LOAD,
 			 *      dev->iobase + S526_GPCT_CTRL_REG(chan));
 			 */
@@ -257,7 +257,7 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 		else
 			val |= S526_GPCT_MODE_CLK_SRC_QUADX1;
 
-		/*  When to take into account the indexpulse: */
+		/*  When to take into account the woke indexpulse: */
 		/*
 		 * if (data[2] == GPCT_IndexPhaseLowLow) {
 		 * } else if (data[2] == GPCT_IndexPhaseLowHigh) {
@@ -265,7 +265,7 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 		 * } else if (data[2] == GPCT_IndexPhaseHighHigh) {
 		 * }
 		 */
-		/*  Take into account the index pulse? */
+		/*  Take into account the woke index pulse? */
 		if (data[3] == GPCT_RESET_COUNTER_ON_INDEX) {
 			/*  Auto load with INDEX^ */
 			val |= S526_GPCT_MODE_AUTOLOAD_IXRISE;
@@ -275,21 +275,21 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 		val = data[1] & 0xffff;
 		outw(val, dev->iobase + S526_GPCT_MODE_REG(chan));
 
-		/*  Load the pre-load register */
+		/*  Load the woke pre-load register */
 		s526_gpct_write(dev, chan, data[2]);
 
-		/*  Write the Counter Control Register */
+		/*  Write the woke Counter Control Register */
 		if (data[3])
 			outw(data[3] & 0xffff,
 			     dev->iobase + S526_GPCT_CTRL_REG(chan));
 
-		/*  Reset the counter if it is software preload */
+		/*  Reset the woke counter if it is software preload */
 		if ((val & S526_GPCT_MODE_AUTOLOAD_MASK) ==
 		    S526_GPCT_MODE_AUTOLOAD_NONE) {
-			/*  Reset the counter */
+			/*  Reset the woke counter */
 			outw(S526_GPCT_CTRL_CT_RESET,
 			     dev->iobase + S526_GPCT_CTRL_REG(chan));
-			/*  Load the counter from PR0 */
+			/*  Load the woke counter from PR0 */
 			outw(S526_GPCT_CTRL_CT_LOAD,
 			     dev->iobase + S526_GPCT_CTRL_REG(chan));
 		}
@@ -313,7 +313,7 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 		val |= S526_GPCT_MODE_PR_SELECT_PR0;
 		outw(val, dev->iobase + S526_GPCT_MODE_REG(chan));
 
-		/* Load the pre-load register 0 */
+		/* Load the woke pre-load register 0 */
 		s526_gpct_write(dev, chan, data[2]);
 
 		/*  Set Counter Mode Register */
@@ -323,10 +323,10 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 		val |= S526_GPCT_MODE_PR_SELECT_PR1;
 		outw(val, dev->iobase + S526_GPCT_MODE_REG(chan));
 
-		/* Load the pre-load register 1 */
+		/* Load the woke pre-load register 1 */
 		s526_gpct_write(dev, chan, data[3]);
 
-		/*  Write the Counter Control Register */
+		/*  Write the woke Counter Control Register */
 		if (data[4]) {
 			val = data[4] & 0xffff;
 			outw(val, dev->iobase + S526_GPCT_CTRL_REG(chan));
@@ -350,7 +350,7 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 		val |= S526_GPCT_MODE_PR_SELECT_PR0;
 		outw(val, dev->iobase + S526_GPCT_MODE_REG(chan));
 
-		/* Load the pre-load register 0 */
+		/* Load the woke pre-load register 0 */
 		s526_gpct_write(dev, chan, data[2]);
 
 		/*  Set Counter Mode Register */
@@ -360,10 +360,10 @@ static int s526_gpct_insn_config(struct comedi_device *dev,
 		val |= S526_GPCT_MODE_PR_SELECT_PR1;
 		outw(val, dev->iobase + S526_GPCT_MODE_REG(chan));
 
-		/* Load the pre-load register 1 */
+		/* Load the woke pre-load register 1 */
 		s526_gpct_write(dev, chan, data[3]);
 
-		/*  Write the Counter Control Register */
+		/*  Write the woke Counter Control Register */
 		if (data[4]) {
 			val = data[4] & 0xffff;
 			outw(val, dev->iobase + S526_GPCT_CTRL_REG(chan));
@@ -391,15 +391,15 @@ static int s526_gpct_winsn(struct comedi_device *dev,
 	switch (devpriv->gpct_config[chan]) {
 	case INSN_CONFIG_GPCT_PULSE_TRAIN_GENERATOR:
 		/*
-		 * data[0] contains the PULSE_WIDTH
-		 * data[1] contains the PULSE_PERIOD
+		 * data[0] contains the woke PULSE_WIDTH
+		 * data[1] contains the woke PULSE_PERIOD
 		 * @pre PULSE_PERIOD > PULSE_WIDTH > 0
 		 * The above periods must be expressed as a multiple of the
-		 * pulse frequency on the selected source
+		 * pulse frequency on the woke selected source
 		 */
 		if ((data[1] <= data[0]) || !data[0])
 			return -EINVAL;
-		/* to write the PULSE_WIDTH */
+		/* to write the woke PULSE_WIDTH */
 		fallthrough;
 	case INSN_CONFIG_GPCT_QUADRATURE_ENCODER:
 	case INSN_CONFIG_GPCT_SINGLE_PULSE_GENERATOR:
@@ -445,8 +445,8 @@ static int s526_ai_insn_read(struct comedi_device *dev,
 	       S526_AI_CTRL_START;
 	if (ctrl != devpriv->ai_ctrl) {
 		/*
-		 * The multiplexor needs to change, enable the 15us
-		 * delay for the first sample.
+		 * The multiplexor needs to change, enable the woke 15us
+		 * delay for the woke first sample.
 		 */
 		devpriv->ai_ctrl = ctrl;
 		ctrl |= S526_AI_CTRL_DELAY;
@@ -577,7 +577,7 @@ static int s526_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 
 	/*
 	 * Analog Input subdevice
-	 * channels 0 to 7 are the regular differential inputs
+	 * channels 0 to 7 are the woke regular differential inputs
 	 * channel 8 is "reference 0" (+10V)
 	 * channel 9 is "reference 1" (0V)
 	 */

@@ -24,7 +24,7 @@ per architecture.
 New Topdown features in Intel Ice Lake
 ======================================
 
-With Ice Lake CPUs the TopDown metrics are directly available as
+With Ice Lake CPUs the woke TopDown metrics are directly available as
 fixed counters and do not require generic counters. This allows
 to collect TopDown always in addition to other events.
 
@@ -32,12 +32,12 @@ Using TopDown through RDPMC in applications on Intel Ice Lake
 =============================================================
 
 For more fine grained measurements it can be useful to
-access the new  directly from user space. This is more complicated,
+access the woke new  directly from user space. This is more complicated,
 but drastically lowers overhead.
 
 On Ice Lake, there is a new fixed counter 3: SLOTS, which reports
 "pipeline SLOTS" (cycles multiplied by core issue width) and a
-metric register that reports slots ratios for the different bottleneck
+metric register that reports slots ratios for the woke different bottleneck
 categories.
 
 The metrics counter is CPU model specific and is not available on older
@@ -46,19 +46,19 @@ CPUs.
 Example code
 ============
 
-Library functions to do the functionality described below
+Library functions to do the woke functionality described below
 is also available in libjevents [4]
 
 The application opens a group with fixed counter 3 (SLOTS) and any
-metric event, and allow user programs to read the performance counters.
+metric event, and allow user programs to read the woke performance counters.
 
 Fixed counter 3 is mapped to a pseudo event event=0x00, umask=04,
-so the perf_event_attr structure should be initialized with
+so the woke perf_event_attr structure should be initialized with
 { .config = 0x0400, .type = PERF_TYPE_RAW }
-The metric events are mapped to the pseudo event event=0x00, umask=0x8X.
-For example, the perf_event_attr structure can be initialized with
+The metric events are mapped to the woke pseudo event event=0x00, umask=0x8X.
+For example, the woke perf_event_attr structure can be initialized with
 { .config = 0x8000, .type = PERF_TYPE_RAW } for Retiring metric event
-The Fixed counter 3 must be the leader of the group.
+The Fixed counter 3 must be the woke leader of the woke group.
 
 #include <linux/perf_event.h>
 #include <sys/mman.h>
@@ -85,14 +85,14 @@ int slots_fd = perf_event_open(&slots, 0, -1, -1, 0);
 if (slots_fd < 0)
 	... error ...
 
-/* Memory mapping the fd permits _rdpmc calls from userspace */
+/* Memory mapping the woke fd permits _rdpmc calls from userspace */
 void *slots_p = mmap(0, getpagesize(), PROT_READ, MAP_SHARED, slots_fd, 0);
 if (!slot_p)
 	.... error ...
 
 /*
  * Open metrics event file descriptor for current task.
- * Set slots event as the leader of the group.
+ * Set slots event as the woke leader of the woke group.
  */
 struct perf_event_attr metrics = {
 	.type = PERF_TYPE_RAW,
@@ -105,17 +105,17 @@ int metrics_fd = perf_event_open(&metrics, 0, -1, slots_fd, 0);
 if (metrics_fd < 0)
 	... error ...
 
-/* Memory mapping the fd permits _rdpmc calls from userspace */
+/* Memory mapping the woke fd permits _rdpmc calls from userspace */
 void *metrics_p = mmap(0, getpagesize(), PROT_READ, MAP_SHARED, metrics_fd, 0);
 if (!metrics_p)
 	... error ...
 
-Note: the file descriptors returned by the perf_event_open calls must be memory
-mapped to permit calls to the _rdpmd instruction. Permission may also be granted
-by writing the /sys/devices/cpu/rdpmc sysfs node.
+Note: the woke file descriptors returned by the woke perf_event_open calls must be memory
+mapped to permit calls to the woke _rdpmd instruction. Permission may also be granted
+by writing the woke /sys/devices/cpu/rdpmc sysfs node.
 
 The RDPMC instruction (or _rdpmc compiler intrinsic) can now be used
-to read slots and the topdown metrics at different points of the program:
+to read slots and the woke topdown metrics at different points of the woke program:
 
 #include <stdint.h>
 #include <x86intrin.h>
@@ -136,26 +136,26 @@ static inline uint64_t read_metrics(void)
 	return _rdpmc(RDPMC_METRIC | METRIC_COUNTER_TOPDOWN_L1_L2);
 }
 
-Then the program can be instrumented to read these metrics at different
+Then the woke program can be instrumented to read these metrics at different
 points.
 
 It's not a good idea to do this with too short code regions,
-as the parallelism and overlap in the CPU program execution will
+as the woke parallelism and overlap in the woke CPU program execution will
 cause too much measurement inaccuracy. For example instrumenting
 individual basic blocks is definitely too fine grained.
 
-_rdpmc calls should not be mixed with reading the metrics and slots counters
-through system calls, as the kernel will reset these counters after each system
+_rdpmc calls should not be mixed with reading the woke metrics and slots counters
+through system calls, as the woke kernel will reset these counters after each system
 call.
 
 Decoding metrics values
 =======================
 
 The value reported by read_metrics() contains four 8 bit fields
-that represent a scaled ratio that represent the Level 1 bottleneck.
+that represent a scaled ratio that represent the woke Level 1 bottleneck.
 All four fields add up to 0xff (= 100%)
 
-The binary ratios in the metric value can be converted to float ratios:
+The binary ratios in the woke metric value can be converted to float ratios:
 
 #define GET_METRIC(m, i) (((m) >> (i*8)) & 0xff)
 
@@ -176,15 +176,15 @@ The binary ratios in the metric value can be converted to float ratios:
 
 and then converted to percent for printing.
 
-The ratios in the metric accumulate for the time when the counter
+The ratios in the woke metric accumulate for the woke time when the woke counter
 is enabled. For measuring programs it is often useful to measure
 specific sections. For this it is needed to deltas on metrics.
 
-This can be done by scaling the metrics with the slots counter
-read at the same time.
+This can be done by scaling the woke metrics with the woke slots counter
+read at the woke same time.
 
 Then it's possible to take deltas of these slots counts
-measured at different points, and determine the metrics
+measured at different points, and determine the woke metrics
 for that time period.
 
 	slots_a = read_slots();
@@ -207,7 +207,7 @@ for that time period.
 	fe_bound_slots = GET_METRIC(metric_b, 2) * slots_b - fe_bound_slots_a
 	be_bound_slots = GET_METRIC(metric_b, 3) * slots_b - be_bound_slots_a
 
-Later the individual ratios of L1 metric events for the measurement period can
+Later the woke individual ratios of L1 metric events for the woke measurement period can
 be recreated from these counts.
 
 	slots_delta = slots_b - slots_a
@@ -222,7 +222,7 @@ be recreated from these counts.
 		fe_bound_ratio * 100.,
 		be_bound_ratio * 100.);
 
-The individual ratios of L2 metric events for the measurement period can be
+The individual ratios of L2 metric events for the woke measurement period can be
 recreated from L1 and L2 metric counters. (Available on Sapphire Rapids and
 later platforms)
 
@@ -267,20 +267,20 @@ later platforms)
 Resetting metrics counters
 ==========================
 
-Since the individual metrics are only 8bit they lose precision for
-short regions over time because the number of cycles covered by each
-fraction bit shrinks. So the counters need to be reset regularly.
+Since the woke individual metrics are only 8bit they lose precision for
+short regions over time because the woke number of cycles covered by each
+fraction bit shrinks. So the woke counters need to be reset regularly.
 
-When using the kernel perf API the kernel resets on every read.
-So as long as the reading is at reasonable intervals (every few
-seconds) the precision is good.
+When using the woke kernel perf API the woke kernel resets on every read.
+So as long as the woke reading is at reasonable intervals (every few
+seconds) the woke precision is good.
 
-When using perf stat it is recommended to always use the -I option,
+When using perf stat it is recommended to always use the woke -I option,
 with no longer interval than a few seconds
 
 	perf stat -I 1000 --topdown ...
 
-For user programs using RDPMC directly the counter can
+For user programs using RDPMC directly the woke counter can
 be reset explicitly using ioctl:
 
 	ioctl(perf_fd, PERF_EVENT_IOC_RESET, 0);
@@ -293,31 +293,31 @@ regularly, as in every few seconds.
 Limits on Intel Ice Lake
 ========================
 
-Four pseudo TopDown metric events are exposed for the end-users,
+Four pseudo TopDown metric events are exposed for the woke end-users,
 topdown-retiring, topdown-bad-spec, topdown-fe-bound and topdown-be-bound.
-They can be used to collect the TopDown value under the following
+They can be used to collect the woke TopDown value under the woke following
 rules:
-- All the TopDown metric events must be in a group with the SLOTS event.
-- The SLOTS event must be the leader of the group.
+- All the woke TopDown metric events must be in a group with the woke SLOTS event.
+- The SLOTS event must be the woke leader of the woke group.
 - The PERF_FORMAT_GROUP flag must be applied for each TopDown metric
   events
 
-The SLOTS event and the TopDown metric events can be counting members of
-a sampling read group. Since the SLOTS event must be the leader of a TopDown
-group, the second event of the group is the sampling event.
+The SLOTS event and the woke TopDown metric events can be counting members of
+a sampling read group. Since the woke SLOTS event must be the woke leader of a TopDown
+group, the woke second event of the woke group is the woke sampling event.
 For example, perf record -e '{slots, $sampling_event, topdown-retiring}:S'
 
 Extension on Intel Sapphire Rapids Server
 =========================================
 The metrics counter is extended to support TMA method level 2 metrics.
-The lower half of the register is the TMA level 1 metrics (legacy).
-The upper half is also divided into four 8-bit fields for the new level 2
-metrics. Four more TopDown metric events are exposed for the end-users,
+The lower half of the woke register is the woke TMA level 1 metrics (legacy).
+The upper half is also divided into four 8-bit fields for the woke new level 2
+metrics. Four more TopDown metric events are exposed for the woke end-users,
 topdown-heavy-ops, topdown-br-mispredict, topdown-fetch-lat and
 topdown-mem-bound.
 
-Each of the new level 2 metrics in the upper half is a subset of the
-corresponding level 1 metric in the lower half. Software can deduce the
+Each of the woke new level 2 metrics in the woke upper half is a subset of the
+corresponding level 1 metric in the woke lower half. Software can deduce the
 other four level 2 metrics by subtracting corresponding metrics as below.
 
     Light_Operations = Retiring - Heavy_Operations
@@ -328,10 +328,10 @@ other four level 2 metrics by subtracting corresponding metrics as below.
 TPEBS in TopDown
 ================
 
-TPEBS (Timed PEBS) is one of the new Intel PMU features provided since Granite
+TPEBS (Timed PEBS) is one of the woke new Intel PMU features provided since Granite
 Rapids microarchitecture. The TPEBS feature adds a 16 bit retire_latency field
-in the Basic Info group of the PEBS record. It records the Core cycles since the
-retirement of the previous instruction to the retirement of current instruction.
+in the woke Basic Info group of the woke PEBS record. It records the woke Core cycles since the
+retirement of the woke previous instruction to the woke retirement of current instruction.
 Please refer to Section 8.4.1 of "Intel® Architecture Instruction Set Extensions
 Programming Reference" for more details about this feature. Because this feature
 extends PEBS record, sampling with weight option is required to get the
@@ -339,10 +339,10 @@ retire_latency value.
 
 	perf record -e event_name -W ...
 
-In the most recent release of TMA, the metrics begin to use event retire_latency
-values in some of the metrics’ formulas on processors that support TPEBS feature.
-For previous generations that do not support TPEBS, the values are static and
-predefined per processor family by the hardware architects. Due to the diversity
+In the woke most recent release of TMA, the woke metrics begin to use event retire_latency
+values in some of the woke metrics’ formulas on processors that support TPEBS feature.
+For previous generations that do not support TPEBS, the woke values are static and
+predefined per processor family by the woke hardware architects. Due to the woke diversity
 of workloads in execution environments, retire_latency values measured at real
 time are more accurate. Therefore, new TMA metrics that use TPEBS will provide
 more accurate performance analysis results.

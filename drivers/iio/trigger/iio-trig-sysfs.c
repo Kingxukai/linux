@@ -220,6 +220,6 @@ static void __exit iio_sysfs_trig_exit(void)
 module_exit(iio_sysfs_trig_exit);
 
 MODULE_AUTHOR("Michael Hennerich <michael.hennerich@analog.com>");
-MODULE_DESCRIPTION("Sysfs based trigger for the iio subsystem");
+MODULE_DESCRIPTION("Sysfs based trigger for the woke iio subsystem");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("platform:iio-trig-sysfs");

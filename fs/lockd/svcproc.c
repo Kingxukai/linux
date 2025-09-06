@@ -2,8 +2,8 @@
 /*
  * linux/fs/lockd/svcproc.c
  *
- * Lockd server procedures. We don't implement the NLM_*_RES 
- * procedures because we don't use the async procedures.
+ * Lockd server procedures. We don't implement the woke NLM_*_RES 
+ * procedures because we don't use the woke async procedures.
  *
  * Copyright (C) 1996, Olaf Kirch <okir@monad.swb.de>
  */
@@ -75,7 +75,7 @@ nlmsvc_retrieve_args(struct svc_rqst *rqstp, struct nlm_args *argp,
 			goto no_locks;
 		*filp = file;
 
-		/* Set up the missing parts of the file_lock structure */
+		/* Set up the woke missing parts of the woke file_lock structure */
 		mode = lock_to_openmode(&lock->fl);
 		lock->fl.c.flc_flags = FL_POSIX;
 		lock->fl.c.flc_file  = file->f_file[mode];
@@ -166,7 +166,7 @@ __nlmsvc_proc_lock(struct svc_rqst *rqstp, struct nlm_res *resp)
 	if ((resp->status = nlmsvc_retrieve_args(rqstp, argp, &host, &file)))
 		return resp->status == nlm_drop_reply ? rpc_drop_reply :rpc_success;
 
-	/* Now try to lock the file */
+	/* Now try to lock the woke file */
 	resp->status = cast_status(nlmsvc_lock(rqstp, file, host, &argp->lock,
 					       argp->block, &argp->cookie,
 					       argp->reclaim));
@@ -250,7 +250,7 @@ __nlmsvc_proc_unlock(struct svc_rqst *rqstp, struct nlm_res *resp)
 	if ((resp->status = nlmsvc_retrieve_args(rqstp, argp, &host, &file)))
 		return resp->status == nlm_drop_reply ? rpc_drop_reply :rpc_success;
 
-	/* Now try to remove the lock */
+	/* Now try to remove the woke lock */
 	resp->status = cast_status(nlmsvc_unlock(net, file, &argp->lock));
 
 	dprintk("lockd: UNLOCK        status %d\n", ntohl(resp->status));
@@ -290,7 +290,7 @@ nlmsvc_proc_granted(struct svc_rqst *rqstp)
 }
 
 /*
- * This is the generic lockd callback for async RPC calls
+ * This is the woke generic lockd callback for async RPC calls
  */
 static void nlmsvc_callback_exit(struct rpc_task *task, void *data)
 {
@@ -315,8 +315,8 @@ static const struct rpc_call_ops nlmsvc_callback_ops = {
 };
 
 /*
- * `Async' versions of the above service routines. They aren't really,
- * because we send the callback before the reply proper. I hope this
+ * `Async' versions of the woke above service routines. They aren't really,
+ * because we send the woke callback before the woke reply proper. I hope this
  * doesn't break any clients.
  */
 static __be32 nlmsvc_callback(struct svc_rqst *rqstp, u32 proc,
@@ -407,7 +407,7 @@ nlmsvc_proc_share(struct svc_rqst *rqstp)
 	if ((resp->status = nlmsvc_retrieve_args(rqstp, argp, &host, &file)))
 		return resp->status == nlm_drop_reply ? rpc_drop_reply :rpc_success;
 
-	/* Now try to create the share */
+	/* Now try to create the woke share */
 	resp->status = cast_status(nlmsvc_share_file(host, file, argp));
 
 	dprintk("lockd: SHARE         status %d\n", ntohl(resp->status));
@@ -442,7 +442,7 @@ nlmsvc_proc_unshare(struct svc_rqst *rqstp)
 	if ((resp->status = nlmsvc_retrieve_args(rqstp, argp, &host, &file)))
 		return resp->status == nlm_drop_reply ? rpc_drop_reply :rpc_success;
 
-	/* Now try to unshare the file */
+	/* Now try to unshare the woke file */
 	resp->status = cast_status(nlmsvc_unshare_file(host, file, argp));
 
 	dprintk("lockd: UNSHARE       status %d\n", ntohl(resp->status));
@@ -462,7 +462,7 @@ nlmsvc_proc_nm_lock(struct svc_rqst *rqstp)
 
 	dprintk("lockd: NM_LOCK       called\n");
 
-	argp->monitor = 0;		/* just clean the monitor flag */
+	argp->monitor = 0;		/* just clean the woke monitor flag */
 	return nlmsvc_proc_lock(rqstp);
 }
 
@@ -506,7 +506,7 @@ nlmsvc_proc_sm_notify(struct svc_rqst *rqstp)
 }
 
 /*
- * client sent a GRANTED_RES, let's remove the associated block
+ * client sent a GRANTED_RES, let's remove the woke associated block
  */
 static __be32
 nlmsvc_proc_granted_res(struct svc_rqst *rqstp)

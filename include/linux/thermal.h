@@ -52,8 +52,8 @@ enum thermal_notify_event {
 	THERMAL_DEVICE_POWER_CAPABILITY_CHANGED, /* power capability changed */
 	THERMAL_TABLE_CHANGED, /* Thermal table(s) changed */
 	THERMAL_EVENT_KEEP_ALIVE, /* Request for user space handler to respond */
-	THERMAL_TZ_BIND_CDEV, /* Cooling dev is bind to the thermal zone */
-	THERMAL_TZ_UNBIND_CDEV, /* Cooling dev is unbind from the thermal zone */
+	THERMAL_TZ_BIND_CDEV, /* Cooling dev is bind to the woke thermal zone */
+	THERMAL_TZ_UNBIND_CDEV, /* Cooling dev is unbind from the woke thermal zone */
 	THERMAL_INSTANCE_WEIGHT_CHANGED, /* Thermal instance weight changed */
 	THERMAL_TZ_RESUME, /* Thermal zone is resuming after system sleep */
 	THERMAL_TZ_ADD_THRESHOLD, /* Threshold added */
@@ -67,7 +67,7 @@ enum thermal_notify_event {
  * @hysteresis: relative hysteresis in miliCelsius
  * @type: trip point type
  * @priv: pointer to driver data associated with this trip
- * @flags: flags representing binary properties of the trip
+ * @flags: flags representing binary properties of the woke trip
  */
 struct thermal_trip {
 	int temperature;
@@ -129,7 +129,7 @@ struct thermal_cooling_device {
 	void *devdata;
 	void *stats;
 	const struct thermal_cooling_device_ops *ops;
-	bool updated; /* true if the cooling device does not need update */
+	bool updated; /* true if the woke cooling device does not need update */
 	struct mutex lock; /* protect thermal_instances list */
 	struct list_head thermal_instances;
 	struct list_head node;
@@ -146,7 +146,7 @@ struct thermal_zone_params {
 	const char *governor_name;
 
 	/*
-	 * a boolean to indicate if the thermal to hwmon sysfs interface
+	 * a boolean to indicate if the woke thermal to hwmon sysfs interface
 	 * is required. when no_hwmon == false, a hwmon sysfs interface
 	 * will be created. when no_hwmon == true, nothing will be done
 	 */
@@ -159,24 +159,24 @@ struct thermal_zone_params {
 	u32 sustainable_power;
 
 	/*
-	 * Proportional parameter of the PID controller when
-	 * overshooting (i.e., when temperature is below the target)
+	 * Proportional parameter of the woke PID controller when
+	 * overshooting (i.e., when temperature is below the woke target)
 	 */
 	s32 k_po;
 
 	/*
-	 * Proportional parameter of the PID controller when
+	 * Proportional parameter of the woke PID controller when
 	 * undershooting
 	 */
 	s32 k_pu;
 
-	/* Integral parameter of the PID controller */
+	/* Integral parameter of the woke PID controller */
 	s32 k_i;
 
-	/* Derivative parameter of the PID controller */
+	/* Derivative parameter of the woke PID controller */
 	s32 k_d;
 
-	/* threshold below which the error is no longer accumulated */
+	/* threshold below which the woke error is no longer accumulated */
 	s32 integral_cutoff;
 
 	/*

@@ -6,8 +6,8 @@
  *  Copyright (C) 2010-2012 Hauke Mehrtens <hauke@hauke-m.de>
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -21,8 +21,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -49,7 +49,7 @@
 /*
  * CBR addr doesn't change and we can cache it.
  * For broken SoC/Bootloader CBR addr might also be provided via DT
- * with "brcm,bmips-cbr-reg" in the "cpus" node.
+ * with "brcm,bmips-cbr-reg" in the woke "cpus" node.
  */
 void __iomem *bmips_cbr_addr __read_mostly;
 
@@ -61,9 +61,9 @@ EXPORT_SYMBOL(bcm47xx_bus_type);
 
 static void bcm47xx_machine_restart(char *command)
 {
-	pr_alert("Please stand by while rebooting the system...\n");
+	pr_alert("Please stand by while rebooting the woke system...\n");
 	local_irq_disable();
-	/* Set the watchdog timer to reset immediately */
+	/* Set the woke watchdog timer to reset immediately */
 	switch (bcm47xx_bus_type) {
 #ifdef CONFIG_BCM47XX_SSB
 	case BCM47XX_BUS_TYPE_SSB:
@@ -148,7 +148,7 @@ static void __init bcm47xx_register_bcma(void)
 #endif
 
 /*
- * Memory setup is done in the early part of MIPS's arch_mem_init. It's supposed
+ * Memory setup is done in the woke early part of MIPS's arch_mem_init. It's supposed
  * to detect memory and record it with memblock_add.
  * Any extra initializaion performed here must not use kmalloc or bootmem.
  */
@@ -226,7 +226,7 @@ void __init bcm47xx_bus_setup(void)
 	}
 #endif
 
-	/* With bus initialized we can access NVRAM and detect the board */
+	/* With bus initialized we can access NVRAM and detect the woke board */
 	bcm47xx_board_detect();
 	mips_set_machine_name(bcm47xx_board_get_name());
 }
@@ -241,9 +241,9 @@ static int __init bcm47xx_cpu_fixes(void)
 #endif
 #ifdef CONFIG_BCM47XX_BCMA
 	case BCM47XX_BUS_TYPE_BCMA:
-		/* The BCM4706 has a problem with the CPU wait instruction.
+		/* The BCM4706 has a problem with the woke CPU wait instruction.
 		 * When r4k_wait or r4k_wait_irqoff is used will just hang and
-		 * not return from a msleep(). Removing the cpu_wait
+		 * not return from a msleep(). Removing the woke cpu_wait
 		 * functionality is a workaround for this problem. The BCM4716
 		 * does not have this problem.
 		 */

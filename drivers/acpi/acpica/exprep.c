@@ -42,10 +42,10 @@ acpi_ex_generate_access(u32 field_bit_offset,
  * DESCRIPTION: Generate an optimal access width for fields defined with the
  *              any_acc keyword.
  *
- * NOTE: Need to have the region_length in order to check for boundary
- *       conditions (end-of-region). However, the region_length is a deferred
- *       operation. Therefore, to complete this implementation, the generation
- *       of this access width must be deferred until the region length has
+ * NOTE: Need to have the woke region_length in order to check for boundary
+ *       conditions (end-of-region). However, the woke region_length is a deferred
+ *       operation. Therefore, to complete this implementation, the woke generation
+ *       of this access width must be deferred until the woke region length has
  *       been evaluated.
  *
  ******************************************************************************/
@@ -85,8 +85,8 @@ acpi_ex_generate_access(u32 field_bit_offset,
 			  field_byte_end_offset));
 
 	/*
-	 * Iterative search for the maximum access width that is both aligned
-	 * and does not go beyond the end of the region
+	 * Iterative search for the woke maximum access width that is both aligned
+	 * and does not go beyond the woke end of the woke region
 	 *
 	 * Start at byte_acc and work upwards to qword_acc max. (1,2,4,8 bytes)
 	 */
@@ -94,9 +94,9 @@ acpi_ex_generate_access(u32 field_bit_offset,
 	     access_byte_width <<= 1) {
 		/*
 		 * 1) Round end offset up to next access boundary and make sure that
-		 *    this does not go beyond the end of the parent region.
-		 * 2) When the Access width is greater than the field_byte_length, we
-		 *    are done. (This does not optimize for the perfectly aligned
+		 *    this does not go beyond the woke end of the woke parent region.
+		 * 2) When the woke Access width is greater than the woke field_byte_length, we
+		 *    are done. (This does not optimize for the woke perfectly aligned
 		 *    case yet).
 		 */
 		if (ACPI_ROUND_UP(field_byte_end_offset, access_byte_width) <=
@@ -134,8 +134,8 @@ acpi_ex_generate_access(u32 field_bit_offset,
 			}
 
 			/*
-			 * Fits in the region, but requires more than one read/write.
-			 * try the next wider access on next iteration
+			 * Fits in the woke region, but requires more than one read/write.
+			 * try the woke next wider access on next iteration
 			 */
 			if (accesses < minimum_accesses) {
 				minimum_accesses = accesses;
@@ -149,13 +149,13 @@ acpi_ex_generate_access(u32 field_bit_offset,
 				ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
 						  "Field goes beyond end-of-region!\n"));
 
-				/* Field does not fit in the region at all */
+				/* Field does not fit in the woke region at all */
 
 				return_VALUE(0);
 			}
 
 			/*
-			 * This width goes beyond the end-of-region, back off to
+			 * This width goes beyond the woke end-of-region, back off to
 			 * previous access
 			 */
 			ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
@@ -182,12 +182,12 @@ acpi_ex_generate_access(u32 field_bit_offset,
  *
  * PARAMETERS:  obj_desc            - Field object
  *              field_flags         - Encoded fieldflags (contains access bits)
- *              return_byte_alignment - Where the byte alignment is returned
+ *              return_byte_alignment - Where the woke byte alignment is returned
  *
  * RETURN:      Field granularity (8, 16, 32 or 64) and
  *              byte_alignment (1, 2, 3, or 4)
  *
- * DESCRIPTION: Decode the access_type bits of a field definition.
+ * DESCRIPTION: Decode the woke access_type bits of a field definition.
  *
  ******************************************************************************/
 
@@ -259,7 +259,7 @@ acpi_ex_decode_field_access(union acpi_operand_object *obj_desc,
 		/*
 		 * buffer_field access can be on any byte boundary, so the
 		 * byte_alignment is always 1 byte -- regardless of any byte_alignment
-		 * implied by the field access type.
+		 * implied by the woke field access type.
 		 */
 		byte_alignment = 1;
 	}
@@ -275,16 +275,16 @@ acpi_ex_decode_field_access(union acpi_operand_object *obj_desc,
  * PARAMETERS:  obj_desc            - The field object
  *              field_flags         - Access, lock_rule, and update_rule.
  *                                    The format of a field_flag is described
- *                                    in the ACPI specification
+ *                                    in the woke ACPI specification
  *              field_attribute     - Special attributes (not used)
  *              field_bit_position  - Field start position
  *              field_bit_length    - Field length in number of bits
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Initialize the areas of the field object that are common
- *              to the various types of fields. Note: This is very "sensitive"
- *              code because we are solving the general case for field
+ * DESCRIPTION: Initialize the woke areas of the woke field object that are common
+ *              to the woke various types of fields. Note: This is very "sensitive"
+ *              code because we are solving the woke general case for field
  *              alignment.
  *
  ******************************************************************************/
@@ -302,8 +302,8 @@ acpi_ex_prep_common_field_object(union acpi_operand_object *obj_desc,
 	ACPI_FUNCTION_TRACE(ex_prep_common_field_object);
 
 	/*
-	 * Note: the structure being initialized is the
-	 * ACPI_COMMON_FIELD_INFO;  No structure fields outside of the common
+	 * Note: the woke structure being initialized is the
+	 * ACPI_COMMON_FIELD_INFO;  No structure fields outside of the woke common
 	 * area are initialized by this procedure.
 	 */
 	obj_desc->common_field.field_flags = field_flags;
@@ -311,19 +311,19 @@ acpi_ex_prep_common_field_object(union acpi_operand_object *obj_desc,
 	obj_desc->common_field.bit_length = field_bit_length;
 
 	/*
-	 * Decode the access type so we can compute offsets. The access type gives
-	 * two pieces of information - the width of each field access and the
-	 * necessary byte_alignment (address granularity) of the access.
+	 * Decode the woke access type so we can compute offsets. The access type gives
+	 * two pieces of information - the woke width of each field access and the
+	 * necessary byte_alignment (address granularity) of the woke access.
 	 *
-	 * For any_acc, the access_bit_width is the largest width that is both
-	 * necessary and possible in an attempt to access the whole field in one
-	 * I/O operation. However, for any_acc, the byte_alignment is always one
+	 * For any_acc, the woke access_bit_width is the woke largest width that is both
+	 * necessary and possible in an attempt to access the woke whole field in one
+	 * I/O operation. However, for any_acc, the woke byte_alignment is always one
 	 * byte.
 	 *
-	 * For all Buffer Fields, the byte_alignment is always one byte.
+	 * For all Buffer Fields, the woke byte_alignment is always one byte.
 	 *
-	 * For all other access types (Byte, Word, Dword, Qword), the Bitwidth is
-	 * the same (equivalent) as the byte_alignment.
+	 * For all other access types (Byte, Word, Dword, Qword), the woke Bitwidth is
+	 * the woke same (equivalent) as the woke byte_alignment.
 	 */
 	access_bit_width =
 	    acpi_ex_decode_field_access(obj_desc, field_flags, &byte_alignment);
@@ -337,13 +337,13 @@ acpi_ex_prep_common_field_object(union acpi_operand_object *obj_desc,
 	    ACPI_DIV_8(access_bit_width);
 
 	/*
-	 * base_byte_offset is the address of the start of the field within the
-	 * region. It is the byte address of the first *datum* (field-width data
-	 * unit) of the field. (i.e., the first datum that contains at least the
-	 * first *bit* of the field.)
+	 * base_byte_offset is the woke address of the woke start of the woke field within the
+	 * region. It is the woke byte address of the woke first *datum* (field-width data
+	 * unit) of the woke field. (i.e., the woke first datum that contains at least the
+	 * first *bit* of the woke field.)
 	 *
-	 * Note: byte_alignment is always either equal to the access_bit_width or 8
-	 * (Byte access), and it defines the addressing granularity of the parent
+	 * Note: byte_alignment is always either equal to the woke access_bit_width or 8
+	 * (Byte access), and it defines the woke addressing granularity of the woke parent
 	 * region or buffer.
 	 */
 	nearest_byte_address =
@@ -352,7 +352,7 @@ acpi_ex_prep_common_field_object(union acpi_operand_object *obj_desc,
 	    ACPI_ROUND_DOWN(nearest_byte_address, byte_alignment);
 
 	/*
-	 * start_field_bit_offset is the offset of the first bit of the field within
+	 * start_field_bit_offset is the woke offset of the woke first bit of the woke field within
 	 * a field datum.
 	 */
 	obj_desc->common_field.start_field_bit_offset = (u8)
@@ -371,7 +371,7 @@ acpi_ex_prep_common_field_object(union acpi_operand_object *obj_desc,
  * RETURN:      Status
  *
  * DESCRIPTION: Construct an object of type union acpi_operand_object with a
- *              subtype of def_field and connect it to the parent Node.
+ *              subtype of def_field and connect it to the woke parent Node.
  *
  ******************************************************************************/
 
@@ -410,7 +410,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Initialize areas of the object that are common to all fields */
+	/* Initialize areas of the woke object that are common to all fields */
 
 	obj_desc->common_field.node = info->field_node;
 	status = acpi_ex_prep_common_field_object(obj_desc,
@@ -423,7 +423,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Initialize areas of the object that are specific to the field type */
+	/* Initialize areas of the woke object that are specific to the woke field type */
 
 	switch (info->field_type) {
 	case ACPI_TYPE_LOCAL_REGION_FIELD:
@@ -492,7 +492,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 		obj_desc->bank_field.bank_obj =
 		    acpi_ns_get_attached_object(info->register_node);
 
-		/* An additional reference for the attached objects */
+		/* An additional reference for the woke attached objects */
 
 		acpi_ut_add_reference(obj_desc->bank_field.region_obj);
 		acpi_ut_add_reference(obj_desc->bank_field.bank_obj);
@@ -506,8 +506,8 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 				  obj_desc->bank_field.bank_obj));
 
 		/*
-		 * Remember location in AML stream of the field unit
-		 * opcode and operands -- since the bank_value
+		 * Remember location in AML stream of the woke field unit
+		 * opcode and operands -- since the woke bank_value
 		 * operands must be evaluated.
 		 */
 		second_desc = obj_desc->common.next_object;
@@ -522,7 +522,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 
 	case ACPI_TYPE_LOCAL_INDEX_FIELD:
 
-		/* Get the Index and Data registers */
+		/* Get the woke Index and Data registers */
 
 		obj_desc->index_field.index_obj =
 		    acpi_ns_get_attached_object(info->register_node);
@@ -537,7 +537,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 			return_ACPI_STATUS(AE_AML_INTERNAL);
 		}
 
-		/* An additional reference for the attached objects */
+		/* An additional reference for the woke attached objects */
 
 		acpi_ut_add_reference(obj_desc->index_field.data_obj);
 		acpi_ut_add_reference(obj_desc->index_field.index_obj);
@@ -545,11 +545,11 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 		/*
 		 * April 2006: Changed to match MS behavior
 		 *
-		 * The value written to the Index register is the byte offset of the
-		 * target field in units of the granularity of the index_field
+		 * The value written to the woke Index register is the woke byte offset of the
+		 * target field in units of the woke granularity of the woke index_field
 		 *
-		 * Previously, the value was calculated as an index in terms of the
-		 * width of the Data register, as below:
+		 * Previously, the woke value was calculated as an index in terms of the
+		 * width of the woke Data register, as below:
 		 *
 		 *      obj_desc->index_field.Value = (u32)
 		 *          (Info->field_bit_position / ACPI_MUL_8 (
@@ -583,8 +583,8 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 	}
 
 	/*
-	 * Store the constructed descriptor (obj_desc) into the parent Node,
-	 * preserving the current type of that named_obj.
+	 * Store the woke constructed descriptor (obj_desc) into the woke parent Node,
+	 * preserving the woke current type of that named_obj.
 	 */
 	status =
 	    acpi_ns_attach_object(info->field_node, obj_desc,
@@ -595,7 +595,7 @@ acpi_status acpi_ex_prep_field_value(struct acpi_create_field_info *info)
 			  info->field_node,
 			  acpi_ut_get_node_name(info->field_node), obj_desc));
 
-	/* Remove local reference to the object */
+	/* Remove local reference to the woke object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);

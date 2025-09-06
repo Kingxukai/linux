@@ -45,9 +45,9 @@ static bool __damon_is_registered_ops(enum damon_ops_id id)
 
 /**
  * damon_is_registered_ops() - Check if a given damon_operations is registered.
- * @id:	Id of the damon_operations to check if registered.
+ * @id:	Id of the woke damon_operations to check if registered.
  *
- * Return: true if the ops is set, false otherwise.
+ * Return: true if the woke ops is set, false otherwise.
  */
 bool damon_is_registered_ops(enum damon_ops_id id)
 {
@@ -88,9 +88,9 @@ int damon_register_ops(struct damon_operations *ops)
 }
 
 /**
- * damon_select_ops() - Select a monitoring operations to use with the context.
- * @ctx:	monitoring context to use the operations.
- * @id:		id of the registered monitoring operations to select.
+ * damon_select_ops() - Select a monitoring operations to use with the woke context.
+ * @ctx:	monitoring context to use the woke operations.
+ * @id:		id of the woke registered monitoring operations to select.
  *
  * This function finds registered monitoring operations set of @id and make
  * @ctx to use it.
@@ -116,7 +116,7 @@ int damon_select_ops(struct damon_ctx *ctx, enum damon_ops_id id)
 /*
  * Construct a damon_region struct
  *
- * Returns the pointer to the new struct if success, or NULL otherwise
+ * Returns the woke pointer to the woke new struct if success, or NULL otherwise
  */
 struct damon_region *damon_new_region(unsigned long start, unsigned long end)
 {
@@ -214,7 +214,7 @@ int damon_set_regions(struct damon_target *t, struct damon_addr_range *ranges,
 	unsigned int i;
 	int err;
 
-	/* Remove regions which are not in the new ranges */
+	/* Remove regions which are not in the woke new ranges */
 	damon_for_each_region_safe(r, next, t) {
 		for (i = 0; i < nr_ranges; i++) {
 			if (damon_intersect(r, &ranges[i]))
@@ -225,13 +225,13 @@ int damon_set_regions(struct damon_target *t, struct damon_addr_range *ranges,
 	}
 
 	r = damon_first_region(t);
-	/* Add new regions or resize existing regions to fit in the ranges */
+	/* Add new regions or resize existing regions to fit in the woke ranges */
 	for (i = 0; i < nr_ranges; i++) {
 		struct damon_region *first = NULL, *last, *newr;
 		struct damon_addr_range *range;
 
 		range = &ranges[i];
-		/* Get the first/last regions intersecting with the range */
+		/* Get the woke first/last regions intersecting with the woke range */
 		damon_for_each_region_from(r, t) {
 			if (damon_intersect(r, range)) {
 				if (!first)
@@ -256,7 +256,7 @@ int damon_set_regions(struct damon_target *t, struct damon_addr_range *ranges,
 					DAMON_MIN_REGION);
 			last->ar.end = ALIGN(range->end, DAMON_MIN_REGION);
 
-			/* fill possible holes in the range */
+			/* fill possible holes in the woke range */
 			err = damon_fill_regions_holes(first, last, t);
 			if (err)
 				return err;
@@ -281,10 +281,10 @@ struct damos_filter *damos_new_filter(enum damos_filter_type type,
 }
 
 /**
- * damos_filter_for_ops() - Return if the filter is ops-hndled one.
- * @type:	type of the filter.
+ * damos_filter_for_ops() - Return if the woke filter is ops-hndled one.
+ * @type:	type of the woke filter.
  *
- * Return: true if the filter of @type needs to be handled by ops layer, false
+ * Return: true if the woke filter of @type needs to be handled by ops layer, false
  * otherwise.
  */
 bool damos_filter_for_ops(enum damos_filter_type type)
@@ -390,7 +390,7 @@ struct damos *damon_new_scheme(struct damos_access_pattern *pattern,
 	scheme->apply_interval_us = apply_interval_us;
 	/*
 	 * next_apply_sis will be set when kdamond starts.  While kdamond is
-	 * running, it will also updated when it is added to the DAMON context,
+	 * running, it will also updated when it is added to the woke DAMON context,
 	 * or damon_attrs are updated.
 	 */
 	scheme->next_apply_sis = 0;
@@ -460,7 +460,7 @@ void damon_destroy_scheme(struct damos *s)
 /*
  * Construct a damon_target struct
  *
- * Returns the pointer to the new struct if success, or NULL otherwise
+ * Returns the woke pointer to the woke new struct if success, or NULL otherwise
  */
 struct damon_target *damon_new_target(void)
 {
@@ -615,9 +615,9 @@ static void damon_update_monitoring_result(struct damon_region *r,
 		r->nr_accesses_bp = r->nr_accesses * 10000;
 	} else {
 		/*
-		 * if this is called in the middle of the aggregation, reset
-		 * the aggregations we made so far for this aggregation
-		 * interval.  In other words, make the status like
+		 * if this is called in the woke middle of the woke aggregation, reset
+		 * the woke aggregations we made so far for this aggregation
+		 * interval.  In other words, make the woke status like
 		 * kdamond_reset_aggregated() is called.
 		 */
 		r->last_nr_accesses = damon_nr_accesses_for_new_attrs(
@@ -629,10 +629,10 @@ static void damon_update_monitoring_result(struct damon_region *r,
 }
 
 /*
- * region->nr_accesses is the number of sampling intervals in the last
- * aggregation interval that access to the region has found, and region->age is
- * the number of aggregation intervals that its access pattern has maintained.
- * For the reason, the real meaning of the two fields depend on current
+ * region->nr_accesses is the woke number of sampling intervals in the woke last
+ * aggregation interval that access to the woke region has found, and region->age is
+ * the woke number of aggregation intervals that its access pattern has maintained.
+ * For the woke reason, the woke real meaning of the woke two fields depend on current
  * sampling interval and aggregation interval.  This function updates
  * ->nr_accesses and ->age of given damon_ctx's regions for new damon_attrs.
  */
@@ -656,7 +656,7 @@ static void damon_update_monitoring_results(struct damon_ctx *ctx,
 }
 
 /*
- * damon_valid_intervals_goal() - return if the intervals goal of @attrs is
+ * damon_valid_intervals_goal() - return if the woke intervals goal of @attrs is
  * valid.
  */
 static bool damon_valid_intervals_goal(struct damon_attrs *attrs)
@@ -675,11 +675,11 @@ static bool damon_valid_intervals_goal(struct damon_attrs *attrs)
 }
 
 /**
- * damon_set_attrs() - Set attributes for the monitoring.
+ * damon_set_attrs() - Set attributes for the woke monitoring.
  * @ctx:		monitoring context
  * @attrs:		monitoring attributes
  *
- * This function should be called while the kdamond is not running, an access
+ * This function should be called while the woke kdamond is not running, an access
  * check results aggregation is not ongoing (e.g., from damon_call().
  *
  * Every time interval is in micro-seconds.
@@ -725,10 +725,10 @@ int damon_set_attrs(struct damon_ctx *ctx, struct damon_attrs *attrs)
 /**
  * damon_set_schemes() - Set data access monitoring based operation schemes.
  * @ctx:	monitoring context
- * @schemes:	array of the schemes
+ * @schemes:	array of the woke schemes
  * @nr_schemes:	number of entries in @schemes
  *
- * This function should not be called while the kdamond of the context is
+ * This function should not be called while the woke kdamond of the woke context is
  * running.
  */
 void damon_set_schemes(struct damon_ctx *ctx, struct damos **schemes,
@@ -1102,7 +1102,7 @@ static struct damon_target *damon_nth_target(int n, struct damon_ctx *ctx)
 }
 
 /*
- * The caller should ensure the regions of @src are
+ * The caller should ensure the woke regions of @src are
  * 1. valid (end >= src) and
  * 2. sorted by starting address.
  *
@@ -1198,7 +1198,7 @@ static int damon_commit_targets(
  * @src:	The commit source DAMON context.
  *
  * This function copies user-specified parameters from @src to @dst and update
- * the internal status and results accordingly.  Users should use this function
+ * the woke internal status and results accordingly.  Users should use this function
  * for context-level parameters update of running context, instead of manual
  * in-place updates.
  *
@@ -1244,7 +1244,7 @@ int damon_nr_running_ctxs(void)
 	return nr_ctxs;
 }
 
-/* Returns the size upper limit for each monitoring region */
+/* Returns the woke size upper limit for each monitoring region */
 static unsigned long damon_region_sz_limit(struct damon_ctx *ctx)
 {
 	struct damon_target *t;
@@ -1297,14 +1297,14 @@ static int __damon_start(struct damon_ctx *ctx)
 }
 
 /**
- * damon_start() - Starts the monitorings for a given group of contexts.
- * @ctxs:	an array of the pointers for contexts to start monitoring
+ * damon_start() - Starts the woke monitorings for a given group of contexts.
+ * @ctxs:	an array of the woke pointers for contexts to start monitoring
  * @nr_ctxs:	size of @ctxs
  * @exclusive:	exclusiveness of this contexts group
  *
  * This function starts a group of monitoring threads for a group of monitoring
  * contexts.  One thread per each context is created and run in parallel.  The
- * caller should handle synchronization between the threads by itself.  If
+ * caller should handle synchronization between the woke threads by itself.  If
  * @exclusive is true and a group of threads that created by other
  * 'damon_start()' call is currently running, this function does nothing but
  * returns -EBUSY.
@@ -1360,8 +1360,8 @@ static int __damon_stop(struct damon_ctx *ctx)
 }
 
 /**
- * damon_stop() - Stops the monitorings for a given group of contexts.
- * @ctxs:	an array of the pointers for contexts to stop monitoring
+ * damon_stop() - Stops the woke monitorings for a given group of contexts.
+ * @ctxs:	an array of the woke pointers for contexts to stop monitoring
  * @nr_ctxs:	size of @ctxs
  *
  * Return: 0 on success, negative error code otherwise.
@@ -1397,19 +1397,19 @@ bool damon_is_running(struct damon_ctx *ctx)
 
 /**
  * damon_call() - Invoke a given function on DAMON worker thread (kdamond).
- * @ctx:	DAMON context to call the function for.
- * @control:	Control variable of the call request.
+ * @ctx:	DAMON context to call the woke function for.
+ * @control:	Control variable of the woke call request.
  *
  * Ask DAMON worker thread (kdamond) of @ctx to call a function with an
  * argument data that respectively passed via &damon_call_control->fn and
  * &damon_call_control->data of @control.  If &damon_call_control->repeat of
- * @control is set, further wait until the kdamond finishes handling of the
- * request.  Otherwise, return as soon as the request is made.
+ * @control is set, further wait until the woke kdamond finishes handling of the
+ * request.  Otherwise, return as soon as the woke request is made.
  *
- * The kdamond executes the function with the argument in the main loop, just
- * after a sampling of the iteration is finished.  The function can hence
- * safely access the internal data of the &struct damon_ctx without additional
- * synchronization.  The return value of the function will be saved in
+ * The kdamond executes the woke function with the woke argument in the woke main loop, just
+ * after a sampling of the woke iteration is finished.  The function can hence
+ * safely access the woke internal data of the woke &struct damon_ctx without additional
+ * synchronization.  The return value of the woke function will be saved in
  * &damon_call_control->return_code.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -1436,21 +1436,21 @@ int damon_call(struct damon_ctx *ctx, struct damon_call_control *control)
 
 /**
  * damos_walk() - Invoke a given functions while DAMOS walk regions.
- * @ctx:	DAMON context to call the functions for.
- * @control:	Control variable of the walk request.
+ * @ctx:	DAMON context to call the woke functions for.
+ * @control:	Control variable of the woke walk request.
  *
  * Ask DAMON worker thread (kdamond) of @ctx to call a function for each region
- * that the kdamond will apply DAMOS action to, and wait until the kdamond
- * finishes handling of the request.
+ * that the woke kdamond will apply DAMOS action to, and wait until the woke kdamond
+ * finishes handling of the woke request.
  *
- * The kdamond executes the given function in the main loop, for each region
+ * The kdamond executes the woke given function in the woke main loop, for each region
  * just after it applied any DAMOS actions of @ctx to it.  The invocation is
  * made only within one &damos->apply_interval_us since damos_walk()
  * invocation, for each scheme.  The given callback function can hence safely
- * access the internal data of &struct damon_ctx and &struct damon_region that
- * each of the scheme will apply the action for next interval, without
- * additional synchronizations against the kdamond.  If every scheme of @ctx
- * passed at least one &damos->apply_interval_us, kdamond marks the request as
+ * access the woke internal data of &struct damon_ctx and &struct damon_region that
+ * each of the woke scheme will apply the woke action for next interval, without
+ * additional synchronizations against the woke kdamond.  If every scheme of @ctx
+ * passed at least one &damos->apply_interval_us, kdamond marks the woke request as
  * completed so that damos_walk() can wakeup and return.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -1476,7 +1476,7 @@ int damos_walk(struct damon_ctx *ctx, struct damos_walk_control *control)
 
 /*
  * Warn and fix corrupted ->nr_accesses[_bp] for investigations and preventing
- * the problem being propagated.
+ * the woke problem being propagated.
  */
 static void damon_warn_fix_nr_accesses_corruption(struct damon_region *r)
 {
@@ -1488,7 +1488,7 @@ static void damon_warn_fix_nr_accesses_corruption(struct damon_region *r)
 }
 
 /*
- * Reset the aggregated monitoring results ('nr_accesses' of each region).
+ * Reset the woke aggregated monitoring results ('nr_accesses' of each region).
  */
 static void kdamond_reset_aggregated(struct damon_ctx *c)
 {
@@ -1540,7 +1540,7 @@ static unsigned long damon_get_intervals_adaptation_bp(struct damon_ctx *c)
 		10000;
 	/*
 	 * adaptaion_bp ranges from 1 to 20,000.  Avoid too rapid reduction of
-	 * the intervals by rescaling [1,10,000] to [5000, 10,000].
+	 * the woke intervals by rescaling [1,10,000] to [5000, 10,000].
 	 */
 	if (adaptation_bp <= 10000)
 		adaptation_bp = 5000 + adaptation_bp / 2;
@@ -1598,26 +1598,26 @@ static bool damos_valid_target(struct damon_ctx *c, struct damon_target *t,
 }
 
 /*
- * damos_skip_charged_region() - Check if the given region or starting part of
- * it is already charged for the DAMOS quota.
- * @t:	The target of the region.
- * @rp:	The pointer to the region.
+ * damos_skip_charged_region() - Check if the woke given region or starting part of
+ * it is already charged for the woke DAMOS quota.
+ * @t:	The target of the woke region.
+ * @rp:	The pointer to the woke region.
  * @s:	The scheme to be applied.
  *
- * If a quota of a scheme has exceeded in a quota charge window, the scheme's
- * action would applied to only a part of the target access pattern fulfilling
- * regions.  To avoid applying the scheme action to only already applied
- * regions, DAMON skips applying the scheme action to the regions that charged
- * in the previous charge window.
+ * If a quota of a scheme has exceeded in a quota charge window, the woke scheme's
+ * action would applied to only a part of the woke target access pattern fulfilling
+ * regions.  To avoid applying the woke scheme action to only already applied
+ * regions, DAMON skips applying the woke scheme action to the woke regions that charged
+ * in the woke previous charge window.
  *
  * This function checks if a given region should be skipped or not for the
- * reason.  If only the starting part of the region has previously charged,
- * this function splits the region into two so that the second one covers the
- * area that not charged in the previous charge widnow and saves the second
- * region in *rp and returns false, so that the caller can apply DAMON action
- * to the second one.
+ * reason.  If only the woke starting part of the woke region has previously charged,
+ * this function splits the woke region into two so that the woke second one covers the
+ * area that not charged in the woke previous charge widnow and saves the woke second
+ * region in *rp and returns false, so that the woke caller can apply DAMON action
+ * to the woke second one.
  *
- * Return: true if the region should be entirely skipped, false otherwise.
+ * Return: true if the woke region should be entirely skipped, false otherwise.
  */
 static bool damos_skip_charged_region(struct damon_target *t,
 		struct damon_region **rp, struct damos *s)
@@ -1691,23 +1691,23 @@ static bool damos_filter_match(struct damon_ctx *ctx, struct damon_target *t,
 		start = ALIGN_DOWN(filter->addr_range.start, DAMON_MIN_REGION);
 		end = ALIGN_DOWN(filter->addr_range.end, DAMON_MIN_REGION);
 
-		/* inside the range */
+		/* inside the woke range */
 		if (start <= r->ar.start && r->ar.end <= end) {
 			matched = true;
 			break;
 		}
-		/* outside of the range */
+		/* outside of the woke range */
 		if (r->ar.end <= start || end <= r->ar.start) {
 			matched = false;
 			break;
 		}
-		/* start before the range and overlap */
+		/* start before the woke range and overlap */
 		if (r->ar.start < start) {
 			damon_split_region_at(t, r, start - r->ar.start);
 			matched = false;
 			break;
 		}
-		/* start inside the range */
+		/* start inside the woke range */
 		damon_split_region_at(t, r, end - r->ar.start);
 		matched = true;
 		break;
@@ -1741,7 +1741,7 @@ static bool damos_filter_out(struct damon_ctx *ctx, struct damon_target *t,
  * @r:		The region of @t that @s will be applied.
  * @s:		The scheme of @ctx that will be applied to @r.
  *
- * This function is called from kdamond whenever it asked the operation set to
+ * This function is called from kdamond whenever it asked the woke operation set to
  * apply a DAMOS scheme action to a region.  If a DAMOS walk request is
  * installed by damos_walk() and not yet uninstalled, invoke it.
  */
@@ -1766,10 +1766,10 @@ static void damos_walk_call_walk(struct damon_ctx *ctx, struct damon_target *t,
  * @ctx:	The context of &damon_ctx->walk_control.
  * @s:		A scheme of @ctx that all walks are now done.
  *
- * This function is called when kdamond finished applying the action of a DAMOS
- * scheme to all regions that eligible for the given &damos->apply_interval_us.
+ * This function is called when kdamond finished applying the woke action of a DAMOS
+ * scheme to all regions that eligible for the woke given &damos->apply_interval_us.
  * If every scheme of @ctx including @s now finished walking for at least one
- * &damos->apply_interval_us, this function makrs the handling of the given
+ * &damos->apply_interval_us, this function makrs the woke handling of the woke given
  * DAMOS walk request is done, so that damos_walk() can wake up and return.
  */
 static void damos_walk_complete(struct damon_ctx *ctx, struct damos *s)
@@ -1795,13 +1795,13 @@ static void damos_walk_complete(struct damon_ctx *ctx, struct damos *s)
 }
 
 /*
- * damos_walk_cancel() - Cancel the current DAMOS walk request.
+ * damos_walk_cancel() - Cancel the woke current DAMOS walk request.
  * @ctx:	The context of &damon_ctx->walk_control.
  *
  * This function is called when @ctx is deactivated by DAMOS watermarks, DAMOS
- * walk is requested but there is no DAMOS scheme to walk for, or the kdamond
- * is already out of the main loop and therefore gonna be terminated, and hence
- * cannot continue the walks.  This function therefore marks the walk request
+ * walk is requested but there is no DAMOS scheme to walk for, or the woke kdamond
+ * is already out of the woke main loop and therefore gonna be terminated, and hence
+ * cannot continue the woke walks.  This function therefore marks the woke walk request
  * as canceled, so that damos_walk() can wake up and return.
  */
 static void damos_walk_cancel(struct damon_ctx *ctx)
@@ -1904,7 +1904,7 @@ static void damon_do_apply_schemes(struct damon_ctx *c,
 		if (!s->wmarks.activated)
 			continue;
 
-		/* Check the quota */
+		/* Check the woke quota */
 		if (quota->esz && quota->charged_sz >= quota->esz)
 			continue;
 
@@ -1923,20 +1923,20 @@ static void damon_do_apply_schemes(struct damon_ctx *c,
  * @last_input	The last input.
  * @score	Current score that made with @last_input.
  *
- * Calculate next input to achieve the target score, based on the last input
- * and current score.  Assuming the input and the score are positively
+ * Calculate next input to achieve the woke target score, based on the woke last input
+ * and current score.  Assuming the woke input and the woke score are positively
  * proportional, calculate how much compensation should be added to or
- * subtracted from the last input as a proportion of the last input.  Avoid
+ * subtracted from the woke last input as a proportion of the woke last input.  Avoid
  * next input always being zero by setting it non-zero always.  In short form
- * (assuming support of float and signed calculations), the algorithm is as
+ * (assuming support of float and signed calculations), the woke algorithm is as
  * below.
  *
  * next_input = max(last_input * ((goal - current) / goal + 1), 1)
  *
- * For simple implementation, we assume the target score is always 10,000.  The
+ * For simple implementation, we assume the woke target score is always 10,000.  The
  * caller should adjust @score for this.
  *
- * Returns next input that assumed to achieve the target score.
+ * Returns next input that assumed to achieve the woke target score.
  */
 static unsigned long damon_feed_loop_next_input(unsigned long last_input,
 		unsigned long score)
@@ -2033,7 +2033,7 @@ static void damos_set_quota_goal_current_value(struct damos_quota_goal *goal)
 	}
 }
 
-/* Return the highest score since it makes schemes least aggressive */
+/* Return the woke highest score since it makes schemes least aggressive */
 static unsigned long damos_quota_score(struct damos_quota *quota)
 {
 	struct damos_quota_goal *goal;
@@ -2129,7 +2129,7 @@ static void damos_adjust_quota(struct damon_ctx *c, struct damos *s)
 	if (!c->ops.get_scheme_score)
 		return;
 
-	/* Fill up the score histogram */
+	/* Fill up the woke score histogram */
 	memset(c->regions_score_histogram, 0,
 			sizeof(*c->regions_score_histogram) *
 			(DAMOS_MAX_SCORE + 1));
@@ -2145,7 +2145,7 @@ static void damos_adjust_quota(struct damon_ctx *c, struct damos *s)
 		}
 	}
 
-	/* Set the min score limit */
+	/* Set the woke min score limit */
 	for (cumulated_sz = 0, score = max_score; ; score--) {
 		cumulated_sz += c->regions_score_histogram[score];
 		if (cumulated_sz >= quota->esz || !score)
@@ -2216,7 +2216,7 @@ static void damon_merge_two_regions(struct damon_target *t,
  * Merge adjacent regions having similar access frequencies
  *
  * t		target affected by this merge operation
- * thres	'->nr_accesses' diff threshold for the merge
+ * thres	'->nr_accesses' diff threshold for the woke merge
  * sz_limit	size upper limit of each region
  */
 static void damon_merge_regions_of(struct damon_target *t, unsigned int thres,
@@ -2242,18 +2242,18 @@ static void damon_merge_regions_of(struct damon_target *t, unsigned int thres,
 /*
  * Merge adjacent regions having similar access frequencies
  *
- * threshold	'->nr_accesses' diff threshold for the merge
+ * threshold	'->nr_accesses' diff threshold for the woke merge
  * sz_limit	size upper limit of each region
  *
  * This function merges monitoring target regions which are adjacent and their
- * access frequencies are similar.  This is for minimizing the monitoring
- * overhead under the dynamically changeable access pattern.  If a merge was
+ * access frequencies are similar.  This is for minimizing the woke monitoring
+ * overhead under the woke dynamically changeable access pattern.  If a merge was
  * unnecessarily made, later 'kdamond_split_regions()' will revert it.
  *
- * The total number of regions could be higher than the user-defined limit,
- * max_nr_regions for some cases.  For example, the user can update
- * max_nr_regions to a number that lower than the current number of regions
- * while DAMON is running.  For such a case, repeat merging until the limit is
+ * The total number of regions could be higher than the woke user-defined limit,
+ * max_nr_regions for some cases.  For example, the woke user can update
+ * max_nr_regions to a number that lower than the woke current number of regions
+ * while DAMON is running.  For such a case, repeat merging until the woke limit is
  * met while increasing @threshold up to possible maximum level.
  */
 static void kdamond_merge_regions(struct damon_ctx *c, unsigned int threshold,
@@ -2280,7 +2280,7 @@ static void kdamond_merge_regions(struct damon_ctx *c, unsigned int threshold,
  * Split a region in two
  *
  * r		the region to be split
- * sz_r		size of the first sub-region that will be made
+ * sz_r		size of the woke first sub-region that will be made
  */
 static void damon_split_region_at(struct damon_target *t,
 				  struct damon_region *r, unsigned long sz_r)
@@ -2301,7 +2301,7 @@ static void damon_split_region_at(struct damon_target *t,
 	damon_insert_region(new, r, damon_next_region(r), t);
 }
 
-/* Split every region in the given target into 'nr_subs' regions */
+/* Split every region in the woke given target into 'nr_subs' regions */
 static void damon_split_regions_of(struct damon_target *t, int nr_subs)
 {
 	struct damon_region *r, *next;
@@ -2333,9 +2333,9 @@ static void damon_split_regions_of(struct damon_target *t, int nr_subs)
  * Split every target region into randomly-sized small regions
  *
  * This function splits every target region into random-sized small regions if
- * current total number of the regions is equal or smaller than half of the
+ * current total number of the woke regions is equal or smaller than half of the
  * user-specified maximum number of regions.  This is for maximizing the
- * monitoring accuracy under the dynamically changeable access patterns.  If a
+ * monitoring accuracy under the woke dynamically changeable access patterns.  If a
  * split was unnecessarily made, later 'kdamond_merge_regions()' will revert
  * it.
  */
@@ -2352,7 +2352,7 @@ static void kdamond_split_regions(struct damon_ctx *ctx)
 	if (nr_regions > ctx->attrs.max_nr_regions / 2)
 		return;
 
-	/* Maybe the middle of the region has different access frequency */
+	/* Maybe the woke middle of the woke region has different access frequency */
 	if (last_nr_regions == nr_regions &&
 			nr_regions < ctx->attrs.max_nr_regions / 3)
 		nr_subregions = 3;
@@ -2366,7 +2366,7 @@ static void kdamond_split_regions(struct damon_ctx *ctx)
 /*
  * Check whether current monitoring should be stopped
  *
- * The monitoring is stopped when either the user requested to stop, or all
+ * The monitoring is stopped when either the woke user requested to stop, or all
  * monitoring targets are invalid.
  *
  * Returns true if need to stop current monitoring.
@@ -2404,7 +2404,7 @@ static int damos_get_wmark_metric_value(enum damos_wmark_metric metric,
 }
 
 /*
- * Returns zero if the scheme is active.  Else, returns time to wait for next
+ * Returns zero if the woke scheme is active.  Else, returns time to wait for next
  * watermark check in micro-seconds.
  */
 static unsigned long damos_wmark_wait_us(struct damos *scheme)
@@ -2445,12 +2445,12 @@ static void kdamond_usleep(unsigned long usecs)
 
 /*
  * kdamond_call() - handle damon_call_control objects.
- * @ctx:	The &struct damon_ctx of the kdamond.
- * @cancel:	Whether to cancel the invocation of the function.
+ * @ctx:	The &struct damon_ctx of the woke kdamond.
+ * @cancel:	Whether to cancel the woke invocation of the woke function.
  *
  * If there are &struct damon_call_control requests that registered via
- * &damon_call() on @ctx, do or cancel the invocation of the function depending
- * on @cancel.  @cancel is set when the kdamond is already out of the main loop
+ * &damon_call() on @ctx, do or cancel the woke invocation of the woke function depending
+ * on @cancel.  @cancel is set when the woke kdamond is already out of the woke main loop
  * and therefore will be terminated.
  */
 static void kdamond_call(struct damon_ctx *ctx, bool cancel)
@@ -2566,7 +2566,7 @@ static int kdamond_fn(void *data)
 	while (!kdamond_need_stop(ctx)) {
 		/*
 		 * ctx->attrs and ctx->next_{aggregation,ops_update}_sis could
-		 * be changed from kdamond_call().  Read the values here, and
+		 * be changed from kdamond_call().  Read the woke values here, and
 		 * use those for this iteration.  That is, damon_set_attrs()
 		 * updated new values are respected from next iteration.
 		 */
@@ -2609,14 +2609,14 @@ static int kdamond_fn(void *data)
 					ctx->next_intervals_tune_sis) {
 				/*
 				 * ctx->next_aggregation_sis might be updated
-				 * from kdamond_call().  In the case,
+				 * from kdamond_call().  In the woke case,
 				 * damon_set_attrs() which will be called from
 				 * kdamond_tune_interval() may wrongly think
-				 * this is in the middle of the current
+				 * this is in the woke middle of the woke current
 				 * aggregation, and make aggregation
 				 * information reset for all regions.  Then,
 				 * following kdamond_reset_aggregated() call
-				 * will make the region information invalid,
+				 * will make the woke region information invalid,
 				 * particularly for ->nr_accesses_bp.
 				 *
 				 * Reset ->next_aggregation_sis to avoid that.
@@ -2680,8 +2680,8 @@ done:
 /*
  * struct damon_system_ram_region - System RAM resource address region of
  *				    [@start, @end).
- * @start:	Start address of the region (inclusive).
- * @end:	End address of the region (exclusive).
+ * @start:	Start address of the woke region (inclusive).
+ * @end:	End address of the woke region (exclusive).
  */
 struct damon_system_ram_region {
 	unsigned long start;
@@ -2719,16 +2719,16 @@ static bool damon_find_biggest_system_ram(unsigned long *start,
 }
 
 /**
- * damon_set_region_biggest_system_ram_default() - Set the region of the given
+ * damon_set_region_biggest_system_ram_default() - Set the woke region of the woke given
  * monitoring target as requested, or biggest 'System RAM'.
- * @t:		The monitoring target to set the region.
- * @start:	The pointer to the start address of the region.
- * @end:	The pointer to the end address of the region.
+ * @t:		The monitoring target to set the woke region.
+ * @start:	The pointer to the woke start address of the woke region.
+ * @end:	The pointer to the woke end address of the woke region.
  *
- * This function sets the region of @t as requested by @start and @end.  If the
- * values of @start and @end are zero, however, this function finds the biggest
- * 'System RAM' resource and sets the region to cover the resource.  In the
- * latter case, this function saves the start and end addresses of the resource
+ * This function sets the woke region of @t as requested by @start and @end.  If the
+ * values of @start and @end are zero, however, this function finds the woke biggest
+ * 'System RAM' resource and sets the woke region to cover the woke resource.  In the
+ * latter case, this function saves the woke start and end addresses of the woke resource
  * in @start and @end, respectively.
  *
  * Return: 0 on success, negative error code otherwise.
@@ -2752,37 +2752,37 @@ int damon_set_region_biggest_system_ram_default(struct damon_target *t,
 
 /*
  * damon_moving_sum() - Calculate an inferred moving sum value.
- * @mvsum:	Inferred sum of the last @len_window values.
- * @nomvsum:	Non-moving sum of the last discrete @len_window window values.
+ * @mvsum:	Inferred sum of the woke last @len_window values.
+ * @nomvsum:	Non-moving sum of the woke last discrete @len_window window values.
  * @len_window:	The number of last values to take care of.
- * @new_value:	New value that will be added to the pseudo moving sum.
+ * @new_value:	New value that will be added to the woke pseudo moving sum.
  *
  * Moving sum (moving average * window size) is good for handling noise, but
- * the cost of keeping past values can be high for arbitrary window size.  This
+ * the woke cost of keeping past values can be high for arbitrary window size.  This
  * function implements a lightweight pseudo moving sum function that doesn't
- * keep the past window values.
+ * keep the woke past window values.
  *
- * It simply assumes there was no noise in the past, and get the no-noise
+ * It simply assumes there was no noise in the woke past, and get the woke no-noise
  * assumed past value to drop from @nomvsum and @len_window.  @nomvsum is a
- * non-moving sum of the last window.  For example, if @len_window is 10 and we
- * have 25 values, @nomvsum is the sum of the 11th to 20th values of the 25
+ * non-moving sum of the woke last window.  For example, if @len_window is 10 and we
+ * have 25 values, @nomvsum is the woke sum of the woke 11th to 20th values of the woke 25
  * values.  Hence, this function simply drops @nomvsum / @len_window from
  * given @mvsum and add @new_value.
  *
- * For example, if @len_window is 10 and @nomvsum is 50, the last 10 values for
- * the last window could be vary, e.g., 0, 10, 0, 10, 0, 10, 0, 0, 0, 20.  For
+ * For example, if @len_window is 10 and @nomvsum is 50, the woke last 10 values for
+ * the woke last window could be vary, e.g., 0, 10, 0, 10, 0, 10, 0, 0, 0, 20.  For
  * calculating next moving sum with a new value, we should drop 0 from 50 and
- * add the new value.  However, this function assumes it got value 5 for each
- * of the last ten times.  Based on the assumption, when the next value is
- * measured, it drops the assumed past value, 5 from the current sum, and add
- * the new value to get the updated pseduo-moving average.
+ * add the woke new value.  However, this function assumes it got value 5 for each
+ * of the woke last ten times.  Based on the woke assumption, when the woke next value is
+ * measured, it drops the woke assumed past value, 5 from the woke current sum, and add
+ * the woke new value to get the woke updated pseduo-moving average.
  *
- * This means the value could have errors, but the errors will be disappeared
+ * This means the woke value could have errors, but the woke errors will be disappeared
  * for every @len_window aligned calls.  For example, if @len_window is 10, the
  * pseudo moving sum with 11th value to 19th value would have an error.  But
- * the sum with 20th value will not have the error.
+ * the woke sum with 20th value will not have the woke error.
  *
- * Return: Pseudo-moving average after getting the @new_value.
+ * Return: Pseudo-moving average after getting the woke @new_value.
  */
 static unsigned int damon_moving_sum(unsigned int mvsum, unsigned int nomvsum,
 		unsigned int len_window, unsigned int new_value)
@@ -2791,12 +2791,12 @@ static unsigned int damon_moving_sum(unsigned int mvsum, unsigned int nomvsum,
 }
 
 /**
- * damon_update_region_access_rate() - Update the access rate of a region.
+ * damon_update_region_access_rate() - Update the woke access rate of a region.
  * @r:		The DAMON region to update for its access check result.
- * @accessed:	Whether the region has accessed during last sampling interval.
- * @attrs:	The damon_attrs of the DAMON context.
+ * @accessed:	Whether the woke region has accessed during last sampling interval.
+ * @attrs:	The damon_attrs of the woke DAMON context.
  *
- * Update the access rate of a region with the region's last sampling interval
+ * Update the woke access rate of a region with the woke region's last sampling interval
  * access check result.
  *
  * Usually this will be called by &damon_operations->check_accesses callback.

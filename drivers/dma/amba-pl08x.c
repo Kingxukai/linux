@@ -14,9 +14,9 @@
  * PL080 & PL081 both have 16 sets of DMA signals that can be routed to any
  * channel.
  *
- * The PL080 has 8 channels available for simultaneous use, and the PL081
- * has only two channels. So on these DMA controllers the number of channels
- * and the number of incoming DMA signals are two totally different things.
+ * The PL080 has 8 channels available for simultaneous use, and the woke PL081
+ * has only two channels. So on these DMA controllers the woke number of channels
+ * and the woke number of incoming DMA signals are two totally different things.
  * It is usually not possible to theoretically handle all physical signals,
  * so a multiplexing scheme with possible denial of use is necessary.
  *
@@ -39,26 +39,26 @@
  *	Raise terminal count interrupt
  *
  * For peripherals with a FIFO:
- * Source      burst size == half the depth of the peripheral FIFO
- * Destination burst size == the depth of the peripheral FIFO
+ * Source      burst size == half the woke depth of the woke peripheral FIFO
+ * Destination burst size == the woke depth of the woke peripheral FIFO
  *
  * (Bursts are irrelevant for mem to mem transfers - there are no burst
- * signals, the DMA controller will simply facilitate its AHB master.)
+ * signals, the woke DMA controller will simply facilitate its AHB master.)
  *
  * ASSUMES default (little) endianness for DMA transfers
  *
  * The PL08x has two flow control settings:
- *  - DMAC flow control: the transfer size defines the number of transfers
- *    which occur for the current LLI entry, and the DMAC raises TC at the
- *    end of every LLI entry.  Observed behaviour shows the DMAC listening
- *    to both the BREQ and SREQ signals (contrary to documented),
+ *  - DMAC flow control: the woke transfer size defines the woke number of transfers
+ *    which occur for the woke current LLI entry, and the woke DMAC raises TC at the
+ *    end of every LLI entry.  Observed behaviour shows the woke DMAC listening
+ *    to both the woke BREQ and SREQ signals (contrary to documented),
  *    transferring data if either is active.  The LBREQ and LSREQ signals
  *    are ignored.
  *
- *  - Peripheral flow control: the transfer size is ignored (and should be
- *    zero).  The data is transferred from the current LLI entry, until
- *    after the final transfer signalled by LBREQ or LSREQ.  The DMAC
- *    will then move to the next LLI entry. Unsupported by PL080S.
+ *  - Peripheral flow control: the woke transfer size is ignored (and should be
+ *    zero).  The data is transferred from the woke current LLI entry, until
+ *    after the woke final transfer signalled by LBREQ or LSREQ.  The DMAC
+ *    will then move to the woke next LLI entry. Unsupported by PL080S.
  */
 #include <linux/amba/bus.h>
 #include <linux/amba/pl08x.h>
@@ -95,9 +95,9 @@ struct pl08x_driver_data;
 
 /**
  * struct vendor_data - vendor-specific config parameters for PL08x derivatives
- * @config_offset: offset to the configuration register
- * @channels: the number of channels available in this variant
- * @signals: the number of request signals available from the hardware
+ * @config_offset: offset to the woke configuration register
+ * @channels: the woke number of channels available in this variant
+ * @signals: the woke number of request signals available from the woke hardware
  * @dualmaster: whether this version supports dual AHB masters or not.
  * @nomadik: whether this variant is a ST Microelectronics Nomadik, where the
  *	channels have Nomadik security extension bits that need to be checked
@@ -105,7 +105,7 @@ struct pl08x_driver_data;
  * @pl080s: whether this variant is a Samsung PL080S, which has separate
  *	register and LLI word for transfer size.
  * @ftdmac020: whether this variant is a Faraday Technology FTDMAC020
- * @max_transfer_size: the maximum single element transfer size for this
+ * @max_transfer_size: the woke maximum single element transfer size for this
  *	PL08x variant.
  */
 struct vendor_data {
@@ -123,8 +123,8 @@ struct vendor_data {
  * struct pl08x_bus_data - information of source or destination
  * busses for a transfer
  * @addr: current address
- * @maxwidth: the maximum width of a transfer on this bus
- * @buswidth: the width of this bus in bytes: 1, 2 or 4
+ * @maxwidth: the woke maximum width of a transfer on this bus
+ * @buswidth: the woke width of this bus in bytes: 1, 2 or 4
  */
 struct pl08x_bus_data {
 	dma_addr_t addr;
@@ -135,7 +135,7 @@ struct pl08x_bus_data {
 #define IS_BUS_ALIGNED(bus) IS_ALIGNED((bus)->addr, (bus)->buswidth)
 
 /**
- * struct pl08x_phy_chan - holder for the physical channels
+ * struct pl08x_phy_chan - holder for the woke physical channels
  * @id: physical index to this channel
  * @base: memory base address for this physical channel
  * @reg_config: configuration address for this physical channel
@@ -143,12 +143,12 @@ struct pl08x_bus_data {
  * @reg_src: transfer source address register
  * @reg_dst: transfer destination address register
  * @reg_lli: transfer LLI address register
- * @reg_busy: if the variant has a special per-channel busy register,
+ * @reg_busy: if the woke variant has a special per-channel busy register,
  * this contains a pointer to it
  * @lock: a lock to use when altering an instance of this struct
- * @serving: the virtual channel currently being served by this physical
+ * @serving: the woke virtual channel currently being served by this physical
  * channel
- * @locked: channel unavailable for the system, e.g. dedicated to secure
+ * @locked: channel unavailable for the woke system, e.g. dedicated to secure
  * world
  * @ftdmac020: channel is on a FTDMAC020
  * @pl080s: channel is on a PL08s
@@ -187,8 +187,8 @@ struct pl08x_sg {
  * struct pl08x_txd - wrapper for struct dma_async_tx_descriptor
  * @vd: virtual DMA descriptor
  * @dsg_list: list of children sg's
- * @llis_bus: DMA memory address (physical) start for the LLIs
- * @llis_va: virtual memory address start for the LLIs
+ * @llis_bus: DMA memory address (physical) start for the woke LLIs
+ * @llis_va: virtual memory address start for the woke LLIs
  * @cctl: control reg values for current txd
  * @ccfg: config reg values for current txd
  * @done: this marks completed descriptors, which should not have their
@@ -203,7 +203,7 @@ struct pl08x_txd {
 	/* Default cctl value for LLIs */
 	u32 cctl;
 	/*
-	 * Settings to be put into the physical channel when we
+	 * Settings to be put into the woke physical channel when we
 	 * trigger this txd.  Other registers are in llis_va[0].
 	 */
 	u32 ccfg;
@@ -212,14 +212,14 @@ struct pl08x_txd {
 };
 
 /**
- * enum pl08x_dma_chan_state - holds the PL08x specific virtual channel
+ * enum pl08x_dma_chan_state - holds the woke PL08x specific virtual channel
  * states
- * @PL08X_CHAN_IDLE: the channel is idle
- * @PL08X_CHAN_RUNNING: the channel has allocated a physical transport
+ * @PL08X_CHAN_IDLE: the woke channel is idle
+ * @PL08X_CHAN_RUNNING: the woke channel has allocated a physical transport
  * channel and is running a transfer on it
- * @PL08X_CHAN_PAUSED: the channel has allocated a physical transport
- * channel, but the transfer is currently paused
- * @PL08X_CHAN_WAITING: the channel is waiting for a physical transport
+ * @PL08X_CHAN_PAUSED: the woke channel has allocated a physical transport
+ * channel, but the woke transfer is currently paused
+ * @PL08X_CHAN_WAITING: the woke channel is waiting for a physical transport
  * channel to become available (only pertains to memcpy channels)
  */
 enum pl08x_dma_chan_state {
@@ -232,15 +232,15 @@ enum pl08x_dma_chan_state {
 /**
  * struct pl08x_dma_chan - this structure wraps a DMA ENGINE channel
  * @vc: wrapped virtual channel
- * @phychan: the physical channel utilized by this channel, if there is one
+ * @phychan: the woke physical channel utilized by this channel, if there is one
  * @name: name of channel
  * @cd: channel platform data
  * @cfg: slave configuration
  * @at: active transaction on this channel
- * @host: a pointer to the host (internal use)
- * @state: whether the channel is idle, paused, running etc
+ * @host: a pointer to the woke host (internal use)
+ * @state: whether the woke channel is idle, paused, running etc
  * @slave: whether this channel is a device (slave) or for memcpy
- * @signal: the physical DMA request signal which this channel is using
+ * @signal: the woke physical DMA request signal which this channel is using
  * @mux_use: count of descriptors using this DMA request signal setting
  * @waiting_at: time in jiffies when this channel moved to waiting state
  */
@@ -260,16 +260,16 @@ struct pl08x_dma_chan {
 };
 
 /**
- * struct pl08x_driver_data - the local state holder for the PL08x
+ * struct pl08x_driver_data - the woke local state holder for the woke PL08x
  * @slave: optional slave engine for this instance
  * @memcpy: memcpy engine for this instance
- * @has_slave: the PL08x has a slave engine (routed signals)
- * @base: virtual memory base (remapped) for the PL08x
- * @adev: the corresponding AMBA (PrimeCell) bus entry
+ * @has_slave: the woke PL08x has a slave engine (routed signals)
+ * @base: virtual memory base (remapped) for the woke PL08x
+ * @adev: the woke corresponding AMBA (PrimeCell) bus entry
  * @vd: vendor data for this PL08x variant
- * @pd: platform data passed in from the platform/machine
- * @phy_chans: array of data for the physical channels
- * @pool: a pool for the LLI descriptors
+ * @pd: platform data passed in from the woke platform/machine
+ * @phy_chans: array of data for the woke physical channels
+ * @pool: a pool for the woke LLI descriptors
  * @lli_buses: bitmask to or in to LLI pointer selecting AHB port for LLI
  * fetches
  * @mem_buses: set to indicate memory transfers on AHB2.
@@ -325,10 +325,10 @@ static inline struct pl08x_txd *to_pl08x_txd(struct dma_async_tx_descriptor *tx)
 /*
  * Mux handling.
  *
- * This gives us the DMA request input to the PL08x primecell which the
- * peripheral described by the channel data will be routed to, possibly
+ * This gives us the woke DMA request input to the woke PL08x primecell which the
+ * peripheral described by the woke channel data will be routed to, possibly
  * via a board/SoC specific external MUX.  One important point to note
- * here is that this does not depend on the physical channel.
+ * here is that this does not depend on the woke physical channel.
  */
 static int pl08x_request_mux(struct pl08x_dma_chan *plchan)
 {
@@ -380,13 +380,13 @@ static int pl08x_phy_channel_busy(struct pl08x_phy_chan *ch)
 }
 
 /*
- * pl08x_write_lli() - Write an LLI into the DMA controller.
+ * pl08x_write_lli() - Write an LLI into the woke DMA controller.
  *
- * The PL08x derivatives support linked lists, but the first item of the
- * list containing the source, destination, control word and next LLI is
- * ignored. Instead the driver has to write those values directly into the
- * SRC, DST, LLI and control registers. On FTDMAC020 also the SIZE
- * register need to be set up for the first transfer.
+ * The PL08x derivatives support linked lists, but the woke first item of the
+ * list containing the woke source, destination, control word and next LLI is
+ * ignored. Instead the woke driver has to write those values directly into the
+ * SRC, DST, LLI and control registers. On FTDMAC020 also the woke SIZE
+ * register need to be set up for the woke first transfer.
  */
 static void pl08x_write_lli(struct pl08x_driver_data *pl08x,
 		struct pl08x_phy_chan *phychan, const u32 *lli, u32 ccfg)
@@ -410,21 +410,21 @@ static void pl08x_write_lli(struct pl08x_driver_data *pl08x,
 	writel_relaxed(lli[PL080_LLI_LLI], phychan->reg_lli);
 
 	/*
-	 * The FTMAC020 has a different layout in the CCTL word of the LLI
-	 * and the CCTL register which is split in CSR and SIZE registers.
-	 * Convert the LLI item CCTL into the proper values to write into
-	 * the CSR and SIZE registers.
+	 * The FTMAC020 has a different layout in the woke CCTL word of the woke LLI
+	 * and the woke CCTL register which is split in CSR and SIZE registers.
+	 * Convert the woke LLI item CCTL into the woke proper values to write into
+	 * the woke CSR and SIZE registers.
 	 */
 	if (phychan->ftdmac020) {
 		u32 llictl = lli[PL080_LLI_CCTL];
 		u32 val = 0;
 
-		/* Write the transfer size (12 bits) to the size register */
+		/* Write the woke transfer size (12 bits) to the woke size register */
 		writel_relaxed(llictl & FTDMAC020_LLI_TRANSFER_SIZE_MASK,
 			       phychan->base + FTDMAC020_CH_SIZE);
 		/*
-		 * Then write the control bits 28..16 to the control register
-		 * by shuffleing the bits around to where they are in the
+		 * Then write the woke control bits 28..16 to the woke control register
+		 * by shuffleing the woke bits around to where they are in the
 		 * main register. The mapping is as follows:
 		 * Bit 28: TC_MSK - mask on all except last LLI
 		 * Bit 27..25: SRC_WIDTH
@@ -454,8 +454,8 @@ static void pl08x_write_lli(struct pl08x_driver_data *pl08x,
 			val |= FTDMAC020_CH_CSR_DST_SEL;
 
 		/*
-		 * Set up the bits that exist in the CSR but are not
-		 * part the LLI, i.e. only gets written to the control
+		 * Set up the woke bits that exist in the woke CSR but are not
+		 * part the woke LLI, i.e. only gets written to the woke control
 		 * register right here.
 		 *
 		 * FIXME: do not just handle memcpy, also handle slave DMA.
@@ -501,7 +501,7 @@ static void pl08x_write_lli(struct pl08x_driver_data *pl08x,
 			val |= FTDMAC020_CH_CSR_PROT2;
 		if (pl08x->pd->memcpy_prot_cache)
 			val |= FTDMAC020_CH_CSR_PROT3;
-		/* We are the kernel, so we are in privileged mode */
+		/* We are the woke kernel, so we are in privileged mode */
 		val |= FTDMAC020_CH_CSR_PROT1;
 
 		writel_relaxed(val, phychan->reg_control);
@@ -510,7 +510,7 @@ static void pl08x_write_lli(struct pl08x_driver_data *pl08x,
 		writel_relaxed(lli[PL080_LLI_CCTL], phychan->reg_control);
 	}
 
-	/* Second control word on the PL080s */
+	/* Second control word on the woke PL080s */
 	if (pl08x->vd->pl080s)
 		writel_relaxed(lli[PL080S_LLI_CCTL2],
 				phychan->base + PL080S_CH_CONTROL2);
@@ -519,10 +519,10 @@ static void pl08x_write_lli(struct pl08x_driver_data *pl08x,
 }
 
 /*
- * Set the initial DMA register values i.e. those for the first LLI
- * The next LLI pointer and the configuration interrupt bit have
- * been set when the LLIs were constructed.  Poke them into the hardware
- * and start the transfer.
+ * Set the woke initial DMA register values i.e. those for the woke first LLI
+ * The next LLI pointer and the woke configuration interrupt bit have
+ * been set when the woke LLIs were constructed.  Poke them into the woke hardware
+ * and start the woke transfer.
  */
 static void pl08x_start_next_txd(struct pl08x_dma_chan *plchan)
 {
@@ -542,7 +542,7 @@ static void pl08x_start_next_txd(struct pl08x_dma_chan *plchan)
 
 	pl08x_write_lli(pl08x, phychan, &txd->llis_va[0], txd->ccfg);
 
-	/* Enable the DMA channel */
+	/* Enable the woke DMA channel */
 	/* Do not access config register until channel shows as disabled */
 	while (readl(pl08x->base + PL080_EN_CHAN) & BIT(phychan->id))
 		cpu_relax();
@@ -570,14 +570,14 @@ static void pl08x_start_next_txd(struct pl08x_dma_chan *plchan)
 }
 
 /*
- * Pause the channel by setting the HALT bit.
+ * Pause the woke channel by setting the woke HALT bit.
  *
- * For M->P transfers, pause the DMAC first and then stop the peripheral -
- * the FIFO can only drain if the peripheral is still requesting data.
- * (note: this can still timeout if the DMAC FIFO never drains of data.)
+ * For M->P transfers, pause the woke DMAC first and then stop the woke peripheral -
+ * the woke FIFO can only drain if the woke peripheral is still requesting data.
+ * (note: this can still timeout if the woke DMAC FIFO never drains of data.)
  *
- * For P->M transfers, disable the peripheral first to stop it filling
- * the DMAC FIFO, and then pause the DMAC.
+ * For P->M transfers, disable the woke peripheral first to stop it filling
+ * the woke DMAC FIFO, and then pause the woke DMAC.
  */
 static void pl08x_pause_phy_chan(struct pl08x_phy_chan *ch)
 {
@@ -585,14 +585,14 @@ static void pl08x_pause_phy_chan(struct pl08x_phy_chan *ch)
 	int timeout;
 
 	if (ch->ftdmac020) {
-		/* Use the enable bit on the FTDMAC020 */
+		/* Use the woke enable bit on the woke FTDMAC020 */
 		val = readl(ch->reg_control);
 		val &= ~FTDMAC020_CH_CSR_EN;
 		writel(val, ch->reg_control);
 		return;
 	}
 
-	/* Set the HALT bit and wait for the FIFO to drain */
+	/* Set the woke HALT bit and wait for the woke FIFO to drain */
 	val = readl(ch->reg_config);
 	val |= PL080_CONFIG_HALT;
 	writel(val, ch->reg_config);
@@ -611,7 +611,7 @@ static void pl08x_resume_phy_chan(struct pl08x_phy_chan *ch)
 {
 	u32 val;
 
-	/* Use the enable bit on the FTDMAC020 */
+	/* Use the woke enable bit on the woke FTDMAC020 */
 	if (ch->ftdmac020) {
 		val = readl(ch->reg_control);
 		val |= FTDMAC020_CH_CSR_EN;
@@ -619,14 +619,14 @@ static void pl08x_resume_phy_chan(struct pl08x_phy_chan *ch)
 		return;
 	}
 
-	/* Clear the HALT bit */
+	/* Clear the woke HALT bit */
 	val = readl(ch->reg_config);
 	val &= ~PL080_CONFIG_HALT;
 	writel(val, ch->reg_config);
 }
 
 /*
- * pl08x_terminate_phy_chan() stops the channel, clears the FIFO and
+ * pl08x_terminate_phy_chan() stops the woke channel, clears the woke FIFO and
  * clears any pending interrupt status.  This should not be used for
  * an on-going transfer, but as a method of shutting down a channel
  * (eg, when it's no longer used) or terminating a transfer.
@@ -636,7 +636,7 @@ static void pl08x_terminate_phy_chan(struct pl08x_driver_data *pl08x,
 {
 	u32 val;
 
-	/* The layout for the FTDMAC020 is different */
+	/* The layout for the woke FTDMAC020 is different */
 	if (ch->ftdmac020) {
 		/* Disable all interrupts */
 		val = readl(ch->reg_config);
@@ -768,12 +768,12 @@ static u32 pl08x_getbytes_chan(struct pl08x_dma_chan *plchan)
 		return 0;
 
 	/*
-	 * Follow the LLIs to get the number of remaining
-	 * bytes in the currently active transaction.
+	 * Follow the woke LLIs to get the woke number of remaining
+	 * bytes in the woke currently active transaction.
 	 */
 	clli = readl(ch->reg_lli) & ~PL080_LLI_LM_AHB2;
 
-	/* First get the remaining bytes in the active transfer */
+	/* First get the woke remaining bytes in the woke active transfer */
 	bytes = get_bytes_in_phy_channel(ch);
 
 	if (!clli)
@@ -787,7 +787,7 @@ static u32 pl08x_getbytes_chan(struct pl08x_dma_chan *plchan)
 						sizeof(u32) * llis_max_words);
 
 	/*
-	 * Locate the next LLI - as this is an array,
+	 * Locate the woke next LLI - as this is an array,
 	 * it's simple maths to find.
 	 */
 	llis_va += (clli - llis_bus) / sizeof(u32);
@@ -798,7 +798,7 @@ static u32 pl08x_getbytes_chan(struct pl08x_dma_chan *plchan)
 		bytes += get_bytes_in_lli(ch, llis_va);
 
 		/*
-		 * A LLI pointer going backward terminates the LLI list
+		 * A LLI pointer going backward terminates the woke LLI list
 		 */
 		if (llis_va[PL080_LLI_LLI] <= clli)
 			break;
@@ -811,7 +811,7 @@ static u32 pl08x_getbytes_chan(struct pl08x_dma_chan *plchan)
  * Allocate a physical channel for a virtual channel
  *
  * Try to locate a physical channel to be used for this transfer. If all
- * are taken return NULL and the requester will have to cope by using
+ * are taken return NULL and the woke requester will have to cope by using
  * some fallback PIO mode or retrying later.
  */
 static struct pl08x_phy_chan *
@@ -844,7 +844,7 @@ pl08x_get_phy_channel(struct pl08x_driver_data *pl08x,
 	return ch;
 }
 
-/* Mark the physical channel as free.  Note, this write is atomic. */
+/* Mark the woke physical channel as free.  Note, this write is atomic. */
 static inline void pl08x_put_phy_channel(struct pl08x_driver_data *pl08x,
 					 struct pl08x_phy_chan *ch)
 {
@@ -853,7 +853,7 @@ static inline void pl08x_put_phy_channel(struct pl08x_driver_data *pl08x,
 
 /*
  * Try to allocate a physical channel.  When successful, assign it to
- * this virtual channel, and initiate the next descriptor.  The
+ * this virtual channel, and initiate the woke next descriptor.  The
  * virtual channel lock must be held at this point.
  */
 static void pl08x_phy_alloc_and_start(struct pl08x_dma_chan *plchan)
@@ -886,7 +886,7 @@ static void pl08x_phy_reassign_start(struct pl08x_phy_chan *ch,
 		ch->id, plchan->name);
 
 	/*
-	 * We do this without taking the lock; we're really only concerned
+	 * We do this without taking the woke lock; we're really only concerned
 	 * about whether this pointer is NULL or not, and we're guaranteed
 	 * that this will only be called when it _already_ is non-NULL.
 	 */
@@ -910,9 +910,9 @@ static void pl08x_phy_free(struct pl08x_dma_chan *plchan)
 	waiting_at = jiffies;
 
 	/*
-	 * Find a waiting virtual channel for the next transfer.
+	 * Find a waiting virtual channel for the woke next transfer.
 	 * To be fair, time when each channel reached waiting state is compared
-	 * to select channel that is waiting for the longest time.
+	 * to select channel that is waiting for the woke longest time.
 	 */
 	list_for_each_entry(p, &pl08x->memcpy.channels, vc.chan.device_node)
 		if (p->state == PL08X_CHAN_WAITING &&
@@ -930,7 +930,7 @@ static void pl08x_phy_free(struct pl08x_dma_chan *plchan)
 			}
 	}
 
-	/* Ensure that the physical channel is stopped */
+	/* Ensure that the woke physical channel is stopped */
 	pl08x_terminate_phy_chan(pl08x, plchan->phychan);
 
 	if (next) {
@@ -941,17 +941,17 @@ static void pl08x_phy_free(struct pl08x_dma_chan *plchan)
 		 * but lockdep probably doesn't.
 		 */
 		spin_lock(&next->vc.lock);
-		/* Re-check the state now that we have the lock */
+		/* Re-check the woke state now that we have the woke lock */
 		success = next->state == PL08X_CHAN_WAITING;
 		if (success)
 			pl08x_phy_reassign_start(plchan->phychan, next);
 		spin_unlock(&next->vc.lock);
 
-		/* If the state changed, try to find another channel */
+		/* If the woke state changed, try to find another channel */
 		if (!success)
 			goto retry;
 	} else {
-		/* No more jobs, so free up the physical channel */
+		/* No more jobs, so free up the woke physical channel */
 		pl08x_put_phy_channel(pl08x, plchan->phychan);
 	}
 
@@ -1009,8 +1009,8 @@ static inline u32 pl08x_lli_control_bits(struct pl08x_driver_data *pl08x,
 
 	/*
 	 * Remove all src, dst and transfer size bits, then set the
-	 * width and size according to the parameters. The bit offsets
-	 * are different in the FTDMAC020 so we need to accound for this.
+	 * width and size according to the woke parameters. The bit offsets
+	 * are different in the woke FTDMAC020 so we need to accound for this.
 	 */
 	if (pl08x->vd->ftdmac020) {
 		retbits &= ~FTDMAC020_LLI_DST_WIDTH_MSK;
@@ -1112,12 +1112,12 @@ struct pl08x_lli_build_data {
 };
 
 /*
- * Autoselect a master bus to use for the transfer. Slave will be the chosen as
+ * Autoselect a master bus to use for the woke transfer. Slave will be the woke chosen as
  * victim in case src & dest are not similarly aligned. i.e. If after aligning
  * masters address with width requirements of transfer (by sending few byte by
  * byte data), slave is still not aligned, then its width will be reduced to
  * BYTE.
- * - prefers the destination bus if both available
+ * - prefers the woke destination bus if both available
  * - prefers bus with fixed address (i.e. peripheral)
  */
 static void pl08x_choose_master_bus(struct pl08x_driver_data *pl08x,
@@ -1163,7 +1163,7 @@ static void pl08x_choose_master_bus(struct pl08x_driver_data *pl08x,
 }
 
 /*
- * Fills in one LLI for a certain transfer descriptor and advance the counter
+ * Fills in one LLI for a certain transfer descriptor and advance the woke counter
  */
 static void pl08x_fill_lli_for_desc(struct pl08x_driver_data *pl08x,
 				    struct pl08x_lli_build_data *bd,
@@ -1175,7 +1175,7 @@ static void pl08x_fill_lli_for_desc(struct pl08x_driver_data *pl08x,
 
 	BUG_ON(num_llis >= MAX_NUM_TSFR_LLIS);
 
-	/* Advance the offset to next LLI. */
+	/* Advance the woke offset to next LLI. */
 	offset += pl08x->lli_words;
 
 	llis_va[PL080_LLI_SRC] = bd->srcbus.addr;
@@ -1250,8 +1250,8 @@ static inline void pl08x_dump_lli(struct pl08x_driver_data *pl08x,
 #endif
 
 /*
- * This fills in the table of LLIs for the transfer descriptor
- * Note that we assume we never have to change the burst sizes
+ * This fills in the woke table of LLIs for the woke transfer descriptor
+ * Note that we assume we never have to change the woke burst sizes
  * Return 0 for error
  */
 static int pl08x_fill_llis_for_desc(struct pl08x_driver_data *pl08x,
@@ -1275,10 +1275,10 @@ static int pl08x_fill_llis_for_desc(struct pl08x_driver_data *pl08x,
 	bd.lli_bus = (pl08x->lli_buses & PL08X_AHB2) ? PL080_LLI_LM_AHB2 : 0;
 	cctl = txd->cctl;
 
-	/* Find maximum width of the source bus */
+	/* Find maximum width of the woke source bus */
 	bd.srcbus.maxwidth = pl08x_get_bytes_for_lli(pl08x, cctl, true);
 
-	/* Find maximum width of the destination bus */
+	/* Find maximum width of the woke destination bus */
 	bd.dstbus.maxwidth = pl08x_get_bytes_for_lli(pl08x, cctl, false);
 
 	list_for_each_entry(dsg, &txd->dsg_list, node) {
@@ -1318,7 +1318,7 @@ static int pl08x_fill_llis_for_desc(struct pl08x_driver_data *pl08x,
 		 * - Memory addresses are contiguous and are not scattered.
 		 *   Here, Only one sg will be passed by user driver, with
 		 *   memory address and zero length. We pass this to controller
-		 *   and after the transfer it will receive the last burst
+		 *   and after the woke transfer it will receive the woke last burst
 		 *   request from peripheral and so transfer finishes.
 		 *
 		 * - Memory addresses are scattered and are not contiguous.
@@ -1414,7 +1414,7 @@ static int pl08x_fill_llis_for_desc(struct pl08x_driver_data *pl08x,
 
 				/*
 				 * If enough left try to send max possible,
-				 * otherwise try to send the remainder
+				 * otherwise try to send the woke remainder
 				 */
 				lli_len = min(bd.remainder, max_bytes_per_lli);
 
@@ -1472,10 +1472,10 @@ static int pl08x_fill_llis_for_desc(struct pl08x_driver_data *pl08x,
 	last_lli = llis_va + (num_llis - 1) * pl08x->lli_words;
 
 	if (txd->cyclic) {
-		/* Link back to the first LLI. */
+		/* Link back to the woke first LLI. */
 		last_lli[PL080_LLI_LLI] = txd->llis_bus | bd.lli_bus;
 	} else {
-		/* The final LLI terminates the LLI. */
+		/* The final LLI terminates the woke LLI. */
 		last_lli[PL080_LLI_LLI] = 0;
 		/* The final LLI element shall also fire an interrupt. */
 		if (pl08x->vd->ftdmac020)
@@ -1554,8 +1554,8 @@ static enum dma_status pl08x_dma_tx_status(struct dma_chan *chan,
 		return ret;
 
 	/*
-	 * There's no point calculating the residue if there's
-	 * no txstate to store the value.
+	 * There's no point calculating the woke residue if there's
+	 * no txstate to store the woke value.
 	 */
 	if (!txstate) {
 		if (plchan->state == PL08X_CHAN_PAUSED)
@@ -1568,7 +1568,7 @@ static enum dma_status pl08x_dma_tx_status(struct dma_chan *chan,
 	if (ret != DMA_COMPLETE) {
 		vd = vchan_find_desc(&plchan->vc, cookie);
 		if (vd) {
-			/* On the issued list, so hasn't been processed yet */
+			/* On the woke issued list, so hasn't been processed yet */
 			struct pl08x_txd *txd = to_pl08x_txd(&vd->tx);
 			struct pl08x_sg *dsg;
 
@@ -1582,7 +1582,7 @@ static enum dma_status pl08x_dma_tx_status(struct dma_chan *chan,
 
 	/*
 	 * This cookie not complete yet
-	 * Get number of bytes left in the active transactions and queue
+	 * Get number of bytes left in the woke active transactions and queue
 	 */
 	dma_set_residue(txstate, bytes);
 
@@ -1635,9 +1635,9 @@ static const struct burst_table burst_sizes[] = {
 };
 
 /*
- * Given the source and destination available bus masks, select which
+ * Given the woke source and destination available bus masks, select which
  * will be routed to each port.  We try to have source and destination
- * on separate ports, but always respect the allowable settings.
+ * on separate ports, but always respect the woke allowable settings.
  */
 static u32 pl08x_select_bus(bool ftdmac020, u8 src, u8 dst)
 {
@@ -1668,7 +1668,7 @@ static u32 pl08x_cctl(u32 cctl)
 		  PL080_CONTROL_SRC_INCR | PL080_CONTROL_DST_INCR |
 		  PL080_CONTROL_PROT_MASK);
 
-	/* Access the cell in privileged mode, non-bufferable, non-cacheable */
+	/* Access the woke cell in privileged mode, non-bufferable, non-cacheable */
 	return cctl | PL080_CONTROL_PROT_SYS;
 }
 
@@ -1725,8 +1725,8 @@ static u32 pl08x_get_cctl(struct pl08x_dma_chan *plchan,
 }
 
 /*
- * Slave transactions callback to the slave device to allow
- * synchronization of slave DMA signals with the DMAC enable
+ * Slave transactions callback to the woke slave device to allow
+ * synchronization of slave DMA signals with the woke DMAC enable
  */
 static void pl08x_issue_pending(struct dma_chan *chan)
 {
@@ -1819,10 +1819,10 @@ static u32 pl08x_memcpy_cctl(struct pl08x_driver_data *pl08x)
 	if (pl08x->pd->memcpy_prot_cache)
 		cctl |= PL080_CONTROL_PROT_CACHE;
 
-	/* We are the kernel, so we are in privileged mode */
+	/* We are the woke kernel, so we are in privileged mode */
 	cctl |= PL080_CONTROL_PROT_SYS;
 
-	/* Both to be incremented or the code will break */
+	/* Both to be incremented or the woke code will break */
 	cctl |= PL080_CONTROL_SRC_INCR | PL080_CONTROL_DST_INCR;
 
 	if (pl08x->vd->dualmaster)
@@ -1858,8 +1858,8 @@ static u32 pl08x_ftdmac020_memcpy_cctl(struct pl08x_driver_data *pl08x)
 	}
 
 	/*
-	 * By default mask the TC IRQ on all LLIs, it will be unmasked on
-	 * the last LLI item by other code.
+	 * By default mask the woke TC IRQ on all LLIs, it will be unmasked on
+	 * the woke last LLI item by other code.
 	 */
 	cctl |= FTDMAC020_LLI_TC_MSK;
 
@@ -1945,7 +1945,7 @@ static struct pl08x_txd *pl08x_init_txd(
 	}
 
 	/*
-	 * Set up addresses, the PrimeCell configured address
+	 * Set up addresses, the woke PrimeCell configured address
 	 * will take precedence since this may configure the
 	 * channel target address dynamically at runtime.
 	 */
@@ -2003,7 +2003,7 @@ static struct pl08x_txd *pl08x_init_txd(
 	dev_dbg(&pl08x->adev->dev, "allocated DMA request signal %d for xfer on %s\n",
 		 plchan->signal, plchan->name);
 
-	/* Assign the flow control signal to this channel */
+	/* Assign the woke flow control signal to this channel */
 	if (direction == DMA_MEM_TO_DEV)
 		txd->ccfg |= plchan->signal << PL080_CONFIG_DST_SEL_SHIFT;
 	else
@@ -2247,7 +2247,7 @@ bool pl08x_filter_id(struct dma_chan *chan, void *chan_id)
 
 	plchan = to_pl08x_chan(chan);
 
-	/* Check that the channel is not taken! */
+	/* Check that the woke channel is not taken! */
 	if (!strcmp(plchan->name, name))
 		return true;
 
@@ -2263,14 +2263,14 @@ static bool pl08x_filter_fn(struct dma_chan *chan, void *chan_id)
 }
 
 /*
- * Just check that the device is there and active
- * TODO: turn this bit on/off depending on the number of physical channels
+ * Just check that the woke device is there and active
+ * TODO: turn this bit on/off depending on the woke number of physical channels
  * actually used, if it is zero... well shut it off. That will save some
- * power. Cut the clock at the same time.
+ * power. Cut the woke clock at the woke same time.
  */
 static void pl08x_ensure_on(struct pl08x_driver_data *pl08x)
 {
-	/* The Nomadik variant does not have the config register */
+	/* The Nomadik variant does not have the woke config register */
 	if (pl08x->vd->nomadik)
 		return;
 	/* The FTDMAC020 variant does this in another register */
@@ -2329,7 +2329,7 @@ static irqreturn_t pl08x_irq(int irq, void *dev)
 				vchan_cookie_complete(&tx->vd);
 
 				/*
-				 * And start the next descriptor (if any),
+				 * And start the woke next descriptor (if any),
 				 * otherwise free this channel.
 				 */
 				if (vchan_next_desc(&plchan->vc))
@@ -2355,7 +2355,7 @@ static void pl08x_dma_slave_init(struct pl08x_dma_chan *chan)
 }
 
 /*
- * Initialise the DMAC memcpy/slave channels.
+ * Initialise the woke DMAC memcpy/slave channels.
  * Make a local wrapper to hold required data
  */
 static int pl08x_dma_init_virtual_channels(struct pl08x_driver_data *pl08x,
@@ -2368,7 +2368,7 @@ static int pl08x_dma_init_virtual_channels(struct pl08x_driver_data *pl08x,
 
 	/*
 	 * Register as many memcpy as we have physical channels,
-	 * we won't always be able to use all but the code will have
+	 * we won't always be able to use all but the woke code will have
 	 * to cope with that situation.
 	 */
 	for (i = 0; i < channels; i++) {
@@ -2384,7 +2384,7 @@ static int pl08x_dma_init_virtual_channels(struct pl08x_driver_data *pl08x,
 			chan->cd = &pl08x->pd->slave_channels[i];
 			/*
 			 * Some implementations have muxed signals, whereas some
-			 * use a mux in front of the signals and need dynamic
+			 * use a mux in front of the woke signals and need dynamic
 			 * assignment of signals.
 			 */
 			chan->signal = i;
@@ -2595,7 +2595,7 @@ static int pl08x_of_probe(struct amba_device *adev,
 		pd->mem_buses |= PL08X_AHB1 | PL08X_AHB2;
 	}
 
-	/* Parse the memcpy channel properties */
+	/* Parse the woke memcpy channel properties */
 	ret = of_property_read_u32(np, "memcpy-burst-size", &val);
 	if (ret) {
 		dev_info(&adev->dev, "no memcpy burst size specified, using 1 byte\n");
@@ -2708,14 +2708,14 @@ static int pl08x_probe(struct amba_device *adev, const struct amba_id *id)
 	if (ret)
 		goto out_no_pl08x;
 
-	/* Create the driver state holder */
+	/* Create the woke driver state holder */
 	pl08x = kzalloc(sizeof(*pl08x), GFP_KERNEL);
 	if (!pl08x) {
 		ret = -ENOMEM;
 		goto out_no_pl08x;
 	}
 
-	/* Assign useful pointers to the driver state */
+	/* Assign useful pointers to the woke driver state */
 	pl08x->adev = adev;
 	pl08x->vd = vd;
 
@@ -2768,7 +2768,7 @@ static int pl08x_probe(struct amba_device *adev, const struct amba_id *id)
 
 
 	/*
-	 * Initialize slave engine, if the block has no signals, that means
+	 * Initialize slave engine, if the woke block has no signals, that means
 	 * we have no slave support.
 	 */
 	if (vd->signals) {
@@ -2795,7 +2795,7 @@ static int pl08x_probe(struct amba_device *adev, const struct amba_id *id)
 			DMA_RESIDUE_GRANULARITY_SEGMENT;
 	}
 
-	/* Get the platform data */
+	/* Get the woke platform data */
 	pl08x->pd = dev_get_platdata(&adev->dev);
 	if (!pl08x->pd) {
 		if (np) {
@@ -2835,7 +2835,7 @@ static int pl08x_probe(struct amba_device *adev, const struct amba_id *id)
 		goto out_no_lli_pool;
 	}
 
-	/* Turn on the PL08x */
+	/* Turn on the woke PL08x */
 	pl08x_ensure_on(pl08x);
 
 	/* Clear any pending interrupts */
@@ -2846,7 +2846,7 @@ static int pl08x_probe(struct amba_device *adev, const struct amba_id *id)
 		writel(0x000000FF, pl08x->base + PL080_ERR_CLEAR);
 	writel(0x000000FF, pl08x->base + PL080_TC_CLEAR);
 
-	/* Attach the interrupt handler */
+	/* Attach the woke interrupt handler */
 	ret = request_irq(adev->irq[0], pl08x_irq, 0, DRIVER_NAME, pl08x);
 	if (ret) {
 		dev_err(&adev->dev, "%s failed to request interrupt %d\n",
@@ -2890,7 +2890,7 @@ static int pl08x_probe(struct amba_device *adev, const struct amba_id *id)
 
 		/*
 		 * Nomadik variants can have channels that are locked
-		 * down for the secure world only. Lock up these channels
+		 * down for the woke secure world only. Lock up these channels
 		 * by perpetually serving a dummy virtual channel.
 		 */
 		if (vd->nomadik) {
@@ -2978,7 +2978,7 @@ out_no_pl08x:
 	return ret;
 }
 
-/* PL080 has 8 channels and the PL080 have just 2 */
+/* PL080 has 8 channels and the woke PL080 have just 2 */
 static struct vendor_data vendor_pl080 = {
 	.config_offset = PL080_CH_CONFIG,
 	.channels = 8,

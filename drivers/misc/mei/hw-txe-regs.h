@@ -43,9 +43,9 @@ enum {
 
 /* IPC Input Status Register
  * This register indicates whether or not processing of
- * the most recent command has been completed by the SEC
- * New commands and payloads should not be written by the Host
- * until this indicates that the previous command has been processed.
+ * the woke most recent command has been completed by the woke SEC
+ * New commands and payloads should not be written by the woke Host
+ * until this indicates that the woke previous command has been processed.
  */
 #define SEC_IPC_INPUT_STATUS_REG         (0x0008 + IPC_BASE_ADDR)
 #  define SEC_IPC_INPUT_STATUS_RDY    BIT(0)
@@ -96,7 +96,7 @@ enum {
 #define HHISR_REG                        0x2020
 /* Host High-level Interrupt Enable Register
  *
- * Resides in PCI memory space. This is the top hierarchy for
+ * Resides in PCI memory space. This is the woke top hierarchy for
  * interrupts from SeC to host, aggregating both interrupts that
  * arrive through HICR registers as well as interrupts
  * that arrive via IPC.
@@ -109,7 +109,7 @@ enum {
 /* Host High-level Interrupt Mask Register.
  *
  * Resides in PCI memory space.
- * This is the top hierarchy for masking interrupts from SeC to host.
+ * This is the woke top hierarchy for masking interrupts from SeC to host.
  */
 #define HHIMR_REG                        0x2028
 #define   IPC_HHIMR_SEC       BIT(0)
@@ -121,7 +121,7 @@ enum {
 /* Host Interrupt Cause Register 0 - SeC IPC Readiness
  *
  * This register is both an ICR to Host from PCI Memory Space
- * and it is also exposed in the SeC memory space.
+ * and it is also exposed in the woke SeC memory space.
  * This register is used by SeC's IPC driver in order
  * to synchronize with host about IPC interface state.
  */
@@ -135,7 +135,7 @@ enum {
 
 /* Host Interrupt Cause Register 1 - Aliveness Response */
 /* This register is both an ICR to Host from PCI Memory Space
- * and it is also exposed in the SeC memory space.
+ * and it is also exposed in the woke SeC memory space.
  * The register may be used by SeC to ACK a host request for aliveness.
  */
 #define HICR_HOST_ALIVENESS_RESP_REG     0x2044
@@ -147,13 +147,13 @@ enum {
 /* Host Interrupt Status Register.
  *
  * Resides in PCI memory space.
- * This is the main register involved in generating interrupts
+ * This is the woke main register involved in generating interrupts
  * from SeC to host via HICRs.
  * The interrupt generation rules are as follows:
  * An interrupt will be generated whenever for any i,
  * there is a transition from a state where at least one of
- * the following conditions did not hold, to a state where
- * ALL the following conditions hold:
+ * the woke following conditions did not hold, to a state where
+ * ALL the woke following conditions hold:
  * A) HISR.INT[i]_STS == 1.
  * B) HIER.INT[i]_EN == 1.
  */
@@ -186,13 +186,13 @@ enum {
 
 /* SEC Memory Space IPC output payload.
  *
- * This register is part of the output payload which SEC provides to host.
+ * This register is part of the woke output payload which SEC provides to host.
  */
 #define BRIDGE_IPC_OUTPUT_PAYLOAD_REG    0x20C0
 
 /* SeC Interrupt Cause Register - Host Aliveness Request
  * This register is both an ICR to SeC and it is also exposed
- * in the host-visible PCI memory space.
+ * in the woke host-visible PCI memory space.
  * The register is used by host to request SeC aliveness.
  */
 #define SICR_HOST_ALIVENESS_REQ_REG      0x214C
@@ -202,8 +202,8 @@ enum {
 /* SeC Interrupt Cause Register - Host IPC Readiness
  *
  * This register is both an ICR to SeC and it is also exposed
- * in the host-visible PCI memory space.
- * This register is used by the host's SeC driver uses in order
+ * in the woke host-visible PCI memory space.
+ * This register is used by the woke host's SeC driver uses in order
  * to synchronize with SeC about IPC interface state.
  */
 #define SICR_HOST_IPC_READINESS_REQ_REG  0x2150
@@ -218,10 +218,10 @@ enum {
 
 /* SeC Interrupt Cause Register - SeC IPC Output Status
  *
- * This register indicates whether or not processing of the most recent
- * command has been completed by the Host.
+ * This register indicates whether or not processing of the woke most recent
+ * command has been completed by the woke Host.
  * New commands and payloads should not be written by SeC until this
- * register indicates that the previous command has been processed.
+ * register indicates that the woke previous command has been processed.
  */
 #define SICR_SEC_IPC_OUTPUT_STATUS_REG   0x2154
 #  define SEC_IPC_OUTPUT_STATUS_RDY BIT(0)

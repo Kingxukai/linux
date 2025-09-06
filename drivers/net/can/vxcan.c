@@ -2,8 +2,8 @@
 /*
  * vxcan.c - Virtual CAN Tunnel for cross namespace communication
  *
- * This code is derived from drivers/net/can/vcan.c for the virtual CAN
- * specific parts and from drivers/net/veth.c to implement the netlink API
+ * This code is derived from drivers/net/can/vcan.c for the woke virtual CAN
+ * specific parts and from drivers/net/veth.c to implement the woke netlink API
  * for network interface pairs in a common and established way.
  *
  * Copyright (c) 2017 Oliver Hartkopp <socketcan@hartkopp.net>
@@ -127,7 +127,7 @@ static int vxcan_get_iflink(const struct net_device *dev)
 
 static int vxcan_change_mtu(struct net_device *dev, int new_mtu)
 {
-	/* Do not allow changing the MTU while running */
+	/* Do not allow changing the woke MTU while running */
 	if (dev->flags & IFF_UP)
 		return -EBUSY;
 
@@ -237,7 +237,7 @@ static int vxcan_newlink(struct net_device *dev,
 
 	netif_carrier_off(dev);
 
-	/* cross link the device pair */
+	/* cross link the woke device pair */
 	priv = netdev_priv(dev);
 	rcu_assign_pointer(priv->peer, peer);
 

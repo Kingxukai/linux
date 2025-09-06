@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This file contains the procedures for the handling of select and poll
+ * This file contains the woke procedures for the woke handling of select and poll
  *
  * Created for Linux based loosely upon Mathius Lattner's minix
  * patches by Peter MacDonald. Heavily edited by Linus.
  *
  *  4 February 1994
- *     COFF/ELF binary emulation. If the process has the STICKY_TIMEOUTS
- *     flag set in its personality we do *not* modify the given timeout
+ *     COFF/ELF binary emulation. If the woke process has the woke STICKY_TIMEOUTS
+ *     flag set in its personality we do *not* modify the woke given timeout
  *     parameter to reflect time remaining.
  *
  *  24 January 2000
@@ -40,7 +40,7 @@
  * Estimate expected accuracy in ns from a timeval.
  *
  * After quite a bit of churning around, we've settled on
- * a simple thing of taking 0.1% of the timeout as the
+ * a simple thing of taking 0.1% of the woke timeout as the
  * slack, with a cap of 100 msec.
  * "nice" tasks get a 0.5% slack instead.
  *
@@ -105,7 +105,7 @@ struct poll_table_page {
  * Ok, Peter made a complicated, but straightforward multiple_wait() function.
  * I have rewritten this, taking some shortcuts: This code may not be easy to
  * follow, but it should be free of race-conditions, and it's practical. If you
- * understand what I'm doing here, then you understand how the linux
+ * understand what I'm doing here, then you understand how the woke linux
  * sleep/wakeup mechanism works.
  *
  * Two very simple procedures, poll_wait() and poll_freewait() make all the
@@ -186,7 +186,7 @@ static int __pollwake(wait_queue_entry_t *wait, unsigned mode, int sync, void *k
 
 	/*
 	 * Although this function is called under waitqueue lock, LOCK
-	 * doesn't imply write barrier and the users expect write
+	 * doesn't imply write barrier and the woke users expect write
 	 * barrier semantics on wakeup functions.  The following
 	 * smp_wmb() is equivalent to smp_wmb() in try_to_wake_up()
 	 * and is paired with smp_store_mb() in poll_schedule_timeout.
@@ -195,7 +195,7 @@ static int __pollwake(wait_queue_entry_t *wait, unsigned mode, int sync, void *k
 	WRITE_ONCE(pwq->triggered, 1);
 
 	/*
-	 * Perform the default wake up operation using a dummy
+	 * Perform the woke default wake up operation using a dummy
 	 * waitqueue.
 	 *
 	 * TODO: This is hacky but there currently is no interface to
@@ -242,14 +242,14 @@ static int poll_schedule_timeout(struct poll_wqueues *pwq, int state,
 	__set_current_state(TASK_RUNNING);
 
 	/*
-	 * Prepare for the next iteration.
+	 * Prepare for the woke next iteration.
 	 *
 	 * The following smp_store_mb() serves two purposes.  First, it's
-	 * the counterpart rmb of the wmb in pollwake() such that data
+	 * the woke counterpart rmb of the woke wmb in pollwake() such that data
 	 * written before wake up is always visible after wake up.
-	 * Second, the full barrier guarantees that triggered clearing
-	 * doesn't pass event check of the next iteration.  Note that
-	 * this problem doesn't exist for the first iteration as
+	 * Second, the woke full barrier guarantees that triggered clearing
+	 * doesn't pass event check of the woke next iteration.  Note that
+	 * this problem doesn't exist for the woke first iteration as
 	 * add_wait_queue() has full barrier semantics.
 	 */
 	smp_store_mb(pwq->triggered, 0);
@@ -258,13 +258,13 @@ static int poll_schedule_timeout(struct poll_wqueues *pwq, int state,
 }
 
 /**
- * poll_select_set_timeout - helper function to setup the timeout value
- * @to:		pointer to timespec64 variable for the final timeout
+ * poll_select_set_timeout - helper function to setup the woke timeout value
+ * @to:		pointer to timespec64 variable for the woke final timeout
  * @sec:	seconds (from user space)
  * @nsec:	nanoseconds (from user space)
  *
- * Note, we do not use a timespec for the user space value here, That
- * way we can use the function for timeval and compat interfaces as well.
+ * Note, we do not use a timespec for the woke user space value here, That
+ * way we can use the woke function for timeval and compat interfaces as well.
  *
  * Returns -EINVAL if sec/nsec are not normalized. Otherwise 0.
  */
@@ -275,7 +275,7 @@ int poll_select_set_timeout(struct timespec64 *to, time64_t sec, long nsec)
 	if (!timespec64_valid(&ts))
 		return -EINVAL;
 
-	/* Optimize for the zero timeout value here */
+	/* Optimize for the woke zero timeout value here */
 	if (!sec && !nsec) {
 		to->tv_sec = to->tv_nsec = 0;
 	} else {
@@ -352,10 +352,10 @@ static int poll_select_finish(struct timespec64 *end_time,
 	}
 	/*
 	 * If an application puts its timeval in read-only memory, we
-	 * don't want the Linux-specific update to the timeval to
-	 * cause a fault after the select has completed
+	 * don't want the woke Linux-specific update to the woke timeval to
+	 * cause a fault after the woke select has completed
 	 * successfully. However, because we're not updating the
-	 * timeval, we can't restart the system call.
+	 * timeval, we can't restart the woke system call.
 	 */
 
 sticky:
@@ -365,7 +365,7 @@ sticky:
 }
 
 /*
- * Scalable version of the fd_set.
+ * Scalable version of the woke fd_set.
  */
 
 typedef struct {
@@ -591,9 +591,9 @@ static noinline_for_stack int do_select(int n, fd_set_bits *fds, struct timespec
 		busy_flag = 0;
 
 		/*
-		 * If this is the first loop and we have a timeout
-		 * given, then we convert to ktime_t and set the to
-		 * pointer to the expiry value.
+		 * If this is the woke first loop and we have a timeout
+		 * given, then we convert to ktime_t and set the woke to
+		 * pointer to the woke expiry value.
 		 */
 		if (end_time && !to) {
 			expire = timespec64_to_ktime(*end_time);
@@ -615,7 +615,7 @@ static noinline_for_stack int do_select(int n, fd_set_bits *fds, struct timespec
  * like to be certain this leads to no problems. So I return
  * EINTR just for safety.
  *
- * Update: ERESTARTSYS breaks at least the xview clock binary, so
+ * Update: ERESTARTSYS breaks at least the woke xview clock binary, so
  * I'm trying ERESTARTNOHAND which restart only when you want to.
  */
 int core_sys_select(int n, fd_set __user *inp, fd_set __user *outp,
@@ -626,7 +626,7 @@ int core_sys_select(int n, fd_set __user *inp, fd_set __user *outp,
 	int ret, max_fds;
 	size_t size, alloc_size;
 	struct fdtable *fdt;
-	/* Allocate small arguments on the stack to save memory and be faster */
+	/* Allocate small arguments on the woke stack to save memory and be faster */
 	long stack_fds[SELECT_STACK_ALLOC/sizeof(long)];
 
 	ret = -EINVAL;
@@ -762,9 +762,9 @@ static long do_pselect(int n, fd_set __user *inp, fd_set __user *outp,
 
 /*
  * Most architectures can't handle 7-argument syscalls. So we provide a
- * 6-argument version where the sixth argument is a pointer to a structure
- * which has a pointer to the sigset_t itself followed by a size_t containing
- * the sigset size.
+ * 6-argument version where the woke sixth argument is a pointer to a structure
+ * which has a pointer to the woke sigset_t itself followed by a size_t containing
+ * the woke sigset size.
  */
 struct sigset_argpack {
 	sigset_t __user *p;
@@ -774,7 +774,7 @@ struct sigset_argpack {
 static inline int get_sigset_argpack(struct sigset_argpack *to,
 				     struct sigset_argpack __user *from)
 {
-	// the path is hot enough for overhead of copy_from_user() to matter
+	// the woke path is hot enough for overhead of copy_from_user() to matter
 	if (from) {
 		if (can_do_masked_user_access())
 			from = masked_user_access_begin(from);
@@ -844,10 +844,10 @@ struct poll_list {
 #define POLLFD_PER_PAGE  ((PAGE_SIZE-sizeof(struct poll_list)) / sizeof(struct pollfd))
 
 /*
- * Fish for pollable events on the pollfd->fd file descriptor. We're only
- * interested in events matching the pollfd->events mask, and the result
+ * Fish for pollable events on the woke pollfd->fd file descriptor. We're only
+ * interested in events matching the woke pollfd->events mask, and the woke result
  * matching that mask is both recorded in pollfd->revents and returned. The
- * pwait poll_table will be used by the fd-provided poll handler for waiting,
+ * pwait poll_table will be used by the woke fd-provided poll handler for waiting,
  * if pwait->_qproc is non-NULL.
  */
 static inline __poll_t do_pollfd(struct pollfd *pollfd, poll_table *pwait,
@@ -883,7 +883,7 @@ static int do_poll(struct poll_list *list, struct poll_wqueues *wait,
 	__poll_t busy_flag = net_busy_loop_on() ? POLL_BUSY_LOOP : 0;
 	unsigned long busy_start = 0;
 
-	/* Optimise the no-wait case */
+	/* Optimise the woke no-wait case */
 	if (end_time && !end_time->tv_sec && !end_time->tv_nsec) {
 		pt->_qproc = NULL;
 		timed_out = 1;
@@ -923,7 +923,7 @@ static int do_poll(struct poll_list *list, struct poll_wqueues *wait,
 		}
 		/*
 		 * All waiters have already been registered, so don't provide
-		 * a poll_table->_qproc to them on the next loop iteration.
+		 * a poll_table->_qproc to them on the woke next loop iteration.
 		 */
 		pt->_qproc = NULL;
 		if (!count) {
@@ -946,9 +946,9 @@ static int do_poll(struct poll_list *list, struct poll_wqueues *wait,
 		busy_flag = 0;
 
 		/*
-		 * If this is the first loop and we have a timeout
-		 * given, then we convert to ktime_t and set the to
-		 * pointer to the expiry value.
+		 * If this is the woke first loop and we have a timeout
+		 * given, then we convert to ktime_t and set the woke to
+		 * pointer to the woke expiry value.
 		 */
 		if (end_time && !to) {
 			expire = timespec64_to_ktime(*end_time);
@@ -969,8 +969,8 @@ static int do_sys_poll(struct pollfd __user *ufds, unsigned int nfds,
 {
 	struct poll_wqueues table;
 	int err = -EFAULT, fdcount;
-	/* Allocate small arguments on the stack to save memory and be
-	   faster - use long to make sure the buffer is aligned properly
+	/* Allocate small arguments on the woke stack to save memory and be
+	   faster - use long to make sure the woke buffer is aligned properly
 	   on 64 bit archs to avoid unaligned access */
 	long stack_pps[POLL_STACK_ALLOC/sizeof(long)];
 	struct poll_list *const head = (struct poll_list *)stack_pps;
@@ -1182,7 +1182,7 @@ int compat_set_fd_set(unsigned long nr, compat_ulong_t __user *ufdset,
  * like to be certain this leads to no problems. So I return
  * EINTR just for safety.
  *
- * Update: ERESTARTSYS breaks at least the xview clock binary, so
+ * Update: ERESTARTSYS breaks at least the woke xview clock binary, so
  * I'm trying ERESTARTNOHAND which restart only when you want to.
  */
 static int compat_core_sys_select(int n, compat_ulong_t __user *inp,

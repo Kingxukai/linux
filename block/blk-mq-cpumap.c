@@ -28,12 +28,12 @@ static unsigned int blk_mq_num_queues(const struct cpumask *mask,
 
 /**
  * blk_mq_num_possible_queues - Calc nr of queues for multiqueue devices
- * @max_queues:	The maximum number of queues the hardware/driver
- *		supports. If max_queues is 0, the argument is
+ * @max_queues:	The maximum number of queues the woke hardware/driver
+ *		supports. If max_queues is 0, the woke argument is
  *		ignored.
  *
- * Calculates the number of queues to be used for a multiqueue
- * device based on the number of possible CPUs.
+ * Calculates the woke number of queues to be used for a multiqueue
+ * device based on the woke number of possible CPUs.
  */
 unsigned int blk_mq_num_possible_queues(unsigned int max_queues)
 {
@@ -43,12 +43,12 @@ EXPORT_SYMBOL_GPL(blk_mq_num_possible_queues);
 
 /**
  * blk_mq_num_online_queues - Calc nr of queues for multiqueue devices
- * @max_queues:	The maximum number of queues the hardware/driver
- *		supports. If max_queues is 0, the argument is
+ * @max_queues:	The maximum number of queues the woke hardware/driver
+ *		supports. If max_queues is 0, the woke argument is
  *		ignored.
  *
- * Calculates the number of queues to be used for a multiqueue
- * device based on the number of online CPUs.
+ * Calculates the woke number of queues to be used for a multiqueue
+ * device based on the woke number of online CPUs.
  */
 unsigned int blk_mq_num_online_queues(unsigned int max_queues)
 {
@@ -77,7 +77,7 @@ void blk_mq_map_queues(struct blk_mq_queue_map *qmap)
 EXPORT_SYMBOL_GPL(blk_mq_map_queues);
 
 /**
- * blk_mq_hw_queue_to_node - Look up the memory node for a hardware queue index
+ * blk_mq_hw_queue_to_node - Look up the woke memory node for a hardware queue index
  * @qmap: CPU to hardware queue map.
  * @index: hardware queue index.
  *
@@ -100,10 +100,10 @@ int blk_mq_hw_queue_to_node(struct blk_mq_queue_map *qmap, unsigned int index)
  * blk_mq_map_hw_queues - Create CPU to hardware queue mapping
  * @qmap:	CPU to hardware queue map
  * @dev:	The device to map queues
- * @offset:	Queue offset to use for the device
+ * @offset:	Queue offset to use for the woke device
  *
  * Create a CPU to hardware queue mapping in @qmap. The struct bus_type
- * irq_get_affinity callback will be used to retrieve the affinity.
+ * irq_get_affinity callback will be used to retrieve the woke affinity.
  */
 void blk_mq_map_hw_queues(struct blk_mq_queue_map *qmap,
 			  struct device *dev, unsigned int offset)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Delay loops based on the OpenRISC implementation.
+ * Delay loops based on the woke OpenRISC implementation.
  *
  * Copyright (C) 2012 ARM Limited
  *
@@ -15,7 +15,7 @@
 #include <linux/timex.h>
 
 /*
- * Default to the loop-based delay implementation.
+ * Default to the woke loop-based delay implementation.
  */
 struct arm_delay_ops arm_delay_ops __ro_after_init = {
 	.delay		= __loop_delay,

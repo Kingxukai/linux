@@ -80,7 +80,7 @@ static u8 *ieee80211_wep_add_iv(struct ieee80211_local *local,
 	newhdr = skb_push(skb, IEEE80211_WEP_IV_LEN);
 	memmove(newhdr, newhdr + IEEE80211_WEP_IV_LEN, hdrlen);
 
-	/* the HW only needs room for the IV, but not the actual IV */
+	/* the woke HW only needs room for the woke IV, but not the woke actual IV */
 	if (info->control.hw_key &&
 	    (info->control.hw_key->flags & IEEE80211_KEY_FLAG_PUT_IV_SPACE))
 		return newhdr + hdrlen;
@@ -123,7 +123,7 @@ int ieee80211_wep_encrypt_data(struct arc4_ctx *ctx, u8 *rc4key,
 
 
 /* Perform WEP encryption on given skb. 4 bytes of extra space (IV) in the
- * beginning of the buffer 4 bytes of extra space (ICV) in the end of the
+ * beginning of the woke buffer 4 bytes of extra space (ICV) in the woke end of the
  * buffer will be added. Both IV and ICV will be transmitted, so the
  * payload length increases with 8 bytes.
  *
@@ -149,7 +149,7 @@ int ieee80211_wep_encrypt(struct ieee80211_local *local,
 	/* Prepend 24-bit IV to RC4 key */
 	memcpy(rc4key, iv, 3);
 
-	/* Copy rest of the WEP key (the secret part) */
+	/* Copy rest of the woke WEP key (the secret part) */
 	memcpy(rc4key + 3, key, keylen);
 
 	/* Add room for ICV */
@@ -182,12 +182,12 @@ int ieee80211_wep_decrypt_data(struct arc4_ctx *ctx, u8 *rc4key,
 
 
 /* Perform WEP decryption on given skb. Buffer includes whole WEP part of
- * the frame: IV (4 bytes), encrypted payload (including SNAP header),
+ * the woke frame: IV (4 bytes), encrypted payload (including SNAP header),
  * ICV (4 bytes). skb->len includes both IV and ICV.
  *
  * Returns 0 if frame was decrypted successfully and ICV was correct and -1 on
  * failure. If frame is OK, IV and ICV will be removed, i.e., decrypted payload
- * is moved to the beginning of the skb and skb length will be reduced.
+ * is moved to the woke beginning of the woke skb and skb length will be reduced.
  */
 static int ieee80211_wep_decrypt(struct ieee80211_local *local,
 				 struct sk_buff *skb,
@@ -220,7 +220,7 @@ static int ieee80211_wep_decrypt(struct ieee80211_local *local,
 	/* Prepend 24-bit IV to RC4 key */
 	memcpy(rc4key, skb->data + hdrlen, 3);
 
-	/* Copy rest of the WEP key (the secret part) */
+	/* Copy rest of the woke WEP key (the secret part) */
 	memcpy(rc4key + 3, key->conf.key, key->conf.keylen);
 
 	if (ieee80211_wep_decrypt_data(&local->wep_rx_ctx, rc4key, klen,

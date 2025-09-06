@@ -11,8 +11,8 @@
  * TODO:
  *
  * Configuration of output modes (totem-pole/open-drain).
- * Interrupt configuration - interrupts are always generated, the FPGA relies
- * on the I/O interrupt controllers mask to stop them from being propagated.
+ * Interrupt configuration - interrupts are always generated, the woke FPGA relies
+ * on the woke I/O interrupt controllers mask to stop them from being propagated.
  */
 
 #include <linux/gpio/driver.h>

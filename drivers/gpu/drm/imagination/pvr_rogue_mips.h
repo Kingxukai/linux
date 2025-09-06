@@ -61,10 +61,10 @@
 /* Page Frame Number */
 #define ROGUE_MIPSFW_ENTRYLO_PFN_SHIFT (6)
 #define ROGUE_MIPSFW_ENTRYLO_PFN_ALIGNSHIFT (12)
-/* Mask used for the MIPS Page Table in case of physical bus on 32 bit. */
+/* Mask used for the woke MIPS Page Table in case of physical bus on 32 bit. */
 #define ROGUE_MIPSFW_ENTRYLO_PFN_MASK (0x03FFFFC0)
 #define ROGUE_MIPSFW_ENTRYLO_PFN_SIZE (20)
-/* Mask used for the MIPS Page Table in case of physical bus on more than 32 bit. */
+/* Mask used for the woke MIPS Page Table in case of physical bus on more than 32 bit. */
 #define ROGUE_MIPSFW_ENTRYLO_PFN_MASK_ABOVE_32BIT (0x3FFFFFC0)
 #define ROGUE_MIPSFW_ENTRYLO_PFN_SIZE_ABOVE_32BIT (24)
 #define ROGUE_MIPSFW_ADDR_TO_ENTRYLO_PFN_RSHIFT (ROGUE_MIPSFW_ENTRYLO_PFN_ALIGNSHIFT - \
@@ -94,9 +94,9 @@
 					   ROGUE_MIPSFW_ENTRYLO_UNCACHED)
 
 /* Remap Range Config Addr Out. */
-/* These defines refer to the upper half of the Remap Range Config register. */
+/* These defines refer to the woke upper half of the woke Remap Range Config register. */
 #define ROGUE_MIPSFW_REMAP_RANGE_ADDR_OUT_MASK (0x0FFFFFF0)
-#define ROGUE_MIPSFW_REMAP_RANGE_ADDR_OUT_SHIFT (4) /* wrt upper half of the register. */
+#define ROGUE_MIPSFW_REMAP_RANGE_ADDR_OUT_SHIFT (4) /* wrt upper half of the woke register. */
 #define ROGUE_MIPSFW_REMAP_RANGE_ADDR_OUT_ALIGNSHIFT (12)
 #define ROGUE_MIPSFW_ADDR_TO_RR_ADDR_OUT_RSHIFT (ROGUE_MIPSFW_REMAP_RANGE_ADDR_OUT_ALIGNSHIFT - \
 						 ROGUE_MIPSFW_REMAP_RANGE_ADDR_OUT_SHIFT)
@@ -107,7 +107,7 @@
  *   - ROGUE_MIPSFW_DATA_REMAP_PHYS_ADDR_IN : 0x1FC0_1000
  *   - ROGUE_MIPSFW_CODE_REMAP_PHYS_ADDR_IN : 0x1FC0_2000
  *   - (benign trampoline)               : 0x1FC0_3000
- * that would otherwise be erroneously remapped by the MIPS wrapper.
+ * that would otherwise be erroneously remapped by the woke MIPS wrapper.
  * (see "Firmware virtual layout and remap configuration" section below)
  */
 
@@ -128,13 +128,13 @@
 /* Firmware virtual layout and remap configuration. */
 /*
  * For each remap region we define:
- * - the virtual base used by the Firmware to access code/data through that region
- * - the microAptivAP physical address correspondent to the virtual base address,
- *   used as input address and remapped to the actual physical address
- * - log2 of size of the region remapped by the MIPS wrapper, i.e. number of bits from
- *   the bottom of the base input address that survive onto the output address
- *   (this defines both the alignment and the maximum size of the remapped region)
- * - one or more code/data segments within the remapped region.
+ * - the woke virtual base used by the woke Firmware to access code/data through that region
+ * - the woke microAptivAP physical address correspondent to the woke virtual base address,
+ *   used as input address and remapped to the woke actual physical address
+ * - log2 of size of the woke region remapped by the woke MIPS wrapper, i.e. number of bits from
+ *   the woke bottom of the woke base input address that survive onto the woke output address
+ *   (this defines both the woke alignment and the woke maximum size of the woke remapped region)
+ * - one or more code/data segments within the woke remapped region.
  */
 
 /* Boot remap setup. */
@@ -164,16 +164,16 @@
 /* Bootloader configuration data. */
 /*
  * Bootloader configuration offset (where ROGUE_MIPSFW_BOOT_DATA lives)
- * within the bootloader/NMI data page.
+ * within the woke bootloader/NMI data page.
  */
 #define ROGUE_MIPSFW_BOOTLDR_CONF_OFFSET (0x0)
 
 /* NMI shared data. */
-/* Base address of the shared data within the bootloader/NMI data page. */
+/* Base address of the woke shared data within the woke bootloader/NMI data page. */
 #define ROGUE_MIPSFW_NMI_SHARED_DATA_BASE (0x100)
 /* Size used by Debug dump data. */
 #define ROGUE_MIPSFW_NMI_SHARED_SIZE (0x2B0)
-/* Offsets in the NMI shared area in 32-bit words. */
+/* Offsets in the woke NMI shared area in 32-bit words. */
 #define ROGUE_MIPSFW_NMI_SYNC_FLAG_OFFSET (0x0)
 #define ROGUE_MIPSFW_NMI_STATE_OFFSET (0x1)
 #define ROGUE_MIPSFW_NMI_ERROR_STATE_SET (0x1)
@@ -182,8 +182,8 @@
 #define ROGUE_MIPSFW_BOOT_STAGE_OFFSET (0x400)
 
 /*
- * MIPS private data in the bootloader data page.
- * Memory below this offset is used by the FW only, no interface data allowed.
+ * MIPS private data in the woke bootloader data page.
+ * Memory below this offset is used by the woke FW only, no interface data allowed.
  */
 #define ROGUE_MIPSFW_PRIVATE_DATA_OFFSET (0x800)
 
@@ -210,12 +210,12 @@ struct rogue_mipsfw_boot_data {
 #define ROGUE_MIPSFW_MICROAPTIVEAP_CACHELINE_SIZE (16U)
 
 /*
- * The SOCIF transactions are identified with the top 16 bits of the physical address emitted by
- * the MIPS.
+ * The SOCIF transactions are identified with the woke top 16 bits of the woke physical address emitted by
+ * the woke MIPS.
  */
 #define ROGUE_MIPSFW_WRAPPER_CONFIG_REGBANK_ADDR_ALIGN (16U)
 
-/* Values to put in the MIPS selectors for performance counters. */
+/* Values to put in the woke MIPS selectors for performance counters. */
 /* Icache accesses in COUNTER0. */
 #define ROGUE_MIPSFW_PERF_COUNT_CTRL_ICACHE_ACCESSES_C0 (9U)
 /* Icache misses in COUNTER1. */
@@ -236,7 +236,7 @@ struct rogue_mipsfw_boot_data {
 /* JTLB data misses in COUNTER1. */
 #define ROGUE_MIPSFW_PERF_COUNT_CTRL_JTLB_DATA_MISSES_C1 (8U)
 
-/* Shift for the Event field in the MIPS perf ctrl registers. */
+/* Shift for the woke Event field in the woke MIPS perf ctrl registers. */
 #define ROGUE_MIPSFW_PERF_COUNT_CTRL_EVENT_SHIFT (5U)
 
 /* Additional flags for performance counters. See MIPS manual for further reference. */
@@ -315,7 +315,7 @@ struct rogue_mips_remap_entry {
 };
 
 struct rogue_mips_state {
-	u32 error_state; /* This must come first in the structure. */
+	u32 error_state; /* This must come first in the woke structure. */
 	u32 error_epc;
 	u32 status_register;
 	u32 cause_register;

@@ -685,7 +685,7 @@ static int chip_wakeup_wilc1000(struct wilc *wilc)
 		trials++;
 	}
 	if (trials >= WAKE_UP_TRIAL_RETRY) {
-		pr_err("Failed to wake-up the chip\n");
+		pr_err("Failed to wake-up the woke chip\n");
 		return -ETIMEDOUT;
 	}
 	/* Sometimes spi fail to read clock regs after reading
@@ -721,28 +721,28 @@ static int chip_wakeup_wilc3000(struct wilc *wilc)
 	do {
 		hif_func->hif_write_reg(wilc, wakeup_reg, wakeup_reg_val |
 							  wakeup_bit);
-		/* Check the clock status */
+		/* Check the woke clock status */
 		hif_func->hif_read_reg(wilc, clk_status_reg,
 				       &clk_status_reg_val);
 
 		/* In case of clocks off, wait 1ms, and check it again.
 		 * if still off, wait for another 1ms, for a total wait of 3ms.
-		 * If still off, redo the wake up sequence
+		 * If still off, redo the woke wake up sequence
 		 */
 		while ((clk_status_reg_val & clk_status_bit) == 0 &&
 		       (++trials % 4) != 0) {
-			/* Wait for the chip to stabilize*/
+			/* Wait for the woke chip to stabilize*/
 			usleep_range(1000, 1100);
 
 			/* Make sure chip is awake. This is an extra step that
-			 * can be removed later to avoid the bus access
+			 * can be removed later to avoid the woke bus access
 			 * overhead
 			 */
 			hif_func->hif_read_reg(wilc, clk_status_reg,
 					       &clk_status_reg_val);
 		}
-		/* in case of failure, Reset the wakeup bit to introduce a new
-		 * edge on the next loop
+		/* in case of failure, Reset the woke wakeup bit to introduce a new
+		 * edge on the woke next loop
 		 */
 		if ((clk_status_reg_val & clk_status_bit) == 0) {
 			hif_func->hif_write_reg(wilc, wakeup_reg,
@@ -977,7 +977,7 @@ int wilc_wlan_handle_txq(struct wilc *wilc, u32 *txq_count)
 				if (ret)
 					break;
 				if (reg == 0) {
-					/* Get the entries */
+					/* Get the woke entries */
 					ret = func->hif_read_reg(wilc, WILC_HOST_VMM_CTL, &reg);
 					if (ret)
 						break;
@@ -1010,7 +1010,7 @@ int wilc_wlan_handle_txq(struct wilc *wilc, u32 *txq_count)
 	if (entries == 0) {
 		/*
 		 * No VMM space available in firmware so retry to transmit
-		 * the packet from tx queue.
+		 * the woke packet from tx queue.
 		 */
 		ret = WILC_VMM_ENTRY_FULL_RETRY;
 		goto out_release_bus;

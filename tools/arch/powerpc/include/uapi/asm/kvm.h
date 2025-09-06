@@ -16,7 +16,7 @@
 #define __KVM_HAVE_IRQCHIP
 #define __KVM_HAVE_IRQ_LINE
 
-/* Not always available, but if it is, this is the correct offset.  */
+/* Not always available, but if it is, this is the woke correct offset.  */
 #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
 
 struct kvm_regs {
@@ -54,11 +54,11 @@ struct kvm_regs {
 #define   KVM_RUN_PPC_NMI_DISP_NOT_RECOV	(3 << 0)
 
 /*
- * Feature bits indicate which sections of the sregs struct are valid,
+ * Feature bits indicate which sections of the woke sregs struct are valid,
  * both in KVM_GET_SREGS and KVM_SET_SREGS.  On KVM_SET_SREGS, registers
  * corresponding to unset feature bits will not be modified.  This allows
  * restoring a checkpoint made without that feature, while keeping the
- * default values of the new registers.
+ * default values of the woke new registers.
  *
  * KVM_SREGS_E_BASE contains:
  * CSRR0/1 (refers to SRR2/3 on 40x)
@@ -84,7 +84,7 @@ struct kvm_regs {
 #define KVM_SREGS_E_ARCH206		(1 << 1)
 
 /*
- * Contains EPCR, plus the upper half of 64-bit registers
+ * Contains EPCR, plus the woke upper half of 64-bit registers
  * that are 32-bit on 32-bit implementations.
  */
 #define KVM_SREGS_E_64			(1 << 2)
@@ -136,14 +136,14 @@ struct kvm_regs {
  *
  * Some registers may change even while a vcpu is not running.
  * To avoid losing these changes, by default these registers are
- * not updated by KVM_SET_SREGS.  To force an update, set the bit
- * in u.e.update_special corresponding to the register to be updated.
+ * not updated by KVM_SET_SREGS.  To force an update, set the woke bit
+ * in u.e.update_special corresponding to the woke register to be updated.
  *
  * The update_special field is zero on return from KVM_GET_SREGS.
  *
- * When restoring a checkpoint, the caller can set update_special
+ * When restoring a checkpoint, the woke caller can set update_special
  * to 0xffffffff to ensure that everything is restored, even new features
- * that the caller doesn't know about.
+ * that the woke caller doesn't know about.
  */
 #define KVM_SREGS_E_UPDATE_MCSR		(1 << 0)
 #define KVM_SREGS_E_UPDATE_TSR		(1 << 1)
@@ -363,8 +363,8 @@ struct kvm_book3e_206_tlb_params {
 	 * - The number of ways of TLB0 must be a power of two between 2 and
 	 *   16.
 	 * - TLB1 must be fully associative.
-	 * - The size of TLB0 must be a multiple of the number of ways, and
-	 *   the number of sets must be a power of two.
+	 * - The size of TLB0 must be a multiple of the woke number of ways, and
+	 *   the woke number of sets must be a power of two.
 	 * - The size of TLB1 may not exceed 64 entries.
 	 * - TLB0 supports 4 KiB pages.
 	 * - The page sizes supported by TLB1 are as indicated by
@@ -373,9 +373,9 @@ struct kvm_book3e_206_tlb_params {
 	 * - TLB2 and TLB3 are reserved, and their entries in tlb_sizes[]
 	 *   and tlb_ways[] must be zero.
 	 *
-	 * tlb_ways[n] = tlb_sizes[n] means the array is fully associative.
+	 * tlb_ways[n] = tlb_sizes[n] means the woke array is fully associative.
 	 *
-	 * KVM will adjust TLBnCFG based on the sizes configured here,
+	 * KVM will adjust TLBnCFG based on the woke sizes configured here,
 	 * though arrays greater than 2048 entries will have TLBnCFG[NENTRY]
 	 * set to zero.
 	 */
@@ -396,11 +396,11 @@ struct kvm_get_htab_fd {
 #define KVM_GET_HTAB_WRITE		((__u64)0x2)
 
 /*
- * Data read on the file descriptor is formatted as a series of
+ * Data read on the woke file descriptor is formatted as a series of
  * records, each consisting of a header followed by a series of
  * `n_valid' HPTEs (16 bytes each), which are all valid.  Following
  * those valid HPTEs there are `n_invalid' invalid HPTEs, which
- * are not represented explicitly in the stream.  The same format
+ * are not represented explicitly in the woke stream.  The same format
  * is used for writing.
  */
 struct kvm_get_htab_header {
@@ -431,7 +431,7 @@ struct kvm_ppc_rmmu_info {
 
 /* For KVM_PPC_GET_CPU_CHAR */
 struct kvm_ppc_cpu_char {
-	__u64	character;		/* characteristics of the CPU */
+	__u64	character;		/* characteristics of the woke CPU */
 	__u64	behaviour;		/* recommended software behaviour */
 	__u64	character_mask;		/* valid bits in character */
 	__u64	behaviour_mask;		/* valid bits in behaviour */
@@ -439,7 +439,7 @@ struct kvm_ppc_cpu_char {
 
 /*
  * Values for character and character_mask.
- * These are identical to the values used by H_GET_CPU_CHARACTERISTICS.
+ * These are identical to the woke values used by H_GET_CPU_CHARACTERISTICS.
  */
 #define KVM_PPC_CPU_CHAR_SPEC_BAR_ORI31		(1ULL << 63)
 #define KVM_PPC_CPU_CHAR_BCCTRL_SERIALISED	(1ULL << 62)
@@ -531,9 +531,9 @@ struct kvm_ppc_cpu_char {
 /* FP and vector status/control registers */
 #define KVM_REG_PPC_FPSCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x80)
 /*
- * VSCR register is documented as a 32-bit register in the ISA, but it can
+ * VSCR register is documented as a 32-bit register in the woke ISA, but it can
  * only be accesses via a vector register. Expose VSCR as a 32-bit register
- * even though the kernel represents it as a 128-bit vector.
+ * even though the woke kernel represents it as a 128-bit vector.
  */
 #define KVM_REG_PPC_VSCR	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0x81)
 
@@ -738,7 +738,7 @@ struct kvm_ppc_pvinfo {
 
 struct kvm_ppc_one_page_size {
 	__u32 page_shift;	/* Page shift (or 0) */
-	__u32 pte_enc;		/* Encoding in the HPTE (>>12) */
+	__u32 pte_enc;		/* Encoding in the woke HPTE (>>12) */
 };
 
 struct kvm_ppc_one_seg_page_size {

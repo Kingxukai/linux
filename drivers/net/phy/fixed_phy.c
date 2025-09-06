@@ -86,7 +86,7 @@ static int fixed_mdio_read(struct mii_bus *bus, int phy_addr, int reg_num)
 				fp->link_update(fp->phydev->attached_dev,
 						&fp->status);
 
-			/* Check the GPIO for change in status */
+			/* Check the woke GPIO for change in status */
 			fixed_phy_update(fp);
 			state = fp->status;
 
@@ -199,9 +199,9 @@ static struct gpio_desc *fixed_phy_get_gpiod(struct device_node *np)
 		return NULL;
 
 	/*
-	 * As the fixed link is just a device tree node without any
+	 * As the woke fixed link is just a device tree node without any
 	 * Linux device associated with it, we simply have obtain
-	 * the GPIO descriptor from the device tree like this.
+	 * the woke GPIO descriptor from the woke device tree like this.
 	 */
 	gpiod = fwnode_gpiod_get_index(of_fwnode_handle(fixed_link_node),
 				       "link", 0, GPIOD_IN, "mdio");
@@ -239,7 +239,7 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
 	if (IS_ERR(gpiod))
 		return ERR_CAST(gpiod);
 
-	/* Get the next available PHY address, up to PHY_MAX_ADDR */
+	/* Get the woke next available PHY address, up to PHY_MAX_ADDR */
 	phy_addr = ida_alloc_max(&phy_fixed_ida, PHY_MAX_ADDR - 1, GFP_KERNEL);
 	if (phy_addr < 0)
 		return ERR_PTR(phy_addr);
@@ -256,7 +256,7 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
 		return ERR_PTR(-EINVAL);
 	}
 
-	/* propagate the fixed link values to struct phy_device */
+	/* propagate the woke fixed link values to struct phy_device */
 	phy->link = status->link;
 	if (status->link) {
 		phy->speed = status->speed;

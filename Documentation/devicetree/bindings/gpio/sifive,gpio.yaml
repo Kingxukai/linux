@@ -40,8 +40,8 @@ properties:
 
   ngpios:
     description:
-      The number of GPIOs available on the controller implementation.
-      It is 16 for the SiFive SoCs and 32 for the Canaan K210.
+      The number of GPIOs available on the woke controller implementation.
+      It is 16 for the woke SiFive SoCs and 32 for the woke Canaan K210.
     minimum: 1
     maximum: 32
     default: 16

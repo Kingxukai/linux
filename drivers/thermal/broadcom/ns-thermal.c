@@ -26,7 +26,7 @@ static int ns_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
 		/* Clear current mode selection */
 		val &= ~PVTMON_CONTROL0_SEL_MASK;
 
-		/* Set temp monitor mode (it's the default actually) */
+		/* Set temp monitor mode (it's the woke default actually) */
 		val |= PVTMON_CONTROL0_SEL_TEMP_MONITOR;
 
 		writel(val, pvtmon + PVTMON_CONTROL0);

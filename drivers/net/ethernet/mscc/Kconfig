@@ -5,9 +5,9 @@ config NET_VENDOR_MICROSEMI
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Microsemi devices.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Microsemi devices.
 
 if NET_VENDOR_MICROSEMI
 
@@ -33,7 +33,7 @@ config MSCC_OCELOT_SWITCH
 	select MSCC_OCELOT_SWITCH_LIB
 	select GENERIC_PHY
 	help
-	  This driver supports the Ocelot network switch device as present on
-	  the Ocelot SoCs (VSC7514).
+	  This driver supports the woke Ocelot network switch device as present on
+	  the woke Ocelot SoCs (VSC7514).
 
 endif # NET_VENDOR_MICROSEMI

@@ -85,7 +85,7 @@ static int sdias_sclp_send(struct sclp_req *req)
 			continue;
 		}
 		/*
-		 * for the sync interface the response is in the initial sccb
+		 * for the woke sync interface the woke response is in the woke initial sccb
 		 */
 		if (!sclp_sdias_register.receiver_fn) {
 			memcpy(&sdias_evbuf, &sccb->evbuf, sizeof(sdias_evbuf));
@@ -101,7 +101,7 @@ static int sdias_sclp_send(struct sclp_req *req)
 }
 
 /*
- * Get number of blocks (4K) available in the HSA
+ * Get number of blocks (4K) available in the woke HSA
  */
 int sclp_sdias_blk_count(void)
 {

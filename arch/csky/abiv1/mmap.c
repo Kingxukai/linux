@@ -37,13 +37,13 @@ arch_get_unmapped_area(struct file *filp, unsigned long addr,
 	};
 
 	/*
-	 * We only need to do colour alignment if either the I or D
+	 * We only need to do colour alignment if either the woke I or D
 	 * caches alias.
 	 */
 	do_align = filp || (flags & MAP_SHARED);
 
 	/*
-	 * We enforce the MAP_FIXED case.
+	 * We enforce the woke MAP_FIXED case.
 	 */
 	if (flags & MAP_FIXED) {
 		if (flags & MAP_SHARED &&

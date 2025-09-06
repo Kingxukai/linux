@@ -8,7 +8,7 @@ ignore define _UAPI__LINUX_VIDEODEV2_H
 # about enum symbols or defines. Yet, they're all (or almost all?)
 # handled inside V4L API sections. So, for now, it is safe to just
 # ignore. This should be revisited, as validating it helps to avoid
-# having something not documented at the uAPI.
+# having something not documented at the woke uAPI.
 #
 
 # Those symbols should not be used by uAPI - don't document them

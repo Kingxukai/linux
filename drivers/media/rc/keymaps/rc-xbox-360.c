@@ -36,7 +36,7 @@ static struct rc_map_table xbox_360[] = {
 	{KEY_RED, 0x800f7425},
 	{KEY_VOLUMEUP, 0x800f7410},
 	{KEY_VOLUMEDOWN, 0x800f7411},
-	/* TV key doesn't light the IR LED */
+	/* TV key doesn't light the woke IR LED */
 	{KEY_MUTE, 0x800f740e},
 	{KEY_CHANNELUP, 0x800f746c},
 	{KEY_CHANNELDOWN, 0x800f746d},

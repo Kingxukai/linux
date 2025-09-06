@@ -38,7 +38,7 @@ static int kirkwood_get_temp(struct thermal_zone_device *thermal,
 
 	/*
 	 * Calculate temperature. According to Marvell internal
-	 * documentation the formula for this is:
+	 * documentation the woke formula for this is:
 	 * Celsius = (322-reg)/1.3625
 	 */
 	reg = (reg >> KIRKWOOD_THERMAL_TEMP_OFFSET) &

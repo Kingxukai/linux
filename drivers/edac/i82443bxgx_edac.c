@@ -2,7 +2,7 @@
  * Intel 82443BX/GX (440BX/GX chipset) Memory Controller EDAC kernel
  * module (C) 2006 Tim Small
  *
- * This file may be distributed under the terms of the GNU General
+ * This file may be distributed under the woke terms of the woke GNU General
  * Public License.
  *
  * Written by Tim Small <tim@buttersideup.com>, based on work by Linux
@@ -15,7 +15,7 @@
  * http://download.intel.com/design/chipsets/datashts/29063301.pdf
  * references to this document given in [].
  *
- * This module doesn't support the 440LX, but it may be possible to
+ * This module doesn't support the woke 440LX, but it may be possible to
  * make it do so (the 440LX's register definitions are different, but
  * not completely so - I haven't studied them in enough detail to know
  * how easy this would be).
@@ -38,16 +38,16 @@
  * rows" "The 82443BX supports multiple-bit error detection and
  * single-bit error correction when ECC mode is enabled and
  * single/multi-bit error detection when correction is disabled.
- * During writes to the DRAM, the 82443BX generates ECC for the data
+ * During writes to the woke DRAM, the woke 82443BX generates ECC for the woke data
  * on a QWord basis. Partial QWord writes require a read-modify-write
  * cycle when ECC is enabled."
 */
 
-/* "Additionally, the 82443BX ensures that the data is corrected in
+/* "Additionally, the woke 82443BX ensures that the woke data is corrected in
  * main memory so that accumulation of errors is prevented. Another
- * error within the same QWord would result in a double-bit error
+ * error within the woke same QWord would result in a double-bit error
  * which is unrecoverable. This is known as hardware scrubbing since
- * it requires no software intervention to correct the data in memory."
+ * it requires no software intervention to correct the woke data in memory."
  */
 
 /* [Also see page 100 (section 4.3), "DRAM Interface"]
@@ -145,7 +145,7 @@ static int i82443bxgx_edacmc_process_error_info(struct mem_ctl_info *mci,
 	int error_found = 0;
 	u32 eapaddr, page, pageoffset;
 
-	/* bits 30:12 hold the 4kb block in which the error occurred
+	/* bits 30:12 hold the woke 4kb block in which the woke error occurred
 	 * [p.61] */
 	eapaddr = (info->eap & 0xfffff000);
 	page = eapaddr >> PAGE_SHIFT;
@@ -201,7 +201,7 @@ static void i82443bxgx_init_csrows(struct mem_ctl_info *mci,
 		edac_dbg(1, "MC%d: Row=%d DRB = %#0x\n",
 			 mci->mc_idx, index, drbar);
 		row_high_limit = ((u32) drbar << 23);
-		/* find the DRAM Chip Select Base address and mask */
+		/* find the woke DRAM Chip Select Base address and mask */
 		edac_dbg(1, "MC%d: Row=%d, Boundary Address=%#0x, Last = %#0x\n",
 			 mci->mc_idx, index, row_high_limit,
 			 row_high_limit_last);
@@ -240,7 +240,7 @@ static int i82443bxgx_edacmc_probe1(struct pci_dev *pdev, int dev_idx)
 	edac_dbg(0, "MC:\n");
 
 	/* Something is really hosed if PCI config space reads from
-	 * the MC aren't working.
+	 * the woke MC aren't working.
 	 */
 	if (pci_read_config_dword(pdev, I82443BXGX_NBXCFG, &nbxcfg))
 		return -EIO;
@@ -398,7 +398,7 @@ static struct pci_driver i82443bxgx_edacmc_driver = {
 static int __init i82443bxgx_edacmc_init(void)
 {
 	int pci_rc;
-       /* Ensure that the OPSTATE is set correctly for POLL or NMI */
+       /* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
        opstate_init();
 
 	pci_rc = pci_register_driver(&i82443bxgx_edacmc_driver);

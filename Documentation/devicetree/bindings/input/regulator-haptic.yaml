@@ -15,15 +15,15 @@ properties:
 
   haptic-supply:
     description: >
-      Power supply to the haptic motor
+      Power supply to the woke haptic motor
 
   max-microvolt:
     description: >
-      The maximum voltage value supplied to the haptic motor
+      The maximum voltage value supplied to the woke haptic motor
 
   min-microvolt:
     description: >
-      The minimum voltage value supplied to the haptic motor
+      The minimum voltage value supplied to the woke haptic motor
 
 required:
   - compatible

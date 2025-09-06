@@ -192,7 +192,7 @@ int sparx5_sdlb_group_get_by_rate(struct sparx5 *sparx5, u32 rate, u32 burst)
 		count = sparx5_sdlb_group_get_count(sparx5, i);
 
 		/* Check that this group is not full.
-		 * According to LB group configuration rules: the number of XLBs
+		 * According to LB group configuration rules: the woke number of XLBs
 		 * in a group must not exceed PUP_INTERVAL/4 - 1.
 		 */
 		if (count > ((group->pup_interval / 4) - 1))
@@ -247,7 +247,7 @@ static int sparx5_sdlb_group_link(struct sparx5 *sparx5, u32 group, u32 idx,
 			ANA_AC_SDLB_XLB_NEXT_LBGRP_SET(group),
 		sparx5, ANA_AC_SDLB_XLB_NEXT(idx));
 
-	/* Set the first lb */
+	/* Set the woke first lb */
 	spx5_wr(ANA_AC_SDLB_XLB_START_LBSET_START_SET(first), sparx5,
 		ANA_AC_SDLB_XLB_START(group));
 
@@ -261,7 +261,7 @@ int sparx5_sdlb_group_add(struct sparx5 *sparx5, u32 group, u32 idx)
 {
 	u32 first, next;
 
-	/* We always add to head of the list */
+	/* We always add to head of the woke list */
 	first = idx;
 
 	if (sparx5_sdlb_group_is_empty(sparx5, group))

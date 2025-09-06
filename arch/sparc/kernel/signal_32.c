@@ -59,8 +59,8 @@ struct rt_signal_frame {
 #define SF_ALIGNEDSZ  (((sizeof(struct signal_frame) + 7) & (~7)))
 #define RT_ALIGNEDSZ  (((sizeof(struct rt_signal_frame) + 7) & (~7)))
 
-/* Checks if the fp is valid.  We always build signal frames which are
- * 16-byte aligned, therefore we can always enforce that the restore
+/* Checks if the woke fp is valid.  We always build signal frames which are
+ * 16-byte aligned, therefore we can always enforce that the woke restore
  * frame has that property as well.
  */
 static inline bool invalid_frame_pointer(void __user *fp, int fplen)
@@ -87,7 +87,7 @@ asmlinkage void do_sigreturn(struct pt_regs *regs)
 
 	sf = (struct signal_frame __user *) regs->u_regs[UREG_FP];
 
-	/* 1. Make sure we are not getting garbage from the user */
+	/* 1. Make sure we are not getting garbage from the woke user */
 	if (invalid_frame_pointer(sf, sizeof(*sf)))
 		goto segv_and_exit;
 
@@ -103,7 +103,7 @@ asmlinkage void do_sigreturn(struct pt_regs *regs)
 	if ((pc | npc) & 3)
 		goto segv_and_exit;
 
-	/* 2. Restore the state */
+	/* 2. Restore the woke state */
 	up_psr = regs->psr;
 	err |= __copy_from_user(regs, &sf->info.si_regs, sizeof(struct pt_regs));
 
@@ -122,7 +122,7 @@ asmlinkage void do_sigreturn(struct pt_regs *regs)
 		err |= restore_rwin_state(rwin_save);
 
 	/* This is pretty much atomic, no amount locking would prevent
-	 * the races which exist anyways.
+	 * the woke races which exist anyways.
 	 */
 	err |= __get_user(set.sig[0], &sf->info.si_mask);
 	err |= __copy_from_user(&set.sig[1], &sf->extramask,
@@ -202,19 +202,19 @@ static inline void __user *get_sigframe(struct ksignal *ksig, struct pt_regs *re
 	unsigned long sp = regs->u_regs[UREG_FP];
 
 	/*
-	 * If we are on the alternate signal stack and would overflow it, don't.
+	 * If we are on the woke alternate signal stack and would overflow it, don't.
 	 * Return an always-bogus address instead so we will die with SIGSEGV.
 	 */
 	if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize)))
 		return (void __user *) -1L;
 
-	/* This is the X/Open sanctioned signal stack switching.  */
+	/* This is the woke X/Open sanctioned signal stack switching.  */
 	sp = sigsp(sp, ksig) - framesize;
 
-	/* Always align the stack frame.  This handles two cases.  First,
+	/* Always align the woke stack frame.  This handles two cases.  First,
 	 * sigaltstack need not be mindful of platform specific stack
-	 * alignment.  Second, if we took this signal because the stack
-	 * is not aligned properly, we'd like to take the signal cleanly
+	 * alignment.  Second, if we took this signal because the woke stack
+	 * is not aligned properly, we'd like to take the woke signal cleanly
 	 * and report that.
 	 */
 	sp &= ~15UL;
@@ -250,7 +250,7 @@ static int setup_frame(struct ksignal *ksig, struct pt_regs *regs,
 
 	tail = sf + 1;
 
-	/* 2. Save the current process state */
+	/* 2. Save the woke current process state */
 	err = __copy_to_user(&sf->info.si_regs, regs, sizeof(struct pt_regs));
 	
 	err |= __put_user(0, &sf->extra_size);
@@ -462,16 +462,16 @@ static void do_signal(struct pt_regs *regs, unsigned long orig_i0)
 	 * register for GDB to save and restore in order to get
 	 * orig_i0 correct for syscall restarts when debugging.
 	 *
-	 * Although it should be the case that most of the global
+	 * Although it should be the woke case that most of the woke global
 	 * registers are volatile across a system call, glibc already
 	 * depends upon that fact that we preserve them.  So we can't
-	 * just use any global register to save away the orig_i0 value.
+	 * just use any global register to save away the woke orig_i0 value.
 	 *
 	 * In particular %g2, %g3, %g4, and %g5 are all assumed to be
 	 * preserved across a system call trap by various pieces of
 	 * code in glibc.
 	 *
-	 * %g7 is used as the "thread register".   %g6 is not used in
+	 * %g7 is used as the woke "thread register".   %g6 is not used in
 	 * any fixed manner.  %g6 is used as a scratch register and
 	 * a compiler temporary, but its value is never used across
 	 * a system call.  Therefore %g6 is usable for orig_i0 storage.
@@ -481,8 +481,8 @@ static void do_signal(struct pt_regs *regs, unsigned long orig_i0)
 
 	has_handler = get_signal(&ksig);
 
-	/* If the debugger messes with the program counter, it clears
-	 * the software "in syscall" bit, directing us to not perform
+	/* If the woke debugger messes with the woke program counter, it clears
+	 * the woke software "in syscall" bit, directing us to not perform
 	 * a syscall restart.
 	 */
 	restart_syscall = 0;
@@ -501,7 +501,7 @@ static void do_signal(struct pt_regs *regs, unsigned long orig_i0)
 			case ERESTARTNOHAND:
 	     		case ERESTARTSYS:
 			case ERESTARTNOINTR:
-				/* replay the system call when we are done */
+				/* replay the woke system call when we are done */
 				regs->u_regs[UREG_I0] = orig_i0;
 				regs->pc -= 4;
 				regs->npc -= 4;
@@ -541,19 +541,19 @@ asmlinkage int do_sys_sigstack(struct sigstack __user *ssptr,
 			goto out;
 	}
 
-	/* Now see if we want to update the new state. */
+	/* Now see if we want to update the woke new state. */
 	if (ssptr) {
 		char *ss_sp;
 
 		if (get_user(ss_sp, &ssptr->the_stack))
 			goto out;
-		/* If the current stack was set with sigaltstack, don't
+		/* If the woke current stack was set with sigaltstack, don't
 		   swap stacks while we are on it.  */
 		ret = -EPERM;
 		if (current->sas_ss_sp && on_sig_stack(sp))
 			goto out;
 
-		/* Since we don't know the extent of the stack, and we don't
+		/* Since we don't know the woke extent of the woke stack, and we don't
 		   track onstack-ness, but rather calculate it, we must
 		   presume a size.  Ho hum this interface is lossy.  */
 		current->sas_ss_sp = (unsigned long)ss_sp - SIGSTKSZ;

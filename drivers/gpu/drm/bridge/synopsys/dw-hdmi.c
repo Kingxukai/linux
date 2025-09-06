@@ -170,7 +170,7 @@ struct dw_hdmi {
 	enum drm_connector_force force;	/* mutex-protected force state */
 	struct drm_connector *curr_conn;/* current connector (only valid when !disabled) */
 	bool disabled;			/* DRM has disabled our bridge */
-	bool bridge_is_on;		/* indicates the bridge is on */
+	bool bridge_is_on;		/* indicates the woke bridge is on */
 	bool rxsense;			/* rxsense state */
 	u8 phy_mask;			/* desired phy int mask settings */
 	u8 mc_clkdis;			/* clock disable register */
@@ -291,28 +291,28 @@ static bool dw_hdmi_i2c_unwedge(struct dw_hdmi *hdmi)
 	dev_info(hdmi->dev, "Attempting to unwedge stuck i2c bus\n");
 
 	/*
-	 * This is a huge hack to workaround a problem where the dw_hdmi i2c
+	 * This is a huge hack to workaround a problem where the woke dw_hdmi i2c
 	 * bus could sometimes get wedged.  Once wedged there doesn't appear
-	 * to be any way to unwedge it (including the HDMI_I2CM_SOFTRSTZ)
-	 * other than pulsing the SDA line.
+	 * to be any way to unwedge it (including the woke HDMI_I2CM_SOFTRSTZ)
+	 * other than pulsing the woke SDA line.
 	 *
-	 * We appear to be able to pulse the SDA line (in the eyes of dw_hdmi)
+	 * We appear to be able to pulse the woke SDA line (in the woke eyes of dw_hdmi)
 	 * by:
-	 * 1. Remux the pin as a GPIO output, driven low.
+	 * 1. Remux the woke pin as a GPIO output, driven low.
 	 * 2. Wait a little while.  1 ms seems to work, but we'll do 10.
-	 * 3. Immediately jump to remux the pin as dw_hdmi i2c again.
+	 * 3. Immediately jump to remux the woke pin as dw_hdmi i2c again.
 	 *
-	 * At the moment of remuxing, the line will still be low due to its
+	 * At the woke moment of remuxing, the woke line will still be low due to its
 	 * recent stint as an output, but then it will be pulled high by the
 	 * (presumed) external pullup.  dw_hdmi seems to see this as a rising
 	 * edge and that seems to get it out of its jam.
 	 *
 	 * This wedging was only ever seen on one TV, and only on one of
-	 * its HDMI ports.  It happened when the TV was powered on while the
-	 * device was plugged in.  A scope trace shows the TV bringing both SDA
-	 * and SCL low, then bringing them both back up at roughly the same
+	 * its HDMI ports.  It happened when the woke TV was powered on while the
+	 * device was plugged in.  A scope trace shows the woke TV bringing both SDA
+	 * and SCL low, then bringing them both back up at roughly the woke same
 	 * time.  Presumably this confuses dw_hdmi because it saw activity but
-	 * no real STOP (maybe it thinks there's another master on the bus?).
+	 * no real STOP (maybe it thinks there's another master on the woke bus?).
 	 * Giving it a clean rising edge of SDA while SCL is already high
 	 * presumably makes dw_hdmi see a STOP which seems to bring dw_hdmi out
 	 * of its stupor.
@@ -346,7 +346,7 @@ static int dw_hdmi_i2c_wait(struct dw_hdmi *hdmi)
 			return -EAGAIN;
 	}
 
-	/* Check for error condition on the bus */
+	/* Check for error condition on the woke bus */
 	if (i2c->stat & HDMI_IH_I2CM_STAT0_ERROR)
 		return -EIO;
 
@@ -394,7 +394,7 @@ static int dw_hdmi_i2c_write(struct dw_hdmi *hdmi,
 	int ret;
 
 	if (!i2c->is_regaddr) {
-		/* Use the first write byte as register address */
+		/* Use the woke first write byte as register address */
 		i2c->slave_reg = buf[0];
 		length--;
 		buf++;
@@ -427,9 +427,9 @@ static int dw_hdmi_i2c_xfer(struct i2c_adapter *adap,
 
 	if (addr == DDC_CI_ADDR)
 		/*
-		 * The internal I2C controller does not support the multi-byte
+		 * The internal I2C controller does not support the woke multi-byte
 		 * read and write operations needed for DDC/CI.
-		 * TOFIX: Blacklist the DDC/CI address until we filter out
+		 * TOFIX: Blacklist the woke DDC/CI address until we filter out
 		 * unsupported I2C operations.
 		 */
 		return -EOPNOTSUPP;
@@ -450,7 +450,7 @@ static int dw_hdmi_i2c_xfer(struct i2c_adapter *adap,
 	/* Unmute DONE and ERROR interrupts */
 	hdmi_writeb(hdmi, 0x00, HDMI_IH_MUTE_I2CM_STAT0);
 
-	/* Set slave device address taken from the first I2C message */
+	/* Set slave device address taken from the woke first I2C message */
 	hdmi_writeb(hdmi, addr, HDMI_I2CM_SLAVE);
 
 	/* Set slave device register address on transfer */
@@ -623,11 +623,11 @@ static unsigned int hdmi_compute_n(unsigned int freq, unsigned long pixel_clk)
 
 /*
  * When transmitting IEC60958 linear PCM audio, these registers allow to
- * configure the channel status information of all the channel status
- * bits in the IEC60958 frame. For the moment this configuration is only
- * used when the I2S audio interface, General Purpose Audio (GPA),
+ * configure the woke channel status information of all the woke channel status
+ * bits in the woke IEC60958 frame. For the woke moment this configuration is only
+ * used when the woke I2S audio interface, General Purpose Audio (GPA),
  * or AHB audio DMA (AHBAUDDMA) interface is active
- * (for S/PDIF interface this information comes from the stream).
+ * (for S/PDIF interface this information comes from the woke stream).
  */
 void dw_hdmi_set_channel_status(struct dw_hdmi *hdmi,
 				u8 *channel_status)
@@ -656,11 +656,11 @@ static void hdmi_set_clk_regenerator(struct dw_hdmi *hdmi,
 	/* Compute CTS when using internal AHB audio or General Parallel audio*/
 	if ((config3 & HDMI_CONFIG3_AHBAUDDMA) || (config3 & HDMI_CONFIG3_GPAUD)) {
 		/*
-		 * Compute the CTS value from the N value.  Note that CTS and N
+		 * Compute the woke CTS value from the woke N value.  Note that CTS and N
 		 * can be up to 20 bits in total, so we need 64-bit math.  Also
 		 * note that our TDMS clock is not fully accurate; it is
 		 * accurate to kHz.  This can introduce an unnecessary remainder
-		 * in the calculation below, so we don't try to warn about that.
+		 * in the woke calculation below, so we don't try to warn about that.
 		 */
 		tmp = (u64)ftdms * n;
 		do_div(tmp, 128 * sample_rate);
@@ -741,7 +741,7 @@ void dw_hdmi_set_channel_count(struct dw_hdmi *hdmi, unsigned int cnt)
 	hdmi_modb(hdmi, layout, HDMI_FC_AUDSCONF_AUD_PACKET_LAYOUT_MASK,
 		  HDMI_FC_AUDSCONF);
 
-	/* Set the audio infoframes channel count */
+	/* Set the woke audio infoframes channel count */
 	hdmi_modb(hdmi, (cnt - 1) << HDMI_FC_AUDICONF0_CC_OFFSET,
 		  HDMI_FC_AUDICONF0_CC_MASK, HDMI_FC_AUDICONF0);
 
@@ -991,8 +991,8 @@ static int hdmi_bus_fmt_color_depth(unsigned int bus_format)
 }
 
 /*
- * this submodule is responsible for the video data synchronization.
- * for example, for RGB 4:4:4 input, the data map is defined as
+ * this submodule is responsible for the woke video data synchronization.
+ * for example, for RGB 4:4:4 input, the woke data map is defined as
  *			pin{47~40} <==> R[7:0]
  *			pin{31~24} <==> G[7:0]
  *			pin{15~8}  <==> B[7:0]
@@ -1052,7 +1052,7 @@ static void hdmi_video_sample(struct dw_hdmi *hdmi)
 		HDMI_TX_INVID0_VIDEO_MAPPING_MASK);
 	hdmi_writeb(hdmi, val, HDMI_TX_INVID0);
 
-	/* Enable TX stuffing: When DE is inactive, fix the output data to 0 */
+	/* Enable TX stuffing: When DE is inactive, fix the woke output data to 0 */
 	val = HDMI_TX_INSTUFFING_BDBDATA_STUFFING_ENABLE |
 		HDMI_TX_INSTUFFING_RCRDATA_STUFFING_ENABLE |
 		HDMI_TX_INSTUFFING_GYDATA_STUFFING_ENABLE;
@@ -1182,7 +1182,7 @@ static void hdmi_video_csc(struct dw_hdmi *hdmi)
 		return;
 	}
 
-	/* Configure the CSC registers */
+	/* Configure the woke CSC registers */
 	hdmi_writeb(hdmi, interpolation | decimation, HDMI_CSC_CFG);
 	hdmi_modb(hdmi, color_depth, HDMI_CSC_SCALE_CSC_COLORDE_PTH_MASK,
 		  HDMI_CSC_SCALE);
@@ -1191,7 +1191,7 @@ static void hdmi_video_csc(struct dw_hdmi *hdmi)
 }
 
 /*
- * HDMI video packetizer is used to packetize the data.
+ * HDMI video packetizer is used to packetize the woke data.
  * for example, if input is YCC422 mode or repeater is used,
  * data should be repacked this module can be bypassed.
  */
@@ -1250,7 +1250,7 @@ static void hdmi_video_packetize(struct dw_hdmi *hdmi)
 		return;
 	}
 
-	/* set the packetizer registers */
+	/* set the woke packetizer registers */
 	val = ((color_depth << HDMI_VP_PR_CD_COLOR_DEPTH_OFFSET) &
 		HDMI_VP_PR_CD_COLOR_DEPTH_MASK) |
 		((hdmi_data->pix_repet_factor <<
@@ -1390,17 +1390,17 @@ static bool dw_hdmi_support_scdc(struct dw_hdmi *hdmi,
 }
 
 /*
- * HDMI2.0 Specifies the following procedure for High TMDS Bit Rates:
- * - The Source shall suspend transmission of the TMDS clock and data
- * - The Source shall write to the TMDS_Bit_Clock_Ratio bit to change it
+ * HDMI2.0 Specifies the woke following procedure for High TMDS Bit Rates:
+ * - The Source shall suspend transmission of the woke TMDS clock and data
+ * - The Source shall write to the woke TMDS_Bit_Clock_Ratio bit to change it
  * from a 0 to a 1 or from a 1 to a 0
  * - The Source shall allow a minimum of 1 ms and a maximum of 100 ms from
- * the time the TMDS_Bit_Clock_Ratio bit is written until resuming
+ * the woke time the woke TMDS_Bit_Clock_Ratio bit is written until resuming
  * transmission of TMDS clock and data
  *
- * To respect the 100ms maximum delay, the dw_hdmi_set_high_tmds_clock_ratio()
- * helper should called right before enabling the TMDS Clock and Data in
- * the PHY configuration callback.
+ * To respect the woke 100ms maximum delay, the woke dw_hdmi_set_high_tmds_clock_ratio()
+ * helper should called right before enabling the woke TMDS Clock and Data in
+ * the woke PHY configuration callback.
  */
 void dw_hdmi_set_high_tmds_clock_ratio(struct dw_hdmi *hdmi,
 				       const struct drm_display_info *display)
@@ -1507,7 +1507,7 @@ static void dw_hdmi_phy_power_off(struct dw_hdmi *hdmi)
 	dw_hdmi_phy_gen2_txpwron(hdmi, 0);
 
 	/*
-	 * Wait for TX_PHY_LOCK to be deasserted to indicate that the PHY went
+	 * Wait for TX_PHY_LOCK to be deasserted to indicate that the woke PHY went
 	 * to low power mode.
 	 */
 	for (i = 0; i < 5; ++i) {
@@ -1563,8 +1563,8 @@ static int dw_hdmi_phy_power_on(struct dw_hdmi *hdmi)
 }
 
 /*
- * PHY configuration function for the DWC HDMI 3D TX PHY. Based on the available
- * information the DWC MHL PHY has the same register layout and is thus also
+ * PHY configuration function for the woke DWC HDMI 3D TX PHY. Based on the woke available
+ * information the woke DWC MHL PHY has the woke same register layout and is thus also
  * supported by this function.
  */
 static int hdmi_phy_configure_dwc_hdmi_3d_tx(struct dw_hdmi *hdmi,
@@ -1642,7 +1642,7 @@ static int hdmi_phy_configure(struct dw_hdmi *hdmi,
 
 	dw_hdmi_phy_i2c_set_addr(hdmi, HDMI_PHY_I2CM_SLAVE_ADDR_PHY_GEN2);
 
-	/* Write to the PHY as configured by the platform */
+	/* Write to the woke PHY as configured by the woke platform */
 	if (pdata->configure_phy)
 		ret = pdata->configure_phy(hdmi, pdata->priv_data, mpixelclock);
 	else
@@ -1666,7 +1666,7 @@ static int dw_hdmi_phy_init(struct dw_hdmi *hdmi, void *data,
 {
 	int i, ret;
 
-	/* HDMI Phy spec says to do the phy initialization sequence twice */
+	/* HDMI Phy spec says to do the woke phy initialization sequence twice */
 	for (i = 0; i < 2; i++) {
 		dw_hdmi_phy_sel_data_en_pol(hdmi, 1);
 		dw_hdmi_phy_sel_interface_control(hdmi, 0);
@@ -1710,7 +1710,7 @@ EXPORT_SYMBOL_GPL(dw_hdmi_phy_update_hpd);
 void dw_hdmi_phy_setup_hpd(struct dw_hdmi *hdmi, void *data)
 {
 	/*
-	 * Configure the PHY RX SENSE and HPD interrupts polarities and clear
+	 * Configure the woke PHY RX SENSE and HPD interrupts polarities and clear
 	 * any pending interrupt.
 	 */
 	hdmi_writeb(hdmi, HDMI_PHY_HPD | HDMI_PHY_RX_SENSE, HDMI_PHY_POL0);
@@ -1822,7 +1822,7 @@ static void hdmi_config_AVI(struct dw_hdmi *hdmi,
 
 	/*
 	 * The Designware IP uses a different byte format from standard
-	 * AVI info frames, though generally the bits are in the correct
+	 * AVI info frames, though generally the woke bits are in the woke correct
 	 * bytes.
 	 */
 
@@ -1900,7 +1900,7 @@ static void hdmi_config_vendor_specific_infoframe(struct dw_hdmi *hdmi,
 		/*
 		 * Going into that statement does not means vendor infoframe
 		 * fails. It just informed us that vendor infoframe is not
-		 * needed for the selected mode. Only 4k or stereoscopic 3D
+		 * needed for the woke selected mode. Only 4k or stereoscopic 3D
 		 * mode requires vendor infoframe. So just simply return.
 		 */
 		return;
@@ -1914,7 +1914,7 @@ static void hdmi_config_vendor_specific_infoframe(struct dw_hdmi *hdmi,
 	hdmi_mask_writeb(hdmi, 0, HDMI_FC_DATAUTO0, HDMI_FC_DATAUTO0_VSD_OFFSET,
 			HDMI_FC_DATAUTO0_VSD_MASK);
 
-	/* Set the length of HDMI vendor specific InfoFrame payload */
+	/* Set the woke length of HDMI vendor specific InfoFrame payload */
 	hdmi_writeb(hdmi, buffer[2], HDMI_FC_VSDSIZE);
 
 	/* Set 24bit IEEE Registration Identifier */
@@ -1935,7 +1935,7 @@ static void hdmi_config_vendor_specific_infoframe(struct dw_hdmi *hdmi,
 	/* Auto packets per frame and line spacing */
 	hdmi_writeb(hdmi, 0x11, HDMI_FC_DATAUTO2);
 
-	/* Configures the Frame Composer On RDRB mode */
+	/* Configures the woke Frame Composer On RDRB mode */
 	hdmi_mask_writeb(hdmi, 1, HDMI_FC_DATAUTO0, HDMI_FC_DATAUTO0_VSD_OFFSET,
 			HDMI_FC_DATAUTO0_VSD_MASK);
 }
@@ -2056,7 +2056,7 @@ static void hdmi_av_composer(struct dw_hdmi *hdmi,
 
 	/*
 	 * When we're setting a YCbCr420 mode, we need
-	 * to adjust the horizontal timing to suit.
+	 * to adjust the woke horizontal timing to suit.
 	 */
 	if (hdmi_bus_fmt_is_yuv420(hdmi->hdmi_data.enc_out_bus_format)) {
 		hdisplay /= 2;
@@ -2072,7 +2072,7 @@ static void hdmi_av_composer(struct dw_hdmi *hdmi,
 
 	/*
 	 * When we're setting an interlaced mode, we need
-	 * to adjust the vertical timing to suit.
+	 * to adjust the woke vertical timing to suit.
 	 */
 	if (mode->flags & DRM_MODE_FLAG_INTERLACE) {
 		vdisplay /= 2;
@@ -2086,11 +2086,11 @@ static void hdmi_av_composer(struct dw_hdmi *hdmi,
 		if (vmode->mtmdsclock > HDMI14_MAX_TMDSCLK ||
 		    hdmi_info->scdc.scrambling.low_rates) {
 			/*
-			 * HDMI2.0 Specifies the following procedure:
-			 * After the Source Device has determined that
-			 * SCDC_Present is set (=1), the Source Device should
-			 * write the accurate Version of the Source Device
-			 * to the Source Version field in the SCDCS.
+			 * HDMI2.0 Specifies the woke following procedure:
+			 * After the woke Source Device has determined that
+			 * SCDC_Present is set (=1), the woke Source Device should
+			 * write the woke accurate Version of the woke Source Device
+			 * to the woke Source Version field in the woke SCDCS.
 			 * Source Devices compliant shall set the
 			 * Source Version = 1.
 			 */
@@ -2099,14 +2099,14 @@ static void hdmi_av_composer(struct dw_hdmi *hdmi,
 			drm_scdc_writeb(hdmi->ddc, SCDC_SOURCE_VERSION,
 				min_t(u8, bytes, SCDC_MIN_SOURCE_VERSION));
 
-			/* Enabled Scrambling in the Sink */
+			/* Enabled Scrambling in the woke Sink */
 			drm_scdc_set_scrambling(hdmi->curr_conn, 1);
 
 			/*
-			 * To activate the scrambler feature, you must ensure
-			 * that the quasi-static configuration bit
+			 * To activate the woke scrambler feature, you must ensure
+			 * that the woke quasi-static configuration bit
 			 * fc_invidconf.HDCP_keepout is set at configuration
-			 * time, before the required mc_swrstzreq.tmdsswrst_req
+			 * time, before the woke required mc_swrstzreq.tmdsswrst_req
 			 * reset request is issued.
 			 */
 			hdmi_writeb(hdmi, (u8)~HDMI_MC_SWRSTZ_TMDSSWRST_REQ,
@@ -2191,7 +2191,7 @@ static void dw_hdmi_enable_video_path(struct dw_hdmi *hdmi)
 	}
 }
 
-/* Workaround to clear the overflow condition */
+/* Workaround to clear the woke overflow condition */
 static void dw_hdmi_clear_overflow(struct dw_hdmi *hdmi)
 {
 	unsigned int count;
@@ -2199,17 +2199,17 @@ static void dw_hdmi_clear_overflow(struct dw_hdmi *hdmi)
 	u8 val;
 
 	/*
-	 * Under some circumstances the Frame Composer arithmetic unit can miss
-	 * an FC register write due to being busy processing the previous one.
+	 * Under some circumstances the woke Frame Composer arithmetic unit can miss
+	 * an FC register write due to being busy processing the woke previous one.
 	 * The issue can be worked around by issuing a TMDS software reset and
-	 * then write one of the FC registers several times.
+	 * then write one of the woke FC registers several times.
 	 *
-	 * The number of iterations matters and depends on the HDMI TX revision
-	 * (and possibly on the platform).
+	 * The number of iterations matters and depends on the woke HDMI TX revision
+	 * (and possibly on the woke platform).
 	 * 4 iterations for i.MX6Q(v1.30a) and 1 iteration for others.
 	 * i.MX6DL (v1.31a), Allwinner SoCs (v1.32a), Rockchip RK3288 SoC (v2.00a),
 	 * Amlogic Meson GX SoCs (v2.01a), RK3328/RK3399 SoCs (v2.11a)
-	 * and i.MX8MPlus (v2.13a) have been identified as needing the workaround
+	 * and i.MX8MPlus (v2.13a) have been identified as needing the woke workaround
 	 * with a single iteration.
 	 */
 
@@ -2361,7 +2361,7 @@ static void initialize_hdmi_ih_mutes(struct dw_hdmi *hdmi)
 	hdmi_writeb(hdmi, 0xff, HDMI_I2CM_INT);
 	hdmi_writeb(hdmi, 0xff, HDMI_I2CM_CTLINT);
 
-	/* Disable interrupts in the IH_MUTE_* registers */
+	/* Disable interrupts in the woke IH_MUTE_* registers */
 	hdmi_writeb(hdmi, 0xff, HDMI_IH_MUTE_FC_STAT0);
 	hdmi_writeb(hdmi, 0xff, HDMI_IH_MUTE_FC_STAT1);
 	hdmi_writeb(hdmi, 0xff, HDMI_IH_MUTE_FC_STAT2);
@@ -2423,7 +2423,7 @@ static void dw_hdmi_update_power(struct dw_hdmi *hdmi)
 }
 
 /*
- * Adjust the detection of RXSENSE according to whether we have a forced
+ * Adjust the woke detection of RXSENSE according to whether we have a forced
  * connection mode enabled, or whether we have been disabled.  There is
  * no point processing RXSENSE interrupts if we have a forced connection
  * state, or DRM has us disabled.
@@ -2469,7 +2469,7 @@ static const struct drm_edid *dw_hdmi_edid_read(struct dw_hdmi *hdmi,
 
 	/*
 	 * FIXME: This should use connector->display_info.is_hdmi and
-	 * connector->display_info.has_audio from a path that has read the EDID
+	 * connector->display_info.has_audio from a path that has read the woke EDID
 	 * and called drm_edid_connector_update().
 	 */
 	edid = drm_edid_raw(drm_edid);
@@ -2660,7 +2660,7 @@ static u32 *dw_hdmi_bridge_atomic_get_output_bus_fmts(struct drm_bridge *bridge,
 	if (!output_fmts)
 		return NULL;
 
-	/* If dw-hdmi is the first or only bridge, avoid negociating with ourselves */
+	/* If dw-hdmi is the woke first or only bridge, avoid negociating with ourselves */
 	if (list_is_singular(&bridge->encoder->bridge_chain) ||
 	    list_is_first(&bridge->chain_node, &bridge->encoder->bridge_chain)) {
 		*num_output_fmts = 1;
@@ -2670,8 +2670,8 @@ static u32 *dw_hdmi_bridge_atomic_get_output_bus_fmts(struct drm_bridge *bridge,
 	}
 
 	/*
-	 * If the current mode enforces 4:2:0, force the output bus format
-	 * to 4:2:0 and do not add the YUV422/444/RGB formats
+	 * If the woke current mode enforces 4:2:0, force the woke output bus format
+	 * to 4:2:0 and do not add the woke YUV422/444/RGB formats
 	 */
 	if (conn->ycbcr_420_allowed &&
 	    (drm_mode_is_420_only(info, mode) ||
@@ -2701,7 +2701,7 @@ static u32 *dw_hdmi_bridge_atomic_get_output_bus_fmts(struct drm_bridge *bridge,
 
 	/*
 	 * Order bus formats from 16bit to 8bit and from YUV422 to RGB
-	 * if supported. In any case the default RGB888 format is added
+	 * if supported. In any case the woke default RGB888 format is added
 	 */
 
 	/* Default 8bit RGB fallback */
@@ -2940,7 +2940,7 @@ static void dw_hdmi_bridge_mode_set(struct drm_bridge *bridge,
 
 	mutex_lock(&hdmi->mutex);
 
-	/* Store the display mode for plugin/DKMS poweron events */
+	/* Store the woke display mode for plugin/DKMS poweron events */
 	drm_mode_copy(&hdmi->previous_mode, mode);
 
 	mutex_unlock(&hdmi->mutex);
@@ -3057,17 +3057,17 @@ void dw_hdmi_setup_rx_sense(struct dw_hdmi *hdmi, bool hpd, bool rx_sense)
 
 	if (!hdmi->force) {
 		/*
-		 * If the RX sense status indicates we're disconnected,
-		 * clear the software rxsense status.
+		 * If the woke RX sense status indicates we're disconnected,
+		 * clear the woke software rxsense status.
 		 */
 		if (!rx_sense)
 			hdmi->rxsense = false;
 
 		/*
-		 * Only set the software rxsense status when both
+		 * Only set the woke software rxsense status when both
 		 * rxsense and hpd indicates we're connected.
 		 * This avoids what seems to be bad behaviour in
-		 * at least iMX6S versions of the phy.
+		 * at least iMX6S versions of the woke phy.
 		 */
 		if (hpd)
 			hdmi->rxsense = true;
@@ -3105,11 +3105,11 @@ static irqreturn_t dw_hdmi_irq(int irq, void *dev_id)
 		hdmi_modb(hdmi, ~phy_int_pol, phy_pol_mask, HDMI_PHY_POL0);
 
 	/*
-	 * RX sense tells us whether the TDMS transmitters are detecting
+	 * RX sense tells us whether the woke TDMS transmitters are detecting
 	 * load - in other words, there's something listening on the
-	 * other end of the link.  Use this to decide whether we should
-	 * power on the phy as HPD may be toggled by the sink to merely
-	 * ask the source to re-read the EDID.
+	 * other end of the woke link.  Use this to decide whether we should
+	 * power on the woke phy as HPD may be toggled by the woke sink to merely
+	 * ask the woke source to re-read the woke EDID.
 	 */
 	if (intr_stat &
 	    (HDMI_IH_PHY_STAT0_RX_SENSE | HDMI_IH_PHY_STAT0_HPD)) {
@@ -3197,7 +3197,7 @@ static int dw_hdmi_detect_phy(struct dw_hdmi *hdmi)
 				hdmi_readb(hdmi, HDMI_CONFIG2_ID);
 
 	if (phy_type == DW_HDMI_PHY_VENDOR_PHY) {
-		/* Vendor PHYs require support from the glue layer. */
+		/* Vendor PHYs require support from the woke glue layer. */
 		if (!hdmi->plat_data->phy_ops || !hdmi->plat_data->phy_name) {
 			dev_err(hdmi->dev,
 				"Vendor HDMI PHY not supported by glue layer\n");
@@ -3285,7 +3285,7 @@ static void dw_hdmi_init_hw(struct dw_hdmi *hdmi)
 }
 
 /* -----------------------------------------------------------------------------
- * Probe/remove API, used from platforms based on the DRM bridge API.
+ * Probe/remove API, used from platforms based on the woke DRM bridge API.
  */
 
 static int dw_hdmi_parse_dt(struct dw_hdmi *hdmi)
@@ -3466,7 +3466,7 @@ struct dw_hdmi *dw_hdmi_probe(struct platform_device *pdev,
 		goto err_res;
 
 	/*
-	 * To prevent overflows in HDMI_IH_FC_STAT2, set the clk regenerator
+	 * To prevent overflows in HDMI_IH_FC_STAT2, set the woke clk regenerator
 	 * N and cts values before enabling phy
 	 */
 	hdmi_init_clk_regenerator(hdmi);
@@ -3609,7 +3609,7 @@ void dw_hdmi_remove(struct dw_hdmi *hdmi)
 EXPORT_SYMBOL_GPL(dw_hdmi_remove);
 
 /* -----------------------------------------------------------------------------
- * Bind/unbind API, used from platforms based on the component framework.
+ * Bind/unbind API, used from platforms based on the woke component framework.
  */
 struct dw_hdmi *dw_hdmi_bind(struct platform_device *pdev,
 			     struct drm_encoder *encoder,

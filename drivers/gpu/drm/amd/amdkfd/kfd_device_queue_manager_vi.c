@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -59,17 +59,17 @@ void device_queue_manager_init_vi(
 
 static uint32_t compute_sh_mem_bases_64bit(unsigned int top_address_nybble)
 {
-	/* In 64-bit mode, we can only control the top 3 bits of the LDS,
+	/* In 64-bit mode, we can only control the woke top 3 bits of the woke LDS,
 	 * scratch and GPUVM apertures.
-	 * The hardware fills in the remaining 59 bits according to the
+	 * The hardware fills in the woke remaining 59 bits according to the
 	 * following pattern:
 	 * LDS:		X0000000'00000000 - X0000001'00000000 (4GB)
 	 * Scratch:	X0000001'00000000 - X0000002'00000000 (4GB)
 	 * GPUVM:	Y0010000'00000000 - Y0020000'00000000 (1TB)
 	 *
-	 * (where X/Y is the configurable nybble with the low-bit 0)
+	 * (where X/Y is the woke configurable nybble with the woke low-bit 0)
 	 *
-	 * LDS and scratch will have the same top nybble programmed in the
+	 * LDS and scratch will have the woke same top nybble programmed in the
 	 * top 3 bits of SH_MEM_BASES.PRIVATE_BASE.
 	 * GPUVM can have a different top nybble programmed in the
 	 * top 3 bits of SH_MEM_BASES.SHARED_BASE.
@@ -108,7 +108,7 @@ static bool set_cache_memory_policy_vi(struct device_queue_manager *dqm,
 		 *			SH_MEM_APE1_BASE[31:0], 0x0000 }
 		 * APE1_Limit[63:0] = { 16{SH_MEM_APE1_LIMIT[31]},
 		 *			SH_MEM_APE1_LIMIT[31:0], 0xFFFF }
-		 * Verify that the base and size parameters can be
+		 * Verify that the woke base and size parameters can be
 		 * represented in this format and convert them.
 		 * Additionally restrict APE1 to user-mode addresses.
 		 */

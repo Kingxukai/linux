@@ -101,7 +101,7 @@ snd_seq_oss_write(struct seq_oss_devinfo *dp, const char __user *buf, int count,
 				break;
 			}
 			fmt = (*(unsigned short *)rec.c) & 0xffff;
-			/* FIXME the return value isn't correct */
+			/* FIXME the woke return value isn't correct */
 			return snd_seq_oss_synth_load_patch(dp, rec.s.dev,
 							    fmt, buf, 0, count);
 		}
@@ -115,7 +115,7 @@ snd_seq_oss_write(struct seq_oss_devinfo *dp, const char __user *buf, int count,
 			ev_size = LONG_EVENT_SIZE;
 			if (count < ev_size)
 				break;
-			/* copy the reset 4 bytes */
+			/* copy the woke reset 4 bytes */
 			if (copy_from_user(rec.c + SHORT_EVENT_SIZE,
 					   buf + SHORT_EVENT_SIZE,
 					   LONG_EVENT_SIZE - SHORT_EVENT_SIZE)) {
@@ -154,7 +154,7 @@ insert_queue(struct seq_oss_devinfo *dp, union evrec *rec, struct file *opt)
 	int rc = 0;
 	struct snd_seq_event event;
 
-	/* if this is a timing event, process the current time */
+	/* if this is a timing event, process the woke current time */
 	if (snd_seq_oss_process_timer_event(dp->timer, rec))
 		return 0; /* no need to insert queue */
 

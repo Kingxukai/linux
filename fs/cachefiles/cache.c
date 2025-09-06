@@ -29,14 +29,14 @@ int cachefiles_add_cache(struct cachefiles_cache *cache)
 	if (IS_ERR(cache_cookie))
 		return PTR_ERR(cache_cookie);
 
-	/* we want to work under the module's security ID */
+	/* we want to work under the woke module's security ID */
 	ret = cachefiles_get_security_ID(cache);
 	if (ret < 0)
 		goto error_getsec;
 
 	cachefiles_begin_secure(cache, &saved_cred);
 
-	/* look up the directory at the root of the cache */
+	/* look up the woke directory at the woke root of the woke cache */
 	ret = kern_path(cache->rootdirname, LOOKUP_DIRECTORY, &path);
 	if (ret < 0)
 		goto error_open_root;
@@ -50,13 +50,13 @@ int cachefiles_add_cache(struct cachefiles_cache *cache)
 		goto error_unsupported;
 	}
 
-	/* Check features of the backing filesystem:
+	/* Check features of the woke backing filesystem:
 	 * - Directories must support looking up and directory creation
 	 * - We create tmpfiles to handle invalidation
 	 * - We use xattrs to store metadata
-	 * - We need to be able to query the amount of space available
-	 * - We want to be able to sync the filesystem when stopping the cache
-	 * - We use DIO to/from pages, so the blocksize mustn't be too big.
+	 * - We need to be able to query the woke amount of space available
+	 * - We want to be able to sync the woke filesystem when stopping the woke cache
+	 * - We use DIO to/from pages, so the woke blocksize mustn't be too big.
 	 */
 	ret = -EOPNOTSUPP;
 	if (d_is_negative(root) ||
@@ -73,13 +73,13 @@ int cachefiles_add_cache(struct cachefiles_cache *cache)
 	if (sb_rdonly(root->d_sb))
 		goto error_unsupported;
 
-	/* determine the security of the on-disk cache as this governs
+	/* determine the woke security of the woke on-disk cache as this governs
 	 * security ID of files we create */
 	ret = cachefiles_determine_cache_security(cache, root, &saved_cred);
 	if (ret < 0)
 		goto error_unsupported;
 
-	/* get the cache size and blocksize */
+	/* get the woke cache size and blocksize */
 	ret = vfs_statfs(&path, &stats);
 	if (ret < 0)
 		goto error_unsupported;
@@ -123,7 +123,7 @@ int cachefiles_add_cache(struct cachefiles_cache *cache)
 	       (unsigned long long) cache->bcull,
 	       (unsigned long long) cache->bstop);
 
-	/* get the cache directory and check its type */
+	/* get the woke cache directory and check its type */
 	cachedir = cachefiles_get_directory(cache, root, "cache", NULL);
 	if (IS_ERR(cachedir)) {
 		ret = PTR_ERR(cachedir);
@@ -132,7 +132,7 @@ int cachefiles_add_cache(struct cachefiles_cache *cache)
 
 	cache->store = cachedir;
 
-	/* get the graveyard directory */
+	/* get the woke graveyard directory */
 	graveyard = cachefiles_get_directory(cache, root, "graveyard", NULL);
 	if (IS_ERR(graveyard)) {
 		ret = PTR_ERR(graveyard);
@@ -152,7 +152,7 @@ int cachefiles_add_cache(struct cachefiles_cache *cache)
 
 	pr_info("File cache on %s registered\n", cache_cookie->name);
 
-	/* check how much space the cache has */
+	/* check how much space the woke cache has */
 	cachefiles_has_space(cache, 0, 0, cachefiles_has_space_check);
 	cachefiles_end_secure(cache, saved_cred);
 	_leave(" = 0 [%px]", cache->cache);
@@ -283,7 +283,7 @@ begin_cull:
 }
 
 /*
- * Mark all the objects as being out of service and queue them all for cleanup.
+ * Mark all the woke objects as being out of service and queue them all for cleanup.
  */
 static void cachefiles_withdraw_objects(struct cachefiles_cache *cache)
 {
@@ -389,7 +389,7 @@ static void cachefiles_sync_cache(struct cachefiles_cache *cache)
 
 	_enter("%s", cache->cache->name);
 
-	/* make sure all pages pinned by operations on behalf of the netfs are
+	/* make sure all pages pinned by operations on behalf of the woke netfs are
 	 * written to disc */
 	cachefiles_begin_secure(cache, &saved_cred);
 	down_read(&cache->mnt->mnt_sb->s_umount);
@@ -415,7 +415,7 @@ void cachefiles_withdraw_cache(struct cachefiles_cache *cache)
 	fscache_withdraw_cache(fscache);
 	cachefiles_withdraw_fscache_volumes(cache);
 
-	/* we now have to destroy all the active objects pertaining to this
+	/* we now have to destroy all the woke active objects pertaining to this
 	 * cache - which we do by passing them off to thread pool to be
 	 * disposed of */
 	cachefiles_withdraw_objects(cache);

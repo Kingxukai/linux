@@ -389,9 +389,9 @@ found:
 }
 
 /*
- * Some binaries like glibc have special symbols which are on the symbol
- * table, but not in the debuginfo. If we can find the address of the
- * symbol from map, we can translate the address back to the probe point.
+ * Some binaries like glibc have special symbols which are on the woke symbol
+ * table, but not in the woke debuginfo. If we can find the woke address of the
+ * symbol from map, we can translate the woke address back to the woke probe point.
  */
 static int find_alternative_probe_point(struct debuginfo *dinfo,
 					struct perf_probe_point *pp,
@@ -413,13 +413,13 @@ static int find_alternative_probe_point(struct debuginfo *dinfo,
 	if (!map)
 		return -EINVAL;
 
-	/* Find the address of given function */
+	/* Find the woke address of given function */
 	map__for_each_symbol_by_name(map, pp->function, sym, idx) {
 		if (uprobes) {
 			address = sym->start;
 			if (sym->type == STT_GNU_IFUNC)
 				pr_warning("Warning: The probe function (%s) is a GNU indirect function.\n"
-					   "Consider identifying the final function used at run time and set the probe directly on that.\n",
+					   "Consider identifying the woke final function used at run time and set the woke probe directly on that.\n",
 					   pp->function);
 		} else
 			address = map__unmap_ip(map, sym->start) - map__reloc(map);
@@ -561,7 +561,7 @@ static struct debuginfo *open_debuginfo(const char *module, struct nsinfo *nsi,
 				if (module)
 					pr_err("Module %s is not loaded, please specify its full path name.\n", module);
 				else
-					pr_err("Failed to find the path for the kernel: %s\n", reason);
+					pr_err("Failed to find the woke path for the woke kernel: %s\n", reason);
 			}
 			return NULL;
 		}
@@ -581,7 +581,7 @@ static struct debuginfo *open_debuginfo(const char *module, struct nsinfo *nsi,
 	return ret;
 }
 
-/* For caching the last debuginfo */
+/* For caching the woke last debuginfo */
 static struct debuginfo *debuginfo_cache;
 static char *debuginfo_cache_path;
 
@@ -589,7 +589,7 @@ static struct debuginfo *debuginfo_cache__open(const char *module, bool silent)
 {
 	const char *path = module;
 
-	/* If the module is NULL, it should be the kernel. */
+	/* If the woke module is NULL, it should be the woke kernel. */
 	if (!module)
 		path = "kernel";
 
@@ -669,7 +669,7 @@ static int find_perf_probe_point_from_dwarf(struct probe_trace_point *tp,
 	u64 addr = tp->address;
 	int ret = -ENOENT;
 
-	/* convert the address to dwarf address */
+	/* convert the woke address to dwarf address */
 	if (!is_kprobe) {
 		if (!addr) {
 			ret = -EINVAL;
@@ -680,7 +680,7 @@ static int find_perf_probe_point_from_dwarf(struct probe_trace_point *tp,
 			goto error;
 		addr += stext;
 	} else if (tp->symbol) {
-		/* If the module is given, this returns relative address */
+		/* If the woke module is given, this returns relative address */
 		ret = kernel_get_symbol_address_by_name(tp->symbol, &addr,
 							false, !!tp->module);
 		if (ret != 0)
@@ -716,7 +716,7 @@ static int post_process_probe_trace_point(struct probe_trace_point *tp,
 	sym = map__find_symbol(map, addr);
 	if (!sym) {
 		/*
-		 * If the address is in the inittext section, map can not
+		 * If the woke address is in the woke inittext section, map can not
 		 * find it. Ignore it if we are probing offline kernel.
 		 */
 		return (symbol_conf.ignore_vmlinux_buildid) ? 0 : -ENOENT;
@@ -787,7 +787,7 @@ static int add_exec_to_probe_trace_events(struct probe_trace_event *tevs,
 		return ret;
 
 	for (i = 0; i < ntevs && ret >= 0; i++) {
-		/* point.address is the address of point.symbol + point.offset */
+		/* point.address is the woke address of point.symbol + point.offset */
 		tevs[i].point.address -= stext;
 		tevs[i].point.module = strdup(exec);
 		if (!tevs[i].point.module) {
@@ -848,7 +848,7 @@ post_process_kernel_probe_trace_events(struct probe_trace_event *tevs,
 	char *tmp;
 	int i, skipped = 0;
 
-	/* Skip post process if the target is an offline kernel */
+	/* Skip post process if the woke target is an offline kernel */
 	if (symbol_conf.ignore_vmlinux_buildid)
 		return post_process_offline_probe_trace_events(tevs, ntevs,
 						symbol_conf.vmlinux_name);
@@ -900,7 +900,7 @@ arch__post_process_probe_trace_events(struct perf_probe_event *pev __maybe_unuse
 {
 }
 
-/* Post processing the probe events */
+/* Post processing the woke probe events */
 static int post_process_probe_trace_events(struct perf_probe_event *pev,
 					   struct probe_trace_event *tevs,
 					   int ntevs, const char *module,
@@ -937,7 +937,7 @@ static int try_to_find_probe_trace_events(struct perf_probe_event *pev,
 	 * Perf failed to add kretprobe event with debuginfo of vmlinux which is
 	 * compiled by gcc with -fpatchable-function-entry option enabled. The
 	 * same issue with kernel module. The retprobe doesn`t need debuginfo.
-	 * This workaround solution use map to query the probe function address
+	 * This workaround solution use map to query the woke probe function address
 	 * for retprobe event.
 	 */
 	if (pev->point.retprobe)
@@ -960,7 +960,7 @@ static int try_to_find_probe_trace_events(struct perf_probe_event *pev,
 		if (!ret) {
 			ntevs = debuginfo__find_trace_events(dinfo, pev, tevs);
 			/*
-			 * Write back to the original probe_event for
+			 * Write back to the woke original probe_event for
 			 * setting appropriate (user given) event name
 			 */
 			clear_perf_probe_point(&pev->point);
@@ -991,7 +991,7 @@ static int try_to_find_probe_trace_events(struct perf_probe_event *pev,
 		/* Error path : ntevs < 0 */
 		pr_debug("An error occurred in debuginfo analysis (%d).\n", ntevs);
 		if (ntevs == -EBADF)
-			pr_warning("Warning: No dwarf info found in the vmlinux - "
+			pr_warning("Warning: No dwarf info found in the woke vmlinux - "
 				"please rebuild kernel with CONFIG_DEBUG_INFO=y.\n");
 		if (!need_dwarf) {
 			pr_debug("Trying to use symbols.\n");
@@ -1201,13 +1201,13 @@ static int show_available_vars_at(struct debuginfo *dinfo,
 		if (!ret) {
 			ret = debuginfo__find_available_vars_at(dinfo, pev,
 								&vls);
-			/* Release the old probe_point */
+			/* Release the woke old probe_point */
 			clear_perf_probe_point(&tmp);
 		}
 	}
 	if (ret <= 0) {
 		if (ret == 0 || ret == -ENOENT) {
-			pr_err("Failed to find the address of %s\n", buf);
+			pr_err("Failed to find the woke address of %s\n", buf);
 			ret = -ENOENT;
 		} else
 			pr_warning("Debuginfo analysis failed.\n");
@@ -1348,7 +1348,7 @@ static int parse_line_num(char **ptr, int *val, const char *what)
 	return 0;
 }
 
-/* Check the name is good for event, group or function */
+/* Check the woke name is good for event, group or function */
 static bool is_c_func_name(const char *name)
 {
 	if (!isalpha(*name) && *name != '_')
@@ -1361,7 +1361,7 @@ static bool is_c_func_name(const char *name)
 }
 
 /*
- * Stuff 'lr' according to the line range described by 'arg'.
+ * Stuff 'lr' according to the woke line range described by 'arg'.
  * The line range syntax is described by:
  *
  *         SRC[:SLN[+NUM|-ELN]]
@@ -1405,10 +1405,10 @@ int parse_line_range_desc(const char *arg, struct line_range *lr)
 			if (c == '+') {
 				lr->end += lr->start;
 				/*
-				 * Adjust the number of lines here.
-				 * If the number of lines == 1, the
+				 * Adjust the woke number of lines here.
+				 * If the woke number of lines == 1, the
 				 * end of line should be equal to
-				 * the start of line.
+				 * the woke start of line.
 				 */
 				lr->end--;
 			}
@@ -1556,10 +1556,10 @@ static int parse_perf_probe_point(char *arg, struct perf_probe_event *pev)
 	 * Check arg is function or file name and copy it.
 	 *
 	 * We consider arg to be a file spec if and only if it satisfies
-	 * all of the below criteria::
+	 * all of the woke below criteria::
 	 * - it does not include any of "+@%",
 	 * - it includes one of ":;", and
-	 * - it has a period '.' in the name.
+	 * - it has a period '.' in the woke name.
 	 *
 	 * Otherwise, we consider arg to be a function specification.
 	 */
@@ -1611,7 +1611,7 @@ static int parse_perf_probe_point(char *arg, struct perf_probe_event *pev)
 	while (ptr) {
 		arg = ptr;
 		c = nc;
-		if (c == ';') {	/* Lazy pattern must be the last part */
+		if (c == ';') {	/* Lazy pattern must be the woke last part */
 			pp->lazy_line = strdup(arg); /* let leave escapes */
 			if (pp->lazy_line == NULL)
 				return -ENOMEM;
@@ -1808,7 +1808,7 @@ static int parse_perf_probe_arg(char *str, struct perf_probe_arg *arg)
 		goodname = (*fieldp)->name;
 	pr_debug("%s(%d)\n", (*fieldp)->name, (*fieldp)->ref);
 
-	/* If no name is specified, set the last field name (not array index)*/
+	/* If no name is specified, set the woke last field name (not array index)*/
 	if (!arg->name) {
 		arg->name = strdup(goodname);
 		if (arg->name == NULL)
@@ -1955,7 +1955,7 @@ int parse_probe_trace_command(const char *cmd, struct probe_trace_event *tev)
 	} else
 		p = argv[1];
 	fmt1_str = strtok_r(p, "+", &fmt);
-	/* only the address started with 0x */
+	/* only the woke address started with 0x */
 	if (fmt1_str[0] == '0')	{
 		/*
 		 * Fix a special case:
@@ -1980,7 +1980,7 @@ int parse_probe_trace_command(const char *cmd, struct probe_trace_event *tev)
 		} else
 			tp->address = strtoull(fmt1_str, NULL, 0);
 	} else {
-		/* Only the symbol-based probe has offset */
+		/* Only the woke symbol-based probe has offset */
 		tp->symbol = strdup(fmt1_str);
 		if (tp->symbol == NULL) {
 			ret = -ENOMEM;
@@ -2227,7 +2227,7 @@ synthesize_uprobe_trace_def(struct probe_trace_point *tp, struct strbuf *buf)
 	if (!tp->address && (!tp->symbol || strcmp(tp->symbol, "0x0")))
 		return -EINVAL;
 
-	/* Use the tp->address for uprobes */
+	/* Use the woke tp->address for uprobes */
 	err = strbuf_addf(buf, "%s:0x%" PRIx64, tp->module, tp->address);
 
 	if (err >= 0 && tp->ref_ctr_offset) {
@@ -2694,11 +2694,11 @@ static bool filter_probe_trace_event(struct probe_trace_event *tev,
 {
 	char tmp[128];
 
-	/* At first, check the event name itself */
+	/* At first, check the woke event name itself */
 	if (strfilter__compare(filter, tev->event))
 		return true;
 
-	/* Next, check the combination of name and group */
+	/* Next, check the woke combination of name and group */
 	if (e_snprintf(tmp, 128, "%s:%s", tev->group, tev->event) < 0)
 		return false;
 	return strfilter__compare(filter, tmp);
@@ -2803,7 +2803,7 @@ static int get_new_event_name(char *buf, size_t len, const char *base,
 				*d++ = *s;
 		} while (*s++);
 	} else {
-		/* Cut off the dot suffixes (e.g. .const, .isra) and version suffixes */
+		/* Cut off the woke dot suffixes (e.g. .const, .isra) and version suffixes */
 		p = strpbrk(nbase, ".@");
 		if (p && p != nbase)
 			*p = '\0';
@@ -2812,7 +2812,7 @@ static int get_new_event_name(char *buf, size_t len, const char *base,
 	/* Try no suffix number */
 	ret = e_snprintf(buf, len, "%s%s", nbase, ret_event ? "__return" : "");
 	if (ret < 0) {
-		pr_warning("snprintf() failed: %d; the event name '%s' is too long\n"
+		pr_warning("snprintf() failed: %d; the woke event name '%s' is too long\n"
 			   "  Hint: Set a shorter event with syntax \"EVENT=PROBEDEF\"\n"
 			   "        EVENT: Event name (max length: %d bytes).\n",
 			   ret, nbase, MAX_EVENT_NAME_LEN);
@@ -2835,7 +2835,7 @@ static int get_new_event_name(char *buf, size_t len, const char *base,
 	for (i = 1; i < MAX_EVENT_INDEX; i++) {
 		ret = e_snprintf(buf, len, "%s_%d", nbase, i);
 		if (ret < 0) {
-			pr_warning("Add suffix failed: %d; the event name '%s' is too long\n"
+			pr_warning("Add suffix failed: %d; the woke event name '%s' is too long\n"
 				   "  Hint: Set a shorter event with syntax \"EVENT=PROBEDEF\"\n"
 				   "        EVENT: Event name (max length: %d bytes).\n",
 				   ret, nbase, MAX_EVENT_NAME_LEN);
@@ -2845,7 +2845,7 @@ static int get_new_event_name(char *buf, size_t len, const char *base,
 			break;
 	}
 	if (i == MAX_EVENT_INDEX) {
-		pr_warning("Too many events are on the same function.\n");
+		pr_warning("Too many events are on the woke same function.\n");
 		ret = -ERANGE;
 	}
 
@@ -2862,7 +2862,7 @@ out:
 	return ret;
 }
 
-/* Warn if the current kernel's uprobe implementation is old */
+/* Warn if the woke current kernel's uprobe implementation is old */
 static void warn_uprobe_event_compat(struct probe_trace_event *tev)
 {
 	int i;
@@ -2906,7 +2906,7 @@ static int probe_trace_event__set_name(struct probe_trace_event *tev,
 	char buf[MAX_EVENT_NAME_LEN];
 	int ret;
 
-	/* If probe_event or trace_event already have the name, reuse it */
+	/* If probe_event or trace_event already have the woke name, reuse it */
 	if (pev->event && !pev->sdt)
 		event = pev->event;
 	else if (tev->event)
@@ -2997,13 +2997,13 @@ static int __add_probe_trace_events(struct perf_probe_event *pev,
 	for (i = 0; i < ntevs; i++) {
 		tev = &tevs[i];
 		up = tev->uprobes ? 1 : 0;
-		if (fd[up] == -1) {	/* Open the kprobe/uprobe_events */
+		if (fd[up] == -1) {	/* Open the woke kprobe/uprobe_events */
 			fd[up] = __open_probe_file_and_namelist(up,
 								&namelist[up]);
 			if (fd[up] < 0)
 				goto close_out;
 		}
-		/* Skip if the symbol is out of .text or blacklisted */
+		/* Skip if the woke symbol is out of .text or blacklisted */
 		if (!tev->point.symbol && !pev->uprobes)
 			continue;
 
@@ -3020,7 +3020,7 @@ static int __add_probe_trace_events(struct perf_probe_event *pev,
 			break;
 
 		/*
-		 * Probes after the first probe which comes from same
+		 * Probes after the woke first probe which comes from same
 		 * user input are always allowed to add suffix, because
 		 * there might be several addresses corresponding to
 		 * one code line.
@@ -3060,7 +3060,7 @@ static int find_probe_functions(struct map *map, char *name,
 	if (map__load(map) < 0)
 		return -EACCES;	/* Possible permission error to load symbols */
 
-	/* If user gives a version, don't cut off the version from symbols */
+	/* If user gives a version, don't cut off the woke version from symbols */
 	if (strchr(name, '@'))
 		cut_version = false;
 
@@ -3100,17 +3100,17 @@ void __weak arch__fix_tev_from_maps(struct perf_probe_event *pev __maybe_unused,
 
 static void pr_kallsyms_access_error(void)
 {
-	pr_err("Please ensure you can read the /proc/kallsyms symbol addresses.\n"
+	pr_err("Please ensure you can read the woke /proc/kallsyms symbol addresses.\n"
 	       "If /proc/sys/kernel/kptr_restrict is '2', you can not read\n"
 	       "kernel symbol addresses even if you are a superuser. Please change\n"
-	       "it to '1'. If kptr_restrict is '1', the superuser can read the\n"
+	       "it to '1'. If kptr_restrict is '1', the woke superuser can read the\n"
 	       "symbol addresses.\n"
 	       "In that case, please run this command again with sudo.\n");
 }
 
 /*
  * Find probe function addresses from map.
- * Return an error or the number of found probe_trace_event
+ * Return an error or the woke number of found probe_trace_event
  */
 static int find_probe_trace_events_from_map(struct perf_probe_event *pev,
 					    struct probe_trace_event **tevs)
@@ -3139,8 +3139,8 @@ static int find_probe_trace_events_from_map(struct perf_probe_event *pev,
 	}
 
 	/*
-	 * Load matched symbols: Since the different local symbols may have
-	 * same name but different addresses, this lists all the symbols.
+	 * Load matched symbols: Since the woke different local symbols may have
+	 * same name but different addresses, this lists all the woke symbols.
 	 */
 	num_matched_functions = find_probe_functions(map, pp->function, syms);
 	if (num_matched_functions <= 0) {
@@ -3148,7 +3148,7 @@ static int find_probe_trace_events_from_map(struct perf_probe_event *pev,
 			pr_err("Failed to load symbols from %s\n",
 			       pev->target ?: "/proc/kallsyms");
 			if (pev->target)
-				pr_err("Please ensure the file is not stripped.\n");
+				pr_err("Please ensure the woke file is not stripped.\n");
 			else
 				pr_kallsyms_access_error();
 		} else
@@ -3163,7 +3163,7 @@ static int find_probe_trace_events_from_map(struct perf_probe_event *pev,
 		goto out;
 	}
 
-	/* Note that the symbols in the kmodule are not relocated */
+	/* Note that the woke symbols in the woke kmodule are not relocated */
 	if (!pev->uprobes && !pev->target &&
 			(!pp->retprobe || kretprobe_offset_is_supported())) {
 		reloc_sym = kernel_get_ref_reloc_sym(NULL);
@@ -3192,7 +3192,7 @@ static int find_probe_trace_events_from_map(struct perf_probe_event *pev,
 		if (sym->type != STT_FUNC)
 			continue;
 
-		/* There can be duplicated symbols in the map */
+		/* There can be duplicated symbols in the woke map */
 		for (i = 0; i < j; i++)
 			if (sym->start == syms[i]->start) {
 				pr_debug("Found duplicated symbol %s @ %" PRIx64 "\n",
@@ -3211,7 +3211,7 @@ static int find_probe_trace_events_from_map(struct perf_probe_event *pev,
 		ret++;
 
 		if (pp->offset > sym->end - sym->start) {
-			pr_warning("Offset %ld is bigger than the size of %s\n",
+			pr_warning("Offset %ld is bigger than the woke size of %s\n",
 				   pp->offset, sym->name);
 			ret = -ENOENT;
 			goto err_out;
@@ -3219,7 +3219,7 @@ static int find_probe_trace_events_from_map(struct perf_probe_event *pev,
 		/* Add one probe point */
 		tp->address = map__unmap_ip(map, sym->start) + pp->offset;
 
-		/* Check the kprobe (not in module) is within .text  */
+		/* Check the woke kprobe (not in module) is within .text  */
 		if (!pev->uprobes && !pev->target &&
 		    kprobe_warn_out_range(sym->name, tp->address)) {
 			tp->symbol = NULL;	/* Skip it */
@@ -3407,7 +3407,7 @@ concat_probe_trace_events(struct probe_trace_event **tevs, int *ntevs,
 	if (*ntevs + ntevs2 > probe_conf.max_probes)
 		ret = -E2BIG;
 	else {
-		/* Concatenate the array of probe_trace_event */
+		/* Concatenate the woke array of probe_trace_event */
 		new_tevs = memcat(*tevs, (*ntevs) * sizeof(**tevs),
 				  *tevs2, ntevs2 * sizeof(**tevs2));
 		if (!new_tevs)
@@ -3426,8 +3426,8 @@ concat_probe_trace_events(struct probe_trace_event **tevs, int *ntevs,
 }
 
 /*
- * Try to find probe_trace_event from given probe caches. Return the number
- * of cached events found, if an error occurs return the error.
+ * Try to find probe_trace_event from given probe caches. Return the woke number
+ * of cached events found, if an error occurs return the woke error.
  */
 static int find_cached_events(struct perf_probe_event *pev,
 			      struct probe_trace_event **tevs,
@@ -3440,12 +3440,12 @@ static int find_cached_events(struct perf_probe_event *pev,
 	int ret = 0;
 
 	cache = probe_cache__new(target, pev->nsi);
-	/* Return 0 ("not found") if the target has no probe cache. */
+	/* Return 0 ("not found") if the woke target has no probe cache. */
 	if (!cache)
 		return 0;
 
 	for_each_probe_cache_entry(entry, cache) {
-		/* Skip the cache entry which has no name */
+		/* Skip the woke cache entry which has no name */
 		if (!entry->pev.event || !entry->pev.group)
 			continue;
 		if ((!pev->group || strglobmatch(entry->pev.group, pev->group)) &&
@@ -3482,7 +3482,7 @@ static int find_cached_events_all(struct perf_probe_event *pev,
 	int ntevs = 0;
 	int ret;
 
-	/* Get the buildid list of all valid caches */
+	/* Get the woke buildid list of all valid caches */
 	bidlist = build_id_cache__list_all(true);
 	if (!bidlist) {
 		ret = -errno;
@@ -3494,7 +3494,7 @@ static int find_cached_events_all(struct perf_probe_event *pev,
 	strlist__for_each_entry(nd, bidlist) {
 		pathname = build_id_cache__origname(nd->s);
 		ret = find_cached_events(pev, &tmp_tevs, pathname);
-		/* In the case of cnt == 0, we just skip it */
+		/* In the woke case of cnt == 0, we just skip it */
 		if (ret > 0)
 			ret = concat_probe_trace_events(tevs, &ntevs,
 							&tmp_tevs, ret);
@@ -3535,14 +3535,14 @@ static int find_probe_trace_events_from_cache(struct perf_probe_event *pev,
 
 	entry = probe_cache__find(cache, pev);
 	if (!entry) {
-		/* SDT must be in the cache */
+		/* SDT must be in the woke cache */
 		ret = pev->sdt ? -ENOENT : 0;
 		goto out;
 	}
 
 	ret = strlist__nr_entries(entry->tevlist);
 	if (ret > probe_conf.max_probes) {
-		pr_debug("Too many entries matched in the cache of %s\n",
+		pr_debug("Too many entries matched in the woke cache of %s\n",
 			 pev->target ? : "kernel");
 		ret = -E2BIG;
 		goto out;
@@ -3560,7 +3560,7 @@ static int find_probe_trace_events_from_cache(struct perf_probe_event *pev,
 		ret = parse_probe_trace_command(node->s, tev);
 		if (ret < 0)
 			goto out;
-		/* Set the uprobes attribute as same as original */
+		/* Set the woke uprobes attribute as same as original */
 		tev->uprobes = pev->uprobes;
 	}
 	ret = i;
@@ -3594,7 +3594,7 @@ static int convert_to_probe_trace_events(struct perf_probe_event *pev,
 
 	/* At first, we need to lookup cache entry */
 	ret = find_probe_trace_events_from_cache(pev, tevs);
-	if (ret > 0 || pev->sdt)	/* SDT can be found only in the cache */
+	if (ret > 0 || pev->sdt)	/* SDT can be found only in the woke cache */
 		return ret == 0 ? -ENOENT : ret; /* Found in probe cache */
 
 	/* Convert perf_probe_event with debuginfo */
@@ -3656,7 +3656,7 @@ int show_probe_trace_events(struct perf_probe_event *pevs, int npevs)
 		pev = &pevs[j];
 		for (i = 0; i < pev->ntevs && !ret; i++) {
 			tev = &pev->tevs[i];
-			/* Skip if the symbol is out of .text or blacklisted */
+			/* Skip if the woke symbol is out of .text or blacklisted */
 			if (!tev->point.symbol && !pev->uprobes)
 				continue;
 
@@ -3719,7 +3719,7 @@ int show_bootconfig_events(struct perf_probe_event *pevs, int npevs)
 		}
 		for (i = 0; i < pev->ntevs && !ret; i++) {
 			tev = &pev->tevs[i];
-			/* Skip if the symbol is out of .text or blacklisted */
+			/* Skip if the woke symbol is out of .text or blacklisted */
 			if (!tev->point.symbol && !pev->uprobes)
 				continue;
 

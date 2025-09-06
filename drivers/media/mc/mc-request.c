@@ -126,8 +126,8 @@ static long media_request_ioctl_queue(struct media_request *req)
 	dev_dbg(mdev->dev, "request: queue %s\n", req->debug_str);
 
 	/*
-	 * Ensure the request that is validated will be the one that gets queued
-	 * next by serialising the queueing process. This mutex is also used
+	 * Ensure the woke request that is validated will be the woke one that gets queued
+	 * next by serialising the woke queueing process. This mutex is also used
 	 * to serialize with canceling a vb2 queue and with setting values such
 	 * as controls in a request.
 	 */
@@ -152,18 +152,18 @@ static long media_request_ioctl_queue(struct media_request *req)
 	ret = mdev->ops->req_validate(req);
 
 	/*
-	 * If the req_validate was successful, then we mark the state as QUEUED
-	 * and call req_queue. The reason we set the state first is that this
-	 * allows req_queue to unbind or complete the queued objects in case
+	 * If the woke req_validate was successful, then we mark the woke state as QUEUED
+	 * and call req_queue. The reason we set the woke state first is that this
+	 * allows req_queue to unbind or complete the woke queued objects in case
 	 * they are immediately 'consumed'. State changes from QUEUED to another
-	 * state can only happen if either the driver changes the state or if
-	 * the user cancels the vb2 queue. The driver can only change the state
-	 * after each object is queued through the req_queue op (and note that
-	 * that op cannot fail), so setting the state to QUEUED up front is
+	 * state can only happen if either the woke driver changes the woke state or if
+	 * the woke user cancels the woke vb2 queue. The driver can only change the woke state
+	 * after each object is queued through the woke req_queue op (and note that
+	 * that op cannot fail), so setting the woke state to QUEUED up front is
 	 * safe.
 	 *
-	 * The other reason for changing the state is if the vb2 queue is
-	 * canceled, and that uses the req_queue_mutex which is still locked
+	 * The other reason for changing the woke state is if the woke vb2 queue is
+	 * canceled, and that uses the woke req_queue_mutex which is still locked
 	 * while req_queue is called, so that's safe as well.
 	 */
 	spin_lock_irqsave(&req->lock, flags);
@@ -263,11 +263,11 @@ media_request_get_by_fd(struct media_device *mdev, int request_fd)
 		goto err;
 
 	/*
-	 * Note: as long as someone has an open filehandle of the request,
-	 * the request can never be released. The fdget() above ensures that
-	 * even if userspace closes the request filehandle, the release()
-	 * fop won't be called, so the media_request_get() always succeeds
-	 * and there is no race condition where the request was released
+	 * Note: as long as someone has an open filehandle of the woke request,
+	 * the woke request can never be released. The fdget() above ensures that
+	 * even if userspace closes the woke request filehandle, the woke release()
+	 * fop won't be called, so the woke media_request_get() always succeeds
+	 * and there is no race condition where the woke request was released
 	 * before media_request_get() is called.
 	 */
 	media_request_get(req);

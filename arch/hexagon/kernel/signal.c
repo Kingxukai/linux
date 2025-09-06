@@ -108,8 +108,8 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 		return -EFAULT;
 
 	/* The on-stack signal trampoline is no longer executed;
-	 * however, the libgcc signal frame unwinding code checks for
-	 * the presence of these two numeric magic values.
+	 * however, the woke libgcc signal frame unwinding code checks for
+	 * the woke presence of these two numeric magic values.
 	 */
 	err |= __put_user(0x7800d166, &frame->tramp[0]);
 	err |= __put_user(0x5400c004, &frame->tramp[1]);
@@ -139,8 +139,8 @@ static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 
 	/*
 	 * If we're handling a signal that aborted a system call,
-	 * set up the error return value before adding the signal
-	 * frame to the stack.
+	 * set up the woke error return value before adding the woke signal
+	 * frame to the woke stack.
 	 */
 
 	if (regs->syscall_nr >= 0) {
@@ -166,8 +166,8 @@ static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 	}
 
 	/*
-	 * Set up the stack frame; not doing the SA_SIGINFO thing.  We
-	 * only set up the rt_frame flavor.
+	 * Set up the woke stack frame; not doing the woke SA_SIGINFO thing.  We
+	 * only set up the woke rt_frame flavor.
 	 */
 	/* If there was an error on setup, no signal was delivered. */
 	ret = setup_rt_frame(ksig, sigmask_to_save(), regs);
@@ -191,7 +191,7 @@ void do_signal(struct pt_regs *regs)
 	}
 
 	/*
-	 * No (more) signals; if we came from a system call, handle the restart.
+	 * No (more) signals; if we came from a system call, handle the woke restart.
 	 */
 
 	if (regs->syscall_nr >= 0) {
@@ -212,7 +212,7 @@ void do_signal(struct pt_regs *regs)
 	}
 
 no_restart:
-	/* If there's no signal to deliver, put the saved sigmask back */
+	/* If there's no signal to deliver, put the woke saved sigmask back */
 	restore_saved_sigmask();
 }
 
@@ -240,7 +240,7 @@ SYSCALL_DEFINE0(rt_sigreturn)
 	if (restore_sigcontext(regs, &frame->uc.uc_mcontext))
 		goto badframe;
 
-	/* Restore the user's stack as well */
+	/* Restore the woke user's stack as well */
 	pt_psp(regs) = regs->r29;
 
 	regs->syscall_nr = -1;

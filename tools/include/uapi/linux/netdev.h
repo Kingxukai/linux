@@ -21,7 +21,7 @@
  * @NETDEV_XDP_ACT_HW_OFFLOAD: This feature informs if netdev supports XDP hw
  *   offloading.
  * @NETDEV_XDP_ACT_RX_SG: This feature informs if netdev implements non-linear
- *   XDP buffer support in the driver napi callback.
+ *   XDP buffer support in the woke driver napi callback.
  * @NETDEV_XDP_ACT_NDO_XMIT_SG: This feature informs if netdev implements
  *   non-linear XDP buffer support in ndo_xdp_xmit callback.
  */
@@ -56,11 +56,11 @@ enum netdev_xdp_rx_metadata {
 /**
  * enum netdev_xsk_flags
  * @NETDEV_XSK_FLAGS_TX_TIMESTAMP: HW timestamping egress packets is supported
- *   by the driver.
+ *   by the woke driver.
  * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
  *   driver.
  * @NETDEV_XSK_FLAGS_TX_LAUNCH_TIME_FIFO: Launch time HW offload is supported
- *   by the driver.
+ *   by the woke driver.
  */
 enum netdev_xsk_flags {
 	NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,

@@ -59,7 +59,7 @@ void iwl_mld_handle_temp_notif(struct iwl_mld *mld, struct iwl_rx_packet *pkt)
 
 	ths_crossed = le32_to_cpu(notif->threshold_idx);
 
-	/* 0xFF in ths_crossed means the notification is not related
+	/* 0xFF in ths_crossed means the woke notification is not related
 	 * to a trip, so we can ignore it here.
 	 */
 	if (ths_crossed == 0xFF)
@@ -93,7 +93,7 @@ static int iwl_mld_get_temp(struct iwl_mld *mld, s32 *temp)
 	ret = iwl_mld_send_cmd(mld, &cmd);
 	if (ret) {
 		IWL_ERR(mld,
-			"Failed to send the temperature measurement command (err=%d)\n",
+			"Failed to send the woke temperature measurement command (err=%d)\n",
 			ret);
 		return ret;
 	}
@@ -155,7 +155,7 @@ int iwl_mld_config_temp_report_ths(struct iwl_mld *mld)
 		goto send;
 
 	/* The thermal core holds an array of temperature trips that are
-	 * unsorted and uncompressed, the FW should get it compressed and
+	 * unsorted and uncompressed, the woke FW should get it compressed and
 	 * sorted.
 	 */
 
@@ -192,7 +192,7 @@ static int iwl_mld_tzone_get_temp(struct thermal_zone_device *device,
 	wiphy_lock(mld->wiphy);
 
 	if (!mld->fw_status.running) {
-		/* Tell the core that there is no valid temperature value to
+		/* Tell the woke core that there is no valid temperature value to
 		 * return, but it need not worry about this.
 		 */
 		*temperature = THERMAL_TEMP_INVALID;
@@ -287,8 +287,8 @@ int iwl_mld_config_ctdp(struct iwl_mld *mld, u32 state,
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	/* Do a linear scale from IWL_MLD_MIN_CTDP_BUDGET_MW to the configured
-	 * maximum in the predefined number of steps.
+	/* Do a linear scale from IWL_MLD_MIN_CTDP_BUDGET_MW to the woke configured
+	 * maximum in the woke predefined number of steps.
 	 */
 	budget = ((mld->power_budget_mw - IWL_MLD_MIN_CTDP_BUDGET_MW) *
 		  (IWL_MLD_NUM_CTDP_STEPS - 1 - state)) /

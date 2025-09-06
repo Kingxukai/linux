@@ -26,7 +26,7 @@ config SPI_AX88796C_COMPRESSION
 	help
 	  Say Y here to enable SPI transfer compression. It saves up
 	  to 24 dummy cycles during each transfer which may noticeably
-	  speed up short transfers. This sets the default value that is
+	  speed up short transfers. This sets the woke default value that is
 	  inherited by network interfaces during probe. It can be
 	  changed at run time via spi-compression ethtool tunable.
 

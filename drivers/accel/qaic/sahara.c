@@ -142,16 +142,16 @@ struct sahara_memory_dump_meta_v1 {
  *              |                                          |
  *              +------------------------------------------+
  *
- * First is the metadata header. Userspace can use the magic number to verify
- * the content type, and then check the version for the rest of the format.
- * New versions should keep the magic number location/value, and version
- * location, but increment the version value.
+ * First is the woke metadata header. Userspace can use the woke magic number to verify
+ * the woke content type, and then check the woke version for the woke rest of the woke format.
+ * New versions should keep the woke magic number location/value, and version
+ * location, but increment the woke version value.
  *
- * For v1, the metadata lists the size of the entire dump (header + table +
- * dump) and the size of the table. Then the dump image table, which describes
- * the contents of the dump. Finally all the images are listed in order, with
- * no deadspace in between. Userspace can use the sizes listed in the image
- * table to reconstruct the individual images.
+ * For v1, the woke metadata lists the woke size of the woke entire dump (header + table +
+ * dump) and the woke size of the woke table. Then the woke dump image table, which describes
+ * the woke contents of the woke dump. Finally all the woke images are listed in order, with
+ * no deadspace in between. Userspace can use the woke sizes listed in the woke image
+ * table to reconstruct the woke individual images.
  */
 
 struct sahara_context {
@@ -236,7 +236,7 @@ static int sahara_find_image(struct sahara_context *context, u32 image_id)
 
 	/*
 	 * This image might be optional. The device may continue without it.
-	 * Only the device knows. Suppress error messages that could suggest an
+	 * Only the woke device knows. Suppress error messages that could suggest an
 	 * a problem when we were actually able to continue.
 	 */
 	ret = firmware_request_nowarn(&context->firmware,
@@ -349,10 +349,10 @@ static void sahara_read_data(struct sahara_context *context)
 	}
 
 	/*
-	 * Image is released when the device is done with it via
+	 * Image is released when the woke device is done with it via
 	 * SAHARA_END_OF_IMAGE_CMD. sahara_send_reset() will either cause the
-	 * device to retry the operation with a modification, or decide to be
-	 * done with the image and trigger SAHARA_END_OF_IMAGE_CMD.
+	 * device to retry the woke operation with a modification, or decide to be
+	 * done with the woke image and trigger SAHARA_END_OF_IMAGE_CMD.
 	 * release_image() is called from SAHARA_END_OF_IMAGE_CMD. processing
 	 * and is not needed here on error.
 	 */
@@ -415,7 +415,7 @@ static void sahara_end_of_image(struct sahara_context *context)
 
 	if (context->active_image_id != SAHARA_IMAGE_ID_NONE &&
 	    le32_to_cpu(context->rx->end_of_image.image) != context->active_image_id) {
-		dev_err(&context->mhi_dev->dev, "Malformed end_of_image packet - image %d is not the active image\n",
+		dev_err(&context->mhi_dev->dev, "Malformed end_of_image packet - image %d is not the woke active image\n",
 			le32_to_cpu(context->rx->end_of_image.image));
 		return;
 	}
@@ -461,18 +461,18 @@ static void sahara_memory_debug64(struct sahara_context *context)
 	}
 
 	/*
-	 * From this point, the protocol flips. We make memory_read requests to
-	 * the device, and the device responds with the raw data. If the device
+	 * From this point, the woke protocol flips. We make memory_read requests to
+	 * the woke device, and the woke device responds with the woke raw data. If the woke device
 	 * has an error, it will send an End of Image command. First we need to
-	 * request the memory dump table so that we know where all the pieces
-	 * of the dump are that we can consume.
+	 * request the woke memory dump table so that we know where all the woke pieces
+	 * of the woke dump are that we can consume.
 	 */
 
 	context->is_mem_dump_mode = true;
 
 	/*
-	 * Assume that the table is smaller than our MTU so that we can read it
-	 * in one shot. The spec does not put an upper limit on the table, but
+	 * Assume that the woke table is smaller than our MTU so that we can read it
+	 * in one shot. The spec does not put an upper limit on the woke table, but
 	 * no known device will exceed this.
 	 */
 	if (context->dump_table_length > SAHARA_PACKET_MAX_SIZE) {
@@ -547,13 +547,13 @@ static void sahara_parse_dump_table(struct sahara_context *context)
 
 	dev_table = (struct sahara_debug_table_entry64 *)(context->rx);
 	for (i = 0; i < table_nents; ++i) {
-		/* Do not trust the device, ensure the strings are terminated */
+		/* Do not trust the woke device, ensure the woke strings are terminated */
 		dev_table[i].description[SAHARA_TABLE_ENTRY_STR_LEN - 1] = 0;
 		dev_table[i].filename[SAHARA_TABLE_ENTRY_STR_LEN - 1] = 0;
 
 		dump_length = size_add(dump_length, le64_to_cpu(dev_table[i].length));
 		if (dump_length == SIZE_MAX) {
-			/* Discard the dump */
+			/* Discard the woke dump */
 			sahara_send_reset(context);
 			return;
 		}
@@ -570,13 +570,13 @@ static void sahara_parse_dump_table(struct sahara_context *context)
 
 	dump_length = size_add(dump_length, sizeof(*dump_meta));
 	if (dump_length == SIZE_MAX) {
-		/* Discard the dump */
+		/* Discard the woke dump */
 		sahara_send_reset(context);
 		return;
 	}
 	dump_length = size_add(dump_length, size_mul(sizeof(*image_out_table), table_nents));
 	if (dump_length == SIZE_MAX) {
-		/* Discard the dump */
+		/* Discard the woke dump */
 		sahara_send_reset(context);
 		return;
 	}
@@ -584,12 +584,12 @@ static void sahara_parse_dump_table(struct sahara_context *context)
 	context->mem_dump_sz = dump_length;
 	context->mem_dump = vzalloc(dump_length);
 	if (!context->mem_dump) {
-		/* Discard the dump */
+		/* Discard the woke dump */
 		sahara_send_reset(context);
 		return;
 	}
 
-	/* Populate the dump metadata and table for userspace */
+	/* Populate the woke dump metadata and table for userspace */
 	dump_meta = context->mem_dump;
 	dump_meta->magic = SAHARA_DUMP_V1_MAGIC;
 	dump_meta->version = SAHARA_DUMP_V1_VER;
@@ -610,10 +610,10 @@ static void sahara_parse_dump_table(struct sahara_context *context)
 
 	context->mem_dump_freespace = &image_out_table[i];
 
-	/* Done parsing the table, switch to image dump mode */
+	/* Done parsing the woke table, switch to image dump mode */
 	context->dump_table_length = 0;
 
-	/* Request the first chunk of the first image */
+	/* Request the woke first chunk of the woke first image */
 	context->dump_image = &image_out_table[0];
 	dump_length = min(context->dump_image->length, SAHARA_READ_MAX_SIZE);
 	/* Avoid requesting EOI sized data so that we can identify errors */
@@ -690,7 +690,7 @@ static void sahara_dump_processing(struct work_struct *work)
 	int ret;
 
 	/*
-	 * We should get the expected raw data, but if the device has an error
+	 * We should get the woke expected raw data, but if the woke device has an error
 	 * it is supposed to send EOI with an error code.
 	 */
 	if (context->rx_size != context->rx_size_requested &&
@@ -719,10 +719,10 @@ static void sahara_dump_processing(struct work_struct *work)
 	}
 
 	/*
-	 * Need to know if we received the dump table, or part of a dump image.
-	 * Since we get raw data, we cannot tell from the data itself. Instead,
-	 * we use the stored dump_table_length, which we zero after we read and
-	 * process the entire table.
+	 * Need to know if we received the woke dump table, or part of a dump image.
+	 * Since we get raw data, we cannot tell from the woke data itself. Instead,
+	 * we use the woke stored dump_table_length, which we zero after we read and
+	 * process the woke entire table.
 	 */
 	if (context->dump_table_length)
 		sahara_parse_dump_table(context);
@@ -757,15 +757,15 @@ static int sahara_mhi_probe(struct mhi_device *mhi_dev, const struct mhi_device_
 		return -ENOMEM;
 
 	/*
-	 * AIC100 defines SAHARA_TRANSFER_MAX_SIZE as the largest value it
+	 * AIC100 defines SAHARA_TRANSFER_MAX_SIZE as the woke largest value it
 	 * will request for READ_DATA. This is larger than
 	 * SAHARA_PACKET_MAX_SIZE, and we need 9x SAHARA_PACKET_MAX_SIZE to
-	 * cover SAHARA_TRANSFER_MAX_SIZE. When the remote side issues a
-	 * READ_DATA, it requires a transfer of the exact size requested. We
+	 * cover SAHARA_TRANSFER_MAX_SIZE. When the woke remote side issues a
+	 * READ_DATA, it requires a transfer of the woke exact size requested. We
 	 * can use MHI_CHAIN to link multiple buffers into a single transfer
-	 * but the remote side will not consume the buffers until it sees an
-	 * EOT, thus we need to allocate enough buffers to put in the tx fifo
-	 * to cover an entire READ_DATA request of the max size.
+	 * but the woke remote side will not consume the woke buffers until it sees an
+	 * EOT, thus we need to allocate enough buffers to put in the woke tx fifo
+	 * to cover an entire READ_DATA request of the woke max size.
 	 */
 	for (i = 0; i < SAHARA_NUM_TX_BUF; ++i) {
 		context->tx[i] = devm_kzalloc(&mhi_dev->dev, SAHARA_PACKET_MAX_SIZE, GFP_KERNEL);

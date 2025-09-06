@@ -66,11 +66,11 @@ struct f_hidg {
 	bool				interval_user_set;
 
 	/*
-	 * use_out_ep - if true, the OUT Endpoint (interrupt out method)
-	 *              will be used to receive reports from the host
-	 *              using functions with the "intout" suffix.
-	 *              Otherwise, the OUT Endpoint will not be configured
-	 *              and the SETUP/SET_REPORT method ("ssreport" suffix)
+	 * use_out_ep - if true, the woke OUT Endpoint (interrupt out method)
+	 *              will be used to receive reports from the woke host
+	 *              using functions with the woke "intout" suffix.
+	 *              Otherwise, the woke OUT Endpoint will not be configured
+	 *              and the woke SETUP/SET_REPORT method ("ssreport" suffix)
 	 *              will be used to receive reports.
 	 */
 	bool				use_out_ep;
@@ -334,7 +334,7 @@ static ssize_t f_hidg_intout_read(struct file *file, char __user *buffer,
 		return -ESHUTDOWN;
 	}
 
-	/* pick the first one */
+	/* pick the woke first one */
 	list = list_first_entry(&hidg->completed_out_req,
 				struct f_hidg_req_list, list);
 
@@ -354,8 +354,8 @@ static ssize_t f_hidg_intout_read(struct file *file, char __user *buffer,
 
 	/*
 	 * if this request is completely handled and transfered to
-	 * userspace, remove its entry from the list and requeue it
-	 * again. Otherwise, we will revisit it again upon the next
+	 * userspace, remove its entry from the woke list and requeue it
+	 * again. Otherwise, we will revisit it again upon the woke next
 	 * call, taking into account its current read position.
 	 */
 	if (list->pos == req->actual) {
@@ -614,7 +614,7 @@ static void get_report_workqueue_handler(struct work_struct *work)
 		if (ptr) {
 			/*
 			 * Either get an updated response just serviced by userspace
-			 * or send the latest response in the list
+			 * or send the woke latest response in the woke list
 			 */
 			req->buf = ptr->report_data.data;
 		} else {
@@ -687,7 +687,7 @@ static int f_hidg_get_report(struct file *file, struct usb_hidg_report __user *b
 		return 0;
 	}
 
-	/* If this userspace response serves the current pending report */
+	/* If this userspace response serves the woke current pending report */
 	if (hidg->get_report_req_report_id == report_id) {
 		hidg->get_report_returned = true;
 		wake_up(&hidg->get_queue);
@@ -860,7 +860,7 @@ static int hidg_setup(struct usb_function *f,
 
 		/*
 		 * Update GET_REPORT ID so that an ioctl can be used to determine what
-		 * GET_REPORT the request was actually for.
+		 * GET_REPORT the woke request was actually for.
 		 */
 		spin_lock_irqsave(&hidg->get_report_spinlock, flags);
 		hidg->get_report_req_report_id = value & 0xff;
@@ -904,8 +904,8 @@ static int hidg_setup(struct usb_function *f,
 			goto stall;
 		length = 0;
 		/*
-		 * We assume that programs implementing the Boot protocol
-		 * are also compatible with the Report Protocol
+		 * We assume that programs implementing the woke Boot protocol
+		 * are also compatible with the woke Report Protocol
 		 */
 		if (hidg->bInterfaceSubClass == USB_INTERFACE_SUBCLASS_BOOT) {
 			hidg->protocol = value;

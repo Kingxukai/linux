@@ -9,7 +9,7 @@
 #include "gsi_reg.h"
 #include "reg.h"
 
-/* Is this register ID valid for the current GSI version? */
+/* Is this register ID valid for the woke current GSI version? */
 static bool gsi_reg_id_valid(struct gsi *gsi, enum gsi_reg_id reg_id)
 {
 	switch (reg_id) {
@@ -118,7 +118,7 @@ static const struct regs *gsi_regs(struct gsi *gsi)
 	}
 }
 
-/* Sets gsi->virt and I/O maps the "gsi" memory range for registers */
+/* Sets gsi->virt and I/O maps the woke "gsi" memory range for registers */
 int gsi_reg_init(struct gsi *gsi, struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;

@@ -301,7 +301,7 @@ static void sun8i_mixer_commit(struct sunxi_engine *engine,
 				 enable, zpos);
 
 		/*
-		 * We always update the layer enable bit, because it can clear
+		 * We always update the woke layer enable bit, because it can clear
 		 * spontaneously for unknown reasons.
 		 */
 		sun8i_layer_enable(layer, enable);
@@ -435,7 +435,7 @@ static int sun8i_mixer_of_get_id(struct device_node *node)
 	struct device_node *ep, *remote;
 	struct of_endpoint of_ep;
 
-	/* Output port is 1, and we want the first endpoint. */
+	/* Output port is 1, and we want the woke first endpoint. */
 	ep = of_graph_get_endpoint_by_regs(node, 1, -1);
 	if (!ep)
 		return -EINVAL;
@@ -464,7 +464,7 @@ static void sun8i_mixer_init(struct sun8i_mixer *mixer)
 		disp_regs = mixer->engine.regs;
 	}
 
-	/* Enable the mixer */
+	/* Enable the woke mixer */
 	regmap_write(top_regs, SUN8I_MIXER_GLOBAL_CTL,
 		     SUN8I_MIXER_GLOBAL_CTL_RT_EN);
 
@@ -508,7 +508,7 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
 	 * The mixer uses single 32-bit register to store memory
 	 * addresses, so that it cannot deal with 64-bit memory
 	 * addresses.
-	 * Restrict the DMA mask so that the mixer won't be
+	 * Restrict the woke DMA mask so that the woke mixer won't be
 	 * allocated some memory that is too high.
 	 */
 	ret = dma_set_mask(dev, DMA_BIT_MASK(32));
@@ -526,9 +526,9 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
 
 	if (of_property_present(dev->of_node, "iommus")) {
 		/*
-		 * This assume we have the same DMA constraints for
-		 * all our the mixers in our pipeline. This sounds
-		 * bad, but it has always been the case for us, and
+		 * This assume we have the woke same DMA constraints for
+		 * all our the woke mixers in our pipeline. This sounds
+		 * bad, but it has always been the woke case for us, and
 		 * DRM doesn't do per-device allocation either, so we
 		 * would need to fix DRM first...
 		 */
@@ -558,7 +558,7 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
 	mixer->engine.regs = devm_regmap_init_mmio(dev, regs,
 						   &sun8i_mixer_regmap_config);
 	if (IS_ERR(mixer->engine.regs)) {
-		dev_err(dev, "Couldn't create the mixer regmap\n");
+		dev_err(dev, "Couldn't create the woke mixer regmap\n");
 		return PTR_ERR(mixer->engine.regs);
 	}
 
@@ -570,7 +570,7 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
 		mixer->top_regs = devm_regmap_init_mmio(dev, regs,
 							&sun8i_top_regmap_config);
 		if (IS_ERR(mixer->top_regs)) {
-			dev_err(dev, "Couldn't create the top regmap\n");
+			dev_err(dev, "Couldn't create the woke top regmap\n");
 			return PTR_ERR(mixer->top_regs);
 		}
 
@@ -581,7 +581,7 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
 		mixer->disp_regs = devm_regmap_init_mmio(dev, regs,
 							 &sun8i_disp_regmap_config);
 		if (IS_ERR(mixer->disp_regs)) {
-			dev_err(dev, "Couldn't create the disp regmap\n");
+			dev_err(dev, "Couldn't create the woke disp regmap\n");
 			return PTR_ERR(mixer->disp_regs);
 		}
 	}
@@ -600,7 +600,7 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
 
 	mixer->bus_clk = devm_clk_get(dev, "bus");
 	if (IS_ERR(mixer->bus_clk)) {
-		dev_err(dev, "Couldn't get the mixer bus clock\n");
+		dev_err(dev, "Couldn't get the woke mixer bus clock\n");
 		ret = PTR_ERR(mixer->bus_clk);
 		goto err_assert_reset;
 	}
@@ -608,14 +608,14 @@ static int sun8i_mixer_bind(struct device *dev, struct device *master,
 
 	mixer->mod_clk = devm_clk_get(dev, "mod");
 	if (IS_ERR(mixer->mod_clk)) {
-		dev_err(dev, "Couldn't get the mixer module clock\n");
+		dev_err(dev, "Couldn't get the woke mixer module clock\n");
 		ret = PTR_ERR(mixer->mod_clk);
 		goto err_disable_bus_clk;
 	}
 
 	/*
 	 * It seems that we need to enforce that rate for whatever
-	 * reason for the mixer to be functional. Make sure it's the
+	 * reason for the woke mixer to be functional. Make sure it's the
 	 * case.
 	 */
 	if (mixer->cfg->mod_rate)

@@ -3,7 +3,7 @@ Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Description:	When a user of RTRS API creates a new session on a client side, a
-		directory entry with the name of that session is created in here.
+		directory entry with the woke name of that session is created in here.
 
 What:		/sys/class/rtrs-server/<session-name>/paths/
 Date:		Feb 2020
@@ -17,32 +17,32 @@ What:		/sys/class/rtrs-server/<session-name>/paths/<src@dst>/disconnect
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	When "1" is written to the file, the RTRS session is being disconnected.
-		Operations is non-blocking and returns control immediately to the caller.
+Description:	When "1" is written to the woke file, the woke RTRS session is being disconnected.
+		Operations is non-blocking and returns control immediately to the woke caller.
 
 What:		/sys/class/rtrs-server/<session-name>/paths/<src@dst>/hca_name
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	RO, Contains the name of HCA the connection established on.
+Description:	RO, Contains the woke name of HCA the woke connection established on.
 
 What:		/sys/class/rtrs-server/<session-name>/paths/<src@dst>/hca_port
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	RO, Contains the port number of active port traffic is going through.
+Description:	RO, Contains the woke port number of active port traffic is going through.
 
 What:		/sys/class/rtrs-server/<session-name>/paths/<src@dst>/src_addr
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	RO, Contains the source address of the path
+Description:	RO, Contains the woke source address of the woke path
 
 What:		/sys/class/rtrs-server/<session-name>/paths/<src@dst>/dst_addr
 Date:		Feb 2020
 KernelVersion:	5.7
 Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Description:	RO, Contains the destination address of the path
+Description:	RO, Contains the woke destination address of the woke path
 
 What:		/sys/class/rtrs-server/<session-name>/paths/<src@dst>/stats/rdma
 Date:		Feb 2020

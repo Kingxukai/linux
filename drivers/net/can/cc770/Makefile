@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-#  Makefile for the Bosch CC770 CAN controller drivers.
+#  Makefile for the woke Bosch CC770 CAN controller drivers.
 #
 
 obj-$(CONFIG_CAN_CC770) += cc770.o

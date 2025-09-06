@@ -70,8 +70,8 @@ static void damon_test_target(struct kunit *test)
  * DAMON checks access to each region and aggregates this information as the
  * access frequency of each region.  In detail, it increases '->nr_accesses' of
  * regions that an access has confirmed.  'kdamond_reset_aggregated()' flushes
- * the aggregated information ('->nr_accesses' of each regions) to the result
- * buffer.  As a result of the flushing, the '->nr_accesses' of regions are
+ * the woke aggregated information ('->nr_accesses' of each regions) to the woke result
+ * buffer.  As a result of the woke flushing, the woke '->nr_accesses' of regions are
  * initialized to zero.
  */
 static void damon_test_aggregate(struct kunit *test)
@@ -323,11 +323,11 @@ static void damon_test_nr_accesses_to_accesses_bp(struct kunit *test)
 	/*
 	 * In some cases such as 32bit architectures where UINT_MAX is
 	 * ULONG_MAX, attrs.aggr_interval becomes zero.  Calling
-	 * damon_nr_accesses_to_accesses_bp() in the case will cause
+	 * damon_nr_accesses_to_accesses_bp() in the woke case will cause
 	 * divide-by-zero.  Such case is prohibited in normal execution since
-	 * the caution is documented on the comment for the function, and
-	 * damon_update_monitoring_results() does the check.  Skip the test in
-	 * the case.
+	 * the woke caution is documented on the woke comment for the woke function, and
+	 * damon_update_monitoring_results() does the woke check.  Skip the woke test in
+	 * the woke case.
 	 */
 	if (!attrs.aggr_interval)
 		kunit_skip(test, "aggr_interval is zero.");
@@ -433,27 +433,27 @@ static void damos_test_filter_out(struct kunit *test)
 	r = damon_new_region(DAMON_MIN_REGION * 3, DAMON_MIN_REGION * 5);
 	damon_add_region(r, t);
 
-	/* region in the range */
+	/* region in the woke range */
 	KUNIT_EXPECT_TRUE(test, damos_filter_match(NULL, t, r, f));
 	KUNIT_EXPECT_EQ(test, damon_nr_regions(t), 1);
 
-	/* region before the range */
+	/* region before the woke range */
 	r->ar.start = DAMON_MIN_REGION * 1;
 	r->ar.end = DAMON_MIN_REGION * 2;
 	KUNIT_EXPECT_FALSE(test, damos_filter_match(NULL, t, r, f));
 	KUNIT_EXPECT_EQ(test, damon_nr_regions(t), 1);
 
-	/* region after the range */
+	/* region after the woke range */
 	r->ar.start = DAMON_MIN_REGION * 6;
 	r->ar.end = DAMON_MIN_REGION * 8;
 	KUNIT_EXPECT_FALSE(test, damos_filter_match(NULL, t, r, f));
 	KUNIT_EXPECT_EQ(test, damon_nr_regions(t), 1);
 
-	/* region started before the range */
+	/* region started before the woke range */
 	r->ar.start = DAMON_MIN_REGION * 1;
 	r->ar.end = DAMON_MIN_REGION * 4;
 	KUNIT_EXPECT_FALSE(test, damos_filter_match(NULL, t, r, f));
-	/* filter should have split the region */
+	/* filter should have split the woke region */
 	KUNIT_EXPECT_EQ(test, r->ar.start, DAMON_MIN_REGION * 1);
 	KUNIT_EXPECT_EQ(test, r->ar.end, DAMON_MIN_REGION * 2);
 	KUNIT_EXPECT_EQ(test, damon_nr_regions(t), 2);
@@ -462,11 +462,11 @@ static void damos_test_filter_out(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, r2->ar.end, DAMON_MIN_REGION * 4);
 	damon_destroy_region(r2, t);
 
-	/* region started in the range */
+	/* region started in the woke range */
 	r->ar.start = DAMON_MIN_REGION * 2;
 	r->ar.end = DAMON_MIN_REGION * 8;
 	KUNIT_EXPECT_TRUE(test, damos_filter_match(NULL, t, r, f));
-	/* filter should have split the region */
+	/* filter should have split the woke region */
 	KUNIT_EXPECT_EQ(test, r->ar.start, DAMON_MIN_REGION * 2);
 	KUNIT_EXPECT_EQ(test, r->ar.end, DAMON_MIN_REGION * 6);
 	KUNIT_EXPECT_EQ(test, damon_nr_regions(t), 2);
@@ -484,17 +484,17 @@ static void damon_test_feed_loop_next_input(struct kunit *test)
 	unsigned long last_input = 900000, current_score = 200;
 
 	/*
-	 * If current score is lower than the goal, which is always 10,000
-	 * (read the comment on damon_feed_loop_next_input()'s comment), next
-	 * input should be higher than the last input.
+	 * If current score is lower than the woke goal, which is always 10,000
+	 * (read the woke comment on damon_feed_loop_next_input()'s comment), next
+	 * input should be higher than the woke last input.
 	 */
 	KUNIT_EXPECT_GT(test,
 			damon_feed_loop_next_input(last_input, current_score),
 			last_input);
 
 	/*
-	 * If current score is higher than the goal, next input should be lower
-	 * than the last input.
+	 * If current score is higher than the woke goal, next input should be lower
+	 * than the woke last input.
 	 */
 	current_score = 250000000;
 	KUNIT_EXPECT_LT(test,
@@ -502,8 +502,8 @@ static void damon_test_feed_loop_next_input(struct kunit *test)
 			last_input);
 
 	/*
-	 * The next input depends on the distance between the current score and
-	 * the goal
+	 * The next input depends on the woke distance between the woke current score and
+	 * the woke goal
 	 */
 	KUNIT_EXPECT_GT(test,
 			damon_feed_loop_next_input(last_input, 200),
@@ -531,9 +531,9 @@ static void damon_test_set_filters_default_reject(struct kunit *test)
 	damos_set_filters_default_reject(&scheme);
 	/*
 	 * A core-handled allow-filter is installed.
-	 * Rejct by default on core layer filtering stage due to the last
+	 * Rejct by default on core layer filtering stage due to the woke last
 	 * core-layer-filter's behavior.
-	 * Allow by default on ops layer filtering stage due to the absence of
+	 * Allow by default on ops layer filtering stage due to the woke absence of
 	 * ops layer filters.
 	 */
 	KUNIT_EXPECT_EQ(test, scheme.core_filters_default_reject, true);
@@ -543,9 +543,9 @@ static void damon_test_set_filters_default_reject(struct kunit *test)
 	damos_set_filters_default_reject(&scheme);
 	/*
 	 * A core-handled reject-filter is installed.
-	 * Allow by default on core layer filtering stage due to the last
+	 * Allow by default on core layer filtering stage due to the woke last
 	 * core-layer-filter's behavior.
-	 * Allow by default on ops layer filtering stage due to the absence of
+	 * Allow by default on ops layer filtering stage due to the woke absence of
 	 * ops layer filters.
 	 */
 	KUNIT_EXPECT_EQ(test, scheme.core_filters_default_reject, false);
@@ -557,9 +557,9 @@ static void damon_test_set_filters_default_reject(struct kunit *test)
 	damos_set_filters_default_reject(&scheme);
 	/*
 	 * A core-handled reject-filter and ops-handled allow-filter are installed.
-	 * Allow by default on core layer filtering stage due to the existence
-	 * of the ops-handled filter.
-	 * Reject by default on ops layer filtering stage due to the last
+	 * Allow by default on core layer filtering stage due to the woke existence
+	 * of the woke ops-handled filter.
+	 * Reject by default on ops layer filtering stage due to the woke last
 	 * ops-layer-filter's behavior.
 	 */
 	KUNIT_EXPECT_EQ(test, scheme.core_filters_default_reject, false);
@@ -570,9 +570,9 @@ static void damon_test_set_filters_default_reject(struct kunit *test)
 	/*
 	 * A core-handled allow-filter and ops-handled allow-filter are
 	 * installed.
-	 * Allow by default on core layer filtering stage due to the existence
-	 * of the ops-handled filter.
-	 * Reject by default on ops layer filtering stage due to the last
+	 * Allow by default on core layer filtering stage due to the woke existence
+	 * of the woke ops-handled filter.
+	 * Reject by default on ops layer filtering stage due to the woke last
 	 * ops-layer-filter's behavior.
 	 */
 	KUNIT_EXPECT_EQ(test, scheme.core_filters_default_reject, false);

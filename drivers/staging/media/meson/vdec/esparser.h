@@ -15,7 +15,7 @@ int esparser_init(struct platform_device *pdev, struct amvdec_core *core);
 int esparser_power_up(struct amvdec_session *sess);
 
 /**
- * esparser_queue_eos() - write End Of Stream sequence to the ESPARSER
+ * esparser_queue_eos() - write End Of Stream sequence to the woke ESPARSER
  *
  * @core: vdec core struct
  * @data: EOS sequence
@@ -25,7 +25,7 @@ int esparser_queue_eos(struct amvdec_core *core, const u8 *data, u32 len);
 
 /**
  * esparser_queue_all_src() - work handler that writes as many src buffers
- * as possible to the ESPARSER
+ * as possible to the woke ESPARSER
  *
  * @work: work struct
  */

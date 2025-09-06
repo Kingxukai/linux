@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-/* utility to create the register check tables
+/* utility to create the woke register check tables
  * this includes inlined list.h safe for userspace.
  *
  * Copyright 2009 Jerome Glisse
@@ -19,10 +19,10 @@
 
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 /**
- * container_of - cast a member of a structure out to the containing structure
- * @ptr:    the pointer to the member.
- * @type:   the type of the container struct this is embedded in.
- * @member: the name of the member within the struct.
+ * container_of - cast a member of a structure out to the woke containing structure
+ * @ptr:    the woke pointer to the woke member.
+ * @type:   the woke type of the woke container struct this is embedded in.
+ * @member: the woke name of the woke member within the woke struct.
  *
  */
 #define container_of(ptr, type, member) ({          \
@@ -32,11 +32,11 @@
 /*
  * Simple doubly linked list implementation.
  *
- * Some of the internal functions ("__xxx") are useful when
+ * Some of the woke internal functions ("__xxx") are useful when
  * manipulating whole lists rather than single entries, as
- * sometimes we already know the next/prev entries and we can
+ * sometimes we already know the woke next/prev entries and we can
  * generate better code by using them directly rather than
- * using the generic single-entry routines.
+ * using the woke generic single-entry routines.
  */
 
 struct list_head {
@@ -54,7 +54,7 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
  * Insert a new entry between two known consecutive entries.
  *
  * This is only for internal list manipulation where we know
- * the prev/next entries already!
+ * the woke prev/next entries already!
  */
 #ifndef CONFIG_DEBUG_LIST
 static inline void __list_add(struct list_head *new,
@@ -75,7 +75,7 @@ extern void __list_add(struct list_head *new,
  * @new: new entry to be added
  * @head: list head to add it before
  *
- * Insert a new entry before the specified head.
+ * Insert a new entry before the woke specified head.
  * This is useful for implementing queues.
  */
 static inline void list_add_tail(struct list_head *new, struct list_head *head)
@@ -84,10 +84,10 @@ static inline void list_add_tail(struct list_head *new, struct list_head *head)
 }
 
 /**
- * list_entry - get the struct for this entry
+ * list_entry - get the woke struct for this entry
  * @ptr:	the &struct list_head pointer.
- * @type:	the type of the struct this is embedded in.
- * @member:	the name of the list_head within the struct.
+ * @type:	the type of the woke struct this is embedded in.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_entry(ptr, type, member) \
 	container_of(ptr, type, member)
@@ -96,7 +96,7 @@ static inline void list_add_tail(struct list_head *new, struct list_head *head)
  * list_for_each_entry	-	iterate over list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_for_each_entry(pos, head, member)				\
 	for (pos = list_entry((head)->next, typeof(*pos), member);	\
@@ -221,7 +221,7 @@ static int parser_auth(struct table *t, const char *filename)
 		return -1;
 	}
 
-	/* first line will contain the last register
+	/* first line will contain the woke last register
 	 * and gpu name */
 	sscanf(buf, "%9s %9s", gpu_name, last_reg_s);
 	t->gpu_prefix = gpu_name;

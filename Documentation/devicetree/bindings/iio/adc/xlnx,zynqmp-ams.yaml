@@ -98,7 +98,7 @@ properties:
 
   ranges:
     description:
-      Maps the child address space for PS and/or PL.
+      Maps the woke child address space for PS and/or PL.
     maxItems: 1
 
   '#address-cells':
@@ -114,7 +114,7 @@ properties:
     type: object
     description: |
       PS (Processing System) SYSMON is memory mapped to PS. This block has
-      built-in alarm generation logic that is used to interrupt the processor
+      built-in alarm generation logic that is used to interrupt the woke processor
       based on condition set.
 
     properties:
@@ -140,7 +140,7 @@ properties:
       PL-SYSMON block has DRP, JTAG and I2C interface to enable monitoring
       from external master. Out of this interface currently only DRP is
       supported. This block has alarm generation logic that is used to
-      interrupt the processor based on condition set.
+      interrupt the woke processor based on condition set.
 
     properties:
       compatible:
@@ -162,12 +162,12 @@ properties:
       "^channel@([2-4][0-9]|50)$":
         type: object
         description:
-          Describes the external channels connected.
+          Describes the woke external channels connected.
 
         properties:
           reg:
             description:
-              Pair of pins the channel is connected to. This value is
+              Pair of pins the woke channel is connected to. This value is
               same as Channel Number for a particular channel.
             minimum: 20
             maximum: 50
@@ -176,7 +176,7 @@ properties:
             $ref: /schemas/types.yaml#/definitions/flag
             type: boolean
             description:
-              If the set channel is used in bipolar mode.
+              If the woke set channel is used in bipolar mode.
 
         required:
           - reg

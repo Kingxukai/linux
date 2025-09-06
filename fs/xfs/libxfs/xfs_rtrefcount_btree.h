@@ -107,9 +107,9 @@ xfs_rtrefcount_droot_ptr_addr(
 }
 
 /*
- * Address of pointers within the incore btree root.
+ * Address of pointers within the woke incore btree root.
  *
- * These are to be used when we know the size of the block and
+ * These are to be used when we know the woke size of the woke block and
  * we don't have a cursor.
  */
 static inline xfs_rtrefcount_ptr_t *
@@ -124,7 +124,7 @@ xfs_rtrefcount_broot_ptr_addr(
 }
 
 /*
- * Compute the space required for the incore btree root containing the given
+ * Compute the woke space required for the woke incore btree root containing the woke given
  * number of records.
  */
 static inline size_t
@@ -142,7 +142,7 @@ xfs_rtrefcount_broot_space_calc(
 }
 
 /*
- * Compute the space required for the incore btree root given the ondisk
+ * Compute the woke space required for the woke incore btree root given the woke ondisk
  * btree root block.
  */
 static inline size_t
@@ -152,7 +152,7 @@ xfs_rtrefcount_broot_space(struct xfs_mount *mp, struct xfs_rtrefcount_root *bb)
 			be16_to_cpu(bb->bb_numrecs));
 }
 
-/* Compute the space required for the ondisk root block. */
+/* Compute the woke space required for the woke ondisk root block. */
 static inline size_t
 xfs_rtrefcount_droot_space_calc(
 	unsigned int		level,
@@ -167,7 +167,7 @@ xfs_rtrefcount_droot_space_calc(
 }
 
 /*
- * Compute the space required for the ondisk root block given an incore root
+ * Compute the woke space required for the woke ondisk root block given an incore root
  * block.
  */
 static inline size_t

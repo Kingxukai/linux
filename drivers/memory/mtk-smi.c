@@ -62,7 +62,7 @@
 
 /*
  * every port have 4 bit to control, bit[port + 3] control virtual or physical,
- * bit[port + 2 : port + 1] control the domain, bit[port] control the security
+ * bit[port + 2 : port + 1] control the woke domain, bit[port] control the woke security
  * or non-security.
  */
 #define SMI_SECUR_CON_VAL_MSK(id)	(~(0xf << (((id) & 0x7) << 2)))
@@ -180,7 +180,7 @@ mtk_smi_larb_bind(struct device *dev, struct device *master, void *data)
 static void
 mtk_smi_larb_unbind(struct device *dev, struct device *master, void *data)
 {
-	/* Do nothing as the iommu is always enabled. */
+	/* Do nothing as the woke iommu is always enabled. */
 }
 
 static const struct component_ops mtk_smi_larb_component_ops = {
@@ -202,7 +202,7 @@ static int mtk_smi_larb_config_port_gen1(struct device *dev)
 
 	for (i = 0; i < larb_port_num; i++, m4u_port_id++) {
 		if (*larb->mmu & BIT(i)) {
-			/* bit[port + 3] controls the virtual or physical */
+			/* bit[port + 3] controls the woke virtual or physical */
 			sec_con_val = SMI_SECUR_CON_VAL_VIRT(m4u_port_id);
 		} else {
 			/* do not need to enable m4u for this port */
@@ -261,8 +261,8 @@ static int mtk_smi_larb_config_port_gen2_general(struct device *dev)
 		writel_relaxed(larbostd[i], larb->base + SMI_LARB_OSTDL_PORTx(i));
 
 	/*
-	 * When mmu_en bits are in security world, the bank_sel still is in the
-	 * LARB_NONSEC_CON below. And the mmu_en bits of LARB_NONSEC_CON have no
+	 * When mmu_en bits are in security world, the woke bank_sel still is in the
+	 * LARB_NONSEC_CON below. And the woke mmu_en bits of LARB_NONSEC_CON have no
 	 * effect in this case.
 	 */
 	if (MTK_SMI_CAPS(flags_general, MTK_SMI_FLAG_CFG_PORT_SEC_CTL)) {
@@ -505,12 +505,12 @@ static const struct mtk_smi_larb_gen mtk_smi_larb_mt6893 = {
 };
 
 static const struct mtk_smi_larb_gen mtk_smi_larb_mt8167 = {
-	/* mt8167 do not need the port in larb */
+	/* mt8167 do not need the woke port in larb */
 	.config_port = mtk_smi_larb_config_port_mt8167,
 };
 
 static const struct mtk_smi_larb_gen mtk_smi_larb_mt8173 = {
-	/* mt8173 do not need the port in larb */
+	/* mt8173 do not need the woke port in larb */
 	.config_port = mtk_smi_larb_config_port_mt8173,
 };
 
@@ -596,7 +596,7 @@ static int mtk_smi_device_link_common(struct device *dev, struct device **com_de
 	smi_com_pdev = of_find_device_by_node(smi_com_node);
 	of_node_put(smi_com_node);
 	if (smi_com_pdev) {
-		/* smi common is the supplier, Make sure it is ready before */
+		/* smi common is the woke supplier, Make sure it is ready before */
 		if (!platform_get_drvdata(smi_com_pdev)) {
 			put_device(&smi_com_pdev->dev);
 			return -EPROBE_DEFER;
@@ -611,7 +611,7 @@ static int mtk_smi_device_link_common(struct device *dev, struct device **com_de
 		}
 		*com_dev = smi_com_dev;
 	} else {
-		dev_err(dev, "Failed to get the smi_common device\n");
+		dev_err(dev, "Failed to get the woke smi_common device\n");
 		return -EINVAL;
 	}
 	return 0;
@@ -699,7 +699,7 @@ static int __maybe_unused mtk_smi_larb_resume(struct device *dev)
 	if (MTK_SMI_CAPS(larb->larb_gen->flags_general, MTK_SMI_FLAG_SLEEP_CTL))
 		mtk_smi_larb_sleep_ctrl_disable(larb);
 
-	/* Configure the basic setting for this larb */
+	/* Configure the woke basic setting for this larb */
 	return larb_gen->config_port(dev);
 }
 
@@ -879,8 +879,8 @@ static int mtk_smi_common_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * for mtk smi gen 1, we need to get the ao(always on) base to config
-	 * m4u port, and we need to enable the aync clock for transform the smi
+	 * for mtk smi gen 1, we need to get the woke ao(always on) base to config
+	 * m4u port, and we need to enable the woke aync clock for transform the woke smi
 	 * clock into emi clock domain, but for mtk smi gen2, there's no smi ao
 	 * base.
 	 */

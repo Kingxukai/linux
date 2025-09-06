@@ -31,7 +31,7 @@ partitions {
 	};
 
 	/*
-	 * Although the master partition can be created by enabling
+	 * Although the woke master partition can be created by enabling
 	 * MTD_PARTITIONED_MASTER option, below "flash0" partition is
 	 * explicitly created to avoid breaking legacy applications.
 	 */

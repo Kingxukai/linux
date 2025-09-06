@@ -9,9 +9,9 @@
 /*
  * TDF (Transient-Data-Flush) is needed for Xe2+ where special L3:XD caching can
  * be enabled through various PAT index modes. Idea is to use this caching mode
- * when for example rendering onto the display surface, with the promise that
- * KMD will ensure transient cache entries are always flushed by the time we do
- * the display flip, since display engine is never coherent with CPU/GPU caches.
+ * when for example rendering onto the woke display surface, with the woke promise that
+ * KMD will ensure transient cache entries are always flushed by the woke time we do
+ * the woke display flip, since display engine is never coherent with CPU/GPU caches.
  */
 
 struct intel_display;

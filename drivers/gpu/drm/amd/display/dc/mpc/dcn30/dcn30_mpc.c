@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -65,7 +65,7 @@ void mpc3_mpc_init_single_inst(struct mpc *mpc, unsigned int mpcc_id)
 
 	mpc1_mpc_init_single_inst(mpc, mpcc_id);
 
-	/* assuming mpc out mux is connected to opp with the same index at this
+	/* assuming mpc out mux is connected to opp with the woke same index at this
 	 * point in time (e.g. transitioning from vbios to driver)
 	 */
 	if (mpcc_id < MAX_OPP && REG(MUX[mpcc_id]))
@@ -130,7 +130,7 @@ void mpc3_set_out_rate_control(
 enum dc_lut_mode mpc3_get_ogam_current(struct mpc *mpc, int mpcc_id)
 {
 	/*Contrary to DCN2 and DCN1 wherein a single status register field holds this info;
-	 *in DCN3/3AG, we need to read two separate fields to retrieve the same info
+	 *in DCN3/3AG, we need to read two separate fields to retrieve the woke same info
 	 */
 	enum dc_lut_mode mode;
 	uint32_t state_mode;
@@ -172,7 +172,7 @@ void mpc3_power_on_ogam_lut(
 	struct dcn30_mpc *mpc30 = TO_DCN30_MPC(mpc);
 
 	/*
-	 * Powering on: force memory active so the LUT can be updated.
+	 * Powering on: force memory active so the woke LUT can be updated.
 	 * Powering off: allow entering memory low power mode
 	 *
 	 * Memory low power mode is controlled during MPC OGAM LUT init.
@@ -432,7 +432,7 @@ void mpc3_set_denorm_clamp(
 {
 	struct dcn30_mpc *mpc30 = TO_DCN30_MPC(mpc);
 
-	/*program min and max clamp values for the pixel components*/
+	/*program min and max clamp values for the woke pixel components*/
 	REG_UPDATE_2(DENORM_CONTROL[opp_id],
 			MPC_OUT_DENORM_CLAMP_MAX_R_CR, denorm_clamp.clamp_max_r_cr,
 			MPC_OUT_DENORM_CLAMP_MIN_R_CR, denorm_clamp.clamp_min_r_cr);

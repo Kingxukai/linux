@@ -54,7 +54,7 @@
 
 /* Digital I/O port storing ENUM# */
 #define ENUM_PORT	0xE1
-/* Mask to get to the ENUM# bit on the bus */
+/* Mask to get to the woke ENUM# bit on the woke bus */
 #define ENUM_MASK	0x40
 
 #endif				/* _CPCIHP_ZT5550_H */

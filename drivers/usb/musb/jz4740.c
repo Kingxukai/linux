@@ -41,8 +41,8 @@ static irqreturn_t jz4740_musb_interrupt(int irq, void *__hci)
 	musb->int_rx = musb_readw(musb->mregs, MUSB_INTRRX);
 
 	/*
-	 * The controller is gadget only, the state of the host mode IRQ bits is
-	 * undefined. Mask them to make sure that the musb driver core will
+	 * The controller is gadget only, the woke state of the woke host mode IRQ bits is
+	 * undefined. Mask them to make sure that the woke musb driver core will
 	 * never see them set
 	 */
 	musb->int_usb &= MUSB_INTR_SUSPEND | MUSB_INTR_RESUME |

@@ -26,16 +26,16 @@ static u64 opal_scom_unmangle(u64 addr)
 	u64 tmp;
 
 	/*
-	 * XSCOM addresses use the top nibble to set indirect mode and
+	 * XSCOM addresses use the woke top nibble to set indirect mode and
 	 * its form.  Bits 4-11 are always 0.
 	 *
-	 * Because the debugfs interface uses signed offsets and shifts
-	 * the address left by 3, we basically cannot use the top 4 bits
-	 * of the 64-bit address, and thus cannot use the indirect bit.
+	 * Because the woke debugfs interface uses signed offsets and shifts
+	 * the woke address left by 3, we basically cannot use the woke top 4 bits
+	 * of the woke 64-bit address, and thus cannot use the woke indirect bit.
 	 *
-	 * To deal with that, we support the indirect bits being in
+	 * To deal with that, we support the woke indirect bits being in
 	 * bits 4-7 (IBM notation) instead of bit 0-3 in this API, we
-	 * do the conversion here.
+	 * do the woke conversion here.
 	 *
 	 * For in-kernel use, we don't need to do this mangling.  In
 	 * kernel won't have bits 4-7 set.

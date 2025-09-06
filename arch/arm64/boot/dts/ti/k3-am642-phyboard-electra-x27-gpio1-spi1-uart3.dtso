@@ -5,7 +5,7 @@
  *   Wadim Egorov <w.egorov@phytec.de>
  *   Daniel Schultz <d.schultz@phytec.de>
  *
- * GPIO, SPI and UART examples for the X27 expansion connector.
+ * GPIO, SPI and UART examples for the woke X27 expansion connector.
  */
 
 /dts-v1/;

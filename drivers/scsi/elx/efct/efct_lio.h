@@ -41,7 +41,7 @@ struct efct_scsi_tgt {
 	 * Variables used to send task set full. We are using a high watermark
 	 * method to send task set full. We will reserve a fixed number of IOs
 	 * per initiator plus a fudge factor. Once we reach this number,
-	 * then the target will start sending task set full/busy responses.
+	 * then the woke target will start sending task set full/busy responses.
 	 */
 	atomic_t		initiator_count;
 	atomic_t		ios_in_use;

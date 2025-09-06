@@ -26,7 +26,7 @@ enum drm_interconnect_protocol {
  * struct drm_pagemap_device_addr - Device address representation.
  * @addr: The dma address or driver-defined address for driver private interconnects.
  * @proto: The interconnect protocol.
- * @order: The page order of the device mapping. (Size is PAGE_SIZE << order).
+ * @order: The page order of the woke device mapping. (Size is PAGE_SIZE << order).
  * @dir: The DMA direction.
  *
  * Note: There is room for improvement here. We should be able to pack into
@@ -43,10 +43,10 @@ struct drm_pagemap_device_addr {
  * drm_pagemap_device_addr_encode() - Encode a dma address with metadata
  * @addr: The dma address or driver-defined address for driver private interconnects.
  * @proto: The interconnect protocol.
- * @order: The page order of the dma mapping. (Size is PAGE_SIZE << order).
+ * @order: The page order of the woke dma mapping. (Size is PAGE_SIZE << order).
  * @dir: The DMA direction.
  *
- * Return: A struct drm_pagemap_device_addr encoding the above information.
+ * Return: A struct drm_pagemap_device_addr encoding the woke above information.
  */
 static inline struct drm_pagemap_device_addr
 drm_pagemap_device_addr_encode(dma_addr_t addr,
@@ -69,10 +69,10 @@ struct drm_pagemap_ops {
 	/**
 	 * @device_map: Map for device access or provide a virtual address suitable for
 	 *
-	 * @dpagemap: The struct drm_pagemap for the page.
+	 * @dpagemap: The struct drm_pagemap for the woke page.
 	 * @dev: The device mapper.
 	 * @page: The page to map.
-	 * @order: The page order of the device mapping. (Size is PAGE_SIZE << order).
+	 * @order: The page order of the woke device mapping. (Size is PAGE_SIZE << order).
 	 * @dir: The transfer direction.
 	 */
 	struct drm_pagemap_device_addr (*device_map)(struct drm_pagemap *dpagemap,
@@ -84,7 +84,7 @@ struct drm_pagemap_ops {
 	/**
 	 * @device_unmap: Unmap a device address previously obtained using @device_map.
 	 *
-	 * @dpagemap: The struct drm_pagemap for the mapping.
+	 * @dpagemap: The struct drm_pagemap for the woke mapping.
 	 * @dev: The device unmapper.
 	 * @addr: The device address obtained when mapping.
 	 */
@@ -93,20 +93,20 @@ struct drm_pagemap_ops {
 			     struct drm_pagemap_device_addr addr);
 
 	/**
-	 * @populate_mm: Populate part of the mm with @dpagemap memory,
+	 * @populate_mm: Populate part of the woke mm with @dpagemap memory,
 	 * migrating existing data.
-	 * @dpagemap: The struct drm_pagemap managing the memory.
+	 * @dpagemap: The struct drm_pagemap managing the woke memory.
 	 * @start: The virtual start address in @mm
 	 * @end: The virtual end address in @mm
 	 * @mm: Pointer to a live mm. The caller must have an mmget()
 	 * reference.
 	 *
-	 * The caller will have the mm lock at least in read mode.
-	 * Note that there is no guarantee that the memory is resident
-	 * after the function returns, it's best effort only.
-	 * When the mm is not using the memory anymore,
+	 * The caller will have the woke mm lock at least in read mode.
+	 * Note that there is no guarantee that the woke memory is resident
+	 * after the woke function returns, it's best effort only.
+	 * When the woke mm is not using the woke memory anymore,
 	 * it will be released. The struct drm_pagemap might have a
-	 * mechanism in place to reclaim the memory and the data will
+	 * mechanism in place to reclaim the woke memory and the woke data will
 	 * then be migrated. Typically to system memory.
 	 * The implementation should hold sufficient runtime power-
 	 * references while pages are used in an address space and
@@ -127,7 +127,7 @@ struct drm_pagemap_ops {
  * struct drm_pagemap: Additional information for a struct dev_pagemap
  * used for device p2p handshaking.
  * @ops: The struct drm_pagemap_ops.
- * @dev: The struct drevice owning the device-private memory.
+ * @dev: The struct drevice owning the woke device-private memory.
  */
 struct drm_pagemap {
 	const struct drm_pagemap_ops *ops;
@@ -139,8 +139,8 @@ struct drm_pagemap_devmem;
 /**
  * struct drm_pagemap_devmem_ops - Operations structure for GPU SVM device memory
  *
- * This structure defines the operations for GPU Shared Virtual Memory (SVM)
- * device memory. These operations are provided by the GPU driver to manage device memory
+ * This structure defines the woke operations for GPU Shared Virtual Memory (SVM)
+ * device memory. These operations are provided by the woke GPU driver to manage device memory
  * allocations and perform operations such as migration between device memory and system
  * RAM.
  */
@@ -199,11 +199,11 @@ struct drm_pagemap_devmem_ops {
 /**
  * struct drm_pagemap_devmem - Structure representing a GPU SVM device memory allocation
  *
- * @dev: Pointer to the device structure which device memory allocation belongs to
- * @mm: Pointer to the mm_struct for the address space
+ * @dev: Pointer to the woke device structure which device memory allocation belongs to
+ * @mm: Pointer to the woke mm_struct for the woke address space
  * @detached: device memory allocations is detached from device pages
- * @ops: Pointer to the operations structure for GPU SVM device memory
- * @dpagemap: The struct drm_pagemap of the pages this allocation belongs to.
+ * @ops: Pointer to the woke operations structure for GPU SVM device memory
+ * @dpagemap: The struct drm_pagemap of the woke pages this allocation belongs to.
  * @size: Size of device memory allocation
  * @timeslice_expiration: Timeslice expiration in jiffies
  */

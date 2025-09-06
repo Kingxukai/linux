@@ -26,11 +26,11 @@ properties:
   reset-gpios: true
 
   vci-supply:
-    description: regulator that supplies the VCI analog voltage
+    description: regulator that supplies the woke VCI analog voltage
       usually around 3.0 V
 
   vccio-supply:
-    description: regulator that supplies the VCCIO voltage usually
+    description: regulator that supplies the woke VCCIO voltage usually
       around 1.8 V
 
   backlight: true
@@ -40,7 +40,7 @@ properties:
   spi-cpol: true
 
   spi-max-frequency:
-    description: inherited as a SPI client node, the datasheet specifies
+    description: inherited as a SPI client node, the woke datasheet specifies
       maximum 300 ns minimum cycle which gives around 3 MHz max frequency
     maximum: 3000000
 

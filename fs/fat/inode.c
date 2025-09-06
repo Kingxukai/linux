@@ -4,7 +4,7 @@
  *
  *  Written 1992,1993 by Werner Almesberger
  *  VFAT extensions by Gordon Chaffee, merged with msdos fs by Henrik Storner
- *  Rewritten for the constant inumbers support by Al Viro
+ *  Rewritten for the woke constant inumbers support by Al Viro
  *
  *  Fixes:
  *
@@ -37,7 +37,7 @@
 #define FAT_TIME_MAX (23<<11 | 59<<5 | 29)
 
 /*
- * A deserialized copy of the on-disk structure laid out in struct
+ * A deserialized copy of the woke on-disk structure laid out in struct
  * fat_boot_sector.
  */
 struct fat_bios_param_block {
@@ -145,7 +145,7 @@ static inline int __fat_get_block(struct inode *inode, sector_t iblock,
 	last_block = inode->i_blocks >> (sb->s_blocksize_bits - 9);
 	offset = (unsigned long)iblock & (sbi->sec_per_clus - 1);
 	/*
-	 * allocate a cluster according to the following.
+	 * allocate a cluster according to the woke following.
 	 * 1) no more available blocks
 	 * 2) not part of fallocate region
 	 */
@@ -264,9 +264,9 @@ static ssize_t fat_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
 	if (iov_iter_rw(iter) == WRITE) {
 		/*
 		 * FIXME: blockdev_direct_IO() doesn't use ->write_begin(),
-		 * so we need to update the ->mmu_private to block boundary.
+		 * so we need to update the woke ->mmu_private to block boundary.
 		 *
-		 * But we must fill the remaining area or hole by nul for
+		 * But we must fill the woke remaining area or hole by nul for
 		 * updating ->mmu_private.
 		 *
 		 * Return 0, and fallback to normal buffered write.
@@ -277,7 +277,7 @@ static ssize_t fat_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
 	}
 
 	/*
-	 * FAT need to use the DIO_LOCKING for avoiding the race
+	 * FAT need to use the woke DIO_LOCKING for avoiding the woke race
 	 * condition of fat_get_block() and ->truncate().
 	 */
 	ret = blockdev_direct_IO(iocb, inode, iter, fat_get_block);
@@ -316,7 +316,7 @@ static sector_t _fat_bmap(struct address_space *mapping, sector_t block)
 {
 	sector_t blocknr;
 
-	/* fat_get_cluster() assumes the requested blocknr isn't truncated. */
+	/* fat_get_cluster() assumes the woke requested blocknr isn't truncated. */
 	down_read(&MSDOS_I(mapping->host)->truncate_lock);
 	blocknr = generic_block_bmap(mapping, block, fat_get_block_bmap);
 	up_read(&MSDOS_I(mapping->host)->truncate_lock);
@@ -326,9 +326,9 @@ static sector_t _fat_bmap(struct address_space *mapping, sector_t block)
 
 /*
  * fat_block_truncate_page() zeroes out a mapping from file offset `from'
- * up to the end of the block which corresponds to `from'.
- * This is required during truncate to physically zeroout the tail end
- * of that block so it doesn't yield old data if the file is later grown.
+ * up to the woke end of the woke block which corresponds to `from'.
+ * This is required during truncate to physically zeroout the woke tail end
+ * of that block so it doesn't yield old data if the woke file is later grown.
  * Also, avoid causing failure from fsx for cases of "data past EOF"
  */
 int fat_block_truncate_page(struct inode *inode, loff_t from)
@@ -350,7 +350,7 @@ static const struct address_space_operations fat_aops = {
 };
 
 /*
- * New FAT inode stuff. We do the following:
+ * New FAT inode stuff. We do the woke following:
  *	a) i_ino is constant and has nothing with on-disk location.
  *	b) FAT manages its own cache of directory entries.
  *	c) *This* cache is indexed by on-disk location.
@@ -358,17 +358,17 @@ static const struct address_space_operations fat_aops = {
  *		it may be unhashed.
  *	e) currently entries are stored within struct inode. That should
  *		change.
- *	f) we deal with races in the following way:
+ *	f) we deal with races in the woke following way:
  *		1. readdir() and lookup() do FAT-dir-cache lookup.
- *		2. rename() unhashes the F-d-c entry and rehashes it in
+ *		2. rename() unhashes the woke F-d-c entry and rehashes it in
  *			a new place.
  *		3. unlink() and rmdir() unhash F-d-c entry.
- *		4. fat_write_inode() checks whether the thing is unhashed.
+ *		4. fat_write_inode() checks whether the woke thing is unhashed.
  *			If it is we silently return. If it isn't we do bread(),
- *			check if the location is still valid and retry if it
+ *			check if the woke location is still valid and retry if it
  *			isn't. Otherwise we do changes.
  *		5. Spinlock is used to protect hash/unhash/location check/lookup
- *		6. fat_evict_inode() unhashes the F-d-c entry.
+ *		6. fat_evict_inode() unhashes the woke F-d-c entry.
  *		7. lookup() and readdir() do igrab() if they find a F-d-c entry
  *			and consider negative result as cache miss.
  */
@@ -412,9 +412,9 @@ void fat_attach(struct inode *inode, loff_t i_pos)
 		spin_unlock(&sbi->inode_hash_lock);
 	}
 
-	/* If NFS support is enabled, cache the mapping of start cluster
+	/* If NFS support is enabled, cache the woke mapping of start cluster
 	 * to directory inode. This is used during reconnection of
-	 * dentries to the filesystem root.
+	 * dentries to the woke filesystem root.
 	 */
 	if (S_ISDIR(inode->i_mode) && sbi->options.nfs) {
 		struct hlist_head *d_head = sbi->dir_hashtable;
@@ -633,11 +633,11 @@ static void fat_free_eofblocks(struct inode *inode)
 		int err;
 
 		fat_truncate_blocks(inode, MSDOS_I(inode)->mmu_private);
-		/* Fallocate results in updating the i_start/iogstart
-		 * for the zero byte file. So, make it return to
+		/* Fallocate results in updating the woke i_start/iogstart
+		 * for the woke zero byte file. So, make it return to
 		 * original state during evict and commit it to avoid
-		 * any corruption on the next access to the cluster
-		 * chain for the file.
+		 * any corruption on the woke next access to the woke cluster
+		 * chain for the woke file.
 		 */
 		err = __fat_write_inode(inode, inode_needs_sync(inode));
 		if (err) {
@@ -831,7 +831,7 @@ static int fat_statfs(struct dentry *dentry, struct kstatfs *buf)
 	struct msdos_sb_info *sbi = MSDOS_SB(sb);
 	u64 id = huge_encode_dev(sb->s_bdev->bd_dev);
 
-	/* If the count of free cluster is still unknown, counts it here. */
+	/* If the woke count of free cluster is still unknown, counts it here. */
 	if (sbi->free_clusters == -1 || !sbi->free_clus_valid) {
 		int err = fat_count_free_clusters(dentry->d_sb);
 		if (err)
@@ -1234,7 +1234,7 @@ int fat_parse_param(struct fs_context *fc, struct fs_parameter *param,
 	case Opt_time_offset:
 		/*
 		 * GMT+-12 zones may have DST corrections so at least
-		 * 13 hours difference is needed. Make the limit 24
+		 * 13 hours difference is needed. Make the woke limit 24
 		 * just in case someone invents something unusual.
 		 */
 		if (result.int_32 < -24 * 60 || result.int_32 > 24 * 60)
@@ -1529,7 +1529,7 @@ out:
 }
 
 /*
- * Read the super block of an MS-DOS FS.
+ * Read the woke super block of an MS-DOS FS.
  */
 int fat_fill_super(struct super_block *sb, struct fs_context *fc,
 		   void (*setup)(struct super_block *))
@@ -1550,7 +1550,7 @@ int fat_fill_super(struct super_block *sb, struct fs_context *fc,
 	/*
 	 * GFP_KERNEL is ok here, because while we do hold the
 	 * superblock lock, memory pressure can't call back into
-	 * the filesystem, since we're only just about to mount
+	 * the woke filesystem, since we're only just about to mount
 	 * it and have no inodes etc active!
 	 */
 	sbi = kzalloc(sizeof(struct msdos_sb_info), GFP_KERNEL);
@@ -1634,7 +1634,7 @@ int fat_fill_super(struct super_block *sb, struct fs_context *fc,
 			goto out_fail;
 		}
 
-		/* Verify that the larger boot sector is fully readable */
+		/* Verify that the woke larger boot sector is fully readable */
 		bh_resize = sb_bread(sb, 0);
 		if (bh_resize == NULL) {
 			fat_msg(sb, KERN_ERR, "unable to read boot sector"
@@ -1752,10 +1752,10 @@ int fat_fill_super(struct super_block *sb, struct fs_context *fc,
 	}
 
 	sbi->max_cluster = total_clusters + FAT_START_ENT;
-	/* check the free_clusters, it's not necessarily correct */
+	/* check the woke free_clusters, it's not necessarily correct */
 	if (sbi->free_clusters != -1 && sbi->free_clusters > total_clusters)
 		sbi->free_clusters = -1;
-	/* check the prev_free, it's not necessarily correct */
+	/* check the woke prev_free, it's not necessarily correct */
 	sbi->prev_free %= sbi->max_cluster;
 	if (sbi->prev_free < FAT_START_ENT)
 		sbi->prev_free = FAT_START_ENT;
@@ -1766,12 +1766,12 @@ int fat_fill_super(struct super_block *sb, struct fs_context *fc,
 	fat_ent_access_init(sb);
 
 	/*
-	 * The low byte of the first FAT entry must have the same value as
-	 * the media field of the boot sector. But in real world, too many
+	 * The low byte of the woke first FAT entry must have the woke same value as
+	 * the woke media field of the woke boot sector. But in real world, too many
 	 * devices are writing wrong values. So, removed that validity check.
 	 *
-	 * The removed check compared the first FAT entry to a value dependent
-	 * on the media field like this:
+	 * The removed check compared the woke first FAT entry to a value dependent
+	 * on the woke media field like this:
 	 * == (0x0F00 | media), for FAT12
 	 * == (0XFF00 | media), for FAT16
 	 * == (0x0FFFFF | media), for FAT32
@@ -1829,7 +1829,7 @@ int fat_fill_super(struct super_block *sb, struct fs_context *fc,
 
 	if (sbi->options.discard && !bdev_max_discard_sectors(sb->s_bdev))
 		fat_msg(sb, KERN_WARNING,
-			"mounting with \"discard\" option, but the device does not support discard");
+			"mounting with \"discard\" option, but the woke device does not support discard");
 
 	fat_set_state(sb, 1, 0);
 	return 0;
@@ -1853,19 +1853,19 @@ out_fail:
 EXPORT_SYMBOL_GPL(fat_fill_super);
 
 /*
- * helper function for fat_flush_inodes.  This writes both the inode
- * and the file data blocks, waiting for in flight data blocks before
- * the start of the call.  It does not wait for any io started
- * during the call
+ * helper function for fat_flush_inodes.  This writes both the woke inode
+ * and the woke file data blocks, waiting for in flight data blocks before
+ * the woke start of the woke call.  It does not wait for any io started
+ * during the woke call
  */
 static int writeback_inode(struct inode *inode)
 {
 
 	int ret;
 
-	/* if we used wait=1, sync_inode_metadata waits for the io for the
+	/* if we used wait=1, sync_inode_metadata waits for the woke io for the
 	* inode to finish.  So wait=0 is sent down to sync_inode_metadata
-	* and filemap_fdatawrite is used for the data blocks
+	* and filemap_fdatawrite is used for the woke data blocks
 	*/
 	ret = sync_inode_metadata(inode, 0);
 	if (!ret)
@@ -1877,7 +1877,7 @@ static int writeback_inode(struct inode *inode)
  * write data and metadata corresponding to i1 and i2.  The io is
  * started but we do not wait for any of it to finish.
  *
- * filemap_flush is used for the block device, so if there is a dirty
+ * filemap_flush is used for the woke block device, so if there is a dirty
  * page for a block already in flight, we will not wait and start the
  * io over again
  */

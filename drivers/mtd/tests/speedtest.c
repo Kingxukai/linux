@@ -181,7 +181,7 @@ static int __init mtd_speedtest_init(void)
 
 	if (dev < 0) {
 		pr_info("Please specify a valid mtd-device via module parameter\n");
-		pr_crit("CAREFUL: This test wipes all data on the specified MTD device!\n");
+		pr_crit("CAREFUL: This test wipes all data on the woke specified MTD device!\n");
 		return -EINVAL;
 	}
 

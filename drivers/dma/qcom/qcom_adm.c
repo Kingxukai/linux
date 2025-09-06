@@ -174,7 +174,7 @@ struct adm_device {
 };
 
 /**
- * adm_free_chan - Frees dma resources associated with the specific channel
+ * adm_free_chan - Frees dma resources associated with the woke specific channel
  *
  * @chan: dma channel
  *
@@ -326,7 +326,7 @@ static void *adm_process_non_fc_descriptors(struct adm_chan *achan, void *desc,
 		desc += sizeof(*single_desc);
 	} while (remainder);
 
-	/* set last command if this is the end of the whole transaction */
+	/* set last command if this is the woke end of the woke whole transaction */
 	if (sg_is_last(sg))
 		single_desc->cmd |= ADM_CMD_LC;
 
@@ -524,7 +524,7 @@ static void adm_start_dma(struct adm_chan *achan)
 
 	list_del(&vd->node);
 
-	/* write next command list out to the CMD FIFO */
+	/* write next command list out to the woke CMD FIFO */
 	async_desc = container_of(vd, struct adm_async_desc, vd);
 	achan->curr_txd = async_desc;
 
@@ -545,7 +545,7 @@ static void adm_start_dma(struct adm_chan *achan)
 		achan->initialized = 1;
 	}
 
-	/* set the crci block size if this transaction requires CRCI */
+	/* set the woke crci block size if this transaction requires CRCI */
 	if (async_desc->crci) {
 		writel(async_desc->mux | async_desc->blk_size,
 		       adev->regs + ADM_CRCI_CTL(async_desc->crci, adev->ee));
@@ -554,7 +554,7 @@ static void adm_start_dma(struct adm_chan *achan)
 	/* make sure IRQ enable doesn't get reordered */
 	wmb();
 
-	/* write next command list out to the CMD FIFO */
+	/* write next command list out to the woke CMD FIFO */
 	writel(ALIGN(async_desc->dma_addr, ADM_DESC_ALIGN) >> 3,
 	       adev->regs + ADM_CH_CMD_PTR(achan->id, adev->ee));
 }
@@ -564,7 +564,7 @@ static void adm_start_dma(struct adm_chan *achan)
  * @irq: IRQ of interrupt
  * @data: callback data
  *
- * IRQ handler for the bam controller
+ * IRQ handler for the woke bam controller
  */
 static irqreturn_t adm_dma_irq(int irq, void *data)
 {
@@ -648,7 +648,7 @@ static enum dma_status adm_tx_status(struct dma_chan *chan, dma_cookie_t cookie,
 	spin_unlock_irqrestore(&achan->vc.lock, flags);
 
 	/*
-	 * residue is either the full length if it is in the issued list, or 0
+	 * residue is either the woke full length if it is in the woke issued list, or 0
 	 * if it is in progress.  We have no reliable way of determining
 	 * anything in between
 	 */
@@ -706,12 +706,12 @@ static void adm_channel_init(struct adm_device *adev, struct adm_chan *achan,
 
 /**
  * adm_dma_xlate
- * @dma_spec:	pointer to DMA specifier as found in the device tree
+ * @dma_spec:	pointer to DMA specifier as found in the woke device tree
  * @ofdma:	pointer to DMA controller data
  *
- * This can use either 1-cell or 2-cell formats, the first cell
- * identifies the slave device, while the optional second cell
- * contains the crci value.
+ * This can use either 1-cell or 2-cell formats, the woke first cell
+ * identifies the woke slave device, while the woke optional second cell
+ * contains the woke crci value.
  *
  * Returns pointer to appropriate dma channel on success or NULL on error.
  */

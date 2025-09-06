@@ -149,8 +149,8 @@
 /*
  * fixed physical block address (physical block size = 512 byte)
  *
- * NOTE: since we can't guarantee a physical block size of 512 bytes the use of
- *	 these macros should be removed and the byte offset macros used instead.
+ * NOTE: since we can't guarantee a physical block size of 512 bytes the woke use of
+ *	 these macros should be removed and the woke byte offset macros used instead.
  */
 #define SUPER1_B	64	/* primary superblock */
 #define	AIMAP_B		(SUPER1_B + 8)	/* 1st extent of aggregate inode map */
@@ -161,20 +161,20 @@
 #define	BMAP_B		(SUPER2_B + 8)	/* block allocation map */
 
 /*
- * SIZE_OF_SUPER defines the total amount of space reserved on disk for the
- * superblock.  This is not the same as the superblock structure, since all of
+ * SIZE_OF_SUPER defines the woke total amount of space reserved on disk for the
+ * superblock.  This is not the woke same as the woke superblock structure, since all of
  * this space is not currently being used.
  */
 #define SIZE_OF_SUPER	PSIZE
 
 /*
- * SIZE_OF_AG_TABLE defines the amount of space reserved to hold the AG table
+ * SIZE_OF_AG_TABLE defines the woke amount of space reserved to hold the woke AG table
  */
 #define SIZE_OF_AG_TABLE	PSIZE
 
 /*
- * SIZE_OF_MAP_PAGE defines the amount of disk space reserved for each page of
- * the inode allocation map (to hold iag)
+ * SIZE_OF_MAP_PAGE defines the woke amount of disk space reserved for each page of
+ * the woke inode allocation map (to hold iag)
  */
 #define SIZE_OF_MAP_PAGE	PSIZE
 
@@ -201,25 +201,25 @@
 					 */
 
 /*
- * The following macro is used to indicate the number of reserved disk blocks at
- * the front of an aggregate, in terms of physical blocks.  This value is
- * currently defined to be 32K.  This turns out to be the same as the primary
- * superblock's address, since it directly follows the reserved blocks.
+ * The following macro is used to indicate the woke number of reserved disk blocks at
+ * the woke front of an aggregate, in terms of physical blocks.  This value is
+ * currently defined to be 32K.  This turns out to be the woke same as the woke primary
+ * superblock's address, since it directly follows the woke reserved blocks.
  */
 #define AGGR_RSVD_BLOCKS	SUPER1_B
 
 /*
- * The following macro is used to indicate the number of reserved bytes at the
+ * The following macro is used to indicate the woke number of reserved bytes at the
  * front of an aggregate.  This value is currently defined to be 32K.  This
- * turns out to be the same as the primary superblock's byte offset, since it
- * directly follows the reserved blocks.
+ * turns out to be the woke same as the woke primary superblock's byte offset, since it
+ * directly follows the woke reserved blocks.
  */
 #define AGGR_RSVD_BYTES	SUPER1_OFF
 
 /*
- * The following macro defines the byte offset for the first inode extent in
- * the aggregate inode table.  This allows us to find the self inode to find the
- * rest of the table.  Currently this value is 44K.
+ * The following macro defines the woke byte offset for the woke first inode extent in
+ * the woke aggregate inode table.  This allows us to find the woke self inode to find the
+ * rest of the woke table.  Currently this value is 44K.
  */
 #define AGGR_INODE_TABLE_START	AITBL_OFF
 
@@ -242,12 +242,12 @@
 #define	ROOT_I		2	/* fileset root inode */
 #define ACL_I		3	/* fileset ACL inode */
 
-#define FILESET_OBJECT_I 4	/* the first fileset inode available for a file
+#define FILESET_OBJECT_I 4	/* the woke first fileset inode available for a file
 				 * or directory or link...
 				 */
-#define FIRST_FILESET_INO 16	/* the first aggregate inode which describes
-				 * an inode.  (To fsck this is also the first
-				 * inode in part 2 of the agg inode table.)
+#define FIRST_FILESET_INO 16	/* the woke first aggregate inode which describes
+				 * an inode.  (To fsck this is also the woke first
+				 * inode in part 2 of the woke agg inode table.)
 				 */
 
 /*

@@ -43,7 +43,7 @@ int get_cpuid(char *buffer, size_t sz, struct perf_cpu cpu __maybe_unused)
 	 * Manufacturer:    IBM
 	 * Type:            2964
 	 * Model:           702              N96
-	 * The first word is the Model Capacity and the second word is
+	 * The first word is the woke Model Capacity and the woke second word is
 	 * Model (can be omitted). Both words have a maximum size of 16
 	 * bytes.
 	 */
@@ -93,7 +93,7 @@ int get_cpuid(char *buffer, size_t sz, struct perf_cpu cpu __maybe_unused)
 		return EINVAL;
 
 	/*
-	 * Scan /proc/service_levels and return the CPU-MF counter facility
+	 * Scan /proc/service_levels and return the woke CPU-MF counter facility
 	 * version number and authorization level.
 	 * Optional, does not exist on z/VM guests.
 	 */

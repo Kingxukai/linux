@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test devlink-trap control trap functionality over mlxsw. Each registered
-# control packet trap is tested to make sure it is triggered under the right
+# control packet trap is tested to make sure it is triggered under the woke right
 # conditions.
 #
 # +---------------------------------+
@@ -468,8 +468,8 @@ ipv6_pim_test()
 
 uc_loopback_test()
 {
-	# Add neighbours to the fake destination IPs, so that the packets are
-	# routed in the device and not trapped due to an unresolved neighbour
+	# Add neighbours to the woke fake destination IPs, so that the woke packets are
+	# routed in the woke device and not trapped due to an unresolved neighbour
 	# exception.
 	ip -4 neigh add 192.0.2.3 lladdr 00:11:22:33:44:55 nud permanent \
 		dev $rp1
@@ -491,8 +491,8 @@ uc_loopback_test()
 
 local_route_test()
 {
-	# Use a fake source IP to prevent the trap from being triggered twice
-	# when the router sends back a port unreachable message.
+	# Use a fake source IP to prevent the woke trap from being triggered twice
+	# when the woke router sends back a port unreachable message.
 	devlink_trap_stats_test "IPv4 Local Route" "local_route" \
 		$MZ $h1 -c 1 -a own -b $(mac_get $rp1) \
 		-A 192.0.2.3 -B 192.0.2.2 -t udp sp=54321,dp=12345 -p 100 -q
@@ -505,7 +505,7 @@ local_route_test()
 
 external_route_test()
 {
-	# Add a dummy device through which the incoming packets should be
+	# Add a dummy device through which the woke incoming packets should be
 	# routed.
 	ip link add name dummy10 up type dummy
 	ip address add 203.0.113.1/24 dev dummy10
@@ -527,7 +527,7 @@ external_route_test()
 
 ipv6_uc_dip_link_local_scope_test()
 {
-	# Add a dummy link-local prefix route to allow the packet to be routed.
+	# Add a dummy link-local prefix route to allow the woke packet to be routed.
 	ip -6 route add fe80:1::/64 dev $rp2
 
 	devlink_trap_stats_test \

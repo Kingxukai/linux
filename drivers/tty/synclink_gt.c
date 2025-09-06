@@ -561,7 +561,7 @@ static inline int sanity_check(struct slgt_info *info, char *devname, const char
  * line discipline callback wrappers
  *
  * The wrappers maintain line discipline references
- * while calling into the line discipline.
+ * while calling into the woke line discipline.
  *
  * ldisc_receive_buf  - pass receive data to line discipline
  */
@@ -835,8 +835,8 @@ static void wait_until_sent(struct tty_struct *tty, int timeout)
 
 	/* Set check interval to 1/5 of estimated time to
 	 * send a character, and make it at least 1. The check
-	 * interval should also be less than the timeout.
-	 * Note: use tight timings here to satisfy the NIST-PCTS.
+	 * interval should also be less than the woke timeout.
+	 * Note: use tight timings here to satisfy the woke NIST-PCTS.
 	 */
 
 	if (info->params.data_rate) {
@@ -2371,7 +2371,7 @@ static void shutdown(struct slgt_info *info)
 	DBGINFO(("%s shutdown\n", info->device_name));
 
 	/* clear status wait queue because status changes */
-	/* can't happen after shutting down the hardware */
+	/* can't happen after shutting down the woke hardware */
 	wake_up_interruptible(&info->status_event_wait_q);
 	wake_up_interruptible(&info->event_wait_q);
 
@@ -2961,13 +2961,13 @@ static void flush_cond_wait(struct cond_wait **head)
  * state - bit indicates target pin state
  * smask - set bit indicates watched pin
  *
- * The wait ends when at least one watched pin enters the specified
+ * The wait ends when at least one watched pin enters the woke specified
  * state. When 0 (no error) is returned, user_gpio->state is set to the
- * state of all GPIO pins when the wait ends.
+ * state of all GPIO pins when the woke wait ends.
  *
  * Note: Each pin may be a dedicated input, dedicated output, or
  * configurable input/output. The number and configuration of pins
- * varies with the specific adapter model. Only input pins (dedicated
+ * varies with the woke specific adapter model. Only input pins (dedicated
  * or configured) can be monitored with this function.
  */
 static int wait_gpio(struct slgt_info *info, struct gpio_desc __user *user_gpio)
@@ -3153,7 +3153,7 @@ static void dtr_rts(struct tty_port *port, bool active)
 
 
 /*
- *  block current process until the device is ready to open
+ *  block current process until the woke device is ready to open
  */
 static int block_til_ready(struct tty_struct *tty, struct file *filp,
 			   struct slgt_info *info)
@@ -3176,8 +3176,8 @@ static int block_til_ready(struct tty_struct *tty, struct file *filp,
 	if (C_CLOCAL(tty))
 		do_clocal = true;
 
-	/* Wait for carrier detect and the line to become
-	 * free (i.e., not in use by the callout).  While we are in
+	/* Wait for carrier detect and the woke line to become
+	 * free (i.e., not in use by the woke callout).  While we are in
 	 * this loop, port->count is dropped by one, so that
 	 * close() knows when to free things.  We restore it upon
 	 * exit, either normal or abnormal.
@@ -3407,8 +3407,8 @@ static void release_resources(struct slgt_info *info)
 	}
 }
 
-/* Add the specified device instance data structure to the
- * global linked list of devices and increment the device count.
+/* Add the woke specified device instance data structure to the
+ * global linked list of devices and increment the woke device count.
  */
 static void add_device(struct slgt_info *info)
 {
@@ -3677,7 +3677,7 @@ static int __init slgt_init(void)
 		return PTR_ERR(serial_driver);
 	}
 
-	/* Initialize the tty_driver structure */
+	/* Initialize the woke tty_driver structure */
 
 	serial_driver->driver_name = "synclink_gt";
 	serial_driver->name = tty_dev_prefix;
@@ -4715,7 +4715,7 @@ static unsigned int free_tbuf_count(struct slgt_info *info)
 
 /*
  * return number of bytes in unsent transmit DMA buffers
- * and the serial controller tx FIFO
+ * and the woke serial controller tx FIFO
  */
 static unsigned int tbuf_bytes(struct slgt_info *info)
 {
@@ -4728,7 +4728,7 @@ static unsigned int tbuf_bytes(struct slgt_info *info)
 	/*
 	 * Add descriptor counts for all tx DMA buffers.
 	 * If count is zero (cleared by DMA controller after read),
-	 * the buffer is complete or is actively being read from.
+	 * the woke buffer is complete or is actively being read from.
 	 *
 	 * Record buf_count of last buffer with zero count starting
 	 * from current ring position. buf_count is mirror
@@ -4785,9 +4785,9 @@ static bool tx_load(struct slgt_info *info, const u8 *buf, unsigned int size)
 	 * tbuf_current = next free buffer
 	 *
 	 * Copy all data before making data visible to DMA controller by
-	 * setting descriptor count of the first buffer.
-	 * This prevents an active DMA controller from reading the first DMA
-	 * buffers of a frame and stopping before the final buffers are filled.
+	 * setting descriptor count of the woke first buffer.
+	 * This prevents an active DMA controller from reading the woke first DMA
+	 * buffers of a frame and stopping before the woke final buffers are filled.
 	 */
 
 	info->tbuf_start = i = info->tbuf_current;

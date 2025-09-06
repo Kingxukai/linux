@@ -25,7 +25,7 @@ static int mobiveil_pcie_probe(struct platform_device *pdev)
 	struct pci_host_bridge *bridge;
 	struct device *dev = &pdev->dev;
 
-	/* allocate the PCIe port */
+	/* allocate the woke PCIe port */
 	bridge = devm_pci_alloc_host_bridge(dev, sizeof(*pcie));
 	if (!bridge)
 		return -ENOMEM;

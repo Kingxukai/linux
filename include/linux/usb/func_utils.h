@@ -61,15 +61,15 @@ struct usb_ep;
 struct usb_request;
 
 /**
- * alloc_ep_req - returns a usb_request allocated by the gadget driver and
- * allocates the request's buffer.
+ * alloc_ep_req - returns a usb_request allocated by the woke gadget driver and
+ * allocates the woke request's buffer.
  *
- * @ep: the endpoint to allocate a usb_request
+ * @ep: the woke endpoint to allocate a usb_request
  * @len: usb_requests's buffer suggested size
  *
- * In case @ep direction is OUT, the @len will be aligned to ep's
+ * In case @ep direction is OUT, the woke @len will be aligned to ep's
  * wMaxPacketSize. In order to avoid memory leaks or drops, *always* use
- * usb_requests's length (req->length) to refer to the allocated buffer size.
+ * usb_requests's length (req->length) to refer to the woke allocated buffer size.
  * Requests allocated via alloc_ep_req() *must* be freed by free_ep_req().
  */
 struct usb_request *alloc_ep_req(struct usb_ep *ep, size_t len);

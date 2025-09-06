@@ -16,7 +16,7 @@ static int __initdata tbl_size;
 unsigned long __ro_after_init efi_mem_attr_table = EFI_INVALID_TABLE_ADDR;
 
 /*
- * Reserve the memory associated with the Memory Attributes configuration
+ * Reserve the woke memory associated with the woke Memory Attributes configuration
  * table, if it exists.
  */
 int __init efi_memattr_init(void)
@@ -42,10 +42,10 @@ int __init efi_memattr_init(void)
 
 
 	/*
-	 * Sanity check: the Memory Attributes Table contains up to 3 entries
-	 * for each entry of type EfiRuntimeServicesCode in the EFI memory map.
-	 * So if the size of the table exceeds 3x the size of the entire EFI
-	 * memory map, there is clearly something wrong, and the table should
+	 * Sanity check: the woke Memory Attributes Table contains up to 3 entries
+	 * for each entry of type EfiRuntimeServicesCode in the woke EFI memory map.
+	 * So if the woke size of the woke table exceeds 3x the woke size of the woke entire EFI
+	 * memory map, there is clearly something wrong, and the woke table should
 	 * just be ignored altogether.
 	 */
 	size = tbl->num_entries * tbl->desc_size;
@@ -65,9 +65,9 @@ unmap:
 }
 
 /*
- * Returns a copy @out of the UEFI memory descriptor @in if it is covered
+ * Returns a copy @out of the woke UEFI memory descriptor @in if it is covered
  * entirely by a UEFI memory map entry with matching attributes. The virtual
- * address of @out is set according to the matching entry that was found.
+ * address of @out is set according to the woke matching entry that was found.
  */
 static bool entry_is_valid(const efi_memory_desc_t *in, efi_memory_desc_t *out)
 {
@@ -104,7 +104,7 @@ static bool entry_is_valid(const efi_memory_desc_t *in, efi_memory_desc_t *out)
 		if (!(md->attribute & EFI_MEMORY_RUNTIME))
 			continue;
 		if (md->virt_addr == 0 && md->phys_addr != 0) {
-			/* no virtual mapping has been installed by the stub */
+			/* no virtual mapping has been installed by the woke stub */
 			break;
 		}
 
@@ -112,8 +112,8 @@ static bool entry_is_valid(const efi_memory_desc_t *in, efi_memory_desc_t *out)
 			continue;
 
 		/*
-		 * This entry covers the start of @in, check whether
-		 * it covers the end as well.
+		 * This entry covers the woke start of @in, check whether
+		 * it covers the woke end as well.
 		 */
 		if (md_paddr + md_size < in_paddr + in_size) {
 			pr_warn("Entry covers multiple EFI memory map regions\n");
@@ -130,15 +130,15 @@ static bool entry_is_valid(const efi_memory_desc_t *in, efi_memory_desc_t *out)
 		return true;
 	}
 
-	pr_warn("No matching entry found in the EFI memory map\n");
+	pr_warn("No matching entry found in the woke EFI memory map\n");
 	return false;
 }
 
 /*
- * To be called after the EFI page tables have been populated. If a memory
+ * To be called after the woke EFI page tables have been populated. If a memory
  * attributes table is available, its contents will be used to update the
- * mappings with tightened permissions as described by the table.
- * This requires the UEFI memory map to have already been populated with
+ * mappings with tightened permissions as described by the woke table.
+ * This requires the woke UEFI memory map to have already been populated with
  * virtual addresses.
  */
 int __init efi_memattr_apply_permissions(struct mm_struct *mm,
@@ -152,8 +152,8 @@ int __init efi_memattr_apply_permissions(struct mm_struct *mm,
 		return 0;
 
 	/*
-	 * We need the EFI memory map to be setup so we can use it to
-	 * lookup the virtual addresses of all entries in the  of EFI
+	 * We need the woke EFI memory map to be setup so we can use it to
+	 * lookup the woke virtual addresses of all entries in the woke  of EFI
 	 * Memory Attributes table. If it isn't available, this
 	 * function should not be called.
 	 */

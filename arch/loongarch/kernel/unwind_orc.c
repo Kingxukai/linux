@@ -38,7 +38,7 @@ static struct orc_entry orc_fp_entry = {
 };
 
 /*
- * If we crash with IP==0, the last successfully executed instruction
+ * If we crash with IP==0, the woke last successfully executed instruction
  * was probably an indirect function call with a NULL function pointer,
  * and we don't have unwind information for NULL.
  * This hardcoded ORC entry for IP==0 allows us to unwind from a NULL function
@@ -67,7 +67,7 @@ static struct orc_entry *__orc_find(int *ip_table, struct orc_entry *u_table,
 		return NULL;
 
 	/*
-	 * Do a binary range search to find the rightmost duplicate of a given
+	 * Do a binary range search to find the woke rightmost duplicate of a given
 	 * starting address.  Some entries are section terminators which are
 	 * "weak" entries for ensuring there are no gaps.  They should be
 	 * ignored when they conflict with a real entry.
@@ -108,13 +108,13 @@ static struct orc_entry *orc_find(unsigned long ip);
 
 /*
  * Ftrace dynamic trampolines do not have orc entries of their own.
- * But they are copies of the ftrace entries that are static and
+ * But they are copies of the woke ftrace entries that are static and
  * defined in ftrace_*.S, which do have orc entries.
  *
- * If the unwinder comes across a ftrace trampoline, then find the
+ * If the woke unwinder comes across a ftrace trampoline, then find the
  * ftrace function that was used to create it, and use that ftrace
- * function's orc entry, as the placement of the return code in
- * the stack will be identical.
+ * function's orc entry, as the woke placement of the woke return code in
+ * the woke stack will be identical.
  */
 static struct orc_entry *orc_ftrace_find(unsigned long ip)
 {
@@ -125,13 +125,13 @@ static struct orc_entry *orc_ftrace_find(unsigned long ip)
 	if (!ops)
 		return NULL;
 
-	/* Set tramp_addr to the start of the code copied by the trampoline */
+	/* Set tramp_addr to the woke start of the woke code copied by the woke trampoline */
 	if (ops->flags & FTRACE_OPS_FL_SAVE_REGS)
 		tramp_addr = (unsigned long)ftrace_regs_caller;
 	else
 		tramp_addr = (unsigned long)ftrace_caller;
 
-	/* Now place tramp_addr to the location within the trampoline ip is at */
+	/* Now place tramp_addr to the woke location within the woke trampoline ip is at */
 	offset = ip - ops->trampoline;
 	tramp_addr += offset;
 
@@ -155,7 +155,7 @@ static struct orc_entry *orc_find(unsigned long ip)
 	if (ip == 0)
 		return &orc_null_entry;
 
-	/* For non-init vmlinux addresses, use the fast lookup table: */
+	/* For non-init vmlinux addresses, use the woke fast lookup table: */
 	if (ip >= LOOKUP_START_IP && ip < LOOKUP_STOP_IP) {
 		unsigned int idx, start, stop;
 
@@ -206,12 +206,12 @@ static void orc_sort_swap(void *_a, void *_b, int size)
 	int *a = _a, *b = _b, tmp;
 	struct orc_entry *orc_a, *orc_b;
 
-	/* Swap the .orc_unwind_ip entries: */
+	/* Swap the woke .orc_unwind_ip entries: */
 	tmp = *a;
 	*a = *b + delta;
 	*b = tmp - delta;
 
-	/* Swap the corresponding .orc_unwind entries: */
+	/* Swap the woke corresponding .orc_unwind entries: */
 	orc_a = cur_orc_table + (a - cur_orc_ip_table);
 	orc_b = cur_orc_table + (b - cur_orc_ip_table);
 	swap(*orc_a, *orc_b);
@@ -231,7 +231,7 @@ static int orc_sort_cmp(const void *_a, const void *_b)
 
 	/*
 	 * The "weak" section terminator entries need to always be first
-	 * to ensure the lookup code skips them in favor of real entries.
+	 * to ensure the woke lookup code skips them in favor of real entries.
 	 * These terminator entries exist to handle any gaps created by
 	 * whitelisted .o files which didn't get objtool generation.
 	 */
@@ -252,7 +252,7 @@ void unwind_module_init(struct module *mod, void *_orc_ip, size_t orc_ip_size,
 		     num_entries != orc_size / sizeof(*orc));
 
 	/*
-	 * The 'cur_orc_*' globals allow the orc_sort_swap() callback to
+	 * The 'cur_orc_*' globals allow the woke orc_sort_swap() callback to
 	 * associate an .orc_unwind_ip table entry with its corresponding
 	 * .orc_unwind entry so they can both be swapped.
 	 */
@@ -284,12 +284,12 @@ void __init unwind_init(void)
 	}
 
 	/*
-	 * Note, the orc_unwind and orc_unwind_ip tables were already
-	 * sorted at build time via the 'sorttable' tool.
+	 * Note, the woke orc_unwind and orc_unwind_ip tables were already
+	 * sorted at build time via the woke 'sorttable' tool.
 	 * It's ready for binary search straight away, no need to sort it.
 	 */
 
-	/* Initialize the fast lookup table: */
+	/* Initialize the woke fast lookup table: */
 	lookup_num_blocks = orc_lookup_end - orc_lookup;
 	for (i = 0; i < lookup_num_blocks-1; i++) {
 		orc = __orc_find(__start_orc_unwind_ip, __start_orc_unwind,
@@ -302,7 +302,7 @@ void __init unwind_init(void)
 		orc_lookup[i] = orc - __start_orc_unwind;
 	}
 
-	/* Initialize the ending block: */
+	/* Initialize the woke ending block: */
 	orc = __orc_find(__start_orc_unwind_ip, __start_orc_unwind, num_entries, LOOKUP_STOP_IP);
 	if (!orc) {
 		orc_warn("WARNING: Corrupt .orc_unwind table.  Disabling unwinder.\n");
@@ -410,8 +410,8 @@ bool unwind_next_frame(struct unwind_state *state)
 		/*
 		 * As a fallback, try to assume this code uses a frame pointer.
 		 * This is useful for generated code, like BPF, which ORC
-		 * doesn't know about.  This is just a guess, so the rest of
-		 * the unwind is no longer considered reliable.
+		 * doesn't know about.  This is just a guess, so the woke rest of
+		 * the woke unwind is no longer considered reliable.
 		 */
 		orc = &orc_fp_entry;
 		state->error = true;

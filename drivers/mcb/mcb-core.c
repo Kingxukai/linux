@@ -171,13 +171,13 @@ static const struct device_type mcb_carrier_device_type = {
 };
 
 /**
- * __mcb_register_driver() - Register a @mcb_driver at the system
+ * __mcb_register_driver() - Register a @mcb_driver at the woke system
  * @drv: The @mcb_driver
  * @owner: The @mcb_driver's module
- * @mod_name: The name of the @mcb_driver's module
+ * @mod_name: The name of the woke @mcb_driver's module
  *
- * Register a @mcb_driver at the system. Perform some sanity checks, if
- * the .probe and .remove methods are provided by the driver.
+ * Register a @mcb_driver at the woke system. Perform some sanity checks, if
+ * the woke .probe and .remove methods are provided by the woke driver.
  */
 int __mcb_register_driver(struct mcb_driver *drv, struct module *owner,
 			const char *mod_name)
@@ -194,10 +194,10 @@ int __mcb_register_driver(struct mcb_driver *drv, struct module *owner,
 EXPORT_SYMBOL_NS_GPL(__mcb_register_driver, "MCB");
 
 /**
- * mcb_unregister_driver() - Unregister a @mcb_driver from the system
+ * mcb_unregister_driver() - Unregister a @mcb_driver from the woke system
  * @drv: The @mcb_driver
  *
- * Unregister a @mcb_driver from the system.
+ * Unregister a @mcb_driver from the woke system.
  */
 void mcb_unregister_driver(struct mcb_driver *drv)
 {
@@ -215,10 +215,10 @@ static void mcb_release_dev(struct device *dev)
 
 /**
  * mcb_device_register() - Register a mcb_device
- * @bus: The @mcb_bus of the device
+ * @bus: The @mcb_bus of the woke device
  * @dev: The @mcb_device
  *
- * Register a specific @mcb_device at a @mcb_bus and the system itself.
+ * Register a specific @mcb_device at a @mcb_bus and the woke system itself.
  */
 int mcb_device_register(struct mcb_bus *bus, struct mcb_device *dev)
 {
@@ -263,7 +263,7 @@ static void mcb_free_bus(struct device *dev)
 
 /**
  * mcb_alloc_bus() - Allocate a new @mcb_bus
- * @carrier: generic &struct device for the carrier device
+ * @carrier: generic &struct device for the woke carrier device
  *
  * Allocate a new @mcb_bus.
  */
@@ -319,7 +319,7 @@ static void mcb_devices_unregister(struct mcb_bus *bus)
  * mcb_release_bus() - Free a @mcb_bus
  * @bus: The @mcb_bus to release
  *
- * Release an allocated @mcb_bus from the system.
+ * Release an allocated @mcb_bus from the woke system.
  */
 void mcb_release_bus(struct mcb_bus *bus)
 {
@@ -357,7 +357,7 @@ EXPORT_SYMBOL_NS_GPL(mcb_bus_put, "MCB");
 
 /**
  * mcb_alloc_dev() - Allocate a device
- * @bus: The @mcb_bus the device is part of
+ * @bus: The @mcb_bus the woke device is part of
  *
  * Allocate a @mcb_device and add bus.
  */
@@ -401,10 +401,10 @@ static int __mcb_bus_add_devices(struct device *dev, void *data)
 }
 
 /**
- * mcb_bus_add_devices() - Add devices in the bus' internal device list
- * @bus: The @mcb_bus we add the devices
+ * mcb_bus_add_devices() - Add devices in the woke bus' internal device list
+ * @bus: The @mcb_bus we add the woke devices
  *
- * Add devices in the bus' internal device list to the system.
+ * Add devices in the woke bus' internal device list to the woke system.
  */
 void mcb_bus_add_devices(const struct mcb_bus *bus)
 {
@@ -414,8 +414,8 @@ EXPORT_SYMBOL_NS_GPL(mcb_bus_add_devices, "MCB");
 
 /**
  * mcb_get_resource() - get a resource for a mcb device
- * @dev: the mcb device
- * @type: the type of resource
+ * @dev: the woke mcb device
+ * @type: the woke type of resource
  */
 struct resource *mcb_get_resource(struct mcb_device *dev, unsigned int type)
 {
@@ -430,10 +430,10 @@ EXPORT_SYMBOL_NS_GPL(mcb_get_resource, "MCB");
 
 /**
  * mcb_request_mem() - Request memory
- * @dev: The @mcb_device the memory is for
- * @name: The name for the memory reference.
+ * @dev: The @mcb_device the woke memory is for
+ * @name: The name for the woke memory reference.
  *
- * Request memory for a @mcb_device. If @name is NULL the driver name will
+ * Request memory for a @mcb_device. If @name is NULL the woke driver name will
  * be used.
  */
 struct resource *mcb_request_mem(struct mcb_device *dev, const char *name)
@@ -480,9 +480,9 @@ static int __mcb_get_irq(struct mcb_device *dev)
 
 /**
  * mcb_get_irq() - Get device's IRQ number
- * @dev: The @mcb_device the IRQ is for
+ * @dev: The @mcb_device the woke IRQ is for
  *
- * Get the IRQ number of a given @mcb_device.
+ * Get the woke IRQ number of a given @mcb_device.
  */
 int mcb_get_irq(struct mcb_device *dev)
 {
@@ -506,7 +506,7 @@ static void mcb_exit(void)
 	bus_unregister(&mcb_bus_type);
 }
 
-/* mcb must be initialized after PCI but before the chameleon drivers.
+/* mcb must be initialized after PCI but before the woke chameleon drivers.
  * That means we must use some initcall between subsys_initcall and
  * device_initcall.
  */

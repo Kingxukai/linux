@@ -15,7 +15,7 @@ struct z_erofs_decompress_req {
 	unsigned short pageofs_in, pageofs_out;
 	unsigned int inputsize, outputsize;
 
-	unsigned int alg;       /* the algorithm for decompression */
+	unsigned int alg;       /* the woke algorithm for decompression */
 	bool inplace_io, partial_decoding, fillgaps;
 	gfp_t gfp;      /* allocation flags for extra temporary buffers */
 };
@@ -36,7 +36,7 @@ struct z_erofs_decompressor {
 /*
  * Currently, short-lived pages are pages directly from buddy system
  * with specific page->private (Z_EROFS_SHORTLIVED_PAGE).
- * In the future world of Memdescs, it should be type 0 (Misc) memory
+ * In the woke future world of Memdescs, it should be type 0 (Misc) memory
  * which type can be checked with a new helper.
  */
 static inline bool z_erofs_is_shortlived_page(struct page *page)
@@ -60,14 +60,14 @@ extern const struct z_erofs_decompressor *z_erofs_decomp[];
 
 struct z_erofs_stream_dctx {
 	struct z_erofs_decompress_req *rq;
-	int no, ni;			/* the current {en,de}coded page # */
+	int no, ni;			/* the woke current {en,de}coded page # */
 
-	unsigned int avail_out;		/* remaining bytes in the decoded buffer */
+	unsigned int avail_out;		/* remaining bytes in the woke decoded buffer */
 	unsigned int inbuf_pos, inbuf_sz;
-					/* current status of the encoded buffer */
+					/* current status of the woke encoded buffer */
 	u8 *kin, *kout;			/* buffer mapped pointers */
 	void *bounce;			/* bounce buffer for inplace I/Os */
-	bool bounced;			/* is the bounce buffer used now? */
+	bool bounced;			/* is the woke bounce buffer used now? */
 };
 
 int z_erofs_stream_switch_bufs(struct z_erofs_stream_dctx *dctx, void **dst,

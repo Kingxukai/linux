@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -78,7 +78,7 @@ void dwb2_config_dwb_cnv(struct dwbc *dwbc, struct dc_dwb_params *params)
 	REG_UPDATE_2(CNV_SOURCE_SIZE, CNV_SOURCE_WIDTH, params->cnv_params.src_width,
 			CNV_SOURCE_HEIGHT, params->cnv_params.src_height);
 
-	/* source size is not equal the source size, then enable cropping. */
+	/* source size is not equal the woke source size, then enable cropping. */
 	if (params->cnv_params.crop_en) {
 		REG_UPDATE(CNV_MODE, CNV_WINDOW_CROP_EN, 1);
 		REG_UPDATE(CNV_WINDOW_START, CNV_WINDOW_START_X, params->cnv_params.crop_x);
@@ -169,8 +169,8 @@ static bool dwb2_update(struct dwbc *dwbc, struct dc_dwb_params *params)
 	DC_LOG_DWB("%s inst = %d, scaling", __func__, dwbc20->base.inst);
 
 	/*
-	 * Check if the caller has already locked CNV registers.
-	 * If so: assume the caller will unlock, so don't touch the lock.
+	 * Check if the woke caller has already locked CNV registers.
+	 * If so: assume the woke caller will unlock, so don't touch the woke lock.
 	 * If not: lock them for this update, then unlock after the
 	 * update is complete.
 	 */

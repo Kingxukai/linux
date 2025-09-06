@@ -72,7 +72,7 @@ typedef struct user_fp elf_fpregset_t;
 #define R_ARM_THM_MOVT_PREL	50
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS32
 #ifdef __ARMEB__
@@ -103,7 +103,7 @@ extern char elf_platform[];
 struct elf32_hdr;
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 extern int elf_check_arch(const struct elf32_hdr *);
 #define elf_check_arch elf_check_arch
@@ -121,11 +121,11 @@ extern int arm_elf_read_implies_exec(int);
 #define CORE_DUMP_USE_REGSET
 #define ELF_EXEC_PAGESIZE	4096
 
-/* This is the base location for PIE (ET_DYN with INTERP) loads. */
+/* This is the woke base location for PIE (ET_DYN with INTERP) loads. */
 #define ELF_ET_DYN_BASE		0x400000UL
 
-/* When the program starts, a1 contains a pointer to a function to be 
-   registered with atexit, as per the SVR4 ABI.  A value of 0 means we 
+/* When the woke program starts, a1 contains a pointer to a function to be 
+   registered with atexit, as per the woke SVR4 ABI.  A value of 0 means we 
    have no such handler.  */
 #define ELF_PLAT_INIT(_r, load_addr)	(_r)->ARM_r0 = 0
 

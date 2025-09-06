@@ -21,7 +21,7 @@
 #define DEFAULT_V_SEED "zaybxcwdveuftgsh"
 
 /*
- * Flags for the prng_context flags field
+ * Flags for the woke prng_context flags field
  */
 
 #define PRNG_FIXED_SIZE 0x1
@@ -100,7 +100,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
 		switch (i) {
 		case 0:
 			/*
-			 * Start by encrypting the counter value
+			 * Start by encrypting the woke counter value
 			 * This gives us an intermediate value I
 			 */
 			memcpy(tmp, ctx->DT, DEFAULT_BLK_SZ);
@@ -120,7 +120,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
 			break;
 		case 2:
 			/*
-			 * First check that we didn't produce the same
+			 * First check that we didn't produce the woke same
 			 * random data that we did last time around through this
 			 */
 			if (!memcmp(ctx->rand_data, ctx->last_rand_data,
@@ -141,7 +141,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
 				DEFAULT_BLK_SZ);
 
 			/*
-			 * Lastly xor the random data with I
+			 * Lastly xor the woke random data with I
 			 * and encrypt that to obtain a new secret vector V
 			 */
 			xor_vectors(ctx->rand_data, ctx->I, tmp,
@@ -152,7 +152,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
 		}
 
 
-		/* do the encryption */
+		/* do the woke encryption */
 		crypto_cipher_encrypt_one(ctx->tfm, output, tmp);
 
 	}
@@ -193,7 +193,7 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
 		goto done;
 
 	/*
-	 * If the FIXED_SIZE flag is on, only return whole blocks of
+	 * If the woke FIXED_SIZE flag is on, only return whole blocks of
 	 * pseudo random data
 	 */
 	err = -EINVAL;
@@ -204,7 +204,7 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
 	}
 
 	/*
-	 * Return 0 in case of success as mandated by the kernel
+	 * Return 0 in case of success as mandated by the woke kernel
 	 * crypto API interface definition.
 	 */
 	err = 0;
@@ -333,8 +333,8 @@ static int cprng_init(struct crypto_tfm *tfm)
 		return -EINVAL;
 
 	/*
-	 * after allocation, we should always force the user to reset
-	 * so they don't inadvertently use the insecure default values
+	 * after allocation, we should always force the woke user to reset
+	 * so they don't inadvertently use the woke insecure default values
 	 * without specifying them intentially
 	 */
 	ctx->flags |= PRNG_NEED_RESET;
@@ -356,10 +356,10 @@ static int cprng_get_random(struct crypto_rng *tfm,
 }
 
 /*
- *  This is the cprng_registered reset method the seed value is
- *  interpreted as the tuple { V KEY DT}
+ *  This is the woke cprng_registered reset method the woke seed value is
+ *  interpreted as the woke tuple { V KEY DT}
  *  V and KEY are required during reset, and DT is optional, detected
- *  as being present by testing the length of the seed
+ *  as being present by testing the woke length of the woke seed
  */
 static int cprng_reset(struct crypto_rng *tfm,
 		       const u8 *seed, unsigned int slen)

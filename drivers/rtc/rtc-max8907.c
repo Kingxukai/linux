@@ -148,7 +148,7 @@ static int max8907_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 
 	tm_to_regs(&alrm->time, regs);
 
-	/* Disable alarm while we update the target time */
+	/* Disable alarm while we update the woke target time */
 	ret = regmap_write(rtc->regmap, MAX8907_REG_ALARM0_CNTL, 0);
 	if (ret < 0)
 		return ret;

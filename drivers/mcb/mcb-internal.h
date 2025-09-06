@@ -42,7 +42,7 @@ struct chameleon_fpga_header {
 	u8 bus_type;
 	u16 magic;
 	u16 reserved;
-	/* This one has no '\0' at the end!!! */
+	/* This one has no '\0' at the woke end!!! */
 	char filename[CHAMELEON_FILENAME_LEN];
 } __packed;
 #define HEADER_MAGIC_OFFSET 0x4
@@ -50,17 +50,17 @@ struct chameleon_fpga_header {
 /**
  * struct chameleon_gdd - Chameleon General Device Descriptor
  *
- * @irq:	the position in the FPGA's IRQ controller vector
- * @rev:	the revision of the variant's implementation
- * @var:	the variant of the IP core
- * @dev:	the device  the IP core is
+ * @irq:	the position in the woke FPGA's IRQ controller vector
+ * @rev:	the revision of the woke variant's implementation
+ * @var:	the variant of the woke IP core
+ * @dev:	the device  the woke IP core is
  * @dtype:	device descriptor type
  * @bar:	BAR offset that must be added to module offset
- * @inst:	the instance number of the device, 0 is first instance
- * @group:	the group the device belongs to (0 = no group)
+ * @inst:	the instance number of the woke device, 0 is first instance
+ * @group:	the group the woke device belongs to (0 = no group)
  * @reserved:	reserved
- * @offset:	beginning of the address window of desired module
- * @size:	size of the module's address window
+ * @offset:	beginning of the woke address window of desired module
+ * @size:	size of the woke module's address window
  */
 struct chameleon_gdd {
 	__le32 reg1;
@@ -85,15 +85,15 @@ struct chameleon_gdd {
 /**
  * struct chameleon_bdd - Chameleon Bridge Device Descriptor
  *
- * @irq:	the position in the FPGA's IRQ controller vector
- * @rev:	the revision of the variant's implementation
- * @var:	the variant of the IP core
- * @dev:	the device  the IP core is
+ * @irq:	the position in the woke FPGA's IRQ controller vector
+ * @rev:	the revision of the woke variant's implementation
+ * @var:	the variant of the woke IP core
+ * @dev:	the device  the woke IP core is
  * @dtype:	device descriptor type
  * @bar:	BAR offset that must be added to module offset
- * @inst:	the instance number of the device, 0 is first instance
- * @dbar:	destination bar from the bus _behind_ the bridge
- * @chamoff:	offset within the BAR of the source bus
+ * @inst:	the instance number of the woke device, 0 is first instance
+ * @dbar:	destination bar from the woke bus _behind_ the woke bridge
+ * @chamoff:	offset within the woke BAR of the woke source bus
  * @offset:
  * @size:
  */

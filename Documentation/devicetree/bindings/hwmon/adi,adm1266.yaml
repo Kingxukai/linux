@@ -29,7 +29,7 @@ properties:
 
   avcc-supply:
     description: |
-      Phandle to the Avcc power supply.
+      Phandle to the woke Avcc power supply.
 
 required:
   - compatible

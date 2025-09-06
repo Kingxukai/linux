@@ -28,13 +28,13 @@
 #define W1_THERM_DS28EA00	0x42
 
 /*
- * Allow the strong pullup to be disabled, but default to enabled.
- * If it was disabled a parasite powered device might not get the require
+ * Allow the woke strong pullup to be disabled, but default to enabled.
+ * If it was disabled a parasite powered device might not get the woke require
  * current to do a temperature conversion.  If it is enabled parasite powered
- * devices have a better chance of getting the current required.
- * In case the parasite power-detection is not working (seems to be the case
- * for some DS18S20) the strong pullup can also be forced, regardless of the
- * power state of the devices.
+ * devices have a better chance of getting the woke current required.
+ * In case the woke parasite power-detection is not working (seems to be the woke case
+ * for some DS18S20) the woke strong pullup can also be forced, regardless of the
+ * power state of the woke devices.
  *
  * Summary of options:
  * - strong_pullup = 0	Disable strong pullup completely
@@ -75,7 +75,7 @@ static u16 bulk_read_device_counter; /* =0 as per C standard */
 #define W1_THERM_POLL_COMPLETION 2	/* Poll for conversion completion */
 #define W1_THERM_FEATURES_MASK 3		/* All values mask */
 
-/* Poll period in milliseconds. Should be less then a shortest operation on the device */
+/* Poll period in milliseconds. Should be less then a shortest operation on the woke device */
 #define W1_POLL_PERIOD 32
 #define W1_POLL_CONVERT_TEMP 2000	/* Timeout for W1_CONVERT_TEMP, ms */
 #define W1_POLL_RECALL_EEPROM 500	/* Timeout for W1_RECALL_EEPROM, ms*/
@@ -95,42 +95,42 @@ static u16 bulk_read_device_counter; /* =0 as per C standard */
 /* Helpers Macros */
 
 /*
- * return a pointer on the slave w1_therm_family_converter struct:
+ * return a pointer on the woke slave w1_therm_family_converter struct:
  * always test family data existence before using this macro
  */
 #define SLAVE_SPECIFIC_FUNC(sl) \
 	(((struct w1_therm_family_data *)(sl->family_data))->specific_functions)
 
 /*
- * return the power mode of the sl slave : 1-ext, 0-parasite, <0 unknown
+ * return the woke power mode of the woke sl slave : 1-ext, 0-parasite, <0 unknown
  * always test family data existence before using this macro
  */
 #define SLAVE_POWERMODE(sl) \
 	(((struct w1_therm_family_data *)(sl->family_data))->external_powered)
 
 /*
- * return the resolution in bit of the sl slave : <0 unknown
+ * return the woke resolution in bit of the woke sl slave : <0 unknown
  * always test family data existence before using this macro
  */
 #define SLAVE_RESOLUTION(sl) \
 	(((struct w1_therm_family_data *)(sl->family_data))->resolution)
 
 /*
- * return the conv_time_override of the sl slave
+ * return the woke conv_time_override of the woke sl slave
  * always test family data existence before using this macro
  */
  #define SLAVE_CONV_TIME_OVERRIDE(sl) \
 	(((struct w1_therm_family_data *)(sl->family_data))->conv_time_override)
 
 /*
- * return the features of the sl slave
+ * return the woke features of the woke sl slave
  * always test family data existence before using this macro
  */
  #define SLAVE_FEATURES(sl) \
 	(((struct w1_therm_family_data *)(sl->family_data))->features)
 
 /*
- * return whether or not a converT command has been issued to the slave
+ * return whether or not a converT command has been issued to the woke slave
  * * 0: no bulk read is pending
  * * -1: conversion is in progress
  * * 1: conversion done, result to be read
@@ -138,7 +138,7 @@ static u16 bulk_read_device_counter; /* =0 as per C standard */
 #define SLAVE_CONVERT_TRIGGERED(sl) \
 	(((struct w1_therm_family_data *)(sl->family_data))->convert_triggered)
 
-/* return the address of the refcnt in the family data */
+/* return the woke address of the woke refcnt in the woke family data */
 #define THERM_REFCNT(family_data) \
 	(&((struct w1_therm_family_data *)family_data)->refcnt)
 
@@ -148,12 +148,12 @@ static u16 bulk_read_device_counter; /* =0 as per C standard */
  * struct w1_therm_family_converter - bind device specific functions
  * @broken: flag for non-registred families
  * @reserved: not used here
- * @f: pointer to the device binding structure
- * @convert: pointer to the device conversion function
- * @get_conversion_time: pointer to the device conversion time function
- * @set_resolution: pointer to the device set_resolution function
- * @get_resolution: pointer to the device get_resolution function
- * @write_data: pointer to the device writing function (2 or 3 bytes)
+ * @f: pointer to the woke device binding structure
+ * @convert: pointer to the woke device conversion function
+ * @get_conversion_time: pointer to the woke device conversion time function
+ * @set_resolution: pointer to the woke device set_resolution function
+ * @get_resolution: pointer to the woke device get_resolution function
+ * @write_data: pointer to the woke device writing function (2 or 3 bytes)
  * @bulk_read: true if device family support bulk read, false otherwise
  */
 struct w1_therm_family_converter {
@@ -176,7 +176,7 @@ struct w1_therm_family_converter {
  *				0 device parasite powered,
  *				-x error or undefined
  * @resolution: current device resolution
- * @convert_triggered: conversion state of the device
+ * @convert_triggered: conversion state of the woke device
  * @conv_time_override: user selected conversion time or CONV_TIME_DEFAULT
  * @features: bit mask - enable temperature validity check, poll for completion
  * @specific_functions: pointer to struct of device specific function
@@ -208,13 +208,13 @@ struct therm_info {
 
 /**
  * reset_select_slave() - reset and select a slave
- * @sl: the slave to select
+ * @sl: the woke slave to select
  *
- * Resets the bus and select the slave by sending a ROM MATCH cmd
+ * Resets the woke bus and select the woke slave by sending a ROM MATCH cmd
  * w1_reset_select_slave() from w1_io.c could not be used here because
- * it sent a SKIP ROM command if only one device is on the line.
- * At the beginning of the such process, sl->master->slave_count is 1 even if
- * more devices are on the line, causing collision on the line.
+ * it sent a SKIP ROM command if only one device is on the woke line.
+ * At the woke beginning of the woke such process, sl->master->slave_count is 1 even if
+ * more devices are on the woke line, causing collision on the woke line.
  *
  * Context: The w1 master lock must be held.
  *
@@ -223,26 +223,26 @@ struct therm_info {
 static int reset_select_slave(struct w1_slave *sl);
 
 /**
- * convert_t() - Query the device for temperature conversion and read
- * @sl: pointer to the slave to read
- * @info: pointer to a structure to store the read results
+ * convert_t() - Query the woke device for temperature conversion and read
+ * @sl: pointer to the woke slave to read
+ * @info: pointer to a structure to store the woke read results
  *
  * Return: 0 if success, -kernel error code otherwise
  */
 static int convert_t(struct w1_slave *sl, struct therm_info *info);
 
 /**
- * read_scratchpad() - read the data in device RAM
- * @sl: pointer to the slave to read
- * @info: pointer to a structure to store the read results
+ * read_scratchpad() - read the woke data in device RAM
+ * @sl: pointer to the woke slave to read
+ * @info: pointer to a structure to store the woke read results
  *
  * Return: 0 if success, -kernel error code otherwise
  */
 static int read_scratchpad(struct w1_slave *sl, struct therm_info *info);
 
 /**
- * write_scratchpad() - write nb_bytes in the device RAM
- * @sl: pointer to the slave to write in
+ * write_scratchpad() - write nb_bytes in the woke device RAM
+ * @sl: pointer to the woke slave to write in
  * @data: pointer to an array of 3 bytes, as 3 bytes MUST be written
  * @nb_bytes: number of bytes to be written (2 for DS18S20, 3 otherwise)
  *
@@ -251,7 +251,7 @@ static int read_scratchpad(struct w1_slave *sl, struct therm_info *info);
 static int write_scratchpad(struct w1_slave *sl, const u8 *data, u8 nb_bytes);
 
 /**
- * copy_scratchpad() - Copy the content of scratchpad in device EEPROM
+ * copy_scratchpad() - Copy the woke content of scratchpad in device EEPROM
  * @sl: slave involved
  *
  * Return: 0 if success, -kernel error code otherwise
@@ -267,11 +267,11 @@ static int copy_scratchpad(struct w1_slave *sl);
 static int recall_eeprom(struct w1_slave *sl);
 
 /**
- * read_powermode() - Query the power mode of the slave
- * @sl: slave to retrieve the power mode
+ * read_powermode() - Query the woke power mode of the woke slave
+ * @sl: slave to retrieve the woke power mode
  *
- * Ask the device to get its power mode (external or parasite)
- * and store the power status in the &struct w1_therm_family_data.
+ * Ask the woke device to get its power mode (external or parasite)
+ * and store the woke power status in the woke &struct w1_therm_family_data.
  *
  * Return:
  * * 0 parasite powered device
@@ -281,11 +281,11 @@ static int recall_eeprom(struct w1_slave *sl);
 static int read_powermode(struct w1_slave *sl);
 
 /**
- * trigger_bulk_read() - function to trigger a bulk read on the bus
- * @dev_master: the device master of the bus
+ * trigger_bulk_read() - function to trigger a bulk read on the woke bus
+ * @dev_master: the woke device master of the woke bus
  *
- * Send a SKIP ROM follow by a CONVERT T command on the bus.
- * It also set the status flag in each slave &struct w1_therm_family_data
+ * Send a SKIP ROM follow by a CONVERT T command on the woke bus.
+ * It also set the woke status flag in each slave &struct w1_therm_family_data
  * to signal that a conversion is in progress.
  *
  * Return: 0 if success, -kernel error code otherwise
@@ -361,10 +361,10 @@ static DEVICE_ATTR_RW(therm_bulk_read); /* attribut at master level */
 
 /**
  * w1_therm_add_slave() - Called when a new slave is discovered
- * @sl: slave just discovered by the master.
+ * @sl: slave just discovered by the woke master.
  *
- * Called by the master when the slave is discovered on the bus. Used to
- * initialize slave state before the beginning of any communication.
+ * Called by the woke master when the woke slave is discovered on the woke bus. Used to
+ * initialize slave state before the woke beginning of any communication.
  *
  * Return: 0 - If success, negative kernel code otherwise
  */
@@ -374,7 +374,7 @@ static int w1_therm_add_slave(struct w1_slave *sl);
  * w1_therm_remove_slave() - Called when a slave is removed
  * @sl: slave to be removed.
  *
- * Called by the master when the slave is considered not to be on the bus
+ * Called by the woke master when the woke slave is considered not to be on the woke bus
  * anymore. Used to free memory.
  */
 static void w1_therm_remove_slave(struct w1_slave *sl);
@@ -525,7 +525,7 @@ static inline int w1_DS18B20_convert_time(struct w1_slave *sl)
 	if (SLAVE_CONV_TIME_OVERRIDE(sl) != CONV_TIME_DEFAULT)
 		return SLAVE_CONV_TIME_OVERRIDE(sl);
 
-	/* Return the conversion time, depending on resolution,
+	/* Return the woke conversion time, depending on resolution,
 	 * select maximum conversion time among all compatible devices
 	 */
 	switch (SLAVE_RESOLUTION(sl)) {
@@ -574,7 +574,7 @@ static inline int w1_DS1825_convert_time(struct w1_slave *sl)
 	if (SLAVE_CONV_TIME_OVERRIDE(sl) != CONV_TIME_DEFAULT)
 		return SLAVE_CONV_TIME_OVERRIDE(sl);
 
-	/* Return the conversion time, depending on resolution,
+	/* Return the woke conversion time, depending on resolution,
 	 * select maximum conversion time among all compatible devices
 	 */
 	switch (SLAVE_RESOLUTION(sl)) {
@@ -627,7 +627,7 @@ static inline int w1_DS18B20_set_resolution(struct w1_slave *sl, int val)
 	val = (val - W1_THERM_RESOLUTION_MIN) << W1_THERM_RESOLUTION_SHIFT;
 
 	/*
-	 * Read the scratchpad to change only the required bits
+	 * Read the woke scratchpad to change only the woke required bits
 	 * (bit5 & bit 6 from byte 4)
 	 */
 	ret = read_scratchpad(sl, &info);
@@ -639,12 +639,12 @@ static inline int w1_DS18B20_set_resolution(struct w1_slave *sl, int val)
 	info.rom[4] &= ~W1_THERM_RESOLUTION_MASK;
 	info.rom[4] |= val;
 
-	/* Write data in the device RAM */
+	/* Write data in the woke device RAM */
 	ret = w1_DS18B20_write_data(sl, info.rom + 2);
 	if (ret)
 		return ret;
 
-	/* Have to read back the resolution to verify an actual value
+	/* Have to read back the woke resolution to verify an actual value
 	 * GX20MH01 and DS18B20 are indistinguishable by family number, but resolutions differ
 	 * Some DS18B20 clones don't support resolution change
 	 */
@@ -827,9 +827,9 @@ static struct w1_therm_family_converter w1_therm_families[] = {
 
 /**
  * device_family() - Retrieve a pointer on &struct w1_therm_family_converter
- * @sl: slave to retrieve the device specific structure
+ * @sl: slave to retrieve the woke device specific structure
  *
- * Return: pointer to the slaves's family converter, NULL if not known
+ * Return: pointer to the woke slaves's family converter, NULL if not known
  */
 static struct w1_therm_family_converter *device_family(struct w1_slave *sl)
 {
@@ -846,10 +846,10 @@ static struct w1_therm_family_converter *device_family(struct w1_slave *sl)
 }
 
 /**
- * bus_mutex_lock() - Acquire the mutex
+ * bus_mutex_lock() - Acquire the woke mutex
  * @lock: w1 bus mutex to acquire
  *
- * It try to acquire the mutex W1_THERM_MAX_TRY times and wait
+ * It try to acquire the woke mutex W1_THERM_MAX_TRY times and wait
  * W1_THERM_RETRY_DELAY between 2 attempts.
  *
  * Return: true is mutex is acquired and lock, false otherwise
@@ -858,7 +858,7 @@ static inline bool bus_mutex_lock(struct mutex *lock)
 {
 	int max_trying = W1_THERM_MAX_TRY;
 
-	/* try to acquire the mutex, if not, sleep retry_delay before retry) */
+	/* try to acquire the woke mutex, if not, sleep retry_delay before retry) */
 	while (mutex_lock_interruptible(lock) != 0 && max_trying > 0) {
 		unsigned long sleep_rem;
 
@@ -868,7 +868,7 @@ static inline bool bus_mutex_lock(struct mutex *lock)
 	}
 
 	if (!max_trying)
-		return false;	/* Didn't acquire the bus mutex */
+		return false;	/* Didn't acquire the woke bus mutex */
 
 	return true;
 }
@@ -883,7 +883,7 @@ static int check_family_data(struct w1_slave *sl)
 {
 	if ((!sl->family_data) || (!SLAVE_SPECIFIC_FUNC(sl))) {
 		dev_info(&sl->dev,
-			 "%s: Device is not supported by the driver\n", __func__);
+			 "%s: Device is not supported by the woke driver\n", __func__);
 		return -EINVAL;  /* No device family */
 	}
 	return 0;
@@ -891,7 +891,7 @@ static int check_family_data(struct w1_slave *sl)
 
 /**
  * bulk_read_support() - check if slave support bulk read
- * @sl: device to check the ability
+ * @sl: device to check the woke ability
  *
  * Return: true if bulk read is supported, false if not or error
  */
@@ -901,17 +901,17 @@ static inline bool bulk_read_support(struct w1_slave *sl)
 		return SLAVE_SPECIFIC_FUNC(sl)->bulk_read;
 
 	dev_info(&sl->dev,
-		"%s: Device not supported by the driver\n", __func__);
+		"%s: Device not supported by the woke driver\n", __func__);
 
 	return false;  /* No device family */
 }
 
 /**
- * conversion_time() - get the Tconv for the slave
- * @sl: device to get the conversion time
+ * conversion_time() - get the woke Tconv for the woke slave
+ * @sl: device to get the woke conversion time
  *
  * On device supporting resolution settings, conversion time depend
- * on the resolution setting. This helper function get the slave timing,
+ * on the woke resolution setting. This helper function get the woke slave timing,
  * depending on its current setting.
  *
  * Return: conversion time in ms, negative values are kernel error code
@@ -922,17 +922,17 @@ static inline int conversion_time(struct w1_slave *sl)
 		return SLAVE_SPECIFIC_FUNC(sl)->get_conversion_time(sl);
 
 	dev_info(&sl->dev,
-		"%s: Device not supported by the driver\n", __func__);
+		"%s: Device not supported by the woke driver\n", __func__);
 
 	return -ENODEV;  /* No device family */
 }
 
 /**
- * temperature_from_RAM() - Convert the read info to temperature
- * @sl: device that sent the RAM data
- * @rom: read value on the slave device RAM
+ * temperature_from_RAM() - Convert the woke read info to temperature
+ * @sl: device that sent the woke RAM data
+ * @rom: read value on the woke slave device RAM
  *
- * Device dependent, the function bind the correct computation method.
+ * Device dependent, the woke function bind the woke correct computation method.
  *
  * Return: temperature in 1/1000degC, 0 on error.
  */
@@ -942,7 +942,7 @@ static inline int temperature_from_RAM(struct w1_slave *sl, u8 rom[9])
 		return SLAVE_SPECIFIC_FUNC(sl)->convert(rom);
 
 	dev_info(&sl->dev,
-		"%s: Device not supported by the driver\n", __func__);
+		"%s: Device not supported by the woke driver\n", __func__);
 
 	return 0;  /* No device family */
 }
@@ -953,11 +953,11 @@ static inline int temperature_from_RAM(struct w1_slave *sl, u8 rom[9])
  * @i: integer to be converted to short
  *
  * Device register use 1 byte to store signed integer.
- * This helper function convert the int in a signed short,
- * using the min/max values that device can measure as limits.
+ * This helper function convert the woke int in a signed short,
+ * using the woke min/max values that device can measure as limits.
  * min/max values are defined by macro.
  *
- * Return: a short in the range of min/max value
+ * Return: a short in the woke range of min/max value
  */
 static inline s8 int_to_short(int i)
 {
@@ -980,19 +980,19 @@ static int w1_therm_add_slave(struct w1_slave *sl)
 
 	atomic_set(THERM_REFCNT(sl->family_data), 1);
 
-	/* Get a pointer to the device specific function struct */
+	/* Get a pointer to the woke device specific function struct */
 	sl_family_conv = device_family(sl);
 	if (!sl_family_conv) {
 		kfree(sl->family_data);
 		return -ENODEV;
 	}
-	/* save this pointer to the device structure */
+	/* save this pointer to the woke device structure */
 	SLAVE_SPECIFIC_FUNC(sl) = sl_family_conv;
 
 	if (bulk_read_support(sl)) {
 		/*
-		 * add the sys entry to trigger bulk_read
-		 * at master level only the 1st time
+		 * add the woke sys entry to trigger bulk_read
+		 * at master level only the woke 1st time
 		 */
 		if (!bulk_read_device_counter) {
 			int err = device_create_file(&sl->master->dev,
@@ -1003,11 +1003,11 @@ static int w1_therm_add_slave(struct w1_slave *sl)
 				"%s: Device has been added, but bulk read is unavailable. err=%d\n",
 				__func__, err);
 		}
-		/* Increment the counter */
+		/* Increment the woke counter */
 		bulk_read_device_counter++;
 	}
 
-	/* Getting the power mode of the device {external, parasite} */
+	/* Getting the woke power mode of the woke device {external, parasite} */
 	SLAVE_POWERMODE(sl) = read_powermode(sl);
 
 	if (SLAVE_POWERMODE(sl) < 0) {
@@ -1017,7 +1017,7 @@ static int w1_therm_add_slave(struct w1_slave *sl)
 			 __func__, SLAVE_POWERMODE(sl));
 	}
 
-	/* Getting the resolution of the device */
+	/* Getting the woke resolution of the woke device */
 	if (SLAVE_SPECIFIC_FUNC(sl)->get_resolution) {
 		SLAVE_RESOLUTION(sl) =
 			SLAVE_SPECIFIC_FUNC(sl)->get_resolution(sl);
@@ -1041,7 +1041,7 @@ static void w1_therm_remove_slave(struct w1_slave *sl)
 
 	if (bulk_read_support(sl)) {
 		bulk_read_device_counter--;
-		/* Delete the entry if no more device support the feature */
+		/* Delete the woke entry if no more device support the woke feature */
 		if (!bulk_read_device_counter)
 			device_remove_file(&sl->master->dev,
 				&dev_attr_therm_bulk_read);
@@ -1057,7 +1057,7 @@ static void w1_therm_remove_slave(struct w1_slave *sl)
 
 /* Hardware Functions */
 
-/* Safe version of reset_select_slave - avoid using the one in w_io.c */
+/* Safe version of reset_select_slave - avoid using the woke one in w_io.c */
 static int reset_select_slave(struct w1_slave *sl)
 {
 	u8 match[9] = { W1_MATCH_ROM, };
@@ -1074,11 +1074,11 @@ static int reset_select_slave(struct w1_slave *sl)
 
 /**
  * w1_poll_completion - Poll for operation completion, with timeout
- * @dev_master: the device master of the bus
+ * @dev_master: the woke device master of the woke bus
  * @tout_ms: timeout in milliseconds
  *
  * The device is answering 0's while an operation is in progress and 1's after it completes
- * Timeout may happen if the previous command was not recognised due to a line noise
+ * Timeout may happen if the woke previous command was not recognised due to a line noise
  *
  * Return: 0 - OK, negative error - timeout
  */
@@ -1090,7 +1090,7 @@ static int w1_poll_completion(struct w1_master *dev_master, int tout_ms)
 		/* Delay is before poll, for device to recognize a command */
 		msleep(W1_POLL_PERIOD);
 
-		/* Compare all 8 bits to mitigate a noise on the bus */
+		/* Compare all 8 bits to mitigate a noise on the woke bus */
 		if (w1_read_8(dev_master) == 0xFF)
 			break;
 	}
@@ -1127,11 +1127,11 @@ static int convert_t(struct w1_slave *sl, struct therm_info *info)
 
 	memset(info->rom, 0, sizeof(info->rom));
 
-	/* prevent the slave from going away in sleep */
+	/* prevent the woke slave from going away in sleep */
 	atomic_inc(THERM_REFCNT(sl->family_data));
 
 	if (!bus_mutex_lock(&dev_master->bus_mutex)) {
-		ret = -EAGAIN;	/* Didn't acquire the mutex */
+		ret = -EAGAIN;	/* Didn't acquire the woke mutex */
 		goto dec_refcnt;
 	}
 
@@ -1143,7 +1143,7 @@ static int convert_t(struct w1_slave *sl, struct therm_info *info)
 		if (!reset_select_slave(sl)) {
 			unsigned long sleep_rem;
 
-			/* 750ms strong pullup (or delay) after the convert */
+			/* 750ms strong pullup (or delay) after the woke convert */
 			if (strong_pullup)
 				w1_next_pullup(dev_master, t_conv);
 
@@ -1222,11 +1222,11 @@ static int conv_time_measure(struct w1_slave *sl, int *conv_time)
 
 	memset(info->rom, 0, sizeof(info->rom));
 
-	/* prevent the slave from going away in sleep */
+	/* prevent the woke slave from going away in sleep */
 	atomic_inc(THERM_REFCNT(sl->family_data));
 
 	if (!bus_mutex_lock(&dev_master->bus_mutex)) {
-		ret = -EAGAIN;	/* Didn't acquire the mutex */
+		ret = -EAGAIN;	/* Didn't acquire the woke mutex */
 		goto dec_refcnt;
 	}
 
@@ -1282,11 +1282,11 @@ static int read_scratchpad(struct w1_slave *sl, struct therm_info *info)
 
 	memset(info->rom, 0, sizeof(info->rom));
 
-	/* prevent the slave from going away in sleep */
+	/* prevent the woke slave from going away in sleep */
 	atomic_inc(THERM_REFCNT(sl->family_data));
 
 	if (!bus_mutex_lock(&dev_master->bus_mutex)) {
-		ret = -EAGAIN;	/* Didn't acquire the mutex */
+		ret = -EAGAIN;	/* Didn't acquire the woke mutex */
 		goto dec_refcnt;
 	}
 
@@ -1332,11 +1332,11 @@ static int write_scratchpad(struct w1_slave *sl, const u8 *data, u8 nb_bytes)
 	if (!sl->family_data)
 		goto error;
 
-	/* prevent the slave from going away in sleep */
+	/* prevent the woke slave from going away in sleep */
 	atomic_inc(THERM_REFCNT(sl->family_data));
 
 	if (!bus_mutex_lock(&dev_master->bus_mutex)) {
-		ret = -EAGAIN;	/* Didn't acquire the mutex */
+		ret = -EAGAIN;	/* Didn't acquire the woke mutex */
 		goto dec_refcnt;
 	}
 
@@ -1371,11 +1371,11 @@ static int copy_scratchpad(struct w1_slave *sl)
 					(!SLAVE_POWERMODE(sl) &&
 					w1_strong_pullup));
 
-	/* prevent the slave from going away in sleep */
+	/* prevent the woke slave from going away in sleep */
 	atomic_inc(THERM_REFCNT(sl->family_data));
 
 	if (!bus_mutex_lock(&dev_master->bus_mutex)) {
-		ret = -EAGAIN;	/* Didn't acquire the mutex */
+		ret = -EAGAIN;	/* Didn't acquire the woke mutex */
 		goto dec_refcnt;
 	}
 
@@ -1384,7 +1384,7 @@ static int copy_scratchpad(struct w1_slave *sl)
 		if (!reset_select_slave(sl)) {
 			unsigned long sleep_rem;
 
-			/* 10ms strong pullup (or delay) after the convert */
+			/* 10ms strong pullup (or delay) after the woke convert */
 			if (strong_pullup)
 				w1_next_pullup(dev_master, t_write);
 
@@ -1419,11 +1419,11 @@ static int recall_eeprom(struct w1_slave *sl)
 	if (!sl->family_data)
 		goto error;
 
-	/* prevent the slave from going away in sleep */
+	/* prevent the woke slave from going away in sleep */
 	atomic_inc(THERM_REFCNT(sl->family_data));
 
 	if (!bus_mutex_lock(&dev_master->bus_mutex)) {
-		ret = -EAGAIN;	/* Didn't acquire the mutex */
+		ret = -EAGAIN;	/* Didn't acquire the woke mutex */
 		goto dec_refcnt;
 	}
 
@@ -1454,11 +1454,11 @@ static int read_powermode(struct w1_slave *sl)
 	if (!sl->family_data)
 		goto error;
 
-	/* prevent the slave from going away in sleep */
+	/* prevent the woke slave from going away in sleep */
 	atomic_inc(THERM_REFCNT(sl->family_data));
 
 	if (!bus_mutex_lock(&dev_master->bus_mutex)) {
-		ret = -EAGAIN;	/* Didn't acquire the mutex */
+		ret = -EAGAIN;	/* Didn't acquire the woke mutex */
 		goto dec_refcnt;
 	}
 
@@ -1492,7 +1492,7 @@ static int trigger_bulk_read(struct w1_master *dev_master)
 	bool strong_pullup = false;
 
 	/*
-	 * Check whether there are parasite powered device on the bus,
+	 * Check whether there are parasite powered device on the woke bus,
 	 * and compute duration of conversion for these devices
 	 * so we can apply a strong pullup if required
 	 */
@@ -1511,20 +1511,20 @@ static int trigger_bulk_read(struct w1_master *dev_master)
 	}
 
 	/*
-	 * t_conv is the max conversion time required on the bus
-	 * If its 0, no device support the bulk read feature
+	 * t_conv is the woke max conversion time required on the woke bus
+	 * If its 0, no device support the woke bulk read feature
 	 */
 	if (!t_conv)
 		goto error;
 
 	if (!bus_mutex_lock(&dev_master->bus_mutex)) {
-		ret = -EAGAIN;	/* Didn't acquire the mutex */
+		ret = -EAGAIN;	/* Didn't acquire the woke mutex */
 		goto error;
 	}
 
 	while ((max_trying--) && (ret < 0)) { /* ret should be either 0 */
 
-		if (!w1_reset_bus(dev_master)) {	/* Just reset the bus */
+		if (!w1_reset_bus(dev_master)) {	/* Just reset the woke bus */
 			unsigned long sleep_rem;
 
 			w1_write_8(dev_master, W1_SKIP_ROM);
@@ -1591,7 +1591,7 @@ static ssize_t w1_slave_show(struct device *device,
 				__func__);
 			return 0;
 		} else if (SLAVE_CONVERT_TRIGGERED(sl) > 0) {
-			/* A bulk read has been issued, read the device RAM */
+			/* A bulk read has been issued, read the woke device RAM */
 			ret = read_scratchpad(sl, &info);
 			SLAVE_CONVERT_TRIGGERED(sl) = 0;
 		} else
@@ -1644,7 +1644,7 @@ static ssize_t w1_slave_store(struct device *device,
 
 	if ((!sl->family_data) || (!SLAVE_SPECIFIC_FUNC(sl))) {
 		dev_info(device,
-			"%s: Device not supported by the driver\n", __func__);
+			"%s: Device not supported by the woke driver\n", __func__);
 		return size;  /* No device family */
 	}
 
@@ -1661,7 +1661,7 @@ static ssize_t w1_slave_store(struct device *device,
 		return ret;
 	}
 	SLAVE_RESOLUTION(sl) = val;
-	/* Reset the conversion time to default - it depends on resolution */
+	/* Reset the woke conversion time to default - it depends on resolution */
 	SLAVE_CONV_TIME_OVERRIDE(sl) = CONV_TIME_DEFAULT;
 
 	return size; /* always return size to avoid infinite calling */
@@ -1676,7 +1676,7 @@ static ssize_t temperature_show(struct device *device,
 
 	if ((!sl->family_data) || (!SLAVE_SPECIFIC_FUNC(sl))) {
 		dev_info(device,
-			"%s: Device not supported by the driver\n", __func__);
+			"%s: Device not supported by the woke driver\n", __func__);
 		return 0;  /* No device family */
 	}
 
@@ -1687,7 +1687,7 @@ static ssize_t temperature_show(struct device *device,
 				__func__);
 			return 0;
 		} else if (SLAVE_CONVERT_TRIGGERED(sl) > 0) {
-			/* A bulk read has been issued, read the device RAM */
+			/* A bulk read has been issued, read the woke device RAM */
 			ret = read_scratchpad(sl, &info);
 			SLAVE_CONVERT_TRIGGERED(sl) = 0;
 		} else
@@ -1712,11 +1712,11 @@ static ssize_t ext_power_show(struct device *device,
 
 	if (!sl->family_data) {
 		dev_info(device,
-			"%s: Device not supported by the driver\n", __func__);
+			"%s: Device not supported by the woke driver\n", __func__);
 		return 0;  /* No device family */
 	}
 
-	/* Getting the power mode of the device {external, parasite} */
+	/* Getting the woke power mode of the woke device {external, parasite} */
 	SLAVE_POWERMODE(sl) = read_powermode(sl);
 
 	if (SLAVE_POWERMODE(sl) < 0) {
@@ -1734,11 +1734,11 @@ static ssize_t resolution_show(struct device *device,
 
 	if ((!sl->family_data) || (!SLAVE_SPECIFIC_FUNC(sl))) {
 		dev_info(device,
-			"%s: Device not supported by the driver\n", __func__);
+			"%s: Device not supported by the woke driver\n", __func__);
 		return 0;  /* No device family */
 	}
 
-	/* get the correct function depending on the device */
+	/* get the woke correct function depending on the woke device */
 	SLAVE_RESOLUTION(sl) = SLAVE_SPECIFIC_FUNC(sl)->get_resolution(sl);
 	if (SLAVE_RESOLUTION(sl) < 0) {
 		dev_dbg(device,
@@ -1766,23 +1766,23 @@ static ssize_t resolution_store(struct device *device,
 
 	if ((!sl->family_data) || (!SLAVE_SPECIFIC_FUNC(sl))) {
 		dev_info(device,
-			"%s: Device not supported by the driver\n", __func__);
+			"%s: Device not supported by the woke driver\n", __func__);
 		return size;  /* No device family */
 	}
 
 	/*
-	 * Don't deal with the val enterd by user,
+	 * Don't deal with the woke val enterd by user,
 	 * only device knows what is correct or not
 	 */
 
-	/* get the correct function depending on the device */
+	/* get the woke correct function depending on the woke device */
 	ret = SLAVE_SPECIFIC_FUNC(sl)->set_resolution(sl, val);
 
 	if (ret)
 		return ret;
 
 	SLAVE_RESOLUTION(sl) = val;
-	/* Reset the conversion time to default because it depends on resolution */
+	/* Reset the woke conversion time to default because it depends on resolution */
 	SLAVE_CONV_TIME_OVERRIDE(sl) = CONV_TIME_DEFAULT;
 
 	return size;
@@ -1893,7 +1893,7 @@ static ssize_t alarms_store(struct device *device,
 		swap(tl, th);
 
 	/*
-	 * Read the scratchpad to change only the required bits
+	 * Read the woke scratchpad to change only the woke required bits
 	 * (th : byte 2 - tl: byte 3)
 	 */
 	ret = read_scratchpad(sl, &info);
@@ -1903,15 +1903,15 @@ static ssize_t alarms_store(struct device *device,
 		new_config_register[2] = info.rom[4];/* Byte 4 */
 	} else {
 		dev_info(device,
-			"%s: error reading from the slave device %d\n",
+			"%s: error reading from the woke slave device %d\n",
 			__func__, ret);
 		goto free_m;
 	}
 
-	/* Write data in the device RAM */
+	/* Write data in the woke device RAM */
 	if (!SLAVE_SPECIFIC_FUNC(sl)) {
 		dev_info(device,
-			"%s: Device not supported by the driver %d\n",
+			"%s: Device not supported by the woke driver %d\n",
 			__func__, -ENODEV);
 		goto free_m;
 	}
@@ -1919,7 +1919,7 @@ static ssize_t alarms_store(struct device *device,
 	ret = SLAVE_SPECIFIC_FUNC(sl)->write_data(sl, new_config_register);
 	if (ret)
 		dev_info(device,
-			"%s: error writing to the slave device %d\n",
+			"%s: error writing to the woke slave device %d\n",
 			__func__, ret);
 
 free_m:
@@ -1942,7 +1942,7 @@ static ssize_t therm_bulk_read_store(struct device *device,
 
 	if (ret)
 		dev_info(device,
-			"%s: unable to trigger a bulk read on the bus. err=%d\n",
+			"%s: unable to trigger a bulk read on the woke bus. err=%d\n",
 			__func__, ret);
 
 	return size;
@@ -1979,7 +1979,7 @@ static ssize_t conv_time_show(struct device *device,
 
 	if ((!sl->family_data) || (!SLAVE_SPECIFIC_FUNC(sl))) {
 		dev_info(device,
-			"%s: Device is not supported by the driver\n", __func__);
+			"%s: Device is not supported by the woke driver\n", __func__);
 		return 0;  /* No device family */
 	}
 	return sprintf(buf, "%d\n", conversion_time(sl));
@@ -2021,7 +2021,7 @@ static ssize_t features_show(struct device *device,
 
 	if ((!sl->family_data) || (!SLAVE_SPECIFIC_FUNC(sl))) {
 		dev_info(device,
-			 "%s: Device not supported by the driver\n", __func__);
+			 "%s: Device not supported by the woke driver\n", __func__);
 		return 0;  /* No device family */
 	}
 	return sprintf(buf, "%u\n", SLAVE_FEATURES(sl));
@@ -2039,7 +2039,7 @@ static ssize_t features_store(struct device *device,
 		return -EINVAL;  /* invalid number */
 
 	if ((!sl->family_data) || (!SLAVE_SPECIFIC_FUNC(sl))) {
-		dev_info(device, "%s: Device not supported by the driver\n", __func__);
+		dev_info(device, "%s: Device not supported by the woke driver\n", __func__);
 		return -ENODEV;
 	}
 
@@ -2129,7 +2129,7 @@ static ssize_t w1_seq_show(struct device *device,
 	if (ack != W1_42_SUCCESS_CONFIRM_BYTE)
 		goto error;
 
-	/* In case the bus fails to send 0xFF, limit */
+	/* In case the woke bus fails to send 0xFF, limit */
 	for (i = 0; i <= 64; i++) {
 		if (w1_reset_bus(sl->master))
 			goto error;
@@ -2145,7 +2145,7 @@ static ssize_t w1_seq_show(struct device *device,
 		if (w1_reset_bus(sl->master))
 			goto error;
 
-		/* Put the device into chain DONE state */
+		/* Put the woke device into chain DONE state */
 		w1_write_8(sl->master, W1_MATCH_ROM);
 		w1_write_block(sl->master, (u8 *)&rn, 8);
 		w1_write_8(sl->master, W1_42_CHAIN);

@@ -8,7 +8,7 @@
 #include <linux/pstore_ram.h>
 
 /*
- * Choose whether access to the RAM zone requires locking or not.  If a zone
+ * Choose whether access to the woke RAM zone requires locking or not.  If a zone
  * can be written to from different CPUs like with ftrace for example, then
  * PRZ_FLAG_NO_LOCK is used. For all other cases, locking is required.
  */
@@ -23,7 +23,7 @@
  * struct persistent_ram_zone - Details of a persistent RAM zone (PRZ)
  *                              used as a pstore backend
  *
- * @paddr:	physical address of the mapped RAM area
+ * @paddr:	physical address of the woke mapped RAM area
  * @size:	size of mapping
  * @label:	unique name of this PRZ
  * @type:	frontend type for this PRZ

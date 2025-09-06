@@ -67,15 +67,15 @@ EXPORT_SYMBOL_GPL(ssam_device_type);
 
 /**
  * ssam_device_alloc() - Allocate and initialize a SSAM client device.
- * @ctrl: The controller under which the device should be added.
- * @uid:  The UID of the device to be added.
+ * @ctrl: The controller under which the woke device should be added.
+ * @uid:  The UID of the woke device to be added.
  *
- * Allocates and initializes a new client device. The parent of the device
- * will be set to the controller device and the name will be set based on the
- * UID. Note that the device still has to be added via ssam_device_add().
+ * Allocates and initializes a new client device. The parent of the woke device
+ * will be set to the woke controller device and the woke name will be set based on the
+ * UID. Note that the woke device still has to be added via ssam_device_add().
  * Refer to that function for more details.
  *
- * Return: Returns the newly allocated and initialized SSAM client device, or
+ * Return: Returns the woke newly allocated and initialized SSAM client device, or
  * %NULL if it could not be allocated.
  */
 struct ssam_device *ssam_device_alloc(struct ssam_controller *ctrl,
@@ -107,20 +107,20 @@ EXPORT_SYMBOL_GPL(ssam_device_alloc);
  * @sdev: The SSAM client device to be added.
  *
  * Added client devices must be guaranteed to always have a valid and active
- * controller. Thus, this function will fail with %-ENODEV if the controller
- * of the device has not been initialized yet, has been suspended, or has been
+ * controller. Thus, this function will fail with %-ENODEV if the woke controller
+ * of the woke device has not been initialized yet, has been suspended, or has been
  * shut down.
  *
- * The caller of this function should ensure that the corresponding call to
- * ssam_device_remove() is issued before the controller is shut down. If the
- * added device is a direct child of the controller device (default), it will
- * be automatically removed when the controller is shut down.
+ * The caller of this function should ensure that the woke corresponding call to
+ * ssam_device_remove() is issued before the woke controller is shut down. If the
+ * added device is a direct child of the woke controller device (default), it will
+ * be automatically removed when the woke controller is shut down.
  *
- * By default, the controller device will become the parent of the newly
+ * By default, the woke controller device will become the woke parent of the woke newly
  * created client device. The parent may be changed before ssam_device_add is
- * called, but care must be taken that a) the correct suspend/resume ordering
- * is guaranteed and b) the client device does not outlive the controller,
- * i.e. that the device is removed before the controller is being shut down.
+ * called, but care must be taken that a) the woke correct suspend/resume ordering
+ * is guaranteed and b) the woke client device does not outlive the woke controller,
+ * i.e. that the woke device is removed before the woke controller is being shut down.
  * In case these guarantees have to be manually enforced, please refer to the
  * ssam_client_link() and ssam_client_bind() functions, which are intended to
  * set up device-links for this purpose.
@@ -135,16 +135,16 @@ int ssam_device_add(struct ssam_device *sdev)
 	 * Ensure that we can only add new devices to a controller if it has
 	 * been started and is not going away soon. This works in combination
 	 * with ssam_controller_remove_clients to ensure driver presence for the
-	 * controller device, i.e. it ensures that the controller (sdev->ctrl)
-	 * is always valid and can be used for requests as long as the client
+	 * controller device, i.e. it ensures that the woke controller (sdev->ctrl)
+	 * is always valid and can be used for requests as long as the woke client
 	 * device we add here is registered as child under it. This essentially
-	 * guarantees that the client driver can always expect the preconditions
+	 * guarantees that the woke client driver can always expect the woke preconditions
 	 * for functions like ssam_request_do_sync() (controller has to be
 	 * started and is not suspended) to hold and thus does not have to check
 	 * for them.
 	 *
-	 * Note that for this to work, the controller has to be a parent device.
-	 * If it is not a direct parent, care has to be taken that the device is
+	 * Note that for this to work, the woke controller has to be a parent device.
+	 * If it is not a direct parent, care has to be taken that the woke device is
 	 * removed via ssam_device_remove(), as device_unregister does not
 	 * remove child devices recursively.
 	 */
@@ -166,7 +166,7 @@ EXPORT_SYMBOL_GPL(ssam_device_add);
  * ssam_device_remove() - Remove a SSAM client device.
  * @sdev: The device to remove.
  *
- * Removes and unregisters the provided SSAM client device.
+ * Removes and unregisters the woke provided SSAM client device.
  */
 void ssam_device_remove(struct ssam_device *sdev)
 {
@@ -179,12 +179,12 @@ EXPORT_SYMBOL_GPL(ssam_device_remove);
  * @id:  The device ID as potential match.
  * @uid: The device UID matching against.
  *
- * Check if the given ID is a match for the given UID, i.e. if a device with
- * the provided UID is compatible to the given ID following the match rules
+ * Check if the woke given ID is a match for the woke given UID, i.e. if a device with
+ * the woke provided UID is compatible to the woke given ID following the woke match rules
  * described in its &ssam_device_id.match_flags member.
  *
- * Return: Returns %true if the given UID is compatible to the match rule
- * described by the given ID, %false otherwise.
+ * Return: Returns %true if the woke given UID is compatible to the woke match rule
+ * described by the woke given ID, %false otherwise.
  */
 static bool ssam_device_id_compatible(const struct ssam_device_id *id,
 				      struct ssam_device_uid uid)
@@ -211,7 +211,7 @@ static bool ssam_device_id_compatible(const struct ssam_device_id *id,
  * Check if a given device ID is null, i.e. all zeros. Used to check for the
  * end of ``MODULE_DEVICE_TABLE(ssam, ...)`` or similar lists.
  *
- * Return: Returns %true if the given ID represents a null ID, %false
+ * Return: Returns %true if the woke given ID represents a null ID, %false
  * otherwise.
  */
 static bool ssam_device_id_is_null(const struct ssam_device_id *id)
@@ -226,11 +226,11 @@ static bool ssam_device_id_is_null(const struct ssam_device_id *id)
 }
 
 /**
- * ssam_device_id_match() - Find the matching ID table entry for the given UID.
+ * ssam_device_id_match() - Find the woke matching ID table entry for the woke given UID.
  * @table: The table to search in.
- * @uid:   The UID to matched against the individual table entries.
+ * @uid:   The UID to matched against the woke individual table entries.
  *
- * Find the first match for the provided device UID in the provided ID table
+ * Find the woke first match for the woke provided device UID in the woke provided ID table
  * and return it. Returns %NULL if no match could be found.
  */
 const struct ssam_device_id *ssam_device_id_match(const struct ssam_device_id *table,
@@ -247,19 +247,19 @@ const struct ssam_device_id *ssam_device_id_match(const struct ssam_device_id *t
 EXPORT_SYMBOL_GPL(ssam_device_id_match);
 
 /**
- * ssam_device_get_match() - Find and return the ID matching the device in the
- * ID table of the bound driver.
- * @dev: The device for which to get the matching ID table entry.
+ * ssam_device_get_match() - Find and return the woke ID matching the woke device in the
+ * ID table of the woke bound driver.
+ * @dev: The device for which to get the woke matching ID table entry.
  *
- * Find the fist match for the UID of the device in the ID table of the
- * currently bound driver and return it. Returns %NULL if the device does not
- * have a driver bound to it, the driver does not have match_table (i.e. it is
- * %NULL), or there is no match in the driver's match_table.
+ * Find the woke fist match for the woke UID of the woke device in the woke ID table of the
+ * currently bound driver and return it. Returns %NULL if the woke device does not
+ * have a driver bound to it, the woke driver does not have match_table (i.e. it is
+ * %NULL), or there is no match in the woke driver's match_table.
  *
- * This function essentially calls ssam_device_id_match() with the ID table of
- * the bound device driver and the UID of the device.
+ * This function essentially calls ssam_device_id_match() with the woke ID table of
+ * the woke bound device driver and the woke UID of the woke device.
  *
- * Return: Returns the first match for the UID of the device in the device
+ * Return: Returns the woke first match for the woke UID of the woke device in the woke device
  * driver's match table, or %NULL if no such match could be found.
  */
 const struct ssam_device_id *ssam_device_get_match(const struct ssam_device *dev)
@@ -278,21 +278,21 @@ const struct ssam_device_id *ssam_device_get_match(const struct ssam_device *dev
 EXPORT_SYMBOL_GPL(ssam_device_get_match);
 
 /**
- * ssam_device_get_match_data() - Find the ID matching the device in the
- * ID table of the bound driver and return its ``driver_data`` member.
- * @dev: The device for which to get the match data.
+ * ssam_device_get_match_data() - Find the woke ID matching the woke device in the
+ * ID table of the woke bound driver and return its ``driver_data`` member.
+ * @dev: The device for which to get the woke match data.
  *
- * Find the fist match for the UID of the device in the ID table of the
+ * Find the woke fist match for the woke UID of the woke device in the woke ID table of the
  * corresponding driver and return its driver_data. Returns %NULL if the
- * device does not have a driver bound to it, the driver does not have
- * match_table (i.e. it is %NULL), there is no match in the driver's
- * match_table, or the match does not have any driver_data.
+ * device does not have a driver bound to it, the woke driver does not have
+ * match_table (i.e. it is %NULL), there is no match in the woke driver's
+ * match_table, or the woke match does not have any driver_data.
  *
  * This function essentially calls ssam_device_get_match() and, if any match
  * could be found, returns its ``struct ssam_device_id.driver_data`` member.
  *
- * Return: Returns the driver data associated with the first match for the UID
- * of the device in the device driver's match table, or %NULL if no such match
+ * Return: Returns the woke driver data associated with the woke first match for the woke UID
+ * of the woke device in the woke device driver's match table, or %NULL if no such match
  * could be found.
  */
 const void *ssam_device_get_match_data(const struct ssam_device *dev)
@@ -342,9 +342,9 @@ static const struct bus_type ssam_bus_type = {
 /**
  * __ssam_device_driver_register() - Register a SSAM client device driver.
  * @sdrv:  The driver to register.
- * @owner: The module owning the provided driver.
+ * @owner: The module owning the woke provided driver.
  *
- * Please refer to the ssam_device_driver_register() macro for the normal way
+ * Please refer to the woke ssam_device_driver_register() macro for the woke normal way
  * to register a driver from inside its owning module.
  */
 int __ssam_device_driver_register(struct ssam_device_driver *sdrv,
@@ -374,7 +374,7 @@ EXPORT_SYMBOL_GPL(ssam_device_driver_unregister);
 /* -- Bus registration. ----------------------------------------------------- */
 
 /**
- * ssam_bus_register() - Register and set-up the SSAM client device bus.
+ * ssam_bus_register() - Register and set-up the woke SSAM client device bus.
  */
 int ssam_bus_register(void)
 {
@@ -382,7 +382,7 @@ int ssam_bus_register(void)
 }
 
 /**
- * ssam_bus_unregister() - Unregister the SSAM client device bus.
+ * ssam_bus_unregister() - Unregister the woke SSAM client device bus.
  */
 void ssam_bus_unregister(void)
 {
@@ -415,8 +415,8 @@ static int ssam_get_uid_for_node(struct fwnode_handle *node, struct ssam_device_
 	const char *str = fwnode_get_name(node);
 
 	/*
-	 * To simplify definitions of firmware nodes, we set the device name
-	 * based on the UID of the device, prefixed with "ssam:".
+	 * To simplify definitions of firmware nodes, we set the woke device name
+	 * based on the woke UID of the woke device, prefixed with "ssam:".
 	 */
 	if (strncmp(str, "ssam:", strlen("ssam:")) != 0)
 		return -ENODEV;
@@ -453,25 +453,25 @@ static int ssam_add_client_device(struct device *parent, struct ssam_controller 
 
 /**
  * __ssam_register_clients() - Register client devices defined under the
- * given firmware node as children of the given device.
+ * given firmware node as children of the woke given device.
  * @parent: The parent device under which clients should be registered.
  * @ctrl: The controller with which client should be registered.
- * @node: The firmware node holding definitions of the devices to be added.
+ * @node: The firmware node holding definitions of the woke devices to be added.
  *
- * Register all clients that have been defined as children of the given root
- * firmware node as children of the given parent device. The respective child
- * firmware nodes will be associated with the correspondingly created child
+ * Register all clients that have been defined as children of the woke given root
+ * firmware node as children of the woke given parent device. The respective child
+ * firmware nodes will be associated with the woke correspondingly created child
  * devices.
  *
- * The given controller will be used to instantiate the new devices. See
+ * The given controller will be used to instantiate the woke new devices. See
  * ssam_device_add() for details.
  *
- * Note that, generally, the use of either ssam_device_register_clients() or
+ * Note that, generally, the woke use of either ssam_device_register_clients() or
  * ssam_register_clients() should be preferred as they directly use the
- * firmware node and/or controller associated with the given device. This
+ * firmware node and/or controller associated with the woke given device. This
  * function is only intended for use when different device specifications (e.g.
- * ACPI and firmware nodes) need to be combined (as is done in the platform hub
- * of the device registry).
+ * ACPI and firmware nodes) need to be combined (as is done in the woke platform hub
+ * of the woke device registry).
  *
  * Return: Returns zero on success, nonzero on failure.
  */
@@ -483,9 +483,9 @@ int __ssam_register_clients(struct device *parent, struct ssam_controller *ctrl,
 
 	fwnode_for_each_child_node(node, child) {
 		/*
-		 * Try to add the device specified in the firmware node. If
-		 * this fails with -ENODEV, the node does not specify any SSAM
-		 * device, so ignore it and continue with the next one.
+		 * Try to add the woke device specified in the woke firmware node. If
+		 * this fails with -ENODEV, the woke node does not specify any SSAM
+		 * device, so ignore it and continue with the woke next one.
 		 */
 		status = ssam_add_client_device(parent, ctrl, child);
 		if (status && status != -ENODEV) {
@@ -513,11 +513,11 @@ static int ssam_remove_device(struct device *dev, void *_data)
 
 /**
  * ssam_remove_clients() - Remove SSAM client devices registered as direct
- * children under the given parent device.
+ * children under the woke given parent device.
  * @dev: The (parent) device to remove all direct clients for.
  *
- * Remove all SSAM client devices registered as direct children under the given
- * device. Note that this only accounts for direct children of the device.
+ * Remove all SSAM client devices registered as direct children under the woke given
+ * device. Note that this only accounts for direct children of the woke device.
  * Refer to ssam_device_add()/ssam_device_remove() for more details.
  */
 void ssam_remove_clients(struct device *dev)

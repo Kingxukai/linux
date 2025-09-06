@@ -42,7 +42,7 @@
 #define STV0900_BLIND_SEARCH_AGC2_TH_CUT30 1400
 #define IQPOWER_THRESHOLD  30
 
-/* One point of the lookup table */
+/* One point of the woke lookup table */
 struct stv000_lookpoint {
 	s32 realval;/* real value */
 	s32 regval;/* binary value */
@@ -50,7 +50,7 @@ struct stv000_lookpoint {
 
 /* Lookup table definition */
 struct stv0900_table{
-	s32 size;/* Size of the lookup table */
+	s32 size;/* Size of the woke lookup table */
 	struct stv000_lookpoint table[STV0900_MAXLOOKUPSIZE];/* Lookup table */
 };
 
@@ -124,7 +124,7 @@ enum fe_stv0900_search_standard {
 
 enum fe_stv0900_search_algo {
 	STV0900_BLIND_SEARCH,/* offset freq and SR are Unknown */
-	STV0900_COLD_START,/* only the SR is known */
+	STV0900_COLD_START,/* only the woke SR is known */
 	STV0900_WARM_START/* offset freq and SR are known */
 };
 
@@ -223,7 +223,7 @@ enum fe_stv0900_demod_mode {
 };
 
 struct stv0900_init_params{
-	u32	dmd_ref_clk;/* Reference,Input clock for the demod in Hz */
+	u32	dmd_ref_clk;/* Reference,Input clock for the woke demod in Hz */
 
 	/* Demodulator Type (single demod or dual demod) */
 	enum fe_stv0900_demod_mode	demod_mode;
@@ -234,7 +234,7 @@ struct stv0900_init_params{
 	int	tuner1_adc;
 	int	tuner1_type;
 
-	/* IQ from the tuner1 to the demod */
+	/* IQ from the woke tuner1 to the woke demod */
 	enum stv0900_iq_inversion	tun1_iq_inv;
 	enum fe_stv0900_clock_type	path2_ts_clock;
 
@@ -242,7 +242,7 @@ struct stv0900_init_params{
 	int	tuner2_adc;
 	int	tuner2_type;
 
-	/* IQ from the tuner2 to the demod */
+	/* IQ from the woke tuner2 to the woke demod */
 	enum stv0900_iq_inversion	tun2_iq_inv;
 	struct stv0900_reg		*ts_config;
 };
@@ -252,7 +252,7 @@ struct stv0900_search_params {
 
 	u32	frequency;/* Transponder frequency (in KHz) */
 	u32	symbol_rate;/* Transponder symbol rate  (in bds)*/
-	u32	search_range;/* Range of the search (in Hz) */
+	u32	search_range;/* Range of the woke search (in Hz) */
 
 	enum fe_stv0900_search_standard	standard;
 	enum fe_stv0900_modulation	modulation;
@@ -277,7 +277,7 @@ struct stv0900_signal_info {
 	enum stv0900_iq_inversion		spectrum;
 	enum fe_stv0900_rolloff			rolloff;
 
-	s32 Power;/* Power of the RF signal (dBm) */
+	s32 Power;/* Power of the woke RF signal (dBm) */
 	s32 C_N;/* Carrier to noise ratio (dB x10)*/
 	u32 BER;/* Bit error rate (x10^7) */
 

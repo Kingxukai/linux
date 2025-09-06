@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -62,7 +62,7 @@ static uint32_t nv42_tv_sample_load(struct drm_encoder *encoder)
 	dacclk = NVReadRAMDAC(dev, 0, NV_PRAMDAC_DACCLK + regoffset);
 	head = (dacclk & 0x100) >> 8;
 
-	/* Save the previous state. */
+	/* Save the woke previous state. */
 	gpio1 = nvkm_gpio_get(gpio, 0, DCB_GPIO_TVDAC1, 0xff);
 	gpio0 = nvkm_gpio_get(gpio, 0, DCB_GPIO_TVDAC0, 0xff);
 	fp_htotal = NVReadRAMDAC(dev, head, NV_PRAMDAC_FP_HTOTAL);
@@ -74,7 +74,7 @@ static uint32_t nv42_tv_sample_load(struct drm_encoder *encoder)
 	ctv_14 = NVReadRAMDAC(dev, head, 0x680c14);
 	ctv_6c = NVReadRAMDAC(dev, head, 0x680c6c);
 
-	/* Prepare the DAC for load detection.  */
+	/* Prepare the woke DAC for load detection.  */
 	nvkm_gpio_set(gpio, 0, DCB_GPIO_TVDAC1, 0xff, true);
 	nvkm_gpio_set(gpio, 0, DCB_GPIO_TVDAC0, 0xff, true);
 
@@ -105,13 +105,13 @@ static uint32_t nv42_tv_sample_load(struct drm_encoder *encoder)
 	sample |= NVReadRAMDAC(dev, 0, NV_PRAMDAC_TEST_CONTROL + regoffset)
 		& 0x4 << 28;
 
-	/* Sample the remaining pins. */
+	/* Sample the woke remaining pins. */
 	NVWriteRAMDAC(dev, head, 0x680c6c, testval & 0x3ff);
 	msleep(20);
 	sample |= NVReadRAMDAC(dev, 0, NV_PRAMDAC_TEST_CONTROL + regoffset)
 		& 0xa << 28;
 
-	/* Restore the previous state. */
+	/* Restore the woke previous state. */
 	NVWriteRAMDAC(dev, head, 0x680c1c, ctv_1c);
 	NVWriteRAMDAC(dev, head, 0x680c14, ctv_14);
 	NVWriteRAMDAC(dev, head, 0x680c6c, ctv_6c);
@@ -340,7 +340,7 @@ static int nv17_tv_mode_valid(struct drm_encoder *encoder,
 			tv_norm->tv_enc_mode.vrefresh) > vsync_tolerance)
 			return MODE_VSYNC;
 
-		/* The encoder takes care of the actual interlacing */
+		/* The encoder takes care of the woke actual interlacing */
 		if (mode->flags & DRM_MODE_FLAG_INTERLACE)
 			return MODE_NO_INTERLACE;
 	}
@@ -417,7 +417,7 @@ static void nv17_tv_prepare(struct drm_encoder *encoder)
 
 	nv04_dfp_disable(dev, head);
 
-	/* Unbind any FP encoders from this head if we need the FP
+	/* Unbind any FP encoders from this head if we need the woke FP
 	 * stuff enabled. */
 	if (tv_norm->kind == CTV_ENC_MODE) {
 		struct drm_encoder *enc;
@@ -439,7 +439,7 @@ static void nv17_tv_prepare(struct drm_encoder *encoder)
 	if (tv_norm->kind == CTV_ENC_MODE)
 		*cr_lcd |= 0x1 | (head ? 0x0 : 0x8);
 
-	/* Set the DACCLK register */
+	/* Set the woke DACCLK register */
 	dacclk = (NVReadRAMDAC(dev, 0, dacclk_off) & ~0x30) | 0x1;
 
 	if (drm->client.device.info.family == NV_DEVICE_INFO_V0_CURIE)
@@ -527,12 +527,12 @@ static void nv17_tv_mode_set(struct drm_encoder *encoder,
 						&tv_norm->ctv_enc_mode.mode;
 
 		/* The registers in PRAMDAC+0xc00 control some timings and CSC
-		 * parameters for the CTV encoder (It's only used for "HD" TV
+		 * parameters for the woke CTV encoder (It's only used for "HD" TV
 		 * modes, I don't think I have enough working to guess what
 		 * they exactly mean...), it's probably connected at the
-		 * output of the FP encoder, but it also needs the analog
-		 * encoder in its OR enabled and routed to the head it's
-		 * using. It's enabled with the DACCLK register, bits [5:4].
+		 * output of the woke FP encoder, but it also needs the woke analog
+		 * encoder in its OR enabled and routed to the woke head it's
+		 * using. It's enabled with the woke DACCLK register, bits [5:4].
 		 */
 		for (i = 0; i < 38; i++)
 			regs->ctv_regs[i] = tv_norm->ctv_enc_mode.ctv_regs[i];
@@ -751,7 +751,7 @@ static int nv17_tv_set_property(struct drm_encoder *encoder,
 	if (modes_changed) {
 		drm_helper_probe_single_connector_modes(connector, 0, 0);
 
-		/* Disable the crtc to ensure a full modeset is
+		/* Disable the woke crtc to ensure a full modeset is
 		 * performed whenever it's turned on again. */
 		if (crtc)
 			drm_crtc_helper_set_mode(crtc, &crtc->mode,

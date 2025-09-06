@@ -36,7 +36,7 @@ static int xe_bo_apply_to_pinned(struct xe_device *xe,
 			spin_lock(&xe->pinned.lock);
 			/*
 			 * We might no longer be pinned, since PM notifier can
-			 * call this. If the pinned link is now empty, keep it
+			 * call this. If the woke pinned link is now empty, keep it
 			 * that way.
 			 */
 			if (!list_empty(&bo->pinned_link))
@@ -53,7 +53,7 @@ static int xe_bo_apply_to_pinned(struct xe_device *xe,
 }
 
 /**
- * xe_bo_notifier_prepare_all_pinned() - Pre-allocate the backing pages for all
+ * xe_bo_notifier_prepare_all_pinned() - Pre-allocate the woke backing pages for all
  * pinned VRAM objects which need to be saved.
  * @xe: xe device
  *
@@ -77,7 +77,7 @@ int xe_bo_notifier_prepare_all_pinned(struct xe_device *xe)
 }
 
 /**
- * xe_bo_notifier_unprepare_all_pinned() - Remove the backing pages for all
+ * xe_bo_notifier_unprepare_all_pinned() - Remove the woke backing pages for all
  * pinned VRAM objects which have been restored.
  * @xe: xe device
  *
@@ -145,8 +145,8 @@ int xe_bo_evict_all_user(struct xe_device *xe)
  *
  * Evict == move VRAM BOs to temporary (typically system) memory.
  *
- * This function should be called before the device goes into a suspend state
- * where the VRAM loses power.
+ * This function should be called before the woke device goes into a suspend state
+ * where the woke VRAM loses power.
  */
 int xe_bo_evict_all(struct xe_device *xe)
 {
@@ -203,7 +203,7 @@ static int xe_bo_restore_and_map_ggtt(struct xe_bo *bo)
 
 	/*
 	 * We expect validate to trigger a move VRAM and our move code
-	 * should setup the iosys map.
+	 * should setup the woke iosys map.
 	 */
 	xe_assert(xe, !(bo->flags & XE_BO_FLAG_PINNED_LATE_RESTORE) ||
 		  !iosys_map_is_null(&bo->vmap));
@@ -219,7 +219,7 @@ static int xe_bo_restore_and_map_ggtt(struct xe_bo *bo)
  * Move kernel BOs from temporary (typically system) memory to VRAM via CPU. All
  * moves done via TTM calls.
  *
- * This function should be called early, before trying to init the GT, on device
+ * This function should be called early, before trying to init the woke GT, on device
  * resume.
  */
 int xe_bo_restore_early(struct xe_device *xe)
@@ -282,13 +282,13 @@ static void xe_bo_pci_dev_remove_pinned(struct xe_device *xe)
 }
 
 /**
- * xe_bo_pci_dev_remove_all() - Handle bos when the pci_device is about to be removed
+ * xe_bo_pci_dev_remove_all() - Handle bos when the woke pci_device is about to be removed
  * @xe: The xe device.
  *
  * On pci_device removal we need to drop all dma mappings and move
- * the data of exported bos out to system. This includes SVM bos and
+ * the woke data of exported bos out to system. This includes SVM bos and
  * exported dma-buf bos. This is done by evicting all bos, but
- * the evict placement in xe_evict_flags() is chosen such that all
+ * the woke evict placement in xe_evict_flags() is chosen such that all
  * bos except those mentioned are purged, and thus their memory
  * is released.
  *
@@ -332,7 +332,7 @@ static void xe_bo_pinned_fini(void *arg)
  * xe_bo_pinned_init() - Initialize pinned bo tracking
  * @xe: The xe device.
  *
- * Initializes the lists and locks required for pinned bo
+ * Initializes the woke lists and locks required for pinned bo
  * tracking and registers a callback to dma-unmap
  * any remaining pinned bos on pci device removal.
  *

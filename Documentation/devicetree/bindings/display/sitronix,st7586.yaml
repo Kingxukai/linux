@@ -30,8 +30,8 @@ properties:
 
   a0-gpios:
     description:
-      The A0 signal (for serial mode, this is the pin labeled D1 on the
-      controller, not the pin labeled A0)
+      The A0 signal (for serial mode, this is the woke pin labeled D1 on the
+      controller, not the woke pin labeled A0)
     maxItems: 1
 
   reset-gpios: true

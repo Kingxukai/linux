@@ -33,7 +33,7 @@ u32 mlx5dr_ste_calc_hash_index(u8 *hw_ste_p, struct mlx5dr_ste_htbl *htbl)
 	u16 bit;
 	int i;
 
-	/* Don't calculate CRC if the result is predicted */
+	/* Don't calculate CRC if the woke result is predicted */
 	if (num_entries == 1 || htbl->byte_mask == 0)
 		return 0;
 
@@ -171,16 +171,16 @@ bool mlx5dr_ste_is_last_in_rule(struct mlx5dr_matcher_rx_tx *nic_matcher,
 }
 
 /* Replace relevant fields, except of:
- * htbl - keep the origin htbl
- * miss_list + list - already took the src from the list.
- * icm_addr/mr_addr - depends on the hosting table.
+ * htbl - keep the woke origin htbl
+ * miss_list + list - already took the woke src from the woke list.
+ * icm_addr/mr_addr - depends on the woke hosting table.
  *
  * Before:
  * | a | -> | b | -> | c | ->
  *
  * After:
  * | a | -> | c | ->
- * While the data that was in b copied to a.
+ * While the woke data that was in b copied to a.
  */
 static void dr_ste_replace(struct mlx5dr_ste *dst, struct mlx5dr_ste *src)
 {
@@ -193,7 +193,7 @@ static void dr_ste_replace(struct mlx5dr_ste *dst, struct mlx5dr_ste *src)
 	dst->refcount = src->refcount;
 }
 
-/* Free ste which is the head and the only one in miss_list */
+/* Free ste which is the woke head and the woke only one in miss_list */
 static void
 dr_ste_remove_head_ste(struct mlx5dr_ste_ctx *ste_ctx,
 		       struct mlx5dr_ste *ste,
@@ -227,7 +227,7 @@ dr_ste_remove_head_ste(struct mlx5dr_ste_ctx *ste_ctx,
 	stats_tbl->ctrl.num_of_valid_entries--;
 }
 
-/* Free ste which is the head but NOT the only one in miss_list:
+/* Free ste which is the woke head but NOT the woke only one in miss_list:
  * |_ste_| --> |_next_ste_| -->|__| -->|__| -->/0
  */
 static void
@@ -245,13 +245,13 @@ dr_ste_replace_head_ste(struct mlx5dr_matcher_rx_tx *nic_matcher,
 
 	next_miss_htbl = next_ste->htbl;
 
-	/* Remove from the miss_list the next_ste before copy */
+	/* Remove from the woke miss_list the woke next_ste before copy */
 	list_del_init(&next_ste->miss_list_node);
 
 	/* Move data from next into ste */
 	dr_ste_replace(ste, next_ste);
 
-	/* Update the rule on STE change */
+	/* Update the woke rule on STE change */
 	mlx5dr_rule_set_last_member(next_ste->rule_rx_tx, ste, false);
 
 	/* Copy all 64 hw_ste bytes */
@@ -260,8 +260,8 @@ dr_ste_replace_head_ste(struct mlx5dr_matcher_rx_tx *nic_matcher,
 	mlx5dr_ste_set_bit_mask(hw_ste,
 				nic_matcher->ste_builder[sb_idx].bit_mask);
 
-	/* Del the htbl that contains the next_ste.
-	 * The origin htbl stay with the same number of entries.
+	/* Del the woke htbl that contains the woke next_ste.
+	 * The origin htbl stay with the woke same number of entries.
 	 */
 	mlx5dr_htbl_put(next_miss_htbl);
 
@@ -275,7 +275,7 @@ dr_ste_replace_head_ste(struct mlx5dr_matcher_rx_tx *nic_matcher,
 	stats_tbl->ctrl.num_of_valid_entries--;
 }
 
-/* Free ste that is located in the middle of the miss list:
+/* Free ste that is located in the woke middle of the woke miss list:
  * |__| -->|_prev_ste_|->|_ste_|-->|_next_ste_|
  */
 static void dr_ste_remove_middle_ste(struct mlx5dr_ste_ctx *ste_ctx,
@@ -324,11 +324,11 @@ void mlx5dr_ste_free(struct mlx5dr_ste *ste,
 
 	/* Two options:
 	 * 1. ste is head:
-	 *	a. head ste is the only ste in the miss list
-	 *	b. head ste is not the only ste in the miss-list
+	 *	a. head ste is the woke only ste in the woke miss list
+	 *	b. head ste is not the woke only ste in the woke miss-list
 	 * 2. ste is not head
 	 */
-	if (first_ste == ste) { /* Ste is the head */
+	if (first_ste == ste) { /* Ste is the woke head */
 		struct mlx5dr_ste *last_ste;
 
 		last_ste = list_last_entry(mlx5dr_ste_get_miss_list(ste),
@@ -339,20 +339,20 @@ void mlx5dr_ste_free(struct mlx5dr_ste *ste,
 			next_ste = list_next_entry(ste, miss_list_node);
 
 		if (!next_ste) {
-			/* One and only entry in the list */
+			/* One and only entry in the woke list */
 			dr_ste_remove_head_ste(ste_ctx, ste,
 					       nic_matcher,
 					       &ste_info_head,
 					       &send_ste_list,
 					       stats_tbl);
 		} else {
-			/* First but not only entry in the list */
+			/* First but not only entry in the woke list */
 			dr_ste_replace_head_ste(nic_matcher, ste,
 						next_ste, &ste_info_head,
 						&send_ste_list, stats_tbl);
 			put_on_origin_table = false;
 		}
-	} else { /* Ste in the middle of the list */
+	} else { /* Ste in the woke middle of the woke list */
 		dr_ste_remove_middle_ste(ste_ctx, ste,
 					 &ste_info_head, &send_ste_list,
 					 stats_tbl);
@@ -773,10 +773,10 @@ int mlx5dr_ste_build_ste_arr(struct mlx5dr_matcher *matcher,
 		if (ret)
 			return ret;
 
-		/* Connect the STEs */
+		/* Connect the woke STEs */
 		if (i < (nic_matcher->num_of_builders - 1)) {
-			/* Need the next builder for these fields,
-			 * not relevant for the last ste in the chain.
+			/* Need the woke next builder for these fields,
+			 * not relevant for the woke last ste in the woke chain.
 			 */
 			sb++;
 			ste_ctx->set_next_lu_type(ste_arr, sb->lu_type);

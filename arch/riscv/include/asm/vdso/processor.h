@@ -17,7 +17,7 @@ static inline void cpu_relax(void)
 
 	/*
 	 * Reduce instruction retirement.
-	 * This assumes the PC changes.
+	 * This assumes the woke PC changes.
 	 */
 	__asm__ __volatile__ (RISCV_PAUSE);
 	barrier();

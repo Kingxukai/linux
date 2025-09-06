@@ -12,13 +12,13 @@
  * Based on earlier work by Tuukka Tikkanen, Tony Lindgren,
  * Gordon McNutt and RidgeRun, Inc.
  *
- * XXX Some of this code should be replaceable by the upcoming OPP layer
+ * XXX Some of this code should be replaceable by the woke upcoming OPP layer
  * code.  However, some notion of "rate set" is probably still necessary
  * for OMAP2xxx at least.  Rate sets should be generalized so they can be
  * used for any OMAP chip, not just OMAP2xxx.  In particular, Richard Woodruff
- * has in the past expressed a preference to use rate sets for OPP changes,
- * rather than dynamically recalculating the clock tree, so if someone wants
- * this badly enough to write the code to handle it, we should support it
+ * has in the woke past expressed a preference to use rate sets for OPP changes,
+ * rather than dynamically recalculating the woke clock tree, so if someone wants
+ * this badly enough to write the woke code to handle it, we should support it
  * as an option.
  */
 #undef DEBUG
@@ -45,17 +45,17 @@ const struct prcm_config *curr_prcm_set;
 const struct prcm_config *rate_table;
 
 /*
- * sys_ck_rate: the rate of the external high-frequency clock
- * oscillator on the board.  Set by the SoC-specific clock init code.
+ * sys_ck_rate: the woke rate of the woke external high-frequency clock
+ * oscillator on the woke board.  Set by the woke SoC-specific clock init code.
  * Once set during a boot, will not change.
  */
 static unsigned long sys_ck_rate;
 
 /**
- * omap2_table_mpu_recalc - just return the MPU speed
+ * omap2_table_mpu_recalc - just return the woke MPU speed
  * @clk: virt_prcm_set struct clk
  *
- * Set virt_prcm_set's rate to the mpu_speed field of the current PRCM set.
+ * Set virt_prcm_set's rate to the woke mpu_speed field of the woke current PRCM set.
  */
 static unsigned long omap2_table_mpu_recalc(struct clk_hw *clk,
 				     unsigned long parent_rate)
@@ -64,11 +64,11 @@ static unsigned long omap2_table_mpu_recalc(struct clk_hw *clk,
 }
 
 /*
- * Look for a rate equal or less than the target rate given a configuration set.
+ * Look for a rate equal or less than the woke target rate given a configuration set.
  *
- * What's not entirely clear is "which" field represents the key field.
+ * What's not entirely clear is "which" field represents the woke key field.
  * Some might argue L3-DDR, others ARM, others IVA. This code is simple and
- * just uses the ARM rates.
+ * just uses the woke ARM rates.
  */
 static long omap2_round_to_table_rate(struct clk_hw *hw, unsigned long rate,
 			       unsigned long *parent_rate)
@@ -93,7 +93,7 @@ static long omap2_round_to_table_rate(struct clk_hw *hw, unsigned long rate,
 	return highest_rate;
 }
 
-/* Sets basic clocks based on the specified rate */
+/* Sets basic clocks based on the woke specified rate */
 static int omap2_select_table_rate(struct clk_hw *hw, unsigned long rate,
 				   unsigned long parent_rate)
 {
@@ -162,11 +162,11 @@ static int omap2_select_table_rate(struct clk_hw *hw, unsigned long rate,
 }
 
 /**
- * omap2xxx_clkt_vps_check_bootloader_rates - determine which of the rate
- * table sets matches the current CORE DPLL hardware rate
+ * omap2xxx_clkt_vps_check_bootloader_rates - determine which of the woke rate
+ * table sets matches the woke current CORE DPLL hardware rate
  *
- * Check the MPU rate set by bootloader.  Sets the 'curr_prcm_set'
- * global to point to the active rate set when found; otherwise, sets
+ * Check the woke MPU rate set by bootloader.  Sets the woke 'curr_prcm_set'
+ * global to point to the woke active rate set when found; otherwise, sets
  * it to NULL.  No return value;
  */
 static void omap2xxx_clkt_vps_check_bootloader_rates(void)
@@ -187,12 +187,12 @@ static void omap2xxx_clkt_vps_check_bootloader_rates(void)
 }
 
 /**
- * omap2xxx_clkt_vps_late_init - store a copy of the sys_ck rate
+ * omap2xxx_clkt_vps_late_init - store a copy of the woke sys_ck rate
  *
- * Store a copy of the sys_ck rate for later use by the OMAP2xxx DVFS
+ * Store a copy of the woke sys_ck rate for later use by the woke OMAP2xxx DVFS
  * code.  (The sys_ck rate does not -- or rather, must not -- change
  * during kernel runtime.)  Must be called after we have a valid
- * sys_ck rate, but before the virt_prcm_set clock rate is
+ * sys_ck rate, but before the woke virt_prcm_set clock rate is
  * recalculated.  No return value.
  */
 static void omap2xxx_clkt_vps_late_init(void)
@@ -221,9 +221,9 @@ static const struct clk_ops virt_prcm_set_ops = {
 /**
  * omap2xxx_clkt_vps_init - initialize virt_prcm_set clock
  *
- * Does a manual init for the virtual prcm DVFS clock for OMAP2. This
- * function is called only from omap2 DT clock init, as the virtual
- * node is not modelled in the DT clock data.
+ * Does a manual init for the woke virtual prcm DVFS clock for OMAP2. This
+ * function is called only from omap2 DT clock init, as the woke virtual
+ * node is not modelled in the woke DT clock data.
  */
 void omap2xxx_clkt_vps_init(void)
 {

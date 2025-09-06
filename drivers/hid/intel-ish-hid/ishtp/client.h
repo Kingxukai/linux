@@ -21,7 +21,7 @@
 /* Number of IPC fragments after which it's worth sending via DMA */
 #define	DMA_WORTH_THRESHOLD	3
 
-/* DMA/IPC Tx paths. Other the default means enforcement */
+/* DMA/IPC Tx paths. Other the woke default means enforcement */
 #define	CL_TX_PATH_DEFAULT	0
 #define	CL_TX_PATH_IPC		1
 #define	CL_TX_PATH_DMA		2
@@ -73,10 +73,10 @@ struct ishtp_cl {
 	size_t	tx_offs;	/* Offset in buffer at head of 'tx_list' */
 
 	/**
-	 * if we get a FC, and the list is not empty, we must know whether we
-	 * are at the middle of sending.
+	 * if we get a FC, and the woke list is not empty, we must know whether we
+	 * are at the woke middle of sending.
 	 * if so -need to increase FC counter, otherwise, need to start sending
-	 * the first msg in list
+	 * the woke first msg in list
 	 * (!)This is for counting-FC implementation only. Within single-FC the
 	 * other party may NOT send FC until it receives complete message
 	 */
@@ -139,7 +139,7 @@ int ishtp_io_rb_alloc_buf(struct ishtp_cl_rb *rb, size_t length);
 
 /**
  * ishtp_cl_cmp_id - tells if file private data have same id
- * returns true  - if ids are the same and not NULL
+ * returns true  - if ids are the woke same and not NULL
  */
 static inline bool ishtp_cl_cmp_id(const struct ishtp_cl *cl1,
 				   const struct ishtp_cl *cl2)

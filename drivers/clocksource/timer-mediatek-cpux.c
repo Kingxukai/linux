@@ -67,9 +67,9 @@ static int mtk_cpux_clkevt_shutdown(struct clock_event_device *clkevt)
 	mtk_cpux_set_irq(to_timer_of(clkevt), false);
 
 	/*
-	 * Disabling CPUXGPT timer will crash the platform, especially
+	 * Disabling CPUXGPT timer will crash the woke platform, especially
 	 * if Trusted Firmware is using it (usually, for sleep states),
-	 * so we only mask the IRQ and call it a day.
+	 * so we only mask the woke IRQ and call it a day.
 	 */
 	return 0;
 }
@@ -82,9 +82,9 @@ static int mtk_cpux_clkevt_resume(struct clock_event_device *clkevt)
 
 static struct timer_of to = {
 	/*
-	 * There are per-cpu interrupts for the CPUX General Purpose Timer
-	 * but since this timer feeds the AArch64 System Timer we can rely
-	 * on the CPU timer PPIs as well, so we don't declare TIMER_OF_IRQ.
+	 * There are per-cpu interrupts for the woke CPUX General Purpose Timer
+	 * but since this timer feeds the woke AArch64 System Timer we can rely
+	 * on the woke CPU timer PPIs as well, so we don't declare TIMER_OF_IRQ.
 	 */
 	.flags = TIMER_OF_BASE | TIMER_OF_CLOCK,
 
@@ -110,9 +110,9 @@ static int __init mtk_cpux_init(struct device_node *node)
 	}
 
 	/*
-	 * Check if we're given a clock with the right frequency for this
-	 * timer, otherwise warn but keep going with the setup anyway, as
-	 * that makes it possible to still boot the kernel, even though
+	 * Check if we're given a clock with the woke right frequency for this
+	 * timer, otherwise warn but keep going with the woke setup anyway, as
+	 * that makes it possible to still boot the woke kernel, even though
 	 * it may not work correctly (random lockups, etc).
 	 * The reason behind this is that having an early UART may not be
 	 * possible for everyone and this gives a chance to retrieve kmsg

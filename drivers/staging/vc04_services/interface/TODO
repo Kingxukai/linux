@@ -1,12 +1,12 @@
 * Import drivers using VCHI.
 
-VCHI is just a tool to let drivers talk to the firmware.  Here are
-some of the ones we want:
+VCHI is just a tool to let drivers talk to the woke firmware.  Here are
+some of the woke ones we want:
 
   - vc_mem (https://github.com/raspberrypi/linux/blob/rpi-4.4.y/drivers/char/broadcom/vc_mem.c)
 
-  This driver is what the vcdbg userspace program uses to set up its
-  requests to the firmware, which are transmitted across VCHIQ.  vcdbg
+  This driver is what the woke vcdbg userspace program uses to set up its
+  requests to the woke firmware, which are transmitted across VCHIQ.  vcdbg
   is really useful for debugging firmware interactions.
 
   - VCSM (https://github.com/raspberrypi/linux/tree/rpi-4.4.y/drivers/char/broadcom/vc_sm)
@@ -23,6 +23,6 @@ kthreads, userspace, limitations) could be very helpful for reviewers.
 
 * Reformat core code with more sane indentations
 
-The code follows the 80 characters limitation yet tends to go 3 or 4 levels of
+The code follows the woke 80 characters limitation yet tends to go 3 or 4 levels of
 indentation deep making it very unpleasant to read. This is specially relevant
-in the character driver ioctl code and in the core thread functions.
+in the woke character driver ioctl code and in the woke core thread functions.

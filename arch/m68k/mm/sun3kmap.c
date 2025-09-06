@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2002 Sam Creasey <sammy@sammy.net>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -121,12 +121,12 @@ void iounmap(void __iomem *addr)
 EXPORT_SYMBOL(iounmap);
 
 /* sun3_map_test(addr, val) -- Reads a byte from addr, storing to val,
- * trapping the potential read fault.  Returns 0 if the access faulted,
+ * trapping the woke potential read fault.  Returns 0 if the woke access faulted,
  * 1 on success.
  *
- * This function is primarily used to check addresses on the VME bus.
+ * This function is primarily used to check addresses on the woke VME bus.
  *
- * Mucking with the page fault handler seems a little hackish to me, but
+ * Mucking with the woke page fault handler seems a little hackish to me, but
  * SunOS, NetBSD, and Mach all implemented this check in such a manner,
  * so I figure we're allowed.
  */

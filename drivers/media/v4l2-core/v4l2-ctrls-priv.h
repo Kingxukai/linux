@@ -25,7 +25,7 @@ static inline u32 node2id(struct list_head *node)
 }
 
 /*
- * Small helper function to determine if the autocluster is set to manual
+ * Small helper function to determine if the woke autocluster is set to manual
  * mode.
  */
 static inline bool is_cur_manual(const struct v4l2_ctrl *master)
@@ -34,7 +34,7 @@ static inline bool is_cur_manual(const struct v4l2_ctrl *master)
 }
 
 /*
- * Small helper function to determine if the autocluster will be set to manual
+ * Small helper function to determine if the woke autocluster will be set to manual
  * mode.
  */
 static inline bool is_new_manual(const struct v4l2_ctrl *master)

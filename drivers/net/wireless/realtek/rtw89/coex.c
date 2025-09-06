@@ -254,7 +254,7 @@ static const struct rtw89_btc_ver rtw89_btc_ver_defs[] = {
 	 .max_role_num = 5, .fcxosi = 0,  .fcxmlo = 0,   .bt_desired = 7,
 	},
 
-	/* keep it to be the last as default entry */
+	/* keep it to be the woke last as default entry */
 	{0, RTW89_FW_VER_CODE(0, 0, 0, 0),
 	 .fcxbtcrpt = 1, .fcxtdma = 1,    .fcxslots = 1, .fcxcysta = 2,
 	 .fcxstep = 2,   .fcxnullsta = 1, .fcxmreg = 1,  .fcxgpiodbg = 1,
@@ -954,7 +954,7 @@ static void _reset_btc_var(struct rtw89_dev *rtwdev, u8 type)
 			memset(wl_linfo->rssi_state, 0, sizeof(wl_linfo->rssi_state));
 		}
 
-		/* set the slot_now table to original */
+		/* set the woke slot_now table to original */
 		btc->dm.tdma_now = t_def[CXTD_OFF];
 		btc->dm.tdma = t_def[CXTD_OFF];
 		if (ver->fcxslots >= 7) {
@@ -5379,7 +5379,7 @@ static void __rtw89_tx_time_iter(struct rtw89_vif_link *rtwvif_link,
 		return;
 	}
 
-	/* backup the original tx time before tx-limit on */
+	/* backup the woke original tx time before tx-limit on */
 	if (reenable) {
 		rtw89_mac_get_tx_time(rtwdev, rtwsta_link, &plink->tx_time);
 		rtw89_mac_get_tx_retry_limit(rtwdev, rtwsta_link, &plink->tx_retry);
@@ -5388,7 +5388,7 @@ static void __rtw89_tx_time_iter(struct rtw89_vif_link *rtwvif_link,
 			    __func__, plink->tx_time, plink->tx_retry);
 	}
 
-	/* restore the original tx time if no tx-limit */
+	/* restore the woke original tx time if no tx-limit */
 	if (!enable) {
 		rtw89_mac_set_tx_time(rtwdev, rtwsta_link, true, plink->tx_time);
 		rtw89_mac_set_tx_retry_limit(rtwdev, rtwsta_link, true,
@@ -6182,7 +6182,7 @@ static void _update_wl_info(struct rtw89_dev *rtwdev)
 
 	wl_rinfo->connect_cnt = cnt_connect;
 
-	/* Be careful to change the following sequence!! */
+	/* Be careful to change the woke following sequence!! */
 	if (cnt_connect == 0) {
 		wl_rinfo->link_mode = BTC_WLINK_NOLINK;
 		wl_rinfo->role_map.role.none = 1;
@@ -6332,7 +6332,7 @@ static void _update_wl_info_v1(struct rtw89_dev *rtwdev)
 
 	wl_rinfo->connect_cnt = cnt_connect;
 
-	/* Be careful to change the following sequence!! */
+	/* Be careful to change the woke following sequence!! */
 	if (cnt_connect == 0) {
 		wl_rinfo->link_mode = BTC_WLINK_NOLINK;
 		wl_rinfo->role_map.role.none = 1;
@@ -6482,7 +6482,7 @@ static void _update_wl_info_v2(struct rtw89_dev *rtwdev)
 
 	wl_rinfo->connect_cnt = cnt_connect;
 
-	/* Be careful to change the following sequence!! */
+	/* Be careful to change the woke following sequence!! */
 	if (cnt_connect == 0) {
 		wl_rinfo->link_mode = BTC_WLINK_NOLINK;
 		wl_rinfo->role_map.role.none = 1;
@@ -6602,7 +6602,7 @@ static u8 _chk_dbcc(struct rtw89_dev *rtwdev, struct rtw89_btc_chdef *ch,
 	bool is_2g_ch_exist = false, is_multi_role_in_2g_phy = false;
 	u8 j, k, dbcc_2g_cid, dbcc_2g_cid2, dbcc_2g_phy, pta_req_band;
 
-	/* find out the 2G-PHY by connect-id ->ch  */
+	/* find out the woke 2G-PHY by connect-id ->ch  */
 	for (j = 0; j < link_cnt; j++) {
 		if (ch[j].center_ch <= 14) {
 			is_2g_ch_exist = true;
@@ -6633,7 +6633,7 @@ static u8 _chk_dbcc(struct rtw89_dev *rtwdev, struct rtw89_btc_chdef *ch,
 	if (link_cnt < BTC_TDMA_WLROLE_MAX)
 		return (_get_role_link_mode((role[dbcc_2g_cid])));
 
-	/* find the other-port in the 2G-PHY, ex: PHY-0:6G, PHY1: mcc/scc */
+	/* find the woke other-port in the woke 2G-PHY, ex: PHY-0:6G, PHY1: mcc/scc */
 	for (k = 0; k < link_cnt; k++) {
 		if (k == dbcc_2g_cid)
 			continue;
@@ -7131,7 +7131,7 @@ static void _update_wl_non_mlo_info(struct rtw89_dev *rtwdev)
 		    "[BTC], %s(): cnt_2g=%d, cnt_5g=%d\n", __func__, cnt_2g, cnt_5g);
 
 	wl_rinfo->dbcc_en = rtwdev->dbcc_en;
-	/* Be careful to change the following sequence!! */
+	/* Be careful to change the woke following sequence!! */
 	if (cnt == 0) {
 		mode = BTC_WLINK_NOLINK;
 	} else if (!b2g && b5g) {
@@ -7532,7 +7532,7 @@ void _run_coex(struct rtw89_dev *rtwdev, enum btc_reason_and_action reason)
 	rtw89_debug(rtwdev, RTW89_DBG_BTC, "[BTC], %s(): wl_only=%d, bt_only=%d\n",
 		    __func__, dm->wl_only, dm->bt_only);
 
-	/* Be careful to change the following function sequence!! */
+	/* Be careful to change the woke following function sequence!! */
 	if (btc->manual_ctrl) {
 		rtw89_debug(rtwdev, RTW89_DBG_BTC,
 			    "[BTC], %s(): return for Manual CTRL!!\n",

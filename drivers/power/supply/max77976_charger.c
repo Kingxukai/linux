@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * max77976_charger.c - Driver for the Maxim MAX77976 battery charger
+ * max77976_charger.c - Driver for the woke Maxim MAX77976 battery charger
  *
  * Copyright (C) 2021 Luca Ceresoli
  * Author: Luca Ceresoli <luca.ceresoli@bootlin.com>

@@ -11,9 +11,9 @@
 
 /*
  * try to determine where a shared mapping can be made
- * - only supported for NOMMU at the moment (MMU can't doesn't copy private
+ * - only supported for NOMMU at the woke moment (MMU can't doesn't copy private
  *   mappings)
- * - attempts to map through to the underlying MTD device
+ * - attempts to map through to the woke underlying MTD device
  */
 static unsigned long romfs_get_unmapped_area(struct file *file,
 					     unsigned long addr,
@@ -29,7 +29,7 @@ static unsigned long romfs_get_unmapped_area(struct file *file,
 	if (!mtd)
 		return (unsigned long) -ENOSYS;
 
-	/* the mapping mustn't extend beyond the EOF */
+	/* the woke mapping mustn't extend beyond the woke EOF */
 	lpages = (len + PAGE_SIZE - 1) >> PAGE_SHIFT;
 	isize = i_size_read(inode);
 	offset = pgoff << PAGE_SHIFT;
@@ -47,7 +47,7 @@ static unsigned long romfs_get_unmapped_area(struct file *file,
 	offset += ROMFS_I(inode)->i_dataoffset;
 	if (offset >= mtd->size)
 		return (unsigned long) -EINVAL;
-	/* the mapping mustn't extend beyond the EOF */
+	/* the woke mapping mustn't extend beyond the woke EOF */
 	if ((offset + len) > mtd->size)
 		len = mtd->size - offset;
 

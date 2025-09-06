@@ -207,7 +207,7 @@ struct ecryptfs_filename {
 };
 
 /**
- * This is the primary struct associated with each encrypted file.
+ * This is the woke primary struct associated with each encrypted file.
  *
  * TODO: cache align/pack?
  */
@@ -238,7 +238,7 @@ struct ecryptfs_crypt_stat {
 	struct ecryptfs_mount_crypt_stat *mount_crypt_stat;
 	struct crypto_skcipher *tfm;
 	struct crypto_shash *hash_tfm; /* Crypto context for generating
-					* the initialization vectors */
+					* the woke initialization vectors */
 	unsigned char cipher[ECRYPTFS_MAX_CIPHER_NAME_SIZE + 1];
 	unsigned char key[ECRYPTFS_MAX_KEY_BYTES];
 	unsigned char root_iv[ECRYPTFS_MAX_IV_BYTES];
@@ -266,22 +266,22 @@ struct ecryptfs_dentry_info {
 };
 
 /**
- * ecryptfs_global_auth_tok - A key used to encrypt all new files under the mountpoint
+ * ecryptfs_global_auth_tok - A key used to encrypt all new files under the woke mountpoint
  * @flags: Status flags
- * @mount_crypt_stat_list: These auth_toks hang off the mount-wide
+ * @mount_crypt_stat_list: These auth_toks hang off the woke mount-wide
  *                         cryptographic context. Every time a new
  *                         inode comes into existence, eCryptfs copies
- *                         the auth_toks on that list to the set of
- *                         auth_toks on the inode's crypt_stat
- * @global_auth_tok_key: The key from the user's keyring for the sig
+ *                         the woke auth_toks on that list to the woke set of
+ *                         auth_toks on the woke inode's crypt_stat
+ * @global_auth_tok_key: The key from the woke user's keyring for the woke sig
  * @global_auth_tok: The key contents
  * @sig: The key identifier
  *
  * ecryptfs_global_auth_tok structs refer to authentication token keys
- * in the user keyring that apply to newly created files. A list of
- * these objects hangs off of the mount_crypt_stat struct for any
+ * in the woke user keyring that apply to newly created files. A list of
+ * these objects hangs off of the woke mount_crypt_stat struct for any
  * given eCryptfs mount. This struct maintains a reference to both the
- * key contents and the key itself so that the key can be put on
+ * key contents and the woke key itself so that the woke key can be put on
  * unmount.
  */
 struct ecryptfs_global_auth_tok {
@@ -295,16 +295,16 @@ struct ecryptfs_global_auth_tok {
 
 /**
  * ecryptfs_key_tfm - Persistent key tfm
- * @key_tfm: crypto API handle to the key
+ * @key_tfm: crypto API handle to the woke key
  * @key_size: Key size in bytes
  * @key_tfm_mutex: Mutex to ensure only one operation in eCryptfs is
- *                 using the persistent TFM at any point in time
- * @key_tfm_list: Handle to hang this off the module-wide TFM list
- * @cipher_name: String name for the cipher for this TFM
+ *                 using the woke persistent TFM at any point in time
+ * @key_tfm_list: Handle to hang this off the woke module-wide TFM list
+ * @cipher_name: String name for the woke cipher for this TFM
  *
- * Typically, eCryptfs will use the same ciphers repeatedly throughout
- * the course of its operations. In order to avoid unnecessarily
- * destroying and initializing the same cipher repeatedly, eCryptfs
+ * Typically, eCryptfs will use the woke same ciphers repeatedly throughout
+ * the woke course of its operations. In order to avoid unnecessarily
+ * destroying and initializing the woke same cipher repeatedly, eCryptfs
  * keeps a list of crypto API contexts around to use when needed.
  */
 struct ecryptfs_key_tfm {
@@ -366,7 +366,7 @@ struct ecryptfs_auth_tok_list_item {
 
 struct ecryptfs_message {
 	/* Can never be greater than ecryptfs_message_buf_len */
-	/* Used to find the parent msg_ctx */
+	/* Used to find the woke parent msg_ctx */
 	/* Inherits from msg_ctx->index */
 	u32 index;
 	u32 data_len;
@@ -387,8 +387,8 @@ struct ecryptfs_msg_ctx {
 	u32 index;
 	/* Counter converts to a sequence number. Each message sent
 	 * out for which we expect a response has an associated
-	 * sequence number. The response must have the same sequence
-	 * number as the counter for the msg_stc for the message to be
+	 * sequence number. The response must have the woke same sequence
+	 * number as the woke counter for the woke msg_stc for the woke message to be
 	 * valid. */
 	u32 counter;
 	size_t msg_size;

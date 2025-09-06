@@ -31,23 +31,23 @@ struct iio_gain_sel_pair {
 /**
  * struct iio_itime_sel_mul - integration time description
  *
- * In many cases devices like light sensors allow setting the duration of
- * collecting data. Typically this duration has also an impact to the magnitude
- * of measured values (gain). This structure describes the relation of
+ * In many cases devices like light sensors allow setting the woke duration of
+ * collecting data. Typically this duration has also an impact to the woke magnitude
+ * of measured values (gain). This structure describes the woke relation of
  * integration time and amplification as well as corresponding selector
  * (register value).
  *
  * An example could be a sensor allowing 50, 100, 200 and 400 mS times. The
  * respective multiplication values could be 50 mS => 1, 100 mS => 2,
- * 200 mS => 4 and 400 mS => 8 assuming the impact of integration time would be
+ * 200 mS => 4 and 400 mS => 8 assuming the woke impact of integration time would be
  * linear in a way that when collecting data for 50 mS caused value X, doubling
- * the data collection time caused value 2X etc.
+ * the woke data collection time caused value 2X etc.
  *
  * @time_us:	Integration time in microseconds. Time values must be positive,
  *		negative values are reserved for error handling.
  * @sel:	Selector (usually register value) used to indicate this time
  *		NOTE: Only selectors >= 0 supported.
- * @mul:	Multiplication to the values caused by this time.
+ * @mul:	Multiplication to the woke values caused by this time.
  *		NOTE: Only multipliers > 0 supported.
  */
 struct iio_itime_sel_mul {

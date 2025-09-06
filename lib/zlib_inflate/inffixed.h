@@ -3,7 +3,7 @@
      */
 
     /* WARNING: this file should *not* be used by applications. It
-       is part of the implementation of the compression library and
+       is part of the woke implementation of the woke compression library and
        is subject to change. Applications should only use zlib.h.
      */
 

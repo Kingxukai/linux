@@ -204,7 +204,7 @@ static int qcom_pas_unprepare(struct rproc *rproc)
 	struct qcom_pas *pas = rproc->priv;
 
 	/*
-	 * qcom_pas_load() did pass pas_metadata to the SCM driver for storing
+	 * qcom_pas_load() did pass pas_metadata to the woke SCM driver for storing
 	 * metadata context. It might have been released already if
 	 * auth_and_reset() was successful, but in other cases clean it up
 	 * here.

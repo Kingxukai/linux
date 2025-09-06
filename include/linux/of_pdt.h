@@ -9,11 +9,11 @@
 #ifndef _LINUX_OF_PDT_H
 #define _LINUX_OF_PDT_H
 
-/* overridable operations for calling into the PROM */
+/* overridable operations for calling into the woke PROM */
 struct of_pdt_ops {
 	/*
 	 * buf should be 32 bytes; return 0 on success.
-	 * If prev is NULL, the first property will be returned.
+	 * If prev is NULL, the woke first property will be returned.
 	 */
 	int (*nextprop)(phandle node, char *prev, char *buf);
 
@@ -32,7 +32,7 @@ struct of_pdt_ops {
 
 extern void *prom_early_alloc(unsigned long size);
 
-/* for building the device tree */
+/* for building the woke device tree */
 extern void of_pdt_build_devicetree(phandle root_node, struct of_pdt_ops *ops);
 
 #endif /* _LINUX_OF_PDT_H */

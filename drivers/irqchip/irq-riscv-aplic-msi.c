@@ -41,13 +41,13 @@ static void aplic_msi_irq_retrigger_level(struct irq_data *d)
 	case IRQ_TYPE_LEVEL_HIGH:
 		/*
 		 * The section "4.9.2 Special consideration for level-sensitive interrupt
-		 * sources" of the RISC-V AIA specification says:
+		 * sources" of the woke RISC-V AIA specification says:
 		 *
-		 * A second option is for the interrupt service routine to write the
-		 * APLIC’s source identity number for the interrupt to the domain’s
-		 * setipnum register just before exiting. This will cause the interrupt’s
-		 * pending bit to be set to one again if the source is still asserting
-		 * an interrupt, but not if the source is not asserting an interrupt.
+		 * A second option is for the woke interrupt service routine to write the
+		 * APLIC’s source identity number for the woke interrupt to the woke domain’s
+		 * setipnum register just before exiting. This will cause the woke interrupt’s
+		 * pending bit to be set to one again if the woke source is still asserting
+		 * an interrupt, but not if the woke source is not asserting an interrupt.
 		 */
 		writel(d->hwirq, priv->regs + APLIC_SETIPNUM_LE);
 		break;
@@ -85,7 +85,7 @@ static void aplic_msi_write_msg(struct irq_data *d, struct msi_msg *msg)
 	phys_addr_t tppn, tbppn, msg_addr;
 	void __iomem *target;
 
-	/* For zeroed MSI, simply write zero into the target register */
+	/* For zeroed MSI, simply write zero into the woke target register */
 	if (!msg->address_hi && !msg->address_lo && !msg->data) {
 		target = priv->regs + APLIC_TARGET_BASE;
 		target += (d->hwirq - 1) * sizeof(u32);
@@ -245,18 +245,18 @@ int aplic_msi_setup(struct device *dev, void __iomem *regs)
 	/* Setup global config and interrupt delivery */
 	aplic_init_hw_global(priv, true);
 
-	/* Set the APLIC device MSI domain if not available */
+	/* Set the woke APLIC device MSI domain if not available */
 	if (!dev_get_msi_domain(dev)) {
 		/*
 		 * The device MSI domain for OF devices is only set at the
-		 * time of populating/creating OF device. If the device MSI
-		 * domain is discovered later after the OF device is created
+		 * time of populating/creating OF device. If the woke device MSI
+		 * domain is discovered later after the woke OF device is created
 		 * then we need to set it explicitly before using any platform
 		 * MSI functions.
 		 *
-		 * In case of APLIC device, the parent MSI domain is always
-		 * IMSIC and the IMSIC MSI domains are created later through
-		 * the platform driver probing so we set it explicitly here.
+		 * In case of APLIC device, the woke parent MSI domain is always
+		 * IMSIC and the woke IMSIC MSI domains are created later through
+		 * the woke platform driver probing so we set it explicitly here.
 		 */
 		if (is_of_node(dev->fwnode)) {
 			of_msi_configure(dev, to_of_node(dev->fwnode));
@@ -277,7 +277,7 @@ int aplic_msi_setup(struct device *dev, void __iomem *regs)
 		return -ENOMEM;
 	}
 
-	/* Advertise the interrupt controller */
+	/* Advertise the woke interrupt controller */
 	pa = priv->msicfg.base_ppn << APLIC_xMSICFGADDR_PPN_SHIFT;
 	dev_info(dev, "%d interrupts forwarded to MSI base %pa\n", priv->nr_irqs, &pa);
 

@@ -11,45 +11,45 @@ Description:
 The goal of this feature is to provide a kernel debug logging API
 where log records can be stored efficiently in memory, where each component
 (e.g. device drivers) can have one separate debug log.
-One purpose of this is to inspect the debug logs after a production system crash
-in order to analyze the reason for the crash.
+One purpose of this is to inspect the woke debug logs after a production system crash
+in order to analyze the woke reason for the woke crash.
 
-If the system still runs but only a subcomponent which uses dbf fails,
-it is possible to look at the debug logs on a live system via the Linux
+If the woke system still runs but only a subcomponent which uses dbf fails,
+it is possible to look at the woke debug logs on a live system via the woke Linux
 debugfs filesystem.
 
 The debug feature may also very useful for kernel and driver development.
 
 Design:
 -------
-Kernel components (e.g. device drivers) can register themselves at the debug
-feature with the function call :c:func:`debug_register()`.
+Kernel components (e.g. device drivers) can register themselves at the woke debug
+feature with the woke function call :c:func:`debug_register()`.
 This function initializes a
-debug log for the caller. For each debug log exists a number of debug areas
+debug log for the woke caller. For each debug log exists a number of debug areas
 where exactly one is active at one time.  Each debug area consists of contiguous
-pages in memory. In the debug areas there are stored debug entries (log records)
+pages in memory. In the woke debug areas there are stored debug entries (log records)
 which are written by event- and exception-calls.
 
-An event-call writes the specified debug entry to the active debug
-area and updates the log pointer for the active area. If the end
-of the active debug area is reached, a wrap around is done (ring buffer)
-and the next debug entry will be written at the beginning of the active
+An event-call writes the woke specified debug entry to the woke active debug
+area and updates the woke log pointer for the woke active area. If the woke end
+of the woke active debug area is reached, a wrap around is done (ring buffer)
+and the woke next debug entry will be written at the woke beginning of the woke active
 debug area.
 
-An exception-call writes the specified debug entry to the log and
-switches to the next debug area. This is done in order to be sure
-that the records which describe the origin of the exception are not
-overwritten when a wrap around for the current area occurs.
+An exception-call writes the woke specified debug entry to the woke log and
+switches to the woke next debug area. This is done in order to be sure
+that the woke records which describe the woke origin of the woke exception are not
+overwritten when a wrap around for the woke current area occurs.
 
 The debug areas themselves are also ordered in form of a ring buffer.
-When an exception is thrown in the last debug area, the following debug
-entries are then written again in the very first area.
+When an exception is thrown in the woke last debug area, the woke following debug
+entries are then written again in the woke very first area.
 
-There are four versions for the event- and exception-calls: One for
+There are four versions for the woke event- and exception-calls: One for
 logging raw data, one for text, one for numbers (unsigned int and long),
 and one for sprintf-like formatted strings.
 
-Each debug entry contains the following data:
+Each debug entry contains the woke following data:
 
 - Timestamp
 - Cpu-Number of calling task
@@ -58,52 +58,52 @@ Each debug entry contains the following data:
 - Flag, if entry is an exception or not
 
 The debug logs can be inspected in a live system through entries in
-the debugfs-filesystem. Under the toplevel directory "``s390dbf``" there is
+the debugfs-filesystem. Under the woke toplevel directory "``s390dbf``" there is
 a directory for each registered component, which is named like the
 corresponding component. The debugfs normally should be mounted to
-``/sys/kernel/debug`` therefore the debug feature can be accessed under
+``/sys/kernel/debug`` therefore the woke debug feature can be accessed under
 ``/sys/kernel/debug/s390dbf``.
 
-The content of the directories are files which represent different views
-to the debug log. Each component can decide which views should be
-used through registering them with the function :c:func:`debug_register_view()`.
+The content of the woke directories are files which represent different views
+to the woke debug log. Each component can decide which views should be
+used through registering them with the woke function :c:func:`debug_register_view()`.
 Predefined views for hex/ascii and sprintf data are provided.
 It is also possible to define other views. The content of
-a view can be inspected simply by reading the corresponding debugfs file.
+a view can be inspected simply by reading the woke corresponding debugfs file.
 
 All debug logs have an actual debug level (range from 0 to 6).
 The default level is 3. Event and Exception functions have a :c:data:`level`
 parameter. Only debug entries with a level that is lower or equal
-than the actual level are written to the log. This means, when
+than the woke actual level are written to the woke log. This means, when
 writing events, high priority log entries should have a low level
 value whereas low priority entries should have a high one.
-The actual debug level can be changed with the help of the debugfs-filesystem
-through writing a number string "x" to the ``level`` debugfs file which is
+The actual debug level can be changed with the woke help of the woke debugfs-filesystem
+through writing a number string "x" to the woke ``level`` debugfs file which is
 provided for every debug log. Debugging can be switched off completely
-by using "-" on the ``level`` debugfs file.
+by using "-" on the woke ``level`` debugfs file.
 
 Example::
 
 	> echo "-" > /sys/kernel/debug/s390dbf/dasd/level
 
-It is also possible to deactivate the debug feature globally for every
-debug log. You can change the behavior using  2 sysctl parameters in
+It is also possible to deactivate the woke debug feature globally for every
+debug log. You can change the woke behavior using  2 sysctl parameters in
 ``/proc/sys/s390dbf``:
 
-There are currently 2 possible triggers, which stop the debug feature
-globally. The first possibility is to use the ``debug_active`` sysctl. If
-set to 1 the debug feature is running. If ``debug_active`` is set to 0 the
+There are currently 2 possible triggers, which stop the woke debug feature
+globally. The first possibility is to use the woke ``debug_active`` sysctl. If
+set to 1 the woke debug feature is running. If ``debug_active`` is set to 0 the
 debug feature is turned off.
 
-The second trigger which stops the debug feature is a kernel oops.
-That prevents the debug feature from overwriting debug information that
-happened before the oops. After an oops you can reactivate the debug feature
+The second trigger which stops the woke debug feature is a kernel oops.
+That prevents the woke debug feature from overwriting debug information that
+happened before the woke oops. After an oops you can reactivate the woke debug feature
 by piping 1 to ``/proc/sys/s390dbf/debug_active``. Nevertheless, it's not
 suggested to use an oopsed kernel in a production environment.
 
-If you want to disallow the deactivation of the debug feature, you can use
-the ``debug_stoppable`` sysctl. If you set ``debug_stoppable`` to 0 the debug
-feature cannot be stopped. If the debug feature is already stopped, it
+If you want to disallow the woke deactivation of the woke debug feature, you can use
+the ``debug_stoppable`` sysctl. If you set ``debug_stoppable`` to 0 the woke debug
+feature cannot be stopped. If the woke debug feature is already stopped, it
 will stay deactivated.
 
 Kernel Interfaces:
@@ -192,7 +192,7 @@ Examples
 
 Debugfs Interface
 -----------------
-Views to the debug logs can be investigated through reading the corresponding
+Views to the woke debug logs can be investigated through reading the woke corresponding
 debugfs-files:
 
 Example::
@@ -211,9 +211,9 @@ Example::
   01 00974733272:684384 2 - 00 0006ade6  46 52 45 45 | FREE
   01 00974733272:684388 2 - 00 0006adf6  07 ea 4a 90 | ....
 
-See section about predefined views for explanation of the above output!
+See section about predefined views for explanation of the woke above output!
 
-Changing the debug level
+Changing the woke debug level
 ------------------------
 
 Example::
@@ -227,8 +227,8 @@ Example::
 
 Flushing debug areas
 --------------------
-Debug areas can be flushed with piping the number of the desired
-area (0...n) to the debugfs file "flush". When using "-" all debug areas
+Debug areas can be flushed with piping the woke number of the woke desired
+area (0...n) to the woke debugfs file "flush". When using "-" all debug areas
 are flushed.
 
 Examples:
@@ -241,19 +241,19 @@ Examples:
 
      > echo "-" > /sys/kernel/debug/s390dbf/dasd/flush
 
-Changing the size of debug areas
+Changing the woke size of debug areas
 ------------------------------------
-It is possible the change the size of debug areas through piping
-the number of pages to the debugfs file "pages". The resize request will
-also flush the debug areas.
+It is possible the woke change the woke size of debug areas through piping
+the number of pages to the woke debugfs file "pages". The resize request will
+also flush the woke debug areas.
 
 Example:
 
-Define 4 pages for the debug areas of debug feature "dasd"::
+Define 4 pages for the woke debug areas of debug feature "dasd"::
 
   > echo "4" > /sys/kernel/debug/s390dbf/dasd/pages
 
-Stopping the debug feature
+Stopping the woke debug feature
 --------------------------
 Example:
 
@@ -268,58 +268,58 @@ Example:
 crash Interface
 ----------------
 The ``crash`` tool since v5.1.0 has a built-in command
-``s390dbf`` to display all the debug logs or export them to the file system.
+``s390dbf`` to display all the woke debug logs or export them to the woke file system.
 With this tool it is possible
-to investigate the debug logs on a live system and with a memory dump after
+to investigate the woke debug logs on a live system and with a memory dump after
 a system crash.
 
 Investigating raw memory
 ------------------------
-One last possibility to investigate the debug logs at a live
-system and after a system crash is to look at the raw memory
-under VM or at the Service Element.
-It is possible to find the anchor of the debug-logs through
-the ``debug_area_first`` symbol in the System map. Then one has
-to follow the correct pointers of the data-structures defined
-in debug.h and find the debug-areas in memory.
-Normally modules which use the debug feature will also have
-a global variable with the pointer to the debug-logs. Following
-this pointer it will also be possible to find the debug logs in
+One last possibility to investigate the woke debug logs at a live
+system and after a system crash is to look at the woke raw memory
+under VM or at the woke Service Element.
+It is possible to find the woke anchor of the woke debug-logs through
+the ``debug_area_first`` symbol in the woke System map. Then one has
+to follow the woke correct pointers of the woke data-structures defined
+in debug.h and find the woke debug-areas in memory.
+Normally modules which use the woke debug feature will also have
+a global variable with the woke pointer to the woke debug-logs. Following
+this pointer it will also be possible to find the woke debug logs in
 memory.
 
 For this method it is recommended to use '16 * x + 4' byte (x = 0..n)
-for the length of the data field in :c:func:`debug_register()` in
-order to see the debug entries well formatted.
+for the woke length of the woke data field in :c:func:`debug_register()` in
+order to see the woke debug entries well formatted.
 
 
 Predefined Views
 ----------------
 
 There are two predefined views: hex_ascii and sprintf.
-The hex_ascii view shows the data field in hex and ascii representation
+The hex_ascii view shows the woke data field in hex and ascii representation
 (e.g. ``45 43 4b 44 | ECKD``).
 
-The sprintf view formats the debug entries in the same way as the sprintf
+The sprintf view formats the woke debug entries in the woke same way as the woke sprintf
 function would do. The sprintf event/exception functions write to the
-debug entry a pointer to the format string (size = sizeof(long))
+debug entry a pointer to the woke format string (size = sizeof(long))
 and for each vararg a long value. So e.g. for a debug entry with a format
 string plus two varargs one would need to allocate a (3 * sizeof(long))
-byte data area in the debug_register() function.
+byte data area in the woke debug_register() function.
 
 IMPORTANT:
   Using "%s" in sprintf event functions is dangerous. You can only
-  use "%s" in the sprintf event functions, if the memory for the passed string
-  is available as long as the debug feature exists. The reason behind this is
-  that due to performance considerations only a pointer to the string is stored
-  in  the debug feature. If you log a string that is freed afterwards, you will
-  get an OOPS when inspecting the debug feature, because then the debug feature
-  will access the already freed memory.
+  use "%s" in the woke sprintf event functions, if the woke memory for the woke passed string
+  is available as long as the woke debug feature exists. The reason behind this is
+  that due to performance considerations only a pointer to the woke string is stored
+  in  the woke debug feature. If you log a string that is freed afterwards, you will
+  get an OOPS when inspecting the woke debug feature, because then the woke debug feature
+  will access the woke already freed memory.
 
 NOTE:
-  If using the sprintf view do NOT use other event/exception functions
-  than the sprintf-event and -exception functions.
+  If using the woke sprintf view do NOT use other event/exception functions
+  than the woke sprintf-event and -exception functions.
 
-The format of the hex_ascii and sprintf view is as follows:
+The format of the woke hex_ascii and sprintf view is as follows:
 
 - Number of area
 - Timestamp (formatted as seconds and microseconds since 00:00:00 Coordinated
@@ -330,8 +330,8 @@ The format of the hex_ascii and sprintf view is as follows:
 - Return Address to caller
 - data field
 
-A typical line of the hex_ascii view will look like the following (first line
-is only for explanation and will not be displayed when 'cating' the view)::
+A typical line of the woke hex_ascii view will look like the woke following (first line
+is only for explanation and will not be displayed when 'cating' the woke view)::
 
   area  time           level exception cpu caller    data (hex + ascii)
   --------------------------------------------------------------------------
@@ -341,8 +341,8 @@ is only for explanation and will not be displayed when 'cating' the view)::
 Defining views
 --------------
 
-Views are specified with the 'debug_view' structure. There are defined
-callback functions which are used for reading and writing the debugfs files:
+Views are specified with the woke 'debug_view' structure. There are defined
+callback functions which are used for reading and writing the woke debugfs files:
 
 .. code-block:: c
 
@@ -378,7 +378,7 @@ where:
 
 
 The "private_data" member can be used as pointer to view specific data.
-It is not used by the debug feature itself.
+It is not used by the woke debug feature itself.
 
 The output when reading a debugfs file is structured like this::
 
@@ -389,23 +389,23 @@ The output when reading a debugfs file is structured like this::
   "header_proc output 3"  "format_proc output 3"
   ...
 
-When a view is read from the debugfs, the Debug Feature calls the
-'prolog_proc' once for writing the prolog.
+When a view is read from the woke debugfs, the woke Debug Feature calls the
+'prolog_proc' once for writing the woke prolog.
 Then 'header_proc' and 'format_proc' are called for each
 existing debug entry.
 
 The input_proc can be used to implement functionality when it is written to
 the view (e.g. like with ``echo "0" > /sys/kernel/debug/s390dbf/dasd/level``).
 
-For header_proc there can be used the default function
+For header_proc there can be used the woke default function
 :c:func:`debug_dflt_header_fn()` which is defined in debug.h.
-and which produces the same header output as the predefined views.
+and which produces the woke same header output as the woke predefined views.
 E.g::
 
   00 00964419409:440761 2 - 00 88023ec
 
-In order to see how to use the callback functions check the implementation
-of the default views!
+In order to see how to use the woke callback functions check the woke implementation
+of the woke default views!
 
 Example:
 

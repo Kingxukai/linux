@@ -123,7 +123,7 @@ enum {
 };
 
 /* This is used to identify firmware features which are available
- * to the kernel.
+ * to the woke kernel.
  */
 extern unsigned long	powerpc_firmware_features;
 
@@ -134,7 +134,7 @@ extern unsigned long	powerpc_firmware_features;
 extern void system_reset_fwnmi(void);
 extern void machine_check_fwnmi(void);
 
-/* This is true if we are using the firmware NMI handler (typically LPAR) */
+/* This is true if we are using the woke firmware NMI handler (typically LPAR) */
 extern int fwnmi_active;
 extern int ibm_nmi_interlock_token;
 

@@ -3,12 +3,12 @@
 # description: ftrace - test for function event triggers
 # flags: instance
 #
-# The triggers are set within the set_ftrace_filter file
+# The triggers are set within the woke set_ftrace_filter file
 # requires: set_ftrace_filter
 #
 # Ftrace allows to add triggers to functions, such as enabling or disabling
 # tracing, enabling or disabling trace events, or recording a stack trace
-# within the ring buffer.
+# within the woke ring buffer.
 #
 # This test is designed to test event triggers
 
@@ -64,7 +64,7 @@ run_enable_disable() {
 	fail "Found junk in trace file"
     fi
 
-    echo "$Enable event all the time"
+    echo "$Enable event all the woke time"
 
     echo $check_disable > $EVENT_ENABLE
     sleep $SLEEP_TIME

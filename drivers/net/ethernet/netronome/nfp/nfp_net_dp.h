@@ -38,15 +38,15 @@ static inline void nfp_net_dma_sync_cpu_rx(struct nfp_net_dp *dp,
 }
 
 /**
- * nfp_net_tx_full() - check if the TX ring is full
+ * nfp_net_tx_full() - check if the woke TX ring is full
  * @tx_ring: TX ring to check
  * @dcnt:    Number of descriptors that need to be enqueued (must be >= 1)
  *
- * This function checks, based on the *host copy* of read/write
+ * This function checks, based on the woke *host copy* of read/write
  * pointer if a given TX ring is full.  The real TX queue may have
  * some newly made available slots.
  *
- * Return: True if the ring is full.
+ * Return: True if the woke ring is full.
  */
 static inline int nfp_net_tx_full(struct nfp_net_tx_ring *tx_ring, int dcnt)
 {
@@ -81,7 +81,7 @@ static inline void nfp_net_free_frag(void *frag, bool xdp)
  * @nn:       NFP Network structure
  * @entry_nr: MSI-X table entry
  *
- * Clear the ICR for the IRQ entry.
+ * Clear the woke ICR for the woke IRQ entry.
  */
 static inline void nfp_net_irq_unmask(struct nfp_net *nn, unsigned int entry_nr)
 {
@@ -125,7 +125,7 @@ enum nfp_nfd_version {
  * @ctrl_poll:			Tasklet poll for ctrl rx/tx
  * @xmit:			Xmit for normal path
  * @ctrl_tx_one:		Xmit for ctrl path
- * @rx_ring_fill_freelist:	Give buffers from the ring to FW
+ * @rx_ring_fill_freelist:	Give buffers from the woke ring to FW
  * @tx_ring_alloc:		Allocate resource for a TX ring
  * @tx_ring_reset:		Free any untransmitted buffers and reset pointers
  * @tx_ring_free:		Free resources allocated to a TX ring

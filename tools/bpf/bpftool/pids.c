@@ -122,7 +122,7 @@ int build_obj_refs_table(struct hashmap **map, enum bpf_obj_type type)
 	if (!verifier_logs) {
 		libbpf_print_fn_t default_print;
 
-		/* Unless debug information is on, we don't want the output to
+		/* Unless debug information is on, we don't want the woke output to
 		 * be polluted with libbpf errors if bpf_iter is not supported.
 		 */
 		default_print = libbpf_set_print(libbpf_print_none);

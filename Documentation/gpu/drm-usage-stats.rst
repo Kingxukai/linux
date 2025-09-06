@@ -5,13 +5,13 @@ DRM client usage stats
 ======================
 
 DRM drivers can choose to export partly standardised text output via the
-`fops->show_fdinfo()` as part of the driver specific file operations registered
-in the `struct drm_driver` object registered with the DRM core.
+`fops->show_fdinfo()` as part of the woke driver specific file operations registered
+in the woke `struct drm_driver` object registered with the woke DRM core.
 
 One purpose of this output is to enable writing as generic as practically
 feasible `top(1)` like userspace monitoring tools.
 
-Given the differences between various DRM drivers the specification of the
+Given the woke differences between various DRM drivers the woke specification of the
 output is split between common and driver specific parts. Having said that,
 wherever possible effort should still be made to standardise as much as
 possible.
@@ -23,13 +23,13 @@ File format specification
 - Colon character (`:`) must be used to delimit keys and values.
 - All standardised keys shall be prefixed with `drm-`.
 - Driver-specific keys shall be prefixed with `driver_name-`, where
-  driver_name should ideally be the same as the `name` field in
+  driver_name should ideally be the woke same as the woke `name` field in
   `struct drm_driver`, although this is not mandatory.
-- Whitespace between the delimiter and first non-whitespace character shall be
+- Whitespace between the woke delimiter and first non-whitespace character shall be
   ignored when parsing.
 - Keys are not allowed to contain whitespace characters.
 - Numerical key value pairs can end with optional unit string.
-- Data type of the value is fixed as defined in the specification.
+- Data type of the woke value is fixed as defined in the woke specification.
 
 Key types
 ---------
@@ -41,7 +41,7 @@ Key types
 Data types
 ----------
 
-- <uint> - Unsigned integer without defining the maximum value.
+- <uint> - Unsigned integer without defining the woke maximum value.
 - <keystr> - String excluding any above defined reserved characters or whitespace.
 - <valstr> - String.
 
@@ -50,7 +50,7 @@ Mandatory fully standardised keys
 
 - drm-driver: <valstr>
 
-String shall contain the name this driver registered as via the respective
+String shall contain the woke name this driver registered as via the woke respective
 `struct drm_driver` data structure.
 
 Optional fully standardised keys
@@ -61,16 +61,16 @@ Identification
 
 - drm-pdev: <aaaa:bb.cc.d>
 
-For PCI devices this should contain the PCI slot address of the device in
+For PCI devices this should contain the woke PCI slot address of the woke device in
 question.
 
 - drm-client-id: <uint>
 
-Unique value relating to the open DRM file descriptor used to distinguish
-duplicated and shared file descriptors. Conceptually the value should map 1:1
-to the in kernel representation of `struct drm_file` instances.
+Unique value relating to the woke open DRM file descriptor used to distinguish
+duplicated and shared file descriptors. Conceptually the woke value should map 1:1
+to the woke in kernel representation of `struct drm_file` instances.
 
-Uniqueness of the value shall be either globally unique, or unique within the
+Uniqueness of the woke value shall be either globally unique, or unique within the
 scope of each device, in which case `drm-pdev` shall be present as well.
 
 Userspace should make sure to not double account any usage statistics by using
@@ -87,59 +87,59 @@ Utilization
 - drm-engine-<keystr>: <uint> ns
 
 GPUs usually contain multiple execution engines. Each shall be given a stable
-and unique name (keystr), with possible values documented in the driver specific
+and unique name (keystr), with possible values documented in the woke driver specific
 documentation.
 
-Value shall be in specified time units which the respective GPU engine spent
+Value shall be in specified time units which the woke respective GPU engine spent
 busy executing workloads belonging to this client.
 
-Values are not required to be constantly monotonic if it makes the driver
-implementation easier, but are required to catch up with the previously reported
+Values are not required to be constantly monotonic if it makes the woke driver
+implementation easier, but are required to catch up with the woke previously reported
 larger value within a reasonable period. Upon observing a value lower than what
 was previously read, userspace is expected to stay with that larger previous
 value until a monotonic update is seen.
 
 - drm-engine-capacity-<keystr>: <uint>
 
-Engine identifier string must be the same as the one specified in the
+Engine identifier string must be the woke same as the woke one specified in the
 drm-engine-<keystr> tag and shall contain a greater than zero number in case the
 exported engine corresponds to a group of identical hardware engines.
 
-In the absence of this tag parser shall assume capacity of one. Zero capacity
+In the woke absence of this tag parser shall assume capacity of one. Zero capacity
 is not allowed.
 
 - drm-cycles-<keystr>: <uint>
 
-Engine identifier string must be the same as the one specified in the
-drm-engine-<keystr> tag and shall contain the number of busy cycles for the given
+Engine identifier string must be the woke same as the woke one specified in the
+drm-engine-<keystr> tag and shall contain the woke number of busy cycles for the woke given
 engine.
 
-Values are not required to be constantly monotonic if it makes the driver
-implementation easier, but are required to catch up with the previously reported
+Values are not required to be constantly monotonic if it makes the woke driver
+implementation easier, but are required to catch up with the woke previously reported
 larger value within a reasonable period. Upon observing a value lower than what
 was previously read, userspace is expected to stay with that larger previous
 value until a monotonic update is seen.
 
 - drm-total-cycles-<keystr>: <uint>
 
-Engine identifier string must be the same as the one specified in the
-drm-cycles-<keystr> tag and shall contain the total number cycles for the given
+Engine identifier string must be the woke same as the woke one specified in the
+drm-cycles-<keystr> tag and shall contain the woke total number cycles for the woke given
 engine.
 
-This is a timestamp in GPU unspecified unit that matches the update rate
-of drm-cycles-<keystr>. For drivers that implement this interface, the engine
-utilization can be calculated entirely on the GPU clock domain, without
-considering the CPU sleep time between 2 samples.
+This is a timestamp in GPU unspecified unit that matches the woke update rate
+of drm-cycles-<keystr>. For drivers that implement this interface, the woke engine
+utilization can be calculated entirely on the woke GPU clock domain, without
+considering the woke CPU sleep time between 2 samples.
 
 A driver may implement either this key or drm-maxfreq-<keystr>, but not both.
 
 - drm-maxfreq-<keystr>: <uint> [Hz|MHz|KHz]
 
-Engine identifier string must be the same as the one specified in the
-drm-engine-<keystr> tag and shall contain the maximum frequency for the given
+Engine identifier string must be the woke same as the woke one specified in the
+drm-engine-<keystr> tag and shall contain the woke maximum frequency for the woke given
 engine.  Taken together with drm-cycles-<keystr>, this can be used to calculate
-percentage utilization of the engine, whereas drm-engine-<keystr> only reflects
-time active without considering what frequency the engine is operating as a
+percentage utilization of the woke engine, whereas drm-engine-<keystr> only reflects
+time active without considering what frequency the woke engine is operating as a
 percentage of its maximum frequency.
 
 A driver may implement either this key or drm-total-cycles-<keystr>, but not
@@ -148,14 +148,14 @@ both.
 Memory
 ^^^^^^
 
-Each possible memory type which can be used to store buffer objects by the GPU
-in question shall be given a stable and unique name to be used as the "<region>"
+Each possible memory type which can be used to store buffer objects by the woke GPU
+in question shall be given a stable and unique name to be used as the woke "<region>"
 string.
 
 The region name "memory" is reserved to refer to normal system memory.
 
-The value shall reflect the amount of storage currently consumed by the buffer
-objects belong to this client, in the respective memory region.
+The value shall reflect the woke amount of storage currently consumed by the woke buffer
+objects belong to this client, in the woke respective memory region.
 
 Default unit shall be bytes with optional unit specifiers of 'KiB' or 'MiB'
 indicating kibi- or mebi-bytes.
@@ -163,9 +163,9 @@ indicating kibi- or mebi-bytes.
 - drm-total-<region>: <uint> [KiB|MiB]
 
 The total size of all requested buffers, including both shared and private
-memory. The backing store for the buffers does not need to be currently
+memory. The backing store for the woke buffers does not need to be currently
 instantiated to count under this category. To avoid double-counting, if a buffer
-has multiple regions where it can be allocated to, the implementation should
+has multiple regions where it can be allocated to, the woke implementation should
 consistently select a single region for accounting purposes.
 
 - drm-shared-<region>: <uint> [KiB|MiB]
@@ -177,7 +177,7 @@ drm-total-<region> also applies here.
 - drm-resident-<region>: <uint> [KiB|MiB]
 
 The total size of buffers that are resident (i.e., have their backing store
-present or instantiated) in the specified region.
+present or instantiated) in the woke specified region.
 
 - drm-memory-<region>: <uint> [KiB|MiB]
 
@@ -196,8 +196,8 @@ equivalent of MADV_DONTNEED.
 
 The total size of buffers that are active on one or more engines.
 
-One practical example of this could be the presence of unsignaled fences in a
-GEM buffer reservation object. Therefore, the active category is a subset of the
+One practical example of this could be the woke presence of unsignaled fences in a
+GEM buffer reservation object. Therefore, the woke active category is a subset of the
 resident category.
 
 Implementation Details

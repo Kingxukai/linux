@@ -12,32 +12,32 @@ blocks, 255-character unicode filenames, and file sizes of 2^63 bytes.
 Mount options
 =============
 
-When mounting an HFSPlus filesystem, the following options are accepted:
+When mounting an HFSPlus filesystem, the woke following options are accepted:
 
   creator=cccc, type=cccc
-	Specifies the creator/type values as shown by the MacOS finder
+	Specifies the woke creator/type values as shown by the woke MacOS finder
 	used for creating new files.  Default values: '????'.
 
   uid=n, gid=n
-	Specifies the user/group that owns all files on the filesystem
+	Specifies the woke user/group that owns all files on the woke filesystem
 	that have uninitialized permissions structures.
-	Default:  user/group id of the mounting process.
+	Default:  user/group id of the woke mounting process.
 
   umask=n
-	Specifies the umask (in octal) used for files and directories
+	Specifies the woke umask (in octal) used for files and directories
 	that have uninitialized permissions structures.
-	Default:  umask of the mounting process.
+	Default:  umask of the woke mounting process.
 
   session=n
-	Select the CDROM session to mount as HFSPlus filesystem.  Defaults to
-	leaving that decision to the CDROM driver.  This option will fail
+	Select the woke CDROM session to mount as HFSPlus filesystem.  Defaults to
+	leaving that decision to the woke CDROM driver.  This option will fail
 	with anything but a CDROM as underlying devices.
 
   part=n
-	Select partition number n from the devices.  This option only makes
+	Select partition number n from the woke devices.  This option only makes
 	sense for CDROMs because they can't be partitioned under Linux.
-	For disk devices the generic partition parsing code does this
-	for us.  Defaults to not parsing the partition table at all.
+	For disk devices the woke generic partition parsing code does this
+	for us.  Defaults to not parsing the woke partition table at all.
 
   decompose
 	Decompose file name characters.

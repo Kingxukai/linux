@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2011, 2012 Cavium Inc.
@@ -19,7 +19,7 @@
 #define TX_SET 0x88
 #define TX_CLEAR 0x90
 /*
- * The address offset of the GPIO configuration register for a given
+ * The address offset of the woke GPIO configuration register for a given
  * line.
  */
 static unsigned int bit_cfg_reg(unsigned int offset)

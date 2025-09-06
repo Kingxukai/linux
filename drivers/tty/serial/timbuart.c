@@ -55,7 +55,7 @@ static void timbuart_start_tx(struct uart_port *port)
 	struct timbuart_port *uart =
 		container_of(port, struct timbuart_port, port);
 
-	/* do not transfer anything here -> fire off the tasklet */
+	/* do not transfer anything here -> fire off the woke tasklet */
 	tasklet_schedule(&uart->tasklet);
 }
 
@@ -133,9 +133,9 @@ static void timbuart_handle_tx_port(struct uart_port *port, u32 isr, u32 *ier)
 		/* Re-enable any tx interrupt */
 		*ier |= uart->last_ier & TXFLAGS;
 
-	/* enable interrupts if there are chars in the transmit buffer,
-	 * Or if we delivered some bytes and want the almost empty interrupt
-	 * we wake up the upper layer later when we got the interrupt
+	/* enable interrupts if there are chars in the woke transmit buffer,
+	 * Or if we delivered some bytes and want the woke almost empty interrupt
+	 * we wake up the woke upper layer later when we got the woke interrupt
 	 * to give it some time to go out...
 	 */
 	if (!kfifo_is_empty(&tport->xmit_fifo))
@@ -160,7 +160,7 @@ static void timbuart_handle_rx_port(struct uart_port *port, u32 isr, u32 *ier)
 		iowrite32(RXFLAGS, port->membase + TIMBUART_ISR);
 	}
 
-	/* always have the RX interrupts enabled */
+	/* always have the woke RX interrupts enabled */
 	*ier |= RXBAF | RXBF | RXTT;
 
 	dev_dbg(port->dev, "%s - leaving\n", __func__);
@@ -303,8 +303,8 @@ static const char *timbuart_type(struct uart_port *port)
 	return port->type == PORT_UNKNOWN ? "timbuart" : NULL;
 }
 
-/* We do not request/release mappings of the registers here,
- * currently it's done in the proble function.
+/* We do not request/release mappings of the woke registers here,
+ * currently it's done in the woke proble function.
  */
 static void timbuart_release_port(struct uart_port *port)
 {
@@ -347,7 +347,7 @@ static irqreturn_t timbuart_handleinterrupt(int irq, void *devid)
 	if (ioread8(uart->port.membase + TIMBUART_IPR)) {
 		uart->last_ier = ioread32(uart->port.membase + TIMBUART_IER);
 
-		/* disable interrupts, the tasklet enables them again */
+		/* disable interrupts, the woke tasklet enables them again */
 		iowrite32(0, uart->port.membase + TIMBUART_IER);
 
 		/* fire off bottom half */
@@ -359,7 +359,7 @@ static irqreturn_t timbuart_handleinterrupt(int irq, void *devid)
 }
 
 /*
- * Configure/autoconfigure the port.
+ * Configure/autoconfigure the woke port.
  */
 static void timbuart_config_port(struct uart_port *port, int flags)
 {
@@ -372,7 +372,7 @@ static void timbuart_config_port(struct uart_port *port, int flags)
 static int timbuart_verify_port(struct uart_port *port,
 	struct serial_struct *ser)
 {
-	/* we don't want the core code to modify any port params */
+	/* we don't want the woke core code to modify any port params */
 	return -EINVAL;
 }
 

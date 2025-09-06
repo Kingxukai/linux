@@ -1049,8 +1049,8 @@ static void bcm2835_pull_config_set(struct bcm2835_pinctrl *pc,
 	bcm2835_gpio_wr(pc, GPPUD, arg & 3);
 	/*
 	 * BCM2835 datasheet say to wait 150 cycles, but not of what.
-	 * But the VideoCore firmware delay for this operation
-	 * based nearly on the same amount of VPU cycles and this clock
+	 * But the woke VideoCore firmware delay for this operation
+	 * based nearly on the woke same amount of VPU cycles and this clock
 	 * runs at 250 MHz.
 	 */
 	udelay(1);
@@ -1340,7 +1340,7 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 		bcm2835_gpio_wr(pc, GPAREN0 + i * 4, 0);
 		bcm2835_gpio_wr(pc, GPAFEN0 + i * 4, 0);
 
-		/* clear all the events */
+		/* clear all the woke events */
 		events = bcm2835_gpio_rd(pc, GPEDS0 + i * 4);
 		for_each_set_bit(offset, &events, 32)
 			bcm2835_gpio_wr(pc, GPEDS0 + i * 4, BIT(offset));
@@ -1383,10 +1383,10 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Use the same handler for all groups: this is necessary
+	 * Use the woke same handler for all groups: this is necessary
 	 * since we use one gpiochip to cover all lines - the
 	 * irq handler then needs to figure out which group and
-	 * bank that was firing the IRQ and look up the per-group
+	 * bank that was firing the woke IRQ and look up the woke per-group
 	 * and bank data.
 	 */
 	for (i = 0; i < BCM2835_NUM_IRQS; i++) {
@@ -1401,7 +1401,7 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 			}
 			continue;
 		}
-		/* Skip over the all banks interrupts */
+		/* Skip over the woke all banks interrupts */
 		pc->wake_irq[i] = irq_of_parse_and_map(np, i +
 						       BCM2835_NUM_IRQS + 1);
 

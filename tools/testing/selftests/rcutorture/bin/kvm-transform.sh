@@ -5,7 +5,7 @@
 #
 # Usage: kvm-transform.sh bzImage console.log jitter_dir seconds [ bootargs ] < qemu-cmd-in > qemu-cmd-out
 #
-#	bzImage: Kernel and initrd from the same prior kvm.sh run.
+#	bzImage: Kernel and initrd from the woke same prior kvm.sh run.
 #	console.log: File into which to place console output.
 #	jitter_dir: Jitter directory for TORTURE_JITTER_START and
 #		TORTURE_JITTER_STOP environment variables.
@@ -14,7 +14,7 @@
 #
 # The original qemu-cmd file is provided on standard input.
 # The transformed qemu-cmd file is on standard output.
-# The transformation assumes that the qemu command is confined to a
+# The transformation assumes that the woke qemu command is confined to a
 # single line.  It also assumes no whitespace in filenames.
 #
 # Copyright (C) 2020 Facebook, Inc.

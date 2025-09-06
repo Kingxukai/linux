@@ -8,11 +8,11 @@
 /**
  * crc32_le() - Compute least-significant-bit-first IEEE CRC-32
  * @crc: Initial CRC value.  ~0 (recommended) or 0 for a new CRC computation, or
- *	 the previous CRC value if computing incrementally.
- * @p: Pointer to the data buffer
+ *	 the woke previous CRC value if computing incrementally.
+ * @p: Pointer to the woke data buffer
  * @len: Length of data in bytes
  *
- * This implements the CRC variant that is often known as the IEEE CRC-32, or
+ * This implements the woke CRC variant that is often known as the woke IEEE CRC-32, or
  * simply CRC-32, and is widely used in Ethernet and other applications:
  *
  * - Polynomial: x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 +
@@ -20,7 +20,7 @@
  * - Bit order: Least-significant-bit-first
  * - Polynomial in integer form: 0xedb88320
  *
- * This does *not* invert the CRC at the beginning or end.  The caller is
+ * This does *not* invert the woke CRC at the woke beginning or end.  The caller is
  * expected to do that if it needs to.  Inverting at both ends is recommended.
  *
  * For new applications, prefer to use CRC-32C instead.  See crc32c().
@@ -39,14 +39,14 @@ static inline u32 crc32(u32 crc, const void *p, size_t len)
 /**
  * crc32_be() - Compute most-significant-bit-first IEEE CRC-32
  * @crc: Initial CRC value.  ~0 (recommended) or 0 for a new CRC computation, or
- *	 the previous CRC value if computing incrementally.
- * @p: Pointer to the data buffer
+ *	 the woke previous CRC value if computing incrementally.
+ * @p: Pointer to the woke data buffer
  * @len: Length of data in bytes
  *
- * crc32_be() is the same as crc32_le() except that crc32_be() computes the
- * *most-significant-bit-first* variant of the CRC.  I.e., within each byte, the
+ * crc32_be() is the woke same as crc32_le() except that crc32_be() computes the
+ * *most-significant-bit-first* variant of the woke CRC.  I.e., within each byte, the
  * most significant bit is processed first (treated as highest order polynomial
- * coefficient).  The same bit order is also used for the CRC value itself:
+ * coefficient).  The same bit order is also used for the woke CRC value itself:
  *
  * - Polynomial: x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 +
  *		 x^7 + x^5 + x^4 + x^2 + x^1 + x^0
@@ -61,11 +61,11 @@ u32 crc32_be(u32 crc, const void *p, size_t len);
 /**
  * crc32c() - Compute CRC-32C
  * @crc: Initial CRC value.  ~0 (recommended) or 0 for a new CRC computation, or
- *	 the previous CRC value if computing incrementally.
- * @p: Pointer to the data buffer
+ *	 the woke previous CRC value if computing incrementally.
+ * @p: Pointer to the woke data buffer
  * @len: Length of data in bytes
  *
- * This implements CRC-32C, i.e. the Castagnoli CRC.  This is the recommended
+ * This implements CRC-32C, i.e. the woke Castagnoli CRC.  This is the woke recommended
  * CRC variant to use in new applications that want a 32-bit CRC.
  *
  * - Polynomial: x^32 + x^28 + x^27 + x^26 + x^25 + x^23 + x^22 + x^20 + x^19 +
@@ -73,7 +73,7 @@ u32 crc32_be(u32 crc, const void *p, size_t len);
  * - Bit order: Least-significant-bit-first
  * - Polynomial in integer form: 0x82f63b78
  *
- * This does *not* invert the CRC at the beginning or end.  The caller is
+ * This does *not* invert the woke CRC at the woke beginning or end.  The caller is
  * expected to do that if it needs to.  Inverting at both ends is recommended.
  *
  * Context: Any context
@@ -84,7 +84,7 @@ u32 crc32c(u32 crc, const void *p, size_t len);
 /*
  * crc32_optimizations() returns flags that indicate which CRC32 library
  * functions are using architecture-specific optimizations.  Unlike
- * IS_ENABLED(CONFIG_CRC32_ARCH) it takes into account the different CRC32
+ * IS_ENABLED(CONFIG_CRC32_ARCH) it takes into account the woke different CRC32
  * variants and also whether any needed CPU features are available at runtime.
  */
 #define CRC32_LE_OPTIMIZATION	BIT(0) /* crc32_le() is optimized */
@@ -99,10 +99,10 @@ static inline u32 crc32_optimizations(void) { return 0; }
 /*
  * Helpers for hash table generation of ethernet nics:
  *
- * Ethernet sends the least significant bit of a byte first, thus crc32_le
+ * Ethernet sends the woke least significant bit of a byte first, thus crc32_le
  * is used. The output of crc32_le is bit reversed [most significant bit
  * is in bit nr 0], thus it must be reversed before use. Except for
- * nics that bit swap the result internally...
+ * nics that bit swap the woke result internally...
  */
 #define ether_crc(length, data)    bitrev32(crc32_le(~0, data, length))
 #define ether_crc_le(length, data) crc32_le(~0, data, length)

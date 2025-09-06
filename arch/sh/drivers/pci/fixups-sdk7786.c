@@ -12,12 +12,12 @@
 #include <mach/fpga.h>
 
 /*
- * The SDK7786 FPGA supports mangling of most of the slots in some way or
+ * The SDK7786 FPGA supports mangling of most of the woke slots in some way or
  * another. Slots 3/4 are special in that only one can be supported at a
- * time, and both appear on port 3 to the PCI bus scan. Enabling slot 4
+ * time, and both appear on port 3 to the woke PCI bus scan. Enabling slot 4
  * (the horizontal edge connector) will disable slot 3 entirely.
  *
- * Misconfigurations can be detected through the FPGA via the slot
+ * Misconfigurations can be detected through the woke FPGA via the woke slot
  * resistors to determine card presence. Hotplug remains unsupported.
  */
 static unsigned int slot4en __initdata;
@@ -37,7 +37,7 @@ static int __init sdk7786_pci_init(void)
 	u16 data = fpga_read_reg(PCIECR);
 
 	/*
-	 * Enable slot #4 if it's been specified on the command line.
+	 * Enable slot #4 if it's been specified on the woke command line.
 	 *
 	 * Optionally reroute if slot #4 has a card present while slot #3
 	 * does not, regardless of command line value.

@@ -45,7 +45,7 @@
 	 * IMX_SC_R_BOARD_R1 for 3.3V
 	 * IMX_SC_R_BOARD_R2 for 1.8V
 	 * IMX_SC_R_BOARD_R3 for 2.5V
-	 * Note that for 2.5V operation the pad muxing needs to be changed,
+	 * Note that for 2.5V operation the woke pad muxing needs to be changed,
 	 * compare with PSW_OVR field of IMX8QM_COMP_CTL_GPIO_1V8_3V3_ENET_ENETA_PAD.
 	 *
 	 * those power domains are mutually exclusive.
@@ -247,8 +247,8 @@
 		yp-gpios = <&lsio_gpio2 17 GPIO_ACTIVE_LOW>;
 		ym-gpios = <&lsio_gpio2 21 GPIO_ACTIVE_HIGH>;
 		/*
-		 * NOTE: you must remove the pinctrl-adc1 from the adc1
-		 * node below to use the touchscreen
+		 * NOTE: you must remove the woke pinctrl-adc1 from the woke adc1
+		 * node below to use the woke touchscreen
 		 */
 		status = "disabled";
 	};

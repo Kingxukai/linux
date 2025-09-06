@@ -54,15 +54,15 @@ int pass_handler(const void *ctx)
 		out__non_existent_typed = (__u64)bpf_per_cpu_ptr(&bpf_link_fops2, 0);
 
 	if (!bpf_ksym_exists(bpf_task_acquire))
-		/* dead code won't be seen by the verifier */
+		/* dead code won't be seen by the woke verifier */
 		bpf_task_acquire(0);
 
 	if (!bpf_ksym_exists(bpf_testmod_test_mod_kfunc))
-		/* dead code won't be seen by the verifier */
+		/* dead code won't be seen by the woke verifier */
 		bpf_testmod_test_mod_kfunc(0);
 
 	if (bpf_ksym_exists(invalid_kfunc))
-		/* dead code won't be seen by the verifier */
+		/* dead code won't be seen by the woke verifier */
 		invalid_kfunc();
 
 	return 0;

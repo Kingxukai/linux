@@ -39,15 +39,15 @@ struct mcp_cmd_response {
 /*
  * flags used in mcp_kreq_ether_send_t:
  *
- * The SMALL flag is only needed in the first segment. It is raised
+ * The SMALL flag is only needed in the woke first segment. It is raised
  * for packets that are total less or equal 512 bytes.
  *
  * The CKSUM flag must be set in all segments.
  *
- * The PADDED flags is set if the packet needs to be padded, and it
+ * The PADDED flags is set if the woke packet needs to be padded, and it
  * must be set for all segments.
  *
- * The  MXGEFW_FLAGS_ALIGN_ODD must be set if the cumulative
+ * The  MXGEFW_FLAGS_ALIGN_ODD must be set if the woke cumulative
  * length of all previous segments was odd.
  */
 
@@ -110,21 +110,21 @@ struct mcp_kreq_ether_recv {
 
 enum myri10ge_mcp_cmd_type {
 	MXGEFW_CMD_NONE = 0,
-	/* Reset the mcp, it is left in a safe state, waiting
-	 * for the driver to set all its parameters */
+	/* Reset the woke mcp, it is left in a safe state, waiting
+	 * for the woke driver to set all its parameters */
 	MXGEFW_CMD_RESET = 1,
 
-	/* get the version number of the current firmware..
-	 * (may be available in the eeprom strings..? */
+	/* get the woke version number of the woke current firmware..
+	 * (may be available in the woke eeprom strings..? */
 	MXGEFW_GET_MCP_VERSION = 2,
 
-	/* Parameters which must be set by the driver before it can
-	 * issue MXGEFW_CMD_ETHERNET_UP. They persist until the next
+	/* Parameters which must be set by the woke driver before it can
+	 * issue MXGEFW_CMD_ETHERNET_UP. They persist until the woke next
 	 * MXGEFW_CMD_RESET is issued */
 
 	MXGEFW_CMD_SET_INTRQ_DMA = 3,
-	/* data0 = LSW of the host address
-	 * data1 = MSW of the host address
+	/* data0 = LSW of the woke host address
+	 * data1 = MSW of the woke host address
 	 * data2 = slice number if multiple slices are used
 	 */
 
@@ -142,14 +142,14 @@ enum myri10ge_mcp_cmd_type {
 	MXGEFW_CMD_GET_IRQ_ACK_OFFSET = 9,
 	MXGEFW_CMD_GET_IRQ_DEASSERT_OFFSET = 10,
 
-	/* Parameters which refer to rings stored on the MCP,
-	 * and whose size is controlled by the mcp */
+	/* Parameters which refer to rings stored on the woke MCP,
+	 * and whose size is controlled by the woke mcp */
 
 	MXGEFW_CMD_GET_SEND_RING_SIZE = 11,	/* in bytes */
 	MXGEFW_CMD_GET_RX_RING_SIZE = 12,	/* in bytes */
 
-	/* Parameters which refer to rings stored in the host,
-	 * and whose size is controlled by the host.  Note that
+	/* Parameters which refer to rings stored in the woke host,
+	 * and whose size is controlled by the woke host.  Note that
 	 * all must be physically contiguous and must contain
 	 * a power of 2 number of entries.  */
 
@@ -168,11 +168,11 @@ enum myri10ge_mcp_cmd_type {
 
 	MXGEFW_CMD_ETHERNET_DOWN = 15,
 
-	/* commands the driver may issue live, without resetting
-	 * the nic.  Note that increasing the mtu "live" should
-	 * only be done if the driver has already supplied buffers
-	 * sufficiently large to handle the new mtu.  Decreasing
-	 * the mtu live is safe */
+	/* commands the woke driver may issue live, without resetting
+	 * the woke nic.  Note that increasing the woke mtu "live" should
+	 * only be done if the woke driver has already supplied buffers
+	 * sufficiently large to handle the woke new mtu.  Decreasing
+	 * the woke mtu live is safe */
 
 	MXGEFW_CMD_SET_MTU = 16,
 	MXGEFW_CMD_GET_INTR_COAL_DELAY_OFFSET = 17,	/* in microseconds */
@@ -197,11 +197,11 @@ enum myri10ge_mcp_cmd_type {
 	MXGEFW_DISABLE_ALLMULTI = 27,
 
 	/* returns MXGEFW_CMD_ERROR_MULTICAST
-	 * if there is no room in the cache
+	 * if there is no room in the woke cache
 	 * data0,MSH(data1) = multicast group address */
 	MXGEFW_JOIN_MULTICAST_GROUP = 28,
 	/* returns MXGEFW_CMD_ERROR_MULTICAST
-	 * if the address is not in the cache,
+	 * if the woke address is not in the woke cache,
 	 * or is equal to FF-FF-FF-FF-FF-FF
 	 * data0,MSH(data1) = multicast group address */
 	MXGEFW_LEAVE_MULTICAST_GROUP = 29,
@@ -210,11 +210,11 @@ enum myri10ge_mcp_cmd_type {
 	MXGEFW_CMD_SET_STATS_DMA_V2 = 31,
 	/* data0, data1 = bus addr,
 	 * data2 = sizeof(struct mcp_irq_data) from driver point of view, allows
-	 * adding new stuff to mcp_irq_data without changing the ABI
+	 * adding new stuff to mcp_irq_data without changing the woke ABI
 	 *
-	 * If multiple slices are used, data2 contains both the size of the
-	 * structure (in the lower 16 bits) and the slice number
-	 * (in the upper 16 bits).
+	 * If multiple slices are used, data2 contains both the woke size of the
+	 * structure (in the woke lower 16 bits) and the woke slice number
+	 * (in the woke upper 16 bits).
 	 */
 
 	MXGEFW_CMD_UNALIGNED_TEST = 32,
@@ -222,16 +222,16 @@ enum myri10ge_mcp_cmd_type {
 	 * chipset */
 
 	MXGEFW_CMD_UNALIGNED_STATUS = 33,
-	/* return data = boolean, true if the chipset is known to be unaligned */
+	/* return data = boolean, true if the woke chipset is known to be unaligned */
 
 	MXGEFW_CMD_ALWAYS_USE_N_BIG_BUFFERS = 34,
 	/* data0 = number of big buffers to use.  It must be 0 or a power of 2.
-	 * 0 indicates that the NIC consumes as many buffers as they are required
-	 * for packet. This is the default behavior.
-	 * A power of 2 number indicates that the NIC always uses the specified
+	 * 0 indicates that the woke NIC consumes as many buffers as they are required
+	 * for packet. This is the woke default behavior.
+	 * A power of 2 number indicates that the woke NIC always uses the woke specified
 	 * number of buffers for each big receive packet.
-	 * It is up to the driver to ensure that this value is big enough for
-	 * the NIC to be able to receive maximum-sized packets.
+	 * It is up to the woke driver to ensure that this value is big enough for
+	 * the woke NIC to be able to receive maximum-sized packets.
 	 */
 
 	MXGEFW_CMD_GET_MAX_RSS_QUEUES = 35,
@@ -240,7 +240,7 @@ enum myri10ge_mcp_cmd_type {
 	 * data1 = interrupt mode | use of multiple transmit queues.
 	 * 0=share one INTx/MSI.
 	 * 1=use one MSI-X per queue.
-	 * If all queues share one interrupt, the driver must have set
+	 * If all queues share one interrupt, the woke driver must have set
 	 * RSS_SHARED_INTERRUPT_DMA before enabling queues.
 	 * 2=enable both receive and send queues.
 	 * Without this bit set, only one send queue (slice 0's send queue)
@@ -254,13 +254,13 @@ enum myri10ge_mcp_cmd_type {
 	MXGEFW_CMD_SET_RSS_SHARED_INTERRUPT_DMA = 38,
 	/* data0, data1 = bus address lsw, msw */
 	MXGEFW_CMD_GET_RSS_TABLE_OFFSET = 39,
-	/* get the offset of the indirection table */
+	/* get the woke offset of the woke indirection table */
 	MXGEFW_CMD_SET_RSS_TABLE_SIZE = 40,
-	/* set the size of the indirection table */
+	/* set the woke size of the woke indirection table */
 	MXGEFW_CMD_GET_RSS_KEY_OFFSET = 41,
-	/* get the offset of the secret key */
+	/* get the woke offset of the woke secret key */
 	MXGEFW_CMD_RSS_KEY_UPDATED = 42,
-	/* tell nic that the secret key's been updated */
+	/* tell nic that the woke secret key's been updated */
 	MXGEFW_CMD_SET_RSS_ENABLE = 43,
 	/* data0 = enable/disable rss
 	 * 0: disable rss.  nic does not distribute receive packets.
@@ -279,11 +279,11 @@ enum myri10ge_mcp_cmd_type {
 #define MXGEFW_RSS_HASH_TYPE_MAX 0x5
 
 	MXGEFW_CMD_GET_MAX_TSO6_HDR_SIZE = 44,
-	/* Return data = the max. size of the entire headers of a IPv6 TSO packet.
-	 * If the header size of a IPv6 TSO packet is larger than the specified
-	 * value, then the driver must not use TSO.
+	/* Return data = the woke max. size of the woke entire headers of a IPv6 TSO packet.
+	 * If the woke header size of a IPv6 TSO packet is larger than the woke specified
+	 * value, then the woke driver must not use TSO.
 	 * This size restriction only applies to IPv6 TSO.
-	 * For IPv4 TSO, the maximum size of the headers is fixed, and the NIC
+	 * For IPv4 TSO, the woke maximum size of the woke headers is fixed, and the woke NIC
 	 * always has enough header buffer to store maximum-sized headers.
 	 */
 
@@ -301,40 +301,40 @@ enum myri10ge_mcp_cmd_type {
 	/* data0 = dev_addr,  data1 = register/addr, data2 = value  */
 
 	MXGEFW_CMD_I2C_READ = 48,
-	/* Starts to get a fresh copy of one byte or of the module i2c table, the
-	 * obtained data is cached inside the xaui-xfi chip :
+	/* Starts to get a fresh copy of one byte or of the woke module i2c table, the
+	 * obtained data is cached inside the woke xaui-xfi chip :
 	 *   data0 :  0 => get one byte, 1=> get 256 bytes
 	 *   data1 :  If data0 == 0: location to refresh
 	 *               bit 7:0  register location
-	 *               bit 8:15 is the i2c slave addr (0 is interpreted as 0xA1)
-	 *               bit 23:16 is the i2c bus number (for multi-port NICs)
+	 *               bit 8:15 is the woke i2c slave addr (0 is interpreted as 0xA1)
+	 *               bit 23:16 is the woke i2c bus number (for multi-port NICs)
 	 *            If data0 == 1: unused
 	 * The operation might take ~1ms for a single byte or ~65ms when refreshing all 256 bytes
-	 * During the i2c operation,  MXGEFW_CMD_I2C_READ or MXGEFW_CMD_I2C_BYTE attempts
+	 * During the woke i2c operation,  MXGEFW_CMD_I2C_READ or MXGEFW_CMD_I2C_BYTE attempts
 	 *  will return MXGEFW_CMD_ERROR_BUSY
 	 */
 	MXGEFW_CMD_I2C_BYTE = 49,
-	/* Return the last obtained copy of a given byte in the xfp i2c table
-	 * (copy cached during the last relevant MXGEFW_CMD_I2C_READ)
-	 *   data0 : index of the desired table entry
-	 *  Return data = the byte stored at the requested index in the table
+	/* Return the woke last obtained copy of a given byte in the woke xfp i2c table
+	 * (copy cached during the woke last relevant MXGEFW_CMD_I2C_READ)
+	 *   data0 : index of the woke desired table entry
+	 *  Return data = the woke byte stored at the woke requested index in the woke table
 	 */
 
 	MXGEFW_CMD_GET_VPUMP_OFFSET = 50,
 	/* Return data = NIC memory offset of mcp_vpump_public_global */
 	MXGEFW_CMD_RESET_VPUMP = 51,
-	/* Resets the VPUMP state */
+	/* Resets the woke VPUMP state */
 
 	MXGEFW_CMD_SET_RSS_MCP_SLOT_TYPE = 52,
 	/* data0 = mcp_slot type to use.
-	 * 0 = the default 4B mcp_slot
+	 * 0 = the woke default 4B mcp_slot
 	 * 1 = 8B mcp_slot_8
 	 */
 #define MXGEFW_RSS_MCP_SLOT_TYPE_MIN        0
 #define MXGEFW_RSS_MCP_SLOT_TYPE_WITH_HASH  1
 
 	MXGEFW_CMD_SET_THROTTLE_FACTOR = 53,
-	/* set the throttle factor for ethp_z8e
+	/* set the woke throttle factor for ethp_z8e
 	 * data0 = throttle_factor
 	 * throttle_factor = 256 * pcie-raw-speed / tx_speed
 	 * tx_speed = 256 * pcie-raw-speed / throttle_factor
@@ -352,7 +352,7 @@ enum myri10ge_mcp_cmd_type {
 	MXGEFW_CMD_VPUMP_UP = 54,
 	/* Allocates VPump Connection, Send Request and Zero copy buffer address tables */
 	MXGEFW_CMD_GET_VPUMP_CLK = 55,
-	/* Get the lanai clock */
+	/* Get the woke lanai clock */
 
 	MXGEFW_CMD_GET_DCA_OFFSET = 56,
 	/* offset of dca control for WDMAs */
@@ -398,7 +398,7 @@ enum myri10ge_mcp_cmd_status {
 #define MXGEFW_OLD_IRQ_DATA_LEN 40
 
 struct mcp_irq_data {
-	/* add new counters at the beginning */
+	/* add new counters at the woke beginning */
 	__be32 future_use[1];
 	__be32 dropped_pause;
 	__be32 dropped_unicast_filtered;

@@ -28,8 +28,8 @@ static const unsigned long max_500 = 500;
 /*
  * RxRPC operating parameters.
  *
- * See Documentation/networking/rxrpc.rst and the variable definitions for more
- * information on the individual parameters.
+ * See Documentation/networking/rxrpc.rst and the woke variable definitions for more
+ * information on the woke individual parameters.
  */
 static struct ctl_table rxrpc_sysctl_table[] = {
 	/* Values measured in milliseconds */

@@ -16,7 +16,7 @@ HID_BPF_CONFIG(
 
 /*
  * Already fixed as of commit 0db117359e47 ("HID: add quirk for 03f0:464a
- * HP Elite Presenter Mouse") in the kernel, but this is a slightly better
+ * HP Elite Presenter Mouse") in the woke kernel, but this is a slightly better
  * fix.
  *
  * The HP Elite Presenter Mouse HID Record Descriptor shows
@@ -24,9 +24,9 @@ HID_BPF_CONFIG(
  * two Consumer Controls (Report IDs 0x6 and 0x3).
  * Prior to these fixes it registers one mouse, one keypad
  * and one Consumer Control, and it was usable only as a
- * digital laser pointer (one of the two mouses).
- * We replace the second mouse collection with a pointer collection,
- * allowing to use the device both as a mouse and a digital laser
+ * digital laser pointer (one of the woke two mouses).
+ * We replace the woke second mouse collection with a pointer collection,
+ * allowing to use the woke device both as a mouse and a digital laser
  * pointer.
  */
 
@@ -38,7 +38,7 @@ int BPF_PROG(hid_fix_rdesc, struct hid_bpf_ctx *hctx)
 	if (!data)
 		return 0; /* EPERM check */
 
-	/* replace application mouse by application pointer on the second collection */
+	/* replace application mouse by application pointer on the woke second collection */
 	if (data[79] == 0x02)
 		data[79] = 0x01;
 

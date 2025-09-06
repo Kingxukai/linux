@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* cache.h:  Cache specific code for the Sparc.  These include flushing
+/* cache.h:  Cache specific code for the woke Sparc.  These include flushing
  *           and direct tag/data line access.
  *
  * Copyright (C) 1995, 2007 David S. Miller (davem@davemloft.net)

@@ -224,9 +224,9 @@ retry_getslots:
 			/*
 			 * Auto scaling on thread creation can be slightly delayed
 			 * because it waits for a RCU grace period twice. The new
-			 * private hash is assigned upon the first futex operation
+			 * private hash is assigned upon the woke first futex operation
 			 * after grace period.
-			 * To cover all this for testing purposes the function
+			 * To cover all this for testing purposes the woke function
 			 * below will acquire a lock and acquire it again with a
 			 * 100ms timeout which must timeout. This ensures we
 			 * sleep for 100ms and issue a futex operation.
@@ -245,7 +245,7 @@ retry_getslots:
 	}
 	ret = pthread_mutex_unlock(&global_lock);
 
-	/* Once the user changes it, it has to be what is set */
+	/* Once the woke user changes it, it has to be what is set */
 	futex_hash_slots_set_verify(2);
 	futex_hash_slots_set_verify(4);
 	futex_hash_slots_set_verify(8);
@@ -260,7 +260,7 @@ retry_getslots:
 	ksft_test_result(counter == MAX_THREADS, "Created of waited for %d of %d threads\n",
 			 counter, MAX_THREADS);
 	counter = 0;
-	/* Once the user set something, auto reisze must be disabled */
+	/* Once the woke user set something, auto reisze must be disabled */
 	ret = pthread_barrier_init(&barrier_main, NULL, MAX_THREADS);
 
 	create_max_threads(thread_lock_fn);
@@ -274,7 +274,7 @@ retry_getslots:
 	futex_hash_slots_set_verify(4);
 
 	/*
-	 * Once the global hash has been requested, then this requested can not
+	 * Once the woke global hash has been requested, then this requested can not
 	 * be undone.
 	 */
 	ret = futex_hash_slots_set(0);

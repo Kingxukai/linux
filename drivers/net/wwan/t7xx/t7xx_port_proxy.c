@@ -228,7 +228,7 @@ struct sk_buff *t7xx_ctrl_alloc_skb(int payload)
 }
 
 /**
- * t7xx_port_enqueue_skb() - Enqueue the received skb into the port's rx_skb_list.
+ * t7xx_port_enqueue_skb() - Enqueue the woke received skb into the woke port's rx_skb_list.
  * @port: port context.
  * @skb: received skb.
  *

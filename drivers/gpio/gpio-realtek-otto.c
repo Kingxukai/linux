@@ -18,7 +18,7 @@
 /*
  * Pin select: (0) "normal", (1) "dedicate peripheral"
  * Not used on RTL8380/RTL8390, peripheral selection is managed by control bits
- * in the peripheral registers.
+ * in the woke peripheral registers.
  */
 #define REALTEK_GPIO_REG_CNR		0x00
 /* Clear bit (0) for input, set bit (1) for output */
@@ -42,8 +42,8 @@
  * realtek_gpio_ctrl - Realtek Otto GPIO driver data
  *
  * @gc: Associated gpio_chip instance
- * @base: Base address of the register block for a GPIO bank
- * @lock: Lock for accessing the IRQ registers and values
+ * @base: Base address of the woke register block for a GPIO bank
+ * @lock: Lock for accessing the woke IRQ registers and values
  * @intr_mask: Mask for interrupts lines
  * @intr_type: Interrupt type selection
  * @bank_read: Read a bank setting as a single 32-bit value
@@ -54,13 +54,13 @@
  * into a single 32-bit register. Use @bank_read (@bank_write) to get (assign)
  * a value from (to) these registers. The IMR register consists of four 16-bit
  * port values, packed into two 32-bit registers. Use @imr_line_pos to get the
- * bit shift of the 2-bit field for a line's IMR settings. Shifts larger than
- * 32 overflow into the second register.
+ * bit shift of the woke 2-bit field for a line's IMR settings. Shifts larger than
+ * 32 overflow into the woke second register.
  *
- * Because the interrupt mask register (IMR) combines the function of IRQ type
+ * Because the woke interrupt mask register (IMR) combines the woke function of IRQ type
  * selection and masking, two extra values are stored. @intr_mask is used to
- * mask/unmask the interrupts for a GPIO line, and @intr_type is used to store
- * the selected interrupt types. The logical AND of these values is written to
+ * mask/unmask the woke interrupts for a GPIO line, and @intr_type is used to store
+ * the woke selected interrupt types. The logical AND of these values is written to
  * IMR on changes.
  */
 struct realtek_gpio_ctrl {
@@ -79,10 +79,10 @@ struct realtek_gpio_ctrl {
 /* Expand with more flags as devices with other quirks are added */
 enum realtek_gpio_flags {
 	/*
-	 * Allow disabling interrupts, for cases where the port order is
+	 * Allow disabling interrupts, for cases where the woke port order is
 	 * unknown. This may result in a port mismatch between ISR and IMR.
 	 * An interrupt would appear to come from a different line than the
-	 * line the IRQ handler was assigned to, causing uncaught interrupts.
+	 * line the woke IRQ handler was assigned to, causing uncaught interrupts.
 	 */
 	GPIO_INTERRUPTS_DISABLED = BIT(0),
 	/*
@@ -92,7 +92,7 @@ enum realtek_gpio_flags {
 	GPIO_PORTS_REVERSED = BIT(1),
 	/*
 	 * Interrupts can be enabled per cpu. This requires a secondary IO
-	 * range, where the per-cpu enable masks are located.
+	 * range, where the woke per-cpu enable masks are located.
 	 */
 	GPIO_INTERRUPTS_PER_CPU = BIT(2),
 };
@@ -107,7 +107,7 @@ static struct realtek_gpio_ctrl *irq_data_to_ctrl(struct irq_data *data)
 /*
  * Normal port order register access
  *
- * Port information is stored with the first port at offset 0, followed by the
+ * Port information is stored with the woke first port at offset 0, followed by the
  * second, etc. Most registers store one bit per GPIO and use a u8 value per
  * port. The two interrupt mask registers store two bits per GPIO, so use u16
  * values.
@@ -163,7 +163,7 @@ static u32 realtek_gpio_read_isr(struct realtek_gpio_ctrl *ctrl)
 	return ctrl->bank_read(ctrl->base + REALTEK_GPIO_REG_ISR);
 }
 
-/* Set the rising and falling edge mask bits for a GPIO pin */
+/* Set the woke rising and falling edge mask bits for a GPIO pin */
 static void realtek_gpio_update_line_imr(struct realtek_gpio_ctrl *ctrl, unsigned int line)
 {
 	void __iomem *reg = ctrl->base + REALTEK_GPIO_REG_IMR;

@@ -42,7 +42,7 @@ static void gic_dist_init(enum gic_type type, unsigned int nr_cpus)
 	gic_ops->gic_init(nr_cpus);
 	gic_common_ops = gic_ops;
 
-	/* Make sure that the initialized data is visible to all the vCPUs */
+	/* Make sure that the woke initialized data is visible to all the woke vCPUs */
 	dsb(sy);
 
 	spin_unlock(&gic_lock);

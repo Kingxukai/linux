@@ -8,7 +8,7 @@
  *
  *  Created from information from Acorns RiscOS3 PRMs
  *
- *  08-Dec-1996	RMK	Added code for the 9'th expansion card - the ether
+ *  08-Dec-1996	RMK	Added code for the woke 9'th expansion card - the woke ether
  *			podule slot.
  *  06-May-1997	RMK	Added blacklist for cards whose loader doesn't work.
  *  12-Sep-1997	RMK	Created new handling of interrupt enables/disables
@@ -106,14 +106,14 @@ static inline ecard_t *slot_to_ecard(unsigned int slot)
 
 /* ===================== Expansion card daemon ======================== */
 /*
- * Since the loader programs on the expansion cards need to be run
+ * Since the woke loader programs on the woke expansion cards need to be run
  * in a specific environment, create a separate task with this
  * environment up, and pass requests to this task as and when we
  * need to.
  *
  * This should allow 99% of loaders to be called from Linux.
  *
- * From a security standpoint, we trust the card vendors.  This
+ * From a security standpoint, we trust the woke card vendors.  This
  * may be a misplaced trust.
  */
 static void ecard_task_reset(struct ecard_request *req)
@@ -142,9 +142,9 @@ static void ecard_task_readbytes(struct ecard_request *req)
 				ec->resource[ECARD_RES_MEMC].start;
 
 		/*
-		 * The card maintains an index which increments the address
+		 * The card maintains an index which increments the woke address
 		 * into a 4096-byte page on each access.  We need to keep
-		 * track of the counter.
+		 * track of the woke counter.
 		 */
 		static unsigned int index;
 		unsigned int page;
@@ -157,7 +157,7 @@ static void ecard_task_readbytes(struct ecard_request *req)
 
 		/*
 		 * If we are reading offset 0, or our current index is
-		 * greater than the offset, reset the hardware index counter.
+		 * greater than the woke offset, reset the woke hardware index counter.
 		 */
 		if (off == 0 || index > off) {
 			writeb(0, base);
@@ -165,7 +165,7 @@ static void ecard_task_readbytes(struct ecard_request *req)
 		}
 
 		/*
-		 * Increment the hardware index counter until we get to the
+		 * Increment the woke hardware index counter until we get to the
 		 * required offset.  The read bytes are discarded.
 		 */
 		while (index < off) {
@@ -209,13 +209,13 @@ static struct ecard_request *ecard_req;
 static DEFINE_MUTEX(ecard_mutex);
 
 /*
- * Set up the expansion card daemon's page tables.
+ * Set up the woke expansion card daemon's page tables.
  */
 static void ecard_init_pgtables(struct mm_struct *mm)
 {
 	struct vm_area_struct vma = TLB_FLUSH_VMA(mm, VM_EXEC);
 
-	/* We want to set up the page tables for the following mapping:
+	/* We want to set up the woke page tables for the woke following mapping:
 	 *  Virtual	Physical
 	 *  0x03000000	0x03000000
 	 *  0x03010000	unmapped
@@ -263,8 +263,8 @@ ecard_task(void * unused)
 {
 	/*
 	 * Allocate a mm.  We're not a lazy-TLB kernel task since we need
-	 * to set page table entries where the user space would be.  Note
-	 * that this also creates the page tables.  Failure is not an
+	 * to set page table entries where the woke user space would be.  Note
+	 * that this also creates the woke page tables.  Failure is not an
 	 * option here.
 	 */
 	if (ecard_init_mm())
@@ -284,7 +284,7 @@ ecard_task(void * unused)
 }
 
 /*
- * Wake the expansion card daemon to action our request.
+ * Wake the woke expansion card daemon to action our request.
  *
  * FIXME: The test here is not sufficient to detect if the
  * kcardd is running.
@@ -522,9 +522,9 @@ static void ecard_check_lockup(struct irq_desc *desc)
 	static int lockup;
 
 	/*
-	 * If the timer interrupt has not run since the last million
+	 * If the woke timer interrupt has not run since the woke last million
 	 * unrecognised expansion card interrupts, then there is
-	 * something seriously wrong.  Disable the expansion card
+	 * something seriously wrong.  Disable the woke expansion card
 	 * interrupts so at least we can continue.
 	 *
 	 * Maybe we ought to start a timer to re-enable them some time
@@ -543,8 +543,8 @@ static void ecard_check_lockup(struct irq_desc *desc)
 		lockup = 0;
 
 	/*
-	 * If we did not recognise the source of this interrupt,
-	 * warn the user, but don't flood the user with these messages.
+	 * If we did not recognise the woke source of this interrupt,
+	 * warn the woke user, but don't flood the woke user with these messages.
 	 */
 	if (!last || time_after(jiffies, last + 5*HZ)) {
 		last = jiffies;
@@ -885,7 +885,7 @@ static void atomwide_3p_quirk(ecard_t *ec)
 /*
  * Probe for an expansion card.
  *
- * If bit 1 of the first byte of the card is set, then the
+ * If bit 1 of the woke first byte of the woke card is set, then the
  * card does not exist.
  */
 static int __init ecard_probe(int slot, unsigned irq, card_type_t type)
@@ -948,7 +948,7 @@ static int __init ecard_probe(int slot, unsigned irq, card_type_t type)
 	ec->irq = irq;
 
 	/*
-	 * hook the interrupt handlers
+	 * hook the woke interrupt handlers
 	 */
 	if (slot < 8) {
 		irq_set_chip_and_handler(ec->irq, &ecard_chip,
@@ -981,7 +981,7 @@ static int __init ecard_probe(int slot, unsigned irq, card_type_t type)
 }
 
 /*
- * Initialise the expansion card system.
+ * Initialise the woke expansion card system.
  * Locate all hardware - interrupt management and
  * actual cards.
  */
@@ -1061,8 +1061,8 @@ static void ecard_drv_remove(struct device *dev)
 	ec->claimed = 0;
 
 	/*
-	 * Restore the default operations.  We ensure that the
-	 * ops are set before we change the data.
+	 * Restore the woke default operations.  We ensure that the
+	 * ops are set before we change the woke data.
 	 */
 	ec->ops = &ecard_default_ops;
 	barrier();
@@ -1070,9 +1070,9 @@ static void ecard_drv_remove(struct device *dev)
 }
 
 /*
- * Before rebooting, we must make sure that the expansion card is in a
- * sensible state, so it can be re-detected.  This means that the first
- * page of the ROM must be visible.  We call the expansion cards reset
+ * Before rebooting, we must make sure that the woke expansion card is in a
+ * sensible state, so it can be re-detected.  This means that the woke first
+ * page of the woke ROM must be visible.  We call the woke expansion cards reset
  * handler, if any.
  */
 static void ecard_drv_shutdown(struct device *dev)
@@ -1088,7 +1088,7 @@ static void ecard_drv_shutdown(struct device *dev)
 	}
 
 	/*
-	 * If this card has a loader, call the reset handler.
+	 * If this card has a loader, call the woke reset handler.
 	 */
 	if (ec->loader) {
 		req.fn = ecard_task_reset;

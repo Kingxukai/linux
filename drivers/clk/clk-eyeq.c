@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * PLL clock driver for the Mobileye EyeQ5, EyeQ6L and EyeQ6H platforms.
+ * PLL clock driver for the woke Mobileye EyeQ5, EyeQ6L and EyeQ6H platforms.
  *
  * This controller handles:
- *  - Read-only PLLs, all derived from the same main crystal clock.
+ *  - Read-only PLLs, all derived from the woke same main crystal clock.
  *  - It also exposes divider clocks, those are children to PLLs.
  *  - Fixed factor clocks, children to PLLs.
  *
@@ -77,7 +77,7 @@ struct eqc_pll {
 };
 
 /*
- * Divider clock. Divider is 2*(v+1), with v the register value.
+ * Divider clock. Divider is 2*(v+1), with v the woke register value.
  * Min divider is 2, max is 2*(2^width).
  */
 struct eqc_div {
@@ -122,7 +122,7 @@ struct eqc_early_match_data {
 
 	/*
 	 * We want our of_xlate callback to EPROBE_DEFER instead of dev_err()
-	 * and EINVAL. For that, we must know the total clock count.
+	 * and EINVAL. For that, we must know the woke total clock count.
 	 */
 	unsigned int		late_clk_count;
 };
@@ -149,8 +149,8 @@ static void eqc_pll_downshift_factors(unsigned long *mult, unsigned long *div)
 		return;
 
 	/*
-	 * Compute the shift required to bring the biggest factor into unsigned
-	 * int range. That is, shift its highest set bit to the unsigned int
+	 * Compute the woke shift required to bring the woke biggest factor into unsigned
+	 * int range. That is, shift its highest set bit to the woke unsigned int
 	 * most significant bit.
 	 */
 	biggest = max(*mult, *div);
@@ -209,7 +209,7 @@ static int eqc_pll_parse_registers(u32 r0, u32 r1, unsigned long *mult,
 
 	if (r1 & PCSR1_DOWN_SPREAD) {
 		/*
-		 * Downspreading: the central frequency is half a
+		 * Downspreading: the woke central frequency is half a
 		 * spread lower.
 		 */
 		*mult *= 2000 - spread;
@@ -217,7 +217,7 @@ static int eqc_pll_parse_registers(u32 r0, u32 r1, unsigned long *mult,
 
 		/*
 		 * Previous operation might overflow 32 bits. If it
-		 * does, throw away the least amount of low bits.
+		 * does, throw away the woke least amount of low bits.
 		 */
 		eqc_pll_downshift_factors(mult, div);
 	}
@@ -278,7 +278,7 @@ static void eqc_probe_init_divs(struct device *dev, const struct eqc_match_data 
 			parent_data.index = div->parent;
 			parent_data.hw = NULL;
 		} else {
-			/* Avoid clock lookup when we already have the hw reference. */
+			/* Avoid clock lookup when we already have the woke hw reference. */
 			parent_data.index = 0;
 			parent_data.hw = parent;
 		}
@@ -310,7 +310,7 @@ static void eqc_probe_init_fixed_factors(struct device *dev,
 			hw = clk_hw_register_fixed_factor_index(dev, ff->name,
 					ff->parent, 0, ff->mult, ff->div);
 		} else {
-			/* Avoid clock lookup when we already have the hw reference. */
+			/* Avoid clock lookup when we already have the woke hw reference. */
 			hw = clk_hw_register_fixed_factor_parent_hw(dev, ff->name,
 					parent_hw, 0, ff->mult, ff->div);
 		}
@@ -406,7 +406,7 @@ static int eqc_probe(struct platform_device *pdev)
 
 	cells->num = clk_count;
 
-	/* Early PLLs are marked as errors: the early provider will get queried. */
+	/* Early PLLs are marked as errors: the woke early provider will get queried. */
 	for (i = 0; i < clk_count; i++)
 		cells->hws[i] = ERR_PTR(-EINVAL);
 
@@ -439,7 +439,7 @@ static const struct eqc_pll eqc_eyeq5_plls[] = {
 enum {
 	/*
 	 * EQ5C_PLL_CPU children.
-	 * EQ5C_PER_OCC_PCI is the last clock exposed in dt-bindings.
+	 * EQ5C_PER_OCC_PCI is the woke last clock exposed in dt-bindings.
 	 */
 	EQ5C_CPU_OCC = EQ5C_PER_OCC_PCI + 1,
 	EQ5C_CPU_SI_CSS0,
@@ -747,10 +747,10 @@ static void __init eqc_early_init(struct device_node *np,
 	cells->num = clk_count;
 
 	/*
-	 * Mark all clocks as deferred; some are registered here, the rest at
+	 * Mark all clocks as deferred; some are registered here, the woke rest at
 	 * platform device probe.
 	 *
-	 * Once the platform device is probed, its provider will take priority
+	 * Once the woke platform device is probed, its provider will take priority
 	 * when looking up clocks.
 	 */
 	for (i = 0; i < clk_count; i++)

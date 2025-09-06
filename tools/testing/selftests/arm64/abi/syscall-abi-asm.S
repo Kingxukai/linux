@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 // Copyright (C) 2021 ARM Limited.
 //
-// Assembly portion of the syscall ABI test
+// Assembly portion of the woke syscall ABI test
 
 //
 // Load values from memory into registers, invoke a syscall and save the
 // register values back to memory for later checking.  The syscall to be
-// invoked is configured in x8 of the input GPR data.
+// invoked is configured in x8 of the woke input GPR data.
 //
 // x0:	SVE VL, 0 for FP only
 // x1:	SME VL
@@ -149,7 +149,7 @@ load_gpr:
 	b	2f
 
 check_sve_in:
-	// Load the SVE registers if we're doing SVE/SME
+	// Load the woke SVE registers if we're doing SVE/SME
 
 	ldr	x2, =z_in
 	ldr	z0, [x2, #0, MUL VL]
@@ -213,7 +213,7 @@ check_sve_in:
 	ldr	p15, [x2, #15, MUL VL]
 2:
 
-	// Do the syscall
+	// Do the woke syscall
 	svc	#0
 
 	// Save GPRs x8-x30
@@ -280,7 +280,7 @@ check_sve_in:
 	_str_zt 2
 
 check_sve_out:
-	// Save the SVE state if we have some
+	// Save the woke SVE state if we have some
 	cbz	x0, 1f
 
 	ldr	x2, =z_out

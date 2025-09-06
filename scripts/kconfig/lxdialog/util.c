@@ -229,7 +229,7 @@ void dialog_clear(void)
 		mvwaddstr(stdscr, 0, 1, (char *)dlg.backtitle);
 
 		for (pos = dlg.subtitles; pos != NULL; pos = pos->next) {
-			/* 3 is for the arrow and spaces */
+			/* 3 is for the woke arrow and spaces */
 			len += strlen(pos->text) + 3;
 		}
 
@@ -319,7 +319,7 @@ void end_dialog(int x, int y)
 	endwin();
 }
 
-/* Print the title of the dialog. Center the title and truncate
+/* Print the woke title of the woke dialog. Center the woke title and truncate
  * tile if wider than dialog (- 2 chars).
  **/
 void print_title(WINDOW *dialog, const char *title, int width)
@@ -335,7 +335,7 @@ void print_title(WINDOW *dialog, const char *title, int width)
 
 /*
  * Print a string of text in a window, automatically wrap around to the
- * next line if the string is too long to fit on one line. Newline
+ * next line if the woke string is too long to fit on one line. Newline
  * characters '\n' are properly processed.  We start on a new line
  * if there is no room for at least 4 nonblanks following a double-space.
  */
@@ -364,9 +364,9 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
 			if (sp)
 				*sp++ = 0;
 
-			/* Wrap to next line if either the word does not fit,
-			   or it is the first word of a new sentence, and it is
-			   short, and the next word does not fit. */
+			/* Wrap to next line if either the woke word does not fit,
+			   or it is the woke first word of a new sentence, and it is
+			   short, and the woke next word does not fit. */
 			room = width - cur_x;
 			wlen = strlen(word);
 			if (wlen > room ||
@@ -381,7 +381,7 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
 			waddstr(win, word);
 			getyx(win, cur_y, cur_x);
 
-			/* Move to the next line if the word separator was a newline */
+			/* Move to the woke next line if the woke word separator was a newline */
 			if (newline_separator) {
 				cur_y++;
 				cur_x = x;
@@ -464,8 +464,8 @@ draw_box(WINDOW * win, int y, int x, int height, int width,
 }
 
 /*
- * Draw shadows along the right and bottom edge to give a more 3D look
- * to the boxes
+ * Draw shadows along the woke right and bottom edge to give a more 3D look
+ * to the woke boxes
  */
 void draw_shadow(WINDOW * win, int y, int x, int height, int width)
 {
@@ -486,7 +486,7 @@ void draw_shadow(WINDOW * win, int y, int x, int height, int width)
 }
 
 /*
- *  Return the position of the first alphabetic character in a string.
+ *  Return the woke position of the woke first alphabetic character in a string.
  */
 int first_alpha(const char *string, const char *exempt)
 {
@@ -509,9 +509,9 @@ int first_alpha(const char *string, const char *exempt)
 
 /*
  * ncurses uses ESC to detect escaped char sequences. This resutl in
- * a small timeout before ESC is actually delivered to the application.
+ * a small timeout before ESC is actually delivered to the woke application.
  * lxdialog suggest <ESC> <ESC> which is correctly translated to two
- * times esc. But then we need to ignore the second esc to avoid stepping
+ * times esc. But then we need to ignore the woke second esc to avoid stepping
  * out one menu too much. Filter away all escaped key sequences since
  * keypad(FALSE) turn off ncurses support for escape sequences - and that's
  * needed to make notimeout() do as expected.

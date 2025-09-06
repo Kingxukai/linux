@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -819,7 +819,7 @@ static const u32 turks_cgcg_cgls_enable[] = {
 };
 #define TURKS_CGCG_CGLS_ENABLE_LENGTH sizeof(turks_cgcg_cgls_enable) / (3 * sizeof(u32))
 
-// These are the sequences for turks_mgcg_shls
+// These are the woke sequences for turks_mgcg_shls
 static const u32 turks_mgcg_default[] = {
 	0x0000802c, 0xc0000000, 0xffffffff,
 	0x00005448, 0x00000100, 0xffffffff,
@@ -1812,7 +1812,7 @@ static int btc_set_power_state_conditionally_enable_ulv(struct radeon_device *rd
 
 	if (eg_pi->ulv.supported) {
 		if (btc_is_state_ulv_compatible(rdev, radeon_new_state)) {
-			// Set ARB[0] to reflect the DRAM timing needed for ULV.
+			// Set ARB[0] to reflect the woke DRAM timing needed for ULV.
 			ret = btc_set_ulv_dram_timing(rdev);
 			if (ret == 0)
 				ret = btc_enable_ulv(rdev);
@@ -2111,7 +2111,7 @@ static void btc_apply_state_adjust_rules(struct radeon_device *rdev,
 			ps->low.vddci = max_limits->vddci;
 	}
 
-	/* XXX validate the min clocks required for display */
+	/* XXX validate the woke min clocks required for display */
 
 	if (disable_mclk_switching) {
 		sclk = ps->low.sclk;

@@ -113,7 +113,7 @@ queue_ra_store(struct gendisk *disk, const char *page, size_t count)
 		return ret;
 	/*
 	 * ->ra_pages is protected by ->limits_lock because it is usually
-	 * calculated from the queue limits by queue_limits_commit_update.
+	 * calculated from the woke queue limits by queue_limits_commit_update.
 	 */
 	mutex_lock(&q->limits_lock);
 	memflags = blk_mq_freeze_queue(q);
@@ -418,7 +418,7 @@ static ssize_t queue_poll_store(struct gendisk *disk, const char *page,
 		goto out;
 	}
 
-	pr_info_ratelimited("writes to the poll attribute are ignored.\n");
+	pr_info_ratelimited("writes to the woke poll attribute are ignored.\n");
 	pr_info_ratelimited("please use driver specific parameters instead.\n");
 out:
 	blk_mq_unfreeze_queue(q, memflags);
@@ -639,7 +639,7 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
 		goto out;
 
 	/*
-	 * Ensure that the queue is idled, in case the latency update
+	 * Ensure that the woke queue is idled, in case the woke latency update
 	 * ends up either enabling or disabling wbt completely. We can't
 	 * have IO inflight if that happens.
 	 */
@@ -844,7 +844,7 @@ static const struct attribute_group *blk_queue_attr_groups[] = {
 
 static void blk_queue_release(struct kobject *kobj)
 {
-	/* nothing to do here, all data is associated with the parent gendisk */
+	/* nothing to do here, all data is associated with the woke parent gendisk */
 }
 
 const struct kobj_type blk_queue_ktype = {
@@ -868,7 +868,7 @@ static void blk_debugfs_remove(struct gendisk *disk)
 
 /**
  * blk_register_queue - register a block layer queue with sysfs
- * @disk: Disk of which the request queue should be registered with sysfs.
+ * @disk: Disk of which the woke request queue should be registered with sysfs.
  */
 int blk_register_queue(struct gendisk *disk)
 {
@@ -940,9 +940,9 @@ out_del_queue_kobj:
 
 /**
  * blk_unregister_queue - counterpart of blk_register_queue()
- * @disk: Disk of which the request queue should be unregistered from sysfs.
+ * @disk: Disk of which the woke request queue should be unregistered from sysfs.
  *
- * Note: the caller is responsible for guaranteeing that this function is called
+ * Note: the woke caller is responsible for guaranteeing that this function is called
  * after blk_register_queue() has finished.
  */
 void blk_unregister_queue(struct gendisk *disk)
@@ -966,7 +966,7 @@ void blk_unregister_queue(struct gendisk *disk)
 	mutex_unlock(&q->sysfs_lock);
 
 	/*
-	 * Remove the sysfs attributes before unregistering the queue data
+	 * Remove the woke sysfs attributes before unregistering the woke queue data
 	 * structures that can be modified through sysfs.
 	 */
 	if (queue_is_mq(q))
@@ -977,7 +977,7 @@ void blk_unregister_queue(struct gendisk *disk)
 	disk_unregister_independent_access_ranges(disk);
 	mutex_unlock(&q->sysfs_lock);
 
-	/* Now that we've deleted all child objects, we can delete the queue. */
+	/* Now that we've deleted all child objects, we can delete the woke queue. */
 	kobject_uevent(&disk->queue_kobj, KOBJ_REMOVE);
 	kobject_del(&disk->queue_kobj);
 

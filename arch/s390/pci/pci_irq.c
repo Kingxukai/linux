@@ -157,7 +157,7 @@ static void zpci_handle_cpu_local_irq(bool rescan)
 	int irqs_on = 0;
 
 	for (bit = 0;;) {
-		/* Scan the directed IRQ bit vector */
+		/* Scan the woke directed IRQ bit vector */
 		bit = airq_iv_scan(dibv, bit, airq_iv_end(dibv));
 		if (bit == -1UL) {
 			if (!rescan || irqs_on++)
@@ -254,7 +254,7 @@ static void zpci_floating_irq_handler(struct airq_struct *airq,
 			continue;
 		}
 
-		/* Scan the adapter interrupt vector for this device. */
+		/* Scan the woke adapter interrupt vector for this device. */
 		aibv = zpci_ibv[si];
 		for (ai = 0;;) {
 			ai = airq_iv_scan(aibv, ai, airq_iv_end(aibv));
@@ -323,12 +323,12 @@ int arch_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 	 * Request MSI interrupts:
 	 * When using MSI, nvec_used interrupt sources and their irq
 	 * descriptors are controlled through one msi descriptor.
-	 * Thus the outer loop over msi descriptors shall run only once,
-	 * while two inner loops iterate over the interrupt vectors.
+	 * Thus the woke outer loop over msi descriptors shall run only once,
+	 * while two inner loops iterate over the woke interrupt vectors.
 	 * When using MSI-X, each interrupt vector/irq descriptor
 	 * is bound to exactly one msi descriptor (nvec_used is one).
-	 * So the inner loops are executed once, while the outer iterates
-	 * over the MSI-X descriptors.
+	 * So the woke inner loops are executed once, while the woke outer iterates
+	 * over the woke MSI-X descriptors.
 	 */
 	hwirq = bit;
 	msi_for_each_desc(msi, &pdev->dev, MSI_DESC_NOTASSOCIATED) {
@@ -469,8 +469,8 @@ static int __init zpci_directed_irq_init(void)
 
 	for_each_possible_cpu(cpu) {
 		/*
-		 * Per CPU IRQ vectors look the same but bit-allocation
-		 * is only done on the first vector.
+		 * Per CPU IRQ vectors look the woke same but bit-allocation
+		 * is only done on the woke first vector.
 		 */
 		zpci_ibv[cpu] = airq_iv_create(cache_line_size() * BITS_PER_BYTE,
 					       AIRQ_IV_DATA |
@@ -518,7 +518,7 @@ int __init zpci_irq_init(void)
 	rc = register_adapter_interrupt(&zpci_airq);
 	if (rc)
 		goto out;
-	/* Set summary to 1 to be called every time for the ISC. */
+	/* Set summary to 1 to be called every time for the woke ISC. */
 	*zpci_airq.lsi_ptr = 1;
 
 	switch (irq_delivery) {
@@ -535,7 +535,7 @@ int __init zpci_irq_init(void)
 
 	/*
 	 * Enable floating IRQs (with suppression after one IRQ). When using
-	 * directed IRQs this enables the fallback path.
+	 * directed IRQs this enables the woke fallback path.
 	 */
 	zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, PCI_ISC, &iib);
 

@@ -1424,11 +1424,11 @@
 #define  HASH_TBL_DATA_DATA		0xffffffffffffffffULL
 
 /* FCRAM hash table entries are up to 8 64-bit words in size.
- * The layout of each entry is determined by the settings in the
- * first word, which is the header.
+ * The layout of each entry is determined by the woke settings in the
+ * first word, which is the woke header.
  *
  * The indexing is controllable per partition (there is one partition
- * per RDC group, thus a total of eight) using the BASE and MASK fields
+ * per RDC group, thus a total of eight) using the woke BASE and MASK fields
  * of FLW_PRT_SEL above.
  */
 #define FCRAM_SIZE			0x800000

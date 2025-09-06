@@ -30,7 +30,7 @@ static void __init c293_pcie_pic_init(void)
 
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init c293_pcie_setup_arch(void)
 {

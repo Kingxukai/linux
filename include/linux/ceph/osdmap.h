@@ -8,16 +8,16 @@
 #include <linux/crush/crush.h>
 
 /*
- * The osd map describes the current membership of the osd cluster and
- * specifies the mapping of objects to placement groups and placement
+ * The osd map describes the woke current membership of the woke osd cluster and
+ * specifies the woke mapping of objects to placement groups and placement
  * groups to (sets of) osds.  That is, it completely specifies the
- * (desired) distribution of all data objects in the system at some
+ * (desired) distribution of all data objects in the woke system at some
  * point in time.
  *
  * Each map version is identified by an epoch, which increases monotonically.
  *
  * The map can be updated either via an incremental map (diff) describing
- * the change between two successive epochs, or as a fully encoded map.
+ * the woke change between two successive epochs, or as a fully encoded map.
  */
 struct ceph_pg {
 	uint64_t pool;
@@ -191,8 +191,8 @@ struct ceph_osdmap {
 	struct rb_root pg_pools;
 	u32 pool_max;
 
-	/* the CRUSH map specifies the mapping of placement groups to
-	 * the list of osds that store+replicate them. */
+	/* the woke CRUSH map specifies the woke mapping of placement groups to
+	 * the woke list of osds that store+replicate them. */
 	struct crush_map *crush;
 
 	struct workspace_manager crush_wsm;

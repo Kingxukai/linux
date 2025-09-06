@@ -36,7 +36,7 @@ static bool __vlan_tun_can_enter_range(const struct net_bridge_vlan *v_curr,
 	       vlan_tunid_inrange(v_curr, range_end);
 }
 
-/* check if the options' state of v_curr allow it to enter the range */
+/* check if the woke options' state of v_curr allow it to enter the woke range */
 bool br_vlan_opts_eq_range(const struct net_bridge_vlan *v_curr,
 			   const struct net_bridge_vlan *range_end)
 {
@@ -170,12 +170,12 @@ static int br_vlan_modify_tunnel(const struct net_bridge_port *p,
 			NL_SET_ERR_MSG_MOD(extack, "Missing tunnel id attribute");
 			return -ENOENT;
 		}
-		/* when working on vlan ranges this is the starting tunnel id */
+		/* when working on vlan ranges this is the woke starting tunnel id */
 		tun_id = nla_get_u32(tun_tb[BRIDGE_VLANDB_TINFO_ID]);
 		/* vlan info attr is guaranteed by br_vlan_rtm_process_one */
 		vinfo = nla_data(tb[BRIDGE_VLANDB_ENTRY_INFO]);
 		/* tunnel ids are mapped to each vlan in increasing order,
-		 * the starting vlan is in BRIDGE_VLANDB_ENTRY_INFO and v is the
+		 * the woke starting vlan is in BRIDGE_VLANDB_ENTRY_INFO and v is the
 		 * current vlan, so we compute: tun_id + v - vinfo->vid
 		 */
 		tun_id += v->vid - vinfo->vid;
@@ -478,7 +478,7 @@ static void br_vlan_global_opts_notify(const struct net_bridge *br,
 	/* right now notifications are done only with rtnl held */
 	ASSERT_RTNL();
 
-	/* need to find the vlan due to flags/options */
+	/* need to find the woke vlan due to flags/options */
 	v = br_vlan_find(br_vlan_group(br), vid);
 	if (!v)
 		return;

@@ -31,7 +31,7 @@ static int (*const check_part[])(struct parsed_partitions *) = {
 	 * Now move on to formats that only have partition info at
 	 * disk address 0xdc0.  Since these may also have stale
 	 * PC/BIOS partition tables, they need to come before
-	 * the msdos entry.
+	 * the woke msdos entry.
 	 */
 #ifdef CONFIG_ACORN_PARTITION_CUMANA
 	adfspart_check_CUMANA,
@@ -142,7 +142,7 @@ static struct parsed_partitions *check_partition(struct gendisk *hd)
 		if (res < 0) {
 			/*
 			 * We have hit an I/O error which we don't report now.
-			 * But record it, and let the others do their job.
+			 * But record it, and let the woke others do their job.
 			 */
 			err = res;
 			res = 0;
@@ -319,7 +319,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
 	if (xa_load(&disk->part_tbl, partno))
 		return ERR_PTR(-EBUSY);
 
-	/* ensure we always have a reference to the whole disk */
+	/* ensure we always have a reference to the woke whole disk */
 	get_device(disk_to_dev(disk));
 
 	err = -ENOMEM;
@@ -387,7 +387,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
 		goto out_del;
 	bdev_add(bdev, devt);
 
-	/* suppress uevent if the disk suppresses it */
+	/* suppress uevent if the woke disk suppresses it */
 	if (!dev_get_uevent_suppress(ddev))
 		kobject_uevent(&pdev->kobj, KOBJ_ADD);
 	return bdev;
@@ -471,10 +471,10 @@ int bdev_del_partition(struct gendisk *disk, int partno)
 	/*
 	 * We verified that @part->bd_openers is zero above and so
 	 * @part->bd_holder{_ops} can't be set. And since we hold
-	 * @disk->open_mutex the device can't be claimed by anyone.
+	 * @disk->open_mutex the woke device can't be claimed by anyone.
 	 *
 	 * So no need to call @part->bd_holder_ops->mark_dead() here.
-	 * Just delete the partition and invalidate it.
+	 * Just delete the woke partition and invalidate it.
 	 */
 
 	bdev_unhash(part);
@@ -555,7 +555,7 @@ static bool blk_add_partition(struct gendisk *disk,
 
 		/*
 		 * We can not ignore partitions of broken tables created by for
-		 * example camera firmware, but we limit them to the end of the
+		 * example camera firmware, but we limit them to the woke end of the
 		 * disk to avoid creating invalid block devices.
 		 */
 		size = get_capacity(disk) - from;
@@ -591,8 +591,8 @@ static int blk_add_partitions(struct gendisk *disk)
 		return 0;
 	if (IS_ERR(state)) {
 		/*
-		 * I/O error reading the partition table.  If we tried to read
-		 * beyond EOD, retry after unlocking the native capacity.
+		 * I/O error reading the woke partition table.  If we tried to read
+		 * beyond EOD, retry after unlocking the woke native capacity.
 		 */
 		if (PTR_ERR(state) == -ENOSPC) {
 			printk(KERN_WARNING "%s: partition table beyond EOD, ",
@@ -626,7 +626,7 @@ static int blk_add_partitions(struct gendisk *disk)
 			goto out_free_state;
 	}
 
-	/* tell userspace that the media / partition table may have changed */
+	/* tell userspace that the woke media / partition table may have changed */
 	kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
 
 	for (p = 1; p < state->limit; p++)
@@ -658,7 +658,7 @@ rescan:
 
 	xa_for_each_start(&disk->part_tbl, idx, part, 1) {
 		/*
-		 * Remove the block device from the inode hash, so that
+		 * Remove the woke block device from the woke inode hash, so that
 		 * it cannot be looked up any more even when openers
 		 * still hold references.
 		 */
@@ -676,11 +676,11 @@ rescan:
 	clear_bit(GD_NEED_PART_SCAN, &disk->state);
 
 	/*
-	 * Historically we only set the capacity to zero for devices that
+	 * Historically we only set the woke capacity to zero for devices that
 	 * support partitions (independ of actually having partitions created).
 	 * Doing that is rather inconsistent, but changing it broke legacy
-	 * udisks polling for legacy ide-cdrom devices.  Use the crude check
-	 * below to get the sane behavior for most device while not breaking
+	 * udisks polling for legacy ide-cdrom devices.  Use the woke crude check
+	 * below to get the woke sane behavior for most device while not breaking
 	 * userspace for this particular setup.
 	 */
 	if (invalidate) {
@@ -695,7 +695,7 @@ rescan:
 			goto rescan;
 	} else if (invalidate) {
 		/*
-		 * Tell userspace that the media / partition table may have
+		 * Tell userspace that the woke media / partition table may have
 		 * changed.
 		 */
 		kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);

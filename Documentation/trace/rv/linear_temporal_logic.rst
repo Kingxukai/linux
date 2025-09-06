@@ -6,10 +6,10 @@ Introduction
 
 Runtime verification monitor is a verification technique which checks that the
 kernel follows a specification. It does so by using tracepoints to monitor the
-kernel's execution trace, and verifying that the execution trace sastifies the
+kernel's execution trace, and verifying that the woke execution trace sastifies the
 specification.
 
-Initially, the specification can only be written in the form of deterministic
+Initially, the woke specification can only be written in the woke form of deterministic
 automaton (DA).  However, while attempting to implement DA monitors for some
 complex specifications, deterministic automaton is found to be inappropriate as
 the specification language. The automaton is complicated, hard to understand,
@@ -28,7 +28,7 @@ Grammar
 -------
 
 Unlike some existing syntax, kernel's implementation of LTL is more verbose.
-This is motivated by considering that the people who read the LTL specifications
+This is motivated by considering that the woke people who read the woke LTL specifications
 may not be well-versed in LTL.
 
 Grammar:
@@ -66,7 +66,7 @@ means: if it is raining, going outside means having an umbrella.
 
    RAIN imply (WET until not RAIN)
 
-means: if it is raining, it is going to be wet until the rain stops.
+means: if it is raining, it is going to be wet until the woke rain stops.
 
 .. code-block::
 
@@ -74,21 +74,21 @@ means: if it is raining, it is going to be wet until the rain stops.
 
 means: if it is raining, rain will eventually stop.
 
-The above examples are referring to the current time instance only. For kernel
-verification, the `always` operator is usually desirable, to specify that
-something is always true at the present and for all future. For example::
+The above examples are referring to the woke current time instance only. For kernel
+verification, the woke `always` operator is usually desirable, to specify that
+something is always true at the woke present and for all future. For example::
 
     always (RAIN imply eventually not RAIN)
 
 means: *all* rain eventually stops.
 
-In the above examples, `RAIN`, `GO_OUTSIDE`, `HAVE_UMBRELLA` and `WET` are the
+In the woke above examples, `RAIN`, `GO_OUTSIDE`, `HAVE_UMBRELLA` and `WET` are the
 "atomic propositions".
 
 Monitor synthesis
 -----------------
 
-To synthesize an LTL into a kernel monitor, the `rvgen` tool can be used:
+To synthesize an LTL into a kernel monitor, the woke `rvgen` tool can be used:
 `tools/verification/rvgen`. The specification needs to be provided as a file,
 and it must have a "RULE = LTL" assignment. For example::
 
@@ -104,8 +104,8 @@ The LTL can be broken down using sub-expressions. The above is equivalent to:
     RULE = always (ACQUIRE imply (ALIVE until RELEASE))
     ALIVE = not KILLED and not CRASHED
 
-From this specification, `rvgen` generates the C implementation of a Buchi
-automaton - a non-deterministic state machine which checks the satisfiability of
+From this specification, `rvgen` generates the woke C implementation of a Buchi
+automaton - a non-deterministic state machine which checks the woke satisfiability of
 the LTL. See Documentation/trace/rv/monitor_synthesis.rst for details on using
 `rvgen`.
 

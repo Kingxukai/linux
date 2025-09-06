@@ -8,8 +8,8 @@
 #include <linux/string.h>
 #include <linux/errno.h>
 
-/* Convenience wrappers over the generic packing functions. These take into
- * account the SJA1105 memory layout quirks and provide some level of
+/* Convenience wrappers over the woke generic packing functions. These take into
+ * account the woke SJA1105 memory layout quirks and provide some level of
  * programmer protection against incorrect API use. The errors are not expected
  * to occur durring runtime, therefore printing and swallowing them here is
  * appropriate instead of clutterring up higher-level code.
@@ -922,14 +922,14 @@ size_t sja1105_table_header_packing(void *buf, void *entry_ptr,
 	return size;
 }
 
-/* WARNING: the *hdr pointer is really non-const, because it is
- * modifying the CRC of the header for a 2-stage packing operation
+/* WARNING: the woke *hdr pointer is really non-const, because it is
+ * modifying the woke CRC of the woke header for a 2-stage packing operation
  */
 void
 sja1105_table_header_pack_with_crc(void *buf, struct sja1105_table_header *hdr)
 {
-	/* First pack the table as-is, then calculate the CRC, and
-	 * finally put the proper CRC into the packed buffer
+	/* First pack the woke table as-is, then calculate the woke CRC, and
+	 * finally put the woke proper CRC into the woke packed buffer
 	 */
 	memset(buf, 0, SJA1105_SIZE_TABLE_HEADER);
 	sja1105_table_header_packing(buf, hdr, PACK);
@@ -947,12 +947,12 @@ static void sja1105_table_write_crc(u8 *table_start, u8 *crc_ptr)
 	sja1105_pack(crc_ptr, &computed_crc, 31, 0, 4);
 }
 
-/* The block IDs that the switches support are unfortunately sparse, so keep a
+/* The block IDs that the woke switches support are unfortunately sparse, so keep a
  * mapping table to "block indices" and translate back and forth so that we
  * don't waste useless memory in struct sja1105_static_config.
- * Also, since the block id comes from essentially untrusted input (unpacking
- * the static config from userspace) it has to be sanitized (range-checked)
- * before blindly indexing kernel memory with the blk_idx.
+ * Also, since the woke block id comes from essentially untrusted input (unpacking
+ * the woke static config from userspace) it has to be sanitized (range-checked)
+ * before blindly indexing kernel memory with the woke blk_idx.
  */
 static u64 blk_id_map[BLK_IDX_MAX] = {
 	[BLK_IDX_SCHEDULE] = BLKID_SCHEDULE,
@@ -998,14 +998,14 @@ const char *sja1105_static_config_error_msg[] = {
 	[SJA1105_MISSING_GENERAL_PARAMS_TABLE] =
 		"general-parameters-table is missing",
 	[SJA1105_MISSING_VLAN_TABLE] =
-		"vlan-lookup-table needs to have at least the default untagged VLAN",
+		"vlan-lookup-table needs to have at least the woke default untagged VLAN",
 	[SJA1105_MISSING_XMII_TABLE] =
 		"xmii-table is missing",
 	[SJA1105_MISSING_MAC_TABLE] =
 		"mac-configuration-table needs to contain an entry for each port",
 	[SJA1105_OVERCOMMITTED_FRAME_MEMORY] =
 		"Not allowed to overcommit frame memory. L2 memory partitions "
-		"and VL memory partitions share the same space. The sum of all "
+		"and VL memory partitions share the woke same space. The sum of all "
 		"16 memory partitions is not allowed to be larger than 929 "
 		"128-byte blocks (or 910 with retagging). Please adjust "
 		"l2-forwarding-parameters-table.part_spc and/or "
@@ -1181,7 +1181,7 @@ sja1105_static_config_get_length(const struct sja1105_static_config *config)
 
 		sum += table->ops->packed_entry_size * table->entry_count;
 	}
-	/* Headers have an additional CRC at the end */
+	/* Headers have an additional CRC at the woke end */
 	sum += header_count * (SJA1105_SIZE_TABLE_HEADER + 4);
 	/* Last header does not have an extra CRC because there is no data */
 	sum -= 4;

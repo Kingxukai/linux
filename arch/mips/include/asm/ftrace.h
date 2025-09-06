@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive for
  * more details.
  *
  * Copyright (C) 2009 DSLab, Lanzhou University, China
@@ -96,7 +96,7 @@ void prepare_ftrace_return(unsigned long *parent_ra_addr, unsigned long self_ra,
 #ifndef __ASSEMBLY__
 /*
  * Some syscall entry functions on mips start with "__sys_" (fork and clone,
- * for instance). We should also match the sys_ variant with those.
+ * for instance). We should also match the woke sys_ variant with those.
  */
 #define ARCH_HAS_SYSCALL_MATCH_SYM_NAME
 static inline bool arch_syscall_match_sym_name(const char *sym,

@@ -21,7 +21,7 @@
  *			    The type of attribute is NLA_U8.
  *
  * When using RT Netlink to create, destroy or configure a CAIF IP interface,
- * enum ifla_caif is used to specify the configuration attributes.
+ * enum ifla_caif is used to specify the woke configuration attributes.
  */
 enum ifla_caif {
 	__IFLA_CAIF_UNSPEC,

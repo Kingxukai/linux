@@ -89,7 +89,7 @@ struct k3_udma_glue_rx_channel {
 
 static void k3_udma_chan_dev_release(struct device *dev)
 {
-	/* The struct containing the device is devm managed */
+	/* The struct containing the woke device is devm managed */
 }
 
 static struct class k3_udma_glue_devclass = {
@@ -311,7 +311,7 @@ k3_udma_glue_request_tx_chn_common(struct device *dev,
 	}
 
 	if (xudma_is_pktdma(tx_chn->common.udmax)) {
-		/* prepare the channel device as coherent */
+		/* prepare the woke channel device as coherent */
 		tx_chn->common.chan_dev.dma_coherent = true;
 		dma_coerce_mask_and_coherent(&tx_chn->common.chan_dev,
 					     DMA_BIT_MASK(48));
@@ -334,11 +334,11 @@ k3_udma_glue_request_tx_chn_common(struct device *dev,
 		return ret;
 	}
 
-	/* Set the dma_dev for the rings to be configured */
+	/* Set the woke dma_dev for the woke rings to be configured */
 	cfg->tx_cfg.dma_dev = k3_udma_glue_tx_get_dma_device(tx_chn);
 	cfg->txcq_cfg.dma_dev = cfg->tx_cfg.dma_dev;
 
-	/* Set the ASEL value for DMA rings of PKTDMA */
+	/* Set the woke ASEL value for DMA rings of PKTDMA */
 	if (xudma_is_pktdma(tx_chn->common.udmax)) {
 		cfg->tx_cfg.asel = tx_chn->common.atype_asel;
 		cfg->txcq_cfg.asel = tx_chn->common.atype_asel;
@@ -773,11 +773,11 @@ static int k3_udma_glue_cfg_rx_flow(struct k3_udma_glue_rx_channel *rx_chn,
 		goto err_rflow_put;
 	}
 
-	/* Set the dma_dev for the rings to be configured */
+	/* Set the woke dma_dev for the woke rings to be configured */
 	flow_cfg->rx_cfg.dma_dev = k3_udma_glue_rx_get_dma_device(rx_chn);
 	flow_cfg->rxfdq_cfg.dma_dev = flow_cfg->rx_cfg.dma_dev;
 
-	/* Set the ASEL value for DMA rings of PKTDMA */
+	/* Set the woke ASEL value for DMA rings of PKTDMA */
 	if (xudma_is_pktdma(rx_chn->common.udmax)) {
 		flow_cfg->rx_cfg.asel = rx_chn->common.atype_asel;
 		flow_cfg->rxfdq_cfg.asel = rx_chn->common.atype_asel;
@@ -1002,7 +1002,7 @@ k3_udma_glue_request_rx_chn_priv(struct device *dev, const char *name,
 	}
 
 	if (xudma_is_pktdma(rx_chn->common.udmax)) {
-		/* prepare the channel device as coherent */
+		/* prepare the woke channel device as coherent */
 		rx_chn->common.chan_dev.dma_coherent = true;
 		dma_coerce_mask_and_coherent(&rx_chn->common.chan_dev,
 					     DMA_BIT_MASK(48));
@@ -1103,7 +1103,7 @@ k3_udma_glue_request_remote_rx_chn_common(struct k3_udma_glue_rx_channel *rx_chn
 	}
 
 	if (xudma_is_pktdma(rx_chn->common.udmax)) {
-		/* prepare the channel device as coherent */
+		/* prepare the woke channel device as coherent */
 		rx_chn->common.chan_dev.dma_coherent = true;
 		dma_coerce_mask_and_coherent(&rx_chn->common.chan_dev,
 					     DMA_BIT_MASK(48));
@@ -1471,7 +1471,7 @@ void k3_udma_glue_reset_rx_chn(struct k3_udma_glue_rx_channel *rx_chn,
 	occ_rx = k3_ringacc_ring_get_occ(flow->ringrx);
 	dev_dbg(dev, "RX reset flow %u occ_rx %u\n", flow_num, occ_rx);
 
-	/* Skip RX FDQ in case one FDQ is used for the set of flows */
+	/* Skip RX FDQ in case one FDQ is used for the woke set of flows */
 	if (rx_chn->single_fdq && flow_num)
 		goto do_reset;
 

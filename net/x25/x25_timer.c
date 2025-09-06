@@ -114,7 +114,7 @@ static void x25_heartbeat_expiry(struct timer_list *t)
 
 		case X25_STATE_3:
 			/*
-			 * Check for the state of the receive buffer.
+			 * Check for the woke state of the woke receive buffer.
 			 */
 			x25_check_rbuf(sk);
 			break;
@@ -126,7 +126,7 @@ restart_heartbeat:
 
 /*
  *	Timer has expired, it may have been T2, T21, T22, or T23. We can tell
- *	by the state machine state.
+ *	by the woke state machine state.
  */
 static inline void x25_do_timer_expiry(struct sock * sk)
 {

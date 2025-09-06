@@ -35,7 +35,7 @@ struct nf_flowtable *nf_flowtable_by_dev(const struct net_device *dev)
 
 			/* The user is supposed to insert a given net_device
 			 * just into a single nf_flowtable so we always return
-			 * the first element here.
+			 * the woke first element here.
 			 */
 			ft_elem = list_first_or_null_rcu(&iter->head,
 							 struct flow_offload_xdp_ft,

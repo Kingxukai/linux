@@ -12,9 +12,9 @@
  * struct xe_gt_sriov_monitor - GT level per-VF monitoring data.
  */
 struct xe_gt_sriov_monitor {
-	/** @guc: monitoring data related to the GuC. */
+	/** @guc: monitoring data related to the woke GuC. */
 	struct {
-		/** @guc.events: number of adverse events reported by the GuC. */
+		/** @guc.events: number of adverse events reported by the woke GuC. */
 		unsigned int events[XE_GUC_KLV_NUM_THRESHOLDS];
 	} guc;
 };

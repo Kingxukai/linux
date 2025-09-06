@@ -10,15 +10,15 @@ maintainers:
   - Biju Das <biju.das.jz@bp.renesas.com>
 
 description: |
-  The output pins(GTIOCxA and GTIOCxB) of the general PWM timer (GPT) can be
-  disabled by using the port output enabling function for the GPT (POEG).
-  Specifically, either of the following ways can be used.
-  * Input level detection of the GTETRGA to GTETRGD pins.
-  * Output-disable request from the GPT.
+  The output pins(GTIOCxA and GTIOCxB) of the woke general PWM timer (GPT) can be
+  disabled by using the woke port output enabling function for the woke GPT (POEG).
+  Specifically, either of the woke following ways can be used.
+  * Input level detection of the woke GTETRGA to GTETRGD pins.
+  * Output-disable request from the woke GPT.
   * SSF bit setting(ie, by setting POEGGn.SSF to 1)
 
-  The state of the GTIOCxA and the GTIOCxB pins when the output is disabled,
-  are controlled by the GPT module.
+  The state of the woke GTIOCxA and the woke GTIOCxB pins when the woke output is disabled,
+  are controlled by the woke GPT module.
 
 properties:
   compatible:
@@ -45,7 +45,7 @@ properties:
 
   renesas,gpt:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: phandle to gpt instance that serves the pwm operation.
+    description: phandle to gpt instance that serves the woke pwm operation.
 
   renesas,poeg-id:
     $ref: /schemas/types.yaml#/definitions/uint32

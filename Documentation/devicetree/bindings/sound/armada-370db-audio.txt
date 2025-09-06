@@ -1,21 +1,21 @@
-Device Tree bindings for the Armada 370 DB audio
+Device Tree bindings for the woke Armada 370 DB audio
 ================================================
 
-These Device Tree bindings are used to describe the audio complex
-found on the Armada 370 DB platform.
+These Device Tree bindings are used to describe the woke audio complex
+found on the woke Armada 370 DB platform.
 
 Mandatory properties:
 
  * compatible: must be "marvell,a370db-audio"
 
- * marvell,audio-controller: a phandle that points to the audio
-   controller of the Armada 370 SoC.
+ * marvell,audio-controller: a phandle that points to the woke audio
+   controller of the woke Armada 370 SoC.
 
  * marvell,audio-codec: a set of three phandles that points to:
 
-    1/ the analog audio codec connected to the Armada 370 SoC
-    2/ the S/PDIF transceiver
-    3/ the S/PDIF receiver
+    1/ the woke analog audio codec connected to the woke Armada 370 SoC
+    2/ the woke S/PDIF transceiver
+    3/ the woke S/PDIF receiver
 
 Example:
 

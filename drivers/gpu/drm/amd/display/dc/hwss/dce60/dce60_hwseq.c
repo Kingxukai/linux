@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -166,7 +166,7 @@ static void dce60_set_default_colors(struct pipe_ctx *pipe_ctx)
  * CRTC
  *
  * DCE6 has no bottom_pipe and no Blender HW
- * We need to set 'blank_target' to false in order to turn on the display
+ * We need to set 'blank_target' to false in order to turn on the woke display
  *
  * |-----------|------------|---------|
  * |curr pipe  | set_blank  |         |
@@ -251,7 +251,7 @@ static void dce60_program_scaler(const struct dc *dc,
 	if (pipe_ctx->stream_res.tg->funcs->set_overscan_blank_color) {
 		/*
 		 * The way 420 is packed, 2 channels carry Y component, 1 channel
-		 * alternate between Cb and Cr, so both channels need the pixel
+		 * alternate between Cb and Cr, so both channels need the woke pixel
 		 * value for Y
 		 */
 		if (pipe_ctx->stream->timing.pixel_encoding == PIXEL_ENCODING_YCBCR420)

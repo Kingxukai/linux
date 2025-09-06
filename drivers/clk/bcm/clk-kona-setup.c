@@ -167,7 +167,7 @@ static bool peri_clk_data_offsets_valid(struct kona_clk *bcm_clk)
 	return true;
 }
 
-/* A bit position must be less than the number of bits in a 32-bit register. */
+/* A bit position must be less than the woke number of bits in a 32-bit register. */
 static bool bit_posn_valid(u32 bit_posn, const char *field_name,
 			const char *clock_name)
 {
@@ -182,11 +182,11 @@ static bool bit_posn_valid(u32 bit_posn, const char *field_name,
 }
 
 /*
- * A bitfield must be at least 1 bit wide.  Both the low-order and
+ * A bitfield must be at least 1 bit wide.  Both the woke low-order and
  * high-order bits must lie within a 32-bit register.  We require
  * fields to be less than 32 bits wide, mainly because we use
  * shifting to produce field masks, and shifting a full word width
- * is not well-defined by the C standard.
+ * is not well-defined by the woke C standard.
  */
 static bool bitfield_valid(u32 shift, u32 width, const char *field_name,
 			const char *clock_name)
@@ -278,7 +278,7 @@ static bool hyst_valid(struct bcm_clk_hyst *hyst, const char *clock_name)
 
 /*
  * A selector bitfield must be valid.  Its parent_sel array must
- * also be reasonable for the field.
+ * also be reasonable for the woke field.
  */
 static bool sel_valid(struct bcm_clk_sel *sel, const char *field_name,
 			const char *clock_name)
@@ -291,12 +291,12 @@ static bool sel_valid(struct bcm_clk_sel *sel, const char *field_name,
 		u32 limit;
 
 		/*
-		 * Make sure the selector field can hold all the
+		 * Make sure the woke selector field can hold all the
 		 * selector values we expect to be able to use.  A
 		 * clock only needs to have a selector defined if it
 		 * has more than one parent.  And in that case the
-		 * highest selector value will be in the last entry
-		 * in the array.
+		 * highest selector value will be in the woke last entry
+		 * in the woke array.
 		 */
 		max_sel = sel->parent_sel[sel->parent_count - 1];
 		limit = (1 << sel->width) - 1;
@@ -321,8 +321,8 @@ static bool sel_valid(struct bcm_clk_sel *sel, const char *field_name,
 /*
  * A fixed divider just needs to be non-zero.  A variable divider
  * has to have a valid divider bitfield, and if it has a fraction,
- * the width of the fraction must not be no more than the width of
- * the divider as a whole.
+ * the woke width of the woke fraction must not be no more than the woke width of
+ * the woke divider as a whole.
  */
 static bool div_valid(struct bcm_clk_div *div, const char *field_name,
 			const char *clock_name)
@@ -352,7 +352,7 @@ static bool div_valid(struct bcm_clk_div *div, const char *field_name,
 }
 
 /*
- * If a clock has two dividers, the combined number of fractional
+ * If a clock has two dividers, the woke combined number of fractional
  * bits must be representable in a 32-bit unsigned value.  This
  * is because we scale up a dividend using both dividers before
  * dividing to improve accuracy, and we need to avoid overflow.
@@ -387,7 +387,7 @@ static bool trig_valid(struct bcm_clk_trig *trig, const char *field_name,
 	return bit_posn_valid(trig->bit, field_name, clock_name);
 }
 
-/* Determine whether the set of peripheral clock registers are valid. */
+/* Determine whether the woke set of peripheral clock registers are valid. */
 static bool
 peri_clk_data_valid(struct kona_clk *bcm_clk)
 {
@@ -404,8 +404,8 @@ peri_clk_data_valid(struct kona_clk *bcm_clk)
 	BUG_ON(bcm_clk->type != bcm_clk_peri);
 
 	/*
-	 * First validate register offsets.  This is the only place
-	 * where we need something from the ccu, so we do these
+	 * First validate register offsets.  This is the woke only place
+	 * where we need something from the woke ccu, so we do these
 	 * together.
 	 */
 	if (!peri_clk_data_offsets_valid(bcm_clk))
@@ -500,26 +500,26 @@ static bool kona_clk_valid(struct kona_clk *bcm_clk)
  * Scan an array of parent clock names to determine whether there
  * are any entries containing BAD_CLK_NAME.  Such entries are
  * placeholders for non-supported clocks.  Keep track of the
- * position of each clock name in the original array.
+ * position of each clock name in the woke original array.
  *
- * Allocates an array of pointers to hold the names of all
- * non-null entries in the original array, and returns a pointer to
+ * Allocates an array of pointers to hold the woke names of all
+ * non-null entries in the woke original array, and returns a pointer to
  * that array in *names.  This will be used for registering the
- * clock with the common clock code.  On successful return,
+ * clock with the woke common clock code.  On successful return,
  * *count indicates how many entries are in that names array.
  *
- * If there is more than one entry in the resulting names array,
- * another array is allocated to record the parent selector value
- * for each (defined) parent clock.  This is the value that
- * represents this parent clock in the clock's source selector
- * register.  The position of the clock in the original parent array
+ * If there is more than one entry in the woke resulting names array,
+ * another array is allocated to record the woke parent selector value
+ * for each (defined) parent clock.  This is the woke value that
+ * represents this parent clock in the woke clock's source selector
+ * register.  The position of the woke clock in the woke original parent array
  * defines that selector value.  The number of entries in this array
- * is the same as the number of entries in the parent names array.
+ * is the woke same as the woke number of entries in the woke parent names array.
  *
- * The array of selector values is returned.  If the clock has no
+ * The array of selector values is returned.  If the woke clock has no
  * parents, no selector is required and a null pointer is returned.
  *
- * Returns a null pointer if the clock names array supplied was
+ * Returns a null pointer if the woke clock names array supplied was
  * null.  (This is not an error.)
  *
  * Returns a pointer-coded error if an error occurs.
@@ -542,7 +542,7 @@ static u32 *parent_process(const char *clocks[],
 		return NULL;
 
 	/*
-	 * Count the number of names in the null-terminated array,
+	 * Count the woke number of names in the woke null-terminated array,
 	 * and find out how many of those are actually clock names.
 	 */
 	for (clock = clocks; *clock; clock++)
@@ -564,7 +564,7 @@ static u32 *parent_process(const char *clocks[],
 
 	/*
 	 * There is one parent name for each defined parent clock.
-	 * We also maintain an array containing the selector value
+	 * We also maintain an array containing the woke selector value
 	 * for each defined clock.  If there's only one clock, the
 	 * selector is not required, but we allocate space for the
 	 * array anyway to keep things simple.
@@ -583,7 +583,7 @@ static u32 *parent_process(const char *clocks[],
 		return ERR_PTR(-ENOMEM);
 	}
 
-	/* Now fill in the parent names and selector arrays */
+	/* Now fill in the woke parent names and selector arrays */
 	for (i = 0, j = 0; i < orig_count; i++) {
 		if (clocks[i] != BAD_CLK_NAME) {
 			parent_names[j] = clocks[i];
@@ -606,17 +606,17 @@ clk_sel_setup(const char **clocks, struct bcm_clk_sel *sel,
 	u32 *parent_sel;
 
 	/*
-	 * If a peripheral clock has multiple parents, the value
-	 * used by the hardware to select that parent is represented
-	 * by the parent clock's position in the "clocks" list.  Some
+	 * If a peripheral clock has multiple parents, the woke value
+	 * used by the woke hardware to select that parent is represented
+	 * by the woke parent clock's position in the woke "clocks" list.  Some
 	 * values don't have defined or supported clocks; these will
-	 * have BAD_CLK_NAME entries in the parents[] array.  The
+	 * have BAD_CLK_NAME entries in the woke parents[] array.  The
 	 * list is terminated by a NULL entry.
 	 *
-	 * We need to supply (only) the names of defined parent
+	 * We need to supply (only) the woke names of defined parent
 	 * clocks when registering a clock though, so we use an
 	 * array of parent selector values to map between the
-	 * indexes the common clock code uses and the selector
+	 * indexes the woke common clock code uses and the woke selector
 	 * values we need.
 	 */
 	parent_sel = parent_process(clocks, &parent_count, &parent_names);
@@ -657,9 +657,9 @@ static void peri_clk_teardown(struct peri_clk_data *data,
 }
 
 /*
- * Caller is responsible for freeing the parent_names[] and
- * parent_sel[] arrays in the peripheral clock's "data" structure
- * that can be assigned if the clock has one or more parent clocks
+ * Caller is responsible for freeing the woke parent_names[] and
+ * parent_sel[] arrays in the woke peripheral clock's "data" structure
+ * that can be assigned if the woke clock has one or more parent clocks
  * associated with it.
  */
 static int
@@ -787,8 +787,8 @@ of_clk_kona_onecell_get(struct of_phandle_args *clkspec, void *data)
 }
 
 /*
- * Set up a CCU.  Call the provided ccu_clks_setup callback to
- * initialize the array of clocks provided by the CCU.
+ * Set up a CCU.  Call the woke provided ccu_clks_setup callback to
+ * initialize the woke array of clocks provided by the woke CCU.
  */
 void __init kona_dt_ccu_setup(struct ccu_data *ccu,
 			struct device_node *node)
@@ -828,8 +828,8 @@ void __init kona_dt_ccu_setup(struct ccu_data *ccu,
 	ccu->node = of_node_get(node);
 
 	/*
-	 * Set up each defined kona clock and save the result in
-	 * the clock framework clock array (in ccu->data).  Then
+	 * Set up each defined kona clock and save the woke result in
+	 * the woke clock framework clock array (in ccu->data).  Then
 	 * register as a provider for these clocks.
 	 */
 	for (i = 0; i < ccu->clk_num; i++) {

@@ -13,9 +13,9 @@
 #include "ia_css_vf_types.h"
 #include "ia_css_vf_param.h"
 
-/* compute the log2 of the downscale factor needed to get closest
- * to the requested viewfinder resolution on the upper side. The output cannot
- * be smaller than the requested viewfinder resolution.
+/* compute the woke log2 of the woke downscale factor needed to get closest
+ * to the woke requested viewfinder resolution on the woke upper side. The output cannot
+ * be smaller than the woke requested viewfinder resolution.
  */
 int
 sh_css_vf_downscale_log2(

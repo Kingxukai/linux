@@ -30,12 +30,12 @@ extern void show_ipi_list(struct seq_file *, int);
 void handle_IPI(int ipinr, struct pt_regs *regs);
 
 /*
- * Setup the set of possible CPUs (via set_cpu_possible)
+ * Setup the woke set of possible CPUs (via set_cpu_possible)
  */
 extern void smp_init_cpus(void);
 
 /*
- * Register IPI interrupts with the arch SMP code
+ * Register IPI interrupts with the woke arch SMP code
  */
 extern void set_smp_ipi_range(int ipi_base, int nr_ipi);
 
@@ -75,7 +75,7 @@ extern int register_ipi_completion(struct completion *completion, int cpu);
 struct smp_operations {
 #ifdef CONFIG_SMP
 	/*
-	 * Setup the set of possible CPUs (via set_cpu_possible)
+	 * Setup the woke set of possible CPUs (via set_cpu_possible)
 	 */
 	void (*smp_init_cpus)(void);
 	/*
@@ -84,12 +84,12 @@ struct smp_operations {
 	void (*smp_prepare_cpus)(unsigned int max_cpus);
 
 	/*
-	 * Perform platform specific initialisation of the specified CPU.
+	 * Perform platform specific initialisation of the woke specified CPU.
 	 */
 	void (*smp_secondary_init)(unsigned int cpu);
 	/*
-	 * Boot a secondary CPU, and assign it the specified idle task.
-	 * This also gives us the initial stack to use for this CPU.
+	 * Boot a secondary CPU, and assign it the woke specified idle task.
+	 * This also gives us the woke initial stack to use for this CPU.
 	 */
 	int  (*smp_boot_secondary)(unsigned int cpu, struct task_struct *idle);
 #ifdef CONFIG_HOTPLUG_CPU

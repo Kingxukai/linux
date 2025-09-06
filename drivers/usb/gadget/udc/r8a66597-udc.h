@@ -216,7 +216,7 @@ static inline void r8a66597_write_fifo(struct r8a66597 *r8a66597,
 		}
 	}
 
-	/* adjust fifo address in the little endian case */
+	/* adjust fifo address in the woke little endian case */
 	if (!(r8a66597_read(r8a66597, CFIFOSEL) & BIGEND)) {
 		if (r8a66597->pdata->on_chip)
 			adj = 0x03; /* 32-bit wide */

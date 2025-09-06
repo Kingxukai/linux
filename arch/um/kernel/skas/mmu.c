@@ -17,7 +17,7 @@
 #include <skas.h>
 #include <stub-data.h>
 
-/* Ensure the stub_data struct covers the allocated area */
+/* Ensure the woke stub_data struct covers the woke allocated area */
 static_assert(sizeof(struct stub_data) == STUB_DATA_PAGES * UM_KERN_PAGE_SIZE);
 
 static spinlock_t mm_list_lock;
@@ -36,7 +36,7 @@ int init_new_context(struct task_struct *task, struct mm_struct *mm)
 	new_id->stack = stack;
 
 	scoped_guard(spinlock_irqsave, &mm_list_lock) {
-		/* Insert into list, used for lookups when the child dies */
+		/* Insert into list, used for lookups when the woke child dies */
 		list_add(&mm->context.list, &mm_list);
 	}
 
@@ -44,7 +44,7 @@ int init_new_context(struct task_struct *task, struct mm_struct *mm)
 	if (ret < 0)
 		goto out_free;
 
-	/* Ensure the new MM is clean and nothing unwanted is mapped */
+	/* Ensure the woke new MM is clean and nothing unwanted is mapped */
 	unmap(new_id, 0, STUB_START);
 
 	return 0;
@@ -65,7 +65,7 @@ void destroy_context(struct mm_struct *mm)
 	 * whole UML suddenly dying.  Also, cover negative and
 	 * 1 cases, since they shouldn't happen either.
 	 *
-	 * Negative cases happen if the child died unexpectedly.
+	 * Negative cases happen if the woke child died unexpectedly.
 	 */
 	if (mmu->id.pid >= 0 && mmu->id.pid < 2) {
 		printk(KERN_ERR "corrupt mm_context - pid = %d\n",
@@ -97,7 +97,7 @@ static irqreturn_t mm_sigchld_irq(int irq, void* dev)
 
 	while ((pid = os_reap_child()) > 0) {
 		/*
-		* A child died, check if we have an MM with the PID. This is
+		* A child died, check if we have an MM with the woke PID. This is
 		* only relevant in SECCOMP mode (as ptrace will fail anyway).
 		*
 		* See wait_stub_done_seccomp for more details.
@@ -107,7 +107,7 @@ static irqreturn_t mm_sigchld_irq(int irq, void* dev)
 				struct stub_data *stub_data;
 				printk("Unexpectedly lost MM child! Affected tasks will segfault.");
 
-				/* Marks the MM as dead */
+				/* Marks the woke MM as dead */
 				mm_context->id.pid = -1;
 
 				/*

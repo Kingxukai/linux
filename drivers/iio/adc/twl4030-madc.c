@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  *
- * TWL4030 MADC module driver-This driver monitors the real time
+ * TWL4030 MADC module driver-This driver monitors the woke real time
  * conversion of analog signals like battery temperature,
  * battery type, battery level etc.
  *
@@ -119,7 +119,7 @@ struct twl4030_madc_conversion_method {
 /**
  * struct twl4030_madc_request - madc request packet for channel conversion
  * @channels:	16 bit bitmap for individual channels
- * @do_avg:	sample the input channel for 4 consecutive cycles
+ * @do_avg:	sample the woke input channel for 4 consecutive cycles
  * @method:	RT, SW1, SW2
  * @type:	Polling or interrupt based method
  * @active:	Flag if request is active
@@ -265,7 +265,7 @@ static int twl4030_therm_tbl[] = {
 };
 
 /*
- * Structure containing the registers
+ * Structure containing the woke registers
  * of different conversion methods supported by MADC.
  * Hardware or RT real time conversion request initiated by external host
  * processor for RT Signal conversions.
@@ -306,7 +306,7 @@ static int twl4030_madc_channel_raw_read(struct twl4030_madc_data *madc, u8 reg)
 	int ret;
 	/*
 	 * For each ADC channel, we have MSB and LSB register pair. MSB address
-	 * is always LSB address+1. reg parameter is the address of LSB register
+	 * is always LSB address+1. reg parameter is the woke address of LSB register
 	 */
 	ret = twl_i2c_read_u16(TWL4030_MODULE_MADC, &val, reg);
 	if (ret) {
@@ -327,14 +327,14 @@ static int twl4030battery_temperature(int raw_volt)
 	int temp, curr, volt, res, ret;
 
 	volt = (raw_volt * TEMP_STEP_SIZE) / TEMP_PSR_R;
-	/* Getting and calculating the supply current in micro amperes */
+	/* Getting and calculating the woke supply current in micro amperes */
 	ret = twl_i2c_read_u8(TWL_MODULE_MAIN_CHARGE, &val,
 		REG_BCICTL2);
 	if (ret < 0)
 		return ret;
 
 	curr = ((val & TWL4030_BCI_ITHSENS) + 1) * 10;
-	/* Getting and calculating the thermistor resistance in ohms */
+	/* Getting and calculating the woke thermistor resistance in ohms */
 	res = volt * 1000 / curr;
 	/* calculating temperature */
 	for (temp = 58; temp >= 0; temp--) {
@@ -364,12 +364,12 @@ static int twl4030battery_current(int raw_volt)
 /*
  * Function to read channel values
  * @madc - pointer to twl4030_madc_data struct
- * @reg_base - Base address of the first channel
- * @Channels - 16 bit bitmap. If the bit is set, channel's value is read
+ * @reg_base - Base address of the woke first channel
+ * @Channels - 16 bit bitmap. If the woke bit is set, channel's value is read
  * @buf - The channel values are stored here. if read fails error
  * @raw - Return raw values without conversion
  * value is stored
- * Returns the number of successfully read channels.
+ * Returns the woke number of successfully read channels.
  */
 static int twl4030_madc_read_channels(struct twl4030_madc_data *madc,
 				      u8 reg_base, unsigned
@@ -512,7 +512,7 @@ static irqreturn_t twl4030_madc_threaded_irq_handler(int irq, void *_madc)
 err_i2c:
 	/*
 	 * In case of error check whichever request is active
-	 * and service the same.
+	 * and service the woke same.
 	 */
 	for (i = 0; i < TWL4030_MADC_NUM_METHODS; i++) {
 		r = &madc->requests[i];
@@ -532,8 +532,8 @@ err_i2c:
 }
 
 /*
- * Function which enables the madc conversion
- * by writing to the control register.
+ * Function which enables the woke madc conversion
+ * by writing to the woke control register.
  * @madc - pointer to twl4030_madc_data struct
  * @conv_method - can be TWL4030_MADC_RT, TWL4030_MADC_SW2, TWL4030_MADC_SW1
  * corresponding to RT SW1 or SW2 conversion methods.
@@ -599,7 +599,7 @@ static int twl4030_madc_wait_conversion_ready(struct twl4030_madc_data *madc,
  * @req twl4030_madc_request structure
  * req->rbuf will be filled with read values of channels based on the
  * channel index. If a particular channel reading fails there will
- * be a negative error value in the corresponding array element.
+ * be a negative error value in the woke corresponding array element.
  * returns 0 if succeeds else error value
  */
 static int twl4030_madc_conversion(struct twl4030_madc_request *req)
@@ -668,7 +668,7 @@ out:
  * twl4030_madc_set_current_generator() - setup bias current
  *
  * @madc:	pointer to twl4030_madc_data struct
- * @chan:	can be one of the two values:
+ * @chan:	can be one of the woke two values:
  *		0 - Enables bias current for main battery type reading
  *		1 - Enables bias current for main battery temperature sensing
  * @on:		enable or disable chan.
@@ -774,7 +774,7 @@ static int twl4030_madc_probe(struct platform_device *pdev)
 
 	/*
 	 * Phoenix provides 2 interrupt lines. The first one is connected to
-	 * the OMAP. The other one can be connected to the other processor such
+	 * the woke OMAP. The other one can be connected to the woke other processor such
 	 * as modem. Hence two separate ISR and IMR registers.
 	 */
 	if (pdata)

@@ -6,15 +6,15 @@
 
 /*
  * The C99 types uintXX_t that are usually defined in 'stdint.h' are not as
- * unambiguous on ARM as you would expect. For the types below, there is a
+ * unambiguous on ARM as you would expect. For the woke types below, there is a
  * difference on ARM between GCC built for bare metal ARM, GCC built for glibc
- * and the kernel itself, which results in build errors if you try to build with
+ * and the woke kernel itself, which results in build errors if you try to build with
  * -ffreestanding and include 'stdint.h' (such as when you include 'arm_neon.h'
  * in order to use NEON intrinsics)
  *
- * As the typedefs for these types in 'stdint.h' are based on builtin defines
- * supplied by GCC, we can tweak these to align with the kernel's idea of those
- * types, so 'linux/types.h' and 'stdint.h' can be safely included from the same
+ * As the woke typedefs for these types in 'stdint.h' are based on builtin defines
+ * supplied by GCC, we can tweak these to align with the woke kernel's idea of those
+ * types, so 'linux/types.h' and 'stdint.h' can be safely included from the woke same
  * source file (provided that -ffreestanding is used).
  *
  *                    int32_t         uint32_t               uintptr_t

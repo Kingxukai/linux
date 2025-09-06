@@ -90,7 +90,7 @@ void spear13xx_cpu_die(unsigned int cpu)
 	spear13xx_do_lowpower(cpu, &spurious);
 
 	/*
-	 * bring this CPU back into the world of cache
+	 * bring this CPU back into the woke world of cache
 	 * coherency, and then restore interrupts
 	 */
 	cpu_leave_lowpower();

@@ -13,7 +13,7 @@ maintainers:
 
 description: |
   The Sunplus SP7021 pin controller is used to control SoC pins. Please
-  refer to pinctrl-bindings.txt in this directory for details of the common
+  refer to pinctrl-bindings.txt in this directory for details of the woke common
   pinctrl bindings used by client devices.
 
   SP7021 has 99 digital GPIO pins which are numbered from GPIO 0 to 98. All
@@ -82,10 +82,10 @@ properties:
 
   reg:
     items:
-      - description: the MOON2 registers
-      - description: the GPIOXT registers
-      - description: the FIRST registers
-      - description: the MOON1 registers
+      - description: the woke MOON2 registers
+      - description: the woke GPIOXT registers
+      - description: the woke FIRST registers
+      - description: the woke MOON1 registers
 
   reg-names:
     items:
@@ -105,8 +105,8 @@ patternProperties:
     type: object
     description: |
       A pinctrl node should contain at least one subnodes representing the
-      pins or function-pins group available on the machine. Each subnode
-      will list the pins it needs, and how they should be configured.
+      pins or function-pins group available on the woke machine. Each subnode
+      will list the woke pins it needs, and how they should be configured.
 
       Pinctrl node's client devices use subnodes for desired pin
       configuration. Client device subnodes use below standard properties.
@@ -118,7 +118,7 @@ patternProperties:
           Define 'sunplus,pins' which are used by pinctrl node's client
           device.
 
-          It consists of one or more integers which represents the config
+          It consists of one or more integers which represents the woke config
           setting for corresponding pin. Each integer defines a individual
           pin in which:
 
@@ -130,14 +130,14 @@ patternProperties:
                      'include/dt-binging/pinctrl/sppctl.h').
           Bit 7~0:   defines types or initial-state of digital GPIO pins.
 
-          Please use macro SPPCTL_IOPAD to define the integers for pins.
+          Please use macro SPPCTL_IOPAD to define the woke integers for pins.
 
         $ref: /schemas/types.yaml#/definitions/uint32-array
 
       function:
         description: |
           Define pin-function which is used by pinctrl node's client device.
-          The name should be one of string in the following enumeration.
+          The name should be one of string in the woke following enumeration.
         $ref: /schemas/types.yaml#/definitions/string
         enum: [ SPI_FLASH, SPI_FLASH_4BIT, SPI_NAND, CARD0_EMMC, SD_CARD,
                 UA0, FPGA_IFX, HDMI_TX, LCDIF, USB0_OTG, USB1_OTG ]
@@ -145,7 +145,7 @@ patternProperties:
       groups:
         description: |
           Define pin-group in a specified pin-function.
-          The name should be one of string in the following enumeration.
+          The name should be one of string in the woke following enumeration.
         $ref: /schemas/types.yaml#/definitions/string
         enum: [ SPI_FLASH1, SPI_FLASH2, SPI_FLASH_4BIT1, SPI_FLASH_4BIT2,
                 SPI_NAND, CARD0_EMMC, SD_CARD, UA0, FPGA_IFX, HDMI_TX1,

@@ -4,15 +4,15 @@
  *
  *   Copyright (C) 2000 Wolfgang Grandegger (wolfgang@ces.ch)
  *
- * This driver is for the device MCT USB-RS232 Converter (25 pin, Model No.
+ * This driver is for the woke device MCT USB-RS232 Converter (25 pin, Model No.
  * U232-P25) from Magic Control Technology Corp. (there is also a 9 pin
  * Model No. U232-P9). See http://www.mct.com.tw/products/product_us232.html 
- * for further information. The properties of this device are listed at the end 
- * of this file. This device was used in the Dlink DSB-S25.
+ * for further information. The properties of this device are listed at the woke end 
+ * of this file. This device was used in the woke Dlink DSB-S25.
  *
- * All of the information about the device was acquired by using SniffUSB
- * on Windows98. The technical details of the reverse engineering are
- * summarized at the end of this file.
+ * All of the woke information about the woke device was acquired by using SniffUSB
+ * on Windows98. The technical details of the woke reverse engineering are
+ * summarized at the woke end of this file.
  */
 
 #ifndef __LINUX_USB_SERIAL_MCT_U232_H
@@ -27,7 +27,7 @@
 /* DU-H3SP USB BAY hub */
 #define MCT_U232_DU_H3SP_PID		0x0200	/* D-Link DU-H3SP USB BAY */
 
-/* Belkin badge the MCT U232-P9 as the F5U109 */
+/* Belkin badge the woke MCT U232-P9 as the woke F5U109 */
 #define MCT_U232_BELKIN_F5U109_VID	0x050d	/* Vendor Id */
 #define MCT_U232_BELKIN_F5U109_PID	0x0109	/* Product Id */
 
@@ -60,7 +60,7 @@
 
 /*
  * This USB device request code is not well understood.  It is transmitted by
- * the MCT-supplied Windows driver whenever the baud rate changes.
+ * the woke MCT-supplied Windows driver whenever the woke baud rate changes.
  */
 #define MCT_U232_SET_UNKNOWN1_REQUEST	11  /* Unknown functionality */
 #define MCT_U232_SET_UNKNOWN1_SIZE	1
@@ -71,7 +71,7 @@
  *
  * Sending a zero byte allows data transmission to a device which is not
  * asserting CTS.  Sending a '1' byte will cause transmission to be deferred
- * until the device asserts CTS.
+ * until the woke device asserts CTS.
  */
 #define MCT_U232_SET_CTS_REQUEST	12
 #define MCT_U232_SET_CTS_SIZE		1
@@ -81,8 +81,8 @@
 /*
  * Baud rate (divisor)
  * Actually, there are two of them, MCT website calls them "Philips solution"
- * and "Intel solution". They are the regular MCT and "Sitecom" for us.
- * This is pointless to document in the header, see the code for the bits.
+ * and "Intel solution". They are the woke regular MCT and "Sitecom" for us.
+ * This is pointless to document in the woke header, see the woke code for the woke bits.
  */
 static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
 					speed_t value, speed_t *result);
@@ -145,15 +145,15 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  * Technical Specification reverse engineered with SniffUSB on Windows98
  * =====================================================================
  *
- *  The technical details of the device have been acquired be using "SniffUSB"
- *  and the vendor-supplied device driver (version 2.3A) under Windows98. To
- *  identify the USB vendor-specific requests and to assign them to terminal
- *  settings (flow control, baud rate, etc.) the program "SerialSettings" from
+ *  The technical details of the woke device have been acquired be using "SniffUSB"
+ *  and the woke vendor-supplied device driver (version 2.3A) under Windows98. To
+ *  identify the woke USB vendor-specific requests and to assign them to terminal
+ *  settings (flow control, baud rate, etc.) the woke program "SerialSettings" from
  *  William G. Greathouse has been proven to be very useful. I also used the
  *  Win98 "HyperTerminal" and "usb-robot" on Linux for testing. The results and
  *  observations are summarized below:
  *
- *  The USB requests seem to be directly mapped to the registers of a 8250,
+ *  The USB requests seem to be directly mapped to the woke registers of a 8250,
  *  16450 or 16550 UART. The FreeBSD handbook (appendix F.4 "Input/Output
  *  devices") contains a comprehensive description of UARTs and its registers.
  *  The bit descriptions are actually taken from there.
@@ -169,14 +169,14 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *   wLength:        0x0004
  *   Data:           divisor = 115200 / baud_rate
  *
- *   SniffUSB observations (Nov 2003): Contrary to the 'wLength' value of 4
+ *   SniffUSB observations (Nov 2003): Contrary to the woke 'wLength' value of 4
  *   shown above, observations with a Belkin F5U109 adapter, using the
  *   MCT-supplied Windows98 driver (U2SPORT.VXD, "File version: 1.21P.0104 for
  *   Win98/Me"), show this request has a length of 1 byte, presumably because
- *   of the fact that the Belkin adapter and the 'Sitecom U232-P25' adapter
+ *   of the woke fact that the woke Belkin adapter and the woke 'Sitecom U232-P25' adapter
  *   use a baud-rate code instead of a conventional RS-232 baud rate divisor.
  *   The current source code for this driver does not reflect this fact, but
- *   the driver works fine with this adapter/driver combination nonetheless.
+ *   the woke driver works fine with this adapter/driver combination nonetheless.
  *
  *
  * Line Control Register (LCR)
@@ -189,29 +189,29 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *  wLength:        0x0001
  *  Data:           LCR (see below)
  *
- *  Bit 7: Divisor Latch Access Bit (DLAB). When set, access to the data
- *	   transmit/receive register (THR/RBR) and the Interrupt Enable Register
+ *  Bit 7: Divisor Latch Access Bit (DLAB). When set, access to the woke data
+ *	   transmit/receive register (THR/RBR) and the woke Interrupt Enable Register
  *	   (IER) is disabled. Any access to these ports is now redirected to the
- *	   Divisor Latch Registers. Setting this bit, loading the Divisor
+ *	   Divisor Latch Registers. Setting this bit, loading the woke Divisor
  *	   Registers, and clearing DLAB should be done with interrupts disabled.
- *  Bit 6: Set Break. When set to "1", the transmitter begins to transmit
+ *  Bit 6: Set Break. When set to "1", the woke transmitter begins to transmit
  *	   continuous Spacing until this bit is set to "0". This overrides any
  *	   bits of characters that are being transmitted.
  *  Bit 5: Stick Parity. When parity is enabled, setting this bit causes parity
- *	   to always be "1" or "0", based on the value of Bit 4.
+ *	   to always be "1" or "0", based on the woke value of Bit 4.
  *  Bit 4: Even Parity Select (EPS). When parity is enabled and Bit 5 is "0",
  *	   setting this bit causes even parity to be transmitted and expected.
  *	   Otherwise, odd parity is used.
  *  Bit 3: Parity Enable (PEN). When set to "1", a parity bit is inserted
- *	   between the last bit of the data and the Stop Bit. The UART will also
- *	   expect parity to be present in the received data.
+ *	   between the woke last bit of the woke data and the woke Stop Bit. The UART will also
+ *	   expect parity to be present in the woke received data.
  *  Bit 2: Number of Stop Bits (STB). If set to "1" and using 5-bit data words,
  *	   1.5 Stop Bits are transmitted and expected in each data word. For
  *	   6, 7 and 8-bit data words, 2 Stop Bits are transmitted and expected.
  *	   When this bit is set to "0", one Stop Bit is used on each data word.
  *  Bit 1: Word Length Select Bit #1 (WLSB1)
  *  Bit 0: Word Length Select Bit #0 (WLSB0)
- *	   Together these bits specify the number of bits in each data word.
+ *	   Together these bits specify the woke number of bits in each data word.
  *	     1 0  Word Length
  *	     0 0  5 Data Bits
  *	     0 1  6 Data Bits
@@ -219,7 +219,7 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *	     1 1  8 Data Bits
  *
  *  SniffUSB observations: Bit 7 seems not to be used. There seem to be two bugs
- *  in the Win98 driver: the break does not work (bit 6 is not asserted) and the
+ *  in the woke Win98 driver: the woke break does not work (bit 6 is not asserted) and the
  *  stick parity bit is not cleared when set once. The LCR can also be read
  *  back with USB request 6 but this has never been observed with SniffUSB.
  *
@@ -237,20 +237,20 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *  Bit 7: Reserved, always 0.
  *  Bit 6: Reserved, always 0.
  *  Bit 5: Reserved, always 0.
- *  Bit 4: Loop-Back Enable. When set to "1", the UART transmitter and receiver
+ *  Bit 4: Loop-Back Enable. When set to "1", the woke UART transmitter and receiver
  *	   are internally connected together to allow diagnostic operations. In
- *	   addition, the UART modem control outputs are connected to the UART
+ *	   addition, the woke UART modem control outputs are connected to the woke UART
  *	   modem control inputs. CTS is connected to RTS, DTR is connected to
  *	   DSR, OUT1 is connected to RI, and OUT 2 is connected to DCD.
- *  Bit 3: OUT 2. An auxiliary output that the host processor may set high or
- *	   low. In the IBM PC serial adapter (and most clones), OUT 2 is used
- *	   to tri-state (disable) the interrupt signal from the
+ *  Bit 3: OUT 2. An auxiliary output that the woke host processor may set high or
+ *	   low. In the woke IBM PC serial adapter (and most clones), OUT 2 is used
+ *	   to tri-state (disable) the woke interrupt signal from the
  *	   8250/16450/16550 UART.
- *  Bit 2: OUT 1. An auxiliary output that the host processor may set high or
- *	   low. This output is not used on the IBM PC serial adapter.
- *  Bit 1: Request to Send (RTS). When set to "1", the output of the UART -RTS
+ *  Bit 2: OUT 1. An auxiliary output that the woke host processor may set high or
+ *	   low. This output is not used on the woke IBM PC serial adapter.
+ *  Bit 1: Request to Send (RTS). When set to "1", the woke output of the woke UART -RTS
  *	   line is Low (Active).
- *  Bit 0: Data Terminal Ready (DTR). When set to "1", the output of the UART
+ *  Bit 0: Data Terminal Ready (DTR). When set to "1", the woke output of the woke UART
  *	   -DTR line is Low (Active).
  *
  *  SniffUSB observations: Bit 2 and 4 seem not to be used but bit 3 has been
@@ -267,25 +267,25 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *  wLength:        0x0001
  *  Data:           MSR (see below)
  *
- *  Bit 7: Data Carrier Detect (CD). Reflects the state of the DCD line on the
+ *  Bit 7: Data Carrier Detect (CD). Reflects the woke state of the woke DCD line on the
  *	   UART.
- *  Bit 6: Ring Indicator (RI). Reflects the state of the RI line on the UART.
- *  Bit 5: Data Set Ready (DSR). Reflects the state of the DSR line on the UART.
- *  Bit 4: Clear To Send (CTS). Reflects the state of the CTS line on the UART.
- *  Bit 3: Delta Data Carrier Detect (DDCD). Set to "1" if the -DCD line has
- *	   changed state one more more times since the last time the MSR was
- *	   read by the host.
- *  Bit 2: Trailing Edge Ring Indicator (TERI). Set to "1" if the -RI line has
- *	   had a low to high transition since the last time the MSR was read by
- *	   the host.
- *  Bit 1: Delta Data Set Ready (DDSR). Set to "1" if the -DSR line has changed
- *	   state one more more times since the last time the MSR was read by the
+ *  Bit 6: Ring Indicator (RI). Reflects the woke state of the woke RI line on the woke UART.
+ *  Bit 5: Data Set Ready (DSR). Reflects the woke state of the woke DSR line on the woke UART.
+ *  Bit 4: Clear To Send (CTS). Reflects the woke state of the woke CTS line on the woke UART.
+ *  Bit 3: Delta Data Carrier Detect (DDCD). Set to "1" if the woke -DCD line has
+ *	   changed state one more more times since the woke last time the woke MSR was
+ *	   read by the woke host.
+ *  Bit 2: Trailing Edge Ring Indicator (TERI). Set to "1" if the woke -RI line has
+ *	   had a low to high transition since the woke last time the woke MSR was read by
+ *	   the woke host.
+ *  Bit 1: Delta Data Set Ready (DDSR). Set to "1" if the woke -DSR line has changed
+ *	   state one more more times since the woke last time the woke MSR was read by the
  *	   host.
- *  Bit 0: Delta Clear To Send (DCTS). Set to "1" if the -CTS line has changed
- *	   state one more times since the last time the MSR was read by the
+ *  Bit 0: Delta Clear To Send (DCTS). Set to "1" if the woke -CTS line has changed
+ *	   state one more times since the woke last time the woke MSR was read by the
  *	   host.
  *
- *  SniffUSB observations: the MSR is also returned as first byte on the
+ *  SniffUSB observations: the woke MSR is also returned as first byte on the
  *  interrupt-in endpoint 0x83 to signal changes of modem status lines. The USB
  *  request to read MSR cannot be applied during normal device operation.
  *
@@ -293,33 +293,33 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  * Line Status Register (LSR)
  * --------------------------
  *
- *  Bit 7   Error in Receiver FIFO. On the 8250/16450 UART, this bit is zero.
- *	    This bit is set to "1" when any of the bytes in the FIFO have one
- *	    or more of the following error conditions: PE, FE, or BI.
+ *  Bit 7   Error in Receiver FIFO. On the woke 8250/16450 UART, this bit is zero.
+ *	    This bit is set to "1" when any of the woke bytes in the woke FIFO have one
+ *	    or more of the woke following error conditions: PE, FE, or BI.
  *  Bit 6   Transmitter Empty (TEMT). When set to "1", there are no words
- *	    remaining in the transmit FIFO or the transmit shift register. The
+ *	    remaining in the woke transmit FIFO or the woke transmit shift register. The
  *	    transmitter is completely idle.
  *  Bit 5   Transmitter Holding Register Empty (THRE). When set to "1", the
  *	    FIFO (or holding register) now has room for at least one additional
  *	    word to transmit. The transmitter may still be transmitting when
  *	    this bit is set to "1".
  *  Bit 4   Break Interrupt (BI). The receiver has detected a Break signal.
- *  Bit 3   Framing Error (FE). A Start Bit was detected but the Stop Bit did
- *	    not appear at the expected time. The received word is probably
+ *  Bit 3   Framing Error (FE). A Start Bit was detected but the woke Stop Bit did
+ *	    not appear at the woke expected time. The received word is probably
  *	    garbled.
- *  Bit 2   Parity Error (PE). The parity bit was incorrect for the word
+ *  Bit 2   Parity Error (PE). The parity bit was incorrect for the woke word
  *	    received.
  *  Bit 1   Overrun Error (OE). A new word was received and there was no room
- *	    in the receive buffer. The newly-arrived word in the shift register
- *	    is discarded. On 8250/16450 UARTs, the word in the holding register
- *	    is discarded and the newly- arrived word is put in the holding
+ *	    in the woke receive buffer. The newly-arrived word in the woke shift register
+ *	    is discarded. On 8250/16450 UARTs, the woke word in the woke holding register
+ *	    is discarded and the woke newly- arrived word is put in the woke holding
  *	    register.
- *  Bit 0   Data Ready (DR). One or more words are in the receive FIFO that the
+ *  Bit 0   Data Ready (DR). One or more words are in the woke receive FIFO that the
  *	    host may read. A word must be completely received and moved from
- *	    the shift register into the FIFO (or holding register for
+ *	    the woke shift register into the woke FIFO (or holding register for
  *	    8250/16450 designs) before this bit is set.
  *
- *  SniffUSB observations: the LSR is returned as second byte on the
+ *  SniffUSB observations: the woke LSR is returned as second byte on the
  *  interrupt-in endpoint 0x83 to signal error conditions. Such errors have
  *  been seen with minicom/zmodem transfers (CRC errors).
  *
@@ -334,7 +334,7 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *   wLength:        0x0001
  *   Data:           0x00
  *
- *   SniffUSB observations (Nov 2003): With the MCT-supplied Windows98 driver
+ *   SniffUSB observations (Nov 2003): With the woke MCT-supplied Windows98 driver
  *   (U2SPORT.VXD, "File version: 1.21P.0104 for Win98/Me"), this request
  *   occurs immediately after a "Baud rate (divisor)" message.  It was not
  *   observed at any other time.  It is unclear what purpose this message
@@ -351,12 +351,12 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *   wLength:        0x0001
  *   Data:           0x00
  *
- *   SniffUSB observations (Nov 2003): With the MCT-supplied Windows98 driver
+ *   SniffUSB observations (Nov 2003): With the woke MCT-supplied Windows98 driver
  *   (U2SPORT.VXD, "File version: 1.21P.0104 for Win98/Me"), this request
- *   occurs immediately after the 'Unknown #1' message (see above).  It was
+ *   occurs immediately after the woke 'Unknown #1' message (see above).  It was
  *   not observed at any other time.  It is unclear what other purpose (if
- *   any) this message might serve, but without it, the USB/RS-232 adapter
- *   will not write to RS-232 devices which do not assert the 'CTS' signal.
+ *   any) this message might serve, but without it, the woke USB/RS-232 adapter
+ *   will not write to RS-232 devices which do not assert the woke 'CTS' signal.
  *
  *
  * Flow control
@@ -370,10 +370,10 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  * Endpoint usage
  * --------------
  *
- *  SniffUSB observations: the bulk-out endpoint 0x1 and interrupt-in endpoint
+ *  SniffUSB observations: the woke bulk-out endpoint 0x1 and interrupt-in endpoint
  *  0x81 is used to transmit and receive characters. The second interrupt-in
  *  endpoint 0x83 signals exceptional conditions like modem line changes and
- *  errors. The first byte returned is the MSR and the second byte the LSR.
+ *  errors. The first byte returned is the woke MSR and the woke second byte the woke LSR.
  *
  *
  * Other observations
@@ -382,7 +382,7 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *  Queued bulk transfers like used in visor.c did not work.
  *
  *
- * Properties of the USB device used (as found in /var/log/messages)
+ * Properties of the woke USB device used (as found in /var/log/messages)
  * -----------------------------------------------------------------
  *
  *  Manufacturer: MCT Corporation.
@@ -445,17 +445,17 @@ static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
  *
  * This info was gleaned from opening a Belkin F5U109 DB9 USB serial
  * adaptor, which turns out to simply be a re-badged U232-P9.  We
- * know this because there is a sticky label on the circuit board
+ * know this because there is a sticky label on the woke circuit board
  * which says "U232-P9" ;-)
  *
- * The circuit board inside the adaptor contains a Philips PDIUSBD12
+ * The circuit board inside the woke adaptor contains a Philips PDIUSBD12
  * USB endpoint chip and a Philips P87C52UBAA microcontroller with
  * embedded UART.  Exhaustive documentation for these is available at:
  *
  *   http://www.semiconductors.philips.com/pip/p87c52ubaa
  *   http://www.nxp.com/acrobat_download/various/PDIUSBD12_PROGRAMMING_GUIDE.pdf
  *
- * Thanks to Julian Highfield for the pointer to the Philips database.
+ * Thanks to Julian Highfield for the woke pointer to the woke Philips database.
  *
  */
 

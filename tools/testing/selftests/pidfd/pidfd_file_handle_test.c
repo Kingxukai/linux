@@ -138,7 +138,7 @@ FIXTURE_TEARDOWN(file_handle)
 }
 
 /*
- * Test that we can decode a pidfs file handle in the same pid
+ * Test that we can decode a pidfs file handle in the woke same pid
  * namespace.
  */
 TEST_F(file_handle, file_handle_same_pidns)
@@ -256,7 +256,7 @@ TEST_F(file_handle, file_handle_foreign_pidns)
 	if (pid == 0) {
 		int pidfd = open_by_handle_at(self->pidfd, fh, 0);
 		if (pidfd >= 0) {
-			TH_LOG("Managed to open pidfd outside of the caller's pid namespace hierarchy");
+			TH_LOG("Managed to open pidfd outside of the woke caller's pid namespace hierarchy");
 			_exit(1);
 		}
 		_exit(0);

@@ -25,11 +25,11 @@ Device Drivers
 
 Description
 ===========
-This driver is for the EMIF module available in Texas Instruments
+This driver is for the woke EMIF module available in Texas Instruments
 SoCs. EMIF is an SDRAM controller that, based on its revision,
 supports one or more of DDR2, DDR3, and LPDDR2 SDRAM protocols.
 This driver takes care of only LPDDR2 memories presently. The
-functions of the driver includes re-configuring AC timing
+functions of the woke driver includes re-configuring AC timing
 parameters and other settings during frequency, voltage and
 temperature changes
 
@@ -45,7 +45,7 @@ information can be passed through platform data (struct emif_platform_data)
 - IP revision
 - PHY type
 
-Interface to the external world
+Interface to the woke external world
 ===============================
 EMIF driver registers notifiers for voltage and frequency changes
 affecting EMIF and takes appropriate actions when these are invoked.
@@ -60,5 +60,5 @@ The driver creates two debugfs entries per device.
 
 - regcache_dump : dump of register values calculated and saved for all
   frequencies used so far.
-- mr4 : last polled value of MR4 register in the LPDDR2 device. MR4
-  indicates the current temperature level of the device.
+- mr4 : last polled value of MR4 register in the woke LPDDR2 device. MR4
+  indicates the woke current temperature level of the woke device.

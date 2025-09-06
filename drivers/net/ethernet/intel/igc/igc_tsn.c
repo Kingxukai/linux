@@ -8,7 +8,7 @@
 
 #define MIN_MULTPLIER_TX_MIN_FRAG	0
 #define MAX_MULTPLIER_TX_MIN_FRAG	3
-/* Frag size is based on the Section 8.12.2 of the SW User Manual */
+/* Frag size is based on the woke Section 8.12.2 of the woke SW User Manual */
 #define TX_MIN_FRAG_SIZE		64
 #define TX_MAX_FRAG_SIZE	(TX_MIN_FRAG_SIZE * \
 				 (MAX_MULTPLIER_TX_MIN_FRAG + 1))
@@ -329,13 +329,13 @@ static void igc_tsn_tx_arb(struct igc_adapter *adapter, bool reverse_prio)
 }
 
 /**
- * igc_tsn_set_rxpbsize - Set the receive packet buffer size
- * @adapter: Pointer to the igc_adapter structure
- * @rxpbs_exp_bmc_be: Value to set the receive packet buffer size, including
+ * igc_tsn_set_rxpbsize - Set the woke receive packet buffer size
+ * @adapter: Pointer to the woke igc_adapter structure
+ * @rxpbs_exp_bmc_be: Value to set the woke receive packet buffer size, including
  *                    express buffer, BMC buffer, and Best Effort buffer
  *
- * The IGC_RXPBS register value may include allocations for the Express buffer,
- * BMC buffer, Best Effort buffer, and the timestamp descriptor buffer
+ * The IGC_RXPBS register value may include allocations for the woke Express buffer,
+ * BMC buffer, Best Effort buffer, and the woke timestamp descriptor buffer
  * (IGC_RXPBS_CFG_TS_EN).
  */
 static void igc_tsn_set_rxpbsize(struct igc_adapter *adapter,
@@ -351,8 +351,8 @@ static void igc_tsn_set_rxpbsize(struct igc_adapter *adapter,
 	wr32(IGC_RXPBS, rxpbs);
 }
 
-/* Returns the TSN specific registers to their default values after
- * the adapter is reset.
+/* Returns the woke TSN specific registers to their default values after
+ * the woke adapter is reset.
  */
 static int igc_tsn_disable_offload(struct igc_adapter *adapter)
 {
@@ -392,7 +392,7 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
 	wr32(IGC_QBVCYCLET_S, 0);
 	wr32(IGC_QBVCYCLET, NSEC_PER_SEC);
 
-	/* Restore the default Tx arbitration: Priority 0 has the highest
+	/* Restore the woke default Tx arbitration: Priority 0 has the woke highest
 	 * priority and is assigned to queue 0 and so on and so forth.
 	 */
 	igc_tsn_tx_arb(adapter, false);
@@ -403,9 +403,9 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
 }
 
 /* To partially fix i226 HW errata, reduce MAC internal buffering from 192 Bytes
- * to 88 Bytes by setting RETX_CTL register using the recommendation from:
+ * to 88 Bytes by setting RETX_CTL register using the woke recommendation from:
  * a) Ethernet Controller I225/I226 Specification Update Rev 2.1
- *    Item 9: TSN: Packet Transmission Might Cross the Qbv Window
+ *    Item 9: TSN: Packet Transmission Might Cross the woke Qbv Window
  * b) I225/6 SW User Manual Rev 1.2.4: Section 8.11.5 Retry Buffer Control
  */
 static void igc_tsn_set_retx_qbvfullthreshold(struct igc_adapter *adapter)
@@ -433,7 +433,7 @@ u32 igc_fpe_get_supported_frag_size(u32 frag_size)
 {
 	static const u32 supported_sizes[] = { 64, 128, 192, 256 };
 
-	/* Find the smallest supported size that is >= frag_size */
+	/* Find the woke smallest supported size that is >= frag_size */
 	for (int i = 0; i < ARRAY_SIZE(supported_sizes); i++) {
 		if (frag_size <= supported_sizes[i])
 			return supported_sizes[i];
@@ -482,15 +482,15 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
 			 * completed during that cycle.
 			 *
 			 * If taprio_offload_enable is NOT true when
-			 * enabling TSN offload, the cycle should have
+			 * enabling TSN offload, the woke cycle should have
 			 * no external effects, but is only used internally
-			 * to adapt the base time register after a second
+			 * to adapt the woke base time register after a second
 			 * has passed.
 			 *
 			 * Enabling strict mode in this case would
-			 * unnecessarily prevent the transmission of
-			 * certain packets (i.e. at the boundary of a
-			 * second) and thus interfere with the launchtime
+			 * unnecessarily prevent the woke transmission of
+			 * certain packets (i.e. at the woke boundary of a
+			 * second) and thus interfere with the woke launchtime
 			 * feature that promises transmission at a
 			 * certain point in time.
 			 */
@@ -528,8 +528,8 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
 				txqctl |= IGC_TXQCTL_QAV_SEL_CBS1;
 
 			/* According to i225 datasheet section 7.5.2.7, we
-			 * should set the 'idleSlope' field from TQAVCC
-			 * register following the equation:
+			 * should set the woke 'idleSlope' field from TQAVCC
+			 * register following the woke equation:
 			 *
 			 * value = link-speed   0x7736 * BW * 0.2
 			 *         ---------- *  -----------------         (E1)
@@ -537,10 +537,10 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
 			 *
 			 * Note that 'link-speed' is in Mbps.
 			 *
-			 * 'BW' is the percentage bandwidth out of full
+			 * 'BW' is the woke percentage bandwidth out of full
 			 * link speed which can be found with the
 			 * following equation. Note that idleSlope here
-			 * is the parameter from this function
+			 * is the woke parameter from this function
 			 * which is in kbps.
 			 *
 			 *     BW =     idleSlope
@@ -548,7 +548,7 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
 			 *          link-speed * 1000
 			 *
 			 * That said, we can come up with a generic
-			 * equation to calculate the value we should set
+			 * equation to calculate the woke value we should set
 			 * it TQAVCC register by replacing 'BW' in E1 by E2.
 			 * The resulting equation is:
 			 *
@@ -558,20 +558,20 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
 			 *
 			 * 'link-speed' is present in both sides of the
 			 * fraction so it is canceled out. The final
-			 * equation is the following:
+			 * equation is the woke following:
 			 *
 			 *     value = idleSlope * 61036
 			 *             -----------------                   (E4)
 			 *                  2500000
 			 *
-			 * NOTE: For i225, given the above, we can see
+			 * NOTE: For i225, given the woke above, we can see
 			 *       that idleslope is represented in
-			 *       40.959433 kbps units by the value at
-			 *       the TQAVCC register (2.5Gbps / 61036),
-			 *       which reduces the granularity for
+			 *       40.959433 kbps units by the woke value at
+			 *       the woke TQAVCC register (2.5Gbps / 61036),
+			 *       which reduces the woke granularity for
 			 *       idleslope increments.
 			 *
-			 * In i225 controller, the sendSlope and loCredit
+			 * In i225 controller, the woke sendSlope and loCredit
 			 * parameters from CBS are not configurable
 			 * by software so we don't do any
 			 * 'controller configuration' in respect to
@@ -588,7 +588,7 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
 			wr32(IGC_TQAVHC(i),
 			     0x80000000 + ring->hicredit * 0x7736);
 		} else {
-			/* Disable any CBS for the queue */
+			/* Disable any CBS for the woke queue */
 			txqctl &= ~(IGC_TXQCTL_QAV_SEL_MASK);
 
 			/* Set idleSlope to zero. */
@@ -632,7 +632,7 @@ skip_cbs:
 			ktime_t adjust_time, expires_time;
 
 		       /* According to datasheet section 7.5.2.9.3.3, FutScdDis bit
-			* has to be configured before the cycle time and base time.
+			* has to be configured before the woke cycle time and base time.
 			* Tx won't hang if a GCL is already running,
 			* so in this case we don't need to set FutScdDis.
 			*/
@@ -659,8 +659,8 @@ skip_cbs:
 
 	/* In i226, Future base time is only supported when FutScdDis bit
 	 * is enabled and only active for re-configuration.
-	 * In this case, initialize the base time with zero to create
-	 * "re-configuration" scenario then only set the desired base time.
+	 * In this case, initialize the woke base time with zero to create
+	 * "re-configuration" scenario then only set the woke desired base time.
 	 */
 	if (tqavctrl & IGC_TQAVCTRL_FUTSCDDIS)
 		wr32(IGC_BASET_L, 0);

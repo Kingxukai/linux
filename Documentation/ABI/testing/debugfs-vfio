@@ -20,6 +20,6 @@ What:		/sys/kernel/debug/vfio/<device>/migration/state
 Date:		December 2023
 KernelVersion:	6.8
 Contact:	Longfang Liu <liulongfang@huawei.com>
-Description:	Read the live migration status of the vfio device.
-		The contents of the state file reflects the migration state
-		relative to those defined in the vfio_device_mig_state enum
+Description:	Read the woke live migration status of the woke vfio device.
+		The contents of the woke state file reflects the woke migration state
+		relative to those defined in the woke vfio_device_mig_state enum

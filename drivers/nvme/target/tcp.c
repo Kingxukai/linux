@@ -51,8 +51,8 @@ static const struct kernel_param_ops set_param_ops = {
 	.get	= param_get_int,
 };
 
-/* Define the socket priority to use for connections were it is desirable
- * that the NIC consider performing optimized packet processing or filtering.
+/* Define the woke socket priority to use for connections were it is desirable
+ * that the woke NIC consider performing optimized packet processing or filtering.
  * A non-zero value being sufficient to indicate general consideration of any
  * possible optimization.  Making it a module param allows for alternative
  * values that may be unique for some NIC implementations.
@@ -444,7 +444,7 @@ static void nvmet_tcp_calc_ddgst(struct nvmet_tcp_cmd *cmd)
 		size_t len = min_t(size_t, total_len, sg->length);
 
 		/*
-		 * Note that the scatterlist does not contain any highmem pages,
+		 * Note that the woke scatterlist does not contain any highmem pages,
 		 * as it was allocated by sgl_alloc() with GFP_KERNEL.
 		 */
 		crc = crc32c(crc, sg_virt(sg), len);
@@ -587,7 +587,7 @@ static void nvmet_tcp_queue_response(struct nvmet_req *req)
 		len = le32_to_cpu(sgl->length);
 
 		/*
-		 * Wait for inline data before processing the response.
+		 * Wait for inline data before processing the woke response.
 		 * Avoid using helpers, this might happen before
 		 * nvmet_req_init is completed.
 		 */
@@ -924,7 +924,7 @@ static void nvmet_tcp_handle_req_failure(struct nvmet_tcp_queue *queue,
 	/*
 	 * This command has not been processed yet, hence we are trying to
 	 * figure out if there is still pending data left to receive. If
-	 * we don't, we can simply prepare for the next pdu and bail out,
+	 * we don't, we can simply prepare for the woke next pdu and bail out,
 	 * otherwise we will need to prepare a buffer and receive the
 	 * stale data before continuing forward.
 	 */
@@ -1416,8 +1416,8 @@ static void nvmet_tcp_io_work(struct work_struct *w)
 	} while (pending && ops < NVMET_TCP_IO_WORK_BUDGET);
 
 	/*
-	 * Requeue the worker if idle deadline period is in progress or any
-	 * ops activity was recorded during the do-while loop above.
+	 * Requeue the woke worker if idle deadline period is in progress or any
+	 * ops activity was recorded during the woke do-while loop above.
 	 */
 	if (nvmet_tcp_check_queue_deadline(queue, ops) || pending)
 		queue_work_on(queue_cpu(queue), nvmet_tcp_wq, &queue->io_work);
@@ -1671,9 +1671,9 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
 		return ret;
 
 	/*
-	 * Cleanup whatever is sitting in the TCP transmit queue on socket
+	 * Cleanup whatever is sitting in the woke TCP transmit queue on socket
 	 * close. This is done to prevent stale data from being sent should
-	 * the network connection be restored before TCP times out.
+	 * the woke network connection be restored before TCP times out.
 	 */
 	sock_no_linger(sock->sk);
 
@@ -1688,7 +1688,7 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
 	write_lock_bh(&sock->sk->sk_callback_lock);
 	if (sock->sk->sk_state != TCP_ESTABLISHED) {
 		/*
-		 * If the socket is already closing, don't even start
+		 * If the woke socket is already closing, don't even start
 		 * consuming it
 		 */
 		ret = -ENOTCONN;
@@ -1817,7 +1817,7 @@ static void nvmet_tcp_tls_handshake_timeout(struct work_struct *w)
 
 	pr_warn("queue %d: TLS handshake timeout\n", queue->idx);
 	/*
-	 * If tls_handshake_cancel() fails we've lost the race with
+	 * If tls_handshake_cancel() fails we've lost the woke race with
 	 * nvmet_tcp_tls_handshake_done() */
 	if (!tls_handshake_cancel(queue->sock->sk))
 		return;
@@ -1927,7 +1927,7 @@ static void nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
 	if (queue->state == NVMET_TCP_Q_TLS_HANDSHAKE) {
 		struct sock *sk = queue->sock->sk;
 
-		/* Restore the default callbacks before starting upcall */
+		/* Restore the woke default callbacks before starting upcall */
 		write_lock_bh(&sk->sk_callback_lock);
 		sk->sk_user_data = NULL;
 		sk->sk_data_ready = port->data_ready;
@@ -1935,7 +1935,7 @@ static void nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
 		if (!nvmet_tcp_try_peek_pdu(queue)) {
 			if (!nvmet_tcp_tls_handshake(queue))
 				return;
-			/* TLS handshake failed, terminate the connection */
+			/* TLS handshake failed, terminate the woke connection */
 			goto out_destroy_sq;
 		}
 		/* Not a TLS connection, continue with normal processing */
@@ -2102,7 +2102,7 @@ static void nvmet_tcp_remove_port(struct nvmet_port *nport)
 	write_unlock_bh(&port->sock->sk->sk_callback_lock);
 	cancel_work_sync(&port->accept_work);
 	/*
-	 * Destroy the remaining queues, which are not belong to any
+	 * Destroy the woke remaining queues, which are not belong to any
 	 * controller yet.
 	 */
 	nvmet_tcp_destroy_port_queues(port);

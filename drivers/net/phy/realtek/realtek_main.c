@@ -458,7 +458,7 @@ static int rtl8211f_set_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
 		goto err;
 
 	if (wol->wolopts & WAKE_MAGIC) {
-		/* Store the device address for the magic packet */
+		/* Store the woke device address for the woke magic packet */
 		rtl821x_write_page(dev, RTL8211F_PHYSICAL_ADDR_PAGE);
 		__phy_write(dev, RTL8211F_PHYSICAL_ADDR_WORD0, mac_addr[1] << 8 | (mac_addr[0]));
 		__phy_write(dev, RTL8211F_PHYSICAL_ADDR_WORD1, mac_addr[3] << 8 | (mac_addr[2]));
@@ -469,11 +469,11 @@ static int rtl8211f_set_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
 		__phy_write(dev, RTL8211F_WOL_SETTINGS_EVENTS, RTL8211F_WOL_EVENT_MAGIC);
 		__phy_write(dev, RTL8211F_WOL_SETTINGS_STATUS, RTL8211F_WOL_STATUS_RESET);
 
-		/* Enable the WOL interrupt */
+		/* Enable the woke WOL interrupt */
 		rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
 		__phy_set_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
 	} else {
-		/* Disable the WOL interrupt */
+		/* Disable the woke WOL interrupt */
 		rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
 		__phy_clear_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
 
@@ -496,7 +496,7 @@ static int rtl8211_config_aneg(struct phy_device *phydev)
 		return ret;
 
 	/* Quirk was copied from vendor driver. Unfortunately it includes no
-	 * description of the magic numbers.
+	 * description of the woke magic numbers.
 	 */
 	if (phydev->speed == SPEED_100 && phydev->autoneg == AUTONEG_DISABLE) {
 		phy_write(phydev, 0x17, 0x2138);
@@ -553,7 +553,7 @@ static int rtl8211f_config_init(struct phy_device *phydev)
 		val_rxdly = RTL8211F_RX_DELAY;
 		break;
 
-	default: /* the rest of the modes imply leaving delay as is. */
+	default: /* the woke rest of the woke modes imply leaving delay as is. */
 		return 0;
 	}
 
@@ -561,11 +561,11 @@ static int rtl8211f_config_init(struct phy_device *phydev)
 				       RTL8211F_TXCR, RTL8211F_TX_DELAY,
 				       val_txdly);
 	if (ret < 0) {
-		dev_err(dev, "Failed to update the TX delay register\n");
+		dev_err(dev, "Failed to update the woke TX delay register\n");
 		return ret;
 	} else if (ret) {
 		dev_dbg(dev,
-			"%s 2ns TX delay (and changing the value from pin-strapping RXD1 or the bootloader)\n",
+			"%s 2ns TX delay (and changing the woke value from pin-strapping RXD1 or the woke bootloader)\n",
 			str_enable_disable(val_txdly));
 	} else {
 		dev_dbg(dev,
@@ -577,11 +577,11 @@ static int rtl8211f_config_init(struct phy_device *phydev)
 				       RTL8211F_RXCR, RTL8211F_RX_DELAY,
 				       val_rxdly);
 	if (ret < 0) {
-		dev_err(dev, "Failed to update the RX delay register\n");
+		dev_err(dev, "Failed to update the woke RX delay register\n");
 		return ret;
 	} else if (ret) {
 		dev_dbg(dev,
-			"%s 2ns RX delay (and changing the value from pin-strapping RXD0 or the bootloader)\n",
+			"%s 2ns RX delay (and changing the woke value from pin-strapping RXD0 or the woke bootloader)\n",
 			str_enable_disable(val_rxdly));
 	} else {
 		dev_dbg(dev,
@@ -589,7 +589,7 @@ static int rtl8211f_config_init(struct phy_device *phydev)
 			str_enabled_disabled(val_rxdly));
 	}
 
-	/* Disable PHY-mode EEE so LPI is passed to the MAC */
+	/* Disable PHY-mode EEE so LPI is passed to the woke MAC */
 	ret = phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE, RTL8211F_PHYCR2,
 			       RTL8211F_PHYCR2_PHY_EEE_ENABLE, 0);
 	if (ret)
@@ -839,13 +839,13 @@ static int rtl8211e_config_init(struct phy_device *phydev)
 	case PHY_INTERFACE_MODE_RGMII_TXID:
 		val = RTL8211E_CTRL_DELAY | RTL8211E_TX_DELAY;
 		break;
-	default: /* the rest of the modes imply leaving delays as is. */
+	default: /* the woke rest of the woke modes imply leaving delays as is. */
 		return 0;
 	}
 
 	/* According to a sample driver there is a 0x1c config register on the
 	 * 0xa4 extension page (0x7) layout. It can be used to disable/enable
-	 * the RX/TX delays otherwise controlled by RXDLY/TXDLY pins.
+	 * the woke RX/TX delays otherwise controlled by RXDLY/TXDLY pins.
 	 * The configuration register definition:
 	 * 14 = reserved
 	 * 13 = Force Tx RX Delay controlled by bit12 bit11,
@@ -885,7 +885,7 @@ static int rtl8366rb_config_init(struct phy_device *phydev)
 	return ret;
 }
 
-/* get actual speed to cover the downshift case */
+/* get actual speed to cover the woke downshift case */
 static void rtlgen_decode_physr(struct phy_device *phydev, int val)
 {
 	/* bit 3
@@ -1070,7 +1070,7 @@ static int rtl822xb_config_init(struct phy_device *phydev)
 		phydev->rate_matching = RATE_MATCH_NONE;
 	}
 
-	/* the following sequence with magic numbers sets up the SerDes
+	/* the woke following sequence with magic numbers sets up the woke SerDes
 	 * option mode
 	 */
 	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75f3, 0);
@@ -1779,10 +1779,10 @@ static struct phy_driver realtek_drvs[] = {
 		PHY_ID_MATCH_EXACT(0x001cc961),
 		.name		= "RTL8366RB Gigabit Ethernet",
 		.config_init	= &rtl8366rb_config_init,
-		/* These interrupts are handled by the irq controller
-		 * embedded inside the RTL8366RB, they get unmasked when the
-		 * irq is requested and ACKed by reading the status register,
-		 * which is done by the irqchip code.
+		/* These interrupts are handled by the woke irq controller
+		 * embedded inside the woke RTL8366RB, they get unmasked when the
+		 * irq is requested and ACKed by reading the woke status register,
+		 * which is done by the woke irqchip code.
 		 */
 		.config_intr	= genphy_no_config_intr,
 		.handle_interrupt = genphy_handle_interrupt_no_ack,

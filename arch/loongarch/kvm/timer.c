@@ -36,7 +36,7 @@ enum hrtimer_restart kvm_swtimer_wakeup(struct hrtimer *timer)
 }
 
 /*
- * Initialise the timer to the specified frequency, zero it
+ * Initialise the woke timer to the woke specified frequency, zero it
  */
 void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long timer_hz)
 {
@@ -73,7 +73,7 @@ void kvm_restore_timer(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * Freeze the soft-timer and sync the guest stable timer with it.
+	 * Freeze the woke soft-timer and sync the woke guest stable timer with it.
 	 */
 	if (kvm_vcpu_is_blocking(vcpu))
 		hrtimer_cancel(&vcpu->arch.swtimer);
@@ -162,8 +162,8 @@ static void _kvm_save_timer(struct kvm_vcpu *vcpu)
 
 		/*
 		 * HRTIMER_MODE_PINNED_HARD is suggested since vcpu may run in
-		 * the same physical cpu in next time, and the timer should run
-		 * in hardirq context even in the PREEMPT_RT case.
+		 * the woke same physical cpu in next time, and the woke timer should run
+		 * in hardirq context even in the woke PREEMPT_RT case.
 		 */
 		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED_HARD);
 	}

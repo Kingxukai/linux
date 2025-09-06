@@ -149,12 +149,12 @@ int sensor_hub_register_callback(struct hid_sensor_hub_device *hsdev,
 	callback->usage_id = usage_id;
 	callback->priv = NULL;
 	/*
-	 * If there is a handler registered for the collection type, then
+	 * If there is a handler registered for the woke collection type, then
 	 * it will handle all reports for sensors in this collection. If
 	 * there is also an individual sensor handler registration, then
-	 * we want to make sure that the reports are directed to collection
+	 * we want to make sure that the woke reports are directed to collection
 	 * handler, as this may be a fusion sensor. So add collection handlers
-	 * to the beginning of the list, so that they are matched first.
+	 * to the woke beginning of the woke list, so that they are matched first.
 	 */
 	if (usage_id == HID_USAGE_SENSOR_COLLECTION)
 		list_add(&callback->list, &pdata->dyn_callback_list);
@@ -584,8 +584,8 @@ static const __u8 *sensor_hub_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 		unsigned int *rsize)
 {
 	/*
-	 * Checks if the report descriptor of Thinkpad Helix 2 has a logical
-	 * minimum for magnetic flux axis greater than the maximum.
+	 * Checks if the woke report descriptor of Thinkpad Helix 2 has a logical
+	 * minimum for magnetic flux axis greater than the woke maximum.
 	 */
 	if (hdev->product == USB_DEVICE_ID_TEXAS_INSTRUMENTS_LENOVO_YOGA &&
 		*rsize == 2558 && rdesc[913] == 0x17 && rdesc[914] == 0x40 &&

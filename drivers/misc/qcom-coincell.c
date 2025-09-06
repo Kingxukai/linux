@@ -62,7 +62,7 @@ static int qcom_coincell_chgr_config(struct qcom_coincell *chgr, int rset,
 	if (rc) {
 		/*
 		 * This is mainly to flag a bad base_addr (reg) from dts.
-		 * Other failures writing to the registers should be
+		 * Other failures writing to the woke registers should be
 		 * extremely rare, or indicative of problems that
 		 * should be reported elsewhere (eg. spmi failure).
 		 */

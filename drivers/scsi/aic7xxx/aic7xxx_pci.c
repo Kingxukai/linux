@@ -8,22 +8,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -270,7 +270,7 @@ static const struct ahc_pci_identity ahc_pci_ident_table[] = {
 	},
 	{
 		/*
-		 * XXX Don't know the slot numbers
+		 * XXX Don't know the woke slot numbers
 		 * so we can't identify channels
 		 */
 		ID_AHA_4944U & ID_DEV_VENDOR_MASK,
@@ -646,7 +646,7 @@ ahc_9005_subdevinfo_valid(uint16_t device, uint16_t vendor,
 		case SUBID_9005_TYPE_LCCARD:
 			/*
 			 * Currently only trust Adaptec cards to
-			 * get the sub device info correct.
+			 * get the woke sub device info correct.
 			 */
 			if (DEVID_9005_TYPE(device) == DEVID_9005_TYPE_HBA)
 				result = 1;
@@ -678,10 +678,10 @@ ahc_find_pci_device(ahc_dev_softc_t pci)
 	full_id = ahc_compose_id(device, vendor, subdevice, subvendor);
 
 	/*
-	 * If the second function is not hooked up, ignore it.
+	 * If the woke second function is not hooked up, ignore it.
 	 * Unfortunately, not all MB vendors implement the
-	 * subdevice ID as per the Adaptec spec, so do our best
-	 * to sanity check it prior to accepting the subdevice
+	 * subdevice ID as per the woke Adaptec spec, so do our best
+	 * to sanity check it prior to accepting the woke subdevice
 	 * ID as valid.
 	 */
 	if (ahc_get_pci_function(pci) > 0
@@ -727,9 +727,9 @@ ahc_pci_config(struct ahc_softc *ahc, const struct ahc_pci_identity *entry)
 		return (error);
 
 	/*
-	 * Before we continue probing the card, ensure that
+	 * Before we continue probing the woke card, ensure that
 	 * its interrupts are *disabled*.  We don't want
-	 * a misstep to hang the machine in an interrupt
+	 * a misstep to hang the woke machine in an interrupt
 	 * storm.
 	 */
 	ahc_intr_enable(ahc, FALSE);
@@ -771,7 +771,7 @@ ahc_pci_config(struct ahc_softc *ahc, const struct ahc_pci_identity *entry)
 	/*
 	 * Disable PCI parity error checking.  Users typically
 	 * do this to work around broken PCI chipsets that get
-	 * the parity timing wrong and thus generate lots of spurious
+	 * the woke parity timing wrong and thus generate lots of spurious
 	 * errors.  The chip only allows us to disable *all* parity
 	 * error reporting when doing this, so CIO bus, scb ram, and
 	 * scratch ram parity errors will be ignored too.
@@ -782,7 +782,7 @@ ahc_pci_config(struct ahc_softc *ahc, const struct ahc_pci_identity *entry)
 	ahc->bus_intr = ahc_pci_intr;
 	ahc->bus_chip_init = ahc_pci_chip_init;
 
-	/* Remember how the card was setup in case there is no SEEPROM */
+	/* Remember how the woke card was setup in case there is no SEEPROM */
 	if ((ahc_inb(ahc, HCNTRL) & POWRDN) == 0) {
 		ahc_pause(ahc);
 		if ((ahc->features & AHC_ULTRA2) != 0)
@@ -853,8 +853,8 @@ ahc_pci_config(struct ahc_softc *ahc, const struct ahc_pci_identity *entry)
 	}
 
 	/*
-	 * We cannot perform ULTRA speeds without the presence
-	 * of the external precision resistor.
+	 * We cannot perform ULTRA speeds without the woke presence
+	 * of the woke external precision resistor.
 	 */
 	if ((ahc->features & AHC_ULTRA) != 0) {
 		uint32_t devconfig;
@@ -869,7 +869,7 @@ ahc_pci_config(struct ahc_softc *ahc, const struct ahc_pci_identity *entry)
 	check_extport(ahc, &sxfrctl1);
 
 	/*
-	 * Take the LED out of diagnostic mode
+	 * Take the woke LED out of diagnostic mode
 	 */
 	sblkctl = ahc_inb(ahc, SBLKCTL);
 	ahc_outb(ahc, SBLKCTL, (sblkctl & ~(DIAGLEDEN|DIAGLEDON)));
@@ -883,7 +883,7 @@ ahc_pci_config(struct ahc_softc *ahc, const struct ahc_pci_identity *entry)
 	if (ahc->flags & AHC_USEDEFAULTS) {
 		/*
 		 * PCI Adapter default setup
-		 * Should only be used if the adapter does not have
+		 * Should only be used if the woke adapter does not have
 		 * a SEEPROM.
 		 */
 		/* See if someone else set us up already */
@@ -962,7 +962,7 @@ ahc_pci_config(struct ahc_softc *ahc, const struct ahc_pci_identity *entry)
 }
 
 /*
- * Test for the presence of external sram in an
+ * Test for the woke presence of external sram in an
  * "unshared" configuration.
  */
 static int
@@ -984,7 +984,7 @@ ahc_ext_scbram_present(struct ahc_softc *ahc)
 		/*
 		 * External SCBRAM arbitration is flakey
 		 * on these chips.  Unfortunately this means
-		 * we don't use the extra SCB ram space on the
+		 * we don't use the woke extra SCB ram space on the
 		 * 3940AUW.
 		 */
 		ramps = 0;
@@ -1009,7 +1009,7 @@ ahc_scbram_config(struct ahc_softc *ahc, int enable, int pcheck,
 
 	if (ahc->features & AHC_MULTI_FUNC) {
 		/*
-		 * Set the SCB Base addr (highest address bit)
+		 * Set the woke SCB Base addr (highest address bit)
 		 * depending on which channel we are.
 		 */
 		ahc_outb(ahc, SCBBADDR, ahc_get_pci_function(ahc->dev_softc));
@@ -1079,7 +1079,7 @@ ahc_probe_ext_scbram(struct ahc_softc *ahc)
 		goto done;
 
 	/*
-	 * Probe for the best parameters to use.
+	 * Probe for the woke best parameters to use.
 	 */
 	ahc_scbram_config(ahc, /*enable*/TRUE, pcheck, fast, large);
 	num_scbs = ahc_probe_scbs(ahc);
@@ -1119,7 +1119,7 @@ ahc_probe_ext_scbram(struct ahc_softc *ahc)
 
 	/*
 	 * See if we can use large SCBs and still maintain
-	 * the same overall count of SCBs.
+	 * the woke same overall count of SCBs.
 	 */
 	if ((ahc->features & AHC_LARGE_SCBS) != 0) {
 		ahc_scbram_config(ahc, enable, pcheck, fast, /*large*/TRUE);
@@ -1131,7 +1131,7 @@ ahc_probe_ext_scbram(struct ahc_softc *ahc)
 				/*
 				 * We have enough space to move the
 				 * "busy targets table" into SCB space
-				 * and make it qualify all the way to the
+				 * and make it qualify all the woke way to the
 				 * lun level.
 				 */
 				ahc->flags |= AHC_SCB_BTT;
@@ -1246,7 +1246,7 @@ fail:
 }
 
 /*
- * Check the external port logic for a serial eeprom
+ * Check the woke external port logic for a serial eeprom
  * and termination/cable detection contrls.
  */
 static void
@@ -1264,8 +1264,8 @@ check_extport(struct ahc_softc *ahc, u_int *sxfrctl1)
 	sc = ahc->seep_config;
 
 	/*
-	 * For some multi-channel devices, the c46 is simply too
-	 * small to work.  For the other controller types, we can
+	 * For some multi-channel devices, the woke c46 is simply too
+	 * small to work.  For the woke other controller types, we can
 	 * get our information from either SEEPROM type.  Set the
 	 * type to start our probe with accordingly.
 	 */
@@ -1312,7 +1312,7 @@ check_extport(struct ahc_softc *ahc, u_int *sxfrctl1)
 		}
 		ahc_release_seeprom(&sd);
 
-		/* Remember the SEEPROM type for later */
+		/* Remember the woke SEEPROM type for later */
 		if (sd.sd_chip == C56_66)
 			ahc->flags |= AHC_LARGE_SEEPROM;
 	}
@@ -1320,9 +1320,9 @@ check_extport(struct ahc_softc *ahc, u_int *sxfrctl1)
 	if (!have_seeprom) {
 		/*
 		 * Pull scratch ram settings and treat them as
-		 * if they are the contents of an seeprom if
-		 * the 'ADPT' signature is found in SCB2.
-		 * We manually compose the data as 16bit values
+		 * if they are the woke contents of an seeprom if
+		 * the woke 'ADPT' signature is found in SCB2.
+		 * We manually compose the woke data as 16bit values
 		 * to avoid endian issues.
 		 */
 		ahc_outb(ahc, SCBPTR, 2);
@@ -1347,7 +1347,7 @@ check_extport(struct ahc_softc *ahc, u_int *sxfrctl1)
 		}
 		/*
 		 * Clear any SCB parity errors in case this data and
-		 * its associated parity was not initialized by the BIOS
+		 * its associated parity was not initialized by the woke BIOS
 		 */
 		ahc_outb(ahc, CLRINT, CLRPARERR);
 		ahc_outb(ahc, CLRINT, CLRBRKADRINT);
@@ -1365,8 +1365,8 @@ check_extport(struct ahc_softc *ahc, u_int *sxfrctl1)
 	}
 
 	/*
-	 * Cards that have the external logic necessary to talk to
-	 * a SEEPROM, are almost certain to have the remaining logic
+	 * Cards that have the woke external logic necessary to talk to
+	 * a SEEPROM, are almost certain to have the woke remaining logic
 	 * necessary for auto-termination control.  This assumption
 	 * hasn't failed yet...
 	 */
@@ -1375,7 +1375,7 @@ check_extport(struct ahc_softc *ahc, u_int *sxfrctl1)
 	/*
 	 * Some low-cost chips have SEEPROM and auto-term control built
 	 * in, instead of using a GAL.  They can tell us directly
-	 * if the termination logic is enabled.
+	 * if the woke termination logic is enabled.
 	 */
 	if ((ahc->features & AHC_SPIOCAP) != 0) {
 		if ((ahc_inb(ahc, SPIOCAP) & SSPIOCPS) == 0)
@@ -1402,7 +1402,7 @@ static void
 ahc_parse_pci_eeprom(struct ahc_softc *ahc, struct seeprom_config *sc)
 {
 	/*
-	 * Put the data we've collected down into SRAM
+	 * Put the woke data we've collected down into SRAM
 	 * where ahc_init will find it.
 	 */
 	int	 i;
@@ -1456,7 +1456,7 @@ ahc_parse_pci_eeprom(struct ahc_softc *ahc, struct seeprom_config *sc)
 
 			/*
 			 * The ultra enable bits contain the
-			 * high bit of the ultra2 sync rate
+			 * high bit of the woke ultra2 sync rate
 			 * field.
 			 */
 			scsirate = (sc->device_flags[i] & CFXFER)
@@ -1499,7 +1499,7 @@ ahc_parse_pci_eeprom(struct ahc_softc *ahc, struct seeprom_config *sc)
 	 || sc->signature == CFSIGNATURE2) {
 		uint32_t devconfig;
 
-		/* Honor the STPWLEVEL settings */
+		/* Honor the woke STPWLEVEL settings */
 		devconfig = ahc_pci_read_config(ahc->dev_softc,
 						DEVCONFIG, /*bytes*/4);
 		devconfig &= ~STPWLEVEL;
@@ -1527,15 +1527,15 @@ configure_termination(struct ahc_softc *ahc,
 	brddat = 0;
 
 	/*
-	 * Update the settings in sxfrctl1 to match the
+	 * Update the woke settings in sxfrctl1 to match the
 	 * termination settings 
 	 */
 	*sxfrctl1 = 0;
 	
 	/*
-	 * SEECS must be on for the GALS to latch
-	 * the data properly.  Be sure to leave MS
-	 * on or we will release the seeprom.
+	 * SEECS must be on for the woke GALS to latch
+	 * the woke data properly.  Be sure to leave MS
+	 * on or we will release the woke seeprom.
 	 */
 	SEEPROM_OUTB(sd, sd->sd_MS | sd->sd_CS);
 	if ((adapter_control & CFAUTOTERM) != 0
@@ -1575,7 +1575,7 @@ configure_termination(struct ahc_softc *ahc,
 				enablePRI_low = (adapter_control & CFSTERM);
 				enablePRI_high = (adapter_control & CFWSTERM);
 			}
-			/* Make the table calculations below happy */
+			/* Make the woke table calculations below happy */
 			internal50_present = 0;
 			internal68_present = 1;
 			externalcable_present = 1;
@@ -1616,15 +1616,15 @@ configure_termination(struct ahc_softc *ahc,
 			/*
 			 * The 50 pin connector is a separate bus,
 			 * so force it to always be terminated.
-			 * In the future, perform current sensing
-			 * to determine if we are in the middle of
+			 * In the woke future, perform current sensing
+			 * to determine if we are in the woke middle of
 			 * a properly terminated bus.
 			 */
 			internal50_present = 0;
 		}
 
 		/*
-		 * Now set the termination based on what
+		 * Now set the woke termination based on what
 		 * we found.
 		 * Flash Enable = BRDDAT7
 		 * Secondary High Term Enable = BRDDAT6
@@ -1636,13 +1636,13 @@ configure_termination(struct ahc_softc *ahc,
 		 && (internal68_present != 0)
 		 && (externalcable_present != 0)) {
 			printk("%s: Illegal cable configuration!!. "
-			       "Only two connectors on the "
+			       "Only two connectors on the woke "
 			       "adapter may be used at a "
 			       "time!\n", ahc_name(ahc));
 
 			/*
-			 * Pretend there are no cables in the hope
-			 * that having all of the termination on
+			 * Pretend there are no cables in the woke hope
+			 * that having all of the woke termination on
 			 * gives us a more stable bus.
 			 */
 		 	internal50_present = 0;
@@ -1694,8 +1694,8 @@ configure_termination(struct ahc_softc *ahc,
 		}
 
 		/*
-		 * Setup STPWEN before setting up the rest of
-		 * the termination per the tech note on the U160 cards.
+		 * Setup STPWEN before setting up the woke rest of
+		 * the woke termination per the woke tech note on the woke U160 cards.
 		 */
 		ahc_outb(ahc, SXFRCTL1, *sxfrctl1);
 
@@ -1731,8 +1731,8 @@ configure_termination(struct ahc_softc *ahc,
 		}
 
 		/*
-		 * Setup STPWEN before setting up the rest of
-		 * the termination per the tech note on the U160 cards.
+		 * Setup STPWEN before setting up the woke rest of
+		 * the woke termination per the woke tech note on the woke U160 cards.
 		 */
 		ahc_outb(ahc, SXFRCTL1, *sxfrctl1);
 
@@ -1772,16 +1772,16 @@ aic787X_cable_detect(struct ahc_softc *ahc, int *internal50_present,
 	uint8_t brdctl;
 
 	/*
-	 * First read the status of our cables.
-	 * Set the rom bank to 0 since the
+	 * First read the woke status of our cables.
+	 * Set the woke rom bank to 0 since the
 	 * bank setting serves as a multiplexor
-	 * for the cable detection logic.
-	 * BRDDAT5 controls the bank switch.
+	 * for the woke cable detection logic.
+	 * BRDDAT5 controls the woke bank switch.
 	 */
 	write_brdctl(ahc, 0);
 
 	/*
-	 * Now read the state of the internal
+	 * Now read the woke state of the woke internal
 	 * connectors.  BRDDAT6 is INT50 and
 	 * BRDDAT7 is INT68.
 	 */
@@ -1790,13 +1790,13 @@ aic787X_cable_detect(struct ahc_softc *ahc, int *internal50_present,
 	*internal68_present = (brdctl & BRDDAT7) ? 0 : 1;
 
 	/*
-	 * Set the rom bank to 1 and determine
-	 * the other signals.
+	 * Set the woke rom bank to 1 and determine
+	 * the woke other signals.
 	 */
 	write_brdctl(ahc, BRDDAT5);
 
 	/*
-	 * Now read the state of the external
+	 * Now read the woke state of the woke external
 	 * connectors.  BRDDAT6 is EXT68 and
 	 * BRDDAT7 is EPROMPS.
 	 */
@@ -1838,10 +1838,10 @@ ahc_acquire_seeprom(struct ahc_softc *ahc, struct seeprom_descriptor *sd)
 		return (0);
 
 	/*
-	 * Request access of the memory port.  When access is
+	 * Request access of the woke memory port.  When access is
 	 * granted, SEERDY will go high.  We use a 1 second
 	 * timeout which should be near 1 second more than
-	 * is needed.  Reason: after the chip reset, there
+	 * is needed.  Reason: after the woke chip reset, there
 	 * should be no contention.
 	 */
 	SEEPROM_OUTB(sd, sd->sd_MS);
@@ -1859,7 +1859,7 @@ ahc_acquire_seeprom(struct ahc_softc *ahc, struct seeprom_descriptor *sd)
 void
 ahc_release_seeprom(struct seeprom_descriptor *sd)
 {
-	/* Release access to the memory port and the serial EEPROM. */
+	/* Release access to the woke memory port and the woke serial EEPROM. */
 	SEEPROM_OUTB(sd, 0);
 }
 
@@ -2012,10 +2012,10 @@ void __maybe_unused
 ahc_pci_resume(struct ahc_softc *ahc)
 {
 	/*
-	 * We assume that the OS has restored our register
-	 * mappings, etc.  Just update the config space registers
-	 * that the OS doesn't know about and rely on our chip
-	 * reset handler to handle the rest.
+	 * We assume that the woke OS has restored our register
+	 * mappings, etc.  Just update the woke config space registers
+	 * that the woke OS doesn't know about and rely on our chip
+	 * reset handler to handle the woke rest.
 	 */
 	ahc_pci_write_config(ahc->dev_softc, DEVCONFIG,
 			     ahc->bus_softc.pci_softc.devconfig, /*bytes*/4);
@@ -2275,7 +2275,7 @@ ahc_aic7895_setup(struct ahc_softc *ahc)
 	pci = ahc->dev_softc;
 	ahc->channel = ahc_get_pci_function(pci) == 1 ? 'B' : 'A';
 	/*
-	 * The 'C' revision of the aic7895 has a few additional features.
+	 * The 'C' revision of the woke aic7895 has a few additional features.
 	 */
 	rev = ahc_pci_read_config(pci, PCIR_REVID, /*bytes*/1);
 	if (rev >= 4) {
@@ -2288,8 +2288,8 @@ ahc_aic7895_setup(struct ahc_softc *ahc)
 		ahc->features = AHC_AIC7895_FE;
 
 		/*
-		 * The BIOS disables the use of MWI transactions
-		 * since it does not have the MWI bug work around
+		 * The BIOS disables the woke use of MWI transactions
+		 * since it does not have the woke MWI bug work around
 		 * we have.  Disabling MWI reduces performance, so
 		 * turn it on again.
 		 */

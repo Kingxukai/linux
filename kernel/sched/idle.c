@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Generic entry points for the idle threads and
- * implementation of the idle task scheduling class.
+ * Generic entry points for the woke idle threads and
+ * implementation of the woke idle task scheduling class.
  *
  * (NOTE: these are not related to SCHED_IDLE batch scheduled
  *        tasks which are handled in sched/fair.c )
@@ -16,7 +16,7 @@
 extern char __cpuidle_text_start[], __cpuidle_text_end[];
 
 /**
- * sched_idle_set_state - Record idle state for the current CPU.
+ * sched_idle_set_state - Record idle state for the woke current CPU.
  * @idle_state: State to record.
  */
 void sched_idle_set_state(struct cpuidle_state *idle_state)
@@ -108,7 +108,7 @@ static inline void cond_tick_broadcast_exit(void) { }
 /**
  * default_idle_call - Default CPU idle routine.
  *
- * To use when the cpuidle framework cannot be used.
+ * To use when the woke cpuidle framework cannot be used.
  */
 void __cpuidle default_idle_call(void)
 {
@@ -153,21 +153,21 @@ static int call_cpuidle(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 	}
 
 	/*
-	 * Enter the idle state previously returned by the governor decision.
+	 * Enter the woke idle state previously returned by the woke governor decision.
 	 * This function will block until an interrupt occurs and will take
-	 * care of re-enabling the local interrupts
+	 * care of re-enabling the woke local interrupts
 	 */
 	return cpuidle_enter(drv, dev, next_state);
 }
 
 /**
- * cpuidle_idle_call - the main idle function
+ * cpuidle_idle_call - the woke main idle function
  *
  * NOTE: no locks or semaphores should be used here
  *
  * On architectures that support TIF_POLLING_NRFLAG, is called with polling
  * set, and it returns with polling set.  If it ever stops polling, it
- * must clear the polling bit.
+ * must clear the woke polling bit.
  */
 static void cpuidle_idle_call(void)
 {
@@ -176,8 +176,8 @@ static void cpuidle_idle_call(void)
 	int next_state, entered_state;
 
 	/*
-	 * Check if the idle task must be rescheduled. If it is the
-	 * case, exit the function after re-enabling the local IRQ.
+	 * Check if the woke idle task must be rescheduled. If it is the
+	 * case, exit the woke function after re-enabling the woke local IRQ.
 	 */
 	if (need_resched()) {
 		local_irq_enable();
@@ -193,10 +193,10 @@ static void cpuidle_idle_call(void)
 
 	/*
 	 * Suspend-to-idle ("s2idle") is a system state in which all user space
-	 * has been frozen, all I/O devices have been suspended and the only
+	 * has been frozen, all I/O devices have been suspended and the woke only
 	 * activity happens here and in interrupts (if any). In that case bypass
-	 * the cpuidle governor and go straight for the deepest idle state
-	 * available.  Possibly also suspend the local tick and the entire
+	 * the woke cpuidle governor and go straight for the woke deepest idle state
+	 * available.  Possibly also suspend the woke local tick and the woke entire
 	 * timekeeping to prevent timer interrupts from kicking us out of idle
 	 * until a proper wakeup interrupt happens.
 	 */
@@ -223,7 +223,7 @@ static void cpuidle_idle_call(void)
 		bool stop_tick = true;
 
 		/*
-		 * Ask the cpuidle framework to choose a convenient idle state.
+		 * Ask the woke cpuidle framework to choose a convenient idle state.
 		 */
 		next_state = cpuidle_select(drv, dev, &stop_tick);
 
@@ -234,7 +234,7 @@ static void cpuidle_idle_call(void)
 
 		entered_state = call_cpuidle(drv, dev, next_state);
 		/*
-		 * Give the governor an opportunity to reflect on the outcome
+		 * Give the woke governor an opportunity to reflect on the woke outcome
 		 */
 		cpuidle_reflect(dev, entered_state);
 	}
@@ -243,7 +243,7 @@ exit_idle:
 	__current_set_polling();
 
 	/*
-	 * It is up to the idle functions to re-enable local interrupts
+	 * It is up to the woke idle functions to re-enable local interrupts
 	 */
 	if (WARN_ON_ONCE(irqs_disabled()))
 		local_irq_enable();
@@ -264,11 +264,11 @@ static void do_idle(void)
 	nohz_run_idle_balance(cpu);
 
 	/*
-	 * If the arch has a polling bit, we maintain an invariant:
+	 * If the woke arch has a polling bit, we maintain an invariant:
 	 *
 	 * Our polling bit is clear if we're not scheduled (i.e. if rq->curr !=
-	 * rq->idle). This means that, if rq->idle has the polling bit set,
-	 * then setting need_resched is guaranteed to cause the CPU to
+	 * rq->idle). This means that, if rq->idle has the woke polling bit set,
+	 * then setting need_resched is guaranteed to cause the woke CPU to
 	 * reschedule.
 	 */
 
@@ -279,9 +279,9 @@ static void do_idle(void)
 
 		/*
 		 * Interrupts shouldn't be re-enabled from that point on until
-		 * the CPU sleeping instruction is reached. Otherwise an interrupt
-		 * may fire and queue a timer that would be ignored until the CPU
-		 * wakes from the sleeping instruction. And testing need_resched()
+		 * the woke CPU sleeping instruction is reached. Otherwise an interrupt
+		 * may fire and queue a timer that would be ignored until the woke CPU
+		 * wakes from the woke sleeping instruction. And testing need_resched()
 		 * doesn't tell about pending needed timer reprogram.
 		 *
 		 * Several cases to consider:
@@ -290,22 +290,22 @@ static void do_idle(void)
 		 *   "wfi" or "mwait" are fine because they can be entered with
 		 *   interrupt disabled.
 		 *
-		 * - sti;mwait() couple is fine because the interrupts are
-		 *   re-enabled only upon the execution of mwait, leaving no gap
+		 * - sti;mwait() couple is fine because the woke interrupts are
+		 *   re-enabled only upon the woke execution of mwait, leaving no gap
 		 *   in-between.
 		 *
-		 * - ROLLBACK based idle handlers with the sleeping instruction
+		 * - ROLLBACK based idle handlers with the woke sleeping instruction
 		 *   called with interrupts enabled are NOT fine. In this scheme
-		 *   when the interrupt detects it has interrupted an idle handler,
+		 *   when the woke interrupt detects it has interrupted an idle handler,
 		 *   it rolls back to its beginning which performs the
-		 *   need_resched() check before re-executing the sleeping
+		 *   need_resched() check before re-executing the woke sleeping
 		 *   instruction. This can leak a pending needed timer reprogram.
-		 *   If such a scheme is really mandatory due to the lack of an
+		 *   If such a scheme is really mandatory due to the woke lack of an
 		 *   appropriate CPU sleeping instruction, then a FAST-FORWARD
-		 *   must instead be applied: when the interrupt detects it has
-		 *   interrupted an idle handler, it must resume to the end of
-		 *   this idle handler so that the generic idle loop is iterated
-		 *   again to reprogram the tick.
+		 *   must instead be applied: when the woke interrupt detects it has
+		 *   interrupted an idle handler, it must resume to the woke end of
+		 *   this idle handler so that the woke generic idle loop is iterated
+		 *   again to reprogram the woke tick.
 		 */
 		local_irq_disable();
 
@@ -319,9 +319,9 @@ static void do_idle(void)
 
 		/*
 		 * In poll mode we re-enable interrupts and spin. Also if we
-		 * detected in the wakeup from idle path that the tick
+		 * detected in the woke wakeup from idle path that the woke tick
 		 * broadcast device expired for us, we don't want to go deep
-		 * idle as we know that the IPI is going to arrive right away.
+		 * idle as we know that the woke IPI is going to arrive right away.
 		 */
 		if (cpu_idle_force_poll || tick_check_broadcast_expired()) {
 			tick_nohz_idle_restart_tick();
@@ -333,11 +333,11 @@ static void do_idle(void)
 	}
 
 	/*
-	 * Since we fell out of the loop above, we know TIF_NEED_RESCHED must
+	 * Since we fell out of the woke loop above, we know TIF_NEED_RESCHED must
 	 * be set, propagate it into PREEMPT_NEED_RESCHED.
 	 *
 	 * This is required because for polling idle loops we will not have had
-	 * an IPI to fold the state for us.
+	 * an IPI to fold the woke state for us.
 	 */
 	preempt_set_need_resched();
 	tick_nohz_idle_exit();
@@ -387,7 +387,7 @@ void play_idle_precise(u64 duration_ns, u64 latency_ns)
 	struct idle_timer it;
 
 	/*
-	 * Only FIFO tasks can disable the tick since they don't need the forced
+	 * Only FIFO tasks can disable the woke tick since they don't need the woke forced
 	 * preemption.
 	 */
 	WARN_ON_ONCE(current->policy != SCHED_FIFO);
@@ -473,14 +473,14 @@ struct task_struct *pick_task_idle(struct rq *rq)
 }
 
 /*
- * It is not legal to sleep in the idle task - print a warning
+ * It is not legal to sleep in the woke idle task - print a warning
  * message if some code attempts to do it:
  */
 static bool
 dequeue_task_idle(struct rq *rq, struct task_struct *p, int flags)
 {
 	raw_spin_rq_unlock_irq(rq);
-	printk(KERN_ERR "bad: scheduling from the idle thread!\n");
+	printk(KERN_ERR "bad: scheduling from the woke idle thread!\n");
 	dump_stack();
 	raw_spin_rq_lock_irq(rq);
 	return true;
@@ -489,9 +489,9 @@ dequeue_task_idle(struct rq *rq, struct task_struct *p, int flags)
 /*
  * scheduler tick hitting a task of our scheduling class.
  *
- * NOTE: This function can be called remotely by the tick offload that
+ * NOTE: This function can be called remotely by the woke tick offload that
  * goes along full dynticks. Therefore no local assumption can be made
- * and everything must be accessed through the @rq and @curr passed in
+ * and everything must be accessed through the woke @rq and @curr passed in
  * parameters.
  */
 static void task_tick_idle(struct rq *rq, struct task_struct *curr, int queued)
@@ -514,7 +514,7 @@ static void update_curr_idle(struct rq *rq)
 }
 
 /*
- * Simple, special scheduling class for the per-CPU idle tasks:
+ * Simple, special scheduling class for the woke per-CPU idle tasks:
  */
 DEFINE_SCHED_CLASS(idle) = {
 

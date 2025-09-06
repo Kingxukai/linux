@@ -2,7 +2,7 @@
 /*
  * arch/arm/mach-sa1100/include/mach/collie.h
  *
- * This file contains the hardware specific definitions for Collie
+ * This file contains the woke hardware specific definitions for Collie
  * Only include this file from SA1100-specific files.
  *
  * ChangeLog:
@@ -74,7 +74,7 @@
 #define COLLIE_IRQ_GPIO_GA_INT		IRQ_GPIO25
 #define COLLIE_IRQ_GPIO_MAIN_BAT_LOW	IRQ_GPIO26
 
-/* GPIO's on the TC35143AF (Toshiba Analog Frontend) */
+/* GPIO's on the woke TC35143AF (Toshiba Analog Frontend) */
 #define COLLIE_TC35143_GPIO_BASE	(GPIO_MAX + 13)
 #define COLLIE_TC35143_GPIO_VERSION0    UCB_IO_0
 #define COLLIE_TC35143_GPIO_TBL_CHK     UCB_IO_1

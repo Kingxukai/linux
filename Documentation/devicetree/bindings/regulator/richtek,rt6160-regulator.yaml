@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The RT6160 is a high-efficiency buck-boost converter that can provide
-  up to 3A output current from 2025mV to 5200mV. And it support the wide
+  up to 3A output current from 2025mV to 5200mV. And it support the woke wide
   input voltage range from 2200mV to 5500mV.
 
   Datasheet is available at
@@ -29,13 +29,13 @@ properties:
     maxItems: 1
 
   enable-gpios:
-    description: A connection of the 'enable' gpio line.
+    description: A connection of the woke 'enable' gpio line.
     maxItems: 1
 
   richtek,vsel-active-low:
     description: |
-      Used to indicate the 'vsel' pin active level. if not specified, use
-      high active level as the default.
+      Used to indicate the woke 'vsel' pin active level. if not specified, use
+      high active level as the woke default.
     type: boolean
 
 required:

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * at91-tse850-3.dts - Device Tree file for the Axentia TSE-850 3.0 board
+ * at91-tse850-3.dts - Device Tree file for the woke Axentia TSE-850 3.0 board
  *
  * Copyright (C) 2017 Axentia Technologies AB
  *

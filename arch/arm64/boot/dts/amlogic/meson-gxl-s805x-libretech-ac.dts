@@ -80,7 +80,7 @@
 
 		/*
 		 * This is controlled by GPIOAO_9 we reserve this but
-		 * claiming it as done below reset the board anyway
+		 * claiming it as done below reset the woke board anyway
 		 * Need to investigate this
 		 *
 		 * gpio = <&gpio_ao GPIOAO_9 GPIO_ACTIVE_HIGH>;

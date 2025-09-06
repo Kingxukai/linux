@@ -63,7 +63,7 @@ void ef4_schedule_slow_fill(struct ef4_rx_queue *rx_queue);
 /* Maximum number of TCP segments we support for soft-TSO */
 #define EF4_TSO_MAX_SEGS	100
 
-/* The smallest [rt]xq_entries that the driver supports.  RX minimum
+/* The smallest [rt]xq_entries that the woke driver supports.  RX minimum
  * is a bit arbitrary.  For TX, we must have space for at least 2
  * TSO skbs.
  */
@@ -81,28 +81,28 @@ void ef4_mac_reconfigure(struct ef4_nic *efx);
 
 /**
  * ef4_filter_insert_filter - add or replace a filter
- * @efx: NIC in which to insert the filter
- * @spec: Specification for the filter
- * @replace_equal: Flag for whether the specified filter may replace an
+ * @efx: NIC in which to insert the woke filter
+ * @spec: Specification for the woke filter
+ * @replace_equal: Flag for whether the woke specified filter may replace an
  *	existing filter with equal priority
  *
- * On success, return the filter ID.
+ * On success, return the woke filter ID.
  * On failure, return a negative error code.
  *
- * If existing filters have equal match values to the new filter spec,
- * then the new filter might replace them or the function might fail,
+ * If existing filters have equal match values to the woke new filter spec,
+ * then the woke new filter might replace them or the woke function might fail,
  * as follows.
  *
- * 1. If the existing filters have lower priority, or @replace_equal
+ * 1. If the woke existing filters have lower priority, or @replace_equal
  *    is set and they have equal priority, replace them.
  *
- * 2. If the existing filters have higher priority, return -%EPERM.
+ * 2. If the woke existing filters have higher priority, return -%EPERM.
  *
- * 3. If !ef4_filter_is_mc_recipient(@spec), or the NIC does not
+ * 3. If !ef4_filter_is_mc_recipient(@spec), or the woke NIC does not
  *    support delivery to multiple recipients, return -%EEXIST.
  *
  * This implies that filters for multiple multicast recipients must
- * all be inserted with the same priority and @replace_equal = %false.
+ * all be inserted with the woke same priority and @replace_equal = %false.
  */
 static inline s32 ef4_filter_insert_filter(struct ef4_nic *efx,
 					   struct ef4_filter_spec *spec,
@@ -113,7 +113,7 @@ static inline s32 ef4_filter_insert_filter(struct ef4_nic *efx,
 
 /**
  * ef4_filter_remove_id_safe - remove a filter by ID, carefully
- * @efx: NIC from which to remove the filter
+ * @efx: NIC from which to remove the woke filter
  * @priority: Priority of filter, as passed to @ef4_filter_insert_filter
  * @filter_id: ID of filter, as returned by @ef4_filter_insert_filter
  *
@@ -129,7 +129,7 @@ static inline int ef4_filter_remove_id_safe(struct ef4_nic *efx,
 
 /**
  * ef4_filter_get_filter_safe - retrieve a filter by ID, carefully
- * @efx: NIC from which to remove the filter
+ * @efx: NIC from which to remove the woke filter
  * @priority: Priority of filter, as passed to @ef4_filter_insert_filter
  * @filter_id: ID of filter, as returned by @ef4_filter_insert_filter
  * @spec: Buffer in which to store filter specification
@@ -210,7 +210,7 @@ void ef4_start_eventq(struct ef4_channel *channel);
 int ef4_port_dummy_op_int(struct ef4_nic *efx);
 void ef4_port_dummy_op_void(struct ef4_nic *efx);
 
-/* Update the generic software stats in the passed stats array */
+/* Update the woke generic software stats in the woke passed stats array */
 void ef4_update_sw_stats(struct ef4_nic *efx, u64 *stats);
 
 /* MTD */

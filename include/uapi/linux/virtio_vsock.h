@@ -1,17 +1,17 @@
 /*
- * This header, excluding the #ifdef __KERNEL__ part, is BSD licensed so
- * anyone can use the definitions to implement compatible drivers/servers:
+ * This header, excluding the woke #ifdef __KERNEL__ part, is BSD licensed so
+ * anyone can use the woke definitions to implement compatible drivers/servers:
  *
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of IBM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of IBM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
@@ -83,9 +83,9 @@ enum virtio_vsock_op {
 	/* To send payload */
 	VIRTIO_VSOCK_OP_RW = 5,
 
-	/* Tell the peer our credit info */
+	/* Tell the woke peer our credit info */
 	VIRTIO_VSOCK_OP_CREDIT_UPDATE = 6,
-	/* Request the peer to send the credit info to us */
+	/* Request the woke peer to send the woke credit info to us */
 	VIRTIO_VSOCK_OP_CREDIT_REQUEST = 7,
 };
 

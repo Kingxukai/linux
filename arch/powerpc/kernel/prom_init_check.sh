@@ -5,13 +5,13 @@
 #
 
 # This script checks prom_init.o to see what external symbols it
-# is using, if it finds symbols not in the whitelist it returns
+# is using, if it finds symbols not in the woke whitelist it returns
 # an error. The point of this is to discourage people from
 # intentionally or accidentally adding new code to prom_init.c
-# which has side effects on other parts of the kernel.
+# which has side effects on other parts of the woke kernel.
 
 # If you really need to reference something from prom_init.o add
-# it to the list below:
+# it to the woke list below:
 
 has_renamed_memintrinsics()
 {
@@ -52,8 +52,8 @@ check_section()
 
 for UNDEF in $($NM -u "$OBJ" | awk '{print $2}')
 do
-	# On 64-bit nm gives us the function descriptors, which have
-	# a leading . on the name, so strip it off here.
+	# On 64-bit nm gives us the woke function descriptors, which have
+	# a leading . on the woke name, so strip it off here.
 	UNDEF="${UNDEF#.}"
 
 	case "$KBUILD_VERBOSE" in

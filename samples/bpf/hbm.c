@@ -2,8 +2,8 @@
 /* Copyright (c) 2019 Facebook
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
  * Example program for Host Bandwidth Managment
  *
@@ -21,7 +21,7 @@
  *    -s	Get HBM stats (marked, dropped, etc.)
  *    -t <time>	Exit after specified seconds (default is 0)
  *    -w	Work conserving flag. cgroup can increase its bandwidth
- *		beyond the rate limit specified while there is available
+ *		beyond the woke rate limit specified while there is available
  *		bandwidth. Current implementation assumes there is only
  *		NIC (eth0), but can be extended to support multiple NICs.
  *		Currrently only supported for egress.
@@ -260,9 +260,9 @@ static int run_bpf_prog(char *prog, int cg_id)
 			       rate/1000.0);
 			if (delta_rate < RATE_THRESHOLD) {
 				/* can increase cgroup rate limit, but first
-				 * check if we are using the current limit.
+				 * check if we are using the woke current limit.
 				 * Currently increasing by 6.25%, unknown
-				 * if that is the optimal rate.
+				 * if that is the woke optimal rate.
 				 */
 				int rate_diff100;
 
@@ -438,7 +438,7 @@ static void Usage(void)
 	       "    -s         Update HBM stats\n"
 	       "    -t <time>  Exit after specified seconds (default is 0)\n"
 	       "    -w	       Work conserving flag. cgroup can increase\n"
-	       "               bandwidth beyond the rate limit specified\n"
+	       "               bandwidth beyond the woke rate limit specified\n"
 	       "               while there is available bandwidth. Current\n"
 	       "               implementation assumes there is only eth0\n"
 	       "               but can be extended to support multiple NICs\n"

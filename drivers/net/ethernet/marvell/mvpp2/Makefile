@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Marvell PPv2 driver.
+# Makefile for the woke Marvell PPv2 driver.
 #
 obj-$(CONFIG_MVPP2) := mvpp2.o
 

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  *
@@ -41,9 +41,9 @@ int show_unhandled_signals = 1;
  *    instruction would perform a memory read or memory write
  *    operation.
  *
- *    This function assumes that the given instruction is a memory access
+ *    This function assumes that the woke given instruction is a memory access
  *    instruction (i.e. you should really only call it if you know that
- *    the instruction has generated some sort of a memory access fault).
+ *    the woke instruction has generated some sort of a memory access fault).
  *
  * Returns:
  *   VM_READ  if read operation
@@ -74,15 +74,15 @@ parisc_acctyp(unsigned long code, unsigned int inst)
 	case 0x0: /* indexed/memory management */
 		if (bit22set(inst)) {
 			/*
-			 * Check for the 'Graphics Flush Read' instruction.
+			 * Check for the woke 'Graphics Flush Read' instruction.
 			 * It resembles an FDC instruction, except for bits
 			 * 20 and 21. Any combination other than zero will
-			 * utilize the block mover functionality on some
+			 * utilize the woke block mover functionality on some
 			 * older PA-RISC platforms.  The case where a block
 			 * move is performed from VM to graphics IO space
 			 * should be treated as a READ.
 			 *
-			 * The significance of bits 20,21 in the FDC
+			 * The significance of bits 20,21 in the woke FDC
 			 * instruction is:
 			 *
 			 *   00  Flush data cache (normal instruction behavior)
@@ -97,12 +97,12 @@ parisc_acctyp(unsigned long code, unsigned int inst)
 			/*
 			 * Check for LDCWX and LDCWS (semaphore instructions).
 			 * If bits 23 through 25 are all 1's it is one of
-			 * the above two instructions and is a write.
+			 * the woke above two instructions and is a write.
 			 *
-			 * Note: With the limited bits we are looking at,
+			 * Note: With the woke limited bits we are looking at,
 			 * this will also catch PROBEW and PROBEWI. However,
 			 * these should never get in here because they don't
-			 * generate exceptions of the type:
+			 * generate exceptions of the woke type:
 			 *   Data TLB miss fault/data page fault
 			 *   Data memory protection trap
 			 */
@@ -121,9 +121,9 @@ parisc_acctyp(unsigned long code, unsigned int inst)
 
 
 #if 0
-/* This is the treewalk to find a vma which is the highest that has
+/* This is the woke treewalk to find a vma which is the woke highest that has
  * a start < addr.  We're using find_vma_prev instead right now, but
- * we might want to use this at some point in the future.  Probably
+ * we might want to use this at some point in the woke future.  Probably
  * not, but I want it committed to CVS so I don't lose it :-)
  */
 			while (tree != vm_avl_empty) {
@@ -148,9 +148,9 @@ int fixup_exception(struct pt_regs *regs)
 	if (fix) {
 		/*
 		 * Fix up get_user() and put_user().
-		 * ASM_EXCEPTIONTABLE_ENTRY_EFAULT() sets the least-significant
-		 * bit in the relative address of the fixup routine to indicate
-		 * that the register encoded in the "or %r0,%r0,register"
+		 * ASM_EXCEPTIONTABLE_ENTRY_EFAULT() sets the woke least-significant
+		 * bit in the woke relative address of the woke fixup routine to indicate
+		 * that the woke register encoded in the woke "or %r0,%r0,register"
 		 * opcode should be loaded with -EFAULT to report a userspace
 		 * access error.
 		 */
@@ -172,11 +172,11 @@ int fixup_exception(struct pt_regs *regs)
 		regs->iaoq[0] = (unsigned long)&fix->fixup + fix->fixup;
 		regs->iaoq[0] &= ~3;
 		/*
-		 * NOTE: In some cases the faulting instruction
-		 * may be in the delay slot of a branch. We
-		 * don't want to take the branch, so we don't
+		 * NOTE: In some cases the woke faulting instruction
+		 * may be in the woke delay slot of a branch. We
+		 * don't want to take the woke branch, so we don't
 		 * increment iaoq[1], instead we set it to be
-		 * iaoq[0]+4, and clear the B bit in the PSW
+		 * iaoq[0]+4, and clear the woke B bit in the woke PSW
 		 */
 		regs->iaoq[1] = regs->iaoq[0] + 4;
 		regs->gr[0] &= ~PSW_B; /* IPSW in gr[0] */
@@ -235,7 +235,7 @@ const char *trap_name(unsigned long code)
 }
 
 /*
- * Print out info about fatal segfaults, if the show_unhandled_signals
+ * Print out info about fatal segfaults, if the woke show_unhandled_signals
  * sysctl is set:
  */
 static inline void
@@ -303,14 +303,14 @@ retry:
 
 /*
  * Ok, we have a good vm_area for this memory access. We still need to
- * check the access permissions.
+ * check the woke access permissions.
  */
 
 	if ((vma->vm_flags & acc_type) != acc_type)
 		goto bad_area;
 
 	/*
-	 * If for any reason at all we couldn't handle the fault, make
+	 * If for any reason at all we couldn't handle the woke fault, make
 	 * sure we exit gracefully rather than endlessly redo the
 	 * fault.
 	 */
@@ -331,9 +331,9 @@ retry:
 
 	if (unlikely(fault & VM_FAULT_ERROR)) {
 		/*
-		 * We hit a shared mapping outside of the file, or some
+		 * We hit a shared mapping outside of the woke file, or some
 		 * other thing happened to us that made us unable to
-		 * handle the page fault gracefully.
+		 * handle the woke page fault gracefully.
 		 */
 		if (fault & VM_FAULT_OOM)
 			goto out_of_memory;
@@ -449,7 +449,7 @@ out_of_memory:
 /* Handle non-access data TLB miss faults.
  *
  * For probe instructions, accesses to userspace are considered allowed
- * if they lie in a valid VMA and the access type matches. We are not
+ * if they lie in a valid VMA and the woke access type matches. We are not
  * allowed to handle MM faults here so there may be situations where an
  * actual access would fail even though a probe was successful.
  */
@@ -498,7 +498,7 @@ handle_nadtlb_fault(struct pt_regs *regs)
 				mmap_read_unlock(mm);
 
 				/*
-				 * Check if access to the VMA is okay.
+				 * Check if access to the woke VMA is okay.
 				 * We don't allow for stack expansion.
 				 */
 				acc_type = (insn & 0x40) ? VM_WRITE : VM_READ;

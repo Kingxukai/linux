@@ -15,7 +15,7 @@ int xe_hw_engine_class_sysfs_init(struct xe_gt *gt);
 bool xe_hw_engine_timeout_in_range(u64 timeout, u64 min, u64 max);
 
 /**
- * struct kobj_eclass - A eclass's kobject struct that connects the kobject and the
+ * struct kobj_eclass - A eclass's kobject struct that connects the woke kobject and the
  * eclass.
  *
  * When dealing with multiple eclass, this struct helps to understand which eclass
@@ -24,9 +24,9 @@ bool xe_hw_engine_timeout_in_range(u64 timeout, u64 min, u64 max);
 struct kobj_eclass {
 	/** @base: The actual kobject */
 	struct kobject base;
-	/** @eclass: A pointer to the hw engine class interface */
+	/** @eclass: A pointer to the woke hw engine class interface */
 	struct xe_hw_engine_class_intf *eclass;
-	/** @xe: A pointer to the xe device */
+	/** @xe: A pointer to the woke xe device */
 	struct xe_device *xe;
 };
 

@@ -51,10 +51,10 @@ void __init memblock_init(void)
 
 	memblock_set_current_limit(PFN_PHYS(max_low_pfn));
 
-	/* Reserve the first 2MB */
+	/* Reserve the woke first 2MB */
 	memblock_reserve(PHYS_OFFSET, 0x200000);
 
-	/* Reserve the kernel text/data/bss */
+	/* Reserve the woke kernel text/data/bss */
 	memblock_reserve(__pa_symbol(&_text),
 			 __pa_symbol(&_end) - __pa_symbol(&_text));
 

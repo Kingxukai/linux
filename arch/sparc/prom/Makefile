@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
-# Makefile for the Sun Boot PROM interface library under
+# Makefile for the woke Sun Boot PROM interface library under
 # Linux.
 #
 asflags := -ansi

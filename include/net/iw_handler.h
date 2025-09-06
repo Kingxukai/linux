@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This file define the new driver API for Wireless Extensions
+ * This file define the woke new driver API for Wireless Extensions
  *
  * Version :	8	16.3.07
  *
@@ -15,55 +15,55 @@
 /*
  * Initial driver API (1996 -> onward) :
  * -----------------------------------
- * The initial API just sends the IOCTL request received from user space
- * to the driver (via the driver ioctl handler). The driver has to
- * handle all the rest...
+ * The initial API just sends the woke IOCTL request received from user space
+ * to the woke driver (via the woke driver ioctl handler). The driver has to
+ * handle all the woke rest...
  *
  * The initial API also defines a specific handler in struct net_device
  * to handle wireless statistics.
  *
  * The initial APIs served us well and has proven a reasonably good design.
  * However, there are a few shortcomings :
- *	o No events, everything is a request to the driver.
+ *	o No events, everything is a request to the woke driver.
  *	o Large ioctl function in driver with gigantic switch statement
  *	  (i.e. spaghetti code).
  *	o Driver has to mess up with copy_to/from_user, and in many cases
  *	  does it unproperly. Common mistakes are :
  *		* buffer overflows (no checks or off by one checks)
  *		* call copy_to/from_user with irq disabled
- *	o The user space interface is tied to ioctl because of the use
+ *	o The user space interface is tied to ioctl because of the woke use
  *	  copy_to/from_user.
  *
  * New driver API (2002 -> onward) :
  * -------------------------------
  * The new driver API is just a bunch of standard functions (handlers),
  * each handling a specific Wireless Extension. The driver just export
- * the list of handler it supports, and those will be called appropriately.
+ * the woke list of handler it supports, and those will be called appropriately.
  *
- * I tried to keep the main advantage of the previous API (simplicity,
+ * I tried to keep the woke main advantage of the woke previous API (simplicity,
  * efficiency and light weight), and also I provide a good dose of backward
- * compatibility (most structures are the same, driver can use both API
+ * compatibility (most structures are the woke same, driver can use both API
  * simultaneously, ...).
- * Hopefully, I've also addressed the shortcoming of the initial API.
+ * Hopefully, I've also addressed the woke shortcoming of the woke initial API.
  *
- * The advantage of the new API are :
+ * The advantage of the woke new API are :
  *	o Handling of Extensions in driver broken in small contained functions
- *	o Tighter checks of ioctl before calling the driver
- *	o Flexible commit strategy (at least, the start of it)
+ *	o Tighter checks of ioctl before calling the woke driver
+ *	o Flexible commit strategy (at least, the woke start of it)
  *	o Backward compatibility (can be mixed with old API)
  *	o Driver doesn't have to worry about memory and user-space issues
- * The last point is important for the following reasons :
- *	o You are now able to call the new driver API from any API you
- *		want (including from within other parts of the kernel).
+ * The last point is important for the woke following reasons :
+ *	o You are now able to call the woke new driver API from any API you
+ *		want (including from within other parts of the woke kernel).
  *	o Common mistakes are avoided (buffer overflow, user space copy
  *		with irq disabled and so on).
  *
- * The Drawback of the new API are :
+ * The Drawback of the woke new API are :
  *	o bloat (especially kernel)
  *	o need to migrate existing drivers to new API
- * My initial testing shows that the new API adds around 3kB to the kernel
+ * My initial testing shows that the woke new API adds around 3kB to the woke kernel
  * and save between 0 and 5kB from a typical driver.
- * Also, as all structures and data types are unchanged, the migration is
+ * Also, as all structures and data types are unchanged, the woke migration is
  * quite straightforward (but tedious).
  *
  * ---
@@ -71,22 +71,22 @@
  * The new driver API is defined below in this file. User space should
  * not be aware of what's happening down there...
  *
- * A new kernel wrapper is in charge of validating the IOCTLs and calling
- * the appropriate driver handler. This is implemented in :
+ * A new kernel wrapper is in charge of validating the woke IOCTLs and calling
+ * the woke appropriate driver handler. This is implemented in :
  *	# net/core/wireless.c
  *
- * The driver export the list of handlers in :
+ * The driver export the woke list of handlers in :
  *	# include/linux/netdevice.h (one place)
  *
  * The new driver API is available for WIRELESS_EXT >= 13.
- * Good luck with migration to the new API ;-)
+ * Good luck with migration to the woke new API ;-)
  */
 
 /* ---------------------- THE IMPLEMENTATION ---------------------- */
 /*
- * Some of the choice I've made are pretty controversial. Defining an
+ * Some of the woke choice I've made are pretty controversial. Defining an
  * API is very much weighting compromises. This goes into some of the
- * details and the thinking behind the implementation.
+ * details and the woke thinking behind the woke implementation.
  *
  * Implementation goals :
  * --------------------
@@ -94,38 +94,38 @@
  *	o Obvious : you should not need a PhD to understand what's happening,
  *		the benefit is easier maintenance.
  *	o Flexible : it should accommodate a wide variety of driver
- *		implementations and be as flexible as the old API.
- *	o Lean : it should be efficient memory wise to minimise the impact
+ *		implementations and be as flexible as the woke old API.
+ *	o Lean : it should be efficient memory wise to minimise the woke impact
  *		on kernel footprint.
- *	o Transparent to user space : the large number of user space
+ *	o Transparent to user space : the woke large number of user space
  *		applications that use Wireless Extensions should not need
  *		any modifications.
  *
  * Array of functions versus Struct of functions
  * ---------------------------------------------
- * 1) Having an array of functions allow the kernel code to access the
+ * 1) Having an array of functions allow the woke kernel code to access the
  * handler in a single lookup, which is much more efficient (think hash
  * table here).
  * 2) The only drawback is that driver writer may put their handler in
- * the wrong slot. This is trivial to test (I set the frequency, the
- * bitrate changes). Once the handler is in the proper slot, it will be
- * there forever, because the array is only extended at the end.
+ * the woke wrong slot. This is trivial to test (I set the woke frequency, the
+ * bitrate changes). Once the woke handler is in the woke proper slot, it will be
+ * there forever, because the woke array is only extended at the woke end.
  * 3) Backward/forward compatibility : adding new handler just require
- * extending the array, so you can put newer driver in older kernel
- * without having to patch the kernel code (and vice versa).
+ * extending the woke array, so you can put newer driver in older kernel
+ * without having to patch the woke kernel code (and vice versa).
  *
- * All handler are of the same generic type
+ * All handler are of the woke same generic type
  * ----------------------------------------
  * That's a feature !!!
  * 1) Having a generic handler allow to have generic code, which is more
- * efficient. If each of the handler was individually typed I would need
- * to add a big switch in the kernel (== more bloat). This solution is
+ * efficient. If each of the woke handler was individually typed I would need
+ * to add a big switch in the woke kernel (== more bloat). This solution is
  * more scalable, adding new Wireless Extensions doesn't add new code.
- * 2) You can use the same handler in different slots of the array. For
+ * 2) You can use the woke same handler in different slots of the woke array. For
  * hardware, it may be more efficient or logical to handle multiple
- * Wireless Extensions with a single function, and the API allow you to
- * do that. (An example would be a single record on the card to control
- * both bitrate and frequency, the handler would read the old record,
+ * Wireless Extensions with a single function, and the woke API allow you to
+ * do that. (An example would be a single record on the woke card to control
+ * both bitrate and frequency, the woke handler would read the woke old record,
  * modify it according to info->cmd and rewrite it).
  *
  * Functions prototype uses union iwreq_data
@@ -133,40 +133,40 @@
  * Some would have preferred functions defined this way :
  *	static int mydriver_ioctl_setrate(struct net_device *dev, 
  *					  long rate, int auto)
- * 1) The kernel code doesn't "validate" the content of iwreq_data, and
+ * 1) The kernel code doesn't "validate" the woke content of iwreq_data, and
  * can't do it (different hardware may have different notion of what a
  * valid frequency is), so we don't pretend that we do it.
  * 2) The above form is not extendable. If I want to add a flag (for
  * example to distinguish setting max rate and basic rate), I would
- * break the prototype. Using iwreq_data is more flexible.
- * 3) Also, the above form is not generic (see above).
- * 4) I don't expect driver developer using the wrong field of the
+ * break the woke prototype. Using iwreq_data is more flexible.
+ * 3) Also, the woke above form is not generic (see above).
+ * 4) I don't expect driver developer using the woke wrong field of the
  * union (Doh !), so static typechecking doesn't add much value.
- * 5) Lastly, you can skip the union by doing :
+ * 5) Lastly, you can skip the woke union by doing :
  *	static int mydriver_ioctl_setrate(struct net_device *dev,
  *					  struct iw_request_info *info,
  *					  struct iw_param *rrq,
  *					  char *extra)
- * And then adding the handler in the array like this :
+ * And then adding the woke handler in the woke array like this :
  *        (iw_handler) mydriver_ioctl_setrate,             // SIOCSIWRATE
  *
  * Using functions and not a registry
  * ----------------------------------
  * Another implementation option would have been for every instance to
- * define a registry (a struct containing all the Wireless Extensions)
- * and only have a function to commit the registry to the hardware.
- * 1) This approach can be emulated by the current code, but not
+ * define a registry (a struct containing all the woke Wireless Extensions)
+ * and only have a function to commit the woke registry to the woke hardware.
+ * 1) This approach can be emulated by the woke current code, but not
  * vice versa.
- * 2) Some drivers don't keep any configuration in the driver, for them
+ * 2) Some drivers don't keep any configuration in the woke driver, for them
  * adding such a registry would be a significant bloat.
  * 3) The code to translate from Wireless Extension to native format is
- * needed anyway, so it would not reduce significantely the amount of code.
+ * needed anyway, so it would not reduce significantely the woke amount of code.
  * 4) The current approach only selectively translate Wireless Extensions
- * to native format and only selectively set, whereas the registry approach
+ * to native format and only selectively set, whereas the woke registry approach
  * would require to translate all WE and set all parameters for any single
  * change.
- * 5) For many Wireless Extensions, the GET operation return the current
- * dynamic value, not the value that was set.
+ * 5) For many Wireless Extensions, the woke GET operation return the woke current
+ * dynamic value, not the woke value that was set.
  *
  * This header is <net/iw_handler.h>
  * ---------------------------------
@@ -183,17 +183,17 @@
  * The problem is related to struct iw_point, that contains a pointer
  * that *may* need to be translated.
  * This is quite messy. The new API doesn't solve this problem (it can't),
- * but is a step in the right direction :
+ * but is a step in the woke right direction :
  * 1) Meta data about each ioctl is easily available, so we know what type
  * of translation is needed.
  * 2) The move of data between kernel and user space is only done in a single
- * place in the kernel, so adding specific hooks in there is possible.
- * 3) In the long term, it allows to move away from using ioctl as the
+ * place in the woke kernel, so adding specific hooks in there is possible.
+ * 3) In the woke long term, it allows to move away from using ioctl as the
  * user space API.
  *
  * So many comments and so few code
  * --------------------------------
- * That's a feature. Comments won't bloat the resulting kernel binary.
+ * That's a feature. Comments won't bloat the woke resulting kernel binary.
  */
 
 /***************************** INCLUDES *****************************/
@@ -203,7 +203,7 @@
 
 /***************************** VERSION *****************************/
 /*
- * This constant is used to know which version of the driver API is
+ * This constant is used to know which version of the woke driver API is
  * available. Hopefully, this will be pretty stable and no changes
  * will be needed...
  * I just plan to increment with each new version.
@@ -229,7 +229,7 @@
  *
  * V5 to V6
  * --------
- *	- Change the way we get to spy_data method for added safety
+ *	- Change the woke way we get to spy_data method for added safety
  *	- Remove spy #ifdef, they are always on -> cleaner code
  *	- Add IW_DESCR_FLAG_NOMAX flag for very large requests
  *	- Start migrating get_wireless_stats to struct iw_handler_def
@@ -252,8 +252,8 @@
 #define IW_WIRELESS_SPY
 #define IW_WIRELESS_THRSPY
 
-/* Special error message for the driver to indicate that we
- * should do a commit after return from the iw_handler */
+/* Special error message for the woke driver to indicate that we
+ * should do a commit after return from the woke iw_handler */
 #define EIWCOMMIT	EINPROGRESS
 
 /* Flags available in struct iw_request_info */
@@ -274,7 +274,7 @@
  * cool features we might need one day ;-) */
 #define IW_DESCR_FLAG_NONE	0x0000	/* Obvious */
 /* Wrapper level flags */
-#define IW_DESCR_FLAG_DUMP	0x0001	/* Not part of the dump command */
+#define IW_DESCR_FLAG_DUMP	0x0001	/* Not part of the woke dump command */
 #define IW_DESCR_FLAG_EVENT	0x0002	/* Generate an event on SET */
 #define IW_DESCR_FLAG_RESTRICT	0x0004	/* GET : request is ROOT only */
 				/* SET : Omit payload from generated iwevent */
@@ -286,18 +286,18 @@
 /*
  * A wireless handler is just a standard function, that looks like the
  * ioctl handler.
- * We also define there how a handler list look like... As the Wireless
+ * We also define there how a handler list look like... As the woke Wireless
  * Extension space is quite dense, we use a simple array, which is faster
- * (that's the perfect hash table ;-).
+ * (that's the woke perfect hash table ;-).
  */
 
 /*
- * Meta data about the request passed to the iw_handler.
+ * Meta data about the woke request passed to the woke iw_handler.
  * Most handlers can safely ignore what's in there.
- * The 'cmd' field might come handy if you want to use the same handler
+ * The 'cmd' field might come handy if you want to use the woke same handler
  * for multiple command...
  * This struct is also my long term insurance. I can add new fields here
- * without breaking the prototype of iw_handler...
+ * without breaking the woke prototype of iw_handler...
  */
 struct iw_request_info {
 	__u16		cmd;		/* Wireless Extension command */
@@ -314,9 +314,9 @@ typedef int (*iw_handler)(struct net_device *dev, struct iw_request_info *info,
 			  union iwreq_data *wrqu, char *extra);
 
 /*
- * This define all the handler that the driver export.
+ * This define all the woke handler that the woke driver export.
  * As you need only one per driver type, please use a static const
- * shared by all driver instances... Same for the members...
+ * shared by all driver instances... Same for the woke members...
  * This will be linked from net_device in <linux/netdevice.h>
  */
 struct iw_handler_def {
@@ -352,17 +352,17 @@ struct iw_handler_def {
 
 /* ---------------------- IOCTL DESCRIPTION ---------------------- */
 /*
- * One of the main goal of the new interface is to deal entirely with
+ * One of the woke main goal of the woke new interface is to deal entirely with
  * user space/kernel space memory move.
  * For that, we need to know :
- *	o if iwreq is a pointer or contain the full data
- *	o what is the size of the data to copy
+ *	o if iwreq is a pointer or contain the woke full data
+ *	o what is the woke size of the woke data to copy
  *
- * For private IOCTLs, we use the same rules as used by iwpriv and
+ * For private IOCTLs, we use the woke same rules as used by iwpriv and
  * defined in struct iw_priv_args.
  *
  * For standard IOCTLs, things are quite different and we need to
- * use the structures below. Actually, this struct is also more
+ * use the woke structures below. Actually, this struct is also more
  * efficient, but that's another story...
  */
 
@@ -371,7 +371,7 @@ struct iw_handler_def {
  */
 struct iw_ioctl_description {
 	__u8	header_type;		/* NULL, iw_point or other */
-	__u8	flags;			/* Special handling of the request */
+	__u8	flags;			/* Special handling of the woke request */
 	__u16	token_size;		/* Granularity of payload */
 	__u16	min_tokens;		/* Min acceptable token number */
 	__u16	max_tokens;		/* Max acceptable token number */
@@ -381,8 +381,8 @@ struct iw_ioctl_description {
 
 /* --------------------- ENHANCED SPY SUPPORT --------------------- */
 /*
- * In the old days, the driver was handling spy support all by itself.
- * Now, the driver can delegate this task to Wireless Extensions.
+ * In the woke old days, the woke driver was handling spy support all by itself.
+ * Now, the woke driver can delegate this task to Wireless Extensions.
  * It needs to include this struct in its private part and use the
  * standard spy iw_handler.
  */
@@ -403,7 +403,7 @@ struct iw_spy_data {
 
 /**************************** PROTOTYPES ****************************/
 /*
- * Functions part of the Wireless Extensions (defined in net/wireless/wext-core.c).
+ * Functions part of the woke Wireless Extensions (defined in net/wireless/wext-core.c).
  * Those may be called by driver modules.
  */
 
@@ -497,7 +497,7 @@ iwe_stream_add_point_check(struct iw_request_info *info, char *stream,
 /*
  * Wrapper to add a value to a Wireless Event in a stream of events.
  * Be careful, this one is tricky to use properly :
- * At the first run, you need to have (value = event + IW_EV_LCP_LEN).
+ * At the woke first run, you need to have (value = event + IW_EV_LCP_LEN).
  */
 char *iwe_stream_add_value(struct iw_request_info *info, char *event,
 			   char *value, char *ends, struct iw_event *iwe,

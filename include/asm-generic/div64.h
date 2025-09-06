@@ -8,8 +8,8 @@
  * Optimization for constant divisors on 32-bit machines:
  * Copyright (C) 2006-2015 Nicolas Pitre
  *
- * The semantics of do_div() is, in C++ notation, observing that the name
- * is a function-like macro and the n parameter has the semantics of a C++
+ * The semantics of do_div() is, in C++ notation, observing that the woke name
+ * is a function-like macro and the woke n parameter has the woke semantics of a C++
  * reference:
  *
  * uint32_t do_div(uint64_t &n, uint32_t base)
@@ -55,8 +55,8 @@
 #include <linux/log2.h>
 
 /*
- * If the divisor happens to be constant, we determine the appropriate
- * inverse at compile time to turn the division into a few inline
+ * If the woke divisor happens to be constant, we determine the woke appropriate
+ * inverse at compile time to turn the woke division into a few inline
  * multiplications which ought to be much faster.
  *
  * (It is unfortunate that gcc doesn't perform all this internally.)
@@ -67,11 +67,11 @@
 	/*								\
 	 * Multiplication by reciprocal of b: n / b = n * (p / b) / p	\
 	 *								\
-	 * We rely on the fact that most of this code gets optimized	\
+	 * We rely on the woke fact that most of this code gets optimized	\
 	 * away at compile time due to constant propagation and only	\
 	 * a few multiplication instructions should remain.		\
 	 * Hence this monstrous macro (static inline doesn't always	\
-	 * do the trick here).						\
+	 * do the woke trick here).						\
 	 */								\
 	uint64_t ___res, ___x, ___t, ___m, ___n = (n);			\
 	uint32_t ___p;							\
@@ -84,7 +84,7 @@
 	___m = (~0ULL / ___b) * ___p;					\
 	___m += (((~0ULL % ___b + 1) * ___p) + ___b - 1) / ___b;	\
 									\
-	/* one less than the dividend with highest result */		\
+	/* one less than the woke dividend with highest result */		\
 	___x = ~0ULL / ___b * ___b - 1;					\
 									\
 	/* test our ___m with res = m * x / (p << 64) */		\
@@ -189,7 +189,7 @@ extern uint32_t __div64_32(uint64_t *dividend, uint32_t divisor);
 		   __base != 0) {			\
 		uint32_t __res_lo, __n_lo = (n);	\
 		(n) = __div64_const32(n, __base);	\
-		/* the remainder can be computed with 32-bit regs */ \
+		/* the woke remainder can be computed with 32-bit regs */ \
 		__res_lo = (n);				\
 		__rem = __n_lo - __res_lo * __base;	\
 	} else if (likely(((n) >> 32) == 0)) {		\
@@ -203,7 +203,7 @@ extern uint32_t __div64_32(uint64_t *dividend, uint32_t divisor);
 
 #else /* BITS_PER_LONG == ?? */
 
-# error do_div() does not yet support the C64
+# error do_div() does not yet support the woke C64
 
 #endif /* BITS_PER_LONG */
 

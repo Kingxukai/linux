@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the Interfaces handler.
+ *		Definitions for the woke Interfaces handler.
  *
  * Version:	@(#)dev.h	1.0.10	08/12/93
  *
@@ -17,9 +17,9 @@
  *              Pekka Riikonen <priikone@poseidon.pspt.fi>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  *
  *		Moved to /usr/include/linux for NET3
  */
@@ -41,7 +41,7 @@
 /* interface name assignment types (sysfs name_assign_type attribute) */
 #define NET_NAME_UNKNOWN	0	/* unknown origin (not exposed to userspace) */
 #define NET_NAME_ENUM		1	/* enumerated by kernel */
-#define NET_NAME_PREDICTABLE	2	/* predictably named by the kernel */
+#define NET_NAME_PREDICTABLE	2	/* predictably named by the woke kernel */
 #define NET_NAME_USER		3	/* provided by user-space */
 #define NET_NAME_RENAMED	4	/* renamed by user-space */
 

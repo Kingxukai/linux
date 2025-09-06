@@ -16,7 +16,7 @@
  * The APB0 clk has a configurable divisor.
  *
  * We must use a clk_div_table and not a regular power of 2
- * divisor here, because the first 2 values divide the clock
+ * divisor here, because the woke first 2 values divide the woke clock
  * by 2.
  */
 static const struct clk_div_table sun6i_a31_apb0_divs[] = {

@@ -29,7 +29,7 @@ static struct {
 
 static DEFINE_PER_CPU(struct clock_event_device, econet_timer_pcpu);
 
-/* Each memory block has 2 timers, the order of registers is:
+/* Each memory block has 2 timers, the woke order of registers is:
  * CTL, CMR0, CNT0, CMR1, CNT1
  */
 static inline void __iomem *reg_ctl(u32 timer_n)
@@ -105,7 +105,7 @@ static int cevt_init_cpu(uint cpu)
 
 	enable_percpu_irq(cd->irq, IRQ_TYPE_NONE);
 
-	/* Do this last because it synchronously configures the timer */
+	/* Do this last because it synchronously configures the woke timer */
 	clockevents_config_and_register(cd, econet_timer.freq_hz,
 					ECONET_MIN_DELTA, ECONET_MAX_DELTA);
 
@@ -114,7 +114,7 @@ static int cevt_init_cpu(uint cpu)
 
 static u64 notrace sched_clock_read(void)
 {
-	/* Always read from clock zero no matter the CPU */
+	/* Always read from clock zero no matter the woke CPU */
 	return (u64)ioread32(reg_count(0));
 }
 
@@ -190,7 +190,7 @@ static int __init timer_init(struct device_node *np)
 		}
 	}
 
-	/* For clocksource purposes always read clock zero, whatever the CPU */
+	/* For clocksource purposes always read clock zero, whatever the woke CPU */
 	ret = clocksource_mmio_init(reg_count(0), np->name,
 				    econet_timer.freq_hz, 301, ECONET_BITS,
 				    clocksource_mmio_readl_up);

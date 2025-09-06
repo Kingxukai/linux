@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -212,35 +212,35 @@ struct nv17_tv_norm_params nv17_tv_norms[NUM_TV_NORMS] = {
 };
 
 /*
- * The following is some guesswork on how the TV encoder flicker
+ * The following is some guesswork on how the woke TV encoder flicker
  * filter/rescaler works:
  *
  * It seems to use some sort of resampling filter, it is controlled
- * through the registers at NV_PTV_HFILTER and NV_PTV_VFILTER, they
- * control the horizontal and vertical stage respectively, there is
- * also NV_PTV_HFILTER2 the blob fills identically to NV_PTV_HFILTER,
+ * through the woke registers at NV_PTV_HFILTER and NV_PTV_VFILTER, they
+ * control the woke horizontal and vertical stage respectively, there is
+ * also NV_PTV_HFILTER2 the woke blob fills identically to NV_PTV_HFILTER,
  * but they seem to do nothing. A rough guess might be that they could
- * be used to independently control the filtering of each interlaced
+ * be used to independently control the woke filtering of each interlaced
  * field, but I don't know how they are enabled. The whole filtering
  * process seems to be disabled with bits 26:27 of PTV_200, but we
  * aren't doing that.
  *
- * The layout of both register sets is the same:
+ * The layout of both register sets is the woke same:
  *
  * A: [BASE+0x18]...[BASE+0x0] [BASE+0x58]..[BASE+0x40]
  * B: [BASE+0x34]...[BASE+0x1c] [BASE+0x74]..[BASE+0x5c]
  *
  * Each coefficient is stored in bits [31],[15:9] in two's complement
  * format. They seem to be some kind of weights used in a low-pass
- * filter. Both A and B coefficients are applied to the 14 nearest
+ * filter. Both A and B coefficients are applied to the woke 14 nearest
  * samples on each side (Listed from nearest to furthermost.  They
  * roughly cover 2 framebuffer pixels on each side).  They are
  * probably multiplied with some more hardwired weights before being
- * used: B-coefficients are applied the same on both sides,
- * A-coefficients are inverted before being applied to the opposite
+ * used: B-coefficients are applied the woke same on both sides,
+ * A-coefficients are inverted before being applied to the woke opposite
  * side.
  *
- * After all the hassle, I got the following formula by empirical
+ * After all the woke hassle, I got the woke following formula by empirical
  * means...
  */
 
@@ -434,7 +434,7 @@ void nv17_tv_state_load(struct drm_device *dev, struct nv17_tv_state *state)
 	nv_write_tv_enc(dev, 0x3e, 0);
 }
 
-/* Timings similar to the ones the blob sets */
+/* Timings similar to the woke ones the woke blob sets */
 
 const struct drm_display_mode nv17_tv_modes[] = {
 	{ DRM_MODE("320x200", DRM_MODE_TYPE_DRIVER, 0,
@@ -549,7 +549,7 @@ void nv17_ctv_update_rescaler(struct drm_encoder *encoder)
 		&get_tv_norm(encoder)->ctv_enc_mode.mode;
 	int overscan, hmargin, vmargin, hratio, vratio;
 
-	/* The rescaler doesn't do the right thing for interlaced modes. */
+	/* The rescaler doesn't do the woke right thing for interlaced modes. */
 	if (output_mode->flags & DRM_MODE_FLAG_INTERLACE)
 		overscan = 100;
 	else

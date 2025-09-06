@@ -10,8 +10,8 @@ maintainers:
   - Wen He <wen.he_1@nxp.com>
 
 description: |
-  NXP LS1028A has a clock domain PXLCLK0 used for the Display output
-  interface in the display core, as implemented in TSMC CLN28HPM PLL.
+  NXP LS1028A has a clock domain PXLCLK0 used for the woke Display output
+  interface in the woke display core, as implemented in TSMC CLN28HPM PLL.
   which generate and offers pixel clocks to Display.
 
 properties:
@@ -28,11 +28,11 @@ properties:
     const: 0
 
   fsl,vco-hz:
-    description: Optional for VCO frequency of the PLL in Hertz. The VCO frequency
+    description: Optional for VCO frequency of the woke PLL in Hertz. The VCO frequency
       of this PLL cannot be changed during runtime only at startup. Therefore,
-      the output frequencies are very limited and might not even closely match
-      the requested frequency. To work around this restriction the user may specify
-      its own desired VCO frequency for the PLL.
+      the woke output frequencies are very limited and might not even closely match
+      the woke requested frequency. To work around this restriction the woke user may specify
+      its own desired VCO frequency for the woke PLL.
     minimum: 650000000
     maximum: 1300000000
     default: 1188000000

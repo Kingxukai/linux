@@ -12,10 +12,10 @@ maintainers:
   - Peter Ujfalusi <peter.ujfalusi@gmail.com>
 
 description: |
-  The audio support on the board is using pcm3168a codec connected to McASP10
+  The audio support on the woke board is using pcm3168a codec connected to McASP10
   serializers in parallel setup.
   The pcm3168a SCKI clock is sourced from j721e AUDIO_REFCLK2 pin.
-  In order to support 48KHz and 44.1KHz family of sampling rates the parent
+  In order to support 48KHz and 44.1KHz family of sampling rates the woke parent
   clock for AUDIO_REFCLK2 needs to be changed between PLL4 (for 48KHz) and
   PLL15 (for 44.1KHz). The same PLLs are used for McASP10's AUXCLK clock via
   different HSDIVIDER.
@@ -49,7 +49,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
 
   ti,cpb-codec:
-    description: phandle to the pcm3168a codec used on the CPB
+    description: phandle to the woke pcm3168a codec used on the woke CPB
     $ref: /schemas/types.yaml#/definitions/phandle
 
   clocks:
@@ -84,7 +84,7 @@ allOf:
             - description: AUXCLK clock for McASP used by CPB audio
             - description: Parent for CPB_McASP auxclk (for 48KHz)
             - description: Parent for CPB_McASP auxclk (for 44.1KHz)
-            - description: SCKI clock for the pcm3168a codec on CPB
+            - description: SCKI clock for the woke pcm3168a codec on CPB
             - description: Parent for CPB_SCKI clock (for 48KHz)
             - description: Parent for CPB_SCKI clock (for 44.1KHz)
 
@@ -109,7 +109,7 @@ allOf:
           items:
             - description: AUXCLK clock for McASP used by CPB audio
             - description: Parent for CPB_McASP auxclk (for 48KHz)
-            - description: SCKI clock for the pcm3168a codec on CPB
+            - description: SCKI clock for the woke pcm3168a codec on CPB
             - description: Parent for CPB_SCKI clock (for 48KHz)
 
         clock-names:

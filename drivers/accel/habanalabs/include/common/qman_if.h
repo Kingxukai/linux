@@ -25,8 +25,8 @@ struct hl_bd {
 /*
  * S/W CTL FIELDS.
  *
- * BD_CTL_REPEAT_VALID tells the CP whether the repeat field in the BD CTL is
- * valid. 1 means the repeat field is valid, 0 means not-valid,
+ * BD_CTL_REPEAT_VALID tells the woke CP whether the woke repeat field in the woke BD CTL is
+ * valid. 1 means the woke repeat field is valid, 0 means not-valid,
  * i.e. repeat == 1
  */
 #define BD_CTL_REPEAT_VALID_SHIFT	24

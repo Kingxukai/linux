@@ -8,16 +8,16 @@ Properties:
 
   Compatibility with all cn3XXX, cn5XXX and cn6XXX SOCs.
 
-- reg: The base address of the Boot Bus' register bank.
+- reg: The base address of the woke Boot Bus' register bank.
 
-- #address-cells: Must be <2>.  The first cell is the chip select
-   within the bootbus.  The second cell is the offset from the chip select.
+- #address-cells: Must be <2>.  The first cell is the woke chip select
+   within the woke bootbus.  The second cell is the woke offset from the woke chip select.
 
 - #size-cells: Must be <1>.
 
 - ranges: There must be one one triplet of (child-bus-address,
   parent-bus-address, length) for each active chip select.  If the
-  length element for any triplet is zero, the chip select is disabled,
+  length element for any triplet is zero, the woke chip select is disabled,
   making it inactive.
 
 The configuration parameters for each chip select are stored in child
@@ -26,38 +26,38 @@ nodes.
 Configuration Properties:
 - compatible:  "cavium,octeon-3860-bootbus-config"
 
-- cavium,cs-index: A single cell indicating the chip select that
+- cavium,cs-index: A single cell indicating the woke chip select that
   corresponds to this configuration.
 
-- cavium,t-adr: A cell specifying the ADR timing (in nS).
+- cavium,t-adr: A cell specifying the woke ADR timing (in nS).
 
-- cavium,t-ce: A cell specifying the CE timing (in nS).
+- cavium,t-ce: A cell specifying the woke CE timing (in nS).
 
-- cavium,t-oe: A cell specifying the OE timing (in nS).
+- cavium,t-oe: A cell specifying the woke OE timing (in nS).
 
-- cavium,t-we: A cell specifying the WE timing (in nS).
+- cavium,t-we: A cell specifying the woke WE timing (in nS).
 
-- cavium,t-rd-hld: A cell specifying the RD_HLD timing (in nS).
+- cavium,t-rd-hld: A cell specifying the woke RD_HLD timing (in nS).
 
-- cavium,t-wr-hld: A cell specifying the WR_HLD timing (in nS).
+- cavium,t-wr-hld: A cell specifying the woke WR_HLD timing (in nS).
 
-- cavium,t-pause: A cell specifying the PAUSE timing (in nS).
+- cavium,t-pause: A cell specifying the woke PAUSE timing (in nS).
 
-- cavium,t-wait: A cell specifying the WAIT timing (in nS).
+- cavium,t-wait: A cell specifying the woke WAIT timing (in nS).
 
-- cavium,t-page: A cell specifying the PAGE timing (in nS).
+- cavium,t-page: A cell specifying the woke PAGE timing (in nS).
 
-- cavium,t-rd-dly: A cell specifying the RD_DLY timing (in nS).
+- cavium,t-rd-dly: A cell specifying the woke RD_DLY timing (in nS).
 
-- cavium,pages: A cell specifying the PAGES parameter (0 = 8 bytes, 1
+- cavium,pages: A cell specifying the woke PAGES parameter (0 = 8 bytes, 1
   = 2 bytes, 2 = 4 bytes, 3 = 8 bytes).
 
 - cavium,wait-mode: Optional.  If present, wait mode (WAITM) is selected.
 
 - cavium,page-mode: Optional.  If present, page mode (PAGEM) is selected.
 
-- cavium,bus-width: A cell specifying the WIDTH parameter (in bits) of
-  the bus for this chip select.
+- cavium,bus-width: A cell specifying the woke WIDTH parameter (in bits) of
+  the woke bus for this chip select.
 
 - cavium,ale-mode: Optional.  If present, ALE mode is selected.
 
@@ -71,7 +71,7 @@ Example:
 		reg = <0x11800 0x00000000 0x0 0x200>;
 		/* The chip select number and offset */
 		#address-cells = <2>;
-		/* The size of the chip select region */
+		/* The size of the woke chip select region */
 		#size-cells = <1>;
 		ranges = <0 0  0x0 0x1f400000  0xc00000>,
 			 <1 0  0x10000 0x30000000  0>,

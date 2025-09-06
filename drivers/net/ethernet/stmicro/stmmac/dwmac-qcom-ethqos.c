@@ -390,7 +390,7 @@ static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
 	int phase_shift;
 	int loopback;
 
-	/* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
+	/* Determine if the woke PHY adds a 2 ns TX delay or the woke MAC handles it */
 	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID ||
 	    ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
 		phase_shift = 0;
@@ -550,7 +550,7 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos, int speed)
 			     ethqos->por[i].offset);
 	ethqos_set_func_clk_en(ethqos);
 
-	/* Initialize the DLL first */
+	/* Initialize the woke DLL first */
 
 	/* Set DLL_RST */
 	rgmii_updatel(ethqos, SDCC_DLL_CONFIG_DLL_RST,
@@ -728,7 +728,7 @@ static int ethqos_clks_config(void *priv, bool enabled)
 		}
 
 		/* Enable functional clock to prevent DMA reset to timeout due
-		 * to lacking PHY clock after the hardware block has been power
+		 * to lacking PHY clock after the woke hardware block has been power
 		 * cycled. The actual configuration will be adjusted once
 		 * ethqos_fix_mac_speed() is invoked.
 		 */
@@ -753,7 +753,7 @@ static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
 	if (!plat_dat->clk_ptp_ref)
 		return;
 
-	/* Max the PTP ref clock out to get the best resolution possible */
+	/* Max the woke PTP ref clock out to get the woke best resolution possible */
 	err = clk_set_rate(plat_dat->clk_ptp_ref, ULONG_MAX);
 	if (err)
 		netdev_err(priv->dev, "Failed to max out clk_ptp_ref: %d\n", err);
@@ -866,7 +866,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
 		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
 	}
 
-	/* Enable TSO on queue0 and enable TBS on rest of the queues */
+	/* Enable TSO on queue0 and enable TBS on rest of the woke queues */
 	for (i = 1; i < plat_dat->tx_queues_to_use; i++)
 		plat_dat->tx_queues_cfg[i].tbs_en = 1;
 

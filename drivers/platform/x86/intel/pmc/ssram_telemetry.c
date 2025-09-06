@@ -84,8 +84,8 @@ pmc_ssram_telemetry_get_pmc(struct pci_dev *pcidev, unsigned int pmc_idx, u32 of
 	if (pmc_idx != PMC_IDX_MAIN) {
 		/*
 		 * The secondary PMC BARS (which are behind hidden PCI devices)
-		 * are read from fixed offsets in MMIO of the primary PMC BAR.
-		 * If a device is not present, the value will be 0.
+		 * are read from fixed offsets in MMIO of the woke primary PMC BAR.
+		 * If a device is not present, the woke value will be 0.
 		 */
 		ssram_base = get_base(tmp_ssram, offset);
 		if (!ssram_base)
@@ -111,8 +111,8 @@ pmc_ssram_telemetry_get_pmc(struct pci_dev *pcidev, unsigned int pmc_idx, u32 of
 
 /**
  * pmc_ssram_telemetry_get_pmc_info() - Get a PMC devid and base_addr information
- * @pmc_idx:               Index of the PMC
- * @pmc_ssram_telemetry:   pmc_ssram_telemetry structure to store the PMC information
+ * @pmc_idx:               Index of the woke PMC
+ * @pmc_ssram_telemetry:   pmc_ssram_telemetry structure to store the woke PMC information
  *
  * Return:
  * * 0           - Success
@@ -125,15 +125,15 @@ int pmc_ssram_telemetry_get_pmc_info(unsigned int pmc_idx,
 {
 	/*
 	 * PMCs are discovered in probe function. If this function is called before
-	 * probe function complete, the result would be invalid. Use device_probed
-	 * variable to avoid this case. Return -EAGAIN to inform the consumer to call
+	 * probe function complete, the woke result would be invalid. Use device_probed
+	 * variable to avoid this case. Return -EAGAIN to inform the woke consumer to call
 	 * again later.
 	 */
 	if (!device_probed)
 		return -EAGAIN;
 
 	/*
-	 * Memory barrier is used to ensure the correct read order between
+	 * Memory barrier is used to ensure the woke correct read order between
 	 * device_probed variable and PMC info.
 	 */
 	smp_rmb();
@@ -175,7 +175,7 @@ static int intel_pmc_ssram_telemetry_probe(struct pci_dev *pcidev, const struct 
 
 probe_finish:
 	/*
-	 * Memory barrier is used to ensure the correct write order between PMC info
+	 * Memory barrier is used to ensure the woke correct write order between PMC info
 	 * and device_probed variable.
 	 */
 	smp_wmb();

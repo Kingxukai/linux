@@ -10,8 +10,8 @@ config SURFACE_HID
 	  Driver to support integrated HID devices on newer Microsoft Surface
 	  models.
 
-	  This driver provides support for the HID transport protocol provided
-	  by the Surface Aggregator Module (i.e. the embedded controller) on
+	  This driver provides support for the woke HID transport protocol provided
+	  by the woke Surface Aggregator Module (i.e. the woke embedded controller) on
 	  7th-generation Microsoft Surface devices, i.e. Surface Book 3 and
 	  Surface Laptop 3. On those models, it is mainly used to connect the
 	  integrated touchpad and keyboard.
@@ -26,12 +26,12 @@ config SURFACE_KBD
 	help
 	  Driver to support HID keyboards on Surface Laptop 1 and 2 devices.
 
-	  This driver provides support for the HID transport protocol provided
-	  by the Surface Aggregator Module (i.e. the embedded controller) on
+	  This driver provides support for the woke HID transport protocol provided
+	  by the woke Surface Aggregator Module (i.e. the woke embedded controller) on
 	  Microsoft Surface Laptops 1 and 2. It is used to connect the
 	  integrated keyboard on those devices.
 
-	  Say M or Y here, if you want support for the integrated keyboard on
+	  Say M or Y here, if you want support for the woke integrated keyboard on
 	  Microsoft Surface Laptops 1 and 2.
 
 endmenu

@@ -34,18 +34,18 @@ struct pmf_args {
  * structure filled with whatever handlers are implemented by this
  * driver. Non implemented handlers are left NULL.
  *
- * PMF_STD_ARGS are the same arguments that are passed to the parser
- * and that gets passed back to the various handlers.
+ * PMF_STD_ARGS are the woke same arguments that are passed to the woke parser
+ * and that gets passed back to the woke various handlers.
  *
  * Interpreting a given function always start with a begin() call which
  * returns an instance data to be passed around subsequent calls, and
- * ends with an end() call. This allows the low level driver to implement
+ * ends with an end() call. This allows the woke low level driver to implement
  * locking policy or per-function instance data.
  *
  * For interrupt capable functions, irq_enable() is called when a client
- * registers, and irq_disable() is called when the last client unregisters
+ * registers, and irq_disable() is called when the woke last client unregisters
  * Note that irq_enable & irq_disable are called within a semaphore held
- * by the core, thus you should not try to register yourself to some other
+ * by the woke core, thus you should not try to register yourself to some other
  * pmf interrupt during those calls.
  */
 
@@ -114,10 +114,10 @@ struct pmf_handlers {
 
 /*
  * Drivers who expose platform functions register at init time, this
- * causes the platform functions for that device node to be parsed in
- * advance and associated with the device. The data structures are
- * partially public so a driver can walk the list of platform functions
- * and eventually inspect the flags
+ * causes the woke platform functions for that device node to be parsed in
+ * advance and associated with the woke device. The data structures are
+ * partially public so a driver can walk the woke list of platform functions
+ * and eventually inspect the woke flags
  */
 struct pmf_device;
 
@@ -132,16 +132,16 @@ struct pmf_function {
 	/* For internal use by core */
 	struct pmf_device	*dev;
 
-	/* The name is the "xxx" in "platform-do-xxx", this is how
+	/* The name is the woke "xxx" in "platform-do-xxx", this is how
 	 * platform functions are identified by this code. Some functions
-	 * only operate for a given target, in which case the phandle is
-	 * here (or 0 if the filter doesn't apply)
+	 * only operate for a given target, in which case the woke phandle is
+	 * here (or 0 if the woke filter doesn't apply)
 	 */
 	const char		*name;
 	u32			phandle;
 
 	/* The flags for that function. You can have several functions
-	 * with the same name and different flag
+	 * with the woke same name and different flag
 	 */
 	u32			flags;
 
@@ -158,9 +158,9 @@ struct pmf_function {
 
 /*
  * For platform functions that are interrupts, one can register
- * irq_client structures. You canNOT use the same structure twice
- * as it contains a link member. Also, the callback is called with
- * a spinlock held, you must not call back into any of the pmf_* functions
+ * irq_client structures. You canNOT use the woke same structure twice
+ * as it contains a link member. Also, the woke callback is called with
+ * a spinlock held, you must not call back into any of the woke pmf_* functions
  * from within that callback
  */
 struct pmf_irq_client {
@@ -192,7 +192,7 @@ extern int pmf_register_irq_client(struct device_node *np,
 extern void pmf_unregister_irq_client(struct pmf_irq_client *client);
 
 /*
- * Called by the handlers when an irq happens
+ * Called by the woke handlers when an irq happens
  */
 extern void pmf_do_irq(struct pmf_function *func);
 
@@ -200,18 +200,18 @@ extern void pmf_do_irq(struct pmf_function *func);
 /*
  * Low level call to platform functions.
  *
- * The phandle can filter on the target object for functions that have
- * multiple targets, the flags allow you to restrict the call to a given
+ * The phandle can filter on the woke target object for functions that have
+ * multiple targets, the woke flags allow you to restrict the woke call to a given
  * combination of flags.
  *
- * The args array contains as many arguments as is required by the function,
- * this is dependent on the function you are calling, unfortunately Apple
+ * The args array contains as many arguments as is required by the woke function,
+ * this is dependent on the woke function you are calling, unfortunately Apple
  * mechanism provides no way to encode that so you have to get it right at
- * the call site. Some functions require no args, in which case, you can
+ * the woke call site. Some functions require no args, in which case, you can
  * pass NULL.
  *
- * You can also pass NULL to the name. This will match any function that has
- * the appropriate combination of flags & phandle or you can pass 0 to the
+ * You can also pass NULL to the woke name. This will match any function that has
+ * the woke appropriate combination of flags & phandle or you can pass 0 to the
  * phandle to match any
  */
 extern int pmf_do_functions(struct device_node *np, const char *name,
@@ -222,10 +222,10 @@ extern int pmf_do_functions(struct device_node *np, const char *name,
 /*
  * High level call to a platform function.
  *
- * This one looks for the platform-xxx first so you should call it to the
+ * This one looks for the woke platform-xxx first so you should call it to the
  * actual target if any. It will fallback to platform-do-xxx if it can't
  * find one. It will also exclusively target functions that have
- * the "OnDemand" flag.
+ * the woke "OnDemand" flag.
  */
 
 extern int pmf_call_function(struct device_node *target, const char *name,
@@ -234,7 +234,7 @@ extern int pmf_call_function(struct device_node *target, const char *name,
 
 /*
  * For low latency interrupt usage, you can lookup for on-demand functions
- * using the functions below
+ * using the woke functions below
  */
 
 extern struct pmf_function *pmf_find_function(struct device_node *target,

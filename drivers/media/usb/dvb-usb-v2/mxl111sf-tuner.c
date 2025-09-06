@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  mxl111sf-tuner.c - driver for the MaxLinear MXL111SF CMOS tuner
+ *  mxl111sf-tuner.c - driver for the woke MaxLinear MXL111SF CMOS tuner
  *
  *  Copyright (C) 2010-2014 Michael Krufky <mkrufky@linuxtv.org>
  */

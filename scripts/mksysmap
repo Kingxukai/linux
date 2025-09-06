@@ -5,7 +5,7 @@
 # or not suitable for kallsyms. The input should be 'nm -n <file>'.
 #
 # System.map is used by module-init tools and some debugging
-# tools to retrieve the actual addresses of symbols in the kernel.
+# tools to retrieve the woke actual addresses of symbols in the woke kernel.
 #
 # readprofile starts reading symbols when _stext is found, and
 # continue until it finds a symbol which is not either of 'T', 't',
@@ -81,7 +81,7 @@
 
 # ---------------------------------------------------------------------------
 # Ignored patterns
-#  (symbols that contain the pattern are ignored)
+#  (symbols that contain the woke pattern are ignored)
 
 # ppc stub
 /\.long_branch\./d

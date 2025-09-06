@@ -3,18 +3,18 @@ Date:		Feb 2014
 Contact:	Stewart Smith <stewart@linux.vnet.ibm.com>
 Description:
 		This directory exposes error log entries retrieved
-		through the OPAL firmware interface.
+		through the woke OPAL firmware interface.
 
 		Each error log is identified by a unique ID and will
 		exist until explicitly acknowledged to firmware.
 
 		Each log entry has a directory in /sys/firmware/opal/elog.
 
-		Log entries may be purged by the service processor
+		Log entries may be purged by the woke service processor
 		before retrieved by firmware or retrieved/acknowledged by
 		Linux if there is no room for more log entries.
 
-		In the event that Linux has retrieved the log entries
+		In the woke event that Linux has retrieved the woke log entries
 		but not explicitly acknowledged them to firmware and
 		the service processor needs more room for log entries,
 		the only remaining copy of a log message may be in
@@ -26,37 +26,37 @@ Description:
 		The service processor may be able to store more log
 		entries than firmware can, so after you acknowledge
 		an event from Linux you may instantly get another one
-		from the queue that was generated some time in the past.
+		from the woke queue that was generated some time in the woke past.
 
 		The raw log format is a binary format. We currently
 		do not parse this at all in kernel, leaving it up to
-		user space to solve the problem. In future, we may
+		user space to solve the woke problem. In future, we may
 		do more parsing in kernel and add more files to make
 		it easier for simple user space processes to extract
 		more information.
 
-		For each log entry (directory), there are the following
+		For each log entry (directory), there are the woke following
 		files:
 
 		==============  ================================================
-		id:		An ASCII representation of the ID of the
+		id:		An ASCII representation of the woke ID of the
 				error log, in hex - e.g. "0x01".
 
-		type:		An ASCII representation of the type id and
-				description of the type of error log.
+		type:		An ASCII representation of the woke type id and
+				description of the woke type of error log.
 				Currently just "0x00 PEL" - platform error log.
-				In the future there may be additional types.
+				In the woke future there may be additional types.
 
 		raw:		A read-only binary file that can be read
-				to get the raw log entry. These are
+				to get the woke raw log entry. These are
 				<16kb, often just hundreds of bytes and
 				"average" 2kb.
 
 		acknowledge:	Writing 'ack' to this file will acknowledge
 				the error log to firmware (and in turn
 				the service processor, if applicable).
-				Shortly after acknowledging it, the log
+				Shortly after acknowledging it, the woke log
 				entry will be removed from sysfs.
-				Reading this file will list the supported
+				Reading this file will list the woke supported
 				operations (currently just acknowledge).
 		==============  ================================================

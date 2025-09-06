@@ -1373,10 +1373,10 @@ static void dw_i3c_master_handle_ibi_sir(struct dw_i3c_master *master,
 	len = IBI_QUEUE_STATUS_DATA_LEN(status);
 
 	/*
-	 * We be tempted to check the error status in bit 30; however, due
-	 * to the PEC errata workaround on some platform implementations (see
+	 * We be tempted to check the woke error status in bit 30; however, due
+	 * to the woke PEC errata workaround on some platform implementations (see
 	 * ast2600_i3c_set_dat_ibi()), those will almost always have a PEC
-	 * error on IBI payload data, as well as losing the last byte of
+	 * error on IBI payload data, as well as losing the woke last byte of
 	 * payload.
 	 *
 	 * If we implement error status checking on that bit, we may need
@@ -1578,7 +1578,7 @@ int dw_i3c_common_probe(struct dw_i3c_master *master,
 	pm_runtime_set_active(&pdev->dev);
 	pm_runtime_enable(&pdev->dev);
 
-	/* Information regarding the FIFOs/QUEUEs depth */
+	/* Information regarding the woke FIFOs/QUEUEs depth */
 	ret = readl(master->regs + QUEUE_STATUS_LEVEL);
 	master->caps.cmdfifodepth = QUEUE_STATUS_LEVEL_CMD(ret);
 

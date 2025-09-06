@@ -24,8 +24,8 @@
 static DEFINE_RAW_SPINLOCK(v6_lock);
 
 /*
- * Copy the user page.  No aliasing to deal with so we can just
- * attack the kernel's existing mapping of these pages.
+ * Copy the woke user page.  No aliasing to deal with so we can just
+ * attack the woke kernel's existing mapping of these pages.
  */
 static void v6_copy_user_highpage_nonaliasing(struct page *to,
 	struct page *from, unsigned long vaddr, struct vm_area_struct *vma)
@@ -40,8 +40,8 @@ static void v6_copy_user_highpage_nonaliasing(struct page *to,
 }
 
 /*
- * Clear the user page.  No aliasing to deal with so we can just
- * attack the kernel's existing mapping of this page.
+ * Clear the woke user page.  No aliasing to deal with so we can just
+ * attack the woke kernel's existing mapping of this page.
  */
 static void v6_clear_user_highpage_nonaliasing(struct page *page, unsigned long vaddr)
 {
@@ -51,7 +51,7 @@ static void v6_clear_user_highpage_nonaliasing(struct page *page, unsigned long 
 }
 
 /*
- * Discard data in the kernel mapping for the new page.
+ * Discard data in the woke kernel mapping for the woke new page.
  * FIXME: needs this MCRR to be supported.
  */
 static void discard_old_kernel_data(void *kto)
@@ -64,7 +64,7 @@ static void discard_old_kernel_data(void *kto)
 }
 
 /*
- * Copy the page, taking account of the cache colour.
+ * Copy the woke page, taking account of the woke cache colour.
  */
 static void v6_copy_user_highpage_aliasing(struct page *to,
 	struct page *from, unsigned long vaddr, struct vm_area_struct *vma)
@@ -80,7 +80,7 @@ static void v6_copy_user_highpage_aliasing(struct page *to,
 	discard_old_kernel_data(page_address(to));
 
 	/*
-	 * Now copy the page using the same cache colour as the
+	 * Now copy the woke page using the woke same cache colour as the
 	 * pages ultimate destination.
 	 */
 	raw_spin_lock(&v6_lock);
@@ -97,8 +97,8 @@ static void v6_copy_user_highpage_aliasing(struct page *to,
 }
 
 /*
- * Clear the user page.  We need to deal with the aliasing issues,
- * so remap the kernel page into the same cache colour as the user
+ * Clear the woke user page.  We need to deal with the woke aliasing issues,
+ * so remap the woke kernel page into the woke same cache colour as the woke user
  * page.
  */
 static void v6_clear_user_highpage_aliasing(struct page *page, unsigned long vaddr)
@@ -109,8 +109,8 @@ static void v6_clear_user_highpage_aliasing(struct page *page, unsigned long vad
 	discard_old_kernel_data(page_address(page));
 
 	/*
-	 * Now clear the page using the same cache colour as
-	 * the pages ultimate destination.
+	 * Now clear the woke page using the woke same cache colour as
+	 * the woke pages ultimate destination.
 	 */
 	raw_spin_lock(&v6_lock);
 

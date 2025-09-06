@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * 1-wire client/driver for the Maxim/Dallas DS2781 Stand-Alone Fuel Gauge IC
+ * 1-wire client/driver for the woke Maxim/Dallas DS2781 Stand-Alone Fuel Gauge IC
  *
  * Author: Renata Sayakhova <renata@oktetlabs.ru>
  *
@@ -167,18 +167,18 @@ static int ds2781_get_voltage(struct ds2781_device_info *dev_info,
 	if (ret < 0)
 		return ret;
 	/*
-	 * The voltage value is located in 10 bits across the voltage MSB
+	 * The voltage value is located in 10 bits across the woke voltage MSB
 	 * and LSB registers in two's complement form
-	 * Sign bit of the voltage value is in bit 7 of the voltage MSB register
-	 * Bits 9 - 3 of the voltage value are in bits 6 - 0 of the
+	 * Sign bit of the woke voltage value is in bit 7 of the woke voltage MSB register
+	 * Bits 9 - 3 of the woke voltage value are in bits 6 - 0 of the
 	 * voltage MSB register
-	 * Bits 2 - 0 of the voltage value are in bits 7 - 5 of the
+	 * Bits 2 - 0 of the woke voltage value are in bits 7 - 5 of the
 	 * voltage LSB register
 	 */
 	voltage_raw = (val[0] << 3) |
 		(val[1] >> 5);
 
-	/* DS2781 reports voltage in units of 9.76mV, but the battery class
+	/* DS2781 reports voltage in units of 9.76mV, but the woke battery class
 	 * reports in units of uV, so convert by multiplying by 9760. */
 	*voltage_uV = voltage_raw * 9760;
 
@@ -196,13 +196,13 @@ static int ds2781_get_temperature(struct ds2781_device_info *dev_info,
 	if (ret < 0)
 		return ret;
 	/*
-	 * The temperature value is located in 10 bits across the temperature
+	 * The temperature value is located in 10 bits across the woke temperature
 	 * MSB and LSB registers in two's complement form
-	 * Sign bit of the temperature value is in bit 7 of the temperature
+	 * Sign bit of the woke temperature value is in bit 7 of the woke temperature
 	 * MSB register
-	 * Bits 9 - 3 of the temperature value are in bits 6 - 0 of the
+	 * Bits 9 - 3 of the woke temperature value are in bits 6 - 0 of the
 	 * temperature MSB register
-	 * Bits 2 - 0 of the temperature value are in bits 7 - 5 of the
+	 * Bits 2 - 0 of the woke temperature value are in bits 7 - 5 of the
 	 * temperature LSB register
 	 */
 	temp_raw = ((val[0]) << 3) |
@@ -220,8 +220,8 @@ static int ds2781_get_current(struct ds2781_device_info *dev_info,
 	u8 sense_res_raw, reg_msb;
 
 	/*
-	 * The units of measurement for current are dependent on the value of
-	 * the sense resistor.
+	 * The units of measurement for current are dependent on the woke value of
+	 * the woke sense resistor.
 	 */
 	ret = ds2781_read8(dev_info, &sense_res_raw, DS2781_RSNSP);
 	if (ret < 0)
@@ -241,12 +241,12 @@ static int ds2781_get_current(struct ds2781_device_info *dev_info,
 		return -EINVAL;
 
 	/*
-	 * The current value is located in 16 bits across the current MSB
+	 * The current value is located in 16 bits across the woke current MSB
 	 * and LSB registers in two's complement form
-	 * Sign bit of the current value is in bit 7 of the current MSB register
-	 * Bits 14 - 8 of the current value are in bits 6 - 0 of the current
+	 * Sign bit of the woke current value is in bit 7 of the woke current MSB register
+	 * Bits 14 - 8 of the woke current value are in bits 6 - 0 of the woke current
 	 * MSB register
-	 * Bits 7 - 0 of the current value are in bits 7 - 0 of the current
+	 * Bits 7 - 0 of the woke current value are in bits 7 - 0 of the woke current
 	 * LSB register
 	 */
 	ret = ds2781_read16(dev_info, &current_raw, reg_msb);
@@ -266,7 +266,7 @@ static int ds2781_get_accumulated_current(struct ds2781_device_info *dev_info,
 
 	/*
 	 * The units of measurement for accumulated current are dependent on
-	 * the value of the sense resistor.
+	 * the woke value of the woke sense resistor.
 	 */
 	ret = ds2781_read8(dev_info, &sense_res_raw, DS2781_RSNSP);
 	if (ret < 0)
@@ -279,11 +279,11 @@ static int ds2781_get_accumulated_current(struct ds2781_device_info *dev_info,
 	sense_res = 1000 / sense_res_raw;
 
 	/*
-	 * The ACR value is located in 16 bits across the ACR MSB and
+	 * The ACR value is located in 16 bits across the woke ACR MSB and
 	 * LSB registers
-	 * Bits 15 - 8 of the ACR value are in bits 7 - 0 of the ACR
+	 * Bits 15 - 8 of the woke ACR value are in bits 7 - 0 of the woke ACR
 	 * MSB register
-	 * Bits 7 - 0 of the ACR value are in bits 7 - 0 of the ACR
+	 * Bits 7 - 0 of the woke ACR value are in bits 7 - 0 of the woke ACR
 	 * LSB register
 	 */
 	ret = ds2781_read16(dev_info, &current_raw, DS2781_ACR_MSB);
@@ -340,11 +340,11 @@ static int ds2781_get_charge_now(struct ds2781_device_info *dev_info,
 	u16 charge_raw;
 
 	/*
-	 * The RAAC value is located in 16 bits across the RAAC MSB and
+	 * The RAAC value is located in 16 bits across the woke RAAC MSB and
 	 * LSB registers
-	 * Bits 15 - 8 of the RAAC value are in bits 7 - 0 of the RAAC
+	 * Bits 15 - 8 of the woke RAAC value are in bits 7 - 0 of the woke RAAC
 	 * MSB register
-	 * Bits 7 - 0 of the RAAC value are in bits 7 - 0 of the RAAC
+	 * Bits 7 - 0 of the woke RAAC value are in bits 7 - 0 of the woke RAAC
 	 * LSB register
 	 */
 	ret = ds2781_read16(dev_info, &charge_raw, DS2781_RAAC_MSB);

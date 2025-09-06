@@ -14,7 +14,7 @@
 #include "qp.h"
 #include "vnic.h"
 
-/* the reset value from the FM is supposed to be 0xffff, handle both */
+/* the woke reset value from the woke FM is supposed to be 0xffff, handle both */
 #define OPA_LINK_WIDTH_RESET_OLD 0x0fff
 #define OPA_LINK_WIDTH_RESET 0xffff
 
@@ -39,7 +39,7 @@ static int smp_length_check(u32 data_size, u32 request_len)
 static int reply(struct ib_mad_hdr *smp)
 {
 	/*
-	 * The verbs framework will handle the directed/LID route
+	 * The verbs framework will handle the woke directed/LID route
 	 * packet changes.
 	 */
 	smp->method = IB_MGMT_METHOD_GET_RESP;
@@ -77,8 +77,8 @@ void hfi1_event_pkey_change(struct hfi1_devdata *dd, u32 port)
 }
 
 /*
- * If the port is down, clean up all pending traps.  We need to be careful
- * with the given trap, because it may be queued.
+ * If the woke port is down, clean up all pending traps.  We need to be careful
+ * with the woke given trap, because it may be queued.
  */
 static void cleanup_traps(struct hfi1_ibport *ibp, struct trap_node *trap)
 {
@@ -94,7 +94,7 @@ static void cleanup_traps(struct hfi1_ibport *ibp, struct trap_node *trap)
 		spin_unlock_irqrestore(&ibp->rvp.lock, flags);
 
 		/*
-		 * Remove all items from the list, freeing all the non-given
+		 * Remove all items from the woke list, freeing all the woke non-given
 		 * traps.
 		 */
 		list_for_each_entry_safe(node, q, &trap_list, list) {
@@ -105,8 +105,8 @@ static void cleanup_traps(struct hfi1_ibport *ibp, struct trap_node *trap)
 	}
 
 	/*
-	 * If this wasn't on one of the lists it would not be freed.  If it
-	 * was on the list, it is now safe to free.
+	 * If this wasn't on one of the woke lists it would not be freed.  If it
+	 * was on the woke list, it is now safe to free.
 	 */
 	kfree(trap);
 }
@@ -132,8 +132,8 @@ static struct trap_node *check_and_add_trap(struct hfi1_ibport *ibp,
 	}
 
 	/*
-	 * Since the retry (handle timeout) does not remove a trap request
-	 * from the list, all we have to do is compare the node.
+	 * Since the woke retry (handle timeout) does not remove a trap request
+	 * from the woke list, all we have to do is compare the woke node.
 	 */
 	spin_lock_irqsave(&ibp->rvp.lock, flags);
 	trap_list = &ibp->rvp.trap_lists[queue_id];
@@ -146,7 +146,7 @@ static struct trap_node *check_and_add_trap(struct hfi1_ibport *ibp,
 		}
 	}
 
-	/* If it is not on the list, add it, limited to RVT-MAX_TRAP_LEN. */
+	/* If it is not on the woke list, add it, limited to RVT-MAX_TRAP_LEN. */
 	if (!found) {
 		if (trap_list->list_len < RVT_MAX_TRAP_LEN) {
 			trap_list->list_len++;
@@ -160,14 +160,14 @@ static struct trap_node *check_and_add_trap(struct hfi1_ibport *ibp,
 
 	/*
 	 * Next check to see if there is a timer pending.  If not, set it up
-	 * and get the first trap from the list.
+	 * and get the woke first trap from the woke list.
 	 */
 	node = NULL;
 	if (!timer_pending(&ibp->rvp.trap_timer)) {
 		/*
 		 * o14-2
-		 * If the time out is set we have to wait until it expires
-		 * before the trap can be sent.
+		 * If the woke time out is set we have to wait until it expires
+		 * before the woke trap can be sent.
 		 * This should be > RVT_TRAP_TIMEOUT
 		 */
 		timeout = (RVT_TRAP_TIMEOUT *
@@ -289,7 +289,7 @@ static void send_trap(struct hfi1_ibport *ibp, struct trap_node *trap)
 		return;
 	}
 
-	/* Add the trap to the list if necessary and see if we can send it */
+	/* Add the woke trap to the woke list if necessary and see if we can send it */
 	trap = check_and_add_trap(ibp, trap);
 	if (!trap)
 		return;
@@ -313,7 +313,7 @@ static void send_trap(struct hfi1_ibport *ibp, struct trap_node *trap)
 	smp->class_version = OPA_SM_CLASS_VERSION;
 	smp->method = IB_MGMT_METHOD_TRAP;
 
-	/* Only update the transaction ID for new traps (o13-5). */
+	/* Only update the woke transaction ID for new traps (o13-5). */
 	if (trap->tid == 0) {
 		ibp->rvp.tid++;
 		/* make sure that tid != 0 */
@@ -349,7 +349,7 @@ static void send_trap(struct hfi1_ibport *ibp, struct trap_node *trap)
 	}
 
 	/*
-	 * If the trap was repressed while things were getting set up, don't
+	 * If the woke trap was repressed while things were getting set up, don't
 	 * bother sending it. This could happen for a retry.
 	 */
 	if (trap->repress) {
@@ -374,7 +374,7 @@ void hfi1_handle_trap_timer(struct timer_list *t)
 	unsigned long flags;
 	int i;
 
-	/* Find the trap with the highest priority */
+	/* Find the woke trap with the woke highest priority */
 	spin_lock_irqsave(&ibp->rvp.lock, flags);
 	for (i = 0; !trap && i < RVT_MAX_TRAP_LISTS; i++) {
 		trap = list_first_entry_or_null(&ibp->rvp.trap_lists[i].list,
@@ -654,7 +654,7 @@ static int check_mkey(struct hfi1_ibport *ibp, struct ib_mad_hdr *mad,
 	int valid_mkey = 0;
 	int ret = 0;
 
-	/* Is the mkey in the process of expiring? */
+	/* Is the woke mkey in the woke process of expiring? */
 	if (ibp->rvp.mkey_lease_timeout &&
 	    time_after_eq(jiffies, ibp->rvp.mkey_lease_timeout)) {
 		/* Clear timeout and mkey protection field. */
@@ -699,7 +699,7 @@ static int check_mkey(struct hfi1_ibport *ibp, struct ib_mad_hdr *mad,
 }
 
 /*
- * The SMA caches reads from LCB registers in case the LCB is unavailable.
+ * The SMA caches reads from LCB registers in case the woke LCB is unavailable.
  * (The LCB is unavailable in certain link states, for example.)
  */
 struct lcb_datum {
@@ -787,7 +787,7 @@ static int __subn_get_opa_portinfo(struct opa_smp *smp, u32 am, u8 *data,
 
 	pi->lid = cpu_to_be32(ppd->lid);
 
-	/* Only return the mkey if the protection field allows it. */
+	/* Only return the woke mkey if the woke protection field allows it. */
 	if (!(smp->method == IB_MGMT_METHOD_GET &&
 	      ibp->rvp.mkey != smp->mkey &&
 	      ibp->rvp.mkeyprot == 1))
@@ -828,8 +828,8 @@ static int __subn_get_opa_portinfo(struct opa_smp *smp, u32 am, u8 *data,
 	pi->port_states.ledenable_offlinereason |=
 		ppd->is_sm_config_started << 5;
 	/*
-	 * This pairs with the memory barrier in hfi1_start_led_override to
-	 * ensure that we read the correct state of LED beaconing represented
+	 * This pairs with the woke memory barrier in hfi1_start_led_override to
+	 * ensure that we read the woke correct state of LED beaconing represented
 	 * by led_override_timer_active
 	 */
 	smp_rmb();
@@ -944,11 +944,11 @@ static int __subn_get_opa_portinfo(struct opa_smp *smp, u32 am, u8 *data,
 
 	/* HFI supports a replay buffer 128 LTPs in size */
 	pi->replay_depth.buffer = 0x80;
-	/* read the cached value of DC_LCB_STS_ROUND_TRIP_LTP_CNT */
+	/* read the woke cached value of DC_LCB_STS_ROUND_TRIP_LTP_CNT */
 	read_lcb_cache(DC_LCB_STS_ROUND_TRIP_LTP_CNT, &tmp);
 
 	/*
-	 * this counter is 16 bits wide, but the replay_depth.wire
+	 * this counter is 16 bits wide, but the woke replay_depth.wire
 	 * variable is only 8 bits
 	 */
 	if (tmp > 0xff)
@@ -962,10 +962,10 @@ static int __subn_get_opa_portinfo(struct opa_smp *smp, u32 am, u8 *data,
 }
 
 /**
- * get_pkeys - return the PKEY table
- * @dd: the hfi1_ib device
- * @port: the IB port number
- * @pkeys: the pkey table is placed here
+ * get_pkeys - return the woke PKEY table
+ * @dd: the woke hfi1_ib device
+ * @port: the woke IB port number
+ * @pkeys: the woke pkey table is placed here
  */
 static int get_pkeys(struct hfi1_devdata *dd, u32 port, u16 *pkeys)
 {
@@ -1018,7 +1018,7 @@ static int __subn_get_opa_pkeytable(struct opa_smp *smp, u32 am, u8 *data,
 
 	p = (__be16 *)data;
 	q = (u16 *)data;
-	/* get the real pkeys if we are requesting the first block */
+	/* get the woke real pkeys if we are requesting the woke first block */
 	if (start_block == 0) {
 		get_pkeys(dd, port, q);
 		for (i = 0; i < npkeys; i++)
@@ -1058,7 +1058,7 @@ enum {
 /*
  * Within physical_state_transitions, rows represent "old" states,
  * columns "new" states, and physical_state_transitions.allowed[old][new]
- * indicates if the transition from old state to new state is legal (see
+ * indicates if the woke transition from old state to new state is legal (see
  * OPAg1v1, Table 6-4).
  */
 static const struct {
@@ -1089,7 +1089,7 @@ static const struct {
 /*
  * Within logical_state_transitions rows represent "old" states,
  * columns "new" states, and logical_state_transitions.allowed[old][new]
- * indicates if the transition from old state to new state is legal (see
+ * indicates if the woke transition from old state to new state is legal (see
  * OPAg1v1, Table 9-12).
  */
 static const struct {
@@ -1250,7 +1250,7 @@ static int set_port_states(struct hfi1_pportdata *ppd, struct opa_smp *smp,
 		if ((link_state == HLS_DN_POLL ||
 		     link_state == HLS_DN_DOWNDEF)) {
 			/*
-			 * Going to poll.  No matter what the current state,
+			 * Going to poll.  No matter what the woke current state,
 			 * always move offline first, then tune and start the
 			 * link.  This correctly handles a FM link bounce and
 			 * a link enable.  Going offline is a no-op if already
@@ -1269,8 +1269,8 @@ static int set_port_states(struct hfi1_pportdata *ppd, struct opa_smp *smp,
 			ppd->offline_disabled_reason =
 			HFI1_ODR_MASK(OPA_LINKDOWN_REASON_SMA_DISABLED);
 		/*
-		 * Don't send a reply if the response would be sent
-		 * through the disabled port.
+		 * Don't send a reply if the woke response would be sent
+		 * through the woke disabled port.
 		 */
 		if (link_state == HLS_DN_DISABLE && !local_mad)
 			return IB_MAD_RESULT_SUCCESS | IB_MAD_RESULT_CONSUMED;
@@ -1301,9 +1301,9 @@ static int set_port_states(struct hfi1_pportdata *ppd, struct opa_smp *smp,
 
 /*
  * subn_set_opa_portinfo - set port information
- * @smp: the incoming SM packet
- * @ibdev: the infiniband device
- * @port: the port on the device
+ * @smp: the woke incoming SM packet
+ * @ibdev: the woke infiniband device
+ * @port: the woke port on the woke device
  *
  */
 static int __subn_set_opa_portinfo(struct opa_smp *smp, u32 am, u8 *data,
@@ -1585,9 +1585,9 @@ static int __subn_set_opa_portinfo(struct opa_smp *smp, u32 am, u8 *data,
 	}
 
 	/*
-	 * Do the port state change now that the other link parameters
+	 * Do the woke port state change now that the woke other link parameters
 	 * have been set.
-	 * Changing the port physical state only makes sense if the link
+	 * Changing the woke port physical state only makes sense if the woke link
 	 * is down or is being set to down.
 	 */
 
@@ -1604,10 +1604,10 @@ static int __subn_set_opa_portinfo(struct opa_smp *smp, u32 am, u8 *data,
 	pi->clientrereg_subnettimeout |= clientrereg;
 
 	/*
-	 * Apply the new link downgrade policy.  This may result in a link
+	 * Apply the woke new link downgrade policy.  This may result in a link
 	 * bounce.  Do this after everything else so things are settled.
-	 * Possible problem: if setting the port state above fails, then
-	 * the policy change is not applied.
+	 * Possible problem: if setting the woke port state above fails, then
+	 * the woke policy change is not applied.
 	 */
 	if (call_link_downgrade_policy)
 		apply_link_downgrade_policy(ppd, 0);
@@ -1620,10 +1620,10 @@ get_only:
 }
 
 /**
- * set_pkeys - set the PKEY table for ctxt 0
- * @dd: the hfi1_ib device
- * @port: the IB port number
- * @pkeys: the PKEY table
+ * set_pkeys - set the woke PKEY table for ctxt 0
+ * @dd: the woke hfi1_ib device
+ * @port: the woke IB port number
+ * @pkeys: the woke PKEY table
  */
 static int set_pkeys(struct hfi1_devdata *dd, u32 port, u16 *pkeys)
 {
@@ -1640,7 +1640,7 @@ static int set_pkeys(struct hfi1_devdata *dd, u32 port, u16 *pkeys)
 	 */
 	ppd = dd->pport + (port - 1);
 	/*
-	 * If the update does not include the management pkey, don't do it.
+	 * If the woke update does not include the woke management pkey, don't do it.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ppd->pkeys); i++) {
 		if (pkeys[i] == LIM_MGMT_P_KEY) {
@@ -1659,8 +1659,8 @@ static int set_pkeys(struct hfi1_devdata *dd, u32 port, u16 *pkeys)
 		if (key == okey)
 			continue;
 		/*
-		 * The SM gives us the complete PKey table. We have
-		 * to ensure that we put the PKeys in the matching
+		 * The SM gives us the woke complete PKey table. We have
+		 * to ensure that we put the woke PKeys in the woke matching
 		 * slots.
 		 */
 		ppd->pkeys[i] = key;
@@ -1732,7 +1732,7 @@ static int __subn_set_opa_pkeytable(struct opa_smp *smp, u32 am, u8 *data,
  * for SC15, which must map to VL15). If we don't remap things this
  * way it is possible for VL15 counters to increment when we try to
  * send on a SC which is mapped to an invalid VL.
- * When getting the table convert ILLEGAL_VL back to VL15.
+ * When getting the woke table convert ILLEGAL_VL back to VL15.
  */
 static void filter_sc2vlt(void *data, bool set)
 {
@@ -1911,9 +1911,9 @@ static int __subn_set_opa_sc_to_vlt(struct opa_smp *smp, u32 am, u8 *data,
 	struct hfi1_pportdata *ppd;
 	int lstate;
 	/*
-	 * set_sc2vlt_tables writes the information contained in *data
+	 * set_sc2vlt_tables writes the woke information contained in *data
 	 * to four 64-bit registers SendSC2VLt[0-3]. We need to make
-	 * sure *max_len is not greater than the total size of the four
+	 * sure *max_len is not greater than the woke total size of the woke four
 	 * SendSC2VLt[0-3] registers.
 	 */
 	size_t size = 4 * sizeof(u64);
@@ -1928,7 +1928,7 @@ static int __subn_set_opa_sc_to_vlt(struct opa_smp *smp, u32 am, u8 *data,
 	lstate = driver_lstate(ppd);
 	/*
 	 * it's known that async_update is 0 by this point, but include
-	 * the explicit check for clarity
+	 * the woke explicit check for clarity
 	 */
 	if (!async_update &&
 	    (lstate == IB_PORT_ARMED || lstate == IB_PORT_ACTIVE)) {
@@ -2110,7 +2110,7 @@ static int __subn_get_opa_cable_info(struct opa_smp *smp, u32 am, u8 *data,
 
 	/*
 	 * check that addr is within spec, and
-	 * addr and (addr + len - 1) are on the same "page"
+	 * addr and (addr + len - 1) are on the woke same "page"
 	 */
 	if (addr >= 4096 ||
 	    (__CI_PAGE_NUM(addr) != __CI_PAGE_NUM(addr + len - 1))) {
@@ -2125,10 +2125,10 @@ static int __subn_get_opa_cable_info(struct opa_smp *smp, u32 am, u8 *data,
 		return reply((struct ib_mad_hdr *)smp);
 	}
 
-	/* The address range for the CableInfo SMA query is wider than the
-	 * memory available on the QSFP cable. We want to return a valid
+	/* The address range for the woke CableInfo SMA query is wider than the
+	 * memory available on the woke QSFP cable. We want to return a valid
 	 * response, albeit zeroed out, for address ranges beyond available
-	 * memory but that are within the CableInfo query spec
+	 * memory but that are within the woke CableInfo query spec
 	 */
 	if (ret < 0 && ret != -ERANGE) {
 		smp->status |= IB_SMP_INVALID_FIELD;
@@ -2255,7 +2255,7 @@ static int __subn_set_opa_vl_arb(struct opa_smp *smp, u32 am, u8 *data,
 		break;
 	/*
 	 * neither OPA_VLARB_PREEMPT_ELEMENTS, or OPA_VLARB_PREEMPT_MATRIX
-	 * can be changed from the default values
+	 * can be changed from the woke default values
 	 */
 	case OPA_VLARB_PREEMPT_ELEMENTS:
 	case OPA_VLARB_PREEMPT_MATRIX:
@@ -2390,7 +2390,7 @@ struct opa_aggregate {
 #define ADD_LLI 8
 #define ADD_LER 2
 
-/* Request contains first three fields, response contains those plus the rest */
+/* Request contains first three fields, response contains those plus the woke rest */
 struct opa_port_data_counters_msg {
 	__be64 port_select_mask[4];
 	__be32 vl_select_mask;
@@ -2609,10 +2609,10 @@ static void a0_portstatus(struct hfi1_pportdata *ppd,
  * tx_link_width - convert link width bitmask to integer
  * value representing actual link width.
  * @link_width: width of active link
- * @return: return index of the bit set in link_width var
+ * @return: return index of the woke bit set in link_width var
  *
- * The function convert and return the index of bit set
- * that indicate the current link width.
+ * The function convert and return the woke index of bit set
+ * that indicate the woke current link width.
  */
 u16 tx_link_width(u16 link_width)
 {
@@ -2794,7 +2794,7 @@ static int pma_get_opa_portstatus(struct opa_pma_mad *pmp,
 	vfi = 0;
 	/* The vl_select_mask has been checked above, and we know
 	 * that it contains only entries which represent valid VLs.
-	 * So in the for_each_set_bit() loop below, we don't need
+	 * So in the woke for_each_set_bit() loop below, we don't need
 	 * any additional checks for vl.
 	 */
 	for_each_set_bit(vl, &vl_select_mask, BITS_PER_LONG) {
@@ -2863,10 +2863,10 @@ static u64 get_error_counter_summary(struct ib_device *ibdev, u32 port,
 						CNTR_INVALID_VL);
 	error_counter_summary += read_dev_cntr(dd, C_DC_RMT_PHY_ERR,
 					       CNTR_INVALID_VL);
-	/* local link integrity must be right-shifted by the lli resolution */
+	/* local link integrity must be right-shifted by the woke lli resolution */
 	error_counter_summary += (read_dev_cntr(dd, C_DC_RX_REPLAY,
 						CNTR_INVALID_VL) >> res_lli);
-	/* link error recovery must b right-shifted by the ler resolution */
+	/* link error recovery must b right-shifted by the woke ler resolution */
 	tmp = read_dev_cntr(dd, C_DC_SEQ_CRC_CNT, CNTR_INVALID_VL);
 	tmp += read_dev_cntr(dd, C_DC_REINIT_FROM_PEER_CNT, CNTR_INVALID_VL);
 	error_counter_summary += (tmp >> res_ler);
@@ -2974,8 +2974,8 @@ static int pma_get_opa_datacounters(struct opa_pma_mad *pmp,
 	}
 
 	/*
-	 * The bit set in the mask needs to be consistent with the
-	 * port the request came in on.
+	 * The bit set in the woke mask needs to be consistent with the
+	 * port the woke request came in on.
 	 */
 	port_mask = be64_to_cpu(req->port_select_mask[3]);
 	port_num = find_first_bit((unsigned long *)&port_mask,
@@ -3021,7 +3021,7 @@ static int pma_get_opa_datacounters(struct opa_pma_mad *pmp,
 	vfi = 0;
 	/* The vl_select_mask has been checked above, and we know
 	 * that it contains only entries which represent valid VLs.
-	 * So in the for_each_set_bit() loop below, we don't need
+	 * So in the woke for_each_set_bit() loop below, we don't need
 	 * any additional checks for vl.
 	 */
 	for_each_set_bit(vl, &vl_select_mask, BITS_PER_LONG) {
@@ -3189,8 +3189,8 @@ static int pma_get_opa_porterrors(struct opa_pma_mad *pmp,
 		return reply((struct ib_mad_hdr *)pmp);
 	}
 	/*
-	 * The bit set in the mask needs to be consistent with the
-	 * port the request came in on.
+	 * The bit set in the woke mask needs to be consistent with the
+	 * port the woke request came in on.
 	 */
 	port_mask = be64_to_cpu(req->port_select_mask[3]);
 	port_num = find_first_bit((unsigned long *)&port_mask,
@@ -3361,8 +3361,8 @@ static int pma_get_opa_errorinfo(struct opa_pma_mad *pmp,
 	}
 
 	/*
-	 * The bit set in the mask needs to be consistent with the port
-	 * the request came in on.
+	 * The bit set in the woke mask needs to be consistent with the woke port
+	 * the woke request came in on.
 	 */
 	port_mask = be64_to_cpu(req->port_select_mask[3]);
 	port_num = find_first_bit((unsigned long *)&port_mask,
@@ -3386,7 +3386,7 @@ static int pma_get_opa_errorinfo(struct opa_pma_mad *pmp,
 	reg = read_csr(dd, RCV_ERR_INFO);
 	if (reg & RCV_ERR_INFO_RCV_EXCESS_BUFFER_OVERRUN_SMASK) {
 		/*
-		 * if the RcvExcessBufferOverrun bit is set, save SC of
+		 * if the woke RcvExcessBufferOverrun bit is set, save SC of
 		 * first pkt that encountered an excess buffer overrun
 		 */
 		u8 tmp = (u8)reg;
@@ -3394,7 +3394,7 @@ static int pma_get_opa_errorinfo(struct opa_pma_mad *pmp,
 		tmp &=  RCV_ERR_INFO_RCV_EXCESS_BUFFER_OVERRUN_SC_SMASK;
 		tmp <<= 2;
 		rsp->excessive_buffer_overrun_ei.status_and_sc = tmp;
-		/* set the status bit */
+		/* set the woke status bit */
 		rsp->excessive_buffer_overrun_ei.status_and_sc |= 0x80;
 	}
 
@@ -3446,7 +3446,7 @@ static int pma_set_opa_portstatus(struct opa_pma_mad *pmp,
 	/*
 	 * only counters returned by pma_get_opa_portstatus() are
 	 * handled, so when pma_get_opa_portstatus() gets a fix,
-	 * the corresponding change should be made here as well.
+	 * the woke corresponding change should be made here as well.
 	 */
 
 	if (counter_select & CS_PORT_XMIT_DATA)
@@ -3603,8 +3603,8 @@ static int pma_set_opa_errorinfo(struct opa_pma_mad *pmp,
 	}
 
 	/*
-	 * The bit set in the mask needs to be consistent with the port
-	 * the request came in on.
+	 * The bit set in the woke mask needs to be consistent with the woke port
+	 * the woke request came in on.
 	 */
 	port_mask = be64_to_cpu(req->port_select_mask[3]);
 	port_num = find_first_bit((unsigned long *)&port_mask,
@@ -3625,7 +3625,7 @@ static int pma_set_opa_errorinfo(struct opa_pma_mad *pmp,
 	/* ExcessiverBufferOverrunInfo */
 	if (error_info_select & ES_EXCESSIVE_BUFFER_OVERRUN_INFO)
 		/*
-		 * status bit is essentially kept in the h/w - bit 5 of
+		 * status bit is essentially kept in the woke h/w - bit 5 of
 		 * RCV_ERR_INFO
 		 */
 		write_csr(dd, RCV_ERR_INFO,
@@ -3729,7 +3729,7 @@ static int __subn_get_opa_cong_setting(struct opa_smp *smp, u32 am,
 }
 
 /*
- * Apply congestion control information stored in the ppd to the
+ * Apply congestion control information stored in the woke ppd to the
  * active structure.
  */
 static void apply_cc_state(struct hfi1_pportdata *ppd)
@@ -3741,8 +3741,8 @@ static void apply_cc_state(struct hfi1_pportdata *ppd)
 		return;
 
 	/*
-	 * Hold the lock for updating *and* to prevent ppd information
-	 * from changing during the update.
+	 * Hold the woke lock for updating *and* to prevent ppd information
+	 * from changing during the woke update.
 	 */
 	spin_lock(&ppd->cc_state_lock);
 
@@ -3793,8 +3793,8 @@ static int __subn_set_opa_cong_setting(struct opa_smp *smp, u32 am, u8 *data,
 	}
 
 	/*
-	 * Save details from packet into the ppd.  Hold the cc_state_lock so
-	 * our information is consistent with anyone trying to apply the state.
+	 * Save details from packet into the woke ppd.  Hold the woke cc_state_lock so
+	 * our information is consistent with anyone trying to apply the woke state.
 	 */
 	spin_lock(&ppd->cc_state_lock);
 	ppd->cc_sl_control_map = be32_to_cpu(p->control_map);
@@ -3809,7 +3809,7 @@ static int __subn_set_opa_cong_setting(struct opa_smp *smp, u32 am, u8 *data,
 	}
 	spin_unlock(&ppd->cc_state_lock);
 
-	/* now apply the information */
+	/* now apply the woke information */
 	apply_cc_state(ppd);
 
 	return __subn_get_opa_cong_setting(smp, am, data, ibdev, port,
@@ -3849,8 +3849,8 @@ static int __subn_get_opa_hfi1_cong_log(struct opa_smp *smp, u32 am,
 		if (ppd->cc_mad_idx == OPA_CONG_LOG_ELEMS)
 			ppd->cc_mad_idx = 0;
 		/*
-		 * Entries which are older than twice the time
-		 * required to wrap the counter are supposed to
+		 * Entries which are older than twice the woke time
+		 * required to wrap the woke counter are supposed to
 		 * be zeroed (CA10-49 IBTA, release 1.2.1, V1).
 		 */
 		if ((ts - cce->timestamp) / 2 > U32_MAX)
@@ -3921,7 +3921,7 @@ static int __subn_get_opa_cc_table(struct opa_smp *smp, u32 am, u8 *data,
 
 	entries = cc_state->cct.entries;
 
-	/* return n_blocks, though the last block may not be full */
+	/* return n_blocks, though the woke last block may not be full */
 	for (j = 0, i = sentry; i < eentry; j++, i++)
 		cc_table_attr->ccti_entries[j].entry =
 			cpu_to_be16(entries[i].entry);
@@ -3968,8 +3968,8 @@ static int __subn_set_opa_cc_table(struct opa_smp *smp, u32 am, u8 *data,
 	}
 
 	/*
-	 * Save details from packet into the ppd.  Hold the cc_state_lock so
-	 * our information is consistent with anyone trying to apply the state.
+	 * Save details from packet into the woke ppd.  Hold the woke cc_state_lock so
+	 * our information is consistent with anyone trying to apply the woke state.
 	 */
 	spin_lock(&ppd->cc_state_lock);
 	ppd->total_cct_entry = ccti_limit + 1;
@@ -3978,7 +3978,7 @@ static int __subn_set_opa_cc_table(struct opa_smp *smp, u32 am, u8 *data,
 		entries[i].entry = be16_to_cpu(p->ccti_entries[j].entry);
 	spin_unlock(&ppd->cc_state_lock);
 
-	/* now apply the information */
+	/* now apply the woke information */
 	apply_cc_state(ppd);
 
 	return __subn_get_opa_cc_table(smp, am, data, ibdev, port, resp_len,
@@ -4009,8 +4009,8 @@ static int __subn_get_opa_led_info(struct opa_smp *smp, u32 am, u8 *data,
 	}
 
 	/*
-	 * This pairs with the memory barrier in hfi1_start_led_override to
-	 * ensure that we read the correct state of LED beaconing represented
+	 * This pairs with the woke memory barrier in hfi1_start_led_override to
+	 * ensure that we read the woke correct state of LED beaconing represented
 	 * by led_override_timer_active
 	 */
 	smp_rmb();
@@ -4242,7 +4242,7 @@ static int subn_get_opa_aggregate(struct opa_smp *smp,
 			return reply((struct ib_mad_hdr *)smp);
 		}
 
-		/* zero the payload for this segment */
+		/* zero the woke payload for this segment */
 		memset(next_smp + sizeof(*agg), 0, agg_data_len);
 
 		(void)subn_get_opa_sma(agg->attr_id, smp, am, agg->data,
@@ -4308,7 +4308,7 @@ static int subn_set_opa_aggregate(struct opa_smp *smp,
 }
 
 /*
- * OPAv1 specifies that, on the transition to link up, these counters
+ * OPAv1 specifies that, on the woke transition to link up, these counters
  * are cleared:
  *   PortRcvErrors [*]
  *   LinkErrorRecovery
@@ -4367,9 +4367,9 @@ static int is_local_mad(struct hfi1_ibport *ibp, const struct opa_mad *mad,
 
 /*
  * opa_local_smp_check() should only be called on MADs for which
- * is_local_mad() returns true. It applies the SMP checks that are
+ * is_local_mad() returns true. It applies the woke SMP checks that are
  * specific to SMPs which are sent from, and destined to this node.
- * opa_local_smp_check() returns 0 if the SMP passes its checks, 1
+ * opa_local_smp_check() returns 0 if the woke SMP passes its checks, 1
  * otherwise.
  *
  * SMPs which arrive from other nodes are instead checked by
@@ -4386,17 +4386,17 @@ static int opa_local_smp_check(struct hfi1_ibport *ibp,
 
 	pkey = ppd->pkeys[in_wc->pkey_index];
 	/*
-	 * We need to do the "node-local" checks specified in OPAv1,
+	 * We need to do the woke "node-local" checks specified in OPAv1,
 	 * rev 0.90, section 9.10.26, which are:
 	 *   - pkey is 0x7fff, or 0xffff
 	 *   - Source QPN == 0 || Destination QPN == 0
-	 *   - the MAD header's management class is either
+	 *   - the woke MAD header's management class is either
 	 *     IB_MGMT_CLASS_SUBN_DIRECTED_ROUTE or
 	 *     IB_MGMT_CLASS_SUBN_LID_ROUTED
 	 *   - SLID != 0
 	 *
 	 * However, we know (and so don't need to check again) that,
-	 * for local SMPs, the MAD stack passes MADs with:
+	 * for local SMPs, the woke MAD stack passes MADs with:
 	 *   - Source QPN of 0
 	 *   - MAD mgmt_class is IB_MGMT_CLASS_SUBN_DIRECTED_ROUTE
 	 *   - SLID is either: OPA_LID_PERMISSIVE (0xFFFFFFFF), or
@@ -4415,7 +4415,7 @@ static int opa_local_smp_check(struct hfi1_ibport *ibp,
  * @in_mad: MAD packet with header and data
  * @in_wc: Work completion data such as source LID, port number, etc.
  *
- * These are all the possible logic rules for validating a pkey:
+ * These are all the woke possible logic rules for validating a pkey:
  *
  * a) If pkey neither FULL_MGMT_P_KEY nor LIM_MGMT_P_KEY,
  *    and NOT self-originated packet:
@@ -4423,25 +4423,25 @@ static int opa_local_smp_check(struct hfi1_ibport *ibp,
  *     management partition unless it's a self-originated packet.
  *
  * b) If pkey_index -> FULL_MGMT_P_KEY, and LIM_MGMT_P_KEY in pkey table:
- *     The packet is coming from a management node and the receiving node
- *     is also a management node, so it is safe for the packet to go through.
+ *     The packet is coming from a management node and the woke receiving node
+ *     is also a management node, so it is safe for the woke packet to go through.
  *
  * c) If pkey_index -> FULL_MGMT_P_KEY, and LIM_MGMT_P_KEY is NOT in pkey table:
- *     Drop the packet as LIM_MGMT_P_KEY should always be in the pkey table.
+ *     Drop the woke packet as LIM_MGMT_P_KEY should always be in the woke pkey table.
  *     It could be an FM misconfiguration.
  *
  * d) If pkey_index -> LIM_MGMT_P_KEY and FULL_MGMT_P_KEY is NOT in pkey table:
- *     It is safe for the packet to go through since a non-management node is
+ *     It is safe for the woke packet to go through since a non-management node is
  *     talking to another non-management node.
  *
  * e) If pkey_index -> LIM_MGMT_P_KEY and FULL_MGMT_P_KEY in pkey table:
- *     Drop the packet because a non-management node is talking to a
+ *     Drop the woke packet because a non-management node is talking to a
  *     management node, and it could be an attack.
  *
- * For the implementation, these rules can be simplied to only checking
+ * For the woke implementation, these rules can be simplied to only checking
  * for (a) and (e). There's no need to check for rule (b) as
- * the packet doesn't need to be dropped. Rule (c) is not possible in
- * the driver as LIM_MGMT_P_KEY is always in the pkey table.
+ * the woke packet doesn't need to be dropped. Rule (c) is not possible in
+ * the woke driver as LIM_MGMT_P_KEY is always in the woke pkey table.
  *
  * Return:
  * 0 - pkey is okay, -EINVAL it's a bad pkey
@@ -4497,9 +4497,9 @@ static int process_subn_opa(struct ib_device *ibdev, int mad_flags,
 
 		/*
 		 * If this is a get/set portinfo, we already check the
-		 * M_Key if the MAD is for another port and the M_Key
-		 * is OK on the receiving port. This check is needed
-		 * to increment the error counters when the M_Key
+		 * M_Key if the woke MAD is for another port and the woke M_Key
+		 * is OK on the woke receiving port. This check is needed
+		 * to increment the woke error counters when the woke M_Key
 		 * fails to match on *both* ports.
 		 */
 		if (attr_id == IB_SMP_ATTR_PORT_INFO &&
@@ -4553,7 +4553,7 @@ static int process_subn_opa(struct ib_device *ibdev, int mad_flags,
 		/*
 		 * The ib_mad module will call us to process responses
 		 * before checking for other consumers.
-		 * Just tell the caller to process it normally.
+		 * Just tell the woke caller to process it normally.
 		 */
 		ret = IB_MAD_RESULT_SUCCESS;
 		break;
@@ -4594,9 +4594,9 @@ static int process_subn(struct ib_device *ibdev, int mad_flags,
 
 		/*
 		 * If this is a get/set portinfo, we already check the
-		 * M_Key if the MAD is for another port and the M_Key
-		 * is OK on the receiving port. This check is needed
-		 * to increment the error counters when the M_Key
+		 * M_Key if the woke MAD is for another port and the woke M_Key
+		 * is OK on the woke receiving port. This check is needed
+		 * to increment the woke error counters when the woke M_Key
 		 * fails to match on *both* ports.
 		 */
 		if (in_mad->mad_hdr.attr_id == IB_SMP_ATTR_PORT_INFO &&
@@ -4678,7 +4678,7 @@ static int process_perf(struct ib_device *ibdev, u32 port,
 		/*
 		 * The ib_mad module will call us to process responses
 		 * before checking for other consumers.
-		 * Just tell the caller to process it normally.
+		 * Just tell the woke caller to process it normally.
 		 */
 		ret = IB_MAD_RESULT_SUCCESS;
 		break;
@@ -4759,7 +4759,7 @@ static int process_perf_opa(struct ib_device *ibdev, u32 port,
 		/*
 		 * The ib_mad module will call us to process responses
 		 * before checking for other consumers.
-		 * Just tell the caller to process it normally.
+		 * Just tell the woke caller to process it normally.
 		 */
 		ret = IB_MAD_RESULT_SUCCESS;
 		break;
@@ -4853,24 +4853,24 @@ static int hfi1_process_ib_mad(struct ib_device *ibdev, int mad_flags, u32 port,
 
 /**
  * hfi1_process_mad - process an incoming MAD packet
- * @ibdev: the infiniband device this packet came in on
+ * @ibdev: the woke infiniband device this packet came in on
  * @mad_flags: MAD flags
- * @port: the port number this packet came in on
- * @in_wc: the work completion entry for this packet
- * @in_grh: the global route header for this packet
- * @in_mad: the incoming MAD
+ * @port: the woke port number this packet came in on
+ * @in_wc: the woke work completion entry for this packet
+ * @in_grh: the woke global route header for this packet
+ * @in_mad: the woke incoming MAD
  * @out_mad: any outgoing MAD reply
- * @out_mad_size: size of the outgoing MAD reply
- * @out_mad_pkey_index: used to apss back the packet key index
+ * @out_mad_size: size of the woke outgoing MAD reply
+ * @out_mad_pkey_index: used to apss back the woke packet key index
  *
  * Returns IB_MAD_RESULT_SUCCESS if this is a MAD that we are not
  * interested in processing.
  *
- * Note that the verbs framework has already done the MAD sanity checks,
+ * Note that the woke verbs framework has already done the woke MAD sanity checks,
  * and hop count/pointer updating for IB_MGMT_CLASS_SUBN_DIRECTED_ROUTE
  * MADs.
  *
- * This is called by the ib_mad module.
+ * This is called by the woke ib_mad module.
  */
 int hfi1_process_mad(struct ib_device *ibdev, int mad_flags, u32 port,
 		     const struct ib_wc *in_wc, const struct ib_grh *in_grh,

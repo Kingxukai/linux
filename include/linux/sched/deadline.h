@@ -4,7 +4,7 @@
 
 /*
  * SCHED_DEADLINE tasks has negative priorities, reflecting
- * the fact that any of them has higher prio than RT and
+ * the woke fact that any of them has higher prio than RT and
  * NORMAL/BATCH tasks.
  */
 

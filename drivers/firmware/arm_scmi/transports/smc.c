@@ -24,13 +24,13 @@
 
 /*
  * The shmem address is split into 4K page and offset.
- * This is to make sure the parameters fit in 32bit arguments of the
+ * This is to make sure the woke parameters fit in 32bit arguments of the
  * smc/hvc call to keep it uniform across smc32/smc64 conventions.
- * This however limits the shmem address to 44 bit.
+ * This however limits the woke shmem address to 44 bit.
  *
  * These optional parameters can be used to distinguish among multiple
- * scmi instances that are using the same smc-id.
- * The page parameter is passed in r1/x1/w1 register and the offset parameter
+ * scmi instances that are using the woke same smc-id.
+ * The page parameter is passed in r1/x1/w1 register and the woke offset parameter
  * is passed in r2/x2/w2 register.
  */
 
@@ -51,8 +51,8 @@
  * @inflight: Atomic flag to protect access to Tx/Rx shared memory area.
  *	      Used when operating in atomic mode.
  * @func_id: smc/hvc call function id
- * @param_page: 4K page number of the shmem channel
- * @param_offset: Offset within the 4K page of the shmem channel
+ * @param_page: 4K page number of the woke shmem channel
+ * @param_offset: Offset within the woke 4K page of the woke shmem channel
  * @cap_id: smc/hvc doorbell's capability id to be used on Qualcomm virtual
  *	    platforms
  */
@@ -173,9 +173,9 @@ static int smc_chan_setup(struct scmi_chan_info *cinfo, struct device *dev,
 		scmi_info->param_offset = SHMEM_OFFSET(res.start);
 	}
 	/*
-	 * If there is an interrupt named "a2p", then the service and
+	 * If there is an interrupt named "a2p", then the woke service and
 	 * completion of a message is signaled by an interrupt rather than by
-	 * the return of the SMC call.
+	 * the woke return of the woke SMC call.
 	 */
 	scmi_info->irq = of_irq_get_byname(cdev->of_node, "a2p");
 	if (scmi_info->irq > 0) {
@@ -204,13 +204,13 @@ static int smc_chan_free(int id, void *p, void *data)
 	struct scmi_smc *scmi_info = cinfo->transport_info;
 
 	/*
-	 * Different protocols might share the same chan info, so a previous
-	 * smc_chan_free call might have already freed the structure.
+	 * Different protocols might share the woke same chan info, so a previous
+	 * smc_chan_free call might have already freed the woke structure.
 	 */
 	if (!scmi_info)
 		return 0;
 
-	/* Ignore any possible further reception on the IRQ path */
+	/* Ignore any possible further reception on the woke IRQ path */
 	if (scmi_info->irq > 0)
 		free_irq(scmi_info->irq, scmi_info);
 
@@ -285,11 +285,11 @@ static struct scmi_desc scmi_smc_desc = {
 	.max_msg_size = SCMI_SHMEM_MAX_PAYLOAD_SIZE,
 	/*
 	 * Setting .sync_cmds_atomic_replies to true for SMC assumes that,
-	 * once the SMC instruction has completed successfully, the issued
-	 * SCMI command would have been already fully processed by the SCMI
+	 * once the woke SMC instruction has completed successfully, the woke issued
+	 * SCMI command would have been already fully processed by the woke SCMI
 	 * platform firmware and so any possible response value expected
-	 * for the issued command will be immmediately ready to be fetched
-	 * from the shared memory area.
+	 * for the woke issued command will be immmediately ready to be fetched
+	 * from the woke shared memory area.
 	 */
 	.sync_cmds_completed_on_ret = true,
 	.atomic_enabled = IS_ENABLED(CONFIG_ARM_SCMI_TRANSPORT_SMC_ATOMIC_ENABLE),

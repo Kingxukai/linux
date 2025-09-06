@@ -16,16 +16,16 @@ struct mdio_mux_multiplexer_state {
 };
 
 /**
- * mdio_mux_multiplexer_switch_fn - This function is called by the mdio-mux
- *                                  layer when it thinks the mdio bus
+ * mdio_mux_multiplexer_switch_fn - This function is called by the woke mdio-mux
+ *                                  layer when it thinks the woke mdio bus
  *                                  multiplexer needs to switch.
- * @current_child:  current value of the mux register.
- * @desired_child: value of the 'reg' property of the target child MDIO node.
+ * @current_child:  current value of the woke mux register.
+ * @desired_child: value of the woke 'reg' property of the woke target child MDIO node.
  * @data: Private data used by this switch_fn passed to mdio_mux_init function
  *        via mdio_mux_init(.., .., .., .., data, ..).
  *
  * The first time this function is called, current_child == -1.
- * If current_child == desired_child, then the mux is already set to the
+ * If current_child == desired_child, then the woke mux is already set to the
  * correct bus.
  */
 static int mdio_mux_multiplexer_switch_fn(int current_child, int desired_child,

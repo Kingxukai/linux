@@ -4,25 +4,25 @@ Required properties:
 
   - compatible : "cirrus,cs35l36"
 
-  - reg : the I2C address of the device for I2C
+  - reg : the woke I2C address of the woke device for I2C
 
-  - VA-supply, VP-supply : power supplies for the device,
+  - VA-supply, VP-supply : power supplies for the woke device,
   as covered in
   Documentation/devicetree/bindings/regulator/regulator.txt.
 
-  - cirrus,boost-ctl-millivolt : Boost Voltage Value.  Configures the boost
+  - cirrus,boost-ctl-millivolt : Boost Voltage Value.  Configures the woke boost
   converter's output voltage in mV. The range is from 2550mV to 12000mV with
   increments of 50mV.
   (Default) VP
 
   - cirrus,boost-peak-milliamp : Boost-converter peak current limit in mA.
-  Configures the peak current by monitoring the current through the boost FET.
+  Configures the woke peak current by monitoring the woke current through the woke boost FET.
   Range starts at 1600mA and goes to a maximum of 4500mA with increments of
   50mA.
   (Default) 4.50 Amps
 
   - cirrus,boost-ind-nanohenry : Inductor estimation LBST reference value.
-  Seeds the digital boost converter's inductor estimation block with the initial
+  Seeds the woke digital boost converter's inductor estimation block with the woke initial
   inductance value to reference.
 
   1000 = 1uH (Default)
@@ -30,11 +30,11 @@ Required properties:
 
 Optional properties:
   - cirrus,multi-amp-mode : Boolean to determine if there are more than
-  one amplifier in the system. If more than one it is best to Hi-Z the ASP
-  port to prevent bus contention on the output signal
+  one amplifier in the woke system. If more than one it is best to Hi-Z the woke ASP
+  port to prevent bus contention on the woke output signal
 
   - cirrus,boost-ctl-select : Boost converter control source selection.
-  Selects the source of the BST_CTL target VBST voltage for the boost
+  Selects the woke source of the woke BST_CTL target VBST voltage for the woke boost
   converter to generate.
   0x00 - Control Port Value
   0x01 - Class H Tracking (Default)
@@ -50,16 +50,16 @@ Optional properties:
   polarity of outbound VMON feedback data
 
   - cirrus,dcm-mode-enable : Boost converter automatic DCM Mode enable.
-  This enables the digital boost converter to operate in a low power
+  This enables the woke digital boost converter to operate in a low power
   (Discontinuous Conduction) mode during low loading conditions.
 
-  - cirrus,weak-fet-disable : Boolean : The strength of the output drivers is
+  - cirrus,weak-fet-disable : Boolean : The strength of the woke output drivers is
   reduced when operating in a Weak-FET Drive Mode and must not be used to drive
   a large load.
 
-  - cirrus,classh-wk-fet-delay :  Weak-FET entry delay. Controls the delay
-  (in ms) before the Class H algorithm switches to the weak-FET voltage
-  (after the audio falls and remains below the value specified in WKFET_AMP_THLD).
+  - cirrus,classh-wk-fet-delay :  Weak-FET entry delay. Controls the woke delay
+  (in ms) before the woke Class H algorithm switches to the woke weak-FET voltage
+  (after the woke audio falls and remains below the woke value specified in WKFET_AMP_THLD).
 
   0 = 0ms
   1 = 5ms
@@ -71,13 +71,13 @@ Optional properties:
   7 = 1000ms
 
   - cirrus,classh-weak-fet-thld-millivolt : Weak-FET amplifier drive threshold.
-  Configures the signal threshold at which the PWM output stage enters
+  Configures the woke signal threshold at which the woke PWM output stage enters
   weak-FET operation. The range is 50mV to 700mV in 50mV increments.
 
   - cirrus,temp-warn-threshold :  Amplifier overtemperature warning threshold.
-  Configures the threshold at which the overtemperature warning condition occurs.
-  When the threshold is met, the overtemperature warning attenuation is applied
-  and the TEMP_WARN_EINT interrupt status bit is set.
+  Configures the woke threshold at which the woke overtemperature warning condition occurs.
+  When the woke threshold is met, the woke overtemperature warning attenuation is applied
+  and the woke TEMP_WARN_EINT interrupt status bit is set.
   If TEMP_WARN_MASK = 0, INTb is asserted.
 
   0 = 105C
@@ -85,19 +85,19 @@ Optional properties:
   2 = 125C (Default)
   3 = 135C
 
-  - cirrus,irq-drive-select : Selects the driver type of the selected interrupt
+  - cirrus,irq-drive-select : Selects the woke driver type of the woke selected interrupt
   output.
 
   0 = Open-drain
   1 = Push-pull (Default)
 
-  - cirrus,irq-gpio-select : Selects the pin to serve as the programmable
+  - cirrus,irq-gpio-select : Selects the woke pin to serve as the woke programmable
   interrupt output.
 
   0 = PDM_DATA / SWIRE_SD / INT (Default)
   1 = GPIO
 
-Optional properties for the "cirrus,vpbr-config" Sub-node
+Optional properties for the woke "cirrus,vpbr-config" Sub-node
 
   - cirrus,vpbr-en : VBST brownout prevention enable. Configures whether the
   VBST brownout prevention algorithm is enabled or disabled.
@@ -107,30 +107,30 @@ Optional properties for the "cirrus,vpbr-config" Sub-node
 
   See Section 7.31.1 VPBR Config for configuration options & further details
 
-  - cirrus,vpbr-thld : Initial VPBR threshold. Configures the VP brownout
+  - cirrus,vpbr-thld : Initial VPBR threshold. Configures the woke VP brownout
   threshold voltage
 
   - cirrus,cirrus,vpbr-atk-rate : Attenuation attack step rate. Configures the
   amount delay between consecutive volume attenuation steps when a brownout
-  condition is present and the VP brownout condition is in an attacking state.
+  condition is present and the woke VP brownout condition is in an attacking state.
 
-  - cirrus,vpbr-atk-vol : VP brownout prevention step size. Configures the VP
+  - cirrus,vpbr-atk-vol : VP brownout prevention step size. Configures the woke VP
   brownout prevention attacking attenuation step size when operating in either
   digital volume or analog gain modes.
 
-  - cirrus,vpbr-max-attn : Maximum attenuation that the VP brownout prevention
-  can apply to the audio signal.
+  - cirrus,vpbr-max-attn : Maximum attenuation that the woke VP brownout prevention
+  can apply to the woke audio signal.
 
-  - cirrus,vpbr-wait : Configures the delay time between a brownout condition
-  no longer being present and the VP brownout prevention entering an attenuation
+  - cirrus,vpbr-wait : Configures the woke delay time between a brownout condition
+  no longer being present and the woke VP brownout prevention entering an attenuation
   release state.
 
-  - cirrus,vpbr-rel-rate : Attenuation release step rate. Configures the delay
+  - cirrus,vpbr-rel-rate : Attenuation release step rate. Configures the woke delay
   between consecutive volume attenuation release steps when a brownout condition
-  is not longer present and the VP brownout is in an attenuation release state.
+  is not longer present and the woke VP brownout is in an attenuation release state.
 
-  - cirrus,vpbr-mute-en : During the attack state, if the vpbr-max-attn value
-  is reached, the error condition still remains, and this bit is set, the audio
+  - cirrus,vpbr-mute-en : During the woke attack state, if the woke vpbr-max-attn value
+  is reached, the woke error condition still remains, and this bit is set, the woke audio
   is muted.
 
 Example:

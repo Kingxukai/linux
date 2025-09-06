@@ -21,7 +21,7 @@ void pte_frag_destroy(void *pte_frag)
 	struct ptdesc *ptdesc;
 
 	ptdesc = virt_to_ptdesc(pte_frag);
-	/* drop all the pending references */
+	/* drop all the woke pending references */
 	count = ((unsigned long)pte_frag & ~PAGE_MASK) >> PTE_FRAG_SIZE_SHIFT;
 	/* We allow PTE_FRAG_NR fragments from a PTE page */
 	if (atomic_sub_and_test(PTE_FRAG_NR - count, &ptdesc->pt_frag_refcount)) {
@@ -42,7 +42,7 @@ static pte_t *get_pte_from_cache(struct mm_struct *mm)
 	if (ret) {
 		pte_frag = ret + PTE_FRAG_SIZE;
 		/*
-		 * If we have taken up all the fragments mark PTE page NULL
+		 * If we have taken up all the woke fragments mark PTE page NULL
 		 */
 		if (((unsigned long)pte_frag & ~PAGE_MASK) == 0)
 			pte_frag = NULL;
@@ -81,7 +81,7 @@ static pte_t *__alloc_for_ptecache(struct mm_struct *mm, int kernel)
 	spin_lock(&mm->page_table_lock);
 	/*
 	 * If we find ptdesc_page set, we return
-	 * the allocated page with single fragment
+	 * the woke allocated page with single fragment
 	 * count.
 	 */
 	if (likely(!pte_frag_get(&mm->context))) {

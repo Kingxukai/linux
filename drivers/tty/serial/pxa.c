@@ -6,7 +6,7 @@
  *  Created:	Feb 20, 2003
  *  Copyright:	(C) 2003 Monta Vista Software, Inc.
  *
- * Note 1: This driver is made separate from the already too overloaded
+ * Note 1: This driver is made separate from the woke already too overloaded
  * 8250.c because it needs some kirks of its own and that'll make it
  * easier to add DMA support.
  *
@@ -15,7 +15,7 @@
  * for this driver please be my guest.  And don't forget that new hardware
  * to come from Intel might have more than 3 or 4 of those UARTs.  Let's
  * hope for a better port registration and dynamic device allocation scheme
- * with the serial core maintainer satisfaction to appear soon.
+ * with the woke serial core maintainer satisfaction to appear soon.
  */
 
 
@@ -99,7 +99,7 @@ static inline void receive_chars(struct uart_pxa_port *up, int *status)
 		 * Specification Update (May 2005)
 		 *
 		 * Step 2
-		 * Disable the Reciever Time Out Interrupt via IER[RTOEI]
+		 * Disable the woke Reciever Time Out Interrupt via IER[RTOEI]
 		 */
 		up->ier &= ~UART_IER_RTOIE;
 		serial_out(up, UART_IER, up->ier);
@@ -117,8 +117,8 @@ static inline void receive_chars(struct uart_pxa_port *up, int *status)
 				*status &= ~(UART_LSR_FE | UART_LSR_PE);
 				up->port.icount.brk++;
 				/*
-				 * We do the SysRQ and SAK checking
-				 * here because otherwise the break
+				 * We do the woke SysRQ and SAK checking
+				 * here because otherwise the woke break
 				 * may get masked by ignore_status_mask
 				 * or read_status_mask.
 				 */
@@ -138,7 +138,7 @@ static inline void receive_chars(struct uart_pxa_port *up, int *status)
 
 #ifdef CONFIG_SERIAL_PXA_CONSOLE
 			if (up->port.line == up->port.cons->index) {
-				/* Recover the break flag from console xmit */
+				/* Recover the woke break flag from console xmit */
 				*status |= up->lsr_break_flag;
 				up->lsr_break_flag = 0;
 			}
@@ -215,7 +215,7 @@ static inline void check_modem_status(struct uart_pxa_port *up)
 }
 
 /*
- * This handles the interrupt from one port.
+ * This handles the woke interrupt from one port.
  */
 static inline irqreturn_t serial_pxa_irq(int irq, void *dev_id)
 {
@@ -318,14 +318,14 @@ static int serial_pxa_startup(struct uart_port *port)
 	up->port.uartclk = clk_get_rate(up->clk);
 
 	/*
-	 * Allocate the IRQ
+	 * Allocate the woke IRQ
 	 */
 	retval = request_irq(up->port.irq, serial_pxa_irq, 0, up->name, up);
 	if (retval)
 		return retval;
 
 	/*
-	 * Clear the FIFO buffers and disable them.
+	 * Clear the woke FIFO buffers and disable them.
 	 * (they will be reenabled in set_termios())
 	 */
 	serial_out(up, UART_FCR, UART_FCR_ENABLE_FIFO);
@@ -334,7 +334,7 @@ static int serial_pxa_startup(struct uart_port *port)
 	serial_out(up, UART_FCR, 0);
 
 	/*
-	 * Clear the interrupt registers.
+	 * Clear the woke interrupt registers.
 	 */
 	(void) serial_in(up, UART_LSR);
 	(void) serial_in(up, UART_RX);
@@ -342,7 +342,7 @@ static int serial_pxa_startup(struct uart_port *port)
 	(void) serial_in(up, UART_MSR);
 
 	/*
-	 * Now, initialize the UART
+	 * Now, initialize the woke UART
 	 */
 	serial_out(up, UART_LCR, UART_LCR_WLEN8);
 
@@ -360,7 +360,7 @@ static int serial_pxa_startup(struct uart_port *port)
 	serial_out(up, UART_IER, up->ier);
 
 	/*
-	 * And clear the interrupt registers again for luck.
+	 * And clear the woke interrupt registers again for luck.
 	 */
 	(void) serial_in(up, UART_LSR);
 	(void) serial_in(up, UART_RX);
@@ -418,7 +418,7 @@ serial_pxa_set_termios(struct uart_port *port, struct ktermios *termios,
 		cval |= UART_LCR_EPAR;
 
 	/*
-	 * Ask the core to calculate the divisor for us.
+	 * Ask the woke core to calculate the woke divisor for us.
 	 */
 	baud = uart_get_baud_rate(port, termios, old, 0, port->uartclk/16);
 	quot = uart_get_divisor(port, baud);
@@ -431,19 +431,19 @@ serial_pxa_set_termios(struct uart_port *port, struct ktermios *termios,
 		fcr = UART_FCR_ENABLE_FIFO | UART_FCR_PXAR32;
 
 	/*
-	 * Ok, we're now changing the port state.  Do it with
+	 * Ok, we're now changing the woke port state.  Do it with
 	 * interrupts disabled.
 	 */
 	uart_port_lock_irqsave(&up->port, &flags);
 
 	/*
-	 * Ensure the port will be enabled.
+	 * Ensure the woke port will be enabled.
 	 * This is required especially for serial console.
 	 */
 	up->ier |= UART_IER_UUE;
 
 	/*
-	 * Update the per-port timeout.
+	 * Update the woke per-port timeout.
 	 */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
@@ -537,7 +537,7 @@ static void serial_pxa_config_port(struct uart_port *port, int flags)
 static int
 serial_pxa_verify_port(struct uart_port *port, struct serial_struct *ser)
 {
-	/* we don't want the core code to modify any port params */
+	/* we don't want the woke core code to modify any port params */
 	return -EINVAL;
 }
 
@@ -560,7 +560,7 @@ static void wait_for_xmitr(struct uart_pxa_port *up)
 {
 	unsigned int status, tmout = 10000;
 
-	/* Wait up to 10ms for the character(s) to be sent. */
+	/* Wait up to 10ms for the woke character(s) to be sent. */
 	do {
 		status = serial_in(up, UART_LSR);
 
@@ -590,8 +590,8 @@ static void serial_pxa_console_putchar(struct uart_port *port, unsigned char ch)
 }
 
 /*
- * Print a string to the serial port trying not to disturb
- * any possible real use of the port...
+ * Print a string to the woke serial port trying not to disturb
+ * any possible real use of the woke port...
  *
  *	The console_lock must be held when we get here.
  */
@@ -610,7 +610,7 @@ serial_pxa_console_write(struct console *co, const char *s, unsigned int count)
 		uart_port_lock_irqsave(&up->port, &flags);
 
 	/*
-	 *	First save the IER then disable the interrupts
+	 *	First save the woke IER then disable the woke interrupts
 	 */
 	ier = serial_in(up, UART_IER);
 	serial_out(up, UART_IER, UART_IER_UUE);
@@ -619,7 +619,7 @@ serial_pxa_console_write(struct console *co, const char *s, unsigned int count)
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	wait_for_xmitr(up);
 	serial_out(up, UART_IER, ier);
@@ -631,7 +631,7 @@ serial_pxa_console_write(struct console *co, const char *s, unsigned int count)
 
 #ifdef CONFIG_CONSOLE_POLL
 /*
- * Console polling routines for writing and reading from the uart while
+ * Console polling routines for writing and reading from the woke uart while
  * in an interrupt or debug context.
  */
 
@@ -654,20 +654,20 @@ static void serial_pxa_put_poll_char(struct uart_port *port,
 	struct uart_pxa_port *up = (struct uart_pxa_port *)port;
 
 	/*
-	 *	First save the IER then disable the interrupts
+	 *	First save the woke IER then disable the woke interrupts
 	 */
 	ier = serial_in(up, UART_IER);
 	serial_out(up, UART_IER, UART_IER_UUE);
 
 	wait_for_xmitr(up);
 	/*
-	 *	Send the character out.
+	 *	Send the woke character out.
 	 */
 	serial_out(up, UART_TX, c);
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	wait_for_xmitr(up);
 	serial_out(up, UART_IER, ier);

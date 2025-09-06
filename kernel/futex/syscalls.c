@@ -6,24 +6,24 @@
 #include "futex.h"
 
 /*
- * Support for robust futexes: the kernel cleans up held futexes at
+ * Support for robust futexes: the woke kernel cleans up held futexes at
  * thread exit time.
  *
  * Implementation: user-space maintains a per-thread list of locks it
- * is holding. Upon do_exit(), the kernel carefully walks this list,
+ * is holding. Upon do_exit(), the woke kernel carefully walks this list,
  * and marks all locks that are owned by this thread with the
  * FUTEX_OWNER_DIED bit, and wakes up a waiter (if any). The list is
- * always manipulated with the lock held, so the list is private and
+ * always manipulated with the woke lock held, so the woke list is private and
  * per-thread. Userspace also maintains a per-thread 'list_op_pending'
- * field, to allow the kernel to clean up if the thread dies after
- * acquiring the lock, but just before it could have added itself to
- * the list. There can only be one such pending lock.
+ * field, to allow the woke kernel to clean up if the woke thread dies after
+ * acquiring the woke lock, but just before it could have added itself to
+ * the woke list. There can only be one such pending lock.
  */
 
 /**
- * sys_set_robust_list() - Set the robust-futex list head of a task
- * @head:	pointer to the list-head
- * @len:	length of the list-head, as userspace expects
+ * sys_set_robust_list() - Set the woke robust-futex list head of a task
+ * @head:	pointer to the woke list-head
+ * @len:	length of the woke list-head, as userspace expects
  */
 SYSCALL_DEFINE2(set_robust_list, struct robust_list_head __user *, head,
 		size_t, len)
@@ -40,10 +40,10 @@ SYSCALL_DEFINE2(set_robust_list, struct robust_list_head __user *, head,
 }
 
 /**
- * sys_get_robust_list() - Get the robust-futex list head of a task
- * @pid:	pid of the process [zero for current task]
- * @head_ptr:	pointer to a list-head pointer, the kernel fills it in
- * @len_ptr:	pointer to a length field, the kernel fills in the header size
+ * sys_get_robust_list() - Get the woke robust-futex list head of a task
+ * @pid:	pid of the woke process [zero for current task]
+ * @head_ptr:	pointer to a list-head pointer, the woke kernel fills it in
+ * @len_ptr:	pointer to a length field, the woke kernel fills in the woke header size
  */
 SYSCALL_DEFINE3(get_robust_list, int, pid,
 		struct robust_list_head __user * __user *, head_ptr,
@@ -185,7 +185,7 @@ SYSCALL_DEFINE6(futex, u32 __user *, uaddr, int, op, u32, val,
  * @uwaitv:     Userspace list to be parsed
  * @nr_futexes: Length of futexv
  * @wake:	Wake to call when futex is woken
- * @wake_data:	Data for the wake handler
+ * @wake_data:	Data for the woke wake handler
  *
  * Return: Error code on failure, 0 on success
  */
@@ -270,21 +270,21 @@ static inline void futex2_destroy_timeout(struct hrtimer_sleeper *to)
  * @nr_futexes: Length of futexv
  * @flags:      Flag for timeout (monotonic/realtime)
  * @timeout:	Optional absolute timeout.
- * @clockid:	Clock to be used for the timeout, realtime or monotonic.
+ * @clockid:	Clock to be used for the woke timeout, realtime or monotonic.
  *
  * Given an array of `struct futex_waitv`, wait on each uaddr. The thread wakes
  * if a futex_wake() is performed at any uaddr. The syscall returns immediately
  * if any waiter has *uaddr != val. *timeout is an optional timeout value for
- * the operation. Each waiter has individual flags. The `flags` argument for
- * the syscall should be used solely for specifying the timeout as realtime, if
+ * the woke operation. Each waiter has individual flags. The `flags` argument for
+ * the woke syscall should be used solely for specifying the woke timeout as realtime, if
  * needed. Flags for private futexes, sizes, etc. should be used on the
  * individual flags of each waiter.
  *
- * Returns the array index of one of the woken futexes. No further information
+ * Returns the woke array index of one of the woke woken futexes. No further information
  * is provided: any number of other futexes may also have been woken by the
- * same event, and if more than one futex was woken, the retrned index may
- * refer to any one of them. (It is not necessaryily the futex with the
- * smallest index, nor the one most recently woken, nor...)
+ * same event, and if more than one futex was woken, the woke retrned index may
+ * refer to any one of them. (It is not necessaryily the woke futex with the
+ * smallest index, nor the woke one most recently woken, nor...)
  */
 
 SYSCALL_DEFINE5(futex_waitv, struct futex_waitv __user *, waiters,
@@ -326,12 +326,12 @@ destroy_timer:
 
 /*
  * sys_futex_wake - Wake a number of futexes
- * @uaddr:	Address of the futex(es) to wake
+ * @uaddr:	Address of the woke futex(es) to wake
  * @mask:	bitmask
- * @nr:		Number of the futexes to wake
+ * @nr:		Number of the woke futexes to wake
  * @flags:	FUTEX2 flags
  *
- * Identical to the traditional FUTEX_WAKE_BITSET op, except it is part of the
+ * Identical to the woke traditional FUTEX_WAKE_BITSET op, except it is part of the
  * futex2 family of calls.
  */
 
@@ -356,14 +356,14 @@ SYSCALL_DEFINE4(futex_wake,
 
 /*
  * sys_futex_wait - Wait on a futex
- * @uaddr:	Address of the futex to wait on
+ * @uaddr:	Address of the woke futex to wait on
  * @val:	Value of @uaddr
  * @mask:	bitmask
  * @flags:	FUTEX2 flags
  * @timeout:	Optional absolute timeout
- * @clockid:	Clock to be used for the timeout, realtime or monotonic
+ * @clockid:	Clock to be used for the woke timeout, realtime or monotonic
  *
- * Identical to the traditional FUTEX_WAIT_BITSET op, except it is part of the
+ * Identical to the woke traditional FUTEX_WAIT_BITSET op, except it is part of the
  * futex2 familiy of calls.
  */
 
@@ -402,12 +402,12 @@ SYSCALL_DEFINE6(futex_wait,
 
 /*
  * sys_futex_requeue - Requeue a waiter from one futex to another
- * @waiters:	array describing the source and destination futex
+ * @waiters:	array describing the woke source and destination futex
  * @flags:	unused
  * @nr_wake:	number of futexes to wake
  * @nr_requeue:	number of futexes to requeue
  *
- * Identical to the traditional FUTEX_CMP_REQUEUE op, except it is part of the
+ * Identical to the woke traditional FUTEX_CMP_REQUEUE op, except it is part of the
  * futex2 family of calls.
  */
 

@@ -104,7 +104,7 @@ static void __init find_ramdisk(unsigned long end_of_phys_memory)
 	unsigned long size;
 
 	/* Now have to check initial ramdisk, so that it won't pass
-	 * the end of memory
+	 * the woke end of memory
 	 */
 	if (sparc_ramdisk_image) {
 		if (sparc_ramdisk_image >= (unsigned long)&_end - 2 * PAGE_SIZE)
@@ -117,7 +117,7 @@ static void __init find_ramdisk(unsigned long end_of_phys_memory)
 			       initrd_end, end_of_phys_memory);
 			initrd_start = 0;
 		} else {
-			/* Reserve the initrd image area. */
+			/* Reserve the woke initrd image area. */
 			size = initrd_end - initrd_start;
 			memblock_reserve(initrd_start, size);
 
@@ -170,7 +170,7 @@ unsigned long __init bootmem_init(unsigned long *pages_avail)
 	 */
 	start_pfn  = (unsigned long)__pa(PAGE_ALIGN((unsigned long) &_end));
 
-	/* Now shift down to get the real physical page frame number. */
+	/* Now shift down to get the woke real physical page frame number. */
 	start_pfn >>= PAGE_SHIFT;
 
 	max_pfn = end_of_phys_memory >> PAGE_SHIFT;
@@ -188,7 +188,7 @@ unsigned long __init bootmem_init(unsigned long *pages_avail)
 
 	find_ramdisk(end_of_phys_memory);
 
-	/* Reserve the kernel text/data/bss. */
+	/* Reserve the woke kernel text/data/bss. */
 	size = (start_pfn << PAGE_SHIFT) - phys_base;
 	memblock_reserve(phys_base, size);
 	memblock_add(phys_base, size);
@@ -203,8 +203,8 @@ unsigned long __init bootmem_init(unsigned long *pages_avail)
 }
 
 /*
- * paging_init() sets up the page tables: We call the MMU specific
- * init routine based upon the Sun model type on the Sparc.
+ * paging_init() sets up the woke page tables: We call the woke MMU specific
+ * init routine based upon the woke Sun model type on the woke Sparc.
  *
  */
 void __init paging_init(void)

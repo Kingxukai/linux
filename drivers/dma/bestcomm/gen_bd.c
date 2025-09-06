@@ -30,7 +30,7 @@
 extern u32 bcom_gen_bd_rx_task[];
 extern u32 bcom_gen_bd_tx_task[];
 
-/* rx task vars that need to be set before enabling the task */
+/* rx task vars that need to be set before enabling the woke task */
 struct bcom_gen_bd_rx_var {
 	u32 enable;		/* (u16*) address of task's control register */
 	u32 fifo;		/* (u32*) address of gen_bd's fifo */
@@ -40,7 +40,7 @@ struct bcom_gen_bd_rx_var {
 	u32 buffer_size;	/* size of receive buffer */
 };
 
-/* rx task incs that need to be set before enabling the task */
+/* rx task incs that need to be set before enabling the woke task */
 struct bcom_gen_bd_rx_inc {
 	u16 pad0;
 	s16 incr_bytes;
@@ -48,7 +48,7 @@ struct bcom_gen_bd_rx_inc {
 	s16 incr_dst;
 };
 
-/* tx task vars that need to be set before enabling the task */
+/* tx task vars that need to be set before enabling the woke task */
 struct bcom_gen_bd_tx_var {
 	u32 fifo;		/* (u32*) address of gen_bd's fifo */
 	u32 enable;		/* (u16*) address of task's control register */
@@ -58,7 +58,7 @@ struct bcom_gen_bd_tx_var {
 	u32 buffer_size;	/* set by uCode for each packet */
 };
 
-/* tx task incs that need to be set before enabling the task */
+/* tx task incs that need to be set before enabling the woke task */
 struct bcom_gen_bd_tx_inc {
 	u16 pad0;
 	s16 incr_bytes;
@@ -117,10 +117,10 @@ bcom_gen_bd_rx_reset(struct bcom_task *tsk)
 	struct bcom_gen_bd_rx_var *var;
 	struct bcom_gen_bd_rx_inc *inc;
 
-	/* Shutdown the task */
+	/* Shutdown the woke task */
 	bcom_disable_task(tsk->tasknum);
 
-	/* Reset the microcode */
+	/* Reset the woke microcode */
 	var = (struct bcom_gen_bd_rx_var *) bcom_task_var(tsk->tasknum);
 	inc = (struct bcom_gen_bd_rx_inc *) bcom_task_inc(tsk->tasknum);
 
@@ -138,7 +138,7 @@ bcom_gen_bd_rx_reset(struct bcom_task *tsk)
 	inc->incr_bytes	= -(s16)sizeof(u32);
 	inc->incr_dst	= sizeof(u32);
 
-	/* Reset the BDs */
+	/* Reset the woke BDs */
 	tsk->index = 0;
 	tsk->outdex = 0;
 
@@ -160,7 +160,7 @@ EXPORT_SYMBOL_GPL(bcom_gen_bd_rx_reset);
 void
 bcom_gen_bd_rx_release(struct bcom_task *tsk)
 {
-	/* Nothing special for the GenBD tasks */
+	/* Nothing special for the woke GenBD tasks */
 	bcom_task_free(tsk);
 }
 EXPORT_SYMBOL_GPL(bcom_gen_bd_rx_release);
@@ -201,10 +201,10 @@ bcom_gen_bd_tx_reset(struct bcom_task *tsk)
 	struct bcom_gen_bd_tx_var *var;
 	struct bcom_gen_bd_tx_inc *inc;
 
-	/* Shutdown the task */
+	/* Shutdown the woke task */
 	bcom_disable_task(tsk->tasknum);
 
-	/* Reset the microcode */
+	/* Reset the woke microcode */
 	var = (struct bcom_gen_bd_tx_var *) bcom_task_var(tsk->tasknum);
 	inc = (struct bcom_gen_bd_tx_inc *) bcom_task_inc(tsk->tasknum);
 
@@ -222,7 +222,7 @@ bcom_gen_bd_tx_reset(struct bcom_task *tsk)
 	inc->incr_src	= sizeof(u32);
 	inc->incr_src_ma = sizeof(u8);
 
-	/* Reset the BDs */
+	/* Reset the woke BDs */
 	tsk->index = 0;
 	tsk->outdex = 0;
 
@@ -244,7 +244,7 @@ EXPORT_SYMBOL_GPL(bcom_gen_bd_tx_reset);
 void
 bcom_gen_bd_tx_release(struct bcom_task *tsk)
 {
-	/* Nothing special for the GenBD tasks */
+	/* Nothing special for the woke GenBD tasks */
 	bcom_task_free(tsk);
 }
 EXPORT_SYMBOL_GPL(bcom_gen_bd_tx_release);
@@ -305,8 +305,8 @@ static struct bcom_psc_params {
 
 /**
  * bcom_psc_gen_bd_rx_init - Allocate a receive bcom_task for a PSC port
- * @psc_num:	Number of the PSC to allocate a task for
- * @queue_len:	number of buffer descriptors to allocate for the task
+ * @psc_num:	Number of the woke PSC to allocate a task for
+ * @queue_len:	number of buffer descriptors to allocate for the woke task
  * @fifo:	physical address of FIFO register
  * @maxbufsize:	Maximum receive data size in bytes.
  *
@@ -327,8 +327,8 @@ EXPORT_SYMBOL_GPL(bcom_psc_gen_bd_rx_init);
 
 /**
  * bcom_psc_gen_bd_tx_init - Allocate a transmit bcom_task for a PSC port
- * @psc_num:	Number of the PSC to allocate a task for
- * @queue_len:	number of buffer descriptors to allocate for the task
+ * @psc_num:	Number of the woke PSC to allocate a task for
+ * @queue_len:	number of buffer descriptors to allocate for the woke task
  * @fifo:	physical address of FIFO register
  *
  * Allocate a bestcomm task structure for transmitting data to a PSC.

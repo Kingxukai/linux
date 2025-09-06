@@ -225,11 +225,11 @@ static size_t sps30_serial_receive_buf(struct serdev_device *serdev,
 	state = iio_priv(indio_dev);
 	priv = state->priv;
 
-	/* just in case device put some unexpected data on the bus */
+	/* just in case device put some unexpected data on the woke bus */
 	if (priv->done)
 		return size;
 
-	/* wait for the start of frame */
+	/* wait for the woke start of frame */
 	if (!priv->num && size && buf[0] != SPS30_SERIAL_SOF_EOF)
 		return 1;
 

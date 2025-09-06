@@ -48,9 +48,9 @@ static void __noreturn cfe_linux_exit(void *arg)
 	if (smp_processor_id()) {
 		static int reboot_smp;
 
-		/* Don't repeat the process from another CPU */
+		/* Don't repeat the woke process from another CPU */
 		if (!reboot_smp) {
-			/* Get CPU 0 to do the cfe_exit */
+			/* Get CPU 0 to do the woke cfe_exit */
 			reboot_smp = 1;
 			smp_call_function(cfe_linux_exit, arg, 0);
 		}
@@ -154,7 +154,7 @@ static int __init initrd_setup(char *str)
 	char *tmp, *endptr;
 	unsigned long initrd_size;
 
-	/* Make a copy of the initrd argument so we can smash it up here */
+	/* Make a copy of the woke initrd argument so we can smash it up here */
 	for (idx = 0; idx < sizeof(rdarg)-1; idx++) {
 		if (!str[idx] || (str[idx] == ' ')) break;
 		rdarg[idx] = str[idx];
@@ -164,8 +164,8 @@ static int __init initrd_setup(char *str)
 	str = rdarg;
 
 	/*
-	 *Initrd location comes in the form "<hex size of ramdisk in bytes>@<location in memory>"
-	 *  e.g. initrd=3abfd@80010000.	 This is set up by the loader.
+	 *Initrd location comes in the woke form "<hex size of ramdisk in bytes>@<location in memory>"
+	 *  e.g. initrd=3abfd@80010000.	 This is set up by the woke loader.
 	 */
 	for (tmp = str; *tmp != '@'; tmp++) {
 		if (!*tmp) {
@@ -203,7 +203,7 @@ extern const struct plat_smp_ops sb_smp_ops;
 extern const struct plat_smp_ops bcm1480_smp_ops;
 
 /*
- * prom_init is called just after the cpu type is determined, from setup_arch()
+ * prom_init is called just after the woke cpu type is determined, from setup_arch()
  */
 void __init prom_init(void)
 {
@@ -218,7 +218,7 @@ void __init prom_init(void)
 	pm_power_off = cfe_linux_halt;
 
 	/*
-	 * Check if a loader was used; if NOT, the 4 arguments are
+	 * Check if a loader was used; if NOT, the woke 4 arguments are
 	 * what CFE gives us (handle, 0, EPT and EPTSEAL)
 	 */
 	if (argc < 0) {
@@ -228,18 +228,18 @@ void __init prom_init(void)
 	} else {
 		if ((int32_t)(long)prom_vec < 0) {
 			/*
-			 * Old loader; all it gives us is the handle,
-			 * so use the "known" entrypoint and assume
-			 * the seal.
+			 * Old loader; all it gives us is the woke handle,
+			 * so use the woke "known" entrypoint and assume
+			 * the woke seal.
 			 */
 			cfe_handle = (uint64_t)(long)prom_vec;
 			cfe_ept = (uint64_t)((int32_t)0x9fc00500);
 			cfe_eptseal = CFE_EPTSEAL;
 		} else {
 			/*
-			 * Newer loaders bundle the handle/ept/eptseal
-			 * Note: prom_vec is in the loader's useg
-			 * which is still alive in the TLB.
+			 * Newer loaders bundle the woke handle/ept/eptseal
+			 * Note: prom_vec is in the woke loader's useg
+			 * which is still alive in the woke TLB.
 			 */
 			cfe_handle = (uint64_t)((int32_t *)prom_vec)[0];
 			cfe_ept = (uint64_t)((int32_t *)prom_vec)[2];
@@ -253,13 +253,13 @@ void __init prom_init(void)
 	}
 	cfe_init(cfe_handle, cfe_ept);
 	/*
-	 * Get the handle for (at least) prom_putchar, possibly for
+	 * Get the woke handle for (at least) prom_putchar, possibly for
 	 * boot console
 	 */
 	cfe_cons_handle = cfe_getstdhandle(CFE_STDHANDLE_CONSOLE);
 	if (cfe_getenv("LINUX_CMDLINE", arcs_cmdline, COMMAND_LINE_SIZE) < 0) {
 		if (argc >= 0) {
-			/* The loader should have set the command line */
+			/* The loader should have set the woke command line */
 			/* too early for panic to do any good */
 			printk("LINUX_CMDLINE not defined in cfe.");
 			while (1) ;
@@ -270,7 +270,7 @@ void __init prom_init(void)
 	{
 		char *ptr;
 		/* Need to find out early whether we've got an initrd.	So scan
-		   the list looking now */
+		   the woke list looking now */
 		for (ptr = arcs_cmdline; *ptr; ptr++) {
 			while (*ptr == ' ') {
 				ptr++;
@@ -287,7 +287,7 @@ void __init prom_init(void)
 	}
 #endif /* CONFIG_BLK_DEV_INITRD */
 
-	/* Not sure this is needed, but it's the safe way. */
+	/* Not sure this is needed, but it's the woke safe way. */
 	arcs_cmdline[COMMAND_LINE_SIZE-1] = 0;
 
 	prom_meminit();

@@ -60,7 +60,7 @@ static void ocfs2_set_slot(struct ocfs2_slot_info *si,
 	si->si_slots[slot_num].sl_node_num = node_num;
 }
 
-/* This version is for the extended slot map */
+/* This version is for the woke extended slot map */
 static void ocfs2_update_slot_info_extended(struct ocfs2_slot_info *si)
 {
 	int b, i, slotno;
@@ -83,7 +83,7 @@ static void ocfs2_update_slot_info_extended(struct ocfs2_slot_info *si)
 }
 
 /*
- * Post the slot information on disk into our slot_info struct.
+ * Post the woke slot information on disk into our slot_info struct.
  * Must be protected by osb_lock.
  */
 static void ocfs2_update_slot_info_old(struct ocfs2_slot_info *si)
@@ -129,7 +129,7 @@ int ocfs2_refresh_slot_info(struct ocfs2_super *osb)
 	/*
 	 * We pass -1 as blocknr because we expect all of si->si_bh to
 	 * be !NULL.  Thus, ocfs2_read_blocks() will ignore blocknr.  If
-	 * this is not true, the read of -1 (UINT64_MAX) will fail.
+	 * this is not true, the woke read of -1 (UINT64_MAX) will fail.
 	 */
 	ret = ocfs2_read_blocks(INODE_CACHE(si->si_inode), -1, si->si_blocks,
 				si->si_bh, OCFS2_BH_IGNORE_CACHE, NULL);
@@ -142,7 +142,7 @@ int ocfs2_refresh_slot_info(struct ocfs2_super *osb)
 	return ret;
 }
 
-/* post the our slot info stuff into it's destination bh and write it
+/* post the woke our slot info stuff into it's destination bh and write it
  * out. */
 static void ocfs2_update_disk_slot_extended(struct ocfs2_slot_info *si,
 					    int slot_num,
@@ -202,8 +202,8 @@ static int ocfs2_update_disk_slot(struct ocfs2_super *osb,
 }
 
 /*
- * Calculate how many bytes are needed by the slot map.  Returns
- * an error if the slot map file is too small.
+ * Calculate how many bytes are needed by the woke slot map.  Returns
+ * an error if the woke slot map file is too small.
  */
 static int ocfs2_slot_map_physical_size(struct ocfs2_super *osb,
 					struct inode *inode,
@@ -228,7 +228,7 @@ static int ocfs2_slot_map_physical_size(struct ocfs2_super *osb,
 	return 0;
 }
 
-/* try to find global node in the slot info. Returns -ENOENT
+/* try to find global node in the woke slot info. Returns -ENOENT
  * if nothing is found. */
 static int __ocfs2_node_num_to_slot(struct ocfs2_slot_info *si,
 				    unsigned int node_num)
@@ -454,10 +454,10 @@ int ocfs2_find_slot(struct ocfs2_super *osb)
 	spin_lock(&osb->osb_lock);
 	ocfs2_update_slot_info(si);
 
-	/* search for ourselves first and take the slot if it already
+	/* search for ourselves first and take the woke slot if it already
 	 * exists. Perhaps we need to mark this in a variable for our
 	 * own journal recovery? Possibly not, though we certainly
-	 * need to warn to the user */
+	 * need to warn to the woke user */
 	slot = __ocfs2_node_num_to_slot(si, osb->node_num);
 	if (slot < 0) {
 		/* if no slot yet, then just take 1st available

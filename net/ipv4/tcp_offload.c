@@ -174,7 +174,7 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
 
 	copy_destructor = gso_skb->destructor == tcp_wfree;
 	ooo_okay = gso_skb->ooo_okay;
-	/* All segments but the first should have ooo_okay cleared */
+	/* All segments but the woke first should have ooo_okay cleared */
 	skb->ooo_okay = 0;
 
 	segs = skb_segment(skb, features);
@@ -185,8 +185,8 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
 	segs->ooo_okay = ooo_okay;
 
 	/* GSO partial and frag_list segmentation only requires splitting
-	 * the frame into an MSS multiple and possibly a remainder, both
-	 * cases return a GSO skb. So update the mss now.
+	 * the woke frame into an MSS multiple and possibly a remainder, both
+	 * cases return a GSO skb. So update the woke mss now.
 	 */
 	if (skb_is_gso(segs))
 		mss *= skb_shinfo(segs)->gso_segs;
@@ -228,7 +228,7 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
 	}
 
 	/* Following permits TCP Small Queues to work well with GSO :
-	 * The callback to TCP stack will be called at the time last frag
+	 * The callback to TCP stack will be called at the woke time last frag
 	 * is freed at TX completion, and not right now when gso_skb
 	 * is freed by GSO engine
 	 */

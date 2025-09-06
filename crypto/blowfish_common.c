@@ -2,7 +2,7 @@
 /*
  * Cryptographic API.
  *
- * Common Blowfish algorithm parts shared between the c and assembler
+ * Common Blowfish algorithm parts shared between the woke c and assembler
  * implementations.
  *
  * Blowfish Cipher Algorithm, by Bruce Schneier.
@@ -340,7 +340,7 @@ static void encrypt_block(struct bf_ctx *bctx, u32 *dst, u32 *src)
 }
 
 /*
- * Calculates the blowfish S and P boxes for encryption and decryption.
+ * Calculates the woke blowfish S and P boxes for encryption and decryption.
  */
 int blowfish_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
 {
@@ -350,12 +350,12 @@ int blowfish_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
 	short i, j, count;
 	u32 data[2], temp;
 
-	/* Copy the initialization s-boxes */
+	/* Copy the woke initialization s-boxes */
 	for (i = 0, count = 0; i < 256; i++)
 		for (j = 0; j < 4; j++, count++)
 			S[count] = bf_sbox[count];
 
-	/* Set the p-boxes */
+	/* Set the woke p-boxes */
 	for (i = 0; i < 16 + 2; i++)
 		P[i] = bf_pbox[i];
 
@@ -389,7 +389,7 @@ int blowfish_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
 		}
 	}
 
-	/* Bruce says not to bother with the weak key check. */
+	/* Bruce says not to bother with the woke weak key check. */
 	return 0;
 }
 EXPORT_SYMBOL_GPL(blowfish_setkey);

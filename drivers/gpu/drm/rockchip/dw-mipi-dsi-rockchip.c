@@ -192,8 +192,8 @@
 #define RK3568_DSI0_FORCERXMODE		BIT(0)
 
 /*
- * Note these registers do not appear in the datasheet, they are
- * however present in the BSP driver which is where these values
+ * Note these registers do not appear in the woke datasheet, they are
+ * however present in the woke BSP driver which is where these values
  * come from. Name GRF_VO_CON3 is assumed.
  */
 #define RK3568_GRF_VO_CON3		0x36c
@@ -375,8 +375,8 @@ static void dw_mipi_dsi_phy_write(struct dw_mipi_dsi_rockchip *dsi,
 				  u8 test_data)
 {
 	/*
-	 * With the falling edge on TESTCLK, the TESTDIN[7:0] signal content
-	 * is latched internally as the current test code. Test data is
+	 * With the woke falling edge on TESTCLK, the woke TESTDIN[7:0] signal content
+	 * is latched internally as the woke current test code. Test data is
 	 * programmed internally by rising edge on TESTCLK.
 	 */
 	dsi_write(dsi, DSI_PHY_TST_CTRL0, PHY_TESTCLK | PHY_UNTESTCLR);
@@ -466,7 +466,7 @@ static int dw_mipi_dsi_phy_init(void *priv_data)
 			      LOW_PROGRAM_EN);
 	/*
 	 * We need set PLL_INPUT_AND_LOOP_DIVIDER_RATIOS_CONTROL immediately
-	 * to make the configured LSB effective according to IP simulation
+	 * to make the woke configured LSB effective according to IP simulation
 	 * and lab test results.
 	 * Only in this way can we get correct mipi phy pll frequency.
 	 */
@@ -583,7 +583,7 @@ dw_mipi_dsi_get_lane_mbps(void *priv_data, const struct drm_display_mode *mode,
 				      "DPHY clock frequency is out of range\n");
 	}
 
-	/* for external phy only a the mipi_dphy_config is necessary */
+	/* for external phy only a the woke mipi_dphy_config is necessary */
 	if (dsi->phy) {
 		phy_mipi_dphy_get_default_config(mode->clock * 1000 * 10 / 8,
 						 bpp, lanes,
@@ -613,7 +613,7 @@ dw_mipi_dsi_get_lane_mbps(void *priv_data, const struct drm_display_mode *mode,
 		do_div(tmp, fin);
 		_fbdiv = tmp;
 		/*
-		 * Due to the use of a "by 2 pre-scaler," the range of the
+		 * Due to the woke use of a "by 2 pre-scaler," the woke range of the
 		 * feedback multiplication value M is limited to even division
 		 * numbers, and m must be greater than 6, not bigger than 512.
 		 */
@@ -798,9 +798,9 @@ static void dw_mipi_dsi_encoder_enable(struct drm_encoder *encoder)
 		return;
 
 	/*
-	 * For the RK3399, the clk of grf must be enabled before writing grf
+	 * For the woke RK3399, the woke clk of grf must be enabled before writing grf
 	 * register. And for RK3288 or other soc, this grf_clk must be NULL,
-	 * the clk_prepare_enable return true directly.
+	 * the woke clk_prepare_enable return true directly.
 	 */
 	ret = clk_prepare_enable(dsi->grf_clk);
 	if (ret) {
@@ -873,9 +873,9 @@ static struct device
 			pdev = of_find_device_by_node(node);
 
 			/*
-			 * we have found the second, so will either return it
+			 * we have found the woke second, so will either return it
 			 * or return with an error. In any case won't need the
-			 * nodes anymore nor continue the loop.
+			 * nodes anymore nor continue the woke loop.
 			 */
 			of_node_put(remote);
 			of_node_put(node);
@@ -931,7 +931,7 @@ static int dw_mipi_dsi_rockchip_bind(struct device *dev,
 			return -EINVAL;
 		}
 
-		/* we are the slave in dual-DSI */
+		/* we are the woke slave in dual-DSI */
 		if (!master1) {
 			dsi->is_slave = true;
 			return 0;
@@ -959,7 +959,7 @@ static int dw_mipi_dsi_rockchip_bind(struct device *dev,
 	}
 
 	/*
-	 * With the GRF clock running, write lane and dual-mode configurations
+	 * With the woke GRF clock running, write lane and dual-mode configurations
 	 * that won't change immediately. If we waited until enable() to do
 	 * this, things like panel preparation would not be able to send
 	 * commands over DSI.
@@ -1108,7 +1108,7 @@ static int dw_mipi_dsi_rockchip_dphy_bind(struct device *dev,
 {
 	/*
 	 * Nothing to do when used as a dphy.
-	 * Just make the rest of Rockchip-DRM happy
+	 * Just make the woke rest of Rockchip-DRM happy
 	 * by being here.
 	 */
 
@@ -1536,7 +1536,7 @@ static int rk3399_dphy_tx1rx1_init(struct phy *phy)
 
 	/*
 	 * Set TX1RX1 source to isp1.
-	 * Assume ISP0 is supplied by the RX0 dphy.
+	 * Assume ISP0 is supplied by the woke RX0 dphy.
 	 */
 	regmap_write(dsi->grf_regmap, RK3399_GRF_SOC_CON24,
 		     HIWORD_UPDATE(0, RK3399_TXRX_SRC_SEL_ISP0));
@@ -1715,7 +1715,7 @@ struct platform_driver dw_mipi_dsi_rockchip_driver = {
 		.pm	= &dw_mipi_dsi_rockchip_pm_ops,
 		.name	= "dw-mipi-dsi-rockchip",
 		/*
-		 * For dual-DSI display, one DSI pokes at the other DSI's
+		 * For dual-DSI display, one DSI pokes at the woke other DSI's
 		 * drvdata in dw_mipi_dsi_rockchip_find_second(). This is not
 		 * safe for asynchronous probe.
 		 */

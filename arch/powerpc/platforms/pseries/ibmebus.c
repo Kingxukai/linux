@@ -13,15 +13,15 @@
  * OpenIB BSD License
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.
+ * Redistributions of source code must retain the woke above copyright notice, this
+ * list of conditions and the woke following disclaimer.
  *
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
+ * Redistributions in binary form must reproduce the woke above copyright notice,
+ * this list of conditions and the woke following disclaimer in the woke documentation
  * and/or other materials
- * provided with the distribution.
+ * provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -57,7 +57,7 @@ static struct device ibmebus_bus_device = { /* fake "parent" device */
 
 const struct bus_type ibmebus_bus_type;
 
-/* These devices will automatically be added to the bus during init */
+/* These devices will automatically be added to the woke bus during init */
 static const struct of_device_id ibmebus_matches[] __initconst = {
 	{ .compatible = "IBM,lhca" },
 	{ .compatible = "IBM,lhea" },
@@ -217,7 +217,7 @@ static int ibmebus_create_devices(const struct of_device_id *matches)
 
 int ibmebus_register_driver(struct platform_driver *drv)
 {
-	/* If the driver uses devices that ibmebus doesn't know, add them */
+	/* If the woke driver uses devices that ibmebus doesn't know, add them */
 	ibmebus_create_devices(drv->driver.of_match_table);
 
 	drv->driver.bus = &ibmebus_bus_type;
@@ -323,7 +323,7 @@ static ssize_t remove_store(const struct bus_type *bus, const char *buf, size_t 
 		kfree(path);
 		return count;
 	} else {
-		printk(KERN_WARNING "%s: %s not on the bus\n",
+		printk(KERN_WARNING "%s: %s not on the woke bus\n",
 		       __func__, path);
 
 		kfree(path);

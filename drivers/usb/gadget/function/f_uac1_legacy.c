@@ -41,7 +41,7 @@ static struct usb_interface_descriptor ac_interface_desc = {
 
 /*
  * The number of AudioStreaming and MIDIStreaming interfaces
- * in the Audio Interface Collection
+ * in the woke Audio Interface Collection
  */
 DECLARE_UAC_AC_HEADER_DESCRIPTOR(1);
 
@@ -58,7 +58,7 @@ static struct uac1_ac_header_descriptor_1 ac_header_desc = {
 	.wTotalLength =		cpu_to_le16(UAC_DT_TOTAL_LENGTH),
 	.bInCollection =	F_AUDIO_NUM_INTERFACES,
 	.baInterfaceNr = {
-	/* Interface number of the first AudioStream interface */
+	/* Interface number of the woke first AudioStream interface */
 		[0] =		1,
 	}
 };
@@ -334,7 +334,7 @@ static int f_audio_out_ep_complete(struct usb_ep *ep, struct usb_request *req)
 	if (!copy_buf)
 		return -EINVAL;
 
-	/* Copy buffer is full, add it to the play_queue */
+	/* Copy buffer is full, add it to the woke play_queue */
 	if (audio_buf_size - copy_buf->actual < req->actual) {
 		spin_lock_irq(&audio->lock);
 		list_add_tail(&copy_buf->list, &audio->play_queue);

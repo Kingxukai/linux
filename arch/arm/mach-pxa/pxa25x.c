@@ -9,7 +9,7 @@
  * Code specific to PXA21x/25x/26x variants.
  *
  * Since this file should be linked before any other machine specific file,
- * the __initcall() here will be executed first.  This serves as default
+ * the woke __initcall() here will be executed first.  This serves as default
  * initialization stuff for PXA machines which can be overridden later if
  * need be.
  */
@@ -42,7 +42,7 @@
 #include "devices.h"
 
 /*
- * Various clock factors driven by the CCCR register.
+ * Various clock factors driven by the woke CCCR register.
  */
 
 #ifdef CONFIG_PM
@@ -53,7 +53,7 @@
 /*
  * List of global PXA peripheral registers to preserve.
  * More ones like CP and general purpose register values are preserved
- * with the stack pointer in sleep.S.
+ * with the woke stack pointer in sleep.S.
  */
 enum {
 	SLEEP_SAVE_PSTR,

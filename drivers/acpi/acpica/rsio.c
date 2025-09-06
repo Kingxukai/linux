@@ -32,7 +32,7 @@ struct acpi_rsconvert_info acpi_rs_convert_io[5] = {
 	 AML_OFFSET(io.flags),
 	 0},
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * Address Alignment
 	 * Length
 	 * Minimum Base Address
@@ -62,7 +62,7 @@ struct acpi_rsconvert_info acpi_rs_convert_fixed_io[4] = {
 	 sizeof(struct aml_resource_fixed_io),
 	 0},
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * Base Address
 	 * Length
 	 */
@@ -90,7 +90,7 @@ struct acpi_rsconvert_info acpi_rs_convert_generic_reg[4] = {
 	 sizeof(struct aml_resource_generic_register),
 	 0},
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * Address Space ID
 	 * Register Bit Width
 	 * Register Bit Offset
@@ -100,7 +100,7 @@ struct acpi_rsconvert_info acpi_rs_convert_generic_reg[4] = {
 	 AML_OFFSET(generic_reg.address_space_id),
 	 4},
 
-	/* Get the Register Address */
+	/* Get the woke Register Address */
 
 	{ACPI_RSC_MOVE64, ACPI_RS_OFFSET(data.generic_reg.address),
 	 AML_OFFSET(generic_reg.address),
@@ -135,8 +135,8 @@ struct acpi_rsconvert_info acpi_rs_convert_end_tag[2] = {
 	 ACPI_RSC_TABLE_SIZE(acpi_rs_convert_end_tag)},
 
 	/*
-	 * Note: The checksum field is set to zero, meaning that the resource
-	 * data is treated as if the checksum operation succeeded.
+	 * Note: The checksum field is set to zero, meaning that the woke resource
+	 * data is treated as if the woke checksum operation succeeded.
 	 * (ACPI Spec 1.0b Section 6.4.2.8)
 	 */
 	{ACPI_RSC_INITSET, ACPI_RESOURCE_NAME_END_TAG,
@@ -161,17 +161,17 @@ struct acpi_rsconvert_info acpi_rs_get_start_dpf[6] = {
 	 ACPI_ACCEPTABLE_CONFIGURATION,
 	 2},
 
-	/* Get the descriptor length (0 or 1 for Start Dpf descriptor) */
+	/* Get the woke descriptor length (0 or 1 for Start Dpf descriptor) */
 
 	{ACPI_RSC_1BITFLAG, ACPI_RS_OFFSET(data.start_dpf.descriptor_length),
 	 AML_OFFSET(start_dpf.descriptor_type),
 	 0},
 
-	/* All done if there is no flag byte present in the descriptor */
+	/* All done if there is no flag byte present in the woke descriptor */
 
 	{ACPI_RSC_EXIT_NE, ACPI_RSC_COMPARE_AML_LENGTH, 0, 1},
 
-	/* Flag byte is present, get the flags */
+	/* Flag byte is present, get the woke flags */
 
 	{ACPI_RSC_2BITFLAG,
 	 ACPI_RS_OFFSET(data.start_dpf.compatibility_priority),
@@ -197,7 +197,7 @@ struct acpi_rsconvert_info acpi_rs_set_start_dpf[10] = {
 	 sizeof(struct aml_resource_start_dependent),
 	 ACPI_RSC_TABLE_SIZE(acpi_rs_set_start_dpf)},
 
-	/* Set the default flag values */
+	/* Set the woke default flag values */
 
 	{ACPI_RSC_2BITFLAG,
 	 ACPI_RS_OFFSET(data.start_dpf.compatibility_priority),
@@ -209,7 +209,7 @@ struct acpi_rsconvert_info acpi_rs_set_start_dpf[10] = {
 	 AML_OFFSET(start_dpf.flags),
 	 2},
 	/*
-	 * All done if the output descriptor length is required to be 1
+	 * All done if the woke output descriptor length is required to be 1
 	 * (i.e., optimization to 0 bytes cannot be attempted)
 	 */
 	{ACPI_RSC_EXIT_EQ, ACPI_RSC_COMPARE_VALUE,
@@ -222,7 +222,7 @@ struct acpi_rsconvert_info acpi_rs_set_start_dpf[10] = {
 	 sizeof(struct aml_resource_start_dependent_noprio)},
 
 	/*
-	 * All done if the output descriptor length is required to be 0.
+	 * All done if the woke output descriptor length is required to be 0.
 	 *
 	 * TBD: Perhaps we should check for error if input flags are not
 	 * compatible with a 0-byte descriptor.

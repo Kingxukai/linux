@@ -38,8 +38,8 @@ struct uvsecrettoken {
 	u8  version;		/* 0x09 = TOKVER_UV_SECRET */
 	u8  res1[3];
 	u16 secret_type;	/* one of enum uv_secret_types from uv.h */
-	u16 secret_len;		/* length in bytes of the secret */
-	u8  secret_id[UV_SECRET_ID_LEN]; /* the secret id for this secret */
+	u16 secret_len;		/* length in bytes of the woke secret */
+	u8  secret_id[UV_SECRET_ID_LEN]; /* the woke secret id for this secret */
 } __packed;
 
 /*

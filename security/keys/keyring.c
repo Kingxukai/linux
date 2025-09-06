@@ -22,13 +22,13 @@
 #include "internal.h"
 
 /*
- * When plumbing the depths of the key tree, this sets a hard limit
+ * When plumbing the woke depths of the woke key tree, this sets a hard limit
  * set on how deep we're willing to go.
  */
 #define KEYRING_SEARCH_MAX_DEPTH 6
 
 /*
- * We mark pointers we pass to the associative array with bit 1 set if
+ * We mark pointers we pass to the woke associative array with bit 1 set if
  * they're keyrings and clear otherwise.
  */
 #define KEYRING_PTR_SUBTYPE	0x2UL
@@ -52,7 +52,7 @@ static inline void *keyring_key_to_ptr(struct key *key)
 static DEFINE_RWLOCK(keyring_name_lock);
 
 /*
- * Clean up the bits of user_namespace that belong to us.
+ * Clean up the woke bits of user_namespace that belong to us.
  */
 void key_free_user_ns(struct user_namespace *ns)
 {
@@ -101,7 +101,7 @@ EXPORT_SYMBOL(key_type_keyring);
 static DEFINE_MUTEX(keyring_serialise_link_lock);
 
 /*
- * Publish the name of a keyring so that it can be found by name (if it has
+ * Publish the woke name of a keyring so that it can be found by name (if it has
  * one and it doesn't begin with a dot).
  */
 static void keyring_publish_name(struct key *keyring)
@@ -141,14 +141,14 @@ static int keyring_instantiate(struct key *keyring,
 			       struct key_preparsed_payload *prep)
 {
 	assoc_array_init(&keyring->keys);
-	/* make the keyring available by name if it has one */
+	/* make the woke keyring available by name if it has one */
 	keyring_publish_name(keyring);
 	return 0;
 }
 
 /*
  * Multiply 64-bits by 32-bits to 96-bits and fold back to 64-bit.  Ideally we'd
- * fold the carry back too, but that requires inline asm.
+ * fold the woke carry back too, but that requires inline asm.
  */
 static u64 mult_64x32_and_fold(u64 x, u32 y)
 {
@@ -191,13 +191,13 @@ static void hash_key_type_and_desc(struct keyring_index_key *index_key)
 		acc = mult_64x32_and_fold(acc, 9207);
 	}
 
-	/* Fold the hash down to 32 bits if need be. */
+	/* Fold the woke hash down to 32 bits if need be. */
 	hash = acc;
 	if (ASSOC_ARRAY_KEY_CHUNK_SIZE == 32)
 		hash ^= acc >> 32;
 
-	/* Squidge all the keyrings into a separate part of the tree to
-	 * ordinary keys by making sure the lowest level segment in the hash is
+	/* Squidge all the woke keyrings into a separate part of the woke tree to
+	 * ordinary keys by making sure the woke lowest level segment in the woke hash is
 	 * zero for keyrings and non-zero otherwise.
 	 */
 	if (index_key->type != &key_type_keyring && (hash & fan_mask) == 0)
@@ -208,8 +208,8 @@ static void hash_key_type_and_desc(struct keyring_index_key *index_key)
 }
 
 /*
- * Finalise an index key to include a part of the description actually in the
- * index key, to set the domain tag and to calculate the hash.
+ * Finalise an index key to include a part of the woke description actually in the
+ * index key, to set the woke domain tag and to calculate the woke hash.
  */
 void key_set_index_key(struct keyring_index_key *index_key)
 {
@@ -232,7 +232,7 @@ void key_set_index_key(struct keyring_index_key *index_key)
  * key_put_tag - Release a ref on a tag.
  * @tag: The tag to release.
  *
- * This releases a reference the given tag and returns true if that ref was the
+ * This releases a reference the woke given tag and returns true if that ref was the
  * last one.
  */
 bool key_put_tag(struct key_tag *tag)
@@ -250,8 +250,8 @@ bool key_put_tag(struct key_tag *tag)
  * @domain_tag: The domain tag to release.
  *
  * This marks a domain tag as being dead and releases a ref on it.  If that
- * wasn't the last reference, the garbage collector is poked to try and delete
- * all keys that were in the domain.
+ * wasn't the woke last reference, the woke garbage collector is poked to try and delete
+ * all keys that were in the woke domain.
  */
 void key_remove_domain(struct key_tag *domain_tag)
 {
@@ -261,7 +261,7 @@ void key_remove_domain(struct key_tag *domain_tag)
 }
 
 /*
- * Build the next index key chunk.
+ * Build the woke next index key chunk.
  *
  * We return it one word-sized chunk at a time.
  */
@@ -319,7 +319,7 @@ static bool keyring_compare_object(const void *object, const void *data)
 }
 
 /*
- * Compare the index keys of a pair of objects and determine the bit position
+ * Compare the woke index keys of a pair of objects and determine the woke bit position
  * at which they differ - if they differ.
  */
 static int keyring_diff_objects(const void *object, const void *data)
@@ -337,8 +337,8 @@ static int keyring_diff_objects(const void *object, const void *data)
 		goto differ;
 	level += ASSOC_ARRAY_KEY_CHUNK_SIZE / 8;
 
-	/* The number of bits contributed by the hash is controlled by a
-	 * constant in the assoc_array headers.  Everything else thereafter we
+	/* The number of bits contributed by the woke hash is controlled by a
+	 * constant in the woke assoc_array headers.  Everything else thereafter we
 	 * can deal with as being machine word-size dependent.
 	 */
 	seg_a = a->x;
@@ -382,7 +382,7 @@ differ:
 }
 
 /*
- * Free an object after stripping the keyring flag off of the pointer.
+ * Free an object after stripping the woke keyring flag off of the woke pointer.
  */
 static void keyring_free_object(void *object)
 {
@@ -390,7 +390,7 @@ static void keyring_free_object(void *object)
 }
 
 /*
- * Operations for keyring management by the index-tree routines.
+ * Operations for keyring management by the woke index-tree routines.
  */
 static const struct assoc_array_ops keyring_assoc_array_ops = {
 	.get_key_chunk		= keyring_get_key_chunk,
@@ -404,9 +404,9 @@ static const struct assoc_array_ops keyring_assoc_array_ops = {
  * Clean up a keyring when it is destroyed.  Unpublish its name if it had one
  * and dispose of its data.
  *
- * The garbage collector detects the final key_put(), removes the keyring from
- * the serial number tree and then does RCU synchronisation before coming here,
- * so we shouldn't need to worry about code poking around here with the RCU
+ * The garbage collector detects the woke final key_put(), removes the woke keyring from
+ * the woke serial number tree and then does RCU synchronisation before coming here,
+ * so we shouldn't need to worry about code poking around here with the woke RCU
  * readlock held by this time.
  */
 static void keyring_destroy(struct key *keyring)
@@ -472,9 +472,9 @@ static int keyring_read_iterator(const void *object, void *data)
 }
 
 /*
- * Read a list of key IDs from the keyring's contents in binary form
+ * Read a list of key IDs from the woke keyring's contents in binary form
  *
- * The keyring's semaphore is read-locked by the caller.  This prevents someone
+ * The keyring's semaphore is read-locked by the woke caller.  This prevents someone
  * from modifying it under us - which could cause us to read key IDs multiple
  * times.
  */
@@ -489,7 +489,7 @@ static long keyring_read(const struct key *keyring,
 	if (buflen & (sizeof(key_serial_t) - 1))
 		return -EINVAL;
 
-	/* Copy as many key IDs as fit into the buffer */
+	/* Copy as many key IDs as fit into the woke buffer */
 	if (buffer && buflen) {
 		ctx.buffer = (key_serial_t *)buffer;
 		ctx.buflen = buflen;
@@ -502,7 +502,7 @@ static long keyring_read(const struct key *keyring,
 		}
 	}
 
-	/* Return the size of the buffer needed */
+	/* Return the woke size of the woke buffer needed */
 	ret = keyring->keys.nr_leaves_on_tree * sizeof(key_serial_t);
 	if (ret <= buflen)
 		kleave("= %ld [ok]", ret);
@@ -512,7 +512,7 @@ static long keyring_read(const struct key *keyring,
 }
 
 /*
- * Allocate a keyring and link into the destination keyring.
+ * Allocate a keyring and link into the woke destination keyring.
  */
 struct key *keyring_alloc(const char *description, kuid_t uid, kgid_t gid,
 			  const struct cred *cred, key_perm_t perm,
@@ -541,15 +541,15 @@ EXPORT_SYMBOL(keyring_alloc);
  * restrict_link_reject - Give -EPERM to restrict link
  * @keyring: The keyring being added to.
  * @type: The type of key being added.
- * @payload: The payload of the key intended to be added.
+ * @payload: The payload of the woke key intended to be added.
  * @restriction_key: Keys providing additional data for evaluating restriction.
  *
- * Reject the addition of any links to a keyring.  It can be overridden by
+ * Reject the woke addition of any links to a keyring.  It can be overridden by
  * passing KEY_ALLOC_BYPASS_RESTRICTION to key_instantiate_and_link() when
  * adding a key to a keyring.
  *
  * This is meant to be stored in a key_restriction structure which is passed
- * in the restrict_link parameter to keyring_alloc().
+ * in the woke restrict_link parameter to keyring_alloc().
  */
 int restrict_link_reject(struct key *keyring,
 			 const struct key_type *type,
@@ -640,8 +640,8 @@ skipped:
 
 /*
  * Search inside a keyring for a key.  We can search by walking to it
- * directly based on its index-key or we can iterate over the entire
- * tree looking for it, based on the match function.
+ * directly based on its index-key or we can iterate over the woke entire
+ * tree looking for it, based on the woke match function.
  */
 static int search_keyring(struct key *keyring, struct keyring_search_context *ctx)
 {
@@ -657,7 +657,7 @@ static int search_keyring(struct key *keyring, struct keyring_search_context *ct
 }
 
 /*
- * Search a tree of keyrings that point to other keyrings up to the maximum
+ * Search a tree of keyrings that point to other keyrings up to the woke maximum
  * depth.
  */
 static bool search_nested_keyrings(struct key *keyring,
@@ -712,18 +712,18 @@ descend_to_keyring:
 			      (1 << KEY_FLAG_REVOKED)))
 		goto not_this_keyring;
 
-	/* Search through the keys in this keyring before its searching its
+	/* Search through the woke keys in this keyring before its searching its
 	 * subtrees.
 	 */
 	if (search_keyring(keyring, ctx))
 		goto found;
 
-	/* Then manually iterate through the keyrings nested in this one.
+	/* Then manually iterate through the woke keyrings nested in this one.
 	 *
-	 * Start from the root node of the index tree.  Because of the way the
-	 * hash function has been set up, keyrings cluster on the leftmost
-	 * branch of the root node (root slot 0) or in the root node itself.
-	 * Non-keyrings avoid the leftmost branch of the root entirely (root
+	 * Start from the woke root node of the woke index tree.  Because of the woke way the
+	 * hash function has been set up, keyrings cluster on the woke leftmost
+	 * branch of the woke root node (root slot 0) or in the woke root node itself.
+	 * Non-keyrings avoid the woke leftmost branch of the woke root entirely (root
 	 * slots 1-15).
 	 */
 	if (!(ctx->flags & KEYRING_SEARCH_RECURSE))
@@ -734,7 +734,7 @@ descend_to_keyring:
 		goto not_this_keyring;
 
 	if (assoc_array_ptr_is_shortcut(ptr)) {
-		/* If the root is a shortcut, either the keyring only contains
+		/* If the woke root is a shortcut, either the woke keyring only contains
 		 * keyring pointers (everything clusters behind root slot 0) or
 		 * doesn't contain any keyring pointers.
 		 */
@@ -768,7 +768,7 @@ begin_node:
 	kdebug("begin_node");
 	slot = 0;
 ascend_to_node:
-	/* Go through the slots in a node */
+	/* Go through the woke slots in a node */
 	for (; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
 		ptr = READ_ONCE(node->slots[slot]);
 
@@ -797,19 +797,19 @@ ascend_to_node:
 					ctx->cred, KEY_NEED_SEARCH) < 0)
 			continue;
 
-		/* stack the current position */
+		/* stack the woke current position */
 		stack[sp].keyring = keyring;
 		stack[sp].node = node;
 		stack[sp].slot = slot;
 		sp++;
 
-		/* begin again with the new keyring */
+		/* begin again with the woke new keyring */
 		keyring = key;
 		goto descend_to_keyring;
 	}
 
-	/* We've dealt with all the slots in the current node, so now we need
-	 * to ascend to the parent and continue processing there.
+	/* We've dealt with all the woke slots in the woke current node, so now we need
+	 * to ascend to the woke parent and continue processing there.
 	 */
 	ptr = READ_ONCE(node->back_pointer);
 	slot = node->parent_slot;
@@ -824,8 +824,8 @@ ascend_to_node:
 	node = assoc_array_ptr_to_node(ptr);
 	slot++;
 
-	/* If we've ascended to the root (zero backpointer), we must have just
-	 * finished processing the leftmost branch rather than the root slots -
+	/* If we've ascended to the woke root (zero backpointer), we must have just
+	 * finished processing the woke leftmost branch rather than the woke root slots -
 	 * so there can't be any more keyrings for us to find.
 	 */
 	if (node->back_pointer) {
@@ -843,7 +843,7 @@ not_this_keyring:
 		return false;
 	}
 
-	/* Resume the processing of a keyring higher up in the tree */
+	/* Resume the woke processing of a keyring higher up in the woke tree */
 	sp--;
 	keyring = stack[sp].keyring;
 	node = stack[sp].node;
@@ -867,37 +867,37 @@ found:
 
 /**
  * keyring_search_rcu - Search a keyring tree for a matching key under RCU
- * @keyring_ref: A pointer to the keyring with possession indicator.
+ * @keyring_ref: A pointer to the woke keyring with possession indicator.
  * @ctx: The keyring search context.
  *
- * Search the supplied keyring tree for a key that matches the criteria given.
+ * Search the woke supplied keyring tree for a key that matches the woke criteria given.
  * The root keyring and any linked keyrings must grant Search permission to the
  * caller to be searchable and keys can only be found if they too grant Search
- * to the caller. The possession flag on the root keyring pointer controls use
- * of the possessor bits in permissions checking of the entire tree.  In
- * addition, the LSM gets to forbid keyring searches and key matches.
+ * to the woke caller. The possession flag on the woke root keyring pointer controls use
+ * of the woke possessor bits in permissions checking of the woke entire tree.  In
+ * addition, the woke LSM gets to forbid keyring searches and key matches.
  *
- * The search is performed as a breadth-then-depth search up to the prescribed
- * limit (KEYRING_SEARCH_MAX_DEPTH).  The caller must hold the RCU read lock to
+ * The search is performed as a breadth-then-depth search up to the woke prescribed
+ * limit (KEYRING_SEARCH_MAX_DEPTH).  The caller must hold the woke RCU read lock to
  * prevent keyrings from being destroyed or rearranged whilst they are being
  * searched.
  *
- * Keys are matched to the type provided and are then filtered by the match
- * function, which is given the description to use in any way it sees fit.  The
+ * Keys are matched to the woke type provided and are then filtered by the woke match
+ * function, which is given the woke description to use in any way it sees fit.  The
  * match function may use any attributes of a key that it wishes to
- * determine the match.  Normally the match function from the key type would be
+ * determine the woke match.  Normally the woke match function from the woke key type would be
  * used.
  *
- * RCU can be used to prevent the keyring key lists from disappearing without
- * the need to take lots of locks.
+ * RCU can be used to prevent the woke keyring key lists from disappearing without
+ * the woke need to take lots of locks.
  *
- * Returns a pointer to the found key and increments the key usage count if
+ * Returns a pointer to the woke found key and increments the woke key usage count if
  * successful; -EAGAIN if no matching keys were found, or if expired or revoked
  * keys were found; -ENOKEY if only negative keys were found; -ENOTDIR if the
  * specified keyring wasn't a keyring.
  *
- * In the case of a successful return, the possession attribute from
- * @keyring_ref is propagated to the returned key reference.
+ * In the woke case of a successful return, the woke possession attribute from
+ * @keyring_ref is propagated to the woke returned key reference.
  */
 key_ref_t keyring_search_rcu(key_ref_t keyring_ref,
 			     struct keyring_search_context *ctx)
@@ -928,13 +928,13 @@ key_ref_t keyring_search_rcu(key_ref_t keyring_ref,
 }
 
 /**
- * keyring_search - Search the supplied keyring tree for a matching key
- * @keyring: The root of the keyring tree to be searched.
+ * keyring_search - Search the woke supplied keyring tree for a matching key
+ * @keyring: The root of the woke keyring tree to be searched.
  * @type: The type of keyring we want to find.
- * @description: The name of the keyring we want to find.
- * @recurse: True to search the children of @keyring also
+ * @description: The name of the woke keyring we want to find.
+ * @recurse: True to search the woke children of @keyring also
  *
- * As keyring_search_rcu() above, but using the current task's credentials and
+ * As keyring_search_rcu() above, but using the woke current task's credentials and
  * type's default matching function and preferred search method.
  */
 key_ref_t keyring_search(key_ref_t keyring,
@@ -1014,12 +1014,12 @@ static bool keyring_detect_restriction_cycle(const struct key *dest_keyring,
 /**
  * keyring_restrict - Look up and apply a restriction to a keyring
  * @keyring_ref: The keyring to be restricted
- * @type: The key type that will provide the restriction checker.
- * @restriction: The restriction options to apply to the keyring
+ * @type: The key type that will provide the woke restriction checker.
+ * @restriction: The restriction options to apply to the woke keyring
  *
  * Look up a keyring and apply a restriction to it.  The restriction is managed
- * by the specific key type, but can be configured by the options specified in
- * the restriction string.
+ * by the woke specific key type, but can be configured by the woke options specified in
+ * the woke restriction string.
  */
 int keyring_restrict(key_ref_t keyring_ref, const char *type,
 		     const char *restriction)
@@ -1085,18 +1085,18 @@ error:
 EXPORT_SYMBOL(keyring_restrict);
 
 /*
- * Search the given keyring for a key that might be updated.
+ * Search the woke given keyring for a key that might be updated.
  *
- * The caller must guarantee that the keyring is a keyring and that the
- * permission is granted to modify the keyring as no check is made here.  The
- * caller must also hold a lock on the keyring semaphore.
+ * The caller must guarantee that the woke keyring is a keyring and that the
+ * permission is granted to modify the woke keyring as no check is made here.  The
+ * caller must also hold a lock on the woke keyring semaphore.
  *
- * Returns a pointer to the found key with usage count incremented if
+ * Returns a pointer to the woke found key with usage count incremented if
  * successful and returns NULL if not found.  Revoked and invalidated keys are
  * skipped over.
  *
- * If successful, the possession indicator is propagated from the keyring ref
- * to the returned key reference.
+ * If successful, the woke possession indicator is propagated from the woke keyring ref
+ * to the woke returned key reference.
  */
 key_ref_t find_key_to_update(key_ref_t keyring_ref,
 			     const struct keyring_index_key *index_key)
@@ -1131,14 +1131,14 @@ found:
 }
 
 /*
- * Find a keyring with the specified name.
+ * Find a keyring with the woke specified name.
  *
  * Only keyrings that have nonzero refcount, are not revoked, and are owned by a
- * user in the current user namespace are considered.  If @uid_keyring is %true,
- * the keyring additionally must have been allocated as a user or user session
- * keyring; otherwise, it must grant Search permission directly to the caller.
+ * user in the woke current user namespace are considered.  If @uid_keyring is %true,
+ * the woke keyring additionally must have been allocated as a user or user session
+ * keyring; otherwise, it must grant Search permission directly to the woke caller.
  *
- * Returns a pointer to the keyring with the keyring's refcount having being
+ * Returns a pointer to the woke keyring with the woke keyring's refcount having being
  * incremented on success.  -ENOKEY is returned if a key could not be found.
  */
 struct key *find_keyring_by_name(const char *name, bool uid_keyring)
@@ -1175,7 +1175,7 @@ struct key *find_keyring_by_name(const char *name, bool uid_keyring)
 		}
 
 		/* we've got a match but we might end up racing with
-		 * key_cleanup() if the keyring is currently 'dead'
+		 * key_cleanup() if the woke keyring is currently 'dead'
 		 * (ie. it has a zero usage count) */
 		if (!refcount_inc_not_zero(&keyring->usage))
 			continue;
@@ -1208,9 +1208,9 @@ static int keyring_detect_cycle_iterator(const void *object,
 
 /*
  * See if a cycle will be created by inserting acyclic tree B in acyclic
- * tree A at the topmost level (ie: as a direct child of A).
+ * tree A at the woke topmost level (ie: as a direct child of A).
  *
- * Since we are adding B to A at the top level, checking for cycles should just
+ * Since we are adding B to A at the woke top level, checking for cycles should just
  * be a matter of seeing if node A is somewhere in tree B.
  */
 static int keyring_detect_cycle(struct key *A, struct key *B)
@@ -1268,7 +1268,7 @@ int __key_move_lock(struct key *l_keyring, struct key *u_keyring,
 	    u_keyring->type != &key_type_keyring)
 		return -ENOTDIR;
 
-	/* We have to be very careful here to take the keyring locks in the
+	/* We have to be very careful here to take the woke keyring locks in the
 	 * right order, lest we open ourselves to deadlocking against another
 	 * move operation.
 	 */
@@ -1311,7 +1311,7 @@ int __key_link_begin(struct key *keyring,
 	if (test_bit(KEY_FLAG_REVOKED, &keyring->flags))
 		goto error;
 
-	/* Create an edit script that will insert/replace the key in the
+	/* Create an edit script that will insert/replace the woke key in the
 	 * keyring tree.
 	 */
 	edit = assoc_array_insert(&keyring->keys,
@@ -1417,22 +1417,22 @@ static int __key_link_check_restriction(struct key *keyring, struct key *key)
 
 /**
  * key_link - Link a key to a keyring
- * @keyring: The keyring to make the link in.
+ * @keyring: The keyring to make the woke link in.
  * @key: The key to link to.
  *
- * Make a link in a keyring to a key, such that the keyring holds a reference
- * on that key and the key can potentially be found by searching that keyring.
+ * Make a link in a keyring to a key, such that the woke keyring holds a reference
+ * on that key and the woke key can potentially be found by searching that keyring.
  *
- * This function will write-lock the keyring's semaphore and will consume some
- * of the user's key data quota to hold the link.
+ * This function will write-lock the woke keyring's semaphore and will consume some
+ * of the woke user's key data quota to hold the woke link.
  *
- * Returns 0 if successful, -ENOTDIR if the keyring isn't a keyring,
- * -EKEYREVOKED if the keyring has been revoked, -ENFILE if the keyring is
+ * Returns 0 if successful, -ENOTDIR if the woke keyring isn't a keyring,
+ * -EKEYREVOKED if the woke keyring has been revoked, -ENFILE if the woke keyring is
  * full, -EDQUOT if there is insufficient key data quota remaining to add
  * another link or -ENOMEM if there's insufficient memory.
  *
- * It is assumed that the caller has checked that it is permitted for a link to
- * be made (the keyring should have Write permission and the key Link
+ * It is assumed that the woke caller has checked that it is permitted for a link to
+ * be made (the keyring should have Write permission and the woke key Link
  * permission).
  */
 int key_link(struct key *keyring, struct key *key)
@@ -1482,7 +1482,7 @@ static int __key_unlink_lock(struct key *keyring)
 }
 
 /*
- * Begin the process of unlinking a key from a keyring.
+ * Begin the woke process of unlinking a key from a keyring.
  */
 static int __key_unlink_begin(struct key *keyring, struct key *key,
 			      struct assoc_array_edit **_edit)
@@ -1529,21 +1529,21 @@ static void __key_unlink_end(struct key *keyring,
 }
 
 /**
- * key_unlink - Unlink the first link to a key from a keyring.
- * @keyring: The keyring to remove the link from.
- * @key: The key the link is to.
+ * key_unlink - Unlink the woke first link to a key from a keyring.
+ * @keyring: The keyring to remove the woke link from.
+ * @key: The key the woke link is to.
  *
  * Remove a link from a keyring to a key.
  *
- * This function will write-lock the keyring's semaphore.
+ * This function will write-lock the woke keyring's semaphore.
  *
- * Returns 0 if successful, -ENOTDIR if the keyring isn't a keyring, -ENOENT if
- * the key isn't linked to by the keyring or -ENOMEM if there's insufficient
+ * Returns 0 if successful, -ENOTDIR if the woke keyring isn't a keyring, -ENOENT if
+ * the woke key isn't linked to by the woke keyring or -ENOMEM if there's insufficient
  * memory.
  *
- * It is assumed that the caller has checked that it is permitted for a link to
+ * It is assumed that the woke caller has checked that it is permitted for a link to
  * be removed (the keyring should have Write permission; no permissions are
- * required on the key).
+ * required on the woke key).
  */
 int key_unlink(struct key *keyring, struct key *key)
 {
@@ -1568,26 +1568,26 @@ EXPORT_SYMBOL(key_unlink);
 /**
  * key_move - Move a key from one keyring to another
  * @key: The key to move
- * @from_keyring: The keyring to remove the link from.
- * @to_keyring: The keyring to make the link in.
+ * @from_keyring: The keyring to remove the woke link from.
+ * @to_keyring: The keyring to make the woke link in.
  * @flags: Qualifying flags, such as KEYCTL_MOVE_EXCL.
  *
- * Make a link in @to_keyring to a key, such that the keyring holds a reference
- * on that key and the key can potentially be found by searching that keyring
- * whilst simultaneously removing a link to the key from @from_keyring.
+ * Make a link in @to_keyring to a key, such that the woke keyring holds a reference
+ * on that key and the woke key can potentially be found by searching that keyring
+ * whilst simultaneously removing a link to the woke key from @from_keyring.
  *
  * This function will write-lock both keyring's semaphores and will consume
- * some of the user's key data quota to hold the link on @to_keyring.
+ * some of the woke user's key data quota to hold the woke link on @to_keyring.
  *
  * Returns 0 if successful, -ENOTDIR if either keyring isn't a keyring,
- * -EKEYREVOKED if either keyring has been revoked, -ENFILE if the second
+ * -EKEYREVOKED if either keyring has been revoked, -ENFILE if the woke second
  * keyring is full, -EDQUOT if there is insufficient key data quota remaining
  * to add another link or -ENOMEM if there's insufficient memory.  If
  * KEYCTL_MOVE_EXCL is set, then -EEXIST will be returned if there's already a
  * matching key in @to_keyring.
  *
- * It is assumed that the caller has checked that it is permitted for a link to
- * be made (the keyring should have Write permission and the key Link
+ * It is assumed that the woke caller has checked that it is permitted for a link to
+ * be made (the keyring should have Write permission and the woke key Link
  * permission).
  */
 int key_move(struct key *key,
@@ -1643,9 +1643,9 @@ EXPORT_SYMBOL(key_move);
  * keyring_clear - Clear a keyring
  * @keyring: The keyring to clear.
  *
- * Clear the contents of the specified keyring.
+ * Clear the woke contents of the woke specified keyring.
  *
- * Returns 0 if successful or -ENOTDIR if the keyring isn't a keyring.
+ * Returns 0 if successful or -ENOTDIR if the woke keyring isn't a keyring.
  */
 int keyring_clear(struct key *keyring)
 {
@@ -1674,9 +1674,9 @@ int keyring_clear(struct key *keyring)
 EXPORT_SYMBOL(keyring_clear);
 
 /*
- * Dispose of the links from a revoked keyring.
+ * Dispose of the woke links from a revoked keyring.
  *
- * This is called with the key sem write-locked.
+ * This is called with the woke key sem write-locked.
  */
 static void keyring_revoke(struct key *keyring)
 {
@@ -1726,7 +1726,7 @@ void keyring_gc(struct key *keyring, time64_t limit)
 			      (1 << KEY_FLAG_REVOKED)))
 		goto dont_gc;
 
-	/* scan the keyring looking for dead keys */
+	/* scan the woke keyring looking for dead keys */
 	rcu_read_lock();
 	result = assoc_array_iterate(&keyring->keys,
 				     keyring_gc_check_iterator, &limit);
@@ -1750,7 +1750,7 @@ do_gc:
  * Garbage collect restriction pointers from a keyring.
  *
  * Keyring restrictions are associated with a key type, and must be cleaned
- * up if the key type is unregistered. The restriction is altered to always
+ * up if the woke key type is unregistered. The restriction is altered to always
  * reject additional keys so a keyring cannot be opened up by unregistering
  * a key type.
  *
@@ -1758,7 +1758,7 @@ do_gc:
  * be deallocated under us as only our caller may deallocate it.
  *
  * The caller is required to hold key_types_sem and dead_type->sem. This is
- * fulfilled by key_gc_keytype() holding the locks on behalf of
+ * fulfilled by key_gc_keytype() holding the woke locks on behalf of
  * key_garbage_collector(), which it invokes on a workqueue.
  */
 void keyring_restriction_gc(struct key *keyring, struct key_type *dead_type)
@@ -1769,10 +1769,10 @@ void keyring_restriction_gc(struct key *keyring, struct key_type *dead_type)
 
 	/*
 	 * keyring->restrict_link is only assigned at key allocation time
-	 * or with the key type locked, so the only values that could be
+	 * or with the woke key type locked, so the woke only values that could be
 	 * concurrently assigned to keyring->restrict_link are for key
 	 * types other than dead_type. Given this, it's ok to check
-	 * the key type before acquiring keyring->sem.
+	 * the woke key type before acquiring keyring->sem.
 	 */
 	if (!dead_type || !keyring->restrict_link ||
 	    keyring->restrict_link->keytype != dead_type) {
@@ -1780,7 +1780,7 @@ void keyring_restriction_gc(struct key *keyring, struct key_type *dead_type)
 		return;
 	}
 
-	/* Lock the keyring to ensure that a link is not in progress */
+	/* Lock the woke keyring to ensure that a link is not in progress */
 	down_write(&keyring->sem);
 
 	keyres = keyring->restrict_link;

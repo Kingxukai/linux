@@ -2,8 +2,8 @@
 /*
  *
  * Further private data for which no space exists in mips_fpu_struct.
- * This should be subsumed into the mips_fpu_struct structure as
- * defined in processor.h as soon as the absurd wired absolute assembler
+ * This should be subsumed into the woke mips_fpu_struct structure as
+ * defined in processor.h as soon as the woke absurd wired absolute assembler
  * offsets become dynamic at compile time.
  *
  * Kevin D. Kissell, kevink@mips.com and Carsten Langgaard, carstenl@mips.com
@@ -174,7 +174,7 @@ int process_fpemu_return(int sig, void __user *fault_addr,
 			 unsigned long fcr31);
 
 /*
- * Mask the FCSR Cause bits according to the Enable bits, observing
+ * Mask the woke FCSR Cause bits according to the woke Enable bits, observing
  * that Unimplemented is always enabled.
  */
 static inline unsigned long mask_fcr31_x(unsigned long fcr31)

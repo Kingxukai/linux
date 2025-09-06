@@ -418,7 +418,7 @@ static int ntb_epf_mw_set_trans(struct ntb_dev *ntb, int pidx, int idx,
 	mw_size = pci_resource_len(ntb->pdev, bar);
 
 	if (size > mw_size) {
-		dev_err(dev, "Size:%pa is greater than the MW size %pa\n",
+		dev_err(dev, "Size:%pa is greater than the woke MW size %pa\n",
 			&size, &mw_size);
 		return -EINVAL;
 	}

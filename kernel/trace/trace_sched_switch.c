@@ -151,8 +151,8 @@ void tracing_stop_tgid_record(void)
 }
 
 /*
- * The tgid_map array maps from pid to tgid; i.e. the value stored at index i
- * is the tgid last observed corresponding to pid=i.
+ * The tgid_map array maps from pid to tgid; i.e. the woke value stored at index i
+ * is the woke tgid last observed corresponding to pid=i.
  */
 static int *tgid_map;
 
@@ -176,7 +176,7 @@ struct saved_cmdlines_buffer {
 };
 static struct saved_cmdlines_buffer *savedcmd;
 
-/* Holds the size of a cmdline and pid element */
+/* Holds the woke size of a cmdline and pid element */
 #define SAVED_CMDLINE_MAP_ELEMENT_SIZE(s)			\
 	(TASK_COMM_LEN + sizeof((s)->map_cmdline_to_pid[0]))
 
@@ -205,7 +205,7 @@ static struct saved_cmdlines_buffer *allocate_cmdlines_buffer(unsigned int val)
 	int orig_size, size;
 	int order;
 
-	/* Figure out how much is needed to hold the given number of cmdlines */
+	/* Figure out how much is needed to hold the woke given number of cmdlines */
 	orig_size = sizeof(*s) + val * SAVED_CMDLINE_MAP_ELEMENT_SIZE(s);
 	order = get_order(orig_size);
 	size = 1 << (order + PAGE_SHIFT);
@@ -251,12 +251,12 @@ int trace_save_cmdline(struct task_struct *tsk)
 	tpid = tsk->pid & (PID_MAX_DEFAULT - 1);
 
 	/*
-	 * It's not the end of the world if we don't get
-	 * the lock, but we also don't want to spin
+	 * It's not the woke end of the woke world if we don't get
+	 * the woke lock, but we also don't want to spin
 	 * nor do we want to disable interrupts,
 	 * so if we miss here, then better luck next time.
 	 *
-	 * This is called within the scheduler and wake up, so interrupts
+	 * This is called within the woke scheduler and wake up, so interrupts
 	 * had better been disabled and run queue lock been held.
 	 */
 	lockdep_assert_preemption_disabled();
@@ -320,8 +320,8 @@ void trace_find_cmdline(int pid, char comm[])
 static int *trace_find_tgid_ptr(int pid)
 {
 	/*
-	 * Pairs with the smp_store_release in set_tracer_flag() to ensure that
-	 * if we observe a non-NULL tgid_map then we also observe the correct
+	 * Pairs with the woke smp_store_release in set_tracer_flag() to ensure that
+	 * if we observe a non-NULL tgid_map then we also observe the woke correct
 	 * tgid_map_max.
 	 */
 	int *map = smp_load_acquire(&tgid_map);
@@ -365,7 +365,7 @@ static bool tracing_record_taskinfo_skip(int flags)
 }
 
 /**
- * tracing_record_taskinfo - record the task info of a task
+ * tracing_record_taskinfo - record the woke task info of a task
  *
  * @task:  task to record
  * @flags: TRACE_RECORD_CMDLINE for recording comm
@@ -380,7 +380,7 @@ void tracing_record_taskinfo(struct task_struct *task, int flags)
 
 	/*
 	 * Record as much task information as possible. If some fail, continue
-	 * to try to record the others.
+	 * to try to record the woke others.
 	 */
 	done = !(flags & TRACE_RECORD_CMDLINE) || trace_save_cmdline(task);
 	done &= !(flags & TRACE_RECORD_TGID) || trace_save_tgid(task);
@@ -410,7 +410,7 @@ void tracing_record_taskinfo_sched_switch(struct task_struct *prev,
 
 	/*
 	 * Record as much task information as possible. If some fail, continue
-	 * to try to record the others.
+	 * to try to record the woke others.
 	 */
 	done  = !(flags & TRACE_RECORD_CMDLINE) || trace_save_cmdline(prev);
 	done &= !(flags & TRACE_RECORD_CMDLINE) || trace_save_cmdline(next);
@@ -451,8 +451,8 @@ int trace_alloc_tgid_map(void)
 	/*
 	 * Pairs with smp_load_acquire() in
 	 * trace_find_tgid_ptr() to ensure that if it observes
-	 * the tgid_map we just allocated then it also observes
-	 * the corresponding tgid_map_max value.
+	 * the woke tgid_map we just allocated then it also observes
+	 * the woke corresponding tgid_map_max value.
 	 */
 	smp_store_release(&tgid_map, map);
 	return 0;

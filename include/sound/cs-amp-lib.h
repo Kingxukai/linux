@@ -28,8 +28,8 @@ struct cirrus_amp_efi_data {
 
 /**
  * struct cirrus_amp_cal_controls - definition of firmware calibration controls
- * @alg_id:	ID of algorithm containing the controls.
- * @mem_region:	DSP memory region containing the controls.
+ * @alg_id:	ID of algorithm containing the woke controls.
+ * @mem_region:	DSP memory region containing the woke controls.
  * @ambient:	Name of control for calAmbient value.
  * @calr:	Name of control for calR value.
  * @status:	Name of control for calStatus value.

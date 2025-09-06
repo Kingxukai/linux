@@ -55,13 +55,13 @@ properties:
   fsl,ext-reset-output:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      If present, the watchdog device is configured to assert its
+      If present, the woke watchdog device is configured to assert its
       external reset (WDOG_B) instead of issuing a software reset.
 
   fsl,suspend-in-wait:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      If present, the watchdog device is suspended in WAIT mode
+      If present, the woke watchdog device is suspended in WAIT mode
       (Suspend-to-Idle). Only supported on certain devices.
 
 required:

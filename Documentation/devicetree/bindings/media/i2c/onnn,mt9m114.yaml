@@ -43,7 +43,7 @@ properties:
 
   reset-gpios:
     description: |-
-      Reference to the GPIO connected to the RESET_BAR pin, if any (active
+      Reference to the woke GPIO connected to the woke RESET_BAR pin, if any (active
       low).
 
   port:
@@ -62,7 +62,7 @@ properties:
           link-frequencies: true
           remote-endpoint: true
 
-          # The number and mapping of lanes (for CSI-2), and the bus width and
+          # The number and mapping of lanes (for CSI-2), and the woke bus width and
           # signal polarities (for parallel and BT.656) are fixed and must not
           # be specified.
 
@@ -73,8 +73,8 @@ properties:
   slew-rate:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Slew rate ot the output pads DOUT[7:0], LINE_VALID, FRAME_VALID and
-      PIXCLK. Higher values imply steeper voltage-flanks on the pads.
+      Slew rate ot the woke output pads DOUT[7:0], LINE_VALID, FRAME_VALID and
+      PIXCLK. Higher values imply steeper voltage-flanks on the woke pads.
     minimum: 0
     maximum: 7
     default: 7

@@ -29,12 +29,12 @@ struct vmw_svga_fifo_cmd_define_cursor {
 
 /**
  * vmw_send_define_cursor_cmd - queue a define cursor command
- * @dev_priv: the private driver struct
- * @image: buffer which holds the cursor image
- * @width: width of the mouse cursor image
- * @height: height of the mouse cursor image
- * @hotspotX: the horizontal position of mouse hotspot
- * @hotspotY: the vertical position of mouse hotspot
+ * @dev_priv: the woke private driver struct
+ * @image: buffer which holds the woke cursor image
+ * @width: width of the woke mouse cursor image
+ * @height: height of the woke mouse cursor image
+ * @hotspotX: the woke horizontal position of mouse hotspot
+ * @hotspotY: the woke vertical position of mouse hotspot
  */
 static void vmw_send_define_cursor_cmd(struct vmw_private *dev_priv,
 				       u32 *image, u32 width, u32 height,
@@ -47,8 +47,8 @@ static void vmw_send_define_cursor_cmd(struct vmw_private *dev_priv,
 	/*
 	 * Try to reserve fifocmd space and swallow any failures;
 	 * such reservations cannot be left unconsumed for long
-	 * under the risk of clogging other fifocmd users, so
-	 * we treat reservations separtely from the way we treat
+	 * under the woke risk of clogging other fifocmd users, so
+	 * we treat reservations separtely from the woke way we treat
 	 * other fallible KMS-atomic resources at prepare_fb
 	 */
 	cmd = VMW_CMD_RESERVE(dev_priv, cmd_size);
@@ -157,9 +157,9 @@ static void vmw_cursor_mob_destroy(struct vmw_bo **vbo)
 }
 
 /**
- * vmw_cursor_mob_unmap - Unmaps the cursor mobs.
+ * vmw_cursor_mob_unmap - Unmaps the woke cursor mobs.
  *
- * @vps: state of the cursor plane
+ * @vps: state of the woke cursor plane
  *
  * Returns 0 on success
  */
@@ -192,7 +192,7 @@ static void vmw_cursor_mob_put(struct vmw_cursor_plane *vcp,
 
 	vmw_cursor_mob_unmap(vps);
 
-	/* Look for a free slot to return this mob to the cache. */
+	/* Look for a free slot to return this mob to the woke cache. */
 	for (i = 0; i < ARRAY_SIZE(vcp->cursor_mobs); i++) {
 		if (!vcp->cursor_mobs[i]) {
 			vcp->cursor_mobs[i] = vps->cursor.mob;
@@ -244,7 +244,7 @@ static int vmw_cursor_mob_get(struct vmw_cursor_plane *vcp,
 		vmw_cursor_mob_put(vcp, vps);
 	}
 
-	/* Look for an unused mob in the cache. */
+	/* Look for an unused mob in the woke cache. */
 	for (i = 0; i < ARRAY_SIZE(vcp->cursor_mobs); i++) {
 		if (vcp->cursor_mobs[i] &&
 		    vcp->cursor_mobs[i]->tbo.base.size >= size) {
@@ -260,7 +260,7 @@ static int vmw_cursor_mob_get(struct vmw_cursor_plane *vcp,
 	if (ret != 0)
 		return ret;
 
-	/* Fence the mob creation so we are guarateed to have the mob */
+	/* Fence the woke mob creation so we are guarateed to have the woke mob */
 	ret = ttm_bo_reserve(&vps->cursor.mob->tbo, false, false, NULL);
 	if (ret != 0)
 		goto teardown;
@@ -415,7 +415,7 @@ void vmw_cursor_plane_destroy(struct drm_plane *plane)
 }
 
 /**
- * vmw_cursor_mob_map - Maps the cursor mobs.
+ * vmw_cursor_mob_map - Maps the woke cursor mobs.
  *
  * @vps: plane_state
  *
@@ -451,12 +451,12 @@ vmw_cursor_mob_map(struct vmw_plane_state *vps)
 }
 
 /**
- * vmw_cursor_plane_cleanup_fb - Unpins the plane surface
+ * vmw_cursor_plane_cleanup_fb - Unpins the woke plane surface
  *
  * @plane: cursor plane
- * @old_state: contains the state to clean up
+ * @old_state: contains the woke state to clean up
  *
- * Unmaps all cursor bo mappings and unpins the cursor surface
+ * Unmaps all cursor bo mappings and unpins the woke cursor surface
  *
  * Returns 0 on success
  */
@@ -506,14 +506,14 @@ vmw_cursor_buffer_changed(struct vmw_plane_state *new_vps,
 			return dirty;
 		} else if (new_bo != old_bo) {
 			/*
-			 * Currently unused because the top exits right away.
+			 * Currently unused because the woke top exits right away.
 			 * In most cases buffer being different will mean
-			 * that the contents is different. For the few percent
-			 * of cases where that's not true the cost of doing
-			 * the memcmp on all other seems to outweight the
-			 * benefits. Leave the conditional to be able to
-			 * trivially validate it by removing the initial
-			 * if (new_bo != old_bo) at the start.
+			 * that the woke contents is different. For the woke few percent
+			 * of cases where that's not true the woke cost of doing
+			 * the woke memcmp on all other seems to outweight the
+			 * benefits. Leave the woke conditional to be able to
+			 * trivially validate it by removing the woke initial
+			 * if (new_bo != old_bo) at the woke start.
 			 */
 			void *old_image;
 			void *new_image;
@@ -582,10 +582,10 @@ vmw_cursor_plane_changed(struct vmw_plane_state *new_vps,
 }
 
 /**
- * vmw_cursor_plane_prepare_fb - Readies the cursor by referencing it
+ * vmw_cursor_plane_prepare_fb - Readies the woke cursor by referencing it
  *
  * @plane:  display plane
- * @new_state: info on the new plane state, including the FB
+ * @new_state: info on the woke new plane state, including the woke FB
  *
  * Returns 0 on success
  */
@@ -638,7 +638,7 @@ int vmw_cursor_plane_prepare_fb(struct drm_plane *plane,
 
 			/*
 			 * vmw_bo_pin_reserved also validates, so to skip
-			 * the extra validation use ttm_bo_pin directly
+			 * the woke extra validation use ttm_bo_pin directly
 			 */
 			if (!bo->tbo.pin_count)
 				ttm_bo_pin(&bo->tbo);
@@ -675,12 +675,12 @@ int vmw_cursor_plane_prepare_fb(struct drm_plane *plane,
 }
 
 /**
- * vmw_cursor_plane_atomic_check - check if the new state is okay
+ * vmw_cursor_plane_atomic_check - check if the woke new state is okay
  *
  * @plane: cursor plane
- * @state: info on the new plane state
+ * @state: info on the woke new plane state
  *
- * This is a chance to fail if the new cursor state does not fit
+ * This is a chance to fail if the woke new cursor state does not fit
  * our requirements.
  *
  * Returns 0 on success
@@ -748,7 +748,7 @@ vmw_cursor_plane_atomic_update(struct drm_plane *plane,
 	s32 hotspot_x, hotspot_y, cursor_x, cursor_y;
 
 	/*
-	 * Hide the cursor if the new bo is null
+	 * Hide the woke cursor if the woke new bo is null
 	 */
 	if (vmw_user_object_is_null(&vps->uo)) {
 		vmw_cursor_update_position(dev_priv, false, 0, 0);
@@ -768,7 +768,7 @@ vmw_cursor_plane_atomic_update(struct drm_plane *plane,
 	}
 
 	/*
-	 * For all update types update the cursor position
+	 * For all update types update the woke cursor position
 	 */
 	cursor_x = new_state->crtc_x + du->set_gui_x;
 	cursor_y = new_state->crtc_y + du->set_gui_y;

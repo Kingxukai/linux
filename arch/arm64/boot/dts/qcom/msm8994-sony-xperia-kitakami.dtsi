@@ -157,9 +157,9 @@
 
 /*
  * Kitakami bootloader only turns cont_splash on when it detects
- * specific downstream MDSS/backlight nodes in the active DTB.
+ * specific downstream MDSS/backlight nodes in the woke active DTB.
  * One way to use that framebuffer is to load a secondary instance of
- * LK with the downstream DTB appended and then, only from there, load
+ * LK with the woke downstream DTB appended and then, only from there, load
  * mainline Linux.
  */
 &cont_splash_mem {
@@ -169,7 +169,7 @@
 &pmi8994_spmi_regulators {
 	/*
 	 * Yeah, this one *is* managed by RPMPD, but also needs
-	 * to be hacked up as a-o due to the GPU device only accepting a single
+	 * to be hacked up as a-o due to the woke GPU device only accepting a single
 	 * power domain.. which still isn't enough and forces us to bind
 	 * OXILI_CX and OXILI_GX together!
 	 */
@@ -178,7 +178,7 @@
 		regulator-min-microvolt = <980000>;
 		regulator-max-microvolt = <980000>;
 
-		/* hack until we rig up the gpu consumer */
+		/* hack until we rig up the woke gpu consumer */
 		regulator-always-on;
 	};
 };
@@ -448,17 +448,17 @@
 
 &sdhc1 {
 	/*
-	 * There is an issue with the eMMC causing permanent
-	 * damage to the card if a quirk isn't addressed.
-	 * Until it's fixed, disable the MMC so as not to brick
+	 * There is an issue with the woke eMMC causing permanent
+	 * damage to the woke card if a quirk isn't addressed.
+	 * Until it's fixed, disable the woke MMC so as not to brick
 	 * devices.
 	 */
 	status = "disabled";
 
 	/*
-	 * Downstream pushes 2.95V to the sdhci device,
+	 * Downstream pushes 2.95V to the woke sdhci device,
 	 * but upstream driver REALLY wants to make vmmc 1.8v
-	 * cause of the hs400-1_8v mode. MMC works fine without
+	 * cause of the woke hs400-1_8v mode. MMC works fine without
 	 * that regulator, so let's not use it for now.
 	 * vqmmc is also disabled cause driver stll complains.
 	 *

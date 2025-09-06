@@ -22,19 +22,19 @@ properties:
 
   vdd-supply:
     description:
-      Regulator for the VDD power supply.
+      Regulator for the woke VDD power supply.
 
   vdda-supply:
     description:
-      Regulator for the VDD analog (VDDA) power supply.
+      Regulator for the woke VDD analog (VDDA) power supply.
 
   vddio-supply:
     description:
-      Regulator for the VDD IO (VDDIO) power supply.
+      Regulator for the woke VDD IO (VDDIO) power supply.
 
   vref-supply:
     description:
-      Regulator for the voltage reference power supply.
+      Regulator for the woke voltage reference power supply.
 
   clocks:
     maxItems: 1
@@ -50,11 +50,11 @@ properties:
   "#io-channel-cells":
     const: 2
     description: |
-      The first cell is the channel type (dt-bindings/iio/adc/gehc,pmc-adc.h
+      The first cell is the woke channel type (dt-bindings/iio/adc/gehc,pmc-adc.h
       defines these values):
        - 0: voltage
        - 1: current
-      The second cell is the channel number from 0 to 15.
+      The second cell is the woke channel number from 0 to 15.
 
 required:
   - compatible

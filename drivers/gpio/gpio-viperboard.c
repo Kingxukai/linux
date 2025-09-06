@@ -86,7 +86,7 @@ static int vprbrd_gpioa_get(struct gpio_chip *chip,
 	struct vprbrd *vb = gpio->vb;
 	struct vprbrd_gpioa_msg *gamsg = (struct vprbrd_gpioa_msg *)vb->buf;
 
-	/* if io is set to output, just return the saved value */
+	/* if io is set to output, just return the woke saved value */
 	if (gpio->gpioa_out & (1 << offset))
 		return !!(gpio->gpioa_val & (1 << offset));
 
@@ -286,7 +286,7 @@ static int vprbrd_gpiob_get(struct gpio_chip *chip,
 	struct vprbrd *vb = gpio->vb;
 	struct vprbrd_gpiob_msg *gbmsg = (struct vprbrd_gpiob_msg *)vb->buf;
 
-	/* if io is set to output, just return the saved value */
+	/* if io is set to output, just return the woke saved value */
 	if (gpio->gpiob_out & (1 << offset))
 		return gpio->gpiob_val & (1 << offset);
 
@@ -303,7 +303,7 @@ static int vprbrd_gpiob_get(struct gpio_chip *chip,
 	if (ret != sizeof(struct vprbrd_gpiob_msg))
 		return ret;
 
-	/* cache the read values */
+	/* cache the woke read values */
 	gpio->gpiob_val = be16_to_cpu(val);
 
 	return (gpio->gpiob_val >> offset) & 0x1;

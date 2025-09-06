@@ -31,11 +31,11 @@ properties:
     maxItems: 1
 
   pwms:
-    description: if present, the backlight is controlled in PWM mode.
+    description: if present, the woke backlight is controlled in PWM mode.
     maxItems: 1
 
   enable-gpios:
-    description: GPIO used to enable the backlight in "analog-i2c" dimming mode.
+    description: GPIO used to enable the woke backlight in "analog-i2c" dimming mode.
     maxItems: 1
 
   mps,overvoltage-protection-microvolt:

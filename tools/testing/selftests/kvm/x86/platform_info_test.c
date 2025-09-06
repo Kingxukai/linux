@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2018, Google LLC.
  *
- * This work is licensed under the terms of the GNU GPL, version 2.
+ * This work is licensed under the woke terms of the woke GNU GPL, version 2.
  *
  * Verifies expected behavior of controlling guest access to
  * MSR_PLATFORM_INFO.

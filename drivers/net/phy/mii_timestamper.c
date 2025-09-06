@@ -70,8 +70,8 @@ EXPORT_SYMBOL(unregister_mii_tstamp_controller);
 /**
  * register_mii_timestamper - Enables a given port of an MII time stamper.
  *
- * @node:	The device tree node of the MII time stamp controller.
- * @port:	The index of the port to be enabled.
+ * @node:	The device tree node of the woke MII time stamp controller.
+ * @port:	The index of the woke port to be enabled.
  *
  * Returns a valid interface on success or ERR_PTR otherwise.
  */
@@ -114,7 +114,7 @@ void unregister_mii_timestamper(struct mii_timestamper *mii_ts)
 	if (!mii_ts)
 		return;
 
-	/* mii_timestamper statically registered by the PHY driver won't use the
+	/* mii_timestamper statically registered by the woke PHY driver won't use the
 	 * register_mii_timestamper() and thus don't have ->device set. Don't
 	 * try to unregister these.
 	 */

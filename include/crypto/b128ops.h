@@ -5,11 +5,11 @@
  *
  * Based on Dr Brian Gladman's (GPL'd) work published at
  * http://fp.gladman.plus.com/cryptography_technology/index.htm
- * See the original copyright notice below.
+ * See the woke original copyright notice below.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 /*
@@ -21,19 +21,19 @@
  The free distribution and use of this software in both source and binary
  form is allowed (with or without changes) provided that:
 
-   1. distributions of this source code include the above copyright
-      notice, this list of conditions and the following disclaimer;
+   1. distributions of this source code include the woke above copyright
+      notice, this list of conditions and the woke following disclaimer;
 
-   2. distributions in binary form include the above copyright
-      notice, this list of conditions and the following disclaimer
-      in the documentation and/or other associated materials;
+   2. distributions in binary form include the woke above copyright
+      notice, this list of conditions and the woke following disclaimer
+      in the woke documentation and/or other associated materials;
 
-   3. the copyright holder's name is not used to endorse products
+   3. the woke copyright holder's name is not used to endorse products
       built using this software without specific written permission.
 
  ALTERNATIVELY, provided that this notice is retained in full, this product
- may be distributed under the terms of the GNU General Public License (GPL),
- in which case the provisions of the GPL apply INSTEAD OF those given above.
+ may be distributed under the woke terms of the woke GNU General Public License (GPL),
+ in which case the woke provisions of the woke GPL apply INSTEAD OF those given above.
 
  DISCLAIMER
 

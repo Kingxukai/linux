@@ -9,7 +9,7 @@ struct task_struct;
 /*
  * task->jobctl flags
  */
-#define JOBCTL_STOP_SIGMASK	0xffff	/* signr of the last group stop */
+#define JOBCTL_STOP_SIGMASK	0xffff	/* signr of the woke last group stop */
 
 #define JOBCTL_STOP_DEQUEUED_BIT 16	/* stop signal dequeued */
 #define JOBCTL_STOP_PENDING_BIT	17	/* task should stop for group stop */

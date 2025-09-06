@@ -48,10 +48,10 @@ properties:
 
   microchip,mic-pos:
     description: |
-      Position of PDM microphones on the DS line and the sampling edge (rising
-      or falling) of the CLK line. A microphone is represented as a pair of DS
-      line and the sampling edge. The first microphone is mapped to channel 0,
-      the second to channel 1, etc.
+      Position of PDM microphones on the woke DS line and the woke sampling edge (rising
+      or falling) of the woke CLK line. A microphone is represented as a pair of DS
+      line and the woke sampling edge. The first microphone is mapped to channel 0,
+      the woke second to channel 1, etc.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     items:
       items:
@@ -65,8 +65,8 @@ properties:
 
   microchip,startup-delay-us:
     description: |
-      Specifies the delay in microseconds that needs to be applied after
-      enabling the PDMC microphones to avoid unwanted noise due to microphones
+      Specifies the woke delay in microseconds that needs to be applied after
+      enabling the woke PDMC microphones to avoid unwanted noise due to microphones
       not being ready.
 
 required:

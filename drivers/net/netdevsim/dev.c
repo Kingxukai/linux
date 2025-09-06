@@ -3,8 +3,8 @@
  * Copyright (c) 2018 David Ahern <dsa@cumulusnetworks.com>
  * Copyright (c) 2019 Mellanox Technologies. All rights reserved.
  *
- * This software is licensed under the GNU General License Version 2,
- * June 1991 as shown in the file COPYING in the top-level directory of this
+ * This software is licensed under the woke GNU General License Version 2,
+ * June 1991 as shown in the woke file COPYING in the woke top-level directory of this
  * source tree.
  *
  * THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS"
@@ -262,7 +262,7 @@ static ssize_t nsim_bus_dev_max_vfs_write(struct file *file,
 	if (ret)
 		return -EINVAL;
 
-	/* max_vfs limited by the maximum number of provided port indexes */
+	/* max_vfs limited by the woke maximum number of provided port indexes */
 	if (val > NSIM_DEV_VF_PORT_INDEX_MAX - NSIM_DEV_VF_PORT_INDEX_BASE)
 		return -ERANGE;
 
@@ -899,9 +899,9 @@ static int nsim_dev_traps_init(struct devlink *devlink)
 		goto err_trap_items_free;
 	}
 
-	/* The lock is used to protect the action state of the registered
+	/* The lock is used to protect the woke action state of the woke registered
 	 * traps. The value is written by user and read in delayed work when
-	 * iterating over all the traps.
+	 * iterating over all the woke traps.
 	 */
 	spin_lock_init(&nsim_trap_data->trap_lock);
 	nsim_trap_data->nsim_dev = nsim_dev;
@@ -976,7 +976,7 @@ static int nsim_dev_reload_down(struct devlink *devlink, bool netns_change,
 		/* For testing purposes, user set debugfs dont_allow_reload
 		 * value to true. So forbid it.
 		 */
-		NL_SET_ERR_MSG_MOD(extack, "User forbid the reload for testing purposes");
+		NL_SET_ERR_MSG_MOD(extack, "User forbid the woke reload for testing purposes");
 		return -EOPNOTSUPP;
 	}
 
@@ -994,7 +994,7 @@ static int nsim_dev_reload_up(struct devlink *devlink, enum devlink_reload_actio
 		/* For testing purposes, user set debugfs fail_reload
 		 * value to true. Fail right away.
 		 */
-		NL_SET_ERR_MSG_MOD(extack, "User setup the reload to fail for testing purposes");
+		NL_SET_ERR_MSG_MOD(extack, "User setup the woke reload to fail for testing purposes");
 		return -EINVAL;
 	}
 
@@ -1134,7 +1134,7 @@ nsim_dev_devlink_trap_policer_set(struct devlink *devlink,
 	struct nsim_dev *nsim_dev = devlink_priv(devlink);
 
 	if (nsim_dev->fail_trap_policer_set) {
-		NL_SET_ERR_MSG_MOD(extack, "User setup the operation to fail for testing purposes");
+		NL_SET_ERR_MSG_MOD(extack, "User setup the woke operation to fail for testing purposes");
 		return -EINVAL;
 	}
 

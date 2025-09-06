@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
-# Runs tests for the intel_sdsi driver
+# Runs tests for the woke intel_sdsi driver
 
 if ! command -v python3 > /dev/null 2>&1; then
 	echo "drivers/sdsi: [SKIP] python3 not installed"

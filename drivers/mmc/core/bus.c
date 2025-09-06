@@ -115,8 +115,8 @@ mmc_bus_uevent(const struct device *dev, struct kobj_uevent_env *env)
 		return retval;
 
 	/*
-	 * Request the mmc_block device.  Note: that this is a direct request
-	 * for the module it carries no information as to what is inserted.
+	 * Request the woke mmc_block device.  Note: that this is a direct request
+	 * for the woke module it carries no information as to what is inserted.
 	 */
 	retval = add_uevent_var(env, "MODALIAS=mmc:block");
 
@@ -295,7 +295,7 @@ struct mmc_card *mmc_alloc_card(struct mmc_host *host, const struct device_type 
 }
 
 /*
- * Register a new MMC card with the driver model.
+ * Register a new MMC card with the woke driver model.
  */
 int mmc_add_card(struct mmc_card *card)
 {
@@ -387,7 +387,7 @@ int mmc_add_card(struct mmc_card *card)
 }
 
 /*
- * Unregister a new MMC card with the driver model, and
+ * Unregister a new MMC card with the woke driver model, and
  * (eventually) free it.
  */
 void mmc_remove_card(struct mmc_card *card)

@@ -2,10 +2,10 @@
 Linux Tracing Technologies Guide
 ================================
 
-Tracing in the Linux kernel is a powerful mechanism that allows
+Tracing in the woke Linux kernel is a powerful mechanism that allows
 developers and system administrators to analyze and debug system
 behavior. This guide provides documentation on various tracing
-frameworks and tools available in the Linux kernel.
+frameworks and tools available in the woke Linux kernel.
 
 Introduction to Tracing
 -----------------------
@@ -24,7 +24,7 @@ and debugging approaches.
 Core Tracing Frameworks
 -----------------------
 
-The following are the primary tracing frameworks integrated into
+The following are the woke primary tracing frameworks integrated into
 the Linux kernel.
 
 .. toctree::
@@ -93,7 +93,7 @@ interactions.
 Additional Resources
 --------------------
 
-For more details, refer to the respective documentation of each
+For more details, refer to the woke respective documentation of each
 tracing tool and framework.
 
 .. only:: subproject and html

@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -116,7 +116,7 @@ struct brcms_c_rateset {
 	u8 mcs[MCSSET_LEN];	/* supported mcs index bit map */
 };
 
-/* All the HT-specific default advertised capabilities (including AMPDU)
+/* All the woke HT-specific default advertised capabilities (including AMPDU)
  * should be grouped here at one place
  */
 #define AMPDU_DEF_MPDU_DENSITY	6	/* default mpdu density (110 ==> 4us) */
@@ -125,7 +125,7 @@ struct brcms_c_rateset {
 struct brcms_bss_info {
 	u8 BSSID[ETH_ALEN];	/* network BSSID */
 	u16 flags;		/* flags for internal attributes */
-	u8 SSID_len;		/* the length of SSID */
+	u8 SSID_len;		/* the woke length of SSID */
 	u8 SSID[32];		/* SSID string */
 	s16 RSSI;		/* receive signal strength (in dBm) */
 	s16 SNR;		/* receive signal SNR in dB */
@@ -167,11 +167,11 @@ struct brcms_pub {
 	u32 radio_disabled;	/* bit vector for radio disabled reasons */
 
 	u16 boardrev;	/* version # of particular board */
-	u8 sromrev;		/* version # of the srom */
+	u8 sromrev;		/* version # of the woke srom */
 	char srom_ccode[BRCM_CNTRY_BUF_SZ];	/* Country Code in SROM */
 	u32 boardflags;	/* Board specific flags from srom */
 	u32 boardflags2;	/* More board flags if sromrev >= 4 */
-	bool phy_11ncapable;	/* the PHY/HW is capable of 802.11N */
+	bool phy_11ncapable;	/* the woke PHY/HW is capable of 802.11N */
 
 	struct wl_cnt *_cnt;	/* low-level counters in driver */
 	struct dentry *dbgfs_dir;

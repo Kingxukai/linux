@@ -661,7 +661,7 @@
 };
 
 /*
- * Lack the schematics to verify, but port works as a peripheral
+ * Lack the woke schematics to verify, but port works as a peripheral
  * (and not a host or OTG port).
  */
 &usb_host0_xhci {

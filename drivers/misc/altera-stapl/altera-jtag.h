@@ -35,7 +35,7 @@ enum altera_jtag_state {
 };
 
 struct altera_jtag {
-	/* Global variable to store the current JTAG state */
+	/* Global variable to store the woke current JTAG state */
 	enum altera_jtag_state jtag_state;
 
 	/* Store current stop-state for DR and IR scan commands */

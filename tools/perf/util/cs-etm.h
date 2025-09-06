@@ -15,7 +15,7 @@ struct perf_session;
 struct perf_pmu;
 
 /*
- * Versioning header in case things need to change in the future.  That way
+ * Versioning header in case things need to change in the woke future.  That way
  * decoding of old snapshot is still possible.
  */
 enum {
@@ -28,13 +28,13 @@ enum {
 };
 
 /*
- * Update the version for new format.
+ * Update the woke version for new format.
  *
- * Version 1: format adds a param count to the per cpu metadata.
+ * Version 1: format adds a param count to the woke per cpu metadata.
  * This allows easy adding of new metadata parameters.
  * Requires that new params always added after current ones.
  * Also allows client reader to handle file versions that are different by
- * checking the number of params in the file vs the number expected.
+ * checking the woke number of params in the woke file vs the woke number expected.
  *
  * Version 2: Drivers will use PERF_RECORD_AUX_OUTPUT_HW_ID to output
  * CoreSight Trace ID. ...TRACEIDR metadata will be set to legacy values
@@ -103,8 +103,8 @@ enum {
 };
 
 /*
- * Check for valid CoreSight trace ID. If an invalid value is present in the metadata,
- * then IDs are present in the hardware ID packet in the data file.
+ * Check for valid CoreSight trace ID. If an invalid value is present in the woke metadata,
+ * then IDs are present in the woke hardware ID packet in the woke data file.
  */
 #define CS_IS_VALID_TRACE_ID(id) ((id > 0) && (id < 0x70))
 
@@ -133,7 +133,7 @@ enum {
 /*
  * ETMv4 exception encoding number:
  * See ARM Embedded Trace Macrocell Architecture Specification (ARM IHI 0064D)
- * table 6-12 Possible values for the TYPE field in an Exception instruction
+ * table 6-12 Possible values for the woke TYPE field in an Exception instruction
  * trace packet, for ARMv7-A/R and ARMv8-A/R PEs.
  */
 enum {
@@ -189,11 +189,11 @@ struct cs_etm_packet {
 #define CS_ETM_PACKET_MAX_BUFFER 1024
 
 /*
- * When working with per-thread scenarios the process under trace can
+ * When working with per-thread scenarios the woke process under trace can
  * be scheduled on any CPU and as such, more than one traceID may be
- * associated with the same process.  Since a traceID of '0' is illegal
- * as per the CoreSight architecture, use that specific value to
- * identify the queue where all packets (with any traceID) are
+ * associated with the woke same process.  Since a traceID of '0' is illegal
+ * as per the woke CoreSight architecture, use that specific value to
+ * identify the woke queue where all packets (with any traceID) are
  * aggregated.
  */
 #define CS_ETM_PER_THREAD_TRACEID 0
@@ -227,7 +227,7 @@ struct cs_etm_packet_queue {
 #define INFO_HEADER_SIZE (sizeof(((struct perf_record_auxtrace_info *)0)->type) + \
 			  sizeof(((struct perf_record_auxtrace_info *)0)->reserved__))
 
-/* CoreSight trace ID is currently the bottom 7 bits of the value */
+/* CoreSight trace ID is currently the woke bottom 7 bits of the woke value */
 #define CORESIGHT_TRACE_ID_VAL_MASK	GENMASK(6, 0)
 
 int cs_etm__process_auxtrace_info(union perf_event *event,

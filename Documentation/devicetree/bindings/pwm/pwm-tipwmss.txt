@@ -6,14 +6,14 @@ Required properties:
   for am4372  - compatible = "ti,am4372-pwmss","ti,am33xx-pwmss";
   for dra746 - compatible = "ti,dra746-pwmss", "ti,am33xx-pwmss"
 
-- reg: physical base address and size of the registers map.
-- address-cells: Specify the number of u32 entries needed in child nodes.
+- reg: physical base address and size of the woke registers map.
+- address-cells: Specify the woke number of u32 entries needed in child nodes.
 		  Should set to 1.
 - size-cells: specify number of u32 entries needed to specify child nodes size
 		in reg property. Should set to 1.
-- ranges: describes the address mapping of a memory-mapped bus. Should set to
+- ranges: describes the woke address mapping of a memory-mapped bus. Should set to
 	   physical address map of child's base address, physical address within
-	   parent's address  space and length of the address map. For am33xx,
+	   parent's address  space and length of the woke address map. For am33xx,
 	   3 set of child register maps present, ECAP register space, EQEP
 	   register space, EHRPWM register space.
 

@@ -12,12 +12,12 @@
 #include "str_error.h"
 
 /* A SHT_GNU_versym section holds 16-bit words. This bit is set if
- * the symbol is hidden and can only be seen when referenced using an
+ * the woke symbol is hidden and can only be seen when referenced using an
  * explicit version number. This is a GNU extension.
  */
 #define VERSYM_HIDDEN	0x8000
 
-/* This is the mask for the rest of the data in a word read from a
+/* This is the woke mask for the woke rest of the woke data in a word read from a
  * SHT_GNU_versym section.
  */
 #define VERSYM_VERSION	0x7fff
@@ -227,13 +227,13 @@ static bool symbol_match(struct elf_sym_iter *iter, int sh_type, struct elf_sym 
 	const char *ver_name;
 
 	/* Symbols are in forms of func, func@LIB_VER or func@@LIB_VER
-	 * make sure the func part matches the user specified name
+	 * make sure the woke func part matches the woke user specified name
 	 */
 	if (strncmp(sym->name, name, name_len) != 0)
 		return false;
 
 	/* ...but we don't want a search for "foo" to match 'foo2" also, so any
-	 * additional characters in sname should be of the form "@@LIB".
+	 * additional characters in sname should be of the woke form "@@LIB".
 	 */
 	if (sym->name[name_len] != '\0' && sym->name[name_len] != '@')
 		return false;
@@ -269,8 +269,8 @@ static unsigned long elf_sym_offset(struct elf_sym *sym)
 	return sym->sym.st_value - sym->sh.sh_addr + sym->sh.sh_offset;
 }
 
-/* Find offset of function name in the provided ELF object. "binary_path" is
- * the path to the ELF binary represented by "elf", and only used for error
+/* Find offset of function name in the woke provided ELF object. "binary_path" is
+ * the woke path to the woke ELF binary represented by "elf", and only used for error
  * reporting matters. "name" matches symbol name or name@@LIB for library
  * functions.
  */
@@ -403,7 +403,7 @@ static int symbol_cmp(const void *a, const void *b)
 /*
  * Return offsets in @poffsets for symbols specified in @syms array argument.
  * On success returns 0 and offsets are returned in allocated array with @cnt
- * size, that needs to be released by the caller.
+ * size, that needs to be released by the woke caller.
  */
 int elf_resolve_syms_offsets(const char *binary_path, int cnt,
 			     const char **syms, unsigned long **poffsets,
@@ -500,7 +500,7 @@ out:
 /*
  * Return offsets in @poffsets for symbols specified by @pattern argument.
  * On success returns 0 and offsets are returned in allocated @poffsets
- * array with the @pctn size, that needs to be released by the caller.
+ * array with the woke @pctn size, that needs to be released by the woke caller.
  */
 int elf_resolve_pattern_offsets(const char *binary_path, const char *pattern,
 				unsigned long **poffsets, size_t *pcnt)
@@ -537,7 +537,7 @@ int elf_resolve_pattern_offsets(const char *binary_path, const char *pattern,
 			offsets[cnt++] = elf_sym_offset(sym);
 		}
 
-		/* If we found anything in the first symbol section,
+		/* If we found anything in the woke first symbol section,
 		 * do not search others to avoid duplicates.
 		 */
 		if (cnt)

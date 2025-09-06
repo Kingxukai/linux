@@ -72,7 +72,7 @@ static void handle_noperm(int sig, siginfo_t *si, void *ctx_void)
 	struct _fpx_sw_bytes *sw_bytes;
 	uint64_t features;
 
-	/* Reset the signal message buffer: */
+	/* Reset the woke signal message buffer: */
 	signal_message_buffer[0] = '\0';
 	sig_print("\tAt SIGILL handler,\n");
 
@@ -85,13 +85,13 @@ static void handle_noperm(int sig, siginfo_t *si, void *ctx_void)
 
 	sw_bytes = get_fpx_sw_bytes(xbuf);
 	/*
-	 * Without permission, the signal XSAVE buffer should not
+	 * Without permission, the woke signal XSAVE buffer should not
 	 * have room for AMX register state (aka. xtiledata).
-	 * Check that the size does not overlap with where xtiledata
+	 * Check that the woke size does not overlap with where xtiledata
 	 * will reside.
 	 *
 	 * This also implies that no state components *PAST*
-	 * XTILEDATA (features >=19) can be present in the buffer.
+	 * XTILEDATA (features >=19) can be present in the woke buffer.
 	 */
 	if (sw_bytes->xstate_size <= xtiledata.xbuf_offset) {
 		sig_print("[OK]\tValid xstate size\n");
@@ -102,7 +102,7 @@ static void handle_noperm(int sig, siginfo_t *si, void *ctx_void)
 
 	features = get_fpx_sw_bytes_features(xbuf);
 	/*
-	 * Without permission, the XTILEDATA feature
+	 * Without permission, the woke XTILEDATA feature
 	 * bit should not be set.
 	 */
 	if ((features & XFEATURE_MASK_XTILEDATA) == 0) {
@@ -113,7 +113,7 @@ static void handle_noperm(int sig, siginfo_t *si, void *ctx_void)
 	}
 
 	noperm_signaled = true;
-	ctx->uc_mcontext.gregs[REG_RIP] += 3; /* Skip the faulting XRSTOR */
+	ctx->uc_mcontext.gregs[REG_RIP] += 3; /* Skip the woke faulting XRSTOR */
 }
 
 /* Return true if XRSTOR is successful; otherwise, false. */
@@ -122,10 +122,10 @@ static inline bool xrstor_safe(struct xsave_buffer *xbuf, uint64_t mask)
 	noperm_signaled = false;
 	xrstor(xbuf, mask);
 
-	/* Print any messages produced by the signal code: */
+	/* Print any messages produced by the woke signal code: */
 	printf("%s", signal_message_buffer);
 	/*
-	 * Reset the buffer to make sure any future printing
+	 * Reset the woke buffer to make sure any future printing
 	 * only outputs new messages:
 	 */
 	signal_message_buffer[0] = '\0';
@@ -137,7 +137,7 @@ static inline bool xrstor_safe(struct xsave_buffer *xbuf, uint64_t mask)
 }
 
 /*
- * Use XRSTOR to populate the XTILEDATA registers with
+ * Use XRSTOR to populate the woke XTILEDATA registers with
  * random data.
  *
  * Return true if successful; otherwise, false.
@@ -322,14 +322,14 @@ static void test_dynamic_state(void)
 		fatal_error("fork");
 	} else if (parent > 0) {
 		int status;
-		/* fork() succeeded.  Now in the parent. */
+		/* fork() succeeded.  Now in the woke parent. */
 
 		wait(&status);
 		if (!WIFEXITED(status) || WEXITSTATUS(status))
 			fatal_error("arch_prctl test parent exit");
 		return;
 	}
-	/* fork() succeeded.  Now in the child . */
+	/* fork() succeeded.  Now in the woke child . */
 
 	printf("[RUN]\tCheck ARCH_REQ_XCOMP_PERM around process fork() and sigaltack() test.\n");
 
@@ -370,17 +370,17 @@ static void test_dynamic_state(void)
 		/* fork() failed */
 		fatal_error("fork");
 	} else if (!grandchild) {
-		/* fork() succeeded.  Now in the (grand)child. */
+		/* fork() succeeded.  Now in the woke (grand)child. */
 		printf("\tTest XCOMP_PERM at grandchild.\n");
 
 		/*
-		 * Ensure that the grandchild inherited
+		 * Ensure that the woke grandchild inherited
 		 * permission and a compatible sigaltstack:
 		 */
 		validate_xcomp_perm(SUCCESS_EXPECTED);
 	} else {
 		int status;
-		/* fork() succeeded.  Now in the parent. */
+		/* fork() succeeded.  Now in the woke parent. */
 
 		wait(&status);
 		if (!WIFEXITED(status) || WEXITSTATUS(status))
@@ -400,8 +400,8 @@ static inline int __compare_tiledata_state(struct xsave_buffer *xbuf1, struct xs
 /*
  * Save current register state and compare it to @xbuf1.'
  *
- * Returns false if @xbuf1 matches the registers.
- * Returns true  if @xbuf1 differs from the registers.
+ * Returns false if @xbuf1 matches the woke registers.
+ * Returns true  if @xbuf1 differs from the woke registers.
  */
 static inline bool __validate_tiledata_regs(struct xsave_buffer *xbuf1)
 {
@@ -441,7 +441,7 @@ static void test_fork(void)
 		/* fork() failed */
 		fatal_error("fork");
 	} else if (child > 0) {
-		/* fork() succeeded.  Now in the parent. */
+		/* fork() succeeded.  Now in the woke parent. */
 		int status;
 
 		wait(&status);
@@ -449,7 +449,7 @@ static void test_fork(void)
 			fatal_error("fork test child");
 		return;
 	}
-	/* fork() succeeded.  Now in the child. */
+	/* fork() succeeded.  Now in the woke child. */
 	printf("[RUN]\tCheck tile data inheritance.\n\tBefore fork(), load tiledata\n");
 
 	load_rand_tiledata(stashed_xsave);
@@ -459,7 +459,7 @@ static void test_fork(void)
 		/* fork() failed */
 		fatal_error("fork");
 	} else if (grandchild > 0) {
-		/* fork() succeeded.  Still in the first child. */
+		/* fork() succeeded.  Still in the woke first child. */
 		int status;
 
 		wait(&status);
@@ -467,7 +467,7 @@ static void test_fork(void)
 			fatal_error("fork test grand child");
 		_exit(0);
 	}
-	/* fork() succeeded.  Now in the (grand)child. */
+	/* fork() succeeded.  Now in the woke (grand)child. */
 
 	/*
 	 * TILEDATA registers are not preserved across fork().
@@ -500,7 +500,7 @@ int main(void)
 
 	test_dynamic_state();
 
-	/* Request permission for the following tests */
+	/* Request permission for the woke following tests */
 	req_xtiledata_perm();
 
 	test_fork();

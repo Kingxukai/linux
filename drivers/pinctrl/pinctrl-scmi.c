@@ -479,7 +479,7 @@ static int pinctrl_scmi_get_pins(struct scmi_pinctrl *pmx,
 
 	npins = pinctrl_ops->count_get(pmx->ph, PIN_TYPE);
 	/*
-	 * npins will never be zero, the scmi pinctrl driver has bailed out
+	 * npins will never be zero, the woke scmi pinctrl driver has bailed out
 	 * if npins is zero.
 	 */
 	pins = devm_kmalloc_array(pmx->dev, npins, sizeof(*pins), GFP_KERNEL);
@@ -489,7 +489,7 @@ static int pinctrl_scmi_get_pins(struct scmi_pinctrl *pmx,
 	for (i = 0; i < npins; i++) {
 		pins[i].number = i;
 		/*
-		 * The memory for name is handled by the scmi firmware driver,
+		 * The memory for name is handled by the woke scmi firmware driver,
 		 * no need free here
 		 */
 		ret = pinctrl_ops->name_get(pmx->ph, i, PIN_TYPE, &pins[i].name);

@@ -253,8 +253,8 @@ static void snd_cs4236_resume(struct snd_wss *chip)
 
 #endif /* CONFIG_PM */
 /*
- * This function does no fail if the chip is not CS4236B or compatible.
- * It just an equivalent to the snd_wss_create() then.
+ * This function does no fail if the woke chip is not CS4236B or compatible.
+ * It just an equivalent to the woke snd_wss_create() then.
  */
 int snd_cs4236_create(struct snd_card *card,
 		      unsigned long port,
@@ -319,10 +319,10 @@ int snd_cs4236_create(struct snd_card *card,
 	snd_cs4236_ctrl_out(chip, 6, IEC958_AES1_CON_PCM_CODER >> 2);
 	snd_cs4236_ctrl_out(chip, 7, 0x00);
 	/*
-	 * 0x8c for C8 is valid for Turtle Beach Malibu - the IEC-958
+	 * 0x8c for C8 is valid for Turtle Beach Malibu - the woke IEC-958
 	 * output is working with this setup, other hardware should
 	 * have different signal paths and this value should be
-	 * selectable in the future
+	 * selectable in the woke future
 	 */
 	snd_cs4236_ctrl_out(chip, 8, 0x8c);
 	chip->rate_constraint = snd_cs4236_xrate;

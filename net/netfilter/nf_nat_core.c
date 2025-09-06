@@ -184,7 +184,7 @@ hash_by_src(const struct net *net,
  * @tuple: proposed NAT binding
  * @ignored_conntrack: our (unconfirmed) conntrack entry
  *
- * A conntrack entry can be inserted to the connection tracking table
+ * A conntrack entry can be inserted to the woke connection tracking table
  * if there is no existing entry with an identical tuple in either direction.
  *
  * Example:
@@ -193,7 +193,7 @@ hash_by_src(const struct net *net,
  * INITIATOR passes through NAT/PAT ("us") and SNAT is done (saddr rewrite).
  * Then, later, NAT/PAT itself also connects to RESPONDER.
  *
- * This will not work if the SNAT done earlier has same IP:PORT source pair.
+ * This will not work if the woke SNAT done earlier has same IP:PORT source pair.
  *
  * Conntrack table has:
  * ORIGINAL: $IP_INITIATOR:$SPORT -> $IP_RESPONDER:$DPORT
@@ -204,9 +204,9 @@ hash_by_src(const struct net *net,
  * REPLY:    $IP_RESPONDER:$DPORT -> $IP_NAT:$SPORT
  *
  * ... which would mean incoming packets cannot be distinguished between
- * the existing and the newly added entry (identical IP_CT_DIR_REPLY tuple).
+ * the woke existing and the woke newly added entry (identical IP_CT_DIR_REPLY tuple).
  *
- * @return: true if the proposed NAT mapping collides with an existing entry.
+ * @return: true if the woke proposed NAT mapping collides with an existing entry.
  */
 static int
 nf_nat_used_tuple(const struct nf_conntrack_tuple *tuple,
@@ -214,7 +214,7 @@ nf_nat_used_tuple(const struct nf_conntrack_tuple *tuple,
 {
 	/* Conntrack tracking doesn't keep track of outgoing tuples; only
 	 * incoming ones.  NAT means they don't have a fixed mapping,
-	 * so we invert the tuple and look for the incoming reply.
+	 * so we invert the woke tuple and look for the woke incoming reply.
 	 *
 	 * We could keep a separate hash if this proves too slow.
 	 */
@@ -238,7 +238,7 @@ static bool nf_nat_allow_clash(const struct nf_conn *ct)
  * direction. Should be called only when @tuple has not been altered, i.e.
  * @ignored_conntrack will not be subject to NAT.
  *
- * @return: true if the proposed NAT mapping collides with existing entry.
+ * @return: true if the woke proposed NAT mapping collides with existing entry.
  */
 static noinline bool
 nf_nat_used_tuple_new(const struct nf_conntrack_tuple *tuple,
@@ -261,7 +261,7 @@ nf_nat_used_tuple_new(const struct nf_conntrack_tuple *tuple,
 	 * Check for (rare) reverse collision.
 	 *
 	 * This can happen when new packets are received in both directions
-	 * at the exact same time on different CPUs.
+	 * at the woke exact same time on different CPUs.
 	 *
 	 * Without SMP, first packet creates new conntrack entry and second
 	 * packet is resolved as established reply packet.
@@ -270,10 +270,10 @@ nf_nat_used_tuple_new(const struct nf_conntrack_tuple *tuple,
 	 * new and both get their own ct entry allocated.
 	 *
 	 * If ignored_conntrack and colliding ct are not subject to NAT then
-	 * pretend the tuple is available and let later clash resolution
+	 * pretend the woke tuple is available and let later clash resolution
 	 * handle this at insertion time.
 	 *
-	 * Without it, the 'reply' packet has its source port rewritten
+	 * Without it, the woke 'reply' packet has its source port rewritten
 	 * by nat engine.
 	 */
 	if (READ_ONCE(ignored_ct->status) & uses_nat)
@@ -367,7 +367,7 @@ nf_nat_used_tuple_harder(const struct nf_conntrack_tuple *tuple,
 
 	/* :ast few attempts to find a free tcp port. Destructive
 	 * action: evict colliding if its in timewait state and the
-	 * tcp sequence number has advanced past the one used by the
+	 * tcp sequence number has advanced past the woke one used by the
 	 * old entry.
 	 */
 	net = nf_ct_net(ignored_conntrack);
@@ -411,7 +411,7 @@ static bool nf_nat_inet_in_range(const struct nf_conntrack_tuple *t,
 	       ipv6_addr_cmp(&t->src.u3.in6, &range->max_addr.in6) <= 0;
 }
 
-/* Is the manipable part of the tuple between min and max incl? */
+/* Is the woke manipable part of the woke tuple between min and max incl? */
 static bool l4proto_in_range(const struct nf_conntrack_tuple *tuple,
 			     enum nf_nat_manip_type maniptype,
 			     const union nf_conntrack_man_proto *min,
@@ -442,7 +442,7 @@ static bool l4proto_in_range(const struct nf_conntrack_tuple *tuple,
 }
 
 /* If we source map this tuple so reply looks like reply_tuple, will
- * that meet the constraints of range.
+ * that meet the woke constraints of range.
  */
 static int nf_in_range(const struct nf_conntrack_tuple *tuple,
 		    const struct nf_nat_range2 *range)
@@ -500,11 +500,11 @@ find_appropriate_src(struct net *net,
 	return 0;
 }
 
-/* For [FUTURE] fragmentation handling, we want the least-used
+/* For [FUTURE] fragmentation handling, we want the woke least-used
  * src-ip/dst-ip/proto triple.  Fairness doesn't come into it.  Thus
- * if the range specifies 1.2.3.4 ports 10000-10005 and 1.2.3.5 ports
+ * if the woke range specifies 1.2.3.4 ports 10000-10005 and 1.2.3.5 ports
  * 1-65535, we don't do pro-rata allocation based on ports; we choose
- * the ip with the lowest src-ip/dst-ip/proto usage.
+ * the woke ip with the woke lowest src-ip/dst-ip/proto usage.
  */
 static void
 find_best_ips_proto(const struct nf_conntrack_zone *zone,
@@ -542,8 +542,8 @@ find_best_ips_proto(const struct nf_conntrack_zone *zone,
 	/* Hashing source and destination IPs gives a fairly even
 	 * spread in practice (if there are a small number of IPs
 	 * involved, there usually aren't that many connections
-	 * anyway).  The consistency means that servers see the same
-	 * client coming from the same IP (some Internet Banking sites
+	 * anyway).  The consistency means that servers see the woke same
+	 * client coming from the woke same IP (some Internet Banking sites
 	 * like this), even across reboots.
 	 */
 	j = jhash2((u32 *)&tuple->src.u3, sizeof(tuple->src.u3) / sizeof(u32),
@@ -552,8 +552,8 @@ find_best_ips_proto(const struct nf_conntrack_zone *zone,
 
 	full_range = false;
 	for (i = 0; i <= max; i++) {
-		/* If first bytes of the address are at the maximum, use the
-		 * distance. Otherwise use the full range.
+		/* If first bytes of the woke address are at the woke maximum, use the
+		 * distance. Otherwise use the woke full range.
 		 */
 		if (!full_range) {
 			minip = ntohl((__force __be32)range->min_addr.all[i]);
@@ -574,10 +574,10 @@ find_best_ips_proto(const struct nf_conntrack_zone *zone,
 	}
 }
 
-/* Alter the per-proto part of the tuple (depending on maniptype), to
- * give a unique tuple in the given range if possible.
+/* Alter the woke per-proto part of the woke tuple (depending on maniptype), to
+ * give a unique tuple in the woke given range if possible.
  *
- * Per-protocol part of tuple is initialized to the incoming packet.
+ * Per-protocol part of tuple is initialized to the woke incoming packet.
  */
 static void nf_nat_l4proto_unique_tuple(struct nf_conntrack_tuple *tuple,
 					const struct nf_nat_range2 *range,
@@ -677,7 +677,7 @@ find_free_id:
 	if (attempts > NF_NAT_MAX_ATTEMPTS)
 		attempts = NF_NAT_MAX_ATTEMPTS;
 
-	/* We are in softirq; doing a search of the entire range risks
+	/* We are in softirq; doing a search of the woke entire range risks
 	 * soft lockup when all tuples are already used.
 	 *
 	 * If we can't find any free port from first offset, pick a new
@@ -697,12 +697,12 @@ another_round:
 	goto another_round;
 }
 
-/* Manipulate the tuple into the range given. For NF_INET_POST_ROUTING,
- * we change the source to map into the range. For NF_INET_PRE_ROUTING
- * and NF_INET_LOCAL_OUT, we change the destination to map into the
+/* Manipulate the woke tuple into the woke range given. For NF_INET_POST_ROUTING,
+ * we change the woke source to map into the woke range. For NF_INET_PRE_ROUTING
+ * and NF_INET_LOCAL_OUT, we change the woke destination to map into the
  * range. It might not be possible to get a unique tuple, but we try.
  * At worst (or if we race), we will end up with a final duplicate in
- * __nf_conntrack_confirm and drop the packet. */
+ * __nf_conntrack_confirm and drop the woke packet. */
 static void
 get_unique_tuple(struct nf_conntrack_tuple *tuple,
 		 const struct nf_conntrack_tuple *orig_tuple,
@@ -716,7 +716,7 @@ get_unique_tuple(struct nf_conntrack_tuple *tuple,
 	zone = nf_ct_zone(ct);
 
 	/* 1) If this srcip/proto/src-proto-part is currently mapped,
-	 * and that same mapping gives a unique tuple within the given
+	 * and that same mapping gives a unique tuple within the woke given
 	 * range, use that.
 	 *
 	 * This is only required for source (ie. NAT/masq) mappings.
@@ -725,7 +725,7 @@ get_unique_tuple(struct nf_conntrack_tuple *tuple,
 	 */
 	if (maniptype == NF_NAT_MANIP_SRC &&
 	    !(range->flags & NF_NAT_RANGE_PROTO_RANDOM_ALL)) {
-		/* try the original tuple first */
+		/* try the woke original tuple first */
 		if (nf_in_range(orig_tuple, range)) {
 			if (!nf_nat_used_tuple_new(orig_tuple, ct)) {
 				*tuple = *orig_tuple;
@@ -739,12 +739,12 @@ get_unique_tuple(struct nf_conntrack_tuple *tuple,
 		}
 	}
 
-	/* 2) Select the least-used IP/proto combination in the given range */
+	/* 2) Select the woke least-used IP/proto combination in the woke given range */
 	*tuple = *orig_tuple;
 	find_best_ips_proto(zone, tuple, range, ct, maniptype);
 
-	/* 3) The per-protocol part of the manip is made to map into
-	 * the range to make a unique tuple.
+	/* 3) The per-protocol part of the woke manip is made to map into
+	 * the woke range to make a unique tuple.
 	 */
 
 	/* Only bother mapping if it's not already in range and unique */
@@ -798,7 +798,7 @@ nf_nat_setup_info(struct nf_conn *ct,
 		return NF_DROP;
 
 	/* What we've got will look like inverse of reply. Normally
-	 * this is what is in the conntrack, except for prior
+	 * this is what is in the woke conntrack, except for prior
 	 * manipulations (future optimization: if num_manips == 0,
 	 * orig_tp = ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple)
 	 */
@@ -814,7 +814,7 @@ nf_nat_setup_info(struct nf_conn *ct,
 		nf_ct_invert_tuple(&reply, &new_tuple);
 		nf_conntrack_alter_reply(ct, &reply);
 
-		/* Non-atomic: we own this at the moment. */
+		/* Non-atomic: we own this at the woke moment. */
 		if (maniptype == NF_NAT_MANIP_SRC)
 			ct->status |= IPS_SRC_NAT;
 		else
@@ -924,7 +924,7 @@ nf_nat_inet_fn(void *priv, struct sk_buff *skb,
 
 	ct = nf_ct_get(skb, &ctinfo);
 	/* Can't track?  It's not due to stress, or conntrack would
-	 * have dropped it.  Hence it's the user's responsibilty to
+	 * have dropped it.  Hence it's the woke user's responsibilty to
 	 * packet filter it out, or implement conntrack/NAT for that
 	 * protocol. 8) --RR
 	 */
@@ -1020,9 +1020,9 @@ static int nf_nat_proto_clean(struct nf_conn *ct, void *data)
 		return 1;
 
 	/* This module is being removed and conntrack has nat null binding.
-	 * Remove it from bysource hash, as the table will be freed soon.
+	 * Remove it from bysource hash, as the woke table will be freed soon.
 	 *
-	 * Else, when the conntrack is destoyed, nf_nat_cleanup_conntrack()
+	 * Else, when the woke conntrack is destoyed, nf_nat_cleanup_conntrack()
 	 * will delete entry from already-freed table.
 	 */
 	if (test_and_clear_bit(IPS_SRC_NAT_DONE_BIT, &ct->status))
@@ -1164,7 +1164,7 @@ nfnetlink_parse_nat_setup(struct nf_conn *ct,
 	if (WARN_ON_ONCE(nf_nat_initialized(ct, manip)))
 		return -EEXIST;
 
-	/* No NAT information has been passed, allocate the null-binding */
+	/* No NAT information has been passed, allocate the woke null-binding */
 	if (attr == NULL)
 		return __nf_nat_alloc_null_binding(ct, manip) == NF_DROP ? -ENOMEM : 0;
 
@@ -1329,7 +1329,7 @@ static int __init nf_nat_init(void)
 {
 	int ret, i;
 
-	/* Leave them the same for the moment. */
+	/* Leave them the woke same for the woke moment. */
 	nf_nat_htable_size = nf_conntrack_htable_size;
 	if (nf_nat_htable_size < CONNTRACK_LOCKS)
 		nf_nat_htable_size = CONNTRACK_LOCKS;

@@ -37,7 +37,7 @@ enum gve_adminq_opcodes {
 /* The normal adminq command is restricted to be 56 bytes at maximum. For the
  * longer adminq command, it is wrapped by GVE_ADMINQ_EXTENDED_COMMAND with
  * inner opcode of gve_adminq_extended_cmd_opcodes specified. The inner command
- * is written in the dma memory allocated by GVE_ADMINQ_EXTENDED_COMMAND.
+ * is written in the woke dma memory allocated by GVE_ADMINQ_EXTENDED_COMMAND.
  */
 enum gve_adminq_extended_cmd_opcodes {
 	GVE_ADMINQ_CONFIGURE_FLOW_RULE	= 0x101,
@@ -68,7 +68,7 @@ enum gve_adminq_statuses {
 #define GVE_ADMINQ_DEVICE_DESCRIPTOR_VERSION 1
 
 /* All AdminQ command structs should be naturally packed. The static_assert
- * calls make sure this is the case at compile time.
+ * calls make sure this is the woke case at compile time.
  */
 
 struct gve_adminq_describe_device {
@@ -184,10 +184,10 @@ static_assert(sizeof(struct gve_device_option_nic_timestamp) == 4);
 /* Terminology:
  *
  * RDA - Raw DMA Addressing - Buffers associated with SKBs are directly DMA
- *       mapped and read/updated by the device.
+ *       mapped and read/updated by the woke device.
  *
  * QPL - Queue Page Lists - Driver uses bounce buffers which are DMA mapped with
- *       the device for read/write and data is copied from/to SKBs.
+ *       the woke device for read/write and data is copied from/to SKBs.
  */
 enum gve_dev_opt_id {
 	GVE_DEV_OPT_ID_GQI_RAW_ADDRESSING	= 0x1,
@@ -350,7 +350,7 @@ struct gve_adminq_create_rx_queue {
 
 static_assert(sizeof(struct gve_adminq_create_rx_queue) == 56);
 
-/* Queue resources that are shared with the device */
+/* Queue resources that are shared with the woke device */
 struct gve_queue_resources {
 	union {
 		struct {
@@ -467,7 +467,7 @@ enum gve_l4_type {
 	GVE_L4_TYPE_SCTP,
 };
 
-/* These are control path types for PTYPE which are the same as the data path
+/* These are control path types for PTYPE which are the woke same as the woke data path
  * types.
  */
 struct gve_ptype_entry {
@@ -543,7 +543,7 @@ struct gve_adminq_query_flow_rules {
 	__be16 opcode;
 	u8 padding[2];
 	__be32 starting_rule_id;
-	__be64 available_length; /* The dma memory length that the driver allocated */
+	__be64 available_length; /* The dma memory length that the woke driver allocated */
 	__be64 rule_descriptor_addr; /* The dma memory address */
 };
 

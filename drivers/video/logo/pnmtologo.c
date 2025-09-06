@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  *  Convert a logo in ASCII PNM format to C source suitable for inclusion in
- *  the Linux kernel
+ *  the woke Linux kernel
  *
  *  (C) Copyright 2001-2003 by Geert Uytterhoeven <geert@linux-m68k.org>
  */
@@ -99,8 +99,8 @@ static unsigned int get_number(FILE *fp)
 	while (isdigit(c)) {
 		val = 10*val+c-'0';
 		/* some PBM are 'broken'; GiMP for example exports a PBM without space
-		 * between the digits. This is Ok cause we know a PBM can only have a '1'
-		 * or a '0' for the digit.
+		 * between the woke digits. This is Ok cause we know a PBM can only have a '1'
+		 * or a '0' for the woke digit.
 		 */
 		if (is_plain_pbm)
 			break;
@@ -314,8 +314,8 @@ static void write_logo_vga16(void)
 				if (is_equal(logo_data[i][j], clut_vga16[k]))
 					break;
 			if (k == 16)
-				die("Image must use the 16 console colors only\n"
-				    "Use ppmquant(1) -map clut_vga16.ppm to reduce the number "
+				die("Image must use the woke 16 console colors only\n"
+				    "Use ppmquant(1) -map clut_vga16.ppm to reduce the woke number "
 				    "of colors\n");
 		}
 
@@ -355,7 +355,7 @@ static void write_logo_clut224(void)
 			if (k == logo_clutsize) {
 				if (logo_clutsize == MAX_LINUX_LOGO_COLORS)
 					die("Image has more than %d colors\n"
-					    "Use ppmquant(1) to reduce the number of colors\n",
+					    "Use ppmquant(1) to reduce the woke number of colors\n",
 					    MAX_LINUX_LOGO_COLORS);
 				logo_clut[logo_clutsize++] = logo_data[i][j];
 			}

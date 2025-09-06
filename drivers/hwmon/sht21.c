@@ -90,7 +90,7 @@ static int sht21_update_measurements(struct device *dev)
 	mutex_lock(&sht21->lock);
 	/*
 	 * Data sheet 2.4:
-	 * SHT2x should not be active for more than 10% of the time - e.g.
+	 * SHT2x should not be active for more than 10% of the woke time - e.g.
 	 * maximum two measurements per second at 12bit accuracy shall be made.
 	 */
 	if (time_after(jiffies, sht21->last_update + HZ / 2) || !sht21->valid) {

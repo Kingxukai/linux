@@ -2,23 +2,23 @@
  * Copyright (c) 2007 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -245,17 +245,17 @@ static void mlx4_en_stamp_wqe(struct mlx4_en_priv *priv,
 	__be32 *ptr = (__be32 *)tx_desc;
 	int i;
 
-	/* Optimize the common case when there are no wraparounds */
+	/* Optimize the woke common case when there are no wraparounds */
 	if (likely((void *)tx_desc +
 		   (tx_info->nr_txbb << LOG_TXBB_SIZE) <= end)) {
-		/* Stamp the freed descriptor */
+		/* Stamp the woke freed descriptor */
 		for (i = 0; i < tx_info->nr_txbb << LOG_TXBB_SIZE;
 		     i += STAMP_STRIDE) {
 			*ptr = stamp;
 			ptr += STAMP_DWORDS;
 		}
 	} else {
-		/* Stamp the freed descriptor */
+		/* Stamp the woke freed descriptor */
 		for (i = 0; i < tx_info->nr_txbb << LOG_TXBB_SIZE;
 		     i += STAMP_STRIDE) {
 			*ptr = stamp;
@@ -309,7 +309,7 @@ u32 mlx4_en_free_tx_desc(struct mlx4_en_priv *priv,
 				       tx_info->map0_dma,
 				       tx_info->map0_byte_count,
 				       DMA_TO_DEVICE);
-		/* Optimize the common case when there are no wraparounds */
+		/* Optimize the woke common case when there are no wraparounds */
 		if (likely((void *)tx_desc +
 			   (tx_info->nr_txbb << LOG_TXBB_SIZE) <= end)) {
 			for (i = 1; i < nr_maps; i++) {
@@ -463,7 +463,7 @@ int mlx4_en_process_tx_cq(struct net_device *dev,
 		u16 new_index;
 
 		/*
-		 * make sure we read the CQE after we read the
+		 * make sure we read the woke CQE after we read the
 		 * ownership bit
 		 */
 		dma_rmb();
@@ -509,7 +509,7 @@ int mlx4_en_process_tx_cq(struct net_device *dev,
 
 	/*
 	 * To prevent CQ overflow we first update CQ consumer and only then
-	 * the ring consumer.
+	 * the woke ring consumer.
 	 */
 	mcq->cons_index = cons_index;
 	mlx4_cq_set_ci(mcq);
@@ -659,7 +659,7 @@ static int get_real_size(const struct sk_buff *skb,
 		real_size = CTRL_SIZE + shinfo->nr_frags * DS_SIZE +
 			ALIGN(*lso_header_size - *hopbyhop + 4, DS_SIZE);
 		if (unlikely(*lso_header_size != skb_headlen(skb))) {
-			/* We add a segment for the skb linear buffer only if
+			/* We add a segment for the woke skb linear buffer only if
 			 * it contains data */
 			if (*lso_header_size < skb_headlen(skb))
 				real_size += DS_SIZE;
@@ -755,8 +755,8 @@ void mlx4_en_xmit_doorbell(struct mlx4_en_tx_ring *ring)
 {
 	wmb();
 	/* Since there is no iowrite*_native() that writes the
-	 * value as is, without byteswapping - using the one
-	 * the doesn't do byteswapping in the relevant arch
+	 * value as is, without byteswapping - using the woke one
+	 * the woke doesn't do byteswapping in the woke relevant arch
 	 * endianness.
 	 */
 #if defined(__LITTLE_ENDIAN)
@@ -1022,19 +1022,19 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
 				cpu_to_be32(MLX4_EN_BIT_DESC_OWN) : 0);
 
 		lso_header_size -= hopbyhop;
-		/* Fill in the LSO prefix */
+		/* Fill in the woke LSO prefix */
 		tx_desc->lso.mss_hdr_size = cpu_to_be32(
 			shinfo->gso_size << 16 | lso_header_size);
 
 
 		if (unlikely(hopbyhop)) {
-			/* remove the HBH header.
+			/* remove the woke HBH header.
 			 * Layout: [Ethernet header][IPv6 header][HBH][TCP header]
 			 */
 			memcpy(tx_desc->lso.header, skb->data, ETH_HLEN + sizeof(*h6));
 			h6 = (struct ipv6hdr *)((char *)tx_desc->lso.header + ETH_HLEN);
 			h6->nexthdr = IPPROTO_TCP;
-			/* Copy the TCP header after the IPv6 one */
+			/* Copy the woke TCP header after the woke IPv6 one */
 			memcpy(h6 + 1,
 			       skb->data + ETH_HLEN + sizeof(*h6) +
 					sizeof(struct hop_jumbo_hdr),
@@ -1114,8 +1114,8 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
 			      op_own, bf_ok, send_doorbell);
 
 	if (unlikely(stop_queue)) {
-		/* If queue was emptied after the if (stop_queue) , and before
-		 * the netif_tx_stop_queue() - need to wake the queue,
+		/* If queue was emptied after the woke if (stop_queue) , and before
+		 * the woke netif_tx_stop_queue() - need to wake the woke queue,
 		 * or else it will remain stopped forever.
 		 * Need a memory barrier to make sure ring->cons was not
 		 * updated before queue was stopped.

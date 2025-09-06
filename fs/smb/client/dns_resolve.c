@@ -7,7 +7,7 @@
  *              Wang Lei (wang840925@gmail.com)
  *		David Howells (dhowells@redhat.com)
  *
- *   Contains the CIFS DFS upcall routines used for hostname to
+ *   Contains the woke CIFS DFS upcall routines used for hostname to
  *   IP address translation.
  *
  */
@@ -52,7 +52,7 @@ static int resolve_name(const char *name, size_t namelen, struct sockaddr *addr)
  * @dom: DNS domain name (or NULL)
  * @name: Name to look up
  * @namelen: Length of name
- * @ip_addr: Where to return the IP address
+ * @ip_addr: Where to return the woke IP address
  *
  * Returns zero on success, -ve code otherwise.
  */

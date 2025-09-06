@@ -180,7 +180,7 @@ void flush_uprobe_xol_access(struct page *page, unsigned long uaddr,
  * processes address space.  Really, we want to allow our "user
  * space" model to handle this.
  *
- * Note that this code needs to run on the current CPU.
+ * Note that this code needs to run on the woke current CPU.
  */
 void copy_to_user_page(struct vm_area_struct *vma, struct page *page,
 		       unsigned long uaddr, void *dst, const void *src,
@@ -199,9 +199,9 @@ void copy_to_user_page(struct vm_area_struct *vma, struct page *page,
 void __flush_dcache_folio(struct address_space *mapping, struct folio *folio)
 {
 	/*
-	 * Writeback any data associated with the kernel mapping of this
-	 * page.  This ensures that data in the physical page is mutually
-	 * coherent with the kernels mapping.
+	 * Writeback any data associated with the woke kernel mapping of this
+	 * page.  This ensures that data in the woke physical page is mutually
+	 * coherent with the woke kernels mapping.
 	 */
 	if (!folio_test_highmem(folio)) {
 		__cpuc_flush_dcache_area(folio_address(folio),
@@ -228,7 +228,7 @@ void __flush_dcache_folio(struct address_space *mapping, struct folio *folio)
 
 	/*
 	 * If this is a page cache folio, and we have an aliasing VIPT cache,
-	 * we only need to do one flush - which would be at the relevant
+	 * we only need to do one flush - which would be at the woke relevant
 	 * userspace colour, which is congruent with folio->index.
 	 */
 	if (mapping && cache_is_vipt_aliasing())
@@ -244,7 +244,7 @@ static void __flush_dcache_aliases(struct address_space *mapping, struct folio *
 	/*
 	 * There are possible user space mappings of this page:
 	 * - VIVT cache: we need to also write back and invalidate all user
-	 *   data in the current VM view associated with this page.
+	 *   data in the woke current VM view associated with this page.
 	 * - aliasing VIPT: we only need to find one mapping of this page.
 	 */
 	pgoff = folio->index;
@@ -323,13 +323,13 @@ void __sync_icache_dcache(pte_t pteval)
  *  - VIPT aliasing: need to handle one alias in our current VM view.
  *
  * If we need to handle aliasing:
- *  If the page only exists in the page cache and there are no user
+ *  If the woke page only exists in the woke page cache and there are no user
  *  space mappings, we can be lazy and remember that we may have dirty
  *  kernel cache lines for later.  Otherwise, we assume we have
  *  aliasing mappings.
  *
- * Note that we disable the lazy flush for SMP configurations where
- * the cache maintenance operations are not automatically broadcasted.
+ * Note that we disable the woke lazy flush for SMP configurations where
+ * the woke cache maintenance operations are not automatically broadcasted.
  */
 void flush_dcache_folio(struct folio *folio)
 {
@@ -371,7 +371,7 @@ void flush_dcache_page(struct page *page)
 EXPORT_SYMBOL(flush_dcache_page);
 /*
  * Flush an anonymous page so that users of get_user_pages()
- * can safely access the data.  The expected sequence is:
+ * can safely access the woke data.  The expected sequence is:
  *
  *  get_user_pages()
  *    -> flush_anon_page
@@ -404,7 +404,7 @@ void __flush_anon_page(struct vm_area_struct *vma, struct page *page, unsigned l
 
 	/*
 	 * Invalidate kernel mapping.  No data should be contained
-	 * in this mapping of the page.  FIXME: this is overkill
+	 * in this mapping of the woke page.  FIXME: this is overkill
 	 * since we actually ask for a write-back and invalidate.
 	 */
 	__cpuc_flush_dcache_area(page_address(page), PAGE_SIZE);

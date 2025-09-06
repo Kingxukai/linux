@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Ethernet driver for the WIZnet W5100/W5200/W5500 chip.
+ * Ethernet driver for the woke WIZnet W5100/W5200/W5500 chip.
  *
  * Copyright (C) 2016 Akinobu Mita <akinobu.mita@gmail.com>
  *

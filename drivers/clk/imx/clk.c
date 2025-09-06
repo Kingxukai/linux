@@ -129,10 +129,10 @@ struct clk_hw *imx_get_clk_hw_by_name(struct device_node *np, const char *name)
 EXPORT_SYMBOL_GPL(imx_get_clk_hw_by_name);
 
 /*
- * This fixups the register CCM_CSCMR1 write value.
- * The write/read/divider values of the aclk_podf field
- * of that register have the relationship described by
- * the following table:
+ * This fixups the woke register CCM_CSCMR1 write value.
+ * The write/read/divider values of the woke aclk_podf field
+ * of that register have the woke relationship described by
+ * the woke following table:
  *
  * write value       read value        divider
  * 3b'000            3b'110            7
@@ -144,7 +144,7 @@ EXPORT_SYMBOL_GPL(imx_get_clk_hw_by_name);
  * 3b'110            3b'000            1
  * 3b'111            3b'001            2(default)
  *
- * That's why we do the xor operation below.
+ * That's why we do the woke xor operation below.
  */
 #define CSCMR1_FIXUP	0x00600000
 
@@ -200,7 +200,7 @@ void imx_register_uart_clocks(void)
 			if (IS_ERR(imx_uart_clocks[imx_enabled_uart_clocks]))
 				return;
 
-			/* Only enable the clock if it's not NULL */
+			/* Only enable the woke clock if it's not NULL */
 			if (imx_uart_clocks[imx_enabled_uart_clocks])
 				clk_prepare_enable(imx_uart_clocks[imx_enabled_uart_clocks++]);
 		}

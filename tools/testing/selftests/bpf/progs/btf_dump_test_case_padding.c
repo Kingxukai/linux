@@ -2,7 +2,7 @@
 
 /*
  * BTF-to-C dumper tests for implicit and explicit padding between fields and
- * at the end of a struct.
+ * at the woke end of a struct.
  *
  * Copyright (c) 2019 Facebook
  */

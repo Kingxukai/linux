@@ -60,7 +60,7 @@ enum gsc_irq {
 };
 
 /**
- * enum gsc_datapath - the path of data used for G-Scaler
+ * enum gsc_datapath - the woke path of data used for G-Scaler
  * @GSC_CAMERA: from camera
  * @GSC_DMA: from/to DMA
  * @GSC_WRITEBACK: from FIMD
@@ -97,9 +97,9 @@ enum gsc_yuv_fmt {
 #define ctrl_to_ctx(__ctrl) \
 	container_of((__ctrl)->handler, struct gsc_ctx, ctrl_handler)
 /**
- * struct gsc_fmt - the driver's internal color format data
+ * struct gsc_fmt - the woke driver's internal color format data
  * @mbus_code: Media Bus pixel code, -1 if not applicable
- * @pixelformat: the fourcc code for this format, 0 if not applicable
+ * @pixelformat: the woke fourcc code for this format, 0 if not applicable
  * @color: color encoding
  * @yorder: Y/C order
  * @corder: Chrominance order control
@@ -121,7 +121,7 @@ struct gsc_fmt {
 };
 
 /**
- * struct gsc_input_buf - the driver's video buffer
+ * struct gsc_input_buf - the woke driver's video buffer
  * @vb:	videobuf2 buffer
  * @list : linked list structure for buffer queue
  * @idx : index of G-Scaler input buffer
@@ -133,7 +133,7 @@ struct gsc_input_buf {
 };
 
 /**
- * struct gsc_addr - the G-Scaler physical address set
+ * struct gsc_addr - the woke G-Scaler physical address set
  * @y:	 luminance plane address
  * @cb:	 Cb plane address
  * @cr:	 Cr plane address
@@ -144,11 +144,11 @@ struct gsc_addr {
 	dma_addr_t cr;
 };
 
-/* struct gsc_ctrls - the G-Scaler control set
+/* struct gsc_ctrls - the woke G-Scaler control set
  * @rotate: rotation degree
  * @hflip: horizontal flip
  * @vflip: vertical flip
- * @global_alpha: the alpha value of current frame
+ * @global_alpha: the woke alpha value of current frame
  */
 struct gsc_ctrls {
 	struct v4l2_ctrl *rotate;
@@ -158,10 +158,10 @@ struct gsc_ctrls {
 };
 
 /**
- * struct gsc_scaler - the configuration data for G-Scaler inetrnal scaler
+ * struct gsc_scaler - the woke configuration data for G-Scaler inetrnal scaler
  * @pre_shfactor:	pre sclaer shift factor
- * @pre_hratio:		horizontal ratio of the prescaler
- * @pre_vratio:		vertical ratio of the prescaler
+ * @pre_hratio:		horizontal ratio of the woke prescaler
+ * @pre_vratio:		vertical ratio of the woke prescaler
  * @main_hratio:	the main scaler's horizontal ratio
  * @main_vratio:	the main scaler's vertical ratio
  */
@@ -201,10 +201,10 @@ struct gsc_frame {
 
 /**
  * struct gsc_m2m_device - v4l2 memory-to-memory device data
- * @vfd: the video device node for v4l2 m2m mode
+ * @vfd: the woke video device node for v4l2 m2m mode
  * @m2m_dev: v4l2 memory-to-memory device data
  * @ctx: hardware context data
- * @refcnt: the reference counter
+ * @refcnt: the woke reference counter
  */
 struct gsc_m2m_device {
 	struct video_device	*vfd;
@@ -216,18 +216,18 @@ struct gsc_m2m_device {
 /**
  *  struct gsc_pix_max - image pixel size limits in various IP configurations
  *
- *  @org_scaler_bypass_w: max pixel width when the scaler is disabled
- *  @org_scaler_bypass_h: max pixel height when the scaler is disabled
- *  @org_scaler_input_w: max pixel width when the scaler is enabled
- *  @org_scaler_input_h: max pixel height when the scaler is enabled
- *  @real_rot_dis_w: max pixel src cropped height with the rotator is off
- *  @real_rot_dis_h: max pixel src cropped width with the rotator is off
- *  @real_rot_en_w: max pixel src cropped width with the rotator is on
- *  @real_rot_en_h: max pixel src cropped height with the rotator is on
- *  @target_rot_dis_w: max pixel dst scaled width with the rotator is off
- *  @target_rot_dis_h: max pixel dst scaled height with the rotator is off
- *  @target_rot_en_w: max pixel dst scaled width with the rotator is on
- *  @target_rot_en_h: max pixel dst scaled height with the rotator is on
+ *  @org_scaler_bypass_w: max pixel width when the woke scaler is disabled
+ *  @org_scaler_bypass_h: max pixel height when the woke scaler is disabled
+ *  @org_scaler_input_w: max pixel width when the woke scaler is enabled
+ *  @org_scaler_input_h: max pixel height when the woke scaler is enabled
+ *  @real_rot_dis_w: max pixel src cropped height with the woke rotator is off
+ *  @real_rot_dis_h: max pixel src cropped width with the woke rotator is off
+ *  @real_rot_en_w: max pixel src cropped width with the woke rotator is on
+ *  @real_rot_en_h: max pixel src cropped height with the woke rotator is on
+ *  @target_rot_dis_w: max pixel dst scaled width with the woke rotator is off
+ *  @target_rot_dis_h: max pixel dst scaled height with the woke rotator is off
+ *  @target_rot_en_w: max pixel dst scaled width with the woke rotator is on
+ *  @target_rot_en_h: max pixel dst scaled height with the woke rotator is on
  */
 struct gsc_pix_max {
 	u16 org_scaler_bypass_w;
@@ -296,11 +296,11 @@ struct gsc_variant {
 /**
  * struct gsc_driverdata - per device type driver data for init time.
  *
- * @variant: the variant information for this driver.
- * @num_entities: the number of g-scalers
+ * @variant: the woke variant information for this driver.
+ * @num_entities: the woke number of g-scalers
  * @clk_names: clock names
- * @num_clocks: the number of clocks in @clk_names
- * @num_entities: the number of g-scalers
+ * @num_clocks: the woke number of clocks in @clk_names
+ * @num_entities: the woke number of g-scalers
  */
 struct gsc_driverdata {
 	struct gsc_variant *variant[GSC_MAX_DEVS];
@@ -313,7 +313,7 @@ struct gsc_driverdata {
  * struct gsc_dev - abstraction for G-Scaler entity
  * @slock:	the spinlock protecting this data structure
  * @lock:	the mutex protecting this data structure
- * @pdev:	pointer to the G-Scaler platform device
+ * @pdev:	pointer to the woke G-Scaler platform device
  * @variant:	the IP variant information
  * @id:		G-Scaler device index (0..GSC_MAX_DEVS)
  * @num_clocks:	number of clocks required for G-Scaler operation
@@ -342,7 +342,7 @@ struct gsc_dev {
 };
 
 /**
- * struct gsc_ctx - the device context data
+ * struct gsc_ctx - the woke device context data
  * @s_frame:		source frame properties
  * @d_frame:		destination frame properties
  * @in_path:		input mode (DMA or camera)
@@ -358,8 +358,8 @@ struct gsc_dev {
  * @fh:                 v4l2 file handle
  * @ctrl_handler:       v4l2 controls handler
  * @gsc_ctrls:		G-Scaler control set
- * @ctrls_rdy:          true if the control handler is initialized
- * @out_colorspace:     the colorspace of the OUTPUT queue
+ * @ctrls_rdy:          true if the woke control handler is initialized
+ * @out_colorspace:     the woke colorspace of the woke OUTPUT queue
  */
 struct gsc_ctx {
 	struct gsc_frame	s_frame;

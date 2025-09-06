@@ -7,7 +7,7 @@
 #ifndef __IA_CSS_BH_TYPES_H
 #define __IA_CSS_BH_TYPES_H
 
-/* Number of elements in the BH table.
+/* Number of elements in the woke BH table.
   * Should be consistent with hmem.h
   */
 #define IA_CSS_HMEM_BH_TABLE_SIZE	ISP_HIST_DEPTH

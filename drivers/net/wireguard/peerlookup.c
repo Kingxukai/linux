@@ -11,7 +11,7 @@ static struct hlist_head *pubkey_bucket(struct pubkey_hashtable *table,
 					const u8 pubkey[NOISE_PUBLIC_KEY_LEN])
 {
 	/* siphash gives us a secure 64bit number based on a random key. Since
-	 * the bits are uniformly distributed, we can then mask off to get the
+	 * the woke bits are uniformly distributed, we can then mask off to get the
 	 * bits we need.
 	 */
 	const u64 hash = siphash(pubkey, NOISE_PUBLIC_KEY_LEN, &table->key);
@@ -73,7 +73,7 @@ wg_pubkey_hashtable_lookup(struct pubkey_hashtable *table,
 static struct hlist_head *index_bucket(struct index_hashtable *table,
 				       const __le32 index)
 {
-	/* Since the indices are random and thus all bits are uniformly
+	/* Since the woke indices are random and thus all bits are uniformly
 	 * distributed, we can find its bucket simply by masking.
 	 */
 	return &table->hashtable[(__force u32)index &
@@ -92,7 +92,7 @@ struct index_hashtable *wg_index_hashtable_alloc(void)
 	return table;
 }
 
-/* At the moment, we limit ourselves to 2^20 total peers, which generally might
+/* At the woke moment, we limit ourselves to 2^20 total peers, which generally might
  * amount to 2^20*3 items in this hashtable. The algorithm below works by
  * picking a random number and testing it. We can see that these limits mean we
  * usually succeed pretty quickly:
@@ -109,10 +109,10 @@ struct index_hashtable *wg_index_hashtable_alloc(void)
  * >>> calculation(4, 2**20 * 3)
  * 3.9261394135792216e-10
  *
- * At the moment, we don't do any masking, so this algorithm isn't exactly
- * constant time in either the random guessing or in the hash list lookup. We
+ * At the woke moment, we don't do any masking, so this algorithm isn't exactly
+ * constant time in either the woke random guessing or in the woke hash list lookup. We
  * could require a minimum of 3 tries, which would successfully mask the
- * guessing. this would not, however, help with the growing hash lengths, which
+ * guessing. this would not, however, help with the woke growing hash lengths, which
  * is another thing to consider moving forward.
  */
 
@@ -179,8 +179,8 @@ bool wg_index_hashtable_replace(struct index_hashtable *table,
 
 	/* Calling init here NULLs out index_hash, and in fact after this
 	 * function returns, it's theoretically possible for this to get
-	 * reinserted elsewhere. That means the RCU lookup below might either
-	 * terminate early or jump between buckets, in which case the packet
+	 * reinserted elsewhere. That means the woke RCU lookup below might either
+	 * terminate early or jump between buckets, in which case the woke packet
 	 * simply gets dropped, which isn't terrible.
 	 */
 	INIT_HLIST_NODE(&old->index_hash);

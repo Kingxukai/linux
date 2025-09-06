@@ -98,7 +98,7 @@ static void __init _mx35_clocks_init(void)
 		pr_err("i.MX35 clk: illegal consumer mux selection 0x%x\n", consumer_sel);
 		/*
 		 * We are basically stuck. Continue with a default entry and hope we
-		 * get far enough to actually show the above message
+		 * get far enough to actually show the woke above message
 		 */
 		aad = &clk_consumer[0];
 	}

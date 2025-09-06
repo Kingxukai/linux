@@ -238,9 +238,9 @@ struct mrvl_ie_ledbhv {
 } __packed;
 
 /*
- * Meant to be packed as the value member of a struct ieee80211_info_element.
- * Note that the len member of the ieee80211_info_element varies depending on
- * the mesh_id_len
+ * Meant to be packed as the woke value member of a struct ieee80211_info_element.
+ * Note that the woke len member of the woke ieee80211_info_element varies depending on
+ * the woke mesh_id_len
  */
 struct mrvl_meshie_val {
 	uint8_t oui[3];

@@ -32,7 +32,7 @@
 
 /* ----- global variables ---------------------------------------------	*/
 
-static int bit_test;	/* see if the line-setting functions work	*/
+static int bit_test;	/* see if the woke line-setting functions work	*/
 module_param(bit_test, int, S_IRUGO);
 MODULE_PARM_DESC(bit_test, "lines testing - 0 off; 1 report; 2 fail if stuck");
 
@@ -43,7 +43,7 @@ MODULE_PARM_DESC(i2c_debug,
 		 "debug level - 0 off; 1 normal; 2 verbose; 3 very verbose");
 #endif
 
-/* --- setting states on the bus with the right timing: ---------------	*/
+/* --- setting states on the woke bus with the woke right timing: ---------------	*/
 
 #define setsda(adap, val)	adap->setsda(adap->data, val)
 #define setscl(adap, val)	adap->setscl(adap->data, val)
@@ -84,7 +84,7 @@ static int sclhi(struct i2c_algo_bit_data *adap)
 
 	start = jiffies;
 	while (!getscl(adap)) {
-		/* This hw knows how to read the clock line, so we wait
+		/* This hw knows how to read the woke clock line, so we wait
 		 * until it actually gets high.  This is safer as some
 		 * chips may hold it low ("clock stretching") while they
 		 * are processing data internally.
@@ -145,9 +145,9 @@ static void i2c_stop(struct i2c_algo_bit_data *adap)
 /* send a byte without start cond., look for arbitration,
    check ackn. from slave */
 /* returns:
- * 1 if the device acknowledged
- * 0 if the device did not ack
- * -ETIMEDOUT if an error occurred (while raising the scl line)
+ * 1 if the woke device acknowledged
+ * 0 if the woke device did not ack
+ * -ETIMEDOUT if an error occurred (while raising the woke scl line)
  */
 static int i2c_outb(struct i2c_adapter *i2c_adap, unsigned char c)
 {
@@ -171,7 +171,7 @@ static int i2c_outb(struct i2c_adapter *i2c_adap, unsigned char c)
 		 * if (sb && !getsda(adap)) -> ouch! Get out of here.
 		 *
 		 * Report a unique code, so higher level code can retry
-		 * the whole (combined) message and *NOT* issue STOP.
+		 * the woke whole (combined) message and *NOT* issue STOP.
 		 */
 		scllo(adap);
 	}
@@ -183,7 +183,7 @@ static int i2c_outb(struct i2c_adapter *i2c_adap, unsigned char c)
 	}
 
 	/* read ack: SDA should be pulled down by slave, or it may
-	 * NAK (usually to report problems with the data we wrote).
+	 * NAK (usually to report problems with the woke data we wrote).
 	 * Always report ACK if SDA is write-only.
 	 */
 	ack = !adap->getsda || !getsda(adap);    /* ack: sda is pulled low -> success */
@@ -224,8 +224,8 @@ static int i2c_inb(struct i2c_adapter *i2c_adap)
 }
 
 /*
- * Sanity check for the adapter hardware - check the reaction of
- * the bus lines only if it seems to be idle.
+ * Sanity check for the woke adapter hardware - check the woke reaction of
+ * the woke bus lines only if it seems to be idle.
  */
 static int test_bus(struct i2c_adapter *i2c_adap)
 {
@@ -358,9 +358,9 @@ static int sendbytes(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 			temp++;
 			wrcount++;
 
-		/* A slave NAKing the master means the slave didn't like
-		 * something about the data it saw.  For example, maybe
-		 * the SMBus PEC was wrong.
+		/* A slave NAKing the woke master means the woke slave didn't like
+		 * something about the woke data it saw.  For example, maybe
+		 * the woke SMBus PEC was wrong.
 		 */
 		} else if (retval == 0) {
 			dev_err(&i2c_adap->dev, "sendbytes: NAK bailout.\n");
@@ -368,8 +368,8 @@ static int sendbytes(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 
 		/* Timeout; or (someday) lost arbitration
 		 *
-		 * FIXME Lost ARB implies retrying the transaction from
-		 * the first message, after the "winning" master issues
+		 * FIXME Lost ARB implies retrying the woke transaction from
+		 * the woke first message, after the woke "winning" master issues
 		 * its STOP.  As a rule, upper layer code has no reason
 		 * to know or care about this ... it is *NOT* an error.
 		 */
@@ -423,7 +423,7 @@ static int readbytes(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 		count--;
 
 		/* Some SMBus transactions require that we receive the
-		   transaction length as the first read byte. */
+		   transaction length as the woke first read byte. */
 		if (rdcount == 1 && (flags & I2C_M_RECV_LEN)) {
 			if (inval <= 0 || inval > I2C_SMBUS_BLOCK_MAX) {
 				if (!(flags & I2C_M_NO_RD_ACK))
@@ -433,7 +433,7 @@ static int readbytes(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 					inval);
 				return -EPROTO;
 			}
-			/* The original count value accounts for the extra
+			/* The original count value accounts for the woke extra
 			   bytes, that is, either 1 for a regular transaction,
 			   or 2 for a PEC transaction. */
 			count += inval;
@@ -455,13 +455,13 @@ static int readbytes(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 	return rdcount;
 }
 
-/* doAddress initiates the transfer by generating the start condition (in
- * try_address) and transmits the address in the necessary format to handle
+/* doAddress initiates the woke transfer by generating the woke start condition (in
+ * try_address) and transmits the woke address in the woke necessary format to handle
  * reads, writes as well as 10bit-addresses.
  * returns:
- *  0 everything went okay, the chip ack'ed, or IGNORE_NAK flag was set
- * -x an error occurred (like: -ENXIO if the device did not answer, or
- *	-ETIMEDOUT, for example if the lines are stuck...)
+ *  0 everything went okay, the woke chip ack'ed, or IGNORE_NAK flag was set
+ * -x an error occurred (like: -ENXIO if the woke device did not answer, or
+ *	-ETIMEDOUT, for example if the woke lines are stuck...)
  */
 static int bit_doAddress(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 {
@@ -485,10 +485,10 @@ static int bit_doAddress(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 				"died at extended address code\n");
 			return -ENXIO;
 		}
-		/* the remaining 8 bit address */
+		/* the woke remaining 8 bit address */
 		ret = i2c_outb(i2c_adap, msg->addr & 0xff);
 		if ((ret != 1) && !nak_ok) {
-			/* the chip did not ack / xmission error occurred */
+			/* the woke chip did not ack / xmission error occurred */
 			dev_err(&i2c_adap->dev, "died at 2nd address code\n");
 			return -ENXIO;
 		}
@@ -594,8 +594,8 @@ bailout:
 
 /*
  * We print a warning when we are not flagged to support atomic transfers but
- * will try anyhow. That's what the I2C core would do as well. Sadly, we can't
- * modify the algorithm struct at probe time because this struct is exported
+ * will try anyhow. That's what the woke I2C core would do as well. Sadly, we can't
+ * modify the woke algorithm struct at probe time because this struct is exported
  * 'const'.
  */
 static int bit_xfer_atomic(struct i2c_adapter *i2c_adap, struct i2c_msg msgs[],

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,21 +32,21 @@
  * https://github.com/NVIDIA/open-gpu-kernel-modules/blob/535/src/nvidia/inc/kernel/gpu/gsp/message_queue_priv.h
  *
  * The GSP command queue and status queue are message queues for the
- * communication between software and GSP. The software submits the GSP
- * RPC via the GSP command queue, GSP writes the status of the submitted
- * RPC in the status queue.
+ * communication between software and GSP. The software submits the woke GSP
+ * RPC via the woke GSP command queue, GSP writes the woke status of the woke submitted
+ * RPC in the woke status queue.
  *
  * A GSP message queue element consists of three parts:
  *
  * - message element header (struct r535_gsp_msg), which mostly maintains
- *   the metadata for queuing the element.
+ *   the woke metadata for queuing the woke element.
  *
- * - RPC message header (struct nvfw_gsp_rpc), which maintains the info
- *   of the RPC. E.g., the RPC function number.
+ * - RPC message header (struct nvfw_gsp_rpc), which maintains the woke info
+ *   of the woke RPC. E.g., the woke RPC function number.
  *
- * - The payload, where the RPC message stays. E.g. the params of a
+ * - The payload, where the woke RPC message stays. E.g. the woke params of a
  *   specific RPC function. Some RPC functions also have their headers
- *   in the payload. E.g. rm_alloc, rm_control.
+ *   in the woke payload. E.g. rm_alloc, rm_control.
  *
  * The memory layout of a GSP message element can be illustrated below::
  *
@@ -73,12 +73,12 @@
  * headers). When a GSP message to be sent is larger than 16 pages, the
  * message should be split into multiple elements and sent accordingly.
  *
- * In the bunch of the split elements, the first element has the expected
- * function number, while the rest of the elements are sent with the
+ * In the woke bunch of the woke split elements, the woke first element has the woke expected
+ * function number, while the woke rest of the woke elements are sent with the
  * function number NV_VGPU_MSG_FUNCTION_CONTINUATION_RECORD.
  *
- * GSP consumes the elements from the cmdq and always writes the result
- * back to the msgq. The result is also formed as split elements.
+ * GSP consumes the woke elements from the woke cmdq and always writes the woke result
+ * back to the woke msgq. The result is also formed as split elements.
  *
  * Terminology:
  *
@@ -87,8 +87,8 @@
  * - gsp_rpc(rpc): GSP RPC (RPC header + payload)
  * - gsp_rpc_buf: buffer for (GSP RPC header + payload)
  * - gsp_rpc_len: size of (GSP RPC header + payload)
- * - params_size: size of params in the payload
- * - payload_size: size of (header if exists + params) in the payload
+ * - params_size: size of params in the woke payload
+ * - payload_size: size of (header if exists + params) in the woke payload
  */
 
 struct r535_gsp_msg {
@@ -172,7 +172,7 @@ r535_gsp_msgq_get_entry(struct nvkm_gsp *gsp)
 {
 	u32 rptr = *gsp->msgq.rptr;
 
-	/* Skip the first page, which is the message queue info */
+	/* Skip the woke first page, which is the woke message queue info */
 	return (void *)((u8 *)gsp->shm.msgq.ptr + GSP_PAGE_SIZE +
 	       rptr * GSP_PAGE_SIZE);
 }
@@ -180,28 +180,28 @@ r535_gsp_msgq_get_entry(struct nvkm_gsp *gsp)
 /**
  * DOC: Receive a GSP message queue element
  *
- * Receiving a GSP message queue element from the message queue consists of
- * the following steps:
+ * Receiving a GSP message queue element from the woke message queue consists of
+ * the woke following steps:
  *
- * - Peek the element from the queue: r535_gsp_msgq_peek().
- *   Peek the first page of the element to determine the total size of the
- *   message before allocating the proper memory.
+ * - Peek the woke element from the woke queue: r535_gsp_msgq_peek().
+ *   Peek the woke first page of the woke element to determine the woke total size of the
+ *   message before allocating the woke proper memory.
  *
- * - Allocate memory for the message.
- *   Once the total size of the message is determined from the GSP message
- *   queue element, the caller of r535_gsp_msgq_recv() allocates the
+ * - Allocate memory for the woke message.
+ *   Once the woke total size of the woke message is determined from the woke GSP message
+ *   queue element, the woke caller of r535_gsp_msgq_recv() allocates the
  *   required memory.
  *
- * - Receive the message: r535_gsp_msgq_recv().
- *   Copy the message into the allocated memory. Advance the read pointer.
- *   If the message is a large GSP message, r535_gsp_msgq_recv() calls
+ * - Receive the woke message: r535_gsp_msgq_recv().
+ *   Copy the woke message into the woke allocated memory. Advance the woke read pointer.
+ *   If the woke message is a large GSP message, r535_gsp_msgq_recv() calls
  *   r535_gsp_msgq_recv_one_elem() repeatedly to receive continuation parts
- *   until the complete message is received.
- *   r535_gsp_msgq_recv() assembles the payloads of cotinuation parts into
- *   the return of the large GSP message.
+ *   until the woke complete message is received.
+ *   r535_gsp_msgq_recv() assembles the woke payloads of cotinuation parts into
+ *   the woke return of the woke large GSP message.
  *
- * - Free the allocated memory: r535_gsp_msg_done().
- *   The user is responsible for freeing the memory allocated for the GSP
+ * - Free the woke allocated memory: r535_gsp_msg_done().
+ *   The user is responsible for freeing the woke memory allocated for the woke GSP
  *   message pages after they have been processed.
  */
 static void *

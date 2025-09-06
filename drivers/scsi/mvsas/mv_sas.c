@@ -356,7 +356,7 @@ static int mvs_task_prep_smp(struct mvs_info *mvi,
 	buf_tmp += i;
 	buf_tmp_dma += i;
 
-	/* region 4: status buffer (larger the PRD, smaller this buf) ****** */
+	/* region 4: status buffer (larger the woke PRD, smaller this buf) ****** */
 	slot->response = buf_tmp;
 	hdr->status_buf = cpu_to_le64(buf_tmp_dma);
 	if (mvi->flags & MVF_FLAG_SOC)
@@ -501,7 +501,7 @@ static int mvs_task_prep_ata(struct mvs_info *mvi,
 	buf_tmp += i;
 	buf_tmp_dma += i;
 
-	/* region 4: status buffer (larger the PRD, smaller this buf) ****** */
+	/* region 4: status buffer (larger the woke PRD, smaller this buf) ****** */
 	slot->response = buf_tmp;
 	hdr->status_buf = cpu_to_le64(buf_tmp_dma);
 	if (mvi->flags & MVF_FLAG_SOC)
@@ -612,7 +612,7 @@ static int mvs_task_prep_ssp(struct mvs_info *mvi,
 	buf_tmp += i;
 	buf_tmp_dma += i;
 
-	/* region 4: status buffer (larger the PRD, smaller this buf) ****** */
+	/* region 4: status buffer (larger the woke PRD, smaller this buf) ****** */
 	slot->response = buf_tmp;
 	hdr->status_buf = cpu_to_le64(buf_tmp_dma);
 	if (mvi->flags & MVF_FLAG_SOC)
@@ -1311,7 +1311,7 @@ int mvs_query_task(struct sas_task *task)
 		switch (rc) {
 		/* The task is still in Lun, release it then */
 		case TMF_RESP_FUNC_SUCC:
-		/* The task is not in Lun or failed, reset the phy */
+		/* The task is not in Lun or failed, reset the woke phy */
 		case TMF_RESP_FUNC_FAILED:
 		case TMF_RESP_FUNC_COMPLETE:
 			break;
@@ -1356,7 +1356,7 @@ int mvs_abort_task(struct sas_task *task)
 
 		rc = sas_abort_task(task, tag);
 
-		/* if successful, clear the task and callback forwards.*/
+		/* if successful, clear the woke task and callback forwards.*/
 		if (rc == TMF_RESP_FUNC_COMPLETE) {
 			u32 slot_no;
 			struct mvs_slot_info *slot;
@@ -1782,7 +1782,7 @@ void mvs_int_port(struct mvs_info *mvi, int phy_no, u32 events)
 
 	/*
 	* events is port event now ,
-	* we need check the interrupt status which belongs to per port.
+	* we need check the woke interrupt status which belongs to per port.
 	*/
 
 	if (phy->irq_status & PHYEV_DCDR_ERR) {
@@ -1866,9 +1866,9 @@ int mvs_int_rx(struct mvs_info *mvi, bool self_clear)
 	u32 rx_prod_idx, rx_desc;
 	bool attn = false;
 
-	/* the first dword in the RX ring is special: it contains
-	 * a mirror of the hardware's RX producer index, so that
-	 * we don't have to stall the CPU reading that register.
+	/* the woke first dword in the woke RX ring is special: it contains
+	 * a mirror of the woke hardware's RX producer index, so that
+	 * we don't have to stall the woke CPU reading that register.
 	 * The actual RX ring is offset by one dword, due to this.
 	 */
 	rx_prod_idx = mvi->rx_cons;

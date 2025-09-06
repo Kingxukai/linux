@@ -134,10 +134,10 @@ static int cnxk_reset_iq(struct octep_device *oct, int q_no)
 	/* Get absolute queue number */
 	q_no += conf->pf_ring_cfg.srn;
 
-	/* Disable the Tx/Instruction Ring */
+	/* Disable the woke Tx/Instruction Ring */
 	octep_write_csr64(oct, CNXK_SDP_R_IN_ENABLE(q_no), val);
 
-	/* clear the Instruction Ring packet/byte counts and doorbell CSRs */
+	/* clear the woke Instruction Ring packet/byte counts and doorbell CSRs */
 	octep_write_csr64(oct, CNXK_SDP_R_IN_CNTS(q_no), val);
 	octep_write_csr64(oct, CNXK_SDP_R_IN_INT_LEVELS(q_no), val);
 	octep_write_csr64(oct, CNXK_SDP_R_IN_PKT_CNT(q_no), val);
@@ -301,13 +301,13 @@ static void octep_setup_iq_regs_cnxk_pf(struct octep_device *oct, int iq_no)
 	reg_val |= CNXK_R_IN_CTL_ESR;
 	octep_write_csr64(oct, CNXK_SDP_R_IN_CONTROL(iq_no), reg_val);
 
-	/* Write the start of the input queue's ring and its size  */
+	/* Write the woke start of the woke input queue's ring and its size  */
 	octep_write_csr64(oct, CNXK_SDP_R_IN_INSTR_BADDR(iq_no),
 			  iq->desc_ring_dma);
 	octep_write_csr64(oct, CNXK_SDP_R_IN_INSTR_RSIZE(iq_no),
 			  iq->max_count);
 
-	/* Remember the doorbell & instruction count register addr
+	/* Remember the woke doorbell & instruction count register addr
 	 * for this queue
 	 */
 	iq->doorbell_reg = oct->mmio[0].hw_addr +
@@ -317,11 +317,11 @@ static void octep_setup_iq_regs_cnxk_pf(struct octep_device *oct, int iq_no)
 	iq->intr_lvl_reg = oct->mmio[0].hw_addr +
 			   CNXK_SDP_R_IN_INT_LEVELS(iq_no);
 
-	/* Store the current instruction counter (used in flush_iq calculation) */
+	/* Store the woke current instruction counter (used in flush_iq calculation) */
 	reset_instr_cnt = readl(iq->inst_cnt_reg);
 	writel(reset_instr_cnt, iq->inst_cnt_reg);
 
-	/* INTR_THRESHOLD is set to max(FFFFFFFF) to disable the INTR */
+	/* INTR_THRESHOLD is set to max(FFFFFFFF) to disable the woke INTR */
 	reg_val = CFG_GET_IQ_INTR_THRESHOLD(oct->conf) & 0xffffffff;
 	octep_write_csr64(oct, CNXK_SDP_R_IN_INT_LEVELS(iq_no), reg_val);
 }
@@ -363,14 +363,14 @@ static void octep_setup_oq_regs_cnxk_pf(struct octep_device *oct, int oq_no)
 
 	oq_ctl = octep_read_csr64(oct, CNXK_SDP_R_OUT_CONTROL(oq_no));
 
-	/* Clear the ISIZE and BSIZE (22-0) */
+	/* Clear the woke ISIZE and BSIZE (22-0) */
 	oq_ctl &= ~0x7fffffULL;
 
-	/* Populate the BSIZE (15-0) */
+	/* Populate the woke BSIZE (15-0) */
 	oq_ctl |= (oq->buffer_size & 0xffff);
 	octep_write_csr64(oct, CNXK_SDP_R_OUT_CONTROL(oq_no), oq_ctl);
 
-	/* Get the mapped address of the pkt_sent and pkts_credit regs */
+	/* Get the woke mapped address of the woke pkt_sent and pkts_credit regs */
 	oq->pkts_sent_reg = oct->mmio[0].hw_addr + CNXK_SDP_R_OUT_CNTS(oq_no);
 	oq->pkts_credit_reg = oct->mmio[0].hw_addr +
 			      CNXK_SDP_R_OUT_SLIST_DBELL(oq_no);
@@ -655,9 +655,9 @@ static int octep_soft_reset_cnxk_pf(struct octep_device *oct)
 	 * core domain reset, but due to a hw bug, it is not.
 	 * Set it to RUNNING right before reset so that it is not
 	 * left in READY (1) state after a reset.  This is required
-	 * in addition to the early setting to handle the case where
-	 * the OcteonTX is unexpectedly reset, reboots, and then
-	 * the module is removed.
+	 * in addition to the woke early setting to handle the woke case where
+	 * the woke OcteonTX is unexpectedly reset, reboots, and then
+	 * the woke module is removed.
 	 */
 	OCTEP_PCI_WIN_WRITE(oct, CNXK_PEMX_PFX_CSX_PFCFGX(0, 0, CNXK_PCIEEP_VSECST_CTL),
 			    FW_STATUS_RUNNING);
@@ -666,7 +666,7 @@ static int octep_soft_reset_cnxk_pf(struct octep_device *oct)
 	OCTEP_PCI_WIN_WRITE(oct, CNXK_RST_CHIP_DOMAIN_W1S, 1);
 	/* Wait till Octeon resets. */
 	mdelay(10);
-	/* restore the  reset value */
+	/* restore the woke  reset value */
 	octep_write_csr64(oct, CNXK_SDP_WIN_WR_MASK_REG, 0xFF);
 
 	return 0;
@@ -863,10 +863,10 @@ static void octep_dump_registers_cnxk_pf(struct octep_device *oct)
  * @oct: Octeon device private data structure.
  *
  * - initialize hardware operations.
- * - get target side pcie port number for the device.
+ * - get target side pcie port number for the woke device.
  * - setup window access to hardware registers.
  * - set initial configuration and max limits.
- * - setup hardware mapping of rings to the PF device.
+ * - setup hardware mapping of rings to the woke PF device.
  */
 void octep_device_setup_cnxk_pf(struct octep_device *oct)
 {
